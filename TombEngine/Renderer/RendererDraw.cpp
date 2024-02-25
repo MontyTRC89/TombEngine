@@ -632,12 +632,12 @@ namespace TEN::Renderer
 						{
 							for (auto& poly : bucket.Polygons)
 							{
-								auto centre = Vector3::Transform(poly.Centre, fish.Transform);
-								float dist = (centre - view.Camera.WorldPosition).Length();
+								auto center = Vector3::Transform(poly.Centre, fish.Transform);
+								float dist = (center - view.Camera.WorldPosition).Length();
 
 								auto object = RendererSortableObject{};
 								object.ObjectType = RendererObjectType::MoveableAsStatic;
-								object.Centre = centre;
+								object.Centre = center;
 								object.Distance = dist;
 								object.Bucket = &bucket;
 								object.Mesh = &mesh;

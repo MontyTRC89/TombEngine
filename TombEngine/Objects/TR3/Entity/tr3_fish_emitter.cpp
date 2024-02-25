@@ -228,17 +228,18 @@ namespace TEN::Entities::Creatures::TR3
 			int enemyvelocity = fish.target != fish.leader ? 16 : 26;
 
 			// Randomly adjust target position around target object.
-			fish.XTarget = (GetRandomControl() & 0xFF) - 128;
-			fish.YTarget = (GetRandomControl() & 0xFF) - 122;
-			fish.ZTarget = (GetRandomControl() & 0xFF) - 128;
+			fish.PositionTarget = Vector3i(
+				(GetRandomControl() & 0xFF) - 128,
+				(GetRandomControl() & 0xFF) - 122,
+				(GetRandomControl() & 0xFF) - 128);
 
 			// Calculate desired position based on target object and random offsets.
-			auto desiredPos = fish.target->Pose.Position + Vector3i(fish.XTarget, fish.YTarget, fish.ZTarget);
+			auto desiredPos = fish.target->Pose.Position + fish.PositionTarget;
 			auto dir = desiredPos - fish.Pose.Position;
 
 			auto dirs = dir.ToVector3();
 			dirs.Normalize();
-			auto normalizedDirection = dirs;
+			auto dirNorm = dirs;
 
 			// Define cohesion factor to keep fish close to each other.
 			float distToTarget = dirs.Length();
@@ -248,9 +249,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			// If fish is too far away from leader, make it faster to catch up.
 			if (distToTarget > MAX_DISTANCE_FROM_LEADER)
-			{
 				fish.Velocity += SPEEDUP_FACTOR; 
-			}
 
 			// Make fish move in direction it is facing.
 			auto rotMatrix = fish.Pose.Orientation.ToRotationMatrix();
@@ -279,10 +278,10 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (distToOtherFish < separationDist)
 				{
-					auto separationVector = (fish.Pose.Position - otherFish.Pose.Position).ToVector3();
-					separationVector.Normalize();
+					auto separationDir = (fish.Pose.Position - otherFish.Pose.Position).ToVector3();
+					separationDir.Normalize();
 
-					fish.Pose.Position += separationVector * (separationDist - distToOtherFish);
+					fish.Pose.Position += separationDir * (separationDist - distToOtherFish);
 				}
 				else
 				{
@@ -293,10 +292,10 @@ namespace TEN::Entities::Creatures::TR3
 				if ((distToPlayer < separationDist * 3) && !leaderItem.TriggerFlags && LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD)
 				{
 					// Calculate separation vector.
-					auto separationVector = (fish.Pose.Position - LaraItem->Pose.Position).ToVector3();
-					separationVector.Normalize();
+					auto separationDir = (fish.Pose.Position - LaraItem->Pose.Position).ToVector3();
+					separationDir.Normalize();
 
-					auto playerPos = LaraItem->Pose.Position + Vector3i(fish.XTarget, fish.YTarget, fish.ZTarget);
+					auto playerPos = LaraItem->Pose.Position +fish.PositionTarget;
 
 					auto orientTo = Geometry::GetOrientToPoint(fish.Pose.Position.ToVector3(), -playerPos.ToVector3());
 					fish.Pose.Orientation.Lerp(orientTo, 0.1f);

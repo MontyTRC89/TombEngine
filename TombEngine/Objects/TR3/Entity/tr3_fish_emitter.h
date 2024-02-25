@@ -1,5 +1,8 @@
 #pragma once
 #include "Game/items.h"
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -13,9 +16,7 @@ namespace TEN::Entities::Creatures::TR3
 		ItemInfo* leader;
 		short RoomNumber;
 		short Velocity;
-		short YTarget;
-		short XTarget;
-		short ZTarget;
+		Vector3i PositionTarget = Vector3::Zero;
 		BYTE counter;
 
 		Matrix Transform;
