@@ -190,6 +190,7 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* lBackup)
 	// Restore inventory.
 	// It restores even puzzle/key items, to reset them, a ResetHub analog must be made.
 	lara->Inventory = lBackup->Inventory;
+	lara->Status = lBackup->Status;
 	lara->Control.Weapon.LastGunType = lBackup->Control.Weapon.LastGunType;
 	memcpy(&lara->Weapons, &lBackup->Weapons, sizeof(CarriedWeaponInfo) * int(LaraWeaponType::NumWeapons));
 
