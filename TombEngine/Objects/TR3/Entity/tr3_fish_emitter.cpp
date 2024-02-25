@@ -318,18 +318,14 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					const float fleeVel = 20;
 
-					// Calculate separation vector.
 					auto separationDir = (fish.Pose.Position - LaraItem->Pose.Position).ToVector3();
 					separationDir.Normalize();
 
-					// Move fish away from the player along the separation vector.
 					fish.Pose.Position += separationDir * fleeVel;
 
-					// Orient fish away from the player.
 					auto orientTo = Geometry::GetOrientToPoint(fish.Pose.Position.ToVector3(), fish.Pose.Position.ToVector3() + separationDir);
 					fish.Pose.Orientation.Lerp(orientTo, 0.05f);
 
-					// Adjust fish velocity.
 					fish.Velocity -= std::min(fleeVel, fish.target->Animation.Velocity.z - 1.0f);
 				}
 			}
