@@ -316,16 +316,20 @@ namespace TEN::Entities::Creatures::TR3
 				// If player is too close and fish are not lethal, steer away.
 				if ((distToPlayer < separationDist * 3) && fish.Lethal == false && LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD)
 				{
+					const float fleeVel = 20;
+
 					// Calculate separation vector.
 					auto separationDir = (fish.Pose.Position - LaraItem->Pose.Position).ToVector3();
 					separationDir.Normalize();
 
-					auto playerPos = LaraItem->Pose.Position +fish.PositionTarget;
+					// Move fish away from the player along the separation vector.
+					fish.Pose.Position += separationDir * fleeVel;
 
-					auto orientTo = Geometry::GetOrientToPoint(fish.Pose.Position.ToVector3(), -playerPos.ToVector3());
-					fish.Pose.Orientation.Lerp(orientTo, 0.1f);
+					// Orient fish away from the player.
+					auto orientTo = Geometry::GetOrientToPoint(fish.Pose.Position.ToVector3(), fish.Pose.Position.ToVector3() + separationDir);
+					fish.Pose.Orientation.Lerp(orientTo, 0.05f);
 
-					float fleeVel = (distToTarget * COHESION_FACTOR) + Random::GenerateFloat(3.0f, 15.0f);
+					// Adjust fish velocity.
 					fish.Velocity -= std::min(fleeVel, fish.target->Animation.Velocity.z - 1.0f);
 				}
 			}
