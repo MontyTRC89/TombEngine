@@ -85,18 +85,21 @@ float CinematicBarsSpeed = 0;
 
 static bool IsCameraCollidableItem(const ItemInfo& item)
 {
+	// 1) Test distance.
 	float dist = Vector3i::Distance(item.Pose.Position, Camera.pos.ToVector3i());
 	if (dist >= CAMERA_OBJECT_COLL_DIST_THRESHOLD)
 		return false;
 
+	// 2) Test object collidability.
 	const auto& object = Objects[item.ObjectNumber];
 	if (!item.Collidable || !object.usingDrawAnimatingItem)
 		return false;
 
+	// 3) Check object attributes.
 	if (object.intelligent || object.isPickup || object.isPuzzleHole || object.collision == nullptr)
 		return false;
 
-	// Test if any 2 box extents are smaller than threshold.
+	// 4) Test if any 2 box extents are smaller than threshold.
 	auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
 		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
@@ -112,23 +115,26 @@ static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
 {
 	const auto& neighborRoomNumbers = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
 
+	// Collect item pointers.
 	auto itemPtrs = std::vector<const ItemInfo*>{};
 	for (int itemNumber = 0; itemNumber < g_Level.NumItems; itemNumber++)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 
-		// 1) Check if item is birdge.
+		// 1) Check if item is bridge.
 		if (item.IsBridge())
 			continue;
 
-		// 2) Test if item is in neighboring room.
-		if (!Contains(neighborRoomNumbers, (int)item.RoomNumber))
-			continue;
-
+		// 2) Check if room is active.
 		const auto& room = g_Level.Rooms[item.RoomNumber];
 		if (!room.Active())
 			continue;
 		
+		// 3) Test if item is in neighboring room.
+		if (!Contains(neighborRoomNumbers, (int)item.RoomNumber))
+			continue;
+
+		// 4) Test if item is camera-collidable.
 		if (!IsCameraCollidableItem(item))
 			continue;
 
@@ -140,14 +146,16 @@ static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
 
 static bool IsCameraCollideableStatic(const MESH_INFO& staticObject)
 {
+	// 1) Test distance.
 	float dist = Vector3i::Distance(Camera.pos.ToVector3i(), staticObject.pos.Position);
 	if (dist >= CAMERA_OBJECT_COLL_DIST_THRESHOLD)
 		return false;
 
+	// 2) Check if static is visible.
 	if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
 		return false;
 
-	// Test if any 2 box extents are smaller than threshold.
+	// 3) Test if any 2 box extents are smaller than threshold.
 	auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
 	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
 		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
@@ -163,15 +171,19 @@ static std::vector<const MESH_INFO*> GetCameraCollidableStaticPtrs()
 {
 	const auto& neighborRoomNumbers = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
 
+	// Collect static pointers.
 	auto staticPtrs = std::vector<const MESH_INFO*>{};
 	for (int roomNumber : neighborRoomNumbers)
 	{
+		// 1) Check if room is active.
 		const auto& room = g_Level.Rooms[roomNumber];
 		if (!room.Active())
 			continue;
 
+		// Run through statics in room.
 		for (const auto& staticObject : room.mesh)
 		{
+			// 2) Test if static is camera-collidable.
 			if (!IsCameraCollideableStatic(staticObject))
 				continue;
 
