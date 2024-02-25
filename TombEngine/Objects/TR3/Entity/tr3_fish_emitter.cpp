@@ -53,6 +53,9 @@ namespace TEN::Entities::Creatures::TR3
 		item.HitPoints = 24; // NOTE: HitPoints stores fish count.
 		item.ItemFlags[0] = item.Index; // Save leaderitem for little fishes into itemFlags0.
 		item.ItemFlags[1] = item.Index; // Save targetitem for little fishes into itemFlags1.
+		item.ItemFlags[3] = item.HitPoints; //Save Hitpoints (Fish number) into itemFlags3.
+		item.ItemFlags[4] = 0; //Save counter for spawning fishes into itemFlags4. 
+		item.ItemFlags[5] = 0; //Save Hitpoints (Fish number) into item.ItemFlags[5].
 		item.StartPose.Position = item.Pose.Position;
 		item.Animation.Velocity.z = (Random::GenerateInt() & 127) + 32;
 	}
@@ -88,11 +91,49 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto cadaverPos = INVALID_CADAVER_POSITION;
 
-		if (item.HitPoints)
+		/*if (item.ItemFlags[5] && !item.ItemFlags[4])
 		{
 			SpawnFishSwarm(&item);
-			item.HitPoints--;
+			item.ItemFlags[5]--;
+
 		}
+		else 
+			item.ItemFlags[4] = item.HitPoints;*/
+
+
+		if (item.ItemFlags[5] != item.HitPoints)
+		{
+			// Calculate the difference between the current and the previous hit points
+			int hitPointsDifference = item.HitPoints - item.ItemFlags[5];
+
+			// If HitPoints decreased, turn off corresponding number of fish
+			if (hitPointsDifference < 0)
+			{
+				int fishToTurnOff = -hitPointsDifference;
+				for (auto& fish : FishSwarm)
+				{
+					if (fish.leader == &item && fish.on)
+					{
+						fish.on = false;
+						fishToTurnOff--;
+						if (fishToTurnOff == 0)
+							break;
+					}
+				}
+			}
+
+			// If HitPoints increased, spawn corresponding number of fish
+			else if (hitPointsDifference > 0)
+			{
+				for (int i = 0; i < hitPointsDifference; i++)
+					SpawnFishSwarm(&item);
+			}
+
+			// Update ItemFlags to match the current HitPoints
+			item.ItemFlags[5] = item.HitPoints;
+		}
+
+
 
 		GetAITarget(&creature);
 		AI_INFO ai;
@@ -154,6 +195,22 @@ namespace TEN::Entities::Creatures::TR3
 
 				fish.RoomNumber = item.RoomNumber;
 				fish.target = &g_Level.Items[item.ItemFlags[1]];
+
+				/*if (item.ItemFlags[3] != item.HitPoints)
+				{
+					if (item.ItemFlags[4] > 0)
+					{
+						fish.on = false;
+						NextFish = 0;
+						item.ItemFlags[4]--;
+					}
+					else
+					{
+						item.ItemFlags[3] = item.HitPoints;
+						item.ItemFlags[5] = item.HitPoints;
+					}
+					
+				}	*/		
 			}
 		}
 	}
