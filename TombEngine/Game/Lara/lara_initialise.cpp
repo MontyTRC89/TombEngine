@@ -62,7 +62,7 @@ void InitializeLara(bool restore)
 	}
 	else
 	{
-		InitializeLaraDefaultInventory();
+		InitializeLaraDefaultInventory(LaraItem);
 		LaraItem->HitPoints = LARA_HEALTH_MAX;
 	}
 
@@ -83,54 +83,11 @@ void InitializeLaraMeshes(ItemInfo* item)
 
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 		item->Model.MeshIndex[i] = item->Model.BaseMesh + i;
+}
 
-	switch (lara->Control.Weapon.GunType)
-	{
-	case LaraWeaponType::Shotgun:
-		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Present)
-			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Shotgun;
-		break;
-
-	case LaraWeaponType::Crossbow:
-		if (lara->Weapons[(int)LaraWeaponType::Crossbow].Present)
-			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Crossbow;
-		break;
-
-	case LaraWeaponType::HarpoonGun:
-		if (lara->Weapons[(int)LaraWeaponType::HarpoonGun].Present)
-			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Harpoon;
-		break;
-
-	case LaraWeaponType::GrenadeLauncher:
-		if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
-			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::GrenadeLauncher;
-		break;
-
-	case LaraWeaponType::RocketLauncher:
-		if (lara->Weapons[(int)LaraWeaponType::RocketLauncher].Present)
-			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::RocketLauncher;
-		break;
-
-	case LaraWeaponType::HK:
-		if (lara->Weapons[(int)LaraWeaponType::HK].Present)
-			lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::HK;
-		break;
-
-	default:
-		lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
-		break;
-	}
-
-	if (lara->Weapons[(int)LaraWeaponType::Pistol].Present)
-	{
-		Lara.Control.Weapon.HolsterInfo.LeftHolster =
-		Lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Pistols;
-	}
-	else
-	{
-		Lara.Control.Weapon.HolsterInfo.LeftHolster =
-		Lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
-	}
+void InitializeLaraAnims(ItemInfo* item)
+{
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.HandStatus = HandStatus::Free;
 	lara->TargetEntity = nullptr;
@@ -138,11 +95,6 @@ void InitializeLaraMeshes(ItemInfo* item)
 	lara->RightArm.FrameNumber = 0;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
-}
-
-void InitializeLaraAnims(ItemInfo* item)
-{
-	auto* lara = GetLaraInfo(item);
 
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
@@ -192,6 +144,7 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* lBackup)
 	lara->Inventory = lBackup->Inventory;
 	lara->Status = lBackup->Status;
 	lara->Control.Weapon.LastGunType = lBackup->Control.Weapon.LastGunType;
+	lara->Control.Weapon.HolsterInfo = lBackup->Control.Weapon.HolsterInfo;
 	memcpy(&lara->Weapons, &lBackup->Weapons, sizeof(CarriedWeaponInfo) * int(LaraWeaponType::NumWeapons));
 
 	// If no flare present, quit
@@ -207,32 +160,45 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* lBackup)
 	DrawFlareMeshes(*item);
 }
 
-void InitializeLaraDefaultInventory()
+void InitializeLaraDefaultInventory(ItemInfo* item)
 {
+	auto* lara = GetLaraInfo(item);
+
 	if (Objects[ID_FLARE_INV_ITEM].loaded)
-		Lara.Inventory.TotalFlares = 3;
+		lara->Inventory.TotalFlares = 3;
 
 	if (Objects[ID_SMALLMEDI_ITEM].loaded)
-		Lara.Inventory.TotalSmallMedipacks = 3;
+		lara->Inventory.TotalSmallMedipacks = 3;
 
 	if (Objects[ID_BIGMEDI_ITEM].loaded)
-		Lara.Inventory.TotalLargeMedipacks = 1;
+		lara->Inventory.TotalLargeMedipacks = 1;
 
 	if (Objects[ID_BINOCULARS_ITEM].loaded)
-		Lara.Inventory.HasBinoculars = true;
+		lara->Inventory.HasBinoculars = true;
 
-	Lara.Inventory.BeetleLife = 3;
+	lara->Inventory.BeetleLife = 3;
 
-	LaraWeaponType weapon = LaraWeaponType::None;
+	auto weapon = LaraWeaponType::None;
 
 	if (Objects[ID_PISTOLS_ITEM].loaded)
 	{
 		weapon = LaraWeaponType::Pistol;
-		Lara.Weapons[(int)LaraWeaponType::Pistol].Present = true;
-		Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+		lara->Weapons[(int)LaraWeaponType::Pistol].Present = true;
+		lara->Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
 	}
 
-	Lara.Control.Weapon.LastGunType =
-	Lara.Control.Weapon.GunType =
-	Lara.Control.Weapon.RequestGunType = weapon;
+	lara->Control.Weapon.LastGunType =
+	lara->Control.Weapon.GunType =
+	lara->Control.Weapon.RequestGunType = weapon;
+
+	if (lara->Weapons[(int)LaraWeaponType::Pistol].Present)
+	{
+		lara->Control.Weapon.HolsterInfo.LeftHolster =
+		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Pistols;
+	}
+	else
+	{
+		lara->Control.Weapon.HolsterInfo.LeftHolster =
+		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
+	}
 }
