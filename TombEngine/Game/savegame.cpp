@@ -2234,6 +2234,14 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 			// Hit points
 			item->HitPoints = savedItem->hit_points();
+
+			// Mesh stuff
+			item->MeshBits = savedItem->mesh_bits();
+
+			item->Model.BaseMesh = savedItem->base_mesh();
+			item->Model.MeshIndex.resize(savedItem->mesh_pointers()->size());
+			for (int j = 0; j < savedItem->mesh_pointers()->size(); j++)
+				item->Model.MeshIndex[j] = savedItem->mesh_pointers()->Get(j);
 		}
 
 		item->Animation.Velocity = ToVector3(savedItem->velocity());
@@ -2276,14 +2284,6 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 		item->Effect.SecondaryEffectColor = ToVector3(savedItem->effect_secondary_colour());
 		item->Effect.LightColor = ToVector3(savedItem->effect_light_colour());
 		item->Effect.Count = savedItem->effect_count();
-
-		// Mesh stuff
-		item->MeshBits = savedItem->mesh_bits();
-
-		item->Model.BaseMesh = savedItem->base_mesh();
-		item->Model.MeshIndex.resize(savedItem->mesh_pointers()->size());
-		for (int j = 0; j < savedItem->mesh_pointers()->size(); j++)
-			item->Model.MeshIndex[j] = savedItem->mesh_pointers()->Get(j);
 
 		if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8 &&
 			(item->Flags & ONESHOT))
