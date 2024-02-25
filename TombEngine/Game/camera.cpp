@@ -21,17 +21,17 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-
-using TEN::Renderer::g_Renderer;
+#include "Specific/trutils.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Utils;
+using TEN::Renderer::g_Renderer;
 
 constexpr auto PARTICLE_FADE_THRESHOLD = BLOCK(14);
 constexpr auto COLL_CHECK_THRESHOLD    = BLOCK(4);
-constexpr auto COLL_CANCEL_THRESHOLD   = BLOCK(2);
 constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS           = CLICK(1);
 
@@ -1472,12 +1472,12 @@ float GetParticleDistanceFade(const Vector3i& pos)
 	return std::clamp(1.0f - ((dist - PARTICLE_FADE_THRESHOLD) / COLL_CHECK_THRESHOLD), 0.0f, 1.0f);
 }
 
-void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius)
+void ItemPushCamera(const GameBoundingBox* bounds, const Pose* pose, short radius)
 {
-	int dx = Camera.pos.x - pos->Position.x;
-	int dz = Camera.pos.z - pos->Position.z;
-	auto sinY = phd_sin(pos->Orientation.y);
-	auto cosY = phd_cos(pos->Orientation.y);
+	int dx = Camera.pos.x - pose->Position.x;
+	int dz = Camera.pos.z - pose->Position.z;
+	auto sinY = phd_sin(pose->Orientation.y);
+	auto cosY = phd_cos(pose->Orientation.y);
 	auto x = (dx * cosY) - (dz * sinY);
 	auto z = (dx * sinY) + (dz * cosY);
 
@@ -1496,39 +1496,59 @@ void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius)
 
 	// Left is closest.
 	if (left <= right && left <= top && left <= bottom)
+	{
 		x -= left;
+	}
 	// Right is closest.
 	else if (right <= left && right <= top && right <= bottom)
+	{
 		x += right;
+	}
 	// Top is closest.
 	else if (top <= left && top <= right && top <= bottom)
+	{
 		z += top;
+	}
 	// Bottom is closest.
 	else
+	{
 		z -= bottom;
+	}
 
-	Camera.pos.x = pos->Position.x + ((x * cosY) + (z * sinY));
-	Camera.pos.z = pos->Position.z + ((z * cosY) - (x * sinY));
+	Camera.pos.x = pose->Position.x + ((x * cosY) + (z * sinY));
+	Camera.pos.z = pose->Position.z + ((z * cosY) - (x * sinY));
 
 	auto pointColl = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber);
-	if (pointColl.Position.Floor == NO_HEIGHT || Camera.pos.y > pointColl.Position.Floor || Camera.pos.y < pointColl.Position.Ceiling)
+	if (pointColl.Position.Floor == NO_HEIGHT ||
+		Camera.pos.y > pointColl.Position.Floor ||
+		Camera.pos.y < pointColl.Position.Ceiling)
+	{
 		Camera.pos = GameVector(CamOldPos, pointColl.RoomNumber);
+	}
 }
 
-bool CheckItemCollideCamera(ItemInfo* item)
+// TODO
+//static std::optional<Vector3> GetCameraItemRayIntersect(const ItemInfo& item)
+//{
+//
+//}
+
+static bool TestCameraItemCollision(const ItemInfo& item)
 {
-	bool isCloseEnough = Vector3i::Distance(item->Pose.Position, Camera.pos.ToVector3i()) <= COLL_CHECK_THRESHOLD;
-
-	if (!isCloseEnough || !item->Collidable || !Objects[item->ObjectNumber].usingDrawAnimatingItem)
+	float dist = Vector3i::Distance(item.Pose.Position, Camera.pos.ToVector3i());
+	if (dist >= COLL_CHECK_THRESHOLD)
 		return false;
 
-	// TODO: Find a better way to define objects which are collidable with camera.
-	auto* object = &Objects[item->ObjectNumber];
-	if (object->intelligent || object->isPickup || object->isPuzzleHole || object->collision == nullptr)
+	const auto& object = Objects[item.ObjectNumber];
+	if (!item.Collidable || !object.usingDrawAnimatingItem)
 		return false;
 
-	// Check extents; if any 2 bounds are smaller than threshold, discard.
-	auto extents = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose).Extents;
+	// TODO: Find better way to define objects which are collidable with camera.
+	if (object.intelligent || object.isPickup || object.isPuzzleHole || object.collision == nullptr)
+		return false;
+
+	// Test if any 2 box extents are smaller than threshold.
+	auto extents = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose).Extents;
 	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
@@ -1539,46 +1559,47 @@ bool CheckItemCollideCamera(ItemInfo* item)
 	return true;
 }
 
-static std::vector<int> FillCollideableItemList()
+static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
 {
-	auto itemList = std::vector<int>{};
-	auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
+	const auto& neighborRoomNumbers = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
 
-	for (short i = 0; i < g_Level.NumItems; i++)
+	auto itemPtrs = std::vector<const ItemInfo*>{};
+	for (int itemNumber = 0; itemNumber < g_Level.NumItems; itemNumber++)
 	{
-		const auto& item = g_Level.Items[i];
+		const auto& item = g_Level.Items[itemNumber];
 
-		if (std::find(roomList.begin(), roomList.end(), item.RoomNumber) == roomList.end())
+		if (!Contains(neighborRoomNumbers, (int)item.RoomNumber))
 			continue;
 
-		if (!g_Level.Rooms[item.RoomNumber].Active())
+		const auto& room = g_Level.Rooms[item.RoomNumber];
+		if (!room.Active())
 			continue;
 
-		if (!CheckItemCollideCamera(&g_Level.Items[i]))
+		if (!TestCameraItemCollision(item))
 			continue;
 
-		itemList.push_back(i);
+		itemPtrs.push_back(&item);
 	}
 
-	return itemList;
+	return itemPtrs;
 }
 
-bool CheckStaticCollideCamera(MESH_INFO* mesh)
+static bool TestCameraStaticCollision(const MESH_INFO& staticObject)
 {
-	bool isCloseEnough = Vector3i::Distance(mesh->pos.Position, Camera.pos.ToVector3i()) <= COLL_CHECK_THRESHOLD;
-	if (!isCloseEnough)
+	float dist = Vector3i::Distance(Camera.pos.ToVector3i(), staticObject.pos.Position);
+	if (dist >= COLL_CHECK_THRESHOLD)
 		return false;
 
-	if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+	if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
 		return false;
 
-	const auto& bounds = GetBoundsAccurate(*mesh, false);
+	const auto& bounds = GetBoundsAccurate(staticObject, false);
 	auto extents = Vector3(
 		abs(bounds.X1 - bounds.X2),
 		abs(bounds.Y1 - bounds.Y2),
 		abs(bounds.Z1 - bounds.Z2));
 
-	// Check extents; if any two bounds are smaller than threshold, discard.
+	// Test if any 2 box extents are smaller than threshold.
 	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
@@ -1589,82 +1610,72 @@ bool CheckStaticCollideCamera(MESH_INFO* mesh)
 	return true;
 }
 
-std::vector<MESH_INFO*> FillCollideableStaticsList()
+static std::vector<const MESH_INFO*> GetCameraCollidableStaticPtrs()
 {
-	std::vector<MESH_INFO*> staticList;
-	auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
+	const auto& neighborRoomNumbers = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
 
-	for (int i : roomList)
+	auto staticPtrs = std::vector<const MESH_INFO*>{};
+	for (int roomNumber : neighborRoomNumbers)
 	{
-		auto* room = &g_Level.Rooms[i];
-
-		if (!room->Active())
+		const auto& room = g_Level.Rooms[roomNumber];
+		if (!room.Active())
 			continue;
 
-		for (short j = 0; j < room->mesh.size(); j++)
+		for (const auto& staticObject : room.mesh)
 		{
-			if (!CheckStaticCollideCamera(&room->mesh[j]))
+			if (!TestCameraStaticCollision(staticObject))
 				continue;
 
-			staticList.push_back(&room->mesh[j]);
+			staticPtrs.push_back(&staticObject);
 		}
 	}
 
-	return staticList;
+	return staticPtrs;
 }
 
 void ItemsCollideCamera()
 {
-	constexpr auto RADIUS = CLICK(0.5f);
+	constexpr auto BREAK_DIST	   = BLOCK(2);
+	constexpr auto RADIUS		   = CLICK(0.5f);
+	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
 
-	auto itemList = FillCollideableItemList();
-
-	// Collide with items in the items list.
-	for (int i = 0; i < itemList.size(); i++)
+	// Collide with items.
+	auto itemPtrs = GetCameraCollidableItemPtrs();
+	for (const auto* itemPtr : itemPtrs)
 	{
-		auto* item = &g_Level.Items[itemList[i]];
-		if (!item)
-			return;
-
-		// Break off if camera is stuck behind an object and the player runs off.
-		auto distance = Vector3i::Distance(item->Pose.Position, LaraItem->Pose.Position);
-		if (distance > COLL_CANCEL_THRESHOLD)
+		if (itemPtr == nullptr)
 			continue;
 
-		auto bounds = GameBoundingBox(item);
-		if (TestBoundsCollideCamera(bounds, item->Pose, CAMERA_RADIUS))
-			ItemPushCamera(&bounds, &item->Pose, RADIUS);
-
-		TEN::Renderer::g_Renderer.AddDebugBox(
-			bounds.ToBoundingOrientedBox(item->Pose),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
-	}
-
-	// Done.
-	itemList.clear();
-
-	// Collide with static meshes.
-	auto staticList = FillCollideableStaticsList();
-	for (auto* mesh : staticList)
-	{
-		if (!mesh)
-			return;
-
-		auto distance = Vector3i::Distance(mesh->pos.Position, LaraItem->Pose.Position);
-		if (distance > COLL_CANCEL_THRESHOLD)
+		// Break off if camera is stuck behind object and player is too far.
+		float dist = Vector3i::Distance(itemPtr->Pose.Position, LaraItem->Pose.Position);
+		if (dist > BREAK_DIST)
 			continue;
 
-		auto bounds = GetBoundsAccurate(*mesh, false);
-		if (TestBoundsCollideCamera(bounds, mesh->pos, CAMERA_RADIUS))
-			ItemPushCamera(&bounds, &mesh->pos, RADIUS);
+		auto bounds = GameBoundingBox(itemPtr);
+		if (TestBoundsCollideCamera(bounds, itemPtr->Pose, CAMERA_RADIUS))
+			ItemPushCamera(&bounds, &itemPtr->Pose, RADIUS);
 
-		TEN::Renderer::g_Renderer.AddDebugBox(
-			bounds.ToBoundingOrientedBox(mesh->pos),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
+		g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(itemPtr->Pose), DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
 	}
 
-	// Done.
-	staticList.clear();
+	// Collide with statics.
+	auto staticPtrs = GetCameraCollidableStaticPtrs();
+	for (const auto* staticPtr : staticPtrs)
+	{
+		if (staticPtr == nullptr)
+			return;
+
+		// Break off if camera is stuck behind object and player is too far.
+		float dist = Vector3i::Distance(staticPtr->pos.Position, LaraItem->Pose.Position);
+		if (dist > BREAK_DIST)
+			continue;
+
+		auto bounds = GetBoundsAccurate(*staticPtr, false);
+		if (TestBoundsCollideCamera(bounds, staticPtr->pos, CAMERA_RADIUS))
+			ItemPushCamera(&bounds, &staticPtr->pos, RADIUS);
+
+		g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(staticPtr->pos), DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+	}
 }
 
 void UpdateMikePos(const ItemInfo& item)

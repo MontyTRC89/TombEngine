@@ -101,7 +101,7 @@ void ConfirmCameraTargetPos();
 void CalculateCamera(const CollisionInfo& coll);
 void RumbleScreen();
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
-void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius);
+void ItemPushCamera(const GameBoundingBox* bounds, const Pose* pos, short radius);
 void ItemsCollideCamera();
 void ObjCamera(ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID, bool cond);
 void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID);
