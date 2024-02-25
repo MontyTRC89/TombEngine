@@ -71,10 +71,22 @@ namespace TEN::Entities::Creatures::TR3
 		int	ZleaderBoundBack = item->StartPose.Position.z + BLOCK(3);
 
 		// Calculate and return random target within bounds.
-		return Vector3(
+
+		Vector3 validTarget = Vector3(
 			Random::GenerateInt(XleaderBoundLeft, XleaderBoundRight),
 			Random::GenerateInt(YleaderBoundUp, YleaderBoundDown),
 			Random::GenerateInt(ZleaderBoundFront, ZleaderBoundBack));
+
+
+		auto pointColl = GetCollision(validTarget, item->RoomNumber);
+		const auto& room = g_Level.Rooms[item->RoomNumber];
+
+		// Prevent fish from peeking out of water surface.
+		if (pointColl.RoomNumber != NO_ROOM && !TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber) || pointColl.Position.Floor < validTarget.y ||
+			pointColl.Position.Ceiling > validTarget.y)
+			return Vector3::Zero;
+		else
+			return validTarget;
 	}
 
 	void FishSwarmControl(short itemNumber)
@@ -250,8 +262,12 @@ namespace TEN::Entities::Creatures::TR3
 			if (!leaderItem.ItemFlags[2] && fish.target == fish.leader)
 			{
 				fish.target->Pose.Position = GetRandomFishTarget(&leaderItem);
+
+				if (fish.target->Pose.Position != Vector3::Zero)
 				leaderItem.ItemFlags[2] = 1;
 			}
+
+			//g_Renderer.AddDebugSphere(Vector3(fish.target->Pose.Position.x, fish.target->Pose.Position.y, fish.target->Pose.Position.z), 46, Vector4(1, 1, 1, 1), RendererDebugPage::None);
 
 			int enemyvelocity = fish.target != fish.leader ? 16 : 26;
 
