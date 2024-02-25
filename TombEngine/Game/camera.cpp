@@ -33,7 +33,6 @@ using TEN::Renderer::g_Renderer;
 constexpr auto PARTICLE_FADE_THRESHOLD = BLOCK(14);
 constexpr auto COLL_CHECK_THRESHOLD    = BLOCK(4);
 constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
-constexpr auto CAMERA_RADIUS           = CLICK(1);
 
 constexpr auto SWIVEL_STEP_COUNT = 16;
 
@@ -401,6 +400,7 @@ void MoveCamera(GameVector* ideal, float speed)
 		Camera.pos = *ideal;
 	}
 
+	// TODO: Use item collision intersection to recalculate ideal earlier in this function.
 	ItemsCollideCamera();
 
 	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
@@ -895,116 +895,116 @@ bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst)
 	int y = ideal->y;
 	int z = ideal->z;
 
-	CollisionResult probe = {};
+	auto pointColl = CollisionResult{};
 	if (yFirst)
 	{
-		probe = GetCollision(x, y, z, ideal->RoomNumber);
+		pointColl = GetCollision(x, y, z, ideal->RoomNumber);
 
 		int buffer = CLICK(1) - 1;
-		if ((y - buffer) < probe.Position.Ceiling &&
-			(y + buffer) > probe.Position.Floor &&
-			probe.Position.Ceiling < probe.Position.Floor &&
-			probe.Position.Ceiling != NO_HEIGHT &&
-			probe.Position.Floor != NO_HEIGHT)
+		if ((y - buffer) < pointColl.Position.Ceiling &&
+			(y + buffer) > pointColl.Position.Floor &&
+			pointColl.Position.Ceiling < pointColl.Position.Floor &&
+			pointColl.Position.Ceiling != NO_HEIGHT &&
+			pointColl.Position.Floor != NO_HEIGHT)
 		{
-			y = (probe.Position.Floor + probe.Position.Ceiling) / 2;
+			y = (pointColl.Position.Floor + pointColl.Position.Ceiling) / 2;
 		}
-		else if ((y + buffer) > probe.Position.Floor &&
-			probe.Position.Ceiling < probe.Position.Floor &&
-			probe.Position.Ceiling != NO_HEIGHT &&
-			probe.Position.Floor != NO_HEIGHT)
+		else if ((y + buffer) > pointColl.Position.Floor &&
+			pointColl.Position.Ceiling < pointColl.Position.Floor &&
+			pointColl.Position.Ceiling != NO_HEIGHT &&
+			pointColl.Position.Floor != NO_HEIGHT)
 		{
-			y = probe.Position.Floor - buffer;
+			y = pointColl.Position.Floor - buffer;
 		}
-		else if ((y - buffer) < probe.Position.Ceiling &&
-			probe.Position.Ceiling < probe.Position.Floor &&
-			probe.Position.Ceiling != NO_HEIGHT &&
-			probe.Position.Floor != NO_HEIGHT)
+		else if ((y - buffer) < pointColl.Position.Ceiling &&
+			pointColl.Position.Ceiling < pointColl.Position.Floor &&
+			pointColl.Position.Ceiling != NO_HEIGHT &&
+			pointColl.Position.Floor != NO_HEIGHT)
 		{
-			y = probe.Position.Ceiling + buffer;
+			y = pointColl.Position.Ceiling + buffer;
 		}
 	}
 
-	probe = GetCollision(x - push, y, z, ideal->RoomNumber);
-	if (y > probe.Position.Floor ||
-		probe.Position.Floor == NO_HEIGHT ||
-		probe.Position.Ceiling == NO_HEIGHT ||
-		probe.Position.Ceiling >= probe.Position.Floor ||
-		y < probe.Position.Ceiling)
+	pointColl = GetCollision(x - push, y, z, ideal->RoomNumber);
+	if (y > pointColl.Position.Floor ||
+		pointColl.Position.Floor == NO_HEIGHT ||
+		pointColl.Position.Ceiling == NO_HEIGHT ||
+		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
+		y < pointColl.Position.Ceiling)
 	{
-		x = (x & (~1023)) + push;
+		x = (x & (~WALL_MASK)) + push;
 	}
 
-	probe = GetCollision(x, y, z - push, ideal->RoomNumber);
-	if (y > probe.Position.Floor ||
-		probe.Position.Floor == NO_HEIGHT ||
-		probe.Position.Ceiling == NO_HEIGHT ||
-		probe.Position.Ceiling >= probe.Position.Floor ||
-		y < probe.Position.Ceiling)
+	pointColl = GetCollision(x, y, z - push, ideal->RoomNumber);
+	if (y > pointColl.Position.Floor ||
+		pointColl.Position.Floor == NO_HEIGHT ||
+		pointColl.Position.Ceiling == NO_HEIGHT ||
+		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
+		y < pointColl.Position.Ceiling)
 	{
-		z = (z & (~1023)) + push;
+		z = (z & (~WALL_MASK)) + push;
 	}
 
-	probe = GetCollision(x + push, y, z, ideal->RoomNumber);
-	if (y > probe.Position.Floor ||
-		probe.Position.Floor == NO_HEIGHT ||
-		probe.Position.Ceiling == NO_HEIGHT ||
-		probe.Position.Ceiling >= probe.Position.Floor ||
-		y < probe.Position.Ceiling)
+	pointColl = GetCollision(x + push, y, z, ideal->RoomNumber);
+	if (y > pointColl.Position.Floor ||
+		pointColl.Position.Floor == NO_HEIGHT ||
+		pointColl.Position.Ceiling == NO_HEIGHT ||
+		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
+		y < pointColl.Position.Ceiling)
 	{
-		x = (x | 1023) - push;
+		x = (x | WALL_MASK) - push;
 	}
 
-	probe = GetCollision(x, y, z + push, ideal->RoomNumber);
-	if (y > probe.Position.Floor ||
-		probe.Position.Floor == NO_HEIGHT ||
-		probe.Position.Ceiling == NO_HEIGHT ||
-		probe.Position.Ceiling >= probe.Position.Floor ||
-		y < probe.Position.Ceiling)
+	pointColl = GetCollision(x, y, z + push, ideal->RoomNumber);
+	if (y > pointColl.Position.Floor ||
+		pointColl.Position.Floor == NO_HEIGHT ||
+		pointColl.Position.Ceiling == NO_HEIGHT ||
+		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
+		y < pointColl.Position.Ceiling)
 	{
-		z = (z | 1023) - push;
+		z = (z | WALL_MASK) - push;
 	}
 
 	if (!yFirst)
 	{
-		probe = GetCollision(x, y, z, ideal->RoomNumber);
+		pointColl = GetCollision(x, y, z, ideal->RoomNumber);
 
 		int buffer = CLICK(1) - 1;
-		if ((y - buffer) < probe.Position.Ceiling &&
-			(y + buffer) > probe.Position.Floor &&
-			probe.Position.Ceiling < probe.Position.Floor &&
-			probe.Position.Ceiling != NO_HEIGHT &&
-			probe.Position.Floor != NO_HEIGHT)
+		if ((y - buffer) < pointColl.Position.Ceiling &&
+			(y + buffer) > pointColl.Position.Floor &&
+			pointColl.Position.Ceiling < pointColl.Position.Floor &&
+			pointColl.Position.Ceiling != NO_HEIGHT &&
+			pointColl.Position.Floor != NO_HEIGHT)
 		{
-			y = (probe.Position.Floor + probe.Position.Ceiling) / 2;
+			y = (pointColl.Position.Floor + pointColl.Position.Ceiling) / 2;
 		}
-		else if ((y + buffer) > probe.Position.Floor &&
-			probe.Position.Ceiling < probe.Position.Floor &&
-			probe.Position.Ceiling != NO_HEIGHT &&
-			probe.Position.Floor != NO_HEIGHT)
+		else if ((y + buffer) > pointColl.Position.Floor &&
+			pointColl.Position.Ceiling < pointColl.Position.Floor &&
+			pointColl.Position.Ceiling != NO_HEIGHT &&
+			pointColl.Position.Floor != NO_HEIGHT)
 		{
-			y = probe.Position.Floor - buffer;
+			y = pointColl.Position.Floor - buffer;
 		}
-		else if ((y - buffer) < probe.Position.Ceiling &&
-			probe.Position.Ceiling < probe.Position.Floor &&
-			probe.Position.Ceiling != NO_HEIGHT &&
-			probe.Position.Floor != NO_HEIGHT)
+		else if ((y - buffer) < pointColl.Position.Ceiling &&
+			pointColl.Position.Ceiling < pointColl.Position.Floor &&
+			pointColl.Position.Ceiling != NO_HEIGHT &&
+			pointColl.Position.Floor != NO_HEIGHT)
 		{
-			y = probe.Position.Ceiling + buffer;
+			y = pointColl.Position.Ceiling + buffer;
 		}
 	}
 
-	probe = GetCollision(x, y, z, ideal->RoomNumber);
-	if (y > probe.Position.Floor ||
-		y < probe.Position.Ceiling ||
-		probe.Position.Floor == NO_HEIGHT ||
-		probe.Position.Ceiling == NO_HEIGHT ||
-		probe.Position.Ceiling >= probe.Position.Floor)
+	pointColl = GetCollision(x, y, z, ideal->RoomNumber);
+	if (y > pointColl.Position.Floor ||
+		y < pointColl.Position.Ceiling ||
+		pointColl.Position.Floor == NO_HEIGHT ||
+		pointColl.Position.Ceiling == NO_HEIGHT ||
+		pointColl.Position.Ceiling >= pointColl.Position.Floor)
 	{
 		return true;
 	}
 
-	ideal->RoomNumber = probe.RoomNumber;
+	ideal->RoomNumber = pointColl.RoomNumber;
 	ideal->x = x;
 	ideal->y = y;
 	ideal->z = z;
@@ -1472,68 +1472,7 @@ float GetParticleDistanceFade(const Vector3i& pos)
 	return std::clamp(1.0f - ((dist - PARTICLE_FADE_THRESHOLD) / COLL_CHECK_THRESHOLD), 0.0f, 1.0f);
 }
 
-void ItemPushCamera(const GameBoundingBox* bounds, const Pose* pose, short radius)
-{
-	int dx = Camera.pos.x - pose->Position.x;
-	int dz = Camera.pos.z - pose->Position.z;
-	auto sinY = phd_sin(pose->Orientation.y);
-	auto cosY = phd_cos(pose->Orientation.y);
-	auto x = (dx * cosY) - (dz * sinY);
-	auto z = (dx * sinY) + (dz * cosY);
-
-	int xMin = bounds->X1 - radius;
-	int xMax = bounds->X2 + radius;
-	int zMin = bounds->Z1 - radius;
-	int zMax = bounds->Z2 + radius;
-
-	if (x <= xMin || x >= xMax || z <= zMin || z >= zMax)
-		return;
-
-	auto left = x - xMin;
-	auto right = xMax - x;
-	auto top = zMax - z;
-	auto bottom = z - zMin;
-
-	// Left is closest.
-	if (left <= right && left <= top && left <= bottom)
-	{
-		x -= left;
-	}
-	// Right is closest.
-	else if (right <= left && right <= top && right <= bottom)
-	{
-		x += right;
-	}
-	// Top is closest.
-	else if (top <= left && top <= right && top <= bottom)
-	{
-		z += top;
-	}
-	// Bottom is closest.
-	else
-	{
-		z -= bottom;
-	}
-
-	Camera.pos.x = pose->Position.x + ((x * cosY) + (z * sinY));
-	Camera.pos.z = pose->Position.z + ((z * cosY) - (x * sinY));
-
-	auto pointColl = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber);
-	if (pointColl.Position.Floor == NO_HEIGHT ||
-		Camera.pos.y > pointColl.Position.Floor ||
-		Camera.pos.y < pointColl.Position.Ceiling)
-	{
-		Camera.pos = GameVector(CamOldPos, pointColl.RoomNumber);
-	}
-}
-
-// TODO
-//static std::optional<Vector3> GetCameraItemRayIntersect(const ItemInfo& item)
-//{
-//
-//}
-
-static bool TestCameraItemCollision(const ItemInfo& item)
+static bool IsCameraCollidableItem(const ItemInfo& item)
 {
 	float dist = Vector3i::Distance(item.Pose.Position, Camera.pos.ToVector3i());
 	if (dist >= COLL_CHECK_THRESHOLD)
@@ -1575,7 +1514,7 @@ static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
 		if (!room.Active())
 			continue;
 
-		if (!TestCameraItemCollision(item))
+		if (!IsCameraCollidableItem(item))
 			continue;
 
 		itemPtrs.push_back(&item);
@@ -1584,7 +1523,30 @@ static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
 	return itemPtrs;
 }
 
-static bool TestCameraStaticCollision(const MESH_INFO& staticObject)
+static std::optional<Vector3> GetCameraRayBoxIntersect(const BoundingOrientedBox& box)
+{
+	constexpr auto DIST_MIN = 0;// BLOCK(1 / 8.0f);
+
+	auto origin = Camera.target.ToVector3();
+	auto target = Camera.pos.ToVector3();
+	float dist = Vector3::Distance(origin, target);
+
+	auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
+	dir.Normalize();
+
+	// Calculate and return intersection.
+	float intersectDist = 0.0f;
+	if (box.Intersects(origin, dir, intersectDist))
+	{
+		if (intersectDist < dist && intersectDist >= DIST_MIN)
+			return Geometry::TranslatePoint(origin, dir, intersectDist);
+	}
+
+	// No intersection; return nullopt.
+	return std::nullopt;
+}
+
+static bool IsCameraCollideableStatic(const MESH_INFO& staticObject)
 {
 	float dist = Vector3i::Distance(Camera.pos.ToVector3i(), staticObject.pos.Position);
 	if (dist >= COLL_CHECK_THRESHOLD)
@@ -1623,7 +1585,7 @@ static std::vector<const MESH_INFO*> GetCameraCollidableStaticPtrs()
 
 		for (const auto& staticObject : room.mesh)
 		{
-			if (!TestCameraStaticCollision(staticObject))
+			if (!IsCameraCollideableStatic(staticObject))
 				continue;
 
 			staticPtrs.push_back(&staticObject);
@@ -1635,46 +1597,41 @@ static std::vector<const MESH_INFO*> GetCameraCollidableStaticPtrs()
 
 void ItemsCollideCamera()
 {
-	constexpr auto BREAK_DIST	   = BLOCK(2);
-	constexpr auto RADIUS		   = CLICK(0.5f);
+	//constexpr auto BOX_EXTENT_EXTENSION = Vector3(BLOCK(1 / 8.0f));
+
+	constexpr auto CAMERA_RADIUS   = BLOCK(1 / 8.0f);
 	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
 
 	// Collide with items.
 	auto itemPtrs = GetCameraCollidableItemPtrs();
 	for (const auto* itemPtr : itemPtrs)
 	{
-		if (itemPtr == nullptr)
-			continue;
+		auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
+		/*box.Extents.x += BOX_EXTENT_EXTENSION.x;
+		box.Extents.y += BOX_EXTENT_EXTENSION.y;
+		box.Extents.z += BOX_EXTENT_EXTENSION.z;*/
 
-		// Break off if camera is stuck behind object and player is too far.
-		float dist = Vector3i::Distance(itemPtr->Pose.Position, LaraItem->Pose.Position);
-		if (dist > BREAK_DIST)
-			continue;
+		auto intersect = GetCameraRayBoxIntersect(box);
+		if (intersect != std::nullopt)
+			Camera.pos = GameVector(*intersect, Camera.pos.RoomNumber);
 
-		auto bounds = GameBoundingBox(itemPtr);
-		if (TestBoundsCollideCamera(bounds, itemPtr->Pose, CAMERA_RADIUS))
-			ItemPushCamera(&bounds, &itemPtr->Pose, RADIUS);
-
-		g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(itemPtr->Pose), DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+		g_Renderer.AddDebugBox(box, DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
 	}
 
 	// Collide with statics.
 	auto staticPtrs = GetCameraCollidableStaticPtrs();
 	for (const auto* staticPtr : staticPtrs)
 	{
-		if (staticPtr == nullptr)
-			return;
+		auto box = GetBoundsAccurate(*staticPtr, false).ToBoundingOrientedBox(staticPtr->pos);
+		/*box.Extents.x += BOX_EXTENT_EXTENSION.x;
+		box.Extents.y += BOX_EXTENT_EXTENSION.y;
+		box.Extents.z += BOX_EXTENT_EXTENSION.z;*/
 
-		// Break off if camera is stuck behind object and player is too far.
-		float dist = Vector3i::Distance(staticPtr->pos.Position, LaraItem->Pose.Position);
-		if (dist > BREAK_DIST)
-			continue;
+		auto intersect = GetCameraRayBoxIntersect(box);
+		if (intersect != std::nullopt)
+			Camera.pos = GameVector(*intersect, Camera.pos.RoomNumber);
 
-		auto bounds = GetBoundsAccurate(*staticPtr, false);
-		if (TestBoundsCollideCamera(bounds, staticPtr->pos, CAMERA_RADIUS))
-			ItemPushCamera(&bounds, &staticPtr->pos, RADIUS);
-
-		g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(staticPtr->pos), DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+		g_Renderer.AddDebugBox(box, DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
 	}
 }
 
