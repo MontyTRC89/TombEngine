@@ -30,9 +30,9 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
-constexpr auto PARTICLE_FADE_THRESHOLD = BLOCK(14);
-constexpr auto COLL_CHECK_THRESHOLD    = BLOCK(4);
-constexpr auto COLL_DISCARD_THRESHOLD  = CLICK(0.5f);
+constexpr auto PARTICLE_FADE_THRESHOLD			   = BLOCK(14);
+constexpr auto CAMERA_OBJECT_COLL_DIST_THRESHOLD   = BLOCK(4);
+constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
 constexpr auto SWIVEL_STEP_COUNT = 16;
 
@@ -86,22 +86,21 @@ float CinematicBarsSpeed = 0;
 static bool IsCameraCollidableItem(const ItemInfo& item)
 {
 	float dist = Vector3i::Distance(item.Pose.Position, Camera.pos.ToVector3i());
-	if (dist >= COLL_CHECK_THRESHOLD)
+	if (dist >= CAMERA_OBJECT_COLL_DIST_THRESHOLD)
 		return false;
 
 	const auto& object = Objects[item.ObjectNumber];
 	if (!item.Collidable || !object.usingDrawAnimatingItem)
 		return false;
 
-	// TODO: Find better way to define objects which are collidable with camera.
 	if (object.intelligent || object.isPickup || object.isPuzzleHole || object.collision == nullptr)
 		return false;
 
 	// Test if any 2 box extents are smaller than threshold.
-	auto extents = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose).Extents;
-	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
-		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
-		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
+	auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD))
 	{
 		return false;
 	}
@@ -118,16 +117,18 @@ static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
 	{
 		const auto& item = g_Level.Items[itemNumber];
 
+		// 1) Check if item is birdge.
 		if (item.IsBridge())
 			continue;
 
+		// 2) Test if item is in neighboring room.
 		if (!Contains(neighborRoomNumbers, (int)item.RoomNumber))
 			continue;
 
 		const auto& room = g_Level.Rooms[item.RoomNumber];
 		if (!room.Active())
 			continue;
-
+		
 		if (!IsCameraCollidableItem(item))
 			continue;
 
@@ -140,22 +141,17 @@ static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
 static bool IsCameraCollideableStatic(const MESH_INFO& staticObject)
 {
 	float dist = Vector3i::Distance(Camera.pos.ToVector3i(), staticObject.pos.Position);
-	if (dist >= COLL_CHECK_THRESHOLD)
+	if (dist >= CAMERA_OBJECT_COLL_DIST_THRESHOLD)
 		return false;
 
 	if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
 		return false;
 
-	const auto& bounds = GetBoundsAccurate(staticObject, false);
-	auto extents = Vector3(
-		abs(bounds.X1 - bounds.X2),
-		abs(bounds.Y1 - bounds.Y2),
-		abs(bounds.Z1 - bounds.Z2));
-
 	// Test if any 2 box extents are smaller than threshold.
-	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
-		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
-		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
+	auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
+	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD))
 	{
 		return false;
 	}
@@ -1664,7 +1660,7 @@ float GetParticleDistanceFade(const Vector3i& pos)
 	if (dist <= PARTICLE_FADE_THRESHOLD)
 		return 1.0f;
 
-	return std::clamp(1.0f - ((dist - PARTICLE_FADE_THRESHOLD) / COLL_CHECK_THRESHOLD), 0.0f, 1.0f);
+	return std::clamp(1.0f - ((dist - PARTICLE_FADE_THRESHOLD) / CAMERA_OBJECT_COLL_DIST_THRESHOLD), 0.0f, 1.0f);
 }
 
 void UpdateMikePos(const ItemInfo& item)
