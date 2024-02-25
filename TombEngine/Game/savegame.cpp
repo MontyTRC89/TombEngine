@@ -78,8 +78,10 @@ void SaveGame::LoadSavegameInfos()
 		if (!DoesSaveGameExist(i, true))
 			continue;
 
+		if (!SaveGame::LoadHeader(i, &SavegameInfos[i]))
+			continue;
+
 		SavegameInfos[i].Present = true;
-		SaveGame::LoadHeader(i, &SavegameInfos[i]);
 
 		if (SavegameInfos[i].Count > LastSaveGame)
 			LastSaveGame = SavegameInfos[i].Count;
@@ -1454,6 +1456,9 @@ void SaveGame::SaveHub(int index)
 
 void SaveGame::LoadHub(int index)
 {
+	if (Hub.count(index) == 0)
+		return;
+
 	Parse(Hub[index], true);
 }
 
@@ -1689,6 +1694,28 @@ static void ParseLua(const Save::SaveGame* s)
 		callbacksPostLoadVec,
 		callbacksPreLoopVec,
 		callbacksPostLoopVec);
+
+	// Event sets
+
+	if (g_Level.VolumeEventSets.size() == s->volume_event_sets()->size())
+	{
+		for (int i = 0; i < s->volume_event_sets()->size(); ++i)
+		{
+			auto set_saved = s->volume_event_sets()->Get(i);
+			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
+				g_Level.VolumeEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
+		}
+	}
+
+	if (g_Level.GlobalEventSets.size() == s->global_event_sets()->size())
+	{
+		for (int i = 0; i < s->global_event_sets()->size(); ++i)
+		{
+			auto set_saved = s->global_event_sets()->Get(i);
+			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
+				g_Level.GlobalEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
+		}
+	}
 }
 
 static void ParseLara(const Save::SaveGame* s)
@@ -2052,7 +2079,7 @@ static void ParseEffects(const Save::SaveGame* s)
 	}
 }
 
-static void ParseLevel(const Save::SaveGame* s)
+static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 {
 	// Rooms
 	for (int i = 0; i < s->rooms()->size(); i++)
@@ -2200,8 +2227,14 @@ static void ParseLevel(const Save::SaveGame* s)
 
 		g_GameScriptEntities->TryAddColliding(i);
 
-		item->Pose = ToPose(savedItem->pose());
-		item->RoomNumber = savedItem->room_number();
+		if (item->ObjectNumber != ID_LARA || !hubMode)
+		{
+			item->Pose = ToPose(savedItem->pose());
+			item->RoomNumber = savedItem->room_number();
+
+			// Hit points
+			item->HitPoints = savedItem->hit_points();
+		}
 
 		item->Animation.Velocity = ToVector3(savedItem->velocity());
 
@@ -2215,9 +2248,6 @@ static void ParseLevel(const Save::SaveGame* s)
 		item->Animation.TargetState = savedItem->target_state();
 		item->Animation.AnimNumber = obj->animIndex + savedItem->anim_number();
 		item->Animation.FrameNumber = savedItem->frame_number();
-
-		// Hit points
-		item->HitPoints = savedItem->hit_points();
 
 		// Flags and timers
 		for (int j = 0; j < 7; j++)
@@ -2432,28 +2462,6 @@ static void ParseLevel(const Save::SaveGame* s)
 			item->Data = savedData->scalar();
 		}
 	}
-
-	// Event sets
-
-	if (g_Level.VolumeEventSets.size() == s->volume_event_sets()->size())
-	{
-		for (int i = 0; i < s->volume_event_sets()->size(); ++i)
-		{
-			auto set_saved = s->volume_event_sets()->Get(i);
-			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
-				g_Level.VolumeEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
-		}
-	}
-
-	if (g_Level.GlobalEventSets.size() == s->global_event_sets()->size())
-	{
-		for (int i = 0; i < s->global_event_sets()->size(); ++i)
-		{
-			auto set_saved = s->global_event_sets()->Get(i);
-			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
-				g_Level.GlobalEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
-		}
-	}
 }
 
 void SaveGame::Parse(const std::vector<byte>& buffer, bool hubMode)
@@ -2462,7 +2470,7 @@ void SaveGame::Parse(const std::vector<byte>& buffer, bool hubMode)
 
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.data());
 
-	ParseLevel(s);
+	ParseLevel(s, hubMode);
 	ParseLua(s);
 	ParseStatistics(s, hubMode);
 
@@ -2485,26 +2493,51 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
+
 	file.seekg(0, std::ios::end);
 	size_t length = file.tellg();
 	file.seekg(0, std::ios::beg);
-	std::unique_ptr<char[]> buffer = std::make_unique<char[]>(length);
-	file.read(buffer.get(), length);
-	file.close();
 
-	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
+	if (length <= 0)
+	{
+		TENLog("Savegame #" + std::to_string(slot) + " has no data!", LogLevel::Warning);
+		return false;
+	}
 
-	header->Level = s->header()->level();
-	header->LevelName = s->header()->level_name()->str();
-	header->Days = s->header()->days();
-	header->Hours = s->header()->hours();
-	header->Minutes = s->header()->minutes();
-	header->Seconds = s->header()->seconds();
-	header->Level = s->header()->level();
-	header->Timer = s->header()->timer();
-	header->Count = s->header()->count();
+	try
+	{
+		int size;
+		file >> size;
 
-	return true;
+		std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
+		file.read(buffer.get(), size);
+		file.close();
+
+		if (size <= 0 || size >= length)
+		{
+			TENLog("Incorrect data in savegame #" + std::to_string(slot) + ". Old format?", LogLevel::Warning);
+			return false;
+		}
+
+		const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
+
+		header->Level = s->header()->level();
+		header->LevelName = s->header()->level_name()->str();
+		header->Days = s->header()->days();
+		header->Hours = s->header()->hours();
+		header->Minutes = s->header()->minutes();
+		header->Seconds = s->header()->seconds();
+		header->Level = s->header()->level();
+		header->Timer = s->header()->timer();
+		header->Count = s->header()->count();
+
+		return true;
+	}
+	catch (std::exception& ex)
+	{
+		TENLog("Error reading savegame #" + std::to_string(slot) + ", Exception: " + ex.what(), LogLevel::Warning);
+		return false;
+	}
 }
 
 void SaveGame::Delete(int slot)
