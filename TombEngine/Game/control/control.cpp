@@ -522,6 +522,8 @@ void InitializeOrLoadGame(bool loadGame)
 		// If not loading a savegame, clear all info.
 		Statistics.Level = {};
 
+		SaveGame::LoadHub(CurrentLevel);
+
 		if (InitializeGame)
 		{
 			// Clear all game info as well.

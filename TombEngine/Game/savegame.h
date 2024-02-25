@@ -41,7 +41,7 @@ struct SaveGameHeader
 
 extern GameStats Statistics;
 extern SaveGameHeader SavegameInfos[SAVEGAME_MAX];
-extern std::vector<std::pair<int, std::vector<char>>> SavegameState;
+extern std::map<int, std::vector<byte>> Hub;
 
 class SaveGame 
 {
@@ -62,7 +62,12 @@ public:
 	static void LoadSavegameInfos();
 	static void Delete(int slot);
 
-	static FlatBufferBuilder& SaveGame::Build();
+	static void SaveHub(int index);
+	static void LoadHub(int index);
+	static void ResetHub();
+
+	static const std::vector<byte> Build();
+	static void Parse(const std::vector<byte>& buffer, bool hubMode);
 
 	static bool DoesSaveGameExist(int slot, bool silent = false);
 };
