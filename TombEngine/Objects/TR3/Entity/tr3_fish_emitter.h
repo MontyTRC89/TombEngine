@@ -3,7 +3,6 @@
 
 namespace TEN::Entities::Creatures::TR3
 {
-
 	constexpr auto NUM_FISHES = 240;
 
 	struct FishData
@@ -21,8 +20,6 @@ namespace TEN::Entities::Creatures::TR3
 
 		Matrix Transform;
 	};
-
-
 
 	extern FishData FishSwarm[NUM_FISHES];
 	extern int NextFish;

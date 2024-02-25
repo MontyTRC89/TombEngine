@@ -32,16 +32,16 @@
 #include "Specific/winmain.h"
 #include "Renderer/Structures/RendererSortableObject.h"
 
+using namespace std::chrono;
+using namespace TEN::Effects::Hair;
+using namespace TEN::Entities::Generic;
+using namespace TEN::Hud;
+using namespace TEN::Renderer::Structures;
+
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer
 {
-	using namespace std::chrono;
-	using namespace TEN::Effects::Hair;
-	using namespace TEN::Entities::Generic;
-	using namespace TEN::Hud;
-	using namespace TEN::Renderer::Structures;
-
 	void Renderer::RenderBlobShadows(RenderView& renderView)
 	{
 		auto nearestSpheres = std::vector<Sphere>{};
@@ -613,42 +613,37 @@ namespace TEN::Renderer
 
 	void Renderer::DrawFishes(RenderView& view, RendererPass rendererPass)
 	{
+		using namespace TEN::Entities::Creatures::TR3;
+
 		if (!Objects[ID_FISH_EMITTER].loaded)
-		{
 			return;
-		}
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			for (int i = 0; i < TEN::Entities::Creatures::TR3::NUM_FISHES; i++)
+			for (const auto& fish : FishSwarm)
 			{
-				auto* fish = &TEN::Entities::Creatures::TR3::FishSwarm[i];
-
-				if (fish->on)
+				if (fish.on)
 				{
-					RendererMesh* mesh = GetMesh(Objects[ID_FISH_EMITTER].meshIndex + (rand() % 4));
+					auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + (rand() % 4));
 
-					for (int j = 0; j < mesh->Buckets.size(); j++)
+					for (auto& bucket : mesh.Buckets)
 					{
-						auto& bucket = mesh->Buckets[j];
-
 						if (IsSortedBlendMode(bucket.BlendMode))
 						{
-							for (int p = 0; p < bucket.Polygons.size(); p++)
+							for (auto& poly : bucket.Polygons)
 							{
-								auto centre = Vector3::Transform(
-									bucket.Polygons[p].Centre, fish->Transform);
-								int distance = (centre - view.Camera.WorldPosition).Length();
+								auto centre = Vector3::Transform(poly.Centre, fish.Transform);
+								float dist = (centre - view.Camera.WorldPosition).Length();
 
-								RendererSortableObject object;
+								auto object = RendererSortableObject{};
 								object.ObjectType = RendererObjectType::MoveableAsStatic;
 								object.Centre = centre;
-								object.Distance = distance;
+								object.Distance = dist;
 								object.Bucket = &bucket;
-								object.Mesh = mesh;
-								object.Polygon = &bucket.Polygons[p];
-								object.World = fish->Transform;
-								object.Room = &_rooms[fish->RoomNumber];
+								object.Mesh = &mesh;
+								object.Polygon = &poly;
+								object.World = fish.Transform;
+								object.Room = &_rooms[fish.RoomNumber];
 
 								view.TransparentObjectsToDraw.push_back(object);
 							}
@@ -659,19 +654,17 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			bool activefishsExist = false;
-			for (int i = 0; i < TEN::Entities::Creatures::TR3::NUM_FISHES; i++)
+			bool doesActiveFishExist = false;
+			for (const auto& fish : FishSwarm)
 			{
-				auto* fish = &TEN::Entities::Creatures::TR3::FishSwarm[i];
-
-				if (fish->on)
+				if (fish.on)
 				{
-					activefishsExist = true;
+					doesActiveFishExist = true;
 					break;
 				}
 			}
 
-			if (activefishsExist)
+			if (doesActiveFishExist)
 			{
 				if (rendererPass == RendererPass::GBuffer)
 				{
@@ -684,50 +677,41 @@ namespace TEN::Renderer
 					_context->PSSetShader(_psStatics.Get(), nullptr, 0);
 				}
 
-				UINT stride = sizeof(Vertex);
-				UINT offset = 0;
+				unsigned int stride = sizeof(Vertex);
+				unsigned int offset = 0;
 
 				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-				RendererObject& moveableObj = *_moveableObjects[ID_FISH_EMITTER];
+				const auto& moveableObj = *_moveableObjects[ID_FISH_EMITTER];
 
 				_stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
 
-				for (int i = 0; i < TEN::Entities::Creatures::TR3::NUM_FISHES; i++)
+				for (const auto& fish : FishSwarm)
 				{
-					auto* fish = &TEN::Entities::Creatures::TR3::FishSwarm[i];
-
-					if (fish->on)
+					if (fish.on)
 					{
-						RendererMesh* mesh = GetMesh(Objects[ID_FISH_EMITTER].meshIndex + (rand() % 4));
+						const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + (rand() % 4));
 
-						_stStatic.World = fish->Transform;
+						_stStatic.World = fish.Transform;
 						_stStatic.Color = Vector4::One;
-						_stStatic.AmbientLight = _rooms[fish->RoomNumber].AmbientLight;
+						_stStatic.AmbientLight = _rooms[fish.RoomNumber].AmbientLight;
 
 						if (rendererPass != RendererPass::GBuffer)
-						{
-							BindStaticLights(_rooms[fish->RoomNumber].LightsToDraw);
-						}
+							BindStaticLights(_rooms[fish.RoomNumber].LightsToDraw);
 
 						_cbStatic.UpdateData(_stStatic, _context.Get());
 
-						for (auto& bucket : mesh->Buckets)
+						for (const auto& bucket : mesh.Buckets)
 						{
 							if (bucket.NumVertices == 0)
-							{
 								continue;
-							}
 
-							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
-
-							for (int p = 0; p < passes; p++)
+							int passCount = (rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest) ? 2 : 1;
+							for (int p = 0; p < passCount; p++)
 							{
 								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-								{
 									continue;
-								}
 
 								BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 								BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
@@ -746,11 +730,9 @@ namespace TEN::Renderer
 	void Renderer::DrawBats(RenderView& view, RendererPass rendererPass)
 	{
 		if (!Objects[ID_BATS_EMITTER].loaded)
-		{
 			return;
-		}
 
-		RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
+		auto* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{

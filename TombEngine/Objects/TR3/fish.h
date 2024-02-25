@@ -1,8 +1,11 @@
 #pragma once
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 struct FishInfo
 {
-	Pose Pose;
+	Pose Pose = Pose::Zero;
 	int	angle;
 	short destX;
 	short destY;
