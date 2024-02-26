@@ -195,7 +195,7 @@ GameStatus ControlPhase(int numFrames)
 		{
 			// Do the standard camera.
 			TrackCameraInit = false;
-			CalculateCamera(LaraCollision);
+			CalculateCamera(*LaraItem, LaraCollision);
 		}
 
 		// Update oscillator seed.

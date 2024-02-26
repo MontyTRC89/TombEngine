@@ -83,22 +83,22 @@ extern float CinematicBarsHeight;
 extern float CinematicBarsSpeed;
 
 void DoThumbstickCamera();
-void LookCamera(ItemInfo& item, const CollisionInfo& coll);
+void LookCamera(const ItemInfo& item, const CollisionInfo& coll);
 
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(short value, bool store = true);
 short GetCurrentFOV();
 void InitializeCamera();
 void MoveCamera(GameVector* ideal, float speed);
-void ChaseCamera(ItemInfo* item);
+void ChaseCamera(const ItemInfo& playerItem);
 void UpdateCameraElevation();
-void CombatCamera(ItemInfo* item);
+void CombatCamera(const ItemInfo& playerItem);
 bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst);
-void FixedCamera(ItemInfo* item);
+void FixedCamera();
 void BounceCamera(ItemInfo* item, short bounce, short maxDistance);
 void BinocularCamera(ItemInfo* item);
 void ConfirmCameraTargetPos();
-void CalculateCamera(const CollisionInfo& coll);
+void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
 void RumbleScreen();
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
 void ObjCamera(ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID, bool cond);

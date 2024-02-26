@@ -335,7 +335,7 @@ static int GetLookCameraVerticalOffset(const ItemInfo& item, const CollisionInfo
 	return -((verticalOffset < floorToCeilHeight) ? verticalOffset : floorToCeilHeight);
 }
 
-void LookCamera(ItemInfo& item, const CollisionInfo& coll)
+void LookCamera(const ItemInfo& item, const CollisionInfo& coll)
 {
 	constexpr auto POS_LERP_ALPHA	 = 0.25f;
 	constexpr auto COLL_PUSH		 = BLOCK(0.25f) - BLOCK(1 / 16.0f);
@@ -451,7 +451,7 @@ void InitializeCamera()
 	AlterFOV(ANGLE(DEFAULT_FOV));
 
 	UseForcedFixedCamera = 0;
-	CalculateCamera(LaraCollision);
+	CalculateCamera(*LaraItem, LaraCollision);
 
 	// Fade in screen.
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
@@ -710,19 +710,19 @@ void RefreshFixedCamera(short camNumber)
 	MoveCamera(&origin, moveSpeed);
 }
 
-void ChaseCamera(ItemInfo* item)
+void ChaseCamera(const ItemInfo& playerItem)
 {
 	constexpr auto MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT = std::pair<short, short>(-ANGLE(85.0f), ANGLE(70.0f));
 	constexpr auto MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT	= std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
 	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT				= ANGLE(85.0f);
 	constexpr auto BUFFER										= 100;
 
-	const auto& player = GetLaraInfo(*item);
+	const auto& player = GetLaraInfo(playerItem);
 
 	if (Camera.targetElevation == 0)
 		Camera.targetElevation = ANGLE(-10.0f);
 
-	Camera.targetElevation += item->Pose.Orientation.x;
+	Camera.targetElevation += playerItem.Pose.Orientation.x;
 	UpdateCameraElevation();
 
 	// Clamp X orientation.
@@ -892,27 +892,27 @@ void UpdateCameraElevation()
 		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }
 
-void CombatCamera(ItemInfo* item)
+void CombatCamera(const ItemInfo& playerItem)
 {
 	constexpr auto MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT = std::pair<short, short>(-ANGLE(85.0f), ANGLE(70.0f));
 	constexpr auto MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT	= std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
 	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT				= ANGLE(85.0f);
 	constexpr auto BUFFER										= 100;
 
-	auto& player = GetLaraInfo(*item);
+	const auto& player = GetLaraInfo(playerItem);
 
-	Camera.target.x = item->Pose.Position.x;
-	Camera.target.z = item->Pose.Position.z;
+	Camera.target.x = playerItem.Pose.Position.x;
+	Camera.target.z = playerItem.Pose.Position.z;
 
 	if (player.TargetEntity != nullptr)
 	{
 		Camera.targetAngle = player.TargetArmOrient.y;
-		Camera.targetElevation = player.TargetArmOrient.x + item->Pose.Orientation.x;
+		Camera.targetElevation = player.TargetArmOrient.x + playerItem.Pose.Orientation.x;
 	}
 	else
 	{
 		Camera.targetAngle = player.ExtraHeadRot.y + player.ExtraTorsoRot.y;
-		Camera.targetElevation = player.ExtraHeadRot.x + player.ExtraTorsoRot.x + item->Pose.Orientation.x - ANGLE(15.0f);
+		Camera.targetElevation = player.ExtraHeadRot.x + player.ExtraTorsoRot.x + playerItem.Pose.Orientation.x - ANGLE(15.0f);
 	}
 
 	auto pointColl = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.RoomNumber);
@@ -1208,7 +1208,7 @@ bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst)
 	return false;
 }
 
-void FixedCamera(ItemInfo* item)
+void FixedCamera()
 {
 	// Fixed cameras before TR3 had optional "movement" effect. 
 	// Later for some reason it was forced to always be 1, and actual speed value
@@ -1408,7 +1408,7 @@ static void UpdatePlayerRefCameraOrient(ItemInfo& item)
 		player.Control.RefCameraOrient = EulerAngles(Camera.actualElevation, Camera.actualAngle, 0);
 }
 
-void CalculateCamera(const CollisionInfo& coll)
+void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 {
 	CamOldPos.x = Camera.pos.x;
 	CamOldPos.y = Camera.pos.y;
@@ -1443,7 +1443,7 @@ void CalculateCamera(const CollisionInfo& coll)
 			Camera.underwater = false;
 	}
 
-	ItemInfo* item = nullptr;
+	const ItemInfo* item = nullptr;
 	bool isFixedCamera = false;
 	if (Camera.item != nullptr &&
 		(Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
@@ -1453,7 +1453,7 @@ void CalculateCamera(const CollisionInfo& coll)
 	}
 	else
 	{
-		item = LaraItem;
+		item = &playerItem;
 		isFixedCamera = false;
 	}
 
@@ -1550,7 +1550,7 @@ void CalculateCamera(const CollisionInfo& coll)
 		}
 		else
 		{
-			CombatCamera(item);
+			CombatCamera(*item);
 		}
 	}
 	else
@@ -1622,11 +1622,11 @@ void CalculateCamera(const CollisionInfo& coll)
 
 		if (Camera.type != CameraType::Chase && Camera.flags != CF_CHASE_OBJECT)
 		{
-			FixedCamera(item);
+			FixedCamera();
 		}
 		else
 		{
-			ChaseCamera(item);
+			ChaseCamera(*item);
 		}
 	}
 
