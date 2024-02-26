@@ -790,63 +790,57 @@ void ChaseCamera(const ItemInfo& playerItem)
 	}
 	else
 	{
-		// Calculate ideal positions around player.
-		float dist = Camera.targetDistance * phd_cos(Camera.actualElevation);
+		float farthestDistSqr = INFINITY;
+		auto farthestIdealPos = Camera.pos;
+
+		// Determine ideal position around player.
 		for (int i = 0; i < SWIVEL_STEP_COUNT; i++)
 		{
 			short yOrient = (i == 0) ? Camera.actualAngle : ANGLE(90.0f * (i - 1));
 			auto dir = -EulerAngles(Camera.actualElevation, yOrient, 0).ToDirection();
-			Ideals[i] = GameVector(Geometry::TranslatePoint(Camera.target.ToVector3i(), dir, Camera.targetDistance), Camera.target.RoomNumber);
-		}
+			auto idealPos = GameVector(Geometry::TranslatePoint(Camera.target.ToVector3i(), dir, Camera.targetDistance), Camera.target.RoomNumber);
 
-		float farthestDistSqr = INFINITY;
-		const GameVector* farthestIdealPtr = &Ideals[0];
-
-		// Determine best player viewing angle.
-		for (int i = 0; i < SWIVEL_STEP_COUNT; i++)
-		{
-			// Assess LOS.
-			if (LOSAndReturnTarget(&Camera.target, &Ideals[i], 200))
+			// Assess room LOS.
+			if (LOSAndReturnTarget(&Camera.target, &idealPos, 200))
 			{
-				auto origin = Ideals[i];
+				auto origin = idealPos;
 				auto target = Camera.pos;
 
 				if (i == 0 || LOSAndReturnTarget(&origin, &target, 0))
 				{
 					if (i == 0)
 					{
-						farthestIdealPtr = &Ideals[0];
+						farthestIdealPos = idealPos;
 						break;
 					}
 
-					float distSqr = Vector3::DistanceSquared(Camera.pos.ToVector3(), Ideals[i].ToVector3());
+					float distSqr = Vector3::DistanceSquared(Camera.pos.ToVector3(), idealPos.ToVector3());
 					if (distSqr < farthestDistSqr)
 					{
 						farthestDistSqr = distSqr;
-						farthestIdealPtr = &Ideals[i];
+						farthestIdealPos = idealPos;
 					}
 				}
 			}
 			else if (i == 0)
 			{
-				auto origin = Ideals[i];
+				auto origin = idealPos;
 				auto target = Camera.pos;
 
 				if (i == 0 || LOSAndReturnTarget(&origin, &target, 0))
 				{
-					float distSqr = Vector3::DistanceSquared(Camera.target.ToVector3(), Ideals[i].ToVector3());
+					float distSqr = Vector3::DistanceSquared(Camera.target.ToVector3(), idealPos.ToVector3());
 					if (distSqr > SQUARE(BLOCK(0.75f)))
 					{
-						farthestIdealPtr = &Ideals[0];
+						farthestIdealPos = idealPos;
 						break;
 					}
 				}
 			}
 		}
 
-		auto ideal = *farthestIdealPtr;
-		CameraCollisionBounds(&ideal, CLICK(1.5f), true);
-		MoveCamera(&ideal, Camera.speed);
+		CameraCollisionBounds(&farthestIdealPos, CLICK(1.5f), true);
+		MoveCamera(&farthestIdealPos, Camera.speed);
 	}
 }
 
@@ -1008,67 +1002,62 @@ void CombatCamera(const ItemInfo& playerItem)
 	}
 	else
 	{
-		// Calculate ideal positions around player.
-		float dist = Camera.targetDistance * phd_cos(Camera.actualElevation);
+		float farthestDistSqr = INFINITY;
+		auto farthestIdealPos = Camera.pos;
+
+		// Determine ideal position around player.
 		for (int i = 0; i < SWIVEL_STEP_COUNT; i++)
 		{
 			short yOrient = (i == 0) ? Camera.actualAngle : ANGLE(90.0f * (i - 1));
 			auto dir = -EulerAngles(Camera.actualElevation, yOrient, 0).ToDirection();
-			Ideals[i] = GameVector(Geometry::TranslatePoint(Camera.target.ToVector3i(), dir, Camera.targetDistance), Camera.target.RoomNumber);
-		}
+			auto idealPos = GameVector(Geometry::TranslatePoint(Camera.target.ToVector3i(), dir, Camera.targetDistance), Camera.target.RoomNumber);
 
-		float farthestDistSqr = INFINITY;
-		const GameVector* farthestIdealPtr = &Ideals[0];
-
-		// Determine best player viewing angle.
-		for (int i = 0; i < SWIVEL_STEP_COUNT; i++)
-		{
-			if (LOSAndReturnTarget(&Camera.target, &Ideals[i], 200))
+			// Assess room LOS.
+			if (LOSAndReturnTarget(&Camera.target, &idealPos, 200))
 			{
-				auto origin = Ideals[i];
+				auto origin = idealPos;
 				auto target = Camera.pos;
 
 				if (i == 0 || LOSAndReturnTarget(&origin, &target, 0))
 				{
 					if (i == 0)
 					{
-						farthestIdealPtr = &Ideals[0];
+						farthestIdealPos = idealPos;
 						break;
 					}
 
-					float distSqr = Vector3::DistanceSquared(Camera.pos.ToVector3(), Ideals[i].ToVector3());
+					float distSqr = Vector3::DistanceSquared(Camera.pos.ToVector3(), idealPos.ToVector3());
 					if (distSqr < farthestDistSqr)
 					{
 						farthestDistSqr = distSqr;
-						farthestIdealPtr = &Ideals[i];
+						farthestIdealPos = idealPos;
 					}
 				}
 			}
 			else if (i == 0)
 			{
-				auto origin = Ideals[i];
+				auto origin = idealPos;
 				auto target = Camera.pos;
 
 				if (i == 0 || LOSAndReturnTarget(&origin, &target, 0))
 				{
-					float distSqr = Vector3::DistanceSquared(Camera.target.ToVector3(), Ideals[i].ToVector3());
+					float distSqr = Vector3::DistanceSquared(Camera.target.ToVector3(), idealPos.ToVector3());
 					if (distSqr > SQUARE(BLOCK(0.75f)))
 					{
-						farthestIdealPtr = &Ideals[0];
+						farthestIdealPos = idealPos;
 						break;
 					}
 				}
 			}
 		}
 
-		auto ideal = *farthestIdealPtr;
-		CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
+		CameraCollisionBounds(&farthestIdealPos, CLICK(1.5f), 1);
 
 		// Snap position of fixed camera type.
 		if (Camera.oldType == CameraType::Fixed)
 			Camera.speed = 1;
 
-		MoveCamera(&ideal, Camera.speed);
+		MoveCamera(&farthestIdealPos, Camera.speed);
 	}
 }
 
