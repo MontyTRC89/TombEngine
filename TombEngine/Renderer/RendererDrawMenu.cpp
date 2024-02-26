@@ -257,35 +257,35 @@ namespace TEN::Renderer
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGETING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoTargeting), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
 			GetNextLinePosition(&y);
+			
+			// Opposite action roll
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_OPPOSITE_ACTION_ROLL), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableOppositeActionRoll), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
+			GetNextLinePosition(&y);
 
 			// Thumbstick camera
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCamera), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 7));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCamera), PRINTSTRING_COLOR_WHITE, SF(titleOption == 7));
 			GetNextLinePosition(&y);
 
 			// Rumble
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 7));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 7));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 8));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 8));
 			GetNextLinePosition(&y);
 
 			// Target highlighter
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TARGET_HIGHLIGHTER), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 8));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableTargetHighlighter), PRINTSTRING_COLOR_WHITE, SF(titleOption == 8));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TARGET_HIGHLIGHTER), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 9));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableTargetHighlighter), PRINTSTRING_COLOR_WHITE, SF(titleOption == 9));
 			GetNextLinePosition(&y);
 			
 			// Subtitles
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SUBTITLES), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 9));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableSubtitles), PRINTSTRING_COLOR_WHITE, SF(titleOption == 9));
-			GetNextBlockPosition(&y);
-
-			// Mouse sensitivity
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SENSITIVITY), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 10));
-			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 10));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SUBTITLES), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 10));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableSubtitles), PRINTSTRING_COLOR_WHITE, SF(titleOption == 10));
 			GetNextLinePosition(&y);
 
-			// Mouse smoothing
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SMOOTHING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 11));
-			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSmoothing).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 11));
+			// Mouse sensitivity
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SENSITIVITY), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 11));
+			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 11));
 			GetNextBlockPosition(&y);
 
 			// Apply

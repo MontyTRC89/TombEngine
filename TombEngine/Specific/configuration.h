@@ -32,24 +32,24 @@ constexpr auto REGKEY_MUSIC_VOLUME	= "MusicVolume";
 constexpr auto REGKEY_SFX_VOLUME	= "SfxVolume";
 
 // Gameplay keys
-constexpr auto REGKEY_CONTROL_MODE				= "ControlMode";
-constexpr auto REGKEY_ENABLE_AUTO_GRAB			= "EnableAutoGrab";
-constexpr auto REGKEY_ENABLE_AUTO_TARGETING		= "EnableAutoTargeting";
-constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	= "EnableThumbstickCamera";
-constexpr auto REGKEY_ENABLE_RUMBLE				= "EnableRumble";
-constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER = "EnableTargetHighlighter";
-constexpr auto REGKEY_ENABLE_SUBTITLES			= "EnableSubtitles";
+constexpr auto REGKEY_CONTROL_MODE				  = "ControlMode";
+constexpr auto REGKEY_ENABLE_AUTO_GRAB			  = "EnableAutoGrab";
+constexpr auto REGKEY_ENABLE_AUTO_TARGETING		  = "EnableAutoTargeting";
+constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER	  = "EnableTargetHighlighter";
+constexpr auto REGKEY_ENABLE_SUBTITLES			  = "EnableSubtitles";
 
 // Input keys
-constexpr auto REGKEY_MOUSE_SENSITIVITY = "MouseSensitivity";
-constexpr auto REGKEY_MOUSE_SMOOTHING	= "MouseSmoothing";
+constexpr auto REGKEY_MOUSE_SENSITIVITY			  = "MouseSensitivity";
+constexpr auto REGKEY_ENABLE_OPPOSITE_ACTION_ROLL = "EnableOppositeActionRoll";
+constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	  = "EnableThumbstickCamera";
+constexpr auto REGKEY_ENABLE_RUMBLE				  = "EnableRumble";
+// + key bindings
 
 struct GameConfiguration
 {
 	static constexpr auto DEFAULT_SHADOW_MAP_SIZE	= 1024;
 	static constexpr auto DEFAULT_SHADOW_BLOBS_MAX	= 16;
 	static constexpr auto DEFAULT_MOUSE_SENSITIVITY = 6;
-	static constexpr auto DEFAULT_MOUSE_SMOOTHING	= 1;
 
 	// Graphics
 	int		   ScreenWidth		  = 0;
@@ -70,18 +70,18 @@ struct GameConfiguration
 	int	 SfxVolume	  = 0;
 
 	// Gameplay
-	ControlMode ControlMode				= ControlMode::ClassicTank;
-	bool		EnableAutoGrab			= false;
-	bool		EnableAutoTargeting		= false;
-	bool		EnableThumbstickCamera	= false;
-	bool		EnableRumble			= false;
-	bool		EnableTargetHighlighter = false;
-	bool		EnableSubtitles			= false;
+	ControlMode ControlMode				 = ControlMode::ClassicTank;
+	bool		EnableAutoGrab			 = false;
+	bool		EnableAutoTargeting		 = false;
+	bool		EnableTargetHighlighter	 = false;
+	bool		EnableSubtitles			 = false;
 
 	// Input
-	int MouseSensitivity = DEFAULT_MOUSE_SENSITIVITY;
-	int MouseSmoothing	 = DEFAULT_MOUSE_SMOOTHING;
-	std::vector<int> Bindings = {};
+	std::vector<int> Bindings				  = {};
+	int				 MouseSensitivity		  = DEFAULT_MOUSE_SENSITIVITY;
+	bool			 EnableOppositeActionRoll = false;
+	bool			 EnableThumbstickCamera	  = false;
+	bool			 EnableRumble			  = false;
 
 	std::vector<Vector2i> SupportedScreenResolutions = {};
 	std::string			  AdapterName				 = {};

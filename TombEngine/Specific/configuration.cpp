@@ -257,8 +257,7 @@ bool SaveConfiguration()
 	}
 
 	// Set Input keys.
-	if (SetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS ||
-		SetDWORDRegKey(inputKey, REGKEY_MOUSE_SMOOTHING, g_Configuration.MouseSmoothing) != ERROR_SUCCESS)
+	if (SetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
@@ -326,13 +325,13 @@ void InitDefaultConfiguration()
 	g_Configuration.ControlMode = ControlMode::EnhancedTank;
 	g_Configuration.EnableAutoGrab = true;
 	g_Configuration.EnableAutoTargeting = true;
-	g_Configuration.EnableThumbstickCamera = false;
-	g_Configuration.EnableRumble = true;
 	g_Configuration.EnableTargetHighlighter = true;
 	g_Configuration.EnableSubtitles = true;
 
 	g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-	g_Configuration.MouseSmoothing = GameConfiguration::DEFAULT_MOUSE_SMOOTHING;
+	g_Configuration.EnableOppositeActionRoll = true;
+	g_Configuration.EnableThumbstickCamera = false;
+	g_Configuration.EnableRumble = true;
 
 	g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
 	g_Configuration.AdapterName = g_Renderer.GetDefaultAdapterName();
@@ -426,10 +425,14 @@ bool LoadConfiguration()
 	DWORD controlMode = (DWORD)ControlMode::EnhancedTank;
 	bool enableAutoGrab = true;
 	bool enableAutoTargeting = true;
-	bool enableThumbstickCamera = true;
-	bool enableRumble = true;
 	bool enableTargetHighlighter = true;
 	bool enableSubtitles = true;
+
+	// TODO: Move lower.
+	DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
+	bool enableOppositeActionRoll = true;
+	bool enableThumbstickCamera = true;
+	bool enableRumble = true;
 
 	// Load Gameplay keys.
 	if (GetDWORDRegKey(gameplayKey, REGKEY_CONTROL_MODE, &controlMode, (DWORD)ControlMode::EnhancedTank) != ERROR_SUCCESS ||
@@ -447,15 +450,11 @@ bool LoadConfiguration()
 		return false;
 	}
 
-	DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-	DWORD mouseSmoothing = GameConfiguration::DEFAULT_MOUSE_SMOOTHING;
-
 	// Load Input keys.
 	HKEY inputKey = NULL;
 	if (RegOpenKeyExA(rootKey, REGKEY_INPUT, 0, KEY_READ, &inputKey) == ERROR_SUCCESS)
 	{
-		if (GetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS ||
-			GetDWORDRegKey(inputKey, REGKEY_MOUSE_SMOOTHING, &mouseSmoothing, GameConfiguration::DEFAULT_MOUSE_SMOOTHING) != ERROR_SUCCESS)
+		if (GetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
@@ -518,13 +517,13 @@ bool LoadConfiguration()
 	g_Configuration.ControlMode = (ControlMode)controlMode;
 	g_Configuration.EnableAutoGrab = enableAutoGrab;
 	g_Configuration.EnableAutoTargeting = enableAutoTargeting;
-	g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
-	g_Configuration.EnableRumble = enableRumble;
 	g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
 	g_Configuration.EnableSubtitles = enableSubtitles;
 
 	g_Configuration.MouseSensitivity = mouseSensitivity;
-	g_Configuration.MouseSmoothing = mouseSmoothing;
+	g_Configuration.EnableOppositeActionRoll = enableOppositeActionRoll;
+	g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
+	g_Configuration.EnableRumble = enableRumble;
 
 	// Set legacy variables.
 	SetVolumeTracks(musicVolume);
