@@ -1108,6 +1108,7 @@ void Moveable::Shatter()
 		ExplodeItemNode(m_item, i, 0, 128);
 
 	CreatureDie(m_num, false);
+	KillItem(m_num);
 }
 
 /// Make the item invisible. Alias for `Moveable:SetVisible(false)`.
