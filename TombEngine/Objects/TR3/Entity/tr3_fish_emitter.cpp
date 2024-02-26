@@ -14,6 +14,8 @@
 #include "Renderer/Renderer.h"
 #include "Specific/level.h"
 
+#define DEG2RAD (3.14159265358979323846f / 180.0f)
+
 using namespace TEN::Entities::TR3;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -218,6 +220,7 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			ZeroMemory(FishSwarm, FISH_COUNT_MAX * sizeof(FishData));
 			NextFish = 0;
+			FlipEffect = -1;
 		}
 	}
 
@@ -365,13 +368,17 @@ namespace TEN::Entities::Creatures::TR3
 				}
 			}
 
-			auto pointColl = GetCollision(fish.Pose.Position, fish.RoomNumber);
-			const auto& room = g_Level.Rooms[fish.RoomNumber];
+				auto pointColl = GetCollision(fish.Pose.Position, fish.RoomNumber);
+				const auto& room = g_Level.Rooms[fish.RoomNumber];
 
-			// Prevent fish from peeking out of water surface.
-			if (pointColl.RoomNumber != fish.RoomNumber && !TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
-				fish.Pose.Position.y = room.maxceiling + 180;
+				//Update fish's roomnumber
+				if (pointColl.RoomNumber != fish.RoomNumber)
+					fish.RoomNumber = pointColl.RoomNumber;
 
+				// Prevent fish from peeking out of water surface.
+				if (pointColl.RoomNumber != fish.RoomNumber && !TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
+					fish.Pose.Position.y = room.maxceiling + 180;
+			
 			if (ItemNearTarget(fish.Pose.Position, fish.target, CLICK(2) / 2) )
 			{
 				if (fish.leader != fish.target)
@@ -385,9 +392,19 @@ namespace TEN::Entities::Creatures::TR3
 				}
 			}
 
-			fish.Lethal = leaderItem.TriggerFlags < 0 ? true : false;
-			auto tMatrix = Matrix::CreateTranslation(fish.Pose.Position.x, fish.Pose.Position.y, fish.Pose.Position.z);
+			if (fish.YAngle > ANGLE(2.0f) || fish.YAngle == ANGLE(0.0f))
+				fish.YAngle = -ANGLE(4.0f);
+			else if (fish.YAngle < -ANGLE(2.0f))
+				fish.YAngle = ANGLE(4.0f);
+
+			float wiggleAngle = fish.YAngle;
+
 			auto rotMatrix2 = fish.Pose.Orientation.ToRotationMatrix();
+
+			rotMatrix2 = rotMatrix2 * Matrix::CreateRotationY(fish.YAngle * RADIAN);
+
+			// Update fish's transformation matrix
+			auto tMatrix = Matrix::CreateTranslation(fish.Pose.Position.x, fish.Pose.Position.y, fish.Pose.Position.z);
 			fish.Transform = rotMatrix2 * tMatrix;
 		}
 	}

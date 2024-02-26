@@ -19,6 +19,7 @@ namespace TEN::Entities::Creatures::TR3
 		Vector3i PositionTarget = Vector3::Zero;
 		short Species;
 		bool Lethal;
+		short YAngle = ANGLE(0.0f);
 
 		Matrix Transform;
 	};

@@ -624,7 +624,7 @@ namespace TEN::Renderer
 			{
 				if (fish.on)
 				{
-					auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + 1 + ((fish.Species - 1) * 4) + (rand() % 4));
+					auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + 1 + ((fish.Species - 1) * 4) );
 
 					for (auto& bucket : mesh.Buckets)
 					{
@@ -691,7 +691,7 @@ namespace TEN::Renderer
 				{
 					if (fish.on)
 					{
-						const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + 1 + ((fish.Species - 1) * 4) + (rand() % 4));
+						const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + 1 + ((fish.Species - 1) * 4) );
 
 						_stStatic.World = fish.Transform;
 						_stStatic.Color = Vector4::One;
