@@ -885,12 +885,15 @@ namespace TEN::Gui
 			Reverb,
 			MusicVolume,
 			SfxVolume,
+
 			ControlMode,
-			Subtitles,
+			AutoGrab,
 			AutoTargeting,
-			TargetHighlighter,
-			ToggleRumble,
 			ThumbstickCameraControl,
+			ToggleRumble,
+			TargetHighlighter,
+			Subtitles,
+
 			MouseSensitivity,
 			MouseSmoothing,
 
@@ -898,7 +901,7 @@ namespace TEN::Gui
 			Cancel
 		};
 
-		static const auto numOtherSettingsOptions = 12;
+		static const auto numOtherSettingsOptions = 13;
 
 		OptionCount = numOtherSettingsOptions;
 
@@ -943,9 +946,9 @@ namespace TEN::Gui
 			}
 				break;
 
-			case OtherSettingsOption::Subtitles:
+			case OtherSettingsOption::AutoGrab:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
+				CurrentSettings.Configuration.EnableAutoGrab = !CurrentSettings.Configuration.EnableAutoGrab;
 				break;
 
 			case OtherSettingsOption::AutoTargeting:
@@ -953,19 +956,24 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.EnableAutoTargeting = !CurrentSettings.Configuration.EnableAutoTargeting;
 				break;
 
-			case OtherSettingsOption::TargetHighlighter:
+			case OtherSettingsOption::ThumbstickCameraControl:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableTargetHighlighter = !CurrentSettings.Configuration.EnableTargetHighlighter;
+				CurrentSettings.Configuration.EnableThumbstickCamera = !CurrentSettings.Configuration.EnableThumbstickCamera;
 				break;
-				
+
 			case OtherSettingsOption::ToggleRumble:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableRumble = !CurrentSettings.Configuration.EnableRumble;
 				break;
 
-			case OtherSettingsOption::ThumbstickCameraControl:
+			case OtherSettingsOption::TargetHighlighter:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableThumbstickCamera = !CurrentSettings.Configuration.EnableThumbstickCamera;
+				CurrentSettings.Configuration.EnableTargetHighlighter = !CurrentSettings.Configuration.EnableTargetHighlighter;
+				break;
+				
+			case OtherSettingsOption::Subtitles:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
 				break;
 			}
 		}

@@ -230,11 +230,12 @@ bool SaveConfiguration()
 
 	// Set Gameplay keys.
 	if (SetDWORDRegKey(gameplayKey, REGKEY_CONTROL_MODE, (DWORD)g_Configuration.ControlMode) != ERROR_SUCCESS ||
-		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_GRAB, g_Configuration.EnableAutoGrab) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
-		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, g_Configuration.EnableTargetHighlighter) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
-		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS)
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, g_Configuration.EnableTargetHighlighter) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
@@ -323,11 +324,12 @@ void InitDefaultConfiguration()
 	g_Configuration.SfxVolume = 100;
 
 	g_Configuration.ControlMode = ControlMode::EnhancedTank;
-	g_Configuration.EnableSubtitles = true;
+	g_Configuration.EnableAutoGrab = true;
 	g_Configuration.EnableAutoTargeting = true;
-	g_Configuration.EnableTargetHighlighter = true;
-	g_Configuration.EnableRumble = true;
 	g_Configuration.EnableThumbstickCamera = false;
+	g_Configuration.EnableRumble = true;
+	g_Configuration.EnableTargetHighlighter = true;
+	g_Configuration.EnableSubtitles = true;
 
 	g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
 	g_Configuration.MouseSmoothing = GameConfiguration::DEFAULT_MOUSE_SMOOTHING;
@@ -422,19 +424,21 @@ bool LoadConfiguration()
 	}
 
 	DWORD controlMode = (DWORD)ControlMode::EnhancedTank;
-	bool enableSubtitles = true;
+	bool enableAutoGrab = true;
 	bool enableAutoTargeting = true;
-	bool enableTargetHighlighter = true;
-	bool enableRumble = true;
 	bool enableThumbstickCamera = true;
+	bool enableRumble = true;
+	bool enableTargetHighlighter = true;
+	bool enableSubtitles = true;
 
 	// Load Gameplay keys.
 	if (GetDWORDRegKey(gameplayKey, REGKEY_CONTROL_MODE, &controlMode, (DWORD)ControlMode::EnhancedTank) != ERROR_SUCCESS ||
-		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_GRAB, &enableAutoGrab, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
-		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, &enableTargetHighlighter, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
-		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS)
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, &enableTargetHighlighter, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
@@ -512,10 +516,11 @@ bool LoadConfiguration()
 	g_Configuration.SoundDevice = soundDevice;
 
 	g_Configuration.ControlMode = (ControlMode)controlMode;
+	g_Configuration.EnableAutoGrab = enableAutoGrab;
 	g_Configuration.EnableAutoTargeting = enableAutoTargeting;
-	g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
-	g_Configuration.EnableRumble = enableRumble;
 	g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
+	g_Configuration.EnableRumble = enableRumble;
+	g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
 	g_Configuration.EnableSubtitles = enableSubtitles;
 
 	g_Configuration.MouseSensitivity = mouseSensitivity;
