@@ -51,6 +51,9 @@ private:
 
 	static std::string SaveGame::GetSavegameFilename(int slot);
 	static bool IsSaveGameSlotValid(int slot);
+
+	static const std::vector<byte> Build();
+	static void Parse(const std::vector<byte>& buffer, bool hubMode);
 	
 public:
 	static int LastSaveGame;
@@ -58,16 +61,13 @@ public:
 	static void Init(const std::string& dir);
 	static bool Load(int slot);
 	static bool LoadHeader(int slot, SaveGameHeader* header);
+	static void LoadHeaders();
 	static bool Save(int slot);
-	static void LoadSavegameInfos();
 	static void Delete(int slot);
+
+	static bool DoesSaveGameExist(int slot, bool silent = false);
 
 	static void SaveHub(int index);
 	static void LoadHub(int index);
 	static void ResetHub();
-
-	static const std::vector<byte> Build();
-	static void Parse(const std::vector<byte>& buffer, bool hubMode);
-
-	static bool DoesSaveGameExist(int slot, bool silent = false);
 };

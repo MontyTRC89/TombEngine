@@ -407,7 +407,7 @@ namespace TEN::Gui
 						selectedOptionBackup = SelectedOption;
 						SelectedOption = 0;
 						MenuToDisplay = Menu::LoadGame;
-						SaveGame::LoadSavegameInfos();
+						SaveGame::LoadHeaders();
 						break;
 
 					case TitleOption::Options:
@@ -2612,12 +2612,12 @@ namespace TEN::Gui
 						break;
 
 					case MenuType::Load:
-						SaveGame::LoadSavegameInfos();
+						SaveGame::LoadHeaders();
 						SetInventoryMode(InventoryMode::Load);
 						break;
 
 					case MenuType::Save:
-						SaveGame::LoadSavegameInfos();
+						SaveGame::LoadHeaders();
 						SetInventoryMode(InventoryMode::Save);
 						break;
 

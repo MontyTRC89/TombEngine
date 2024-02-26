@@ -7,6 +7,8 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
+#include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_two_guns.h"
 #include "Game/Lara/PlayerStateMachine.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
@@ -144,8 +146,23 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* lBackup)
 	lara->Inventory = lBackup->Inventory;
 	lara->Status = lBackup->Status;
 	lara->Control.Weapon.LastGunType = lBackup->Control.Weapon.LastGunType;
-	lara->Control.Weapon.HolsterInfo = lBackup->Control.Weapon.HolsterInfo;
 	memcpy(&lara->Weapons, &lBackup->Weapons, sizeof(CarriedWeaponInfo) * int(LaraWeaponType::NumWeapons));
+
+	// Restore holsters.
+	// At first, attempt to restore original holster data, then refer to selected weapons.
+	lara->Control.Weapon.HolsterInfo = lBackup->Control.Weapon.HolsterInfo;
+	
+	if (lara->Control.Weapon.HolsterInfo.RightHolster == HolsterSlot::Empty ||
+		lara->Control.Weapon.HolsterInfo.LeftHolster  == HolsterSlot::Empty)
+	{
+		UndrawPistolMesh(*item, lara->Control.Weapon.LastGunType, true);
+		UndrawPistolMesh(*item, lara->Control.Weapon.LastGunType, false);
+	}
+
+	if (lara->Control.Weapon.HolsterInfo.BackHolster == HolsterSlot::Empty)
+	{
+		UndrawShotgunMeshes(*item, lara->Control.Weapon.LastGunType);
+	}
 
 	// If no flare present, quit
 	if (lBackup->Control.Weapon.GunType != LaraWeaponType::Flare)

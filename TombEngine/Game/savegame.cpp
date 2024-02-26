@@ -61,7 +61,7 @@ FileStream* SaveGame::StreamPtr;
 std::string SaveGame::FullSaveDirectory;
 int SaveGame::LastSaveGame;
 
-void SaveGame::LoadSavegameInfos()
+void SaveGame::LoadHeaders()
 {
 	for (int i = 0; i < SAVEGAME_MAX; i++)
 		SavegameInfos[i].Present = false;
@@ -86,13 +86,6 @@ void SaveGame::LoadSavegameInfos()
 		if (SavegameInfos[i].Count > LastSaveGame)
 			LastSaveGame = SavegameInfos[i].Count;
 	}
-}
-
-Pose ToPose(const Save::Pose* pose)
-{
-	return Pose(
-		pose->x_pos(), pose->y_pos(), pose->z_pos(),
-		(short)pose->x_rot(), (short)pose->y_rot(), (short)pose->z_rot());
 }
 
 Save::Pose FromPose(const Pose& pose)
@@ -134,6 +127,13 @@ Save::Vector3 FromVector3i(const Vector3i& vec)
 Save::Vector4 FromVector4(const Vector4& vec)
 {
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
+}
+
+Pose ToPose(const Save::Pose* pose)
+{
+	return Pose(
+		pose->x_pos(), pose->y_pos(), pose->z_pos(),
+		(short)pose->x_rot(), (short)pose->y_rot(), (short)pose->z_rot());
 }
 
 EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
@@ -1483,7 +1483,7 @@ bool SaveGame::Save(int slot)
 	HandleAllGlobalEvents(EventType::Save, (Activator)LaraItem->Index);
 
 	// Savegame infos need to be reloaded so that last savegame counter properly increases.
-	SaveGame::LoadSavegameInfos();
+	LoadHeaders();
 
 	auto fileName = GetSavegameFilename(slot);
 	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
