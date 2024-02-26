@@ -30,7 +30,6 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
-constexpr auto PARTICLE_FADE_THRESHOLD			   = BLOCK(14);
 constexpr auto CAMERA_OBJECT_COLL_DIST_THRESHOLD   = BLOCK(4);
 constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
@@ -86,8 +85,8 @@ float CinematicBarsSpeed = 0;
 static bool IsCameraCollidableItem(const ItemInfo& item)
 {
 	// 1) Test distance.
-	float dist = Vector3i::Distance(item.Pose.Position, Camera.pos.ToVector3i());
-	if (dist >= CAMERA_OBJECT_COLL_DIST_THRESHOLD)
+	float distSqr = Vector3i::DistanceSquared(item.Pose.Position, Camera.pos.ToVector3i());
+	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
 		return false;
 
 	// 2) Test object collidability.
@@ -147,8 +146,8 @@ static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
 static bool IsCameraCollideableStatic(const MESH_INFO& staticObject)
 {
 	// 1) Test distance.
-	float dist = Vector3i::Distance(Camera.pos.ToVector3i(), staticObject.pos.Position);
-	if (dist >= CAMERA_OBJECT_COLL_DIST_THRESHOLD)
+	float distSqr = Vector3i::DistanceSquared(Camera.pos.ToVector3i(), staticObject.pos.Position);
+	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
 		return false;
 
 	// 2) Check if static is visible.
@@ -224,7 +223,7 @@ static std::optional<Vector3> GetCameraRayBoxIntersect(const BoundingOrientedBox
 	return std::nullopt;
 }
 
-static std::optional<GameVector> GetCameraObjectLos(const GameVector& idealPos)
+static std::optional<GameVector> GetCameraObjectLosIntersect(const GameVector& idealPos)
 {
 	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
 
@@ -233,7 +232,7 @@ static std::optional<GameVector> GetCameraObjectLos(const GameVector& idealPos)
 
 	auto pos = idealPos.ToVector3();
 
-	// Collide with items.
+	// Collide items.
 	auto itemPtrs = GetCameraCollidableItemPtrs();
 	for (const auto* itemPtr : itemPtrs)
 	{
@@ -252,7 +251,7 @@ static std::optional<GameVector> GetCameraObjectLos(const GameVector& idealPos)
 		g_Renderer.AddDebugBox(box, DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
 	}
 
-	// Collide with statics.
+	// Collide statics.
 	auto staticPtrs = GetCameraCollidableStaticPtrs();
 	for (const auto* staticPtr : staticPtrs)
 	{
@@ -378,7 +377,7 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 	CameraCollisionBounds(&target, COLL_PUSH, true);
 
 	// Collide with objects.
-	auto objectLosIntersect = GetCameraObjectLos(target);
+	auto objectLosIntersect = GetCameraObjectLosIntersect(target);
 	if (objectLosIntersect.has_value())
 		target = *objectLosIntersect;
 
@@ -393,15 +392,10 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 
 void LookAt(CAMERA_INFO* cam, short roll)
 {
-	auto pos = cam->pos.ToVector3();
-	auto target = cam->target.ToVector3();
-	auto up = Vector3::Down;
 	float fov = TO_RAD(CurrentFOV / 1.333333f);
-	float r = TO_RAD(roll);
+	float levelFarView = BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView());
 
-	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(BLOCK(1));
-
-	g_Renderer.UpdateCameraMatrices(cam, r, fov, levelFarView);
+	g_Renderer.UpdateCameraMatrices(cam, TO_RAD(roll), fov, levelFarView);
 }
 
 void AlterFOV(short value, bool store)
@@ -421,7 +415,6 @@ inline void RumbleFromBounce()
 {
 	Rumble(std::clamp((float)abs(Camera.bounce) / 70.0f, 0.0f, 0.8f), 0.2f);
 }
-
 
 void InitializeCamera()
 {
@@ -466,6 +459,8 @@ void InitializeCamera()
 
 void MoveCamera(GameVector* ideal, float speed)
 {
+	constexpr auto BUFFER = CLICK(1) - 1;
+
 	if (Lara.Control.Look.IsUsingBinoculars)
 		speed = 1.0f;
 
@@ -516,21 +511,24 @@ void MoveCamera(GameVector* ideal, float speed)
 	}
 
 	// Collide with objects.
-	auto objectLosIntersect = GetCameraObjectLos(*ideal);
+	auto objectLosIntersect = GetCameraObjectLosIntersect(*ideal);
 	if (objectLosIntersect.has_value())
 		*ideal = *objectLosIntersect;
 
+	// Translate camera.
 	Camera.pos.x += (ideal->x - Camera.pos.x) / speed;
 	Camera.pos.y += (ideal->y - Camera.pos.y) / speed;
 	Camera.pos.z += (ideal->z - Camera.pos.z) / speed;
 	Camera.pos.RoomNumber = ideal->RoomNumber;
 
+	// Bounce.
 	if (Camera.bounce)
 	{
 		if (Camera.bounce <= 0)
 		{
 			int bounce = -Camera.bounce;
 			int bounce2 = bounce / 2;
+
 			Camera.target.x += GetRandomControl() % bounce - bounce2;
 			Camera.target.y += GetRandomControl() % bounce - bounce2;
 			Camera.target.z += GetRandomControl() % bounce - bounce2;
@@ -546,25 +544,25 @@ void MoveCamera(GameVector* ideal, float speed)
 	}
 
 	// Avoid entering swamp rooms.
-	int y = Camera.pos.y;
+	int vPos = Camera.pos.y;
 	if (TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber))
-		y = g_Level.Rooms[Camera.pos.RoomNumber].y - CLICK(1);
+		vPos = g_Level.Rooms[Camera.pos.RoomNumber].y - BUFFER;
 
-	// Beyond floor or ceiling.
-	auto pointColl = GetCollision(Camera.pos.x, y, Camera.pos.z, Camera.pos.RoomNumber);
-	if (y < pointColl.Position.Ceiling ||
-		y > pointColl.Position.Floor)
+	// Handle position out of room bounds.
+	auto pointColl = GetCollision(Camera.pos.x, vPos, Camera.pos.z, Camera.pos.RoomNumber);
+	if (vPos > pointColl.Position.Floor ||
+		vPos < pointColl.Position.Ceiling)
 	{
 		LOSAndReturnTarget(&Camera.target, &Camera.pos, 0);
 
-		if (abs(Camera.pos.x - ideal->x) < BLOCK(0.5f) &&
-			abs(Camera.pos.y - ideal->y) < BLOCK(0.5f) &&
-			abs(Camera.pos.z - ideal->z) < BLOCK(0.5f))
+		float dist = Vector3::Distance(Camera.pos.ToVector3(), ideal->ToVector3());
+		if (dist < BLOCK(0.5f))
 		{
 			auto origin = *ideal;
 			auto target = Camera.pos;
-			if (!LOSAndReturnTarget(&origin, &target, 0) &&
-				++CameraSnaps >= 8)
+
+			// Snap to within room bounds.
+			if (!LOSAndReturnTarget(&origin, &target, 0) && ++CameraSnaps >= 8)
 			{
 				Camera.pos = *ideal;
 				CameraSnaps = 0;
@@ -572,34 +570,29 @@ void MoveCamera(GameVector* ideal, float speed)
 		}
 	}
 
+	// Handle narrow space between floor and ceiling.
 	pointColl = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber);
-
-	int buffer = CLICK(1) - 1;
-	if ((Camera.pos.y - buffer) < pointColl.Position.Ceiling &&
-		(Camera.pos.y + buffer) > pointColl.Position.Floor &&
+	if ((Camera.pos.y - BUFFER) < pointColl.Position.Ceiling &&
+		(Camera.pos.y + BUFFER) > pointColl.Position.Floor &&
 		pointColl.Position.Ceiling < pointColl.Position.Floor &&
-		pointColl.Position.Ceiling != NO_HEIGHT &&
-		pointColl.Position.Floor != NO_HEIGHT)
+		pointColl.Position.Ceiling != NO_HEIGHT && pointColl.Position.Floor != NO_HEIGHT)
 	{
 		Camera.pos.y = (pointColl.Position.Floor + pointColl.Position.Ceiling) / 2;
 	}
-	else if ((Camera.pos.y + buffer) > pointColl.Position.Floor &&
+	else if ((Camera.pos.y + BUFFER) > pointColl.Position.Floor &&
 		pointColl.Position.Ceiling < pointColl.Position.Floor &&
-		pointColl.Position.Ceiling != NO_HEIGHT &&
-		pointColl.Position.Floor != NO_HEIGHT)
+		pointColl.Position.Ceiling != NO_HEIGHT && pointColl.Position.Floor != NO_HEIGHT)
 	{
-		Camera.pos.y = pointColl.Position.Floor - buffer;
+		Camera.pos.y = pointColl.Position.Floor - BUFFER;
 	}
-	else if ((Camera.pos.y - buffer) < pointColl.Position.Ceiling &&
+	else if ((Camera.pos.y - BUFFER) < pointColl.Position.Ceiling &&
 		pointColl.Position.Ceiling < pointColl.Position.Floor &&
-		pointColl.Position.Ceiling != NO_HEIGHT &&
-		pointColl.Position.Floor != NO_HEIGHT)
+		pointColl.Position.Ceiling != NO_HEIGHT &&	pointColl.Position.Floor != NO_HEIGHT)
 	{
-		Camera.pos.y = pointColl.Position.Ceiling + buffer;
+		Camera.pos.y = pointColl.Position.Ceiling + BUFFER;
 	}
 	else if (pointColl.Position.Ceiling >= pointColl.Position.Floor ||
-		pointColl.Position.Floor == NO_HEIGHT ||
-		pointColl.Position.Ceiling == NO_HEIGHT)
+		pointColl.Position.Floor == NO_HEIGHT || pointColl.Position.Ceiling == NO_HEIGHT)
 	{
 		Camera.pos = *ideal;
 	}
@@ -1428,9 +1421,7 @@ void CalculateCamera(const CollisionInfo& coll)
 	}
 
 	if (ItemCamera.ItemCameraOn)
-	{
 		return;
-	}
 
 	if (UseForcedFixedCamera != 0)
 	{
@@ -1439,7 +1430,7 @@ void CalculateCamera(const CollisionInfo& coll)
 			Camera.speed = 1;
 	}
 
-	// Camera is in a water room, play water sound effect.
+	// Play water sound effect if camera is in water room.
 	if (TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber))
 	{
 		SoundEffect(SFX_TR4_UNDERWATER, nullptr, SoundEnvironment::Always);
@@ -1472,6 +1463,7 @@ void CalculateCamera(const CollisionInfo& coll)
 	int y = item->Pose.Position.y + bounds.Y2 + (3 * (bounds.Y1 - bounds.Y2) / 4);
 	int z;
 
+	// Make player look toward target item.
 	if (Camera.item)
 	{
 		if (!isFixedCamera)
@@ -1574,7 +1566,8 @@ void CalculateCamera(const CollisionInfo& coll)
 		x = item->Pose.Position.x;
 		z = item->Pose.Position.z;
 
-		if (Camera.flags == CF_FOLLOW_CENTER)	//Troye Aug. 7th 2022
+		// -- Troye 2022.8.7
+		if (Camera.flags == CF_FOLLOW_CENTER)
 		{
 			auto shift = (bounds.Z1 + bounds.Z2) / 2;
 			x += shift * phd_sin(item->Pose.Orientation.y);
@@ -1584,9 +1577,7 @@ void CalculateCamera(const CollisionInfo& coll)
 		Camera.target.x = x;
 		Camera.target.z = z;
 
-		// CF_FOLLOW_CENTER sets target on the item, ConfirmCameraTargetPos overrides this target, 
-		// hence the flag check. Troye Aug. 7th 2022
-		
+		// CF_FOLLOW_CENTER sets target on item abd ConfirmCameraTargetPos overrides this target, hence flag check. -- Troye 2022.8.7
 		if (item->IsLara() && Camera.flags != CF_FOLLOW_CENTER)
 			ConfirmCameraTargetPos();
 
@@ -1668,6 +1659,8 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, sh
 
 float GetParticleDistanceFade(const Vector3i& pos)
 {
+	constexpr auto PARTICLE_FADE_THRESHOLD = BLOCK(14);
+
 	float dist = Vector3::Distance(Camera.pos.ToVector3(), pos.ToVector3());
 	if (dist <= PARTICLE_FADE_THRESHOLD)
 		return 1.0f;
