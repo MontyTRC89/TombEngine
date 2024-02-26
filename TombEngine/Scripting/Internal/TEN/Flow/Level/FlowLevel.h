@@ -36,7 +36,7 @@ struct Level : public ScriptInterfaceLevel
 	LaraType Type{ LaraType::Normal };
 	Mirror Mirror;
 	int LevelFarView{ 0 };
-	bool UnlimitedAir{ false };
+	bool ResetHub{ false };
 	std::vector<InventoryItem> InventoryObjects;
 	int LevelSecrets{ 0 };
 
@@ -44,7 +44,7 @@ struct Level : public ScriptInterfaceLevel
 	bool GetFogEnabled() const override;
 	float GetWeatherStrength() const override;
 	bool GetSkyLayerEnabled(int index) const override;
-	bool HasStorm() const override;
+	bool GetStormEnabled() const override;
 	short GetSkyLayerSpeed(int index) const override;
 	RGBAColor8Byte GetSkyLayerColor(int index) const override;
 	LaraType GetLaraType() const override;
@@ -59,4 +59,5 @@ struct Level : public ScriptInterfaceLevel
 	void SetSecrets(int secrets);
 	int GetSecrets() const override;
 	std::string GetAmbientTrack() const override;
+	bool GetResetHubEnabled() const override;
 };

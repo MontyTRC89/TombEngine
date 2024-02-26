@@ -1451,14 +1451,21 @@ const std::vector<byte> SaveGame::Build()
 
 void SaveGame::SaveHub(int index)
 {
+	// Don't save title level to a hub
+	if (index == 0)
+		return;
+
+	// Build hub data
 	Hub[index] = Build();
 }
 
 void SaveGame::LoadHub(int index)
 {
-	if (Hub.count(index) == 0)
+	// Don't attempt to load hub data if it does not exist, or level is a title level
+	if (index == 0 || Hub.count(index) == 0)
 		return;
 
+	// Load hub data
 	Parse(Hub[index], true);
 }
 
@@ -1487,13 +1494,14 @@ bool SaveGame::Save(int slot)
 	std::ofstream fileOut{};
 	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
 
+	// Write current level save data
 	auto currentLevelState = SaveGame::Build();
 	int size = (int)currentLevelState.size();
 	fileOut << size;
 	fileOut.write(reinterpret_cast<const char*>(currentLevelState.data()), size);
 
+	// Write hub data
 	int hubCount = (int)Hub.size();
-
 	fileOut.write(reinterpret_cast<const char*>(&hubCount), sizeof(hubCount));
 
 	for (auto& level : Hub)
@@ -1523,16 +1531,18 @@ bool SaveGame::Load(int slot)
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
-	file.seekg(0, std::ios::end);
-	size_t length = file.tellg();
-	file.seekg(0, std::ios::beg);
 
 	int size;
 	file >> size;
 
+	// Read current level save data
 	std::vector<byte> saveData(size);
 	file.read(reinterpret_cast<char*>(saveData.data()), size);
 
+	// Reset hub data, because we're about to replace it with saved one
+	ResetHub();
+
+	// Read hub data from the savegame
 	int hubCount;
 	file >> hubCount;
 
@@ -1550,6 +1560,7 @@ bool SaveGame::Load(int slot)
 
 	file.close();
 
+	// Load save data for current level
 	Parse(saveData, false);
 	return true;
 }
@@ -1564,6 +1575,7 @@ static void ParseStatistics(const Save::SaveGame* s, bool hub)
 	Statistics.Level.Secrets = s->level()->secrets();
 	Statistics.Level.Timer = s->level()->timer();
 
+	// Game statistics are untouched, if data is parsed in hub mode
 	if (hub)
 		return;
 
@@ -2227,6 +2239,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		g_GameScriptEntities->TryAddColliding(i);
 
+		// Don't load Lara data in the hub mode
 		if (item->ObjectNumber == ID_LARA && hubMode)
 			continue;
 
@@ -2472,6 +2485,9 @@ void SaveGame::Parse(const std::vector<byte>& buffer, bool hubMode)
 	ParseLua(s);
 	ParseStatistics(s, hubMode);
 
+	// Effects and Lara data is ignored when loading hub.
+	// Effects are commonly believed to be non-preservable, while Lara data is transfered from previous level.
+
 	if (hubMode)
 		return;
 
@@ -2496,7 +2512,7 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 	size_t length = file.tellg();
 	file.seekg(0, std::ios::beg);
 
-	if (length <= 0)
+	if (length == 0)
 	{
 		TENLog("Savegame #" + std::to_string(slot) + " has no data!", LogLevel::Warning);
 		return false;

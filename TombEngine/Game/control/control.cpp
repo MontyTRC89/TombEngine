@@ -529,6 +529,7 @@ void InitializeOrLoadGame(bool loadGame)
 			GameTimer = 0;
 			InitializeGame = false;
 
+			SaveGame::ResetHub();
 			TENLog("Starting new game.", LogLevel::Info);
 		}
 		else
