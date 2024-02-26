@@ -1456,7 +1456,7 @@ void SaveGame::SaveHub(int index)
 		return;
 
 	// Build hub data
-	TENLog("Saving hub data for level #" + std::to_string(index) + (Hub.count(index) > 0 ? " (overwrite)" : "(new)"), LogLevel::Info);
+	TENLog("Saving hub data for level #" + std::to_string(index) + (Hub.count(index) > 0 ? " (overwrite)" : " (new)"), LogLevel::Info);
 	Hub[index] = Build();
 }
 
@@ -1503,7 +1503,7 @@ bool SaveGame::Save(int slot)
 	// Write current level save data
 	auto currentLevelState = SaveGame::Build();
 	int size = (int)currentLevelState.size();
-	fileOut << size;
+	fileOut.write(reinterpret_cast<const char*>(&size), sizeof(size));
 	fileOut.write(reinterpret_cast<const char*>(currentLevelState.data()), size);
 
 	// Write hub data
@@ -1512,10 +1512,10 @@ bool SaveGame::Save(int slot)
 
 	for (auto& level : Hub)
 	{
-		fileOut << level.first;
+		fileOut.write(reinterpret_cast<const char*>(&level.first), sizeof(level.first));
 
 		size = (int)level.second.size();
-		fileOut << size;
+		fileOut.write(reinterpret_cast<const char*>(&size), sizeof(size));
 		fileOut.write(reinterpret_cast<const char*>(level.second.data()), size);
 	}
 
@@ -1538,8 +1538,8 @@ bool SaveGame::Load(int slot)
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
 
-	int size;
-	file >> size;
+	int size; 
+	file.read(reinterpret_cast<char*>(&size), sizeof(size));
 
 	// Read current level save data
 	std::vector<byte> saveData(size);
@@ -1550,16 +1550,16 @@ bool SaveGame::Load(int slot)
 
 	// Read hub data from the savegame
 	int hubCount;
-	file >> hubCount;
+	file.read(reinterpret_cast<char*>(&hubCount), sizeof(hubCount));
 
 	TENLog("Hub count: " + std::to_string(hubCount), LogLevel::Info);
 
 	for (int i = 0; i < hubCount; i++)
 	{
 		int index;
-		file >> index;
+		file.read(reinterpret_cast<char*>(&index), sizeof(index));
 
-		file >> size;
+		file.read(reinterpret_cast<char*>(&size), sizeof(size));
 		std::vector<byte> hubBuffer(size);
 		file.read(reinterpret_cast<char*>(hubBuffer.data()), size);
 
@@ -2485,6 +2485,12 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 void SaveGame::Parse(const std::vector<byte>& buffer, bool hubMode)
 {
+	if (!Save::VerifySaveGameBuffer(flatbuffers::Verifier(buffer.data(), buffer.size())))
+	{
+		TENLog("Savegame data is incorrect and was not loaded! Incorrect flatbuffer format or memory corruption?", LogLevel::Error);
+		return;
+	}
+
 	JustLoaded = true;
 
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.data());
@@ -2529,13 +2535,15 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 	try
 	{
 		int size;
-		file >> size;
+		file.read(reinterpret_cast<char*>(&size), sizeof(size));
 
 		std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
 		file.read(buffer.get(), size);
 		file.close();
 
-		if (size <= 0 || size >= length)
+		bool bufferIsValid = Save::VerifySaveGameBuffer(flatbuffers::Verifier(reinterpret_cast<const unsigned char*>(buffer.get()), size));
+
+		if (size <= 0 || size >= length || !bufferIsValid)
 		{
 			TENLog("Incorrect data in savegame #" + std::to_string(slot) + ". Old format?", LogLevel::Warning);
 			return false;
@@ -2557,7 +2565,7 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 	}
 	catch (std::exception& ex)
 	{
-		TENLog("Error reading savegame #" + std::to_string(slot) + ", Exception: " + ex.what(), LogLevel::Warning);
+		TENLog("Error reading savegame #" + std::to_string(slot) + ", Exception: " + ex.what(), LogLevel::Error);
 		return false;
 	}
 }
