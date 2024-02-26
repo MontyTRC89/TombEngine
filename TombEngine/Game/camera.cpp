@@ -1410,9 +1410,7 @@ static void UpdatePlayerRefCameraOrient(ItemInfo& item)
 
 void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 {
-	CamOldPos.x = Camera.pos.x;
-	CamOldPos.y = Camera.pos.y;
-	CamOldPos.z = Camera.pos.z;
+	CamOldPos = Camera.pos.ToVector3i();
 
 	if (Lara.Control.Look.IsUsingBinoculars)
 	{
@@ -1443,37 +1441,36 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 			Camera.underwater = false;
 	}
 
-	const ItemInfo* item = nullptr;
+	const ItemInfo* itemPtr = nullptr;
 	bool isFixedCamera = false;
-	if (Camera.item != nullptr &&
-		(Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
+	if (Camera.item != nullptr && (Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
 	{
-		item = Camera.item;
+		itemPtr = Camera.item;
 		isFixedCamera = true;
 	}
 	else
 	{
-		item = &playerItem;
+		itemPtr = &playerItem;
 		isFixedCamera = false;
 	}
 
-	auto bounds = GameBoundingBox(item);
+	auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
 
-	int x;
-	int y = item->Pose.Position.y + bounds.Y2 + (3 * (bounds.Y1 - bounds.Y2) / 4);
-	int z;
+	int x = 0;
+	int y = itemPtr->Pose.Position.y - (box.Extents.y * (IsUsingModernControls() ? 1.8f : 1.5f));
+	int z = 0;
 
 	// Make player look toward target item.
-	if (Camera.item)
+	if (Camera.item != nullptr)
 	{
 		if (!isFixedCamera)
 		{
-			auto deltaPos = Camera.item->Pose.Position - item->Pose.Position;
-			float dist = Vector3i::Distance(Camera.item->Pose.Position, item->Pose.Position);
+			auto deltaPos = Camera.item->Pose.Position - itemPtr->Pose.Position;
+			float dist = Vector3i::Distance(Camera.item->Pose.Position, itemPtr->Pose.Position);
 
 			auto lookOrient = EulerAngles(
-				phd_atan(dist, y - (bounds.Y1 + bounds.Y2) / 2 - Camera.item->Pose.Position.y),
-				phd_atan(deltaPos.z, deltaPos.x) - item->Pose.Orientation.y,
+				phd_atan(dist, y + box.Extents.y - Camera.item->Pose.Position.y),
+				phd_atan(deltaPos.z, deltaPos.x) - itemPtr->Pose.Orientation.y,
 				0) / 2;
 
 			if (lookOrient.y > ANGLE(-50.0f) &&	lookOrient.y < ANGLE(50.0f) &&
@@ -1522,15 +1519,13 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	{
 		if (Camera.type == CameraType::Combat)
 		{
-			LastTarget.x = Camera.target.x;
-			LastTarget.y = Camera.target.y;
-			LastTarget.z = Camera.target.z;
-			LastTarget.RoomNumber = Camera.target.RoomNumber;
+			LastTarget = Camera.target;
 
-			y -= CLICK(1);
+			if (!IsUsingModernControls())
+				y -= CLICK(1);
 		}
 
-		Camera.target.RoomNumber = item->RoomNumber;
+		Camera.target.RoomNumber = itemPtr->RoomNumber;
 
 		if (Camera.fixedCamera || Lara.Control.Look.IsUsingBinoculars)
 		{
@@ -1546,11 +1541,11 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 		Camera.fixedCamera = false;
 		if (Camera.type == CameraType::Look)
 		{
-			LookCamera(*item, coll);
+			LookCamera(*itemPtr, coll);
 		}
 		else
 		{
-			CombatCamera(*item);
+			CombatCamera(*itemPtr);
 		}
 	}
 	else
@@ -1560,25 +1555,25 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 		LastTarget.z = Camera.target.z;
 		LastTarget.RoomNumber = Camera.target.RoomNumber;
 
-		Camera.target.RoomNumber = item->RoomNumber;
+		Camera.target.RoomNumber = itemPtr->RoomNumber;
 		Camera.target.y = y;
 
-		x = item->Pose.Position.x;
-		z = item->Pose.Position.z;
+		x = itemPtr->Pose.Position.x;
+		z = itemPtr->Pose.Position.z;
 
 		// -- Troye 2022.8.7
 		if (Camera.flags == CF_FOLLOW_CENTER)
 		{
-			auto shift = (bounds.Z1 + bounds.Z2) / 2;
-			x += shift * phd_sin(item->Pose.Orientation.y);
-			z += shift * phd_cos(item->Pose.Orientation.y);
+			int shift = -box.Extents.y;
+			x += shift * phd_sin(itemPtr->Pose.Orientation.y);
+			z += shift * phd_cos(itemPtr->Pose.Orientation.y);
 		}
 
 		Camera.target.x = x;
 		Camera.target.z = z;
 
 		// CF_FOLLOW_CENTER sets target on item abd ConfirmCameraTargetPos overrides this target, hence flag check. -- Troye 2022.8.7
-		if (item->IsLara() && Camera.flags != CF_FOLLOW_CENTER)
+		if (itemPtr->IsLara() && Camera.flags != CF_FOLLOW_CENTER)
 			ConfirmCameraTargetPos();
 
 		if (isFixedCamera == Camera.fixedCamera)
@@ -1626,7 +1621,7 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 		}
 		else
 		{
-			ChaseCamera(*item);
+			ChaseCamera(*itemPtr);
 		}
 	}
 
