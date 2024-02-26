@@ -709,26 +709,15 @@ void RefreshFixedCamera(short camNumber)
 	MoveCamera(&origin, moveSpeed);
 }
 
-void ChaseCamera(const ItemInfo& playerItem)
+static void ClampCameraXOrientation(bool isUnderwater)
 {
-	constexpr auto MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT = std::pair<short, short>(-ANGLE(85.0f), ANGLE(70.0f));
-	constexpr auto MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT	= std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
+	constexpr auto MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT = std::pair<short, short>(ANGLE(-85.0f), ANGLE(70.0f));
+	constexpr auto MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT	= std::pair<short, short>(ANGLE(-85.0f), ANGLE(80.0f));
 	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT				= ANGLE(85.0f);
-	constexpr auto BUFFER										= 100;
 
-	const auto& player = GetLaraInfo(playerItem);
-
-	if (Camera.targetElevation == 0)
-		Camera.targetElevation = ANGLE(-10.0f);
-
-	Camera.targetElevation += playerItem.Pose.Orientation.x;
-	UpdateCameraElevation();
-
-	// Clamp X orientation.
 	if (IsUsingModernControls())
 	{
-		const auto& xAngleConstraint = (player.Control.WaterStatus == WaterStatus::Underwater) ?
-			MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT : MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT;
+		const auto& xAngleConstraint = isUnderwater ? MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT : MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT;
 		if (Camera.actualElevation > xAngleConstraint.second)
 		{
 			Camera.actualElevation = xAngleConstraint.second;
@@ -749,24 +738,11 @@ void ChaseCamera(const ItemInfo& playerItem)
 			Camera.actualElevation = -TANK_CAMERA_X_ANGLE_CONSTRAINT;
 		}
 	}
+}
 
-	auto pointColl = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.RoomNumber);
-
-	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.RoomNumber))
-		Camera.target.y = g_Level.Rooms[pointColl.RoomNumber].maxceiling - CLICK(1);
-
-	int y = Camera.target.y;
-	pointColl = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.RoomNumber);
-	if (((y < pointColl.Position.Ceiling || pointColl.Position.Floor < y) || pointColl.Position.Floor <= pointColl.Position.Ceiling) ||
-		(pointColl.Position.Floor == NO_HEIGHT || pointColl.Position.Ceiling == NO_HEIGHT))
-	{
-		TargetSnaps++;
-		Camera.target = LastTarget;
-	}
-	else
-	{
-		TargetSnaps = 0;
-	}
+static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
+{
+	constexpr auto BUFFER = 100;
 
 	// Move camera.
 	if (IsUsingModernControls())
@@ -839,43 +815,48 @@ void ChaseCamera(const ItemInfo& playerItem)
 		}
 
 		CameraCollisionBounds(&farthestIdealPos, CLICK(1.5f), true);
+
+		if (isCombatCamera)
+		{
+			// Snap position of fixed camera type.
+			if (Camera.oldType == CameraType::Fixed)
+				Camera.speed = 1.0f;
+		}
+
 		MoveCamera(&farthestIdealPos, Camera.speed);
 	}
 }
 
-void UpdateCameraElevation()
+void ChaseCamera(const ItemInfo& playerItem)
 {
-	constexpr auto CAMERA_AXIS_COEFF = 20.0f;
-	constexpr auto MOUSE_AXIS_COEFF	 = 250.0f;
+	const auto& player = GetLaraInfo(playerItem);
 
-	DoThumbstickCamera();
+	if (Camera.targetElevation == 0)
+		Camera.targetElevation = ANGLE(-10.0f);
 
-	if (Camera.laraNode != -1)
+	Camera.targetElevation += playerItem.Pose.Orientation.x;
+	UpdateCameraElevation();
+	ClampCameraXOrientation(player.Control.WaterStatus == WaterStatus::Underwater);
+
+	auto pointColl = GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, 0, 0, CLICK(1));
+
+	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.RoomNumber))
+		Camera.target.y = g_Level.Rooms[pointColl.RoomNumber].maxceiling - CLICK(1);
+
+	int vPos = Camera.target.y;
+	pointColl = GetCollision(Camera.target.x, vPos, Camera.target.z, Camera.target.RoomNumber);
+	if (((vPos < pointColl.Position.Ceiling || pointColl.Position.Floor < vPos) || pointColl.Position.Floor <= pointColl.Position.Ceiling) ||
+		(pointColl.Position.Floor == NO_HEIGHT || pointColl.Position.Ceiling == NO_HEIGHT))
 	{
-		auto pos = GetJointPosition(LaraItem, Camera.laraNode, Vector3i::Zero);
-		auto pos1 = GetJointPosition(LaraItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
-		pos = pos1 - pos;
-		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
+		TargetSnaps++;
+		Camera.target = LastTarget;
 	}
 	else
 	{
-		if (IsUsingModernControls())
-		{
-			const auto& cameraAxis = GetCameraAxis();
-			const auto& mouseAxis = GetMouseAxis();
-			const auto& activeAxis = (cameraAxis != Vector2::Zero) ? (cameraAxis * CAMERA_AXIS_COEFF) : (mouseAxis * MOUSE_AXIS_COEFF);
-
-			Camera.actualAngle += ANGLE(activeAxis.x);
-			Camera.actualElevation -= ANGLE(activeAxis.y);
-		}
-		else
-		{
-			Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
-		}
+		TargetSnaps = 0;
 	}
 
-	if (!IsUsingModernControls())
-		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
+	HandleCameraFollow(playerItem, false);
 }
 
 void CombatCamera(const ItemInfo& playerItem)
@@ -883,7 +864,6 @@ void CombatCamera(const ItemInfo& playerItem)
 	constexpr auto MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT = std::pair<short, short>(-ANGLE(85.0f), ANGLE(70.0f));
 	constexpr auto MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT	= std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
 	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT				= ANGLE(85.0f);
-	constexpr auto BUFFER										= 100;
 
 	const auto& player = GetLaraInfo(playerItem);
 
@@ -901,7 +881,7 @@ void CombatCamera(const ItemInfo& playerItem)
 		Camera.targetElevation = player.ExtraHeadRot.x + player.ExtraTorsoRot.x + playerItem.Pose.Orientation.x - ANGLE(15.0f);
 	}
 
-	auto pointColl = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.RoomNumber);
+	auto pointColl = GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, 0, 0, CLICK(1));
 	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.RoomNumber))
 		Camera.target.y = g_Level.Rooms[pointColl.RoomNumber].y - CLICK(1);
 
@@ -948,116 +928,46 @@ void CombatCamera(const ItemInfo& playerItem)
 	}
 
 	UpdateCameraElevation();
-
-	// Clamp X orientation.
-	if (IsUsingModernControls())
-	{
-		const auto& xAngleConstraint = (player.Control.WaterStatus == WaterStatus::Underwater) ?
-			MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT : MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT;
-		if (Camera.actualElevation > xAngleConstraint.second)
-		{
-			Camera.actualElevation = xAngleConstraint.second;
-		}
-		else if (Camera.actualElevation < xAngleConstraint.first)
-		{
-			Camera.actualElevation = xAngleConstraint.first;
-		}
-	}
-	else
-	{
-		if (Camera.actualElevation > TANK_CAMERA_X_ANGLE_CONSTRAINT)
-		{
-			Camera.actualElevation = TANK_CAMERA_X_ANGLE_CONSTRAINT;
-		}
-		else if (Camera.actualElevation < -TANK_CAMERA_X_ANGLE_CONSTRAINT)
-		{
-			Camera.actualElevation = -TANK_CAMERA_X_ANGLE_CONSTRAINT;
-		}
-	}
+	ClampCameraXOrientation(player.Control.WaterStatus == WaterStatus::Underwater);
 
 	Camera.targetDistance = BLOCK(1.5f);
 
-	if (IsUsingModernControls())
+	HandleCameraFollow(playerItem, true);
+}
+
+void UpdateCameraElevation()
+{
+	constexpr auto CAMERA_AXIS_COEFF = 20.0f;
+	constexpr auto MOUSE_AXIS_COEFF	 = 250.0f;
+
+	DoThumbstickCamera();
+
+	if (Camera.laraNode != -1)
 	{
-		auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
-		auto idealPos = Geometry::TranslatePoint(Camera.target.ToVector3(), dir, Camera.targetDistance);
-
-		// Determine best position.
-		auto origin = Camera.target;
-		auto target = GameVector(idealPos, GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, dir, Camera.targetDistance).RoomNumber);
-		LOSAndReturnTarget(&origin, &target, 0);
-
-		// Apply buffer if origin and target are too close.
-		float dist = Vector3::Distance(origin.ToVector3(), target.ToVector3());
-		if (dist <= BUFFER)
-			target = GameVector(Geometry::TranslatePoint(target.ToVector3i(), dir, BUFFER), target.RoomNumber);
-
-		// Snap position of fixed camera type.
-		if (Camera.oldType == CameraType::Fixed)
-			Camera.speed = 1;
-
-		// Update camera position.
-		MoveCamera(&target, Camera.speed * ((Camera.type != CameraType::Look) ? 0.25f : 1.0f));
+		auto pos = GetJointPosition(LaraItem, Camera.laraNode, Vector3i::Zero);
+		auto pos1 = GetJointPosition(LaraItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
+		pos = pos1 - pos;
+		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
 	else
 	{
-		float farthestDistSqr = INFINITY;
-		auto farthestIdealPos = Camera.pos;
-
-		// Determine ideal position around player.
-		for (int i = 0; i < SWIVEL_STEP_COUNT; i++)
+		if (IsUsingModernControls())
 		{
-			short yOrient = (i == 0) ? Camera.actualAngle : ANGLE(90.0f * (i - 1));
-			auto dir = -EulerAngles(Camera.actualElevation, yOrient, 0).ToDirection();
-			auto idealPos = GameVector(Geometry::TranslatePoint(Camera.target.ToVector3i(), dir, Camera.targetDistance), Camera.target.RoomNumber);
+			const auto& cameraAxis = GetCameraAxis();
+			const auto& mouseAxis = GetMouseAxis();
+			const auto& activeAxis = (cameraAxis != Vector2::Zero) ? (cameraAxis * CAMERA_AXIS_COEFF) : (mouseAxis * MOUSE_AXIS_COEFF);
 
-			// Assess room LOS.
-			if (LOSAndReturnTarget(&Camera.target, &idealPos, 200))
-			{
-				auto origin = idealPos;
-				auto target = Camera.pos;
-
-				if (i == 0 || LOSAndReturnTarget(&origin, &target, 0))
-				{
-					if (i == 0)
-					{
-						farthestIdealPos = idealPos;
-						break;
-					}
-
-					float distSqr = Vector3::DistanceSquared(Camera.pos.ToVector3(), idealPos.ToVector3());
-					if (distSqr < farthestDistSqr)
-					{
-						farthestDistSqr = distSqr;
-						farthestIdealPos = idealPos;
-					}
-				}
-			}
-			else if (i == 0)
-			{
-				auto origin = idealPos;
-				auto target = Camera.pos;
-
-				if (i == 0 || LOSAndReturnTarget(&origin, &target, 0))
-				{
-					float distSqr = Vector3::DistanceSquared(Camera.target.ToVector3(), idealPos.ToVector3());
-					if (distSqr > SQUARE(BLOCK(0.75f)))
-					{
-						farthestIdealPos = idealPos;
-						break;
-					}
-				}
-			}
+			Camera.actualAngle += ANGLE(activeAxis.x);
+			Camera.actualElevation -= ANGLE(activeAxis.y);
 		}
-
-		CameraCollisionBounds(&farthestIdealPos, CLICK(1.5f), 1);
-
-		// Snap position of fixed camera type.
-		if (Camera.oldType == CameraType::Fixed)
-			Camera.speed = 1;
-
-		MoveCamera(&farthestIdealPos, Camera.speed);
+		else
+		{
+			Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
+		}
 	}
+
+	if (!IsUsingModernControls())
+		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }
 
 bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst)
