@@ -1,6 +1,7 @@
 Version 1.4
 ===========
 
+* Fixed drawing of display sprites in title level.
 * Fixed shadows still being visible after shattering a moveable.
 * Fixed fade-in and fade-out effects not canceling properly when next level is loaded.
 * Fixed FOV interpolation at the end of the flyby sequence.
