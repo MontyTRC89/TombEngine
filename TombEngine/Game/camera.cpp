@@ -51,7 +51,6 @@ struct OLD_CAMERA
 GameVector LastTarget;
 
 GameVector LastIdeal;
-GameVector Ideals[SWIVEL_STEP_COUNT];
 OLD_CAMERA OldCam;
 int CameraSnaps = 0;
 int TargetSnaps = 0;
