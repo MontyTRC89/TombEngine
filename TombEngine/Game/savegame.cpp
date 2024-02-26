@@ -1456,6 +1456,7 @@ void SaveGame::SaveHub(int index)
 		return;
 
 	// Build hub data
+	TENLog("Saving hub data for level #" + std::to_string(index) + (Hub.count(index) > 0 ? " (overwrite)" : "(new)"), LogLevel::Info);
 	Hub[index] = Build();
 }
 
@@ -1466,11 +1467,16 @@ void SaveGame::LoadHub(int index)
 		return;
 
 	// Load hub data
+	TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
 	Parse(Hub[index], true);
 }
 
 void SaveGame::ResetHub()
 {
+	if (Hub.empty())
+		return;
+
+	TENLog("Clearing hub data", LogLevel::Info);
 	Hub.clear();
 }
 
@@ -1545,6 +1551,8 @@ bool SaveGame::Load(int slot)
 	// Read hub data from the savegame
 	int hubCount;
 	file >> hubCount;
+
+	TENLog("Hub count: " + std::to_string(hubCount), LogLevel::Info);
 
 	for (int i = 0; i < hubCount; i++)
 	{
