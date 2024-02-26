@@ -211,7 +211,7 @@ static std::optional<Vector3> GetCameraRayBoxIntersect(const BoundingOrientedBox
 	float intersectDist = 0.0f;
 	if (bufferBox.Intersects(origin, dir, intersectDist))
 	{
-		if (intersectDist < dist)
+		if (intersectDist < dist && intersectDist <= Camera.targetDistance)
 		{
 			if (expandedBox.Intersects(origin, dir, intersectDist))
 				return Geometry::TranslatePoint(origin, dir, intersectDist);
@@ -229,7 +229,7 @@ static std::optional<GameVector> GetCameraObjectLosIntersect(const GameVector& i
 	float closestDistSqr = INFINITY;
 	auto closestIntersect = std::optional<Vector3>();
 
-	auto pos = idealPos.ToVector3();
+	auto origin = idealPos.ToVector3();
 
 	// Collide items.
 	auto itemPtrs = GetCameraCollidableItemPtrs();
@@ -239,7 +239,7 @@ static std::optional<GameVector> GetCameraObjectLosIntersect(const GameVector& i
 		auto intersect = GetCameraRayBoxIntersect(box);
 		if (intersect.has_value())
 		{
-			float distSqr = Vector3::DistanceSquared(pos, *intersect);
+			float distSqr = Vector3::DistanceSquared(origin, *intersect);
 			if (distSqr < closestDistSqr)
 			{
 				closestDistSqr = distSqr;
@@ -258,7 +258,7 @@ static std::optional<GameVector> GetCameraObjectLosIntersect(const GameVector& i
 		auto intersect = GetCameraRayBoxIntersect(box);
 		if (intersect.has_value())
 		{
-			float distSqr = Vector3::DistanceSquared(pos, *intersect);
+			float distSqr = Vector3::DistanceSquared(origin, *intersect);
 			if (distSqr < closestDistSqr)
 			{
 				closestDistSqr = distSqr;
@@ -374,11 +374,6 @@ void LookCamera(const ItemInfo& item, const CollisionInfo& coll)
 	// Handle room and object collisions.
 	LOSAndReturnTarget(&origin, &target, 0);
 	CameraCollisionBounds(&target, COLL_PUSH, true);
-
-	// Collide with objects.
-	auto objectLosIntersect = GetCameraObjectLosIntersect(target);
-	if (objectLosIntersect.has_value())
-		target = *objectLosIntersect;
 
 	// Smoothly update camera position.
 	MoveCamera(&target, Camera.speed);
@@ -508,11 +503,6 @@ void MoveCamera(GameVector* ideal, float speed)
 		ideal->z = LastIdeal.z;
 		ideal->RoomNumber = LastIdeal.RoomNumber;
 	}
-
-	// Collide with objects.
-	auto objectLosIntersect = GetCameraObjectLosIntersect(*ideal);
-	if (objectLosIntersect.has_value())
-		*ideal = *objectLosIntersect;
 
 	// Translate camera.
 	Camera.pos.x += (ideal->x - Camera.pos.x) / speed;
@@ -755,6 +745,11 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		auto target = GameVector(idealPos, GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, dir, Camera.targetDistance).RoomNumber);
 		LOSAndReturnTarget(&origin, &target, 0);
 
+		// Collide with objects.
+		auto objectLosIntersect = GetCameraObjectLosIntersect(target);
+		if (objectLosIntersect.has_value())
+			target = *objectLosIntersect;
+
 		// Apply buffer if origin and target are too close.
 		float dist = Vector3::Distance(origin.ToVector3(), target.ToVector3());
 		if (dist <= BUFFER)
@@ -776,13 +771,14 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			auto idealPos = GameVector(Geometry::TranslatePoint(Camera.target.ToVector3i(), dir, Camera.targetDistance), Camera.target.RoomNumber);
 
 			// Assess room LOS.
-			if (LOSAndReturnTarget(&Camera.target, &idealPos, 200))
+			if (LOSAndReturnTarget(&Camera.target, &idealPos, BUFFER))
 			{
 				auto origin = idealPos;
 				auto target = Camera.pos;
 
 				if (i == 0 || LOSAndReturnTarget(&origin, &target, 0))
 				{
+					// Position directly behind is ideal; set and break loop.
 					if (i == 0)
 					{
 						farthestIdealPos = idealPos;
@@ -799,17 +795,11 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			}
 			else if (i == 0)
 			{
-				auto origin = idealPos;
-				auto target = Camera.pos;
-
-				if (i == 0 || LOSAndReturnTarget(&origin, &target, 0))
+				float distSqr = Vector3::DistanceSquared(Camera.target.ToVector3(), idealPos.ToVector3());
+				if (distSqr > SQUARE(BLOCK(0.75f)))
 				{
-					float distSqr = Vector3::DistanceSquared(Camera.target.ToVector3(), idealPos.ToVector3());
-					if (distSqr > SQUARE(BLOCK(0.75f)))
-					{
-						farthestIdealPos = idealPos;
-						break;
-					}
+					farthestIdealPos = idealPos;
+					break;
 				}
 			}
 		}
@@ -822,6 +812,11 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			if (Camera.oldType == CameraType::Fixed)
 				Camera.speed = 1.0f;
 		}
+
+		// Collide with objects.
+		auto objectLosIntersect = GetCameraObjectLosIntersect(farthestIdealPos);
+		if (objectLosIntersect.has_value())
+			farthestIdealPos = *objectLosIntersect;
 
 		MoveCamera(&farthestIdealPos, Camera.speed);
 	}
