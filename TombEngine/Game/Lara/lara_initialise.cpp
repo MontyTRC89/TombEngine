@@ -71,14 +71,9 @@ void InitializeLara(bool restore)
 	InitializeLaraStartPosition(*LaraItem);
 
 	if (restore)
-	{
 		InitializeLaraLevelJump(LaraItem, &lBackup);
-	}
 	else
-	{
 		InitializeLaraDefaultInventory(LaraItem);
-		LaraItem->HitPoints = LARA_HEALTH_MAX;
-	}
 
 	g_Hud.StatusBars.Initialize(*LaraItem);
 }
@@ -201,6 +196,8 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* lBackup)
 
 void InitializeLaraDefaultInventory(ItemInfo* item)
 {
+	item->HitPoints = LARA_HEALTH_MAX;
+
 	auto* lara = GetLaraInfo(item);
 
 	if (Objects[ID_FLARE_INV_ITEM].loaded)
