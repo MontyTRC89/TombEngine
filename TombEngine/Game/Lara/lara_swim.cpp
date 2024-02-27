@@ -12,6 +12,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
@@ -39,7 +40,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls())) &&
+	if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll)) &&
 		!hasDivesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);

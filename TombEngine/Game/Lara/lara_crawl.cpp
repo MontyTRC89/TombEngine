@@ -14,8 +14,10 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/configuration.h"
 
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
@@ -86,7 +88,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
+		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
 		{
 			item->Animation.TargetState = LS_CROUCH_TURN_180;
 			return;
@@ -462,7 +464,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
+		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
 		{
 			item->Animation.TargetState = LS_CRAWL_TURN_180;
 			return;

@@ -12,6 +12,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
+#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
@@ -75,7 +76,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
+		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
@@ -230,7 +231,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
 	{
-		if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
+		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;

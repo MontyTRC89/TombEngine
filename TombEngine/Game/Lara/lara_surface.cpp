@@ -10,6 +10,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
+#include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
@@ -70,7 +71,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	
-	if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && !IsUsingModernControls()))
+	if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;

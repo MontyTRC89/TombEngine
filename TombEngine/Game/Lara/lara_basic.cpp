@@ -321,7 +321,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		player.Control.IsRunJumpQueued = CanQueueRunningJump(*item, *coll);
 	}
 
-	if ((IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && g_Configuration.EnableOppositeActionRoll)) &&
+	if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll)) &&
 		CanRoll180Running(*item))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
@@ -525,7 +525,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::Roll) || ((IsHeld(In::Forward) && IsHeld(In::Back)) && g_Configuration.EnableOppositeActionRoll))
+	if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
 	{
 		if (IsHeld(In::Walk) || CanTurn180(*item, *coll))
 		{
@@ -714,7 +714,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && g_Configuration.EnableOppositeActionRoll))
+	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !IsUsingModernControls()))
 	{
 		if (CanSidestepLeft(*item, *coll))
 		{
@@ -727,7 +727,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
-	else if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && g_Configuration.EnableOppositeActionRoll))
+	else if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && !IsUsingModernControls()))
 	{
 		if (CanSidestepRight(*item, *coll))
 		{
@@ -939,7 +939,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
+	if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll)) &&
 		!isWading)
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
@@ -1283,7 +1283,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingEnhancedTankControls())
 	{
-		if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) &&
+		if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll)) &&
 			!isWading)
 		{
 			item->Animation.TargetState = LS_ROLL_180_FORWARD;
@@ -1432,7 +1432,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && g_Configuration.EnableOppositeActionRoll))
+	if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && !IsUsingModernControls()))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
@@ -1537,7 +1537,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && g_Configuration.EnableOppositeActionRoll))
+	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !IsUsingModernControls()))
 	{
 		item->Animation.TargetState = LS_STEP_LEFT;
 		return;

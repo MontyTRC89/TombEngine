@@ -1219,6 +1219,23 @@ bool TestPlayerCombatMode(const ItemInfo& item)
 			player.Control.HandStatus == HandStatus::WeaponReady);
 }
 
+bool HasOppositeAction(const ItemInfo& item)
+{
+	if (IsUsingModernControls())
+	{
+		// TODO: Camera orientation-dependent opposite action check. Will mean Left+Right can be used too.
+		if (IsHeld(In::Forward) && IsHeld(In::Back))
+			return true;
+	}
+	else
+	{
+		if (IsHeld(In::Forward) && IsHeld(In::Back))
+			return true;
+	}
+
+	return false;
+}
+
 bool HasClimbAction(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
@@ -1230,7 +1247,6 @@ bool HasCrouchAction(const ItemInfo& item)
 	const auto& player = GetLaraInfo(item);
 	return IsUsingModernControls() ? player.Control.ToggleCrouch : IsHeld(In::Crouch);
 }
-
 
 std::optional<VaultTestResult> TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup)
 {
