@@ -2,7 +2,7 @@ Version 1.4
 ===========
 
 * Fixed drawing of display sprites in title level.
-* Fixed Lara holster state not preserved correctly on level jump.
+* Fixed Lara holster state and current vehicle not preserved correctly on level jump.
 * Fixed fade-in and fade-out effects not canceling correctly when next level is loaded.
 * Fixed shadows still being visible after shattering a moveable.
 * Fixed FOV interpolation at the end of the flyby sequence.

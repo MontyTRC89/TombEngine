@@ -17,7 +17,8 @@ using namespace TEN::Entities::Player;
 using namespace TEN::Hud;
 
 LaraInfo lBackup = {};
-int lHitPoints   = 0;
+ItemInfo lItemBackup = {};
+GAME_OBJECT_ID lVehicleID = GAME_OBJECT_ID::ID_NO_OBJECT;
 
 void BackupLara()
 {
@@ -25,7 +26,12 @@ void BackupLara()
 		return;
 
 	memcpy(&lBackup, &Lara, sizeof(LaraInfo));
-	lHitPoints = LaraItem->HitPoints;
+	memcpy(&lItemBackup, LaraItem, sizeof(ItemInfo));
+
+	if (Lara.Context.Vehicle != NO_ITEM)
+		lVehicleID = g_Level.Items[Lara.Context.Vehicle].ObjectNumber;
+	else
+		lVehicleID = GAME_OBJECT_ID::ID_NO_OBJECT;
 }
 
 void InitializeLara(bool restore)
@@ -57,21 +63,33 @@ void InitializeLara(bool restore)
 	Lara.Control.Rope.Ptr = -1;
 	Lara.Control.HandStatus = HandStatus::Free;
 
+	InitializePlayerStateMachine();
+	InitializeLaraMeshes(LaraItem);
+	InitializeLaraAnims(LaraItem);
+	InitializeLaraStartPosition(*LaraItem);
+
 	if (restore)
 	{
 		InitializeLaraLevelJump(LaraItem, &lBackup);
-		LaraItem->HitPoints = lHitPoints;
+		LaraItem->HitPoints = lItemBackup.HitPoints;
+
+		if (lVehicleID != GAME_OBJECT_ID::ID_NO_OBJECT)
+		{
+			auto* vehicle = FindItem(lVehicleID);
+			if (vehicle != nullptr)
+			{ 
+				vehicle->Pose = LaraItem->Pose;
+				ItemNewRoom(vehicle->Index, LaraItem->RoomNumber);
+				SetLaraVehicle(LaraItem, vehicle);
+				LaraItem->Animation = lItemBackup.Animation;
+			}
+		}
 	}
 	else
 	{
 		InitializeLaraDefaultInventory(LaraItem);
 		LaraItem->HitPoints = LARA_HEALTH_MAX;
 	}
-
-	InitializePlayerStateMachine();
-	InitializeLaraMeshes(LaraItem);
-	InitializeLaraAnims(LaraItem);
-	InitializeLaraStartPosition(*LaraItem);
 
 	g_Hud.StatusBars.Initialize(*LaraItem);
 }
