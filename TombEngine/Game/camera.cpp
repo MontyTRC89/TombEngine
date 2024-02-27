@@ -1330,10 +1330,13 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 		isFixedCamera = false;
 	}
 
+	auto bounds = GameBoundingBox(itemPtr);
+
+	// TODO: Use DX box.
 	auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
 
 	int x = 0;
-	int y = itemPtr->Pose.Position.y - (box.Extents.y * (IsUsingModernControls() ? 1.8f : 1.5f));
+	int y = itemPtr->Pose.Position.y + bounds.Y2 + ((bounds.Y1 - bounds.Y2) / 2 * (IsUsingModernControls() ? 1.8f : 1.5f));
 	int z = 0;
 
 	// Make player look toward target item.
@@ -1345,7 +1348,7 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 			float dist = Vector3i::Distance(Camera.item->Pose.Position, itemPtr->Pose.Position);
 
 			auto lookOrient = EulerAngles(
-				phd_atan(dist, y + box.Extents.y - Camera.item->Pose.Position.y),
+				phd_atan(dist, y - (bounds.Y1 + bounds.Y2) / 2 - Camera.item->Pose.Position.y),
 				phd_atan(deltaPos.z, deltaPos.x) - itemPtr->Pose.Orientation.y,
 				0) / 2;
 
@@ -1440,7 +1443,7 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 		// -- Troye 2022.8.7
 		if (Camera.flags == CF_FOLLOW_CENTER)
 		{
-			int shift = -box.Extents.y;
+			int shift = (bounds.Z1 + bounds.Z2) / 2;
 			x += shift * phd_sin(itemPtr->Pose.Orientation.y);
 			z += shift * phd_cos(itemPtr->Pose.Orientation.y);
 		}
