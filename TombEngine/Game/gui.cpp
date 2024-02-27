@@ -3215,7 +3215,7 @@ namespace TEN::Gui
 					if (ring.ObjectListMovement < 0)
 						ring.ObjectListMovement -= ANGLE(45.0f);
 
-					if (IsHeld(In::Left))
+					if (IsHeld(In::Left) && !IsHeld(In::Right))
 					{
 						if (!ring.ObjectListMovement)
 						{
@@ -3227,7 +3227,7 @@ namespace TEN::Gui
 						}
 					}
 
-					if (IsHeld(In::Right))
+					if (IsHeld(In::Right) && !IsHeld(In::Left))
 					{
 						if (!ring.ObjectListMovement)
 						{
@@ -3459,14 +3459,14 @@ namespace TEN::Gui
 
 		SetInventoryMode(InventoryMode::Diary);
 
-		if (GuiIsPulsed(In::Right) &&
+		if ((GuiIsPulsed(In::Right) && !IsHeld(In::Left)) &&
 			lara->Inventory.Diary.CurrentPage < lara->Inventory.Diary.NumPages)
 		{
 			lara->Inventory.Diary.CurrentPage++;
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (GuiIsPulsed(In::Left) &&
+		if ((GuiIsPulsed(In::Left) && !IsHeld(In::Right)) &&
 			lara->Inventory.Diary.CurrentPage > 1)
 		{
 			lara->Inventory.Diary.CurrentPage--;

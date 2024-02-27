@@ -618,16 +618,6 @@ namespace TEN::Input
 		return false;
 	}
 
-	void SolveActionCollisions()
-	{
-		// Block simultaneous Left+Right actions.
-		if (IsHeld(In::Left) && IsHeld(In::Right))
-		{
-			ClearAction(In::Left);
-			ClearAction(In::Right);
-		}
-	}
-
 	static void HandleHotkeyActions()
 	{
 		// Save screenshot.
@@ -722,7 +712,6 @@ namespace TEN::Input
 
 		// Additional handling.
 		HandleHotkeyActions();
-		SolveActionCollisions();
 	}
 
 	void ClearAllActions()

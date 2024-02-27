@@ -487,13 +487,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			// TODO: Bugged.
-			short relMoveAngle = abs(Geometry::GetShortestAngle(item->Pose.Orientation.y + ANGLE(180.0f), GetPlayerHeadingAngleY(*item)));
-			if (!TestPlayerCombatMode(*item)/* && relMoveAngle >= ANGLE(45.0f)*/)
-			{
-				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
-				HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
-			}
+			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+			HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
 		}
 	}
 	else
@@ -1492,7 +1487,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
-	player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(90.0f);
+	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item) + ANGLE(90.0f);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : CLICK(0.8f);
@@ -1597,7 +1592,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
-	player.Control.HeadingOrient.y = item->Pose.Orientation.y - ANGLE(90.0f);
+	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item) - ANGLE(90.0f);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : CLICK(0.8f);
