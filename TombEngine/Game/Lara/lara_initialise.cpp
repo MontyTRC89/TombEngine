@@ -16,8 +16,9 @@
 using namespace TEN::Entities::Player;
 using namespace TEN::Hud;
 
+int lHitPoints = 0;
 LaraInfo lBackup = {};
-ItemInfo lItemBackup = {};
+EntityAnimationData lAnimation = {};
 GAME_OBJECT_ID lVehicleID = GAME_OBJECT_ID::ID_NO_OBJECT;
 
 void BackupLara()
@@ -25,8 +26,9 @@ void BackupLara()
 	if (LaraItem == nullptr || LaraItem->Index == NO_ITEM)
 		return;
 
+	lHitPoints = LaraItem->HitPoints;
 	memcpy(&lBackup, &Lara, sizeof(LaraInfo));
-	memcpy(&lItemBackup, LaraItem, sizeof(ItemInfo));
+	memcpy(&lAnimation, &LaraItem->Animation, sizeof(EntityAnimationData));
 
 	if (Lara.Context.Vehicle != NO_ITEM)
 		lVehicleID = g_Level.Items[Lara.Context.Vehicle].ObjectNumber;
@@ -71,20 +73,6 @@ void InitializeLara(bool restore)
 	if (restore)
 	{
 		InitializeLaraLevelJump(LaraItem, &lBackup);
-		LaraItem->HitPoints = lItemBackup.HitPoints;
-
-		if (lVehicleID != GAME_OBJECT_ID::ID_NO_OBJECT)
-		{
-			auto* vehicle = FindItem(lVehicleID);
-			if (vehicle != nullptr)
-			{
-				TENLog("Transferring vehicle " + GetObjectName(lVehicleID) + " from the previous level.");
-				vehicle->Pose = LaraItem->Pose;
-				ItemNewRoom(vehicle->Index, LaraItem->RoomNumber);
-				SetLaraVehicle(LaraItem, vehicle);
-				LaraItem->Animation = lItemBackup.Animation;
-			}
-		}
 	}
 	else
 	{
@@ -161,7 +149,6 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* lBackup)
 	auto* lara = GetLaraInfo(item);
 
 	// Restore inventory.
-	// It restores even puzzle/key items, to reset them, a ResetHub analog must be made.
 	lara->Inventory = lBackup->Inventory;
 	lara->Status = lBackup->Status;
 	lara->Control.Weapon.LastGunType = lBackup->Control.Weapon.LastGunType;
@@ -183,17 +170,33 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* lBackup)
 		UndrawShotgunMeshes(*item, lara->Control.Weapon.LastGunType);
 	}
 
-	// If no flare present, quit
-	if (lBackup->Control.Weapon.GunType != LaraWeaponType::Flare)
-		return;
-
 	// Restore flare
-	lara->LeftArm = lBackup->LeftArm;
-	lara->RightArm = lBackup->RightArm;
-	lara->Control.HandStatus = lBackup->Control.HandStatus;
-	lara->Control.Weapon = lBackup->Control.Weapon;
-	lara->Flare = lBackup->Flare;
-	DrawFlareMeshes(*item);
+	if (lBackup->Control.Weapon.GunType == LaraWeaponType::Flare)
+	{
+		lara->LeftArm = lBackup->LeftArm;
+		lara->RightArm = lBackup->RightArm;
+		lara->Control.HandStatus = lBackup->Control.HandStatus;
+		lara->Control.Weapon = lBackup->Control.Weapon;
+		lara->Flare = lBackup->Flare;
+		DrawFlareMeshes(*item);
+	}
+
+	// Restore hit points
+	item->HitPoints = lHitPoints;
+
+	// Restore vehicle
+	if (lVehicleID != GAME_OBJECT_ID::ID_NO_OBJECT)
+	{
+		auto* vehicle = FindItem(lVehicleID);
+		if (vehicle != nullptr)
+		{
+			TENLog("Transferring vehicle " + GetObjectName(lVehicleID) + " from the previous level.");
+			vehicle->Pose = item->Pose;
+			ItemNewRoom(vehicle->Index, item->RoomNumber);
+			SetLaraVehicle(item, vehicle);
+			item->Animation = lAnimation;
+		}
+	}
 }
 
 void InitializeLaraDefaultInventory(ItemInfo* item)
