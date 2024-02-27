@@ -20,6 +20,7 @@ namespace TEN::Entities::Creatures::TR3
 		short Species;
 		bool Lethal;
 		short YAngle = ANGLE(0.0f);
+		short Timer;
 
 		Matrix Transform;
 	};
