@@ -32,7 +32,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Free;
-	player.Control.ToggleClimb = IsUsingModernControls();
+	player.Control.ToggleClimb = g_Configuration.EnableAutoGrab;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -62,7 +62,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsClicked(In::Action) && IsUsingModernControls())
+	if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
 		player.Control.ToggleClimb = false;
 
 	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
@@ -203,7 +203,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
-	player.Control.ToggleClimb = IsUsingModernControls();
+	player.Control.ToggleClimb = g_Configuration.EnableAutoGrab;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -226,7 +226,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
-	if (IsClicked(In::Action) && IsUsingModernControls())
+	if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
 		player.Control.ToggleClimb = false;
 
 	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
@@ -368,7 +368,7 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
-	player.Control.ToggleClimb = IsUsingModernControls();
+	player.Control.ToggleClimb = g_Configuration.EnableAutoGrab;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -391,7 +391,7 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsClicked(In::Action) && IsUsingModernControls())
+	if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
 		player.Control.ToggleClimb = false;
 
 	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
@@ -452,7 +452,7 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
-	player.Control.ToggleClimb = IsUsingModernControls();
+	player.Control.ToggleClimb = g_Configuration.EnableAutoGrab;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -475,7 +475,7 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsClicked(In::Action) && IsUsingModernControls())
+	if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
 		player.Control.ToggleClimb = false;
 
 	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)

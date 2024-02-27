@@ -13,6 +13,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/configuration.h"
 
 using namespace TEN::Input;
 
@@ -981,8 +982,8 @@ bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 
-	lara->Control.ToggleClimb = IsUsingModernControls();
-	if (IsClicked(In::Action) && IsUsingModernControls())
+	lara->Control.ToggleClimb = g_Configuration.EnableAutoGrab;
+	if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
 		lara->Control.ToggleClimb = false;
 
 	if (HasClimbAction(*item) && item->HitPoints > 0 || item->Animation.AnimNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim
