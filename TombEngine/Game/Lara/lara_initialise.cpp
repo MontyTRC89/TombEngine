@@ -77,7 +77,8 @@ void InitializeLara(bool restore)
 		{
 			auto* vehicle = FindItem(lVehicleID);
 			if (vehicle != nullptr)
-			{ 
+			{
+				TENLog("Transferring vehicle " + GetObjectName(lVehicleID) + " from the previous level.");
 				vehicle->Pose = LaraItem->Pose;
 				ItemNewRoom(vehicle->Index, LaraItem->RoomNumber);
 				SetLaraVehicle(LaraItem, vehicle);
