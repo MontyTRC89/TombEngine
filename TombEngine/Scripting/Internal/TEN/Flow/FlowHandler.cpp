@@ -658,7 +658,7 @@ bool FlowHandler::DoFlow()
 			break;
 
 		case GameStatus::LoadGame:
-			// Load the header of the savegame for getting the level to load
+			// Load header of savegame for getting level to load.
 			SaveGame::LoadHeader(SelectedSaveGame, &header);
 
 			// Load level
@@ -675,12 +675,12 @@ bool FlowHandler::DoFlow()
 			}
 			else
 			{
-				// Save the state of the current level to a hub
+				// Save state of current level to a hub.
 				SaveGame::SaveHub(CurrentLevel);
 
 				CurrentLevel = NextLevel;
 				
-				// Reset hub, if next level has it set
+				// Reset hub, if next level has it set.
 				if (g_GameFlow->GetLevel(CurrentLevel)->GetResetHubEnabled())
 					SaveGame::ResetHub();
 			}

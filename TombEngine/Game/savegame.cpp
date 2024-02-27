@@ -1449,22 +1449,22 @@ const std::vector<byte> SaveGame::Build()
 
 void SaveGame::SaveHub(int index)
 {
-	// Don't save title level to a hub
+	// Don't save title level to a hub.
 	if (index == 0)
 		return;
 
-	// Build hub data
+	// Build hub data.
 	TENLog("Saving hub data for level #" + std::to_string(index) + (Hub.count(index) > 0 ? " (overwrite)" : " (new)"), LogLevel::Info);
 	Hub[index] = Build();
 }
 
 void SaveGame::LoadHub(int index)
 {
-	// Don't attempt to load hub data if it does not exist, or level is a title level
+	// Don't attempt to load hub data if it doesn't exist, or level is a title level.
 	if (index == 0 || Hub.count(index) == 0)
 		return;
 
-	// Load hub data
+	// Load hub data.
 	TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
 	Parse(Hub[index], true);
 }
@@ -1498,13 +1498,13 @@ bool SaveGame::Save(int slot)
 	std::ofstream fileOut{};
 	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
 
-	// Write current level save data
+	// Write current level save data.
 	auto currentLevelState = SaveGame::Build();
 	int size = (int)currentLevelState.size();
 	fileOut.write(reinterpret_cast<const char*>(&size), sizeof(size));
 	fileOut.write(reinterpret_cast<const char*>(currentLevelState.data()), size);
 
-	// Write hub data
+	// Write hub data.
 	int hubCount = (int)Hub.size();
 	fileOut.write(reinterpret_cast<const char*>(&hubCount), sizeof(hubCount));
 
@@ -1539,14 +1539,14 @@ bool SaveGame::Load(int slot)
 	int size; 
 	file.read(reinterpret_cast<char*>(&size), sizeof(size));
 
-	// Read current level save data
+	// Read current level save data.
 	std::vector<byte> saveData(size);
 	file.read(reinterpret_cast<char*>(saveData.data()), size);
 
-	// Reset hub data, because we're about to replace it with saved one
+	// Reset hub data, as it's about to be replaced with saved one.
 	ResetHub();
 
-	// Read hub data from the savegame
+	// Read hub data from savegame.
 	int hubCount;
 	file.read(reinterpret_cast<char*>(&hubCount), sizeof(hubCount));
 
@@ -1566,7 +1566,7 @@ bool SaveGame::Load(int slot)
 
 	file.close();
 
-	// Load save data for current level
+	// Load save data for current level.
 	Parse(saveData, false);
 	return true;
 }
@@ -1581,7 +1581,7 @@ static void ParseStatistics(const Save::SaveGame* s, bool hub)
 	SaveGame::Statistics.Level.Secrets = s->level()->secrets();
 	SaveGame::Statistics.Level.Timer = s->level()->timer();
 
-	// Game statistics are untouched, if data is parsed in hub mode
+	// Game statistics are untouched if data is parsed in hub mode.
 	if (hub)
 		return;
 
@@ -1594,12 +1594,11 @@ static void ParseStatistics(const Save::SaveGame* s, bool hub)
 	SaveGame::Statistics.Game.Kills = s->game()->kills();
 	SaveGame::Statistics.Game.Secrets = s->game()->secrets();
 	SaveGame::Statistics.Game.Timer = s->game()->timer();
-
 }
 
 static void ParseLua(const Save::SaveGame* s)
 {
-	std::vector<SavedVar> loadedVars;
+	auto loadedVars = std::vector<SavedVar>{};
 
 	auto unionVec = s->script_vars();
 	if (unionVec)
@@ -1736,14 +1735,14 @@ static void ParseLua(const Save::SaveGame* s)
 	}
 }
 
-static void ParseLara(const Save::SaveGame* s)
+static void ParsePlayer(const Save::SaveGame* s)
 {
-	// Restore current inventory item
+	// Restore current inventory item.
 	g_Gui.SetLastInventoryItem(s->last_inv_item());
 
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
-	// Lara
+	// Player
 	ZeroMemory(Lara.Inventory.Puzzles, NUM_PUZZLES * sizeof(int));
 	for (int i = 0; i < s->lara()->inventory()->puzzles()->size(); i++)
 		Lara.Inventory.Puzzles[i] = s->lara()->inventory()->puzzles()->Get(i);
@@ -1926,7 +1925,7 @@ static void ParseLara(const Save::SaveGame* s)
 	// Rope
 	if (Lara.Control.Rope.Ptr >= 0)
 	{
-		ROPE_STRUCT* rope = &Ropes[Lara.Control.Rope.Ptr];
+		auto* rope = &Ropes[Lara.Control.Rope.Ptr];
 
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
 		{
@@ -1970,15 +1969,15 @@ static void ParseLara(const Save::SaveGame* s)
 
 static void ParseEffects(const Save::SaveGame* s)
 {
-	// Restore camera FOV
+	// Restore camera FOV.
 	AlterFOV(s->current_fov());
 
-	// Restore postprocess effects
+	// Restore postprocess effects.
 	g_Renderer.SetPostProcessMode((PostProcessMode)s->postprocess_mode());
 	g_Renderer.SetPostProcessStrength(s->postprocess_strength());
 	g_Renderer.SetPostProcessTint(ToVector3(s->postprocess_tint()));
 
-	// Restore soundtracks
+	// Restore soundtracks.
 	for (int i = 0; i < s->soundtracks()->size(); i++)
 	{
 		assertion(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
@@ -2108,7 +2107,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 		g_Level.Rooms[room->index()].reverbType = (ReverbType)room->reverb_type();
 	}
 
-	// Static objects
+	// Static objects.
 	for (int i = 0; i < s->static_meshes()->size(); i++)
 	{
 		auto staticMesh = s->static_meshes()->Get(i);
@@ -2173,14 +2172,14 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 	FlipEffect = s->flip_effect();
 	FlipStatus = s->flip_status();
 
-	// Restore action queue
+	// Restore action queue.
 	for (int i = 0; i < s->action_queue()->size(); i++)
 	{
 		assertion(i < ActionQueue.size(), "Action queue size was changed");
 		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
 	}
 
-	// Legacy soundtrack map
+	// Legacy soundtrack map.
 	for (int i = 0; i < s->cd_flags()->size(); i++)
 	{
 		int index = s->cd_flags()->Get(i);
@@ -2306,7 +2305,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 			(item->Flags & ONESHOT))
 			item->MeshBits = 0x00100;
 
-		// Now some post-load specific hacks for objects
+		// Post-load specific hacks for objects.
 		if (item->ObjectNumber >= ID_PUZZLE_HOLE1 && item->ObjectNumber <= ID_PUZZLE_HOLE16 &&
 			(item->Status == ITEM_ACTIVE || item->Status == ITEM_DEACTIVATED))
 		{
@@ -2317,7 +2316,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 		if (item->IsBridge())
 			UpdateBridgeItem(g_Level.Items[i]);
 
-		// Creature data for intelligent items
+		// Creature data for intelligent items.
 		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)
 		{
 			EnableEntityAI(i, true, false);
@@ -2497,14 +2496,14 @@ void SaveGame::Parse(const std::vector<byte>& buffer, bool hubMode)
 	ParseLua(s);
 	ParseStatistics(s, hubMode);
 
-	// Effects and Lara data is ignored when loading hub.
-	// Effects are commonly believed to be non-preservable, while Lara data is transfered from previous level.
+	// Effects and player data is ignored when loading hub.
+	// Effects are commonly believed to be non-preservable, while player data is transfered from previous level.
 
 	if (hubMode)
 		return;
 
 	ParseEffects(s);
-	ParseLara(s);
+	ParsePlayer(s);
 }
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)

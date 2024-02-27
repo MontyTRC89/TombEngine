@@ -16,24 +16,29 @@
 using namespace TEN::Entities::Player;
 using namespace TEN::Hud;
 
-int lHitPoints = 0;
-LaraInfo lBackup = {};
-EntityAnimationData lAnimation = {};
-GAME_OBJECT_ID lVehicleID = GAME_OBJECT_ID::ID_NO_OBJECT;
+// Globals
+int					PlayerHitPoints		  = 0;
+LaraInfo			PlayerBackup		  = {};
+EntityAnimationData PlayerAnim			  = {};
+GAME_OBJECT_ID		PlayerVehicleObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
 
 void BackupLara()
 {
 	if (LaraItem == nullptr || LaraItem->Index == NO_ITEM)
 		return;
 
-	lHitPoints = LaraItem->HitPoints;
-	memcpy(&lBackup, &Lara, sizeof(LaraInfo));
-	memcpy(&lAnimation, &LaraItem->Animation, sizeof(EntityAnimationData));
+	PlayerHitPoints = LaraItem->HitPoints;
+	memcpy(&PlayerBackup, &Lara, sizeof(LaraInfo));
+	memcpy(&PlayerAnim, &LaraItem->Animation, sizeof(EntityAnimationData));
 
 	if (Lara.Context.Vehicle != NO_ITEM)
-		lVehicleID = g_Level.Items[Lara.Context.Vehicle].ObjectNumber;
+	{
+		PlayerVehicleObjectID = g_Level.Items[Lara.Context.Vehicle].ObjectNumber;
+	}
 	else
-		lVehicleID = GAME_OBJECT_ID::ID_NO_OBJECT;
+	{
+		PlayerVehicleObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
+	}
 }
 
 void InitializeLara(bool restore)
@@ -71,18 +76,20 @@ void InitializeLara(bool restore)
 	InitializeLaraStartPosition(*LaraItem);
 
 	if (restore)
-		InitializeLaraLevelJump(LaraItem, &lBackup);
+	{
+		InitializeLaraLevelJump(LaraItem, &PlayerBackup);
+	}
 	else
-		InitializeLaraDefaultInventory(LaraItem);
+	{
+		InitializeLaraDefaultInventory(*LaraItem);
+	}
 
 	g_Hud.StatusBars.Initialize(*LaraItem);
 }
 
 void InitializeLaraMeshes(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
-
-	// Override base mesh and mesh indices to Lara skin, if it exists.
+	// Override base mesh and mesh indices to player skin if it exists.
 	item->Model.BaseMesh = Objects[(Objects[ID_LARA_SKIN].loaded ? ID_LARA_SKIN : ID_LARA)].meshIndex;
 
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
@@ -91,24 +98,24 @@ void InitializeLaraMeshes(ItemInfo* item)
 
 void InitializeLaraAnims(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.HandStatus = HandStatus::Free;
-	lara->TargetEntity = nullptr;
-	lara->LeftArm.FrameNumber = 0;
-	lara->RightArm.FrameNumber = 0;
-	lara->LeftArm.Locked = false;
-	lara->RightArm.Locked = false;
+	player.Control.HandStatus = HandStatus::Free;
+	player.TargetEntity = nullptr;
+	player.LeftArm.FrameNumber = 0;
+	player.RightArm.FrameNumber = 0;
+	player.LeftArm.Locked = false;
+	player.RightArm.Locked = false;
 
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
-		lara->Control.WaterStatus = WaterStatus::Underwater;
+		player.Control.WaterStatus = WaterStatus::Underwater;
 		item->Animation.Velocity.y = 0;
 		SetAnimation(item, LA_UNDERWATER_IDLE);
 	}
 	else
 	{
-		lara->Control.WaterStatus = WaterStatus::Dry;
+		player.Control.WaterStatus = WaterStatus::Dry;
 		SetAnimation(item, LA_STAND_SOLID);
 	}
 }
@@ -139,102 +146,103 @@ void InitializeLaraStartPosition(ItemInfo& playerItem)
 	playerItem.Location.Height = playerItem.Pose.Position.y;
 }
 
-void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* lBackup)
+void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	// Restore inventory.
-	lara->Inventory = lBackup->Inventory;
-	lara->Status = lBackup->Status;
-	lara->Control.Weapon.LastGunType = lBackup->Control.Weapon.LastGunType;
-	memcpy(&lara->Weapons, &lBackup->Weapons, sizeof(CarriedWeaponInfo) * int(LaraWeaponType::NumWeapons));
+	player.Inventory = playerBackup->Inventory;
+	player.Status = playerBackup->Status;
+	player.Control.Weapon.LastGunType = playerBackup->Control.Weapon.LastGunType;
+	memcpy(&player.Weapons, &playerBackup->Weapons, sizeof(CarriedWeaponInfo) * int(LaraWeaponType::NumWeapons));
 
-	// Restore holsters.
-	// At first, attempt to restore original holster data, then refer to selected weapons.
-	lara->Control.Weapon.HolsterInfo = lBackup->Control.Weapon.HolsterInfo;
+	// Restore holsters. First attempt restoring original holster data, then refer to selected weapons.
+	player.Control.Weapon.HolsterInfo = playerBackup->Control.Weapon.HolsterInfo;
 	
-	if (lara->Control.Weapon.HolsterInfo.RightHolster == HolsterSlot::Empty ||
-		lara->Control.Weapon.HolsterInfo.LeftHolster  == HolsterSlot::Empty)
+	if (player.Control.Weapon.HolsterInfo.RightHolster == HolsterSlot::Empty ||
+		player.Control.Weapon.HolsterInfo.LeftHolster  == HolsterSlot::Empty)
 	{
-		UndrawPistolMesh(*item, lara->Control.Weapon.LastGunType, true);
-		UndrawPistolMesh(*item, lara->Control.Weapon.LastGunType, false);
+		UndrawPistolMesh(*item, player.Control.Weapon.LastGunType, true);
+		UndrawPistolMesh(*item, player.Control.Weapon.LastGunType, false);
 	}
 
-	if (lara->Control.Weapon.HolsterInfo.BackHolster == HolsterSlot::Empty)
-	{
-		UndrawShotgunMeshes(*item, lara->Control.Weapon.LastGunType);
-	}
+	if (player.Control.Weapon.HolsterInfo.BackHolster == HolsterSlot::Empty)
+		UndrawShotgunMeshes(*item, player.Control.Weapon.LastGunType);
 
-	// Restore flare
-	if (lBackup->Control.Weapon.GunType == LaraWeaponType::Flare)
+	// Restore flare.
+	if (playerBackup->Control.Weapon.GunType == LaraWeaponType::Flare)
 	{
-		lara->LeftArm = lBackup->LeftArm;
-		lara->RightArm = lBackup->RightArm;
-		lara->Control.HandStatus = lBackup->Control.HandStatus;
-		lara->Control.Weapon = lBackup->Control.Weapon;
-		lara->Flare = lBackup->Flare;
+		player.LeftArm = playerBackup->LeftArm;
+		player.RightArm = playerBackup->RightArm;
+		player.Control.HandStatus = playerBackup->Control.HandStatus;
+		player.Control.Weapon = playerBackup->Control.Weapon;
+		player.Flare = playerBackup->Flare;
 		DrawFlareMeshes(*item);
 	}
 
-	// Restore hit points
-	item->HitPoints = lHitPoints;
+	// Restore hit points.
+	item->HitPoints = PlayerHitPoints;
 
-	// Restore vehicle
-	if (lVehicleID != GAME_OBJECT_ID::ID_NO_OBJECT)
+	// Restore vehicle.
+	if (PlayerVehicleObjectID != GAME_OBJECT_ID::ID_NO_OBJECT)
 	{
-		auto* vehicle = FindItem(lVehicleID);
+		auto* vehicle = FindItem(PlayerVehicleObjectID);
 		if (vehicle != nullptr)
 		{
-			TENLog("Transferring vehicle " + GetObjectName(lVehicleID) + " from the previous level.");
+			TENLog("Transferring vehicle " + GetObjectName(PlayerVehicleObjectID) + " from the previous level.");
 			vehicle->Pose = item->Pose;
 			ItemNewRoom(vehicle->Index, item->RoomNumber);
 			SetLaraVehicle(item, vehicle);
-			item->Animation = lAnimation;
+			item->Animation = PlayerAnim;
 		}
 	}
 }
 
-void InitializeLaraDefaultInventory(ItemInfo* item)
+void InitializeLaraDefaultInventory(ItemInfo& item)
 {
-	item->HitPoints = LARA_HEALTH_MAX;
+	constexpr auto DEFAULT_FLARE_COUNT			= 3;
+	constexpr auto DEFAULT_SMALL_MEDIPACK_COUNT = 3;
+	constexpr auto DEFAULT_LARGE_MEDIPACK_COUNT = 1;
+	constexpr auto DEFAULT_BEETLE_LIFE			= 3;
 
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(item);
+
+	item.HitPoints = LARA_HEALTH_MAX;
 
 	if (Objects[ID_FLARE_INV_ITEM].loaded)
-		lara->Inventory.TotalFlares = 3;
+		player.Inventory.TotalFlares = DEFAULT_FLARE_COUNT;
 
 	if (Objects[ID_SMALLMEDI_ITEM].loaded)
-		lara->Inventory.TotalSmallMedipacks = 3;
+		player.Inventory.TotalSmallMedipacks = DEFAULT_SMALL_MEDIPACK_COUNT;
 
 	if (Objects[ID_BIGMEDI_ITEM].loaded)
-		lara->Inventory.TotalLargeMedipacks = 1;
+		player.Inventory.TotalLargeMedipacks = DEFAULT_LARGE_MEDIPACK_COUNT;
 
 	if (Objects[ID_BINOCULARS_ITEM].loaded)
-		lara->Inventory.HasBinoculars = true;
+		player.Inventory.HasBinoculars = true;
 
-	lara->Inventory.BeetleLife = 3;
+	player.Inventory.BeetleLife = DEFAULT_BEETLE_LIFE;
 
-	auto weapon = LaraWeaponType::None;
-
+	auto weaponType = LaraWeaponType::None;
 	if (Objects[ID_PISTOLS_ITEM].loaded)
 	{
-		weapon = LaraWeaponType::Pistol;
-		lara->Weapons[(int)LaraWeaponType::Pistol].Present = true;
-		lara->Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+		weaponType = LaraWeaponType::Pistol;
+		player.Weapons[(int)LaraWeaponType::Pistol].Present = true;
+		player.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
 	}
 
-	lara->Control.Weapon.LastGunType =
-	lara->Control.Weapon.GunType =
-	lara->Control.Weapon.RequestGunType = weapon;
+	player.Control.Weapon.LastGunType =
+	player.Control.Weapon.GunType =
+	player.Control.Weapon.RequestGunType = weaponType;
 
-	if (lara->Weapons[(int)LaraWeaponType::Pistol].Present)
+	if (player.Weapons[(int)LaraWeaponType::Pistol].Present)
 	{
-		lara->Control.Weapon.HolsterInfo.LeftHolster =
-		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Pistols;
+		player.Control.Weapon.HolsterInfo.LeftHolster =
+		player.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Pistols;
 	}
 	else
 	{
-		lara->Control.Weapon.HolsterInfo.LeftHolster =
-		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
+		player.Control.Weapon.HolsterInfo.LeftHolster =
+		player.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
 }
