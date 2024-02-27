@@ -520,12 +520,12 @@ void InitializeOrLoadGame(bool loadGame)
 	else
 	{
 		// If not loading a savegame, clear all info.
-		Statistics.Level = {};
+		SaveGame::Statistics.Level = {};
 
 		if (InitializeGame)
 		{
 			// Clear all game info as well.
-			Statistics.Game = {};
+			SaveGame::Statistics.Game = {};
 			GameTimer = 0;
 			InitializeGame = false;
 

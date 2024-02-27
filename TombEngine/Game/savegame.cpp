@@ -52,19 +52,17 @@ constexpr auto SAVEGAME_MAX_SLOT  = 99;
 constexpr auto SAVEGAME_PATH	  = "Save//";
 constexpr auto SAVEGAME_FILE_MASK = "savegame.";
 
-GameStats Statistics;
+GameStats SaveGame::Statistics;
+SaveGameHeader SaveGame::Infos[SAVEGAME_MAX];
+std::map<int, std::vector<byte>> SaveGame::Hub;
 
-SaveGameHeader SavegameInfos[SAVEGAME_MAX];
-std::map<int, std::vector<byte>> Hub;
-
-FileStream* SaveGame::StreamPtr;
-std::string SaveGame::FullSaveDirectory;
 int SaveGame::LastSaveGame;
+std::string SaveGame::FullSaveDirectory;
 
 void SaveGame::LoadHeaders()
 {
 	for (int i = 0; i < SAVEGAME_MAX; i++)
-		SavegameInfos[i].Present = false;
+		Infos[i].Present = false;
 
 	if (!std::filesystem::is_directory(FullSaveDirectory))
 		return;
@@ -78,13 +76,13 @@ void SaveGame::LoadHeaders()
 		if (!DoesSaveGameExist(i, true))
 			continue;
 
-		if (!SaveGame::LoadHeader(i, &SavegameInfos[i]))
+		if (!SaveGame::LoadHeader(i, &Infos[i]))
 			continue;
 
-		SavegameInfos[i].Present = true;
+		Infos[i].Present = true;
 
-		if (SavegameInfos[i].Count > LastSaveGame)
-			LastSaveGame = SavegameInfos[i].Count;
+		if (Infos[i].Count > LastSaveGame)
+			LastSaveGame = Infos[i].Count;
 	}
 }
 
@@ -1575,13 +1573,13 @@ bool SaveGame::Load(int slot)
 
 static void ParseStatistics(const Save::SaveGame* s, bool hub)
 {
-	Statistics.Level.AmmoHits = s->level()->ammo_hits();
-	Statistics.Level.AmmoUsed = s->level()->ammo_used();
-	Statistics.Level.Distance = s->level()->distance();
-	Statistics.Level.HealthUsed = s->level()->medipacks_used();
-	Statistics.Level.Kills = s->level()->kills();
-	Statistics.Level.Secrets = s->level()->secrets();
-	Statistics.Level.Timer = s->level()->timer();
+	SaveGame::Statistics.Level.AmmoHits = s->level()->ammo_hits();
+	SaveGame::Statistics.Level.AmmoUsed = s->level()->ammo_used();
+	SaveGame::Statistics.Level.Distance = s->level()->distance();
+	SaveGame::Statistics.Level.HealthUsed = s->level()->medipacks_used();
+	SaveGame::Statistics.Level.Kills = s->level()->kills();
+	SaveGame::Statistics.Level.Secrets = s->level()->secrets();
+	SaveGame::Statistics.Level.Timer = s->level()->timer();
 
 	// Game statistics are untouched, if data is parsed in hub mode
 	if (hub)
@@ -1589,13 +1587,13 @@ static void ParseStatistics(const Save::SaveGame* s, bool hub)
 
 	GameTimer = s->header()->timer();
 
-	Statistics.Game.AmmoHits = s->game()->ammo_hits();
-	Statistics.Game.AmmoUsed = s->game()->ammo_used();
-	Statistics.Game.Distance = s->game()->distance();
-	Statistics.Game.HealthUsed = s->game()->medipacks_used();
-	Statistics.Game.Kills = s->game()->kills();
-	Statistics.Game.Secrets = s->game()->secrets();
-	Statistics.Game.Timer = s->game()->timer();
+	SaveGame::Statistics.Game.AmmoHits = s->game()->ammo_hits();
+	SaveGame::Statistics.Game.AmmoUsed = s->game()->ammo_used();
+	SaveGame::Statistics.Game.Distance = s->game()->distance();
+	SaveGame::Statistics.Game.HealthUsed = s->game()->medipacks_used();
+	SaveGame::Statistics.Game.Kills = s->game()->kills();
+	SaveGame::Statistics.Game.Secrets = s->game()->secrets();
+	SaveGame::Statistics.Game.Timer = s->game()->timer();
 
 }
 

@@ -474,7 +474,7 @@ bool FlowHandler::DoesSaveGameExist(int slot)
 
 int FlowHandler::GetSecretCount() const
 {
-	return Statistics.Game.Secrets;
+	return SaveGame::Statistics.Game.Secrets;
 }
 
 void FlowHandler::SetSecretCount(int secretsNum)
@@ -482,7 +482,7 @@ void FlowHandler::SetSecretCount(int secretsNum)
 	if (secretsNum > UCHAR_MAX)
 		return;
 
-	Statistics.Game.Secrets = secretsNum;
+	SaveGame::Statistics.Game.Secrets = secretsNum;
 }
 
 void FlowHandler::AddSecret(int levelSecretIndex)
@@ -495,18 +495,18 @@ void FlowHandler::AddSecret(int levelSecretIndex)
 		return;
 	}
 
-	if (Statistics.Level.Secrets & (1 << levelSecretIndex))
+	if (SaveGame::Statistics.Level.Secrets & (1 << levelSecretIndex))
 		return;
 
-	if (Statistics.Game.Secrets >= UINT_MAX)
+	if (SaveGame::Statistics.Game.Secrets >= UINT_MAX)
 	{
 		TENLog("Maximum amount of level secrets is already reached!", LogLevel::Warning);
 		return;
 	}
 
 	PlaySecretTrack();
-	Statistics.Level.Secrets |= (1 << levelSecretIndex);
-	Statistics.Game.Secrets++;
+	SaveGame::Statistics.Level.Secrets |= (1 << levelSecretIndex);
+	SaveGame::Statistics.Game.Secrets++;
 }
 
 bool FlowHandler::IsFlyCheatEnabled() const

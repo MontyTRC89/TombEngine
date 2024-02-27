@@ -2173,7 +2173,7 @@ namespace TEN::Gui
 						item->HitPoints = LARA_HEALTH_MAX;
 
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-					Statistics.Game.HealthUsed++;
+					SaveGame::Statistics.Game.HealthUsed++;
 				}
 				else
 					SayNo();
@@ -2198,7 +2198,7 @@ namespace TEN::Gui
 					item->HitPoints = LARA_HEALTH_MAX;
 
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-					Statistics.Game.HealthUsed++;
+					SaveGame::Statistics.Game.HealthUsed++;
 				}
 				else
 					SayNo();
@@ -3499,7 +3499,7 @@ namespace TEN::Gui
 
 		if (GuiIsSelected())
 		{
-			if (!SavegameInfos[SelectedSaveSlot].Present)
+			if (!SaveGame::Infos[SelectedSaveSlot].Present)
 				SayNo();
 			else
 			{

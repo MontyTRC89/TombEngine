@@ -39,24 +39,22 @@ struct SaveGameHeader
 	bool Present;
 };
 
-extern GameStats Statistics;
-extern SaveGameHeader SavegameInfos[SAVEGAME_MAX];
-extern std::map<int, std::vector<byte>> Hub;
-
 class SaveGame 
 {
 private:
-	static FileStream* StreamPtr;
 	static std::string FullSaveDirectory;
+	static int LastSaveGame;
+	static std::map<int, std::vector<byte>> Hub;
 
 	static std::string SaveGame::GetSavegameFilename(int slot);
 	static bool IsSaveGameSlotValid(int slot);
 
 	static const std::vector<byte> Build();
 	static void Parse(const std::vector<byte>& buffer, bool hubMode);
-	
+
 public:
-	static int LastSaveGame;
+	static GameStats Statistics;
+	static SaveGameHeader Infos[SAVEGAME_MAX];
 
 	static void Init(const std::string& dir);
 	static bool Load(int slot);
