@@ -514,14 +514,29 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::Jump) && CanPerformJump(*item, *coll))
+	if (IsHeld(In::Jump))
 	{
-		auto jumpDirection = GetPlayerJumpDirection(*item, *coll);
-		if (jumpDirection != JumpDirection::None)
+		if ((IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) &&
+			g_Configuration.EnableAutoGrab)
 		{
-			item->Animation.TargetState = LS_JUMP_PREPARE;
-			player.Control.JumpDirection = jumpDirection;
-			return;
+			auto vaultContext = TestLaraVault(item, coll);
+			if (vaultContext.has_value())
+			{
+				item->Animation.TargetState = vaultContext->TargetState;
+				SetLaraVault(item, coll, *vaultContext);
+				return;
+			}
+		}
+
+		if (CanPerformJump(*item, *coll))
+		{
+			auto jumpDirection = GetPlayerJumpDirection(*item, *coll);
+			if (jumpDirection != JumpDirection::None)
+			{
+				item->Animation.TargetState = LS_JUMP_PREPARE;
+				player.Control.JumpDirection = jumpDirection;
+				return;
+			}
 		}
 	}
 
@@ -928,14 +943,28 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
 	}
 
-	if (IsHeld(In::Jump) && CanPerformJump(*item, *coll))
+	if (IsHeld(In::Jump))
 	{
-		auto jumpDirection = GetPlayerJumpDirection(*item, *coll);
-		if (jumpDirection != JumpDirection::None)
+		if (IsHeld(In::Forward) && g_Configuration.EnableAutoGrab)
 		{
-			item->Animation.TargetState = LS_JUMP_PREPARE;
-			player.Control.JumpDirection = jumpDirection;
-			return;
+			auto vaultContext = TestLaraVault(item, coll);
+			if (vaultContext.has_value())
+			{
+				item->Animation.TargetState = vaultContext->TargetState;
+				SetLaraVault(item, coll, *vaultContext);
+				return;
+			}
+		}
+
+		if (CanPerformJump(*item, *coll))
+		{
+			auto jumpDirection = GetPlayerJumpDirection(*item, *coll);
+			if (jumpDirection != JumpDirection::None)
+			{
+				item->Animation.TargetState = LS_JUMP_PREPARE;
+				player.Control.JumpDirection = jumpDirection;
+				return;
+			}
 		}
 	}
 
@@ -1270,14 +1299,28 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 
 	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
 
-	if (IsHeld(In::Jump) && CanPerformJump(*item, *coll))
+	if (IsHeld(In::Jump))
 	{
-		auto jumpDirection = GetPlayerJumpDirection(*item, *coll);
-		if (jumpDirection != JumpDirection::None)
+		if (IsHeld(In::Forward) && g_Configuration.EnableAutoGrab)
 		{
-			item->Animation.TargetState = LS_JUMP_PREPARE;
-			player.Control.JumpDirection = jumpDirection;
-			return;
+			auto vaultContext = TestLaraVault(item, coll);
+			if (vaultContext.has_value())
+			{
+				item->Animation.TargetState = vaultContext->TargetState;
+				SetLaraVault(item, coll, *vaultContext);
+				return;
+			}
+		}
+
+		if (CanPerformJump(*item, *coll))
+		{
+			auto jumpDirection = GetPlayerJumpDirection(*item, *coll);
+			if (jumpDirection != JumpDirection::None)
+			{
+				item->Animation.TargetState = LS_JUMP_PREPARE;
+				player.Control.JumpDirection = jumpDirection;
+				return;
+			}
 		}
 	}
 
