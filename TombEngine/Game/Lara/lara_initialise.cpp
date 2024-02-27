@@ -148,7 +148,7 @@ void InitializeLaraStartPosition(ItemInfo& playerItem)
 		playerItem.Pose = item.Pose;
 		ItemNewRoom(playerItem.Index, item.RoomNumber);
 
-		TENLog("Player start position has been set according to start position object with index " + std::to_string(item.TriggerFlags), LogLevel::Info);
+		TENLog("Player start position has been set according to start position object with index " + std::to_string(item.TriggerFlags) + ".", LogLevel::Info);
 		break;
 	}
 
