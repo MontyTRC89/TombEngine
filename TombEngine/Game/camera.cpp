@@ -81,201 +81,6 @@ float CinematicBarsHeight = 0;
 float CinematicBarsDestinationHeight = 0;
 float CinematicBarsSpeed = 0;
 
-static bool IsCameraCollidableItem(const ItemInfo& item)
-{
-	// 1) Test distance.
-	float distSqr = Vector3i::DistanceSquared(item.Pose.Position, Camera.pos.ToVector3i());
-	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
-		return false;
-
-	// 2) Test object collidability.
-	const auto& object = Objects[item.ObjectNumber];
-	if (!item.Collidable || !object.usingDrawAnimatingItem)
-		return false;
-
-	// 3) Check object attributes.
-	if (object.intelligent || object.isPickup || object.isPuzzleHole || object.collision == nullptr)
-		return false;
-
-	// 4) Test if any 2 box extents are smaller than threshold.
-	auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
-		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
-		(abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD))
-	{
-		return false;
-	}
-
-	return true;
-}
-
-static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
-{
-	const auto& neighborRoomNumbers = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
-
-	// Collect item pointers.
-	auto itemPtrs = std::vector<const ItemInfo*>{};
-	for (int itemNumber = 0; itemNumber < g_Level.NumItems; itemNumber++)
-	{
-		const auto& item = g_Level.Items[itemNumber];
-
-		// 1) Check if item is bridge.
-		if (item.IsBridge())
-			continue;
-
-		// 2) Check if room is active.
-		const auto& room = g_Level.Rooms[item.RoomNumber];
-		if (!room.Active())
-			continue;
-		
-		// 3) Test if item is in neighboring room.
-		if (!Contains(neighborRoomNumbers, (int)item.RoomNumber))
-			continue;
-
-		// 4) Test if item is camera-collidable.
-		if (!IsCameraCollidableItem(item))
-			continue;
-
-		itemPtrs.push_back(&item);
-	}
-
-	return itemPtrs;
-}
-
-static bool IsCameraCollideableStatic(const MESH_INFO& staticObject)
-{
-	// 1) Test distance.
-	float distSqr = Vector3i::DistanceSquared(Camera.pos.ToVector3i(), staticObject.pos.Position);
-	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
-		return false;
-
-	// 2) Check if static is visible.
-	if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
-		return false;
-
-	// 3) Test if any 2 box extents are smaller than threshold.
-	auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
-	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
-		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
-		(abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD))
-	{
-		return false;
-	}
-
-	return true;
-}
-
-static std::vector<const MESH_INFO*> GetCameraCollidableStaticPtrs()
-{
-	const auto& neighborRoomNumbers = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
-
-	// Collect static pointers.
-	auto staticPtrs = std::vector<const MESH_INFO*>{};
-	for (int roomNumber : neighborRoomNumbers)
-	{
-		// 1) Check if room is active.
-		const auto& room = g_Level.Rooms[roomNumber];
-		if (!room.Active())
-			continue;
-
-		// Run through statics in room.
-		for (const auto& staticObject : room.mesh)
-		{
-			// 2) Test if static is camera-collidable.
-			if (!IsCameraCollideableStatic(staticObject))
-				continue;
-
-			staticPtrs.push_back(&staticObject);
-		}
-	}
-
-	return staticPtrs;
-}
-
-static std::optional<Vector3> GetCameraRayBoxIntersect(const BoundingOrientedBox& box)
-{
-	constexpr auto BUFFER = Vector3(BLOCK(1 / 16.0f));
-
-	auto origin = Camera.target.ToVector3();
-	auto target = Camera.pos.ToVector3();
-	float dist = Vector3::Distance(origin, target);
-
-	auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
-	dir.Normalize();
-
-	// Calculate collision boxes.
-	auto expandedBox = BoundingOrientedBox(box.Center, box.Extents + BUFFER, box.Orientation);
-	auto bufferBox = BoundingOrientedBox(box.Center, box.Extents + (BUFFER * 2), box.Orientation);
-
-	// Calculate and return intersection.
-	float intersectDist = 0.0f;
-	if (bufferBox.Intersects(origin, dir, intersectDist))
-	{
-		if (intersectDist < dist && intersectDist <= Camera.targetDistance)
-		{
-			if (expandedBox.Intersects(origin, dir, intersectDist))
-				return Geometry::TranslatePoint(origin, dir, intersectDist);
-		}
-	}
-
-	// No intersection; return nullopt.
-	return std::nullopt;
-}
-
-static std::optional<GameVector> GetCameraObjectLosIntersect(const GameVector& idealPos)
-{
-	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
-
-	float closestDistSqr = INFINITY;
-	auto closestIntersect = std::optional<Vector3>();
-
-	auto origin = idealPos.ToVector3();
-
-	// Collide items.
-	auto itemPtrs = GetCameraCollidableItemPtrs();
-	for (const auto* itemPtr : itemPtrs)
-	{
-		auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
-		auto intersect = GetCameraRayBoxIntersect(box);
-		if (intersect.has_value())
-		{
-			float distSqr = Vector3::DistanceSquared(origin, *intersect);
-			if (distSqr < closestDistSqr)
-			{
-				closestDistSqr = distSqr;
-				closestIntersect = intersect;
-			}
-		}
-
-		g_Renderer.AddDebugBox(box, DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
-	}
-
-	// Collide statics.
-	auto staticPtrs = GetCameraCollidableStaticPtrs();
-	for (const auto* staticPtr : staticPtrs)
-	{
-		auto box = GetBoundsAccurate(*staticPtr, false).ToBoundingOrientedBox(staticPtr->pos);
-		auto intersect = GetCameraRayBoxIntersect(box);
-		if (intersect.has_value())
-		{
-			float distSqr = Vector3::DistanceSquared(origin, *intersect);
-			if (distSqr < closestDistSqr)
-			{
-				closestDistSqr = distSqr;
-				closestIntersect = intersect;
-			}
-		}
-
-		g_Renderer.AddDebugBox(box, DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
-	}
-
-	// TODO: Room number probe.
-	if (closestIntersect.has_value())
-		return GameVector(*closestIntersect, idealPos.RoomNumber);
-
-	return std::nullopt;
-}
-
 void DoThumbstickCamera()
 {
 	constexpr auto X_ANGLE_CONSTRAINT = ANGLE(80.0f);
@@ -730,6 +535,201 @@ static void ClampCameraXOrientation(bool isUnderwater)
 	}
 }
 
+static bool IsCameraCollidableItem(const ItemInfo& item)
+{
+	// 1) Test distance.
+	float distSqr = Vector3i::DistanceSquared(item.Pose.Position, Camera.pos.ToVector3i());
+	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
+		return false;
+
+	// 2) Test object collidability.
+	const auto& object = Objects[item.ObjectNumber];
+	if (!item.Collidable || !object.usingDrawAnimatingItem)
+		return false;
+
+	// 3) Check object attributes.
+	if (object.intelligent || object.isPickup || object.isPuzzleHole || object.collision == nullptr)
+		return false;
+
+	// 4) Test if any 2 box extents are smaller than threshold.
+	auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
+{
+	const auto& neighborRoomNumbers = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
+
+	// Collect item pointers.
+	auto itemPtrs = std::vector<const ItemInfo*>{};
+	for (int itemNumber = 0; itemNumber < g_Level.NumItems; itemNumber++)
+	{
+		const auto& item = g_Level.Items[itemNumber];
+
+		// 1) Check if item is bridge.
+		if (item.IsBridge())
+			continue;
+
+		// 2) Check if room is active.
+		const auto& room = g_Level.Rooms[item.RoomNumber];
+		if (!room.Active())
+			continue;
+
+		// 3) Test if item is in neighboring room.
+		if (!Contains(neighborRoomNumbers, (int)item.RoomNumber))
+			continue;
+
+		// 4) Test if item is camera-collidable.
+		if (!IsCameraCollidableItem(item))
+			continue;
+
+		itemPtrs.push_back(&item);
+	}
+
+	return itemPtrs;
+}
+
+static bool IsCameraCollideableStatic(const MESH_INFO& staticObject)
+{
+	// 1) Test distance.
+	float distSqr = Vector3i::DistanceSquared(Camera.pos.ToVector3i(), staticObject.pos.Position);
+	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
+		return false;
+
+	// 2) Check if static is visible.
+	if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+		return false;
+
+	// 3) Test if any 2 box extents are smaller than threshold.
+	auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
+	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+static std::vector<const MESH_INFO*> GetCameraCollidableStaticPtrs()
+{
+	const auto& neighborRoomNumbers = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
+
+	// Collect static pointers.
+	auto staticPtrs = std::vector<const MESH_INFO*>{};
+	for (int roomNumber : neighborRoomNumbers)
+	{
+		// 1) Check if room is active.
+		const auto& room = g_Level.Rooms[roomNumber];
+		if (!room.Active())
+			continue;
+
+		// Run through statics in room.
+		for (const auto& staticObject : room.mesh)
+		{
+			// 2) Test if static is camera-collidable.
+			if (!IsCameraCollideableStatic(staticObject))
+				continue;
+
+			staticPtrs.push_back(&staticObject);
+		}
+	}
+
+	return staticPtrs;
+}
+
+static std::optional<Vector3> GetCameraRayBoxIntersect(const BoundingOrientedBox& box)
+{
+	constexpr auto BUFFER = Vector3(BLOCK(1 / 16.0f));
+
+	auto origin = Camera.target.ToVector3();
+	auto target = Camera.pos.ToVector3();
+	float dist = Vector3::Distance(origin, target);
+
+	auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
+	dir.Normalize();
+
+	// Calculate collision boxes.
+	auto expandedBox = BoundingOrientedBox(box.Center, box.Extents + BUFFER, box.Orientation);
+	auto bufferBox = BoundingOrientedBox(box.Center, box.Extents + (BUFFER * 2), box.Orientation);
+
+	// Calculate and return intersection.
+	float intersectDist = 0.0f;
+	if (bufferBox.Intersects(origin, dir, intersectDist))
+	{
+		if (intersectDist < dist && intersectDist <= Camera.targetDistance)
+		{
+			if (expandedBox.Intersects(origin, dir, intersectDist))
+				return Geometry::TranslatePoint(origin, dir, intersectDist);
+		}
+	}
+
+	// No intersection; return nullopt.
+	return std::nullopt;
+}
+
+static std::optional<GameVector> GetCameraObjectLosIntersect(const GameVector& idealPos)
+{
+	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
+
+	float closestDistSqr = INFINITY;
+	auto closestIntersect = std::optional<Vector3>();
+
+	auto origin = idealPos.ToVector3();
+
+	// Collide items.
+	auto itemPtrs = GetCameraCollidableItemPtrs();
+	for (const auto* itemPtr : itemPtrs)
+	{
+		auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
+		auto intersect = GetCameraRayBoxIntersect(box);
+		if (intersect.has_value())
+		{
+			float distSqr = Vector3::DistanceSquared(origin, *intersect);
+			if (distSqr < closestDistSqr)
+			{
+				closestDistSqr = distSqr;
+				closestIntersect = intersect;
+			}
+		}
+
+		g_Renderer.AddDebugBox(box, DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+	}
+
+	// Collide statics.
+	auto staticPtrs = GetCameraCollidableStaticPtrs();
+	for (const auto* staticPtr : staticPtrs)
+	{
+		auto box = GetBoundsAccurate(*staticPtr, false).ToBoundingOrientedBox(staticPtr->pos);
+		auto intersect = GetCameraRayBoxIntersect(box);
+		if (intersect.has_value())
+		{
+			float distSqr = Vector3::DistanceSquared(origin, *intersect);
+			if (distSqr < closestDistSqr)
+			{
+				closestDistSqr = distSqr;
+				closestIntersect = intersect;
+			}
+		}
+
+		g_Renderer.AddDebugBox(box, DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+	}
+
+	// TODO: Room number probe.
+	if (closestIntersect.has_value())
+		return GameVector(*closestIntersect, idealPos.RoomNumber);
+
+	return std::nullopt;
+}
+
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
 	constexpr auto BUFFER = 100;
@@ -856,10 +856,6 @@ void ChaseCamera(const ItemInfo& playerItem)
 
 void CombatCamera(const ItemInfo& playerItem)
 {
-	constexpr auto MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT = std::pair<short, short>(-ANGLE(85.0f), ANGLE(70.0f));
-	constexpr auto MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT	= std::pair<short, short>(-ANGLE(85.0f), ANGLE(80.0f));
-	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT				= ANGLE(85.0f);
-
 	const auto& player = GetLaraInfo(playerItem);
 
 	Camera.target.x = playerItem.Pose.Position.x;
