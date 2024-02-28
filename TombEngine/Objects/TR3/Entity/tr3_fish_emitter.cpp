@@ -356,7 +356,7 @@ namespace TEN::Entities::Creatures::TR3
 
 					fish.Pose.Position += separationDir * fleeVel;
 
-					auto orientTo = Geometry::GetOrientToPoint(fish.Pose.Position.ToVector3(), -fish.Pose.Position.ToVector3() + separationDir);
+					auto orientTo = Geometry::GetOrientToPoint(fish.Pose.Position.ToVector3(), separationDir);
 					fish.Pose.Orientation.Lerp(orientTo, 0.05f);
 
 					fish.Velocity -= std::min(fleeVel, fish.target->Animation.Velocity.z - 1.0f);
@@ -374,18 +374,18 @@ namespace TEN::Entities::Creatures::TR3
 				if (pointColl.RoomNumber != fish.RoomNumber && !TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
 					fish.Pose.Position.y = room.maxceiling + 180;
 			
-			if (ItemNearTarget(fish.Pose.Position, fish.target, CLICK(2) / 2) )
-			{
-				if (fish.leader != fish.target)
+				if (ItemNearTarget(fish.Pose.Position, fish.target, CLICK(1) / 2) &&
+					fish.leader != fish.target)
 				{
+
 					TriggerBlood(fish.Pose.Position.x, fish.Pose.Position.y, fish.Pose.Position.z, 4 * GetRandomControl(), 4);
 					DoDamage(fish.target, FISH_HARM_DAMAGE);
 				}
-				else
+				else if (ItemNearTarget(fish.Pose.Position, fish.target, BLOCK (2)) &&
+					fish.leader == fish.target)
 				{
 					leaderItem.ItemFlags[2] = 0;
-				}
-			}
+				}			
 			
 			// Calculate wiggle angle based on sine wave and fish velocity
 			float movementValue = movement.z < 0.0f ? abs(movement.z) : movement.z;
