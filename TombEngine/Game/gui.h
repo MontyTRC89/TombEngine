@@ -72,18 +72,21 @@ namespace TEN::Gui
 	{
 		Title,
 		Pause,
+
 		Statistics,
 		SelectLevel,
 		LoadGame,
 		Options,
+
 		Display,
+		Sound,
+		Gameplay,
+		Input,
+
 		GeneralActions,
 		VehicleActions,
 		QuickActions,
-		MenuActions,
-		Sound,
-		Gameplay,
-		Input
+		MenuActions
 	};
 
 	struct MenuOption

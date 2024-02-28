@@ -40,7 +40,7 @@ namespace TEN::Renderer
 	constexpr auto MenuVerticalBlockSpacing = 50;
 	
 	// Vertical menu positioning templates
-	constexpr auto MenuVerticalControls = 50;
+	constexpr auto MenuVerticalKeyBindings = 50;
 	constexpr auto MenuVerticalDisplaySettings = 50;
 	constexpr auto MenuVerticalSoundSettings = 50;
 	constexpr auto MenuVerticalGameplaySettings = 50;
@@ -339,7 +339,7 @@ namespace TEN::Renderer
 			GetNextBlockPosition(&y);
 
 			// Key Bindings
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_KEY_BINDINGS), PRINTSTRING_COLOR_WHITE, SF(titleOption == 0));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_KEY_BINDINGS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 0));
 			GetNextBlockPosition(&y);
 
 			// Mouse sensitivity
@@ -367,206 +367,210 @@ namespace TEN::Renderer
 			break;
 
 		case Menu::GeneralActions:
+		{
+			// Set up needed parameters.
+			y = MenuVerticalKeyBindings;
+
+			// Heading
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_INPUT), PRINTSTRING_COLOR_YELLOW, SF_Center());
+			GetNextBlockPosition(&y);
+
+			// Arrows
+			AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+
+			// Heading
+			auto titleString = std::string(g_GameFlow->GetString(STRING_GENERAL_ACTIONS));
+			AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
+			GetNextBlockPosition(&y);
+
+			// General action listing
+			for (int k = 0; k < GeneralActionStrings.size(); k++)
 			{
-				// Set up needed parameters.
-				y = MenuVerticalControls;
+				AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(GeneralActionStrings[k].c_str()), PRINTSTRING_COLOR_ORANGE, SF(titleOption == k));
 
-				// Arrows
-				AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
-
-				// Heading
-				auto titleString = std::string(g_GameFlow->GetString(STRING_GENERAL_ACTIONS));
-				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
-				GetNextBlockPosition(&y);
-
-				// General action listing
-				for (int k = 0; k < GeneralActionStrings.size(); k++)
+				if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(GeneralActionStrings[k].c_str()), PRINTSTRING_COLOR_ORANGE, SF(titleOption == k));
-
-					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
-					{
-						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
-					}
-					else
-					{
-						int index = Bindings[1][k] ? Bindings[1][k] : Bindings[0][k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_WHITE, SF(false));
-					}
-
-					if (k < (GeneralActionStrings.size() - 1))
-						GetNextNarrowLinePosition(&y);
+					AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+				}
+				else
+				{
+					int index = Bindings[1][k] ? Bindings[1][k] : Bindings[0][k];
+					AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_WHITE, SF(false));
 				}
 
-				y = MenuVerticalBottomOptions;
-
-				// Reset to defaults
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == GeneralActionStrings.size()));
-				GetNextLinePosition(&y);
-
-				// Apply
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (GeneralActionStrings.size() + 1)));
-				GetNextLinePosition(&y);
-
-				// Cancel
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (GeneralActionStrings.size() + 2)));
-				break;
+				if (k < (GeneralActionStrings.size() - 1))
+					GetNextNarrowLinePosition(&y);
 			}
+
+			y = MenuVerticalBottomOptions;
+
+			// Reset to defaults
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == GeneralActionStrings.size()));
+			GetNextLinePosition(&y);
+
+			// Apply
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (GeneralActionStrings.size() + 1)));
+			GetNextLinePosition(&y);
+
+			// Cancel
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (GeneralActionStrings.size() + 2)));
+			break;
+		}
 
 		case Menu::VehicleActions:
+		{
+			// Set up needed parameters.
+			y = MenuVerticalKeyBindings;
+
+			// Arrows
+			AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+			AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+
+			// Heading
+			auto titleString = std::string(g_GameFlow->GetString(STRING_VEHICLE_ACTIONS));
+			AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
+			GetNextBlockPosition(&y);
+
+			int baseIndex = (int)In::Accelerate;
+
+			// Vehicle action listing
+			for (int k = 0; k < VehicleActionStrings.size(); k++)
 			{
-				// Set up needed parameters.
-				y = MenuVerticalControls;
+				AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(VehicleActionStrings[k].c_str()), PRINTSTRING_COLOR_ORANGE, SF(titleOption == k));
 
-				// Arrows
-				AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
-				AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
-
-				// Heading
-				auto titleString = std::string(g_GameFlow->GetString(STRING_VEHICLE_ACTIONS));
-				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
-				GetNextBlockPosition(&y);
-
-				int baseIndex = (int)In::Accelerate;
-
-				// Vehicle action listing
-				for (int k = 0; k < VehicleActionStrings.size(); k++)
+				if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(VehicleActionStrings[k].c_str()), PRINTSTRING_COLOR_ORANGE, SF(titleOption == k));
-
-					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
-					{
-						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_WHITE, SF(true));
-					}
-					else
-					{
-						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_WHITE, SF(false));
-					}
-
-					if (k < (VehicleActionStrings.size() - 1))
-					{
-						GetNextNarrowLinePosition(&y);
-					}
-					else
-					{
-						GetNextBlockPosition(&y);
-					}
+					AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+				}
+				else
+				{
+					int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
+					AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_WHITE, SF(false));
 				}
 
-				y = MenuVerticalBottomOptions;
-
-				// Reset to defaults
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == VehicleActionStrings.size()));
-				GetNextLinePosition(&y);
-
-				// Apply
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (VehicleActionStrings.size() + 1)));
-				GetNextLinePosition(&y);
-
-				// Cancel
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (VehicleActionStrings.size() + 2)));
-				break;
+				if (k < (VehicleActionStrings.size() - 1))
+				{
+					GetNextNarrowLinePosition(&y);
+				}
+				else
+				{
+					GetNextBlockPosition(&y);
+				}
 			}
+
+			y = MenuVerticalBottomOptions;
+
+			// Reset to defaults
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == VehicleActionStrings.size()));
+			GetNextLinePosition(&y);
+
+			// Apply
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (VehicleActionStrings.size() + 1)));
+			GetNextLinePosition(&y);
+
+			// Cancel
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (VehicleActionStrings.size() + 2)));
+			break;
+		}
 
 		case Menu::QuickActions:
+		{
+			// Set up needed parameters.
+			y = MenuVerticalKeyBindings;
+
+			// Arrows
+			AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+			AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+
+			// Heading
+			auto titleString = std::string(g_GameFlow->GetString(STRING_QUICK_ACTIONS));
+			AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
+			GetNextBlockPosition(&y);
+
+			int baseIndex = (int)In::Flare;
+
+			// Quick action listing
+			for (int k = 0; k < QuickActionStrings.size(); k++)
 			{
-				// Set up needed parameters.
-				y = MenuVerticalControls;
+				AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(QuickActionStrings[k].c_str()), PRINTSTRING_COLOR_ORANGE, SF(titleOption == k));
 
-				// Arrows
-				AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
-				AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
-
-				// Heading
-				auto titleString = std::string(g_GameFlow->GetString(STRING_QUICK_ACTIONS));
-				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
-				GetNextBlockPosition(&y);
-
-				int baseIndex = (int)In::Flare;
-
-				// Quick action listing
-				for (int k = 0; k < QuickActionStrings.size(); k++)
+				if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(QuickActionStrings[k].c_str()), PRINTSTRING_COLOR_ORANGE, SF(titleOption == k));
-
-					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
-					{
-						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_WHITE, SF(true));
-					}
-					else
-					{
-						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_WHITE, SF(false));
-					}
-
-					if (k < (QuickActionStrings.size() - 1))
-						GetNextNarrowLinePosition(&y);
+					AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+				}
+				else
+				{
+					int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
+					AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_WHITE, SF(false));
 				}
 
-				y = MenuVerticalBottomOptions;
-
-				// Reset to defaults
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == QuickActionStrings.size()));
-				GetNextLinePosition(&y);
-
-				// Apply
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (QuickActionStrings.size() + 1)));
-				GetNextLinePosition(&y);
-
-				// Cancel
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (QuickActionStrings.size() + 2)));
-				break;
+				if (k < (QuickActionStrings.size() - 1))
+					GetNextNarrowLinePosition(&y);
 			}
+
+			y = MenuVerticalBottomOptions;
+
+			// Reset to defaults
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == QuickActionStrings.size()));
+			GetNextLinePosition(&y);
+
+			// Apply
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (QuickActionStrings.size() + 1)));
+			GetNextLinePosition(&y);
+
+			// Cancel
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (QuickActionStrings.size() + 2)));
+			break;
+		}
 
 		case Menu::MenuActions:
+		{
+			// Set up parameters.
+			y = MenuVerticalKeyBindings;
+
+			// Arrows
+			AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
+
+			// Heading
+			auto titleString = std::string(g_GameFlow->GetString(STRING_MENU_ACTIONS));
+			AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
+			GetNextBlockPosition(&y);
+
+			int baseIndex = (int)In::Select;
+
+			// Menu action listing.
+			for (int k = 0; k < MenuActionStrings.size(); k++)
 			{
-				// Set up parameters.
-				y = MenuVerticalControls;
+				AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(MenuActionStrings[k].c_str()), PRINTSTRING_COLOR_ORANGE, SF(titleOption == k));
 
-				// Arrows
-				AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
-
-				// Heading
-				auto titleString = std::string(g_GameFlow->GetString(STRING_MENU_ACTIONS));
-				AddString(MenuCenterEntry, y, titleString.c_str(), PRINTSTRING_COLOR_YELLOW, SF_Center());
-				GetNextBlockPosition(&y);
-
-				int baseIndex = (int)In::Select;
-
-				// Menu action listing.
-				for (int k = 0; k < MenuActionStrings.size(); k++)
+				if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
 				{
-					AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(MenuActionStrings[k].c_str()), PRINTSTRING_COLOR_ORANGE, SF(titleOption == k));
-
-					if (g_Gui.GetCurrentSettings().NewKeyWaitTimer > 0.0f && titleOption == k)
-					{
-						AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_WHITE, SF(true));
-					}
-					else
-					{
-						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_WHITE, SF(false));
-					}
-
-					if (k < (MenuActionStrings.size() - 1))
-						GetNextNarrowLinePosition(&y);
+					AddString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_INPUT), PRINTSTRING_COLOR_YELLOW, SF(true));
+				}
+				else
+				{
+					int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
+					AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_WHITE, SF(false));
 				}
 
-				y = MenuVerticalBottomOptions;
-
-				// Reset to defaults
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == MenuActionStrings.size()));
-				GetNextLinePosition(&y);
-
-				// Apply
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (MenuActionStrings.size() + 1)));
-				GetNextLinePosition(&y);
-
-				// Cancel
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (MenuActionStrings.size() + 2)));
-				break;
+				if (k < (MenuActionStrings.size() - 1))
+					GetNextNarrowLinePosition(&y);
 			}
+
+			y = MenuVerticalBottomOptions;
+
+			// Reset to defaults
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_RESET_TO_DEFAULTS), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == MenuActionStrings.size()));
+			GetNextLinePosition(&y);
+
+			// Apply
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (MenuActionStrings.size() + 1)));
+			GetNextLinePosition(&y);
+
+			// Cancel
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == (MenuActionStrings.size() + 2)));
+			break;
+		}
 		}
 	}
 
