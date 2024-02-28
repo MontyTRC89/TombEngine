@@ -40,7 +40,6 @@ namespace TEN::Renderer
 	constexpr auto MenuVerticalBlockSpacing = 50;
 	
 	// Vertical menu positioning templates
-	constexpr auto MenuVerticalOptionsSubmenu = 220;
 	constexpr auto MenuVerticalControls = 50;
 	constexpr auto MenuVerticalDisplaySettings = 50;
 	constexpr auto MenuVerticalSoundSettings = 50;
@@ -173,7 +172,7 @@ namespace TEN::Renderer
 		{
 		case Menu::Options:
 			// Set up parameters.
-			y = MenuVerticalOptionsSubmenu;
+			y = initialY;
 
 			// Heading
 			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_OPTIONS), PRINTSTRING_COLOR_ORANGE, SF_Center());
@@ -190,11 +189,10 @@ namespace TEN::Renderer
 			// Gameplay
 			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_GAMEPLAY), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 2));
 			GetNextLinePosition(&y);
-
-			// TODO: Input submenu. Key bindings + some settings from Gameplay section.
-
-			// Key bindings
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_KEY_BINDINGS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 3));
+			
+			// Input
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_INPUT), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 3));
+			GetNextLinePosition(&y);
 			break;
 
 		case Menu::Display:
@@ -293,69 +291,46 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(controlModeIdString.c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == 0));
 			GetNextLinePosition(&y);
 
-			// TODO
 			// Swim control mode
-			/*AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SWIM_CONTROL_MODE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SWIM_CONTROL_MODE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
 			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(swimControlModeIdString.c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
-			GetNextLinePosition(&y);*/
+			GetNextLinePosition(&y);
 
 			// Auto grab
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_GRAB), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoGrab), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_GRAB), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 2));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoGrab), PRINTSTRING_COLOR_WHITE, SF(titleOption == 2));
 			GetNextLinePosition(&y);
 
 			// Auto targeting
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGETING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 2));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoTargeting), PRINTSTRING_COLOR_WHITE, SF(titleOption == 2));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGETING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 3));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoTargeting), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
 			GetNextLinePosition(&y);
 
 			// Target highlighter
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TARGET_HIGHLIGHTER), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 3));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableTargetHighlighter), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TARGET_HIGHLIGHTER), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableTargetHighlighter), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
 			GetNextLinePosition(&y);
 
 			// Opposite action roll
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_OPPOSITE_ACTION_ROLL), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableOppositeActionRoll), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_OPPOSITE_ACTION_ROLL), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableOppositeActionRoll), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
 			GetNextLinePosition(&y);
 
 			// Subtitles
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SUBTITLES), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableSubtitles), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
-			GetNextLinePosition(&y);
-
-			// TODO: Move to Input settings.
-			//---
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SUBTITLES), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableSubtitles), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
 			
-			// Mouse sensitivity
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SENSITIVITY), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
-			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
-			GetNextLinePosition(&y);
-
-			// Thumbstick camera
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 7));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCamera), PRINTSTRING_COLOR_WHITE, SF(titleOption == 7));
-			GetNextLinePosition(&y);
-
-			// Rumble
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 8));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 8));
-			GetNextLinePosition(&y);
-
-			//---
-
 			y = MenuVerticalBottomOptions;
 
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 9));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 7));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 10));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 8));
 			break;
 
-		// TODO
-		/*case Menu::Input:
+		case Menu::Input:
 			// Set up parameters.
 			y = MenuVerticalInputSettings;
 
@@ -363,12 +338,14 @@ namespace TEN::Renderer
 			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_INPUT), PRINTSTRING_COLOR_YELLOW, SF_Center());
 			GetNextBlockPosition(&y);
 
-			// TODO
 			// Key Bindings
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_KEY_BINDINGS), PRINTSTRING_COLOR_WHITE, SF(titleOption == 0));
+			GetNextBlockPosition(&y);
 
 			// Mouse sensitivity
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SENSITIVITY), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
 			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
+			GetNextLinePosition(&y);
 
 			// Thumbstick camera
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 2));
@@ -378,7 +355,6 @@ namespace TEN::Renderer
 			// Rumble
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 3));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
-			GetNextLinePosition(&y);
 
 			y = MenuVerticalBottomOptions;
 
@@ -388,7 +364,7 @@ namespace TEN::Renderer
 
 			// Cancel
 			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 5));
-			break;*/
+			break;
 
 		case Menu::GeneralActions:
 			{
@@ -545,7 +521,7 @@ namespace TEN::Renderer
 
 		case Menu::MenuActions:
 			{
-				// Set up parameters..
+				// Set up parameters.
 				y = MenuVerticalControls;
 
 				// Arrows
@@ -656,7 +632,7 @@ namespace TEN::Renderer
 		case Menu::Display:
 		case Menu::Sound:
 		case Menu::Gameplay:
-		//case Menu::Input:
+		case Menu::Input:
 			RenderOptionsMenu(menu, MenuVerticalOptionsTitle);
 			break;
 
@@ -706,7 +682,7 @@ namespace TEN::Renderer
 		case Menu::Display:
 		case Menu::Sound:
 		case Menu::Gameplay:
-		//case Menu::Input:
+		case Menu::Input:
 			RenderOptionsMenu(menu, MenuVerticalOptionsPause);
 			break;
 

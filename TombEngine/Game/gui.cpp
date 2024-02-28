@@ -327,11 +327,15 @@ namespace TEN::Gui
 			HandleGameplaySettingsInput(false);
 			return inventoryResult;
 
+		case Menu::Input:
+			HandleInputSettingsInput(false);
+			return inventoryResult;
+
 		case Menu::GeneralActions:
 		case Menu::VehicleActions:
 		case Menu::QuickActions:
 		case Menu::MenuActions:
-			HandleControlSettingsInput(item, false);
+			HandleKeyBindingsSettingsInput(item, false);
 			return inventoryResult;
 		}
 
@@ -476,6 +480,7 @@ namespace TEN::Gui
 			Caustics,
 			Antialiasing,
 			AmbientOcclusion,
+
 			Save,
 			Cancel
 		};
@@ -809,23 +814,18 @@ namespace TEN::Gui
 		enum GameplaySettingsOption
 		{
 			ControlMode,
-			//SwimControlMode,
+			SwimControlMode,
 			AutoGrab,
 			AutoTargeting,
 			TargetHighlighter,
 			OppositeActionRoll,
 			Subtitles,
 
-			// TODO: Move to HandleInputSettingsInput().
-			MouseSensitivity,
-			ThumbstickCameraControl,
-			ToggleRumble,
-
 			Apply,
 			Cancel
 		};
 
-		static const auto numGameplaySettingsOptions = 10;//7;
+		static const auto numGameplaySettingsOptions = 8;
 
 		OptionCount = numGameplaySettingsOptions;
 
@@ -861,8 +861,9 @@ namespace TEN::Gui
 			}
 				break;
 
-			/*case GameplaySettingsOption::SwimControlMode:
+			case GameplaySettingsOption::SwimControlMode:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+
 				if (CurrentSettings.Configuration.SwimControlMode == SwimControlMode::Omnidirectional)
 				{
 					CurrentSettings.Configuration.SwimControlMode = SwimControlMode::Planar;
@@ -872,7 +873,7 @@ namespace TEN::Gui
 					CurrentSettings.Configuration.SwimControlMode = SwimControlMode::Omnidirectional;
 				}
 
-				break;*/
+				break;
 
 			case GameplaySettingsOption::AutoGrab:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -898,13 +899,97 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
 				break;
+			}
+		}
 
-			case GameplaySettingsOption::ThumbstickCameraControl:
+		if (GuiIsPulsed(In::Forward))
+		{
+			if (SelectedOption <= 0)
+			{
+				SelectedOption += OptionCount;
+			}
+			else
+			{
+				SelectedOption--;
+			}
+
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+		}
+
+		if (GuiIsPulsed(In::Back))
+		{
+			if (SelectedOption < OptionCount)
+			{
+				SelectedOption++;
+			}
+			else
+			{
+				SelectedOption -= OptionCount;
+			}
+
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+		}
+
+		if (GuiIsSelected())
+		{
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
+			if (SelectedOption == GameplaySettingsOption::Apply)
+			{
+				// Save configuration.
+				g_Configuration = CurrentSettings.Configuration;
+				SaveConfiguration();
+
+				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
+				SelectedOption = 1;
+			}
+			else if (SelectedOption == GameplaySettingsOption::Cancel)
+			{
+				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+				SetVolumeTracks(g_Configuration.MusicVolume);
+				SetVolumeFX(g_Configuration.SfxVolume);
+				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
+				SelectedOption = 1;
+			}
+		}
+	}
+
+	void GuiController::HandleInputSettingsInput(bool fromPauseMenu)
+	{
+		enum InputSettingsOption
+		{
+			KeyBindings,
+
+			MouseSensitivity,
+			ThumbstickCameraControl,
+			ToggleRumble,
+
+			Apply,
+			Cancel
+		};
+
+		static const auto numInputSettingsOptions = 5;
+
+		OptionCount = numInputSettingsOptions;
+
+		if (GuiIsDeselected())
+		{
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+			MenuToDisplay = Menu::Options;
+			SelectedOption = 3;
+			return;
+		}
+
+		if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
+		{
+			switch (SelectedOption)
+			{
+			case InputSettingsOption::ThumbstickCameraControl:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableThumbstickCamera = !CurrentSettings.Configuration.EnableThumbstickCamera;
 				break;
 
-			case GameplaySettingsOption::ToggleRumble:
+			case InputSettingsOption::ToggleRumble:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableRumble = !CurrentSettings.Configuration.EnableRumble;
 				break;
@@ -915,7 +1000,7 @@ namespace TEN::Gui
 		{
 			switch (SelectedOption)
 			{
-			case GameplaySettingsOption::MouseSensitivity:
+			case InputSettingsOption::MouseSensitivity:
 				if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MIN)
 				{
 					CurrentSettings.Configuration.MouseSensitivity -= 1;
@@ -933,7 +1018,7 @@ namespace TEN::Gui
 		{
 			switch (SelectedOption)
 			{
-			case GameplaySettingsOption::MouseSensitivity:
+			case InputSettingsOption::MouseSensitivity:
 				if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MAX)
 				{
 					CurrentSettings.Configuration.MouseSensitivity += 1;
@@ -979,9 +1064,18 @@ namespace TEN::Gui
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
-			if (SelectedOption == GameplaySettingsOption::Apply)
+			// TODO: Go to Key Bindings submenu.
+
+			switch (SelectedOption)
 			{
-				// Was rumble setting changed?
+			case InputSettingsOption::KeyBindings:
+				BackupOptions();
+				MenuToDisplay = Menu::GeneralActions;
+				SelectedOption = 0;
+				break;
+
+			case InputSettingsOption::Apply:
+			{
 				bool indicateRumble = CurrentSettings.Configuration.EnableRumble && !g_Configuration.EnableRumble;
 
 				// Save configuration.
@@ -995,37 +1089,20 @@ namespace TEN::Gui
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 				SelectedOption = 1;
 			}
-			else if (SelectedOption == GameplaySettingsOption::Cancel)
-			{
+				break;
+
+			case InputSettingsOption::Cancel:
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				SetVolumeTracks(g_Configuration.MusicVolume);
 				SetVolumeFX(g_Configuration.SfxVolume);
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 				SelectedOption = 1;
+				break;
 			}
 		}
 	}
 
-	void GuiController::HandleInputSettingsInput(bool fromPauseMenu)
-	{
-		enum InputSettingsOption
-		{
-			MouseSensitivity,
-			ThumbstickCameraControl,
-			ToggleRumble,
-
-			Apply,
-			Cancel
-		};
-
-		static const auto numGameplaySettingsOptions = 3;
-
-		OptionCount = numGameplaySettingsOptions;
-
-		// TODO
-	}
-
-	void GuiController::HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu)
+	void GuiController::HandleKeyBindingsSettingsInput(ItemInfo* item, bool fromPauseMenu)
 	{
 		unsigned int numControlSettingsOptions = 0;
 		switch (MenuToDisplay)
@@ -1243,9 +1320,8 @@ namespace TEN::Gui
 			if (GuiIsDeselected())
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-
-				MenuToDisplay = Menu::Options;
-				SelectedOption = 3;
+				MenuToDisplay = Menu::Input;
+				SelectedOption = 0;
 			}
 		}
 	}
@@ -1262,8 +1338,7 @@ namespace TEN::Gui
 			Display,
 			Sound,
 			Gameplay,
-			//Input
-			KeyBindings
+			Input
 		};
 
 		switch (SelectedOption)
@@ -1286,16 +1361,9 @@ namespace TEN::Gui
 			SelectedOption = 0;
 			break;
 
-		// TODO
-		/*case OptionsOption::Input:
+		case OptionsOption::Input:
 			BackupOptions();
 			MenuToDisplay = Menu::Input;
-			SelectedOption = 0;
-			break;*/
-
-		case OptionsOption::KeyBindings:
-			BackupOptions();
-			MenuToDisplay = Menu::GeneralActions;
 			SelectedOption = 0;
 			break;
 		}
@@ -1343,11 +1411,15 @@ namespace TEN::Gui
 			HandleGameplaySettingsInput(true);
 			return InventoryResult::None;
 
+		case Menu::Input:
+			HandleInputSettingsInput(true);
+			return InventoryResult::None;
+
 		case Menu::GeneralActions:
 		case Menu::VehicleActions:
 		case Menu::QuickActions:
 		case Menu::MenuActions:
-			HandleControlSettingsInput(item, true);
+			HandleKeyBindingsSettingsInput(item, true);
 			return InventoryResult::None;
 		}
 
@@ -1462,8 +1534,8 @@ namespace TEN::Gui
 
 	bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 	{
-		static const int numSmallWaterskins = INV_OBJECT_SMALL_WATERSKIN_3L - INV_OBJECT_SMALL_WATERSKIN_EMPTY + 1;
-		static const int numBigWaterskins	= INV_OBJECT_BIG_WATERSKIN_5L - INV_OBJECT_BIG_WATERSKIN_EMPTY + 1;
+		constexpr auto SMALL_WATERSKIN_COUNT = INV_OBJECT_SMALL_WATERSKIN_3L - INV_OBJECT_SMALL_WATERSKIN_EMPTY + 1;
+		constexpr auto BIG_WATERSKIN_COUNT	 = INV_OBJECT_BIG_WATERSKIN_5L - INV_OBJECT_BIG_WATERSKIN_EMPTY + 1;
 
 		if (objectNumber < INV_OBJECT_SMALL_WATERSKIN_EMPTY || objectNumber > INV_OBJECT_BIG_WATERSKIN_5L)//trash
 		{
@@ -1484,7 +1556,7 @@ namespace TEN::Gui
 		}
 		else if (objectNumber > INV_OBJECT_SMALL_WATERSKIN_3L)
 		{
-			for (int n = 0; n < numSmallWaterskins; n++)
+			for (int n = 0; n < SMALL_WATERSKIN_COUNT; n++)
 			{
 				if (IsItemInInventory(n + INV_OBJECT_SMALL_WATERSKIN_EMPTY))
 					return true;
@@ -1492,7 +1564,7 @@ namespace TEN::Gui
 		}
 		else
 		{
-			for (int n = 0; n < numBigWaterskins; n++)
+			for (int n = 0; n < BIG_WATERSKIN_COUNT; n++)
 			{
 				if (IsItemInInventory(n + INV_OBJECT_BIG_WATERSKIN_EMPTY))
 					return true;

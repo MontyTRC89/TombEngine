@@ -230,6 +230,7 @@ bool SaveConfiguration()
 
 	// Set Gameplay keys.
 	if (SetDWORDRegKey(gameplayKey, REGKEY_CONTROL_MODE, (DWORD)g_Configuration.ControlMode) != ERROR_SUCCESS ||
+		SetDWORDRegKey(gameplayKey, REGKEY_SWIM_CONTROL_MODE, (DWORD)g_Configuration.SwimControlMode) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_GRAB, g_Configuration.EnableAutoGrab) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, g_Configuration.EnableTargetHighlighter) != ERROR_SUCCESS ||
@@ -326,6 +327,7 @@ void InitDefaultConfiguration()
 	g_Configuration.SfxVolume = 100;
 
 	g_Configuration.ControlMode = ControlMode::EnhancedTank;
+	g_Configuration.SwimControlMode = SwimControlMode::Omnidirectional;
 	g_Configuration.EnableAutoGrab = true;
 	g_Configuration.EnableAutoTargeting = true;
 	g_Configuration.EnableTargetHighlighter = true;
@@ -426,6 +428,7 @@ bool LoadConfiguration()
 	}
 
 	DWORD controlMode = (DWORD)ControlMode::EnhancedTank;
+	DWORD swimControlMode = (DWORD)SwimControlMode::Omnidirectional;
 	bool enableAutoGrab = true;
 	bool enableAutoTargeting = true;
 	bool enableTargetHighlighter = true;
@@ -439,6 +442,7 @@ bool LoadConfiguration()
 
 	// Load Gameplay keys.
 	if (GetDWORDRegKey(gameplayKey, REGKEY_CONTROL_MODE, &controlMode, (DWORD)ControlMode::EnhancedTank) != ERROR_SUCCESS ||
+		GetDWORDRegKey(gameplayKey, REGKEY_SWIM_CONTROL_MODE, &controlMode, (DWORD)SwimControlMode::Omnidirectional) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_GRAB, &enableAutoGrab, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, &enableTargetHighlighter, true) != ERROR_SUCCESS ||
@@ -521,6 +525,7 @@ bool LoadConfiguration()
 	g_Configuration.SoundDevice = soundDevice;
 
 	g_Configuration.ControlMode = (ControlMode)controlMode;
+	g_Configuration.SwimControlMode = (SwimControlMode)swimControlMode;
 	g_Configuration.EnableAutoGrab = enableAutoGrab;
 	g_Configuration.EnableAutoTargeting = enableAutoTargeting;
 	g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
@@ -579,8 +584,8 @@ LONG GetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool* bValue, bool bDefaultVa
 {
 	DWORD nDefValue((bDefaultValue) ? 1 : 0);
 	DWORD nResult(nDefValue);
+
 	LONG nError = GetDWORDRegKey(hKey, strValueName, &nResult, nDefValue);
-	
 	if (ERROR_SUCCESS == nError)
 		*bValue = (nResult != 0);
 	
@@ -592,12 +597,11 @@ LONG GetStringRegKey(HKEY hKey, LPCSTR strValueName, char** strValue, char* strD
 	*strValue = strDefaultValue;
 	char szBuffer[512];
 	DWORD dwBufferSize = sizeof(szBuffer);
-	ULONG nError;
-	nError = RegQueryValueEx(hKey, strValueName, 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
+	
+	ULONG nError = RegQueryValueEx(hKey, strValueName, 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
 	if (ERROR_SUCCESS == nError)
-	{
 		*strValue = szBuffer;
-	}
+	
 	return nError;
 }
 

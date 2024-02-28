@@ -33,6 +33,7 @@ constexpr auto REGKEY_SFX_VOLUME	= "SfxVolume";
 
 // Gameplay keys
 constexpr auto REGKEY_CONTROL_MODE				  = "ControlMode";
+constexpr auto REGKEY_SWIM_CONTROL_MODE			  = "SwimControlMode";
 constexpr auto REGKEY_ENABLE_AUTO_GRAB			  = "EnableAutoGrab";
 constexpr auto REGKEY_ENABLE_AUTO_TARGETING		  = "EnableAutoTargeting";
 constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER	  = "EnableTargetHighlighter";

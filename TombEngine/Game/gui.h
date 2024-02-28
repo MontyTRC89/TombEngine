@@ -83,7 +83,7 @@ namespace TEN::Gui
 		MenuActions,
 		Sound,
 		Gameplay,
-		//Input
+		Input
 	};
 
 	struct MenuOption
@@ -207,7 +207,7 @@ namespace TEN::Gui
 		void HandleSoundSettingsInput(bool fromPauseMenu);
 		void HandleGameplaySettingsInput(bool fromPauseMenu);
 		void HandleInputSettingsInput(bool fromPauseMenu);
-		void HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu);
+		void HandleKeyBindingsSettingsInput(ItemInfo* item, bool fromPauseMenu);
 		void HandleOptionsInput();
 		void BackupOptions();
 		bool DoObjectsCombine(int objectNumber1, int objectNumber2);

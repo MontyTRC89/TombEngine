@@ -94,7 +94,7 @@
 #define STRING_CONTROL_MODE_ENHANCED_TANK	"control_mode_enhanced_tank"
 #define STRING_CONTROL_MODE_MODERN			"control_mode_modern"
 #define STRING_SWIM_CONTROL_MODE		"swim_control_mode"
-#define STRING_SWIM_CONTROL_MODE_OMNI	"swim_control_mode_omni"
+#define STRING_SWIM_CONTROL_MODE_OMNI	"swim_control_mode_omnidirectional"
 #define STRING_SWIM_CONTROL_MODE_PLANAR	"swim_control_mode_planar"
 #define STRING_SUBTITLES				"subtitles"
 #define STRING_MOUSE_SENSITIVITY		"mouse_sensitivity"
