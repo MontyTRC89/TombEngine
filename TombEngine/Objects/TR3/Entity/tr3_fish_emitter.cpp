@@ -23,14 +23,12 @@ using namespace TEN::Renderer;
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto FISH_HARM_DAMAGE = 3;
-	constexpr auto FISH_ENTITY_DAMAGE = 1;
 	constexpr auto MAX_FISH_VELOCITY = 10.0f;
-	constexpr auto MIN_FISH_VELOCITY = 8.0f;
-	constexpr auto LEADER_REACH_TARGET_RANGE = SQUARE(BLOCK(0.4f));
-	constexpr auto FISH_ORIENT_LERP_ALPHA = 0.1f;
-	constexpr float MAX_ANGLE = ANGLE(10.0f);
-	constexpr float MIN_ANGLE = ANGLE(-4.0f);
-	constexpr float ANGLE_STEP = ANGLE(1.0f);
+	constexpr auto COHESION_FACTOR = 100.1f;
+	constexpr auto SPACING_FACTOR = 600.0f;
+	constexpr auto SPEEDUP_FACTOR = 0.2f;
+	constexpr auto MAX_DISTANCE_FROM_TARGET = SQUARE(BLOCK(0.01f));
+	constexpr float BASE_SEPARATION_DISTANCE = 210.0f;
 
 	FishData FishSwarm[FISH_COUNT_MAX];
 	int NextFish;
@@ -243,18 +241,10 @@ namespace TEN::Entities::Creatures::TR3
 
 	void UpdateFishSwarm()
 	{
-		constexpr auto COHESION_FACTOR			= 100.1f;			
-		constexpr auto SPACING_FACTOR			= 600.0f;
-		constexpr auto SPEEDUP_FACTOR			= 0.2f;
-		constexpr auto MAX_DISTANCE_FROM_TARGET = SQUARE(BLOCK(0.01f));
-		constexpr float BASE_SEPARATION_DISTANCE = 210.0f;
-
-
 		int nearestFishIndex = -1; // Index of the nearest fish
 		float minDistanceToTarget = std::numeric_limits<float>::max(); // Initialize to maximum possible value
 
 		int minDist = MAXINT;
-		int minIndex = -1;
 
 		for (int i = 0; i < FISH_COUNT_MAX; i++)
 		{
@@ -366,7 +356,7 @@ namespace TEN::Entities::Creatures::TR3
 
 					fish.Pose.Position += separationDir * fleeVel;
 
-					auto orientTo = Geometry::GetOrientToPoint(fish.Pose.Position.ToVector3(), fish.Pose.Position.ToVector3() + separationDir);
+					auto orientTo = Geometry::GetOrientToPoint(fish.Pose.Position.ToVector3(), -fish.Pose.Position.ToVector3() + separationDir);
 					fish.Pose.Orientation.Lerp(orientTo, 0.05f);
 
 					fish.Velocity -= std::min(fleeVel, fish.target->Animation.Velocity.z - 1.0f);
@@ -397,19 +387,18 @@ namespace TEN::Entities::Creatures::TR3
 				}
 			}
 			
-			// Calculate wiggle angle based on sine wave
-			//TODO: Include speed of the fish
-			float wiggleAngle = sin(fish.Timer) * MAX_ANGLE;
+			// Calculate wiggle angle based on sine wave and fish velocity
+			float movementValue = movement.z < 0.0f ? abs(movement.z) : movement.z;
+			float wiggleAngle = sin(fish.Timer) * ANGLE(std::clamp(movementValue * 7.0f, 4.0f, 7.0f));
 
 			fish.Pose.Orientation.y += wiggleAngle;
 			auto rotMatrix2 = fish.Pose.Orientation.ToRotationMatrix();
 
-			fish.Timer += 1.0f; 
+			fish.Timer += std::clamp(movementValue / 2, 0.3f, 1.0f);
 
 			if (fish.Timer > PI_MUL_2)
 				fish.Timer -= PI_MUL_2;
 
-			// Update fish's transformation matrix
 			auto tMatrix = Matrix::CreateTranslation(fish.Pose.Position.x, fish.Pose.Position.y, fish.Pose.Position.z);
 			fish.Transform = rotMatrix2 * tMatrix;
 		}
