@@ -94,6 +94,12 @@ void InitializeLaraMeshes(ItemInfo* item)
 
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 		item->Model.MeshIndex[i] = item->Model.BaseMesh + i;
+
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.Weapon.HolsterInfo.LeftHolster =
+	lara->Control.Weapon.HolsterInfo.RightHolster = 
+	lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
 }
 
 void InitializeLaraAnims(ItemInfo* item)
