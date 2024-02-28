@@ -15,6 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/configuration.h"
 
+using namespace TEN::Config;
 using namespace TEN::Input;
 
 constexpr auto LADDER_TEST_MARGIN = 8;

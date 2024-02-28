@@ -18,6 +18,7 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 
+using namespace TEN::Config;
 using TEN::Renderer::g_Renderer;
 
 /// Utility functions for various calculations.

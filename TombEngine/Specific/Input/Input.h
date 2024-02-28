@@ -1,6 +1,5 @@
 #pragma once
 #include "Math/Math.h"
-#include "Specific/Input/ControlModes.h"
 #include "Specific/Input/InputAction.h"
 
 using namespace TEN::Math;

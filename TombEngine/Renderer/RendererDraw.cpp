@@ -31,6 +31,8 @@
 #include "Specific/winmain.h"
 #include "Renderer/Structures/RendererSortableObject.h"
 
+using namespace TEN::Config;
+
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer

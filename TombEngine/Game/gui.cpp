@@ -19,6 +19,7 @@
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/Input/InputAction.h"
 #include "Specific/clock.h"
@@ -26,6 +27,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Config;
 using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Utils;
@@ -857,7 +859,7 @@ namespace TEN::Gui
 					controlMode = (int)ControlMode::ClassicTank;
 				}
 
-				CurrentSettings.Configuration.ControlMode = (Input::ControlMode)controlMode;
+				CurrentSettings.Configuration.ControlMode = (Config::ControlMode)controlMode;
 			}
 				break;
 

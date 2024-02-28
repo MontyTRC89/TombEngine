@@ -16,6 +16,7 @@
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
+using namespace TEN::Config;
 using namespace TEN::Gui;
 using namespace TEN::Hud;
 using namespace TEN::Input;
@@ -370,10 +371,6 @@ namespace TEN::Renderer
 		{
 			// Set up needed parameters.
 			y = MenuVerticalKeyBindings;
-
-			// Heading
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_INPUT), PRINTSTRING_COLOR_YELLOW, SF_Center());
-			GetNextBlockPosition(&y);
 
 			// Arrows
 			AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));

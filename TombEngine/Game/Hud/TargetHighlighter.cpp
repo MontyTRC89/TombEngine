@@ -11,6 +11,7 @@
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Config;
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Math;
 using namespace TEN::Utils;

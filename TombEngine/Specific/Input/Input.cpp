@@ -20,6 +20,7 @@
 #include "Specific/winmain.h"
 
 using namespace OIS;
+using namespace TEN::Config;
 using namespace TEN::Gui;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;

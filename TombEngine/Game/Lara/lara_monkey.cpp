@@ -17,6 +17,7 @@
 #include "Specific/level.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
+using namespace TEN::Config;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 

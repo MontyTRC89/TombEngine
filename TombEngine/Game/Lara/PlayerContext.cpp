@@ -12,9 +12,11 @@
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_tests.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Config;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Player

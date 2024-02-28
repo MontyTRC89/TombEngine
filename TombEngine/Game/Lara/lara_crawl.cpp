@@ -19,6 +19,7 @@
 #include "Specific/level.h"
 #include "Specific/configuration.h"
 
+using namespace TEN::Config;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 

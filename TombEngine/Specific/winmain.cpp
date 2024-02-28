@@ -19,8 +19,9 @@
 #include "Scripting/Include/ScriptInterfaceState.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
-using namespace TEN::Renderer;
+using namespace TEN::Config;
 using namespace TEN::Input;
+using namespace TEN::Renderer;
 using namespace TEN::Utils;
 
 using std::exception;

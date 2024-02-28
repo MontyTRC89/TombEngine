@@ -6,6 +6,8 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/InputAction.h"
 
+using namespace TEN::Config;
+
 struct ItemInfo;
 
 using namespace TEN::Input;

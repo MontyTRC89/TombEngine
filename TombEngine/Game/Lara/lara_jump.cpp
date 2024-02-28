@@ -14,9 +14,11 @@
 #include "Game/Setup.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
+#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Config;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 

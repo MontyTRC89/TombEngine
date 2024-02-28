@@ -8,8 +8,10 @@
 #include "Game/Lara/lara_swim.h"
 #include "Game/Setup.h"
 #include "Sound/sound.h"
+#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Config;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Player

@@ -16,6 +16,7 @@
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
+using namespace TEN::Config;
 using namespace TEN::Gui;
 
 HSAMPLE BASS_SamplePointer[SOUND_MAX_SAMPLES];

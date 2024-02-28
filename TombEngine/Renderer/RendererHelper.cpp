@@ -34,6 +34,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Config;
 using namespace TEN::Math;
 
 extern GameConfiguration g_Configuration;
@@ -362,7 +363,7 @@ namespace TEN::Renderer
 			farView = DEFAULT_FAR_VIEW;
 
 		farView = farView;
-		_gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
+		_gameCamera = RenderView(cam, roll, fov, 32, farView, Config::g_Configuration.ScreenWidth, Config::g_Configuration.ScreenHeight);
 	}
 
 	bool Renderer::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)

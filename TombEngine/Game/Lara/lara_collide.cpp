@@ -14,11 +14,13 @@
 #include "Game/Lara/lara_tests.h"
 #include "Game/Setup.h"
 #include "Objects/Sink.h"
+#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
+using namespace TEN::Config;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 

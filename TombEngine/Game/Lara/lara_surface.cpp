@@ -14,6 +14,7 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Config;
 using namespace TEN::Input;
 
 // -----------------------------
