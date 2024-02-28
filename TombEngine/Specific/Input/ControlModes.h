@@ -2,6 +2,7 @@
 
 namespace TEN::Input
 {
+	// TODO: Move to configuration.h
 	enum class ControlMode
 	{
 		ClassicTank,

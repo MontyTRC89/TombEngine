@@ -81,7 +81,9 @@ namespace TEN::Gui
 		VehicleActions,
 		QuickActions,
 		MenuActions,
-		OtherSettings
+		Sound,
+		Gameplay,
+		//Input
 	};
 
 	struct MenuOption
@@ -202,8 +204,10 @@ namespace TEN::Gui
 
 	private:
 		void HandleDisplaySettingsInput(bool fromPauseMenu);
+		void HandleSoundSettingsInput(bool fromPauseMenu);
+		void HandleGameplaySettingsInput(bool fromPauseMenu);
+		void HandleInputSettingsInput(bool fromPauseMenu);
 		void HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu);
-		void HandleOtherSettingsInput(bool fromPauseMenu);
 		void HandleOptionsInput();
 		void BackupOptions();
 		bool DoObjectsCombine(int objectNumber1, int objectNumber2);

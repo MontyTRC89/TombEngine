@@ -45,6 +45,13 @@ constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	  = "EnableThumbstickCamera";
 constexpr auto REGKEY_ENABLE_RUMBLE				  = "EnableRumble";
 // + key bindings
 
+// TODO: Implement these swim control modes.
+enum class SwimControlMode
+{
+	Omnidirectional,
+	Planar
+};
+
 struct GameConfiguration
 {
 	static constexpr auto DEFAULT_SHADOW_MAP_SIZE	= 1024;
@@ -52,13 +59,13 @@ struct GameConfiguration
 	static constexpr auto DEFAULT_MOUSE_SENSITIVITY = 6;
 
 	// Graphics
-	int		   ScreenWidth		  = 0;
-	int		   ScreenHeight		  = 0;
-	bool	   EnableWindowedMode = false;
-	ShadowMode ShadowType		  = ShadowMode::None;
-	int		   ShadowMapSize	  = DEFAULT_SHADOW_MAP_SIZE;
-	int		   ShadowBlobsMax	  = DEFAULT_SHADOW_BLOBS_MAX;
-	bool	   EnableCaustics	  = false;
+	int		   ScreenWidth			  = 0;
+	int		   ScreenHeight			  = 0;
+	bool	   EnableWindowedMode	  = false;
+	ShadowMode ShadowType			  = ShadowMode::None;
+	int		   ShadowMapSize		  = DEFAULT_SHADOW_MAP_SIZE;
+	int		   ShadowBlobsMax		  = DEFAULT_SHADOW_BLOBS_MAX;
+	bool	   EnableCaustics		  = false;
 	bool	   EnableAmbientOcclusion = false;
 	AntialiasingMode AntialiasingMode = AntialiasingMode::None;
 
@@ -70,22 +77,25 @@ struct GameConfiguration
 	int	 SfxVolume	  = 0;
 
 	// Gameplay
-	ControlMode ControlMode				 = ControlMode::ClassicTank;
-	bool		EnableAutoGrab			 = false;
-	bool		EnableAutoTargeting		 = false;
-	bool		EnableTargetHighlighter	 = false;
-	bool		EnableSubtitles			 = false;
+	ControlMode		ControlMode		= ControlMode::ClassicTank;
+	SwimControlMode SwimControlMode = SwimControlMode::Omnidirectional;
+	bool EnableAutoGrab			  = false;
+	bool EnableAutoTargeting	  = false;
+	bool EnableTargetHighlighter  = false;
+	bool EnableOppositeActionRoll = false;
+	bool EnableSubtitles		  = false;
 
 	// Input
-	std::vector<int> Bindings				  = {};
-	int				 MouseSensitivity		  = DEFAULT_MOUSE_SENSITIVITY;
-	bool			 EnableOppositeActionRoll = false;
-	bool			 EnableThumbstickCamera	  = false;
-	bool			 EnableRumble			  = false;
+	std::vector<int> Bindings				= {};
+	int				 MouseSensitivity		= DEFAULT_MOUSE_SENSITIVITY;
+	bool			 EnableThumbstickCamera = false;
+	bool			 EnableRumble			= false;
 
 	std::vector<Vector2i> SupportedScreenResolutions = {};
 	std::string			  AdapterName				 = {};
 };
+
+extern GameConfiguration g_Configuration;
 
 void LoadResolutionsInCombobox(HWND handle);
 void LoadSoundDevicesInCombobox(HWND handle);
@@ -102,4 +112,5 @@ LONG SetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD nValue);
 LONG SetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool bValue);
 LONG SetStringRegKey(HKEY hKey, LPCSTR strValueName, char* strValue);
 
-extern GameConfiguration g_Configuration;
+bool IsUsingOmnidirectionalSwimControls();
+bool IsUsingPlanarSwimControls();

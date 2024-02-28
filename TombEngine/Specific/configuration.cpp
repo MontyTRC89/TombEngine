@@ -232,10 +232,13 @@ bool SaveConfiguration()
 	if (SetDWORDRegKey(gameplayKey, REGKEY_CONTROL_MODE, (DWORD)g_Configuration.ControlMode) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_GRAB, g_Configuration.EnableAutoGrab) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
-		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS ||
-		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, g_Configuration.EnableTargetHighlighter) != ERROR_SUCCESS ||
-		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS)
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, g_Configuration.EnableOppositeActionRoll) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS ||
+
+		// TODO: Move to Input section.
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
@@ -326,10 +329,10 @@ void InitDefaultConfiguration()
 	g_Configuration.EnableAutoGrab = true;
 	g_Configuration.EnableAutoTargeting = true;
 	g_Configuration.EnableTargetHighlighter = true;
+	g_Configuration.EnableOppositeActionRoll = true;
 	g_Configuration.EnableSubtitles = true;
 
 	g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-	g_Configuration.EnableOppositeActionRoll = true;
 	g_Configuration.EnableThumbstickCamera = false;
 	g_Configuration.EnableRumble = true;
 
@@ -426,11 +429,11 @@ bool LoadConfiguration()
 	bool enableAutoGrab = true;
 	bool enableAutoTargeting = true;
 	bool enableTargetHighlighter = true;
+	bool enableOppositeActionRoll = true;
 	bool enableSubtitles = true;
 
-	// TODO: Move lower.
+	// TODO: Move to Input section.
 	DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-	bool enableOppositeActionRoll = true;
 	bool enableThumbstickCamera = true;
 	bool enableRumble = true;
 
@@ -438,10 +441,13 @@ bool LoadConfiguration()
 	if (GetDWORDRegKey(gameplayKey, REGKEY_CONTROL_MODE, &controlMode, (DWORD)ControlMode::EnhancedTank) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_GRAB, &enableAutoGrab, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
-		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS ||
-		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, &enableTargetHighlighter, true) != ERROR_SUCCESS ||
-		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS)
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, &enableOppositeActionRoll, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS ||
+
+		// TODO: Move to Input section.
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
@@ -518,10 +524,10 @@ bool LoadConfiguration()
 	g_Configuration.EnableAutoGrab = enableAutoGrab;
 	g_Configuration.EnableAutoTargeting = enableAutoTargeting;
 	g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
+	g_Configuration.EnableOppositeActionRoll = enableOppositeActionRoll;
 	g_Configuration.EnableSubtitles = enableSubtitles;
 
 	g_Configuration.MouseSensitivity = mouseSensitivity;
-	g_Configuration.EnableOppositeActionRoll = enableOppositeActionRoll;
 	g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
 	g_Configuration.EnableRumble = enableRumble;
 
@@ -581,7 +587,6 @@ LONG GetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool* bValue, bool bDefaultVa
 	return nError;
 }
 
-
 LONG GetStringRegKey(HKEY hKey, LPCSTR strValueName, char** strValue, char* strDefaultValue)
 {
 	*strValue = strDefaultValue;
@@ -594,4 +599,14 @@ LONG GetStringRegKey(HKEY hKey, LPCSTR strValueName, char** strValue, char* strD
 		*strValue = szBuffer;
 	}
 	return nError;
+}
+
+bool IsUsingOmnidirectionalSwimControls()
+{
+	return (g_Configuration.SwimControlMode == SwimControlMode::Omnidirectional);
+}
+
+bool IsUsingPlanarSwimControls()
+{
+	return (g_Configuration.SwimControlMode == SwimControlMode::Planar);
 }

@@ -287,7 +287,7 @@ namespace TEN::Gui
 
 		static const int numTitleOptions	= 3;
 		static const int numLoadGameOptions = SAVEGAME_MAX - 1;
-		static const int numOptionsOptions	= 2;
+		static const int numOptionsOptions	= 3;
 
 		static int selectedOptionBackup;
 		auto inventoryResult = InventoryResult::None;
@@ -319,15 +319,19 @@ namespace TEN::Gui
 			HandleDisplaySettingsInput(false);
 			return inventoryResult;
 
+		case Menu::Sound:
+			HandleSoundSettingsInput(false);
+			return inventoryResult;
+
+		case Menu::Gameplay:
+			HandleGameplaySettingsInput(false);
+			return inventoryResult;
+
 		case Menu::GeneralActions:
 		case Menu::VehicleActions:
 		case Menu::QuickActions:
 		case Menu::MenuActions:
 			HandleControlSettingsInput(item, false);
-			return inventoryResult;
-
-		case Menu::OtherSettings:
-			HandleOtherSettingsInput(false);
 			return inventoryResult;
 		}
 
@@ -362,9 +366,13 @@ namespace TEN::Gui
 			if (GuiIsPulsed(In::Back))
 			{
 				if (SelectedOption < OptionCount)
+				{
 					SelectedOption++;
+				}
 				else
+				{
 					SelectedOption -= OptionCount;
+				}
 
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
@@ -423,14 +431,16 @@ namespace TEN::Gui
 				}
 				else if (MenuToDisplay == Menu::SelectLevel)
 				{
-					// Level 0 is the title level, so increment the option by 1 to offset it.
+					// Level 0 is title level, so increment option by 1 to offset it.
 					g_GameFlow->SelectedLevelForNewGame = SelectedOption + 1;
 					MenuToDisplay = Menu::Title;
 					SelectedOption = 0;
 					inventoryResult = InventoryResult::NewGameSelectedLevel;
 				}
 				else if (MenuToDisplay == Menu::Options)
+				{
 					HandleOptionsInput();
+				}
 			}
 		}
 
@@ -439,16 +449,16 @@ namespace TEN::Gui
 
 	void GuiController::FillDisplayOptions()
 	{
-		// Copy configuration to a temporary object
+		// Copy configuration to temporary object.
 		BackupOptions();
 
-		// Get current display mode
+		// Get current display mode.
 		CurrentSettings.SelectedScreenResolution = 0;
 		for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
 		{
-			auto screenResolution = g_Configuration.SupportedScreenResolutions[i];
-			if (screenResolution.x == CurrentSettings.Configuration.ScreenWidth &&
-				screenResolution.y == CurrentSettings.Configuration.ScreenHeight)
+			auto screenRes = g_Configuration.SupportedScreenResolutions[i];
+			if (screenRes.x == CurrentSettings.Configuration.ScreenWidth &&
+				screenRes.y == CurrentSettings.Configuration.ScreenHeight)
 			{
 				CurrentSettings.SelectedScreenResolution = i;
 				break;
@@ -602,7 +612,7 @@ namespace TEN::Gui
 
 			if (SelectedOption == DisplaySettingsOption::Save)
 			{
-				// Save the configuration.
+				// Save configuration.
 				auto screenResolution = g_Configuration.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
 				CurrentSettings.Configuration.ScreenWidth = screenResolution.x;
 				CurrentSettings.Configuration.ScreenHeight = screenResolution.y;
@@ -623,6 +633,396 @@ namespace TEN::Gui
 				SelectedOption = fromPauseMenu ? 1 : 0;
 			}
 		}
+	}
+
+	void GuiController::HandleSoundSettingsInput(bool fromPauseMenu)
+	{
+		enum SoundSettingsOption
+		{
+			MusicVolume,
+			SfxVolume,
+			Reverb,
+
+			Apply,
+			Cancel
+		};
+
+		static const auto numSoundSettingsOptions = 4;
+
+		OptionCount = numSoundSettingsOptions;
+
+		if (GuiIsDeselected())
+		{
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
+			MenuToDisplay = Menu::Options;
+			SelectedOption = 1;
+
+			SetVolumeTracks(g_Configuration.MusicVolume);
+			SetVolumeFX(g_Configuration.SfxVolume);
+			return;
+		}
+
+		if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
+		{
+			switch (SelectedOption)
+			{
+			case SoundSettingsOption::Reverb:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableReverb = !CurrentSettings.Configuration.EnableReverb;
+				break;
+			}
+		}
+
+		if (IsPulsed(In::Left, 0.05f, 0.4f))
+		{
+			bool isVolumeAdjusted = false;
+			switch (SelectedOption)
+			{
+			case SoundSettingsOption::MusicVolume:
+				if (CurrentSettings.Configuration.MusicVolume > 0)
+				{
+					CurrentSettings.Configuration.MusicVolume -= VOLUME_STEP;
+					if (CurrentSettings.Configuration.MusicVolume < 0)
+						CurrentSettings.Configuration.MusicVolume = 0;
+
+					SetVolumeTracks(CurrentSettings.Configuration.MusicVolume);
+					isVolumeAdjusted = true;
+				}
+
+				break;
+
+			case SoundSettingsOption::SfxVolume:
+				if (CurrentSettings.Configuration.SfxVolume > 0)
+				{
+					CurrentSettings.Configuration.SfxVolume -= VOLUME_STEP;
+					if (CurrentSettings.Configuration.SfxVolume < 0)
+						CurrentSettings.Configuration.SfxVolume = 0;
+
+					SetVolumeFX(CurrentSettings.Configuration.SfxVolume);
+					isVolumeAdjusted = true;
+				}
+
+				break;
+			}
+
+			if (isVolumeAdjusted)
+			{
+				if (IsClicked(In::Left))
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			}
+		}
+
+		if (IsPulsed(In::Right, 0.05f, 0.4f))
+		{
+			bool isVolumeAdjusted = false;
+			switch (SelectedOption)
+			{
+			case SoundSettingsOption::MusicVolume:
+				if (CurrentSettings.Configuration.MusicVolume < VOLUME_MAX)
+				{
+					CurrentSettings.Configuration.MusicVolume += VOLUME_STEP;
+					if (CurrentSettings.Configuration.MusicVolume > VOLUME_MAX)
+						CurrentSettings.Configuration.MusicVolume = VOLUME_MAX;
+
+					SetVolumeTracks(CurrentSettings.Configuration.MusicVolume);
+					isVolumeAdjusted = true;
+				}
+
+				break;
+
+			case SoundSettingsOption::SfxVolume:
+				if (CurrentSettings.Configuration.SfxVolume < VOLUME_MAX)
+				{
+					CurrentSettings.Configuration.SfxVolume += VOLUME_STEP;
+					if (CurrentSettings.Configuration.SfxVolume > VOLUME_MAX)
+						CurrentSettings.Configuration.SfxVolume = VOLUME_MAX;
+
+					SetVolumeFX(CurrentSettings.Configuration.SfxVolume);
+					isVolumeAdjusted = true;
+				}
+
+				break;
+			}
+
+			if (isVolumeAdjusted)
+			{
+				if (IsClicked(In::Right))
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			}
+		}
+
+		if (GuiIsPulsed(In::Forward))
+		{
+			if (SelectedOption <= 0)
+			{
+				SelectedOption += OptionCount;
+			}
+			else
+			{
+				SelectedOption--;
+			}
+
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+		}
+
+		if (GuiIsPulsed(In::Back))
+		{
+			if (SelectedOption < OptionCount)
+			{
+				SelectedOption++;
+			}
+			else
+			{
+				SelectedOption -= OptionCount;
+			}
+
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+		}
+
+		if (GuiIsSelected())
+		{
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
+			if (SelectedOption == SoundSettingsOption::Apply)
+			{
+				// Save configuration.
+				g_Configuration = CurrentSettings.Configuration;
+				SaveConfiguration();
+
+				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
+				SelectedOption = 1;
+			}
+			else if (SelectedOption == SoundSettingsOption::Cancel)
+			{
+				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+				SetVolumeTracks(g_Configuration.MusicVolume);
+				SetVolumeFX(g_Configuration.SfxVolume);
+				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
+				SelectedOption = 1;
+			}
+		}
+	}
+
+	void GuiController::HandleGameplaySettingsInput(bool fromPauseMenu)
+	{
+		enum GameplaySettingsOption
+		{
+			ControlMode,
+			//SwimControlMode,
+			AutoGrab,
+			AutoTargeting,
+			TargetHighlighter,
+			OppositeActionRoll,
+			Subtitles,
+
+			// TODO: Move to HandleInputSettingsInput().
+			MouseSensitivity,
+			ThumbstickCameraControl,
+			ToggleRumble,
+
+			Apply,
+			Cancel
+		};
+
+		static const auto numGameplaySettingsOptions = 10;//7;
+
+		OptionCount = numGameplaySettingsOptions;
+
+		if (GuiIsDeselected())
+		{
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+			MenuToDisplay = Menu::Options;
+			SelectedOption = 2;
+			return;
+		}
+
+		if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
+		{
+			switch (SelectedOption)
+			{
+			case GameplaySettingsOption::ControlMode:
+			{
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+
+				int controlMode = (int)CurrentSettings.Configuration.ControlMode;
+				GuiIsPulsed(In::Left) ? --controlMode : ++controlMode;
+
+				if (controlMode < (int)ControlMode::ClassicTank)
+				{
+					controlMode = (int)ControlMode::Count - 1;
+				}
+				else if (controlMode > (int)ControlMode::Modern)
+				{
+					controlMode = (int)ControlMode::ClassicTank;
+				}
+
+				CurrentSettings.Configuration.ControlMode = (Input::ControlMode)controlMode;
+			}
+				break;
+
+			/*case GameplaySettingsOption::SwimControlMode:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				if (CurrentSettings.Configuration.SwimControlMode == SwimControlMode::Omnidirectional)
+				{
+					CurrentSettings.Configuration.SwimControlMode = SwimControlMode::Planar;
+				}
+				else
+				{
+					CurrentSettings.Configuration.SwimControlMode = SwimControlMode::Omnidirectional;
+				}
+
+				break;*/
+
+			case GameplaySettingsOption::AutoGrab:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableAutoGrab = !CurrentSettings.Configuration.EnableAutoGrab;
+				break;
+
+			case GameplaySettingsOption::AutoTargeting:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableAutoTargeting = !CurrentSettings.Configuration.EnableAutoTargeting;
+				break;
+
+			case GameplaySettingsOption::TargetHighlighter:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableTargetHighlighter = !CurrentSettings.Configuration.EnableTargetHighlighter;
+				break;
+
+			case GameplaySettingsOption::OppositeActionRoll:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableOppositeActionRoll = !CurrentSettings.Configuration.EnableOppositeActionRoll;
+				break;
+
+			case GameplaySettingsOption::Subtitles:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
+				break;
+
+			case GameplaySettingsOption::ThumbstickCameraControl:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableThumbstickCamera = !CurrentSettings.Configuration.EnableThumbstickCamera;
+				break;
+
+			case GameplaySettingsOption::ToggleRumble:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableRumble = !CurrentSettings.Configuration.EnableRumble;
+				break;
+			}
+		}
+
+		if (IsPulsed(In::Left, 0.05f, 0.4f))
+		{
+			switch (SelectedOption)
+			{
+			case GameplaySettingsOption::MouseSensitivity:
+				if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MIN)
+				{
+					CurrentSettings.Configuration.MouseSensitivity -= 1;
+					if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MIN)
+						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MIN;
+
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
+
+				break;
+			}
+		}
+
+		if (IsPulsed(In::Right, 0.05f, 0.4f))
+		{
+			switch (SelectedOption)
+			{
+			case GameplaySettingsOption::MouseSensitivity:
+				if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MAX)
+				{
+					CurrentSettings.Configuration.MouseSensitivity += 1;
+					if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MAX)
+						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MAX;
+
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
+
+				break;
+			}
+		}
+
+		if (GuiIsPulsed(In::Forward))
+		{
+			if (SelectedOption <= 0)
+			{
+				SelectedOption += OptionCount;
+			}
+			else
+			{
+				SelectedOption--;
+			}
+
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+		}
+
+		if (GuiIsPulsed(In::Back))
+		{
+			if (SelectedOption < OptionCount)
+			{
+				SelectedOption++;
+			}
+			else
+			{
+				SelectedOption -= OptionCount;
+			}
+
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+		}
+
+		if (GuiIsSelected())
+		{
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
+			if (SelectedOption == GameplaySettingsOption::Apply)
+			{
+				// Was rumble setting changed?
+				bool indicateRumble = CurrentSettings.Configuration.EnableRumble && !g_Configuration.EnableRumble;
+
+				// Save configuration.
+				g_Configuration = CurrentSettings.Configuration;
+				SaveConfiguration();
+
+				// Rumble if setting was changed.
+				if (indicateRumble)
+					Rumble(0.5f);
+
+				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
+				SelectedOption = 1;
+			}
+			else if (SelectedOption == GameplaySettingsOption::Cancel)
+			{
+				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+				SetVolumeTracks(g_Configuration.MusicVolume);
+				SetVolumeFX(g_Configuration.SfxVolume);
+				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
+				SelectedOption = 1;
+			}
+		}
+	}
+
+	void GuiController::HandleInputSettingsInput(bool fromPauseMenu)
+	{
+		enum InputSettingsOption
+		{
+			MouseSensitivity,
+			ThumbstickCameraControl,
+			ToggleRumble,
+
+			Apply,
+			Cancel
+		};
+
+		static const auto numGameplaySettingsOptions = 3;
+
+		OptionCount = numGameplaySettingsOptions;
+
+		// TODO
 	}
 
 	void GuiController::HandleControlSettingsInput(ItemInfo* item, bool fromPauseMenu)
@@ -745,9 +1145,13 @@ namespace TEN::Gui
 			if (GuiIsPulsed(In::Forward))
 			{
 				if (SelectedOption <= 0)
+				{
 					SelectedOption += OptionCount;
+				}
 				else
+				{
 					SelectedOption--;
+				}
 
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
@@ -755,9 +1159,13 @@ namespace TEN::Gui
 			if (GuiIsPulsed(In::Back))
 			{
 				if (SelectedOption < OptionCount)
+				{
 					SelectedOption++;
+				}
 				else
+				{
 					SelectedOption -= OptionCount;
+				}
 
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
@@ -837,7 +1245,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
 				MenuToDisplay = Menu::Options;
-				SelectedOption = 2;
+				SelectedOption = 3;
 			}
 		}
 	}
@@ -852,8 +1260,10 @@ namespace TEN::Gui
 		enum OptionsOption
 		{
 			Display,
-			OtherSettings,
-			Controls
+			Sound,
+			Gameplay,
+			//Input
+			KeyBindings
 		};
 
 		switch (SelectedOption)
@@ -864,283 +1274,30 @@ namespace TEN::Gui
 			SelectedOption = 0;
 			break;
 
-		case OptionsOption::OtherSettings:
+		case OptionsOption::Sound:
 			BackupOptions();
-			MenuToDisplay = Menu::OtherSettings;
+			MenuToDisplay = Menu::Sound;
+			SelectedOption = 0;
+			break;
+			
+		case OptionsOption::Gameplay:
+			BackupOptions();
+			MenuToDisplay = Menu::Gameplay;
 			SelectedOption = 0;
 			break;
 
-		case OptionsOption::Controls:
+		// TODO
+		/*case OptionsOption::Input:
+			BackupOptions();
+			MenuToDisplay = Menu::Input;
+			SelectedOption = 0;
+			break;*/
+
+		case OptionsOption::KeyBindings:
 			BackupOptions();
 			MenuToDisplay = Menu::GeneralActions;
 			SelectedOption = 0;
 			break;
-		}
-	}
-
-	void GuiController::HandleOtherSettingsInput(bool fromPauseMenu)
-	{
-		enum OtherSettingsOption
-		{
-			Reverb,
-			MusicVolume,
-			SfxVolume,
-
-			ControlMode,
-			AutoGrab,
-			AutoTargeting,
-			OppositeActionRoll,
-			ThumbstickCameraControl,
-			ToggleRumble,
-			TargetHighlighter,
-			Subtitles,
-
-			MouseSensitivity,
-			MouseSmoothing,
-
-			Apply,
-			Cancel
-		};
-
-		static const auto numOtherSettingsOptions = 13;
-
-		OptionCount = numOtherSettingsOptions;
-
-		if (GuiIsDeselected())
-		{
-			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-
-			MenuToDisplay = Menu::Options;
-			SelectedOption = 1;
-
-			SetVolumeTracks(g_Configuration.MusicVolume);
-			SetVolumeFX(g_Configuration.SfxVolume);
-			return;
-		}
-
-		if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
-		{
-			switch (SelectedOption)
-			{
-			case OtherSettingsOption::Reverb:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableReverb = !CurrentSettings.Configuration.EnableReverb;
-				break;
-
-			case OtherSettingsOption::ControlMode:
-			{
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-
-				int controlMode = (int)CurrentSettings.Configuration.ControlMode;
-				GuiIsPulsed(In::Left) ? --controlMode : ++controlMode;
-
-				if (controlMode < (int)ControlMode::ClassicTank)
-				{
-					controlMode = (int)ControlMode::Count - 1;
-				}
-				else if (controlMode > (int)ControlMode::Modern)
-				{
-					controlMode = (int)ControlMode::ClassicTank;
-				}
-
-				CurrentSettings.Configuration.ControlMode = (Input::ControlMode)controlMode;
-			}
-				break;
-
-			case OtherSettingsOption::AutoGrab:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableAutoGrab = !CurrentSettings.Configuration.EnableAutoGrab;
-				break;
-
-			case OtherSettingsOption::AutoTargeting:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableAutoTargeting = !CurrentSettings.Configuration.EnableAutoTargeting;
-				break;
-
-			case OtherSettingsOption::OppositeActionRoll:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableOppositeActionRoll = !CurrentSettings.Configuration.EnableOppositeActionRoll;
-				break;
-				
-			case OtherSettingsOption::ThumbstickCameraControl:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableThumbstickCamera = !CurrentSettings.Configuration.EnableThumbstickCamera;
-				break;
-
-			case OtherSettingsOption::ToggleRumble:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableRumble = !CurrentSettings.Configuration.EnableRumble;
-				break;
-
-			case OtherSettingsOption::TargetHighlighter:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableTargetHighlighter = !CurrentSettings.Configuration.EnableTargetHighlighter;
-				break;
-				
-			case OtherSettingsOption::Subtitles:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
-				break;
-			}
-		}
-
-		if (IsPulsed(In::Left, 0.05f, 0.4f))
-		{
-			bool isVolumeAdjusted = false;
-			switch (SelectedOption)
-			{
-			case OtherSettingsOption::MusicVolume:
-				if (CurrentSettings.Configuration.MusicVolume > 0)
-				{
-					CurrentSettings.Configuration.MusicVolume -= VOLUME_STEP;
-					if (CurrentSettings.Configuration.MusicVolume < 0)
-						CurrentSettings.Configuration.MusicVolume = 0;
-
-					SetVolumeTracks(CurrentSettings.Configuration.MusicVolume);
-					isVolumeAdjusted = true;
-				}
-
-				break;
-
-			case OtherSettingsOption::SfxVolume:
-				if (CurrentSettings.Configuration.SfxVolume > 0)
-				{
-					CurrentSettings.Configuration.SfxVolume -= VOLUME_STEP;
-					if (CurrentSettings.Configuration.SfxVolume < 0)
-						CurrentSettings.Configuration.SfxVolume = 0;
-
-					SetVolumeFX(CurrentSettings.Configuration.SfxVolume);
-					isVolumeAdjusted = true;
-				}
-
-				break;
-
-			case OtherSettingsOption::MouseSensitivity:
-				if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MIN)
-				{
-					CurrentSettings.Configuration.MouseSensitivity -= 1;
-					if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MIN)
-						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MIN;
-
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-
-				break;
-			}
-			if (isVolumeAdjusted)
-			{
-				if (IsClicked(In::Left))
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			}
-		}
-
-		if (IsPulsed(In::Right, 0.05f, 0.4f))
-		{
-			bool isVolumeAdjusted = false;
-			switch (SelectedOption)
-			{
-			case OtherSettingsOption::MusicVolume:
-				if (CurrentSettings.Configuration.MusicVolume < VOLUME_MAX)
-				{
-					CurrentSettings.Configuration.MusicVolume += VOLUME_STEP;
-					if (CurrentSettings.Configuration.MusicVolume > VOLUME_MAX)
-						CurrentSettings.Configuration.MusicVolume = VOLUME_MAX;
-
-					SetVolumeTracks(CurrentSettings.Configuration.MusicVolume);
-					isVolumeAdjusted = true;
-				}
-
-				break;
-
-			case OtherSettingsOption::SfxVolume:
-				if (CurrentSettings.Configuration.SfxVolume < VOLUME_MAX)
-				{
-					CurrentSettings.Configuration.SfxVolume += VOLUME_STEP;
-					if (CurrentSettings.Configuration.SfxVolume > VOLUME_MAX)
-						CurrentSettings.Configuration.SfxVolume = VOLUME_MAX;
-
-					SetVolumeFX(CurrentSettings.Configuration.SfxVolume);
-					isVolumeAdjusted = true;
-				}
-
-				break;
-
-			case OtherSettingsOption::MouseSensitivity:
-				if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MAX)
-				{
-					CurrentSettings.Configuration.MouseSensitivity += 1;
-					if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MAX)
-						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MAX;
-
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-
-				break;
-			}
-
-			if (isVolumeAdjusted)
-			{
-				if (IsClicked(In::Right))
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			}
-		}
-
-		if (GuiIsPulsed(In::Forward))
-		{
-			if (SelectedOption <= 0)
-			{
-				SelectedOption += OptionCount;
-			}
-			else
-			{
-				SelectedOption--;
-			}
-
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-		}
-
-		if (GuiIsPulsed(In::Back))
-		{
-			if (SelectedOption < OptionCount)
-			{
-				SelectedOption++;
-			}
-			else
-			{
-				SelectedOption -= OptionCount;
-			}
-
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-		}
-
-		if (GuiIsSelected())
-		{
-			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-
-			if (SelectedOption == OtherSettingsOption::Apply)
-			{
-				// Was rumble setting changed?
-				bool indicateRumble = CurrentSettings.Configuration.EnableRumble && !g_Configuration.EnableRumble;
-
-				// Save the configuration.
-				g_Configuration = CurrentSettings.Configuration;
-				SaveConfiguration();
-
-				// Rumble if setting was changed.
-				if (indicateRumble)
-					Rumble(0.5f);
-
-				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = 1;
-			}
-			else if (SelectedOption == OtherSettingsOption::Cancel)
-			{
-				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				SetVolumeTracks(g_Configuration.MusicVolume);
-				SetVolumeFX(g_Configuration.SfxVolume);
-				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = 1;
-			}
 		}
 	}
 
@@ -1155,7 +1312,7 @@ namespace TEN::Gui
 
 		static const int numPauseOptions	  = 2;
 		static const int numStatisticsOptions = 0;
-		static const int numOptionsOptions	  = 2;
+		static const int numOptionsOptions	  = 3;
 
 		TimeInMenu++;
 		UpdateInputActions(item);
@@ -1178,15 +1335,19 @@ namespace TEN::Gui
 			HandleDisplaySettingsInput(true);
 			return InventoryResult::None;
 
+		case Menu::Sound:
+			HandleSoundSettingsInput(true);
+			return InventoryResult::None;
+
+		case Menu::Gameplay:
+			HandleGameplaySettingsInput(true);
+			return InventoryResult::None;
+
 		case Menu::GeneralActions:
 		case Menu::VehicleActions:
 		case Menu::QuickActions:
 		case Menu::MenuActions:
 			HandleControlSettingsInput(item, true);
-			return InventoryResult::None;
-
-		case Menu::OtherSettings:
-			HandleOtherSettingsInput(true);
 			return InventoryResult::None;
 		}
 
@@ -1196,9 +1357,13 @@ namespace TEN::Gui
 			if (GuiIsPulsed(In::Forward))
 			{
 				if (SelectedOption <= 0)
+				{
 					SelectedOption += OptionCount;
+				}
 				else
+				{
 					SelectedOption--;
+				}
 
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
@@ -1206,9 +1371,13 @@ namespace TEN::Gui
 			if (GuiIsPulsed(In::Back))
 			{
 				if (SelectedOption < OptionCount)
+				{
 					SelectedOption++;
+				}
 				else
+				{
 					SelectedOption -= OptionCount;
+				}
 
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
@@ -1253,7 +1422,6 @@ namespace TEN::Gui
 				case PauseMenuOption::ExitToTitle:
 					SetInventoryMode(InventoryMode::None);
 					return InventoryResult::ExitToTitle;
-					break;
 				}
 
 				break;

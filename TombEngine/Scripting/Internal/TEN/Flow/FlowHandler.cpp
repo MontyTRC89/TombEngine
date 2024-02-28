@@ -353,13 +353,9 @@ void FlowHandler::LoadFlowScript()
 char const * FlowHandler::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
-	{
 		return id;
-	}
-	else
-	{
-		return m_translationsMap.at(std::string(id)).at(0).c_str();
-	}
+
+	return m_translationsMap.at(std::string(id)).at(0).c_str();
 }
 
 Settings* FlowHandler::GetSettings()
