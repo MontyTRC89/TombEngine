@@ -42,10 +42,10 @@ namespace TEN::Renderer
 	constexpr auto MenuVerticalBlockSpacing = 50;
 	
 	// Vertical menu positioning templates
-	constexpr auto MenuVerticalKeyBindings = 50;
-	constexpr auto MenuVerticalDisplaySettings = 50;
-	constexpr auto MenuVerticalSoundSettings = 50;
-	constexpr auto MenuVerticalInputSettings = 50;
+	constexpr auto MenuVerticalKeyBindingsSettings = 50;
+	constexpr auto MenuVerticalDisplaySettings = 100;
+	constexpr auto MenuVerticalSoundSettings = 220;
+	constexpr auto MenuVerticalControlsSettings = 50;
 	constexpr auto MenuVerticalBottomCenter = 400;
 	constexpr auto MenuVerticalStatisticsTitle = 150;
 	constexpr auto MenuVerticalOptionsTitle = 350;
@@ -287,7 +287,7 @@ namespace TEN::Renderer
 
 		case Menu::Controls:
 			// Set up parameters.
-			y = MenuVerticalInputSettings;
+			y = MenuVerticalControlsSettings;
 
 			// Heading
 			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_CONTROLS), PRINTSTRING_COLOR_YELLOW, SF_Center());
@@ -349,7 +349,7 @@ namespace TEN::Renderer
 		case Menu::GeneralActions:
 		{
 			// Set up needed parameters.
-			y = MenuVerticalKeyBindings;
+			y = MenuVerticalKeyBindingsSettings;
 
 			// Arrows
 			AddString(RIGHT_ARROW_X_OFFSET, y, RIGHT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
@@ -396,7 +396,7 @@ namespace TEN::Renderer
 		case Menu::VehicleActions:
 		{
 			// Set up needed parameters.
-			y = MenuVerticalKeyBindings;
+			y = MenuVerticalKeyBindingsSettings;
 
 			// Arrows
 			AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
@@ -452,7 +452,7 @@ namespace TEN::Renderer
 		case Menu::QuickActions:
 		{
 			// Set up needed parameters.
-			y = MenuVerticalKeyBindings;
+			y = MenuVerticalKeyBindingsSettings;
 
 			// Arrows
 			AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
@@ -502,7 +502,7 @@ namespace TEN::Renderer
 		case Menu::MenuActions:
 		{
 			// Set up parameters.
-			y = MenuVerticalKeyBindings;
+			y = MenuVerticalKeyBindingsSettings;
 
 			// Arrows
 			AddString(MenuLeftSideEntry, y, LEFT_ARROW_STRING.c_str(), PRINTSTRING_COLOR_YELLOW, SF(true));
