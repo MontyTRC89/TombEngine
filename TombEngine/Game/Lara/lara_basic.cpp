@@ -156,7 +156,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA/*, true*/);
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
 		HandlePlayerTurnLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA);
 		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
 	}

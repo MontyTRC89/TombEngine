@@ -1336,8 +1336,10 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
 
 	int x = 0;
-	int y = itemPtr->Pose.Position.y + bounds.Y2 + ((bounds.Y1 - bounds.Y2) / 2 * (IsUsingModernControls() ? 1.8f : 1.5f));
+	int y = itemPtr->Pose.Position.y + bounds.Y2 + ((bounds.Y1 - bounds.Y2) / 2 * 1.5f);
 	int z = 0;
+	if (itemPtr->IsLara())
+		y = itemPtr->Pose.Position.y - (LaraCollision.Setup.Height * (IsUsingModernControls() ? 0.9f : 0.75f));
 
 	// Make player look toward target item.
 	if (Camera.item != nullptr)

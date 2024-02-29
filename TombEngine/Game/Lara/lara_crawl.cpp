@@ -635,8 +635,15 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			ModulateLaraTurnRateY(item, LARA_CRAWL_MOVE_TURN_RATE_ACCEL, 0, LARA_CRAWL_MOVE_TURN_RATE_MAX);
-			HandlePlayerCrawlTurnFlex(*item);
+			if (IsUsingClassicControls())
+			{
+				ModulateLaraTurnRateY(item, LARA_CRAWL_MOVE_TURN_RATE_ACCEL, 0, LARA_CRAWL_MOVE_TURN_RATE_MAX);
+			}
+			else if (IsUsingEnhancedControls())
+			{
+				ModulateLaraTurnRateY(item, LARA_CRAWL_MOVE_TURN_RATE_ACCEL, 0, LARA_CRAWL_MOVE_TURN_RATE_MAX);
+				HandlePlayerCrawlTurnFlex(*item);
+			}
 		}
 	}
 

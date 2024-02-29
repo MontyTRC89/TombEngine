@@ -51,7 +51,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
 	}
-	else
+	else if (IsUsingEnhancedControls())
 	{
 		// Shimmy locks orientation.
 		if ((IsHeld(In::Left) &&
@@ -224,7 +224,16 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+		{
+			if (IsUsingClassicControls())
+			{
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX / 2);
+			}
+			else
+			{
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
+			}
+		}
 	}
 
 	if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
@@ -560,6 +569,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
+	player.Control.ToggleClimb = g_Configuration.EnableAutoGrab;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -571,6 +581,9 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 		SetLaraMonkeyRelease(item);
 		return;
 	}
+
+	if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
+		player.Control.ToggleClimb = false;
 
 	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
 	{
@@ -650,6 +663,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
+	player.Control.ToggleClimb = g_Configuration.EnableAutoGrab;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -661,6 +675,9 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 		SetLaraMonkeyRelease(item);
 		return;
 	}
+
+	if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
+		player.Control.ToggleClimb = false;
 
 	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
 	{
