@@ -32,6 +32,7 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "Renderer/Renderer.h"
@@ -44,6 +45,7 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Gui;
+using namespace TEN::Input;
 using namespace TEN::Renderer;
 
 namespace Save = TEN::Save;

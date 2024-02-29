@@ -20,6 +20,7 @@
 #include "Math/Random.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
+#include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
 using std::vector;

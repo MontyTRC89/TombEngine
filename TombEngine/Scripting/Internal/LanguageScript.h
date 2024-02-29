@@ -8,7 +8,6 @@
 #define STRING_OPTIONS_DISPLAY			"options_display"
 #define STRING_OPTIONS_EXIT_GAME		"options_exit_game"
 #define STRING_OPTIONS_EXIT_TO_TITLE	"options_exit_to_title"
-#define STRING_OPTIONS_GAMEPLAY			"options_gameplay"
 #define STRING_OPTIONS_KEY_BINDINGS		"options_key_bindings"
 #define STRING_OPTIONS_OPTIONS			"options_options"
 #define STRING_OPTIONS_PAUSE			"options_pause"

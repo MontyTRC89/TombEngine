@@ -790,7 +790,7 @@ namespace TEN::Input
 			ApplyBindings(DefaultXInputBindings);
 
 			for (int i = 0; i < (int)In::Count; i++)
-				g_Configuration.Bindings[i] = Bindings[1][i];
+				g_Configuration.KeyBindings[i] = Bindings[1][i];
 
 			// Additionally turn on thumbstick camera and vibration.
 			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCamera = true;

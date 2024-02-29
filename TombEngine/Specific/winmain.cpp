@@ -11,13 +11,14 @@
 #include "Game/control/control.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer.h"
-#include "Sound/sound.h"
-#include "Specific/level.h"
-#include "Specific/configuration.h"
-#include "Specific/trutils.h"
-#include "Scripting/Internal/LanguageScript.h"
-#include "Scripting/Include/ScriptInterfaceState.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Scripting/Include/ScriptInterfaceState.h"
+#include "Scripting/Internal/LanguageScript.h"
+#include "Sound/sound.h"
+#include "Specific/configuration.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Config;
 using namespace TEN::Input;

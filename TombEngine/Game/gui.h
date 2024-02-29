@@ -82,7 +82,6 @@ namespace TEN::Gui
 
 		Display,
 		Sound,
-		Gameplay,
 		Controls,
 
 		GeneralActions,
@@ -210,8 +209,7 @@ namespace TEN::Gui
 	private:
 		void HandleDisplaySettingsInput(bool fromPauseMenu);
 		void HandleSoundSettingsInput(bool fromPauseMenu);
-		void HandleGameplaySettingsInput(bool fromPauseMenu);
-		void HandleInputSettingsInput(bool fromPauseMenu);
+		void HandleControlsSettingsInput(bool fromPauseMenu);
 		void HandleKeyBindingsSettingsInput(ItemInfo* item, bool fromPauseMenu);
 		void HandleOptionsInput();
 		void BackupOptions();

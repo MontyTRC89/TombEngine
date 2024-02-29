@@ -289,7 +289,7 @@ namespace TEN::Gui
 
 		static const int numTitleOptions	= 3;
 		static const int numLoadGameOptions = SAVEGAME_MAX - 1;
-		static const int numOptionsOptions	= 3;
+		static const int numOptionsOptions	= 2;
 
 		static int selectedOptionBackup;
 		auto inventoryResult = InventoryResult::None;
@@ -325,12 +325,8 @@ namespace TEN::Gui
 			HandleSoundSettingsInput(false);
 			return inventoryResult;
 
-		case Menu::Gameplay:
-			HandleGameplaySettingsInput(false);
-			return inventoryResult;
-
 		case Menu::Controls:
-			HandleInputSettingsInput(false);
+			HandleControlsSettingsInput(false);
 			return inventoryResult;
 
 		case Menu::GeneralActions:
@@ -483,11 +479,14 @@ namespace TEN::Gui
 			Antialiasing,
 			AmbientOcclusion,
 
-			Save,
+			TargetHighlighter,
+			Subtitles,
+
+			Apply,
 			Cancel
 		};
 
-		static const int numDisplaySettingsOptions = 7;
+		static const int numDisplaySettingsOptions = 9;
 
 		OptionCount = numDisplaySettingsOptions;
 
@@ -519,9 +518,13 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 				if (CurrentSettings.Configuration.ShadowType == ShadowMode::None)
+				{
 					CurrentSettings.Configuration.ShadowType = ShadowMode::All;
+				}
 				else
+				{
 					CurrentSettings.Configuration.ShadowType = ShadowMode(int(CurrentSettings.Configuration.ShadowType) - 1);
+				}
 
 				break;
 
@@ -534,15 +537,29 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 				if (CurrentSettings.Configuration.AntialiasingMode == AntialiasingMode::None)
+				{
 					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode::High;
+				}
 				else
+				{
 					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode(int(CurrentSettings.Configuration.AntialiasingMode) - 1);
+				}
 
 				break;
 
 			case DisplaySettingsOption::AmbientOcclusion:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
+				break;
+
+			case DisplaySettingsOption::TargetHighlighter:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableTargetHighlighter = !CurrentSettings.Configuration.EnableTargetHighlighter;
+				break;
+
+			case DisplaySettingsOption::Subtitles:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
 				break;
 			}
 		}
@@ -555,6 +572,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				if (CurrentSettings.SelectedScreenResolution < g_Configuration.SupportedScreenResolutions.size() - 1)
 					CurrentSettings.SelectedScreenResolution++;
+
 				break;
 
 			case DisplaySettingsOption::Windowed:
@@ -565,9 +583,13 @@ namespace TEN::Gui
 			case DisplaySettingsOption::ShadowType:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				if (CurrentSettings.Configuration.ShadowType == ShadowMode::All)
+				{
 					CurrentSettings.Configuration.ShadowType = ShadowMode::None;
+				}
 				else
+				{
 					CurrentSettings.Configuration.ShadowType = ShadowMode(int(CurrentSettings.Configuration.ShadowType) + 1);
+				}
 
 				break;
 
@@ -580,9 +602,13 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 				if (CurrentSettings.Configuration.AntialiasingMode == AntialiasingMode::High)
+				{
 					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode::None;
+				}
 				else
+				{
 					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode(int(CurrentSettings.Configuration.AntialiasingMode) + 1);
+				}
 
 				break;
 
@@ -590,15 +616,29 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
 				break;
+
+			case DisplaySettingsOption::TargetHighlighter:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableTargetHighlighter = !CurrentSettings.Configuration.EnableTargetHighlighter;
+				break;
+
+			case DisplaySettingsOption::Subtitles:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
+				break;
 			}
 		}
 
 		if (GuiIsPulsed(In::Forward))
 		{
 			if (SelectedOption <= 0)
+			{
 				SelectedOption += OptionCount;
+			}
 			else
+			{
 				SelectedOption--;
+			}
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
@@ -606,9 +646,13 @@ namespace TEN::Gui
 		if (GuiIsPulsed(In::Back))
 		{
 			if (SelectedOption < OptionCount)
+			{
 				SelectedOption++;
+			}
 			else
+			{
 				SelectedOption -= OptionCount;
+			}
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
@@ -617,12 +661,12 @@ namespace TEN::Gui
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
-			if (SelectedOption == DisplaySettingsOption::Save)
+			if (SelectedOption == DisplaySettingsOption::Apply)
 			{
 				// Save configuration.
-				auto screenResolution = g_Configuration.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
-				CurrentSettings.Configuration.ScreenWidth = screenResolution.x;
-				CurrentSettings.Configuration.ScreenHeight = screenResolution.y;
+				auto screenRes = g_Configuration.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
+				CurrentSettings.Configuration.ScreenWidth = screenRes.x;
+				CurrentSettings.Configuration.ScreenHeight = screenRes.y;
 
 				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
@@ -631,13 +675,13 @@ namespace TEN::Gui
 				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.ScreenWidth, CurrentSettings.Configuration.ScreenHeight, 
 					CurrentSettings.Configuration.EnableWindowedMode);
 
-				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = fromPauseMenu ? 1 : 0;
+				MenuToDisplay = Menu::Options;
+				SelectedOption = 0;
 			}
 			else if (SelectedOption == DisplaySettingsOption::Cancel)
 			{
-				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = fromPauseMenu ? 1 : 0;
+				MenuToDisplay = Menu::Options;
+				SelectedOption = 0;
 			}
 		}
 	}
@@ -811,25 +855,29 @@ namespace TEN::Gui
 		}
 	}
 
-	void GuiController::HandleGameplaySettingsInput(bool fromPauseMenu)
+	void GuiController::HandleControlsSettingsInput(bool fromPauseMenu)
 	{
-		enum GameplaySettingsOption
+		enum InputSettingsOption
 		{
+			KeyBindings,
+
+			MouseSensitivity,
+			ToggleRumble,
+
 			ControlMode,
 			SwimControlMode,
 			AutoGrab,
 			AutoTargeting,
-			TargetHighlighter,
 			OppositeActionRoll,
-			Subtitles,
+			ThumbstickCameraControl,
 
 			Apply,
 			Cancel
 		};
 
-		static const auto numGameplaySettingsOptions = 8;
+		static const auto numInputSettingsOptions = 10;
 
-		OptionCount = numGameplaySettingsOptions;
+		OptionCount = numInputSettingsOptions;
 
 		if (GuiIsDeselected())
 		{
@@ -843,7 +891,12 @@ namespace TEN::Gui
 		{
 			switch (SelectedOption)
 			{
-			case GameplaySettingsOption::ControlMode:
+			case InputSettingsOption::ToggleRumble:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableRumble = !CurrentSettings.Configuration.EnableRumble;
+				break;
+
+			case InputSettingsOption::ControlMode:
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
@@ -863,7 +916,7 @@ namespace TEN::Gui
 			}
 				break;
 
-			case GameplaySettingsOption::SwimControlMode:
+			case InputSettingsOption::SwimControlMode:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 				if (CurrentSettings.Configuration.SwimControlMode == SwimControlMode::Omnidirectional)
@@ -877,123 +930,24 @@ namespace TEN::Gui
 
 				break;
 
-			case GameplaySettingsOption::AutoGrab:
+			case InputSettingsOption::AutoGrab:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAutoGrab = !CurrentSettings.Configuration.EnableAutoGrab;
 				break;
 
-			case GameplaySettingsOption::AutoTargeting:
+			case InputSettingsOption::AutoTargeting:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAutoTargeting = !CurrentSettings.Configuration.EnableAutoTargeting;
 				break;
 
-			case GameplaySettingsOption::TargetHighlighter:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableTargetHighlighter = !CurrentSettings.Configuration.EnableTargetHighlighter;
-				break;
-
-			case GameplaySettingsOption::OppositeActionRoll:
+			case InputSettingsOption::OppositeActionRoll:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableOppositeActionRoll = !CurrentSettings.Configuration.EnableOppositeActionRoll;
 				break;
 
-			case GameplaySettingsOption::Subtitles:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
-				break;
-			}
-		}
-
-		if (GuiIsPulsed(In::Forward))
-		{
-			if (SelectedOption <= 0)
-			{
-				SelectedOption += OptionCount;
-			}
-			else
-			{
-				SelectedOption--;
-			}
-
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-		}
-
-		if (GuiIsPulsed(In::Back))
-		{
-			if (SelectedOption < OptionCount)
-			{
-				SelectedOption++;
-			}
-			else
-			{
-				SelectedOption -= OptionCount;
-			}
-
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-		}
-
-		if (GuiIsSelected())
-		{
-			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-
-			if (SelectedOption == GameplaySettingsOption::Apply)
-			{
-				// Save configuration.
-				g_Configuration = CurrentSettings.Configuration;
-				SaveConfiguration();
-
-				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = 2;
-			}
-			else if (SelectedOption == GameplaySettingsOption::Cancel)
-			{
-				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				SetVolumeTracks(g_Configuration.MusicVolume);
-				SetVolumeFX(g_Configuration.SfxVolume);
-				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = 2;
-			}
-		}
-	}
-
-	void GuiController::HandleInputSettingsInput(bool fromPauseMenu)
-	{
-		enum InputSettingsOption
-		{
-			KeyBindings,
-
-			MouseSensitivity,
-			ThumbstickCameraControl,
-			ToggleRumble,
-
-			Apply,
-			Cancel
-		};
-
-		static const auto numInputSettingsOptions = 5;
-
-		OptionCount = numInputSettingsOptions;
-
-		if (GuiIsDeselected())
-		{
-			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			MenuToDisplay = Menu::Options;
-			SelectedOption = 3;
-			return;
-		}
-
-		if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
-		{
-			switch (SelectedOption)
-			{
 			case InputSettingsOption::ThumbstickCameraControl:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableThumbstickCamera = !CurrentSettings.Configuration.EnableThumbstickCamera;
-				break;
-
-			case InputSettingsOption::ToggleRumble:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableRumble = !CurrentSettings.Configuration.EnableRumble;
 				break;
 			}
 		}
@@ -1066,8 +1020,6 @@ namespace TEN::Gui
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
-			// TODO: Go to Key Bindings submenu.
-
 			switch (SelectedOption)
 			{
 			case InputSettingsOption::KeyBindings:
@@ -1089,7 +1041,7 @@ namespace TEN::Gui
 					Rumble(0.5f);
 
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = 3;
+				SelectedOption = 2;
 			}
 				break;
 
@@ -1098,7 +1050,7 @@ namespace TEN::Gui
 				SetVolumeTracks(g_Configuration.MusicVolume);
 				SetVolumeFX(g_Configuration.SfxVolume);
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = 3;
+				SelectedOption = 2;
 				break;
 			}
 		}
@@ -1300,8 +1252,8 @@ namespace TEN::Gui
 				if (SelectedOption == (OptionCount - 1))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					CurrentSettings.Configuration.Bindings = Bindings[1];
-					g_Configuration.Bindings = Bindings[1];
+					CurrentSettings.Configuration.KeyBindings = Bindings[1];
+					g_Configuration.KeyBindings = Bindings[1];
 					SaveConfiguration();
 					MenuToDisplay = Menu::Controls;
 					SelectedOption = 0;
@@ -1312,7 +1264,7 @@ namespace TEN::Gui
 				if (SelectedOption == OptionCount)
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					Bindings[1] = CurrentSettings.Configuration.Bindings;
+					Bindings[1] = CurrentSettings.Configuration.KeyBindings;
 					MenuToDisplay = Menu::Controls;
 					SelectedOption = 0;
 					return;
@@ -1339,7 +1291,6 @@ namespace TEN::Gui
 		{
 			Display,
 			Sound,
-			Gameplay,
 			Controls
 		};
 
@@ -1357,12 +1308,6 @@ namespace TEN::Gui
 			SelectedOption = 0;
 			break;
 			
-		case OptionsOption::Gameplay:
-			BackupOptions();
-			MenuToDisplay = Menu::Gameplay;
-			SelectedOption = 0;
-			break;
-
 		case OptionsOption::Controls:
 			BackupOptions();
 			MenuToDisplay = Menu::Controls;
@@ -1382,7 +1327,7 @@ namespace TEN::Gui
 
 		static const int numPauseOptions	  = 2;
 		static const int numStatisticsOptions = 0;
-		static const int numOptionsOptions	  = 3;
+		static const int numOptionsOptions	  = 2;
 
 		TimeInMenu++;
 		UpdateInputActions(item);
@@ -1409,12 +1354,8 @@ namespace TEN::Gui
 			HandleSoundSettingsInput(true);
 			return InventoryResult::None;
 
-		case Menu::Gameplay:
-			HandleGameplaySettingsInput(true);
-			return InventoryResult::None;
-
 		case Menu::Controls:
-			HandleInputSettingsInput(true);
+			HandleControlsSettingsInput(true);
 			return InventoryResult::None;
 
 		case Menu::GeneralActions:

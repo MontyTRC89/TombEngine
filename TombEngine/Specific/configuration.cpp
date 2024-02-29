@@ -189,7 +189,9 @@ namespace TEN::Config
 			SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, g_Configuration.ShadowBlobsMax) != ERROR_SUCCESS ||
 			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, g_Configuration.EnableCaustics) != ERROR_SUCCESS ||
 			SetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, (DWORD)g_Configuration.AntialiasingMode) != ERROR_SUCCESS ||
-			SetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, g_Configuration.EnableAmbientOcclusion) != ERROR_SUCCESS)
+			SetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, g_Configuration.EnableAmbientOcclusion) != ERROR_SUCCESS ||
+			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, g_Configuration.EnableTargetHighlighter) != ERROR_SUCCESS ||
+			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
@@ -219,74 +221,60 @@ namespace TEN::Config
 			return false;
 		}
 
-		// Open Gameplay subkey.
-		HKEY gameplayKey = NULL;
-		if (RegCreateKeyExA(rootKey, REGKEY_GAMEPLAY, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &gameplayKey, NULL) != ERROR_SUCCESS)
+		// Open Controls subkey.
+		HKEY controlsKey = NULL;
+		if (RegCreateKeyExA(rootKey, REGKEY_CONTROLS, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &controlsKey, NULL) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
 			RegCloseKey(soundKey);
-			RegCloseKey(gameplayKey);
+			RegCloseKey(controlsKey);
 			return false;
 		}
 
-		// Set Gameplay keys.
-		if (SetDWORDRegKey(gameplayKey, REGKEY_CONTROL_MODE, (DWORD)g_Configuration.ControlMode) != ERROR_SUCCESS ||
-			SetDWORDRegKey(gameplayKey, REGKEY_SWIM_CONTROL_MODE, (DWORD)g_Configuration.SwimControlMode) != ERROR_SUCCESS ||
-			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_GRAB, g_Configuration.EnableAutoGrab) != ERROR_SUCCESS ||
-			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
-			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, g_Configuration.EnableTargetHighlighter) != ERROR_SUCCESS ||
-			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, g_Configuration.EnableOppositeActionRoll) != ERROR_SUCCESS ||
-			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS ||
-
-			// TODO: Move to Input section.
-			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS ||
-			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS)
+		// Set Controls keys.
+		if (SetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
+			SetDWORDRegKey(controlsKey, REGKEY_CONTROL_MODE, (DWORD)g_Configuration.ControlMode) != ERROR_SUCCESS ||
+			SetDWORDRegKey(controlsKey, REGKEY_SWIM_CONTROL_MODE, (DWORD)g_Configuration.SwimControlMode) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_GRAB, g_Configuration.EnableAutoGrab) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, g_Configuration.EnableOppositeActionRoll) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
 			RegCloseKey(soundKey);
-			RegCloseKey(gameplayKey);
+			RegCloseKey(controlsKey);
 			return false;
 		}
 
-		// Open Input subkey.
-		HKEY inputKey = NULL;
-		if (RegCreateKeyExA(rootKey, REGKEY_INPUT, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &inputKey, NULL) != ERROR_SUCCESS)
+		// Open Controls\\KeyBindings subkey.
+		HKEY keyBindingsKey = NULL;
+		if (RegCreateKeyExA(controlsKey, REGKEY_KEY_BINDINGS, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &keyBindingsKey, NULL) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
 			RegCloseKey(soundKey);
-			RegCloseKey(gameplayKey);
-			RegCloseKey(inputKey);
+			RegCloseKey(controlsKey);
+			RegCloseKey(keyBindingsKey);
 			return false;
 		}
 
-		// Set Input keys.
-		if (SetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS)
-		{
-			RegCloseKey(rootKey);
-			RegCloseKey(graphicsKey);
-			RegCloseKey(soundKey);
-			RegCloseKey(gameplayKey);
-			RegCloseKey(inputKey);
-			return false;
-		}
-
-		// Set Input binding keys.
-		g_Configuration.Bindings.resize((int)In::Count);
+		// Open and set Controls\\KeyBindings keys.
+		g_Configuration.KeyBindings.resize((int)In::Count);
 		for (int i = 0; i < (int)In::Count; i++)
 		{
 			char buffer[9];
 			sprintf(buffer, "Action%d", i);
 
-			if (SetDWORDRegKey(inputKey, buffer, g_Configuration.Bindings[i]) != ERROR_SUCCESS)
+			if (SetDWORDRegKey(keyBindingsKey, buffer, g_Configuration.KeyBindings[i]) != ERROR_SUCCESS)
 			{
 				RegCloseKey(rootKey);
 				RegCloseKey(graphicsKey);
 				RegCloseKey(soundKey);
-				RegCloseKey(gameplayKey);
-				RegCloseKey(inputKey);
+				RegCloseKey(controlsKey);
+				RegCloseKey(keyBindingsKey);
 				return false;
 			}
 		}
@@ -295,8 +283,8 @@ namespace TEN::Config
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
 		RegCloseKey(soundKey);
-		RegCloseKey(gameplayKey);
-		RegCloseKey(inputKey);
+		RegCloseKey(controlsKey);
+		RegCloseKey(keyBindingsKey);
 		return true;
 	}
 
@@ -308,13 +296,13 @@ namespace TEN::Config
 
 	void InitDefaultConfiguration()
 	{
-		// Include default device into the list
+		// Include default device in list.
 		BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, true);
 
-		auto currentScreenResolution = GetScreenResolution();
+		auto screenRes = GetScreenResolution();
 
-		g_Configuration.ScreenWidth = currentScreenResolution.x;
-		g_Configuration.ScreenHeight = currentScreenResolution.y;
+		g_Configuration.ScreenWidth = screenRes.x;
+		g_Configuration.ScreenHeight = screenRes.y;
 		g_Configuration.ShadowType = ShadowMode::Lara;
 		g_Configuration.ShadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
 		g_Configuration.ShadowBlobsMax = GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX;
@@ -330,7 +318,7 @@ namespace TEN::Config
 
 		g_Configuration.ControlMode = ControlMode::Enhanced;
 		g_Configuration.SwimControlMode = SwimControlMode::Omnidirectional;
-		g_Configuration.EnableAutoGrab = true;
+		g_Configuration.EnableAutoGrab = false;
 		g_Configuration.EnableAutoTargeting = true;
 		g_Configuration.EnableTargetHighlighter = true;
 		g_Configuration.EnableOppositeActionRoll = true;
@@ -372,6 +360,8 @@ namespace TEN::Config
 		bool enableCaustics = false;
 		DWORD antialiasingMode = 1;
 		bool enableAmbientOcclusion = false;
+		bool enableTargetHighlighter = true;
+		bool enableSubtitles = true;
 
 		// Load Graphics keys.
 		if (GetDWORDRegKey(graphicsKey, REGKEY_SCREEN_WIDTH, &screenWidth, 0) != ERROR_SUCCESS ||
@@ -382,7 +372,9 @@ namespace TEN::Config
 			GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, &shadowBlobsMax, GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX) != ERROR_SUCCESS ||
 			GetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, &enableCaustics, true) != ERROR_SUCCESS ||
 			GetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, &antialiasingMode, true) != ERROR_SUCCESS ||
-			GetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, &enableAmbientOcclusion, false) != ERROR_SUCCESS)
+			GetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, &enableAmbientOcclusion, false) != ERROR_SUCCESS ||
+			GetBoolRegKey(graphicsKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, &enableTargetHighlighter, true) != ERROR_SUCCESS ||
+			GetBoolRegKey(graphicsKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
@@ -418,98 +410,80 @@ namespace TEN::Config
 			return false;
 		}
 
-		// Open Gameplay subkey.
-		HKEY gameplayKey = NULL;
-		if (RegOpenKeyExA(rootKey, REGKEY_GAMEPLAY, 0, KEY_READ, &gameplayKey) != ERROR_SUCCESS)
+		// Open Controls subkey.
+		HKEY controlsKey = NULL;
+		if (RegOpenKeyExA(rootKey, REGKEY_CONTROLS, 0, KEY_READ, &controlsKey) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
 			RegCloseKey(soundKey);
-			RegCloseKey(gameplayKey);
+			RegCloseKey(controlsKey);
 			return false;
 		}
 
+		DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
+		bool enableRumble = true;
 		DWORD controlMode = (DWORD)ControlMode::Enhanced;
 		DWORD swimControlMode = (DWORD)SwimControlMode::Omnidirectional;
 		bool enableAutoGrab = true;
 		bool enableAutoTargeting = true;
-		bool enableTargetHighlighter = true;
 		bool enableOppositeActionRoll = true;
-		bool enableSubtitles = true;
-
-		// TODO: Move to Input section.
-		DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
 		bool enableThumbstickCamera = true;
-		bool enableRumble = true;
 
-		// Load Gameplay keys.
-		if (GetDWORDRegKey(gameplayKey, REGKEY_CONTROL_MODE, &controlMode, (DWORD)ControlMode::Enhanced) != ERROR_SUCCESS ||
-			GetDWORDRegKey(gameplayKey, REGKEY_SWIM_CONTROL_MODE, &controlMode, (DWORD)SwimControlMode::Omnidirectional) != ERROR_SUCCESS ||
-			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_GRAB, &enableAutoGrab, true) != ERROR_SUCCESS ||
-			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
-			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, &enableTargetHighlighter, true) != ERROR_SUCCESS ||
-			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, &enableOppositeActionRoll, true) != ERROR_SUCCESS ||
-			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS ||
-
-			// TODO: Move to Input section.
-			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS ||
-			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS)
+		// Load Controls keys.
+		if (GetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
+			GetDWORDRegKey(controlsKey, REGKEY_CONTROL_MODE, &controlMode, (DWORD)ControlMode::Enhanced) != ERROR_SUCCESS ||
+			GetDWORDRegKey(controlsKey, REGKEY_SWIM_CONTROL_MODE, &swimControlMode, (DWORD)SwimControlMode::Omnidirectional) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_GRAB, &enableAutoGrab, true) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, &enableOppositeActionRoll, true) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
 			RegCloseKey(soundKey);
-			RegCloseKey(gameplayKey);
+			RegCloseKey(controlsKey);
 			return false;
 		}
 
-		// Load Input keys.
-		HKEY inputKey = NULL;
-		if (RegOpenKeyExA(rootKey, REGKEY_INPUT, 0, KEY_READ, &inputKey) == ERROR_SUCCESS)
+		// Load Controls\\KeyBindings keys.
+		HKEY keyBindingsKey = NULL;
+		if (RegOpenKeyExA(controlsKey, REGKEY_KEY_BINDINGS, 0, KEY_READ, &keyBindingsKey) == ERROR_SUCCESS)
 		{
-			if (GetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS)
-			{
-				RegCloseKey(rootKey);
-				RegCloseKey(graphicsKey);
-				RegCloseKey(soundKey);
-				RegCloseKey(gameplayKey);
-				RegCloseKey(inputKey);
-				return false;
-			}
-
 			for (int i = 0; i < (int)In::Count; i++)
 			{
 				DWORD tempAction = 0;
 				char buffer[9];
 				sprintf(buffer, "Action%d", i);
 
-				if (GetDWORDRegKey(inputKey, buffer, &tempAction, Bindings[0][i]) != ERROR_SUCCESS)
+				if (GetDWORDRegKey(keyBindingsKey, buffer, &tempAction, Bindings[0][i]) != ERROR_SUCCESS)
 				{
 					RegCloseKey(rootKey);
 					RegCloseKey(graphicsKey);
 					RegCloseKey(soundKey);
-					RegCloseKey(gameplayKey);
-					RegCloseKey(inputKey);
+					RegCloseKey(controlsKey);
+					RegCloseKey(keyBindingsKey);
 					return false;
 				}
 
-				g_Configuration.Bindings.push_back(tempAction);
+				g_Configuration.KeyBindings.push_back(tempAction);
 				Bindings[1][i] = tempAction;
 			}
-
-			RegCloseKey(inputKey);
 		}
 		else
 		{
-			// "Input" key does not exist; use default bindings.
-			g_Configuration.Bindings = Bindings[0];
+			// "KeyBindings" key doesn't exist; use default bindings.
+			g_Configuration.KeyBindings = Bindings[0];
 		}
 
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
 		RegCloseKey(soundKey);
-		RegCloseKey(gameplayKey);
+		RegCloseKey(controlsKey);
+		RegCloseKey(keyBindingsKey);
 
-		// All configuration values found; apply configuration to engine.
+		// All configuration values found; apply configuration.
 		g_Configuration.ScreenWidth = screenWidth;
 		g_Configuration.ScreenHeight = screenHeight;
 		g_Configuration.EnableWindowedMode = enableWindowedMode;
@@ -519,6 +493,8 @@ namespace TEN::Config
 		g_Configuration.AntialiasingMode = AntialiasingMode(antialiasingMode);
 		g_Configuration.ShadowMapSize = shadowMapSize;
 		g_Configuration.EnableAmbientOcclusion = enableAmbientOcclusion;
+		g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
+		g_Configuration.EnableSubtitles = enableSubtitles;
 
 		g_Configuration.EnableSound = enableSound;
 		g_Configuration.EnableReverb = enableReverb;
@@ -526,17 +502,14 @@ namespace TEN::Config
 		g_Configuration.SfxVolume = sfxVolume;
 		g_Configuration.SoundDevice = soundDevice;
 
+		g_Configuration.MouseSensitivity = mouseSensitivity;
+		g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
+		g_Configuration.EnableRumble = enableRumble;
 		g_Configuration.ControlMode = (ControlMode)controlMode;
 		g_Configuration.SwimControlMode = (SwimControlMode)swimControlMode;
 		g_Configuration.EnableAutoGrab = enableAutoGrab;
 		g_Configuration.EnableAutoTargeting = enableAutoTargeting;
-		g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
 		g_Configuration.EnableOppositeActionRoll = enableOppositeActionRoll;
-		g_Configuration.EnableSubtitles = enableSubtitles;
-
-		g_Configuration.MouseSensitivity = mouseSensitivity;
-		g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
-		g_Configuration.EnableRumble = enableRumble;
 
 		// Set legacy variables.
 		SetVolumeTracks(musicVolume);
