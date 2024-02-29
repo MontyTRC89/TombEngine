@@ -316,8 +316,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		if (player.Control.HandStatus == HandStatus::WeaponDraw ||
-			player.Control.HandStatus == HandStatus::WeaponReady)
+		if (TestPlayerCombatMode(*item) || IsHeld(In::Walk))
 		{
 			player.Control.JumpDirection = GetPlayerJumpDirection(*item, *coll);
 			switch (player.Control.JumpDirection)
@@ -330,10 +329,6 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 				item->Animation.TargetState = LS_JUMP_FORWARD;
 				return;
 				
-			case JumpDirection::ShortForward:
-				item->Animation.TargetState = LS_SHORT_JUMP_FORWARD;
-				return;
-
 			case JumpDirection::Back:
 				item->Animation.TargetState = LS_JUMP_BACK;
 				return;
@@ -365,19 +360,10 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 					item->Animation.TargetState = LS_IDLE;
 					return;
 
-				case JumpDirection::Forward:
-					item->Animation.TargetState = LS_JUMP_FORWARD;
-					return;
-
-				case JumpDirection::ShortForward:
-					item->Animation.TargetState = LS_SHORT_JUMP_FORWARD;
-					return;
-
 				case JumpDirection::Up:
 					item->Animation.TargetState = LS_JUMP_UP;
 					return;
 
-				// FAILSAFE
 				default:
 					item->Animation.TargetState = LS_JUMP_FORWARD;
 					player.Control.JumpDirection = JumpDirection::Forward;

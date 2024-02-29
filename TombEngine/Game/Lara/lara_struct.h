@@ -987,7 +987,6 @@ enum class JumpDirection
 	None,
 	Up,
 	Forward,
-	ShortForward,
 	Back,
 	Left,
 	Right

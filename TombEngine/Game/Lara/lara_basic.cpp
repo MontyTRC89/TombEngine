@@ -488,24 +488,42 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
-			HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
+			// Directional jump intent locks orientation.
+			if (!(TestPlayerCombatMode(*item) || (IsHeld(In::Jump) && IsHeld(In::Walk))))
+			{
+				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+				HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
+			}
 		}
 	}
 	else
 	{
-		// Jump locks orientation.
-		if (!IsHeld(In::Jump))
+		if (IsUsingClassicControls())
 		{
-			// Sidestep locks orientation.
-			if ((IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left))) ||
-				(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right))))
+			if (IsHeld(In::Forward) && (IsHeld(In::Left) || IsHeld(In::Right)))
+			{
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
+			}
+			else
 			{
 				ResetPlayerTurnRateY(*item);
 			}
-			else if (IsHeld(In::Left) || IsHeld(In::Right))
+		}
+		else if (IsUsingEnhancedControls())
+		{
+			// Jump locks orientation.
+			if (!IsHeld(In::Jump))
 			{
-				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
+				// Sidestep locks orientation.
+				if ((IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left))) ||
+					(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right))))
+				{
+					ResetPlayerTurnRateY(*item);
+				}
+				else if (IsHeld(In::Left) || IsHeld(In::Right))
+				{
+					ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
+				}
 			}
 		}
 	}
@@ -574,32 +592,6 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 					item->Animation.TargetState = vaultContext->TargetState;
 					SetLaraVault(item, coll, *vaultContext);
 					return;
-				}
-			}
-
-			if (TestPlayerCombatMode(*item))
-			{
-				short relMoveAngle = GetPlayerRelMoveAngle(*item);
-				if (relMoveAngle < ANGLE(45.0f))
-				{
-					if (CanWadeBackward(*item, *coll))
-					{
-						item->Animation.TargetState = LS_WALK_BACK;
-						return;
-					}
-					else if (IsHeld(In::Walk))
-					{
-						if (CanWalkBackward(*item, *coll))
-						{
-							item->Animation.TargetState = LS_WALK_BACK;
-							return;
-						}
-					}
-					else if (CanRunBackward(*item, *coll))
-					{
-						item->Animation.TargetState = LS_RUN_BACK;
-						return;
-					}
 				}
 			}
 
