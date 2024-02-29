@@ -50,8 +50,8 @@ namespace TEN::Config
 
 	enum class ControlMode
 	{
-		ClassicTank,
-		EnhancedTank,
+		Classic,
+		Enhanced,
 		Modern,
 
 		Count
@@ -88,7 +88,7 @@ namespace TEN::Config
 		int	 SfxVolume = 0;
 
 		// Gameplay
-		ControlMode		ControlMode = ControlMode::ClassicTank;
+		ControlMode		ControlMode = ControlMode::Classic;
 		SwimControlMode SwimControlMode = SwimControlMode::Omnidirectional;
 		bool EnableAutoGrab = false;
 		bool EnableAutoTargeting = false;
@@ -123,8 +123,8 @@ namespace TEN::Config
 	LONG SetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool bValue);
 	LONG SetStringRegKey(HKEY hKey, LPCSTR strValueName, char* strValue);
 
-	bool IsUsingClassicTankControls();
-	bool IsUsingEnhancedTankControls();
+	bool IsUsingClassicControls();
+	bool IsUsingEnhancedControls();
 	bool IsUsingModernControls();
 	bool IsUsingOmnidirectionalSwimControls();
 	bool IsUsingPlanarSwimControls();

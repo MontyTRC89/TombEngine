@@ -143,12 +143,12 @@ namespace TEN::Renderer
 		switch (g_Gui.GetCurrentSettings().Configuration.ControlMode)
 		{
 		default:
-		case ControlMode::ClassicTank:
-			controlModeIdString = STRING_CONTROL_MODE_CLASSIC_TANK;
+		case ControlMode::Classic:
+			controlModeIdString = STRING_CONTROL_MODE_CLASSIC;
 			break;
 
-		case ControlMode::EnhancedTank:
-			controlModeIdString = STRING_CONTROL_MODE_ENHANCED_TANK;
+		case ControlMode::Enhanced:
+			controlModeIdString = STRING_CONTROL_MODE_ENHANCED;
 			break;
 
 		case ControlMode::Modern:
@@ -191,8 +191,8 @@ namespace TEN::Renderer
 			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_GAMEPLAY), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 2));
 			GetNextLinePosition(&y);
 			
-			// Input
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_INPUT), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 3));
+			// Controls
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_CONTROLS), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == 3));
 			GetNextLinePosition(&y);
 			break;
 
@@ -331,12 +331,12 @@ namespace TEN::Renderer
 			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 8));
 			break;
 
-		case Menu::Input:
+		case Menu::Controls:
 			// Set up parameters.
 			y = MenuVerticalInputSettings;
 
 			// Heading
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_INPUT), PRINTSTRING_COLOR_YELLOW, SF_Center());
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_CONTROLS), PRINTSTRING_COLOR_YELLOW, SF_Center());
 			GetNextBlockPosition(&y);
 
 			// Key Bindings
@@ -633,7 +633,7 @@ namespace TEN::Renderer
 		case Menu::Display:
 		case Menu::Sound:
 		case Menu::Gameplay:
-		case Menu::Input:
+		case Menu::Controls:
 			RenderOptionsMenu(menu, MenuVerticalOptionsTitle);
 			break;
 
@@ -683,7 +683,7 @@ namespace TEN::Renderer
 		case Menu::Display:
 		case Menu::Sound:
 		case Menu::Gameplay:
-		case Menu::Input:
+		case Menu::Controls:
 			RenderOptionsMenu(menu, MenuVerticalOptionsPause);
 			break;
 

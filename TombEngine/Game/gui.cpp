@@ -329,7 +329,7 @@ namespace TEN::Gui
 			HandleGameplaySettingsInput(false);
 			return inventoryResult;
 
-		case Menu::Input:
+		case Menu::Controls:
 			HandleInputSettingsInput(false);
 			return inventoryResult;
 
@@ -850,13 +850,13 @@ namespace TEN::Gui
 				int controlMode = (int)CurrentSettings.Configuration.ControlMode;
 				GuiIsPulsed(In::Left) ? --controlMode : ++controlMode;
 
-				if (controlMode < (int)ControlMode::ClassicTank)
+				if (controlMode < (int)ControlMode::Classic)
 				{
 					controlMode = (int)ControlMode::Count - 1;
 				}
 				else if (controlMode > (int)ControlMode::Modern)
 				{
-					controlMode = (int)ControlMode::ClassicTank;
+					controlMode = (int)ControlMode::Classic;
 				}
 
 				CurrentSettings.Configuration.ControlMode = (Config::ControlMode)controlMode;
@@ -943,7 +943,7 @@ namespace TEN::Gui
 				SaveConfiguration();
 
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = 1;
+				SelectedOption = 2;
 			}
 			else if (SelectedOption == GameplaySettingsOption::Cancel)
 			{
@@ -951,7 +951,7 @@ namespace TEN::Gui
 				SetVolumeTracks(g_Configuration.MusicVolume);
 				SetVolumeFX(g_Configuration.SfxVolume);
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = 1;
+				SelectedOption = 2;
 			}
 		}
 	}
@@ -1089,7 +1089,7 @@ namespace TEN::Gui
 					Rumble(0.5f);
 
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = 1;
+				SelectedOption = 3;
 			}
 				break;
 
@@ -1098,7 +1098,7 @@ namespace TEN::Gui
 				SetVolumeTracks(g_Configuration.MusicVolume);
 				SetVolumeFX(g_Configuration.SfxVolume);
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-				SelectedOption = 1;
+				SelectedOption = 3;
 				break;
 			}
 		}
@@ -1303,8 +1303,8 @@ namespace TEN::Gui
 					CurrentSettings.Configuration.Bindings = Bindings[1];
 					g_Configuration.Bindings = Bindings[1];
 					SaveConfiguration();
-					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-					SelectedOption = 2;
+					MenuToDisplay = Menu::Controls;
+					SelectedOption = 0;
 					return;
 				}
 
@@ -1313,8 +1313,8 @@ namespace TEN::Gui
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 					Bindings[1] = CurrentSettings.Configuration.Bindings;
-					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
-					SelectedOption = 2;
+					MenuToDisplay = Menu::Controls;
+					SelectedOption = 0;
 					return;
 				}
 			}
@@ -1322,7 +1322,7 @@ namespace TEN::Gui
 			if (GuiIsDeselected())
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				MenuToDisplay = Menu::Input;
+				MenuToDisplay = Menu::Controls;
 				SelectedOption = 0;
 			}
 		}
@@ -1340,7 +1340,7 @@ namespace TEN::Gui
 			Display,
 			Sound,
 			Gameplay,
-			Input
+			Controls
 		};
 
 		switch (SelectedOption)
@@ -1363,9 +1363,9 @@ namespace TEN::Gui
 			SelectedOption = 0;
 			break;
 
-		case OptionsOption::Input:
+		case OptionsOption::Controls:
 			BackupOptions();
-			MenuToDisplay = Menu::Input;
+			MenuToDisplay = Menu::Controls;
 			SelectedOption = 0;
 			break;
 		}
@@ -1413,7 +1413,7 @@ namespace TEN::Gui
 			HandleGameplaySettingsInput(true);
 			return InventoryResult::None;
 
-		case Menu::Input:
+		case Menu::Controls:
 			HandleInputSettingsInput(true);
 			return InventoryResult::None;
 

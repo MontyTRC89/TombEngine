@@ -328,7 +328,7 @@ namespace TEN::Config
 		g_Configuration.MusicVolume = 100;
 		g_Configuration.SfxVolume = 100;
 
-		g_Configuration.ControlMode = ControlMode::EnhancedTank;
+		g_Configuration.ControlMode = ControlMode::Enhanced;
 		g_Configuration.SwimControlMode = SwimControlMode::Omnidirectional;
 		g_Configuration.EnableAutoGrab = true;
 		g_Configuration.EnableAutoTargeting = true;
@@ -429,7 +429,7 @@ namespace TEN::Config
 			return false;
 		}
 
-		DWORD controlMode = (DWORD)ControlMode::EnhancedTank;
+		DWORD controlMode = (DWORD)ControlMode::Enhanced;
 		DWORD swimControlMode = (DWORD)SwimControlMode::Omnidirectional;
 		bool enableAutoGrab = true;
 		bool enableAutoTargeting = true;
@@ -443,7 +443,7 @@ namespace TEN::Config
 		bool enableRumble = true;
 
 		// Load Gameplay keys.
-		if (GetDWORDRegKey(gameplayKey, REGKEY_CONTROL_MODE, &controlMode, (DWORD)ControlMode::EnhancedTank) != ERROR_SUCCESS ||
+		if (GetDWORDRegKey(gameplayKey, REGKEY_CONTROL_MODE, &controlMode, (DWORD)ControlMode::Enhanced) != ERROR_SUCCESS ||
 			GetDWORDRegKey(gameplayKey, REGKEY_SWIM_CONTROL_MODE, &controlMode, (DWORD)SwimControlMode::Omnidirectional) != ERROR_SUCCESS ||
 			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_GRAB, &enableAutoGrab, true) != ERROR_SUCCESS ||
 			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
@@ -607,14 +607,14 @@ namespace TEN::Config
 		return nError;
 	}
 
-	bool IsUsingClassicTankControls()
+	bool IsUsingClassicControls()
 	{
-		return (g_Configuration.ControlMode == ControlMode::ClassicTank);
+		return (g_Configuration.ControlMode == ControlMode::Classic);
 	}
 
-	bool IsUsingEnhancedTankControls()
+	bool IsUsingEnhancedControls()
 	{
-		return (g_Configuration.ControlMode == ControlMode::EnhancedTank);
+		return (g_Configuration.ControlMode == ControlMode::Enhanced);
 	}
 
 	bool IsUsingModernControls()

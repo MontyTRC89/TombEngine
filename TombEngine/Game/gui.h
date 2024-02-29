@@ -83,7 +83,7 @@ namespace TEN::Gui
 		Display,
 		Sound,
 		Gameplay,
-		Input,
+		Controls,
 
 		GeneralActions,
 		VehicleActions,

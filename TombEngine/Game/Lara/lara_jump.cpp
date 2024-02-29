@@ -225,7 +225,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 			HandlePlayerTurnFlex(*item, PLAYER_JUMP_TURN_ALPHA);
 		}
 	}
-	else if (IsUsingEnhancedTankControls())
+	else if (IsUsingEnhancedControls())
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX / 2);
@@ -533,7 +533,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 			HandlePlayerTurnFlex(*item, PLAYER_JUMP_TURN_ALPHA);
 		}
 	}
-	else if (IsUsingEnhancedTankControls())
+	else if (IsUsingEnhancedControls())
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
@@ -870,7 +870,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 			HandlePlayerTurnFlex(*item, PLAYER_JUMP_TURN_ALPHA);
 		}
 	}
-	else if (IsUsingEnhancedTankControls())
+	else if (IsUsingEnhancedControls())
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{

@@ -164,11 +164,11 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			if (IsUsingClassicTankControls())
+			if (IsUsingClassicControls())
 			{
 				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 			}
-			else if (IsUsingEnhancedTankControls())
+			else if (IsUsingEnhancedControls())
 			{
 				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 				HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
@@ -1320,7 +1320,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsUsingEnhancedTankControls())
+	if (IsUsingEnhancedControls())
 	{
 		if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll)) &&
 			!isWading)
@@ -1458,7 +1458,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 	{
 		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, REL_HEADING_ANGLE);
 	}
-	else if (IsUsingEnhancedTankControls())
+	else if (IsUsingEnhancedControls())
 	{
 		// Walk action locks orientation.
 		if (IsHeld(In::Walk))
@@ -1563,7 +1563,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 	{
 		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, REL_HEADING_ANGLE);
 	}
-	else if (IsUsingEnhancedTankControls())
+	else if (IsUsingEnhancedControls())
 	{
 		// Walk action locks orientation.
 		if (IsHeld(In::Walk))
