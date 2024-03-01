@@ -116,12 +116,6 @@ class ItemData
 	}
 	*/
 
-	ItemData& operator =(const ItemData& newData)
-	{
-		data = newData.data;
-		return *this;
-	}
-
 	ItemData& operator =(std::nullptr_t null)
 	{
 		data = nullptr;

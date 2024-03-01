@@ -11,6 +11,11 @@
 #include "Game/Lara/lara_two_guns.h"
 #include "Game/Lara/PlayerStateMachine.h"
 #include "Game/Setup.h"
+#include "Objects/TR3/Vehicles/kayak.h"
+#include "Objects/TR4/Vehicles/motorbike.h"
+#include "Objects/TR4/Vehicles/jeep.h"
+#include "Objects/TR3/Vehicles/quad_bike.h"
+#include "Objects/TR2/Vehicles/skidoo.h"
 #include "Specific/level.h"
 
 using namespace TEN::Entities::Player;
@@ -21,7 +26,6 @@ int					PlayerHitPoints		  = 0;
 LaraInfo			PlayerBackup		  = {};
 EntityAnimationData PlayerAnim			  = {};
 GAME_OBJECT_ID		PlayerVehicleObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
-ItemData			PlayerVehicleItemData = nullptr;
 
 void BackupLara()
 {
@@ -35,12 +39,10 @@ void BackupLara()
 	if (Lara.Context.Vehicle != NO_ITEM)
 	{
 		PlayerVehicleObjectID = g_Level.Items[Lara.Context.Vehicle].ObjectNumber;
-		PlayerVehicleItemData = g_Level.Items[Lara.Context.Vehicle].Data;
 	}
 	else
 	{
 		PlayerVehicleObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
-		PlayerVehicleItemData = nullptr;
 	}
 }
 
@@ -209,10 +211,37 @@ void InitializeLaraVehicle(ItemInfo& playerItem)
 
 	TENLog("Transferring vehicle " + GetObjectName(PlayerVehicleObjectID) + " from the previous level.");
 	vehicle->Pose = playerItem.Pose;
-	vehicle->Data = PlayerVehicleItemData;
 	ItemNewRoom(vehicle->Index, playerItem.RoomNumber);
 	SetLaraVehicle(&playerItem, vehicle);
 	playerItem.Animation = PlayerAnim;
+
+	// HACK: Reinitialize vehicles which require specific parameters to be reset according to Lara pose.
+
+	switch (vehicle->ObjectNumber)
+	{
+		case GAME_OBJECT_ID::ID_KAYAK:
+			InitializeKayak(vehicle->Index);
+			break;
+
+		case GAME_OBJECT_ID::ID_MOTORBIKE:
+			InitializeMotorbike(vehicle->Index);
+			break;
+
+		case GAME_OBJECT_ID::ID_JEEP:
+			InitializeJeep(vehicle->Index);
+			break;
+
+		case GAME_OBJECT_ID::ID_QUAD:
+			InitializeQuadBike(vehicle->Index);
+			break;
+
+		case GAME_OBJECT_ID::ID_SNOWMOBILE:
+			InitializeSkidoo(vehicle->Index);
+			break;
+
+		default:
+			break;
+	}
 }
 
 void InitializeLaraDefaultInventory(ItemInfo& item)
