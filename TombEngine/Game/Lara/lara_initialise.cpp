@@ -195,13 +195,6 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup)
 		DrawFlareMeshes(*item);
 	}
 
-	// Restore crawl animation, if it was set before leveljump.
-	if (PlayerAnim.ActiveState == LS_CRAWL_FORWARD ||
-		PlayerAnim.ActiveState == LS_CRAWL_BACK)
-	{
-		SetAnimation(item, LA_CRAWL_IDLE);
-	}
-
 	// Restore hit points.
 	item->HitPoints = PlayerHitPoints;
 
