@@ -170,15 +170,19 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup)
 	// Restore holsters. First attempt restoring original holster data, then refer to selected weapons.
 	player.Control.Weapon.HolsterInfo = playerBackup->Control.Weapon.HolsterInfo;
 	
-	if (player.Control.Weapon.HolsterInfo.RightHolster == HolsterSlot::Empty ||
-		player.Control.Weapon.HolsterInfo.LeftHolster  == HolsterSlot::Empty)
+	if ((player.Control.Weapon.HolsterInfo.RightHolster == HolsterSlot::Empty ||
+		 player.Control.Weapon.HolsterInfo.LeftHolster  == HolsterSlot::Empty) &&
+		 player.Control.Weapon.LastGunType <= LaraWeaponType::Uzi)
 	{
 		UndrawPistolMesh(*item, player.Control.Weapon.LastGunType, true);
 		UndrawPistolMesh(*item, player.Control.Weapon.LastGunType, false);
 	}
 
-	if (player.Control.Weapon.HolsterInfo.BackHolster == HolsterSlot::Empty)
+	if (player.Control.Weapon.HolsterInfo.BackHolster == HolsterSlot::Empty &&
+		player.Control.Weapon.LastGunType > LaraWeaponType::Uzi)
+	{
 		UndrawShotgunMeshes(*item, player.Control.Weapon.LastGunType);
+	}
 
 	// Restore flare.
 	if (playerBackup->Control.Weapon.GunType == LaraWeaponType::Flare)
@@ -189,6 +193,13 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup)
 		player.Control.Weapon = playerBackup->Control.Weapon;
 		player.Flare = playerBackup->Flare;
 		DrawFlareMeshes(*item);
+	}
+
+	// Restore crawl animation, if it was set before leveljump.
+	if (PlayerAnim.ActiveState == LS_CRAWL_FORWARD ||
+		PlayerAnim.ActiveState == LS_CRAWL_BACK)
+	{
+		SetAnimation(item, LA_CRAWL_IDLE);
 	}
 
 	// Restore hit points.
