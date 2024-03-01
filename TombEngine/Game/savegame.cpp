@@ -2248,6 +2248,9 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 		if (item->ObjectNumber == ID_LARA && hubMode)
 			continue;
 
+		if (item->Index == Lara.Context.Vehicle && hubMode)
+			continue;
+
 		// Position
 		item->Pose = ToPose(savedItem->pose());
 		item->RoomNumber = savedItem->room_number();
