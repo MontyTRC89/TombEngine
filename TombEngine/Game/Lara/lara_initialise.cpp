@@ -127,7 +127,19 @@ void InitializeLaraAnims(ItemInfo* item)
 	else
 	{
 		player.Control.WaterStatus = WaterStatus::Dry;
-		SetAnimation(item, LA_STAND_SOLID);
+
+		// Allow Lara to start in a crawl position if start position is too low.
+
+		auto probe = GetCollision(item);
+		if (abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT)
+		{
+			SetAnimation(item, LA_CRAWL_IDLE);
+			player.Control.IsLow = player.Control.KeepLow = true;
+		}
+		else
+		{
+			SetAnimation(item, LA_STAND_SOLID);
+		}
 	}
 }
 

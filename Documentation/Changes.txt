@@ -9,6 +9,7 @@ Version 1.4
 * Fixed sounds resuming in pause mode while switching between apps.
 * Fixed slide directions.
 * Fixed occasional collision warnings in a log when teeth spikes object was activated.
+* Auto-switch to a crawl state if Lara start position is in a crawlspace.
 * Revise wall spikes:
   - Wall spikes now stop when they touch a pushable, another spike wall or a normal wall.
   - Wall spikes will shatter any shatter in its path.
