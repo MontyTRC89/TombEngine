@@ -21,6 +21,7 @@ int					PlayerHitPoints		  = 0;
 LaraInfo			PlayerBackup		  = {};
 EntityAnimationData PlayerAnim			  = {};
 GAME_OBJECT_ID		PlayerVehicleObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
+ItemData			PlayerVehicleItemData = nullptr;
 
 void BackupLara()
 {
@@ -34,10 +35,12 @@ void BackupLara()
 	if (Lara.Context.Vehicle != NO_ITEM)
 	{
 		PlayerVehicleObjectID = g_Level.Items[Lara.Context.Vehicle].ObjectNumber;
+		PlayerVehicleItemData = g_Level.Items[Lara.Context.Vehicle].Data;
 	}
 	else
 	{
 		PlayerVehicleObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
+		PlayerVehicleItemData = nullptr;
 	}
 }
 
@@ -189,19 +192,27 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup)
 	// Restore hit points.
 	item->HitPoints = PlayerHitPoints;
 
+	// Restore vehicle
+	InitializeLaraVehicle(*item);
+}
+
+void InitializeLaraVehicle(ItemInfo& playerItem)
+{
+	if (PlayerVehicleObjectID == GAME_OBJECT_ID::ID_NO_OBJECT)
+		return;
+
+	auto* vehicle = FindItem(PlayerVehicleObjectID);
+	if (vehicle == nullptr)
+		return;
+
 	// Restore vehicle.
-	if (PlayerVehicleObjectID != GAME_OBJECT_ID::ID_NO_OBJECT)
-	{
-		auto* vehicle = FindItem(PlayerVehicleObjectID);
-		if (vehicle != nullptr)
-		{
-			TENLog("Transferring vehicle " + GetObjectName(PlayerVehicleObjectID) + " from the previous level.");
-			vehicle->Pose = item->Pose;
-			ItemNewRoom(vehicle->Index, item->RoomNumber);
-			SetLaraVehicle(item, vehicle);
-			item->Animation = PlayerAnim;
-		}
-	}
+
+	TENLog("Transferring vehicle " + GetObjectName(PlayerVehicleObjectID) + " from the previous level.");
+	vehicle->Pose = playerItem.Pose;
+	vehicle->Data = PlayerVehicleItemData;
+	ItemNewRoom(vehicle->Index, playerItem.RoomNumber);
+	SetLaraVehicle(&playerItem, vehicle);
+	playerItem.Animation = PlayerAnim;
 }
 
 void InitializeLaraDefaultInventory(ItemInfo& item)
