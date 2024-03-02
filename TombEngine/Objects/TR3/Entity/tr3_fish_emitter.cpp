@@ -339,6 +339,7 @@ namespace TEN::Entities::Creatures::TR3
 			float movementValue = abs(moveDir.z);
 			float undulationAngle = sin(fish.Undulation) * ANGLE(std::clamp(movementValue * 7.0f, 4.0f, 7.0f));
 
+			// Upply undulation.
 			fish.Orientation.y += undulationAngle;
 
 			// Update undulation.
