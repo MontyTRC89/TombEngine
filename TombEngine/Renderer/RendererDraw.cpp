@@ -21,7 +21,7 @@
 #include "Game/Setup.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/rope.h"
-#include "Objects/TR3/Entity/tr3_fish_emitter.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
@@ -611,7 +611,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawFishes(RenderView& view, RendererPass rendererPass)
+	void Renderer::DrawFishSwarm(RenderView& view, RendererPass rendererPass)
 	{
 		using namespace TEN::Entities::Creatures::TR3;
 
@@ -1825,7 +1825,7 @@ namespace TEN::Renderer
 		DrawLocusts(view, RendererPass::Opaque);
 		DrawDebris(view, RendererPass::Opaque);
 		DrawSprites(view, RendererPass::Opaque);
-		DrawFishes(view, RendererPass::Opaque);
+		DrawFishSwarm(view, RendererPass::Opaque);
 
 		// Draw additive faces.
 		DrawRooms(view, RendererPass::Additive);
@@ -1839,7 +1839,7 @@ namespace TEN::Renderer
 		DrawLocusts(view, RendererPass::Additive);
 		DrawDebris(view, RendererPass::Additive);
 		DrawSprites(view, RendererPass::Additive);
-		DrawFishes(view, RendererPass::Additive);
+		DrawFishSwarm(view, RendererPass::Additive);
 
 		// Collect all non-commutative transparent faces.
 		// NOTE: Sorted sprites are already collected at the beginning of the frame.
@@ -1850,7 +1850,7 @@ namespace TEN::Renderer
 		DrawEffects(view, RendererPass::CollectTransparentFaces);
 		DrawRats(view, RendererPass::CollectTransparentFaces);
 		DrawLocusts(view, RendererPass::CollectTransparentFaces);
-		DrawFishes(view, RendererPass::CollectTransparentFaces);
+		DrawFishSwarm(view, RendererPass::CollectTransparentFaces);
 
 		// Draw sorted faces.
 		DrawSortedFaces(view);

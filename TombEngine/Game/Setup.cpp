@@ -20,7 +20,7 @@
 #include "Objects/Generic/Traps/falling_block.h"
 #include "Objects/TR1/tr1_objects.h"
 #include "Objects/TR2/tr2_objects.h"
-#include "Objects/TR3/Entity/tr3_fish_emitter.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR3/tr3_objects.h"
 #include "Objects/TR4/tr4_objects.h"
 #include "Objects/TR5/tr5_objects.h"

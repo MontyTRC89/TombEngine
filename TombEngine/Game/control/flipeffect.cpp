@@ -18,7 +18,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Objects/Generic/puzzles_keys.h"
-#include "Objects/TR3/Entity/tr3_fish_emitter.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"

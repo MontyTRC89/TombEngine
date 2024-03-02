@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/tr3_fish_emitter.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
@@ -51,6 +51,27 @@ namespace TEN::Entities::Creatures::TR3
 		item.ItemFlags[5] = 0;
 	}
 
+	static void SpawnFishSwarm(ItemInfo& item)
+	{
+		constexpr auto VEL_MAX = 48.0f;
+		constexpr auto VEL_MIN = 16.0f;
+
+		// Create new fish.
+		auto& fish = GetNewEffect(FishSwarm, FISH_COUNT_MAX);
+
+		fish.Life = 1.0f;
+		fish.Position = item.Pose.Position.ToVector3();
+		fish.Orientation.x = Random::GenerateAngle(ANGLE(-3.0f), ANGLE(3.0f));
+		fish.Orientation.y = (item.Pose.Orientation.y + ANGLE(180.0f)) + Random::GenerateAngle(ANGLE(-6.0f), ANGLE(6.0f));
+		fish.RoomNumber = item.RoomNumber;
+		fish.Velocity = Random::GenerateFloat(VEL_MIN, VEL_MAX);
+		fish.MeshIndex = abs(item.TriggerFlags);
+		fish.IsLethal = (item.TriggerFlags < 0) ? true : false;
+		fish.LeaderItemPtr = &g_Level.Items[item.ItemFlags[0]];
+
+		fish.Undulation = Random::GenerateFloat(0.0f, PI_MUL_2);
+	}
+
 	void ControlFishSwarm(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
@@ -61,11 +82,11 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (item.ItemFlags[5] != item.HitPoints)
 		{
-			int deltaHitPoints = item.HitPoints - item.ItemFlags[5];
+			int fishCount = item.HitPoints - item.ItemFlags[5];
 
-			if (deltaHitPoints < 0)
+			if (fishCount < 0)
 			{
-				int fishToTurnOff = -deltaHitPoints;
+				int fishToTurnOff = -fishCount;
 				for (auto& fish : FishSwarm)
 				{
 					if (fish.LeaderItemPtr == &item && fish.Life > 0.0f)
@@ -77,10 +98,10 @@ namespace TEN::Entities::Creatures::TR3
 					}
 				}
 			}
-			else if (deltaHitPoints > 0)
+			else if (fishCount > 0)
 			{
-				for (int i = 0; i < deltaHitPoints; i++)
-					SpawnFishSwarm(&item);
+				for (int i = 0; i < fishCount; i++)
+					SpawnFishSwarm(item);
 			}
 
 			item.ItemFlags[5] = item.HitPoints;
@@ -152,27 +173,6 @@ namespace TEN::Entities::Creatures::TR3
 		}
 	}
 
-	void SpawnFishSwarm(ItemInfo* item)
-	{
-		constexpr auto VEL_MAX = 48.0f;
-		constexpr auto VEL_MIN = 16.0f;
-
-		// Create new fish.
-		auto& fish = GetNewEffect(FishSwarm, FISH_COUNT_MAX);
-
-		fish.Life = 1.0f;
-		fish.Position = item->Pose.Position.ToVector3();
-		fish.Orientation.x = Random::GenerateAngle(ANGLE(-3.0f), ANGLE(3.0f));
-		fish.Orientation.y = (item->Pose.Orientation.y + ANGLE(180.0f)) + Random::GenerateAngle(ANGLE(-6.0f), ANGLE(6.0f));
-		fish.RoomNumber = item->RoomNumber;
-		fish.Velocity = Random::GenerateFloat(VEL_MIN, VEL_MAX);
-		fish.MeshIndex = abs(item->TriggerFlags);
-		fish.IsLethal = (item->TriggerFlags < 0) ? true : false;
-		fish.LeaderItemPtr = &g_Level.Items[item->ItemFlags[0]];
-
-		fish.Undulation = Random::GenerateFloat(0.0f, PI_MUL_2);
-	}
-
 	static Vector3 GetFishStartPosition(const ItemInfo& item)
 	{
 		constexpr auto SPHERE_RADIUS		= BLOCK(1);
@@ -181,23 +181,21 @@ namespace TEN::Entities::Creatures::TR3
 		auto sphere = BoundingSphere(item.StartPose.Position.ToVector3(), SPHERE_RADIUS);
 		auto pos = Random::GeneratePointInSphere(sphere);
 
+		// Get point collision.
 		auto pointColl = GetCollision(pos, item.RoomNumber);
 		int waterHeight = GetWaterHeight(pointColl.Coordinates.x, pointColl.Coordinates.y, pointColl.Coordinates.z, pointColl.RoomNumber);
 
-		// Prevent fish from peeking out from water surface.
-		if (pointColl.Position.Floor < pos.y ||
-			pointColl.Position.Ceiling > pos.y ||
-			!TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
-		{
+		// Clamp position to slightly below water surface.
+		if (pos.y < (waterHeight + WATER_SURFACE_OFFSET))
 			pos.y = waterHeight + WATER_SURFACE_OFFSET;
-		}
 
 		return pos;
 	}
 
 	void UpdateFishSwarm()
 	{
-		constexpr auto FLEE_VEL = 20.0f;
+		constexpr auto WATER_SURFACE_OFFSET = CLICK(0.5f);
+		constexpr auto FLEE_VEL				= 20.0f;
 
 		static const auto SPHERE = BoundingSphere(Vector3::Zero, BLOCK(1 / 8.0f));
 
@@ -320,9 +318,10 @@ namespace TEN::Entities::Creatures::TR3
 			if (pointColl.RoomNumber != fish.RoomNumber)
 				fish.RoomNumber = pointColl.RoomNumber;
 
-			// Prevent fish from peeking out of water surface.
-			if (pointColl.RoomNumber != fish.RoomNumber && !TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
-				fish.Position.y = room.maxceiling + 180;
+			// Clamp position to slightly below water surface.
+			int waterHeight = GetWaterHeight(fish.Position.x, fish.Position.y, fish.Position.z, fish.RoomNumber);
+			if (fish.Position.y < (waterHeight + WATER_SURFACE_OFFSET))
+				fish.Position.y = waterHeight + WATER_SURFACE_OFFSET;
 			
 			if (ItemNearTarget(fish.Position, fish.TargetItemPtr, CLICK(0.5f)) &&
 				fish.LeaderItemPtr != fish.TargetItemPtr)

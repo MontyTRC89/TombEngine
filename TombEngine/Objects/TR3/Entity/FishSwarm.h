@@ -31,8 +31,6 @@ namespace TEN::Entities::Creatures::TR3
 	void InitializeFishSwarm(short itemNumber);
 	void ControlFishSwarm(short itemNumber);
 
-	void SpawnFishSwarm(ItemInfo* item);
-
 	void UpdateFishSwarm();
 	void ClearFishSwarm();
 }
