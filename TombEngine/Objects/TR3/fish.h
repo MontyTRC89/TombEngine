@@ -13,10 +13,3 @@ struct FishInfo
 	int swim;
 };
 
-struct FishLeaderInfo
-{
-	short angle;
-	unsigned char speed;
-	unsigned char on;
-	short angleTime;
-};

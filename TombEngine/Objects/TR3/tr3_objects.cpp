@@ -430,7 +430,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeFishSwarm;
-		obj->control = FishSwarmControl;
+		obj->control = ControlFishSwarm;
 		obj->intelligent = true;
 		obj->drawRoutine = NULL;
 	}

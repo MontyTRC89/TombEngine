@@ -622,7 +622,7 @@ namespace TEN::Renderer
 		{
 			for (const auto& fish : FishSwarm)
 			{
-				if (fish.on)
+				if (fish.Life > 0.0f)
 				{
 					auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.Species);
 
@@ -657,7 +657,7 @@ namespace TEN::Renderer
 			bool doesActiveFishExist = false;
 			for (const auto& fish : FishSwarm)
 			{
-				if (fish.on)
+				if (fish.Life > 0.0f)
 				{
 					doesActiveFishExist = true;
 					break;
@@ -689,7 +689,7 @@ namespace TEN::Renderer
 
 				for (const auto& fish : FishSwarm)
 				{
-					if (fish.on)
+					if (fish.Life > 0.0f)
 					{
 						const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.Species);
 

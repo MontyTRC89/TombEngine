@@ -6,11 +6,12 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto FISH_COUNT_MAX = 240;
+	constexpr auto FISH_COUNT_MAX = 512;
 
 	struct FishData
 	{
-		bool on;
+		float Life = 0.0f;
+
 		Pose Pose;
 		ItemInfo* target;
 		ItemInfo* leader;
@@ -18,22 +19,20 @@ namespace TEN::Entities::Creatures::TR3
 		short Velocity;
 		Vector3i PositionTarget = Vector3::Zero;
 		short Species;
-		bool Lethal;
+		bool IsLethal;
 		short YAngle = ANGLE(0.0f);
-		float Timer;
+		float Undulation;
 
 		Matrix Transform;
 	};
 
-	extern FishData FishSwarm[FISH_COUNT_MAX];
-	extern int NextFish;
+	extern std::vector<FishData> FishSwarm;
 
 	void InitializeFishSwarm(short itemNumber);
-	void FishSwarmControl(short itemNumber);
+	void ControlFishSwarm(short itemNumber);
 
-	short GetFreeFish();
-	void ClearFishSwarm();
-	void UpdateFishSwarm();
 	void SpawnFishSwarm(ItemInfo* item);
-	Vector3 GetRandomFishTarget(ItemInfo* item);
+
+	void UpdateFishSwarm();
+	void ClearFishSwarm();
 }
