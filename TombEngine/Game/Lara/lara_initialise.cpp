@@ -77,7 +77,6 @@ void InitializeLara(bool restore)
 
 	InitializePlayerStateMachine();
 	InitializeLaraMeshes(LaraItem);
-	InitializeLaraAnims(LaraItem);
 	InitializeLaraStartPosition(*LaraItem);
 
 	if (restore)
@@ -88,6 +87,9 @@ void InitializeLara(bool restore)
 	{
 		InitializeLaraDefaultInventory(*LaraItem);
 	}
+
+	// Lara animation init should happen after leveljump init.
+	InitializeLaraAnims(LaraItem);
 
 	g_Hud.StatusBars.Initialize(*LaraItem);
 }
