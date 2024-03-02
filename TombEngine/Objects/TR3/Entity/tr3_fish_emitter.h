@@ -10,20 +10,20 @@ namespace TEN::Entities::Creatures::TR3
 
 	struct FishData
 	{
-		float Life = 0.0f;
+		int	 MeshIndex = 0;
+		bool IsLethal  = false;
 
-		Pose Pose;
-		ItemInfo* target;
-		ItemInfo* leader;
-		short RoomNumber;
-		short Velocity;
-		Vector3i PositionTarget = Vector3::Zero;
-		short Species;
-		bool IsLethal;
-		short YAngle = ANGLE(0.0f);
-		float Undulation;
+		Vector3		Position	   = Vector3::Zero;
+		int			RoomNumber	   = 0;
+		Vector3		PositionTarget = Vector3::Zero;
+		EulerAngles Orientation	   = EulerAngles::Identity;
+		float		Velocity	   = 0.0f;
 
-		Matrix Transform;
+		float Life		 = 0.0f;
+		float Undulation = 0.0f;
+
+		ItemInfo* TargetItemPtr = nullptr;
+		ItemInfo* LeaderItemPtr = nullptr;
 	};
 
 	extern std::vector<FishData> FishSwarm;

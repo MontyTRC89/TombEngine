@@ -624,7 +624,7 @@ namespace TEN::Renderer
 			{
 				if (fish.Life > 0.0f)
 				{
-					auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.Species);
+					auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
 
 					for (auto& bucket : mesh.Buckets)
 					{
@@ -632,7 +632,8 @@ namespace TEN::Renderer
 						{
 							for (auto& poly : bucket.Polygons)
 							{
-								auto center = Vector3::Transform(poly.Centre, fish.Transform);
+								auto worldMatrix = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
+								auto center = Vector3::Transform(poly.Centre, worldMatrix);
 								float dist = (center - view.Camera.WorldPosition).Length();
 
 								auto object = RendererSortableObject{};
@@ -642,7 +643,7 @@ namespace TEN::Renderer
 								object.Bucket = &bucket;
 								object.Mesh = &mesh;
 								object.Polygon = &poly;
-								object.World = fish.Transform;
+								object.World = worldMatrix;
 								object.Room = &_rooms[fish.RoomNumber];
 
 								view.TransparentObjectsToDraw.push_back(object);
@@ -691,9 +692,9 @@ namespace TEN::Renderer
 				{
 					if (fish.Life > 0.0f)
 					{
-						const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.Species);
+						const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
 
-						_stStatic.World = fish.Transform;
+						_stStatic.World = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
 						_stStatic.Color = Vector4::One;
 						_stStatic.AmbientLight = _rooms[fish.RoomNumber].AmbientLight;
 
