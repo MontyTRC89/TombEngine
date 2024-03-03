@@ -438,18 +438,22 @@ bool CanPlayerLookAround(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	// 1) Check if look mode is not None.
+	// 1) Check for modern control mode.
+	if (IsUsingModernControls())
+		return false;
+
+	// 2) Check if look mode is not None.
 	if (player.Control.Look.Mode == LookMode::None)
 		return false;
 
-	// 2) Check if drawn weapon has lasersight.
+	// 3) Check if drawn weapon has lasersight.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
 	{
 		return true;
 	}
 
-	// 3) Test for switchable target.
+	// 4) Test for switchable target.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.TargetEntity != nullptr)
 	{
