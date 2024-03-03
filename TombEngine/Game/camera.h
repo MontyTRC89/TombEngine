@@ -30,11 +30,14 @@ struct CAMERA_INFO
 	bool underwater;
 	int numberFrames;
 	int bounce;
-	int targetDistance;
-	short targetAngle;
-	short targetElevation;
-	short actualElevation;
-	short actualAngle;
+
+	// Camera sphere
+	short actualAngle	  = 0; // Azimuth angle
+	short targetAngle	  = 0;
+	short actualElevation = 0; // Altitude angle
+	short targetElevation = 0;
+	float targetDistance  = 0.0f;
+
 	short laraNode;
 	short box;
 	short number;
@@ -92,7 +95,7 @@ void InitializeCamera();
 void MoveCamera(GameVector* ideal, float speed);
 void ChaseCamera(const ItemInfo& playerItem);
 void CombatCamera(const ItemInfo& playerItem);
-void UpdateCameraElevation();
+void UpdateCameraSphere();
 bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst);
 void FixedCamera();
 void BounceCamera(ItemInfo* item, short bounce, short maxDistance);

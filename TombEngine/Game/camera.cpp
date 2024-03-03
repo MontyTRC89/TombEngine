@@ -37,12 +37,16 @@ constexpr auto SWIVEL_STEP_COUNT = 16;
 
 struct OLD_CAMERA
 {
-	short ActiveState;
-	short TargetState;
-	int targetDistance;
-	short actualElevation;
-	short targetElevation;
-	short actualAngle;
+	// Camera sphere
+	short actualAngle	  = 0.0f;
+	short actualElevation = 0;
+	short targetElevation = 0;
+	float targetDistance  = 0.0f;
+
+	// Player anim state
+	int ActiveState = 0;
+	int TargetState = 0;
+
 	Pose pos;
 	Pose pos2;
 	Vector3i target;
@@ -403,7 +407,7 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 	//activates code below ->  void CalculateCamera().
 	ItemCamera.ItemCameraOn = cond;
 
-	UpdateCameraElevation();
+	UpdateCameraSphere();
 
 	//get mesh 0 coordinates.	
 	auto pos = GetJointPosition(camSlotId, 0, Vector3i::Zero);
@@ -830,7 +834,7 @@ void ChaseCamera(const ItemInfo& playerItem)
 		Camera.targetElevation = ANGLE(-10.0f);
 
 	Camera.targetElevation += playerItem.Pose.Orientation.x;
-	UpdateCameraElevation();
+	UpdateCameraSphere();
 	ClampCameraXOrientation(player.Control.WaterStatus == WaterStatus::Underwater);
 
 	auto pointColl = GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, 0, 0, CLICK(1));
@@ -918,7 +922,7 @@ void CombatCamera(const ItemInfo& playerItem)
 		TargetSnaps = 0;
 	}
 
-	UpdateCameraElevation();
+	UpdateCameraSphere();
 	ClampCameraXOrientation(player.Control.WaterStatus == WaterStatus::Underwater);
 
 	Camera.targetDistance = BLOCK(1.5f);
@@ -926,10 +930,11 @@ void CombatCamera(const ItemInfo& playerItem)
 	HandleCameraFollow(playerItem, true);
 }
 
-void UpdateCameraElevation()
+void UpdateCameraSphere()
 {
-	constexpr auto CAMERA_AXIS_COEFF = 20.0f;
-	constexpr auto MOUSE_AXIS_COEFF	 = 250.0f;
+	constexpr auto CAMERA_AXIS_COEFF = 30.0f;
+	constexpr auto MOUSE_AXIS_COEFF	 = 30.0f;
+	constexpr auto SMOOTHING_FACTOR	 = 8.0f;
 
 	DoThumbstickCamera();
 
@@ -945,7 +950,9 @@ void UpdateCameraElevation()
 	{
 		if (IsUsingModernControls())
 		{
-			auto axis = (GetCameraAxis() != Vector2::Zero) ? (GetCameraAxis() * CAMERA_AXIS_COEFF) : (GetMouseAxis() * MOUSE_AXIS_COEFF);
+			auto axis = (GetCameraAxis() != Vector2::Zero) ? GetCameraAxis() : GetMouseAxis();
+			float sensitivity = MOUSE_AXIS_COEFF / (1.0f + (abs(axis.x) + abs(axis.y)));
+			axis *= sensitivity * SMOOTHING_FACTOR;
 
 			Camera.actualAngle += ANGLE(axis.x);
 			Camera.actualElevation -= ANGLE(axis.y);
@@ -1558,14 +1565,14 @@ void UpdateMikePos(const ItemInfo& item)
 	}
 	else
 	{
-		// Recalculate Y orient.
-		if (!(IsUsingModernControls() && TestPlayerCombatMode(*LaraItem)))
+		// Recalculate azimuth angle.
+		if ((IsUsingModernControls() && !TestPlayerCombatMode(*LaraItem)) || !IsUsingModernControls())
 		{
 			auto deltaPos = Camera.target.ToVector3() - Camera.pos.ToVector3();
-			short targetAngle = FROM_RAD(atan2(deltaPos.x, deltaPos.z));
+			short targetAximuthAngle = FROM_RAD(atan2(deltaPos.x, deltaPos.z));
 
 			float alpha = 1.0f / Camera.speed;
-			Camera.actualAngle += Geometry::GetShortestAngle(Camera.actualAngle, targetAngle) * alpha;
+			Camera.actualAngle += Geometry::GetShortestAngle(Camera.actualAngle, targetAximuthAngle) * alpha;
 		}
 
 		int perspective = ((g_Configuration.ScreenWidth / 2) * phd_cos(CurrentFOV / 2)) / phd_sin(CurrentFOV / 2);
