@@ -1598,6 +1598,28 @@ static void ParseStatistics(const Save::SaveGame* s, bool hub)
 
 static void ParseLua(const Save::SaveGame* s)
 {
+	// Event sets
+
+	if (g_Level.VolumeEventSets.size() == s->volume_event_sets()->size())
+	{
+		for (int i = 0; i < s->volume_event_sets()->size(); ++i)
+		{
+			auto set_saved = s->volume_event_sets()->Get(i);
+			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
+				g_Level.VolumeEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
+		}
+	}
+
+	if (g_Level.GlobalEventSets.size() == s->global_event_sets()->size())
+	{
+		for (int i = 0; i < s->global_event_sets()->size(); ++i)
+		{
+			auto set_saved = s->global_event_sets()->Get(i);
+			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
+				g_Level.GlobalEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
+		}
+	}
+
 	auto loadedVars = std::vector<SavedVar>{};
 
 	auto unionVec = s->script_vars();
@@ -1675,15 +1697,15 @@ static void ParseLua(const Save::SaveGame* s)
 	g_GameScript->SetVariables(loadedVars);
 
 	auto populateCallbackVecs = [&s](auto callbackFunc)
-		{
-			auto callbacksVec = std::vector<std::string>{};
-			auto callbacksOffsetVec = std::invoke(callbackFunc, s);
+	{
+		auto callbacksVec = std::vector<std::string>{};
+		auto callbacksOffsetVec = std::invoke(callbackFunc, s);
 
-			for (const auto& e : *callbacksOffsetVec)
-				callbacksVec.push_back(e->str());
+		for (const auto& e : *callbacksOffsetVec)
+			callbacksVec.push_back(e->str());
 
-			return callbacksVec;
-		};
+		return callbacksVec;
+	};
 
 	auto callbacksPreStartVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_start);
 	auto callbacksPostStartVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_start);
@@ -1711,28 +1733,6 @@ static void ParseLua(const Save::SaveGame* s)
 		callbacksPostLoadVec,
 		callbacksPreLoopVec,
 		callbacksPostLoopVec);
-
-	// Event sets
-
-	if (g_Level.VolumeEventSets.size() == s->volume_event_sets()->size())
-	{
-		for (int i = 0; i < s->volume_event_sets()->size(); ++i)
-		{
-			auto set_saved = s->volume_event_sets()->Get(i);
-			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
-				g_Level.VolumeEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
-		}
-	}
-
-	if (g_Level.GlobalEventSets.size() == s->global_event_sets()->size())
-	{
-		for (int i = 0; i < s->global_event_sets()->size(); ++i)
-		{
-			auto set_saved = s->global_event_sets()->Get(i);
-			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
-				g_Level.GlobalEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
-		}
-	}
 }
 
 static void ParsePlayer(const Save::SaveGame* s)
