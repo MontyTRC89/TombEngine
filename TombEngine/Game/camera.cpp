@@ -756,7 +756,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			target = GameVector(Geometry::TranslatePoint(target.ToVector3i(), dir, BUFFER), target.RoomNumber);
 
 		// Update camera position.
-		MoveCamera(&target, Camera.speed * ((Camera.type != CameraType::Look) ? 0.25f : 1.0f));
+		MoveCamera(&target, Camera.speed * ((Camera.type != CameraType::Look) ? 0.2f : 1.0f));
 	}
 	else
 	{
@@ -938,18 +938,17 @@ void UpdateCameraElevation()
 		auto pos = GetJointPosition(LaraItem, Camera.laraNode, Vector3i::Zero);
 		auto pos1 = GetJointPosition(LaraItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
 		pos = pos1 - pos;
+
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
 	else
 	{
 		if (IsUsingModernControls())
 		{
-			const auto& cameraAxis = GetCameraAxis();
-			const auto& mouseAxis = GetMouseAxis();
-			const auto& activeAxis = (cameraAxis != Vector2::Zero) ? (cameraAxis * CAMERA_AXIS_COEFF) : (mouseAxis * MOUSE_AXIS_COEFF);
+			auto axis = (GetCameraAxis() != Vector2::Zero) ? (GetCameraAxis() * CAMERA_AXIS_COEFF) : (GetMouseAxis() * MOUSE_AXIS_COEFF);
 
-			Camera.actualAngle += ANGLE(activeAxis.x);
-			Camera.actualElevation -= ANGLE(activeAxis.y);
+			Camera.actualAngle += ANGLE(axis.x);
+			Camera.actualElevation -= ANGLE(axis.y);
 		}
 		else
 		{
@@ -1559,11 +1558,19 @@ void UpdateMikePos(const ItemInfo& item)
 	}
 	else
 	{
-		int phdPerspective = g_Configuration.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+		// Recalculate Y orient.
+		if (!(IsUsingModernControls() && TestPlayerCombatMode(*LaraItem)))
+		{
+			auto deltaPos = Camera.target.ToVector3() - Camera.pos.ToVector3();
+			short targetAngle = FROM_RAD(atan2(deltaPos.x, deltaPos.z));
 
-		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
-		Camera.mikePos.x = Camera.pos.x + phdPerspective * phd_sin(Camera.actualAngle);
-		Camera.mikePos.z = Camera.pos.z + phdPerspective * phd_cos(Camera.actualAngle);
+			float alpha = 1.0f / Camera.speed;
+			Camera.actualAngle += Geometry::GetShortestAngle(Camera.actualAngle, targetAngle) * alpha;
+		}
+
+		int perspective = ((g_Configuration.ScreenWidth / 2) * phd_cos(CurrentFOV / 2)) / phd_sin(CurrentFOV / 2);
+		Camera.mikePos.x = Camera.pos.x + (perspective * phd_sin(Camera.actualAngle));
+		Camera.mikePos.z = Camera.pos.z + (perspective * phd_cos(Camera.actualAngle));
 		Camera.mikePos.y = Camera.pos.y;
 	}
 }
