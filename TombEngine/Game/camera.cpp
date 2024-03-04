@@ -106,21 +106,19 @@ float CinematicBarsSpeed = 0;
 
 void DoThumbstickCamera()
 {
-	constexpr auto X_ANGLE_CONSTRAINT = ANGLE(80.0f);
-	constexpr auto Y_ANGLE_CONSTRAINT = ANGLE(120.0f);
+	constexpr auto AZIMUTH_ANGLE_CONSTRAINT	 = ANGLE(80.0f);
+	constexpr auto ALTITUDE_ANGLE_CONSTRAINT = ANGLE(120.0f);
 
 	if (!g_Configuration.EnableThumbstickCamera)
 		return;
 
 	if (Camera.laraNode == -1 && Camera.target.ToVector3i() == OldCam.target)
 	{
-		const auto& cameraAxis = GetCameraAxis();
+		if (abs(GetCameraAxis().x) > EPSILON && abs(Camera.targetAngle) == 0)
+			Camera.targetAngle = ANGLE(ALTITUDE_ANGLE_CONSTRAINT * GetCameraAxis().x);
 
-		if (abs(cameraAxis.x) > EPSILON && abs(Camera.targetAngle) == 0)
-			Camera.targetAngle = ANGLE(Y_ANGLE_CONSTRAINT * cameraAxis.x);
-
-		if (abs(cameraAxis.y) > EPSILON)
-			Camera.targetElevation = ANGLE((X_ANGLE_CONSTRAINT * cameraAxis.y) - ANGLE(10.0f));
+		if (abs(GetCameraAxis().y) > EPSILON)
+			Camera.targetElevation = ANGLE((AZIMUTH_ANGLE_CONSTRAINT * GetCameraAxis().y) - ANGLE(10.0f));
 	}
 }
 
@@ -783,8 +781,8 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 	}
 	else
 	{
-		float farthestDistSqr = INFINITY;
 		auto farthestIdealPos = Camera.pos;
+		float farthestDistSqr = INFINITY;
 
 		// Determine ideal position around player.
 		for (int i = 0; i < SWIVEL_STEP_COUNT; i++)
@@ -811,8 +809,8 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 					float distSqr = Vector3::DistanceSquared(Camera.pos.ToVector3(), idealPos.ToVector3());
 					if (distSqr < farthestDistSqr)
 					{
-						farthestDistSqr = distSqr;
 						farthestIdealPos = idealPos;
+						farthestDistSqr = distSqr;
 					}
 				}
 			}
