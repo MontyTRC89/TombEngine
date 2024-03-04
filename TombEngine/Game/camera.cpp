@@ -44,9 +44,7 @@ struct CameraSphereData
 	int		RoomNumberTarget = 0;
 
 	Vector3 Pivot		 = Vector3::Zero;
-	Vector3 PivotTarget	 = Vector3::Zero;
 	Vector3 LookAt		 = Vector3::Zero;
-	Vector3 LookAtTarget = Vector3::Zero;
 
 	short AzimuthAngle		  = 0;
 	short AzimuthAngleTarget  = 0;
@@ -529,34 +527,23 @@ void RefreshFixedCamera(short camNumber)
 	MoveCamera(&origin, moveSpeed);
 }
 
-static void ClampCameraXOrientation(bool isUnderwater)
+static void ClampCameraAltitudeAngle(bool isUnderwater)
 {
-	constexpr auto MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT = std::pair<short, short>(ANGLE(-85.0f), ANGLE(70.0f));
-	constexpr auto MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT	= std::pair<short, short>(ANGLE(-85.0f), ANGLE(80.0f));
-	constexpr auto TANK_CAMERA_X_ANGLE_CONSTRAINT				= ANGLE(85.0f);
+	constexpr auto MODERN_CAMERA_ABOVE_WATER_ANGLE_CONSTRAINT = std::pair<short, short>(ANGLE(-80.0f), ANGLE(70.0f));
+	constexpr auto MODERN_CAMERA_UNDERWATER_ANGLE_CONSTRAINT  = std::pair<short, short>(ANGLE(-80.0f), ANGLE(80.0f));
+	constexpr auto TANK_CAMERA_ANGLE_CONSTRAINT				  = std::pair<short, short>(ANGLE(-85.0f), ANGLE(85.0f));
 
-	if (IsUsingModernControls())
+	const auto& angleConstraint = IsUsingModernControls() ?
+		(isUnderwater ? MODERN_CAMERA_UNDERWATER_ANGLE_CONSTRAINT : MODERN_CAMERA_ABOVE_WATER_ANGLE_CONSTRAINT) :
+		TANK_CAMERA_ANGLE_CONSTRAINT;
+
+	if (Camera.actualElevation > angleConstraint.second)
 	{
-		const auto& xAngleConstraint = isUnderwater ? MODERN_CAMERA_UNDERWATER_X_ANGLE_CONSTRAINT : MODERN_CAMERA_ABOVE_WATER_X_ANGLE_CONSTRAINT;
-		if (Camera.actualElevation > xAngleConstraint.second)
-		{
-			Camera.actualElevation = xAngleConstraint.second;
-		}
-		else if (Camera.actualElevation < xAngleConstraint.first)
-		{
-			Camera.actualElevation = xAngleConstraint.first;
-		}
+		Camera.actualElevation = angleConstraint.second;
 	}
-	else
+	else if (Camera.actualElevation < angleConstraint.first)
 	{
-		if (Camera.actualElevation > TANK_CAMERA_X_ANGLE_CONSTRAINT)
-		{
-			Camera.actualElevation = TANK_CAMERA_X_ANGLE_CONSTRAINT;
-		}
-		else if (Camera.actualElevation < -TANK_CAMERA_X_ANGLE_CONSTRAINT)
-		{
-			Camera.actualElevation = -TANK_CAMERA_X_ANGLE_CONSTRAINT;
-		}
+		Camera.actualElevation = angleConstraint.first;
 	}
 }
 
@@ -867,7 +854,7 @@ void ChaseCamera(const ItemInfo& playerItem)
 
 	Camera.targetElevation += playerItem.Pose.Orientation.x;
 	UpdateCameraSphere();
-	ClampCameraXOrientation(player.Control.WaterStatus == WaterStatus::Underwater);
+	ClampCameraAltitudeAngle(player.Control.WaterStatus == WaterStatus::Underwater);
 
 	auto pointColl = GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, 0, 0, CLICK(1));
 
@@ -955,7 +942,7 @@ void CombatCamera(const ItemInfo& playerItem)
 	}
 
 	UpdateCameraSphere();
-	ClampCameraXOrientation(player.Control.WaterStatus == WaterStatus::Underwater);
+	ClampCameraAltitudeAngle(player.Control.WaterStatus == WaterStatus::Underwater);
 
 	Camera.targetDistance = BLOCK(1.5f);
 
