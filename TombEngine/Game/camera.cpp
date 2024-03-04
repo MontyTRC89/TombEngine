@@ -35,6 +35,22 @@ constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
 constexpr auto SWIVEL_STEP_COUNT = 16;
 
+// TODO: For future CameraObject class.
+struct CameraSphereData
+{
+	Vector3 Position		 = Vector3::Zero;
+	int		RoomNumber		 = 0;
+	Vector3 PositionTarget	 = Vector3::Zero;
+	int		RoomNumberTarget = 0;
+
+	short AzimuthAngle		  = 0;
+	short AzimuthAngleTarget  = 0;
+	short AltitudeAngle		  = 0;
+	short AltitudeAngleTarget = 0;
+	float Distance			  = 0.0f;
+	float DistanceTarget	  = 0.0f;
+};
+
 struct OLD_CAMERA
 {
 	// Camera sphere
@@ -736,31 +752,36 @@ static std::optional<GameVector> GetCameraObjectLosIntersect(const GameVector& i
 
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
-	constexpr auto BUFFER = 100;
+	constexpr auto LOOK_AT_DIST = BLOCK(0.5f);
+	constexpr auto BUFFER		= 100;
 
 	// Move camera.
 	if (IsUsingModernControls())
 	{
 		auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
-		auto idealPos = Geometry::TranslatePoint(Camera.target.ToVector3(), dir, Camera.targetDistance);
+		auto basePos = Geometry::TranslatePoint(Camera.target.ToVector3(), dir, Camera.targetDistance);
 
-		// Determine best position.
-		auto origin = Camera.target;
-		auto target = GameVector(idealPos, GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, dir, Camera.targetDistance).RoomNumber);
-		LOSAndReturnTarget(&origin, &target, 0);
+		// Determine pivot and ideal.
+		auto pivotPos = Camera.target;
+		auto idealPos = GameVector(basePos, GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, dir, Camera.targetDistance).RoomNumber);
+		LOSAndReturnTarget(&pivotPos, &idealPos, 0);
 
 		// Collide with objects.
-		auto objectLosIntersect = GetCameraObjectLosIntersect(target);
+		auto objectLosIntersect = GetCameraObjectLosIntersect(idealPos);
 		if (objectLosIntersect.has_value())
-			target = *objectLosIntersect;
+			idealPos = *objectLosIntersect;
 
-		// Apply buffer if origin and target are too close.
-		float dist = Vector3::Distance(origin.ToVector3(), target.ToVector3());
+		// Apply buffer if pivot and ideal are too close.
+		float dist = Vector3::Distance(pivotPos.ToVector3(), idealPos.ToVector3());
 		if (dist <= BUFFER)
-			target = GameVector(Geometry::TranslatePoint(target.ToVector3i(), dir, BUFFER), target.RoomNumber);
+			idealPos = GameVector(Geometry::TranslatePoint(idealPos.ToVector3i(), dir, BUFFER), idealPos.RoomNumber);
 
 		// Update camera position.
-		MoveCamera(&target, Camera.speed * ((Camera.type != CameraType::Look) ? 0.2f : 1.0f));
+		float speed = Camera.speed * ((Camera.type != CameraType::Look) ? 0.2f : 1.0f);
+		MoveCamera(&idealPos, speed);
+
+		// Calculate lookAt.
+		auto lookAtPos = Geometry::TranslatePoint(basePos, -dir, LOOK_AT_DIST);
 	}
 	else
 	{
@@ -770,8 +791,8 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		// Determine ideal position around player.
 		for (int i = 0; i < SWIVEL_STEP_COUNT; i++)
 		{
-			short yOrient = (i == 0) ? Camera.actualAngle : ANGLE(90.0f * (i - 1));
-			auto dir = -EulerAngles(Camera.actualElevation, yOrient, 0).ToDirection();
+			short azimuthAngle = (i == 0) ? Camera.actualAngle : ANGLE(90.0f * (i - 1));
+			auto dir = -EulerAngles(Camera.actualElevation, azimuthAngle, 0).ToDirection();
 			auto idealPos = GameVector(Geometry::TranslatePoint(Camera.target.ToVector3i(), dir, Camera.targetDistance), Camera.target.RoomNumber);
 
 			// Assess room LOS.
