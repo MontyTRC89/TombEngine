@@ -783,7 +783,8 @@ int WrapToRange(int value, int range)
 // NOTE: Modern control version.
 void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool isStrafing)
 {
-	constexpr auto BASE_ANGLE = ANGLE(90.0f);
+	constexpr auto BASE_ANGLE		 = ANGLE(90.0f);
+	constexpr auto STRAFE_LEAN_COEFF = 0.5f;
 
 	auto& player = GetLaraInfo(item);
 
@@ -798,7 +799,7 @@ void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool 
 		if (absDeltaAngle > BASE_ANGLE)
 			absDeltaAngle -= BASE_ANGLE;
 
-		absDeltaAngle *= 0.5f;
+		absDeltaAngle *= STRAFE_LEAN_COEFF;
 	}
 
 	// Calculate target lean orientation.
