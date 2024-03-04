@@ -316,7 +316,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		if (TestPlayerCombatMode(*item) || IsHeld(In::Walk))
+		if (IsPlayerStrafing(*item) || IsHeld(In::Walk))
 		{
 			player.Control.JumpDirection = GetPlayerJumpDirection(*item, *coll);
 			switch (player.Control.JumpDirection)

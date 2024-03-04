@@ -775,8 +775,13 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing, short relHe
 	player.Control.HeadingOrientTarget.y = headingAngle;
 }
 
+int WrapToRange(int value, int range)
+{
+	return (value % range + range) % range;
+}
+
 // NOTE: Modern control version.
-void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha)
+void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool isStrafing)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
@@ -786,8 +791,17 @@ void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha)
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 	int sign = std::copysign(1, deltaAngle);
 
+	short absDeltaAngle = abs(deltaAngle);
+	if (true)
+	{
+		if (absDeltaAngle > BASE_ANGLE)
+			absDeltaAngle -= BASE_ANGLE;
+
+		absDeltaAngle /= 2;
+	}
+
 	// Calculate target lean orientation.
-	float leanAngleAlpha = std::clamp(abs(deltaAngle) / (float)BASE_ANGLE, 0.0f, 1.0f);
+	float leanAngleAlpha = std::clamp(absDeltaAngle / (float)BASE_ANGLE, 0.0f, 1.0f);
 	short targetLeanAngle = (leanAngleMax * leanAngleAlpha) * sign;
 	auto targetOrient = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, targetLeanAngle);
 
@@ -1526,7 +1540,7 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 
 	if (IsUsingModernControls())
 	{
-		if (TestPlayerCombatMode(item) || IsHeld(In::Walk))
+		if (IsPlayerStrafing(item) || IsHeld(In::Walk))
 		{
 			// TODO: Up case.
 			short deltaAngle = GetPlayerRelMoveAngle(item);

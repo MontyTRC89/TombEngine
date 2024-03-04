@@ -156,8 +156,9 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
-		HandlePlayerTurnLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA);
+		bool isStrafing = IsPlayerStrafing(*item);
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
 		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
 	}
 	else
@@ -298,8 +299,9 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
-		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA);
+		bool isStrafing = IsPlayerStrafing(*item);
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
 		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
 	}
 	else
@@ -489,7 +491,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			// Directional jump intent locks orientation.
-			if (!(TestPlayerCombatMode(*item) || (IsHeld(In::Jump) && IsHeld(In::Walk))))
+			if (!(IsPlayerStrafing(*item) || (IsHeld(In::Jump) && IsHeld(In::Walk))))
 			{
 				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
 				HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
@@ -1448,7 +1450,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, REL_HEADING_ANGLE);
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
 	}
 	else if (IsUsingEnhancedControls())
 	{
@@ -1553,7 +1555,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, REL_HEADING_ANGLE);
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
 	}
 	else if (IsUsingEnhancedControls())
 	{
@@ -1785,8 +1787,10 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		float turnAlpha = PLAYER_WADE_TURN_ALPHA / (isInSwamp ? 3 : 1);
-		HandlePlayerTurnY(*item, turnAlpha);
-		HandlePlayerTurnLean(*item, LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f), turnAlpha);
+		bool isStrafing = IsPlayerStrafing(*item);
+
+		HandlePlayerTurnY(*item, turnAlpha, IsPlayerStrafing(*item), isStrafing);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f), turnAlpha, isStrafing);
 		HandlePlayerTurnFlex(*item, turnAlpha);
 	}
 	else

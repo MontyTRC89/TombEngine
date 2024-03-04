@@ -773,7 +773,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		auto lookAtDir = Camera.target.ToVector3() - Camera.pos.ToVector3();
 		lookAtDir.Normalize();
 		auto lookAtPos = Geometry::TranslatePoint(pivotPos.ToVector3(), lookAtDir, LOOK_AT_DIST);
-		
+
 		// Handle look at.
 		Camera.target = GameVector(lookAtPos, playerItem.RoomNumber);
 		LookAt(&Camera, 0);
@@ -1586,7 +1586,7 @@ void UpdateMikePos(const ItemInfo& item)
 	else
 	{
 		// Recalculate azimuth angle.
-		if ((IsUsingModernControls() && !TestPlayerCombatMode(*LaraItem)) || !IsUsingModernControls())
+		if ((IsUsingModernControls() && !IsPlayerStrafing(*LaraItem)) || !IsUsingModernControls())
 		{
 			auto deltaPos = Camera.target.ToVector3() - Camera.pos.ToVector3();
 			short targetAximuthAngle = FROM_RAD(atan2(deltaPos.x, deltaPos.z));

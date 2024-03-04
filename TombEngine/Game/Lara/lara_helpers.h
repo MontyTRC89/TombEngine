@@ -32,7 +32,7 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 void HandlePlayerTurnX(ItemInfo& item, float alpha);
 void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing = false, short relHeadingAngle = ANGLE(0.0f));
-void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha);
+void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool isStrafing = false);
 void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
 void HandlePlayerTurnFlex(ItemInfo& item, float alpha);
 void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha);

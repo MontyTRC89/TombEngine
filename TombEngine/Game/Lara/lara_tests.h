@@ -49,7 +49,7 @@ bool IsJumpState(int state);
 bool IsRunJumpQueueableState(int state);
 bool IsRunJumpCountableState(int state);
 
-bool TestPlayerCombatMode(const ItemInfo& item);
+bool IsPlayerStrafing(const ItemInfo& item);
 bool HasOppositeAction(const ItemInfo& item);
 bool HasClimbAction(const ItemInfo& item);
 bool HasCrouchAction(const ItemInfo& item);

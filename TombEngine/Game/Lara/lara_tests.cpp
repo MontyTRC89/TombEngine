@@ -1212,12 +1212,21 @@ bool IsRunJumpCountableState(int state)
 	return TestState(state, runningJumpTimerStates);
 }
 
-bool TestPlayerCombatMode(const ItemInfo& item)
+bool IsPlayerStrafing(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	return (player.Control.HandStatus == HandStatus::WeaponDraw ||
-			player.Control.HandStatus == HandStatus::WeaponReady);
+	if (!IsUsingModernControls())
+		return false;
+
+	if (IsHeld(In::Look) ||
+		player.Control.HandStatus == HandStatus::WeaponDraw ||
+		player.Control.HandStatus == HandStatus::WeaponReady)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool HasOppositeAction(const ItemInfo& item)
