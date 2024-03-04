@@ -98,8 +98,14 @@ void Renderer::UpdateLaraAnimations(bool force)
 	_laraWorldMatrix = rotMatrix * tMatrix;
 	rItem.World = _laraWorldMatrix;
 
-	// Update extra head and torso rotations.
-	playerObject.LinearizedBones[LM_TORSO]->ExtraRotation = Lara.ExtraTorsoRot.ToQuaternion();
+	auto extraHipRot = Lara.ExtraHipRot.ToQuaternion();
+	auto negExtraHipRot = extraHipRot;
+	negExtraHipRot.Conjugate();
+
+	// TODO: Rotate hips in absolute space.
+	// Update extra hip, torso, and head rotations.
+	playerObject.LinearizedBones[LM_HIPS]->ExtraRotation = extraHipRot;
+	playerObject.LinearizedBones[LM_TORSO]->ExtraRotation = Lara.ExtraTorsoRot.ToQuaternion() * negExtraHipRot;
 	playerObject.LinearizedBones[LM_HEAD]->ExtraRotation = Lara.ExtraHeadRot.ToQuaternion();
 
 	// First calculate matrices for legs, hips, head, and torso.

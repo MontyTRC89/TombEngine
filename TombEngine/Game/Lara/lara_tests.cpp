@@ -1216,11 +1216,16 @@ bool IsPlayerStrafing(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
+	// 1) Check if modern control mode is enabled.
 	if (!IsUsingModernControls())
 		return false;
 
-	if (IsHeld(In::Look) ||
-		player.Control.HandStatus == HandStatus::WeaponDraw ||
+	// 2) Test for Look input action.
+	if (IsHeld(In::Look))
+		return true;
+
+	// 3) Test for combat mode.
+	if (player.Control.HandStatus == HandStatus::WeaponDraw ||
 		player.Control.HandStatus == HandStatus::WeaponReady)
 	{
 		return true;
@@ -1233,9 +1238,11 @@ bool HasOppositeAction(const ItemInfo& item)
 {
 	if (IsUsingModernControls())
 	{
-		// TODO: Camera orientation-dependent opposite action check. Will mean Left+Right can be used too.
-		if (IsHeld(In::Forward) && IsHeld(In::Back))
+		if ((IsHeld(In::Forward) && IsHeld(In::Back)) ||
+			(IsHeld(In::Left) && IsHeld(In::Right)))
+		{
 			return true;
+		}
 	}
 	else
 	{

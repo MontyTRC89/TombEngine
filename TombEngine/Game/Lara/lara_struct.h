@@ -1366,8 +1366,9 @@ struct LaraInfo
 	TorchData		  Torch = {};
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {}; // TODO: Move to WeaponControlData.
 
-	EulerAngles ExtraHeadRot	= EulerAngles::Identity;
+	EulerAngles ExtraHipRot		= EulerAngles::Identity; // TODO: Savegame.
 	EulerAngles ExtraTorsoRot	= EulerAngles::Identity;
+	EulerAngles ExtraHeadRot	= EulerAngles::Identity;
 	EulerAngles TargetArmOrient = EulerAngles::Identity;
 	ArmInfo		LeftArm			= {};
 	ArmInfo		RightArm		= {};

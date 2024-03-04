@@ -157,9 +157,10 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		bool isStrafing = IsPlayerStrafing(*item);
+
 		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
 		HandlePlayerTurnLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
-		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
 	}
 	else
 	{
@@ -300,9 +301,10 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		bool isStrafing = IsPlayerStrafing(*item);
+
 		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
 		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
-		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
 	}
 	else
 	{
@@ -1791,7 +1793,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 
 		HandlePlayerTurnY(*item, turnAlpha, IsPlayerStrafing(*item), isStrafing);
 		HandlePlayerTurnLean(*item, LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f), turnAlpha, isStrafing);
-		HandlePlayerTurnFlex(*item, turnAlpha);
+		HandlePlayerTurnFlex(*item, turnAlpha, isStrafing);
 	}
 	else
 	{

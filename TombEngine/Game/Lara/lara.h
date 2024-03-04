@@ -11,7 +11,7 @@ constexpr auto FRONT_ARC		   = ANGLE(90.0f);
 
 // Modern control turn alphas
 constexpr auto PLAYER_STANDARD_TURN_ALPHA	  = 0.25f;
-constexpr auto PLAYER_SPRINT_TURN_ALPHA		  = 0.05f;
+constexpr auto PLAYER_SPRINT_TURN_ALPHA		  = 0.06f;
 constexpr auto PLAYER_CRAWL_TURN_ALPHA		  = 0.1f;
 constexpr auto PLAYER_JUMP_PREPARE_TURN_ALPHA = 0.6f;
 constexpr auto PLAYER_JUMP_TURN_ALPHA		  = 0.02f;

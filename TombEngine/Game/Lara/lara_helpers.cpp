@@ -828,12 +828,14 @@ void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, s
 }
 
 // NOTE: Modern control version.
-void HandlePlayerTurnFlex(ItemInfo& item, float alpha)
+void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 {
-	constexpr auto FLEX_ANGLE_CONSTRAINT = ANGLE(100.0f);
-	constexpr auto HEAD_ROT_COEFF		 = 0.5f;
-	constexpr auto TORSO_ROT_COEFF		 = 0.5f;
-	constexpr auto Z_ROT_COEFF			 = 0.1f;
+	constexpr auto LOWER_FLEX_ANGLE_CONSTRAINT	 = ANGLE(70.0f);
+	constexpr auto UPPER_FLEX_ANGLE_CONSTRAINT	 = ANGLE(100.0f);
+	constexpr auto UPPER_FLEX_ANGLE_STRAFE_COEFF = 0.4f;
+	constexpr auto TORSO_ROT_COEFF				 = 0.5f;
+	constexpr auto HEAD_ROT_COEFF				 = 0.5f;
+	constexpr auto Z_ROT_COEFF					 = 0.1f;
 
 	auto& player = GetLaraInfo(item);
 
@@ -841,22 +843,31 @@ void HandlePlayerTurnFlex(ItemInfo& item, float alpha)
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 	int sign = std::copysign(1, deltaAngle);
 
-	// Calculate target flex rotation.
-	float flexAngleAlpha = std::clamp(abs(deltaAngle) / (float)FLEX_ANGLE_CONSTRAINT, 0.0f, 1.0f);
-	short targetFlexAngle = (FLEX_ANGLE_CONSTRAINT * flexAngleAlpha) * sign;
-	auto targetFlexRot = EulerAngles(player.ExtraHeadRot.x, targetFlexAngle, targetFlexAngle * Z_ROT_COEFF);
+	// Calculate upper flex rotation.
+	float upperFlexAngleAlpha = std::clamp(abs(deltaAngle) / (float)UPPER_FLEX_ANGLE_CONSTRAINT, 0.0f, 1.0f);
+	float upperFlexAngleCoeff = isStrafing ? UPPER_FLEX_ANGLE_STRAFE_COEFF : 1.0f;
+	short upperFlexAngle = ((UPPER_FLEX_ANGLE_CONSTRAINT * upperFlexAngleAlpha) * sign) * upperFlexAngleCoeff;
+	auto upperFlexRot = EulerAngles(player.ExtraHeadRot.x, upperFlexAngle, upperFlexAngle * Z_ROT_COEFF);
 
-	// Flex head and torso.
-	player.ExtraHeadRot.Lerp(targetFlexRot * HEAD_ROT_COEFF, alpha);
-	player.ExtraTorsoRot.Lerp(targetFlexRot * TORSO_ROT_COEFF, alpha);
+	// Calculate lower flex rotation.
+	short lowerFlexAngle = isStrafing ? (GetPlayerHeadingAngleY(item) - item.Pose.Orientation.y) : 0;
+	lowerFlexAngle = std::clamp<short>(lowerFlexAngle, -LOWER_FLEX_ANGLE_CONSTRAINT, LOWER_FLEX_ANGLE_CONSTRAINT);
+	auto lowerFlexRot = EulerAngles(0, lowerFlexAngle, 0);
+
+	int headFlexSign = isStrafing ? -1 : 1;
+
+	// Flex hips, torso, and head.
+	player.ExtraHipRot.Lerp(lowerFlexRot, alpha);
+	player.ExtraTorsoRot.Lerp(upperFlexRot * TORSO_ROT_COEFF, alpha);
+	player.ExtraHeadRot.Lerp((upperFlexRot * HEAD_ROT_COEFF) * headFlexSign, alpha);
 }
 
 // NOTE: Modern control version.
 void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha)
 {
 	constexpr auto FLEX_ANGLE_CONSTRAINT = ANGLE(40.0f);
-	constexpr auto HEAD_ROT_COEFF		 = 0.6f;
 	constexpr auto TORSO_ROT_COEFF		 = 0.4f;
+	constexpr auto HEAD_ROT_COEFF		 = 0.6f;
 	constexpr auto Y_ROT_COEFF			 = 0.75f;
 
 	auto& player = GetLaraInfo(item);
@@ -867,12 +878,12 @@ void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha)
 
 	// Calculate target flex rotation.
 	float flexAngleAlpha = std::clamp(abs(deltaAngle) / (float)FLEX_ANGLE_CONSTRAINT, 0.0f, 1.0f);
-	short targetFlexAngle = (FLEX_ANGLE_CONSTRAINT * flexAngleAlpha) * sign;
-	auto targetFlexRot = EulerAngles(player.ExtraHeadRot.x, player.ExtraHeadRot.y + (targetFlexAngle * Y_ROT_COEFF), targetFlexAngle);
+	short flexAngle = (FLEX_ANGLE_CONSTRAINT * flexAngleAlpha) * sign;
+	auto flexRot = EulerAngles(player.ExtraHeadRot.x, player.ExtraHeadRot.y + (flexAngle * Y_ROT_COEFF), flexAngle);
 
 	// Flex head and torso.
-	player.ExtraHeadRot.Lerp(targetFlexRot * HEAD_ROT_COEFF, alpha);
-	player.ExtraTorsoRot.Lerp(targetFlexRot * TORSO_ROT_COEFF, alpha);
+	player.ExtraHeadRot.Lerp(flexRot * HEAD_ROT_COEFF, alpha);
+	player.ExtraTorsoRot.Lerp(flexRot * TORSO_ROT_COEFF, alpha);
 }
 
 // NOTE: Tank control version.
@@ -905,8 +916,8 @@ void HandlePlayerCrawlTurnFlex(ItemInfo& item)
 void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha)
 {
 	constexpr auto FLEX_ANGLE_CONSTRAINT = ANGLE(40.0f);
-	constexpr auto HEAD_ROT_COEFF		 = 0.6f;
 	constexpr auto TORSO_ROT_COEFF		 = 0.4f;
+	constexpr auto HEAD_ROT_COEFF		 = 0.6f;
 	constexpr auto Y_ROT_COEFF			 = 0.5f;
 
 	auto& player = GetLaraInfo(item);
@@ -922,13 +933,13 @@ void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha)
 	float flexAngleZAlpha = std::clamp(abs(deltaAngleZ) / (float)FLEX_ANGLE_CONSTRAINT, 0.0f, 1.0f);
 
 	// Calculate target flex rotation.
-	short targetFlexAngleX = (FLEX_ANGLE_CONSTRAINT * flexAngleXAlpha) * signX;
-	short targetFlexAngleZ = (FLEX_ANGLE_CONSTRAINT * flexAngleZAlpha) * signZ;
-	auto targetFlexRot = EulerAngles(targetFlexAngleX, player.ExtraHeadRot.y + (targetFlexAngleZ * Y_ROT_COEFF), targetFlexAngleZ);
+	short flexAngleX = (FLEX_ANGLE_CONSTRAINT * flexAngleXAlpha) * signX;
+	short flexAngleZ = (FLEX_ANGLE_CONSTRAINT * flexAngleZAlpha) * signZ;
+	auto flexRot = EulerAngles(flexAngleX, player.ExtraHeadRot.y + (flexAngleZ * Y_ROT_COEFF), flexAngleZ);
 
 	// Flex head and torso.
-	player.ExtraHeadRot.Lerp(targetFlexRot * HEAD_ROT_COEFF, alpha);
-	player.ExtraTorsoRot.Lerp(targetFlexRot * TORSO_ROT_COEFF, alpha);
+	player.ExtraHeadRot.Lerp(flexRot * HEAD_ROT_COEFF, alpha);
+	player.ExtraTorsoRot.Lerp(flexRot * TORSO_ROT_COEFF, alpha);
 }
 
 void HandlePlayerUpJumpShift(ItemInfo& item)
@@ -2128,8 +2139,9 @@ void ResetPlayerFlex(ItemInfo* item, float alpha)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.ExtraHeadRot.Lerp(EulerAngles::Identity, alpha);
+	player.ExtraHipRot.Lerp(EulerAngles::Identity, alpha);
 	player.ExtraTorsoRot.Lerp(EulerAngles::Identity, alpha);
+	player.ExtraHeadRot.Lerp(EulerAngles::Identity, alpha);
 }
 
 void ResetPlayerLookAround(ItemInfo& item, float alpha)
