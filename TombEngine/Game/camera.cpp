@@ -43,6 +43,11 @@ struct CameraSphereData
 	Vector3 PositionTarget	 = Vector3::Zero;
 	int		RoomNumberTarget = 0;
 
+	Vector3 Pivot		 = Vector3::Zero;
+	Vector3 PivotTarget	 = Vector3::Zero;
+	Vector3 LookAt		 = Vector3::Zero;
+	Vector3 LookAtTarget = Vector3::Zero;
+
 	short AzimuthAngle		  = 0;
 	short AzimuthAngleTarget  = 0;
 	short AltitudeAngle		  = 0;
@@ -702,7 +707,6 @@ static std::optional<GameVector> GetCameraObjectLosIntersect(const GameVector& i
 
 	float closestDistSqr = INFINITY;
 	auto closestIntersect = std::optional<Vector3>();
-
 	auto origin = idealPos.ToVector3();
 
 	// Collide items.
@@ -780,9 +784,15 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		float speed = Camera.speed * ((Camera.type != CameraType::Look) ? 0.2f : 1.0f);
 		MoveCamera(&idealPos, speed);
 
-		// TODO
 		// Calculate lookAt.
-		auto lookAtPos = Geometry::TranslatePoint(basePos, -dir, LOOK_AT_DIST);
+		auto lookAtDir = Camera.target.ToVector3() - Camera.pos.ToVector3();
+		lookAtDir.Normalize();
+		auto lookAtPos = Geometry::TranslatePoint(pivotPos.ToVector3(), lookAtDir, LOOK_AT_DIST);
+		
+		// Handle look at.
+		Camera.target = GameVector(lookAtPos, playerItem.RoomNumber);
+		LookAt(&Camera, 0);
+		Camera.target = pivotPos;
 	}
 	else
 	{
