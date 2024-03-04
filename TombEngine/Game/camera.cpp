@@ -121,7 +121,7 @@ void DoThumbstickCamera()
 	}
 }
 
-static int GetLookCameraVerticalOffset(const ItemInfo& item, const CollisionInfo& coll)
+static int GetCameraPlayerVerticalOffset(const ItemInfo& item, const CollisionInfo& coll)
 {
 	constexpr auto VERTICAL_OFFSET_DEFAULT		  = -BLOCK(1 / 16.0f);
 	constexpr auto VERTICAL_OFFSET_SWAMP		  = BLOCK(0.4f);
@@ -169,7 +169,7 @@ void LookCamera(const ItemInfo& item, const CollisionInfo& coll)
 
 	const auto& player = GetLaraInfo(item);
 
-	int verticalOffset = GetLookCameraVerticalOffset(item, coll);
+	int verticalOffset = GetCameraPlayerVerticalOffset(item, coll);
 	auto pivotOffset = Vector3i(0, verticalOffset, 0);
 
 	float idealDist = -std::max(Camera.targetDistance * CAMERA_DIST_COEFF, CAMERA_DIST_MAX);
@@ -780,6 +780,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		float speed = Camera.speed * ((Camera.type != CameraType::Look) ? 0.2f : 1.0f);
 		MoveCamera(&idealPos, speed);
 
+		// TODO
 		// Calculate lookAt.
 		auto lookAtPos = Geometry::TranslatePoint(basePos, -dir, LOOK_AT_DIST);
 	}
@@ -1357,16 +1358,19 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 		isFixedCamera = false;
 	}
 
-	auto bounds = GameBoundingBox(itemPtr);
-
 	// TODO: Use DX box.
 	auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
+	auto bounds = GameBoundingBox(itemPtr);
 
 	int x = 0;
 	int y = itemPtr->Pose.Position.y + bounds.Y2 + ((bounds.Y1 - bounds.Y2) / 2 * 1.5f);
 	int z = 0;
 	if (itemPtr->IsLara())
-		y = itemPtr->Pose.Position.y - (LaraCollision.Setup.Height * (IsUsingModernControls() ? 0.9f : 0.75f));
+	{
+		float heightCoeff = IsUsingModernControls() ? 0.9f : 0.75f;
+		int offset = GetCameraPlayerVerticalOffset(*itemPtr, LaraCollision) * heightCoeff;
+		y = itemPtr->Pose.Position.y + offset;
+	}
 
 	// Make player look toward target item.
 	if (Camera.item != nullptr)
