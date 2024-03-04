@@ -789,15 +789,16 @@ void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool 
 
 	// Calculate delta angle.
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
+	short absDeltaAngle = abs(deltaAngle);
 	int sign = std::copysign(1, deltaAngle);
 
-	short absDeltaAngle = abs(deltaAngle);
-	if (true)
+	// Adjust angle if strafing.
+	if (isStrafing)
 	{
 		if (absDeltaAngle > BASE_ANGLE)
 			absDeltaAngle -= BASE_ANGLE;
 
-		absDeltaAngle /= 2;
+		absDeltaAngle *= 0.5f;
 	}
 
 	// Calculate target lean orientation.
