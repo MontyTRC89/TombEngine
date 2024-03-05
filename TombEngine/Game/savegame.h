@@ -67,5 +67,6 @@ public:
 
 	static void SaveHub(int index);
 	static void LoadHub(int index);
+	static bool IsOnHub(int index);
 	static void ResetHub();
 };

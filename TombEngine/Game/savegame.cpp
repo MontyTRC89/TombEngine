@@ -1454,19 +1454,24 @@ void SaveGame::SaveHub(int index)
 		return;
 
 	// Build hub data.
-	TENLog("Saving hub data for level #" + std::to_string(index) + (Hub.count(index) > 0 ? " (overwrite)" : " (new)"), LogLevel::Info);
+	TENLog("Saving hub data for level #" + std::to_string(index) + (IsOnHub(index) ? " (overwrite)" : " (new)"), LogLevel::Info);
 	Hub[index] = Build();
 }
 
 void SaveGame::LoadHub(int index)
 {
 	// Don't attempt to load hub data if it doesn't exist, or level is a title level.
-	if (index == 0 || Hub.count(index) == 0)
+	if (index == 0 || !IsOnHub(index))
 		return;
 
 	// Load hub data.
 	TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
 	Parse(Hub[index], true);
+}
+
+bool SaveGame::IsOnHub(int index)
+{
+	return (Hub.count(index) > 0);
 }
 
 void SaveGame::ResetHub()
