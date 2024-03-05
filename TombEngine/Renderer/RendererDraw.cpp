@@ -2660,8 +2660,10 @@ namespace TEN::Renderer
 			{
 				auto weather = TEN::Effects::Environment::Weather;
 
-				auto translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * SKY_SIZE,
-					Camera.pos.y - 1536.0f, Camera.pos.z);
+				auto translation = Matrix::CreateTranslation(
+					renderView.Camera.WorldPosition.x + weather.SkyPosition(s) - i * SKY_SIZE,
+					renderView.Camera.WorldPosition.y - 1536.0f, 
+					renderView.Camera.WorldPosition.z);
 				auto world = rotation * translation;
 
 				_stStatic.World = (rotation * translation);
@@ -2685,7 +2687,7 @@ namespace TEN::Renderer
 
 			auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
-			_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+			_stStatic.World = Matrix::CreateTranslation(renderView.Camera.WorldPosition);
 			_stStatic.Color = Vector4::One;
 			_stStatic.ApplyFogBulbs = 1;
 			_cbStatic.UpdateData(_stStatic, _context.Get());
