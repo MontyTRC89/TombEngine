@@ -37,6 +37,11 @@ int Sync()
 	return nFrames;
 }
 
+double Clock_GetCurrent()
+{
+	return 0;
+}
+
 GameTime GetGameTime(int frameCount)
 {
 	GameTime result = {};

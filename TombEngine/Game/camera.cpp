@@ -58,6 +58,7 @@ GameVector LookCamPosition;
 GameVector LookCamTarget;
 Vector3i CamOldPos;
 CAMERA_INFO Camera;
+CAMERA_INFO PreviousCamera;
 ObjectCameraInfo ItemCamera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;

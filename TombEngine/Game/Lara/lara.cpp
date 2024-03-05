@@ -58,6 +58,7 @@ using namespace TEN::Gui;
 using TEN::Renderer::g_Renderer;
 
 LaraInfo Lara = {};
+LaraInfo OldLara = {};
 ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 
@@ -621,6 +622,13 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 
 	// Control player.
 	InItemControlLoop = true;
+	
+	// Copy current state to old state for interpolation
+	//memcpy(&item->OldPose, &item->Pose, sizeof(Pose));
+	//memcpy(&item->OldLocation, &item->Location, sizeof(Vector3i));
+	//memcpy(&item->OldAnimation, &item->Animation, sizeof(EntityAnimationData));
+	//memcpy(&OldLara, &Lara, sizeof(LaraInfo));
+
 	LaraControl(item, &LaraCollision);
 	HandlePlayerFlyCheat(*item);
 	InItemControlLoop = false;

@@ -2168,10 +2168,10 @@ namespace TEN::Renderer
 		RendererObject& moveableObj = *_moveableObjects[item->ObjectNumber];
 
 		// Bind item main properties
-		_stItem.World = item->World;
+		_stItem.World = item->InterpolatedWorld; // item->World;
 		_stItem.Color = item->Color;
 		_stItem.AmbientLight = item->AmbientLight;
-		memcpy(_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
+		memcpy(_stItem.BonesMatrices, item->InterpolatedAnimationTransforms, sizeof(Matrix) * MAX_BONES);
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
@@ -2720,9 +2720,45 @@ namespace TEN::Renderer
 		_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
-	void Renderer::Render()
+	void Renderer::Render(float interpolateFactor)
 	{
 		//RenderToCubemap(reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
+	
+		/*RenderView oldCamera = RenderView(
+			&PreviousCamera, 
+			0, 
+			TO_RAD(CurrentFOV / 1.333333f) ,
+			32, 100*1024, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
+
+		RenderView newCamera = RenderView(
+			&Camera,
+			0,
+			TO_RAD(CurrentFOV / 1.333333f),
+			32, 100 * 1024, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
+		
+		_gameCamera.Camera = oldCamera.Camera;
+		_gameCamera.Camera.WorldPosition = Vector3::Lerp(oldCamera.Camera.WorldPosition, newCamera.Camera.WorldPosition, interpolateFactor);
+		_gameCamera.Camera.WorldDirection = Vector3::Lerp(oldCamera.Camera.WorldDirection, newCamera.Camera.WorldDirection, interpolateFactor);
+		_gameCamera.Camera.View = Matrix::Lerp(oldCamera.Camera.View, newCamera.Camera.View, interpolateFactor);
+		_gameCamera.Camera.Projection = Matrix::Lerp(oldCamera.Camera.Projection, newCamera.Camera.Projection, interpolateFactor);
+		_gameCamera.Camera.View = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
+*/
+
+		_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpolateFactor);
+		_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpolateFactor);
+		_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpolateFactor);
+		_gameCamera.Camera.Projection = Matrix::Lerp(_oldGameCamera.Camera.Projection, _currentGameCamera.Camera.Projection, interpolateFactor);
+		_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
+		_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
+		_gameCamera.Camera.Frustum=_currentGameCamera.Camera.Frustum;
+		_gameCamera.Camera.ViewSize = _currentGameCamera.Camera.ViewSize;
+		_gameCamera.Camera.InvViewSize = _currentGameCamera.Camera.InvViewSize;
+		_gameCamera.Camera.NearPlane = _currentGameCamera.Camera.NearPlane;
+		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
+
+		_interpolationFactor = interpolateFactor;
+
+		//_gameCamera = _currentGameCamera;
 		RenderScene(&_backBuffer, true, _gameCamera);
 		_context->ClearState();
 		_swapChain->Present(1, 0);

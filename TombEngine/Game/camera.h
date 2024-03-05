@@ -66,6 +66,7 @@ constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
 constexpr auto DEFAULT_FOV = 80.0f;
 
 extern CAMERA_INFO Camera;
+extern CAMERA_INFO PreviousCamera;
 extern GameVector ForcedFixedCamera;
 extern int UseForcedFixedCamera;
 extern CameraType BinocularOldCamera;

@@ -110,7 +110,7 @@ short NextFxFree;
 
 int ControlPhaseTime;
 
-int DrawPhase(bool isTitle)
+int DrawPhase(bool isTitle, float interpolateFactor)
 {
 	if (isTitle)
 	{
@@ -118,13 +118,13 @@ int DrawPhase(bool isTitle)
 	}
 	else
 	{
-		g_Renderer.Render();
+		g_Renderer.Render(interpolateFactor);
 	}
 
 	// Clear display sprites.
 	ClearDisplaySprites();
 
-	Camera.numberFrames = g_Renderer.Synchronize();
+	//Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
 }
 
@@ -149,8 +149,10 @@ GameStatus ControlPhase(int numFrames)
 	bool isFirstTime = true;
 	static int framesCount = 0;
 
-	for (framesCount += numFrames; framesCount > 0; framesCount -= LOOP_FRAME_COUNT)
+	//for (framesCount += numFrames; framesCount > 0; framesCount -= LOOP_FRAME_COUNT)
 	{
+		g_Renderer.SaveOldState();
+
 		// Controls are polled before OnLoop, so input data could be
 		// overwritten by script API methods.
 		HandleControls(isTitle);
@@ -548,12 +550,46 @@ GameStatus DoGameLoop(int levelIndex)
 
 	// Before entering actual game loop, ControlPhase must be
 	// called once to sort out various runtime shenanigangs (e.g. hair).
+
 	status = ControlPhase(numFrames);
+
+	LARGE_INTEGER lastTime;
+	LARGE_INTEGER currentTime;
+	LARGE_INTEGER lastDrawTime;
+	LARGE_INTEGER currentDrawTime;
+	double controlLag = 0;
+	double drawLag = 0;
+	double frameTime = 0;
+	constexpr auto controlFrameTime = 1000.0f / 30.0f;
+	constexpr auto drawFrameTime = 1000.0f / 60.0f;
+
+	LARGE_INTEGER frequency;
+	QueryPerformanceFrequency(&frequency);
+
+	QueryPerformanceCounter(&lastTime);
+	QueryPerformanceCounter(&lastDrawTime);
+
+	int controlCalls = 0;
+	int drawCalls = 0;
+
+	memcpy(&PreviousCamera , &Camera, sizeof(CAMERA_INFO));
 
 	while (DoTheGame)
 	{
-		status = ControlPhase(numFrames);
+		QueryPerformanceCounter(&currentTime);
+		frameTime = (currentTime.QuadPart - lastTime.QuadPart) * 1000.0 / frequency.QuadPart;
+		lastTime = currentTime;
+		controlLag += frameTime;
 
+		//while (controlLag >= controlFrameTime)
+		if (controlLag >= controlFrameTime)
+		{
+			memcpy(&PreviousCamera, &Camera, sizeof(CAMERA_INFO));
+			status = ControlPhase(0);
+			controlLag -= controlFrameTime;
+			controlCalls++;
+		}
+				
 		if (!levelIndex)
 		{
 			UpdateInputActions(LaraItem);
@@ -590,7 +626,23 @@ GameStatus DoGameLoop(int levelIndex)
 			}
 		}
 
-		numFrames = DrawPhase(!levelIndex);
+		QueryPerformanceCounter(&currentDrawTime);
+		frameTime = (currentDrawTime.QuadPart - lastDrawTime.QuadPart) * 1000.0 / frequency.QuadPart;
+		lastDrawTime = currentDrawTime;
+		drawLag += frameTime;
+
+		//if (drawLag >= drawFrameTime)
+		{ 
+			float interpolateFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
+			//printf("%f\n", interpolateFactor);
+
+			numFrames = DrawPhase(!levelIndex, interpolateFactor);
+			drawLag -= drawFrameTime;
+			drawCalls++;
+		}
+		
+
+
 		Sound_UpdateScene();
 	}
 

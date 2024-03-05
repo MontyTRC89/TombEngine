@@ -21,4 +21,6 @@ int Sync();
 bool TimeInit();
 bool TimeReset();
 
+double Clock_GetCurrent();
+
 GameTime GetGameTime(int frameCount);

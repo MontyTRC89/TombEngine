@@ -380,10 +380,17 @@ namespace TEN::Renderer
 			newItem->ObjectNumber = item->ObjectNumber;
 			newItem->Color = item->Model.Color;
 			newItem->Position = item->Pose.Position.ToVector3();
-			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+			newItem->Translation = Matrix::CreateTranslation(newItem->Position.x, newItem->Position.y, newItem->Position.z);
 			newItem->Rotation = item->Pose.Orientation.ToRotationMatrix();
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
+
+			newItem->InterpolatedPosition = Vector3::Lerp(newItem->OldPosition, newItem->Position, _interpolationFactor);
+			newItem->InterpolatedTranslation = Matrix::Lerp(newItem->OldTranslation, newItem->Translation, _interpolationFactor);
+			newItem->InterpolatedRotation = Matrix::Lerp(newItem->InterpolatedRotation, newItem->Rotation, _interpolationFactor);
+			newItem->InterpolatedWorld = Matrix::Lerp(newItem->OldWorld, newItem->World, _interpolationFactor);
+			for (int j = 0; j < MAX_BONES; j++)
+				newItem->InterpolatedAnimationTransforms[j] = Matrix::Lerp(newItem->OldAnimationTransforms[j], newItem->AnimationTransforms[j], _interpolationFactor);	
 
 			CalculateLightFades(newItem);
 			CollectLightsForItem(newItem);
@@ -830,6 +837,21 @@ namespace TEN::Renderer
 	{
 		for (int i = 0; i < NUM_ITEMS; i++)
 			_items[i].DoneAnimations = false;
+	}
+
+
+	void Renderer::SaveOldState()
+	{
+		for (int i = 0; i < NUM_ITEMS; i++)
+		{
+			_items[i].OldPosition = _items[i].Position;
+			_items[i].OldWorld = _items[i].World;
+			_items[i].OldTranslation = _items[i].Translation;
+			_items[i].OldRotation = _items[i].Rotation;
+			_items[i].OldScale = _items[i].Scale;
+			for (int j = 0; j < MAX_BONES; j++)
+				_items[i].OldAnimationTransforms[j] = _items[i].AnimationTransforms[j];
+		}
 	}
 
 } // namespace TEN::Renderer

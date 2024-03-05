@@ -79,7 +79,7 @@ namespace TEN::Renderer
 			{
 				auto offset0 = frameData.FramePtr0->Offset;
 				auto rotMatrix = Matrix::CreateFromQuaternion(frameData.FramePtr0->BoneOrientations[bonePtr->Index]);
-				
+
 				if (frameData.Alpha != 0.0f)
 				{
 					auto offset1 = frameData.FramePtr1->Offset;
@@ -362,6 +362,9 @@ namespace TEN::Renderer
 			farView = DEFAULT_FAR_VIEW;
 
 		farView = farView;
+
+		_oldGameCamera = _currentGameCamera;
+		_currentGameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
 		_gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
 	}
 

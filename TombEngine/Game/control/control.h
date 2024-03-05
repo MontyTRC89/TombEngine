@@ -74,7 +74,7 @@ extern int ControlPhaseTime;
 
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
-int DrawPhase(bool isTitle);
+int DrawPhase(bool isTitle, float interpolateFactor);
 
 GameStatus ControlPhase(int numFrames);
 GameStatus DoLevel(int levelIndex, bool loadGame = false);

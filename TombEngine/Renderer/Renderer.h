@@ -160,6 +160,8 @@ namespace TEN::Renderer
 
 		// Constant buffers
 		RenderView _gameCamera;
+		RenderView _oldGameCamera;
+		RenderView _currentGameCamera;
 		ConstantBuffer<CCameraMatrixBuffer> _cbCameraMatrices;
 		CItemBuffer _stItem;
 		ConstantBuffer<CItemBuffer> _cbItem;
@@ -373,6 +375,8 @@ namespace TEN::Renderer
 		VertexBuffer<Vertex> _sortedPolygonsVertexBuffer;
 		IndexBuffer _sortedPolygonsIndexBuffer;
 
+		float _interpolationFactor = 0.0f;
+
 		// Private functions
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);
@@ -580,7 +584,7 @@ namespace TEN::Renderer
 		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
 		void Initialize(int w, int h, bool windowed, HWND handle);
-		void Render();
+		void Render(float interpolateFactor);
 		void RenderTitle();
 		void Lock();
 		bool PrepareDataForTheRenderer();
@@ -632,7 +636,7 @@ namespace TEN::Renderer
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
-
+		void SaveOldState();
 		Vector2i GetScreenResolution() const;
 		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;
 		Vector3 GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);

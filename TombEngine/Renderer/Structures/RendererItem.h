@@ -20,6 +20,20 @@ namespace TEN::Renderer::Structures
 		Matrix Scale;
 		Matrix AnimationTransforms[MAX_BONES];
 
+		Vector3 OldPosition;
+		Matrix OldWorld;
+		Matrix OldTranslation;
+		Matrix OldRotation;
+		Matrix OldScale;
+		Matrix OldAnimationTransforms[MAX_BONES];
+
+		Vector3 InterpolatedPosition;
+		Matrix InterpolatedWorld;
+		Matrix InterpolatedTranslation;
+		Matrix InterpolatedRotation;
+		Matrix InterpolatedScale;
+		Matrix InterpolatedAnimationTransforms[MAX_BONES];
+
 		int RoomNumber = NO_ROOM;
 		int PrevRoomNumber = NO_ROOM;
 		Vector4 Color;
