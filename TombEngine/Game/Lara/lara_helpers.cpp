@@ -846,15 +846,15 @@ void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 	int sign = std::copysign(1, deltaAngle);
 
+	// Calculate lower flex rotation.
+	short lowerFlexAngle = isStrafing ? std::clamp<short>(deltaAngle, -LOWER_FLEX_ANGLE_CONSTRAINT, LOWER_FLEX_ANGLE_CONSTRAINT) : 0;
+	auto lowerFlexRot = EulerAngles(0, lowerFlexAngle, 0);
+
 	// Calculate upper flex rotation.
 	float upperFlexAngleAlpha = std::clamp(abs(deltaAngle) / (float)UPPER_FLEX_ANGLE_CONSTRAINT, 0.0f, 1.0f);
 	float upperFlexAngleCoeff = isStrafing ? UPPER_FLEX_ANGLE_STRAFE_COEFF : 1.0f;
 	short upperFlexAngle = ((UPPER_FLEX_ANGLE_CONSTRAINT * upperFlexAngleAlpha) * sign) * upperFlexAngleCoeff;
 	auto upperFlexRot = EulerAngles(player.ExtraHeadRot.x, upperFlexAngle, upperFlexAngle * UPPER_FLEX_Z_COEFF);
-
-	// Calculate lower flex rotation.
-	short lowerFlexAngle = isStrafing ? std::clamp<short>(deltaAngle, -LOWER_FLEX_ANGLE_CONSTRAINT, LOWER_FLEX_ANGLE_CONSTRAINT) : 0;
-	auto lowerFlexRot = EulerAngles(0, lowerFlexAngle, 0);
 
 	int headFlexSign = isStrafing ? -1 : 1;
 
