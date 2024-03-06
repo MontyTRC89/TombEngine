@@ -80,8 +80,9 @@ namespace TEN::Entities::Creatures::TR3
 		if (!CreatureActive(itemNumber))
 			return;
 
-		if (item.ItemFlags[5] != item.HitPoints)
+		if (item.HitPoints != NOT_TARGETABLE)
 		{
+
 			int fishCount = item.HitPoints - item.ItemFlags[5];
 
 			if (fishCount < 0)
@@ -105,6 +106,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			item.ItemFlags[5] = item.HitPoints;
+			item.HitPoints = NOT_TARGETABLE;
 		}
 
 		GetAITarget(&creature);
