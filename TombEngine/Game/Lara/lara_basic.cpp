@@ -934,7 +934,7 @@ void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
 	{
 		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
 		//HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, true);
-		//HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
+		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
 	}
 
 	if (IsHeld(In::Roll))
@@ -952,14 +952,13 @@ void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:	LS_HOP_BACK (207)
+// State:	LS_SKIP_BACK (207)
 // Control: lara_as_skip_back()
 void lara_col_skip_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(180.0f);
-	//player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
+	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
