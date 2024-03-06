@@ -581,8 +581,8 @@ GameStatus DoGameLoop(int levelIndex)
 		lastTime = currentTime;
 		controlLag += frameTime;
 
-		//while (controlLag >= controlFrameTime)
-		if (controlLag >= controlFrameTime)
+		while (controlLag >= controlFrameTime)
+		//if (controlLag >= controlFrameTime)
 		{
 			memcpy(&PreviousCamera, &Camera, sizeof(CAMERA_INFO));
 			status = ControlPhase(0);
