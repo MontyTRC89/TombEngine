@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
@@ -23,7 +24,10 @@ using namespace TEN::Renderer;
 // HitPoints =  fish count (on spawn).
 // ItemFlags[0] = leader item number.
 // ItemFlags[1] = target item number.
+// ItemFlags[2] = OCB rotation when in patrol mode.
+// ItemFlags[3] = Start OCB of AI_FOLLOW. Do not change
 // ItemFlags[5] = fish count.
+// ItemFlags[6] = Does fish patrol?
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -48,10 +52,14 @@ namespace TEN::Entities::Creatures::TR3
 		item.HitPoints = DEFAULT_FISH_COUNT;
 		item.ItemFlags[0] = item.Index;
 		item.ItemFlags[1] = item.Index;
+
 		item.ItemFlags[5] = 0;
+
+		if (item.AIBits)
+			item.ItemFlags[6] = true;
 	}
 
-	static void SpawnFishSwarm(ItemInfo& item)
+	static void SpawnFishSwarm(ItemInfo& item, CreatureInfo& creature)
 	{
 		constexpr auto VEL_MAX = 48.0f;
 		constexpr auto VEL_MIN = 16.0f;
@@ -68,7 +76,7 @@ namespace TEN::Entities::Creatures::TR3
 		fish.MeshIndex = abs(item.TriggerFlags);
 		fish.IsLethal = (item.TriggerFlags < 0) ? true : false;
 		fish.LeaderItemPtr = &g_Level.Items[item.ItemFlags[0]];
-
+		fish.Patrols = item.ItemFlags[6];
 		fish.Undulation = Random::GenerateFloat(0.0f, PI_MUL_2);
 	}
 
@@ -79,6 +87,9 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (!CreatureActive(itemNumber))
 			return;
+
+		AI_INFO ai;
+		CreatureAIInfo(&item, &ai);
 
 		if (item.HitPoints != NOT_TARGETABLE)
 		{
@@ -101,16 +112,12 @@ namespace TEN::Entities::Creatures::TR3
 			else if (fishCount > 0)
 			{
 				for (int i = 0; i < fishCount; i++)
-					SpawnFishSwarm(item);
+					SpawnFishSwarm(item, creature);
 			}
 
 			item.ItemFlags[5] = item.HitPoints;
 			item.HitPoints = NOT_TARGETABLE;
 		}
-
-		GetAITarget(&creature);
-		AI_INFO ai;
-		CreatureAIInfo(&item, &ai);
 
 		int dx = creature.Target.x - item.Pose.Position.x;
 		int dz = creature.Target.z - item.Pose.Position.z;
@@ -153,11 +160,29 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			item.ItemFlags[1] = LaraItem->Index;
 			corpsePos = std::nullopt;
+			item.ItemFlags[2] = 0;
 		}
-		// Circle around leader item.
+
+		// Circle around leader item
 		else if (!corpsePos.has_value())
 		{
-			item.ItemFlags[1] = item.ItemFlags[0];
+				item.ItemFlags[1] = item.ItemFlags[0];
+				corpsePos = std::nullopt;			
+		}
+
+		//Or follow a path.
+		if (item.AIBits && !corpsePos.has_value())
+		{
+			FindAITargetObject(&creature, ID_AI_FOLLOW, item.ItemFlags[3] + item.ItemFlags[2], false);
+
+			if (creature.AITarget->TriggerFlags == item.ItemFlags[3] + item.ItemFlags[2] && creature.AITarget->ObjectNumber == ID_AI_FOLLOW)
+			{
+				item.ItemFlags[1] = creature.AITarget->Index;
+			}
+			else
+			{
+				item.ItemFlags[2] = 0;
+			}
 			corpsePos = std::nullopt;
 		}
 
@@ -226,10 +251,13 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (!leaderItem.ItemFlags[2] && fish.TargetItemPtr == fish.LeaderItemPtr)
 			{
-				fish.TargetItemPtr->Pose.Position = GetFishStartPosition(leaderItem);
+				if (!fish.Patrols)
+				{
+					fish.TargetItemPtr->Pose.Position = GetFishStartPosition(leaderItem);
 
-				if (fish.TargetItemPtr->Pose.Position != Vector3::Zero)
-					leaderItem.ItemFlags[2] = 1;
+					if (fish.TargetItemPtr->Pose.Position != Vector3::Zero)
+						leaderItem.ItemFlags[2] = 1;
+				}
 			}
 
 			int enemyVel = (fish.TargetItemPtr != fish.LeaderItemPtr) ? 16 : 26;
@@ -273,13 +301,13 @@ namespace TEN::Entities::Creatures::TR3
 				float distToTarget = Vector3i::Distance(fish.Position, otherFish.PositionTarget);
 
 				// Update the index of the nearest fish to the target
-				if (distToTarget < minDistToTarget && fish.TargetItemPtr == fish.LeaderItemPtr)
+				if (distToTarget < minDistToTarget && (fish.TargetItemPtr == fish.LeaderItemPtr || fish.TargetItemPtr->ObjectNumber == ID_AI_FOLLOW))
 				{
 					minDistToTarget = distToTarget;
 					closestFishPtr = &otherFish;
 				}
 
-				if (fish.TargetItemPtr != fish.LeaderItemPtr)
+				if (fish.TargetItemPtr != fish.LeaderItemPtr && fish.TargetItemPtr->ObjectNumber != ID_AI_FOLLOW)
 					separationDist = 80.0f;
 
 				if (distToOtherFish < separationDist )
@@ -295,7 +323,8 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				// Orient to fish nearest to target. To prevent other fish from swimming forward but orient elsewhere.
-				if (fish.Orientation.x != closestFishPtr->Orientation.x && separationDist > 30.0f && fish.TargetItemPtr == fish.LeaderItemPtr)
+				if (fish.Orientation.x != closestFishPtr->Orientation.x && separationDist > 30.0f && 
+					(fish.TargetItemPtr == fish.LeaderItemPtr || fish.TargetItemPtr->ObjectNumber == ID_AI_FOLLOW))
 				{
 					separationDist--;
 					auto orientTo = Geometry::GetOrientToPoint(fish.Position, closestFishPtr->Position);
@@ -332,12 +361,17 @@ namespace TEN::Entities::Creatures::TR3
 			if (ItemNearTarget(fish.Position, fish.TargetItemPtr, CLICK(0.5f)) &&
 				fish.LeaderItemPtr != fish.TargetItemPtr)
 			{
-				TriggerBlood(fish.Position.x, fish.Position.y, fish.Position.z, 4 * GetRandomControl(), 4);
-				DoDamage(fish.TargetItemPtr, FISH_HARM_DAMAGE);
+				if (fish.TargetItemPtr->ObjectNumber != ID_AI_FOLLOW)
+				{
+					TriggerBlood(fish.Position.x, fish.Position.y, fish.Position.z, 4 * GetRandomControl(), 4);
+					DoDamage(fish.TargetItemPtr, FISH_HARM_DAMAGE);
+				}
+				else 
+					leaderItem.ItemFlags[2]++;
 			}
 			else if (ItemNearTarget(fish.Position, fish.TargetItemPtr, BLOCK(2)) && fish.LeaderItemPtr == fish.TargetItemPtr)
 			{
-				leaderItem.ItemFlags[2] = 0;
+					leaderItem.ItemFlags[2] = 0;
 			}			
 			
 			// Calculate undulation angle based on sine wave and fish velocity.
