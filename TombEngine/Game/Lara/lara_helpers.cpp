@@ -980,7 +980,7 @@ void HandlePlayerUpJumpShift(ItemInfo& item)
 	{
 		if (GetMoveAxis() != Vector2::Zero)
 		{
-			short relMoveAngle = GetPlayerRelMoveAngle(item);
+			short relMoveAngle = GetPlayerRelHeadingAngleY(item);
 			if (abs(relMoveAngle) <= BASE_ANGLE)
 			{
 				ShiftType::ForwardActive;
@@ -1570,7 +1570,7 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 		if (IsPlayerStrafing(item) || IsHeld(In::Walk))
 		{
 			// TODO: Up case.
-			short deltaAngle = GetPlayerRelMoveAngle(item);
+			short deltaAngle = GetPlayerRelHeadingAngleY(item);
 			if (abs(deltaAngle) <= ANGLE(45.0f) && CanJumpForward(item, coll))
 			{
 				return JumpDirection::Forward;
@@ -1669,7 +1669,7 @@ short GetPlayerHeadingAngleY(const ItemInfo& item)
 	}
 }
 
-short GetPlayerRelMoveAngle(const ItemInfo& item)
+short GetPlayerRelHeadingAngleY(const ItemInfo& item)
 {
 	return Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 }

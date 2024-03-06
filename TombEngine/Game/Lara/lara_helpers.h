@@ -61,7 +61,7 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 PlayerWaterData GetPlayerWaterData(ItemInfo& item);
 short GetPlayerHeadingAngleX(const ItemInfo& item);
 short GetPlayerHeadingAngleY(const ItemInfo& item);
-short GetPlayerRelMoveAngle(const ItemInfo& item);
+short GetPlayerRelHeadingAngleY(const ItemInfo& item);
 short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll);
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);

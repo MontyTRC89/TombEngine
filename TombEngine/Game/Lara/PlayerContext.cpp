@@ -310,6 +310,14 @@ namespace TEN::Entities::Player
 		return TestGroundMovementSetup(item, coll, setup);
 	}
 
+	bool CanStrafeBackward(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto BASE_ANGLE = ANGLE(90.0f);
+
+		short relHeadingAngle = GetPlayerRelHeadingAngleY(item);
+		return (abs(relHeadingAngle) > BASE_ANGLE);
+	}
+
 	static bool TestSidestep(const ItemInfo& item, const CollisionInfo& coll, bool isGoingRight)
 	{
 		const auto& player = GetLaraInfo(item);

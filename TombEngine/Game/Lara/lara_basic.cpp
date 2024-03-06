@@ -368,7 +368,14 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 		else
 		{
-			item->Animation.TargetState = LS_RUN_FORWARD;
+			if (IsPlayerStrafing(*item))
+			{
+				item->Animation.TargetState = CanStrafeBackward(*item, *coll) ? LS_SKIP_BACK : LS_RUN_FORWARD;
+			}
+			else
+			{
+				item->Animation.TargetState = LS_RUN_FORWARD;
+			}
 		}
 
 		return;
@@ -952,11 +959,8 @@ void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsPlayerStrafing(*item))
 		{
-			if (IsHeld(In::Back))
-			{
-				item->Animation.TargetState = LS_HOP_BACK;
-				return;
-			}
+			item->Animation.TargetState = CanStrafeBackward(*item, *coll) ? LS_SKIP_BACK : LS_RUN_FORWARD;
+			return;
 		}
 		else
 		{
