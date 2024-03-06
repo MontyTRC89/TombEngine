@@ -7,6 +7,7 @@
 #include "Specific/Input/Input.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
+#include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
 #include "Game/collision/collide_room.h"
@@ -14,7 +15,9 @@
 #include "Objects/Generic/Object/rope.h"
 #include "Sound/sound.h"
 #include "Game/camera.h"
+#include "Specific/configuration.h"
 
+using namespace TEN::Config;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -166,8 +169,12 @@ namespace TEN::Entities::Generic
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* ropeItem = &g_Level.Items[itemNumber];
 		auto* rope = &Ropes[ropeItem->TriggerFlags];
-		
-		if (IsHeld(In::Action) &&
+
+		laraInfo->Control.ToggleClimb = g_Configuration.EnableAutoGrab;
+		if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
+			laraInfo->Control.ToggleClimb = false;
+
+		if (HasClimbAction(*laraItem) &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			(laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP) &&
 			laraItem->Animation.IsAirborne &&

@@ -12,9 +12,11 @@
 #include "Game/Lara/lara_tests.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Sound/sound.h"
+#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Config;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
@@ -476,7 +478,11 @@ void lara_as_rope_idle(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Look.Mode = LookMode::Free;
 
-	if (!IsHeld(In::Action))
+	lara->Control.ToggleClimb = g_Configuration.EnableAutoGrab;
+	if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
+		lara->Control.ToggleClimb = false;
+
+	if (!HasClimbAction(*item))
 		FallFromRope(item);
 }
 
@@ -486,7 +492,11 @@ void lara_col_rope_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (IsHeld(In::Action))
+	lara->Control.ToggleClimb = g_Configuration.EnableAutoGrab;
+	if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
+		lara->Control.ToggleClimb = false;
+
+	if (HasClimbAction(*item))
 	{
 		UpdateRopeSwing(item);
 		RopeSwingCollision(item, coll, false);

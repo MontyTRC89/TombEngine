@@ -937,16 +937,32 @@ void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
 		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
 	}
 
+	if (IsHeld(In::Jump))
+	{
+		// TODO: Directional jump.
+	}
+
 	if (IsHeld(In::Roll))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
 	}
 
-	if (IsHeld(In::Back))
+	if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 	{
-		item->Animation.TargetState = LS_HOP_BACK;
-		return;
+		if (IsPlayerStrafing(*item))
+		{
+			if (IsHeld(In::Back))
+			{
+				item->Animation.TargetState = LS_HOP_BACK;
+				return;
+			}
+		}
+		else
+		{
+			item->Animation.TargetState = LS_RUN_FORWARD;
+			return;
+		}
 	}
 
 	item->Animation.TargetState = LS_IDLE;
