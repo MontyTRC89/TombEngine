@@ -82,7 +82,6 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (item.HitPoints != NOT_TARGETABLE)
 		{
-
 			int fishCount = item.HitPoints - item.ItemFlags[5];
 
 			if (fishCount < 0)
@@ -177,7 +176,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	static Vector3 GetFishStartPosition(const ItemInfo& item)
 	{
-		constexpr auto SPHERE_RADIUS		= BLOCK(1);
+		constexpr auto SPHERE_RADIUS		= BLOCK(4);
 		constexpr auto WATER_SURFACE_OFFSET = CLICK(0.5f);
 
 		auto sphere = BoundingSphere(item.StartPose.Position.ToVector3(), SPHERE_RADIUS);
@@ -187,11 +186,15 @@ namespace TEN::Entities::Creatures::TR3
 		auto pointColl = GetCollision(pos, item.RoomNumber);
 		int waterHeight = GetWaterHeight(pointColl.Coordinates.x, pointColl.Coordinates.y, pointColl.Coordinates.z, pointColl.RoomNumber);
 
-		// Clamp position to slightly below water surface.
-		if (pos.y < (waterHeight + WATER_SURFACE_OFFSET))
-			pos.y = waterHeight + WATER_SURFACE_OFFSET;
-
-		return pos;
+		if (pointColl.RoomNumber == NO_ROOM || 
+			!(TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber)) ||
+			pos.y >= pointColl.Position.Floor - WATER_SURFACE_OFFSET || 
+			pos.y <= waterHeight + WATER_SURFACE_OFFSET || 
+			pointColl.Block->IsWall(item.Pose.Position.x + WATER_SURFACE_OFFSET, item.Pose.Position.z + WATER_SURFACE_OFFSET) ||
+			pointColl.Block->IsWall(item.Pose.Position.x - WATER_SURFACE_OFFSET, item.Pose.Position.z - WATER_SURFACE_OFFSET))
+			return Vector3::Zero;
+		else
+			return pos;
 	}
 
 	void UpdateFishSwarm()
