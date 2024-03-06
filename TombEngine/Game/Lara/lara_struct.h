@@ -30,7 +30,7 @@ enum LaraState
 	LS_IDLE = 2,
 	LS_JUMP_FORWARD = 3,
 	LS_POSE = 4,
-	LS_RUN_BACK = 5,
+	LS_HOP_BACK = 5,
 	LS_TURN_RIGHT_SLOW = 6,
 	LS_TURN_LEFT_SLOW = 7,
 	LS_DEATH = 8,
@@ -229,10 +229,8 @@ enum LaraState
 	LS_EDGE_HANG_SWING_CATCH = 203,
 	LS_EDGE_HANG_SHIMMY_UP = 204,
 	LS_EDGE_HANG_SHIMMY_DOWN = 205,
-	LS_RUN_FORWARD_START_CANCEL = 206,
-	LS_SHORT_JUMP_FORWARD = 207,
-	/*LS_RUN_FORWARD_TURN_180 = 207,
-	LS_WALK_FORWARD_TURN_180 = 208,*/
+	LS_RUN_FORWARD_CANCEL = 206,
+	LS_SKIP_BACK = 207,
 
 	NUM_LARA_STATES
 };
@@ -623,10 +621,10 @@ enum LaraAnim
 	LA_LADDER_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner
 	LA_PUSHABLE_BLOCK_PUSH_EDGE_SLIP = 366,
 	LA_LADDER_LEFT_CORNER_INNER_START = 367,				// Ladder around inner left corner
-	LA_RUN_FORWARD_TO_STAND_IDLE_EARLY_START = 368,			// Run forward start > idle (1/2)
+	LA_RUN_FORWARD_TO_STAND_IDLE_EARLY_START = 368,			// Run forward start > stand idle (1/2)
 	LA_LADDER_LEFT_CORNER_INNER_END = 368,					// TODO: Remove.
 	LA_LADDER_RIGHT_CORNER_INNER_START = 369,				// Ladder around inner right corner
-	LA_RUN_FORWARD_TO_STAND_IDLE_EARLY_END = 370,			// Run forward start > idle (2/2)
+	LA_RUN_FORWARD_TO_STAND_IDLE_EARLY_END = 370,			// Run forward start > stand idle (2/2)
 	LA_JUMP_UP_TO_ROPE_START = 371,							// Jump up > rope idle (1/2)
 	LA_TRAIN_OVERBOARD_DEATH = 372,							// Train overboard death
 	LA_JUMP_UP_TO_ROPE_END = 373,							// Jump up > rope idle (2/2)
@@ -837,6 +835,11 @@ enum LaraAnim
 	LA_LEDGE_JUMP_BACK_END = 568,
 
 	// 569-598 reserved for ladder object. -- Sezz 2023.04.16
+
+	LA_STAND_IDLE_TO_SKIP_BACK = 599,
+	LA_SKIP_BACK = 600,
+	LA_SKIP_BACK_TO_STAND_IDLE = 601,
+	LA_SKIP_BACK_TO_STAND_IDLE_EARLY = 602,
 
 	NUM_LARA_ANIMS
 
@@ -1267,10 +1270,12 @@ struct WeaponControlData
 
 struct PlayerControlData
 {
+	// Used in tank control modes.
+	EulerAngles TurnRate = EulerAngles::Identity;
+
+	// Used in modern control mode.
 	EulerAngles HeadingOrient		= EulerAngles::Identity;
 	EulerAngles HeadingOrientTarget = EulerAngles::Identity;
-	EulerAngles TurnRate			= EulerAngles::Identity;
-
 	EulerAngles RefCameraOrient		= EulerAngles::Identity;
 	bool		LockRefCameraOrient = false;
 

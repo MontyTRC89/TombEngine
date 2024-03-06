@@ -1216,7 +1216,7 @@ bool IsPlayerStrafing(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	// 1) Check if modern control mode is enabled.
+	// 1) Check if modern control mode is set.
 	if (!IsUsingModernControls())
 		return false;
 

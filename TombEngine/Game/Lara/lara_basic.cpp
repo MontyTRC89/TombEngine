@@ -376,7 +376,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		item->Animation.TargetState = HasStateDispatch(item, LS_RUN_FORWARD_START_CANCEL) ? LS_RUN_FORWARD_START_CANCEL : LS_IDLE;
+		item->Animation.TargetState = HasStateDispatch(item, LS_RUN_FORWARD_CANCEL) ? LS_RUN_FORWARD_CANCEL : LS_IDLE;
 	}
 	else
 	{
@@ -586,6 +586,13 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
+		// TEMP
+		if (IsHeld(In::Back) && IsPlayerStrafing(*item))
+		{
+			item->Animation.TargetState = LS_SKIP_BACK;
+			return;
+		}
+
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			if (IsHeld(In::Action))
@@ -686,7 +693,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 			else if (CanRunBackward(*item, *coll))
 			{
-				item->Animation.TargetState = LS_RUN_BACK;
+				item->Animation.TargetState = LS_HOP_BACK;
 				return;
 			}
 		}
@@ -842,9 +849,9 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:	  LS_RUN_BACK (5)
-// Collision: lara_col_run_back()
-void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
+// State:	  LS_HOP_BACK (5)
+// Collision: lara_col_hop_back()
+void lara_as_hop_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
@@ -862,16 +869,97 @@ void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// TEMP
+	if (IsHeld(In::Back))
+	{
+		item->Animation.TargetState = LS_HOP_BACK;
+		return;
+	}
+
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:	LS_RUN_BACK (5)
-// Control: lara_as_run_back()
-void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
+// State:	LS_HOP_BACK (5)
+// Control: lara_as_hop_back()
+void lara_col_hop_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(180.0f);
+	item->Animation.Velocity.y = 0;
+	item->Animation.IsAirborne = false;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+		return;
+	}
+
+	if (coll->Middle.Floor > (STEPUP_HEIGHT / 2))
+	{
+		SetLaraFallBackAnimation(item);
+		return;
+	}
+
+	if (CanSlide(*item, *coll))
+	{
+		SetLaraSlideAnimation(item, coll);
+		return;
+	}
+
+	if (LaraDeflectEdge(item, coll))
+		LaraCollideStop(item, coll);
+
+	if (CanChangeElevation(*item, *coll))
+	{
+		HandlePlayerElevationChange(item, coll);
+		return;
+	}
+}
+
+// State:	  LS_SKIP_BACK (207)
+// Collision: lara_col_skip_back()
+void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::None;
+
+	if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+	{
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
+		//HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, true);
+		//HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
+	}
+
+	if (IsHeld(In::Roll))
+	{
+		item->Animation.TargetState = LS_ROLL_180_FORWARD;
+		return;
+	}
+
+	if (IsHeld(In::Back))
+	{
+		item->Animation.TargetState = LS_HOP_BACK;
+		return;
+	}
+
+	item->Animation.TargetState = LS_IDLE;
+}
+
+// State:	LS_HOP_BACK (207)
+// Control: lara_as_skip_back()
+void lara_col_skip_back(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(180.0f);
+	//player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -1030,7 +1118,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (CanRunBackward(*item, *coll))
 		{
-			item->Animation.TargetState = LS_RUN_BACK;
+			item->Animation.TargetState = LS_HOP_BACK;
 			return;
 		}
 	}
@@ -1388,7 +1476,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 			}
 			else if (CanRunBackward(*item, *coll))
 			{
-				item->Animation.TargetState = LS_RUN_BACK;
+				item->Animation.TargetState = LS_HOP_BACK;
 				return;
 			}
 		}
@@ -1789,11 +1877,10 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		float turnAlpha = PLAYER_WADE_TURN_ALPHA / (isInSwamp ? 3 : 1);
-		bool isStrafing = IsPlayerStrafing(*item);
 
-		HandlePlayerTurnY(*item, turnAlpha, IsPlayerStrafing(*item), isStrafing);
-		HandlePlayerTurnLean(*item, LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f), turnAlpha, isStrafing);
-		HandlePlayerTurnFlex(*item, turnAlpha, isStrafing);
+		HandlePlayerTurnY(*item, turnAlpha);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f), turnAlpha);
+		HandlePlayerTurnFlex(*item, turnAlpha);
 	}
 	else
 	{
