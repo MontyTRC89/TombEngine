@@ -20,8 +20,6 @@ using namespace TEN::Entities::TR3;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
-// TODO: Nested loop results in O(n^2) complexity.
-// 
 // NOTES:
 // HitPoints	= Fish count on spawn.
 // ItemFlags[0] = leader item number.
@@ -134,7 +132,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto& playerRoom = g_Level.Rooms[LaraItem->RoomNumber];
 
-		auto corpsePos = std::optional<Vector3>();;
+		auto corpsePos = std::optional<Vector3>();
 
 		// Check if corpse is near.
 		if (!corpsePos.has_value())
@@ -151,7 +149,7 @@ namespace TEN::Entities::Creatures::TR3
 					if (dist < closestDist &&
 						targetItem.ObjectNumber == ID_CORPSE &&
 						targetItem.Active && TriggerActive(&targetItem) &&
-						targetItem.ItemFlags[1] == (int)CorpseFlags::Lying &&
+						targetItem.ItemFlags[1] == (int)CorpseFlag::Grounded &&
 						TestEnvironment(ENV_FLAG_WATER, targetItem.RoomNumber))
 					{
 						corpsePos = targetItem.Pose.Position.ToVector3();
