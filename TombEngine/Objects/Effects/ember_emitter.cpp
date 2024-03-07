@@ -75,16 +75,25 @@
 			{
 				auto* spark = GetFreeParticle();
 				spark->on = 1;
-
-				spark->sR = r;
-				spark->sB = b;
-				spark->sG = g;
-				spark->dR = r;
-				spark->dB = b;
-				spark->dG = g;
 				spark->fadeToBlack = 4;
 				spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-				spark->blendMode = BlendMode::Additive;
+
+				if (!item->Model.Color.x && !item->Model.Color.y && !item->Model.Color.z)
+				{
+					spark->sR = spark->sB = spark->sG = spark->dR = spark->dB = spark->dG = 255;
+					spark->blendMode = BlendMode::Subtractive;
+				}
+				else
+				{
+					spark->sR = r;
+					spark->sB = b;
+					spark->sG = g;
+					spark->dR = r;
+					spark->dB = b;
+					spark->dG = g;
+					spark->blendMode = BlendMode::Additive;
+				}
+
 				spark->life = spark->sLife = (GetRandomControl() & 3) + 74;
 				spark->x = (GetRandomControl() & 0x15) + item->Pose.Position.x;
 				spark->y = item->Pose.Position.y;
