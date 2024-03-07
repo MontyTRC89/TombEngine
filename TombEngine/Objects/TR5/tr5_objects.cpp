@@ -774,7 +774,7 @@ static void StartObject(ObjectInfo *obj)
 		obj->collision = ObjectCollision;
 	}
 
-	obj = &Objects[ID_HIGH_OBJECT2];
+	obj = &Objects[ID_EMBER_EMITTER];
 	if (obj->loaded)
 	{
 		obj->drawRoutine = nullptr;

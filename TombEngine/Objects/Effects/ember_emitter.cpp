@@ -1,30 +1,8 @@
 #include "framework.h"
 #include "Objects/Effects/ember_emitter.h"
 
-#include "Game/animation.h"
-#include "Game/collision/collide_item.h"
-#include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/Electricity.h"
-#include "Game/effects/item_fx.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/effects/weather.h"
-#include "Game/items.h"
-#include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
-#include "Sound/sound.h"
-#include "Specific/clock.h"
-#include "Specific/Input/Input.h"
-#include "Specific/level.h"
-
-using namespace TEN::Effects::Electricity;
-using namespace TEN::Effects::Environment;
-using namespace TEN::Effects::Items;
-using namespace TEN::Input;
-
 
 	void EmberEmitterControl(short itemNumber)
 	{
@@ -32,6 +10,10 @@ using namespace TEN::Input;
 
 		if (!TriggerActive(item))
 			return;
+
+		unsigned char r = std::clamp(Random::GenerateInt(-32, 32) + int(item->Model.Color.x * UCHAR_MAX), 0, UCHAR_MAX);
+		unsigned char g = std::clamp(Random::GenerateInt(-32, 32) + int(item->Model.Color.y * UCHAR_MAX), 0, UCHAR_MAX);
+		unsigned char b = std::clamp(Random::GenerateInt(-32, 32) + int(item->Model.Color.z * UCHAR_MAX), 0, UCHAR_MAX);
 
 		if (item->TriggerFlags)
 
@@ -94,12 +76,12 @@ using namespace TEN::Input;
 				auto* spark = GetFreeParticle();
 				spark->on = 1;
 
-				spark->sR = -1;
-				spark->sB = 6;
-				spark->sG = (GetRandomControl() & 0x1F) + 48;
-				spark->dR = (GetRandomControl() & 0x3F) - 64;
-				spark->dB = 0;
-				spark->dG = (GetRandomControl() & 0x3F) + -128;
+				spark->sR = r;
+				spark->sB = b;
+				spark->sG = g;
+				spark->dR = r;
+				spark->dB = b;
+				spark->dG = g;
 				spark->fadeToBlack = 4;
 				spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
 				spark->blendMode = BlendMode::Additive;
@@ -121,7 +103,5 @@ using namespace TEN::Input;
 				spark->dSize = spark->size;
 			}
 		}
-
-
 	}
 
