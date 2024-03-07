@@ -10,9 +10,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	struct FishData
 	{
-		int	 MeshIndex = 0;
-		bool IsLethal  = false;
-		bool Patrols = false;
+		int	 MeshIndex	  = 0;
+		bool IsPatrolling = false;
+		bool IsLethal	  = false;
 
 		Vector3		Position	   = Vector3::Zero;
 		int			RoomNumber	   = 0;
@@ -25,7 +25,6 @@ namespace TEN::Entities::Creatures::TR3
 
 		ItemInfo* TargetItemPtr = nullptr;
 		ItemInfo* LeaderItemPtr = nullptr;
-		//CreatureInfo LeaderCreature;
 	};
 
 	extern std::vector<FishData> FishSwarm;
