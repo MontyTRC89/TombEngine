@@ -145,124 +145,123 @@ GameStatus ControlPhase(int numFrames)
 	}
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
-	
+
 	bool isFirstTime = true;
 	static int framesCount = 0;
 
-	//for (framesCount += numFrames; framesCount > 0; framesCount -= LOOP_FRAME_COUNT)
+	// Save current state to old variables for interpolation
+	SaveOldState();
+	g_Renderer.SaveOldState();
+
+	// Controls are polled before OnLoop, so input data could be
+	// overwritten by script API methods.
+	HandleControls(isTitle);
+
+	// Pre-loop script and event handling.
+	g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
+	HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
+
+	// Control lock is processed after handling scripts, because builder may want to
+	// process input externally, while still locking Lara from input.
+	if (!isTitle && Lara.Control.IsLocked)
+		ClearAllActions();
+
+	// Handle inventory / pause / load / save screens.
+	auto result = HandleMenuCalls(isTitle);
+	if (result != GameStatus::Normal)
+		return result;
+
+	// Handle global input events.
+	result = HandleGlobalInputEvents(isTitle);
+	if (result != GameStatus::Normal)
+		return result;
+
+	// Queued input actions are read again and cleared after UI 
+	// interrupts are processed, so first frame after exiting UI
+	// will still register it.
+	ApplyActionQueue();
+	ClearActionQueue();
+
+	UpdateAllItems();
+	UpdateAllEffects();
+	UpdateLara(LaraItem, isTitle);
+
+	g_GameScriptEntities->TestCollidingObjects();
+
+	if (UseSpotCam)
 	{
-		g_Renderer.SaveOldState();
+		// Draw flyby cameras.
+		CalculateSpotCameras();
+	}
+	else
+	{
+		// Do the standard camera.
+		TrackCameraInit = false;
+		CalculateCamera(LaraCollision);
+	}
 
-		// Controls are polled before OnLoop, so input data could be
-		// overwritten by script API methods.
-		HandleControls(isTitle);
+	// Update oscillator seed.
+	Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
 
-		// Pre-loop script and event handling.
-		g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
-		HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
+	// Smash shatters and clear stopper flags under them.
+	UpdateShatters();
 
-		// Control lock is processed after handling scripts, because builder may want to
-		// process input externally, while still locking Lara from input.
-		if (!isTitle && Lara.Control.IsLocked)
-			ClearAllActions();
+	// Update weather.
+	Weather.Update();
 
-		// Handle inventory / pause / load / save screens.
-		auto result = HandleMenuCalls(isTitle);
-		if (result != GameStatus::Normal)
-			return result;
+	// Update effects.
+	StreamerEffect.Update();
+	UpdateSparks();
+	UpdateFireSparks();
+	UpdateSmoke();
+	UpdateBlood();
+	UpdateBubbles();
+	UpdateDebris();
+	UpdateGunShells();
+	UpdateFootprints();
+	UpdateSplashes();
+	UpdateElectricityArcs();
+	UpdateHelicalLasers();
+	UpdateDrips();
+	UpdateRats();
+	UpdateRipples();
+	UpdateBats();
+	UpdateSpiders();
+	UpdateSparkParticles();
+	UpdateSmokeParticles();
+	UpdateSimpleParticles();
+	UpdateExplosionParticles();
+	UpdateShockwaves();
+	UpdateBeetleSwarm();
+	UpdateLocusts();
+	UpdateUnderwaterBloodParticles();
 
-		// Handle global input events.
-		result = HandleGlobalInputEvents(isTitle);
-		if (result != GameStatus::Normal)
-			return result;
+	// Update HUD.
+	g_Hud.Update(*LaraItem);
+	UpdateFadeScreenAndCinematicBars();
 
-		// Queued input actions are read again and cleared after UI 
-		// interrupts are processed, so first frame after exiting UI
-		// will still register it.
-		ApplyActionQueue();
-		ClearActionQueue();
+	// Rumble screen (like in submarine level of TRC).
+	if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
+		RumbleScreen();
 
-		UpdateAllItems();
-		UpdateAllEffects();
-		UpdateLara(LaraItem, isTitle);
+	PlaySoundSources();
+	DoFlipEffect(FlipEffect, LaraItem);
 
-		g_GameScriptEntities->TestCollidingObjects();
+	// Post-loop script and event handling.
+	g_GameScript->OnLoop(DELTA_TIME, true);
 
-		if (UseSpotCam)
-		{
-			// Draw flyby cameras.
-			CalculateSpotCameras();
-		}
-		else
-		{
-			// Do the standard camera.
-			TrackCameraInit = false;
-			CalculateCamera(LaraCollision);
-		}
+	// Clear savegame loaded flag.
+	JustLoaded = false;
 
-		// Update oscillator seed.
-		Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
+	// Update timers.
+	GameTimer++;
+	GlobalCounter++;
 
-		// Smash shatters and clear stopper flags under them.
-		UpdateShatters();
-
-		// Update weather.
-		Weather.Update();
-
-		// Update effects.
-		StreamerEffect.Update();
-		UpdateSparks();
-		UpdateFireSparks();
-		UpdateSmoke();
-		UpdateBlood();
-		UpdateBubbles();
-		UpdateDebris();
-		UpdateGunShells();
-		UpdateFootprints();
-		UpdateSplashes();
-		UpdateElectricityArcs();
-		UpdateHelicalLasers();
-		UpdateDrips();
-		UpdateRats();
-		UpdateRipples();
-		UpdateBats();
-		UpdateSpiders();
-		UpdateSparkParticles();
-		UpdateSmokeParticles();
-		UpdateSimpleParticles();
-		UpdateExplosionParticles();
-		UpdateShockwaves();
-		UpdateBeetleSwarm();
-		UpdateLocusts();
-		UpdateUnderwaterBloodParticles();
-
-		// Update HUD.
-		g_Hud.Update(*LaraItem);
-		UpdateFadeScreenAndCinematicBars();
-
-		// Rumble screen (like in submarine level of TRC).
-		if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
-			RumbleScreen();
-
-		PlaySoundSources();
-		DoFlipEffect(FlipEffect, LaraItem);
-
-		// Post-loop script and event handling.
-		g_GameScript->OnLoop(DELTA_TIME, true);
-
-		// Clear savegame loaded flag.
-		JustLoaded = false;
-
-		// Update timers.
-		GameTimer++;
-		GlobalCounter++;
-
-		// Add renderer objects on the first processed frame.
-		if (isFirstTime)
-		{
-			g_Renderer.Lock();
-			isFirstTime = false;
-		}
+	// Add renderer objects on the first processed frame.
+	if (isFirstTime)
+	{
+		g_Renderer.Lock();
+		isFirstTime = false;
 	}
 
 	using ns = std::chrono::nanoseconds;
@@ -555,19 +554,13 @@ GameStatus DoGameLoop(int levelIndex)
 
 	LARGE_INTEGER lastTime;
 	LARGE_INTEGER currentTime;
-	LARGE_INTEGER lastDrawTime;
-	LARGE_INTEGER currentDrawTime;
 	double controlLag = 0;
-	double drawLag = 0;
 	double frameTime = 0;
 	constexpr auto controlFrameTime = 1000.0f / 30.0f;
-	constexpr auto drawFrameTime = 1000.0f / 60.0f;
 
 	LARGE_INTEGER frequency;
 	QueryPerformanceFrequency(&frequency);
-
 	QueryPerformanceCounter(&lastTime);
-	QueryPerformanceCounter(&lastDrawTime);
 
 	int controlCalls = 0;
 	int drawCalls = 0;
@@ -576,20 +569,30 @@ GameStatus DoGameLoop(int levelIndex)
 
 	while (DoTheGame)
 	{
-		QueryPerformanceCounter(&currentTime);
-		frameTime = (currentTime.QuadPart - lastTime.QuadPart) * 1000.0 / frequency.QuadPart;
-		lastTime = currentTime;
-		controlLag += frameTime;
+		if (App.ResetClock)
+		{
+			App.ResetClock = false;
+			QueryPerformanceCounter(&lastTime);
+			currentTime = lastTime;
+			controlLag = 0;
+			frameTime = 0;
+		}
+		else
+		{
+			QueryPerformanceCounter(&currentTime);
+			frameTime = (currentTime.QuadPart - lastTime.QuadPart) * 1000.0 / frequency.QuadPart;
+			lastTime = currentTime;
+			controlLag += frameTime;
+		}
 
 		while (controlLag >= controlFrameTime)
-		//if (controlLag >= controlFrameTime)
 		{
 			memcpy(&PreviousCamera, &Camera, sizeof(CAMERA_INFO));
 			status = ControlPhase(0);
 			controlLag -= controlFrameTime;
 			controlCalls++;
 		}
-				
+
 		if (!levelIndex)
 		{
 			UpdateInputActions(LaraItem);
@@ -626,27 +629,15 @@ GameStatus DoGameLoop(int levelIndex)
 			}
 		}
 
-		QueryPerformanceCounter(&currentDrawTime);
-		frameTime = (currentDrawTime.QuadPart - lastDrawTime.QuadPart) * 1000.0 / frequency.QuadPart;
-		lastDrawTime = currentDrawTime;
-		drawLag += frameTime;
-
-		//if (drawLag >= drawFrameTime)
-		{ 
-			float interpolateFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
-			//printf("%f\n", interpolateFactor);
-
-			numFrames = DrawPhase(!levelIndex, interpolateFactor);
-			drawLag -= drawFrameTime;
-			drawCalls++;
-		}
-		
-
+		float interpolateFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
+		DrawPhase(!levelIndex, interpolateFactor);
+		drawCalls++;
 
 		Sound_UpdateScene();
 	}
 
 	EndGameLoop(levelIndex, status);
+
 	return status;
 }
 
@@ -657,6 +648,11 @@ void EndGameLoop(int levelIndex, GameStatus reason)
 	StopAllSounds();
 	StopSoundTracks();
 	StopRumble();
+}
+
+void SaveOldState()
+{
+
 }
 
 void HandleControls(bool isTitle)

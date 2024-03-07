@@ -165,6 +165,12 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
+	if (msg == WM_ACTIVATEAPP)
+	{
+		App.ResetClock = true;
+		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
+	}
+
 	if (msg > WM_CLOSE)
 	{
 		if (msg == WM_COMMAND)

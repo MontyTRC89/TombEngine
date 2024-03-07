@@ -98,4 +98,6 @@ void InitializeOrLoadGame(bool loadGame);
 void InitializeScripting(int levelIndex, bool loadGame);
 void DeInitializeScripting(int levelIndex);
 
+void SaveOldState();
+
 unsigned CALLBACK GameMain(void*);

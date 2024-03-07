@@ -22,10 +22,12 @@ struct WINAPP
     HWND WindowHandle;
     bool bNoFocus;
     bool isInScene;
+    bool ResetClock;
 };
 
 extern bool DebugMode;
 extern HWND WindowsHandle;
+extern WINAPP App;
 
 // return handle
 #define BeginThread(function, threadid) _beginthreadex(0, 0, &function, 0, 0, &threadid)

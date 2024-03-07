@@ -25,6 +25,7 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Input;
 using namespace TEN::Renderer;
@@ -1166,6 +1167,7 @@ namespace TEN::Gui
 
 		case Menu::Display:
 			HandleDisplaySettingsInput(true);
+			App.ResetClock = true;
 			return InventoryResult::None;
 
 		case Menu::GeneralActions:
@@ -1173,10 +1175,12 @@ namespace TEN::Gui
 		case Menu::QuickActions:
 		case Menu::MenuActions:
 			HandleControlSettingsInput(item, true);
+			App.ResetClock = true;
 			return InventoryResult::None;
 
 		case Menu::OtherSettings:
 			HandleOtherSettingsInput(true);
+			App.ResetClock = true;
 			return InventoryResult::None;
 		}
 
@@ -1242,6 +1246,7 @@ namespace TEN::Gui
 
 				case PauseMenuOption::ExitToTitle:
 					SetInventoryMode(InventoryMode::None);
+					App.ResetClock = true;
 					return InventoryResult::ExitToTitle;
 					break;
 				}
@@ -1259,6 +1264,7 @@ namespace TEN::Gui
 			}
 		}
 
+		App.ResetClock = true;
 		return InventoryResult::None;
 	}
 
@@ -3315,7 +3321,10 @@ namespace TEN::Gui
 		while (!exitLoop)
 		{
 			if (ThreadEnded)
+			{
+				App.ResetClock = true;
 				return false;
+			}
 
 			TimeInMenu++;
 			GameTimer++;
@@ -3401,6 +3410,8 @@ namespace TEN::Gui
 
 		lara->Inventory.IsBusy = lara->Inventory.OldBusy;
 		SetInventoryMode(InventoryMode::None);
+
+		App.ResetClock = true;
 
 		return doLoad;
 	}
