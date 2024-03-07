@@ -58,7 +58,7 @@ namespace TEN::Entities::Creatures::TR3
 			item.ItemFlags[6] = true;
 	}
 
-	static void SpawnFishSwarm(ItemInfo& item, CreatureInfo& creature)
+	static void SpawnFishSwarm(ItemInfo& item)
 	{
 		constexpr auto VEL_MAX				   = 48.0f;
 		constexpr auto VEL_MIN				   = 16.0f;
@@ -117,7 +117,7 @@ namespace TEN::Entities::Creatures::TR3
 			else if (fishCount > 0)
 			{
 				for (int i = 0; i < fishCount; i++)
-					SpawnFishSwarm(item, creature);
+					SpawnFishSwarm(item);
 			}
 
 			item.ItemFlags[5] = item.HitPoints;
