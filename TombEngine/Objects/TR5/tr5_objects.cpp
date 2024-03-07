@@ -55,6 +55,7 @@
 #include "Objects/TR5/Object/tr5_twoblockplatform.h"
 
 // Traps
+#include "Objects/Effects/ember_emitter.h"
 #include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/TR5/Trap/ZipLine.h"
@@ -777,7 +778,7 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->drawRoutine = nullptr;
-		obj->control = HighObject2Control;
+		obj->control = EmberEmitterControl;
 	}
 
 	obj = &Objects[ID_GEN_SLOT1];
