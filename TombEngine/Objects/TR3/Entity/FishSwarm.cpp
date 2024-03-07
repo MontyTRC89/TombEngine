@@ -207,11 +207,10 @@ namespace TEN::Entities::Creatures::TR3
 
 	static Vector3 GetFishStartPosition(const ItemInfo& item)
 	{
-		constexpr auto SPHERE_RADIUS = BLOCK(4);
 		constexpr auto BUFFER		 = BLOCK(1 / 8.0f);
+		constexpr auto SPHEROID_SEMI_MAJOR_AXIS = Vector3(BLOCK(2), BLOCK(1), BLOCK(5));
 
-		auto sphere = BoundingSphere(item.StartPose.Position.ToVector3(), SPHERE_RADIUS);
-		auto pos = Random::GeneratePointInSphere(sphere);
+		auto pos = Random::GeneratePointInSpheroid(item.StartPose.Position.ToVector3(), EulerAngles::Identity, SPHEROID_SEMI_MAJOR_AXIS);
 
 		// Get point collision.
 		auto pointColl = GetCollision(pos, item.RoomNumber);

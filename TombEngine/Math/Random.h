@@ -1,6 +1,8 @@
 #pragma once
 #include <SimpleMath.h>
 
+class EulerAngles;
+
 namespace TEN::Math::Random
 {
 	using namespace DirectX;
