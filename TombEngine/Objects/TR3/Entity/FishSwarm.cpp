@@ -62,8 +62,11 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void SpawnFishSwarm(ItemInfo& item, CreatureInfo& creature)
 	{
-		constexpr auto VEL_MAX = 48.0f;
-		constexpr auto VEL_MIN = 16.0f;
+		constexpr auto VEL_MAX				   = 48.0f;
+		constexpr auto VEL_MIN				   = 16.0f;
+		constexpr auto START_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
+			EulerAngles(ANGLE(-3.0f), ANGLE(-6.0f), 0),
+			EulerAngles(ANGLE(3.0f), ANGLE(6.0f), 0));
 
 		// Create new fish.
 		auto& fish = GetNewEffect(FishSwarm, FISH_COUNT_MAX);
@@ -74,8 +77,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		fish.Position = item.Pose.Position.ToVector3();
 		fish.RoomNumber = item.RoomNumber;
-		fish.Orientation.x = Random::GenerateAngle(ANGLE(-3.0f), ANGLE(3.0f));
-		fish.Orientation.y = (item.Pose.Orientation.y + ANGLE(180.0f)) + Random::GenerateAngle(ANGLE(-6.0f), ANGLE(6.0f));
+		fish.Orientation.x = Random::GenerateAngle(START_ORIENT_CONSTRAINT.first.x, START_ORIENT_CONSTRAINT.second.x);
+		fish.Orientation.y = (item.Pose.Orientation.y + ANGLE(180.0f)) + Random::GenerateAngle(START_ORIENT_CONSTRAINT.first.y, START_ORIENT_CONSTRAINT.second.y);
 		fish.Velocity = Random::GenerateFloat(VEL_MIN, VEL_MAX);
 
 		fish.Life = 1.0f;
