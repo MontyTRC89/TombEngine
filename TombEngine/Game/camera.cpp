@@ -951,8 +951,7 @@ void CombatCamera(const ItemInfo& playerItem)
 void UpdateCameraSphere(const ItemInfo& playerItem)
 {
 	// Modern camera constants
-	constexpr auto CAMERA_AXIS_COEFF		   = 30.0f;
-	constexpr auto MOUSE_AXIS_COEFF			   = 30.0f;
+	constexpr auto AXIS_SENSITIVITY_COEFF	   = 30.0f;
 	constexpr auto SMOOTHING_FACTOR			   = 8.0f;
 	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA = 0.4f;
 
@@ -975,7 +974,7 @@ void UpdateCameraSphere(const ItemInfo& playerItem)
 		{
 			auto axisSign = Vector2(g_Configuration.InvertCameraXAxis ? -1 : 1, g_Configuration.InvertCameraYAxis ? -1 : 1);
 			auto axis = ((GetCameraAxis() != Vector2::Zero) ? GetCameraAxis() : GetMouseAxis()) * axisSign;
-			float sensitivity = MOUSE_AXIS_COEFF / (1.0f + (abs(axis.x) + abs(axis.y)));
+			float sensitivity = AXIS_SENSITIVITY_COEFF / (1.0f + (abs(axis.x) + abs(axis.y)));
 			axis *= sensitivity * SMOOTHING_FACTOR;
 
 			if (IsPlayerInCombat(playerItem))
