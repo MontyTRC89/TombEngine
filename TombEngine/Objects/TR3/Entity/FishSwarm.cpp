@@ -9,6 +9,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
@@ -342,7 +343,8 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				// If player is too close and fish are not lethal, steer away.
-				if ((distToPlayer < separationDist * 3) && fish.IsLethal == false && LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD)
+				if ((distToPlayer < separationDist * 3) && fish.IsLethal == false && (LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD || 
+					GetLaraInfo(LaraItem)->Context.Vehicle != NO_ITEM ))
 				{
 					auto separationDir = fish.Position - LaraItem->Pose.Position.ToVector3();
 					separationDir.Normalize();
