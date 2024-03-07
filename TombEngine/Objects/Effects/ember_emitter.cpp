@@ -8,12 +8,24 @@
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
+		unsigned char r;
+		unsigned char g;
+		unsigned char b;
+
 		if (!TriggerActive(item))
 			return;
 
-		unsigned char r = std::clamp(Random::GenerateInt(-32, 32) + int(item->Model.Color.x * UCHAR_MAX), 0, UCHAR_MAX);
-		unsigned char g = std::clamp(Random::GenerateInt(-32, 32) + int(item->Model.Color.y * UCHAR_MAX), 0, UCHAR_MAX);
-		unsigned char b = std::clamp(Random::GenerateInt(-32, 32) + int(item->Model.Color.z * UCHAR_MAX), 0, UCHAR_MAX);
+		//For a grey color, all color values have to be the same. Else it gives some variation to the color. Grey with one color different results to a multicolor emitter.
+		if  (item->Model.Color.x == item->Model.Color.y && item->Model.Color.y == item->Model.Color.z)
+		{
+			r = g = b = item->Model.Color.x * UCHAR_MAX;
+		}
+		else
+		{
+			r = std::clamp(Random::GenerateInt(-32, 32) + int(item->Model.Color.x * UCHAR_MAX), 0, UCHAR_MAX);
+			g = std::clamp(Random::GenerateInt(-32, 32) + int(item->Model.Color.y * UCHAR_MAX), 0, UCHAR_MAX);
+			b = std::clamp(Random::GenerateInt(-32, 32) + int(item->Model.Color.z * UCHAR_MAX), 0, UCHAR_MAX);
+		}
 
 		if (item->TriggerFlags)
 
@@ -78,6 +90,7 @@
 				spark->fadeToBlack = 4;
 				spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
 
+				//Only The color black (0, 0, 0) has a subtractive blending mode.
 				if (!item->Model.Color.x && !item->Model.Color.y && !item->Model.Color.z)
 				{
 					spark->sR = spark->sB = spark->sG = spark->dR = spark->dB = spark->dG = 255;
