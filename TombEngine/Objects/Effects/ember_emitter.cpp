@@ -74,7 +74,7 @@ using namespace TEN::Input;
 
 				if (GetRandomControl() & 3)
 				{
-					spark->flags = SP_ROTATE | SP_DEF | SP_SCALE | SP_EXPDEF;
+					spark->flags = SP_DAMAGE | SP_ROTATE | SP_DEF | SP_SCALE | SP_EXPDEF;
 					spark->scalar = 3;
 					spark->gravity = (GetRandomControl() & 0x3F) + 32;
 				}
@@ -103,20 +103,19 @@ using namespace TEN::Input;
 				spark->fadeToBlack = 4;
 				spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
 				spark->blendMode = BlendMode::Additive;
-				spark->life = spark->sLife = (GetRandomControl() & 3) + 54;
-				spark->x = (GetRandomControl() & 0x3F) + item->Pose.Position.x;
+				spark->life = spark->sLife = (GetRandomControl() & 3) + 74;
+				spark->x = (GetRandomControl() & 0x15) + item->Pose.Position.x;
 				spark->y = item->Pose.Position.y;
-				spark->z = (GetRandomControl() & 0x3F) + item->Pose.Position.z;
-
+				spark->z = (GetRandomControl() & 0x15) + item->Pose.Position.z;
 				spark->rotAng = (GetRandomControl() - 0x4000) * 2;
-				spark->yVel = -BLOCK(1.8f) - (GetRandomControl() & 0x3FF);
-				spark->gravity = (GetRandomControl() & 0xF) + 64;
-				spark->xVel = (GetRandomControl() & 0x2FF) - 356;
-				spark->friction = 6;
+				spark->yVel = -BLOCK(1.1f) - (GetRandomControl() & 0x6FF);
+				spark->gravity = (GetRandomControl() & 0xF) + 64; 
+				spark->xVel = (GetRandomControl() & 0x2FF) - 386;
+				spark->friction = 15;
 				spark->maxYvel = 0;
-				spark->zVel = (GetRandomControl() & 0x2FF) - 356;
+				spark->zVel = (GetRandomControl() & 0x2FF) - 386;
 				spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
-				spark->flags = SP_ROTATE | SP_DEF | SP_SCALE;
+				spark->flags = SP_DAMAGE |SP_ROTATE | SP_DEF | SP_SCALE;
 				spark->scalar = 1;
 				spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 32;
 				spark->dSize = spark->size;
