@@ -967,13 +967,14 @@ void UpdateCameraSphere(const ItemInfo& playerItem)
 		auto pos1 = GetJointPosition(playerItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
 		pos = pos1 - pos;
 
-		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
+		Camera.actualAngle = Camera.targetAngle + FROM_RAD(atan2(pos.x, pos.z));
 	}
 	else
 	{
 		if (IsUsingModernControls())
 		{
-			auto axis = (GetCameraAxis() != Vector2::Zero) ? GetCameraAxis() : GetMouseAxis();
+			auto axisSign = Vector2(g_Configuration.InvertCameraXAxis ? -1 : 1, g_Configuration.InvertCameraYAxis ? -1 : 1);
+			auto axis = ((GetCameraAxis() != Vector2::Zero) ? GetCameraAxis() : GetMouseAxis()) * axisSign;
 			float sensitivity = MOUSE_AXIS_COEFF / (1.0f + (abs(axis.x) + abs(axis.y)));
 			axis *= sensitivity * SMOOTHING_FACTOR;
 
@@ -983,7 +984,7 @@ void UpdateCameraSphere(const ItemInfo& playerItem)
 				short altitudeRot = Geometry::GetShortestAngle(Camera.actualElevation, Camera.targetElevation - ANGLE(axis.y));
 
 				Camera.actualAngle += azimuthRot * COMBAT_CAMERA_REBOUND_ALPHA;
-				Camera.actualElevation += altitudeRot * COMBAT_CAMERA_REBOUND_ALPHA;;
+				Camera.actualElevation += altitudeRot * COMBAT_CAMERA_REBOUND_ALPHA;
 			}
 			else
 			{

@@ -233,14 +233,16 @@ namespace TEN::Config
 		}
 
 		// Set Controls keys.
-		if (SetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
-			SetDWORDRegKey(controlsKey, REGKEY_CONTROL_MODE, (DWORD)g_Configuration.ControlMode) != ERROR_SUCCESS ||
+		if (SetDWORDRegKey(controlsKey, REGKEY_CONTROL_MODE, (DWORD)g_Configuration.ControlMode) != ERROR_SUCCESS ||
 			SetDWORDRegKey(controlsKey, REGKEY_SWIM_CONTROL_MODE, (DWORD)g_Configuration.SwimControlMode) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_GRAB, g_Configuration.EnableAutoGrab) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, g_Configuration.EnableOppositeActionRoll) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS)
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_X_AXIS, g_Configuration.InvertCameraXAxis) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_Y_AXIS, g_Configuration.InvertCameraYAxis) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS ||
+			SetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
@@ -309,6 +311,8 @@ namespace TEN::Config
 		g_Configuration.EnableCaustics = true;
 		g_Configuration.AntialiasingMode = AntialiasingMode::Medium;
 		g_Configuration.EnableAmbientOcclusion = true;
+		g_Configuration.EnableTargetHighlighter = true;
+		g_Configuration.EnableSubtitles = true;
 
 		g_Configuration.SoundDevice = 1;
 		g_Configuration.EnableSound = true;
@@ -320,13 +324,12 @@ namespace TEN::Config
 		g_Configuration.SwimControlMode = SwimControlMode::Omnidirectional;
 		g_Configuration.EnableAutoGrab = false;
 		g_Configuration.EnableAutoTargeting = true;
-		g_Configuration.EnableTargetHighlighter = true;
 		g_Configuration.EnableOppositeActionRoll = true;
-		g_Configuration.EnableSubtitles = true;
-
-		g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-		g_Configuration.EnableThumbstickCamera = false;
 		g_Configuration.EnableRumble = true;
+		g_Configuration.InvertCameraXAxis = false;
+		g_Configuration.InvertCameraYAxis = false;
+		g_Configuration.EnableThumbstickCamera = false;
+		g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
 
 		g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
 		g_Configuration.AdapterName = g_Renderer.GetDefaultAdapterName();
@@ -421,24 +424,28 @@ namespace TEN::Config
 			return false;
 		}
 
-		DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-		bool enableRumble = true;
 		DWORD controlMode = (DWORD)ControlMode::Enhanced;
 		DWORD swimControlMode = (DWORD)SwimControlMode::Omnidirectional;
-		bool enableAutoGrab = true;
+		bool enableAutoGrab = false;
 		bool enableAutoTargeting = true;
 		bool enableOppositeActionRoll = true;
+		bool enableRumble = true;
+		bool invertCameraXAxis = false;
+		bool invertCameraYAxis = false;
 		bool enableThumbstickCamera = true;
+		DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
 
 		// Load Controls keys.
-		if (GetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS ||
-			GetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
-			GetDWORDRegKey(controlsKey, REGKEY_CONTROL_MODE, &controlMode, (DWORD)ControlMode::Enhanced) != ERROR_SUCCESS ||
+		if (GetDWORDRegKey(controlsKey, REGKEY_CONTROL_MODE, &controlMode, (DWORD)ControlMode::Enhanced) != ERROR_SUCCESS ||
 			GetDWORDRegKey(controlsKey, REGKEY_SWIM_CONTROL_MODE, &swimControlMode, (DWORD)SwimControlMode::Omnidirectional) != ERROR_SUCCESS ||
-			GetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_GRAB, &enableAutoGrab, true) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_GRAB, &enableAutoGrab, false) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, &enableOppositeActionRoll, true) != ERROR_SUCCESS ||
-			GetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS)
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_X_AXIS, &invertCameraXAxis, false) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_Y_AXIS, &invertCameraYAxis, false) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS ||
+			GetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
@@ -502,14 +509,16 @@ namespace TEN::Config
 		g_Configuration.SfxVolume = sfxVolume;
 		g_Configuration.SoundDevice = soundDevice;
 
-		g_Configuration.MouseSensitivity = mouseSensitivity;
-		g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
-		g_Configuration.EnableRumble = enableRumble;
 		g_Configuration.ControlMode = (ControlMode)controlMode;
 		g_Configuration.SwimControlMode = (SwimControlMode)swimControlMode;
 		g_Configuration.EnableAutoGrab = enableAutoGrab;
 		g_Configuration.EnableAutoTargeting = enableAutoTargeting;
 		g_Configuration.EnableOppositeActionRoll = enableOppositeActionRoll;
+		g_Configuration.EnableRumble = enableRumble;
+		g_Configuration.InvertCameraXAxis = invertCameraXAxis;
+		g_Configuration.InvertCameraYAxis = invertCameraYAxis;
+		g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
+		g_Configuration.MouseSensitivity = mouseSensitivity;
 
 		// Set legacy variables.
 		SetVolumeTracks(musicVolume);

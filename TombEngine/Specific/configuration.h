@@ -34,14 +34,16 @@ namespace TEN::Config
 	constexpr auto REGKEY_SFX_VOLUME	= "SfxVolume";
 
 	// Controls keys
-	constexpr auto REGKEY_MOUSE_SENSITIVITY			  = "MouseSensitivity";
-	constexpr auto REGKEY_ENABLE_RUMBLE				  = "EnableRumble";
 	constexpr auto REGKEY_CONTROL_MODE				  = "ControlMode";
 	constexpr auto REGKEY_SWIM_CONTROL_MODE			  = "SwimControlMode";
 	constexpr auto REGKEY_ENABLE_AUTO_GRAB			  = "EnableAutoGrab";
 	constexpr auto REGKEY_ENABLE_AUTO_TARGETING		  = "EnableAutoTargeting";
 	constexpr auto REGKEY_ENABLE_OPPOSITE_ACTION_ROLL = "EnableOppositeActionRoll";
+	constexpr auto REGKEY_ENABLE_RUMBLE				  = "EnableRumble";
+	constexpr auto REGKEY_INVERT_CAMERA_X_AXIS		  = "InvertCameraXAxis";
+	constexpr auto REGKEY_INVERT_CAMERA_Y_AXIS		  = "InvertCameraYAxis";
 	constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	  = "EnableThumbstickCamera";
+	constexpr auto REGKEY_MOUSE_SENSITIVITY			  = "MouseSensitivity";
 
 	enum class ControlMode
 	{
@@ -86,14 +88,16 @@ namespace TEN::Config
 
 		// Controls
 		std::vector<int> KeyBindings			  = {};
-		int				 MouseSensitivity		  = DEFAULT_MOUSE_SENSITIVITY;
-		bool			 EnableRumble			  = false;
 		ControlMode		 ControlMode			  = ControlMode::Classic;
 		SwimControlMode	 SwimControlMode		  = SwimControlMode::Omnidirectional;
 		bool			 EnableAutoGrab			  = false;
 		bool			 EnableAutoTargeting	  = false;
 		bool			 EnableOppositeActionRoll = false;
+		bool			 EnableRumble			  = false;
+		bool			 InvertCameraXAxis		  = false;
+		bool			 InvertCameraYAxis		  = false;
 		bool			 EnableThumbstickCamera	  = false;
+		int				 MouseSensitivity		  = DEFAULT_MOUSE_SENSITIVITY;
 
 		std::vector<Vector2i> SupportedScreenResolutions = {};
 		std::string			  AdapterName				 = {};

@@ -861,21 +861,24 @@ namespace TEN::Gui
 		{
 			KeyBindings,
 
-			MouseSensitivity,
-			ToggleRumble,
-
 			ControlMode,
 			SwimControlMode,
 			AutoGrab,
 			AutoTargeting,
 			OppositeActionRoll,
+
+			EnableRumble,
+			InvertCameraXAxis,
+			InvertCameraYAxis,
 			ThumbstickCameraControl,
+
+			MouseSensitivity,
 
 			Apply,
 			Cancel
 		};
 
-		static const auto numInputSettingsOptions = 10;
+		static const auto numInputSettingsOptions = 12;
 
 		OptionCount = numInputSettingsOptions;
 
@@ -891,11 +894,6 @@ namespace TEN::Gui
 		{
 			switch (SelectedOption)
 			{
-			case InputSettingsOption::ToggleRumble:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableRumble = !CurrentSettings.Configuration.EnableRumble;
-				break;
-
 			case InputSettingsOption::ControlMode:
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -943,6 +941,21 @@ namespace TEN::Gui
 			case InputSettingsOption::OppositeActionRoll:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableOppositeActionRoll = !CurrentSettings.Configuration.EnableOppositeActionRoll;
+				break;
+
+			case InputSettingsOption::EnableRumble:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableRumble = !CurrentSettings.Configuration.EnableRumble;
+				break;
+
+			case InputSettingsOption::InvertCameraXAxis:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.InvertCameraXAxis = !CurrentSettings.Configuration.InvertCameraXAxis;
+				break;
+
+			case InputSettingsOption::InvertCameraYAxis:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.InvertCameraYAxis = !CurrentSettings.Configuration.InvertCameraYAxis;
 				break;
 
 			case InputSettingsOption::ThumbstickCameraControl:

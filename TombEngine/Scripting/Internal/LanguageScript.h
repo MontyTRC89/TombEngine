@@ -95,6 +95,8 @@
 #define STRING_SWIM_CONTROL_MODE		"swim_control_mode"
 #define STRING_SWIM_CONTROL_MODE_OMNI	"swim_control_mode_omnidirectional"
 #define STRING_SWIM_CONTROL_MODE_PLANAR	"swim_control_mode_planar"
+#define STRING_INVERT_CAMERA_X_AXIS		"invert_camera_x_axis"
+#define STRING_INVERT_CAMERA_Y_AXIS		"invert_camera_y_axis"
 #define STRING_SUBTITLES				"subtitles"
 #define STRING_MOUSE_SENSITIVITY		"mouse_sensitivity"
 #define STRING_ACTIONS_FORWARD			"actions_forward"
