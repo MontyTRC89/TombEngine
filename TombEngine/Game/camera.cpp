@@ -424,7 +424,7 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 	//activates code below ->  void CalculateCamera().
 	ItemCamera.ItemCameraOn = cond;
 
-	UpdateCameraSphere();
+	UpdateCameraSphere(*LaraItem);
 
 	//get mesh 0 coordinates.	
 	auto pos = GetJointPosition(camSlotId, 0, Vector3i::Zero);
@@ -774,6 +774,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		lookAtDir.Normalize();
 		auto lookAtPos = Geometry::TranslatePoint(pivotPos.ToVector3(), lookAtDir, LOOK_AT_DIST);
 
+		// TODO: Ceilings not handled correctly.
 		// Handle look at.
 		Camera.target = GameVector(lookAtPos, playerItem.RoomNumber);
 		LookAt(&Camera, 0);
@@ -851,7 +852,7 @@ void ChaseCamera(const ItemInfo& playerItem)
 		Camera.targetElevation = ANGLE(-10.0f);
 
 	Camera.targetElevation += playerItem.Pose.Orientation.x;
-	UpdateCameraSphere();
+	UpdateCameraSphere(playerItem);
 	ClampCameraAltitudeAngle(player.Control.WaterStatus == WaterStatus::Underwater);
 
 	auto pointColl = GetCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber, 0, 0, CLICK(1));
@@ -939,7 +940,7 @@ void CombatCamera(const ItemInfo& playerItem)
 		TargetSnaps = 0;
 	}
 
-	UpdateCameraSphere();
+	UpdateCameraSphere(playerItem);
 	ClampCameraAltitudeAngle(player.Control.WaterStatus == WaterStatus::Underwater);
 
 	Camera.targetDistance = BLOCK(1.5f);
@@ -947,18 +948,23 @@ void CombatCamera(const ItemInfo& playerItem)
 	HandleCameraFollow(playerItem, true);
 }
 
-void UpdateCameraSphere()
+void UpdateCameraSphere(const ItemInfo& playerItem)
 {
-	constexpr auto CAMERA_AXIS_COEFF = 30.0f;
-	constexpr auto MOUSE_AXIS_COEFF	 = 30.0f;
-	constexpr auto SMOOTHING_FACTOR	 = 8.0f;
+	// Modern camera constants
+	constexpr auto CAMERA_AXIS_COEFF		   = 30.0f;
+	constexpr auto MOUSE_AXIS_COEFF			   = 30.0f;
+	constexpr auto SMOOTHING_FACTOR			   = 8.0f;
+	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA = 0.4f;
+
+	// Tank camera constants
+	constexpr auto ALTITUDE_ROT_ALPHA = 1 / 8.0f;
 
 	DoThumbstickCamera();
 
 	if (Camera.laraNode != -1)
 	{
-		auto pos = GetJointPosition(LaraItem, Camera.laraNode, Vector3i::Zero);
-		auto pos1 = GetJointPosition(LaraItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
+		auto pos = GetJointPosition(playerItem, Camera.laraNode, Vector3i::Zero);
+		auto pos1 = GetJointPosition(playerItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
 		pos = pos1 - pos;
 
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
@@ -971,17 +977,28 @@ void UpdateCameraSphere()
 			float sensitivity = MOUSE_AXIS_COEFF / (1.0f + (abs(axis.x) + abs(axis.y)));
 			axis *= sensitivity * SMOOTHING_FACTOR;
 
-			Camera.actualAngle += ANGLE(axis.x);
-			Camera.actualElevation -= ANGLE(axis.y);
+			if (IsPlayerInCombat(playerItem))
+			{
+				short azimuthRot = Geometry::GetShortestAngle(Camera.actualAngle, (playerItem.Pose.Orientation.y + Camera.targetAngle) + ANGLE(axis.x));
+				short altitudeRot = Geometry::GetShortestAngle(Camera.actualElevation, Camera.targetElevation - ANGLE(axis.y));
+
+				Camera.actualAngle += azimuthRot * COMBAT_CAMERA_REBOUND_ALPHA;
+				Camera.actualElevation += altitudeRot * COMBAT_CAMERA_REBOUND_ALPHA;;
+			}
+			else
+			{
+				Camera.actualAngle += ANGLE(axis.x);
+				Camera.actualElevation -= ANGLE(axis.y);
+			}
 		}
 		else
 		{
-			Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
+			Camera.actualAngle = playerItem.Pose.Orientation.y + Camera.targetAngle;
 		}
 	}
 
 	if (!IsUsingModernControls())
-		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
+		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) * ALTITUDE_ROT_ALPHA;
 }
 
 bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst)

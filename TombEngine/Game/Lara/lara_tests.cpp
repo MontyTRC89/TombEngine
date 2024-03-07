@@ -1224,7 +1224,7 @@ bool IsPlayerStrafing(const ItemInfo& item)
 	if (IsHeld(In::Look))
 		return true;
 
-	// 3) Test for combat mode.
+	// 3) Test for combat stance.
 	if (player.Control.HandStatus == HandStatus::WeaponDraw ||
 		player.Control.HandStatus == HandStatus::WeaponReady)
 	{
@@ -1232,6 +1232,24 @@ bool IsPlayerStrafing(const ItemInfo& item)
 	}
 
 	return false;
+}
+
+bool IsPlayerInCombat(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+
+	// 1) Test for combat stance.
+	if (player.Control.HandStatus != HandStatus::WeaponDraw &&
+		player.Control.HandStatus != HandStatus::WeaponReady)
+	{
+		return false;
+	}
+
+	// 2) Test for attack target.
+	if (player.TargetEntity == nullptr)
+		return false;
+
+	return true;
 }
 
 bool HasOppositeAction(const ItemInfo& item)

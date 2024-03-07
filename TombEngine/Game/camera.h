@@ -95,7 +95,7 @@ void InitializeCamera();
 void MoveCamera(GameVector* ideal, float speed);
 void ChaseCamera(const ItemInfo& playerItem);
 void CombatCamera(const ItemInfo& playerItem);
-void UpdateCameraSphere();
+void UpdateCameraSphere(const ItemInfo& playerItem);
 bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst);
 void FixedCamera();
 void BounceCamera(ItemInfo* item, short bounce, short maxDistance);
