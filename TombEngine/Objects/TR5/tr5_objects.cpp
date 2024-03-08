@@ -778,7 +778,7 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->drawRoutine = nullptr;
-		obj->control = EmberEmitterControl;
+		obj->control = ControlEmberEmitter;
 	}
 
 	obj = &Objects[ID_GEN_SLOT1];

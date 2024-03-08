@@ -1,3 +1,6 @@
 #pragma once
 
-	void EmberEmitterControl(short itemNumber);
+namespace TEN::Effects::EmberEmitter
+{
+	void ControlEmberEmitter(short itemNumber);
+}
