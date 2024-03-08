@@ -105,17 +105,25 @@ void Renderer::UpdateLaraAnimations(bool force)
 	auto hipOrientConj = hipOrient;
 	hipOrientConj.Conjugate();
 
-	// Calculate extra hip rotation and conjugate.
+	// Calculate extra absolute hip rotation and conjugate.
 	auto extraAbsHipRot = Lara.ExtraHipRot.ToQuaternion();
 	auto extraAbsHipRotConj = extraAbsHipRot;
 	extraAbsHipRotConj.Conjugate();
 
-	// Calculate relative rotation between hip and torso.
-	auto relHipTorsoRot = extraAbsHipRotConj * hipOrientConj;
+	// Calculate extra absolute hip rotation and conjugate on XZ axes.
+	auto extraAbsHipRotXZ = EulerAngles(Lara.ExtraHipRot.x, 0, Lara.ExtraHipRot.z).ToQuaternion();
+	auto extraAbsHipRotConjXZ = extraAbsHipRotXZ;
+	extraAbsHipRotConjXZ.Conjugate();
 
-	// Update extra hip and torso rotations.
+	// Calculate relative hip rotations.
+	auto relHipRot = extraAbsHipRotConj * hipOrientConj;
+	auto relHipRotXZ = extraAbsHipRotConjXZ * hipOrientConj;
+
+	// Update extra absolute hip, torso, and thigh rotations to facilitate hip twist.
 	playerObject.LinearizedBones[LM_HIPS]->ExtraAbsRotation = extraAbsHipRot;
-	playerObject.LinearizedBones[LM_TORSO]->ExtraAbsRotation = hipOrient * relHipTorsoRot;
+	playerObject.LinearizedBones[LM_TORSO]->ExtraAbsRotation = hipOrient * relHipRot;
+	playerObject.LinearizedBones[LM_LTHIGH]->ExtraAbsRotation = hipOrient * relHipRotXZ;
+	playerObject.LinearizedBones[LM_RTHIGH]->ExtraAbsRotation = hipOrient * relHipRotXZ;
 
 	// Update extra torso and head rotations.
 	playerObject.LinearizedBones[LM_TORSO]->ExtraRotation = Lara.ExtraTorsoRot.ToQuaternion();
