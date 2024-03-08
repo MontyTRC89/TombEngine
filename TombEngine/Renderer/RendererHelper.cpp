@@ -75,12 +75,12 @@ namespace TEN::Renderer
 				return;
 			}
 
-			bool calculateMatrix = (mask >> bonePtr->Index) & 1;
+			bool calculateMatrix = bool((mask >> bonePtr->Index) & 1);
 			if (calculateMatrix)
 			{
 				auto offset0 = frameData.FramePtr0->Offset;
 				auto rotMatrix = Matrix::CreateFromQuaternion(frameData.FramePtr0->BoneOrientations[bonePtr->Index]);
-				
+
 				if (frameData.Alpha != 0.0f)
 				{
 					auto offset1 = frameData.FramePtr1->Offset;
@@ -95,9 +95,12 @@ namespace TEN::Renderer
 					rotMatrix = Matrix::CreateFromQuaternion(quat3);
 				}
 
+				auto extraAbsRotMatrix = Matrix::CreateFromQuaternion(bonePtr->ExtraAbsRotation);
+				rotMatrix = rotMatrix * extraAbsRotMatrix;
+
 				auto tMatrix = (bonePtr == rObject.Skeleton) ? Matrix::CreateTranslation(offset0) : Matrix::Identity;
 
-				auto extraRotMatrix = Matrix::CreateFromQuaternion(bonePtr->ExtraRotation);
+				auto extraRelRotMatrix = Matrix::CreateFromQuaternion(bonePtr->ExtraRotation);
 
 				if (useObjectWorldRotation)
 				{
@@ -106,17 +109,21 @@ namespace TEN::Renderer
 					auto translation = Vector3::Zero;
 					transforms[bonePtr->Parent->Index].Invert().Decompose(scale, inverseQuat, translation);
 
-					rotMatrix = rotMatrix * extraRotMatrix * Matrix::CreateFromQuaternion(inverseQuat);
+					rotMatrix = rotMatrix * extraRelRotMatrix * Matrix::CreateFromQuaternion(inverseQuat);
 				}
 				else
 				{
-					rotMatrix = extraRotMatrix * rotMatrix;
+					rotMatrix = extraRelRotMatrix * rotMatrix;
 				}
 
 				if (bonePtr != rObject.Skeleton)
+				{
 					transforms[bonePtr->Index] = rotMatrix * bonePtr->Transform;
+				}
 				else
+				{
 					transforms[bonePtr->Index] = rotMatrix * tMatrix;
+				}
 
 				if (bonePtr != rObject.Skeleton)
 					transforms[bonePtr->Index] = transforms[bonePtr->Index] * transforms[bonePtr->Parent->Index];

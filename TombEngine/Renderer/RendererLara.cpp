@@ -98,20 +98,32 @@ void Renderer::UpdateLaraAnimations(bool force)
 	_laraWorldMatrix = rotMatrix * tMatrix;
 	rItem.World = _laraWorldMatrix;
 
-	auto extraHipRot = Lara.ExtraHipRot.ToQuaternion();
-	auto negExtraHipRot = extraHipRot;
-	negExtraHipRot.Conjugate();
+	auto frameData = GetFrameInterpData(*LaraItem);
 
-	// TODO: Rotate hips in absolute space.
-	// Update extra hip, torso, and head rotations.
-	playerObject.LinearizedBones[LM_HIPS]->ExtraRotation = extraHipRot;
-	playerObject.LinearizedBones[LM_TORSO]->ExtraRotation = Lara.ExtraTorsoRot.ToQuaternion() * negExtraHipRot;
+	// Calculate current hip orientation and conjugate.
+	auto hipOrient = Quaternion::Lerp(frameData.FramePtr0->BoneOrientations[LM_HIPS], frameData.FramePtr1->BoneOrientations[LM_HIPS], frameData.Alpha);
+	auto hipOrientConj = hipOrient;
+	hipOrientConj.Conjugate();
+
+	// Calculate extra hip rotation and conjugate.
+	auto extraAbsHipRot = Lara.ExtraHipRot.ToQuaternion();
+	auto extraAbsHipRotConj = extraAbsHipRot;
+	extraAbsHipRotConj.Conjugate();
+
+	// Calculate relative rotation between hip and torso.
+	auto relHipTorsoRot = extraAbsHipRotConj * hipOrientConj;
+
+	// Update extra hip and torso rotations.
+	playerObject.LinearizedBones[LM_HIPS]->ExtraAbsRotation = extraAbsHipRot;
+	playerObject.LinearizedBones[LM_TORSO]->ExtraAbsRotation = hipOrient * relHipTorsoRot;
+
+	// Update extra torso and head rotations.
+	playerObject.LinearizedBones[LM_TORSO]->ExtraRotation = Lara.ExtraTorsoRot.ToQuaternion();
 	playerObject.LinearizedBones[LM_HEAD]->ExtraRotation = Lara.ExtraHeadRot.ToQuaternion();
 
 	// First calculate matrices for legs, hips, head, and torso.
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 	
-	auto frameData = GetFrameInterpData(*LaraItem);
 	UpdateAnimation(&rItem, playerObject, frameData, mask);
 
 	// Then the arms, based on current weapon status.
