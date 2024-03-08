@@ -3,6 +3,9 @@
 
 #include "Game/effects/effects.h"
 #include "Game/Setup.h"
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Effects::EmberEmitter
 {
@@ -50,41 +53,41 @@ namespace TEN::Effects::EmberEmitter
 				spark.on = true;
 				spark.sR = -1;
 				spark.sB = 16;
-				spark.sG = (GetRandomControl() & 0x1F) + 48;
+				spark.sG = Random::GenerateFloat(0.2f, 0.3f) * UCHAR_MAX;
 				spark.dR = (GetRandomControl() & 0x3F) - 64;
 				spark.dB = 0;
-				spark.dG = (GetRandomControl() & 0x3F) + -128;
+				spark.dG = (GetRandomControl() & 0x3F) - 128;
 				spark.fadeToBlack = 4;
-				spark.colFadeSpeed = (GetRandomControl() & 3) + 4;
+				spark.colFadeSpeed = Random::GenerateFloat(4.0f, 8.0f);
 				spark.blendMode = BlendMode::Additive;
 				spark.life =
-				spark.sLife = (GetRandomControl() & 3) + 24;
-				spark.x = item.ItemFlags[1] + (GetRandomControl() & 0x3F) + item.Pose.Position.x - 544;
+				spark.sLife = Random::GenerateFloat(24.0f, 28.0f);
+				spark.x = item.ItemFlags[1] + Random::GenerateFloat(0.0f, 64.0f) + item.Pose.Position.x - 544;
 				spark.y = item.Pose.Position.y;
-				spark.z = item.ItemFlags[0] + (GetRandomControl() & 0x3F) + item.Pose.Position.z - 544;
-				spark.xVel = (GetRandomControl() & 0x1FF) - 256;
-				spark.friction = 6;
-				spark.zVel = (GetRandomControl() & 0x1FF) - 256;
-				spark.rotAng = GetRandomControl() & 0xFFF;
-				spark.rotAdd = (GetRandomControl() & 0x3F) - 32;
-				spark.maxYvel = 0;
+				spark.z = item.ItemFlags[0] + Random::GenerateFloat(0.0f, 64.0f) + item.Pose.Position.z - 544;
+				spark.xVel = Random::GenerateFloat(-BLOCK(0.25f), BLOCK(0.25f));
+				spark.friction = 6.0f;
+				spark.zVel = Random::GenerateFloat(-BLOCK(0.25f), BLOCK(0.25f));
+				spark.rotAng = Random::GenerateAngle(ANGLE(0.0f), ANGLE(20.0f));
+				spark.rotAdd = Random::GenerateAngle(ANGLE(-0.2f), ANGLE(0.2f));
+				spark.maxYvel = 0.0f;
 				spark.yVel = -512 - (GetRandomControl() & 0x3FF);
 				spark.sSize =
-				spark.size = (GetRandomControl() & 0x0F) + 32;
+				spark.size = Random::GenerateFloat(32.0f, 48.0f);
 				spark.dSize = spark.size / 4;
 
 				if (GetRandomControl() & 3)
 				{
+					spark.scalar = 3.0f;
+					spark.gravity = Random::GenerateFloat(32.0f, 96.0f);
 					spark.flags = SP_DAMAGE | SP_ROTATE | SP_DEF | SP_SCALE | SP_EXPDEF;
-					spark.scalar = 3;
-					spark.gravity = (GetRandomControl() & 0x3F) + 32;
 				}
 				else
 				{
-					spark.flags = SP_ROTATE | SP_DEF | SP_SCALE;
 					spark.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
-					spark.scalar = 1;
-					spark.gravity = (GetRandomControl() & 0xF) + 64;
+					spark.scalar = 1.0f;
+					spark.gravity = Random::GenerateFloat(64.0f, 80.0f);
+					spark.flags = SP_ROTATE | SP_DEF | SP_SCALE;
 				}
 			}
 		}
@@ -95,8 +98,8 @@ namespace TEN::Effects::EmberEmitter
 				auto& spark = *GetFreeParticle();
 
 				spark.on = true;
-				spark.fadeToBlack = 4;
-				spark.colFadeSpeed = (GetRandomControl() & 3) + 4;
+				spark.fadeToBlack = 4.0f;
+				spark.colFadeSpeed = Random::GenerateFloat(4.0f, 8.0f);
 
 				// NOTE: Only black has subtractive blending mode.
 				if (item.Model.Color.x == 0.0f &&
@@ -122,24 +125,24 @@ namespace TEN::Effects::EmberEmitter
 					spark.blendMode = BlendMode::Additive;
 				}
 
+				spark.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
 				spark.life =
-				spark.sLife = (GetRandomControl() & 3) + 74;
-				spark.x = (GetRandomControl() & 0x15) + item.Pose.Position.x;
+				spark.sLife = Random::GenerateFloat(74.0f, 78.0f);
+				spark.x = item.Pose.Position.x + Random::GenerateFloat(0.0f, 22.0f);
 				spark.y = item.Pose.Position.y;
-				spark.z = (GetRandomControl() & 0x15) + item.Pose.Position.z;
-				spark.rotAng = (GetRandomControl() - 0x4000) * 2;
-				spark.yVel = -BLOCK(1.1f) - (GetRandomControl() & 0x6FF);
-				spark.gravity = (GetRandomControl() & 0xF) + 64;
-				spark.xVel = (GetRandomControl() & 0x2FF) - 386;
+				spark.z = item.Pose.Position.z + Random::GenerateFloat(0.0f, 22.0f);
+				spark.rotAng = Random::GenerateAngle();
+				spark.yVel = -BLOCK(1.1f) - Random::GenerateFloat(0.0f, BLOCK(1.75f));
+				spark.gravity = Random::GenerateFloat(64.0f, 80.0f);
+				spark.xVel = Random::GenerateFloat(-368.0f, 368.0f);
 				spark.friction = 15;
 				spark.maxYvel = 0;
-				spark.zVel = (GetRandomControl() & 0x2FF) - 386;
-				spark.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
-				spark.flags = SP_DAMAGE | SP_ROTATE | SP_DEF | SP_SCALE;
-				spark.scalar = 1;
+				spark.zVel = Random::GenerateFloat(-368.0f, 368.0f);
+				spark.scalar = 1.0f;
 				spark.sSize =
-				spark.size = (GetRandomControl() & 0x0F) + 32;
+				spark.size = Random::GenerateFloat(32.0f, 48.0f);
 				spark.dSize = spark.size;
+				spark.flags = SP_DAMAGE | SP_ROTATE | SP_DEF | SP_SCALE;
 			}
 		}
 	}
