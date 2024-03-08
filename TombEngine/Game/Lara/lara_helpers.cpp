@@ -801,8 +801,6 @@ void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool 
 		deltaAngle *= STRAFE_LEAN_COEFF;
 	}
 
-	g_Renderer.PrintDebugMessage("%.3f", TO_DEGREES(abs(deltaAngle)));
-
 	// Calculate target lean orientation.
 	float leanAngleAlpha = std::clamp(abs(deltaAngle) / (float)BASE_ANGLE, 0.0f, 1.0f);
 	short targetLeanAngle = (leanAngleMax * leanAngleAlpha) * sign;
