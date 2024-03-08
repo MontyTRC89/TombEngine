@@ -4,9 +4,6 @@
 #include "Game/effects/effects.h"
 #include "Game/Setup.h"
 
-// For grey color, all color values must be identical, otherwise it gives some variation to the color.
-// Grey with one color different results to a multicolor emitter.
-
 namespace TEN::Effects::EmberEmitter
 {
 	void ControlEmberEmitter(short itemNumber)
@@ -20,7 +17,8 @@ namespace TEN::Effects::EmberEmitter
 		unsigned char g = 0;
 		unsigned char b = 0;
 
-		if (item.Model.Color.x == item.Model.Color.y && item.Model.Color.y == item.Model.Color.z)
+		if (item.Model.Color.x == item.Model.Color.y &&
+			item.Model.Color.y == item.Model.Color.z)
 		{
 			r =
 			g =
@@ -34,12 +32,12 @@ namespace TEN::Effects::EmberEmitter
 		}
 
 		if (item.TriggerFlags)
-
 		{
 			if (!item.ItemFlags[2])
 			{
 				int div = item.TriggerFlags % 10 << 10;
 				int mod = item.TriggerFlags / 10 << 10;
+
 				item.ItemFlags[0] = GetRandomControl() % div;
 				item.ItemFlags[1] = GetRandomControl() % mod;
 				item.ItemFlags[2] = (GetRandomControl() & 0xF) + 15;
@@ -59,7 +57,8 @@ namespace TEN::Effects::EmberEmitter
 				spark.fadeToBlack = 4;
 				spark.colFadeSpeed = (GetRandomControl() & 3) + 4;
 				spark.blendMode = BlendMode::Additive;
-				spark.life = spark.sLife = (GetRandomControl() & 3) + 24;
+				spark.life =
+				spark.sLife = (GetRandomControl() & 3) + 24;
 				spark.x = item.ItemFlags[1] + (GetRandomControl() & 0x3F) + item.Pose.Position.x - 544;
 				spark.y = item.Pose.Position.y;
 				spark.z = item.ItemFlags[0] + (GetRandomControl() & 0x3F) + item.Pose.Position.z - 544;
@@ -70,7 +69,8 @@ namespace TEN::Effects::EmberEmitter
 				spark.rotAdd = (GetRandomControl() & 0x3F) - 32;
 				spark.maxYvel = 0;
 				spark.yVel = -512 - (GetRandomControl() & 0x3FF);
-				spark.sSize = spark.size = (GetRandomControl() & 0x0F) + 32;
+				spark.sSize =
+				spark.size = (GetRandomControl() & 0x0F) + 32;
 				spark.dSize = spark.size / 4;
 
 				if (GetRandomControl() & 3)
@@ -98,24 +98,32 @@ namespace TEN::Effects::EmberEmitter
 				spark.fadeToBlack = 4;
 				spark.colFadeSpeed = (GetRandomControl() & 3) + 4;
 
-				// NOTE: Only color black (0, 0, 0) has subtractive blending mode.
-				if (!item.Model.Color.x && !item.Model.Color.y && !item.Model.Color.z)
+				// NOTE: Only black has subtractive blending mode.
+				if (item.Model.Color.x == 0.0f &&
+					item.Model.Color.y == 0.0f &&
+					item.Model.Color.z == 0.0f)
 				{
-					spark.sR = spark.sB = spark.sG = spark.dR = spark.dB = spark.dG = 255;
+					spark.sR =
+					spark.sG =
+					spark.sB =
+					spark.dR =
+					spark.dG =
+					spark.dB = 1.0f * UCHAR_MAX;
 					spark.blendMode = BlendMode::Subtractive;
 				}
 				else
 				{
 					spark.sR = r;
-					spark.sB = b;
 					spark.sG = g;
+					spark.sB = b;
 					spark.dR = r;
-					spark.dB = b;
 					spark.dG = g;
+					spark.dB = b;
 					spark.blendMode = BlendMode::Additive;
 				}
 
-				spark.life = spark.sLife = (GetRandomControl() & 3) + 74;
+				spark.life =
+				spark.sLife = (GetRandomControl() & 3) + 74;
 				spark.x = (GetRandomControl() & 0x15) + item.Pose.Position.x;
 				spark.y = item.Pose.Position.y;
 				spark.z = (GetRandomControl() & 0x15) + item.Pose.Position.z;
@@ -129,7 +137,8 @@ namespace TEN::Effects::EmberEmitter
 				spark.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
 				spark.flags = SP_DAMAGE | SP_ROTATE | SP_DEF | SP_SCALE;
 				spark.scalar = 1;
-				spark.sSize = spark.size = (GetRandomControl() & 0x0F) + 32;
+				spark.sSize =
+				spark.size = (GetRandomControl() & 0x0F) + 32;
 				spark.dSize = spark.size;
 			}
 		}
