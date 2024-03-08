@@ -803,6 +803,8 @@ void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool 
 		absDeltaAngle *= STRAFE_LEAN_COEFF;
 	}
 
+	g_Renderer.PrintDebugMessage("%.3f", TO_DEGREES(absDeltaAngle));
+
 	// Calculate target lean orientation.
 	float leanAngleAlpha = std::clamp(absDeltaAngle / (float)BASE_ANGLE, 0.0f, 1.0f);
 	short targetLeanAngle = (leanAngleMax * leanAngleAlpha) * sign;
@@ -833,12 +835,14 @@ void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, s
 // NOTE: Modern control version.
 void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 {
-	constexpr auto LOWER_FLEX_ANGLE_CONSTRAINT	 = ANGLE(65.0f);
-	constexpr auto UPPER_FLEX_ANGLE_CONSTRAINT	 = ANGLE(100.0f);
-	constexpr auto UPPER_FLEX_ANGLE_STRAFE_COEFF = 0.4f;
-	constexpr auto UPPER_FLEX_Z_COEFF			 = 0.1f;
-	constexpr auto TORSO_ROT_COEFF				 = 0.5f;
-	constexpr auto HEAD_ROT_COEFF				 = 0.5f;
+	constexpr auto BASE_ANGLE					   = ANGLE(90.0f);
+	constexpr auto LOWER_FLEX_ANGLE_X_CONSTRAINT   = ANGLE(5.0f);
+	constexpr auto LOWER_FLEX_ANGLE_Y_CONSTRAINT   = ANGLE(65.0f);
+	constexpr auto UPPER_FLEX_ANGLE_Y_CONSTRAINT   = ANGLE(100.0f);
+	constexpr auto UPPER_FLEX_ANGLE_Y_STRAFE_COEFF = 0.4f;
+	constexpr auto UPPER_FLEX_ANGLE_Z_COEFF		   = 0.1f;
+	constexpr auto TORSO_ROT_COEFF				   = 0.5f;
+	constexpr auto HEAD_ROT_COEFF				   = 0.5f;
 
 	auto& player = GetLaraInfo(item);
 
@@ -846,31 +850,31 @@ void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 	int sign = std::copysign(1, deltaAngle);
 
-	g_Renderer.PrintDebugMessage("%.3f", TO_DEGREES(deltaAngle));
-
-	// Calculate lower flex rotation.
 	if (isStrafing)
 	{
-		if (abs(deltaAngle) > ANGLE(90.0f))
+		if (abs(deltaAngle) > BASE_ANGLE)
 		{
-			deltaAngle -= ANGLE(90.0f) * sign;
+			deltaAngle -= BASE_ANGLE * sign;
 			deltaAngle *= -1;
-			deltaAngle = (ANGLE(90.0f) * -sign) - deltaAngle;
+			deltaAngle = (BASE_ANGLE * -sign) - deltaAngle;
 		}
 	}
 
-	g_Renderer.PrintDebugMessage("%.3f", TO_DEGREES(deltaAngle));
+	// Calculate angle modifiers.
+	float lowerFlexAngleXAlpha = abs(deltaAngle) / (float)LOWER_FLEX_ANGLE_Y_CONSTRAINT;
+	float upperFlexAngleYAlpha = std::clamp(abs(deltaAngle) / (float)UPPER_FLEX_ANGLE_Y_CONSTRAINT, 0.0f, 1.0f);
+	float upperFlexAngleYCoeff = isStrafing ? UPPER_FLEX_ANGLE_Y_STRAFE_COEFF : 1.0f;
+	int headFlexSign = isStrafing ? -1 : 1;
 
-	short lowerFlexAngle = isStrafing ? std::clamp<short>(deltaAngle, -LOWER_FLEX_ANGLE_CONSTRAINT, LOWER_FLEX_ANGLE_CONSTRAINT) : 0;
-	auto lowerFlexRot = EulerAngles(0, lowerFlexAngle, 0);
+	// Calculate lower flex rotation.
+	short lowerFlexAngleX = isStrafing ? (LOWER_FLEX_ANGLE_X_CONSTRAINT * lowerFlexAngleXAlpha) : 0;
+	short lowerFlexAngleY = isStrafing ? std::clamp<short>(deltaAngle, -LOWER_FLEX_ANGLE_Y_CONSTRAINT, LOWER_FLEX_ANGLE_Y_CONSTRAINT) : 0;
+	auto lowerFlexRot = EulerAngles(lowerFlexAngleX, lowerFlexAngleY, 0);
 
 	// Calculate upper flex rotation.
-	float upperFlexAngleAlpha = std::clamp(abs(deltaAngle) / (float)UPPER_FLEX_ANGLE_CONSTRAINT, 0.0f, 1.0f);
-	float upperFlexAngleCoeff = isStrafing ? UPPER_FLEX_ANGLE_STRAFE_COEFF : 1.0f;
-	short upperFlexAngle = ((UPPER_FLEX_ANGLE_CONSTRAINT * upperFlexAngleAlpha) * sign) * upperFlexAngleCoeff;
-	auto upperFlexRot = EulerAngles(player.ExtraHeadRot.x, upperFlexAngle, upperFlexAngle * UPPER_FLEX_Z_COEFF);
-
-	int headFlexSign = isStrafing ? -1 : 1;
+	short upperFlexAngleY = ((UPPER_FLEX_ANGLE_Y_CONSTRAINT * upperFlexAngleYAlpha) * sign) * upperFlexAngleYCoeff;
+	short upperFlexAngleZ = upperFlexAngleY * UPPER_FLEX_ANGLE_Z_COEFF;
+	auto upperFlexRot = EulerAngles(player.ExtraHeadRot.x, upperFlexAngleY, upperFlexAngleZ);
 
 	// Flex hips, torso, and head.
 	player.ExtraHipRot.Lerp(lowerFlexRot, alpha);

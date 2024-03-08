@@ -940,7 +940,7 @@ void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
-		//HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, true);
+		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, true);
 		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
 	}
 

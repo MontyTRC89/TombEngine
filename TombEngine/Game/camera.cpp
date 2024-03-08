@@ -953,7 +953,7 @@ void UpdateCameraSphere(const ItemInfo& playerItem)
 	// Modern camera constants
 	constexpr auto AXIS_SENSITIVITY_COEFF	   = 30.0f;
 	constexpr auto SMOOTHING_FACTOR			   = 8.0f;
-	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA = 0.4f;
+	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA = 0.3f;
 
 	// Tank camera constants
 	constexpr auto ALTITUDE_ROT_ALPHA = 1 / 8.0f;
