@@ -790,23 +790,21 @@ void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool 
 
 	// Calculate delta angle.
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
-	short absDeltaAngle = abs(deltaAngle);
 	int sign = std::copysign(1, deltaAngle);
 
-	// TODO: Math error causes too much lean when running back.
-	// Adjust absolute detla angle if strafing.
+	// Adjust detla angle if strafing.
 	if (isStrafing)
 	{
-		if (absDeltaAngle > BASE_ANGLE)
-			absDeltaAngle -= BASE_ANGLE;
+		if (abs(deltaAngle) > BASE_ANGLE)
+			deltaAngle = ((BASE_ANGLE * 2) * sign) - deltaAngle;
 
-		absDeltaAngle *= STRAFE_LEAN_COEFF;
+		deltaAngle *= STRAFE_LEAN_COEFF;
 	}
 
-	g_Renderer.PrintDebugMessage("%.3f", TO_DEGREES(absDeltaAngle));
+	g_Renderer.PrintDebugMessage("%.3f", TO_DEGREES(abs(deltaAngle)));
 
 	// Calculate target lean orientation.
-	float leanAngleAlpha = std::clamp(absDeltaAngle / (float)BASE_ANGLE, 0.0f, 1.0f);
+	float leanAngleAlpha = std::clamp(abs(deltaAngle) / (float)BASE_ANGLE, 0.0f, 1.0f);
 	short targetLeanAngle = (leanAngleMax * leanAngleAlpha) * sign;
 	auto targetOrient = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, targetLeanAngle);
 
@@ -850,15 +848,9 @@ void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 	int sign = std::copysign(1, deltaAngle);
 
-	if (isStrafing)
-	{
-		if (abs(deltaAngle) > BASE_ANGLE)
-		{
-			deltaAngle -= BASE_ANGLE * sign;
-			deltaAngle *= -1;
-			deltaAngle = (BASE_ANGLE * -sign) - deltaAngle;
-		}
-	}
+	// Adjust detla angle if strafing.
+	if (isStrafing && abs(deltaAngle) > BASE_ANGLE)
+		deltaAngle = (((BASE_ANGLE * 2) * sign) - deltaAngle) * -1;
 
 	// Calculate angle modifiers.
 	float lowerFlexAngleXAlpha = abs(deltaAngle) / (float)LOWER_FLEX_ANGLE_Y_CONSTRAINT;
