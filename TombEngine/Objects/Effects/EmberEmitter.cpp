@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/Effects/ember_emitter.h"
+#include "Objects/Effects/EmberEmitter.h"
 
 #include "Game/effects/effects.h"
 #include "Game/Setup.h"
