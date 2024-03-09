@@ -1327,12 +1327,13 @@ static void UpdatePlayerRefCameraOrient(ItemInfo& item)
 
 	bool isCameraTransition = (Camera.type == CameraType::Fixed && (Camera.oldType == CameraType::Chase || Camera.oldType == CameraType::Combat)) ||
 							  ((Camera.type == CameraType::Chase || Camera.type == CameraType::Combat) && Camera.oldType == CameraType::Fixed);
+	bool hasMoveAction = (GetMoveAxis() != Vector2::Zero || IsHeld(In::StepLeft) || IsHeld(In::StepRight));
 
-	if (isCameraTransition && GetMoveAxis() != Vector2::Zero)
+	if (isCameraTransition && hasMoveAction)
 	{
 		player.Control.LockRefCameraOrient = true;
 	}
-	else if (GetMoveAxis() == Vector2::Zero)
+	else if (!hasMoveAction)
 	{
 		player.Control.LockRefCameraOrient = false;
 	}
