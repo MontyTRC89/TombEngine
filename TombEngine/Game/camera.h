@@ -4,6 +4,12 @@
 
 struct CollisionInfo;
 
+using namespace TEN::Math;
+
+constexpr auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
+	EulerAngles(ANGLE(-70.0f), ANGLE(-90.0f), 0),
+	EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0));
+
 enum class CameraType
 {
 	Chase,
@@ -14,31 +20,39 @@ enum class CameraType
 	Object
 };
 
+enum class CameraFlag
+{
+	None,
+	FollowCenter,
+	NoChunky,
+	ChaseObject
+};
+
 struct CAMERA_INFO
 {
 	// Camera sphere
-	GameVector pos			   = GameVector();
-	GameVector target		   = GameVector(); // LookAt
-	short	   actualAngle	   = 0;			   // AzimuthAngle
+	GameVector pos			   = GameVector::Zero;
+	GameVector target		   = GameVector::Zero; // LookAt
+	short	   actualAngle	   = 0;				   // AzimuthAngle
 	short	   targetAngle	   = 0;
-	short	   actualElevation = 0;			   // AltitudeAngle
+	short	   actualElevation = 0;				   // AltitudeAngle
 	short	   targetElevation = 0;
 	float	   targetDistance  = 0.0f;
 
-	CameraType type;
-	CameraType oldType;
-	int shift;
-	int flags;
-	int numberFrames;
+	CameraType type	= CameraType::Chase;
+	CameraType oldType = CameraType::Chase;
+	CameraFlag flags = CameraFlag::None;
+	float speed;
+	float targetspeed;
 	int bounce;
+	int shift;
+	int numberFrames;
 
-	short laraNode;
-	short box;
-	short number;
-	short last;
-	short timer;
-	short speed;
-	short targetspeed;
+	int laraNode;
+	int box;
+	int number;
+	int last;
+	int timer;
 	ItemInfo* item;
 	ItemInfo* lastItem;
 	int mikeAtLara;
@@ -53,14 +67,6 @@ struct ObjectCameraInfo
 {
 	GameVector LastAngle;
 	bool ItemCameraOn;
-};
-
-enum CAMERA_FLAGS
-{
-	CF_NONE			 = 0,
-	CF_FOLLOW_CENTER = 1,
-	CF_NO_CHUNKY	 = 2,
-	CF_CHASE_OBJECT	 = 3,
 };
 
 constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
@@ -95,15 +101,15 @@ void CombatCamera(const ItemInfo& playerItem);
 void UpdateCameraSphere(const ItemInfo& playerItem);
 bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst);
 void FixedCamera();
-void BounceCamera(ItemInfo* item, short bounce, short maxDistance);
+void BounceCamera(ItemInfo* item, int bounce, float distMax);
 void BinocularCamera(ItemInfo* item);
 void ConfirmCameraTargetPos();
 void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll);
 void RumbleScreen();
-bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
-void ObjCamera(ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID, bool cond);
-void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID);
-void RefreshFixedCamera(short camNumber);
+bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, float radius);
+void ObjCamera(ItemInfo* item, int boneID, ItemInfo* targetItem, int targetBoneID, bool cond);
+void MoveObjCamera(GameVector* ideal, ItemInfo* item, int boneID, ItemInfo* targetItem, int targetBoneID);
+void RefreshFixedCamera(int cameraID);
 
 void SetScreenFadeOut(float speed, bool force = false);
 void SetScreenFadeIn(float speed, bool force = false);

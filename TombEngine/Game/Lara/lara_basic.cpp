@@ -57,7 +57,7 @@ void lara_default_col(ItemInfo* item, CollisionInfo* coll)
 // Boulder death.
 void lara_as_special(ItemInfo* item, CollisionInfo* coll)
 {
-	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.flags = CameraFlag::FollowCenter;
 	Camera.targetAngle = ANGLE(170.0f);
 	Camera.targetElevation = ANGLE(-25.0f);
 }
@@ -75,7 +75,7 @@ void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.flags = CameraFlag::FollowCenter;
 
 	if (item->Animation.FrameNumber == GetAnimData(*item).frameEnd - 1)
 	{

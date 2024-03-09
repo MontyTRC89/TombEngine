@@ -34,7 +34,7 @@ void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = BLOCK(1);
-	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.flags = CameraFlag::FollowCenter;
 
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
@@ -974,7 +974,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = 0;
 	Camera.targetDistance = BLOCK(1);
-	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.flags = CameraFlag::FollowCenter;
 
 	ResetPlayerLean(item, 1 / 6.0f);
 

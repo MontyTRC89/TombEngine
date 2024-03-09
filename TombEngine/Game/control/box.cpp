@@ -581,7 +581,7 @@ void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnim
 	player.HitDirection = -1;
 
 	Camera.pos.RoomNumber = playerItem.RoomNumber;
-	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.flags = CameraFlag::FollowCenter;
 	Camera.targetAngle = ANGLE(170.0f);
 	Camera.targetElevation = ANGLE(-25.0f);
 	Camera.targetDistance = BLOCK(2);

@@ -150,10 +150,6 @@ void LookCamera(const ItemInfo& item, const CollisionInfo& coll)
 	constexpr auto CAMERA_DIST_COEFF = 0.7f;
 	constexpr auto CAMERA_DIST_MAX	 = BLOCK(0.75f);
 
-	constexpr auto ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
-		EulerAngles(ANGLE(-70.0f), ANGLE(-90.0f), 0),
-		EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0));
-
 	const auto& player = GetLaraInfo(item);
 
 	int verticalOffset = GetCameraPlayerVerticalOffset(item, coll);
@@ -165,7 +161,7 @@ void LookCamera(const ItemInfo& item, const CollisionInfo& coll)
 	auto orient = player.Control.Look.Orientation +
 		EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, 0) +
 		EulerAngles(0, Camera.targetAngle, 0);
-	orient.x = std::clamp(orient.x, ORIENT_CONSTRAINT.first.x, ORIENT_CONSTRAINT.second.x);
+	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
 
 	// Determine base position.
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
@@ -249,7 +245,7 @@ void InitializeCamera()
 	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
 	Camera.speed = 1;
-	Camera.flags = CF_NONE;
+	Camera.flags = CameraFlag::None;
 	Camera.bounce = 0;
 	Camera.number = -1;
 	Camera.fixedCamera = false;
@@ -404,22 +400,21 @@ void MoveCamera(GameVector* ideal, float speed)
 	Camera.oldType = Camera.type;
 }
 
-void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId, bool cond)
+void ObjCamera(ItemInfo* item, int boneID, ItemInfo* targetItem, int targetBoneID, bool cond)
 {
-	//camSlotId and targetItem stay the same object until I know how to expand targetItem to another object.
-	//activates code below ->  void CalculateCamera().
+	// item and targetItem remain same object until it becomes possible to extend targetItem to another object.
+	// Activates code below -> void CalculateCamera().
 	ItemCamera.ItemCameraOn = cond;
 
 	UpdateCameraSphere(*LaraItem);
 
-	//get mesh 0 coordinates.	
-	auto pos = GetJointPosition(camSlotId, 0, Vector3i::Zero);
-	auto dest = Vector3(pos.x, pos.y, pos.z);
+	// Get position of mesh 0.	
+	auto pos = GetJointPosition(item, 0, Vector3i::Zero);
+	auto target = GameVector(pos, item->RoomNumber);
 
-	GameVector from = GameVector(dest, camSlotId->RoomNumber);
 	Camera.fixedCamera = true;
 
-	MoveObjCamera(&from, camSlotId, camMeshId, targetItem, targetMeshId);
+	MoveObjCamera(&target, item, boneID, targetItem, targetBoneID);
 	Camera.timer = -1;
 }
 
@@ -428,15 +423,16 @@ void ClearObjCamera()
 	ItemCamera.ItemCameraOn = false;
 }
 
-void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId)
+void MoveObjCamera(GameVector* ideal, ItemInfo* item, int boneID, ItemInfo* targetItem, int targetBoneID)
 {
-	int	speed = 1;
+	float speed = 1.0f;
+
 	//Get mesh1 to attach camera to
 	//Vector3i pos = Vector3i::Zero;
-	auto pos = GetJointPosition(camSlotId, camMeshId, Vector3i::Zero);
+	auto pos = GetJointPosition(item, boneID, Vector3i::Zero);
 	//Get mesh2 to attach target to
 	//Vector3i pos2 = Vector3i::Zero;
-	auto pos2 = GetJointPosition(targetItem, targetMeshId, Vector3i::Zero);
+	auto pos2 = GetJointPosition(targetItem, targetBoneID, Vector3i::Zero);
 
 	if (OldCam.pos.Position != pos ||
 		OldCam.targetDistance  != Camera.targetDistance  ||
@@ -501,9 +497,9 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 	}
 }
 
-void RefreshFixedCamera(short camNumber)
+void RefreshFixedCamera(int cameraID)
 {
-	auto& camera = g_Level.Cameras[camNumber];
+	const auto& camera = g_Level.Cameras[cameraID];
 
 	auto origin = GameVector(camera.Position, camera.RoomNumber);
 	int moveSpeed = camera.Speed * 8 + 1;
@@ -1185,18 +1181,24 @@ void FixedCamera()
 	}
 }
 
-void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
+void BounceCamera(ItemInfo* item, int bounce, float distMax)
 {
-	float distance = Vector3i::Distance(item->Pose.Position, Camera.pos.ToVector3i());
-	if (distance < maxDistance)
+	float dist = Vector3i::Distance(item->Pose.Position, Camera.pos.ToVector3i());
+	if (dist < distMax)
 	{
-		if (maxDistance == -1)
+		if (distMax == -1)
+		{
 			Camera.bounce = bounce;
+		}
 		else
-			Camera.bounce = -(bounce * (maxDistance - distance) / maxDistance);
+		{
+			Camera.bounce = -(bounce * (distMax - dist) / distMax);
+		}
 	}
-	else if (maxDistance == -1)
+	else if (distMax == -1)
+	{
 		Camera.bounce = bounce;
+	}
 }
 
 void BinocularCamera(ItemInfo* item)
@@ -1514,7 +1516,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		z = itemPtr->Pose.Position.z;
 
 		// -- Troye 2022.8.7
-		if (Camera.flags == CF_FOLLOW_CENTER)
+		if (Camera.flags == CameraFlag::FollowCenter)
 		{
 			int shift = (bounds.Z1 + bounds.Z2) / 2;
 			x += shift * phd_sin(itemPtr->Pose.Orientation.y);
@@ -1524,8 +1526,9 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		Camera.target.x = x;
 		Camera.target.z = z;
 
-		// CF_FOLLOW_CENTER sets target on item abd ConfirmCameraTargetPos overrides this target, hence flag check. -- Troye 2022.8.7
-		if (itemPtr->IsLara() && Camera.flags != CF_FOLLOW_CENTER)
+		// CameraFlag::FollowCenter sets target on item and
+		// ConfirmCameraTargetPos() overrides this target, hence flag check. -- Troye 2022.8.7
+		if (itemPtr->IsLara() && Camera.flags != CameraFlag::FollowCenter)
 			ConfirmCameraTargetPos();
 
 		if (isFixedCamera == Camera.fixedCamera)
@@ -1567,7 +1570,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 			Camera.target.z = LastTarget.z;
 		}
 
-		if (Camera.type != CameraType::Chase && Camera.flags != CF_CHASE_OBJECT)
+		if (Camera.type != CameraType::Chase && Camera.flags != CameraFlag::ChaseObject)
 		{
 			FixedCamera();
 		}
@@ -1591,14 +1594,14 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		Camera.targetElevation = 0;
 		Camera.targetAngle = 0;
 		Camera.targetDistance = BLOCK(1.5f);
-		Camera.flags = 0;
+		Camera.flags = CameraFlag::None;
 		Camera.laraNode = -1;
 	}
 
 	UpdatePlayerRefCameraOrient(playerItem);
 }
 
-bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius)
+bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, float radius)
 {
 	auto sphere = BoundingSphere(Camera.pos.ToVector3(), radius);
 	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));

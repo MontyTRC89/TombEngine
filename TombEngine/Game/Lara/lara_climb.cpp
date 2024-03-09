@@ -36,7 +36,7 @@ void lara_as_climb_end(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.flags = CameraFlag::FollowCenter;
 	Camera.targetAngle = -ANGLE(45.0f);
 }
 

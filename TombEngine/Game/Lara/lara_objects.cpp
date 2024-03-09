@@ -172,7 +172,7 @@ void lara_as_pushable_push(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(35.0f);
 	Camera.targetElevation = ANGLE(-25.0f);
-	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.flags = CameraFlag::FollowCenter;
 }
 
 // State:	  LS_PUSHABLE_PULL (37)
@@ -186,7 +186,7 @@ void lara_as_pushable_pull(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(35.0f);
 	Camera.targetElevation = ANGLE(-25.0f);
-	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.flags = CameraFlag::FollowCenter;
 }
 
 // State:	  LS_PUSHABLE_GRAB (38)
@@ -212,7 +212,7 @@ void lara_as_pushable_edge_slip(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = ANGLE(35.0f);
 	Camera.targetElevation = ANGLE(-25.0f);
-	Camera.flags = CF_FOLLOW_CENTER;
+	Camera.flags = CameraFlag::FollowCenter;
 }
 
 // ------
