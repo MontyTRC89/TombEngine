@@ -150,6 +150,10 @@ void LookCamera(const ItemInfo& item, const CollisionInfo& coll)
 	constexpr auto CAMERA_DIST_COEFF = 0.7f;
 	constexpr auto CAMERA_DIST_MAX	 = BLOCK(0.75f);
 
+	constexpr auto ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
+		EulerAngles(ANGLE(-70.0f), ANGLE(-90.0f), 0),
+		EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0));
+
 	const auto& player = GetLaraInfo(item);
 
 	int verticalOffset = GetCameraPlayerVerticalOffset(item, coll);
@@ -161,7 +165,7 @@ void LookCamera(const ItemInfo& item, const CollisionInfo& coll)
 	auto orient = player.Control.Look.Orientation +
 		EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, 0) +
 		EulerAngles(0, Camera.targetAngle, 0);
-	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
+	orient.x = std::clamp(orient.x, ORIENT_CONSTRAINT.first.x, ORIENT_CONSTRAINT.second.x);
 
 	// Determine base position.
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
