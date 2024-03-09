@@ -1342,13 +1342,15 @@ static void UpdatePlayerRefCameraOrient(ItemInfo& item)
 		player.Control.RefCameraOrient = EulerAngles(Camera.actualElevation, Camera.actualAngle, 0);
 }
 
-void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
+void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 {
+	auto& player = GetLaraInfo(playerItem);
+
 	CamOldPos = Camera.pos.ToVector3i();
 
-	if (Lara.Control.Look.IsUsingBinoculars)
+	if (player.Control.Look.IsUsingBinoculars)
 	{
-		BinocularCamera(LaraItem);
+		BinocularCamera(&playerItem);
 		return;
 	}
 
@@ -1398,7 +1400,7 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	if (itemPtr->IsLara())
 	{
 		float heightCoeff = IsUsingModernControls() ? 0.9f : 0.75f;
-		int offset = GetCameraPlayerVerticalOffset(*itemPtr, LaraCollision) * heightCoeff;
+		int offset = GetCameraPlayerVerticalOffset(*itemPtr, coll) * heightCoeff;
 		y = itemPtr->Pose.Position.y + offset;
 	}
 
@@ -1418,37 +1420,37 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 			if (lookOrient.y > ANGLE(-50.0f) &&	lookOrient.y < ANGLE(50.0f) &&
 				lookOrient.z > ANGLE(-85.0f) && lookOrient.z < ANGLE(85.0f))
 			{
-				short angleDelta = lookOrient.y - Lara.ExtraHeadRot.y;
+				short angleDelta = lookOrient.y - player.ExtraHeadRot.y;
 				if (angleDelta > ANGLE(4.0f))
 				{
-					Lara.ExtraHeadRot.y += ANGLE(4.0f);
+					player.ExtraHeadRot.y += ANGLE(4.0f);
 				}
 				else if (angleDelta < ANGLE(-4.0f))
 				{
-					Lara.ExtraHeadRot.y -= ANGLE(4.0f);
+					player.ExtraHeadRot.y -= ANGLE(4.0f);
 				}
 				else
 				{
-					Lara.ExtraHeadRot.y += angleDelta;
+					player.ExtraHeadRot.y += angleDelta;
 				}
-				Lara.ExtraTorsoRot.y = Lara.ExtraHeadRot.y;
+				player.ExtraTorsoRot.y = player.ExtraHeadRot.y;
 
-				angleDelta = lookOrient.z - Lara.ExtraHeadRot.x;
+				angleDelta = lookOrient.z - player.ExtraHeadRot.x;
 				if (angleDelta > ANGLE(4.0f))
 				{
-					Lara.ExtraHeadRot.x += ANGLE(4.0f);
+					player.ExtraHeadRot.x += ANGLE(4.0f);
 				}
 				else if (angleDelta < ANGLE(-4.0f))
 				{
-					Lara.ExtraHeadRot.x -= ANGLE(4.0f);
+					player.ExtraHeadRot.x -= ANGLE(4.0f);
 				}
 				else
 				{
-					Lara.ExtraHeadRot.x += angleDelta;
+					player.ExtraHeadRot.x += angleDelta;
 				}
-				Lara.ExtraTorsoRot.x = Lara.ExtraHeadRot.x;
+				player.ExtraTorsoRot.x = player.ExtraHeadRot.x;
 
-				Lara.Control.Look.Orientation = lookOrient;
+				player.Control.Look.Orientation = lookOrient;
 
 				Camera.type = CameraType::Look;
 				Camera.item->LookedAt = true;
@@ -1469,7 +1471,7 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 
 		Camera.target.RoomNumber = itemPtr->RoomNumber;
 
-		if (Camera.fixedCamera || Lara.Control.Look.IsUsingBinoculars)
+		if (Camera.fixedCamera || player.Control.Look.IsUsingBinoculars)
 		{
 			Camera.target.y = y;
 			Camera.speed = 1;
@@ -1522,7 +1524,7 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 		{
 			Camera.fixedCamera = false;
 			if (Camera.speed != 1 &&
-				!Lara.Control.Look.IsUsingBinoculars)
+				!player.Control.Look.IsUsingBinoculars)
 			{
 				if (TargetSnaps <= 8)
 				{
@@ -1571,7 +1573,7 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	Camera.last = Camera.number;
 
 	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) &&
-		LaraItem->HitPoints > 0)
+		playerItem.HitPoints > 0)
 	{
 		Camera.type = CameraType::Chase;
 		Camera.speed = 10;
@@ -1585,7 +1587,7 @@ void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 		Camera.laraNode = -1;
 	}
 
-	UpdatePlayerRefCameraOrient(*LaraItem);
+	UpdatePlayerRefCameraOrient(playerItem);
 }
 
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius)

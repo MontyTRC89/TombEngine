@@ -20,8 +20,15 @@ enum class CameraType
 
 struct CAMERA_INFO
 {
-	GameVector pos;
-	GameVector target;
+	// Camera sphere
+	GameVector pos			   = GameVector();
+	GameVector target		   = GameVector(); // LookAt
+	short	   actualAngle	   = 0;			   // AzimuthAngle
+	short	   targetAngle	   = 0;
+	short	   actualElevation = 0;			   // AltitudeAngle
+	short	   targetElevation = 0;
+	float	   targetDistance  = 0.0f;
+
 	CameraType type;
 	CameraType oldType;
 	int shift;
@@ -30,13 +37,6 @@ struct CAMERA_INFO
 	bool underwater;
 	int numberFrames;
 	int bounce;
-
-	// Camera sphere
-	short actualAngle	  = 0; // Azimuth angle
-	short targetAngle	  = 0;
-	short actualElevation = 0; // Altitude angle
-	short targetElevation = 0;
-	float targetDistance  = 0.0f;
 
 	short laraNode;
 	short box;
@@ -100,7 +100,7 @@ void FixedCamera();
 void BounceCamera(ItemInfo* item, short bounce, short maxDistance);
 void BinocularCamera(ItemInfo* item);
 void ConfirmCameraTargetPos();
-void CalculateCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
+void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll);
 void RumbleScreen();
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
 void ObjCamera(ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID, bool cond);
