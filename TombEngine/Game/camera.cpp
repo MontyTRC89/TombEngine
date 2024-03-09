@@ -749,7 +749,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			idealPos = GameVector(Geometry::TranslatePoint(idealPos.ToVector3i(), dir, BUFFER), idealPos.RoomNumber);
 
 		// Update camera position.
-		float speedCoeff = (Camera.type != CameraType::Look && !Camera.IsControllingTankCamera) ? 0.2f : 1.0f;
+		float speedCoeff = (Camera.type != CameraType::Look) ? 0.2f : 1.0f;
 		float speed = Camera.speed * speedCoeff;
 		MoveCamera(&idealPos, speed);
 
