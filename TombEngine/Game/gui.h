@@ -207,9 +207,9 @@ namespace TEN::Gui
 		void SetLastInventoryItem(int itemNumber);
 
 	private:
-		void HandleDisplaySettingsInput(bool fromPauseMenu);
-		void HandleSoundSettingsInput(bool fromPauseMenu);
-		void HandleControlsSettingsInput(bool fromPauseMenu);
+		void HandleDisplaySettingsInput();
+		void HandleSoundSettingsInput();
+		void HandleControlsSettingsInput();
 		void HandleKeyBindingsSettingsInput(ItemInfo* item, bool fromPauseMenu);
 		void HandleOptionsInput();
 		void BackupOptions();

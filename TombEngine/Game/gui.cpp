@@ -318,15 +318,15 @@ namespace TEN::Gui
 			break;
 
 		case Menu::Display:
-			HandleDisplaySettingsInput(false);
+			HandleDisplaySettingsInput();
 			return inventoryResult;
 
 		case Menu::Sound:
-			HandleSoundSettingsInput(false);
+			HandleSoundSettingsInput();
 			return inventoryResult;
 
 		case Menu::Controls:
-			HandleControlsSettingsInput(false);
+			HandleControlsSettingsInput();
 			return inventoryResult;
 
 		case Menu::GeneralActions:
@@ -468,7 +468,7 @@ namespace TEN::Gui
 		}
 	}
 
-	void GuiController::HandleDisplaySettingsInput(bool fromPauseMenu)
+	void GuiController::HandleDisplaySettingsInput()
 	{
 		enum DisplaySettingsOption
 		{
@@ -686,7 +686,7 @@ namespace TEN::Gui
 		}
 	}
 
-	void GuiController::HandleSoundSettingsInput(bool fromPauseMenu)
+	void GuiController::HandleSoundSettingsInput()
 	{
 		enum SoundSettingsOption
 		{
@@ -841,7 +841,7 @@ namespace TEN::Gui
 				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
 
-				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
+				MenuToDisplay = Menu::Options;
 				SelectedOption = 1;
 			}
 			else if (SelectedOption == SoundSettingsOption::Cancel)
@@ -849,13 +849,13 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				SetVolumeTracks(g_Configuration.MusicVolume);
 				SetVolumeFX(g_Configuration.SfxVolume);
-				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
+				MenuToDisplay = Menu::Options;
 				SelectedOption = 1;
 			}
 		}
 	}
 
-	void GuiController::HandleControlsSettingsInput(bool fromPauseMenu)
+	void GuiController::HandleControlsSettingsInput()
 	{
 		enum InputSettingsOption
 		{
@@ -1053,7 +1053,7 @@ namespace TEN::Gui
 				if (indicateRumble)
 					Rumble(0.5f);
 
-				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
+				MenuToDisplay = Menu::Options;
 				SelectedOption = 2;
 			}
 				break;
@@ -1062,7 +1062,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				SetVolumeTracks(g_Configuration.MusicVolume);
 				SetVolumeFX(g_Configuration.SfxVolume);
-				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
+				MenuToDisplay = Menu::Options;
 				SelectedOption = 2;
 				break;
 			}
@@ -1360,15 +1360,15 @@ namespace TEN::Gui
 			break;
 
 		case Menu::Display:
-			HandleDisplaySettingsInput(true);
+			HandleDisplaySettingsInput();
 			return InventoryResult::None;
 
 		case Menu::Sound:
-			HandleSoundSettingsInput(true);
+			HandleSoundSettingsInput();
 			return InventoryResult::None;
 
 		case Menu::Controls:
-			HandleControlsSettingsInput(true);
+			HandleControlsSettingsInput();
 			return InventoryResult::None;
 
 		case Menu::GeneralActions:

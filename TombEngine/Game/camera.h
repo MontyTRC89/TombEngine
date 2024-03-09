@@ -85,7 +85,6 @@ extern float CinematicBarsDestinationHeight;
 extern float CinematicBarsHeight;
 extern float CinematicBarsSpeed;
 
-void DoThumbstickCamera();
 void LookCamera(const ItemInfo& item, const CollisionInfo& coll);
 
 void LookAt(CAMERA_INFO* cam, short roll);

@@ -104,24 +104,6 @@ float CinematicBarsHeight = 0;
 float CinematicBarsDestinationHeight = 0;
 float CinematicBarsSpeed = 0;
 
-void DoThumbstickCamera()
-{
-	constexpr auto AZIMUTH_ANGLE_CONSTRAINT	 = ANGLE(80.0f);
-	constexpr auto ALTITUDE_ANGLE_CONSTRAINT = ANGLE(120.0f);
-
-	if (!g_Configuration.EnableThumbstickCamera)
-		return;
-
-	if (Camera.laraNode == -1 && Camera.target.ToVector3i() == OldCam.target)
-	{
-		if (abs(GetCameraAxis().x) > EPSILON && abs(Camera.targetAngle) == 0)
-			Camera.targetAngle = ANGLE(ALTITUDE_ANGLE_CONSTRAINT * GetCameraAxis().x);
-
-		if (abs(GetCameraAxis().y) > EPSILON)
-			Camera.targetElevation = ANGLE((AZIMUTH_ANGLE_CONSTRAINT * GetCameraAxis().y) - ANGLE(10.0f));
-	}
-}
-
 static int GetCameraPlayerVerticalOffset(const ItemInfo& item, const CollisionInfo& coll)
 {
 	constexpr auto VERTICAL_OFFSET_DEFAULT		  = -BLOCK(1 / 16.0f);
@@ -948,6 +930,26 @@ void CombatCamera(const ItemInfo& playerItem)
 	HandleCameraFollow(playerItem, true);
 }
 
+static void HandleThumbstickCamera()
+{
+	constexpr auto AZIMUTH_ANGLE_CONSTRAINT	 = ANGLE(80.0f);
+	constexpr auto ALTITUDE_ANGLE_CONSTRAINT = ANGLE(120.0f);
+
+	if (!g_Configuration.EnableThumbstickCamera)
+		return;
+
+	if (Camera.laraNode == -1 && Camera.target.ToVector3i() == OldCam.target)
+	{
+		auto axisSign = Vector2(g_Configuration.InvertCameraXAxis ? -1 : 1, g_Configuration.InvertCameraYAxis ? -1 : 1);
+
+		if (abs(GetCameraAxis().x) > EPSILON && abs(Camera.targetAngle) == 0)
+			Camera.targetAngle = ANGLE(ALTITUDE_ANGLE_CONSTRAINT * GetCameraAxis().x) * axisSign.x;
+
+		if (abs(GetCameraAxis().y) > EPSILON)
+			Camera.targetElevation = ANGLE((AZIMUTH_ANGLE_CONSTRAINT * GetCameraAxis().y) - ANGLE(10.0f)) * axisSign.y;
+	}
+}
+
 void UpdateCameraSphere(const ItemInfo& playerItem)
 {
 	// Modern camera constants
@@ -958,7 +960,7 @@ void UpdateCameraSphere(const ItemInfo& playerItem)
 	// Tank camera constants
 	constexpr auto ALTITUDE_ROT_ALPHA = 1 / 8.0f;
 
-	DoThumbstickCamera();
+	HandleThumbstickCamera();
 
 	if (Camera.laraNode != -1)
 	{
