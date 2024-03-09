@@ -104,6 +104,22 @@ float CinematicBarsHeight = 0;
 float CinematicBarsDestinationHeight = 0;
 float CinematicBarsSpeed = 0;
 
+static bool CanControlTankCamera()
+{
+	if (!g_Configuration.EnableThumbstickCamera)
+		return false;
+
+	// Test if player is stationary.
+	if (!IsWakeActionHeld())
+		return true;
+
+	// Test if player is moving and camera or mouse axis isn't zero.
+	if (IsWakeActionHeld() && (GetCameraAxis() != Vector2::Zero || GetMouseAxis() != Vector2::Zero))
+		return true;
+
+	return false;
+}
+
 static int GetCameraPlayerVerticalOffset(const ItemInfo& item, const CollisionInfo& coll)
 {
 	constexpr auto VERTICAL_OFFSET_DEFAULT		  = -BLOCK(1 / 16.0f);
@@ -726,8 +742,10 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 	constexpr auto LOOK_AT_DIST = BLOCK(0.5f);
 	constexpr auto BUFFER		= 100;
 
+	// TODO: Tank camera control.
 	// Move camera.
-	if (IsUsingModernControls())
+	if (IsUsingModernControls())/* ||
+		(CanControlTankCamera() && (GetCameraAxis() != Vector2::Zero || GetMouseAxis() != Vector2::Zero)))*/
 	{
 		auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
 		auto basePos = Geometry::TranslatePoint(Camera.target.ToVector3(), dir, Camera.targetDistance);
@@ -930,77 +948,74 @@ void CombatCamera(const ItemInfo& playerItem)
 	HandleCameraFollow(playerItem, true);
 }
 
-static void HandleThumbstickCamera()
+static EulerAngles GetCameraControlRotation()
 {
-	constexpr auto AZIMUTH_ANGLE_CONSTRAINT	 = ANGLE(80.0f);
-	constexpr auto ALTITUDE_ANGLE_CONSTRAINT = ANGLE(120.0f);
+	constexpr auto AXIS_SENSITIVITY_COEFF = 30.0f;
+	constexpr auto SMOOTHING_FACTOR		  = 8.0f;
 
-	if (!g_Configuration.EnableThumbstickCamera)
-		return;
+	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
+	auto axisSign = Vector2(g_Configuration.InvertCameraXAxis ? -1 : 1, g_Configuration.InvertCameraYAxis ? -1 : 1);
 
-	if (Camera.laraNode == -1 && Camera.target.ToVector3i() == OldCam.target)
-	{
-		auto axisSign = Vector2(g_Configuration.InvertCameraXAxis ? -1 : 1, g_Configuration.InvertCameraYAxis ? -1 : 1);
+	// Calculate axis.
+	auto axis = (isUsingMouse ? GetMouseAxis() : GetCameraAxis()) * axisSign;
+	float sensitivity = AXIS_SENSITIVITY_COEFF / (1.0f + (abs(axis.x) + abs(axis.y)));
+	axis *= sensitivity * (isUsingMouse ? SMOOTHING_FACTOR : 1.0f); // TODO: Add camera sensitivity setting? Unify mouse and analog stick somehow.
 
-		if (abs(GetCameraAxis().x) > EPSILON && abs(Camera.targetAngle) == 0)
-			Camera.targetAngle = ANGLE(ALTITUDE_ANGLE_CONSTRAINT * GetCameraAxis().x) * axisSign.x;
-
-		if (abs(GetCameraAxis().y) > EPSILON)
-			Camera.targetElevation = ANGLE((AZIMUTH_ANGLE_CONSTRAINT * GetCameraAxis().y) - ANGLE(10.0f)) * axisSign.y;
-	}
+	// Calculate and return rotation.
+	return EulerAngles(ANGLE(axis.x), ANGLE(axis.y), 0);
 }
 
 void UpdateCameraSphere(const ItemInfo& playerItem)
 {
-	// Modern camera constants
-	constexpr auto AXIS_SENSITIVITY_COEFF	   = 30.0f;
-	constexpr auto SMOOTHING_FACTOR			   = 8.0f;
 	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA = 0.3f;
-
-	// Tank camera constants
-	constexpr auto ALTITUDE_ROT_ALPHA = 1 / 8.0f;
-
-	HandleThumbstickCamera();
+	constexpr auto ALTITUDE_ROT_ALPHA		   = 1 / 8.0f;
 
 	if (Camera.laraNode != -1)
 	{
-		auto pos = GetJointPosition(playerItem, Camera.laraNode, Vector3i::Zero);
-		auto pos1 = GetJointPosition(playerItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
-		pos = pos1 - pos;
+		auto origin = GetJointPosition(playerItem, Camera.laraNode, Vector3i::Zero);
+		auto target = GetJointPosition(playerItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
+		origin = target - origin;
 
-		Camera.actualAngle = Camera.targetAngle + FROM_RAD(atan2(pos.x, pos.z));
+		Camera.actualAngle = Camera.targetAngle + FROM_RAD(atan2(origin.x, origin.z));
+		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) * ALTITUDE_ROT_ALPHA;
 	}
 	else
 	{
 		if (IsUsingModernControls())
 		{
-			auto axisSign = Vector2(g_Configuration.InvertCameraXAxis ? -1 : 1, g_Configuration.InvertCameraYAxis ? -1 : 1);
-			auto axis = ((GetCameraAxis() != Vector2::Zero) ? GetCameraAxis() : GetMouseAxis()) * axisSign;
-			float sensitivity = AXIS_SENSITIVITY_COEFF / (1.0f + (abs(axis.x) + abs(axis.y)));
-			axis *= sensitivity * SMOOTHING_FACTOR;
+			auto rot = GetCameraControlRotation();
 
 			if (IsPlayerInCombat(playerItem))
 			{
-				short azimuthRot = Geometry::GetShortestAngle(Camera.actualAngle, (playerItem.Pose.Orientation.y + Camera.targetAngle) + ANGLE(axis.x));
-				short altitudeRot = Geometry::GetShortestAngle(Camera.actualElevation, Camera.targetElevation - ANGLE(axis.y));
+				short azimuthRot = Geometry::GetShortestAngle(Camera.actualAngle, (playerItem.Pose.Orientation.y + Camera.targetAngle) + rot.x);
+				short altitudeRot = Geometry::GetShortestAngle(Camera.actualElevation, Camera.targetElevation - rot.y);
 
 				Camera.actualAngle += azimuthRot * COMBAT_CAMERA_REBOUND_ALPHA;
 				Camera.actualElevation += altitudeRot * COMBAT_CAMERA_REBOUND_ALPHA;
 			}
 			else
 			{
-				Camera.actualAngle += ANGLE(axis.x);
-				Camera.actualElevation -= ANGLE(axis.y);
+				Camera.actualAngle += rot.x;
+				Camera.actualElevation -= rot.y;
 			}
 		}
 		else
 		{
-			Camera.actualAngle = playerItem.Pose.Orientation.y + Camera.targetAngle;
+			// TODO: Needs hard reset.
+			if (CanControlTankCamera() && g_Configuration.EnableThumbstickCamera)
+			{
+				auto rot = GetCameraControlRotation();
+
+				Camera.actualAngle += rot.x;
+				Camera.actualElevation -= rot.y;
+			}
+			else
+			{
+				Camera.actualAngle = playerItem.Pose.Orientation.y + Camera.targetAngle;
+				Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) * ALTITUDE_ROT_ALPHA;
+			}
 		}
 	}
-
-	if (!IsUsingModernControls())
-		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) * ALTITUDE_ROT_ALPHA;
 }
 
 bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst)
