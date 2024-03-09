@@ -104,22 +104,6 @@ float CinematicBarsHeight = 0;
 float CinematicBarsDestinationHeight = 0;
 float CinematicBarsSpeed = 0;
 
-static bool CanControlTankCamera()
-{
-	if (!g_Configuration.EnableThumbstickCamera)
-		return false;
-
-	// Test if player is stationary.
-	if (!IsWakeActionHeld())
-		return true;
-
-	// Test if player is moving and camera or mouse axis isn't zero.
-	if (IsWakeActionHeld() && (GetCameraAxis() != Vector2::Zero || GetMouseAxis() != Vector2::Zero))
-		return true;
-
-	return false;
-}
-
 static int GetCameraPlayerVerticalOffset(const ItemInfo& item, const CollisionInfo& coll)
 {
 	constexpr auto VERTICAL_OFFSET_DEFAULT		  = -BLOCK(1 / 16.0f);
@@ -744,8 +728,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 
 	// TODO: Tank camera control.
 	// Move camera.
-	if (IsUsingModernControls())/* ||
-		(CanControlTankCamera() && (GetCameraAxis() != Vector2::Zero || GetMouseAxis() != Vector2::Zero)))*/
+	if (IsUsingModernControls() || Camera.IsControllingTankCamera)
 	{
 		auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
 		auto basePos = Geometry::TranslatePoint(Camera.target.ToVector3(), dir, Camera.targetDistance);
@@ -766,7 +749,8 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			idealPos = GameVector(Geometry::TranslatePoint(idealPos.ToVector3i(), dir, BUFFER), idealPos.RoomNumber);
 
 		// Update camera position.
-		float speed = Camera.speed * ((Camera.type != CameraType::Look) ? 0.2f : 1.0f);
+		float speedCoeff = (Camera.type != CameraType::Look && !Camera.IsControllingTankCamera) ? 0.2f : 1.0f;
+		float speed = Camera.speed * speedCoeff;
 		MoveCamera(&idealPos, speed);
 
 		// Calculate lookAt.
@@ -965,6 +949,25 @@ static EulerAngles GetCameraControlRotation()
 	return EulerAngles(ANGLE(axis.x), ANGLE(axis.y), 0);
 }
 
+static bool CanControlTankCamera()
+{
+	if (!g_Configuration.EnableThumbstickCamera)
+		return false;
+
+	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
+	const auto& axis = isUsingMouse ? GetMouseAxis() : GetCameraAxis();
+
+	// Test if player is stationary.
+	if (!IsWakeActionHeld() && (axis != Vector2::Zero || Camera.IsControllingTankCamera))
+		return true;
+
+	// Test if player is moving and camera or mouse axis isn't zero.
+	if (IsWakeActionHeld() && axis != Vector2::Zero)
+		return true;
+
+	return false;
+}
+
 void UpdateCameraSphere(const ItemInfo& playerItem)
 {
 	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA = 0.3f;
@@ -1001,18 +1004,19 @@ void UpdateCameraSphere(const ItemInfo& playerItem)
 		}
 		else
 		{
-			// TODO: Needs hard reset.
-			if (CanControlTankCamera() && g_Configuration.EnableThumbstickCamera)
+			if (CanControlTankCamera())
 			{
 				auto rot = GetCameraControlRotation();
 
 				Camera.actualAngle += rot.x;
 				Camera.actualElevation -= rot.y;
+				Camera.IsControllingTankCamera = true;
 			}
 			else
 			{
 				Camera.actualAngle = playerItem.Pose.Orientation.y + Camera.targetAngle;
 				Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) * ALTITUDE_ROT_ALPHA;
+				Camera.IsControllingTankCamera = false;
 			}
 		}
 	}

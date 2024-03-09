@@ -33,8 +33,6 @@ struct CAMERA_INFO
 	CameraType oldType;
 	int shift;
 	int flags;
-	bool fixedCamera;
-	bool underwater;
 	int numberFrames;
 	int bounce;
 
@@ -49,6 +47,10 @@ struct CAMERA_INFO
 	ItemInfo* lastItem;
 	int mikeAtLara;
 	Vector3i mikePos;
+
+	bool fixedCamera			 = false;
+	bool underwater				 = false;
+	bool IsControllingTankCamera = false;
 };
 
 struct ObjectCameraInfo
