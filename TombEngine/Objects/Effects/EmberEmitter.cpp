@@ -34,12 +34,12 @@ namespace TEN::Effects::EmberEmitter
 			b = std::clamp(Random::GenerateInt(-32, 32) + int(item.Model.Color.z * UCHAR_MAX), 0, UCHAR_MAX);
 		}
 
-		if (item.TriggerFlags)
+		if (item.TriggerFlags < 0)
 		{
 			if (!item.ItemFlags[2])
 			{
-				int div = item.TriggerFlags % 10 << 10;
-				int mod = item.TriggerFlags / 10 << 10;
+				int div = abs(item.TriggerFlags) % 10 << 10;
+				int mod = abs(item.TriggerFlags) / 10 << 10;
 
 				item.ItemFlags[0] = GetRandomControl() % div;
 				item.ItemFlags[1] = GetRandomControl() % mod;
@@ -93,6 +93,14 @@ namespace TEN::Effects::EmberEmitter
 		}
 		else
 		{
+
+			float size;
+
+			if (item.TriggerFlags)
+				size = item.TriggerFlags / 10.0f;
+			else
+				size = 1.0f;
+
 			if (GetRandomControl() & 7)
 			{
 				auto& spark = *GetFreeParticle();
@@ -132,12 +140,12 @@ namespace TEN::Effects::EmberEmitter
 				spark.y = item.Pose.Position.y;
 				spark.z = item.Pose.Position.z + Random::GenerateFloat(0.0f, 22.0f);
 				spark.rotAng = Random::GenerateAngle();
-				spark.yVel = -BLOCK(1.1f) - Random::GenerateFloat(0.0f, BLOCK(1.75f));
+				spark.yVel = -BLOCK(0.1f + size) - Random::GenerateFloat(0.0f, BLOCK(0.75f + size));
 				spark.gravity = Random::GenerateFloat(64.0f, 80.0f);
-				spark.xVel = Random::GenerateFloat(-368.0f, 368.0f);
+				spark.xVel = Random::GenerateFloat(-368.0f * size, 368.0f * size);
 				spark.friction = 15;
 				spark.maxYvel = 0;
-				spark.zVel = Random::GenerateFloat(-368.0f, 368.0f);
+				spark.zVel = Random::GenerateFloat(-368.0f * size, 368.0f * size);
 				spark.scalar = 1.0f;
 				spark.sSize =
 				spark.size = Random::GenerateFloat(32.0f, 48.0f);
