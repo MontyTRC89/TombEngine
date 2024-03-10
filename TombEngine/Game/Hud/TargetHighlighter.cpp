@@ -61,19 +61,6 @@ namespace TEN::Hud
 		ColorTarget = COLOR_GRAY;
 	}
 
-	bool CrosshairData::IsOffscreen() const
-	{
-		if (!Position.has_value())
-			return true;
-
-		// TODO: Not working?
-		float screenEdgeThreshold = GetRadius();
-		return (Position->x <= -screenEdgeThreshold ||
-				Position->y <= -screenEdgeThreshold ||
-				Position->x >= (DISPLAY_SPACE_RES.x + screenEdgeThreshold) ||
-				Position->y >= (DISPLAY_SPACE_RES.y + screenEdgeThreshold));
-	}
-
 	void CrosshairData::Update(const Vector3& targetPos, bool isActive, bool doPulse)
 	{
 		constexpr auto ROT					   = ANGLE(2.0f);
@@ -149,9 +136,6 @@ namespace TEN::Hud
 		constexpr auto ALIGN_MODE				 = DisplaySpriteAlignMode::Center;
 		constexpr auto SCALE_MODE				 = DisplaySpriteScaleMode::Fill;
 		constexpr auto BLEND_MODE				 = BlendMode::Additive;
-
-		if (IsOffscreen())
-			return;
 
 		// Draw main static element.
 		AddDisplaySprite(
@@ -358,21 +342,14 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::DrawDebug() const
 	{
-		unsigned int visibleCount = 0;
 		unsigned int primaryCount = 0;
 		unsigned int peripheralCount = 0;
 
 		for (const auto& [itemNumber, crosshair] : _crosshairs)
-		{
 			crosshair.IsPrimary ? primaryCount++ : peripheralCount++;
-			
-			if (!crosshair.IsOffscreen())
-				visibleCount++;
-		}
 
 		g_Renderer.PrintDebugMessage("TARGET HIGHLIGHTER DEBUG");
 		g_Renderer.PrintDebugMessage(g_Configuration.EnableTargetHighlighter ? "Enabled" : "Disabled");
-		g_Renderer.PrintDebugMessage("Visible crosshairs: %d", visibleCount);
 		g_Renderer.PrintDebugMessage("Primary crosshairs: %d", primaryCount);
 		g_Renderer.PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
 	}
