@@ -61,10 +61,10 @@ namespace TEN::Collision::PointCollision
 		bool IsIllegalCeiling();
 		bool IsDiagonalFloorStep();
 		bool IsDiagonalCeilingStep();
-		bool IsFloorDiagonalSplit();
-		bool IsCeilingDiagonalSplit();
-		bool IsFloorFlippedDiagonalSplit();
-		bool IsCeilingFlippedDiagonalSplit();
+		bool IsDiagonalFloorSplit();
+		bool IsDiagonalCeilingSplit();
+		bool IsFlippedDiagonalFloorSplit();
+		bool IsFlippedDiagonalCeilingSplit();
 
 		bool TestEnvironmentFlag(RoomEnvFlags envFlag);
 

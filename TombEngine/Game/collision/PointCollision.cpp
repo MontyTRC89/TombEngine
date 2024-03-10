@@ -241,25 +241,25 @@ namespace TEN::Collision::PointCollision
 		return GetTopSector().IsSurfaceDiagonalStep(false);
 	}
 
-	bool PointCollisionData::IsFloorDiagonalSplit()
+	bool PointCollisionData::IsDiagonalFloorSplit()
 	{
 		float splitAngle = GetBottomSector().FloorSurface.SplitAngle;
 		return (splitAngle == SectorSurfaceData::SPLIT_ANGLE_0 || splitAngle == SectorSurfaceData::SPLIT_ANGLE_1);
 	}
 
-	bool PointCollisionData::IsCeilingDiagonalSplit()
+	bool PointCollisionData::IsDiagonalCeilingSplit()
 	{
 		float splitAngle = GetTopSector().CeilingSurface.SplitAngle;
 		return (splitAngle == SectorSurfaceData::SPLIT_ANGLE_0 || splitAngle == SectorSurfaceData::SPLIT_ANGLE_1);
 	}
 
-	bool PointCollisionData::IsFloorFlippedDiagonalSplit()
+	bool PointCollisionData::IsFlippedDiagonalFloorSplit()
 	{
 		float splitAngle = GetBottomSector().FloorSurface.SplitAngle;
 		return (IsDiagonalFloorStep() && splitAngle == SectorSurfaceData::SPLIT_ANGLE_1);
 	}
 	
-	bool PointCollisionData::IsCeilingFlippedDiagonalSplit()
+	bool PointCollisionData::IsFlippedDiagonalCeilingSplit()
 	{
 		float splitAngle = GetTopSector().CeilingSurface.SplitAngle;
 		return (IsDiagonalCeilingStep() && splitAngle == SectorSurfaceData::SPLIT_ANGLE_1);
@@ -339,15 +339,11 @@ namespace TEN::Collision::PointCollision
 
 	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber)
 	{
-		// TEMP HACK
-		// GetPointCollision() takes arguments for a *current* position and room number.
-		// However, since some calls to the old GetPointCollision() function had *projected*
-		// positions passed to it, the room number had be corrected to account for such cases.
-		// These are primarily found in camera.cpp.
-		short correctedRoomNumber = roomNumber;
-		GetFloor(pos.x, pos.y, pos.z, &correctedRoomNumber);
+		// HACK: Ensure room number is correct if position extends to another room.
+		// Accounts for some calls to this function which directly pass offset position instead of using dedicated overloads to probe.
+		GetFloor(pos.x, pos.y, pos.z, (short*)&roomNumber);
 
-		return PointCollisionData(pos, correctedRoomNumber);
+		return PointCollisionData(pos, roomNumber);
 	}
 
 	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist)
