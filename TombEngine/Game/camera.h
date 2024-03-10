@@ -89,13 +89,13 @@ extern float CinematicBarsDestinationHeight;
 extern float CinematicBarsHeight;
 extern float CinematicBarsSpeed;
 
-void LookCamera(const ItemInfo& item, const CollisionInfo& coll);
+void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
 
-void LookAt(CAMERA_INFO* cam, short roll);
+void LookAt(CAMERA_INFO& camera, short roll);
 void AlterFOV(short value, bool store = true);
 short GetCurrentFOV();
 void InitializeCamera();
-void MoveCamera(GameVector* ideal, float speed);
+void MoveCamera(const ItemInfo& playerItem, GameVector* ideal, float speed);
 void ChaseCamera(const ItemInfo& playerItem);
 void CombatCamera(const ItemInfo& playerItem);
 void UpdateCameraSphere(const ItemInfo& playerItem);

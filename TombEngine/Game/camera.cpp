@@ -142,7 +142,7 @@ static int GetCameraPlayerVerticalOffset(const ItemInfo& item, const CollisionIn
 	return -((verticalOffset < floorToCeilHeight) ? verticalOffset : floorToCeilHeight);
 }
 
-void LookCamera(const ItemInfo& item, const CollisionInfo& coll)
+void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 {
 	constexpr auto POS_LERP_ALPHA	 = 0.25f;
 	constexpr auto COLL_PUSH		 = BLOCK(0.25f) - BLOCK(1 / 16.0f);
@@ -150,33 +150,33 @@ void LookCamera(const ItemInfo& item, const CollisionInfo& coll)
 	constexpr auto CAMERA_DIST_COEFF = 0.7f;
 	constexpr auto CAMERA_DIST_MAX	 = BLOCK(0.75f);
 
-	const auto& player = GetLaraInfo(item);
+	const auto& player = GetLaraInfo(playerItem);
 
-	int verticalOffset = GetCameraPlayerVerticalOffset(item, coll);
+	int verticalOffset = GetCameraPlayerVerticalOffset(playerItem, coll);
 	auto pivotOffset = Vector3i(0, verticalOffset, 0);
 
 	float idealDist = -std::max(Camera.targetDistance * CAMERA_DIST_COEFF, CAMERA_DIST_MAX);
 
 	// Define absolute camera orientation.
 	auto orient = player.Control.Look.Orientation +
-		EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, 0) +
+		EulerAngles(playerItem.Pose.Orientation.x, playerItem.Pose.Orientation.y, 0) +
 		EulerAngles(0, Camera.targetAngle, 0);
 	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
 
 	// Determine base position.
-	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
+	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, playerItem.RoomNumber);
 	auto basePos = Vector3i(
-		item.Pose.Position.x,
-		isInSwamp ? g_Level.Rooms[item.RoomNumber].maxceiling : item.Pose.Position.y,
-		item.Pose.Position.z);
+		playerItem.Pose.Position.x,
+		isInSwamp ? g_Level.Rooms[playerItem.RoomNumber].maxceiling : playerItem.Pose.Position.y,
+		playerItem.Pose.Position.z);
 
 	// Define landmarks.
-	auto pivotPos = Geometry::TranslatePoint(basePos, item.Pose.Orientation.y, pivotOffset);
+	auto pivotPos = Geometry::TranslatePoint(basePos, playerItem.Pose.Orientation.y, pivotOffset);
 	auto idealPos = Geometry::TranslatePoint(pivotPos, orient, idealDist);
 	auto lookAtPos = Geometry::TranslatePoint(pivotPos, orient, LOOK_AT_DIST);
 
 	// Determine best position.
-	auto origin = GameVector(pivotPos, GetCollision(&item, item.Pose.Orientation.y, pivotOffset.z, pivotOffset.y).RoomNumber);
+	auto origin = GameVector(pivotPos, GetCollision(&playerItem, playerItem.Pose.Orientation.y, pivotOffset.z, pivotOffset.y).RoomNumber);
 	auto target = GameVector(idealPos, GetCollision(origin.ToVector3i(), origin.RoomNumber, orient, idealDist).RoomNumber);
 
 	// Handle room and object collisions.
@@ -184,20 +184,20 @@ void LookCamera(const ItemInfo& item, const CollisionInfo& coll)
 	CameraCollisionBounds(&target, COLL_PUSH, true);
 
 	// Smoothly update camera position.
-	MoveCamera(&target, Camera.speed);
-	Camera.target = GameVector(Camera.target.ToVector3i() + (lookAtPos - Camera.target.ToVector3i()) * POS_LERP_ALPHA, item.RoomNumber);
+	MoveCamera(playerItem, &target, Camera.speed);
+	Camera.target = GameVector(Camera.target.ToVector3i() + (lookAtPos - Camera.target.ToVector3i()) * POS_LERP_ALPHA, playerItem.RoomNumber);
 
-	LookAt(&Camera, 0);
-	UpdateMikePos(item);
+	LookAt(Camera, 0);
+	UpdateMikePos(playerItem);
 	Camera.oldType = Camera.type;
 }
 
-void LookAt(CAMERA_INFO* cam, short roll)
+void LookAt(CAMERA_INFO& camera, short roll)
 {
 	float fov = TO_RAD(CurrentFOV / 1.333333f);
 	float levelFarView = BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView());
 
-	g_Renderer.UpdateCameraMatrices(cam, TO_RAD(roll), fov, levelFarView);
+	g_Renderer.UpdateCameraMatrices(&camera, TO_RAD(roll), fov, levelFarView);
 }
 
 void AlterFOV(short value, bool store)
@@ -215,7 +215,7 @@ short GetCurrentFOV()
 
 inline void RumbleFromBounce()
 {
-	Rumble(std::clamp((float)abs(Camera.bounce) / 70.0f, 0.0f, 0.8f), 0.2f);
+	Rumble(std::clamp(abs(Camera.bounce) / 70.0f, 0.0f, 0.8f), 0.2f);
 }
 
 void InitializeCamera()
@@ -244,7 +244,7 @@ void InitializeCamera()
 	Camera.item = nullptr;
 	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
-	Camera.speed = 1;
+	Camera.speed = 1.0f;
 	Camera.flags = CameraFlag::None;
 	Camera.bounce = 0;
 	Camera.number = -1;
@@ -259,21 +259,23 @@ void InitializeCamera()
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 }
 
-void MoveCamera(GameVector* ideal, float speed)
+void MoveCamera(const ItemInfo& playerItem, GameVector* ideal, float speed)
 {
 	constexpr auto BUFFER = CLICK(1) - 1;
 
-	if (Lara.Control.Look.IsUsingBinoculars)
+	const auto& player = GetLaraInfo(playerItem);
+
+	if (player.Control.Look.IsUsingBinoculars)
 		speed = 1.0f;
 
-	if (OldCam.pos.Orientation != LaraItem->Pose.Orientation ||
-		OldCam.pos2.Orientation.x != Lara.ExtraHeadRot.x ||
-		OldCam.pos2.Orientation.y != Lara.ExtraHeadRot.y ||
-		OldCam.pos2.Position.x != Lara.ExtraTorsoRot.x ||
-		OldCam.pos2.Position.y != Lara.ExtraTorsoRot.y ||
-		OldCam.pos.Position != LaraItem->Pose.Position ||
-		OldCam.ActiveState != LaraItem->Animation.ActiveState ||
-		OldCam.TargetState != LaraItem->Animation.TargetState ||
+	if (OldCam.pos.Orientation != playerItem.Pose.Orientation ||
+		OldCam.pos2.Orientation.x != player.ExtraHeadRot.x ||
+		OldCam.pos2.Orientation.y != player.ExtraHeadRot.y ||
+		OldCam.pos2.Position.x != player.ExtraTorsoRot.x ||
+		OldCam.pos2.Position.y != player.ExtraTorsoRot.y ||
+		OldCam.pos.Position != playerItem.Pose.Position ||
+		OldCam.ActiveState != playerItem.Animation.ActiveState ||
+		OldCam.TargetState != playerItem.Animation.TargetState ||
 		OldCam.targetDistance != Camera.targetDistance ||
 		OldCam.targetElevation != Camera.targetElevation ||
 		OldCam.actualElevation != Camera.actualElevation ||
@@ -282,16 +284,16 @@ void MoveCamera(GameVector* ideal, float speed)
 		OldCam.target.y != Camera.target.y ||
 		OldCam.target.z != Camera.target.z ||
 		Camera.oldType != Camera.type ||
-		Lara.Control.Look.IsUsingBinoculars)
+		player.Control.Look.IsUsingBinoculars)
 	{
-		OldCam.pos.Orientation = LaraItem->Pose.Orientation;
-		OldCam.pos2.Orientation.x = Lara.ExtraHeadRot.x;
-		OldCam.pos2.Orientation.y = Lara.ExtraHeadRot.y;
-		OldCam.pos2.Position.x = Lara.ExtraTorsoRot.x;
-		OldCam.pos2.Position.y = Lara.ExtraTorsoRot.y;
-		OldCam.pos.Position = LaraItem->Pose.Position;
-		OldCam.ActiveState = LaraItem->Animation.ActiveState;
-		OldCam.TargetState = LaraItem->Animation.TargetState;
+		OldCam.pos.Orientation = playerItem.Pose.Orientation;
+		OldCam.pos2.Orientation.x = player.ExtraHeadRot.x;
+		OldCam.pos2.Orientation.y = player.ExtraHeadRot.y;
+		OldCam.pos2.Position.x = player.ExtraTorsoRot.x;
+		OldCam.pos2.Position.y = player.ExtraTorsoRot.y;
+		OldCam.pos.Position = playerItem.Pose.Position;
+		OldCam.ActiveState = playerItem.Animation.ActiveState;
+		OldCam.TargetState = playerItem.Animation.TargetState;
 		OldCam.targetDistance = Camera.targetDistance;
 		OldCam.targetElevation = Camera.targetElevation;
 		OldCam.actualElevation = Camera.actualElevation;
@@ -395,8 +397,8 @@ void MoveCamera(GameVector* ideal, float speed)
 	}
 
 	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
-	LookAt(&Camera, 0);
-	UpdateMikePos(*LaraItem);
+	LookAt(Camera, 0);
+	UpdateMikePos(playerItem);
 	Camera.oldType = Camera.type;
 }
 
@@ -462,7 +464,7 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* item, int boneID, ItemInfo* targ
 
 	Camera.pos += (ideal->ToVector3i() - Camera.pos.ToVector3i()) / speed;
 	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
-	LookAt(&Camera, 0);
+	LookAt(Camera, 0);
 
 	auto angle = Camera.target.ToVector3i() - Camera.pos.ToVector3i();
 	auto position = Vector3i(Camera.target.ToVector3i() - Camera.pos.ToVector3i());
@@ -504,7 +506,7 @@ void RefreshFixedCamera(int cameraID)
 	auto origin = GameVector(camera.Position, camera.RoomNumber);
 	int moveSpeed = camera.Speed * 8 + 1;
 
-	MoveCamera(&origin, moveSpeed);
+	MoveCamera(*LaraItem, &origin, moveSpeed);
 }
 
 static void ClampCameraAltitudeAngle(bool isUnderwater)
@@ -750,8 +752,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 
 		// Update camera position.
 		float speedCoeff = (Camera.type != CameraType::Look) ? 0.2f : 1.0f;
-		float speed = Camera.speed * speedCoeff;
-		MoveCamera(&idealPos, speed);
+		MoveCamera(playerItem, &idealPos, Camera.speed * speedCoeff);
 
 		// Calculate lookAt.
 		auto lookAtDir = Camera.target.ToVector3() - Camera.pos.ToVector3();
@@ -761,7 +762,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		// TODO: Ceilings not handled correctly.
 		// Handle look at.
 		Camera.target = GameVector(lookAtPos, playerItem.RoomNumber);
-		LookAt(&Camera, 0);
+		LookAt(Camera, 0);
 		Camera.target = pivotPos;
 	}
 	else
@@ -824,7 +825,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		if (objectLosIntersect.has_value())
 			farthestIdealPos = *objectLosIntersect;
 
-		MoveCamera(&farthestIdealPos, Camera.speed);
+		MoveCamera(playerItem, &farthestIdealPos, Camera.speed);
 	}
 }
 
@@ -1153,9 +1154,9 @@ void FixedCamera()
 	// floordata trigger to camera itself to make use of it again. Still, by default,
 	// value is 1 for UseForcedFixedCamera hack.
 
-	int moveSpeed = 1;
+	float speed = 1.0f;
 
-	GameVector origin, target;
+	auto origin = GameVector::Zero;
 	if (UseForcedFixedCamera)
 	{
 		origin = ForcedFixedCamera;
@@ -1165,14 +1166,12 @@ void FixedCamera()
 		const auto& camera = g_Level.Cameras[Camera.number];
 
 		origin = GameVector(camera.Position, camera.RoomNumber);
-
-		// NOTE: Multiply original speed by 8 to comply with original bitshifted speed from TR1-2.
-		moveSpeed = (camera.Speed * 8) + 1;
+		speed = (camera.Speed * 8) + 1.0f; // Multiply original speed by 8 to comply with original bitshifted speed from TR1-2.
 	}
 
 	Camera.fixedCamera = true;
 
-	MoveCamera(&origin, moveSpeed);
+	MoveCamera(*LaraItem, &origin, speed);
 
 	if (Camera.timer)
 	{
@@ -1283,7 +1282,7 @@ void BinocularCamera(ItemInfo* item)
 	}
 
 	Camera.target.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.RoomNumber).RoomNumber;
-	LookAt(&Camera, 0);
+	LookAt(Camera, 0);
 	UpdateMikePos(*item);
 	Camera.oldType = Camera.type;
 
@@ -1371,7 +1370,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 	{
 		Camera.type = CameraType::Fixed;
 		if (Camera.oldType != CameraType::Fixed)
-			Camera.speed = 1;
+			Camera.speed = 1.0f;
 	}
 
 	// Play water sound effect if camera is in water room.
@@ -1484,12 +1483,12 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		if (Camera.fixedCamera || player.Control.Look.IsUsingBinoculars)
 		{
 			Camera.target.y = y;
-			Camera.speed = 1;
+			Camera.speed = 1.0f;
 		}
 		else
 		{
 			Camera.target.y += (y - Camera.target.y) / 4;
-			Camera.speed = (Camera.type != CameraType::Look) ? 8 : 4;
+			Camera.speed = (Camera.type != CameraType::Look) ? 8.0f : 4.0f;
 		}
 
 		Camera.fixedCamera = false;
@@ -1534,7 +1533,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		if (isFixedCamera == Camera.fixedCamera)
 		{
 			Camera.fixedCamera = false;
-			if (Camera.speed != 1 &&
+			if (Camera.speed != 1.0f &&
 				!player.Control.Look.IsUsingBinoculars)
 			{
 				if (TargetSnaps <= 8)
@@ -1556,7 +1555,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		else
 		{
 			Camera.fixedCamera = true;
-			Camera.speed = 1;
+			Camera.speed = 1.0f;
 		}
 
 		Camera.target.RoomNumber = GetCollision(x, y, z, Camera.target.RoomNumber).RoomNumber;
@@ -1587,7 +1586,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		playerItem.HitPoints > 0)
 	{
 		Camera.type = CameraType::Chase;
-		Camera.speed = 10;
+		Camera.speed = 10.0f;
 		Camera.number = -1;
 		Camera.lastItem = Camera.item;
 		Camera.item = nullptr;
@@ -1701,7 +1700,7 @@ void SetScreenFadeIn(float speed, bool force)
 		return;
 
 	ScreenFading = true;
-	ScreenFadeStart = 0;
+	ScreenFadeStart = 0.0f;
 	ScreenFadeEnd = 1.0f;
 	ScreenFadeSpeed = speed;
 	ScreenFadeCurrent = ScreenFadeStart;
@@ -1715,9 +1714,9 @@ void SetCinematicBars(float height, float speed)
 
 void ClearCinematicBars()
 {
-	CinematicBarsHeight = 0;
-	CinematicBarsDestinationHeight = 0;
-	CinematicBarsSpeed = 0;
+	CinematicBarsHeight = 0.0f;
+	CinematicBarsDestinationHeight = 0.0f;
+	CinematicBarsSpeed = 0.0f;
 }
 
 void UpdateFadeScreenAndCinematicBars()
