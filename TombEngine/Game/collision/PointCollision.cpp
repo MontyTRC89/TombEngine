@@ -14,9 +14,6 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Room;
 using namespace TEN::Math;
 
-// TODO
-// BUG: Grabbing diagonal ledges stopped working. Lara deflects. Minor error somewhere.
-
 namespace TEN::Collision::PointCollision
 {
 	PointCollisionData::PointCollisionData(const Vector3i& pos, int roomNumber)
@@ -57,9 +54,10 @@ namespace TEN::Collision::PointCollision
 		auto roomNumberBelow = bottomSectorPtr->GetNextRoomNumber(_position, true);
 		while (roomNumberBelow.has_value())
 		{
-			auto& room = g_Level.Rooms[roomNumberBelow.value_or(bottomSectorPtr->RoomNumber)];
-			bottomSectorPtr = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
+			int roomNumber = roomNumberBelow.value_or(bottomSectorPtr->RoomNumber);
+			auto& room = g_Level.Rooms[roomNumber];
 
+			bottomSectorPtr = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
 			roomNumberBelow = bottomSectorPtr->GetNextRoomNumber(_position, true);
 		}
 		_bottomSectorPtr = bottomSectorPtr;
@@ -77,9 +75,10 @@ namespace TEN::Collision::PointCollision
 		auto roomNumberAbove = topSectorPtr->GetNextRoomNumber(_position, false);
 		while (roomNumberAbove.has_value())
 		{
-			auto& room = g_Level.Rooms[roomNumberAbove.value_or(topSectorPtr->RoomNumber)];
-			topSectorPtr = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
+			int roomNumber = roomNumberAbove.value_or(topSectorPtr->RoomNumber);
+			auto& room = g_Level.Rooms[roomNumber];
 
+			topSectorPtr = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
 			roomNumberAbove = topSectorPtr->GetNextRoomNumber(_position, false);
 		}
 		_topSectorPtr = topSectorPtr;

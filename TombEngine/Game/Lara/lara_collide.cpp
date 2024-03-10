@@ -24,6 +24,11 @@ using namespace TEN::Collision::PointCollision;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 
+constexpr auto DEFLECT_STRAIGHT_ANGLE		= ANGLE(5.0f);
+constexpr auto DEFLECT_DIAGONAL_ANGLE		= ANGLE(12.0f);
+constexpr auto DEFLECT_STRAIGHT_ANGLE_CRAWL = ANGLE(2.0f);
+constexpr auto DEFLECT_DIAGONAL_ANGLE_CRAWL = ANGLE(5.0f);
+
 // -----------------------------
 // COLLISION TEST FUNCTIONS
 // For State Control & Collision
@@ -45,12 +50,12 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.y += ANGLE(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y += coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE;
 	}
 	else if (coll->CollisionType == CT_RIGHT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.y -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y -= coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE;
 	}
 	else if (coll->LastBridgeItemNumber != NO_ITEM)
 	{
@@ -120,11 +125,11 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 	switch (coll->CollisionType)
 	{
 	case CT_LEFT:
-		item->Pose.Orientation.y += ANGLE(DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y += DEFLECT_STRAIGHT_ANGLE;
 		break;
 
 	case CT_RIGHT:
-		item->Pose.Orientation.y -= ANGLE(DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y -= DEFLECT_STRAIGHT_ANGLE;
 		break;
 
 	case CT_TOP:
@@ -156,11 +161,11 @@ void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll)
 	switch (coll->CollisionType)
 	{
 	case CT_LEFT:
-		item->Pose.Orientation.y += ANGLE(DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y += DEFLECT_STRAIGHT_ANGLE;
 		break;
 
 	case CT_RIGHT:
-		item->Pose.Orientation.y -= ANGLE(DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y -= DEFLECT_STRAIGHT_ANGLE;
 		break;
 
 	case CT_TOP:
@@ -198,12 +203,12 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.y += ANGLE(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL);
+		item->Pose.Orientation.y += coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL;
 	}
 	else if (coll->CollisionType == CT_RIGHT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.y -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL);
+		item->Pose.Orientation.y -= coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL;
 	}
 
 	return false;
@@ -229,12 +234,12 @@ bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.y += ANGLE(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y += coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE;
 	}
 	else if (coll->CollisionType == CT_RIGHT)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.y -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y -= coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE;
 	}
 
 	return false;

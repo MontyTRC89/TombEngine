@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/collision/floordata.h"
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 
@@ -8,13 +9,14 @@ struct ItemInfo;
 struct MESH_INFO;
 struct ROOM_INFO;
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 
 constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBound.
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
 constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 
-constexpr auto DEFAULT_ILLEGAL_FLOOR_SLOPE_ANGLE   = ANGLE(45.0f * 0.75f);
+constexpr auto DEFAULT_ILLEGAL_FLOOR_SLOPE_ANGLE   = ANGLE(36.0f);
 constexpr auto DEFAULT_ILLEGAL_CEILING_SLOPE_ANGLE = ANGLE(45.0f);
 
 enum CollisionType
@@ -47,13 +49,13 @@ struct CollisionPositionData
 	int	  Floor		   = 0;
 	int	  Ceiling	   = 0;
 	int	  Bridge	   = 0;
-	float SplitAngle   = 0.0f;
+	short SplitAngle   = 0;
 	bool  FloorSlope   = false;
 	bool  CeilingSlope = false;
 	bool  DiagonalStep = false;
 
-	bool HasDiagonalSplit()		   { return ((SplitAngle == (45.0f * RADIAN)) || (SplitAngle == (135.0f * RADIAN))); }
-	bool HasFlippedDiagonalSplit() { return (HasDiagonalSplit() && (SplitAngle != (45.0f * RADIAN))); }
+	bool HasDiagonalSplit()		   { return ((SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0) || (SplitAngle == SectorSurfaceData::SPLIT_ANGLE_1)); }
+	bool HasFlippedDiagonalSplit() { return (HasDiagonalSplit() && (SplitAngle != SectorSurfaceData::SPLIT_ANGLE_0)); }
 };
 
 struct CollisionSetupData
@@ -112,8 +114,8 @@ struct CollisionInfo
 	bool HitStatic	   = false;
 	bool HitTallObject = false;
 
-	bool TriangleAtRight()	   { return ((MiddleRight.SplitAngle != 0.0f) && (MiddleRight.SplitAngle == Middle.SplitAngle)); }
-	bool TriangleAtLeft()	   { return ((MiddleLeft.SplitAngle != 0.0f) && (MiddleLeft.SplitAngle == Middle.SplitAngle)); }
+	bool TriangleAtRight()	   { return ((MiddleRight.SplitAngle != 0) && (MiddleRight.SplitAngle == Middle.SplitAngle)); }
+	bool TriangleAtLeft()	   { return ((MiddleLeft.SplitAngle != 0) && (MiddleLeft.SplitAngle == Middle.SplitAngle)); }
 	bool DiagonalStepAtRight() { return (MiddleRight.DiagonalStep && TriangleAtRight() && (NearestLedgeAngle % ANGLE(90.0f))); }
 	bool DiagonalStepAtLeft()  { return (MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90.0f))); }
 };
