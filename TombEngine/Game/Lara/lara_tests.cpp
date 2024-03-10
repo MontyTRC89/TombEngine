@@ -156,8 +156,8 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 	if (lara->Control.CanClimbLadder) // Ladder case
 	{
-		lara->Control.ToggleClimb = g_Configuration.EnableAutoGrab;
-		if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
+		lara->Control.ToggleClimb = g_Configuration.EnableAutoClimb;
+		if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
 			lara->Control.ToggleClimb = false;
 
 		if (HasClimbAction(*item) && item->HitPoints > 0)
@@ -197,8 +197,8 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	}
 	else // Normal case
 	{
-		lara->Control.ToggleClimb = g_Configuration.EnableAutoGrab;
-		if (IsClicked(In::Action) && g_Configuration.EnableAutoGrab)
+		lara->Control.ToggleClimb = g_Configuration.EnableAutoClimb;
+		if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
 			lara->Control.ToggleClimb = false;
 
 		if ((HasClimbAction(*item) && item->HitPoints > 0 && coll->Front.Floor <= 0) ||
@@ -263,7 +263,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		{
 			SetAnimation(item, LA_JUMP_UP, 9);
 			item->Pose.Position.x += coll->Shift.Position.x;
-			item->Pose.Position.y += GameBoundingBox(item).Y2 * (g_Configuration.EnableAutoGrab ? 2.5f : 1.8f);
+			item->Pose.Position.y += GameBoundingBox(item).Y2 * (g_Configuration.EnableAutoClimb ? 2.5f : 1.8f);
 			item->Pose.Position.z += coll->Shift.Position.z;
 			item->Animation.IsAirborne = true;
 			item->Animation.Velocity.z = 2;
@@ -279,7 +279,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!IsHeld(In::Action) && !g_Configuration.EnableAutoGrab)
+	if (!IsHeld(In::Action) && !g_Configuration.EnableAutoClimb)
 		return false;
 
 	if (lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
@@ -347,7 +347,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!IsHeld(In::Action) && !g_Configuration.EnableAutoGrab)
+	if (!IsHeld(In::Action) && !g_Configuration.EnableAutoClimb)
 		return false;
 
 	if (lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
@@ -1274,7 +1274,7 @@ bool HasOppositeAction(const ItemInfo& item)
 bool HasClimbAction(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
-	return g_Configuration.EnableAutoGrab ? player.Control.ToggleClimb : IsHeld(In::Action);
+	return g_Configuration.EnableAutoClimb ? player.Control.ToggleClimb : IsHeld(In::Action);
 }
 
 bool HasCrouchAction(const ItemInfo& item)

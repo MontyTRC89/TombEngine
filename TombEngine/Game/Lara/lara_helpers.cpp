@@ -1227,6 +1227,9 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 
 				player.Control.WaterStatus = WaterStatus::FlyCheat;
 				player.Control.Count.Death = 0;
+				player.Control.ToggleClimb = false;
+				player.Control.ToggleCrouch = false;
+				player.Control.ToggleWalk = false;
 				player.Status.Air = LARA_AIR_MAX;
 				player.Status.Poison = 0;
 				player.Status.Stamina = LARA_STAMINA_MAX;

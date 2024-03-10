@@ -235,7 +235,9 @@ namespace TEN::Config
 		// Set Controls keys.
 		if (SetDWORDRegKey(controlsKey, REGKEY_CONTROL_MODE, (DWORD)g_Configuration.ControlMode) != ERROR_SUCCESS ||
 			SetDWORDRegKey(controlsKey, REGKEY_SWIM_CONTROL_MODE, (DWORD)g_Configuration.SwimControlMode) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_GRAB, g_Configuration.EnableAutoGrab) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_WALK_TOGGLE, g_Configuration.EnableWalkToggle) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_CROUCH_TOGGLE, g_Configuration.EnableCrouchToggle) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_CLIMB, g_Configuration.EnableAutoClimb) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, g_Configuration.EnableOppositeActionRoll) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
@@ -322,7 +324,9 @@ namespace TEN::Config
 
 		g_Configuration.ControlMode = ControlMode::Enhanced;
 		g_Configuration.SwimControlMode = SwimControlMode::Omnidirectional;
-		g_Configuration.EnableAutoGrab = false;
+		g_Configuration.EnableWalkToggle = false;
+		g_Configuration.EnableCrouchToggle = false;
+		g_Configuration.EnableAutoClimb = false;
 		g_Configuration.EnableAutoTargeting = true;
 		g_Configuration.EnableOppositeActionRoll = true;
 		g_Configuration.EnableRumble = true;
@@ -361,7 +365,7 @@ namespace TEN::Config
 		DWORD shadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
 		DWORD shadowBlobsMax = GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX;
 		bool enableCaustics = false;
-		DWORD antialiasingMode = 1;
+		DWORD antialiasingMode = (DWORD)AntialiasingMode::High;
 		bool enableAmbientOcclusion = false;
 		bool enableTargetHighlighter = true;
 		bool enableSubtitles = true;
@@ -426,7 +430,9 @@ namespace TEN::Config
 
 		DWORD controlMode = (DWORD)ControlMode::Enhanced;
 		DWORD swimControlMode = (DWORD)SwimControlMode::Omnidirectional;
-		bool enableAutoGrab = false;
+		bool enableWalkToggle = false;
+		bool enableCrouchToggle = false;
+		bool enableAutoClimb = false;
 		bool enableAutoTargeting = true;
 		bool enableOppositeActionRoll = true;
 		bool enableRumble = true;
@@ -438,7 +444,9 @@ namespace TEN::Config
 		// Load Controls keys.
 		if (GetDWORDRegKey(controlsKey, REGKEY_CONTROL_MODE, &controlMode, (DWORD)ControlMode::Enhanced) != ERROR_SUCCESS ||
 			GetDWORDRegKey(controlsKey, REGKEY_SWIM_CONTROL_MODE, &swimControlMode, (DWORD)SwimControlMode::Omnidirectional) != ERROR_SUCCESS ||
-			GetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_GRAB, &enableAutoGrab, false) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_WALK_TOGGLE, &enableCrouchToggle, false) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_CROUCH_TOGGLE, &enableCrouchToggle, false) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_CLIMB, &enableAutoClimb, false) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, &enableOppositeActionRoll, true) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
@@ -511,7 +519,9 @@ namespace TEN::Config
 
 		g_Configuration.ControlMode = (ControlMode)controlMode;
 		g_Configuration.SwimControlMode = (SwimControlMode)swimControlMode;
-		g_Configuration.EnableAutoGrab = enableAutoGrab;
+		g_Configuration.EnableWalkToggle = enableWalkToggle;
+		g_Configuration.EnableCrouchToggle = enableCrouchToggle;
+		g_Configuration.EnableAutoClimb = enableAutoClimb;
 		g_Configuration.EnableAutoTargeting = enableAutoTargeting;
 		g_Configuration.EnableOppositeActionRoll = enableOppositeActionRoll;
 		g_Configuration.EnableRumble = enableRumble;

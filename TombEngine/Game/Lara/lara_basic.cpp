@@ -495,6 +495,9 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (player.Control.Look.IsUsingBinoculars)
 		return;
 
+	if (IsClicked(In::Walk))
+		player.Control.ToggleWalk = true;
+
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
@@ -542,7 +545,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Jump))
 	{
 		if ((IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) &&
-			g_Configuration.EnableAutoGrab)
+			g_Configuration.EnableAutoClimb)
 		{
 			auto vaultContext = TestLaraVault(item, coll);
 			if (vaultContext.has_value())
@@ -1044,7 +1047,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump))
 	{
-		if (IsHeld(In::Forward) && g_Configuration.EnableAutoGrab)
+		if (IsHeld(In::Forward) && g_Configuration.EnableAutoClimb)
 		{
 			auto vaultContext = TestLaraVault(item, coll);
 			if (vaultContext.has_value())
@@ -1400,7 +1403,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump))
 	{
-		if (IsHeld(In::Forward) && g_Configuration.EnableAutoGrab)
+		if (IsHeld(In::Forward) && g_Configuration.EnableAutoClimb)
 		{
 			auto vaultContext = TestLaraVault(item, coll);
 			if (vaultContext.has_value())

@@ -36,7 +36,9 @@ namespace TEN::Config
 	// Controls keys
 	constexpr auto REGKEY_CONTROL_MODE				  = "ControlMode";
 	constexpr auto REGKEY_SWIM_CONTROL_MODE			  = "SwimControlMode";
-	constexpr auto REGKEY_ENABLE_AUTO_GRAB			  = "EnableAutoGrab";
+	constexpr auto REGKEY_ENABLE_WALK_TOGGLE		  = "EnableWalkToggle";
+	constexpr auto REGKEY_ENABLE_CROUCH_TOGGLE		  = "EnableCrouchToggle";
+	constexpr auto REGKEY_ENABLE_AUTO_CLIMB			  = "EnableAutoClimb";
 	constexpr auto REGKEY_ENABLE_AUTO_TARGETING		  = "EnableAutoTargeting";
 	constexpr auto REGKEY_ENABLE_OPPOSITE_ACTION_ROLL = "EnableOppositeActionRoll";
 	constexpr auto REGKEY_ENABLE_RUMBLE				  = "EnableRumble";
@@ -57,7 +59,9 @@ namespace TEN::Config
 	enum class SwimControlMode
 	{
 		Omnidirectional,
-		Planar
+		Planar,
+
+		Count
 	};
 
 	struct GameConfiguration
@@ -80,7 +84,7 @@ namespace TEN::Config
 		bool			 EnableSubtitles		 = false;
 
 		// Sound
-		int	 SoundDevice = 0;
+		int	 SoundDevice  = 0;
 		bool EnableSound  = false;
 		bool EnableReverb = false;
 		int	 MusicVolume  = 0;
@@ -90,7 +94,9 @@ namespace TEN::Config
 		std::vector<int> KeyBindings			  = {};
 		ControlMode		 ControlMode			  = ControlMode::Classic;
 		SwimControlMode	 SwimControlMode		  = SwimControlMode::Omnidirectional;
-		bool			 EnableAutoGrab			  = false;
+		bool			 EnableWalkToggle		  = false;
+		bool			 EnableCrouchToggle		  = false;
+		bool			 EnableAutoClimb		  = false;
 		bool			 EnableAutoTargeting	  = false;
 		bool			 EnableOppositeActionRoll = false;
 		bool			 EnableRumble			  = false;

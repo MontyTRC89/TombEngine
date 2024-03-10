@@ -494,7 +494,7 @@ void CalculateSpotCameras()
 
 		AlterFOV(cfov, false);
 
-		LookAt(&Camera, croll);
+		LookAt(Camera, croll);
 		UpdateMikePos(*LaraItem);
 
 		if (SpotCam[CurrentSplineCamera].flags & SCF_OVERLAY)
@@ -749,11 +749,11 @@ void CalculateSpotCameras()
 					CameraSpeed[4] = CameraSpeed[2] >> 1;
 					CameraRoll[4] = 0;
 
-					memcpy((char*)& Camera, (char*)& backup, sizeof(CAMERA_INFO));
+					memcpy((char*)&Camera, (char*)&backup, sizeof(CAMERA_INFO));
 
 					Camera.targetElevation = elevation;
 
-					LookAt(&Camera, croll);
+					LookAt(Camera, croll);
 					UpdateMikePos(*LaraItem);
 
 					SplineToCamera = 1;

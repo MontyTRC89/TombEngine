@@ -863,7 +863,9 @@ namespace TEN::Gui
 
 			ControlMode,
 			SwimControlMode,
-			AutoGrab,
+			WalkToggle,
+			CrouchToggle,
+			AutoClimb,
 			AutoTargeting,
 			OppositeActionRoll,
 
@@ -878,7 +880,7 @@ namespace TEN::Gui
 			Cancel
 		};
 
-		static const auto numInputSettingsOptions = 12;
+		static const auto numInputSettingsOptions = 14;
 
 		OptionCount = numInputSettingsOptions;
 
@@ -928,9 +930,19 @@ namespace TEN::Gui
 
 				break;
 
-			case InputSettingsOption::AutoGrab:
+			case InputSettingsOption::WalkToggle:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableAutoGrab = !CurrentSettings.Configuration.EnableAutoGrab;
+				CurrentSettings.Configuration.EnableWalkToggle = !CurrentSettings.Configuration.EnableWalkToggle;
+				break;
+				
+			case InputSettingsOption::CrouchToggle:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableCrouchToggle = !CurrentSettings.Configuration.EnableCrouchToggle;
+				break;
+				
+			case InputSettingsOption::AutoClimb:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableAutoClimb = !CurrentSettings.Configuration.EnableAutoClimb;
 				break;
 
 			case InputSettingsOption::AutoTargeting:
