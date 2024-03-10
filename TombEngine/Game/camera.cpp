@@ -35,25 +35,6 @@ constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
 constexpr auto SWIVEL_STEP_COUNT = 16;
 
-// TODO: For future CameraObject class.
-struct CameraSphereData
-{
-	Vector3 Position		 = Vector3::Zero;
-	int		RoomNumber		 = 0;
-	Vector3 PositionTarget	 = Vector3::Zero;
-	int		RoomNumberTarget = 0;
-
-	Vector3 Pivot		 = Vector3::Zero;
-	Vector3 LookAt		 = Vector3::Zero;
-
-	short AzimuthAngle		  = 0;
-	short AzimuthAngleTarget  = 0;
-	short AltitudeAngle		  = 0;
-	short AltitudeAngleTarget = 0;
-	float Distance			  = 0.0f;
-	float DistanceTarget	  = 0.0f;
-};
-
 struct OLD_CAMERA
 {
 	// Camera sphere
@@ -1606,17 +1587,6 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, fl
 	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
 }
 
-float GetParticleDistanceFade(const Vector3i& pos)
-{
-	constexpr auto PARTICLE_FADE_THRESHOLD = BLOCK(14);
-
-	float dist = Vector3::Distance(Camera.pos.ToVector3(), pos.ToVector3());
-	if (dist <= PARTICLE_FADE_THRESHOLD)
-		return 1.0f;
-
-	return std::clamp(1.0f - ((dist - PARTICLE_FADE_THRESHOLD) / CAMERA_OBJECT_COLL_DIST_THRESHOLD), 0.0f, 1.0f);
-}
-
 void UpdateMikePos(const ItemInfo& item)
 {
 	if (Camera.mikeAtLara)
@@ -1759,4 +1729,15 @@ void UpdateFadeScreenAndCinematicBars()
 			ScreenFading = false;
 		}
 	}
+}
+
+float GetParticleDistanceFade(const Vector3i& pos)
+{
+	constexpr auto PARTICLE_FADE_THRESHOLD = BLOCK(14);
+
+	float dist = Vector3::Distance(Camera.pos.ToVector3(), pos.ToVector3());
+	if (dist <= PARTICLE_FADE_THRESHOLD)
+		return 1.0f;
+
+	return std::clamp(1.0f - ((dist - PARTICLE_FADE_THRESHOLD) / CAMERA_OBJECT_COLL_DIST_THRESHOLD), 0.0f, 1.0f);
 }
