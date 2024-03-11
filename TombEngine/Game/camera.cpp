@@ -920,7 +920,7 @@ void CombatCamera(const ItemInfo& playerItem)
 
 static EulerAngles GetCameraControlRotation()
 {
-	constexpr auto AXIS_SENSITIVITY_COEFF = 20.0f;
+	constexpr auto AXIS_SENSITIVITY_COEFF = 25.0f;
 	constexpr auto SMOOTHING_FACTOR		  = 8.0f;
 
 	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
