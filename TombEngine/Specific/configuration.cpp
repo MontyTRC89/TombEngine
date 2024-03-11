@@ -243,7 +243,7 @@ namespace TEN::Config
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_X_AXIS, g_Configuration.InvertCameraXAxis) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_Y_AXIS, g_Configuration.InvertCameraYAxis) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCamera) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableTankCameraControl) != ERROR_SUCCESS ||
 			SetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
@@ -332,7 +332,7 @@ namespace TEN::Config
 		g_Configuration.EnableRumble = true;
 		g_Configuration.InvertCameraXAxis = false;
 		g_Configuration.InvertCameraYAxis = false;
-		g_Configuration.EnableThumbstickCamera = false;
+		g_Configuration.EnableTankCameraControl = false;
 		g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
 
 		g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
@@ -527,7 +527,7 @@ namespace TEN::Config
 		g_Configuration.EnableRumble = enableRumble;
 		g_Configuration.InvertCameraXAxis = invertCameraXAxis;
 		g_Configuration.InvertCameraYAxis = invertCameraYAxis;
-		g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
+		g_Configuration.EnableTankCameraControl = enableThumbstickCamera;
 		g_Configuration.MouseSensitivity = mouseSensitivity;
 
 		// Set legacy variables.

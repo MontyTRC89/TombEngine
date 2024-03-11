@@ -933,7 +933,7 @@ static EulerAngles GetCameraControlRotation()
 
 static bool CanControlTankCamera()
 {
-	if (!g_Configuration.EnableThumbstickCamera)
+	if (!g_Configuration.EnableTankCameraControl)
 		return false;
 
 	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);

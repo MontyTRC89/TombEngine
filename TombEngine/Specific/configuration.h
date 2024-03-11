@@ -8,10 +8,28 @@ namespace TEN::Config
 {
 	// Directories
 	constexpr auto REGKEY_ROOT		   = "Software\\TombEngine\\1.4.0";
-	constexpr auto REGKEY_GRAPHICS	   = "Graphics";
-	constexpr auto REGKEY_SOUND		   = "Sound";
 	constexpr auto REGKEY_CONTROLS	   = "Controls";
 	constexpr auto REGKEY_KEY_BINDINGS = "KeyBindings";
+	constexpr auto REGKEY_GAMEPLAY	   = "Gameplay";
+	constexpr auto REGKEY_GRAPHICS	   = "Graphics";
+	constexpr auto REGKEY_SOUND		   = "Sound";
+
+	// Controls keys
+	constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA = "EnableThumbstickCamera";
+	constexpr auto REGKEY_INVERT_CAMERA_X_AXIS	   = "InvertCameraXAxis";
+	constexpr auto REGKEY_INVERT_CAMERA_Y_AXIS	   = "InvertCameraYAxis";
+	constexpr auto REGKEY_ENABLE_RUMBLE			   = "EnableRumble";
+	constexpr auto REGKEY_MOUSE_SENSITIVITY		   = "MouseSensitivity";
+
+	// Gameplay keys
+	constexpr auto REGKEY_CONTROL_MODE				  = "ControlMode";
+	constexpr auto REGKEY_SWIM_CONTROL_MODE			  = "SwimControlMode";
+	constexpr auto REGKEY_ENABLE_WALK_TOGGLE		  = "EnableWalkToggle";
+	constexpr auto REGKEY_ENABLE_CROUCH_TOGGLE		  = "EnableCrouchToggle";
+	constexpr auto REGKEY_ENABLE_AUTO_CLIMB			  = "EnableAutoClimb";
+	constexpr auto REGKEY_ENABLE_AUTO_TARGETING		  = "EnableAutoTargeting";
+	constexpr auto REGKEY_ENABLE_OPPOSITE_ACTION_ROLL = "EnableOppositeActionRoll";
+	constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER	  = "EnableTargetHighlighter";
 
 	// Graphics keys
 	constexpr auto REGKEY_SCREEN_WIDTH				= "ScreenWidth";
@@ -23,7 +41,6 @@ namespace TEN::Config
 	constexpr auto REGKEY_ENABLE_CAUSTICS			= "EnableCaustics";
 	constexpr auto REGKEY_ANTIALIASING_MODE			= "AntialiasingMode";
 	constexpr auto REGKEY_AMBIENT_OCCLUSION			= "AmbientOcclusion";
-	constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER = "EnableTargetHighlighter";
 	constexpr auto REGKEY_ENABLE_SUBTITLES			= "EnableSubtitles";
 
 	// Sound keys
@@ -32,20 +49,6 @@ namespace TEN::Config
 	constexpr auto REGKEY_ENABLE_REVERB = "EnableReverb";
 	constexpr auto REGKEY_MUSIC_VOLUME	= "MusicVolume";
 	constexpr auto REGKEY_SFX_VOLUME	= "SfxVolume";
-
-	// Controls keys
-	constexpr auto REGKEY_CONTROL_MODE				  = "ControlMode";
-	constexpr auto REGKEY_SWIM_CONTROL_MODE			  = "SwimControlMode";
-	constexpr auto REGKEY_ENABLE_WALK_TOGGLE		  = "EnableWalkToggle";
-	constexpr auto REGKEY_ENABLE_CROUCH_TOGGLE		  = "EnableCrouchToggle";
-	constexpr auto REGKEY_ENABLE_AUTO_CLIMB			  = "EnableAutoClimb";
-	constexpr auto REGKEY_ENABLE_AUTO_TARGETING		  = "EnableAutoTargeting";
-	constexpr auto REGKEY_ENABLE_OPPOSITE_ACTION_ROLL = "EnableOppositeActionRoll";
-	constexpr auto REGKEY_ENABLE_RUMBLE				  = "EnableRumble";
-	constexpr auto REGKEY_INVERT_CAMERA_X_AXIS		  = "InvertCameraXAxis";
-	constexpr auto REGKEY_INVERT_CAMERA_Y_AXIS		  = "InvertCameraYAxis";
-	constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	  = "EnableThumbstickCamera";
-	constexpr auto REGKEY_MOUSE_SENSITIVITY			  = "MouseSensitivity";
 
 	enum class ControlMode
 	{
@@ -70,18 +73,35 @@ namespace TEN::Config
 		static constexpr auto DEFAULT_SHADOW_BLOBS_MAX	= 16;
 		static constexpr auto DEFAULT_MOUSE_SENSITIVITY = 6;
 
+		// Controls
+		std::vector<int> KeyBindings			 = {};
+		bool			 EnableTankCameraControl = false;
+		bool			 InvertCameraXAxis		 = false;
+		bool			 InvertCameraYAxis		 = false;
+		bool			 EnableRumble			 = false;
+		int				 MouseSensitivity		 = DEFAULT_MOUSE_SENSITIVITY;
+
+		// Gameplay
+		ControlMode		ControlMode				 = ControlMode::Classic;
+		SwimControlMode SwimControlMode			 = SwimControlMode::Omnidirectional;
+		bool			EnableWalkToggle		 = false;
+		bool			EnableCrouchToggle		 = false;
+		bool			EnableAutoClimb			 = false;
+		bool			EnableAutoTargeting		 = false;
+		bool			EnableOppositeActionRoll = false;
+		bool			EnableTargetHighlighter  = false;
+		
 		// Graphics
-		int				 ScreenWidth			 = 0;
-		int				 ScreenHeight			 = 0;
-		bool			 EnableWindowedMode		 = false;
-		ShadowMode		 ShadowType				 = ShadowMode::None;
-		int				 ShadowMapSize			 = DEFAULT_SHADOW_MAP_SIZE;
-		int				 ShadowBlobsMax			 = DEFAULT_SHADOW_BLOBS_MAX;
-		bool			 EnableCaustics			 = false;
-		bool			 EnableAmbientOcclusion	 = false;
-		AntialiasingMode AntialiasingMode		 = AntialiasingMode::None;
-		bool			 EnableTargetHighlighter = false;
-		bool			 EnableSubtitles		 = false;
+		int				 ScreenWidth			= 0;
+		int				 ScreenHeight			= 0;
+		bool			 EnableWindowedMode		= false;
+		ShadowMode		 ShadowType				= ShadowMode::None;
+		int				 ShadowMapSize			= DEFAULT_SHADOW_MAP_SIZE;
+		int				 ShadowBlobsMax			= DEFAULT_SHADOW_BLOBS_MAX;
+		bool			 EnableCaustics			= false;
+		bool			 EnableAmbientOcclusion = false;
+		AntialiasingMode AntialiasingMode		= AntialiasingMode::None;
+		bool			 EnableSubtitles		= false;
 
 		// Sound
 		int	 SoundDevice  = 0;
@@ -89,21 +109,6 @@ namespace TEN::Config
 		bool EnableReverb = false;
 		int	 MusicVolume  = 0;
 		int	 SfxVolume	  = 0;
-
-		// Controls
-		std::vector<int> KeyBindings			  = {};
-		ControlMode		 ControlMode			  = ControlMode::Classic;
-		SwimControlMode	 SwimControlMode		  = SwimControlMode::Omnidirectional;
-		bool			 EnableWalkToggle		  = false;
-		bool			 EnableCrouchToggle		  = false;
-		bool			 EnableAutoClimb		  = false;
-		bool			 EnableAutoTargeting	  = false;
-		bool			 EnableOppositeActionRoll = false;
-		bool			 EnableRumble			  = false;
-		bool			 InvertCameraXAxis		  = false;
-		bool			 InvertCameraYAxis		  = false;
-		bool			 EnableThumbstickCamera	  = false;
-		int				 MouseSensitivity		  = DEFAULT_MOUSE_SENSITIVITY;
 
 		std::vector<Vector2i> SupportedScreenResolutions = {};
 		std::string			  AdapterName				 = {};

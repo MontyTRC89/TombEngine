@@ -220,7 +220,7 @@ namespace TEN::Input
 				if (ApplyDefaultXInputBindings())
 				{
 					g_Configuration.EnableRumble = (OisRumble != nullptr);
-					g_Configuration.EnableThumbstickCamera = true;
+					g_Configuration.EnableTankCameraControl = true;
 					SaveConfiguration();
 				}
 			}
@@ -792,8 +792,8 @@ namespace TEN::Input
 			for (int i = 0; i < (int)In::Count; i++)
 				g_Configuration.KeyBindings[i] = Bindings[1][i];
 
-			// Additionally turn on thumbstick camera and vibration.
-			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCamera = true;
+			// Additionally enable tank camera control and vibration.
+			g_Configuration.EnableRumble = g_Configuration.EnableTankCameraControl = true;
 
 			return true;
 		}

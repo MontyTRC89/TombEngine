@@ -80,9 +80,10 @@ namespace TEN::Gui
 		LoadGame,
 		Options,
 
+		Controls,
+		Gameplay,
 		Display,
 		Sound,
-		Controls,
 
 		GeneralActions,
 		VehicleActions,
@@ -207,10 +208,11 @@ namespace TEN::Gui
 		void SetLastInventoryItem(int itemNumber);
 
 	private:
-		void HandleDisplaySettingsInput();
-		void HandleSoundSettingsInput();
 		void HandleControlsSettingsInput();
 		void HandleKeyBindingsSettingsInput(ItemInfo* item, bool fromPauseMenu);
+		void HandleGameplaySettingsInput();
+		void HandleDisplaySettingsInput();
+		void HandleSoundSettingsInput();
 		void HandleOptionsInput();
 		void BackupOptions();
 		bool DoObjectsCombine(int objectNumber1, int objectNumber2);
