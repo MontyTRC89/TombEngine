@@ -868,7 +868,6 @@ namespace TEN::Gui
 			OppositeActionRoll,
 
 			TargetHighlighter,
-			//HitIndicator,
 			//InteractionHints,
 
 			Apply,

@@ -42,10 +42,11 @@ namespace TEN::Renderer
 	constexpr auto MenuVerticalBlockSpacing = 50;
 	
 	// Vertical menu positioning templates
+	constexpr auto MenuVerticalControlsSettings = 100;
 	constexpr auto MenuVerticalKeyBindingsSettings = 30;
+	constexpr auto MenuVerticalGameplaySettings = 100;
 	constexpr auto MenuVerticalDisplaySettings = 100;
 	constexpr auto MenuVerticalSoundSettings = 220;
-	constexpr auto MenuVerticalControlsSettings = 30;
 	constexpr auto MenuVerticalBottomCenter = 400;
 	constexpr auto MenuVerticalStatisticsTitle = 150;
 	constexpr auto MenuVerticalOptionsTitle = 350;
@@ -244,7 +245,7 @@ namespace TEN::Renderer
 
 		case Menu::Gameplay:
 			// Set up parameters.
-			y = MenuVerticalControlsSettings;
+			y = MenuVerticalGameplaySettings;
 
 			// Heading
 			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OPTIONS_GAMEPLAY), PRINTSTRING_COLOR_YELLOW, SF_Center());
