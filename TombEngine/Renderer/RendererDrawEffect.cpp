@@ -27,6 +27,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/SingleLaser.h"
 #include "Objects/Utils/object_helper.h"
 #include "Renderer/Structures/RendererSprite2D.h"
 #include "Renderer/Structures/RendererSprite.h"
@@ -66,6 +67,25 @@ namespace TEN::Renderer
 			return;
 
 		for (const auto& [entityID, barrier] : LaserBarriers)
+		{
+			for (const auto& beam : barrier.Beams)
+			{
+				AddColoredQuad(
+					beam.VertexPoints[0], beam.VertexPoints[1],
+					beam.VertexPoints[2], beam.VertexPoints[3],
+					barrier.Color, barrier.Color,
+					barrier.Color, barrier.Color,
+					BlendMode::Additive, view, SpriteRenderType::LaserBarrier);
+			}
+		}
+	}
+
+	void Renderer::PrepareSingleLaserBeam(RenderView& view)
+	{
+		if (LaserBeams.empty())
+			return;
+
+		for (const auto& [entityID, barrier] : LaserBeams)
 		{
 			for (const auto& beam : barrier.Beams)
 			{

@@ -57,6 +57,7 @@
 // Traps
 #include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/SingleLaser.h"
 #include "Objects/TR5/Trap/ZipLine.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
 #include "Objects/TR5/Trap/tr5_ventilator.h"
@@ -942,6 +943,16 @@ static void StartTrap(ObjectInfo *obj)
 		obj->Initialize = InitializeLaserBarrier;
 		obj->control = ControlLaserBarrier;
 		obj->collision = CollideLaserBarrier;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_SINGLE_LASER];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeSingleLaser;
+		obj->control = ControlSingleLaser;
+		obj->collision = CollideSingleLaser;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
