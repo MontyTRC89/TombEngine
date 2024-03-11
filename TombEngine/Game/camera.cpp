@@ -709,7 +709,6 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 	constexpr auto LOOK_AT_DIST = BLOCK(0.5f);
 	constexpr auto BUFFER		= 100;
 
-	// TODO: Tank camera control.
 	// Move camera.
 	if (IsUsingModernControls() || Camera.IsControllingTankCamera)
 	{
@@ -749,6 +748,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 	else
 	{
 		auto farthestIdealPos = Camera.pos;
+		short farthestIdealAzimuthAngle = Camera.actualAngle;
 		float farthestDistSqr = INFINITY;
 
 		// Determine ideal position around player.
@@ -770,6 +770,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 					if (i == 0)
 					{
 						farthestIdealPos = idealPos;
+						farthestIdealAzimuthAngle = azimuthAngle;
 						break;
 					}
 
@@ -777,6 +778,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 					if (distSqr < farthestDistSqr)
 					{
 						farthestIdealPos = idealPos;
+						farthestIdealAzimuthAngle = azimuthAngle;
 						farthestDistSqr = distSqr;
 					}
 				}
@@ -787,11 +789,13 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 				if (distSqr > SQUARE(BLOCK(0.75f)))
 				{
 					farthestIdealPos = idealPos;
+					farthestIdealAzimuthAngle = azimuthAngle;
 					break;
 				}
 			}
 		}
 
+		Camera.actualAngle = farthestIdealAzimuthAngle;
 		CameraCollisionBounds(&farthestIdealPos, CLICK(1.5f), true);
 
 		if (isCombatCamera)
@@ -959,9 +963,9 @@ void UpdateCameraSphere(const ItemInfo& playerItem)
 	{
 		auto origin = GetJointPosition(playerItem, Camera.laraNode, Vector3i::Zero);
 		auto target = GetJointPosition(playerItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
-		origin = target - origin;
+		auto deltaPos = target - origin;
 
-		Camera.actualAngle = Camera.targetAngle + FROM_RAD(atan2(origin.x, origin.z));
+		Camera.actualAngle = Camera.targetAngle + FROM_RAD(atan2(deltaPos.x, deltaPos.z));
 		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) * ALTITUDE_ROT_ALPHA;
 	}
 	else
