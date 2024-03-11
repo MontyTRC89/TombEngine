@@ -249,6 +249,8 @@ void MoveCamera(const ItemInfo& playerItem, GameVector* ideal, float speed)
 	if (player.Control.Look.IsUsingBinoculars)
 		speed = 1.0f;
 
+	UpdateMikePos(playerItem);
+
 	if (OldCam.pos.Orientation != playerItem.Pose.Orientation ||
 		OldCam.pos2.Orientation.x != player.ExtraHeadRot.x ||
 		OldCam.pos2.Orientation.y != player.ExtraHeadRot.y ||
@@ -279,9 +281,8 @@ void MoveCamera(const ItemInfo& playerItem, GameVector* ideal, float speed)
 		OldCam.targetElevation = Camera.targetElevation;
 		OldCam.actualElevation = Camera.actualElevation;
 		OldCam.actualAngle = Camera.actualAngle;
-		OldCam.target.x = Camera.target.x;
-		OldCam.target.y = Camera.target.y;
-		OldCam.target.z = Camera.target.z;
+		OldCam.target = Camera.target.ToVector3i();
+
 		LastIdeal.x = ideal->x;
 		LastIdeal.y = ideal->y;
 		LastIdeal.z = ideal->z;
@@ -379,7 +380,6 @@ void MoveCamera(const ItemInfo& playerItem, GameVector* ideal, float speed)
 
 	Camera.pos.RoomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber).RoomNumber;
 	LookAt(Camera, 0);
-	UpdateMikePos(playerItem);
 	Camera.oldType = Camera.type;
 }
 
@@ -920,7 +920,7 @@ void CombatCamera(const ItemInfo& playerItem)
 
 static EulerAngles GetCameraControlRotation()
 {
-	constexpr auto AXIS_SENSITIVITY_COEFF = 30.0f;
+	constexpr auto AXIS_SENSITIVITY_COEFF = 20.0f;
 	constexpr auto SMOOTHING_FACTOR		  = 8.0f;
 
 	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
@@ -1607,13 +1607,14 @@ void UpdateMikePos(const ItemInfo& item)
 	else
 	{
 		// Recalculate azimuth angle.
-		if ((IsUsingModernControls() && !IsPlayerStrafing(*LaraItem)) || !IsUsingModernControls())
+		if (((IsUsingModernControls() && !IsPlayerStrafing(*LaraItem)) || !IsUsingModernControls()) &&
+			OldCam.target != Camera.target.ToVector3i())
 		{
 			auto deltaPos = Camera.target.ToVector3() - Camera.pos.ToVector3();
-			short targetAximuthAngle = FROM_RAD(atan2(deltaPos.x, deltaPos.z));
+			short targetAzimuthAngle = FROM_RAD(atan2(deltaPos.x, deltaPos.z));
 
 			float alpha = 1.0f / Camera.speed;
-			Camera.actualAngle += Geometry::GetShortestAngle(Camera.actualAngle, targetAximuthAngle) * alpha;
+			Camera.actualAngle += Geometry::GetShortestAngle(Camera.actualAngle, targetAzimuthAngle) * alpha;
 		}
 
 		int perspective = ((g_Configuration.ScreenWidth / 2) * phd_cos(CurrentFOV / 2)) / phd_sin(CurrentFOV / 2);
