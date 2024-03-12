@@ -580,7 +580,7 @@ void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnim
 	player.ExtraAnim = 1;
 	player.HitDirection = -1;
 
-	Camera.pos.RoomNumber = playerItem.RoomNumber;
+	Camera.RoomNumber = playerItem.RoomNumber;
 	Camera.flags = CameraFlag::FollowCenter;
 	Camera.targetAngle = ANGLE(170.0f);
 	Camera.targetElevation = ANGLE(-25.0f);
@@ -1078,7 +1078,7 @@ bool SearchLOT(LOTInfo* LOT, int depth)
 CreatureAIPriority GetCreatureLOTPriority(ItemInfo* item)
 {
 	auto itemPos = item->Pose.Position.ToVector3();
-	auto cameraPos = Camera.pos.ToVector3();
+	auto cameraPos = Camera.Position;
 
 	float distance = Vector3::Distance(itemPos, cameraPos) / BLOCK(1);
 	if (distance <= HIGH_PRIO_RANGE)

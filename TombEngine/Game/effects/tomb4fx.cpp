@@ -209,8 +209,8 @@ void TriggerPilotFlame(int itemNumber, int nodeIndex)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	int dx = Camera.pos.x - item->Pose.Position.x;
-	int dz = Camera.pos.z - item->Pose.Position.z;
+	int dx = Camera.Position.x - item->Pose.Position.x;
+	int dz = Camera.Position.z - item->Pose.Position.z;
 	if (dx < -BLOCK(16) || dx > BLOCK(16) ||
 		dz < -BLOCK(16) || dz > BLOCK(16))
 	{

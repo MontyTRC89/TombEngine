@@ -287,9 +287,9 @@ namespace TEN::Entities::Generic
 
 				if (item.TriggerFlags > 0)
 				{
-					if (abs(item.Pose.Position.x - Camera.pos.x) < 10240 &&
-						abs(item.Pose.Position.x - Camera.pos.x) < 10240 &&
-						abs(item.Pose.Position.x - Camera.pos.x) < 10240)
+					if (abs(item.Pose.Position.x - Camera.Position.x) < 10240 &&
+						abs(item.Pose.Position.x - Camera.Position.x) < 10240 &&
+						abs(item.Pose.Position.x - Camera.Position.x) < 10240)
 					{
 						if (item.ItemFlags[1] == 64 || item.ItemFlags[1] == 4096)
 							Camera.bounce = -32;
@@ -313,9 +313,9 @@ namespace TEN::Entities::Generic
 
 			if (item.TriggerFlags >= 0)
 			{
-				if (abs(item.Pose.Position.x - Camera.pos.x) < 10240 &&
-					abs(item.Pose.Position.x - Camera.pos.x) < 10240 &&
-					abs(item.Pose.Position.x - Camera.pos.x) < 10240)
+				if (abs(item.Pose.Position.x - Camera.Position.x) < 10240 &&
+					abs(item.Pose.Position.x - Camera.Position.x) < 10240 &&
+					abs(item.Pose.Position.x - Camera.Position.x) < 10240)
 				{
 					if (item.ItemFlags[1] == 64 || item.ItemFlags[1] == 4096)
 					{

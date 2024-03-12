@@ -31,13 +31,15 @@ enum class CameraFlag
 struct CAMERA_INFO
 {
 	// Camera sphere
-	GameVector pos			   = GameVector::Zero;
-	GameVector target		   = GameVector::Zero; // LookAt
-	short	   actualAngle	   = 0;				   // AzimuthAngle
-	short	   targetAngle	   = 0;
-	short	   actualElevation = 0;				   // AltitudeAngle
-	short	   targetElevation = 0;
-	float	   targetDistance  = 0.0f;
+	Vector3 Position		 = Vector3::Zero;
+	int		RoomNumber		 = 0;
+	Vector3 LookAt			 = Vector3::Zero;
+	int		LookAtRoomNumber = 0;
+	short	actualAngle		 = 0; // AzimuthAngle
+	short	targetAngle		 = 0;
+	short	actualElevation	 = 0; // AltitudeAngle
+	short	targetElevation	 = 0;
+	float	targetDistance	 = 0.0f;
 
 	CameraType type	= CameraType::Chase;
 	CameraType oldType = CameraType::Chase;
@@ -95,7 +97,7 @@ void LookAt(CAMERA_INFO& camera, short roll);
 void AlterFOV(short value, bool store = true);
 short GetCurrentFOV();
 void InitializeCamera();
-void MoveCamera(const ItemInfo& playerItem, GameVector* ideal, float speed);
+void MoveCamera(const ItemInfo& playerItem, Vector3 ideal, int idealRoomNumber, float speed);
 void ChaseCamera(const ItemInfo& playerItem);
 void CombatCamera(const ItemInfo& playerItem);
 void UpdateCameraSphere(const ItemInfo& playerItem);

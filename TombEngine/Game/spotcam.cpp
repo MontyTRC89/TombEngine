@@ -141,16 +141,11 @@ void InitializeSpotCam(short Sequence)
 
 	LaraAir = Lara.Status.Air;
 
-	InitialCameraPosition.x = Camera.pos.x;
-	InitialCameraPosition.y = Camera.pos.y;
-	InitialCameraPosition.z = Camera.pos.z;
-
-	InitialCameraTarget.x = Camera.target.x;
-	InitialCameraTarget.y = Camera.target.y;
-	InitialCameraTarget.z = Camera.target.z;
+	InitialCameraPosition = Camera.Position;
+	InitialCameraTarget = Camera.LookAt;
 
 	LaraHealth = LaraItem->HitPoints;
-	InitialCameraRoom = Camera.pos.RoomNumber;
+	InitialCameraRoom = Camera.RoomNumber;
 
 	LaraFixedPosition.x = LaraItem->Pose.Position.x;
 	LaraFixedPosition.y = LaraItem->Pose.Position.y;
@@ -466,31 +461,35 @@ void CalculateSpotCameras()
 
 	if ((s->flags & SCF_DISABLE_BREAKOUT) || !lookPressed)
 	{
-		Camera.pos.x = cpx;
-		Camera.pos.y = cpy;
-		Camera.pos.z = cpz;
+		Camera.Position.x = cpx;
+		Camera.Position.y = cpy;
+		Camera.Position.z = cpz;
 
 		if ((s->flags & SCF_FOCUS_LARA_HEAD) || (s->flags & SCF_TRACKING_CAM))
 		{
-			Camera.target.x = LaraItem->Pose.Position.x;
-			Camera.target.y = LaraItem->Pose.Position.y;
-			Camera.target.z = LaraItem->Pose.Position.z;
+			Camera.LookAt.x = LaraItem->Pose.Position.x;
+			Camera.LookAt.y = LaraItem->Pose.Position.y;
+			Camera.LookAt.z = LaraItem->Pose.Position.z;
 		}
 		else
 		{
-			Camera.target.x = ctx;
-			Camera.target.y = cty;
-			Camera.target.z = ctz;
+			Camera.LookAt.x = ctx;
+			Camera.LookAt.y = cty;
+			Camera.LookAt.z = ctz;
 		}
 
 		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
 		if (outsideRoom == NO_ROOM)
 		{
-			Camera.pos.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
-			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
+			Camera.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
+			short roomNumber = Camera.RoomNumber;
+			GetFloor(Camera.Position.x, Camera.Position.y, Camera.Position.z, &roomNumber);
+			Camera.RoomNumber = roomNumber;
 		}
 		else
-			Camera.pos.RoomNumber = outsideRoom;
+		{
+			Camera.RoomNumber = outsideRoom;
+		}
 
 		AlterFOV(cfov, false);
 
@@ -512,13 +511,13 @@ void CalculateSpotCameras()
 			Camera.type = CameraType::Heavy;
 			if (CurrentLevel != 0)
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
+				TestTriggers(Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.RoomNumber, true);
 				TestVolumes(&Camera);
 			}
 			else
 			{
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, false);
-				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
+				TestTriggers(Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.RoomNumber, false);
+				TestTriggers(Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.RoomNumber, true);
 				TestVolumes(&Camera);
 			}
 
@@ -648,13 +647,13 @@ void CalculateSpotCameras()
 						Camera.type = CameraType::Heavy;
 						if (CurrentLevel)
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
+							TestTriggers(Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.RoomNumber, true);
 							TestVolumes(&Camera);
 						}
 						else
 						{
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, false);
-							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber, true);
+							TestTriggers(Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.RoomNumber, false);
+							TestTriggers(Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.RoomNumber, true);
 							TestVolumes(&Camera);
 						}
 
@@ -673,13 +672,13 @@ void CalculateSpotCameras()
 
 					if (s->flags & SCF_CUT_TO_LARA_CAM)
 					{
-						Camera.pos.x = InitialCameraPosition.x;
-						Camera.pos.y = InitialCameraPosition.y;
-						Camera.pos.z = InitialCameraPosition.z;
-						Camera.target.x = InitialCameraTarget.x;
-						Camera.target.y = InitialCameraTarget.y;
-						Camera.target.z = InitialCameraTarget.z;
-						Camera.pos.RoomNumber = InitialCameraRoom;
+						Camera.Position.x = InitialCameraPosition.x;
+						Camera.Position.y = InitialCameraPosition.y;
+						Camera.Position.z = InitialCameraPosition.z;
+						Camera.LookAt.x = InitialCameraTarget.x;
+						Camera.LookAt.y = InitialCameraTarget.y;
+						Camera.LookAt.z = InitialCameraTarget.z;
+						Camera.RoomNumber = InitialCameraRoom;
 					}
 
 					SpotcamOverlay = false;
@@ -721,30 +720,30 @@ void CalculateSpotCameras()
 					CameraRoll[3] = 0;
 					CameraSpeed[2] = CameraSpeed[1];
 
-					InitialCameraPosition.x = Camera.pos.x;
-					InitialCameraPosition.y = Camera.pos.y;
-					InitialCameraPosition.z = Camera.pos.z;
+					InitialCameraPosition.x = Camera.Position.x;
+					InitialCameraPosition.y = Camera.Position.y;
+					InitialCameraPosition.z = Camera.Position.z;
 
-					InitialCameraTarget.x = Camera.target.x;
-					InitialCameraTarget.y = Camera.target.y;
-					InitialCameraTarget.z = Camera.target.z;
+					InitialCameraTarget.x = Camera.LookAt.x;
+					InitialCameraTarget.y = Camera.LookAt.y;
+					InitialCameraTarget.z = Camera.LookAt.z;
 
-					CameraXposition[3] = Camera.pos.x;
-					CameraYposition[3] = Camera.pos.y;
-					CameraZposition[3] = Camera.pos.z;
-					CameraXtarget[3] = Camera.target.x;
-					CameraYtarget[3] = Camera.target.y;
-					CameraZtarget[3] = Camera.target.z;
+					CameraXposition[3] = Camera.Position.x;
+					CameraYposition[3] = Camera.Position.y;
+					CameraZposition[3] = Camera.Position.z;
+					CameraXtarget[3] = Camera.LookAt.x;
+					CameraYtarget[3] = Camera.LookAt.y;
+					CameraZtarget[3] = Camera.LookAt.z;
 					CameraFOV[3] = LastFOV;
 					CameraSpeed[3] = CameraSpeed[2];
 					CameraRoll[3] = 0;
 
-					CameraXposition[4] = Camera.pos.x;
-					CameraYposition[4] = Camera.pos.y;
-					CameraZposition[4] = Camera.pos.z;
-					CameraXtarget[4] = Camera.target.x;
-					CameraYtarget[4] = Camera.target.y;
-					CameraZtarget[4] = Camera.target.z;
+					CameraXposition[4] = Camera.Position.x;
+					CameraYposition[4] = Camera.Position.y;
+					CameraZposition[4] = Camera.Position.z;
+					CameraXtarget[4] = Camera.LookAt.x;
+					CameraYtarget[4] = Camera.LookAt.y;
+					CameraZtarget[4] = Camera.LookAt.z;
 					CameraFOV[4] = LastFOV;
 					CameraSpeed[4] = CameraSpeed[2] >> 1;
 					CameraRoll[4] = 0;

@@ -55,18 +55,18 @@ namespace TEN::Renderer
 
 	RenderViewCamera::RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h)
 	{
-		RoomNumber = cam->pos.RoomNumber;
-		WorldPosition = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
+		RoomNumber = cam->RoomNumber;
+		WorldPosition = cam->Position;
 
-		Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
+		auto target = cam->LookAt;
 		if ((target - WorldPosition) == Vector3::Zero)
 			target.y -= 10;
 
 		WorldDirection = target - WorldPosition;
 		WorldDirection.Normalize();
 		
-		Vector3 up = -Vector3::UnitY;
-		Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
+		auto up = -Vector3::UnitY;
+		auto upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
 		up = Vector3::Transform(up, upRotation);
 		up.Normalize();
 

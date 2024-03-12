@@ -310,9 +310,9 @@ void PlaySoundEffect(ItemInfo* item)
 
 void FloorShake(ItemInfo* item)
 {
-	int x = abs(item->Pose.Position.x - Camera.pos.x);
-	int y = abs(item->Pose.Position.y - Camera.pos.y);
-	int z = abs(item->Pose.Position.z - Camera.pos.z);
+	int x = abs(item->Pose.Position.x - Camera.Position.x);
+	int y = abs(item->Pose.Position.y - Camera.Position.y);
+	int z = abs(item->Pose.Position.z - Camera.Position.z);
 
 	if (x < BLOCK(16) &&
 		y < BLOCK(16) &&

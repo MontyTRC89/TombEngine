@@ -1350,17 +1350,18 @@ namespace TEN::Renderer
 
 			case RendererDebugPage::DimensionStats:
 				PrintDebugMessage("DIMENSION STATS");
-				PrintDebugMessage("Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-				PrintDebugMessage("Orient: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
+				PrintDebugMessage("Pos: %d, %d, %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
+				PrintDebugMessage("Orient: %d, %d, %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
 				PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("Room location: %d %d", LaraItem->Location.RoomNumber, LaraItem->Location.Height);
+				PrintDebugMessage("Room location: %d, %d", LaraItem->Location.RoomNumber, LaraItem->Location.Height);
 				PrintDebugMessage("BoxNumber: %d", LaraItem->BoxNumber);
 				PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
-				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * BLOCK(1), r->z + r->zSize * BLOCK(1));
-				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
-				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
-				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
-				PrintDebugMessage("Camera.RoomNumber: %d", Camera.pos.RoomNumber);
+				PrintDebugMessage("Room: %d, %d, %d, %d", r->x, r->z, r->x + r->xSize * BLOCK(1), r->z + r->zSize * BLOCK(1));
+				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d, %d, %d ", r->y, r->minfloor, r->maxceiling);
+				PrintDebugMessage("Camera.Position: %.3f, %.3f, %.3f", Camera.Position.x, Camera.Position.y, Camera.Position.z);
+				PrintDebugMessage("Camera.LookAt: %.3f, %.3f, %.3f", Camera.LookAt.x, Camera.LookAt.y, Camera.LookAt.z);
+				PrintDebugMessage("Camera.RoomNumber: %d", Camera.RoomNumber);
+				PrintDebugMessage("Camera azimuth, altitude: %d, %d", Camera.actualAngle, Camera.actualElevation);
 				break;
 
 			case RendererDebugPage::PlayerStats:
@@ -1370,7 +1371,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("FrameNumber: %d", LaraItem->Animation.FrameNumber);
 				PrintDebugMessage("ActiveState: %d", LaraItem->Animation.ActiveState);
 				PrintDebugMessage("TargetState: %d", LaraItem->Animation.TargetState);
-				PrintDebugMessage("Velocity: %.3f %.3f %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
+				PrintDebugMessage("Velocity: %.3f, %.3f, %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
 				PrintDebugMessage("IsAirborne: %d", LaraItem->Animation.IsAirborne);
 				PrintDebugMessage("HandStatus: %d", Lara.Control.HandStatus);
 				PrintDebugMessage("WaterStatus: %d", Lara.Control.WaterStatus);

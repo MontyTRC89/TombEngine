@@ -1878,8 +1878,8 @@ namespace TEN::Renderer
 				{
 					auto weather = TEN::Effects::Environment::Weather;
 
-					auto translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * SKY_SIZE,
-						Camera.pos.y - 1536.0f, Camera.pos.z);
+					auto translation = Matrix::CreateTranslation(Camera.Position.x + weather.SkyPosition(s) - i * SKY_SIZE,
+						Camera.Position.y - 1536.0f, Camera.Position.z);
 					auto world = rotation * translation;
 
 					_stStatic.World = (rotation * translation);
@@ -2662,8 +2662,8 @@ namespace TEN::Renderer
 			{
 				auto weather = TEN::Effects::Environment::Weather;
 
-				auto translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyPosition(s) - i * SKY_SIZE,
-					Camera.pos.y - 1536.0f, Camera.pos.z);
+				auto translation = Matrix::CreateTranslation(Camera.Position.x + weather.SkyPosition(s) - i * SKY_SIZE,
+					Camera.Position.y - 1536.0f, Camera.Position.z);
 				auto world = rotation * translation;
 
 				_stStatic.World = (rotation * translation);
@@ -2687,7 +2687,7 @@ namespace TEN::Renderer
 
 			auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
-			_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+			_stStatic.World = Matrix::CreateTranslation(Camera.Position.x, Camera.Position.y, Camera.Position.z);
 			_stStatic.Color = Vector4::One;
 			_stStatic.ApplyFogBulbs = 1;
 			_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -2732,7 +2732,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RenderView& view, RendererPass rendererPass)
 	{
-		auto cameraPos = Camera.pos.ToVector3();
+		auto cameraPos = Camera.Position;
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{

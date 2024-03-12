@@ -98,7 +98,7 @@ namespace TEN::Entities::Generic
 		if (item->TriggerFlags == 0)
 			return;
 
-		if ((item->Pose.Position.ToVector3() - Camera.pos.ToVector3()).Length() < BLOCK(10))
+		if ((item->Pose.Position.ToVector3() - Camera.Position).Length() < BLOCK(10))
 		{
 			if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
 				Camera.bounce = -32;

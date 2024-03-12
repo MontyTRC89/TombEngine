@@ -43,11 +43,11 @@ void VentilatorEffect(GameBoundingBox* bounds, int intensity, short rot, int spe
 		}
 	}
 
-	if (abs(Camera.pos.x - x) <= BLOCK(7))
+	if (abs(Camera.Position.x - x) <= BLOCK(7))
 	{
-		if (abs(Camera.pos.y - y) <= BLOCK(7))
+		if (abs(Camera.Position.y - y) <= BLOCK(7))
 		{
-			if (abs(Camera.pos.z - z) <= BLOCK(7))
+			if (abs(Camera.Position.z - z) <= BLOCK(7))
 			{
 				auto* spark = GetFreeParticle();
 

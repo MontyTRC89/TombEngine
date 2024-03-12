@@ -1252,7 +1252,10 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 		}
 	}
 
-	GetTargetOnLOS(&Camera.pos, &Camera.target, true, isFiring);
+	auto origin = GameVector(Camera.Position, Camera.RoomNumber);
+	auto target = GameVector(Camera.LookAt, Camera.LookAtRoomNumber);
+	GetTargetOnLOS(&origin, &target, true, isFiring);
+	Camera.LookAt = target.ToVector3();
 }
 
 void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)

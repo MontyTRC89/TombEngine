@@ -238,8 +238,8 @@ namespace TEN::Effects::Environment
 
 			// Check if particle got out of collision check radius, and fade it out if it did.
 
-			if (abs(Camera.pos.x - p.Position.x) > COLLISION_CHECK_DISTANCE ||
-				abs(Camera.pos.z - p.Position.z) > COLLISION_CHECK_DISTANCE)
+			if (abs(Camera.Position.x - p.Position.x) > COLLISION_CHECK_DISTANCE ||
+				abs(Camera.Position.z - p.Position.z) > COLLISION_CHECK_DISTANCE)
 			{
 				p.Life = std::clamp(p.Life, 0.0f, WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE);
 			}
@@ -402,12 +402,12 @@ namespace TEN::Effects::Environment
 	{
 		for (int i = 0; i < DUST_SPAWN_DENSITY; i++)
 		{
-			int xPos = Camera.pos.x + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
-			int yPos = Camera.pos.y + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
-			int zPos = Camera.pos.z + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
+			int xPos = Camera.Position.x + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
+			int yPos = Camera.Position.y + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
+			int zPos = Camera.Position.z + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
 
 			// Use fast GetFloor instead of GetCollision as we spawn a lot of dust.
-			short roomNumber = Camera.pos.RoomNumber;
+			short roomNumber = Camera.RoomNumber;
 			auto* floor = GetFloor(xPos, yPos, zPos, &roomNumber);
 
 			// Check if water room.
@@ -466,9 +466,9 @@ namespace TEN::Effects::Environment
 				auto radius = GenerateInt(0, distance);
 				short angle = GenerateInt(ANGLE(0), ANGLE(180));
 
-				auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
-				auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
-				auto yPos = Camera.pos.y - (BLOCK(4) + GenerateInt() & (BLOCK(4) - 1));
+				auto xPos = Camera.Position.x + ((int)(phd_cos(angle) * radius));
+				auto zPos = Camera.Position.z + ((int)(phd_sin(angle) * radius));
+				auto yPos = Camera.Position.y - (BLOCK(4) + GenerateInt() & (BLOCK(4) - 1));
 				
 				auto outsideRoom = IsRoomOutside(xPos, yPos, zPos);
 				

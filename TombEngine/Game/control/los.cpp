@@ -818,8 +818,8 @@ std::pair<GameVector, GameVector> GetRayFrom2DPosition(const Vector2& screenPos)
 {
 	auto pos = g_Renderer.GetRay(screenPos);
 
-	auto origin = GameVector(pos.first, Camera.pos.RoomNumber);
-	auto target = GameVector(pos.second, Camera.pos.RoomNumber);
+	auto origin = GameVector(pos.first, Camera.RoomNumber);
+	auto target = GameVector(pos.second, Camera.RoomNumber);
 
 	LOS(&origin, &target);
 	return std::pair<GameVector, GameVector>(origin, target);

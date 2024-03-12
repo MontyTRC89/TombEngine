@@ -504,13 +504,8 @@ void InitializeOrLoadGame(bool loadGame)
 	{
 		SaveGame::Load(g_GameFlow->SelectedSaveGame);
 
-		Camera.pos.x = LaraItem->Pose.Position.x + 256;
-		Camera.pos.y = LaraItem->Pose.Position.y + 256;
-		Camera.pos.z = LaraItem->Pose.Position.z + 256;
-
-		Camera.target.x = LaraItem->Pose.Position.x;
-		Camera.target.y = LaraItem->Pose.Position.y;
-		Camera.target.z = LaraItem->Pose.Position.z;
+		Camera.Position = LaraItem->Pose.Position.ToVector3() + Vector3(BLOCK(0.25f));
+		Camera.LookAt = LaraItem->Pose.Position.ToVector3();
 
 		InitializeGame = false;
 

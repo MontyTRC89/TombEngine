@@ -74,17 +74,17 @@ namespace TEN::Scripting::View
 	
 	static Vec3 GetCameraPosition()
 	{
-		return Vec3(Camera.pos.ToVector3());
+		return Vec3(Camera.Position);
 	}
 
 	static Vec3 GetCameraTarget()
 	{
-		return Vec3(Camera.target.ToVector3());
+		return Vec3(Camera.LookAt);
 	}
 
 	static std::unique_ptr<Room> GetCameraRoom()
 	{
-		return std::make_unique<Room>(g_Level.Rooms[Camera.pos.RoomNumber]);
+		return std::make_unique<Room>(g_Level.Rooms[Camera.RoomNumber]);
 	}
 
 	static void ResetObjCamera()
