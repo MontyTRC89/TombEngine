@@ -28,6 +28,34 @@ enum class CameraFlag
 	ChaseObject
 };
 
+// TODO: Prepared for later refactor.
+/*struct CameraSphereData
+{
+	Vector3 Position		 = Vector3::Zero;
+	int		RoomNumber		 = 0;
+	Vector3 LookAt			 = Vector3::Zero;
+	int		LookAtRoomNumber = 0;
+
+	float DistanceTarget   = 0.0f;
+	float SpeedAlpha	   = 0.0f;
+	float SpeedAlphaTarget = 0.0f;
+
+	short AzimuthAngle		  = 0;
+	short AzimuthAngleTarget  = 0;
+	short AltitudeAngle		  = 0;
+	short AltitudeAngleTarget = 0;
+};
+
+class CameraObject
+{
+private:
+
+public:
+	CameraSphereData Sphere = {};
+
+private:
+};*/
+
 struct CAMERA_INFO
 {
 	// Camera sphere
@@ -40,12 +68,15 @@ struct CAMERA_INFO
 	short	actualElevation	 = 0; // AltitudeAngle
 	short	targetElevation	 = 0;
 	float	targetDistance	 = 0.0f;
+	float	speed			 = 0.0f;
+	float	targetspeed		 = 0.0f;
 
-	CameraType type	= CameraType::Chase;
+	Vector3 RelShift = Vector3::Zero;
+
+	CameraType type	   = CameraType::Chase;
 	CameraType oldType = CameraType::Chase;
-	CameraFlag flags = CameraFlag::None;
-	float speed;
-	float targetspeed;
+	CameraFlag flags   = CameraFlag::None;
+
 	int bounce;
 	int shift;
 	int numberFrames;

@@ -921,7 +921,7 @@ static void ClampCameraAltitudeAngle(bool isUnderwater)
 {
 	constexpr auto MODERN_CAMERA_ABOVE_WATER_ANGLE_CONSTRAINT = std::pair<short, short>(ANGLE(-80.0f), ANGLE(70.0f));
 	constexpr auto MODERN_CAMERA_UNDERWATER_ANGLE_CONSTRAINT  = std::pair<short, short>(ANGLE(-80.0f), ANGLE(80.0f));
-	constexpr auto TANK_CAMERA_ANGLE_CONSTRAINT				  = std::pair<short, short>(ANGLE(-85.0f), ANGLE(85.0f));
+	constexpr auto TANK_CAMERA_ANGLE_CONSTRAINT				  = std::pair<short, short>(ANGLE(-80.0f), ANGLE(85.0f));
 
 	const auto& angleConstraint = IsUsingModernControls() ?
 		(isUnderwater ? MODERN_CAMERA_UNDERWATER_ANGLE_CONSTRAINT : MODERN_CAMERA_ABOVE_WATER_ANGLE_CONSTRAINT) :
@@ -939,12 +939,10 @@ static void ClampCameraAltitudeAngle(bool isUnderwater)
 
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
-	constexpr auto LOOK_AT_DIST = BLOCK(0.5f);
-
 	// Move camera.
 	if (IsUsingModernControls() || Camera.IsControllingTankCamera)
 	{
-		// Calcuate ideal position and its direction from lookAt.
+		// Calcuate ideal position and direction.
 		auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
 		auto idealPos = Geometry::TranslatePoint(Camera.LookAt, dir, Camera.targetDistance);
 		int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, Camera.targetDistance).RoomNumber;
@@ -957,24 +955,9 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			idealRoomNumber = intersect->second;
 		}
 
-		// Update camera position.
+		// Update camera.
 		float speedCoeff = (Camera.type != CameraType::Look) ? 0.2f : 1.0f;
 		MoveCamera(playerItem, idealPos, idealRoomNumber, Camera.speed * speedCoeff);
-
-		// Calculate lookAt.
-		auto lookAtDir = Camera.LookAt - Camera.Position;
-		lookAtDir.Normalize();
-		auto lookAtBackup = Camera.LookAt;
-		int lookAtRoomNumberBackup = Camera.LookAtRoomNumber;
-		auto lookAtPos = Geometry::TranslatePoint(Camera.LookAt, lookAtDir, LOOK_AT_DIST);
-
-		// TODO: Ceilings not handled correctly.
-		// Handle look at.
-		Camera.LookAt = lookAtPos;
-		Camera.LookAtRoomNumber = playerItem.RoomNumber;
-		LookAt(Camera, 0);
-		Camera.LookAt = lookAtBackup;
-		Camera.LookAtRoomNumber = lookAtRoomNumberBackup;
 	}
 	else
 	{
