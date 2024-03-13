@@ -91,14 +91,67 @@ float CinematicBarsSpeed = 0;
 // HELPER FUNCTIONS
 // ----------------
 
-// GetCameraRoomLosIntersect()
 // IsCameraCollidableItem()
-// GetCameraCollidableItemPtrs()
 // IsCameraCollideableStatic()
+
+// GetCameraRoomLosIntersect()
+// GetCameraCollidableItemPtrs()
 // GetCameraCollidableStaticPtrs()
 // GetCameraRayBoxIntersect()
 // GetCameraObjectLosIntersect()
 // GetCameraLosIntersect()
+// GetCameraRelativeShift()
+
+static bool IsCameraCollidableItem(const ItemInfo& item)
+{
+	// 1) Test distance.
+	float distSqr = Vector3i::DistanceSquared(item.Pose.Position, Camera.Position);
+	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
+		return false;
+
+	// 2) Check object collidability.
+	const auto& object = Objects[item.ObjectNumber];
+	if (!item.Collidable || !object.usingDrawAnimatingItem)
+		return false;
+
+	// 3) Check object attributes.
+	if (object.intelligent || object.isPickup || object.isPuzzleHole || object.collision == nullptr)
+		return false;
+
+	// 4) Test if any 2 box extents are smaller than threshold.
+	auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+static bool IsCameraCollideableStatic(const MESH_INFO& staticObject)
+{
+	// 1) Test distance.
+	float distSqr = Vector3i::DistanceSquared(Camera.Position, staticObject.pos.Position);
+	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
+		return false;
+
+	// 2) Check if static is visible.
+	if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+		return false;
+
+	// 3) Test if any 2 box extents are smaller than threshold.
+	auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
+	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
+		(abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD))
+	{
+		return false;
+	}
+
+	return true;
+}
 
 static std::optional<std::pair<Vector3, int>> GetCameraRoomLosIntersect(const Vector3& idealPos, int idealRoomNumber, const Vector3& dir)
 {
@@ -134,34 +187,6 @@ static std::optional<std::pair<Vector3, int>> GetCameraRoomLosIntersect(const Ve
 	return std::nullopt;
 }
 
-static bool IsCameraCollidableItem(const ItemInfo& item)
-{
-	// 1) Test distance.
-	float distSqr = Vector3i::DistanceSquared(item.Pose.Position, Camera.Position);
-	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
-		return false;
-
-	// 2) Check object collidability.
-	const auto& object = Objects[item.ObjectNumber];
-	if (!item.Collidable || !object.usingDrawAnimatingItem)
-		return false;
-
-	// 3) Check object attributes.
-	if (object.intelligent || object.isPickup || object.isPuzzleHole || object.collision == nullptr)
-		return false;
-
-	// 4) Test if any 2 box extents are smaller than threshold.
-	auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
-		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
-		(abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD))
-	{
-		return false;
-	}
-
-	return true;
-}
-
 static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
 {
 	auto itemPtrs = std::vector<const ItemInfo*>{};
@@ -193,29 +218,6 @@ static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
 	}
 
 	return itemPtrs;
-}
-
-static bool IsCameraCollideableStatic(const MESH_INFO& staticObject)
-{
-	// 1) Test distance.
-	float distSqr = Vector3i::DistanceSquared(Camera.Position, staticObject.pos.Position);
-	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
-		return false;
-
-	// 2) Check if static is visible.
-	if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
-		return false;
-
-	// 3) Test if any 2 box extents are smaller than threshold.
-	auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
-	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
-		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
-		(abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD))
-	{
-		return false;
-	}
-
-	return true;
 }
 
 static std::vector<const MESH_INFO*> GetCameraCollidableStaticPtrs()
@@ -373,6 +375,11 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 
 	// No intersection; return nullopt.
 	return std::nullopt;
+}
+
+static Vector3 GetCameraRelativeShift()
+{
+	return Vector3::Zero;
 }
 
 // ----------------
@@ -1379,35 +1386,29 @@ void BinocularCamera(ItemInfo* item)
 
 void ConfirmCameraTargetPos()
 {
-	auto pos = Vector3i(
+	auto pos = Vector3(
 		LaraItem->Pose.Position.x,
 		LaraItem->Pose.Position.y - (LaraCollision.Setup.Height / 2),
 		LaraItem->Pose.Position.z);
 
 	if (Camera.laraNode != -1)
 	{
-		Camera.LookAt.x = pos.x;
-		Camera.LookAt.y = pos.y;
-		Camera.LookAt.z = pos.z;
+		Camera.LookAt = pos;
 	}
 	else
 	{
-		Camera.LookAt.x = LaraItem->Pose.Position.x;
-		Camera.LookAt.y = (Camera.LookAt.y + pos.y) / 2;
-		Camera.LookAt.z = LaraItem->Pose.Position.z;
+		Camera.LookAt = Vector3(LaraItem->Pose.Position.x, (Camera.LookAt.y + pos.y) / 2, LaraItem->Pose.Position.z);
 	}
 
 	int y = Camera.LookAt.y;
-	auto probe = GetCollision(Camera.LookAt.x, y, Camera.LookAt.z, Camera.LookAtRoomNumber);
-	if (y < probe.Position.Ceiling ||
-		probe.Position.Floor < y ||
-		probe.Position.Floor <= probe.Position.Ceiling ||
-		probe.Position.Floor == NO_HEIGHT ||
-		probe.Position.Ceiling == NO_HEIGHT)
+	auto pointColl = GetCollision(Camera.LookAt.x, y, Camera.LookAt.z, Camera.LookAtRoomNumber);
+	if (y < pointColl.Position.Ceiling ||
+		pointColl.Position.Floor < y ||
+		pointColl.Position.Floor <= pointColl.Position.Ceiling ||
+		pointColl.Position.Floor == NO_HEIGHT ||
+		pointColl.Position.Ceiling == NO_HEIGHT)
 	{
-		Camera.LookAt.x = pos.x;
-		Camera.LookAt.y = pos.y;
-		Camera.LookAt.z = pos.z;
+		Camera.LookAt = pos;
 	}
 }
 
@@ -1415,11 +1416,11 @@ static void UpdatePlayerRefCameraOrient(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
 
-	bool isCameraTransition = (Camera.type == CameraType::Fixed && (Camera.oldType == CameraType::Chase || Camera.oldType == CameraType::Combat)) ||
-							  ((Camera.type == CameraType::Chase || Camera.type == CameraType::Combat) && Camera.oldType == CameraType::Fixed);
+	bool isFixedCameraSwitch = (Camera.type == CameraType::Fixed && (Camera.oldType == CameraType::Chase || Camera.oldType == CameraType::Combat)) ||
+							   ((Camera.type == CameraType::Chase || Camera.type == CameraType::Combat) && Camera.oldType == CameraType::Fixed);
 	bool hasMoveAction = (GetMoveAxis() != Vector2::Zero || IsHeld(In::StepLeft) || IsHeld(In::StepRight));
 
-	if (isCameraTransition && hasMoveAction)
+	if (isFixedCameraSwitch && hasMoveAction)
 	{
 		player.Control.LockRefCameraOrient = true;
 	}
