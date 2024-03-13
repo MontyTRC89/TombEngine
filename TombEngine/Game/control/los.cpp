@@ -217,6 +217,7 @@ static bool ClipTarget(const GameVector& origin, GameVector& target)
 	return true;
 }
 
+// NOTE: Accurate with axis-aligned walls. Diagonal walls, floor/ceiling heights, and objects are ignored.
 bool LOS(const GameVector* origin, GameVector* target)
 {
 	int losAxis0 = 0;
@@ -697,21 +698,27 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 	return ClosestItem;
 }
 
+// NOTE: Coarsely accurate with walls and floor/ceiling heights. Objects ignored.
 bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 {
+	constexpr auto STEP_COUNT = 8;
+
 	int x = origin->x;
 	int y = origin->y;
 	int z = origin->z;
+
 	short roomNumber = origin->RoomNumber;
 	short roomNumber2 = roomNumber;
+
 	int dx = (target->x - x) >> 3;
 	int dy = (target->y - y) >> 3;
 	int dz = (target->z - z) >> 3;
+
 	bool flag = false;
 	bool result = false;
 
 	int i;
-	for (i = 0; i < 8; ++i)
+	for (i = 0; i < STEP_COUNT; ++i)
 	{
 		roomNumber2 = roomNumber;
 		auto* floor = GetFloor(x, y, z, &roomNumber);
