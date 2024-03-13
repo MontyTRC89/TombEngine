@@ -91,6 +91,8 @@ extern float CinematicBarsDestinationHeight;
 extern float CinematicBarsHeight;
 extern float CinematicBarsSpeed;
 
+std::pair<Vector3, int> CameraCollisionBounds(const Vector3& pos, int roomNumber, int push, bool yFirst);
+
 void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
 
 void LookAt(CAMERA_INFO& camera, short roll);
@@ -101,7 +103,6 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 ideal, int idealRoomNumber, 
 void ChaseCamera(const ItemInfo& playerItem);
 void CombatCamera(const ItemInfo& playerItem);
 void UpdateCameraSphere(const ItemInfo& playerItem);
-std::pair<Vector3, int> CameraCollisionBounds(const Vector3& pos, int roomNumber, int push, bool yFirst);
 void FixedCamera();
 void BounceCamera(ItemInfo* item, int bounce, float distMax);
 void BinocularCamera(ItemInfo* item);
