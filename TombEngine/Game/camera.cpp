@@ -33,7 +33,7 @@ using TEN::Renderer::g_Renderer;
 constexpr auto CAMERA_OBJECT_COLL_DIST_THRESHOLD   = BLOCK(4);
 constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
-constexpr auto SWIVEL_STEP_COUNT = 16;
+constexpr auto SWIVEL_STEP_COUNT = 4;
 
 struct OLD_CAMERA
 {
@@ -92,6 +92,11 @@ float CinematicBarsSpeed = 0;
 // ----------------
 
 // GetCameraRoomLosIntersect()
+// IsCameraCollidableItem()
+// GetCameraCollidableItemPtrs()
+// IsCameraCollideableStatic()
+// GetCameraCollidableStaticPtrs()
+// GetCameraRayBoxIntersect()
 // GetCameraObjectLosIntersect()
 // GetCameraLosIntersect()
 
@@ -803,7 +808,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		auto idealPos = Geometry::TranslatePoint(Camera.LookAt, dir, Camera.targetDistance);
 		int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, Camera.targetDistance).RoomNumber;
 
-		// Get and apply LOS intersection.
+		// Calculate LOS intersection.
 		auto intersect = GetCameraLosIntersect(idealPos, idealRoomNumber, dir);
 		if (intersect.has_value())
 		{
@@ -895,11 +900,11 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 				Camera.speed = 1.0f;
 		}
 
-		// Collide with objects.
+		// Calculate LOS intersection.
 		auto dir = -EulerAngles(Camera.actualElevation, farthestIdealAzimuthAngle, 0).ToDirection();
-		auto objectLosIntersect = GetCameraObjectLosIntersect(farthestIdealPos.first, farthestIdealPos.second, dir);
-		if (objectLosIntersect.has_value())
-			farthestIdealPos = *objectLosIntersect;
+		auto intersect = GetCameraLosIntersect(farthestIdealPos.first, farthestIdealPos.second, dir);
+		if (intersect.has_value())
+			farthestIdealPos = *intersect;
 
 		MoveCamera(playerItem, farthestIdealPos.first, farthestIdealPos.second, Camera.speed);
 	}
@@ -1694,6 +1699,7 @@ void UpdateMikePos(const ItemInfo& item)
 	{
 		float dist = Vector3::DistanceSquared(Camera.LookAt, OldCam.target);
 
+		// TODO: Better method.
 		// Recalculate azimuth angle.
 		if (((IsUsingModernControls() && !IsPlayerStrafing(*LaraItem)) || !IsUsingModernControls()) &&
 			dist > 1.0f)
