@@ -558,12 +558,10 @@ namespace TEN::Entities::Vehicles
 			kayakPos.z = kayak->OldPose.Position.z;
 			kayakPos.RoomNumber = kayakItem->RoomNumber;
 
-			CameraCollisionBounds(&kayakPos, 256, 0);
+			auto collidedPos = CameraCollisionBounds(kayak->OldPose.Position.ToVector3(), kayakItem->RoomNumber, BLOCK(0.25f), false);
 			{
-				kayakItem->Pose.Position.x = kayakPos.x;
-				kayakItem->Pose.Position.y = kayakPos.y;
-				kayakItem->Pose.Position.z = kayakPos.z;
-				kayakItem->RoomNumber = kayakPos.RoomNumber;
+				kayakItem->Pose.Position = collidedPos.first;
+				kayakItem->RoomNumber = collidedPos.second;
 			}
 		}
 

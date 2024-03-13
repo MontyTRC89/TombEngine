@@ -101,7 +101,7 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 ideal, int idealRoomNumber, 
 void ChaseCamera(const ItemInfo& playerItem);
 void CombatCamera(const ItemInfo& playerItem);
 void UpdateCameraSphere(const ItemInfo& playerItem);
-bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst);
+std::pair<Vector3, int> CameraCollisionBounds(const Vector3& pos, int roomNumber, int push, bool yFirst);
 void FixedCamera();
 void BounceCamera(ItemInfo* item, int bounce, float distMax);
 void BinocularCamera(ItemInfo* item);
