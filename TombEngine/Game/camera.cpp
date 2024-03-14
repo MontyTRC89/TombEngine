@@ -152,10 +152,12 @@ static bool IsCameraCollideableStatic(const MESH_INFO& staticObject)
 }
 
 static std::optional<std::pair<Vector3, int>> GetCameraRoomLosIntersect(const Vector3& origin, int originRoomNumber,
-																		const Vector3& target, int targetRoomNumber,
-																		const Vector3& dir)
+																		const Vector3& target, int targetRoomNumber)
 {
 	auto closestIntersect = std::optional<Vector3>();
+
+	auto dir = target - origin;
+	dir.Normalize();
 
 	auto losOrigin = GameVector(origin, originRoomNumber);
 	auto losTarget = GameVector(target, targetRoomNumber);
@@ -268,8 +270,7 @@ static std::optional<Vector3> GetCameraRayBoxIntersect(const Vector3& origin, co
 	return std::nullopt;
 }
 
-static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target,
-																		  const Vector3& dir)
+static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target)
 {
 	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
 
@@ -280,6 +281,9 @@ static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const 
 	// No objects nearby; return nullopt.
 	if (itemPtrs.empty() && staticPtrs.empty())
 		return std::nullopt;
+
+	auto dir = target - origin;
+	dir.Normalize();
 
 	float dist = Vector3::Distance(origin, target);
 
@@ -345,7 +349,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 	bool hasIntersect = false;
 
 	// 1) Collide with room.
-	auto roomIntersect = GetCameraRoomLosIntersect(origin, originRoomNumber, intersect.first, intersect.second, dir);
+	auto roomIntersect = GetCameraRoomLosIntersect(origin, originRoomNumber, intersect.first, intersect.second);
 	if (roomIntersect.has_value())
 	{
 		intersect = *roomIntersect;
@@ -353,7 +357,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 	}
 
 	// 2) Collide with objects.
-	auto objectIntersect = GetCameraObjectLosIntersect(origin, originRoomNumber, intersect.first, dir);
+	auto objectIntersect = GetCameraObjectLosIntersect(origin, originRoomNumber, intersect.first);
 	if (objectIntersect.has_value())
 	{
 		intersect = *objectIntersect;
@@ -948,7 +952,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 	// Move camera.
 	if (IsUsingModernControls() || Camera.IsControllingTankCamera)
 	{
-		// Calcuate direction ang ideal position.
+		// Calcuate direction and ideal position.
 		auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
 		auto idealPos = Geometry::TranslatePoint(Camera.LookAt, dir, Camera.targetDistance);
 		int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, Camera.targetDistance).RoomNumber;

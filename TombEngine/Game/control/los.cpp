@@ -28,6 +28,48 @@ int ClosestItem;
 int ClosestDist;
 Vector3i ClosestCoord;
 
+std::optional<std::pair<Vector3, int>> GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber)
+{
+	return std::nullopt;
+}
+
+// TODO: Extend to be a more general, simple, all-in-one LOS function with a variety of flags for what to detect.
+std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
+{
+	// Run through neighbor rooms.
+	const auto& room = g_Level.Rooms[roomNumber];
+	for (int neighborRoomNumber : room.neighbors)
+	{
+		// Get neighbor room.
+		const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+		if (!neighborRoom.Active())
+			continue;
+
+		// Run through statics.
+		for (const auto& staticObject : g_Level.Rooms[neighborRoomNumber].mesh)
+		{
+			// Check if static is visible.
+			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Check if static is solid (if applicable).
+			if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
+				continue;
+
+			// Test ray-box intersection.
+			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
+			float intersectDist = 0.0f;
+			if (box.Intersects(origin, dir, intersectDist))
+			{
+				if (intersectDist <= dist)
+					return Geometry::TranslatePoint(origin, dir, dist);
+			}
+		}
+	}
+
+	return std::nullopt;
+}
+
 static int xLOS(const GameVector& origin, GameVector& target)
 {
 	int dx = target.x - origin.x;
@@ -244,6 +286,92 @@ bool LOS(const GameVector* origin, GameVector* target)
 	}
 
 	return false;
+}
+
+// NOTE: Coarsely accurate with walls and floor/ceiling heights. Objects ignored.
+bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
+{
+	constexpr auto STEP_COUNT = 8;
+
+	int x = origin->x;
+	int y = origin->y;
+	int z = origin->z;
+
+	short roomNumber = origin->RoomNumber;
+	short roomNumber2 = roomNumber;
+
+	int dx = (target->x - x) >> 3;
+	int dy = (target->y - y) >> 3;
+	int dz = (target->z - z) >> 3;
+
+	bool flag = false;
+	bool result = false;
+
+	int i;
+	for (i = 0; i < STEP_COUNT; ++i)
+	{
+		roomNumber2 = roomNumber;
+		auto* floor = GetFloor(x, y, z, &roomNumber);
+
+		if (g_Level.Rooms[roomNumber2].flags & ENV_FLAG_SWAMP)
+		{
+			flag = true;
+			break;
+		}
+
+		int floorHeight = GetFloorHeight(floor, x, y, z);
+		int ceilingHeight = GetCeiling(floor, x, y, z);
+		if (floorHeight != NO_HEIGHT && ceilingHeight != NO_HEIGHT && ceilingHeight < floorHeight)
+		{
+			if (y > floorHeight)
+			{
+				if (y - floorHeight >= push)
+				{
+					flag = true;
+					break;
+				}
+
+				y = floorHeight;
+			}
+
+			if (y < ceilingHeight)
+			{
+				if (ceilingHeight - y >= push)
+				{
+					flag = true;
+					break;
+				}
+
+				y = ceilingHeight;
+			}
+
+			result = true;
+		}
+		else if (result)
+		{
+			flag = true;
+			break;
+		}
+
+		x += dx;
+		y += dy;
+		z += dz;
+	}
+
+	if (i)
+	{
+		x -= dx;
+		y -= dy;
+		z -= dz;
+	}
+
+	GetFloor(x, y, z, &roomNumber2);
+	target->x = x;
+	target->y = y;
+	target->z = z;
+	target->RoomNumber = roomNumber2;
+
+	return !flag;
 }
 
 bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, bool isFiring)
@@ -696,129 +824,6 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 	vec->z = ClosestCoord.z;
 
 	return ClosestItem;
-}
-
-// NOTE: Coarsely accurate with walls and floor/ceiling heights. Objects ignored.
-bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
-{
-	constexpr auto STEP_COUNT = 8;
-
-	int x = origin->x;
-	int y = origin->y;
-	int z = origin->z;
-
-	short roomNumber = origin->RoomNumber;
-	short roomNumber2 = roomNumber;
-
-	int dx = (target->x - x) >> 3;
-	int dy = (target->y - y) >> 3;
-	int dz = (target->z - z) >> 3;
-
-	bool flag = false;
-	bool result = false;
-
-	int i;
-	for (i = 0; i < STEP_COUNT; ++i)
-	{
-		roomNumber2 = roomNumber;
-		auto* floor = GetFloor(x, y, z, &roomNumber);
-
-		if (g_Level.Rooms[roomNumber2].flags & ENV_FLAG_SWAMP)
-		{
-			flag = true;
-			break;
-		}
-
-		int floorHeight = GetFloorHeight(floor, x, y, z);
-		int ceilingHeight = GetCeiling(floor, x, y, z);
-		if (floorHeight != NO_HEIGHT && ceilingHeight != NO_HEIGHT && ceilingHeight < floorHeight)
-		{
-			if (y > floorHeight)
-			{
-				if (y - floorHeight >= push)
-				{
-					flag = true;
-					break;
-				}
-
-				y = floorHeight;
-			}
-
-			if (y < ceilingHeight)
-			{
-				if (ceilingHeight - y >= push)
-				{
-					flag = true;
-					break;
-				}
-
-				y = ceilingHeight;
-			}
-
-			result = true;
-		}
-		else if (result)
-		{
-			flag = true;
-			break;
-		}
-
-		x += dx;
-		y += dy;
-		z += dz;
-	}
-
-	if (i)
-	{
-		x -= dx;
-		y -= dy;
-		z -= dz;
-	}
-
-	GetFloor(x, y, z, &roomNumber2);
-	target->x = x;
-	target->y = y;
-	target->z = z;
-	target->RoomNumber = roomNumber2;
-
-	return !flag;
-}
-
-// TODO: Extend to be a more general, simple, all-in-one LOS function with a variety of flags for what to detect.
-std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
-{
-	// Run through neighbor rooms.
-	const auto& room = g_Level.Rooms[roomNumber];
-	for (int neighborRoomNumber : room.neighbors)
-	{
-		// Get neighbor room.
-		const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-		if (!neighborRoom.Active())
-			continue;
-
-		// Run through statics.
-		for (const auto& staticObject : g_Level.Rooms[neighborRoomNumber].mesh)
-		{
-			// Check if static is visible.
-			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
-				continue;
-
-			// Check if static is solid (if applicable).
-			if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
-				continue;
-
-			// Test ray-box intersection.
-			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
-			float intersectDist = 0.0f;
-			if (box.Intersects(origin, dir, intersectDist))
-			{
-				if (intersectDist <= dist)
-					return Geometry::TranslatePoint(origin, dir, dist);
-			}
-		}
-	}
-
-	return std::nullopt;
 }
 
 std::pair<GameVector, GameVector> GetRayFrom2DPosition(const Vector2& screenPos)
