@@ -9,6 +9,7 @@
 #include "Game/items.h"
 #include "Game/control/los.h"
 #include "Game/Lara/lara.h"
+#include "Game/people.h"
 #include "Specific/level.h"
 #include "Renderer/Renderer.h"
 #include "Math/Objects/EulerAngles.h"
@@ -20,16 +21,16 @@ using namespace TEN::Math;
 
 namespace TEN::Traps::TR5
 {
-	constexpr auto MAX_WIDTH = BLOCK(7);
 	constexpr auto LIGHT_INTENSITY = 50.0f;
 	constexpr auto LIGHT_AMPLITUDE = 31.0f;
 	constexpr auto BEAM_HEIGHT = CLICK(0.05f);
+	constexpr auto LIGHT_INTENSITY_MODIFY = 255.0f;
+	constexpr auto LIGHT_AMPLITUDE_MODIFY = 100.0f;
 
 	extern std::unordered_map<int, SingleLaser> LaserBeams = {};
 
 	void SingleLaser::Initialize(const ItemInfo& item)
 	{
-		float barrierHeight = item.ItemFlags[0];
 		int beamCount = 1;
 
 		Color = item.Model.Color;
@@ -68,23 +69,18 @@ namespace TEN::Traps::TR5
 
 	void SingleLaser::Update(const ItemInfo& item)
 	{
-		// Fixed size for the laser beam
-		
-		
 		float beamHeight = item.TriggerFlags < 0 ? BEAM_HEIGHT * abs(item.TriggerFlags) : BEAM_HEIGHT * item.TriggerFlags;
-		const short BUFFER = -CLICK(0.5);
 		GameVector origin;
 
 		origin.x = item.Pose.Position.x;
-		origin.y = item.Pose.Position.y;// -CLICK(0.6f);
+		origin.y = item.Pose.Position.y;
 		origin.z = item.Pose.Position.z;
 		origin.RoomNumber = item.RoomNumber;
 
-		float laserWidth = MAX_WIDTH;
 		auto basePos = origin.ToVector3();
 
 		auto rotMatrix = EulerAngles(item.Pose.Orientation.x + ANGLE(180.0f), item.Pose.Orientation.y , item.Pose.Orientation.z);
-		GameVector target = Geometry::TranslatePoint(origin.ToVector3(), rotMatrix, MAX_WIDTH);
+		GameVector target = Geometry::TranslatePoint(origin.ToVector3(), rotMatrix, MAX_VISIBILITY_DISTANCE);
 
 		auto color = Vector4(item.Model.Color.x, item.Model.Color.y, item.Model.Color.z, 1.0f);
 
@@ -94,6 +90,11 @@ namespace TEN::Traps::TR5
 
 		bool los2 = LOS(&origin, &target);
 		
+
+		auto pointColl = GetCollision(target.ToVector3i(), item.RoomNumber);
+		if (pointColl.RoomNumber != target.RoomNumber)
+			target.RoomNumber = pointColl.RoomNumber;
+
 		if (!los2)
 		{
 			if (item.TriggerFlags > 0)
@@ -115,7 +116,7 @@ namespace TEN::Traps::TR5
 		};
 
 		// Set vertex positions.
-		auto beamOffset = Vector3(0.0f, 0, 0.0f);
+		auto beamOffset = Vector3::Zero;
 		for (auto& beam : Beams)
 		{
 			assertion(beam.VertexPoints.size() == baseVertices.size(), "Laser barrier beam vertex count out of sync.");
@@ -143,11 +144,8 @@ namespace TEN::Traps::TR5
 				g_Renderer.AddDebugSphere(beam.VertexPoints[1], 23, Vector4(0.5f, 0.5f, 0.5f, 1), RendererDebugPage::None, true);
 				g_Renderer.AddDebugSphere(beam.VertexPoints[2], 23, Vector4(0, 0, 1, 1), RendererDebugPage::None, true);
 				g_Renderer.AddDebugSphere(beam.VertexPoints[3], 23, Vector4(1, 1, 0, 1), RendererDebugPage::None, true);*/
-
 				//g_Renderer.AddDebugSphere(beam.VertexPoints[0], 23, Vector4(1, 1, 1, 1), RendererDebugPage::None, true);
 			}
-
-			//beamOffset.y -= beamHeight;
 		}
 
 		// Determine bounding box reference points.
@@ -167,13 +165,8 @@ namespace TEN::Traps::TR5
 	void InitializeSingleLaser(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-
-		// Initialize barrier height.
 		auto pointColl = GetCollision(&item);
-		float barrierHeight = item.Pose.Position.y - pointColl.Position.Ceiling;
-		item.ItemFlags[0] = barrierHeight;
 
-		// Initialize barrier effect.
 		auto barrier = SingleLaser{};
 		barrier.Initialize(item);
 		LaserBeams.insert({ itemNumber, barrier });
@@ -205,13 +198,8 @@ namespace TEN::Traps::TR5
 
 	void ControlSingleLaser(short itemNumber)
 	{
-		constexpr auto LIGHT_INTENSITY = 150.0f;
-		constexpr auto LIGHT_AMPLITUDE = 31.0f;
-
 		if (!LaserBeams.count(itemNumber))
 			return;
-
-		
 
 		auto& item = g_Level.Items[itemNumber];
 		auto& barrier = LaserBeams.at(itemNumber);
@@ -223,9 +211,6 @@ namespace TEN::Traps::TR5
 			item.Model.Color.w = 0.0f;
 			return;
 		}
-
-
-		//item.Pose.Orientation.x += 359;
 
 		// Brightness fade-in and distortion.
 		if (item.Model.Color.w < 1.0f)
@@ -245,16 +230,13 @@ namespace TEN::Traps::TR5
 		barrier.Update(item);
 
 		if (item.Model.Color.w >= 0.8f)
-			//SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, GameVector::Zero);
+			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, GameVector::Zero);
 
 		SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
 	}
 
 	void CollideSingleLaser(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
-		constexpr auto LIGHT_INTENSITY = 255.0f;
-		constexpr auto LIGHT_AMPLITUDE = 100.0f;
-
 		if (!LaserBeams.count(itemNumber))
 			return;
 
@@ -264,8 +246,26 @@ namespace TEN::Traps::TR5
 		if (!barrier.IsActive)
 			return;
 
-		auto playerBox = GameBoundingBox(playerItem).ToBoundingOrientedBox(playerItem->Pose);
-		if (barrier.BoundingBox.Intersects(playerBox))
+		GameVector origin;
+
+		origin.x = item.Pose.Position.x;
+		origin.y = item.Pose.Position.y;
+		origin.z = item.Pose.Position.z;
+		origin.RoomNumber = item.RoomNumber;
+
+		auto basePos = origin.ToVector3();
+
+		auto rotMatrix = EulerAngles(item.Pose.Orientation.x + ANGLE(180.0f), item.Pose.Orientation.y, item.Pose.Orientation.z);
+		GameVector target = Geometry::TranslatePoint(origin.ToVector3(), rotMatrix, MAX_VISIBILITY_DISTANCE);
+
+		auto pointColl = GetCollision(target.ToVector3i(),item.RoomNumber);
+		if (pointColl.RoomNumber != target.RoomNumber)
+			target.RoomNumber = pointColl.RoomNumber;
+
+		bool los2 = LOS(&origin, &target);
+
+		auto hitPos = Vector3i::Zero;
+		if (ObjectOnLOS2(&origin, &target, &hitPos, nullptr, ID_LARA) == LaraItem->Index && !los2)
 		{
 			if (barrier.IsLethal &&
 				playerItem->HitPoints > 0 && playerItem->Effect.Type != EffectType::Smoke)
@@ -279,7 +279,9 @@ namespace TEN::Traps::TR5
 			}
 
 			barrier.Color.w = Random::GenerateFloat(0.6f, 1.0f);
-			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, GameVector::Zero);
+			SpawnLaserBarrierLight(item, LIGHT_INTENSITY_MODIFY, LIGHT_AMPLITUDE_MODIFY, GameVector::Zero);
+
+			//g_Renderer.AddDebugLine(origin.ToVector3(),target.ToVector3(), Vector4(1, 1, 1, 1), RendererDebugPage::None);
 		}		
 	}
 
