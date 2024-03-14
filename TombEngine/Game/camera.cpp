@@ -268,8 +268,7 @@ static std::optional<Vector3> GetCameraRayBoxIntersect(const Vector3& origin, co
 	return std::nullopt;
 }
 
-static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const Vector3& origin, int originRoomNumber,
-																		  const Vector3& target, int targetRoomNumber,
+static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target,
 																		  const Vector3& dir)
 {
 	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
@@ -335,10 +334,12 @@ static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const 
 }
 
 static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector3& origin, int originRoomNumber,
-																	const Vector3& target, int targetRoomNumber,
-																	const Vector3& dir)
+																	const Vector3& target, int targetRoomNumber)
 {
 	constexpr auto BUFFER = BLOCK(0.1f);
+
+	auto dir = target - origin;
+	dir.Normalize();
 
 	auto intersect = std::pair(target, targetRoomNumber);
 	bool hasIntersect = false;
@@ -352,7 +353,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 	}
 
 	// 2) Collide with objects.
-	auto objectIntersect = GetCameraObjectLosIntersect(origin, originRoomNumber, intersect.first, intersect.second, dir);
+	auto objectIntersect = GetCameraObjectLosIntersect(origin, originRoomNumber, intersect.first, dir);
 	if (objectIntersect.has_value())
 	{
 		intersect = *objectIntersect;
@@ -606,17 +607,17 @@ void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 
 	const auto& player = GetLaraInfo(playerItem);
 
-	// Calculate direction.
-	auto orient = player.Control.Look.Orientation + EulerAngles(playerItem.Pose.Orientation.x, playerItem.Pose.Orientation.y + Camera.targetAngle, 0);
-	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
-	auto dir = -orient.ToDirection();
-
 	// Determine base position.
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, playerItem.RoomNumber);
 	auto basePos = Vector3(
 		playerItem.Pose.Position.x,
 		isInSwamp ? g_Level.Rooms[playerItem.RoomNumber].maxceiling : playerItem.Pose.Position.y,
 		playerItem.Pose.Position.z);
+
+	// Calculate direction.
+	auto orient = player.Control.Look.Orientation + EulerAngles(playerItem.Pose.Orientation.x, playerItem.Pose.Orientation.y + Camera.targetAngle, 0);
+	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
+	auto dir = -orient.ToDirection();
 
 	float dist = Camera.targetDistance * DIST_COEFF;
 
@@ -626,7 +627,7 @@ void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, dist).RoomNumber;
 
 	// Calculate LOS intersection.
-	auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber, dir);
+	auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
 	if (intersect.has_value())
 	{
 		idealPos = intersect->first;
@@ -947,13 +948,13 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 	// Move camera.
 	if (IsUsingModernControls() || Camera.IsControllingTankCamera)
 	{
-		// Calcuate ideal position and direction.
+		// Calcuate direction ang ideal position.
 		auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
 		auto idealPos = Geometry::TranslatePoint(Camera.LookAt, dir, Camera.targetDistance);
 		int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, Camera.targetDistance).RoomNumber;
 
 		// Calculate LOS intersection.
-		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber, dir);
+		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
 		if (intersect.has_value())
 		{
 			idealPos = intersect->first;
@@ -1030,8 +1031,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		}
 
 		// Calculate LOS intersection.
-		auto dir = -EulerAngles(Camera.actualElevation, farthestIdealAzimuthAngle, 0).ToDirection();
-		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, farthestIdealPos.first, farthestIdealPos.second, dir);
+		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, farthestIdealPos.first, farthestIdealPos.second);
 		if (intersect.has_value())
 			farthestIdealPos = *intersect;
 
