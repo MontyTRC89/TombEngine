@@ -33,8 +33,6 @@ using TEN::Renderer::g_Renderer;
 constexpr auto CAMERA_OBJECT_COLL_DIST_THRESHOLD   = BLOCK(4);
 constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
-constexpr auto SWIVEL_STEP_COUNT = 4;
-
 struct OLD_CAMERA
 {
 	Pose pos;
@@ -153,31 +151,33 @@ static bool IsCameraCollideableStatic(const MESH_INFO& staticObject)
 	return true;
 }
 
-static std::optional<std::pair<Vector3, int>> GetCameraRoomLosIntersect(const Vector3& idealPos, int idealRoomNumber, const Vector3& dir)
+static std::optional<std::pair<Vector3, int>> GetCameraRoomLosIntersect(const Vector3& origin, int originRoomNumber,
+																		const Vector3& target, int targetRoomNumber,
+																		const Vector3& dir)
 {
 	auto closestIntersect = std::optional<Vector3>();
 
-	auto origin = GameVector(Camera.LookAt, Camera.LookAtRoomNumber);
-	auto target = GameVector(idealPos, idealRoomNumber);
+	auto losOrigin = GameVector(origin, originRoomNumber);
+	auto losTarget = GameVector(target, targetRoomNumber);
 
 	// 1) Collide axis-aligned walls.
-	if (!LOS(&origin, &target))
+	if (!LOS(&losOrigin, &losTarget))
 	{
-		float dist = Vector3::Distance(origin.ToVector3(), target.ToVector3());
+		float dist = Vector3::Distance(losOrigin.ToVector3(), losTarget.ToVector3());
 		closestIntersect = Geometry::TranslatePoint(Camera.LookAt, dir, dist);
 	}
 
 	// 2) Collide diagonal walls and floors/ceilings.
-	if (!LOSAndReturnTarget(&origin, &target, 0))
+	if (!LOSAndReturnTarget(&losOrigin, &losTarget, 0))
 	{
-		float dist = Vector3::Distance(origin.ToVector3(), target.ToVector3());
+		float dist = Vector3::Distance(losOrigin.ToVector3(), losTarget.ToVector3());
 		closestIntersect = Geometry::TranslatePoint(Camera.LookAt, dir, dist);
 	}
 
 	// Return intersection.
 	if (closestIntersect.has_value())
 	{
-		int intersectRoomNumber = target.RoomNumber;
+		int intersectRoomNumber = losTarget.RoomNumber;
 		return std::pair(*closestIntersect, intersectRoomNumber);
 	}
 
@@ -268,7 +268,9 @@ static std::optional<Vector3> GetCameraRayBoxIntersect(const Vector3& origin, co
 	return std::nullopt;
 }
 
-static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const Vector3& idealPos, int idealRoomNumber, const Vector3& dir)
+static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const Vector3& origin, int originRoomNumber,
+																		  const Vector3& target, int targetRoomNumber,
+																		  const Vector3& dir)
 {
 	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
 
@@ -280,7 +282,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const 
 	if (itemPtrs.empty() && staticPtrs.empty())
 		return std::nullopt;
 
-	float dist = Vector3::Distance(Camera.LookAt, idealPos);
+	float dist = Vector3::Distance(Camera.LookAt, target);
 
 	auto closestIntersect = std::optional<Vector3>();
 	float closestDistSqr = INFINITY;
@@ -324,7 +326,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const 
 	// Return intersection.
 	if (closestIntersect.has_value())
 	{
-		int intersectRoomNumber = GetCollision(idealPos, idealRoomNumber, -dir, sqrt(closestDistSqr)).RoomNumber;
+		int intersectRoomNumber = GetCollision(target, targetRoomNumber, -dir, sqrt(closestDistSqr)).RoomNumber;
 		return std::pair(*closestIntersect, intersectRoomNumber);
 	}
 
@@ -332,15 +334,17 @@ static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const 
 	return std::nullopt;
 }
 
-static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector3& idealPos, int idealRoomNumber, const Vector3& dir)
+static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector3& origin, int originRoomNumber,
+																	const Vector3& target, int targetRoomNumber,
+																	const Vector3& dir)
 {
 	constexpr auto BUFFER = BLOCK(0.1f);
 
-	auto intersect = std::pair(idealPos, idealRoomNumber);
+	auto intersect = std::pair(target, targetRoomNumber);
 	bool hasIntersect = false;
 
 	// 1) Collide with room.
-	auto roomIntersect = GetCameraRoomLosIntersect(intersect.first, intersect.second, dir);
+	auto roomIntersect = GetCameraRoomLosIntersect(origin, originRoomNumber, intersect.first, intersect.second, dir);
 	if (roomIntersect.has_value())
 	{
 		intersect = *roomIntersect;
@@ -348,7 +352,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 	}
 
 	// 2) Collide with objects.
-	auto objectIntersect = GetCameraObjectLosIntersect(intersect.first, intersect.second, dir);
+	auto objectIntersect = GetCameraObjectLosIntersect(origin, originRoomNumber, intersect.first, intersect.second, dir);
 	if (objectIntersect.has_value())
 	{
 		intersect = *objectIntersect;
@@ -359,11 +363,11 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 	if (hasIntersect)
 	{
 		// Apply buffer.
-		float dist = Vector3::Distance(Camera.LookAt, intersect.first);
+		float dist = Vector3::Distance(origin, intersect.first);
 		dist = ((dist - BUFFER) >= BUFFER) ? (dist - BUFFER) : BUFFER;
 
-		intersect.first = Geometry::TranslatePoint(Camera.LookAt, dir, dist);
-		intersect.second = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, dist).RoomNumber;
+		intersect.first = Geometry::TranslatePoint(origin, dir, dist);
+		intersect.second = GetCollision(origin, originRoomNumber, dir, dist).RoomNumber;
 		return intersect;
 	}
 
@@ -428,10 +432,9 @@ static Vector3 GetCameraRelativeShift(const Vector3& pos, int roomNumber)
 	auto average = Vector3::Zero;
 	for (const auto& intersect : intersects)
 		average += intersect;
-
 	average /= RAY_COUNT;
-	shift += average;
 
+	shift += average;
 	return (pos - shift);
 }
 
@@ -623,7 +626,7 @@ void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, dist).RoomNumber;
 
 	// Calculate LOS intersection.
-	auto intersect = GetCameraLosIntersect(idealPos, idealRoomNumber, dir);
+	auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber, dir);
 	if (intersect.has_value())
 	{
 		idealPos = intersect->first;
@@ -939,6 +942,8 @@ static void ClampCameraAltitudeAngle(bool isUnderwater)
 
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
+	constexpr auto SWIVEL_STEP_COUNT = 4;
+
 	// Move camera.
 	if (IsUsingModernControls() || Camera.IsControllingTankCamera)
 	{
@@ -948,7 +953,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, Camera.targetDistance).RoomNumber;
 
 		// Calculate LOS intersection.
-		auto intersect = GetCameraLosIntersect(idealPos, idealRoomNumber, dir);
+		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber, dir);
 		if (intersect.has_value())
 		{
 			idealPos = intersect->first;
@@ -1026,7 +1031,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 
 		// Calculate LOS intersection.
 		auto dir = -EulerAngles(Camera.actualElevation, farthestIdealAzimuthAngle, 0).ToDirection();
-		auto intersect = GetCameraLosIntersect(farthestIdealPos.first, farthestIdealPos.second, dir);
+		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, farthestIdealPos.first, farthestIdealPos.second, dir);
 		if (intersect.has_value())
 			farthestIdealPos = *intersect;
 
