@@ -164,14 +164,14 @@ static std::optional<std::pair<Vector3, int>> GetCameraRoomLosIntersect(const Ve
 	if (!LOS(&losOrigin, &losTarget))
 	{
 		float dist = Vector3::Distance(losOrigin.ToVector3(), losTarget.ToVector3());
-		closestIntersect = Geometry::TranslatePoint(Camera.LookAt, dir, dist);
+		closestIntersect = Geometry::TranslatePoint(origin, dir, dist);
 	}
 
 	// 2) Collide diagonal walls and floors/ceilings.
 	if (!LOSAndReturnTarget(&losOrigin, &losTarget, 0))
 	{
 		float dist = Vector3::Distance(losOrigin.ToVector3(), losTarget.ToVector3());
-		closestIntersect = Geometry::TranslatePoint(Camera.LookAt, dir, dist);
+		closestIntersect = Geometry::TranslatePoint(origin, dir, dist);
 	}
 
 	// Return intersection.
@@ -282,7 +282,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const 
 	if (itemPtrs.empty() && staticPtrs.empty())
 		return std::nullopt;
 
-	float dist = Vector3::Distance(Camera.LookAt, target);
+	float dist = Vector3::Distance(origin, target);
 
 	auto closestIntersect = std::optional<Vector3>();
 	float closestDistSqr = INFINITY;
@@ -291,10 +291,10 @@ static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const 
 	for (const auto* itemPtr : itemPtrs)
 	{
 		auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
-		auto intersect = GetCameraRayBoxIntersect(Camera.LookAt, dir, dist, box);
+		auto intersect = GetCameraRayBoxIntersect(origin, dir, dist, box);
 		if (intersect.has_value())
 		{
-			float distSqr = Vector3::DistanceSquared(Camera.LookAt, *intersect);
+			float distSqr = Vector3::DistanceSquared(origin, *intersect);
 			if (distSqr < closestDistSqr)
 			{
 				closestIntersect = intersect;
@@ -309,10 +309,10 @@ static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const 
 	for (const auto* staticPtr : staticPtrs)
 	{
 		auto box = GetBoundsAccurate(*staticPtr, false).ToBoundingOrientedBox(staticPtr->pos);
-		auto intersect = GetCameraRayBoxIntersect(Camera.LookAt, dir, dist, box);
+		auto intersect = GetCameraRayBoxIntersect(origin, dir, dist, box);
 		if (intersect.has_value())
 		{
-			float distSqr = Vector3::DistanceSquared(Camera.LookAt, *intersect);
+			float distSqr = Vector3::DistanceSquared(origin, *intersect);
 			if (distSqr < closestDistSqr)
 			{
 				closestIntersect = intersect;
@@ -326,7 +326,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const 
 	// Return intersection.
 	if (closestIntersect.has_value())
 	{
-		int intersectRoomNumber = GetCollision(target, targetRoomNumber, -dir, sqrt(closestDistSqr)).RoomNumber;
+		int intersectRoomNumber = GetCollision(origin, originRoomNumber, dir, sqrt(closestDistSqr)).RoomNumber;
 		return std::pair(*closestIntersect, intersectRoomNumber);
 	}
 
