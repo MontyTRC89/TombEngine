@@ -947,7 +947,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_SINGLE_LASER];
+	obj = &Objects[ID_LASER_BEAM];
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSingleLaser;
