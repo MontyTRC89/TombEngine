@@ -23,6 +23,7 @@ namespace TEN::Traps::TR5
 	constexpr auto MAX_WIDTH = BLOCK(7);
 	constexpr auto LIGHT_INTENSITY = 50.0f;
 	constexpr auto LIGHT_AMPLITUDE = 31.0f;
+	constexpr auto BEAM_HEIGHT = CLICK(0.05f);
 
 	extern std::unordered_map<int, SingleLaser> LaserBeams = {};
 
@@ -68,61 +69,53 @@ namespace TEN::Traps::TR5
 	void SingleLaser::Update(const ItemInfo& item)
 	{
 		// Fixed size for the laser beam
-		const float beamHeight = 0.2f;
-
-		// Calculate dimension values.
 		
+		
+		float beamHeight = item.TriggerFlags < 0 ? BEAM_HEIGHT * abs(item.TriggerFlags) : BEAM_HEIGHT * item.TriggerFlags;
+		const short BUFFER = -CLICK(0.5);
+		GameVector origin;
 
-		// Determine beam vertex base.
+		origin.x = item.Pose.Position.x;
+		origin.y = item.Pose.Position.y;// -CLICK(0.6f);
+		origin.z = item.Pose.Position.z;
+		origin.RoomNumber = item.RoomNumber;
+
 		float laserWidth = MAX_WIDTH;
-		auto basePos = item.Pose.Position.ToVector3();
-		
-		auto rotMatrix = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y + ANGLE(90.0f), item.Pose.Orientation.z).ToRotationMatrix();
-		
+		auto basePos = origin.ToVector3();
 
-		//rotMatrix = rotMatrix.Transpose();
-		GameVector target = basePos + Vector3::Transform(Vector3(MAX_WIDTH, 0.0f, 0.0f), rotMatrix);
+		auto rotMatrix = EulerAngles(item.Pose.Orientation.x + ANGLE(180.0f), item.Pose.Orientation.y , item.Pose.Orientation.z);
+		GameVector target = Geometry::TranslatePoint(origin.ToVector3(), rotMatrix, MAX_WIDTH);
 
 		auto color = Vector4(item.Model.Color.x, item.Model.Color.y, item.Model.Color.z, 1.0f);
-
-
-		GameVector origin;
-		origin.x = item.Pose.Position.x ;
-		origin.y = item.Pose.Position.y ;
-		origin.z = item.Pose.Position.z ;
-		origin.RoomNumber = item.RoomNumber;
-		bool los = LOS(&origin, &target);
 
 		target.x = 3 * target.x - 2 * origin.x;
 		target.y = 3 * target.y - 2 * origin.y;
 		target.z = 3 * target.z - 2 * origin.z;
+
 		bool los2 = LOS(&origin, &target);
-
-		auto desiredPos = target;
-		auto dir = desiredPos - item.Pose.Position;
-
-		auto dirs = dir.ToVector3();
-		float distToTarget = dirs.Length();
-
+		
 		if (!los2)
 		{
-			TriggerLaserSpark(target, 2 * GetRandomControl(), 3, color);
-			TriggerLaserSpark(target, 2 * GetRandomControl(), 3, color);
-			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, target);
-			
-		}
-		// Determine beam vertex base.
+			if (item.TriggerFlags > 0)
+			{
+				TriggerLaserSpark(target, 2 * GetRandomControl(), 3, color);
+				TriggerLaserSpark(target, 2 * GetRandomControl(), 3, color);
+			}
 
+			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, target);			
+		}
+
+		// Determine beam vertex base.
 		auto baseVertices = std::array<Vector3, SingleLaserBeam::VERTEX_COUNT>
 		{
-			basePos + Vector3::Transform(Vector3(0, -SingleLaserBeam::HEIGHT / 2, 0.0f), rotMatrix),
-				basePos + Vector3::Transform(Vector3(distToTarget, -SingleLaserBeam::HEIGHT / 2, 0.0f), rotMatrix),
-				basePos + Vector3::Transform(Vector3(distToTarget, SingleLaserBeam::HEIGHT / 2, 0.0f), rotMatrix),
-				basePos + Vector3::Transform(Vector3(0, SingleLaserBeam::HEIGHT / 2, 0.0f), rotMatrix)
+			basePos + Vector3(0,  -beamHeight / 2, 0.0f),
+			target.ToVector3() + Vector3(0,  -beamHeight / 2, 0.0f),
+			target.ToVector3() + Vector3(0,  +beamHeight / 2, 0.0f),
+			basePos + Vector3(0,  +beamHeight / 2, 0.0f),
 		};
 
 		// Set vertex positions.
-		auto beamOffset = Vector3(0.0f, -SingleLaserBeam::HEIGHT, 0.0f);
+		auto beamOffset = Vector3(0.0f, 0, 0.0f);
 		for (auto& beam : Beams)
 		{
 			assertion(beam.VertexPoints.size() == baseVertices.size(), "Laser barrier beam vertex count out of sync.");
@@ -140,24 +133,21 @@ namespace TEN::Traps::TR5
 					beam.VertexPoints[1] = pointColl0.Coordinates.ToVector3();
 				}
 				
-
 				if (pointColl1.Block->IsWall(beam.VertexPoints[2].x, beam.VertexPoints[2].z) ||
 					pointColl1.Block->IsWall(beam.VertexPoints[2].x, beam.VertexPoints[2].z))
 				{
-					beam.VertexPoints[2].z = pointColl1.Coordinates.z;
+					beam.VertexPoints[2] = pointColl1.Coordinates.ToVector3();
 				}
-				
 
 				/*g_Renderer.AddDebugSphere(beam.VertexPoints[0], 23, Vector4(1, 1, 1, 1), RendererDebugPage::None, true);
 				g_Renderer.AddDebugSphere(beam.VertexPoints[1], 23, Vector4(0.5f, 0.5f, 0.5f, 1), RendererDebugPage::None, true);
 				g_Renderer.AddDebugSphere(beam.VertexPoints[2], 23, Vector4(0, 0, 1, 1), RendererDebugPage::None, true);
-				g_Renderer.AddDebugSphere(beam.VertexPoints[3], 23, Vector4(1, 1, 0, 1), RendererDebugPage::None, true);
+				g_Renderer.AddDebugSphere(beam.VertexPoints[3], 23, Vector4(1, 1, 0, 1), RendererDebugPage::None, true);*/
 
-				g_Renderer.AddDebugSphere(beam.VertexPoints[0], 23, Vector4(1, 1, 1, 1), RendererDebugPage::None, true);*/
-
+				//g_Renderer.AddDebugSphere(beam.VertexPoints[0], 23, Vector4(1, 1, 1, 1), RendererDebugPage::None, true);
 			}
 
-			beamOffset.y -= beamHeight;
+			//beamOffset.y -= beamHeight;
 		}
 
 		// Determine bounding box reference points.
@@ -166,17 +156,12 @@ namespace TEN::Traps::TR5
 		auto point2 = Beams.front().VertexPoints[2];
 		auto point3 = Beams.front().VertexPoints[3];
 
-
 		// Update bounding box.
 		BoundingBox.Center = (point0 + point1 + point2 + point3) / 4;
 		BoundingBox.Extents = Vector3(
 			std::abs(point0.x - point1.x) / 2,
 			std::abs(point0.y - point2.y) / 2,
 			std::abs(point0.z - point2.z) / 2);
-
-
-
-
 	}
 
 	void InitializeSingleLaser(short itemNumber)
@@ -226,20 +211,10 @@ namespace TEN::Traps::TR5
 		if (!LaserBeams.count(itemNumber))
 			return;
 
+		
+
 		auto& item = g_Level.Items[itemNumber];
 		auto& barrier = LaserBeams.at(itemNumber);
-
-
-
-
-		//item.Pose.Orientation.y += 35;;
-		//item.Pose.Orientation.x += ANGLE(35.0f);;
-		//item.Pose.Orientation.z -=11;
-		//auto targetOrient = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y , item.Pose.Orientation.z);
-		//item.Pose.Orientation.InterpolateConstant(targetOrient, ANGLE(90.0f));
-
-
-
 
 		if (!TriggerActive(&item))
 		{
@@ -249,6 +224,8 @@ namespace TEN::Traps::TR5
 			return;
 		}
 
+
+		//item.Pose.Orientation.x += 359;
 
 		// Brightness fade-in and distortion.
 		if (item.Model.Color.w < 1.0f)
