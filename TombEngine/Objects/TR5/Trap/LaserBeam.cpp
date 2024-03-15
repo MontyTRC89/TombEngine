@@ -21,11 +21,9 @@ using namespace TEN::Renderer;
 
 namespace TEN::Traps::TR5
 {
-	constexpr auto LIGHT_INTENSITY = 50.0f;
-	constexpr auto LIGHT_AMPLITUDE = 31.0f;
-	constexpr auto BEAM_HEIGHT = CLICK(0.05f);
-	constexpr auto LIGHT_INTENSITY_MODIFY = 255.0f;
-	constexpr auto LIGHT_AMPLITUDE_MODIFY = 100.0f;
+	constexpr auto LASER_BEAM_LIGHT_INTENSITY = 50.0f;
+	constexpr auto LASER_BEAM_LIGHT_AMPLITUDE = 31.0f;
+	constexpr auto LASER_BEAM_RADIUS		  = CLICK(0.05f);
 
 	extern std::unordered_map<int, LaserBeamEffect> LaserBeams = {};
 
@@ -40,7 +38,7 @@ namespace TEN::Traps::TR5
 		Update(item);
 	}
 
-	void SpawnLaserSpark(const GameVector& pos, short angle, int count, const Vector4& colorStart)
+	static void SpawnLaserSpark(const GameVector& pos, short angle, int count, const Vector4& colorStart)
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -67,9 +65,22 @@ namespace TEN::Traps::TR5
 		}
 	}
 
+	static void SpawnLaserBeamLight(const Vector3& pos, int roomNumber, const Color& color, float intensity, float amplitude)
+	{
+		constexpr auto FALLOFF = 8;
+
+		float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitude);
+		TriggerDynamicLight(
+			pos.x, pos.y, pos.z,
+			FALLOFF,
+			intensityNorm * (color.x / 2),
+			intensityNorm * (color.y / 2),
+			intensityNorm * (color.z / 2));
+	}
+
 	void LaserBeamEffect::Update(const ItemInfo& item)
 	{
-		float beamHeight = item.TriggerFlags < 0 ? BEAM_HEIGHT * abs(item.TriggerFlags) : BEAM_HEIGHT * item.TriggerFlags;
+		float beamHeight = item.TriggerFlags < 0 ? LASER_BEAM_RADIUS * abs(item.TriggerFlags) : LASER_BEAM_RADIUS * item.TriggerFlags;
 		GameVector origin;
 
 		origin.x = item.Pose.Position.x;
@@ -89,7 +100,6 @@ namespace TEN::Traps::TR5
 		target.z = 3 * target.z - 2 * origin.z;
 
 		bool los2 = LOS(&origin, &target);
-		
 
 		auto pointColl = GetCollision(target.ToVector3i(), item.RoomNumber);
 		if (pointColl.RoomNumber != target.RoomNumber)
@@ -103,7 +113,7 @@ namespace TEN::Traps::TR5
 				SpawnLaserSpark(target, 2 * GetRandomControl(), 3, color);
 			}
 
-			SpawnLaserBeamLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, target);			
+			SpawnLaserBeamLight(target.ToVector3(), target.RoomNumber, item.Model.Color, LASER_BEAM_LIGHT_INTENSITY, LASER_BEAM_LIGHT_AMPLITUDE);
 		}
 
 		// Determine beam vertex base.
@@ -165,30 +175,6 @@ namespace TEN::Traps::TR5
 		LaserBeams.insert({ itemNumber, laser });
 	}
 
-	void SpawnLaserBeamLight(const ItemInfo& item, float intensity, float amplitude, const GameVector& pos)
-	{
-		if (pos == GameVector::Zero)
-		{
-			float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitude);
-			TriggerDynamicLight(
-				item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z,
-				8,
-				intensityNorm * (item.Model.Color.x / 2),
-				intensityNorm * (item.Model.Color.y / 2),
-				intensityNorm * (item.Model.Color.z / 2));
-		}
-		else
-		{
-			float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitude);
-			TriggerDynamicLight(
-				pos.x, pos.y, pos.z,
-				8,
-				intensityNorm * (item.Model.Color.x / 2),
-				intensityNorm * (item.Model.Color.y / 2),
-				intensityNorm * (item.Model.Color.z / 2));
-		}
-	}
-
 	void ControlLaserBeam(short itemNumber)
 	{
 		if (!LaserBeams.count(itemNumber))
@@ -223,29 +209,26 @@ namespace TEN::Traps::TR5
 		laser.Update(item);
 
 		if (item.Model.Color.w >= 0.8f)
-			SpawnLaserBeamLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, GameVector::Zero);
+			SpawnLaserBeamLight(item.Pose.Position.ToVector3(), item.RoomNumber, item.Model.Color, LASER_BEAM_LIGHT_INTENSITY, LASER_BEAM_LIGHT_AMPLITUDE);
 
 		SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
 	}
 
 	void CollideLaserBeam(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
+		constexpr auto LASER_BEAM_LIGHT_INTENSITY_MODIFY = 255.0f;
+		constexpr auto LASER_BEAM_LIGHT_AMPLITUDE_MODIFY = 100.0f;
+
 		if (!LaserBeams.count(itemNumber))
 			return;
 
 		auto& item = g_Level.Items[itemNumber];
-		auto& barrier = LaserBeams.at(itemNumber);
+		auto& laser = LaserBeams.at(itemNumber);
 
-		if (!barrier.IsActive)
+		if (!laser.IsActive)
 			return;
 
-		GameVector origin;
-
-		origin.x = item.Pose.Position.x;
-		origin.y = item.Pose.Position.y;
-		origin.z = item.Pose.Position.z;
-		origin.RoomNumber = item.RoomNumber;
-
+		auto origin = GameVector(item.Pose.Position, item.RoomNumber);
 		auto basePos = origin.ToVector3();
 
 		auto rotMatrix = EulerAngles(item.Pose.Orientation.x + ANGLE(180.0f), item.Pose.Orientation.y, item.Pose.Orientation.z);
@@ -260,19 +243,19 @@ namespace TEN::Traps::TR5
 		auto hitPos = Vector3i::Zero;
 		if (ObjectOnLOS2(&origin, &target, &hitPos, nullptr, ID_LARA) == LaraItem->Index && !los2)
 		{
-			if (barrier.IsLethal &&
+			if (laser.IsLethal &&
 				playerItem->HitPoints > 0 && playerItem->Effect.Type != EffectType::Smoke)
 			{
 				ItemRedLaserBurn(playerItem, 2.0f * FPS);
 				DoDamage(playerItem, MAXINT);
 			}
-			else if (barrier.IsHeavyActivator)
+			else if (laser.IsHeavyActivator)
 			{
 				TestTriggers(&item, true, item.Flags & IFLAG_ACTIVATION_MASK);
 			}
 
-			barrier.Color.w = Random::GenerateFloat(0.6f, 1.0f);
-			SpawnLaserBeamLight(item, LIGHT_INTENSITY_MODIFY, LIGHT_AMPLITUDE_MODIFY, GameVector::Zero);
+			laser.Color.w = Random::GenerateFloat(0.6f, 1.0f);
+			SpawnLaserBeamLight(item.Pose.Position.ToVector3(), item.RoomNumber, item.Model.Color, LASER_BEAM_LIGHT_INTENSITY_MODIFY, LASER_BEAM_LIGHT_AMPLITUDE_MODIFY);
 		}		
 	}
 

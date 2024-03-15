@@ -113,9 +113,7 @@ namespace TEN::Renderer
 
 						if (segment.Life <= 0.0f)
 							continue;
-
-						bool useAdditiveBlendMode = bool(segment.Flags & (int)StreamerFlags::BlendModeAdditive);
-
+						
 						// Determine blend mode.
 						auto blendMode = DEFAULT_BLEND_MODE;
 						if (segment.Flags & (int)StreamerFlags::BlendModeAdditive)

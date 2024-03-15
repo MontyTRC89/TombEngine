@@ -30,9 +30,5 @@ namespace TEN::Traps::TR5
 	void InitializeLaserBeam(short itemNumber);
 	void ControlLaserBeam(short itemNumber);
 	void CollideLaserBeam(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
-
-	void SpawnLaserSpark(const GameVector& pos, short angle, int count, const Vector4& colorStart);
-	void SpawnLaserBeamLight(const ItemInfo& item, float intensity, float amplitude, const GameVector& pos);
-
 	void ClearLaserBeamEffects();
 }
