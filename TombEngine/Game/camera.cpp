@@ -91,7 +91,6 @@ float CinematicBarsSpeed = 0;
 // IsCameraCollidableItem()
 // IsCameraCollideableStatic()
 
-// GetCameraRoomLosIntersect()
 // GetCameraCollidableItemPtrs()
 // GetCameraCollidableStaticPtrs()
 // GetCameraRayBoxIntersect()
@@ -149,42 +148,6 @@ static bool IsCameraCollideableStatic(const MESH_INFO& staticObject)
 	}
 
 	return true;
-}
-
-static std::optional<std::pair<Vector3, int>> GetCameraRoomLosIntersect(const Vector3& origin, int originRoomNumber,
-																		const Vector3& target, int targetRoomNumber)
-{
-	auto closestIntersect = std::optional<Vector3>();
-
-	auto dir = target - origin;
-	dir.Normalize();
-
-	auto losOrigin = GameVector(origin, originRoomNumber);
-	auto losTarget = GameVector(target, targetRoomNumber);
-
-	// 1) Collide axis-aligned walls.
-	if (!LOS(&losOrigin, &losTarget))
-	{
-		float dist = Vector3::Distance(losOrigin.ToVector3(), losTarget.ToVector3());
-		closestIntersect = Geometry::TranslatePoint(origin, dir, dist);
-	}
-
-	// 2) Collide diagonal walls and floors/ceilings.
-	if (!LOSAndReturnTarget(&losOrigin, &losTarget, 0))
-	{
-		float dist = Vector3::Distance(losOrigin.ToVector3(), losTarget.ToVector3());
-		closestIntersect = Geometry::TranslatePoint(origin, dir, dist);
-	}
-
-	// Return intersection.
-	if (closestIntersect.has_value())
-	{
-		int intersectRoomNumber = losTarget.RoomNumber;
-		return std::pair(*closestIntersect, intersectRoomNumber);
-	}
-
-	// No intersection; return nullopt.
-	return std::nullopt;
 }
 
 static std::vector<const ItemInfo*> GetCameraCollidableItemPtrs()
@@ -270,7 +233,7 @@ static std::optional<Vector3> GetCameraRayBoxIntersect(const Vector3& origin, co
 	return std::nullopt;
 }
 
-static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target)
+static std::optional<std::pair<Vector3, int>> GetCameraObjectLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
 {
 	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
 
@@ -337,8 +300,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraObjectLosIntersect(const 
 	return std::nullopt;
 }
 
-static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector3& origin, int originRoomNumber,
-																	const Vector3& target, int targetRoomNumber)
+static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber)
 {
 	constexpr auto BUFFER = BLOCK(0.1f);
 
@@ -349,18 +311,18 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 	bool hasIntersect = false;
 
 	// 1) Collide with room.
-	auto roomIntersect = GetCameraRoomLosIntersect(origin, originRoomNumber, intersect.first, intersect.second);
-	if (roomIntersect.has_value())
+	auto roomLos = GetRoomLos(origin, originRoomNumber, intersect.first, intersect.second);
+	if (roomLos.has_value())
 	{
-		intersect = *roomIntersect;
+		intersect = *roomLos;
 		hasIntersect = true;
 	}
 
 	// 2) Collide with objects.
-	auto objectIntersect = GetCameraObjectLosIntersect(origin, originRoomNumber, intersect.first);
-	if (objectIntersect.has_value())
+	auto objectLos = GetCameraObjectLos(origin, originRoomNumber, intersect.first);
+	if (objectLos.has_value())
 	{
-		intersect = *objectIntersect;
+		intersect = *objectLos;
 		hasIntersect = true;
 	}
 

@@ -3,9 +3,25 @@
 #include "Objects/objectslist.h"
 #include "Math/Math.h"
 
+struct ItemInfo;
+struct MESH_INFO;
+
+using GameObjectPtr = std::variant<ItemInfo*, MESH_INFO*>;
+
 constexpr auto NO_LOS_ITEM = INT_MAX;
 
+struct LosInstanceData
+{
+	std::optional<GameObjectPtr> ObjectPtr = std::nullopt;
+
+	Vector3 Position   = Vector3::Zero;
+	int		RoomNumber = 0;
+
+	float Distance = 0.0f;
+};
+
 // WIP new LOS functions.
+std::vector<LosInstanceData>		   GetLosInstances(const Vector3& origin, int originRoomNumber, const Vector3& dir, float dist);
 std::optional<std::pair<Vector3, int>> GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber);
 std::optional<Vector3>				   GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid);
 

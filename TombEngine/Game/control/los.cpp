@@ -17,8 +17,10 @@
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Math;
+using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
 // Globals
@@ -28,16 +30,180 @@ int ClosestItem;
 int ClosestDist;
 Vector3i ClosestCoord;
 
+static std::vector<ItemInfo*> GetNearbyItemPtrs(const std::set<int>& roomNumbers)
+{
+	// Collect item pointers.
+	auto itemPtrs = std::vector<ItemInfo*>{};
+	for (int itemNumber = 0; itemNumber < g_Level.NumItems; itemNumber++)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		// 1) Check if room is active.
+		const auto& room = g_Level.Rooms[item.RoomNumber];
+		if (!room.Active())
+			continue;
+
+		// 2) Test if item is in nearby room.
+		auto it = std::find(roomNumbers.begin(), roomNumbers.end(), (int)item.RoomNumber);
+		if (it == roomNumbers.end())
+			continue;
+
+		itemPtrs.push_back(&item);
+	}
+
+	return itemPtrs;
+}
+
+static std::vector<MESH_INFO*> GetNearbyStaticPtrs(const std::set<int>& roomNumbers)
+{
+	// Collect static pointers.
+	auto staticPtrs = std::vector<MESH_INFO*>{};
+	for (int roomNumber : roomNumbers)
+	{
+		// 1) Check if room is active.
+		auto& room = g_Level.Rooms[roomNumber];
+		if (!room.Active())
+			continue;
+
+		// 2) Run through statics in room.
+		for (auto& staticObject : room.mesh)
+			staticPtrs.push_back(&staticObject);
+	}
+
+	return staticPtrs;
+}
+
+std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumber, const Vector3& dir, float dist)
+{
+	auto losList = std::vector<LosInstanceData>{};
+
+	// Calculate target.
+	auto target = Geometry::TranslatePoint(origin, dir, dist);
+	int targetRoomNumber = GetCollision(origin, roomNumber, dir, dist).RoomNumber;
+
+	// Collect room LOS instance.
+	auto roomLos = GetRoomLos(origin, roomNumber, target, targetRoomNumber);
+	if (roomLos.has_value())
+	{
+		target = roomLos->first;
+		targetRoomNumber = roomLos->second;
+		dist = Vector3::Distance(origin, target);
+
+		losList.push_back(LosInstanceData{ {}, roomLos->first, roomLos->second, dist });
+	}
+
+	// TODO: Get all room numbers intersected between origin and target to account for all relevant rooms.
+	// Collect relevant room numbers.
+	auto roomNumbers = std::set<int>{};
+	if (roomNumber == targetRoomNumber)
+	{
+		const auto& neighborRoomNumbers = g_Level.Rooms[roomNumber].neighbors;
+		roomNumbers.insert(neighborRoomNumbers.begin(), neighborRoomNumbers.end());
+	}
+	else
+	{
+		const auto& originNeighborRoomNumbers = g_Level.Rooms[roomNumber].neighbors;
+		const auto& targetNeighborRoomNumbers = g_Level.Rooms[targetRoomNumber].neighbors;
+
+		roomNumbers.insert(originNeighborRoomNumbers.begin(), originNeighborRoomNumbers.end());
+		roomNumbers.insert(targetNeighborRoomNumbers.begin(), targetNeighborRoomNumbers.end());
+	}
+
+	// Collect item LOS instances.
+	auto itemPtrs = GetNearbyItemPtrs(roomNumbers);
+	for (auto* itemPtr : itemPtrs)
+	{
+		auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
+
+		float intersectDist = 0.0f;
+		if (box.Intersects(origin, dir, intersectDist))
+		{
+			if (intersectDist <= dist)
+				losList.push_back(LosInstanceData{ itemPtr, Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
+		}
+	}
+
+	// Collect static LOS instances.
+	auto staticPtrs = GetNearbyStaticPtrs(roomNumbers);
+	for (auto* staticPtr : staticPtrs)
+	{
+		auto box = GetBoundsAccurate(*staticPtr, false).ToBoundingOrientedBox(staticPtr->pos);
+
+		float intersectDist = 0.0f;
+		if (box.Intersects(origin, dir, intersectDist))
+		{
+			if (intersectDist <= dist)
+				losList.push_back(LosInstanceData{ staticPtr, Geometry::TranslatePoint(origin, dir, intersectDist), staticPtr->roomNumber, intersectDist });
+		}
+	}
+
+	// Sort LOS instances by distance.
+	std::sort(
+		losList.begin(), losList.end(),
+		[](const auto& los0, const auto& los1)
+		{
+			return (los0.Distance < los1.Distance);
+		});
+
+	// Return room and object LOS instances sorted by distance.
+	return losList;
+}
+
+// TODO: Accurate room LOS.
 std::optional<std::pair<Vector3, int>> GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber)
 {
+	auto losOrigin = GameVector(origin, originRoomNumber);
+	auto losTarget = GameVector(target, targetRoomNumber);
+
+	float dist = 0.0f;
+
+	// 1) Collide axis-aligned walls.
+	if (!LOS(&losOrigin, &losTarget))
+		dist = Vector3::Distance(origin, losTarget.ToVector3());
+
+	// 2) Collide diagonal walls and floors/ceilings.
+	if (!LOSAndReturnTarget(&losOrigin, &losTarget, 0))
+		dist = Vector3::Distance(origin, losTarget.ToVector3());
+
+	// Calculate and return intersection.
+	if (dist != 0.0f)
+	{
+		auto dir = target - origin;
+		dir.Normalize();
+
+		auto closestIntersect = Geometry::TranslatePoint(origin, dir, dist);
+		int intersectRoomNumber = losTarget.RoomNumber;
+		return std::pair(closestIntersect, intersectRoomNumber);
+	}
+
+	// No intersection; return nullopt.
 	return std::nullopt;
 }
 
-// TODO: Extend to be a more general, simple, all-in-one LOS function with a variety of flags for what to detect.
 std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
 {
+	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist);
+	for (const auto& losInstance : losInstances)
+	{
+		if (!losInstance.ObjectPtr.has_value())
+			continue;
+
+		if (!std::holds_alternative<MESH_INFO*>(*losInstance.ObjectPtr))
+			continue;
+
+		// Check if static is solid (if applicable).
+		const auto& staticObject = *std::get<MESH_INFO*>(*losInstance.ObjectPtr);
+		if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
+			continue;
+
+		return losInstance.Position;
+	}
+
+	return std::nullopt;
+
+	// Old version.
 	// Run through neighbor rooms.
-	const auto& room = g_Level.Rooms[roomNumber];
+	/*const auto& room = g_Level.Rooms[roomNumber];
 	for (int neighborRoomNumber : room.neighbors)
 	{
 		// Get neighbor room.
@@ -67,7 +233,7 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 		}
 	}
 
-	return std::nullopt;
+	return std::nullopt;*/
 }
 
 static int xLOS(const GameVector& origin, GameVector& target)
