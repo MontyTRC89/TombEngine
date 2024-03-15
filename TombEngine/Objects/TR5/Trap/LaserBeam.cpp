@@ -3,21 +3,21 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/spark.h"
 #include "Game/items.h"
-#include "Game/control/los.h"
 #include "Game/Lara/lara.h"
 #include "Game/people.h"
-#include "Specific/level.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer.h"
-#include "Math/Objects/EulerAngles.h"
+#include "Specific/level.h"
 
-using namespace TEN::Renderer;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
+using namespace TEN::Renderer;
 
 namespace TEN::Traps::TR5
 {
@@ -31,13 +31,13 @@ namespace TEN::Traps::TR5
 
 	void SingleLaser::Initialize(const ItemInfo& item)
 	{
-		int beamCount = 1;
-
 		Color = item.Model.Color;
 		Color.w = 0.0f;
+
 		Beams.resize(1);
 		IsLethal = (item.TriggerFlags > 0);
 		IsHeavyActivator = (item.TriggerFlags <= 0);
+
 		Update(item);
 	}
 
@@ -45,26 +45,27 @@ namespace TEN::Traps::TR5
 	{
 		for (int i = 0; i < count; i++)
 		{
-			auto& s = GetFreeSparkParticle();
-			s = {};
-			s.age = 0;
-			s.life = Random::GenerateFloat(10, 20);
-			s.friction = 0.98f;
-			s.gravity = 1.2f;
-			s.width = 7.0f;
-			s.height = 34.0f;
-			s.room = pos.RoomNumber;
-			s.pos = pos.ToVector3();
 			float ang = TO_RAD(angle);
-			Vector3 v = Vector3(sin(ang + Random::GenerateFloat(-PI_DIV_2, PI_DIV_2)), Random::GenerateFloat(-1, 1), cos(ang + Random::GenerateFloat(-PI_DIV_2, PI_DIV_2)));
-			v += Vector3(Random::GenerateFloat(-64, 64), Random::GenerateFloat(-64, 64), Random::GenerateFloat(-64, 64));
-			v.Normalize(v);
-			s.velocity = v * Random::GenerateFloat(17, 24);
-			s.sourceColor = colorStart;
-			s.destinationColor = Vector4::Zero;
-			s.active = true;
-		}
+			auto vel = Vector3(sin(ang + Random::GenerateFloat(-PI_DIV_2, PI_DIV_2)), Random::GenerateFloat(-1, 1), cos(ang + Random::GenerateFloat(-PI_DIV_2, PI_DIV_2)));
+			vel += Vector3(Random::GenerateFloat(-64, 64), Random::GenerateFloat(-64, 64), Random::GenerateFloat(-64, 64));
+			vel.Normalize(vel);
 
+			auto& spark = GetFreeSparkParticle();
+
+			spark = {};
+			spark.age = 0;
+			spark.life = Random::GenerateFloat(10, 20);
+			spark.friction = 0.98f;
+			spark.gravity = 1.2f;
+			spark.width = 7.0f;
+			spark.height = 34.0f;
+			spark.room = pos.RoomNumber;
+			spark.pos = pos.ToVector3();
+			spark.velocity = vel * Random::GenerateFloat(17, 24);
+			spark.sourceColor = colorStart;
+			spark.destinationColor = Vector4::Zero;
+			spark.active = true;
+		}
 	}
 
 	void SingleLaser::Update(const ItemInfo& item)
@@ -109,10 +110,10 @@ namespace TEN::Traps::TR5
 		// Determine beam vertex base.
 		auto baseVertices = std::array<Vector3, SingleLaserBeam::VERTEX_COUNT>
 		{
-			basePos + Vector3(0,  -beamHeight / 2, 0.0f),
-			target.ToVector3() + Vector3(0,  -beamHeight / 2, 0.0f),
-			target.ToVector3() + Vector3(0,  +beamHeight / 2, 0.0f),
-			basePos + Vector3(0,  +beamHeight / 2, 0.0f),
+			basePos + Vector3(0.0f, -beamHeight / 2, 0.0f),
+			target.ToVector3() + Vector3(0.0f, -beamHeight / 2, 0.0f),
+			target.ToVector3() + Vector3(0.0f, beamHeight / 2, 0.0f),
+			basePos + Vector3(0.0f, beamHeight / 2, 0.0f),
 		};
 
 		// Set vertex positions.
@@ -139,12 +140,6 @@ namespace TEN::Traps::TR5
 				{
 					beam.VertexPoints[2] = pointColl1.Coordinates.ToVector3();
 				}
-
-				/*g_Renderer.AddDebugSphere(beam.VertexPoints[0], 23, Vector4(1, 1, 1, 1), RendererDebugPage::None, true);
-				g_Renderer.AddDebugSphere(beam.VertexPoints[1], 23, Vector4(0.5f, 0.5f, 0.5f, 1), RendererDebugPage::None, true);
-				g_Renderer.AddDebugSphere(beam.VertexPoints[2], 23, Vector4(0, 0, 1, 1), RendererDebugPage::None, true);
-				g_Renderer.AddDebugSphere(beam.VertexPoints[3], 23, Vector4(1, 1, 0, 1), RendererDebugPage::None, true);*/
-				//g_Renderer.AddDebugSphere(beam.VertexPoints[0], 23, Vector4(1, 1, 1, 1), RendererDebugPage::None, true);
 			}
 		}
 
@@ -164,12 +159,12 @@ namespace TEN::Traps::TR5
 
 	void InitializeLaserBeam(short itemNumber)
 	{
-		auto& item = g_Level.Items[itemNumber];
-		auto pointColl = GetCollision(&item);
+		const auto& item = g_Level.Items[itemNumber];
 
-		auto barrier = SingleLaser{};
-		barrier.Initialize(item);
-		LaserBeams.insert({ itemNumber, barrier });
+		auto laser = SingleLaser{};
+		laser.Initialize(item);
+
+		LaserBeams.insert({ itemNumber, laser });
 	}
 
 	void SpawnLaserBeamLight(const ItemInfo& item, float intensity, float amplitude, const GameVector& pos)
@@ -202,12 +197,12 @@ namespace TEN::Traps::TR5
 			return;
 
 		auto& item = g_Level.Items[itemNumber];
-		auto& barrier = LaserBeams.at(itemNumber);
+		auto& laser = LaserBeams.at(itemNumber);
 
 		if (!TriggerActive(&item))
 		{
-			barrier.IsActive = false;
-			barrier.Color.w = 0.0f;
+			laser.IsActive = false;
+			laser.Color.w = 0.0f;
 			item.Model.Color.w = 0.0f;
 			return;
 		}
@@ -216,18 +211,18 @@ namespace TEN::Traps::TR5
 		if (item.Model.Color.w < 1.0f)
 			item.Model.Color.w += 0.02f;
 
-		if (barrier.Color.w < 1.0f)
-			barrier.Color.w += 0.02f;
+		if (laser.Color.w < 1.0f)
+			laser.Color.w += 0.02f;
 
 		// TODO: Weird.
 		if (item.Model.Color.w > 8.0f)
 		{
-			barrier.Color.w = 0.8f;
+			laser.Color.w = 0.8f;
 			item.Model.Color.w = 0.8f;
 		}
 			
-		barrier.IsActive = true;
-		barrier.Update(item);
+		laser.IsActive = true;
+		laser.Update(item);
 
 		if (item.Model.Color.w >= 0.8f)
 			SpawnLaserBeamLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, GameVector::Zero);
@@ -256,7 +251,7 @@ namespace TEN::Traps::TR5
 		auto basePos = origin.ToVector3();
 
 		auto rotMatrix = EulerAngles(item.Pose.Orientation.x + ANGLE(180.0f), item.Pose.Orientation.y, item.Pose.Orientation.z);
-		GameVector target = Geometry::TranslatePoint(origin.ToVector3(), rotMatrix, MAX_VISIBILITY_DISTANCE);
+		auto target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), rotMatrix, MAX_VISIBILITY_DISTANCE), 0);
 
 		auto pointColl = GetCollision(target.ToVector3i(),item.RoomNumber);
 		if (pointColl.RoomNumber != target.RoomNumber)
@@ -280,8 +275,6 @@ namespace TEN::Traps::TR5
 
 			barrier.Color.w = Random::GenerateFloat(0.6f, 1.0f);
 			SpawnLaserBeamLight(item, LIGHT_INTENSITY_MODIFY, LIGHT_AMPLITUDE_MODIFY, GameVector::Zero);
-
-			//g_Renderer.AddDebugLine(origin.ToVector3(),target.ToVector3(), Vector4(1, 1, 1, 1), RendererDebugPage::None);
 		}		
 	}
 
