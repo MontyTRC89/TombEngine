@@ -27,14 +27,13 @@ namespace TEN::Traps::TR5
 	constexpr auto LIGHT_INTENSITY_MODIFY = 255.0f;
 	constexpr auto LIGHT_AMPLITUDE_MODIFY = 100.0f;
 
-	extern std::unordered_map<int, SingleLaser> LaserBeams = {};
+	extern std::unordered_map<int, LaserBeamEffect> LaserBeams = {};
 
-	void SingleLaser::Initialize(const ItemInfo& item)
+	void LaserBeamEffect::Initialize(const ItemInfo& item)
 	{
 		Color = item.Model.Color;
 		Color.w = 0.0f;
 
-		Beams.resize(1);
 		IsLethal = (item.TriggerFlags > 0);
 		IsHeavyActivator = (item.TriggerFlags <= 0);
 
@@ -68,7 +67,7 @@ namespace TEN::Traps::TR5
 		}
 	}
 
-	void SingleLaser::Update(const ItemInfo& item)
+	void LaserBeamEffect::Update(const ItemInfo& item)
 	{
 		float beamHeight = item.TriggerFlags < 0 ? BEAM_HEIGHT * abs(item.TriggerFlags) : BEAM_HEIGHT * item.TriggerFlags;
 		GameVector origin;
@@ -108,7 +107,7 @@ namespace TEN::Traps::TR5
 		}
 
 		// Determine beam vertex base.
-		auto baseVertices = std::array<Vector3, SingleLaserBeam::VERTEX_COUNT>
+		auto baseVertices = std::array<Vector3, LaserBeamEffect::VERTEX_COUNT>
 		{
 			basePos + Vector3(0.0f, -beamHeight / 2, 0.0f),
 			target.ToVector3() + Vector3(0.0f, -beamHeight / 2, 0.0f),
@@ -118,33 +117,32 @@ namespace TEN::Traps::TR5
 
 		// Set vertex positions.
 		auto beamOffset = Vector3::Zero;
-		for (auto& beam : Beams)
+		assertion(VertexPoints.size() == baseVertices.size(), "Laser beam vertex count out of sync.");
+
+		for (int i = 0; i < VertexPoints.size(); i++)
 		{
-			assertion(beam.VertexPoints.size() == baseVertices.size(), "Laser barrier beam vertex count out of sync.");
+			VertexPoints[i] = baseVertices[i] + beamOffset;
 
-			for (int i = 0; i < beam.VertexPoints.size(); i++)
+			auto pointColl0 = GetCollision(VertexPoints[1], item.RoomNumber);
+			auto pointColl1 = GetCollision(VertexPoints[2], item.RoomNumber);
+
+			if (pointColl0.Block->IsWall(VertexPoints[1].x, VertexPoints[1].z) ||
+				pointColl0.Block->IsWall(VertexPoints[1].x, VertexPoints[1].z))
 			{
-				beam.VertexPoints[i] = baseVertices[i] + beamOffset;
-
-				auto pointColl0 = GetCollision(beam.VertexPoints[1], item.RoomNumber);
-				auto pointColl1 = GetCollision(beam.VertexPoints[2], item.RoomNumber);
-
-				if (pointColl0.Block->IsWall(beam.VertexPoints[1].x, beam.VertexPoints[1].z) ||
-					pointColl0.Block->IsWall(beam.VertexPoints[1].x, beam.VertexPoints[1].z))
-				{
-					beam.VertexPoints[1] = pointColl0.Coordinates.ToVector3();
-				}
+				VertexPoints[1] = pointColl0.Coordinates.ToVector3();
+			}
 				
-				if (pointColl1.Block->IsWall(beam.VertexPoints[2].x, beam.VertexPoints[2].z) ||
-					pointColl1.Block->IsWall(beam.VertexPoints[2].x, beam.VertexPoints[2].z))
-				{
-					beam.VertexPoints[2] = pointColl1.Coordinates.ToVector3();
-				}
+			if (pointColl1.Block->IsWall(VertexPoints[2].x, VertexPoints[2].z) ||
+				pointColl1.Block->IsWall(VertexPoints[2].x, VertexPoints[2].z))
+			{
+				VertexPoints[2] = pointColl1.Coordinates.ToVector3();
 			}
 		}
 
+		// TODO: Bounding box.
+
 		// Determine bounding box reference points.
-		auto point0 = Beams.back().VertexPoints[0];
+		/*auto point0 = Beams.back().VertexPoints[0];
 		auto point1 = Beams.back().VertexPoints[1];
 		auto point2 = Beams.front().VertexPoints[2];
 		auto point3 = Beams.front().VertexPoints[3];
@@ -154,14 +152,14 @@ namespace TEN::Traps::TR5
 		BoundingBox.Extents = Vector3(
 			std::abs(point0.x - point1.x) / 2,
 			std::abs(point0.y - point2.y) / 2,
-			std::abs(point0.z - point2.z) / 2);
+			std::abs(point0.z - point2.z) / 2);*/
 	}
 
 	void InitializeLaserBeam(short itemNumber)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 
-		auto laser = SingleLaser{};
+		auto laser = LaserBeamEffect{};
 		laser.Initialize(item);
 
 		LaserBeams.insert({ itemNumber, laser });

@@ -8,19 +8,14 @@ struct ItemInfo;
 
 namespace TEN::Traps::TR5
 {
-	struct SingleLaserBeam
+	struct LaserBeamEffect
 	{
+		static constexpr auto SUBDIVISION_COUNT = 8;
 		static constexpr auto VERTEX_COUNT = 4;
-		static constexpr auto HEIGHT	   = CLICK(0.05f);
 
+		Vector4				Color		= Vector4::Zero;
+		BoundingOrientedBox BoundingBox = {};
 		std::array<Vector3, VERTEX_COUNT> VertexPoints = {};
-	};
-
-	struct SingleLaser
-	{
-		Vector4						  Color		  = Vector4::Zero;
-		BoundingOrientedBox			  BoundingBox = {};
-		std::vector<SingleLaserBeam> Beams		  = {};
 
 		bool IsActive		  = false;
 		bool IsLethal		  = false;
@@ -30,7 +25,7 @@ namespace TEN::Traps::TR5
 		void Update(const ItemInfo& item);
 	};
 
-	extern std::unordered_map<int, SingleLaser> LaserBeams;
+	extern std::unordered_map<int, LaserBeamEffect> LaserBeams;
 
 	void InitializeLaserBeam(short itemNumber);
 	void ControlLaserBeam(short itemNumber);

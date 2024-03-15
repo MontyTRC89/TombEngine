@@ -66,7 +66,7 @@ namespace TEN::Renderer
 		if (LaserBarriers.empty())
 			return;
 
-		for (const auto& [entityID, barrier] : LaserBarriers)
+		for (const auto& [itemNumber, barrier] : LaserBarriers)
 		{
 			for (const auto& beam : barrier.Beams)
 			{
@@ -85,25 +85,22 @@ namespace TEN::Renderer
 		if (LaserBeams.empty())
 			return;
 
-		for (const auto& [entityID, barrier] : LaserBeams)
+		for (const auto& [itemNumber, laser] : LaserBeams)
 		{
-			for (const auto& beam : barrier.Beams)
-			{
-				AddColoredQuad(
-					beam.VertexPoints[0], beam.VertexPoints[1],
-					beam.VertexPoints[2], beam.VertexPoints[3],
-					barrier.Color, barrier.Color,
-					barrier.Color, barrier.Color,
-					BlendMode::Additive, view, SpriteRenderType::LaserBarrier);
-			}
+			AddColoredQuad(
+				laser.VertexPoints[0], laser.VertexPoints[1],
+				laser.VertexPoints[2], laser.VertexPoints[3],
+				laser.Color, laser.Color,
+				laser.Color, laser.Color,
+				BlendMode::Additive, view, SpriteRenderType::LaserBarrier);
 		}
 	}
 
 	void Renderer::PrepareStreamers(RenderView& view)
 	{
-		constexpr auto BLEND_MODE_DEFAULT = BlendMode::Additive;
+		constexpr auto DEFAULT_BLEND_MODE = BlendMode::Additive;
 
-		for (const auto& [entityNumber, module] : StreamerEffect.Modules)
+		for (const auto& [itemNumber, module] : StreamerEffect.Modules)
 		{
 			for (const auto& [tag, pool] : module.Pools)
 			{
@@ -117,8 +114,10 @@ namespace TEN::Renderer
 						if (segment.Life <= 0.0f)
 							continue;
 
+						bool useAdditiveBlendMode = bool(segment.Flags & (int)StreamerFlags::BlendModeAdditive);
+
 						// Determine blend mode.
-						auto blendMode = BLEND_MODE_DEFAULT;
+						auto blendMode = DEFAULT_BLEND_MODE;
 						if (segment.Flags & (int)StreamerFlags::BlendModeAdditive)
 							blendMode = BlendMode::AlphaBlend;
 
