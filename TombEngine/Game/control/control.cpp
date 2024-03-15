@@ -430,7 +430,7 @@ void CleanUp()
 	ClearDrips();
 	ClearRipples();
 	ClearLaserBarrierEffects();
-	ClearSingleLaserEffects();
+	ClearLaserBeamEffects();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();

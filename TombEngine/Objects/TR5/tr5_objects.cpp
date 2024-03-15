@@ -950,9 +950,9 @@ static void StartTrap(ObjectInfo *obj)
 	obj = &Objects[ID_LASER_BEAM];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeSingleLaser;
-		obj->control = ControlSingleLaser;
-		obj->collision = CollideSingleLaser;
+		obj->Initialize = InitializeLaserBeam;
+		obj->control = ControlLaserBeam;
+		obj->collision = CollideLaserBeam;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}

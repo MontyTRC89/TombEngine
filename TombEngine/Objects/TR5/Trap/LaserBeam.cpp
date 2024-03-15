@@ -41,7 +41,7 @@ namespace TEN::Traps::TR5
 		Update(item);
 	}
 
-	void TriggerLaserSpark(const GameVector& pos, short angle, int count, const Vector4& colorStart)
+	void SpawnLaserSpark(const GameVector& pos, short angle, int count, const Vector4& colorStart)
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -99,11 +99,11 @@ namespace TEN::Traps::TR5
 		{
 			if (item.TriggerFlags > 0)
 			{
-				TriggerLaserSpark(target, 2 * GetRandomControl(), 3, color);
-				TriggerLaserSpark(target, 2 * GetRandomControl(), 3, color);
+				SpawnLaserSpark(target, 2 * GetRandomControl(), 3, color);
+				SpawnLaserSpark(target, 2 * GetRandomControl(), 3, color);
 			}
 
-			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, target);			
+			SpawnLaserBeamLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, target);			
 		}
 
 		// Determine beam vertex base.
@@ -162,7 +162,7 @@ namespace TEN::Traps::TR5
 			std::abs(point0.z - point2.z) / 2);
 	}
 
-	void InitializeSingleLaser(short itemNumber)
+	void InitializeLaserBeam(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		auto pointColl = GetCollision(&item);
@@ -172,7 +172,7 @@ namespace TEN::Traps::TR5
 		LaserBeams.insert({ itemNumber, barrier });
 	}
 
-	void SpawnLaserBarrierLight(const ItemInfo& item, float intensity, float amplitude, const GameVector& pos)
+	void SpawnLaserBeamLight(const ItemInfo& item, float intensity, float amplitude, const GameVector& pos)
 	{
 		if (pos == GameVector::Zero)
 		{
@@ -196,7 +196,7 @@ namespace TEN::Traps::TR5
 		}
 	}
 
-	void ControlSingleLaser(short itemNumber)
+	void ControlLaserBeam(short itemNumber)
 	{
 		if (!LaserBeams.count(itemNumber))
 			return;
@@ -230,12 +230,12 @@ namespace TEN::Traps::TR5
 		barrier.Update(item);
 
 		if (item.Model.Color.w >= 0.8f)
-			SpawnLaserBarrierLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, GameVector::Zero);
+			SpawnLaserBeamLight(item, LIGHT_INTENSITY, LIGHT_AMPLITUDE, GameVector::Zero);
 
 		SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
 	}
 
-	void CollideSingleLaser(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
+	void CollideLaserBeam(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		if (!LaserBeams.count(itemNumber))
 			return;
@@ -279,13 +279,13 @@ namespace TEN::Traps::TR5
 			}
 
 			barrier.Color.w = Random::GenerateFloat(0.6f, 1.0f);
-			SpawnLaserBarrierLight(item, LIGHT_INTENSITY_MODIFY, LIGHT_AMPLITUDE_MODIFY, GameVector::Zero);
+			SpawnLaserBeamLight(item, LIGHT_INTENSITY_MODIFY, LIGHT_AMPLITUDE_MODIFY, GameVector::Zero);
 
 			//g_Renderer.AddDebugLine(origin.ToVector3(),target.ToVector3(), Vector4(1, 1, 1, 1), RendererDebugPage::None);
 		}		
 	}
 
-	void ClearSingleLaserEffects()
+	void ClearLaserBeamEffects()
 	{
 		LaserBeams.clear();
 	}
