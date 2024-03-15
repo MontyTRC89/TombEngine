@@ -20,20 +20,11 @@ namespace TEN::Effects::EmberEmitter
 		unsigned char g = 0;
 		unsigned char b = 0;
 
-		if (item.Model.Color.x == item.Model.Color.y &&
-			item.Model.Color.y == item.Model.Color.z)
-		{
-			r =
-			g =
-			b = item.Model.Color.x * UCHAR_MAX;
-		}
-		else
-		{
-			r = std::clamp(Random::GenerateInt(-32, 32) + int(item.Model.Color.x * UCHAR_MAX), 0, UCHAR_MAX);
-			g = std::clamp(Random::GenerateInt(-32, 32) + int(item.Model.Color.y * UCHAR_MAX), 0, UCHAR_MAX);
-			b = std::clamp(Random::GenerateInt(-32, 32) + int(item.Model.Color.z * UCHAR_MAX), 0, UCHAR_MAX);
-		}
-
+		int random = Random::GenerateInt(-32, 32);
+		r = std::clamp(random + int(item.Model.Color.x * UCHAR_MAX), 0, UCHAR_MAX);
+		g = std::clamp(random + int(item.Model.Color.y * UCHAR_MAX), 0, UCHAR_MAX);
+		b = std::clamp(random + int(item.Model.Color.z * UCHAR_MAX), 0, UCHAR_MAX);
+		
 		if (item.TriggerFlags < 0)
 		{
 			if (!item.ItemFlags[2])
