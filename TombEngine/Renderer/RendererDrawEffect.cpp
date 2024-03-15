@@ -27,7 +27,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
-#include "Objects/TR5/Trap/SingleLaser.h"
+#include "Objects/TR5/Trap/LaserBeam.h"
 #include "Objects/Utils/object_helper.h"
 #include "Renderer/Structures/RendererSprite2D.h"
 #include "Renderer/Structures/RendererSprite.h"
