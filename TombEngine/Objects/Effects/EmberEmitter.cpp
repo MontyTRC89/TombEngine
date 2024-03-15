@@ -20,10 +20,10 @@ namespace TEN::Effects::EmberEmitter
 		unsigned char g = 0;
 		unsigned char b = 0;
 
-		int random = Random::GenerateInt(-32, 32);
-		r = std::clamp(random + int(item.Model.Color.x * UCHAR_MAX), 0, UCHAR_MAX);
-		g = std::clamp(random + int(item.Model.Color.y * UCHAR_MAX), 0, UCHAR_MAX);
-		b = std::clamp(random + int(item.Model.Color.z * UCHAR_MAX), 0, UCHAR_MAX);
+		float brightnessShift = Random::GenerateFloat(-0.1f, 0.1f);
+		r = std::clamp(item.Model.Color.x + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
+		g = std::clamp(item.Model.Color.y + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
+		b = std::clamp(item.Model.Color.z + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
 		
 		if (item.TriggerFlags < 0)
 		{
@@ -32,6 +32,7 @@ namespace TEN::Effects::EmberEmitter
 				int div = abs(item.TriggerFlags) % 10 << 10;
 				int mod = abs(item.TriggerFlags) / 10 << 10;
 
+				// TODO: Use Random::GenerateInt()
 				item.ItemFlags[0] = GetRandomControl() % div;
 				item.ItemFlags[1] = GetRandomControl() % mod;
 				item.ItemFlags[2] = (GetRandomControl() & 0xF) + 15;
@@ -84,13 +85,15 @@ namespace TEN::Effects::EmberEmitter
 		}
 		else
 		{
-
-			float size;
-
+			float size = 0.0f;
 			if (item.TriggerFlags)
+			{
 				size = item.TriggerFlags / 10.0f;
+			}
 			else
+			{
 				size = 1.0f;
+			}
 
 			if (GetRandomControl() & 7)
 			{
