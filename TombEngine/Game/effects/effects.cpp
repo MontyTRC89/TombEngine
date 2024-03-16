@@ -1191,29 +1191,29 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			spark->dG = std::clamp(int(endColor.y)   + colorOffset, 0, UCHAR_MAX);
 			spark->dB = std::clamp(int(endColor.z)   + colorOffset, 0, UCHAR_MAX);
 
-			spark->colFadeSpeed = 1;
+			spark->colFadeSpeed = 2;
 			spark->blendMode = BlendMode::Additive;
-			spark->life = spark->sLife = Random::GenerateInt(8, 12);
-			spark->fadeToBlack = spark->life - 6;
+			spark->life = spark->sLife = (GetRandomControl() & 3) + 46;
+			spark->fadeToBlack = 8;
 
 			spark->x = offset * sign * sin + Random::GenerateInt(-8, 8) + item.Pose.Position.x;
 			spark->y = Random::GenerateInt(0, 16) + item.Pose.Position.y - 8;
 			spark->z = offset * sign * cos + Random::GenerateInt(-8, 8) + item.Pose.Position.z;
 
-			spark->xVel = 0;
-			spark->yVel = Random::GenerateInt(-64, 64);
-			spark->zVel = 0;
+			spark->xVel = (800 * cos);
+			spark->yVel = -16 - (GetRandomControl() & 0xF);// Random::GenerateInt(-44, 44);
+			spark->zVel = (800 * sin );
 
-			spark->friction = 0;
+			spark->friction = -2;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 			spark->scalar = scale;
 			spark->maxYvel = 0;
 			spark->rotAdd = Random::GenerateInt(-16, 16);
-			spark->gravity = -spark->yVel >> 2;
-			spark->sSize = spark->size = Random::GenerateInt(0, 3) * scale + size;
-			spark->dSize = 2 * spark->size;
+			spark->gravity =104;
+			spark->sSize = spark->size = Random::GenerateInt(0, 5) * scale + size;
+			spark->dSize = 3 * spark->size;
 
-			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 95 ? 17 : 0);
+			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 70 ? 34 : 0);
 			spark->flags = 538;
 
 			if (sign == 1)
