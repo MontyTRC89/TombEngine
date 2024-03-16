@@ -81,8 +81,10 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumb
 	auto target = Geometry::TranslatePoint(origin, dir, dist);
 	int targetRoomNumber = GetCollision(origin, roomNumber, dir, dist).RoomNumber;
 
+	auto losRoomNumbers = std::set<int>{};
+
 	// Collect room LOS instance.
-	auto roomLos = GetRoomLos(origin, roomNumber, target, targetRoomNumber);
+	auto roomLos = GetRoomLos(origin, roomNumber, target, targetRoomNumber, &losRoomNumbers);
 	if (roomLos.has_value())
 	{
 		target = roomLos->first;
@@ -92,21 +94,12 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumb
 		losList.push_back(LosInstanceData{ {}, roomLos->first, roomLos->second, dist });
 	}
 
-	// TODO: Get all room numbers intersected between origin and target to account for all relevant rooms.
-	// Collect relevant room numbers.
+	// Collect neighbor room numbers.
 	auto roomNumbers = std::set<int>{};
-	if (roomNumber == targetRoomNumber)
+	for (int roomNumber : losRoomNumbers)
 	{
 		const auto& neighborRoomNumbers = g_Level.Rooms[roomNumber].neighbors;
 		roomNumbers.insert(neighborRoomNumbers.begin(), neighborRoomNumbers.end());
-	}
-	else
-	{
-		const auto& originNeighborRoomNumbers = g_Level.Rooms[roomNumber].neighbors;
-		const auto& targetNeighborRoomNumbers = g_Level.Rooms[targetRoomNumber].neighbors;
-
-		roomNumbers.insert(originNeighborRoomNumbers.begin(), originNeighborRoomNumbers.end());
-		roomNumbers.insert(targetNeighborRoomNumbers.begin(), targetNeighborRoomNumbers.end());
 	}
 
 	// Collect item LOS instances.
@@ -150,7 +143,8 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumb
 }
 
 // TODO: Accurate room LOS.
-std::optional<std::pair<Vector3, int>> GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber)
+std::optional<std::pair<Vector3, int>> GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber,
+												  std::optional<std::set<int>*> roomNumbers)
 {
 	auto losOrigin = GameVector(origin, originRoomNumber);
 	auto losTarget = GameVector(target, targetRoomNumber);
@@ -158,7 +152,7 @@ std::optional<std::pair<Vector3, int>> GetRoomLos(const Vector3& origin, int ori
 	float dist = 0.0f;
 
 	// 1) Collide axis-aligned walls.
-	if (!LOS(&losOrigin, &losTarget))
+	if (!LOS(&losOrigin, &losTarget, roomNumbers))
 		dist = Vector3::Distance(origin, losTarget.ToVector3());
 
 	// 2) Collide diagonal walls and floors/ceilings.
@@ -236,7 +230,7 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 	return std::nullopt;*/
 }
 
-static int xLOS(const GameVector& origin, GameVector& target)
+static int xLOS(const GameVector& origin, GameVector& target, std::optional<std::set<int>*> roomNumbers)
 {
 	int dx = target.x - origin.x;
 	if (dx == 0)
@@ -251,6 +245,12 @@ static int xLOS(const GameVector& origin, GameVector& target)
 	short roomNumber0 = origin.RoomNumber;
 	short roomNumber1 = origin.RoomNumber;
 
+	if (roomNumbers.has_value())
+	{
+		roomNumbers.value()->insert(roomNumber0);
+		roomNumbers.value()->insert(roomNumber1);
+	}
+
 	bool isNegative = (dx < 0);
 	int sign = (isNegative ? -1 : 1);
 
@@ -264,6 +264,9 @@ static int xLOS(const GameVector& origin, GameVector& target)
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		if (roomNumber0 != roomNumber1)
 		{
+			if (roomNumbers.has_value())
+				roomNumbers.value()->insert(roomNumber0);
+
 			roomNumber1 = roomNumber0;
 			LosRooms[NumberLosRooms] = roomNumber0;
 			++NumberLosRooms;
@@ -279,6 +282,9 @@ static int xLOS(const GameVector& origin, GameVector& target)
 		sectorPtr = GetFloor(x + sign, y, z, &roomNumber0);
 		if (roomNumber0 != roomNumber1)
 		{
+			if (roomNumbers.has_value())
+				roomNumbers.value()->insert(roomNumber0);
+
 			roomNumber1 = roomNumber0;
 			LosRooms[NumberLosRooms] = roomNumber0;
 			++NumberLosRooms;
@@ -303,7 +309,7 @@ static int xLOS(const GameVector& origin, GameVector& target)
 	return flag;
 }
 
-static int zLOS(const GameVector& origin, GameVector& target)
+static int zLOS(const GameVector& origin, GameVector& target, std::optional<std::set<int>*> roomNumbers)
 {
 	int dz = target.z - origin.z;
 	if (dz == 0)
@@ -426,7 +432,7 @@ static bool ClipTarget(const GameVector& origin, GameVector& target)
 }
 
 // NOTE: Accurate with axis-aligned walls. Diagonal walls, floor/ceiling heights, and objects are ignored.
-bool LOS(const GameVector* origin, GameVector* target)
+bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<int>*> roomNumbers)
 {
 	int losAxis0 = 0;
 	int losAxis1 = 0;
@@ -434,13 +440,13 @@ bool LOS(const GameVector* origin, GameVector* target)
 	target->RoomNumber = origin->RoomNumber;
 	if (abs(target->z - origin->z) > abs(target->x - origin->x))
 	{
-		losAxis0 = xLOS(*origin, *target);
-		losAxis1 = zLOS(*origin, *target);
+		losAxis0 = xLOS(*origin, *target, roomNumbers);
+		losAxis1 = zLOS(*origin, *target, roomNumbers);
 	}
 	else
 	{
-		losAxis0 = zLOS(*origin, *target);
-		losAxis1 = xLOS(*origin, *target);
+		losAxis0 = zLOS(*origin, *target, roomNumbers);
+		losAxis1 = xLOS(*origin, *target, roomNumbers);
 	}
 
 	if (losAxis1)

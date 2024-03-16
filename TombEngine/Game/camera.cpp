@@ -95,7 +95,7 @@ float CinematicBarsSpeed = 0;
 // GetCameraCollidableStaticPtrs()
 // GetCameraRayBoxIntersect()
 // GetCameraObjectLosIntersect()
-// GetCameraLosIntersect()
+// GetCameraLos()
 // GetCameraRelativeShift()
 // GetCameraPlayerOffset()
 
@@ -300,7 +300,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraObjectLos(const Vector3& 
 	return std::nullopt;
 }
 
-static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber)
+static std::optional<std::pair<Vector3, int>> GetCameraLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber)
 {
 	constexpr auto BUFFER = BLOCK(0.1f);
 
@@ -593,7 +593,7 @@ void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, dist).RoomNumber;
 
 	// Calculate LOS intersection.
-	auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
+	auto intersect = GetCameraLos(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
 	if (intersect.has_value())
 	{
 		idealPos = intersect->first;
@@ -920,7 +920,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, Camera.targetDistance).RoomNumber;
 
 		// Calculate LOS intersection.
-		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
+		auto intersect = GetCameraLos(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
 		if (intersect.has_value())
 		{
 			idealPos = intersect->first;
@@ -997,7 +997,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		}
 
 		// Calculate LOS intersection.
-		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, farthestIdealPos.first, farthestIdealPos.second);
+		auto intersect = GetCameraLos(Camera.LookAt, Camera.LookAtRoomNumber, farthestIdealPos.first, farthestIdealPos.second);
 		if (intersect.has_value())
 			farthestIdealPos = *intersect;
 
