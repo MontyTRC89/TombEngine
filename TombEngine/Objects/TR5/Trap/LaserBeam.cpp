@@ -23,16 +23,16 @@ namespace TEN::Traps::TR5
 {
 	constexpr auto LASER_BEAM_LIGHT_INTENSITY = 50.0f;
 	constexpr auto LASER_BEAM_LIGHT_AMPLITUDE = 31.0f;
-	constexpr auto LASER_BEAM_RADIUS		  = CLICK(0.05f);
 
 	extern std::unordered_map<int, LaserBeamEffect> LaserBeams = {};
 
 	void LaserBeamEffect::Initialize(const ItemInfo& item)
 	{
-		Color = item.Model.Color;
-		Color.w = 0.5f;
+		constexpr auto RADIUS_STEP = BLOCK(0.01f);
 
-		Radius = 10.0f; // TODO
+		Color = item.Model.Color;
+		Color.w = 1.0f;
+		Radius = (item.TriggerFlags == 0) ? RADIUS_STEP : (abs(item.TriggerFlags) * RADIUS_STEP);
 		IsLethal = (item.TriggerFlags > 0);
 		IsHeavyActivator = (item.TriggerFlags <= 0);
 
@@ -98,11 +98,8 @@ namespace TEN::Traps::TR5
 		{
 			if (item.TriggerFlags > 0)
 			{
-				auto color = item.Model.Color;
-				color.w = 1.0f;
-
-				SpawnLaserSpark(target, Random::GenerateAngle(), 3, color);
-				SpawnLaserSpark(target, Random::GenerateAngle(), 3, color);
+				SpawnLaserSpark(target, Random::GenerateAngle(), 3, Color);
+				SpawnLaserSpark(target, Random::GenerateAngle(), 3, Color);
 			}
 
 			SpawnLaserBeamLight(target.ToVector3(), target.RoomNumber, item.Model.Color, LASER_BEAM_LIGHT_INTENSITY, LASER_BEAM_LIGHT_AMPLITUDE);
@@ -131,9 +128,6 @@ namespace TEN::Traps::TR5
 		auto center = (origin.ToVector3() + target.ToVector3()) / 2;
 		auto extents = Vector3(boxApothem, boxApothem, length / 2);
 		BoundingBox = BoundingOrientedBox(center, extents, orient.ToQuaternion());
-
-		// DEBUG
-		g_Renderer.AddDebugBox(BoundingBox, Vector4::One);
 	}
 
 	void InitializeLaserBeam(short itemNumber)
