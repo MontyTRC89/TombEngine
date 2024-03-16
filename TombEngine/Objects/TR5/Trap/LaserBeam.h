@@ -11,11 +11,12 @@ namespace TEN::Traps::TR5
 	struct LaserBeamEffect
 	{
 		static constexpr auto SUBDIVISION_COUNT = 8;
-		static constexpr auto VERTEX_COUNT = 4;
 
-		Vector4				Color		= Vector4::Zero;
-		BoundingOrientedBox BoundingBox = {};
-		std::array<Vector3, VERTEX_COUNT> VertexPoints = {};
+		Vector4				Color			 = Vector4::Zero;
+		BoundingOrientedBox BoundingBox		 = {};
+		std::array<Vector3, SUBDIVISION_COUNT * 2> Vertices = {};
+
+		float Radius = 0.0f;
 
 		bool IsActive		  = false;
 		bool IsLethal		  = false;

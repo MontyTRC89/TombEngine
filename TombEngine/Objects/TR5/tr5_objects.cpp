@@ -14,7 +14,7 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR5/Entity/AutoGun.h"		 // OK
+#include "Objects/TR5/Entity/AutoGun.h"			 // OK
 #include "Objects/TR5/Entity/HeavyGuard.h"		 // OK
 #include "Objects/TR5/Entity/tr5_brownbeast.h"	 // OK
 #include "Objects/TR5/Entity/tr5_chef.h"		 // OK

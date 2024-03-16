@@ -63,9 +63,6 @@ namespace TEN::Renderer
 		
 	void Renderer::PrepareLaserBarriers(RenderView& view)
 	{
-		if (LaserBarriers.empty())
-			return;
-
 		for (const auto& [itemNumber, barrier] : LaserBarriers)
 		{
 			for (const auto& beam : barrier.Beams)
@@ -82,17 +79,49 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareSingleLaserBeam(RenderView& view)
 	{
-		if (LaserBeams.empty())
-			return;
-
-		for (const auto& [itemNumber, laser] : LaserBeams)
+		for (const auto& [itemNumber, beam] : LaserBeams)
 		{
-			AddColoredQuad(
-				laser.VertexPoints[0], laser.VertexPoints[1],
-				laser.VertexPoints[2], laser.VertexPoints[3],
-				laser.Color, laser.Color,
-				laser.Color, laser.Color,
-				BlendMode::Additive, view, SpriteRenderType::LaserBarrier);
+			// Prepare cylinder tube.
+			for (int i = 0; i < LaserBeamEffect::SUBDIVISION_COUNT; i++)
+			{
+				bool isLastSubdivision = (i == (LaserBeamEffect::SUBDIVISION_COUNT - 1));
+
+				AddColoredQuad(
+					beam.Vertices[i],
+					beam.Vertices[isLastSubdivision ? 0 : (i + 1)],
+					beam.Vertices[LaserBeamEffect::SUBDIVISION_COUNT + (isLastSubdivision ? 0 : (i + 1))],
+					beam.Vertices[LaserBeamEffect::SUBDIVISION_COUNT + i],
+					beam.Color, beam.Color,
+					beam.Color, beam.Color,
+					BlendMode::Additive, view, SpriteRenderType::Default);
+			}
+
+			// Prepare cylinder caps.
+			for (int i = 0; i < 2; i++)
+			{
+				int baseIndex = LaserBeamEffect::SUBDIVISION_COUNT * i;
+
+				AddColoredQuad(
+					beam.Vertices[baseIndex + 0], beam.Vertices[baseIndex + 1],
+					beam.Vertices[baseIndex + 2], beam.Vertices[baseIndex + 3],
+					beam.Color, beam.Color,
+					beam.Color, beam.Color,
+					BlendMode::Additive, view, SpriteRenderType::Default);
+
+				AddColoredQuad(
+					beam.Vertices[baseIndex + 0], beam.Vertices[baseIndex + 3],
+					beam.Vertices[baseIndex + 4], beam.Vertices[baseIndex + 7],
+					beam.Color, beam.Color,
+					beam.Color, beam.Color,
+					BlendMode::Additive, view, SpriteRenderType::Default);
+
+				AddColoredQuad(
+					beam.Vertices[baseIndex + 4], beam.Vertices[baseIndex + 5],
+					beam.Vertices[baseIndex + 6], beam.Vertices[baseIndex + 7],
+					beam.Color, beam.Color,
+					beam.Color, beam.Color,
+					BlendMode::Additive, view, SpriteRenderType::Default);
+			}
 		}
 	}
 
