@@ -77,6 +77,11 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		output = DoLaserBarrierEffect(input.Position, output, input.UV, FADE_FACTOR, Frame);
 	}
 
+	if (RenderType == 2)
+	{
+		output = DoLaserBeamEffect(input.Position, output, input.UV, FADE_FACTOR, Frame);
+	}
+
 	output.xyz -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
 	output.xyz = saturate(output.xyz);
 	
