@@ -133,7 +133,7 @@ namespace TEN::Traps::TR5
 		BoundingBox = BoundingOrientedBox(center, extents, orient.ToQuaternion());
 
 		// DEBUG
-		g_Renderer.AddDebugBox(BoundingBox, Vector4::One);
+		//g_Renderer.AddDebugBox(BoundingBox, Vector4::One);
 	}
 
 	void InitializeLaserBeam(short itemNumber)
