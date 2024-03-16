@@ -6,13 +6,14 @@
 struct ItemInfo;
 struct MESH_INFO;
 
-using GameObjectPtr = std::variant<ItemInfo*, MESH_INFO*>;
+using ItemSpherePair = std::pair<ItemInfo*, int>;
+using LosObjectPtr	 = std::variant<ItemInfo*, MESH_INFO*, ItemSpherePair>;
 
 constexpr auto NO_LOS_ITEM = INT_MAX;
 
 struct LosInstanceData
 {
-	std::optional<GameObjectPtr> ObjectPtr = std::nullopt;
+	std::optional<LosObjectPtr> ObjectPtr = std::nullopt;
 
 	Vector3 Position   = Vector3::Zero;
 	int		RoomNumber = 0;
@@ -21,7 +22,8 @@ struct LosInstanceData
 };
 
 // WIP new LOS functions.
-std::vector<LosInstanceData>		   GetLosInstances(const Vector3& origin, int originRoomNumber, const Vector3& dir, float dist);
+std::vector<LosInstanceData>		   GetLosInstances(const Vector3& origin, int originRoomNumber, const Vector3& dir, float dist,
+													   bool collideItems = true, bool collideStatics = true, bool collideSpheres = false);
 std::optional<std::pair<Vector3, int>> GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber,
 												  std::optional<std::set<int>*> roomNumbers = std::nullopt);
 std::optional<Vector3>				   GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid);

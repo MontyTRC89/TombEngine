@@ -73,9 +73,10 @@ static std::vector<MESH_INFO*> GetNearbyStaticPtrs(const std::set<int>& roomNumb
 	return staticPtrs;
 }
 
-std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumber, const Vector3& dir, float dist)
+std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
+											 bool collideItems, bool collideStatics, bool collideSpheres)
 {
-	auto losList = std::vector<LosInstanceData>{};
+	auto losInstances = std::vector<LosInstanceData>{};
 
 	// Calculate target.
 	auto target = Geometry::TranslatePoint(origin, dir, dist);
@@ -83,7 +84,7 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumb
 
 	auto losRoomNumbers = std::set<int>{};
 
-	// Collect room LOS instance.
+	// 1) Collect room LOS instance.
 	auto roomLos = GetRoomLos(origin, roomNumber, target, targetRoomNumber, &losRoomNumbers);
 	if (roomLos.has_value())
 	{
@@ -91,7 +92,7 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumb
 		targetRoomNumber = roomLos->second;
 		dist = Vector3::Distance(origin, target);
 
-		losList.push_back(LosInstanceData{ {}, roomLos->first, roomLos->second, dist });
+		losInstances.push_back(LosInstanceData{ {}, roomLos->first, roomLos->second, dist });
 	}
 
 	// Collect neighbor room numbers.
@@ -102,44 +103,70 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumb
 		roomNumbers.insert(neighborRoomNumbers.begin(), neighborRoomNumbers.end());
 	}
 
-	// Collect item LOS instances.
-	auto itemPtrs = GetNearbyItemPtrs(roomNumbers);
-	for (auto* itemPtr : itemPtrs)
+	if (collideItems || collideSpheres)
 	{
-		auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
-
-		float intersectDist = 0.0f;
-		if (box.Intersects(origin, dir, intersectDist))
+		auto itemPtrs = GetNearbyItemPtrs(roomNumbers);
+		for (auto* itemPtr : itemPtrs)
 		{
-			if (intersectDist <= dist)
-				losList.push_back(LosInstanceData{ itemPtr, Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
+			// 2) Collect item LOS instances.
+			if (collideItems)
+			{
+				auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
+
+				float intersectDist = 0.0f;
+				if (box.Intersects(origin, dir, intersectDist))
+				{
+					if (intersectDist <= dist)
+						losInstances.push_back(LosInstanceData{ itemPtr, Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
+				}
+			}
+
+			// 3) Collect item sphere LOS instances.
+			if (collideSpheres)
+			{
+				int sphereCount = GetSpheres(itemPtr, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+				for (int i = 0; i < sphereCount; i++)
+				{
+					auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
+
+					float intersectDist = 0.0f;
+					if (sphere.Intersects(origin, dir, intersectDist))
+					{
+						if (intersectDist <= dist)
+							losInstances.push_back(LosInstanceData{ ItemSpherePair(itemPtr, i), Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
+					}
+				}
+			}
 		}
 	}
 
-	// Collect static LOS instances.
-	auto staticPtrs = GetNearbyStaticPtrs(roomNumbers);
-	for (auto* staticPtr : staticPtrs)
+	// 4) Collect static LOS instances.
+	if (collideStatics)
 	{
-		auto box = GetBoundsAccurate(*staticPtr, false).ToBoundingOrientedBox(staticPtr->pos);
-
-		float intersectDist = 0.0f;
-		if (box.Intersects(origin, dir, intersectDist))
+		auto staticPtrs = GetNearbyStaticPtrs(roomNumbers);
+		for (auto* staticPtr : staticPtrs)
 		{
-			if (intersectDist <= dist)
-				losList.push_back(LosInstanceData{ staticPtr, Geometry::TranslatePoint(origin, dir, intersectDist), staticPtr->roomNumber, intersectDist });
+			auto box = GetBoundsAccurate(*staticPtr, false).ToBoundingOrientedBox(staticPtr->pos);
+
+			float intersectDist = 0.0f;
+			if (box.Intersects(origin, dir, intersectDist))
+			{
+				if (intersectDist <= dist)
+					losInstances.push_back(LosInstanceData{ staticPtr, Geometry::TranslatePoint(origin, dir, intersectDist), staticPtr->roomNumber, intersectDist });
+			}
 		}
 	}
 
 	// Sort LOS instances by distance.
 	std::sort(
-		losList.begin(), losList.end(),
+		losInstances.begin(), losInstances.end(),
 		[](const auto& los0, const auto& los1)
 		{
 			return (los0.Distance < los1.Distance);
 		});
 
 	// Return room and object LOS instances sorted by distance.
-	return losList;
+	return losInstances;
 }
 
 // TODO: Accurate room LOS.
@@ -194,40 +221,6 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 	}
 
 	return std::nullopt;
-
-	// Old version.
-	// Run through neighbor rooms.
-	/*const auto& room = g_Level.Rooms[roomNumber];
-	for (int neighborRoomNumber : room.neighbors)
-	{
-		// Get neighbor room.
-		const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-		if (!neighborRoom.Active())
-			continue;
-
-		// Run through statics.
-		for (const auto& staticObject : g_Level.Rooms[neighborRoomNumber].mesh)
-		{
-			// Check if static is visible.
-			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
-				continue;
-
-			// Check if static is solid (if applicable).
-			if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
-				continue;
-
-			// Test ray-box intersection.
-			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
-			float intersectDist = 0.0f;
-			if (box.Intersects(origin, dir, intersectDist))
-			{
-				if (intersectDist <= dist)
-					return Geometry::TranslatePoint(origin, dir, dist);
-			}
-		}
-	}
-
-	return std::nullopt;*/
 }
 
 static int xLOS(const GameVector& origin, GameVector& target, std::optional<std::set<int>*> roomNumbers)
