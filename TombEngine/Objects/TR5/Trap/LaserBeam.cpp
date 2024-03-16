@@ -28,7 +28,7 @@ namespace TEN::Traps::TR5
 
 	void LaserBeamEffect::Initialize(const ItemInfo& item)
 	{
-		constexpr auto RADIUS_STEP = BLOCK(0.01f);
+		constexpr auto RADIUS_STEP = BLOCK(0.002f);
 
 		Color = item.Model.Color;
 		Color.w = 1.0f;

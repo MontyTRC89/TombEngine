@@ -159,8 +159,8 @@ float4 DoLaserBarrierEffect(float3 input, float4 output, float2 uv, float faceFa
 	uv83.y = (uv.y + (timeUniform * 0.02));
 	noiseValue3 = NebularNoise(uv83, frequency, amplitude, persistence);
 
-	noiseValue2 += AnimatedNebula(uv/2, timeUniform * 0.05f);
-	
+	noiseValue2 += AnimatedNebula(uv / 2, timeUniform * 0.05f);
+
 	color.rgb *= noiseValue2 + 0.6f;
 	color.rgb += noiseValue3;
 	color.a *= noiseValue + 0.01f;
@@ -214,6 +214,11 @@ float4 DoLaserBeamEffect(float3 input, float4 output, float2 uv, float faceFacto
 	float gradT = smoothstep(0.0, 0.25, uv.y);
 	float gradB = 1.0 - smoothstep(0.75, 1.0, uv.y);
 
+
+	// Stretching the UV coordinates
+	float stretchFactor = 0.005f; // Adjust this value as needed to control the stretching
+	uv.x *= stretchFactor;
+
 	float distortion = timeUniform / 1024;
 
 	float3 noisix = SimplexNoise
@@ -237,10 +242,10 @@ float4 DoLaserBeamEffect(float3 input, float4 output, float2 uv, float faceFacto
 	float noiseValue2 = 0;
 	float noiseValue3 = 0;
 
-	float2 uv84 = (uv * 2.4);
+	float2 uv84 = (uv * 1.4);
 	uv84.y = (uv84.y - 1.3);
 	uv84.x = (uv84.x / 1.3);
-	float2 uv85 = (uv / 2.4);
+	float2 uv85 = (uv / 1.4);
 
 	noiseValue2 = AnimatedNebula(uv84, timeUniform * 0.1f);
 
@@ -248,12 +253,12 @@ float4 DoLaserBeamEffect(float3 input, float4 output, float2 uv, float faceFacto
 	amplitude = 0.2;
 	persistence = 4.7;
 
-	float2 uv83 = uv * 8;
+	float2 uv83 = uv * 6;
 	uv83.y = (uv.y + (timeUniform * 0.02));
 	noiseValue3 = NebularNoise(uv83, frequency, amplitude, persistence);
 
-	noiseValue2 += AnimatedNebula(uv/2, timeUniform * 0.05f);
-	
+	noiseValue2 += AnimatedNebula(uv / 2, timeUniform * 0.05f);
+
 	color.rgb *= noiseValue2 + 0.6f;
 	color.rgb += noiseValue3;
 	color.a *= noiseValue + 0.01f;
@@ -268,10 +273,10 @@ float4 DoLaserBeamEffect(float3 input, float4 output, float2 uv, float faceFacto
 	float fade2 = faceFactor * max(0.0, 1.0 - dot(float2(BLENDING, BLENDING), float2(gradR, gradB)));
 	float fade3 = faceFactor * max(0.0, 1.0 - dot(float2(BLENDING, BLENDING), float2(gradR, gradT)));
 
-	float fadeL = 1.40f * faceFactor * faceFactor * (1.0 - gradL);
-	float fadeB = 2.75f * faceFactor * faceFactor * (1.0 - gradB);
-	float fadeR = 1.40f * faceFactor * faceFactor * (1.0 - gradR);
-	float fadeT = 2.75f * faceFactor * faceFactor * (1.0 - gradT);
+	float fadeL = 0; //fade out hight
+	float fadeB = 1.0f * faceFactor * faceFactor * (1.0 - gradB); //fade out width
+	float fadeR = 0; //fade out hight
+	float fadeT = 1.0f * faceFactor * faceFactor * (1.0 - gradT);//fade out width
 
 	float fade = max(
 		max(max(fade0, fade1), max(fade2, fade3)),
@@ -290,7 +295,7 @@ float4 DoLaserBeamEffect(float3 input, float4 output, float2 uv, float faceFacto
 		decayFactor = (1.0f - uv.y) / 2;
 	}
 	color *= decayFactor;
-
+	color.rgb *= 0.17; // Adjust the factor as needed to reduce brightness. Don't change
 	color.rgb = smoothstep(ZERO, EIGHT_FIVE, color.rgb);
 	return color;
 }
