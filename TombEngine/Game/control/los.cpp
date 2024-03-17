@@ -73,19 +73,19 @@ static std::vector<MESH_INFO*> GetNearbyStaticPtrs(const std::set<int>& roomNumb
 	return staticPtrs;
 }
 
-std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
+std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRoomNumber, const Vector3& dir, float dist,
 											 bool collideItems, bool collideStatics, bool collideSpheres)
 {
 	auto losInstances = std::vector<LosInstanceData>{};
 
 	// Calculate target.
 	auto target = Geometry::TranslatePoint(origin, dir, dist);
-	int targetRoomNumber = GetCollision(origin, roomNumber, dir, dist).RoomNumber;
+	int targetRoomNumber = GetCollision(origin, originRoomNumber, dir, dist).RoomNumber;
 
 	auto losRoomNumbers = std::set<int>{};
 
 	// 1) Collect room LOS instance.
-	auto roomLos = GetRoomLos(origin, roomNumber, target, targetRoomNumber, &losRoomNumbers);
+	auto roomLos = GetRoomLos(origin, originRoomNumber, target, targetRoomNumber, &losRoomNumbers);
 	if (roomLos.has_value())
 	{
 		target = roomLos->first;
@@ -160,9 +160,9 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumb
 	// Sort LOS instances by distance.
 	std::sort(
 		losInstances.begin(), losInstances.end(),
-		[](const auto& los0, const auto& los1)
+		[](const auto& losInstance0, const auto& losInstance1)
 		{
-			return (los0.Distance < los1.Distance);
+			return (losInstance0.Distance < losInstance1.Distance);
 		});
 
 	// Return room and object LOS instances sorted by distance.
