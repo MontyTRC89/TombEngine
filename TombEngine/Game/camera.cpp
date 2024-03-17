@@ -88,14 +88,11 @@ float CinematicBarsSpeed = 0;
 // HELPER FUNCTIONS
 // ----------------
 
-// IsCameraCollidableItem()
-// IsCameraCollidableStatic()
-
 // GetCameraLos()
 // GetCameraRelativeShift()
 // GetCameraPlayerOffset()
 
-static bool IsCameraCollidableBox(const BoundingOrientedBox& box)
+static bool TestCameraCollidableBox(const BoundingOrientedBox& box)
 {
 	// Test if any 2 box extents are smaller than threshold.
 	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
@@ -108,7 +105,7 @@ static bool IsCameraCollidableBox(const BoundingOrientedBox& box)
 	return true;
 }
 
-static bool IsCameraCollidableItem(const ItemInfo& item)
+static bool TestCameraCollidableItem(const ItemInfo& item)
 {
 	// 1) Check if item is player.
 	if (item.ObjectNumber == ID_LARA)
@@ -134,13 +131,13 @@ static bool IsCameraCollidableItem(const ItemInfo& item)
 
 	// 6) Test if box is collidable.
 	auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-	if (!IsCameraCollidableBox(box))
+	if (!TestCameraCollidableBox(box))
 		return false;
 
 	return true;
 }
 
-static bool IsCameraCollidableStatic(const MESH_INFO& staticObject)
+static bool TestCameraCollidableStatic(const MESH_INFO& staticObject)
 {
 	// 1) Test distance.
 	float distSqr = Vector3i::DistanceSquared(Camera.Position, staticObject.pos.Position);
@@ -153,7 +150,7 @@ static bool IsCameraCollidableStatic(const MESH_INFO& staticObject)
 
 	// 3) Test if box is collidable.
 	auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
-	if (!IsCameraCollidableBox(box))
+	if (!TestCameraCollidableBox(box))
 		return false;
 
 	return true;
@@ -167,12 +164,8 @@ static std::optional<std::pair<Vector3, int>> GetCameraLos(const Vector3& origin
 	dir.Normalize();
 	float dist = Vector3::Distance(origin, target);
 
-	// No intersection; return nullopt.
+	// Run through LOS instances.
 	auto losInstances = GetLosInstances(origin, originRoomNumber, dir, dist);
-	if (losInstances.empty())
-		return std::nullopt;
-
-	// Get LOS intersection.
 	for (auto& losInstance : losInstances)
 	{
 		// Test object collidability (if applicable).
@@ -181,14 +174,14 @@ static std::optional<std::pair<Vector3, int>> GetCameraLos(const Vector3& origin
 			if (std::holds_alternative<ItemInfo*>(*losInstance.ObjectPtr))
 			{
 				const auto& item = *std::get<ItemInfo*>(*losInstance.ObjectPtr);
-				if (!IsCameraCollidableItem(item))
+				if (!TestCameraCollidableItem(item))
 					continue;
 
 			}
 			else if (std::holds_alternative<MESH_INFO*>(*losInstance.ObjectPtr))
 			{
 				const auto& staticObject = *std::get<MESH_INFO*>(*losInstance.ObjectPtr);
-				if (!IsCameraCollidableStatic(staticObject))
+				if (!TestCameraCollidableStatic(staticObject))
 					continue;
 			}
 		}
