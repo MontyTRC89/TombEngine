@@ -156,7 +156,7 @@ static bool TestCameraCollidableStatic(const MESH_INFO& staticObject)
 	return true;
 }
 
-static std::optional<std::pair<Vector3, int>> GetCameraLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber)
+static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber)
 {
 	constexpr auto BUFFER = BLOCK(0.1f);
 
@@ -450,7 +450,7 @@ void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, dist).RoomNumber;
 
 	// Calculate LOS intersection.
-	auto intersect = GetCameraLos(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
+	auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
 	if (intersect.has_value())
 	{
 		idealPos = intersect->first;
@@ -739,7 +739,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, Camera.targetDistance).RoomNumber;
 
 		// Calculate LOS intersection.
-		auto intersect = GetCameraLos(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
+		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
 		if (intersect.has_value())
 		{
 			idealPos = intersect->first;
@@ -764,22 +764,22 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			auto idealPos = Geometry::TranslatePoint(Camera.LookAt, dir, Camera.targetDistance);
 			int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, Camera.targetDistance).RoomNumber;
 
-			// Assess room LOS.
-			auto lookAt = GameVector(Camera.LookAt, Camera.LookAtRoomNumber);
-			auto roomLosIntersect = GameVector(idealPos, idealRoomNumber);
-
-			bool los = LOSAndReturnTarget(&lookAt, &roomLosIntersect, 0);
-			float dist = Vector3::Distance(lookAt.ToVector3(), roomLosIntersect.ToVector3());
-			idealPos = Geometry::TranslatePoint(Camera.LookAt, dir, dist);
-
-			if (los)
+			// Assess LOS.
+			auto losIntersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
+			if (losIntersect.has_value())
 			{
-				if (i == 0 || LOSAndReturnTarget(&roomLosIntersect, &GameVector(Camera.Position, Camera.RoomNumber), 0))
+				idealPos = losIntersect->first;
+				idealRoomNumber = losIntersect->second;
+			}
+
+			if (!losIntersect.has_value())
+			{
+				if (i == 0 || !GetCameraLosIntersect(idealPos, idealRoomNumber, Camera.Position, Camera.RoomNumber).has_value())
 				{
 					// Position directly behind is ideal; set and break loop.
 					if (i == 0)
 					{
-						farthestIdealPos = std::pair(idealPos, roomLosIntersect.RoomNumber);
+						farthestIdealPos = std::pair(idealPos, idealRoomNumber);
 						farthestIdealAzimuthAngle = azimuthAngle;
 						break;
 					}
@@ -787,7 +787,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 					float distSqr = Vector3::DistanceSquared(Camera.Position, idealPos);
 					if (distSqr < farthestDistSqr)
 					{
-						farthestIdealPos = std::pair(idealPos, roomLosIntersect.RoomNumber);
+						farthestIdealPos = std::pair(idealPos, idealRoomNumber);
 						farthestIdealAzimuthAngle = azimuthAngle;
 						farthestDistSqr = distSqr;
 					}
@@ -798,7 +798,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 				float distSqr = Vector3::DistanceSquared(Camera.LookAt, idealPos);
 				if (distSqr > SQUARE(BLOCK(0.75f)))
 				{
-					farthestIdealPos = std::pair(idealPos, roomLosIntersect.RoomNumber);
+					farthestIdealPos = std::pair(idealPos, idealRoomNumber);
 					farthestIdealAzimuthAngle = azimuthAngle;
 					break;
 				}
@@ -814,11 +814,6 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			if (Camera.oldType == CameraType::Fixed)
 				Camera.speed = 1.0f;
 		}
-
-		// Calculate LOS intersection.
-		auto intersect = GetCameraLos(Camera.LookAt, Camera.LookAtRoomNumber, farthestIdealPos.first, farthestIdealPos.second);
-		if (intersect.has_value())
-			farthestIdealPos = *intersect;
 
 		MoveCamera(playerItem, farthestIdealPos.first, farthestIdealPos.second, Camera.speed);
 	}
