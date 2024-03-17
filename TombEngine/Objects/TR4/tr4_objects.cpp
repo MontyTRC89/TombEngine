@@ -954,6 +954,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_SQUISHY_BLOCK1];
 		if (obj->loaded)
 		{
+			obj->Initialize = InitializeSquishyBlock;
 			obj->control = ControlSquishyBlock;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
