@@ -160,15 +160,24 @@ void InitializeLaraStartPosition(ItemInfo& playerItem)
 		if (!item.TriggerFlags || item.TriggerFlags != RequiredStartPos)
 			continue;
 
+		// HACK: For some reason, player can't be immediately updated and moved on loading.
+		// We need to simulate "game loop" happening, so that its position actually updates on the next loop.
+		// However, room number must be also manually set in advance, so that startup animation detection
+		// won't fail (otherwise player may start crouching because probe uses previous room number).
+
+		InItemControlLoop = true;
+
 		playerItem.Pose = item.Pose;
 		ItemNewRoom(playerItem.Index, item.RoomNumber);
+
+		playerItem.RoomNumber = playerItem.Location.RoomNumber = item.RoomNumber;
+		playerItem.Location.Height = playerItem.Pose.Position.y;
+
+		InItemControlLoop = false;
 
 		TENLog("Player start position has been set according to start position object with index " + std::to_string(item.TriggerFlags) + ".", LogLevel::Info);
 		break;
 	}
-
-	playerItem.Location.RoomNumber = playerItem.RoomNumber;
-	playerItem.Location.Height = playerItem.Pose.Position.y;
 }
 
 void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup)
