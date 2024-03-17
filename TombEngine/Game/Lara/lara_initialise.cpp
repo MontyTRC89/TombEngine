@@ -168,16 +168,17 @@ void InitializeLaraStartPosition(ItemInfo& playerItem)
 		InItemControlLoop = true;
 
 		playerItem.Pose = item.Pose;
+		playerItem.RoomNumber = item.RoomNumber;
 		ItemNewRoom(playerItem.Index, item.RoomNumber);
-
-		playerItem.RoomNumber = playerItem.Location.RoomNumber = item.RoomNumber;
-		playerItem.Location.Height = playerItem.Pose.Position.y;
 
 		InItemControlLoop = false;
 
 		TENLog("Player start position has been set according to start position object with index " + std::to_string(item.TriggerFlags) + ".", LogLevel::Info);
 		break;
 	}
+
+	playerItem.Location.RoomNumber = playerItem.RoomNumber;
+	playerItem.Location.Height = playerItem.Pose.Position.y;
 }
 
 void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup)
