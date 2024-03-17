@@ -70,6 +70,7 @@
 #include "Objects/TR4/Trap/tr4_plough.h"
 #include "Objects/TR4/Trap/tr4_sethblade.h"
 #include "Objects/TR4/Trap/tr4_slicerdicer.h"
+#include "Objects/TR4/Trap/SquishyBlock.h"
 #include "Objects/TR4/Trap/tr4_spikeball.h"
 #include "Objects/TR4/Trap/tr4_stargate.h"
 #include "Objects/TR4/Trap/tr4_cog.h"
@@ -947,6 +948,22 @@ namespace TEN::Entities
 		{
 			obj->control = HammerControl;
 			obj->collision = GenericSphereBoxCollision;
+			obj->SetHitEffect(true);
+		}
+
+		obj = &Objects[ID_SQUISHY_BLOCK1];
+		if (obj->loaded)
+		{
+			obj->control = ControlSquishyBlock;
+			obj->collision = GenericSphereBoxCollision;
+			obj->SetHitEffect(true);
+		}
+
+		obj = &Objects[ID_SQUISHY_BLOCK2];
+		if (obj->loaded)
+		{
+			obj->control = ControlFallingSquishyBlock;
+			obj->collision = FallingSquishyBlockCollision;
 			obj->SetHitEffect(true);
 		}
 	}

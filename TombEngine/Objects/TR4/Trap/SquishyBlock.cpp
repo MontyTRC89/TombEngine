@@ -2,6 +2,7 @@
 #include "Objects/TR4/Trap/SquishyBlock.h"
 
 #include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
@@ -13,95 +14,79 @@
 #include "Specific/level.h"
 
 namespace TEN::Entities::Traps
-{
-	
-	void ControlLRSquishyBlock(short item_number)
+{	
+	void ControlSquishyBlock(short itemNumber)
 	{
-		ITEM_INFO* item;
-		ushort ang;
+		auto& item = g_Level.Items[itemNumber];
+
+		short ang;
 		short frame;
 
-		item = &items[item_number];
-
-		if (!TriggerActive(item))
+		if (!TriggerActive(&item))
 			return;
 
-		frame = item->frame_number - anims[item->anim_number].frame_base;
+		frame = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 
-		if (item->touch_bits)
+		if (&item.TouchBits)
 		{
-			ang = (ushort)phd_atan(item->pos.z_pos - lara_item->pos.z_pos, item->pos.x_pos - lara_item->pos.x_pos) - item->pos.y_rot;
+			ang = (short)phd_atan(item.Pose.Position.z - LaraItem->Pose.Position.z, item.Pose.Position.x - LaraItem->Pose.Position.x) - item.Pose.Orientation.y;
 
 			if (!frame && ang > 0xA000 && ang < 0xE000)
 			{
-				item->item_flags[0] = 9;
-				lara_item->hit_points = 0;
-				lara_item->pos.y_rot = item->pos.y_rot - 0x4000;
+				item.ItemFlags[0] = 9;
+				LaraItem->HitPoints = 0;
+				LaraItem->Pose.Orientation.y = item.Pose.Orientation.y - 0x4000;
 			}
 			else if (frame == 33 && ang > 0x2000 && ang < 0x6000)
 			{
-				item->item_flags[0] = 42;
-				lara_item->hit_points = 0;
-				lara_item->pos.y_rot = item->pos.y_rot + 0x4000;
+				item.ItemFlags[0] = 42;
+				LaraItem->HitPoints = 0;
+				LaraItem->Pose.Orientation.y = item.Pose.Orientation.y + 0x4000;
 			}
 		}
 
-		if (!item->item_flags[0] || frame != item->item_flags[0])
-			AnimateItem(item);
+		if (!item.ItemFlags[0] || frame != item.ItemFlags[0])
+			AnimateItem(&item);
 	}
 
-
-
-
-	void FallingSquishyBlockCollision(short item_number, ITEM_INFO* l, COLL_INFO* coll)
+	void FallingSquishyBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		ItemInfo* item;
+		auto& item = g_Level.Items[itemNumber];
 
-		item = &items[item_number];
-
-		if (TestBoundsCollide(item, l, coll->radius) && TestCollision(item, l))
+		if (TestBoundsCollide(&item, laraItem, coll->Setup.Radius) && TestCollision(&item, laraItem))
 		{
-			if (item->frame_number - anims[item->anim_number].frame_base <= 8)
+			if (item.Animation.FrameNumber - GetAnimData(item).frameBase <= 8)
 			{
-				item->frame_number += 2;
-				l->hit_points = 0;
-				l->current_anim_state = AS_DEATH;
-				l->goal_anim_state = AS_DEATH;
-				l->anim_number = ANIM_FBLOCK_DEATH;
-				l->frame_number = anims[ANIM_FBLOCK_DEATH].frame_base + 50;
-				l->fallspeed = 0;
-				l->speed = 0;
-
-				for (int i = 0; i < 12; i++)
-					TriggerBlood(l->pos.x_pos, l->pos.y_pos - 128, l->pos.z_pos, GetRandomControl() << 1, 3);
+				item.Animation.FrameNumber += 2;
+				laraItem->HitPoints = 0;
+				SetAnimation(laraItem, LA_BOULDER_DEATH);
+				laraItem->Animation.Velocity.z = 0;
+				laraItem->Animation.Velocity.y = 0;		
 			}
-			else if (l->hit_points > 0)
-				ItemPushLara(item, l, coll, 0, 1);
+			else if (laraItem->HitPoints > 0)
+				ItemPushItem(&item, laraItem, coll, false, 1);
 		}
 	}
 
-	void ControlFallingSquishyBlock(short item_number)
+	void ControlFallingSquishyBlock(short itemNumber)
 	{
-		ITEM_INFO* item;
+		auto& item = g_Level.Items[itemNumber];
 
-		item = &items[item_number];
-
-		if (TriggerActive(item))
+		if (TriggerActive(&item))
 		{
-			if (item->item_flags[0] < 60)
+			if (item.ItemFlags[0] < 60)
 			{
-				SoundEffect(SFX_EARTHQUAKE_LOOP, &item->pos, SFX_DEFAULT);
-				camera.bounce = (item->item_flags[0] - 92) >> 1;
-				item->item_flags[0]++;
+				SoundEffect(SFX_TR4_EARTHQUAKE_LOOP, &item.Pose);
+				Camera.bounce = (item.ItemFlags[0] - 92) >> 1;
+				item.ItemFlags[0]++;
 			}
 			else
 			{
-				if (item->frame_number - anims[item->anim_number].frame_base == 8)
-					camera.bounce = -96;
+				if (item.Animation.FrameNumber - GetAnimData(item).frameBase == 8)
+					Camera.bounce = -96;
 
-				AnimateItem(item);
+				AnimateItem(&item);
 			}
 		}
 	}
-
 }
