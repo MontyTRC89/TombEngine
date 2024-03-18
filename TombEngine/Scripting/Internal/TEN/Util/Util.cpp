@@ -44,7 +44,7 @@ namespace TEN::Scripting::Util
 
 		auto vector = Vector3i::Zero;
 		return (LOS(&vector0, &vector1) &&
-			ObjectOnLOS2(&vector0, &vector1, &vector, nullptr) == NO_LOS_ITEM);
+			ObjectOnLOS2(&vector0, &vector1, &vector, nullptr) == NO_VALUE);
 	}
 
 	///Calculate the distance between two positions.
@@ -143,7 +143,7 @@ namespace TEN::Scripting::Util
 		auto vector = Vector3i::Zero;
 		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, nullptr, GAME_OBJECT_ID::ID_LARA);
 
-		if (itemNumber == NO_LOS_ITEM || itemNumber < 0)
+		if (itemNumber == NO_VALUE || itemNumber < 0)
 			return sol::nullopt;
 
 		return std::make_unique<Moveable>(itemNumber);
@@ -162,7 +162,7 @@ namespace TEN::Scripting::Util
 		auto vector = Vector3i::Zero;
 		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, &mesh, GAME_OBJECT_ID::ID_LARA);
 
-		if (itemNumber == NO_LOS_ITEM || itemNumber >= 0)
+		if (itemNumber == NO_VALUE || itemNumber >= 0)
 			return sol::nullopt;
 
 		return std::make_unique<Static>(*mesh);

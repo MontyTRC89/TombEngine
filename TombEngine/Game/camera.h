@@ -33,17 +33,22 @@ enum class CameraFlag
 {
 	Vector3 Position		 = Vector3::Zero;
 	int		RoomNumber		 = 0;
-	Vector3 LookAt			 = Vector3::Zero;
-	int		LookAtRoomNumber = 0;
+	Vector3 PositionTarget	 = Vector3::Zero;
+	int		RoomNumberTarget = 0;
 
-	float DistanceTarget   = 0.0f;
-	float SpeedAlpha	   = 0.0f;
-	float SpeedAlphaTarget = 0.0f;
+	Vector3 LookAt				   = Vector3::Zero;
+	int		LookAtRoomNumber	   = 0;
+	Vector3 LookAtTarget		   = Vector3::Zero;
+	int		LookAtRoomNumberTarget = 0;
 
 	short AzimuthAngle		  = 0;
 	short AzimuthAngleTarget  = 0;
 	short AltitudeAngle		  = 0;
 	short AltitudeAngleTarget = 0;
+	float Distance		   = 0.0f;
+	float DistanceTarget   = 0.0f;
+
+	float SpeedAlpha = 0.0f;
 };
 
 class CameraObject

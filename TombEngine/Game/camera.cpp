@@ -171,6 +171,10 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 		// Test object collidability (if applicable).
 		if (losInstance.ObjectPtr.has_value())
 		{
+			// FAILSAFE: Ignore sphere.
+			if (losInstance.SphereID != NO_VALUE)
+				continue;
+
 			if (std::holds_alternative<ItemInfo*>(*losInstance.ObjectPtr))
 			{
 				const auto& item = *std::get<ItemInfo*>(*losInstance.ObjectPtr);
@@ -189,7 +193,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 		float intersectDist = Vector3::Distance(origin, losInstance.Position);
 		intersectDist = ((intersectDist - BUFFER) >= BUFFER) ? (intersectDist - BUFFER) : BUFFER;
 
-		// Calculate and return intersection with applied buffer.
+		// Calculate and return intersection with distance buffer applied.
 		auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
 		int intersectRoomNumber = GetCollision(origin, originRoomNumber, dir, intersectDist).RoomNumber;
 		return std::pair(intersectPos, intersectRoomNumber);

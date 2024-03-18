@@ -137,9 +137,9 @@ bool Targetable(ItemInfo* item, AI_INFO* ai)
 	Vector3i vector = {};
 	int losItemIndex = ObjectOnLOS2(&origin, &target, &vector, &mesh);
 	if (losItemIndex == item->Index)
-		losItemIndex = NO_LOS_ITEM; // Don't find itself
+		losItemIndex = NO_VALUE; // Don't find itself
 
-	return (LOS(&origin, &target) && losItemIndex == NO_LOS_ITEM && mesh == nullptr);
+	return (LOS(&origin, &target) && losItemIndex == NO_VALUE && mesh == nullptr);
 }
 
 bool TargetVisible(ItemInfo* item, AI_INFO* ai, float maxAngleInDegrees)

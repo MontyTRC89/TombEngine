@@ -90,7 +90,7 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRo
 		targetRoomNumber = roomLos->second;
 		dist = Vector3::Distance(origin, target);
 
-		losInstances.push_back(LosInstanceData{ {}, roomLos->first, roomLos->second, dist });
+		losInstances.push_back(LosInstanceData{ {}, NO_VALUE, roomLos->first, roomLos->second, dist });
 	}
 
 	// Collect neighbor room numbers.
@@ -115,7 +115,7 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRo
 				if (box.Intersects(origin, dir, intersectDist))
 				{
 					if (intersectDist <= dist)
-						losInstances.push_back(LosInstanceData{ itemPtr, Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
+						losInstances.push_back(LosInstanceData{ itemPtr, NO_VALUE, Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
 				}
 			}
 
@@ -131,7 +131,7 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRo
 					if (sphere.Intersects(origin, dir, intersectDist))
 					{
 						if (intersectDist <= dist)
-							losInstances.push_back(LosInstanceData{ ItemSpherePair(itemPtr, i), Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
+							losInstances.push_back(LosInstanceData{ itemPtr, i, Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
 					}
 				}
 			}
@@ -150,7 +150,7 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRo
 			if (box.Intersects(origin, dir, intersectDist))
 			{
 				if (intersectDist <= dist)
-					losInstances.push_back(LosInstanceData{ staticPtr, Geometry::TranslatePoint(origin, dir, intersectDist), staticPtr->roomNumber, intersectDist });
+					losInstances.push_back(LosInstanceData{ staticPtr, NO_VALUE, Geometry::TranslatePoint(origin, dir, intersectDist), staticPtr->roomNumber, intersectDist });
 			}
 		}
 	}
@@ -167,7 +167,7 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRo
 	return losInstances;
 }
 
-// TODO: Accurate room LOS. For now it simply wraps legacy functions.
+// TODO: Accurate room LOS. For now, it simply wraps legacy functions.
 std::optional<std::pair<Vector3, int>> GetRoomLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber,
 														   std::optional<std::set<int>*> roomNumbers)
 {
@@ -205,12 +205,19 @@ std::optional<std::pair<Vector3, int>> GetItemLosIntersect(const Vector3& origin
 	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, true, false);
 	for (const auto& losInstance : losInstances)
 	{
+		// 1) FAILSAFE: Ignore sphere.
+		if (losInstance.SphereID != NO_VALUE)
+			continue;
+
+		// 2) Check for object.
 		if (!losInstance.ObjectPtr.has_value())
 			continue;
 
+		// 3) Check if object is item.
 		if (!std::holds_alternative<ItemInfo*>(*losInstance.ObjectPtr))
 			continue;
 
+		// 4) Check if item is not player (if applicable).
 		if (ignorePlayer)
 		{
 			const auto& item = std::get<ItemInfo*>(*losInstance.ObjectPtr);
@@ -230,13 +237,19 @@ std::optional<std::pair<Vector3, int>> GetStaticLosIntersect(const Vector3& orig
 	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false);
 	for (const auto& losInstance : losInstances)
 	{
+		// 1) FAILSAFE: Ignore sphere.
+		if (losInstance.SphereID != NO_VALUE)
+			continue;
+
+		// 2) Check for object.
 		if (!losInstance.ObjectPtr.has_value())
 			continue;
 
+		// 3) Check if object is static.
 		if (!std::holds_alternative<MESH_INFO*>(*losInstance.ObjectPtr))
 			continue;
 
-		// Check if static is solid (if applicable).
+		// 4) Check if static is solid (if applicable).
 		const auto& staticObject = *std::get<MESH_INFO*>(*losInstance.ObjectPtr);
 		if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
 			continue;
@@ -247,26 +260,33 @@ std::optional<std::pair<Vector3, int>> GetStaticLosIntersect(const Vector3& orig
 	return std::nullopt;
 }
 
-std::optional<std::pair<Vector3, int>> GetItemSphereLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
-																 bool ignorePlayer)
+std::optional<ItemSphereLosData> GetItemSphereLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
+														   bool ignorePlayer)
 {
 	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false, false, true);
 	for (const auto& losInstance : losInstances)
 	{
+		// 1) Check for sphere.
+		if (losInstance.SphereID == NO_VALUE)
+			continue;
+
+		// 2) Check for object.
 		if (!losInstance.ObjectPtr.has_value())
 			continue;
 
-		if (!std::holds_alternative<ItemSpherePair>(*losInstance.ObjectPtr))
+		// 3) Check if object is item.
+		if (!std::holds_alternative<ItemInfo*>(*losInstance.ObjectPtr))
 			continue;
 
+		// 4) Check if item is not player (if applicable).
 		if (ignorePlayer)
 		{
-			const auto& item = std::get<ItemSpherePair>(*losInstance.ObjectPtr).first;
-			if (item->ObjectNumber == ID_LARA)
+			const auto& item = *std::get<ItemInfo*>(*losInstance.ObjectPtr);
+			if (item.ObjectNumber == ID_LARA)
 				continue;
 		}
 
-		return std::pair(losInstance.Position, losInstance.RoomNumber);
+		return ItemSphereLosData{ std::pair(losInstance.Position, losInstance.RoomNumber), losInstance.SphereID };
 	}
 
 	return std::nullopt;
@@ -613,7 +633,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 	auto vector = Vector3i::Zero;
 	int itemNumber = ObjectOnLOS2(origin, target, &vector, &mesh);
 
-	if (itemNumber != NO_LOS_ITEM)
+	if (itemNumber != NO_VALUE)
 	{
 		target2.x = vector.x - ((vector.x - origin->x) >> 5);
 		target2.y = vector.y - ((vector.y - origin->y) >> 5);
@@ -980,7 +1000,7 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 
 int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObjectID)
 {
-	ClosestItem = NO_LOS_ITEM;
+	ClosestItem = NO_VALUE;
 	ClosestDist = SQUARE(target->x - origin->x) + SQUARE(target->y - origin->y) + SQUARE(target->z - origin->z);
 
 	for (int r = 0; r < NumberLosRooms; ++r)

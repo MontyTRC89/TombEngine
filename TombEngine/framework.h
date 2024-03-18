@@ -30,3 +30,5 @@ using namespace DirectX::SimpleMath;
 #else
 #define USE_FEATURE_IF_CPP20(x)
 #endif
+
+constexpr auto NO_VALUE = -1;
