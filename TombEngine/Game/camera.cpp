@@ -760,7 +760,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		float farthestDistSqr = INFINITY;
 
 		// Determine ideal position around player.
-		for (int i = 0; i < TANK_CAMERA_SWIVEL_STEP_COUNT; i++)
+		for (int i = 0; i < (TANK_CAMERA_SWIVEL_STEP_COUNT + 1); i++)
 		{
 			// Calcuate azimuth angle and direction of swivel step.
 			short azimuthAngle = (i == 0) ? Camera.actualAngle : ANGLE(90.0f * (i - 1));
@@ -807,7 +807,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			{
 				// Track farthest ideal.
 				float distSqr = Vector3::DistanceSquared(Camera.LookAt, idealPos);
-				if (distSqr > TANK_CAMERA_CLOSE_DIST_MIN)
+				if (distSqr > SQUARE(TANK_CAMERA_CLOSE_DIST_MIN))
 				{
 					farthestIdealPos = std::pair(idealPos, idealRoomNumber);
 					farthestIdealAzimuthAngle = azimuthAngle;
