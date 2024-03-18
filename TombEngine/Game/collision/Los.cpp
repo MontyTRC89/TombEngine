@@ -48,7 +48,6 @@ namespace TEN::Collision::Los
 		{
 			const auto& room = g_Level.Rooms[roomNumber];
 
-			const auto& neighborRoomNumbers = room.neighbors;
 			for (auto& neighborRoomNumber : room.neighbors)
 			{
 				// 1) Check if room is active.
