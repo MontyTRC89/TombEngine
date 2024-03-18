@@ -31,7 +31,7 @@ namespace TEN::Collision::Los
 				continue;
 
 			// 2) Test if item is in nearby room.
-			if (!Contains(roomNumbers, (int)item.RoomNumber))
+			if (!Contains(room.neighbors, (int)item.RoomNumber))
 				continue;
 
 			itemPtrs.push_back(&item);
@@ -46,14 +46,20 @@ namespace TEN::Collision::Los
 		auto staticPtrs = std::vector<MESH_INFO*>{};
 		for (int roomNumber : roomNumbers)
 		{
-			// 1) Check if room is active.
-			auto& room = g_Level.Rooms[roomNumber];
-			if (!room.Active())
-				continue;
+			const auto& room = g_Level.Rooms[roomNumber];
 
-			// 2) Run through statics in room.
-			for (auto& staticObject : room.mesh)
-				staticPtrs.push_back(&staticObject);
+			const auto& neighborRoomNumbers = room.neighbors;
+			for (auto& neighborRoomNumber : room.neighbors)
+			{
+				// 1) Check if room is active.
+				auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+				if (!neighborRoom.Active())
+					continue;
+
+				// 2) Run through statics in room.
+				for (auto& staticObject : neighborRoom.mesh)
+					staticPtrs.push_back(&staticObject);
+			}
 		}
 
 		return staticPtrs;
