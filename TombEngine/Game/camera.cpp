@@ -728,7 +728,7 @@ static void ClampCameraAltitudeAngle(bool isUnderwater)
 
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
-	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT = 4;
+	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT = 8;
 	constexpr auto TANK_CAMERA_CLOSE_DIST_MIN	 = BLOCK(0.75f);
 
 	// Move camera.
@@ -763,7 +763,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		for (int i = 0; i < (TANK_CAMERA_SWIVEL_STEP_COUNT + 1); i++)
 		{
 			// Calcuate azimuth angle and direction of swivel step.
-			short azimuthAngle = (i == 0) ? Camera.actualAngle : ANGLE(90.0f * (i - 1));
+			short azimuthAngle = (i == 0) ? Camera.actualAngle : (ANGLE(360.0f / TANK_CAMERA_SWIVEL_STEP_COUNT) * (i - 1));
 			auto dir = -EulerAngles(Camera.actualElevation, azimuthAngle, 0).ToDirection();
 
 			// Calcuate ideal position.
