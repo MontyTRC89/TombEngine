@@ -6,10 +6,12 @@
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Objects/game_object_ids.h"
+#include "Math/Math.h"
 #include "Renderer/Renderer.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
@@ -176,12 +178,12 @@ namespace TEN::Collision::Los
 		return RoomLosData{ intersect, roomNumbers };
 	}
 
-	std::optional<std::pair<Vector3, int>> GetItemLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer)
+	std::optional<ItemLosData> GetItemLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer)
 	{
 		auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, true, false);
-		for (const auto& losInstance : losInstances)
+		for (auto& losInstance : losInstances)
 		{
-			// 1) FAILSAFE: Ignore sphere.
+			// 1) FAILSAFE: Ignore sphere LOS.
 			if (losInstance.SphereID != NO_VALUE)
 				continue;
 
@@ -193,26 +195,24 @@ namespace TEN::Collision::Los
 			if (!std::holds_alternative<ItemInfo*>(*losInstance.ObjectPtr))
 				continue;
 
-			// 4) Check if item is not player (if applicable).
-			if (ignorePlayer)
-			{
-				const auto& item = std::get<ItemInfo*>(*losInstance.ObjectPtr);
-				if (item->ObjectNumber == ID_LARA)
-					continue;
-			}
+			auto& item = *std::get<ItemInfo*>(*losInstance.ObjectPtr);
 
-			return std::pair(losInstance.Position, losInstance.RoomNumber);
+			// 4) Check if item is not player (if applicable).
+			if (ignorePlayer && item.ObjectNumber == ID_LARA)
+				continue;
+
+			return ItemLosData{ item, std::pair(losInstance.Position, losInstance.RoomNumber), NO_VALUE };
 		}
 
 		return std::nullopt;
 	}
 
-	std::optional<ItemSphereLosData> GetItemSphereLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer)
+	std::optional<ItemLosData> GetItemSphereLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer)
 	{
 		auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false, false, true);
-		for (const auto& losInstance : losInstances)
+		for (auto& losInstance : losInstances)
 		{
-			// 1) Check for sphere.
+			// 1) Check for sphere LOS.
 			if (losInstance.SphereID == NO_VALUE)
 				continue;
 
@@ -224,26 +224,24 @@ namespace TEN::Collision::Los
 			if (!std::holds_alternative<ItemInfo*>(*losInstance.ObjectPtr))
 				continue;
 
-			// 4) Check if item is not player (if applicable).
-			if (ignorePlayer)
-			{
-				const auto& item = *std::get<ItemInfo*>(*losInstance.ObjectPtr);
-				if (item.ObjectNumber == ID_LARA)
-					continue;
-			}
+			auto& item = *std::get<ItemInfo*>(*losInstance.ObjectPtr);
 
-			return ItemSphereLosData{ std::pair(losInstance.Position, losInstance.RoomNumber), losInstance.SphereID };
+			// 4) Check if item is not player (if applicable).
+			if (ignorePlayer && item.ObjectNumber == ID_LARA)
+				continue;
+
+			return ItemLosData{ item, std::pair(losInstance.Position, losInstance.RoomNumber), losInstance.SphereID };
 		}
 
 		return std::nullopt;
 	}
 
-	std::optional<std::pair<Vector3, int>> GetStaticLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
+	std::optional<StaticLosData> GetStaticLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
 	{
 		auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false);
-		for (const auto& losInstance : losInstances)
+		for (auto& losInstance : losInstances)
 		{
-			// 1) FAILSAFE: Ignore sphere.
+			// 1) FAILSAFE: Ignore sphere LOS.
 			if (losInstance.SphereID != NO_VALUE)
 				continue;
 
@@ -255,12 +253,13 @@ namespace TEN::Collision::Los
 			if (!std::holds_alternative<MESH_INFO*>(*losInstance.ObjectPtr))
 				continue;
 
+			auto& staticObject = *std::get<MESH_INFO*>(*losInstance.ObjectPtr);
+
 			// 4) Check if static is solid (if applicable).
-			const auto& staticObject = *std::get<MESH_INFO*>(*losInstance.ObjectPtr);
 			if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
-			return std::pair(losInstance.Position, losInstance.RoomNumber);
+			return StaticLosData{ staticObject, std::pair(losInstance.Position, losInstance.RoomNumber) };
 		}
 
 		return std::nullopt;

@@ -25,19 +25,26 @@ namespace TEN::Collision::Los
 		std::set<int>						   RoomNumbers = {};
 	};
 
-	struct ItemSphereLosData
+	struct ItemLosData
 	{
+		ItemInfo&				Item;
 		std::pair<Vector3, int> Intersect = {};
 		int						SphereID  = NO_VALUE;
+	};
+	
+	struct StaticLosData
+	{
+		MESH_INFO&				Static;
+		std::pair<Vector3, int> Intersect = {};
 	};
 
 	std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRoomNumber, const Vector3& dir, float dist,
 												 bool collideItems = true, bool collideStatics = true, bool collideSpheres = false);
 
-	RoomLosData							   GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber);
-	std::optional<std::pair<Vector3, int>> GetItemLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer = true);
-	std::optional<ItemSphereLosData>	   GetItemSphereLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer = true);
-	std::optional<std::pair<Vector3, int>> GetStaticLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid = true);
+	RoomLosData					 GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber);
+	std::optional<ItemLosData>	 GetItemLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer = true);
+	std::optional<ItemLosData>	 GetItemSphereLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer = true);
+	std::optional<StaticLosData> GetStaticLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid = true);
 
 	std::pair<GameVector, GameVector> GetRayFrom2DPosition(const Vector2& screenPos);
 }

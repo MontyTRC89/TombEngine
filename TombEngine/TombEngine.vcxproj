@@ -123,6 +123,7 @@
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
