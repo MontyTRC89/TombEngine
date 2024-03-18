@@ -26,4 +26,11 @@ namespace TEN::Utils
 		auto it = std::find(vector.begin(), vector.end(), element);
 		return (it != vector.end());
 	}
+
+	template <typename TElement>
+	bool Contains(const std::set<TElement>& set, const TElement& element)
+	{
+		auto it = std::find(set.begin(), set.end(), element);
+		return (it != set.end());
+	}
 }

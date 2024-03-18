@@ -227,8 +227,8 @@ namespace TEN::Entities::Player
 		dir.Normalize();
 
 		// 4) Assess static LOS.
-		auto staticLos = GetStaticObjectLos(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
-		if (staticLos.has_value())
+		auto losInteresect = GetStaticLosIntersect(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
+		if (losInteresect.has_value())
 			return false;
 
 		// 5) Assess room LOS.
@@ -713,7 +713,7 @@ namespace TEN::Entities::Player
 		dir.Normalize();
 
 		// 3) Assess ray-static collision.
-		auto staticLos = GetStaticObjectLos(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
+		auto staticLos = GetStaticLosIntersect(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
 		if (staticLos.has_value())
 			return false;
 

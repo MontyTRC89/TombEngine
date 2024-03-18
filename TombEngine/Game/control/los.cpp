@@ -44,8 +44,7 @@ static std::vector<ItemInfo*> GetNearbyItemPtrs(const std::set<int>& roomNumbers
 			continue;
 
 		// 2) Test if item is in nearby room.
-		auto it = std::find(roomNumbers.begin(), roomNumbers.end(), (int)item.RoomNumber);
-		if (it == roomNumbers.end())
+		if (!Contains(roomNumbers, (int)item.RoomNumber))
 			continue;
 
 		itemPtrs.push_back(&item);
@@ -82,10 +81,9 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRo
 	auto target = Geometry::TranslatePoint(origin, dir, dist);
 	int targetRoomNumber = GetCollision(origin, originRoomNumber, dir, dist).RoomNumber;
 
-	auto losRoomNumbers = std::set<int>{};
-
 	// 1) Collect room LOS instance.
-	auto roomLos = GetRoomLos(origin, originRoomNumber, target, targetRoomNumber, &losRoomNumbers);
+	auto losRoomNumbers = std::set<int>{};
+	auto roomLos = GetRoomLosIntersect(origin, originRoomNumber, target, targetRoomNumber, &losRoomNumbers);
 	if (roomLos.has_value())
 	{
 		target = roomLos->first;
@@ -169,9 +167,9 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRo
 	return losInstances;
 }
 
-// TODO: Accurate room LOS.
-std::optional<std::pair<Vector3, int>> GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber,
-												  std::optional<std::set<int>*> roomNumbers)
+// TODO: Accurate room LOS. For now it simply wraps legacy functions.
+std::optional<std::pair<Vector3, int>> GetRoomLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber,
+														   std::optional<std::set<int>*> roomNumbers)
 {
 	auto losOrigin = GameVector(origin, originRoomNumber);
 	auto losTarget = GameVector(target, targetRoomNumber);
@@ -201,9 +199,35 @@ std::optional<std::pair<Vector3, int>> GetRoomLos(const Vector3& origin, int ori
 	return std::nullopt;
 }
 
-std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
+std::optional<std::pair<Vector3, int>> GetItemLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
+														   bool ignorePlayer)
 {
-	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist);
+	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, true, false);
+	for (const auto& losInstance : losInstances)
+	{
+		if (!losInstance.ObjectPtr.has_value())
+			continue;
+
+		if (!std::holds_alternative<ItemInfo*>(*losInstance.ObjectPtr))
+			continue;
+
+		if (ignorePlayer)
+		{
+			const auto& item = std::get<ItemInfo*>(*losInstance.ObjectPtr);
+			if (item->ObjectNumber == ID_LARA)
+				continue;
+		}
+		
+		return std::pair(losInstance.Position, losInstance.RoomNumber);
+	}
+
+	return std::nullopt;
+}
+
+std::optional<std::pair<Vector3, int>> GetStaticLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
+															 bool onlySolid)
+{
+	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false);
 	for (const auto& losInstance : losInstances)
 	{
 		if (!losInstance.ObjectPtr.has_value())
@@ -217,7 +241,32 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 		if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
 			continue;
 
-		return losInstance.Position;
+		return std::pair(losInstance.Position, losInstance.RoomNumber);
+	}
+
+	return std::nullopt;
+}
+
+std::optional<std::pair<Vector3, int>> GetItemSphereLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
+																 bool ignorePlayer)
+{
+	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false, false, true);
+	for (const auto& losInstance : losInstances)
+	{
+		if (!losInstance.ObjectPtr.has_value())
+			continue;
+
+		if (!std::holds_alternative<ItemSpherePair>(*losInstance.ObjectPtr))
+			continue;
+
+		if (ignorePlayer)
+		{
+			const auto& item = std::get<ItemSpherePair>(*losInstance.ObjectPtr).first;
+			if (item->ObjectNumber == ID_LARA)
+				continue;
+		}
+
+		return std::pair(losInstance.Position, losInstance.RoomNumber);
 	}
 
 	return std::nullopt;
@@ -424,7 +473,7 @@ static bool ClipTarget(const GameVector& origin, GameVector& target)
 	return true;
 }
 
-// NOTE: Accurate with axis-aligned walls. Diagonal walls, floor/ceiling heights, and objects are ignored.
+// NOTE: Accurate with axis-aligned walls. Ignores diagonal walls, floors/ceilings, and objects.
 bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<int>*> roomNumbers)
 {
 	int losAxis0 = 0;
@@ -453,7 +502,7 @@ bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<in
 	return false;
 }
 
-// NOTE: Coarsely accurate with walls and floor/ceiling heights. Objects ignored.
+// NOTE: Coarsely accurate with walls and floors/ceilings. Ignores objects.
 bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 {
 	constexpr auto STEP_COUNT = 8;

@@ -21,12 +21,25 @@ struct LosInstanceData
 	float Distance = 0.0f;
 };
 
-// WIP new LOS functions.
+struct ItemSphereLosData
+{
+	std::pair<Vector3, int> Position = {};
+	int						SphereID = -1;
+};
+
+// Low-level LOS getters
 std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRoomNumber, const Vector3& dir, float dist,
 											 bool collideItems = true, bool collideStatics = true, bool collideSpheres = false);
-std::optional<std::pair<Vector3, int>> GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber,
-												  std::optional<std::set<int>*> roomNumbers = std::nullopt);
-std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int originRoomNumber, const Vector3& dir, float dist, bool onlySolid);
+
+// High-level LOS getters
+std::optional<std::pair<Vector3, int>> GetRoomLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber,
+														   std::optional<std::set<int>*> roomNumbers = std::nullopt);
+std::optional<std::pair<Vector3, int>> GetItemLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
+														   bool ignorePlayer = true);
+std::optional<std::pair<Vector3, int>> GetStaticLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
+															 bool onlySolid = true);
+std::optional<std::pair<Vector3, int>> GetItemSphereLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
+																 bool ignorePlayer = true);
 
 // Legacy LOS functions.
 bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<int>*> roomNumbers = std::nullopt);

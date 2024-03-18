@@ -728,8 +728,8 @@ static void ClampCameraAltitudeAngle(bool isUnderwater)
 
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
-	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT			= 4;
-	constexpr auto TANK_CAMERA_INITIAL_SWIVEL_STEP_DIST_MIN = BLOCK(0.75f);
+	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT = 4;
+	constexpr auto TANK_CAMERA_CLOSE_DIST_MIN	 = BLOCK(0.75f);
 
 	// Move camera.
 	if (IsUsingModernControls() || Camera.IsControllingTankCamera)
@@ -807,7 +807,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			{
 				// Track farthest ideal.
 				float distSqr = Vector3::DistanceSquared(Camera.LookAt, idealPos);
-				if (distSqr > TANK_CAMERA_INITIAL_SWIVEL_STEP_DIST_MIN)
+				if (distSqr > TANK_CAMERA_CLOSE_DIST_MIN)
 				{
 					farthestIdealPos = std::pair(idealPos, idealRoomNumber);
 					farthestIdealAzimuthAngle = azimuthAngle;
