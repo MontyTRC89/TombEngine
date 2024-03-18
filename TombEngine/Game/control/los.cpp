@@ -82,28 +82,19 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRo
 	int targetRoomNumber = GetCollision(origin, originRoomNumber, dir, dist).RoomNumber;
 
 	// 1) Collect room LOS instance.
-	auto losRoomNumbers = std::set<int>{};
-	auto roomLos = GetRoomLosIntersect(origin, originRoomNumber, target, targetRoomNumber, &losRoomNumbers);
-	if (roomLos.has_value())
+	auto roomLos = GetRoomLos(origin, originRoomNumber, target, targetRoomNumber);
+	if (roomLos.Intersect.has_value())
 	{
-		target = roomLos->first;
-		targetRoomNumber = roomLos->second;
+		target = roomLos.Intersect->first;
+		targetRoomNumber = roomLos.Intersect->second;
 		dist = Vector3::Distance(origin, target);
 
-		losInstances.push_back(LosInstanceData{ {}, NO_VALUE, roomLos->first, roomLos->second, dist });
-	}
-
-	// Collect neighbor room numbers.
-	auto roomNumbers = std::set<int>{};
-	for (int roomNumber : losRoomNumbers)
-	{
-		const auto& neighborRoomNumbers = g_Level.Rooms[roomNumber].neighbors;
-		roomNumbers.insert(neighborRoomNumbers.begin(), neighborRoomNumbers.end());
+		losInstances.push_back(LosInstanceData{ {}, NO_VALUE, roomLos.Intersect->first, roomLos.Intersect->second, dist });
 	}
 
 	if (collideItems || collideSpheres)
 	{
-		auto itemPtrs = GetNearbyItemPtrs(roomNumbers);
+		auto itemPtrs = GetNearbyItemPtrs(roomLos.RoomNumbers);
 		for (auto* itemPtr : itemPtrs)
 		{
 			// 2) Collect item LOS instances.
@@ -141,7 +132,7 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRo
 	// 4) Collect static LOS instances.
 	if (collideStatics)
 	{
-		auto staticPtrs = GetNearbyStaticPtrs(roomNumbers);
+		auto staticPtrs = GetNearbyStaticPtrs(roomLos.RoomNumbers);
 		for (auto* staticPtr : staticPtrs)
 		{
 			auto box = GetBoundsAccurate(*staticPtr, false).ToBoundingOrientedBox(staticPtr->pos);
@@ -168,23 +159,24 @@ std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRo
 }
 
 // TODO: Accurate room LOS. For now, it simply wraps legacy functions.
-std::optional<std::pair<Vector3, int>> GetRoomLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber,
-														   std::optional<std::set<int>*> roomNumbers)
+RoomLosData GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber)
 {
 	auto losOrigin = GameVector(origin, originRoomNumber);
 	auto losTarget = GameVector(target, targetRoomNumber);
 
 	float dist = 0.0f;
+	auto roomNumbers = std::set<int>{};
 
 	// 1) Collide axis-aligned walls.
-	if (!LOS(&losOrigin, &losTarget, roomNumbers))
+	if (!LOS(&losOrigin, &losTarget, &roomNumbers))
 		dist = Vector3::Distance(origin, losTarget.ToVector3());
 
 	// 2) Collide diagonal walls and floors/ceilings.
 	if (!LOSAndReturnTarget(&losOrigin, &losTarget, 0))
 		dist = Vector3::Distance(origin, losTarget.ToVector3());
 
-	// Calculate and return intersection.
+	// Calculate intersection (if applicable).
+	auto intersect = std::optional<std::pair<Vector3, int>>();
 	if (dist != 0.0f)
 	{
 		auto dir = target - origin;
@@ -192,15 +184,14 @@ std::optional<std::pair<Vector3, int>> GetRoomLosIntersect(const Vector3& origin
 
 		auto closestIntersect = Geometry::TranslatePoint(origin, dir, dist);
 		int intersectRoomNumber = losTarget.RoomNumber;
-		return std::pair(closestIntersect, intersectRoomNumber);
+		intersect = std::pair(closestIntersect, intersectRoomNumber);
 	}
 
-	// No intersection; return nullopt.
-	return std::nullopt;
+	// Return room LOS.
+	return RoomLosData{ intersect, roomNumbers };
 }
 
-std::optional<std::pair<Vector3, int>> GetItemLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
-														   bool ignorePlayer)
+std::optional<std::pair<Vector3, int>> GetItemLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer)
 {
 	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, true, false);
 	for (const auto& losInstance : losInstances)
@@ -231,37 +222,7 @@ std::optional<std::pair<Vector3, int>> GetItemLosIntersect(const Vector3& origin
 	return std::nullopt;
 }
 
-std::optional<std::pair<Vector3, int>> GetStaticLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
-															 bool onlySolid)
-{
-	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false);
-	for (const auto& losInstance : losInstances)
-	{
-		// 1) FAILSAFE: Ignore sphere.
-		if (losInstance.SphereID != NO_VALUE)
-			continue;
-
-		// 2) Check for object.
-		if (!losInstance.ObjectPtr.has_value())
-			continue;
-
-		// 3) Check if object is static.
-		if (!std::holds_alternative<MESH_INFO*>(*losInstance.ObjectPtr))
-			continue;
-
-		// 4) Check if static is solid (if applicable).
-		const auto& staticObject = *std::get<MESH_INFO*>(*losInstance.ObjectPtr);
-		if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
-			continue;
-
-		return std::pair(losInstance.Position, losInstance.RoomNumber);
-	}
-
-	return std::nullopt;
-}
-
-std::optional<ItemSphereLosData> GetItemSphereLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
-														   bool ignorePlayer)
+std::optional<ItemSphereLosData> GetItemSphereLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer)
 {
 	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false, false, true);
 	for (const auto& losInstance : losInstances)
@@ -287,6 +248,34 @@ std::optional<ItemSphereLosData> GetItemSphereLosIntersect(const Vector3& origin
 		}
 
 		return ItemSphereLosData{ std::pair(losInstance.Position, losInstance.RoomNumber), losInstance.SphereID };
+	}
+
+	return std::nullopt;
+}
+
+std::optional<std::pair<Vector3, int>> GetStaticLosIntersect(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
+{
+	auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false);
+	for (const auto& losInstance : losInstances)
+	{
+		// 1) FAILSAFE: Ignore sphere.
+		if (losInstance.SphereID != NO_VALUE)
+			continue;
+
+		// 2) Check for object.
+		if (!losInstance.ObjectPtr.has_value())
+			continue;
+
+		// 3) Check if object is static.
+		if (!std::holds_alternative<MESH_INFO*>(*losInstance.ObjectPtr))
+			continue;
+
+		// 4) Check if static is solid (if applicable).
+		const auto& staticObject = *std::get<MESH_INFO*>(*losInstance.ObjectPtr);
+		if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
+			continue;
+
+		return std::pair(losInstance.Position, losInstance.RoomNumber);
 	}
 
 	return std::nullopt;

@@ -714,7 +714,7 @@ static void ClampCameraAltitudeAngle(bool isUnderwater)
 {
 	constexpr auto MODERN_CAMERA_ABOVE_WATER_ANGLE_CONSTRAINT = std::pair<short, short>(ANGLE(-80.0f), ANGLE(70.0f));
 	constexpr auto MODERN_CAMERA_UNDERWATER_ANGLE_CONSTRAINT  = std::pair<short, short>(ANGLE(-80.0f), ANGLE(80.0f));
-	constexpr auto TANK_CAMERA_ANGLE_CONSTRAINT				  = std::pair<short, short>(ANGLE(-80.0f), ANGLE(85.0f));
+	constexpr auto TANK_CAMERA_ANGLE_CONSTRAINT				  = std::pair<short, short>(ANGLE(-80.0f), ANGLE(70.0f));
 
 	const auto& angleConstraint = IsUsingModernControls() ?
 		(isUnderwater ? MODERN_CAMERA_UNDERWATER_ANGLE_CONSTRAINT : MODERN_CAMERA_ABOVE_WATER_ANGLE_CONSTRAINT) :
@@ -734,6 +734,10 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
 	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT = 8;
 	constexpr auto TANK_CAMERA_CLOSE_DIST_MIN	 = BLOCK(0.75f);
+
+	const auto& player = GetLaraInfo(playerItem);
+
+	ClampCameraAltitudeAngle(player.Control.WaterStatus == WaterStatus::Underwater);
 
 	// Move camera.
 	if (IsUsingModernControls() || Camera.IsControllingTankCamera)
@@ -830,6 +834,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 				Camera.speed = 1.0f;
 		}
 
+		// Update camera.
 		MoveCamera(playerItem, farthestIdealPos.first, farthestIdealPos.second, Camera.speed);
 	}
 }
@@ -843,7 +848,6 @@ void ChaseCamera(const ItemInfo& playerItem)
 
 	Camera.targetElevation += playerItem.Pose.Orientation.x;
 	UpdateCameraSphere(playerItem);
-	ClampCameraAltitudeAngle(player.Control.WaterStatus == WaterStatus::Underwater);
 
 	auto pointColl = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, 0, 0, CLICK(1));
 
@@ -933,7 +937,6 @@ void CombatCamera(const ItemInfo& playerItem)
 	}
 
 	UpdateCameraSphere(playerItem);
-	ClampCameraAltitudeAngle(player.Control.WaterStatus == WaterStatus::Underwater);
 
 	Camera.targetDistance = BLOCK(1.5f);
 
