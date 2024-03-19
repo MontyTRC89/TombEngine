@@ -954,12 +954,9 @@ void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::None;
 
 	// Turn.
-	if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-	{
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
-		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, true);
-		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
-	}
+	HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
+	HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, true);
+	HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
 
 	if (IsHeld(In::Jump))
 	{
@@ -1612,8 +1609,6 @@ void lara_col_turn_fast(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_step_right()
 void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto REL_HEADING_ANGLE = ANGLE(90.0f);
-
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
@@ -1718,8 +1713,6 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_step_left()
 void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto REL_HEADING_ANGLE = ANGLE(-90.0f);
-
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;

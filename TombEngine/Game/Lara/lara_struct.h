@@ -1273,9 +1273,11 @@ struct PlayerControlData
 	// Used in tank control modes.
 	EulerAngles TurnRate = EulerAngles::Identity;
 
+	// savegame pls
 	// Used in modern control mode.
 	EulerAngles HeadingOrient		= EulerAngles::Identity;
 	EulerAngles HeadingOrientTarget = EulerAngles::Identity;
+	Vector2		RefMoveAxis			= Vector3::Zero;
 	EulerAngles RefCameraOrient		= EulerAngles::Identity;
 	bool		LockRefCameraOrient = false;
 
@@ -1290,7 +1292,7 @@ struct PlayerControlData
 	TightropeControlData Tightrope = {};
 	WeaponControlData	 Weapon	   = {};
 
-	//save
+	// savegame
 	bool ToggleClimb  = false;
 	bool ToggleCrouch = false;
 	bool ToggleWalk	  = false;

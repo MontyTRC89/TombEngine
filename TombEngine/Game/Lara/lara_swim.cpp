@@ -50,13 +50,15 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
-		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
-		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
-		HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
-
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+		{
+			HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
+			HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
+			HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
+			HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+
 			item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+		}
 	}
 	else
 	{

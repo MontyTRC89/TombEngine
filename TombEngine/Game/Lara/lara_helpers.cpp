@@ -53,31 +53,31 @@ using namespace TEN::Renderer;
 
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	// Update AFK pose timer.
-	if (lara->Control.Count.Pose < PLAYER_POSE_TIME && 
+	if (player.Control.Count.Pose < PLAYER_POSE_TIME && 
 		!(IsHeld(In::Look) || IsOpticActionHeld()) &&
 		g_GameFlow->HasAFKPose())
 	{
-		lara->Control.Count.Pose++;
+		player.Control.Count.Pose++;
 	}
 	else
 	{
-		lara->Control.Count.Pose = 0;
+		player.Control.Count.Pose = 0;
 	}
 
 	// Reset running jump timer.
 	if (!IsRunJumpCountableState(item->Animation.ActiveState))
-		lara->Control.Count.Run = 0;
+		player.Control.Count.Run = 0;
 
 	// Reset running jump action queue.
 	if (!IsRunJumpQueueableState(item->Animation.ActiveState))
-		lara->Control.IsRunJumpQueued = false;
+		player.Control.IsRunJumpQueued = false;
 
 	// Reset lean.
-	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))) &&
-		(!lara->Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
+	if ((!player.Control.IsMoving || (player.Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))) &&
+		(!player.Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
 	{
 		if (IsUsingModernControls())
 		{
@@ -101,13 +101,13 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	if (!IsUsingModernControls())
 	{
 		// Apply and reset turn rate.
-		item->Pose.Orientation.y += lara->Control.TurnRate.y;
+		item->Pose.Orientation.y += player.Control.TurnRate.y;
 		if (!(IsHeld(In::Left) || IsHeld(In::Right)))
-			lara->Control.TurnRate.y = 0;
+			player.Control.TurnRate.y = 0;
 	}
 
-	lara->Control.IsLow = false;
-	lara->Control.IsMonkeySwinging = false;
+	player.Control.IsLow = false;
+	player.Control.IsMonkeySwinging = false;
 }
 
 void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWaterData& water)
@@ -1650,12 +1650,10 @@ short GetPlayerHeadingAngleY(const ItemInfo& item)
 
 	if (IsUsingModernControls())
 	{
-		if (GetMoveAxis() == Vector2::Zero)
-		{
-			return ((item.Animation.ActiveState == LS_IDLE) ? player.Control.RefCameraOrient.y : player.Control.HeadingOrientTarget.y);
-		}
+		if (IsPlayerStrafing(item) && item.Animation.Velocity.z == 0.0f)
+			return player.Control.RefCameraOrient.y;
 
-		auto dir = GetMoveAxis();
+		auto dir = player.Control.RefMoveAxis;
 		dir.Normalize();
 		return (player.Control.RefCameraOrient.y + FROM_RAD(atan2(dir.x, dir.y)));
 	}

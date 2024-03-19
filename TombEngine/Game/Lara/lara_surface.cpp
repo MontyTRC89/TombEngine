@@ -57,8 +57,11 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
-		HandlePlayerTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA);
+		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+		{
+			HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
+			HandlePlayerTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA);
+		}
 	}
 	else
 	{

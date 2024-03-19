@@ -1199,7 +1199,7 @@ void ConfirmCameraTargetPos()
 		LaraItem->Pose.Position.y - (LaraCollision.Setup.Height / 2),
 		LaraItem->Pose.Position.z);
 
-	if (Camera.laraNode != -1)
+	if (Camera.laraNode != NO_VALUE)
 	{
 		Camera.LookAt = pos;
 	}
@@ -1479,7 +1479,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		Camera.targetAngle = 0;
 		Camera.targetDistance = BLOCK(1.5f);
 		Camera.flags = CameraFlag::None;
-		Camera.laraNode = -1;
+		Camera.laraNode = NO_VALUE;
 	}
 
 	UpdatePlayerRefCameraOrient(playerItem);

@@ -362,6 +362,10 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
+	// Update reference move axis.
+	if (GetMoveAxis() != Vector2::Zero)
+		lara->Control.RefMoveAxis = GetMoveAxis();
+
 	// Handle look-around.
 	if (((IsHeld(In::Look) && CanPlayerLookAround(*item)) ||
 			(lara->Control.Look.IsUsingBinoculars || lara->Control.Look.IsUsingLasersight)) &&
@@ -431,6 +435,10 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
+
+	// Update reference move axis.
+	if (GetMoveAxis() != Vector2::Zero)
+		lara->Control.RefMoveAxis = GetMoveAxis();
 
 	// Handle look-around.
 	if (IsHeld(In::Look) && CanPlayerLookAround(*item))
