@@ -9,5 +9,5 @@ namespace TEN::Entities::Traps
 	void ControlSquishyBlock(short itemNumber);
 	void FallingSquishyBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void ControlFallingSquishyBlock(short itemNumber);
-	void SquishyBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, short& vel);
 }

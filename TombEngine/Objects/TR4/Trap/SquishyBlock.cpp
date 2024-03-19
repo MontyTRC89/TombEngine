@@ -13,19 +13,26 @@
 #include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Renderer/Renderer.h"
+
+using namespace TEN::Renderer;
 
 namespace TEN::Entities::Traps
 {	
+	
+
 	enum SquishyBlockState
 	{
 		SQUISHY_BLOCK_STATE_MOVE = 0,
-		SQUISHY_BLOCK_STATE_COLLIDE = 1,
+		SQUISHY_BLOCK_STATE_COLLIDE_LEFT = 1,
+		SQUISHY_BLOCK_STATE_COLLIDE_RIGHT = 2,
 	};
 
 	enum SquishyBlockAnim
 	{
 		SQUISHY_BLOCK_ANIM_MOVE = 0,
-		SQUISHY_BLOCK_ANIM_COLLIDE = 1,
+		SQUISHY_BLOCK_ANIM_COLLIDE_LEFT = 1,
+		SQUISHY_BLOCK_ANIM_COLLIDE_RIGHT = 2,
 	};
 
 
@@ -33,78 +40,152 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		item.ItemFlags[1] = item.TriggerFlags * 2;
+		item.ItemFlags[0] = item.TriggerFlags;
+		item.ItemFlags[4] = ANGLE(0.0f);
 	}
 
 	void ControlSquishyBlock(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-
-		short ang;
-		short frame;
+		const auto& object = Objects[item.ObjectNumber];
 
 		if (!TriggerActive(&item))
 			return;
 
-		frame = item.Animation.FrameNumber - GetAnimData(item).frameBase;
-		int forwardVel = item.ItemFlags[1];
+		item.ItemFlags[0] = item.TriggerFlags;
+		auto forwardDir = EulerAngles(0, item.Pose.Orientation.y + item.ItemFlags[4], 0).ToDirection();		
+	
+		auto pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+
+		// DEBUG
 		auto bounds = GameBoundingBox(&item);
-		auto pointColl = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2);
-
-		int upperFloorBound = item.Pose.Position.y;
-		int lowerCeilBound = item.Pose.Position.y + bounds.Y1;
-
-		if (&item.TouchBits)
-		{
-			ang = (short)phd_atan(item.Pose.Position.x - LaraItem->Pose.Position.x, item.Pose.Position.z - LaraItem->Pose.Position.z) - item.Pose.Orientation.y;
-
-			 if ((item.Animation.ActiveState == SQUISHY_BLOCK_ANIM_COLLIDE &&  (ang > -24586 && ang < -8206)))
-			{
-				//item.ItemFlags[0] = 9;
-				//LaraItem->HitPoints = 0;
-				//LaraItem->Pose.Orientation.y = item.Pose.Orientation.y - 0x4000;
-			}
-		}
+		g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(item.Pose), Vector4::One, RendererDebugPage::None, true);
 
 		if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_MOVE)
 		{
-				
 			if (pointColl.RoomNumber != item.RoomNumber)
 				ItemNewRoom(itemNumber, pointColl.RoomNumber);
 
-			if (pointColl.Block->IsWall(item.Pose.Position.x, item.Pose.Position.z) ||
-				pointColl.Block->Stopper ||
-				pointColl.Position.Floor < upperFloorBound ||
-				pointColl.Position.Ceiling > lowerCeilBound)
+			if (!IsNextSectorValid(item, forwardDir, item.ItemFlags[0]))
 			{
-					item.Pose.Orientation.y += ANGLE(180.0f);
-					item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_COLLIDE;
+				if (item.ItemFlags[4] == ANGLE(180))
+				{
+					item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_COLLIDE_LEFT;
 					item.Animation.FrameNumber = GetAnimData(item).frameBase;
-					item.Animation.ActiveState = SQUISHY_BLOCK_STATE_COLLIDE;
-					item.Animation.TargetState = SQUISHY_BLOCK_STATE_COLLIDE;
+					item.Animation.ActiveState = SQUISHY_BLOCK_STATE_COLLIDE_LEFT;
+					item.Animation.TargetState = SQUISHY_BLOCK_STATE_COLLIDE_LEFT;
+
+					if (&item.TouchBits)
+					{
+
+
+					}
+				}
+				else if (item.ItemFlags[4] == ANGLE(0))
+				{
+					item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_COLLIDE_RIGHT;
+					item.Animation.FrameNumber = GetAnimData(item).frameBase;
+					item.Animation.ActiveState = SQUISHY_BLOCK_STATE_COLLIDE_RIGHT;
+					item.Animation.TargetState = SQUISHY_BLOCK_STATE_COLLIDE_RIGHT;
+
+					if (&item.TouchBits)
+					{
+
+
+					}
+				}
 			}
-			else
-				item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, item.Pose.Orientation.y, forwardVel);							
+				else
+					item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, Lerp(item.TriggerFlags / 4, item.TriggerFlags, item.ItemFlags[0]));			
 		}
-					
-			if (!item.ItemFlags[0])
+		else
+		{
+			if (item.Animation.FrameNumber - GetAnimData(item).frameBase == 19)
+			{
+				item.ItemFlags[4] = item.ItemFlags[4] + ANGLE(180.0f);
+			}
+		}
+
+			if (LaraItem->HitPoints)
 			AnimateItem(&item);		
 	}
-
-	void SquishyBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	
+	bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, short& vel)
 	{
-		auto& item = g_Level.Items[itemNumber];
+		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(0.5f) + vel);
 
-		if (TestBoundsCollide(&item, laraItem, coll->Setup.Radius) && TestCollision(&item, laraItem))
+		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(0.5f) + vel);
+
+		// Test for wall.
+		if (pointColl.Block->IsWall(projectedPos.x, projectedPos.z))
+			return false;
+
+		// Test for slippery slope.
+		if (pointColl.Position.FloorSlope)
+			return false;
+
+		// Flat floor.
+		if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
 		{
-			if (item.Animation.ActiveState == SQUISHY_BLOCK_ANIM_COLLIDE)
-			{
-				laraItem->HitPoints = 0;
-				laraItem->Animation.Velocity.z = 0;
-				laraItem->Animation.Velocity.y = 0;
-				item.ItemFlags[0] = 1;
-			}
+			// Test for step.
+			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
+			if (relFloorHeight >= CLICK(1))
+				return false;
 		}
+		// Sloped floor.
+		else
+		{
+			// Half block.
+			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
+			if (relFloorHeight > CLICK(2))
+				return false;
+
+			short slopeAngle = ANGLE(0.0f);
+			if (pointColl.FloorTilt.x > 0)
+			{
+				slopeAngle = ANGLE(-90.0f);
+			}
+			else if (pointColl.FloorTilt.x < 0)
+			{
+				slopeAngle = ANGLE(90.0f);
+			}
+
+			if (pointColl.FloorTilt.y > 0 && pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
+			{
+				slopeAngle = ANGLE(180.0f);
+			}
+			else if (pointColl.FloorTilt.y < 0 && -pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
+			{
+				slopeAngle = ANGLE(0.0f);
+			}
+
+			/*short dirAngle = phd_atan(dir.z, dir.x);
+			short alignAngle = Geometry::GetShortestAngle(slopeAngle, dirAngle);
+
+			// Test if slope aspect is aligned with direction.
+			if (alignAngle != 0 && alignAngle != ANGLE(180.0f))
+				return false;*/
+		}
+
+		// Check for diagonal split.
+		if (pointColl.Position.DiagonalStep)
+			return false;
+
+		// Test ceiling height.
+		int relCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+		int cleanerHeight = BLOCK(1);
+		if (relCeilHeight < cleanerHeight)
+			return false;
+
+		// Check for inaccessible sector.
+		if (pointColl.Block->Box == NO_BOX)
+			return false;
+
+		// Check for stopper flag.
+		if (pointColl.Block->Stopper)
+			return false;
+
+		return true;
 	}
 
 	void FallingSquishyBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
