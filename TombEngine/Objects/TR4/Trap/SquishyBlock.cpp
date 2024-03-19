@@ -19,8 +19,6 @@ using namespace TEN::Renderer;
 
 namespace TEN::Entities::Traps
 {	
-	
-
 	enum SquishyBlockState
 	{
 		SQUISHY_BLOCK_STATE_MOVE = 0,
@@ -34,7 +32,6 @@ namespace TEN::Entities::Traps
 		SQUISHY_BLOCK_ANIM_COLLIDE_LEFT = 1,
 		SQUISHY_BLOCK_ANIM_COLLIDE_RIGHT = 2,
 	};
-
 
 	void InitializeSquishyBlock(short itemNumber)
 	{
@@ -57,10 +54,6 @@ namespace TEN::Entities::Traps
 	
 		auto pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
-		// DEBUG
-		auto bounds = GameBoundingBox(&item);
-		g_Renderer.AddDebugBox(bounds.ToBoundingOrientedBox(item.Pose), Vector4::One, RendererDebugPage::None, true);
-
 		if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_MOVE)
 		{
 			if (pointColl.RoomNumber != item.RoomNumber)
@@ -74,12 +67,6 @@ namespace TEN::Entities::Traps
 					item.Animation.FrameNumber = GetAnimData(item).frameBase;
 					item.Animation.ActiveState = SQUISHY_BLOCK_STATE_COLLIDE_LEFT;
 					item.Animation.TargetState = SQUISHY_BLOCK_STATE_COLLIDE_LEFT;
-
-					if (&item.TouchBits)
-					{
-
-
-					}
 				}
 				else if (item.ItemFlags[4] == ANGLE(0))
 				{
@@ -87,12 +74,6 @@ namespace TEN::Entities::Traps
 					item.Animation.FrameNumber = GetAnimData(item).frameBase;
 					item.Animation.ActiveState = SQUISHY_BLOCK_STATE_COLLIDE_RIGHT;
 					item.Animation.TargetState = SQUISHY_BLOCK_STATE_COLLIDE_RIGHT;
-
-					if (&item.TouchBits)
-					{
-
-
-					}
 				}
 			}
 				else
@@ -105,16 +86,16 @@ namespace TEN::Entities::Traps
 				item.ItemFlags[4] = item.ItemFlags[4] + ANGLE(180.0f);
 			}
 		}
-
 			if (LaraItem->HitPoints)
 			AnimateItem(&item);		
 	}
 	
 	bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, short& vel)
 	{
-		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(0.5f) + vel);
-
-		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(0.5f) + vel);
+		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(0.5f));// BLOCK(0.5f) + vel);
+		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(0.5f));// BLOCK(0.5f) + vel);
+		auto bounds = GameBoundingBox(&item);
+		int itemHeight = bounds.GetHeight();
 
 		// Test for wall.
 		if (pointColl.Block->IsWall(projectedPos.x, projectedPos.z))
@@ -137,7 +118,7 @@ namespace TEN::Entities::Traps
 		{
 			// Half block.
 			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
-			if (relFloorHeight > CLICK(2))
+			if (relFloorHeight > CLICK(1))
 				return false;
 
 			short slopeAngle = ANGLE(0.0f);
@@ -159,12 +140,12 @@ namespace TEN::Entities::Traps
 				slopeAngle = ANGLE(0.0f);
 			}
 
-			/*short dirAngle = phd_atan(dir.z, dir.x);
+			short dirAngle = phd_atan(dir.z, dir.x);
 			short alignAngle = Geometry::GetShortestAngle(slopeAngle, dirAngle);
 
 			// Test if slope aspect is aligned with direction.
 			if (alignAngle != 0 && alignAngle != ANGLE(180.0f))
-				return false;*/
+				return false;
 		}
 
 		// Check for diagonal split.
@@ -173,8 +154,8 @@ namespace TEN::Entities::Traps
 
 		// Test ceiling height.
 		int relCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
-		int cleanerHeight = BLOCK(1);
-		if (relCeilHeight < cleanerHeight)
+		
+		if (relCeilHeight < itemHeight)
 			return false;
 
 		// Check for inaccessible sector.
@@ -186,6 +167,24 @@ namespace TEN::Entities::Traps
 			return false;
 
 		return true;
+	}
+
+	void SquishyBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		if (TestBoundsCollide(&item, laraItem, coll->Setup.Radius) && TestCollision(&item, laraItem))
+		{
+			if (laraItem->HitPoints > 0)
+				ItemPushItem(&item, laraItem, coll, false, 1);
+		}
+
+		if (ItemPushItem(&item, laraItem, coll, false, 1))
+		{
+			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_RIGHT ||
+			item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_LEFT)
+			LaraItem->HitPoints = 0;
+		}
 	}
 
 	void FallingSquishyBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

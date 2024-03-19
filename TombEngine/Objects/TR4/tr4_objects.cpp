@@ -956,7 +956,7 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeSquishyBlock;
 			obj->control = ControlSquishyBlock;
-			obj->collision = GenericSphereBoxCollision;
+			obj->collision = SquishyBlockCollision;
 			obj->SetHitEffect(true);
 		}
 
