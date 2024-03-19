@@ -582,6 +582,14 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	Camera.Position = Vector3::Lerp(Camera.Position, idealPos, 1.0f / speed);
 	Camera.RoomNumber = idealRoomNumber;
 
+	// Assess LOS.
+	auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, Camera.Position, Camera.RoomNumber);
+	if (intersect.has_value())
+	{
+		Camera.Position = intersect->first;
+		Camera.RoomNumber = intersect->second;
+	}
+
 	// Bounce.
 	if (Camera.bounce)
 	{
@@ -768,6 +776,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		auto farthestIdealPos = std::pair<Vector3, int>(Camera.Position, Camera.RoomNumber);
 		short farthestIdealAzimuthAngle = Camera.actualAngle;
 		float farthestDistSqr = INFINITY;
+		short shortestAngularDist = SHRT_MAX;
 
 		// Determine ideal position around player.
 		for (int i = 0; i < (TANK_CAMERA_SWIVEL_STEP_COUNT + 1); i++)
@@ -781,35 +790,34 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, Camera.targetDistance).RoomNumber;
 
 			// Assess LOS.
-			auto losIntersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
-			if (losIntersect.has_value())
+			auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
+			if (intersect.has_value())
 			{
-				idealPos = losIntersect->first;
-				idealRoomNumber = losIntersect->second;
+				idealPos = intersect->first;
+				idealRoomNumber = intersect->second;
 			}
 
 			// Has no LOS intersection.
-			if (!losIntersect.has_value())
+			if (!intersect.has_value())
 			{
-				// Initial swivel step and camera position change has no obstruction.
-				if (i == 0 || !GetCameraLosIntersect(idealPos, idealRoomNumber, Camera.Position, Camera.RoomNumber).has_value())
+				// Initial swivel is clear; set ideal.
+				if (i == 0)
 				{
-					// Initial swivel is clear; set ideal.
-					if (i == 0)
-					{
-						farthestIdealPos = std::pair(idealPos, idealRoomNumber);
-						farthestIdealAzimuthAngle = azimuthAngle;
-						break;
-					}
+					farthestIdealPos = std::pair(idealPos, idealRoomNumber);
+					farthestIdealAzimuthAngle = azimuthAngle;
+					break;
+				}
 
-					// Track closest ideal.
-					float distSqr = Vector3::DistanceSquared(Camera.Position, idealPos);
-					if (distSqr < farthestDistSqr)
-					{
-						farthestIdealPos = std::pair(idealPos, idealRoomNumber);
-						farthestIdealAzimuthAngle = azimuthAngle;
-						farthestDistSqr = distSqr;
-					}
+				// TODO: Calculate angularDist with nearest *projected* azimuth angle, not the actual nearest one.
+				// Track closest ideal.
+				float distSqr = Vector3::DistanceSquared(Camera.Position, idealPos);
+				short angularDist = abs(Geometry::GetShortestAngle(Camera.actualAngle, azimuthAngle));
+				if (distSqr < farthestDistSqr && angularDist < shortestAngularDist)
+				{
+					farthestIdealPos = std::pair(idealPos, idealRoomNumber);
+					farthestIdealAzimuthAngle = azimuthAngle;
+					farthestDistSqr = distSqr;
+					shortestAngularDist = angularDist;
 				}
 			}
 			// Has LOS intersection and is initial swivel step.
@@ -827,7 +835,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		}
 
 		Camera.actualAngle = farthestIdealAzimuthAngle;
-		//CameraCollisionBounds(&farthestIdealPos, CLICK(1.5f), true);
+		//CameraCollisionBounds(farthestIdealPos.first, farthestIdealPos.second, CLICK(1.5f), true);
 
 		if (isCombatCamera)
 		{
