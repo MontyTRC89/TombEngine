@@ -742,7 +742,7 @@ static void ClampCameraAltitudeAngle(bool isUnderwater)
 
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
-	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT = 8;
+	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT = 4;
 	constexpr auto TANK_CAMERA_CLOSE_DIST_MIN	 = BLOCK(0.75f);
 
 	const auto& player = GetLaraInfo(playerItem);
@@ -776,7 +776,6 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		auto farthestIdealPos = std::pair<Vector3, int>(Camera.Position, Camera.RoomNumber);
 		short farthestIdealAzimuthAngle = Camera.actualAngle;
 		float farthestDistSqr = INFINITY;
-		short shortestAngularDist = SHRT_MAX;
 
 		// Determine ideal position around player.
 		for (int i = 0; i < (TANK_CAMERA_SWIVEL_STEP_COUNT + 1); i++)
@@ -808,22 +807,18 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 					break;
 				}
 
-				// TODO: Calculate angularDist with nearest *projected* azimuth angle, not the actual nearest one.
 				// Track closest ideal.
 				float distSqr = Vector3::DistanceSquared(Camera.Position, idealPos);
-				short angularDist = abs(Geometry::GetShortestAngle(Camera.actualAngle, azimuthAngle));
-				if (distSqr < farthestDistSqr && angularDist < shortestAngularDist)
+				if (distSqr < farthestDistSqr)
 				{
 					farthestIdealPos = std::pair(idealPos, idealRoomNumber);
 					farthestIdealAzimuthAngle = azimuthAngle;
 					farthestDistSqr = distSqr;
-					shortestAngularDist = angularDist;
 				}
 			}
 			// Has LOS intersection and is initial swivel step.
 			else if (i == 0)
 			{
-				// Track farthest ideal.
 				float distSqr = Vector3::DistanceSquared(Camera.LookAt, idealPos);
 				if (distSqr > SQUARE(TANK_CAMERA_CLOSE_DIST_MIN))
 				{
