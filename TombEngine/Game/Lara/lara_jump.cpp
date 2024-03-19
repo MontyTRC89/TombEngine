@@ -217,6 +217,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Turn.
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
@@ -848,6 +849,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Turn.
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
@@ -863,6 +865,10 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
 			HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE / 2, LARA_LEAN_MAX);
 		}
+	}
+	else if (IsUsingClassicControls())
+	{
+		ResetPlayerTurnRateY(*item);
 	}
 
 	if (CanLand(*item, *coll))
