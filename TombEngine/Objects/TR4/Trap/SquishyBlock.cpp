@@ -13,9 +13,6 @@
 #include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Renderer/Renderer.h"
-
-using namespace TEN::Renderer;
 
 namespace TEN::Entities::Traps
 {	
@@ -92,8 +89,8 @@ namespace TEN::Entities::Traps
 	
 	bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, short& vel)
 	{
-		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(0.5f));// BLOCK(0.5f) + vel);
-		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(0.5f));// BLOCK(0.5f) + vel);
+		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(0.5f));
+		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(0.5f));
 		auto bounds = GameBoundingBox(&item);
 		int itemHeight = bounds.GetHeight();
 
