@@ -405,12 +405,22 @@ namespace TEN::Entities::Creatures::TR2
 					if (timer == -100)
 					{
 						InitializeDragonBones(item);
+
+						if (flagDaggerDeath)
+						{
+							CollectCarriedItems(&item);
+						}
 					}
 					else if (timer == -200)
 					{
 						DisableEntityAI(itemNumber);
 						KillItem(itemNumber);
-						DropPickups(&item);
+
+						if (!flagDaggerDeath)
+						{
+							DropPickups(&item);
+						}
+
 						item.Status = ITEM_DEACTIVATED;
 					}
 					else if (timer < -100)
