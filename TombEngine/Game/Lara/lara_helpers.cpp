@@ -832,7 +832,6 @@ void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, s
 void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 {
 	constexpr auto BASE_ANGLE					   = ANGLE(90.0f);
-	constexpr auto LOWER_FLEX_ANGLE_X_CONSTRAINT   = ANGLE(5.0f);
 	constexpr auto LOWER_FLEX_ANGLE_Y_CONSTRAINT   = ANGLE(65.0f);
 	constexpr auto UPPER_FLEX_ANGLE_Y_CONSTRAINT   = ANGLE(100.0f);
 	constexpr auto UPPER_FLEX_ANGLE_Y_STRAFE_COEFF = 0.4f;
@@ -851,15 +850,13 @@ void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 		deltaAngle = (((BASE_ANGLE * 2) * sign) - deltaAngle) * -1;
 
 	// Calculate angle modifiers.
-	float lowerFlexAngleXAlpha = abs(deltaAngle) / (float)LOWER_FLEX_ANGLE_Y_CONSTRAINT;
 	float upperFlexAngleYAlpha = std::clamp(abs(deltaAngle) / (float)UPPER_FLEX_ANGLE_Y_CONSTRAINT, 0.0f, 1.0f);
 	float upperFlexAngleYCoeff = isStrafing ? UPPER_FLEX_ANGLE_Y_STRAFE_COEFF : 1.0f;
 	int headFlexSign = isStrafing ? -1 : 1;
 
 	// Calculate lower flex rotation.
-	short lowerFlexAngleX = isStrafing ? (LOWER_FLEX_ANGLE_X_CONSTRAINT * lowerFlexAngleXAlpha) : 0;
 	short lowerFlexAngleY = isStrafing ? std::clamp<short>(deltaAngle, -LOWER_FLEX_ANGLE_Y_CONSTRAINT, LOWER_FLEX_ANGLE_Y_CONSTRAINT) : 0;
-	auto lowerFlexRot = EulerAngles(lowerFlexAngleX, lowerFlexAngleY, 0);
+	auto lowerFlexRot = EulerAngles(0, lowerFlexAngleY, 0);
 
 	// Calculate upper flex rotation.
 	short upperFlexAngleY = ((UPPER_FLEX_ANGLE_Y_CONSTRAINT * upperFlexAngleYAlpha) * sign) * upperFlexAngleYCoeff;
@@ -1654,7 +1651,9 @@ short GetPlayerHeadingAngleY(const ItemInfo& item)
 	if (IsUsingModernControls())
 	{
 		if (GetMoveAxis() == Vector2::Zero)
-			return player.Control.HeadingOrientTarget.y;
+		{
+			return ((item.Animation.ActiveState == LS_IDLE) ? player.Control.RefCameraOrient.y : player.Control.HeadingOrientTarget.y);
+		}
 
 		auto dir = GetMoveAxis();
 		dir.Normalize();

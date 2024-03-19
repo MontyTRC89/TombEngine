@@ -513,6 +513,11 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
 			}
 		}
+		else if (IsPlayerStrafing(*item))
+		{
+			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+			HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
+		}
 	}
 	else
 	{
