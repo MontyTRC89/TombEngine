@@ -21,6 +21,7 @@ namespace TEN::Entities::Traps
 		SQUISHY_BLOCK_STATE_MOVE = 0,
 		SQUISHY_BLOCK_STATE_COLLIDE_LEFT = 1,
 		SQUISHY_BLOCK_STATE_COLLIDE_RIGHT = 2,
+		SQUISHY_BLOCK_STATE_ORIGINAL = 3,
 	};
 
 	enum SquishyBlockAnim
@@ -28,14 +29,26 @@ namespace TEN::Entities::Traps
 		SQUISHY_BLOCK_ANIM_MOVE = 0,
 		SQUISHY_BLOCK_ANIM_COLLIDE_LEFT = 1,
 		SQUISHY_BLOCK_ANIM_COLLIDE_RIGHT = 2,
+		SQUISHY_BLOCK_ANIM_ORIGINAL = 3,
 	};
 
 	void InitializeSquishyBlock(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		item.ItemFlags[0] = item.TriggerFlags;
-		item.ItemFlags[4] = ANGLE(0.0f);
+		if (!item.TriggerFlags)
+		{
+			SetAnimation(item, SQUISHY_BLOCK_ANIM_ORIGINAL);
+			item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_ORIGINAL;
+			item.Animation.FrameNumber = GetAnimData(item).frameBase;
+			item.Animation.ActiveState = SQUISHY_BLOCK_STATE_ORIGINAL;
+			item.Animation.TargetState = SQUISHY_BLOCK_STATE_ORIGINAL;
+		}
+		else
+		{
+			item.ItemFlags[0] = item.TriggerFlags;
+			item.ItemFlags[4] = ANGLE(0.0f);
+		}
 	}
 
 	void ControlSquishyBlock(short itemNumber)
@@ -46,41 +59,62 @@ namespace TEN::Entities::Traps
 		if (!TriggerActive(&item))
 			return;
 
-		item.ItemFlags[0] = item.TriggerFlags;
-		auto forwardDir = EulerAngles(0, item.Pose.Orientation.y + item.ItemFlags[4], 0).ToDirection();		
-	
-		auto pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
-
-		if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_MOVE)
+		if (!item.TriggerFlags)
 		{
-			if (pointColl.RoomNumber != item.RoomNumber)
-				ItemNewRoom(itemNumber, pointColl.RoomNumber);
-
-			if (!IsNextSectorValid(item, forwardDir, item.ItemFlags[0]))
+			if (item.Animation.ActiveState != SQUISHY_BLOCK_STATE_ORIGINAL)
 			{
-				if (item.ItemFlags[4] == ANGLE(180))
-				{
-					item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_COLLIDE_LEFT;
-					item.Animation.FrameNumber = GetAnimData(item).frameBase;
-					item.Animation.ActiveState = SQUISHY_BLOCK_STATE_COLLIDE_LEFT;
-					item.Animation.TargetState = SQUISHY_BLOCK_STATE_COLLIDE_LEFT;
-				}
-				else if (item.ItemFlags[4] == ANGLE(0))
-				{
-					item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_COLLIDE_RIGHT;
-					item.Animation.FrameNumber = GetAnimData(item).frameBase;
-					item.Animation.ActiveState = SQUISHY_BLOCK_STATE_COLLIDE_RIGHT;
-					item.Animation.TargetState = SQUISHY_BLOCK_STATE_COLLIDE_RIGHT;
-				}
+				item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_ORIGINAL;
+				item.Animation.FrameNumber = GetAnimData(item).frameBase;
+				item.Animation.ActiveState = SQUISHY_BLOCK_STATE_ORIGINAL;
+				item.Animation.TargetState = SQUISHY_BLOCK_STATE_ORIGINAL;
 			}
-				else
-					item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, Lerp(item.TriggerFlags / 4, item.TriggerFlags, item.ItemFlags[0]));			
 		}
 		else
 		{
-			if (item.Animation.FrameNumber - GetAnimData(item).frameBase == 19)
+			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_ORIGINAL)
 			{
-				item.ItemFlags[4] = item.ItemFlags[4] + ANGLE(180.0f);
+				item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_MOVE;
+				item.Animation.FrameNumber = GetAnimData(item).frameBase;
+				item.Animation.ActiveState = SQUISHY_BLOCK_STATE_MOVE;
+				item.Animation.TargetState = SQUISHY_BLOCK_STATE_MOVE;
+			}
+
+			item.ItemFlags[0] = item.TriggerFlags;
+			auto forwardDir = EulerAngles(0, item.Pose.Orientation.y + item.ItemFlags[4], 0).ToDirection();
+
+			auto pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+
+			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_MOVE)
+			{
+				if (pointColl.RoomNumber != item.RoomNumber)
+					ItemNewRoom(itemNumber, pointColl.RoomNumber);
+
+				if (!IsNextSectorValid(item, forwardDir, item.ItemFlags[0]))
+				{
+					if (item.ItemFlags[4] == ANGLE(180))
+					{
+						item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_COLLIDE_LEFT;
+						item.Animation.FrameNumber = GetAnimData(item).frameBase;
+						item.Animation.ActiveState = SQUISHY_BLOCK_STATE_COLLIDE_LEFT;
+						item.Animation.TargetState = SQUISHY_BLOCK_STATE_COLLIDE_LEFT;
+					}
+					else if (item.ItemFlags[4] == ANGLE(0))
+					{
+						item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_COLLIDE_RIGHT;
+						item.Animation.FrameNumber = GetAnimData(item).frameBase;
+						item.Animation.ActiveState = SQUISHY_BLOCK_STATE_COLLIDE_RIGHT;
+						item.Animation.TargetState = SQUISHY_BLOCK_STATE_COLLIDE_RIGHT;
+					}
+				}
+				else
+					item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, Lerp(item.TriggerFlags / 4, item.TriggerFlags, item.ItemFlags[0]));
+			}
+			else
+			{
+				if (item.Animation.FrameNumber - GetAnimData(item).frameBase == 19)
+				{
+					item.ItemFlags[4] = item.ItemFlags[4] + ANGLE(180.0f);
+				}
 			}
 		}
 			if (LaraItem->HitPoints)
@@ -93,7 +127,7 @@ namespace TEN::Entities::Traps
 		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(0.5f));
 		auto bounds = GameBoundingBox(&item);
 		int itemHeight = bounds.GetHeight();
-
+		
 		// Test for wall.
 		if (pointColl.Block->IsWall(projectedPos.x, projectedPos.z))
 			return false;
@@ -103,11 +137,11 @@ namespace TEN::Entities::Traps
 			return false;
 
 		// Flat floor.
-		if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
+		if ((abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0))
 		{
 			// Test for step.
 			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
-			if (relFloorHeight >= CLICK(1))
+			if (relFloorHeight >= CLICK(1) && item.Pose.Position.y >= pointColl.Position.Floor)
 				return false;
 		}
 		// Sloped floor.
@@ -152,11 +186,18 @@ namespace TEN::Entities::Traps
 		// Test ceiling height.
 		int relCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 		
-		if (relCeilHeight < itemHeight)
+		if (relCeilHeight <= itemHeight)
 			return false;
 
+		// Check for blocked grey box.
+		if (g_Level.Boxes[pointColl.Block->Box].flags & BLOCKABLE)
+		{
+			if (g_Level.Boxes[pointColl.Block->Box].flags & BLOCKED)
+				return false;
+		}
+
 		// Check for inaccessible sector.
-		if (pointColl.Block->Box == NO_BOX)
+		if (pointColl.Block->Box == NO_ZONE)
 			return false;
 
 		// Check for stopper flag.
@@ -173,15 +214,23 @@ namespace TEN::Entities::Traps
 		if (TestBoundsCollide(&item, laraItem, coll->Setup.Radius) && TestCollision(&item, laraItem))
 		{
 			if (laraItem->HitPoints > 0)
-				ItemPushItem(&item, laraItem, coll, false, 1);
+				ItemPushItem(&item, laraItem, coll, false, 1);			
 		}
 
 		if (ItemPushItem(&item, laraItem, coll, false, 1))
 		{
-			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_RIGHT ||
-			item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_LEFT)
-			LaraItem->HitPoints = 0;
-		}
+			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_ORIGINAL)
+			{
+				auto frame = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+				if (!frame || frame == 33)
+					LaraItem->HitPoints = 0;
+			}
+			else if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_RIGHT ||
+					item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_LEFT)
+			{
+				LaraItem->HitPoints = 0;
+			}
+		}	
 	}
 
 	void FallingSquishyBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

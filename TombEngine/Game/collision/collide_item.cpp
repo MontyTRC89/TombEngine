@@ -662,6 +662,8 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 	int maxX = bounds.X2;
 	int minZ = bounds.Z1;
 	int maxZ = bounds.Z2;
+	int minY = bounds.Y1;
+	int maxY = bounds.Y2;
 
 	if (bigPushFlags & 1)
 	{
@@ -669,12 +671,15 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 		maxX += coll->Setup.Radius;
 		minZ -= coll->Setup.Radius;
 		maxZ += coll->Setup.Radius;
+		minY -= coll->Setup.Radius;
+		maxY += coll->Setup.Radius;
 	}
 
 	// Big enemies.
 	if (abs(deltaPos.x) > BLOCK(4.5f) || abs(deltaPos.z) > BLOCK(4.5f) ||
 		relDeltaPos.x <= minX || relDeltaPos.x >= maxX ||
-		relDeltaPos.z <= minZ || relDeltaPos.z >= maxZ)
+		relDeltaPos.z <= minZ || relDeltaPos.z >= maxZ ||
+		relDeltaPos.y <= minY || relDeltaPos.y >= maxY)
 	{
 		return false;
 	}
