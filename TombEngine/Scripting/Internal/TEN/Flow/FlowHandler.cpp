@@ -564,6 +564,28 @@ void FlowHandler::EnableLoadSave(bool loadSave)
 	LoadSave = loadSave;
 }
 
+void FlowHandler::PrepareInventoryObjects()
+{
+	Level* level = Levels[CurrentLevel];
+
+	for (size_t i = 0; i < level->InventoryObjects.size(); i++)
+	{
+		InventoryItem* obj = &level->InventoryObjects[i];
+		if (obj->ObjectID >= 0 && obj->ObjectID < INVENTORY_TABLE_SIZE)
+		{
+			InventoryObject* invObj = &InventoryObjectTable[obj->ObjectID];
+
+			invObj->ObjectName = obj->Name.c_str();
+			invObj->Scale1 = obj->Scale;
+			invObj->YOffset = obj->YOffset;
+			invObj->Orientation = EulerAngles(ANGLE(obj->Rot.x), ANGLE(obj->Rot.y), ANGLE(obj->Rot.z));
+			invObj->MeshBits = obj->MeshBits;
+			invObj->Options = obj->MenuAction;
+			invObj->RotFlags = obj->RotFlags;
+		}
+	}
+}
+
 bool FlowHandler::DoFlow()
 {
 	// We start with the title level, if no other index is specified
@@ -585,9 +607,6 @@ bool FlowHandler::DoFlow()
 			TENLog("Level not found. Check Gameflow.lua file integrity.", LogLevel::Error, LogConfig::All);
 			CurrentLevel = 0;
 		}
-		
-		// First we need to fill some legacy variables in PCTomb5.exe
-		Level* level = Levels[CurrentLevel];
 
 		GameStatus status;
 
@@ -607,26 +626,9 @@ bool FlowHandler::DoFlow()
 		}
 		else
 		{
-			// Prepare inventory objects table
-			for (size_t i = 0; i < level->InventoryObjects.size(); i++)
-			{
-				InventoryItem* obj = &level->InventoryObjects[i];
-				if (obj->ObjectID >= 0 && obj->ObjectID < INVENTORY_TABLE_SIZE)
-				{
-					InventoryObject* invObj = &InventoryObjectTable[obj->ObjectID];
-
-					invObj->ObjectName = obj->Name.c_str();
-					invObj->Scale1 = obj->Scale;
-					invObj->YOffset = obj->YOffset;
-					invObj->Orientation = EulerAngles(ANGLE(obj->Rot.x), ANGLE(obj->Rot.y), ANGLE(obj->Rot.z));
-					invObj->MeshBits = obj->MeshBits;
-					invObj->Options = obj->MenuAction;
-					invObj->RotFlags = obj->RotFlags;
-				}
-			}
-
 			try
 			{
+				PrepareInventoryObjects();
 				status = DoLevel(CurrentLevel, loadFromSavegame);
 			}
 			catch (TENScriptException const& e) 
