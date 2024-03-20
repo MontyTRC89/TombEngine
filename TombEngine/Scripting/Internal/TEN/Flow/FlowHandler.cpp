@@ -677,11 +677,8 @@ bool FlowHandler::DoFlow()
 			}
 			else
 			{
-				// Save state of current level to a hub.
-				SaveGame::SaveHub(CurrentLevel);
-
 				CurrentLevel = NextLevel;
-				
+
 				// Reset hub, if next level has it set.
 				if (g_GameFlow->GetLevel(CurrentLevel)->GetResetHubEnabled())
 					SaveGame::ResetHub();

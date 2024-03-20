@@ -299,6 +299,7 @@ unsigned CALLBACK GameMain(void *)
 GameStatus DoLevel(int levelIndex, bool loadGame)
 {
 	bool isTitle = !levelIndex;
+	auto loadType = loadGame ? LevelLoadType::Load : (SaveGame::IsOnHub(levelIndex) ? LevelLoadType::Hub : LevelLoadType::New);
 
 	TENLog(isTitle ? "DoTitle" : "DoLevel", LogLevel::Info);
 
@@ -314,7 +315,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeItemBoxData();
 
 	// Initialize scripting.
-	InitializeScripting(levelIndex, loadGame);
+	InitializeScripting(levelIndex, loadType);
 	InitializeNodeScripts();
 
 	// Initialize menu and inventory state.
@@ -452,12 +453,12 @@ void CleanUp()
 	ClearObjCamera();
 }
 
-void InitializeScripting(int levelIndex, bool loadGame)
+void InitializeScripting(int levelIndex, LevelLoadType type)
 {
 	TENLog("Loading level script...", LogLevel::Info);
 
 	g_GameStringsHandler->ClearDisplayStrings();
-	g_GameScript->ResetScripts(!levelIndex || loadGame);
+	g_GameScript->ResetScripts(!levelIndex || type != LevelLoadType::New);
 
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
@@ -477,7 +478,7 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	}
 
 	// Play default background music.
-	if (!loadGame)
+	if (type != LevelLoadType::Load)
 		PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
@@ -602,6 +603,7 @@ GameStatus DoGameLoop(int levelIndex)
 
 void EndGameLoop(int levelIndex, GameStatus reason)
 {
+	SaveGame::SaveHub(levelIndex);
 	DeInitializeScripting(levelIndex, reason);
 
 	StopAllSounds();
