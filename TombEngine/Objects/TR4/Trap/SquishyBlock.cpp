@@ -44,11 +44,11 @@ namespace TEN::Entities::Traps
 			item.Animation.ActiveState = SQUISHY_BLOCK_STATE_ORIGINAL;
 			item.Animation.TargetState = SQUISHY_BLOCK_STATE_ORIGINAL;
 		}
-		else
-		{
+
 			item.ItemFlags[0] = item.TriggerFlags;
 			item.ItemFlags[4] = ANGLE(0.0f);
-		}
+			item.ItemFlags[1] = 0;
+			item.HitPoints = NOT_TARGETABLE;
 	}
 
 	void ControlSquishyBlock(short itemNumber)
@@ -80,16 +80,18 @@ namespace TEN::Entities::Traps
 			}
 
 			item.ItemFlags[0] = item.TriggerFlags;
-			auto forwardDir = EulerAngles(0, item.Pose.Orientation.y + item.ItemFlags[4], 0).ToDirection();
-
-			auto pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
 			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_MOVE)
 			{
+
+				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y + item.ItemFlags[4], 0).ToDirection();
+
+				auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, forwardDir, BLOCK(0.5f));
+
 				if (pointColl.RoomNumber != item.RoomNumber)
 					ItemNewRoom(itemNumber, pointColl.RoomNumber);
 
-				if (!IsNextSectorValid(item, forwardDir, item.ItemFlags[0]))
+				if (!IsNextSectorValid(item, forwardDir))
 				{
 					if (item.ItemFlags[4] == ANGLE(180))
 					{
@@ -113,15 +115,22 @@ namespace TEN::Entities::Traps
 			{
 				if (item.Animation.FrameNumber - GetAnimData(item).frameBase == 19)
 				{
+					if (item.HitPoints != NOT_TARGETABLE && item.HitPoints)
+					{
+						item.ItemFlags[1] = item.HitPoints;
+						item.HitPoints = NOT_TARGETABLE;
+					}
+
 					item.ItemFlags[4] = item.ItemFlags[4] + ANGLE(180.0f);
-				}
+					item.Pose.Orientation.y += ANGLE(item.ItemFlags[1]);
+				}				
 			}
 		}
 			if (LaraItem->HitPoints)
 			AnimateItem(&item);		
 	}
 	
-	bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, short& vel)
+	bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir)
 	{
 		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(0.5f));
 		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(0.5f));
