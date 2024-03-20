@@ -740,10 +740,32 @@ static void ClampCameraAltitudeAngle(bool isUnderwater)
 	}
 }
 
+static bool DoStrafeZoom(const ItemInfo& playerItem)
+{
+	const auto& player = GetLaraInfo(playerItem);
+
+	if (!IsUsingModernControls())
+		return false;
+
+	if (player.Control.HandStatus == HandStatus::WeaponDraw ||
+		player.Control.HandStatus == HandStatus::WeaponReady)
+	{
+		return false;
+	}
+
+	if (IsHeld(In::Look))
+		return true;
+
+	return false;
+}
+
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
-	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT = 4;
-	constexpr auto TANK_CAMERA_CLOSE_DIST_MIN	 = BLOCK(0.75f);
+	constexpr auto STRAFE_CAMERA_FOV			   = ANGLE(90.0f);
+	constexpr auto STRAFE_CAMERA_DIST_OFFSET_COEFF = 0.4f;
+	constexpr auto STRAFE_CAMERA_ZOOM_BUFFER	   = BLOCK(0.1f);
+	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT   = 4;
+	constexpr auto TANK_CAMERA_CLOSE_DIST_MIN	   = BLOCK(0.75f);
 
 	const auto& player = GetLaraInfo(playerItem);
 
@@ -760,15 +782,37 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, Camera.targetDistance).RoomNumber;
 
 		// Assess LOS.
-		auto losIntersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
-		if (losIntersect.has_value())
+		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
+		if (intersect.has_value())
 		{
-			idealPos = losIntersect->first;
-			idealRoomNumber = losIntersect->second;
+			idealPos = intersect->first;
+			idealRoomNumber = intersect->second;
+		}
+
+		float speedCoeff = (Camera.type != CameraType::Look) ? 0.2f : 1.0f;
+
+		// Handle strafe zoom.
+		if (IsPlayerStrafing(playerItem))
+		{
+			AlterFOV((short)Lerp(CurrentFOV, STRAFE_CAMERA_FOV, speedCoeff));
+
+			// Apply zoom if using Look action to strafe.
+			if (DoStrafeZoom(playerItem))
+			{
+				float distOffset = Camera.targetDistance * STRAFE_CAMERA_DIST_OFFSET_COEFF;
+				float dist = Vector3::Distance(Camera.LookAt, idealPos);
+				dist = ((dist - distOffset) >= STRAFE_CAMERA_ZOOM_BUFFER) ? (dist - distOffset) : STRAFE_CAMERA_ZOOM_BUFFER;
+
+				idealPos = Geometry::TranslatePoint(Camera.LookAt, dir, dist);
+				idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, dist).RoomNumber;
+			}
+		}
+		else
+		{
+			AlterFOV((short)Lerp(CurrentFOV, ANGLE(DEFAULT_FOV), speedCoeff));
 		}
 
 		// Update camera.
-		float speedCoeff = (Camera.type != CameraType::Look) ? 0.2f : 1.0f;
 		MoveCamera(playerItem, idealPos, idealRoomNumber, Camera.speed * speedCoeff);
 	}
 	else
