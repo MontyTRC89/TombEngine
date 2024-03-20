@@ -762,6 +762,7 @@ static bool DoStrafeZoom(const ItemInfo& playerItem)
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
 	constexpr auto STRAFE_CAMERA_FOV			   = ANGLE(90.0f);
+	constexpr auto STRAFE_CAMERA_FOV_LEFT_ALPHA	   = 0.2f;
 	constexpr auto STRAFE_CAMERA_DIST_OFFSET_COEFF = 0.4f;
 	constexpr auto STRAFE_CAMERA_ZOOM_BUFFER	   = BLOCK(0.1f);
 	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT   = 4;
@@ -789,12 +790,10 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			idealRoomNumber = intersect->second;
 		}
 
-		float speedCoeff = (Camera.type != CameraType::Look) ? 0.2f : 1.0f;
-
-		// Handle strafe zoom.
+		// Handle strafe camera effects.
 		if (IsPlayerStrafing(playerItem))
 		{
-			AlterFOV((short)Lerp(CurrentFOV, STRAFE_CAMERA_FOV, speedCoeff));
+			AlterFOV((short)Lerp(CurrentFOV, STRAFE_CAMERA_FOV, STRAFE_CAMERA_FOV_LEFT_ALPHA));
 
 			// Apply zoom if using Look action to strafe.
 			if (DoStrafeZoom(playerItem))
@@ -809,10 +808,11 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		}
 		else
 		{
-			AlterFOV((short)Lerp(CurrentFOV, ANGLE(DEFAULT_FOV), speedCoeff));
+			AlterFOV((short)Lerp(CurrentFOV, ANGLE(DEFAULT_FOV), STRAFE_CAMERA_FOV_LEFT_ALPHA));
 		}
 
 		// Update camera.
+		float speedCoeff = (Camera.type != CameraType::Look) ? 0.2f : 1.0f;
 		MoveCamera(playerItem, idealPos, idealRoomNumber, Camera.speed * speedCoeff);
 	}
 	else
