@@ -8,37 +8,39 @@
 
 static const std::unordered_map<std::string, WeatherType> WEATHER_TYPES
 {
-	{"None", WeatherType::None},
-	{"Rain", WeatherType::Rain},
-	{"Snow", WeatherType::Snow}
+	{ "None", WeatherType::None },
+	{ "Rain", WeatherType::Rain },
+	{ "Snow", WeatherType::Snow }
 };
-
 
 static const std::unordered_map<std::string, LaraType> PLAYER_TYPES
 {
-	{"Normal", LaraType::Normal},
-	{"Young", LaraType::Young},
-	{"Bunhead", LaraType::Bunhead},
-	{"Catsuit", LaraType::Catsuit},
-	{"Divesuit", LaraType::Divesuit},
-	{"Invisible", LaraType::Invisible}
+	{ "Normal", LaraType::Normal },
+	{ "Young", LaraType::Young },
+	{ "Bunhead", LaraType::Bunhead },
+	{ "Catsuit", LaraType::Catsuit },
+	{ "Divesuit", LaraType::Divesuit },
+	{ "Invisible", LaraType::Invisible }
 };
 
 struct Level : public ScriptInterfaceLevel
 {
-	std::string AmbientTrack;
-	SkyLayer Layer1;
-	SkyLayer Layer2;
-	Fog Fog;
-	bool Storm{ false };
-	WeatherType Weather{ WeatherType::None };
-	float WeatherStrength{ 1.0f };
-	LaraType Type{ LaraType::Normal };
-	Mirror Mirror;
-	int LevelFarView{ 0 };
-	bool ResetHub{ false };
-	std::vector<InventoryItem> InventoryObjects;
-	int LevelSecrets{ 0 };
+	SkyLayer	Layer1		 = {};
+	SkyLayer	Layer2		 = {};
+	Fog			Fog			 = {};
+	Mirror		Mirror		 = {};
+	int			LevelFarView = 0;
+	std::string AmbientTrack = {};
+	
+	WeatherType Weather			= WeatherType::None;
+	float		WeatherStrength = 1.0f;
+	bool		Storm			= false;
+
+	LaraType Type = LaraType::Normal;
+	int LevelSecrets = 0;
+	std::vector<InventoryItem> InventoryObjects = {};
+
+	bool ResetHub = false;
 
 	RGBAColor8Byte GetFogColor() const override;
 	bool GetFogEnabled() const override;

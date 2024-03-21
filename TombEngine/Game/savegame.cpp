@@ -127,11 +127,11 @@ Save::Vector4 FromVector4(const Vector4& vec)
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
 }
 
-Pose ToPose(const Save::Pose* pose)
+Pose ToPose(const Save::Pose& pose)
 {
 	return Pose(
-		pose->x_pos(), pose->y_pos(), pose->z_pos(),
-		(short)pose->x_rot(), (short)pose->y_rot(), (short)pose->z_rot());
+		pose.x_pos(), pose.y_pos(), pose.z_pos(),
+		(short)pose.x_rot(), (short)pose.y_rot(), (short)pose.z_rot());
 }
 
 EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
@@ -1576,7 +1576,7 @@ bool SaveGame::Load(int slot)
 	return true;
 }
 
-static void ParseStatistics(const Save::SaveGame* s, bool hub)
+static void ParseStatistics(const Save::SaveGame* s, bool isHub)
 {
 	SaveGame::Statistics.Level.AmmoHits = s->level()->ammo_hits();
 	SaveGame::Statistics.Level.AmmoUsed = s->level()->ammo_used();
@@ -1586,8 +1586,8 @@ static void ParseStatistics(const Save::SaveGame* s, bool hub)
 	SaveGame::Statistics.Level.Secrets = s->level()->secrets();
 	SaveGame::Statistics.Level.Timer = s->level()->timer();
 
-	// Game statistics are untouched if data is parsed in hub mode.
-	if (hub)
+	// Don't touch game statistics if data is parsed in hub mode.
+	if (isHub)
 		return;
 
 	GameTimer = s->header()->timer();
@@ -1609,9 +1609,9 @@ static void ParseLua(const Save::SaveGame* s)
 	{
 		for (int i = 0; i < s->volume_event_sets()->size(); ++i)
 		{
-			auto set_saved = s->volume_event_sets()->Get(i);
-			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
-				g_Level.VolumeEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
+			auto setSaved = s->volume_event_sets()->Get(i);
+			for (int j = 0; j < setSaved->call_counters()->size(); ++j)
+				g_Level.VolumeEventSets[setSaved->index()].Events[j].CallCounter = setSaved->call_counters()->Get(j);
 		}
 	}
 
@@ -1619,9 +1619,9 @@ static void ParseLua(const Save::SaveGame* s)
 	{
 		for (int i = 0; i < s->global_event_sets()->size(); ++i)
 		{
-			auto set_saved = s->global_event_sets()->Get(i);
-			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
-				g_Level.GlobalEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
+			auto setSaved = s->global_event_sets()->Get(i);
+			for (int j = 0; j < setSaved->call_counters()->size(); ++j)
+				g_Level.GlobalEventSets[setSaved->index()].Events[j].CallCounter = setSaved->call_counters()->Get(j);
 		}
 	}
 
@@ -1792,7 +1792,7 @@ static void ParsePlayer(const Save::SaveGame* s)
 	Lara.Context.WaterCurrentPull.y = s->lara()->context()->water_current_pull()->y();
 	Lara.Context.WaterCurrentPull.z = s->lara()->context()->water_current_pull()->z();
 	Lara.Context.InteractedItem = s->lara()->context()->interacted_item_number();
-	Lara.Context.NextCornerPos = ToPose(s->lara()->context()->next_corner_pose());
+	Lara.Context.NextCornerPos = ToPose(*s->lara()->context()->next_corner_pose());
 	Lara.Context.ProjectedFloorHeight = s->lara()->context()->projected_floor_height();
 	Lara.Context.TargetOrientation = ToEulerAngles(s->lara()->context()->target_orient());
 	Lara.Context.Vehicle = s->lara()->context()->vehicle_item_number();
@@ -2043,7 +2043,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		bat->On = batInfo->on();
 		bat->Counter = batInfo->flags();
 		bat->RoomNumber = batInfo->room_number();
-		bat->Pose = ToPose(batInfo->pose());
+		bat->Pose = ToPose(*batInfo->pose());
 	}
 
 	for (int i = 0; i < s->rats()->size(); i++)
@@ -2054,7 +2054,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		rat->On = ratInfo->on();
 		rat->Flags = ratInfo->flags();
 		rat->RoomNumber = ratInfo->room_number();
-		rat->Pose = ToPose(ratInfo->pose());
+		rat->Pose = ToPose(*ratInfo->pose());
 	}
 
 	for (int i = 0; i < s->spiders()->size(); i++)
@@ -2065,7 +2065,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		spider->On = spiderInfo->on();
 		spider->Flags = spiderInfo->flags();
 		spider->RoomNumber = spiderInfo->room_number();
-		spider->Pose = ToPose(spiderInfo->pose());
+		spider->Pose = ToPose(*spiderInfo->pose());
 	}
 
 	for (int i = 0; i < s->scarabs()->size(); i++)
@@ -2076,7 +2076,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		beetle->On = beetleInfo->on();
 		beetle->Flags = beetleInfo->flags();
 		beetle->RoomNumber = beetleInfo->room_number();
-		beetle->Pose = ToPose(beetleInfo->pose());
+		beetle->Pose = ToPose(*beetleInfo->pose());
 	}
 
 	NextFxFree = s->next_fx_free();
@@ -2086,7 +2086,7 @@ static void ParseEffects(const Save::SaveGame* s)
 	{
 		auto& fx = EffectList[i];
 		auto fx_saved = s->fxinfos()->Get(i);
-		fx.pos = ToPose(fx_saved->pose());
+		fx.pos = ToPose(*fx_saved->pose());
 		fx.roomNumber = fx_saved->room_number();
 		fx.objectNumber = fx_saved->object_number();
 		fx.nextFx = fx_saved->next_fx();
@@ -2119,7 +2119,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 		auto room = &g_Level.Rooms[staticMesh->room_number()];
 		int number = staticMesh->number();
 
-		room->mesh[number].pos = ToPose(staticMesh->pose());
+		room->mesh[number].pos = ToPose(*staticMesh->pose());
 		room->mesh[number].roomNumber = staticMesh->room_number();
 		room->mesh[number].scale = staticMesh->scale();
 		room->mesh[number].color = ToVector4(staticMesh->color());
@@ -2249,7 +2249,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		g_GameScriptEntities->TryAddColliding(i);
 
-		// Don't load Lara data in the hub mode
+		// Don't load player data in hub mode.
 		if (item->ObjectNumber == ID_LARA && hubMode)
 			continue;
 
@@ -2257,7 +2257,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 			continue;
 
 		// Position
-		item->Pose = ToPose(savedItem->pose());
+		item->Pose = ToPose(*savedItem->pose());
 		item->RoomNumber = savedItem->room_number();
 		item->Floor = savedItem->floor();
 		item->BoxNumber = savedItem->box_number();
@@ -2311,7 +2311,9 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8 &&
 			(item->Flags & ONESHOT))
+		{
 			item->MeshBits = 0x00100;
+		}
 
 		// Post-load specific hacks for objects.
 		if (item->ObjectNumber >= ID_PUZZLE_HOLE1 && item->ObjectNumber <= ID_PUZZLE_HOLE16 &&
@@ -2430,7 +2432,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 			kayak->FrontVerticalVelocity = savedKayak->front_vertical_velocity();
 			kayak->LeftRightPaddleCount = savedKayak->left_right_count();
 			kayak->LeftVerticalVelocity = savedKayak->left_vertical_velocity();
-			kayak->OldPose = ToPose(savedKayak->old_pos());
+			kayak->OldPose = ToPose(*savedKayak->old_pos());
 			kayak->RightVerticalVelocity = savedKayak->right_vertical_velocity();
 			kayak->TrueWater = savedKayak->true_water();
 			kayak->Turn = savedKayak->turn();

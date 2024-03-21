@@ -2,14 +2,14 @@ Version 1.4
 ===========
 
 * Fixed drawing of display sprites in title level.
-* Fixed Lara holster state and current vehicle not preserved correctly on level jump.
+* Fixed player holster state and current vehicle not preserved correctly on level jump.
 * Fixed fade-in and fade-out effects not canceling correctly when next level is loaded.
 * Fixed shadows still being visible after shattering a moveable.
 * Fixed FOV interpolation at the end of the flyby sequence.
 * Fixed sounds resuming in pause mode while switching between apps.
 * Fixed slide directions.
 * Fixed occasional collision warnings in a log when teeth spikes object was activated.
-* Auto-switch to a crawl state if Lara start position is in a crawlspace.
+* Auto-switch to a crawl state if player start position is in a crawlspace.
 * Revise wall spikes:
   - Wall spikes now stop when they touch a pushable, another spike wall or a normal wall.
   - Wall spikes will shatter any shatter in its path.

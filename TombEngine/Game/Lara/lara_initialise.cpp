@@ -6,16 +6,16 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara_two_guns.h"
 #include "Game/Lara/PlayerStateMachine.h"
 #include "Game/Setup.h"
-#include "Objects/TR3/Vehicles/kayak.h"
-#include "Objects/TR4/Vehicles/motorbike.h"
-#include "Objects/TR4/Vehicles/jeep.h"
-#include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR2/Vehicles/skidoo.h"
+#include "Objects/TR3/Vehicles/kayak.h"
+#include "Objects/TR3/Vehicles/quad_bike.h"
+#include "Objects/TR4/Vehicles/jeep.h"
+#include "Objects/TR4/Vehicles/motorbike.h"
 #include "Specific/level.h"
 
 using namespace TEN::Entities::Player;
@@ -88,7 +88,7 @@ void InitializeLara(bool restore)
 		InitializeLaraDefaultInventory(*LaraItem);
 	}
 
-	// Lara animation init should happen after leveljump init.
+	// Player anim init should happen after leveljump init.
 	InitializeLaraAnims(LaraItem);
 
 	g_Hud.StatusBars.Initialize(*LaraItem);
@@ -96,17 +96,17 @@ void InitializeLara(bool restore)
 
 void InitializeLaraMeshes(ItemInfo* item)
 {
+	auto& player = GetLaraInfo(*item);
+
 	// Override base mesh and mesh indices to player skin if it exists.
 	item->Model.BaseMesh = Objects[(Objects[ID_LARA_SKIN].loaded ? ID_LARA_SKIN : ID_LARA)].meshIndex;
 
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 		item->Model.MeshIndex[i] = item->Model.BaseMesh + i;
 
-	auto* lara = GetLaraInfo(item);
-
-	lara->Control.Weapon.HolsterInfo.LeftHolster =
-	lara->Control.Weapon.HolsterInfo.RightHolster = 
-	lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
+	player.Control.Weapon.HolsterInfo.LeftHolster =
+	player.Control.Weapon.HolsterInfo.RightHolster = 
+	player.Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
 }
 
 void InitializeLaraAnims(ItemInfo* item)
@@ -122,21 +122,21 @@ void InitializeLaraAnims(ItemInfo* item)
 
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
-		player.Control.WaterStatus = WaterStatus::Underwater;
-		item->Animation.Velocity.y = 0;
 		SetAnimation(item, LA_UNDERWATER_IDLE);
+		item->Animation.Velocity.y = 0.0f;
+		player.Control.WaterStatus = WaterStatus::Underwater;
 	}
 	else
 	{
 		player.Control.WaterStatus = WaterStatus::Dry;
 
-		// Allow player to start in a crawl position if start position is too low.
-
-		auto probe = GetCollision(item);
-		if (abs(probe.Position.Ceiling - probe.Position.Floor) < LARA_HEIGHT)
+		// Allow player to start in crawl idle anim if start position is too low.
+		auto pointColl = GetCollision(item);
+		if (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT)
 		{
 			SetAnimation(item, LA_CRAWL_IDLE);
-			player.Control.IsLow = player.Control.KeepLow = true;
+			player.Control.IsLow =
+			player.Control.KeepLow = true;
 		}
 		else
 		{
@@ -161,8 +161,8 @@ void InitializeLaraStartPosition(ItemInfo& playerItem)
 			continue;
 
 		// HACK: For some reason, player can't be immediately updated and moved on loading.
-		// We need to simulate "game loop" happening, so that its position actually updates on the next loop.
-		// However, room number must be also manually set in advance, so that startup animation detection
+		// Need to simulate "game loop" happening so that its position actually updates on next loop.
+		// However, room number must be also be manually set in advance, so that startup anim detection
 		// won't fail (otherwise player may start crouching because probe uses previous room number).
 
 		InItemControlLoop = true;
@@ -173,12 +173,57 @@ void InitializeLaraStartPosition(ItemInfo& playerItem)
 
 		InItemControlLoop = false;
 
-		TENLog("Player start position has been set according to start position object with index " + std::to_string(item.TriggerFlags) + ".", LogLevel::Info);
+		TENLog("Player start position has been set according to start position of object with ID " + std::to_string(item.TriggerFlags) + ".", LogLevel::Info);
 		break;
 	}
 
 	playerItem.Location.RoomNumber = playerItem.RoomNumber;
 	playerItem.Location.Height = playerItem.Pose.Position.y;
+}
+
+static void InitializePlayerVehicle(ItemInfo& playerItem)
+{
+	if (PlayerVehicleObjectID == GAME_OBJECT_ID::ID_NO_OBJECT)
+		return;
+
+	auto* vehicle = FindItem(PlayerVehicleObjectID);
+	if (vehicle == nullptr)
+		return;
+
+	// Restore vehicle.
+	TENLog("Transferring vehicle " + GetObjectName(PlayerVehicleObjectID) + " from the previous level.");
+	vehicle->Pose = playerItem.Pose;
+	ItemNewRoom(vehicle->Index, playerItem.RoomNumber);
+	SetLaraVehicle(&playerItem, vehicle);
+	playerItem.Animation = PlayerAnim;
+
+	// HACK: Reinitialize vehicles which require specific parameters to be reset according to Lara pose.
+
+	switch (vehicle->ObjectNumber)
+	{
+	case GAME_OBJECT_ID::ID_KAYAK:
+		InitializeKayak(vehicle->Index);
+		break;
+
+	case GAME_OBJECT_ID::ID_MOTORBIKE:
+		InitializeMotorbike(vehicle->Index);
+		break;
+
+	case GAME_OBJECT_ID::ID_JEEP:
+		InitializeJeep(vehicle->Index);
+		break;
+
+	case GAME_OBJECT_ID::ID_QUAD:
+		InitializeQuadBike(vehicle->Index);
+		break;
+
+	case GAME_OBJECT_ID::ID_SNOWMOBILE:
+		InitializeSkidoo(vehicle->Index);
+		break;
+
+	default:
+		break;
+	}
 }
 
 void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup)
@@ -222,54 +267,8 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup)
 	// Restore hit points.
 	item->HitPoints = PlayerHitPoints;
 
-	// Restore vehicle
-	InitializeLaraVehicle(*item);
-}
-
-void InitializeLaraVehicle(ItemInfo& playerItem)
-{
-	if (PlayerVehicleObjectID == GAME_OBJECT_ID::ID_NO_OBJECT)
-		return;
-
-	auto* vehicle = FindItem(PlayerVehicleObjectID);
-	if (vehicle == nullptr)
-		return;
-
 	// Restore vehicle.
-
-	TENLog("Transferring vehicle " + GetObjectName(PlayerVehicleObjectID) + " from the previous level.");
-	vehicle->Pose = playerItem.Pose;
-	ItemNewRoom(vehicle->Index, playerItem.RoomNumber);
-	SetLaraVehicle(&playerItem, vehicle);
-	playerItem.Animation = PlayerAnim;
-
-	// HACK: Reinitialize vehicles which require specific parameters to be reset according to Lara pose.
-
-	switch (vehicle->ObjectNumber)
-	{
-		case GAME_OBJECT_ID::ID_KAYAK:
-			InitializeKayak(vehicle->Index);
-			break;
-
-		case GAME_OBJECT_ID::ID_MOTORBIKE:
-			InitializeMotorbike(vehicle->Index);
-			break;
-
-		case GAME_OBJECT_ID::ID_JEEP:
-			InitializeJeep(vehicle->Index);
-			break;
-
-		case GAME_OBJECT_ID::ID_QUAD:
-			InitializeQuadBike(vehicle->Index);
-			break;
-
-		case GAME_OBJECT_ID::ID_SNOWMOBILE:
-			InitializeSkidoo(vehicle->Index);
-			break;
-
-		default:
-			break;
-	}
+	InitializePlayerVehicle(*item);
 }
 
 void InitializeLaraDefaultInventory(ItemInfo& item)

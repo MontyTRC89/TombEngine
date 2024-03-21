@@ -8,5 +8,4 @@ void InitializeLaraMeshes(ItemInfo* item);
 void InitializeLaraAnims(ItemInfo* item);
 void InitializeLaraStartPosition(ItemInfo& playerItem);
 void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup);
-void InitializeLaraVehicle(ItemInfo& playerItem);
 void InitializeLaraDefaultInventory(ItemInfo& item);

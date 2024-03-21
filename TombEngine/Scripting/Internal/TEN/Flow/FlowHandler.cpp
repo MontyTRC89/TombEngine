@@ -566,23 +566,21 @@ void FlowHandler::EnableLoadSave(bool loadSave)
 
 void FlowHandler::PrepareInventoryObjects()
 {
-	Level* level = Levels[CurrentLevel];
-
-	for (size_t i = 0; i < level->InventoryObjects.size(); i++)
+	const auto& level = *Levels[CurrentLevel];
+	for (const auto& refInvItem : level.InventoryObjects)
 	{
-		InventoryItem* obj = &level->InventoryObjects[i];
-		if (obj->ObjectID >= 0 && obj->ObjectID < INVENTORY_TABLE_SIZE)
-		{
-			InventoryObject* invObj = &InventoryObjectTable[obj->ObjectID];
+		if (refInvItem.ObjectID < 0 || refInvItem.ObjectID >= INVENTORY_TABLE_SIZE)
+			continue;
 
-			invObj->ObjectName = obj->Name.c_str();
-			invObj->Scale1 = obj->Scale;
-			invObj->YOffset = obj->YOffset;
-			invObj->Orientation = EulerAngles(ANGLE(obj->Rot.x), ANGLE(obj->Rot.y), ANGLE(obj->Rot.z));
-			invObj->MeshBits = obj->MeshBits;
-			invObj->Options = obj->MenuAction;
-			invObj->RotFlags = obj->RotFlags;
-		}
+		auto& invItem = InventoryObjectTable[refInvItem.ObjectID];
+
+		invItem.ObjectName = refInvItem.Name.c_str();
+		invItem.Scale1 = refInvItem.Scale;
+		invItem.YOffset = refInvItem.YOffset;
+		invItem.Orientation = EulerAngles(ANGLE(refInvItem.Rot.x), ANGLE(refInvItem.Rot.y), ANGLE(refInvItem.Rot.z));
+		invItem.MeshBits = refInvItem.MeshBits;
+		invItem.Options = refInvItem.MenuAction;
+		invItem.RotFlags = refInvItem.RotFlags;
 	}
 }
 
@@ -660,10 +658,10 @@ bool FlowHandler::DoFlow()
 			break;
 
 		case GameStatus::LoadGame:
-			// Load header of savegame for getting level to load.
+			// Load header of savegame to get level to load.
 			SaveGame::LoadHeader(SelectedSaveGame, &header);
 
-			// Load level
+			// Load level.
 			CurrentLevel = header.Level;
 			NextLevel = 0;
 			GameTimer = header.Timer;
@@ -673,13 +671,13 @@ bool FlowHandler::DoFlow()
 		case GameStatus::LevelComplete:
 			if (NextLevel >= Levels.size())
 			{
-				CurrentLevel = 0; // TODO: final credits
+				CurrentLevel = 0; // TODO: Final credits.
 			}
 			else
 			{
 				CurrentLevel = NextLevel;
 
-				// Reset hub, if next level has it set.
+				// Reset hub if next level has it set.
 				if (g_GameFlow->GetLevel(CurrentLevel)->GetResetHubEnabled())
 					SaveGame::ResetHub();
 			}

@@ -303,7 +303,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 
 	TENLog(isTitle ? "DoTitle" : "DoLevel", LogLevel::Info);
 
-	// Load the level. Fall back to title if unsuccessful.
+	// Load level. Fall back to title if unsuccessful.
 	if (!LoadLevelFile(levelIndex))
 		return isTitle ? GameStatus::ExitGame : GameStatus::ExitToTitle;
 
