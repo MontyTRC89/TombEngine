@@ -875,7 +875,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	}
 	else
 	{
-		Statistics.Game.AmmoHits++;
+		SaveGame::Statistics.Game.AmmoHits++;
 		target = origin + (directionNorm * bestDistance);
 		auto vTarget = GameVector(target);
 

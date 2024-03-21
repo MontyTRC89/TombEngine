@@ -25,6 +25,8 @@ private:
 
 	LuaHandler m_handler;
 
+	void PrepareInventoryObjects();
+
 public:
 	int FogInDistance  = 0;
 	int FogOutDistance = 0;

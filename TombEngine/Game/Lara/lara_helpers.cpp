@@ -314,7 +314,7 @@ static void UsePlayerMedipack(ItemInfo& item)
 	if (hasUsedMedipack)
 	{
 		player.Status.Poison = 0;
-		Statistics.Game.HealthUsed++;
+		SaveGame::Statistics.Game.HealthUsed++;
 		SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 	}
 }
