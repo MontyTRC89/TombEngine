@@ -204,7 +204,7 @@ namespace TEN::Entities::Traps
 			}
 		}
 
-		if (LaraItem->HitPoints)
+		if (LaraItem->HitPoints != 0)
 			AnimateItem(&item);		
 	}
 
@@ -248,12 +248,12 @@ namespace TEN::Entities::Traps
 			{
 				int frameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 				if (!frameNumber || frameNumber == 33)
-					LaraItem->HitPoints = 0;
+					DoDamage(playerItem, INT_MAX);
 			}
 			else if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_RIGHT ||
 				item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_LEFT)
 			{
-				LaraItem->HitPoints = 0;
+				DoDamage(playerItem, INT_MAX);
 			}
 		}	
 	}
@@ -268,8 +268,8 @@ namespace TEN::Entities::Traps
 			{
 				item.Animation.FrameNumber += 2;
 
+				DoDamage(playerItem, INT_MAX);
 				SetAnimation(playerItem, LA_BOULDER_DEATH);
-				playerItem->HitPoints = 0;
 				playerItem->Animation.Velocity.y = 0.0f;	
 				playerItem->Animation.Velocity.z = 0.0f;	
 			}
