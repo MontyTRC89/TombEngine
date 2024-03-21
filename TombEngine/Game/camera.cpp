@@ -1516,6 +1516,9 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, fl
 
 void UpdateMikePos(const ItemInfo& item)
 {
+	constexpr auto BASE_ANGLE				= ANGLE(90.0f);
+	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.01f;
+
 	if (Camera.mikeAtLara)
 	{
 		Camera.mikePos = item.Pose.Position.ToVector3();
@@ -1529,18 +1532,20 @@ void UpdateMikePos(const ItemInfo& item)
 	}
 	else
 	{
-		float dist = Vector3::DistanceSquared(Camera.LookAt, OldCam.target);
-
-		// TODO: Better method.
 		// Recalculate azimuth angle.
-		if (((IsUsingModernControls() && !IsPlayerStrafing(*LaraItem)) || !IsUsingModernControls()) &&
-			dist > 1.0f)
+		if (IsUsingModernControls() && !IsPlayerStrafing(item) &&
+			GetMoveAxis() != Vector2::Zero && item.Animation.Velocity.z != 0.0f)
 		{
-			auto deltaPos = Camera.Position - Camera.Position;
-			short targetAzimuthAngle = FROM_RAD(atan2(deltaPos.x, deltaPos.z));
-
-			float alpha = 1.0f / Camera.speed;
-			//Camera.actualAngle += Geometry::GetShortestAngle(Camera.actualAngle, targetAzimuthAngle) * alpha;
+			short deltaAngle = Geometry::GetShortestAngle(Camera.actualAngle, GetPlayerHeadingAngleY(item));
+			if (abs(deltaAngle) <= BASE_ANGLE)
+			{
+				Camera.actualAngle += deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA;
+			}
+			else
+			{
+				int sign = std::copysign(1, deltaAngle);
+				Camera.actualAngle += (BASE_ANGLE * sign) * AZIMUTH_ANGLE_LERP_ALPHA;
+			}
 		}
 
 		int perspective = ((g_Configuration.ScreenWidth / 2) * phd_cos(CurrentFOV / 2)) / phd_sin(CurrentFOV / 2);

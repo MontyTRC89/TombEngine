@@ -65,6 +65,10 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	// Update reference move axis.
+	if (GetMoveAxis() != Vector2::Zero)
+		player.Control.RefMoveAxis = GetMoveAxis();
+
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)
 	{
@@ -340,7 +344,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	// Reset collision setup.
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
@@ -362,14 +366,10 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
-	// Update reference move axis.
-	if (GetMoveAxis() != Vector2::Zero)
-		lara->Control.RefMoveAxis = GetMoveAxis();
-
 	// Handle look-around.
 	if (((IsHeld(In::Look) && CanPlayerLookAround(*item)) ||
-			(lara->Control.Look.IsUsingBinoculars || lara->Control.Look.IsUsingLasersight)) &&
-		lara->ExtraAnim == NO_ITEM)
+			(player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)) &&
+		player.ExtraAnim == NO_ITEM)
 	{
 		HandlePlayerLookAround(*item);
 	}
@@ -377,7 +377,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	{
 		ResetPlayerLookAround(*item);
 	}
-	lara->Control.Look.Mode = LookMode::None;
+	player.Control.Look.Mode = LookMode::None;
 
 	// Process vehicles.
 	if (HandleLaraVehicle(item, coll))
@@ -389,13 +389,13 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	HandleLaraMovementParameters(item, coll);
 	AnimateItem(item);
 
-	if (lara->ExtraAnim == NO_ITEM)
+	if (player.ExtraAnim == NO_ITEM)
 	{
 		// Check for collision with items.
 		DoObjectCollision(item, coll);
 
 		// Handle player behavior state collision.
-		if (lara->Context.Vehicle == NO_ITEM)
+		if (player.Context.Vehicle == NO_ITEM)
 			HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 	}
 
@@ -413,11 +413,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
-	lara->Control.IsLow = false;
-
-	Camera.targetElevation = -ANGLE(22.0f);
+	auto& player = GetLaraInfo(*item);
 
 	// Reset collision setup.
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
@@ -436,9 +432,8 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
-	// Update reference move axis.
-	if (GetMoveAxis() != Vector2::Zero)
-		lara->Control.RefMoveAxis = GetMoveAxis();
+	player.Control.IsLow = false;
+	Camera.targetElevation = ANGLE(-22.0f);
 
 	// Handle look-around.
 	if (IsHeld(In::Look) && CanPlayerLookAround(*item))
@@ -450,7 +445,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 		ResetPlayerLookAround(*item);
 	}
 
-	lara->Control.Count.Pose = 0;
+	player.Control.Count.Pose = 0;
 
 	HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Control);
 
@@ -458,26 +453,26 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	// TODO: Subsuit gradually slows down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
-	item->Pose.Orientation.y += lara->Control.TurnRate.y;
+	item->Pose.Orientation.y += player.Control.TurnRate.y;
 	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
-		lara->Control.TurnRate.y = 0;
+		player.Control.TurnRate.y = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
 
 	// Reset lean.
-	if (!lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))
+	if (!player.Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))
 		ResetPlayerLean(item, 1 / 8.0f);
 
-	if (lara->Context.WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
+	if (player.Context.WaterCurrentActive && player.Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
 	AnimateItem(item);
-	TranslateItem(item, lara->Control.HeadingOrient.y, item->Animation.Velocity.y);
+	TranslateItem(item, player.Control.HeadingOrient.y, item->Animation.Velocity.y);
 
 	DoObjectCollision(item, coll);
 
-	if (lara->Context.Vehicle == NO_ITEM)
+	if (player.Context.Vehicle == NO_ITEM)
 		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, LARA_RADIUS);
@@ -491,9 +486,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
-	lara->Control.IsLow = false;
+	auto& player = GetLaraInfo(*item);
 
 	// Reset collision setup.
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
@@ -512,6 +505,8 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
+	player.Control.IsLow = false;
+
 	// Handle look-around.
 	if (IsHeld(In::Look) && CanPlayerLookAround(*item))
 	{
@@ -522,7 +517,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 		ResetPlayerLookAround(*item);
 	}
 
-	lara->Control.Count.Pose = 0;
+	player.Control.Count.Pose = 0;
 
 	HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Control);
 
@@ -530,14 +525,14 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	// TODO: Subsuit gradually slowed down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
-	item->Pose.Orientation.y += lara->Control.TurnRate.y;
+	item->Pose.Orientation.y += player.Control.TurnRate.y;
 	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
-		lara->Control.TurnRate.y = 0;
+		player.Control.TurnRate.y = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
 
-	if (!lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))
+	if (!player.Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))
 		ResetPlayerLean(item, 1 / 8.0f, true, false);
 
 	if (item->Pose.Orientation.x < -ANGLE(85.0f))
@@ -560,7 +555,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 			item->Pose.Orientation.z = -ANGLE(22.0f);
 	}
 
-	if (lara->Context.WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
+	if (player.Context.WaterCurrentActive && player.Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
 	AnimateItem(item);
@@ -568,7 +563,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	DoObjectCollision(item, coll);
 
-	if (lara->Context.Vehicle == NO_ITEM)
+	if (player.Context.Vehicle == NO_ITEM)
 		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, 0);
