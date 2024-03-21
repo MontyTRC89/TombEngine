@@ -258,24 +258,24 @@ namespace TEN::Entities::Traps
 		}	
 	}
 
-	void CollideFallingSquishyBlock(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void CollideFallingSquishyBlock(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		if (TestBoundsCollide(&item, laraItem, coll->Setup.Radius) && TestCollision(&item, laraItem))
+		if (TestBoundsCollide(&item, playerItem, coll->Setup.Radius) && TestCollision(&item, playerItem))
 		{
 			if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) <= 8)
 			{
 				item.Animation.FrameNumber += 2;
 
-				SetAnimation(laraItem, LA_BOULDER_DEATH);
-				laraItem->HitPoints = 0;
-				laraItem->Animation.Velocity.y = 0.0f;	
-				laraItem->Animation.Velocity.z = 0.0f;	
+				SetAnimation(playerItem, LA_BOULDER_DEATH);
+				playerItem->HitPoints = 0;
+				playerItem->Animation.Velocity.y = 0.0f;	
+				playerItem->Animation.Velocity.z = 0.0f;	
 			}
-			else if (laraItem->HitPoints > 0)
+			else if (playerItem->HitPoints > 0)
 			{
-				ItemPushItem(&item, laraItem, coll, false, 1);
+				ItemPushItem(&item, playerItem, coll, false, 1);
 			}
 		}
 	}
