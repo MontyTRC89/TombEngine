@@ -19,6 +19,7 @@
 // item.ItemFlags[0]: use dynamic motion.
 // item.ItemFlags[1]: ??
 // item.ItemFlags[4]: heading angle.
+// TODO: Add support for 4 directions.
 
 namespace TEN::Entities::Traps
 {	
@@ -29,7 +30,9 @@ namespace TEN::Entities::Traps
 		SQUISHY_BLOCK_STATE_MOVE = 0,
 		SQUISHY_BLOCK_STATE_COLLIDE_LEFT = 1,
 		SQUISHY_BLOCK_STATE_COLLIDE_RIGHT = 2,
-		SQUISHY_BLOCK_STATE_BAKED_MOTION = 3
+		SQUISHY_BLOCK_STATE_BAKED_MOTION = 3,
+		SQUISHY_BLOCK_STATE_COLLIDE_FRONT = 4,
+		SQUISHY_BLOCK_STATE_COLLIDE_BACK = 5
 	};
 
 	enum SquishyBlockAnim
@@ -37,7 +40,9 @@ namespace TEN::Entities::Traps
 		SQUISHY_BLOCK_ANIM_MOVE = 0,
 		SQUISHY_BLOCK_ANIM_IMPACT_BACK = 1,
 		SQUISHY_BLOCK_ANIM_IMPACT_FRONT = 2,
-		SQUISHY_BLOCK_ANIM_BAKED_MOTION = 3
+		SQUISHY_BLOCK_ANIM_BAKED_MOTION = 3,
+		SQUISHY_BLOCK_ANIM_COLLIDE_FRONT = 4,
+		SQUISHY_BLOCK_ANIM_COLLIDE_BACK = 5
 	};
 
 	void InitializeSquishyBlock(short itemNumber)
