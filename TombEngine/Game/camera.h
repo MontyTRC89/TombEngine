@@ -76,6 +76,8 @@ struct CAMERA_INFO
 	float	speed			 = 0.0f;
 	float	targetspeed		 = 0.0f;
 
+	EulerAngles Rotation = EulerAngles::Identity;
+
 	Vector3 RelShift = Vector3::Zero;
 
 	CameraType type	   = CameraType::Chase;

@@ -192,12 +192,11 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 			}
 		}
 
-		float intersectDist = Vector3::Distance(origin, losInstance.Position);
-		intersectDist = ((intersectDist - BUFFER) >= BUFFER) ? (intersectDist - BUFFER) : BUFFER;
-
-		// Calculate and return intersection with distance buffer applied.
+		// Calculate intersection with distance buffer applied.
+		float intersectDist = std::max(Vector3::Distance(origin, losInstance.Position) - BUFFER, BUFFER);
 		auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
 		int intersectRoomNumber = GetCollision(origin, originRoomNumber, dir, intersectDist).RoomNumber;
+
 		return std::pair(intersectPos, intersectRoomNumber);
 	}
 
@@ -517,7 +516,7 @@ void InitializeCamera()
 	Camera.speed = 1.0f;
 	Camera.flags = CameraFlag::None;
 	Camera.bounce = 0;
-	Camera.number = -1;
+	Camera.number = NO_VALUE;
 	Camera.fixedCamera = false;
 
 	AlterFOV(ANGLE(DEFAULT_FOV));
@@ -614,7 +613,7 @@ void ObjCamera(ItemInfo* item, int boneID, ItemInfo* targetItem, int targetBoneI
 	Camera.fixedCamera = true;
 
 	MoveObjCamera(&target, item, boneID, targetItem, targetBoneID);
-	Camera.timer = -1;
+	Camera.timer = NO_VALUE;
 }
 
 void ClearObjCamera()
@@ -740,8 +739,8 @@ static bool TestCameraStrafeZoom(const ItemInfo& playerItem)
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
 	constexpr auto STRAFE_CAMERA_FOV			   = ANGLE(90.0f);
-	constexpr auto STRAFE_CAMERA_FOV_LERP_ALPHA	   = 0.2f;
-	constexpr auto STRAFE_CAMERA_DIST_OFFSET_COEFF = 0.4f;
+	constexpr auto STRAFE_CAMERA_FOV_LERP_ALPHA	   = 0.5f;
+	constexpr auto STRAFE_CAMERA_DIST_OFFSET_COEFF = 0.5f;
 	constexpr auto STRAFE_CAMERA_ZOOM_BUFFER	   = BLOCK(0.1f);
 	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT   = 4;
 	constexpr auto TANK_CAMERA_CLOSE_DIST_MIN	   = BLOCK(0.75f);
@@ -776,9 +775,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			// Apply zoom if using Look action to strafe.
 			if (TestCameraStrafeZoom(playerItem))
 			{
-				float distOffset = Camera.targetDistance * STRAFE_CAMERA_DIST_OFFSET_COEFF;
 				float dist = std::max(Vector3::Distance(Camera.LookAt, idealPos) * STRAFE_CAMERA_DIST_OFFSET_COEFF, STRAFE_CAMERA_ZOOM_BUFFER);
-
 				idealPos = Geometry::TranslatePoint(Camera.LookAt, dir, dist);
 				idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, dist).RoomNumber;
 			}
@@ -1007,52 +1004,55 @@ static bool CanControlTankCamera()
 
 void UpdateCameraSphere(const ItemInfo& playerItem)
 {
-	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA = 0.3f;
-	constexpr auto ALTITUDE_ROT_ALPHA		   = 1 / 8.0f;
+	constexpr auto CONTROLLED_CAMERA_ROT_LERP_ALPHA = 0.6f;
+	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA		= 0.3f;
+	constexpr auto LOCKED_CAMERA_ALTITUDE_ROT_ALPHA = 1 / 8.0f;
 
-	if (Camera.laraNode != -1)
+	if (Camera.laraNode != NO_VALUE)
 	{
 		auto origin = GetJointPosition(playerItem, Camera.laraNode, Vector3i::Zero);
 		auto target = GetJointPosition(playerItem, Camera.laraNode, Vector3i(0, -CLICK(1), BLOCK(2)));
 		auto deltaPos = target - origin;
 
 		Camera.actualAngle = Camera.targetAngle + FROM_RAD(atan2(deltaPos.x, deltaPos.z));
-		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) * ALTITUDE_ROT_ALPHA;
+		Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) * LOCKED_CAMERA_ALTITUDE_ROT_ALPHA;
+		Camera.Rotation = EulerAngles::Identity;
 	}
 	else
 	{
 		if (IsUsingModernControls())
 		{
-			auto rot = GetCameraControlRotation();
+			Camera.Rotation.Lerp(GetCameraControlRotation(), CONTROLLED_CAMERA_ROT_LERP_ALPHA);
 
 			if (IsPlayerInCombat(playerItem))
 			{
-				short azimuthRot = Geometry::GetShortestAngle(Camera.actualAngle, (playerItem.Pose.Orientation.y + Camera.targetAngle) + rot.x);
-				short altitudeRot = Geometry::GetShortestAngle(Camera.actualElevation, Camera.targetElevation - rot.y);
+				short azimuthRot = Geometry::GetShortestAngle(Camera.actualAngle, (playerItem.Pose.Orientation.y + Camera.targetAngle) + Camera.Rotation.x);
+				short altitudeRot = Geometry::GetShortestAngle(Camera.actualElevation, Camera.targetElevation - Camera.Rotation.y);
 
 				Camera.actualAngle += azimuthRot * COMBAT_CAMERA_REBOUND_ALPHA;
 				Camera.actualElevation += altitudeRot * COMBAT_CAMERA_REBOUND_ALPHA;
 			}
 			else
 			{
-				Camera.actualAngle += rot.x;
-				Camera.actualElevation -= rot.y;
+				Camera.actualAngle += Camera.Rotation.x;
+				Camera.actualElevation -= Camera.Rotation.y;
 			}
 		}
 		else
 		{
 			if (CanControlTankCamera())
 			{
-				auto rot = GetCameraControlRotation();
+				Camera.Rotation.Lerp(GetCameraControlRotation(), CONTROLLED_CAMERA_ROT_LERP_ALPHA);
 
-				Camera.actualAngle += rot.x;
-				Camera.actualElevation -= rot.y;
+				Camera.actualAngle += Camera.Rotation.x;
+				Camera.actualElevation -= Camera.Rotation.y;
 				Camera.IsControllingTankCamera = true;
 			}
 			else
 			{
 				Camera.actualAngle = playerItem.Pose.Orientation.y + Camera.targetAngle;
-				Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) * ALTITUDE_ROT_ALPHA;
+				Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) * LOCKED_CAMERA_ALTITUDE_ROT_ALPHA;
+				Camera.Rotation.Lerp(EulerAngles::Identity, CONTROLLED_CAMERA_ROT_LERP_ALPHA);
 				Camera.IsControllingTankCamera = false;
 			}
 		}
@@ -1089,7 +1089,7 @@ void FixedCamera()
 	if (Camera.timer)
 	{
 		if (!--Camera.timer)
-			Camera.timer = -1;
+			Camera.timer = NO_VALUE;
 	}
 }
 
@@ -1493,7 +1493,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 	{
 		Camera.type = CameraType::Chase;
 		Camera.speed = 10.0f;
-		Camera.number = -1;
+		Camera.number = NO_VALUE;
 		Camera.lastItem = Camera.item;
 		Camera.item = nullptr;
 		Camera.targetElevation = 0;
