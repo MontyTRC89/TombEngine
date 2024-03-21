@@ -968,6 +968,7 @@ void CombatCamera(const ItemInfo& playerItem)
 
 static EulerAngles GetCameraControlRotation()
 {
+	constexpr auto SLOW_ROT_COEFF		  = 0.4f;
 	constexpr auto AXIS_SENSITIVITY_COEFF = 25.0f;
 	constexpr auto SMOOTHING_FACTOR		  = 8.0f;
 
@@ -980,7 +981,8 @@ static EulerAngles GetCameraControlRotation()
 	axis *= sensitivity * (isUsingMouse ? SMOOTHING_FACTOR : 1.0f); // TODO: Add camera sensitivity setting? Unify mouse and analog stick somehow.
 
 	// Calculate and return rotation.
-	return EulerAngles(ANGLE(axis.x), ANGLE(axis.y), 0);
+	auto rotCoeff = IsHeld(In::Walk) ? SLOW_ROT_COEFF : 1.0f;
+	return EulerAngles(ANGLE(axis.x), ANGLE(axis.y), 0) * rotCoeff;
 }
 
 static bool CanControlTankCamera()
