@@ -956,7 +956,7 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeSquishyBlock;
 			obj->control = ControlSquishyBlock;
-			obj->collision = SquishyBlockCollision;
+			obj->collision = CollideSquishyBlock;
 			obj->SetHitEffect(true);
 		}
 
@@ -964,7 +964,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->control = ControlFallingSquishyBlock;
-			obj->collision = FallingSquishyBlockCollision;
+			obj->collision = CollideFallingSquishyBlock;
 			obj->SetHitEffect(true);
 		}
 	}

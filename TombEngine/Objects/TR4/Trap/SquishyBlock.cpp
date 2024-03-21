@@ -14,6 +14,11 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+// NOTES:
+// item.ItemFlags[0]: use dynamic motion.
+// item.ItemFlags[1]: ??
+// item.ItemFlags[4]: heading angle.
+
 namespace TEN::Entities::Traps
 {	
 	enum SquishyBlockState
@@ -21,15 +26,15 @@ namespace TEN::Entities::Traps
 		SQUISHY_BLOCK_STATE_MOVE = 0,
 		SQUISHY_BLOCK_STATE_COLLIDE_LEFT = 1,
 		SQUISHY_BLOCK_STATE_COLLIDE_RIGHT = 2,
-		SQUISHY_BLOCK_STATE_ORIGINAL = 3,
+		SQUISHY_BLOCK_STATE_BAKED_MOTION = 3
 	};
 
 	enum SquishyBlockAnim
 	{
 		SQUISHY_BLOCK_ANIM_MOVE = 0,
-		SQUISHY_BLOCK_ANIM_COLLIDE_LEFT = 1,
-		SQUISHY_BLOCK_ANIM_COLLIDE_RIGHT = 2,
-		SQUISHY_BLOCK_ANIM_ORIGINAL = 3,
+		SQUISHY_BLOCK_ANIM_IMPACT_BACK = 1,
+		SQUISHY_BLOCK_ANIM_IMPACT_FRONT = 2,
+		SQUISHY_BLOCK_ANIM_BAKED_MOTION = 3
 	};
 
 	void InitializeSquishyBlock(short itemNumber)
@@ -37,106 +42,20 @@ namespace TEN::Entities::Traps
 		auto& item = g_Level.Items[itemNumber];
 
 		if (!item.TriggerFlags)
-		{
-			SetAnimation(item, SQUISHY_BLOCK_ANIM_ORIGINAL);
-			item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_ORIGINAL;
-			item.Animation.FrameNumber = GetAnimData(item).frameBase;
-			item.Animation.ActiveState = SQUISHY_BLOCK_STATE_ORIGINAL;
-			item.Animation.TargetState = SQUISHY_BLOCK_STATE_ORIGINAL;
-		}
+			SetAnimation(item, SQUISHY_BLOCK_ANIM_BAKED_MOTION);
 
-			item.ItemFlags[0] = item.TriggerFlags;
-			item.ItemFlags[4] = ANGLE(0.0f);
-			item.ItemFlags[1] = 0;
-			item.HitPoints = NOT_TARGETABLE;
+		item.HitPoints = NOT_TARGETABLE;
+		item.ItemFlags[0] = item.TriggerFlags;
+		item.ItemFlags[1] = 0;
+		item.ItemFlags[4] = 0;
 	}
 
-	void ControlSquishyBlock(short itemNumber)
-	{
-		auto& item = g_Level.Items[itemNumber];
-		const auto& object = Objects[item.ObjectNumber];
-
-		if (!TriggerActive(&item))
-			return;
-
-		if (!item.TriggerFlags)
-		{
-			if (item.Animation.ActiveState != SQUISHY_BLOCK_STATE_ORIGINAL)
-			{
-				item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_ORIGINAL;
-				item.Animation.FrameNumber = GetAnimData(item).frameBase;
-				item.Animation.ActiveState = SQUISHY_BLOCK_STATE_ORIGINAL;
-				item.Animation.TargetState = SQUISHY_BLOCK_STATE_ORIGINAL;
-			}
-		}
-		else
-		{
-			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_ORIGINAL)
-			{
-				item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_MOVE;
-				item.Animation.FrameNumber = GetAnimData(item).frameBase;
-				item.Animation.ActiveState = SQUISHY_BLOCK_STATE_MOVE;
-				item.Animation.TargetState = SQUISHY_BLOCK_STATE_MOVE;
-			}
-
-			item.ItemFlags[0] = item.TriggerFlags;
-
-			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_MOVE)
-			{
-
-				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y + item.ItemFlags[4], 0).ToDirection();
-
-				auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, forwardDir, BLOCK(0.5f));
-
-				if (pointColl.RoomNumber != item.RoomNumber)
-					ItemNewRoom(itemNumber, pointColl.RoomNumber);
-
-				if (!IsNextSectorValid(item, forwardDir))
-				{
-					if (item.ItemFlags[4] == ANGLE(180))
-					{
-						item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_COLLIDE_LEFT;
-						item.Animation.FrameNumber = GetAnimData(item).frameBase;
-						item.Animation.ActiveState = SQUISHY_BLOCK_STATE_COLLIDE_LEFT;
-						item.Animation.TargetState = SQUISHY_BLOCK_STATE_COLLIDE_LEFT;
-					}
-					else if (item.ItemFlags[4] == ANGLE(0))
-					{
-						item.Animation.AnimNumber = Objects[item.ObjectNumber].animIndex + SQUISHY_BLOCK_ANIM_COLLIDE_RIGHT;
-						item.Animation.FrameNumber = GetAnimData(item).frameBase;
-						item.Animation.ActiveState = SQUISHY_BLOCK_STATE_COLLIDE_RIGHT;
-						item.Animation.TargetState = SQUISHY_BLOCK_STATE_COLLIDE_RIGHT;
-					}
-				}
-				else
-					item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, Lerp(item.TriggerFlags / 4, item.TriggerFlags, item.ItemFlags[0]));
-			}
-			else
-			{
-				if (item.Animation.FrameNumber - GetAnimData(item).frameBase == 19)
-				{
-					if (item.HitPoints != NOT_TARGETABLE && item.HitPoints)
-					{
-						item.ItemFlags[1] = item.HitPoints;
-						item.HitPoints = NOT_TARGETABLE;
-					}
-
-					item.ItemFlags[4] = item.ItemFlags[4] + ANGLE(180.0f);
-					item.Pose.Orientation.y += ANGLE(item.ItemFlags[1]);
-				}				
-			}
-		}
-			if (LaraItem->HitPoints)
-			AnimateItem(&item);		
-	}
-	
-	bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir)
+	static bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir)
 	{
 		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(0.5f));
 		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(0.5f));
-		auto bounds = GameBoundingBox(&item);
-		int itemHeight = bounds.GetHeight();
-		
+		int height = GameBoundingBox(&item).GetHeight();
+
 		// Test for wall.
 		if (pointColl.Block->IsWall(projectedPos.x, projectedPos.z))
 			return false;
@@ -194,8 +113,8 @@ namespace TEN::Entities::Traps
 
 		// Test ceiling height.
 		int relCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
-		
-		if (relCeilHeight <= itemHeight)
+
+		if (relCeilHeight <= height)
 			return false;
 
 		// Check for blocked grey box.
@@ -216,69 +135,147 @@ namespace TEN::Entities::Traps
 		return true;
 	}
 
-	void SquishyBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void ControlSquishyBlock(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
+		const auto& object = Objects[item.ObjectNumber];
 
-		if (TestBoundsCollide(&item, laraItem, coll->Setup.Radius) && TestCollision(&item, laraItem))
+		short& something0 = item.ItemFlags[0];
+		short& someAngle = item.ItemFlags[1];
+		short& headingAngle = item.ItemFlags[4];
+
+		if (!TriggerActive(&item))
+			return;
+
+		if (!item.TriggerFlags)
 		{
-			if (laraItem->HitPoints > 0)
-				ItemPushItem(&item, laraItem, coll, false, 1);			
+			if (item.Animation.ActiveState != SQUISHY_BLOCK_STATE_BAKED_MOTION)
+				SetAnimation(item, SQUISHY_BLOCK_ANIM_BAKED_MOTION);
+		}
+		else
+		{
+			if (item.Animation.ActiveState == SQUISHY_BLOCK_ANIM_BAKED_MOTION)
+				SetAnimation(item, SQUISHY_BLOCK_STATE_MOVE);
+
+			something0 = item.TriggerFlags;
+
+			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_MOVE)
+			{
+				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y + headingAngle, 0).ToDirection();
+
+				auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, forwardDir, BLOCK(0.5f));
+
+				if (pointColl.RoomNumber != item.RoomNumber)
+					ItemNewRoom(itemNumber, pointColl.RoomNumber);
+
+				if (!IsNextSectorValid(item, forwardDir))
+				{
+					switch (headingAngle)
+					{
+					default:
+					case ANGLE(0.0f):
+						SetAnimation(item, SQUISHY_BLOCK_ANIM_IMPACT_FRONT);
+						break;
+
+					case ANGLE(-180.0f):
+						SetAnimation(item, SQUISHY_BLOCK_ANIM_IMPACT_BACK);
+						break;
+					}
+				}
+				else
+				{
+					float dist = Lerp(item.TriggerFlags / 4, item.TriggerFlags, something0);
+					item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, dist);
+				}
+			}
+			else
+			{
+				if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == 19)
+				{
+					if (item.HitPoints != NOT_TARGETABLE && item.HitPoints)
+					{
+						someAngle = item.HitPoints;
+						item.HitPoints = NOT_TARGETABLE;
+					}
+
+					headingAngle += ANGLE(180.0f);
+					item.Pose.Orientation.y += ANGLE(someAngle);
+				}				
+			}
 		}
 
-		if (ItemPushItem(&item, laraItem, coll, false, 1))
-		{
-			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_ORIGINAL)
-			{
-				auto frame = item.Animation.FrameNumber - GetAnimData(item).frameBase;
-				if (!frame || frame == 33)
-					LaraItem->HitPoints = 0;
-			}
-			else if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_RIGHT ||
-					item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_LEFT)
-			{
-				LaraItem->HitPoints = 0;
-			}
-		}	
-	}
-
-	void FallingSquishyBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto& item = g_Level.Items[itemNumber];
-
-		if (TestBoundsCollide(&item, laraItem, coll->Setup.Radius) && TestCollision(&item, laraItem))
-		{
-			if (item.Animation.FrameNumber - GetAnimData(item).frameBase <= 8)
-			{
-				item.Animation.FrameNumber += 2;
-				laraItem->HitPoints = 0;
-				SetAnimation(laraItem, LA_BOULDER_DEATH);
-				laraItem->Animation.Velocity.z = 0;
-				laraItem->Animation.Velocity.y = 0;		
-			}
-			else if (laraItem->HitPoints > 0)
-				ItemPushItem(&item, laraItem, coll, false, 1);
-		}
+		if (LaraItem->HitPoints)
+			AnimateItem(&item);		
 	}
 
 	void ControlFallingSquishyBlock(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
+		short& something0 = item.ItemFlags[0];
+
 		if (TriggerActive(&item))
 		{
-			if (item.ItemFlags[0] < 60)
+			if (something0 < 60)
 			{
 				SoundEffect(SFX_TR4_EARTHQUAKE_LOOP, &item.Pose);
-				Camera.bounce = (item.ItemFlags[0] - 92) >> 1;
-				item.ItemFlags[0]++;
+				Camera.bounce = (something0 - 92) >> 1;
+				something0++;
 			}
 			else
 			{
-				if (item.Animation.FrameNumber - GetAnimData(item).frameBase == 8)
+				if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == 8)
 					Camera.bounce = -96;
 
 				AnimateItem(&item);
+			}
+		}
+	}
+
+	void CollideSquishyBlock(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		if (TestBoundsCollide(&item, playerItem, coll->Setup.Radius) && TestCollision(&item, playerItem))
+		{
+			if (playerItem->HitPoints > 0)
+				ItemPushItem(&item, playerItem, coll, false, 1);
+		}
+
+		if (ItemPushItem(&item, playerItem, coll, false, 1))
+		{
+			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_BAKED_MOTION)
+			{
+				int frameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+				if (!frameNumber || frameNumber == 33)
+					LaraItem->HitPoints = 0;
+			}
+			else if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_RIGHT ||
+				item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_LEFT)
+			{
+				LaraItem->HitPoints = 0;
+			}
+		}	
+	}
+
+	void CollideFallingSquishyBlock(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		if (TestBoundsCollide(&item, laraItem, coll->Setup.Radius) && TestCollision(&item, laraItem))
+		{
+			if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) <= 8)
+			{
+				item.Animation.FrameNumber += 2;
+
+				SetAnimation(laraItem, LA_BOULDER_DEATH);
+				laraItem->HitPoints = 0;
+				laraItem->Animation.Velocity.y = 0.0f;	
+				laraItem->Animation.Velocity.z = 0.0f;	
+			}
+			else if (laraItem->HitPoints > 0)
+			{
+				ItemPushItem(&item, laraItem, coll, false, 1);
 			}
 		}
 	}
