@@ -23,7 +23,7 @@
 
 namespace TEN::Entities::Traps
 {	
-	constexpr auto SQUISHY_BLOCK_LETHAL_FRAME = 120;
+	constexpr auto SQUISHY_BLOCK_LETHAL_FRAME = 33;
 
 	enum SquishyBlockState
 	{
