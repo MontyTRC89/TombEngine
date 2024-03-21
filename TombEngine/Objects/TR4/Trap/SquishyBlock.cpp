@@ -22,6 +22,8 @@
 
 namespace TEN::Entities::Traps
 {	
+	constexpr auto SQUISHY_BLOCK_LETHAL_FRAME = 120;
+
 	enum SquishyBlockState
 	{
 		SQUISHY_BLOCK_STATE_MOVE = 0,
@@ -134,7 +136,7 @@ namespace TEN::Entities::Traps
 			if (something0 < 60)
 			{
 				SoundEffect(SFX_TR4_EARTHQUAKE_LOOP, &item.Pose);
-				Camera.bounce = (something0 - 92) >> 1;
+				Camera.bounce = (something0 - 92) / 2;
 				something0++;
 			}
 			else
@@ -162,7 +164,7 @@ namespace TEN::Entities::Traps
 			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_BAKED_MOTION)
 			{
 				int frameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
-				if (!frameNumber || frameNumber == 33)
+				if (!frameNumber || frameNumber == SQUISHY_BLOCK_LETHAL_FRAME)
 					DoDamage(playerItem, INT_MAX);
 			}
 			else if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_RIGHT ||
