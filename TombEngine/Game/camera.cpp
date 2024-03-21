@@ -568,16 +568,16 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	}
 
 	// Bounce.
-	if (Camera.bounce)
+	if (Camera.bounce != 0)
 	{
 		if (Camera.bounce <= 0)
 		{
 			int bounce = -Camera.bounce;
 			int bounce2 = bounce / 2;
 
-			Camera.LookAt.x += GetRandomControl() % bounce - bounce2;
-			Camera.LookAt.y += GetRandomControl() % bounce - bounce2;
-			Camera.LookAt.z += GetRandomControl() % bounce - bounce2;
+			Camera.LookAt.x += Random::GenerateInt() % bounce - bounce2;
+			Camera.LookAt.y += Random::GenerateInt() % bounce - bounce2;
+			Camera.LookAt.z += Random::GenerateInt() % bounce - bounce2;
 			Camera.bounce += 5;
 			RumbleFromBounce();
 		}
@@ -1183,9 +1183,9 @@ void BinocularCamera(ItemInfo* item)
 	{
 		if (Camera.bounce <= 0)
 		{
-			Camera.LookAt.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
-			Camera.LookAt.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
-			Camera.LookAt.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.LookAt.x += (CLICK(0.25f) / 4) * (Random::GenerateInt() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.LookAt.y += (CLICK(0.25f) / 4) * (Random::GenerateInt() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.LookAt.z += (CLICK(0.25f) / 4) * (Random::GenerateInt() % (-Camera.bounce) - (-Camera.bounce / 2));
 			Camera.bounce += 5;
 			RumbleFromBounce();
 		}
@@ -1560,10 +1560,10 @@ void RumbleScreen()
 
 	if (RumbleTimer > 450)
 	{
-		if (!(GetRandomControl() & 0x1FF))
+		if (!(Random::GenerateInt() & 0x1FF))
 		{
 			RumbleCounter = 0;
-			RumbleTimer = -32 - (GetRandomControl() & 0x1F);
+			RumbleTimer = -32 - (Random::GenerateInt() & 0x1F);
 			return;
 		}
 	}
@@ -1572,13 +1572,13 @@ void RumbleScreen()
 	{
 		if (RumbleCounter >= abs(RumbleTimer))
 		{
-			Camera.bounce = -(GetRandomControl() % abs(RumbleTimer));
+			Camera.bounce = -(Random::GenerateInt() % abs(RumbleTimer));
 			RumbleTimer++;
 		}
 		else
 		{
 			RumbleCounter++;
-			Camera.bounce = -(GetRandomControl() % RumbleCounter);
+			Camera.bounce = -(Random::GenerateInt() % RumbleCounter);
 		}
 	}
 }

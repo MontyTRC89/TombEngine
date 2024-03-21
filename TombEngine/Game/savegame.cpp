@@ -475,6 +475,8 @@ bool SaveGame::Save(int slot)
 	control.add_is_low(Lara.Control.IsLow);
 	control.add_is_moving(Lara.Control.IsMoving);
 	control.add_is_run_jump_queued(Lara.Control.IsRunJumpQueued);
+	control.add_heading_orient(&FromEulerAngles(Lara.Control.HeadingOrient));
+	control.add_heading_orient_target(&FromEulerAngles(Lara.Control.HeadingOrientTarget));
 	control.add_jump_direction((int)Lara.Control.JumpDirection);
 	control.add_keep_low(Lara.Control.KeepLow);
 	control.add_lock_ref_camera_orient(Lara.Control.LockRefCameraOrient);
@@ -482,11 +484,13 @@ bool SaveGame::Save(int slot)
 	control.add_move_angle(Lara.Control.HeadingOrient.y);
 	control.add_move_angle_target(Lara.Control.HeadingOrientTarget.y);
 	control.add_ref_camera_orient(&FromEulerAngles(Lara.Control.RefCameraOrient));
+	control.add_ref_move_axis(&FromVector2(Lara.Control.RefMoveAxis));
 	control.add_rope(ropeControlOffset);
 	control.add_subsuit(subsuitControlOffset);
 	control.add_tightrope(tightropeControlOffset);
 	control.add_toggle_climb(Lara.Control.ToggleClimb);
 	control.add_toggle_crouch(Lara.Control.ToggleCrouch);
+	control.add_toggle_walk(Lara.Control.ToggleWalk);
 	control.add_turn_rate(Lara.Control.TurnRate.y);
 	control.add_water_status((int)Lara.Control.WaterStatus);
 	control.add_weapon(weaponControlOffset);
@@ -2108,6 +2112,8 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Count.PositionAdjust = s->lara()->control()->count()->position_adjust();
 	Lara.Control.Count.Run = s->lara()->control()->count()->run_jump();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
+	Lara.Control.HeadingOrient = ToEulerAngles(s->lara()->control()->heading_orient());
+	Lara.Control.HeadingOrientTarget = ToEulerAngles(s->lara()->control()->heading_orient_target());
 	Lara.Control.IsClimbingLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.IsLow = s->lara()->control()->is_low();
 	Lara.Control.IsMoving = s->lara()->control()->is_moving();
@@ -2124,8 +2130,10 @@ bool SaveGame::Load(int slot)
 	Lara.Control.HeadingOrientTarget.y = s->lara()->control()->move_angle_target();
 	Lara.Control.IsRunJumpQueued = s->lara()->control()->is_run_jump_queued();
 	Lara.Control.RefCameraOrient = ToEulerAngles(s->lara()->control()->ref_camera_orient());
+	Lara.Control.RefMoveAxis = ToVector2(s->lara()->control()->ref_move_axis());
 	Lara.Control.ToggleClimb = s->lara()->control()->toggle_climb();
 	Lara.Control.ToggleCrouch = s->lara()->control()->toggle_crouch();
+	Lara.Control.ToggleWalk = s->lara()->control()->toggle_walk();
 	Lara.Control.TurnRate.y = s->lara()->control()->turn_rate();
 	Lara.Control.IsLocked = s->lara()->control()->is_locked();
 	Lara.Control.HandStatus = (HandStatus)s->lara()->control()->hand_status();

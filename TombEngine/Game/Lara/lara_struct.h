@@ -1255,7 +1255,7 @@ struct WeaponControlData
 	LaraWeaponType LastGunType	  = LaraWeaponType::None;
 	HolsterInfo	   HolsterInfo	  = {};
 
-	short WeaponItem = -1;
+	short WeaponItem = NO_VALUE;
 	bool  HasFired	 = false;
 	bool  Fired		 = false;
 
@@ -1273,7 +1273,6 @@ struct PlayerControlData
 	// Used in tank control modes.
 	EulerAngles TurnRate = EulerAngles::Identity;
 
-	// savegame pls
 	// Used in modern control mode.
 	EulerAngles HeadingOrient		= EulerAngles::Identity;
 	EulerAngles HeadingOrientTarget = EulerAngles::Identity;
@@ -1292,7 +1291,6 @@ struct PlayerControlData
 	TightropeControlData Tightrope = {};
 	WeaponControlData	 Weapon	   = {};
 
-	// savegame
 	bool ToggleClimb  = false;
 	bool ToggleCrouch = false;
 	bool ToggleWalk	  = false;

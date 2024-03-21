@@ -233,6 +233,8 @@ table LaraControlData {
 	can_monkey_swing: bool;
 	count: LaraCountData;
 	hand_status: int32;
+	heading_orient: EulerAngles;
+	heading_orient_target: EulerAngles;
 	is_climbing_ladder: bool;
 	is_locked: bool;
 	is_low: bool;
@@ -245,11 +247,13 @@ table LaraControlData {
 	move_angle: int32;
 	move_angle_target: int32;
 	ref_camera_orient: EulerAngles;
+	ref_move_axis: Vector2;
 	rope: RopeControlData;
 	subsuit: SubsuitControlData;
 	tightrope: TightropeControlData;
 	toggle_climb: bool;
 	toggle_crouch: bool;
+	toggle_walk: bool;
 	turn_rate: int32;
 	water_status: int32;
 	weapon: WeaponControlData;
