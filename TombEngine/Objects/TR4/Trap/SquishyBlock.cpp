@@ -204,8 +204,7 @@ namespace TEN::Entities::Traps
 			}
 		}
 
-		if (LaraItem->HitPoints != 0)
-			AnimateItem(&item);		
+		AnimateItem(&item);		
 	}
 
 	void ControlFallingSquishyBlock(short itemNumber)
