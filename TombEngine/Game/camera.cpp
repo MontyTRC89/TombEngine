@@ -540,43 +540,21 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 
 	UpdateMikePos(playerItem);
 
-	if (OldCam.pos.Orientation != playerItem.Pose.Orientation ||
-		OldCam.pos2.Orientation.x != player.ExtraHeadRot.x ||
-		OldCam.pos2.Orientation.y != player.ExtraHeadRot.y ||
-		OldCam.pos2.Position.x != player.ExtraTorsoRot.x ||
-		OldCam.pos2.Position.y != player.ExtraTorsoRot.y ||
-		OldCam.pos.Position != playerItem.Pose.Position ||
-		OldCam.ActiveState != playerItem.Animation.ActiveState ||
-		OldCam.TargetState != playerItem.Animation.TargetState ||
-		OldCam.targetDistance != Camera.targetDistance ||
-		OldCam.targetElevation != Camera.targetElevation ||
-		OldCam.actualElevation != Camera.actualElevation ||
-		OldCam.actualAngle != Camera.actualAngle ||
-		OldCam.target != Camera.LookAt ||
-		Camera.oldType != Camera.type ||
-		player.Control.Look.IsUsingBinoculars)
-	{
-		OldCam.pos.Orientation = playerItem.Pose.Orientation;
-		OldCam.pos2.Orientation.x = player.ExtraHeadRot.x;
-		OldCam.pos2.Orientation.y = player.ExtraHeadRot.y;
-		OldCam.pos2.Position.x = player.ExtraTorsoRot.x;
-		OldCam.pos2.Position.y = player.ExtraTorsoRot.y;
-		OldCam.pos.Position = playerItem.Pose.Position;
-		OldCam.ActiveState = playerItem.Animation.ActiveState;
-		OldCam.TargetState = playerItem.Animation.TargetState;
-		OldCam.targetDistance = Camera.targetDistance;
-		OldCam.targetElevation = Camera.targetElevation;
-		OldCam.actualElevation = Camera.actualElevation;
-		OldCam.actualAngle = Camera.actualAngle;
-		OldCam.target = Camera.LookAt;
-		LastIdeal = idealPos;
-		LastIdealRoomNumber = idealRoomNumber;
-	}
-	else
-	{
-		idealPos = LastIdeal;
-		idealRoomNumber = LastIdealRoomNumber;
-	}
+	OldCam.pos.Orientation = playerItem.Pose.Orientation;
+	OldCam.pos2.Orientation.x = player.ExtraHeadRot.x;
+	OldCam.pos2.Orientation.y = player.ExtraHeadRot.y;
+	OldCam.pos2.Position.x = player.ExtraTorsoRot.x;
+	OldCam.pos2.Position.y = player.ExtraTorsoRot.y;
+	OldCam.pos.Position = playerItem.Pose.Position;
+	OldCam.ActiveState = playerItem.Animation.ActiveState;
+	OldCam.TargetState = playerItem.Animation.TargetState;
+	OldCam.targetDistance = Camera.targetDistance;
+	OldCam.targetElevation = Camera.targetElevation;
+	OldCam.actualElevation = Camera.actualElevation;
+	OldCam.actualAngle = Camera.actualAngle;
+	OldCam.target = Camera.LookAt;
+	LastIdeal = idealPos;
+	LastIdealRoomNumber = idealRoomNumber;
 
 	// Translate camera.
 	Camera.Position = Vector3::Lerp(Camera.Position, idealPos, 1.0f / speed);
@@ -652,7 +630,7 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* item, int boneID, ItemInfo* targ
 	auto lookAt = GetJointPosition(targetItem, targetBoneID, Vector3i::Zero).ToVector3();
 
 	if (OldCam.pos.Position != idealPos ||
-		OldCam.targetDistance  != Camera.targetDistance  ||
+		OldCam.targetDistance != Camera.targetDistance  ||
 		OldCam.targetElevation != Camera.targetElevation ||
 		OldCam.actualElevation != Camera.actualElevation ||
 		OldCam.actualAngle != Camera.actualAngle ||
@@ -740,7 +718,7 @@ static void ClampCameraAltitudeAngle(bool isUnderwater)
 	}
 }
 
-static bool DoStrafeZoom(const ItemInfo& playerItem)
+static bool TestCameraStrafeZoom(const ItemInfo& playerItem)
 {
 	const auto& player = GetLaraInfo(playerItem);
 
@@ -762,7 +740,7 @@ static bool DoStrafeZoom(const ItemInfo& playerItem)
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
 	constexpr auto STRAFE_CAMERA_FOV			   = ANGLE(90.0f);
-	constexpr auto STRAFE_CAMERA_FOV_LEFT_ALPHA	   = 0.2f;
+	constexpr auto STRAFE_CAMERA_FOV_LERP_ALPHA	   = 0.2f;
 	constexpr auto STRAFE_CAMERA_DIST_OFFSET_COEFF = 0.4f;
 	constexpr auto STRAFE_CAMERA_ZOOM_BUFFER	   = BLOCK(0.1f);
 	constexpr auto TANK_CAMERA_SWIVEL_STEP_COUNT   = 4;
@@ -781,7 +759,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		// Calcuate ideal position.
 		auto idealPos = Geometry::TranslatePoint(Camera.LookAt, dir, Camera.targetDistance);
 		int idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, Camera.targetDistance).RoomNumber;
-
+		
 		// Assess LOS.
 		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos, idealRoomNumber);
 		if (intersect.has_value())
@@ -790,17 +768,16 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			idealRoomNumber = intersect->second;
 		}
 
-		// Handle strafe camera effects.
+		// Apply strafe camera effects.
 		if (IsPlayerStrafing(playerItem))
 		{
-			AlterFOV((short)Lerp(CurrentFOV, STRAFE_CAMERA_FOV, STRAFE_CAMERA_FOV_LEFT_ALPHA));
+			AlterFOV((short)Lerp(CurrentFOV, STRAFE_CAMERA_FOV, STRAFE_CAMERA_FOV_LERP_ALPHA));
 
 			// Apply zoom if using Look action to strafe.
-			if (DoStrafeZoom(playerItem))
+			if (TestCameraStrafeZoom(playerItem))
 			{
 				float distOffset = Camera.targetDistance * STRAFE_CAMERA_DIST_OFFSET_COEFF;
-				float dist = Vector3::Distance(Camera.LookAt, idealPos);
-				dist = ((dist - distOffset) >= STRAFE_CAMERA_ZOOM_BUFFER) ? (dist - distOffset) : STRAFE_CAMERA_ZOOM_BUFFER;
+				float dist = std::max(Vector3::Distance(Camera.LookAt, idealPos) * STRAFE_CAMERA_DIST_OFFSET_COEFF, STRAFE_CAMERA_ZOOM_BUFFER);
 
 				idealPos = Geometry::TranslatePoint(Camera.LookAt, dir, dist);
 				idealRoomNumber = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, dist).RoomNumber;
@@ -808,7 +785,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		}
 		else
 		{
-			AlterFOV((short)Lerp(CurrentFOV, ANGLE(DEFAULT_FOV), STRAFE_CAMERA_FOV_LEFT_ALPHA));
+			AlterFOV((short)Lerp(CurrentFOV, ANGLE(DEFAULT_FOV), STRAFE_CAMERA_FOV_LERP_ALPHA));
 		}
 
 		// Update camera.
