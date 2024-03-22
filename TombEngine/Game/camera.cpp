@@ -1519,6 +1519,7 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, fl
 void UpdateMikePos(const ItemInfo& item)
 {
 	constexpr auto BASE_ANGLE				= ANGLE(90.0f);
+	constexpr auto AUTO_ROT_DELTA_ANGLE_MAX = BASE_ANGLE * 1.5f;
 	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.01f;
 
 	if (Camera.mikeAtLara)
@@ -1543,7 +1544,7 @@ void UpdateMikePos(const ItemInfo& item)
 			{
 				Camera.actualAngle += deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA;
 			}
-			else if (abs(deltaAngle) <= (BASE_ANGLE * 1.5f))
+			else if (abs(deltaAngle) <= AUTO_ROT_DELTA_ANGLE_MAX)
 			{
 				int sign = std::copysign(1, deltaAngle);
 				Camera.actualAngle += (BASE_ANGLE * sign) * AZIMUTH_ANGLE_LERP_ALPHA;
