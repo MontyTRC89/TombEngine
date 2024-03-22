@@ -1543,7 +1543,7 @@ void UpdateMikePos(const ItemInfo& item)
 			{
 				Camera.actualAngle += deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA;
 			}
-			else
+			else if (abs(deltaAngle) <= (BASE_ANGLE * 1.5f))
 			{
 				int sign = std::copysign(1, deltaAngle);
 				Camera.actualAngle += (BASE_ANGLE * sign) * AZIMUTH_ANGLE_LERP_ALPHA;
