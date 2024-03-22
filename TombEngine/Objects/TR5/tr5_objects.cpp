@@ -55,6 +55,7 @@
 #include "Objects/TR5/Object/tr5_twoblockplatform.h"
 
 // Traps
+#include "Objects/Effects/EmberEmitter.h"
 #include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/TR5/Trap/ZipLine.h"
@@ -71,6 +72,7 @@
 // Shatters
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
 
+using namespace TEN::Effects::EmberEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Traps::TR5;
@@ -773,11 +775,11 @@ static void StartObject(ObjectInfo *obj)
 		obj->collision = ObjectCollision;
 	}
 
-	obj = &Objects[ID_HIGH_OBJECT2];
+	obj = &Objects[ID_EMBER_EMITTER];
 	if (obj->loaded)
 	{
 		obj->drawRoutine = nullptr;
-		obj->control = HighObject2Control;
+		obj->control = ControlEmberEmitter;
 	}
 
 	obj = &Objects[ID_GEN_SLOT1];
