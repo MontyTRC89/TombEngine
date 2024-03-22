@@ -528,6 +528,29 @@ void InitializeCamera()
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 }
 
+static void UpdateAzimuthAngle(const ItemInfo& item)
+{
+	constexpr auto BASE_ANGLE				= ANGLE(90.0f);
+	constexpr auto AUTO_ROT_DELTA_ANGLE_MAX = BASE_ANGLE * 1.5f;
+	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.01f;
+
+	// Modify azimuth angle.
+	if (IsUsingModernControls() && !IsPlayerStrafing(item) &&
+		GetMoveAxis() != Vector2::Zero && item.Animation.Velocity.z != 0.0f)
+	{
+		short deltaAngle = Geometry::GetShortestAngle(Camera.actualAngle, GetPlayerHeadingAngleY(item));
+		if (abs(deltaAngle) <= BASE_ANGLE)
+		{
+			Camera.actualAngle += deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA;
+		}
+		else if (abs(deltaAngle) <= AUTO_ROT_DELTA_ANGLE_MAX)
+		{
+			int sign = std::copysign(1, deltaAngle);
+			Camera.actualAngle += (BASE_ANGLE * AZIMUTH_ANGLE_LERP_ALPHA) * sign;
+		}
+	}
+}
+
 void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumber, float speed)
 {
 	constexpr auto BUFFER = BLOCK(0.2f);
@@ -537,6 +560,7 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	if (player.Control.Look.IsUsingBinoculars)
 		speed = 1.0f;
 
+	UpdateAzimuthAngle(playerItem);
 	UpdateListenerPosition(playerItem);
 
 	OldCam.pos.Orientation = playerItem.Pose.Orientation;
@@ -1518,28 +1542,6 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, fl
 
 void UpdateListenerPosition(const ItemInfo& item)
 {
-	constexpr auto BASE_ANGLE				= ANGLE(90.0f);
-	constexpr auto AUTO_ROT_DELTA_ANGLE_MAX = BASE_ANGLE * 1.5f;
-	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.01f;
-
-	// TODO: Move this elsewhere.
-	// Modify azimuth angle.
-	if (IsUsingModernControls() && !IsPlayerStrafing(item) &&
-		GetMoveAxis() != Vector2::Zero && item.Animation.Velocity.z != 0.0f)
-	{
-		short deltaAngle = Geometry::GetShortestAngle(Camera.actualAngle, GetPlayerHeadingAngleY(item));
-		if (abs(deltaAngle) <= BASE_ANGLE)
-		{
-			Camera.actualAngle += deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA;
-		}
-		else if (abs(deltaAngle) <= AUTO_ROT_DELTA_ANGLE_MAX)
-		{
-			int sign = std::copysign(1, deltaAngle);
-			Camera.actualAngle += (BASE_ANGLE * AZIMUTH_ANGLE_LERP_ALPHA) * sign;
-		}
-	}
-
-	// Update listener position.
 	float persp = ((g_Configuration.ScreenWidth / 2) * phd_cos(CurrentFOV / 2)) / phd_sin(CurrentFOV / 2);
 	Camera.ListenerPosition = Camera.Position + (persp * Vector3(phd_sin(Camera.actualAngle), 0.0f, phd_cos(Camera.actualAngle)));
 }
