@@ -14,7 +14,7 @@
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/Utils/VehicleHelpers.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -497,13 +497,14 @@ namespace TEN::Entities::Vehicles
 	bool RubberBoatUserControl(ItemInfo* rBoatItem, ItemInfo* laraItem)
 	{
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		bool noTurn = true;
 
 		if (rBoatItem->Pose.Position.y >= (rBoat->Water - 128) && 
 			rBoat->Water != NO_HEIGHT)
 		{
-			if (!IsHeld(In::Brake) && !(TrInput & IN_LOOK) || rBoatItem->Animation.Velocity.z)
+			if (!IsHeld(In::Brake) && !IsHeld(In::Look) || rBoatItem->Animation.Velocity.z)
 			{
 				if ((IsHeld(In::Left) && !IsHeld(In::Reverse)) ||
 					(IsHeld(In::Right) && IsHeld(In::Reverse)))
@@ -544,10 +545,10 @@ namespace TEN::Entities::Vehicles
 				else if (IsHeld(In::Accelerate))
 				{
 					int maxVelocity;
-					if (IsHeld(In::Speed))
+					if (IsHeld(In::Faster))
 						maxVelocity = RBOAT_FAST_VELOCITY_MAX;
 					else
-						maxVelocity = (IsHeld(In::Slow)) ? RBOAT_SLOW_VELOCITY_MAX : RBOAT_NORMAL_VELOCITY_MAX;
+						maxVelocity = (IsHeld(In::Slower)) ? RBOAT_SLOW_VELOCITY_MAX : RBOAT_NORMAL_VELOCITY_MAX;
 
 					if (rBoatItem->Animation.Velocity.z < maxVelocity)
 						rBoatItem->Animation.Velocity.z += (RBOAT_VELOCITY_ACCEL / 2 + 1) + (RBOAT_VELOCITY_ACCEL * rBoatItem->Animation.Velocity.z) / (maxVelocity * 2);
@@ -581,8 +582,7 @@ namespace TEN::Entities::Vehicles
 				else
 					rBoatItem->Animation.Velocity.z = 0;
 
-				if (TrInput & IN_LOOK && rBoatItem->Animation.Velocity.z == 0)
-					LookUpDown(laraItem);
+				lara->Control.Look.Mode = (rBoatItem->Animation.Velocity.z == 0.0f) ? LookMode::Horizontal : LookMode::Free;
 			}
 		}
 
@@ -650,9 +650,9 @@ namespace TEN::Entities::Vehicles
 				{
 					if (rBoatItem->Animation.Velocity.z == 0)
 					{
-						if (TrInput & IN_RIGHT && TestRubberBoatDismount(laraItem, rBoatItem->Pose.Orientation.y + ANGLE(90.0f)))
+						if (IsHeld(In::Right) && TestRubberBoatDismount(laraItem, rBoatItem->Pose.Orientation.y + ANGLE(90.0f)))
 							laraItem->Animation.TargetState = RBOAT_STATE_JUMP_RIGHT;
-						else if (TrInput & IN_LEFT && TestRubberBoatDismount(laraItem, rBoatItem->Pose.Orientation.y - ANGLE(90.0f)))
+						else if (IsHeld(In::Left) && TestRubberBoatDismount(laraItem, rBoatItem->Pose.Orientation.y - ANGLE(90.0f)))
 							laraItem->Animation.TargetState = RBOAT_STATE_JUMP_LEFT;
 					}
 				}
@@ -721,7 +721,7 @@ namespace TEN::Entities::Vehicles
 		sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 		sptr->fadeToBlack = 12 - (snow * 8);
 		sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BlendMode::Additive;
 		sptr->extras = 0;
 		sptr->dynamic = -1;
 

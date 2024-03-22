@@ -5,7 +5,7 @@
 #include "Game/effects/effects.h"
 #include "Game/misc.h"
 #include "Game/people.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/level.h"
 
 using namespace TEN::Renderer;
@@ -69,8 +69,8 @@ namespace TEN::Entities::Creatures::TR1
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (creature.MuzzleFlash[0].Delay != 0)
 			creature.MuzzleFlash[0].Delay--;

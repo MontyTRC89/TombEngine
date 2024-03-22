@@ -359,7 +359,7 @@ void ReadyShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	player.Control.HandStatus = HandStatus::WeaponReady;
 	player.TargetEntity = nullptr;
 	player.LeftArm.Orientation =
-	player.RightArm.Orientation = EulerAngles::Zero;
+	player.RightArm.Orientation = EulerAngles::Identity;
 	player.LeftArm.FrameNumber =
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Locked =
@@ -431,7 +431,7 @@ void FireShotgun(ItemInfo& laraItem)
 
 		Rumble(0.5f, 0.2f);
 
-		Statistics.Game.AmmoUsed++;
+		SaveGame::Statistics.Game.AmmoUsed++;
 	}
 }
 
@@ -630,8 +630,8 @@ bool FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose)
 
 	Rumble(0.2f, 0.1f);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 
 	return true;
 }
@@ -760,8 +760,8 @@ void FireGrenade(ItemInfo& laraItem)
 		break;
 	}
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void GrenadeControl(short itemNumber)
@@ -813,11 +813,11 @@ void GrenadeControl(short itemNumber)
 	// Trigger fire and smoke sparks in direction of motion.
 	if (grenadeItem.Animation.Velocity.z && aboveWater)
 	{
-		auto world = Matrix::CreateFromYawPitchRoll(
-			TO_RAD(grenadeItem.Pose.Orientation.y - ANGLE(180.0f)),
-			TO_RAD(grenadeItem.Pose.Orientation.x),
-			TO_RAD(grenadeItem.Pose.Orientation.z)) *
-			Matrix::CreateTranslation(0, 0, -64);
+		auto world = Matrix::CreateTranslation(0, 0, -64) * 
+					 Matrix::CreateFromYawPitchRoll(
+						TO_RAD(grenadeItem.Pose.Orientation.y - ANGLE(180.0f)),
+						TO_RAD(grenadeItem.Pose.Orientation.x),
+						TO_RAD(grenadeItem.Pose.Orientation.z));
 
 		int wx = world.Translation().x;
 		int wy = world.Translation().y;
@@ -922,8 +922,8 @@ void FireRocket(ItemInfo& laraItem)
 	Rumble(0.4f, 0.3f);
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void RocketControl(short itemNumber)
@@ -958,11 +958,11 @@ void RocketControl(short itemNumber)
 	rocketItem.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	// Calculate offset in rocket direction for fire and smoke sparks.
-	auto world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(rocketItem.Pose.Orientation.y - ANGLE(180.0f)),
-		TO_RAD(rocketItem.Pose.Orientation.x),
-		TO_RAD(rocketItem.Pose.Orientation.z)) *
-		Matrix::CreateTranslation(0, 0, -64);
+	auto world = Matrix::CreateTranslation(0, 0, -64) *
+				 Matrix::CreateFromYawPitchRoll(
+					TO_RAD(rocketItem.Pose.Orientation.y - ANGLE(180.0f)),
+					TO_RAD(rocketItem.Pose.Orientation.x),
+					TO_RAD(rocketItem.Pose.Orientation.z));
 
 	int wx = world.Translation().x;
 	int wy = world.Translation().y;
@@ -1074,8 +1074,8 @@ void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose)
 	Rumble(0.2f, 0.1f);
 	SoundEffect(SFX_TR4_CROSSBOW_FIRE, &laraItem.Pose);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void FireCrossBowFromLaserSight(ItemInfo& laraItem, GameVector* origin, GameVector* target)
@@ -1167,7 +1167,7 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 	auto& ammo = GetAmmo(player, player.Control.Weapon.GunType);
 	const auto& weapon = player.Weapons[(int)weaponType];
 
-	if (!LaserSight || (!weapon.HasLasersight))
+	if (!player.Control.Look.IsUsingLasersight || !weapon.HasLasersight)
 		return;
 
 	bool isFiring = false;
@@ -1191,7 +1191,7 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 		if (player.Control.Weapon.GunType == LaraWeaponType::Revolver)
 		{
 			player.Control.Weapon.Interval = 16.0f;
-			Statistics.Game.AmmoUsed++;
+			SaveGame::Statistics.Game.AmmoUsed++;
 			isFiring = true;
 
 			if (!ammo.HasInfinite())
@@ -1261,7 +1261,7 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 	const auto& weapon = Weapons[(int)weaponType];
 
 	// Never handle weapons in binocular mode.
-	if (BinocularRange || LaserSight)
+	if (player.Control.Look.OpticRange || player.Control.Look.IsUsingLasersight)
 		return;
 
 	FindNewTarget(laraItem, weapon);
@@ -1275,8 +1275,8 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 	{
 		player.ExtraTorsoRot = player.LeftArm.Orientation;
 
-		if (Camera.oldType != CameraType::Look && !BinocularRange)
-			player.ExtraHeadRot = EulerAngles::Zero;
+		if (Camera.oldType != CameraType::Look && player.Control.Look.OpticRange == 0)
+			player.ExtraHeadRot = EulerAngles::Identity;
 	}
 
 	if (weaponType == LaraWeaponType::Revolver)
@@ -1326,10 +1326,10 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 
 		if (&target != &emitter)
 		{
-			Statistics.Game.AmmoHits++;
+			SaveGame::Statistics.Game.AmmoHits++;
 			if (target.HitPoints <= 0)
 			{
-				Statistics.Level.Kills++;
+				SaveGame::Statistics.Level.Kills++;
 				CreatureDie(target.Index, true);
 			}
 		}
@@ -1459,7 +1459,7 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 	}
 	else
 	{
-		TriggerShockwave(&item.Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		item.Pose.Position.y += CLICK(1.0f / 2);
 		TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, item.RoomNumber);
 
@@ -1488,8 +1488,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		if (pointColl.Position.Floor < projectile.Pose.Position.y ||
 			pointColl.Position.Ceiling > projectile.Pose.Position.y)
 		{
-			hasHit =
-			hasHitNotByEmitter = true;
+			hasHit = hasHitNotByEmitter = true;
 		}
 	}
 	// If projectile is timed grenade, try to emit from it according to flags.
@@ -1570,7 +1569,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 			hasHit = hasHitNotByEmitter = doShatter = true;
 			doExplosion = isExplosive;
 
-			if (StaticObjects[meshPtr->staticNumber].shatterType == SHT_NONE)
+			if (StaticObjects[meshPtr->staticNumber].shatterType == ShatterType::None)
 				continue;
 
 			meshPtr->HitPoints -= damage;
@@ -1582,7 +1581,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 
 			TriggerExplosionSparks(meshPtr->pos.Position.x, meshPtr->pos.Position.y, meshPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
 			auto pose = Pose(meshPtr->pos.Position.x, meshPtr->pos.Position.y - 128, meshPtr->pos.Position.z, 0, meshPtr->pos.Orientation.y, 0);
-			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		}
 
 		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
@@ -1601,8 +1600,9 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				itemPtr->IsLara() ||
 				(itemPtr->Flags & 0x40 && Objects[itemPtr->ObjectNumber].explodableMeshbits))
 			{
-				// If we collide with emitter, don't process further in early launch stages.
-				if (!hasHitNotByEmitter && itemPtr == &emitter)
+				// If we collide with emitter, and there are no other objects around, 
+				// don't process further in early launch stages.
+				if (!hasHitNotByEmitter && itemPtr == &emitter && affectedObjects.empty())
 				{
 					// Non-grenade projectiles require larger timeout
 					int timeout = type >= ProjectileType::Grenade ? TRIGGER_TIMEOUT : TRIGGER_TIMEOUT * 2;
@@ -1625,7 +1625,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 					if (type != ProjectileType::FlashGrenade && currentObject.damageType != DamageMode::None)
 						DoExplosiveDamage(emitter, *itemPtr, projectile, damage);
 				}
-				else if (currentObject.damageType == DamageMode::AnyWeapon)
+				else if (currentObject.damageType == DamageMode::Any)
 				{
 					if (type == ProjectileType::Poison)
 					{
@@ -1645,11 +1645,19 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 					 itemPtr->ObjectNumber <= ID_SMASH_OBJECT8)
 			{
 				doShatter = hasHit = true;
+				doExplosion = isExplosive;
 
 				// Smash objects are legacy objects from TRC. Make them explode in legacy way.
 				ExplodeItemNode(itemPtr, 0, 0, 128);
 				SmashObject(itemPtr->Index);
 				KillItem(itemPtr->Index);
+			}
+			else if (currentObject.collision && !(itemPtr->Status & ITEM_INVISIBLE))
+			{
+				doShatter = hasHit = true;
+				doExplosion = isExplosive;
+
+				affectedObjects.push_back(itemPtr->Index);
 			}
 		}
 
@@ -1684,12 +1692,14 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		projectile.ItemFlags[1] = GRENADE_FRAG_TIMEOUT;
 		return;
 
+	case ProjectileType::Harpoon:
+		if (affectedObjects.empty())
+			return;
+		break;
+
 	default:
 		break;
 	}
-
-	if (type == ProjectileType::Harpoon)
-		return;
 
 	if (hasHit)
 		KillItem(projectile.Index);

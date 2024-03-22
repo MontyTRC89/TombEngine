@@ -16,6 +16,8 @@ struct BatData
 	byte ZTarget;
 
 	byte Flags;
+
+	Matrix Transform;
 };
 
 extern int NextBat;

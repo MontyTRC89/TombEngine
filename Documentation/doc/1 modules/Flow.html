@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.1.0 Lua API</title>
+    <title>TombEngine 1.3 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -34,14 +34,18 @@
 <ul class="nowrap">
   <li>    <a href="../1 modules/Effects.html">Effects</a></li>
   <li>    <here>Flow</here></li>
+  <li>    <a href="../1 modules/Input.html">Input</a></li>
   <li>    <a href="../1 modules/Inventory.html">Inventory</a></li>
   <li>    <a href="../1 modules/Logic.html">Logic</a></li>
-  <li>    <a href="../1 modules/Misc.html">Misc</a></li>
   <li>    <a href="../1 modules/Objects.html">Objects</a></li>
+  <li>    <a href="../1 modules/Sound.html">Sound</a></li>
   <li>    <a href="../1 modules/Strings.html">Strings</a></li>
+  <li>    <a href="../1 modules/Util.html">Util</a></li>
+  <li>    <a href="../1 modules/View.html">View</a></li>
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
+  <li>    <a href="../2 classes/View.DisplaySprite.html">View.DisplaySprite</a></li>
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
@@ -71,13 +75,19 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
-  <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
-  <li>    <a href="../4 enums/Misc.LogLevel.html">Misc.LogLevel</a></li>
-  <li>    <a href="../4 enums/Misc.SoundTrackType.html">Misc.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
+  <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
+  <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
+  <li>    <a href="../4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
+  <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
+  <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
+  <li>    <a href="../4 enums/View.PostProcessMode.html">View.PostProcessMode</a></li>
+  <li>    <a href="../4 enums/View.ScaleMode.html">View.ScaleMode</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
@@ -118,12 +128,20 @@ scripts too.</p>
 	<td class="name" ><a href="#EnableLevelSelect">EnableLevelSelect(enabled)</a></td>
 	<td class="summary">Enable or disable level selection in title flyby.</td>
 	</tr>
+	<tr>
+	<td class="name" ><a href="#EnableLoadSave">EnableLoadSave(enabled)</a></td>
+	<td class="summary">Enable or disable saving and loading of savegames.</td>
+	</tr>
 </table>
 <h2><a href="#gameflow_lua_or_level_scripts">gameflow.lua or level scripts </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#EnableFlyCheat">EnableFlyCheat(enabled)</a></td>
 	<td class="summary">Enable or disable DOZY mode (fly cheat).</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#EnablePointFilter">EnablePointFilter(enabled)</a></td>
+	<td class="summary">Enable or disable point texture filter.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#EnableMassPickup">EnableMassPickup(enabled)</a></td>
@@ -138,8 +156,28 @@ scripts too.</p>
 	<td class="summary">Returns the level that the game control is running in that moment.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EndLevel">EndLevel([index])</a></td>
-	<td class="summary">Finishes the current level, with optional level index provided.</td>
+	<td class="name" ><a href="#EndLevel">EndLevel([index][, startPos])</a></td>
+	<td class="summary">Finishes the current level, with optional level index and start position index provided.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetGameStatus">GetGameStatus()</a></td>
+	<td class="summary">Get current game status, such as normal game loop, exiting to title, etc.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SaveGame">SaveGame(slotID)</a></td>
+	<td class="summary">Save the game to a savegame slot.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#LoadGame">LoadGame(slotID)</a></td>
+	<td class="summary">Load the game from a savegame slot.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#DeleteSaveGame">DeleteSaveGame(slotID)</a></td>
+	<td class="summary">Delete a savegame.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#DoesSaveGameExist">DoesSaveGameExist(slotID)</a></td>
+	<td class="summary">Check if a savegame exists.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#GetSecretCount">GetSecretCount()</a></td>
@@ -181,7 +219,7 @@ scripts too.</p>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#GetString">GetString(string)</a></td>
-	<td class="summary">Get translated string</td>
+	<td class="summary">Get translated string.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#SetLanguageNames">SetLanguageNames(table)</a></td>
@@ -316,6 +354,28 @@ Must be true or false
 
 
 </dd>
+    <dt>
+    <a name = "EnableLoadSave"></a>
+    <strong>EnableLoadSave(enabled)</strong>
+    </dt>
+    <dd>
+    Enable or disable saving and loading of savegames.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">enabled</span>
+            <span class="types"><span class="type">bool</span></span>
+         true or false.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
 </dl>
     <h2 class="section-header "><a name="gameflow_lua_or_level_scripts"></a>gameflow.lua or level scripts </h2>
 
@@ -326,6 +386,29 @@ Must be true or false
     </dt>
     <dd>
     Enable or disable DOZY mode (fly cheat).
+Must be true or false
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">enabled</span>
+            <span class="types"><span class="type">bool</span></span>
+         true or false
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "EnablePointFilter"></a>
+    <strong>EnablePointFilter(enabled)</strong>
+    </dt>
+    <dd>
+    Enable or disable point texture filter.
 Must be true or false
 
 
@@ -419,12 +502,13 @@ have an ID of 0, the second an ID of 1, and so on.
 </dd>
     <dt>
     <a name = "EndLevel"></a>
-    <strong>EndLevel([index])</strong>
+    <strong>EndLevel([index][, startPos])</strong>
     </dt>
     <dd>
-    Finishes the current level, with optional level index provided.  If level index
-is not provided or is zero, jumps to next level. If level index is more than
-level count, jumps to title.
+    Finishes the current level, with optional level index and start position index provided.
+If level index is not provided or is zero, jumps to next level. If level index is more than
+level count, jumps to title. If LARA_START_POS objects are present in level, player will be
+teleported to such object with OCB similar to provided second argument.
 
 
 
@@ -435,8 +519,128 @@ level count, jumps to title.
          level index (default 0)
          (<em>optional</em>)
         </li>
+        <li><span class="parameter">startPos</span>
+            <span class="types"><span class="type">int</span></span>
+         player start position (default 0)
+         (<em>optional</em>)
+        </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetGameStatus"></a>
+    <strong>GetGameStatus()</strong>
+    </dt>
+    <dd>
+    Get current game status, such as normal game loop, exiting to title, etc.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../4 enums/Flow.GameStatus.html#">GameStatus</a></span>
+        the current game status
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SaveGame"></a>
+    <strong>SaveGame(slotID)</strong>
+    </dt>
+    <dd>
+    Save the game to a savegame slot.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">slotID</span>
+            <span class="types"><span class="type">int</span></span>
+         ID of the savegame slot to save to.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "LoadGame"></a>
+    <strong>LoadGame(slotID)</strong>
+    </dt>
+    <dd>
+    Load the game from a savegame slot.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">slotID</span>
+            <span class="types"><span class="type">int</span></span>
+         ID of the savegame slot to load from.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "DeleteSaveGame"></a>
+    <strong>DeleteSaveGame(slotID)</strong>
+    </dt>
+    <dd>
+    Delete a savegame.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">slotID</span>
+            <span class="types"><span class="type">int</span></span>
+         ID of the savegame slot to clear.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "DoesSaveGameExist"></a>
+    <strong>DoesSaveGameExist(slotID)</strong>
+    </dt>
+    <dd>
+    Check if a savegame exists.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">slotID</span>
+            <span class="types"><span class="type">int</span></span>
+         ID of the savegame slot to check.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        true if the savegame exists, false if not.
+    </ol>
 
 
 
@@ -623,7 +827,7 @@ You will not need to call them manually.
     <strong>GetString(string)</strong>
     </dt>
     <dd>
-    Get translated string
+    Get translated string.
 
 
 
@@ -670,7 +874,6 @@ Specify which translations in the strings table correspond to which languages.
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-07-20 12:10:11 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

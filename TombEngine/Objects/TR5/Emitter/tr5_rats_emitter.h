@@ -13,6 +13,8 @@ struct RatData
 	short VerticalVelocity;
 
 	byte Flags;
+	
+	Matrix Transform;
 };
 
 extern int NextRat;

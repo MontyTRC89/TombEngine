@@ -194,6 +194,10 @@ namespace TEN::Entities::TR4
 
 				if (locust->counter > 0)
 					SoundEffect(SFX_TR4_LOCUSTS_LOOP, &locust->pos);
+				
+				Matrix translation = Matrix::CreateTranslation(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z);
+				Matrix rotation = locust->pos.Orientation.ToRotationMatrix();
+				locust->Transform = rotation * translation;
 			}
 		}
 	}

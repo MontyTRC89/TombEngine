@@ -45,7 +45,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 	}
 
 	spark->fxObj = objNum;
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BlendMode::Additive;
 	spark->flags = SP_ITEM | SP_NODEATTACH | SP_SCALE | SP_DEF;
 	spark->nodeNumber = node;
 	spark->x = x;
@@ -100,7 +100,7 @@ void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 	spark->sG = color;
 	spark->dB = color;
 	spark->dG = color / 2;
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BlendMode::Additive;
 	spark->fadeToBlack = 4;
 	spark->life = 12;
 	spark->sLife = 12;
@@ -207,7 +207,7 @@ void ElectricityWiresControl(short itemNumber)
 				if ((GetRandomControl() & 127) < 16)
 				{
 					SpawnRipple(
-						Vector3(pos.x, floor->GetSurfaceHeight(pos.x, pos.y, pos.z, true), pos.z),
+						Vector3(pos.x, floor->GetSurfaceHeight(pos, true), pos.z),
 						roomNumber,
 						Random::GenerateFloat(32.0f, 40.0f),
 						(int)RippleFlags::LowOpacity);

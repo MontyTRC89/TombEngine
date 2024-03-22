@@ -1027,7 +1027,7 @@ namespace TEN::Entities::Vehicles
 						{
 							if (TestBoundsCollide(item, kayakItem, KAYAK_TO_ENTITY_RADIUS))
 							{
-								DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - STEP_SIZE, laraItem->Pose.Position.z, kayakItem->Animation.Velocity.z, kayakItem->Pose.Orientation.y, laraItem->RoomNumber, 3);
+								DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - CLICK(1), laraItem->Pose.Position.z, kayakItem->Animation.Velocity.z, kayakItem->Pose.Orientation.y, laraItem->RoomNumber, 3);
 								DoDamage(laraItem, 5);
 							}
 						}
@@ -1071,8 +1071,7 @@ namespace TEN::Entities::Vehicles
 		auto* kayakItem = &g_Level.Items[lara->Context.Vehicle];
 		auto* kayak = GetKayakInfo(kayakItem);
 
-		if (TrInput & IN_LOOK)
-			LookUpDown(laraItem);
+		lara->Control.Look.Mode = LookMode::Free;
 
 		int ofs = kayakItem->Animation.Velocity.y;
 

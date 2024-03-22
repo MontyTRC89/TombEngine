@@ -1,7 +1,10 @@
 #include "framework.h"
 #include "Game/Lara/lara_helpers.h"
 
+#include <OISKeyboard.h>
+
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/control.h"
@@ -9,6 +12,8 @@
 #include "Game/items.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/Drip.h"
+#include "Game/GuiObjects.h"
+#include "Game/Lara/PlayerContext.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
@@ -16,7 +21,7 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
@@ -31,10 +36,12 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
-using namespace TEN::Collision::Floordata;
+using namespace TEN::Entities::Player;
+using namespace TEN::Gui;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -49,8 +56,8 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update AFK pose timer.
-	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
-		!(TrInput & IN_LOOK || IsOpticActionHeld()) &&
+	if (lara->Control.Count.Pose < PLAYER_POSE_TIME && 
+		!(IsHeld(In::Look) || IsOpticActionHeld()) &&
 		g_GameFlow->HasAFKPose())
 	{
 		lara->Control.Count.Pose++;
@@ -61,12 +68,12 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Reset running jump timer.
-	if (!IsRunJumpCountableState((LaraState)item->Animation.ActiveState))
+	if (!IsRunJumpCountableState(item->Animation.ActiveState))
 		lara->Control.Count.Run = 0;
 
 	// Reset running jump action queue.
-	if (!IsRunJumpQueueableState((LaraState)item->Animation.ActiveState))
-		lara->Control.RunJumpQueued = false;
+	if (!IsRunJumpQueueableState(item->Animation.ActiveState))
+		lara->Control.IsRunJumpQueued = false;
 
 	// Reset lean.
 	if ((!lara->Control.IsMoving || (lara->Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))) &&
@@ -76,8 +83,8 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Reset crawl flex.
-	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
-		(!item->Animation.Velocity.z || (item->Animation.Velocity.z && !(IsHeld(In::Left) || IsHeld(In::Right)))))
+	if (!IsHeld(In::Look) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM && // HACK
+		(item->Animation.Velocity.z == 0.0f || (item->Animation.Velocity.z != 0.0f && !(IsHeld(In::Left) || IsHeld(In::Right)))))
 	{
 		ResetPlayerFlex(item, 0.1f);
 	}
@@ -89,6 +96,184 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.IsLow = false;
 	lara->Control.IsMonkeySwinging = false;
+}
+
+void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWaterData& water)
+{
+	auto& player = GetLaraInfo(item);
+
+	// Update health status.
+	if (TestEnvironment(ENV_FLAG_DAMAGE, &item) && item.HitPoints > 0)
+		item.HitPoints--;
+
+	// Update poison status.
+	if (player.Status.Poison)
+	{
+		if (player.Status.Poison > LARA_POISON_MAX)
+			player.Status.Poison = LARA_POISON_MAX;
+
+		if (!(Wibble & 0xFF))
+			item.HitPoints -= player.Status.Poison;
+	}
+
+	// Update stamina status.
+	if (player.Status.Stamina < LARA_STAMINA_MAX && item.Animation.ActiveState != LS_SPRINT)
+		player.Status.Stamina++;
+
+	// TODO: Dehardcode values and make cleaner implementation.
+	// Handle environmental status effects.
+	switch (waterStatus)
+	{
+	case WaterStatus::Dry:
+	case WaterStatus::Wade:
+		// TODO: Find best height. -- Sezz 2021.11.10
+		if (water.IsSwamp && player.Context.WaterSurfaceDist < -(LARA_HEIGHT + 8))
+		{
+			if (item.HitPoints >= 0)
+			{
+				player.Status.Air -= 6;
+				if (player.Status.Air < 0)
+				{
+					player.Status.Air = -1;
+					item.HitPoints -= 10;
+				}
+			}
+		}
+		else if (player.Status.Air < LARA_AIR_MAX && item.HitPoints >= 0)
+		{
+			// HACK: Special case for UPV.
+			if (player.Context.Vehicle == NO_ITEM)
+			{
+				player.Status.Air += 10;
+				if (player.Status.Air > LARA_AIR_MAX)
+					player.Status.Air = LARA_AIR_MAX;
+			}
+		}
+
+		if (item.HitPoints >= 0)
+		{
+			if (player.Control.WaterStatus == WaterStatus::Dry)
+			{
+				// HACK: Special case for UPV.
+				if (player.Context.Vehicle != NO_ITEM)
+				{
+					const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
+					if (vehicleItem.ObjectNumber == ID_UPV)
+					{
+						auto pointColl = GetCollision(&item, 0, 0, CLICK(1));
+
+						water.IsCold = (water.IsCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber));
+						if (water.IsCold)
+						{
+							player.Status.Exposure--;
+							if (player.Status.Exposure <= 0)
+							{
+								player.Status.Exposure = 0;
+								item.HitPoints -= 10;
+							}
+						}
+					}
+				}
+				else
+				{
+					player.Status.Exposure++;
+					if (player.Status.Exposure >= LARA_EXPOSURE_MAX)
+						player.Status.Exposure = LARA_EXPOSURE_MAX;
+				}
+			}
+			else
+			{
+				if (water.IsCold)
+				{
+					player.Status.Exposure--;
+					if (player.Status.Exposure <= 0)
+					{
+						player.Status.Exposure = 0;
+						item.HitPoints -= 10;
+					}
+				}
+				else
+				{
+					player.Status.Exposure++;
+					if (player.Status.Exposure >= LARA_EXPOSURE_MAX)
+						player.Status.Exposure = LARA_EXPOSURE_MAX;
+				}
+			}
+		}
+
+		break;
+
+	case WaterStatus::Underwater:
+		if (item.HitPoints >= 0)
+		{
+			const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
+			if (level.GetLaraType() != LaraType::Divesuit)
+				player.Status.Air--;
+
+			if (player.Status.Air < 0)
+			{
+				item.HitPoints -= 5;
+				player.Status.Air = -1;
+			}
+
+			if (water.IsCold)
+			{
+				player.Status.Exposure -= 2;
+				if (player.Status.Exposure <= 0)
+				{
+					player.Status.Exposure = 0;
+					item.HitPoints -= 10;
+				}
+			}
+			else
+			{
+				player.Status.Exposure++;
+				if (player.Status.Exposure >= LARA_EXPOSURE_MAX)
+					player.Status.Exposure = LARA_EXPOSURE_MAX;
+			}
+		}
+
+		break;
+
+	case WaterStatus::TreadWater:
+		if (item.HitPoints >= 0)
+		{
+			player.Status.Air += 10;
+			if (player.Status.Air > LARA_AIR_MAX)
+				player.Status.Air = LARA_AIR_MAX;
+
+			if (water.IsCold)
+			{
+				player.Status.Exposure -= 2;
+				if (player.Status.Exposure <= 0)
+				{
+					player.Status.Exposure = 0;
+					item.HitPoints -= 10;
+				}
+			}
+		}
+
+		break;
+
+	default:
+		break;
+	}
+
+	// Update death counter.
+	if (item.HitPoints <= 0)
+	{
+		item.HitPoints = -1;
+
+		if (player.Control.Count.Death == 0)
+			StopSoundTracks(true);
+
+		player.Control.Count.Death++;
+		if ((item.Flags & IFLAG_INVISIBLE))
+		{
+			player.Control.Count.Death++;
+			return;
+		}
+	}
 }
 
 static void UsePlayerMedipack(ItemInfo& item)
@@ -129,7 +314,7 @@ static void UsePlayerMedipack(ItemInfo& item)
 	if (hasUsedMedipack)
 	{
 		player.Status.Poison = 0;
-		Statistics.Game.HealthUsed++;
+		SaveGame::Statistics.Game.HealthUsed++;
 		SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 	}
 }
@@ -149,6 +334,11 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 		LaraWeaponType::RocketLauncher
 	};
 
+	auto getNextIndex = [getPrev](unsigned int index)
+	{
+		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
+	};
+
 	auto& player = GetLaraInfo(item);
 
 	// Get vector index for current weapon type.
@@ -165,12 +355,6 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 	// Invalid current weapon type; return nullopt.
 	if (!currentIndex.has_value())
 		return std::nullopt;
-
-	// Getter for next index.
-	auto getNextIndex = [getPrev](unsigned int index)
-	{
-		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
-	};
 
 	// Get next valid weapon type in sequence.
 	unsigned int nextIndex = getNextIndex(*currentIndex);
@@ -195,7 +379,7 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	if (IsClicked(In::SmallMedipack) || IsClicked(In::LargeMedipack))
 		UsePlayerMedipack(item);
 
-	// Handle weapon scroll requests.
+	// Handle weapon scroll request.
 	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
 	{
 		bool getPrev = IsClicked(In::PreviousWeapon);
@@ -236,25 +420,240 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	// TODO: 10th possible weapon, probably grapple gun.
 	/*if (IsClicked(In::Weapon10) && player.Weapons[(int)LaraWeaponType::].Present)
 	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
+}
 
-	// TODO: Could theoretically remove SwitchTarget and instead do unique behaviour handling using only Look. -- Sezz 2023.07.08
-	// HACK: Handle target switch when locked on to an entity.
+bool CanPlayerLookAround(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+
+	// 1) Check if look mode is not None.
+	if (player.Control.Look.Mode == LookMode::None)
+		return false;
+
+	// 2) Check if drawn weapon has lasersight.
+	if (player.Control.HandStatus == HandStatus::WeaponReady &&
+		player.Weapons[(int)player.Control.Weapon.GunType].HasLasersight)
+	{
+		return true;
+	}
+
+	// 3) Test for switchable target.
 	if (player.Control.HandStatus == HandStatus::WeaponReady &&
 		player.TargetEntity != nullptr)
 	{
-		if (IsClicked(In::Look))
+		unsigned int targetableCount = 0;
+		for (const auto* targetPtr : player.TargetList)
 		{
-			ActionMap[(int)In::SwitchTarget].Update(true);
-		}
-		else
-		{
-			ClearAction(In::SwitchTarget);
+			if (targetPtr != nullptr)
+				targetableCount++;
+
+			if (targetableCount > 1)
+				return false;
 		}
 	}
-	else
+
+	return true;
+}
+
+static void ClearPlayerLookAroundActions(const ItemInfo& item)
+{
+	const auto& player = GetLaraInfo(item);
+
+	switch (player.Control.Look.Mode)
 	{
-		ClearAction(In::SwitchTarget);
+	default:
+	case LookMode::None:
+		break;
+
+	case LookMode::Vertical:
+		ClearAction(In::Forward);
+		ClearAction(In::Back);
+		break;
+
+	case LookMode::Horizontal:
+		ClearAction(In::Left);
+		ClearAction(In::Right);
+		break;
+
+	case LookMode::Free:
+		ClearAction(In::Forward);
+		ClearAction(In::Back);
+		ClearAction(In::Left);
+		ClearAction(In::Right);
+		break;
 	}
+}
+
+static void SetPlayerOptics(ItemInfo* item)
+{
+	constexpr auto OPTIC_RANGE_DEFAULT = ANGLE(0.7f);
+
+	auto& player = GetLaraInfo(*item);
+
+	bool breakOptics = true;
+
+	// Standing; can use optics.
+	if (item->Animation.ActiveState == LS_IDLE || item->Animation.AnimNumber == LA_STAND_IDLE)
+		breakOptics = false;
+
+	// Crouching; can use optics.
+	if ((player.Control.IsLow || !IsHeld(In::Crouch)) &&
+		(item->Animation.TargetState == LS_CROUCH_IDLE || item->Animation.AnimNumber == LA_CROUCH_IDLE))
+	{
+		breakOptics = false;
+	}
+
+	// If lasersight and Look is not held, exit optics.
+	if (player.Control.Look.IsUsingLasersight && !IsHeld(In::Look))
+		breakOptics = true;
+
+	// If lasersight and weapon is holstered, exit optics.
+	if (player.Control.Look.IsUsingLasersight && IsHeld(In::Draw))
+		breakOptics = true;
+
+	// Engage lasersight if available.
+	if (!player.Control.Look.IsUsingLasersight && !breakOptics && IsHeld(In::Look))
+	{
+		if (player.Control.HandStatus == HandStatus::WeaponReady &&
+			((player.Control.Weapon.GunType == LaraWeaponType::HK && player.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
+				(player.Control.Weapon.GunType == LaraWeaponType::Revolver && player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+				(player.Control.Weapon.GunType == LaraWeaponType::Crossbow && player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
+		{
+			player.Control.Look.OpticRange = OPTIC_RANGE_DEFAULT;
+			player.Control.Look.IsUsingBinoculars = true;
+			player.Control.Look.IsUsingLasersight = true;
+			player.Inventory.IsBusy = true;
+
+			BinocularOldCamera = Camera.oldType;
+			return;
+		}
+	}
+
+	if (!breakOptics)
+		return;
+
+	// Not using optics; return early.
+	if (!player.Control.Look.IsUsingBinoculars && !player.Control.Look.IsUsingLasersight)
+		return;
+
+	player.Control.Look.OpticRange = 0;
+	player.Control.Look.IsUsingBinoculars = false;
+	player.Control.Look.IsUsingLasersight = false;
+	player.Inventory.IsBusy = false;
+
+	Camera.type = BinocularOldCamera;
+	Camera.bounce = 0;
+	AlterFOV(LastFOV);
+}
+
+static short NormalizeLookAroundTurnRate(short turnRate, short opticRange)
+{
+	constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
+	constexpr auto ZOOM_LEVEL_REF = ANGLE(17.0f);
+
+	if (opticRange == 0)
+		return turnRate;
+
+	return short(turnRate * (ZOOM_LEVEL_MAX - opticRange) / ZOOM_LEVEL_REF);
+};
+
+void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
+{
+	constexpr auto OPTIC_RANGE_MAX	= ANGLE(8.5f);
+	constexpr auto OPTIC_RANGE_MIN	= ANGLE(0.7f);
+	constexpr auto OPTIC_RANGE_RATE = ANGLE(0.35f);
+	constexpr auto TURN_RATE_MAX	= ANGLE(4.0f);
+	constexpr auto TURN_RATE_ACCEL	= ANGLE(0.75f);
+
+	auto& player = GetLaraInfo(item);
+
+	// Set optics.
+	Camera.type = CameraType::Look;
+	SetPlayerOptics(LaraItem);
+
+	bool isSlow = IsHeld(In::Walk);
+
+	// Zoom optics.
+	if (player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)
+	{
+		short rangeRate = isSlow ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
+
+		// NOTE: Zooming allowed with either StepLeft/StepRight or Walk/Sprint.
+		if ((IsHeld(In::StepLeft) && !IsHeld(In::StepRight)) ||
+			(IsHeld(In::Walk) && !IsHeld(In::Sprint)))
+		{
+			player.Control.Look.OpticRange -= rangeRate;
+			if (player.Control.Look.OpticRange < OPTIC_RANGE_MIN)
+			{
+				player.Control.Look.OpticRange = OPTIC_RANGE_MIN;
+			}
+			else
+			{
+				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
+			}
+		}
+		else if ((IsHeld(In::StepRight) && !IsHeld(In::StepLeft)) ||
+			(IsHeld(In::Sprint) && !IsHeld(In::Walk)))
+		{
+			player.Control.Look.OpticRange += rangeRate;
+			if (player.Control.Look.OpticRange > OPTIC_RANGE_MAX)
+			{
+				player.Control.Look.OpticRange = OPTIC_RANGE_MAX;
+			}
+			else
+			{
+				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
+			}
+		}
+	}
+
+	auto axisCoeff = Vector2::Zero;
+
+	// Determine X axis coefficient.
+	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
+	{
+		axisCoeff.x = AxisMap[(int)InputAxis::Move].y;
+	}
+
+	// Determine Y axis coefficient.
+	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
+		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
+	{
+		axisCoeff.y = AxisMap[(int)InputAxis::Move].x;
+	}
+
+	// Determine turn rate base values.
+	short turnRateMax = isSlow ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
+	short turnRateAccel = isSlow ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
+
+	// Normalize turn rate base values.
+	turnRateMax = NormalizeLookAroundTurnRate(turnRateMax, player.Control.Look.OpticRange);
+	turnRateAccel = NormalizeLookAroundTurnRate(turnRateAccel, player.Control.Look.OpticRange);
+
+	// Modulate turn rates.
+	player.Control.Look.TurnRate = EulerAngles(
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.x, turnRateAccel, 0, turnRateMax, axisCoeff.x, invertXAxis),
+		ModulateLaraTurnRate(player.Control.Look.TurnRate.y, turnRateAccel, 0, turnRateMax, axisCoeff.y, false),
+		0);
+
+	// Apply turn rates.
+	player.Control.Look.Orientation += player.Control.Look.TurnRate;
+	player.Control.Look.Orientation = EulerAngles(
+		std::clamp(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x),
+		std::clamp(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y),
+		0);
+
+	// Visually adapt head and torso orientations.
+	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
+	if (player.Control.HandStatus != HandStatus::Busy &&
+		!player.LeftArm.Locked && !player.RightArm.Locked &&
+		player.Context.Vehicle == NO_ITEM)
+	{
+		player.ExtraTorsoRot = player.ExtraHeadRot;
+	}
+
+	ClearPlayerLookAroundActions(item);
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
@@ -308,12 +707,249 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 		BigGunControl(item, coll);
 		break;
 
-		// Boats are processed like normal items in loop.
+	// Boats are processed like normal items in loop.
 	default:
 		HandleWeapon(*item);
 	}
 
 	return true;
+}
+
+void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
+{
+	if (!item->Animation.Velocity.z)
+		return;
+
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+	int sign = copysign(1, axisCoeff);
+	short maxAngleNormalized = maxAngle * axisCoeff;
+
+	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+		maxAngleNormalized *= 0.6f;
+
+	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
+}
+
+void HandlePlayerCrawlFlex(ItemInfo& item)
+{
+	constexpr auto FLEX_RATE_ANGLE = ANGLE(2.25f);
+	constexpr auto FLEX_ANGLE_MAX  = ANGLE(50.0f) / 2; // 2 = hardcoded number of bones to flex (head and torso).
+
+	auto& player = GetLaraInfo(item);
+
+	// Check if player is moving.
+	if (item.Animation.Velocity.z == 0.0f)
+		return;
+
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+	int sign = copysign(1, axisCoeff);
+	short maxAngleNormalized = FLEX_ANGLE_MAX * axisCoeff;
+
+	if (abs(player.ExtraTorsoRot.z) < FLEX_ANGLE_MAX)
+		player.ExtraTorsoRot.z += std::min<short>(FLEX_RATE_ANGLE, abs(maxAngleNormalized - player.ExtraTorsoRot.z) / 6) * sign;
+
+	if (!IsHeld(In::Look) && item.Animation.ActiveState != LS_CRAWL_BACK)
+	{
+		player.ExtraHeadRot.z = player.ExtraTorsoRot.z / 2;
+		player.ExtraHeadRot.y = player.ExtraHeadRot.z;
+	}
+}
+
+static void GivePlayerItemsCheat(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	for (int i = 0; i < 8; ++i)
+	{
+		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
+			player.Inventory.Puzzles[i] = true;
+
+		player.Inventory.PuzzlesCombo[2 * i] = false;
+		player.Inventory.PuzzlesCombo[(92 * i) + 1] = false;
+	}
+
+	for (int i = 0; i < 8; ++i)
+	{
+		if (Objects[ID_KEY_ITEM1 + i].loaded)
+			player.Inventory.Keys[i] = true;
+
+		player.Inventory.KeysCombo[2 * i] = false;
+		player.Inventory.KeysCombo[(2 * i) + 1] = false;
+	}
+
+	for (int i = 0; i < 3; ++i)
+	{
+		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
+			player.Inventory.Pickups[i] = true;
+
+		player.Inventory.PickupsCombo[2 * i] = false;
+		player.Inventory.PickupsCombo[(2 * i) + 1] = false;
+	}
+}
+
+static void GivePlayerWeaponsCheat(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	player.Inventory.TotalFlares = -1;
+	player.Inventory.TotalSmallMedipacks = -1;
+	player.Inventory.TotalLargeMedipacks = -1;
+
+	if (Objects[ID_CROWBAR_ITEM].loaded)
+		player.Inventory.HasCrowbar = true;
+
+	if (Objects[ID_LASERSIGHT_ITEM].loaded)
+		player.Inventory.HasLasersight = true;
+
+	if (Objects[ID_CLOCKWORK_BEETLE].loaded)
+		player.Inventory.BeetleComponents |= BEETLECOMP_FLAG_BEETLE;
+
+	if (Objects[ID_WATERSKIN1_EMPTY].loaded)
+		player.Inventory.SmallWaterskin = 1;
+
+	if (Objects[ID_WATERSKIN2_EMPTY].loaded)
+		player.Inventory.BigWaterskin = 1;
+
+	if (Objects[ID_PISTOLS_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Pistol];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_REVOLVER_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Revolver];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_UZI_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Uzi];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_SHOTGUN_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Shotgun];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].SetInfinite(true);
+	}
+
+	if (Objects[ID_HARPOON_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::HarpoonGun];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_GRENADE_GUN_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::GrenadeLauncher];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo3].SetInfinite(true);
+	}
+
+	if (Objects[ID_ROCKET_LAUNCHER_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::RocketLauncher];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_HK_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::HK];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+	}
+
+	if (Objects[ID_CROSSBOW_ITEM].loaded)
+	{
+		auto& weapon = player.Weapons[(int)LaraWeaponType::Crossbow];
+
+		weapon.Present = true;
+		weapon.SelectedAmmo = WeaponAmmoType::Ammo1;
+		weapon.HasLasersight = false;
+		weapon.HasSilencer = false;
+		weapon.Ammo[(int)WeaponAmmoType::Ammo1].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo2].SetInfinite(true);
+		weapon.Ammo[(int)WeaponAmmoType::Ammo3].SetInfinite(true);
+	}
+}
+
+void HandlePlayerFlyCheat(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	if (!g_GameFlow->IsFlyCheatEnabled())
+		return;
+
+	static bool dbFlyCheat = true;
+	if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
+	{
+		if (player.Context.Vehicle == NO_ITEM)
+		{
+			GivePlayerItemsCheat(item);
+			GivePlayerWeaponsCheat(item);
+
+			if (player.Control.WaterStatus != WaterStatus::FlyCheat)
+			{
+				SetAnimation(item, LA_FLY_CHEAT);
+				ResetPlayerFlex(&item);
+				item.Animation.IsAirborne = false;
+				item.HitPoints = LARA_HEALTH_MAX;
+
+				player.Control.WaterStatus = WaterStatus::FlyCheat;
+				player.Control.Count.Death = 0;
+				player.Status.Air = LARA_AIR_MAX;
+				player.Status.Poison = 0;
+				player.Status.Stamina = LARA_STAMINA_MAX;
+			}
+		}
+		else
+		{
+			SayNo();
+		}
+	}
+	dbFlyCheat = !KeyMap[OIS::KeyCode::KC_O];
 }
 
 void HandlePlayerWetnessDrips(ItemInfo& item)
@@ -326,8 +962,8 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 	int jointIndex = 0;
 	for (auto& node : player.Effect.DripNodes)
 	{
-		auto pos = GetJointPosition(&item, jointIndex).ToVector3();
-		int roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+		auto pos = GetJointPosition(&item, jointIndex);
+		int roomNumber = GetRoomVector(item.Location, pos).RoomNumber;
 		jointIndex++;
 
 		// Node underwater; set max wetness value.
@@ -345,7 +981,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 		float chance = (node / PLAYER_DRIP_NODE_MAX) / 2;
 		if (Random::TestProbability(chance))
 		{
-			SpawnWetnessDrip(pos, item.RoomNumber);
+			SpawnWetnessDrip(pos.ToVector3(), item.RoomNumber);
 
 			node -= 1.0f;
 			if (node <= 0.0f)
@@ -363,8 +999,8 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 	int jointIndex = 0;
 	for (auto& node : player.Effect.BubbleNodes)
 	{
-		auto pos = GetJointPosition(&item, jointIndex).ToVector3();
-		int roomNumber = GetRoom(item.Location, pos.x, pos.y, pos.z).roomNumber;
+		auto pos = GetJointPosition(&item, jointIndex);
+		int roomNumber = GetRoomVector(item.Location, pos).RoomNumber;
 		jointIndex++;
 
 		// Node inactive; continue.
@@ -380,7 +1016,7 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 		if (Random::TestProbability(chance))
 		{
 			unsigned int count = (int)round(node * BUBBLE_COUNT_MULT);
-			SpawnDiveBubbles(pos, roomNumber, count);
+			SpawnDiveBubbles(pos.ToVector3(), roomNumber, count);
 
 			node -= 1.0f;
 			if (node <= 0.0f)
@@ -406,20 +1042,20 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 		SpawnBubble(pos, item->RoomNumber);
 }
 
-// TODO: This approach may cause undesirable artefacts where a platform rapidly ascends/descends or the player gets pushed.
+// TODO: This approach may present undesirable artefacts where a platform rapidly ascends/descends or the player gets pushed.
 // Potential solutions:
 // 1. Consider floor tilt when translating objects.
 // 2. Object parenting. -- Sezz 2022.10.28
-void HandlePlayerStepEasing(ItemInfo* item, int height)
+void EasePlayerElevation(ItemInfo* item, int relHeight)
 {
 	constexpr auto LINEAR_RATE_MIN = 50.0f;
 
 	// Check for wall.
-	if (height == NO_HEIGHT)
+	if (relHeight == NO_HEIGHT)
 		return;
 
 	// Handle swamp case.
-	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
+	if (TestEnvironment(ENV_FLAG_SWAMP, item) && relHeight > 0)
 	{
 		item->Pose.Position.y += SWAMP_GRAVITY;
 		return;
@@ -427,15 +1063,15 @@ void HandlePlayerStepEasing(ItemInfo* item, int height)
 
 	// Handle regular case.
 	float linearRate = std::max(LINEAR_RATE_MIN, abs(item->Animation.Velocity.z));
-	if (abs(height) > linearRate)
+	if (abs(relHeight) > linearRate)
 	{
-		int sign = std::copysign(1, height);
-		item->Pose.Position.y += linearRate * sign;
+		int sign = std::copysign(1, relHeight);
+		item->Pose.Position.y += (int)round(linearRate * sign);
+		return;
 	}
-	else
-	{
-		item->Pose.Position.y += height;
-	}
+
+	// Snap elevation.
+	item->Pose.Position.y += relHeight;
 }
 
 static void HandlePlayerFootRoll(ItemInfo& item, LimbRotationData& limbRot, const Vector2& floorTilt,
@@ -632,11 +1268,11 @@ void HandlePlayerLegIK(ItemInfo& item)
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
 // Try implementing leg IK as a substitute to make step animations obsolete. @Sezz 2021.10.09
-void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
+void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll)
 {
 	if (!TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
-		if (TestLaraStepUp(item, coll))
+		if (CanStepUp(*item, *coll))
 		{
 			item->Animation.TargetState = LS_STEP_UP;
 			if (GetStateDispatch(item, GetAnimData(*item)))
@@ -645,7 +1281,7 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TestLaraStepDown(item, coll))
+		else if (CanStepDown(*item, *coll))
 		{
 			item->Animation.TargetState = LS_STEP_DOWN;
 			if (GetStateDispatch(item, GetAnimData(*item)))
@@ -656,12 +1292,12 @@ void DoLaraStep(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	HandlePlayerStepEasing(item, coll->Middle.Floor);
+	EasePlayerElevation(item, coll->Middle.Floor);
 }
 
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
 {
-	HandlePlayerStepEasing(item, coll->Middle.Ceiling);
+	EasePlayerElevation(item, coll->Middle.Ceiling);
 }
 
 void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
@@ -685,9 +1321,9 @@ void DoLaraTightropeBalance(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 	const int factor = ((lara->Control.Tightrope.TimeOnTightrope >> 7) & 0xFF) * 128;
 
-	if (TrInput & IN_LEFT)
+	if (IsHeld(In::Left))
 		lara->Control.Tightrope.Balance += ANGLE(1.4f);
-	if (TrInput & IN_RIGHT)
+	if (IsHeld(In::Right))
 		lara->Control.Tightrope.Balance -= ANGLE(1.4f);
 
 	if (lara->Control.Tightrope.Balance < 0)
@@ -804,33 +1440,108 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 	return (LaraInfo*&)firstPlayerItem.Data;
 }
 
-short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
+PlayerWaterData GetPlayerWaterData(ItemInfo& item)
+{
+	bool isWater = TestEnvironment(ENV_FLAG_WATER, &item);
+	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, &item);
+	bool isCold = TestEnvironment(ENV_FLAG_COLD, &item);
+
+	int waterDepth = GetWaterDepth(&item);
+	int waterHeight = GetWaterHeight(&item);
+
+	auto pointColl = GetCollision(item);
+	int heightFromWater = (waterHeight == NO_HEIGHT) ? NO_HEIGHT : (std::min(item.Pose.Position.y, pointColl.Position.Floor) - waterHeight);
+
+	return PlayerWaterData
+	{
+		isWater, isSwamp, isCold,
+		waterDepth, waterHeight, heightFromWater
+	};
+}
+
+JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& coll)
+{
+	if (IsHeld(In::Forward) && CanJumpForward(item, coll))
+	{
+		return JumpDirection::Forward;
+	}
+	else if (IsHeld(In::Back) && CanJumpBackward(item, coll))
+	{
+		return JumpDirection::Back;
+	}
+	else if (IsHeld(In::Left) && CanJumpLeft(item, coll))
+	{
+		return JumpDirection::Left;
+	}
+	else if (IsHeld(In::Right) && CanJumpRight(item, coll))
+	{
+		return JumpDirection::Right;
+	}
+	else if (CanJumpUp(item, coll))
+	{
+		return JumpDirection::Up;
+	}
+
+	return JumpDirection::None;
+}
+
+static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)
+{
+	auto tilt = GetSurfaceTilt(floorNormal, true);
+
+	short headingAngle = ANGLE(0.0f);
+	if (tilt.x > 2)
+	{
+		headingAngle = ANGLE(-90.0f);
+	}
+	else if (tilt.x < -2)
+	{
+		headingAngle = ANGLE(90.0f);
+	}
+
+	if (tilt.y > 2 && tilt.y > abs(tilt.x))
+	{
+		headingAngle = ANGLE(180.0f);
+	}
+	else if (tilt.y < -2 && -tilt.y > abs(tilt.x))
+	{
+		headingAngle = ANGLE(0.0f);
+	}
+
+	return headingAngle;
+}
+
+short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;
-	auto probe = GetCollision(item);
+	auto pointColl = GetCollision(item);
 
 	// Ground is flat.
-	if (probe.FloorTilt == Vector2::Zero)
-		return headingAngle;
+	if (pointColl.FloorTilt == Vector2::Zero)
+		return coll->Setup.ForwardAngle;
 
-	// Get either:
-	// a) the surface aspect angle (extended slides), or
-	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = Geometry::GetSurfaceAspectAngle(GetSurfaceNormal(probe.FloorTilt, true));
+	// Return slide heading angle.
 	if (g_GameFlow->HasSlideExtended())
-		return headingAngle;
+	{
+		return Geometry::GetSurfaceAspectAngle(pointColl.FloorNormal);
+	}
 	else
-		return (GetQuadrant(headingAngle) * ANGLE(90.0f));
+	{
+		return GetLegacySlideHeadingAngle(pointColl.FloorNormal);
+	}
 }
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
 {
+	// Determine sign.
 	axisCoeff *= invert ? -1 : 1;
 	int sign = std::copysign(1, axisCoeff);
 
+	// Normalize min and max turn rates according to axis coefficient.
 	short minTurnRateNorm = minTurnRate * abs(axisCoeff);
 	short maxTurnRateNorm = maxTurnRate * abs(axisCoeff);
 
+	// Calculate and return new turn rate.
 	short newTurnRate = (turnRate + (accelRate * sign)) * sign;
 	newTurnRate = std::clamp(newTurnRate, minTurnRateNorm, maxTurnRateNorm);
 	return (newTurnRate * sign);
@@ -841,14 +1552,14 @@ void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, s
 {
 	auto* lara = GetLaraInfo(item);
 
-	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
+	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::Move].y, invert);
 }
 
 void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 {
 	auto* lara = GetLaraInfo(item);
 
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 	if (item->Animation.IsAirborne)
 	{
 		int sign = std::copysign(1, axisCoeff);
@@ -858,26 +1569,47 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
 }
 
+static short ResetPlayerTurnRate(short turnRate, short decelRate)
+{
+	int sign = std::copysign(1, turnRate);
+	if (abs(turnRate) > decelRate)
+		return (turnRate - (decelRate * sign));
+
+	return 0;
+}
+
+void ResetPlayerTurnRateX(ItemInfo& item, short decelRate)
+{
+	auto& player = GetLaraInfo(item);
+	player.Control.TurnRate/*.x*/ = ResetPlayerTurnRate(player.Control.TurnRate/*.x*/, decelRate);
+}
+
+void ResetPlayerTurnRateY(ItemInfo& item, short decelRate)
+{
+	auto& player = GetLaraInfo(item);
+	player.Control.TurnRate/*.y*/ = ResetPlayerTurnRate(player.Control.TurnRate/*.y*/, decelRate);
+}
+
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	/*if (TrInput & (IN_FORWARD | IN_BACK))
+	/*if ((IsHeld(In::Forward) || IsHeld(In::Back)))
 	ModulateLaraTurnRateX(item, 0, 0, 0);*/
 
-	if (TrInput & IN_FORWARD)
+	if (IsHeld(In::Forward))
 		item->Pose.Orientation.x -= ANGLE(3.0f);
-	else if (TrInput & IN_BACK)
+	else if (IsHeld(In::Back))
 		item->Pose.Orientation.x += ANGLE(3.0f);
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 
 		// TODO: ModulateLaraLean() doesn't really work here. -- Sezz 2022.06.22
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Pose.Orientation.z -= LARA_LEAN_RATE;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Pose.Orientation.z += LARA_LEAN_RATE;
 	}
 }
@@ -886,20 +1618,20 @@ void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_FORWARD && item->Pose.Orientation.x > -ANGLE(85.0f))
+	if (IsHeld(In::Forward) && item->Pose.Orientation.x > -ANGLE(85.0f))
 		lara->Control.Subsuit.DXRot = -ANGLE(45.0f);
-	else if (TrInput & IN_BACK && item->Pose.Orientation.x < ANGLE(85.0f))
+	else if (IsHeld(In::Back) && item->Pose.Orientation.x < ANGLE(85.0f))
 		lara->Control.Subsuit.DXRot = ANGLE(45.0f);
 	else
 		lara->Control.Subsuit.DXRot = 0;
 
-	if (TrInput & (IN_LEFT | IN_RIGHT))
+	if (IsHeld(In::Left) || IsHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_SUBSUIT_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
 
-		if (TrInput & IN_LEFT)
+		if (IsHeld(In::Left))
 			item->Pose.Orientation.z -= LARA_LEAN_RATE;
-		else if (TrInput & IN_RIGHT)
+		else if (IsHeld(In::Right))
 			item->Pose.Orientation.z += LARA_LEAN_RATE;
 	}
 }
@@ -974,43 +1706,6 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	}
 }
 
-void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
-{
-	if (!item->Animation.Velocity.z)
-		return;
-
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
-	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * axisCoeff;
-
-	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-		maxAngleNormalized *= 0.6f;
-
-	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
-}
-
-void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (!item->Animation.Velocity.z)
-		return;
-
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
-	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * axisCoeff;
-
-	if (abs(lara->ExtraTorsoRot.z) < LARA_CRAWL_FLEX_MAX)
-		lara->ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
-
-	if (!(TrInput & IN_LOOK) &&
-		item->Animation.ActiveState != LS_CRAWL_BACK)
-	{
-		lara->ExtraHeadRot.z = lara->ExtraTorsoRot.z / 2;
-		lara->ExtraHeadRot.y = lara->ExtraHeadRot.z;
-	}
-}
-
 // TODO: Unused; I will pick this back up later. -- Sezz 2022.06.22
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 {
@@ -1042,7 +1737,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	// Determine relative orientation adhering to floor normal.
-	auto floorNormal = GetSurfaceNormal(GetCollision(item).FloorTilt, true);
+	auto floorNormal = GetCollision(item).FloorNormal;
 	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
 	// Apply extra rotation according to alpha.
@@ -1050,85 +1745,30 @@ void AlignLaraToSurface(ItemInfo* item, float alpha)
 	item->Pose.Orientation += extraRot * alpha;
 }
 
-void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll) 
+void SetLaraVault(ItemInfo* item, CollisionInfo* coll, const VaultTestResult& vaultResult)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	if (TrInput & IN_FORWARD &&
-		TestLaraJumpForward(item, coll))
-	{
-		lara->Control.JumpDirection = JumpDirection::Forward;
-	}
-	else if (TrInput & IN_BACK &&
-		TestLaraJumpBack(item, coll))
-	{
-		lara->Control.JumpDirection = JumpDirection::Back;
-	}
-	else if (TrInput & IN_LEFT &&
-		TestLaraJumpLeft(item, coll))
-	{
-		lara->Control.JumpDirection = JumpDirection::Left;
-	}
-	else if (TrInput & IN_RIGHT &&
-		TestLaraJumpRight(item, coll))
-	{
-		lara->Control.JumpDirection = JumpDirection::Right;
-	}
-	else if (TestLaraJumpUp(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
-		lara->Control.JumpDirection = JumpDirection::Up;
-	else
-		lara->Control.JumpDirection = JumpDirection::None;
-}
+	ResetPlayerTurnRateY(*item);
+	player.Context.ProjectedFloorHeight = vaultResult.Height;
 
-// TODO: Add a timeout? Imagine a small, sad rain cloud with the properties of a ceiling following Lara overhead.
-// RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. -- Sezz 2022.01.22
-void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	int y = item->Pose.Position.y;
-	int distance = BLOCK(1);
-	auto probe = GetCollision(item, item->Pose.Orientation.y, distance, -coll->Setup.Height);
-
-	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
-		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
-		(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
-		probe.Position.Floor != NO_HEIGHT)
-	{
-		lara->Control.RunJumpQueued = IsRunJumpQueueableState((LaraState)item->Animation.TargetState);
-	}
-	else
-		lara->Control.RunJumpQueued = false;
-}
-
-void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResult)
-{
-	auto* lara = GetLaraInfo(item);
-
-	lara->Context.ProjectedFloorHeight = vaultResult.Height;
-	lara->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : lara->Control.HandStatus;
-	lara->Control.TurnRate = 0;
+	if (vaultResult.SetBusyHands)
+		player.Control.HandStatus = HandStatus::Busy;
 
 	if (vaultResult.SnapToLedge)
 	{
 		SnapItemToLedge(item, coll, 0.2f, false);
-		lara->Context.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
+		player.Context.TargetOrientation = EulerAngles(0, coll->NearestLedgeAngle, 0);
 	}
 	else
 	{
-		lara->Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
+		player.Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
 	}
 
 	if (vaultResult.SetJumpVelocity)
 	{
-		int height = lara->Context.ProjectedFloorHeight - item->Pose.Position.y;
-		if (height > -CLICK(3.5f))
-			height = -CLICK(3.5f);
-		else if (height < -CLICK(7.5f))
-			height = -CLICK(7.5f);
-
-		// TODO: Find a better formula for this that won't require the above block.
-		lara->Context.CalcJumpVelocity = -3 - sqrt(-9600 - 12 * (height));
+		int jumpHeight = player.Context.ProjectedFloorHeight - item->Pose.Position.y;
+		player.Context.CalcJumpVelocity = GetPlayerJumpVelocity(jumpHeight);
 	}
 }
 
@@ -1188,19 +1828,8 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 
 	static short oldAngle = 1;
 
-	if (abs(coll->FloorTilt.x) <= 2 && abs(coll->FloorTilt.y) <= 2)
-		return;
-
-	short angle = ANGLE(0.0f);
-	if (coll->FloorTilt.x > 2)
-		angle = -ANGLE(90.0f);
-	else if (coll->FloorTilt.x < -2)
-		angle = ANGLE(90.0f);
-
-	if (coll->FloorTilt.y > 2 && coll->FloorTilt.y > abs(coll->FloorTilt.x))
-		angle = ANGLE(180.0f);
-	else if (coll->FloorTilt.y < -2 && -coll->FloorTilt.y > abs(coll->FloorTilt.x))
-		angle = ANGLE(0.0f);
+	short aspectAngle = Geometry::GetSurfaceAspectAngle(coll->FloorNormal);
+	short angle = GetLegacySlideHeadingAngle(coll->FloorNormal);
 
 	short delta = angle - item->Pose.Orientation.y;
 
@@ -1232,7 +1861,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 // TODO: Do it later.
 void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 {
-	short headinAngle = GetLaraSlideDirection(item, coll);
+	short headinAngle = GetPlayerSlideHeadingAngle(item, coll);
 	short deltaAngle = headinAngle - item->Pose.Orientation.y;
 
 	if (!g_GameFlow->HasSlideExtended())
@@ -1288,7 +1917,7 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 
 		item->Pose.Position = lara->Context.NextCornerPos.Position;
 		item->Pose.Orientation.y = lara->Context.NextCornerPos.Orientation.y;
-		coll->Setup.OldPosition = lara->Context.NextCornerPos.Position;
+		coll->Setup.PrevPosition = lara->Context.NextCornerPos.Position;
 	}
 }
 
@@ -1321,21 +1950,50 @@ void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
 	}
 }
 
-void ResetPlayerLean(ItemInfo* item, float alpha, bool resetRoll, bool resetPitch)
+void ResetPlayerLean(ItemInfo* item, float alpha, bool resetZAxisLean, bool resetXAxisLean)
 {
-	if (resetRoll)
-		item->Pose.Orientation.Lerp(EulerAngles(item->Pose.Orientation.x, item->Pose.Orientation.y, 0), alpha);
+	short xTargetOrient = resetXAxisLean ? 0 : item->Pose.Orientation.x;
+	short zTargetOrient = resetZAxisLean ? 0 : item->Pose.Orientation.z;
 
-	if (resetPitch)
-		item->Pose.Orientation.Lerp(EulerAngles(0, item->Pose.Orientation.y, item->Pose.Orientation.z), alpha);
+	item->Pose.Orientation.Lerp(EulerAngles(xTargetOrient, item->Pose.Orientation.y, zTargetOrient), alpha);
 }
 
 void ResetPlayerFlex(ItemInfo* item, float alpha)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.ExtraHeadRot.Lerp(EulerAngles::Zero, alpha);
-	player.ExtraTorsoRot.Lerp(EulerAngles::Zero, alpha);
+	player.ExtraHeadRot.Lerp(EulerAngles::Identity, alpha);
+	player.ExtraTorsoRot.Lerp(EulerAngles::Identity, alpha);
+}
+
+void ResetPlayerLookAround(ItemInfo& item, float alpha)
+{
+	auto& player = GetLaraInfo(item);
+
+	player.Control.Look.Orientation = EulerAngles::Identity;
+
+	if (Camera.type != CameraType::Look)
+	{
+		player.ExtraHeadRot.Lerp(EulerAngles::Identity, alpha);
+
+		if (player.Control.HandStatus != HandStatus::Busy &&
+			!player.LeftArm.Locked && !player.RightArm.Locked &&
+			player.Context.Vehicle == NO_ITEM)
+		{
+			player.ExtraTorsoRot = player.ExtraHeadRot;
+		}
+		else
+		{
+			if (!player.ExtraHeadRot.x)
+				player.ExtraTorsoRot.x = 0;
+
+			if (!player.ExtraHeadRot.y)
+				player.ExtraTorsoRot.y = 0;
+
+			if (!player.ExtraHeadRot.z)
+				player.ExtraTorsoRot.z = 0;
+		}
+	}
 }
 
 void ResetPlayerLegIK(ItemInfo& item, float alpha)
@@ -1372,4 +2030,17 @@ void RumbleLaraHealthCondition(ItemInfo* item)
 	bool doPulse = ((GlobalCounter & 0x0F) % 0x0F == 1);
 	if (doPulse)
 		Rumble(POWER, DELAY);
+}
+
+// NOTE: Formula uses kinematic equation of motion for vertical motion under constant acceleration.
+float GetPlayerJumpVelocity(float jumpHeight)
+{
+	constexpr auto JUMP_HEIGHT_MAX	= -CLICK(7.5f);
+	constexpr auto JUMP_HEIGHT_MIN	= -CLICK(3.5f);
+	constexpr auto A2				= -9600.0f;
+	constexpr auto UNIT_CONV_FACTOR = 12.0f;
+	constexpr auto OFFSET			= -3.0f;
+
+	jumpHeight = std::clamp(jumpHeight, JUMP_HEIGHT_MAX, JUMP_HEIGHT_MIN);
+	return (-sqrt(A2 - (jumpHeight * UNIT_CONV_FACTOR)) + OFFSET);
 }

@@ -1,8 +1,7 @@
 #pragma once
-
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 #include "Scripting/Internal/TEN/Objects/NamedBase.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 
 class LevelFunc;
 
@@ -12,14 +11,13 @@ namespace sol
 	template <typename T> struct as_table_t;
 }
 
-class Vec3;
-class Rotation;
-class ScriptColor;
-
-struct ItemInfo;
-
+enum ItemStatus;
 enum GAME_OBJECT_ID : short;
 enum class EffectType;
+class Rotation;
+class ScriptColor;
+class Vec3;
+struct ItemInfo;
 
 using aiBitsArray = std::array<int, 6>;
 using aiBitsType = sol::as_table_t<aiBitsArray>;
@@ -29,13 +27,13 @@ class Moveable : public NamedBase<Moveable, short>
 public:
 	using IdentifierType = short;
 
+	static void Register(sol::state& state, sol::table& parent);
+
 	Moveable(short num, bool alreadyInitialized = true);
 	~Moveable();
 	Moveable& operator =(const Moveable& other) = delete;
 	Moveable(const Moveable& other) = delete;
 	Moveable(Moveable&& other) noexcept;
-
-	static void Register(sol::table& parent);
 
 	[[nodiscard]] GAME_OBJECT_ID GetObjectID() const;
 	void SetObjectID(GAME_OBJECT_ID id);
@@ -62,6 +60,7 @@ public:
 	void SetAnimNumber(int animNumber);
 
 	[[nodiscard]] int GetFrameNumber() const;
+	[[nodiscard]] int GetEndFrame() const;
 	void SetFrameNumber(int frameNumber);
 
 	[[nodiscard]] Vec3 GetVelocity() const;
@@ -124,6 +123,7 @@ public:
 	void SetOnCollidedWithRoom(const TypeOrNil<LevelFunc>& cb);
 
 	[[nodiscard]] short GetStatus() const;
+	void SetStatus(ItemStatus value);
 
 	void Init();
 

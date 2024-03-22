@@ -362,7 +362,7 @@ namespace TEN::Entities::Vehicles
 			sptr->sLife = random;
 		}
 
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BlendMode::Additive;
 		sptr->x = x + (GetRandomControl() & 0xF) - 8;
 		sptr->y = y + (GetRandomControl() & 0xF) - 8;
 		sptr->z = z + (GetRandomControl() & 0xF) - 8;
@@ -968,7 +968,7 @@ namespace TEN::Entities::Vehicles
 		else
 			motorbike->Revs = 0;
 
-		if (IsHeld(In::Speed) && IsHeld(In::Accelerate) && 
+		if (IsHeld(In::Faster) && IsHeld(In::Accelerate) && 
 			(motorbike->Flags & MOTORBIKE_FLAG_NITRO))
 		{
 			if (lara->Status.Stamina > 10)
@@ -988,8 +988,7 @@ namespace TEN::Entities::Vehicles
 
 		if (motorbikeItem->Pose.Position.y >= (height - CLICK(1)))
 		{
-			if (!motorbike->Velocity && (TrInput & IN_LOOK))
-				LookUpDown(laraItem);
+			lara->Control.Look.Mode = (motorbikeItem->Animation.Velocity.z == 0.0f) ? LookMode::Horizontal : LookMode::Free;
 
 			// Moving forward.
 			if (motorbike->Velocity > 0)
@@ -1189,6 +1188,7 @@ namespace TEN::Entities::Vehicles
 			motorbikeItem->MeshBits.Set(MotorbikeHeadLightJoints);
 
 			drive = MotorbikeUserControl(motorbikeItem, laraItem, probe.Position.Floor, &pitch);
+			HandleVehicleSpeedometer(motorbikeItem->Animation.Velocity.z, MOTORBIKE_ACCEL_MAX / (float)VEHICLE_VELOCITY_SCALE);
 		}
 		else
 		{

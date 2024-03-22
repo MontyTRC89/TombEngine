@@ -61,21 +61,25 @@ struct LaraCountData;
 struct LaraCountDataBuilder;
 struct LaraCountDataT;
 
-struct WeaponControlData;
-struct WeaponControlDataBuilder;
-struct WeaponControlDataT;
+struct LookControlData;
+struct LookControlDataBuilder;
+struct LookControlDataT;
 
 struct RopeControlData;
 struct RopeControlDataBuilder;
 struct RopeControlDataT;
 
+struct SubsuitControlData;
+struct SubsuitControlDataBuilder;
+struct SubsuitControlDataT;
+
 struct TightropeControlData;
 struct TightropeControlDataBuilder;
 struct TightropeControlDataT;
 
-struct SubsuitControlData;
-struct SubsuitControlDataBuilder;
-struct SubsuitControlDataT;
+struct WeaponControlData;
+struct WeaponControlDataBuilder;
+struct WeaponControlDataT;
 
 struct LaraControlData;
 struct LaraControlDataBuilder;
@@ -133,9 +137,9 @@ struct Pendulum;
 struct PendulumBuilder;
 struct PendulumT;
 
-struct EventSetCallCounters;
-struct EventSetCallCountersBuilder;
-struct EventSetCallCountersT;
+struct EventSet;
+struct EventSetBuilder;
+struct EventSetT;
 
 struct VolumeState;
 struct VolumeStateBuilder;
@@ -2719,185 +2723,118 @@ struct LaraCountData::Traits {
 
 flatbuffers::Offset<LaraCountData> CreateLaraCountData(flatbuffers::FlatBufferBuilder &_fbb, const LaraCountDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-struct WeaponControlDataT : public flatbuffers::NativeTable {
-  typedef WeaponControlData TableType;
-  int32_t weapon_item = 0;
-  bool has_fired = false;
-  bool fired = false;
-  bool uzi_left = false;
-  bool uzi_right = false;
-  int32_t gun_type = 0;
-  int32_t request_gun_type = 0;
-  int32_t last_gun_type = 0;
-  std::unique_ptr<TEN::Save::HolsterInfoT> holster_info{};
-  uint32_t num_shots_fired = 0;
-  float interval = 0.0f;
-  float timer = 0.0f;
+struct LookControlDataT : public flatbuffers::NativeTable {
+  typedef LookControlData TableType;
+  bool is_using_binoculars = false;
+  bool is_using_lasersight = false;
+  int32_t mode = 0;
+  int32_t optic_range = 0;
+  std::unique_ptr<TEN::Save::EulerAngles> orientation{};
+  std::unique_ptr<TEN::Save::EulerAngles> turn_rate{};
 };
 
-struct WeaponControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef WeaponControlDataT NativeTableType;
-  typedef WeaponControlDataBuilder Builder;
+struct LookControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef LookControlDataT NativeTableType;
+  typedef LookControlDataBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_WEAPON_ITEM = 4,
-    VT_HAS_FIRED = 6,
-    VT_FIRED = 8,
-    VT_UZI_LEFT = 10,
-    VT_UZI_RIGHT = 12,
-    VT_GUN_TYPE = 14,
-    VT_REQUEST_GUN_TYPE = 16,
-    VT_LAST_GUN_TYPE = 18,
-    VT_HOLSTER_INFO = 20,
-    VT_NUM_SHOTS_FIRED = 22,
-    VT_INTERVAL = 24,
-    VT_TIMER = 26
+    VT_IS_USING_BINOCULARS = 4,
+    VT_IS_USING_LASERSIGHT = 6,
+    VT_MODE = 8,
+    VT_OPTIC_RANGE = 10,
+    VT_ORIENTATION = 12,
+    VT_TURN_RATE = 14
   };
-  int32_t weapon_item() const {
-    return GetField<int32_t>(VT_WEAPON_ITEM, 0);
+  bool is_using_binoculars() const {
+    return GetField<uint8_t>(VT_IS_USING_BINOCULARS, 0) != 0;
   }
-  bool has_fired() const {
-    return GetField<uint8_t>(VT_HAS_FIRED, 0) != 0;
+  bool is_using_lasersight() const {
+    return GetField<uint8_t>(VT_IS_USING_LASERSIGHT, 0) != 0;
   }
-  bool fired() const {
-    return GetField<uint8_t>(VT_FIRED, 0) != 0;
+  int32_t mode() const {
+    return GetField<int32_t>(VT_MODE, 0);
   }
-  bool uzi_left() const {
-    return GetField<uint8_t>(VT_UZI_LEFT, 0) != 0;
+  int32_t optic_range() const {
+    return GetField<int32_t>(VT_OPTIC_RANGE, 0);
   }
-  bool uzi_right() const {
-    return GetField<uint8_t>(VT_UZI_RIGHT, 0) != 0;
+  const TEN::Save::EulerAngles *orientation() const {
+    return GetStruct<const TEN::Save::EulerAngles *>(VT_ORIENTATION);
   }
-  int32_t gun_type() const {
-    return GetField<int32_t>(VT_GUN_TYPE, 0);
-  }
-  int32_t request_gun_type() const {
-    return GetField<int32_t>(VT_REQUEST_GUN_TYPE, 0);
-  }
-  int32_t last_gun_type() const {
-    return GetField<int32_t>(VT_LAST_GUN_TYPE, 0);
-  }
-  const TEN::Save::HolsterInfo *holster_info() const {
-    return GetPointer<const TEN::Save::HolsterInfo *>(VT_HOLSTER_INFO);
-  }
-  uint32_t num_shots_fired() const {
-    return GetField<uint32_t>(VT_NUM_SHOTS_FIRED, 0);
-  }
-  float interval() const {
-    return GetField<float>(VT_INTERVAL, 0.0f);
-  }
-  float timer() const {
-    return GetField<float>(VT_TIMER, 0.0f);
+  const TEN::Save::EulerAngles *turn_rate() const {
+    return GetStruct<const TEN::Save::EulerAngles *>(VT_TURN_RATE);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_WEAPON_ITEM) &&
-           VerifyField<uint8_t>(verifier, VT_HAS_FIRED) &&
-           VerifyField<uint8_t>(verifier, VT_FIRED) &&
-           VerifyField<uint8_t>(verifier, VT_UZI_LEFT) &&
-           VerifyField<uint8_t>(verifier, VT_UZI_RIGHT) &&
-           VerifyField<int32_t>(verifier, VT_GUN_TYPE) &&
-           VerifyField<int32_t>(verifier, VT_REQUEST_GUN_TYPE) &&
-           VerifyField<int32_t>(verifier, VT_LAST_GUN_TYPE) &&
-           VerifyOffset(verifier, VT_HOLSTER_INFO) &&
-           verifier.VerifyTable(holster_info()) &&
-           VerifyField<uint32_t>(verifier, VT_NUM_SHOTS_FIRED) &&
-           VerifyField<float>(verifier, VT_INTERVAL) &&
-           VerifyField<float>(verifier, VT_TIMER) &&
+           VerifyField<uint8_t>(verifier, VT_IS_USING_BINOCULARS) &&
+           VerifyField<uint8_t>(verifier, VT_IS_USING_LASERSIGHT) &&
+           VerifyField<int32_t>(verifier, VT_MODE) &&
+           VerifyField<int32_t>(verifier, VT_OPTIC_RANGE) &&
+           VerifyField<TEN::Save::EulerAngles>(verifier, VT_ORIENTATION) &&
+           VerifyField<TEN::Save::EulerAngles>(verifier, VT_TURN_RATE) &&
            verifier.EndTable();
   }
-  WeaponControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(WeaponControlDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<WeaponControlData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const WeaponControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+  LookControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(LookControlDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<LookControlData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const LookControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
-struct WeaponControlDataBuilder {
-  typedef WeaponControlData Table;
+struct LookControlDataBuilder {
+  typedef LookControlData Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_weapon_item(int32_t weapon_item) {
-    fbb_.AddElement<int32_t>(WeaponControlData::VT_WEAPON_ITEM, weapon_item, 0);
+  void add_is_using_binoculars(bool is_using_binoculars) {
+    fbb_.AddElement<uint8_t>(LookControlData::VT_IS_USING_BINOCULARS, static_cast<uint8_t>(is_using_binoculars), 0);
   }
-  void add_has_fired(bool has_fired) {
-    fbb_.AddElement<uint8_t>(WeaponControlData::VT_HAS_FIRED, static_cast<uint8_t>(has_fired), 0);
+  void add_is_using_lasersight(bool is_using_lasersight) {
+    fbb_.AddElement<uint8_t>(LookControlData::VT_IS_USING_LASERSIGHT, static_cast<uint8_t>(is_using_lasersight), 0);
   }
-  void add_fired(bool fired) {
-    fbb_.AddElement<uint8_t>(WeaponControlData::VT_FIRED, static_cast<uint8_t>(fired), 0);
+  void add_mode(int32_t mode) {
+    fbb_.AddElement<int32_t>(LookControlData::VT_MODE, mode, 0);
   }
-  void add_uzi_left(bool uzi_left) {
-    fbb_.AddElement<uint8_t>(WeaponControlData::VT_UZI_LEFT, static_cast<uint8_t>(uzi_left), 0);
+  void add_optic_range(int32_t optic_range) {
+    fbb_.AddElement<int32_t>(LookControlData::VT_OPTIC_RANGE, optic_range, 0);
   }
-  void add_uzi_right(bool uzi_right) {
-    fbb_.AddElement<uint8_t>(WeaponControlData::VT_UZI_RIGHT, static_cast<uint8_t>(uzi_right), 0);
+  void add_orientation(const TEN::Save::EulerAngles *orientation) {
+    fbb_.AddStruct(LookControlData::VT_ORIENTATION, orientation);
   }
-  void add_gun_type(int32_t gun_type) {
-    fbb_.AddElement<int32_t>(WeaponControlData::VT_GUN_TYPE, gun_type, 0);
+  void add_turn_rate(const TEN::Save::EulerAngles *turn_rate) {
+    fbb_.AddStruct(LookControlData::VT_TURN_RATE, turn_rate);
   }
-  void add_request_gun_type(int32_t request_gun_type) {
-    fbb_.AddElement<int32_t>(WeaponControlData::VT_REQUEST_GUN_TYPE, request_gun_type, 0);
-  }
-  void add_last_gun_type(int32_t last_gun_type) {
-    fbb_.AddElement<int32_t>(WeaponControlData::VT_LAST_GUN_TYPE, last_gun_type, 0);
-  }
-  void add_holster_info(flatbuffers::Offset<TEN::Save::HolsterInfo> holster_info) {
-    fbb_.AddOffset(WeaponControlData::VT_HOLSTER_INFO, holster_info);
-  }
-  void add_num_shots_fired(uint32_t num_shots_fired) {
-    fbb_.AddElement<uint32_t>(WeaponControlData::VT_NUM_SHOTS_FIRED, num_shots_fired, 0);
-  }
-  void add_interval(float interval) {
-    fbb_.AddElement<float>(WeaponControlData::VT_INTERVAL, interval, 0.0f);
-  }
-  void add_timer(float timer) {
-    fbb_.AddElement<float>(WeaponControlData::VT_TIMER, timer, 0.0f);
-  }
-  explicit WeaponControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit LookControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  flatbuffers::Offset<WeaponControlData> Finish() {
+  flatbuffers::Offset<LookControlData> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<WeaponControlData>(end);
+    auto o = flatbuffers::Offset<LookControlData>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(
+inline flatbuffers::Offset<LookControlData> CreateLookControlData(
     flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t weapon_item = 0,
-    bool has_fired = false,
-    bool fired = false,
-    bool uzi_left = false,
-    bool uzi_right = false,
-    int32_t gun_type = 0,
-    int32_t request_gun_type = 0,
-    int32_t last_gun_type = 0,
-    flatbuffers::Offset<TEN::Save::HolsterInfo> holster_info = 0,
-    uint32_t num_shots_fired = 0,
-    float interval = 0.0f,
-    float timer = 0.0f) {
-  WeaponControlDataBuilder builder_(_fbb);
-  builder_.add_timer(timer);
-  builder_.add_interval(interval);
-  builder_.add_num_shots_fired(num_shots_fired);
-  builder_.add_holster_info(holster_info);
-  builder_.add_last_gun_type(last_gun_type);
-  builder_.add_request_gun_type(request_gun_type);
-  builder_.add_gun_type(gun_type);
-  builder_.add_weapon_item(weapon_item);
-  builder_.add_uzi_right(uzi_right);
-  builder_.add_uzi_left(uzi_left);
-  builder_.add_fired(fired);
-  builder_.add_has_fired(has_fired);
+    bool is_using_binoculars = false,
+    bool is_using_lasersight = false,
+    int32_t mode = 0,
+    int32_t optic_range = 0,
+    const TEN::Save::EulerAngles *orientation = 0,
+    const TEN::Save::EulerAngles *turn_rate = 0) {
+  LookControlDataBuilder builder_(_fbb);
+  builder_.add_turn_rate(turn_rate);
+  builder_.add_orientation(orientation);
+  builder_.add_optic_range(optic_range);
+  builder_.add_mode(mode);
+  builder_.add_is_using_lasersight(is_using_lasersight);
+  builder_.add_is_using_binoculars(is_using_binoculars);
   return builder_.Finish();
 }
 
-struct WeaponControlData::Traits {
-  using type = WeaponControlData;
-  static auto constexpr Create = CreateWeaponControlData;
+struct LookControlData::Traits {
+  using type = LookControlData;
+  static auto constexpr Create = CreateLookControlData;
 };
 
-flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(flatbuffers::FlatBufferBuilder &_fbb, const WeaponControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+flatbuffers::Offset<LookControlData> CreateLookControlData(flatbuffers::FlatBufferBuilder &_fbb, const LookControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct RopeControlDataT : public flatbuffers::NativeTable {
   typedef RopeControlData TableType;
@@ -3122,97 +3059,6 @@ struct RopeControlData::Traits {
 
 flatbuffers::Offset<RopeControlData> CreateRopeControlData(flatbuffers::FlatBufferBuilder &_fbb, const RopeControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-struct TightropeControlDataT : public flatbuffers::NativeTable {
-  typedef TightropeControlData TableType;
-  float balance = 0.0f;
-  uint32_t time_on_tightrope = 0;
-  bool can_dismount = false;
-  int32_t tightrope_item = 0;
-};
-
-struct TightropeControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef TightropeControlDataT NativeTableType;
-  typedef TightropeControlDataBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_BALANCE = 4,
-    VT_TIME_ON_TIGHTROPE = 6,
-    VT_CAN_DISMOUNT = 8,
-    VT_TIGHTROPE_ITEM = 10
-  };
-  float balance() const {
-    return GetField<float>(VT_BALANCE, 0.0f);
-  }
-  uint32_t time_on_tightrope() const {
-    return GetField<uint32_t>(VT_TIME_ON_TIGHTROPE, 0);
-  }
-  bool can_dismount() const {
-    return GetField<uint8_t>(VT_CAN_DISMOUNT, 0) != 0;
-  }
-  int32_t tightrope_item() const {
-    return GetField<int32_t>(VT_TIGHTROPE_ITEM, 0);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<float>(verifier, VT_BALANCE) &&
-           VerifyField<uint32_t>(verifier, VT_TIME_ON_TIGHTROPE) &&
-           VerifyField<uint8_t>(verifier, VT_CAN_DISMOUNT) &&
-           VerifyField<int32_t>(verifier, VT_TIGHTROPE_ITEM) &&
-           verifier.EndTable();
-  }
-  TightropeControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(TightropeControlDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<TightropeControlData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const TightropeControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct TightropeControlDataBuilder {
-  typedef TightropeControlData Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_balance(float balance) {
-    fbb_.AddElement<float>(TightropeControlData::VT_BALANCE, balance, 0.0f);
-  }
-  void add_time_on_tightrope(uint32_t time_on_tightrope) {
-    fbb_.AddElement<uint32_t>(TightropeControlData::VT_TIME_ON_TIGHTROPE, time_on_tightrope, 0);
-  }
-  void add_can_dismount(bool can_dismount) {
-    fbb_.AddElement<uint8_t>(TightropeControlData::VT_CAN_DISMOUNT, static_cast<uint8_t>(can_dismount), 0);
-  }
-  void add_tightrope_item(int32_t tightrope_item) {
-    fbb_.AddElement<int32_t>(TightropeControlData::VT_TIGHTROPE_ITEM, tightrope_item, 0);
-  }
-  explicit TightropeControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<TightropeControlData> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<TightropeControlData>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<TightropeControlData> CreateTightropeControlData(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    float balance = 0.0f,
-    uint32_t time_on_tightrope = 0,
-    bool can_dismount = false,
-    int32_t tightrope_item = 0) {
-  TightropeControlDataBuilder builder_(_fbb);
-  builder_.add_tightrope_item(tightrope_item);
-  builder_.add_time_on_tightrope(time_on_tightrope);
-  builder_.add_balance(balance);
-  builder_.add_can_dismount(can_dismount);
-  return builder_.Finish();
-}
-
-struct TightropeControlData::Traits {
-  using type = TightropeControlData;
-  static auto constexpr Create = CreateTightropeControlData;
-};
-
-flatbuffers::Offset<TightropeControlData> CreateTightropeControlData(flatbuffers::FlatBufferBuilder &_fbb, const TightropeControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
 struct SubsuitControlDataT : public flatbuffers::NativeTable {
   typedef SubsuitControlData TableType;
   int32_t x_rot = 0;
@@ -3346,27 +3192,298 @@ inline flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlDataDirect(
 
 flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlData(flatbuffers::FlatBufferBuilder &_fbb, const SubsuitControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct TightropeControlDataT : public flatbuffers::NativeTable {
+  typedef TightropeControlData TableType;
+  float balance = 0.0f;
+  uint32_t time_on_tightrope = 0;
+  bool can_dismount = false;
+  int32_t tightrope_item = 0;
+};
+
+struct TightropeControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef TightropeControlDataT NativeTableType;
+  typedef TightropeControlDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BALANCE = 4,
+    VT_TIME_ON_TIGHTROPE = 6,
+    VT_CAN_DISMOUNT = 8,
+    VT_TIGHTROPE_ITEM = 10
+  };
+  float balance() const {
+    return GetField<float>(VT_BALANCE, 0.0f);
+  }
+  uint32_t time_on_tightrope() const {
+    return GetField<uint32_t>(VT_TIME_ON_TIGHTROPE, 0);
+  }
+  bool can_dismount() const {
+    return GetField<uint8_t>(VT_CAN_DISMOUNT, 0) != 0;
+  }
+  int32_t tightrope_item() const {
+    return GetField<int32_t>(VT_TIGHTROPE_ITEM, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<float>(verifier, VT_BALANCE) &&
+           VerifyField<uint32_t>(verifier, VT_TIME_ON_TIGHTROPE) &&
+           VerifyField<uint8_t>(verifier, VT_CAN_DISMOUNT) &&
+           VerifyField<int32_t>(verifier, VT_TIGHTROPE_ITEM) &&
+           verifier.EndTable();
+  }
+  TightropeControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(TightropeControlDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<TightropeControlData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const TightropeControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct TightropeControlDataBuilder {
+  typedef TightropeControlData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_balance(float balance) {
+    fbb_.AddElement<float>(TightropeControlData::VT_BALANCE, balance, 0.0f);
+  }
+  void add_time_on_tightrope(uint32_t time_on_tightrope) {
+    fbb_.AddElement<uint32_t>(TightropeControlData::VT_TIME_ON_TIGHTROPE, time_on_tightrope, 0);
+  }
+  void add_can_dismount(bool can_dismount) {
+    fbb_.AddElement<uint8_t>(TightropeControlData::VT_CAN_DISMOUNT, static_cast<uint8_t>(can_dismount), 0);
+  }
+  void add_tightrope_item(int32_t tightrope_item) {
+    fbb_.AddElement<int32_t>(TightropeControlData::VT_TIGHTROPE_ITEM, tightrope_item, 0);
+  }
+  explicit TightropeControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<TightropeControlData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<TightropeControlData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<TightropeControlData> CreateTightropeControlData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    float balance = 0.0f,
+    uint32_t time_on_tightrope = 0,
+    bool can_dismount = false,
+    int32_t tightrope_item = 0) {
+  TightropeControlDataBuilder builder_(_fbb);
+  builder_.add_tightrope_item(tightrope_item);
+  builder_.add_time_on_tightrope(time_on_tightrope);
+  builder_.add_balance(balance);
+  builder_.add_can_dismount(can_dismount);
+  return builder_.Finish();
+}
+
+struct TightropeControlData::Traits {
+  using type = TightropeControlData;
+  static auto constexpr Create = CreateTightropeControlData;
+};
+
+flatbuffers::Offset<TightropeControlData> CreateTightropeControlData(flatbuffers::FlatBufferBuilder &_fbb, const TightropeControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct WeaponControlDataT : public flatbuffers::NativeTable {
+  typedef WeaponControlData TableType;
+  int32_t weapon_item = 0;
+  bool has_fired = false;
+  bool fired = false;
+  bool uzi_left = false;
+  bool uzi_right = false;
+  int32_t gun_type = 0;
+  int32_t request_gun_type = 0;
+  int32_t last_gun_type = 0;
+  std::unique_ptr<TEN::Save::HolsterInfoT> holster_info{};
+  uint32_t num_shots_fired = 0;
+  float interval = 0.0f;
+  float timer = 0.0f;
+};
+
+struct WeaponControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef WeaponControlDataT NativeTableType;
+  typedef WeaponControlDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_WEAPON_ITEM = 4,
+    VT_HAS_FIRED = 6,
+    VT_FIRED = 8,
+    VT_UZI_LEFT = 10,
+    VT_UZI_RIGHT = 12,
+    VT_GUN_TYPE = 14,
+    VT_REQUEST_GUN_TYPE = 16,
+    VT_LAST_GUN_TYPE = 18,
+    VT_HOLSTER_INFO = 20,
+    VT_NUM_SHOTS_FIRED = 22,
+    VT_INTERVAL = 24,
+    VT_TIMER = 26
+  };
+  int32_t weapon_item() const {
+    return GetField<int32_t>(VT_WEAPON_ITEM, 0);
+  }
+  bool has_fired() const {
+    return GetField<uint8_t>(VT_HAS_FIRED, 0) != 0;
+  }
+  bool fired() const {
+    return GetField<uint8_t>(VT_FIRED, 0) != 0;
+  }
+  bool uzi_left() const {
+    return GetField<uint8_t>(VT_UZI_LEFT, 0) != 0;
+  }
+  bool uzi_right() const {
+    return GetField<uint8_t>(VT_UZI_RIGHT, 0) != 0;
+  }
+  int32_t gun_type() const {
+    return GetField<int32_t>(VT_GUN_TYPE, 0);
+  }
+  int32_t request_gun_type() const {
+    return GetField<int32_t>(VT_REQUEST_GUN_TYPE, 0);
+  }
+  int32_t last_gun_type() const {
+    return GetField<int32_t>(VT_LAST_GUN_TYPE, 0);
+  }
+  const TEN::Save::HolsterInfo *holster_info() const {
+    return GetPointer<const TEN::Save::HolsterInfo *>(VT_HOLSTER_INFO);
+  }
+  uint32_t num_shots_fired() const {
+    return GetField<uint32_t>(VT_NUM_SHOTS_FIRED, 0);
+  }
+  float interval() const {
+    return GetField<float>(VT_INTERVAL, 0.0f);
+  }
+  float timer() const {
+    return GetField<float>(VT_TIMER, 0.0f);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_WEAPON_ITEM) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_FIRED) &&
+           VerifyField<uint8_t>(verifier, VT_FIRED) &&
+           VerifyField<uint8_t>(verifier, VT_UZI_LEFT) &&
+           VerifyField<uint8_t>(verifier, VT_UZI_RIGHT) &&
+           VerifyField<int32_t>(verifier, VT_GUN_TYPE) &&
+           VerifyField<int32_t>(verifier, VT_REQUEST_GUN_TYPE) &&
+           VerifyField<int32_t>(verifier, VT_LAST_GUN_TYPE) &&
+           VerifyOffset(verifier, VT_HOLSTER_INFO) &&
+           verifier.VerifyTable(holster_info()) &&
+           VerifyField<uint32_t>(verifier, VT_NUM_SHOTS_FIRED) &&
+           VerifyField<float>(verifier, VT_INTERVAL) &&
+           VerifyField<float>(verifier, VT_TIMER) &&
+           verifier.EndTable();
+  }
+  WeaponControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(WeaponControlDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<WeaponControlData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const WeaponControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct WeaponControlDataBuilder {
+  typedef WeaponControlData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_weapon_item(int32_t weapon_item) {
+    fbb_.AddElement<int32_t>(WeaponControlData::VT_WEAPON_ITEM, weapon_item, 0);
+  }
+  void add_has_fired(bool has_fired) {
+    fbb_.AddElement<uint8_t>(WeaponControlData::VT_HAS_FIRED, static_cast<uint8_t>(has_fired), 0);
+  }
+  void add_fired(bool fired) {
+    fbb_.AddElement<uint8_t>(WeaponControlData::VT_FIRED, static_cast<uint8_t>(fired), 0);
+  }
+  void add_uzi_left(bool uzi_left) {
+    fbb_.AddElement<uint8_t>(WeaponControlData::VT_UZI_LEFT, static_cast<uint8_t>(uzi_left), 0);
+  }
+  void add_uzi_right(bool uzi_right) {
+    fbb_.AddElement<uint8_t>(WeaponControlData::VT_UZI_RIGHT, static_cast<uint8_t>(uzi_right), 0);
+  }
+  void add_gun_type(int32_t gun_type) {
+    fbb_.AddElement<int32_t>(WeaponControlData::VT_GUN_TYPE, gun_type, 0);
+  }
+  void add_request_gun_type(int32_t request_gun_type) {
+    fbb_.AddElement<int32_t>(WeaponControlData::VT_REQUEST_GUN_TYPE, request_gun_type, 0);
+  }
+  void add_last_gun_type(int32_t last_gun_type) {
+    fbb_.AddElement<int32_t>(WeaponControlData::VT_LAST_GUN_TYPE, last_gun_type, 0);
+  }
+  void add_holster_info(flatbuffers::Offset<TEN::Save::HolsterInfo> holster_info) {
+    fbb_.AddOffset(WeaponControlData::VT_HOLSTER_INFO, holster_info);
+  }
+  void add_num_shots_fired(uint32_t num_shots_fired) {
+    fbb_.AddElement<uint32_t>(WeaponControlData::VT_NUM_SHOTS_FIRED, num_shots_fired, 0);
+  }
+  void add_interval(float interval) {
+    fbb_.AddElement<float>(WeaponControlData::VT_INTERVAL, interval, 0.0f);
+  }
+  void add_timer(float timer) {
+    fbb_.AddElement<float>(WeaponControlData::VT_TIMER, timer, 0.0f);
+  }
+  explicit WeaponControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<WeaponControlData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<WeaponControlData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t weapon_item = 0,
+    bool has_fired = false,
+    bool fired = false,
+    bool uzi_left = false,
+    bool uzi_right = false,
+    int32_t gun_type = 0,
+    int32_t request_gun_type = 0,
+    int32_t last_gun_type = 0,
+    flatbuffers::Offset<TEN::Save::HolsterInfo> holster_info = 0,
+    uint32_t num_shots_fired = 0,
+    float interval = 0.0f,
+    float timer = 0.0f) {
+  WeaponControlDataBuilder builder_(_fbb);
+  builder_.add_timer(timer);
+  builder_.add_interval(interval);
+  builder_.add_num_shots_fired(num_shots_fired);
+  builder_.add_holster_info(holster_info);
+  builder_.add_last_gun_type(last_gun_type);
+  builder_.add_request_gun_type(request_gun_type);
+  builder_.add_gun_type(gun_type);
+  builder_.add_weapon_item(weapon_item);
+  builder_.add_uzi_right(uzi_right);
+  builder_.add_uzi_left(uzi_left);
+  builder_.add_fired(fired);
+  builder_.add_has_fired(has_fired);
+  return builder_.Finish();
+}
+
+struct WeaponControlData::Traits {
+  using type = WeaponControlData;
+  static auto constexpr Create = CreateWeaponControlData;
+};
+
+flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(flatbuffers::FlatBufferBuilder &_fbb, const WeaponControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct LaraControlDataT : public flatbuffers::NativeTable {
   typedef LaraControlData TableType;
-  int32_t move_angle = 0;
-  int32_t turn_rate = 0;
-  int32_t jump_direction = 0;
-  int32_t hand_status = 0;
-  int32_t water_status = 0;
-  std::unique_ptr<TEN::Save::LaraCountDataT> count{};
-  bool can_look = false;
-  bool is_moving = false;
-  bool keep_low = false;
-  bool is_low = false;
   bool can_climb_ladder = false;
-  bool is_climbing_ladder = false;
   bool can_monkey_swing = false;
-  bool run_jump_queued = false;
-  bool locked = false;
-  std::unique_ptr<TEN::Save::WeaponControlDataT> weapon{};
+  std::unique_ptr<TEN::Save::LaraCountDataT> count{};
+  int32_t hand_status = 0;
+  bool is_climbing_ladder = false;
+  bool is_locked = false;
+  bool is_low = false;
+  bool is_moving = false;
+  bool is_run_jump_queued = false;
+  int32_t jump_direction = 0;
+  bool keep_low = false;
+  std::unique_ptr<TEN::Save::LookControlDataT> look{};
+  int32_t move_angle = 0;
   std::unique_ptr<TEN::Save::RopeControlDataT> rope{};
-  std::unique_ptr<TEN::Save::TightropeControlDataT> tightrope{};
   std::unique_ptr<TEN::Save::SubsuitControlDataT> subsuit{};
+  std::unique_ptr<TEN::Save::TightropeControlDataT> tightrope{};
+  int32_t turn_rate = 0;
+  int32_t water_status = 0;
+  std::unique_ptr<TEN::Save::WeaponControlDataT> weapon{};
 };
 
 struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -3374,109 +3491,110 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef LaraControlDataBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_MOVE_ANGLE = 4,
-    VT_TURN_RATE = 6,
-    VT_JUMP_DIRECTION = 8,
+    VT_CAN_CLIMB_LADDER = 4,
+    VT_CAN_MONKEY_SWING = 6,
+    VT_COUNT = 8,
     VT_HAND_STATUS = 10,
-    VT_WATER_STATUS = 12,
-    VT_COUNT = 14,
-    VT_CAN_LOOK = 16,
+    VT_IS_CLIMBING_LADDER = 12,
+    VT_IS_LOCKED = 14,
+    VT_IS_LOW = 16,
     VT_IS_MOVING = 18,
-    VT_KEEP_LOW = 20,
-    VT_IS_LOW = 22,
-    VT_CAN_CLIMB_LADDER = 24,
-    VT_IS_CLIMBING_LADDER = 26,
-    VT_CAN_MONKEY_SWING = 28,
-    VT_RUN_JUMP_QUEUED = 30,
-    VT_LOCKED = 32,
-    VT_WEAPON = 34,
-    VT_ROPE = 36,
-    VT_TIGHTROPE = 38,
-    VT_SUBSUIT = 40
+    VT_IS_RUN_JUMP_QUEUED = 20,
+    VT_JUMP_DIRECTION = 22,
+    VT_KEEP_LOW = 24,
+    VT_LOOK = 26,
+    VT_MOVE_ANGLE = 28,
+    VT_ROPE = 30,
+    VT_SUBSUIT = 32,
+    VT_TIGHTROPE = 34,
+    VT_TURN_RATE = 36,
+    VT_WATER_STATUS = 38,
+    VT_WEAPON = 40
   };
-  int32_t move_angle() const {
-    return GetField<int32_t>(VT_MOVE_ANGLE, 0);
-  }
-  int32_t turn_rate() const {
-    return GetField<int32_t>(VT_TURN_RATE, 0);
-  }
-  int32_t jump_direction() const {
-    return GetField<int32_t>(VT_JUMP_DIRECTION, 0);
-  }
-  int32_t hand_status() const {
-    return GetField<int32_t>(VT_HAND_STATUS, 0);
-  }
-  int32_t water_status() const {
-    return GetField<int32_t>(VT_WATER_STATUS, 0);
-  }
-  const TEN::Save::LaraCountData *count() const {
-    return GetPointer<const TEN::Save::LaraCountData *>(VT_COUNT);
-  }
-  bool can_look() const {
-    return GetField<uint8_t>(VT_CAN_LOOK, 0) != 0;
-  }
-  bool is_moving() const {
-    return GetField<uint8_t>(VT_IS_MOVING, 0) != 0;
-  }
-  bool keep_low() const {
-    return GetField<uint8_t>(VT_KEEP_LOW, 0) != 0;
-  }
-  bool is_low() const {
-    return GetField<uint8_t>(VT_IS_LOW, 0) != 0;
-  }
   bool can_climb_ladder() const {
     return GetField<uint8_t>(VT_CAN_CLIMB_LADDER, 0) != 0;
-  }
-  bool is_climbing_ladder() const {
-    return GetField<uint8_t>(VT_IS_CLIMBING_LADDER, 0) != 0;
   }
   bool can_monkey_swing() const {
     return GetField<uint8_t>(VT_CAN_MONKEY_SWING, 0) != 0;
   }
-  bool run_jump_queued() const {
-    return GetField<uint8_t>(VT_RUN_JUMP_QUEUED, 0) != 0;
+  const TEN::Save::LaraCountData *count() const {
+    return GetPointer<const TEN::Save::LaraCountData *>(VT_COUNT);
   }
-  bool locked() const {
-    return GetField<uint8_t>(VT_LOCKED, 0) != 0;
+  int32_t hand_status() const {
+    return GetField<int32_t>(VT_HAND_STATUS, 0);
   }
-  const TEN::Save::WeaponControlData *weapon() const {
-    return GetPointer<const TEN::Save::WeaponControlData *>(VT_WEAPON);
+  bool is_climbing_ladder() const {
+    return GetField<uint8_t>(VT_IS_CLIMBING_LADDER, 0) != 0;
+  }
+  bool is_locked() const {
+    return GetField<uint8_t>(VT_IS_LOCKED, 0) != 0;
+  }
+  bool is_low() const {
+    return GetField<uint8_t>(VT_IS_LOW, 0) != 0;
+  }
+  bool is_moving() const {
+    return GetField<uint8_t>(VT_IS_MOVING, 0) != 0;
+  }
+  bool is_run_jump_queued() const {
+    return GetField<uint8_t>(VT_IS_RUN_JUMP_QUEUED, 0) != 0;
+  }
+  int32_t jump_direction() const {
+    return GetField<int32_t>(VT_JUMP_DIRECTION, 0);
+  }
+  bool keep_low() const {
+    return GetField<uint8_t>(VT_KEEP_LOW, 0) != 0;
+  }
+  const TEN::Save::LookControlData *look() const {
+    return GetPointer<const TEN::Save::LookControlData *>(VT_LOOK);
+  }
+  int32_t move_angle() const {
+    return GetField<int32_t>(VT_MOVE_ANGLE, 0);
   }
   const TEN::Save::RopeControlData *rope() const {
     return GetPointer<const TEN::Save::RopeControlData *>(VT_ROPE);
   }
-  const TEN::Save::TightropeControlData *tightrope() const {
-    return GetPointer<const TEN::Save::TightropeControlData *>(VT_TIGHTROPE);
-  }
   const TEN::Save::SubsuitControlData *subsuit() const {
     return GetPointer<const TEN::Save::SubsuitControlData *>(VT_SUBSUIT);
   }
+  const TEN::Save::TightropeControlData *tightrope() const {
+    return GetPointer<const TEN::Save::TightropeControlData *>(VT_TIGHTROPE);
+  }
+  int32_t turn_rate() const {
+    return GetField<int32_t>(VT_TURN_RATE, 0);
+  }
+  int32_t water_status() const {
+    return GetField<int32_t>(VT_WATER_STATUS, 0);
+  }
+  const TEN::Save::WeaponControlData *weapon() const {
+    return GetPointer<const TEN::Save::WeaponControlData *>(VT_WEAPON);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_MOVE_ANGLE) &&
-           VerifyField<int32_t>(verifier, VT_TURN_RATE) &&
-           VerifyField<int32_t>(verifier, VT_JUMP_DIRECTION) &&
-           VerifyField<int32_t>(verifier, VT_HAND_STATUS) &&
-           VerifyField<int32_t>(verifier, VT_WATER_STATUS) &&
+           VerifyField<uint8_t>(verifier, VT_CAN_CLIMB_LADDER) &&
+           VerifyField<uint8_t>(verifier, VT_CAN_MONKEY_SWING) &&
            VerifyOffset(verifier, VT_COUNT) &&
            verifier.VerifyTable(count()) &&
-           VerifyField<uint8_t>(verifier, VT_CAN_LOOK) &&
-           VerifyField<uint8_t>(verifier, VT_IS_MOVING) &&
-           VerifyField<uint8_t>(verifier, VT_KEEP_LOW) &&
-           VerifyField<uint8_t>(verifier, VT_IS_LOW) &&
-           VerifyField<uint8_t>(verifier, VT_CAN_CLIMB_LADDER) &&
+           VerifyField<int32_t>(verifier, VT_HAND_STATUS) &&
            VerifyField<uint8_t>(verifier, VT_IS_CLIMBING_LADDER) &&
-           VerifyField<uint8_t>(verifier, VT_CAN_MONKEY_SWING) &&
-           VerifyField<uint8_t>(verifier, VT_RUN_JUMP_QUEUED) &&
-           VerifyField<uint8_t>(verifier, VT_LOCKED) &&
-           VerifyOffset(verifier, VT_WEAPON) &&
-           verifier.VerifyTable(weapon()) &&
+           VerifyField<uint8_t>(verifier, VT_IS_LOCKED) &&
+           VerifyField<uint8_t>(verifier, VT_IS_LOW) &&
+           VerifyField<uint8_t>(verifier, VT_IS_MOVING) &&
+           VerifyField<uint8_t>(verifier, VT_IS_RUN_JUMP_QUEUED) &&
+           VerifyField<int32_t>(verifier, VT_JUMP_DIRECTION) &&
+           VerifyField<uint8_t>(verifier, VT_KEEP_LOW) &&
+           VerifyOffset(verifier, VT_LOOK) &&
+           verifier.VerifyTable(look()) &&
+           VerifyField<int32_t>(verifier, VT_MOVE_ANGLE) &&
            VerifyOffset(verifier, VT_ROPE) &&
            verifier.VerifyTable(rope()) &&
-           VerifyOffset(verifier, VT_TIGHTROPE) &&
-           verifier.VerifyTable(tightrope()) &&
            VerifyOffset(verifier, VT_SUBSUIT) &&
            verifier.VerifyTable(subsuit()) &&
+           VerifyOffset(verifier, VT_TIGHTROPE) &&
+           verifier.VerifyTable(tightrope()) &&
+           VerifyField<int32_t>(verifier, VT_TURN_RATE) &&
+           VerifyField<int32_t>(verifier, VT_WATER_STATUS) &&
+           VerifyOffset(verifier, VT_WEAPON) &&
+           verifier.VerifyTable(weapon()) &&
            verifier.EndTable();
   }
   LaraControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -3488,62 +3606,62 @@ struct LaraControlDataBuilder {
   typedef LaraControlData Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_move_angle(int32_t move_angle) {
-    fbb_.AddElement<int32_t>(LaraControlData::VT_MOVE_ANGLE, move_angle, 0);
-  }
-  void add_turn_rate(int32_t turn_rate) {
-    fbb_.AddElement<int32_t>(LaraControlData::VT_TURN_RATE, turn_rate, 0);
-  }
-  void add_jump_direction(int32_t jump_direction) {
-    fbb_.AddElement<int32_t>(LaraControlData::VT_JUMP_DIRECTION, jump_direction, 0);
-  }
-  void add_hand_status(int32_t hand_status) {
-    fbb_.AddElement<int32_t>(LaraControlData::VT_HAND_STATUS, hand_status, 0);
-  }
-  void add_water_status(int32_t water_status) {
-    fbb_.AddElement<int32_t>(LaraControlData::VT_WATER_STATUS, water_status, 0);
-  }
-  void add_count(flatbuffers::Offset<TEN::Save::LaraCountData> count) {
-    fbb_.AddOffset(LaraControlData::VT_COUNT, count);
-  }
-  void add_can_look(bool can_look) {
-    fbb_.AddElement<uint8_t>(LaraControlData::VT_CAN_LOOK, static_cast<uint8_t>(can_look), 0);
-  }
-  void add_is_moving(bool is_moving) {
-    fbb_.AddElement<uint8_t>(LaraControlData::VT_IS_MOVING, static_cast<uint8_t>(is_moving), 0);
-  }
-  void add_keep_low(bool keep_low) {
-    fbb_.AddElement<uint8_t>(LaraControlData::VT_KEEP_LOW, static_cast<uint8_t>(keep_low), 0);
-  }
-  void add_is_low(bool is_low) {
-    fbb_.AddElement<uint8_t>(LaraControlData::VT_IS_LOW, static_cast<uint8_t>(is_low), 0);
-  }
   void add_can_climb_ladder(bool can_climb_ladder) {
     fbb_.AddElement<uint8_t>(LaraControlData::VT_CAN_CLIMB_LADDER, static_cast<uint8_t>(can_climb_ladder), 0);
-  }
-  void add_is_climbing_ladder(bool is_climbing_ladder) {
-    fbb_.AddElement<uint8_t>(LaraControlData::VT_IS_CLIMBING_LADDER, static_cast<uint8_t>(is_climbing_ladder), 0);
   }
   void add_can_monkey_swing(bool can_monkey_swing) {
     fbb_.AddElement<uint8_t>(LaraControlData::VT_CAN_MONKEY_SWING, static_cast<uint8_t>(can_monkey_swing), 0);
   }
-  void add_run_jump_queued(bool run_jump_queued) {
-    fbb_.AddElement<uint8_t>(LaraControlData::VT_RUN_JUMP_QUEUED, static_cast<uint8_t>(run_jump_queued), 0);
+  void add_count(flatbuffers::Offset<TEN::Save::LaraCountData> count) {
+    fbb_.AddOffset(LaraControlData::VT_COUNT, count);
   }
-  void add_locked(bool locked) {
-    fbb_.AddElement<uint8_t>(LaraControlData::VT_LOCKED, static_cast<uint8_t>(locked), 0);
+  void add_hand_status(int32_t hand_status) {
+    fbb_.AddElement<int32_t>(LaraControlData::VT_HAND_STATUS, hand_status, 0);
   }
-  void add_weapon(flatbuffers::Offset<TEN::Save::WeaponControlData> weapon) {
-    fbb_.AddOffset(LaraControlData::VT_WEAPON, weapon);
+  void add_is_climbing_ladder(bool is_climbing_ladder) {
+    fbb_.AddElement<uint8_t>(LaraControlData::VT_IS_CLIMBING_LADDER, static_cast<uint8_t>(is_climbing_ladder), 0);
+  }
+  void add_is_locked(bool is_locked) {
+    fbb_.AddElement<uint8_t>(LaraControlData::VT_IS_LOCKED, static_cast<uint8_t>(is_locked), 0);
+  }
+  void add_is_low(bool is_low) {
+    fbb_.AddElement<uint8_t>(LaraControlData::VT_IS_LOW, static_cast<uint8_t>(is_low), 0);
+  }
+  void add_is_moving(bool is_moving) {
+    fbb_.AddElement<uint8_t>(LaraControlData::VT_IS_MOVING, static_cast<uint8_t>(is_moving), 0);
+  }
+  void add_is_run_jump_queued(bool is_run_jump_queued) {
+    fbb_.AddElement<uint8_t>(LaraControlData::VT_IS_RUN_JUMP_QUEUED, static_cast<uint8_t>(is_run_jump_queued), 0);
+  }
+  void add_jump_direction(int32_t jump_direction) {
+    fbb_.AddElement<int32_t>(LaraControlData::VT_JUMP_DIRECTION, jump_direction, 0);
+  }
+  void add_keep_low(bool keep_low) {
+    fbb_.AddElement<uint8_t>(LaraControlData::VT_KEEP_LOW, static_cast<uint8_t>(keep_low), 0);
+  }
+  void add_look(flatbuffers::Offset<TEN::Save::LookControlData> look) {
+    fbb_.AddOffset(LaraControlData::VT_LOOK, look);
+  }
+  void add_move_angle(int32_t move_angle) {
+    fbb_.AddElement<int32_t>(LaraControlData::VT_MOVE_ANGLE, move_angle, 0);
   }
   void add_rope(flatbuffers::Offset<TEN::Save::RopeControlData> rope) {
     fbb_.AddOffset(LaraControlData::VT_ROPE, rope);
   }
+  void add_subsuit(flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit) {
+    fbb_.AddOffset(LaraControlData::VT_SUBSUIT, subsuit);
+  }
   void add_tightrope(flatbuffers::Offset<TEN::Save::TightropeControlData> tightrope) {
     fbb_.AddOffset(LaraControlData::VT_TIGHTROPE, tightrope);
   }
-  void add_subsuit(flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit) {
-    fbb_.AddOffset(LaraControlData::VT_SUBSUIT, subsuit);
+  void add_turn_rate(int32_t turn_rate) {
+    fbb_.AddElement<int32_t>(LaraControlData::VT_TURN_RATE, turn_rate, 0);
+  }
+  void add_water_status(int32_t water_status) {
+    fbb_.AddElement<int32_t>(LaraControlData::VT_WATER_STATUS, water_status, 0);
+  }
+  void add_weapon(flatbuffers::Offset<TEN::Save::WeaponControlData> weapon) {
+    fbb_.AddOffset(LaraControlData::VT_WEAPON, weapon);
   }
   explicit LaraControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -3558,45 +3676,45 @@ struct LaraControlDataBuilder {
 
 inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
     flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t move_angle = 0,
-    int32_t turn_rate = 0,
-    int32_t jump_direction = 0,
-    int32_t hand_status = 0,
-    int32_t water_status = 0,
-    flatbuffers::Offset<TEN::Save::LaraCountData> count = 0,
-    bool can_look = false,
-    bool is_moving = false,
-    bool keep_low = false,
-    bool is_low = false,
     bool can_climb_ladder = false,
-    bool is_climbing_ladder = false,
     bool can_monkey_swing = false,
-    bool run_jump_queued = false,
-    bool locked = false,
-    flatbuffers::Offset<TEN::Save::WeaponControlData> weapon = 0,
+    flatbuffers::Offset<TEN::Save::LaraCountData> count = 0,
+    int32_t hand_status = 0,
+    bool is_climbing_ladder = false,
+    bool is_locked = false,
+    bool is_low = false,
+    bool is_moving = false,
+    bool is_run_jump_queued = false,
+    int32_t jump_direction = 0,
+    bool keep_low = false,
+    flatbuffers::Offset<TEN::Save::LookControlData> look = 0,
+    int32_t move_angle = 0,
     flatbuffers::Offset<TEN::Save::RopeControlData> rope = 0,
+    flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit = 0,
     flatbuffers::Offset<TEN::Save::TightropeControlData> tightrope = 0,
-    flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit = 0) {
+    int32_t turn_rate = 0,
+    int32_t water_status = 0,
+    flatbuffers::Offset<TEN::Save::WeaponControlData> weapon = 0) {
   LaraControlDataBuilder builder_(_fbb);
-  builder_.add_subsuit(subsuit);
-  builder_.add_tightrope(tightrope);
-  builder_.add_rope(rope);
   builder_.add_weapon(weapon);
-  builder_.add_count(count);
   builder_.add_water_status(water_status);
-  builder_.add_hand_status(hand_status);
-  builder_.add_jump_direction(jump_direction);
   builder_.add_turn_rate(turn_rate);
+  builder_.add_tightrope(tightrope);
+  builder_.add_subsuit(subsuit);
+  builder_.add_rope(rope);
   builder_.add_move_angle(move_angle);
-  builder_.add_locked(locked);
-  builder_.add_run_jump_queued(run_jump_queued);
-  builder_.add_can_monkey_swing(can_monkey_swing);
-  builder_.add_is_climbing_ladder(is_climbing_ladder);
-  builder_.add_can_climb_ladder(can_climb_ladder);
-  builder_.add_is_low(is_low);
+  builder_.add_look(look);
+  builder_.add_jump_direction(jump_direction);
+  builder_.add_hand_status(hand_status);
+  builder_.add_count(count);
   builder_.add_keep_low(keep_low);
+  builder_.add_is_run_jump_queued(is_run_jump_queued);
   builder_.add_is_moving(is_moving);
-  builder_.add_can_look(can_look);
+  builder_.add_is_low(is_low);
+  builder_.add_is_locked(is_locked);
+  builder_.add_is_climbing_ladder(is_climbing_ladder);
+  builder_.add_can_monkey_swing(can_monkey_swing);
+  builder_.add_can_climb_ladder(can_climb_ladder);
   return builder_.Finish();
 }
 
@@ -5436,85 +5554,86 @@ struct Pendulum::Traits {
 
 flatbuffers::Offset<Pendulum> CreatePendulum(flatbuffers::FlatBufferBuilder &_fbb, const PendulumT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-struct EventSetCallCountersT : public flatbuffers::NativeTable {
-  typedef EventSetCallCounters TableType;
-  int32_t on_enter = 0;
-  int32_t on_inside = 0;
-  int32_t on_leave = 0;
+struct EventSetT : public flatbuffers::NativeTable {
+  typedef EventSet TableType;
+  int32_t index = 0;
+  std::vector<int32_t> call_counters{};
 };
 
-struct EventSetCallCounters FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef EventSetCallCountersT NativeTableType;
-  typedef EventSetCallCountersBuilder Builder;
+struct EventSet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef EventSetT NativeTableType;
+  typedef EventSetBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_ON_ENTER = 4,
-    VT_ON_INSIDE = 6,
-    VT_ON_LEAVE = 8
+    VT_INDEX = 4,
+    VT_CALL_COUNTERS = 6
   };
-  int32_t on_enter() const {
-    return GetField<int32_t>(VT_ON_ENTER, 0);
+  int32_t index() const {
+    return GetField<int32_t>(VT_INDEX, 0);
   }
-  int32_t on_inside() const {
-    return GetField<int32_t>(VT_ON_INSIDE, 0);
-  }
-  int32_t on_leave() const {
-    return GetField<int32_t>(VT_ON_LEAVE, 0);
+  const flatbuffers::Vector<int32_t> *call_counters() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_CALL_COUNTERS);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_ON_ENTER) &&
-           VerifyField<int32_t>(verifier, VT_ON_INSIDE) &&
-           VerifyField<int32_t>(verifier, VT_ON_LEAVE) &&
+           VerifyField<int32_t>(verifier, VT_INDEX) &&
+           VerifyOffset(verifier, VT_CALL_COUNTERS) &&
+           verifier.VerifyVector(call_counters()) &&
            verifier.EndTable();
   }
-  EventSetCallCountersT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(EventSetCallCountersT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<EventSetCallCounters> Pack(flatbuffers::FlatBufferBuilder &_fbb, const EventSetCallCountersT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+  EventSetT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(EventSetT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<EventSet> Pack(flatbuffers::FlatBufferBuilder &_fbb, const EventSetT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 };
 
-struct EventSetCallCountersBuilder {
-  typedef EventSetCallCounters Table;
+struct EventSetBuilder {
+  typedef EventSet Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_on_enter(int32_t on_enter) {
-    fbb_.AddElement<int32_t>(EventSetCallCounters::VT_ON_ENTER, on_enter, 0);
+  void add_index(int32_t index) {
+    fbb_.AddElement<int32_t>(EventSet::VT_INDEX, index, 0);
   }
-  void add_on_inside(int32_t on_inside) {
-    fbb_.AddElement<int32_t>(EventSetCallCounters::VT_ON_INSIDE, on_inside, 0);
+  void add_call_counters(flatbuffers::Offset<flatbuffers::Vector<int32_t>> call_counters) {
+    fbb_.AddOffset(EventSet::VT_CALL_COUNTERS, call_counters);
   }
-  void add_on_leave(int32_t on_leave) {
-    fbb_.AddElement<int32_t>(EventSetCallCounters::VT_ON_LEAVE, on_leave, 0);
-  }
-  explicit EventSetCallCountersBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+  explicit EventSetBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  flatbuffers::Offset<EventSetCallCounters> Finish() {
+  flatbuffers::Offset<EventSet> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<EventSetCallCounters>(end);
+    auto o = flatbuffers::Offset<EventSet>(end);
     return o;
   }
 };
 
-inline flatbuffers::Offset<EventSetCallCounters> CreateEventSetCallCounters(
+inline flatbuffers::Offset<EventSet> CreateEventSet(
     flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t on_enter = 0,
-    int32_t on_inside = 0,
-    int32_t on_leave = 0) {
-  EventSetCallCountersBuilder builder_(_fbb);
-  builder_.add_on_leave(on_leave);
-  builder_.add_on_inside(on_inside);
-  builder_.add_on_enter(on_enter);
+    int32_t index = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> call_counters = 0) {
+  EventSetBuilder builder_(_fbb);
+  builder_.add_call_counters(call_counters);
+  builder_.add_index(index);
   return builder_.Finish();
 }
 
-struct EventSetCallCounters::Traits {
-  using type = EventSetCallCounters;
-  static auto constexpr Create = CreateEventSetCallCounters;
+struct EventSet::Traits {
+  using type = EventSet;
+  static auto constexpr Create = CreateEventSet;
 };
 
-flatbuffers::Offset<EventSetCallCounters> CreateEventSetCallCounters(flatbuffers::FlatBufferBuilder &_fbb, const EventSetCallCountersT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+inline flatbuffers::Offset<EventSet> CreateEventSetDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t index = 0,
+    const std::vector<int32_t> *call_counters = nullptr) {
+  auto call_counters__ = call_counters ? _fbb.CreateVector<int32_t>(*call_counters) : 0;
+  return TEN::Save::CreateEventSet(
+      _fbb,
+      index,
+      call_counters__);
+}
+
+flatbuffers::Offset<EventSet> CreateEventSet(flatbuffers::FlatBufferBuilder &_fbb, const EventSetT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct VolumeStateT : public flatbuffers::NativeTable {
   typedef VolumeState TableType;
@@ -6828,11 +6947,15 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::vector<int32_t> action_queue{};
   std::vector<std::unique_ptr<TEN::Save::SoundtrackT>> soundtracks{};
   std::vector<int32_t> cd_flags{};
+  int32_t postprocess_mode = 0;
+  float postprocess_strength = 0.0f;
+  std::unique_ptr<TEN::Save::Vector3> postprocess_tint{};
   std::unique_ptr<TEN::Save::RopeT> rope{};
   std::unique_ptr<TEN::Save::PendulumT> pendulum{};
   std::unique_ptr<TEN::Save::PendulumT> alternate_pendulum{};
   std::vector<std::unique_ptr<TEN::Save::VolumeT>> volumes{};
-  std::vector<std::unique_ptr<TEN::Save::EventSetCallCountersT>> call_counters{};
+  std::vector<std::unique_ptr<TEN::Save::EventSetT>> global_event_sets{};
+  std::vector<std::unique_ptr<TEN::Save::EventSetT>> volume_event_sets{};
   std::unique_ptr<TEN::Save::UnionVecT> script_vars{};
   std::vector<std::string> callbacks_pre_start{};
   std::vector<std::string> callbacks_post_start{};
@@ -6842,8 +6965,8 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::vector<std::string> callbacks_post_save{};
   std::vector<std::string> callbacks_pre_load{};
   std::vector<std::string> callbacks_post_load{};
-  std::vector<std::string> callbacks_pre_control{};
-  std::vector<std::string> callbacks_post_control{};
+  std::vector<std::string> callbacks_pre_loop{};
+  std::vector<std::string> callbacks_post_loop{};
 };
 
 struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -6882,22 +7005,26 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ACTION_QUEUE = 60,
     VT_SOUNDTRACKS = 62,
     VT_CD_FLAGS = 64,
-    VT_ROPE = 66,
-    VT_PENDULUM = 68,
-    VT_ALTERNATE_PENDULUM = 70,
-    VT_VOLUMES = 72,
-    VT_CALL_COUNTERS = 74,
-    VT_SCRIPT_VARS = 76,
-    VT_CALLBACKS_PRE_START = 78,
-    VT_CALLBACKS_POST_START = 80,
-    VT_CALLBACKS_PRE_END = 82,
-    VT_CALLBACKS_POST_END = 84,
-    VT_CALLBACKS_PRE_SAVE = 86,
-    VT_CALLBACKS_POST_SAVE = 88,
-    VT_CALLBACKS_PRE_LOAD = 90,
-    VT_CALLBACKS_POST_LOAD = 92,
-    VT_CALLBACKS_PRE_CONTROL = 94,
-    VT_CALLBACKS_POST_CONTROL = 96
+    VT_POSTPROCESS_MODE = 66,
+    VT_POSTPROCESS_STRENGTH = 68,
+    VT_POSTPROCESS_TINT = 70,
+    VT_ROPE = 72,
+    VT_PENDULUM = 74,
+    VT_ALTERNATE_PENDULUM = 76,
+    VT_VOLUMES = 78,
+    VT_GLOBAL_EVENT_SETS = 80,
+    VT_VOLUME_EVENT_SETS = 82,
+    VT_SCRIPT_VARS = 84,
+    VT_CALLBACKS_PRE_START = 86,
+    VT_CALLBACKS_POST_START = 88,
+    VT_CALLBACKS_PRE_END = 90,
+    VT_CALLBACKS_POST_END = 92,
+    VT_CALLBACKS_PRE_SAVE = 94,
+    VT_CALLBACKS_POST_SAVE = 96,
+    VT_CALLBACKS_PRE_LOAD = 98,
+    VT_CALLBACKS_POST_LOAD = 100,
+    VT_CALLBACKS_PRE_LOOP = 102,
+    VT_CALLBACKS_POST_LOOP = 104
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -6992,6 +7119,15 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<int32_t> *cd_flags() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_CD_FLAGS);
   }
+  int32_t postprocess_mode() const {
+    return GetField<int32_t>(VT_POSTPROCESS_MODE, 0);
+  }
+  float postprocess_strength() const {
+    return GetField<float>(VT_POSTPROCESS_STRENGTH, 0.0f);
+  }
+  const TEN::Save::Vector3 *postprocess_tint() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_POSTPROCESS_TINT);
+  }
   const TEN::Save::Rope *rope() const {
     return GetPointer<const TEN::Save::Rope *>(VT_ROPE);
   }
@@ -7004,8 +7140,11 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Volume>> *volumes() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Volume>> *>(VT_VOLUMES);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> *call_counters() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> *>(VT_CALL_COUNTERS);
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSet>> *global_event_sets() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSet>> *>(VT_GLOBAL_EVENT_SETS);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSet>> *volume_event_sets() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSet>> *>(VT_VOLUME_EVENT_SETS);
   }
   const TEN::Save::UnionVec *script_vars() const {
     return GetPointer<const TEN::Save::UnionVec *>(VT_SCRIPT_VARS);
@@ -7034,11 +7173,11 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_load() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_CALLBACKS_POST_LOAD);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_control() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_CALLBACKS_PRE_CONTROL);
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_loop() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_CALLBACKS_PRE_LOOP);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_control() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_CALLBACKS_POST_CONTROL);
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_loop() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_CALLBACKS_POST_LOOP);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -7108,6 +7247,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVectorOfTables(soundtracks()) &&
            VerifyOffset(verifier, VT_CD_FLAGS) &&
            verifier.VerifyVector(cd_flags()) &&
+           VerifyField<int32_t>(verifier, VT_POSTPROCESS_MODE) &&
+           VerifyField<float>(verifier, VT_POSTPROCESS_STRENGTH) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_POSTPROCESS_TINT) &&
            VerifyOffset(verifier, VT_ROPE) &&
            verifier.VerifyTable(rope()) &&
            VerifyOffset(verifier, VT_PENDULUM) &&
@@ -7117,9 +7259,12 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_VOLUMES) &&
            verifier.VerifyVector(volumes()) &&
            verifier.VerifyVectorOfTables(volumes()) &&
-           VerifyOffset(verifier, VT_CALL_COUNTERS) &&
-           verifier.VerifyVector(call_counters()) &&
-           verifier.VerifyVectorOfTables(call_counters()) &&
+           VerifyOffset(verifier, VT_GLOBAL_EVENT_SETS) &&
+           verifier.VerifyVector(global_event_sets()) &&
+           verifier.VerifyVectorOfTables(global_event_sets()) &&
+           VerifyOffset(verifier, VT_VOLUME_EVENT_SETS) &&
+           verifier.VerifyVector(volume_event_sets()) &&
+           verifier.VerifyVectorOfTables(volume_event_sets()) &&
            VerifyOffset(verifier, VT_SCRIPT_VARS) &&
            verifier.VerifyTable(script_vars()) &&
            VerifyOffset(verifier, VT_CALLBACKS_PRE_START) &&
@@ -7146,12 +7291,12 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_CALLBACKS_POST_LOAD) &&
            verifier.VerifyVector(callbacks_post_load()) &&
            verifier.VerifyVectorOfStrings(callbacks_post_load()) &&
-           VerifyOffset(verifier, VT_CALLBACKS_PRE_CONTROL) &&
-           verifier.VerifyVector(callbacks_pre_control()) &&
-           verifier.VerifyVectorOfStrings(callbacks_pre_control()) &&
-           VerifyOffset(verifier, VT_CALLBACKS_POST_CONTROL) &&
-           verifier.VerifyVector(callbacks_post_control()) &&
-           verifier.VerifyVectorOfStrings(callbacks_post_control()) &&
+           VerifyOffset(verifier, VT_CALLBACKS_PRE_LOOP) &&
+           verifier.VerifyVector(callbacks_pre_loop()) &&
+           verifier.VerifyVectorOfStrings(callbacks_pre_loop()) &&
+           VerifyOffset(verifier, VT_CALLBACKS_POST_LOOP) &&
+           verifier.VerifyVector(callbacks_post_loop()) &&
+           verifier.VerifyVectorOfStrings(callbacks_post_loop()) &&
            verifier.EndTable();
   }
   SaveGameT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -7256,6 +7401,15 @@ struct SaveGameBuilder {
   void add_cd_flags(flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags) {
     fbb_.AddOffset(SaveGame::VT_CD_FLAGS, cd_flags);
   }
+  void add_postprocess_mode(int32_t postprocess_mode) {
+    fbb_.AddElement<int32_t>(SaveGame::VT_POSTPROCESS_MODE, postprocess_mode, 0);
+  }
+  void add_postprocess_strength(float postprocess_strength) {
+    fbb_.AddElement<float>(SaveGame::VT_POSTPROCESS_STRENGTH, postprocess_strength, 0.0f);
+  }
+  void add_postprocess_tint(const TEN::Save::Vector3 *postprocess_tint) {
+    fbb_.AddStruct(SaveGame::VT_POSTPROCESS_TINT, postprocess_tint);
+  }
   void add_rope(flatbuffers::Offset<TEN::Save::Rope> rope) {
     fbb_.AddOffset(SaveGame::VT_ROPE, rope);
   }
@@ -7268,8 +7422,11 @@ struct SaveGameBuilder {
   void add_volumes(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Volume>>> volumes) {
     fbb_.AddOffset(SaveGame::VT_VOLUMES, volumes);
   }
-  void add_call_counters(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>>> call_counters) {
-    fbb_.AddOffset(SaveGame::VT_CALL_COUNTERS, call_counters);
+  void add_global_event_sets(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSet>>> global_event_sets) {
+    fbb_.AddOffset(SaveGame::VT_GLOBAL_EVENT_SETS, global_event_sets);
+  }
+  void add_volume_event_sets(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSet>>> volume_event_sets) {
+    fbb_.AddOffset(SaveGame::VT_VOLUME_EVENT_SETS, volume_event_sets);
   }
   void add_script_vars(flatbuffers::Offset<TEN::Save::UnionVec> script_vars) {
     fbb_.AddOffset(SaveGame::VT_SCRIPT_VARS, script_vars);
@@ -7298,11 +7455,11 @@ struct SaveGameBuilder {
   void add_callbacks_post_load(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_load) {
     fbb_.AddOffset(SaveGame::VT_CALLBACKS_POST_LOAD, callbacks_post_load);
   }
-  void add_callbacks_pre_control(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_control) {
-    fbb_.AddOffset(SaveGame::VT_CALLBACKS_PRE_CONTROL, callbacks_pre_control);
+  void add_callbacks_pre_loop(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_loop) {
+    fbb_.AddOffset(SaveGame::VT_CALLBACKS_PRE_LOOP, callbacks_pre_loop);
   }
-  void add_callbacks_post_control(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_control) {
-    fbb_.AddOffset(SaveGame::VT_CALLBACKS_POST_CONTROL, callbacks_post_control);
+  void add_callbacks_post_loop(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_loop) {
+    fbb_.AddOffset(SaveGame::VT_CALLBACKS_POST_LOOP, callbacks_post_loop);
   }
   explicit SaveGameBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -7348,11 +7505,15 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> action_queue = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Soundtrack>>> soundtracks = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags = 0,
+    int32_t postprocess_mode = 0,
+    float postprocess_strength = 0.0f,
+    const TEN::Save::Vector3 *postprocess_tint = 0,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Volume>>> volumes = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>>> call_counters = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSet>>> global_event_sets = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::EventSet>>> volume_event_sets = 0,
     flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_start = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_start = 0,
@@ -7362,11 +7523,11 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_save = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_load = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_load = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_control = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_control = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_loop = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_loop = 0) {
   SaveGameBuilder builder_(_fbb);
-  builder_.add_callbacks_post_control(callbacks_post_control);
-  builder_.add_callbacks_pre_control(callbacks_pre_control);
+  builder_.add_callbacks_post_loop(callbacks_post_loop);
+  builder_.add_callbacks_pre_loop(callbacks_pre_loop);
   builder_.add_callbacks_post_load(callbacks_post_load);
   builder_.add_callbacks_pre_load(callbacks_pre_load);
   builder_.add_callbacks_post_save(callbacks_post_save);
@@ -7376,11 +7537,15 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_callbacks_post_start(callbacks_post_start);
   builder_.add_callbacks_pre_start(callbacks_pre_start);
   builder_.add_script_vars(script_vars);
-  builder_.add_call_counters(call_counters);
+  builder_.add_volume_event_sets(volume_event_sets);
+  builder_.add_global_event_sets(global_event_sets);
   builder_.add_volumes(volumes);
   builder_.add_alternate_pendulum(alternate_pendulum);
   builder_.add_pendulum(pendulum);
   builder_.add_rope(rope);
+  builder_.add_postprocess_tint(postprocess_tint);
+  builder_.add_postprocess_strength(postprocess_strength);
+  builder_.add_postprocess_mode(postprocess_mode);
   builder_.add_cd_flags(cd_flags);
   builder_.add_soundtracks(soundtracks);
   builder_.add_action_queue(action_queue);
@@ -7453,11 +7618,15 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     const std::vector<int32_t> *action_queue = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::Soundtrack>> *soundtracks = nullptr,
     const std::vector<int32_t> *cd_flags = nullptr,
+    int32_t postprocess_mode = 0,
+    float postprocess_strength = 0.0f,
+    const TEN::Save::Vector3 *postprocess_tint = 0,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::Volume>> *volumes = nullptr,
-    const std::vector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> *call_counters = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::EventSet>> *global_event_sets = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::EventSet>> *volume_event_sets = nullptr,
     flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_start = nullptr,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_start = nullptr,
@@ -7467,8 +7636,8 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_save = nullptr,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_load = nullptr,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_load = nullptr,
-    const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_control = nullptr,
-    const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_control = nullptr) {
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_loop = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_loop = nullptr) {
   auto rooms__ = rooms ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Room>>(*rooms) : 0;
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto room_items__ = room_items ? _fbb.CreateVector<int32_t>(*room_items) : 0;
@@ -7488,7 +7657,8 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto soundtracks__ = soundtracks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Soundtrack>>(*soundtracks) : 0;
   auto cd_flags__ = cd_flags ? _fbb.CreateVector<int32_t>(*cd_flags) : 0;
   auto volumes__ = volumes ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Volume>>(*volumes) : 0;
-  auto call_counters__ = call_counters ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>>(*call_counters) : 0;
+  auto global_event_sets__ = global_event_sets ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::EventSet>>(*global_event_sets) : 0;
+  auto volume_event_sets__ = volume_event_sets ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::EventSet>>(*volume_event_sets) : 0;
   auto callbacks_pre_start__ = callbacks_pre_start ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_pre_start) : 0;
   auto callbacks_post_start__ = callbacks_post_start ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_post_start) : 0;
   auto callbacks_pre_end__ = callbacks_pre_end ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_pre_end) : 0;
@@ -7497,8 +7667,8 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto callbacks_post_save__ = callbacks_post_save ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_post_save) : 0;
   auto callbacks_pre_load__ = callbacks_pre_load ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_pre_load) : 0;
   auto callbacks_post_load__ = callbacks_post_load ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_post_load) : 0;
-  auto callbacks_pre_control__ = callbacks_pre_control ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_pre_control) : 0;
-  auto callbacks_post_control__ = callbacks_post_control ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_post_control) : 0;
+  auto callbacks_pre_loop__ = callbacks_pre_loop ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_pre_loop) : 0;
+  auto callbacks_post_loop__ = callbacks_post_loop ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_post_loop) : 0;
   return TEN::Save::CreateSaveGame(
       _fbb,
       header,
@@ -7532,11 +7702,15 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       action_queue__,
       soundtracks__,
       cd_flags__,
+      postprocess_mode,
+      postprocess_strength,
+      postprocess_tint,
       rope,
       pendulum,
       alternate_pendulum,
       volumes__,
-      call_counters__,
+      global_event_sets__,
+      volume_event_sets__,
       script_vars,
       callbacks_pre_start__,
       callbacks_post_start__,
@@ -7546,8 +7720,8 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       callbacks_post_save__,
       callbacks_pre_load__,
       callbacks_post_load__,
-      callbacks_pre_control__,
-      callbacks_post_control__);
+      callbacks_pre_loop__,
+      callbacks_post_loop__);
 }
 
 flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -8179,63 +8353,45 @@ inline flatbuffers::Offset<LaraCountData> CreateLaraCountData(flatbuffers::FlatB
       _no_cheat);
 }
 
-inline WeaponControlDataT *WeaponControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<WeaponControlDataT>();
+inline LookControlDataT *LookControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<LookControlDataT>();
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
 
-inline void WeaponControlData::UnPackTo(WeaponControlDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+inline void LookControlData::UnPackTo(LookControlDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = weapon_item(); _o->weapon_item = _e; }
-  { auto _e = has_fired(); _o->has_fired = _e; }
-  { auto _e = fired(); _o->fired = _e; }
-  { auto _e = uzi_left(); _o->uzi_left = _e; }
-  { auto _e = uzi_right(); _o->uzi_right = _e; }
-  { auto _e = gun_type(); _o->gun_type = _e; }
-  { auto _e = request_gun_type(); _o->request_gun_type = _e; }
-  { auto _e = last_gun_type(); _o->last_gun_type = _e; }
-  { auto _e = holster_info(); if (_e) _o->holster_info = std::unique_ptr<TEN::Save::HolsterInfoT>(_e->UnPack(_resolver)); }
-  { auto _e = num_shots_fired(); _o->num_shots_fired = _e; }
-  { auto _e = interval(); _o->interval = _e; }
-  { auto _e = timer(); _o->timer = _e; }
+  { auto _e = is_using_binoculars(); _o->is_using_binoculars = _e; }
+  { auto _e = is_using_lasersight(); _o->is_using_lasersight = _e; }
+  { auto _e = mode(); _o->mode = _e; }
+  { auto _e = optic_range(); _o->optic_range = _e; }
+  { auto _e = orientation(); if (_e) _o->orientation = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
+  { auto _e = turn_rate(); if (_e) _o->turn_rate = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
 }
 
-inline flatbuffers::Offset<WeaponControlData> WeaponControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const WeaponControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateWeaponControlData(_fbb, _o, _rehasher);
+inline flatbuffers::Offset<LookControlData> LookControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LookControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateLookControlData(_fbb, _o, _rehasher);
 }
 
-inline flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(flatbuffers::FlatBufferBuilder &_fbb, const WeaponControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+inline flatbuffers::Offset<LookControlData> CreateLookControlData(flatbuffers::FlatBufferBuilder &_fbb, const LookControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
   (void)_rehasher;
   (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const WeaponControlDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _weapon_item = _o->weapon_item;
-  auto _has_fired = _o->has_fired;
-  auto _fired = _o->fired;
-  auto _uzi_left = _o->uzi_left;
-  auto _uzi_right = _o->uzi_right;
-  auto _gun_type = _o->gun_type;
-  auto _request_gun_type = _o->request_gun_type;
-  auto _last_gun_type = _o->last_gun_type;
-  auto _holster_info = _o->holster_info ? CreateHolsterInfo(_fbb, _o->holster_info.get(), _rehasher) : 0;
-  auto _num_shots_fired = _o->num_shots_fired;
-  auto _interval = _o->interval;
-  auto _timer = _o->timer;
-  return TEN::Save::CreateWeaponControlData(
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LookControlDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _is_using_binoculars = _o->is_using_binoculars;
+  auto _is_using_lasersight = _o->is_using_lasersight;
+  auto _mode = _o->mode;
+  auto _optic_range = _o->optic_range;
+  auto _orientation = _o->orientation ? _o->orientation.get() : 0;
+  auto _turn_rate = _o->turn_rate ? _o->turn_rate.get() : 0;
+  return TEN::Save::CreateLookControlData(
       _fbb,
-      _weapon_item,
-      _has_fired,
-      _fired,
-      _uzi_left,
-      _uzi_right,
-      _gun_type,
-      _request_gun_type,
-      _last_gun_type,
-      _holster_info,
-      _num_shots_fired,
-      _interval,
-      _timer);
+      _is_using_binoculars,
+      _is_using_lasersight,
+      _mode,
+      _optic_range,
+      _orientation,
+      _turn_rate);
 }
 
 inline RopeControlDataT *RopeControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -8309,41 +8465,6 @@ inline flatbuffers::Offset<RopeControlData> CreateRopeControlData(flatbuffers::F
       _count);
 }
 
-inline TightropeControlDataT *TightropeControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<TightropeControlDataT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void TightropeControlData::UnPackTo(TightropeControlDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = balance(); _o->balance = _e; }
-  { auto _e = time_on_tightrope(); _o->time_on_tightrope = _e; }
-  { auto _e = can_dismount(); _o->can_dismount = _e; }
-  { auto _e = tightrope_item(); _o->tightrope_item = _e; }
-}
-
-inline flatbuffers::Offset<TightropeControlData> TightropeControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const TightropeControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateTightropeControlData(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<TightropeControlData> CreateTightropeControlData(flatbuffers::FlatBufferBuilder &_fbb, const TightropeControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const TightropeControlDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _balance = _o->balance;
-  auto _time_on_tightrope = _o->time_on_tightrope;
-  auto _can_dismount = _o->can_dismount;
-  auto _tightrope_item = _o->tightrope_item;
-  return TEN::Save::CreateTightropeControlData(
-      _fbb,
-      _balance,
-      _time_on_tightrope,
-      _can_dismount,
-      _tightrope_item);
-}
-
 inline SubsuitControlDataT *SubsuitControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<SubsuitControlDataT>();
   UnPackTo(_o.get(), _resolver);
@@ -8385,6 +8506,100 @@ inline flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlData(flatbuff
       _hit_count);
 }
 
+inline TightropeControlDataT *TightropeControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<TightropeControlDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void TightropeControlData::UnPackTo(TightropeControlDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = balance(); _o->balance = _e; }
+  { auto _e = time_on_tightrope(); _o->time_on_tightrope = _e; }
+  { auto _e = can_dismount(); _o->can_dismount = _e; }
+  { auto _e = tightrope_item(); _o->tightrope_item = _e; }
+}
+
+inline flatbuffers::Offset<TightropeControlData> TightropeControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const TightropeControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateTightropeControlData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<TightropeControlData> CreateTightropeControlData(flatbuffers::FlatBufferBuilder &_fbb, const TightropeControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const TightropeControlDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _balance = _o->balance;
+  auto _time_on_tightrope = _o->time_on_tightrope;
+  auto _can_dismount = _o->can_dismount;
+  auto _tightrope_item = _o->tightrope_item;
+  return TEN::Save::CreateTightropeControlData(
+      _fbb,
+      _balance,
+      _time_on_tightrope,
+      _can_dismount,
+      _tightrope_item);
+}
+
+inline WeaponControlDataT *WeaponControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<WeaponControlDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void WeaponControlData::UnPackTo(WeaponControlDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = weapon_item(); _o->weapon_item = _e; }
+  { auto _e = has_fired(); _o->has_fired = _e; }
+  { auto _e = fired(); _o->fired = _e; }
+  { auto _e = uzi_left(); _o->uzi_left = _e; }
+  { auto _e = uzi_right(); _o->uzi_right = _e; }
+  { auto _e = gun_type(); _o->gun_type = _e; }
+  { auto _e = request_gun_type(); _o->request_gun_type = _e; }
+  { auto _e = last_gun_type(); _o->last_gun_type = _e; }
+  { auto _e = holster_info(); if (_e) _o->holster_info = std::unique_ptr<TEN::Save::HolsterInfoT>(_e->UnPack(_resolver)); }
+  { auto _e = num_shots_fired(); _o->num_shots_fired = _e; }
+  { auto _e = interval(); _o->interval = _e; }
+  { auto _e = timer(); _o->timer = _e; }
+}
+
+inline flatbuffers::Offset<WeaponControlData> WeaponControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const WeaponControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateWeaponControlData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(flatbuffers::FlatBufferBuilder &_fbb, const WeaponControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const WeaponControlDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _weapon_item = _o->weapon_item;
+  auto _has_fired = _o->has_fired;
+  auto _fired = _o->fired;
+  auto _uzi_left = _o->uzi_left;
+  auto _uzi_right = _o->uzi_right;
+  auto _gun_type = _o->gun_type;
+  auto _request_gun_type = _o->request_gun_type;
+  auto _last_gun_type = _o->last_gun_type;
+  auto _holster_info = _o->holster_info ? CreateHolsterInfo(_fbb, _o->holster_info.get(), _rehasher) : 0;
+  auto _num_shots_fired = _o->num_shots_fired;
+  auto _interval = _o->interval;
+  auto _timer = _o->timer;
+  return TEN::Save::CreateWeaponControlData(
+      _fbb,
+      _weapon_item,
+      _has_fired,
+      _fired,
+      _uzi_left,
+      _uzi_right,
+      _gun_type,
+      _request_gun_type,
+      _last_gun_type,
+      _holster_info,
+      _num_shots_fired,
+      _interval,
+      _timer);
+}
+
 inline LaraControlDataT *LaraControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<LaraControlDataT>();
   UnPackTo(_o.get(), _resolver);
@@ -8394,25 +8609,25 @@ inline LaraControlDataT *LaraControlData::UnPack(const flatbuffers::resolver_fun
 inline void LaraControlData::UnPackTo(LaraControlDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = move_angle(); _o->move_angle = _e; }
-  { auto _e = turn_rate(); _o->turn_rate = _e; }
-  { auto _e = jump_direction(); _o->jump_direction = _e; }
-  { auto _e = hand_status(); _o->hand_status = _e; }
-  { auto _e = water_status(); _o->water_status = _e; }
-  { auto _e = count(); if (_e) _o->count = std::unique_ptr<TEN::Save::LaraCountDataT>(_e->UnPack(_resolver)); }
-  { auto _e = can_look(); _o->can_look = _e; }
-  { auto _e = is_moving(); _o->is_moving = _e; }
-  { auto _e = keep_low(); _o->keep_low = _e; }
-  { auto _e = is_low(); _o->is_low = _e; }
   { auto _e = can_climb_ladder(); _o->can_climb_ladder = _e; }
-  { auto _e = is_climbing_ladder(); _o->is_climbing_ladder = _e; }
   { auto _e = can_monkey_swing(); _o->can_monkey_swing = _e; }
-  { auto _e = run_jump_queued(); _o->run_jump_queued = _e; }
-  { auto _e = locked(); _o->locked = _e; }
-  { auto _e = weapon(); if (_e) _o->weapon = std::unique_ptr<TEN::Save::WeaponControlDataT>(_e->UnPack(_resolver)); }
+  { auto _e = count(); if (_e) _o->count = std::unique_ptr<TEN::Save::LaraCountDataT>(_e->UnPack(_resolver)); }
+  { auto _e = hand_status(); _o->hand_status = _e; }
+  { auto _e = is_climbing_ladder(); _o->is_climbing_ladder = _e; }
+  { auto _e = is_locked(); _o->is_locked = _e; }
+  { auto _e = is_low(); _o->is_low = _e; }
+  { auto _e = is_moving(); _o->is_moving = _e; }
+  { auto _e = is_run_jump_queued(); _o->is_run_jump_queued = _e; }
+  { auto _e = jump_direction(); _o->jump_direction = _e; }
+  { auto _e = keep_low(); _o->keep_low = _e; }
+  { auto _e = look(); if (_e) _o->look = std::unique_ptr<TEN::Save::LookControlDataT>(_e->UnPack(_resolver)); }
+  { auto _e = move_angle(); _o->move_angle = _e; }
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeControlDataT>(_e->UnPack(_resolver)); }
-  { auto _e = tightrope(); if (_e) _o->tightrope = std::unique_ptr<TEN::Save::TightropeControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = subsuit(); if (_e) _o->subsuit = std::unique_ptr<TEN::Save::SubsuitControlDataT>(_e->UnPack(_resolver)); }
+  { auto _e = tightrope(); if (_e) _o->tightrope = std::unique_ptr<TEN::Save::TightropeControlDataT>(_e->UnPack(_resolver)); }
+  { auto _e = turn_rate(); _o->turn_rate = _e; }
+  { auto _e = water_status(); _o->water_status = _e; }
+  { auto _e = weapon(); if (_e) _o->weapon = std::unique_ptr<TEN::Save::WeaponControlDataT>(_e->UnPack(_resolver)); }
 }
 
 inline flatbuffers::Offset<LaraControlData> LaraControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -8423,46 +8638,46 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LaraControlDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _move_angle = _o->move_angle;
-  auto _turn_rate = _o->turn_rate;
-  auto _jump_direction = _o->jump_direction;
-  auto _hand_status = _o->hand_status;
-  auto _water_status = _o->water_status;
-  auto _count = _o->count ? CreateLaraCountData(_fbb, _o->count.get(), _rehasher) : 0;
-  auto _can_look = _o->can_look;
-  auto _is_moving = _o->is_moving;
-  auto _keep_low = _o->keep_low;
-  auto _is_low = _o->is_low;
   auto _can_climb_ladder = _o->can_climb_ladder;
-  auto _is_climbing_ladder = _o->is_climbing_ladder;
   auto _can_monkey_swing = _o->can_monkey_swing;
-  auto _run_jump_queued = _o->run_jump_queued;
-  auto _locked = _o->locked;
-  auto _weapon = _o->weapon ? CreateWeaponControlData(_fbb, _o->weapon.get(), _rehasher) : 0;
+  auto _count = _o->count ? CreateLaraCountData(_fbb, _o->count.get(), _rehasher) : 0;
+  auto _hand_status = _o->hand_status;
+  auto _is_climbing_ladder = _o->is_climbing_ladder;
+  auto _is_locked = _o->is_locked;
+  auto _is_low = _o->is_low;
+  auto _is_moving = _o->is_moving;
+  auto _is_run_jump_queued = _o->is_run_jump_queued;
+  auto _jump_direction = _o->jump_direction;
+  auto _keep_low = _o->keep_low;
+  auto _look = _o->look ? CreateLookControlData(_fbb, _o->look.get(), _rehasher) : 0;
+  auto _move_angle = _o->move_angle;
   auto _rope = _o->rope ? CreateRopeControlData(_fbb, _o->rope.get(), _rehasher) : 0;
-  auto _tightrope = _o->tightrope ? CreateTightropeControlData(_fbb, _o->tightrope.get(), _rehasher) : 0;
   auto _subsuit = _o->subsuit ? CreateSubsuitControlData(_fbb, _o->subsuit.get(), _rehasher) : 0;
+  auto _tightrope = _o->tightrope ? CreateTightropeControlData(_fbb, _o->tightrope.get(), _rehasher) : 0;
+  auto _turn_rate = _o->turn_rate;
+  auto _water_status = _o->water_status;
+  auto _weapon = _o->weapon ? CreateWeaponControlData(_fbb, _o->weapon.get(), _rehasher) : 0;
   return TEN::Save::CreateLaraControlData(
       _fbb,
-      _move_angle,
-      _turn_rate,
-      _jump_direction,
-      _hand_status,
-      _water_status,
-      _count,
-      _can_look,
-      _is_moving,
-      _keep_low,
-      _is_low,
       _can_climb_ladder,
-      _is_climbing_ladder,
       _can_monkey_swing,
-      _run_jump_queued,
-      _locked,
-      _weapon,
+      _count,
+      _hand_status,
+      _is_climbing_ladder,
+      _is_locked,
+      _is_low,
+      _is_moving,
+      _is_run_jump_queued,
+      _jump_direction,
+      _keep_low,
+      _look,
+      _move_angle,
       _rope,
+      _subsuit,
       _tightrope,
-      _subsuit);
+      _turn_rate,
+      _water_status,
+      _weapon);
 }
 
 inline PlayerEffectDataT *PlayerEffectData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -9064,36 +9279,33 @@ inline flatbuffers::Offset<Pendulum> CreatePendulum(flatbuffers::FlatBufferBuild
       _node);
 }
 
-inline EventSetCallCountersT *EventSetCallCounters::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<EventSetCallCountersT>();
+inline EventSetT *EventSet::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<EventSetT>();
   UnPackTo(_o.get(), _resolver);
   return _o.release();
 }
 
-inline void EventSetCallCounters::UnPackTo(EventSetCallCountersT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+inline void EventSet::UnPackTo(EventSetT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = on_enter(); _o->on_enter = _e; }
-  { auto _e = on_inside(); _o->on_inside = _e; }
-  { auto _e = on_leave(); _o->on_leave = _e; }
+  { auto _e = index(); _o->index = _e; }
+  { auto _e = call_counters(); if (_e) { _o->call_counters.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->call_counters[_i] = _e->Get(_i); } } }
 }
 
-inline flatbuffers::Offset<EventSetCallCounters> EventSetCallCounters::Pack(flatbuffers::FlatBufferBuilder &_fbb, const EventSetCallCountersT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateEventSetCallCounters(_fbb, _o, _rehasher);
+inline flatbuffers::Offset<EventSet> EventSet::Pack(flatbuffers::FlatBufferBuilder &_fbb, const EventSetT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateEventSet(_fbb, _o, _rehasher);
 }
 
-inline flatbuffers::Offset<EventSetCallCounters> CreateEventSetCallCounters(flatbuffers::FlatBufferBuilder &_fbb, const EventSetCallCountersT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+inline flatbuffers::Offset<EventSet> CreateEventSet(flatbuffers::FlatBufferBuilder &_fbb, const EventSetT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
   (void)_rehasher;
   (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const EventSetCallCountersT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _on_enter = _o->on_enter;
-  auto _on_inside = _o->on_inside;
-  auto _on_leave = _o->on_leave;
-  return TEN::Save::CreateEventSetCallCounters(
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const EventSetT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _index = _o->index;
+  auto _call_counters = _fbb.CreateVector(_o->call_counters);
+  return TEN::Save::CreateEventSet(
       _fbb,
-      _on_enter,
-      _on_inside,
-      _on_leave);
+      _index,
+      _call_counters);
 }
 
 inline VolumeStateT *VolumeState::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -9595,11 +9807,15 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = action_queue(); if (_e) { _o->action_queue.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->action_queue[_i] = _e->Get(_i); } } }
   { auto _e = soundtracks(); if (_e) { _o->soundtracks.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->soundtracks[_i] = std::unique_ptr<TEN::Save::SoundtrackT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = cd_flags(); if (_e) { _o->cd_flags.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->cd_flags[_i] = _e->Get(_i); } } }
+  { auto _e = postprocess_mode(); _o->postprocess_mode = _e; }
+  { auto _e = postprocess_strength(); _o->postprocess_strength = _e; }
+  { auto _e = postprocess_tint(); if (_e) _o->postprocess_tint = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeT>(_e->UnPack(_resolver)); }
   { auto _e = pendulum(); if (_e) _o->pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
   { auto _e = alternate_pendulum(); if (_e) _o->alternate_pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
   { auto _e = volumes(); if (_e) { _o->volumes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->volumes[_i] = std::unique_ptr<TEN::Save::VolumeT>(_e->Get(_i)->UnPack(_resolver)); } } }
-  { auto _e = call_counters(); if (_e) { _o->call_counters.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->call_counters[_i] = std::unique_ptr<TEN::Save::EventSetCallCountersT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = global_event_sets(); if (_e) { _o->global_event_sets.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->global_event_sets[_i] = std::unique_ptr<TEN::Save::EventSetT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = volume_event_sets(); if (_e) { _o->volume_event_sets.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->volume_event_sets[_i] = std::unique_ptr<TEN::Save::EventSetT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = script_vars(); if (_e) _o->script_vars = std::unique_ptr<TEN::Save::UnionVecT>(_e->UnPack(_resolver)); }
   { auto _e = callbacks_pre_start(); if (_e) { _o->callbacks_pre_start.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_pre_start[_i] = _e->Get(_i)->str(); } } }
   { auto _e = callbacks_post_start(); if (_e) { _o->callbacks_post_start.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_post_start[_i] = _e->Get(_i)->str(); } } }
@@ -9609,8 +9825,8 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = callbacks_post_save(); if (_e) { _o->callbacks_post_save.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_post_save[_i] = _e->Get(_i)->str(); } } }
   { auto _e = callbacks_pre_load(); if (_e) { _o->callbacks_pre_load.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_pre_load[_i] = _e->Get(_i)->str(); } } }
   { auto _e = callbacks_post_load(); if (_e) { _o->callbacks_post_load.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_post_load[_i] = _e->Get(_i)->str(); } } }
-  { auto _e = callbacks_pre_control(); if (_e) { _o->callbacks_pre_control.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_pre_control[_i] = _e->Get(_i)->str(); } } }
-  { auto _e = callbacks_post_control(); if (_e) { _o->callbacks_post_control.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_post_control[_i] = _e->Get(_i)->str(); } } }
+  { auto _e = callbacks_pre_loop(); if (_e) { _o->callbacks_pre_loop.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_pre_loop[_i] = _e->Get(_i)->str(); } } }
+  { auto _e = callbacks_post_loop(); if (_e) { _o->callbacks_post_loop.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_post_loop[_i] = _e->Get(_i)->str(); } } }
 }
 
 inline flatbuffers::Offset<SaveGame> SaveGame::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -9652,11 +9868,15 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _action_queue = _fbb.CreateVector(_o->action_queue);
   auto _soundtracks = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Soundtrack>> (_o->soundtracks.size(), [](size_t i, _VectorArgs *__va) { return CreateSoundtrack(*__va->__fbb, __va->__o->soundtracks[i].get(), __va->__rehasher); }, &_va );
   auto _cd_flags = _fbb.CreateVector(_o->cd_flags);
+  auto _postprocess_mode = _o->postprocess_mode;
+  auto _postprocess_strength = _o->postprocess_strength;
+  auto _postprocess_tint = _o->postprocess_tint ? _o->postprocess_tint.get() : 0;
   auto _rope = _o->rope ? CreateRope(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _pendulum = _o->pendulum ? CreatePendulum(_fbb, _o->pendulum.get(), _rehasher) : 0;
   auto _alternate_pendulum = _o->alternate_pendulum ? CreatePendulum(_fbb, _o->alternate_pendulum.get(), _rehasher) : 0;
   auto _volumes = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Volume>> (_o->volumes.size(), [](size_t i, _VectorArgs *__va) { return CreateVolume(*__va->__fbb, __va->__o->volumes[i].get(), __va->__rehasher); }, &_va );
-  auto _call_counters = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::EventSetCallCounters>> (_o->call_counters.size(), [](size_t i, _VectorArgs *__va) { return CreateEventSetCallCounters(*__va->__fbb, __va->__o->call_counters[i].get(), __va->__rehasher); }, &_va );
+  auto _global_event_sets = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::EventSet>> (_o->global_event_sets.size(), [](size_t i, _VectorArgs *__va) { return CreateEventSet(*__va->__fbb, __va->__o->global_event_sets[i].get(), __va->__rehasher); }, &_va );
+  auto _volume_event_sets = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::EventSet>> (_o->volume_event_sets.size(), [](size_t i, _VectorArgs *__va) { return CreateEventSet(*__va->__fbb, __va->__o->volume_event_sets[i].get(), __va->__rehasher); }, &_va );
   auto _script_vars = _o->script_vars ? CreateUnionVec(_fbb, _o->script_vars.get(), _rehasher) : 0;
   auto _callbacks_pre_start = _fbb.CreateVectorOfStrings(_o->callbacks_pre_start);
   auto _callbacks_post_start = _fbb.CreateVectorOfStrings(_o->callbacks_post_start);
@@ -9666,8 +9886,8 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _callbacks_post_save = _fbb.CreateVectorOfStrings(_o->callbacks_post_save);
   auto _callbacks_pre_load = _fbb.CreateVectorOfStrings(_o->callbacks_pre_load);
   auto _callbacks_post_load = _fbb.CreateVectorOfStrings(_o->callbacks_post_load);
-  auto _callbacks_pre_control = _fbb.CreateVectorOfStrings(_o->callbacks_pre_control);
-  auto _callbacks_post_control = _fbb.CreateVectorOfStrings(_o->callbacks_post_control);
+  auto _callbacks_pre_loop = _fbb.CreateVectorOfStrings(_o->callbacks_pre_loop);
+  auto _callbacks_post_loop = _fbb.CreateVectorOfStrings(_o->callbacks_post_loop);
   return TEN::Save::CreateSaveGame(
       _fbb,
       _header,
@@ -9701,11 +9921,15 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _action_queue,
       _soundtracks,
       _cd_flags,
+      _postprocess_mode,
+      _postprocess_strength,
+      _postprocess_tint,
       _rope,
       _pendulum,
       _alternate_pendulum,
       _volumes,
-      _call_counters,
+      _global_event_sets,
+      _volume_event_sets,
       _script_vars,
       _callbacks_pre_start,
       _callbacks_post_start,
@@ -9715,8 +9939,8 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _callbacks_post_save,
       _callbacks_pre_load,
       _callbacks_post_load,
-      _callbacks_pre_control,
-      _callbacks_post_control);
+      _callbacks_pre_loop,
+      _callbacks_post_loop);
 }
 
 inline bool VerifyVarUnion(flatbuffers::Verifier &verifier, const void *obj, VarUnion type) {

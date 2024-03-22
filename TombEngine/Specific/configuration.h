@@ -1,7 +1,7 @@
 #pragma once
 #include "Math/Math.h"
 #include "Specific/Input/Input.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -22,6 +22,7 @@ constexpr auto REGKEY_SHADOW_MAP_SIZE	   = "ShadowMapSize";
 constexpr auto REGKEY_SHADOW_BLOBS_MAX	   = "ShadowBlobsMax";
 constexpr auto REGKEY_ENABLE_CAUSTICS	   = "EnableCaustics";
 constexpr auto REGKEY_ANTIALIASING_MODE	   = "AntialiasingMode";
+constexpr auto REGKEY_AMBIENT_OCCLUSION	   = "AmbientOcclusion";
 
 // Sound keys
 constexpr auto REGKEY_SOUND_DEVICE	= "SoundDevice";
@@ -31,22 +32,33 @@ constexpr auto REGKEY_MUSIC_VOLUME	= "MusicVolume";
 constexpr auto REGKEY_SFX_VOLUME	= "SfxVolume";
 
 // Gameplay keys
-constexpr auto REGKEY_ENABLE_SUBTITLES		   = "EnableSubtitles";
-constexpr auto REGKEY_ENABLE_AUTO_TARGETING	   = "EnableAutoTargeting";
-constexpr auto REGKEY_ENABLE_IK				   = "EnableIK";
-constexpr auto REGKEY_ENABLE_RUMBLE			   = "EnableRumble";
-constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA = "EnableThumbstickCamera";
+constexpr auto REGKEY_ENABLE_SUBTITLES			= "EnableSubtitles";
+constexpr auto REGKEY_ENABLE_AUTO_TARGETING		= "EnableAutoTargeting";
+constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER = "EnableTargetHighlighter";
+constexpr auto REGKEY_ENABLE_IK					= "EnableIK";
+constexpr auto REGKEY_ENABLE_RUMBLE				= "EnableRumble";
+constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	= "EnableThumbstickCamera";
+
+// Input keys
+constexpr auto REGKEY_MOUSE_SENSITIVITY = "MouseSensitivity";
+constexpr auto REGKEY_MOUSE_SMOOTHING	= "MouseSmoothing";
 
 struct GameConfiguration 
 {
+	static constexpr auto DEFAULT_SHADOW_MAP_SIZE	= 1024;
+	static constexpr auto DEFAULT_SHADOW_BLOBS_MAX	= 16;
+	static constexpr auto DEFAULT_MOUSE_SENSITIVITY = 6;
+	static constexpr auto DEFAULT_MOUSE_SMOOTHING	= 1;
+
 	// Graphics
 	int		   ScreenWidth		  = 0;
 	int		   ScreenHeight		  = 0;
 	bool	   EnableWindowedMode = false;
 	ShadowMode ShadowType		  = ShadowMode::None;
-	int		   ShadowMapSize	  = 1024;
-	int		   ShadowBlobsMax	  = 16;
+	int		   ShadowMapSize	  = DEFAULT_SHADOW_MAP_SIZE;
+	int		   ShadowBlobsMax	  = DEFAULT_SHADOW_BLOBS_MAX;
 	bool	   EnableCaustics	  = false;
+	bool	   EnableAmbientOcclusion = false;
 	AntialiasingMode AntialiasingMode = AntialiasingMode::None;
 
 	// Sound
@@ -57,13 +69,16 @@ struct GameConfiguration
 	int	 SfxVolume	  = 0;
 
 	// Gameplay
-	bool EnableSubtitles		= false;
-	bool EnableAutoTargeting	= false;
+	bool EnableSubtitles		 = false;
+	bool EnableAutoTargeting	 = false;
+	bool EnableTargetHighlighter = false;
 	bool EnableIK				= false;
-	bool EnableRumble			= false;
-	bool EnableThumbstickCamera = false;
+	bool EnableRumble			 = false;
+	bool EnableThumbstickCamera	 = false;
 
 	// Input
+	int MouseSensitivity = DEFAULT_MOUSE_SENSITIVITY;
+	int MouseSmoothing	 = DEFAULT_MOUSE_SMOOTHING;
 	std::vector<int> Bindings = {};
 
 	std::vector<Vector2i> SupportedScreenResolutions = {};

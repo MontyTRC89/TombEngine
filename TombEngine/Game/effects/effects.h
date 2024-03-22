@@ -1,6 +1,6 @@
 #pragma once
 #include "Math/Math.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 enum class LaraWeaponType;
 enum GAME_OBJECT_ID : short;
@@ -154,11 +154,11 @@ struct Particle
 	unsigned char fadeToBlack;
 	int sLife;
 	int life;
-	BLEND_MODES blendMode;
+	BlendMode blendMode;
 	unsigned char extras;
 	signed char dynamic;
-	unsigned char fxObj;
-	unsigned char roomNumber;
+	int fxObj;
+	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
 };
 
@@ -211,9 +211,10 @@ extern FX_INFO EffectList[NUM_EFFECTS];
 template <typename TEffect>
 TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
 {
+	assertion(effects.size() <= countMax, "Too many particle effects.");
+
 	// Add and return new effect.
-	assert(effects.size() <= countMax);
-	if (effects.size() != countMax)
+	if (effects.size() < countMax)
 		return effects.emplace_back();
 
 	TEffect* effectPtr = nullptr;
@@ -272,9 +273,11 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vector3& color, int additional);
 void SpawnCorpseEffect(const Vector3& pos);
 void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale);
-void WadeSplash(ItemInfo* item, int wh, int wd);
+void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth);
 void Splash(ItemInfo* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
+
+void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff);

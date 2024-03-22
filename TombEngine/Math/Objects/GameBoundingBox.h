@@ -26,7 +26,7 @@ struct ObjectInfo;
 		GameBoundingBox() {};
 		GameBoundingBox(float x1, float x2, float y1, float y2, float z1, float z2);
 		GameBoundingBox(GAME_OBJECT_ID objectID, int animNumber = 0, int frameNumber = 0);
-		GameBoundingBox(ItemInfo* item);
+		GameBoundingBox(const ItemInfo* item);
 
 		// Getters
 		int		GetWidth() const;
@@ -36,7 +36,7 @@ struct ObjectInfo;
 		Vector3 GetExtents() const;
 
 		// Utilities
-		void RotateNoPersp(const EulerAngles& orient, const GameBoundingBox& bounds);
+		void Rotate(const EulerAngles& rot);
 
 		// Converters
 		BoundingOrientedBox ToBoundingOrientedBox(const Pose& pose) const;
@@ -47,7 +47,7 @@ struct ObjectInfo;
 		GameBoundingBox operator +(const Pose& pose) const;
 		GameBoundingBox operator -(const GameBoundingBox& bounds) const;
 		GameBoundingBox operator -(const Pose& pose) const;
-		GameBoundingBox operator *(float scale) const;
-		GameBoundingBox operator /(float scale) const;
+		GameBoundingBox operator *(float scalar) const;
+		GameBoundingBox operator /(float scalar) const;
 	};
 //}
