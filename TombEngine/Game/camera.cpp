@@ -534,20 +534,21 @@ static void UpdateAzimuthAngle(const ItemInfo& item)
 	constexpr auto AUTO_ROT_DELTA_ANGLE_MAX = BASE_ANGLE * 1.5f;
 	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.01f;
 
-	// Modify azimuth angle.
-	if (IsUsingModernControls() && !IsPlayerStrafing(item) &&
-		GetMoveAxis() != Vector2::Zero && item.Animation.Velocity.z != 0.0f)
+	if (!IsUsingModernControls() || IsPlayerStrafing(item))
+		return;
+
+	if (GetMoveAxis() == Vector2::Zero || item.Animation.Velocity.z == 0.0f)
+		return;
+
+	short deltaAngle = Geometry::GetShortestAngle(Camera.actualAngle, GetPlayerHeadingAngleY(item));
+	if (abs(deltaAngle) <= BASE_ANGLE)
 	{
-		short deltaAngle = Geometry::GetShortestAngle(Camera.actualAngle, GetPlayerHeadingAngleY(item));
-		if (abs(deltaAngle) <= BASE_ANGLE)
-		{
-			Camera.actualAngle += deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA;
-		}
-		else if (abs(deltaAngle) <= AUTO_ROT_DELTA_ANGLE_MAX)
-		{
-			int sign = std::copysign(1, deltaAngle);
-			Camera.actualAngle += (BASE_ANGLE * AZIMUTH_ANGLE_LERP_ALPHA) * sign;
-		}
+		Camera.actualAngle += deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA;
+	}
+	else if (abs(deltaAngle) <= AUTO_ROT_DELTA_ANGLE_MAX)
+	{
+		int sign = std::copysign(1, deltaAngle);
+		Camera.actualAngle += (BASE_ANGLE * AZIMUTH_ANGLE_LERP_ALPHA) * sign;
 	}
 }
 
