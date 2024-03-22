@@ -95,8 +95,7 @@ struct CAMERA_INFO
 	int timer;
 	ItemInfo* item;
 	ItemInfo* lastItem;
-	int mikeAtLara;
-	Vector3i mikePos;
+	Vector3 ListenerPosition = Vector3::Zero;
 
 	bool fixedCamera			 = false;
 	bool underwater				 = false;
@@ -157,7 +156,7 @@ void SetScreenFadeIn(float speed, bool force = false);
 void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
 void UpdateFadeScreenAndCinematicBars();
-void UpdateMikePos(const ItemInfo& item);
+void UpdateListenerPosition(const ItemInfo& item);
 void ClearObjCamera();
 
 float GetParticleDistanceFade(const Vector3i& pos);

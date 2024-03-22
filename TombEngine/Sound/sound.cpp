@@ -706,15 +706,15 @@ int Sound_GetFreeSlot()
 
 	// No free slots, hijack now.
 
-	float minDistance = 0;
+	float distMin = 0;
 	int farSlot = SOUND_NO_CHANNEL;
 
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
-		float distance = Vector3(SoundSlot[i].Origin - Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z)).Length();
-		if (distance > minDistance)
+		float dist = Vector3(SoundSlot[i].Origin - Camera.ListenerPosition).Length();
+		if (dist > distMin)
 		{
-			minDistance = distance;
+			distMin = dist;
 			farSlot = i;
 		}
 	}
@@ -793,7 +793,7 @@ float Sound_DistanceToListener(Pose *position)
 }
 float Sound_DistanceToListener(Vector3 position)
 {
-	return Vector3(Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z) - position).Length();
+	return Vector3(Camera.ListenerPosition - position).Length();
 }
 
 // Calculate attenuated volume.
@@ -922,23 +922,19 @@ void Sound_UpdateScene()
 
 	// Apply current listener position.
 
-	Vector3 at = Vector3(Camera.LookAt.x, Camera.LookAt.y, Camera.LookAt.z) -
-		Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z);
+	auto at = Camera.LookAt - Camera.ListenerPosition;
 	at.Normalize();
 	auto mikePos = BASS_3DVECTOR(					// Pos
-		Camera.mikePos.x,
-		Camera.mikePos.y,
-		Camera.mikePos.z);
+		Camera.ListenerPosition.x,
+		Camera.ListenerPosition.y,
+		Camera.ListenerPosition.z);
 	auto laraVel = BASS_3DVECTOR(					// Vel
 		Lara.Context.WaterCurrentPull.x,
 		Lara.Context.WaterCurrentPull.y,
 		Lara.Context.WaterCurrentPull.z);
 	auto atVec = BASS_3DVECTOR(at.x, at.y, at.z);	// At
 	auto upVec = BASS_3DVECTOR(0.0f, 1.0f, 0.0f);	// Up
-	BASS_Set3DPosition(&mikePos,
-					   &laraVel,
-					   &atVec,
-					   &upVec);
+	BASS_Set3DPosition(&mikePos, &laraVel, &atVec, &upVec);
 	BASS_Apply3D();
 }
 

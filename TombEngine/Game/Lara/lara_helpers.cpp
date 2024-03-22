@@ -864,7 +864,7 @@ void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 	auto upperFlexRot = EulerAngles(player.ExtraHeadRot.x, upperFlexAngleY, upperFlexAngleZ);
 
 	// Flex hips, torso, and head.
-	player.ExtraHipRot.Lerp(lowerFlexRot, alpha);
+	player.LimbRot.Hip.Lerp(lowerFlexRot, alpha);
 	player.ExtraTorsoRot.Lerp(upperFlexRot * TORSO_ROT_COEFF, alpha);
 	player.ExtraHeadRot.Lerp((upperFlexRot * HEAD_ROT_COEFF) * headFlexSign, alpha);
 }
@@ -2149,7 +2149,7 @@ void ResetPlayerFlex(ItemInfo* item, float alpha)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.ExtraHipRot.Lerp(EulerAngles::Identity, alpha);
+	player.LimbRot.Hip.Lerp(EulerAngles::Identity, alpha);
 	player.ExtraTorsoRot.Lerp(EulerAngles::Identity, alpha);
 	player.ExtraHeadRot.Lerp(EulerAngles::Identity, alpha);
 }

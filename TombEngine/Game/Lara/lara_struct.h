@@ -1270,10 +1270,10 @@ struct WeaponControlData
 
 struct PlayerControlData
 {
-	// Used in tank control modes.
+	// Tank control
 	EulerAngles TurnRate = EulerAngles::Identity;
 
-	// Used in modern control mode.
+	// Modern control
 	EulerAngles HeadingOrient		= EulerAngles::Identity;
 	EulerAngles HeadingOrientTarget = EulerAngles::Identity;
 	Vector2		RefMoveAxis			= Vector3::Zero;
@@ -1300,7 +1300,6 @@ struct PlayerControlData
 	bool IsLow			  = false;
 	bool IsMonkeySwinging = false;
 	bool IsMoving		  = false;
-	bool IsStrafing		  = false; // savegame
 	bool IsRunJumpQueued  = false;
 	bool KeepLow		  = false;
 
@@ -1336,7 +1335,6 @@ struct PlayerInventoryData
 	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
 	byte BigWaterskin;	  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6 (has skin + 5 liters = 6)
 
-	// TODO: Rename prefixes back to "Num".
 	int TotalSmallMedipacks;
 	int TotalLargeMedipacks;
 	int TotalFlares;
@@ -1358,6 +1356,17 @@ struct PlayerInventoryData
 	int ExaminesCombo[NUM_EXAMINES * 2] = {};
 };
 
+// TODO: Savegame.
+struct PlayerLimbRotationData
+{
+	EulerAngles Hip	  = EulerAngles::Identity;
+	EulerAngles Torso = EulerAngles::Identity;
+	EulerAngles Head  = EulerAngles::Identity;
+
+	EulerAngles LeftArm	 = EulerAngles::Identity;
+	EulerAngles RightArm = EulerAngles::Identity;
+};
+
 struct LaraInfo
 {
 	static constexpr auto TARGET_COUNT_MAX = 16;
@@ -1371,12 +1380,14 @@ struct LaraInfo
 	// TODO: Move to PlayerControlData.
 	FlareData		  Flare = {};
 	TorchData		  Torch = {};
-	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {}; // TODO: Move to WeaponControlData.
 
-	EulerAngles ExtraHipRot		= EulerAngles::Identity; // TODO: Savegame.
-	EulerAngles ExtraTorsoRot	= EulerAngles::Identity;
-	EulerAngles ExtraHeadRot	= EulerAngles::Identity;
-	EulerAngles TargetArmOrient = EulerAngles::Identity;
+	// TODO: Move to PlayerInventoryData.
+	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {};
+
+	PlayerLimbRotationData LimbRot = {};
+	EulerAngles ExtraTorsoRot	= EulerAngles::Identity; // Deprecated.
+	EulerAngles ExtraHeadRot	= EulerAngles::Identity; // Deprecated.
+	EulerAngles TargetArmOrient = EulerAngles::Identity; // Deprecated.
 	ArmInfo		LeftArm			= {};
 	ArmInfo		RightArm		= {};
 

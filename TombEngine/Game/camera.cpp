@@ -537,7 +537,7 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	if (player.Control.Look.IsUsingBinoculars)
 		speed = 1.0f;
 
-	UpdateMikePos(playerItem);
+	UpdateListenerPosition(playerItem);
 
 	OldCam.pos.Orientation = playerItem.Pose.Orientation;
 	OldCam.pos2.Orientation.x = player.ExtraHeadRot.x;
@@ -1200,7 +1200,7 @@ void BinocularCamera(ItemInfo* item)
 
 	Camera.LookAtRoomNumber = GetCollision(Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.LookAtRoomNumber).RoomNumber;
 	LookAt(Camera, 0);
-	UpdateMikePos(*item);
+	UpdateListenerPosition(*item);
 	Camera.oldType = Camera.type;
 
 	auto origin0 = GameVector(Camera.Position, Camera.RoomNumber);
@@ -1516,46 +1516,32 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, fl
 	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
 }
 
-void UpdateMikePos(const ItemInfo& item)
+void UpdateListenerPosition(const ItemInfo& item)
 {
 	constexpr auto BASE_ANGLE				= ANGLE(90.0f);
 	constexpr auto AUTO_ROT_DELTA_ANGLE_MAX = BASE_ANGLE * 1.5f;
 	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.01f;
 
-	if (Camera.mikeAtLara)
+	// TODO: Move this elsewhere.
+	// Modify azimuth angle.
+	if (IsUsingModernControls() && !IsPlayerStrafing(item) &&
+		GetMoveAxis() != Vector2::Zero && item.Animation.Velocity.z != 0.0f)
 	{
-		Camera.mikePos = item.Pose.Position.ToVector3();
-		Camera.actualAngle = item.Pose.Orientation.y;
-
-		if (item.IsLara())
+		short deltaAngle = Geometry::GetShortestAngle(Camera.actualAngle, GetPlayerHeadingAngleY(item));
+		if (abs(deltaAngle) <= BASE_ANGLE)
 		{
-			const auto& player = GetLaraInfo(item);
-			Camera.actualAngle += player.ExtraHeadRot.y + player.ExtraTorsoRot.y;
+			Camera.actualAngle += deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA;
+		}
+		else if (abs(deltaAngle) <= AUTO_ROT_DELTA_ANGLE_MAX)
+		{
+			int sign = std::copysign(1, deltaAngle);
+			Camera.actualAngle += (BASE_ANGLE * AZIMUTH_ANGLE_LERP_ALPHA) * sign;
 		}
 	}
-	else
-	{
-		// Modify azimuth angle.
-		if (IsUsingModernControls() && !IsPlayerStrafing(item) &&
-			GetMoveAxis() != Vector2::Zero && item.Animation.Velocity.z != 0.0f)
-		{
-			short deltaAngle = Geometry::GetShortestAngle(Camera.actualAngle, GetPlayerHeadingAngleY(item));
-			if (abs(deltaAngle) <= BASE_ANGLE)
-			{
-				Camera.actualAngle += deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA;
-			}
-			else if (abs(deltaAngle) <= AUTO_ROT_DELTA_ANGLE_MAX)
-			{
-				int sign = std::copysign(1, deltaAngle);
-				Camera.actualAngle += (BASE_ANGLE * sign) * AZIMUTH_ANGLE_LERP_ALPHA;
-			}
-		}
 
-		int perspective = ((g_Configuration.ScreenWidth / 2) * phd_cos(CurrentFOV / 2)) / phd_sin(CurrentFOV / 2);
-		Camera.mikePos.x = Camera.Position.x + (perspective * phd_sin(Camera.actualAngle));
-		Camera.mikePos.z = Camera.Position.z + (perspective * phd_cos(Camera.actualAngle));
-		Camera.mikePos.y = Camera.Position.y;
-	}
+	// Update listener position.
+	float persp = ((g_Configuration.ScreenWidth / 2) * phd_cos(CurrentFOV / 2)) / phd_sin(CurrentFOV / 2);
+	Camera.ListenerPosition = Camera.Position + (persp * Vector3(phd_sin(Camera.actualAngle), 0.0f, phd_cos(Camera.actualAngle)));
 }
 
 void RumbleScreen()
