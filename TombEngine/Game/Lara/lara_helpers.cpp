@@ -1154,7 +1154,8 @@ static PlayerLimbRotationData SolvePlayerLegIK(const ItemInfo& item, const Playe
 		g_Renderer.AddDebugLine(refMiddle, refEnd, Vector4::One);
 	}
 
-	return PlayerLimbRotationData{ baseOrient, middleOrient, limbRot.End };
+	return limbRot;
+	//return PlayerLimbRotationData{ baseOrient, middleOrient, limbRot.End };
 }
 
 void HandlePlayerLegIK(ItemInfo& item)
