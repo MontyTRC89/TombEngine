@@ -1331,30 +1331,34 @@ struct PlayerInventoryData
 	int ExaminesCombo[NUM_EXAMINES * 2] = {};
 };
 
-struct LimbRotationData
+struct PlayerLimbRotationData
 {
-	Quaternion Base   = Quaternion::Identity;
-	Quaternion Middle = Quaternion::Identity;
-	Quaternion End	  = Quaternion::Identity;
+	EulerAngles Base   = EulerAngles::Identity;
+	EulerAngles Middle = EulerAngles::Identity;
+	EulerAngles End	   = EulerAngles::Identity;
 };
 
-struct JointRotationData
+struct PlayerJointRotationData
 {
-	EulerAngles Head  = EulerAngles::Zero;
-	EulerAngles Torso = EulerAngles::Zero;
+	// Midsection
+	EulerAngles Hip	  = EulerAngles::Identity;
+	EulerAngles Torso = EulerAngles::Identity;
+	EulerAngles Head  = EulerAngles::Identity;
 
-	LimbRotationData LeftArm  = {};
-	LimbRotationData RightArm = {};
-	LimbRotationData LeftLeg  = {};
-	LimbRotationData RightLeg = {};
+	// Limbs
+	/*PlayerLimbRotationData LeftArm	= {};
+	PlayerLimbRotationData RightArm = {};*/
+	PlayerLimbRotationData LeftLeg	= {};
+	PlayerLimbRotationData RightLeg = {};
+
+	// Arms
+	EulerAngles LeftArm	 = EulerAngles::Identity;
+	EulerAngles RightArm = EulerAngles::Identity;
 };
 
 struct LaraInfo
 {
 	static constexpr auto TARGET_COUNT_MAX = 16;
-
-	int VerticalOffset = 0;
-	JointRotationData ExtraJointRot = {};
 
 	PlayerContext		Context	  = PlayerContext();
 	PlayerControlData	Control	  = {};
@@ -1366,6 +1370,9 @@ struct LaraInfo
 	FlareData		  Flare = {};
 	TorchData		  Torch = {};
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {}; // TODO: Move to WeaponControlData.
+
+	int VerticalOffset = 0;
+	PlayerJointRotationData JointRot = {};
 
 	EulerAngles ExtraHeadRot	= EulerAngles::Identity;
 	EulerAngles ExtraTorsoRot	= EulerAngles::Identity;

@@ -6,7 +6,6 @@ enum class WaterStatus;
 struct ItemInfo;
 struct CollisionInfo;
 struct LaraInfo;
-struct LimbRotationData;
 struct VaultTestResult;
 
 struct PlayerWaterData

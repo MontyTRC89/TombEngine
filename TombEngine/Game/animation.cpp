@@ -712,8 +712,3 @@ float GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex)
 	auto nextBoneOffset = GetJointOffset(objectID, boneIndex + 1);
 	return nextBoneOffset.Length();
 }
-
-Matrix& GetJointMatrix(const ItemInfo& item, int jointIndex)
-{
-	return g_Renderer.GetItemBoneMatrix(item.Index, jointIndex);
-}

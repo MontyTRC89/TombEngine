@@ -156,5 +156,3 @@ Vector3i   GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite);
 Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex);
 Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex);
 float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneIndex);
-
-Matrix& GetJointMatrix(const ItemInfo& item, int jointIndex);

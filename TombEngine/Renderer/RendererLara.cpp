@@ -103,12 +103,12 @@ void Renderer::UpdateLaraAnimations(bool force)
 	playerObject.LinearizedBones[LM_HEAD]->ExtraRotation = Lara.ExtraHeadRot.ToQuaternion();
 
 	// Update extra leg rotations for IK.
-	playerObject.LinearizedBones[LM_LTHIGH]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.Base;
-	playerObject.LinearizedBones[LM_LSHIN]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.Middle;
-	playerObject.LinearizedBones[LM_LFOOT]->ExtraRotation = Lara.ExtraJointRot.LeftLeg.End;
-	playerObject.LinearizedBones[LM_RTHIGH]->ExtraRotation = Lara.ExtraJointRot.RightLeg.Base;
-	playerObject.LinearizedBones[LM_RSHIN]->ExtraRotation = Lara.ExtraJointRot.RightLeg.Middle;
-	playerObject.LinearizedBones[LM_RFOOT]->ExtraRotation = Lara.ExtraJointRot.RightLeg.End;
+	playerObject.LinearizedBones[LM_LTHIGH]->ExtraRotation = Lara.JointRot.LeftLeg.Base.ToQuaternion();
+	playerObject.LinearizedBones[LM_LSHIN]->ExtraRotation = Lara.JointRot.LeftLeg.Middle.ToQuaternion();
+	playerObject.LinearizedBones[LM_LFOOT]->ExtraRotation = Lara.JointRot.LeftLeg.End.ToQuaternion();
+	playerObject.LinearizedBones[LM_RTHIGH]->ExtraRotation = Lara.JointRot.RightLeg.Base.ToQuaternion();
+	playerObject.LinearizedBones[LM_RSHIN]->ExtraRotation = Lara.JointRot.RightLeg.Middle.ToQuaternion();
+	playerObject.LinearizedBones[LM_RFOOT]->ExtraRotation = Lara.JointRot.RightLeg.End.ToQuaternion();
 
 	// First calculate matrices for legs, hips, head, and torso.
 	int mask = MESH_BITS(LM_HIPS) | MESH_BITS(LM_LTHIGH) | MESH_BITS(LM_LSHIN) | MESH_BITS(LM_LFOOT) | MESH_BITS(LM_RTHIGH) | MESH_BITS(LM_RSHIN) | MESH_BITS(LM_RFOOT) | MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
