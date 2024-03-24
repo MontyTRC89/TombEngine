@@ -110,6 +110,17 @@ constexpr auto WADE_WATER_DEPTH		= STEPUP_HEIGHT;
 constexpr auto SWIM_WATER_DEPTH		= CLICK(2.75f);
 constexpr auto SLOPE_DIFFERENCE		= 60;
 
+static const auto PLAYER_STRAFE_STATE_IDS = std::vector<int>
+{
+	LS_IDLE,
+	LS_RUN_FORWARD,
+	LS_SKIP_BACK,
+	LS_WALK_FORWARD,
+	LS_WALK_BACK,
+	LS_STEP_LEFT,
+	LS_STEP_RIGHT
+};
+
 extern LaraInfo Lara;
 extern ItemInfo* LaraItem;
 extern CollisionInfo LaraCollision;

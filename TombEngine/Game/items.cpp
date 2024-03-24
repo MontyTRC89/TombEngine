@@ -179,15 +179,9 @@ void ItemInfo::ResetModelToDefault()
 	}
 }
 
-bool TestState(int refState, const std::vector<int>& stateList)
+bool TestState(int refStateID, const std::vector<int>& stateIds)
 {
-	for (const auto& state : stateList)
-	{
-		if (state == refState)
-			return true;
-	}
-
-	return false;
+	return Contains(stateIds, refStateID);
 }
 
 static void GameScriptHandleKilled(short itemNumber, bool destroyed)

@@ -172,7 +172,7 @@ struct ItemInfo
 	void ResetModelToDefault();
 };
 
-bool TestState(int refState, const std::vector<int>& stateList);
+bool TestState(int refStateID, const std::vector<int>& stateIds);
 void EffectNewRoom(short fxNumber, short roomNumber);
 void ItemNewRoom(short itemNumber, short roomNumber);
 void AddActiveItem(short itemNumber);

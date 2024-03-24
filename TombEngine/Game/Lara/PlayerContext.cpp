@@ -759,9 +759,6 @@ namespace TEN::Entities::Player
 
 	bool CanMonkeySwingBackward(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		if (IsUsingClassicControls())
-			return false;
-
 		auto setup = MonkeySwingMovementSetupData
 		{
 			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? 0 : ANGLE(180.0f))),

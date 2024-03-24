@@ -1220,11 +1220,15 @@ bool IsPlayerStrafing(const ItemInfo& item)
 	if (!IsUsingModernControls())
 		return false;
 
-	// 2) Test for Look input action.
+	// 2) Test for strafe state.
+	if (!TestState(item.Animation.ActiveState, PLAYER_STRAFE_STATE_IDS))
+		return false;
+
+	// 3) Test for Look input action.
 	if (IsHeld(In::Look))
 		return true;
 
-	// 3) Test for combat stance.
+	// 4) Test for combat stance.
 	if (player.Control.HandStatus == HandStatus::WeaponDraw ||
 		player.Control.HandStatus == HandStatus::WeaponReady)
 	{

@@ -11,8 +11,10 @@
 #include "Game/Lara/lara_tests.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
+#include "Specific/configuration.h"
 #include "Specific/level.h"
 
+using namespace TEN::Config;
 using namespace TEN::Input;
 using namespace TEN::Entities::Player;
 
@@ -78,10 +80,18 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(In::Forward))
+	if (IsUsingModernControls() && ((IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))))
+	{
 		item->Animation.TargetState = LS_RUN_FORWARD;
+	}
+	else if (IsHeld(In::Forward))
+	{
+		item->Animation.TargetState = LS_RUN_FORWARD;
+	}
 	else
+	{
 		item->Animation.TargetState = LS_IDLE;
+	}
 
 	StopSoundEffect(SFX_TR4_LARA_SLIPPING);
 	return;
