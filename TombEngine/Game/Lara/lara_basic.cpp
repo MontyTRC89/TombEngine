@@ -111,6 +111,7 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 	EasePlayerElevation(item, player.Context.ProjectedFloorHeight - item->Pose.Position.y);
 	item->Pose.Orientation.Lerp(player.Context.TargetOrientation, 0.4f);
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -224,6 +225,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -387,6 +389,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	if (IsUsingModernControls())
 	{
 		item->Animation.TargetState = HasStateDispatch(item, LS_RUN_FORWARD_CANCEL) ? LS_RUN_FORWARD_CANCEL : LS_IDLE;
@@ -505,53 +508,54 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		player.Control.ToggleWalk = true;
 
 	// Turn.
-	if (IsUsingModernControls())
+	if (IsUsingClassicControls())
 	{
+		if ((IsHeld(In::Forward) || abs(player.Control.TurnRate.y) >= LARA_MED_TURN_RATE_MAX) &&
+			(IsHeld(In::Left) || IsHeld(In::Right)))
+		{
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_FAST_TURN_RATE_MAX);
+		}
+		else
+		{
+			ResetPlayerTurnRateY(*item);
+		}
+	}
+	else if (IsUsingEnhancedControls())
+	{
+		// Jump locks orientation.
+		if (!IsHeld(In::Jump))
+		{
+			// Sidestep locks orientation.
+			if ((IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left))) ||
+				(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right))))
+			{
+				ResetPlayerTurnRateY(*item);
+			}
+			else if (IsHeld(In::Left) || IsHeld(In::Right))
+			{
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
+			}
+		}
+	}
+	else if (IsUsingModernControls())
+	{
+		float turnAlpha = isWading ?
+			PLAYER_WADE_TURN_ALPHA * (isInSwamp ? 0.5f : 1.0f) :
+			PLAYER_STANDARD_TURN_ALPHA;
+
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			// Directional jump intent locks orientation.
 			if (!(IsPlayerStrafing(*item) || (IsHeld(In::Jump) && IsHeld(In::Walk))))
 			{
-				HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
-				HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
+				HandlePlayerTurnY(*item, turnAlpha);
+				HandlePlayerTurnFlex(*item, turnAlpha);
 			}
 		}
 		else if (IsPlayerStrafing(*item))
 		{
-			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
-			HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA);
-		}
-	}
-	else
-	{
-		if (IsUsingClassicControls())
-		{
-			if ((IsHeld(In::Forward) || abs(player.Control.TurnRate.y) >= LARA_MED_TURN_RATE_MAX) &&
-				(IsHeld(In::Left) || IsHeld(In::Right)))
-			{
-				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_FAST_TURN_RATE_MAX);
-			}
-			else
-			{
-				ResetPlayerTurnRateY(*item);
-			}
-		}
-		else if (IsUsingEnhancedControls())
-		{
-			// Jump locks orientation.
-			if (!IsHeld(In::Jump))
-			{
-				// Sidestep locks orientation.
-				if ((IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left))) ||
-					(IsHeld(In::StepRight) || (IsHeld(In::Walk) && IsHeld(In::Right))))
-				{
-					ResetPlayerTurnRateY(*item);
-				}
-				else if (IsHeld(In::Left) || IsHeld(In::Right))
-				{
-					ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
-				}
-			}
+			HandlePlayerTurnY(*item, turnAlpha);
+			HandlePlayerTurnFlex(*item, turnAlpha);
 		}
 	}
 
@@ -799,7 +803,22 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	item->Animation.TargetState = LS_IDLE;
+	// Reset.
+	if (IsPlayerStrafing(*item))
+	{
+		int turnStateID = GetPlayerStrafeTurnStateID(*item);
+		if (turnStateID != NO_VALUE)
+		{
+			item->Animation.TargetState = turnStateID;
+			return;
+		}
+
+		item->Animation.TargetState = LS_IDLE;
+	}
+	else
+	{
+		item->Animation.TargetState = LS_IDLE;
+	}
 }
 
 // State:	LS_IDLE (2), LS_POSE (4), LS_SPLAT_SOFT (170)
@@ -1066,20 +1085,32 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Turn.
-	if (isWading)
+	if (IsUsingModernControls())
 	{
-		if (IsUsingClassicControls())
-		{
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_WADE_TURN_RATE_MAX / 2);
-		}
-		else
-		{
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, isInSwamp ? LARA_SWAMP_TURN_RATE_MAX : LARA_WADE_TURN_RATE_MAX);
-		}
+		float turnAlpha = isWading ?
+			PLAYER_WADE_TURN_ALPHA * (isInSwamp ? 0.5f : 1.0f) :
+			PLAYER_STANDARD_TURN_ALPHA;
+
+		HandlePlayerTurnY(*item, turnAlpha);
+		HandlePlayerTurnFlex(*item, turnAlpha);
 	}
 	else
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
+		if (isWading)
+		{
+			if (IsUsingClassicControls())
+			{
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_WADE_TURN_RATE_MAX / 2);
+			}
+			else
+			{
+				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, isInSwamp ? LARA_SWAMP_TURN_RATE_MAX : LARA_WADE_TURN_RATE_MAX);
+			}
+		}
+		else
+		{
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
+		}
 	}
 
 	if (IsUsingClassicControls())
@@ -1270,7 +1301,22 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	item->Animation.TargetState = LS_IDLE;
+	// Reset.
+	if (IsPlayerStrafing(*item))
+	{
+		int turnStateID = GetPlayerStrafeTurnStateID(*item);
+		if (turnStateID != NO_VALUE)
+		{
+			item->Animation.TargetState = turnStateID;
+			return;
+		}
+
+		item->Animation.TargetState = LS_IDLE;
+	}
+	else
+	{
+		item->Animation.TargetState = LS_IDLE;
+	}
 }
 
 // State:	LS_TURN_RIGHT_SLOW (6), LS_TURN_LEFT_SLOW (7)

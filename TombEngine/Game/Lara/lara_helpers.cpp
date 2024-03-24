@@ -1627,6 +1627,25 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 	return JumpDirection::None;
 }
 
+int GetPlayerStrafeTurnStateID(const ItemInfo& item)
+{
+	constexpr auto DELTA_ANGLE_CONSTRAINT = ANGLE(2.5f);
+
+	const auto& player = GetLaraInfo(item);
+
+	short deltaAngele = Geometry::GetShortestAngle(player.Control.HeadingOrientTarget.y, item.Pose.Orientation.y);
+	if (deltaAngele >= DELTA_ANGLE_CONSTRAINT)
+	{
+		return LS_TURN_LEFT_SLOW;
+	}
+	else if (deltaAngele <= -DELTA_ANGLE_CONSTRAINT)
+	{
+		return LS_TURN_RIGHT_SLOW;
+	}
+
+	return NO_VALUE;
+}
+
 short GetPlayerHeadingAngleX(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
@@ -1665,7 +1684,7 @@ short GetPlayerHeadingAngleY(const ItemInfo& item)
 
 short GetPlayerRelHeadingAngleY(const ItemInfo& item)
 {
-	return Geometry::GetShortestAngle(Camera.actualAngle, GetPlayerHeadingAngleY(item));
+	return Geometry::GetShortestAngle(GetPlayerHeadingAngleY(item), Camera.actualAngle);
 }
 
 static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)

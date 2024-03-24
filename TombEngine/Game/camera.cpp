@@ -1035,7 +1035,7 @@ static bool CanControlTankCamera()
 
 void UpdateCameraSphere(const ItemInfo& playerItem)
 {
-	constexpr auto CONTROLLED_CAMERA_ROT_LERP_ALPHA = 0.6f;
+	constexpr auto CONTROLLED_CAMERA_ROT_LERP_ALPHA = 0.7f;
 	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA		= 0.3f;
 	constexpr auto LOCKED_CAMERA_ALTITUDE_ROT_ALPHA = 1 / 8.0f;
 

@@ -53,10 +53,11 @@ void DoLaraTightropeLean(ItemInfo* item);
 void DoLaraTightropeBalanceRegen(ItemInfo* item);
 void DoLaraFallDamage(ItemInfo* item);
 
-LaraInfo& GetLaraInfo(ItemInfo& item);
+LaraInfo&		GetLaraInfo(ItemInfo& item);
 const LaraInfo& GetLaraInfo(const ItemInfo& item);
-LaraInfo*& GetLaraInfo(ItemInfo* item);
-JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& coll);
+LaraInfo*&		GetLaraInfo(ItemInfo* item);
+JumpDirection	GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& coll);
+int				GetPlayerStrafeTurnStateID(const ItemInfo& item);
 
 PlayerWaterData GetPlayerWaterData(ItemInfo& item);
 short GetPlayerHeadingAngleX(const ItemInfo& item);
