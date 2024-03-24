@@ -340,7 +340,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 			
 	ScriptReserved_SetAIBits, &Moveable::SetAIBits,
 
-	ScriptReserved_GetMeshVisable, &Moveable::GetMeshVisible,
+	ScriptReserved_GetMeshCount, & Moveable::GetMeshCount,
+
+	ScriptReserved_GetMeshVisible, &Moveable::GetMeshVisible,
 			
 	ScriptReserved_SetMeshVisible, &Moveable::SetMeshVisible,
 			
@@ -948,6 +950,15 @@ short Moveable::GetStatus() const
 void Moveable::SetStatus(ItemStatus status)
 {
 	m_item->Status = status;
+}
+
+/// Get number of meshes for a particular object
+// Returns number of meshes in an object
+// @function Moveable:GetMeshCount
+// @treturn int number of meshes
+short Moveable::GetMeshCount() const
+{
+	return Objects[m_item->ObjectNumber].nmeshes;
 }
 
 /// Get state of specified mesh visibility of object
