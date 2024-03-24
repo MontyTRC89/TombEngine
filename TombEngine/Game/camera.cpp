@@ -192,6 +192,8 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 			}
 		}
 
+		return std::pair(losInstance.Position, losInstance.RoomNumber);
+
 		// Calculate intersection with distance buffer applied.
 		float intersectDist = std::max(Vector3::Distance(origin, losInstance.Position) - BUFFER, BUFFER);
 		auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);

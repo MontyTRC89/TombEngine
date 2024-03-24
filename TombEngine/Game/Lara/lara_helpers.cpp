@@ -1665,7 +1665,7 @@ short GetPlayerHeadingAngleY(const ItemInfo& item)
 
 short GetPlayerRelHeadingAngleY(const ItemInfo& item)
 {
-	return Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
+	return Geometry::GetShortestAngle(Camera.actualAngle, GetPlayerHeadingAngleY(item));
 }
 
 static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)

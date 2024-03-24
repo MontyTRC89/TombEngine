@@ -95,6 +95,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (!player.Control.IsLocked)
 		player.LocationPad = -1;
 
+	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);
+	g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));
+
 	// FAILSAFE: Force hand status reset.
 	if (item->Animation.AnimNumber == LA_STAND_IDLE &&
 		item->Animation.ActiveState == LS_IDLE &&

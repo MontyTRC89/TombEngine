@@ -283,7 +283,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = GroundMovementSetupData
 		{
-			short(item.Pose.Orientation.y + ANGLE(180.0f)),
+			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? 0 : ANGLE(180.0f))),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by run backward state.
 			false, false, false
 		};
@@ -306,7 +306,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = GroundMovementSetupData
 		{
-			short(item.Pose.Orientation.y + ANGLE(180.0f)),
+			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? 0 : ANGLE(180.0f))),
 			STEPUP_HEIGHT, -STEPUP_HEIGHT // NOTE: Bounds defined by walk backward state.
 		};
 
@@ -316,6 +316,9 @@ namespace TEN::Entities::Player
 	bool CanStrafeBackward(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto BASE_ANGLE = ANGLE(90.0f);
+
+		if (!IsUsingModernControls())
+			return false;
 
 		short relHeadingAngle = GetPlayerRelHeadingAngleY(item);
 		return (abs(relHeadingAngle) > BASE_ANGLE);
@@ -328,11 +331,12 @@ namespace TEN::Entities::Player
 		auto setup = GroundMovementSetupData{};
 
 		// Wade case.
+		short headingAngle = (IsUsingModernControls() ? Camera.actualAngle : item.Pose.Orientation.y) + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f));
 		if (player.Control.WaterStatus == WaterStatus::Wade)
 		{
 			setup = GroundMovementSetupData
 			{
-				short((IsUsingModernControls() ? Camera.actualAngle : item.Pose.Orientation.y) + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+				headingAngle,
 				-MAX_HEIGHT, -(int)CLICK(1.25f), // NOTE: Upper bound defined by sidestep left/right states.
 				false, false, false
 			};
@@ -342,7 +346,7 @@ namespace TEN::Entities::Player
 		{
 			setup = GroundMovementSetupData
 			{
-				short((IsUsingModernControls() ? Camera.actualAngle : item.Pose.Orientation.y) + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+				headingAngle,
 				(int)CLICK(0.8f), -(int)CLICK(0.8f) // NOTE: Bounds defined by sidestep left/right states.
 			};
 		}
@@ -389,7 +393,7 @@ namespace TEN::Entities::Player
 
 		auto setup = GroundMovementSetupData
 		{
-			short(item.Pose.Orientation.y + ANGLE(180.0f)),
+			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? 0 : ANGLE(180.0f))),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by walk backward state.
 			false, false, false
 		};
@@ -570,7 +574,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = GroundMovementSetupData
 		{
-			item.Pose.Orientation.y,
+			GetPlayerHeadingAngleY(item),
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // NOTE: Bounds defined by crawl forward state.
 		};
 
@@ -581,7 +585,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = GroundMovementSetupData
 		{
-			short(item.Pose.Orientation.y + ANGLE(180.0f)),
+			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? 0 : ANGLE(180.0f))),
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // NOTE: Bounds defined by crawl backward state.
 		};
 
@@ -746,7 +750,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = MonkeySwingMovementSetupData
 		{
-			item.Pose.Orientation.y,
+			GetPlayerHeadingAngleY(item),
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // NOTE: Bounds defined by monkey forward state.
 		};
 
@@ -760,7 +764,7 @@ namespace TEN::Entities::Player
 
 		auto setup = MonkeySwingMovementSetupData
 		{
-			short(item.Pose.Orientation.y + ANGLE(180.0f)),
+			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? 0 : ANGLE(180.0f))),
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // NOTE: Bounds defined by monkey backward state.
 		};
 
@@ -771,7 +775,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = MonkeySwingMovementSetupData
 		{
-			short(item.Pose.Orientation.y + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+			short((IsUsingModernControls() ? Camera.actualAngle : item.Pose.Orientation.y) + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 			(int)CLICK(0.5f), -(int)CLICK(0.5f) // NOTE: Bounds defined by monkey shimmy left/right states.
 		};
 
@@ -967,7 +971,7 @@ namespace TEN::Entities::Player
 
 		auto setup = JumpSetupData
 		{
-			item.Pose.Orientation.y,
+			GetPlayerHeadingAngleY(item),
 			CLICK(3 / 2.0f)
 		};
 
@@ -993,7 +997,7 @@ namespace TEN::Entities::Player
 
 		auto setup = JumpSetupData
 		{
-			item.Pose.Orientation.y,
+			GetPlayerHeadingAngleY(item),
 			CLICK(1.8f)
 		};
 

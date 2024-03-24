@@ -21,6 +21,9 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+#include "Renderer/Renderer.h"
+using TEN::Renderer::g_Renderer;
+
 using namespace TEN::Config;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
@@ -606,13 +609,6 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		// TEMP
-		if (IsHeld(In::Back) && IsPlayerStrafing(*item))
-		{
-			item->Animation.TargetState = LS_SKIP_BACK;
-			return;
-		}
-
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			if (IsHeld(In::Action))
@@ -626,28 +622,50 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				}
 			}
 
-			if (CanWadeForward(*item, *coll))
+			// TODO
+			if (!CanStrafeBackward(*item, *coll))
 			{
-				item->Animation.TargetState = LS_WADE_FORWARD;
-				return;
-			}
-			else if (IsHeld(In::Walk))
-			{
-				if (CanWalkForward(*item, *coll))
+				if (CanWadeForward(*item, *coll))
 				{
-					item->Animation.TargetState = LS_WALK_FORWARD;
+					item->Animation.TargetState = LS_WADE_FORWARD;
+					return;
+				}
+				else if (IsHeld(In::Walk))
+				{
+					if (CanWalkForward(*item, *coll))
+					{
+						item->Animation.TargetState = LS_WALK_FORWARD;
+						return;
+					}
+				}
+				else if (CanRunForward(*item, *coll))
+				{
+					if (IsHeld(In::Sprint))
+					{
+						item->Animation.TargetState = LS_SPRINT;
+					}
+					else
+					{
+						item->Animation.TargetState = LS_RUN_FORWARD;
+					}
+
 					return;
 				}
 			}
-			else if (CanRunForward(*item, *coll))
+			else
 			{
-				if (IsHeld(In::Sprint))
+				if (CanWadeBackward(*item, *coll))
 				{
-					item->Animation.TargetState = LS_SPRINT;
+					item->Animation.TargetState = LS_WALK_BACK;
 				}
-				else
+				if (IsHeld(In::Walk))
 				{
-					item->Animation.TargetState = LS_RUN_FORWARD;
+					if (CanWalkBackward(*item, *coll))
+						item->Animation.TargetState = LS_WALK_BACK;
+				}
+				else if (CanRunBackward(*item, *coll))
+				{
+					item->Animation.TargetState = LS_SKIP_BACK;
 				}
 
 				return;
@@ -1374,8 +1392,19 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// Turn.
-	if (!IsUsingModernControls())
+	if (IsUsingModernControls())
+	{
+		// TODO
+		if (IsPlayerStrafing(*item))
+		{
+			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
+			HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
+
+			item->Animation.TargetState = LS_WALK_BACK;
+			return;
+		}
+	}
+	else
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -1409,7 +1438,7 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
-	player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(180.0f);
+	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : STEPUP_HEIGHT;
