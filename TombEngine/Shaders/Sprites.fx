@@ -3,6 +3,7 @@
 #include "./VertexInput.hlsli"
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
+#include "./SpriteEffects.hlsli"
 
 // NOTE: This shader is used for all 3D and alpha blended sprites, because we send aleady transformed vertices to the GPU 
 // instead of instances

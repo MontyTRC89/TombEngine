@@ -1272,6 +1272,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="Shaders\Shadows.hlsli" />
+    <None Include="Shaders\SpriteEffects.hlsli">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="Shaders\VertexEffects.hlsli" />
     <None Include="Shaders\VertexInput.hlsli">
       <DeploymentContent>true</DeploymentContent>
