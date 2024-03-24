@@ -14,9 +14,10 @@ namespace TEN::Entities::Creatures::TR3
 		bool IsPatrolling = false;
 		bool IsLethal	  = false;
 
-		Pose		Pose	   = Pose::Zero;
+		Vector3		Position	   = Vector3::Zero;
 		int			RoomNumber	   = 0;
 		Vector3		PositionTarget = Vector3::Zero;
+		EulerAngles Orientation	   = EulerAngles::Identity;
 		float		Velocity	   = 0.0f;
 
 		float Life		 = 0.0f;

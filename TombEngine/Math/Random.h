@@ -1,13 +1,9 @@
 #pragma once
-#include <SimpleMath.h>
 
 class EulerAngles;
 
 namespace TEN::Math::Random
 {
-	using namespace DirectX;
-	using namespace DirectX::SimpleMath;
-
 	// Value generation
 	int	  GenerateInt(int low = 0, int high = SHRT_MAX);
 	float GenerateFloat(float low = 0.0f, float high = 1.0f);
@@ -24,7 +20,7 @@ namespace TEN::Math::Random
 	Vector3 GeneratePointInBox(const BoundingOrientedBox& box);
 	Vector3 GeneratePointInSphere(const BoundingSphere& sphere);
 	Vector3 GeneratePointOnSphere(const BoundingSphere& sphere);
-	Vector3 GeneratePointInSpheroid(const Vector3& center, const EulerAngles& orient, const Vector3& semiMajorAxis);
+	Vector3 GeneratePointInSpheroid(const Vector3& center, const Vector3& semiMajorAxis, const EulerAngles& orient);
 
 	bool TestProbability(float prob);
 }

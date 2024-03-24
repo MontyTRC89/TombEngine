@@ -123,7 +123,7 @@ namespace TEN::Math::Random
 		return (sphere.Center + (relPoint * sphere.Radius));
 	}
 
-	Vector3 GeneratePointInSpheroid(const Vector3& center, const EulerAngles& orient, const Vector3& semiMajorAxis)
+	Vector3 GeneratePointInSpheroid(const Vector3& center, const Vector3& semiMajorAxis, const EulerAngles& orient)
 	{
 		// Use rejection sampling method.
 		auto relPoint = Vector3::Zero;

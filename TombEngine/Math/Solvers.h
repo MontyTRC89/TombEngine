@@ -1,6 +1,4 @@
 #pragma once
-#include <SimpleMath.h>
-#include <optional>
 
 namespace TEN::Math::Solvers
 {

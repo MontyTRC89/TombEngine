@@ -632,7 +632,7 @@ namespace TEN::Renderer
 						{
 							for (auto& poly : bucket.Polygons)
 							{
-								auto worldMatrix = fish.Pose.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Pose.Position.ToVector3());
+								auto worldMatrix = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
 								auto center = Vector3::Transform(poly.Centre, worldMatrix);
 								float dist = (center - view.Camera.WorldPosition).Length();
 
@@ -694,7 +694,7 @@ namespace TEN::Renderer
 					{
 						const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
 
-						_stStatic.World = fish.Pose.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Pose.Position.ToVector3());
+						_stStatic.World = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
 						_stStatic.Color = Vector4::One;
 						_stStatic.AmbientLight = _rooms[fish.RoomNumber].AmbientLight;
 
