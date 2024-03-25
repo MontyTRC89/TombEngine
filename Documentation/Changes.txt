@@ -22,6 +22,7 @@ Version 1.4
 Lua API changes:
 * Added resetHub flag to Flow.Level, which allows to reset hub data.
 * Added Moveable:GetMeshCount() function to get number of moveable meshes.
+* Added Static:GetHP() and Static:SetHP() functions to change shatterable static mesh hit points.
 
 Version 1.3
 ===========
