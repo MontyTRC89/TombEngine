@@ -128,7 +128,7 @@ extern float CinematicBarsDestinationHeight;
 extern float CinematicBarsHeight;
 extern float CinematicBarsSpeed;
 
-std::pair<Vector3, int> CameraCollisionBounds(const Vector3& pos, int roomNumber, int push, bool yFirst);
+std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, int push, bool yFirst);
 
 void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
 

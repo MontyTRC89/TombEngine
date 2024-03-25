@@ -558,7 +558,8 @@ namespace TEN::Entities::Vehicles
 			kayakPos.z = kayak->OldPose.Position.z;
 			kayakPos.RoomNumber = kayakItem->RoomNumber;
 
-			auto collidedPos = CameraCollisionBounds(kayak->OldPose.Position.ToVector3(), kayakItem->RoomNumber, BLOCK(0.25f), false);
+			// HACK: Camera wall shift used.
+			auto collidedPos = GetCameraWallShift(kayak->OldPose.Position.ToVector3(), kayakItem->RoomNumber, BLOCK(0.25f), false);
 			{
 				kayakItem->Pose.Position = collidedPos.first;
 				kayakItem->RoomNumber = collidedPos.second;

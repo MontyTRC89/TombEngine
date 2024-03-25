@@ -60,8 +60,8 @@ namespace TEN::Renderer
 		if ((target - WorldPosition) == Vector3::Zero)
 			target.y -= 10.0f;
 
-		auto up = -Vector3::UnitY;
 		auto rotMatrix = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
+		auto up = -Vector3::UnitY;
 		up = Vector3::Transform(up, rotMatrix);
 		up.Normalize();
 
