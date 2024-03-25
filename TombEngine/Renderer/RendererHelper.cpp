@@ -338,7 +338,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::BuildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode)
+	void Renderer::BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode)
 	{
 		node->GlobalTransform = node->Transform * parentNode->GlobalTransform;
 		obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
@@ -349,7 +349,7 @@ namespace TEN::Renderer
 			BuildHierarchyRecursive(obj, childNode, node);
 	}
 
-	void Renderer::BuildHierarchy(RendererObject *obj)
+	void Renderer::BuildHierarchy(RendererObject* obj)
 	{
 		obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
 		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
@@ -361,19 +361,21 @@ namespace TEN::Renderer
 
 	bool Renderer::IsFullsScreen() 
 	{
-		return (!_isWindowed);
+		return !_isWindowed;
 	}
 
-	void Renderer::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov, float farView)
+	void Renderer::UpdateCameraMatrices(const CAMERA_INFO& camera, float roll, float fov, float farView)
 	{
+		constexpr auto NEAR_PLANE = 32.0f;
+
 		if (farView < MIN_FAR_VIEW)
 			farView = DEFAULT_FAR_VIEW;
 
 		farView = farView;
-		_gameCamera = RenderView(cam, roll, fov, 32, farView, Config::g_Configuration.ScreenWidth, Config::g_Configuration.ScreenHeight);
+		_gameCamera = RenderView(camera, roll, fov, NEAR_PLANE, farView, Config::g_Configuration.ScreenWidth, Config::g_Configuration.ScreenHeight);
 	}
 
-	bool Renderer::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
+	bool Renderer::SphereBoxIntersection(const BoundingBox& box, const Vector3& sphereCentre, float sphereRadius)
 	{
 		if (sphereRadius == 0.0f)
 		{
@@ -381,7 +383,7 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			BoundingSphere sphere = BoundingSphere(sphereCentre, sphereRadius);
+			auto sphere = BoundingSphere(sphereCentre, sphereRadius);
 			return box.Intersects(sphere);
 		}
 	}
@@ -401,9 +403,13 @@ namespace TEN::Renderer
 		if (id == GAME_OBJECT_ID::ID_LARA || id == GAME_OBJECT_ID::ID_LARA_SKIN)
 		{
 			if (_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].has_value())
+			{
 				return _moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].value();
+			}
 			else
+			{
 				return _moveableObjects[GAME_OBJECT_ID::ID_LARA].value();
+			}
 		}
 		else
 		{

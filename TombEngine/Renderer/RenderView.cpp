@@ -3,27 +3,28 @@
 
 namespace TEN::Renderer
 {
-	RenderView::RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h) : Camera(cam, roll, fov, nearPlane, farPlane, w, h) 
+	RenderView::RenderView(const CAMERA_INFO& camera, float roll, float fov, float nearPlane, float farPlane, float width, float height) :
+		Camera(camera, roll, fov, nearPlane, farPlane, width, height) 
 	{
 		Viewport = {};
-		Viewport.TopLeftX = 0;
-		Viewport.TopLeftY = 0;
-		Viewport.Width = w;
-		Viewport.Height = h;
-		Viewport.MinDepth = 0;
-		Viewport.MaxDepth = 1;
+		Viewport.TopLeftX = 0.0f;
+		Viewport.TopLeftY = 0.0f;
+		Viewport.Width = width;
+		Viewport.Height = height;
+		Viewport.MinDepth = 0.0f;
+		Viewport.MaxDepth = 1.0f;
 	}
 
-	RenderView::RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov) : Camera(pos, dir, up, room, w, h, fov, nearPlane, farPlane) 
+	RenderView::RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, float width, float height, int roomNumber, float nearPlane, float farPlane, float fov) :
+		Camera(pos, dir, up, roomNumber, width, height, fov, nearPlane, farPlane) 
 	{
-
 		Viewport = {};
-		Viewport.TopLeftX = 0;
-		Viewport.TopLeftY = 0;
-		Viewport.Width = w;
-		Viewport.Height = h;
-		Viewport.MinDepth = 0;
-		Viewport.MaxDepth = 1;
+		Viewport.TopLeftX = 0.0f;
+		Viewport.TopLeftY = 0.0f;
+		Viewport.Width = width;
+		Viewport.Height = height;
+		Viewport.MinDepth = 0.0f;
+		Viewport.MaxDepth = 1.0f;
 	}
 	 
 	void RenderView::FillConstantBuffer(CCameraMatrixBuffer& bufferToFill)
@@ -53,48 +54,49 @@ namespace TEN::Renderer
 		FogBulbsToDraw.clear();
 	}
 
-	RenderViewCamera::RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h)
+	RenderViewCamera::RenderViewCamera(const CAMERA_INFO& camera, float roll, float fov, float nearPlane, float farPlane, float width, float height)
 	{
-		RoomNumber = cam->RoomNumber;
-		WorldPosition = cam->Position;
-
-		auto target = cam->LookAt;
+		auto target = camera.LookAt;
 		if ((target - WorldPosition) == Vector3::Zero)
-			target.y -= 10;
+			target.y -= 10.0f;
 
-		WorldDirection = target - WorldPosition;
-		WorldDirection.Normalize();
-		
 		auto up = -Vector3::UnitY;
-		auto upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
-		up = Vector3::Transform(up, upRotation);
+		auto rotMatrix = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
+		up = Vector3::Transform(up, rotMatrix);
 		up.Normalize();
 
+		RoomNumber = camera.RoomNumber;
+		WorldPosition = camera.Position;
+		WorldDirection = target - WorldPosition;
+		WorldDirection.Normalize();
 		View = Matrix::CreateLookAt(WorldPosition, target, up);
-		Projection = Matrix::CreatePerspectiveFieldOfView(fov, w / (float)h, n, f);
+		Projection = Matrix::CreatePerspectiveFieldOfView(fov, width / height, nearPlane, farPlane);
 		ViewProjection = View * Projection;
-		ViewSize = { (float)w, (float)h };
-		InvViewSize = { 1.0f / w, 1.0f / h };
+		ViewSize = Vector2(width, height);
+		InvViewSize = Vector2::One / Vector2(width, height);
 		Frustum.Update(View, Projection);
-		NearPlane = n;
-		FarPlane = f;
+		NearPlane = nearPlane;
+		FarPlane = farPlane;
 		FOV = fov;
 	}
 
-	RenderViewCamera::RenderViewCamera(const Vector3& pos, const Vector3& dir, const Vector3& up, int room, int width, int height, float fov, float n, float f) 
+	RenderViewCamera::RenderViewCamera(const Vector3& pos, const Vector3& dir, const Vector3& up, int roomNumber, float width, float height, float fov, float nearPlane, float farPlane) 
 	{
-		RoomNumber = room;
+		constexpr auto LOOK_AT_DIST = BLOCK(10);
+
+		float screenAspect = width / height;
+
+		RoomNumber = roomNumber;
 		WorldPosition = pos;
 		WorldDirection = dir;
-		View = Matrix::CreateLookAt(pos, pos + dir * 10240, up);
-		float aspect = (float)width / (float)height;
-		Projection = Matrix::CreatePerspectiveFieldOfView(fov, aspect, n, f);
+		View = Matrix::CreateLookAt(pos, pos + (dir * LOOK_AT_DIST), up);
+		Projection = Matrix::CreatePerspectiveFieldOfView(fov, screenAspect, nearPlane, farPlane);
 		ViewProjection = View * Projection;
-		ViewSize = { (float)width, (float)height };
-		InvViewSize = { 1.0f / width, 1.0f / height };
+		ViewSize = Vector2(width, height);
+		InvViewSize = Vector2::One / Vector2(width, height);
 		Frustum.Update(View, Projection);
-		NearPlane = n;
-		FarPlane = f;
+		NearPlane = nearPlane;
+		FarPlane = farPlane;
 		FOV = fov;
 	}
 }

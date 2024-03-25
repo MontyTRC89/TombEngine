@@ -109,29 +109,25 @@ static bool TestCameraCollidableBox(const BoundingOrientedBox& box)
 
 static bool TestCameraCollidableItem(const ItemInfo& item)
 {
-	// 1) Check if item is player.
-	if (item.ObjectNumber == ID_LARA)
+	// 1) Check if item is player or bridge.
+	if (item.IsLara() || item.IsBridge())
 		return false;
 
-	// 2) Check if item is bridge.
-	if (item.IsBridge())
-		return false;
-
-	// 3) Test distance.
+	// 2) Test distance.
 	float distSqr = Vector3i::DistanceSquared(item.Pose.Position, Camera.Position);
 	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
 		return false;
 
-	// 4) Check object collidability.
+	// 3) Check object collidability.
 	const auto& object = Objects[item.ObjectNumber];
 	if (!item.Collidable || !object.usingDrawAnimatingItem)
 		return false;
 
-	// 5) Check object attributes.
+	// 4) Check object attributes.
 	if (object.intelligent || object.isPickup || object.isPuzzleHole || object.collision == nullptr)
 		return false;
 
-	// 6) Test if box is collidable.
+	// 5) Test if box is collidable.
 	auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 	if (!TestCameraCollidableBox(box))
 		return false;
@@ -472,9 +468,9 @@ void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 void LookAt(CAMERA_INFO& camera, short roll)
 {
 	float fov = TO_RAD(CurrentFOV / 1.333333f);
-	float levelFarView = BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView());
+	float farView = BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView());
 
-	g_Renderer.UpdateCameraMatrices(&camera, TO_RAD(roll), fov, levelFarView);
+	g_Renderer.UpdateCameraMatrices(camera, TO_RAD(roll), fov, farView);
 }
 
 void AlterFOV(short value, bool store)
@@ -1035,7 +1031,7 @@ static bool CanControlTankCamera()
 
 void UpdateCameraSphere(const ItemInfo& playerItem)
 {
-	constexpr auto CONTROLLED_CAMERA_ROT_LERP_ALPHA = 0.7f;
+	constexpr auto CONTROLLED_CAMERA_ROT_LERP_ALPHA = 0.75f;
 	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA		= 0.3f;
 	constexpr auto LOCKED_CAMERA_ALTITUDE_ROT_ALPHA = 1 / 8.0f;
 

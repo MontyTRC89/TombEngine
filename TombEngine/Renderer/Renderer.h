@@ -524,7 +524,7 @@ namespace TEN::Renderer
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
 		Vector4 GetPortalRect(Vector4 v, Vector4 vp);
-		bool SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius);
+		bool SphereBoxIntersection(const BoundingBox& box, const Vector3& sphereCentre, float sphereRadius);
 		void InitializeSpriteQuad();
 		void InitializePostProcess();
 		void CreateSSAONoiseTexture();
@@ -584,7 +584,7 @@ namespace TEN::Renderer
 		void RenderTitle();
 		void Lock();
 		bool PrepareDataForTheRenderer();
-		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
+		void UpdateCameraMatrices(const CAMERA_INFO& camera, float roll, float fov, float farView);
 		void RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere);
 		void DumpGameScene();
 		void RenderInventory();

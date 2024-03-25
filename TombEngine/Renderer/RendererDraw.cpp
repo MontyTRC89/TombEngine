@@ -1827,19 +1827,12 @@ namespace TEN::Renderer
 
 		_context->RSSetScissorRects(1, rects);
 
-		// Opaque geometry
+		// Opaque geometry.
 		SetBlendMode(BlendMode::Opaque);
 
-		if (emisphere == -1)
-		{
-			SetCullMode(CullMode::CounterClockwise);
-		}
-		else
-		{
-			SetCullMode(CullMode::Clockwise);
-		}
+		SetCullMode((emisphere == NO_VALUE) ? CullMode::CounterClockwise : CullMode::Clockwise);
 
-		RenderView view = RenderView(&Camera, 0, PI / 2.0f, 32, DEFAULT_FAR_VIEW, ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE);
+		auto view = RenderView(Camera, 0.0f, PI_DIV_2, 32.0f, DEFAULT_FAR_VIEW, ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE);
 
 		CCameraMatrixBuffer cameraConstantBuffer;
 		cameraConstantBuffer.DualParaboloidView = Matrix::CreateLookAt(position, position + Vector3(0, 0, 1024), -Vector3::UnitY);
@@ -1847,7 +1840,7 @@ namespace TEN::Renderer
 		view.FillConstantBuffer(cameraConstantBuffer);
 		_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
 
-		// Draw horizon and the sky
+		// Draw horizon and sky.
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
 		if (levelPtr->Horizon)
