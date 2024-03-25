@@ -16,6 +16,7 @@ Version 1.4
   - Wall spikes can be stopped by normal antitrigger or with a volume.
 * Added hub system to preserve level state on level jumps.
 * Added Ember emitter nullmesh object.
+* Added Laserbeam object.
 * Added TR2 Dragon.
 * Added TR3 Winston (requires updated TEN Winston wad2).
 
