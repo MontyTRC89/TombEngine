@@ -622,35 +622,37 @@ namespace TEN::Renderer
 		{
 			for (const auto& fish : FishSwarm)
 			{
-				if (fish.Life > 0.0f)
-				{
+				if (fish.Life <= 0.0f) 
+					continue;
+
 					auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
 
 					for (auto& bucket : mesh.Buckets)
 					{
-						if (IsSortedBlendMode(bucket.BlendMode))
+						if (!IsSortedBlendMode(bucket.BlendMode))
+							continue;
+						
+						for (auto& poly : bucket.Polygons)
 						{
-							for (auto& poly : bucket.Polygons)
-							{
-								auto worldMatrix = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
-								auto center = Vector3::Transform(poly.Centre, worldMatrix);
-								float dist = (center - view.Camera.WorldPosition).Length();
+							auto worldMatrix = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
+							auto center = Vector3::Transform(poly.Centre, worldMatrix);
+							float dist = (center - view.Camera.WorldPosition).Length();
 
-								auto object = RendererSortableObject{};
-								object.ObjectType = RendererObjectType::MoveableAsStatic;
-								object.Centre = center;
-								object.Distance = dist;
-								object.Bucket = &bucket;
-								object.Mesh = &mesh;
-								object.Polygon = &poly;
-								object.World = worldMatrix;
-								object.Room = &_rooms[fish.RoomNumber];
+							auto object = RendererSortableObject{};
+							object.ObjectType = RendererObjectType::MoveableAsStatic;
+							object.Centre = center;
+							object.Distance = dist;
+							object.Bucket = &bucket;
+							object.Mesh = &mesh;
+							object.Polygon = &poly;
+							object.World = worldMatrix;
+							object.Room = &_rooms[fish.RoomNumber];
 
-								view.TransparentObjectsToDraw.push_back(object);
-							}
+							view.TransparentObjectsToDraw.push_back(object);
 						}
+						
 					}
-				}
+				
 			}
 		}
 		else
@@ -690,39 +692,40 @@ namespace TEN::Renderer
 
 				for (const auto& fish : FishSwarm)
 				{
-					if (fish.Life > 0.0f)
+					if (fish.Life <= 0.0f)
+						continue;
+
+					const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
+
+					_stStatic.World = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
+					_stStatic.Color = Vector4::One;
+					_stStatic.AmbientLight = _rooms[fish.RoomNumber].AmbientLight;
+
+					if (rendererPass != RendererPass::GBuffer)
+						BindStaticLights(_rooms[fish.RoomNumber].LightsToDraw);
+
+					_cbStatic.UpdateData(_stStatic, _context.Get());
+
+					for (const auto& bucket : mesh.Buckets)
 					{
-						const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
+						if (bucket.NumVertices == 0)
+							continue;
 
-						_stStatic.World = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
-						_stStatic.Color = Vector4::One;
-						_stStatic.AmbientLight = _rooms[fish.RoomNumber].AmbientLight;
-
-						if (rendererPass != RendererPass::GBuffer)
-							BindStaticLights(_rooms[fish.RoomNumber].LightsToDraw);
-
-						_cbStatic.UpdateData(_stStatic, _context.Get());
-
-						for (const auto& bucket : mesh.Buckets)
+						int passCount = (rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest) ? 2 : 1;
+						for (int p = 0; p < passCount; p++)
 						{
-							if (bucket.NumVertices == 0)
+							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
 								continue;
 
-							int passCount = (rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest) ? 2 : 1;
-							for (int p = 0; p < passCount; p++)
-							{
-								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-									continue;
+							BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+							BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-								BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-								BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
-								DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-								_numMoveablesDrawCalls++;
-							}
+							_numMoveablesDrawCalls++;
 						}
 					}
+					
 				}
 			}
 		}

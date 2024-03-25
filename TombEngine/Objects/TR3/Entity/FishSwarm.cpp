@@ -136,7 +136,8 @@ namespace TEN::Entities::Creatures::TR3
 		auto corpsePos = std::optional<Vector3>();
 
 		// Check if corpse is near.
-		if (!corpsePos.has_value())
+		//TODO: in future also check for other enemies like sharks or crocodile
+		if (!corpsePos.has_value() && (GlobalCounter & 0x97) == 0x97)
 		{
 			float closestDist = INFINITY;
 			for (auto& targetItem : g_Level.Items)
@@ -334,7 +335,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				// Orient to fish nearest to target. To prevent other fish from swimming forward but orient elsewhere.
-				if (fish.Orientation.x != closestFishPtr->Orientation.x && separationDist > 30.0f &&
+				if (closestFishPtr != nullptr && fish.Orientation.x != closestFishPtr->Orientation.x && separationDist > 30.0f &&
 					(fish.TargetItemPtr == fish.LeaderItemPtr || fish.TargetItemPtr->ObjectNumber == ID_AI_FOLLOW))
 				{
 					separationDist--;
