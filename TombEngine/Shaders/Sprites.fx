@@ -3,6 +3,7 @@
 #include "./VertexInput.hlsli"
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
+#include "./SpriteEffects.hlsli"
 
 // NOTE: This shader is used for all 3D and alpha blended sprites, because we send aleady transformed vertices to the GPU 
 // instead of instances
@@ -77,9 +78,14 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		output = DoLaserBarrierEffect(input.Position, output, input.UV, FADE_FACTOR, Frame);
 	}
 
+	if (RenderType == 2)
+	{
+		output = DoLaserBeamEffect(input.Position, output, input.UV, FADE_FACTOR, Frame);
+	}
+
 	output.xyz -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
 	output.xyz = saturate(output.xyz);
-	
+
 	output = DoDistanceFogForPixel(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.DistanceFog);
 
 	return output;
