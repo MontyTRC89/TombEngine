@@ -104,7 +104,7 @@ float4 DoLaserBeamEffect(float3 input, float4 output, float2 uv, float faceFacto
 {
     float2 noiseTexture = input.xy / uv;
     noiseTexture *= uv.x / uv.y;
-    float noiseValue = FractalNoise(noiseTexture * 0.1f - timeUniform);
+    float noiseValue = FractalNoise(noiseTexture * 0.1f + timeUniform);
 
     float4 color = output;
     float gradL = smoothstep(0.0, 0.0, uv.x);
