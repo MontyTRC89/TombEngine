@@ -1276,7 +1276,7 @@ bool LoadLevel(int levelIndex)
 
 		// Initialize the game
 		InitializeGameFlags();
-		InitializeLara(!(InitializeGame || CurrentLevel <= 1));
+		InitializeLara(!InitializeGame && CurrentLevel > 0);
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();

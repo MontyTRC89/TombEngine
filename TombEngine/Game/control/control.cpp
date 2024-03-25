@@ -300,10 +300,11 @@ unsigned CALLBACK GameMain(void *)
 GameStatus DoLevel(int levelIndex, bool loadGame)
 {
 	bool isTitle = !levelIndex;
+	auto loadType = loadGame ? LevelLoadType::Load : (SaveGame::IsOnHub(levelIndex) ? LevelLoadType::Hub : LevelLoadType::New);
 
 	TENLog(isTitle ? "DoTitle" : "DoLevel", LogLevel::Info);
 
-	// Load the level. Fall back to title if unsuccessful.
+	// Load level. Fall back to title if unsuccessful.
 	if (!LoadLevelFile(levelIndex))
 		return isTitle ? GameStatus::ExitGame : GameStatus::ExitToTitle;
 
@@ -315,7 +316,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeItemBoxData();
 
 	// Initialize scripting.
-	InitializeScripting(levelIndex, loadGame);
+	InitializeScripting(levelIndex, loadType);
 	InitializeNodeScripts();
 
 	// Initialize menu and inventory state.
@@ -453,12 +454,12 @@ void CleanUp()
 	ClearObjCamera();
 }
 
-void InitializeScripting(int levelIndex, bool loadGame)
+void InitializeScripting(int levelIndex, LevelLoadType type)
 {
 	TENLog("Loading level script...", LogLevel::Info);
 
 	g_GameStringsHandler->ClearDisplayStrings();
-	g_GameScript->ResetScripts(!levelIndex || loadGame);
+	g_GameScript->ResetScripts(!levelIndex || type != LevelLoadType::New);
 
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
@@ -478,7 +479,7 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	}
 
 	// Play default background music.
-	if (!loadGame)
+	if (type != LevelLoadType::Load)
 		PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
@@ -516,19 +517,21 @@ void InitializeOrLoadGame(bool loadGame)
 	else
 	{
 		// If not loading a savegame, clear all info.
-		Statistics.Level = {};
+		SaveGame::Statistics.Level = {};
 
 		if (InitializeGame)
 		{
 			// Clear all game info as well.
-			Statistics.Game = {};
+			SaveGame::Statistics.Game = {};
 			GameTimer = 0;
 			InitializeGame = false;
 
+			SaveGame::ResetHub();
 			TENLog("Starting new game.", LogLevel::Info);
 		}
 		else
 		{
+			SaveGame::LoadHub(CurrentLevel);
 			TENLog("Starting new level.", LogLevel::Info);
 		}
 
@@ -596,6 +599,7 @@ GameStatus DoGameLoop(int levelIndex)
 
 void EndGameLoop(int levelIndex, GameStatus reason)
 {
+	SaveGame::SaveHub(levelIndex);
 	DeInitializeScripting(levelIndex, reason);
 
 	StopAllSounds();
@@ -629,7 +633,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 		g_Gui.GetInventoryMode() != InventoryMode::Save &&
 		g_GameFlow->IsLoadSaveEnabled())
 	{
-		SaveGame::LoadSavegameInfos();
+		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 		g_Gui.CallInventory(LaraItem, false);
 	}
@@ -637,7 +641,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 		g_Gui.GetInventoryMode() != InventoryMode::Load &&
 		g_GameFlow->IsLoadSaveEnabled())
 	{
-		SaveGame::LoadSavegameInfos();
+		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))

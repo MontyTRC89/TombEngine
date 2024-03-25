@@ -124,7 +124,7 @@ namespace TEN::Effects::Environment
 
 	void EnvironmentController::UpdateStorm(ScriptInterfaceLevel* level)
 	{
-		if (level->HasStorm())
+		if (level->GetStormEnabled())
 		{
 			if (StormCount || StormRand)
 			{
@@ -147,7 +147,7 @@ namespace TEN::Effects::Environment
 								 level->GetSkyLayerColor(i).GetG() / 255.0f,
 								 level->GetSkyLayerColor(i).GetB() / 255.0f, 1.0f);
 
-			if (level->HasStorm())
+			if (level->GetStormEnabled())
 			{
 				auto flashBrightness = StormSkyColor / 255.0f;
 				auto r = std::clamp(color.x + flashBrightness, 0.0f, 1.0f);

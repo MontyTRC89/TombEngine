@@ -2755,6 +2755,20 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
+	<name>GetMeshCount</name>
+	<summary>Get number of meshes for a particular object
+ Returns number of meshes in an object</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>number of meshes</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
 	<name>GetMeshVisible</name>
 	<summary>Get state of specified mesh visibility of object
  Returns true if specified mesh is visible on an object, and false

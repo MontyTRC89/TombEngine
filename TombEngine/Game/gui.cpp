@@ -421,7 +421,7 @@ namespace TEN::Gui
 						selectedOptionBackup = SelectedOption;
 						SelectedOption = 0;
 						MenuToDisplay = Menu::LoadGame;
-						SaveGame::LoadSavegameInfos();
+						SaveGame::LoadHeaders();
 						break;
 
 					case TitleOption::Options:
@@ -2483,7 +2483,7 @@ namespace TEN::Gui
 						item->HitPoints = LARA_HEALTH_MAX;
 
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-					Statistics.Game.HealthUsed++;
+					SaveGame::Statistics.Game.HealthUsed++;
 				}
 				else
 					SayNo();
@@ -2508,7 +2508,7 @@ namespace TEN::Gui
 					item->HitPoints = LARA_HEALTH_MAX;
 
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-					Statistics.Game.HealthUsed++;
+					SaveGame::Statistics.Game.HealthUsed++;
 				}
 				else
 					SayNo();
@@ -2922,12 +2922,12 @@ namespace TEN::Gui
 						break;
 
 					case MenuType::Load:
-						SaveGame::LoadSavegameInfos();
+						SaveGame::LoadHeaders();
 						SetInventoryMode(InventoryMode::Load);
 						break;
 
 					case MenuType::Save:
-						SaveGame::LoadSavegameInfos();
+						SaveGame::LoadHeaders();
 						SetInventoryMode(InventoryMode::Save);
 						break;
 
@@ -3809,7 +3809,7 @@ namespace TEN::Gui
 
 		if (GuiIsSelected())
 		{
-			if (!SavegameInfos[SelectedSaveSlot].Present)
+			if (!SaveGame::Infos[SelectedSaveSlot].Present)
 				SayNo();
 			else
 			{

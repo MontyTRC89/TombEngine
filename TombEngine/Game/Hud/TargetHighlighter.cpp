@@ -138,6 +138,9 @@ namespace TEN::Hud
 		constexpr auto SCALE_MODE				 = DisplaySpriteScaleMode::Fill;
 		constexpr auto BLEND_MODE				 = BlendMode::Additive;
 
+		if (!Position.has_value())
+			return;
+
 		// Draw main static element.
 		AddDisplaySprite(
 			SPRITE_SEQUENCE_OBJECT_ID, STATIC_ELEMENT_SPRITE_ID,

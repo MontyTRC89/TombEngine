@@ -470,7 +470,7 @@ bool FlowHandler::DoesSaveGameExist(int slot)
 
 int FlowHandler::GetSecretCount() const
 {
-	return Statistics.Game.Secrets;
+	return SaveGame::Statistics.Game.Secrets;
 }
 
 void FlowHandler::SetSecretCount(int secretsNum)
@@ -478,7 +478,7 @@ void FlowHandler::SetSecretCount(int secretsNum)
 	if (secretsNum > UCHAR_MAX)
 		return;
 
-	Statistics.Game.Secrets = secretsNum;
+	SaveGame::Statistics.Game.Secrets = secretsNum;
 }
 
 void FlowHandler::AddSecret(int levelSecretIndex)
@@ -491,18 +491,18 @@ void FlowHandler::AddSecret(int levelSecretIndex)
 		return;
 	}
 
-	if (Statistics.Level.Secrets & (1 << levelSecretIndex))
+	if (SaveGame::Statistics.Level.Secrets & (1 << levelSecretIndex))
 		return;
 
-	if (Statistics.Game.Secrets >= UINT_MAX)
+	if (SaveGame::Statistics.Game.Secrets >= UINT_MAX)
 	{
 		TENLog("Maximum amount of level secrets is already reached!", LogLevel::Warning);
 		return;
 	}
 
 	PlaySecretTrack();
-	Statistics.Level.Secrets |= (1 << levelSecretIndex);
-	Statistics.Game.Secrets++;
+	SaveGame::Statistics.Level.Secrets |= (1 << levelSecretIndex);
+	SaveGame::Statistics.Game.Secrets++;
 }
 
 bool FlowHandler::IsFlyCheatEnabled() const
@@ -560,6 +560,26 @@ void FlowHandler::EnableLoadSave(bool loadSave)
 	LoadSave = loadSave;
 }
 
+void FlowHandler::PrepareInventoryObjects()
+{
+	const auto& level = *Levels[CurrentLevel];
+	for (const auto& refInvItem : level.InventoryObjects)
+	{
+		if (refInvItem.ObjectID < 0 || refInvItem.ObjectID >= INVENTORY_TABLE_SIZE)
+			continue;
+
+		auto& invItem = InventoryObjectTable[refInvItem.ObjectID];
+
+		invItem.ObjectName = refInvItem.Name.c_str();
+		invItem.Scale1 = refInvItem.Scale;
+		invItem.YOffset = refInvItem.YOffset;
+		invItem.Orientation = EulerAngles(ANGLE(refInvItem.Rot.x), ANGLE(refInvItem.Rot.y), ANGLE(refInvItem.Rot.z));
+		invItem.MeshBits = refInvItem.MeshBits;
+		invItem.Options = refInvItem.MenuAction;
+		invItem.RotFlags = refInvItem.RotFlags;
+	}
+}
+
 bool FlowHandler::DoFlow()
 {
 	// We start with the title level, if no other index is specified
@@ -581,9 +601,6 @@ bool FlowHandler::DoFlow()
 			TENLog("Level not found. Check Gameflow.lua file integrity.", LogLevel::Error, LogConfig::All);
 			CurrentLevel = 0;
 		}
-		
-		// First we need to fill some legacy variables in PCTomb5.exe
-		Level* level = Levels[CurrentLevel];
 
 		GameStatus status;
 
@@ -603,26 +620,9 @@ bool FlowHandler::DoFlow()
 		}
 		else
 		{
-			// Prepare inventory objects table
-			for (size_t i = 0; i < level->InventoryObjects.size(); i++)
-			{
-				InventoryItem* obj = &level->InventoryObjects[i];
-				if (obj->ObjectID >= 0 && obj->ObjectID < INVENTORY_TABLE_SIZE)
-				{
-					InventoryObject* invObj = &InventoryObjectTable[obj->ObjectID];
-
-					invObj->ObjectName = obj->Name.c_str();
-					invObj->Scale1 = obj->Scale;
-					invObj->YOffset = obj->YOffset;
-					invObj->Orientation = EulerAngles(ANGLE(obj->Rot.x), ANGLE(obj->Rot.y), ANGLE(obj->Rot.z));
-					invObj->MeshBits = obj->MeshBits;
-					invObj->Options = obj->MenuAction;
-					invObj->RotFlags = obj->RotFlags;
-				}
-			}
-
 			try
 			{
+				PrepareInventoryObjects();
 				status = DoLevel(CurrentLevel, loadFromSavegame);
 			}
 			catch (TENScriptException const& e) 
@@ -654,10 +654,10 @@ bool FlowHandler::DoFlow()
 			break;
 
 		case GameStatus::LoadGame:
-			// Load the header of the savegame for getting the level to load
+			// Load header of savegame to get level to load.
 			SaveGame::LoadHeader(SelectedSaveGame, &header);
 
-			// Load level
+			// Load level.
 			CurrentLevel = header.Level;
 			NextLevel = 0;
 			GameTimer = header.Timer;
@@ -667,11 +667,15 @@ bool FlowHandler::DoFlow()
 		case GameStatus::LevelComplete:
 			if (NextLevel >= Levels.size())
 			{
-				CurrentLevel = 0; // TODO: final credits
+				CurrentLevel = 0; // TODO: Final credits.
 			}
 			else
 			{
 				CurrentLevel = NextLevel;
+
+				// Reset hub if next level has it set.
+				if (g_GameFlow->GetLevel(CurrentLevel)->GetResetHubEnabled())
+					SaveGame::ResetHub();
 			}
 
 			NextLevel = 0;
