@@ -81,6 +81,9 @@ namespace TEN::Renderer
 	{
 		for (const auto& [itemNumber, beam] : LaserBeams)
 		{
+			if (!beam.IsActive)
+				continue;
+
 			// Prepare cylinder tube.
 			for (int i = 0; i < LaserBeamEffect::SUBDIVISION_COUNT; i++)
 			{
