@@ -235,6 +235,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
@@ -406,6 +407,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
@@ -627,7 +629,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 
 			// TODO
-			if (!CanStrafeBackward(*item, *coll))
+			if (!IsPlayerStrafing(*item) && !CanStrafeBackward(*item, *coll))
 			{
 				if (CanWadeForward(*item, *coll))
 				{
@@ -662,7 +664,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				{
 					item->Animation.TargetState = LS_WALK_BACK;
 				}
-				if (IsHeld(In::Walk))
+				else if (IsHeld(In::Walk))
 				{
 					if (CanWalkBackward(*item, *coll))
 						item->Animation.TargetState = LS_WALK_BACK;
@@ -829,9 +831,10 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
+	// Setup.
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
-	player.Control.HeadingOrient.y = (item->Animation.Velocity.z >= 0) ? GetPlayerHeadingAngleY(*item) : (GetPlayerHeadingAngleY(*item) + ANGLE(180.0f));
+	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item) + ((item->Animation.Velocity.z >= 0.0f) ? 0 : ANGLE(180.0f));
 	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : STEPUP_HEIGHT;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -903,6 +906,7 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -936,6 +940,7 @@ void lara_as_hop_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -945,6 +950,7 @@ void lara_col_hop_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(180.0f);
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
@@ -1020,6 +1026,7 @@ void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -1029,8 +1036,9 @@ void lara_col_skip_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
-	item->Animation.Velocity.y = 0;
+	item->Animation.Velocity.y = 0.0f;
 	item->Animation.IsAirborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -1422,8 +1430,8 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-	player.Control.CanLook = (isWading && isInSwamp) ? false : true;
 
+	player.Control.CanLook = (isWading && isInSwamp) ? false : true;
 	player.Control.Look.Mode = LookMode::Horizontal;
 
 	if (item->HitPoints <= 0)
@@ -1440,18 +1448,23 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		// TODO
 		if (IsPlayerStrafing(*item))
 		{
+			// Turn.
 			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
 			HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
 
-			item->Animation.TargetState = LS_WALK_BACK;
-			return;
+			if ((IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) &&
+				(IsHeld(In::Walk) || isWading))
+			{
+				item->Animation.TargetState = CanStrafeBackward(*item, *coll) ? LS_WALK_BACK : LS_WALK_FORWARD;
+				return;
+			}
 		}
 	}
 	else
 	{
+		// Turn.
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			if (isWading && isInSwamp)
@@ -1473,6 +1486,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -1484,6 +1498,7 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
+	// Setup.
 	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
@@ -1670,6 +1685,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -1724,6 +1740,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -1735,6 +1752,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
+	// Setup.
 	player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(90.0f);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
@@ -1828,6 +1846,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -1839,6 +1858,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
+	// Setup.
 	player.Control.HeadingOrient.y = item->Pose.Orientation.y - ANGLE(90.0f);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
@@ -1897,6 +1917,7 @@ void lara_as_turn_180(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::None;
 	ResetPlayerTurnRateY(*item);
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -1916,6 +1937,7 @@ void lara_as_roll_180_back(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::None;
 	ResetPlayerTurnRateY(*item);
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -1925,6 +1947,7 @@ void lara_col_roll_180_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(180.0f);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
@@ -1972,6 +1995,7 @@ void lara_as_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::None;
 	ResetPlayerTurnRateY(*item);
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 

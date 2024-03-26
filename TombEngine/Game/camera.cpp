@@ -462,6 +462,7 @@ void InitializeCamera()
 static void UpdateAzimuthAngle(const ItemInfo& item)
 {
 	constexpr auto BASE_ANGLE				= ANGLE(90.0f);
+	constexpr auto BASE_VEL					= 50.0f;
 	constexpr auto AUTO_ROT_DELTA_ANGLE_MAX = BASE_ANGLE * 1.5f;
 	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.01f;
 
@@ -471,15 +472,18 @@ static void UpdateAzimuthAngle(const ItemInfo& item)
 	if (GetMoveAxis() == Vector2::Zero || item.Animation.Velocity.z == 0.0f)
 		return;
 
+	float vel = Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length();
+	float alpha = std::clamp(vel / BASE_VEL, 0.0f, 1.0f);
+
 	short deltaAngle = Geometry::GetShortestAngle(Camera.actualAngle, GetPlayerHeadingAngleY(item));
 	if (abs(deltaAngle) <= BASE_ANGLE)
 	{
-		Camera.actualAngle += deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA;
+		Camera.actualAngle += (deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA) * alpha;
 	}
 	else if (abs(deltaAngle) <= AUTO_ROT_DELTA_ANGLE_MAX)
 	{
 		int sign = std::copysign(1, deltaAngle);
-		Camera.actualAngle += (BASE_ANGLE * AZIMUTH_ANGLE_LERP_ALPHA) * sign;
+		Camera.actualAngle += ((BASE_ANGLE * AZIMUTH_ANGLE_LERP_ALPHA) * sign) * alpha;
 	}
 }
 

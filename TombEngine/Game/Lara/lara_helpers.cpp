@@ -1674,7 +1674,9 @@ short GetPlayerHeadingAngleY(const ItemInfo& item)
 
 		auto dir = player.Control.RefMoveAxis;
 		dir.Normalize();
-		return (player.Control.RefCameraOrient.y + FROM_RAD(atan2(dir.x, dir.y)));
+		short moveAxisAngle = FROM_RAD(atan2(dir.x, dir.y));
+
+		return (player.Control.RefCameraOrient.y + moveAxisAngle);
 	}
 	else
 	{
@@ -1684,7 +1686,13 @@ short GetPlayerHeadingAngleY(const ItemInfo& item)
 
 short GetPlayerRelHeadingAngleY(const ItemInfo& item)
 {
-	return Geometry::GetShortestAngle(GetPlayerHeadingAngleY(item), Camera.actualAngle);
+	const auto& player = GetLaraInfo(item);
+
+	auto dir = player.Control.RefMoveAxis;
+	dir.Normalize();
+	short headingAngle = player.Control.RefCameraOrient.y + FROM_RAD(atan2(dir.x, dir.y));
+
+	return Geometry::GetShortestAngle(headingAngle, player.Control.RefCameraOrient.y);
 }
 
 static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)
