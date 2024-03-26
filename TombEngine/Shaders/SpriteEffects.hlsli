@@ -112,7 +112,7 @@ float4 DoLaserBeamEffect(float3 input, float4 output, float2 uv, float faceFacto
 	float gradT = smoothstep(0.0, 0.25, uv.y);
 	float gradB = 1.0 - smoothstep(0.75, 1.0, uv.y);
 
-	// Stretching the UV coordinates	
+	// Stretch UV coordinates.
 	float stretchFactor = 0.005f;
 	uv.x *= stretchFactor;
 
@@ -171,9 +171,9 @@ float4 DoLaserBeamEffect(float3 input, float4 output, float2 uv, float faceFacto
 	float fade3 = faceFactor * max(0.0, 1.0 - dot(float2(BLENDING, BLENDING), float2(gradR, gradT)));
 
 	float fadeL = 0; // Fade out hight.
-	float fadeB = 0.3f * faceFactor * faceFactor * (0.3 - gradB); //fade out width
+	float fadeB = 0.3f * faceFactor * faceFactor * (0.3 - gradB); // Fade out width.
 	float fadeR = 0; // Fade out hight.
-	float fadeT = 0.3f * faceFactor * faceFactor * (0.3 - gradT); //fade out width
+	float fadeT = 0.3f * faceFactor * faceFactor * (0.3 - gradT); // Fade out width.
 
 	float fade = max(
 		max(max(fade0, fade1), max(fade2, fade3)),
@@ -192,7 +192,8 @@ float4 DoLaserBeamEffect(float3 input, float4 output, float2 uv, float faceFacto
 		decayFactor = (1.0f - uv.y) / 2;
 	}
 	color *= decayFactor;
-	color.rgb *= 0.17; // Reduce brightness. Don't change
+
+	color.rgb *= 0.17; // Reduce brightness.
 	color.rgb = smoothstep(ZERO, EIGHT_FIVE, color.rgb);
 	return color;
 }
