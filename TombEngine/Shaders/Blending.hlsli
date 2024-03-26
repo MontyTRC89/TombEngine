@@ -24,89 +24,89 @@
 
 cbuffer BlendingBuffer : register(b12)
 {
-    uint BlendMode;
-    int AlphaTest;
-    float AlphaThreshold;
+	uint BlendMode;
+	int AlphaTest;
+	float AlphaThreshold;
 };
 
 void DoAlphaTest(float4 inputColor)
 {
-    if (AlphaTest == ALPHATEST_GREATER_THAN && inputColor.w < AlphaThreshold)
-    {
-        discard;
-    }
-    else if (AlphaTest == ALPHATEST_LESS_THAN && inputColor.w > AlphaThreshold)
-    {
-        discard;
-    }
-    else
-    {
-        return;
-    }
+	if (AlphaTest == ALPHATEST_GREATER_THAN && inputColor.w < AlphaThreshold)
+	{
+		discard;
+	}
+	else if (AlphaTest == ALPHATEST_LESS_THAN && inputColor.w > AlphaThreshold)
+	{
+		discard;
+	}
+	else
+	{
+		return;
+	}
 }
 
 float4 DoDistanceFogForPixel(float4 sourceColor, float4 fogColor, float value)
 {
-    switch (BlendMode)
-    {
-        case BLENDMODE_ADDITIVE:
-        case BLENDMODE_SCREEN:
-        case BLENDMODE_LIGHTEN:
-            fogColor.xyz *= Luma(sourceColor.xyz);
-            break;
+	switch (BlendMode)
+	{
+		case BLENDMODE_ADDITIVE:
+		case BLENDMODE_SCREEN:
+		case BLENDMODE_LIGHTEN:
+			fogColor.xyz *= Luma(sourceColor.xyz);
+			break;
 
-        case BLENDMODE_SUBTRACTIVE:
-        case BLENDMODE_EXCLUDE:
-            fogColor.xyz *= 1.0f - Luma(sourceColor.xyz);
-            break;
+		case BLENDMODE_SUBTRACTIVE:
+		case BLENDMODE_EXCLUDE:
+			fogColor.xyz *= 1.0f - Luma(sourceColor.xyz);
+			break;
 
-        case BLENDMODE_ALPHABLEND:
-            fogColor.w = sourceColor.w;
-            break;
+		case BLENDMODE_ALPHABLEND:
+			fogColor.w = sourceColor.w;
+			break;
 
-        default:
-            break;
-    }
+		default:
+			break;
+	}
 
-    if (fogColor.w > sourceColor.w)
-        fogColor.w = sourceColor.w;
+	if (fogColor.w > sourceColor.w)
+		fogColor.w = sourceColor.w;
 
-    float4 result = lerp(sourceColor, fogColor, value);
-    return result;
+	float4 result = lerp(sourceColor, fogColor, value);
+	return result;
 }
 
 float4 DoFogBulbsForPixel(float4 sourceColor, float4 fogColor)
 {
-    switch (BlendMode)
-    {
-        case BLENDMODE_ADDITIVE:
-        case BLENDMODE_SCREEN:
-        case BLENDMODE_LIGHTEN:
-            fogColor.xyz *= Luma(sourceColor);
-            break;
+	switch (BlendMode)
+	{
+		case BLENDMODE_ADDITIVE:
+		case BLENDMODE_SCREEN:
+		case BLENDMODE_LIGHTEN:
+			fogColor.xyz *= Luma(sourceColor);
+			break;
 
-        case BLENDMODE_SUBTRACTIVE:
-        case BLENDMODE_EXCLUDE:
-            fogColor.xyz *= 1.0f - Luma(sourceColor.xyz);
-            break;
+		case BLENDMODE_SUBTRACTIVE:
+		case BLENDMODE_EXCLUDE:
+			fogColor.xyz *= 1.0f - Luma(sourceColor.xyz);
+			break;
 
-        case BLENDMODE_ALPHABLEND:
-            fogColor.w = sourceColor.w;
-            break;
+		case BLENDMODE_ALPHABLEND:
+			fogColor.w = sourceColor.w;
+			break;
 
-        default:
-            break;
+		default:
+			break;
 
-    }
+	}
 
-    if (fogColor.w > sourceColor.w)
-        fogColor.w = sourceColor.w;
+	if (fogColor.w > sourceColor.w)
+		fogColor.w = sourceColor.w;
 
-    float4 result = sourceColor;
+	float4 result = sourceColor;
 
-    result.xyz += saturate(fogColor.xyz);
+	result.xyz += saturate(fogColor.xyz);
 
-    return result;
+	return result;
 }
 
 #endif // BLENDINGSHADER

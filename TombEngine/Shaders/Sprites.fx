@@ -1,12 +1,11 @@
 #include "./CBCamera.hlsli"
 #include "./Blending.hlsli"
-#include "./VertexInput.hlsli"
 #include "./Math.hlsli"
-#include "./ShaderLight.hlsli"
 #include "./SpriteEffects.hlsli"
+#include "./ShaderLight.hlsli"
+#include "./VertexInput.hlsli"
 
-// NOTE: This shader is used for all 3D and alpha blended sprites, because we send aleady transformed vertices to the GPU 
-// instead of instances
+// NOTE: Shader is used for all 3D and alpha blended sprites because transformed vertices are already sent to GPU instead of instances.
 
 #define FADE_FACTOR .789f
 
