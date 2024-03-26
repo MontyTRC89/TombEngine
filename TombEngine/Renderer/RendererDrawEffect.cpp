@@ -84,7 +84,6 @@ namespace TEN::Renderer
 			if (!beam.IsActive)
 				continue;
 
-			// Prepare cylinder tube.
 			for (int i = 0; i < LaserBeamEffect::SUBDIVISION_COUNT; i++)
 			{
 				bool isLastSubdivision = (i == (LaserBeamEffect::SUBDIVISION_COUNT - 1));
@@ -94,33 +93,6 @@ namespace TEN::Renderer
 					beam.Vertices[isLastSubdivision ? 0 : (i + 1)],
 					beam.Vertices[LaserBeamEffect::SUBDIVISION_COUNT + (isLastSubdivision ? 0 : (i + 1))],
 					beam.Vertices[LaserBeamEffect::SUBDIVISION_COUNT + i],
-					beam.Color, beam.Color,
-					beam.Color, beam.Color,
-					BlendMode::Additive, view, SpriteRenderType::LaserBeam);
-			}
-
-			// Prepare cylinder caps.
-			for (int i = 0; i < 2; i++)
-			{
-				int baseIndex = LaserBeamEffect::SUBDIVISION_COUNT * i;
-
-				AddColoredQuad(
-					beam.Vertices[baseIndex + 0], beam.Vertices[baseIndex + 1],
-					beam.Vertices[baseIndex + 2], beam.Vertices[baseIndex + 3],
-					beam.Color, beam.Color,
-					beam.Color, beam.Color,
-					BlendMode::Additive, view, SpriteRenderType::LaserBeam);
-
-				AddColoredQuad(
-					beam.Vertices[baseIndex + 0], beam.Vertices[baseIndex + 3],
-					beam.Vertices[baseIndex + 4], beam.Vertices[baseIndex + 7],
-					beam.Color, beam.Color,
-					beam.Color, beam.Color,
-					BlendMode::Additive, view, SpriteRenderType::LaserBeam);
-
-				AddColoredQuad(
-					beam.Vertices[baseIndex + 4], beam.Vertices[baseIndex + 5],
-					beam.Vertices[baseIndex + 6], beam.Vertices[baseIndex + 7],
 					beam.Color, beam.Color,
 					beam.Color, beam.Color,
 					BlendMode::Additive, view, SpriteRenderType::LaserBeam);
