@@ -24,8 +24,8 @@ using namespace TEN::Input;
 // Control & Collision Functions
 // -----------------------------
 
-// State:		LS_UNDERWATER_IDLE (13)
-// Collision:	lara_col_underwater_idle()
+// State:	  LS_UNDERWATER_IDLE (13)
+// Collision: lara_col_underwater_idle()
 void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
@@ -50,14 +50,35 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+		if (IsUsingOmnidirectionalSwimControls())
 		{
-			HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
-			HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
-			HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
-			HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+			if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+			{
+				// Turn.
+				HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
 
-			item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+				item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+			}
+		}
+		else if (IsUsingPlanarSwimControls())
+		{
+			if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+			{
+				// Turn.
+				HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+
+				item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+			}
+			else if (IsHeld(In::Jump) || IsHeld(In::Crouch))
+			{
+				item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+			}
 		}
 	}
 	else
@@ -74,6 +95,9 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (player.Control.HandStatus == HandStatus::Busy)
 		player.Control.HandStatus = HandStatus::Free;
+
+	// Reset.
+	//item->Animation.TargetState = LS_UNDERWATER_IDLE;
 }
 
 // State:		LS_UNDERWATER_IDLE (13)
@@ -108,13 +132,62 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
+		if (IsUsingOmnidirectionalSwimControls())
+		{
+			if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+			{
+				// Turn.
+				HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+
+				item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+			}
+			else
+			{
+				item->Animation.TargetState = LS_UNDERWATER_INERTIA;
+			}
+		}
+		else if (IsUsingPlanarSwimControls())
+		{
+			if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+			{
+				// Turn.
+				item->Pose.Orientation.Lerp(EulerAngles(0, item->Pose.Orientation.y, item->Pose.Orientation.z), PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+
+				item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+			}
+			else if (IsHeld(In::Jump))
+			{
+				item->Pose.Orientation.Lerp(EulerAngles(ANGLE(-90.0f), item->Pose.Orientation.y, item->Pose.Orientation.z), PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+
+				item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+			}
+			else if (IsHeld(In::Crouch))
+			{
+				item->Pose.Orientation.Lerp(EulerAngles(ANGLE(90.0f), item->Pose.Orientation.y, item->Pose.Orientation.z), PLAYER_SWIM_TURN_ALPHA);
+				HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+
+				item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
+			}
+			else
+			{
+				item->Animation.TargetState = LS_UNDERWATER_INERTIA;
+			}
+		}
+
+		/*HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
 		HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
 
 		if (!IsHeld(In::Forward) && !IsHeld(In::Back) && !IsHeld(In::Left) && !IsHeld(In::Right))
-			item->Animation.TargetState = LS_UNDERWATER_INERTIA;
+			item->Animation.TargetState = LS_UNDERWATER_INERTIA;*/
 	}
 	else
 	{
@@ -231,7 +304,7 @@ void lara_col_underwater_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	item->HitPoints = -1;
+	item->HitPoints = NO_VALUE;
 	player.Control.HandStatus = HandStatus::Busy;
 
 	int waterHeight = GetWaterHeight(item);

@@ -628,37 +628,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				}
 			}
 
-			// TODO
-			if (!IsPlayerStrafing(*item) && !CanStrafeBackward(*item, *coll))
-			{
-				if (CanWadeForward(*item, *coll))
-				{
-					item->Animation.TargetState = LS_WADE_FORWARD;
-					return;
-				}
-				else if (IsHeld(In::Walk))
-				{
-					if (CanWalkForward(*item, *coll))
-					{
-						item->Animation.TargetState = LS_WALK_FORWARD;
-						return;
-					}
-				}
-				else if (CanRunForward(*item, *coll))
-				{
-					if (IsHeld(In::Sprint))
-					{
-						item->Animation.TargetState = LS_SPRINT;
-					}
-					else
-					{
-						item->Animation.TargetState = LS_RUN_FORWARD;
-					}
-
-					return;
-				}
-			}
-			else
+			if (CanStrafeBackward(*item, *coll))
 			{
 				if (CanWadeBackward(*item, *coll))
 				{
@@ -672,6 +642,33 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				else if (CanRunBackward(*item, *coll))
 				{
 					item->Animation.TargetState = LS_SKIP_BACK;
+				}
+
+				return;
+			}
+
+			if (CanWadeForward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_WADE_FORWARD;
+				return;
+			}
+			else if (IsHeld(In::Walk))
+			{
+				if (CanWalkForward(*item, *coll))
+				{
+					item->Animation.TargetState = LS_WALK_FORWARD;
+					return;
+				}
+			}
+			else if (CanRunForward(*item, *coll))
+			{
+				if (IsHeld(In::Sprint))
+				{
+					item->Animation.TargetState = LS_SPRINT;
+				}
+				else
+				{
+					item->Animation.TargetState = LS_RUN_FORWARD;
 				}
 
 				return;
@@ -1448,12 +1445,12 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
+		// Turn.
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
+		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
+
 		if (IsPlayerStrafing(*item))
 		{
-			// Turn.
-			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
-			HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
-
 			if ((IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) &&
 				(IsHeld(In::Walk) || isWading))
 			{

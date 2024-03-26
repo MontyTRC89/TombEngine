@@ -478,12 +478,12 @@ static void UpdateAzimuthAngle(const ItemInfo& item)
 	short deltaAngle = Geometry::GetShortestAngle(Camera.actualAngle, GetPlayerHeadingAngleY(item));
 	if (abs(deltaAngle) <= BASE_ANGLE)
 	{
-		Camera.actualAngle += (deltaAngle * AZIMUTH_ANGLE_LERP_ALPHA) * alpha;
+		Camera.actualAngle += deltaAngle * (AZIMUTH_ANGLE_LERP_ALPHA * alpha);
 	}
 	else if (abs(deltaAngle) <= AUTO_ROT_DELTA_ANGLE_MAX)
 	{
 		int sign = std::copysign(1, deltaAngle);
-		Camera.actualAngle += ((BASE_ANGLE * AZIMUTH_ANGLE_LERP_ALPHA) * sign) * alpha;
+		Camera.actualAngle += (BASE_ANGLE * (AZIMUTH_ANGLE_LERP_ALPHA * alpha)) * sign;
 	}
 }
 
@@ -741,7 +741,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		}
 		else
 		{
-			AlterFOV((short)Lerp(CurrentFOV, ANGLE(DEFAULT_FOV), STRAFE_CAMERA_FOV_LERP_ALPHA));
+			AlterFOV((short)Lerp(CurrentFOV, ANGLE(DEFAULT_FOV), STRAFE_CAMERA_FOV_LERP_ALPHA / 2));
 		}
 
 		// Update camera.

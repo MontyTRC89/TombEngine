@@ -1663,18 +1663,33 @@ short GetPlayerHeadingAngleX(const ItemInfo& item)
 	}
 }
 
-short GetPlayerHeadingAngleY(const ItemInfo& item)
+short GetPlayerHeadingAngleY(const ItemInfo& item/*, short headingAngleConstraint*/)
 {
 	const auto& player = GetLaraInfo(item);
 
 	if (IsUsingModernControls())
 	{
-		if (IsPlayerStrafing(item) && item.Animation.Velocity.z == 0.0f)
+		float vel = Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length();
+		if (IsPlayerStrafing(item) && vel == 0.0f)
 			return player.Control.RefCameraOrient.y;
 
 		auto dir = player.Control.RefMoveAxis;
 		dir.Normalize();
 		short moveAxisAngle = FROM_RAD(atan2(dir.x, dir.y));
+
+		// TODO: Argument instead of hardcoding.
+		if (IsPlayerStrafing(item) && (item.Animation.ActiveState == LS_RUN_FORWARD ||
+			item.Animation.ActiveState == LS_WALK_FORWARD))
+		{
+			if (abs(moveAxisAngle) > ANGLE(90.0f))
+				moveAxisAngle = 0;
+		}
+		else if (item.Animation.ActiveState == LS_SKIP_BACK ||
+			item.Animation.ActiveState == LS_WALK_BACK)
+		{
+			if (abs(moveAxisAngle) <= ANGLE(90.0f))
+				moveAxisAngle = ANGLE(180.0f);
+		}
 
 		return (player.Control.RefCameraOrient.y + moveAxisAngle);
 	}

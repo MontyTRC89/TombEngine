@@ -317,7 +317,7 @@ namespace TEN::Entities::Player
 	{
 		constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
-		if (!IsUsingModernControls() || !IsPlayerStrafing(item))
+		if (!IsPlayerStrafing(item))
 			return false;
 
 		short relHeadingAngle = GetPlayerRelHeadingAngleY(item);
