@@ -21,8 +21,8 @@ using namespace TEN::Renderer;
 
 namespace TEN::Traps::TR5
 {
-	constexpr auto LASER_BEAM_LIGHT_INTENSITY = 50.0f;
-	constexpr auto LASER_BEAM_LIGHT_AMPLITUDE = 31.0f;
+	constexpr auto LASER_BEAM_LIGHT_INTENSITY	  = 0.2f;
+	constexpr auto LASER_BEAM_LIGHT_AMPLITUDE_MAX = 0.1f;
 
 	extern std::unordered_map<int, LaserBeamEffect> LaserBeams = {};
 
@@ -48,13 +48,14 @@ namespace TEN::Traps::TR5
 				sin(ang + Random::GenerateFloat(-PI_DIV_2, PI_DIV_2)),
 				Random::GenerateFloat(-1, 1),
 				cos(ang + Random::GenerateFloat(-PI_DIV_2, PI_DIV_2)));
-			vel += Vector3(Random::GenerateFloat(-64, 64), Random::GenerateFloat(-64, 64), Random::GenerateFloat(-64, 64));
+			vel += Vector3(Random::GenerateFloat(-64.0f, 64.0f), Random::GenerateFloat(-64.0f, 64.0f), Random::GenerateFloat(-64, 64.0f));
 			vel.Normalize(vel);
 
 			auto& spark = GetFreeSparkParticle();
-
 			spark = {};
-			spark.age = 0;
+
+			// TODO: Demagic.
+			spark.age = 0.0f;
 			spark.life = Random::GenerateFloat(10, 20);
 			spark.friction = 0.98f;
 			spark.gravity = 1.2f;
@@ -62,24 +63,19 @@ namespace TEN::Traps::TR5
 			spark.height = 34.0f;
 			spark.room = pos.RoomNumber;
 			spark.pos = pos.ToVector3();
-			spark.velocity = vel * Random::GenerateFloat(17, 24);
+			spark.velocity = vel * Random::GenerateFloat(17.0f, 24.0f);
 			spark.sourceColor = colorStart;
 			spark.destinationColor = Vector4::Zero;
 			spark.active = true;
 		}
 	}
 
-	static void SpawnLaserBeamLight(const Vector3& pos, int roomNumber, const Color& color, float intensity, float amplitude)
+	static void SpawnLaserBeamLight(const Vector3& pos, int roomNumber, const Color& color, float intensity, float amplitudeMax)
 	{
-		constexpr auto FALLOFF = 8;
+		constexpr auto FALLOFF = 0.03f;
 
-		float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitude);
-		TriggerDynamicLight(
-			pos.x, pos.y, pos.z,
-			FALLOFF,
-			intensityNorm * (color.x / 2),
-			intensityNorm * (color.y / 2),
-			intensityNorm * (color.z / 2));
+		float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitudeMax);
+		TriggerDynamicLight(pos, color * intensityNorm, FALLOFF);
 	}
 
 	void LaserBeamEffect::Update(const ItemInfo& item)
@@ -102,7 +98,7 @@ namespace TEN::Traps::TR5
 				SpawnLaserSpark(target, Random::GenerateAngle(), 3, Color);
 			}
 
-			SpawnLaserBeamLight(target.ToVector3(), target.RoomNumber, item.Model.Color, LASER_BEAM_LIGHT_INTENSITY, LASER_BEAM_LIGHT_AMPLITUDE);
+			SpawnLaserBeamLight(target.ToVector3(), target.RoomNumber, item.Model.Color, LASER_BEAM_LIGHT_INTENSITY, LASER_BEAM_LIGHT_AMPLITUDE_MAX);
 		}
 
 		float length = Vector3::Distance(origin.ToVector3(), target.ToVector3());
@@ -174,15 +170,15 @@ namespace TEN::Traps::TR5
 		beam.Update(item);
 
 		if (item.Model.Color.w >= 0.8f)
-			SpawnLaserBeamLight(item.Pose.Position.ToVector3(), item.RoomNumber, item.Model.Color, LASER_BEAM_LIGHT_INTENSITY, LASER_BEAM_LIGHT_AMPLITUDE);
+			SpawnLaserBeamLight(item.Pose.Position.ToVector3(), item.RoomNumber, item.Model.Color, LASER_BEAM_LIGHT_INTENSITY, LASER_BEAM_LIGHT_AMPLITUDE_MAX);
 
 		SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
 	}
 
 	void CollideLaserBeam(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
-		constexpr auto LASER_BEAM_LIGHT_INTENSITY_MODIFY = 255.0f;
-		constexpr auto LASER_BEAM_LIGHT_AMPLITUDE_MODIFY = 100.0f;
+		constexpr auto LIGHT_INTENSITY	   = 1.0f;
+		constexpr auto LIGHT_AMPLITUDE_MAX = 0.4f;
 
 		if (!LaserBeams.count(itemNumber))
 			return;
@@ -211,7 +207,7 @@ namespace TEN::Traps::TR5
 			if (beam.IsLethal &&
 				playerItem->HitPoints > 0 && playerItem->Effect.Type != EffectType::Smoke)
 			{
-				ItemRedLaserBurn(playerItem, 2.0f * FPS);
+				ItemRedLaserBurn(playerItem, FPS * 2);
 				DoDamage(playerItem, MAXINT);
 			}
 			else if (beam.IsHeavyActivator)
@@ -220,7 +216,7 @@ namespace TEN::Traps::TR5
 			}
 
 			beam.Color.w = Random::GenerateFloat(0.6f, 1.0f);
-			SpawnLaserBeamLight(item.Pose.Position.ToVector3(), item.RoomNumber, item.Model.Color, LASER_BEAM_LIGHT_INTENSITY_MODIFY, LASER_BEAM_LIGHT_AMPLITUDE_MODIFY);
+			SpawnLaserBeamLight(item.Pose.Position.ToVector3(), item.RoomNumber, item.Model.Color, LIGHT_INTENSITY, LIGHT_AMPLITUDE_MAX);
 		}		
 	}
 
