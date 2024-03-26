@@ -412,6 +412,7 @@ namespace TEN::Renderer
 		void InitializeSky();
 		void DrawAllStrings();
 		void PrepareLaserBarriers(RenderView& view);
+		void PrepareSingleLaserBeam(RenderView& view);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, RendererPass rendererPass);
 		void DrawItems(RenderView& view, RendererPass rendererPass);

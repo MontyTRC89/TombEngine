@@ -14,7 +14,7 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR5/Entity/AutoGun.h"		 // OK
+#include "Objects/TR5/Entity/AutoGun.h"			 // OK
 #include "Objects/TR5/Entity/HeavyGuard.h"		 // OK
 #include "Objects/TR5/Entity/tr5_brownbeast.h"	 // OK
 #include "Objects/TR5/Entity/tr5_chef.h"		 // OK
@@ -58,6 +58,7 @@
 #include "Objects/Effects/EmberEmitter.h"
 #include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/LaserBeam.h"
 #include "Objects/TR5/Trap/ZipLine.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
 #include "Objects/TR5/Trap/tr5_ventilator.h"
@@ -944,6 +945,16 @@ static void StartTrap(ObjectInfo *obj)
 		obj->Initialize = InitializeLaserBarrier;
 		obj->control = ControlLaserBarrier;
 		obj->collision = CollideLaserBarrier;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_LASER_BEAM];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeLaserBeam;
+		obj->control = ControlLaserBeam;
+		obj->collision = CollideLaserBeam;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}

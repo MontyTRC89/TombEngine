@@ -49,6 +49,7 @@
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/LaserBeam.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -431,6 +432,7 @@ void CleanUp()
 	ClearDrips();
 	ClearRipples();
 	ClearLaserBarrierEffects();
+	ClearLaserBeamEffects();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();

@@ -27,6 +27,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/LaserBeam.h"
 #include "Objects/Utils/object_helper.h"
 #include "Renderer/Structures/RendererSprite2D.h"
 #include "Renderer/Structures/RendererSprite.h"
@@ -62,10 +63,7 @@ namespace TEN::Renderer
 		
 	void Renderer::PrepareLaserBarriers(RenderView& view)
 	{
-		if (LaserBarriers.empty())
-			return;
-
-		for (const auto& [entityID, barrier] : LaserBarriers)
+		for (const auto& [itemNumber, barrier] : LaserBarriers)
 		{
 			for (const auto& beam : barrier.Beams)
 			{
@@ -79,11 +77,34 @@ namespace TEN::Renderer
 		}
 	}
 
+	void Renderer::PrepareSingleLaserBeam(RenderView& view)
+	{
+		for (const auto& [itemNumber, beam] : LaserBeams)
+		{
+			if (!beam.IsActive)
+				continue;
+
+			for (int i = 0; i < LaserBeamEffect::SUBDIVISION_COUNT; i++)
+			{
+				bool isLastSubdivision = (i == (LaserBeamEffect::SUBDIVISION_COUNT - 1));
+
+				AddColoredQuad(
+					beam.Vertices[i],
+					beam.Vertices[isLastSubdivision ? 0 : (i + 1)],
+					beam.Vertices[LaserBeamEffect::SUBDIVISION_COUNT + (isLastSubdivision ? 0 : (i + 1))],
+					beam.Vertices[LaserBeamEffect::SUBDIVISION_COUNT + i],
+					beam.Color, beam.Color,
+					beam.Color, beam.Color,
+					BlendMode::Additive, view, SpriteRenderType::LaserBeam);
+			}
+		}
+	}
+
 	void Renderer::PrepareStreamers(RenderView& view)
 	{
-		constexpr auto BLEND_MODE_DEFAULT = BlendMode::Additive;
+		constexpr auto DEFAULT_BLEND_MODE = BlendMode::Additive;
 
-		for (const auto& [entityNumber, module] : StreamerEffect.Modules)
+		for (const auto& [itemNumber, module] : StreamerEffect.Modules)
 		{
 			for (const auto& [tag, pool] : module.Pools)
 			{
@@ -96,9 +117,9 @@ namespace TEN::Renderer
 
 						if (segment.Life <= 0.0f)
 							continue;
-
+						
 						// Determine blend mode.
-						auto blendMode = BLEND_MODE_DEFAULT;
+						auto blendMode = DEFAULT_BLEND_MODE;
 						if (segment.Flags & (int)StreamerFlags::BlendModeAdditive)
 							blendMode = BlendMode::AlphaBlend;
 

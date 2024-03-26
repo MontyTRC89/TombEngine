@@ -387,6 +387,8 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 				{
 					if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
 					{
+						const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
+						mesh->HitPoints -= weapon.Damage;
 						ShatterImpactData.impactDirection = dir;
 						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 						ShatterObject(nullptr, mesh, 128, target2.RoomNumber, 0);

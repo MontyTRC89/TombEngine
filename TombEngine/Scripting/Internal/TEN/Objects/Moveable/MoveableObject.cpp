@@ -290,14 +290,21 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @function Moveable:SetFrame
 // @tparam int frame the new frame number
 	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
-		
+
+/// Get current HP (hit points/health points)
+// @function Moveable:GetHP
+// @treturn int the amount of HP the moveable currently has
 	ScriptReserved_GetHP, &Moveable::GetHP,
 
+/// Set current HP (hit points/health points)
+// Clamped to [0, 32767] for "intelligent" entities (i.e. anything with AI); clamped to [-32767, 32767] otherwise.
+// @function Moveable:SetHP
+// @tparam int HP the amount of HP to give the moveable
 	ScriptReserved_SetHP, &Moveable::SetHP,
 
 /// Get HP definded for that object type (hit points/health points) (Read Only).
 // @function Moveable:GetSlotHP
-// @tparam int ID of the moveable slot type.
+// @treturn int the moveable's slot default hit points
 ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Get OCB (object code bit) of the moveable
@@ -623,18 +630,11 @@ void Moveable::SetRot(const Rotation& rot)
 		UpdateBridgeItem(*m_item);
 }
 
-/// Get current HP (hit points/health points)
-// @function Moveable:GetHP
-// @treturn int the amount of HP the moveable currently has
 short Moveable::GetHP() const
 {
 	return m_item->HitPoints;
 }
 
-/// Set current HP (hit points/health points)
-// Clamped to [0, 32767] for "intelligent" entities (i.e. anything with AI); clamped to [-32767, 32767] otherwise.
-// @function Moveable:SetHP
-// @tparam int HP the amount of HP to give the moveable
 void Moveable::SetHP(short hp)
 {
 	if (Objects[m_item->ObjectNumber].intelligent && hp < 0)

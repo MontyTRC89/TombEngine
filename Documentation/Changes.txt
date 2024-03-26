@@ -15,13 +15,15 @@ Version 1.4
   - Wall spikes will shatter any shatter in its path.
   - Wall spikes can be stopped by normal antitrigger or with a volume.
 * Added hub system to preserve level state on level jumps.
-* Added Ember emitter nullmesh object.
-* Added TR2 Dragon.
-* Added TR3 Winston (requires updated TEN Winston wad2).
+* Added ember emitter object.
+* Added laser beam object.
+* Added TR2 dragon.
+* Added TR3 Winston (requires updated TEN Winston .wad2).
 
 Lua API changes:
 * Added resetHub flag to Flow.Level, which allows to reset hub data.
 * Added Moveable:GetMeshCount() function to get number of moveable meshes.
+* Added Static:GetHP() and Static:SetHP() functions to change shatterable static mesh hit points.
 
 Version 1.3
 ===========
