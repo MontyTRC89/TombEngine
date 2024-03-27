@@ -11,12 +11,12 @@
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
-std::vector<BoundingSphere> GetSpheres(const ItemInfo* itemPtr, int spaceFlags, const Matrix& localMatrix)
+std::vector<BoundingSphere> GetSpheres(const ItemInfo* itemPtr, int spaceFlags)
 {
 	if (itemPtr == nullptr)
 		return {};
 
-	return g_Renderer.GetSpheres(itemPtr->Index, spaceFlags, localMatrix);
+	return g_Renderer.GetSpheres(itemPtr->Index, spaceFlags, Matrix::Identity);
 }
 
 int TestCollision(ItemInfo* creatureItemPtr, ItemInfo* playerItemPtr)

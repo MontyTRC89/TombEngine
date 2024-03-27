@@ -9,5 +9,5 @@ enum class SphereSpaceFlags
 	BoneOrigin = 1 << 2
 };
 
-std::vector<BoundingSphere> GetSpheres(const ItemInfo* itemPtr, int spaceFlags, const Matrix& localMatrix = Matrix::Identity);
+std::vector<BoundingSphere> GetSpheres(const ItemInfo* itemPtr, int spaceFlags);
 int TestCollision(ItemInfo* creatureItemPtr, ItemInfo* playerItemPtr);
