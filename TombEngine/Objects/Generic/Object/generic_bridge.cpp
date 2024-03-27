@@ -10,15 +10,28 @@ using namespace TEN::Collision::Floordata;
 
 namespace TEN::Entities::Generic
 {
+	static int GetTiltOffset(const ItemInfo& item, const Vector3i& pos, int tiltGrade, bool isFloor)
+	{
+		// Calculate delta position.
+		auto deltaPos = (item.Pose.Position - pos).ToVector3();
+
+		// Calculate tilt normal.
+		int sign = isFloor ? -1 : 1;
+		auto rotMatrix = EulerAngles(0, item.Pose.Orientation.y, 0).ToRotationMatrix();
+		auto normal = Vector3::Transform(Vector3(-tiltGrade, 1.0f, 0.0f) * sign, rotMatrix);
+		normal.Normalize();
+
+		// Calculate and return tilt offset.
+		float relPlaneHeight = -((normal.x * deltaPos.x) + (normal.z * deltaPos.z)) / normal.y;
+		return ((relPlaneHeight / 4) + CLICK(tiltGrade * 0.5f));
+	}
+
 	template <int tiltGrade>
 	static std::optional<int> GetBridgeFloorHeight(const ItemInfo& item, const Vector3i& pos)
 	{
 		auto boxHeight = GetBridgeItemIntersect(item, pos, false);
 		if (boxHeight.has_value() && tiltGrade != 0)
-		{
-			int height = item.Pose.Position.y + (tiltGrade * ((GetOffset(item.Pose.Orientation.y, pos.x, pos.z) / 4) + (BLOCK(1 / 8.0f))));
-			return height;
-		}
+			return (*boxHeight + GetTiltOffset(item, pos, tiltGrade, true));
 
 		return boxHeight;
 	}
@@ -28,10 +41,7 @@ namespace TEN::Entities::Generic
 	{
 		auto boxHeight = GetBridgeItemIntersect(item, pos, true);
 		if (boxHeight.has_value() && tiltGrade != 0)
-		{
-			int height = item.Pose.Position.y + (tiltGrade * ((GetOffset(item.Pose.Orientation.y, pos.x, pos.z) / 4) + (BLOCK(1 / 8.0f))));
-			return (height + CLICK(1));
-		}
+			return ((item.Pose.Position.y + GetTiltOffset(item, pos, tiltGrade, false)) + CLICK(1));
 
 		return boxHeight;
 	}
@@ -95,16 +105,5 @@ namespace TEN::Entities::Generic
 		}
 
 		UpdateBridgeItem(bridgeItem);
-	}
-
-	int GetOffset(short angle, int x, int z)
-	{
-		// Get rotated sector point.
-		auto sectorPoint = GetSectorPoint(x, z).ToVector2();
-		auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(angle));
-		Vector2::Transform(sectorPoint, rotMatrix, sectorPoint);
-
-		// Return offset.
-		return -sectorPoint.x;
 	}
 }

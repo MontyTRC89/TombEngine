@@ -6,6 +6,7 @@
 #include "Game/collision/sphere.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/Bubble.h"
@@ -26,6 +27,7 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
@@ -311,7 +313,7 @@ namespace TEN::Entities::Vehicles
 				if (Random::TestProbability(1 / 2.0f))
 				{
 					auto bubblePos = Random::GeneratePointInSphere(sphere);
-					int probedRoomNumber = GetCollision(bubblePos.x, bubblePos.y, bubblePos.z, UPVItem->RoomNumber).RoomNumber;
+					int probedRoomNumber = GetPointCollision(bubblePos, UPVItem->RoomNumber).GetRoomNumber();
 				
 					for (int i = 0; i < 3; i++)
 						SpawnBubble(bubblePos, probedRoomNumber, (int)BubbleFlags::HighAmplitude);
@@ -358,12 +360,12 @@ namespace TEN::Entities::Vehicles
 		int z = UPVItem->Pose.Position.z + velocity * phd_cos(moveAngle);
 		int y = UPVItem->Pose.Position.y - UPV_DISMOUNT_DISTANCE * phd_sin(-UPVItem->Pose.Orientation.x);
 
-		auto probe = GetCollision(x, y, z, UPVItem->RoomNumber);
-		if ((probe.Position.Floor - probe.Position.Ceiling) < CLICK(1) ||
-			probe.Position.Floor < y ||
-			probe.Position.Ceiling > y ||
-			probe.Position.Floor == NO_HEIGHT ||
-			probe.Position.Ceiling == NO_HEIGHT)
+		auto probe = GetPointCollision(Vector3i(x, y, z), UPVItem->RoomNumber);
+		if ((probe.GetFloorHeight() - probe.GetCeilingHeight()) < CLICK(1) ||
+			probe.GetFloorHeight() < y ||
+			probe.GetCeilingHeight() > y ||
+			probe.GetFloorHeight() == NO_HEIGHT ||
+			probe.GetCeilingHeight() == NO_HEIGHT)
 		{
 			return false;
 		}
@@ -849,7 +851,7 @@ namespace TEN::Entities::Vehicles
 		auto* UPV = GetUPVInfo(UPVItem);
 	
 		auto oldPos = UPVItem->Pose;
-		auto probe = GetCollision(UPVItem);
+		auto probe = GetPointCollision(*UPVItem);
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD))
 		{
@@ -869,7 +871,7 @@ namespace TEN::Entities::Vehicles
 			TranslateItem(UPVItem, UPVItem->Pose.Orientation, UPVItem->Animation.Velocity.z);
 		}
 
-		int newHeight = GetCollision(UPVItem).Position.Floor;
+		int newHeight = GetPointCollision(*UPVItem).GetFloorHeight();
 		int waterHeight = GetWaterHeight(UPVItem);
 
 		if ((newHeight - waterHeight) < UPV_HEIGHT || (newHeight < UPVItem->Pose.Position.y - UPV_HEIGHT / 2) || 
@@ -879,7 +881,7 @@ namespace TEN::Entities::Vehicles
 			UPVItem->Animation.Velocity.z = 0;
 		}
 
-		UPVItem->Floor = probe.Position.Floor;
+		UPVItem->Floor = probe.GetFloorHeight();
 
 		if (UPV->Flags & UPV_FLAG_CONTROL && !(UPV->Flags & UPV_FLAG_DEAD))
 		{
@@ -898,7 +900,7 @@ namespace TEN::Entities::Vehicles
 				UPV->Flags |= UPV_FLAG_SURFACE;
 			}
 			else if ((waterHeight - UPVItem->Pose.Position.y) >= -UPV_WATER_SURFACE_DISTANCE && waterHeight != NO_HEIGHT &&
-					 (laraItem->Pose.Position.y - probe.Position.Ceiling) >= CLICK(1))
+					 (laraItem->Pose.Position.y - probe.GetCeilingHeight()) >= CLICK(1))
 			{
 				UPVItem->Pose.Position.y = waterHeight + UPV_WATER_SURFACE_DISTANCE;
 
@@ -963,10 +965,10 @@ namespace TEN::Entities::Vehicles
 				}
 			}
 
-			if (probe.RoomNumber != UPVItem->RoomNumber)
+			if (probe.GetRoomNumber() != UPVItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(laraItem->Index, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
+				ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 			}
 
 			laraItem->Pose = UPVItem->Pose;
@@ -991,8 +993,8 @@ namespace TEN::Entities::Vehicles
 		{
 			AnimateItem(laraItem);
 
-			if (probe.RoomNumber != UPVItem->RoomNumber)
-				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
+			if (probe.GetRoomNumber() != UPVItem->RoomNumber)
+				ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
 
 			BackgroundCollision(UPVItem, laraItem);
 

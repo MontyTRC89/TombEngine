@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/PointCollision.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
@@ -24,6 +25,7 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 
+using namespace TEN::Collision::PointCollision;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 
@@ -312,12 +314,12 @@ void RefreshCamera(short type, short* data)
 
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 {
-	auto bottomBlock = GetCollision(x, y, z, floor->RoomNumber).BottomBlock; 
+	const auto& bottomSector = GetPointCollision(Vector3i(x, y, z), floor->RoomNumber).GetBottomSector(); 
 
-	if (bottomBlock->TriggerIndex == -1)
+	if (bottomSector.TriggerIndex == -1)
 		return nullptr;
 
-	return &g_Level.FloorData[bottomBlock->TriggerIndex];
+	return &g_Level.FloorData[bottomSector.TriggerIndex];
 }
 
 short* GetTriggerIndex(ItemInfo* item)
@@ -516,7 +518,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
-			if (GetCollision(floor, x, y, z).Position.Floor == y)
+			if (GetPointCollision(Vector3i(x, y, z), floor->RoomNumber).GetFloorHeight() == y)
 				break;
 			return;
 
@@ -841,8 +843,8 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ItemInfo* item)
 {
-	auto pointColl = GetCollision(item);
-	auto* sectorPtr = GetCollision(item).BottomBlock;
+	auto pointColl = GetPointCollision(*item);
+	auto* sectorPtr = &GetPointCollision(*item).GetBottomSector();
 
 	bool isPlayer = item->IsLara();
 
@@ -870,7 +872,7 @@ void ProcessSectorFlags(ItemInfo* item)
 				GetLaraInfo(item)->Control.WaterStatus != WaterStatus::Dry)
 			{
 				// To allow both lava and rapids in same level, also check floor material flag.
-				if (sectorPtr->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water &&
+				if (sectorPtr->GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true) == MaterialType::Water &&
 					Objects[ID_KAYAK_LARA_ANIMS].loaded)
 				{
 					KayakLaraRapidsDrown(item);
@@ -883,7 +885,7 @@ void ProcessSectorFlags(ItemInfo* item)
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 		{
-			if (sectorPtr->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water ||
+			if (sectorPtr->GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true) == MaterialType::Water ||
 				TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sectorPtr->RoomNumber))
 			{
 				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!

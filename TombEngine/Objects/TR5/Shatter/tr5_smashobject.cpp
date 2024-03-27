@@ -6,6 +6,8 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 
+using namespace TEN::Collision::Room;
+
 void InitializeSmashObject(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
