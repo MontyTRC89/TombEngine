@@ -27,28 +27,29 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+		auto spheres = GetSpheres(item, (int)SphereSpaceFlags::World);
 		if (item->ItemFlags[0] >= 150)
 		{
 			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose);
 			SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
 
-			if (num > 0)
+			if (!spheres.empty())
 			{
-				for (int i = 0; i < num; i++)
+				for (int i = 0; i < spheres.size(); i++)
 				{
+					// TODO: Hardcoding.
 					if (i >= 7 && i != 9)
 					{
-						auto* sphere = &CreatureSpheres[i];
+						const auto& sphere = spheres[i];
 
-						TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -2, 0, -item->RoomNumber);
-						TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -1, 0, -item->RoomNumber);
-						TriggerShockwave((Pose*)sphere, 48, 304, (GetRandomControl() & 0x1F) + 112, 0, 96, 128, 32, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
+						TriggerExplosionSparks(sphere.Center.x, sphere.Center.y, sphere.Center.z, 3, -2, 0, -item->RoomNumber);
+						TriggerExplosionSparks(sphere.Center.x, sphere.Center.y, sphere.Center.z, 3, -1, 0, -item->RoomNumber);
+						TriggerShockwave(&Pose(Vector3i(sphere.Center)), 48, 304, (GetRandomControl() & 0x1F) + 112, 0, 96, 128, 32, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 					}
 				}
 
-				for (int i = 0; i < num; i++)
+				for (int i = 0; i < spheres.size(); i++)
 					ExplodeItemNode(item, i, 0, -128);
 			}
 
@@ -77,12 +78,12 @@ namespace TEN::Entities::TR4
 			if (fade > 255)
 				fade = 0;
 
-			for (int i = 0; i < num; i++)
+			for (int i = 0; i < spheres.size(); i++)
 			{
 				if (i == 0 || i > 5)
 				{
-					auto* sphere = &CreatureSpheres[i];
-					AddFire(sphere->x, sphere->y, sphere->z, item->RoomNumber, 0.25f, fade);
+					const auto& sphere = spheres[i];
+					AddFire(sphere.Center.x, sphere.Center.y, sphere.Center.z, item->RoomNumber, 0.25f, fade);
 				}
 			}
 

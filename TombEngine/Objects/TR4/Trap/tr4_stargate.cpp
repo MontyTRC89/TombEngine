@@ -67,6 +67,7 @@ namespace TEN::Entities::Traps
 			item->Animation.FrameNumber < GetAnimData(item).frameBase + 60)
 		{
 			// Blades deal damage cumulatively.
+			auto spheres = GetSpheres(item, (int)SphereSpaceFlags::World);
 			for (int i = 0; i < StargateHarmJoints.size(); i++)
 			{
 				if (item->TouchBits.Test(StargateHarmJoints[i]))
@@ -74,7 +75,7 @@ namespace TEN::Entities::Traps
 					DoDamage(laraItem, STARGATE_HARM_DAMAGE);
 					DoBloodSplat(
 						(GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32,
-						(GetRandomControl() & 0x1F) + CreatureSpheres[i].y - 16,
+						(GetRandomControl() & 0x1F) + spheres[i].Center.y - 16,
 						(GetRandomControl() & 0x3F) + laraItem->Pose.Position.z - 32,
 						(GetRandomControl() & 3) + 2,
 						GetRandomControl() * 2,

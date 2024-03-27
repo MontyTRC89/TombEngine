@@ -31,7 +31,7 @@ namespace TEN::Entities::TR4
 
             item->MeshBits |= 2;
 
-            auto pos =  GetJointPosition(item, SPHERES_SPACE_WORLD);
+            auto pos =  GetJointPosition(item, 0);
             byte color = (GetRandomControl() & 0x1F) + 192;
             TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, color, color, 0);
 

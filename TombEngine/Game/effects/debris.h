@@ -26,7 +26,7 @@ struct ITEM_LIGHT
 
 struct SHATTER_ITEM
 {
-	SPHERE sphere;
+	BoundingSphere sphere;
 	ITEM_LIGHT* il;
 	int meshIndex;
 	Vector4 color;

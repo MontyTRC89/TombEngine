@@ -408,17 +408,16 @@ namespace TEN::Renderer
 		return _meshes[meshIndex];
 	}
 
-	int Renderer::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
+	std::vector<BoundingSphere> Renderer::GetSpheres(int itemNumber, int spaceFlags, const Matrix& localMatrix)
 	{
-		auto* itemToDraw = &_items[itemNumber];
-		auto* nativeItem = &g_Level.Items[itemNumber];
+		const auto* nativeItemPtr = &g_Level.Items[itemNumber];
+		if (nativeItemPtr == nullptr)
+			return {};
 
-		itemToDraw->ItemNumber = itemNumber;
+		auto& itemToDraw = _items[itemNumber];
+		itemToDraw.ItemNumber = itemNumber;
 
-		if (!nativeItem)
-			return 0;
-
-		if (!itemToDraw->DoneAnimations)
+		if (!itemToDraw.DoneAnimations)
 		{
 			if (itemNumber == LaraItem->Index)
 			{
@@ -430,38 +429,43 @@ namespace TEN::Renderer
 			}
 		}
 
-		auto world = Matrix::Identity;
-		if (worldSpace & SPHERES_SPACE_WORLD)
+		auto worldMatrix = Matrix::Identity;
+		if (spaceFlags & (int)SphereSpaceFlags::World)
 		{
-			world = Matrix::CreateTranslation(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z) * local;
+			worldMatrix = Matrix::CreateTranslation(nativeItemPtr->Pose.Position.ToVector3()) * localMatrix;
 		}
 		else
 		{
-			world = Matrix::Identity * local;
+			worldMatrix = Matrix::Identity * localMatrix;
 		}
+		worldMatrix = nativeItemPtr->Pose.Orientation.ToRotationMatrix() * worldMatrix;
 
-		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
+		const auto& moveable = GetRendererObject(nativeItemPtr->ObjectNumber);
 
-		auto& moveable = GetRendererObject(nativeItem->ObjectNumber);
-
-		for (int i = 0; i< moveable.ObjectMeshes.size();i++)
+		// Collect spheres.
+		auto spheres = std::vector<BoundingSphere>{};
+		for (int i = 0; i < moveable.ObjectMeshes.size(); i++)
 		{
-			auto mesh = moveable.ObjectMeshes[i];
+			const auto& mesh = *moveable.ObjectMeshes[i];
 
-			auto pos = (Vector3)mesh->Sphere.Center;
-			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
-				pos += moveable.LinearizedBones[i]->Translation;
+			auto relPos = Vector3(mesh.Sphere.Center);
+			if (spaceFlags & (int)SphereSpaceFlags::BoneOrigin)
+				relPos += moveable.LinearizedBones[i]->Translation;
 
-			spheres[i].Center = Vector3::Transform(pos, (itemToDraw->AnimationTransforms[i] * world));
-			spheres[i].Radius = mesh->Sphere.Radius;
+			const auto& tMatrix = itemToDraw.AnimationTransforms[i];
+			auto pos = Vector3::Transform(relPos, tMatrix * worldMatrix);
 
-			// Spheres debug
-			// auto v1 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
-			// auto v2 = Vector3(spheres[i].Center.x + spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
-			// AddDebugLine(v1, v2, Vector4::One);
+			// Add sphere.
+			auto sphere = BoundingSphere(pos, mesh.Sphere.Radius);
+			spheres.push_back(sphere);
+
+			// Debug
+			/* auto linePoint0 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
+			 auto linePoint1 = Vector3(spheres[i].Center.x + spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
+			 AddDebugLine(linePoint0, linePoint1, Vector4::One);*/
 		}
-
-		return (int)moveable.ObjectMeshes.size();
+		
+		return spheres;
 	}
 
 	void Renderer::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
