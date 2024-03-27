@@ -60,30 +60,30 @@ struct CollisionPositionData
 
 struct CollisionSetupData
 {
-	// Collider parameters.
+	// Collider parameters
 	CollisionProbeMode Mode = CollisionProbeMode::Quadrants;
 	int   Radius	   = 0;
 	int   Height	   = 0;
 	short ForwardAngle = 0;
 
-	// Borderline step heights.
+	// Borderline step heights
 	int LowerFloorBound	  = 0;
 	int UpperFloorBound	  = 0;
 	int LowerCeilingBound = 0;
 	int UpperCeilingBound = 0;
 
-	// Blocker flags.
+	// Blocker flags
 	bool BlockFloorSlopeUp	  = false;
 	bool BlockFloorSlopeDown  = false;
 	bool BlockCeilingSlope	  = false;
 	bool BlockDeathFloorDown  = false;
 	bool BlockMonkeySwingEdge = false;
 	
-	// Object collision inquirers.
+	// Inquirers
 	bool EnableObjectPush = false;
 	bool EnableSpasm	  = false;
 
-	// Previous parameters.
+	// Previous parameters
 	Vector3i	   PrevPosition		= Vector3i::Zero;
 	GAME_OBJECT_ID PrevAnimObjectID = ID_NO_OBJECT;
 	int			   PrevAnimNumber	= 0;
@@ -93,7 +93,7 @@ struct CollisionSetupData
 
 struct CollisionInfo
 {
-	CollisionSetupData Setup = {}; // In parameters
+	CollisionSetupData Setup = {};
 
 	CollisionPositionData Middle	  = {};
 	CollisionPositionData MiddleLeft  = {};
@@ -118,6 +118,7 @@ struct CollisionInfo
 	bool HitStatic	   = false;
 	bool HitTallObject = false;
 
+	// Inquirers.
 	bool TriangleAtRight()	   { return ((MiddleRight.SplitAngle != 0) && (MiddleRight.SplitAngle == Middle.SplitAngle)); }
 	bool TriangleAtLeft()	   { return ((MiddleLeft.SplitAngle != 0) && (MiddleLeft.SplitAngle == Middle.SplitAngle)); }
 	bool DiagonalStepAtRight() { return (MiddleRight.DiagonalStep && TriangleAtRight() && (NearestLedgeAngle % ANGLE(90.0f))); }
