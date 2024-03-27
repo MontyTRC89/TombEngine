@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "tr4_mine.h"
 #include "Specific/level.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Sound/sound.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -11,6 +11,7 @@
 #include "Game/collision/collide_item.h"
 #include "Objects/objectslist.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Environment;
 
 namespace TEN::Entities::TR4

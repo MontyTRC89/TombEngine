@@ -4,7 +4,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -14,6 +14,7 @@
 #include "Specific/level.h"
 #include "Renderer/RenderView.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
 namespace TEN::Renderer

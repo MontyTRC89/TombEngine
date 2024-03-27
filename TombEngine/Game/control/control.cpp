@@ -6,7 +6,6 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"

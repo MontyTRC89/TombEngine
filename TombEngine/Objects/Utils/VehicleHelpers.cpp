@@ -2,7 +2,7 @@
 #include "Objects/Utils/VehicleHelpers.h"
 
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
@@ -15,6 +15,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Hud;
 using namespace TEN::Input;

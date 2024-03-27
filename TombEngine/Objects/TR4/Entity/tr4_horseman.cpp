@@ -3,7 +3,6 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"

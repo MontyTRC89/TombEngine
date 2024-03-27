@@ -2,12 +2,15 @@
 
 struct ItemInfo;
 
-enum class SphereSpaceFlags
+namespace TEN::Collision::Sphere
 {
-	Local	   = 1,
-	World	   = 1 << 1,
-	BoneOrigin = 1 << 2
-};
+	enum class SphereSpaceFlags
+	{
+		Local = 1,
+		World = 1 << 1,
+		BoneOrigin = 1 << 2
+	};
 
-std::vector<BoundingSphere> GetSpheres(const ItemInfo* itemPtr, int spaceFlags);
-int TestCollision(ItemInfo* creatureItemPtr, ItemInfo* playerItemPtr);
+	std::vector<BoundingSphere> GetSpheres(const ItemInfo* itemPtr, int spaceFlags);
+	int TestCollision(ItemInfo* creatureItemPtr, ItemInfo* playerItemPtr);
+}
