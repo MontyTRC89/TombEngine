@@ -33,32 +33,47 @@ enum class CameraFlag
 {
 	Vector3 Position		 = Vector3::Zero;
 	int		RoomNumber		 = 0;
-	Vector3 PositionTarget	 = Vector3::Zero;
-	int		RoomNumberTarget = 0;
+	Vector3 LookAt			 = Vector3::Zero;
+	int		LookAtRoomNumber = 0;
 
-	Vector3 LookAt				   = Vector3::Zero;
-	int		LookAtRoomNumber	   = 0;
-	Vector3 LookAtTarget		   = Vector3::Zero;
-	int		LookAtRoomNumberTarget = 0;
-
-	short AzimuthAngle		  = 0;
-	short AzimuthAngleTarget  = 0;
-	short AltitudeAngle		  = 0;
-	short AltitudeAngleTarget = 0;
-	float Distance		   = 0.0f;
-	float DistanceTarget   = 0.0f;
-
-	float SpeedAlpha = 0.0f;
+	short AzimuthAngle	= 0;
+	short AltitudeAngle = 0;
+	float Distance		= 0.0f;
 };
 
 class CameraObject
 {
 private:
+	float SpeedAlpha = 0.0f;
 
 public:
-	CameraSphereData Sphere = {};
+	CameraSphereData Sphere		  = {};
+	CameraSphereData SphereTarget = {};
 
 private:
+	void UpdateSphere()
+	{
+		auto posDelta = Vector3::Lerp(Sphere.Position, SphereTarget.Position, SpeedAlpha) - Sphere.Position;
+		auto posDir = SphereTarget.Position - Sphere.Position;
+		posDir.Normalize();
+
+		// Update position.
+		Sphere.Position += posDelta;
+		Sphere.RoomNumber = GetCollision(Sphere.Position, Sphere.RoomNumber, posDir, posDelta.Length()).RoomNumber;
+
+		auto lookAtDelta = Vector3::Lerp(Sphere.LookAt, SphereTarget.LookAt, SpeedAlpha) - Sphere.LookAt;
+		auto lookAtDir = SphereTarget.LookAt - Sphere.LookAt;
+		lookAtDir.Normalize();
+
+		// Update lookAt.
+		Sphere.LookAt += posDelta;
+		Sphere.LookAtRoomNumber = GetCollision(Sphere.LookAt, Sphere.LookAtRoomNumber, lookAtDir, lookAtDelta.Length()).RoomNumber;
+
+		// Update angles and distance.
+		Sphere.AzimuthAngle = Lerp(Sphere.AzimuthAngle, SphereTarget.AzimuthAngle, SpeedAlpha);
+		Sphere.AltitudeAngle = Lerp(Sphere.AltitudeAngle, SphereTarget.AltitudeAngle, SpeedAlpha);
+		Sphere.Distance = Lerp(Sphere.Distance, SphereTarget.Distance, SpeedAlpha);
+	}
 };*/
 
 struct CAMERA_INFO
