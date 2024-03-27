@@ -742,7 +742,7 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 	GetCollisionInfo(coll, item1);
 	coll->Setup.ForwardAngle = headingAngle;
 
-	if (coll->CollisionType == CT_NONE)
+	if (coll->CollisionType == CollisionType::None)
 	{
 		coll->Setup.PrevPosition = item1->Pose.Position;
 	}
@@ -867,7 +867,7 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 
 	coll->Setup.ForwardAngle = prevHeadingAngle;
 
-	if (coll->CollisionType == CT_NONE)
+	if (coll->CollisionType == CollisionType::None)
 	{
 		coll->Setup.PrevPosition = item->Pose.Position;
 		if (item->IsLara())
@@ -1087,13 +1087,13 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 			{
 				// HACK: Additionally subtract 2 from bottom plane, otherwise false positives may occur.
 				item->Pose.Position.y += distanceToVerticalPlane + 2;
-				coll->CollisionType = CT_TOP;
+				coll->CollisionType = CollisionType::Top;
 			}
 			else
 			{
 				// Set collision type only if dry room (in water rooms the player can get stuck).
 				item->Pose.Position.y -= distanceToVerticalPlane;
-				coll->CollisionType = (g_Level.Rooms[item->RoomNumber].flags & 1) ? coll->CollisionType : CT_CLAMP;
+				coll->CollisionType = (g_Level.Rooms[item->RoomNumber].flags & 1) ? coll->CollisionType : CollisionType::Clamp;
 			}
 
 			result = true;
@@ -1177,19 +1177,19 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = ox - x;
-			coll->CollisionType = CT_FRONT;
+			coll->CollisionType = CollisionType::Front;
 		}
 		else if (rawShift.x > 0 && rawShift.x <= coll->Setup.Radius)
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = 0;
-			coll->CollisionType = CT_LEFT;
+			coll->CollisionType = CollisionType::Left;
 		}
 		else if (rawShift.x < 0 && rawShift.x >= -coll->Setup.Radius)
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = 0;
-			coll->CollisionType = CT_RIGHT;
+			coll->CollisionType = CollisionType::Right;
 		}
 
 		break;
@@ -1199,19 +1199,19 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = ox - x;
-			coll->CollisionType = CT_FRONT;
+			coll->CollisionType = CollisionType::Front;
 		}
 		else if (rawShift.x > 0 && rawShift.x <= coll->Setup.Radius)
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = 0;
-			coll->CollisionType = CT_RIGHT;
+			coll->CollisionType = CollisionType::Right;
 		}
 		else if (rawShift.x < 0 && rawShift.x >= -coll->Setup.Radius)
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = 0;
-			coll->CollisionType = CT_LEFT;
+			coll->CollisionType = CollisionType::Left;
 		}
 
 		break;
@@ -1221,19 +1221,19 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = oz - z;
-			coll->CollisionType = CT_FRONT;
+			coll->CollisionType = CollisionType::Front;
 		}
 		else if (rawShift.z > 0 && rawShift.z <= coll->Setup.Radius)
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = 0;
-			coll->CollisionType = CT_RIGHT;
+			coll->CollisionType = CollisionType::Right;
 		}
 		else if (rawShift.z < 0 && rawShift.z >= -coll->Setup.Radius)
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = 0;
-			coll->CollisionType = CT_LEFT;
+			coll->CollisionType = CollisionType::Left;
 		}
 
 		break;
@@ -1243,19 +1243,19 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = oz - z;
-			coll->CollisionType = CT_FRONT;
+			coll->CollisionType = CollisionType::Front;
 		}
 		else if (rawShift.z > 0 && rawShift.z <= coll->Setup.Radius)
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = 0;
-			coll->CollisionType = CT_LEFT;
+			coll->CollisionType = CollisionType::Left;
 		}
 		else if (rawShift.z < 0 && rawShift.z >= -coll->Setup.Radius)
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = 0;
-			coll->CollisionType = CT_RIGHT;
+			coll->CollisionType = CollisionType::Right;
 		}
 
 		break;
@@ -1271,10 +1271,10 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	coll->Shift.Position.z = (round((distance.x * sinY) + (distance.z * cosY)) + pose.Position.z) - item->Pose.Position.z;
 
 	if (coll->Shift.Position.x == 0 && coll->Shift.Position.z == 0)
-		coll->CollisionType = CT_NONE; // Paranoid.
+		coll->CollisionType = CollisionType::None; // Paranoid.
 
 	// Set splat state flag if item is Lara and bounds are taller than Lara's headroom.
-	if (item == LaraItem && coll->CollisionType == CT_FRONT)
+	if (item == LaraItem && coll->CollisionType == CollisionType::Front)
 		coll->HitTallObject = (yMin <= inYMin + LARA_HEADROOM);
 
 	return true;
