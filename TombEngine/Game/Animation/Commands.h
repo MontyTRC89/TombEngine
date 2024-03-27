@@ -4,11 +4,10 @@ struct ItemInfo;
 
 namespace TEN::Animation
 {
-	// NOTE: Only used when loading animation commands from level file.
 	enum class AnimCommandType
 	{
 		None,
-		MoveOrigin, // "Post-animation adjustment"
+		MoveOrigin,
 		JumpVelocity,
 		AttackReady,
 		Deactivate,
@@ -25,7 +24,6 @@ namespace TEN::Animation
 		Underwater
 	};
 
-	// Abstract base class used by high-level animation command classes.
 	class AnimCommand abstract
 	{
 	public:
