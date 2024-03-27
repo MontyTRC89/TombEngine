@@ -31,10 +31,12 @@ bool CanPlayerLookAround(const ItemInfo& item); // TODO: Move to context file. -
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 void HandlePlayerTurnX(ItemInfo& item, float alpha);
-void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing = false, short relHeadingAngle = ANGLE(0.0f));
+void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing = false, short relHeadingAngle = ANGLE(0.0f),
+					   std::pair<short, short> moveAxisAngleConstraint = std::pair(ANGLE(0.0f), ANGLE(0.0f)), short moveAxisAngleDefault = 0);
 void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool isStrafing = false);
 void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
-void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing = false);
+void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing = false,
+						  std::pair<short, short> moveAxisAngleConstraint = std::pair(ANGLE(0.0f), ANGLE(0.0f)), short moveAxisAngleDefault = 0);
 void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha);
 void HandlePlayerCrawlTurnFlex(ItemInfo& item);
 void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha);
@@ -61,7 +63,7 @@ int				GetPlayerStrafeTurnStateID(const ItemInfo& item);
 
 PlayerWaterData GetPlayerWaterData(ItemInfo& item);
 short GetPlayerHeadingAngleX(const ItemInfo& item);
-short GetPlayerHeadingAngleY(const ItemInfo& item);
+short GetPlayerHeadingAngleY(const ItemInfo& item, std::pair<short, short> moveAxisAngleConstraint = std::pair(ANGLE(0.0f), ANGLE(0.0f)), short defaultMoveAxisAngle = 0);
 short GetPlayerRelHeadingAngleY(const ItemInfo& item);
 short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll);
 

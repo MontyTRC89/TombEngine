@@ -162,10 +162,18 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		bool isStrafing = IsPlayerStrafing(*item);
-
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
-		HandlePlayerTurnLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
-		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+		if (isStrafing)
+		{
+			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing, ANGLE(0.0f), PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_DEFAULT);
+			HandlePlayerTurnLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+			HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing, PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_DEFAULT);
+		}
+		else
+		{
+			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+			HandlePlayerTurnLean(*item, LARA_LEAN_MAX / 2, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+			HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+		}
 	}
 	else
 	{
@@ -236,7 +244,9 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	// Setup.
-	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
+	player.Control.HeadingOrient.y = IsPlayerStrafing(*item) ?
+		GetPlayerHeadingAngleY(*item, PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_DEFAULT) :
+		GetPlayerHeadingAngleY(*item);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
@@ -309,10 +319,18 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		bool isStrafing = IsPlayerStrafing(*item);
-
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
-		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
-		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+		if (isStrafing)
+		{
+			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing, ANGLE(0.0f), PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_DEFAULT);
+			HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+			HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing, PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_DEFAULT);
+		}
+		else
+		{
+			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+			HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+			HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, isStrafing);
+		}
 	}
 	else
 	{
@@ -408,7 +426,9 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	// Setup.
-	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
+	player.Control.HeadingOrient.y = IsPlayerStrafing(*item) ?
+		GetPlayerHeadingAngleY(*item, PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_DEFAULT) :
+		GetPlayerHeadingAngleY(*item);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -994,9 +1014,9 @@ void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::None;
 
 	// Turn.
-	HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
+	HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true, ANGLE(0.0f), PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_DEFAULT);
 	HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_STANDARD_TURN_ALPHA, true);
-	HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
+	HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true, PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_DEFAULT);
 
 	if (IsHeld(In::Jump))
 	{
@@ -1034,7 +1054,7 @@ void lara_col_skip_back(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	// Setup.
-	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
+	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item, PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_DEFAULT);
 	item->Animation.Velocity.y = 0.0f;
 	item->Animation.IsAirborne = false;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -1446,8 +1466,8 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		// Turn.
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true);
-		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true);
+		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA, true, ANGLE(0.0f), PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_DEFAULT);
+		HandlePlayerTurnFlex(*item, PLAYER_STANDARD_TURN_ALPHA, true, PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_DEFAULT);
 
 		if (IsPlayerStrafing(*item))
 		{
@@ -1496,7 +1516,7 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
 	// Setup.
-	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
+	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item, PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_CONSTRAINT, PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_DEFAULT);
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : STEPUP_HEIGHT;
