@@ -60,26 +60,29 @@ struct CollisionPositionData
 
 struct CollisionSetupData
 {
-	CollisionProbeMode Mode = CollisionProbeMode::Quadrants; // Probe rotation mode
-	int   Radius	   = 0;									 // Collision bounds horizontal size
-	int   Height	   = 0;									 // Collision bounds vertical size
-	short ForwardAngle = 0;									 // Forward angle direction
+	// Collider parameters.
+	CollisionProbeMode Mode = CollisionProbeMode::Quadrants;
+	int   Radius	   = 0;
+	int   Height	   = 0;
+	short ForwardAngle = 0;
 
-	int LowerFloorBound	  = 0; // Borderline floor step-up height 
-	int UpperFloorBound	  = 0; // Borderline floor step-down height
-	int LowerCeilingBound = 0; // Borderline ceiling step-up height
-	int UpperCeilingBound = 0; // Borderline ceiling step-down height
+	// Borderline step heights.
+	int LowerFloorBound	  = 0;
+	int UpperFloorBound	  = 0;
+	int LowerCeilingBound = 0;
+	int UpperCeilingBound = 0;
 
-	bool BlockFloorSlopeUp	  = false; // Treat steep slopes as walls
-	bool BlockFloorSlopeDown  = false; // Treat steep slopes as pits
-	bool BlockCeilingSlope	  = false; // Treat steep slopes on ceilings as walls
-	bool BlockDeathFloorDown  = false; // Treat death sectors as pits
-	bool BlockMonkeySwingEdge = false; // Treat non-monkey sectors as walls
+	// Blocker flags.
+	bool BlockFloorSlopeUp	  = false;
+	bool BlockFloorSlopeDown  = false;
+	bool BlockCeilingSlope	  = false;
+	bool BlockDeathFloorDown  = false;
+	bool BlockMonkeySwingEdge = false;
 	
-	bool EnableObjectPush = false; // Can be pushed by objects
-	bool EnableSpasm	  = false; // Convulse when pushed
+	bool EnableObjectPush = false;
+	bool EnableSpasm	  = false;
 
-	// Preserve previous parameters to restore later.
+	// Previous parameters.
 	Vector3i	   PrevPosition		= Vector3i::Zero;
 	GAME_OBJECT_ID PrevAnimObjectID = ID_NO_OBJECT;
 	int			   PrevAnimNumber	= 0;
