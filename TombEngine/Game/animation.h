@@ -109,7 +109,7 @@ int GetFrameCount(const ItemInfo& item);
 
 int	 GetNextAnimState(const ItemInfo& item);
 int	 GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber);
-bool SetStateDispatch(ItemInfo& item, std::optional<int> targetStateID = std::nullopt);
+bool SetStateDispatch(ItemInfo& item, int targetStateID = NO_VALUE);
 
 void ClampRotation(Pose& outPose, short angle, short rot); 
 void DrawAnimatingItem(ItemInfo* item);
