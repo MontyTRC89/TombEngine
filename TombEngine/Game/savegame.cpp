@@ -52,17 +52,17 @@ constexpr auto SAVEGAME_MAX_SLOT  = 99;
 constexpr auto SAVEGAME_PATH	  = "Save//";
 constexpr auto SAVEGAME_FILE_MASK = "savegame.";
 
-GameStats Statistics;
-SaveGameHeader SavegameInfos[SAVEGAME_MAX];
+GameStats SaveGame::Statistics;
+SaveGameHeader SaveGame::Infos[SAVEGAME_MAX];
+std::map<int, std::vector<byte>> SaveGame::Hub;
 
-FileStream* SaveGame::StreamPtr;
-std::string SaveGame::FullSaveDirectory;
 int SaveGame::LastSaveGame;
+std::string SaveGame::FullSaveDirectory;
 
-void SaveGame::LoadSavegameInfos()
+void SaveGame::LoadHeaders()
 {
 	for (int i = 0; i < SAVEGAME_MAX; i++)
-		SavegameInfos[i].Present = false;
+		Infos[i].Present = false;
 
 	if (!std::filesystem::is_directory(FullSaveDirectory))
 		return;
@@ -76,19 +76,14 @@ void SaveGame::LoadSavegameInfos()
 		if (!DoesSaveGameExist(i, true))
 			continue;
 
-		SavegameInfos[i].Present = true;
-		SaveGame::LoadHeader(i, &SavegameInfos[i]);
+		if (!SaveGame::LoadHeader(i, &Infos[i]))
+			continue;
 
-		if (SavegameInfos[i].Count > LastSaveGame)
-			LastSaveGame = SavegameInfos[i].Count;
+		Infos[i].Present = true;
+
+		if (Infos[i].Count > LastSaveGame)
+			LastSaveGame = Infos[i].Count;
 	}
-}
-
-Pose ToPose(const Save::Pose* pose)
-{
-	return Pose(
-		pose->x_pos(), pose->y_pos(), pose->z_pos(),
-		(short)pose->x_rot(), (short)pose->y_rot(), (short)pose->z_rot());
 }
 
 Save::Pose FromPose(const Pose& pose)
@@ -130,6 +125,13 @@ Save::Vector3 FromVector3i(const Vector3i& vec)
 Save::Vector4 FromVector4(const Vector4& vec)
 {
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
+}
+
+Pose ToPose(const Save::Pose& pose)
+{
+	return Pose(
+		pose.x_pos(), pose.y_pos(), pose.z_pos(),
+		(short)pose.x_rot(), (short)pose.y_rot(), (short)pose.z_rot());
 }
 
 EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
@@ -209,20 +211,8 @@ void SaveGame::Init(const std::string& gameDirectory)
 	FullSaveDirectory = gameDirectory + SAVEGAME_PATH;
 }
 
-bool SaveGame::Save(int slot)
+const std::vector<byte> SaveGame::Build()
 {
-	if (!IsSaveGameSlotValid(slot))
-		return false;
-
-	g_GameScript->OnSave();
-	HandleAllGlobalEvents(EventType::Save, (Activator)LaraItem->Index);
-
-	// Savegame infos need to be reloaded so that last savegame counter properly increases.
-	SaveGame::LoadSavegameInfos();
-
-	auto fileName = GetSavegameFilename(slot);
-	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
-
 	ItemInfo itemToSerialize{};
 	FlatBufferBuilder fbb{};
 
@@ -1449,15 +1439,88 @@ bool SaveGame::Save(int slot)
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
 
-	auto bufferToSerialize = fbb.GetBufferPointer();
-	auto bufferSize = fbb.GetSize();
+	auto buffer = fbb.GetBufferPointer();
+	auto size   = fbb.GetSize();
+
+	auto result = std::vector<byte>(buffer, buffer + size);
+	return result;
+}
+
+void SaveGame::SaveHub(int index)
+{
+	// Don't save title level to a hub.
+	if (index == 0)
+		return;
+
+	// Build hub data.
+	TENLog("Saving hub data for level #" + std::to_string(index) + (IsOnHub(index) ? " (overwrite)" : " (new)"), LogLevel::Info);
+	Hub[index] = Build();
+}
+
+void SaveGame::LoadHub(int index)
+{
+	// Don't attempt to load hub data if it doesn't exist, or level is a title level.
+	if (index == 0 || !IsOnHub(index))
+		return;
+
+	// Load hub data.
+	TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
+	Parse(Hub[index], true);
+}
+
+bool SaveGame::IsOnHub(int index)
+{
+	return (Hub.count(index) > 0);
+}
+
+void SaveGame::ResetHub()
+{
+	if (Hub.empty())
+		return;
+
+	TENLog("Clearing hub data", LogLevel::Info);
+	Hub.clear();
+}
+
+bool SaveGame::Save(int slot)
+{
+	if (!IsSaveGameSlotValid(slot))
+		return false;
+
+	g_GameScript->OnSave();
+	HandleAllGlobalEvents(EventType::Save, (Activator)LaraItem->Index);
+
+	// Savegame infos need to be reloaded so that last savegame counter properly increases.
+	LoadHeaders();
+
+	auto fileName = GetSavegameFilename(slot);
+	TENLog("Saving to savegame: " + fileName, LogLevel::Info);
 
 	if (!std::filesystem::is_directory(FullSaveDirectory))
 		std::filesystem::create_directory(FullSaveDirectory);
 
 	std::ofstream fileOut{};
 	fileOut.open(fileName, std::ios_base::binary | std::ios_base::out);
-	fileOut.write((char*)bufferToSerialize, bufferSize);
+
+	// Write current level save data.
+	auto currentLevelState = SaveGame::Build();
+	int size = (int)currentLevelState.size();
+	fileOut.write(reinterpret_cast<const char*>(&size), sizeof(size));
+	fileOut.write(reinterpret_cast<const char*>(currentLevelState.data()), size);
+
+	// Write hub data.
+	int hubCount = (int)Hub.size();
+	fileOut.write(reinterpret_cast<const char*>(&hubCount), sizeof(hubCount));
+
+	for (auto& level : Hub)
+	{
+		fileOut.write(reinterpret_cast<const char*>(&level.first), sizeof(level.first));
+
+		size = (int)level.second.size();
+		fileOut.write(reinterpret_cast<const char*>(&size), sizeof(size));
+		fileOut.write(reinterpret_cast<const char*>(level.second.data()), size);
+	}
+
 	fileOut.close();
 
 	return true;
@@ -1476,34 +1539,569 @@ bool SaveGame::Load(int slot)
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
-	file.seekg(0, std::ios::end);
-	size_t length = file.tellg();
-	file.seekg(0, std::ios::beg);
-	std::unique_ptr<char[]> buffer = std::make_unique<char[]>(length);
-	file.read(buffer.get(), length);
+
+	int size; 
+	file.read(reinterpret_cast<char*>(&size), sizeof(size));
+
+	// Read current level save data.
+	std::vector<byte> saveData(size);
+	file.read(reinterpret_cast<char*>(saveData.data()), size);
+
+	// Reset hub data, as it's about to be replaced with saved one.
+	ResetHub();
+
+	// Read hub data from savegame.
+	int hubCount;
+	file.read(reinterpret_cast<char*>(&hubCount), sizeof(hubCount));
+
+	TENLog("Hub count: " + std::to_string(hubCount), LogLevel::Info);
+
+	for (int i = 0; i < hubCount; i++)
+	{
+		int index;
+		file.read(reinterpret_cast<char*>(&index), sizeof(index));
+
+		file.read(reinterpret_cast<char*>(&size), sizeof(size));
+		std::vector<byte> hubBuffer(size);
+		file.read(reinterpret_cast<char*>(hubBuffer.data()), size);
+
+		Hub[index] = hubBuffer;
+	}
+
 	file.close();
 
-	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
+	// Load save data for current level.
+	Parse(saveData, false);
+	return true;
+}
 
-	// Statistics
+static void ParseStatistics(const Save::SaveGame* s, bool isHub)
+{
+	SaveGame::Statistics.Level.AmmoHits = s->level()->ammo_hits();
+	SaveGame::Statistics.Level.AmmoUsed = s->level()->ammo_used();
+	SaveGame::Statistics.Level.Distance = s->level()->distance();
+	SaveGame::Statistics.Level.HealthUsed = s->level()->medipacks_used();
+	SaveGame::Statistics.Level.Kills = s->level()->kills();
+	SaveGame::Statistics.Level.Secrets = s->level()->secrets();
+	SaveGame::Statistics.Level.Timer = s->level()->timer();
+
+	// Don't touch game statistics if data is parsed in hub mode.
+	if (isHub)
+		return;
+
 	GameTimer = s->header()->timer();
 
-	Statistics.Game.AmmoHits = s->game()->ammo_hits();
-	Statistics.Game.AmmoUsed = s->game()->ammo_used();
-	Statistics.Game.Distance = s->game()->distance();
-	Statistics.Game.HealthUsed = s->game()->medipacks_used();
-	Statistics.Game.Kills = s->game()->kills();
-	Statistics.Game.Secrets = s->game()->secrets();
-	Statistics.Game.Timer = s->game()->timer();
+	SaveGame::Statistics.Game.AmmoHits = s->game()->ammo_hits();
+	SaveGame::Statistics.Game.AmmoUsed = s->game()->ammo_used();
+	SaveGame::Statistics.Game.Distance = s->game()->distance();
+	SaveGame::Statistics.Game.HealthUsed = s->game()->medipacks_used();
+	SaveGame::Statistics.Game.Kills = s->game()->kills();
+	SaveGame::Statistics.Game.Secrets = s->game()->secrets();
+	SaveGame::Statistics.Game.Timer = s->game()->timer();
+}
 
-	Statistics.Level.AmmoHits = s->level()->ammo_hits();
-	Statistics.Level.AmmoUsed = s->level()->ammo_used();
-	Statistics.Level.Distance = s->level()->distance();
-	Statistics.Level.HealthUsed = s->level()->medipacks_used();
-	Statistics.Level.Kills = s->level()->kills();
-	Statistics.Level.Secrets = s->level()->secrets();
-	Statistics.Level.Timer = s->level()->timer();
+static void ParseLua(const Save::SaveGame* s)
+{
+	// Event sets
 
+	if (g_Level.VolumeEventSets.size() == s->volume_event_sets()->size())
+	{
+		for (int i = 0; i < s->volume_event_sets()->size(); ++i)
+		{
+			auto setSaved = s->volume_event_sets()->Get(i);
+			for (int j = 0; j < setSaved->call_counters()->size(); ++j)
+				g_Level.VolumeEventSets[setSaved->index()].Events[j].CallCounter = setSaved->call_counters()->Get(j);
+		}
+	}
+
+	if (g_Level.GlobalEventSets.size() == s->global_event_sets()->size())
+	{
+		for (int i = 0; i < s->global_event_sets()->size(); ++i)
+		{
+			auto setSaved = s->global_event_sets()->Get(i);
+			for (int j = 0; j < setSaved->call_counters()->size(); ++j)
+				g_Level.GlobalEventSets[setSaved->index()].Events[j].CallCounter = setSaved->call_counters()->Get(j);
+		}
+	}
+
+	auto loadedVars = std::vector<SavedVar>{};
+
+	auto unionVec = s->script_vars();
+	if (unionVec)
+	{
+		for (const auto& var : *(unionVec->members()))
+		{
+			auto varType = var->u_type();
+			switch (varType)
+			{
+			case Save::VarUnion::num:
+				loadedVars.push_back(var->u_as_num()->scalar());
+				break;
+
+			case Save::VarUnion::boolean:
+				loadedVars.push_back(var->u_as_boolean()->scalar());
+				break;
+
+			case Save::VarUnion::str:
+				loadedVars.push_back(var->u_as_str()->str()->str());
+				break;
+
+			case Save::VarUnion::tab:
+			{
+				auto tab = var->u_as_tab()->keys_vals();
+				auto& loadedTab = loadedVars.emplace_back(IndexTable{});
+
+				for (const auto& pair : *tab)
+					std::get<IndexTable>(loadedTab).push_back(std::make_pair(pair->key(), pair->val()));
+
+				break;
+			}
+
+			case Save::VarUnion::vec2:
+			{
+				auto stored = var->u_as_vec2()->vec();
+				SavedVar var;
+				var.emplace<(int)SavedVarType::Vec2>(ToVector2(stored));
+				loadedVars.push_back(var);
+				break;
+			}
+
+			case Save::VarUnion::vec3:
+			{
+				auto stored = var->u_as_vec3()->vec();
+				SavedVar var;
+				var.emplace<(int)SavedVarType::Vec3>(ToVector3(stored));
+				loadedVars.push_back(var);
+				break;
+			}
+
+			case Save::VarUnion::rotation:
+			{
+				auto stored = var->u_as_rotation()->vec();
+				SavedVar var;
+				var.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
+				loadedVars.push_back(var);
+				break;
+			}
+
+			case Save::VarUnion::color:
+				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
+				break;
+
+			case Save::VarUnion::funcName:
+				loadedVars.push_back(FuncName{ var->u_as_funcName()->str()->str() });
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
+
+	g_GameScript->SetVariables(loadedVars);
+
+	auto populateCallbackVecs = [&s](auto callbackFunc)
+	{
+		auto callbacksVec = std::vector<std::string>{};
+		auto callbacksOffsetVec = std::invoke(callbackFunc, s);
+
+		for (const auto& e : *callbacksOffsetVec)
+			callbacksVec.push_back(e->str());
+
+		return callbacksVec;
+	};
+
+	auto callbacksPreStartVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_start);
+	auto callbacksPostStartVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_start);
+
+	auto callbacksPreEndVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_end);
+	auto callbacksPostEndVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_end);
+
+	auto callbacksPreSaveVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_save);
+	auto callbacksPostSaveVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_save);
+
+	auto callbacksPreLoadVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_load);
+	auto callbacksPostLoadVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_load);
+
+	auto callbacksPreLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_loop);
+	auto callbacksPostLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_loop);
+
+	g_GameScript->SetCallbackStrings(
+		callbacksPreStartVec,
+		callbacksPostStartVec,
+		callbacksPreEndVec,
+		callbacksPostEndVec,
+		callbacksPreSaveVec,
+		callbacksPostSaveVec,
+		callbacksPreLoadVec,
+		callbacksPostLoadVec,
+		callbacksPreLoopVec,
+		callbacksPostLoopVec);
+}
+
+static void ParsePlayer(const Save::SaveGame* s)
+{
+	// Restore current inventory item.
+	g_Gui.SetLastInventoryItem(s->last_inv_item());
+
+	ZeroMemory(&Lara, sizeof(LaraInfo));
+
+	// Player
+	ZeroMemory(Lara.Inventory.Puzzles, NUM_PUZZLES * sizeof(int));
+	for (int i = 0; i < s->lara()->inventory()->puzzles()->size(); i++)
+		Lara.Inventory.Puzzles[i] = s->lara()->inventory()->puzzles()->Get(i);
+
+	ZeroMemory(Lara.Inventory.PuzzlesCombo, NUM_PUZZLES * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->inventory()->puzzles_combo()->size(); i++)
+		Lara.Inventory.PuzzlesCombo[i] = s->lara()->inventory()->puzzles_combo()->Get(i);
+
+	ZeroMemory(Lara.Inventory.Keys, NUM_KEYS * sizeof(int));
+	for (int i = 0; i < s->lara()->inventory()->keys()->size(); i++)
+		Lara.Inventory.Keys[i] = s->lara()->inventory()->keys()->Get(i);
+
+	ZeroMemory(Lara.Inventory.KeysCombo, NUM_KEYS * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->inventory()->keys_combo()->size(); i++)
+		Lara.Inventory.KeysCombo[i] = s->lara()->inventory()->keys_combo()->Get(i);
+
+	ZeroMemory(Lara.Inventory.Pickups, NUM_PICKUPS * sizeof(int));
+	for (int i = 0; i < s->lara()->inventory()->pickups()->size(); i++)
+		Lara.Inventory.Pickups[i] = s->lara()->inventory()->pickups()->Get(i);
+
+	ZeroMemory(Lara.Inventory.PickupsCombo, NUM_PICKUPS * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->inventory()->pickups_combo()->size(); i++)
+		Lara.Inventory.PickupsCombo[i] = s->lara()->inventory()->pickups_combo()->Get(i);
+
+	ZeroMemory(Lara.Inventory.Examines, NUM_EXAMINES * sizeof(int));
+	for (int i = 0; i < s->lara()->inventory()->examines()->size(); i++)
+		Lara.Inventory.Examines[i] = s->lara()->inventory()->examines()->Get(i);
+
+	ZeroMemory(Lara.Inventory.ExaminesCombo, NUM_EXAMINES * 2 * sizeof(int));
+	for (int i = 0; i < s->lara()->inventory()->examines_combo()->size(); i++)
+		Lara.Inventory.ExaminesCombo[i] = s->lara()->inventory()->examines_combo()->Get(i);
+
+	for (int i = 0; i < Lara.Effect.BubbleNodes.size(); i++)
+		Lara.Effect.BubbleNodes[i] = s->lara()->effect()->bubble_nodes()->Get(i);
+
+	for (int i = 0; i < Lara.Effect.DripNodes.size(); i++)
+		Lara.Effect.DripNodes[i] = s->lara()->effect()->drip_nodes()->Get(i);
+
+	Lara.Context.CalcJumpVelocity = s->lara()->context()->calc_jump_velocity();
+	Lara.Context.WaterCurrentActive = s->lara()->context()->water_current_active();
+	Lara.Context.WaterCurrentPull.x = s->lara()->context()->water_current_pull()->x();
+	Lara.Context.WaterCurrentPull.y = s->lara()->context()->water_current_pull()->y();
+	Lara.Context.WaterCurrentPull.z = s->lara()->context()->water_current_pull()->z();
+	Lara.Context.InteractedItem = s->lara()->context()->interacted_item_number();
+	Lara.Context.NextCornerPos = ToPose(*s->lara()->context()->next_corner_pose());
+	Lara.Context.ProjectedFloorHeight = s->lara()->context()->projected_floor_height();
+	Lara.Context.TargetOrientation = ToEulerAngles(s->lara()->context()->target_orient());
+	Lara.Context.Vehicle = s->lara()->context()->vehicle_item_number();
+	Lara.Context.WaterSurfaceDist = s->lara()->context()->water_surface_dist();
+	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
+	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
+	Lara.Control.Count.Death = s->lara()->control()->count()->death();
+	Lara.Control.Count.Pose = s->lara()->control()->count()->pose();
+	Lara.Control.Count.PositionAdjust = s->lara()->control()->count()->position_adjust();
+	Lara.Control.Count.Run = s->lara()->control()->count()->run_jump();
+	Lara.Control.Count.Death = s->lara()->control()->count()->death();
+	Lara.Control.IsClimbingLadder = s->lara()->control()->is_climbing_ladder();
+	Lara.Control.IsLow = s->lara()->control()->is_low();
+	Lara.Control.IsMoving = s->lara()->control()->is_moving();
+	Lara.Control.JumpDirection = (JumpDirection)s->lara()->control()->jump_direction();
+	Lara.Control.KeepLow = s->lara()->control()->keep_low();
+	Lara.Control.Look.IsUsingBinoculars = s->lara()->control()->look()->is_using_binoculars();
+	Lara.Control.Look.IsUsingLasersight = s->lara()->control()->look()->is_using_lasersight();
+	Lara.Control.Look.Mode = (LookMode)s->lara()->control()->look()->mode();
+	Lara.Control.Look.OpticRange = s->lara()->control()->look()->optic_range();
+	Lara.Control.Look.Orientation = ToEulerAngles(s->lara()->control()->look()->orientation());
+	Lara.Control.Look.TurnRate = ToEulerAngles(s->lara()->control()->look()->turn_rate());
+	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
+	Lara.Control.IsRunJumpQueued = s->lara()->control()->is_run_jump_queued();
+	Lara.Control.TurnRate = s->lara()->control()->turn_rate();
+	Lara.Control.IsLocked = s->lara()->control()->is_locked();
+	Lara.Control.HandStatus = (HandStatus)s->lara()->control()->hand_status();
+	Lara.Control.Weapon.GunType = (LaraWeaponType)s->lara()->control()->weapon()->gun_type();
+	Lara.Control.Weapon.HasFired = s->lara()->control()->weapon()->has_fired();
+	Lara.Control.Weapon.Interval = s->lara()->control()->weapon()->interval();
+	Lara.Control.Weapon.Fired = s->lara()->control()->weapon()->fired();
+	Lara.Control.Weapon.LastGunType = (LaraWeaponType)s->lara()->control()->weapon()->last_gun_type();
+	Lara.Control.Weapon.RequestGunType = (LaraWeaponType)s->lara()->control()->weapon()->request_gun_type();
+	Lara.Control.Weapon.HolsterInfo.BackHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->back_holster();
+	Lara.Control.Weapon.HolsterInfo.LeftHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->left_holster();
+	Lara.Control.Weapon.HolsterInfo.RightHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->right_holster();
+	Lara.Control.Weapon.NumShotsFired = s->lara()->control()->weapon()->num_shots_fired();
+	Lara.Control.Weapon.Timer = s->lara()->control()->weapon()->timer();
+	Lara.Control.Weapon.UziLeft = s->lara()->control()->weapon()->uzi_left();
+	Lara.Control.Weapon.UziRight = s->lara()->control()->weapon()->uzi_right();
+	Lara.Control.Weapon.WeaponItem = s->lara()->control()->weapon()->weapon_item();
+	Lara.ExtraAnim = s->lara()->extra_anim();
+	Lara.ExtraHeadRot = ToEulerAngles(s->lara()->extra_head_rot());
+	Lara.ExtraTorsoRot = ToEulerAngles(s->lara()->extra_torso_rot());
+	Lara.Flare.Life = s->lara()->flare()->life();
+	Lara.Flare.ControlLeft = s->lara()->flare()->control_left();
+	Lara.Flare.Frame = s->lara()->flare()->frame();
+	Lara.HighestLocation = s->lara()->highest_location();
+	Lara.HitDirection = s->lara()->hit_direction();
+	Lara.HitFrame = s->lara()->hit_frame();
+	Lara.Inventory.BeetleComponents = s->lara()->inventory()->beetle_components();
+	Lara.Inventory.BeetleLife = s->lara()->inventory()->beetle_life();
+	Lara.Inventory.BigWaterskin = s->lara()->inventory()->big_waterskin();
+	Lara.Inventory.HasBinoculars = s->lara()->inventory()->has_binoculars();
+	Lara.Inventory.HasCrowbar = s->lara()->inventory()->has_crowbar();
+	Lara.Inventory.HasLasersight = s->lara()->inventory()->has_lasersight();
+	Lara.Inventory.HasSilencer = s->lara()->inventory()->has_silencer();
+	Lara.Inventory.HasTorch = s->lara()->inventory()->has_torch();
+	Lara.Inventory.IsBusy = s->lara()->inventory()->is_busy();
+	Lara.Inventory.OldBusy = s->lara()->inventory()->old_busy();
+	Lara.Inventory.SmallWaterskin = s->lara()->inventory()->small_waterskin();
+	Lara.Inventory.TotalFlares = s->lara()->inventory()->total_flares();
+	Lara.Inventory.TotalLargeMedipacks = s->lara()->inventory()->total_large_medipacks();
+	Lara.Inventory.TotalSmallMedipacks = s->lara()->inventory()->total_small_medipacks();
+	Lara.LeftArm.AnimNumber = s->lara()->left_arm()->anim_number();
+	Lara.LeftArm.GunFlash = s->lara()->left_arm()->gun_flash();
+	Lara.LeftArm.GunSmoke = s->lara()->left_arm()->gun_smoke();
+	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
+	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
+	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
+	Lara.LeftArm.Orientation = ToEulerAngles(s->lara()->left_arm()->rotation());
+	Lara.Location = s->lara()->location();
+	Lara.LocationPad = s->lara()->location_pad();
+	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
+	Lara.RightArm.GunFlash = s->lara()->right_arm()->gun_flash();
+	Lara.RightArm.GunSmoke = s->lara()->right_arm()->gun_smoke();
+	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
+	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
+	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
+	Lara.RightArm.Orientation = ToEulerAngles(s->lara()->right_arm()->rotation());
+	Lara.Torch.IsLit = s->lara()->torch()->is_lit();
+	Lara.Torch.State = (TorchState)s->lara()->torch()->state();
+	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();
+	Lara.Control.Rope.Direction = s->lara()->control()->rope()->direction();
+	Lara.Control.Rope.ArcFront = s->lara()->control()->rope()->arc_front();
+	Lara.Control.Rope.ArcBack = s->lara()->control()->rope()->arc_back();
+	Lara.Control.Rope.LastX = s->lara()->control()->rope()->last_x();
+	Lara.Control.Rope.MaxXForward = s->lara()->control()->rope()->max_x_forward();
+	Lara.Control.Rope.MaxXBackward = s->lara()->control()->rope()->max_x_backward();
+	Lara.Control.Rope.DFrame = s->lara()->control()->rope()->dframe();
+	Lara.Control.Rope.Frame = s->lara()->control()->rope()->frame();
+	Lara.Control.Rope.FrameRate = s->lara()->control()->rope()->frame_rate();
+	Lara.Control.Rope.Y = s->lara()->control()->rope()->y();
+	Lara.Control.Rope.Ptr = s->lara()->control()->rope()->ptr();
+	Lara.Control.Rope.Offset = s->lara()->control()->rope()->offset();
+	Lara.Control.Rope.DownVel = s->lara()->control()->rope()->down_vel();
+	Lara.Control.Rope.Flag = s->lara()->control()->rope()->flag();
+	Lara.Control.Rope.Count = s->lara()->control()->rope()->count();
+	Lara.Control.Subsuit.XRot = s->lara()->control()->subsuit()->x_rot();
+	Lara.Control.Subsuit.DXRot = s->lara()->control()->subsuit()->d_x_rot();
+	Lara.Control.Subsuit.Velocity[0] = s->lara()->control()->subsuit()->velocity()->Get(0);
+	Lara.Control.Subsuit.Velocity[1] = s->lara()->control()->subsuit()->velocity()->Get(1);
+	Lara.Control.Subsuit.VerticalVelocity = s->lara()->control()->subsuit()->vertical_velocity();
+	Lara.Control.Subsuit.XRotVel = s->lara()->control()->subsuit()->x_rot_vel();
+	Lara.Control.Subsuit.HitCount = s->lara()->control()->subsuit()->hit_count();
+	Lara.Control.Tightrope.Balance = s->lara()->control()->tightrope()->balance();
+	Lara.Control.Tightrope.CanDismount = s->lara()->control()->tightrope()->can_dismount();
+	Lara.Control.Tightrope.TightropeItem = s->lara()->control()->tightrope()->tightrope_item();
+	Lara.Control.Tightrope.TimeOnTightrope = s->lara()->control()->tightrope()->time_on_tightrope();
+	Lara.Control.WaterStatus = (WaterStatus)s->lara()->control()->water_status();
+	Lara.Status.Air = s->lara()->status()->air();
+	Lara.Status.Exposure = s->lara()->status()->exposure();
+	Lara.Status.Poison = s->lara()->status()->poison();
+	Lara.Status.Stamina = s->lara()->status()->stamina();
+	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0) ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr;
+	Lara.TargetArmOrient = ToEulerAngles(s->lara()->target_arm_orient());
+
+	for (int i = 0; i < s->lara()->weapons()->size(); i++)
+	{
+		auto* info = s->lara()->weapons()->Get(i);
+
+		for (int j = 0; j < info->ammo()->size(); j++)
+		{
+			Lara.Weapons[i].Ammo[j].SetInfinite(info->ammo()->Get(j)->is_infinite());
+			Lara.Weapons[i].Ammo[j] = info->ammo()->Get(j)->count();
+		}
+
+		Lara.Weapons[i].HasLasersight = info->has_lasersight();
+		Lara.Weapons[i].HasSilencer = info->has_silencer();
+		Lara.Weapons[i].Present = info->present();
+		Lara.Weapons[i].SelectedAmmo = (WeaponAmmoType)info->selected_ammo();
+		Lara.Weapons[i].WeaponMode = (LaraWeaponTypeCarried)info->weapon_mode();
+	}
+
+	// Rope
+	if (Lara.Control.Rope.Ptr >= 0)
+	{
+		auto* rope = &Ropes[Lara.Control.Rope.Ptr];
+
+		for (int i = 0; i < ROPE_SEGMENTS; i++)
+		{
+			rope->segment[i] = ToVector3i(s->rope()->segments()->Get(i));
+			rope->normalisedSegment[i] = ToVector3i(s->rope()->normalised_segments()->Get(i));
+			rope->meshSegment[i] = ToVector3i(s->rope()->mesh_segments()->Get(i));
+			rope->coords[i] = ToVector3i(s->rope()->coords()->Get(i));
+			rope->velocity[i] = ToVector3i(s->rope()->velocities()->Get(i));
+		}
+
+		rope->coiled = s->rope()->coiled();
+		rope->active = s->rope()->active();
+
+		rope->position = ToVector3i(s->rope()->position());
+		CurrentPendulum.position = ToVector3i(s->pendulum()->position());
+		CurrentPendulum.velocity = ToVector3i(s->pendulum()->velocity());
+
+		CurrentPendulum.node = s->pendulum()->node();
+		CurrentPendulum.rope = rope;
+
+		AlternatePendulum.position = ToVector3i(s->alternate_pendulum()->position());
+		AlternatePendulum.velocity = ToVector3i(s->alternate_pendulum()->velocity());
+
+		AlternatePendulum.node = s->alternate_pendulum()->node();
+		AlternatePendulum.rope = rope;
+	}
+
+	for (auto& item : g_Level.Items)
+	{
+		if (item.ObjectNumber != ID_LARA || item.Index >= g_Level.NumItems)
+			continue;
+
+		LaraItem->Data = nullptr;
+		LaraItem = &item;
+		LaraItem->Location.RoomNumber = item.RoomNumber;
+		LaraItem->Location.Height = item.Pose.Position.y;
+		LaraItem->Data = &Lara;
+		break;
+	}
+}
+
+static void ParseEffects(const Save::SaveGame* s)
+{
+	// Restore camera FOV.
+	AlterFOV(s->current_fov());
+
+	// Restore postprocess effects.
+	g_Renderer.SetPostProcessMode((PostProcessMode)s->postprocess_mode());
+	g_Renderer.SetPostProcessStrength(s->postprocess_strength());
+	g_Renderer.SetPostProcessTint(ToVector3(s->postprocess_tint()));
+
+	// Restore soundtracks.
+	for (int i = 0; i < s->soundtracks()->size(); i++)
+	{
+		assertion(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
+
+		auto track = s->soundtracks()->Get(i);
+		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position());
+	}
+
+	for (int i = 0; i < s->particles()->size(); i++)
+	{
+		auto* particleInfo = s->particles()->Get(i);
+		auto* particle = &Particles[i];
+
+		particle->x = particleInfo->x();
+		particle->y = particleInfo->y();
+		particle->z = particleInfo->z();
+		particle->xVel = particleInfo->x_vel();
+		particle->yVel = particleInfo->y_vel();
+		particle->zVel = particleInfo->z_vel();
+		particle->gravity = particleInfo->gravity();
+		particle->rotAng = particleInfo->rot_ang();
+		particle->flags = particleInfo->flags();
+		particle->sSize = particleInfo->s_size();
+		particle->dSize = particleInfo->d_size();
+		particle->size = particleInfo->size();
+		particle->friction = particleInfo->friction();
+		particle->scalar = particleInfo->scalar();
+		particle->spriteIndex = particleInfo->sprite_index();
+		particle->rotAdd = particleInfo->rot_add();
+		particle->maxYvel = particleInfo->max_y_vel();
+		particle->on = particleInfo->on();
+		particle->sR = particleInfo->s_r();
+		particle->sG = particleInfo->s_g();
+		particle->sB = particleInfo->s_b();
+		particle->dR = particleInfo->d_r();
+		particle->dG = particleInfo->d_g();
+		particle->dB = particleInfo->d_b();
+		particle->r = particleInfo->r();
+		particle->g = particleInfo->g();
+		particle->b = particleInfo->b();
+		particle->colFadeSpeed = particleInfo->col_fade_speed();
+		particle->fadeToBlack = particleInfo->fade_to_black();
+		particle->sLife = particleInfo->s_life();
+		particle->life = particleInfo->life();
+		particle->blendMode = (BlendMode)particleInfo->blend_mode();
+		particle->extras = particleInfo->extras();
+		particle->dynamic = particleInfo->dynamic();
+		particle->fxObj = particleInfo->fx_obj();
+		particle->roomNumber = particleInfo->room_number();
+		particle->nodeNumber = particleInfo->node_number();
+	}
+
+	for (int i = 0; i < s->bats()->size(); i++)
+	{
+		auto* batInfo = s->bats()->Get(i);
+		auto* bat = &Bats[i];
+
+		bat->On = batInfo->on();
+		bat->Counter = batInfo->flags();
+		bat->RoomNumber = batInfo->room_number();
+		bat->Pose = ToPose(*batInfo->pose());
+	}
+
+	for (int i = 0; i < s->rats()->size(); i++)
+	{
+		auto ratInfo = s->rats()->Get(i);
+		auto* rat = &Rats[i];
+
+		rat->On = ratInfo->on();
+		rat->Flags = ratInfo->flags();
+		rat->RoomNumber = ratInfo->room_number();
+		rat->Pose = ToPose(*ratInfo->pose());
+	}
+
+	for (int i = 0; i < s->spiders()->size(); i++)
+	{
+		auto* spiderInfo = s->spiders()->Get(i);
+		auto* spider = &Spiders[i];
+
+		spider->On = spiderInfo->on();
+		spider->Flags = spiderInfo->flags();
+		spider->RoomNumber = spiderInfo->room_number();
+		spider->Pose = ToPose(*spiderInfo->pose());
+	}
+
+	for (int i = 0; i < s->scarabs()->size(); i++)
+	{
+		auto beetleInfo = s->scarabs()->Get(i);
+		auto* beetle = &BeetleSwarm[i];
+
+		beetle->On = beetleInfo->on();
+		beetle->Flags = beetleInfo->flags();
+		beetle->RoomNumber = beetleInfo->room_number();
+		beetle->Pose = ToPose(*beetleInfo->pose());
+	}
+
+	NextFxFree = s->next_fx_free();
+	NextFxActive = s->next_fx_active();
+
+	for (int i = 0; i < s->fxinfos()->size(); ++i)
+	{
+		auto& fx = EffectList[i];
+		auto fx_saved = s->fxinfos()->Get(i);
+		fx.pos = ToPose(*fx_saved->pose());
+		fx.roomNumber = fx_saved->room_number();
+		fx.objectNumber = fx_saved->object_number();
+		fx.nextFx = fx_saved->next_fx();
+		fx.nextActive = fx_saved->next_active();
+		fx.speed = fx_saved->speed();
+		fx.fallspeed = fx_saved->fall_speed();
+		fx.frameNumber = fx_saved->frame_number();
+		fx.counter = fx_saved->counter();
+		fx.color = ToVector4(fx_saved->color());
+		fx.flag1 = fx_saved->flag1();
+		fx.flag2 = fx_saved->flag2();
+	}
+}
+
+static void ParseLevel(const Save::SaveGame* s, bool hubMode)
+{
 	// Rooms
 	for (int i = 0; i < s->rooms()->size(); i++)
 	{
@@ -1513,14 +2111,14 @@ bool SaveGame::Load(int slot)
 		g_Level.Rooms[room->index()].reverbType = (ReverbType)room->reverb_type();
 	}
 
-	// Static objects
+	// Static objects.
 	for (int i = 0; i < s->static_meshes()->size(); i++)
 	{
 		auto staticMesh = s->static_meshes()->Get(i);
 		auto room = &g_Level.Rooms[staticMesh->room_number()];
 		int number = staticMesh->number();
 
-		room->mesh[number].pos = ToPose(staticMesh->pose());
+		room->mesh[number].pos = ToPose(*staticMesh->pose());
 		room->mesh[number].roomNumber = staticMesh->room_number();
 		room->mesh[number].scale = staticMesh->scale();
 		room->mesh[number].color = ToVector4(staticMesh->color());
@@ -1574,38 +2172,18 @@ bool SaveGame::Load(int slot)
 		FlipMap[i] = s->flip_maps()->Get(i) << 8;
 	}
 
-	// Effects
+	// Flipeffects
 	FlipEffect = s->flip_effect();
 	FlipStatus = s->flip_status();
 
-	// Restore camera FOV
-	AlterFOV(s->current_fov());
-
-	// Restore current inventory item
-	g_Gui.SetLastInventoryItem(s->last_inv_item());
-
-	// Restore action queue
+	// Restore action queue.
 	for (int i = 0; i < s->action_queue()->size(); i++)
 	{
 		assertion(i < ActionQueue.size(), "Action queue size was changed");
 		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
 	}
 
-	// Restore postprocess effects
-	g_Renderer.SetPostProcessMode((PostProcessMode)s->postprocess_mode());
-	g_Renderer.SetPostProcessStrength(s->postprocess_strength());
-	g_Renderer.SetPostProcessTint(ToVector3(s->postprocess_tint()));
-
-	// Restore soundtracks
-	for (int i = 0; i < s->soundtracks()->size(); i++)
-	{
-		assertion(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
-
-		auto track = s->soundtracks()->Get(i);
-		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position());
-	}
-
-	// Legacy soundtrack map
+	// Legacy soundtrack map.
 	for (int i = 0; i < s->cd_flags()->size(); i++)
 	{
 		int index = s->cd_flags()->Get(i);
@@ -1634,7 +2212,7 @@ bool SaveGame::Load(int slot)
 			SpotCam[i].flags = s->flyby_cameras()->Get(i)->flags();
 	}
 
-	ZeroMemory(&Lara, sizeof(LaraInfo));
+	// Items
 
 	NextItemFree = s->next_item_free();
 	NextItemActive = s->next_item_active();
@@ -1670,20 +2248,16 @@ bool SaveGame::Load(int slot)
 
 		g_GameScriptEntities->TryAddColliding(i);
 
-		item->Pose = ToPose(savedItem->pose());
+		// Don't load player data in hub mode.
+		if (item->ObjectNumber == ID_LARA && hubMode)
+			continue;
+
+		if (item->Index == Lara.Context.Vehicle && hubMode)
+			continue;
+
+		// Position
+		item->Pose = ToPose(*savedItem->pose());
 		item->RoomNumber = savedItem->room_number();
-
-		item->Animation.Velocity = ToVector3(savedItem->velocity());
-
-		if (item->ObjectNumber == ID_LARA && !dynamicItem)
-		{
-			LaraItem->Data = nullptr;
-			LaraItem = item;
-			LaraItem->Location.RoomNumber = savedItem->room_number();
-			LaraItem->Location.Height = item->Pose.Position.y;
-			LaraItem->Data = &Lara;
-		}
-
 		item->Floor = savedItem->floor();
 		item->BoxNumber = savedItem->box_number();
 
@@ -1694,9 +2268,17 @@ bool SaveGame::Load(int slot)
 		item->Animation.TargetState = savedItem->target_state();
 		item->Animation.AnimNumber = savedItem->anim_number();
 		item->Animation.FrameNumber = savedItem->frame_number();
+		item->Animation.Velocity = ToVector3(savedItem->velocity());
 
 		// Hit points
 		item->HitPoints = savedItem->hit_points();
+
+		// Mesh stuff
+		item->MeshBits = savedItem->mesh_bits();
+		item->Model.BaseMesh = savedItem->base_mesh();
+		item->Model.MeshIndex.resize(savedItem->mesh_pointers()->size());
+		for (int j = 0; j < savedItem->mesh_pointers()->size(); j++)
+			item->Model.MeshIndex[j] = savedItem->mesh_pointers()->Get(j);
 
 		// Flags and timers
 		for (int j = 0; j < 7; j++)
@@ -1726,19 +2308,13 @@ bool SaveGame::Load(int slot)
 		item->Effect.LightColor = ToVector3(savedItem->effect_light_colour());
 		item->Effect.Count = savedItem->effect_count();
 
-		// Mesh stuff
-		item->MeshBits = savedItem->mesh_bits();
-
-		item->Model.BaseMesh = savedItem->base_mesh();
-		item->Model.MeshIndex.resize(savedItem->mesh_pointers()->size());
-		for (int j = 0; j < savedItem->mesh_pointers()->size(); j++)
-			item->Model.MeshIndex[j] = savedItem->mesh_pointers()->Get(j);
-
 		if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8 &&
 			(item->Flags & ONESHOT))
+		{
 			item->MeshBits = 0x00100;
+		}
 
-		// Now some post-load specific hacks for objects
+		// Post-load specific hacks for objects.
 		if (item->ObjectNumber >= ID_PUZZLE_HOLE1 && item->ObjectNumber <= ID_PUZZLE_HOLE16 &&
 			(item->Status == ITEM_ACTIVE || item->Status == ITEM_DEACTIVATED))
 		{
@@ -1749,7 +2325,7 @@ bool SaveGame::Load(int slot)
 		if (item->IsBridge())
 			UpdateBridgeItem(g_Level.Items[i]);
 
-		// Creature data for intelligent items
+		// Creature data for intelligent items.
 		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)
 		{
 			EnableEntityAI(i, true, false);
@@ -1855,7 +2431,7 @@ bool SaveGame::Load(int slot)
 			kayak->FrontVerticalVelocity = savedKayak->front_vertical_velocity();
 			kayak->LeftRightPaddleCount = savedKayak->left_right_count();
 			kayak->LeftVerticalVelocity = savedKayak->left_vertical_velocity();
-			kayak->OldPose = ToPose(savedKayak->old_pos());
+			kayak->OldPose = ToPose(*savedKayak->old_pos());
 			kayak->RightVerticalVelocity = savedKayak->right_vertical_velocity();
 			kayak->TrueWater = savedKayak->true_water();
 			kayak->Turn = savedKayak->turn();
@@ -1911,462 +2487,32 @@ bool SaveGame::Load(int slot)
 			item->Data = savedData->scalar();
 		}
 	}
+}
 
-	for (int i = 0; i < s->particles()->size(); i++)
+void SaveGame::Parse(const std::vector<byte>& buffer, bool hubMode)
+{
+	if (!Save::VerifySaveGameBuffer(flatbuffers::Verifier(buffer.data(), buffer.size())))
 	{
-		auto* particleInfo = s->particles()->Get(i);
-		auto* particle = &Particles[i];
-
-		particle->x = particleInfo->x();
-		particle->y = particleInfo->y();
-		particle->z = particleInfo->z();
-		particle->xVel = particleInfo->x_vel();
-		particle->yVel = particleInfo->y_vel();
-		particle->zVel = particleInfo->z_vel();
-		particle->gravity = particleInfo->gravity();
-		particle->rotAng = particleInfo->rot_ang();
-		particle->flags = particleInfo->flags();
-		particle->sSize = particleInfo->s_size();
-		particle->dSize = particleInfo->d_size();
-		particle->size = particleInfo->size();
-		particle->friction = particleInfo->friction();
-		particle->scalar = particleInfo->scalar();
-		particle->spriteIndex = particleInfo->sprite_index();
-		particle->rotAdd = particleInfo->rot_add();
-		particle->maxYvel = particleInfo->max_y_vel();
-		particle->on = particleInfo->on();
-		particle->sR = particleInfo->s_r();
-		particle->sG = particleInfo->s_g();
-		particle->sB = particleInfo->s_b();
-		particle->dR = particleInfo->d_r();
-		particle->dG = particleInfo->d_g();
-		particle->dB = particleInfo->d_b();
-		particle->r = particleInfo->r();
-		particle->g = particleInfo->g();
-		particle->b = particleInfo->b();
-		particle->colFadeSpeed = particleInfo->col_fade_speed();
-		particle->fadeToBlack = particleInfo->fade_to_black();
-		particle->sLife = particleInfo->s_life();
-		particle->life = particleInfo->life();
-		particle->blendMode = (BlendMode)particleInfo->blend_mode();
-		particle->extras = particleInfo->extras();
-		particle->dynamic = particleInfo->dynamic();
-		particle->fxObj = particleInfo->fx_obj();
-		particle->roomNumber = particleInfo->room_number();
-		particle->nodeNumber = particleInfo->node_number();
+		TENLog("Savegame data is incorrect and was not loaded! Incorrect flatbuffer format or memory corruption?", LogLevel::Error);
+		return;
 	}
 
-	for (int i = 0; i < s->bats()->size(); i++)
-	{
-		auto* batInfo = s->bats()->Get(i);
-		auto* bat = &Bats[i];
+	JustLoaded = true;
 
-		bat->On = batInfo->on();
-		bat->Counter = batInfo->flags();
-		bat->RoomNumber = batInfo->room_number();
-		bat->Pose = ToPose(batInfo->pose());
-	}
+	const Save::SaveGame* s = Save::GetSaveGame(buffer.data());
 
-	for (int i = 0; i < s->rats()->size(); i++)
-	{
-		auto ratInfo = s->rats()->Get(i);
-		auto* rat = &Rats[i];
+	ParseLevel(s, hubMode);
+	ParseLua(s);
+	ParseStatistics(s, hubMode);
 
-		rat->On = ratInfo->on();
-		rat->Flags = ratInfo->flags();
-		rat->RoomNumber = ratInfo->room_number();
-		rat->Pose = ToPose(ratInfo->pose());
-	}
+	// Effects and player data is ignored when loading hub.
+	// Effects are commonly believed to be non-preservable, while player data is transfered from previous level.
 
-	for (int i = 0; i < s->spiders()->size(); i++)
-	{
-		auto* spiderInfo = s->spiders()->Get(i);
-		auto* spider = &Spiders[i];
+	if (hubMode)
+		return;
 
-		spider->On = spiderInfo->on();
-		spider->Flags = spiderInfo->flags();
-		spider->RoomNumber = spiderInfo->room_number();
-		spider->Pose = ToPose(spiderInfo->pose());
-	}
-
-	for (int i = 0; i < s->scarabs()->size(); i++)
-	{
-		auto beetleInfo = s->scarabs()->Get(i);
-		auto* beetle = &BeetleSwarm[i];
-
-		beetle->On = beetleInfo->on();
-		beetle->Flags = beetleInfo->flags();
-		beetle->RoomNumber = beetleInfo->room_number();
-		beetle->Pose = ToPose(beetleInfo->pose());
-	}
-
-	NextFxFree = s->next_fx_free();
-	NextFxActive = s->next_fx_active();
-
-	for (int i = 0; i < s->fxinfos()->size(); ++i)
-	{
-		auto& fx = EffectList[i];
-		auto fx_saved = s->fxinfos()->Get(i);
-		fx.pos = ToPose(fx_saved->pose());
-		fx.roomNumber = fx_saved->room_number();
-		fx.objectNumber = fx_saved->object_number();
-		fx.nextFx = fx_saved->next_fx();
-		fx.nextActive = fx_saved->next_active();
-		fx.speed = fx_saved->speed();
-		fx.fallspeed = fx_saved->fall_speed();
-		fx.frameNumber = fx_saved->frame_number();
-		fx.counter = fx_saved->counter();
-		fx.color = ToVector4(fx_saved->color());
-		fx.flag1 = fx_saved->flag1();
-		fx.flag2 = fx_saved->flag2();
-	}
-
-	if (g_Level.VolumeEventSets.size() == s->volume_event_sets()->size())
-	{
-		for (int i = 0; i < s->volume_event_sets()->size(); ++i)
-		{
-			auto set_saved = s->volume_event_sets()->Get(i);
-			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
-				g_Level.VolumeEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
-		}
-	}
-
-	if (g_Level.GlobalEventSets.size() == s->global_event_sets()->size())
-	{
-		for (int i = 0; i < s->global_event_sets()->size(); ++i)
-		{
-			auto set_saved = s->global_event_sets()->Get(i);
-			for (int j = 0; j < set_saved->call_counters()->size(); ++j)
-				g_Level.GlobalEventSets[set_saved->index()].Events[j].CallCounter = set_saved->call_counters()->Get(j);
-		}
-	}
-
-	JustLoaded = true;	
-
-	// Lara
-	ZeroMemory(Lara.Inventory.Puzzles, NUM_PUZZLES * sizeof(int));
-	for (int i = 0; i < s->lara()->inventory()->puzzles()->size(); i++)
-		Lara.Inventory.Puzzles[i] = s->lara()->inventory()->puzzles()->Get(i);
-
-	ZeroMemory(Lara.Inventory.PuzzlesCombo, NUM_PUZZLES * 2 * sizeof(int));
-	for (int i = 0; i < s->lara()->inventory()->puzzles_combo()->size(); i++)
-		Lara.Inventory.PuzzlesCombo[i] = s->lara()->inventory()->puzzles_combo()->Get(i);
-
-	ZeroMemory(Lara.Inventory.Keys, NUM_KEYS * sizeof(int));
-	for (int i = 0; i < s->lara()->inventory()->keys()->size(); i++)
-		Lara.Inventory.Keys[i] = s->lara()->inventory()->keys()->Get(i);
-
-	ZeroMemory(Lara.Inventory.KeysCombo, NUM_KEYS * 2 * sizeof(int));
-	for (int i = 0; i < s->lara()->inventory()->keys_combo()->size(); i++)
-		Lara.Inventory.KeysCombo[i] = s->lara()->inventory()->keys_combo()->Get(i);
-
-	ZeroMemory(Lara.Inventory.Pickups, NUM_PICKUPS * sizeof(int));
-	for (int i = 0; i < s->lara()->inventory()->pickups()->size(); i++)
-		Lara.Inventory.Pickups[i] = s->lara()->inventory()->pickups()->Get(i);
-
-	ZeroMemory(Lara.Inventory.PickupsCombo, NUM_PICKUPS * 2 * sizeof(int));
-	for (int i = 0; i < s->lara()->inventory()->pickups_combo()->size(); i++)
-		Lara.Inventory.PickupsCombo[i] = s->lara()->inventory()->pickups_combo()->Get(i);
-
-	ZeroMemory(Lara.Inventory.Examines, NUM_EXAMINES * sizeof(int));
-	for (int i = 0; i < s->lara()->inventory()->examines()->size(); i++)
-		Lara.Inventory.Examines[i] = s->lara()->inventory()->examines()->Get(i);
-
-	ZeroMemory(Lara.Inventory.ExaminesCombo, NUM_EXAMINES * 2 * sizeof(int));
-	for (int i = 0; i < s->lara()->inventory()->examines_combo()->size(); i++)
-		Lara.Inventory.ExaminesCombo[i] = s->lara()->inventory()->examines_combo()->Get(i);
-
-	for (int i = 0; i < Lara.Effect.BubbleNodes.size(); i++)
-		Lara.Effect.BubbleNodes[i] = s->lara()->effect()->bubble_nodes()->Get(i);
-	
-	for (int i = 0; i < Lara.Effect.DripNodes.size(); i++)
-		Lara.Effect.DripNodes[i] = s->lara()->effect()->drip_nodes()->Get(i);
-
-	Lara.Context.CalcJumpVelocity = s->lara()->context()->calc_jump_velocity();
-	Lara.Context.WaterCurrentActive = s->lara()->context()->water_current_active();
-	Lara.Context.WaterCurrentPull.x = s->lara()->context()->water_current_pull()->x();
-	Lara.Context.WaterCurrentPull.y = s->lara()->context()->water_current_pull()->y();
-	Lara.Context.WaterCurrentPull.z = s->lara()->context()->water_current_pull()->z();
-	Lara.Context.InteractedItem = s->lara()->context()->interacted_item_number();
-	Lara.Context.NextCornerPos = ToPose(s->lara()->context()->next_corner_pose());
-	Lara.Context.ProjectedFloorHeight = s->lara()->context()->projected_floor_height();
-	Lara.Context.TargetOrientation = ToEulerAngles(s->lara()->context()->target_orient());
-	Lara.Context.Vehicle = s->lara()->context()->vehicle_item_number();
-	Lara.Context.WaterSurfaceDist = s->lara()->context()->water_surface_dist();
-	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
-	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
-	Lara.Control.Count.Death = s->lara()->control()->count()->death();
-	Lara.Control.Count.Pose = s->lara()->control()->count()->pose();
-	Lara.Control.Count.PositionAdjust = s->lara()->control()->count()->position_adjust();
-	Lara.Control.Count.Run = s->lara()->control()->count()->run_jump();
-	Lara.Control.Count.Death = s->lara()->control()->count()->death();
-	Lara.Control.IsClimbingLadder = s->lara()->control()->is_climbing_ladder();
-	Lara.Control.IsLow = s->lara()->control()->is_low();
-	Lara.Control.IsMoving = s->lara()->control()->is_moving();
-	Lara.Control.JumpDirection = (JumpDirection)s->lara()->control()->jump_direction();
-	Lara.Control.KeepLow = s->lara()->control()->keep_low();
-	Lara.Control.Look.IsUsingBinoculars = s->lara()->control()->look()->is_using_binoculars();
-	Lara.Control.Look.IsUsingLasersight = s->lara()->control()->look()->is_using_lasersight();
-	Lara.Control.Look.Mode = (LookMode)s->lara()->control()->look()->mode();
-	Lara.Control.Look.OpticRange = s->lara()->control()->look()->optic_range();
-	Lara.Control.Look.Orientation = ToEulerAngles(s->lara()->control()->look()->orientation());
-	Lara.Control.Look.TurnRate = ToEulerAngles(s->lara()->control()->look()->turn_rate());
-	Lara.Control.MoveAngle = s->lara()->control()->move_angle();
-	Lara.Control.IsRunJumpQueued = s->lara()->control()->is_run_jump_queued();
-	Lara.Control.TurnRate = s->lara()->control()->turn_rate();
-	Lara.Control.IsLocked = s->lara()->control()->is_locked();
-	Lara.Control.HandStatus = (HandStatus)s->lara()->control()->hand_status();
-	Lara.Control.Weapon.GunType = (LaraWeaponType)s->lara()->control()->weapon()->gun_type();
-	Lara.Control.Weapon.HasFired = s->lara()->control()->weapon()->has_fired();
-	Lara.Control.Weapon.Interval = s->lara()->control()->weapon()->interval();
-	Lara.Control.Weapon.Fired = s->lara()->control()->weapon()->fired();
-	Lara.Control.Weapon.LastGunType = (LaraWeaponType)s->lara()->control()->weapon()->last_gun_type();
-	Lara.Control.Weapon.RequestGunType = (LaraWeaponType)s->lara()->control()->weapon()->request_gun_type();
-	Lara.Control.Weapon.HolsterInfo.BackHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->back_holster();
-	Lara.Control.Weapon.HolsterInfo.LeftHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->left_holster();
-	Lara.Control.Weapon.HolsterInfo.RightHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->right_holster();
-	Lara.Control.Weapon.NumShotsFired = s->lara()->control()->weapon()->num_shots_fired();
-	Lara.Control.Weapon.Timer = s->lara()->control()->weapon()->timer();
-	Lara.Control.Weapon.UziLeft = s->lara()->control()->weapon()->uzi_left();
-	Lara.Control.Weapon.UziRight = s->lara()->control()->weapon()->uzi_right();
-	Lara.Control.Weapon.WeaponItem = s->lara()->control()->weapon()->weapon_item();
-	Lara.ExtraAnim = s->lara()->extra_anim();
-	Lara.ExtraHeadRot = ToEulerAngles(s->lara()->extra_head_rot());
-	Lara.ExtraTorsoRot = ToEulerAngles(s->lara()->extra_torso_rot());
-	Lara.Flare.Life = s->lara()->flare()->life();
-	Lara.Flare.ControlLeft = s->lara()->flare()->control_left();
-	Lara.Flare.Frame = s->lara()->flare()->frame();
-	Lara.HighestLocation = s->lara()->highest_location();
-	Lara.HitDirection = s->lara()->hit_direction();
-	Lara.HitFrame = s->lara()->hit_frame();
-	Lara.Inventory.BeetleComponents = s->lara()->inventory()->beetle_components();
-	Lara.Inventory.BeetleLife = s->lara()->inventory()->beetle_life();
-	Lara.Inventory.BigWaterskin = s->lara()->inventory()->big_waterskin();
-	Lara.Inventory.HasBinoculars = s->lara()->inventory()->has_binoculars();
-	Lara.Inventory.HasCrowbar = s->lara()->inventory()->has_crowbar();
-	Lara.Inventory.HasLasersight = s->lara()->inventory()->has_lasersight();
-	Lara.Inventory.HasSilencer = s->lara()->inventory()->has_silencer();
-	Lara.Inventory.HasTorch = s->lara()->inventory()->has_torch();
-	Lara.Inventory.IsBusy = s->lara()->inventory()->is_busy();
-	Lara.Inventory.OldBusy = s->lara()->inventory()->old_busy();
-	Lara.Inventory.SmallWaterskin = s->lara()->inventory()->small_waterskin();
-	Lara.Inventory.TotalFlares = s->lara()->inventory()->total_flares();
-	Lara.Inventory.TotalLargeMedipacks = s->lara()->inventory()->total_large_medipacks();
-	Lara.Inventory.TotalSmallMedipacks = s->lara()->inventory()->total_small_medipacks();
-	Lara.LeftArm.AnimNumber = s->lara()->left_arm()->anim_number();
-	Lara.LeftArm.GunFlash = s->lara()->left_arm()->gun_flash();
-	Lara.LeftArm.GunSmoke = s->lara()->left_arm()->gun_smoke();
-	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
-	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
-	Lara.LeftArm.Orientation = ToEulerAngles(s->lara()->left_arm()->rotation());
-	Lara.Location = s->lara()->location();
-	Lara.LocationPad = s->lara()->location_pad();
-	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
-	Lara.RightArm.GunFlash = s->lara()->right_arm()->gun_flash();
-	Lara.RightArm.GunSmoke = s->lara()->right_arm()->gun_smoke();
-	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
-	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
-	Lara.RightArm.Orientation = ToEulerAngles(s->lara()->right_arm()->rotation());
-	Lara.Torch.IsLit = s->lara()->torch()->is_lit();
-	Lara.Torch.State = (TorchState)s->lara()->torch()->state();
-	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();
-	Lara.Control.Rope.Direction = s->lara()->control()->rope()->direction();
-	Lara.Control.Rope.ArcFront = s->lara()->control()->rope()->arc_front();
-	Lara.Control.Rope.ArcBack = s->lara()->control()->rope()->arc_back();
-	Lara.Control.Rope.LastX = s->lara()->control()->rope()->last_x();
-	Lara.Control.Rope.MaxXForward = s->lara()->control()->rope()->max_x_forward();
-	Lara.Control.Rope.MaxXBackward = s->lara()->control()->rope()->max_x_backward();
-	Lara.Control.Rope.DFrame = s->lara()->control()->rope()->dframe();
-	Lara.Control.Rope.Frame = s->lara()->control()->rope()->frame();
-	Lara.Control.Rope.FrameRate = s->lara()->control()->rope()->frame_rate();
-	Lara.Control.Rope.Y = s->lara()->control()->rope()->y();
-	Lara.Control.Rope.Ptr = s->lara()->control()->rope()->ptr();
-	Lara.Control.Rope.Offset = s->lara()->control()->rope()->offset();
-	Lara.Control.Rope.DownVel = s->lara()->control()->rope()->down_vel();
-	Lara.Control.Rope.Flag = s->lara()->control()->rope()->flag();
-	Lara.Control.Rope.Count = s->lara()->control()->rope()->count();
-	Lara.Control.Subsuit.XRot = s->lara()->control()->subsuit()->x_rot();
-	Lara.Control.Subsuit.DXRot = s->lara()->control()->subsuit()->d_x_rot();
-	Lara.Control.Subsuit.Velocity[0] = s->lara()->control()->subsuit()->velocity()->Get(0);
-	Lara.Control.Subsuit.Velocity[1] = s->lara()->control()->subsuit()->velocity()->Get(1);
-	Lara.Control.Subsuit.VerticalVelocity = s->lara()->control()->subsuit()->vertical_velocity();
-	Lara.Control.Subsuit.XRotVel = s->lara()->control()->subsuit()->x_rot_vel();
-	Lara.Control.Subsuit.HitCount = s->lara()->control()->subsuit()->hit_count();
-	Lara.Control.Tightrope.Balance = s->lara()->control()->tightrope()->balance();
-	Lara.Control.Tightrope.CanDismount = s->lara()->control()->tightrope()->can_dismount();
-	Lara.Control.Tightrope.TightropeItem = s->lara()->control()->tightrope()->tightrope_item();
-	Lara.Control.Tightrope.TimeOnTightrope = s->lara()->control()->tightrope()->time_on_tightrope();
-	Lara.Control.WaterStatus = (WaterStatus)s->lara()->control()->water_status();
-	Lara.Status.Air = s->lara()->status()->air();
-	Lara.Status.Exposure = s->lara()->status()->exposure();
-	Lara.Status.Poison = s->lara()->status()->poison();
-	Lara.Status.Stamina = s->lara()->status()->stamina();
-	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0) ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr;
-	Lara.TargetArmOrient = ToEulerAngles(s->lara()->target_arm_orient());
-
-	for (int i = 0; i < s->lara()->weapons()->size(); i++)
-	{
-		auto* info = s->lara()->weapons()->Get(i);
-
-		for (int j = 0; j < info->ammo()->size(); j++)
-		{
-			Lara.Weapons[i].Ammo[j].SetInfinite(info->ammo()->Get(j)->is_infinite());
-			Lara.Weapons[i].Ammo[j] = info->ammo()->Get(j)->count();
-		}
-
-		Lara.Weapons[i].HasLasersight = info->has_lasersight();
-		Lara.Weapons[i].HasSilencer = info->has_silencer();
-		Lara.Weapons[i].Present = info->present();
-		Lara.Weapons[i].SelectedAmmo = (WeaponAmmoType)info->selected_ammo();
-		Lara.Weapons[i].WeaponMode = (LaraWeaponTypeCarried)info->weapon_mode();
-	}
-
-	// Rope
-	if (Lara.Control.Rope.Ptr >= 0)
-	{
-		ROPE_STRUCT* rope = &Ropes[Lara.Control.Rope.Ptr];
-		
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-		{
-			rope->segment[i] = ToVector3i(s->rope()->segments()->Get(i));
-			rope->normalisedSegment[i] = ToVector3i(s->rope()->normalised_segments()->Get(i));
-			rope->meshSegment[i] = ToVector3i(s->rope()->mesh_segments()->Get(i));
-			rope->coords[i] = ToVector3i(s->rope()->coords()->Get(i));
-			rope->velocity[i] = ToVector3i(s->rope()->velocities()->Get(i));
-		}
-
-		rope->coiled = s->rope()->coiled();
-		rope->active = s->rope()->active();
-
-		rope->position = ToVector3i(s->rope()->position());
-		CurrentPendulum.position = ToVector3i(s->pendulum()->position());
-		CurrentPendulum.velocity = ToVector3i(s->pendulum()->velocity());
-
-		CurrentPendulum.node = s->pendulum()->node();
-		CurrentPendulum.rope = rope;
-
-		AlternatePendulum.position = ToVector3i(s->alternate_pendulum()->position());
-		AlternatePendulum.velocity = ToVector3i(s->alternate_pendulum()->velocity());
-
-		AlternatePendulum.node = s->alternate_pendulum()->node();
-		AlternatePendulum.rope = rope;
-	}
-
-	std::vector<SavedVar> loadedVars;
-
-	auto unionVec = s->script_vars();
-	if (unionVec)
-	{
-		for (const auto& var : *(unionVec->members()))
-		{
-			auto varType = var->u_type();
-			switch (varType)
-			{
-			case Save::VarUnion::num:
-				loadedVars.push_back(var->u_as_num()->scalar());
-				break;
-
-			case Save::VarUnion::boolean:
-				loadedVars.push_back(var->u_as_boolean()->scalar());
-				break;
-				
-			case Save::VarUnion::str:
-				loadedVars.push_back(var->u_as_str()->str()->str());
-				break;
-
-			case Save::VarUnion::tab:
-				{
-					auto tab = var->u_as_tab()->keys_vals();
-					auto& loadedTab = loadedVars.emplace_back(IndexTable{});
-
-					for (const auto& pair : *tab)
-						std::get<IndexTable>(loadedTab).push_back(std::make_pair(pair->key(), pair->val()));
-
-					break;
-				}
-				
-			case Save::VarUnion::vec2:
-				{
-					auto stored = var->u_as_vec2()->vec();
-					SavedVar var;
-					var.emplace<(int)SavedVarType::Vec2>(ToVector2(stored));
-					loadedVars.push_back(var);
-					break;
-				}
-				
-			case Save::VarUnion::vec3:
-				{
-					auto stored = var->u_as_vec3()->vec();
-					SavedVar var;
-					var.emplace<(int)SavedVarType::Vec3>(ToVector3(stored));
-					loadedVars.push_back(var);
-					break;
-				}
-				
-			case Save::VarUnion::rotation:
-				{
-					auto stored = var->u_as_rotation()->vec();
-					SavedVar var;
-					var.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
-					loadedVars.push_back(var);
-					break;
-				}
-				
-			case Save::VarUnion::color:
-				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
-				break;
-	
-			case Save::VarUnion::funcName:
-				loadedVars.push_back(FuncName{var->u_as_funcName()->str()->str()});
-				break;
-
-			default:
-				break;
-			}
-		}
-	}
-
-	g_GameScript->SetVariables(loadedVars);
-
-	auto populateCallbackVecs = [&s](auto callbackFunc)
-	{
-		auto callbacksVec = std::vector<std::string>{};
-		auto callbacksOffsetVec = std::invoke(callbackFunc, s);
-
-		for (const auto& e : *callbacksOffsetVec)
-			callbacksVec.push_back(e->str());
-
-		return callbacksVec;
-	};
-
-	auto callbacksPreStartVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_start);
-	auto callbacksPostStartVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_start);
-
-	auto callbacksPreEndVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_end);
-	auto callbacksPostEndVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_end);
-
-	auto callbacksPreSaveVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_save);
-	auto callbacksPostSaveVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_save);
-
-	auto callbacksPreLoadVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_load);
-	auto callbacksPostLoadVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_load);
-
-	auto callbacksPreLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_loop);
-	auto callbacksPostLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_loop);
-
-	g_GameScript->SetCallbackStrings(
-		callbacksPreStartVec,
-		callbacksPostStartVec,
-		callbacksPreEndVec,
-		callbacksPostEndVec,
-		callbacksPreSaveVec,
-		callbacksPostSaveVec,
-		callbacksPreLoadVec,
-		callbacksPostLoadVec,
-		callbacksPreLoopVec,
-		callbacksPostLoopVec);
-
-	return true;
+	ParseEffects(s);
+	ParsePlayer(s);
 }
 
 bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
@@ -2381,26 +2527,53 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 
 	std::ifstream file;
 	file.open(fileName, std::ios_base::app | std::ios_base::binary);
+
 	file.seekg(0, std::ios::end);
 	size_t length = file.tellg();
 	file.seekg(0, std::ios::beg);
-	std::unique_ptr<char[]> buffer = std::make_unique<char[]>(length);
-	file.read(buffer.get(), length);
-	file.close();
 
-	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
+	if (length == 0)
+	{
+		TENLog("Savegame #" + std::to_string(slot) + " has no data!", LogLevel::Warning);
+		return false;
+	}
 
-	header->Level = s->header()->level();
-	header->LevelName = s->header()->level_name()->str();
-	header->Days = s->header()->days();
-	header->Hours = s->header()->hours();
-	header->Minutes = s->header()->minutes();
-	header->Seconds = s->header()->seconds();
-	header->Level = s->header()->level();
-	header->Timer = s->header()->timer();
-	header->Count = s->header()->count();
+	try
+	{
+		int size;
+		file.read(reinterpret_cast<char*>(&size), sizeof(size));
 
-	return true;
+		std::unique_ptr<char[]> buffer = std::make_unique<char[]>(size);
+		file.read(buffer.get(), size);
+		file.close();
+
+		bool bufferIsValid = Save::VerifySaveGameBuffer(flatbuffers::Verifier(reinterpret_cast<const unsigned char*>(buffer.get()), size));
+
+		if (size <= 0 || size >= length || !bufferIsValid)
+		{
+			TENLog("Incorrect data in savegame #" + std::to_string(slot) + ". Old format?", LogLevel::Warning);
+			return false;
+		}
+
+		const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
+
+		header->Level = s->header()->level();
+		header->LevelName = s->header()->level_name()->str();
+		header->Days = s->header()->days();
+		header->Hours = s->header()->hours();
+		header->Minutes = s->header()->minutes();
+		header->Seconds = s->header()->seconds();
+		header->Level = s->header()->level();
+		header->Timer = s->header()->timer();
+		header->Count = s->header()->count();
+
+		return true;
+	}
+	catch (std::exception& ex)
+	{
+		TENLog("Error reading savegame #" + std::to_string(slot) + ", Exception: " + ex.what(), LogLevel::Error);
+		return false;
+	}
 }
 
 void SaveGame::Delete(int slot)

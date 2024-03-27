@@ -763,11 +763,11 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			break;
 
 		case TO_SECRET:
-			if (!(Statistics.Level.Secrets & (1 << value)))
+			if (!(SaveGame::Statistics.Level.Secrets & (1 << value)))
 			{
 				PlaySecretTrack();
-				Statistics.Level.Secrets |= (1 << value);
-				Statistics.Game.Secrets++;
+				SaveGame::Statistics.Level.Secrets |= (1 << value);
+				SaveGame::Statistics.Game.Secrets++;
 			}
 			break;
 

@@ -167,7 +167,7 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 							hasFired = true;
 						}
 
-						Statistics.Game.AmmoUsed++;
+						SaveGame::Statistics.Game.AmmoUsed++;
 					}
 				}
 

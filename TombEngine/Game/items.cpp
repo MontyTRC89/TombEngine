@@ -855,7 +855,7 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 	{
 		if (target->HitPoints > 0)
 		{
-			Statistics.Level.AmmoHits++;
+			SaveGame::Statistics.Level.AmmoHits++;
 			DoDamage(target, damage);
 		}
 	}
