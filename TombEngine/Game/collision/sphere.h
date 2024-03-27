@@ -6,8 +6,8 @@ namespace TEN::Collision::Sphere
 {
 	enum class SphereSpaceFlags
 	{
-		Local = 1,
-		World = 1 << 1,
+		Local	   = 1,
+		World	   = 1 << 1,
 		BoneOrigin = 1 << 2
 	};
 
