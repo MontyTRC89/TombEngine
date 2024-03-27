@@ -2249,15 +2249,43 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
-	<name>GetSlotHP</name>
-	<summary>Get HP definded for that object type (hit points/health points) (Read Only).</summary>
+	<name>GetHP</name>
+	<summary>Get current HP (hit points/health points)</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the amount of HP the moveable currently has</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetHP</name>
+	<summary>Set current HP (hit points/health points)
+ Clamped to [0, 32767] for "intelligent" entities (i.e.</summary>
+	<description>anything with AI); clamped to [-32767, 32767] otherwise.</description>
 	<parameters>
 		<parameter>
-			<name>ID</name>
+			<name>HP</name>
 			<type>int</type>
-			<description>of the moveable slot type.</description>
+			<description>the amount of HP to give the moveable</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetSlotHP</name>
+	<summary>Get HP definded for that object type (hit points/health points) (Read Only).</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the moveable's slot default hit points</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -2603,35 +2631,6 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
-	<name>GetHP</name>
-	<summary>Get current HP (hit points/health points)</summary>
-	<returns>
-		<return>
-			<type>int</type>
-			<description>the amount of HP the moveable currently has</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
-	<name>SetHP</name>
-	<summary>Set current HP (hit points/health points)
- Clamped to [0, 32767] for "intelligent" entities (i.e.</summary>
-	<description>anything with AI); clamped to [-32767, 32767] otherwise.</description>
-	<parameters>
-		<parameter>
-			<name>HP</name>
-			<type>int</type>
-			<description>the amount of HP to give the moveable</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
 	<name>GetLocationAI</name>
 	<summary>Get the location value stored in the Enemy AI</summary>
 	<returns>
@@ -2750,6 +2749,20 @@ most can just be ignored (see usage).</description>
 			<description>New room's ID.</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetMeshCount</name>
+	<summary>Get number of meshes for a particular object
+ Returns number of meshes in an object</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>number of meshes</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -3556,6 +3569,35 @@ most can just be ignored (see usage).</description>
 			<name>scale</name>
 			<type>Scale</type>
 			<description>the static's new scale</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetHP</name>
+	<summary>Get current HP (hit points/health points)
+ Used only with shatterable static meshes.</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the amount of HP the static currently has</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetHP</name>
+	<summary>Set current HP (hit points/health points)
+ Used only with shatterable static meshes.</summary>
+	<parameters>
+		<parameter>
+			<name>HP</name>
+			<type>int</type>
+			<description>the amount of HP to give the static</description>
 		</parameter>
 	</parameters>
 </function>

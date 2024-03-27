@@ -316,7 +316,7 @@ static void UsePlayerMedipack(ItemInfo& item)
 	if (hasUsedMedipack)
 	{
 		player.Status.Poison = 0;
-		Statistics.Game.HealthUsed++;
+		SaveGame::Statistics.Game.HealthUsed++;
 		SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 	}
 }
@@ -726,7 +726,7 @@ void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 
-	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+	if (coll->CollisionType == CollisionType::Left || coll->CollisionType == CollisionType::Right)
 		maxAngleNormalized *= 0.6f;
 
 	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;

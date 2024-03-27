@@ -86,26 +86,6 @@ struct MESH_INFO
 	bool Dirty;
 };
 
-struct LIGHTINFO
-{
-	int x;
-	int y;
-	int z;
-	unsigned char Type;
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
-	short nx;
-	short ny;
-	short nz;
-	short Intensity;
-	unsigned char Inner;
-	unsigned char Outer;
-	short FalloffScale;
-	short Length;
-	short Cutoff;
-};
-
 struct ROOM_INFO
 {
 	int index;

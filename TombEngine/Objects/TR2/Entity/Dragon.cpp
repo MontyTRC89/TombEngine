@@ -310,7 +310,7 @@ namespace TEN::Entities::Creatures::TR2
 			smoke.dB = 0;
 			smoke.colFadeSpeed = 128;
 			smoke.fadeToBlack = 64;
-			smoke.blendMode = BlendMode::Lighten;
+			smoke.blendMode = BlendMode::Additive;
 			smoke.life = smoke.sLife = Random::GenerateInt(10, 60);
 
 			smoke.friction = 0;
@@ -407,12 +407,22 @@ namespace TEN::Entities::Creatures::TR2
 					if (timer == -100)
 					{
 						InitializeDragonBones(item);
+
+						if (flagDaggerDeath)
+						{
+							CollectCarriedItems(&item);
+						}
 					}
 					else if (timer == -200)
 					{
 						DisableEntityAI(itemNumber);
 						KillItem(itemNumber);
-						DropPickups(&item);
+
+						if (!flagDaggerDeath)
+						{
+							DropPickups(&item);
+						}
+
 						item.Status = ITEM_DEACTIVATED;
 					}
 					else if (timer < -100)
@@ -649,7 +659,7 @@ namespace TEN::Entities::Creatures::TR2
 					//playerItem.Pose = item.Pose;
 
 					// HACK: Temporarily use small button push animation.
-					SetAnimation(playerItem, LA_BUTTON_SMALL_PUSH);
+					SetAnimation(playerItem, LA_PICKUP_PEDESTAL_LOW);
 
 					ResetPlayerFlex(&playerItem);
 					playerItem.Animation.FrameNumber = GetAnimData(playerItem).frameBase;

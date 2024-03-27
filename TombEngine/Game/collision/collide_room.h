@@ -19,15 +19,15 @@ constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 constexpr auto DEFAULT_ILLEGAL_FLOOR_SLOPE_ANGLE   = ANGLE(36.0f);
 constexpr auto DEFAULT_ILLEGAL_CEILING_SLOPE_ANGLE = ANGLE(45.0f);
 
-enum CollisionType
+enum class CollisionType
 {
-	CT_NONE		 = 0,
-	CT_FRONT	 = (1 << 0),
-	CT_LEFT		 = (1 << 1),
-	CT_RIGHT	 = (1 << 2),
-	CT_TOP		 = (1 << 3),
-	CT_TOP_FRONT = (1 << 4),
-	CT_CLAMP	 = (1 << 5)
+	None,
+	Front,
+	Left,
+	Right,
+	Top,
+	TopFront,
+	Clamp
 };
 
 enum class CollisionProbeMode
@@ -98,7 +98,7 @@ struct CollisionInfo
 	CollisionPositionData FrontLeft	  = {};
 	CollisionPositionData FrontRight  = {};
 
-	CollisionType CollisionType = CT_NONE;
+	CollisionType CollisionType = CollisionType::None;
 	Pose		  Shift			= Pose::Zero;
 
 	Vector3 FloorNormal			 = Vector3::Zero;

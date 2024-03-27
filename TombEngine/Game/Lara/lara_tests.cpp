@@ -231,7 +231,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			}
 
 			if (!stopped &&
-				coll->Middle.Ceiling < 0 && coll->CollisionType == CT_FRONT && !coll->HitStatic &&
+				coll->Middle.Ceiling < 0 && coll->CollisionType == CollisionType::Front && !coll->HitStatic &&
 				abs(verticalShift) < SLOPE_DIFFERENCE && TestValidLedgeAngle(item, coll))
 			{
 				if (item->Animation.Velocity.z != 0)
@@ -287,7 +287,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 		return true;
 	}
 
-	if (coll->Middle.Floor < 200 || coll->CollisionType != CT_FRONT)
+	if (coll->Middle.Floor < 200 || coll->CollisionType != CollisionType::Front)
 		return false;
 
 	int edge;
@@ -351,7 +351,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 		return true;
 	}
 
-	if (coll->CollisionType != CT_FRONT)
+	if (coll->CollisionType != CollisionType::Front)
 		return false;
 
 	int edge;
@@ -547,7 +547,7 @@ bool TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll)
 	GetCollisionInfo(coll, item);
 
 	// Filter out narrow ceiling spaces, no collision cases and statics in front.
-	if (coll->Middle.Ceiling >= 0 || coll->CollisionType != CT_FRONT || coll->HitStatic)
+	if (coll->Middle.Ceiling >= 0 || coll->CollisionType != CollisionType::Front || coll->HitStatic)
 		return false;
 
 	// Finally, do ordinary ledge checks (slope difference etc.)
@@ -880,7 +880,7 @@ bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 	auto pointColl = GetPointCollision(*item);
 	int vPos = item->Pose.Position.y;
 
-	if (coll->CollisionType == CT_FRONT ||
+	if (coll->CollisionType == CollisionType::Front ||
 		pointColl.IsIllegalFloor() ||
 		(pointColl.GetFloorHeight() - vPos) <= 0)
 	{
@@ -913,7 +913,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (coll->CollisionType != CT_FRONT || !IsHeld(In::Action))
+	if (coll->CollisionType != CollisionType::Front || !IsHeld(In::Action))
 		return false;
 
 	if (lara->Control.HandStatus != HandStatus::Free &&
@@ -1016,7 +1016,7 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!IsHeld(In::Action) || !lara->Control.CanClimbLadder || coll->CollisionType != CT_FRONT)
+	if (!IsHeld(In::Action) || !lara->Control.CanClimbLadder || coll->CollisionType != CollisionType::Front)
 	{
 		return false;
 	}

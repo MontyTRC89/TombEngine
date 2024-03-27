@@ -433,7 +433,7 @@ void FireShotgun(ItemInfo& laraItem)
 
 		Rumble(0.5f, 0.2f);
 
-		Statistics.Game.AmmoUsed++;
+		SaveGame::Statistics.Game.AmmoUsed++;
 	}
 }
 
@@ -632,8 +632,8 @@ bool FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose)
 
 	Rumble(0.2f, 0.1f);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 
 	return true;
 }
@@ -762,8 +762,8 @@ void FireGrenade(ItemInfo& laraItem)
 		break;
 	}
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void GrenadeControl(short itemNumber)
@@ -924,8 +924,8 @@ void FireRocket(ItemInfo& laraItem)
 	Rumble(0.4f, 0.3f);
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void RocketControl(short itemNumber)
@@ -1078,8 +1078,8 @@ void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose)
 	Rumble(0.2f, 0.1f);
 	SoundEffect(SFX_TR4_CROSSBOW_FIRE, &laraItem.Pose);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void FireCrossBowFromLaserSight(ItemInfo& laraItem, GameVector* origin, GameVector* target)
@@ -1195,7 +1195,7 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 		if (player.Control.Weapon.GunType == LaraWeaponType::Revolver)
 		{
 			player.Control.Weapon.Interval = 16.0f;
-			Statistics.Game.AmmoUsed++;
+			SaveGame::Statistics.Game.AmmoUsed++;
 			isFiring = true;
 
 			if (!ammo.HasInfinite())
@@ -1330,10 +1330,10 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 
 		if (&target != &emitter)
 		{
-			Statistics.Game.AmmoHits++;
+			SaveGame::Statistics.Game.AmmoHits++;
 			if (target.HitPoints <= 0)
 			{
-				Statistics.Level.Kills++;
+				SaveGame::Statistics.Level.Kills++;
 				CreatureDie(target.Index, true);
 			}
 		}

@@ -1,13 +1,11 @@
 #pragma once
 
-//#define _XM_NO_INTRINSICS_ 1
-
-#include <future>
 #include <algorithm>
 #include <array>
 #include <d3d11.h>
 #include <deque>
 #include <functional>
+#include <future>
 #include <map>
 #include <memory>
 #include <optional>
@@ -30,3 +28,5 @@ using namespace DirectX::SimpleMath;
 #else
 #define USE_FEATURE_IF_CPP20(x)
 #endif
+
+constexpr auto NO_VALUE = -1;
