@@ -79,6 +79,7 @@ struct CollisionSetupData
 	bool BlockDeathFloorDown  = false;
 	bool BlockMonkeySwingEdge = false;
 	
+	// Object collision inquirers.
 	bool EnableObjectPush = false;
 	bool EnableSpasm	  = false;
 
