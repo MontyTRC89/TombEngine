@@ -85,7 +85,7 @@ namespace TEN::Animation
 
 		if (item.IsLara())
 		{
-			auto& player = GetLaraInfo(item);	
+			const auto& player = GetLaraInfo(item);	
 			if (EnvCondition == SoundEffectEnvCondition::Always ||
 				(EnvCondition == SoundEffectEnvCondition::Land && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
 				(EnvCondition == SoundEffectEnvCondition::Water && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))

@@ -58,7 +58,7 @@ const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
 bool BoneMutator::IsEmpty() const
 {
 	return (Offset == Vector3::Zero &&
-			Rotation == EulerAngles::Zero &&
+			Rotation == EulerAngles::Identity &&
 			Scale == Vector3::One);
 };
 
@@ -204,7 +204,7 @@ void AnimateItem(ItemInfo* item)
 	}
 }
 
-bool TestStateDispatch(const ItemInfo& item, std::optional<int> targetStateID)
+bool TestStateDispatch(const ItemInfo& item, int targetStateID)
 {
 	const auto& anim = GetAnimData(item);
 
@@ -212,7 +212,7 @@ bool TestStateDispatch(const ItemInfo& item, std::optional<int> targetStateID)
 	for (const auto& dispatch : anim.Dispatches)
 	{
 		// State ID mismatch; continue.
-		if (dispatch.StateID != targetStateID.value_or(item.Animation.TargetState))
+		if (dispatch.StateID != ((targetStateID == NO_VALUE) ? item.Animation.TargetState : targetStateID))
 			continue;
 
 		// Test if current frame is within dispatch range.
@@ -223,21 +223,21 @@ bool TestStateDispatch(const ItemInfo& item, std::optional<int> targetStateID)
 	return false;
 }
 
-bool TestLastFrame(const ItemInfo& item, std::optional<int> animNumber)
+bool TestLastFrame(const ItemInfo& item,int animNumber)
 {
-	if (!animNumber.has_value())
+	if (animNumber == NO_VALUE)
 		animNumber = item.Animation.AnimNumber;
 
 	// Animation number mismatch; return early.
-	if (item.Animation.AnimNumber != *animNumber)
+	if (item.Animation.AnimNumber != animNumber)
 		return false;
 
 	// FAILSAFE: Frames beyond real end frame also count.
-	const auto& anim = GetAnimData(item.Animation.AnimObjectID, *animNumber);
+	const auto& anim = GetAnimData(item.Animation.AnimObjectID, animNumber);
 	return (item.Animation.FrameNumber >= anim.EndFrameNumber);
 }
 
-bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber)
+bool TestLastFrame(ItemInfo* item, int animNumber)
 {
 	return TestLastFrame(*item, animNumber);
 }
@@ -330,12 +330,12 @@ const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber)
 	return GetAnimData(object, animNumber);
 }
 
-const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber)
+const AnimData& GetAnimData(const ItemInfo& item, int animNumber)
 {
-	if (!animNumber.has_value())
+	if (animNumber == NO_VALUE)
 		animNumber = item.Animation.AnimNumber;
 
-	return GetAnimData(item.Animation.AnimObjectID, *animNumber);
+	return GetAnimData(item.Animation.AnimObjectID, animNumber);
 }
 
 KeyframeInterpData GetFrameInterpData(const ItemInfo& item)
@@ -400,11 +400,11 @@ int GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber)
 	return nextAnim.StateID;
 }
 
-bool SetStateDispatch(ItemInfo& item, std::optional<int> targetStateID)
+bool SetStateDispatch(ItemInfo& item, int targetStateID)
 {
 	// Set target state ID.
-	if (targetStateID.has_value())
-		item.Animation.TargetState = *targetStateID;
+	if (targetStateID != NO_VALUE)
+		item.Animation.TargetState = targetStateID;
 
 	const auto& anim = GetAnimData(item);
 

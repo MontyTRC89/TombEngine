@@ -75,9 +75,9 @@ struct BoneMutator
 void AnimateItem(ItemInfo* item);
 
 // Inquirers
-bool TestStateDispatch(const ItemInfo& item, std::optional<int> targetStateID = std::nullopt);
-bool TestLastFrame(const ItemInfo& item, std::optional<int> animNumber = std::nullopt);
-bool TestLastFrame(ItemInfo* item, std::optional<int> animNumber = std::nullopt); // Deprecated.
+bool TestStateDispatch(const ItemInfo& item, int targetStateID = NO_VALUE);
+bool TestLastFrame(const ItemInfo& item, int animNumber = NO_VALUE);
+bool TestLastFrame(ItemInfo* item, int animNumber = NO_VALUE); // Deprecated.
 bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber);
 
 // Entity translation
@@ -93,7 +93,7 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Depre
 // Getters
 const AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
-const AnimData& GetAnimData(const ItemInfo& item, std::optional<int> animNumber = std::nullopt);
+const AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_VALUE);
 
 KeyframeInterpData	GetFrameInterpData(const ItemInfo& item);
 const KeyframeData&	GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
