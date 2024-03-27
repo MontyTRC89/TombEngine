@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
@@ -8,82 +8,63 @@
 #include "Math/Math.h"
 #include "Renderer/Renderer.h"
 
+using namespace TEN::Math;
 using namespace TEN::Renderer;
 
-SPHERE LaraSpheres[MAX_SPHERES];
-SPHERE CreatureSpheres[MAX_SPHERES];
-
-int GetSpheres(ItemInfo* item, SPHERE* ptr, int worldSpace, Matrix local)
+namespace TEN::Collision::Sphere
 {
-	if (item == nullptr)
-		return 0;
-
-	BoundingSphere spheres[MAX_SPHERES];
-	int num = g_Renderer.GetSpheres(item->Index, spheres, worldSpace, local);
-
-	for (int i = 0; i < MAX_SPHERES; i++)
+	std::vector<BoundingSphere> GetSpheres(const ItemInfo* itemPtr, int spaceFlags)
 	{
-		ptr[i].x = spheres[i].Center.x;
-		ptr[i].y = spheres[i].Center.y;
-		ptr[i].z = spheres[i].Center.z;
-		ptr[i].r = spheres[i].Radius;
+		if (itemPtr == nullptr)
+			return {};
+
+		return g_Renderer.GetSpheres(itemPtr->Index, spaceFlags, Matrix::Identity);
 	}
 
-	return num;
-}
-
-int TestCollision(ItemInfo* item, ItemInfo* laraItem)
-{
-	int flags = 0;
-
-	int creatureSphereCount = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int laraSphereCount = GetSpheres(laraItem, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-
-	laraItem->TouchBits = NO_JOINT_BITS;
-
-	if (creatureSphereCount <= 0)
+	int TestCollision(ItemInfo* creatureItemPtr, ItemInfo* playerItemPtr)
 	{
-		item->TouchBits = NO_JOINT_BITS;
-		return 0;
-	}
-	else
-	{
-		for (int i = 0; i < creatureSphereCount; i++)
+		auto creatureSpheres = GetSpheres(creatureItemPtr, (int)SphereSpaceFlags::World);
+		auto playerSpheres = GetSpheres(playerItemPtr, (int)SphereSpaceFlags::World);
+
+		playerItemPtr->TouchBits.ClearAll();
+
+		int flags = 0;
+		if (creatureSpheres.empty())
 		{
-			auto* ptr1 = &CreatureSpheres[i];
-			
-			int x1 = item->Pose.Position.x + ptr1->x;
-			int y1 = item->Pose.Position.y + ptr1->y;
-			int z1 = item->Pose.Position.z + ptr1->z;
-			int r1 = ptr1->r;
+			creatureItemPtr->TouchBits.ClearAll();
+			return flags;
+		}
 
-			if (r1 > 0)
+		// Run through creature spheres.
+		for (int i = 0; i < creatureSpheres.size(); i++)
+		{
+			// Get creature sphere.
+			const auto& creatureSphere = creatureSpheres[i];
+			if (creatureSphere.Radius <= 0.0f)
+				continue;
+
+			// Run through player spheres.
+			for (int j = 0; j < playerSpheres.size(); j++)
 			{
-				for (int j = 0; j < laraSphereCount; j++)
-				{
-					auto* ptr2 = &LaraSpheres[j];
+				// Get player sphere.
+				const auto& playerSphere = playerSpheres[j];
+				if (playerSphere.Radius <= 0.0f)
+					continue;
 
-					int x2 = item->Pose.Position.x + ptr2->x;
-					int y2 = item->Pose.Position.y + ptr2->y;
-					int z2 = item->Pose.Position.z + ptr2->z;
-					int r2 = ptr2->r;
+				// Calculate parameters.
+				auto creatureSpherePos = creatureItemPtr->Pose.Position.ToVector3() + creatureSphere.Center;
+				auto playerSpherePos = creatureItemPtr->Pose.Position.ToVector3() + playerSphere.Center;
+				float distMax = SQUARE(creatureSphere.Radius + playerSphere.Radius);
 
-					if (r2 > 0)
-					{
-						int dx = x1 - x2;
-						int dy = y1 - y2;
-						int dz = z1 - z2;
-						int r = r1 + r2;
+				// Test distance.
+				if (Vector3::DistanceSquared(creatureSpherePos, playerSpherePos) > distMax)
+					continue;
 
-						if ((SQUARE(dx) + SQUARE(dy) + SQUARE(dz)) < SQUARE(r))
-						{
-							item->TouchBits.Set(i);
-							laraItem->TouchBits.Set(j);
-							flags |= 1 << i;
-							break;
-						}
-					}
-				}
+				// Set touch bits.
+				creatureItemPtr->TouchBits.Set(i);
+				playerItemPtr->TouchBits.Set(j);
+				flags |= 1 << i;
+				break;
 			}
 		}
 

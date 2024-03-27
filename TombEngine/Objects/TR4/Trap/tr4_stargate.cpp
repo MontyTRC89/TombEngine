@@ -4,13 +4,15 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::Sphere;
 
 namespace TEN::Entities::Traps
 {
@@ -67,6 +69,7 @@ namespace TEN::Entities::Traps
 			item->Animation.FrameNumber < GetAnimData(item).frameBase + 60)
 		{
 			// Blades deal damage cumulatively.
+			auto spheres = GetSpheres(item, (int)SphereSpaceFlags::World);
 			for (int i = 0; i < StargateHarmJoints.size(); i++)
 			{
 				if (item->TouchBits.Test(StargateHarmJoints[i]))
@@ -74,7 +77,7 @@ namespace TEN::Entities::Traps
 					DoDamage(laraItem, STARGATE_HARM_DAMAGE);
 					DoBloodSplat(
 						(GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32,
-						(GetRandomControl() & 0x1F) + CreatureSpheres[i].y - 16,
+						(GetRandomControl() & 0x1F) + spheres[i].Center.y - 16,
 						(GetRandomControl() & 0x3F) + laraItem->Pose.Position.z - 32,
 						(GetRandomControl() & 3) + 2,
 						GetRandomControl() * 2,

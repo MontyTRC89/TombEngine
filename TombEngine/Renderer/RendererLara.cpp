@@ -9,7 +9,7 @@
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"

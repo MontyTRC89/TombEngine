@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/control/los.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
@@ -20,6 +20,7 @@
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
@@ -38,31 +39,32 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		{
 			int collidedBits = TestCollision(item, laraItem);
-			if (collidedBits)
+			if (collidedBits != 0)
 			{
 				short prevYOrient = item->Pose.Orientation.y;
 
 				item->Pose.Orientation.y = 0;
-				GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+				auto spheres = GetSpheres(item, (int)SphereSpaceFlags::World);
 				item->Pose.Orientation.y = prevYOrient;
 
-				int deadlyBits = *((int*)&item->ItemFlags[0]);
-				auto* sphere = &CreatureSpheres[0];
+				int deadlyBits = *((int*)&item->ItemFlags[0]); // NOTE: Value spread across ItemFlags[0] and ItemFlags[1].
+				const auto* spherePtr = &spheres[0];
+				int sphereIndex = 0;
 
 				if (item->ItemFlags[2] != 0)
 					collidedBits &= ~1;
 				coll->Setup.EnableObjectPush = item->ItemFlags[4] == 0;
 
-				while (collidedBits)
+				while (collidedBits != 0)
 				{
 					if (collidedBits & 1)
 					{
-						GlobalCollisionBounds.X1 = sphere->x - sphere->r - item->Pose.Position.x;
-						GlobalCollisionBounds.X2 = sphere->x + sphere->r - item->Pose.Position.x;
-						GlobalCollisionBounds.Y1 = sphere->y - sphere->r - item->Pose.Position.y;
-						GlobalCollisionBounds.Y2 = sphere->y + sphere->r - item->Pose.Position.y;
-						GlobalCollisionBounds.Z1 = sphere->z - sphere->r - item->Pose.Position.z;
-						GlobalCollisionBounds.Z2 = sphere->z + sphere->r - item->Pose.Position.z;
+						GlobalCollisionBounds.X1 = spherePtr->Center.x - spherePtr->Radius - item->Pose.Position.x;
+						GlobalCollisionBounds.X2 = spherePtr->Center.x + spherePtr->Radius - item->Pose.Position.x;
+						GlobalCollisionBounds.Y1 = spherePtr->Center.y - spherePtr->Radius - item->Pose.Position.y;
+						GlobalCollisionBounds.Y2 = spherePtr->Center.y + spherePtr->Radius - item->Pose.Position.y;
+						GlobalCollisionBounds.Z1 = spherePtr->Center.z - spherePtr->Radius - item->Pose.Position.z;
+						GlobalCollisionBounds.Z2 = spherePtr->Center.z + spherePtr->Radius - item->Pose.Position.z;
 
 						int x = laraItem->Pose.Position.x;
 						int y = laraItem->Pose.Position.y;
@@ -93,7 +95,9 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 
 					collidedBits >>= 1;
 					deadlyBits >>= 1;
-					sphere++;
+
+					sphereIndex++;
+					spherePtr = &spheres[sphereIndex];
 				}
 			}
 		}

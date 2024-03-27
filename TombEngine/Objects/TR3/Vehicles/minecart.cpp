@@ -3,7 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
@@ -20,6 +20,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;
 using namespace TEN::Math;

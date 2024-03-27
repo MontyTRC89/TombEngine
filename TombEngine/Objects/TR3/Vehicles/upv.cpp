@@ -3,7 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
@@ -26,6 +26,7 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;

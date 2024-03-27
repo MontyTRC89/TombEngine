@@ -10,7 +10,7 @@
 #include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Objects/Generic/Switches/cog_switch.h"
 #include "Objects/objectslist.h"
 #include "Game/Lara/lara.h"
@@ -23,6 +23,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/itemdata.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 
