@@ -96,7 +96,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (creature->Mood == MoodType::Escape)
 					item->Animation.TargetState = 1;
-				else if (item->Animation.RequiredState != NO_STATE)
+				else if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (creature->Mood == MoodType::Bored)
 				{

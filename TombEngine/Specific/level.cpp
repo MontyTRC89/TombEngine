@@ -907,8 +907,8 @@ void ReadRooms()
 		room.reverbType = (ReverbType)ReadInt32();
 		room.flipNumber = ReadInt32();
 
-		room.itemNumber = NO_ITEM;
-		room.fxNumber = NO_ITEM;
+		room.itemNumber = NO_VALUE;
+		room.fxNumber = NO_VALUE;
 		room.index = i;
 
 		g_GameScriptEntities->AddName(room.name, room);
@@ -1463,7 +1463,7 @@ void LoadSprites()
 void GetCarriedItems()
 {
 	for (int i = 0; i < g_Level.NumItems; ++i)
-		g_Level.Items[i].CarriedItem = NO_ITEM;
+		g_Level.Items[i].CarriedItem = NO_VALUE;
 
 	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
@@ -1473,7 +1473,7 @@ void GetCarriedItems()
 		if (object.intelligent ||
 			(item.ObjectNumber >= ID_SEARCH_OBJECT1 && item.ObjectNumber <= ID_SEARCH_OBJECT3))
 		{
-			for (short linkNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+			for (short linkNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 			{
 				auto& item2 = g_Level.Items[linkNumber];
 

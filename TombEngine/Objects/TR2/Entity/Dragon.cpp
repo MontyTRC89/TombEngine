@@ -116,7 +116,7 @@ namespace TEN::Entities::Creatures::TR2
 		int frontBoneItemNumber = SpawnItem(item, ID_DRAGON_BONE_FRONT);
 		int backBoneItemNumber = SpawnItem(item, ID_DRAGON_BONE_BACK);
 
-		if (backBoneItemNumber == NO_ITEM || frontBoneItemNumber == NO_ITEM)
+		if (backBoneItemNumber == NO_VALUE || frontBoneItemNumber == NO_VALUE)
 		{
 			TENLog("Failed to create dragon skeleton objects.", LogLevel::Warning);
 			return;
@@ -127,7 +127,7 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		int backItemNumber = SpawnItem(frontItem, ID_DRAGON_BACK);
 
-		if (backItemNumber == NO_ITEM)
+		if (backItemNumber == NO_VALUE)
 		{
 			TENLog("Failed to create dragon back body segment.", LogLevel::Warning);
 			return;
@@ -141,7 +141,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		// Store back body segment item number.
 		frontItem.ItemFlags[0] = backItemNumber;
-		backItem.ItemFlags[0] = NO_ITEM;
+		backItem.ItemFlags[0] = NO_VALUE;
 	}
 
 	void InitializeDragon(short itemNumber)
@@ -166,7 +166,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (backItem.Status == ITEM_DEACTIVATED)
 		{
 			KillItem(backItem.Index);
-			backItemNumber = NO_ITEM;
+			backItemNumber = NO_VALUE;
 			return;
 		}
 
