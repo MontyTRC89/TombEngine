@@ -3,7 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/weather.h"
@@ -15,7 +15,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
 using TEN::Renderer::g_Renderer;
 

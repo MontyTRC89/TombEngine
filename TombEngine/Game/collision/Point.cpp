@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
@@ -14,7 +14,7 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Room;
 using namespace TEN::Math;
 
-namespace TEN::Collision::PointCollision
+namespace TEN::Collision::Point
 {
 	PointCollisionData::PointCollisionData(const Vector3i& pos, int roomNumber)
 	{

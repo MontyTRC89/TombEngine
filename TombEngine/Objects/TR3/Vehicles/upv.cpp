@@ -6,7 +6,7 @@
 #include "Game/collision/sphere.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/Bubble.h"
@@ -27,7 +27,7 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;

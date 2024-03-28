@@ -1,14 +1,14 @@
 #pragma once
 #include "Math/Math.h"
 
-namespace TEN::Collision::PointCollision { class PointCollisionData; };
+namespace TEN::Collision::Point { class PointCollisionData; };
 class FloorInfo;
 struct CollisionInfo;
 struct CollisionResult;
 struct ItemInfo;
 struct MESH_INFO;
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 
 constexpr auto MAX_COLLIDED_OBJECTS = 1024;
 constexpr auto ITEM_RADIUS_YMAX = BLOCK(3);

@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -16,7 +16,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 
 constexpr auto ROLLING_BALL_MAX_VELOCITY = BLOCK(3);
 

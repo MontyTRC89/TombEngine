@@ -12,9 +12,9 @@
 #include "Specific/level.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 int SenetPiecesNumber[6];

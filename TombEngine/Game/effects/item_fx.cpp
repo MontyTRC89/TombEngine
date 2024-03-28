@@ -3,7 +3,7 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/smoke.h"
@@ -14,7 +14,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Smoke;
 
 namespace TEN::Effects::Items

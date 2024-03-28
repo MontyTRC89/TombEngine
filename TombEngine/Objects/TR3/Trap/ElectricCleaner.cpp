@@ -3,7 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/spark.h"
@@ -11,7 +11,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;

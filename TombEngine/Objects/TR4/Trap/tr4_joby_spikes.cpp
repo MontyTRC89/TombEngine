@@ -2,7 +2,7 @@
 #include "tr4_joby_spikes.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/animation.h"
 #include "Sound/sound.h"
@@ -10,7 +10,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::TR4
 {

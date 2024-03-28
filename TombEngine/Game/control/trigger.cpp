@@ -3,7 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/floordata.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
@@ -25,7 +25,7 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 

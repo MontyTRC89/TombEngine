@@ -2,14 +2,14 @@
 #include "Objects/Generic/Object/Pushable/PushableStack.h"
 
 #include "Game/collision/floordata.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushable/PushableBridge.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::Generic
 {

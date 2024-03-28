@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "Objects/Generic/Object/Pushable/PushableSound.h"
 
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::Generic
 {

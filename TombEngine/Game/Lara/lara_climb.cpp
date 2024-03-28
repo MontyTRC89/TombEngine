@@ -3,7 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
@@ -15,7 +15,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 constexpr auto LADDER_TEST_MARGIN = 8;

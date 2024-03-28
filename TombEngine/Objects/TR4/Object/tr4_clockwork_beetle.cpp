@@ -6,10 +6,10 @@
 #include "Game/animation.h"
 #include "Sound/sound.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/debris.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 
 void ClockworkBeetleControl(short itemNumber)
 {

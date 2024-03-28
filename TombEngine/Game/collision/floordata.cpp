@@ -2,7 +2,7 @@
 #include "Game/collision/floordata.h"
 
 #include "Game/collision/collide_room.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
@@ -13,7 +13,7 @@
 #include "Specific/trutils.h"
 
 using namespace TEN::Collision::Floordata;
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using namespace TEN::Utils;

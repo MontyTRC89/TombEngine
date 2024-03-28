@@ -3,12 +3,12 @@
 #include "Specific/level.h"
 #include "Sound/sound.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/items.h"
 #include "Game/animation.h"
 #include "Math/Math.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::TR4
 {

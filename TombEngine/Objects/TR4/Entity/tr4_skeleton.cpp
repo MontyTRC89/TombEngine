@@ -3,7 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
@@ -21,7 +21,7 @@
 #include "Math/Math.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4

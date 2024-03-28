@@ -3,7 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/tomb4fx.h"
@@ -14,7 +14,7 @@
 #include "Specific/level.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Math::Random;
 

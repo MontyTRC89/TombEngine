@@ -5,7 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/PointCollision.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/effects/smoke.h"
@@ -23,7 +23,7 @@
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Renderer/Renderer.h"
 
-using namespace TEN::Collision::PointCollision;
+using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Room;
 using namespace TEN::Effects::Smoke;
 
