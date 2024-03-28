@@ -19,7 +19,7 @@ using namespace TEN::Math;
 
 namespace TEN::Traps::TR5
 {
-	const auto ZipLineInteractBasis = InteractionBasis
+	const auto ZIP_LINE_INTERACT_BASIS = InteractionBasis
 	{
 		Vector3i(0, 0, BLOCK(3 / 8.0f)),
 		GameBoundingBox(
@@ -121,7 +121,7 @@ namespace TEN::Traps::TR5
 		}
 	}
 
-	static bool CanPlayerUseZipLine(const ItemInfo& playerItem, const ItemInfo& zipLineItem)
+	static bool TestPlayerZipLineInteraction(const ItemInfo& playerItem, const ItemInfo& zipLineItem)
 	{
 		auto& player = GetLaraInfo(playerItem);
 
@@ -129,7 +129,7 @@ namespace TEN::Traps::TR5
 		if (zipLineItem.Status != ITEM_NOT_ACTIVE)
 			return false;
 
-		// Check for player input action.
+		// Test for Action input action.
 		if (!IsHeld(In::Action))
 			return false;
 
@@ -145,7 +145,7 @@ namespace TEN::Traps::TR5
 		return false;
 	}
 
-	static void InteractZipLine(ItemInfo& playerItem, ItemInfo& zipLineItem)
+	static void SetPlayerZipLineInteraction(ItemInfo& playerItem, ItemInfo& zipLineItem)
 	{
 		SetAnimation(playerItem, LA_ZIPLINE_MOUNT);
 		ResetPlayerFlex(&playerItem);
@@ -160,13 +160,20 @@ namespace TEN::Traps::TR5
 		}
 	}
 
-	void CollideZipLine(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
+	void CollideZipLine(short itemNumber, ItemInfo* collided, CollisionInfo* coll)
 	{
 		auto& zipLineItem = g_Level.Items[itemNumber];
-		auto& player = GetLaraInfo(*playerItem);
 
-		// Interact with zip line.
-		if (CanPlayerUseZipLine(*playerItem, zipLineItem))
-			HandlePlayerInteraction(*playerItem, zipLineItem, ZipLineInteractBasis, InteractZipLine);
+		// Interact.
+		if (collided->IsLara())
+		{
+			if (TestInteraction(*collided, zipLineItem, ZIP_LINE_INTERACT_BASIS))
+			{
+				// TODO: Spawn interaction hint.
+
+				if (TestPlayerZipLineInteraction(*collided, zipLineItem))
+					SetInteraction(*collided, zipLineItem, ZIP_LINE_INTERACT_BASIS, SetPlayerZipLineInteraction, InteractionType::Walk);
+			}
+		}
 	}
 }

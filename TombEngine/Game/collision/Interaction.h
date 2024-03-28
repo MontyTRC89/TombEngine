@@ -5,44 +5,41 @@ using namespace TEN::Math;
 
 struct ItemInfo;
 
-namespace TEN::Collision
+namespace TEN::Collision::Interaction
 {
-	using PlayerInteractRoutine = std::function<void(ItemInfo& playerItem, ItemInfo& interactedItem)>;
-	using OrientConstraintPair	= std::pair<EulerAngles, EulerAngles>;
+	using InteractionRoutine   = std::function<void(ItemInfo& interactor, ItemInfo& interactable)>;
+	using OrientConstraintPair = std::pair<EulerAngles, EulerAngles>;
 
-	class InteractionBasis
+	enum class InteractionType
+	{
+		Latch,
+		Walk
+	};
+
+	struct InteractionBasis
 	{
 	public:
-		// Members
 		Vector3i			 PosOffset		  = Vector3i::Zero;
 		EulerAngles			 OrientOffset	  = EulerAngles::Identity;
 		BoundingOrientedBox	 Box			  = BoundingOrientedBox();
 		OrientConstraintPair OrientConstraint = OrientConstraintPair(EulerAngles::Identity, EulerAngles::Identity);
 
-		// Constructors
-		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const BoundingOrientedBox& box,
-						 const OrientConstraintPair& orientConstraint);
+		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
 		InteractionBasis(const Vector3i& posOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
 		InteractionBasis(const EulerAngles& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
 		InteractionBasis(const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
 
-		// TODO: Deprecated constructors.
-		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const GameBoundingBox& box,
-						 const OrientConstraintPair& orientConstraint);
+		// Deprecated constructors.
+		// TODO: Adopt BoundingOrientedBox to remove.
+		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const GameBoundingBox& box, const OrientConstraintPair& orientConstraint);
 		InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& box, const OrientConstraintPair& orientConstraint);
 		InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& box, const OrientConstraintPair& orientConstraint);
 		InteractionBasis(const GameBoundingBox& box, const OrientConstraintPair& orientConstraint);
-
-		// Inquirers
-		bool TestInteraction(const ItemInfo& itemFrom, const ItemInfo& itemTo, std::optional<BoundingOrientedBox> expansionBox = std::nullopt) const;
-	
-		// Utilities
-		void DrawDebug(const ItemInfo& item) const;
 	};
 
-	void SetItemInteraction(ItemInfo& itemFrom, const ItemInfo& itemTo, const InteractionBasis& basis,
-							const Vector3i& extraPosOffset = Vector3i::Zero, const EulerAngles& extraOrientOffset = EulerAngles::Identity);
-	void SetPlayerAlignAnim(ItemInfo& playerItem, const ItemInfo& interactedItem);
-	
-	bool HandlePlayerInteraction(ItemInfo& playerItem, ItemInfo& interactedItem, const InteractionBasis& basis, const PlayerInteractRoutine& interactRoutine);
+	bool TestInteraction(const ItemInfo& interactor, const ItemInfo& interactable, const InteractionBasis& basis, std::optional<BoundingOrientedBox> expansionBox = std::nullopt);
+	void SetPlayerAlignAnim(ItemInfo& interactor, const ItemInfo& interactable);
+	void SetInteraction(ItemInfo& interactor, ItemInfo& interactable, const InteractionBasis& basis, const InteractionRoutine& routine, InteractionType type);
+
+	void DrawDebug(const ItemInfo& item, const InteractionBasis& basis);
 }

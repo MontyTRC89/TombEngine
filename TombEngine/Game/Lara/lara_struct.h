@@ -1,15 +1,16 @@
 #pragma once
+#include "Game/collision/Interaction.h"
 #include "Game/Lara/PlayerContext.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
-
-using namespace TEN::Math;
 
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
 
+using namespace TEN::Collision::Interaction;
 using namespace TEN::Entities::Player;
+using namespace TEN::Math;
 
 // Inventory object constants
 constexpr int NUM_PUZZLES		  = ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1;
@@ -1240,7 +1241,7 @@ struct WeaponControlData
 	LaraWeaponType LastGunType	  = LaraWeaponType::None;
 	HolsterInfo	   HolsterInfo	  = {};
 
-	short WeaponItem = -1;
+	short WeaponItem = NO_VALUE;
 	bool  HasFired	 = false;
 	bool  Fired		 = false;
 
@@ -1251,6 +1252,32 @@ struct WeaponControlData
 	unsigned int NumShotsFired = 0;
 	float		 Interval	   = 0.0f;
 	float		 Timer		   = 0.0f;
+};
+
+// NOTE: Parent item referenced as interactable.
+struct PlayerWalkInteractionData
+{
+	std::optional<InteractionBasis> Basis	= std::nullopt;
+	InteractionRoutine				Routine = nullptr;
+};
+
+struct PlayerContextData
+{
+	// Members
+	int			ProjectedFloorHeight = 0; // Used for primitive offset blend. TODO: Real offset blend feature + object parenting. -- Sezz 2023.09.27
+	float		CalcJumpVelocity	 = 0;
+	Pose		NextCornerPos		 = Pose::Zero;
+	EulerAngles TargetOrientation	 = EulerAngles::Identity;
+
+	int		 WaterSurfaceDist	= 0;
+	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
+	Vector3i WaterCurrentPull	= Vector3i::Zero;
+
+	PlayerWalkInteractionData WalkInteraction = {};
+
+	// TODO: InteractedItem should be a generic parent stored in ItemInfo. No need to Vehicle either.
+	int InteractedItem = 0; // InteractedItemNumber.
+	int Vehicle		   = 0; // VehicleItemNumber.
 };
 
 struct PlayerControlData
@@ -1335,7 +1362,7 @@ struct LaraInfo
 {
 	static constexpr auto TARGET_COUNT_MAX = 16;
 
-	PlayerContext		Context	  = PlayerContext();
+	PlayerContextData	Context	  = {};
 	PlayerControlData	Control	  = {};
 	PlayerStatusData	Status	  = {};
 	PlayerEffectData	Effect	  = {};

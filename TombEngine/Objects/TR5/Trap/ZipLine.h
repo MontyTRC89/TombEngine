@@ -7,5 +7,5 @@ namespace TEN::Traps::TR5
 {
 	void InitializeZipLine(short itemNumber);
 	void ControlZipLine(short itemNumber);
-	void CollideZipLine(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
+	void CollideZipLine(short itemNumber, ItemInfo* collided, CollisionInfo* coll);
 }

@@ -242,9 +242,10 @@ namespace TEN::Math::Geometry
 	BoundingOrientedBox GetExpandedBoundingOrientedBox(const BoundingOrientedBox& box, const BoundingOrientedBox& expansionBox)
 	{
 		auto rotMatrix = Matrix::CreateFromQuaternion(box.Orientation);
+		auto offset = Vector3::Transform(expansionBox.Center, rotMatrix);
 
 		return BoundingOrientedBox(
-			box.Center + Vector3::Transform(expansionBox.Center, rotMatrix),
+			box.Center + offset,
 			box.Extents + expansionBox.Extents,
 			box.Orientation);
 	}
