@@ -1,11 +1,7 @@
 #pragma once
-#include <SimpleMath.h>
 
 namespace TEN::Math::Random
 {
-	using namespace DirectX;
-	using namespace DirectX::SimpleMath;
-
 	// Value generation
 	int	  GenerateInt(int low = 0, int high = SHRT_MAX);
 	float GenerateFloat(float low = 0.0f, float high = 1.0f);

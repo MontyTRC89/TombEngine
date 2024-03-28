@@ -477,7 +477,7 @@ namespace TEN::Entities::Vehicles
 		GetCollisionInfo(coll, UPVItem, Vector3i(0, height / 2, 0));
 		ShiftItem(UPVItem, coll);
 
-		if (coll->CollisionType == CT_FRONT)
+		if (coll->CollisionType == CollisionType::Front)
 		{
 			if (UPV->TurnRate.x > UPV_DEFLECT_ANGLE)
 				UPV->TurnRate.x += UPV_DEFLCT_TURN_RATE_MAX;
@@ -494,18 +494,18 @@ namespace TEN::Entities::Vehicles
 					UPV->Velocity = 0;
 			}
 		}
-		else if (coll->CollisionType == CT_TOP)
+		else if (coll->CollisionType == CollisionType::Top)
 		{
 			if (UPV->TurnRate.x >= -UPV_DEFLECT_ANGLE)
 				UPV->TurnRate.x -= UPV_DEFLCT_TURN_RATE_MAX;
 		}
-		else if (coll->CollisionType == CT_TOP_FRONT)
+		else if (coll->CollisionType == CollisionType::TopFront)
 			UPV->Velocity = 0;
-		else if (coll->CollisionType == CT_LEFT)
+		else if (coll->CollisionType == CollisionType::Left)
 			UPVItem->Pose.Orientation.y += ANGLE(5.0f);
-		else if (coll->CollisionType == CT_RIGHT)
+		else if (coll->CollisionType == CollisionType::Right)
 			UPVItem->Pose.Orientation.y -= ANGLE(5.0f);
-		else if (coll->CollisionType == CT_CLAMP)
+		else if (coll->CollisionType == CollisionType::Clamp)
 		{
 			UPVItem->Pose.Position = coll->Setup.PrevPosition;
 			UPV->Velocity = 0;
