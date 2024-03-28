@@ -53,8 +53,16 @@ GameTime GetGameTime(int frameCount)
 	return gameTime;
 }
 
-bool TestGlobalTimeInterval(float seconds)
+bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs)
 {
-	int ticks = (int)round(seconds * FPS);
-	return ((GlobalCounter % ticks) == 0);
+	int intervalTicks = (int)round(intervalSecs * FPS);
+	int offsetTicks = (int)round(offsetSecs * FPS);
+
+	if (offsetTicks >= intervalTicks)
+	{
+		TENLog("TestGlobalTimeInterval(): intervalSecs must be greater than offsetSecs.", LogLevel::Warning);
+		return false;
+	}
+
+	return ((GlobalCounter % intervalTicks) == offsetTicks);
 }

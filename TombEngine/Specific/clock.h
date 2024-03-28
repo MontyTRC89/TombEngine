@@ -23,4 +23,4 @@ bool TimeReset();
 
 GameTime GetGameTime(int frameCount);
 
-bool TestGlobalTimeInterval(float seconds);
+bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs);
