@@ -178,7 +178,7 @@ namespace TEN::Entities::Vehicles
 		auto* quadBikeItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(quadBikeItem, laraItem, coll, QuadBikeMountTypes, QBIKE_MOUNT_DISTANCE);
@@ -261,7 +261,7 @@ namespace TEN::Entities::Vehicles
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Context.Vehicle == NO_ITEM)
+		if (lara->Context.Vehicle == NO_VALUE)
 			return true;
 
 		if ((laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_RIGHT || laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_LEFT) &&

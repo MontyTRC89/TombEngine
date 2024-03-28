@@ -363,7 +363,7 @@ namespace TEN::Entities::Creatures::TR3
 	void TribesmanShotDart(ItemInfo* item)
 	{
 		int dartItemNumber = CreateItem();
-		if (dartItemNumber == NO_ITEM)
+		if (dartItemNumber == NO_VALUE)
 			return;
 		
 		auto* dartItem = &g_Level.Items[dartItemNumber];

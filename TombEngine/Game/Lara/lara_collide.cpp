@@ -50,7 +50,7 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 		ShiftItem(item, coll);
 		item->Pose.Orientation.y -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
 	}
-	else if (coll->LastBridgeItemNumber != NO_ITEM)
+	else if (coll->LastBridgeItemNumber != NO_VALUE)
 	{
 		ShiftItem(item, coll);
 	}
@@ -645,7 +645,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			return;
 	}
 
-	if (lara->ExtraAnim == NO_ITEM)
+	if (lara->ExtraAnim == NO_VALUE)
 		TestLaraWaterDepth(item, coll);
 }
 

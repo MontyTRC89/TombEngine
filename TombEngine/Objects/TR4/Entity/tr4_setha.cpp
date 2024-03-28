@@ -181,7 +181,7 @@ namespace TEN::Entities::TR4
 				creature.Flags = 0;
 				creature.LOT.IsJumping = false;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;

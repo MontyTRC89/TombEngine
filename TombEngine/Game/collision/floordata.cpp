@@ -315,7 +315,7 @@ int FloorInfo::GetInsideBridgeItemNumber(const Vector3i& pos, bool testFloorBord
 	}
 
 	// 2) No bridge intersection; return invalid item number.
-	return NO_ITEM;
+	return NO_VALUE;
 }
 
 void FloorInfo::AddBridge(int itemNumber)
@@ -509,7 +509,7 @@ namespace TEN::Collision::Floordata
 				sectorPtr = &GetSideSector(*nextRoomNumber, pos.x, pos.z);
 			}
 		}
-		while (sectorPtr->GetInsideBridgeItemNumber(pos, isBottom, !isBottom) != NO_ITEM);
+		while (sectorPtr->GetInsideBridgeItemNumber(pos, isBottom, !isBottom) != NO_VALUE);
 
 		return FarthestHeightData{ *sectorPtr, pos.y };
 	}
@@ -555,7 +555,7 @@ namespace TEN::Collision::Floordata
 		bool testCeilBorder = (pos.y == floorHeight);
 		int insideBridgeItemNumber = sectorPtr->GetInsideBridgeItemNumber(pos, testFloorBorder, testCeilBorder);
 
-		if (insideBridgeItemNumber != NO_ITEM)
+		if (insideBridgeItemNumber != NO_VALUE)
 		{
 			if (isFloor ? (polarity <= 0) : (polarity >= 0))
 			{
@@ -613,7 +613,7 @@ namespace TEN::Collision::Floordata
 		bool testCeilBorder = (location.Height == floorHeight);
 		int insideBridgeItemNumber = sectorPtr->GetInsideBridgeItemNumber(Vector3i(pos.x, location.Height, pos.z), testFloorBorder, testCeilBorder);
 
-		if (insideBridgeItemNumber != NO_ITEM)
+		if (insideBridgeItemNumber != NO_VALUE)
 		{
 			auto heightData = GetFarthestHeightData(*sectorPtr, Vector3i(pos.x, location.Height, pos.z), isBottom);
 			if (!heightData.has_value())

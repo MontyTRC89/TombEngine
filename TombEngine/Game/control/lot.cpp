@@ -49,7 +49,7 @@ void DisableEntityAI(short itemNumber)
 		return;
 
 	auto* creature = GetCreatureInfo(item);
-	creature->ItemNumber = NO_ITEM;
+	creature->ItemNumber = NO_VALUE;
 	KillItem(creature->AITargetNumber);
 	ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
 	item->Data = nullptr;
@@ -88,13 +88,13 @@ void InitializeSlot(short itemNumber, bool makeTarget)
 	creature->LOT.IsMonkeying = false;
 	creature->LOT.Fly = NO_FLYING;
 	creature->LOT.BlockMask = BLOCKED;
-	creature->AITargetNumber = NO_ITEM;
+	creature->AITargetNumber = NO_VALUE;
 	creature->AITarget = nullptr;
 
 	if (makeTarget)
 	{
 		creature->AITargetNumber = CreateItem();
-		if (creature->AITargetNumber != NO_ITEM)
+		if (creature->AITargetNumber != NO_VALUE)
 			creature->AITarget = &g_Level.Items[creature->AITargetNumber];
 	}
 
@@ -210,7 +210,7 @@ void SetEntityTarget(short itemNum, short target)
 
 	creature->AITargetNumber = target;
 
-	if (creature->AITargetNumber != NO_ITEM)
+	if (creature->AITargetNumber != NO_VALUE)
 		creature->AITarget = &g_Level.Items[creature->AITargetNumber];
 	else
 		creature->AITarget = nullptr;

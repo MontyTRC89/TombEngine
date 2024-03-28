@@ -121,7 +121,7 @@ void UndrawFlare(ItemInfo& laraItem)
 	player.Flare.ControlLeft = true;
 
 	if (laraItem.Animation.TargetState == LS_IDLE &&
-		player.Context.Vehicle == NO_ITEM)
+		player.Context.Vehicle == NO_VALUE)
 	{
 		if (laraItem.Animation.AnimNumber == LA_STAND_IDLE)
 		{
@@ -309,7 +309,7 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 	const auto& lara = *GetLaraInfo(&laraItem);
 
 	auto itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return;
 
 	auto& flareItem = g_Level.Items[itemNumber];

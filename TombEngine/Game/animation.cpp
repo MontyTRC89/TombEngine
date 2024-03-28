@@ -190,7 +190,7 @@ void AnimateItem(ItemInfo* item)
 		if (!item->IsLara())
 		{
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 	}
 
@@ -212,7 +212,7 @@ void AnimateItem(ItemInfo* item)
 			}
 
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 		else
 		{
@@ -229,7 +229,7 @@ void AnimateItem(ItemInfo* item)
 		if (!item->IsLara())
 		{
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}*/
 	}
 
@@ -322,7 +322,7 @@ bool HasStateDispatch(const ItemInfo* item, int targetState)
 	if (anim.NumStateDispatches <= 0)
 		return false;
 
-	if (targetState == NO_STATE)
+	if (targetState == NO_VALUE)
 		targetState = item->Animation.TargetState;
 
 	// Iterate over animation's state dispatches.
@@ -360,7 +360,7 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 {
 	const auto& object = Objects[item->Animation.AnimObjectID];
 
-	if (animNumber == NO_ANIM)
+	if (animNumber == NO_VALUE)
 		animNumber = item->Animation.AnimNumber - object.animIndex;
 
 	// Animation to test doesn't match; return early.
@@ -463,7 +463,7 @@ const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 
 const AnimData& GetAnimData(const ItemInfo& item, int animNumber)
 {
-	if (animNumber == NO_ANIM)
+	if (animNumber == NO_VALUE)
 		return GetAnimData(item.Animation.AnimNumber);
 
 	const auto& object = Objects[item.Animation.AnimObjectID];

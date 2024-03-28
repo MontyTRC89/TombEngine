@@ -39,7 +39,7 @@ short GetNextRat()
 		i++;
 
 		if (i >= NUM_RATS)
-			return NO_ITEM;
+			return NO_VALUE;
 	}
 
 	NextRat = (ratNumber + 1) & 0x1F;

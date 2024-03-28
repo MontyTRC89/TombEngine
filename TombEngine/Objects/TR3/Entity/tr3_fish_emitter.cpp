@@ -15,7 +15,7 @@ using namespace TEN::Math;
 namespace TEN::Entities::Creatures::TR3
 {
 	int PirahnaHitWait = false;
-	int CarcassItem = NO_ITEM;
+	int CarcassItem = NO_VALUE;
 
 	#define PIRAHNA_DAMAGE 4
 	#define X 0

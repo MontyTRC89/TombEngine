@@ -124,7 +124,7 @@ namespace TEN::Entities::Creatures::TR3
 			switch (item->Animation.ActiveState)
 			{
 			case TREX_STATE_IDLE:
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (ai.distance < pow(1500, 2) && ai.bite)
 					item->Animation.TargetState = TREX_STATE_ATTACK;

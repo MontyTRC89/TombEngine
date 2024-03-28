@@ -318,8 +318,8 @@ namespace TEN::Renderer
 		RendererRoom& room = _rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
-		short itemNum = NO_ITEM;
-		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = g_Level.Items[itemNum].NextItem)
+		short itemNum = NO_VALUE;
+		for (itemNum = r->itemNumber; itemNum != NO_VALUE; itemNum = g_Level.Items[itemNum].NextItem)
 		{
 			ItemInfo* item = &g_Level.Items[itemNum];
 
@@ -798,8 +798,8 @@ namespace TEN::Renderer
 		RendererRoom& room = _rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
-		short fxNum = NO_ITEM;
-		for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = EffectList[fxNum].nextFx)
+		short fxNum = NO_VALUE;
+		for (fxNum = r->fxNumber; fxNum != NO_VALUE; fxNum = EffectList[fxNum].nextFx)
 		{
 			FX_INFO *fx = &EffectList[fxNum];
 			if (fx->objectNumber < 0 || fx->color.w <= 0)

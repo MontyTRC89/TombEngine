@@ -134,7 +134,7 @@ namespace TEN::Entities::TR4
 
 		InitializeCreature(itemNumber);
 		SetAnimation(item, HORSEMAN_ANIM_IDLE);
-		item->ItemFlags[0] = NO_ITEM; // No horse yet.
+		item->ItemFlags[0] = NO_VALUE; // No horse yet.
 	}
 
 	void HorsemanSparks(Vector3i* pos, int param1, int maxSparks)
@@ -219,7 +219,7 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		// Try to find a horse.
-		if (item->ItemFlags[0] == NO_ITEM)
+		if (item->ItemFlags[0] == NO_VALUE)
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
@@ -235,7 +235,7 @@ namespace TEN::Entities::TR4
 		}
 
 		// If no horse was found, set ItemFlags[0] to 0 so it isn't searched for again.
-		if (item->ItemFlags[0] == NO_ITEM)
+		if (item->ItemFlags[0] == NO_VALUE)
 			item->ItemFlags[0] = 0;
 
 		// Get horse.
@@ -379,7 +379,7 @@ namespace TEN::Entities::TR4
 			case HORSEMAN_STATE_MOUNTED_RUN_FORWARD:
 				creature->MaxTurn = ANGLE(3.0f);
 				horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNTED_WALK_FORWARD;
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_SPRINT;
 					horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNT_HORSE;
@@ -489,7 +489,7 @@ namespace TEN::Entities::TR4
 				else
 					creature->Flags = 0;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
 					horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNTED_WALK_FORWARD;
@@ -580,7 +580,7 @@ namespace TEN::Entities::TR4
 
 				if (!item->AIBits || item->ItemFlags[3])
 				{
-					if (item->Animation.RequiredState != NO_STATE)
+					if (item->Animation.RequiredState != NO_VALUE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.bite && AI.distance < pow(682,2))
 						item->Animation.TargetState = HORSEMAN_STATE_IDLE_ATTACK;

@@ -85,7 +85,7 @@ namespace TEN::Entities::Creatures::TR3
 	static void TriggerTonyEffect(const TonyFlame& flame)
 	{
 		int fxNumber = CreateNewEffect(flame.RoomNumber);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto& fx = EffectList[fxNumber];

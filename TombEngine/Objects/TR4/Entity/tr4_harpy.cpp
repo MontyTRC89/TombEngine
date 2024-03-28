@@ -243,7 +243,7 @@ namespace TEN::Entities::TR4
 
 			for (auto& currentCreature : ActiveCreatures)
 			{
-				if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+				if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
 					continue;
 
 				auto* target = &g_Level.Items[currentCreature->ItemNumber];
@@ -335,7 +335,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(7.0f);
 				creature->Flags = 0;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					if (item->Animation.RequiredState == HARPY_STATE_FLAME_ATTACK)

@@ -1360,7 +1360,7 @@ struct LaraInfo
 	int HitFrame	 = 0; // Frame index.
 	int HitDirection = 0; // Cardinal direction.
 
-	// Item number? Only ever set to NO_ITEM or 1. Probably anim object ID. Might not be needed since AnimObjectID is kept in item.Animation.
+	// Item number? Only ever set to NO_VALUE or 1. Probably anim object ID. Might not be needed since AnimObjectID is kept in item.Animation.
 	int ExtraAnim = 0;
 
 	signed char Location		= 0;

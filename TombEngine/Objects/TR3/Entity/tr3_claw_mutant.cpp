@@ -149,7 +149,7 @@ namespace TEN::Entities::Creatures::TR3
 		const auto& creature = *GetCreatureInfo(&item);
 
 		int plasmaBall = CreateNewEffect(item.RoomNumber);
-		if (plasmaBall == NO_ITEM)
+		if (plasmaBall == NO_VALUE)
 			return;
 
 		auto enemyPos = creature.Enemy->Pose.Position;
@@ -378,7 +378,7 @@ namespace TEN::Entities::Creatures::TR3
 					if (Random::TestProbability(CLAW_MUTANT_WALK_CHANCE))
 						item.Animation.TargetState = CLAW_MUTANT_STATE_WALK;
 				}
-				else if (item.Animation.RequiredState != NO_STATE)
+				else if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}

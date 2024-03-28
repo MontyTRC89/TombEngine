@@ -81,7 +81,7 @@ namespace TEN::Entities::Creatures::TR5
 		if (!(GetRandomControl() & 0x1F))
 		{
 			int fxNumber = CreateNewEffect(item->RoomNumber);
-			if (fxNumber != NO_ITEM)
+			if (fxNumber != NO_VALUE)
 			{
 				auto* fx = &EffectList[fxNumber];
 
@@ -205,7 +205,7 @@ namespace TEN::Entities::Creatures::TR5
 	static void RomanStatueAttack(Pose* pos, short roomNumber, short count)
 	{
 		int fxNumber = CreateNewEffect(roomNumber);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto* fx = &EffectList[fxNumber];

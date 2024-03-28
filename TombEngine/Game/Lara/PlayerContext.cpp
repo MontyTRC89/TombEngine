@@ -107,7 +107,7 @@ namespace TEN::Entities::Player
 		if (!(IsHeld(In::Flare) || IsHeld(In::Draw)) &&				   // Avoid unsightly concurrent actions.
 			(player.Control.Weapon.GunType != LaraWeaponType::Flare || // Not handling flare.
 				player.Flare.Life) &&								   // OR flare is still active.
-			player.Context.Vehicle == NO_ITEM)						   // Not in a vehicle.
+			player.Context.Vehicle == NO_VALUE)						   // Not in a vehicle.
 		{
 			return true;
 		}

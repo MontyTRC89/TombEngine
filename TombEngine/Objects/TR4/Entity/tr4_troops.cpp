@@ -145,7 +145,7 @@ namespace TEN::Entities::TR4
 
 				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber != NO_ITEM && currentCreature->ItemNumber != itemNumber)
+					if (currentCreature->ItemNumber != NO_VALUE && currentCreature->ItemNumber != itemNumber)
 					{
 						auto* currentItem = &g_Level.Items[currentCreature->ItemNumber];
 						if (currentItem->ObjectNumber != ID_LARA)
@@ -192,7 +192,7 @@ namespace TEN::Entities::TR4
 			CreatureMood(item, &AI, false);
 
 			// Vehicle handling
-			if (Lara.Context.Vehicle != NO_ITEM && AI.bite)
+			if (Lara.Context.Vehicle != NO_VALUE && AI.bite)
 				creature->Mood = MoodType::Escape;
 
 			angle = CreatureTurn(item, creature->MaxTurn);

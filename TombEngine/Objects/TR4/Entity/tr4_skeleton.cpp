@@ -142,7 +142,7 @@ namespace TEN::Entities::TR4
 	void TriggerRiseEffect(ItemInfo* item)
 	{
 		int fxNumber = CreateNewEffect(item->RoomNumber);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto* fx = &EffectList[fxNumber];
@@ -450,7 +450,7 @@ namespace TEN::Entities::TR4
 							item->AIBits & FOLLOW &&
 							(creature->ReachedGoal || laraAI.distance > SQUARE(BLOCK(2))))
 						{
-							if (item->Animation.RequiredState != NO_STATE)
+							if (item->Animation.RequiredState != NO_VALUE)
 								item->Animation.TargetState = item->Animation.RequiredState;
 							else if (Random::TestProbability(1 / 64.0f))
 								item->Animation.TargetState = 15;
@@ -475,7 +475,7 @@ namespace TEN::Entities::TR4
 							else
 								item->Animation.TargetState = SKELETON_STATE_ATTACK_3;
 						}
-						else if (item->HitStatus || item->Animation.RequiredState != NO_STATE)
+						else if (item->HitStatus || item->Animation.RequiredState != NO_VALUE)
 						{
 							if (Random::TestProbability(1 / 2.0f))
 							{

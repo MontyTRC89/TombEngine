@@ -29,14 +29,14 @@ GAME_OBJECT_ID		PlayerVehicleObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
 
 void BackupLara()
 {
-	if (LaraItem == nullptr || LaraItem->Index == NO_ITEM)
+	if (LaraItem == nullptr || LaraItem->Index == NO_VALUE)
 		return;
 
 	PlayerHitPoints = LaraItem->HitPoints;
 	memcpy(&PlayerBackup, &Lara, sizeof(LaraInfo));
 	memcpy(&PlayerAnim, &LaraItem->Animation, sizeof(EntityAnimationData));
 
-	if (Lara.Context.Vehicle != NO_ITEM)
+	if (Lara.Context.Vehicle != NO_VALUE)
 	{
 		PlayerVehicleObjectID = g_Level.Items[Lara.Context.Vehicle].ObjectNumber;
 	}
@@ -48,7 +48,7 @@ void BackupLara()
 
 void InitializeLara(bool restore)
 {
-	if (LaraItem == nullptr || LaraItem->Index == NO_ITEM)
+	if (LaraItem == nullptr || LaraItem->Index == NO_VALUE)
 		return;
 
 	ZeroMemory(&Lara, sizeof(LaraInfo));
@@ -65,11 +65,11 @@ void InitializeLara(bool restore)
 
 	Lara.Control.Look.Mode = LookMode::None;
 	Lara.HitDirection = -1;
-	Lara.Control.Weapon.WeaponItem = NO_ITEM;
+	Lara.Control.Weapon.WeaponItem = NO_VALUE;
 	Lara.Context.WaterSurfaceDist = 100;
 
-	Lara.ExtraAnim = NO_ITEM;
-	Lara.Context.Vehicle = NO_ITEM;
+	Lara.ExtraAnim = NO_VALUE;
+	Lara.Context.Vehicle = NO_VALUE;
 	Lara.Location = -1;
 	Lara.HighestLocation = -1;
 	Lara.Control.Rope.Ptr = -1;

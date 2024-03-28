@@ -82,7 +82,7 @@ namespace TEN::Entities::Generic
 			else
 			{
 				pushable.IsOnEdge = true;
-				if (!pushable.CanFall || pushable.Stack.ItemNumberAbove != NO_ITEM)
+				if (!pushable.CanFall || pushable.Stack.ItemNumberAbove != NO_VALUE)
 					return false;
 			}
 		}

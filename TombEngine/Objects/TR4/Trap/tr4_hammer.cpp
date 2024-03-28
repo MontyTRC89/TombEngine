@@ -100,10 +100,10 @@ namespace TEN::Entities::TR4
                 {
                     short targetItem = g_Level.Rooms[item->RoomNumber].itemNumber;
 
-                    if (targetItem != NO_ITEM)
+                    if (targetItem != NO_VALUE)
                     {
                         auto* target = &g_Level.Items[targetItem];
-                        for (; targetItem != NO_ITEM; targetItem = target->NextItem)
+                        for (; targetItem != NO_VALUE; targetItem = target->NextItem)
                         {
                             target = &g_Level.Items[targetItem];
 
@@ -126,10 +126,10 @@ namespace TEN::Entities::TR4
                 {
                     short targetItem = g_Level.Rooms[item->RoomNumber].itemNumber;
 
-                    if (targetItem != NO_ITEM)
+                    if (targetItem != NO_VALUE)
                     {
                         auto* target = &g_Level.Items[targetItem];
-                        for (; targetItem != NO_ITEM; targetItem = target->NextItem)
+                        for (; targetItem != NO_VALUE; targetItem = target->NextItem)
                         {
                             target = &g_Level.Items[targetItem];
 
@@ -151,10 +151,10 @@ namespace TEN::Entities::TR4
                     {
                         targetItem = g_Level.Rooms[item->RoomNumber].itemNumber;
 
-                        if (targetItem != NO_ITEM)
+                        if (targetItem != NO_VALUE)
                         {
                             auto* target = &g_Level.Items[targetItem];
-                            for (; targetItem != NO_ITEM; targetItem = target->NextItem)
+                            for (; targetItem != NO_VALUE; targetItem = target->NextItem)
                             {
                                 target = &g_Level.Items[targetItem];
 

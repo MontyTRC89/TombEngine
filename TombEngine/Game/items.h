@@ -12,7 +12,6 @@
 
 using namespace TEN::Utils;
 
-constexpr auto NO_ITEM		  = -1;
 constexpr auto NOT_TARGETABLE = -16384;
 
 constexpr auto NUM_ITEMS	 = 1024;
@@ -71,7 +70,7 @@ struct EntityAnimationData
 	int FrameNumber	  = 0; // g_Level.Frames index.
 	int ActiveState	  = 0;
 	int TargetState	  = 0;
-	int RequiredState = NO_STATE;
+	int RequiredState = NO_VALUE;
 
 	bool	IsAirborne = false;
 	Vector3 Velocity   = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward
