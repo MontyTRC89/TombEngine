@@ -44,6 +44,5 @@ namespace TEN::Collision
 							const Vector3i& extraPosOffset = Vector3i::Zero, const EulerAngles& extraOrientOffset = EulerAngles::Identity);
 	void SetPlayerAlignAnim(ItemInfo& playerItem, const ItemInfo& interactedItem);
 	
-	bool HandlePlayerInteraction(ItemInfo& playerItem, ItemInfo& interactedItem, const InteractionBasis& basis,
-								 const PlayerInteractRoutine& interactRoutine);
+	bool HandlePlayerInteraction(ItemInfo& playerItem, ItemInfo& interactedItem, const InteractionBasis& basis, const PlayerInteractRoutine& interactRoutine);
 }

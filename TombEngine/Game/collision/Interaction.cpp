@@ -233,8 +233,7 @@ namespace TEN::Collision
 	}
 
 	// TODO: Don't return bool.
-	bool HandlePlayerInteraction(ItemInfo& playerItem, ItemInfo& interactedItem, const InteractionBasis& basis,
-								 const PlayerInteractRoutine& interactRoutine)
+	bool HandlePlayerInteraction(ItemInfo& playerItem, ItemInfo& interactedItem, const InteractionBasis& basis, const PlayerInteractRoutine& interactRoutine)
 	{
 		auto& player = GetLaraInfo(playerItem);
 		
