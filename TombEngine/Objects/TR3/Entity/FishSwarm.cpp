@@ -15,6 +15,7 @@
 #include "Math/Math.h"
 #include "Objects/TR3/Object/Corpse.h"
 #include "Renderer/Renderer.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 
 using namespace TEN::Entities::TR3;
@@ -39,6 +40,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto FISH_CATCH_UP_FACTOR			 = 0.2f;
 	constexpr auto FISH_TARGET_DISTANCE_MAX		 = SQUARE(BLOCK(0.01f));
 	constexpr auto FISH_BASE_SEPARATION_DISTANCE = 210.0f;
+	constexpr auto FISH_UPDATE_INTERVAL_TIME	 = 0.2f;
 
 	std::vector<FishData> FishSwarm = {};
 
@@ -137,7 +139,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		// Check if corpse is near.
 		// TODO: In future also check for other enemies like sharks or crocodile.
-		if (!corpsePos.has_value() && (GlobalCounter & 0x97) == 0x97)
+		if (!corpsePos.has_value() && TestGlobalTimeInterval(FISH_UPDATE_INTERVAL_TIME))
 		{
 			float closestDist = INFINITY;
 			for (auto& targetItem : g_Level.Items)
