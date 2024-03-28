@@ -21,6 +21,6 @@ int	 Sync();
 bool TimeInit();
 bool TimeReset();
 
-GameTime GetGameTime(int frameCount);
+GameTime GetGameTime(int ticks);
 
-bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs);
+bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs = 0.0f);

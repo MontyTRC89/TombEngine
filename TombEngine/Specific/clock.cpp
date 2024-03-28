@@ -2,54 +2,54 @@
 #include "Specific/clock.h"
 
 // Globals
-LARGE_INTEGER PerformanceCount;
-double		  LdFreq;
-double		  LdSync;
+LARGE_INTEGER PerformanceCount = {};
+double		  LdFreq		   = 0.0;
+double		  LdSync		   = 0.0;
 
 int Sync()
 {
-	LARGE_INTEGER ct;
-	double dCounter;
+	auto ct = LARGE_INTEGER{};
 	QueryPerformanceCounter(&ct);
-	dCounter = (double)ct.LowPart + (double)ct.HighPart * (double)0xFFFFFFFF;
+
+	double dCounter = (double)ct.LowPart + (double)ct.HighPart * (double)0xffffffff;
 	dCounter /= LdFreq;
 
-	long nFrames = long(dCounter) - long(LdSync);
+	long ticks = (long)dCounter - (long)LdSync;
 	LdSync = dCounter;
-	return nFrames;
+	return ticks;
 }
 
 bool TimeReset()
 {
-	LARGE_INTEGER fq;
+	auto fq = LARGE_INTEGER{};
 	QueryPerformanceCounter(&fq);
 
-	LdSync = (double)fq.LowPart + (double)fq.HighPart * (double)0xffffffff;
+	LdSync = (double)fq.LowPart + ((double)fq.HighPart * (double)0xffffffff);
 	LdSync /= LdFreq;
 	return true;
 }
 
 bool TimeInit()
 {
-	LARGE_INTEGER fq;
+	auto fq = LARGE_INTEGER{};
 	if (!QueryPerformanceFrequency(&fq))
 		return false;
 
-	LdFreq = (double)fq.LowPart + (double)fq.HighPart * (double)0xFFFFFFFF;
+	LdFreq = (double)fq.LowPart + ((double)fq.HighPart * (double)0xffffffff);
 	LdFreq /= 60.0;
 	TimeReset();
 	return true;
 }
 
-GameTime GetGameTime(int frameCount)
+GameTime GetGameTime(int ticks)
 {
 	auto gameTime = GameTime{};
-	int seconds = GameTimer / FPS;
+	int seconds = ticks / FPS;
 
-	gameTime.Days    = (seconds / (DAY_UNIT * TIME_UNIT * TIME_UNIT));
-	gameTime.Hours   = (seconds % (DAY_UNIT * TIME_UNIT * TIME_UNIT)) / (TIME_UNIT * TIME_UNIT);
+	gameTime.Days    = (seconds / (DAY_UNIT * SQUARE(TIME_UNIT)));
+	gameTime.Hours   = (seconds % (DAY_UNIT * SQUARE(TIME_UNIT))) / SQUARE(TIME_UNIT);
 	gameTime.Minutes = (seconds / TIME_UNIT) % TIME_UNIT;
-	gameTime.Seconds = (seconds % TIME_UNIT);
+	gameTime.Seconds = seconds % TIME_UNIT;
 	return gameTime;
 }
 
