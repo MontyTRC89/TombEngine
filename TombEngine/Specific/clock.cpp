@@ -14,9 +14,9 @@ int Sync()
 	double dCounter = (double)ct.LowPart + (double)ct.HighPart * (double)0xffffffff;
 	dCounter /= LdFreq;
 
-	long ticks = (long)dCounter - (long)LdSync;
+	long gameFrames = (long)dCounter - (long)LdSync;
 	LdSync = dCounter;
-	return ticks;
+	return gameFrames;
 }
 
 bool TimeReset()
@@ -55,14 +55,14 @@ GameTime GetGameTime(int ticks)
 
 bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs)
 {
-	int intervalTicks = (int)round(intervalSecs * FPS);
-	int offsetTicks = (int)round(offsetSecs * FPS);
+	int intervalGameFrames = (int)round(intervalSecs * FPS);
+	int offsetGameFrames = (int)round(offsetSecs * FPS);
 
-	if (offsetTicks >= intervalTicks)
+	if (offsetGameFrames >= intervalGameFrames)
 	{
-		TENLog("TestGlobalTimeInterval(): intervalSecs must be greater than offsetSecs.", LogLevel::Warning);
+		TENLog("TestGlobalTimeInterval(): interval must be greater than offset.", LogLevel::Warning);
 		return false;
 	}
 
-	return ((GlobalCounter % intervalTicks) == offsetTicks);
+	return ((GlobalCounter % intervalGameFrames) == offsetGameFrames);
 }
