@@ -69,7 +69,7 @@ namespace TEN::Entities::Traps
 			item->Animation.FrameNumber < GetAnimData(item).frameBase + 60)
 		{
 			// Blades deal damage cumulatively.
-			auto spheres = GetSpheres(item, (int)SphereSpaceFlags::World);
+			auto spheres = GetSpheres(*item, (int)SphereSpaceFlags::World);
 			for (int i = 0; i < StargateHarmJoints.size(); i++)
 			{
 				if (item->TouchBits.Test(StargateHarmJoints[i]))

@@ -843,7 +843,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	auto target = origin + (directionNorm * weapon.TargetDist);
 	auto ray = Ray(origin, directionNorm);
 
-	auto spheres = GetSpheres(&targetEntity, (int)SphereSpaceFlags::World);
+	auto spheres = GetSpheres(targetEntity, (int)SphereSpaceFlags::World);
 	int closestJointIndex = NO_JOINT;
 	float closestDist = INFINITY;
 	for (int i = 0; i < spheres.size(); i++)

@@ -13,18 +13,15 @@ using namespace TEN::Renderer;
 
 namespace TEN::Collision::Sphere
 {
-	std::vector<BoundingSphere> GetSpheres(const ItemInfo* itemPtr, int spaceFlags)
+	std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, int spaceFlags)
 	{
-		if (itemPtr == nullptr)
-			return {};
-
-		return g_Renderer.GetSpheres(itemPtr->Index, spaceFlags, Matrix::Identity);
+		return g_Renderer.GetSpheres(item.Index, spaceFlags, Matrix::Identity);
 	}
 
 	int TestCollision(ItemInfo* creatureItemPtr, ItemInfo* playerItemPtr)
 	{
-		auto creatureSpheres = GetSpheres(creatureItemPtr, (int)SphereSpaceFlags::World);
-		auto playerSpheres = GetSpheres(playerItemPtr, (int)SphereSpaceFlags::World);
+		auto creatureSpheres = GetSpheres(*creatureItemPtr, (int)SphereSpaceFlags::World);
+		auto playerSpheres = GetSpheres(*playerItemPtr, (int)SphereSpaceFlags::World);
 
 		playerItemPtr->TouchBits.ClearAll();
 

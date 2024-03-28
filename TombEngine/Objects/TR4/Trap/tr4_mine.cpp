@@ -28,7 +28,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		auto spheres = GetSpheres(item, (int)SphereSpaceFlags::World);
+		auto spheres = GetSpheres(*item, (int)SphereSpaceFlags::World);
 		if (item->ItemFlags[0] >= 150)
 		{
 			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose);
