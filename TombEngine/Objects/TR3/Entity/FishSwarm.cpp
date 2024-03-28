@@ -345,8 +345,8 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				// If player is too close and fish are not lethal, steer away.
-				if ((distToPlayer < separationDist * 3) && fish.IsLethal == false && (LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD || 
-					GetLaraInfo(LaraItem)->Context.Vehicle != NO_ITEM ))
+				if ((distToPlayer < separationDist * 3) && fish.IsLethal == false &&
+					(LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD || GetLaraInfo(LaraItem)->Context.Vehicle != NO_ITEM))
 				{
 					auto separationDir = fish.Position - LaraItem->Pose.Position.ToVector3();
 					separationDir.Normalize();
