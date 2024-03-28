@@ -1,5 +1,8 @@
 #pragma once
+#include "Math/Math.h"
 #include "Specific/clock.h"
+
+using namespace TEN::Math;
 
 struct Vector3i;
 
