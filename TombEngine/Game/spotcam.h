@@ -4,7 +4,7 @@
 
 using namespace TEN::Math;
 
-struct Vector3i;
+class Vector3i;
 
 constexpr auto MAX_SPOTCAMS = 256;
 constexpr auto SPOTCAM_CINEMATIC_BARS_HEIGHT = 1.0f / 16;
