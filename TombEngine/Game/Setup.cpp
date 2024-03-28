@@ -81,6 +81,11 @@ void ObjectInfo::SetBoneRotationFlags(int boneID, int flags)
 	g_Level.Bones[boneIndex + (boneID * 4)] |= flags;
 }
 
+void ObjectInfo::SetHitEffect(HitEffect hitEffect)
+{
+	this->hitEffect = hitEffect;
+}
+
 // NOTE: Use if object is alive, but not intelligent, to set up blood effects.
 void ObjectInfo::SetHitEffect(bool isSolid, bool isAlive)
 {
@@ -168,8 +173,6 @@ void InitializeObjects()
 		obj->Initialize = nullptr;
 		obj->collision = nullptr;
 		obj->control = nullptr;
-		obj->floor = nullptr;
-		obj->ceiling = nullptr;
 		obj->drawRoutine = DrawAnimatingItem;
 		obj->HitRoutine = DefaultItemHit;
 		obj->pivotLength = 0;

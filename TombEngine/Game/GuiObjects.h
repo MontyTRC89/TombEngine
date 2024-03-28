@@ -313,7 +313,7 @@ namespace TEN::Gui
 	{
 		short		InventoryItem = 0;
 		short		Amount		  = 0;
-		EulerAngles Orientation	  = EulerAngles::Zero;
+		EulerAngles Orientation	  = EulerAngles::Identity;
 	};
 
 	struct AmmoData

@@ -8,8 +8,8 @@ class EulerAngles;
 	{
 	private:
 		// Members
-		Vector3 Axis  = Vector3::Backward;
-		short	Angle = 0;
+		Vector3 _axis  = Vector3::Backward;
+		short	_angle = 0;
 
 	public:
 		// Constants

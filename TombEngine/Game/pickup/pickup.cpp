@@ -682,10 +682,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 		if (laraItem->Animation.ActiveState == LS_CROUCH_IDLE)
 		{
-			if (item->ObjectNumber == ID_BURNING_TORCH_ITEM)
-				break;
-
-			if (!AlignPlayerToEntity(item, laraItem, PickUpPosition, EulerAngles::Zero, true))
+			if (!AlignPlayerToEntity(item, laraItem, PickUpPosition, EulerAngles::Identity, true))
 				break;
 
 			if (item->ObjectNumber == ID_FLARE_ITEM && item->Active)

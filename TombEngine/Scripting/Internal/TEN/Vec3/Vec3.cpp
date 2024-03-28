@@ -54,9 +54,9 @@ void Vec3::Register(sol::table& parent)
 
 /// Create a Vec3 object.
 // @function Vec3(x, y, z)
-// @float x X component.
-// @float y Y component.
-// @float z Z component.
+// @tparam float x X component.
+// @tparam float y Y component.
+// @tparam float z Z component.
 // @treturn Vec3 A new Vec3 object.
 Vec3::Vec3(float x, float y, float z)
 {
@@ -67,7 +67,7 @@ Vec3::Vec3(float x, float y, float z)
 
 /// Create a Vec3 object.
 // @function Vec3(value)
-// @float value X, Y, and Z component.
+// @tparam float value X, Y, and Z component.
 // @treturn Vec3 A new Vec3 object.
 Vec3::Vec3(float value)
 {

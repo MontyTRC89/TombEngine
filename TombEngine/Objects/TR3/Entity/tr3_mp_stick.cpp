@@ -75,7 +75,7 @@ namespace TEN::Entities::Creatures::TR3
 		short angle = 0;
 		short tilt = 0;
 		short head = 0;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 		{

@@ -15,8 +15,8 @@ namespace TEN::Hud
 
 	public:
 		// Constants
-		static constexpr auto COLOR_RED		= Vector4(1.0f, 0.2f, 0.2f, 0.9f);
-		static constexpr auto COLOR_GRAY	= Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+		static constexpr auto COLOR_RED		= Color(1.0f, 0.2f, 0.2f);
+		static constexpr auto COLOR_GRAY	= Color(0.7f, 0.7f, 0.7f, 0.7f);
 		static constexpr auto SEGMENT_COUNT = 4;
 
 		// Members
@@ -43,9 +43,6 @@ namespace TEN::Hud
 		void SetPrimary();
 		void SetPeripheral();
 		
-		// Inquirers
-		bool IsOffscreen() const;
-
 		// Utilities
 		void Update(const Vector3& targetPos, bool isActive, bool doPulse);
 		void Draw() const;

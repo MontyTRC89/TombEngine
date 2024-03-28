@@ -11,10 +11,12 @@
 #include "Game/Lara/lara_tests.h"
 #include "Game/items.h"
 #include "Game/Setup.h"
+#include "Objects/Generic/Object/BridgeObject.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
 constexpr auto HORIZONTAL_ALIGN_NORTHEAST = 155;
@@ -89,6 +91,8 @@ short FindBridge(int tiltGrade, short orient, Vector3i& pos, int* returnHeight, 
 		if (bridgeItem->ObjectNumber != bridgeSlot)
 			continue;
 
+		const auto& bridge = GetBridgeObject(*bridgeItem);
+
 		short orientDelta = (short)(bridgeItem->Pose.Orientation.y - orient);
 
 		bool orientCheck = false;
@@ -109,17 +113,20 @@ short FindBridge(int tiltGrade, short orient, Vector3i& pos, int* returnHeight, 
 		{
 			if (ceilingMinY || ceilingMaxY)
 			{
-				if (Objects[bridgeItem->ObjectNumber].ceiling == nullptr)
+				if (bridge.GetCeilingHeight == nullptr)
 					continue;
 
-				*returnHeight = Objects[bridgeItem->ObjectNumber].ceiling(i, pos.x, pos.y, pos.z).value_or(NO_HEIGHT);
+				const auto& item = g_Level.Items[i];
+				*returnHeight = bridge.GetCeilingHeight(item, pos).value_or(NO_HEIGHT);
 				
-				int ceilingDistance = *returnHeight - pos.y;
-				if (ceilingDistance >= ceilingMinY && ceilingDistance <= ceilingMaxY)
+				int ceilingDist = *returnHeight - pos.y;
+				if (ceilingDist >= ceilingMinY && ceilingDist <= ceilingMaxY)
 					return i;
 			}
 			else
+			{
 				return i;
+			}
 		}
 	}
 
@@ -344,7 +351,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Forward))
 	{
 		// Test for ledge over slope.
-		short tempRoom = probeUp.Block->GetRoomNumberAbove(up.x, up.z).value_or(NO_ROOM);
+		short tempRoom = probeUp.Block->GetNextRoomNumber(up.x, up.z, false).value_or(NO_ROOM);
 		if (tempRoom != NO_ROOM)
 		{
 			auto probeLedge = GetCollision(now.x, now.y - CLICK(3), now.z, tempRoom);

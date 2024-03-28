@@ -33,12 +33,10 @@ namespace TEN::Entities::Switches
 		GameBoundingBox(
 			-CLICK(1), CLICK(1),
 			0, 0,
-			BLOCK(0.5f), BLOCK(0.75f)
-		),
+			BLOCK(0.5f), BLOCK(0.75f)),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
-		)
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))
 	};
 
 	void RailSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -61,7 +59,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.ActiveState == SWITCH_ON)
 			{
-				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
+				switchItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
 				if (TestPlayerEntityInteract(switchItem, laraItem, RailSwitchBounds2))
 				{
@@ -79,7 +77,7 @@ namespace TEN::Entities::Switches
 					lara->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
+				switchItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
 
 				if (flag)
 				{

@@ -3,8 +3,9 @@
 
 void BackupLara();
 void InitializeLara(bool restore);
+void InitializeLaraLoad(short itemNumber);
 void InitializeLaraMeshes(ItemInfo* item);
 void InitializeLaraAnims(ItemInfo* item);
-void InitializeLaraLoad(short itemNumber);
-void InitializeLaraLevelJump(short itemNum, LaraInfo* lBackup);
-void InitializeLaraDefaultInventory();
+void InitializeLaraStartPosition(ItemInfo& playerItem);
+void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup);
+void InitializeLaraDefaultInventory(ItemInfo& item);

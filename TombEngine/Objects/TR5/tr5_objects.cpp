@@ -55,8 +55,10 @@
 #include "Objects/TR5/Object/tr5_twoblockplatform.h"
 
 // Traps
+#include "Objects/Effects/EmberEmitter.h"
 #include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/LaserBeam.h"
 #include "Objects/TR5/Trap/ZipLine.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
 #include "Objects/TR5/Trap/tr5_ventilator.h"
@@ -71,6 +73,7 @@
 // Shatters
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
 
+using namespace TEN::Effects::EmberEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Traps::TR5;
@@ -630,10 +633,10 @@ static void StartEntity(ObjectInfo *obj)
 	InitAnimating(obj, ID_LASERHEAD_BASE);
 	InitAnimating(obj, ID_LASERHEAD_TENTACLE);
 
-	obj = &Objects[ID_AUTOGUN];
+	obj = &Objects[ID_AUTO_GUN_VCI];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeAutoGuns;
+		obj->Initialize = InitializeAutoGun;
 		obj->control = ControlAutoGun;
 		obj->intelligent = true;
 		obj->damageType = DamageMode::None;
@@ -662,12 +665,8 @@ static void StartObject(ObjectInfo *obj)
 	obj = &Objects[ID_TWOBLOCK_PLATFORM];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeTwoBlocksPlatform;
-		obj->control = TwoBlocksPlatformControl;
-		obj->floor = TwoBlocksPlatformFloor;
-		obj->ceiling = TwoBlocksPlatformCeiling;
-		obj->floorBorder = TwoBlocksPlatformFloorBorder;
-		obj->ceilingBorder = TwoBlocksPlatformCeilingBorder;
+		obj->Initialize = InitializeTwoBlockPlatform;
+		obj->control = TwoBlockPlatformControl;
 		obj->SetHitEffect(true);
 	}
 
@@ -678,10 +677,6 @@ static void StartObject(ObjectInfo *obj)
 		{
 			obj->Initialize = InitializeRaisingBlock;
 			obj->control = ControlRaisingBlock;
-			obj->floor = RaisingBlockFloor;
-			obj->ceiling = RaisingBlockCeiling;
-			obj->floorBorder = RaisingBlockFloorBorder;
-			obj->ceilingBorder = RaisingBlockCeilingBorder;
 			obj->SetHitEffect(true);
 		}
 	}
@@ -691,10 +686,6 @@ static void StartObject(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeExpandingPlatform;
 		obj->control = ControlExpandingPlatform;
-		obj->floor = ExpandingPlatformFloor;
-		obj->ceiling = ExpandingPlatformCeiling;
-		obj->floorBorder = ExpandingPlatformFloorBorder;
-		obj->ceilingBorder = ExpandingPlatformCeilingBorder;
 		obj->SetHitEffect(true);
 	}
 
@@ -704,8 +695,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->control = ElectricalLightControl;
 		obj->Initialize = InitializeElectricalLight;
 		obj->meshSwapSlot = ID_ELECTRICAL_LIGHT;
-		//obj->drawRoutine = nullptr;
-		//obj->usingDrawAnimatingItem = false;
 	}
 
 	obj = &Objects[ID_PULSE_LIGHT];
@@ -787,11 +776,11 @@ static void StartObject(ObjectInfo *obj)
 		obj->collision = ObjectCollision;
 	}
 
-	obj = &Objects[ID_HIGH_OBJECT2];
+	obj = &Objects[ID_EMBER_EMITTER];
 	if (obj->loaded)
 	{
 		obj->drawRoutine = nullptr;
-		obj->control = HighObject2Control;
+		obj->control = ControlEmberEmitter;
 	}
 
 	obj = &Objects[ID_GEN_SLOT1];
@@ -956,6 +945,16 @@ static void StartTrap(ObjectInfo *obj)
 		obj->Initialize = InitializeLaserBarrier;
 		obj->control = ControlLaserBarrier;
 		obj->collision = CollideLaserBarrier;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_LASER_BEAM];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeLaserBeam;
+		obj->control = ControlLaserBeam;
+		obj->collision = CollideLaserBeam;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}

@@ -1,7 +1,7 @@
 #pragma once
 #include "framework.h"
 
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
@@ -37,6 +37,11 @@ void Room::Register(sol::table& parent)
 		// @function Room:GetActive
 		// @treturn bool true if the room is active
 		ScriptReserved_GetActive, &Room::GetActive,
+
+		/// Get the room's ambient light color.
+		// @function Room:GetColor
+		// @treturn Color ambient light color of the room
+		ScriptReserved_GetColor, & Room::GetColor,
 
 		/// Get the room's reverb type.
 		// @function Room:GetReverbType
@@ -80,6 +85,11 @@ void Room::Register(sol::table& parent)
 bool Room::GetActive() const
 {
 	return m_room.Active();
+}
+
+ScriptColor Room::GetColor() const
+{
+	return ScriptColor{ m_room.ambient };
 }
 
 ReverbType Room::GetReverbType() const

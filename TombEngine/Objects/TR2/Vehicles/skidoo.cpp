@@ -325,6 +325,7 @@ namespace TEN::Entities::Vehicles
 
 			default:
 				drive = SkidooUserControl(skidooItem, laraItem, height, &pitch);
+				HandleVehicleSpeedometer(skidooItem->Animation.Velocity.z, SKIDOO_FAST_VELOCITY_MAX);
 				break;
 			}
 		}
@@ -451,9 +452,9 @@ namespace TEN::Entities::Vehicles
 			}
 			else if (IsHeld(In::Accelerate))
 			{
-				if (IsHeld(In::Speed))
+				if (IsHeld(In::Faster))
 					maxVelocity = SKIDOO_FAST_VELOCITY_MAX;
-				else if (IsHeld(In::Slow))
+				else if (IsHeld(In::Slower))
 					maxVelocity = SKIDOO_SLOW_VELOCITY_MAX;
 				else
 					maxVelocity = SKIDOO_NORMAL_VELOCITY_MAX;
@@ -690,7 +691,8 @@ namespace TEN::Entities::Vehicles
 
 	void DoSnowEffect(ItemInfo* skidooItem)
 	{
-		auto material = GetCollision(skidooItem).BottomBlock->Material;
+		auto pointColl = GetCollision(skidooItem);
+		auto material = pointColl.BottomBlock->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
 		if (material != MaterialType::Ice && material != MaterialType::Snow)
 			return;
 

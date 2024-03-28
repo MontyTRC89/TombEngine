@@ -1,7 +1,7 @@
 -----
 --- Basic timer - after a specified number of seconds, the specified thing happens.
 --
--- Timers are updated automatically every frame before OnControlPhase.
+-- Timers are updated automatically every frame before OnLoop.
 --
 -- Example usage:
 --	local Timer = require("Engine.Timer")
@@ -34,7 +34,7 @@ local Timer
 
 local unpausedColor = TEN.Color(255, 255, 255)
 local pausedColor = TEN.Color(255, 255, 0)
-local str = TEN.Strings.DisplayString("TIMER", 0, 0, unpausedColor, false, {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW} )
+local str = TEN.Strings.DisplayString("TIMER", Vec2 (0, 0), 1, unpausedColor, false, {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW} )
 
 
 Timer = {
@@ -307,7 +307,7 @@ LevelFuncs.Engine.Timer.UpdateAll = function(dt)
 	end
 end
 
-TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.Engine.Timer.UpdateAll)
+TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.Engine.Timer.UpdateAll)
 
 return Timer
 

@@ -9,7 +9,7 @@
 	public:
 		// Members
 		Vector3i	Position	= Vector3i::Zero;
-		EulerAngles Orientation = EulerAngles::Zero;
+		EulerAngles Orientation = EulerAngles::Identity;
 
 		// Constants
 		static const Pose Zero;

@@ -12,7 +12,7 @@
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_tests.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"

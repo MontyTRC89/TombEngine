@@ -57,17 +57,7 @@ namespace TEN::Entities::Switches
 		)
 	};
 
-	void UnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* switchItem = &g_Level.Items[itemNumber];
-
-		if (switchItem->TriggerFlags == 0)
-			WallUnderwaterSwitchCollision(itemNumber, laraItem, coll);
-		else
-			CeilingUnderwaterSwitchCollision(itemNumber, laraItem, coll);
-	}
-
-	void WallUnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void CollideUnderwaterWallSwitch(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
@@ -106,7 +96,7 @@ namespace TEN::Entities::Switches
 		}
 	}
 
-	void CeilingUnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void CollideUnderwaterCeilingSwitch(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];

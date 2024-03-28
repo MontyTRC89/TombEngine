@@ -5,11 +5,13 @@
 #include "Game/control/los.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/Static/StaticObject.h"
 #include "Scripting/Internal/TEN/Util/LevelLog.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
@@ -19,10 +21,10 @@
 using TEN::Renderer::g_Renderer;
 
 /// Utility functions for various calculations.
-// @tentable Utils 
+// @tentable Util
 // @pragma nostrip
 
-namespace Util
+namespace TEN::Scripting::Util
 {
 	/// Determine if there is a clear line of sight between two positions.
 	// NOTE: Limited to room geometry. Objects are ignored.
@@ -39,10 +41,9 @@ namespace Util
 		auto vector0 = posA.ToGameVector();
 		auto vector1 = posB.ToGameVector();
 
-		MESH_INFO* meshPtr = nullptr;
 		auto vector = Vector3i::Zero;
 		return (LOS(&vector0, &vector1) &&
-			ObjectOnLOS2(&vector0, &vector1, &vector, &meshPtr) == NO_LOS_ITEM);
+			ObjectOnLOS2(&vector0, &vector1, &vector, nullptr) == NO_LOS_ITEM);
 	}
 
 	///Calculate the distance between two positions.
@@ -63,13 +64,14 @@ namespace Util
 	static float CalculateHorizontalDistance(const Vec3& posA, const Vec3& posB)
 	{
 		auto pos0 = Vector2(posA.x, posA.z);
-		auto pos1 = Vector2(posA.x, posB.z);
+		auto pos1 = Vector2(posB.x, posB.z);
 		return round(Vector2::Distance(pos0, pos1));
 	}
 
 	/// Get the projected display space position of a 3D world position. Returns nil if the world position is behind the camera view.
+	// @function GetDisplayPosition
 	// @tparam Vec3 worldPos 3D world position.
-	// @return Vec2 Projected display space position in percent.
+	// @treturn Vec2 Projected display space position in percent.
 	// @usage 
 	// Example: Display a string at the player's position.
 	// local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
@@ -82,12 +84,12 @@ namespace Util
 			return sol::nullopt;
 
 		return Vec2(
-			(displayPos->x / SCREEN_SPACE_RES.x) * 100,
-			(displayPos->y / SCREEN_SPACE_RES.y) * 100);
+			(displayPos->x / DISPLAY_SPACE_RES.x) * 100,
+			(displayPos->y / DISPLAY_SPACE_RES.y) * 100);
 	}
 
 	/// Translate a pair display position coordinates to pixel coordinates.
-	//To be used with @{ Strings.DisplayString:SetPosition } and @{ Strings.DisplayString }.
+	//To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString}.
 	//@function PercentToScreen
 	//@tparam float x X component of the display position.
 	//@tparam float y Y component of the display position.
@@ -113,7 +115,7 @@ namespace Util
 	}
 
 	/// Translate a pair of pixel coordinates to display position coordinates.
-	//To be used with @{ Strings.DisplayString:GetPosition }.
+	//To be used with @{Strings.DisplayString:GetPosition}.
 	//@function ScreenToPercent
 	//@tparam int x X pixel coordinate to translate to display position.
 	//@tparam int y Y pixel coordinate to translate to display position.
@@ -126,6 +128,43 @@ namespace Util
 		float resX = x / fWidth * 100.0f;
 		float resY = y / fHeight * 100.0f;
 		return std::make_tuple(resX, resY);
+	}
+
+	/// Pick a moveable by the given display position.
+	// @function PickMoveableByDisplayPosition
+	// @tparam Vec2 Display space position in percent.
+	// @treturn Objects.Moveable Picked moveable (nil if no moveable was found under the cursor).
+	static sol::optional <std::unique_ptr<Moveable>> PickMoveable(const Vec2& screenPos)
+	{
+		auto realScreenPos = PercentToScreen(screenPos.x, screenPos.y);
+		auto ray = GetRayFrom2DPosition(Vector2(int(std::get<0>(realScreenPos)), int(std::get<1>(realScreenPos))));
+
+		auto vector = Vector3i::Zero;
+		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, nullptr, GAME_OBJECT_ID::ID_LARA);
+
+		if (itemNumber == NO_LOS_ITEM || itemNumber < 0)
+			return sol::nullopt;
+
+		return std::make_unique<Moveable>(itemNumber);
+	}
+
+	/// Pick a static mesh by the given display position.
+	// @function PickStaticByDisplayPosition
+	// @tparam Vec2 Display space position in percent.
+	// @treturn Objects.Static Picked static mesh (nil if no static mesh was found under the cursor).
+	static sol::optional <std::unique_ptr<Static>> PickStatic(const Vec2& screenPos)
+	{
+		auto realScreenPos = PercentToScreen(screenPos.x, screenPos.y);
+		auto ray = GetRayFrom2DPosition(Vector2((int)std::get<0>(realScreenPos), (int)std::get<1>(realScreenPos)));
+
+		MESH_INFO* mesh = nullptr;
+		auto vector = Vector3i::Zero;
+		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, &mesh, GAME_OBJECT_ID::ID_LARA);
+
+		if (itemNumber == NO_LOS_ITEM || itemNumber >= 0)
+			return sol::nullopt;
+
+		return std::make_unique<Static>(*mesh);
 	}
 
 	/// Write messages within the Log file
@@ -161,6 +200,8 @@ namespace Util
 		tableUtil.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
 		tableUtil.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
 		tableUtil.set_function(ScriptReserved_GetDisplayPosition, &GetDisplayPosition);
+		tableUtil.set_function(ScriptReserved_PickMoveable, &PickMoveable);
+		tableUtil.set_function(ScriptReserved_PickStatic, &PickStatic);
 		tableUtil.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
 		tableUtil.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 		tableUtil.set_function(ScriptReserved_PrintLog, &PrintLog);

@@ -35,7 +35,7 @@ bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius);
-bool ItemPushItem(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll, bool enableSpasm, char bigPush);
+bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool enableSpasm, char bigPushFlags);
 bool ItemPushItem(ItemInfo* item, ItemInfo* item2);
 bool ItemPushStatic(ItemInfo* laraItem, const MESH_INFO& mesh, CollisionInfo* coll);
 void ItemPushBridge(ItemInfo& item, CollisionInfo& coll);

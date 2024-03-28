@@ -90,7 +90,15 @@ namespace TEN::Entities::Creatures::TR1
 		auto& item = g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-		item.Animation.FrameNumber = WOLF_SLEEP_FRAME;
+
+		if (item.TriggerFlags == 1)
+		{
+			item.Animation.FrameNumber = WOLF_SLEEP_FRAME;
+		}
+		else
+		{
+			SetAnimation(item, WOLF_ANIM_WALK_FORWARD);
+		}
 	}
 
 	void WolfControl(short itemNumber)
@@ -104,7 +112,7 @@ namespace TEN::Entities::Creatures::TR1
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
 
 		if (item.HitPoints <= 0)
 		{

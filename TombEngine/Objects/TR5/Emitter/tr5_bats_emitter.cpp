@@ -216,6 +216,10 @@ void UpdateBats()
 			TriggerBlood(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z, 2 * GetRandomControl(), 2);
 			DoDamage(LaraItem, 2);
 		}
+
+		Matrix translation = Matrix::CreateTranslation(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z);
+		Matrix rotation = bat->Pose.Orientation.ToRotationMatrix();
+		bat->Transform = rotation * translation;
 	}
 
 	if (minIndex != -1)

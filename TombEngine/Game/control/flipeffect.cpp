@@ -340,6 +340,7 @@ void Turn270(ItemInfo* item)
 void FinishLevel(ItemInfo* item)
 {
 	NextLevel = CurrentLevel + 1;
+	RequiredStartPos = TriggerTimer;
 }
 
 void VoidEffect(ItemInfo* item)

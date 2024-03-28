@@ -7,6 +7,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/gui.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
@@ -14,6 +15,8 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
+
+using namespace TEN::Gui;
 
 HSAMPLE BASS_SamplePointer[SOUND_MAX_SAMPLES];
 HSTREAM BASS_3D_Mixdown;
@@ -34,6 +37,7 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[(int)ReverbType::Count] =    // Reverb 
   {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
 };
 
+const  std::string TRACKS_EXTENSIONS[] = {".wav", ".mp3", ".ogg"};
 const  std::string TRACKS_PATH = "Audio/";
 static std::string FullAudioDirectory;
 
@@ -337,6 +341,12 @@ void ResumeAllSounds(SoundPauseMode mode)
 	if (mode == SoundPauseMode::Global)
 		BASS_Start();
 
+	if (g_Gui.GetInventoryMode() == InventoryMode::Pause || 
+		g_Gui.GetInventoryMode() == InventoryMode::Statistics)
+	{
+		return;
+	}
+
 	for (const auto& slot : SoundtrackSlot)
 	{
 		if ((slot.Channel != NULL) && (BASS_ChannelIsActive(slot.Channel) == BASS_ACTIVE_PAUSED))
@@ -496,19 +506,21 @@ void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD positio
 		break;
 	}
 
-	auto fullTrackName = FullAudioDirectory + track + ".ogg";
+	auto fullTrackName = std::filesystem::path(FullAudioDirectory + track);
+	if (!fullTrackName.has_extension() || !std::filesystem::is_regular_file(fullTrackName))
+	{
+		for (auto& extension : TRACKS_EXTENSIONS)
+		{
+			fullTrackName.replace_extension(extension);
+			if (std::filesystem::is_regular_file(fullTrackName))
+				break;
+		}
+	}
+
 	if (!std::filesystem::is_regular_file(fullTrackName))
 	{
-		fullTrackName = FullAudioDirectory + track + ".mp3";
-		if (!std::filesystem::is_regular_file(fullTrackName))
-		{
-			fullTrackName = FullAudioDirectory + track + ".wav";
-			if (!std::filesystem::is_regular_file(fullTrackName))
-			{
-				TENLog("No soundtrack files with name '" + track + "' were found", LogLevel::Warning);
-				return;
-			}
-		}
+		TENLog("No soundtrack files with name '" + fullTrackName.stem().string() + "' were found", LogLevel::Warning);
+		return;
 	}
 
 	if (channelActive)
@@ -516,7 +528,7 @@ void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD positio
 
 	auto stream = BASS_StreamCreateFile(false, fullTrackName.c_str(), 0, 0, flags);
 
-	if (Sound_CheckBASSError("Opening soundtrack '%s'", false, fullTrackName.c_str()))
+	if (Sound_CheckBASSError("Opening soundtrack '%s'", false, fullTrackName.filename().string().c_str()))
 		return;
 
 	float masterVolume = (float)GlobalMusicVolume / 100.0f;
@@ -556,7 +568,7 @@ void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD positio
 	if (position && (BASS_ChannelGetLength(stream, BASS_POS_BYTE) > position))
 		BASS_ChannelSetPosition(stream, position, BASS_POS_BYTE);
 
-	if (Sound_CheckBASSError("Playing soundtrack '%s'", true, fullTrackName.c_str()))
+	if (Sound_CheckBASSError("Playing soundtrack '%s'", true, fullTrackName.filename().string().c_str()))
 		return;
 
 	SoundtrackSlot[(int)mode].Channel = stream;
@@ -631,11 +643,11 @@ void StopSoundTracks(bool excludeAmbience)
 {
 	for (int i = 0; i < (int)SoundTrackType::Count; i++)
 	{
-		auto mode = (SoundTrackType)i;
-		if (excludeAmbience && mode == SoundTrackType::BGM)
+		auto type = (SoundTrackType)i;
+		if (excludeAmbience && type == SoundTrackType::BGM)
 			continue;
 
-		StopSoundTrack((SoundTrackType)i, SOUND_XFADETIME_ONESHOT);
+		StopSoundTrack(type, SOUND_XFADETIME_ONESHOT);
 	}
 }
 

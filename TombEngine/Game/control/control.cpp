@@ -49,6 +49,7 @@
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/LaserBeam.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -78,6 +79,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Control::Volumes;
 using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -148,30 +150,29 @@ GameStatus ControlPhase(int numFrames)
 	bool isFirstTime = true;
 	static int framesCount = 0;
 
-	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
+	for (framesCount += numFrames; framesCount > 0; framesCount -= LOOP_FRAME_COUNT)
 	{
-		// Controls are polled before OnControlPhase, so input data could be
+		// Controls are polled before OnLoop, so input data could be
 		// overwritten by script API methods.
 		HandleControls(isTitle);
 
-		// This might not be the exact amount of time that has passed, but giving it a
-		// value of 1/30 keeps it in lock-step with the rest of the game logic,
-		// which assumes 30 iterations per second.
-		g_GameScript->OnControlPhase(DELTA_TIME);
+		// Pre-loop script and event handling.
+		g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
+		HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
 
 		// Control lock is processed after handling scripts, because builder may want to
 		// process input externally, while still locking Lara from input.
-		if (!isTitle && Lara.Control.Locked)
+		if (!isTitle && Lara.Control.IsLocked)
 			ClearAllActions();
 
 		// Handle inventory / pause / load / save screens.
 		auto result = HandleMenuCalls(isTitle);
-		if (result != GameStatus::None)
+		if (result != GameStatus::Normal)
 			return result;
 
 		// Handle global input events.
 		result = HandleGlobalInputEvents(isTitle);
-		if (result != GameStatus::None)
+		if (result != GameStatus::Normal)
 			return result;
 
 		// Queued input actions are read again and cleared after UI 
@@ -245,6 +246,9 @@ GameStatus ControlPhase(int numFrames)
 		PlaySoundSources();
 		DoFlipEffect(FlipEffect, LaraItem);
 
+		// Post-loop script and event handling.
+		g_GameScript->OnLoop(DELTA_TIME, true);
+
 		// Clear savegame loaded flag.
 		JustLoaded = false;
 
@@ -266,7 +270,7 @@ GameStatus ControlPhase(int numFrames)
 	auto time2 = std::chrono::high_resolution_clock::now();
 	ControlPhaseTime = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 
-	return GameStatus::None;
+	return GameStatus::Normal;
 }
 
 unsigned CALLBACK GameMain(void *)
@@ -296,22 +300,23 @@ unsigned CALLBACK GameMain(void *)
 GameStatus DoLevel(int levelIndex, bool loadGame)
 {
 	bool isTitle = !levelIndex;
+	auto loadType = loadGame ? LevelLoadType::Load : (SaveGame::IsOnHub(levelIndex) ? LevelLoadType::Hub : LevelLoadType::New);
 
 	TENLog(isTitle ? "DoTitle" : "DoLevel", LogLevel::Info);
 
-	// Load the level. Fall back to title if unsuccessful.
+	// Load level. Fall back to title if unsuccessful.
 	if (!LoadLevelFile(levelIndex))
 		return isTitle ? GameStatus::ExitGame : GameStatus::ExitToTitle;
 
 	// Initialize items, effects, lots, and cameras.
 	HairEffect.Initialize();
-	InitializeFXArray(true);
+	InitializeFXArray();
 	InitializeCamera();
 	InitializeSpotCamSequences(isTitle);
 	InitializeItemBoxData();
 
 	// Initialize scripting.
-	InitializeScripting(levelIndex, loadGame);
+	InitializeScripting(levelIndex, loadType);
 	InitializeNodeScripts();
 
 	// Initialize menu and inventory state.
@@ -402,7 +407,7 @@ void CleanUp()
 	Wibble = 0;
 
 	// Needs to be cleared, otherwise controls will lock if user exits to title while playing flyby with locked controls.
-	Lara.Control.Locked = false;
+	Lara.Control.IsLocked = false;
 
 	// Resets lightning and wind parameters to avoid holding over previous weather to new level.
 	Weather.Clear();
@@ -426,6 +431,7 @@ void CleanUp()
 	ClearDrips();
 	ClearRipples();
 	ClearLaserBarrierEffects();
+	ClearLaserBeamEffects();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();
@@ -441,17 +447,20 @@ void CleanUp()
 
 	// Clear all remaining renderer data.
 	g_Renderer.ClearScene();
+	g_Renderer.SetPostProcessMode(PostProcessMode::None);
+	g_Renderer.SetPostProcessStrength(1.0f);
+	g_Renderer.SetPostProcessTint(Vector3::One);
 
 	// Reset Itemcamera
 	ClearObjCamera();
 }
 
-void InitializeScripting(int levelIndex, bool loadGame)
+void InitializeScripting(int levelIndex, LevelLoadType type)
 {
 	TENLog("Loading level script...", LogLevel::Info);
 
 	g_GameStringsHandler->ClearDisplayStrings();
-	g_GameScript->ResetScripts(!levelIndex || loadGame);
+	g_GameScript->ResetScripts(!levelIndex || type != LevelLoadType::New);
 
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
@@ -460,23 +469,26 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	{
 		g_GameScript->ExecuteScriptFile(g_GameFlow->GetGameDir() + level->ScriptFileName);
 		g_GameScript->InitCallbacks();
-		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+		g_GameStringsHandler->SetCallbackDrawString([](const std::string& key, D3DCOLOR color, const Vec2& pos, float scale, int flags)
 		{
 			g_Renderer.AddString(
-				float(x) / float(g_Configuration.ScreenWidth) * SCREEN_SPACE_RES.x,
-				float(y) / float(g_Configuration.ScreenHeight) * SCREEN_SPACE_RES.y,
-				key.c_str(), col, flags);
+				key,
+				Vector2(((float)pos.x / (float)g_Configuration.ScreenWidth * DISPLAY_SPACE_RES.x),
+				((float)pos.y / (float)g_Configuration.ScreenHeight * DISPLAY_SPACE_RES.y)),
+				Color(color), scale, flags);
 		});
 	}
 
 	// Play default background music.
-	if (!loadGame)
+	if (type != LevelLoadType::Load)
 		PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
 	g_GameScript->OnEnd(reason);
+	HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
+
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
@@ -486,8 +498,6 @@ void DeInitializeScripting(int levelIndex, GameStatus reason)
 
 void InitializeOrLoadGame(bool loadGame)
 {
-	RequiredStartPos = false;
-
 	g_Gui.SetInventoryItemChosen(NO_ITEM);
 	g_Gui.SetEnterInventory(NO_ITEM);
 
@@ -508,41 +518,46 @@ void InitializeOrLoadGame(bool loadGame)
 
 		g_GameFlow->SelectedSaveGame = 0;
 		g_GameScript->OnLoad();
+		HandleAllGlobalEvents(EventType::Load, (Activator)LaraItem->Index);
 	}
 	else
 	{
 		// If not loading a savegame, clear all info.
-		Statistics.Level = {};
+		SaveGame::Statistics.Level = {};
 
 		if (InitializeGame)
 		{
 			// Clear all game info as well.
-			Statistics.Game = {};
+			SaveGame::Statistics.Game = {};
 			GameTimer = 0;
 			InitializeGame = false;
 
+			SaveGame::ResetHub();
 			TENLog("Starting new game.", LogLevel::Info);
 		}
 		else
 		{
+			SaveGame::LoadHub(CurrentLevel);
 			TENLog("Starting new level.", LogLevel::Info);
 		}
 
 		g_GameScript->OnStart();
+		HandleAllGlobalEvents(EventType::Start, (Activator)LaraItem->Index);
 	}
 }
 
 GameStatus DoGameLoop(int levelIndex)
 {
+	int numFrames = LOOP_FRAME_COUNT;
+	auto& status = g_GameFlow->LastGameStatus;
+
 	// Before entering actual game loop, ControlPhase must be
 	// called once to sort out various runtime shenanigangs (e.g. hair).
-
-	int numFrames = 2;
-	auto result = ControlPhase(numFrames);
+	status = ControlPhase(numFrames);
 
 	while (DoTheGame)
 	{
-		result = ControlPhase(numFrames);
+		status = ControlPhase(numFrames);
 
 		if (!levelIndex)
 		{
@@ -554,15 +569,15 @@ GameStatus DoGameLoop(int levelIndex)
 			{
 			case InventoryResult::NewGame:
 			case InventoryResult::NewGameSelectedLevel:
-				result = GameStatus::NewGame;
+				status = GameStatus::NewGame;
 				break;
 
 			case InventoryResult::LoadGame:
-				result = GameStatus::LoadGame;
+				status = GameStatus::LoadGame;
 				break;
 
 			case InventoryResult::ExitGame:
-				result = GameStatus::ExitGame;
+				status = GameStatus::ExitGame;
 				break;
 			}
 
@@ -571,10 +586,10 @@ GameStatus DoGameLoop(int levelIndex)
 		}
 		else
 		{
-			if (result == GameStatus::ExitToTitle ||
-				result == GameStatus::LaraDead ||
-				result == GameStatus::LoadGame ||
-				result == GameStatus::LevelComplete)
+			if (status == GameStatus::ExitToTitle ||
+				status == GameStatus::LaraDead ||
+				status == GameStatus::LoadGame ||
+				status == GameStatus::LevelComplete)
 			{
 				break;
 			}
@@ -584,12 +599,13 @@ GameStatus DoGameLoop(int levelIndex)
 		Sound_UpdateScene();
 	}
 
-	EndGameLoop(levelIndex, result);
-	return result;
+	EndGameLoop(levelIndex, status);
+	return status;
 }
 
 void EndGameLoop(int levelIndex, GameStatus reason)
 {
+	SaveGame::SaveHub(levelIndex);
 	DeInitializeScripting(levelIndex, reason);
 
 	StopAllSounds();
@@ -613,7 +629,7 @@ void HandleControls(bool isTitle)
 
 GameStatus HandleMenuCalls(bool isTitle)
 {
-	auto result = GameStatus::None;
+	auto result = GameStatus::Normal;
 
 	if (isTitle || ScreenFading)
 		return result;
@@ -623,17 +639,15 @@ GameStatus HandleMenuCalls(bool isTitle)
 		g_Gui.GetInventoryMode() != InventoryMode::Save &&
 		g_GameFlow->IsLoadSaveEnabled())
 	{
-		SaveGame::LoadSavegameInfos();
+		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
-
-		if (g_Gui.CallInventory(LaraItem, false))
-			result = GameStatus::SaveGame;
+		g_Gui.CallInventory(LaraItem, false);
 	}
 	else if (IsClicked(In::Load) &&
 		g_Gui.GetInventoryMode() != InventoryMode::Load &&
 		g_GameFlow->IsLoadSaveEnabled())
 	{
-		SaveGame::LoadSavegameInfos();
+		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))
@@ -652,7 +666,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 			result = GameStatus::LoadGame;
 	}
 
-	if (result != GameStatus::None)
+	if (result != GameStatus::Normal)
 	{
 		StopAllSounds();
 		StopRumble();
@@ -667,7 +681,7 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 	constexpr auto DEATH_INPUT_TIMEOUT	  = 10 * FPS;
 
 	if (isTitle)
-		return GameStatus::None;
+		return GameStatus::Normal;
 
 	// Check if player dead.
 	if (Lara.Control.Count.Death > DEATH_NO_INPUT_TIMEOUT ||
@@ -689,5 +703,5 @@ GameStatus HandleGlobalInputEvents(bool isTitle)
 		return GameStatus::LoadGame;
 	}
 
-	return GameStatus::None;
+	return GameStatus::Normal;
 }

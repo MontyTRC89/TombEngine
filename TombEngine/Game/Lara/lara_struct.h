@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/Lara/PlayerContext.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 
@@ -7,7 +8,8 @@ using namespace TEN::Math;
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
-namespace TEN::Renderer { struct RendererMesh; };
+
+using namespace TEN::Entities::Player;
 
 // Inventory object constants
 constexpr int NUM_PUZZLES		  = ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1;
@@ -147,7 +149,7 @@ enum LaraState
 	LS_ROPE_UNKNOWN = 115,
 	LS_CORRECT_POSITION = 116,
 	LS_DOUBLEDOOR_PUSH = 117,
-	LS_DOZY = 118,
+	LS_FLY_CHEAT = 118,
 
 	// TR5
 	LS_TIGHTROPE_IDLE = 119,
@@ -234,6 +236,12 @@ enum LaraState
 	LS_REMOVE_PUZZLE = 189,
 	LS_PUSHABLE_EDGE_SLIP = 190,
 	LS_SPRINT_SLIDE = 191,
+	LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND = 192,
+	LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND = 193,
+	LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND = 194,
+	LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH = 195,
+	LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH = 196,
+	LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH = 197,
 
 	NUM_LARA_STATES
 };
@@ -701,11 +709,10 @@ enum LaraAnim
 	LA_PICKUP_SARCOPHAGUS = 439,							// Pickup from sarcophagus
 	LA_DRAG_BODY = 440,										// Drag dead body
 	LA_BINOCULARS_IDLE = 441,								// Stand, looking through binoculars
-	LA_BIG_SCORPION_DEATH = 442,							// Big scorpion death
+	LA_UNUSED_442 = 442,									// Formelly, LA_BIG_SCORPION_DEATH, but that animation is now in LARA EXTRA ANIMS so this slot is unused.
 	LA_ELEVATOR_RECOVER = 443,								// Recover from elevator crash
-																// TODO: 443 is also taken by SETH_DEATH, currently absent from default WAD.
 	LA_MECHANICAL_BEETLE_USE = 444,							// Wind mechanical beetle, place on floor
-	LA_DOZY = 445,											// DOZY fly cheat
+	LA_FLY_CHEAT = 445,										// Fly cheat
 
 	// TR5
 	LA_TIGHTROPE_WALK = 446,								// Tightrope walk (looped)
@@ -874,6 +881,7 @@ enum LaraAnim
 	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):
 	// 280,
 	// 368, 370,
+	// 442
 };
 
 enum LaraExtraAnim
@@ -892,7 +900,9 @@ enum LaraExtraAnim
 	LEA_STRIKE_GONG = 11,
 	LEA_WILLARD_DEATH = 12,
 	LEA_TRAIN_DEATH_END = 13,
-	LEA_SETH_DEATH = 14
+	LEA_SETH_DEATH = 14,
+	LEA_YETI_DEATH = 15,
+	LEA_BIG_SCORPION_DEATH = 16
 };
 #pragma endregion
 
@@ -1167,7 +1177,7 @@ struct ArmInfo
 	int FrameNumber = 0;
 	int FrameBase	= 0;
 
-	EulerAngles Orientation = EulerAngles::Zero;
+	EulerAngles Orientation = EulerAngles::Identity;
 	bool		Locked		= false;
 
 	int GunFlash = 0;
@@ -1210,41 +1220,6 @@ struct DiaryInfo
 	unsigned int CurrentPage			= 0;
 };
 
-struct LaraInventoryData
-{
-	bool IsBusy	 = false;
-	bool OldBusy = false;
-
-	DiaryInfo Diary = {};
-
-	byte BeetleLife;
-	int BeetleComponents; // BeetleComponentFlags enum
-	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
-	byte BigWaterskin;	  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6 (has skin + 5 liters = 6)
-
-	// TODO: Rename prefixes back to "Num".
-	int TotalSmallMedipacks;
-	int TotalLargeMedipacks;
-	int TotalFlares;
-	unsigned int TotalSecrets;
-
-	bool HasBinoculars = false;
-	bool HasCrowbar	   = false;
-	bool HasTorch	   = false;
-	bool HasLasersight = false;
-	bool HasSilencer   = false; // TODO: Unused.
-
-	// TODO: Convert to bools.
-	int Puzzles[NUM_PUZZLES]			= {};
-	int Keys[NUM_KEYS]					= {};
-	int Pickups[NUM_PICKUPS]			= {};
-	int Examines[NUM_EXAMINES]			= {};
-	int PuzzlesCombo[NUM_PUZZLES * 2]	= {};
-	int KeysCombo[NUM_KEYS * 2]			= {};
-	int PickupsCombo[NUM_PICKUPS * 2]	= {};
-	int ExaminesCombo[NUM_EXAMINES * 2] = {};
-};
-
 struct LaraCountData
 {
 	unsigned int Pose			= 0;
@@ -1256,32 +1231,12 @@ struct LaraCountData
 struct LookControlData
 {
 	LookMode	Mode		= LookMode::None;
-	EulerAngles Orientation = EulerAngles::Zero;
-	EulerAngles	TurnRate	= EulerAngles::Zero;
+	EulerAngles Orientation = EulerAngles::Identity;
+	EulerAngles	TurnRate	= EulerAngles::Identity;
 
 	short OpticRange		= 0;
 	bool  IsUsingBinoculars = false;
 	bool  IsUsingLasersight = false;
-};
-
-struct WeaponControlData
-{
-	LaraWeaponType GunType		  = LaraWeaponType::None;
-	LaraWeaponType RequestGunType = LaraWeaponType::None;
-	LaraWeaponType LastGunType	  = LaraWeaponType::None;
-	HolsterInfo	   HolsterInfo	  = {};
-	
-	short WeaponItem = -1;
-	bool  HasFired	 = false;
-	bool  Fired		 = false;
-
-	bool UziLeft  = false;
-	bool UziRight = false;
-
-	// TODO: Interval and Timer count frame time for now, but should count delta time in the future. -- Sezz 2022.11.14
-	unsigned int NumShotsFired = 0;
-	float		 Interval	   = 0.0f;
-	float		 Timer		   = 0.0f;
 };
 
 struct RopeControlData
@@ -1308,15 +1263,6 @@ struct RopeControlData
 	int Count = 0;
 };
 
-// TODO: Give tightrope a property for difficulty?
-struct TightropeControlData
-{
-	short		 TightropeItem	 = 0;
-	bool		 CanDismount	 = false;
-	float		 Balance		 = 0.0f;
-	unsigned int TimeOnTightrope = 0;
-};
-
 struct SubsuitControlData
 {
 	short XRot = 0;
@@ -1329,7 +1275,36 @@ struct SubsuitControlData
 	unsigned short HitCount = 0;
 };
 
-struct LaraControlData
+// TODO: Give tightrope a property for difficulty?
+struct TightropeControlData
+{
+	short		 TightropeItem	 = 0;
+	bool		 CanDismount	 = false;
+	float		 Balance		 = 0.0f;
+	unsigned int TimeOnTightrope = 0;
+};
+
+struct WeaponControlData
+{
+	LaraWeaponType GunType		  = LaraWeaponType::None;
+	LaraWeaponType RequestGunType = LaraWeaponType::None;
+	LaraWeaponType LastGunType	  = LaraWeaponType::None;
+	HolsterInfo	   HolsterInfo	  = {};
+
+	short WeaponItem = -1;
+	bool  HasFired	 = false;
+	bool  Fired		 = false;
+
+	bool UziLeft  = false;
+	bool UziRight = false;
+
+	// TODO: Interval and Timer count frame time for now, but should count delta time in the future. -- Sezz 2022.11.14
+	unsigned int NumShotsFired = 0;
+	float		 Interval	   = 0.0f;
+	float		 Timer		   = 0.0f;
+};
+
+struct PlayerControlData
 {
 	short MoveAngle = 0;
 	short TurnRate	= 0;
@@ -1346,12 +1321,12 @@ struct LaraControlData
 	WeaponControlData	 Weapon	   = {};
 
 	bool IsClimbingLadder = false;
-	bool Locked			  = false; // IsLocked
+	bool IsLocked		  = false;
 	bool IsLow			  = false;
 	bool IsMonkeySwinging = false;
 	bool IsMoving		  = false;
-	bool RunJumpQueued	  = false; // IsRunJumpQueued
-	bool KeepLow		  = false; // IsInLowSpace
+	bool IsRunJumpQueued  = false;
+	bool KeepLow		  = false;
 
 	bool CanClimbLadder = false;
 	bool CanLook		= false;
@@ -1367,45 +1342,64 @@ struct PlayerStatusData
 	int Stamina	 = 0;
 };
 
-struct PlayerContextData
-{
-	int			ProjectedFloorHeight = 0;
-	float		CalcJumpVelocity	 = 0;
-	Pose		NextCornerPos		 = Pose::Zero;
-	EulerAngles TargetOrientation	 = EulerAngles::Zero; // TargetOrient
-
-	int		 WaterSurfaceDist	= 0;
-	short	 WaterCurrentActive = 0; // Sink number? Often used as bool.
-	Vector3i WaterCurrentPull	= Vector3i::Zero;
-
-	int InteractedItem = 0; // InteractedItemNumber
-	int Vehicle		   = 0; // VehicleItemNumber
-};
-
 struct PlayerEffectData
 {
 	std::array<float, NUM_LARA_MESHES> DripNodes   = {};
 	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
 };
 
+struct PlayerInventoryData
+{
+	bool IsBusy	 = false;
+	bool OldBusy = false;
+
+	DiaryInfo Diary = {};
+
+	byte BeetleLife;
+	int BeetleComponents; // BeetleComponentFlags enum
+	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
+	byte BigWaterskin;	  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6 (has skin + 5 liters = 6)
+
+	// TODO: Rename prefixes back to "Num".
+	int TotalSmallMedipacks;
+	int TotalLargeMedipacks;
+	int TotalFlares;
+	unsigned int TotalSecrets;
+
+	bool HasBinoculars = false;
+	bool HasCrowbar	   = false;
+	bool HasTorch	   = false;
+	bool HasLasersight = false;
+	bool HasSilencer   = false; // TODO: Unused.
+
+	int Puzzles[NUM_PUZZLES]			= {};
+	int Keys[NUM_KEYS]					= {};
+	int Pickups[NUM_PICKUPS]			= {};
+	int Examines[NUM_EXAMINES]			= {};
+	int PuzzlesCombo[NUM_PUZZLES * 2]	= {};
+	int KeysCombo[NUM_KEYS * 2]			= {};
+	int PickupsCombo[NUM_PICKUPS * 2]	= {};
+	int ExaminesCombo[NUM_EXAMINES * 2] = {};
+};
+
 struct LaraInfo
 {
-	static constexpr auto TARGET_COUNT_MAX = 8;
+	static constexpr auto TARGET_COUNT_MAX = 16;
 
-	LaraControlData	  Control	= {};
-	PlayerContextData Context	= {};
-	PlayerStatusData  Status	= {};
-	PlayerEffectData  Effect	= {};
-	LaraInventoryData Inventory = {};
+	PlayerContext		Context	  = PlayerContext();
+	PlayerControlData	Control	  = {};
+	PlayerStatusData	Status	  = {};
+	PlayerEffectData	Effect	  = {};
+	PlayerInventoryData Inventory = {};
 
 	// TODO: Move to PlayerControlData.
 	FlareData		  Flare = {};
 	TorchData		  Torch = {};
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] = {}; // TODO: Move to WeaponControlData.
 
-	EulerAngles ExtraHeadRot	= EulerAngles::Zero;
-	EulerAngles ExtraTorsoRot	= EulerAngles::Zero;
-	EulerAngles TargetArmOrient = EulerAngles::Zero;
+	EulerAngles ExtraHeadRot	= EulerAngles::Identity;
+	EulerAngles ExtraTorsoRot	= EulerAngles::Identity;
+	EulerAngles TargetArmOrient = EulerAngles::Identity;
 	ArmInfo		LeftArm			= {};
 	ArmInfo		RightArm		= {};
 

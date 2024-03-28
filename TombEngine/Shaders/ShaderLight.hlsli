@@ -1,3 +1,6 @@
+#ifndef SHADER_LIGHT
+#define SHADER_LIGHT
+
 #include "./Math.hlsli"
 
 float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)
@@ -463,3 +466,5 @@ float3 StaticLight(float3 vertex, float3 tex, float fogBulbsDensity)
 
 	return saturate(result);
 }
+
+#endif

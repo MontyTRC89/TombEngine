@@ -1,19 +1,20 @@
 #pragma once
 #include <vector>
 #include <SimpleMath.h>
+#include "Renderer/Graphics/RenderTarget2D.h"
+#include "Renderer/Structures/RendererRectangle.h"
+#include "Renderer/Structures/RendererBucket.h"
+#include "Renderer/Structures/RendererLight.h"
+#include "Renderer/Structures/RendererItem.h"
+#include "Renderer/Structures/RendererEffect.h"
+#include "Renderer/Structures/RendererStatic.h"
+#include "Renderer/Structures/RendererDoor.h"
 
-#include "Renderer/RendererRectangle.h"
-
-struct MESH_INFO;
-
-namespace TEN::Renderer
+namespace TEN::Renderer::Structures
 {
-	struct RendererItem;
-	struct RendererBucket;
-	struct RendererLight;
-	struct RendererEffect;
-	struct RendererTransparentFace;
-	struct RendererDoor;
+	using namespace DirectX;
+	using namespace DirectX::SimpleMath;
+	using namespace TEN::Renderer::Graphics;
 
 	struct RendererRoom
 	{
@@ -27,7 +28,6 @@ namespace TEN::Renderer
 		std::vector<RendererItem*> ItemsToDraw;
 		std::vector<RendererEffect*> EffectsToDraw;
 		std::vector<RendererStatic*> StaticsToDraw;
-		std::vector<RendererTransparentFace> TransparentFacesToDraw;
 		std::vector<RendererLight*> LightsToDraw;
 		std::vector<RendererDoor> Doors;
 		BoundingBox BoundingBox;
