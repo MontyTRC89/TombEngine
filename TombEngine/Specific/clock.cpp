@@ -55,6 +55,6 @@ GameTime GetGameTime(int frameCount)
 
 bool TestGlobalTimeInterval(float seconds)
 {
-	int tickTime = int(seconds * FPS);
-	return ((GlobalCounter % tickTime) == 0);
+	int ticks = (int)round(seconds * FPS);
+	return ((GlobalCounter % ticks) == 0);
 }
