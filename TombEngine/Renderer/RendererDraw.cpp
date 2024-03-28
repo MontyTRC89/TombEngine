@@ -34,6 +34,7 @@
 
 using namespace std::chrono;
 using namespace TEN::Effects::Hair;
+using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
 using namespace TEN::Renderer::Structures;
@@ -613,8 +614,6 @@ namespace TEN::Renderer
 
 	void Renderer::DrawFishSwarm(RenderView& view, RendererPass rendererPass)
 	{
-		using namespace TEN::Entities::Creatures::TR3;
-
 		if (!Objects[ID_FISH_EMITTER].loaded)
 			return;
 
@@ -625,34 +624,31 @@ namespace TEN::Renderer
 				if (fish.Life <= 0.0f) 
 					continue;
 
-					auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
-
-					for (auto& bucket : mesh.Buckets)
+				auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
+				for (auto& bucket : mesh.Buckets)
+				{
+					if (!IsSortedBlendMode(bucket.BlendMode))
+						continue;
+						
+					for (auto& poly : bucket.Polygons)
 					{
-						if (!IsSortedBlendMode(bucket.BlendMode))
-							continue;
-						
-						for (auto& poly : bucket.Polygons)
-						{
-							auto worldMatrix = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
-							auto center = Vector3::Transform(poly.Centre, worldMatrix);
-							float dist = (center - view.Camera.WorldPosition).Length();
+						auto worldMatrix = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
+						auto center = Vector3::Transform(poly.Centre, worldMatrix);
+						float dist = Vector3::Distance(center, view.Camera.WorldPosition);
 
-							auto object = RendererSortableObject{};
-							object.ObjectType = RendererObjectType::MoveableAsStatic;
-							object.Centre = center;
-							object.Distance = dist;
-							object.Bucket = &bucket;
-							object.Mesh = &mesh;
-							object.Polygon = &poly;
-							object.World = worldMatrix;
-							object.Room = &_rooms[fish.RoomNumber];
+						auto object = RendererSortableObject{};
+						object.ObjectType = RendererObjectType::MoveableAsStatic;
+						object.Centre = center;
+						object.Distance = dist;
+						object.Bucket = &bucket;
+						object.Mesh = &mesh;
+						object.Polygon = &poly;
+						object.World = worldMatrix;
+						object.Room = &_rooms[fish.RoomNumber];
 
-							view.TransparentObjectsToDraw.push_back(object);
-						}
-						
+						view.TransparentObjectsToDraw.push_back(object);
 					}
-				
+				}
 			}
 		}
 		else
@@ -725,7 +721,6 @@ namespace TEN::Renderer
 							_numMoveablesDrawCalls++;
 						}
 					}
-					
 				}
 			}
 		}
