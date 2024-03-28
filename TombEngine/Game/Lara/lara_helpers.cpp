@@ -5,7 +5,7 @@
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/camera.h"
-#include "Game/collision/AttractorCollision.h"
+#include "Game/collision/Attractor.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/control.h"
@@ -328,7 +328,7 @@ static void UsePlayerMedipack(ItemInfo& item)
 	}
 }
 
-static AttractorParentTargetData GetAttractorParentTarget(Attractor& attrac, float chainDist, short headingAngle,
+static AttractorParentTargetData GetAttractorParentTarget(AttractorObject& attrac, float chainDist, short headingAngle,
 														  const Vector3& relPosOffset, const EulerAngles& relOrientOffset)
 {
 	// Get attractor collision.

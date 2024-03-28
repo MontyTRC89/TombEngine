@@ -2,7 +2,7 @@
 #include "Game/Lara/PlayerContext.h"
 
 #include "Game/animation.h"
-#include "Game/collision/AttractorCollision.h"
+#include "Game/collision/Attractor.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
@@ -28,7 +28,7 @@ namespace TEN::Entities::Player
 		Detach(*LaraItem);
 	}
 
-	void PlayerAttractorData::Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist,
+	void PlayerAttractorData::Attach(ItemInfo& playerItem, AttractorObject& attrac, float chainDist,
 									 const Vector3& relPosOffset, const EulerAngles& relOrientOffset,
 									 const Vector3& relDeltaPos, const EulerAngles& relDeltaOrient)
 	{
@@ -53,7 +53,7 @@ namespace TEN::Entities::Player
 		*this = {};
 	};
 
-	void PlayerAttractorData::Update(ItemInfo& playerItem, Attractor& attrac, float chainDist,
+	void PlayerAttractorData::Update(ItemInfo& playerItem, AttractorObject& attrac, float chainDist,
 									 const Vector3& relPosOffset, const EulerAngles& relOrientOffset)
 	{
 		Attach(

@@ -10,7 +10,7 @@
 #include "Specific/newtypes.h"
 #include "Specific/BitField.h"
 
-namespace TEN::Collision::Attractor { class Attractor; };
+namespace TEN::Collision::Attractor { class AttractorObject; };
 
 using namespace TEN::Utils;
 
@@ -180,7 +180,7 @@ struct ItemInfo
 	short CarriedItem;
 
 	// TODO: Temporary.
-	std::optional<Attractor> Attractor = std::nullopt;
+	std::optional<AttractorObject> Attractor = std::nullopt;
 
 	void HandleOffsetBlend();
 

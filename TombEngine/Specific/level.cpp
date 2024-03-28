@@ -924,7 +924,7 @@ void ReadRooms()
 				continue;
 			}
 
-			room.Attractors.push_back(Attractor(type, points, i));
+			room.Attractors.push_back(AttractorObject(type, points, i));
 		}
 
 		room.flippedRoom = ReadInt32();

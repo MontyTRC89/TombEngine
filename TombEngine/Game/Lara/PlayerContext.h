@@ -17,7 +17,7 @@ namespace TEN::Entities::Player
 {
 	struct PlayerAttractorData
 	{
-		Attractor*	Ptr				= nullptr;
+		AttractorObject*	Ptr				= nullptr;
 		float		ChainDistance   = 0.0f;
 		Vector3		RelPosOffset	= Vector3::Zero;
 		EulerAngles RelOrientOffset = EulerAngles::Identity;
@@ -38,11 +38,11 @@ namespace TEN::Entities::Player
 
 	struct DebugAttractorData
 	{
-		std::optional<Attractor> Attrac0 = std::nullopt;
-		std::optional<Attractor> Attrac1 = std::nullopt;
-		std::optional<Attractor> Attrac2 = std::nullopt;
+		std::optional<AttractorObject> Attrac0 = std::nullopt;
+		std::optional<AttractorObject> Attrac1 = std::nullopt;
+		std::optional<AttractorObject> Attrac2 = std::nullopt;
 
-		std::vector<Attractor> Attracs = {};
+		std::vector<AttractorObject> Attracs = {};
 	};
 
 	// TODO: Savegame for attractors.

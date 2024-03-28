@@ -336,7 +336,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Game\collision\Attractor.h" />
-    <ClInclude Include="Game\collision\AttractorCollision.h" />
     <ClInclude Include="Game\collision\AttractorDebug.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\DisplaySprite.h" />
@@ -856,7 +855,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\camera.cpp" />
     <ClCompile Include="Game\collision\Attractor.cpp" />
-    <ClCompile Include="Game\collision\AttractorCollision.cpp" />
     <ClCompile Include="Game\collision\AttractorDebug.cpp" />
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\collision\collide_room.cpp" />

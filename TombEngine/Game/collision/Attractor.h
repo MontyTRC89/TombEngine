@@ -1,4 +1,8 @@
 #pragma once
+#include "Game/collision/AttractorDebug.h"
+#include "Math/Math.h"
+
+using namespace TEN::Math;
 
 struct CollisionResult;
 struct ItemInfo;
@@ -17,7 +21,7 @@ namespace TEN::Collision::Attractor
 		Pinnacle*/
 	};
 
-	class Attractor
+	class AttractorObject
 	{
 	private:
 		// Members
@@ -32,10 +36,10 @@ namespace TEN::Collision::Attractor
 
 	public:
 		// Constructors
-		Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber);
+		AttractorObject(AttractorType type, const std::vector<Vector3>& points, int roomNumber);
 
 		// Destructors
-		~Attractor();
+		~AttractorObject();
 
 		// Getters
 		AttractorType				GetType() const;
@@ -67,6 +71,52 @@ namespace TEN::Collision::Attractor
 		void  Cache();
 	};
 
+	class AttractorCollisionData
+	{
+	private:
+		struct ProximityData
+		{
+			Vector3		 Intersection  = Vector3::Zero;
+			float		 Distance2D	   = 0.0f;
+			float		 Distance3D	   = 0.0f;
+			float		 ChainDistance = 0.0f;
+			unsigned int SegmentID	   = 0;
+		};
+
+	public:
+		// Members
+		AttractorObject* AttractorPtr = nullptr;
+
+		ProximityData Proximity	   = {};
+		short		  HeadingAngle = 0;
+		short		  SlopeAngle   = 0;
+		bool		  IsInFront	   = false;
+
+		// Constructors
+		AttractorCollisionData() {};
+		AttractorCollisionData(AttractorObject& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis);
+
+	private:
+		// Helpers
+		ProximityData GetProximity(const Vector3& pos, unsigned int segmentID, const Vector3& axis) const;
+	};
+
+	// Getters
+	AttractorCollisionData GetAttractorCollision(AttractorObject& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle,
+												 const Vector3& axis = Vector3::UnitY);
+	AttractorCollisionData GetAttractorCollision(AttractorObject& attrac, float chainDist, short headingAngle,
+												 const Vector3& axis = Vector3::UnitY);
+
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float radius,
+															   const Vector3& axis = Vector3::UnitY);
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
+															   float forward, float down, float right, float radius,
+															   const Vector3& axis = Vector3::UnitY);
+
+	// Utilities
 	std::vector<Vector3> GetBridgeAttractorPoints(const ItemInfo& bridgeItem);
-	Attractor			 GenerateBridgeAttractor(const ItemInfo& bridgeItem);
+	AttractorObject		 GenerateBridgeAttractor(const ItemInfo& bridgeItem);
+
+	// Debug
+	void DrawNearbyAttractors(const Vector3& pos, int roomNumber, short headingAngle);
 }

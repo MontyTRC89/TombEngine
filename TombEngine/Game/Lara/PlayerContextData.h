@@ -1,7 +1,7 @@
 #pragma once
 #include "Math/Math.h"
 
-namespace TEN::Collision::Attractor { class Attractor; }
+namespace TEN::Collision::Attractor { class AttractorObject; }
 
 using namespace TEN::Collision::Attractor;
 using namespace TEN::Math;
@@ -94,7 +94,7 @@ namespace TEN::Entities::Player
 
 	struct ClimbContextData
 	{
-		Attractor*	AttractorPtr	= nullptr;
+		AttractorObject*	AttractorPtr	= nullptr;
 		float		ChainDistance	= 0.0f;
 		Vector3		RelPosOffset	= Vector3::Zero;
 		EulerAngles RelOrientOffset = EulerAngles::Identity;

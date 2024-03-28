@@ -136,7 +136,7 @@ struct ROOM_INFO
 
 	std::vector<FloorInfo>	   floor		  = {};
 	std::vector<TriggerVolume> triggerVolumes = {};
-	std::vector<Attractor>	   Attractors	  = {};
+	std::vector<AttractorObject>	   Attractors	  = {};
 
 	std::vector<MESH_INFO>	mesh	  = {};
 	std::vector<ROOM_LIGHT> lights	  = {};

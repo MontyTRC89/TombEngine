@@ -2,7 +2,7 @@
 #include "Renderer/Renderer.h"
 
 #include "Game/animation.h"
-#include "Game/collision/AttractorCollision.h"
+#include "Game/collision/Attractor.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/Gui.h"
@@ -11,12 +11,11 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
+#include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
-#include "Game/collision/AttractorCollision.h"
 
 using namespace TEN::Collision::Attractor;
 using namespace TEN::Gui;

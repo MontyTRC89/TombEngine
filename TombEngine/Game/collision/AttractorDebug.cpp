@@ -4,7 +4,6 @@
 #include <ois/OISKeyboard.h>
 
 #include "Game/collision/Attractor.h"
-#include "Game/collision/AttractorCollision.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -34,12 +33,12 @@ namespace TEN::Collision::Attractor
 
 		auto points = std::vector<Vector3>{ Vector3::Zero, Vector3::Zero };
 
-		player.Context.DebugAttracs.Attrac0 = Attractor(AttractorType::Edge, points, item.RoomNumber);
-		player.Context.DebugAttracs.Attrac1 = Attractor(AttractorType::Edge, points, item.RoomNumber);
-		player.Context.DebugAttracs.Attrac2 = Attractor(AttractorType::Edge, points, item.RoomNumber);
+		player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, points, item.RoomNumber);
+		player.Context.DebugAttracs.Attrac1 = AttractorObject(AttractorType::Edge, points, item.RoomNumber);
+		player.Context.DebugAttracs.Attrac2 = AttractorObject(AttractorType::Edge, points, item.RoomNumber);
 
 		for (int i = 0; i < 8; i++)
-			player.Context.DebugAttracs.Attracs.push_back(Attractor(AttractorType::Edge, points, item.RoomNumber));
+			player.Context.DebugAttracs.Attracs.push_back(AttractorObject(AttractorType::Edge, points, item.RoomNumber));
 	}
 
 	static void SpawnAttractorCircle(ItemInfo& item, bool isOuter)
@@ -68,7 +67,7 @@ namespace TEN::Collision::Attractor
 		if (isOuter)
 			std::reverse(points.begin(), points.end());
 
-		player.Context.DebugAttracs.Attrac2 = Attractor(AttractorType::Edge, points, item.RoomNumber);
+		player.Context.DebugAttracs.Attrac2 = AttractorObject(AttractorType::Edge, points, item.RoomNumber);
 	}
 
 	static void SetDebugAttractors(ItemInfo& item)
@@ -88,13 +87,13 @@ namespace TEN::Collision::Attractor
 		{
 			auto pos0 = attracPoint;
 			auto pos1 = player.Context.DebugAttracs.Attrac0->GetPoints().empty() ? pos0 : player.Context.DebugAttracs.Attrac0->GetPoints().back();
-			player.Context.DebugAttracs.Attrac0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+			player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 		}
 		if (KeyMap[OIS::KeyCode::KC_W])
 		{
 			auto pos1 = attracPoint;
 			auto pos0 = player.Context.DebugAttracs.Attrac0->GetPoints().empty() ? pos1 : player.Context.DebugAttracs.Attrac0->GetPoints().front();
-			player.Context.DebugAttracs.Attrac0 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+			player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 		}
 
 		// Set debug attractor 1.
@@ -102,13 +101,13 @@ namespace TEN::Collision::Attractor
 		{
 			auto pos0 = attracPoint;
 			auto pos1 = player.Context.DebugAttracs.Attrac1->GetPoints().empty() ? pos0 : player.Context.DebugAttracs.Attrac1->GetPoints().back();
-			player.Context.DebugAttracs.Attrac1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+			player.Context.DebugAttracs.Attrac1 = AttractorObject(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 		}
 		if (KeyMap[OIS::KeyCode::KC_R])
 		{
 			auto pos1 = attracPoint;
 			auto pos0 = player.Context.DebugAttracs.Attrac1->GetPoints().empty() ? pos1 : player.Context.DebugAttracs.Attrac1->GetPoints().front();
-			player.Context.DebugAttracs.Attrac1 = Attractor(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
+			player.Context.DebugAttracs.Attrac1 = AttractorObject(AttractorType::Edge, { pos0, pos1 }, item.RoomNumber);
 		}
 
 		// Spawn attractor circle.
@@ -140,7 +139,7 @@ namespace TEN::Collision::Attractor
 				};
 				inc -= CLICK(1);
 
-				attrac = Attractor(AttractorType::WallEdge, points, item.RoomNumber);
+				attrac = AttractorObject(AttractorType::WallEdge, points, item.RoomNumber);
 			}
 		}
 	}

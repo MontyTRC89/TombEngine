@@ -2,7 +2,7 @@
 #include "Game/Lara/States/EdgeHang.h"
 
 #include "Game/camera.h"
-#include "Game/collision/AttractorCollision.h"
+#include "Game/collision/Attractor.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"

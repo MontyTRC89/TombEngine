@@ -6,8 +6,7 @@
 #include "Game/Lara/lara_tests.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/AttractorCollision.h"
-#include "Game/collision/AttractorDebug.h"
+#include "Game/collision/Attractor.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/flipeffect.h"
@@ -375,7 +374,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	{
 		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 		DrawNearbySectorFlags(*item);
-		DrawNearbyAttractors(*item);
+		DrawNearbyAttractors(item->Pose.Position.ToVector3(), item->RoomNumber, item->Pose.Orientation.y);
 
 		g_Renderer.AddDebugCylinder(
 			item->Pose.Position.ToVector3() - Vector3::UnitY, EulerAngles(ANGLE(90.0f), 0, 0).ToQuaternion(), coll->Setup.Radius, coll->Setup.Height,

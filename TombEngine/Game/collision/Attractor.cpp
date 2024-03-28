@@ -15,7 +15,7 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Attractor
 {
-	Attractor::Attractor(AttractorType type, const std::vector<Vector3>& points, int roomNumber)
+	AttractorObject::AttractorObject(AttractorType type, const std::vector<Vector3>& points, int roomNumber)
 	{
 		assertion(!points.empty(), "Attempted to initialize invalid attractor.");
 		
@@ -25,42 +25,42 @@ namespace TEN::Collision::Attractor
 		Cache();
 	}
 
-	Attractor::~Attractor()
+	AttractorObject::~AttractorObject()
 	{
 		DetachAllPlayers();
 	}
 
-	AttractorType Attractor::GetType() const
+	AttractorType AttractorObject::GetType() const
 	{
 		return _type;
 	}
 
-	const std::vector<Vector3>& Attractor::GetPoints() const
+	const std::vector<Vector3>& AttractorObject::GetPoints() const
 	{
 		return _points;
 	}
 
-	int Attractor::GetRoomNumber() const
+	int AttractorObject::GetRoomNumber() const
 	{
 		return _roomNumber;
 	}
 
-	const std::vector<float>& Attractor::GetSegmentLengths() const
+	const std::vector<float>& AttractorObject::GetSegmentLengths() const
 	{
 		return _segmentLengths;
 	}
 
-	float Attractor::GetLength() const
+	float AttractorObject::GetLength() const
 	{
 		return _length;
 	}
 
-	const BoundingBox& Attractor::GetBox() const
+	const BoundingBox& AttractorObject::GetBox() const
 	{
 		return _box;
 	}
 
-	bool Attractor::IsLooped() const
+	bool AttractorObject::IsLooped() const
 	{
 		// Single segment exists; loop not possible.
 		if (GetSegmentCount() == 1)
@@ -71,12 +71,12 @@ namespace TEN::Collision::Attractor
 		return (distSqr <= EPSILON);
 	}
 
-	unsigned int Attractor::GetSegmentCount() const
+	unsigned int AttractorObject::GetSegmentCount() const
 	{
 		return std::max<unsigned int>(_points.size() - 1, 1);
 	}
 
-	unsigned int Attractor::GetSegmentIDAtChainDistance(float chainDist) const
+	unsigned int AttractorObject::GetSegmentIDAtChainDistance(float chainDist) const
 	{
 		// Single segment exists; return segment ID 0.
 		if (GetSegmentCount() == 1)
@@ -111,7 +111,7 @@ namespace TEN::Collision::Attractor
 		return (GetSegmentCount() - 1);
 	}
 
-	Vector3 Attractor::GetIntersectionAtChainDistance(float chainDist) const
+	Vector3 AttractorObject::GetIntersectionAtChainDistance(float chainDist) const
 	{
 		// Single point exists; return simple intersection.
 		if (_points.size() == 1)
@@ -156,7 +156,7 @@ namespace TEN::Collision::Attractor
 		return _points.back();
 	}
 
-	void Attractor::Update(const std::vector<Vector3>& points, int roomNumber)
+	void AttractorObject::Update(const std::vector<Vector3>& points, int roomNumber)
 	{
 		if (points.empty())
 			TENLog("Attempted to update attractor to invalid state.", LogLevel::Warning);
@@ -166,7 +166,7 @@ namespace TEN::Collision::Attractor
 		Cache();
 	}
 
-	void Attractor::AttachPlayer(ItemInfo& playerItem)
+	void AttractorObject::AttachPlayer(ItemInfo& playerItem)
 	{
 		if (!playerItem.IsLara())
 		{
@@ -177,12 +177,12 @@ namespace TEN::Collision::Attractor
 		_attachedPlayerItemNumbers.insert(playerItem.Index);
 	}
 
-	void Attractor::DetachPlayer(ItemInfo& playerItem)
+	void AttractorObject::DetachPlayer(ItemInfo& playerItem)
 	{
 		_attachedPlayerItemNumbers.erase(playerItem.Index);
 	}
 
-	void Attractor::DetachAllPlayers()
+	void AttractorObject::DetachAllPlayers()
 	{
 		// TODO: Crashes trying to loop?
 
@@ -196,7 +196,7 @@ namespace TEN::Collision::Attractor
 		}
 	}
 
-	void Attractor::DrawDebug(unsigned int segmentID) const
+	void AttractorObject::DrawDebug(unsigned int segmentID) const
 	{
 		constexpr auto LABEL_OFFSET				= Vector3(0.0f, -CLICK(0.5f), 0.0f);
 		constexpr auto INDICATOR_LINE_LENGTH	= BLOCK(1 / 20.0f);
@@ -286,13 +286,13 @@ namespace TEN::Collision::Attractor
 		}
 	}
 
-	void Attractor::DrawDebug() const
+	void AttractorObject::DrawDebug() const
 	{
 		for (int i = 0; i < GetSegmentCount(); i++)
 			DrawDebug(i);
 	}
 
-	float Attractor::NormalizeChainDistance(float chainDist) const
+	float AttractorObject::NormalizeChainDistance(float chainDist) const
 	{
 		// Distance along attractor within bounds; return it.
 		if (chainDist >= 0.0f && chainDist <= _length)
@@ -302,7 +302,7 @@ namespace TEN::Collision::Attractor
 		return (IsLooped() ? fmod(chainDist + _length, _length) : std::clamp(chainDist, 0.0f, _length));
 	}
 
-	void Attractor::Cache()
+	void AttractorObject::Cache()
 	{
 		_segmentLengths.clear();
 		_length = 0.0f;
@@ -330,6 +330,228 @@ namespace TEN::Collision::Attractor
 		_box = Geometry::GetBoundingBox(_points);
 	}
 
+	AttractorCollisionData::AttractorCollisionData(AttractorObject& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis)
+	{
+		constexpr auto HEADING_ANGLE_OFFSET = ANGLE(270.0f);
+
+		const auto& points = attrac.GetPoints();
+
+		// FAILSAFE: Clamp segment ID.
+		unsigned int segmentCount = attrac.GetSegmentCount();
+		if (segmentID < 0 || segmentID >= segmentCount)
+		{
+			TENLog("Attempted to get attractor collision data for invalid segment.", LogLevel::Warning);
+			segmentID = std::clamp<unsigned int>(segmentID, 0, segmentCount - 1);
+		}
+
+		// Set attractor pointer and get proximity data.
+		AttractorPtr = &attrac;
+		Proximity = GetProximity(pos, segmentID, axis);
+
+		// TODO: Incorporate axis.
+		// Calculate orientations.
+		auto refOrient = EulerAngles(0, headingAngle, 0);
+		auto segmentOrient = (points.size() == 1) ?
+			refOrient : Geometry::GetOrientToPoint(points[Proximity.SegmentID], points[Proximity.SegmentID + 1]);
+
+		// Set remaining collision data.
+		HeadingAngle = segmentOrient.y + HEADING_ANGLE_OFFSET;
+		SlopeAngle = segmentOrient.x;
+		IsInFront = Geometry::IsPointInFront(pos, Proximity.Intersection, refOrient);
+	}
+
+	AttractorCollisionData::ProximityData AttractorCollisionData::GetProximity(const Vector3& pos, unsigned int segmentID, const Vector3& axis) const
+	{
+		const auto& points = AttractorPtr->GetPoints();
+
+		// Single point exists; return simple proximity data.
+		if (points.size() == 1)
+		{
+			const auto& intersect = points.front();
+
+			float dist2D = Vector2::Distance(Vector2(pos.x, pos.z), Vector2(intersect.x, intersect.z));
+			float dist3D = Vector3::Distance(pos, intersect);
+			return ProximityData{ intersect, dist2D, dist3D, 0.0f, 0 };
+		}
+
+		// Accumulate distance traveled along attractor toward intersection.
+		float chainDistTraveled = 0.0f;
+		for (unsigned int i = 0; i < segmentID; i++)
+		{
+			float segmentLength = AttractorPtr->GetSegmentLengths()[i];
+			chainDistTraveled += segmentLength;
+		}
+
+		// Get segment points.
+		const auto& origin = points[segmentID];
+		const auto& target = points[segmentID + 1];
+
+		// Calculate axis-perpendicular intersection.
+		auto intersect = Geometry::GetClosestPointOnLinePerp(pos, origin, target, axis);
+
+		// Accumulate final distance traveled along attractor toward intersection.
+		chainDistTraveled += Vector3::Distance(origin, intersect);
+
+		// Create proximity data.
+		auto attracProx = ProximityData{};
+		attracProx.Intersection = intersect;
+		attracProx.Distance2D = Vector2::Distance(Vector2(pos.x, pos.z), Vector2(intersect.x, intersect.z));
+		attracProx.Distance3D = Vector3::Distance(pos, intersect);
+		attracProx.ChainDistance = chainDistTraveled;
+		attracProx.SegmentID = segmentID;
+
+		// Return proximity data.
+		return attracProx;
+	}
+
+	AttractorCollisionData GetAttractorCollision(AttractorObject& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle,
+												 const Vector3& axis)
+	{
+		return AttractorCollisionData(attrac, segmentID, pos, headingAngle, axis);
+	}
+
+	AttractorCollisionData GetAttractorCollision(AttractorObject& attrac, float chainDist, short headingAngle,
+												 const Vector3& axis)
+	{
+		unsigned int segmentID = attrac.GetSegmentIDAtChainDistance(chainDist);
+		auto pos = attrac.GetIntersectionAtChainDistance(chainDist);
+
+		return AttractorCollisionData(attrac, segmentID, pos, headingAngle, axis);
+	}
+	
+	// Debug
+	static std::vector<AttractorObject*> GetDebugAttractorPtrs()
+	{
+		auto& player = GetLaraInfo(*LaraItem);
+
+		auto debugAttracPtrs = std::vector<AttractorObject*>{};
+		debugAttracPtrs.push_back(&*player.Context.DebugAttracs.Attrac0);
+		debugAttracPtrs.push_back(&*player.Context.DebugAttracs.Attrac1);
+		debugAttracPtrs.push_back(&*player.Context.DebugAttracs.Attrac2);
+
+		for (auto& attrac : player.Context.DebugAttracs.Attracs)
+			debugAttracPtrs.push_back(&attrac);
+
+		return debugAttracPtrs;
+	}
+
+	// TODO: Spacial partitioning may be ideal here. Would require a general collision refactor. -- Sezz 2023.07.30
+	static std::vector<AttractorObject*> GetNearbyAttractorPtrs(const Vector3& pos, int roomNumber, float radius)
+	{
+		constexpr auto SECTOR_SEARCH_DEPTH = 2;
+
+		auto sphere = BoundingSphere(pos, radius);
+		auto nearbyAttracPtrs = std::vector<AttractorObject*>{};
+
+		// Draw debug sphere.
+		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::AttractorStats);
+
+		// TEMP
+		// Collect debug attractors.
+		auto debugAttracPtrs = GetDebugAttractorPtrs();
+		for (auto* attracPtr : debugAttracPtrs)
+		{
+			if (sphere.Intersects(attracPtr->GetBox()))
+				nearbyAttracPtrs.push_back(attracPtr);
+		}
+
+		// Collect room attractors in neighbor rooms.
+		auto& room = g_Level.Rooms[roomNumber];
+		for (int neighborRoomNumber : room.neighbors)
+		{
+			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+			if (!neighborRoom.Active())
+				continue;
+
+			for (auto& attrac : neighborRoom.Attractors)
+			{
+				if (sphere.Intersects(attrac.GetBox()))
+					nearbyAttracPtrs.push_back(&attrac);
+			}
+		}
+
+		auto bridgeItemNumbers = std::set<int>{};
+
+		// Collect bridge item numbers in neighbor sectors.
+		auto sectorPtrs = GetNeighborSectorPtrs(pos, roomNumber, SECTOR_SEARCH_DEPTH);
+		for (auto* sectorPtr : sectorPtrs)
+		{
+			for (int bridgeItemNumber : sectorPtr->BridgeItemNumbers)
+				bridgeItemNumbers.insert(bridgeItemNumber);
+		}
+
+		// Collect bridge attractors.
+		for (int bridgeItemNumber : bridgeItemNumbers)
+		{
+			auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+			//auto& bridge = GetBridgeObject(bridgeItem);
+
+			auto& attrac = *bridgeItem.Attractor;//bridge.Attractor;
+			if (sphere.Intersects(attrac.GetBox()))
+				nearbyAttracPtrs.push_back(&attrac);
+		}
+
+		// Return pointers to approximately nearby attractors from sphere-AABB tests.
+		return nearbyAttracPtrs;
+	}
+
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float radius,
+															   const Vector3& axis)
+	{
+		constexpr auto COLL_COUNT_MAX = 64;
+
+		// Get pointers to approximately nearby attractors.
+		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(pos, roomNumber, radius);
+
+		// Collect attractor collisions.
+		auto attracColls = std::vector<AttractorCollisionData>{};
+		attracColls.reserve(nearbyAttracPtrs.size());
+		for (auto* attracPtr : nearbyAttracPtrs)
+		{
+			// Get collisions for every segment.
+			for (int i = 0; i < attracPtr->GetSegmentCount(); i++)
+			{
+				auto attracColl = GetAttractorCollision(*attracPtr, i, pos, headingAngle, axis);
+
+				// Filter out non-intersection.
+				if (attracColl.Proximity.Distance3D > radius)
+					continue;
+
+				attracColls.push_back(std::move(attracColl));
+			}
+		}
+
+		// Sort collisions by 2D then 3D distance.
+		std::sort(
+			attracColls.begin(), attracColls.end(),
+			[](const auto& attracColl0, const auto& attracColl1)
+			{
+				if (attracColl0.Proximity.Distance2D == attracColl1.Proximity.Distance2D)
+					return (attracColl0.Proximity.Distance3D < attracColl1.Proximity.Distance3D);
+				
+				return (attracColl0.Proximity.Distance2D < attracColl1.Proximity.Distance2D);
+			});
+
+		// Trim collection.
+		if (attracColls.size() > COLL_COUNT_MAX)
+			attracColls.resize(COLL_COUNT_MAX);
+
+		// Return attractor collisions in capped vector sorted by 2D then 3D distance.
+		return attracColls;
+	}
+
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
+															   float forward, float down, float right, float radius,
+															   const Vector3& axis)
+	{
+		auto relOffset = Vector3(right, down, forward);
+		auto rotMatrix = AxisAngle(axis, headingAngle).ToRotationMatrix();
+		auto probePos = pos + Vector3::Transform(relOffset, rotMatrix);
+		int probeRoomNumber = GetCollision(pos, roomNumber, headingAngle, forward, down, right).RoomNumber;
+
+		return GetAttractorCollisions(probePos, probeRoomNumber, headingAngle, radius);
+	}
+	
 	std::vector<Vector3> GetBridgeAttractorPoints(const ItemInfo& bridgeItem)
 	{
 		constexpr auto TILT_STEP = CLICK(1);
@@ -376,9 +598,29 @@ namespace TEN::Collision::Attractor
 		};
 	}
 
-	Attractor GenerateBridgeAttractor(const ItemInfo& bridgeItem)
+	AttractorObject GenerateBridgeAttractor(const ItemInfo& bridgeItem)
 	{
 		auto points = GetBridgeAttractorPoints(bridgeItem);
-		return Attractor(AttractorType::Edge, points, bridgeItem.RoomNumber);
+		return AttractorObject(AttractorType::Edge, points, bridgeItem.RoomNumber);
+	}
+
+	void DrawNearbyAttractors(const Vector3& pos, int roomNumber, short headingAngle)
+	{
+		constexpr auto RADIUS = BLOCK(5);
+
+		auto uniqueAttracPtrs = std::set<AttractorObject*>{};
+
+		auto attracColls = GetAttractorCollisions(pos, roomNumber, headingAngle, 0.0f, 0.0f, 0.0f, RADIUS);
+		for (const auto& attracColl : attracColls)
+		{
+			uniqueAttracPtrs.insert(attracColl.AttractorPtr);
+			attracColl.AttractorPtr->DrawDebug(attracColl.Proximity.SegmentID);
+		}
+
+		if (g_Renderer.GetDebugPage() == RendererDebugPage::AttractorStats)
+		{
+			g_Renderer.PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracPtrs.size());
+			g_Renderer.PrintDebugMessage("Nearby attractor segments: %d", (int)attracColls.size());
+		}
 	}
 }
