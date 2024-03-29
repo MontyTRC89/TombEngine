@@ -9,17 +9,14 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Math/Math.h"
 #include "Specific/Input/Input.h"
 
-using namespace TEN::Control::Volumes;
 using namespace TEN::Input;
-using namespace TEN::Math;
 using namespace TEN::Renderer;
+using namespace TEN::Control::Volumes;
 
 constexpr auto MAX_CAMERA = 18;
 
-// Globals
 bool TrackCameraInit;
 int SpotcamTimer;
 bool SpotcamPaused;
@@ -34,8 +31,12 @@ int SplineToCamera;
 int FirstCamera;
 int LastCamera;
 int CurrentCameraCnt;
-Vector3i CameraPosition[MAX_CAMERA];
-Vector3i CameraPositionTarget[MAX_CAMERA];
+int CameraXposition[MAX_CAMERA];
+int CameraYposition[MAX_CAMERA];
+int CameraZposition[MAX_CAMERA];
+int CameraXtarget[MAX_CAMERA];
+int CameraYtarget[MAX_CAMERA];
+int CameraZtarget[MAX_CAMERA];
 int CameraRoll[MAX_CAMERA];
 int CameraFOV[MAX_CAMERA];
 int CameraSpeed[MAX_CAMERA];
@@ -62,6 +63,7 @@ void ClearSpotCamSequences()
 	SpotcamDontDrawLara = false;
 	SpotcamOverlay = false;
 
+
 	for (int i = 0; i < MAX_SPOTCAMS; i++)
 		SpotCam[i] = {};
 }
@@ -70,37 +72,35 @@ void InitializeSpotCamSequences(bool startFirstSequence)
 {
 	TrackCameraInit = false;
 
-	int spotCamCount = NumberSpotcams;
+	int n = NumberSpotcams;
 	int cc = 1;
 
-	if (spotCamCount != 0)
+	if (n != 0)
 	{
 		int ce = 0;
-		int sequenceID = SpotCam[0].sequence;
+		int s = SpotCam[0].sequence;
 
-		if (cc < spotCamCount)
+		if (cc < n)
 		{
-			for (spotCamCount = 1; spotCamCount < NumberSpotcams; spotCamCount++)
+			for (n = 1; n < NumberSpotcams; n++)
 			{
 				// Same sequence.
-				if (SpotCam[spotCamCount].sequence == sequenceID)
-				{
+				if (SpotCam[n].sequence == s)
 					cc++;
-				}
 				// New sequence.
 				else
 				{
 					CameraCnt[ce] = cc;
 					cc = 1;
-					SpotCamRemap[sequenceID] = ce;
+					SpotCamRemap[s] = ce;
 					ce++;
-					sequenceID = SpotCam[spotCamCount].sequence;
+					s = SpotCam[n].sequence;
 				}
 			}
 		}
 
 		CameraCnt[ce] = cc;
-		SpotCamRemap[sequenceID] = ce;
+		SpotCamRemap[s] = ce;
 	}
 
 	if (startFirstSequence)
@@ -110,9 +110,9 @@ void InitializeSpotCamSequences(bool startFirstSequence)
 	}
 }
 
-void InitializeSpotCam(short sequenceID)
+void InitializeSpotCam(short Sequence)
 {
-	if (TrackCameraInit != 0 && LastSpotCamSequence == sequenceID)
+	if (TrackCameraInit != 0 && LastSpotCamSequence == Sequence)
 	{
 		TrackCameraInit = false;
 		return;
@@ -131,8 +131,8 @@ void InitializeSpotCam(short sequenceID)
 
 	Lara.Inventory.IsBusy = 0;
 
-	CameraFade = NO_VALUE;
-	LastSpotCamSequence = sequenceID;
+	CameraFade = -1;
+	LastSpotCamSequence = Sequence;
 	TrackCameraInit = false;
 	SpotcamTimer = 0;
 	SpotcamPaused = false;
@@ -151,10 +151,10 @@ void InitializeSpotCam(short sequenceID)
 	LaraFixedPosition.y = LaraItem->Pose.Position.y;
 	LaraFixedPosition.z = LaraItem->Pose.Position.z;
 
-	CurrentSpotcamSequence = sequenceID;
+	CurrentSpotcamSequence = Sequence;
 	CurrentSplineCamera = 0;
 
-	for (int i = 0; i < SpotCamRemap[sequenceID]; i++)
+	for (int i = 0; i < SpotCamRemap[Sequence]; i++)
 		CurrentSplineCamera += CameraCnt[i];
 
 	CurrentSplinePosition = 0;
@@ -162,21 +162,25 @@ void InitializeSpotCam(short sequenceID)
 
 	FirstCamera = CurrentSplineCamera;
 
-	const auto* spotCamPtr = &SpotCam[CurrentSplineCamera];
+	auto* spotcam = &SpotCam[CurrentSplineCamera];
 
-	LastCamera = CurrentSplineCamera + (CameraCnt[SpotCamRemap[sequenceID]] - 1);
-	CurrentCameraCnt = CameraCnt[SpotCamRemap[sequenceID]];
+	LastCamera = CurrentSplineCamera + (CameraCnt[SpotCamRemap[Sequence]] - 1);
+	CurrentCameraCnt = CameraCnt[SpotCamRemap[Sequence]];
 
-	if ((spotCamPtr->flags & SCF_DISABLE_LARA_CONTROLS))
+	if ((spotcam->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
 		Lara.Control.IsLocked = true;
 		SetCinematicBars(1.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 	}
 
-	if (spotCamPtr->flags & SCF_TRACKING_CAM)
+	if (spotcam->flags & SCF_TRACKING_CAM)
 	{
-		CameraPosition[1] = SpotCam[FirstCamera].Position;
-		CameraPositionTarget[1] = SpotCam[FirstCamera].PositionTarget;
+		CameraXposition[1] = SpotCam[FirstCamera].x;
+		CameraYposition[1] = SpotCam[FirstCamera].y;
+		CameraZposition[1] = SpotCam[FirstCamera].z;
+		CameraXtarget[1] = SpotCam[FirstCamera].tx;
+		CameraYtarget[1] = SpotCam[FirstCamera].ty;
+		CameraZtarget[1] = SpotCam[FirstCamera].tz;
 		CameraRoll[1] = SpotCam[FirstCamera].roll;
 		CameraFOV[1] = SpotCam[FirstCamera].fov;
 		CameraSpeed[1] = SpotCam[FirstCamera].speed;
@@ -185,20 +189,28 @@ void InitializeSpotCam(short sequenceID)
 
 		if (CurrentCameraCnt > 0)
 		{
-			spotCamPtr = &SpotCam[FirstCamera];
+			spotcam = &SpotCam[FirstCamera];
 
-			for (int i = 0; i < CurrentCameraCnt; i++, spotCamPtr++)
+			for (int i = 0; i < CurrentCameraCnt; i++, spotcam++)
 			{
-				CameraPosition[i + 2] = spotCamPtr->Position;
-				CameraPositionTarget[i + 2] = spotCamPtr->PositionTarget;
-				CameraRoll[i + 2] = spotCamPtr->roll;
-				CameraFOV[i + 2] = spotCamPtr->fov;
-				CameraSpeed[i + 2] = spotCamPtr->speed;
+				CameraXposition[i + 2] = spotcam->x;
+				CameraYposition[i + 2] = spotcam->y;
+				CameraZposition[i + 2] = spotcam->z;
+				CameraXtarget[i + 2] = spotcam->tx;
+				CameraYtarget[i + 2] = spotcam->ty;
+				CameraZtarget[i + 2] = spotcam->tz;
+				CameraRoll[i + 2] = spotcam->roll;
+				CameraFOV[i + 2] = spotcam->fov;
+				CameraSpeed[i + 2] = spotcam->speed;
 			}
 		}
 
-		CameraPosition[CurrentCameraCnt + 2] = SpotCam[LastCamera].Position;
-		CameraPositionTarget[CurrentCameraCnt + 2] = SpotCam[LastCamera].PositionTarget;
+		CameraXposition[CurrentCameraCnt + 2] = SpotCam[LastCamera].x;
+		CameraYposition[CurrentCameraCnt + 2] = SpotCam[LastCamera].y;
+		CameraZposition[CurrentCameraCnt + 2] = SpotCam[LastCamera].z;
+		CameraXtarget[CurrentCameraCnt + 2] = SpotCam[LastCamera].tx;
+		CameraYtarget[CurrentCameraCnt + 2] = SpotCam[LastCamera].ty;
+		CameraZtarget[CurrentCameraCnt + 2] = SpotCam[LastCamera].tz;
 		CameraFOV[CurrentCameraCnt + 2] = SpotCam[LastCamera].fov;
 		CameraRoll[CurrentCameraCnt + 2] = SpotCam[LastCamera].roll;
 		CameraSpeed[CurrentCameraCnt + 2] = SpotCam[LastCamera].speed;
@@ -206,10 +218,14 @@ void InitializeSpotCam(short sequenceID)
 	else
 	{
 		int sp = 0;
-		if ((spotCamPtr->flags & SCF_CUT_PAN))
+		if ((spotcam->flags & SCF_CUT_PAN))
 		{
-			CameraPosition[1] = SpotCam[CurrentSplineCamera].Position;
-			CameraPositionTarget[1] = SpotCam[CurrentSplineCamera].PositionTarget;
+			CameraXposition[1] = SpotCam[CurrentSplineCamera].x;
+			CameraYposition[1] = SpotCam[CurrentSplineCamera].y;
+			CameraZposition[1] = SpotCam[CurrentSplineCamera].z;
+			CameraXtarget[1] = SpotCam[CurrentSplineCamera].tx;
+			CameraYtarget[1] = SpotCam[CurrentSplineCamera].ty;
+			CameraZtarget[1] = SpotCam[CurrentSplineCamera].tz;
 			CameraRoll[1] = SpotCam[CurrentSplineCamera].roll;
 			CameraFOV[1] = SpotCam[CurrentSplineCamera].fov;
 			CameraSpeed[1] = SpotCam[CurrentSplineCamera].speed;
@@ -222,8 +238,12 @@ void InitializeSpotCam(short sequenceID)
 				if (LastCamera < CurrentSplineCamera)
 					cn = FirstCamera;
 
-				CameraPosition[sp + 2] = SpotCam[cn].Position;
-				CameraPositionTarget[sp + 2] = SpotCam[cn].PositionTarget;
+				CameraXposition[sp + 2] = SpotCam[cn].x;
+				CameraYposition[sp + 2] = SpotCam[cn].y;
+				CameraZposition[sp + 2] = SpotCam[cn].z;
+				CameraXtarget[sp + 2] = SpotCam[cn].tx;
+				CameraYtarget[sp + 2] = SpotCam[cn].ty;
+				CameraZtarget[sp + 2] = SpotCam[cn].tz;
 				CameraRoll[sp + 2] = SpotCam[cn].roll;
 				CameraFOV[sp + 2] = SpotCam[cn].fov;
 				CameraSpeed[sp + 2] = SpotCam[cn].speed;
@@ -236,30 +256,42 @@ void InitializeSpotCam(short sequenceID)
 			if (CurrentSplineCamera > LastCamera)
 				CurrentSplineCamera = FirstCamera;
 
-			if (spotCamPtr->flags & SCF_ACTIVATE_HEAVY_TRIGGERS)
+			if (spotcam->flags & SCF_ACTIVATE_HEAVY_TRIGGERS)
 				CheckTrigger = true;
 
-			if (spotCamPtr->flags & SCF_HIDE_LARA)
+			if (spotcam->flags & SCF_HIDE_LARA)
 				SpotcamDontDrawLara = true;
 		}
 		else
 		{
 			int cn = CurrentSplineCamera;
 
-			CameraPosition[1] = InitialCameraPosition;
-			CameraPositionTarget[1] = InitialCameraTarget;
+			CameraXposition[1] = InitialCameraPosition.x;
+			CameraYposition[1] = InitialCameraPosition.y;
+			CameraZposition[1] = InitialCameraPosition.z;
+			CameraXtarget[1] = InitialCameraTarget.x;
+			CameraYtarget[1] = InitialCameraTarget.y;
+			CameraZtarget[1] = InitialCameraTarget.z;
 			CameraFOV[1] = CurrentFOV;
 			CameraRoll[1] = 0;
-			CameraSpeed[1] = spotCamPtr->speed;
+			CameraSpeed[1] = spotcam->speed;
 
-			CameraPosition[2] = InitialCameraPosition;
-			CameraPositionTarget[2] = InitialCameraTarget;
+			CameraXposition[2] = InitialCameraPosition.x;
+			CameraYposition[2] = InitialCameraPosition.y;
+			CameraZposition[2] = InitialCameraPosition.z;
+			CameraXtarget[2] = InitialCameraTarget.x;
+			CameraYtarget[2] = InitialCameraTarget.y;
+			CameraZtarget[2] = InitialCameraTarget.z;
 			CameraFOV[2] = CurrentFOV;
 			CameraRoll[2] = 0;
-			CameraSpeed[2] = spotCamPtr->speed;
+			CameraSpeed[2] = spotcam->speed;
 
-			CameraPosition[3] = SpotCam[CurrentSplineCamera].Position;
-			CameraPositionTarget[3] = SpotCam[CurrentSplineCamera].PositionTarget;
+			CameraXposition[3] = SpotCam[CurrentSplineCamera].x;
+			CameraYposition[3] = SpotCam[CurrentSplineCamera].y;
+			CameraZposition[3] = SpotCam[CurrentSplineCamera].z;
+			CameraXtarget[3] = SpotCam[CurrentSplineCamera].tx;
+			CameraYtarget[3] = SpotCam[CurrentSplineCamera].ty;
+			CameraZtarget[3] = SpotCam[CurrentSplineCamera].tz;
 			CameraRoll[3] = SpotCam[CurrentSplineCamera].roll;
 			CameraFOV[3] = SpotCam[CurrentSplineCamera].fov;
 			CameraSpeed[3] = SpotCam[CurrentSplineCamera].speed;
@@ -271,8 +303,13 @@ void InitializeSpotCam(short sequenceID)
 			if (LastCamera < cn)
 				cn = FirstCamera;
 
-			CameraPosition[4] = SpotCam[cn].Position;
-			CameraPositionTarget[4] = SpotCam[cn].PositionTarget;
+			CameraXposition[4] = SpotCam[cn].x;
+			CameraYposition[4] = SpotCam[cn].y;
+			CameraZposition[4] = SpotCam[cn].z;
+
+			CameraXtarget[4] = SpotCam[cn].tx;
+			CameraYtarget[4] = SpotCam[cn].ty;
+			CameraZtarget[4] = SpotCam[cn].tz;
 
 			CameraRoll[4] = SpotCam[cn].roll;
 			CameraFOV[4] = SpotCam[cn].fov;
@@ -280,13 +317,42 @@ void InitializeSpotCam(short sequenceID)
 		}
 	}
 
-	if (spotCamPtr->flags & SCF_HIDE_LARA)
+	if (spotcam->flags & SCF_HIDE_LARA)
 		SpotcamDontDrawLara = true;
 }
 
 void CalculateSpotCameras()
 {
-	auto backup = CAMERA_INFO{};
+	int cpx; // stack offset -96
+	int cpy; // stack offset -92
+	int cpz; // stack offset -88
+	int ctx; // stack offset -84
+	int cty; // stack offset -80
+	int ctz; // stack offset -76
+	int cspeed; // stack offset -72
+	int cfov; // stack offset -68
+	int croll; // stack offset -64
+	SPOTCAM* s; // stack offset -60
+	short spline_cnt; // $s3
+	int dx; // $v1
+	int dy; // $s0
+	int dz; // $s1
+
+	//{ // line 76, offset 0x38114
+	int sp; // $s2
+	int cp; // $fp
+	int clen; // $s4
+	int tlen; // $v1
+	int cx; // $s1
+	int cy; // $s0
+	int cz; // $v0
+	int lx; // stack offset -56
+	int lz; // stack offset -52
+	int ly; // stack offset -48
+	int cn; // $s0
+
+
+	CAMERA_INFO backup;
 
 	if (Lara.Control.IsLocked)
 	{
@@ -294,21 +360,22 @@ void CalculateSpotCameras()
 		Lara.Status.Air = LaraAir;
 	}
 
-	auto* s = &SpotCam[FirstCamera];
-	int splineCount = 4;
+	s = &SpotCam[FirstCamera];
+	spline_cnt = 4;
 
 	if (s->flags & SCF_TRACKING_CAM)
-		splineCount = CurrentCameraCnt + 2;
+		spline_cnt = CurrentCameraCnt + 2;
 
-	int cpx = Spline(CurrentSplinePosition, &CameraPosition[1].x, splineCount);
-	int cpy = Spline(CurrentSplinePosition, &CameraPosition[1].y, splineCount);
-	int cpz = Spline(CurrentSplinePosition, &CameraPosition[1].z, splineCount);
-	int ctx = Spline(CurrentSplinePosition, &CameraPositionTarget[1].x, splineCount);
-	int cty = Spline(CurrentSplinePosition, &CameraPositionTarget[1].y, splineCount);
-	int ctz = Spline(CurrentSplinePosition, &CameraPositionTarget[1].z, splineCount);
-	int cspeed = Spline(CurrentSplinePosition, &CameraSpeed[1], splineCount);
-	int croll = Spline(CurrentSplinePosition, &CameraRoll[1], splineCount);
-	int cfov = Spline(CurrentSplinePosition, &CameraFOV[1], splineCount);
+	//loc_37F64
+	cpx = Spline(CurrentSplinePosition, &CameraXposition[1], spline_cnt);
+	cpy = Spline(CurrentSplinePosition, &CameraYposition[1], spline_cnt);
+	cpz = Spline(CurrentSplinePosition, &CameraZposition[1], spline_cnt);
+	ctx = Spline(CurrentSplinePosition, &CameraXtarget[1], spline_cnt);
+	cty = Spline(CurrentSplinePosition, &CameraYtarget[1], spline_cnt);
+	ctz = Spline(CurrentSplinePosition, &CameraZtarget[1], spline_cnt);
+	cspeed = Spline(CurrentSplinePosition, &CameraSpeed[1], spline_cnt);
+	croll = Spline(CurrentSplinePosition, &CameraRoll[1], spline_cnt);
+	cfov = Spline(CurrentSplinePosition, &CameraFOV[1], spline_cnt);
 
 	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_IN) &&
 		CameraFade != CurrentSplineCamera)
@@ -324,17 +391,17 @@ void CalculateSpotCameras()
 		CameraFade = CurrentSplineCamera;
 	}
 
-	int sp = 0;
-	int tlen = 0;
-	int clen = 0;
-	int cp = 0;
+	sp = 0;
+	tlen = 0;
+	clen = 0;
+	cp = 0;
 	int temp = 0x2000;
 
 	if (s->flags & SCF_TRACKING_CAM)
 	{
-		int lx = LaraItem->Pose.Position.x;
-		int ly = LaraItem->Pose.Position.y;
-		int lz = LaraItem->Pose.Position.z;
+		lx = LaraItem->Pose.Position.x;
+		ly = LaraItem->Pose.Position.y;
+		lz = LaraItem->Pose.Position.z;
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -342,13 +409,13 @@ void CalculateSpotCameras()
 
 			for (int j = 0; j < 8; j++)
 			{
-				int cx = Spline(sp, &CameraPosition[1].x, splineCount);
-				int cy = Spline(sp, &CameraPosition[1].y, splineCount);
-				int cz = Spline(sp, &CameraPosition[1].z, splineCount);
+				cx = Spline(sp, &CameraXposition[1], spline_cnt);
+				cy = Spline(sp, &CameraYposition[1], spline_cnt);
+				cz = Spline(sp, &CameraZposition[1], spline_cnt);
 
-				int dx = SQUARE(cx - lx);
-				int dy = SQUARE(cy - ly);
-				int dz = SQUARE(cz - lz);
+				dx = SQUARE(cx - lx);
+				dy = SQUARE(cy - ly);
+				dz = SQUARE(cz - lz);
 
 				tlen = sqrt(dx + dy + dz);
 
@@ -380,23 +447,19 @@ void CalculateSpotCameras()
 		}
 
 		if (CurrentSplinePosition > 0x10000)
-		{
 			CurrentSplinePosition = 0x10000;
-		}
 		else if (CurrentSplinePosition < 0)
-		{
 			CurrentSplinePosition = 0;
-		}
 	}
 	else if (!SpotcamTimer)
-	{
 		CurrentSplinePosition += cspeed;
-	}
 
-	if (!IsHeld(In::Look))
+	bool lookPressed = (IsHeld(In::Look)) != 0;
+
+	if (!lookPressed)
 		SpotCamFirstLook = false;
 
-	if ((s->flags & SCF_DISABLE_BREAKOUT) || !IsHeld(In::Look))
+	if ((s->flags & SCF_DISABLE_BREAKOUT) || !lookPressed)
 	{
 		Camera.Position.x = cpx;
 		Camera.Position.y = cpy;
@@ -479,15 +542,10 @@ void CalculateSpotCameras()
 			{
 				CurrentSplinePosition = 0;
 
-				int cn = 0;
 				if (CurrentSplineCamera != FirstCamera)
-				{
 					cn = CurrentSplineCamera - 1;
-				}
 				else
-				{
 					cn = LastCamera;
-				}
 
 				sp = 1;
 
@@ -514,8 +572,12 @@ void CalculateSpotCameras()
 					{
 						cn = FirstCamera + SpotCam[CurrentSplineCamera].timer;
 
-						CameraPosition[1] = SpotCam[cn].Position;
-						CameraPositionTarget[1] = SpotCam[cn].PositionTarget;
+						CameraXposition[1] = SpotCam[cn].x;
+						CameraYposition[1] = SpotCam[cn].y;
+						CameraZposition[1] = SpotCam[cn].z;
+						CameraXtarget[1] = SpotCam[cn].tx;
+						CameraYtarget[1] = SpotCam[cn].ty;
+						CameraZtarget[1] = SpotCam[cn].tz;
 						CameraRoll[1] = SpotCam[cn].roll;
 						CameraFOV[1] = SpotCam[cn].fov;
 						CameraSpeed[1] = SpotCam[cn].speed;
@@ -525,8 +587,12 @@ void CalculateSpotCameras()
 
 					sp = sp2 + 1;
 
-					CameraPosition[sp] = SpotCam[cn].Position;
-					CameraPositionTarget[sp] = SpotCam[cn].PositionTarget;
+					CameraXposition[sp] = SpotCam[cn].x;
+					CameraYposition[sp] = SpotCam[cn].y;
+					CameraZposition[sp] = SpotCam[cn].z;
+					CameraXtarget[sp] = SpotCam[cn].tx;
+					CameraYtarget[sp] = SpotCam[cn].ty;
+					CameraZtarget[sp] = SpotCam[cn].tz;
 					CameraRoll[sp] = SpotCam[cn].roll;
 					CameraFOV[sp] = SpotCam[cn].fov;
 					CameraSpeed[sp] = SpotCam[cn].speed;
@@ -548,8 +614,12 @@ void CalculateSpotCameras()
 								cn = LastCamera;
 						}
 
-						CameraPosition[sp + 1] = SpotCam[cn].Position;
-						CameraPositionTarget[sp + 1] = SpotCam[cn].PositionTarget;
+						CameraXposition[sp + 1] = SpotCam[cn].x;
+						CameraYposition[sp + 1] = SpotCam[cn].y;
+						CameraZposition[sp + 1] = SpotCam[cn].z;
+						CameraXtarget[sp + 1] = SpotCam[cn].tx;
+						CameraYtarget[sp + 1] = SpotCam[cn].ty;
+						CameraZtarget[sp + 1] = SpotCam[cn].tz;
 						CameraRoll[sp + 1] = SpotCam[cn].roll;
 						CameraFOV[sp + 1] = SpotCam[cn].fov;
 						CameraSpeed[sp + 1] = SpotCam[cn].speed;
@@ -617,14 +687,22 @@ void CalculateSpotCameras()
 				}
 				else
 				{
-					CameraPosition[1] = SpotCam[CurrentSplineCamera - 1].Position;
-					CameraPositionTarget[1] = SpotCam[CurrentSplineCamera - 1].PositionTarget;
+					CameraXposition[1] = SpotCam[CurrentSplineCamera - 1].x;
+					CameraYposition[1] = SpotCam[CurrentSplineCamera - 1].y;
+					CameraZposition[1] = SpotCam[CurrentSplineCamera - 1].z;
+					CameraXtarget[1] = SpotCam[CurrentSplineCamera - 1].tx;
+					CameraYtarget[1] = SpotCam[CurrentSplineCamera - 1].ty;
+					CameraZtarget[1] = SpotCam[CurrentSplineCamera - 1].tz;
 					CameraRoll[1] = SpotCam[CurrentSplineCamera - 1].roll;
 					CameraFOV[1] = SpotCam[CurrentSplineCamera - 1].fov;
 					CameraSpeed[1] = SpotCam[CurrentSplineCamera - 1].speed;
 
-					CameraPosition[2] = SpotCam[CurrentSplineCamera - 1].Position;
-					CameraPositionTarget[2] = SpotCam[CurrentSplineCamera - 1].PositionTarget;
+					CameraXposition[2] = SpotCam[CurrentSplineCamera - 1].x;
+					CameraYposition[2] = SpotCam[CurrentSplineCamera - 1].y;
+					CameraZposition[2] = SpotCam[CurrentSplineCamera - 1].z;
+					CameraXtarget[2] = SpotCam[CurrentSplineCamera - 1].tx;
+					CameraYtarget[2] = SpotCam[CurrentSplineCamera - 1].ty;
+					CameraZtarget[2] = SpotCam[CurrentSplineCamera - 1].tz;
 					CameraRoll[2] = SpotCam[CurrentSplineCamera - 1].roll;
 					CameraFOV[2] = SpotCam[CurrentSplineCamera - 1].fov;
 					CameraSpeed[2] = SpotCam[CurrentSplineCamera - 1].speed;
@@ -642,17 +720,30 @@ void CalculateSpotCameras()
 					CameraRoll[3] = 0;
 					CameraSpeed[2] = CameraSpeed[1];
 
-					InitialCameraPosition = Camera.Position;
-					InitialCameraTarget = Camera.LookAt;
+					InitialCameraPosition.x = Camera.Position.x;
+					InitialCameraPosition.y = Camera.Position.y;
+					InitialCameraPosition.z = Camera.Position.z;
 
-					CameraPosition[3] = Camera.Position;
-					CameraPositionTarget[3] = Camera.LookAt;
+					InitialCameraTarget.x = Camera.LookAt.x;
+					InitialCameraTarget.y = Camera.LookAt.y;
+					InitialCameraTarget.z = Camera.LookAt.z;
+
+					CameraXposition[3] = Camera.Position.x;
+					CameraYposition[3] = Camera.Position.y;
+					CameraZposition[3] = Camera.Position.z;
+					CameraXtarget[3] = Camera.LookAt.x;
+					CameraYtarget[3] = Camera.LookAt.y;
+					CameraZtarget[3] = Camera.LookAt.z;
 					CameraFOV[3] = LastFOV;
 					CameraSpeed[3] = CameraSpeed[2];
 					CameraRoll[3] = 0;
 
-					CameraPosition[4] = Camera.Position;
-					CameraPositionTarget[4] = Camera.LookAt;
+					CameraXposition[4] = Camera.Position.x;
+					CameraYposition[4] = Camera.Position.y;
+					CameraZposition[4] = Camera.Position.z;
+					CameraXtarget[4] = Camera.LookAt.x;
+					CameraYtarget[4] = Camera.LookAt.y;
+					CameraZtarget[4] = Camera.LookAt.z;
 					CameraFOV[4] = LastFOV;
 					CameraSpeed[4] = CameraSpeed[2] >> 1;
 					CameraRoll[4] = 0;

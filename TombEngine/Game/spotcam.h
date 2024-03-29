@@ -2,20 +2,18 @@
 #include "Math/Math.h"
 #include "Specific/clock.h"
 
-using namespace TEN::Math;
-
-class Vector3i;
-
 constexpr auto MAX_SPOTCAMS = 256;
 constexpr auto SPOTCAM_CINEMATIC_BARS_HEIGHT = 1.0f / 16;
 constexpr auto SPOTCAM_CINEMATIC_BARS_SPEED = 1.0f / FPS;
 
-// TODO: Game loads spot cameras in chunks, therefore member ordering and size must remain the same.
 struct SPOTCAM
 {
-	Vector3i Position		= Vector3i::Zero;
-	Vector3i PositionTarget = Vector3i::Zero;
-	
+	int x;
+	int y;
+	int z;
+	int tx;
+	int ty;
+	int tz;
 	unsigned char sequence;
 	unsigned char camera;
 	short fov;
