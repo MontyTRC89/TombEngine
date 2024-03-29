@@ -45,7 +45,7 @@ namespace TEN::Scripting::View
 
 	static bool FadeOutComplete()
 	{
-		return ScreenFadeCurrent == 0.0f;
+		return g_ScreenEffect.ScreenFadeCurrent == 0.0f;
 	}
 
 	static void SetCineBars(TypeOrNil<float> height, TypeOrNil<float> speed)

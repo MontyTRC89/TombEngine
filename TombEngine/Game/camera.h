@@ -115,31 +115,31 @@ struct CAMERA_INFO
 	bool IsControllingTankCamera = false;
 };
 
-struct ObjectCameraInfo
+struct ScreenEffectData
 {
-	GameVector LastAngle;
-	bool ItemCameraOn;
+	bool  ScreenFadedOut	= false;
+	bool  ScreenFading		= false;
+	float ScreenFadeSpeed	= 0.0f;
+	float ScreenFadeStart	= 0.0f;
+	float ScreenFadeEnd		= 0.0f;
+	float ScreenFadeCurrent = 0.0f;
+
+	float CinematicBarsHeight			 = 0.0f;
+	float CinematicBarsDestinationHeight = 0.0f;
+	float CinematicBarsSpeed			 = 0.0f;
 };
 
+constexpr auto DEFAULT_FOV		 = 80.0f;
 constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
-constexpr auto DEFAULT_FOV = 80.0f;
 
-extern CAMERA_INFO Camera;
+extern CAMERA_INFO		Camera;
+extern ScreenEffectData g_ScreenEffect;
+
 extern GameVector ForcedFixedCamera;
-extern int UseForcedFixedCamera;
+extern bool UseForcedFixedCamera;
 extern CameraType BinocularOldCamera;
 extern short CurrentFOV;
 extern short LastFOV;
-
-extern bool  ScreenFadedOut;
-extern bool  ScreenFading;
-extern float ScreenFadeSpeed;
-extern float ScreenFadeStart;
-extern float ScreenFadeEnd;
-extern float ScreenFadeCurrent;
-extern float CinematicBarsDestinationHeight;
-extern float CinematicBarsHeight;
-extern float CinematicBarsSpeed;
 
 std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, int push, bool yFirst);
 

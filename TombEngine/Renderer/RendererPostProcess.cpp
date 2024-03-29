@@ -14,8 +14,8 @@ namespace TEN::Renderer
 
 		_stPostProcessBuffer.ViewportWidth = _screenWidth;
 		_stPostProcessBuffer.ViewportHeight = _screenHeight;
-		_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
-		_stPostProcessBuffer.CinematicBarsHeight = Smoothstep(CinematicBarsHeight) * SPOTCAM_CINEMATIC_BARS_HEIGHT;
+		_stPostProcessBuffer.ScreenFadeFactor = g_ScreenEffect.ScreenFadeCurrent;
+		_stPostProcessBuffer.CinematicBarsHeight = Smoothstep(g_ScreenEffect.CinematicBarsHeight) * SPOTCAM_CINEMATIC_BARS_HEIGHT;
 		_stPostProcessBuffer.EffectStrength = _postProcessStrength;
 		_stPostProcessBuffer.Tint = _postProcessTint;
 		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());

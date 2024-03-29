@@ -76,7 +76,7 @@ namespace TEN::Hud
 	void StatusBarsController::Draw(const ItemInfo& item) const
 	{
 		// Avoid drawing in title level and during cutscenes.
-		if (CurrentLevel == 0 || CinematicBarsHeight > 0)
+		if (CurrentLevel == 0 || g_ScreenEffect.CinematicBarsHeight > 0)
 			return;
 
 		const auto& player = GetLaraInfo(item);

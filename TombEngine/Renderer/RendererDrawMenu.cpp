@@ -1130,7 +1130,7 @@ namespace TEN::Renderer
 				rect.bottom = logoBottom * scale;
 
 				_spriteBatch->Begin(SpriteSortMode_BackToFront, _renderStates->NonPremultiplied());
-				_spriteBatch->Draw(_logo.ShaderResourceView.Get(), rect, Vector4::One * ScreenFadeCurrent);
+				_spriteBatch->Draw(_logo.ShaderResourceView.Get(), rect, Vector4::One * g_ScreenEffect.ScreenFadeCurrent);
 				_spriteBatch->End();
 			}
 
@@ -1211,11 +1211,9 @@ namespace TEN::Renderer
 
 			// Draw the full screen background
 			if (_loadingScreenTexture.Texture)
-				DrawFullScreenQuad(
-					_loadingScreenTexture.ShaderResourceView.Get(),
-					Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
+				DrawFullScreenQuad(_loadingScreenTexture.ShaderResourceView.Get(), Vector3(g_ScreenEffect.ScreenFadeCurrent));
 
-			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
+			if (g_ScreenEffect.ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
 				DrawLoadingBar(percentage);
 
 			_swapChain->Present(0, 0);
@@ -1224,7 +1222,7 @@ namespace TEN::Renderer
 			Synchronize();
 			UpdateFadeScreenAndCinematicBars();
 
-		} while (ScreenFading || !ScreenFadedOut);
+		} while (g_ScreenEffect.ScreenFading || !g_ScreenEffect.ScreenFadedOut);
 	}
 
 	void Renderer::RenderInventory()

@@ -52,7 +52,15 @@ struct OLD_CAMERA
 	int TargetState = 0;
 };
 
-CAMERA_INFO Camera;
+struct ObjectCameraInfo
+{
+	GameVector LastAngle;
+	bool ItemCameraOn;
+};
+
+CAMERA_INFO		 Camera;
+ScreenEffectData g_ScreenEffect;
+
 OLD_CAMERA OldCam;
 GameVector LastTarget;
 
@@ -62,7 +70,7 @@ int LastIdealRoomNumber;
 int TargetSnaps = 0;
 ObjectCameraInfo ItemCamera;
 GameVector ForcedFixedCamera;
-int UseForcedFixedCamera;
+bool UseForcedFixedCamera;
 
 CameraType BinocularOldCamera;
 
@@ -71,17 +79,6 @@ short LastFOV;
 
 int RumbleTimer = 0;
 int RumbleCounter = 0;
-
-bool  ScreenFadedOut = false;
-bool  ScreenFading = false;
-float ScreenFadeSpeed = 0;
-float ScreenFadeStart = 0;
-float ScreenFadeEnd = 0;
-float ScreenFadeCurrent = 0;
-
-float CinematicBarsHeight = 0;
-float CinematicBarsDestinationHeight = 0;
-float CinematicBarsSpeed = 0;
 
 // NOTE: Function label comments will be a temporary reference until a camera class
 // is created to keep them neatly organised as private methods. -- Sezz 2024.03.13
@@ -446,7 +443,7 @@ void InitializeCamera()
 
 	AlterFOV(ANGLE(DEFAULT_FOV));
 
-	UseForcedFixedCamera = 0;
+	UseForcedFixedCamera = false;
 	CalculateCamera(*LaraItem, LaraCollision);
 
 	// Fade in screen.
@@ -1229,7 +1226,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 	if (ItemCamera.ItemCameraOn)
 		return;
 
-	if (UseForcedFixedCamera != 0)
+	if (UseForcedFixedCamera)
 	{
 		Camera.type = CameraType::Fixed;
 		if (Camera.oldType != CameraType::Fixed)
@@ -1507,79 +1504,79 @@ void RumbleScreen()
 
 void SetScreenFadeOut(float speed, bool force)
 {
-	if (ScreenFading && !force)
+	if (g_ScreenEffect.ScreenFading && !force)
 		return;
 
-	ScreenFading = true;
-	ScreenFadeStart = 1.0f;
-	ScreenFadeEnd = 0;
-	ScreenFadeSpeed = speed;
-	ScreenFadeCurrent = ScreenFadeStart;
+	g_ScreenEffect.ScreenFading = true;
+	g_ScreenEffect.ScreenFadeStart = 1.0f;
+	g_ScreenEffect.ScreenFadeEnd = 0;
+	g_ScreenEffect.ScreenFadeSpeed = speed;
+	g_ScreenEffect.ScreenFadeCurrent = g_ScreenEffect.ScreenFadeStart;
 }
 
 void SetScreenFadeIn(float speed, bool force)
 {
-	if (ScreenFading && !force)
+	if (g_ScreenEffect.ScreenFading && !force)
 		return;
 
-	ScreenFading = true;
-	ScreenFadeStart = 0.0f;
-	ScreenFadeEnd = 1.0f;
-	ScreenFadeSpeed = speed;
-	ScreenFadeCurrent = ScreenFadeStart;
+	g_ScreenEffect.ScreenFading = true;
+	g_ScreenEffect.ScreenFadeStart = 0.0f;
+	g_ScreenEffect.ScreenFadeEnd = 1.0f;
+	g_ScreenEffect.ScreenFadeSpeed = speed;
+	g_ScreenEffect.ScreenFadeCurrent = g_ScreenEffect.ScreenFadeStart;
 }
 
 void SetCinematicBars(float height, float speed)
 {
-	CinematicBarsDestinationHeight = height;
-	CinematicBarsSpeed = speed;
+	g_ScreenEffect.CinematicBarsDestinationHeight = height;
+	g_ScreenEffect.CinematicBarsSpeed = speed;
 }
 
 void ClearCinematicBars()
 {
-	CinematicBarsHeight = 0.0f;
-	CinematicBarsDestinationHeight = 0.0f;
-	CinematicBarsSpeed = 0.0f;
+	g_ScreenEffect.CinematicBarsHeight = 0.0f;
+	g_ScreenEffect.CinematicBarsDestinationHeight = 0.0f;
+	g_ScreenEffect.CinematicBarsSpeed = 0.0f;
 }
 
 void UpdateFadeScreenAndCinematicBars()
 {
-	if (CinematicBarsDestinationHeight < CinematicBarsHeight)
+	if (g_ScreenEffect.CinematicBarsDestinationHeight < g_ScreenEffect.CinematicBarsHeight)
 	{
-		CinematicBarsHeight -= CinematicBarsSpeed;
-		if (CinematicBarsDestinationHeight > CinematicBarsHeight)
-			CinematicBarsHeight = CinematicBarsDestinationHeight;
+		g_ScreenEffect.CinematicBarsHeight -= g_ScreenEffect.CinematicBarsSpeed;
+		if (g_ScreenEffect.CinematicBarsDestinationHeight > g_ScreenEffect.CinematicBarsHeight)
+			g_ScreenEffect.CinematicBarsHeight = g_ScreenEffect.CinematicBarsDestinationHeight;
 	}
-	else if (CinematicBarsDestinationHeight > CinematicBarsHeight)
+	else if (g_ScreenEffect.CinematicBarsDestinationHeight > g_ScreenEffect.CinematicBarsHeight)
 	{
-		CinematicBarsHeight += CinematicBarsSpeed;
-		if (CinematicBarsDestinationHeight < CinematicBarsHeight)
-			CinematicBarsHeight = CinematicBarsDestinationHeight;
+		g_ScreenEffect.CinematicBarsHeight += g_ScreenEffect.CinematicBarsSpeed;
+		if (g_ScreenEffect.CinematicBarsDestinationHeight < g_ScreenEffect.CinematicBarsHeight)
+			g_ScreenEffect.CinematicBarsHeight = g_ScreenEffect.CinematicBarsDestinationHeight;
 	}
 
-	int prevScreenFadeCurrent = ScreenFadeCurrent;
+	int prevScreenFadeCurrent = g_ScreenEffect.ScreenFadeCurrent;
 
-	if (ScreenFadeEnd != 0 && ScreenFadeEnd >= ScreenFadeCurrent)
+	if (g_ScreenEffect.ScreenFadeEnd != 0 && g_ScreenEffect.ScreenFadeEnd >= g_ScreenEffect.ScreenFadeCurrent)
 	{
-		ScreenFadeCurrent += ScreenFadeSpeed;
-		if (ScreenFadeCurrent > ScreenFadeEnd)
+		g_ScreenEffect.ScreenFadeCurrent += g_ScreenEffect.ScreenFadeSpeed;
+		if (g_ScreenEffect.ScreenFadeCurrent > g_ScreenEffect.ScreenFadeEnd)
 		{
-			ScreenFadeCurrent = ScreenFadeEnd;
-			if (prevScreenFadeCurrent >= ScreenFadeCurrent)
+			g_ScreenEffect.ScreenFadeCurrent = g_ScreenEffect.ScreenFadeEnd;
+			if (prevScreenFadeCurrent >= g_ScreenEffect.ScreenFadeCurrent)
 			{
-				ScreenFadedOut = true;
-				ScreenFading = false;
+				g_ScreenEffect.ScreenFadedOut = true;
+				g_ScreenEffect.ScreenFading = false;
 			}
 
 		}
 	}
-	else if (ScreenFadeEnd < ScreenFadeCurrent)
+	else if (g_ScreenEffect.ScreenFadeEnd < g_ScreenEffect.ScreenFadeCurrent)
 	{
-		ScreenFadeCurrent -= ScreenFadeSpeed;
-		if (ScreenFadeCurrent < ScreenFadeEnd)
+		g_ScreenEffect.ScreenFadeCurrent -= g_ScreenEffect.ScreenFadeSpeed;
+		if (g_ScreenEffect.ScreenFadeCurrent < g_ScreenEffect.ScreenFadeEnd)
 		{
-			ScreenFadeCurrent = ScreenFadeEnd;
-			ScreenFading = false;
+			g_ScreenEffect.ScreenFadeCurrent = g_ScreenEffect.ScreenFadeEnd;
+			g_ScreenEffect.ScreenFading = false;
 		}
 	}
 }

@@ -627,7 +627,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 {
 	auto result = GameStatus::Normal;
 
-	if (isTitle || ScreenFading)
+	if (isTitle || g_ScreenEffect.ScreenFading)
 		return result;
 
 	// Does the player want to enter inventory?
