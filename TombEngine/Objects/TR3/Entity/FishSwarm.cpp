@@ -30,6 +30,7 @@ using namespace TEN::Renderer;
 // ItemFlags[3] = Start OCB of AI_FOLLOW. NOTE: Cannot change.
 // ItemFlags[5] = Fish count.
 // ItemFlags[6] = Is patrolling.
+// ItemFlags[7] = Distance to player.
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -135,11 +136,9 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto& playerRoom = g_Level.Rooms[LaraItem->RoomNumber];
 
-		auto corpsePos = std::optional<Vector3>();
-
 		// Check if corpse is near.
 		// TODO: In future also check for other enemies like sharks or crocodile.
-		if (!corpsePos.has_value() && TestGlobalTimeInterval(FISH_UPDATE_INTERVAL_TIME))
+		if (!item.Timer && TestGlobalTimeInterval(FISH_UPDATE_INTERVAL_TIME))
 		{
 			float closestDist = INFINITY;
 			for (auto& targetItem : g_Level.Items)
@@ -156,7 +155,7 @@ namespace TEN::Entities::Creatures::TR3
 						targetItem.ItemFlags[1] == (int)CorpseFlag::Grounded &&
 						TestEnvironment(ENV_FLAG_WATER, targetItem.RoomNumber))
 					{
-						corpsePos = targetItem.Pose.Position.ToVector3();
+						item.Timer = 1;
 						closestDist = dist;
 						item.ItemFlags[1] = targetItem.Index; // Target corpse.
 					}
@@ -164,22 +163,22 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		if (ai.distance < SQUARE(BLOCK(3)) && TestEnvironment(ENV_FLAG_WATER, &playerRoom) &&
-			item.TriggerFlags < 0 && !corpsePos.has_value())
+		if (item.ItemFlags[7] < BLOCK(7) && TestEnvironment(ENV_FLAG_WATER, &playerRoom) &&
+			item.TriggerFlags < 0 && !item.Timer)
 		{
 			item.ItemFlags[1] = LaraItem->Index;
-			corpsePos = std::nullopt;
+			item.Timer = 0;
 			item.ItemFlags[2] = 0;
 		}
 		// Circle around leader item.
-		else if (!corpsePos.has_value())
+		else if (!item.Timer)
 		{
 			item.ItemFlags[1] = item.ItemFlags[0];
-			corpsePos = std::nullopt;
+			item.Timer = 0;
 		}
 
 		// Follow path.
-		if (item.AIBits && !corpsePos.has_value())
+		if (item.AIBits && !item.Timer)
 		{
 			FindAITargetObject(&creature, ID_AI_FOLLOW, item.ItemFlags[3] + item.ItemFlags[2], false);
 
@@ -193,7 +192,7 @@ namespace TEN::Entities::Creatures::TR3
 				item.ItemFlags[2] = 0;
 			}
 
-			corpsePos = std::nullopt;
+			item.Timer = 0;
 		}
 
 		for (auto& fish : FishSwarm)
@@ -312,6 +311,8 @@ namespace TEN::Entities::Creatures::TR3
 				float distToOtherFish = Vector3i::Distance(fish.Position, otherFish.Position);
 				float distToPlayer = Vector3i::Distance(fish.Position, LaraItem->Pose.Position);
 				float distToTarget = Vector3i::Distance(fish.Position, otherFish.PositionTarget);
+
+				leaderItem.ItemFlags[7] = distToPlayer;
 
 				// Update the index of the nearest fish to the target
 				if (distToTarget < minDistToTarget &&
