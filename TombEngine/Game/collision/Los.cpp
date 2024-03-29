@@ -70,14 +70,12 @@ namespace TEN::Collision::Los
 
 		// Calculate target.
 		auto target = Geometry::TranslatePoint(origin, dir, dist);
-		int targetRoomNumber = GetCollision(origin, originRoomNumber, dir, dist).RoomNumber;
 
 		// 1) Collect room LOS instance.
-		auto roomLos = GetRoomLos(origin, originRoomNumber, target, targetRoomNumber);
+		auto roomLos = GetRoomLos(origin, originRoomNumber, target);
 		if (roomLos.Intersect.has_value())
 		{
 			target = roomLos.Intersect->first;
-			targetRoomNumber = roomLos.Intersect->second;
 			dist = Vector3::Distance(origin, target);
 
 			losInstances.push_back(LosInstanceData{ {}, NO_VALUE, roomLos.Intersect->first, roomLos.Intersect->second, dist });
@@ -96,6 +94,7 @@ namespace TEN::Collision::Los
 					float intersectDist = 0.0f;
 					if (box.Intersects(origin, dir, intersectDist))
 					{
+						// TODO: Probe room number.
 						if (intersectDist <= dist)
 							losInstances.push_back(LosInstanceData{ itemPtr, NO_VALUE, Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
 					}
@@ -112,6 +111,7 @@ namespace TEN::Collision::Los
 						float intersectDist = 0.0f;
 						if (sphere.Intersects(origin, dir, intersectDist))
 						{
+							// TODO: Probe room number.
 							if (intersectDist <= dist)
 								losInstances.push_back(LosInstanceData{ itemPtr, i, Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
 						}
@@ -131,6 +131,7 @@ namespace TEN::Collision::Los
 				float intersectDist = 0.0f;
 				if (box.Intersects(origin, dir, intersectDist))
 				{
+					// TODO: Probe room number.
 					if (intersectDist <= dist)
 						losInstances.push_back(LosInstanceData{ staticPtr, NO_VALUE, Geometry::TranslatePoint(origin, dir, intersectDist), staticPtr->roomNumber, intersectDist });
 				}
@@ -149,11 +150,11 @@ namespace TEN::Collision::Los
 		return losInstances;
 	}
 
-	// TODO: Accurate room LOS. For now, it simply wraps legacy functions.
-	RoomLosData GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, int targetRoomNumber)
+	// TODO: Accurate room LOS. For now, simply wraps legacy functions.
+	RoomLosData GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
 	{
 		auto losOrigin = GameVector(origin, originRoomNumber);
-		auto losTarget = GameVector(target, targetRoomNumber);
+		auto losTarget = GameVector(target, originRoomNumber);
 
 		float dist = 0.0f;
 		auto roomNumbers = std::set<int>{};
@@ -173,9 +174,7 @@ namespace TEN::Collision::Los
 			auto dir = target - origin;
 			dir.Normalize();
 
-			auto closestIntersect = Geometry::TranslatePoint(origin, dir, dist);
-			int intersectRoomNumber = losTarget.RoomNumber;
-			intersect = std::pair(closestIntersect, intersectRoomNumber);
+			intersect = std::pair(Geometry::TranslatePoint(origin, dir, dist), losTarget.RoomNumber);
 		}
 
 		// Return room LOS.
@@ -271,10 +270,10 @@ namespace TEN::Collision::Los
 
 	std::pair<GameVector, GameVector> GetRayFrom2DPosition(const Vector2& screenPos)
 	{
-		auto pos = g_Renderer.GetRay(screenPos);
+		auto posPair = g_Renderer.GetRay(screenPos);
 
-		auto origin = GameVector(pos.first, Camera.RoomNumber);
-		auto target = GameVector(pos.second, Camera.RoomNumber);
+		auto origin = GameVector(posPair.first, Camera.RoomNumber);
+		auto target = GameVector(posPair.second, Camera.RoomNumber);
 
 		LOS(&origin, &target);
 		return std::pair<GameVector, GameVector>(origin, target);
