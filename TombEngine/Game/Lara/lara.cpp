@@ -340,9 +340,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool HandlePlayerWalkInteractionMovement(ItemInfo& playerItem)
+void HandlePlayerWalkInteractionMovement(ItemInfo& playerItem)
 {
-	constexpr auto VEL		 = 12.0f;
+	constexpr auto VEL		 = BLOCK(0.02f);
 	constexpr auto TURN_RATE = ANGLE(2.0f);
 
 	auto& player = GetLaraInfo(playerItem);
@@ -357,30 +357,11 @@ bool HandlePlayerWalkInteractionMovement(ItemInfo& playerItem)
 	auto pointColl = GetCollision(interactPos, playerItem.RoomNumber);
 	int relFloorHeight = abs(pointColl.Position.Floor - playerItem.Pose.Position.y);
 
-	// Test relative floor height.
+	// 1) Test relative floor height.
 	if (relFloorHeight > STEPUP_HEIGHT)
-		return false;
+		return;
 
-	// Calculate interaction position.
-	auto rotMatrix = interactable.Pose.Orientation.ToRotationMatrix();
-	auto relInteractPos = Vector3::Transform(player.Context.WalkInteraction.Basis->PosOffset.ToVector3(), rotMatrix);
-	auto interactPos = interactable.Pose.Position + Vector3i(relInteractPos);
-
-	auto interactOrient = interactable.Pose.Orientation + player.Context.WalkInteraction.Basis->OrientOffset;
-
-	// Translate.
-	float dist = Vector3i::Distance(playerItem.Pose.Position, interactPos);
-	if (VEL < dist)
-	{
-		auto deltaPos = interactable.Pose.Position - playerItem.Pose.Position;
-		playerItem.Pose.Position += deltaPos * (VEL / dist);
-	}
-	else
-	{
-		playerItem.Pose.Position = interactable.Pose.Position;
-	}
-
-	// Set new interaction.
+	// 2) Set new interaction.
 	if (!player.Control.IsMoving)
 	{
 		short headingAngle = Geometry::GetOrientToPoint(playerItem.Pose.Position.ToVector3(), interactable.Pose.Position.ToVector3()).y;
@@ -411,10 +392,28 @@ bool HandlePlayerWalkInteractionMovement(ItemInfo& playerItem)
 		player.Control.Count.PositionAdjust = 0;
 	}
 
-	// Rotate.
+	// 3) Translate.
+	float dist = Vector3i::Distance(playerItem.Pose.Position, interactPos);
+	if (VEL < dist)
+	{
+		auto deltaPos = interactable.Pose.Position - playerItem.Pose.Position;
+		playerItem.Pose.Position += deltaPos * (VEL / dist);
+	}
+	else
+	{
+		playerItem.Pose.Position = interactable.Pose.Position;
+	}
+
+	// Calculate interaction orientation.
+	auto interactOrient =  player.Context.WalkInteraction.Basis->OrientOffset.has_value() ?
+		(interactable.Pose.Orientation + *player.Context.WalkInteraction.Basis->OrientOffset) :
+		playerItem.Pose.Orientation;
+
+	// 4) Rotate.
 	playerItem.Pose.Orientation.InterpolateConstant(interactOrient, TURN_RATE);
 
-	return (playerItem.Pose == Pose(interactPos, interactOrient));
+	// 5) Set complete status.
+	player.Context.WalkInteraction.IsComplete = (playerItem.Pose == Pose(interactPos, interactOrient));
 }
 
 static void HandlePlayerWalkInteraction(ItemInfo& playerItem)
@@ -428,6 +427,7 @@ static void HandlePlayerWalkInteraction(ItemInfo& playerItem)
 		player.Context.WalkInteraction.Routine == nullptr)
 	{
 		player.Context.InteractedItem = NO_VALUE;
+		player.Context.WalkInteraction.IsComplete = false;
 		player.Context.WalkInteraction.Basis = std::nullopt;
 		player.Context.WalkInteraction.Routine = nullptr;
 		return;
@@ -437,13 +437,16 @@ static void HandlePlayerWalkInteraction(ItemInfo& playerItem)
 
 	//if (TestInteraction(playerItem, interactable, *player.Context.WalkInteraction.Basis))
 	{
-		if (HandlePlayerWalkInteractionMovement(playerItem))
+		HandlePlayerWalkInteractionMovement(playerItem);
+
+		if (player.Context.WalkInteraction.IsComplete)
 		{
 			player.Context.WalkInteraction.Routine(playerItem, interactable);
 			player.Control.IsMoving = false;
 			player.Control.HandStatus = HandStatus::Busy;
 
 			player.Context.InteractedItem = NO_VALUE;
+			player.Context.WalkInteraction.IsComplete = false;
 			player.Context.WalkInteraction.Basis = std::nullopt;
 			player.Context.WalkInteraction.Routine = nullptr;
 		}

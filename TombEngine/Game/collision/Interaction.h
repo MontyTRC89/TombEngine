@@ -19,14 +19,15 @@ namespace TEN::Collision::Interaction
 	struct InteractionBasis
 	{
 	public:
-		Vector3i			 PosOffset		  = Vector3i::Zero;
-		EulerAngles			 OrientOffset	  = EulerAngles::Identity;
-		BoundingOrientedBox	 Box			  = BoundingOrientedBox();
-		OrientConstraintPair OrientConstraint = OrientConstraintPair(EulerAngles::Identity, EulerAngles::Identity);
+		Vector3i				   PosOffset		= Vector3i::Zero;
+		std::optional<EulerAngles> OrientOffset		= std::nullopt;
+		BoundingOrientedBox		   Box				= BoundingOrientedBox();
+		OrientConstraintPair	   OrientConstraint = OrientConstraintPair(EulerAngles::Identity, EulerAngles::Identity);
 
-		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
+		InteractionBasis() {};
+		InteractionBasis(const Vector3i& posOffset, const std::optional<EulerAngles>& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
 		InteractionBasis(const Vector3i& posOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
-		InteractionBasis(const EulerAngles& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
+		InteractionBasis(const std::optional<EulerAngles>& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
 		InteractionBasis(const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint);
 
 		// Deprecated constructors.

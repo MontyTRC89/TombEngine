@@ -16,7 +16,7 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Interaction
 {
-	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint)
+	InteractionBasis::InteractionBasis(const Vector3i& posOffset, const std::optional<EulerAngles>& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint)
 	{
 		PosOffset = posOffset;
 		OrientOffset = orientOffset;
@@ -31,7 +31,7 @@ namespace TEN::Collision::Interaction
 		OrientConstraint = orientConstraint;
 	}
 
-	InteractionBasis::InteractionBasis(const EulerAngles& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint)
+	InteractionBasis::InteractionBasis(const std::optional<EulerAngles>& orientOffset, const BoundingOrientedBox& box, const OrientConstraintPair& orientConstraint)
 	{
 		OrientOffset = orientOffset;
 		Box = box;
@@ -137,7 +137,7 @@ namespace TEN::Collision::Interaction
 
 		// Calculate targets.
 		auto targetPos = Geometry::TranslatePoint(interactable.Pose.Position, interactable.Pose.Orientation, relPosOffset);
-		auto targetOrient = interactable.Pose.Orientation + relOrientOffset;
+		auto targetOrient = relOrientOffset.has_value() ? (interactable.Pose.Orientation + *relOrientOffset) : interactor.Pose.Orientation;
 
 		// Calculate absolute offsets.
 		auto absPosOffset = (targetPos - interactor.Pose.Position).ToVector3();

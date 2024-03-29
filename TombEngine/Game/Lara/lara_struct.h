@@ -1257,6 +1257,8 @@ struct WeaponControlData
 // NOTE: Parent item referenced as interactable.
 struct PlayerWalkInteractionData
 {
+	bool IsComplete = false;
+
 	std::optional<InteractionBasis> Basis	= std::nullopt;
 	InteractionRoutine				Routine = nullptr;
 };
