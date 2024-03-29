@@ -823,7 +823,7 @@ void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, s
 	int sign = copysign(1, axisCoeff);
 	maxAngle *= axisCoeff;
 
-	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+	if (coll->CollisionType == CollisionType::Left || coll->CollisionType == CollisionType::Right)
 		maxAngle *= 0.6f;
 
 	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngle - item->Pose.Orientation.z) / 3) * sign;

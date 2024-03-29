@@ -54,6 +54,7 @@ int NumberSpotcams;
 
 bool CheckTrigger = false;
 bool UseSpotCam = false;
+bool PrevUseSpotCam = false;
 bool SpotcamDontDrawLara = false;
 bool SpotcamOverlay = false;
 
@@ -470,6 +471,10 @@ void CalculateSpotCameras()
 			Camera.LookAt.x = LaraItem->Pose.Position.x;
 			Camera.LookAt.y = LaraItem->Pose.Position.y;
 			Camera.LookAt.z = LaraItem->Pose.Position.z;
+
+			auto orient = Geometry::GetOrientToPoint(Camera.Position, Camera.LookAt);
+			Camera.actualAngle = orient.y;
+			Camera.actualElevation = orient.x;
 		}
 		else
 		{

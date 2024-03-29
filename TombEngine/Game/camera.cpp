@@ -355,6 +355,34 @@ static Vector3 GetCameraPlayerOffset(const ItemInfo& item, const CollisionInfo& 
 // CAMERA FUNCTIONS
 // ----------------
 
+void UpdatePlayerRefCameraOrient(ItemInfo& item)
+{
+	auto& player = GetLaraInfo(item);
+
+	float vel = Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length();
+
+	bool isSpotCameraSwitch = (UseSpotCam != PrevUseSpotCam);
+	bool isMoving = (GetMoveAxis() != Vector2::Zero || IsHeld(In::StepLeft) || IsHeld(In::StepRight) || vel != 0.0f);
+
+	if (isSpotCameraSwitch && isMoving)
+	{
+		player.Control.LockRefCameraOrient = true;
+	}
+	else if (!isMoving)
+	{
+		player.Control.LockRefCameraOrient = false;
+	}
+
+	if (!player.Control.LockRefCameraOrient)
+		player.Control.RefCameraOrient = EulerAngles(Camera.actualElevation, Camera.actualAngle, 0);
+
+	g_Renderer.PrintDebugMessage("%d", (int)UseSpotCam);
+	g_Renderer.PrintDebugMessage("%d", (int)Camera.type);
+	g_Renderer.PrintDebugMessage("%d", (int)player.Control.LockRefCameraOrient);
+	g_Renderer.PrintDebugMessage("%d", Camera.actualElevation);
+	g_Renderer.PrintDebugMessage("%d", Camera.actualAngle);
+}
+
 void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 {
 	constexpr auto DIST_COEFF = 0.5f;
@@ -1192,27 +1220,6 @@ void ConfirmCameraTargetPos()
 	}
 }
 
-static void UpdatePlayerRefCameraOrient(ItemInfo& item)
-{
-	auto& player = GetLaraInfo(item);
-
-	bool isFixedCameraSwitch = (Camera.type == CameraType::Fixed && (Camera.oldType == CameraType::Chase || Camera.oldType == CameraType::Combat)) ||
-							   ((Camera.type == CameraType::Chase || Camera.type == CameraType::Combat) && Camera.oldType == CameraType::Fixed);
-	bool hasMoveAction = (GetMoveAxis() != Vector2::Zero || IsHeld(In::StepLeft) || IsHeld(In::StepRight));
-
-	if (isFixedCameraSwitch && hasMoveAction)
-	{
-		player.Control.LockRefCameraOrient = true;
-	}
-	else if (!hasMoveAction)
-	{
-		player.Control.LockRefCameraOrient = false;
-	}
-
-	if (!player.Control.LockRefCameraOrient)
-		player.Control.RefCameraOrient = EulerAngles(Camera.actualElevation, Camera.actualAngle, 0);
-}
-
 void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 {
 	auto& player = GetLaraInfo(playerItem);
@@ -1453,8 +1460,6 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		Camera.flags = CameraFlag::None;
 		Camera.laraNode = NO_VALUE;
 	}
-
-	UpdatePlayerRefCameraOrient(playerItem);
 }
 
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, float radius)

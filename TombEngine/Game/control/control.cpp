@@ -140,6 +140,7 @@ GameStatus ControlPhase(int numFrames)
 
 	numFrames = std::clamp(numFrames, 0, 10);
 
+	PrevUseSpotCam = UseSpotCam;
 	if (TrackCameraInit)
 	{
 		UseSpotCam = false;
@@ -190,15 +191,14 @@ GameStatus ControlPhase(int numFrames)
 
 		if (UseSpotCam)
 		{
-			// Draw flyby cameras.
 			CalculateSpotCameras();
 		}
 		else
 		{
-			// Do the standard camera.
 			TrackCameraInit = false;
 			CalculateCamera(*LaraItem, LaraCollision);
 		}
+		UpdatePlayerRefCameraOrient(*LaraItem);
 
 		// Update oscillator seed.
 		Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
