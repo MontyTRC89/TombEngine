@@ -336,7 +336,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	SaveGame::Statistics.Game.Distance += (int)round(Vector3::Distance(prevPos.ToVector3(), item->Pose.Position.ToVector3()));
+	SaveGame::Statistics.Game.Distance += (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
 
 	if (DebugMode)
 	{
@@ -402,13 +402,9 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 			HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 	}
 
-	// Handle weapons.
 	HandleWeapon(*item);
-
-	// Handle breath.
 	LaraBreath(item);
 
-	// Test for flags and triggers.
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
 	TestVolumes(item->Index, &coll->Setup);
@@ -452,7 +448,8 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Control);
 
-	auto* level = g_GameFlow->GetLevel(CurrentLevel);
+	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
+	bool hasDivesuit = (level.GetLaraType() == LaraType::Divesuit);
 
 	// TODO: Subsuit gradually slows down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
@@ -460,7 +457,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
 		player.Control.TurnRate.y = 0;
 
-	if (level->GetLaraType() == LaraType::Divesuit)
+	if (hasDivesuit)
 		UpdateLaraSubsuitAngles(item);
 
 	// Reset lean.
@@ -479,7 +476,6 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, LARA_RADIUS);
-
 	HandleWeapon(*item);
 
 	ProcessSectorFlags(item);
@@ -524,7 +520,8 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Control);
 
-	auto* level = g_GameFlow->GetLevel(CurrentLevel);
+	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
+	bool hasDivesuit = (level.GetLaraType() == LaraType::Divesuit);
 
 	// TODO: Subsuit gradually slowed down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
@@ -532,30 +529,42 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	if (!(IsHeld(In::Left) || IsHeld(In::Right)))
 		player.Control.TurnRate.y = 0;
 
-	if (level->GetLaraType() == LaraType::Divesuit)
+	if (hasDivesuit)
 		UpdateLaraSubsuitAngles(item);
 
 	if (!player.Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))
 		ResetPlayerLean(item, 1 / 8.0f, true, false);
 
 	if (item->Pose.Orientation.x < -ANGLE(85.0f))
+	{
 		item->Pose.Orientation.x = -ANGLE(85.0f);
+	}
 	else if (item->Pose.Orientation.x > ANGLE(85.0f))
+	{
 		item->Pose.Orientation.x = ANGLE(85.0f);
+	}
 
-	if (level->GetLaraType() == LaraType::Divesuit)
+	if (hasDivesuit)
 	{
 		if (item->Pose.Orientation.z > ANGLE(44.0f))
+		{
 			item->Pose.Orientation.z = ANGLE(44.0f);
+		}
 		else if (item->Pose.Orientation.z < -ANGLE(44.0f))
+		{
 			item->Pose.Orientation.z = -ANGLE(44.0f);
+		}
 	}
 	else
 	{
 		if (item->Pose.Orientation.z > ANGLE(22.0f))
+		{
 			item->Pose.Orientation.z = ANGLE(22.0f);
+		}
 		else if (item->Pose.Orientation.z < -ANGLE(22.0f))
+		{
 			item->Pose.Orientation.z = -ANGLE(22.0f);
+		}
 	}
 
 	if (player.Context.WaterCurrentActive && player.Control.WaterStatus != WaterStatus::FlyCheat)
@@ -570,7 +579,6 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, 0);
-
 	HandleWeapon(*item);
 
 	ProcessSectorFlags(item);

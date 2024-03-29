@@ -499,6 +499,7 @@ void LoadCameras()
 
 	NumberSpotcams = ReadInt32();
 
+	// TODO: Read properly!
 	if (NumberSpotcams != 0)
 		ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
 

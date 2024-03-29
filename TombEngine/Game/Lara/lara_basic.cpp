@@ -291,7 +291,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CollisionType::Front)
 	{
 		HandlePlayerElevationChange(item, coll);
 		return;
@@ -487,7 +487,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CollisionType::Front)
 	{
 		HandlePlayerElevationChange(item, coll);
 		return;
@@ -2331,7 +2331,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 	if (TestAndDoLaraLadderClimb(item, coll))
 		return;
 
-	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CollisionType::Front)
 	{
 		HandlePlayerElevationChange(item, coll);
 		return;
@@ -2472,7 +2472,7 @@ void lara_col_sprint_slide(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CollisionType::Front)
 	{
 		HandlePlayerElevationChange(item, coll);
 		return;
