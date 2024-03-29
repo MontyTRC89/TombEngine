@@ -54,7 +54,6 @@ void InitializeLara(bool restore)
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
 	LaraItem->Data = &Lara;
-	Lara.Context = PlayerContext(*LaraItem, LaraCollision);
 
 	LaraItem->Collidable = false;
 

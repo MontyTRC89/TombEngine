@@ -127,62 +127,9 @@ namespace TEN::Collision::Interaction
 		return true;
 	}
 
-	static int GetPlayerAlignAnim(const Pose& poseFrom, const Pose& poseTo)
+	static void SetLatchInteraction(ItemInfo& interactor, ItemInfo& interactable, const InteractionBasis& basis, const InteractionRoutine& routine)
 	{
-		short headingAngle = Geometry::GetOrientToPoint(poseFrom.Position.ToVector3(), poseTo.Position.ToVector3()).y;
-		int cardinalDir = GetQuadrant(headingAngle - poseFrom.Orientation.y);
-
-		// Return alignment anim number.
-		switch (cardinalDir)
-		{
-		default:
-		case NORTH:
-			return LA_WALK;
-
-		case SOUTH:
-			return LA_WALK_BACK;
-
-		case EAST:
-			return LA_SIDESTEP_RIGHT;
-
-		case WEST:
-			return LA_SIDESTEP_LEFT;
-		}
-	}
-
-	void SetPlayerAlignAnim(ItemInfo& playerItem, const ItemInfo& interactable)
-	{
-		constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
-
-		auto& player = GetLaraInfo(playerItem);
-
-		// Check if already aligning.
-		if (player.Control.IsMoving)
-			return;
-
-		// Check water status.
-		if (player.Control.WaterStatus == WaterStatus::Underwater ||
-			player.Control.WaterStatus == WaterStatus::TreadWater)
-		{
-			return;
-		}
-
-		float dist = Vector3i::Distance(playerItem.Pose.Position, interactable.Pose.Position);
-		bool doAlignAnim = ((dist - LARA_ALIGN_VELOCITY) > (LARA_ALIGN_VELOCITY * ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD));
-
-		// Skip animating if very close to object.
-		if (!doAlignAnim)
-			return;
-
-		SetAnimation(&playerItem, GetPlayerAlignAnim(playerItem.Pose, interactable.Pose));
-		player.Control.HandStatus = HandStatus::Busy;
-		player.Control.IsMoving = true;
-		player.Control.Count.PositionAdjust = 0;
-	}
-	
-	static void SetEaseInteraction(ItemInfo& interactor, ItemInfo& interactable, const InteractionBasis& basis, const InteractionRoutine& routine)
-	{
-		constexpr auto OFFSET_BLEND_ALPHA = 0.25f;
+		constexpr auto OFFSET_BLEND_ALPHA = 0.2f;
 
 		// Calculate relative offsets.
 		auto relPosOffset = basis.PosOffset;// + extraPosOffset;
@@ -221,54 +168,49 @@ namespace TEN::Collision::Interaction
 		{
 			auto& player = GetLaraInfo(interactor);
 
+			// FAILSAFE.
+			if (player.Control.WaterStatus != WaterStatus::Dry && player.Control.WaterStatus != WaterStatus::Wade)
+			{
+				SetLatchInteraction(interactor, interactable, basis, routine);
+				TENLog("SetWalkInteraction(): player not grounded. Setting latch interaction instead.", LogLevel::Warning);
+				return;
+			}
+
 			player.Control.TurnRate = 0;
 			player.Control.HandStatus = HandStatus::Busy;
 			player.Context.InteractedItem = interactable.Index;
 			player.Context.WalkInteraction.Basis = basis;
 			player.Context.WalkInteraction.Routine = routine;
+			return;
 		}
-		else
-		{
-			TENLog("SetWalkInteraction(): non-player passed as interactor.", LogLevel::Warning);
-		}
-	}
 
-	// TODO: Move to some player file.
-	void HandlePlayerWalkInteraction(ItemInfo& playerItem, ItemInfo& interactable, const InteractionBasis& basis, const InteractionRoutine& routine)
-	{
-		auto& player = GetLaraInfo(playerItem);
-
-		if (TestInteraction(playerItem, interactable, basis))
-		{
-			if (MoveLaraPosition(basis.PosOffset, &interactable, &playerItem))
-			{
-				routine(playerItem, interactable);
-				player.Control.IsMoving = false;
-				player.Control.HandStatus = HandStatus::Busy;
-			}
-			else
-			{
-				player.Context.InteractedItem = interactable.Index;
-			}
-		}
-		else if (player.Control.IsMoving && player.Context.InteractedItem == interactable.Index)
-		{
-			player.Control.IsMoving = false;
-			player.Control.HandStatus = HandStatus::Free;
-		}
+		// FAILSAFE.
+		SetLatchInteraction(interactor, interactable, basis, routine);
+		TENLog("SetWalkInteraction(): non-player passed as interactor. Setting latch interaction instead.", LogLevel::Warning);
 	}
 
 	void SetInteraction(ItemInfo& interactor, ItemInfo& interactable, const InteractionBasis& basis, const InteractionRoutine& routine, InteractionType type)
 	{
+		constexpr auto WALK_DIST_MIN = BLOCK(0.05f);
+
 		switch (type)
 		{
 		default:
 		case InteractionType::Latch:
-			SetEaseInteraction(interactor, interactable, basis, routine);
+			SetLatchInteraction(interactor, interactable, basis, routine);
 			break;
 
 		case InteractionType::Walk:
-			SetWalkInteraction(interactor, interactable, basis, routine);
+			float dist = Vector3i::Distance(interactor.Pose.Position, interactable.Pose.Position);
+			if (dist > WALK_DIST_MIN)
+			{
+				SetWalkInteraction(interactor, interactable, basis, routine);
+			}
+			else
+			{
+				SetLatchInteraction(interactor, interactable, basis, routine);
+			}
+
 			break;
 		}
 	}

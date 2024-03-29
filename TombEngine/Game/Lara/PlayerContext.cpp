@@ -18,15 +18,6 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Player
 {
-	PlayerContext::PlayerContext(const ItemInfo& item, const CollisionInfo& coll)
-	{
-		const auto& player = GetLaraInfo(item);
-
-		/*ItemPtr = &item;
-		PlayerPtr = &player;
-		CollPtr = &coll;*/
-	}
-
 	bool CanChangeElevation(const ItemInfo& item, const CollisionInfo& coll)
 	{
 		constexpr auto LOWER_FLOOR_BOUND = STEPUP_HEIGHT;

@@ -16,7 +16,7 @@
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
@@ -113,7 +113,7 @@ void ItemInfo::HandleOffsetBlend()
 	{
 		// Calculate offset steps.
 		auto posOffsetStep = Vector3::Lerp(Vector3::Zero, OffsetBlend.PosOffset, OffsetBlend.Alpha);
-		auto orientOffsetStep = EulerAngles::Lerp(EulerAngles::Zero, OffsetBlend.OrientOffset, OffsetBlend.Alpha);
+		auto orientOffsetStep = EulerAngles::Lerp(EulerAngles::Identity, OffsetBlend.OrientOffset, OffsetBlend.Alpha);
 
 		// TODO: Raycast to test for obstructions.
 		//if (raycastFail)
@@ -131,7 +131,7 @@ void ItemInfo::HandleOffsetBlend()
 	}
 
 	// Offset blend complete; apply remainig values and clear data.
-	if ((OffsetBlend.PosOffset.Length() <= EPSILON && EulerAngles::Compare(OffsetBlend.OrientOffset, EulerAngles::Zero)) ||
+	if ((OffsetBlend.PosOffset.Length() <= EPSILON && EulerAngles::Compare(OffsetBlend.OrientOffset, EulerAngles::Identity)) ||
 		OffsetBlend.TimeActive >= (int)round(TIME_ACTIVE_MAX * FPS))
 	{
 		Pose.Position += OffsetBlend.PosOffset;

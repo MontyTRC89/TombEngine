@@ -38,7 +38,6 @@ namespace TEN::Collision::Interaction
 	};
 
 	bool TestInteraction(const ItemInfo& interactor, const ItemInfo& interactable, const InteractionBasis& basis, std::optional<BoundingOrientedBox> expansionBox = std::nullopt);
-	void SetPlayerAlignAnim(ItemInfo& interactor, const ItemInfo& interactable);
 	void SetInteraction(ItemInfo& interactor, ItemInfo& interactable, const InteractionBasis& basis, const InteractionRoutine& routine, InteractionType type);
 
 	void DrawDebug(const ItemInfo& item, const InteractionBasis& basis);

@@ -27,14 +27,14 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll);
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll);
 
+// Deprecated legacy object interaction.
 bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem);
 bool AlignLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
 bool MoveLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);
+bool Move3DPosTo3DPos(ItemInfo* item, Pose& poseFrom, const Pose& poseTo, int vel, short turnRate);
 
 bool ItemNearLara(const Vector3i& origin, int radius);
 bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius);
-
-bool Move3DPosTo3DPos(ItemInfo* item, Pose& poseFrom, const Pose& poseTo, int vel, short turnRate);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
 bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius);

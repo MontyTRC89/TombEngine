@@ -62,7 +62,7 @@ const auto FlarePoseStates = std::vector<int>
 
 const auto UnavailableFlarePoseAnims = std::vector<int>
 {
-	LA_WATERLEVER_PULL,
+	//LA_WATERLEVER_PULL,
 	LA_BUTTON_GIANT_PUSH,
 	LA_BUTTON_LARGE_PUSH,
 	LA_JUMPSWITCH_PULL,

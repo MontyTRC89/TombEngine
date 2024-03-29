@@ -24,6 +24,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Interaction.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/volume.h"
 #include "Game/effects/Hair.h"
@@ -47,6 +48,7 @@
 #include "Specific/winmain.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Interaction;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
@@ -338,6 +340,128 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
+bool HandlePlayerWalkInteractionMovement(ItemInfo& playerItem)
+{
+	constexpr auto VEL		 = 12.0f;
+	constexpr auto TURN_RATE = ANGLE(2.0f);
+
+	auto& player = GetLaraInfo(playerItem);
+	const auto& interactable = g_Level.Items[player.Context.InteractedItem];
+
+	// Calculate interaction position.
+	auto rotMatrix = interactable.Pose.Orientation.ToRotationMatrix();
+	auto relInteractPos = Vector3::Transform(player.Context.WalkInteraction.Basis->PosOffset.ToVector3(), rotMatrix);
+	auto interactPos = interactable.Pose.Position + Vector3i(relInteractPos);
+
+	// Get point collision.
+	auto pointColl = GetCollision(interactPos, playerItem.RoomNumber);
+	int relFloorHeight = abs(pointColl.Position.Floor - playerItem.Pose.Position.y);
+
+	// Test relative floor height.
+	if (relFloorHeight > STEPUP_HEIGHT)
+		return false;
+
+	// Calculate interaction position.
+	auto rotMatrix = interactable.Pose.Orientation.ToRotationMatrix();
+	auto relInteractPos = Vector3::Transform(player.Context.WalkInteraction.Basis->PosOffset.ToVector3(), rotMatrix);
+	auto interactPos = interactable.Pose.Position + Vector3i(relInteractPos);
+
+	auto interactOrient = interactable.Pose.Orientation + player.Context.WalkInteraction.Basis->OrientOffset;
+
+	// Translate.
+	float dist = Vector3i::Distance(playerItem.Pose.Position, interactPos);
+	if (VEL < dist)
+	{
+		auto deltaPos = interactable.Pose.Position - playerItem.Pose.Position;
+		playerItem.Pose.Position += deltaPos * (VEL / dist);
+	}
+	else
+	{
+		playerItem.Pose.Position = interactable.Pose.Position;
+	}
+
+	// Set new interaction.
+	if (!player.Control.IsMoving)
+	{
+		short headingAngle = Geometry::GetOrientToPoint(playerItem.Pose.Position.ToVector3(), interactable.Pose.Position.ToVector3()).y;
+		int cardinalDir = GetQuadrant(headingAngle - playerItem.Pose.Orientation.y);
+
+		// Determine walk anim number.
+		int animNumber = 0;
+		switch (cardinalDir)
+		{
+		default:
+		case NORTH:
+			animNumber = LA_WALK;
+
+		case SOUTH:
+			animNumber = LA_WALK_BACK;
+
+		case EAST:
+			animNumber = LA_SIDESTEP_RIGHT;
+
+		case WEST:
+			animNumber = LA_SIDESTEP_LEFT;
+		}
+
+		// Set parameters.
+		SetAnimation(&playerItem, animNumber);
+		player.Control.HandStatus = HandStatus::Busy;
+		player.Control.IsMoving = true;
+		player.Control.Count.PositionAdjust = 0;
+	}
+
+	// Rotate.
+	playerItem.Pose.Orientation.InterpolateConstant(interactOrient, TURN_RATE);
+
+	return (playerItem.Pose == Pose(interactPos, interactOrient));
+}
+
+static void HandlePlayerWalkInteraction(ItemInfo& playerItem)
+{
+	auto& player = GetLaraInfo(playerItem);
+
+	g_Renderer.PrintDebugMessage("%d", (int)player.Control.IsMoving);
+
+	if (player.Context.InteractedItem == NO_VALUE ||
+		!player.Context.WalkInteraction.Basis.has_value() ||
+		player.Context.WalkInteraction.Routine == nullptr)
+	{
+		player.Context.InteractedItem = NO_VALUE;
+		player.Context.WalkInteraction.Basis = std::nullopt;
+		player.Context.WalkInteraction.Routine = nullptr;
+		return;
+	}
+
+	auto& interactable = g_Level.Items[player.Context.InteractedItem];
+
+	//if (TestInteraction(playerItem, interactable, *player.Context.WalkInteraction.Basis))
+	{
+		if (HandlePlayerWalkInteractionMovement(playerItem))
+		{
+			player.Context.WalkInteraction.Routine(playerItem, interactable);
+			player.Control.IsMoving = false;
+			player.Control.HandStatus = HandStatus::Busy;
+
+			player.Context.InteractedItem = NO_VALUE;
+			player.Context.WalkInteraction.Basis = std::nullopt;
+			player.Context.WalkInteraction.Routine = nullptr;
+		}
+		else
+		{
+			player.Context.InteractedItem = interactable.Index;
+		}
+	}
+	/*else if (player.Control.IsMoving && player.Context.InteractedItem == interactable.Index)
+	{
+		player.Control.IsMoving = false;
+		player.Control.HandStatus = HandStatus::Free;
+
+		player.Context.WalkInteraction.Basis = std::nullopt;
+		player.Context.WalkInteraction.Routine = nullptr;
+	}*/
+}
+
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
@@ -390,6 +514,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	{
 		// Check for collision with items.
 		DoObjectCollision(item, coll);
+		HandlePlayerWalkInteraction(*item);
 
 		// Handle player behavior state collision.
 		if (player.Context.Vehicle == NO_ITEM)
@@ -465,6 +590,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	TranslateItem(item, player.Control.MoveAngle, item->Animation.Velocity.y);
 
 	DoObjectCollision(item, coll);
+	HandlePlayerWalkInteraction(*item);
 
 	if (player.Context.Vehicle == NO_ITEM)
 		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
@@ -568,6 +694,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.y);
 
 	DoObjectCollision(item, coll);
+	HandlePlayerWalkInteraction(*item);
 
 	if (player.Context.Vehicle == NO_ITEM)
 		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
