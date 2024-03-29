@@ -8,6 +8,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
@@ -424,7 +425,29 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam Objects.ObjID ObjectID to take animation and stateID from,
 // @tparam int animNumber animation from object
 // @tparam int stateID state from object
-	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
+	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject,
+		
+	/// Get a creature moveable's current enemy
+	// @Function Moveable:GetCreatureEnemy
+	ScriptReserved_GetCreatureEnemy, &Moveable::GetCreatureEnemy,
+
+	/// Clears a creature moveable's current enemy
+	// @Function Moveable:ClearCreatureEnemy
+	ScriptReserved_ClearCreatureEnemy, &Moveable::ClearCreatureEnemy,
+
+	/// Set a creature moveable's current enemy
+	// @Function Moveable:SetCreatureEnemy
+	// @tparam Moveable A moveable for the creature to treat as enemy
+	ScriptReserved_SetCreatureEnemy, &Moveable::SetCreatureEnemy,
+
+	/// Get a creature moveable's target vector
+	// @Function Moveable:GetCreatureTarget
+	// @treturn Vec3 the creature's current target vector
+	ScriptReserved_GetCreatureTarget, &Moveable::GetCreatureTarget,
+
+	/// Set a creature moveable's target vector
+	/// @tparam Vec3 a position for the creature to target
+	ScriptReserved_SetCreatureTarget, &Moveable::SetCreatureTarget);
 }
 
 void Moveable::Init()
@@ -1211,4 +1234,68 @@ void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int state
 	m_item->Animation.ActiveState = stateID;
 	m_item->Animation.FrameNumber = GetAnimData(*m_item).frameBase;
 	AnimateItem(m_item);
+}
+
+std::unique_ptr<Moveable> Moveable::GetCreatureEnemy()
+{
+	// Check if item is a creature before proceding.
+	if (!this->m_item->IsCreature()) {
+		TENLog(this->GetName() + " is not a creature!\n", LogLevel::Error);
+		return nullptr;
+	}
+	auto creature = GetCreatureInfo(this->m_item);
+	if (!creature->Enemy)
+		return nullptr;
+
+	return std::make_unique<Moveable>(creature->Enemy->Index, true);
+}
+
+void Moveable::ClearCreatureEnemy()
+{
+	// Check if item is a creature before proceding.
+	if (!this->m_item->IsCreature()) {
+		TENLog(this->GetName() + " is not a creature!\n", LogLevel::Error);
+		return;
+	}
+
+	auto creature = GetCreatureInfo(this->m_item);
+
+	creature->Enemy = nullptr;
+}
+
+void Moveable::SetCreatureEnemy(Moveable& enemy)
+{
+
+	// Check if item is a creature before proceding.
+	if (!this->m_item->IsCreature()) {
+		TENLog(this->GetName() + " is not a creature!\n", LogLevel::Error);
+		return;
+	}
+
+	auto creature = GetCreatureInfo(this->m_item);
+
+	creature->Enemy = enemy.m_item;
+}
+
+TypeOrNil<Vec3> Moveable::GetCreatureTarget()
+{
+	// Check if item is a creature before proceding.
+	if (!this->m_item->IsCreature()) {
+		TENLog(this->GetName() + " is not a creature!\n", LogLevel::Error);
+		return sol::nil;
+	}
+
+	auto creature = GetCreatureInfo(this->m_item);
+	return creature->Target;
+}
+
+void Moveable::SetCreatureTarget(const Vec3& pos)
+{
+	// Check if item is a creature before proceding.
+	if (!this->m_item->IsCreature()) {
+		TENLog(this->GetName() + " is not a creature!\n", LogLevel::Error);
+		return;
+	}
+	auto creature = GetCreatureInfo(this->m_item);
+	creature->Target = Vector3i(pos);
 }

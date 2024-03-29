@@ -131,6 +131,12 @@ public:
 	friend void SetLevelFuncCallback(const TypeOrNil<LevelFunc>& cb, const std::string& callerName, Moveable& mov, std::string& toModify);
 
 	short GetIndex() const;
+	
+	[[nodiscard]] std::unique_ptr<Moveable> GetCreatureEnemy();
+	void ClearCreatureEnemy();
+	void SetCreatureEnemy(Moveable& enemy);
+	[[nodiscard]] TypeOrNil<Vec3> GetCreatureTarget();
+	void SetCreatureTarget(const Vec3& pos);
 
 protected:
 	ItemInfo* m_item;
