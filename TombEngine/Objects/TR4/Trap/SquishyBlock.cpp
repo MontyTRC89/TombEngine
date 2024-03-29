@@ -24,6 +24,7 @@
 namespace TEN::Entities::Traps
 {	
 	constexpr auto SQUISHY_BLOCK_LETHAL_FRAME = 33;
+	constexpr auto MAX_FALLING_VELOCITY = 60;
 
 	enum SquishyBlockState
 	{
@@ -63,7 +64,7 @@ namespace TEN::Entities::Traps
 		auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
 
-		short& something0 = item.ItemFlags[0];
+		short& velocity = item.ItemFlags[0];
 		short& someAngle = item.ItemFlags[1];
 		short& headingAngle = item.ItemFlags[4];
 
@@ -80,7 +81,7 @@ namespace TEN::Entities::Traps
 			if (item.Animation.ActiveState == SQUISHY_BLOCK_ANIM_BAKED_MOTION)
 				SetAnimation(item, SQUISHY_BLOCK_STATE_MOVE);
 
-			something0 = item.TriggerFlags;
+			velocity = item.TriggerFlags;
 
 			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_MOVE)
 			{
@@ -107,7 +108,7 @@ namespace TEN::Entities::Traps
 				}
 				else
 				{
-					float dist = Lerp(item.TriggerFlags / 4, item.TriggerFlags, something0);
+					float dist = Lerp(item.TriggerFlags / 4, item.TriggerFlags, velocity);
 					item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, forwardDir, dist);
 				}
 			}
@@ -134,15 +135,15 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		short& something0 = item.ItemFlags[0];
+		short& velocity = item.ItemFlags[0];
 
 		if (TriggerActive(&item))
 		{
-			if (something0 < 60)
+			if (velocity < MAX_FALLING_VELOCITY)
 			{
 				SoundEffect(SFX_TR4_EARTHQUAKE_LOOP, &item.Pose);
-				Camera.bounce = (something0 - 92) / 2;
-				something0++;
+				Camera.bounce = (velocity - 92) / 2;
+				velocity++;
 			}
 			else
 			{
