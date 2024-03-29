@@ -167,17 +167,19 @@ namespace TEN::Collision::Los
 		if (!LOSAndReturnTarget(&losOrigin, &losTarget, 0))
 			dist = Vector3::Distance(origin, losTarget.ToVector3());
 
-		// Calculate intersection (if applicable).
-		auto intersect = std::optional<std::pair<Vector3, int>>();
-		if (dist != 0.0f)
+		// Calculate intersection.
+		auto intersect = std::pair<Vector3, int>();
+		if (dist == 0.0f)
+		{
+			intersect = std::pair(target, losTarget.RoomNumber);
+		}
+		else
 		{
 			auto dir = target - origin;
 			dir.Normalize();
-
 			intersect = std::pair(Geometry::TranslatePoint(origin, dir, dist), losTarget.RoomNumber);
 		}
 
-		// Return room LOS.
 		return RoomLosData{ intersect, roomNumbers };
 	}
 
