@@ -85,42 +85,42 @@ std::vector<int> StaticObjectsIds;
 std::vector<int> SpriteSequencesIds;
 LEVEL g_Level;
 
-unsigned char ReadUInt8()
+static unsigned char ReadUInt8()
 {
 	unsigned char value = *(unsigned char*)LevelDataPtr;
 	LevelDataPtr += 1;
 	return value;
 }
 
-short ReadInt16()
+static short ReadInt16()
 {
 	short value = *(short*)LevelDataPtr;
 	LevelDataPtr += 2;
 	return value;
 }
 
-unsigned short ReadUInt16()
+static unsigned short ReadUInt16()
 {
 	unsigned short value = *(unsigned short*)LevelDataPtr;
 	LevelDataPtr += 2;
 	return value;
 }
 
-int ReadInt32()
+static int ReadInt32()
 {
 	int value = *(int*)LevelDataPtr;
 	LevelDataPtr += 4;
 	return value;
 }
 
-float ReadFloat()
+static float ReadFloat()
 {
 	float value = *(float*)LevelDataPtr;
 	LevelDataPtr += 4;
 	return value;
 }
 
-Vector2 ReadVector2()
+static Vector2 ReadVector2()
 {
 	Vector2 value;
 	value.x = ReadFloat();
@@ -128,7 +128,7 @@ Vector2 ReadVector2()
 	return value;
 }
 
-Vector3 ReadVector3()
+static Vector3 ReadVector3()
 {
 	Vector3 value;
 	value.x = ReadFloat();
@@ -137,7 +137,16 @@ Vector3 ReadVector3()
 	return value;
 }
 
-Vector4 ReadVector4()
+static Vector3i ReadVector3i()
+{
+	auto value = Vector3i::Zero;
+	value.x = ReadInt32();
+	value.y = ReadInt32();
+	value.z = ReadInt32();
+	return value;
+}
+
+static Vector4 ReadVector4()
 {
 	Vector4 value;
 	value.x = ReadFloat();
@@ -147,18 +156,18 @@ Vector4 ReadVector4()
 	return value;
 }
 
-bool ReadBool()
+static bool ReadBool()
 {
 	return bool(ReadUInt8());
 }
 
-void ReadBytes(void* dest, int count)
+static void ReadBytes(void* dest, int count)
 {
 	memcpy(dest, LevelDataPtr, count);
 	LevelDataPtr += count;
 }
 
-long long ReadLEB128(bool sign)
+static long long ReadLEB128(bool sign)
 {
 	long long result = 0;
 	int currentShift = 0;
@@ -182,7 +191,7 @@ long long ReadLEB128(bool sign)
 	return result;
 }
 
-std::string ReadString()
+static std::string ReadString()
 {
 	auto numBytes = ReadLEB128(false);
 
@@ -497,11 +506,29 @@ void LoadCameras()
 		g_GameScriptEntities->AddName(camera.Name, camera);
 	}
 
+	// Load spot cameras.
 	NumberSpotcams = ReadInt32();
+	for (int i = 0; i < NumberSpotcams; i++)
+	{
+		auto& spotCamera = SpotCam[i];
 
-	// TODO: Read properly!
-	if (NumberSpotcams != 0)
-		ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
+		spotCamera.Position = ReadVector3i();
+		spotCamera.PositionTarget = ReadVector3i();
+		spotCamera.sequence = ReadUInt8();
+		spotCamera.camera = ReadUInt8();
+		spotCamera.fov = ReadInt16();
+		spotCamera.roll = ReadInt16();
+		spotCamera.timer = ReadInt16();
+		spotCamera.speed = ReadInt16();
+		spotCamera.flags = ReadInt16();
+		spotCamera.roomNumber = ReadInt16();
+
+		// TODO: Remove padding from level format.
+		ReadInt16();
+	}
+
+	//if (NumberSpotcams != 0)
+	//	ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
 
 	int numSinks = ReadInt32();
 	TENLog("Num sinks: " + std::to_string(numSinks), LogLevel::Info);
