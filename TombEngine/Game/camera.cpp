@@ -455,7 +455,7 @@ void InitializeCamera()
 
 static void UpdateAzimuthAngle(const ItemInfo& item)
 {
-	constexpr auto BASE_VEL					= 50.0f;
+	constexpr auto BASE_VEL					= BLOCK(0.05f);
 	constexpr auto BASE_ANGLE				= ANGLE(90.0f);
 	constexpr auto AUTO_ROT_DELTA_ANGLE_MAX = BASE_ANGLE * 1.5f;
 	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.01f;
@@ -845,6 +845,8 @@ void ChaseCamera(const ItemInfo& playerItem)
 
 void CombatCamera(const ItemInfo& playerItem)
 {
+	constexpr auto BUFFER = CLICK(0.25f);
+
 	const auto& player = GetLaraInfo(playerItem);
 
 	Camera.LookAt.x = playerItem.Pose.Position.x;
@@ -868,24 +870,23 @@ void CombatCamera(const ItemInfo& playerItem)
 	pointColl = GetCollision(Camera.LookAt.x, Camera.LookAt.y, Camera.LookAt.z, Camera.LookAtRoomNumber);
 	Camera.LookAtRoomNumber = pointColl.RoomNumber;
 
-	int buffer = CLICK(0.25f);
-	if ((pointColl.Position.Ceiling + buffer) > (pointColl.Position.Floor - buffer) &&
+	if ((pointColl.Position.Ceiling + BUFFER) > (pointColl.Position.Floor - BUFFER) &&
 		pointColl.Position.Floor != NO_HEIGHT &&
 		pointColl.Position.Ceiling != NO_HEIGHT)
 	{
 		Camera.LookAt.y = (pointColl.Position.Ceiling + pointColl.Position.Floor) / 2;
 		Camera.targetElevation = 0;
 	}
-	else if (Camera.LookAt.y > (pointColl.Position.Floor - buffer) &&
+	else if (Camera.LookAt.y > (pointColl.Position.Floor - BUFFER) &&
 		pointColl.Position.Floor != NO_HEIGHT)
 	{
-		Camera.LookAt.y = pointColl.Position.Floor - buffer;
+		Camera.LookAt.y = pointColl.Position.Floor - BUFFER;
 		Camera.targetElevation = 0;
 	}
-	else if (Camera.LookAt.y < (pointColl.Position.Ceiling + buffer) &&
+	else if (Camera.LookAt.y < (pointColl.Position.Ceiling + BUFFER) &&
 		pointColl.Position.Ceiling != NO_HEIGHT)
 	{
-		Camera.LookAt.y = pointColl.Position.Ceiling + buffer;
+		Camera.LookAt.y = pointColl.Position.Ceiling + BUFFER;
 		Camera.targetElevation = 0;
 	}
 
