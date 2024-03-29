@@ -527,9 +527,6 @@ void LoadCameras()
 		ReadInt16();
 	}
 
-	//if (NumberSpotcams != 0)
-	//	ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
-
 	int numSinks = ReadInt32();
 	TENLog("Num sinks: " + std::to_string(numSinks), LogLevel::Info);
 
