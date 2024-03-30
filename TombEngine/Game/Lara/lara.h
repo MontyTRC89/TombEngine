@@ -116,6 +116,21 @@ constexpr auto WADE_WATER_DEPTH		= STEPUP_HEIGHT;
 constexpr auto SWIM_WATER_DEPTH		= CLICK(2.75f);
 constexpr auto SLOPE_DIFFERENCE		= 60;
 
+static const auto PLAYER_IDLE_STATE_IDS = std::vector<int>
+{
+	LS_IDLE,
+	LS_CROUCH_IDLE,
+	LS_CRAWL_IDLE,
+	LS_MONKEY_IDLE,
+	LS_HANG,
+	LS_LADDER_IDLE,
+	LS_POLE_IDLE,
+	LS_ROPE_IDLE,
+	LS_TIGHTROPE_IDLE,
+	LS_ONWATER_IDLE,
+	LS_UNDERWATER_IDLE
+};
+
 static const auto PLAYER_STRAFE_STATE_IDS = std::vector<int>
 {
 	LS_IDLE,

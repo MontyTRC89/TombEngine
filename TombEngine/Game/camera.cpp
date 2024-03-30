@@ -362,25 +362,20 @@ void UpdatePlayerRefCameraOrient(ItemInfo& item)
 	float vel = Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length();
 
 	bool isSpotCameraSwitch = (UseSpotCam != PrevUseSpotCam);
-	bool isMoving = (GetMoveAxis() != Vector2::Zero || IsHeld(In::StepLeft) || IsHeld(In::StepRight) || vel != 0.0f);
+	bool isStopped = (((GetMoveAxis() == Vector2::Zero && !IsHeld(In::StepLeft) && !IsHeld(In::StepRight)) || vel == 0.0f) &&
+					  TestState(item.Animation.ActiveState, PLAYER_IDLE_STATE_IDS));
 
-	if (isSpotCameraSwitch && isMoving)
+	if (isSpotCameraSwitch && !isStopped)
 	{
 		player.Control.LockRefCameraOrient = true;
 	}
-	else if (!isMoving)
+	else if (isStopped)
 	{
 		player.Control.LockRefCameraOrient = false;
 	}
 
 	if (!player.Control.LockRefCameraOrient)
 		player.Control.RefCameraOrient = EulerAngles(Camera.actualElevation, Camera.actualAngle, 0);
-
-	g_Renderer.PrintDebugMessage("%d", (int)UseSpotCam);
-	g_Renderer.PrintDebugMessage("%d", (int)Camera.type);
-	g_Renderer.PrintDebugMessage("%d", (int)player.Control.LockRefCameraOrient);
-	g_Renderer.PrintDebugMessage("%d", Camera.actualElevation);
-	g_Renderer.PrintDebugMessage("%d", Camera.actualAngle);
 }
 
 void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
