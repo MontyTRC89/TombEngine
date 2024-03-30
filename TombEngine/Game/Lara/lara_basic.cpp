@@ -136,7 +136,7 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_walk_forward()
 void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto TURN_FLAGS = PlayerTurnFlags::PT_FLAG_TURN_Y | PlayerTurnFlags::PT_FLAG_VERTICAL_FLEX;
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -290,7 +290,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_run_forward()
 void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto TURN_FLAGS = PlayerTurnFlags::PT_FLAG_TURN_Y | PlayerTurnFlags::PT_FLAG_VERTICAL_FLEX;
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -474,7 +474,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_idle()
 void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto TURN_FLAGS = PlayerTurnFlags::PT_FLAG_TURN_Y | PlayerTurnFlags::PT_FLAG_VERTICAL_FLEX;
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -985,7 +985,7 @@ void lara_col_hop_back(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_skip_back()
 void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto TURN_FLAGS = PlayerTurnFlags::PT_FLAG_TURN_Y | PlayerTurnFlags::PT_FLAG_VERTICAL_FLEX;
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -1071,7 +1071,7 @@ void lara_col_skip_back(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_turn_slow()
 void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto TURN_FLAGS = PlayerTurnFlags::PT_FLAG_TURN_Y | PlayerTurnFlags::PT_FLAG_VERTICAL_FLEX;
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -1417,7 +1417,7 @@ void lara_col_splat(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_walk_back()
 void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto TURN_FLAGS = PlayerTurnFlags::PT_FLAG_TURN_Y | PlayerTurnFlags::PT_FLAG_VERTICAL_FLEX;
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -1692,7 +1692,7 @@ void lara_col_turn_fast(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_step_right()
 void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto TURN_FLAGS = PlayerTurnFlags::PT_FLAG_TURN_Y;
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -1800,7 +1800,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_step_left()
 void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto TURN_FLAGS = PlayerTurnFlags::PT_FLAG_TURN_Y;
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -2042,7 +2042,7 @@ void lara_col_roll_180_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_wade_forward()
 void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto TURN_FLAGS = PlayerTurnFlags::PT_FLAG_TURN_Y | PlayerTurnFlags::PT_FLAG_VERTICAL_FLEX;
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
 
 	auto& player = GetLaraInfo(*item);
 
@@ -2157,7 +2157,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_sprint()
 void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 {
-	constexpr auto TURN_FLAGS = PlayerTurnFlags::PT_FLAG_TURN_Y | PlayerTurnFlags::PT_FLAG_VERTICAL_FLEX;
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
 
 	auto& player = GetLaraInfo(*item);
 

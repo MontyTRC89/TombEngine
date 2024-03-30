@@ -28,6 +28,8 @@ using namespace TEN::Input;
 // Collision: lara_col_underwater_idle()
 void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnX | (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::SwimFlex;
+
 	auto& player = GetLaraInfo(*item);
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
@@ -55,10 +57,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 			if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 			{
 				// Turn.
-				HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+				HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA, LARA_LEAN_MAX, false, TURN_FLAGS);
 
 				item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 			}
@@ -68,10 +67,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 			if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 			{
 				// Turn.
-				HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+				HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA, LARA_LEAN_MAX, false, TURN_FLAGS);
 
 				item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 			}
@@ -111,6 +107,8 @@ void lara_col_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_underwater_swim_forward()
 void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnX | (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::SwimFlex;
+
 	auto& player = GetLaraInfo(*item);
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
@@ -137,10 +135,7 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 			if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 			{
 				// Turn.
-				HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+				HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA, LARA_LEAN_MAX, false, TURN_FLAGS);
 
 				item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 			}
@@ -155,9 +150,7 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 			{
 				// Turn.
 				item->Pose.Orientation.Lerp(EulerAngles(0, item->Pose.Orientation.y, item->Pose.Orientation.z), PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
-				HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+				HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA, LARA_LEAN_MAX, false, TURN_FLAGS);
 
 				item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 			}
@@ -181,10 +174,7 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		/*HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
-		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
-		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
-		HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+		/*HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA, LARA_LEAN_MAX, false, TURN_FLAGS);
 
 		if (!IsHeld(In::Forward) && !IsHeld(In::Back) && !IsHeld(In::Left) && !IsHeld(In::Right))
 			item->Animation.TargetState = LS_UNDERWATER_INERTIA;*/
@@ -213,6 +203,8 @@ void lara_col_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_underwater_inertia()
 void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnX | (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::SwimFlex;
+
 	auto& player = GetLaraInfo(*item);
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
@@ -234,10 +226,7 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnX(*item, PLAYER_SWIM_TURN_ALPHA);
-		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
-		HandlePlayerTurnLean(*item, LARA_LEAN_MAX, PLAYER_SWIM_TURN_ALPHA);
-		HandlePlayerSwimTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA * 2);
+		HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA, LARA_LEAN_MAX, false, TURN_FLAGS);
 
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 			item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;

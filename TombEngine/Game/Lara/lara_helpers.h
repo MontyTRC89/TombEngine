@@ -3,19 +3,19 @@
 
 enum class JumpDirection;
 enum class WaterStatus;
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
 struct LaraInfo;
 struct VaultTestResult;
 
 enum PlayerTurnFlags
 {
-	PT_FLAG_TURN_X = 1,
-	PT_FLAG_TURN_Y = 1 << 1,
+	TurnX = 1,
+	TurnY = 1 << 1,
 
-	PT_FLAG_VERTICAL_FLEX = 1 << 2,
-	PT_FLAG_CRAWL_FLEX	  = 1 << 3,
-	PT_FLAG_SWIM_FLEX	  = 1 << 4
+	VerticalFlex = 1 << 2,
+	CrawlFlex	 = 1 << 3,
+	SwimFlex	 = 1 << 4
 };
 
 struct PlayerWaterData

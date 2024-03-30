@@ -47,6 +47,8 @@ void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_crouch_idle()
 void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY;
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Free;
@@ -76,7 +78,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-			HandlePlayerTurnY(*item, PLAYER_CRAWL_TURN_ALPHA);
+			HandlePlayerTurn(*item, PLAYER_CRAWL_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else
 	{
@@ -190,6 +192,8 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_as_crouch_roll()
 void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY;
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
@@ -202,7 +206,7 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-			HandlePlayerTurnY(*item, PLAYER_CRAWL_TURN_ALPHA / 3);
+			HandlePlayerTurn(*item, PLAYER_CRAWL_TURN_ALPHA / 3, 0, false, TURN_FLAGS);
 	}
 	else
 	{
@@ -421,6 +425,8 @@ void lara_col_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_crawl_idle()
 void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::CrawlFlex;
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Free;
@@ -452,7 +458,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-			HandlePlayerTurnY(*item, PLAYER_CRAWL_TURN_ALPHA);
+			HandlePlayerTurn(*item, PLAYER_CRAWL_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else
 	{
@@ -609,6 +615,8 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision: lara_col_crawl_forward()
 void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::CrawlFlex;
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
@@ -628,8 +636,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_CRAWL_TURN_ALPHA);
-		HandlePlayerCrawlTurnFlex(*item, PLAYER_CRAWL_TURN_ALPHA * 2);
+		HandlePlayerTurn(*item, PLAYER_CRAWL_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else
 	{

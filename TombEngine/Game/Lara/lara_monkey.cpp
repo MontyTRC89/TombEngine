@@ -30,6 +30,8 @@ using namespace TEN::Input;
 // Collision:	lara_col_monkey_idle()
 void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY;
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Free;
@@ -49,7 +51,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-			HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else if (IsUsingEnhancedControls())
 	{
@@ -201,6 +203,8 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_forward()
 void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY;
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
@@ -219,7 +223,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_STANDARD_TURN_ALPHA);
+		HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else
 	{

@@ -41,9 +41,11 @@ void lara_col_surface_dive(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_surface_idle()
 void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
 
-	lara->Control.Look.Mode = LookMode::Free;
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::Free;
 
 	item->Animation.Velocity.y -= LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.Velocity.y < 0)
@@ -59,8 +61,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
-			HandlePlayerTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA);
+			HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA, 0, false, TURN_FLAGS);
 		}
 	}
 	else
@@ -122,9 +123,9 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_surface_idle()
 void lara_col_surface_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.HeadingOrient.y = item->Pose.Orientation.y;
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y;
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -132,9 +133,11 @@ void lara_col_surface_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_surface_swim_forward()
 void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
 
-	lara->Control.Look.Mode = LookMode::Horizontal;
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::Horizontal;
 
 	if (item->HitPoints <= 0)
 	{
@@ -144,8 +147,7 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingModernControls())
 	{
-		HandlePlayerTurnY(*item, PLAYER_SWIM_TURN_ALPHA);
-		HandlePlayerTurnFlex(*item, PLAYER_SWIM_TURN_ALPHA);
+		HandlePlayerTurn(*item, PLAYER_SWIM_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else
 	{
@@ -179,9 +181,9 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_surface_swim_forward()
 void lara_col_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.HeadingOrient.y = item->Pose.Orientation.y;
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	LaraSurfaceCollision(item, coll);
 	TestLaraWaterClimbOut(item, coll);
@@ -192,9 +194,9 @@ void lara_col_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_surface_swim_left()
 void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.Look.Mode = LookMode::Vertical;
+	player.Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -227,9 +229,9 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_surface_swim_left()
 void lara_col_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.HeadingOrient.y = item->Pose.Orientation.y - ANGLE(90.0f);
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y - ANGLE(90.0f);
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -237,9 +239,9 @@ void lara_col_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_surface_swim_right()
 void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.Look.Mode = LookMode::Vertical;
+	player.Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -272,9 +274,9 @@ void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 // Conrol:		lara_as_surface_swim_right()
 void lara_col_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(90.0f);
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(90.0f);
 	LaraSurfaceCollision(item, coll);
 }
 
@@ -282,9 +284,9 @@ void lara_col_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_surface_swim_back()
 void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.Look.Mode = LookMode::Horizontal;
+	player.Control.Look.Mode = LookMode::Horizontal;
 
 	if (item->HitPoints <= 0)
 	{
@@ -310,9 +312,9 @@ void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_surface_swim_back()
 void lara_col_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(180.0f);
+	player.Control.HeadingOrient.y = item->Pose.Orientation.y + ANGLE(180.0f);
 	LaraSurfaceCollision(item, coll);
 }
 

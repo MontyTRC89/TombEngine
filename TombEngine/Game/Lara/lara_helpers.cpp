@@ -734,23 +734,23 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool isStrafing, int flags)
 {
 	// 1) X axis turn.
-	if (flags & PlayerTurnFlags::PT_FLAG_TURN_X)
+	if (flags & (int)PlayerTurnFlags::TurnX)
 		HandlePlayerTurnX(item, turnAlpha);
 
 	// 2) Y axis turn.
-	if (flags & PlayerTurnFlags::PT_FLAG_TURN_Y)
+	if (flags & (int)PlayerTurnFlags::TurnY)
 		HandlePlayerTurnY(item, turnAlpha, isStrafing);
 
 	// 3) Flex.
-	if (flags & PlayerTurnFlags::PT_FLAG_VERTICAL_FLEX)
+	if (flags & (int)PlayerTurnFlags::VerticalFlex)
 	{
 		HandlePlayerTurnFlex(item, turnAlpha, isStrafing);
 	}
-	else if (flags & PlayerTurnFlags::PT_FLAG_CRAWL_FLEX)
+	else if (flags & (int)PlayerTurnFlags::CrawlFlex)
 	{
 		HandlePlayerCrawlTurnFlex(item, turnAlpha);
 	}
-	else if (flags & PlayerTurnFlags::PT_FLAG_SWIM_FLEX)
+	else if (flags & (int)PlayerTurnFlags::SwimFlex)
 	{
 		HandlePlayerSwimTurnFlex(item, turnAlpha);
 	}
