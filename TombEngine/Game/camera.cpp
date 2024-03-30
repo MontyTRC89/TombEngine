@@ -475,7 +475,7 @@ void InitializeCamera()
 
 static void UpdateAzimuthAngle(const ItemInfo& item)
 {
-	constexpr auto BASE_VEL					= BLOCK(0.05f);
+	constexpr auto BASE_VEL					= BLOCK(0.1f);
 	constexpr auto BASE_ANGLE				= ANGLE(90.0f);
 	constexpr auto AUTO_ROT_DELTA_ANGLE_MAX = BASE_ANGLE * 1.5f;
 	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.01f;
