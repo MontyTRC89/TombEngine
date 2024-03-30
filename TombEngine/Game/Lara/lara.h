@@ -101,12 +101,6 @@ constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
 constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
 constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
 
-// Modern control strafe constants
-constexpr auto PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_CONSTRAINT	 = std::pair(ANGLE(-90.0f), ANGLE(90.0f));
-constexpr auto PLAYER_MOVE_AXIS_ANGLE_FORWARD_STRAFE_DEFAULT	 = ANGLE(0.0f);
-constexpr auto PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_CONSTRAINT = std::pair(ANGLE(90.1f), ANGLE(-90.1f));
-constexpr auto PLAYER_MOVE_AXIS_ANGLE_BACKWARD_STRAFE_DEFAULT	 = ANGLE(180.0f);
-
 constexpr auto STEPUP_HEIGHT		= (int)CLICK(1.5f);
 constexpr auto CRAWL_STEPUP_HEIGHT	= CLICK(1) - 1;
 constexpr auto MONKEY_STEPUP_HEIGHT = (int)CLICK(1.25f);

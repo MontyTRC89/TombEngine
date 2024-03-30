@@ -279,7 +279,7 @@ bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 	bool flag = false;
 	bool result = false;
 
-	int i;
+	int i = 0;
 	for (i = 0; i < STEP_COUNT; ++i)
 	{
 		roomNumber2 = roomNumber;
@@ -330,7 +330,7 @@ bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 		z += dz;
 	}
 
-	if (i)
+	if (i != 0)
 	{
 		x -= dx;
 		y -= dy;

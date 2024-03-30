@@ -731,6 +731,34 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
+void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool isStrafing, int flags)
+{
+	// 1) X axis turn.
+	if (flags & PlayerTurnFlags::PT_FLAG_TURN_X)
+		HandlePlayerTurnX(item, turnAlpha);
+
+	// 2) Y axis turn.
+	if (flags & PlayerTurnFlags::PT_FLAG_TURN_Y)
+		HandlePlayerTurnY(item, turnAlpha, isStrafing);
+
+	// 3) Flex.
+	if (flags & PlayerTurnFlags::PT_FLAG_VERTICAL_FLEX)
+	{
+		HandlePlayerTurnFlex(item, turnAlpha, isStrafing);
+	}
+	else if (flags & PlayerTurnFlags::PT_FLAG_CRAWL_FLEX)
+	{
+		HandlePlayerCrawlTurnFlex(item, turnAlpha);
+	}
+	else if (flags & PlayerTurnFlags::PT_FLAG_SWIM_FLEX)
+	{
+		HandlePlayerSwimTurnFlex(item, turnAlpha);
+	}
+
+	// 4) Lean.
+	HandlePlayerTurnLean(item, leanAngleMax, turnAlpha, isStrafing);
+}
+
 void HandlePlayerTurnX(ItemInfo& item, float alpha)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
@@ -753,15 +781,14 @@ void HandlePlayerTurnX(ItemInfo& item, float alpha)
 	player.Control.HeadingOrientTarget.x = headingAngle;
 }
 
-void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing, short relHeadingAngle,
-					   std::pair<short, short> moveAxisAngleConstraint, short moveAxisAngleDefault)
+void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
 	auto& player = GetLaraInfo(item);
 
-	short headingAngle = (isStrafing ? player.Control.RefCameraOrient.y : GetPlayerHeadingAngleY(item, moveAxisAngleConstraint, moveAxisAngleDefault));
-	auto targetOrient = EulerAngles(item.Pose.Orientation.x, headingAngle + relHeadingAngle, item.Pose.Orientation.z);
+	short headingAngle = (isStrafing ? player.Control.RefCameraOrient.y : GetPlayerHeadingAngleY(item));
+	auto targetOrient = EulerAngles(item.Pose.Orientation.x, headingAngle, item.Pose.Orientation.z);
 
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, headingAngle);
 	if (abs(deltaAngle) <= BASE_ANGLE)
@@ -830,8 +857,7 @@ void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, s
 }
 
 // NOTE: Modern control version.
-void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing,
-						  std::pair<short, short> moveAxisAngleConstraint, short moveAxisAngleDefault)
+void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 {
 	constexpr auto BASE_ANGLE					   = ANGLE(90.0f);
 	constexpr auto LOWER_FLEX_ANGLE_Y_CONSTRAINT   = ANGLE(65.0f);
@@ -841,10 +867,12 @@ void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing,
 	constexpr auto TORSO_ROT_COEFF				   = 0.5f;
 	constexpr auto HEAD_ROT_COEFF				   = 0.5f;
 
+	// TODO: Better head turn when strafing.
+
 	auto& player = GetLaraInfo(item);
 
 	// Calculate delta angle.
-	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item, moveAxisAngleConstraint, moveAxisAngleDefault));
+	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 	int sign = std::copysign(1, deltaAngle);
 
 	// Adjust detla angle if strafing.
@@ -1665,7 +1693,7 @@ short GetPlayerHeadingAngleX(const ItemInfo& item)
 	}
 }
 
-short GetPlayerHeadingAngleY(const ItemInfo& item, std::pair<short, short> moveAxisAngleConstraint, short defaultMoveAxisAngle)
+short GetPlayerHeadingAngleY(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
@@ -1681,12 +1709,13 @@ short GetPlayerHeadingAngleY(const ItemInfo& item, std::pair<short, short> moveA
 		dir.Normalize();
 		short moveAxisAngle = FROM_RAD(atan2(dir.x, dir.y));
 
+		// TODO: Make this a general constraint whenever strafing.
 		// Move axis angle falls outside constraint; apply default.
-		if (moveAxisAngle < moveAxisAngleConstraint.first &&
+		/*if (moveAxisAngle < moveAxisAngleConstraint.first &&
 			moveAxisAngle > moveAxisAngleConstraint.second)
 		{
 			moveAxisAngle = defaultMoveAxisAngle;
-		}
+		}*/
 
 		return (player.Control.RefCameraOrient.y + moveAxisAngle);
 	}

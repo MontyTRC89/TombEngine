@@ -8,6 +8,16 @@ struct CollisionInfo;
 struct LaraInfo;
 struct VaultTestResult;
 
+enum PlayerTurnFlags
+{
+	PT_FLAG_TURN_X = 1,
+	PT_FLAG_TURN_Y = 1 << 1,
+
+	PT_FLAG_VERTICAL_FLEX = 1 << 2,
+	PT_FLAG_CRAWL_FLEX	  = 1 << 3,
+	PT_FLAG_SWIM_FLEX	  = 1 << 4
+};
+
 struct PlayerWaterData
 {
 	bool IsWater = false;
@@ -30,13 +40,12 @@ void HandlePlayerQuickActions(ItemInfo& item);
 bool CanPlayerLookAround(const ItemInfo& item); // TODO: Move to context file. -- Sezz 2023.08.22
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
+void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool isStrafing, int flags);
 void HandlePlayerTurnX(ItemInfo& item, float alpha);
-void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing = false, short relHeadingAngle = ANGLE(0.0f),
-					   std::pair<short, short> moveAxisAngleConstraint = std::pair(ANGLE(0.0f), ANGLE(0.0f)), short moveAxisAngleDefault = 0);
+void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing = false);
 void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool isStrafing = false);
 void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
-void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing = false,
-						  std::pair<short, short> moveAxisAngleConstraint = std::pair(ANGLE(0.0f), ANGLE(0.0f)), short moveAxisAngleDefault = 0);
+void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing = false);
 void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha);
 void HandlePlayerCrawlTurnFlex(ItemInfo& item);
 void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha);
@@ -63,7 +72,7 @@ int				GetPlayerStrafeTurnStateID(const ItemInfo& item);
 
 PlayerWaterData GetPlayerWaterData(ItemInfo& item);
 short GetPlayerHeadingAngleX(const ItemInfo& item);
-short GetPlayerHeadingAngleY(const ItemInfo& item, std::pair<short, short> moveAxisAngleConstraint = std::pair(ANGLE(0.0f), ANGLE(0.0f)), short defaultMoveAxisAngle = 0);
+short GetPlayerHeadingAngleY(const ItemInfo& item);
 short GetPlayerRelHeadingAngleY(const ItemInfo& item);
 short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll);
 
