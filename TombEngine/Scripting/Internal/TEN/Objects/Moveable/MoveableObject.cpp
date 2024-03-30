@@ -36,8 +36,8 @@ pickups, and Lara herself (see also @{Objects.LaraObject} for Lara-specific feat
 
 constexpr auto LUA_CLASS_NAME{ ScriptReserved_Moveable };
 
-static auto index_error = index_error_maker(Moveable, LUA_CLASS_NAME);
-static auto newindex_error = newindex_error_maker(Moveable, LUA_CLASS_NAME);
+static auto IndexError = index_error_maker(Moveable, LUA_CLASS_NAME);
+static auto NewIndexError = newindex_error_maker(Moveable, LUA_CLASS_NAME);
 
 
 Moveable::Moveable(short num, bool alreadyInitialized) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialized{ alreadyInitialized }
@@ -153,8 +153,8 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
 		sol::call_constructor, Create,
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
 	ScriptReserved_Enable, &Moveable::EnableItem,
