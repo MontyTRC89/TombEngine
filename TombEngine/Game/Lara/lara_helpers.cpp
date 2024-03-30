@@ -1709,8 +1709,21 @@ short GetPlayerHeadingAngleY(const ItemInfo& item)
 		dir.Normalize();
 		short moveAxisAngle = FROM_RAD(atan2(dir.x, dir.y));
 
-		// TODO: Make this a general constraint whenever strafing.
-		// Move axis angle falls outside constraint; apply default.
+		// TEMP HACK
+		// TODO: No hardcoding. Must pass some kind of argument to this function while keeping calls clean.
+		if (IsPlayerStrafing(item) && (item.Animation.ActiveState == LS_RUN_FORWARD ||
+			item.Animation.ActiveState == LS_WALK_FORWARD))
+		{
+			if (abs(moveAxisAngle) > ANGLE(90.0f))
+				moveAxisAngle = 0;
+		}
+		else if (item.Animation.ActiveState == LS_SKIP_BACK ||
+			item.Animation.ActiveState == LS_WALK_BACK)
+		{
+			if (abs(moveAxisAngle) <= ANGLE(90.0f))
+				moveAxisAngle = ANGLE(180.0f);
+		}
+
 		/*if (moveAxisAngle < moveAxisAngleConstraint.first &&
 			moveAxisAngle > moveAxisAngleConstraint.second)
 		{
