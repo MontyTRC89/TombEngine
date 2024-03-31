@@ -25,12 +25,16 @@ namespace TEN::Collision::Los
 		{
 			auto& item = g_Level.Items[itemNumber];
 
-			// 1) Check if room is active.
+			// 1) Check if item is invisible.
+			if (item.Status == ITEM_INVISIBLE)
+				continue;
+
+			// 2) Check if room is active.
 			const auto& room = g_Level.Rooms[item.RoomNumber];
 			if (!room.Active())
 				continue;
 
-			// 2) Test if item is in nearby room.
+			// 3) Test if item is in nearby room.
 			if (!Contains(room.neighbors, (int)item.RoomNumber))
 				continue;
 
