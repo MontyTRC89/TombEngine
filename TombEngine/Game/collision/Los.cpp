@@ -160,20 +160,20 @@ namespace TEN::Collision::Los
 		auto losOrigin = GameVector(origin, originRoomNumber);
 		auto losTarget = GameVector(target, originRoomNumber);
 
-		float dist = 0.0f;
+		float distSqr = 0.0f;
 		auto roomNumbers = std::set<int>{};
 
 		// 1) Collide axis-aligned walls.
 		if (!LOS(&losOrigin, &losTarget, &roomNumbers))
-			dist = Vector3::Distance(origin, losTarget.ToVector3());
+			distSqr = Vector3::DistanceSquared(origin, losTarget.ToVector3());
 
 		// 2) Collide diagonal walls and floors/ceilings.
 		if (!LOSAndReturnTarget(&losOrigin, &losTarget, 0))
-			dist = Vector3::Distance(origin, losTarget.ToVector3());
+			distSqr = Vector3::DistanceSquared(origin, losTarget.ToVector3());
 
 		// Calculate intersection.
 		auto intersect = std::pair<Vector3, int>();
-		if (dist == 0.0f)
+		if (distSqr == 0.0f)
 		{
 			intersect = std::pair(target, losTarget.RoomNumber);
 		}
@@ -181,7 +181,7 @@ namespace TEN::Collision::Los
 		{
 			auto dir = target - origin;
 			dir.Normalize();
-			intersect = std::pair(Geometry::TranslatePoint(origin, dir, dist), losTarget.RoomNumber);
+			intersect = std::pair(Geometry::TranslatePoint(origin, dir, sqrt(distSqr)), losTarget.RoomNumber);
 		}
 
 		return RoomLosData{ intersect, roomNumbers };
