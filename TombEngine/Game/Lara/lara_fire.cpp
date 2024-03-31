@@ -843,7 +843,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	auto ray = Ray(origin, directionNorm);
 
 	int num = GetSpheres(&targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int bestJointIndex = NO_JOINT;
+	int bestJointIndex = NO_VALUE;
 	float bestDistance = INFINITY;
 	for (int i = 0; i < num; i++)
 	{

@@ -64,15 +64,15 @@ void InitializeLara(bool restore)
 	Lara.Status.Stamina = LARA_STAMINA_MAX;
 
 	Lara.Control.Look.Mode = LookMode::None;
-	Lara.HitDirection = -1;
+	Lara.HitDirection = NO_VALUE;
 	Lara.Control.Weapon.WeaponItem = NO_VALUE;
 	Lara.Context.WaterSurfaceDist = 100;
 
 	Lara.ExtraAnim = NO_VALUE;
 	Lara.Context.Vehicle = NO_VALUE;
-	Lara.Location = -1;
-	Lara.HighestLocation = -1;
-	Lara.Control.Rope.Ptr = -1;
+	Lara.Location = NO_VALUE;
+	Lara.HighestLocation = NO_VALUE;
+	Lara.Control.Rope.Ptr = NO_VALUE;
 	Lara.Control.HandStatus = HandStatus::Free;
 
 	InitializePlayerStateMachine();

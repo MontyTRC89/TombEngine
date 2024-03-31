@@ -828,7 +828,7 @@ namespace TEN::Renderer
 
 	void Renderer::ResetAnimations()
 	{
-		for (int i = 0; i < NUM_ITEMS; i++)
+		for (int i = 0; i < ITEM_COUNT_MAX; i++)
 			_items[i].DoneAnimations = false;
 	}
 

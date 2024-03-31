@@ -1,25 +1,20 @@
 #pragma once
-#include <cstdint>
-#include <string>
-#include <vector>
-
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
-#include "Objects/game_object_ids.h"
 #include "Math/Math.h"
-#include "Specific/newtypes.h"
 #include "Specific/BitField.h"
+#include "Objects/game_object_ids.h"
+#include "Specific/newtypes.h"
 
 using namespace TEN::Utils;
 
-constexpr auto NOT_TARGETABLE = -16384;
+constexpr auto ITEM_COUNT_MAX  = 1024;
+constexpr auto ITEM_FLAG_COUNT = 8;
 
-constexpr auto NUM_ITEMS	 = 1024;
-constexpr auto NUM_ITEM_FLAGS = 8;
+constexpr auto NOT_TARGETABLE = SHRT_MIN / 2;
 
-constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
-constexpr unsigned int NO_JOINT_BITS = 0;
-constexpr int		   NO_JOINT = -1;
+constexpr auto ALL_JOINT_BITS = UINT_MAX;
+constexpr auto NO_JOINT_BITS  = 0u;
 
 enum AIObjectType
 {
@@ -80,10 +75,10 @@ struct EntityModelData
 {
 	int BaseMesh = 0;
 
-	Vector4 Color = Vector4::Zero;
-
 	std::vector<int>		 MeshIndex = {};
 	std::vector<BoneMutator> Mutators  = {};
+
+	Vector4 Color = Vector4::Zero;
 };
 
 struct EntityCallbackData
@@ -100,7 +95,7 @@ struct EntityEffectData
 	Vector3	   LightColor			= Vector3::Zero;
 	Vector3	   PrimaryEffectColor	= Vector3::Zero;
 	Vector3	   SecondaryEffectColor = Vector3::Zero;
-	int		   Count				= -1;
+	int		   Count				= NO_VALUE;
 };
 
 // TODO: We need to find good "default states" for a lot of these. -- squidshire 25/05/2022
@@ -141,7 +136,7 @@ struct ItemInfo
 	BitField MeshBits  = BitField::Default;
 
 	unsigned short Flags; // ItemFlags enum
-	short ItemFlags[NUM_ITEM_FLAGS];
+	short ItemFlags[ITEM_FLAG_COUNT];
 	short TriggerFlags;
 
 	// TODO: Move to CreatureInfo?

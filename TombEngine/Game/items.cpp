@@ -532,7 +532,7 @@ void InitializeItem(short itemNumber)
 	item->Animation.RequiredState = NO_VALUE;
 	item->Animation.Velocity = Vector3::Zero;
 
-	for (int i = 0; i < NUM_ITEM_FLAGS; i++)
+	for (int i = 0; i < ITEM_FLAG_COUNT; i++)
 		item->ItemFlags[i] = 0;
 
 	item->Active = false;

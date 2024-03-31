@@ -3826,7 +3826,7 @@ most can just be ignored (see usage).</description>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
 	<name>IsMoveableInside</name>
-	<summary>Determine if a specified moveable is inside this volume.</summary>
+	<summary>Determine if a moveable is inside this volume.</summary>
 	<description>()</description>
 	<parameters>
 		<parameter>

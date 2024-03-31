@@ -205,7 +205,7 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	InitializeItemArray(NUM_ITEMS);
+	InitializeItemArray(ITEM_COUNT_MAX);
 
 	if (g_Level.NumItems > 0)
 	{
