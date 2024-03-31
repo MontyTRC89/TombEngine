@@ -16,16 +16,15 @@ constexpr auto NOT_TARGETABLE = SHRT_MIN / 2;
 constexpr auto ALL_JOINT_BITS = UINT_MAX;
 constexpr auto NO_JOINT_BITS  = 0u;
 
-enum AIObjectType
+enum class EffectType
 {
-	NO_AI	  = 0,
-	GUARD	  = (1 << 0),
-	AMBUSH	  = (1 << 1),
-	PATROL1	  = (1 << 2),
-	MODIFY	  = (1 << 3),
-	FOLLOW	  = (1 << 4),
-	PATROL2	  = (1 << 5),
-	ALL_AIOBJ = (GUARD | AMBUSH | PATROL1 | MODIFY | FOLLOW | PATROL2)
+	None,
+	Fire,
+	Sparks,
+	Smoke,
+	ElectricIgnite,
+	RedIgnite,
+	Custom
 };
 
 enum ItemStatus
@@ -38,23 +37,24 @@ enum ItemStatus
 
 enum ItemFlags
 {
-	IFLAG_TRIGGERED       = (1 << 5),
-	IFLAG_CLEAR_BODY	  = (1 << 7),
-	IFLAG_INVISIBLE		  = (1 << 8),
-	IFLAG_ACTIVATION_MASK = (0x1F << 9), // Bits 9-13 (IFLAG_CODEBITS)
-	IFLAG_REVERSE		  = (1 << 14),
-	IFLAG_KILLED		  = (1 << 15)
+	IFLAG_TRIGGERED       = 1 << 5,
+	IFLAG_CLEAR_BODY	  = 1 << 7,
+	IFLAG_INVISIBLE		  = 1 << 8,
+	IFLAG_ACTIVATION_MASK = 0x1F << 9, // Bits 9-13 (IFLAG_CODEBITS)
+	IFLAG_REVERSE		  = 1 << 14,
+	IFLAG_KILLED		  = 1 << 15
 };
 
-enum class EffectType
+enum AIObjectType
 {
-	None,
-	Fire,
-	Sparks,
-	Smoke,
-	ElectricIgnite,
-	RedIgnite,
-	Custom
+	NO_AI	  = 0,
+	GUARD	  = 1 << 0,
+	AMBUSH	  = 1 << 1,
+	PATROL1	  = 1 << 2,
+	MODIFY	  = 1 << 3,
+	FOLLOW	  = 1 << 4,
+	PATROL2	  = 1 << 5,
+	ALL_AIOBJ = GUARD | AMBUSH | PATROL1 | MODIFY | FOLLOW | PATROL2
 };
 
 struct EntityAnimationData
@@ -67,8 +67,30 @@ struct EntityAnimationData
 	int TargetState	  = 0;
 	int RequiredState = NO_VALUE;
 
-	bool	IsAirborne = false;
-	Vector3 Velocity   = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward
+	// TODO: Have 3 velocity members:
+	// ControlVelocity:		 relative velocity derived from animation.
+	// ExtraControlVelocity: relative velocity set by code (used to control swimming, falling).
+	// ExternalVelocity:	 absolute velocity set by environment (slippery ice, offset blending).
+	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward.
+
+	bool IsAirborne = false;
+};
+
+struct EntityCallbackData
+{
+	std::string OnKilled		 = {};
+	std::string OnHit			 = {};
+	std::string OnObjectCollided = {};
+	std::string OnRoomCollided	 = {};
+};
+
+struct EntityEffectData
+{
+	EffectType Type					= EffectType::None;
+	Vector3	   LightColor			= Vector3::Zero;
+	Vector3	   PrimaryEffectColor	= Vector3::Zero;
+	Vector3	   SecondaryEffectColor = Vector3::Zero;
+	int		   Count				= NO_VALUE;
 };
 
 struct EntityModelData
@@ -81,89 +103,75 @@ struct EntityModelData
 	Vector4 Color = Vector4::Zero;
 };
 
-struct EntityCallbackData
-{
-	std::string OnKilled;
-	std::string OnHit;
-	std::string OnObjectCollided;
-	std::string OnRoomCollided;
-};
-
-struct EntityEffectData
-{
-	EffectType Type					= EffectType::None;
-	Vector3	   LightColor			= Vector3::Zero;
-	Vector3	   PrimaryEffectColor	= Vector3::Zero;
-	Vector3	   SecondaryEffectColor = Vector3::Zero;
-	int		   Count				= NO_VALUE;
-};
-
-// TODO: We need to find good "default states" for a lot of these. -- squidshire 25/05/2022
 struct ItemInfo
 {
-	GAME_OBJECT_ID ObjectNumber = ID_NO_OBJECT; // ObjectID
 	std::string	   Name			= {};
+	int			   Index		= 0;			// ItemNumber // TODO: Make int.
+	GAME_OBJECT_ID ObjectNumber = ID_NO_OBJECT; // ObjectID
 
-	int Status;	// ItemStatus enum.
-	bool Active;
+	/*ItemStatus*/int Status = ITEM_NOT_ACTIVE;
+	bool	   Active = false;
 
-	short Index;
-	short NextItem;
-	short NextActive;
+	// TODO: Refactor linked list.
+	int NextItem   = 0;
+	int NextActive = 0;
 
-	ItemData Data;
-	EntityAnimationData Animation;
-	EntityCallbackData Callbacks;
-	EntityModelData Model;
-	EntityEffectData Effect;
-	
-	Pose StartPose;
-	Pose Pose;
-	RoomVector Location;
-	short RoomNumber;
-	int Floor;
+	ItemData			Data	  = {};
+	EntityAnimationData Animation = {};
+	EntityCallbackData	Callbacks = {};
+	EntityEffectData	Effect	  = {};
+	EntityModelData		Model	  = {};
 
-	int HitPoints;
-	bool HitStatus;
-	bool LookedAt;
-	bool Collidable;
-	bool InDrawRoom;
+	Pose	   StartPose  = Pose::Zero;
+	Pose	   Pose		  = Pose::Zero;
+	RoomVector Location	  = {}; // NOTE: Describes vertical position in room.
+	short	   RoomNumber = 0; // TODO: Make int.
+	int		   Floor	  = 0;
 
-	int BoxNumber;
-	int Timer;
+	int	 HitPoints	= 0;
+	bool HitStatus	= false;
+	bool LookedAt	= false;
+	bool Collidable = false;
+	bool InDrawRoom = false;
 
-	BitField TouchBits = BitField::Default;
-	BitField MeshBits  = BitField::Default;
+	int BoxNumber = 0;
+	int Timer	  = 0;
 
-	unsigned short Flags; // ItemFlags enum
-	short ItemFlags[ITEM_FLAG_COUNT];
-	short TriggerFlags;
+	BitField TouchBits = BitField::Default; // TouchFlags
+	BitField MeshBits  = BitField::Default; // MeshFlags
+
+	std::array<short, ITEM_FLAG_COUNT> ItemFlags = {};
+	unsigned short Flags		= 0; // ItemFlags enum
+	short		   TriggerFlags = 0;
 
 	// TODO: Move to CreatureInfo?
-	unsigned char AIBits; // AIObjectType enum.
-	short AfterDeath;
-	short CarriedItem;
+	unsigned char AIBits	  = 0; // AIObjectFlags enum.
+	short		  AfterDeath  = 0;
+	short		  CarriedItem = 0;
 
+	// OCB utilities
 	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);
 	void ClearAllOcb();
-	
+
+	// ItemFlags utilities
 	bool  TestFlags(int id, short flags) const;		// ItemFlags[id] & flags
 	bool  TestFlagField(int id, short flags) const; // ItemFlags[id] == flags
 	short GetFlagField(int id) const;				// ItemFlags[id]
 	void  SetFlagField(int id, short flags);		// ItemFlags[id] = flags
 	void  ClearFlags(int id, short flags);			// ItemFlags[id] &= ~flags
 
+	// Model utilities
 	bool TestMeshSwapFlags(unsigned int flags);
 	bool TestMeshSwapFlags(const std::vector<unsigned int>& flags);
 	void SetMeshSwapFlags(unsigned int flags, bool clear = false);
 	void SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear = false);
+	void ResetModelToDefault();
 
+	// Inquirers
 	bool IsLara() const;
 	bool IsCreature() const;
 	bool IsBridge() const;
-
-	void ResetModelToDefault();
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);

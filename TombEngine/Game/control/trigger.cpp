@@ -306,15 +306,15 @@ void RefreshCamera(short type, short* data)
 		if (!targetOk || (targetOk == 2 && Camera.item->LookedAt && Camera.item != Camera.lastItem))
 			Camera.item = nullptr;
 
-	if (Camera.number == -1 && Camera.timer > 0)
-		Camera.timer = -1;
+	if (Camera.number == NO_VALUE && Camera.timer > 0)
+		Camera.timer = NO_VALUE;
 }
 
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 {
 	auto bottomBlock = GetCollision(x, y, z, floor->RoomNumber).BottomBlock; 
 
-	if (bottomBlock->TriggerIndex == -1)
+	if (bottomBlock->TriggerIndex == NO_VALUE)
 		return nullptr;
 
 	return &g_Level.FloorData[bottomBlock->TriggerIndex];
@@ -322,7 +322,7 @@ short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 
 short* GetTriggerIndex(ItemInfo* item)
 {
-	auto roomNumber = item->RoomNumber;
+	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 	return GetTriggerIndex(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 }
@@ -821,7 +821,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 
 void TestTriggers(ItemInfo* item, bool isHeavy, int heavyFlags)
 {
-	auto roomNumber = item->RoomNumber;
+	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
 	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, item->Index, isHeavy, heavyFlags);

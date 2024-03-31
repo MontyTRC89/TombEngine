@@ -25,15 +25,15 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Generic;
-using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 
-constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
+constexpr auto ITEM_DEATH_TIMEOUT = 4 * FPS;
 
 bool ItemInfo::TestOcb(short ocbFlags) const
 {
@@ -79,7 +79,7 @@ void ItemInfo::SetFlagField(int id, short flags)
 	if (id < 0 || id > 7)
 		return;
 
-	this->ItemFlags[id] = flags;
+	ItemFlags[id] = flags;
 }
 
 void ItemInfo::ClearFlags(int id, short flags)
@@ -87,7 +87,7 @@ void ItemInfo::ClearFlags(int id, short flags)
 	if (id < 0 || id > 7)
 		return;
 
-	this->ItemFlags[id] &= ~flags;
+	ItemFlags[id] &= ~flags;
 }
 
 bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
@@ -106,7 +106,7 @@ bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
 
 bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int>& flags)
 {
-	auto bits = BitField();
+	auto bits = BitField::Default;
 	bits.Set(flags);
 	return TestMeshSwapFlags(bits.ToPackedBits());
 }
@@ -143,21 +143,6 @@ void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool cle
 	SetMeshSwapFlags(bits.ToPackedBits(), clear);
 }
 
-bool ItemInfo::IsLara() const
-{
-	return Data.is<LaraInfo*>();
-}
-
-bool ItemInfo::IsCreature() const
-{
-	return Data.is<CreatureInfo>();
-}
-
-bool ItemInfo::IsBridge() const
-{
-	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
-}
-
 void ItemInfo::ResetModelToDefault()
 {
 	if (Objects[ObjectNumber].nmeshes > 0)
@@ -177,6 +162,21 @@ void ItemInfo::ResetModelToDefault()
 		Model.Mutators.clear();
 		Model.MeshIndex.clear();
 	}
+}
+
+bool ItemInfo::IsLara() const
+{
+	return Data.is<LaraInfo*>();
+}
+
+bool ItemInfo::IsCreature() const
+{
+	return Data.is<CreatureInfo>();
+}
+
+bool ItemInfo::IsBridge() const
+{
+	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
 }
 
 bool TestState(int refState, const std::vector<int>& stateList)

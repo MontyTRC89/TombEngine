@@ -2297,7 +2297,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		item->Active = savedItem->active();
 		item->HitStatus = savedItem->hit_stauts();
-		item->Status = savedItem->status();
+		item->Status = (ItemStatus)savedItem->status();
 		item->AIBits = savedItem->ai_bits();
 		item->Animation.IsAirborne = savedItem->is_airborne();
 		item->Collidable = savedItem->collidable();
