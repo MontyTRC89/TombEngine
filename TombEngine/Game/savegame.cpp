@@ -981,7 +981,7 @@ const std::vector<byte> SaveGame::Build()
 			{
 				auto& entry = currVolume.StateQueue[k];
 
-				int activator = NO_ITEM;
+				int activator = NO_VALUE;
 				if (std::holds_alternative<short>(entry.Activator))
 					activator = std::get<short>(entry.Activator);
 				else

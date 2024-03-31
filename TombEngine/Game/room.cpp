@@ -37,7 +37,7 @@ bool ROOM_INFO::Active() const
 static void AddRoomFlipItems(const ROOM_INFO& room)
 {
 	// Run through linked items.
-	for (int itemNumber = room.itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+	for (int itemNumber = room.itemNumber; itemNumber != NO_VALUE; itemNumber = g_Level.Items[itemNumber].NextItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
@@ -51,7 +51,7 @@ static void AddRoomFlipItems(const ROOM_INFO& room)
 static void RemoveRoomFlipItems(const ROOM_INFO& room)
 {
 	// Run through linked items.
-	for (int itemNumber = room.itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+	for (int itemNumber = room.itemNumber; itemNumber != NO_VALUE; itemNumber = g_Level.Items[itemNumber].NextItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
@@ -116,7 +116,7 @@ void DoFlipMap(int group)
 bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID)
 {
 	int itemNumber = g_Level.Rooms[roomNumber].itemNumber;
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return false;
 
 	while (true)
@@ -127,7 +127,7 @@ bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID)
 			break;
 
 		itemNumber = item.NextItem;
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return false;
 	}
 

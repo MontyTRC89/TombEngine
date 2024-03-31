@@ -74,7 +74,7 @@ namespace TEN::Entities::Creatures::TR2
 	short ThrowKnife(int x, int y, int z, float vel, short yRot, int roomNumber)
 	{
 		int fxNumber = CreateNewEffect(roomNumber);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return fxNumber;
 
 		auto& fx = EffectList[fxNumber];

@@ -934,7 +934,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 		return false;
 
 	int frontFloor = coll->Front.Floor + LARA_HEIGHT_TREAD;
-	if (coll->Front.Bridge == NO_ITEM &&
+	if (coll->Front.Bridge == NO_VALUE &&
 		(frontFloor <= -CLICK(2) ||
 		frontFloor > CLICK(1.25f) - 4))
 	{
@@ -942,7 +942,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Extra bridge check.
-	if (coll->Front.Bridge != NO_ITEM)
+	if (coll->Front.Bridge != NO_VALUE)
 	{
 		int bridgeBorder = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
 		
@@ -1002,7 +1002,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 			SetAnimation(item, LA_ONWATER_TO_STAND_0_STEP);
 	}
 
-	if (coll->Front.Bridge == NO_ITEM)
+	if (coll->Front.Bridge == NO_VALUE)
 		UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 	else
 		UpdateLaraRoom(item, -LARA_HEIGHT);
