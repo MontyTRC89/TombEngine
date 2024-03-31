@@ -499,8 +499,8 @@ void DeInitializeScripting(int levelIndex, GameStatus reason)
 
 void InitializeOrLoadGame(bool loadGame)
 {
-	g_Gui.SetInventoryItemChosen(NO_ITEM);
-	g_Gui.SetEnterInventory(NO_ITEM);
+	g_Gui.SetInventoryItemChosen(NO_VALUE);
+	g_Gui.SetEnterInventory(NO_VALUE);
 
 	// Restore the game?
 	if (loadGame)
@@ -655,7 +655,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 		if (g_Gui.CallPause())
 			result = GameStatus::ExitToTitle;
 	}
-	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_ITEM) &&
+	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_VALUE) &&
 			 LaraItem->HitPoints > 0 && !Lara.Control.Look.IsUsingBinoculars)
 	{
 		if (g_Gui.CallInventory(LaraItem, true))

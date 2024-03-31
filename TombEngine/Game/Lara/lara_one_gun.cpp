@@ -441,7 +441,7 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	ItemInfo* weaponItemPtr = nullptr;
 
-	if (player.Control.Weapon.WeaponItem == NO_ITEM)
+	if (player.Control.Weapon.WeaponItem == NO_VALUE)
 	{
 		player.Control.Weapon.WeaponItem = CreateItem();
 		weaponItemPtr = &g_Level.Items[player.Control.Weapon.WeaponItem];
@@ -512,7 +512,7 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	if (item.Status == ITEM_DEACTIVATED)
 	{
 		KillItem(player.Control.Weapon.WeaponItem);
-		player.Control.Weapon.WeaponItem = NO_ITEM;
+		player.Control.Weapon.WeaponItem = NO_VALUE;
 		player.Control.HandStatus = HandStatus::Free;
 		player.TargetEntity = nullptr;
 		player.LeftArm.Locked =
@@ -572,7 +572,7 @@ bool FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose)
 	player.Control.Weapon.HasFired = true;
 
 	int itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return false;
 
 	auto& harpoonItem = g_Level.Items[itemNumber];
@@ -680,7 +680,7 @@ void FireGrenade(ItemInfo& laraItem)
 	player.Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return;
 
 	auto& grenadeItem = g_Level.Items[itemNumber];
@@ -731,7 +731,7 @@ void FireGrenade(ItemInfo& laraItem)
 	grenadeItem.Animation.Velocity.z = GRENADE_VELOCITY;
 	grenadeItem.Animation.ActiveState = grenadeItem.Pose.Orientation.x;
 	grenadeItem.Animation.TargetState = grenadeItem.Pose.Orientation.y;
-	grenadeItem.Animation.RequiredState = NO_STATE;
+	grenadeItem.Animation.RequiredState = NO_VALUE;
 	grenadeItem.HitPoints = GRENADE_TIME;
 	grenadeItem.ItemFlags[0] = (int)WeaponAmmoType::Ammo2;
 
@@ -781,7 +781,7 @@ void GrenadeControl(short itemNumber)
 		if (grenadeItem.Animation.Velocity.z)
 		{
 			grenadeItem.Pose.Orientation.z += (short((grenadeItem.Animation.Velocity.z / 16) + 3.0f) * ANGLE(1.0f));
-			if (grenadeItem.Animation.RequiredState != NO_STATE)
+			if (grenadeItem.Animation.RequiredState != NO_VALUE)
 			{
 				grenadeItem.Pose.Orientation.y += (short((grenadeItem.Animation.Velocity.z / 4) + 3.0f) * ANGLE(1.0f));
 			}
@@ -799,7 +799,7 @@ void GrenadeControl(short itemNumber)
 		if (grenadeItem.Animation.Velocity.z)
 		{
 			grenadeItem.Pose.Orientation.z += (short((grenadeItem.Animation.Velocity.z / 4) + 7.0f) * ANGLE(1.0f));
-			if (grenadeItem.Animation.RequiredState != NO_STATE)
+			if (grenadeItem.Animation.RequiredState != NO_VALUE)
 			{
 				grenadeItem.Pose.Orientation.y += (short((grenadeItem.Animation.Velocity.z / 2) + 7.0f) * ANGLE(1.0f));
 			}
@@ -863,7 +863,7 @@ void FireRocket(ItemInfo& laraItem)
 	player.Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return;
 
 	auto& rocketItem = g_Level.Items[itemNumber];
@@ -1002,7 +1002,7 @@ void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose)
 	player.Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return;
 
 	auto& boltItem = g_Level.Items[itemNumber];
@@ -1382,7 +1382,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 	{
 		// Trigger a new fragment in the case of GRENADE_SUPER until itemFlags[1] is > 0.
 		int grenadeItemNumber = CreateItem();
-		if (grenadeItemNumber == NO_ITEM)
+		if (grenadeItemNumber == NO_VALUE)
 			return true;
 
 		auto& grenadeItem = g_Level.Items[grenadeItemNumber];
@@ -1405,7 +1405,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 		grenadeItem.Animation.Velocity.z = 64.0f;
 		grenadeItem.Animation.ActiveState = grenadeItem.Pose.Orientation.x;
 		grenadeItem.Animation.TargetState = grenadeItem.Pose.Orientation.y;
-		grenadeItem.Animation.RequiredState = NO_STATE;
+		grenadeItem.Animation.RequiredState = NO_VALUE;
 
 		AddActiveItem(grenadeItemNumber);
 

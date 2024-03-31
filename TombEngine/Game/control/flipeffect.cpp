@@ -203,7 +203,7 @@ void LaraHandsFree(ItemInfo* item)
 
 void KillActiveBaddys(ItemInfo* item)
 {
-	if (NextItemActive != NO_ITEM)
+	if (NextItemActive != NO_VALUE)
 	{
 		short itemNumber = NextItemActive;
 
@@ -224,7 +224,7 @@ void KillActiveBaddys(ItemInfo* item)
 			}
 
 			itemNumber = targetItem->NextActive;
-		} while (itemNumber != NO_ITEM);
+		} while (itemNumber != NO_VALUE);
 	}
 
 	FlipEffect = -1;

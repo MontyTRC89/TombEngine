@@ -992,7 +992,7 @@ const std::vector<byte> SaveGame::Build()
 			{
 				auto& entry = currVolume.StateQueue[k];
 
-				int activator = NO_ITEM;
+				int activator = NO_VALUE;
 				if (std::holds_alternative<short>(entry.Activator))
 					activator = std::get<short>(entry.Activator);
 				else
@@ -2317,7 +2317,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		item->Active = savedItem->active();
 		item->HitStatus = savedItem->hit_stauts();
-		item->Status = savedItem->status();
+		item->Status = (ItemStatus)savedItem->status();
 		item->AIBits = savedItem->ai_bits();
 		item->Animation.IsAirborne = savedItem->is_airborne();
 		item->Collidable = savedItem->collidable();

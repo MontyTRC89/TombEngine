@@ -258,8 +258,8 @@ namespace TEN::Renderer
 		// Preallocated pools of objects for avoiding new/delete
 		// Items and effects are safe (can't be more than 1024 items in TR), 
 		// lights should be oversized (eventually ignore lights more than MAX_LIGHTS)
-		RendererItem _items[NUM_ITEMS];
-		RendererEffect _effects[NUM_ITEMS];
+		RendererItem _items[ITEM_COUNT_MAX];
+		RendererEffect _effects[ITEM_COUNT_MAX];
 
 		// Debug variables
 		int _numDrawCalls = 0;

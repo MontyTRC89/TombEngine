@@ -42,8 +42,8 @@ namespace TEN::Entities::Generic
 		Oscillation = DEFAULT_OSC;
 
 		Stack.Limit = DEFAULT_STACK_LIMIT;
-		Stack.ItemNumberAbove = NO_ITEM;
-		Stack.ItemNumberBelow = NO_ITEM;
+		Stack.ItemNumberAbove = NO_VALUE;
+		Stack.ItemNumberBelow = NO_VALUE;
 
 		CanFall = false;
 		DoCenterAlign = true;

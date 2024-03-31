@@ -154,7 +154,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 		else if (player.Status.Air < LARA_AIR_MAX && item.HitPoints >= 0)
 		{
 			// HACK: Special case for UPV.
-			if (player.Context.Vehicle == NO_ITEM)
+			if (player.Context.Vehicle == NO_VALUE)
 			{
 				player.Status.Air += 10;
 				if (player.Status.Air > LARA_AIR_MAX)
@@ -167,7 +167,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 			if (player.Control.WaterStatus == WaterStatus::Dry)
 			{
 				// HACK: Special case for UPV.
-				if (player.Context.Vehicle != NO_ITEM)
+				if (player.Context.Vehicle != NO_VALUE)
 				{
 					const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
 					if (vehicleItem.ObjectNumber == ID_UPV)
@@ -664,7 +664,7 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
 	if (player.Control.HandStatus != HandStatus::Busy &&
 		!player.LeftArm.Locked && !player.RightArm.Locked &&
-		player.Context.Vehicle == NO_ITEM)
+		player.Context.Vehicle == NO_VALUE)
 	{
 		player.ExtraTorsoRot = player.ExtraHeadRot;
 	}
@@ -676,12 +676,12 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Context.Vehicle == NO_ITEM)
+	if (lara->Context.Vehicle == NO_VALUE)
 		return false;
 
 	if (!g_Level.Items[lara->Context.Vehicle].Active)
 	{
-		lara->Context.Vehicle = NO_ITEM;
+		lara->Context.Vehicle = NO_VALUE;
 		item->Animation.IsAirborne = true;
 		SetAnimation(item, LA_FALL_START);
 		return false;
@@ -1240,7 +1240,7 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 	static bool dbFlyCheat = true;
 	if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
 	{
-		if (player.Context.Vehicle == NO_ITEM)
+		if (player.Context.Vehicle == NO_VALUE)
 		{
 			GivePlayerItemsCheat(item);
 			GivePlayerWeaponsCheat(item);
@@ -2206,10 +2206,10 @@ void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
 
 	if (vehicle == nullptr)
 	{
-		if (lara->Context.Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_VALUE)
 			g_Level.Items[lara->Context.Vehicle].Active = false;
 
-		lara->Context.Vehicle = NO_ITEM;
+		lara->Context.Vehicle = NO_VALUE;
 	}
 	else
 	{
@@ -2248,7 +2248,7 @@ void ResetPlayerLookAround(ItemInfo& item, float alpha)
 
 		if (player.Control.HandStatus != HandStatus::Busy &&
 			!player.LeftArm.Locked && !player.RightArm.Locked &&
-			player.Context.Vehicle == NO_ITEM)
+			player.Context.Vehicle == NO_VALUE)
 		{
 			player.ExtraTorsoRot = player.ExtraHeadRot;
 		}

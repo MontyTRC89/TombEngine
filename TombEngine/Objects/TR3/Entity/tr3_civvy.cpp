@@ -124,7 +124,7 @@ namespace TEN::Entities::Creatures::TR3
 		for (auto& targetCreature : ActiveCreatures)
 		{
 			// Ignore itself and invalid entities.
-			if (targetCreature->ItemNumber == NO_ITEM || targetCreature->ItemNumber == item.Index)
+			if (targetCreature->ItemNumber == NO_VALUE || targetCreature->ItemNumber == item.Index)
 				continue;
 
 			auto& currentItem = g_Level.Items[targetCreature->ItemNumber];
