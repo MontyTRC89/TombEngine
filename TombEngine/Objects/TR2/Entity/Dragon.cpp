@@ -116,7 +116,7 @@ namespace TEN::Entities::Creatures::TR2
 		int frontBoneItemNumber = SpawnItem(item, ID_DRAGON_BONE_FRONT);
 		int backBoneItemNumber = SpawnItem(item, ID_DRAGON_BONE_BACK);
 
-		if (backBoneItemNumber == NO_ITEM || frontBoneItemNumber == NO_ITEM)
+		if (backBoneItemNumber == NO_VALUE || frontBoneItemNumber == NO_VALUE)
 		{
 			TENLog("Failed to create dragon skeleton objects.", LogLevel::Warning);
 			return;
@@ -127,7 +127,7 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		int backItemNumber = SpawnItem(frontItem, ID_DRAGON_BACK);
 
-		if (backItemNumber == NO_ITEM)
+		if (backItemNumber == NO_VALUE)
 		{
 			TENLog("Failed to create dragon back body segment.", LogLevel::Warning);
 			return;
@@ -141,7 +141,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		// Store back body segment item number.
 		frontItem.ItemFlags[0] = backItemNumber;
-		backItem.ItemFlags[0] = NO_ITEM;
+		backItem.ItemFlags[0] = NO_VALUE;
 	}
 
 	void InitializeDragon(short itemNumber)
@@ -166,7 +166,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (backItem.Status == ITEM_DEACTIVATED)
 		{
 			KillItem(backItem.Index);
-			backItemNumber = NO_ITEM;
+			backItemNumber = NO_VALUE;
 			return;
 		}
 
@@ -308,7 +308,7 @@ namespace TEN::Entities::Creatures::TR2
 			smoke.dB = 0;
 			smoke.colFadeSpeed = 128;
 			smoke.fadeToBlack = 64;
-			smoke.blendMode = BlendMode::Lighten;
+			smoke.blendMode = BlendMode::Additive;
 			smoke.life = smoke.sLife = Random::GenerateInt(10, 60);
 
 			smoke.friction = 0;
@@ -405,12 +405,22 @@ namespace TEN::Entities::Creatures::TR2
 					if (timer == -100)
 					{
 						InitializeDragonBones(item);
+
+						if (flagDaggerDeath)
+						{
+							CollectCarriedItems(&item);
+						}
 					}
 					else if (timer == -200)
 					{
 						DisableEntityAI(itemNumber);
 						KillItem(itemNumber);
-						DropPickups(&item);
+
+						if (!flagDaggerDeath)
+						{
+							DropPickups(&item);
+						}
+
 						item.Status = ITEM_DEACTIVATED;
 					}
 					else if (timer < -100)
@@ -647,7 +657,7 @@ namespace TEN::Entities::Creatures::TR2
 					//playerItem.Pose = item.Pose;
 
 					// HACK: Temporarily use small button push animation.
-					SetAnimation(playerItem, LA_BUTTON_SMALL_PUSH);
+					SetAnimation(playerItem, LA_PICKUP_PEDESTAL_LOW);
 
 					ResetPlayerFlex(&playerItem);
 					playerItem.Animation.FrameNumber = GetAnimData(playerItem).frameBase;

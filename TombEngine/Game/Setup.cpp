@@ -189,7 +189,7 @@ void InitializeObjects()
 		obj->usingDrawAnimatingItem = true;
 		obj->damageType = DamageMode::Any;
 		obj->LotType = LotType::Basic;
-		obj->meshSwapSlot = NO_ITEM;
+		obj->meshSwapSlot = NO_VALUE;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
 	}

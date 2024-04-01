@@ -142,7 +142,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 		else if (player.Status.Air < LARA_AIR_MAX && item.HitPoints >= 0)
 		{
 			// HACK: Special case for UPV.
-			if (player.Context.Vehicle == NO_ITEM)
+			if (player.Context.Vehicle == NO_VALUE)
 			{
 				player.Status.Air += 10;
 				if (player.Status.Air > LARA_AIR_MAX)
@@ -155,7 +155,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 			if (player.Control.WaterStatus == WaterStatus::Dry)
 			{
 				// HACK: Special case for UPV.
-				if (player.Context.Vehicle != NO_ITEM)
+				if (player.Context.Vehicle != NO_VALUE)
 				{
 					const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
 					if (vehicleItem.ObjectNumber == ID_UPV)
@@ -314,7 +314,7 @@ static void UsePlayerMedipack(ItemInfo& item)
 	if (hasUsedMedipack)
 	{
 		player.Status.Poison = 0;
-		Statistics.Game.HealthUsed++;
+		SaveGame::Statistics.Game.HealthUsed++;
 		SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 	}
 }
@@ -648,7 +648,7 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
 	if (player.Control.HandStatus != HandStatus::Busy &&
 		!player.LeftArm.Locked && !player.RightArm.Locked &&
-		player.Context.Vehicle == NO_ITEM)
+		player.Context.Vehicle == NO_VALUE)
 	{
 		player.ExtraTorsoRot = player.ExtraHeadRot;
 	}
@@ -660,12 +660,12 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Context.Vehicle == NO_ITEM)
+	if (lara->Context.Vehicle == NO_VALUE)
 		return false;
 
 	if (!g_Level.Items[lara->Context.Vehicle].Active)
 	{
-		lara->Context.Vehicle = NO_ITEM;
+		lara->Context.Vehicle = NO_VALUE;
 		item->Animation.IsAirborne = true;
 		SetAnimation(item, LA_FALL_START);
 		return false;
@@ -724,7 +724,7 @@ void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 
-	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+	if (coll->CollisionType == CollisionType::Left || coll->CollisionType == CollisionType::Right)
 		maxAngleNormalized *= 0.6f;
 
 	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
@@ -925,7 +925,7 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 	static bool dbFlyCheat = true;
 	if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
 	{
-		if (player.Context.Vehicle == NO_ITEM)
+		if (player.Context.Vehicle == NO_VALUE)
 		{
 			GivePlayerItemsCheat(item);
 			GivePlayerWeaponsCheat(item);
@@ -1293,35 +1293,50 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 	return JumpDirection::None;
 }
 
-short GetLegacySlideDirection(short angle)
+static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)
 {
-	auto quadrant = (CardinalDirection)GetQuadrant(angle);
+	auto tilt = GetSurfaceTilt(floorNormal, true);
 
-	if (quadrant == CardinalDirection::NORTH)
-		quadrant = CardinalDirection::WEST;
-	if (quadrant == CardinalDirection::SOUTH)
-		quadrant = CardinalDirection::EAST;
-	
-	return (short)quadrant * ANGLE(90.0f);
+	short headingAngle = ANGLE(0.0f);
+	if (tilt.x > 2)
+	{
+		headingAngle = ANGLE(-90.0f);
+	}
+	else if (tilt.x < -2)
+	{
+		headingAngle = ANGLE(90.0f);
+	}
+
+	if (tilt.y > 2 && tilt.y > abs(tilt.x))
+	{
+		headingAngle = ANGLE(180.0f);
+	}
+	else if (tilt.y < -2 && -tilt.y > abs(tilt.x))
+	{
+		headingAngle = ANGLE(0.0f);
+	}
+
+	return headingAngle;
 }
 
-short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
+short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;
-	auto probe = GetCollision(item);
+	auto pointColl = GetCollision(item);
 
 	// Ground is flat.
-	if (probe.FloorTilt == Vector2::Zero)
-		return headingAngle;
+	if (pointColl.FloorTilt == Vector2::Zero)
+		return coll->Setup.ForwardAngle;
 
-	// Get either:
-	// a) the surface aspect angle (extended slides), or
-	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = Geometry::GetSurfaceAspectAngle(probe.FloorNormal);
+	// Return slide heading angle.
 	if (g_GameFlow->HasSlideExtended())
-		return headingAngle;
+	{
+		return Geometry::GetSurfaceAspectAngle(pointColl.FloorNormal);
+	}
 	else
-		return GetLegacySlideDirection(headingAngle);
+	{
+		return GetLegacySlideHeadingAngle(pointColl.FloorNormal);
+	}
 }
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
@@ -1622,7 +1637,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	static short oldAngle = 1;
 
 	short aspectAngle = Geometry::GetSurfaceAspectAngle(coll->FloorNormal);
-	short angle = GetLegacySlideDirection(aspectAngle);
+	short angle = GetLegacySlideHeadingAngle(coll->FloorNormal);
 
 	short delta = angle - item->Pose.Orientation.y;
 
@@ -1654,7 +1669,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 // TODO: Do it later.
 void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 {
-	short headinAngle = GetLaraSlideDirection(item, coll);
+	short headinAngle = GetPlayerSlideHeadingAngle(item, coll);
 	short deltaAngle = headinAngle - item->Pose.Orientation.y;
 
 	if (!g_GameFlow->HasSlideExtended())
@@ -1731,10 +1746,10 @@ void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
 
 	if (vehicle == nullptr)
 	{
-		if (lara->Context.Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_VALUE)
 			g_Level.Items[lara->Context.Vehicle].Active = false;
 
-		lara->Context.Vehicle = NO_ITEM;
+		lara->Context.Vehicle = NO_VALUE;
 	}
 	else
 	{
@@ -1771,7 +1786,7 @@ void ResetPlayerLookAround(ItemInfo& item, float alpha)
 
 		if (player.Control.HandStatus != HandStatus::Busy &&
 			!player.LeftArm.Locked && !player.RightArm.Locked &&
-			player.Context.Vehicle == NO_ITEM)
+			player.Context.Vehicle == NO_VALUE)
 		{
 			player.ExtraTorsoRot = player.ExtraHeadRot;
 		}

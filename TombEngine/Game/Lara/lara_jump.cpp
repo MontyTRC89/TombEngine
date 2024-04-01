@@ -635,9 +635,9 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 	LaraDeflectTopSide(item, coll);
 
 	if (coll->Middle.Ceiling >= 0 ||
-		coll->CollisionType == CT_TOP ||
-		coll->CollisionType == CT_TOP_FRONT ||
-		coll->CollisionType == CT_CLAMP)
+		coll->CollisionType == CollisionType::Top ||
+		coll->CollisionType == CollisionType::TopFront ||
+		coll->CollisionType == CollisionType::Clamp)
 	{
 		item->Animation.Velocity.y = 1;
 	}

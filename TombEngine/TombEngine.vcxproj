@@ -123,6 +123,7 @@
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -173,6 +174,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -436,6 +438,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Math\Solvers.h" />
     <ClInclude Include="Objects\Effects\Boss.h" />
     <ClInclude Include="Objects\Effects\effect_objects.h" />
+    <ClInclude Include="Objects\Effects\EmberEmitter.h" />
     <ClInclude Include="Objects\Effects\enemy_missile.h" />
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
     <ClInclude Include="Objects\Effects\tr4_locusts.h" />
@@ -665,6 +668,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h" />
     <ClInclude Include="Objects\TR5\Switch\tr5_raisingcog.h" />
     <ClInclude Include="Objects\TR5\Trap\LaserBarrier.h" />
+    <ClInclude Include="Objects\TR5\Trap\LaserBeam.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_explosion.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_fallingceiling.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_romehammer.h" />
@@ -941,6 +945,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Math\Solvers.cpp" />
     <ClCompile Include="Objects\Effects\Boss.cpp" />
     <ClCompile Include="Objects\Effects\effect_objects.cpp" />
+    <ClCompile Include="Objects\Effects\EmberEmitter.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
@@ -1158,6 +1163,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR5\Switch\tr5_raisingcog.cpp" />
     <ClCompile Include="Objects\TR5\tr5_objects.cpp" />
     <ClCompile Include="Objects\TR5\Trap\LaserBarrier.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\LaserBeam.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_explosion.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_fallingceiling.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_romehammer.cpp" />
@@ -1269,6 +1275,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="Shaders\Shadows.hlsli" />
+    <None Include="Shaders\SpriteEffects.hlsli">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="Shaders\VertexEffects.hlsli" />
     <None Include="Shaders\VertexInput.hlsli">
       <DeploymentContent>true</DeploymentContent>
