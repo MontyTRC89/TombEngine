@@ -122,7 +122,7 @@ static float ReadFloat()
 
 static Vector2 ReadVector2()
 {
-	Vector2 value;
+	auto value = Vector2::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	return value;
@@ -130,7 +130,7 @@ static Vector2 ReadVector2()
 
 static Vector3 ReadVector3()
 {
-	Vector3 value;
+	auto value = Vector3::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	value.z = ReadFloat();
@@ -148,7 +148,7 @@ static Vector3i ReadVector3i()
 
 static Vector4 ReadVector4()
 {
-	Vector4 value;
+	auto value = Vector4::Zero;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	value.z = ReadFloat();
@@ -158,7 +158,7 @@ static Vector4 ReadVector4()
 
 static bool ReadBool()
 {
-	return bool(ReadUInt8());
+	return (bool)ReadUInt8();
 }
 
 static void ReadBytes(void* dest, int count)
@@ -177,15 +177,17 @@ static long long ReadLEB128(bool sign)
 	{
 		currentByte = ReadUInt8();
 
-		result |= (long long)(currentByte & 0x7F) << currentShift;
+		result |= long long(currentByte & 0x7F) << currentShift;
 		currentShift += 7;
-	} while ((currentByte & 0x80) != 0);
+	}
+	while ((currentByte & 0x80) != 0);
 
-	if (sign) // Sign extend
+	// Sign extend.
+	if (sign)
 	{
 		int shift = 64 - currentShift;
 		if (shift > 0)
-			result = (long long)(result << shift) >> shift;
+			result = long long(result << shift) >> shift;
 	}
 
 	return result;
@@ -193,14 +195,16 @@ static long long ReadLEB128(bool sign)
 
 static std::string ReadString()
 {
-	auto numBytes = ReadLEB128(false);
-
-	if (numBytes <= 0)
-		return std::string();
+	long long bytes = ReadLEB128(false);
+	if (bytes <= 0)
+	{
+		return {};
+	}
 	else
 	{
-		auto newPtr = LevelDataPtr + numBytes;
+		auto newPtr = LevelDataPtr + bytes;
 		auto result = std::string(LevelDataPtr, newPtr);
+
 		LevelDataPtr = newPtr;
 		return result;
 	}
@@ -487,11 +491,11 @@ void LoadObjects()
 
 void LoadCameras()
 {
-	int numCameras = ReadInt32();
-	TENLog("Num cameras: " + std::to_string(numCameras), LogLevel::Info);
+	int cameraCount = ReadInt32();
+	TENLog("Cameras: " + std::to_string(cameraCount), LogLevel::Info);
 
-	g_Level.Cameras.reserve(numCameras);
-	for (int i = 0; i < numCameras; i++)
+	g_Level.Cameras.reserve(cameraCount);
+	for (int i = 0; i < cameraCount; i++)
 	{
 		auto& camera = g_Level.Cameras.emplace_back();
 		camera.Index = i;
@@ -506,12 +510,15 @@ void LoadCameras()
 		g_GameScriptEntities->AddName(camera.Name, camera);
 	}
 
+	int spotCameraCount = ReadInt32();
+	TENLog("Spot cameras: " + std::to_string(cameraCount), LogLevel::Info);
+
+	ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
 	// Load spot cameras.
-	NumberSpotcams = ReadInt32();
-	for (int i = 0; i < NumberSpotcams; i++)
+	NumberSpotcams = spotCameraCount;
+	for (int i = 0; i < spotCameraCount; i++)
 	{
 		auto& spotCamera = SpotCam[i];
-
 		spotCamera.Position = ReadVector3i();
 		spotCamera.PositionTarget = ReadVector3i();
 		spotCamera.sequence = ReadUInt8();
@@ -527,11 +534,11 @@ void LoadCameras()
 		ReadInt16();
 	}
 
-	int numSinks = ReadInt32();
-	TENLog("Num sinks: " + std::to_string(numSinks), LogLevel::Info);
+	int skinkCount = ReadInt32();
+	TENLog("Sinks: " + std::to_string(skinkCount), LogLevel::Info);
 
-	g_Level.Sinks.reserve(numSinks);
-	for (int i = 0; i < numSinks; i++)
+	g_Level.Sinks.reserve(skinkCount);
+	for (int i = 0; i < skinkCount; i++)
 	{
 		auto& sink = g_Level.Sinks.emplace_back();
 		sink.Position.x = ReadInt32();
