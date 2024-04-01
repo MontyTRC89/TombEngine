@@ -28,6 +28,7 @@ using namespace TEN::Renderer;
 // ItemFlags[1] = target item number.
 // ItemFlags[2] = OCB orientation when in patrol mode.
 // ItemFlags[3] = Start OCB of AI_FOLLOW. NOTE: Cannot change.
+// ItemFlags[4] = Check if target is a corpse.
 // ItemFlags[5] = Fish count.
 // ItemFlags[6] = Is patrolling.
 // ItemFlags[7] = Distance to player.
@@ -91,11 +92,11 @@ namespace TEN::Entities::Creatures::TR3
 
 	void ControlFishSwarm(short itemNumber)
 	{
-		auto& item = g_Level.Items[itemNumber];
-		auto& creature = *GetCreatureInfo(&item);
-
 		if (!CreatureActive(itemNumber))
 			return;
+
+		auto& item = g_Level.Items[itemNumber];
+		auto& creature = *GetCreatureInfo(&item);
 
 		AI_INFO ai;
 		CreatureAIInfo(&item, &ai);
@@ -138,7 +139,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		// Check if corpse is near.
 		// TODO: In future also check for other enemies like sharks or crocodile.
-		if (!item.Timer && TestGlobalTimeInterval(FISH_UPDATE_INTERVAL_TIME))
+		if (!item.ItemFlags[4] && TestGlobalTimeInterval(FISH_UPDATE_INTERVAL_TIME))
 		{
 			float closestDist = INFINITY;
 			for (auto& targetItem : g_Level.Items)
@@ -155,7 +156,7 @@ namespace TEN::Entities::Creatures::TR3
 						targetItem.ItemFlags[1] == (int)CorpseFlag::Grounded &&
 						TestEnvironment(ENV_FLAG_WATER, targetItem.RoomNumber))
 					{
-						item.Timer = 1;
+						item.ItemFlags[4] = 1;
 						closestDist = dist;
 						item.ItemFlags[1] = targetItem.Index; // Target corpse.
 					}
@@ -164,21 +165,21 @@ namespace TEN::Entities::Creatures::TR3
 		}
 
 		if (item.ItemFlags[7] < BLOCK(7) && TestEnvironment(ENV_FLAG_WATER, &playerRoom) &&
-			item.TriggerFlags < 0 && !item.Timer)
+			item.TriggerFlags < 0 && !item.ItemFlags[4])
 		{
 			item.ItemFlags[1] = LaraItem->Index;
-			item.Timer = 0;
+			item.ItemFlags[4] = 0;
 			item.ItemFlags[2] = 0;
 		}
 		// Circle around leader item.
-		else if (!item.Timer)
+		else if (!item.ItemFlags[4])
 		{
 			item.ItemFlags[1] = item.ItemFlags[0];
-			item.Timer = 0;
+			item.ItemFlags[4] = 0;
 		}
 
 		// Follow path.
-		if (item.AIBits && !item.Timer)
+		if (item.AIBits && !item.ItemFlags[4])
 		{
 			FindAITargetObject(&creature, ID_AI_FOLLOW, item.ItemFlags[3] + item.ItemFlags[2], false);
 
@@ -192,7 +193,7 @@ namespace TEN::Entities::Creatures::TR3
 				item.ItemFlags[2] = 0;
 			}
 
-			item.Timer = 0;
+			item.ItemFlags[4] = 0;
 		}
 
 		for (auto& fish : FishSwarm)
@@ -366,8 +367,12 @@ namespace TEN::Entities::Creatures::TR3
 			const auto& room = g_Level.Rooms[fish.RoomNumber];
 
 			// Update fish room number.
-			if (pointColl.RoomNumber != fish.RoomNumber)
+			if (pointColl.RoomNumber != fish.RoomNumber && 
+				pointColl.RoomNumber != NO_ROOM &&
+				TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
+			{
 				fish.RoomNumber = pointColl.RoomNumber;
+			}
 
 			// Clamp position to slightly below water surface.
 			int waterHeight = GetWaterHeight(fish.Position.x, fish.Position.y, fish.Position.z, fish.RoomNumber);
@@ -379,7 +384,10 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				if (fish.TargetItemPtr->ObjectNumber != ID_AI_FOLLOW)
 				{
-					TriggerBlood(fish.Position.x, fish.Position.y, fish.Position.z, Random::GenerateAngle(), 4);
+					DoBloodSplat(
+						fish.Position.x, fish.Position.y, fish.Position.z,
+						Random::GenerateFloat(4.0f, 8.0f),
+						fish.TargetItemPtr->Pose.Orientation.y, fish.TargetItemPtr->RoomNumber);
 					DoDamage(fish.TargetItemPtr, FISH_HARM_DAMAGE);
 				}
 				else 
