@@ -20,7 +20,7 @@ namespace TEN::Math::Random
 	Vector3 GeneratePointInBox(const BoundingOrientedBox& box);
 	Vector3 GeneratePointInSphere(const BoundingSphere& sphere);
 	Vector3 GeneratePointOnSphere(const BoundingSphere& sphere);
-	Vector3 GeneratePointInSpheroid(const Vector3& center, const Vector3& semiMajorAxis, const EulerAngles& orient);
+	Vector3 GeneratePointInSpheroid(const Vector3& center, const EulerAngles& orient, const Vector3& semiMajorAxis);
 
 	bool TestProbability(float prob);
 }

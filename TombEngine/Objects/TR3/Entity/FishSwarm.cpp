@@ -97,6 +97,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto& item = g_Level.Items[itemNumber];
 		auto& creature = *GetCreatureInfo(&item);
+		const auto& playerItem = *LaraItem;
 
 		AI_INFO ai;
 		CreatureAIInfo(&item, &ai);
@@ -135,7 +136,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		item.Animation.Velocity.z = FISH_VELOCITY_MAX;
 
-		auto& playerRoom = g_Level.Rooms[LaraItem->RoomNumber];
+		auto& playerRoom = g_Level.Rooms[playerItem.RoomNumber];
 
 		// Check if corpse is near.
 		// TODO: In future also check for other enemies like sharks or crocodile.
@@ -167,7 +168,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (item.ItemFlags[7] < BLOCK(7) && TestEnvironment(ENV_FLAG_WATER, &playerRoom) &&
 			item.TriggerFlags < 0 && !item.ItemFlags[4])
 		{
-			item.ItemFlags[1] = LaraItem->Index;
+			item.ItemFlags[1] = playerItem.Index;
 			item.ItemFlags[4] = 0;
 			item.ItemFlags[2] = 0;
 		}
@@ -214,7 +215,7 @@ namespace TEN::Entities::Creatures::TR3
 		constexpr auto BUFFER					= BLOCK(0.1f);
 		constexpr auto SPHEROID_SEMI_MAJOR_AXIS = Vector3(BLOCK(2), BLOCK(1), BLOCK(5));
 
-		auto pos = Random::GeneratePointInSpheroid(item.StartPose.Position.ToVector3(), SPHEROID_SEMI_MAJOR_AXIS, EulerAngles::Identity);
+		auto pos = Random::GeneratePointInSpheroid(item.StartPose.Position.ToVector3(), EulerAngles::Identity, SPHEROID_SEMI_MAJOR_AXIS);
 
 		// Get point collision.
 		auto pointColl = GetCollision(pos, item.RoomNumber);
@@ -245,6 +246,9 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (FishSwarm.empty())
 			return;
+
+		const auto& playerItem = *LaraItem;
+		const auto& player = GetLaraInfo(playerItem);
 
 		const FishData* closestFishPtr = nullptr;
 		float minDistToTarget = INFINITY;
@@ -309,7 +313,7 @@ namespace TEN::Entities::Creatures::TR3
 					continue;
 
 				float distToOtherFish = Vector3i::Distance(fish.Position, otherFish.Position);
-				float distToPlayer = Vector3i::Distance(fish.Position, LaraItem->Pose.Position);
+				float distToPlayer = Vector3i::Distance(fish.Position, playerItem.Pose.Position);
 				float distToTarget = Vector3i::Distance(fish.Position, otherFish.PositionTarget);
 
 				leaderItem.ItemFlags[7] = distToPlayer;
@@ -348,10 +352,9 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				// If player is too close and fish are not lethal, flee.
-				if ((distToPlayer < separationDist * 3) && fish.IsLethal == false &&
-					(LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD || GetLaraInfo(LaraItem)->Context.Vehicle != NO_ITEM))
+				if ((distToPlayer < separationDist * 3) && fish.IsLethal == false)
 				{
-					auto separationDir = fish.Position - LaraItem->Pose.Position.ToVector3();
+					auto separationDir = fish.Position - playerItem.Pose.Position.ToVector3();
 					separationDir.Normalize();
 
 					fish.Position += separationDir * FLEE_VEL;
