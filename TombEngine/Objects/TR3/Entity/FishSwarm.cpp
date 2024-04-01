@@ -210,7 +210,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	static Vector3 GetFishStartPosition(const ItemInfo& item)
 	{
-		constexpr auto BUFFER					= BLOCK(1 / 8.0f);
+		constexpr auto BUFFER					= BLOCK(0.1f);
 		constexpr auto SPHEROID_SEMI_MAJOR_AXIS = Vector3(BLOCK(2), BLOCK(1), BLOCK(5));
 
 		auto pos = Random::GeneratePointInSpheroid(item.StartPose.Position.ToVector3(), SPHEROID_SEMI_MAJOR_AXIS, EulerAngles::Identity);
@@ -249,18 +249,17 @@ namespace TEN::Entities::Creatures::TR3
 		float minDistToTarget = INFINITY;
 		int minDist = INT_MAX;
 
-		int fishNumber = 0;
+		int fishID = 0;
 		for (auto& fish : FishSwarm)
 		{
 			if (fish.Life <= 0.0f)
 				continue;
 
 			// Increase separation distance for each fish.
-			float separationDist = FISH_BASE_SEPARATION_DISTANCE + (fishNumber * 3);
-			fishNumber += 1;
+			float separationDist = FISH_BASE_SEPARATION_DISTANCE + (fishID * 3);
+			fishID += 1;
 
 			auto& leaderItem = *fish.LeaderItemPtr;
-
 			if (!leaderItem.ItemFlags[2] && fish.TargetItemPtr == fish.LeaderItemPtr)
 			{
 				if (!fish.IsPatrolling)
@@ -272,7 +271,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 			}
 
-			int enemyVel = (fish.TargetItemPtr != fish.LeaderItemPtr) ? 16 : 26;
+			int enemyVel = (fish.TargetItemPtr != fish.LeaderItemPtr) ? 16.0f : 26.0f;
 
 			fish.PositionTarget = Random::GeneratePointInSphere(SPHERE);
 
@@ -297,7 +296,7 @@ namespace TEN::Entities::Creatures::TR3
 			// Translate.
 			auto moveDir = fish.Orientation.ToDirection();
 			moveDir.Normalize(); 
-			fish.Position += (moveDir * fish.Velocity / enemyVel);
+			fish.Position += (moveDir * fish.Velocity) / enemyVel;
 			fish.Position += (moveDir * FISH_SPACING_FACTOR) / enemyVel;
 
 			auto orientTo = Geometry::GetOrientToPoint(fish.Position, desiredPos.ToVector3());
@@ -337,7 +336,7 @@ namespace TEN::Entities::Creatures::TR3
 				    fish.Velocity += FISH_CATCH_UP_FACTOR;
 				}
 
-				// Orient to fish nearest to target. To prevent other fish from swimming forward but orient elsewhere.
+				// Orient to fish nearest to target. Prevents other fish from swimming forward but oriented elsewhere.
 				if (closestFishPtr != nullptr &&
 					fish.Orientation.x != closestFishPtr->Orientation.x && separationDist > 30.0f &&
 					(fish.TargetItemPtr == fish.LeaderItemPtr || fish.TargetItemPtr->ObjectNumber == ID_AI_FOLLOW))
@@ -347,7 +346,7 @@ namespace TEN::Entities::Creatures::TR3
 					fish.Velocity += FISH_CATCH_UP_FACTOR;
 				}
 
-				// If player is too close and fish are not lethal, steer away.
+				// If player is too close and fish are not lethal, flee.
 				if ((distToPlayer < separationDist * 3) && fish.IsLethal == false &&
 					(LaraItem->Animation.ActiveState == LS_UNDERWATER_SWIM_FORWARD || GetLaraInfo(LaraItem)->Context.Vehicle != NO_ITEM))
 				{
@@ -398,7 +397,7 @@ namespace TEN::Entities::Creatures::TR3
 			float movementValue = abs(moveDir.z);
 			float undulationAngle = sin(fish.Undulation) * ANGLE(std::clamp(movementValue * 7.0f, 4.0f, 7.0f));
 
-			// Upply undulation.
+			// Apply undulation.
 			fish.Orientation.y += undulationAngle;
 
 			// Update undulation.
