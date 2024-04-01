@@ -44,6 +44,7 @@
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
@@ -85,6 +86,7 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace TEN::Traps::TR5;
+using namespace TEN::Entities::Creatures::TR3;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -232,6 +234,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
+		UpdateFishSwarm();
 		UpdateLocusts();
 		UpdateUnderwaterBloodParticles();
 
