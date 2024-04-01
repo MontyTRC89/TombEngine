@@ -19,12 +19,15 @@
 // item.ItemFlags[0]: use dynamic motion.
 // item.ItemFlags[1]: ??
 // item.ItemFlags[4]: heading angle.
-// TODO: Add support for 4 directions.
+// TODO: In future add support for 4 directions.
 
 namespace TEN::Entities::Traps
 {	
 	constexpr auto SQUISHY_BLOCK_LETHAL_FRAME = 33;
 	constexpr auto MAX_FALLING_VELOCITY = 60;
+	constexpr auto MAX_VELOCITY = 300;
+	constexpr auto FALLING_BLOCK_IMPACT_FRAME = 8;
+	constexpr auto FALLING_BLOCK_NEXT_FRAME = 2;
 
 	enum SquishyBlockState
 	{
@@ -83,6 +86,9 @@ namespace TEN::Entities::Traps
 
 			velocity = item.TriggerFlags;
 
+			if (velocity > MAX_VELOCITY)
+				velocity = MAX_VELOCITY;
+
 			if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_MOVE)
 			{
 				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y + headingAngle, 0).ToDirection();
@@ -114,7 +120,7 @@ namespace TEN::Entities::Traps
 			}
 			else
 			{
-				if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == 19)
+				if (item.Animation.FrameNumber == GetAnimData(item).frameEnd)
 				{
 					if (item.HitPoints != NOT_TARGETABLE && item.HitPoints)
 					{
@@ -147,7 +153,7 @@ namespace TEN::Entities::Traps
 			}
 			else
 			{
-				if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == 8)
+				if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == FALLING_BLOCK_IMPACT_FRAME)
 					Camera.bounce = -96;
 
 				AnimateItem(&item);
@@ -187,9 +193,9 @@ namespace TEN::Entities::Traps
 
 		if (TestBoundsCollide(&item, playerItem, coll->Setup.Radius) && TestCollision(&item, playerItem))
 		{
-			if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) <= 8)
+			if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) <= FALLING_BLOCK_IMPACT_FRAME)
 			{
-				item.Animation.FrameNumber += 2;
+				item.Animation.FrameNumber += FALLING_BLOCK_NEXT_FRAME;
 
 				DoDamage(playerItem, INT_MAX);
 				SetAnimation(playerItem, LA_BOULDER_DEATH);
