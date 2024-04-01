@@ -951,7 +951,7 @@ namespace TEN::Entities
 			obj->SetHitEffect(true);
 		}
 
-		obj = &Objects[ID_SQUISHY_BLOCK1];
+		obj = &Objects[ID_SQUISHY_BLOCK_HORIZONTAL];
 		if (obj->loaded)
 		{
 			obj->Initialize = InitializeSquishyBlock;
@@ -960,7 +960,7 @@ namespace TEN::Entities
 			obj->SetHitEffect(true);
 		}
 
-		obj = &Objects[ID_SQUISHY_BLOCK2];
+		obj = &Objects[ID_SQUISHY_BLOCK_VERTICAL];
 		if (obj->loaded)
 		{
 			obj->control = ControlFallingSquishyBlock;
