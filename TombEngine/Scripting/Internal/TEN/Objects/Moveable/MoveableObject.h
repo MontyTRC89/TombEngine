@@ -133,6 +133,12 @@ public:
 
 	short GetIndex() const;
 
+	[[nodiscard]] std::unique_ptr<Moveable> GetCreatureEnemy();
+	void ClearCreatureEnemy();
+	void SetCreatureEnemy(Moveable& m);
+	[[nodiscard]] TypeOrNil<Vec3> GetCreatureTarget();
+	void SetCreatureTarget(const Vec3& pos);
+
 protected:
 	ItemInfo* m_item;
 
