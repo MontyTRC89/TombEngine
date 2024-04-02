@@ -8,45 +8,45 @@ namespace TEN::Utils
 
 	BitField::BitField()
 	{
-		Bits.resize(SIZE_DEFAULT);
+		_bits.resize(SIZE_DEFAULT);
 	}
 
 	BitField::BitField(unsigned int size)
 	{
 		// NOTE: Bits initialize as unset.
 		size = std::min<unsigned int>(size, SIZE_DEFAULT);
-		Bits.resize(size);
+		_bits.resize(size);
 	}
 
 	BitField::BitField(unsigned int size, unsigned int packedBits)
 	{
 		size = std::min<unsigned int>(size, SIZE_DEFAULT);
-		Bits.reserve(size);
+		_bits.reserve(size);
 
 		for (unsigned int i = 0; i < size; i++)
 		{
 			unsigned int bit = unsigned int(1 << i);
-			Bits.push_back((packedBits & bit) == bit);
+			_bits.push_back((packedBits & bit) == bit);
 		}
 	}
 
 	BitField::BitField(const std::string& bitString)
 	{
-		Bits.reserve(bitString.size());
+		_bits.reserve(bitString.size());
 
 		for (const char& bit : bitString)
-			Bits.push_back(bit == '1');
+			_bits.push_back(bit == '1');
 	}
 
 	unsigned int BitField::GetSize() const
 	{
-		return (unsigned int)Bits.size();
+		return (unsigned int)_bits.size();
 	}
 
 	unsigned int BitField::GetCount() const
 	{
 		unsigned int count = 0;
-		for (const bool& bit : Bits)
+		for (const bool& bit : _bits)
 		{
 			if (bit)
 				count++;
@@ -59,13 +59,13 @@ namespace TEN::Utils
 	{
 		for (const unsigned int& index : indices)
 		{
-			if (index >= Bits.size())
+			if (index >= _bits.size())
 			{
 				TENLog(std::string("BitField attempted to set bit at invalid index."), LogLevel::Warning);
 				continue;
 			}
 			
-			Bits[index] = true;
+			_bits[index] = true;
 		}
 	}
 
@@ -83,13 +83,13 @@ namespace TEN::Utils
 	{
 		for (const unsigned int& index : indices)
 		{
-			if (index >= Bits.size())
+			if (index >= _bits.size())
 			{
 				TENLog(std::string("BitField attempted to clear bit at invalid index."), LogLevel::Warning);
 				continue;
 			}
 
-			Bits[index] = false;
+			_bits[index] = false;
 		}
 	}
 	
@@ -107,13 +107,13 @@ namespace TEN::Utils
 	{
 		for (const unsigned int& index : indices)
 		{
-			if (index >= Bits.size())
+			if (index >= _bits.size())
 			{
 				TENLog(std::string("BitField attempted to flip bit at invalid index."), LogLevel::Warning);
 				continue;
 			}
 
-			Bits[index].flip();
+			_bits[index].flip();
 		}
 	}
 	
@@ -124,14 +124,14 @@ namespace TEN::Utils
 
 	void BitField::FlipAll()
 	{
-		Bits.flip();
+		_bits.flip();
 	}
 
 	bool BitField::Test(const std::vector<unsigned int>& indices, bool testAny) const
 	{
 		for (const unsigned int& index : indices)
 		{
-			if (index >= Bits.size())
+			if (index >= _bits.size())
 			{
 				TENLog(std::string("BitField attempted to test bit at invalid index."), LogLevel::Warning);
 				continue;
@@ -140,13 +140,13 @@ namespace TEN::Utils
 			// Test if any bits at input indices are set.
 			if (testAny)
 			{
-				if (Bits[index])
+				if (_bits[index])
 					return true;
 			}
 			// Test if any bits at input indices are set.
 			else
 			{
-				if (!Bits[index])
+				if (!_bits[index])
 					return false;
 			}
 		}
@@ -161,7 +161,7 @@ namespace TEN::Utils
 
 	bool BitField::TestAny() const
 	{
-		for (const bool& bit : Bits)
+		for (const bool& bit : _bits)
 		{
 			if (bit)
 				return true;
@@ -172,7 +172,7 @@ namespace TEN::Utils
 
 	bool BitField::TestAll() const
 	{
-		for (const bool& bit : Bits)
+		for (const bool& bit : _bits)
 		{
 			if (!bit)
 				return false;
@@ -184,9 +184,9 @@ namespace TEN::Utils
 	unsigned int BitField::ToPackedBits() const
 	{
 		unsigned int packedBits = 0;
-		for (unsigned int i = 0; i < Bits.size(); i++)
+		for (unsigned int i = 0; i < _bits.size(); i++)
 		{
-			if (Bits[i])
+			if (_bits[i])
 			{
 				unsigned int bit = unsigned int(1 << i);
 				packedBits |= bit;
@@ -199,7 +199,7 @@ namespace TEN::Utils
 	std::string BitField::ToString() const
 	{
 		auto bitString = std::string();
-		for (const bool& bit : Bits)
+		for (const bool& bit : _bits)
 			bitString += bit ? '1' : '0';
 
 		return bitString;
@@ -207,10 +207,10 @@ namespace TEN::Utils
 
 	bool BitField::operator ==(unsigned int packedBits) const
 	{
-		for (unsigned int i = 0; i < Bits.size(); i++)
+		for (unsigned int i = 0; i < _bits.size(); i++)
 		{
 			unsigned int bit = unsigned int(1 << i);
-			if (Bits[i] != ((packedBits & bit) == bit))
+			if (_bits[i] != ((packedBits & bit) == bit))
 				return false;
 		}
 
@@ -224,10 +224,10 @@ namespace TEN::Utils
 
 	BitField& BitField::operator =(unsigned int packedBits)
 	{
-		for (unsigned int i = 0; i < Bits.size(); i++)
+		for (unsigned int i = 0; i < _bits.size(); i++)
 		{
 			unsigned int bit = unsigned int(1 << i);
-			Bits[i] = ((packedBits & bit) == bit);
+			_bits[i] = ((packedBits & bit) == bit);
 		}
 
 		return *this;
@@ -235,10 +235,10 @@ namespace TEN::Utils
 
 	BitField& BitField::operator &=(unsigned int packedBits)
 	{
-		for (unsigned int i = 0; i < Bits.size(); i++)
+		for (unsigned int i = 0; i < _bits.size(); i++)
 		{
 			unsigned int bit = unsigned int(1 << i);
-			Bits[i] = (Bits[i] && (packedBits & bit) == bit);
+			_bits[i] = (_bits[i] && (packedBits & bit) == bit);
 		}
 
 		return *this;
@@ -246,14 +246,14 @@ namespace TEN::Utils
 
 	BitField& BitField::operator |=(unsigned int packedBits)
 	{
-		for (unsigned int i = 0; i < Bits.size(); i++)
+		for (unsigned int i = 0; i < _bits.size(); i++)
 		{
-			if (Bits[i])
+			if (_bits[i])
 				continue;
 
 			unsigned int bit = unsigned int(1 << i);
 			if ((packedBits & bit) == bit)
-				Bits[i] = true;
+				_bits[i] = true;
 		}
 
 		return *this;
@@ -271,6 +271,6 @@ namespace TEN::Utils
 
 	void BitField::Fill(bool value)
 	{
-		std::fill(Bits.begin(), Bits.end(), value);
+		std::fill(_bits.begin(), _bits.end(), value);
 	}
 }

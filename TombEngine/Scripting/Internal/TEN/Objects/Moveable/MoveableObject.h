@@ -90,6 +90,7 @@ public:
 	[[nodiscard]] short GetLocationAI() const;
 	void SetLocationAI(short value);
 
+	[[nodiscard]] short GetMeshCount() const;
 	[[nodiscard]] bool GetMeshVisible(int meshId) const;
 	void SetMeshVisible(int meshId, bool isVisible);
 	void ShatterMesh(int meshId);
@@ -132,6 +133,12 @@ public:
 
 	short GetIndex() const;
 	
+	[[nodiscard]] std::unique_ptr<Moveable> GetCreatureEnemy();
+	void ClearCreatureEnemy();
+	void SetCreatureEnemy(Moveable& m);
+	[[nodiscard]] TypeOrNil<Vec3> GetCreatureTarget();
+	void SetCreatureTarget(const Vec3& pos);
+
 	[[nodiscard]] std::unique_ptr<Moveable> GetCreatureEnemy();
 	void ClearCreatureEnemy();
 	void SetCreatureEnemy(Moveable& m);

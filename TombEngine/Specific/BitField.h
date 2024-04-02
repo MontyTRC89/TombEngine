@@ -12,7 +12,7 @@ namespace TEN::Utils
 		static constexpr auto SIZE_DEFAULT = 32;
 
 		// Members
-		std::vector<bool> Bits = {};
+		std::vector<bool> _bits = {};
 
 	public:
 		// Presets

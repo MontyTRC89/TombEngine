@@ -607,7 +607,7 @@ namespace TEN::Renderer
 		// Savegame listing
 		for (int n = 0; n < SAVEGAME_MAX; n++)
 		{
-			auto& save = SavegameInfos[n];
+			auto& save = SaveGame::Infos[n];
 
 			if (!save.Present)
 			{
@@ -656,19 +656,19 @@ namespace TEN::Renderer
 		GetNextLinePosition(&y);
 
 		// Distance travelled
-		sprintf(buffer, "%dm", Statistics.Game.Distance / UnitsToMeters);
+		sprintf(buffer, "%dm", SaveGame::Statistics.Game.Distance / UnitsToMeters);
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_DISTANCE_TRAVELLED), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
 
 		// Ammo used
-		sprintf(buffer, "%d", Statistics.Game.AmmoUsed);
+		sprintf(buffer, "%d", SaveGame::Statistics.Game.AmmoUsed);
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AMMO_USED), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
 
 		// Medipacks used
-		sprintf(buffer, "%d", Statistics.Game.HealthUsed);
+		sprintf(buffer, "%d", SaveGame::Statistics.Game.HealthUsed);
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_USED_MEDIPACKS), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
@@ -676,7 +676,7 @@ namespace TEN::Renderer
 		// Secrets found in Level
 		if (g_GameFlow->GetLevel(CurrentLevel)->GetSecrets() > 0)
 		{
-			std::bitset<32> levelSecretBitSet(Statistics.Level.Secrets);
+			std::bitset<32> levelSecretBitSet(SaveGame::Statistics.Level.Secrets);
 			sprintf(buffer, "%d / %d", (int)levelSecretBitSet.count(), g_GameFlow->GetLevel(CurrentLevel)->GetSecrets());
 			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_LEVEL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
@@ -686,7 +686,7 @@ namespace TEN::Renderer
 		// Secrets found total
 		if (g_GameFlow->TotalNumberOfSecrets > 0)
 		{
-			sprintf(buffer, "%d / %d", Statistics.Game.Secrets, g_GameFlow->TotalNumberOfSecrets);
+			sprintf(buffer, "%d / %d", SaveGame::Statistics.Game.Secrets, g_GameFlow->TotalNumberOfSecrets);
 			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TOTAL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
 		}
@@ -880,7 +880,7 @@ namespace TEN::Renderer
 	{
 		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
 
-		static EulerAngles orient = EulerAngles::Zero;
+		static EulerAngles orient = EulerAngles::Identity;
 		static float scaler = 1.2f;
 
 		short invItem = g_Gui.GetRing(RingTypes::Inventory).CurrentObjectList[g_Gui.GetRing(RingTypes::Inventory).CurrentObjectInList].InventoryItem;
@@ -940,7 +940,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 	}
 
-	void Renderer::RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background)
+	void Renderer::RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background, float backgroundFade)
 	{
 		// Set basic render states
 		SetBlendMode(BlendMode::Opaque, true);
@@ -954,7 +954,7 @@ namespace TEN::Renderer
 
 		if (background != nullptr)
 		{
-			DrawFullScreenImage(background->ShaderResourceView.Get(), 0.5f, _renderTarget.RenderTargetView.Get(), _renderTarget.DepthStencilView.Get());
+			DrawFullScreenImage(background->ShaderResourceView.Get(), backgroundFade, _renderTarget.RenderTargetView.Get(), _renderTarget.DepthStencilView.Get());
 		}
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -1099,19 +1099,20 @@ namespace TEN::Renderer
 	{
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
-		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget);
+		
+		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 0.5f);
+		
 		_swapChain->Present(0, 0);
 	}
 
 	void Renderer::RenderTitle()
 	{
+		RenderScene(&_dumpScreenRenderTarget, false, _gameCamera);
+
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 
-		RenderScene(&_backBuffer, false, _gameCamera);
-		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-		RenderInventoryScene(&_backBuffer, nullptr);
+		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 1.0f);
 		DrawAllStrings();
 
 		_swapChain->Present(0, 0);

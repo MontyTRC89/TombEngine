@@ -130,7 +130,7 @@ short FindBridge(int tiltGrade, short orient, Vector3i& pos, int* returnHeight, 
 		}
 	}
 
-	return NO_ITEM;
+	return NO_VALUE;
 }
 
 // Get the signed difference between two orientations.
@@ -351,7 +351,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Forward))
 	{
 		// Test for ledge over slope.
-		short tempRoom = probeUp.Block->GetRoomNumberAbove(up.x, up.z).value_or(NO_ROOM);
+		short tempRoom = probeUp.Block->GetNextRoomNumber(up.x, up.z, false).value_or(NO_ROOM);
 		if (tempRoom != NO_ROOM)
 		{
 			auto probeLedge = GetCollision(now.x, now.y - CLICK(3), now.z, tempRoom);

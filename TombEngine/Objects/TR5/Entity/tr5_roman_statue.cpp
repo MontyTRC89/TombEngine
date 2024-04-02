@@ -81,7 +81,7 @@ namespace TEN::Entities::Creatures::TR5
 		if (!(GetRandomControl() & 0x1F))
 		{
 			int fxNumber = CreateNewEffect(item->RoomNumber);
-			if (fxNumber != NO_ITEM)
+			if (fxNumber != NO_VALUE)
 			{
 				auto* fx = &EffectList[fxNumber];
 
@@ -205,7 +205,7 @@ namespace TEN::Entities::Creatures::TR5
 	static void RomanStatueAttack(Pose* pos, short roomNumber, short count)
 	{
 		int fxNumber = CreateNewEffect(roomNumber);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto* fx = &EffectList[fxNumber];
@@ -587,12 +587,12 @@ namespace TEN::Entities::Creatures::TR5
 							if (item->ItemFlags[0])
 								item->ItemFlags[0]--;
 
-							TriggerShockwave(&Pose(pos1), 16, 160, 96, 0, color / 2, color, 48, EulerAngles::Zero, 1, true, false, true, (int)ShockwaveStyle::Normal);
+							TriggerShockwave(&Pose(pos1), 16, 160, 96, 0, color / 2, color, 48, EulerAngles::Identity, 1, true, false, true, (int)ShockwaveStyle::Normal);
 							TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
 
 							pos1.y -= 64;
 
-							TriggerShockwave(&Pose(pos1), 16, 160, 64, 0, color / 2, color, 48, EulerAngles::Zero, 1, true, false, true, (int)ShockwaveStyle::Normal);
+							TriggerShockwave(&Pose(pos1), 16, 160, 64, 0, color / 2, color, 48, EulerAngles::Identity, 1, true, false, true, (int)ShockwaveStyle::Normal);
 							
 							auto lightColor = Color(0.4f, 0.3f, 0.0f);
 							TriggerDynamicLight(pos.ToVector3(), lightColor, 0.04f);

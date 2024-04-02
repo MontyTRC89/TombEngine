@@ -13,15 +13,15 @@ constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBou
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
 constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 
-enum CollisionType
+enum class CollisionType
 {
-	CT_NONE		 = 0,
-	CT_FRONT	 = (1 << 0),
-	CT_LEFT		 = (1 << 1),
-	CT_RIGHT	 = (1 << 2),
-	CT_TOP		 = (1 << 3),
-	CT_TOP_FRONT = (1 << 4),
-	CT_CLAMP	 = (1 << 5)
+	None,
+	Front,
+	Left,
+	Right,
+	Top,
+	TopFront,
+	Clamp
 };
 
 enum class CollisionProbeMode

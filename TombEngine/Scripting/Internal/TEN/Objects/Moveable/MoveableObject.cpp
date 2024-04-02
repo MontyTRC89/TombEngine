@@ -1,5 +1,4 @@
 #include "framework.h"
-#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
 #include "Game/collision/floordata.h"
 #include "Game/control/lot.h"
@@ -8,8 +7,8 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/misc.h"
 #include "Game/Setup.h"
+#include "Game/misc.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
@@ -20,6 +19,7 @@
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
@@ -37,8 +37,8 @@ pickups, and Lara herself (see also @{Objects.LaraObject} for Lara-specific feat
 
 constexpr auto LUA_CLASS_NAME{ ScriptReserved_Moveable };
 
-static auto index_error = index_error_maker(Moveable, LUA_CLASS_NAME);
-static auto newindex_error = newindex_error_maker(Moveable, LUA_CLASS_NAME);
+static auto IndexError = index_error_maker(Moveable, LUA_CLASS_NAME);
+static auto NewIndexError = newindex_error_maker(Moveable, LUA_CLASS_NAME);
 
 
 Moveable::Moveable(short num, bool alreadyInitialized) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialized{ alreadyInitialized }
@@ -49,7 +49,7 @@ Moveable::Moveable(short num, bool alreadyInitialized) : m_item{ &g_Level.Items[
 
 Moveable::Moveable(Moveable&& other) noexcept : 
 	m_item{ std::exchange(other.m_item, nullptr) },
-	m_num{ std::exchange(other.m_num, NO_ITEM) },
+	m_num{ std::exchange(other.m_num, NO_VALUE) },
 	m_initialized{ std::exchange(other.m_initialized, false) }
 {
 	if (GetValid())
@@ -140,7 +140,7 @@ static std::unique_ptr<Moveable> Create(
 		ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
 		ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
 		ptr->SetColor(ScriptColor(Vector4::One));
-		item->CarriedItem = NO_ITEM;
+		item->CarriedItem = NO_VALUE;
 
 		// call this when resetting name too?
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(item, ptr.get());
@@ -154,8 +154,8 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
 		sol::call_constructor, Create,
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
 	ScriptReserved_Enable, &Moveable::EnableItem,
@@ -291,14 +291,21 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @function Moveable:SetFrame
 // @tparam int frame the new frame number
 	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
-		
+
+/// Get current HP (hit points/health points)
+// @function Moveable:GetHP
+// @treturn int the amount of HP the moveable currently has
 	ScriptReserved_GetHP, &Moveable::GetHP,
 
+/// Set current HP (hit points/health points)
+// Clamped to [0, 32767] for "intelligent" entities (i.e. anything with AI); clamped to [-32767, 32767] otherwise.
+// @function Moveable:SetHP
+// @tparam int HP the amount of HP to give the moveable
 	ScriptReserved_SetHP, &Moveable::SetHP,
 
 /// Get HP definded for that object type (hit points/health points) (Read Only).
 // @function Moveable:GetSlotHP
-// @tparam int ID of the moveable slot type.
+// @treturn int the moveable's slot default hit points
 ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Get OCB (object code bit) of the moveable
@@ -341,7 +348,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 			
 	ScriptReserved_SetAIBits, &Moveable::SetAIBits,
 
-	ScriptReserved_GetMeshVisable, &Moveable::GetMeshVisible,
+	ScriptReserved_GetMeshCount, & Moveable::GetMeshCount,
+
+	ScriptReserved_GetMeshVisible, &Moveable::GetMeshVisible,
 			
 	ScriptReserved_SetMeshVisible, &Moveable::SetMeshVisible,
 			
@@ -425,29 +434,30 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam Objects.ObjID ObjectID to take animation and stateID from,
 // @tparam int animNumber animation from object
 // @tparam int stateID state from object
-	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject,
-		
-	/// Get a creature moveable's current enemy
-	// @Function Moveable:GetCreatureEnemy
-	ScriptReserved_GetCreatureEnemy, &Moveable::GetCreatureEnemy,
+	ScriptReserved_AnimFromObject, & Moveable::AnimFromObject,
 
-	/// Clears a creature moveable's current enemy
-	// @Function Moveable:ClearCreatureEnemy
-	ScriptReserved_ClearCreatureEnemy, &Moveable::ClearCreatureEnemy,
+/// Get a creature moveable's current enemy
+// @Function Moveable:GetCreatureEnemy
+	ScriptReserved_GetCreatureEnemy, & Moveable::GetCreatureEnemy,
 
-	/// Set a creature moveable's current enemy
-	// @Function Moveable:SetCreatureEnemy
-	// @tparam Moveable A moveable for the creature to treat as enemy
-	ScriptReserved_SetCreatureEnemy, &Moveable::SetCreatureEnemy,
+/// Clears a creature moveable's current enemy
+// @function Moveable:ClearCreatureEnemy
+	ScriptReserved_ClearCreatureEnemy, & Moveable::ClearCreatureEnemy,
 
-	/// Get a creature moveable's target vector
-	// @Function Moveable:GetCreatureTarget
-	// @treturn Vec3 the creature's current target vector
-	ScriptReserved_GetCreatureTarget, &Moveable::GetCreatureTarget,
+/// Set a creature moveable's current enemy
+// @function Moveable:SetCreatureEnemy
+// @tparam Moveable moveable for the creature to treat as enemy
+	ScriptReserved_SetCreatureEnemy, & Moveable::SetCreatureEnemy,
 
-	/// Set a creature moveable's target vector
-	/// @tparam Vec3 a position for the creature to target
-	ScriptReserved_SetCreatureTarget, &Moveable::SetCreatureTarget);
+/// Get a creature moveable's target vector
+// @function Moveable:GetCreatureTarget
+// @treturn Vec3 the creature's current target vector
+	ScriptReserved_GetCreatureTarget, & Moveable::GetCreatureTarget,
+
+/// Set a creature moveable's target vector
+// @function Moveable:SetCreatureTarget
+// @tparam Vec3 position for the creature to target
+	ScriptReserved_SetCreatureTarget, & Moveable::SetCreatureTarget);
 }
 
 void Moveable::Init()
@@ -644,18 +654,11 @@ void Moveable::SetRot(const Rotation& rot)
 		UpdateBridgeItem(*m_item);
 }
 
-/// Get current HP (hit points/health points)
-// @function Moveable:GetHP
-// @treturn int the amount of HP the moveable currently has
 short Moveable::GetHP() const
 {
 	return m_item->HitPoints;
 }
 
-/// Set current HP (hit points/health points)
-// Clamped to [0, 32767] for "intelligent" entities (i.e. anything with AI); clamped to [-32767, 32767] otherwise.
-// @function Moveable:SetHP
-// @tparam int HP the amount of HP to give the moveable
 void Moveable::SetHP(short hp)
 {
 	if (Objects[m_item->ObjectNumber].intelligent && hp < 0)
@@ -973,6 +976,15 @@ void Moveable::SetStatus(ItemStatus status)
 	m_item->Status = status;
 }
 
+/// Get number of meshes for a particular object
+// Returns number of meshes in an object
+// @function Moveable:GetMeshCount
+// @treturn int number of meshes
+short Moveable::GetMeshCount() const
+{
+	return Objects[m_item->ObjectNumber].nmeshes;
+}
+
 /// Get state of specified mesh visibility of object
 // Returns true if specified mesh is visible on an object, and false
 // if it is not visible.
@@ -1084,7 +1096,7 @@ void Moveable::UnswapMesh(int meshId)
 // @function Moveable:Enable
 void Moveable::EnableItem()
 {
-	if (m_num == NO_ITEM)
+	if (m_num == NO_VALUE)
 		return;
 
 	bool wasInvisible = false;
@@ -1104,12 +1116,12 @@ void Moveable::EnableItem()
 // @function Moveable:Disable
 void Moveable::DisableItem()
 {
-	if (m_num == NO_ITEM)
+	if (m_num == NO_VALUE)
 		return;
 
 	Antitrigger(m_num);
 
-	if (m_num > NO_ITEM && (m_item->Status == ITEM_INVISIBLE))
+	if (m_num > NO_VALUE && (m_item->Status == ITEM_INVISIBLE))
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 }
 
@@ -1131,6 +1143,7 @@ void Moveable::Shatter()
 		ExplodeItemNode(m_item, i, 0, 128);
 
 	CreatureDie(m_num, false);
+	KillItem(m_num);
 }
 
 /// Make the item invisible. Alias for `Moveable:SetVisible(false)`.
@@ -1157,7 +1170,7 @@ void Moveable::SetVisible(bool isVisible)
 
 		m_item->Status = ITEM_INVISIBLE;
 
-		if (m_num > NO_ITEM)
+		if (m_num > NO_VALUE)
 			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 	}
 	else
@@ -1179,7 +1192,7 @@ void Moveable::SetVisible(bool isVisible)
 			m_item->Status = ITEM_ACTIVE;
 		}
 
-		if (m_num > NO_ITEM)
+		if (m_num > NO_VALUE)
 			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 	}
 }
@@ -1187,18 +1200,18 @@ void Moveable::SetVisible(bool isVisible)
 void Moveable::Invalidate()
 {
 	// Keep m_item as-is so it can be properly removed from moveables set when destructor is called.
-	m_num = NO_ITEM;
+	m_num = NO_VALUE;
 	m_initialized = false;
 }
 
 bool Moveable::GetValid() const
 {
-	return m_num > NO_ITEM;
+	return m_num > NO_VALUE;
 }
 
 void Moveable::Destroy()
 {
-	if (m_num > NO_ITEM) 
+	if (m_num > NO_VALUE) 
 	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 		s_callbackRemoveName(m_item->Name);

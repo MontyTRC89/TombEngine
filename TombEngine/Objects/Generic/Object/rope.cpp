@@ -604,9 +604,9 @@ namespace TEN::Entities::Generic
 		GetCollisionInfo(coll, item);
 
 		bool stumble = testForStumble &&
-			((coll->CollisionType != CollisionType::CT_NONE && 
-			  coll->CollisionType != CollisionType::CT_TOP  &&
-			  coll->CollisionType != CollisionType::CT_TOP_FRONT) || 
+			((coll->CollisionType != CollisionType::None && 
+			  coll->CollisionType != CollisionType::Top &&
+			  coll->CollisionType != CollisionType::TopFront) || 
 			  coll->HitStatic);
 
 		if (stumble || 
