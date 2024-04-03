@@ -46,7 +46,7 @@ namespace TEN::Entities::TR4
 	{
 		CollisionInfo coll = {};
 		coll.Setup.Radius = radius;
-		coll.Setup.OldPosition = trapItem->Pose.Position;
+		coll.Setup.PrevPosition = trapItem->Pose.Position;
 		coll.Setup.EnableObjectPush = false;
 
 		DoObjectCollision(trapItem, &coll);
@@ -148,7 +148,7 @@ namespace TEN::Entities::TR4
 					TriggerBlood(Vector3(dx, yBottom - (GetRandomControl() % dy), dz), Random::GenerateAngle(), 1);
 				}
 
-				if (LaraItem->HitPoints <= 0 && Lara.Context.Vehicle == NO_ITEM)
+				if (LaraItem->HitPoints <= 0 && Lara.Context.Vehicle == NO_VALUE)
 				{
 					int heightFromFloor = GetCollision(LaraItem).Position.Floor - LaraItem->Pose.Position.y;
 

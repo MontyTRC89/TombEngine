@@ -39,7 +39,7 @@ short GetNextRat()
 		i++;
 
 		if (i >= NUM_RATS)
-			return NO_ITEM;
+			return NO_VALUE;
 	}
 
 	NextRat = (ratNumber + 1) & 0x1F;
@@ -299,6 +299,10 @@ void UpdateRats()
 
 				if (!i && !(GetRandomControl() & 4))
 					SoundEffect(SFX_TR5_RATS,&rat->Pose);
+
+				Matrix translation = Matrix::CreateTranslation(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z);
+				Matrix rotation = rat->Pose.Orientation.ToRotationMatrix();
+				rat->Transform = rotation * translation;
 			}
 		}
 	}

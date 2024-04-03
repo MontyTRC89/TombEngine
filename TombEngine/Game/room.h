@@ -1,10 +1,13 @@
 #pragma once
-#include "framework.h"
-#include "Game/collision/floordata.h"
 #include "Math/Math.h"
-#include "Specific/newtypes.h"
 
+using namespace TEN::Math;
+
+enum GAME_OBJECT_ID : short;
 enum class ReverbType;
+class FloorInfo;
+class GameBoundingBox;
+struct BUCKET;
 struct TriggerVolume;
 
 constexpr auto MAX_FLIPMAP	= 256;
@@ -13,9 +16,9 @@ constexpr auto NO_ROOM		= -1;
 constexpr auto OUTSIDE_Z	= 64;
 constexpr auto OUTSIDE_SIZE = 1024;
 
-extern byte FlipStatus;
-extern int FlipStats[MAX_FLIPMAP];
-extern int FlipMap[MAX_FLIPMAP];
+extern bool FlipStatus;
+extern bool FlipStats[MAX_FLIPMAP];
+extern int  FlipMap[MAX_FLIPMAP];
 
 enum RoomEnvFlags
 {
@@ -83,26 +86,6 @@ struct MESH_INFO
 	bool Dirty;
 };
 
-struct LIGHTINFO
-{
-	int x;
-	int y;
-	int z;
-	unsigned char Type;
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
-	short nx;
-	short ny;
-	short nz;
-	short Intensity;
-	unsigned char Inner;
-	unsigned char Outer;
-	short FalloffScale;
-	short Length;
-	short Cutoff;
-};
-
 struct ROOM_INFO
 {
 	int index;
@@ -140,19 +123,16 @@ struct ROOM_INFO
 
 	std::vector<int> neighbors = {};
 
-	bool Active();
+	bool Active() const;
 };
 
-void DoFlipMap(short group);
-void AddRoomFlipItems(ROOM_INFO* room);
-void RemoveRoomFlipItems(ROOM_INFO* room);
-bool IsObjectInRoom(short roomNumber, short objectNumber);
-bool IsPointInRoom(Vector3i pos, int roomNumber);
-int FindRoomNumber(Vector3i pos, int startRoom = NO_ROOM);
+void DoFlipMap(int group);
+bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID);
+bool IsPointInRoom(const Vector3i& pos, int roomNumber);
+int FindRoomNumber(const Vector3i& pos, int startRoomNumber = NO_ROOM);
 Vector3i GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
-std::set<int> GetRoomList(int roomNumber);
 void InitializeNeighborRoomList();
 
-GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool visibility);
+GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox);
 FloorInfo* GetSector(ROOM_INFO* room, int x, int z);

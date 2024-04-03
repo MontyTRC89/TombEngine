@@ -1,7 +1,159 @@
-Version 1.1.1
-==============
+Version 1.4
+===========
 
-* Fix burning torch not working properly if there is more than 256 objects in a level.
+* Fixed drawing of display sprites in title level.
+* Fixed player holster state and current vehicle not preserved correctly on level jump.
+* Fixed fade-in and fade-out effects not canceling correctly when next level is loaded.
+* Fixed shadows still being visible after shattering a moveable.
+* Fixed FOV interpolation at the end of the flyby sequence.
+* Fixed sounds resuming in pause mode while switching between apps.
+* Fixed slide directions.
+* Fixed occasional collision warnings in a log when teeth spikes object was activated.
+* Auto-switch to a crawl state if player start position is in a crawlspace.
+* Revise wall spikes:
+  - Wall spikes now stop when they touch a pushable, another spike wall or a normal wall.
+  - Wall spikes will shatter any shatter in its path.
+  - Wall spikes can be stopped by normal antitrigger or with a volume.
+* Added hub system to preserve level state on level jumps.
+* Added ember emitter.
+* Added fish emitter.
+* Added laser beam object.
+* Added TR2 dragon.
+* Added TR3 Winston (requires updated TEN Winston .wad2).
+
+Lua API changes:
+* Added resetHub flag to Flow.Level, which allows to reset hub data.
+* Added Moveable:GetMeshCount() function to get number of moveable meshes.
+* Added Static:GetHP() and Static:SetHP() functions to change shatterable static mesh hit points.
+
+Version 1.3
+===========
+
+* Fixed crash if title logo is removed from Textures folder.
+* Fixed crash if unknown player state ID is encountered.
+* Fixed bug with OCB 2 on pushables, and some other pushable bugs.
+* Fixed pushable camera bug during edge slip.
+* Fixed lever switch turn off alignment animation. 
+* Fixed lack of water splash in certain scenarios.
+* Fixed hydra flame not showing when charging.
+* Fixed shockwave light for hammer god.
+* Fixed camera shaking in some cases when the player is in quicksand room.
+* Fixed certain flame emitter OCBs emitting fire in wrong directions.
+* Fixed player not being able to pick up a torch when crouching.
+* Fixed jittery camera when performing crawl-to-hang.
+* Fixed several issues with limited pistol ammo.
+* Fixed player not being able to crawl if two-handed weapon is currently equipped.
+* Fixed playback issues with audio tracks placed in subfolders.
+* Fixed thin caustics outline on the edge of the blocks.
+* Fixed big static objects affected wrongly by dynamic lights.
+* Fixed legacy trigger leveljumps ignoring provided level index.
+* Fixed incorrect light collection in some cases.
+* Fixed normal mapping for rooms, items, and statics.
+* Added ambient occlusion (SSAO).
+* Added new post-process workflow (monochrome, negative, exclusion) with tinting.
+* Added SMAA antialiasing instead of MSAA.
+* Added previously missing player start position object functionality.
+* Added fast speed for fly cheat by holding Sprint input action.
+* Added speedometer to vehicles.
+* Added global node events.
+* Totally revised transparency handling.
+* Increased the maximum frames for animated sequences from 128 to 256.
+* Optimized the renderer.
+* Separate underwater wall and ceiling switch objects into two slots each.
+* Accurately rotate display sprites around the pivot defined by the align mode.
+* Allow walking on slopes when wading in water (similar to quicksand).
+* Allow player to pull certain levers with both hands when holding a flare.
+* Ported twin auto gun from TR3.
+* Revised keyhole OCBs to account for keeping or losing keys:
+  - OCB 0: Play default animation and lose key.
+  - Positive OCB: Play anim number and keep key.
+  - Negative OCB: Play anim number and lose key.
+* Revised Wolf OCBs:
+  - OCB 0: Wolf starts in walking animation, ready to chase Lara.
+  - OCB 1: Wolf starts in sleeping animation.
+
+Lua API changes:
+* Added Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
+* Added Moveable:SetStatus() to set the current status of the moveable.
+* Added Room:GetColor() to get room's ambient light color.
+* Added Util.PickMoveableByDisplayPosition() and Util.PickStaticByDisplayPosition() functions.
+* Added View.GetCameraPosition(), View.GetCameraTarget() and View.GetCameraRoom() functions.
+* Added View.SetPostProcessMode(), View.SetPostProcessStrength() and View.SetPostProcessTint() functions.
+
+Version 1.2
+===========
+
+* Fix burning torch not working properly if there are more than 256 objects in a level.
+* Fix grenade and rocket projectiles smoke offset in certain directions.
+* Fix projectiles flying through animating objects.
+* Fix harpoon gun doing enormous damage on enemies.
+* Fix train death animation.
+* Fix various camera issues with unique death animations.
+* Fix zipline not following correct trajectory.
+* Fix TR1 wolf damage value inflicted on a close bite attack.
+* Fix TR1 bear various original AI issues.
+* Fix TR2 knife thrower AI.
+* Fix TR2 doberman crashing the game when killed by explosive weapons.
+* Fix random crashes when killing exploding enemies.
+* Fix random crashes in battle with more than 8 enemies.
+* Fix volume change in settings not affecting voice track.
+* Fix several lighting bugs.
+* Fix double drawing additive faces.
+* Fix savegame count not properly increasing.
+* Fix regeneration of non-ammo pickups with OCB 128.
+* Fix vault bug preventing the player from climbing onto ledges out of deeper sections of wade-depth water.
+* Fix cold exposure status not recovering in non-cold wade-depth water.
+* Fix non-elevated combat camera.
+* Fix camera snap when disengaging the look-around mode.
+* Fix TR4 mapper not being visible.
+* Improve head-on wall collision.
+* Overhaul pushables:
+ - Separate climbable and non-climbable pushable object slots.
+ - Add new pushable OCB to manipulate pushable properties.
+ - Add new animations for pushing pushables off edgees (TR1-3 and TR4-5 versions).
+ - Fix pushables not working with raising blocks.
+ - Fix miscellaneous pushable bugs.
+* Overhaul look-around feature:
+ - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
+ - Improve look camera movement and control.
+ - Re-enable looking while performing up jump, backward jump, or backward crawl.
+ - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
+* Add target highlighter system with toggle in Sound and Gameplay settings.
+* Add sprint slide state 191.
+* Add swinging blade.
+* Add crumbling platform and add new OCBs for behaviour:
+ - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
+ - OCB > 0: When the player steps on the platform, it will crumble after the number of frames set in the OCB.
+ - A positive value results in activation via player collision.
+ - A negative value requires a trigger to activate.
+* Add basic mouse input handling. Allows for binding of mouse inputs in control settings.
+* Add settings for Mouse Sensitivity and Mouse Smoothing (not used in-game yet).
+
+Lua API changes:
+* Split and organize functions in `Misc` namespace to appropriate new namespaces.
+* Make Vec2 and Vec3 objects float-based instead of integer-based.
+* Add DisplaySprite object.
+* Add Flow.EnableLoadSave() function to disable savegames.
+* Add Flow.EnablePointFilter() function to disable bilinear filtering.
+* Add View.GetAspectRatio() function to get the screen resolution's aspect ratio.
+* Add Logic.HandleEvent() function to call node events.
+* Add Input.GetCursorDisplayPosition() function to get the cursor's position.
+* Add functions to load, save, delete and check existence of savegames.
+* Add Lara:GetAmmoType() function to read the ammo that player is using.
+* Add Moveable:GetEndFrame() function to get the end frame number of a moveable's current animation.
+* Add extra parameter to GiveItem() function to optionally display an inventory item given to the player in the pickup summary.
+* Add DisplayStringOption.RIGHT and DisplayStringOption.BLINK flags for DisplayString.
+* Add log messages warnings to functions AddCallback and RemoveCallback.
+* Add Vec2 and Vec3 arithmetic for division with a number and multiplication with another Vec2 or Vec3.
+* Add various Vec2 and Vec3 operators and methods, such as Normalize() and Lerp().
+* Fix InventoryItem constructor, now it will accept compound values in Item Action parameter.
+* Fix Moveable constructor forcing initial animation to 0 and hit points to 10, even if not specified.
+* Fix activation of a flipped room when using SetPos() script command or position change node.
+* Fix Sound:PlaySoundEffect() function when used without optional position argument.
+* Update DisplayString constructor to take a "scale" parameter, allowing for the resizing of text.
+* Make DisplayString constructor's "color" parameter optional.
+* Add DisplayString::SetScale() function to resize text.
+* Add DisplayString::GetScale() function to get text scale.
 
 Version 1.1.0
 ==============

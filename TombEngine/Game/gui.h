@@ -2,6 +2,7 @@
 #include "Game/GuiObjects.h"
 #include "Scripting/Internal/LanguageScript.h"
 #include "Math/Math.h"
+#include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/InputAction.h"
 
@@ -92,7 +93,7 @@ namespace TEN::Gui
 	struct ObjectList
 	{
 		int			InventoryItem = 0;
-		EulerAngles Orientation	  = EulerAngles::Zero;
+		EulerAngles Orientation	  = EulerAngles::Identity;
 		unsigned short Bright;
 	};
 
@@ -107,10 +108,13 @@ namespace TEN::Gui
 
 	struct SettingsData
 	{
-		bool WaitingForKey = false; // Waiting for a key to be pressed when configuring controls.
-		bool IgnoreInput = false;   // Ignore input unless all keys were released.
-		int SelectedScreenResolution;
-		GameConfiguration Configuration;
+		static constexpr auto NEW_KEY_WAIT_TIMEOUT = 3.0f * FPS;
+
+		GameConfiguration Configuration = {};
+
+		int	  SelectedScreenResolution = 0;
+		bool  IgnoreInput			   = false; // Ignore input until all actions are inactive.
+		float NewKeyWaitTimer		   = 0.0f;
 	};
 
 	class GuiController
@@ -129,7 +133,7 @@ namespace TEN::Gui
 		int OptionCount;
 		int SelectedSaveSlot;
 
-		float TimeInMenu = 0.0f;
+		float TimeInMenu = -1.0f;
 		SettingsData CurrentSettings;
 
 		// Inventory variables
@@ -179,14 +183,14 @@ namespace TEN::Gui
 
 		// Getters
 		const InventoryRing& GetRing(RingTypes ringType);
-		short GetSelectedOption();
+		int GetSelectedOption();
 		Menu GetMenuToDisplay();
 		InventoryMode GetInventoryMode();
 		int GetInventoryItemChosen();
 		int GetEnterInventory();
 		int GetLastInventoryItem();
 		SettingsData& GetCurrentSettings();
-		short GetLoadSaveSelection();
+		int GetLoadSaveSelection();
 
 		// Setters
 		void SetSelectedOption(int menu);

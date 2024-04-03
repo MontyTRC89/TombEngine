@@ -75,7 +75,7 @@ namespace TEN::Entities::Creatures::TR3
 		short angle = 0;
 		short tilt = 0;
 		short head = 0;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 		{
@@ -112,7 +112,7 @@ namespace TEN::Entities::Creatures::TR3
 				int bestDistance = INT_MAX;
 				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+					if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
 						continue;
 
 					auto* target = &g_Level.Items[currentCreature->ItemNumber];
@@ -212,7 +212,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if (creature->Mood == MoodType::Bored ||
 					(item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2))))
 				{
-					if (item->Animation.RequiredState != NO_STATE)
+					if (item->Animation.RequiredState != NO_VALUE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.ahead)
 						item->Animation.TargetState = MPSTICK_STATE_STOP;

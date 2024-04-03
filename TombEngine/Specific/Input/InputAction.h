@@ -23,8 +23,8 @@ namespace TEN::Input
 		// Vehicle actions
 		Accelerate,
 		Reverse,
-		Speed,
-		Slow,
+		Faster,
+		Slower,
 		Brake,
 		Fire,
 
@@ -52,7 +52,6 @@ namespace TEN::Input
 		Inventory,
 		Save,
 		Load,
-		SwitchTarget, // TODO: Look -> SwitchTarget conversion must be handled differently.
 
 		Count
 	} In;

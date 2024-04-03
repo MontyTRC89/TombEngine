@@ -199,17 +199,18 @@ void RemoveObjectFromInventory(GAME_OBJECT_ID objectID, std::optional<int> count
 void CollectCarriedItems(ItemInfo* item) 
 {
 	short pickupNumber = item->CarriedItem;
-	while (pickupNumber != NO_ITEM)
+	while (pickupNumber != NO_VALUE)
 	{
 		auto* pickupItem = &g_Level.Items[pickupNumber];
 
+		PickedUpObject(pickupItem->ObjectNumber);
 		g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
 		KillItem(pickupNumber);
 
 		pickupNumber = pickupItem->CarriedItem;
 	}
 
-	item->CarriedItem = NO_ITEM;
+	item->CarriedItem = NO_VALUE;
 }
 
 static void HideOrDisablePickup(ItemInfo& pickupItem)
@@ -248,7 +249,9 @@ void CollectMultiplePickups(int itemNumber)
 				continue;
 		}
 
+		PickedUpObject(currentItem->ObjectNumber);
 		g_Hud.PickupSummary.AddDisplayPickup(currentItem->ObjectNumber, currentItem->Pose.Position.ToVector3());
+
 		if (currentItem->TriggerFlags & (1 << 8))
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
@@ -269,7 +272,7 @@ void DoPickup(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	if (lara->Context.InteractedItem == NO_ITEM)
+	if (lara->Context.InteractedItem == NO_VALUE)
 		return;
 
 	short pickupItemNumber = lara->Context.InteractedItem;
@@ -282,13 +285,15 @@ void DoPickup(ItemInfo* laraItem)
 
 	if (pickupItem->ObjectNumber == ID_BURNING_TORCH_ITEM)
 	{
+		PickedUpObject(ID_BURNING_TORCH_ITEM);
 		g_Hud.PickupSummary.AddDisplayPickup(ID_BURNING_TORCH_ITEM, pickupItem->Pose.Position.ToVector3());
+
 		GetFlameTorch();
 		lara->Torch.IsLit = (pickupItem->ItemFlags[3] & 1);
 
 		KillItem(pickupItemNumber);
 		pickupItem->Pose.Orientation = prevOrient;
-		lara->Context.InteractedItem = NO_ITEM;
+		lara->Context.InteractedItem = NO_VALUE;
 		return;
 	}
 	else if (pickupItem->ObjectNumber == ID_FLARE_ITEM && pickupItem->Active)
@@ -314,24 +319,27 @@ void DoPickup(ItemInfo* laraItem)
 			if (g_GameFlow->IsMassPickupEnabled())
 			{
 				CollectMultiplePickups(lara->Context.InteractedItem);
-				lara->Context.InteractedItem = NO_ITEM;
+				lara->Context.InteractedItem = NO_VALUE;
 				return;
 			}
 
+			PickedUpObject(pickupItem->ObjectNumber);
 			g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
 			HideOrDisablePickup(*pickupItem);
 
 			pickupItem->Pose.Orientation = prevOrient;
-			lara->Context.InteractedItem = NO_ITEM;
+			lara->Context.InteractedItem = NO_VALUE;
 			return;
 		}
 		else
 		{
 			if (laraItem->Animation.AnimNumber == LA_CROWBAR_PRY_WALL_SLOW)
 			{
+				PickedUpObject(ID_CROWBAR_ITEM);
 				g_Hud.PickupSummary.AddDisplayPickup(ID_CROWBAR_ITEM, pickupItem->Pose.Position.ToVector3());
-				lara->Inventory.HasCrowbar = true;
 				KillItem(pickupItemNumber);
+
+				lara->Inventory.HasCrowbar = true;
 			}
 			else if (laraItem->Animation.ActiveState == LS_PICKUP ||
 					 laraItem->Animation.ActiveState == LS_PICKUP_FROM_CHEST ||
@@ -340,11 +348,13 @@ void DoPickup(ItemInfo* laraItem)
 				if (g_GameFlow->IsMassPickupEnabled())
 				{
 					CollectMultiplePickups(lara->Context.InteractedItem);
-					lara->Context.InteractedItem = NO_ITEM;
+					lara->Context.InteractedItem = NO_VALUE;
 					return;
 				}
 
+				PickedUpObject(pickupItem->ObjectNumber);
 				g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
+
 				if (pickupItem->TriggerFlags & (1 << 8))
 				{
 					for (int i = 0; i < g_Level.NumItems; i++)
@@ -357,13 +367,13 @@ void DoPickup(ItemInfo* laraItem)
 				HideOrDisablePickup(*pickupItem);
 
 				pickupItem->Pose.Orientation = prevOrient;
-				lara->Context.InteractedItem = NO_ITEM;
+				lara->Context.InteractedItem = NO_VALUE;
 				return;
 			}
 		}
 	}
 
-	lara->Context.InteractedItem = NO_ITEM;
+	lara->Context.InteractedItem = NO_VALUE;
 }
 
 void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -394,7 +404,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		{
 			item->Pose.Orientation.x = -ANGLE(25.0f);
 
-			if (TrInput & IN_ACTION && 
+			if (IsHeld(In::Action) && 
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 
 				laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && 
 				lara->Control.HandStatus == HandStatus::Free &&
@@ -445,8 +455,8 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		return;
 	}
 	
-	if (!(TrInput & IN_ACTION) && (g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
-		BinocularRange ||
+	if (!IsHeld(In::Action) && (g_Gui.GetInventoryItemChosen() == NO_VALUE || triggerFlags != 2) || 
+		lara->Control.Look.IsUsingLasersight ||
 		(laraItem->Animation.ActiveState != LS_IDLE || laraItem->Animation.AnimNumber != LA_STAND_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
 		(laraItem->Animation.ActiveState != LS_CROUCH_IDLE || laraItem->Animation.AnimNumber != LA_CROUCH_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
 		(laraItem->Animation.ActiveState != LS_CRAWL_IDLE || laraItem->Animation.AnimNumber != LA_CRAWL_IDLE))
@@ -530,7 +540,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		}
 		if (!lara->Control.IsMoving)
 		{
-			if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
+			if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
 			{
 				if (g_Gui.IsObjectInInventory(ID_CROWBAR_ITEM))
 					g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
@@ -545,7 +555,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				return;
 			}
 
-			g_Gui.SetInventoryItemChosen(NO_ITEM);
+			g_Gui.SetInventoryItemChosen(NO_VALUE);
 		}
 
 		if (MoveLaraPosition(CrowbarPickUpPosition, item, laraItem))
@@ -674,9 +684,6 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 		if (laraItem->Animation.ActiveState == LS_CROUCH_IDLE)
 		{
-			if (item->ObjectNumber == ID_BURNING_TORCH_ITEM)
-				break;
-
 			if (!AlignLaraPosition(PickUpPosition, item, laraItem))
 				break;
 
@@ -817,6 +824,9 @@ void RegeneratePickups()
 			case ID_SHOTGUN_AMMO2_ITEM:
 				ammo = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2];
 				break;
+
+			default:
+				continue; // Don't regenerate anything but ammo.
 			}
 
 			if (ammo == 0)
@@ -926,7 +936,7 @@ void DropPickups(ItemInfo* item)
 		break;
 	}
 
-	for (short pickupNumber = item->CarriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->CarriedItem)
+	for (short pickupNumber = item->CarriedItem; pickupNumber != NO_VALUE; pickupNumber = pickup->CarriedItem)
 	{
 		pickup = &g_Level.Items[pickupNumber];
 		pickup->Pose.Position = origin;
@@ -1017,11 +1027,11 @@ const GameBoundingBox* FindPlinth(ItemInfo* item)
 		}
 	}
 
-	if (room->itemNumber == NO_ITEM)
+	if (room->itemNumber == NO_VALUE)
 		return nullptr;
 
 	short itemNumber = room->itemNumber;
-	for (itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+	for (itemNumber = room->itemNumber; itemNumber != NO_VALUE; itemNumber = g_Level.Items[itemNumber].NextItem)
 	{
 		auto* currentItem = &g_Level.Items[itemNumber];
 		auto* object = &Objects[currentItem->ObjectNumber];
@@ -1036,7 +1046,7 @@ const GameBoundingBox* FindPlinth(ItemInfo* item)
 		}
 	}
 
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 	{
 		return nullptr;
 	}
@@ -1077,11 +1087,9 @@ void InitializePickup(short itemNumber)
 			{
 				// Automatically align pickups to the floor surface.
 				auto pointColl = GetCollision(item);
-				int bridgeItemNumber = pointColl.Block->GetInsideBridgeItemNumber(
-					item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
-					true, true);
+				int bridgeItemNumber = pointColl.Block->GetInsideBridgeItemNumber(item->Pose.Position, true, true);
 
-				if (bridgeItemNumber != NO_ITEM)
+				if (bridgeItemNumber != NO_VALUE)
 				{
 					// If pickup is within bridge item, most likely it means it is
 					// below pushable or raising block, so ignore its collision.
@@ -1157,7 +1165,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 
 	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1);
 
-	if ((TrInput & IN_ACTION &&
+	if ((IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		lara->Control.HandStatus == HandStatus::Free &&
@@ -1261,6 +1269,7 @@ void SearchObjectControl(short itemNumber)
 
 				if (Objects[item2->ObjectNumber].isPickup)
 				{
+					PickedUpObject(item2->ObjectNumber);
 					g_Hud.PickupSummary.AddDisplayPickup(item2->ObjectNumber, item2->Pose.Position.ToVector3());
 					KillItem(item->ItemFlags[1]);
 				}
@@ -1280,7 +1289,6 @@ void SearchObjectControl(short itemNumber)
 			CollectCarriedItems(item);
 		}
 	}
-
 	
 	if (item->Status == ITEM_DEACTIVATED)
 	{
@@ -1304,7 +1312,7 @@ bool UseSpecialItem(ItemInfo* laraItem)
 	int flag = 0;
 	int itemIDToUse = g_Gui.GetInventoryItemChosen();
 
-	if (itemIDToUse != NO_ITEM &&
+	if (itemIDToUse != NO_VALUE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		lara->Control.HandStatus == HandStatus::Free)
 	{
@@ -1358,7 +1366,7 @@ bool UseSpecialItem(ItemInfo* laraItem)
 				SetAnimation(laraItem, LA_WATERSKIN_POUR_LOW);
 
 			lara->Control.HandStatus = HandStatus::Busy;
-			g_Gui.SetInventoryItemChosen(NO_ITEM);
+			g_Gui.SetInventoryItemChosen(NO_VALUE);
 			return true;
 		}
 	}

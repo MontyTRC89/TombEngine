@@ -10,7 +10,7 @@
 #include "Game/room.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
@@ -78,9 +78,13 @@ int FindGridShift(int x, int z)
 		return 0;
 
 	if ((z / BLOCK(1)) <= (x / BLOCK(1)))
+	{
 		return (-1 - (x & WALL_MASK));
+	}
 	else
+	{
 		return ((BLOCK(1) + 1) - (x & WALL_MASK));
+	}
 }
 
 // Test if the axis-aligned bounding box collides with geometry at all.
@@ -117,7 +121,7 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 // Overload used to quickly get point collision parameters at a given item's position.
 CollisionResult GetCollision(const ItemInfo& item)
 {
-	auto newRoomNumber = item.RoomNumber;
+	short newRoomNumber = item.RoomNumber;
 	auto floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &newRoomNumber);
 	auto probe = GetCollision(floor, item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z);
 
@@ -126,23 +130,23 @@ CollisionResult GetCollision(const ItemInfo& item)
 }
 
 // Deprecated.
-CollisionResult GetCollision(ItemInfo* item)
+CollisionResult GetCollision(const ItemInfo* item)
 {
 	return GetCollision(*item);
 }
 
 // Overload used to probe point collision parameters from a given item's position.
-CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down, float right)
+CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down, float right)
 {
 	short tempRoomNumber = item->RoomNumber;
 
 	// TODO: Find cleaner solution. Constructing a Location for Lara on the spot can result in a stumble when climbing onto thin platforms. -- Sezz 2022.06.14
 	auto location = item->IsLara() ?
 		item->Location :
-		ROOM_VECTOR{ GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y };
+		RoomVector(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->RoomNumber, item->Pose.Position.y);
 
 	auto point = Geometry::TranslatePoint(item->Pose.Position, headingAngle, forward, down, right);
-	int adjacentRoomNumber = GetRoom(location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
+	int adjacentRoomNumber = GetRoomVector(location, Vector3i(item->Pose.Position.x, point.y, item->Pose.Position.z)).RoomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
@@ -150,10 +154,30 @@ CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, 
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down, float right)
 {
 	short tempRoomNumber = roomNumber;
-	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
+	auto location = RoomVector(GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->RoomNumber, pos.y);
 
 	auto point = Geometry::TranslatePoint(pos, headingAngle, forward, down, right);
-	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
+	int adjacentRoomNumber = GetRoomVector(location, Vector3i(pos.x, point.y, pos.z)).RoomNumber;
+	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+}
+
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAngles& orient, float dist)
+{
+	auto point = Geometry::TranslatePoint(pos, orient, dist);
+
+	short tempRoomNumber = roomNumber;
+	auto location = RoomVector(GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->RoomNumber, pos.y);
+	int adjacentRoomNumber = GetRoomVector(location, Vector3i(pos.x, point.y, pos.z)).RoomNumber;
+	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+}
+
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist)
+{
+	auto point = Geometry::TranslatePoint(pos, dir, dist);
+
+	short tempRoomNumber = roomNumber;
+	auto location = RoomVector(GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->RoomNumber, pos.y);
+	int adjacentRoomNumber = GetRoomVector(location, Vector3i(pos.x, point.y, pos.z)).RoomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
@@ -199,29 +223,35 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 	result.Block = floor;
 
 	// Floor and ceiling heights are borrowed directly from floordata.
-	result.Position.Floor = GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
-	result.Position.Ceiling = GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	result.Position.Floor = GetSurfaceHeight(RoomVector(floor->RoomNumber, y), x, z, true).value_or(NO_HEIGHT);
+	result.Position.Ceiling = GetSurfaceHeight(RoomVector(floor->RoomNumber, y), x, z, false).value_or(NO_HEIGHT);
 
 	// Probe bottom collision block through portals.
-	while (floor->GetRoomNumberBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+	while (floor->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 	{
-		auto* room = &g_Level.Rooms[floor->GetRoomNumberBelow(x, y, z).value_or(floor->Room)];
+		auto* room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(floor->RoomNumber)];
 		floor = GetSector(room, x - room->x, z - room->z);
 	}
 
 	// Return probed bottom collision block into result.
 	result.BottomBlock = floor;
 
-	// Get tilts.
-	result.FloorTilt = floor->GetSurfaceTilt(x, z, true);
-	result.CeilingTilt = floor->GetSurfaceTilt(x, z, false);
+	// Get surface noramls.
+	result.FloorNormal = floor->GetSurfaceNormal(x, z, true);
+	result.CeilingNormal = floor->GetSurfaceNormal(x, z, false);
+
+	// Backport surface normals to tilts.
+	result.FloorTilt = GetSurfaceTilt(result.FloorNormal, true).ToVector2();
+	result.CeilingTilt = GetSurfaceTilt(result.CeilingNormal, false).ToVector2();
 
 	// Split, bridge and slope data.
 	result.Position.DiagonalStep = floor->IsSurfaceDiagonalStep(true);
-	result.Position.SplitAngle = floor->FloorCollision.SplitAngle;
-	result.Position.Bridge = result.BottomBlock->GetInsideBridgeItemNumber(x, result.Position.Floor, z, true, false);
-	result.Position.FloorSlope = result.Position.Bridge < 0 && (abs(result.FloorTilt.x) >= 3 || (abs(result.FloorTilt.y) >= 3));
-	result.Position.CeilingSlope = abs(result.CeilingTilt.x) >= 4 || abs(result.CeilingTilt.y) >= 4; // TODO: Fix on bridges placed beneath ceiling slopes. @Sezz 2022.01.29
+	result.Position.SplitAngle = TO_RAD(floor->FloorSurface.SplitAngle);
+	result.Position.Bridge = result.BottomBlock->GetInsideBridgeItemNumber(Vector3i(x, result.Position.Floor, z), true, false);
+	result.Position.FloorSlope = result.Position.Bridge < 0 && Geometry::GetSurfaceSlopeAngle(result.FloorNormal) >=
+		result.BottomBlock->GetSurfaceIllegalSlopeAngle(x, z, true);
+	result.Position.CeilingSlope = Geometry::GetSurfaceSlopeAngle(result.CeilingNormal, -Vector3::UnitY) >=
+		result.BottomBlock->GetSurfaceIllegalSlopeAngle(x, z, false); // TODO: Fix on bridges placed beneath ceiling slopes. @Sezz 2022.01.29
 
 	return result;
 }
@@ -236,7 +266,7 @@ static void SetSectorAttribs(CollisionPosition& sectorAttribs, const CollisionSe
 {
 	constexpr auto ASPECT_ANGLE_DELTA_MAX = ANGLE(90.0f);
 
-	auto floorNormal = GetSurfaceNormal(pointColl.FloorTilt, true);
+	auto floorNormal = pointColl.FloorNormal;
 	short aspectAngle = Geometry::GetSurfaceAspectAngle(floorNormal);
 	short aspectAngleDelta = Geometry::GetShortestAngle(collSetup.ForwardAngle, aspectAngle);
 
@@ -269,11 +299,28 @@ static void SetSectorAttribs(CollisionPosition& sectorAttribs, const CollisionSe
 	}
 	else if (collSetup.BlockMonkeySwingEdge)
 	{
-		auto monkeyPointColl = GetCollision(probePos.x, probePos.y + collSetup.Height, probePos.z, realRoomNumber);
-		if (!monkeyPointColl.BottomBlock->Flags.Monkeyswing)
+		auto pointColl = GetCollision(probePos.x, probePos.y + collSetup.Height, probePos.z, realRoomNumber);
+		if (!pointColl.BottomBlock->Flags.Monkeyswing)
 			sectorAttribs.Floor = MAX_HEIGHT;
 	}
 }
+
+static void HandleDiagonalShift(ItemInfo& item, CollisionInfo& coll, const Vector3i& pos, CardinalDirection quadrant, bool isRightShift)
+{
+	// Calculate angles.
+	int sign = isRightShift ? 1 : -1;
+	short perpSplitAngle = (ANGLE(90.0f) * quadrant) + (ANGLE(45.0f) * sign);
+	short deltaAngle = abs(Geometry::GetShortestAngle(coll.Setup.ForwardAngle, perpSplitAngle));
+
+	// HACK: Force slight push left to avoid getting stuck.
+	float alpha = 1.0f - ((float)deltaAngle / (float)ANGLE(90.0f));
+	if (alpha >= 0.5f)
+		TranslateItem(&item, perpSplitAngle, item.Animation.Velocity.z * alpha);
+
+	// Set shift.
+	coll.Shift.Position.x += coll.Setup.PrevPosition.x - pos.x;
+	coll.Shift.Position.z += coll.Setup.PrevPosition.z - pos.z;
+};
 
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offset, bool resetRoom)
 {
@@ -282,7 +329,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	bool doPlayerCollision = item->IsLara();
 
 	// Reset collision parameters.
-	coll->CollisionType = CollisionType::CT_NONE;
+	coll->CollisionType = CollisionType::None;
 	coll->Shift = Pose::Zero;
 
 	// Offset base probe position by provided offset, if any.
@@ -301,7 +348,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	// If unconstrained mode is specified, don't use quadrant.
 	switch ((coll->Setup.Mode == CollisionProbeMode::Quadrants) ? quadrant : -1)
 	{
-	case 0:
+	case NORTH:
 		xFront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zFront =  coll->Setup.Radius;
 		xLeft  = -coll->Setup.Radius;
@@ -310,7 +357,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight =  coll->Setup.Radius;
 		break;
 
-	case 1:
+	case EAST:
 		xFront =  coll->Setup.Radius;
 		zFront =  phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		xLeft  =  coll->Setup.Radius;
@@ -319,7 +366,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight = -coll->Setup.Radius;
 		break;
 
-	case 2:
+	case SOUTH:
 		xFront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zFront = -coll->Setup.Radius;
 		xLeft  =  coll->Setup.Radius;
@@ -328,7 +375,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight = -coll->Setup.Radius;
 		break;
 
-	case 3:
+	case WEST:
 		xFront = -coll->Setup.Radius;
 		zFront =  phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		xLeft  = -coll->Setup.Radius;
@@ -337,7 +384,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		zRight =  coll->Setup.Radius;
 		break;
 
-	// No valid quadrant; return true probe offsets from object rotation.
+	// No valid quadrant; get true probe offsets from object rotation.
 	default: 
 		xFront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zFront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
@@ -349,8 +396,12 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	}
 
 	// Define generic variables used for later object-specific position test shifts.
-	ROOM_VECTOR tfLocation{}, tcLocation{}, lrfLocation{}, lrcLocation{};
-	int height, ceiling;
+	auto tfLocation = RoomVector();
+	auto tcLocation = RoomVector();
+	auto lrfLocation = RoomVector();
+	auto lrcLocation = RoomVector();
+	int height = 0;
+	int ceiling = 0;
 
 	// Parameter definition ends here, now process to actual collision tests...
 
@@ -361,12 +412,14 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	// updated for Lara, we can't use it for all objects for now. In future, we should
 	// either update Location field for all objects or use this value as it is now.
 
-	int realRoomNumber = doPlayerCollision ? item->Location.roomNumber : item->RoomNumber;
+	int realRoomNumber = doPlayerCollision ? item->Location.RoomNumber : item->RoomNumber;
 	
 	// TEST 1: TILT AND NEAREST LEDGE CALCULATION
 
 	auto collResult = GetCollision(probePos.x, item->Pose.Position.y, probePos.z, realRoomNumber);
 
+	coll->FloorNormal = collResult.FloorNormal;
+	coll->CeilingNormal = collResult.CeilingNormal;
 	coll->FloorTilt = collResult.FloorTilt;
 	coll->CeilingTilt = collResult.CeilingTilt;
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
@@ -382,11 +435,11 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	
 	if (doPlayerCollision)
 	{
-		tfLocation = GetRoom(item->Location, probePos.x, probePos.y, probePos.z);
-		height = GetFloorHeight(tfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		tfLocation = GetRoomVector(item->Location, probePos);
+		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(item->Location, probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z);
-		ceiling = GetCeilingHeight(tcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		tcLocation = GetRoomVector(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -425,11 +478,11 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 			topRoomNumber = realRoomNumber;
 		}
 
-		tfLocation = GetRoom(tfLocation, probePos.x, probePos.y, probePos.z);
-		height = GetFloorHeight(tfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		tfLocation = GetRoomVector(tfLocation, probePos);
+		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z);
-		ceiling = GetCeilingHeight(tcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		tcLocation = GetRoomVector(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -449,8 +502,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (doPlayerCollision)
 	{
-		tfLocation = GetRoom(tfLocation, probePos.x + xFront, probePos.y, probePos.z + zFront);
-		height = GetFloorHeight(tfLocation, probePos.x + xFront, probePos.z + zFront).value_or(NO_HEIGHT);
+		tfLocation = GetRoomVector(tfLocation, Vector3i(probePos.x + xFront, probePos.y, probePos.z + zFront));
+		height = GetSurfaceHeight(tfLocation, probePos.x + xFront, probePos.z + zFront, true).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -473,11 +526,11 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (doPlayerCollision)
 	{
-		lrfLocation = GetRoom(item->Location, probePos.x, probePos.y, probePos.z);
-		height = GetFloorHeight(lrfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		lrfLocation = GetRoomVector(item->Location, probePos);
+		height = GetSurfaceHeight(lrfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		lrcLocation = GetRoom(item->Location, probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z);
-		ceiling = GetCeilingHeight(lrcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		lrcLocation = GetRoomVector(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		ceiling = GetSurfaceHeight(lrcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -503,11 +556,11 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (doPlayerCollision)
 	{
-		tfLocation = GetRoom(tfLocation, probePos.x, probePos.y, probePos.z);
-		height = GetFloorHeight(tfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		tfLocation = GetRoomVector(tfLocation, probePos);
+		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z);
-		ceiling = GetCeilingHeight(tcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		tcLocation = GetRoomVector(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -538,11 +591,11 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (doPlayerCollision)
 	{
-		lrfLocation = GetRoom(item->Location, probePos.x, probePos.y, probePos.z);
-		height = GetFloorHeight(lrfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		lrfLocation = GetRoomVector(item->Location, probePos);
+		height = GetSurfaceHeight(lrfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		lrcLocation = GetRoom(item->Location, probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z);
-		ceiling = GetCeilingHeight(lrcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		lrcLocation = GetRoomVector(item->Location, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		ceiling = GetSurfaceHeight(lrcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -568,11 +621,11 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (doPlayerCollision)
 	{
-		tfLocation = GetRoom(tfLocation, probePos.x, probePos.y, probePos.z);
-		height = GetFloorHeight(tfLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		tfLocation = GetRoomVector(tfLocation, probePos);
+		height = GetSurfaceHeight(tfLocation, probePos.x, probePos.z, true).value_or(NO_HEIGHT);
 
-		tcLocation = GetRoom(tcLocation, probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z);
-		ceiling = GetCeilingHeight(tcLocation, probePos.x, probePos.z).value_or(NO_HEIGHT);
+		tcLocation = GetRoomVector(tcLocation, Vector3i(probePos.x, probePos.y - item->Animation.Velocity.y, probePos.z));
+		ceiling = GetSurfaceHeight(tcLocation, probePos.x, probePos.z, false).value_or(NO_HEIGHT);
 	}
 	else
 	{
@@ -601,24 +654,25 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 	if (coll->Middle.Floor == NO_HEIGHT)
 	{
-		coll->Shift.Position += coll->Setup.OldPosition - entityPos;
-		coll->CollisionType = CT_FRONT;
+		coll->Shift.Position += coll->Setup.PrevPosition - entityPos;
+		coll->CollisionType = CollisionType::Front;
 		return;
 	}
 
 	if (coll->Middle.Floor - coll->Middle.Ceiling <= 0)
 	{
-		coll->Shift.Position += coll->Setup.OldPosition - entityPos;
-		coll->CollisionType = CT_CLAMP;
+		coll->Shift.Position += coll->Setup.PrevPosition - entityPos;
+		coll->CollisionType = CollisionType::Clamp;
 		return;
 	}
 
 	if (coll->Middle.Ceiling >= 0)
 	{
 		coll->Shift.Position.y += coll->Middle.Ceiling;
-		coll->CollisionType = CT_TOP;
+		coll->CollisionType = CollisionType::Top;
 	}
 
+	// Shift away from front wall.
 	if (coll->Front.Floor > coll->Setup.LowerFloorBound ||
 		coll->Front.Floor < coll->Setup.UpperFloorBound ||
 		coll->Front.Ceiling > coll->Setup.LowerCeilingBound ||
@@ -627,39 +681,40 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	{
 		if (coll->Front.HasDiagonalSplit())
 		{
-			coll->Shift.Position.x += coll->Setup.OldPosition.x - entityPos.x;
-			coll->Shift.Position.z += coll->Setup.OldPosition.z - entityPos.z;
+			coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
+			coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
 		}
 		else
 		{
 			switch (quadrant)
 			{
-			case 0:
-			case 2:
-				coll->Shift.Position.x += coll->Setup.OldPosition.x - entityPos.x;
+			case NORTH:
+			case SOUTH:
+				coll->Shift.Position.x += coll->Setup.PrevPosition.x - entityPos.x;
 				coll->Shift.Position.z += FindGridShift(entityPos.z + zFront, entityPos.z);
 				break;
 
-			case 1:
-			case 3:
+			case EAST:
+			case WEST:
 				coll->Shift.Position.x += FindGridShift(entityPos.x + xFront, entityPos.x);
-				coll->Shift.Position.z += coll->Setup.OldPosition.z - entityPos.z;
+				coll->Shift.Position.z += coll->Setup.PrevPosition.z - entityPos.z;
 				break;
-
 			}
 		}
-		coll->CollisionType = (coll->CollisionType == CT_TOP) ? CT_TOP_FRONT : CT_FRONT;
+
+		coll->CollisionType = (coll->CollisionType == CollisionType::Top) ? CollisionType::TopFront : CollisionType::Front;
 		return;
 	}
 
 	if (coll->Front.Ceiling > coll->Setup.LowerCeilingBound ||
 		coll->Front.Ceiling < coll->Setup.UpperCeilingBound)
 	{
-		coll->Shift.Position += coll->Setup.OldPosition - entityPos;
-		coll->CollisionType = CT_TOP_FRONT;
+		coll->Shift.Position += coll->Setup.PrevPosition - entityPos;
+		coll->CollisionType = CollisionType::TopFront;
 		return;
 	}
 
+	// Shift away from left wall.
 	if (coll->MiddleLeft.Floor > coll->Setup.LowerFloorBound ||
 		coll->MiddleLeft.Floor < coll->Setup.UpperFloorBound ||
 		coll->MiddleLeft.Ceiling > coll->Setup.LowerCeilingBound ||
@@ -668,23 +723,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	{
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.FloorSlope)
 		{
-			// HACK: Force slight push-out to the left side to avoid stucking
-			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(8.0f), item->Animation.Velocity.z);
-
-			coll->Shift.Position.x += coll->Setup.OldPosition.x - entityPos.x;
-			coll->Shift.Position.z += coll->Setup.OldPosition.z - entityPos.z;
+			HandleDiagonalShift(*item, *coll, entityPos, (CardinalDirection)quadrant, true);
 		}
 		else
 		{
 			switch (quadrant)
 			{
-			case 0:
-			case 2:
+			case NORTH:
+			case SOUTH:
 				coll->Shift.Position.x += FindGridShift(entityPos.x + xLeft, entityPos.x + xFront);
 				break;
 
-			case 1:
-			case 3:
+			case EAST:
+			case WEST:
 				coll->Shift.Position.z += FindGridShift(entityPos.z + zLeft, entityPos.z + zFront);
 				break;
 			}
@@ -692,28 +743,30 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 
 		if (coll->DiagonalStepAtLeft())
 		{
-			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90.0f); // NOTE: Different from quadrant!
+			// NOTE: Different from quadrant.
+			int quarter = (unsigned short)coll->Setup.ForwardAngle / ANGLE(90.0f);
 			quarter %= 2;
 
 			if (coll->MiddleLeft.HasFlippedDiagonalSplit())
 			{
 				if (quarter)
-					coll->CollisionType = CT_LEFT;
+					coll->CollisionType = CollisionType::Left;
 			}
 			else
 			{
 				if (!quarter)
-					coll->CollisionType = CT_LEFT;
+					coll->CollisionType = CollisionType::Left;
 			}
 		}
 		else
 		{
-			coll->CollisionType = CT_LEFT;
+			coll->CollisionType = CollisionType::Left;
 		}
 
 		return;
 	}
 
+	// Shift away from right wall.
 	if (coll->MiddleRight.Floor > coll->Setup.LowerFloorBound ||
 		coll->MiddleRight.Floor < coll->Setup.UpperFloorBound ||
 		coll->MiddleRight.Ceiling > coll->Setup.LowerCeilingBound ||
@@ -722,23 +775,19 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	{
 		if (coll->TriangleAtRight() && !coll->MiddleRight.FloorSlope)
 		{
-			// HACK: Force slight push out to the right side to avoid getting stuck.
-			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(8.0f), item->Animation.Velocity.z);
-
-			coll->Shift.Position.x += coll->Setup.OldPosition.x - entityPos.x;
-			coll->Shift.Position.z += coll->Setup.OldPosition.z - entityPos.z;
+			HandleDiagonalShift(*item, *coll, entityPos, (CardinalDirection)quadrant, false);
 		}
 		else
 		{
 			switch (quadrant)
 			{
-			case 0:
-			case 2:
+			case NORTH:
+			case SOUTH:
 				coll->Shift.Position.x += FindGridShift(entityPos.x + xRight, entityPos.x + xFront);
 				break;
 
-			case 1:
-			case 3:
+			case EAST:
+			case WEST:
 				coll->Shift.Position.z += FindGridShift(entityPos.z + zRight, entityPos.z + zFront);
 				break;
 			}
@@ -752,17 +801,17 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 			if (coll->MiddleRight.HasFlippedDiagonalSplit())
 			{
 				if (quarter)
-					coll->CollisionType = CT_RIGHT;
+					coll->CollisionType = CollisionType::Right;
 			}
 			else
 			{
 				if (!quarter)
-					coll->CollisionType = CT_RIGHT;
+					coll->CollisionType = CollisionType::Right;
 			}
 		}
 		else
 		{
-			coll->CollisionType = CT_RIGHT;
+			coll->CollisionType = CollisionType::Right;
 		}
 
 		return;
@@ -774,32 +823,32 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha, s
 	// Reduce ellipse axis lengths for stability.
 	auto reducedEllipse = ellipse * 0.75f;
 
-	// Probe heights at points around the entity.
+	// Probe heights at points around entity.
 	int frontHeight = GetCollision(item, item->Pose.Orientation.y, reducedEllipse.y).Position.Floor;
 	int backHeight	= GetCollision(item, item->Pose.Orientation.y + ANGLE(180.0f), reducedEllipse.y).Position.Floor;
 	int leftHeight	= GetCollision(item, item->Pose.Orientation.y - ANGLE(90.0f), reducedEllipse.x).Position.Floor;
 	int rightHeight = GetCollision(item, item->Pose.Orientation.y + ANGLE(90.0f), reducedEllipse.x).Position.Floor;
 
-	// Calculate height differences.
-	int forwardHeightDif = backHeight - frontHeight;
-	int lateralHeightDif = rightHeight - leftHeight;
+	// Calculate height deltas.
+	int forwardHeightDelta = backHeight - frontHeight;
+	int lateralHeightDelta = rightHeight - leftHeight;
 
 	// Calculate extra rotation required.
 	auto extraRot = EulerAngles(
-		FROM_RAD(atan2(forwardHeightDif, ellipse.y * 2)),
+		FROM_RAD(atan2(forwardHeightDelta, ellipse.y * 2)),
 		0,
-		FROM_RAD(atan2(lateralHeightDif, ellipse.x * 2))) -
+		FROM_RAD(atan2(lateralHeightDelta, ellipse.x * 2))) -
 		EulerAngles(item->Pose.Orientation.x, 0, item->Pose.Orientation.z);
 
 	// Rotate X axis.
-	if (abs(forwardHeightDif) <= STEPUP_HEIGHT)
+	if (abs(forwardHeightDelta) <= STEPUP_HEIGHT)
 	{
 		if (abs(extraRot.x) <= constraintAngle)
 			item->Pose.Orientation.x += extraRot.x * alpha;
 	}
 
 	// Rotate Z axis.
-	if (abs(lateralHeightDif) <= STEPUP_HEIGHT)
+	if (abs(lateralHeightDelta) <= STEPUP_HEIGHT)
 	{
 		if (abs(extraRot.z) <= constraintAngle)
 			item->Pose.Orientation.z += extraRot.z * alpha;
@@ -893,12 +942,12 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			float maxZ =  ceil(ffpZ / BLOCK(1)) * BLOCK(1) + 1.0f;
 
 			// Get front floor block
-			auto room = GetRoom(item->Location, ffpX, y, ffpZ).roomNumber;
+			auto room = GetRoomVector(item->Location, Vector3i(ffpX, y, ffpZ)).RoomNumber;
 			auto block = GetCollision(ffpX, y, ffpZ, room).Block;
 
 			// Get front floor surface heights
-			auto floorHeight   = GetFloorHeight(ROOM_VECTOR{ block->Room, y }, ffpX, ffpZ).value_or(NO_HEIGHT);
-			auto ceilingHeight = GetCeilingHeight(ROOM_VECTOR{ block->Room, y }, ffpX, ffpZ).value_or(NO_HEIGHT);
+			auto floorHeight   = GetSurfaceHeight(RoomVector(block->RoomNumber, y), ffpX, ffpZ, true).value_or(NO_HEIGHT);
+			auto ceilingHeight = GetSurfaceHeight(RoomVector(block->RoomNumber, y), ffpX, ffpZ, false).value_or(NO_HEIGHT);
 
 			// If probe landed inside wall (i.e. both floor/ceiling heights are NO_HEIGHT), make a fake
 			// ledge for algorithm to further succeed.
@@ -911,7 +960,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			int height = useCeilingLedge ? ceilingHeight : floorHeight;
 
 			// Determine if there is a bridge in front.
-			auto bridge = block->GetInsideBridgeItemNumber(ffpX, height, ffpZ, true, y == height);
+			auto bridge = block->GetInsideBridgeItemNumber(Vector3i(ffpX, height, ffpZ), true, y == height);
 
 			// Determine floor probe offset.
 			// This must be slightly in front of own coll radius so no bridge misfires occur.
@@ -923,7 +972,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			// g_Renderer.AddDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 			// Get true room number and block, based on derived height
-			room = GetRoom(item->Location, fpX, height, fpZ).roomNumber;
+			room = GetRoomVector(item->Location, Vector3i(fpX, height, fpZ)).RoomNumber;
 			block = GetCollision(fpX, height, fpZ, room).Block;
 
 			// We don't need actual corner heights to build planes, so just use normalized value here.
@@ -936,7 +985,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto ray = Ray(Vector3(eX, cY, eZ), direction);
 
 			// Debug ray direction.
-			// g_Renderer.AddLine3D(Vector3(eX, y, eZ), Vector3(eX, y, eZ) + direction * 256, Vector4(1, 0, 0, 1));
+			// g_Renderer.AddDebugLine(Vector3(eX, y, eZ), Vector3(eX, y, eZ) + direction * 256, Vector4(1, 0, 0, 1));
 
 			// Keep origin ray to calculate true centerpoint distance to ledge later.
 			if (p == 0)
@@ -982,7 +1031,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			else
 			{
 				// Determine if we should use floor or ceiling split angle based on early tests.
-				auto splitAngle = (useCeilingLedge ? block->CeilingCollision.SplitAngle : block->FloorCollision.SplitAngle);
+				auto splitAngle = (useCeilingLedge ? TO_RAD(block->CeilingSurface.SplitAngle) : TO_RAD(block->FloorSurface.SplitAngle));
 
 				// Get horizontal block corner coordinates.
 				auto fX = floor(eX / BLOCK(1)) * BLOCK(1) - 1;
@@ -1037,7 +1086,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 						if (i == 4)
 						{
-							auto usedSectorPlane = useCeilingLedge ? block->GetSurfacePlaneIndex(eX, eZ, false) : block->GetSurfacePlaneIndex(eX, eZ, true);
+							auto usedSectorPlane = useCeilingLedge ? block->GetSurfaceTriangleID(eX, eZ, false) : block->GetSurfaceTriangleID(eX, eZ, true);
 							result[p] = FROM_RAD(splitAngle) + ANGLE(usedSectorPlane * 180.0f) + ANGLE(90.0f);
 						}
 						else
@@ -1122,63 +1171,36 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 
 FloorInfo* GetFloor(int x, int y, int z, short* roomNumber)
 {
-	const auto location = GetRoom(ROOM_VECTOR{ *roomNumber, y }, x, y, z);
-	*roomNumber = location.roomNumber;
+	const auto location = GetRoomVector(RoomVector(*roomNumber, y), Vector3i(x, y, z));
+	*roomNumber = location.RoomNumber;
 	return &GetFloor(*roomNumber, x, z);
 }
 
 int GetFloorHeight(FloorInfo* floor, int x, int y, int z)
 {
-	return GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	return GetSurfaceHeight(RoomVector(floor->RoomNumber, y), x, z, true).value_or(NO_HEIGHT);
 }
 
 int GetCeiling(FloorInfo* floor, int x, int y, int z)
 {
-	return GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
+	return GetSurfaceHeight(RoomVector(floor->RoomNumber, y), x, z, false).value_or(NO_HEIGHT);
 }
 
 int GetDistanceToFloor(int itemNumber, bool precise)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	auto probe = GetCollision(item);
+	auto pointColl = GetCollision(item);
 
 	// HACK: Remove item from bridge objects temporarily.
-	probe.Block->RemoveBridge(itemNumber);
-	auto height = GetFloorHeight(probe.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-	probe.Block->AddBridge(itemNumber);
+	pointColl.Block->RemoveBridge(itemNumber);
+	int height = GetFloorHeight(pointColl.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	pointColl.Block->AddBridge(itemNumber);
 
 	auto bounds = GameBoundingBox(item);
 	int minHeight = precise ? bounds.Y2 : 0;
 
 	return (minHeight + item->Pose.Position.y - height);
-}
-
-void AlterFloorHeight(ItemInfo* item, int height)
-{
-	if (abs(height))
-	{
-		if (height >= 0)
-			height++;
-		else
-			height--;
-	}
-
-	short roomNumber = item->RoomNumber;
-	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	FloorInfo* ceiling = GetFloor(item->Pose.Position.x, height + item->Pose.Position.y - BLOCK(1), item->Pose.Position.z, &roomNumber);
-
-	floor->FloorCollision.Planes[0].z += height;
-	floor->FloorCollision.Planes[1].z += height;
-
-	auto* box = &g_Level.Boxes[floor->Box];
-	if (box->flags & BLOCKABLE)
-	{
-		if (height >= 0)
-			box->flags &= ~BLOCKED;
-		else
-			box->flags |= BLOCKED;
-	}
 }
 
 int GetWaterSurface(int x, int y, int z, short roomNumber)
@@ -1188,9 +1210,9 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 
 	if (TestEnvironment(ENV_FLAG_WATER, room))
 	{
-		while (floor->GetRoomNumberAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), false).has_value())
 		{
-			room = &g_Level.Rooms[floor->GetRoomNumberAbove(x, y, z).value_or(floor->Room)];
+			room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(floor->RoomNumber)];
 			if (!TestEnvironment(ENV_FLAG_WATER, room))
 				return (floor->GetSurfaceHeight(x, z, false));
 
@@ -1201,9 +1223,9 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (floor->GetRoomNumberBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 		{
-			room = &g_Level.Rooms[floor->GetRoomNumberBelow(x, y, z).value_or(floor->Room)];
+			room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(floor->RoomNumber)];
 			if (TestEnvironment(ENV_FLAG_WATER, room))
 				return (floor->GetSurfaceHeight(x, z, true));
 
@@ -1252,7 +1274,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			xFloor = room->xSize - 1;
 
 		floor = &room->floor[zFloor + xFloor * room->zSize];
-		roomIndex = floor->WallPortal;
+		roomIndex = floor->SidePortalRoomNumber;
 		if (roomIndex != NO_ROOM)
 		{
 			roomNumber = roomIndex;
@@ -1264,9 +1286,9 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, room) ||
 		TestEnvironment(ENV_FLAG_SWAMP, room))
 	{
-		while (floor->GetRoomNumberAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), false).has_value())
 		{
-			room = &g_Level.Rooms[floor->GetRoomNumberAbove(x, y, z).value_or(floor->Room)];
+			room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(floor->RoomNumber)];
 
 			if (!TestEnvironment(ENV_FLAG_WATER, room) &&
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
@@ -1283,9 +1305,9 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (floor->GetRoomNumberBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 		{
-			room = &g_Level.Rooms[floor->GetRoomNumberBelow(x, y, z).value_or(floor->Room)];
+			room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(floor->RoomNumber)];
 
 			if (TestEnvironment(ENV_FLAG_WATER, room) ||
 				TestEnvironment(ENV_FLAG_SWAMP, room))
@@ -1340,7 +1362,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			xBlock = room->xSize - 1;
 
 		floor = &room->floor[zBlock + xBlock * room->zSize];
-		adjoiningRoom = floor->WallPortal;
+		adjoiningRoom = floor->SidePortalRoomNumber;
 
 		if (adjoiningRoom != NO_ROOM)
 		{
@@ -1355,9 +1377,9 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, room) ||
 		TestEnvironment(ENV_FLAG_SWAMP, room))
 	{
-		while (floor->GetRoomNumberAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), false).has_value())
 		{
-			auto* room = &g_Level.Rooms[floor->GetRoomNumberAbove(x, y, z).value_or(floor->Room)];
+			auto* room = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(floor->RoomNumber)];
 
 			if (!TestEnvironment(ENV_FLAG_WATER, room) &&
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
@@ -1366,13 +1388,13 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			floor = GetSector(room, x - room->x, z - room->z);
 		}
 
-		return GetCollision(floor, x, y, z).Block->GetSurfaceHeight(x, y, z, false);
+		return GetCollision(floor, x, y, z).Block->GetSurfaceHeight(Vector3i(x, y, z), false);
 	}
-	else if (floor->GetRoomNumberBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+	else if (floor->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 	{
-		while (floor->GetRoomNumberBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
+		while (floor->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 		{
-			auto* room2 = &g_Level.Rooms[floor->GetRoomNumberBelow(x, y, z).value_or(floor->Room)];
+			auto* room2 = &g_Level.Rooms[floor->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(floor->RoomNumber)];
 
 			if (TestEnvironment(ENV_FLAG_WATER, room2) ||
 				TestEnvironment(ENV_FLAG_SWAMP, room2))
@@ -1381,7 +1403,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			floor = GetSector(room2, x - room2->x, z - room2->z);
 		}
 
-		return GetCollision(floor, x, y, z).Block->GetSurfaceHeight(x, y, z, true);
+		return GetCollision(floor, x, y, z).Block->GetSurfaceHeight(Vector3i(x, y, z), true);
 	}
 
 	return NO_HEIGHT;
@@ -1402,7 +1424,7 @@ bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber)
 	return TestEnvironment(environmentType, GetCollision(pos.x, pos.y, pos.z, roomNumber).RoomNumber);
 }
 
-bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item)
+bool TestEnvironment(RoomEnvFlags environmentType, const ItemInfo* item)
 {
 	return TestEnvironment(environmentType, item->RoomNumber);
 }

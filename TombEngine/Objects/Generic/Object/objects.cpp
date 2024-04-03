@@ -10,7 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -71,7 +71,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* tightropeItem = &g_Level.Items[itemNumber];
 	
-	if ((!(TrInput & IN_ACTION) ||
+	if ((!IsHeld(In::Action) ||
 		laraItem->Animation.ActiveState != LS_IDLE ||
 		laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 		laraItem->Status == ITEM_INVISIBLE ||
@@ -129,7 +129,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* barItem = &g_Level.Items[itemNumber];
 
-	if (TrInput & IN_ACTION &&
+	if (IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_REACH &&
 		laraItem->Animation.AnimNumber == LA_REACH &&
 		laraInfo->Control.HandStatus == HandStatus::Free)
@@ -254,61 +254,4 @@ void AnimatingControl(short itemNumber)
 	}*/
 }
 
-void HighObject2Control(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
 
-	if (!TriggerActive(item))
-		return;
-
-	if (!item->ItemFlags[2])
-	{
-		int div = item->TriggerFlags % 10 << 10;
-		int mod = item->TriggerFlags / 10 << 10;
-		item->ItemFlags[0] = GetRandomControl() % div;
-		item->ItemFlags[1] = GetRandomControl() % mod;
-		item->ItemFlags[2] = (GetRandomControl() & 0xF) + 15;
-	}
-
-	if (--item->ItemFlags[2] < 15)
-	{
-		auto* spark = GetFreeParticle();
-		spark->on = 1;
-		spark->sR = -1;
-		spark->sB = 16;
-		spark->sG = (GetRandomControl() & 0x1F) + 48;
-		spark->dR = (GetRandomControl() & 0x3F) - 64;
-		spark->dB = 0;
-		spark->dG = (GetRandomControl() & 0x3F) + -128;
-		spark->fadeToBlack = 4;
-		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
-		spark->x = item->ItemFlags[1] + (GetRandomControl() & 0x3F) + item->Pose.Position.x - 544;
-		spark->y = item->Pose.Position.y;
-		spark->z = item->ItemFlags[0] + (GetRandomControl() & 0x3F) + item->Pose.Position.z - 544;
-		spark->xVel = (GetRandomControl() & 0x1FF) - 256;
-		spark->friction = 6;
-		spark->zVel = (GetRandomControl() & 0x1FF) - 256;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
-		spark->maxYvel = 0;
-		spark->yVel = -512 - (GetRandomControl() & 0x3FF);
-		spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 32;
-		spark->dSize = spark->size / 4;
-
-		if (GetRandomControl() & 3)
-		{
-			spark->flags = SP_ROTATE | SP_DEF | SP_SCALE | SP_EXPDEF;
-			spark->scalar = 3;
-			spark->gravity = (GetRandomControl() & 0x3F) + 32;
-		}
-		else
-		{
-			spark->flags = SP_ROTATE | SP_DEF | SP_SCALE;
-			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
-			spark->scalar = 1;
-			spark->gravity = (GetRandomControl() & 0xF) + 64;
-		}
-	}
-}

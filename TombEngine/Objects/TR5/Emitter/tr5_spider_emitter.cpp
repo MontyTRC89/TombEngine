@@ -34,7 +34,7 @@ short GetNextSpider()
 		}
 
 		if (++i >= NUM_SPIDERS)
-			return NO_ITEM;
+			return NO_VALUE;
 	}
 
 	NextSpider = (spiderNumber + 1) & (NUM_SPIDERS - 1);
@@ -96,7 +96,7 @@ void SpidersEmitterControl(short itemNumber)
 				item->ItemFlags[2]--;
 
 			short spiderNumber = GetNextSpider();
-			if (spiderNumber != NO_ITEM)
+			if (spiderNumber != NO_VALUE)
 			{
 				auto* spider = &Spiders[spiderNumber];
 

@@ -124,7 +124,7 @@ namespace TEN::Entities::Creatures::TR3
 		for (auto& targetCreature : ActiveCreatures)
 		{
 			// Ignore itself and invalid entities.
-			if (targetCreature->ItemNumber == NO_ITEM || targetCreature->ItemNumber == item.Index)
+			if (targetCreature->ItemNumber == NO_VALUE || targetCreature->ItemNumber == item.Index)
 				continue;
 
 			auto& currentItem = g_Level.Items[targetCreature->ItemNumber];
@@ -179,8 +179,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		int targetAngle = 0;
 		int targetDistance = 0;
-		auto jointHeadRot = EulerAngles::Zero;
-		auto jointTorsoRot = EulerAngles::Zero;
+		auto jointHeadRot = EulerAngles::Identity;
+		auto jointTorsoRot = EulerAngles::Identity;
 
 		if (item.BoxNumber != NO_BOX && (g_Level.Boxes[item.BoxNumber].flags & BLOCKED) && item.HitPoints > 0)
 		{

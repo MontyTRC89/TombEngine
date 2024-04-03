@@ -21,7 +21,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
@@ -157,7 +157,7 @@ Particle* GetFreeParticle()
 	spark->extras = 0;
 	spark->dynamic = -1;
 	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BlendMode::Additive;
 
 	return spark;
 }
@@ -467,7 +467,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 		spark->dB = -64 - ((random & 0x7F) + 64);
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->friction = 34;
 		spark->scalar = 1;
 		spark->x = (random & 7) + x - 3;
@@ -733,7 +733,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->sB = 0;
 		spark->colFadeSpeed = 8;
 		spark->fadeToBlack = 12;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->x = x;
 		spark->y = y;
 		spark->z = z;
@@ -793,9 +793,9 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
 	spark->life = spark->sLife= (GetRandomControl() & 0x1F) + 96;
 
 	if (uw)
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 	else
-		spark->blendMode = BLEND_MODES::BLENDMODE_SUBTRACTIVE;
+		spark->blendMode = BlendMode::Subtractive;
 
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -858,7 +858,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 		spark->dB = 64;
 		spark->colFadeSpeed = 2;
 		spark->fadeToBlack = 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_SUBTRACTIVE;
+		spark->blendMode = BlendMode::Subtractive;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 10;
 		spark->x = (GetRandomControl() & 0x1FF) + x - 256;
 		spark->y = (GetRandomControl() & 0x1FF) + y - 256;
@@ -906,7 +906,7 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 		sptr->dB = 32;
 		sptr->colFadeSpeed = 8;
 		sptr->fadeToBlack = 8;
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BlendMode::Additive;
 		sptr->life = sptr->sLife = (size >> 9) + (GetRandomControl() & 7) + 16;
 		sptr->x = (GetRandomControl() & 0x1F) + item->Pose.Position.x - 16;
 		sptr->y = (GetRandomControl() & 0x1F) + item->Pose.Position.y - 16;
@@ -1148,7 +1148,7 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			spark->dB = std::clamp(int(endColor.z)   + colorOffset, 0, UCHAR_MAX);
 
 			spark->colFadeSpeed = 1;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->life = spark->sLife = Random::GenerateInt(8, 12);
 			spark->fadeToBlack = spark->life - 6;
 
@@ -1187,49 +1187,71 @@ void KillAllCurrentItems(short itemNumber)
 	// TODO: Reimplement this functionality.
 }
 
+// TODO: Rname to SpawnDynamicLight().
+void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff)
+{
+	g_Renderer.AddDynamicLight(
+		pos.x, pos.y, pos.z,
+		falloff * UCHAR_MAX,
+		color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
+}
+
+// Deprecated. Use above version instead.
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
 	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
-void WadeSplash(ItemInfo* item, int wh, int wd)
+void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth)
 {
-	auto probe1 = GetCollision(item);
-	auto probe2 = GetCollision(probe1.Block, item->Pose.Position.x, probe1.Position.Ceiling, item->Pose.Position.z);
-	
-	if (!TestEnvironment(ENV_FLAG_WATER, probe1.RoomNumber) ||
-		 TestEnvironment(ENV_FLAG_WATER, probe1.RoomNumber) == TestEnvironment(ENV_FLAG_WATER, probe2.RoomNumber))
+	const auto& player = GetLaraInfo(item);
+
+	// Player underwater; return early.
+	if (player.Control.WaterStatus == WaterStatus::Underwater)
 		return;
 
-	const auto& bounds = GetBestFrame(*item).BoundingBox;
-	if (item->Pose.Position.y + bounds.Y1 > wh)
+	// Get point collision.
+	auto pointColl0 = GetCollision(&item, 0, 0, -(LARA_HEIGHT / 2));
+	auto pointColl1 = GetCollision(&item, 0, 0, item.Animation.Velocity.y);
+
+	// In swamp; return early.
+	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl1.RoomNumber))
 		return;
 
-	if (item->Pose.Position.y + bounds.Y2 < wh)
-		return;
+	bool isWater0 = TestEnvironment(ENV_FLAG_WATER, pointColl0.RoomNumber);
+	bool isWater1 = TestEnvironment(ENV_FLAG_WATER, pointColl1.RoomNumber);
 
-	if (item->Animation.Velocity.y <= 0.0f || wd >= 474 || SplashCount != 0)
+	// Spawn splash.
+	if (!isWater0 && isWater1 &&
+		item.Animation.Velocity.y > 0.0f && SplashCount == 0 &&
+		player.Control.WaterStatus != WaterStatus::TreadWater)
 	{
-		if (!(Wibble & 0xF))
-		{
-			if (!(GetRandomControl() & 0xF) || item->Animation.ActiveState != LS_IDLE)
-			{
-				if (item->Animation.ActiveState != LS_IDLE)
-					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), (int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
-				else
-					SpawnRipple(Vector3(item->Pose.Position.x, wh - 1, item->Pose.Position.z), item->RoomNumber, 112 + (GetRandomControl() & 15), (int)RippleFlags::LowOpacity);
-			}
-		}
-	}
-	else
-	{
-		SplashSetup.y = wh - 1;
-		SplashSetup.x = item->Pose.Position.x;
-		SplashSetup.z = item->Pose.Position.z;
+		SplashSetup.x = item.Pose.Position.x;
+		SplashSetup.y = waterHeight - 1;
+		SplashSetup.z = item.Pose.Position.z;
 		SplashSetup.innerRadius = 16;
-		SplashSetup.splashPower = item->Animation.Velocity.z;
-		SetupSplash(&SplashSetup, probe1.RoomNumber);
+		SplashSetup.splashPower = item.Animation.Velocity.z;
+
+		SetupSplash(&SplashSetup, pointColl0.RoomNumber);
 		SplashCount = 16;
+	}
+	// Spawn ripple.
+	else if (isWater1)
+	{
+		if (Wibble & 0xF)
+			return;
+
+		if (Random::TestProbability(1 / 2000.0f) && item.Animation.ActiveState == LS_IDLE)
+			return;
+
+		int flags = (item.Animation.ActiveState == LS_IDLE) ?
+			(int)RippleFlags::LowOpacity :
+			(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity;
+
+		SpawnRipple(
+			Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z),
+			item.RoomNumber, Random::GenerateFloat(112.0f, 128.0f),
+			flags);
 	}
 }
 
@@ -1265,7 +1287,7 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 	sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 28;
-	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	sptr->blendMode = BlendMode::Additive;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -1321,7 +1343,7 @@ void TriggerRocketFire(int x, int y, int z)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	sptr->blendMode = BlendMode::Additive;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -1387,7 +1409,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->dShade = -128;
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 16;
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BlendMode::Additive;
 	spark->life = spark->sLife = (GetRandomControl() & 0xF) + 64;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -1531,7 +1553,7 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 40;
 	}
 
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BlendMode::Additive;
 
 	if (type != FlameType::Big && type != FlameType::Medium)
 	{
@@ -1667,7 +1689,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vecto
 		spark->colFadeSpeed = 3;
 		spark->fadeToBlack = 5;
 		spark->y = ((r >> 3) & 7) + y - 3;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->friction = 34;
 		spark->scalar = 2;
 		spark->z = ((r >> 6) & 7) + z - 3;
@@ -1689,7 +1711,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vecto
 			spark->sR = spark->dR >> 1;
 			spark->sG = spark->dG >> 1;
 			spark->fadeToBlack = 4;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->colFadeSpeed = (r & 3) + 8;
 			spark->sB = spark->dB >> 1;
 			spark->dR = 32;
@@ -1897,7 +1919,7 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale)
 	spark.dB = color.z;
 	spark.fadeToBlack = 8;
 	spark.colFadeSpeed = Random::GenerateInt(4, 8);
-	spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark.blendMode = BlendMode::Additive;
 	spark.life = Random::GenerateInt(20, 28);
 	spark.sLife = spark.life;
 	spark.x = pos.x + Random::GenerateInt(-8, 8);

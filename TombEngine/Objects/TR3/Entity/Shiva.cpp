@@ -13,7 +13,7 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
@@ -109,7 +109,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto effectPos = Random::GeneratePointInSphere(sphere);
 
 		smoke.on = true;
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.blendMode = BlendMode::Additive;
 
 		smoke.x = effectPos.x;
 		smoke.y = effectPos.y;
@@ -277,8 +277,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (item->HitPoints <= 0)
 		{
@@ -495,8 +495,8 @@ namespace TEN::Entities::Creatures::TR3
 
 			case SHIVA_STATE_KILL:
 				creature.MaxTurn = 0;
-				extraHeadRot = EulerAngles::Zero;
-				extraTorsoRot = EulerAngles::Zero;
+				extraHeadRot = EulerAngles::Identity;
+				extraTorsoRot = EulerAngles::Identity;
 
 				if (item->Animation.FrameNumber == GetFrameIndex(item, 10) ||
 					item->Animation.FrameNumber == GetFrameIndex(item, 21) ||

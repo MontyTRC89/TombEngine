@@ -319,17 +319,17 @@ void SenetPieceExplosionEffect(ItemInfo* item, int color, int speed)
 	int radius = speed >= 0 ? 0xA00020 : 0x2000280;
 	int clr = color | 0x18000000;
 	item->Pose.Position.y -= STEPUP_HEIGHT;
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles(0x2000, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles(0x4000, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
-	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles(0x6000, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles(0x2000, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles(0x4000, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
+	TriggerShockwave(&item->Pose, radius & 0xFFFF, radius >> 16, speed, clr & 0xFF, (clr >> 8) & 0xFF, (clr >> 16) & 0xFF, 64, EulerAngles(0x6000, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 	item->Pose.Position.y += STEPUP_HEIGHT;
 }
 
 void TriggerItemInRoom(short room_number, int object)//originally this is in deltapak
 {
 	short num = g_Level.Rooms[room_number].itemNumber;
-	while (num != NO_ITEM)
+	while (num != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[num];
 		short nex = item->NextItem;
@@ -430,7 +430,7 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
 
-	if (TrInput & IN_ACTION &&
+	if (IsHeld(In::Action) &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		Lara.Control.HandStatus == HandStatus::Free &&

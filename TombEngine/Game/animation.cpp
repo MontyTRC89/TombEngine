@@ -11,13 +11,15 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/rope.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
+
+constexpr auto VERTICAL_VELOCITY_GRAVITY_THRESHOLD = CLICK(0.5f);
 
 // NOTE: 0 frames counts as 1.
 static unsigned int GetNonZeroFrameCount(const AnimData& anim)
@@ -188,7 +190,7 @@ void AnimateItem(ItemInfo* item)
 		if (!item->IsLara())
 		{
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 	}
 
@@ -210,7 +212,7 @@ void AnimateItem(ItemInfo* item)
 			}
 
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 		else
 		{
@@ -227,7 +229,7 @@ void AnimateItem(ItemInfo* item)
 		if (!item->IsLara())
 		{
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}*/
 	}
 
@@ -250,7 +252,7 @@ void AnimateItem(ItemInfo* item)
 					item->Animation.Velocity.z = 0.0f;
 				}
 
-				if (item->Animation.Velocity.y > 128.0f)
+				if (item->Animation.Velocity.y > VERTICAL_VELOCITY_GRAVITY_THRESHOLD)
 					item->Animation.Velocity.y /= 2;
 				item->Animation.Velocity.y -= item->Animation.Velocity.y / 4;
 
@@ -260,7 +262,7 @@ void AnimateItem(ItemInfo* item)
 			}
 			else
 			{
-				item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
+				item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
 				item->Animation.Velocity.z += animAccel.z;
 
 				item->Pose.Position.y += item->Animation.Velocity.y;
@@ -268,7 +270,7 @@ void AnimateItem(ItemInfo* item)
 		}
 		else
 		{
-			item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
+			item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
 			item->Pose.Position.y += item->Animation.Velocity.y;
 		}
 	}
@@ -312,7 +314,7 @@ void AnimateItem(ItemInfo* item)
 	}
 }
 
-bool HasStateDispatch(ItemInfo* item, int targetState)
+bool HasStateDispatch(const ItemInfo* item, int targetState)
 {
 	const auto& anim = GetAnimData(*item);
 
@@ -320,7 +322,7 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 	if (anim.NumStateDispatches <= 0)
 		return false;
 
-	if (targetState == NO_STATE)
+	if (targetState == NO_VALUE)
 		targetState = item->Animation.TargetState;
 
 	// Iterate over animation's state dispatches.
@@ -358,7 +360,7 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 {
 	const auto& object = Objects[item->Animation.AnimObjectID];
 
-	if (animNumber == NO_ANIM)
+	if (animNumber == NO_VALUE)
 		animNumber = item->Animation.AnimNumber - object.animIndex;
 
 	// Animation to test doesn't match; return early.
@@ -461,7 +463,7 @@ const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 
 const AnimData& GetAnimData(const ItemInfo& item, int animNumber)
 {
-	if (animNumber == NO_ANIM)
+	if (animNumber == NO_VALUE)
 		return GetAnimData(item.Animation.AnimNumber);
 
 	const auto& object = Objects[item.Animation.AnimObjectID];
@@ -533,6 +535,11 @@ const AnimFrame& GetBestFrame(const ItemInfo& item)
 {
 	auto frameData = GetFrameInterpData(item);
 	return ((frameData.Alpha <= 0.5f) ? *frameData.FramePtr0 : *frameData.FramePtr1);
+}
+
+float GetEffectiveGravity(float verticalVel)
+{
+	return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
 }
 
 int GetAnimNumber(const ItemInfo& item)

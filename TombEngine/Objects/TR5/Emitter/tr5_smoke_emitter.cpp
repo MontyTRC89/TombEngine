@@ -11,7 +11,7 @@
 #include "Specific/level.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 using namespace TEN::Effects::Bubble;
 
@@ -147,7 +147,7 @@ void SmokeEmitterControl(short itemNumber)
 			sptr->dB = 48;
 			sptr->fadeToBlack = 6;
 			sptr->colFadeSpeed = (GetRandomControl() & 3) + 6;
-			sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			sptr->blendMode = BlendMode::Additive;
 			sptr->life = (GetRandomControl() & 7) + 16;
 			sptr->sLife = sptr->life;
 			sptr->x = (GetRandomControl() & 0x3F) + item->Pose.Position.x - 32;
@@ -220,9 +220,9 @@ void SmokeEmitterControl(short itemNumber)
 		sptr->sLife = sptr->life = (GetRandomControl() & 7) + 28;
 
 		if (item->ObjectNumber == ID_SMOKE_EMITTER_BLACK)
-			sptr->blendMode = BLEND_MODES::BLENDMODE_SUBTRACTIVE;
+			sptr->blendMode = BlendMode::Subtractive;
 		else
-			sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			sptr->blendMode = BlendMode::Additive;
 
 		sptr->x = (GetRandomControl() & 0x3F) + item->Pose.Position.x - 32;
 		sptr->y = (GetRandomControl() & 0x3F) + item->Pose.Position.y - 32;

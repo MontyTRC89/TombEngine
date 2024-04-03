@@ -93,7 +93,7 @@ namespace TEN::Entities::Vehicles
 		// TODO: If Lara global is not used, the game crashes upon level load. Not sure why. @Sezz 2022.01.09
 		auto* lara = &Lara/* GetLaraInfo(laraItem)*/;
 
-		if (!(TrInput & IN_ACTION) ||
+		if (!IsHeld(In::Action) ||
 			lara->Control.HandStatus != HandStatus::Free ||
 			laraItem->Animation.IsAirborne)
 		{
@@ -118,7 +118,7 @@ namespace TEN::Entities::Vehicles
 	void BigGunFire(ItemInfo* bigGunItem, ItemInfo* laraItem)
 	{
 		short itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 		auto* lara = GetLaraInfo(laraItem);
 		auto* bigGun = GetBigGunInfo(bigGunItem);
@@ -154,7 +154,7 @@ namespace TEN::Entities::Vehicles
 		auto* bigGun = GetBigGunInfo(bigGunItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		if (BigGunTestMount(laraItem, bigGunItem))

@@ -3,13 +3,13 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/los.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
-#include "Game/control/los.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/effects/weather.h"
 #include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Scripting/Internal/LuaHandler.h"
@@ -19,6 +19,7 @@
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 
@@ -28,12 +29,12 @@ Functions to generate effects.
 @pragma nostrip
 */
 
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Electricity;
-using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 
-namespace Effects
+namespace TEN::Scripting::Effects
 {
 	///Emit a lightning arc.
 	//@function EmitLightningArc
@@ -127,7 +128,7 @@ namespace Effects
 		)
 	*/
 	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
-							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BLEND_MODES> blendMode, 
+							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
 							TypeOrNil<bool> damage, TypeOrNil<bool> poison)
 	{
@@ -156,8 +157,8 @@ namespace Effects
 		s->dB = colorEnd.GetB();
 
 		//there is no blend mode 7
-		BLEND_MODES bMode = USE_IF_HAVE(BLEND_MODES, blendMode, BLENDMODE_ALPHABLEND);
-		s->blendMode = BLEND_MODES(std::clamp(int(bMode), int(BLEND_MODES::BLENDMODE_OPAQUE), int(BLEND_MODES::BLENDMODE_ALPHABLEND)));
+		BlendMode bMode = USE_IF_HAVE(BlendMode, blendMode, BlendMode::AlphaBlend);
+		s->blendMode = BlendMode(std::clamp(int(bMode), int(BlendMode::Opaque), int(BlendMode::AlphaBlend)));
 
 		s->x = pos.x;
 		s->y = pos.y;
@@ -173,9 +174,9 @@ namespace Effects
 		s->colFadeSpeed = lifeInFrames / 2;
 		s->fadeToBlack = lifeInFrames / 3;
 
-		s->xVel = short(velocity.x << 5);
-		s->yVel = short(velocity.y << 5);
-		s->zVel = short(velocity.z << 5);
+		s->xVel = short(velocity.x * 32);
+		s->yVel = short(velocity.y * 32);
+		s->zVel = short(velocity.z * 32);
 
 		int sSize = USE_IF_HAVE(int, startSize, 10);
 		int eSize = USE_IF_HAVE(int, endSize, 0);
@@ -228,7 +229,7 @@ namespace Effects
 		constexpr auto LIFE_IN_SECONDS_MAX = 8.5f;
 		constexpr auto SECONDS_PER_FRAME   = 1 / (float)FPS;
 
-		auto pose = Pose(pos.x, pos.y, pos.z);
+		auto pose = Pose(Vector3i(pos.x, pos.y, pos.z));
 
 		int innerRad = USE_IF_HAVE(int, innerRadius, 0);
 		int outerRad = USE_IF_HAVE(int, outerRadius, 128);
@@ -249,7 +250,7 @@ namespace Effects
 			&pose, innerRad, outerRad, spd,
 			color.GetR(), color.GetG(), color.GetB(),
 			lifeInFrames, EulerAngles(ANGLE(ang), 0.0f, 0.0f),
-			(short)doDamage, true, false, (int)ShockwaveStyle::Normal);
+			(short)doDamage, true, false, false, (int)ShockwaveStyle::Normal);
 	}
 
 /***Emit dynamic light that lasts for a single frame.
@@ -307,20 +308,9 @@ namespace Effects
 		Camera.bounce = -str;
 	}
 
-/***Flash screen.
-@function FlashScreen
-@tparam Color color (default Color(255, 255, 255))
-@tparam float speed (default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
-*/
-	static void FlashScreen(TypeOrNil<ScriptColor> col, TypeOrNil<float> speed)
-	{
-		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
-		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0)) / (float)FPS);
-	}
-
 	void Register(sol::state* state, sol::table& parent) 
 	{
-		sol::table tableEffects = { state->lua_state(), sol::create };
+		auto tableEffects = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Effects, tableEffects);
 
 		tableEffects.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
@@ -330,10 +320,9 @@ namespace Effects
 		tableEffects.set_function(ScriptReserved_EmitBlood, &EmitBlood);
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
-		tableEffects.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 
-		LuaHandler handler{ state };
+		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
 	}

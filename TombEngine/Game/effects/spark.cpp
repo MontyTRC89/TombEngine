@@ -54,7 +54,7 @@ namespace TEN::Effects::Spark
 		return SparkParticles[0];
 	}
 
-	void TriggerFlareSparkParticles(const Vector3i& pos, const Vector3i& vel, const ColorData& color, int roomNumber)
+	void TriggerFlareSparkParticles(const Vector3i& pos, const Vector3i& vel, const Color& color, int roomNumber)
 	{
 		auto& s = GetFreeSparkParticle();
 		s = {};
@@ -70,8 +70,8 @@ namespace TEN::Effects::Spark
 		v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
 		v.Normalize(v);
 		s.velocity = v *GenerateFloat(17,24);
-		s.sourceColor = Vector4::One;
-		s.destinationColor = Vector4(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, 1.0f);
+		s.sourceColor = Color(1.0f, 1.0f, 1.0f);
+		s.destinationColor = color;
 		s.active = true;
 	}
 
@@ -168,7 +168,7 @@ namespace TEN::Effects::Spark
 		spark.life = 16;
 		spark.sLife = 16;
 		spark.colFadeSpeed = 4;
-		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark.blendMode = BlendMode::Additive;
 		spark.fadeToBlack = 4;
 		spark.x = (int)round(pos.x);
 		spark.y = (int)round(pos.y);
@@ -204,7 +204,7 @@ namespace TEN::Effects::Spark
 		spark.fadeToBlack = 5;
 		spark.life = 10;
 		spark.sLife = 10;
-		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark.blendMode = BlendMode::Additive;
 		spark.friction = 34;
 		spark.scalar = 2;
 		spark.x = (randomInt & 7) + pos.x - 3;

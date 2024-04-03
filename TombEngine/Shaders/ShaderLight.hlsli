@@ -1,3 +1,6 @@
+#ifndef SHADER_LIGHT
+#define SHADER_LIGHT
+
 #include "./Math.hlsli"
 
 float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)
@@ -57,8 +60,9 @@ float3 DoSpecularSpot(float3 pos, float3 n, ShaderLight light, float strength)
 		float coneIn = light.InRange;
 		float coneOut = light.OutRange;
 
-		float3 lightVec = normalize(pos - lightPos);
+		float3 lightVec = pos - lightPos;
 		float distance = length(lightVec);
+		lightVec = normalize(lightVec);
 
 		if (distance > outerRange)
 			return float3(0, 0, 0);
@@ -82,9 +86,9 @@ float3 DoSpecularSpot(float3 pos, float3 n, ShaderLight light, float strength)
 				float3 color = light.Color.xyz;
 				float intensity = saturate(light.Intensity);
 				float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
-				float attenuation = (outerRange - distance) / outerRange;
+				float falloff = saturate((outerRange - distance) / (outerRange - innerRange + 1.0f));
 
-				return attenuation * spec * color * intensity;
+				return attenuation * spec * color * intensity * falloff;
 			}
 			else
 				return float3(0, 0, 0);
@@ -154,8 +158,9 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 	float coneIn = light.InRange;
 	float coneOut = light.OutRange;
 
-	float3 lightVec = normalize(pos - lightPos);
+	float3 lightVec = pos - lightPos;
 	float distance = length(lightVec);
+	lightVec = normalize(lightVec);
 
 	if (distance > outerRange)
 		return float3(0, 0, 0);
@@ -461,3 +466,5 @@ float3 StaticLight(float3 vertex, float3 tex, float fogBulbsDensity)
 
 	return saturate(result);
 }
+
+#endif

@@ -231,7 +231,7 @@ namespace TEN::Entities::TR4
 			for (auto& currentCreature : ActiveCreatures)
 			{
 				targetCreature = currentCreature;
-				if (targetCreature->ItemNumber == NO_ITEM ||
+				if (targetCreature->ItemNumber == NO_VALUE ||
 					targetCreature->ItemNumber == itemNumber ||
 					g_Level.Items[targetCreature->ItemNumber].ObjectNumber == ID_VON_CROY ||
 					g_Level.Items[targetCreature->ItemNumber].ObjectNumber == ID_GUIDE)

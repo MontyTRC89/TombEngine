@@ -1,8 +1,11 @@
 #pragma once
 
-struct alignas(16) CBlendingBuffer
+namespace TEN::Renderer::ConstantBuffers
 {
-	unsigned int BlendMode;
-	int AlphaTest;
-	float AlphaThreshold;
-};
+	struct alignas(16) CBlendingBuffer
+	{
+		unsigned int BlendMode;
+		int AlphaTest;
+		float AlphaThreshold;
+	};
+}

@@ -110,7 +110,7 @@ namespace TEN::Entities::Vehicles
 		mist.colFadeSpeed = 4 + (GetRandomControl() & 3);
 		mist.fadeToBlack = 12;
 		mist.sLife = mist.life = (GetRandomControl() & 3) + 20;
-		mist.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		mist.blendMode = BlendMode::Additive;
 		mist.extras = 0;
 		mist.dynamic = -1;
 
@@ -165,7 +165,7 @@ namespace TEN::Entities::Vehicles
 		auto* speedboatItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(speedboatItem, laraItem, coll, SpeedboatMountTypes, SPEEDBOAT_MOUNT_DISTANCE, LARA_HEIGHT);
@@ -276,7 +276,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.Velocity.y = -50;
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
-			lara->Context.Vehicle = NO_ITEM; // Leave vehicle itself active for inertia.
+			lara->Context.Vehicle = NO_VALUE; // Leave vehicle itself active for inertia.
 
 			int x = laraItem->Pose.Position.x + 360 * phd_sin(laraItem->Pose.Orientation.y);
 			int y = laraItem->Pose.Position.y - 90;
@@ -300,7 +300,7 @@ namespace TEN::Entities::Vehicles
 	void SpeedboatDoBoatShift(ItemInfo* speedboatItem, int itemNumber)
 	{
 		short itemNumber2 = g_Level.Rooms[speedboatItem->RoomNumber].itemNumber;
-		while (itemNumber2 != NO_ITEM)
+		while (itemNumber2 != NO_VALUE)
 		{
 			auto* item = &g_Level.Items[itemNumber2];
 
@@ -598,13 +598,14 @@ namespace TEN::Entities::Vehicles
 	bool SpeedboatUserControl(ItemInfo* speedboatItem, ItemInfo* laraItem)
 	{
 		auto* speedboat = GetSpeedboatInfo(speedboatItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		bool noTurn = true;
 		int maxVelocity;
 
 		if (speedboatItem->Pose.Position.y >= speedboat->Water - CLICK(0.5f) && speedboat->Water != NO_HEIGHT)
 		{
-			if (!IsHeld(In::Brake) && !(TrInput & IN_LOOK) ||
+			if (!IsHeld(In::Brake) && !IsHeld(In::Look) ||
 				speedboatItem->Animation.Velocity.z)
 			{
 				if (IsHeld(In::Left) && !IsHeld(In::Reverse) ||
@@ -645,10 +646,10 @@ namespace TEN::Entities::Vehicles
 				}
 				else if (IsHeld(In::Accelerate))
 				{
-					if (IsHeld(In::Speed))
+					if (IsHeld(In::Faster))
 						maxVelocity = SPEEDBOAT_FAST_VELOCITY_MAX;
 					else
-						maxVelocity = (IsHeld(In::Slow)) ? SPEEDBOAT_SLOW_VELOCITY_MAX : SPEEDBOAT_NORMAL_VELOCITY_MAX;
+						maxVelocity = (IsHeld(In::Slower)) ? SPEEDBOAT_SLOW_VELOCITY_MAX : SPEEDBOAT_NORMAL_VELOCITY_MAX;
 
 					if (speedboatItem->Animation.Velocity.z < maxVelocity)
 						speedboatItem->Animation.Velocity.z += (SPEEDBOAT_VELOCITY_ACCEL / 2) + (SPEEDBOAT_VELOCITY_ACCEL * (speedboatItem->Animation.Velocity.z / (maxVelocity * 2)));
@@ -682,8 +683,7 @@ namespace TEN::Entities::Vehicles
 				else
 					speedboatItem->Animation.Velocity.z = 0;
 
-				if (TrInput & IN_LOOK && speedboatItem->Animation.Velocity.z == 0)
-					LookUpDown(laraItem);
+				lara->Control.Look.Mode = (speedboatItem->Animation.Velocity.z == 0.0f) ? LookMode::Horizontal : LookMode::Free;
 			}
 		}
 
@@ -842,6 +842,7 @@ namespace TEN::Entities::Vehicles
 			default:
 				drive = true;
 				noTurn = SpeedboatUserControl(speedboatItem, laraItem);
+				HandleVehicleSpeedometer(speedboatItem->Animation.Velocity.z, SPEEDBOAT_FAST_VELOCITY_MAX);
 				break;
 			}
 		}
@@ -940,8 +941,9 @@ namespace TEN::Entities::Vehicles
 
 		if (speedboatItem->Animation.Velocity.z && (water - 5) == speedboatItem->Pose.Position.y)
 		{
-			auto room = probe.Block->GetRoomNumberBelow(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z).value_or(NO_ROOM);
-			if (room != NO_ROOM && (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, room) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, room)))
+			auto roomNumber = probe.Block->GetNextRoomNumber(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z, true);
+			if (roomNumber.has_value() &&
+				(TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, *roomNumber) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, *roomNumber)))
 			{
 				if (speedboatItem->TriggerFlags == 1)
 				{

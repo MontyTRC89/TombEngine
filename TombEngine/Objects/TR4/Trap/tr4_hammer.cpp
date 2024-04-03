@@ -100,10 +100,10 @@ namespace TEN::Entities::TR4
                 {
                     short targetItem = g_Level.Rooms[item->RoomNumber].itemNumber;
 
-                    if (targetItem != NO_ITEM)
+                    if (targetItem != NO_VALUE)
                     {
                         auto* target = &g_Level.Items[targetItem];
-                        for (; targetItem != NO_ITEM; targetItem = target->NextItem)
+                        for (; targetItem != NO_VALUE; targetItem = target->NextItem)
                         {
                             target = &g_Level.Items[targetItem];
 
@@ -126,14 +126,15 @@ namespace TEN::Entities::TR4
                 {
                     short targetItem = g_Level.Rooms[item->RoomNumber].itemNumber;
 
-                    if (targetItem != NO_ITEM)
+                    if (targetItem != NO_VALUE)
                     {
                         auto* target = &g_Level.Items[targetItem];
-                        for (; targetItem != NO_ITEM; targetItem = target->NextItem)
+                        for (; targetItem != NO_VALUE; targetItem = target->NextItem)
                         {
                             target = &g_Level.Items[targetItem];
 
-                            if (target->ObjectNumber >= ID_PUSHABLE_OBJECT1 && target->ObjectNumber <= ID_PUSHABLE_OBJECT10)
+                            if (    (target->ObjectNumber >= ID_PUSHABLE_OBJECT1 && target->ObjectNumber <= ID_PUSHABLE_OBJECT10) ||
+                                    (target->ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && target->ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10))
                             {
                                 if (item->Pose.Position.x == target->Pose.Position.x &&
                                     item->Pose.Position.z == target->Pose.Position.z)
@@ -150,10 +151,10 @@ namespace TEN::Entities::TR4
                     {
                         targetItem = g_Level.Rooms[item->RoomNumber].itemNumber;
 
-                        if (targetItem != NO_ITEM)
+                        if (targetItem != NO_VALUE)
                         {
                             auto* target = &g_Level.Items[targetItem];
-                            for (; targetItem != NO_ITEM; targetItem = target->NextItem)
+                            for (; targetItem != NO_VALUE; targetItem = target->NextItem)
                             {
                                 target = &g_Level.Items[targetItem];
 

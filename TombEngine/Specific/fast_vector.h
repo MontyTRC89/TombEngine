@@ -20,7 +20,7 @@ inline void construct_range(T* begin, T* end)
 }
 
 template <class T>
-inline void copy_range(T* begin, T* end, T* dest)
+inline void copy_range(const T* begin, const T* end, T* dest)
 {
     while (begin != end)
     {

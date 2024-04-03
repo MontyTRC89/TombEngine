@@ -1,5 +1,7 @@
 #pragma once
 
+class EulerAngles;
+
 namespace TEN::Math::Random
 {
 	// Value generation
@@ -9,15 +11,16 @@ namespace TEN::Math::Random
 
 	// 2D geometric generation
 	Vector2 GenerateDirection2D();
-	Vector2 GeneratePoint2DInSquare(const Vector2& pos2D, short orient2D, float apothem);
-	Vector2 GeneratePoint2DInCircle(const Vector2& pos2D, float radius);
+	Vector2 GeneratePoint2DInSquare(const Vector2& pos, short orient, float apothem);
+	Vector2 GeneratePoint2DInCircle(const Vector2& pos, float radius);
 
 	// 3D geometric generation
 	Vector3 GenerateDirection();
-	Vector3 GenerateDirectionInCone(const Vector3& direction, float semiangleInDeg);
+	Vector3 GenerateDirectionInCone(const Vector3& dir, float semiangleInDeg);
 	Vector3 GeneratePointInBox(const BoundingOrientedBox& box);
 	Vector3 GeneratePointInSphere(const BoundingSphere& sphere);
 	Vector3 GeneratePointOnSphere(const BoundingSphere& sphere);
+	Vector3 GeneratePointInSpheroid(const Vector3& center, const EulerAngles& orient, const Vector3& semiMajorAxis);
 
-	bool TestProbability(float probability);
+	bool TestProbability(float prob);
 }

@@ -29,10 +29,12 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Utils;
 
 int FlashGrenadeAftershockTimer = 0;
 
@@ -58,13 +60,23 @@ const auto FlarePoseStates = std::vector<int>
 	LS_SOFT_SPLAT
 };
 
+const auto UnavailableFlarePoseAnims = std::vector<int>
+{
+	LA_WATERLEVER_PULL,
+	LA_BUTTON_GIANT_PUSH,
+	LA_BUTTON_LARGE_PUSH,
+	LA_JUMPSWITCH_PULL,
+	LA_UNDERWATER_CEILING_SWITCH_PULL,
+	LA_VALVE_TURN
+};
+
 WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 {
 	// No weapon
 	{
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
 		0,
 		0,
 		0,
@@ -98,7 +110,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 	{
 		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-60.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(60.0f), 0)),
 		std::pair(EulerAngles(ANGLE(-80.0f), ANGLE(-10.0f), 0), EulerAngles(ANGLE(80.0f), ANGLE(10.0f), 0)),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
 		ANGLE(10.0f),
 		ANGLE(4.0f),
 		650,
@@ -181,9 +193,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Flare
 	{
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
-		std::pair(EulerAngles::Zero, EulerAngles::Zero),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
+		std::pair(EulerAngles::Identity, EulerAngles::Identity),
 		0,
 		0,
 		0,
@@ -282,6 +294,15 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 	}
 };
 
+// TODO: Use map like in GetWeaponAnimData();
+const WeaponInfo& GetWeaponInfo(LaraWeaponType weaponType)
+{
+	if ((int)weaponType < 0 || (int)weaponType >= (int)LaraWeaponType::NumWeapons)
+		return Weapons[0];
+
+	return (Weapons[(int)weaponType]);
+}
+
 void InitializeNewWeapon(ItemInfo& laraItem)
 {
 	auto& player = *GetLaraInfo(&laraItem);
@@ -290,7 +311,7 @@ void InitializeNewWeapon(ItemInfo& laraItem)
 	player.LeftArm.FrameNumber =
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Orientation =
-	player.RightArm.Orientation = EulerAngles::Zero;
+	player.RightArm.Orientation = EulerAngles::Identity;
 	player.LeftArm.Locked =
 	player.RightArm.Locked = false;
 	player.LeftArm.GunFlash =
@@ -469,6 +490,15 @@ GAME_OBJECT_ID GetWeaponObjectMeshID(ItemInfo& laraItem, LaraWeaponType weaponTy
 	}
 }
 
+static void ClearPlayerTargets(ItemInfo& playerItem)
+{
+	auto& player = GetLaraInfo(playerItem);
+
+	player.TargetEntity = nullptr;
+	player.TargetList.fill(nullptr);
+	player.LastTargets.fill(nullptr);
+}
+
 void HandleWeapon(ItemInfo& laraItem)
 {
 	auto& player = *GetLaraInfo(&laraItem);
@@ -541,11 +571,11 @@ void HandleWeapon(ItemInfo& laraItem)
 					player.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			}
 			else if (player.Control.Weapon.RequestGunType == LaraWeaponType::Flare ||
-				(player.Context.Vehicle == NO_ITEM &&
+				(player.Context.Vehicle == NO_VALUE &&
 					(player.Control.Weapon.RequestGunType == LaraWeaponType::HarpoonGun ||
 						player.Control.WaterStatus == WaterStatus::Dry ||
 						(player.Control.WaterStatus == WaterStatus::Wade &&
-							player.Context.WaterSurfaceDist > -Weapons[(int)player.Control.Weapon.GunType].GunHeight))))
+							player.Context.WaterSurfaceDist > -GetWeaponInfo(player.Control.Weapon.GunType).GunHeight))))
 			{
 				if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 				{
@@ -586,7 +616,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		else if (player.Control.Weapon.GunType != LaraWeaponType::HarpoonGun &&
 			player.Control.WaterStatus != WaterStatus::Dry &&
 			(player.Control.WaterStatus != WaterStatus::Wade ||
-				player.Context.WaterSurfaceDist < -Weapons[(int)player.Control.Weapon.GunType].GunHeight))
+				player.Context.WaterSurfaceDist < -GetWeaponInfo(player.Control.Weapon.GunType).GunHeight))
 		{
 			player.Control.HandStatus = HandStatus::WeaponUndraw;
 		}
@@ -647,6 +677,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		break;
 
 	case HandStatus::WeaponUndraw:
+		ClearPlayerTargets(laraItem);
 		laraItem.Model.MeshIndex[LM_HEAD] = laraItem.Model.BaseMesh + LM_HEAD;
 
 		switch (player.Control.Weapon.GunType)
@@ -677,7 +708,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		break;
 
 	case HandStatus::WeaponReady:
-		if (!IsHeld(In::Action))
+		if (!IsHeld(In::Action) || !GetAmmo(player, player.Control.Weapon.GunType))
 		{
 			laraItem.Model.MeshIndex[LM_HEAD] = laraItem.Model.BaseMesh + LM_HEAD;
 		}
@@ -692,11 +723,11 @@ void HandleWeapon(ItemInfo& laraItem)
 			Camera.type = CameraType::Combat;
 		}
 
-		if (IsHeld(In::Action) && !LaserSight)
+		if (IsHeld(In::Action) && !player.Control.Look.IsUsingLasersight)
 		{
 			if (!GetAmmo(player, player.Control.Weapon.GunType))
 			{
-				bool hasPistols = (player.Weapons[(int)LaraWeaponType::Pistol].Present && Objects[ID_PISTOLS_ITEM].loaded);
+				bool hasPistols = (player.Weapons[(int)LaraWeaponType::Pistol].Present && Objects[ID_PISTOLS_ITEM].loaded && GetAmmo(player, LaraWeaponType::Pistol));
 				player.Control.Weapon.RequestGunType = hasPistols ? LaraWeaponType::Pistol : LaraWeaponType::None;
 				return;
 			}
@@ -729,7 +760,7 @@ void HandleWeapon(ItemInfo& laraItem)
 	case HandStatus::Free:
 		if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			if (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates))
+			if (player.Context.Vehicle != NO_VALUE || TestState(laraItem.Animation.ActiveState, FlarePoseStates))
 			{
 				if (player.Flare.ControlLeft)
 				{
@@ -761,7 +792,11 @@ void HandleWeapon(ItemInfo& laraItem)
 		{
 			if (laraItem.Model.MeshIndex[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
-				player.Flare.ControlLeft = (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
+				player.Flare.ControlLeft = (player.Context.Vehicle != NO_VALUE || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
+
+				if (Contains(UnavailableFlarePoseAnims, laraItem.Animation.AnimNumber))
+					player.Flare.ControlLeft = false;
+
 				DoFlareInHand(laraItem, player.Flare.Life);
 				SetFlareArm(laraItem, player.LeftArm.FrameNumber);
 			}
@@ -775,7 +810,7 @@ void AimWeapon(ItemInfo& laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo)
 {
 	const auto& player = *GetLaraInfo(&laraItem);
 
-	auto targetArmOrient = arm.Locked ? player.TargetArmOrient : EulerAngles::Zero;
+	auto targetArmOrient = arm.Locked ? player.TargetArmOrient : EulerAngles::Identity;
 	arm.Orientation.InterpolateConstant(targetArmOrient, weaponInfo.AimSpeed);
 }
 
@@ -791,7 +826,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	if (!ammo.HasInfinite())
 		ammo--;
 
-	const auto& weapon = Weapons[(int)weaponType];
+	const auto& weapon = GetWeaponInfo(weaponType);
 
 	auto wobbledArmOrient = EulerAngles(
 		armOrient.x + (Random::GenerateAngle(0, ANGLE(180.0f)) - ANGLE(90.0f)) * weapon.ShotAccuracy / 65536,
@@ -808,7 +843,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	auto ray = Ray(origin, directionNorm);
 
 	int num = GetSpheres(&targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int bestJointIndex = NO_JOINT;
+	int bestJointIndex = NO_VALUE;
 	float bestDistance = INFINITY;
 	for (int i = 0; i < num; i++)
 	{
@@ -840,7 +875,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	}
 	else
 	{
-		Statistics.Game.AmmoHits++;
+		SaveGame::Statistics.Game.AmmoHits++;
 		target = origin + (directionNorm * bestDistance);
 		auto vTarget = GameVector(target);
 
@@ -860,7 +895,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 
 	auto& player = *GetLaraInfo(&laraItem);
 
-	if (BinocularRange)
+	if (player.Control.Look.OpticRange)
 	{
 		player.TargetEntity = nullptr;
 		return;
@@ -882,7 +917,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 	for (auto* creaturePtr : ActiveCreatures)
 	{
 		// Continue loop if no item.
-		if (creaturePtr->ItemNumber == NO_ITEM)
+		if (creaturePtr->ItemNumber == NO_VALUE)
 			continue;
 
 		auto& item = g_Level.Items[creaturePtr->ItemNumber];
@@ -908,8 +943,11 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 			orient.x <= weaponInfo.LockOrientConstraint.second.x &&
 			orient.y <= weaponInfo.LockOrientConstraint.second.y)
 		{
+			if (targetCount >= player.TARGET_COUNT_MAX - 1)
+				break;
+
 			player.TargetList[targetCount] = &item;
-			++targetCount;
+			targetCount++;
 
 			if (distance < closestDistance &&
 				abs(orient.y) < (closestHeadingAngle + ANGLE(15.0f)))
@@ -937,14 +975,14 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 				break;
 		}
 
-		if (IsClicked(In::SwitchTarget) || player.Control.HandStatus != HandStatus::Free)
+		if (IsClicked(In::Look) || player.Control.HandStatus != HandStatus::Free)
 		{
 			if (player.TargetEntity == nullptr)
 			{
 				player.TargetEntity = closestEntityPtr;
 				player.LastTargets[0] = nullptr;
 			}
-			else if (IsClicked(In::SwitchTarget))
+			else if (IsClicked(In::Look))
 			{
 				player.TargetEntity = nullptr;
 				bool flag = true;
@@ -999,7 +1037,7 @@ void LaraTargetInfo(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 	{
 		player.RightArm.Locked = false;
 		player.LeftArm.Locked = false;
-		player.TargetArmOrient = EulerAngles::Zero;
+		player.TargetArmOrient = EulerAngles::Identity;
 		return;
 	}
 

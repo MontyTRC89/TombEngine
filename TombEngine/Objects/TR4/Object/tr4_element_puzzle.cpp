@@ -106,10 +106,10 @@ namespace TEN::Entities::TR4
 		}
 
 		short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-		if (currentItemNumber == NO_ITEM)
+		if (currentItemNumber == NO_VALUE)
 			return;
 
-		while (currentItemNumber != NO_ITEM)
+		while (currentItemNumber != NO_VALUE)
 		{
 			auto* currentItem = &g_Level.Items[currentItemNumber];
 
@@ -236,7 +236,7 @@ namespace TEN::Entities::TR4
 			if (laraInfo->Control.Weapon.GunType != LaraWeaponType::Torch ||
 				laraInfo->Control.HandStatus != HandStatus::WeaponReady ||
 				laraInfo->LeftArm.Locked ||
-				!(TrInput & IN_ACTION) ||
+				!IsHeld(In::Action) ||
 				puzzleItem->TriggerFlags != 1 ||
 				puzzleItem->ItemFlags[0] != 1 ||
 				laraItem->Animation.ActiveState != LS_IDLE ||

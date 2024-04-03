@@ -22,6 +22,16 @@
 		return Vector3::DistanceSquared(origin.ToVector3(), target.ToVector3());
 	}
 
+	void Vector3i::Lerp(const Vector3i& target, float alpha)
+	{
+		*this = Lerp(*this, target, alpha);
+	}
+
+	Vector3i Vector3i::Lerp(const Vector3i& origin, const Vector3i& target, float alpha)
+	{
+		return Vector3i(Vector3::Lerp(origin.ToVector3(), target.ToVector3(), alpha));
+	}
+
 	Vector3 Vector3i::ToVector3() const
 	{
 		return Vector3(x, y, z);
@@ -69,19 +79,19 @@
 		return *this;
 	}
 
-	Vector3i& Vector3i::operator *=(float scale)
+	Vector3i& Vector3i::operator *=(float scalar)
 	{
-		x *= scale;
-		y *= scale;
-		z *= scale;
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
 		return *this;
 	}
 
-	Vector3i& Vector3i::operator /=(float scale)
+	Vector3i& Vector3i::operator /=(float scalar)
 	{
-		x /= scale;
-		y /= scale;
-		z /= scale;
+		x /= scalar;
+		y /= scalar;
+		z /= scalar;
 		return *this;
 	}
 
@@ -100,13 +110,13 @@
 		return Vector3i(x * vector.x, y * vector.y, z * vector.z);
 	}
 
-	Vector3i Vector3i::operator *(float scale) const
+	Vector3i Vector3i::operator *(float scalar) const
 	{
-		return Vector3i((int)round(x * scale), (int)round(y * scale), (int)round(z * scale));
+		return Vector3i((int)round(x * scalar), (int)round(y * scalar), (int)round(z * scalar));
 	}
 
-	Vector3i Vector3i::operator /(float scale) const
+	Vector3i Vector3i::operator /(float scalar) const
 	{
-		return Vector3i((int)round(x / scale), (int)round(y / scale), (int)round(z / scale));
+		return Vector3i((int)round(x / scalar), (int)round(y / scalar), (int)round(z / scalar));
 	}
 //}

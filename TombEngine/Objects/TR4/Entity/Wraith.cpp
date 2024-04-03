@@ -142,7 +142,7 @@ namespace TEN::Entities::TR4
 			spark.dB = dB;
 			spark.colFadeSpeed = 4;
 			spark.fadeToBlack = 7;
-			spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark.blendMode = BlendMode::Additive;
 			short life = (GetRandomControl() & 7) + 32;
 			spark.life = life;
 			spark.sLife = life;
@@ -171,10 +171,10 @@ namespace TEN::Entities::TR4
 		short inner = vel >= 0 ? 32 : 640;
 		short outer = vel >= 0 ? 160 : 512;
 
-		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
-		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(45.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
-		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(90.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
-		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(135.0f), 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(45.0f), 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(90.0f), 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, inner, outer, vel, byteColor.x, byteColor.y, byteColor.z, 24, EulerAngles(ANGLE(135.0f), 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 	}
 
 	void InitializeWraith(short itemNumber)
@@ -320,7 +320,7 @@ namespace TEN::Entities::TR4
 		if (pointColl.RoomNumber != item.RoomNumber)
 			ItemNewRoom(itemNumber, pointColl.RoomNumber);
 
-		for (int linkItemNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkItemNumber != NO_ITEM; linkItemNumber = g_Level.Items[linkItemNumber].NextItem)
+		for (int linkItemNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkItemNumber != NO_VALUE; linkItemNumber = g_Level.Items[linkItemNumber].NextItem)
 		{
 			auto& targetItem = g_Level.Items[linkItemNumber];
 
@@ -412,7 +412,7 @@ namespace TEN::Entities::TR4
 								if (!FlipStats[item.TriggerFlags])
 								{
 									DoFlipMap(item.TriggerFlags);
-									FlipStats[item.TriggerFlags] = 1;
+									FlipStats[item.TriggerFlags] = true;
 								}
 							}
 						}
@@ -675,7 +675,7 @@ namespace TEN::Entities::TR4
 
 		spark.colFadeSpeed = 4;
 		spark.fadeToBlack = 7;
-		spark.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark.blendMode = BlendMode::Additive;
 		unsigned char life = (GetRandomControl() & 7) + 12;
 		spark.life = life;
 		spark.sLife = life;
@@ -700,15 +700,15 @@ namespace TEN::Entities::TR4
 	{
 		ItemInfo* item2 = nullptr;
 
-		if (NextItemActive != NO_ITEM)
+		if (NextItemActive != NO_VALUE)
 		{
-			for (; NextItemActive != NO_ITEM;)
+			for (; NextItemActive != NO_VALUE;)
 			{
 				auto* item2 = &g_Level.Items[NextItemActive];
 				if (item2->ObjectNumber == ID_WRAITH3 && !item2->HitPoints)
 					break;
 
-				if (item2->NextActive == NO_ITEM)
+				if (item2->NextActive == NO_VALUE)
 				{
 					FlipEffect = -1;
 					return;

@@ -26,7 +26,7 @@ namespace TEN::Entities::TR4
 				return i;
 		}
 
-		return NO_ITEM;
+		return NO_VALUE;
 	}
 
 	void SpawnLocust(ItemInfo* item)
@@ -34,7 +34,7 @@ namespace TEN::Entities::TR4
 		Vector3i origin, target;
 	   short locustNumber = CreateLocust();
 	   EulerAngles orient;
-		if (locustNumber != NO_ITEM)
+		if (locustNumber != NO_VALUE)
 		{
 			auto* locust = &Locusts[locustNumber];
 
@@ -194,6 +194,10 @@ namespace TEN::Entities::TR4
 
 				if (locust->counter > 0)
 					SoundEffect(SFX_TR4_LOCUSTS_LOOP, &locust->pos);
+				
+				Matrix translation = Matrix::CreateTranslation(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z);
+				Matrix rotation = locust->pos.Orientation.ToRotationMatrix();
+				locust->Transform = rotation * translation;
 			}
 		}
 	}

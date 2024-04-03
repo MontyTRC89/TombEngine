@@ -52,7 +52,7 @@ namespace TEN::Entities::Switches
 
 		int doSwitch = 0;
 
-		if (((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
+		if (((IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
@@ -77,7 +77,7 @@ namespace TEN::Entities::Switches
 						else
 							laraInfo->Context.InteractedItem = itemNumber;
 
-						g_Gui.SetInventoryItemChosen(NO_ITEM);
+						g_Gui.SetInventoryItemChosen(NO_VALUE);
 					}
 					else
 						doSwitch = -1;
@@ -106,7 +106,7 @@ namespace TEN::Entities::Switches
 						else
 							laraInfo->Context.InteractedItem = itemNumber;
 
-						g_Gui.SetInventoryItemChosen(NO_ITEM);
+						g_Gui.SetInventoryItemChosen(NO_VALUE);
 					}
 					else
 						doSwitch = -1;

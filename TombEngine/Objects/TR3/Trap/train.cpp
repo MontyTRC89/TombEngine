@@ -109,7 +109,7 @@ void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	SoundEffect(SFX_TR4_LARA_HIGH_FALL_DEATH, &laraItem->Pose, SoundEnvironment::Always);
 	StopSoundEffect(SFX_TR3_TUBE_LOOP);
 
-	SetAnimation(*item, ID_LARA_EXTRA_ANIMS, LEA_TRAIN_DEATH_START);
+	SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_TRAIN_DEATH_START);
 	laraItem->Animation.IsAirborne = false;
 	laraItem->Animation.Velocity.y = 0.0f;
 	laraItem->Animation.Velocity.z = 0.0f;

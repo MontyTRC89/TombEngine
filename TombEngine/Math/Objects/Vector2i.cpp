@@ -64,17 +64,17 @@ namespace TEN::Math
 		return *this;
 	}
 
-	Vector2i& Vector2i::operator *=(float scale)
+	Vector2i& Vector2i::operator *=(float scalar)
 	{
-		x *= scale;
-		y *= scale;
+		x *= scalar;
+		y *= scalar;
 		return *this;
 	}
 
-	Vector2i& Vector2i::operator /=(float scale)
+	Vector2i& Vector2i::operator /=(float scalar)
 	{
-		x /= scale;
-		y /= scale;
+		x /= scalar;
+		y /= scalar;
 		return *this;
 	}
 
@@ -93,13 +93,13 @@ namespace TEN::Math
 		return Vector2i(x * vector.x, y * vector.y);
 	}
 
-	Vector2i Vector2i::operator *(float scale) const
+	Vector2i Vector2i::operator *(float scalar) const
 	{
-		return Vector2i((int)round(x * scale), (int)round(y * scale));
+		return Vector2i((int)round(x * scalar), (int)round(y * scalar));
 	}
 
-	Vector2i Vector2i::operator /(float scale) const
+	Vector2i Vector2i::operator /(float scalar) const
 	{
-		return Vector2i((int)round(x / scale), (int)round(y / scale));
+		return Vector2i((int)round(x / scalar), (int)round(y / scalar));
 	}
 }

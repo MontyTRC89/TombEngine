@@ -6,6 +6,7 @@
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/Hud/Hud.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
@@ -15,6 +16,7 @@
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Effects::Streamer;
+using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -55,7 +57,7 @@ namespace TEN::Entities::Vehicles
 		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !TestCollision(vehicleItem, laraItem))
 			return VehicleMountType::None;
 
-		bool hasInputAction = TrInput & IN_ACTION;
+		bool hasInputAction = IsHeld(In::Action);
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
 		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - Geometry::GetOrientToPoint(laraItem->Pose.Position.ToVector3(), vehicleItem->Pose.Position.ToVector3()).y;
@@ -203,7 +205,7 @@ namespace TEN::Entities::Vehicles
 		CollisionInfo coll = {};
 		coll.Setup.Radius = radius * 0.8f; // HACK: Most vehicles use radius larger than needed.
 		coll.Setup.UpperCeilingBound = MAX_HEIGHT; // HACK: this needs to be set to prevent GCI result interference.
-		coll.Setup.OldPosition = vehicleItem->Pose.Position;
+		coll.Setup.PrevPosition = vehicleItem->Pose.Position;
 		coll.Setup.EnableObjectPush = true;
 
 		DoObjectCollision(vehicleItem, &coll);
@@ -296,17 +298,17 @@ namespace TEN::Entities::Vehicles
 
 	void ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate)
 	{
-		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, -AxisMap[InputAxis::MoveVertical]);
+		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, -AxisMap[(int)InputAxis::Move].y);
 	}
 
 	void ModulateVehicleTurnRateY(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate)
 	{
-		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal]);
+		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[(int)InputAxis::Move].x);
 	}
 	
 	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle)
 	{
-		float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+		float axisCoeff = AxisMap[(int)InputAxis::Move].x;
 		int sign = copysign(1, axisCoeff);
 		short maxAngleNormalized = maxAngle * axisCoeff;
 		vehicleItem->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - vehicleItem->Pose.Orientation.z) / 3) * sign;
@@ -386,5 +388,11 @@ namespace TEN::Entities::Vehicles
 			vehicleItem.Index, (int)tagRight,
 			positions.second, direction, orient2D, COLOR,
 			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeRight);
+	}
+
+	void HandleVehicleSpeedometer(float vel, float velMax)
+	{
+		float value = abs(vel / velMax);
+		g_Hud.Speedometer.UpdateValue(value);
 	}
 }

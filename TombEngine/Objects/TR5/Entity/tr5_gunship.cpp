@@ -110,7 +110,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (objOnLos < 0 && GetRandomControl() & 1)
 				{
-					if (StaticObjects[hitMesh->staticNumber].shatterType != SHT_NONE)
+					if (StaticObjects[hitMesh->staticNumber].shatterType != ShatterType::None)
 					{
 						ShatterObject(0, hitMesh, 64, target.RoomNumber, 0);
 						TestTriggers(hitMesh->pos.Position.x, hitMesh->pos.Position.y, hitMesh->pos.Position.z, target.RoomNumber, true);
@@ -170,7 +170,7 @@ namespace TEN::Entities::Creatures::TR5
 				spark->dR = 0;
 				spark->dG = 0;
 				spark->colFadeSpeed = 12;
-				spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+				spark->blendMode = BlendMode::Additive;
 				spark->fadeToBlack = 0;
 				spark->life = 12;
 				spark->sLife = 12;

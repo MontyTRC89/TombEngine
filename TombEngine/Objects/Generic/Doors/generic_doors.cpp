@@ -78,7 +78,7 @@ namespace TEN::Entities::Doors
 		auto* r = &g_Level.Rooms[doorItem->RoomNumber];
 		doorData->d1.floor = GetSector(r, doorItem->Pose.Position.x - r->x + xOffset, doorItem->Pose.Position.z - r->z + zOffset);
 
-		auto roomNumber = doorData->d1.floor->WallPortal;
+		auto roomNumber = doorData->d1.floor->SidePortalRoomNumber;
 		if (roomNumber == NO_ROOM)
 			boxNumber = doorData->d1.floor->Box;
 		else
@@ -95,7 +95,7 @@ namespace TEN::Entities::Doors
 			r = &g_Level.Rooms[r->flippedRoom];
 			doorData->d1flip.floor = GetSector(r, doorItem->Pose.Position.x - r->x + xOffset, doorItem->Pose.Position.z - r->z + zOffset);
 				
-			roomNumber = doorData->d1flip.floor->WallPortal;
+			roomNumber = doorData->d1flip.floor->SidePortalRoomNumber;
 			if (roomNumber == NO_ROOM)
 				boxNumber = doorData->d1flip.floor->Box;
 			else
@@ -110,7 +110,7 @@ namespace TEN::Entities::Doors
 		else
 			doorData->d1flip.floor = NULL;
 
-		twoRoom = doorData->d1.floor->WallPortal;
+		twoRoom = doorData->d1.floor->SidePortalRoomNumber;
 
 		ShutThatDoor(&doorData->d1, doorData);
 		ShutThatDoor(&doorData->d1flip, doorData);
@@ -125,7 +125,7 @@ namespace TEN::Entities::Doors
 			r = &g_Level.Rooms[twoRoom];
 			doorData->d2.floor = GetSector(r, doorItem->Pose.Position.x - r->x, doorItem->Pose.Position.z - r->z);
 
-			roomNumber = doorData->d2.floor->WallPortal;
+			roomNumber = doorData->d2.floor->SidePortalRoomNumber;
 			if (roomNumber == NO_ROOM)
 				boxNumber = doorData->d2.floor->Box;
 			else
@@ -142,7 +142,7 @@ namespace TEN::Entities::Doors
 				r = &g_Level.Rooms[r->flippedRoom];
 				doorData->d2flip.floor = GetSector(r, doorItem->Pose.Position.x - r->x, doorItem->Pose.Position.z - r->z);
 
-				roomNumber = doorData->d2flip.floor->WallPortal;
+				roomNumber = doorData->d2flip.floor->SidePortalRoomNumber;
 				if (roomNumber == NO_ROOM)
 					boxNumber = doorData->d2flip.floor->Box;
 				else
@@ -174,7 +174,7 @@ namespace TEN::Entities::Doors
 
 		if (doorItem->TriggerFlags == 2 &&
 			doorItem->Status == ITEM_NOT_ACTIVE && !doorItem->Animation.IsAirborne && // CHECK
-			((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
+			((IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
 				laraItem->Animation.ActiveState == LS_IDLE &&
 				laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 				!laraItem->HitStatus &&
@@ -186,7 +186,7 @@ namespace TEN::Entities::Doors
 			{
 				if (!laraInfo->Control.IsMoving)
 				{
-					if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
+					if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
 					{
 						if (g_Gui.IsObjectInInventory(ID_CROWBAR_ITEM))
 						{
@@ -216,7 +216,7 @@ namespace TEN::Entities::Doors
 					}
 				}
 
-				g_Gui.SetInventoryItemChosen(NO_ITEM);
+				g_Gui.SetInventoryItemChosen(NO_VALUE);
 
 				if (MoveLaraPosition(CrowbarDoorPos, doorItem, laraItem))
 				{
@@ -275,7 +275,7 @@ namespace TEN::Entities::Doors
 				doorItem->ItemFlags[0]--;
 				doorItem->Pose.Position.y -= TEN::Entities::Switches::COG_DOOR_SPEED;
 				
-				int y = bounds.Y1 + doorItem->ItemFlags[2] - STEP_SIZE;
+				int y = bounds.Y1 + doorItem->ItemFlags[2] - CLICK(1);
 				if (doorItem->Pose.Position.y < y)
 				{
 					doorItem->Pose.Position.y = y;
@@ -362,7 +362,7 @@ namespace TEN::Entities::Doors
 				{
 					if (!item->itemFlags[0])
 						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos);
-					item->itemFlags[0] += STEP_SIZE;
+					item->itemFlags[0] += CLICK(1);
 				}
 			}
 			else
@@ -371,7 +371,7 @@ namespace TEN::Entities::Doors
 				{
 					if (item->itemFlags[0] == BLOCK(4))
 						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos);
-					item->itemFlags[0] -= STEP_SIZE;
+					item->itemFlags[0] -= CLICK(1);
 				}
 				if (!door->opened)
 				{
@@ -409,6 +409,8 @@ namespace TEN::Entities::Doors
 
 	void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	{
+		static const auto WALL_PLANE = Plane(-Vector3::UnitY, -CLICK(127));
+
 		FloorInfo* floor = doorPos->floor;
 
 		if (floor)
@@ -419,15 +421,15 @@ namespace TEN::Entities::Doors
 			// FIXME: HACK!!!!!!!
 			// We should find a better way of dealing with doors using new floordata.
 
-			floor->WallPortal = -1;
-			floor->FloorCollision.Portals[0]   = NO_ROOM;
-			floor->FloorCollision.Portals[1]   = NO_ROOM;
-			floor->CeilingCollision.Portals[0] = NO_ROOM;
-			floor->CeilingCollision.Portals[1] = NO_ROOM;
-			floor->FloorCollision.Planes[0]    = WALL_PLANE;
-			floor->FloorCollision.Planes[1]    = WALL_PLANE;
-			floor->CeilingCollision.Planes[0]  = WALL_PLANE;
-			floor->CeilingCollision.Planes[1]  = WALL_PLANE;
+			floor->SidePortalRoomNumber = -1;
+			floor->FloorSurface.Triangles[0].PortalRoomNumber =
+			floor->FloorSurface.Triangles[1].PortalRoomNumber =
+			floor->CeilingSurface.Triangles[0].PortalRoomNumber =
+			floor->CeilingSurface.Triangles[1].PortalRoomNumber = NO_ROOM;
+			floor->FloorSurface.Triangles[0].Plane =
+			floor->FloorSurface.Triangles[1].Plane =
+			floor->CeilingSurface.Triangles[0].Plane =
+			floor->CeilingSurface.Triangles[1].Plane = WALL_PLANE;
 
 			short boxIndex = doorPos->block;
 			if (boxIndex != NO_BOX)
