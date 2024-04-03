@@ -40,15 +40,11 @@ void HandlePlayerQuickActions(ItemInfo& item);
 bool CanPlayerLookAround(const ItemInfo& item); // TODO: Move to context file. -- Sezz 2023.08.22
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis = true);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
-void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool isStrafing, int flags);
-void HandlePlayerTurnX(ItemInfo& item, float alpha);
-void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing = false);
-void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool isStrafing = false);
 void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
-void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing = false);
-void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha);
 void HandlePlayerCrawlTurnFlex(ItemInfo& item);
+void HandlePlayerTurn(ItemInfo& item, short turnRateAccel, short turnRateMin, short turnRateMax, short leanRate, short leanAngleMax);
 void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha);
+void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool isStrafing, int flags);
 void HandlePlayerUpJumpShift(ItemInfo& item);
 void HandlePlayerFlyCheat(ItemInfo& item);
 void HandlePlayerWetnessDrips(ItemInfo& item);

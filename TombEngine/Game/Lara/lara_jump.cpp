@@ -39,6 +39,8 @@ void lara_col_land(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_jump_forward()
 void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
@@ -63,10 +65,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-		{
-			HandlePlayerTurnY(*item, PLAYER_JUMP_TURN_ALPHA);
-			HandlePlayerTurnFlex(*item, PLAYER_JUMP_TURN_ALPHA);
-		}
+			HandlePlayerTurn(*item, PLAYER_JUMP_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else
 	{
@@ -201,6 +200,8 @@ void lara_col_freefall(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_reach()
 void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
@@ -221,10 +222,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-		{
-			HandlePlayerTurnY(*item, PLAYER_JUMP_TURN_ALPHA);
-			HandlePlayerTurnFlex(*item, PLAYER_JUMP_TURN_ALPHA);
-		}
+			HandlePlayerTurn(*item, PLAYER_JUMP_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else if (IsUsingEnhancedControls())
 	{
@@ -298,6 +296,8 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_jump_prepare()
 void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY;
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Free;
@@ -352,7 +352,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 			if (IsHeld(In::Forward) || IsHeld(In::Back) ||
 				IsHeld(In::Left) || IsHeld(In::Right))
 			{
-				HandlePlayerTurnY(*item, PLAYER_JUMP_PREPARE_TURN_ALPHA);
+				HandlePlayerTurn(*item, PLAYER_JUMP_PREPARE_TURN_ALPHA, 0, false, TURN_FLAGS);
 
 				player.Control.JumpDirection = GetPlayerJumpDirection(*item, *coll);
 				switch (player.Control.JumpDirection)
@@ -496,6 +496,8 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_jump_back()
 void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
@@ -515,10 +517,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-		{
-			HandlePlayerTurnY(*item, PLAYER_JUMP_TURN_ALPHA);
-			HandlePlayerTurnFlex(*item, PLAYER_JUMP_TURN_ALPHA);
-		}
+			HandlePlayerTurn(*item, PLAYER_JUMP_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else if (IsUsingEnhancedControls())
 	{
@@ -825,6 +824,8 @@ void lara_col_fall_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_swan_dive()
 void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 {
+	constexpr auto TURN_FLAGS = (int)PlayerTurnFlags::TurnY | (int)PlayerTurnFlags::VerticalFlex;
+
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.HandStatus = HandStatus::Busy;
@@ -853,10 +854,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-		{
-			HandlePlayerTurnY(*item, PLAYER_JUMP_TURN_ALPHA);
-			HandlePlayerTurnFlex(*item, PLAYER_JUMP_TURN_ALPHA);
-		}
+			HandlePlayerTurn(*item, PLAYER_JUMP_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else if (IsUsingEnhancedControls())
 	{

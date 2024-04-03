@@ -731,35 +731,58 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
-void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool isStrafing, int flags)
+// NOTE: Tank control version.
+void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
 {
-	// 1) X axis turn.
-	if (flags & (int)PlayerTurnFlags::TurnX)
-		HandlePlayerTurnX(item, turnAlpha);
+	auto& player = GetLaraInfo(*item);
 
-	// 2) Y axis turn.
-	if (flags & (int)PlayerTurnFlags::TurnY)
-		HandlePlayerTurnY(item, turnAlpha, isStrafing);
+	if (item->Animation.Velocity.z == 0.0f)
+		return;
 
-	// 3) Flex.
-	if (flags & (int)PlayerTurnFlags::VerticalFlex)
-	{
-		HandlePlayerTurnFlex(item, turnAlpha, isStrafing);
-	}
-	else if (flags & (int)PlayerTurnFlags::CrawlFlex)
-	{
-		HandlePlayerCrawlTurnFlex(item, turnAlpha);
-	}
-	else if (flags & (int)PlayerTurnFlags::SwimFlex)
-	{
-		HandlePlayerSwimTurnFlex(item, turnAlpha);
-	}
+	float axisCoeff = GetMoveAxis().x;
+	int sign = copysign(1, axisCoeff);
+	maxAngle *= axisCoeff;
 
-	// 4) Lean.
-	HandlePlayerTurnLean(item, leanAngleMax, turnAlpha, isStrafing);
+	if (coll->CollisionType == CollisionType::Left || coll->CollisionType == CollisionType::Right)
+		maxAngle *= 0.6f;
+
+	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngle - item->Pose.Orientation.z) / 3) * sign;
 }
 
-void HandlePlayerTurnX(ItemInfo& item, float alpha)
+// TODO: Make static.
+// NOTE: Tank control version.
+void HandlePlayerCrawlTurnFlex(ItemInfo& item)
+{
+	constexpr auto FLEX_RATE_ANGLE		 = ANGLE(2.25f);
+	constexpr auto FLEX_ANGLE_CONSTRAINT = ANGLE(50.0f) / 2; // 2 = hardcoded number of bones to flex (head and torso).
+
+	auto& player = GetLaraInfo(item);
+
+	// Check if player is moving.
+	if (item.Animation.Velocity.z == 0.0f)
+		return;
+
+	float axisCoeff = GetMoveAxis().x;
+	int sign = copysign(1, axisCoeff);
+	short maxAngleNormalized = FLEX_ANGLE_CONSTRAINT * axisCoeff;
+
+	if (abs(player.ExtraTorsoRot.z) < FLEX_ANGLE_CONSTRAINT)
+		player.ExtraTorsoRot.z += std::min<short>(FLEX_RATE_ANGLE, abs(maxAngleNormalized - player.ExtraTorsoRot.z) / 6) * sign;
+
+	if (!IsHeld(In::Look) && item.Animation.ActiveState != LS_CRAWL_BACK)
+	{
+		player.ExtraHeadRot.z = player.ExtraTorsoRot.z / 2;
+		player.ExtraHeadRot.y = player.ExtraHeadRot.z;
+	}
+}
+
+// NOTE: Tank control version.
+void HandlePlayerTurn(ItemInfo& item, short turnRateAccel, short turnRateMin, short turnRateMax, short leanRate, short leanAngleMax)
+{
+	// TODO
+}
+
+static void HandlePlayerTurnX(ItemInfo& item, float alpha)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
@@ -781,7 +804,7 @@ void HandlePlayerTurnX(ItemInfo& item, float alpha)
 	player.Control.HeadingOrientTarget.x = headingAngle;
 }
 
-void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing)
+static void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
@@ -803,13 +826,8 @@ void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing)
 	player.Control.HeadingOrientTarget.y = headingAngle;
 }
 
-int WrapToRange(int value, int range)
-{
-	return (value % range + range) % range;
-}
-
 // NOTE: Modern control version.
-void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool isStrafing)
+static void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool isStrafing)
 {
 	constexpr auto BASE_ANGLE		 = ANGLE(90.0f);
 	constexpr auto STRAFE_LEAN_COEFF = 0.5f;
@@ -838,26 +856,8 @@ void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha, bool 
 	item.Pose.Orientation.Lerp(targetOrient, alpha);
 }
 
-// NOTE: Tank control version.
-void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
-{
-	auto& player = GetLaraInfo(*item);
-
-	if (item->Animation.Velocity.z == 0.0f)
-		return;
-
-	float axisCoeff = GetMoveAxis().x;
-	int sign = copysign(1, axisCoeff);
-	maxAngle *= axisCoeff;
-
-	if (coll->CollisionType == CollisionType::Left || coll->CollisionType == CollisionType::Right)
-		maxAngle *= 0.6f;
-
-	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngle - item->Pose.Orientation.z) / 3) * sign;
-}
-
 // NOTE: Modern control version.
-void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
+static void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 {
 	constexpr auto BASE_ANGLE					   = ANGLE(90.0f);
 	constexpr auto LOWER_FLEX_ANGLE_Y_CONSTRAINT   = ANGLE(65.0f);
@@ -900,7 +900,7 @@ void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 }
 
 // NOTE: Modern control version.
-void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha)
+static void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha)
 {
 	constexpr auto FLEX_ANGLE_CONSTRAINT = ANGLE(40.0f);
 	constexpr auto FLEX_Y_COEFF			 = 0.75f;
@@ -921,32 +921,6 @@ void HandlePlayerCrawlTurnFlex(ItemInfo& item, float alpha)
 	// Flex head and torso.
 	player.ExtraHeadRot.Lerp(flexRot * HEAD_ROT_COEFF, alpha);
 	player.ExtraTorsoRot.Lerp(flexRot * TORSO_ROT_COEFF, alpha);
-}
-
-// NOTE: Tank control version.
-void HandlePlayerCrawlTurnFlex(ItemInfo& item)
-{
-	constexpr auto FLEX_RATE_ANGLE		 = ANGLE(2.25f);
-	constexpr auto FLEX_ANGLE_CONSTRAINT = ANGLE(50.0f) / 2; // 2 = hardcoded number of bones to flex (head and torso).
-
-	auto& player = GetLaraInfo(item);
-
-	// Check if player is moving.
-	if (item.Animation.Velocity.z == 0.0f)
-		return;
-
-	float axisCoeff = GetMoveAxis().x;
-	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = FLEX_ANGLE_CONSTRAINT * axisCoeff;
-
-	if (abs(player.ExtraTorsoRot.z) < FLEX_ANGLE_CONSTRAINT)
-		player.ExtraTorsoRot.z += std::min<short>(FLEX_RATE_ANGLE, abs(maxAngleNormalized - player.ExtraTorsoRot.z) / 6) * sign;
-
-	if (!IsHeld(In::Look) && item.Animation.ActiveState != LS_CRAWL_BACK)
-	{
-		player.ExtraHeadRot.z = player.ExtraTorsoRot.z / 2;
-		player.ExtraHeadRot.y = player.ExtraHeadRot.z;
-	}
 }
 
 // NOTE: Modern control version.
@@ -977,6 +951,35 @@ void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha)
 	// Flex head and torso.
 	player.ExtraHeadRot.Lerp(flexRot * HEAD_ROT_COEFF, alpha);
 	player.ExtraTorsoRot.Lerp(flexRot * TORSO_ROT_COEFF, alpha);
+}
+
+// NOTE: Modern control version.
+void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool isStrafing, int flags)
+{
+	// 1) X axis turn.
+	if (flags & (int)PlayerTurnFlags::TurnX)
+		HandlePlayerTurnX(item, turnAlpha);
+
+	// 2) Y axis turn.
+	if (flags & (int)PlayerTurnFlags::TurnY)
+		HandlePlayerTurnY(item, turnAlpha, isStrafing);
+
+	// 3) Flex.
+	if (flags & (int)PlayerTurnFlags::VerticalFlex)
+	{
+		HandlePlayerTurnFlex(item, turnAlpha, isStrafing);
+	}
+	else if (flags & (int)PlayerTurnFlags::CrawlFlex)
+	{
+		HandlePlayerCrawlTurnFlex(item, turnAlpha);
+	}
+	else if (flags & (int)PlayerTurnFlags::SwimFlex)
+	{
+		HandlePlayerSwimTurnFlex(item, turnAlpha);
+	}
+
+	// 4) Lean.
+	HandlePlayerTurnLean(item, leanAngleMax, turnAlpha, isStrafing);
 }
 
 void HandlePlayerUpJumpShift(ItemInfo& item)

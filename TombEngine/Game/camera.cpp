@@ -365,6 +365,7 @@ void UpdatePlayerRefCameraOrient(ItemInfo& item)
 	bool isStopped = (((GetMoveAxis() == Vector2::Zero && !IsHeld(In::StepLeft) && !IsHeld(In::StepRight)) || vel == 0.0f) &&
 					  TestState(item.Animation.ActiveState, PLAYER_IDLE_STATE_IDS));
 
+	// Set lock.
 	if (isSpotCameraSwitch && !isStopped)
 	{
 		player.Control.LockRefCameraOrient = true;
@@ -374,6 +375,7 @@ void UpdatePlayerRefCameraOrient(ItemInfo& item)
 		player.Control.LockRefCameraOrient = false;
 	}
 
+	// Update orientation.
 	if (!player.Control.LockRefCameraOrient)
 		player.Control.RefCameraOrient = EulerAngles(Camera.actualElevation, Camera.actualAngle, 0);
 }
@@ -478,7 +480,7 @@ static void UpdateAzimuthAngle(const ItemInfo& item)
 	constexpr auto BASE_VEL					= BLOCK(0.1f);
 	constexpr auto BASE_ANGLE				= ANGLE(90.0f);
 	constexpr auto AUTO_ROT_DELTA_ANGLE_MAX = BASE_ANGLE * 1.5f;
-	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.02f;
+	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.05f;
 
 	if (!IsUsingModernControls() || IsPlayerStrafing(item))
 		return;

@@ -18,6 +18,7 @@ namespace TEN::Entities::Player
 {
 	void lara_as_fly_cheat(ItemInfo* item, CollisionInfo* coll)
 	{
+		constexpr auto TURN_FLAGS	 = (int)PlayerTurnFlags::TurnX | (int)PlayerTurnFlags::TurnY;
 		constexpr auto LIGHT_FALLOFF = 0.1f;
 		constexpr auto LIGHT_COLOR	 = Color(0.6f, 0.6f, 0.6f);
 
@@ -54,10 +55,7 @@ namespace TEN::Entities::Player
 			IsHeld(In::Jump))
 		{
 			if (IsUsingModernControls())
-			{
-				HandlePlayerTurnX(*item, PLAYER_FLY_CHEAT_TURN_ALPHA);
-				HandlePlayerTurnY(*item, PLAYER_FLY_CHEAT_TURN_ALPHA);
-			}
+				HandlePlayerTurn(*item, PLAYER_FLY_CHEAT_TURN_ALPHA, 0, false, TURN_FLAGS);
 
 			float velCoeff = IsHeld(In::Sprint) ? 2.5f : 1.0f;
 
