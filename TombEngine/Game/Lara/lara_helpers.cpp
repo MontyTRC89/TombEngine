@@ -1723,7 +1723,7 @@ short GetPlayerHeadingAngleY(const ItemInfo& item)
 		else if (item.Animation.ActiveState == LS_SKIP_BACK ||
 			item.Animation.ActiveState == LS_WALK_BACK)
 		{
-			if (abs(moveAxisAngle) <= ANGLE(90.0f))
+			if (abs(moveAxisAngle) < ANGLE(90.0f))
 				moveAxisAngle = ANGLE(180.0f);
 		}
 
@@ -1749,7 +1749,7 @@ short GetPlayerRelHeadingAngleY(const ItemInfo& item)
 	dir.Normalize();
 	short headingAngle = player.Control.RefCameraOrient.y + FROM_RAD(atan2(dir.x, dir.y));
 
-	return Geometry::GetShortestAngle(headingAngle, player.Control.RefCameraOrient.y);
+	return Geometry::GetShortestAngle(headingAngle, item.Pose.Orientation.y);
 }
 
 static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)
