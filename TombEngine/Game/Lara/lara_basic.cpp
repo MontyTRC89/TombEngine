@@ -996,7 +996,8 @@ void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump))
 	{
-		// TODO: Directional jump.
+		item->Animation.TargetState = LS_JUMP_BACK;
+		return;
 	}
 
 	if (IsHeld(In::Roll))

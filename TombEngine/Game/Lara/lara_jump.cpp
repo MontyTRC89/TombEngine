@@ -514,6 +514,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Turn.
 	if (IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
@@ -532,6 +533,10 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 		if (item->HitPoints <= 0)
 		{
 			item->Animation.TargetState = LS_DEATH;
+		}
+		else if (IsUsingModernControls() && IsHeld(In::Back))
+		{
+			item->Animation.TargetState = LS_SKIP_BACK;
 		}
 		else
 		{
@@ -554,6 +559,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_JUMP_BACK;
 }
 
