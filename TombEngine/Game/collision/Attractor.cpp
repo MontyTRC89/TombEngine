@@ -440,14 +440,13 @@ namespace TEN::Collision::Attractor
 	{
 		constexpr auto SECTOR_SEARCH_DEPTH = 2;
 
-		auto sphere = BoundingSphere(pos, radius);
 		auto nearbyAttracPtrs = std::vector<AttractorObject*>{};
 
-		// Draw debug sphere.
+		auto sphere = BoundingSphere(pos, radius);
 		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::AttractorStats);
 
 		// TEMP
-		// Collect debug attractors.
+		// 1) Collect debug attractors.
 		auto debugAttracPtrs = GetDebugAttractorPtrs();
 		for (auto* attracPtr : debugAttracPtrs)
 		{
@@ -455,7 +454,7 @@ namespace TEN::Collision::Attractor
 				nearbyAttracPtrs.push_back(attracPtr);
 		}
 
-		// Collect room attractors in neighbor rooms.
+		// 2) Collect room attractors in neighbor rooms.
 		auto& room = g_Level.Rooms[roomNumber];
 		for (int neighborRoomNumber : room.neighbors)
 		{
@@ -470,17 +469,16 @@ namespace TEN::Collision::Attractor
 			}
 		}
 
+		// Collect bridge item numbers from neighbor sectors.
 		auto bridgeItemNumbers = std::set<int>{};
-
-		// Collect bridge item numbers in neighbor sectors.
 		auto sectorPtrs = GetNeighborSectorPtrs(pos, roomNumber, SECTOR_SEARCH_DEPTH);
-		for (auto* sectorPtr : sectorPtrs)
+		for (const auto* sectorPtr : sectorPtrs)
 		{
 			for (int bridgeItemNumber : sectorPtr->BridgeItemNumbers)
 				bridgeItemNumbers.insert(bridgeItemNumber);
 		}
 
-		// Collect bridge attractors.
+		// 3) Collect bridge attractors.
 		for (int bridgeItemNumber : bridgeItemNumbers)
 		{
 			auto& bridgeItem = g_Level.Items[bridgeItemNumber];
