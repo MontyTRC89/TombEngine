@@ -153,7 +153,7 @@ static bool TestCameraCollidableStatic(const MESH_INFO& staticObject)
 
 static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target)
 {
-	constexpr auto BUFFER = BLOCK(0.1f);
+	constexpr auto DIST_BUFFER = BLOCK(0.1f);
 
 	auto dir = target - origin;
 	dir.Normalize();
@@ -185,8 +185,20 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 			}
 		}
 
-		// TODO: Redo buffer.
-		return std::pair(losInstance.Position, losInstance.RoomNumber);
+		// TODO: Shift instead.
+		// Apply distance buffer.
+		auto intersect = std::pair(losInstance.Position, losInstance.RoomNumber);
+		if (losInstance.Distance < dist)
+		{
+			float currentDist = Vector3::Distance(origin, losInstance.Position);
+			float targetDist = std::max(currentDist - DIST_BUFFER, DIST_BUFFER);
+			dist = currentDist - targetDist;
+
+			intersect.first = Geometry::TranslatePoint(losInstance.Position, -dir, dist);
+			intersect.second = GetCollision(losInstance.Position, losInstance.RoomNumber, -dir, dist).RoomNumber;
+		}
+
+		return intersect;
 	}
 
 	// No intersection; return nullopt.
@@ -980,7 +992,7 @@ static bool CanControlTankCamera()
 
 void UpdateCameraSphere(const ItemInfo& playerItem)
 {
-	constexpr auto CONTROLLED_CAMERA_ROT_LERP_ALPHA = 0.75f;
+	constexpr auto CONTROLLED_CAMERA_ROT_LERP_ALPHA = 0.5f;
 	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA		= 0.3f;
 	constexpr auto LOCKED_CAMERA_ALTITUDE_ROT_ALPHA = 1 / 8.0f;
 
