@@ -207,7 +207,7 @@ Must be an integer value (0 means no secrets).
 	
 /*** Get current FlipMap status for specific group ID.
 @function GetFlipMapStatus
-@int[opt] index Flipmap group ID to check. If no group specified, function returns overall flipmap status (on or off).
+@int[opt] index Flipmap group ID to check. If no group specified or group is -1, function returns overall flipmap status (on or off).
 @treturn int status Status of the flipmap group (true means on, false means off).
 */
 	tableFlow.set_function(ScriptReserved_GetFlipMapStatus, &FlowHandler::GetFlipMapStatus, this);
@@ -458,12 +458,12 @@ void FlowHandler::FlipMap(int group)
 
 bool FlowHandler::GetFlipMapStatus(std::optional<int> group)
 {
-	if (!group.has_value())
+	if (!group.has_value() || group.value() == NO_VALUE)
 	{
 		return FlipStatus;
 	}
 
-	if (group.value() >= MAX_FLIPMAP)
+	if (group.value() < 0 || group.value() >= MAX_FLIPMAP)
 	{
 		TENLog("Maximum flipmap group number is " + std::to_string(MAX_FLIPMAP) + ". Please specify another index.", LogLevel::Warning);
 		return false;
