@@ -121,7 +121,7 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 // Overload used to quickly get point collision parameters at a given item's position.
 CollisionResult GetCollision(const ItemInfo& item)
 {
-	auto newRoomNumber = item.RoomNumber;
+	short newRoomNumber = item.RoomNumber;
 	auto floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &newRoomNumber);
 	auto probe = GetCollision(floor, item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z);
 
@@ -329,7 +329,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	bool doPlayerCollision = item->IsLara();
 
 	// Reset collision parameters.
-	coll->CollisionType = CollisionType::CT_NONE;
+	coll->CollisionType = CollisionType::None;
 	coll->Shift = Pose::Zero;
 
 	// Offset base probe position by provided offset, if any.
@@ -655,21 +655,21 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (coll->Middle.Floor == NO_HEIGHT)
 	{
 		coll->Shift.Position += coll->Setup.PrevPosition - entityPos;
-		coll->CollisionType = CT_FRONT;
+		coll->CollisionType = CollisionType::Front;
 		return;
 	}
 
 	if (coll->Middle.Floor - coll->Middle.Ceiling <= 0)
 	{
 		coll->Shift.Position += coll->Setup.PrevPosition - entityPos;
-		coll->CollisionType = CT_CLAMP;
+		coll->CollisionType = CollisionType::Clamp;
 		return;
 	}
 
 	if (coll->Middle.Ceiling >= 0)
 	{
 		coll->Shift.Position.y += coll->Middle.Ceiling;
-		coll->CollisionType = CT_TOP;
+		coll->CollisionType = CollisionType::Top;
 	}
 
 	// Shift away from front wall.
@@ -702,7 +702,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 			}
 		}
 
-		coll->CollisionType = (coll->CollisionType == CT_TOP) ? CT_TOP_FRONT : CT_FRONT;
+		coll->CollisionType = (coll->CollisionType == CollisionType::Top) ? CollisionType::TopFront : CollisionType::Front;
 		return;
 	}
 
@@ -710,7 +710,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 		coll->Front.Ceiling < coll->Setup.UpperCeilingBound)
 	{
 		coll->Shift.Position += coll->Setup.PrevPosition - entityPos;
-		coll->CollisionType = CT_TOP_FRONT;
+		coll->CollisionType = CollisionType::TopFront;
 		return;
 	}
 
@@ -750,17 +750,17 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 			if (coll->MiddleLeft.HasFlippedDiagonalSplit())
 			{
 				if (quarter)
-					coll->CollisionType = CT_LEFT;
+					coll->CollisionType = CollisionType::Left;
 			}
 			else
 			{
 				if (!quarter)
-					coll->CollisionType = CT_LEFT;
+					coll->CollisionType = CollisionType::Left;
 			}
 		}
 		else
 		{
-			coll->CollisionType = CT_LEFT;
+			coll->CollisionType = CollisionType::Left;
 		}
 
 		return;
@@ -801,17 +801,17 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 			if (coll->MiddleRight.HasFlippedDiagonalSplit())
 			{
 				if (quarter)
-					coll->CollisionType = CT_RIGHT;
+					coll->CollisionType = CollisionType::Right;
 			}
 			else
 			{
 				if (!quarter)
-					coll->CollisionType = CT_RIGHT;
+					coll->CollisionType = CollisionType::Right;
 			}
 		}
 		else
 		{
-			coll->CollisionType = CT_RIGHT;
+			coll->CollisionType = CollisionType::Right;
 		}
 
 		return;

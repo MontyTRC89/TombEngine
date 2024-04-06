@@ -155,7 +155,7 @@ namespace TEN::Entities::Vehicles
 		auto* jeep = GetJeepInfo(jeepItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints <= 0 && lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints <= 0 && lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(jeepItem, laraItem, coll, JeepMountTypes, JEEP_MOUNT_DISTANCE);
@@ -176,7 +176,7 @@ namespace TEN::Entities::Vehicles
 		// HACK: Hardcoded jeep keys check.
 		/*if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 		{
-			g_Gui.SetInventoryItemChosen(NO_ITEM);
+			g_Gui.SetInventoryItemChosen(NO_VALUE);
 			return true;
 		}
 		else

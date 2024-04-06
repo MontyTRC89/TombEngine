@@ -2,18 +2,31 @@ Version 1.4
 ===========
 
 * Fixed drawing of display sprites in title level.
+* Fixed drawing of smoke sprites and various other sprites.
+* Fixed player holster state and current vehicle not preserved correctly on level jump.
+* Fixed fade-in and fade-out effects not canceling correctly when next level is loaded.
 * Fixed shadows still being visible after shattering a moveable.
-* Fixed fade-in and fade-out effects not canceling properly when next level is loaded.
 * Fixed FOV interpolation at the end of the flyby sequence.
 * Fixed sounds resuming in pause mode while switching between apps.
 * Fixed slide directions.
 * Fixed occasional collision warnings in a log when teeth spikes object was activated.
+* Auto-switch to a crawl state if player start position is in a crawlspace.
 * Revise wall spikes:
   - Wall spikes now stop when they touch a pushable, another spike wall or a normal wall.
   - Wall spikes will shatter any shatter in its path.
   - Wall spikes can be stopped by normal antitrigger or with a volume.
-* Add TR2 Dragon.
-* Add TR3 Winston (requires updated TEN Winston wad2).
+* Added hub system to preserve level state on level jumps.
+* Added ember emitter.
+* Added fish emitter.
+* Added laser beam object.
+* Added TR2 dragon.
+* Added TR3 Winston (requires updated TEN Winston .wad2).
+
+Lua API changes:
+* Added resetHub flag to Flow.Level, which allows to reset hub data.
+* Added Flow.GetFlipMapStatus() function to get current flipmap status.
+* Added Moveable:GetMeshCount() function to get number of moveable meshes.
+* Added Static:GetHP() and Static:SetHP() functions to change shatterable static mesh hit points.
 
 Version 1.3
 ===========

@@ -137,6 +137,9 @@ namespace TEN::Hud
 		constexpr auto SCALE_MODE				 = DisplaySpriteScaleMode::Fill;
 		constexpr auto BLEND_MODE				 = BlendMode::Additive;
 
+		if (!Position.has_value())
+			return;
+
 		// Draw main static element.
 		AddDisplaySprite(
 			SPRITE_SEQUENCE_OBJECT_ID, STATIC_ELEMENT_SPRITE_ID,
@@ -297,8 +300,7 @@ namespace TEN::Hud
 	// TODO: If crosshair happens to be in view upon spawn, first frame is sometimes garbage.
 	void TargetHighlighterController::AddCrosshair(int itemNumber, const Vector3& targetPos)
 	{
-		constexpr auto SCALE_START		  = 0.75f;
-		constexpr auto RADIUS_SCALE_START = 1.5f * SQRT_2;
+		constexpr auto RADIUS_SCALE_START = 0.25f;
 		constexpr auto ANGLE_STEP		  = ANGLE(360.0f / CrosshairData::SEGMENT_COUNT);
 
 		auto pos = g_Renderer.Get2DPosition(targetPos);
@@ -312,7 +314,7 @@ namespace TEN::Hud
 		crosshair.IsPrimary = false;
 		crosshair.Position = *pos;
 		crosshair.Orientation = 0;
-		crosshair.Scale = SCALE_START;
+		crosshair.Scale = 0.0f;
 		crosshair.Color = CrosshairData::COLOR_GRAY;
 		crosshair.Color.w = 0.0f;
 		crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
