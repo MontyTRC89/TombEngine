@@ -241,8 +241,8 @@ Specify which translations in the strings table correspond to which languages.
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
 /*** Do FlipMap with specific ID.
-//@function FlipMap
-//@tparam int flipmap (ID of flipmap)
+@function FlipMap
+@tparam int flipmap (ID of flipmap)
 */
 	tableFlow.set_function(ScriptReserved_FlipMap, &FlowHandler::FlipMap, this);
 
