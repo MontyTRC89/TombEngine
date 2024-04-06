@@ -20,7 +20,8 @@ Version 1.4
 * Added fish emitter.
 * Added laser beam object.
 * Added TR2 dragon.
-* Added TR3 Winston (requires updated TEN Winston .wad2).
+* Added TR3 Winston (requires updated TEN Winston .wad2 on TombEngine.com.
+* Added TR4 Squishy Blocks (requires updated TEN .wad2 on TombEngine.com
 
 Lua API changes:
 * Added resetHub flag to Flow.Level, which allows to reset hub data.
