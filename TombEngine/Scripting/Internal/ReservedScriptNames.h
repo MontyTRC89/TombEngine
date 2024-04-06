@@ -315,6 +315,7 @@ static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
 static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
 
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
+static constexpr char ScriptReserved_GetFlipMapStatus[]				= "GetFlipMapStatus";
 static constexpr char ScriptReserved_PlayFlyBy[]					= "PlayFlyBy";
 
 static constexpr char ScriptReserved_PlayCamera[]					= "PlayCamera";

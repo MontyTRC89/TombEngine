@@ -198,6 +198,19 @@ Must be an integer value (0 means no secrets).
 @tparam int total number of secrets
 */
 	tableFlow.set_function(ScriptReserved_SetTotalSecretCount, &FlowHandler::SetTotalSecretCount, this);
+	
+/*** Do FlipMap with specific group ID.
+@function FlipMap
+@tparam int flipmap (ID of flipmap group to actuvate / deactivate)
+*/
+	tableFlow.set_function(ScriptReserved_FlipMap, &FlowHandler::FlipMap, this);
+	
+/*** Get current FlipMap status for specific group ID.
+@function GetFlipMapStatus
+@int[opt] index Flipmap group ID to check. If no group specified, function returns overall flipmap status (on or off).
+@treturn int status Status of the flipmap group (true means on, false means off).
+*/
+	tableFlow.set_function(ScriptReserved_GetFlipMapStatus, &FlowHandler::GetFlipMapStatus, this);
 
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
@@ -239,12 +252,6 @@ Specify which translations in the strings table correspond to which languages.
 @tparam tab table array-style table with language names
 */
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
-
-/*** Do FlipMap with specific ID.
-@function FlipMap
-@tparam int flipmap (ID of flipmap)
-*/
-	tableFlow.set_function(ScriptReserved_FlipMap, &FlowHandler::FlipMap, this);
 
 	ScriptColor::Register(parent);
 	Rotation::Register(parent);
@@ -444,9 +451,25 @@ GameStatus FlowHandler::GetGameStatus()
 	return this->LastGameStatus;
 }
 
-void FlowHandler::FlipMap(int flipmap)
+void FlowHandler::FlipMap(int group)
 {
-	DoFlipMap(flipmap);
+	DoFlipMap(group);
+}
+
+bool FlowHandler::GetFlipMapStatus(std::optional<int> group)
+{
+	if (!group.has_value())
+	{
+		return FlipStatus;
+	}
+
+	if (group.value() >= MAX_FLIPMAP)
+	{
+		TENLog("Maximum flipmap group number is " + std::to_string(MAX_FLIPMAP) + ". Please specify another index.", LogLevel::Warning);
+		return false;
+	}
+
+	return FlipStatus && FlipStats[group.value()];
 }
 
 void FlowHandler::SaveGame(int slot)

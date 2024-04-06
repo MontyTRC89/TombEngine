@@ -73,6 +73,12 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 
 void DoFlipMap(int group)
 {
+	if (group >= MAX_FLIPMAP)
+	{
+		TENLog("Maximum flipmap group number is " + std::to_string(MAX_FLIPMAP) + ".", LogLevel::Warning);
+		return;
+	}
+
 	// Run through rooms.
 	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
 	{

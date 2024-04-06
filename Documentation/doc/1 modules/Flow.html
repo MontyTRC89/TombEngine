@@ -195,6 +195,14 @@ scripts too.</p>
 	<td class="name" ><a href="#SetTotalSecretCount">SetTotalSecretCount(total)</a></td>
 	<td class="summary">Total number of secrets in game.</td>
 	</tr>
+	<tr>
+	<td class="name" ><a href="#FlipMap">FlipMap(flipmap)</a></td>
+	<td class="summary">Do FlipMap with specific group ID.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetFlipMapStatus">GetFlipMapStatus([index])</a></td>
+	<td class="summary">Get current FlipMap status for specific group ID.</td>
+	</tr>
 </table>
 <h2><a href="#settings_lua">settings.lua </a></h2>
 <table class="function_list">
@@ -730,6 +738,57 @@ Must be an integer value (0 means no secrets).
         </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "FlipMap"></a>
+    <strong>FlipMap(flipmap)</strong>
+    </dt>
+    <dd>
+    Do FlipMap with specific group ID.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">flipmap</span>
+            <span class="types"><span class="type">int</span></span>
+         (ID of flipmap group to actuvate / deactivate)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetFlipMapStatus"></a>
+    <strong>GetFlipMapStatus([index])</strong>
+    </dt>
+    <dd>
+    Get current FlipMap status for specific group ID.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         Flipmap group ID to check. If no group specified, function returns overall flipmap status (on or off).
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        status Status of the flipmap group (true means on, false means off).
+    </ol>
 
 
 
