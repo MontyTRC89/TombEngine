@@ -129,7 +129,7 @@ void ExplosionControl(short itemNumber)
 				}
 			}
 
-			GetCollidedObjects(item, 2048, true, CollidedItems, CollidedMeshes, 1);
+			GetCollidedObjects(item, BLOCK(2), true, CollidedItems, CollidedMeshes, 1);
 			if (CollidedItems[0] || CollidedMeshes[0])
 			{
 				int i = 0;

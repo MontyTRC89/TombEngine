@@ -183,7 +183,7 @@ void ObjectsHandler::TestCollidingObjects()
 		if (!item->Callbacks.OnObjectCollided.empty())
 		{
 			// Test against other moveables.
-			GetCollidedObjects(item, 0, true, CollidedItems, nullptr, false);
+			GetCollidedObjects(item, CLICK(1), true, CollidedItems, nullptr, false);
 			size_t i = 0;
 			while (CollidedItems[i])
 			{

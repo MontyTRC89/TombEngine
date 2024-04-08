@@ -102,8 +102,10 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 
 bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara)
 {
-	short numItems = 0;
-	short numMeshes = 0;
+	int numItems  = 0;
+	int numMeshes = 0;
+
+	auto collidingItemBounds = GetBestFrame(*collidingItem).BoundingBox;
 
 	// Collect all the rooms where to check
 	for (auto i : g_Level.Rooms[collidingItem->RoomNumber].neighbors)
@@ -186,89 +188,41 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						continue;
 					}
 
-					int dx = collidingItem->Pose.Position.x - item->Pose.Position.x;
-					int dy = collidingItem->Pose.Position.y - item->Pose.Position.y;
-					int dz = collidingItem->Pose.Position.z - item->Pose.Position.z;
+					auto delta = collidingItem->Pose.Position - item->Pose.Position;
 
-					int upperBound = radius;
-					int lowerBound = radius;
-
-					if (!radius)
+					if (delta.ToVector3().Length() > COLLISION_CHECK_DISTANCE)
 					{
-						auto collidingItemBounds = GetBestFrame(*collidingItem).BoundingBox;
-						upperBound = collidingItemBounds.Y1;
-						lowerBound = collidingItemBounds.Y2;
+						itemNumber = item->NextItem;
+						continue;
 					}
 
-					auto bounds = GetBestFrame(*item).BoundingBox;
+					auto itemBounds = GetBestFrame(*item).BoundingBox;
 
-					int verticalDelta1 = (collidingItem->Pose.Position.y + lowerBound + CLICK(0.5f)) - (item->Pose.Position.y + bounds.Y1);
-					int verticalDelta2 = (collidingItem->Pose.Position.y - upperBound - CLICK(0.5f)) - (item->Pose.Position.y + bounds.Y2);
-
-					if (dx >= -BLOCK(2) && dx <= BLOCK(2) &&
-						dy >= -BLOCK(2) && dy <= BLOCK(2) &&
-						dz >= -BLOCK(2) && dz <= BLOCK(2) &&
-						(collidingItem->Pose.Position.y + lowerBound + CLICK(0.5f)) >= (item->Pose.Position.y + bounds.Y1) &&
-						(collidingItem->Pose.Position.y - upperBound - CLICK(0.5f)) <= (item->Pose.Position.y + bounds.Y2))
+					// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
+					if (item->ObjectNumber == ID_TURN_SWITCH)
 					{
-						float sinY = phd_sin(item->Pose.Orientation.y);
-						float cosY = phd_cos(item->Pose.Orientation.y);
+						itemBounds.X1 = -CLICK(1);
+						itemBounds.X2 =  CLICK(1);
+						itemBounds.Z1 = -CLICK(1);
+						itemBounds.Z1 =  CLICK(1);
+					}
 
-						int rx = (dx * cosY) - (dz * sinY);
-						int rz = (dz * cosY) + (dx * sinY);
+					if ((collidingItem->Pose.Position.y + collidingItemBounds.Y1 - CLICK(0.5f)) > item->Pose.Position.y + itemBounds.Y2 + CLICK(0.5f) ||
+						(collidingItem->Pose.Position.y + collidingItemBounds.Y2 + CLICK(0.5f)) < item->Pose.Position.y + itemBounds.Y1 - CLICK(0.5f))
+					{
+						itemNumber = item->NextItem;
+						continue;
+					}
 
-						// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
-						if (item->ObjectNumber == ID_TURN_SWITCH)
-						{
-							bounds.X1 = -CLICK(1);
-							bounds.X2 = CLICK(1);
-							bounds.Z1 = -CLICK(1);
-							bounds.Z1 = CLICK(1);
-						}
+					auto bounds1 = itemBounds.ToBoundingOrientedBox(item->Pose);
+					auto bounds2 = GetBestFrame(*collidingItem).BoundingBox.ToBoundingOrientedBox(collidingItem->Pose);
 
-						if ((radius + rx + CLICK(0.5f)) >= bounds.X1 &&
-							(rx - radius - CLICK(0.5f)) <= bounds.X2)
-						{
-							if ((radius + rz + CLICK(0.5f)) >= bounds.Z1 &&
-								(rz - radius - CLICK(0.5f)) <= bounds.Z2)
-							{
-								collidedItems[numItems++] = item;
-							}
-						}
-						else
-						{
-							if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + bounds.Y1) &&
-								(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + bounds.Y2))
-							{
-								float sinY = phd_sin(item->Pose.Orientation.y);
-								float cosY = phd_cos(item->Pose.Orientation.y);
+					if (bounds1.Intersects(bounds2))
+					{
+						collidedItems[numItems++] = item;
 
-								int rx = (dx * cosY) - (dz * sinY);
-								int rz = (dz * cosY) + (dx * sinY);
-
-								// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
-								if (item->ObjectNumber == ID_TURN_SWITCH)
-								{
-									bounds.X1 = -CLICK(1);
-									bounds.X2 = CLICK(1);
-									bounds.Z1 = -CLICK(1);
-									bounds.Z1 = CLICK(1);
-								}
-
-								if ((radius + rx + CLICK(0.5f)) >= bounds.X1 &&
-									(rx - radius - CLICK(0.5f)) <= bounds.X2)
-								{
-									if ((radius + rz + CLICK(0.5f)) >= bounds.Z1 &&
-										(rz - radius - CLICK(0.5f)) <= bounds.Z2)
-									{
-										collidedItems[numItems++] = item;
-
-										if (!radius)
-											return true;
-									}
-								}
-							}
-						}
+						if (!radius)
+							return true;
 					}
 
 					itemNumber = item->NextItem;
