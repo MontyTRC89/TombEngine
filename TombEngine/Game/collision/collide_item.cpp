@@ -102,7 +102,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 	}
 }
 
-bool GetCollidedObjects(ItemInfo* collidingItem, bool onlyVisible, bool ignorePlayer, ItemInfo** collidedItems, MESH_INFO** collidedMeshes)
+bool GetCollidedObjects(ItemInfo* collidingItem, bool onlyVisible, bool ignorePlayer, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, float customRadius)
 {
 	int numItems  = 0;
 	int numMeshes = 0;
@@ -115,7 +115,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, bool onlyVisible, bool ignorePl
 	const auto& collidingItemBounds  = GetBestFrame(*collidingItem).BoundingBox;
 	const auto& collidingItemExtents = collidingItemBounds.GetExtents();
 	const auto& collidingItemSphere  = BoundingSphere(collidingItemBounds.GetCenter() + collidingItem->Pose.Position.ToVector3(), collidingItemExtents.Length());
-	const auto& collidingItemCircle  = Vector3(collidingItemSphere.Center.x, collidingItemSphere.Center.z, std::hypot(collidingItemExtents.x, collidingItemExtents.z));
+	const auto& collidingItemCircle  = Vector3(collidingItemSphere.Center.x, collidingItemSphere.Center.z, customRadius > 0.0f ? customRadius : std::hypot(collidingItemExtents.x, collidingItemExtents.z));
 
 	// Quickly discard collision if colliding item bounds are below tolerance threshold.
 	if (collidingItemSphere.Radius <= EXTENTS_LENGTH_TOLERANCE_THRESHOLD)
@@ -172,9 +172,16 @@ bool GetCollidedObjects(ItemInfo* collidingItem, bool onlyVisible, bool ignorePl
 					continue;
 				}
 
-				// Do precise bounds test.
 				auto bounds1 = staticBounds.ToBoundingOrientedBox(mesh->pos.Position);
 				auto bounds2 = collidingItemBounds.ToBoundingOrientedBox(collidingItem->Pose);
+
+				// Override extents if specified.
+				if (customRadius > 0.0f)
+				{
+					bounds2.Extents = Vector3(customRadius);
+				}
+
+				// Do precise bounds test.
 				if (bounds1.Intersects(bounds2))
 				{
 					collidedMeshes[numMeshes++] = mesh;
@@ -251,9 +258,16 @@ bool GetCollidedObjects(ItemInfo* collidingItem, bool onlyVisible, bool ignorePl
 						continue;
 					}
 
-					// Do precise bounds test.
 					auto bounds1 = itemBounds.ToBoundingOrientedBox(item->Pose);
 					auto bounds2 = collidingItemBounds.ToBoundingOrientedBox(collidingItem->Pose);
+
+					// Override extents if specified.
+					if (customRadius > 0.0f)
+					{
+						bounds2.Extents = Vector3(customRadius);
+					}
+
+					// Do precise bounds test.
 					if (bounds1.Intersects(bounds2))
 					{
 						collidedItems[numItems++] = item;

@@ -177,7 +177,7 @@ void ElectricityWiresControl(short itemNumber)
 	if (GetRandomControl() & 1)
 		return;
 
-	GetCollidedObjects(item, true, false, CollidedItems, nullptr);
+	GetCollidedObjects(item, true, false, CollidedItems, nullptr, BLOCK(2));
 
 	int k = 0;
 	while (CollidedItems[k] != nullptr)
