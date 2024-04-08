@@ -28,6 +28,7 @@ ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
+constexpr auto EXTENTS_LENGTH_TOLERANCE_THRESHOLD = 2.0f;
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
@@ -108,7 +109,18 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 	auto collidingItemBounds = GetBestFrame(*collidingItem).BoundingBox;
 	auto collidingItemSphere = BoundingSphere(collidingItemBounds.GetCenter() + collidingItem->Pose.Position.ToVector3(), collidingItemBounds.GetExtents().Length());
 
-	// Collect all the rooms where to check
+	// Quickly discard collision if colliding item bounds are below tolerance threshold.
+	if (collidingItemSphere.Radius <= EXTENTS_LENGTH_TOLERANCE_THRESHOLD)
+	{
+		if (collidedMeshes)
+			collidedMeshes[0] = nullptr;
+		if (collidedItems)
+			collidedItems[0]  = nullptr;
+
+		return false;
+	}
+
+	// Collect all the neighbor rooms where to check.
 	for (auto i : g_Level.Rooms[collidingItem->RoomNumber].neighbors)
 	{
 		if (!g_Level.Rooms[i].Active())
@@ -164,6 +176,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 				do
 				{
 					auto* item = &g_Level.Items[itemNumber];
+					itemNumber = item->NextItem;
 
 					// Discard all items not feasible for collision checks.
 					if (item == collidingItem ||
@@ -174,19 +187,16 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						(Objects[item->ObjectNumber].drawRoutine == nullptr && item->ObjectNumber != ID_LARA) ||
 						(Objects[item->ObjectNumber].collision == nullptr && item->ObjectNumber != ID_LARA))
 					{
-						itemNumber = item->NextItem;
 						continue;
 					}
 
 					// TODO: This is awful and we need a better system.
 					if (item->ObjectNumber == ID_UPV && item->HitPoints == 1)
 					{
-						itemNumber = item->NextItem;
 						continue;
 					}
 					if (item->ObjectNumber == ID_BIGGUN && item->HitPoints == 1)
 					{
-						itemNumber = item->NextItem;
 						continue;
 					}
 
@@ -194,7 +204,6 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					auto delta = collidingItem->Pose.Position - item->Pose.Position;
 					if (delta.ToVector3().Length() > COLLISION_CHECK_DISTANCE)
 					{
-						itemNumber = item->NextItem;
 						continue;
 					}
 
@@ -209,11 +218,19 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						itemBounds.Z1 =  CLICK(1);
 					}
 
+					auto extents = itemBounds.GetExtents();
+
+					// If item bounding box extents is below tolerance threshold, discard the object.
+					if (extents.Length() <= EXTENTS_LENGTH_TOLERANCE_THRESHOLD)
+					{
+						continue;
+					}
+
+
 					// Do a rough distance test to discard objects which are not intersecting vertically.
 					if ((collidingItem->Pose.Position.y + collidingItemBounds.Y1 - CLICK(0.5f)) > item->Pose.Position.y + itemBounds.Y2 + CLICK(0.5f) ||
 						(collidingItem->Pose.Position.y + collidingItemBounds.Y2 + CLICK(0.5f)) < item->Pose.Position.y + itemBounds.Y1 - CLICK(0.5f))
 					{
-						itemNumber = item->NextItem;
 						continue;
 					}
 
@@ -221,7 +238,6 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					auto itemSphere = BoundingSphere(itemBounds.GetCenter() + item->Pose.Position.ToVector3(), (itemBounds.GetExtents() * Vector3(1, 0, 1)).Length());
 					if (!itemSphere.Intersects(collidingItemSphere))
 					{
-						itemNumber = item->NextItem;
 						continue;
 					}
 
@@ -234,8 +250,6 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						if (!radius)
 							return true;
 					}
-
-					itemNumber = item->NextItem;
 				}
 				while (itemNumber != NO_VALUE);
 			}
