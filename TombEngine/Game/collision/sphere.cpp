@@ -20,8 +20,8 @@ namespace TEN::Collision::Sphere
 
 	bool SetSphereTouchBits(ItemInfo& creatureItem, ItemInfo& playerItem)
 	{
-		auto creatureSpheres = GetSpheres(creatureItem, (int)SphereSpaceFlags::World);
-		auto playerSpheres = GetSpheres(playerItem, (int)SphereSpaceFlags::World);
+		auto creatureSpheres = GetSpheres(creatureItem, (int)SphereSpaceFlags::World | (int)SphereSpaceFlags::BoneOrigin);
+		auto playerSpheres = GetSpheres(playerItem, (int)SphereSpaceFlags::World | (int)SphereSpaceFlags::BoneOrigin);
 
 		playerItem.TouchBits.ClearAll();
 
@@ -48,13 +48,8 @@ namespace TEN::Collision::Sphere
 				if (playerSphere.Radius <= 0.0f)
 					continue;
 
-				// Calculate parameters.
-				auto creatureSpherePos = creatureItem.Pose.Position.ToVector3() + creatureSphere.Center;
-				auto playerSpherePos = creatureItem.Pose.Position.ToVector3() + playerSphere.Center;
-				float distMax = SQUARE(creatureSphere.Radius + playerSphere.Radius);
-
-				// Test distance.
-				if (Vector3::DistanceSquared(creatureSpherePos, playerSpherePos) > distMax)
+				// Test sphere collision.
+				if (!creatureSphere.Intersects(playerSphere))
 					continue;
 
 				// Set touch bits.
