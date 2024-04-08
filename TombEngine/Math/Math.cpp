@@ -1,4 +1,6 @@
 #include "framework.h"
+
+#include <cmath>
 #include "Math/Math.h"
 
 namespace TEN::Math
@@ -29,5 +31,10 @@ namespace TEN::Math
 	{
 		auto result = Screen(Vector3(ambient), Vector3(tint));
 		return Vector4(result.x, result.y, result.z, ambient.w * tint.w);
+	}
+
+	bool CircleIntersects(const Vector3& circle1, const Vector3& circle2)
+	{
+		return std::sqrtf(std::powf(circle2.x - circle1.x, 2) + std::powf(circle2.y - circle1.y, 2)) <= circle1.z + circle2.z;
 	}
 }

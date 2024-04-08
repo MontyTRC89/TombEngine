@@ -20,4 +20,6 @@ namespace TEN::Math
 	float Luma(const Vector3& color);
 	Vector3 Screen(const Vector3& ambient, const Vector3& tint);
 	Vector4 Screen(const Vector4& ambient, const Vector4& tint);
+
+	bool CircleIntersects(const Vector3& circle1, const Vector3& circle2);
 }
