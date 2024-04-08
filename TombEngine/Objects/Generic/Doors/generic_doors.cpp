@@ -187,7 +187,7 @@ namespace TEN::Entities::Doors
 			{
 				if (!laraInfo->Control.IsMoving)
 				{
-					if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
+					if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
 					{
 						if (g_Gui.IsObjectInInventory(ID_CROWBAR_ITEM))
 						{
@@ -217,7 +217,7 @@ namespace TEN::Entities::Doors
 					}
 				}
 
-				g_Gui.SetInventoryItemChosen(NO_ITEM);
+				g_Gui.SetInventoryItemChosen(NO_VALUE);
 
 				if (MoveLaraPosition(CrowbarDoorPos, doorItem, laraItem))
 				{

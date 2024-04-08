@@ -36,8 +36,8 @@ pickups, and Lara herself (see also @{Objects.LaraObject} for Lara-specific feat
 
 constexpr auto LUA_CLASS_NAME{ ScriptReserved_Moveable };
 
-static auto index_error = index_error_maker(Moveable, LUA_CLASS_NAME);
-static auto newindex_error = newindex_error_maker(Moveable, LUA_CLASS_NAME);
+static auto IndexError = index_error_maker(Moveable, LUA_CLASS_NAME);
+static auto NewIndexError = newindex_error_maker(Moveable, LUA_CLASS_NAME);
 
 
 Moveable::Moveable(short num, bool alreadyInitialized) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialized{ alreadyInitialized }
@@ -48,7 +48,7 @@ Moveable::Moveable(short num, bool alreadyInitialized) : m_item{ &g_Level.Items[
 
 Moveable::Moveable(Moveable&& other) noexcept : 
 	m_item{ std::exchange(other.m_item, nullptr) },
-	m_num{ std::exchange(other.m_num, NO_ITEM) },
+	m_num{ std::exchange(other.m_num, NO_VALUE) },
 	m_initialized{ std::exchange(other.m_initialized, false) }
 {
 	if (GetValid())
@@ -139,7 +139,7 @@ static std::unique_ptr<Moveable> Create(
 		ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
 		ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
 		ptr->SetColor(ScriptColor(Vector4::One));
-		item->CarriedItem = NO_ITEM;
+		item->CarriedItem = NO_VALUE;
 
 		// call this when resetting name too?
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(item, ptr.get());
@@ -153,8 +153,8 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
 		sol::call_constructor, Create,
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
 	ScriptReserved_Enable, &Moveable::EnableItem,
@@ -1072,7 +1072,7 @@ void Moveable::UnswapMesh(int meshId)
 // @function Moveable:Enable
 void Moveable::EnableItem()
 {
-	if (m_num == NO_ITEM)
+	if (m_num == NO_VALUE)
 		return;
 
 	bool wasInvisible = false;
@@ -1092,12 +1092,12 @@ void Moveable::EnableItem()
 // @function Moveable:Disable
 void Moveable::DisableItem()
 {
-	if (m_num == NO_ITEM)
+	if (m_num == NO_VALUE)
 		return;
 
 	Antitrigger(m_num);
 
-	if (m_num > NO_ITEM && (m_item->Status == ITEM_INVISIBLE))
+	if (m_num > NO_VALUE && (m_item->Status == ITEM_INVISIBLE))
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 }
 
@@ -1146,7 +1146,7 @@ void Moveable::SetVisible(bool isVisible)
 
 		m_item->Status = ITEM_INVISIBLE;
 
-		if (m_num > NO_ITEM)
+		if (m_num > NO_VALUE)
 			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 	}
 	else
@@ -1168,7 +1168,7 @@ void Moveable::SetVisible(bool isVisible)
 			m_item->Status = ITEM_ACTIVE;
 		}
 
-		if (m_num > NO_ITEM)
+		if (m_num > NO_VALUE)
 			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 	}
 }
@@ -1176,18 +1176,18 @@ void Moveable::SetVisible(bool isVisible)
 void Moveable::Invalidate()
 {
 	// Keep m_item as-is so it can be properly removed from moveables set when destructor is called.
-	m_num = NO_ITEM;
+	m_num = NO_VALUE;
 	m_initialized = false;
 }
 
 bool Moveable::GetValid() const
 {
-	return m_num > NO_ITEM;
+	return m_num > NO_VALUE;
 }
 
 void Moveable::Destroy()
 {
-	if (m_num > NO_ITEM) 
+	if (m_num > NO_VALUE) 
 	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 		s_callbackRemoveName(m_item->Name);

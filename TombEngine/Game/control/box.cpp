@@ -204,7 +204,7 @@ void AlertNearbyGuards(ItemInfo* item)
 	for (int i = 0; i < ActiveCreatures.size(); i++)
 	{
 		auto* currentCreature = ActiveCreatures[i];
-		if (currentCreature->ItemNumber == NO_ITEM)
+		if (currentCreature->ItemNumber == NO_VALUE)
 			continue;
 
 		auto* currentTarget = &g_Level.Items[currentCreature->ItemNumber + i];
@@ -229,7 +229,7 @@ void AlertAllGuards(short itemNumber)
 	for (int i = 0; i < ActiveCreatures.size(); i++)
 	{
 		auto* creature = ActiveCreatures[i];
-		if (creature->ItemNumber == NO_ITEM)
+		if (creature->ItemNumber == NO_VALUE)
 			continue;
 
 		auto* target = &g_Level.Items[creature->ItemNumber];
@@ -902,7 +902,7 @@ int CreatureCreature(short itemNumber)
 		}
 
 		link = linked->NextItem;
-	} while (link != NO_ITEM);
+	} while (link != NO_VALUE);
 
 	return 0;
 }
@@ -1295,7 +1295,7 @@ void GetAITarget(CreatureInfo* creature)
 	if (enemy)
 		enemyObjectNumber = enemy->ObjectNumber;
 	else
-		enemyObjectNumber = NO_ITEM;
+		enemyObjectNumber = NO_VALUE;
 
 	auto* item = &g_Level.Items[creature->ItemNumber];
 
@@ -1387,7 +1387,7 @@ void GetAITarget(CreatureInfo* creature)
 			item->AIBits &= ~FOLLOW;
 		}
 	}
-	/*else if (item->objectNumber == ID_MONKEY && item->carriedItem == NO_ITEM)
+	/*else if (item->objectNumber == ID_MONKEY && item->carriedItem == NO_VALUE)
 	{
 		if (item->aiBits != MODIFY)
 		{

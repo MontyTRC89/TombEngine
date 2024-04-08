@@ -160,7 +160,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 		if (collidedItems)
 		{
 			int itemNumber = room->itemNumber;
-			if (itemNumber != NO_ITEM)
+			if (itemNumber != NO_VALUE)
 			{
 				do
 				{
@@ -264,7 +264,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 					itemNumber = item->NextItem;
 				}
-				while (itemNumber != NO_ITEM);
+				while (itemNumber != NO_VALUE);
 			}
 
 			collidedItems[numItems] = nullptr;
@@ -328,7 +328,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 				continue;
 
 			int itemNumber = g_Level.Rooms[i].itemNumber;
-			while (itemNumber != NO_ITEM)
+			while (itemNumber != NO_VALUE)
 			{
 				auto* item2 = &g_Level.Items[itemNumber];
 				auto* object = &Objects[item2->ObjectNumber];
@@ -664,6 +664,8 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 	const auto& bounds = (bigPushFlags & 2) ? GlobalCollisionBounds : GameBoundingBox(item0);
 	int minX = bounds.X1;
 	int maxX = bounds.X2;
+	int minY = bounds.Y1;
+	int maxY = bounds.Y2;
 	int minZ = bounds.Z1;
 	int maxZ = bounds.Z2;
 
@@ -673,11 +675,14 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 		maxX += coll->Setup.Radius;
 		minZ -= coll->Setup.Radius;
 		maxZ += coll->Setup.Radius;
+		minY -= coll->Setup.Radius;
+		maxY += coll->Setup.Radius;
 	}
 
 	// Big enemies.
 	if (abs(deltaPos.x) > BLOCK(4.5f) || abs(deltaPos.z) > BLOCK(4.5f) ||
 		relDeltaPos.x <= minX || relDeltaPos.x >= maxX ||
+		relDeltaPos.y <= minY || relDeltaPos.y >= maxY ||
 		relDeltaPos.z <= minZ || relDeltaPos.z >= maxZ)
 	{
 		return false;
@@ -905,7 +910,7 @@ void ItemPushBridge(ItemInfo& item, CollisionInfo& coll)
 void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& collResult)
 {
 	// Store an offset for a bridge item into shifts, if exists.
-	if (coll.LastBridgeItemNumber == collResult.Position.Bridge && coll.LastBridgeItemNumber != NO_ITEM)
+	if (coll.LastBridgeItemNumber == collResult.Position.Bridge && coll.LastBridgeItemNumber != NO_VALUE)
 	{
 		auto& bridgeItem = g_Level.Items[collResult.Position.Bridge];
 
@@ -944,7 +949,7 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResu
 	else
 	{
 		coll.LastBridgeItemPose = Pose::Zero;
-		coll.LastBridgeItemNumber = NO_ITEM;
+		coll.LastBridgeItemNumber = NO_VALUE;
 	}
 
 	coll.LastBridgeItemNumber = collResult.Position.Bridge;
@@ -1827,7 +1832,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			continue;
 
 		int nextItemNumber = neighborRoom.itemNumber;
-		while (nextItemNumber != NO_ITEM)
+		while (nextItemNumber != NO_VALUE)
 		{
 			auto& linkItem = g_Level.Items[nextItemNumber];
 			int itemNumber = nextItemNumber;

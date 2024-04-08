@@ -16,8 +16,8 @@ Statics
 @pragma nostrip
 */
 
-static auto index_error = index_error_maker(Static, ScriptReserved_Static);
-static auto newindex_error = newindex_error_maker(Static, ScriptReserved_Static);
+static auto IndexError = index_error_maker(Static, ScriptReserved_Static);
+static auto NewIndexError = newindex_error_maker(Static, ScriptReserved_Static);
 
 Static::Static(MESH_INFO & ref) : m_mesh{ref}
 {};
@@ -26,8 +26,8 @@ void Static::Register(sol::table & parent)
 {
 	parent.new_usertype<Static>(ScriptReserved_Static,
 		sol::no_constructor, // ability to spawn new ones could be added later
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 
 		/// Enable the static, for cases when it was shattered or manually disabled before.
 		// @function Static:Enable

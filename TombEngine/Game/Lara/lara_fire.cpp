@@ -572,7 +572,7 @@ void HandleWeapon(ItemInfo& laraItem)
 					player.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			}
 			else if (player.Control.Weapon.RequestGunType == LaraWeaponType::Flare ||
-				(player.Context.Vehicle == NO_ITEM &&
+				(player.Context.Vehicle == NO_VALUE &&
 					(player.Control.Weapon.RequestGunType == LaraWeaponType::HarpoonGun ||
 						player.Control.WaterStatus == WaterStatus::Dry ||
 						(player.Control.WaterStatus == WaterStatus::Wade &&
@@ -761,7 +761,7 @@ void HandleWeapon(ItemInfo& laraItem)
 	case HandStatus::Free:
 		if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			if (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates))
+			if (player.Context.Vehicle != NO_VALUE || TestState(laraItem.Animation.ActiveState, FlarePoseStates))
 			{
 				if (player.Flare.ControlLeft)
 				{
@@ -793,7 +793,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		{
 			if (laraItem.Model.MeshIndex[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
-				player.Flare.ControlLeft = (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
+				player.Flare.ControlLeft = (player.Context.Vehicle != NO_VALUE || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
 
 				if (Contains(UnavailableFlarePoseAnims, laraItem.Animation.AnimNumber))
 					player.Flare.ControlLeft = false;
@@ -917,7 +917,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 	for (auto* creaturePtr : ActiveCreatures)
 	{
 		// Continue loop if no item.
-		if (creaturePtr->ItemNumber == NO_ITEM)
+		if (creaturePtr->ItemNumber == NO_VALUE)
 			continue;
 
 		auto& item = g_Level.Items[creaturePtr->ItemNumber];

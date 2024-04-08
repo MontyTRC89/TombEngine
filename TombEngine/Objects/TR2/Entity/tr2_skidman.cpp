@@ -55,7 +55,7 @@ namespace TEN::Entities::Creatures::TR2
 	static void CreateSkidooGun(ItemInfo& riderItem)
 	{
 		int skidooItemNumber = CreateItem();
-		if (skidooItemNumber == NO_ITEM)
+		if (skidooItemNumber == NO_VALUE)
 		{
 			TENLog("Failed to create ID_SNOWMOBILE_GUN from ID_SNOWMOBILE_DRIVER.", LogLevel::Warning);
 			return;
@@ -112,7 +112,7 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		if (Lara.Context.Vehicle == NO_ITEM && item.Animation.Velocity.z > 0.0f)
+		if (Lara.Context.Vehicle == NO_VALUE && item.Animation.Velocity.z > 0.0f)
 			DoDamage(laraItem, 100);
 	}
 
@@ -251,7 +251,7 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			if (creature->Flags == 0 && abs(ai.angle) < SKIDOO_MAN_TARGET_ANGLE && creature->Enemy->HitPoints > 0)
 			{
-				int damage = (creature->Enemy->IsLara() && GetLaraInfo(creature->Enemy)->Context.Vehicle != NO_ITEM) ? 10 : 50;
+				int damage = (creature->Enemy->IsLara() && GetLaraInfo(creature->Enemy)->Context.Vehicle != NO_VALUE) ? 10 : 50;
 				
 				ShotLara(skidooItem, &ai, SkidooBiteLeft, 0, damage);
 

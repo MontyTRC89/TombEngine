@@ -164,7 +164,7 @@ namespace TEN::Entities::Vehicles
 		auto* speedboatItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(speedboatItem, laraItem, coll, SpeedboatMountTypes, SPEEDBOAT_MOUNT_DISTANCE, LARA_HEIGHT);
@@ -275,7 +275,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.Velocity.y = -50;
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
-			lara->Context.Vehicle = NO_ITEM; // Leave vehicle itself active for inertia.
+			lara->Context.Vehicle = NO_VALUE; // Leave vehicle itself active for inertia.
 
 			int x = laraItem->Pose.Position.x + 360 * phd_sin(laraItem->Pose.Orientation.y);
 			int y = laraItem->Pose.Position.y - 90;
@@ -299,7 +299,7 @@ namespace TEN::Entities::Vehicles
 	void SpeedboatDoBoatShift(ItemInfo* speedboatItem, int itemNumber)
 	{
 		short itemNumber2 = g_Level.Rooms[speedboatItem->RoomNumber].itemNumber;
-		while (itemNumber2 != NO_ITEM)
+		while (itemNumber2 != NO_VALUE)
 		{
 			auto* item = &g_Level.Items[itemNumber2];
 

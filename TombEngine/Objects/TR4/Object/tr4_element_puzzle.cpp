@@ -108,10 +108,10 @@ namespace TEN::Entities::TR4
 		}
 
 		short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-		if (currentItemNumber == NO_ITEM)
+		if (currentItemNumber == NO_VALUE)
 			return;
 
-		while (currentItemNumber != NO_ITEM)
+		while (currentItemNumber != NO_VALUE)
 		{
 			auto* currentItem = &g_Level.Items[currentItemNumber];
 

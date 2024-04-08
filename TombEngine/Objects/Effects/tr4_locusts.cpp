@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
 				return i;
 		}
 
-		return NO_ITEM;
+		return NO_VALUE;
 	}
 
 	void SpawnLocust(ItemInfo* item)
@@ -33,7 +33,7 @@ namespace TEN::Entities::TR4
 		Vector3i origin, target;
 	   short locustNumber = CreateLocust();
 	   EulerAngles orient;
-		if (locustNumber != NO_ITEM)
+		if (locustNumber != NO_VALUE)
 		{
 			auto* locust = &Locusts[locustNumber];
 
