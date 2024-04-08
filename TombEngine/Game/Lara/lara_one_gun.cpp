@@ -1652,7 +1652,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				SmashObject(itemPtr->Index);
 				KillItem(itemPtr->Index);
 			}
-			else if (currentObject.collision && !(itemPtr->Status & ITEM_INVISIBLE))
+			else if (currentObject.collision && itemPtr->Status != ITEM_INVISIBLE)
 			{
 				doShatter = hasHit = true;
 				doExplosion = isExplosive;
