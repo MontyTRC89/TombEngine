@@ -106,7 +106,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 	int numMeshes = 0;
 
 	auto collidingItemBounds = GetBestFrame(*collidingItem).BoundingBox;
-	auto collidingItemSphere = BoundingSphere(collidingItemBounds.GetCenter(), collidingItemBounds.GetExtents().Length());
+	auto collidingItemSphere = BoundingSphere(collidingItemBounds.GetCenter() + collidingItem->Pose.Position.ToVector3(), collidingItemBounds.GetExtents().Length());
 
 	// Collect all the rooms where to check
 	for (auto i : g_Level.Rooms[collidingItem->RoomNumber].neighbors)
@@ -165,6 +165,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 				{
 					auto* item = &g_Level.Items[itemNumber];
 
+					// Discard all items not feasible for collision checks.
 					if (item == collidingItem ||
 						(ignoreLara && item->ObjectNumber == ID_LARA) ||
 						(onlyVisible && item->Status == ITEM_INVISIBLE) ||
@@ -189,8 +190,8 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						continue;
 					}
 
+					// Do a rough distance test to discard objects which are more than 6 blocks away.
 					auto delta = collidingItem->Pose.Position - item->Pose.Position;
-
 					if (delta.ToVector3().Length() > COLLISION_CHECK_DISTANCE)
 					{
 						itemNumber = item->NextItem;
@@ -208,6 +209,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						itemBounds.Z1 =  CLICK(1);
 					}
 
+					// Do a rough distance test to discard objects which are not intersecting vertically.
 					if ((collidingItem->Pose.Position.y + collidingItemBounds.Y1 - CLICK(0.5f)) > item->Pose.Position.y + itemBounds.Y2 + CLICK(0.5f) ||
 						(collidingItem->Pose.Position.y + collidingItemBounds.Y2 + CLICK(0.5f)) < item->Pose.Position.y + itemBounds.Y1 - CLICK(0.5f))
 					{
@@ -215,21 +217,20 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						continue;
 					}
 
-					auto itemSphere = BoundingSphere(itemBounds.GetCenter(), itemBounds.GetExtents().Length());
-
+					// Do a rough sphere test to discard objects which are not intersecting horizontally.
+					auto itemSphere = BoundingSphere(itemBounds.GetCenter() + item->Pose.Position.ToVector3(), (itemBounds.GetExtents() * Vector3(1, 0, 1)).Length());
 					if (!itemSphere.Intersects(collidingItemSphere))
 					{
 						itemNumber = item->NextItem;
 						continue;
 					}
 
+					// Do precise bounds test.
 					auto bounds1 = itemBounds.ToBoundingOrientedBox(item->Pose);
 					auto bounds2 = GetBestFrame(*collidingItem).BoundingBox.ToBoundingOrientedBox(collidingItem->Pose);
-
 					if (bounds1.Intersects(bounds2))
 					{
 						collidedItems[numItems++] = item;
-
 						if (!radius)
 							return true;
 					}
