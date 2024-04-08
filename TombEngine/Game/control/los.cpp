@@ -265,16 +265,11 @@ bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 {
 	constexpr auto STEP_COUNT = 8;
 
-	int x = origin->x;
-	int y = origin->y;
-	int z = origin->z;
-
+	auto pos = origin->ToVector3i();
 	short roomNumber = origin->RoomNumber;
 	short roomNumber2 = roomNumber;
 
-	int dx = (target->x - x) >> 3;
-	int dy = (target->y - y) >> 3;
-	int dz = (target->z - z) >> 3;
+	auto step = (target->ToVector3i() - origin->ToVector3i()) / STEP_COUNT;
 
 	bool flag = false;
 	bool result = false;
@@ -283,7 +278,7 @@ bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 	for (i = 0; i < STEP_COUNT; ++i)
 	{
 		roomNumber2 = roomNumber;
-		auto* floor = GetFloor(x, y, z, &roomNumber);
+		auto* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 
 		if (g_Level.Rooms[roomNumber2].flags & ENV_FLAG_SWAMP)
 		{
@@ -291,30 +286,30 @@ bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 			break;
 		}
 
-		int floorHeight = GetFloorHeight(floor, x, y, z);
-		int ceilingHeight = GetCeiling(floor, x, y, z);
-		if (floorHeight != NO_HEIGHT && ceilingHeight != NO_HEIGHT && ceilingHeight < floorHeight)
+		int floorHeight = GetFloorHeight(floor, pos.x, pos.y, pos.z);
+		int ceilingHeight = GetCeiling(floor, pos.x, pos.y, pos.z);
+		if (ceilingHeight < floorHeight)
 		{
-			if (y > floorHeight)
+			if (pos.y > floorHeight)
 			{
-				if (y - floorHeight >= push)
+				if (pos.y - floorHeight >= push)
 				{
 					flag = true;
 					break;
 				}
 
-				y = floorHeight;
+				pos.y = floorHeight;
 			}
 
-			if (y < ceilingHeight)
+			if (pos.y < ceilingHeight)
 			{
-				if (ceilingHeight - y >= push)
+				if (ceilingHeight - pos.y >= push)
 				{
 					flag = true;
 					break;
 				}
 
-				y = ceilingHeight;
+				pos.y = ceilingHeight;
 			}
 
 			result = true;
@@ -325,23 +320,14 @@ bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 			break;
 		}
 
-		x += dx;
-		y += dy;
-		z += dz;
+		pos += step;
 	}
 
 	if (i != 0)
-	{
-		x -= dx;
-		y -= dy;
-		z -= dz;
-	}
+		pos -= step;
 
-	GetFloor(x, y, z, &roomNumber2);
-	target->x = x;
-	target->y = y;
-	target->z = z;
-	target->RoomNumber = roomNumber2;
+	GetFloor(pos.x, pos.y, pos.z, &roomNumber2);
+	*target = GameVector(pos, roomNumber2);
 
 	return !flag;
 }
