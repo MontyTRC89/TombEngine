@@ -98,9 +98,14 @@ namespace TEN::Collision::Los
 					float intersectDist = 0.0f;
 					if (box.Intersects(origin, dir, intersectDist))
 					{
-						// TODO: Probe room number.
 						if (intersectDist <= dist)
-							losInstances.push_back(LosInstanceData{ itemPtr, NO_VALUE, Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
+						{
+							auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
+							auto offset = intersectPos - itemPtr->Pose.Position.ToVector3();
+							int intersectRoomNumber = GetCollision(itemPtr->Pose.Position, itemPtr->RoomNumber, offset).RoomNumber;
+
+							losInstances.push_back(LosInstanceData{ itemPtr, NO_VALUE, intersectPos, intersectRoomNumber, intersectDist });
+						}
 					}
 				}
 
@@ -115,9 +120,14 @@ namespace TEN::Collision::Los
 						float intersectDist = 0.0f;
 						if (sphere.Intersects(origin, dir, intersectDist))
 						{
-							// TODO: Probe room number.
 							if (intersectDist <= dist)
-								losInstances.push_back(LosInstanceData{ itemPtr, i, Geometry::TranslatePoint(origin, dir, intersectDist), itemPtr->RoomNumber, intersectDist });
+							{
+								auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
+								auto offset = intersectPos - itemPtr->Pose.Position.ToVector3();
+								int intersectRoomNumber = GetCollision(itemPtr->Pose.Position, itemPtr->RoomNumber, offset).RoomNumber;
+
+								losInstances.push_back(LosInstanceData{ itemPtr, i, intersectPos, intersectRoomNumber, intersectDist });
+							}
 						}
 					}
 				}
@@ -135,9 +145,14 @@ namespace TEN::Collision::Los
 				float intersectDist = 0.0f;
 				if (box.Intersects(origin, dir, intersectDist))
 				{
-					// TODO: Probe room number.
 					if (intersectDist <= dist)
-						losInstances.push_back(LosInstanceData{ staticPtr, NO_VALUE, Geometry::TranslatePoint(origin, dir, intersectDist), staticPtr->roomNumber, intersectDist });
+					{
+						auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
+						auto offset = intersectPos - staticPtr->pos.Position.ToVector3();
+						int intersectRoomNumber = GetCollision(staticPtr->pos.Position, staticPtr->roomNumber, offset).RoomNumber;
+
+						losInstances.push_back(LosInstanceData{ staticPtr, NO_VALUE, intersectPos, intersectRoomNumber, intersectDist });
+					}
 				}
 			}
 		}

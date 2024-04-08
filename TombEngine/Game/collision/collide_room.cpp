@@ -181,6 +181,15 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3&
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3i& offset)
+{
+	auto dir = offset;
+	dir.Normalize();
+	float dist = offset.Length();
+
+	return GetCollision(pos, roomNumber, dir, dist);
+}
+
 // Overload used as universal wrapper across collisional code replacing
 // triads of roomNumber-GetFloor()-GetFloorHeight() calls.
 // Advantage is that it does NOT modify incoming roomNumber argument,
