@@ -20,8 +20,10 @@ namespace TEN::Collision::Sphere
 
 	bool SetSphereTouchBits(ItemInfo& creatureItem, ItemInfo& playerItem)
 	{
-		auto creatureSpheres = GetSpheres(creatureItem, (int)SphereSpaceFlags::World | (int)SphereSpaceFlags::BoneOrigin);
-		auto playerSpheres = GetSpheres(playerItem, (int)SphereSpaceFlags::World | (int)SphereSpaceFlags::BoneOrigin);
+		constexpr auto FLAGS = (int)SphereSpaceFlags::World | (int)SphereSpaceFlags::BoneOrigin;
+
+		auto creatureSpheres = GetSpheres(creatureItem, FLAGS);
+		auto playerSpheres = GetSpheres(playerItem, FLAGS);
 
 		playerItem.TouchBits.ClearAll();
 
