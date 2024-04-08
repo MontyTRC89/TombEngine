@@ -24,7 +24,7 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 	auto* ballItem = &g_Level.Items[itemNumber];
 
 	if (!TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius) ||
-		!SetSphereTouchBits(ballItem, laraItem))
+		!SetSphereTouchBits(*ballItem, *laraItem))
 	{
 		return;
 	}
@@ -322,7 +322,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 		if (!TestBoundsCollide(item, lara, coll->Setup.Radius))
 			return;
 
-		if (!SetSphereTouchBits(item, lara))
+		if (!SetSphereTouchBits(*item, *lara))
 			return;
 
 		if (lara->Animation.IsAirborne)

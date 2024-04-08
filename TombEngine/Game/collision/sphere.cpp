@@ -18,16 +18,16 @@ namespace TEN::Collision::Sphere
 		return g_Renderer.GetSpheres(item.Index, spaceFlags, Matrix::Identity);
 	}
 
-	bool SetSphereTouchBits(ItemInfo* creatureItemPtr, ItemInfo* playerItemPtr)
+	bool SetSphereTouchBits(ItemInfo& creatureItem, ItemInfo& playerItem)
 	{
-		auto creatureSpheres = GetSpheres(*creatureItemPtr, (int)SphereSpaceFlags::World);
-		auto playerSpheres = GetSpheres(*playerItemPtr, (int)SphereSpaceFlags::World);
+		auto creatureSpheres = GetSpheres(creatureItem, (int)SphereSpaceFlags::World);
+		auto playerSpheres = GetSpheres(playerItem, (int)SphereSpaceFlags::World);
 
-		playerItemPtr->TouchBits.ClearAll();
+		playerItem.TouchBits.ClearAll();
 
 		if (creatureSpheres.empty())
 		{
-			creatureItemPtr->TouchBits.ClearAll();
+			creatureItem.TouchBits.ClearAll();
 			return false;
 		}
 
@@ -49,8 +49,8 @@ namespace TEN::Collision::Sphere
 					continue;
 
 				// Calculate parameters.
-				auto creatureSpherePos = creatureItemPtr->Pose.Position.ToVector3() + creatureSphere.Center;
-				auto playerSpherePos = creatureItemPtr->Pose.Position.ToVector3() + playerSphere.Center;
+				auto creatureSpherePos = creatureItem.Pose.Position.ToVector3() + creatureSphere.Center;
+				auto playerSpherePos = creatureItem.Pose.Position.ToVector3() + playerSphere.Center;
 				float distMax = SQUARE(creatureSphere.Radius + playerSphere.Radius);
 
 				// Test distance.
@@ -58,8 +58,8 @@ namespace TEN::Collision::Sphere
 					continue;
 
 				// Set touch bits.
-				creatureItemPtr->TouchBits.Set(i);
-				playerItemPtr->TouchBits.Set(j);
+				creatureItem.TouchBits.Set(i);
+				playerItem.TouchBits.Set(j);
 
 				isCollided = true;
 				break;

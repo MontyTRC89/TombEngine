@@ -120,7 +120,7 @@ namespace TEN::Entities::Generic
 			// Test bounds collision.
 			if (TestBoundsCollide(&poleItem, laraItem, LARA_RADIUS + (int)round(abs(laraItem->Animation.Velocity.z))))
 			{
-				if (SetSphereTouchBits(&poleItem, laraItem))
+				if (SetSphereTouchBits(poleItem, *laraItem))
 				{
 					// Temporarily reorient pole.
 					short yOrient = poleItem.Pose.Orientation.y;

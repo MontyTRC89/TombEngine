@@ -79,7 +79,7 @@ namespace TEN::Entities::Traps
 			if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 				return;
 
-			SetSphereTouchBits(&item, playerItem);
+			SetSphereTouchBits(item, *playerItem);
 		}
 		else if (item.Status != ITEM_INVISIBLE)
 		{
