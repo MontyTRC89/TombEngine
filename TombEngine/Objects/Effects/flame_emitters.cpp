@@ -62,7 +62,7 @@ namespace TEN::Entities::Effects
 
 	void BurnNearbyItems(ItemInfo* item, int radius)
 	{
-		GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
+		GetCollidedObjects(item, true, false, CollidedItems, CollidedMeshes);
 
 		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 		{

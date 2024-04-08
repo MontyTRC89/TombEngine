@@ -23,7 +23,7 @@ struct ObjectCollisionBounds
 };
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara);
+bool GetCollidedObjects(ItemInfo* collidingItem, bool onlyVisible, bool ignorePlayer, ItemInfo** collidedItems, MESH_INFO** collidedMeshes);
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll);
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll);
 

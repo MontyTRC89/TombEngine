@@ -102,10 +102,15 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 	}
 }
 
-bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara)
+bool GetCollidedObjects(ItemInfo* collidingItem, bool onlyVisible, bool ignorePlayer, ItemInfo** collidedItems, MESH_INFO** collidedMeshes)
 {
 	int numItems  = 0;
 	int numMeshes = 0;
+
+	if (collidedItems)
+		collidedItems[0] = nullptr;
+	if (collidedMeshes)
+		collidedMeshes[0] = nullptr;
 
 	const auto& collidingItemBounds  = GetBestFrame(*collidingItem).BoundingBox;
 	const auto& collidingItemExtents = collidingItemBounds.GetExtents();
@@ -115,11 +120,6 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 	// Quickly discard collision if colliding item bounds are below tolerance threshold.
 	if (collidingItemSphere.Radius <= EXTENTS_LENGTH_TOLERANCE_THRESHOLD)
 	{
-		if (collidedMeshes)
-			collidedMeshes[0] = nullptr;
-		if (collidedItems)
-			collidedItems[0]  = nullptr;
-
 		return false;
 	}
 
@@ -178,11 +178,6 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 				if (bounds1.Intersects(bounds2))
 				{
 					collidedMeshes[numMeshes++] = mesh;
-					if (!radius)
-					{
-						collidedItems[0] = nullptr;
-						return true;
-					}
 				}
 			}
 
@@ -201,7 +196,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 					// Discard all items not feasible for collision checks.
 					if (item == collidingItem ||
-						(ignoreLara && item->ObjectNumber == ID_LARA) ||
+						(ignorePlayer && item->ObjectNumber == ID_LARA) ||
 						(onlyVisible && item->Status == ITEM_INVISIBLE) ||
 						item->Flags & IFLAG_KILLED ||
 						item->MeshBits == NO_JOINT_BITS ||
@@ -262,14 +257,10 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					if (bounds1.Intersects(bounds2))
 					{
 						collidedItems[numItems++] = item;
-						if (!radius)
-							return true;
 					}
 				}
 				while (itemNumber != NO_VALUE);
 			}
-
-			collidedItems[numItems] = nullptr;
 		}
 	}
 

@@ -50,7 +50,7 @@ namespace TEN::Entities::Traps
 		auto pointColl0 = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2);
 		auto pointColl1 = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2, (bounds.X2 - bounds.X1) / 2);
 
-		if (GetCollidedObjects(&item, CLICK(1), true, CollidedItems, CollidedMeshes, true))
+		if (GetCollidedObjects(&item, true, true, CollidedItems, CollidedMeshes))
 		{
 			int collidedItemNumber = 0;
 			while (CollidedItems[collidedItemNumber] != nullptr)

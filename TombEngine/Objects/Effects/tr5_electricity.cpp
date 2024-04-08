@@ -142,8 +142,6 @@ void ElectricityWiresControl(short itemNumber)
 
 	SoundEffect(SFX_TR5_ELECTRIC_WIRES, &item->Pose);
 
-	GetCollidedObjects(item, BLOCK(4), true, CollidedItems, nullptr, 0) && CollidedItems[0];
-
 	auto* object = &Objects[item->ObjectNumber];
 
 	auto cableBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
@@ -178,6 +176,8 @@ void ElectricityWiresControl(short itemNumber)
 
 	if (GetRandomControl() & 1)
 		return;
+
+	GetCollidedObjects(item, true, false, CollidedItems, nullptr);
 
 	int k = 0;
 	while (CollidedItems[k] != nullptr)

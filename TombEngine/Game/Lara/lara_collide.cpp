@@ -753,7 +753,7 @@ bool TestLaraObjectCollision(ItemInfo* item, short headingAngle, int forward, in
 	item->Pose.Position.y += down;
 	item->Pose.Position.z += phd_cos(item->Pose.Orientation.y + headingAngle) * forward + phd_sin(headingAngle + ANGLE(90.0f) * sideSign) * abs(right);
 
-	bool result = GetCollidedObjects(item, LARA_RADIUS, true, CollidedItems, CollidedMeshes, 0);
+	bool result = GetCollidedObjects(item, true, false, CollidedItems, CollidedMeshes);
 
 	item->Pose = prevPose;
 	return result;

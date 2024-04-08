@@ -107,7 +107,7 @@ namespace TEN::Entities::Traps
 			break;
 		}
 
-		if (GetCollidedObjects(&item, CLICK(1), true, CollidedItems, CollidedMeshes, true))
+		if (GetCollidedObjects(&item, true, true, CollidedItems, CollidedMeshes))
 		{
 			int lp = 0;
 			while (CollidedItems[lp] != nullptr)

@@ -230,7 +230,7 @@ static void HideOrDisablePickup(ItemInfo& pickupItem)
 void CollectMultiplePickups(int itemNumber)
 {
 	auto* firstItem = &g_Level.Items[itemNumber];
-	GetCollidedObjects(firstItem, LARA_RADIUS, true, CollidedItems, CollidedMeshes, true);
+	GetCollidedObjects(firstItem, true, true, CollidedItems, CollidedMeshes);
 
 	for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
 	{
@@ -847,7 +847,7 @@ void DropPickups(ItemInfo* item)
 	origin.y = yPos; // Initialize drop origin Y point as floor height at centerpoint, in case all corner tests fail.
 
 	// Also collect objects which are around.
-	bool collidedWithObjects = GetCollidedObjects(item, extents.Length(), true, CollidedItems, CollidedMeshes, true);
+	bool collidedWithObjects = GetCollidedObjects(item, true, true, CollidedItems, CollidedMeshes);
 
 	short startAngle = ANGLE(Random::GenerateInt(0, 3) * 90); // Randomize start corner.
 

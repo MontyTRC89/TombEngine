@@ -116,7 +116,7 @@ namespace TEN::Entities::Generic
 		// Test object collision.
 		auto prevPos = pushableItem.Pose.Position;
 		pushableItem.Pose.Position = targetPos;
-		GetCollidedObjects(&pushableItem, BLOCK(0.25f), true, &CollidedItems[0], &CollidedMeshes[0], true);
+		GetCollidedObjects(&pushableItem, true, true, CollidedItems, CollidedMeshes);
 		pushableItem.Pose.Position = prevPos;
 
 		if (CollidedMeshes[0])
@@ -191,7 +191,7 @@ namespace TEN::Entities::Generic
 		// Collide with objects.
 		auto prevPos = LaraItem->Pose.Position;
 		LaraItem->Pose.Position = pointColl.Coordinates;
-		GetCollidedObjects(LaraItem, LARA_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], true);
+		GetCollidedObjects(LaraItem, true, true, CollidedItems, CollidedMeshes);
 		LaraItem->Pose.Position = prevPos;
 
 		if (CollidedMeshes[0])

@@ -1554,7 +1554,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		}
 
 		// Found possible collided items and statics.
-		GetCollidedObjects(&projectile, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
+		GetCollidedObjects(&projectile, true, false, CollidedItems, CollidedMeshes);
 
 		// If no collided items and meshes are found, exit the loop.
 		if (!CollidedItems[0] && !CollidedMeshes[0])
