@@ -106,6 +106,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 	int numMeshes = 0;
 
 	auto collidingItemBounds = GetBestFrame(*collidingItem).BoundingBox;
+	auto collidingItemSphere = BoundingSphere(collidingItemBounds.GetCenter(), collidingItemBounds.GetExtents().Length());
 
 	// Collect all the rooms where to check
 	for (auto i : g_Level.Rooms[collidingItem->RoomNumber].neighbors)
@@ -209,6 +210,14 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 					if ((collidingItem->Pose.Position.y + collidingItemBounds.Y1 - CLICK(0.5f)) > item->Pose.Position.y + itemBounds.Y2 + CLICK(0.5f) ||
 						(collidingItem->Pose.Position.y + collidingItemBounds.Y2 + CLICK(0.5f)) < item->Pose.Position.y + itemBounds.Y1 - CLICK(0.5f))
+					{
+						itemNumber = item->NextItem;
+						continue;
+					}
+
+					auto itemSphere = BoundingSphere(itemBounds.GetCenter(), itemBounds.GetExtents().Length());
+
+					if (!itemSphere.Intersects(collidingItemSphere))
 					{
 						itemNumber = item->NextItem;
 						continue;
