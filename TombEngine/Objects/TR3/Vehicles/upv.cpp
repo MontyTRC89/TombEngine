@@ -184,7 +184,7 @@ namespace TEN::Entities::Vehicles
 		if (mountType == VehicleMountType::None)
 		{
 			// HACK: Collision in water behaves differently? @Sezz 2022.06.28
-			if (TestBoundsCollide(UPVItem, laraItem, coll->Setup.Radius) && TestCollision(UPVItem, laraItem))
+			if (TestBoundsCollide(UPVItem, laraItem, coll->Setup.Radius) && SetSphereTouchBits(UPVItem, laraItem))
 				ItemPushItem(UPVItem, laraItem, coll, false, 0);
 		}
 		else

@@ -39,7 +39,7 @@ namespace TEN::Entities::Doors
 		{
 			if (TestBoundsCollide(doorItem, laraItem, coll->Setup.Radius))
 			{
-				if (TestCollision(doorItem, laraItem))
+				if (SetSphereTouchBits(doorItem, laraItem))
 				{
 					if (coll->Setup.EnableObjectPush)
 						ItemPushItem(doorItem, laraItem, coll, 0, 1);

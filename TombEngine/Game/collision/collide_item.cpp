@@ -38,7 +38,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 	{
 		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		{
-			int collidedBits = TestCollision(item, laraItem);
+			int collidedBits = SetSphereTouchBits(item, laraItem);
 			if (collidedBits != 0)
 			{
 				short prevYOrient = item->Pose.Orientation.y;
@@ -1974,7 +1974,7 @@ void ObjectCollision(const short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 
 	if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 	{
-		if (TestCollision(item, laraItem))
+		if (SetSphereTouchBits(item, laraItem))
 		{
 			if (coll->Setup.EnableObjectPush)
 				ItemPushItem(item, laraItem, coll, false, 1);
@@ -1989,7 +1989,7 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 	if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		return;
 
-	if (!TestCollision(item, laraItem))
+	if (!SetSphereTouchBits(item, laraItem))
 		return;
 
 	bool doPlayerCollision = laraItem->IsLara();
@@ -2024,7 +2024,7 @@ void TrapCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 
-		TestCollision(&item, playerItem);
+		SetSphereTouchBits(&item, playerItem);
 	}
 	else if (item.Status != ITEM_INVISIBLE)
 	{

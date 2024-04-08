@@ -55,7 +55,7 @@ namespace TEN::Entities::Vehicles
 			return VehicleMountType::None;
 
 		// Assess object collision.
-		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !TestCollision(vehicleItem, laraItem))
+		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !SetSphereTouchBits(vehicleItem, laraItem))
 			return VehicleMountType::None;
 
 		bool hasInputAction = IsHeld(In::Action);

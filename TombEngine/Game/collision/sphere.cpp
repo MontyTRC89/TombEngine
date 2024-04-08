@@ -18,21 +18,21 @@ namespace TEN::Collision::Sphere
 		return g_Renderer.GetSpheres(item.Index, spaceFlags, Matrix::Identity);
 	}
 
-	int TestCollision(ItemInfo* creatureItemPtr, ItemInfo* playerItemPtr)
+	bool SetSphereTouchBits(ItemInfo* creatureItemPtr, ItemInfo* playerItemPtr)
 	{
 		auto creatureSpheres = GetSpheres(*creatureItemPtr, (int)SphereSpaceFlags::World);
 		auto playerSpheres = GetSpheres(*playerItemPtr, (int)SphereSpaceFlags::World);
 
 		playerItemPtr->TouchBits.ClearAll();
 
-		int flags = 0;
 		if (creatureSpheres.empty())
 		{
 			creatureItemPtr->TouchBits.ClearAll();
-			return flags;
+			return false;
 		}
 
 		// Run through creature spheres.
+		bool isCollided = false;
 		for (int i = 0; i < creatureSpheres.size(); i++)
 		{
 			// Get creature sphere.
@@ -60,11 +60,12 @@ namespace TEN::Collision::Sphere
 				// Set touch bits.
 				creatureItemPtr->TouchBits.Set(i);
 				playerItemPtr->TouchBits.Set(j);
-				flags |= 1 << i;
+
+				isCollided = true;
 				break;
 			}
 		}
 
-		return flags;
+		return isCollided;
 	}
 }
