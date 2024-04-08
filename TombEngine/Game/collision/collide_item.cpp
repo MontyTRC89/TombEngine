@@ -106,8 +106,8 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 	int numItems  = 0;
 	int numMeshes = 0;
 
-	auto collidingItemBounds = GetBestFrame(*collidingItem).BoundingBox;
-	auto collidingItemSphere = BoundingSphere(collidingItemBounds.GetCenter() + collidingItem->Pose.Position.ToVector3(), collidingItemBounds.GetExtents().Length());
+	const auto& collidingItemBounds = GetBestFrame(*collidingItem).BoundingBox;
+	const auto& collidingItemSphere = BoundingSphere(collidingItemBounds.GetCenter() + collidingItem->Pose.Position.ToVector3(), collidingItemBounds.GetExtents().Length());
 
 	// Quickly discard collision if colliding item bounds are below tolerance threshold.
 	if (collidingItemSphere.Radius <= EXTENTS_LENGTH_TOLERANCE_THRESHOLD)
@@ -133,15 +133,15 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 			for (int j = 0; j < room->mesh.size(); j++)
 			{
 				auto* mesh = &room->mesh[j];
-				const auto& bBox = GetBoundsAccurate(*mesh, false);
+				const auto& staticBounds = GetBoundsAccurate(*mesh, false);
 
 				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
-				if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) < (mesh->pos.Position.y + bBox.Y1))
+				if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) < (mesh->pos.Position.y + staticBounds.Y1))
 					continue;
 
-				if (collidingItem->Pose.Position.y > (mesh->pos.Position.y + bBox.Y2))
+				if (collidingItem->Pose.Position.y > (mesh->pos.Position.y + staticBounds.Y2))
 					continue;
 
 				float sinY = phd_sin(mesh->pos.Orientation.y);
@@ -150,10 +150,10 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 				float rx = ((collidingItem->Pose.Position.x - mesh->pos.Position.x) * cosY) - ((collidingItem->Pose.Position.z - mesh->pos.Position.z) * sinY);
 				float rz = ((collidingItem->Pose.Position.z - mesh->pos.Position.z) * cosY) + ((collidingItem->Pose.Position.x - mesh->pos.Position.x) * sinY);
 
-				if ((radius + rx + CLICK(0.5f) < bBox.X1) || (rx - radius - CLICK(0.5f) > bBox.X2))
+				if ((radius + rx + CLICK(0.5f) < staticBounds.X1) || (rx - radius - CLICK(0.5f) > staticBounds.X2))
 					continue;
 
-				if ((radius + rz + CLICK(0.5f) < bBox.Z1) || (rz - radius - CLICK(0.5f) > bBox.Z2))
+				if ((radius + rz + CLICK(0.5f) < staticBounds.Z1) || (rz - radius - CLICK(0.5f) > staticBounds.Z2))
 					continue;
 
 				collidedMeshes[numMeshes++] = mesh;
@@ -207,17 +207,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 						continue;
 					}
 
-					auto itemBounds = GetBestFrame(*item).BoundingBox;
-
-					// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
-					if (item->ObjectNumber == ID_TURN_SWITCH)
-					{
-						itemBounds.X1 = -CLICK(1);
-						itemBounds.X2 =  CLICK(1);
-						itemBounds.Z1 = -CLICK(1);
-						itemBounds.Z1 =  CLICK(1);
-					}
-
+					const auto& itemBounds = GetBestFrame(*item).BoundingBox;
 					auto extents = itemBounds.GetExtents();
 
 					// If item bounding box extents is below tolerance threshold, discard the object.
@@ -225,7 +215,6 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					{
 						continue;
 					}
-
 
 					// Do a rough distance test to discard objects which are not intersecting vertically.
 					if ((collidingItem->Pose.Position.y + collidingItemBounds.Y1 - CLICK(0.5f)) > item->Pose.Position.y + itemBounds.Y2 + CLICK(0.5f) ||
