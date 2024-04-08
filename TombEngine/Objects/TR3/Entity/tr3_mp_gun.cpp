@@ -65,7 +65,7 @@ namespace TEN::Entities::Creatures::TR3
 		short angle = 0;
 		short tilt = 0;
 		short head = 0;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;
@@ -123,7 +123,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+					if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
 						continue;
 
 					auto* target = &g_Level.Items[currentCreature->ItemNumber];

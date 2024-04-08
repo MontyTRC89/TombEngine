@@ -6,10 +6,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/setup.h"
+#include "Objects/Generic/Object/BridgeObject.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Entities::Generic;
 
 // NOTES:
 // ItemFlags[0]: Delay in frame time.
@@ -39,13 +41,59 @@ namespace TEN::Entities::Traps
 		CRUMBLING_PLATFORM_ANIM_LAND = 3
 	};
 
+	static std::optional<int> GetCrumblingPlatformFloorHeight(const ItemInfo& item, const Vector3i& pos)
+	{
+		if (item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE ||
+			item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_SHAKE)
+		{
+			auto boxHeight = GetBridgeItemIntersect(item, pos, false);
+			if (boxHeight.has_value())
+				return *boxHeight;
+		}
+
+		return std::nullopt;
+	}
+
+	static std::optional<int> GetCrumblingPlatformCeilingHeight(const ItemInfo& item, const Vector3i& pos)
+	{
+		if (item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE ||
+			item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_SHAKE)
+		{
+			auto boxHeight = GetBridgeItemIntersect(item, pos, true);
+			if (boxHeight.has_value())
+				return *boxHeight;
+		}
+
+		return std::nullopt;
+	}
+
+	static int GetCrumblingPlatformFloorBorder(const ItemInfo& item)
+	{
+		auto bounds = GameBoundingBox(&item);
+		return bounds.Y1;
+	}
+
+	static int GetCrumblingPlatformCeilingBorder(const ItemInfo& item)
+	{
+		auto bounds = GameBoundingBox(&item);
+		return bounds.Y2;
+	}
+
 	void InitializeCrumblingPlatform(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
+		item.Data = BridgeObject();
+		auto& bridge = GetBridgeObject(item);
+
+		// Initialize routines.
+		bridge.GetFloorHeight = GetCrumblingPlatformFloorHeight;
+		bridge.GetCeilingHeight = GetCrumblingPlatformCeilingHeight;
+		bridge.GetFloorBorder = GetCrumblingPlatformFloorBorder;
+		bridge.GetCeilingBorder = GetCrumblingPlatformCeilingBorder;
 
 		int delayInFrameTime = (item.TriggerFlags != 0) ? std::abs(item.TriggerFlags) : (int)round(CRUMBLING_PLATFORM_DELAY * FPS);
 		item.ItemFlags[0] = delayInFrameTime;
-		UpdateBridgeItem(itemNumber);
+		UpdateBridgeItem(item);
 	}
 
 	static void ActivateCrumblingPlatform(short itemNumber)
@@ -77,78 +125,82 @@ namespace TEN::Entities::Traps
 
 		switch (item.Animation.ActiveState)
 		{
-			case CRUMBLING_PLATFORM_STATE_SHAKE:
-			{
-				if (item.ItemFlags[0] > 0)
-				{
-					item.ItemFlags[0]--;
-				}
-				else
-				{
-					item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_FALL;
-					item.ItemFlags[1] = CRUMBLING_PLATFORM_VELOCITY_MIN;
-
-					auto pointColl = GetCollision(item);
-					pointColl.Block->RemoveBridge(itemNumber);
-				}
-			}
-
+		case CRUMBLING_PLATFORM_STATE_IDLE:
 			break;
 
-			case CRUMBLING_PLATFORM_STATE_FALL:
+		case CRUMBLING_PLATFORM_STATE_SHAKE:
+		{
+			if (item.ItemFlags[0] > 0)
 			{
-				short& fallVel = item.ItemFlags[1];
+				item.ItemFlags[0]--;
+			}
+			else
+			{
+				item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_FALL;
+				item.ItemFlags[1] = CRUMBLING_PLATFORM_VELOCITY_MIN;
 
-				// Get point collision.
-				auto box = GameBoundingBox(&item);
 				auto pointColl = GetCollision(item);
-				int relFloorHeight = (item.Pose.Position.y - pointColl.Position.Floor) - box.Y1 ;
-
-				// Airborne.
-				if (relFloorHeight <= fallVel)
-				{
-					fallVel += CRUMBLING_PLATFORM_VELOCITY_ACCEL;
-					if (fallVel > CRUMBLING_PLATFORM_VELOCITY_MAX)
-						fallVel = CRUMBLING_PLATFORM_VELOCITY_MAX;
-
-					item.Pose.Position.y += fallVel;
-				}
-				// Grounded.
-				else
-				{
-					item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_LAND;
-					item.Pose.Position.y = pointColl.Position.Floor;
-				}
-
-				// Update room number.
-				int probedRoomNumber = pointColl.RoomNumber;
-				if (item.RoomNumber != probedRoomNumber)
-					ItemNewRoom(itemNumber, probedRoomNumber);
+				pointColl.Block->RemoveBridge(itemNumber);
 			}
+		}
 
-			break;
+		break;
 
-			case CRUMBLING_PLATFORM_STATE_LAND:
+		case CRUMBLING_PLATFORM_STATE_FALL:
+		{
+			short& fallVel = item.ItemFlags[1];
+
+			// Get point collision.
+			auto box = GameBoundingBox(&item);
+			auto pointColl = GetCollision(item);
+			int relFloorHeight = (item.Pose.Position.y - pointColl.Position.Floor) - box.Y1 ;
+
+			// Airborne.
+			if (relFloorHeight <= fallVel)
 			{
-				// Align to surface.
-				auto radius = Vector2(Objects[item.ObjectNumber].radius);
-				AlignEntityToSurface(&item, radius);
+				fallVel += CRUMBLING_PLATFORM_VELOCITY_ACCEL;
+				if (fallVel > CRUMBLING_PLATFORM_VELOCITY_MAX)
+					fallVel = CRUMBLING_PLATFORM_VELOCITY_MAX;
 
-				// Deactivate.
-				if (TestLastFrame(&item))
-				{
-					RemoveActiveItem(itemNumber);
-					item.Status = ITEM_NOT_ACTIVE;
-				}
+				item.Pose.Position.y += fallVel;
+			}
+			// Grounded.
+			else
+			{
+				item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_LAND;
+				item.Pose.Position.y = pointColl.Position.Floor;
 			}
 
-			break;
+			// Update room number.
+			int probedRoomNumber = pointColl.RoomNumber;
+			if (item.RoomNumber != probedRoomNumber)
+				ItemNewRoom(itemNumber, probedRoomNumber);
+		}
 
-			default:
-				TENLog(
-					"Error with crumbling platform with entity ID" + std::to_string(itemNumber) + ". animation state not recognized.",
-					LogLevel::Error, LogConfig::All);
-				break;
+		break;
+
+		case CRUMBLING_PLATFORM_STATE_LAND:
+		{
+			// Align to surface.
+			auto radius = Vector2(Objects[item.ObjectNumber].radius);
+			AlignEntityToSurface(&item, radius);
+
+			// Deactivate.
+			if (TestLastFrame(&item))
+			{
+				RemoveActiveItem(itemNumber);
+				item.Status = ITEM_NOT_ACTIVE;
+			}
+		}
+
+		break;
+
+		default:
+			TENLog(
+				"Error with crumbling platform item " + std::to_string(itemNumber) +
+				": attempted to handle missing state " + std::to_string(item.Animation.ActiveState),
+				LogLevel::Error, LogConfig::All);
+			break;
 		}
 
 		AnimateItem(&item);
@@ -172,51 +224,5 @@ namespace TEN::Entities::Traps
 				ActivateCrumblingPlatform(itemNumber);
 			}
 		}
-	}
-
-	std::optional<int> CrumblingPlatformFloor(short itemNumber, int x, int y, int z)
-	{
-		const auto& item = g_Level.Items[itemNumber];
-
-		if (item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE ||
-			item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_SHAKE)
-		{
-			auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
-			if (boxHeight.has_value())
-				return *boxHeight;
-		}
-
-		return std::nullopt;
-	}
-
-	std::optional<int> CrumblingPlatformCeiling(short itemNumber, int x, int y, int z)
-	{
-		const auto& item = g_Level.Items[itemNumber];
-
-		if (item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_IDLE ||
-			item.Animation.ActiveState == CRUMBLING_PLATFORM_STATE_SHAKE)
-		{
-			auto boxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
-			if (boxHeight.has_value())
-				return *boxHeight;
-		}
-
-		return std::nullopt;
-	}
-
-	int CrumblingPlatformFloorBorder(short itemNumber)
-	{
-		const auto& item = g_Level.Items[itemNumber];
-
-		auto bounds = GameBoundingBox(&item);
-		return bounds.Y1;
-	}
-
-	int CrumblingPlatformCeilingBorder(short itemNumber)
-	{
-		const auto& item = g_Level.Items[itemNumber];
-
-		auto bounds = GameBoundingBox(&item);
-		return bounds.Y2;
 	}
 }

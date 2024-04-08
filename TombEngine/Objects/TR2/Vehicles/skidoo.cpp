@@ -137,7 +137,7 @@ namespace TEN::Entities::Vehicles
 		auto* skidooItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(skidooItem, laraItem, coll, SkidooMountTypes, SKIDOO_MOUNT_DISTANCE);
@@ -203,7 +203,7 @@ namespace TEN::Entities::Vehicles
 		auto* lara = GetLaraInfo(laraItem);
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
-		if (lara->Context.Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_VALUE)
 		{
 			if ((laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_RIGHT || laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_LEFT) &&
 				TestLastFrame(laraItem))
@@ -324,6 +324,7 @@ namespace TEN::Entities::Vehicles
 
 			default:
 				drive = SkidooUserControl(skidooItem, laraItem, height, &pitch);
+				HandleVehicleSpeedometer(skidooItem->Animation.Velocity.z, SKIDOO_FAST_VELOCITY_MAX);
 				break;
 			}
 		}
@@ -450,9 +451,9 @@ namespace TEN::Entities::Vehicles
 			}
 			else if (IsHeld(In::Accelerate))
 			{
-				if (IsHeld(In::Speed))
+				if (IsHeld(In::Faster))
 					maxVelocity = SKIDOO_FAST_VELOCITY_MAX;
-				else if (IsHeld(In::Slow))
+				else if (IsHeld(In::Slower))
 					maxVelocity = SKIDOO_SLOW_VELOCITY_MAX;
 				else
 					maxVelocity = SKIDOO_NORMAL_VELOCITY_MAX;
@@ -689,7 +690,8 @@ namespace TEN::Entities::Vehicles
 
 	void DoSnowEffect(ItemInfo* skidooItem)
 	{
-		auto material = GetCollision(skidooItem).BottomBlock->Material;
+		auto pointColl = GetCollision(skidooItem);
+		auto material = pointColl.BottomBlock->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
 		if (material != MaterialType::Ice && material != MaterialType::Snow)
 			return;
 

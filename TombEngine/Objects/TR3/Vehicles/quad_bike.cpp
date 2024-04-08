@@ -178,7 +178,7 @@ namespace TEN::Entities::Vehicles
 		auto* quadBikeItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(quadBikeItem, laraItem, coll, QuadBikeMountTypes, QBIKE_MOUNT_DISTANCE);
@@ -261,7 +261,7 @@ namespace TEN::Entities::Vehicles
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Context.Vehicle == NO_ITEM)
+		if (lara->Context.Vehicle == NO_VALUE)
 			return true;
 
 		if ((laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_RIGHT || laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_LEFT) &&
@@ -832,7 +832,7 @@ namespace TEN::Entities::Vehicles
 
 		bool drive = false; // Never changes?
 
-		if (!IsHeld(In::Speed) &&
+		if (!IsHeld(In::Faster) &&
 			!quadBike->Velocity && !quadBike->CanStartDrift)
 		{
 			quadBike->CanStartDrift = true;
@@ -840,7 +840,7 @@ namespace TEN::Entities::Vehicles
 		else if (quadBike->Velocity)
 			quadBike->CanStartDrift = false;
 
-		if (!IsHeld(In::Speed))
+		if (!IsHeld(In::Faster))
 			quadBike->DriftStarting = false;
 
 		if (!quadBike->DriftStarting)
@@ -861,7 +861,7 @@ namespace TEN::Entities::Vehicles
 			// Driving forward.
 			if (quadBike->Velocity > 0)
 			{
-				if (IsHeld(In::Speed) &&
+				if (IsHeld(In::Faster) &&
 					!quadBike->DriftStarting &&
 					quadBike->Velocity > MIN_DRIFT_VELOCITY)
 				{
@@ -897,7 +897,7 @@ namespace TEN::Entities::Vehicles
 			// Driving back.
 			else if (quadBike->Velocity < 0)
 			{
-				if (IsHeld(In::Speed) &&
+				if (IsHeld(In::Faster) &&
 					!quadBike->DriftStarting &&
 					quadBike->Velocity < (-MIN_DRIFT_VELOCITY + 0x800))
 				{
@@ -934,7 +934,7 @@ namespace TEN::Entities::Vehicles
 			// Driving back / braking.
 			if (IsHeld(In::Reverse))
 			{
-				if (IsHeld(In::Speed) &&
+				if (IsHeld(In::Faster) &&
 					(quadBike->CanStartDrift || quadBike->DriftStarting))
 				{
 					quadBike->DriftStarting = true;
@@ -952,7 +952,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else if (IsHeld(In::Accelerate))
 			{
-				if (IsHeld(In::Speed) &&
+				if (IsHeld(In::Faster) &&
 					(quadBike->CanStartDrift || quadBike->DriftStarting))
 				{
 					quadBike->DriftStarting = true;
@@ -1044,7 +1044,7 @@ namespace TEN::Entities::Vehicles
 			spark->sLife = spark->life = 9;
 
 		// TODO: Switch back to screen blend mode once rendering for it is refactored. -- Sezz 2023.01.14
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 4;
 		spark->extras = 0;
@@ -1130,6 +1130,7 @@ namespace TEN::Entities::Vehicles
 
 			default:
 				drive = QuadUserControl(quadBikeItem, probe.Position.Floor, &pitch);
+				HandleVehicleSpeedometer(quadBikeItem->Animation.Velocity.z, MAX_VELOCITY / (float)VEHICLE_VELOCITY_SCALE);
 				break;
 			}
 		}

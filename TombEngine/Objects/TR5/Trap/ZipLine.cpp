@@ -87,7 +87,6 @@ namespace TEN::Traps::TR5
 	{
 		constexpr auto VEL_ACCEL   = 5.0f;
 		constexpr auto VEL_MAX	   = 100.0f;
-		constexpr auto SLOPE_ANGLE = -ANGLE(11.25f);
 
 		auto& zipLineItem = g_Level.Items[itemNumber];
 		auto& laraItem = *LaraItem;
@@ -124,8 +123,10 @@ namespace TEN::Traps::TR5
 			zipLineItem.Animation.Velocity.y += VEL_ACCEL;
 
 		// Translate.
-		auto headingOrient = EulerAngles(SLOPE_ANGLE, zipLineItem.Pose.Orientation.y, 0);
+		// TODO: Use proper calculation of the trajectory instead of bitwise operation.
+		auto headingOrient = EulerAngles(0, zipLineItem.Pose.Orientation.y, 0);
 		TranslateItem(&zipLineItem, headingOrient, zipLineItem.Animation.Velocity.y);
+		zipLineItem.Pose.Position.y += ((int)zipLineItem.Animation.Velocity.y >> 2);
 
 		int vPos = zipLineItem.Pose.Position.y + CLICK(0.25f);
 		auto pointColl = GetCollision(&zipLineItem, zipLineItem.Pose.Orientation.y, zipLineItem.Animation.Velocity.y);

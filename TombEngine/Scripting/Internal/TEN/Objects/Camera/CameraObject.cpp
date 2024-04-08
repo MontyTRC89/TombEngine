@@ -16,18 +16,18 @@ Basic cameras that can point at Lara or at a CAMERA_TARGET.
 @pragma nostrip
 */
 
-static auto index_error = index_error_maker(CameraObject, ScriptReserved_Camera);
-static auto newindex_error = newindex_error_maker(CameraObject, ScriptReserved_Camera);
+static auto IndexError = index_error_maker(CameraObject, ScriptReserved_Camera);
+static auto NewIndexError = newindex_error_maker(CameraObject, ScriptReserved_Camera);
 
 CameraObject::CameraObject(LevelCameraInfo & ref) : m_camera{ref}
 {};
 
-void CameraObject::Register(sol::table & parent)
+void CameraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<CameraObject>(ScriptReserved_Camera,
 		sol::no_constructor, // ability to spawn new ones could be added later
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 
 		/// Get the camera's position
 		// @function Camera:GetPosition
@@ -50,7 +50,7 @@ void CameraObject::Register(sol::table & parent)
 		ScriptReserved_SetName, &CameraObject::SetName,
 
 		/// Get the current room of the camera
-		// @function CameraObject:GetRoom
+		// @function Camera:GetRoom
 		// @treturn Room current room of the camera
 		ScriptReserved_GetRoom, &CameraObject::GetRoom,
 
@@ -68,13 +68,12 @@ void CameraObject::Register(sol::table & parent)
 		/// Active the camera during that frame.
 		// @function Camera:PlayCamera
 		// @tparam[opt] Moveable Target If you put a moveable, the camera will look at it. Otherwise, it will look at Lara.
-		ScriptReserved_PlayCamera, &CameraObject::PlayCamera
-		);
+		ScriptReserved_PlayCamera, &CameraObject::PlayCamera);
 }
 
 Vec3 CameraObject::GetPos() const
 {
-	return Vec3{ m_camera.Position };
+	return Vec3(m_camera.Position);
 }
 
 void CameraObject::SetPos(Vec3 const& pos)

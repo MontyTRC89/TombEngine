@@ -2,7 +2,7 @@
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara_struct.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 enum class LaraWeaponType;
 struct CreatureBiteInfo;
@@ -52,7 +52,7 @@ struct SMOKE_SPARKS
 	byte fadeToBlack;
 	signed char sLife;
 	signed char life;
-	BLEND_MODES blendMode;
+	BlendMode blendMode;
 	byte fxObj;
 	byte nodeNumber;
 	byte mirror;
@@ -63,23 +63,27 @@ struct SHOCKWAVE_STRUCT
 	int x;
 	int y;
 	int z;
-	short innerRad;
-	short outerRad;
 	short xRot;
 	short yRot;
 	short zRot;
-	short damage;
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
 	unsigned char sr;
 	unsigned char sg;
 	unsigned char sb;
+
+	short innerRad;
+	short outerRad;
+
 	unsigned char life;
-	short speed;
 	short sLife;
-	bool fadeIn = false;
+	short speed;
+	short damage;
 	int style;
+
+	bool fadeIn = false;
+	bool HasLight = false;
 };
 
 struct GUNSHELL_STRUCT
@@ -248,7 +252,7 @@ void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
 void ExplodingDeath(short itemNumber, short flags); // BODY_ flags
 int GetFreeShockwave();
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, int style);
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, bool light, int style);
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);

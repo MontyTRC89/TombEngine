@@ -31,15 +31,17 @@ public:
 	Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
 	Vec3 GetPos() const;
-	void SetPos(Vec3 const & pos);
+	void SetPos(Vec3 const& pos);
 	float GetScale() const;
 	void SetScale(float const& scale);
+	int GetHP() const;
+	void SetHP(short hitPoints);
 	std::string GetName() const;
-	void SetName(std::string const & name);
+	void SetName(std::string const& name);
 	int GetSlot() const;
 	void SetSlot(int slot);
 	ScriptColor GetColor() const;
-	void SetColor(ScriptColor const & col);
+	void SetColor(ScriptColor const& col);
 	void Shatter();
 
 private:

@@ -14,8 +14,8 @@ Sink
 @pragma nostrip
 */
 
-static auto index_error = index_error_maker(Sink, ScriptReserved_Sink);
-static auto newindex_error = newindex_error_maker(Sink, ScriptReserved_Sink);
+static auto IndexError = index_error_maker(Sink, ScriptReserved_Sink);
+static auto NewIndexError = newindex_error_maker(Sink, ScriptReserved_Sink);
 
 Sink::Sink(SinkInfo& ref) : m_sink{ref}
 {};
@@ -24,8 +24,8 @@ void Sink::Register(sol::table& parent)
 {
 	parent.new_usertype<Sink>(ScriptReserved_Sink,
 		sol::no_constructor, // ability to spawn new ones could be added later
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 
 		/// Get the sink's position
 		// @function Sink:GetPosition
@@ -58,12 +58,12 @@ void Sink::Register(sol::table& parent)
 		// @function Sink:SetStrength
 		// @tparam int strength The sink's new strength
 		ScriptReserved_SetStrength, &Sink::SetStrength
-		);
+	);
 }
 
 Vec3 Sink::GetPos() const
 {
-	return Vec3{ m_sink.Position };
+	return Vec3(m_sink.Position);
 }
 
 void Sink::SetPos(const Vec3& pos)

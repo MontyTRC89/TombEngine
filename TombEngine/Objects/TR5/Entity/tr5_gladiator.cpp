@@ -175,7 +175,7 @@ namespace TEN::Entities::Creatures::TR5
 						if (creature->Mood == MoodType::Bored ||
 							(item->AIBits & FOLLOW && (creature->ReachedGoal || distance > pow(BLOCK(2), 2))))
 						{
-							if (item->Animation.RequiredState != NO_STATE)
+							if (item->Animation.RequiredState != NO_VALUE)
 								item->Animation.TargetState = item->Animation.RequiredState;
 							else if (Random::TestProbability(1 / 64.0f))
 								item->Animation.TargetState = GLADIATOR_STATE_IDLE;
@@ -347,7 +347,7 @@ namespace TEN::Entities::Creatures::TR5
 							{
 								if (!((pos.x ^ mesh->pos.Position.x) & 0xFFFFFC00))
 								{
-									if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+									if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
 									{
 										ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28);

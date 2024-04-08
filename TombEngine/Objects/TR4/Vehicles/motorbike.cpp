@@ -158,7 +158,7 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(motorbikeItem, laraItem, coll, MotorbikeMountTypes, MOTORBIKE_MOUNT_DISTANCE);
@@ -188,7 +188,7 @@ namespace TEN::Entities::Vehicles
 			/*if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
 				SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_UNLOCK);
-				g_Gui.SetInventoryItemChosen(NO_ITEM);
+				g_Gui.SetInventoryItemChosen(NO_VALUE);
 				motorbike->Flags |= MOTORBIKE_FLAG_NITRO;
 			}
 			else
@@ -362,7 +362,7 @@ namespace TEN::Entities::Vehicles
 			sptr->sLife = random;
 		}
 
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BlendMode::Additive;
 		sptr->x = x + (GetRandomControl() & 0xF) - 8;
 		sptr->y = y + (GetRandomControl() & 0xF) - 8;
 		sptr->z = z + (GetRandomControl() & 0xF) - 8;
@@ -398,7 +398,7 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Context.Vehicle == NO_ITEM)
+		if (lara->Context.Vehicle == NO_VALUE)
 			return;
 
 		if (laraItem->Animation.ActiveState != MOTORBIKE_STATE_MOUNT && laraItem->Animation.ActiveState != MOTORBIKE_STATE_DISMOUNT)
@@ -430,7 +430,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Context.Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_VALUE)
 		{
 			auto* item = &g_Level.Items[lara->Context.Vehicle];
 
@@ -968,7 +968,7 @@ namespace TEN::Entities::Vehicles
 		else
 			motorbike->Revs = 0;
 
-		if (IsHeld(In::Speed) && IsHeld(In::Accelerate) && 
+		if (IsHeld(In::Faster) && IsHeld(In::Accelerate) && 
 			(motorbike->Flags & MOTORBIKE_FLAG_NITRO))
 		{
 			if (lara->Status.Stamina > 10)
@@ -1188,6 +1188,7 @@ namespace TEN::Entities::Vehicles
 			motorbikeItem->MeshBits.Set(MotorbikeHeadLightJoints);
 
 			drive = MotorbikeUserControl(motorbikeItem, laraItem, probe.Position.Floor, &pitch);
+			HandleVehicleSpeedometer(motorbikeItem->Animation.Velocity.z, MOTORBIKE_ACCEL_MAX / (float)VEHICLE_VELOCITY_SCALE);
 		}
 		else
 		{

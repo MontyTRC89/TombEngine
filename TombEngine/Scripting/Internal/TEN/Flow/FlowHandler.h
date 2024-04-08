@@ -25,18 +25,22 @@ private:
 
 	LuaHandler m_handler;
 
-public:
-	int	 FogInDistance{ 0 };
-	int	 FogOutDistance{ 0 };
-	bool LevelSelect{ true };
-	bool FlyCheat{ true };
-	bool PointFilter{ false };
-	bool MassPickup{ true }; 
-	bool LaraInTitle{ false };
-	bool DebugMode{ false };
+	void PrepareInventoryObjects();
 
-	// New animation flag table
-	Animations			Anims{};
+public:
+	int FogInDistance  = 0;
+	int FogOutDistance = 0;
+
+	bool LevelSelect = true;
+	bool LoadSave	 = true;
+	bool FlyCheat	 = true;
+	bool PointFilter = false;
+	bool MassPickup	 = true; 
+	bool LaraInTitle = false;
+	bool DebugMode	 = false;
+
+	// Table for movesets.
+	Animations Anims = {};
 
 	std::vector<Level*>	Levels;
 
@@ -57,7 +61,14 @@ public:
 	Level*		GetCurrentLevel();
 	int			GetLevelNumber(const std::string& flieName);
 	int			GetNumLevels() const;
-	void		EndLevel(std::optional<int> nextLevel);
+	void		EndLevel(std::optional<int> nextLevel, std::optional<int> startPosIndex);
+	GameStatus	GetGameStatus();
+	void		FlipMap(int group);
+	bool		GetFlipMapStatus(std::optional<int> group);
+	void		SaveGame(int slot);
+	void		LoadGame(int slot);
+	void		DeleteSaveGame(int slot);
+	bool		DoesSaveGameExist(int slot);
 	int			GetSecretCount() const;
 	void		SetSecretCount(int secretsNum);
 	void		AddSecret(int levelSecretIndex);
@@ -74,6 +85,8 @@ public:
 	void		EnableLaraInTitle(bool laraInTitle);
 	bool		IsLevelSelectEnabled() const;
 	void		EnableLevelSelect(bool laraInTitle);
+	bool		IsLoadSaveEnabled() const;
+	void		EnableLoadSave(bool loadSave);
 
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
 	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }

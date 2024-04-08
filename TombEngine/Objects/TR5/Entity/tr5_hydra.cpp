@@ -26,6 +26,7 @@ namespace TEN::Entities::Creatures::TR5
 		HYDRA_STATE_IDLE = 0,
 		HYDRA_STATE_BITE_ATTACK_1 = 1,
 		HYDRA_STATE_AIM = 2,
+		HYDRA_STATE_SHOOT = 3,
 		HYDRA_STATE_HURT = 4,
 		HYDRA_STATE_BITE_ATTACK_2 = 7,
 		HYDRA_STATE_BITE_ATTACK_3 = 8,
@@ -58,7 +59,7 @@ namespace TEN::Entities::Creatures::TR5
 	static void HydraBubblesAttack(Pose* pos, short roomNumber, int count)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
-		if (fxNumber != NO_ITEM)
+		if (fxNumber != NO_VALUE)
 		{
 			auto* fx = &EffectList[fxNumber];
 
@@ -90,7 +91,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dG = spark->dR / 2;
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->dynamic = -1;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 		spark->x = (GetRandomControl() & 0xF) - 8;
@@ -138,7 +139,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dG = spark->dR / 2;
 		spark->fadeToBlack = 4;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->dynamic = -1;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 		spark->x = (GetRandomControl() & 0xF) - 8;
@@ -155,9 +156,9 @@ namespace TEN::Entities::Creatures::TR5
 		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
 		spark->maxYvel = 0;
 		spark->gravity = -8 - (GetRandomControl() & 7);
-		spark->scalar = 0;
+		spark->scalar = 4;
 		spark->dSize = 4;
-		spark->sSize = spark->size = (frame * ((GetRandomControl() & 0xF) + 16)) / 16;
+		spark->sSize = spark->size = (frame * ((GetRandomControl() & 0xF) + 32)) / 16;
 	}
 
 	void HydraControl(short itemNumber)
@@ -216,7 +217,7 @@ namespace TEN::Entities::Creatures::TR5
 
 			joint0 = -joint1;
 
-			int distance, damage, frame;
+			int dist, damage, frame;
 			short roomNumber;
 
 			switch (item->Animation.ActiveState)
@@ -262,11 +263,16 @@ namespace TEN::Entities::Creatures::TR5
 
 					if (item->HitStatus && AI.distance < pow(CLICK(7), 2))
 					{
-						distance = sqrt(AI.distance);
-						damage = 5 - distance / BLOCK(1);
+						dist = sqrt(AI.distance);
+						damage = 5 - (dist / BLOCK(1));
 
-						if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
+						if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+							Lara.Control.Weapon.GunType == LaraWeaponType::Uzi ||
+							Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
+							Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
+						{
 							damage *= 3;
+						}
 
 						if (damage > 0)
 						{
@@ -290,8 +296,13 @@ namespace TEN::Entities::Creatures::TR5
 
 					damage = 6 - sqrt(AI.distance) / 1024;
 
-					if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
+					if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun ||
+						Lara.Control.Weapon.GunType == LaraWeaponType::Uzi ||
+						Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
+						Lara.Control.Weapon.GunType == LaraWeaponType::Revolver) 
+					{
 						damage *= 3;
+					}
 
 					if ((GetRandomControl() & 0xF) < damage &&
 						AI.distance < SQUARE(BLOCK(10)) && damage > 0)
@@ -303,9 +314,13 @@ namespace TEN::Entities::Creatures::TR5
 				}
 
 				if (item->TriggerFlags == 1)
+				{
 					tilt = -ANGLE(2.8f);
+				}
 				else if (item->TriggerFlags == 2)
+				{
 					tilt = ANGLE(2.8f);
+				}
 
 				if (!(GlobalCounter & 3))
 				{
@@ -318,7 +333,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				break;
 
-			case 3:
+			case HYDRA_STATE_SHOOT:
 				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
 				{
 					auto pos1 = GetJointPosition(item, 10, Vector3i(0, 1024, 40));

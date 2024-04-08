@@ -13,15 +13,15 @@ constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBou
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
 constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 
-enum CollisionType
+enum class CollisionType
 {
-	CT_NONE		 = 0,
-	CT_FRONT	 = (1 << 0),
-	CT_LEFT		 = (1 << 1),
-	CT_RIGHT	 = (1 << 2),
-	CT_TOP		 = (1 << 3),
-	CT_TOP_FRONT = (1 << 4),
-	CT_CLAMP	 = (1 << 5)
+	None,
+	Front,
+	Left,
+	Right,
+	Top,
+	TopFront,
+	Clamp
 };
 
 enum class CollisionProbeMode
@@ -63,6 +63,9 @@ struct CollisionResult
 	CollisionPosition Position;
 	Vector2 FloorTilt;	 // x = x, y = z
 	Vector2 CeilingTilt; // x = x, y = z
+
+	Vector3 FloorNormal;
+	Vector3 CeilingNormal;
 };
 
 struct CollisionSetup
@@ -87,7 +90,7 @@ struct CollisionSetup
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve previous parameters to restore later.
-	Vector3i	   PrevPosition		= Vector3i::Zero;;
+	Vector3i	   PrevPosition		= Vector3i::Zero;
 	GAME_OBJECT_ID PrevAnimObjectID = ID_NO_OBJECT;
 	int			   PrevAnimNumber	= 0;
 	int			   PrevFrameNumber	= 0;
@@ -107,6 +110,8 @@ struct CollisionInfo
 
 	Pose Shift = Pose::Zero;
 	CollisionType CollisionType;
+	Vector3 FloorNormal;
+	Vector3 CeilingNormal;
 	Vector2 FloorTilt;	 // x = x, y = z
 	Vector2 CeilingTilt; // x = x, y = z
 	short NearestLedgeAngle;
@@ -127,10 +132,11 @@ struct CollisionInfo
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
 CollisionResult GetCollision(const ItemInfo& item);
-CollisionResult GetCollision(ItemInfo* item);
-CollisionResult GetCollision(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(const ItemInfo* item);
+CollisionResult GetCollision(const ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const EulerAngles& orient, float dist);
+CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3& dir, float dist);
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(const GameVector& pos);
@@ -145,7 +151,6 @@ FloorInfo* GetFloor(int x, int y, int z, short* roomNumber);
 int GetFloorHeight(FloorInfo* floor, int x, int y, int z);
 int GetCeiling(FloorInfo* floor, int x, int y, int z);
 int GetDistanceToFloor(int itemNumber, bool precise = true);
-void AlterFloorHeight(ItemInfo* item, int height);
 
 int GetWaterSurface(int x, int y, int z, short roomNumber);
 int GetWaterSurface(ItemInfo* item);
@@ -164,7 +169,7 @@ void AlignEntityToSurface(ItemInfo* item, const Vector2& ellipse, float alpha = 
 
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, Vector3i pos, int roomNumber);
-bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
+bool TestEnvironment(RoomEnvFlags environmentType, const ItemInfo* item);
 bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
 bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags);

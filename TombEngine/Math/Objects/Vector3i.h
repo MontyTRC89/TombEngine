@@ -19,8 +19,10 @@
 				  Vector3i(const Vector3& vector);
 
 		// Utilities
-		static float Distance(const Vector3i& origin, const Vector3i& target);
-		static float DistanceSquared(const Vector3i& origin, const Vector3i& target);
+		static float	Distance(const Vector3i& origin, const Vector3i& target);
+		static float	DistanceSquared(const Vector3i& origin, const Vector3i& target);
+		void			Lerp(const Vector3i& target, float alpha);
+		static Vector3i Lerp(const Vector3i& origin, const Vector3i& target, float alpha);
 
 		// Converters
 		Vector3 ToVector3() const;
@@ -32,12 +34,12 @@
 		Vector3i& operator +=(const Vector3i& vector);
 		Vector3i& operator -=(const Vector3i& vector);
 		Vector3i& operator *=(const Vector3i& vector);
-		Vector3i& operator *=(float scale);
-		Vector3i& operator /=(float scale);
+		Vector3i& operator *=(float scalar);
+		Vector3i& operator /=(float scalar);
 		Vector3i  operator +(const Vector3i& vector) const;
 		Vector3i  operator -(const Vector3i& vector) const;
 		Vector3i  operator *(const Vector3i& vector) const;
-		Vector3i  operator *(float scale) const;
-		Vector3i  operator /(float scale) const;
+		Vector3i  operator *(float scalar) const;
+		Vector3i  operator /(float scalar) const;
 	};
 //}
