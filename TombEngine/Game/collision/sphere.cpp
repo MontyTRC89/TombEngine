@@ -13,9 +13,9 @@ using namespace TEN::Renderer;
 
 namespace TEN::Collision::Sphere
 {
-	std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, int spaceFlags)
+	std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, int flags)
 	{
-		return g_Renderer.GetSpheres(item.Index, spaceFlags, Matrix::Identity);
+		return g_Renderer.GetSpheres(item.Index, flags, Matrix::Identity);
 	}
 
 	bool SetSphereTouchBits(ItemInfo& creatureItem, ItemInfo& playerItem)

@@ -409,7 +409,7 @@ namespace TEN::Renderer
 		return _meshes[meshIndex];
 	}
 
-	std::vector<BoundingSphere> Renderer::GetSpheres(int itemNumber, int spaceFlags, const Matrix& localMatrix)
+	std::vector<BoundingSphere> Renderer::GetSpheres(int itemNumber, int flags, const Matrix& localMatrix)
 	{
 		const auto* nativeItemPtr = &g_Level.Items[itemNumber];
 		if (nativeItemPtr == nullptr)
@@ -431,7 +431,7 @@ namespace TEN::Renderer
 		}
 
 		auto worldMatrix = Matrix::Identity;
-		if (spaceFlags & (int)SphereSpaceFlags::World)
+		if (flags & (int)SphereSpaceFlags::World)
 		{
 			worldMatrix = Matrix::CreateTranslation(nativeItemPtr->Pose.Position.ToVector3()) * localMatrix;
 		}
@@ -450,7 +450,7 @@ namespace TEN::Renderer
 			const auto& mesh = *moveable.ObjectMeshes[i];
 
 			auto relPos = Vector3(mesh.Sphere.Center);
-			if (spaceFlags & (int)SphereSpaceFlags::BoneOrigin)
+			if (flags & (int)SphereSpaceFlags::BoneOrigin)
 				relPos += moveable.LinearizedBones[i]->Translation;
 
 			const auto& tMatrix = itemToDraw.AnimationTransforms[i];

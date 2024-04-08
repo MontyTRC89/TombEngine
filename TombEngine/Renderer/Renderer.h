@@ -629,7 +629,7 @@ namespace TEN::Renderer
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void UpdateLaraAnimations(bool force);
 		void UpdateItemAnimations(int itemNumber, bool force);
-		std::vector<BoundingSphere> GetSpheres(int itemNumber, int spaceFlags, const Matrix& localMatrix);
+		std::vector<BoundingSphere> GetSpheres(int itemNumber, int flags, const Matrix& localMatrix);
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
 		void DrawObjectIn2DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale1, float opacity = 1.0f, int meshBits = NO_JOINT_BITS);
 		void SetLoadingScreen(std::wstring& fileName);

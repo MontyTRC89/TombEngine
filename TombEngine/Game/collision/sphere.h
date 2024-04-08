@@ -11,6 +11,6 @@ namespace TEN::Collision::Sphere
 		BoneOrigin = 1 << 2
 	};
 
-	std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, int spaceFlags);
+	std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, int flags);
 	bool SetSphereTouchBits(ItemInfo& creatureItem, ItemInfo& playerItem);
 }
