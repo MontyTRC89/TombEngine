@@ -1784,7 +1784,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 
 	bool atLeastOnePoleCollided = false;
 
-	if (GetCollidedObjects(item, true, false, CollidedItems, nullptr) &&
+	if (GetCollidedObjects(item, true, false, CollidedItems, nullptr, BLOCK(1)) &&
 		CollidedItems[0] != nullptr)
 	{
 		auto laraBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
