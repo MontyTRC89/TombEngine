@@ -129,7 +129,7 @@ void ExplosionControl(short itemNumber)
 				}
 			}
 
-			auto collObjects = GetCollidedObjects(*item, true, true);
+			auto collObjects = GetCollidedObjects(*item, true, true, BLOCK(2), ObjectCollectionMode::All);
 			if (!collObjects.IsEmpty())
 			{
 				for (auto* itemPtr : collObjects.ItemPtrs)

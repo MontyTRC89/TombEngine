@@ -231,7 +231,7 @@ void CollectMultiplePickups(int itemNumber)
 {
 	auto& firstItem = g_Level.Items[itemNumber];
 	
-	auto collObjects = GetCollidedObjects(firstItem, true, true, 0.0f, ObjectCollectionMode::Items);
+	auto collObjects = GetCollidedObjects(firstItem, true, true, LARA_RADIUS, ObjectCollectionMode::Items);
 	collObjects.ItemPtrs.push_back(&firstItem);
 	for (auto* itemPtr : collObjects.ItemPtrs)
 	{
