@@ -229,42 +229,35 @@ static void HideOrDisablePickup(ItemInfo& pickupItem)
 
 void CollectMultiplePickups(int itemNumber)
 {
-	auto* firstItem = &g_Level.Items[itemNumber];
-	GetCollidedObjects(firstItem, true, true, CollidedItems, CollidedMeshes);
-
-	for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+	auto& firstItem = g_Level.Items[itemNumber];
+	
+	auto collObjects = GetCollidedObjects(firstItem, true, true, 0.0f, ObjectCollectionMode::Items);
+	collObjects.ItemPtrs.push_back(&firstItem);
+	for (auto* itemPtr : collObjects.ItemPtrs)
 	{
-		auto* currentItem = CollidedItems[i];
-
-		if (currentItem == nullptr)
-			currentItem = firstItem;
-
-		if (!Objects[currentItem->ObjectNumber].isPickup)
+		if (!Objects[itemPtr->ObjectNumber].isPickup)
 			continue;
 
 		// HACK: Exclude flares and torches from pickup batches.
-		if ((currentItem->ObjectNumber == ID_FLARE_ITEM && currentItem->Active) ||
-			 currentItem->ObjectNumber == ID_BURNING_TORCH_ITEM)
+		if ((itemPtr->ObjectNumber == ID_FLARE_ITEM && itemPtr->Active) ||
+			 itemPtr->ObjectNumber == ID_BURNING_TORCH_ITEM)
 		{
-				continue;
+			continue;
 		}
 
-		PickedUpObject(currentItem->ObjectNumber);
-		g_Hud.PickupSummary.AddDisplayPickup(currentItem->ObjectNumber, currentItem->Pose.Position.ToVector3());
+		PickedUpObject(itemPtr->ObjectNumber);
+		g_Hud.PickupSummary.AddDisplayPickup(itemPtr->ObjectNumber, itemPtr->Pose.Position.ToVector3());
 
-		if (currentItem->TriggerFlags & (1 << 8))
+		if (itemPtr->TriggerFlags & (1 << 8))
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
-				if (g_Level.Items[i].ObjectNumber == currentItem->ObjectNumber)
+				if (g_Level.Items[i].ObjectNumber == itemPtr->ObjectNumber)
 					KillItem(i);
 			}
 		}
 
-		HideOrDisablePickup(*currentItem);
-
-		if (currentItem == firstItem)
-			break;
+		HideOrDisablePickup(*itemPtr);
 	}
 }
 
@@ -846,8 +839,7 @@ void DropPickups(ItemInfo* item)
 
 	origin.y = yPos; // Initialize drop origin Y point as floor height at centerpoint, in case all corner tests fail.
 
-	// Also collect objects which are around.
-	bool collidedWithObjects = GetCollidedObjects(item, true, true, CollidedItems, CollidedMeshes);
+	auto collObjects = GetCollidedObjects(*item, true, true);
 
 	short startAngle = ANGLE(Random::GenerateInt(0, 3) * 90); // Randomize start corner.
 
@@ -892,26 +884,22 @@ void DropPickups(ItemInfo* item)
 		// Iterate through all found items and statics around, and determine if dummy sphere
 		// intersects any of those. If so, try other corner.
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		for (const auto* itemPtr : collObjects.ItemPtrs)
 		{
-			auto* currentItem = CollidedItems[i];
-			if (!currentItem)
-				break;
-
-			if (GameBoundingBox(currentItem).ToBoundingOrientedBox(currentItem->Pose).Intersects(sphere))
+			auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
+			if (box.Intersects(sphere))
 			{
 				collidedWithObject = true;
 				break;
 			}
 		}
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		for (auto* staticPtr : collObjects.StaticPtrs)
 		{
-			auto* currentMesh = CollidedMeshes[i];
-			if (!currentMesh)
-				break;
+			auto& object = StaticObjects[staticPtr->staticNumber];
 
-			if (StaticObjects[currentMesh->staticNumber].collisionBox.ToBoundingOrientedBox(currentMesh->pos).Intersects(sphere))
+			auto box = object.collisionBox.ToBoundingOrientedBox(staticPtr->pos);
+			if (box.Intersects(sphere))
 			{
 				collidedWithObject = true;
 				break;
