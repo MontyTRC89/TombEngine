@@ -28,8 +28,6 @@ ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
-constexpr auto EXTENTS_LENGTH_TOLERANCE_THRESHOLD = 2.0f;
-constexpr auto ROUGH_TEST_TOLERANCE_THRESHOLD = CLICK(0.5f);
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
@@ -102,15 +100,18 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 	}
 }
 
-bool GetCollidedObjects(ItemInfo* collidingItem, bool onlyVisible, bool ignorePlayer, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, float customRadius)
+bool GetCollidedObjects(ItemInfo* collidingItem, bool onlyVisible, bool ignorePlayer, ItemInfo** collidedItems, MESH_INFO** collidedStatics, float customRadius)
 {
-	int numItems  = 0;
-	int numMeshes = 0;
+	constexpr auto EXTENTS_LENGTH_TOLERANCE_THRESHOLD = 2.0f;
+	constexpr auto ROUGH_TEST_TOLERANCE_THRESHOLD	  = BLOCK(1 / 8.0f);
 
-	if (collidedItems)
+	int itemCount	= 0;
+	int staticCount = 0;
+
+	if (collidedItems != nullptr)
 		collidedItems[0] = nullptr;
-	if (collidedMeshes)
-		collidedMeshes[0] = nullptr;
+	if (collidedStatics != nullptr)
+		collidedStatics[0] = nullptr;
 
 	const auto& collidingItemBounds  = GetBestFrame(*collidingItem).BoundingBox;
 	const auto& collidingItemExtents = collidingItemBounds.GetExtents();
@@ -119,81 +120,65 @@ bool GetCollidedObjects(ItemInfo* collidingItem, bool onlyVisible, bool ignorePl
 
 	// Quickly discard collision if colliding item bounds are below tolerance threshold.
 	if (collidingItemSphere.Radius <= EXTENTS_LENGTH_TOLERANCE_THRESHOLD)
-	{
 		return false;
-	}
 
 	// Collect all the neighbor rooms where to check.
 	for (auto i : g_Level.Rooms[collidingItem->RoomNumber].neighbors)
 	{
-		if (!g_Level.Rooms[i].Active())
-		{
+		auto& room = g_Level.Rooms[i];
+		if (!room.Active())
 			continue;
-		}
 
-		auto* room = &g_Level.Rooms[i];
-
-		if (collidedMeshes)
+		if (collidedStatics)
 		{
-			for (int j = 0; j < room->mesh.size(); j++)
+			for (int j = 0; j < room.mesh.size(); j++)
 			{
-				auto* mesh = &room->mesh[j];
+				auto* mesh = &room.mesh[j];
 				const auto& staticBounds = GetBoundsAccurate(*mesh, false);
 
-				// Discard statics which are not feasible for collision.
+				// Discard invisible statics.
 				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+					continue;
+
+				// Test rough distance to discard statics beyond collision check threshold.
+				if (Vector3i::Distance(mesh->pos.Position, collidingItem->Pose.Position) > COLLISION_CHECK_DISTANCE)
+					continue;
+
+				// Test rough vertical distance to discard statics not intersecting vertically.
+				if (((collidingItem->Pose.Position.y + collidingItemBounds.Y1) - ROUGH_TEST_TOLERANCE_THRESHOLD) >
+					((mesh->pos.Position.y + staticBounds.Y2) + ROUGH_TEST_TOLERANCE_THRESHOLD))
+				{
+					continue;
+				}
+				if (((collidingItem->Pose.Position.y + collidingItemBounds.Y2) + ROUGH_TEST_TOLERANCE_THRESHOLD) <
+					((mesh->pos.Position.y + staticBounds.Y1) - ROUGH_TEST_TOLERANCE_THRESHOLD))
 				{
 					continue;
 				}
 
-				// Do a rough distance test to discard statics which are more than 6 blocks away.
-				auto delta = collidingItem->Pose.Position - mesh->pos.Position;
-				if (delta.ToVector3().Length() > COLLISION_CHECK_DISTANCE)
-				{
+				// Do rough circle test to discard statics not intersecting horizontally.
+				auto staticCircle = Vector3(mesh->pos.Position.x, mesh->pos.Position.z, (staticBounds.GetExtents() * Vector3(1.0f, 0.0f, 1.0f)).Length());
+				if (!Geometry::CircleIntersects(staticCircle, collidingItemCircle))
 					continue;
-				}
-
-				// Do a rough vertical distance test to discard statics which are not intersecting vertically.
-				if ((collidingItem->Pose.Position.y + collidingItemBounds.Y1 - ROUGH_TEST_TOLERANCE_THRESHOLD) >
-					(mesh->pos.Position.y + staticBounds.Y2 + ROUGH_TEST_TOLERANCE_THRESHOLD))
-				{
-					continue;
-				}
-				if ((collidingItem->Pose.Position.y + collidingItemBounds.Y2 + ROUGH_TEST_TOLERANCE_THRESHOLD) <
-					(mesh->pos.Position.y + staticBounds.Y1 - ROUGH_TEST_TOLERANCE_THRESHOLD))
-				{
-					continue;
-				}
-
-				// Do a rough circle test to discard statics which are not intersecting horizontally.
-				auto staticCircle = Vector3(mesh->pos.Position.x, mesh->pos.Position.z, (staticBounds.GetExtents() * Vector3(1, 0, 1)).Length());
-				if (!CircleIntersects(staticCircle, collidingItemCircle))
-				{
-					continue;
-				}
 
 				auto bounds1 = staticBounds.ToBoundingOrientedBox(mesh->pos.Position);
 				auto bounds2 = collidingItemBounds.ToBoundingOrientedBox(collidingItem->Pose);
 
 				// Override extents if specified.
 				if (customRadius > 0.0f)
-				{
 					bounds2.Extents = Vector3(customRadius);
-				}
 
 				// Do precise bounds test.
 				if (bounds1.Intersects(bounds2))
-				{
-					collidedMeshes[numMeshes++] = mesh;
-				}
+					collidedStatics[staticCount++] = mesh;
 			}
 
-			collidedMeshes[numMeshes] = nullptr;
+			collidedStatics[staticCount] = nullptr;
 		}
 
-		if (collidedItems)
+		if (collidedItems != nullptr)
 		{
-			int itemNumber = room->itemNumber;
+			int itemNumber = room.itemNumber;
 			if (itemNumber != NO_VALUE)
 			{
 				do
@@ -214,71 +199,55 @@ bool GetCollidedObjects(ItemInfo* collidingItem, bool onlyVisible, bool ignorePl
 					}
 
 					// TODO: This is awful and we need a better system.
-					if (item->ObjectNumber == ID_UPV && item->HitPoints == 1)
-					{
+					if ((item->ObjectNumber == ID_UPV || item->ObjectNumber == ID_BIGGUN)&& item->HitPoints == 1)
 						continue;
-					}
-					if (item->ObjectNumber == ID_BIGGUN && item->HitPoints == 1)
-					{
-						continue;
-					}
 
-					// Do a rough distance test to discard objects which are more than 6 blocks away.
+					// Do rough distance test to discard objects which are more than 6 blocks away.
 					auto delta = collidingItem->Pose.Position - item->Pose.Position;
 					if (delta.ToVector3().Length() > COLLISION_CHECK_DISTANCE)
-					{
 						continue;
-					}
 
 					const auto& itemBounds = GetBestFrame(*item).BoundingBox;
 					const auto& itemExtents = itemBounds.GetExtents();
 
 					// If item bounding box extents is below tolerance threshold, discard the object.
 					if (itemExtents.Length() <= EXTENTS_LENGTH_TOLERANCE_THRESHOLD)
+						continue;
+
+					// Do a rough vertical distance test to discard objects not intersecting vertically.
+					if (((collidingItem->Pose.Position.y + collidingItemBounds.Y1) - ROUGH_TEST_TOLERANCE_THRESHOLD) >
+						((item->Pose.Position.y + itemBounds.Y2) + ROUGH_TEST_TOLERANCE_THRESHOLD))
+					{
+						continue;
+					}
+					if (((collidingItem->Pose.Position.y + collidingItemBounds.Y2) + ROUGH_TEST_TOLERANCE_THRESHOLD) <
+						((item->Pose.Position.y + itemBounds.Y1) - ROUGH_TEST_TOLERANCE_THRESHOLD))
 					{
 						continue;
 					}
 
-					// Do a rough vertical distance test to discard objects which are not intersecting vertically.
-					if ((collidingItem->Pose.Position.y + collidingItemBounds.Y1 - ROUGH_TEST_TOLERANCE_THRESHOLD) >
-						(item->Pose.Position.y + itemBounds.Y2 + ROUGH_TEST_TOLERANCE_THRESHOLD))
-					{
-						continue;
-					}
-					if ((collidingItem->Pose.Position.y + collidingItemBounds.Y2 + ROUGH_TEST_TOLERANCE_THRESHOLD) <
-						(item->Pose.Position.y + itemBounds.Y1 - ROUGH_TEST_TOLERANCE_THRESHOLD))
-					{
-						continue;
-					}
-
-					// Do a rough circle test to discard objects which are not intersecting horizontally.
+					// Do rough circle test to discard objects not intersecting horizontally.
 					auto itemCircle = Vector3(item->Pose.Position.x, item->Pose.Position.z, std::hypot(itemExtents.x, itemExtents.z));
-					if (!CircleIntersects(itemCircle, collidingItemCircle))
-					{
+					if (!Geometry::CircleIntersects(itemCircle, collidingItemCircle))
 						continue;
-					}
 
 					auto bounds1 = itemBounds.ToBoundingOrientedBox(item->Pose);
 					auto bounds2 = collidingItemBounds.ToBoundingOrientedBox(collidingItem->Pose);
 
 					// Override extents if specified.
 					if (customRadius > 0.0f)
-					{
 						bounds2.Extents = Vector3(customRadius);
-					}
 
 					// Do precise bounds test.
 					if (bounds1.Intersects(bounds2))
-					{
-						collidedItems[numItems++] = item;
-					}
+						collidedItems[itemCount++] = item;
 				}
 				while (itemNumber != NO_VALUE);
 			}
 		}
 	}
 
-	return (numItems || numMeshes);
+	return (itemCount > 0 || staticCount > 0);
 }
 
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll)
