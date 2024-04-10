@@ -82,12 +82,12 @@ namespace TEN::Collision::Interaction
 
 		// TODO: Currently unreliable because IteractedItemNumber is frequently not reset after completed interactions.
 		// 2) Avoid overriding active player interactions.
-		if (interactor.IsLara())
+		/*if (interactor.IsLara())
 		{
 			const auto& player = GetLaraInfo(interactor);
 			if (player.Context.InteractedItem != NO_VALUE)
 				return false;
-		}
+		}*/
 
 		// 3) Test if interactor's orientation is within interaction constraint.
 		auto deltaOrient = interactor.Pose.Orientation - interactable.Pose.Orientation;
@@ -131,13 +131,9 @@ namespace TEN::Collision::Interaction
 	{
 		constexpr auto OFFSET_BLEND_ALPHA = 0.2f;
 
-		// Calculate relative offsets.
-		auto relPosOffset = basis.PosOffset;// + extraPosOffset;
-		auto relOrientOffset = basis.OrientOffset;// + extraOrientOffset;
-
 		// Calculate targets.
-		auto targetPos = Geometry::TranslatePoint(interactable.Pose.Position, interactable.Pose.Orientation, relPosOffset);
-		auto targetOrient = relOrientOffset.has_value() ? (interactable.Pose.Orientation + *relOrientOffset) : interactor.Pose.Orientation;
+		auto targetPos = Geometry::TranslatePoint(interactable.Pose.Position, interactable.Pose.Orientation, basis.PosOffset);
+		auto targetOrient = basis.OrientOffset.has_value() ? (interactable.Pose.Orientation + *basis.OrientOffset) : interactor.Pose.Orientation;
 
 		// Calculate absolute offsets.
 		auto absPosOffset = (targetPos - interactor.Pose.Position).ToVector3();
@@ -169,7 +165,8 @@ namespace TEN::Collision::Interaction
 			auto& player = GetLaraInfo(interactor);
 
 			// FAILSAFE.
-			if (player.Control.WaterStatus != WaterStatus::Dry && player.Control.WaterStatus != WaterStatus::Wade)
+			if (player.Control.WaterStatus != WaterStatus::Dry &&
+				player.Control.WaterStatus != WaterStatus::Wade)
 			{
 				SetLatchInteraction(interactor, interactable, basis, routine);
 				TENLog("SetWalkInteraction(): player not grounded. Setting latch interaction instead.", LogLevel::Warning);
@@ -215,21 +212,21 @@ namespace TEN::Collision::Interaction
 		}
 	}
 
-	void DrawDebug(const ItemInfo& item, const InteractionBasis& basis)
+	void DrawDebug(const ItemInfo& interactable, const InteractionBasis& basis)
 	{
 		constexpr auto COLL_BOX_COLOR	  = Color(1.0f, 0.0f, 0.0f, 1.0f);
 		constexpr auto INTERACT_BOX_COLOR = Color(0.0f, 1.0f, 1.0f, 1.0f);
 
 		// Draw collision box.
-		auto collBox = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		auto collBox = GameBoundingBox(&interactable).ToBoundingOrientedBox(interactable.Pose);
 		g_Renderer.AddDebugBox(collBox, COLL_BOX_COLOR);
 
-		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+		auto rotMatrix = interactable.Pose.Orientation.ToRotationMatrix();
 		auto relCenter = Vector3::Transform(basis.Box.Center, rotMatrix);
-		auto orient = item.Pose.Orientation.ToQuaternion();
+		auto orient = interactable.Pose.Orientation.ToQuaternion();
 
 		// Draw interaction box.
-		auto interactBox = BoundingOrientedBox(item.Pose.Position.ToVector3() + relCenter, basis.Box.Extents, orient);
+		auto interactBox = BoundingOrientedBox(interactable.Pose.Position.ToVector3() + relCenter, basis.Box.Extents, orient);
 		g_Renderer.AddDebugBox(interactBox, INTERACT_BOX_COLOR);
 	}
 }
