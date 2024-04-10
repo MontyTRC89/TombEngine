@@ -3237,7 +3237,7 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(objectInfo->Bucket->BlendMode);
-		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		// Draw geometry
 		if (objectInfo->Bucket->Animated)
@@ -3298,10 +3298,10 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
 		SetBlendMode(objectInfo->Bucket->BlendMode);
-		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
-			_context->VSSetShader(_vsItems.Get(), nullptr, 0);
-			_context->PSSetShader(_psItems.Get(), nullptr, 0);
+		_context->VSSetShader(_vsItems.Get(), nullptr, 0);
+		_context->PSSetShader(_psItems.Get(), nullptr, 0);
 
 		ItemInfo* nativeItem = &g_Level.Items[objectInfo->Item->ItemNumber];
 		RendererRoom* room = &_rooms[objectInfo->Item->RoomNumber];
@@ -3354,7 +3354,7 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
 		SetBlendMode(objectInfo->Bucket->BlendMode);
-		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[objectInfo->Bucket->Texture]),
 			SamplerStateRegister::AnisotropicClamp);

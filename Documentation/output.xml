@@ -894,6 +894,38 @@ teleported to such object with OCB similar to provided second argument.</descrip
 
 <function>
 	<module>Flow</module>
+	<name>FlipMap</name>
+	<summary>Do FlipMap with specific group ID.</summary>
+	<parameters>
+		<parameter>
+			<name>flipmap</name>
+			<type>int</type>
+			<description>(ID of flipmap group to actuvate / deactivate)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetFlipMapStatus</name>
+	<summary>Get current FlipMap status for specific group ID.</summary>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>Flipmap group ID to check. If no group specified or group is -1, function returns overall flipmap status (on or off).</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>Status of the flipmap group (true means on, false means off).</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow</module>
 	<name>SetSettings</name>
 	<parameters>
 		<parameter>
