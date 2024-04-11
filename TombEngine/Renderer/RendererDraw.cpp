@@ -794,52 +794,55 @@ namespace TEN::Renderer
 
 					batsCount++;
 				}
-			}
 
-			if (batsCount > 0)
-			{
-				if (rendererPass == RendererPass::GBuffer)
+				if (batsCount == INSTANCED_STATIC_MESH_BUCKET_SIZE ||
+					(i == NUM_BATS - 1 && batsCount > 0))
 				{
-					_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
-					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
-				}
-				else
-				{
-					_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-					_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
-				}
-
-				UINT stride = sizeof(Vertex);
-				UINT offset = 0;
-
-				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-				_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
-
-				for (auto& bucket : mesh->Buckets)
-				{
-					if (bucket.NumVertices == 0)
+					if (rendererPass == RendererPass::GBuffer)
 					{
-						continue;
+						_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
+						_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+					}
+					else
+					{
+						_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
+						_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
 					}
 
-					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+					UINT stride = sizeof(Vertex);
+					UINT offset = 0;
 
-					for (int p = 0; p < passes; p++)
+					_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+					_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+					_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
+
+					for (auto& bucket : mesh->Buckets)
 					{
-						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+						if (bucket.NumVertices == 0)
 						{
 							continue;
 						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
-						DrawIndexedInstancedTriangles(bucket.NumIndices, batsCount, bucket.StartIndex, 0);
+						for (int p = 0; p < passes; p++)
+						{
+							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+							{
+								continue;
+							}
 
-						_numMoveablesDrawCalls++;
+							BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+							BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+							DrawIndexedInstancedTriangles(bucket.NumIndices, batsCount, bucket.StartIndex, 0);
+
+							_numMoveablesDrawCalls++;
+						}
 					}
+
+					batsCount = 0;
 				}
 			}
 		}
