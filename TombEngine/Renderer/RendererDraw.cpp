@@ -21,6 +21,7 @@
 #include "Game/Setup.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/rope.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
@@ -31,16 +32,17 @@
 #include "Specific/winmain.h"
 #include "Renderer/Structures/RendererSortableObject.h"
 
+using namespace std::chrono;
+using namespace TEN::Effects::Hair;
+using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Generic;
+using namespace TEN::Hud;
+using namespace TEN::Renderer::Structures;
+
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer
 {
-	using namespace std::chrono;
-	using namespace TEN::Effects::Hair;
-	using namespace TEN::Entities::Generic;
-	using namespace TEN::Hud;
-	using namespace TEN::Renderer::Structures;
-
 	void Renderer::RenderBlobShadows(RenderView& renderView)
 	{
 		auto nearestSpheres = std::vector<Sphere>{};
@@ -610,14 +612,126 @@ namespace TEN::Renderer
 		}
 	}
 
+	void Renderer::DrawFishSwarm(RenderView& view, RendererPass rendererPass)
+	{
+		if (!Objects[ID_FISH_EMITTER].loaded)
+			return;
+
+		if (rendererPass == RendererPass::CollectTransparentFaces)
+		{
+			for (const auto& fish : FishSwarm)
+			{
+				if (fish.Life <= 0.0f) 
+					continue;
+
+				auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
+				for (auto& bucket : mesh.Buckets)
+				{
+					if (!IsSortedBlendMode(bucket.BlendMode))
+						continue;
+						
+					for (auto& poly : bucket.Polygons)
+					{
+						auto worldMatrix = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
+						auto center = Vector3::Transform(poly.Centre, worldMatrix);
+						float dist = Vector3::Distance(center, view.Camera.WorldPosition);
+
+						auto object = RendererSortableObject{};
+						object.ObjectType = RendererObjectType::MoveableAsStatic;
+						object.Centre = center;
+						object.Distance = dist;
+						object.Bucket = &bucket;
+						object.Mesh = &mesh;
+						object.Polygon = &poly;
+						object.World = worldMatrix;
+						object.Room = &_rooms[fish.RoomNumber];
+
+						view.TransparentObjectsToDraw.push_back(object);
+					}
+				}
+			}
+		}
+		else
+		{
+			bool doesActiveFishExist = false;
+			for (const auto& fish : FishSwarm)
+			{
+				if (fish.Life > 0.0f)
+				{
+					doesActiveFishExist = true;
+					break;
+				}
+			}
+
+			if (doesActiveFishExist)
+			{
+				if (rendererPass == RendererPass::GBuffer)
+				{
+					_context->VSSetShader(_vsGBufferStatics.Get(), nullptr, 0);
+					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+				}
+				else
+				{
+					_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
+					_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+				}
+
+				unsigned int stride = sizeof(Vertex);
+				unsigned int offset = 0;
+
+				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+				const auto& moveableObj = *_moveableObjects[ID_FISH_EMITTER];
+
+				_stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
+
+				for (const auto& fish : FishSwarm)
+				{
+					if (fish.Life <= 0.0f)
+						continue;
+
+					const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
+
+					_stStatic.World = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
+					_stStatic.Color = Vector4::One;
+					_stStatic.AmbientLight = _rooms[fish.RoomNumber].AmbientLight;
+
+					if (rendererPass != RendererPass::GBuffer)
+						BindStaticLights(_rooms[fish.RoomNumber].LightsToDraw);
+
+					_cbStatic.UpdateData(_stStatic, _context.Get());
+
+					for (const auto& bucket : mesh.Buckets)
+					{
+						if (bucket.NumVertices == 0)
+							continue;
+
+						int passCount = (rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest) ? 2 : 1;
+						for (int p = 0; p < passCount; p++)
+						{
+							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+								continue;
+
+							BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+							BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+							_numMoveablesDrawCalls++;
+						}
+					}
+				}
+			}
+		}
+	}
+
 	void Renderer::DrawBats(RenderView& view, RendererPass rendererPass)
 	{
 		if (!Objects[ID_BATS_EMITTER].loaded)
-		{
 			return;
-		}
 
-		RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
+		auto* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
@@ -1556,6 +1670,7 @@ namespace TEN::Renderer
 		PrepareRopes(view);
 		PrepareStreamers(view);
 		PrepareLaserBarriers(view);
+		PrepareSingleLaserBeam(view);
 
 		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected for a later stage.
 		SortAndPrepareSprites(view);
@@ -1709,6 +1824,7 @@ namespace TEN::Renderer
 		DrawLocusts(view, RendererPass::Opaque);
 		DrawDebris(view, RendererPass::Opaque);
 		DrawSprites(view, RendererPass::Opaque);
+		DrawFishSwarm(view, RendererPass::Opaque);
 
 		// Draw additive faces.
 		DrawRooms(view, RendererPass::Additive);
@@ -1722,6 +1838,7 @@ namespace TEN::Renderer
 		DrawLocusts(view, RendererPass::Additive);
 		DrawDebris(view, RendererPass::Additive);
 		DrawSprites(view, RendererPass::Additive);
+		DrawFishSwarm(view, RendererPass::Additive);
 
 		// Collect all non-commutative transparent faces.
 		// NOTE: Sorted sprites are already collected at the beginning of the frame.
@@ -1732,6 +1849,7 @@ namespace TEN::Renderer
 		DrawEffects(view, RendererPass::CollectTransparentFaces);
 		DrawRats(view, RendererPass::CollectTransparentFaces);
 		DrawLocusts(view, RendererPass::CollectTransparentFaces);
+		DrawFishSwarm(view, RendererPass::CollectTransparentFaces);
 
 		// Draw sorted faces.
 		DrawSortedFaces(view);
@@ -3157,7 +3275,7 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(objectInfo->Bucket->BlendMode);
-		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		// Draw geometry
 		if (objectInfo->Bucket->Animated)
@@ -3218,10 +3336,10 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
 		SetBlendMode(objectInfo->Bucket->BlendMode);
-		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
-			_context->VSSetShader(_vsItems.Get(), nullptr, 0);
-			_context->PSSetShader(_psItems.Get(), nullptr, 0);
+		_context->VSSetShader(_vsItems.Get(), nullptr, 0);
+		_context->PSSetShader(_psItems.Get(), nullptr, 0);
 
 		ItemInfo* nativeItem = &g_Level.Items[objectInfo->Item->ItemNumber];
 		RendererRoom* room = &_rooms[objectInfo->Item->RoomNumber];
@@ -3274,7 +3392,7 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
 		SetBlendMode(objectInfo->Bucket->BlendMode);
-		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[objectInfo->Bucket->Texture]),
 			SamplerStateRegister::AnisotropicClamp);

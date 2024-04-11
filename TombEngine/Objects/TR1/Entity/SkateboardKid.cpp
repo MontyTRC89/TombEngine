@@ -61,7 +61,7 @@ namespace TEN::Entities::Creatures::TR1
 	static void SpawnSkateboard(ItemInfo& item)
 	{
 		int skateItemNumber = CreateItem();
-		if (skateItemNumber == NO_ITEM)
+		if (skateItemNumber == NO_VALUE)
 			return;
 
 		auto& skate = g_Level.Items[skateItemNumber];
@@ -113,7 +113,7 @@ namespace TEN::Entities::Creatures::TR1
 		if (!CreatureActive(itemNumber))
 			return;
 		auto& item = g_Level.Items[itemNumber];
-		if (item.ItemFlags[0] == NO_ITEM)
+		if (item.ItemFlags[0] == NO_VALUE)
 		{
 			TENLog("Failed to do the skateboard kid control (itemNumber: " + std::to_string(itemNumber) + "), the skateboard itemNumber is missing, probably failed to be created !");
 			return;
@@ -164,7 +164,7 @@ namespace TEN::Entities::Creatures::TR1
 				creature.MaxTurn = KID_TURN_RATE_MAX;
 				creature.Flags = 0;
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}

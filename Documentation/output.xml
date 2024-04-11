@@ -894,6 +894,38 @@ teleported to such object with OCB similar to provided second argument.</descrip
 
 <function>
 	<module>Flow</module>
+	<name>FlipMap</name>
+	<summary>Do FlipMap with specific group ID.</summary>
+	<parameters>
+		<parameter>
+			<name>flipmap</name>
+			<type>int</type>
+			<description>(ID of flipmap group to actuvate / deactivate)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetFlipMapStatus</name>
+	<summary>Get current FlipMap status for specific group ID.</summary>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>Flipmap group ID to check. If no group specified or group is -1, function returns overall flipmap status (on or off).</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>Status of the flipmap group (true means on, false means off).</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow</module>
 	<name>SetSettings</name>
 	<parameters>
 		<parameter>
@@ -2249,15 +2281,43 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
-	<name>GetSlotHP</name>
-	<summary>Get HP definded for that object type (hit points/health points) (Read Only).</summary>
+	<name>GetHP</name>
+	<summary>Get current HP (hit points/health points)</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the amount of HP the moveable currently has</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetHP</name>
+	<summary>Set current HP (hit points/health points)
+ Clamped to [0, 32767] for "intelligent" entities (i.e.</summary>
+	<description>anything with AI); clamped to [-32767, 32767] otherwise.</description>
 	<parameters>
 		<parameter>
-			<name>ID</name>
+			<name>HP</name>
 			<type>int</type>
-			<description>of the moveable slot type.</description>
+			<description>the amount of HP to give the moveable</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetSlotHP</name>
+	<summary>Get HP definded for that object type (hit points/health points) (Read Only).</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the moveable's slot default hit points</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -2603,35 +2663,6 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
-	<name>GetHP</name>
-	<summary>Get current HP (hit points/health points)</summary>
-	<returns>
-		<return>
-			<type>int</type>
-			<description>the amount of HP the moveable currently has</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
-	<name>SetHP</name>
-	<summary>Set current HP (hit points/health points)
- Clamped to [0, 32767] for "intelligent" entities (i.e.</summary>
-	<description>anything with AI); clamped to [-32767, 32767] otherwise.</description>
-	<parameters>
-		<parameter>
-			<name>HP</name>
-			<type>int</type>
-			<description>the amount of HP to give the moveable</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
 	<name>GetLocationAI</name>
 	<summary>Get the location value stored in the Enemy AI</summary>
 	<returns>
@@ -2750,6 +2781,20 @@ most can just be ignored (see usage).</description>
 			<description>New room's ID.</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetMeshCount</name>
+	<summary>Get number of meshes for a particular object
+ Returns number of meshes in an object</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>number of meshes</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -3563,6 +3608,35 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Static</module>
 	<caller>Static</caller>
+	<name>GetHP</name>
+	<summary>Get current HP (hit points/health points)
+ Used only with shatterable static meshes.</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the amount of HP the static currently has</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetHP</name>
+	<summary>Set current HP (hit points/health points)
+ Used only with shatterable static meshes.</summary>
+	<parameters>
+		<parameter>
+			<name>HP</name>
+			<type>int</type>
+			<description>the amount of HP to give the static</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
 	<name>GetName</name>
 	<summary>Get the static's unique string identifier</summary>
 	<returns>
@@ -3653,26 +3727,13 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
-	<name>Enable</name>
-	<summary>Enable the volume.</summary>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>Disable</name>
-	<summary>Disable the volume.</summary>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>GetActive</name>
-	<summary>Determine whether the volume is active or not</summary>
+	<name>GetName</name>
+	<summary>Get the unique string identifier of this volume.</summary>
+	<description>()</description>
 	<returns>
 		<return>
-			<type>bool</type>
-			<description>true if the volume is active</description>
+			<type>string</type>
+			<description>Name.</description>
 		</return>
 	</returns>
 </function>
@@ -3681,92 +3742,40 @@ most can just be ignored (see usage).</description>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
 	<name>GetPosition</name>
-	<summary>Get the volume's position.</summary>
+	<summary>Get the position of this volume.</summary>
+	<description>()</description>
 	<returns>
 		<return>
 			<type>Vec3</type>
-			<description>a copy of the volume's position</description>
+			<description>Position.</description>
 		</return>
 	</returns>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>SetPosition</name>
-	<summary>Set the volume's position.</summary>
-	<parameters>
-		<parameter>
-			<name>position</name>
-			<type>Vec3</type>
-			<description>the new position of the volume</description>
-		</parameter>
-	</parameters>
 </function>
 
 <function>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
 	<name>GetRotation</name>
-	<summary>Get the volume's rotation.</summary>
+	<summary>Get the rotation of this volume.</summary>
+	<description>()</description>
 	<returns>
 		<return>
 			<type>Rotation</type>
-			<description>a copy of the volume's rotation</description>
+			<description>Rotation.</description>
 		</return>
 	</returns>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>SetRotation</name>
-	<summary>Set the volume's rotation.</summary>
-	<parameters>
-		<parameter>
-			<name>rotation</name>
-			<type>Rotation</type>
-			<description>the volume's new rotation</description>
-		</parameter>
-	</parameters>
 </function>
 
 <function>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
 	<name>GetScale</name>
-	<summary>Get the volume's scale (separately on all 3 axes).</summary>
+	<summary>Get this scale of this volume.</summary>
+	<description>()</description>
 	<returns>
 		<return>
 			<type>Vec3</type>
-			<description>current volume scale</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>SetScale</name>
-	<summary>Set the volume's scale (separately on all 3 axes).</summary>
-	<parameters>
-		<parameter>
-			<name>scale</name>
-			<type>Vec3</type>
-			<description>the volume's new scale</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>GetName</name>
-	<summary>Get the volume's unique string identifier.</summary>
-	<returns>
-		<return>
-			<type>string</type>
-			<description>the volume's name</description>
+			<description>Scale.</description>
 		</return>
 	</returns>
 </function>
@@ -3775,12 +3784,13 @@ most can just be ignored (see usage).</description>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
 	<name>SetName</name>
-	<summary>Set the volume's name (its unique string identifier).</summary>
+	<summary>Set the unique string identifier of this volume.</summary>
+	<description>()</description>
 	<parameters>
 		<parameter>
 			<name>name</name>
 			<type>string</type>
-			<description>The volume's new name</description>
+			<description>New name.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -3788,28 +3798,105 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
-	<name>ClearActivators</name>
-	<summary>Clear activator list for volumes (makes volume trigger everything again)</summary>
+	<name>SetPosition</name>
+	<summary>Set the position of this volume.</summary>
+	<description>()</description>
+	<parameters>
+		<parameter>
+			<name>pos</name>
+			<type>Vec3</type>
+			<description>New position.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>SetRotation</name>
+	<summary>Set the rotation of this volume.</summary>
+	<description>()</description>
+	<parameters>
+		<parameter>
+			<name>rot</name>
+			<type>Rotation</type>
+			<description>New rotation.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>SetScale</name>
+	<summary>Set the scale of the volume.</summary>
+	<description>()</description>
+	<parameters>
+		<parameter>
+			<name>scale</name>
+			<type>Vec3</type>
+			<description>New scale.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>GetActive</name>
+	<summary>Determine if this volume is active.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>Boolean representing active status.</description>
+		</return>
+	</returns>
 </function>
 
 <function>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
 	<name>IsMoveableInside</name>
-	<summary>Check if specified moveable is inside the volume</summary>
+	<summary>Determine if a moveable is inside this volume.</summary>
+	<description>()</description>
 	<parameters>
 		<parameter>
 			<name>Moveable</name>
 			<type>Objects.Moveable</type>
-			<description>which should be checked for containment</description>
+			<description>to be checked for containment.</description>
 		</parameter>
 	</parameters>
 	<returns>
 		<return>
 			<type>bool</type>
-			<description>state of the moveable, true if contained, false if not</description>
+			<description>Boolean representing containment status.</description>
 		</return>
 	</returns>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>Enable</name>
+	<summary>Enable this volume.</summary>
+	<description>()</description>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>Disable</name>
+	<summary>Disable this volume.</summary>
+	<description>()</description>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>ClearActivators</name>
+	<summary>Clear the activators for this volume, allowing it to trigger again.</summary>
+	<description>()</description>
 </function>
 
 <function>

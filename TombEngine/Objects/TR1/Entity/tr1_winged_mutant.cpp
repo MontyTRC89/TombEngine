@@ -450,7 +450,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WMUTANT_STATE_IDLE_JUMP_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE &&
+				if (item->Animation.RequiredState == NO_VALUE &&
 					(item->TouchBits.Test(WingedMutantHandsJoints) || item->TouchBits.Test(WingedMutantHeadJoints)) && creature->Flags == 0)
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_IDLE_JUMP_ATTACK_DAMAGE / 2);
@@ -466,7 +466,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WMUTANT_STATE_RUN_JUMP_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE &&
+				if (item->Animation.RequiredState == NO_VALUE &&
 					(item->TouchBits.Test(WingedMutantHandsJoints) || item->TouchBits.Test(WingedMutantHeadJoints)) && creature->Flags == 0)
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_RUN_JUMP_ATTACK_DAMAGE / 2);
@@ -482,7 +482,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WMUTANT_STATE_SWIPE_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE &&
+				if (item->Animation.RequiredState == NO_VALUE &&
 					item->TouchBits.Test(WingedMutantHandsJoints) && creature->Flags == 0)
 				{
 					DoDamage(creature->Enemy, WINGED_MUTANT_SWIPE_ATTACK_DAMAGE / 2);

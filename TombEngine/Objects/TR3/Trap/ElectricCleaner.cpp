@@ -7,6 +7,7 @@
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/misc.h"
 #include "Game/Setup.h"
 
 using namespace TEN::Effects::Items;
@@ -69,99 +70,15 @@ namespace TEN::Entities::Traps
 		}
 	}
 
-	static bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir)
-	{
-		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(1));
-		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(1));
-
-		// Test for wall.
-		if (pointColl.Block->IsWall(projectedPos.x, projectedPos.z))
-			return false;
-
-		// Test for slippery slope.
-		if (pointColl.Position.FloorSlope)
-			return false;
-
-		// Flat floor.
-		if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
-		{
-			// Test for step.
-			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
-			if (relFloorHeight >= CLICK(1))
-				return false;
-		}
-		// Sloped floor.
-		else
-		{
-			// Half block.
-			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
-			if (relFloorHeight > CLICK(2))
-				return false;
-
-			short slopeAngle = ANGLE(0.0f);
-			if (pointColl.FloorTilt.x > 0)
-			{
-				slopeAngle = ANGLE(-90.0f);
-			}
-			else if (pointColl.FloorTilt.x < 0)
-			{
-				slopeAngle = ANGLE(90.0f);
-			}
-
-			if (pointColl.FloorTilt.y > 0 && pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
-			{
-				slopeAngle = ANGLE(180.0f);
-			}
-			else if (pointColl.FloorTilt.y < 0 && -pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
-			{
-				slopeAngle = ANGLE(0.0f);
-			}
-
-			short dirAngle = phd_atan(dir.z, dir.x);
-			short alignAngle = Geometry::GetShortestAngle(slopeAngle, dirAngle);
-
-			// Test if slope aspect is aligned with direction.
-			if (alignAngle != 0 && alignAngle != ANGLE(180.0f))
-				return false;
-		}
-
-		// Check for diagonal split.
-		if (pointColl.Position.DiagonalStep)
-			return false;
-
-		// Test ceiling height.
-		int relCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
-		int cleanerHeight = BLOCK(1);
-		if (relCeilHeight < cleanerHeight)
-			return false;
-
-		// Check for inaccessible sector.
-		if (pointColl.Block->Box == NO_BOX)
-			return false;
-
-		// Check for blocked grey box.
-		if (g_Level.Boxes[pointColl.Block->Box].flags & BLOCKABLE)
-		{
-			if (g_Level.Boxes[pointColl.Block->Box].flags& BLOCKED)
-				return false;
-		}
-
-		// Check for stopper flag.
-		if (pointColl.Block->Stopper)
-			return false;
-
-		return true;
-	}
-
 	static Vector3 GetElectricCleanerMovementDirection(const ItemInfo& item, const Vector3& dir0, const Vector3& dir1, const Vector3& dir2)
 	{
-		if (IsNextSectorValid(item, dir0))
+		if (IsNextSectorValid(item, dir0, BLOCK(1)))
 			return dir0;
 
-		if (IsNextSectorValid(item, dir1))
+		if (IsNextSectorValid(item, dir1, BLOCK(1)))
 			return dir1;
 
-		if (IsNextSectorValid(item, dir2))
+		if (IsNextSectorValid(item, dir2, BLOCK(1)))
 			return dir2;
 
 		return Vector3::Zero;

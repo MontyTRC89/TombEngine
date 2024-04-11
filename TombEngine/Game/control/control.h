@@ -25,6 +25,13 @@ enum class GameStatus
 	LevelComplete
 };
 
+enum class LevelLoadType
+{
+	New,
+	Hub,
+	Load
+};
+
 enum CardinalDirection
 {
 	NORTH,
@@ -95,7 +102,7 @@ void UpdateShatters();
 void CleanUp();
 
 void InitializeOrLoadGame(bool loadGame);
-void InitializeScripting(int levelIndex, bool loadGame);
+void InitializeScripting(int levelIndex, LevelLoadType type);
 void DeInitializeScripting(int levelIndex);
 
 void SaveOldState();
