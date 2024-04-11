@@ -27,7 +27,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto RAPTOR_SWITCH_TARGET_CHANCE = 1.0f / 128;
 
 	constexpr auto RAPTOR_WALK_TURN_RATE_MAX   = ANGLE(2.0f);
-	constexpr auto RAPTOR_RUN_TURN_RATE_MAX	   = ANGLE(2.0f);
+	constexpr auto RAPTOR_RUN_TURN_RATE_MAX	   = ANGLE(4.0f);
 	constexpr auto RAPTOR_ATTACK_TURN_RATE_MAX = ANGLE(2.0f);
 
 	const auto RaptorBite = CreatureBiteInfo(Vector3(0, 66, 318), 22);
@@ -43,7 +43,11 @@ namespace TEN::Entities::Creatures::TR3
 		RAPTOR_STATE_NONE = 5,
 		RAPTOR_STATE_ROAR = 6,
 		RAPTOR_STATE_RUN_BITE_ATTACK = 7,
-		RAPTOR_STATE_BITE_ATTACK = 8
+		RAPTOR_STATE_BITE_ATTACK = 8,
+		RAPTOR_STATE_JUMP_START = 9,
+		RAPTOR_STATE_JUMP_2BLOCK = 10,
+		RAPTOR_STATE_JUMP_1BLOCK = 11,
+		RAPTOR_STATE_CLIMB = 12
 	};
 
 	enum RaptorAnim
@@ -61,7 +65,17 @@ namespace TEN::Entities::Creatures::TR3
 		RAPTOR_ANIM_DEATH_2 = 10,
 		RAPTOR_ANIM_JUMP_ATTACK_START = 11,
 		RAPTOR_ANIM_JUMP_ATTACK_END = 12,
-		RAPTOR_ANIM_BITE_ATTACK = 13
+		RAPTOR_ANIM_BITE_ATTACK = 13,
+		RAPTOR_ANIM_JUMP_START = 14,
+		RAPTOR_ANIM_JUMP_2BLOCK = 15,
+		RAPTOR_ANIM_JUMP_END = 16,
+		RAPTOR_ANIM_JUMP_1BLOCK = 17,
+		RAPTOR_ANIM_VAULT_2CLICK = 18,
+		RAPTOR_ANIM_VAULT_3CLICK = 19,
+		RAPTOR_ANIM_VAULT_4CLICK = 20,
+		RAPTOR_ANIM_VAULT_DROP_2CLICK = 21,
+		RAPTOR_ANIM_VAULT_DROP_3CLICK = 22,
+		RAPTOR_ANIM_VAULT_DROP_4CLICK = 23
 	};
 
 	// TODO
@@ -79,11 +93,13 @@ namespace TEN::Entities::Creatures::TR3
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-
 		short angle = 0;
 		short tilt = 0;
 		short head = 0;
 		short neck = 0;
+
+		bool canJump1block = CanCreatureJump(*item, JumpDistance::Block1);
+		bool canJump2blocks = !canJump1block && CanCreatureJump(*item, JumpDistance::Block2);
 
 		if (item->HitPoints <= 0)
 		{
@@ -99,7 +115,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
+					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
 						continue;
 
 					auto* targetItem = &g_Level.Items[currentCreature->ItemNumber];
@@ -146,9 +162,20 @@ namespace TEN::Entities::Creatures::TR3
 			{
 			case RAPTOR_STATE_IDLE:
 				creature->MaxTurn = 0;
+				creature->LOT.IsJumping = false;
 				creature->Flags &= ~1;
 
-				if (item->Animation.RequiredState != NO_VALUE)
+				if (canJump1block || canJump2blocks)
+				{
+					creature->MaxTurn = 0;
+					SetAnimation(item, RAPTOR_ANIM_JUMP_START);
+					if (canJump1block)
+						item->Animation.TargetState = RAPTOR_STATE_JUMP_1BLOCK;
+					else
+						item->Animation.TargetState = RAPTOR_STATE_JUMP_2BLOCK;
+					creature->LOT.IsJumping = true;
+				}
+				else if (item->Animation.RequiredState != NO_STATE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (creature->Flags & 2)
 				{
@@ -176,9 +203,12 @@ namespace TEN::Entities::Creatures::TR3
 
 			case RAPTOR_STATE_WALK_FORWARD:
 				creature->MaxTurn = RAPTOR_WALK_TURN_RATE_MAX;
+				creature->LOT.IsJumping = false;
 				creature->Flags &= ~1;
 
-				if (creature->Mood != MoodType::Bored)
+				if (canJump1block || canJump2blocks)
+					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+				else if (creature->Mood != MoodType::Bored)
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 				else if (AI.ahead && Random::TestProbability(RAPTOR_ROAR_CHANCE))
 				{
@@ -191,10 +221,13 @@ namespace TEN::Entities::Creatures::TR3
 
 			case RAPTOR_STATE_RUN_FORWARD:
 				creature->MaxTurn = RAPTOR_RUN_TURN_RATE_MAX;
+				creature->LOT.IsJumping = false;
 				creature->Flags &= ~1;
 				tilt = angle;
 
-				if (item->TouchBits.Test(RaptorAttackJoints))
+				if (canJump1block || canJump2blocks)
+					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+				else if (item->TouchBits.Test(RaptorAttackJoints))
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 				else if (creature->Flags & 2)
 				{
@@ -343,6 +376,49 @@ namespace TEN::Entities::Creatures::TR3
 		CreatureJoint(item, 1, head / 2);
 		CreatureJoint(item, 2, neck);
 		CreatureJoint(item, 3, neck);
-		CreatureAnimation(itemNumber, angle, tilt);
+
+		if (item->Animation.ActiveState != RAPTOR_STATE_JUMP_2BLOCK &&
+			item->Animation.ActiveState != RAPTOR_STATE_JUMP_1BLOCK &&
+			item->Animation.ActiveState != RAPTOR_STATE_CLIMB &&
+			item->Animation.ActiveState != RAPTOR_STATE_JUMP_START)
+		{
+			int vault = CreatureVault(itemNumber, angle, 2, 384);
+			switch (vault)
+			{
+			case 2:
+				SetAnimation(item, RAPTOR_ANIM_VAULT_2CLICK);
+				creature->MaxTurn = 0;
+				break;
+
+			case 3:
+				SetAnimation(item, RAPTOR_ANIM_VAULT_3CLICK);
+				creature->MaxTurn = 0;
+				break;
+
+			case 4:
+				SetAnimation(item, RAPTOR_ANIM_VAULT_4CLICK);
+				creature->MaxTurn = 0;
+				break;
+
+			case -2:
+				SetAnimation(item, RAPTOR_ANIM_VAULT_DROP_2CLICK);
+				creature->MaxTurn = 0;
+				break;
+
+			case -3:
+				SetAnimation(item, RAPTOR_ANIM_VAULT_DROP_3CLICK);
+				creature->MaxTurn = 0;
+				break;
+
+			case -4:
+				SetAnimation(item, RAPTOR_ANIM_VAULT_DROP_4CLICK);
+				creature->MaxTurn = 0;
+				break;
+			}
+		}
+		else
+		{
+			CreatureAnimation(itemNumber, angle, tilt);
+		}
 	}
 }

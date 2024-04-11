@@ -2176,19 +2176,7 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 	if (creature.Enemy == nullptr)
 		return false;
 
-	float stepDist = 0.0f;
-	switch (jumpDistType)
-	{
-	default:
-	case JumpDistance::Block1:
-		stepDist = BLOCK(0.51f);
-		break;
-
-	case JumpDistance::Block2:
-		stepDist = BLOCK(0.76f);
-		break;
-	}
-
+	float stepDist = BLOCK(0.92f);
 	int vPos = item.Pose.Position.y;
 	auto pointCollA = GetCollision(&item, item.Pose.Orientation.y, stepDist);
 	auto pointCollB = GetCollision(&item, item.Pose.Orientation.y, stepDist * 2);
@@ -2199,7 +2187,7 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 	default:
 	case JumpDistance::Block1:
 		if (item.BoxNumber == creature.Enemy->BoxNumber ||
-			vPos >= (pointCollA.Position.Floor - STEPUP_HEIGHT) ||
+			vPos >= (pointCollA.Position.Floor - CLICK(1.5f)) ||
 			vPos >= (pointCollB.Position.Floor + CLICK(1)) ||
 			vPos <= (pointCollB.Position.Floor - CLICK(1)))
 		{
@@ -2210,8 +2198,8 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 
 	case JumpDistance::Block2:
 		if (item.BoxNumber == creature.Enemy->BoxNumber ||
-			vPos >= (pointCollA.Position.Floor - STEPUP_HEIGHT) ||
-			vPos >= (pointCollB.Position.Floor - STEPUP_HEIGHT) ||
+			vPos >= (pointCollA.Position.Floor - CLICK(1.5f)) ||
+			vPos >= (pointCollB.Position.Floor - CLICK(1.5f)) ||
 			vPos >= (pointCollC.Position.Floor + CLICK(1)) ||
 			vPos <= (pointCollC.Position.Floor - CLICK(1)))
 		{

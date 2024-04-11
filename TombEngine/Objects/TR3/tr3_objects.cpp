@@ -117,6 +117,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = 341;
 		obj->pivotLength = 600;
 		obj->intelligent = true;
+		obj->LotType = LotType::HumanPlusJump;
 		obj->SetBoneRotationFlags(20, ROT_Y);
 		obj->SetBoneRotationFlags(21, ROT_Y);
 		obj->SetBoneRotationFlags(23, ROT_Y);
@@ -365,7 +366,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head.
 		obj->SetHitEffect();
 	}
-
+	
 	obj = &Objects[ID_WASP_MUTANT];
 	if (obj->loaded)
 	{
@@ -380,7 +381,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Flyer;
 		obj->SetHitEffect();
 	}
-
+	
 	obj = &Objects[ID_COMPSOGNATHUS];
 	if (obj->loaded)
 	{
