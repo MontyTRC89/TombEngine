@@ -56,6 +56,14 @@ struct SMOKE_SPARKS
 	byte fxObj;
 	byte nodeNumber;
 	byte mirror;
+
+	int oldX;
+	int oldY;
+	int oldZ;
+	unsigned char oldShade;
+	short oldRotAng;
+	unsigned char oldSize;
+	unsigned char oldScalar;
 };
 
 struct SHOCKWAVE_STRUCT
@@ -122,6 +130,11 @@ struct FIRE_LIST
 	byte on;
 	float size;
 	short roomNumber;
+	
+	int oldX;
+	int oldY;
+	int oldZ;
+	int oldSize;
 };
 
 struct FIRE_SPARKS
@@ -157,6 +170,16 @@ struct FIRE_SPARKS
 	unsigned char fadeToBlack;
 	unsigned char sLife;
 	unsigned char life;
+
+	int oldX;
+	int oldY;
+	int oldZ;
+	int oldR;
+	int oldG;
+	int oldB;
+	unsigned char oldScalar;
+	unsigned char oldSize;
+	short oldRotAng;
 };
 
 struct BLOOD_STRUCT

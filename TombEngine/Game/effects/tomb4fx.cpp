@@ -120,6 +120,16 @@ void TriggerGlobalStaticFlame()
 	spark->zVel = 0;
 	spark->flags = SP_NONE;
 	spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 0x1F) + -128;
+	
+	spark->oldX = spark->x;
+	spark->oldY = spark->y;
+	spark->oldZ = spark->z;
+	spark->oldSize = spark->size;
+	spark->oldRotAng = spark->rotAng;
+	spark->oldR = spark->r;
+	spark->oldG = spark->g;
+	spark->oldB = spark->b;
+	spark->oldScalar = spark->scalar;
 }
 
 void TriggerGlobalFireSmoke()
@@ -161,6 +171,16 @@ void TriggerGlobalFireSmoke()
 	spark->gravity = -16 - (GetRandomControl() & 0xF);
 	spark->maxYvel = -8 - (GetRandomControl() & 7);
 	spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 0x7F) + 128;
+
+	spark->oldX = spark->x;
+	spark->oldY = spark->y;
+	spark->oldZ = spark->z;
+	spark->oldSize = spark->size;
+	spark->oldRotAng = spark->rotAng;
+	spark->oldR = spark->r;
+	spark->oldG = spark->g;
+	spark->oldB = spark->b;
+	spark->oldScalar = spark->scalar;
 }
 
 void TriggerGlobalFireFlame()
@@ -203,6 +223,16 @@ void TriggerGlobalFireFlame()
 
 	spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 128;
 	spark->dSize = spark->size;
+
+	spark->oldX = spark->x;
+	spark->oldY = spark->y;
+	spark->oldZ = spark->z;
+	spark->oldSize = spark->size;
+	spark->oldRotAng = spark->rotAng;
+	spark->oldR = spark->r;
+	spark->oldG = spark->g;
+	spark->oldB = spark->b;
+	spark->oldScalar = spark->scalar;
 }
 
 void TriggerPilotFlame(int itemNumber, int nodeIndex)
@@ -394,6 +424,11 @@ void AddFire(int x, int y, int z, short roomNum, float size, short fade)
 	fptr->z = z;
 	fptr->roomNumber = roomNum;
 	fptr->size = size;
+
+	fptr->oldX = fptr->x;
+	fptr->oldY = fptr->y;
+	fptr->oldZ = fptr->z;
+	fptr->oldSize = fptr->size;
 }
 
 void ClearFires()
@@ -419,6 +454,16 @@ void UpdateFireSparks()
 				spark->on = false;
 				continue;
 			}
+
+			spark->oldX = spark->x;
+			spark->oldY = spark->y;
+			spark->oldZ = spark->z;
+			spark->oldSize = spark->size;
+			spark->oldRotAng = spark->rotAng;
+			spark->oldR = spark->r;
+			spark->oldG = spark->g;
+			spark->oldB = spark->b;
+			spark->oldScalar = spark->scalar;
 
 			if (spark->sLife - spark->life < spark->colFadeSpeed)
 			{
@@ -533,6 +578,14 @@ void UpdateSmoke()
 				spark->on = false;
 				continue;
 			}
+
+			spark->oldX = spark->x;
+			spark->oldY = spark->y;
+			spark->oldZ = spark->z;
+			spark->oldSize = spark->size;
+			spark->oldRotAng = spark->rotAng;
+			spark->oldScalar = spark->scalar;
+			spark->oldScalar = spark->scalar;
 
 			if (spark->sLife - spark->life >= spark->colFadeSpeed)
 			{
@@ -680,6 +733,13 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->dSize = (GetRandomControl() & 0x3F) + 64;
 	spark->sSize = spark->dSize >> 3;
 	spark->size = spark->dSize >> 3;
+
+	spark->oldX = spark->x;
+	spark->oldY = spark->y;
+	spark->oldZ = spark->z;
+	spark->oldSize = spark->size;
+	spark->oldRotAng = spark->rotAng;
+	spark->oldScalar = spark->scalar;
 }
 
 int GetFreeBlood()

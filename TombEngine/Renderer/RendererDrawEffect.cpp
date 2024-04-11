@@ -286,6 +286,26 @@ namespace TEN::Renderer
 								   Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
 								   TO_RAD(spark->rotAng << 4), spark->scalar, { spark->size * 4.0f, spark->size * 4.0f },
 								   BlendMode::Additive, true, view);
+
+				AddSpriteBillboard(
+					&_sprites[spark->def],
+					Vector3::Lerp(
+						Vector3(spark->oldX, spark->oldY, spark->oldZ),
+						Vector3(spark->x, spark->y, spark->z),
+						_interpolationFactor),
+					Vector4::Lerp(
+						Vector4(spark->oldShade / 255.0f, spark->oldShade / 255.0f, spark->oldShade / 255.0f, 1.0f),
+						Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
+						_interpolationFactor),
+					TO_RAD(Lerp(spark->oldRotAng << 4, spark->rotAng << 4, _interpolationFactor)),
+					Lerp(spark->oldScalar, spark->scalar, _interpolationFactor),
+					{
+						Lerp(spark->oldSize, spark->size, _interpolationFactor) * 4.0f, 
+						Lerp(spark->oldSize, spark->size, _interpolationFactor) * 4.0f 
+					},
+					BlendMode::Additive,
+					true,
+					view);
 			}
 		}
 	}
@@ -307,11 +327,23 @@ namespace TEN::Renderer
 					{
 						AddSpriteBillboard(
 							&_sprites[spark->def],
-							Vector3(fire->x + spark->x * fire->size / 2, fire->y + spark->y * fire->size / 2, fire->z + spark->z * fire->size / 2),
-							Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
-							TO_RAD(spark->rotAng << 4),
-							spark->scalar,
-							Vector2(spark->size * fire->size, spark->size * fire->size), BlendMode::Additive, true, view);
+							Vector3::Lerp(
+								Vector3(fire->oldX + spark->oldX * fire->oldSize / 2, fire->oldY + spark->oldY * fire->oldSize / 2, fire->oldZ + spark->oldZ * fire->oldSize / 2),
+								Vector3(fire->x + spark->x * fire->size / 2, fire->y + spark->y * fire->size / 2, fire->z + spark->z * fire->size / 2),
+								_interpolationFactor),
+							Vector4::Lerp(
+								Vector4(spark->oldR / 255.0f * fade, spark->oldG / 255.0f * fade, spark->oldB / 255.0f * fade, 1.0f),
+								Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
+								_interpolationFactor),
+							TO_RAD((short)Lerp(spark->oldRotAng, spark->rotAng, _interpolationFactor) << 4),
+							Lerp(spark->oldScalar, spark->scalar, _interpolationFactor),
+							Vector2::Lerp(
+								Vector2(spark->oldSize * fire->oldSize, spark->oldSize * fire->oldSize),
+								Vector2(spark->size * fire->size, spark->size * fire->size),
+								_interpolationFactor),
+							BlendMode::Additive, 
+							true,
+							view);
 					}
 				}
 			}
