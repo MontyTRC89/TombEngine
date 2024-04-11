@@ -660,8 +660,6 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 	const auto& bounds = (bigPushFlags & 2) ? GlobalCollisionBounds : GameBoundingBox(item0);
 	int minX = bounds.X1;
 	int maxX = bounds.X2;
-	int minY = bounds.Y1;
-	int maxY = bounds.Y2;
 	int minZ = bounds.Z1;
 	int maxZ = bounds.Z2;
 
@@ -671,14 +669,11 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 		maxX += coll->Setup.Radius;
 		minZ -= coll->Setup.Radius;
 		maxZ += coll->Setup.Radius;
-		minY -= coll->Setup.Radius;
-		maxY += coll->Setup.Radius;
 	}
 
 	// Big enemies.
 	if (abs(deltaPos.x) > BLOCK(4.5f) || abs(deltaPos.z) > BLOCK(4.5f) ||
 		relDeltaPos.x <= minX || relDeltaPos.x >= maxX ||
-		relDeltaPos.y <= minY || relDeltaPos.y >= maxY ||
 		relDeltaPos.z <= minZ || relDeltaPos.z >= maxZ)
 	{
 		return false;
