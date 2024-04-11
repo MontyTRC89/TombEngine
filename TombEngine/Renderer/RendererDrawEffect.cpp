@@ -1295,8 +1295,17 @@ namespace TEN::Renderer
 
 			AddSpriteBillboard(
 				&_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + smoke.sprite],
-				smoke.position,
-				smoke.color, smoke.rotation, 1.0f, { smoke.size, smoke.size }, BlendMode::AlphaBlend, true, view);
+				Vector3::Lerp(smoke.oldPosition, smoke.position, _interpolationFactor),
+				Vector4::Lerp(smoke.oldColor, smoke.color, _interpolationFactor),
+				Lerp(smoke.oldRotation, smoke.rotation, _interpolationFactor), 
+				1.0f, 
+				{
+					Lerp(smoke.oldSize, smoke.size, _interpolationFactor),
+					Lerp(smoke.oldSize, smoke.size, _interpolationFactor)
+				}, 
+				BlendMode::AlphaBlend, 
+				true, 
+				view);
 		}
 	}
 
