@@ -14,6 +14,11 @@ namespace TEN::Effects::Blood
 		float Init	  = 0.0f;
 		float Size	  = 0.0f;
 		float Opacity = 0.0f;
+
+		Vector3 OldPosition = Vector3::Zero;
+		Vector4 OldColor	= Vector4::Zero;
+		float OldSize = 0.0f;
+		float OldOpacity = 0.0f;
 	};
 
 	extern std::vector<UnderwaterBlood> UnderwaterBloodParticles;

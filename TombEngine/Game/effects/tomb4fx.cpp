@@ -748,6 +748,13 @@ void TriggerBlood(int x, int y, int z, int unk, int num)
 		int size = (GetRandomControl() & 7) + 8;
 		blood->sSize = blood->size = size;
 		blood->dSize = size >> 2;
+
+		blood->oldX = blood->x;
+		blood->oldY = blood->y;
+		blood->oldZ = blood->z;
+		blood->oldRotAng = blood->rotAng;
+		blood->oldSize = blood->size;
+		blood->oldShade = blood->shade;
 	}
 }
 
@@ -766,6 +773,13 @@ void UpdateBlood()
 				blood->on = false;
 				continue;
 			}
+
+			blood->oldX = blood->x;
+			blood->oldY = blood->y;
+			blood->oldZ = blood->z;
+			blood->oldRotAng = blood->rotAng;
+			blood->oldSize = blood->size;
+			blood->oldShade = blood->shade;
 
 			if (blood->sLife - blood->life >= blood->colFadeSpeed)
 			{

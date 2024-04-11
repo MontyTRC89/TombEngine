@@ -767,16 +767,30 @@ namespace TEN::Renderer
 		{
 			BLOOD_STRUCT* blood = &Blood[i];
 
-			if (blood->on) 
+			if (blood->on)
 			{
 				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Blood rendering"))
 					return;
 
-				AddSpriteBillboard(&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
-								   Vector3(blood->x, blood->y, blood->z),
-								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
-								   TO_RAD(blood->rotAng << 4), 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
-								   BlendMode::Additive, true, view);
+				AddSpriteBillboard(
+					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
+					Vector3::Lerp(
+						Vector3(blood->oldX, blood->oldY, blood->oldZ),
+						Vector3(blood->x, blood->y, blood->z),
+						_interpolationFactor),
+					Vector4::Lerp(
+						Vector4(blood->oldShade / 255.0f, blood->oldShade * 0, blood->oldShade * 0, 1.0f),
+						Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
+						_interpolationFactor
+					),
+					TO_RAD(Lerp(blood->oldRotAng << 4, blood->rotAng << 4, _interpolationFactor)), 
+					1.0f, 
+					{ 
+						Lerp(blood->oldSize, blood->size, _interpolationFactor) * 8.0f, 
+						Lerp(blood->oldSize, blood->size, _interpolationFactor) * 8.0f },
+					BlendMode::Additive, 
+					true, 
+					view);
 			}
 		}
 	}

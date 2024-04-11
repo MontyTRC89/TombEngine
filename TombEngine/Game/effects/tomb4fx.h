@@ -183,6 +183,13 @@ struct BLOOD_STRUCT
 	byte sLife;
 	byte life;
 	byte pad;
+
+	int oldX;
+	int oldY;
+	int oldZ;
+	short oldRotAng;
+	unsigned char oldShade;
+	unsigned char oldSize;
 };
 
 enum class ShockwaveStyle
