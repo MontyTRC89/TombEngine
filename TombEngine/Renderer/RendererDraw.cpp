@@ -893,7 +893,10 @@ namespace TEN::Renderer
 		}
 		else
 		{	
+			std::vector<std::vector<BeetleData>> beetlesBuckets;
+
 			unsigned int beetleCount = 0;
+
 			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
 				const auto& beetle = TEN::Entities::TR4::BeetleSwarm[i];
@@ -909,57 +912,65 @@ namespace TEN::Renderer
 
 					if (rendererPass != RendererPass::GBuffer)
 					{
-						BindInstancedStaticLights(room.LightsToDraw, beetleCount);
+						std::vector<RendererLight*> lights;
+						for (int i = 0; i < std::min((int)room.LightsToDraw.size(), MAX_LIGHTS_PER_ITEM); i++)
+						{
+							lights.push_back(room.LightsToDraw[i]);
+						}
+						BindInstancedStaticLights(lights, beetleCount);
 					}
 
 					beetleCount++;
 				}
-			}
 
-			if (beetleCount > 0)
-			{
-				if (rendererPass == RendererPass::GBuffer)
+				if (beetleCount == INSTANCED_STATIC_MESH_BUCKET_SIZE || 
+					(i == TEN::Entities::TR4::NUM_BEETLES - 1 && beetleCount > 0))
 				{
-					_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
-					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
-				}
-				else
-				{
-					_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-					_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
-				}
-
-				unsigned int stride = sizeof(Vertex);
-				unsigned int offset = 0;
-
-				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-				_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
-
-				for (const auto& bucket : mesh->Buckets)
-				{
-					if (bucket.NumVertices == 0)
+					if (rendererPass == RendererPass::GBuffer)
 					{
-						continue;
+						_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
+						_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+					}
+					else
+					{
+						_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
+						_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
 					}
 
-					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+					unsigned int stride = sizeof(Vertex);
+					unsigned int offset = 0;
 
-					for (int p = 0; p < passes; p++)
+					_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+					_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+					_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
+
+					for (const auto& bucket : mesh->Buckets)
 					{
-						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+						if (bucket.NumVertices == 0)
 						{
 							continue;
 						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
-						DrawIndexedInstancedTriangles(bucket.NumIndices, beetleCount, bucket.StartIndex, 0);
+						for (int p = 0; p < passes; p++)
+						{
+							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+							{
+								continue;
+							}
 
-						_numInstancedStaticsDrawCalls++;
+							BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+							BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+							DrawIndexedInstancedTriangles(bucket.NumIndices, beetleCount, bucket.StartIndex, 0);
+
+							_numInstancedStaticsDrawCalls++;
+						}
 					}
+
+					beetleCount = 0;
 				}
 			}
 		}
