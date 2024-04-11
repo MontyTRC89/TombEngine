@@ -115,7 +115,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+					if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
 						continue;
 
 					auto* targetItem = &g_Level.Items[currentCreature->ItemNumber];
@@ -175,7 +175,7 @@ namespace TEN::Entities::Creatures::TR3
 						item->Animation.TargetState = RAPTOR_STATE_JUMP_2BLOCK;
 					creature->LOT.IsJumping = true;
 				}
-				else if (item->Animation.RequiredState != NO_STATE)
+				else if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (creature->Flags & 2)
 				{
