@@ -2114,6 +2114,35 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
+	<name>SetOnCollidedWithObject</name>
+	<summary>Set the function to be called when this moveable collides with another moveable</summary>
+	<parameters>
+		<parameter>
+			<name>func</name>
+			<type>function</type>
+			<description>callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetOnCollidedWithRoom</name>
+	<summary>Set the function called when this moveable collides with room geometry (e.g.</summary>
+	<description>a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.</description>
+	<parameters>
+		<parameter>
+			<name>func</name>
+			<type>function</type>
+			<description>callback function to be called (must be in LevelFuncs hierarchy)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
 	<name>SetOnKilled</name>
 	<summary>Set the name of the function to be called when the moveable is destroyed/killed
  Note that enemy death often occurs at the end of an animation, and not at the exact moment
@@ -2591,35 +2620,6 @@ most can just be ignored (see usage).</description>
 			<name>stateID</name>
 			<type>int</type>
 			<description>state from object</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
-	<name>SetOnCollidedWithObject</name>
-	<summary>Set the function to be called when this moveable collides with another moveable</summary>
-	<parameters>
-		<parameter>
-			<name>func</name>
-			<type>function</type>
-			<description>callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
-	<name>SetOnCollidedWithRoom</name>
-	<summary>Set the function called when this moveable collides with room geometry (e.g.</summary>
-	<description>a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.</description>
-	<parameters>
-		<parameter>
-			<name>func</name>
-			<type>function</type>
-			<description>callback function to be called (must be in LevelFuncs hierarchy)</description>
 		</parameter>
 	</parameters>
 </function>

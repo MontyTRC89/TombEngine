@@ -165,61 +165,41 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 
 	ScriptReserved_SetVisible, &Moveable::SetVisible,
 
-	/// Explode item. This also kills and disables item.
-	// @function Moveable:Explode
+/// Explode item. This also kills and disables item.
+// @function Moveable:Explode
 	ScriptReserved_Explode, &Moveable::Explode,
 
-	/// Shatter item. This also kills and disables item.
-	// @function Moveable:Shatter
+/// Shatter item. This also kills and disables item.
+// @function Moveable:Shatter
 	ScriptReserved_Shatter, &Moveable::Shatter,
 
-	/// Set effect to moveable
-	// @function Moveable:SetEffect
-	// @tparam Effects.EffectID effect Type of effect to assign.
-	// @tparam float timeout time (in seconds) after which effect turns off (optional).
+/// Set effect to moveable
+// @function Moveable:SetEffect
+// @tparam Effects.EffectID effect Type of effect to assign.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
-	/// Set custom colored burn effect to moveable
-	// @function Moveable:SetCustomEffect
-	// @tparam Color Color1 color the primary color of the effect (also used for lighting).
-	// @tparam Color Color2 color the secondary color of the effect.
-	// @tparam float timeout time (in seconds) after which effect turns off (optional).
+/// Set custom colored burn effect to moveable
+// @function Moveable:SetCustomEffect
+// @tparam Color Color1 color the primary color of the effect (also used for lighting).
+// @tparam Color Color2 color the secondary color of the effect.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
 
-	/// Get current moveable effect
-	// @function Moveable:GetEffect
-	// @treturn Effects.EffectID effect type currently assigned to moveable.
+/// Get current moveable effect
+// @function Moveable:GetEffect
+// @treturn Effects.EffectID effect type currently assigned to moveable.
 	ScriptReserved_GetEffect, &Moveable::GetEffect,
 
-	/// Get the moveable's status.
-	// @function Moveable:GetStatus()
-	// @treturn Objects.MoveableStatus The moveable's status.
+/// Get the moveable's status.
+// @function Moveable:GetStatus()
+// @treturn Objects.MoveableStatus The moveable's status.
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 
-	/// Set the moveable's status.
-	// @function Moveable:SetStatus()
-	// @tparam Objects.MoveableStatus status The new status of the moveable.
+/// Set the moveable's status.
+// @function Moveable:SetStatus()
+// @tparam Objects.MoveableStatus status The new status of the moveable.
 	ScriptReserved_SetStatus, &Moveable::SetStatus,
-
-	/// Set the name of the function to be called when the moveable is shot by Lara.
-	// Note that this will be triggered twice when shot with both pistols at once. 
-	// @function Moveable:SetOnHit
-	// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
-	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
-
-	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
-
-	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
-
-/// Set the name of the function to be called when the moveable is destroyed/killed
-// Note that enemy death often occurs at the end of an animation, and not at the exact moment
-// the enemy's HP becomes zero.
-// @function Moveable:SetOnKilled
-// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
-// @usage
-// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
-// baddy:SetOnKilled(LevelFuncs.baddyKilled)
-	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
@@ -433,7 +413,43 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam Objects.ObjID ObjectID to take animation and stateID from,
 // @tparam int animNumber animation from object
 // @tparam int stateID state from object
-	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
+	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject,
+
+/// Set the name of the function to be called when the moveable is shot by Lara.
+// Note that this will be triggered twice when shot with both pistols at once. 
+// @function Moveable:SetOnHit
+// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
+	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
+
+/// Set the function to be called when this moveable collides with another moveable
+// @function Moveable:SetOnCollidedWithObject
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.
+// @usage
+// LevelFuncs.objCollided = function(obj1, obj2)
+//     print(obj1:GetName() .. " collided with " .. obj2:GetName())
+// end
+// baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)
+	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
+
+/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.
+// @function Moveable:SetOnCollidedWithRoom
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
+// @usage
+// LevelFuncs.roomCollided = function(obj)
+//     print(obj:GetName() .. " collided with room geometry")
+// end
+// baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)
+	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
+
+/// Set the name of the function to be called when the moveable is destroyed/killed
+// Note that enemy death often occurs at the end of an animation, and not at the exact moment
+// the enemy's HP becomes zero.
+// @function Moveable:SetOnKilled
+// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
+// @usage
+// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
+// baddy:SetOnKilled(LevelFuncs.baddyKilled)
+	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled);
 }
 
 void Moveable::Init()
@@ -502,27 +518,11 @@ void Moveable::SetOnKilled(const TypeOrNil<LevelFunc>& cb)
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
 }
 
-/// Set the function to be called when this moveable collides with another moveable
-// @function Moveable:SetOnCollidedWithObject
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.
-// @usage
-// LevelFuncs.objCollided = function(obj1, obj2)
-//     print(obj1:GetName() .. " collided with " .. obj2:GetName())
-// end
-// baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)
 void Moveable::SetOnCollidedWithObject(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
 }
 
-/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.
-// @function Moveable:SetOnCollidedWithRoom
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
-// @usage
-// LevelFuncs.roomCollided = function(obj)
-//     print(obj:GetName() .. " collided with room geometry")
-// end
-// baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)
 void Moveable::SetOnCollidedWithRoom(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);

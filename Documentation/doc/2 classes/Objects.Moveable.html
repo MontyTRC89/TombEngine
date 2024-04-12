@@ -145,6 +145,14 @@ associated getters and setters.</td>
 	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(func)</a></td>
+	<td class="summary">Set the function to be called when this moveable collides with another moveable</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(func)</a></td>
+	<td class="summary">Set the function called when this moveable collides with room geometry (e.g.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
 	<td class="summary">Set the name of the function to be called when the moveable is destroyed/killed
  Note that enemy death often occurs at the end of an animation, and not at the exact moment
@@ -272,14 +280,6 @@ associated getters and setters.</td>
 	<tr>
 	<td class="name" ><a href="#Moveable:AnimFromObject">Moveable:AnimFromObject(ObjectID, animNumber, stateID)</a></td>
 	<td class="summary">Borrow animation from an object</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(func)</a></td>
-	<td class="summary">Set the function to be called when this moveable collides with another moveable</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(func)</a></td>
-	<td class="summary">Set the function called when this moveable collides with room geometry (e.g.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetPosition">Moveable:GetPosition()</a></td>
@@ -640,6 +640,64 @@ most can just be ignored (see usage).
 
 
 
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnCollidedWithObject"></a>
+    <strong>Moveable:SetOnCollidedWithObject(func)</strong>
+    </dt>
+    <dd>
+    Set the function to be called when this moveable collides with another moveable
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">function</span></span>
+         callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two <a href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a>s taking part in the collision.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">LevelFuncs.objCollided = <span class="keyword">function</span>(obj1, obj2)
+    <span class="global">print</span>(obj1:GetName() .. <span class="string">" collided with "</span> .. obj2:GetName())
+<span class="keyword">end</span>
+baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnCollidedWithRoom"></a>
+    <strong>Moveable:SetOnCollidedWithRoom(func)</strong>
+    </dt>
+    <dd>
+    Set the function called when this moveable collides with room geometry (e.g.  a wall or floor). This function can take an argument that holds the <a href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a> that collided with geometry.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">func</span>
+            <span class="types"><span class="type">function</span></span>
+         callback function to be called (must be in LevelFuncs hierarchy)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">LevelFuncs.roomCollided = <span class="keyword">function</span>(obj)
+    <span class="global">print</span>(obj:GetName() .. <span class="string">" collided with room geometry"</span>)
+<span class="keyword">end</span>
+baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
+    </ul>
 
 </dd>
     <dt>
@@ -1371,64 +1429,6 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
 
 
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnCollidedWithObject"></a>
-    <strong>Moveable:SetOnCollidedWithObject(func)</strong>
-    </dt>
-    <dd>
-    Set the function to be called when this moveable collides with another moveable
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">func</span>
-            <span class="types"><span class="type">function</span></span>
-         callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two <a href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a>s taking part in the collision.
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">LevelFuncs.objCollided = <span class="keyword">function</span>(obj1, obj2)
-    <span class="global">print</span>(obj1:GetName() .. <span class="string">" collided with "</span> .. obj2:GetName())
-<span class="keyword">end</span>
-baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)</pre>
-    </ul>
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnCollidedWithRoom"></a>
-    <strong>Moveable:SetOnCollidedWithRoom(func)</strong>
-    </dt>
-    <dd>
-    Set the function called when this moveable collides with room geometry (e.g.  a wall or floor). This function can take an argument that holds the <a href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a> that collided with geometry.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">func</span>
-            <span class="types"><span class="type">function</span></span>
-         callback function to be called (must be in LevelFuncs hierarchy)
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">LevelFuncs.roomCollided = <span class="keyword">function</span>(obj)
-    <span class="global">print</span>(obj:GetName() .. <span class="string">" collided with room geometry"</span>)
-<span class="keyword">end</span>
-baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
-    </ul>
 
 </dd>
     <dt>

@@ -52,18 +52,20 @@ namespace TEN::Entities::Traps
 		auto pointColl0 = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2);
 		auto pointColl1 = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2, (bounds.X2 - bounds.X1) / 2);
 
-		if (GetCollidedObjects(&item, CLICK(1), true, CollidedItems, CollidedMeshes, true))
+		auto collObjects = GetCollidedObjects(item, true, true);
+		if (!collObjects.IsEmpty())
 		{
-			int collidedItemNumber = 0;
-			while (CollidedItems[collidedItemNumber] != nullptr)
+			for (auto* itemPtr : collObjects.ItemPtrs)
 			{
-				if (Objects[CollidedItems[collidedItemNumber]->ObjectNumber].intelligent)
+				const auto& object = Objects[itemPtr->ObjectNumber];
+
+				if (object.intelligent)
 				{
-					CollidedItems[collidedItemNumber]->HitPoints = 0;
+					itemPtr->HitPoints = 0;
 				}
-				else if (CollidedItems[collidedItemNumber]->ObjectNumber == ID_SPIKY_WALL && !item.ItemFlags[1])
+				else if (itemPtr->ObjectNumber == ID_SPIKY_WALL && !item.ItemFlags[1])
 				{
-					CollidedItems[collidedItemNumber]->TriggerFlags = 0;
+					itemPtr->TriggerFlags = 0;
 
 					item.TriggerFlags = 0;
 					item.Status = ITEM_DEACTIVATED;
@@ -71,8 +73,6 @@ namespace TEN::Entities::Traps
 
 					StopSoundEffect(SFX_TR4_ROLLING_BALL);
 				}
-
-				collidedItemNumber++;
 			}
 		}
 
