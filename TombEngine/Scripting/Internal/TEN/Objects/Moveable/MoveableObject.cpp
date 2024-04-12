@@ -413,7 +413,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam Objects.ObjID ObjectID to take animation and stateID from,
 // @tparam int animNumber animation from object
 // @tparam int stateID state from object
-	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject),
+	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject,
 
 /// Set the name of the function to be called when the moveable is shot by Lara.
 // Note that this will be triggered twice when shot with both pistols at once. 
@@ -449,7 +449,7 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @usage
 // LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
 // baddy:SetOnKilled(LevelFuncs.baddyKilled)
-	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled;
+	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled);
 }
 
 void Moveable::Init()
