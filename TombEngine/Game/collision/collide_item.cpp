@@ -104,6 +104,8 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 	constexpr auto EXTENTS_LENGTH_MIN	= 2.0f;
 	constexpr auto ROUGH_BOX_HEIGHT_MIN = BLOCK(1 / 8.0f);
 
+	auto collObjects = CollidedObjectData{};
+
 	int itemCount	= 0;
 	int staticCount = 0;
 
@@ -113,11 +115,9 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 	auto collidingSphere = BoundingSphere(collidingBounds.GetCenter() + collidingItem.Pose.Position.ToVector3(), collidingExtents.Length());
 	auto collidingCircle = Vector3(collidingSphere.Center.x, collidingSphere.Center.z, (customRadius > 0.0f) ? customRadius : std::hypot(collidingExtents.x, collidingExtents.z));
 
-	auto objects = CollidedObjectData{};
-
 	// Quickly discard collision if colliding item bounds are below tolerance threshold.
 	if (collidingSphere.Radius <= EXTENTS_LENGTH_MIN)
-		return objects;
+		return collObjects;
 
 	// Run through neighboring rooms.
 	const auto& room = g_Level.Rooms[collidingItem.RoomNumber];
@@ -200,7 +200,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 					// Test accurate box intersection.
 					if (box0.Intersects(box1))
-						objects.ItemPtrs.push_back(&item);
+						collObjects.ItemPtrs.push_back(&item);
 				}
 				while (itemNumber != NO_VALUE);
 			}
@@ -249,12 +249,12 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 				// Test accurate box intersection.
 				if (box0.Intersects(box1))
-					objects.StaticPtrs.push_back(&staticObj);
+					collObjects.StaticPtrs.push_back(&staticObj);
 			}
 		}
 	}
 
-	return objects;
+	return collObjects;
 }
 
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll)
