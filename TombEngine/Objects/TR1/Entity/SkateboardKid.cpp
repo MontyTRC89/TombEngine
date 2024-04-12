@@ -112,22 +112,25 @@ namespace TEN::Entities::Creatures::TR1
 	{
 		if (!CreatureActive(itemNumber))
 			return;
+
 		auto& item = g_Level.Items[itemNumber];
+
 		if (item.ItemFlags[0] == NO_VALUE)
 		{
 			TENLog("Failed to do the skateboard kid control (itemNumber: " + std::to_string(itemNumber) + "), the skateboard itemNumber is missing, probably failed to be created !");
 			return;
 		}
+
 		auto& creature = *GetCreatureInfo(&item);
 		auto& skateItem = g_Level.Items[item.ItemFlags[0]];
 		short headingAngle = 0;
 		auto extraHeadRot = EulerAngles::Identity;
 		auto extraTorsoRot = EulerAngles::Identity;
 
-		if (skateItem.Status & ITEM_INVISIBLE)
+		if (skateItem.Status == ITEM_INVISIBLE)
 		{
 			skateItem.Active = true;
-			skateItem.Status &= ~(ITEM_INVISIBLE);
+			skateItem.Status = ITEM_ACTIVE;
 		}
 
 		for (auto& flash : creature.MuzzleFlash)

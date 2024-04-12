@@ -1554,42 +1554,34 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		}
 
 		// Found possible collided items and statics.
-		GetCollidedObjects(&projectile, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
-
-		// If no collided items and meshes are found, exit the loop.
-		if (!CollidedItems[0] && !CollidedMeshes[0])
+		auto collObjects = GetCollidedObjects(projectile, true, false, radius);
+		if (collObjects.IsEmpty())
 			break;
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		// Run through statics.
+		for (auto* staticPtr : collObjects.StaticPtrs)
 		{
-			auto* meshPtr = CollidedMeshes[i];
-			if (!meshPtr)
-				break;
-
 			hasHit = hasHitNotByEmitter = doShatter = true;
 			doExplosion = isExplosive;
 
-			if (StaticObjects[meshPtr->staticNumber].shatterType == ShatterType::None)
+			if (StaticObjects[staticPtr->staticNumber].shatterType == ShatterType::None)
 				continue;
 
-			meshPtr->HitPoints -= damage;
-			if (meshPtr->HitPoints <= 0)
-				ShatterObject(nullptr, meshPtr, -128, projectile.RoomNumber, 0);
+			staticPtr->HitPoints -= damage;
+			if (staticPtr->HitPoints <= 0)
+				ShatterObject(nullptr, staticPtr, -128, projectile.RoomNumber, 0);
 
 			if (!isExplosive)
 				continue;
 
-			TriggerExplosionSparks(meshPtr->pos.Position.x, meshPtr->pos.Position.y, meshPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
-			auto pose = Pose(meshPtr->pos.Position.x, meshPtr->pos.Position.y - 128, meshPtr->pos.Position.z, 0, meshPtr->pos.Orientation.y, 0);
+			TriggerExplosionSparks(staticPtr->pos.Position.x, staticPtr->pos.Position.y, staticPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
+			auto pose = Pose(staticPtr->pos.Position.x, staticPtr->pos.Position.y - 128, staticPtr->pos.Position.z, 0, staticPtr->pos.Orientation.y, 0);
 			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		}
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		// Run through items.
+		for (auto* itemPtr : collObjects.ItemPtrs)
 		{
-			auto* itemPtr = CollidedItems[i];
-			if (itemPtr == nullptr)
-				break;
-#
 			// Object was already affected by collision, skip it.
 			if (std::find(affectedObjects.begin(), affectedObjects.end(), itemPtr->Index) != affectedObjects.end())
 				continue;
@@ -1652,7 +1644,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				SmashObject(itemPtr->Index);
 				KillItem(itemPtr->Index);
 			}
-			else if (currentObject.collision && !(itemPtr->Status & ITEM_INVISIBLE))
+			else if (currentObject.collision && itemPtr->Status != ITEM_INVISIBLE)
 			{
 				doShatter = hasHit = true;
 				doExplosion = isExplosive;

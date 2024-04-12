@@ -40,7 +40,7 @@ void SmashObject(short itemNumber)
 
 	SoundEffect(SFX_TR5_SMASH_GLASS, &item->Pose);
 
-	item->Collidable = 0;
+	item->Collidable = false;
 	item->MeshBits = 0xFFFE;
 
 	ExplodingDeath(itemNumber, BODY_DO_EXPLOSION | BODY_NO_BOUNCE);

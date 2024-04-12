@@ -28,6 +28,7 @@ Lua API changes:
 * Added Flow.GetFlipMapStatus() function to get current flipmap status.
 * Added Moveable:GetMeshCount() function to get number of moveable meshes.
 * Added Static:GetHP() and Static:SetHP() functions to change shatterable static mesh hit points.
+* Fixed Moveable:SetOnCollidedWithObject() callback.
 
 Version 1.3
 ===========
