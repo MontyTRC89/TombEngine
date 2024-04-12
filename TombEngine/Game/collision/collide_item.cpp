@@ -212,8 +212,6 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 		{
 			for (auto& staticObj : neighborRoom.mesh)
 			{
-				const auto& bounds = GetBoundsAccurate(staticObj, false);
-
 				// Discard invisible statics.
 				if (!(staticObj.flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
@@ -222,6 +220,8 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 				float dist = Vector3i::Distance(staticObj.pos.Position, collidingItem.Pose.Position);
 				if (dist > COLLISION_CHECK_DISTANCE)
 					continue;
+
+				const auto& bounds = GetBoundsAccurate(staticObj, false);
 
 				// Test rough vertical distance to discard statics not intersecting vertically.
 				if (((collidingItem.Pose.Position.y + collidingBounds.Y1) - ROUGH_BOX_HEIGHT_MIN) >
