@@ -342,19 +342,15 @@ namespace TEN::Collision::Attractor
 			segmentID = std::clamp<unsigned int>(segmentID, 0, segmentCount - 1);
 		}
 
-		// Get points.
 		const auto& points = attrac.GetPoints();
-		const auto& origin = points[segmentID];
-		const auto& target = points[segmentID + 1];
-
 		bool isChain = (points.size() > 1);
 
 		// Calculate intersection.
-		auto intersect = isChain ? Geometry::GetClosestPointOnLinePerp(pos, origin, target, axis) : points.front();
+		auto intersect = isChain ? Geometry::GetClosestPointOnLinePerp(pos, points[segmentID], points[segmentID + 1], axis) : points.front();
 
 		// Calculate chain distance.
 		float chainDist = 0.0f;
-		if (!isChain)
+		if (isChain)
 		{
 			// Accumulate distance traveled along attractor toward intersection.
 			for (unsigned int i = 0; i < segmentID; i++)
@@ -364,12 +360,12 @@ namespace TEN::Collision::Attractor
 			}
 
 			// Accumulate final distance traveled along attractor toward intersection.
-			chainDist += Vector3::Distance(origin, intersect);
+			chainDist += Vector3::Distance(points[segmentID], intersect);
 		}
 
 		// Calculate orientations.
 		auto refOrient = EulerAngles(0, headingAngle, 0);
-		auto segmentOrient = !isChain ? refOrient : Geometry::GetOrientToPoint(origin, target);
+		auto segmentOrient = isChain ? Geometry::GetOrientToPoint(points[segmentID], points[segmentID + 1]) : refOrient;
 
 		// Set data.
 		AttractorPtr = &attrac;
