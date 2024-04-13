@@ -48,7 +48,7 @@ using namespace TEN::Traps::TR5;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
-extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+extern SmokeSpark SmokeSparks[MAX_SPARKS_SMOKE];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
 extern Particle Particles[MAX_PARTICLES];
@@ -277,21 +277,15 @@ namespace TEN::Renderer
 	{
 		for (int i = 0; i < 32; i++) 
 		{
-			SMOKE_SPARKS* spark = &SmokeSparks[i];
+			SmokeSpark* spark = &SmokeSparks[i];
 
 			if (spark->on) 
 			{
-				AddSpriteBillboard(&_sprites[spark->def],
-								   Vector3(spark->x, spark->y, spark->z),
-								   Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
-								   TO_RAD(spark->rotAng << 4), spark->scalar, { spark->size * 4.0f, spark->size * 4.0f },
-								   BlendMode::Additive, true, view);
-
 				AddSpriteBillboard(
 					&_sprites[spark->def],
 					Vector3::Lerp(
-						Vector3(spark->oldX, spark->oldY, spark->oldZ),
-						Vector3(spark->x, spark->y, spark->z),
+						Vector3(spark->oldPosition.x, spark->oldPosition.y, spark->oldPosition.z),
+						Vector3(spark->position.x, spark->position.y, spark->position.z),
 						_interpolationFactor),
 					Vector4::Lerp(
 						Vector4(spark->oldShade / 255.0f, spark->oldShade / 255.0f, spark->oldShade / 255.0f, 1.0f),
@@ -335,7 +329,7 @@ namespace TEN::Renderer
 								Vector4(spark->oldR / 255.0f * fade, spark->oldG / 255.0f * fade, spark->oldB / 255.0f * fade, 1.0f),
 								Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
 								_interpolationFactor),
-							TO_RAD((short)Lerp(spark->oldRotAng, spark->rotAng, _interpolationFactor) << 4),
+							TO_RAD(Lerp(spark->oldRotAng << 4, spark->rotAng << 4, _interpolationFactor)),
 							Lerp(spark->oldScalar, spark->scalar, _interpolationFactor),
 							Vector2::Lerp(
 								Vector2(spark->oldSize * fire->oldSize, spark->oldSize * fire->oldSize),

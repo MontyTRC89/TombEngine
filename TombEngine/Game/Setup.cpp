@@ -135,7 +135,7 @@ void InitializeGameFlags()
 void InitializeSpecialEffects()
 {
 	memset(&FireSparks, 0, MAX_SPARKS_FIRE * sizeof(FIRE_SPARKS));
-	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
+	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SmokeSpark));
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
 	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));

@@ -47,7 +47,7 @@ int NextBlood = 0;
 int NextGunShell = 0;
 
 FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
-SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+SmokeSpark SmokeSparks[MAX_SPARKS_SMOKE];
 GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
@@ -527,7 +527,7 @@ void UpdateFireSparks()
 
 int GetFreeSmokeSpark() 
 {
-	SMOKE_SPARKS* spark = &SmokeSparks[NextSmokeSpark];
+	SmokeSpark* spark = &SmokeSparks[NextSmokeSpark];
 	int sparkNum = NextSmokeSpark;
 	short minLife = 4095;
 	short minIndex = 0;
@@ -567,7 +567,7 @@ void UpdateSmoke()
 {
 	for (int i = 0; i < MAX_SPARKS_SMOKE; i++)
 	{
-		SMOKE_SPARKS* spark = &SmokeSparks[i];
+		SmokeSpark* spark = &SmokeSparks[i];
 
 		if (spark->on)
 		{
@@ -579,13 +579,7 @@ void UpdateSmoke()
 				continue;
 			}
 
-			spark->oldX = spark->x;
-			spark->oldY = spark->y;
-			spark->oldZ = spark->z;
-			spark->oldSize = spark->size;
-			spark->oldRotAng = spark->rotAng;
-			spark->oldScalar = spark->scalar;
-			spark->oldScalar = spark->scalar;
+			spark->StoreInterpolationData();
 
 			if (spark->sLife - spark->life >= spark->colFadeSpeed)
 			{
@@ -625,45 +619,45 @@ void UpdateSmoke()
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 
-			spark->yVel += spark->gravity;
+			spark->velocity.y += spark->gravity;
 			
 			if (spark->maxYvel != 0)
 			{
-				if (spark->yVel < 0) 
+				if (spark->velocity.y < 0)
 				{
-					if (spark->yVel < spark->maxYvel) 
+					if (spark->velocity.y < spark->maxYvel)
 					{
-						spark->yVel = spark->maxYvel;
+						spark->velocity.y = spark->maxYvel;
 					}
 				}
 				else 
 				{
-					if (spark->yVel > spark->maxYvel) 
+					if (spark->velocity.y > spark->maxYvel)
 					{
-						spark->yVel = spark->maxYvel;
+						spark->velocity.y = spark->maxYvel;
 					}
 				}
 			}
 			
 			if (spark->friction & 0xF)
 			{
-				spark->xVel -= spark->xVel >> (spark->friction & 0xF);
-				spark->zVel -= spark->zVel >> (spark->friction & 0xF);
+				spark->velocity.x -= spark->velocity.x >> (spark->friction & 0xF);
+				spark->velocity.z -= spark->velocity.z >> (spark->friction & 0xF);
 			}
 
 			if (spark->friction & 0xF0)
 			{
-				spark->yVel -= spark->yVel >> (spark->friction >> 4);
+				spark->velocity.y -= spark->velocity.y >> (spark->friction >> 4);
 			}
 
-			spark->x += spark->xVel >> 5;
-			spark->y += spark->yVel >> 5;
-			spark->z += spark->zVel >> 5;
+			spark->position.x += spark->velocity.x >> 5;
+			spark->position.y += spark->velocity.y >> 5;
+			spark->position.z += spark->velocity.z >> 5;
 
 			if (spark->flags & SP_WIND)
 			{
-				spark->x += Weather.Wind().x;
-				spark->z += Weather.Wind().z;
+				spark->position.x += Weather.Wind().x;
+				spark->position.z += Weather.Wind().z;
 			}
 
 			spark->size = spark->sSize + (dl * (spark->dSize - spark->sSize) >> 16);
@@ -693,7 +687,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 
 void TriggerShatterSmoke(int x, int y, int z)
 {
-	SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
+	SmokeSpark* spark = &SmokeSparks[GetFreeSmokeSpark()];
 	
 	spark->on = true;
 	spark->sShade = 0;
@@ -702,12 +696,12 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->fadeToBlack = 24 - (GetRandomControl() & 7);
 	spark->blendMode = BlendMode::Additive;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
-	spark->x = (GetRandomControl() & 0x1F) + x - 16;
-	spark->y = (GetRandomControl() & 0x1F) + y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + z - 16;
-	spark->xVel = 2 * (GetRandomControl() & 0x1FF) - 512;
-	spark->yVel = 2 * (GetRandomControl() & 0x1FF) - 512;
-	spark->zVel = 2 * (GetRandomControl() & 0x1FF) - 512;
+	spark->position.x = (GetRandomControl() & 0x1F) + x - 16;
+	spark->position.y = (GetRandomControl() & 0x1F) + y - 16;
+	spark->position.z = (GetRandomControl() & 0x1F) + z - 16;
+	spark->velocity.x = 2 * (GetRandomControl() & 0x1FF) - 512;
+	spark->velocity.y = 2 * (GetRandomControl() & 0x1FF) - 512;
+	spark->velocity.z = 2 * (GetRandomControl() & 0x1FF) - 512;
 	spark->friction = 7;
 	
 	if (GetRandomControl() & 1)
@@ -733,13 +727,6 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->dSize = (GetRandomControl() & 0x3F) + 64;
 	spark->sSize = spark->dSize >> 3;
 	spark->size = spark->dSize >> 3;
-
-	spark->oldX = spark->x;
-	spark->oldY = spark->y;
-	spark->oldZ = spark->z;
-	spark->oldSize = spark->size;
-	spark->oldRotAng = spark->rotAng;
-	spark->oldScalar = spark->scalar;
 }
 
 int GetFreeBlood()

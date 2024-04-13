@@ -25,14 +25,10 @@ enum BodyPartFlags
 	BODY_NO_SHATTER_EFFECT	  = (1 << 13), // Remove shatter effect upon despawn.
 };
 
-struct SMOKE_SPARKS
+struct SmokeSpark
 {
-	int x;
-	int y;
-	int z;
-	int xVel;
-	int yVel;
-	int zVel;
+	Vector3i position;
+	Vector3i velocity;
 	int gravity;
 	short rotAng;
 	short flags;
@@ -57,13 +53,20 @@ struct SMOKE_SPARKS
 	byte nodeNumber;
 	byte mirror;
 
-	int oldX;
-	int oldY;
-	int oldZ;
-	unsigned char oldShade;
+	Vector3i oldPosition;
+	byte oldShade;
+	byte oldSize;
+	byte oldScalar;
 	short oldRotAng;
-	unsigned char oldSize;
-	unsigned char oldScalar;
+
+	void StoreInterpolationData()
+	{
+		oldPosition = position;
+		oldShade = shade;
+		oldSize = size;
+		oldScalar = scalar;
+		oldRotAng = rotAng;
+	}
 };
 
 struct SHOCKWAVE_STRUCT
@@ -247,7 +250,7 @@ constexpr auto MAX_GUNSHELL = 24;
 constexpr auto MAX_SHOCKWAVE = 16;
 
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
-extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+extern SmokeSpark SmokeSparks[MAX_SPARKS_SMOKE];
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
