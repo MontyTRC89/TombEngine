@@ -73,32 +73,23 @@ namespace TEN::Collision::Attractor
 
 	class AttractorCollisionData
 	{
-	private:
-		struct ProximityData
-		{
-			Vector3		 Intersection  = Vector3::Zero;
-			float		 Distance2D	   = 0.0f;
-			float		 Distance3D	   = 0.0f;
-			float		 ChainDistance = 0.0f;
-			unsigned int SegmentID	   = 0;
-		};
-
 	public:
 		// Members
 		AttractorObject* AttractorPtr = nullptr;
 
-		ProximityData Proximity	   = {};
-		short		  HeadingAngle = 0;
-		short		  SlopeAngle   = 0;
-		bool		  IsInFront	   = false;
+		unsigned int SegmentID	   = 0;
+		Vector3		 Intersection  = Vector3::Zero;
+		float		 Distance2D	   = 0.0f;
+		float		 Distance3D	   = 0.0f;
+		float		 ChainDistance = 0.0f;
+
+		short HeadingAngle = 0;
+		short SlopeAngle   = 0;
+		bool  IsInFront	   = false;
 
 		// Constructors
 		AttractorCollisionData() {};
 		AttractorCollisionData(AttractorObject& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis);
-
-	private:
-		// Helpers
-		ProximityData GetProximity(const Vector3& pos, unsigned int segmentID, const Vector3& axis) const;
 	};
 
 	// Getters

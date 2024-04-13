@@ -337,7 +337,7 @@ static AttractorParentTargetData GetAttractorParentTarget(AttractorObject& attra
 	// Calculate target.
 	auto orient = EulerAngles(0, attracColl.HeadingAngle, 0) + relOrientOffset;
 	auto rotMatrix = orient.ToRotationMatrix();
-	auto pos = attracColl.Proximity.Intersection + Vector3::Transform(relPosOffset, rotMatrix);
+	auto pos = attracColl.Intersection + Vector3::Transform(relPosOffset, rotMatrix);
 
 	// Return parent target.
 	return AttractorParentTargetData{ pos, orient, rotMatrix };

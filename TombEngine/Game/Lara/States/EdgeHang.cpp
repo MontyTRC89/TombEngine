@@ -56,9 +56,9 @@ namespace TEN::Entities::Player
 		auto attracCollRight = GetAttractorCollision(*handsAttrac.Ptr, chainDistRight, item.Pose.Orientation.y);
 
 		// DEBUG----
-		g_Renderer.AddDebugLine(attracCollCenter.Proximity.Intersection, attracCollCenter.Proximity.Intersection + Vector3(0, -CLICK(0.5f), 0), Color(1, 1, 0));
-		g_Renderer.AddDebugLine(attracCollLeft.Proximity.Intersection, attracCollLeft.Proximity.Intersection + Vector3(0, -CLICK(0.25f), 0), Color(1, 1, 0));
-		g_Renderer.AddDebugLine(attracCollRight.Proximity.Intersection, attracCollRight.Proximity.Intersection + Vector3(0, -CLICK(0.25f), 0), Color(1, 1, 0));
+		g_Renderer.AddDebugLine(attracCollCenter.Intersection, attracCollCenter.Intersection + Vector3(0, -CLICK(0.5f), 0), Color(1, 1, 0));
+		g_Renderer.AddDebugLine(attracCollLeft.Intersection, attracCollLeft.Intersection + Vector3(0, -CLICK(0.25f), 0), Color(1, 1, 0));
+		g_Renderer.AddDebugLine(attracCollRight.Intersection, attracCollRight.Intersection + Vector3(0, -CLICK(0.25f), 0), Color(1, 1, 0));
 		//--------
 		
 		// Return attractor collisions at three points.
@@ -86,20 +86,20 @@ namespace TEN::Entities::Player
 		auto edgeAttracColls = GetEdgeHangAttractorCollisions(item, coll);
 
 		// Calculate target orientation.
-		auto targetOrient = Geometry::GetOrientToPoint(edgeAttracColls->Left.Proximity.Intersection, edgeAttracColls->Right.Proximity.Intersection);
+		auto targetOrient = Geometry::GetOrientToPoint(edgeAttracColls->Left.Intersection, edgeAttracColls->Right.Intersection);
 		targetOrient = EulerAngles(0, targetOrient.y - ANGLE(90.0f), 0);
 
 		// Calculate target position.
-		auto targetPos = edgeAttracColls->Center.Proximity.Intersection;
-		if (!Geometry::IsPointInFront(targetPos, edgeAttracColls->Left.Proximity.Intersection, targetOrient) &&
-			!Geometry::IsPointInFront(targetPos, edgeAttracColls->Right.Proximity.Intersection, targetOrient))
+		auto targetPos = edgeAttracColls->Center.Intersection;
+		if (!Geometry::IsPointInFront(targetPos, edgeAttracColls->Left.Intersection, targetOrient) &&
+			!Geometry::IsPointInFront(targetPos, edgeAttracColls->Right.Intersection, targetOrient))
 		{
-			targetPos = (edgeAttracColls->Left.Proximity.Intersection + edgeAttracColls->Right.Proximity.Intersection) / 2;
+			targetPos = (edgeAttracColls->Left.Intersection + edgeAttracColls->Right.Intersection) / 2;
 		}
 
 		// Calculate relative position and orientation offsets.
 		auto rotMatrix = targetOrient.ToRotationMatrix();
-		auto relPosOffset = Vector3::Transform((targetPos - edgeAttracColls->Center.Proximity.Intersection), rotMatrix) + climbContext.RelPosOffset;
+		auto relPosOffset = Vector3::Transform((targetPos - edgeAttracColls->Center.Intersection), rotMatrix) + climbContext.RelPosOffset;
 		auto relOrientOffset = (targetOrient - EulerAngles(0, edgeAttracColls->Center.HeadingAngle, 0)) + climbContext.RelOrientOffset;
 
 		// Set edge hang parameters.

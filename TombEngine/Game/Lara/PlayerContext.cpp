@@ -1101,7 +1101,7 @@ namespace TEN::Entities::Player
 		// TODO: Probe from player.
 		// Get point collision in front of edge. NOTE: Height offset required for correct bridge collision.
 		auto pointCollFront = GetCollision(
-			attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+			attracColl.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 			attracColl.HeadingAngle, coll.Setup.Radius, -CLICK(1));
 
 		// TODO: This check fails for no reason.
@@ -1117,7 +1117,7 @@ namespace TEN::Entities::Player
 			return false;
 
 		// 4) Test ledge floor-to-edge height.
-		int ledgeFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - pointCollFront.Position.Floor);
+		int ledgeFloorToEdgeHeight = abs(attracColl.Intersection.y - pointCollFront.Position.Floor);
 		if (ledgeFloorToEdgeHeight > ABS_FLOOR_BOUND)
 			return false;
 		
@@ -1131,7 +1131,7 @@ namespace TEN::Entities::Player
 
 		// Get point collision behind edge.
 		auto pointCollBack = GetCollision(
-			attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+			attracColl.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 			attracColl.HeadingAngle, -coll.Setup.Radius);
 
 		// 6) Test if ceiling behind is adequately higher than edge.
@@ -1227,7 +1227,7 @@ namespace TEN::Entities::Player
 			}
 
 			// 2.2) Test if edge is within 2D range.
-			if (attracColl.Proximity.Distance2D > range2D)
+			if (attracColl.Distance2D > range2D)
 				continue;
 
 			// 2.3) Test if edge slope is illegal.
@@ -1246,25 +1246,25 @@ namespace TEN::Entities::Player
 
 			// Get point collision at edge.
 			auto pointCollCenter = GetCollision(
-				Vector3i(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.y - 1, attracColl.Proximity.Intersection.z),
+				Vector3i(attracColl.Intersection.x, attracColl.Intersection.y - 1, attracColl.Intersection.z),
 				attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
 			// TODO: Rotating platforms don't exist yet, so this is hypothetical.
 			// 2.5) Test if intersection is blocked by ceiling.
-			if (attracColl.Proximity.Intersection.y <= pointCollCenter.Position.Ceiling)
+			if (attracColl.Intersection.y <= pointCollCenter.Position.Ceiling)
 				continue;
 
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
-				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
 			bool isTreadingWater = (player.Control.WaterStatus == WaterStatus::TreadWater);
 			int waterSurfaceHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
 			// 2.6) Test if relative edge height is within edge intersection bounds. NOTE: Special case for water tread.
-			int relEdgeHeight = (attracColl.Proximity.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.Position.Floor)) * sign;
+			int relEdgeHeight = (attracColl.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.Position.Floor)) * sign;
 			if (relEdgeHeight >= setup.LowerEdgeBound ||
 				relEdgeHeight < setup.UpperEdgeBound)
 			{
@@ -1272,13 +1272,13 @@ namespace TEN::Entities::Player
 			}
 
 			// 2.7) Test if player vertical position is within surface threshold. NOTE: Special case for water tread.
-			int surfaceHeight = isTreadingWater ? waterSurfaceHeight : (setup.TestEdgeFront ? pointCollBack.Position.Floor : attracColl.Proximity.Intersection.y);
+			int surfaceHeight = isTreadingWater ? waterSurfaceHeight : (setup.TestEdgeFront ? pointCollBack.Position.Floor : attracColl.Intersection.y);
 			int relPlayerSurfaceHeight = abs(item.Pose.Position.y - surfaceHeight);
 			if (relPlayerSurfaceHeight > REL_SURFACE_HEIGHT_THRESHOLD)
 				continue;
 
 			// 2.8) Test if ceiling behind is adequately higher than edge.
-			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
 
@@ -1288,7 +1288,7 @@ namespace TEN::Entities::Player
 
 			// Get point collision in front of edge.
 			auto pointCollFront = GetCollision(
-				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
 			// Test destination space (if applicable).
@@ -1317,7 +1317,7 @@ namespace TEN::Entities::Player
 				// 2.11) Test destination floor-to-edge height if approaching from front.
 				if (setup.TestEdgeFront)
 				{
-					int destFloorToEdgeHeight = abs(attracColl.Proximity.Intersection.y - destPointCollCenter.Position.Floor);
+					int destFloorToEdgeHeight = abs(attracColl.Intersection.y - destPointCollCenter.Position.Floor);
 					if (destFloorToEdgeHeight > REL_SURFACE_HEIGHT_THRESHOLD)
 						continue;
 				}
@@ -1343,11 +1343,11 @@ namespace TEN::Entities::Player
 					continue;
 				}
 
-				if (attracColl.Proximity.Intersection.y < highestAttracCollPtr->Proximity.Intersection.y)
+				if (attracColl.Intersection.y < highestAttracCollPtr->Intersection.y)
 				{
 					// Ensure attractors are stacked exactly.
-					auto highest2DIntersect = Vector2(highestAttracCollPtr->Proximity.Intersection.x, highestAttracCollPtr->Proximity.Intersection.z);
-					auto current2DIntersect = Vector2(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.z);
+					auto highest2DIntersect = Vector2(highestAttracCollPtr->Intersection.x, highestAttracCollPtr->Intersection.z);
+					auto current2DIntersect = Vector2(attracColl.Intersection.x, attracColl.Intersection.z);
 					if (Vector2::DistanceSquared(highest2DIntersect, current2DIntersect) > EPSILON)
 						continue;
 
@@ -1390,7 +1390,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP;
@@ -1425,7 +1425,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP;
@@ -1460,7 +1460,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_1_STEP_UP_TO_CROUCH;
@@ -1495,7 +1495,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP_TO_CROUCH;
@@ -1530,7 +1530,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP_TO_CROUCH;
@@ -1567,11 +1567,11 @@ namespace TEN::Entities::Player
 		auto attracColl = GetEdgeVaultClimbAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
-			int relEdgeHeight = attracColl->Proximity.Intersection.y - item.Pose.Position.y;
+			int relEdgeHeight = attracColl->Intersection.y - item.Pose.Position.y;
 
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, -relEdgeHeight, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_AUTO_JUMP;
@@ -1626,7 +1626,7 @@ namespace TEN::Entities::Player
 				continue;
 
 			// 2) Test if edge is within 2D range.
-			if (attracColl.Proximity.Distance2D > range2D)
+			if (attracColl.Distance2D > range2D)
 				continue;
 
 			// 3) Test if wall edge slope is illegal.
@@ -1642,7 +1642,7 @@ namespace TEN::Entities::Player
 
 			// Get point collision behind wall edge.
 			auto pointCollBack = GetCollision(
-				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// TODO: Test bridge consistency below player and below edge?
@@ -1656,7 +1656,7 @@ namespace TEN::Entities::Player
 			int waterSurfaceHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
 			// 6) Test if relative edge height is within edge intersection bounds. NOTE: Special case for water tread.
-			int relEdgeHeight = attracColl.Proximity.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.Position.Floor);
+			int relEdgeHeight = attracColl.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.Position.Floor);
 			if (relEdgeHeight >= setup.LowerEdgeBound ||
 				relEdgeHeight < setup.UpperEdgeBound)
 			{
@@ -1666,7 +1666,7 @@ namespace TEN::Entities::Player
 			// TODO: collect stacked WallEdge attractors.
 			
 			// 7) Test if ceiling behind is adequately higher than edge.
-			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
 
@@ -1707,7 +1707,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_WALL_CLIMB_IDLE;
@@ -1815,7 +1815,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN;
@@ -1855,7 +1855,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN_TO_STAND;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.IsJump = false;
@@ -1889,7 +1889,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_UP;
@@ -1925,7 +1925,7 @@ namespace TEN::Entities::Player
 			context.AttractorPtr = attracColl->AttractorPtr;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_VAULT_JUMP_FLIP : LS_CRAWL_VAULT_JUMP;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.IsJump = false;
@@ -2045,7 +2045,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND;
@@ -2083,7 +2083,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND;
@@ -2122,7 +2122,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND;
@@ -2161,7 +2161,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH;
@@ -2199,7 +2199,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH;
@@ -2238,7 +2238,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH;
@@ -2408,7 +2408,7 @@ namespace TEN::Entities::Player
 			}
 
 			// 2) Test if edge is within 2D range.
-			if (attracColl.Proximity.Distance2D > range2D)
+			if (attracColl.Distance2D > range2D)
 				continue;
 
 			// 3) Test if edge slope is illegal.
@@ -2424,12 +2424,12 @@ namespace TEN::Entities::Player
 
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
-				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// TODO: Add to other functions.
 			// 5) Test if player vertical position is adequately close to edge.
-			if (abs(attracColl.Proximity.Intersection.y - item.Pose.Position.y) > ABS_EDGE_BOUND)
+			if (abs(attracColl.Intersection.y - item.Pose.Position.y) > ABS_EDGE_BOUND)
 				continue;
 
 			// 6) Test if relative edge height is within edge intersection bounds.
@@ -2441,7 +2441,7 @@ namespace TEN::Entities::Player
 			}
 
 			// 7) Test if ceiling behind is adequately higher than edge.
-			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Intersection.y;
 			if (edgeToCeilHeight > setup.LowerEdgeToCeilBound)
 				continue;
 
@@ -2473,7 +2473,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_STAND_EDGE_HANG_DESCENT_FRONT;
@@ -2511,7 +2511,7 @@ namespace TEN::Entities::Player
 
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = targetStateID;
@@ -2545,7 +2545,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_CRAWL_EDGE_HANG_DESCENT_FRONT;
@@ -2579,7 +2579,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_CRAWL_EDGE_HANG_DESCENT_BACK;
@@ -2619,7 +2619,7 @@ namespace TEN::Entities::Player
 			}
 
 			// 2) Test if edge is within 2D range.
-			if (attracColl.Proximity.Distance2D > range2D)
+			if (attracColl.Distance2D > range2D)
 				continue;
 
 			// 3) Test if edge slope is illegal.
@@ -2632,11 +2632,11 @@ namespace TEN::Entities::Player
 
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
-				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius, 0.0f, POINT_COLL_BACK_DOWN_OFFSET);
 
 			// 5) Test if edge is high enough from floor.
-			int floorToEdgeHeight = pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y;
+			int floorToEdgeHeight = pointCollBack.Position.Floor - attracColl.Intersection.y;
 			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
 				continue;
 
@@ -2647,8 +2647,8 @@ namespace TEN::Entities::Player
 			// 6) Test if edge is high enough from water surface (if applicable).
 			if (waterHeight != NO_HEIGHT && waterDepth != NO_HEIGHT)
 			{
-				int waterSurfaceToEdgeHeight = waterHeight - attracColl.Proximity.Intersection.y;
-				int waterBottomToEdgeHeight = waterDepth - attracColl.Proximity.Intersection.y;
+				int waterSurfaceToEdgeHeight = waterHeight - attracColl.Intersection.y;
+				int waterBottomToEdgeHeight = waterDepth - attracColl.Intersection.y;
 
 				if (waterSurfaceToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN &&
 					waterBottomToEdgeHeight >= 0)
@@ -2658,12 +2658,12 @@ namespace TEN::Entities::Player
 			}
 
 			// 7) Test if ceiling behind is adequately higher than edge.
-			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Intersection.y;
 			if (edgeToCeilHeight >= 0)
 				continue;
 
 			int vPos = item.Pose.Position.y - coll.Setup.Height;
-			int relEdgeHeight = attracColl.Proximity.Intersection.y - vPos;
+			int relEdgeHeight = attracColl.Intersection.y - vPos;
 
 			float projVerticalVel = item.Animation.Velocity.y + GetEffectiveGravity(item.Animation.Velocity.y);
 			bool isFalling = (projVerticalVel >= 0.0f);
@@ -2677,13 +2677,13 @@ namespace TEN::Entities::Player
 
 				// Get point collision in front of edge.
 				auto pointCollFront = GetCollision(
-					attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+					attracColl.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 					attracColl.HeadingAngle, POINT_COLL_FRONT_FORWARD_OFFSET, 0.0f, POINT_COLL_BACK_DOWN_OFFSET);
 
 				// TODO: Can do it another way. Parent stacked WallEdge attractors to pushables and gates?
 				// 9) Test if wall edge is near wall.
-				if (pointCollFront.Position.Floor > (attracColl.Proximity.Intersection.y + WALL_EDGE_FLOOR_THRESHOLD) &&
-					pointCollFront.Position.Ceiling < (attracColl.Proximity.Intersection.y - WALL_EDGE_FLOOR_THRESHOLD))
+				if (pointCollFront.Position.Floor > (attracColl.Intersection.y + WALL_EDGE_FLOOR_THRESHOLD) &&
+					pointCollFront.Position.Ceiling < (attracColl.Intersection.y - WALL_EDGE_FLOOR_THRESHOLD))
 				{
 					return std::nullopt;
 				}
@@ -2715,11 +2715,11 @@ namespace TEN::Entities::Player
 
 		// Get point collision.
 		auto pointColl = GetCollision(
-			attracColl.Proximity.Intersection, item.RoomNumber,
+			attracColl.Intersection, item.RoomNumber,
 			attracColl.HeadingAngle, coll.Setup.Radius / 2, coll.Setup.Height);
 
-		int relFloorHeight = pointColl.Position.Floor - (attracColl.Proximity.Intersection.y + coll.Setup.Height);
-		int relCeilHeight = pointColl.Position.Ceiling - attracColl.Proximity.Intersection.y;
+		int relFloorHeight = pointColl.Position.Floor - (attracColl.Intersection.y + coll.Setup.Height);
+		int relCeilHeight = pointColl.Position.Ceiling - attracColl.Intersection.y;
 
 		// Assess point collision.
 		if (relFloorHeight >= UPPER_FLOOR_BOUND && // Floor height is below upper floor bound.
@@ -2744,7 +2744,7 @@ namespace TEN::Entities::Player
 
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = targetStateID;
@@ -2892,7 +2892,7 @@ namespace TEN::Entities::Player
 		{
 			int sign = isGoingRight ? 1 : -1;
 			attracCollsSide = GetAttractorCollisions(
-				attracCollCenter.Proximity.Intersection, attracCollCenter.AttractorPtr->GetRoomNumber(), attracCollCenter.HeadingAngle,
+				attracCollCenter.Intersection, attracCollCenter.AttractorPtr->GetRoomNumber(), attracCollCenter.HeadingAngle,
 				0.0f, 0.0f, coll.Setup.Radius * sign, ATTRAC_DETECT_RADIUS);
 		}
 
@@ -2932,7 +2932,7 @@ namespace TEN::Entities::Player
 		// Get connecting attractor collisions.
 		int sign = isGoingRight ? 1 : -1;
 		auto connectingAttracColls = GetAttractorCollisions(
-			attracCollCenter.Proximity.Intersection, attracCollCenter.AttractorPtr->GetRoomNumber(), attracCollCenter.HeadingAngle,
+			attracCollCenter.Intersection, attracCollCenter.AttractorPtr->GetRoomNumber(), attracCollCenter.HeadingAngle,
 			0.0f, 0.0f, coll.Setup.Radius * sign, ATTRAC_DETECT_RADIUS);
 
 		auto cornerAttracColls = std::vector<AttractorCollisionData>{};
@@ -2948,7 +2948,7 @@ namespace TEN::Entities::Player
 		// 2) Collect corner attractor collisions for connecting attractors.
 		for (const auto& attracColl : connectingAttracColls)
 		{
-			auto cornerAttracColl = GetAttractorCollision(*attracColl.AttractorPtr, attracColl.Proximity.ChainDistance + (coll.Setup.Radius * sign), attracColl.HeadingAngle);
+			auto cornerAttracColl = GetAttractorCollision(*attracColl.AttractorPtr, attracColl.ChainDistance + (coll.Setup.Radius * sign), attracColl.HeadingAngle);
 			cornerAttracColls.push_back(cornerAttracColl);
 		}
 
@@ -2992,11 +2992,11 @@ namespace TEN::Entities::Player
 		// Get attractor collisions.
 		auto currentAttracColl = GetAttractorCollision(*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
 		auto attracColls = GetAttractorCollisions(
-			currentAttracColl.Proximity.Intersection, currentAttracColl.AttractorPtr->GetRoomNumber(), currentAttracColl.HeadingAngle,
+			currentAttracColl.Intersection, currentAttracColl.AttractorPtr->GetRoomNumber(), currentAttracColl.HeadingAngle,
 			ATTRAC_DETECT_RADIUS);
 
 		// Calculate 2D intersection on current attractor.
-		auto intersect2D0 = Vector2(currentAttracColl.Proximity.Intersection.x, currentAttracColl.Proximity.Intersection.z);
+		auto intersect2D0 = Vector2(currentAttracColl.Intersection.x, currentAttracColl.Intersection.z);
 
 		// Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -3018,7 +3018,7 @@ namespace TEN::Entities::Player
 				continue;
 
 			// 4) Test if relative edge height is within edge intersection bounds.
-			int relEdgeHeight = attracColl.Proximity.Intersection.y - currentAttracColl.Proximity.Intersection.y;
+			int relEdgeHeight = attracColl.Intersection.y - currentAttracColl.Intersection.y;
 			if (relEdgeHeight > setup.LowerEdgeBound ||
 				relEdgeHeight < setup.UpperEdgeBound)
 			{
@@ -3026,26 +3026,26 @@ namespace TEN::Entities::Player
 			}
 
 			// 5) Test if attractors are stacked exactly.
-			/*auto intersect2D1 = Vector2(attracColl.Proximity.Intersection.x, attracColl.Proximity.Intersection.z);
+			/*auto intersect2D1 = Vector2(attracColl.Intersection.x, attracColl.Intersection.z);
 			if (Vector2::DistanceSquared(intersect2D0, intersect2D1) > EPSILON)
 				continue;*/
 
 			// Get point collision behind edge.
 			auto pointCollBack = GetCollision(
-				attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
+				attracColl.Intersection, attracColl.AttractorPtr->GetRoomNumber(),
 				attracColl.HeadingAngle, -coll.Setup.Radius);
 
 			// 6) Test if edge is blocked by floor.
-			if (pointCollBack.Position.Floor <= currentAttracColl.Proximity.Intersection.y)
+			if (pointCollBack.Position.Floor <= currentAttracColl.Intersection.y)
 				continue;
 
 			// 7) Test if edge is high enough from floor.
-			int floorToEdgeHeight = pointCollBack.Position.Floor - attracColl.Proximity.Intersection.y;
+			int floorToEdgeHeight = pointCollBack.Position.Floor - attracColl.Intersection.y;
 			if (floorToEdgeHeight <= setup.UpperFloorToEdgeBound)
 				continue;
 
 			// 8) Test if ceiling behind is adequately higher than edge.
-			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Proximity.Intersection.y;
+			int edgeToCeilHeight = pointCollBack.Position.Ceiling - attracColl.Intersection.y;
 			if (edgeToCeilHeight >= 0)
 				continue;
 
@@ -3072,7 +3072,7 @@ namespace TEN::Entities::Player
 
 					// TODO: Not working.
 					// 4) Test if relative edge height is within edge intersection bounds.
-					/*int relEdgeHeight = attracColl2.Proximity.Intersection.y - currentAttracColl.Proximity.Intersection.y;
+					/*int relEdgeHeight = attracColl2.Intersection.y - currentAttracColl.Intersection.y;
 					if (relEdgeHeight > (setup.LowerEdgeBound + WALL_CLIMB_VERTICAL_OFFSET) ||
 						relEdgeHeight < (setup.UpperEdgeBound + WALL_CLIMB_VERTICAL_OFFSET))
 					{
@@ -3112,7 +3112,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_UP;
@@ -3143,7 +3143,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_DOWN;
@@ -3166,7 +3166,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_LEFT;
@@ -3192,7 +3192,7 @@ namespace TEN::Entities::Player
 
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = relPosOffset;
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = (deltaHeadingAngle >= ANGLE(0.0f)) ? LS_EDGE_HANG_SHIMMY_90_OUTER_LEFT : LS_EDGE_HANG_SHIMMY_90_INNER_LEFT;
@@ -3236,7 +3236,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_RIGHT;
@@ -3257,7 +3257,7 @@ namespace TEN::Entities::Player
 
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.TargetStateID = (deltaHeadingAngle >= ANGLE(0.0f)) ? LS_EDGE_HANG_SHIMMY_90_OUTER_RIGHT : LS_EDGE_HANG_SHIMMY_90_INNER_RIGHT;
 
 			return context;
@@ -3324,7 +3324,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_WALL_CLIMB_UP;
@@ -3359,7 +3359,7 @@ namespace TEN::Entities::Player
 		{
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_WALL_CLIMB_DOWN;
@@ -3385,9 +3385,9 @@ namespace TEN::Entities::Player
 		// TODO: Use player room number?
 		// Get point collision.
 		auto pointColl = GetCollision(
-			attracColl.Proximity.Intersection, attracColl.AttractorPtr->GetRoomNumber(), attracColl.HeadingAngle,
+			attracColl.Intersection, attracColl.AttractorPtr->GetRoomNumber(), attracColl.HeadingAngle,
 			-coll.Setup.Radius, 0.0f, (coll.Setup.Radius * 2) * (isGoingRight ? 1 : -1));
-		int vPos = attracColl.Proximity.Intersection.y + coll.Setup.Height;
+		int vPos = attracColl.Intersection.y + coll.Setup.Height;
 
 		// 1) Test relative edge-to-floor height.
 		int relFloorHeight = abs(pointColl.Position.Floor - vPos);
@@ -3430,7 +3430,7 @@ namespace TEN::Entities::Player
 			// Create and return climb context.
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(90.0f), 0);
 			context.AlignType = ClimbContextAlignType::AttractorParent;
@@ -3447,7 +3447,7 @@ namespace TEN::Entities::Player
 			// Create and return climb context.
 			auto context = ClimbContextData{};
 			context.AttractorPtr = attracColl->AttractorPtr;
-			context.ChainDistance = attracColl->Proximity.ChainDistance;
+			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(coll.Setup.Radius, coll.Setup.Height, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(-90.0f), 0);
 			context.AlignType = ClimbContextAlignType::AttractorParent;

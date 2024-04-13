@@ -311,9 +311,9 @@ bool TestForObjectOnLedge(const AttractorCollisionData& attracColl, float radius
 	// Calculate ray origins.
 	auto origins = std::array<Vector3, PASS_COUNT>
 	{
-		Geometry::TranslatePoint(attracColl.Proximity.Intersection, headingAngle, 0.0f, down, -radius),
-		Geometry::TranslatePoint(attracColl.Proximity.Intersection, headingAngle, 0.0f, down, 0.0f),
-		Geometry::TranslatePoint(attracColl.Proximity.Intersection, headingAngle, 0.0f, down, radius)
+		Geometry::TranslatePoint(attracColl.Intersection, headingAngle, 0.0f, down, -radius),
+		Geometry::TranslatePoint(attracColl.Intersection, headingAngle, 0.0f, down, 0.0f),
+		Geometry::TranslatePoint(attracColl.Intersection, headingAngle, 0.0f, down, radius)
 	};
 
 	//for (const auto& origin : origins)
@@ -344,7 +344,7 @@ bool TestForObjectOnLedge(const AttractorCollisionData& attracColl, float radius
 				continue;
 			}
 
-			if (Vector3i::Distance(attracColl.Proximity.Intersection, collidedItem.Pose.Position) > COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(attracColl.Intersection, collidedItem.Pose.Position) > COLLISION_CHECK_DISTANCE)
 			{
 				collidedItemNumber = collidedItem.NextItem;
 				continue;
@@ -367,7 +367,7 @@ bool TestForObjectOnLedge(const AttractorCollisionData& attracColl, float radius
 			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
-			if (Vector3i::Distance(attracColl.Proximity.Intersection, staticObject.pos.Position) > COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(attracColl.Intersection, staticObject.pos.Position) > COLLISION_CHECK_DISTANCE)
 				continue;
 
 			const auto& box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
