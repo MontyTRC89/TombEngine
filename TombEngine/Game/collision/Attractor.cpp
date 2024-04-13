@@ -338,9 +338,9 @@ namespace TEN::Collision::Attractor
 
 		// FAILSAFE: Clamp segment ID.
 		unsigned int segmentCount = attrac.GetSegmentCount();
-		if (segmentID < 0 || segmentID >= segmentCount)
+		if (segmentID >= segmentCount)
 		{
-			TENLog("Attempted to get attractor collision data for invalid segment.", LogLevel::Warning);
+			TENLog("Attempted to get attractor collision data for invalid segment ID " + std::to_string(segmentID) + ".", LogLevel::Warning);
 			segmentID = std::clamp<unsigned int>(segmentID, 0, segmentCount - 1);
 		}
 
@@ -499,12 +499,12 @@ namespace TEN::Collision::Attractor
 		constexpr auto COLL_COUNT_MAX = 64;
 
 		// Get pointers to approximately nearby attractors.
-		auto nearbyAttracPtrs = GetNearbyAttractorPtrs(pos, roomNumber, radius);
+		auto attracPtrs = GetNearbyAttractorPtrs(pos, roomNumber, radius);
 
 		// Collect attractor collisions.
 		auto attracColls = std::vector<AttractorCollisionData>{};
-		attracColls.reserve(nearbyAttracPtrs.size());
-		for (auto* attracPtr : nearbyAttracPtrs)
+		attracColls.reserve(attracPtrs.size());
+		for (auto* attracPtr : attracPtrs)
 		{
 			// Get collisions for every segment.
 			for (int i = 0; i < attracPtr->GetSegmentCount(); i++)
