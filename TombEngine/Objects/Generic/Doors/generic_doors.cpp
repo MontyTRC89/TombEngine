@@ -247,7 +247,7 @@ namespace TEN::Entities::Doors
 
 		if (TestBoundsCollide(doorItem, laraItem, coll->Setup.Radius))
 		{
-			if (SetSphereTouchBits(*doorItem, *laraItem))
+			if (HandleItemSphereCollision(*doorItem, *laraItem))
 			{
 				if (coll->Setup.EnableObjectPush)
 				{

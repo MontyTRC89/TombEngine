@@ -174,7 +174,7 @@ namespace TEN::Entities::Traps
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 			
-		if (!SetSphereTouchBits(item, *playerItem))
+		if (!HandleItemSphereCollision(item, *playerItem))
 			return;
 
 		if (!ItemPushItem(&item, playerItem, coll, false, 1))
@@ -200,7 +200,7 @@ namespace TEN::Entities::Traps
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 			
-		if (!SetSphereTouchBits(item, *playerItem))
+		if (!HandleItemSphereCollision(item, *playerItem))
 			return;
 
 		if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) <= FALLING_BLOCK_IMPACT_FRAME)

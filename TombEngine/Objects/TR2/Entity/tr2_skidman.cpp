@@ -97,7 +97,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (!TestBoundsCollide(&item, laraItem, coll->Setup.Radius))
 			return;
 
-		if (!SetSphereTouchBits(item, *laraItem))
+		if (!HandleItemSphereCollision(item, *laraItem))
 			return;
 
 		if (coll->Setup.EnableObjectPush)

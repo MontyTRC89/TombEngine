@@ -12,5 +12,5 @@ namespace TEN::Collision::Sphere
 	};
 
 	std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, int flags);
-	bool SetSphereTouchBits(ItemInfo& creatureItem, ItemInfo& playerItem);
+	bool HandleItemSphereCollision(ItemInfo& item0, ItemInfo& item1);
 }

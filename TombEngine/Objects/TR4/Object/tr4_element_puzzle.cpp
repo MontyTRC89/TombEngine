@@ -151,7 +151,7 @@ namespace TEN::Entities::TR4
 
 		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		{
-			if (SetSphereTouchBits(*item, *laraItem))
+			if (HandleItemSphereCollision(*item, *laraItem))
 			{
 				if (coll->Setup.EnableObjectPush)
 					ItemPushItem(item, laraItem, coll, false, 0);

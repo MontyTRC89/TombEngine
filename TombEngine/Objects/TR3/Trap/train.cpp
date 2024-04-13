@@ -104,7 +104,7 @@ void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		return;
 
-	if (!SetSphereTouchBits(*item, *laraItem))
+	if (!HandleItemSphereCollision(*item, *laraItem))
 		return;
 
 	SoundEffect(SFX_TR4_LARA_GENERAL_DEATH, &laraItem->Pose, SoundEnvironment::Always);

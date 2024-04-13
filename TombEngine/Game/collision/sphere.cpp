@@ -18,45 +18,45 @@ namespace TEN::Collision::Sphere
 		return g_Renderer.GetSpheres(item.Index, flags, Matrix::Identity);
 	}
 
-	bool SetSphereTouchBits(ItemInfo& creatureItem, ItemInfo& playerItem)
+	bool HandleItemSphereCollision(ItemInfo& item0, ItemInfo& item1)
 	{
 		constexpr auto FLAGS = (int)SphereSpaceFlags::World | (int)SphereSpaceFlags::BoneOrigin;
 
-		auto creatureSpheres = GetSpheres(creatureItem, FLAGS);
-		auto playerSpheres = GetSpheres(playerItem, FLAGS);
+		auto spheres0 = GetSpheres(item0, FLAGS);
+		auto spheres1 = GetSpheres(item1, FLAGS);
 
-		playerItem.TouchBits.ClearAll();
+		item1.TouchBits.ClearAll();
 
-		if (creatureSpheres.empty())
+		if (spheres0.empty())
 		{
-			creatureItem.TouchBits.ClearAll();
+			item0.TouchBits.ClearAll();
 			return false;
 		}
 
-		// Run through creature spheres.
+		// Run through spheres of item 0.
 		bool isCollided = false;
-		for (int i = 0; i < creatureSpheres.size(); i++)
+		for (int i = 0; i < spheres0.size(); i++)
 		{
-			// Get creature sphere.
-			const auto& creatureSphere = creatureSpheres[i];
-			if (creatureSphere.Radius <= 0.0f)
+			// Get sphere 0.
+			const auto& sphere0 = spheres0[i];
+			if (sphere0.Radius <= 0.0f)
 				continue;
 
-			// Run through player spheres.
-			for (int j = 0; j < playerSpheres.size(); j++)
+			// Run through spheres of item 1.
+			for (int j = 0; j < spheres1.size(); j++)
 			{
-				// Get player sphere.
-				const auto& playerSphere = playerSpheres[j];
-				if (playerSphere.Radius <= 0.0f)
+				// Get sphere 1.
+				const auto& sphere1 = spheres1[j];
+				if (sphere1.Radius <= 0.0f)
 					continue;
 
 				// Test sphere collision.
-				if (!creatureSphere.Intersects(playerSphere))
+				if (!sphere0.Intersects(sphere1))
 					continue;
 
 				// Set touch bits.
-				creatureItem.TouchBits.Set(i);
-				playerItem.TouchBits.Set(j);
+				item0.TouchBits.Set(i);
+				item1.TouchBits.Set(j);
 
 				isCollided = true;
 				break;
