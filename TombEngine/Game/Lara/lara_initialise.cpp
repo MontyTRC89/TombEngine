@@ -160,18 +160,10 @@ void InitializeLaraStartPosition(ItemInfo& playerItem)
 		if (!item.TriggerFlags || item.TriggerFlags != RequiredStartPos)
 			continue;
 
-		// HACK: For some reason, player can't be immediately updated and moved on loading.
-		// Need to simulate "game loop" happening so that its position actually updates on next loop.
-		// However, room number must be also be manually set in advance, so that startup anim detection
-		// won't fail (otherwise player may start crouching because probe uses previous room number).
-
-		InItemControlLoop = true;
-
 		playerItem.Pose = item.Pose;
-		playerItem.RoomNumber = item.RoomNumber;
-		ItemNewRoom(playerItem.Index, item.RoomNumber);
 
-		InItemControlLoop = false;
+		if (playerItem.RoomNumber != item.RoomNumber)
+			ItemNewRoom(playerItem.Index, item.RoomNumber);
 
 		TENLog("Player start position has been set according to start position of object with ID " + std::to_string(item.TriggerFlags) + ".", LogLevel::Info);
 		break;
