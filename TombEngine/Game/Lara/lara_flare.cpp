@@ -324,10 +324,10 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 	flareItem.Pose.Position = pos;
 
 	int floorHeight = GetCollision(pos.x, pos.y, pos.z, laraItem.RoomNumber).Position.Floor;
-	auto hasCollided = GetCollidedObjects(&flareItem, 0, true, CollidedItems, CollidedMeshes, true);
+	auto isCollided = !GetCollidedObjects(flareItem, true, true).IsEmpty();
 	bool hasLanded = false;
 
-	if (floorHeight < pos.y || hasCollided)
+	if (floorHeight < pos.y || isCollided)
 	{
 		hasLanded = true;
 		flareItem.Pose.Position.x = laraItem.Pose.Position.x + 320 * phd_sin(flareItem.Pose.Orientation.y);

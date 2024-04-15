@@ -54,9 +54,9 @@ void InitializeLara(bool restore)
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
 	LaraItem->Data = &Lara;
-	Lara.Context = PlayerContext(*LaraItem, LaraCollision);
-
 	LaraItem->Collidable = false;
+	
+	Lara.Context = PlayerContext(*LaraItem, LaraCollision);
 
 	Lara.Status.Air = LARA_AIR_MAX;
 	Lara.Status.Exposure = LARA_EXPOSURE_MAX;

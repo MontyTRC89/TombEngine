@@ -177,9 +177,6 @@ namespace TEN::Traps::TR5
 
 	void CollideLaserBeam(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
-		constexpr auto LIGHT_INTENSITY	   = 1.0f;
-		constexpr auto LIGHT_AMPLITUDE_MAX = 0.4f;
-
 		if (!LaserBeams.count(itemNumber))
 			return;
 
@@ -216,7 +213,7 @@ namespace TEN::Traps::TR5
 			}
 
 			beam.Color.w = Random::GenerateFloat(0.6f, 1.0f);
-			SpawnLaserBeamLight(item.Pose.Position.ToVector3(), item.RoomNumber, item.Model.Color, LIGHT_INTENSITY, LIGHT_AMPLITUDE_MAX);
+			SpawnLaserBeamLight(item.Pose.Position.ToVector3(), item.RoomNumber, item.Model.Color, LASER_BEAM_LIGHT_INTENSITY, LASER_BEAM_LIGHT_AMPLITUDE_MAX);
 		}		
 	}
 

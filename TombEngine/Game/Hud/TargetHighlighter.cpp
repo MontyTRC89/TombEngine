@@ -181,7 +181,8 @@ namespace TEN::Hud
 				continue;
 
 			// Collect item number.
-			itemNumbers.push_back(itemPtr->Index);
+			if (itemPtr->HitPoints != NOT_TARGETABLE)
+				itemNumbers.push_back(itemPtr->Index);
 
 			// Find crosshair at item number key.
 			auto it = _crosshairs.find(itemPtr->Index);
@@ -190,8 +191,7 @@ namespace TEN::Hud
 
 			// Set crosshair as primary or peripheral.
 			auto& crosshair = it->second;
-			if (player.TargetEntity != nullptr &&
-				itemPtr->Index == player.TargetEntity->Index)
+			if (player.TargetEntity != nullptr && itemPtr->Index == player.TargetEntity->Index)
 			{
 				crosshair.SetPrimary();
 			}

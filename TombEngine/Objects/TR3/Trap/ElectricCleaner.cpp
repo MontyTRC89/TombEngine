@@ -107,18 +107,18 @@ namespace TEN::Entities::Traps
 			break;
 		}
 
-		if (GetCollidedObjects(&item, CLICK(1), true, CollidedItems, CollidedMeshes, true))
+		auto collObjects = GetCollidedObjects(item, true, true);
+		if (!collObjects.IsEmpty())
 		{
-			int lp = 0;
-			while (CollidedItems[lp] != nullptr)
+			for (auto* itemPtr : collObjects.ItemPtrs)
 			{
-				if (Objects[CollidedItems[lp]->ObjectNumber].intelligent)
-				{
-					CollidedItems[lp]->HitPoints = 0;
-					ItemElectricBurn(CollidedItems[lp], 120);
-				}
+				const auto& object = Objects[itemPtr->ObjectNumber];
 
-				lp++;
+				if (object.intelligent)
+				{
+					itemPtr->HitPoints = 0;
+					ItemElectricBurn(itemPtr, 120);
+				}
 			}
 		}
 

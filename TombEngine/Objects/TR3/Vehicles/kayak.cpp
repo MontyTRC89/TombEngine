@@ -1008,7 +1008,9 @@ namespace TEN::Entities::Vehicles
 				auto* item = &g_Level.Items[itemNum];
 				short nextItem = item->NextItem;
 
-				if (item->Collidable && item->Status != ITEM_INVISIBLE)
+				if (item->Collidable &&
+					item->Status != ITEM_INVISIBLE &&
+					item != laraItem && item != kayakItem)
 				{
 					auto* object = &Objects[item->ObjectNumber];
 
