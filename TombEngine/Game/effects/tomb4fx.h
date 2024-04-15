@@ -134,27 +134,28 @@ struct DRIP_STRUCT
 
 struct FIRE_LIST
 {
-	int x;
-	int y;
-	int z;
+	Vector3i position;
 	byte on;
 	float size;
 	short roomNumber;
 	
-	int oldX;
-	int oldY;
-	int oldZ;
-	int oldSize;
+	Vector3i oldPosition;
+	float oldSize;
+	byte oldOn;
+
+	void StoreInterpolationData()
+	{
+		oldPosition = position;
+		oldSize = size;
+		oldOn = on;
+	}
 };
 
 struct FIRE_SPARKS
 {
-	short x;
-	short y;
-	short z;
-	short xVel;
-	short yVel;
-	short zVel;
+	Vector3i position;
+	Vector3i velocity;
+	Vector3i color;
 	short gravity;
 	short rotAng;
 	short flags;
@@ -173,23 +174,25 @@ struct FIRE_SPARKS
 	unsigned char dR;
 	unsigned char dG;
 	unsigned char dB;
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
 	unsigned char colFadeSpeed;
 	unsigned char fadeToBlack;
 	unsigned char sLife;
 	unsigned char life;
 
-	int oldX;
-	int oldY;
-	int oldZ;
-	int oldR;
-	int oldG;
-	int oldB;
+	Vector3i oldPosition;
+	Vector3i oldColor;
 	unsigned char oldScalar;
 	unsigned char oldSize;
 	short oldRotAng;
+
+	void StoreInterpolationData()
+	{
+		oldPosition = position;
+		oldColor = color;
+		oldScalar = scalar;
+		oldSize = size;
+		oldRotAng = rotAng;
+	}
 };
 
 struct BLOOD_STRUCT

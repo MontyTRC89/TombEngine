@@ -1634,8 +1634,6 @@ namespace TEN::Renderer
 	{
 		ResetAnimations();
 
-		ClearFires();
-		ClearDynamicLights();
 		ClearSceneItems();
 		ClearShadowMap();
 

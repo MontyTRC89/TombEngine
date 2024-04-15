@@ -137,6 +137,8 @@ GameStatus ControlPhase(int numFrames)
 
 	bool isTitle = (CurrentLevel == 0);
 
+	ClearFires();
+	g_Renderer.ClearDynamicLights();
 	RegeneratePickups();
 
 	numFrames = std::clamp(numFrames, 0, 10);

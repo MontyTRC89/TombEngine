@@ -312,22 +312,39 @@ namespace TEN::Renderer
 			auto* fire = &Fires[k];
 			if (fire->on) 
 			{
+				auto oldFade = fire->oldOn == 1 ? 1.0f : (float)(255 - fire->oldOn) / 255.0f;
 				auto fade = fire->on == 1 ? 1.0f : (float)(255 - fire->on) / 255.0f;
+				fade = Lerp(oldFade, fade, _interpolationFactor);
 
 				for (int i = 0; i < MAX_SPARKS_FIRE; i++) 
 				{
 					auto* spark = &FireSparks[i];
+
 					if (spark->on)
 					{
 						AddSpriteBillboard(
 							&_sprites[spark->def],
 							Vector3::Lerp(
-								Vector3(fire->oldX + spark->oldX * fire->oldSize / 2, fire->oldY + spark->oldY * fire->oldSize / 2, fire->oldZ + spark->oldZ * fire->oldSize / 2),
-								Vector3(fire->x + spark->x * fire->size / 2, fire->y + spark->y * fire->size / 2, fire->z + spark->z * fire->size / 2),
+								Vector3(
+									fire->oldPosition.x + spark->oldPosition.x * fire->oldSize / 2, 
+									fire->oldPosition.y + spark->oldPosition.y * fire->oldSize / 2, 
+									fire->oldPosition.z + spark->oldPosition.z * fire->oldSize / 2),
+								Vector3(
+									fire->position.x + spark->position.x * fire->size / 2,
+									fire->position.y + spark->position.y * fire->size / 2, 
+									fire->position.z + spark->position.z * fire->size / 2),
 								_interpolationFactor),
 							Vector4::Lerp(
-								Vector4(spark->oldR / 255.0f * fade, spark->oldG / 255.0f * fade, spark->oldB / 255.0f * fade, 1.0f),
-								Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
+								Vector4(
+									spark->oldColor.x / 255.0f * fade, 
+									spark->oldColor.y / 255.0f * fade, 
+									spark->oldColor.z / 255.0f * fade,
+									1.0f),
+								Vector4(
+									spark->color.x / 255.0f * fade,
+									spark->color.y / 255.0f * fade, 
+									spark->color.z / 255.0f * fade, 
+									1.0f),
 								_interpolationFactor),
 							TO_RAD(Lerp(spark->oldRotAng << 4, spark->rotAng << 4, _interpolationFactor)),
 							Lerp(spark->oldScalar, spark->scalar, _interpolationFactor),

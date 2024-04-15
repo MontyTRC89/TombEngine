@@ -404,7 +404,6 @@ namespace TEN::Renderer
 		void CalculateLightFades(RendererItem* item);
 		void CollectEffects(short roomNumber);
 		void ClearSceneItems();
-		void ClearDynamicLights();
 		void ClearShadowMap();
 		void CalculateSSAO(RenderView& view);
 		void UpdateItemAnimations(RenderView& view);
@@ -613,6 +612,7 @@ namespace TEN::Renderer
 		void SetFullScreen();
 		bool IsFullsScreen();
 		void RenderTitleImage();
+		void ClearDynamicLights();
 
 		void AddLine2D(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
 
