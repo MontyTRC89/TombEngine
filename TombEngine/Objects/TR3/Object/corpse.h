@@ -5,15 +5,15 @@ struct ItemInfo;
 
 namespace TEN::Entities::TR3
 {
-
-	enum class CorpseFlags
+	enum class CorpseFlag
 	{
-		Lying = (1 << 0),
-		Hanging = (1 << 1),
-		Falling = (1 << 2)
+		None = 0,
+		Grounded = 1,
+		Hang = 2,
+		Fall = 3
 	};
 
 	void InitializeCorpse(short itemNumber);
-	void CorpseControl(short itemNumber);
-	void CorpseHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
+	void ControlCorpse(short itemNumber);
+	void HitCorpse(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
 }

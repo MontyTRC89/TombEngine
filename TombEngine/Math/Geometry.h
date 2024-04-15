@@ -1,5 +1,4 @@
 #pragma once
-#include <SimpleMath.h>
 
 class AxisAngle;
 class EulerAngles;
@@ -8,8 +7,6 @@ class Vector3i;
 
 namespace TEN::Math::Geometry
 {
-	using namespace DirectX::SimpleMath;
-
 	// Integer-based point translation
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f, const Vector3& axis = Vector3::UnitY);
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset, const Vector3& axis = Vector3::UnitY);
@@ -57,4 +54,7 @@ namespace TEN::Math::Geometry
 	bool IsPointInBox(const Vector3& point, const BoundingBox& box);
 	bool IsPointInBox(const Vector3& point, const BoundingOrientedBox& box);
 	bool IsPointInSphere(const Vector3& point, const BoundingSphere& sphere);
+
+	// Intersection inquirers
+	bool CircleIntersects(const Vector3& circle0, const Vector3& circle1);
 }

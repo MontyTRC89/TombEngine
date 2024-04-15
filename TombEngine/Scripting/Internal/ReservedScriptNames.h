@@ -159,7 +159,8 @@ static constexpr char ScriptReserved_GetItemFlags[]			= "GetItemFlags";
 static constexpr char ScriptReserved_SetItemFlags[]			= "SetItemFlags";
 static constexpr char ScriptReserved_GetLocationAI[]		= "GetLocationAI";
 static constexpr char ScriptReserved_SetLocationAI[]		= "SetLocationAI";
-static constexpr char ScriptReserved_GetMeshVisable[]		= "GetMeshVisable";
+static constexpr char ScriptReserved_GetMeshCount[]			= "GetMeshCount";
+static constexpr char ScriptReserved_GetMeshVisible[]		= "GetMeshVisible";
 static constexpr char ScriptReserved_SetMeshVisible[]		= "SetMeshVisible";
 static constexpr char ScriptReserved_ShatterMesh[]			= "ShatterMesh";
 static constexpr char ScriptReserved_GetMeshSwapped[]		= "GetMeshShapped";
@@ -314,6 +315,7 @@ static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
 static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
 
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
+static constexpr char ScriptReserved_GetFlipMapStatus[]				= "GetFlipMapStatus";
 static constexpr char ScriptReserved_PlayFlyBy[]					= "PlayFlyBy";
 
 static constexpr char ScriptReserved_PlayCamera[]					= "PlayCamera";

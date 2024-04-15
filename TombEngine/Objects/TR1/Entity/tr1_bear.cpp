@@ -185,7 +185,7 @@ namespace TEN::Entities::Creatures::TR1
 						item.Animation.TargetState = BEAR_STATE_LOW_WALK;
 					}
 				}
-				else if (item.Animation.RequiredState != NO_STATE)
+				else if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
@@ -208,7 +208,7 @@ namespace TEN::Entities::Creatures::TR1
 
 				if (creature.Mood == MoodType::Bored ||
 					isPlayerDead ||
-					item.Animation.RequiredState != NO_STATE)
+					item.Animation.RequiredState != NO_VALUE)
 				{
 					// Go to WALK, EAT, or RequiredState state.
 					item.Animation.TargetState = BEAR_STATE_LOW_IDLE;
@@ -232,7 +232,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BEAR_STATE_LOW_CHARGE_ATTACK:
-				if (item.Animation.RequiredState == NO_STATE &&
+				if (item.Animation.RequiredState == NO_VALUE &&
 					item.TouchBits.Test(BearAttackJoints))
 				{
 					DoDamage(creature.Enemy, BEAR_LOW_CHARGE_ATTACK_DAMAGE);
@@ -282,7 +282,7 @@ namespace TEN::Entities::Creatures::TR1
 					item.Animation.RequiredState = BEAR_STATE_LOW_WALK;
 					item.Animation.TargetState = BEAR_STATE_LOW_IDLE;
 				}
-				else if (item.Animation.RequiredState != NO_STATE)
+				else if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
@@ -306,7 +306,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BEAR_STATE_HIGH_CLAW_ATTACK:
-				if (item.Animation.RequiredState == NO_STATE &&
+				if (item.Animation.RequiredState == NO_VALUE &&
 					item.TouchBits.Test(BearAttackJoints))
 				{
 					DoDamage(creature.Enemy, BEAR_HIGH_CLAW_ATTACK_DAMAGE);

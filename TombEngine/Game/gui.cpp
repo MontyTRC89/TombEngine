@@ -407,7 +407,7 @@ namespace TEN::Gui
 						selectedOptionBackup = SelectedOption;
 						SelectedOption = 0;
 						MenuToDisplay = Menu::LoadGame;
-						SaveGame::LoadSavegameInfos();
+						SaveGame::LoadHeaders();
 						break;
 
 					case TitleOption::Options:
@@ -1547,7 +1547,7 @@ namespace TEN::Gui
 		Rings[(int)RingTypes::Inventory].NumObjectsInList = 0;
 
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-			Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem = NO_ITEM;
+			Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem = NO_VALUE;
 
 		Ammo.CurrentPistolsAmmoType = 0;
 		Ammo.CurrentUziAmmoType = 0;
@@ -1783,7 +1783,7 @@ namespace TEN::Gui
 		Rings[(int)RingTypes::Ammo].NumObjectsInList = 0;
 
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-			Rings[(int)RingTypes::Ammo].CurrentObjectList[i].InventoryItem = NO_ITEM;
+			Rings[(int)RingTypes::Ammo].CurrentObjectList[i].InventoryItem = NO_VALUE;
 
 		if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
 		{
@@ -1866,7 +1866,7 @@ namespace TEN::Gui
 	{
 		g_Gui.SetMenuToDisplay(Menu::Title);
 		g_Gui.SetSelectedOption(0);
-		g_Gui.SetLastInventoryItem(NO_ITEM);
+		g_Gui.SetLastInventoryItem(NO_VALUE);
 	}
 
 	void GuiController::InitializeInventory(ItemInfo* item)
@@ -1875,7 +1875,7 @@ namespace TEN::Gui
 
 		AlterFOV(ANGLE(DEFAULT_FOV), false);
 		lara->Inventory.IsBusy = false;
-		InventoryItemChosen = NO_ITEM;
+		InventoryItemChosen = NO_VALUE;
 		UseItem = false;
 
 		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].HasInfinite())
@@ -1912,9 +1912,9 @@ namespace TEN::Gui
 		Ammo.AmountGrenadeAmmo3 = lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].GetCount();
 		ConstructObjectList(item);
 
-		if (EnterInventory == NO_ITEM)
+		if (EnterInventory == NO_VALUE)
 		{
-			if (LastInvItem != NO_ITEM)
+			if (LastInvItem != NO_VALUE)
 			{
 				if (IsItemInInventory(LastInvItem))
 				{
@@ -1946,7 +1946,7 @@ namespace TEN::Gui
 					}
 					else
 					{
-						LastInvItem = NO_ITEM;
+						LastInvItem = NO_VALUE;
 					}
 				}
 			}
@@ -2173,7 +2173,7 @@ namespace TEN::Gui
 						item->HitPoints = LARA_HEALTH_MAX;
 
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-					Statistics.Game.HealthUsed++;
+					SaveGame::Statistics.Game.HealthUsed++;
 				}
 				else
 					SayNo();
@@ -2198,7 +2198,7 @@ namespace TEN::Gui
 					item->HitPoints = LARA_HEALTH_MAX;
 
 					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-					Statistics.Game.HealthUsed++;
+					SaveGame::Statistics.Game.HealthUsed++;
 				}
 				else
 					SayNo();
@@ -2612,12 +2612,12 @@ namespace TEN::Gui
 						break;
 
 					case MenuType::Load:
-						SaveGame::LoadSavegameInfos();
+						SaveGame::LoadHeaders();
 						SetInventoryMode(InventoryMode::Load);
 						break;
 
 					case MenuType::Save:
-						SaveGame::LoadSavegameInfos();
+						SaveGame::LoadHeaders();
 						SetInventoryMode(InventoryMode::Save);
 						break;
 
@@ -3385,7 +3385,7 @@ namespace TEN::Gui
 			if (UseItem && NoAction())
 				exitLoop = true;
 
-			SetEnterInventory(NO_ITEM);
+			SetEnterInventory(NO_VALUE);
 
 			Camera.numberFrames = g_Renderer.Synchronize();
 		}
@@ -3499,7 +3499,7 @@ namespace TEN::Gui
 
 		if (GuiIsSelected())
 		{
-			if (!SavegameInfos[SelectedSaveSlot].Present)
+			if (!SaveGame::Infos[SelectedSaveSlot].Present)
 				SayNo();
 			else
 			{

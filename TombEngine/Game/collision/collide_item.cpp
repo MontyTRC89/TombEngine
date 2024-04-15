@@ -23,11 +23,10 @@
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
-GameBoundingBox GlobalCollisionBounds;
-ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
-MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
-
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
+
+// Globals
+GameBoundingBox GlobalCollisionBounds;
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
@@ -100,174 +99,162 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 	}
 }
 
-bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara)
+CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible, bool ignorePlayer, float customRadius, ObjectCollectionMode mode)
 {
-	short numItems = 0;
-	short numMeshes = 0;
+	constexpr auto EXTENTS_LENGTH_MIN	= 2.0f;
+	constexpr auto ROUGH_BOX_HEIGHT_MIN = BLOCK(1 / 8.0f);
 
-	// Collect all the rooms where to check
-	for (auto i : g_Level.Rooms[collidingItem->RoomNumber].neighbors)
+	auto collObjects = CollidedObjectData{};
+
+	int itemCount	= 0;
+	int staticCount = 0;
+
+	// Establish parameters of colliding item.
+	const auto& collidingBounds = GetBestFrame(collidingItem).BoundingBox;
+	auto collidingExtents = collidingBounds.GetExtents();
+	auto collidingSphere = BoundingSphere(collidingBounds.GetCenter() + collidingItem.Pose.Position.ToVector3(), collidingExtents.Length());
+	auto collidingCircle = Vector3(collidingSphere.Center.x, collidingSphere.Center.z, (customRadius > 0.0f) ? customRadius : std::hypot(collidingExtents.x, collidingExtents.z));
+
+	// Quickly discard collision if colliding item bounds are below tolerance threshold.
+	if (collidingSphere.Radius <= EXTENTS_LENGTH_MIN)
+		return collObjects;
+
+	// Run through neighboring rooms.
+	const auto& room = g_Level.Rooms[collidingItem.RoomNumber];
+	for (int roomNumber : room.neighbors)
 	{
-		if (!g_Level.Rooms[i].Active())
+		auto& neighborRoom = g_Level.Rooms[roomNumber];
+		if (!neighborRoom.Active())
 			continue;
 
-		auto* room = &g_Level.Rooms[i];
-
-		if (collidedMeshes)
+		// Collect items.
+		if (mode == ObjectCollectionMode::All ||
+			mode == ObjectCollectionMode::Items)
 		{
-			for (int j = 0; j < room->mesh.size(); j++)
-			{
-				auto* mesh = &room->mesh[j];
-				const auto& bBox = GetBoundsAccurate(*mesh, false);
-
-				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
-					continue;
-
-				if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) < (mesh->pos.Position.y + bBox.Y1))
-					continue;
-
-				if (collidingItem->Pose.Position.y > (mesh->pos.Position.y + bBox.Y2))
-					continue;
-
-				float sinY = phd_sin(mesh->pos.Orientation.y);
-				float cosY = phd_cos(mesh->pos.Orientation.y);
-
-				float rx = ((collidingItem->Pose.Position.x - mesh->pos.Position.x) * cosY) - ((collidingItem->Pose.Position.z - mesh->pos.Position.z) * sinY);
-				float rz = ((collidingItem->Pose.Position.z - mesh->pos.Position.z) * cosY) + ((collidingItem->Pose.Position.x - mesh->pos.Position.x) * sinY);
-
-				if ((radius + rx + CLICK(0.5f) < bBox.X1) || (rx - radius - CLICK(0.5f) > bBox.X2))
-					continue;
-
-				if ((radius + rz + CLICK(0.5f) < bBox.Z1) || (rz - radius - CLICK(0.5f) > bBox.Z2))
-					continue;
-
-				collidedMeshes[numMeshes++] = mesh;
-
-				if (!radius)
-				{
-					collidedItems[0] = nullptr;
-					return true;
-				}
-			}
-
-			collidedMeshes[numMeshes] = nullptr;
-		}
-
-		if (collidedItems)
-		{
-			int itemNumber = room->itemNumber;
-			if (itemNumber != NO_ITEM)
+			int itemNumber = neighborRoom.itemNumber;
+			if (itemNumber != NO_VALUE)
 			{
 				do
 				{
-					auto* item = &g_Level.Items[itemNumber];
+					auto& item = g_Level.Items[itemNumber];
+					const auto& object = Objects[item.ObjectNumber];
 
-					if (item == collidingItem ||
-						(ignoreLara && item->ObjectNumber == ID_LARA) ||
-						(onlyVisible && item->Status == ITEM_INVISIBLE) ||
-						item->Flags & IFLAG_KILLED ||
-						item->MeshBits == NO_JOINT_BITS ||
-						(Objects[item->ObjectNumber].drawRoutine == nullptr && item->ObjectNumber != ID_LARA) ||
-						(Objects[item->ObjectNumber].collision == nullptr && item->ObjectNumber != ID_LARA))
+					itemNumber = item.NextItem;
+
+					// Ignore player (if applicable).
+					if (ignorePlayer && item.IsLara())
+						continue;
+
+					// Ignore invisible item (if applicable).
+					if (onlyVisible && item.Status == ITEM_INVISIBLE)
+						continue;
+
+					// Ignore items not feasible for collision.
+					if (item.Index == collidingItem.Index ||
+						item.Flags & IFLAG_KILLED || item.MeshBits == NO_JOINT_BITS ||
+						(object.drawRoutine == nullptr && !item.IsLara()) ||
+						(object.collision == nullptr && !item.IsLara()))
 					{
-						itemNumber = item->NextItem;
 						continue;
 					}
 
-					// TODO: This is awful and we need a better system.
-					if (item->ObjectNumber == ID_UPV && item->HitPoints == 1)
+					// HACK: Ignore UPV and big gun.
+					if ((item.ObjectNumber == ID_UPV || item.ObjectNumber == ID_BIGGUN) && item.HitPoints == 1)
+						continue;
+
+					// Test rough distance to discard objects more than 6 blocks away.
+					float dist = Vector3i::Distance(item.Pose.Position, collidingItem.Pose.Position);
+					if (dist > COLLISION_CHECK_DISTANCE)
+						continue;
+
+					const auto& bounds = GetBestFrame(item).BoundingBox;
+					auto extents = bounds.GetExtents();
+
+					// If item bounding box extents is below tolerance threshold, discard object.
+					if (extents.Length() <= EXTENTS_LENGTH_MIN)
+						continue;
+
+					// Test rough vertical distance to discard objects not intersecting vertically.
+					if (((collidingItem.Pose.Position.y + collidingBounds.Y1) - ROUGH_BOX_HEIGHT_MIN) >
+						((item.Pose.Position.y + bounds.Y2) + ROUGH_BOX_HEIGHT_MIN))
 					{
-						itemNumber = item->NextItem;
 						continue;
 					}
-					if (item->ObjectNumber == ID_BIGGUN && item->HitPoints == 1)
+					if (((collidingItem.Pose.Position.y + collidingBounds.Y2) + ROUGH_BOX_HEIGHT_MIN) <
+						((item.Pose.Position.y + bounds.Y1) - ROUGH_BOX_HEIGHT_MIN))
 					{
-						itemNumber = item->NextItem;
 						continue;
 					}
 
-					int dx = collidingItem->Pose.Position.x - item->Pose.Position.x;
-					int dy = collidingItem->Pose.Position.y - item->Pose.Position.y;
-					int dz = collidingItem->Pose.Position.z - item->Pose.Position.z;
+					// Test rough circle intersection to discard objects not intersecting horizontally.
+					auto circle = Vector3(item.Pose.Position.x, item.Pose.Position.z, std::hypot(extents.x, extents.z));
+					if (!Geometry::CircleIntersects(circle, collidingCircle))
+						continue;
 
-					auto bounds = GetBestFrame(*item).BoundingBox;
+					auto box0 = bounds.ToBoundingOrientedBox(item.Pose);
+					auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
 
-					if (dx >= -BLOCK(2) && dx <= BLOCK(2) &&
-						dy >= -BLOCK(2) && dy <= BLOCK(2) &&
-						dz >= -BLOCK(2) && dz <= BLOCK(2) &&
-						(collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + bounds.Y1) &&
-						(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + bounds.Y2))
-					{
-						float sinY = phd_sin(item->Pose.Orientation.y);
-						float cosY = phd_cos(item->Pose.Orientation.y);
+					// Override extents if specified.
+					if (customRadius > 0.0f)
+						box1.Extents = Vector3(customRadius);
 
-						int rx = (dx * cosY) - (dz * sinY);
-						int rz = (dz * cosY) + (dx * sinY);
-
-						// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
-						if (item->ObjectNumber == ID_TURN_SWITCH)
-						{
-							bounds.X1 = -CLICK(1);
-							bounds.X2 = CLICK(1);
-							bounds.Z1 = -CLICK(1);
-							bounds.Z1 = CLICK(1);
-						}
-
-						if ((radius + rx + CLICK(0.5f)) >= bounds.X1 &&
-							(rx - radius - CLICK(0.5f)) <= bounds.X2)
-						{
-							if ((radius + rz + CLICK(0.5f)) >= bounds.Z1 &&
-								(rz - radius - CLICK(0.5f)) <= bounds.Z2)
-							{
-								collidedItems[numItems++] = item;
-							}
-						}
-						else
-						{
-							if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + bounds.Y1) &&
-								(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + bounds.Y2))
-							{
-								float sinY = phd_sin(item->Pose.Orientation.y);
-								float cosY = phd_cos(item->Pose.Orientation.y);
-
-								int rx = (dx * cosY) - (dz * sinY);
-								int rz = (dz * cosY) + (dx * sinY);
-
-								// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
-								if (item->ObjectNumber == ID_TURN_SWITCH)
-								{
-									bounds.X1 = -CLICK(1);
-									bounds.X2 = CLICK(1);
-									bounds.Z1 = -CLICK(1);
-									bounds.Z1 = CLICK(1);
-								}
-
-								if ((radius + rx + CLICK(0.5f)) >= bounds.X1 &&
-									(rx - radius - CLICK(0.5f)) <= bounds.X2)
-								{
-									if ((radius + rz + CLICK(0.5f)) >= bounds.Z1 &&
-										(rz - radius - CLICK(0.5f)) <= bounds.Z2)
-									{
-										collidedItems[numItems++] = item;
-
-										if (!radius)
-											return true;
-									}
-								}
-							}
-						}
-					}
-
-					itemNumber = item->NextItem;
+					// Test accurate box intersection.
+					if (box0.Intersects(box1))
+						collObjects.ItemPtrs.push_back(&item);
 				}
-				while (itemNumber != NO_ITEM);
+				while (itemNumber != NO_VALUE);
 			}
+		}
 
-			collidedItems[numItems] = nullptr;
+		// Collect statics.
+		if (mode == ObjectCollectionMode::All ||
+			mode == ObjectCollectionMode::Statics)
+		{
+			for (auto& staticObj : neighborRoom.mesh)
+			{
+				// Discard invisible statics.
+				if (!(staticObj.flags & StaticMeshFlags::SM_VISIBLE))
+					continue;
+
+				// Test rough distance to discard statics beyond collision check threshold.
+				float dist = Vector3i::Distance(staticObj.pos.Position, collidingItem.Pose.Position);
+				if (dist > COLLISION_CHECK_DISTANCE)
+					continue;
+
+				const auto& bounds = GetBoundsAccurate(staticObj, false);
+
+				// Test rough vertical distance to discard statics not intersecting vertically.
+				if (((collidingItem.Pose.Position.y + collidingBounds.Y1) - ROUGH_BOX_HEIGHT_MIN) >
+					((staticObj.pos.Position.y + bounds.Y2) + ROUGH_BOX_HEIGHT_MIN))
+				{
+					continue;
+				}
+				if (((collidingItem.Pose.Position.y + collidingBounds.Y2) + ROUGH_BOX_HEIGHT_MIN) <
+					((staticObj.pos.Position.y + bounds.Y1) - ROUGH_BOX_HEIGHT_MIN))
+				{
+					continue;
+				}
+
+				// Test rough circle intersection to discard statics not intersecting horizontally.
+				auto circle = Vector3(staticObj.pos.Position.x, staticObj.pos.Position.z, (bounds.GetExtents() * Vector3(1.0f, 0.0f, 1.0f)).Length());
+				if (!Geometry::CircleIntersects(circle, collidingCircle))
+					continue;
+
+				auto box0 = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
+				auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
+
+				// Override extents if specified.
+				if (customRadius > 0.0f)
+					box1.Extents = Vector3(customRadius);
+
+				// Test accurate box intersection.
+				if (box0.Intersects(box1))
+					collObjects.StaticPtrs.push_back(&staticObj);
+			}
 		}
 	}
 
-	return (numItems || numMeshes);
+	return collObjects;
 }
 
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll)
@@ -324,7 +311,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 				continue;
 
 			int itemNumber = g_Level.Rooms[i].itemNumber;
-			while (itemNumber != NO_ITEM)
+			while (itemNumber != NO_VALUE)
 			{
 				auto* item2 = &g_Level.Items[itemNumber];
 				auto* object = &Objects[item2->ObjectNumber];
@@ -742,7 +729,7 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 	GetCollisionInfo(coll, item1);
 	coll->Setup.ForwardAngle = headingAngle;
 
-	if (coll->CollisionType == CT_NONE)
+	if (coll->CollisionType == CollisionType::None)
 	{
 		coll->Setup.PrevPosition = item1->Pose.Position;
 	}
@@ -867,7 +854,7 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 
 	coll->Setup.ForwardAngle = prevHeadingAngle;
 
-	if (coll->CollisionType == CT_NONE)
+	if (coll->CollisionType == CollisionType::None)
 	{
 		coll->Setup.PrevPosition = item->Pose.Position;
 		if (item->IsLara())
@@ -901,7 +888,7 @@ void ItemPushBridge(ItemInfo& item, CollisionInfo& coll)
 void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& collResult)
 {
 	// Store an offset for a bridge item into shifts, if exists.
-	if (coll.LastBridgeItemNumber == collResult.Position.Bridge && coll.LastBridgeItemNumber != NO_ITEM)
+	if (coll.LastBridgeItemNumber == collResult.Position.Bridge && coll.LastBridgeItemNumber != NO_VALUE)
 	{
 		auto& bridgeItem = g_Level.Items[collResult.Position.Bridge];
 
@@ -940,7 +927,7 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResu
 	else
 	{
 		coll.LastBridgeItemPose = Pose::Zero;
-		coll.LastBridgeItemNumber = NO_ITEM;
+		coll.LastBridgeItemNumber = NO_VALUE;
 	}
 
 	coll.LastBridgeItemNumber = collResult.Position.Bridge;
@@ -1087,13 +1074,13 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 			{
 				// HACK: Additionally subtract 2 from bottom plane, otherwise false positives may occur.
 				item->Pose.Position.y += distanceToVerticalPlane + 2;
-				coll->CollisionType = CT_TOP;
+				coll->CollisionType = CollisionType::Top;
 			}
 			else
 			{
 				// Set collision type only if dry room (in water rooms the player can get stuck).
 				item->Pose.Position.y -= distanceToVerticalPlane;
-				coll->CollisionType = (g_Level.Rooms[item->RoomNumber].flags & 1) ? coll->CollisionType : CT_CLAMP;
+				coll->CollisionType = (g_Level.Rooms[item->RoomNumber].flags & 1) ? coll->CollisionType : CollisionType::Clamp;
 			}
 
 			result = true;
@@ -1177,19 +1164,19 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = ox - x;
-			coll->CollisionType = CT_FRONT;
+			coll->CollisionType = CollisionType::Front;
 		}
 		else if (rawShift.x > 0 && rawShift.x <= coll->Setup.Radius)
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = 0;
-			coll->CollisionType = CT_LEFT;
+			coll->CollisionType = CollisionType::Left;
 		}
 		else if (rawShift.x < 0 && rawShift.x >= -coll->Setup.Radius)
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = 0;
-			coll->CollisionType = CT_RIGHT;
+			coll->CollisionType = CollisionType::Right;
 		}
 
 		break;
@@ -1199,19 +1186,19 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = ox - x;
-			coll->CollisionType = CT_FRONT;
+			coll->CollisionType = CollisionType::Front;
 		}
 		else if (rawShift.x > 0 && rawShift.x <= coll->Setup.Radius)
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = 0;
-			coll->CollisionType = CT_RIGHT;
+			coll->CollisionType = CollisionType::Right;
 		}
 		else if (rawShift.x < 0 && rawShift.x >= -coll->Setup.Radius)
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = 0;
-			coll->CollisionType = CT_LEFT;
+			coll->CollisionType = CollisionType::Left;
 		}
 
 		break;
@@ -1221,19 +1208,19 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = oz - z;
-			coll->CollisionType = CT_FRONT;
+			coll->CollisionType = CollisionType::Front;
 		}
 		else if (rawShift.z > 0 && rawShift.z <= coll->Setup.Radius)
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = 0;
-			coll->CollisionType = CT_RIGHT;
+			coll->CollisionType = CollisionType::Right;
 		}
 		else if (rawShift.z < 0 && rawShift.z >= -coll->Setup.Radius)
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = 0;
-			coll->CollisionType = CT_LEFT;
+			coll->CollisionType = CollisionType::Left;
 		}
 
 		break;
@@ -1243,19 +1230,19 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		{
 			coll->Shift.Position.x = rawShift.x;
 			coll->Shift.Position.z = oz - z;
-			coll->CollisionType = CT_FRONT;
+			coll->CollisionType = CollisionType::Front;
 		}
 		else if (rawShift.z > 0 && rawShift.z <= coll->Setup.Radius)
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = 0;
-			coll->CollisionType = CT_LEFT;
+			coll->CollisionType = CollisionType::Left;
 		}
 		else if (rawShift.z < 0 && rawShift.z >= -coll->Setup.Radius)
 		{
 			coll->Shift.Position.z = rawShift.z;
 			coll->Shift.Position.x = 0;
-			coll->CollisionType = CT_RIGHT;
+			coll->CollisionType = CollisionType::Right;
 		}
 
 		break;
@@ -1271,10 +1258,10 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	coll->Shift.Position.z = (round((distance.x * sinY) + (distance.z * cosY)) + pose.Position.z) - item->Pose.Position.z;
 
 	if (coll->Shift.Position.x == 0 && coll->Shift.Position.z == 0)
-		coll->CollisionType = CT_NONE; // Paranoid.
+		coll->CollisionType = CollisionType::None; // Paranoid.
 
 	// Set splat state flag if item is Lara and bounds are taller than Lara's headroom.
-	if (item == LaraItem && coll->CollisionType == CT_FRONT)
+	if (item == LaraItem && coll->CollisionType == CollisionType::Front)
 		coll->HitTallObject = (yMin <= inYMin + LARA_HEADROOM);
 
 	return true;
@@ -1823,7 +1810,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			continue;
 
 		int nextItemNumber = neighborRoom.itemNumber;
-		while (nextItemNumber != NO_ITEM)
+		while (nextItemNumber != NO_VALUE)
 		{
 			auto& linkItem = g_Level.Items[nextItemNumber];
 			int itemNumber = nextItemNumber;

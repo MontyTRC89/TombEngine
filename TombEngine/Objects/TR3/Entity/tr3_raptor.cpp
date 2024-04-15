@@ -99,7 +99,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+					if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
 						continue;
 
 					auto* targetItem = &g_Level.Items[currentCreature->ItemNumber];
@@ -148,7 +148,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->MaxTurn = 0;
 				creature->Flags &= ~1;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (creature->Flags & 2)
 				{

@@ -431,7 +431,7 @@ void FireShotgun(ItemInfo& laraItem)
 
 		Rumble(0.5f, 0.2f);
 
-		Statistics.Game.AmmoUsed++;
+		SaveGame::Statistics.Game.AmmoUsed++;
 	}
 }
 
@@ -441,7 +441,7 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	ItemInfo* weaponItemPtr = nullptr;
 
-	if (player.Control.Weapon.WeaponItem == NO_ITEM)
+	if (player.Control.Weapon.WeaponItem == NO_VALUE)
 	{
 		player.Control.Weapon.WeaponItem = CreateItem();
 		weaponItemPtr = &g_Level.Items[player.Control.Weapon.WeaponItem];
@@ -512,7 +512,7 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	if (item.Status == ITEM_DEACTIVATED)
 	{
 		KillItem(player.Control.Weapon.WeaponItem);
-		player.Control.Weapon.WeaponItem = NO_ITEM;
+		player.Control.Weapon.WeaponItem = NO_VALUE;
 		player.Control.HandStatus = HandStatus::Free;
 		player.TargetEntity = nullptr;
 		player.LeftArm.Locked =
@@ -572,7 +572,7 @@ bool FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose)
 	player.Control.Weapon.HasFired = true;
 
 	int itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return false;
 
 	auto& harpoonItem = g_Level.Items[itemNumber];
@@ -630,8 +630,8 @@ bool FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose)
 
 	Rumble(0.2f, 0.1f);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 
 	return true;
 }
@@ -680,7 +680,7 @@ void FireGrenade(ItemInfo& laraItem)
 	player.Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return;
 
 	auto& grenadeItem = g_Level.Items[itemNumber];
@@ -731,7 +731,7 @@ void FireGrenade(ItemInfo& laraItem)
 	grenadeItem.Animation.Velocity.z = GRENADE_VELOCITY;
 	grenadeItem.Animation.ActiveState = grenadeItem.Pose.Orientation.x;
 	grenadeItem.Animation.TargetState = grenadeItem.Pose.Orientation.y;
-	grenadeItem.Animation.RequiredState = NO_STATE;
+	grenadeItem.Animation.RequiredState = NO_VALUE;
 	grenadeItem.HitPoints = GRENADE_TIME;
 	grenadeItem.ItemFlags[0] = (int)WeaponAmmoType::Ammo2;
 
@@ -760,8 +760,8 @@ void FireGrenade(ItemInfo& laraItem)
 		break;
 	}
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void GrenadeControl(short itemNumber)
@@ -781,7 +781,7 @@ void GrenadeControl(short itemNumber)
 		if (grenadeItem.Animation.Velocity.z)
 		{
 			grenadeItem.Pose.Orientation.z += (short((grenadeItem.Animation.Velocity.z / 16) + 3.0f) * ANGLE(1.0f));
-			if (grenadeItem.Animation.RequiredState != NO_STATE)
+			if (grenadeItem.Animation.RequiredState != NO_VALUE)
 			{
 				grenadeItem.Pose.Orientation.y += (short((grenadeItem.Animation.Velocity.z / 4) + 3.0f) * ANGLE(1.0f));
 			}
@@ -799,7 +799,7 @@ void GrenadeControl(short itemNumber)
 		if (grenadeItem.Animation.Velocity.z)
 		{
 			grenadeItem.Pose.Orientation.z += (short((grenadeItem.Animation.Velocity.z / 4) + 7.0f) * ANGLE(1.0f));
-			if (grenadeItem.Animation.RequiredState != NO_STATE)
+			if (grenadeItem.Animation.RequiredState != NO_VALUE)
 			{
 				grenadeItem.Pose.Orientation.y += (short((grenadeItem.Animation.Velocity.z / 2) + 7.0f) * ANGLE(1.0f));
 			}
@@ -863,7 +863,7 @@ void FireRocket(ItemInfo& laraItem)
 	player.Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return;
 
 	auto& rocketItem = g_Level.Items[itemNumber];
@@ -922,8 +922,8 @@ void FireRocket(ItemInfo& laraItem)
 	Rumble(0.4f, 0.3f);
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void RocketControl(short itemNumber)
@@ -1002,7 +1002,7 @@ void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose)
 	player.Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return;
 
 	auto& boltItem = g_Level.Items[itemNumber];
@@ -1074,8 +1074,8 @@ void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose)
 	Rumble(0.2f, 0.1f);
 	SoundEffect(SFX_TR4_CROSSBOW_FIRE, &laraItem.Pose);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void FireCrossBowFromLaserSight(ItemInfo& laraItem, GameVector* origin, GameVector* target)
@@ -1191,7 +1191,7 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 		if (player.Control.Weapon.GunType == LaraWeaponType::Revolver)
 		{
 			player.Control.Weapon.Interval = 16.0f;
-			Statistics.Game.AmmoUsed++;
+			SaveGame::Statistics.Game.AmmoUsed++;
 			isFiring = true;
 
 			if (!ammo.HasInfinite())
@@ -1326,10 +1326,10 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 
 		if (&target != &emitter)
 		{
-			Statistics.Game.AmmoHits++;
+			SaveGame::Statistics.Game.AmmoHits++;
 			if (target.HitPoints <= 0)
 			{
-				Statistics.Level.Kills++;
+				SaveGame::Statistics.Level.Kills++;
 				CreatureDie(target.Index, true);
 			}
 		}
@@ -1379,7 +1379,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 	{
 		// Trigger a new fragment in the case of GRENADE_SUPER until itemFlags[1] is > 0.
 		int grenadeItemNumber = CreateItem();
-		if (grenadeItemNumber == NO_ITEM)
+		if (grenadeItemNumber == NO_VALUE)
 			return true;
 
 		auto& grenadeItem = g_Level.Items[grenadeItemNumber];
@@ -1402,7 +1402,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 		grenadeItem.Animation.Velocity.z = 64.0f;
 		grenadeItem.Animation.ActiveState = grenadeItem.Pose.Orientation.x;
 		grenadeItem.Animation.TargetState = grenadeItem.Pose.Orientation.y;
-		grenadeItem.Animation.RequiredState = NO_STATE;
+		grenadeItem.Animation.RequiredState = NO_VALUE;
 
 		AddActiveItem(grenadeItemNumber);
 
@@ -1554,42 +1554,34 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		}
 
 		// Found possible collided items and statics.
-		GetCollidedObjects(&projectile, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
-
-		// If no collided items and meshes are found, exit the loop.
-		if (!CollidedItems[0] && !CollidedMeshes[0])
+		auto collObjects = GetCollidedObjects(projectile, true, false, radius);
+		if (collObjects.IsEmpty())
 			break;
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		// Run through statics.
+		for (auto* staticPtr : collObjects.StaticPtrs)
 		{
-			auto* meshPtr = CollidedMeshes[i];
-			if (!meshPtr)
-				break;
-
 			hasHit = hasHitNotByEmitter = doShatter = true;
 			doExplosion = isExplosive;
 
-			if (StaticObjects[meshPtr->staticNumber].shatterType == ShatterType::None)
+			if (StaticObjects[staticPtr->staticNumber].shatterType == ShatterType::None)
 				continue;
 
-			meshPtr->HitPoints -= damage;
-			if (meshPtr->HitPoints <= 0)
-				ShatterObject(nullptr, meshPtr, -128, projectile.RoomNumber, 0);
+			staticPtr->HitPoints -= damage;
+			if (staticPtr->HitPoints <= 0)
+				ShatterObject(nullptr, staticPtr, -128, projectile.RoomNumber, 0);
 
 			if (!isExplosive)
 				continue;
 
-			TriggerExplosionSparks(meshPtr->pos.Position.x, meshPtr->pos.Position.y, meshPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
-			auto pose = Pose(meshPtr->pos.Position.x, meshPtr->pos.Position.y - 128, meshPtr->pos.Position.z, 0, meshPtr->pos.Orientation.y, 0);
+			TriggerExplosionSparks(staticPtr->pos.Position.x, staticPtr->pos.Position.y, staticPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
+			auto pose = Pose(staticPtr->pos.Position.x, staticPtr->pos.Position.y - 128, staticPtr->pos.Position.z, 0, staticPtr->pos.Orientation.y, 0);
 			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		}
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		// Run through items.
+		for (auto* itemPtr : collObjects.ItemPtrs)
 		{
-			auto* itemPtr = CollidedItems[i];
-			if (itemPtr == nullptr)
-				break;
-#
 			// Object was already affected by collision, skip it.
 			if (std::find(affectedObjects.begin(), affectedObjects.end(), itemPtr->Index) != affectedObjects.end())
 				continue;
@@ -1652,7 +1644,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				SmashObject(itemPtr->Index);
 				KillItem(itemPtr->Index);
 			}
-			else if (currentObject.collision && !(itemPtr->Status & ITEM_INVISIBLE))
+			else if (currentObject.collision && itemPtr->Status != ITEM_INVISIBLE)
 			{
 				doShatter = hasHit = true;
 				doExplosion = isExplosive;

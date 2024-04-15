@@ -20,7 +20,7 @@
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_claw_mutant.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
-#include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
+#include "Objects/TR3/Entity/FishSwarm.h" // OK
 #include "Objects/TR3/Entity/tr3_flamethrower.h" // OK
 #include "Objects/TR3/Entity/tr3_monkey.h" // OK
 #include "Objects/TR3/Entity/tr3_mp_gun.h" // OK
@@ -425,6 +425,15 @@ static void StartEntity(ObjectInfo* obj)
 		obj->intelligent = true;
 		obj->SetHitEffect();
 	}
+
+	obj = &Objects[ID_FISH_EMITTER];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeFishSwarm;
+		obj->control = ControlFishSwarm;
+		obj->intelligent = true;
+		obj->drawRoutine = NULL;
+	}
 }
 
 static void StartObject(ObjectInfo* obj)
@@ -462,8 +471,8 @@ static void StartObject(ObjectInfo* obj)
 		obj->Initialize = InitializeCorpse;
 		obj->collision = CreatureCollision;
 		obj->damageType = DamageMode::None;
-		obj->control = CorpseControl;
-		obj->HitRoutine = CorpseHit;
+		obj->control = ControlCorpse;
+		obj->HitRoutine = HitCorpse;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->shadowType = ShadowMode::None;
 		obj->SetHitEffect();

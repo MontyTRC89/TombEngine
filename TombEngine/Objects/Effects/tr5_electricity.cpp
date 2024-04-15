@@ -142,8 +142,6 @@ void ElectricityWiresControl(short itemNumber)
 
 	SoundEffect(SFX_TR5_ELECTRIC_WIRES, &item->Pose);
 
-	GetCollidedObjects(item, BLOCK(4), true, CollidedItems, nullptr, 0) && CollidedItems[0];
-
 	auto* object = &Objects[item->ObjectNumber];
 
 	auto cableBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
@@ -179,21 +177,18 @@ void ElectricityWiresControl(short itemNumber)
 	if (GetRandomControl() & 1)
 		return;
 
-	int k = 0;
-	while (CollidedItems[k] != nullptr)
+	auto collObjects = GetCollidedObjects(*item, true, false, BLOCK(2), ObjectCollectionMode::Items);
+	for (auto* itemPtr : collObjects.ItemPtrs)
 	{
-		auto* collItem = CollidedItems[k];
-		auto* collObj = &Objects[collItem->ObjectNumber];
+		const auto& object = Objects[itemPtr->ObjectNumber];
 
-		k++;
-
-		if (collItem->ObjectNumber != ID_LARA && !collObj->intelligent)
+		if (itemPtr->ObjectNumber != ID_LARA && !object.intelligent)
 			continue;
 
 		bool isWaterNearby = false;
-		auto npcBox = GameBoundingBox(collItem).ToBoundingOrientedBox(collItem->Pose);
+		auto npcBox = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
 
-		for (int i = 0; i < object->nmeshes; i++)
+		for (int i = 0; i < object.nmeshes; i++)
 		{
 			auto pos = GetJointPosition(item, i, Vector3i(0, 0, CLICK(1)));
 			short roomNumber = item->RoomNumber;
@@ -217,11 +212,11 @@ void ElectricityWiresControl(short itemNumber)
 			if (pos.y < cableBottomPlane)
 				continue;
 
-			for (int j = 0; j < collObj->nmeshes; j++)
+			for (int j = 0; j < object.nmeshes; j++)
 			{
-				auto collPos = GetJointPosition(collItem, j);
+				auto collPos = GetJointPosition(itemPtr, j);
 
-				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, collItem->RoomNumber).RoomNumber;
+				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, itemPtr->RoomNumber).RoomNumber;
 
 				if (!isWaterNearby && isTouchingWater && roomNumber == collJointRoom)
 					isWaterNearby = true;
@@ -233,29 +228,35 @@ void ElectricityWiresControl(short itemNumber)
 			{
 				if (!isWaterNearby)
 				{
-					if (collItem->Effect.Type != EffectType::Smoke)
+					if (itemPtr->Effect.Type != EffectType::Smoke)
 					{
-						ItemBlueElectricBurn(collItem, 2 *FPS);
+						ItemBlueElectricBurn(itemPtr, 2 *FPS);
 					}
 					else
-						ItemSmoke(collItem, -1);
+					{
+						ItemSmoke(itemPtr, -1);
+					}
 				}
 
 				if (instantKill)
-					DoDamage(collItem, INT_MAX);
+				{
+					DoDamage(itemPtr, INT_MAX);
+				}
 				else
-					DoDamage(collItem, 8);
+				{
+					DoDamage(itemPtr, 8);
+				}
 
-				for (int j = 0; j < collObj->nmeshes; j++)
+				for (int j = 0; j < object.nmeshes; j++)
 				{
 					if ((GetRandomControl() & 127) < 16)
-						TriggerElectricitySparks(collItem, j, false);
+						TriggerElectricitySparks(itemPtr, j, false);
 				}
 
 				TriggerDynamicLight(
-					collItem->Pose.Position.x,
-					collItem->Pose.Position.y,
-					collItem->Pose.Position.z,
+					itemPtr->Pose.Position.x,
+					itemPtr->Pose.Position.y,
+					itemPtr->Pose.Position.z,
 					5,
 					0,
 					(GetRandomControl() & 0x3F) + 0x2F,

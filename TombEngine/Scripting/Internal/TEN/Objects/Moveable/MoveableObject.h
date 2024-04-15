@@ -90,6 +90,7 @@ public:
 	[[nodiscard]] short GetLocationAI() const;
 	void SetLocationAI(short value);
 
+	[[nodiscard]] short GetMeshCount() const;
 	[[nodiscard]] bool GetMeshVisible(int meshId) const;
 	void SetMeshVisible(int meshId, bool isVisible);
 	void ShatterMesh(int meshId);
