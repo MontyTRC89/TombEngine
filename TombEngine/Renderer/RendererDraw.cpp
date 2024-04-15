@@ -39,7 +39,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
 using namespace TEN::Renderer::Structures;
 
-extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
+extern GunshellInfo Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer
 {
@@ -275,6 +275,16 @@ namespace TEN::Renderer
 			);
 			Matrix rotation = gunshell->pos.Orientation.ToRotationMatrix();
 			Matrix world = rotation * translation;
+
+			Matrix oldTranslation = Matrix::CreateTranslation(
+				gunshell->oldPos.Position.x,
+				gunshell->oldPos.Position.y,
+				gunshell->oldPos.Position.z
+			);
+			Matrix oldRotation = gunshell->oldPos.Orientation.ToRotationMatrix();
+			Matrix oldWorld = oldRotation * oldTranslation;
+
+			world = Matrix::Lerp(oldWorld, world, _interpolationFactor);
 
 			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].World = world;
 			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].Ambient = room.AmbientLight;

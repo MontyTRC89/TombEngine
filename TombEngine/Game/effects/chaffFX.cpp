@@ -98,7 +98,7 @@ void TriggerChaffSparkles(const Vector3i& pos, const Vector3i& vel, const Color&
 
 void TriggerChaffSmoke(const Vector3i& pos, const Vector3i& vel, int speed, bool isMoving, bool wind)
 {
-	SmokeSpark* smoke;
+	SmokeSparkInfo* smoke;
 
 	int rnd = 0;
 	BYTE trans, size;

@@ -48,7 +48,7 @@ using namespace TEN::Traps::TR5;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
-extern SmokeSpark SmokeSparks[MAX_SPARKS_SMOKE];
+extern SmokeSparkInfo SmokeSparks[MAX_SPARKS_SMOKE];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
 extern Particle Particles[MAX_PARTICLES];
@@ -277,7 +277,7 @@ namespace TEN::Renderer
 	{
 		for (int i = 0; i < 32; i++) 
 		{
-			SmokeSpark* spark = &SmokeSparks[i];
+			SmokeSparkInfo* spark = &SmokeSparks[i];
 
 			if (spark->on) 
 			{
