@@ -8,17 +8,13 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
-#include "Scripting/Internal/TEN/DisplaySprite/AlignModes.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScaleModes.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
+#include "Scripting/Internal/TEN/Flow/GameStatuses.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
-
-using namespace TEN::Scripting::DisplaySprite;
 
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
@@ -128,41 +124,50 @@ have an ID of 0, the second an ID of 1, and so on.
 	tableFlow.set_function(ScriptReserved_GetCurrentLevel, &FlowHandler::GetCurrentLevel, this);
 
 /***
-Finishes the current level, with optional level index provided. If level index
-is not provided or is zero, jumps to next level. If level index is more than
-level count, jumps to title.
+Finishes the current level, with optional level index and start position index provided.
+If level index is not provided or is zero, jumps to next level. If level index is more than
+level count, jumps to title. If LARA\_START\_POS objects are present in level, player will be
+teleported to such object with OCB similar to provided second argument.
 @function EndLevel
 @int[opt] index level index (default 0)
+@int[opt] startPos player start position (default 0)
 */
 	tableFlow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
 
-	/***
-	Save the game to a savegame slot.
-	@function SaveGame
-	@tparam int slotID ID of the savegame slot to save to.
-	*/
+/***
+Get current game status, such as normal game loop, exiting to title, etc.
+@function GetGameStatus
+@treturn Flow.GameStatus the current game status
+*/
+	tableFlow.set_function(ScriptReserved_GetGameStatus, &FlowHandler::GetGameStatus, this);
+
+/***
+Save the game to a savegame slot.
+@function SaveGame
+@tparam int slotID ID of the savegame slot to save to.
+*/
 	tableFlow.set_function(ScriptReserved_SaveGame, &FlowHandler::SaveGame, this);
 
-	/***
-	Load the game from a savegame slot.
-	@function LoadGame
-	@tparam int slotID ID of the savegame slot to load from.
-	*/
+/***
+Load the game from a savegame slot.
+@function LoadGame
+@tparam int slotID ID of the savegame slot to load from.
+*/
 	tableFlow.set_function(ScriptReserved_LoadGame, &FlowHandler::LoadGame, this);
 
-	/***
-	Delete a savegame.
-	@function DeleteSaveGame
-	@tparam int slotID ID of the savegame slot to clear.
-	*/
+/***
+Delete a savegame.
+@function DeleteSaveGame
+@tparam int slotID ID of the savegame slot to clear.
+*/
 	tableFlow.set_function(ScriptReserved_DeleteSaveGame, &FlowHandler::DeleteSaveGame, this);
 
-	/***
-	Check if a savegame exists.
-	@function DoesSaveGameExist
-	@tparam int slotID ID of the savegame slot to check.
-	@treturn bool true if the savegame exists, false if not.
-	*/
+/***
+Check if a savegame exists.
+@function DoesSaveGameExist
+@tparam int slotID ID of the savegame slot to check.
+@treturn bool true if the savegame exists, false if not.
+*/
 	tableFlow.set_function(ScriptReserved_DoesSaveGameExist, &FlowHandler::DoesSaveGameExist, this);
 
 /***
@@ -193,6 +198,19 @@ Must be an integer value (0 means no secrets).
 @tparam int total number of secrets
 */
 	tableFlow.set_function(ScriptReserved_SetTotalSecretCount, &FlowHandler::SetTotalSecretCount, this);
+	
+/*** Do FlipMap with specific group ID.
+@function FlipMap
+@tparam int flipmap (ID of flipmap group to actuvate / deactivate)
+*/
+	tableFlow.set_function(ScriptReserved_FlipMap, &FlowHandler::FlipMap, this);
+	
+/*** Get current FlipMap status for specific group ID.
+@function GetFlipMapStatus
+@int[opt] index Flipmap group ID to check. If no group specified or group is -1, function returns overall flipmap status (on or off).
+@treturn int Status of the flipmap group (true means on, false means off).
+*/
+	tableFlow.set_function(ScriptReserved_GetFlipMapStatus, &FlowHandler::GetFlipMapStatus, this);
 
 /*** settings.lua.
 These functions are called in settings.lua, a file which holds your local settings.
@@ -235,14 +253,7 @@ Specify which translations in the strings table correspond to which languages.
 */
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 
-/*** Do FlipMap with specific ID.
-//@function FlipMap
-//@tparam int flipmap (ID of flipmap)
-*/
-	tableFlow.set_function(ScriptReserved_FlipMap, &FlowHandler::FlipMap);
-
 	ScriptColor::Register(parent);
-	ScriptDisplaySprite::Register(*lua, parent);
 	Rotation::Register(parent);
 	Vec2::Register(parent);
 	Vec3::Register(parent);
@@ -259,6 +270,7 @@ Specify which translations in the strings table correspond to which languages.
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
+	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameStatus, GAME_STATUSES);
 }
 
 FlowHandler::~FlowHandler()
@@ -349,7 +361,7 @@ char const * FlowHandler::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
 	{
-		return "String not found.";
+		return id;
 	}
 	else
 	{
@@ -427,15 +439,37 @@ int FlowHandler::GetLevelNumber(const std::string& fileName)
 	return -1;
 }
 
-void FlowHandler::EndLevel(std::optional<int> nextLevel)
+void FlowHandler::EndLevel(std::optional<int> nextLevel, std::optional<int> startPosIndex)
 {
 	int index = (nextLevel.has_value() && nextLevel.value() != 0) ? nextLevel.value() : CurrentLevel + 1;
 	NextLevel = index;
+	RequiredStartPos = startPosIndex.has_value() ? startPosIndex.value() : 0;
 }
 
-void FlowHandler::FlipMap(int flipmap)
+GameStatus FlowHandler::GetGameStatus()
 {
-	DoFlipMap(flipmap);
+	return this->LastGameStatus;
+}
+
+void FlowHandler::FlipMap(int group)
+{
+	DoFlipMap(group);
+}
+
+bool FlowHandler::GetFlipMapStatus(std::optional<int> group)
+{
+	if (!group.has_value() || group.value() == NO_VALUE)
+	{
+		return FlipStatus;
+	}
+
+	if (group.value() < 0 || group.value() >= MAX_FLIPMAP)
+	{
+		TENLog("Maximum flipmap group number is " + std::to_string(MAX_FLIPMAP) + ". Please specify another index.", LogLevel::Warning);
+		return false;
+	}
+
+	return FlipStatus && FlipStats[group.value()];
 }
 
 void FlowHandler::SaveGame(int slot)
@@ -463,7 +497,7 @@ bool FlowHandler::DoesSaveGameExist(int slot)
 
 int FlowHandler::GetSecretCount() const
 {
-	return Statistics.Game.Secrets;
+	return SaveGame::Statistics.Game.Secrets;
 }
 
 void FlowHandler::SetSecretCount(int secretsNum)
@@ -471,7 +505,7 @@ void FlowHandler::SetSecretCount(int secretsNum)
 	if (secretsNum > UCHAR_MAX)
 		return;
 
-	Statistics.Game.Secrets = secretsNum;
+	SaveGame::Statistics.Game.Secrets = secretsNum;
 }
 
 void FlowHandler::AddSecret(int levelSecretIndex)
@@ -484,18 +518,18 @@ void FlowHandler::AddSecret(int levelSecretIndex)
 		return;
 	}
 
-	if (Statistics.Level.Secrets & (1 << levelSecretIndex))
+	if (SaveGame::Statistics.Level.Secrets & (1 << levelSecretIndex))
 		return;
 
-	if (Statistics.Game.Secrets >= UINT_MAX)
+	if (SaveGame::Statistics.Game.Secrets >= UINT_MAX)
 	{
 		TENLog("Maximum amount of level secrets is already reached!", LogLevel::Warning);
 		return;
 	}
 
 	PlaySecretTrack();
-	Statistics.Level.Secrets |= (1 << levelSecretIndex);
-	Statistics.Game.Secrets++;
+	SaveGame::Statistics.Level.Secrets |= (1 << levelSecretIndex);
+	SaveGame::Statistics.Game.Secrets++;
 }
 
 bool FlowHandler::IsFlyCheatEnabled() const
@@ -553,6 +587,26 @@ void FlowHandler::EnableLoadSave(bool loadSave)
 	LoadSave = loadSave;
 }
 
+void FlowHandler::PrepareInventoryObjects()
+{
+	const auto& level = *Levels[CurrentLevel];
+	for (const auto& refInvItem : level.InventoryObjects)
+	{
+		if (refInvItem.ObjectID < 0 || refInvItem.ObjectID >= INVENTORY_TABLE_SIZE)
+			continue;
+
+		auto& invItem = InventoryObjectTable[refInvItem.ObjectID];
+
+		invItem.ObjectName = refInvItem.Name.c_str();
+		invItem.Scale1 = refInvItem.Scale;
+		invItem.YOffset = refInvItem.YOffset;
+		invItem.Orientation = EulerAngles(ANGLE(refInvItem.Rot.x), ANGLE(refInvItem.Rot.y), ANGLE(refInvItem.Rot.z));
+		invItem.MeshBits = refInvItem.MeshBits;
+		invItem.Options = refInvItem.MenuAction;
+		invItem.RotFlags = refInvItem.RotFlags;
+	}
+}
+
 bool FlowHandler::DoFlow()
 {
 	// We start with the title level, if no other index is specified
@@ -574,9 +628,6 @@ bool FlowHandler::DoFlow()
 			TENLog("Level not found. Check Gameflow.lua file integrity.", LogLevel::Error, LogConfig::All);
 			CurrentLevel = 0;
 		}
-		
-		// First we need to fill some legacy variables in PCTomb5.exe
-		Level* level = Levels[CurrentLevel];
 
 		GameStatus status;
 
@@ -596,26 +647,9 @@ bool FlowHandler::DoFlow()
 		}
 		else
 		{
-			// Prepare inventory objects table
-			for (size_t i = 0; i < level->InventoryObjects.size(); i++)
-			{
-				InventoryItem* obj = &level->InventoryObjects[i];
-				if (obj->ObjectID >= 0 && obj->ObjectID < INVENTORY_TABLE_SIZE)
-				{
-					InventoryObject* invObj = &InventoryObjectTable[obj->ObjectID];
-
-					invObj->ObjectName = obj->Name.c_str();
-					invObj->Scale1 = obj->Scale;
-					invObj->YOffset = obj->YOffset;
-					invObj->Orientation = EulerAngles(ANGLE(obj->Rot.x), ANGLE(obj->Rot.y), ANGLE(obj->Rot.z));
-					invObj->MeshBits = obj->MeshBits;
-					invObj->Options = obj->MenuAction;
-					invObj->RotFlags = obj->RotFlags;
-				}
-			}
-
 			try
 			{
+				PrepareInventoryObjects();
 				status = DoLevel(CurrentLevel, loadFromSavegame);
 			}
 			catch (TENScriptException const& e) 
@@ -641,15 +675,16 @@ bool FlowHandler::DoFlow()
 
 		case GameStatus::NewGame:
 			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
+			RequiredStartPos = 0;
 			SelectedLevelForNewGame = 0;
 			InitializeGame = true;
 			break;
 
 		case GameStatus::LoadGame:
-			// Load the header of the savegame for getting the level to load
+			// Load header of savegame to get level to load.
 			SaveGame::LoadHeader(SelectedSaveGame, &header);
 
-			// Load level
+			// Load level.
 			CurrentLevel = header.Level;
 			NextLevel = 0;
 			GameTimer = header.Timer;
@@ -659,11 +694,15 @@ bool FlowHandler::DoFlow()
 		case GameStatus::LevelComplete:
 			if (NextLevel >= Levels.size())
 			{
-				CurrentLevel = 0; // TODO: final credits
+				CurrentLevel = 0; // TODO: Final credits.
 			}
 			else
 			{
 				CurrentLevel = NextLevel;
+
+				// Reset hub if next level has it set.
+				if (g_GameFlow->GetLevel(CurrentLevel)->GetResetHubEnabled())
+					SaveGame::ResetHub();
 			}
 
 			NextLevel = 0;

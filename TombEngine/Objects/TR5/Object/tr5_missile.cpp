@@ -128,9 +128,9 @@ void MissileControl(short itemNumber)
 			{
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx.RoomNumber);
 				fx.Pose.Position.y -= 64;
-				TriggerShockwave(&fx.Pose, 48, 256, 64, 64, 128, 0, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx.Pose, 48, 256, 64, 64, 128, 0, 24, EulerAngles::Identity, 1, true, true, false, (int)ShockwaveStyle::Normal);
 				fx.Pose.Position.y -= 128;
-				TriggerShockwave(&fx.Pose, 48, 256, 48, 64, 128, 0, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx.Pose, 48, 256, 48, 64, 128, 0, 24, EulerAngles::Identity, 1, true, true, false, (int)ShockwaveStyle::Normal);
 			}
 			else if (fxInfo.Flag1 == 2)
 			{
@@ -141,7 +141,7 @@ void MissileControl(short itemNumber)
 		else
 		{
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx.RoomNumber);
-			TriggerShockwave(&fx.Pose, 48, 240, 48, 0, 96, 128, 24, EulerAngles::Zero, 2, true, false, (int)ShockwaveStyle::Normal);
+			TriggerShockwave(&fx.Pose, 48, 240, 48, 0, 96, 128, 24, EulerAngles::Identity, 2, true, true, false, (int)ShockwaveStyle::Normal);
 		}
 		
 		KillItem(itemNumber);
@@ -155,9 +155,9 @@ void MissileControl(short itemNumber)
 				// ROMAN_GOD hit effect.
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx.RoomNumber);
 				fx.Pose.Position.y -= 64;
-				TriggerShockwave(&fx.Pose, 48, 256, 64, 0, 128, 64, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx.Pose, 48, 256, 64, 0, 128, 64, 24, EulerAngles::Identity, 1, true, true, false, (int)ShockwaveStyle::Normal);
 				fx.Pose.Position.y -= 128;
-				TriggerShockwave(&fx.Pose, 48, 256, 48, 0, 128, 64, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx.Pose, 48, 256, 48, 0, 128, 64, 24, EulerAngles::Identity, 1, true, true, false, (int)ShockwaveStyle::Normal);
 				KillItem(itemNumber);
 				DoDamage(LaraItem, 200);
 			}
@@ -180,7 +180,7 @@ void MissileControl(short itemNumber)
 		{
 			// HYDRA hit effect.
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx.RoomNumber);
-			TriggerShockwave(&fx.Pose, 48, 240, 48, 0, 96, 128, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+			TriggerShockwave(&fx.Pose, 48, 240, 48, 0, 96, 128, 24, EulerAngles::Identity, 0, true, true, false, (int)ShockwaveStyle::Normal);
 			
 			if (LaraItem->HitPoints >= 500)
 			{

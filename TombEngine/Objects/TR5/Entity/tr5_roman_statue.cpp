@@ -81,7 +81,7 @@ namespace TEN::Entities::Creatures::TR5
 		if (!(GetRandomControl() & 0x1F))
 		{
 			int fxNumber = CreateNewEffect(item->RoomNumber, ID_BODY_PART, Pose(pos));
-			if (fxNumber != NO_ITEM)
+			if (fxNumber != NO_VALUE)
 			{
 				auto& fx = g_Level.Items[fxNumber];
 				auto& fxInfo = GetFXInfo(fx);
@@ -109,7 +109,7 @@ namespace TEN::Entities::Creatures::TR5
 			spark->colFadeSpeed = 4;
 			spark->fadeToBlack = 32;
 			spark->dShade = (GetRandomControl() & 0xF) + 64;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 64;
 			spark->x = (GetRandomControl() & 0x1F) + pos.x - 16;
 			spark->y = (GetRandomControl() & 0x1F) + pos.y - 16;
@@ -138,7 +138,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->colFadeSpeed = 2;
 		spark->dR = r;
 		spark->sR = r;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->life = 16;
 		spark->sLife = 16;
 		spark->x = x;
@@ -179,7 +179,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dG = spark->dB / 2;
 		spark->fadeToBlack = 4;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->dynamic = -1;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 		spark->y = 0;
@@ -204,7 +204,7 @@ namespace TEN::Entities::Creatures::TR5
 	static void RomanStatueAttack(const Pose& pose, short roomNumber, short count)
 	{
 		int fxNumber = CreateNewEffect(roomNumber, ID_ENERGY_BUBBLES, pose);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto& fx = g_Level.Items[fxNumber];
@@ -235,7 +235,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dB = spark->dG / 2;
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->dynamic = -1;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 		spark->x = (GetRandomControl() & 0xF) - 8;
@@ -585,10 +585,15 @@ namespace TEN::Entities::Creatures::TR5
 							if (item->ItemFlags[0])
 								item->ItemFlags[0]--;
 
-							TriggerShockwave((Pose*)&pos1, 16, 160, 96, 0, 64, 128, 48, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+							TriggerShockwave(&Pose(pos1), 16, 160, 96, 0, color / 2, color, 48, EulerAngles::Identity, 1, true, false, true, (int)ShockwaveStyle::Normal);
 							TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
+
 							pos1.y -= 64;
-							TriggerShockwave((Pose*)&pos1, 16, 160, 64, 0, 64, 128, 48, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+
+							TriggerShockwave(&Pose(pos1), 16, 160, 64, 0, color / 2, color, 48, EulerAngles::Identity, 1, true, false, true, (int)ShockwaveStyle::Normal);
+							
+							auto lightColor = Color(0.4f, 0.3f, 0.0f);
+							TriggerDynamicLight(pos.ToVector3(), lightColor, 0.04f);
 						}
 
 						deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
@@ -598,11 +603,27 @@ namespace TEN::Entities::Creatures::TR5
 						{
 							if (deltaFrame > 16)
 								deltaFrame = 16;
+
 							TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame);
+
+							if (item->ItemFlags[3])
+							{
+								TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 8, 0, color / 4, color / 2);
+							}
+							else
+							{
+								TriggerDynamicLight(pos1.x, pos1.y - 64, pos1.z, 18, 0, color / 4, color / 2);
+							}
 						}
 						else
 						{
 							TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame2);
+
+							if (item->ItemFlags[3])
+							{
+								auto lightColor = Color(0.0f, 0.4f, 1.0f);
+								TriggerDynamicLight(pos.ToVector3(), lightColor, 0.06f);
+							}
 						}
 					}
 				}

@@ -9,6 +9,7 @@
 #include "Scripting/Internal/TEN/Objects/Camera/CameraObject.h"
 #include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
 #include "Scripting/Internal/TEN/Objects/Lara/LaraObject.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableStatuses.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomFlags.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
@@ -25,7 +26,7 @@ Moveables, statics, cameras, and so on.
 
 ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 	m_handler(lua),
-	m_table_objects(sol::table{m_handler.GetState()->lua_state(), sol::create})
+	m_table_objects(sol::table(m_handler.GetState()->lua_state(), sol::create))
 {
 	parent.set(ScriptReserved_Objects, m_table_objects);
 
@@ -119,7 +120,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 
 	LaraObject::Register(m_table_objects);
 
-	Moveable::Register(m_table_objects);
+	Moveable::Register(*lua, m_table_objects);
 	Moveable::SetNameCallbacks(
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
@@ -166,36 +167,32 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_LaraWeaponType, LaraWeaponTypeMap);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_PlayerAmmoType, PLAYER_AMMO_TYPES);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_HandStatus, HandStatusMap);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_MoveableStatus, MOVEABLE_STATUSES);
 }
 
 void ObjectsHandler::TestCollidingObjects()
 {
-	// Remove any items which can't collide.
-	for (const auto id : m_collidingItemsToRemove)
-		m_collidingItems.erase(id);
+	// Remove items which can't collide.
+	for (int itemNumber : m_collidingItemsToRemove)
+		m_collidingItems.erase(itemNumber);
 	m_collidingItemsToRemove.clear();
 
-	for (const auto idOne : m_collidingItems)
+	for (int itemNumber0 : m_collidingItems)
 	{
-		auto item = &g_Level.Items[idOne];
-		if (!item->Callbacks.OnObjectCollided.empty())
+		auto& item = g_Level.Items[itemNumber0];
+		if (!item.Callbacks.OnObjectCollided.empty())
 		{
 			// Test against other moveables.
-			GetCollidedObjects(item, 0, true, CollidedItems, nullptr, 0);
-			size_t i = 0;
-			while (CollidedItems[i])
-			{
-				short idTwo = CollidedItems[i] - &g_Level.Items[0];
-				g_GameScript->ExecuteFunction(item->Callbacks.OnObjectCollided, idOne, idTwo);
-				++i;
-			}
+			auto collObjects = GetCollidedObjects(item, true, false);
+			for (const auto& collidedItemPtr : collObjects.ItemPtrs)
+				g_GameScript->ExecuteFunction(item.Callbacks.OnObjectCollided, itemNumber0, collidedItemPtr->Index);
 		}
 
-		if (!item->Callbacks.OnRoomCollided.empty())
+		if (!item.Callbacks.OnRoomCollided.empty())
 		{
 			// Test against room geometry.
-			if (TestItemRoomCollisionAABB(item))
-				g_GameScript->ExecuteFunction(item->Callbacks.OnRoomCollided, idOne);
+			if (TestItemRoomCollisionAABB(&item))
+				g_GameScript->ExecuteFunction(item.Callbacks.OnRoomCollided, itemNumber0);
 		}
 	}
 }
@@ -207,11 +204,11 @@ void ObjectsHandler::AssignLara()
 
 bool ObjectsHandler::NotifyKilled(ItemInfo* key)
 {
-	auto it = m_moveables.find(key);
-	if (std::end(m_moveables) != it)
+	auto it = moveables.find(key);
+	if (it != std::end(moveables))
 	{
-		for (auto& m : m_moveables[key])
-			m->Invalidate();
+		for (auto* movPtr : moveables[key])
+			movPtr->Invalidate();
 		
 		return true;
 	}
@@ -223,28 +220,28 @@ bool ObjectsHandler::AddMoveableToMap(ItemInfo* key, Moveable* mov)
 {
 	std::unordered_set<Moveable*> movVec;
 	movVec.insert(mov);
-	auto it = m_moveables.find(key);
-	if (std::end(m_moveables) == it)
+	auto it = moveables.find(key);
+	if (std::end(moveables) == it)
 	{
-		return m_moveables.insert(std::pair{ key, movVec }).second;
+		return moveables.insert(std::pair{ key, movVec }).second;
 	}
 	else
 	{
-		m_moveables[key].insert(mov);
+		moveables[key].insert(mov);
 		return true;
 	}
 }
 
 bool ObjectsHandler::RemoveMoveableFromMap(ItemInfo* key, Moveable* mov)
 {
-	auto it = m_moveables.find(key);
-	if (std::end(m_moveables) != it)
+	auto it = moveables.find(key);
+	if (std::end(moveables) != it)
 	{
-		auto& set = m_moveables[key];
+		auto& set = moveables[key];
 
 		bool isErased = static_cast<bool>(set.erase(mov));
 		if (isErased && set.empty())
-			isErased = isErased && static_cast<bool>(m_moveables.erase(key));
+			isErased = isErased && static_cast<bool>(moveables.erase(key));
 		
 		return isErased;
 	}

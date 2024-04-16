@@ -110,7 +110,7 @@ namespace TEN::Entities::Creatures::TR5
 		orient.y += short(GetRandomControl() % (distance / 4) - (distance / 8));
 
 		int fxNumber = CreateNewEffect(item->RoomNumber, ID_IMP_ROCK, Pose(pos1));
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto& fx = g_Level.Items[fxNumber];
@@ -151,7 +151,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto torchItemsNumbers = FindCreatedItems(ID_BURNING_TORCH_ITEM);
 		for (auto& itemNumber : torchItemsNumbers)
 		{
-			if (itemNumber == NO_ITEM)
+			if (itemNumber == NO_VALUE)
 				continue;
 
 			const auto& torchItem = g_Level.Items[itemNumber];
@@ -196,8 +196,8 @@ namespace TEN::Entities::Creatures::TR5
 
 		short headingAngle = 0;
 
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		AI_INFO ai;
 		if (item->HitPoints <= 0)

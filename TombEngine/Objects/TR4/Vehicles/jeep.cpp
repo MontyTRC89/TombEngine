@@ -17,7 +17,7 @@
 #include "Math/Math.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -155,7 +155,7 @@ namespace TEN::Entities::Vehicles
 		auto* jeep = GetJeepInfo(jeepItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints <= 0 && lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints <= 0 && lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(jeepItem, laraItem, coll, JeepMountTypes, JEEP_MOUNT_DISTANCE);
@@ -176,7 +176,7 @@ namespace TEN::Entities::Vehicles
 		// HACK: Hardcoded jeep keys check.
 		/*if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 		{
-			g_Gui.SetInventoryItemChosen(NO_ITEM);
+			g_Gui.SetInventoryItemChosen(NO_VALUE);
 			return true;
 		}
 		else
@@ -418,7 +418,7 @@ namespace TEN::Entities::Vehicles
 			spark->sLife = 9;
 		}
 
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->x = (GetRandomControl() & 0xF) + x - 8;
 		spark->y = (GetRandomControl() & 0xF) + y - 8;
 		spark->z = (GetRandomControl() & 0xF) + z - 8;
@@ -1324,7 +1324,10 @@ namespace TEN::Entities::Vehicles
 			collide = 0;
 		}
 		else
+		{
 			drive = JeepUserControl(jeepItem, laraItem, floorHeight, &pitch);
+			HandleVehicleSpeedometer(jeepItem->Animation.Velocity.z, JEEP_VELOCITY_MAX / (float)VEHICLE_VELOCITY_SCALE);
+		}
 
 		if (jeep->Velocity || jeep->Revs)
 		{

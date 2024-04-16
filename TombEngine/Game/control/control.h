@@ -15,7 +15,7 @@ struct ROOM_INFO;
 
 enum class GameStatus
 {
-	None,
+	Normal,
 	NewGame,
 	LoadGame,
 	SaveGame,
@@ -23,6 +23,13 @@ enum class GameStatus
 	ExitGame,
 	LaraDead,
 	LevelComplete
+};
+
+enum class LevelLoadType
+{
+	New,
+	Hub,
+	Load
 };
 
 enum CardinalDirection
@@ -45,6 +52,8 @@ constexpr int MAX_ROOMS = 1024;
 constexpr int WIBBLE_SPEED = 4;
 constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
 
+constexpr int LOOP_FRAME_COUNT = 2;
+
 extern int GameTimer;
 extern int RumbleTimer;
 extern int GlobalCounter;
@@ -65,8 +74,6 @@ extern short ItemNewRoomNo;
 extern short ItemNewRooms[MAX_ROOMS];
 extern short NextItemActive;
 extern short NextItemFree;
-extern short NextFxActive;
-extern short NextFxFree;
 
 extern int ControlPhaseTime;
 
@@ -92,7 +99,7 @@ void UpdateShatters();
 void CleanUp();
 
 void InitializeOrLoadGame(bool loadGame);
-void InitializeScripting(int levelIndex, bool loadGame);
+void InitializeScripting(int levelIndex, LevelLoadType type);
 void DeInitializeScripting(int levelIndex);
 
 unsigned CALLBACK GameMain(void*);

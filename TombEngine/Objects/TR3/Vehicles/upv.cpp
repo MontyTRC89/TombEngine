@@ -176,7 +176,7 @@ namespace TEN::Entities::Vehicles
 		auto* UPVItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(UPVItem, laraItem, coll, UPVMountTypes, UPV_MOUNT_DISTANCE);
@@ -252,7 +252,7 @@ namespace TEN::Entities::Vehicles
 		sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 		sptr->fadeToBlack = 12;
 		sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BlendMode::Additive;
 		sptr->extras = 0;
 		sptr->dynamic = -1;
 
@@ -288,7 +288,7 @@ namespace TEN::Entities::Vehicles
 
 	void UPVEffects(short itemNumber)
 	{
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 
 		auto* UPVItem = &g_Level.Items[itemNumber];
@@ -477,7 +477,7 @@ namespace TEN::Entities::Vehicles
 		GetCollisionInfo(coll, UPVItem, Vector3i(0, height / 2, 0));
 		ShiftItem(UPVItem, coll);
 
-		if (coll->CollisionType == CT_FRONT)
+		if (coll->CollisionType == CollisionType::Front)
 		{
 			if (UPV->TurnRate.x > UPV_DEFLECT_ANGLE)
 				UPV->TurnRate.x += UPV_DEFLCT_TURN_RATE_MAX;
@@ -494,18 +494,18 @@ namespace TEN::Entities::Vehicles
 					UPV->Velocity = 0;
 			}
 		}
-		else if (coll->CollisionType == CT_TOP)
+		else if (coll->CollisionType == CollisionType::Top)
 		{
 			if (UPV->TurnRate.x >= -UPV_DEFLECT_ANGLE)
 				UPV->TurnRate.x -= UPV_DEFLCT_TURN_RATE_MAX;
 		}
-		else if (coll->CollisionType == CT_TOP_FRONT)
+		else if (coll->CollisionType == CollisionType::TopFront)
 			UPV->Velocity = 0;
-		else if (coll->CollisionType == CT_LEFT)
+		else if (coll->CollisionType == CollisionType::Left)
 			UPVItem->Pose.Orientation.y += ANGLE(5.0f);
-		else if (coll->CollisionType == CT_RIGHT)
+		else if (coll->CollisionType == CollisionType::Right)
 			UPVItem->Pose.Orientation.y -= ANGLE(5.0f);
-		else if (coll->CollisionType == CT_CLAMP)
+		else if (coll->CollisionType == CollisionType::Clamp)
 		{
 			UPVItem->Pose.Position = coll->Setup.PrevPosition;
 			UPV->Velocity = 0;
@@ -946,7 +946,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD) &&
-			lara->Context.Vehicle != NO_ITEM)
+			lara->Context.Vehicle != NO_VALUE)
 		{
 			DoCurrent(UPVItem, laraItem);
 

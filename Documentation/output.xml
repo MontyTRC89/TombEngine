@@ -79,6 +79,253 @@
 </function>
 
 <function>
+	<module>View.DisplaySprite</module>
+	<name>DisplaySprite</name>
+	<summary>Create a DisplaySprite object.</summary>
+	<parameters>
+		<parameter>
+			<name>ID</name>
+			<type>Objects.ObjID</type>
+			<description>of the sprite sequence object.</description>
+		</parameter>
+		<parameter>
+			<name>int</name>
+			<type>int</type>
+			<description>spriteID ID of the sprite in the sequence.</description>
+		</parameter>
+		<parameter>
+			<name>pos</name>
+			<type>Vec2</type>
+			<description>Display position in percent.</description>
+		</parameter>
+		<parameter>
+			<name>rot</name>
+			<type>float</type>
+			<description>Rotation in degrees.</description>
+		</parameter>
+		<parameter>
+			<name>scale</name>
+			<type>Vec2</type>
+			<description>Horizontal and vertical scale in percent. Scaling is interpreted by the DisplaySpriteEnum.ScaleMode passed to the Draw() function call.</description>
+		</parameter>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>Color. __Default: Color(255, 255, 255, 255)__</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>DisplaySprite</type>
+			<description>A new DisplaySprite object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>GetObjectID</name>
+	<summary>Get the object ID of the sprite sequence object used by the display sprite.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>Objects.ObjID</type>
+			<description>Sprite sequence object ID.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>GetSpriteID</name>
+	<summary>Get the sprite ID in the sprite sequence object used by the display sprite.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>Sprite ID in the sprite sequence object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>GetPosition</name>
+	<summary>Get the display position of the display sprite in percent.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>Vec2</type>
+			<description>Display position in percent.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>GetRotation</name>
+	<summary>Get the rotation of the display sprite in degrees.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Rotation in degrees.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>GetScale</name>
+	<summary>Get the horizontal and vertical scale of the display sprite in percent.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>Vec2</type>
+			<description>Horizontal and vertical scale in percent.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>GetColor</name>
+	<summary>Get the color of the display sprite.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>Color</type>
+			<description>Color.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>SetObjectID</name>
+	<summary>Set the sprite sequence object ID used by the display sprite.</summary>
+	<description>(Objects.ObjID)</description>
+	<parameters>
+		<parameter>
+			<name>New</name>
+			<type>Objects.ObjID</type>
+			<description>sprite sequence object ID.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>SetSpriteID</name>
+	<summary>Set the sprite ID in the sprite sequence object used by the display sprite.</summary>
+	<description>(int)</description>
+	<parameters>
+		<parameter>
+			<name>New</name>
+			<type>int</type>
+			<description>sprite ID in the sprite sequence object.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>SetPosition</name>
+	<summary>Set the display position of the display sprite in percent.</summary>
+	<description>(Vec2)</description>
+	<parameters>
+		<parameter>
+			<name>New</name>
+			<type>Vec2</type>
+			<description>display position in percent.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>SetRotation</name>
+	<summary>Set the rotation of the display sprite in degrees.</summary>
+	<description>(float)</description>
+	<parameters>
+		<parameter>
+			<name>New</name>
+			<type>float</type>
+			<description>rotation in degrees.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>SetScale</name>
+	<summary>Set the horizontal and vertical scale of the display sprite in percent.</summary>
+	<description>(Vec2)</description>
+	<parameters>
+		<parameter>
+			<name>New</name>
+			<type>float</type>
+			<description>horizontal and vertical scale in percent.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>SetColor</name>
+	<summary>Set the color of the display sprite.</summary>
+	<description>(Color)</description>
+	<parameters>
+		<parameter>
+			<name>New</name>
+			<type>float</type>
+			<description>color.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View.DisplaySprite</module>
+	<caller>DisplaySprite</caller>
+	<name>Draw</name>
+	<summary>Draw the display sprite in display space for the current frame.</summary>
+	<parameters>
+		<parameter>
+			<name>priority</name>
+			<type>int</type>
+			<description>Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__</description>
+		</parameter>
+		<parameter>
+			<name>alignMode</name>
+			<type>View.AlignMode</type>
+			<description>Align mode interpreting an offset from the sprite's position. __Default: View.AlignMode.CENTER__</description>
+		</parameter>
+		<parameter>
+			<name>scaleMode</name>
+			<type>View.ScaleMode</type>
+			<description>Scale mode interpreting the display sprite's horizontal and vertical scale. __Default: View.ScaleMode.FIT__</description>
+		</parameter>
+		<parameter>
+			<name>blendMode</name>
+			<type>Effects.BlendID</type>
+			<description>Blend mode. __Default: Effects.BlendID.ALPHABLEND__</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
 	<module>Effects</module>
 	<name>EmitLightningArc</name>
 	<summary>Emit a lightning arc.</summary>
@@ -344,24 +591,6 @@
 </function>
 
 <function>
-	<module>Effects</module>
-	<name>FlashScreen</name>
-	<summary>Flash screen.</summary>
-	<parameters>
-		<parameter>
-			<name>color</name>
-			<type>Color</type>
-			<description>(default Color(255, 255, 255))</description>
-		</parameter>
-		<parameter>
-			<name>speed</name>
-			<type>float</type>
-			<description>(default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
 	<module>Flow</module>
 	<name>AddLevel</name>
 	<summary>Add a level to the Flow.</summary>
@@ -522,17 +751,34 @@ have an ID of 0, the second an ID of 1, and so on.</description>
 <function>
 	<module>Flow</module>
 	<name>EndLevel</name>
-	<summary>Finishes the current level, with optional level index provided.</summary>
-	<description>If level index
-is not provided or is zero, jumps to next level. If level index is more than
-level count, jumps to title.</description>
+	<summary>Finishes the current level, with optional level index and start position index provided.</summary>
+	<description>If level index is not provided or is zero, jumps to next level. If level index is more than
+level count, jumps to title. If LARA\_START\_POS objects are present in level, player will be
+teleported to such object with OCB similar to provided second argument.</description>
 	<parameters>
 		<parameter>
 			<name>index</name>
 			<type>int</type>
 			<description>level index (default 0)</description>
 		</parameter>
+		<parameter>
+			<name>startPos</name>
+			<type>int</type>
+			<description>player start position (default 0)</description>
+		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetGameStatus</name>
+	<summary>Get current game status, such as normal game loop, exiting to title, etc.</summary>
+	<returns>
+		<return>
+			<type>Flow.GameStatus</type>
+			<description>the current game status</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -572,6 +818,25 @@ level count, jumps to title.</description>
 			<description>ID of the savegame slot to clear.</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>DoesSaveGameExist</name>
+	<summary>Check if a savegame exists.</summary>
+	<parameters>
+		<parameter>
+			<name>slotID</name>
+			<type>int</type>
+			<description>ID of the savegame slot to check.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>true if the savegame exists, false if not.</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -629,6 +894,38 @@ level count, jumps to title.</description>
 
 <function>
 	<module>Flow</module>
+	<name>FlipMap</name>
+	<summary>Do FlipMap with specific group ID.</summary>
+	<parameters>
+		<parameter>
+			<name>flipmap</name>
+			<type>int</type>
+			<description>(ID of flipmap group to actuvate / deactivate)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Flow</module>
+	<name>GetFlipMapStatus</name>
+	<summary>Get current FlipMap status for specific group ID.</summary>
+	<parameters>
+		<parameter>
+			<name>index</name>
+			<type>int</type>
+			<description>Flipmap group ID to check. If no group specified or group is -1, function returns overall flipmap status (on or off).</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>Status of the flipmap group (true means on, false means off).</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Flow</module>
 	<name>SetSettings</name>
 	<parameters>
 		<parameter>
@@ -667,7 +964,7 @@ level count, jumps to title.</description>
 <function>
 	<module>Flow</module>
 	<name>GetString</name>
-	<summary>Get translated string</summary>
+	<summary>Get translated string.</summary>
 	<parameters>
 		<parameter>
 			<name>string</name>
@@ -825,6 +1122,89 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 </function>
 
 <function>
+	<module>Input</module>
+	<name>Vibrate</name>
+	<summary>Vibrate the game controller if the function is available and the setting is on.</summary>
+	<parameters>
+		<parameter>
+			<name>strength</name>
+			<type>float</type>
+			<description>Vibration strength.</description>
+		</parameter>
+		<parameter>
+			<name>time</name>
+			<type>float</type>
+			<description>__(default 0.3)__ Vibration time in seconds.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Input</module>
+	<name>KeyIsHeld</name>
+	<summary>Check if an action key is being held.</summary>
+	<parameters>
+		<parameter>
+			<name>action</name>
+			<type>Input.ActionID</type>
+			<description>Action ID to check.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Input</module>
+	<name>KeyIsHit</name>
+	<summary>Check if an action key is being hit or clicked.</summary>
+	<parameters>
+		<parameter>
+			<name>action</name>
+			<type>Input.ActionID</type>
+			<description>Action ID to check.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Input</module>
+	<name>KeyPush</name>
+	<summary>Simulate an action key push.</summary>
+	<parameters>
+		<parameter>
+			<name>action</name>
+			<type>Input.ActionID</type>
+			<description>Action ID to push.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Input</module>
+	<name>KeyClear</name>
+	<summary>Clear an action key.</summary>
+	<parameters>
+		<parameter>
+			<name>action</name>
+			<type>Input.ActionID</type>
+			<description>Action ID to clear.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Input</module>
+	<name>GetMouseDisplayPosition</name>
+	<summary>Get the display position of the cursor in percent.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>Vec2</type>
+			<description>Cursor display position in percent.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
 	<module>Inventory</module>
 	<name>GiveItem</name>
 	<summary>Add an item to the player's inventory.</summary>
@@ -908,13 +1288,13 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 	<summary>Register a function as a callback.</summary>
 	<parameters>
 		<parameter>
-			<name>CallbackPoint</name>
-			<type>point</type>
+			<name>point</name>
+			<type>CallbackPoint</type>
 			<description>When should the callback be called?</description>
 		</parameter>
 		<parameter>
 			<name>func</name>
-			<type>function</type>
+			<type>LevelFunc</type>
 			<description>The function to be called (must be in the `LevelFuncs` hierarchy). Will receive, as an argument, the time in seconds since the last frame.</description>
 		</parameter>
 	</parameters>
@@ -927,14 +1307,14 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 	<description>Will have no effect if the function was not registered as a callback</description>
 	<parameters>
 		<parameter>
-			<name>CallbackPoint</name>
-			<type>point</type>
+			<name>point</name>
+			<type>CallbackPoint</type>
 			<description>The callback point the function was registered with. See @{AddCallback}</description>
 		</parameter>
 		<parameter>
-			<name>LevelFunc</name>
-			<type>func</type>
-			<description>the function to remove; must be in the LevelFuncs hierarchy.</description>
+			<name>func</name>
+			<type>LevelFunc</type>
+			<description>The function to remove; must be in the LevelFuncs hierarchy.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -942,505 +1322,58 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 <function>
 	<module>Logic</module>
 	<name>HandleEvent</name>
-	<summary>Attempt to find an event set and exectute a particular event from it.</summary>
+	<summary>Attempt to find an event set and execute a particular event from it.</summary>
 	<parameters>
 		<parameter>
-			<name>string</name>
-			<type>name</type>
+			<name>name</name>
+			<type>string</type>
 			<description>Name of the event set to find.</description>
 		</parameter>
 		<parameter>
-			<name>EventType</name>
-			<type>type</type>
+			<name>type</name>
+			<type>EventType</type>
 			<description>Event to execute.</description>
 		</parameter>
 		<parameter>
-			<name>Moveable</name>
-			<type>activator</type>
+			<name>activator</name>
+			<type>Objects.Moveable</type>
 			<description>Optional activator. Default is the player object.</description>
 		</parameter>
 	</parameters>
 </function>
 
 <function>
-	<module>Misc</module>
-	<name>HasLineOfSight</name>
-	<summary>Determine if there's a line of sight between two points.</summary>
-	<description>i.e. if we run a direct line from one position to another
-will any geometry get in the way?
-
-Note: if you use this with Moveable:GetPosition to test if (for example)
-two creatures can see one another, you might have to do some extra adjustments.
-
-This is because the "position" for most objects refers to its base, i.e., the floor.
-As a solution, you can increase the y-coordinate of this position to correspond to roughly where the
-eyes of the creatures would be.</description>
-	<parameters>
-		<parameter>
-			<name>room1</name>
-			<type>float</type>
-			<description>ID of the room where the first position is</description>
-		</parameter>
-		<parameter>
-			<name>pos1</name>
-			<type>Vec3</type>
-			<description>first position</description>
-		</parameter>
-		<parameter>
-			<name>pos2</name>
-			<type>Vec3</type>
-			<description>second position</description>
-		</parameter>
-	</parameters>
-	<returns>
-		<return>
-			<type>bool</type>
-			<description>is there a direct line of sight between the two positions?</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>Vibrate</name>
-	<summary>Vibrate game controller, if function is available and setting is on.</summary>
-	<parameters>
-		<parameter>
-			<name>strength</name>
-			<type>float</type>
-			<description>Strength of the vibration</description>
-		</parameter>
-		<parameter>
-			<name>time</name>
-			<type>float</type>
-			<description>__(default 0.3)__ Time of the vibration, in seconds</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>FadeOut</name>
-	<summary>Do a full-screen fade-to-black.</summary>
-	<description>The screen will remain black until a call to FadeIn.</description>
-	<parameters>
-		<parameter>
-			<name>speed</name>
-			<type>float</type>
-			<description>(default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>FadeIn</name>
-	<summary>Do a full-screen fade-in from black.</summary>
-	<parameters>
-		<parameter>
-			<name>speed</name>
-			<type>float</type>
-			<description>(default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>SetCineBars</name>
-	<summary>Move black cinematic bars in from the top and bottom of the game window.</summary>
-	<parameters>
-		<parameter>
-			<name>height</name>
-			<type>float</type>
-			<description>__(default 30)__ Percentage of the screen to be covered</description>
-		</parameter>
-		<parameter>
-			<name>speed</name>
-			<type>float</type>
-			<description>__(default 30)__ Coverage percent per second</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>SetFOV</name>
-	<summary>Set field of view.</summary>
-	<parameters>
-		<parameter>
-			<name>angle</name>
-			<type>float</type>
-			<description>in degrees (clamped to [10, 170])</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>GetCameraType</name>
-	<summary>Shows the mode of the game camera.</summary>
-	<returns>
-		<return>
-			<type>Misc.CameraType</type>
-			<description>value used by the Main Camera.</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>PlayAudioTrack</name>
-	<summary>Play an audio track</summary>
+	<module>Logic</module>
+	<name>EnableEvent</name>
+	<summary>Attempt to find an event set and enable specified event in it.</summary>
 	<parameters>
 		<parameter>
 			<name>name</name>
 			<type>string</type>
-			<description>of track (without file extension) to play</description>
+			<description>Name of the event set to find.</description>
 		</parameter>
 		<parameter>
 			<name>type</name>
-			<type>Misc.SoundTrackType</type>
-			<description>of the audio track to play</description>
+			<type>EventType</type>
+			<description>Event to enable.</description>
 		</parameter>
 	</parameters>
 </function>
 
 <function>
-	<module>Misc</module>
-	<name>SetAmbientTrack</name>
-	<summary>Set and play an ambient track</summary>
+	<module>Logic</module>
+	<name>DisableEvent</name>
+	<summary>Attempt to find an event set and disable specified event in it.</summary>
 	<parameters>
 		<parameter>
 			<name>name</name>
 			<type>string</type>
-			<description>of track (without file extension) to play</description>
+			<description>Name of the event set to find.</description>
 		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>StopAudioTracks</name>
-	<summary>Stop any audio tracks currently playing</summary>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>StopAudioTrack</name>
-	<summary>Stop audio track that is currently playing</summary>
-	<parameters>
 		<parameter>
 			<name>type</name>
-			<type>Misc.SoundTrackType</type>
-			<description>of the audio track</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>GetAudioTrackLoudness</name>
-	<summary>Get current loudness level for specified track type</summary>
-	<parameters>
-		<parameter>
-			<name>type</name>
-			<type>Misc.SoundTrackType</type>
-			<description>of the audio track</description>
-		</parameter>
-	</parameters>
-	<returns>
-		<return>
-			<type>float</type>
-			<description>current loudness of a specified audio track</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>GetCurrentSubtitle</name>
-	<summary>Get current subtitle string for a voice track currently playing.</summary>
-	<description>Subtitle file must be in .srt format, have same filename as voice track, and be placed in same directory as voice track.
-Returns nil if no voice track is playing or no subtitle present.</description>
-	<returns>
-		<return>
-			<type>string</type>
-			<description>current subtitle string</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>PlaySound</name>
-	<summary>Play sound effect</summary>
-	<parameters>
-		<parameter>
-			<name>sound</name>
-			<type>int</type>
-			<description>ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.</description>
-		</parameter>
-		<parameter>
-			<name>position</name>
-			<type>Vec3</type>
-			<description>The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>IsSoundPlaying</name>
-	<summary>Check if the sound effect is playing</summary>
-	<parameters>
-		<parameter>
-			<name>Sound</name>
-			<type>int</type>
-			<description>ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>IsAudioTrackPlaying</name>
-	<summary>Check if the audio track is playing</summary>
-	<parameters>
-		<parameter>
-			<name>Track</name>
-			<type>string</type>
-			<description>filename to check. Should be without extension and without full directory path.</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>FlipMap</name>
-	<summary>Do FlipMap with specific ID</summary>
-	<parameters>
-		<parameter>
-			<name>flipmap</name>
-			<type>int</type>
-			<description>(ID of flipmap)</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>PlayFlyBy</name>
-	<summary>Enable FlyBy with specific ID</summary>
-	<parameters>
-		<parameter>
-			<name>flyby</name>
-			<type>short</type>
-			<description>(ID of flyby)</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>CalculateDistance</name>
-	<summary>Calculate the distance between two positions.</summary>
-	<parameters>
-		<parameter>
-			<name>posA</name>
-			<type>Vec3</type>
-			<description>first position</description>
-		</parameter>
-		<parameter>
-			<name>posB</name>
-			<type>Vec3</type>
-			<description>second position</description>
-		</parameter>
-	</parameters>
-	<returns>
-		<return>
-			<type>int</type>
-			<description>the direct distance from one position to the other</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>CalculateHorizontalDistance</name>
-	<summary>Calculate the horizontal distance between two positions.</summary>
-	<parameters>
-		<parameter>
-			<name>posA</name>
-			<type>Vec3</type>
-			<description>first position</description>
-		</parameter>
-		<parameter>
-			<name>posB</name>
-			<type>Vec3</type>
-			<description>second position</description>
-		</parameter>
-	</parameters>
-	<returns>
-		<return>
-			<type>int</type>
-			<description>the direct distance on the XZ plane from one position to the other</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>PercentToScreen</name>
-	<summary>Translate a pair of percentages to screen-space pixel coordinates.</summary>
-	<description>To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString}.</description>
-	<parameters>
-		<parameter>
-			<name>x</name>
-			<type>float</type>
-			<description>percent value to translate to x-coordinate</description>
-		</parameter>
-		<parameter>
-			<name>y</name>
-			<type>float</type>
-			<description>percent value to translate to y-coordinate</description>
-		</parameter>
-	</parameters>
-	<returns>
-		<return>
-			<type>int</type>
-			<description>x coordinate in pixels</description>
-		</return>
-		<return>
-			<type>int</type>
-			<description>y coordinate in pixels</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>ScreenToPercent</name>
-	<summary>Translate a pair of coordinates to percentages of window dimensions.</summary>
-	<description>To be used with @{Strings.DisplayString:GetPosition}.</description>
-	<parameters>
-		<parameter>
-			<name>x</name>
-			<type>int</type>
-			<description>pixel value to translate to a percentage of the window width</description>
-		</parameter>
-		<parameter>
-			<name>y</name>
-			<type>int</type>
-			<description>pixel value to translate to a percentage of the window height</description>
-		</parameter>
-	</parameters>
-	<returns>
-		<return>
-			<type>float</type>
-			<description>x coordinate as percentage</description>
-		</return>
-		<return>
-			<type>float</type>
-			<description>y coordinate as percentage</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>ResetObjCamera</name>
-	<summary>Reset object camera back to Lara and deactivate object camera.</summary>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>PrintLog</name>
-	<summary>Write messages within the Log file</summary>
-	<parameters>
-		<parameter>
-			<name>message</name>
-			<type>string</type>
-			<description>to be displayed within the Log</description>
-		</parameter>
-		<parameter>
-			<name>logLevel</name>
-			<type>Misc.LogLevel</type>
-			<description>log level to be displayed</description>
-		</parameter>
-		<parameter>
-			<name>allowSpam</name>
-			<type>bool</type>
-			<description>true allows spamming of the message</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>Vibrate</name>
-	<summary>Vibrate gamepad, if possible.</summary>
-	<parameters>
-		<parameter>
-			<name>strength</name>
-			<type>float</type>
-		</parameter>
-		<parameter>
-			<name>time</name>
-			<type>float</type>
-			<description>(in seconds, default: 0.3)</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>KeyIsHeld</name>
-	<summary>Check if particular action key is held</summary>
-	<parameters>
-		<parameter>
-			<name>action</name>
-			<type>Misc.ActionID</type>
-			<description>action mapping index to check</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>KeyIsHit</name>
-	<summary>Check if particular action key was hit (once)</summary>
-	<parameters>
-		<parameter>
-			<name>action</name>
-			<type>Misc.ActionID</type>
-			<description>action mapping index to check</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>KeyPush</name>
-	<summary>Emulate pushing of a certain action key</summary>
-	<parameters>
-		<parameter>
-			<name>action</name>
-			<type>Misc.ActionID</type>
-			<description>action mapping index to push</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Misc</module>
-	<name>KeyClear</name>
-	<summary>Clears particular input from action key</summary>
-	<parameters>
-		<parameter>
-			<name>action</name>
-			<type>Misc.ActionID</type>
-			<description>action mapping index to clear</description>
+			<type>EventType</type>
+			<description>Event to disable.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -1658,7 +1591,7 @@ Returns nil if no voice track is playing or no subtitle present.</description>
 
 <function>
 	<module>Objects.Camera</module>
-	<caller>CameraObject</caller>
+	<caller>Camera</caller>
 	<name>GetRoom</name>
 	<summary>Get the current room of the camera</summary>
 	<returns>
@@ -1821,33 +1754,6 @@ Returns nil if no voice track is playing or no subtitle present.</description>
 
 <function>
 	<module>Objects.LaraObject</module>
-	<caller>LaraObject</caller>
-	<name>SetControlLock</name>
-	<summary>Set control lock for Lara.</summary>
-	<parameters>
-		<parameter>
-			<name>whether</name>
-			<type>bool</type>
-			<description>set or not set control lock.</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.LaraObject</module>
-	<caller>LaraObject</caller>
-	<name>GetControlLock</name>
-	<summary>Get control lock for Lara.</summary>
-	<returns>
-		<return>
-			<type>bool</type>
-			<description>current control lock value</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Objects.LaraObject</module>
 	<caller>Moveable</caller>
 	<name>GetAirborne</name>
 	<summary>Get the moveable's airborne status</summary>
@@ -1987,11 +1893,24 @@ Returns nil if no voice track is playing or no subtitle present.</description>
 	<module>Objects.LaraObject</module>
 	<caller>LaraObject</caller>
 	<name>GetTarget</name>
-	<summary>Get current target enemy, if it exists</summary>
+	<summary>Get the player's current targeted moveable (if it exists).</summary>
 	<returns>
 		<return>
 			<type>Objects.Moveable</type>
-			<description>current target enemy (nil if no target present)</description>
+			<description>Target moveable (nil if the player is not currently targeting a moveable).</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.LaraObject</module>
+	<caller>LaraObject</caller>
+	<name>GetInteractedMoveable</name>
+	<summary>Get the player's current interacted moveable (if it exists).</summary>
+	<returns>
+		<return>
+			<type>Objects.Moveable</type>
+			<description>Interacted moveable (nil if the player is not interacting with a moveable).</description>
 		</return>
 	</returns>
 </function>
@@ -2012,9 +1931,9 @@ Returns nil if no voice track is playing or no subtitle present.</description>
 <function>
 	<module>Objects.Moveable</module>
 	<name>Moveable</name>
-	<summary>For more information on each parameter, see the
-associated getters and setters.</summary>
-	<description>If you do not know what to set for these,
+	<summary>Used to generate a new moveable dynamically at runtime.</summary>
+	<description>For more information on each parameter, see the
+associated getters and setters. If you do not know what to set for these,
 most can just be ignored (see usage).</description>
 	<parameters>
 		<parameter>
@@ -2035,17 +1954,17 @@ most can just be ignored (see usage).</description>
 		<parameter>
 			<name>rotation</name>
 			<type>Rotation</type>
-			<description>rotation about x, y, and z axes (default Rotation(0, 0, 0))</description>
+			<description>rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))</description>
 		</parameter>
 		<parameter>
-			<name>room</name>
+			<name>roomID</name>
 			<type>int</type>
 			<description>room ID item is in (default: calculated automatically)</description>
 		</parameter>
 		<parameter>
 			<name>animNumber</name>
 			<type>int</type>
-			<description>anim number</description>
+			<description>animation number</description>
 		</parameter>
 		<parameter>
 			<name>frameNumber</name>
@@ -2060,12 +1979,12 @@ most can just be ignored (see usage).</description>
 		<parameter>
 			<name>OCB</name>
 			<type>int</type>
-			<description>ocb of item (default 0)</description>
+			<description>ocb of item</description>
 		</parameter>
 		<parameter>
 			<name>AIBits</name>
 			<type>table</type>
-			<description>table with AI bits (default {0,0,0,0,0,0})</description>
+			<description>table with AI bits (default { 0, 0, 0, 0, 0, 0 })</description>
 		</parameter>
 	</parameters>
 	<returns>
@@ -2152,16 +2071,12 @@ most can just be ignored (see usage).</description>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
 	<name>GetStatus</name>
-	<summary>Get the status of object.</summary>
-	<description>possible values:
- <br />0 - not active 
- <br />1 - active 
- <br />2 - deactivated 
- <br />3 - invisible</description>
+	<summary>Get the moveable's status.</summary>
+	<description>()</description>
 	<returns>
 		<return>
-			<type>int</type>
-			<description>a number representing the status of the object</description>
+			<type>Objects.MoveableStatus</type>
+			<description>The moveable's status.</description>
 		</return>
 	</returns>
 </function>
@@ -2169,30 +2084,14 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
-	<name>SetOnHit</name>
-	<summary>Set the name of the function to be called when the moveable is shot by Lara.</summary>
-	<description>Note that this will be triggered twice when shot with both pistols at once.</description>
+	<name>SetStatus</name>
+	<summary>Set the moveable's status.</summary>
+	<description>()</description>
 	<parameters>
 		<parameter>
-			<name>callback</name>
-			<type>function</type>
-			<description>function in LevelFuncs hierarchy to call when moveable is shot</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
-	<name>SetOnKilled</name>
-	<summary>Set the name of the function to be called when the moveable is destroyed/killed
- Note that enemy death often occurs at the end of an animation, and not at the exact moment
- the enemy's HP becomes zero.</summary>
-	<parameters>
-		<parameter>
-			<name>callback</name>
-			<type>function</type>
-			<description>function in LevelFuncs hierarchy to call when enemy is killed</description>
+			<name>status</name>
+			<type>Objects.MoveableStatus</type>
+			<description>The new status of the moveable.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -2351,15 +2250,43 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
-	<name>GetSlotHP</name>
-	<summary>Get HP definded for that object type (hit points/health points) (Read Only).</summary>
+	<name>GetHP</name>
+	<summary>Get current HP (hit points/health points)</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the amount of HP the moveable currently has</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetHP</name>
+	<summary>Set current HP (hit points/health points)
+ Clamped to [0, 32767] for "intelligent" entities (i.e.</summary>
+	<description>anything with AI); clamped to [-32767, 32767] otherwise.</description>
 	<parameters>
 		<parameter>
-			<name>ID</name>
+			<name>HP</name>
 			<type>int</type>
-			<description>of the moveable slot type.</description>
+			<description>the amount of HP to give the moveable</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetSlotHP</name>
+	<summary>Get HP definded for that object type (hit points/health points) (Read Only).</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the moveable's slot default hit points</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -2640,6 +2567,21 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
+	<name>SetOnHit</name>
+	<summary>Set the name of the function to be called when the moveable is shot by Lara.</summary>
+	<description>Note that this will be triggered twice when shot with both pistols at once.</description>
+	<parameters>
+		<parameter>
+			<name>callback</name>
+			<type>function</type>
+			<description>function in LevelFuncs hierarchy to call when moveable is shot</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
 	<name>SetOnCollidedWithObject</name>
 	<summary>Set the function to be called when this moveable collides with another moveable</summary>
 	<parameters>
@@ -2662,6 +2604,22 @@ most can just be ignored (see usage).</description>
 			<name>func</name>
 			<type>function</type>
 			<description>callback function to be called (must be in LevelFuncs hierarchy)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetOnKilled</name>
+	<summary>Set the name of the function to be called when the moveable is destroyed/killed
+ Note that enemy death often occurs at the end of an animation, and not at the exact moment
+ the enemy's HP becomes zero.</summary>
+	<parameters>
+		<parameter>
+			<name>callback</name>
+			<type>function</type>
+			<description>function in LevelFuncs hierarchy to call when enemy is killed</description>
 		</parameter>
 	</parameters>
 </function>
@@ -2698,35 +2656,6 @@ most can just be ignored (see usage).</description>
 			<name>updateRoom</name>
 			<type>bool</type>
 			<description>Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
-	<name>GetHP</name>
-	<summary>Get current HP (hit points/health points)</summary>
-	<returns>
-		<return>
-			<type>int</type>
-			<description>the amount of HP the moveable currently has</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
-	<name>SetHP</name>
-	<summary>Set current HP (hit points/health points)
- Clamped to [0, 32767] for "intelligent" entities (i.e.</summary>
-	<description>anything with AI); clamped to [-32767, 32767] otherwise.</description>
-	<parameters>
-		<parameter>
-			<name>HP</name>
-			<type>int</type>
-			<description>the amount of HP to give the moveable</description>
 		</parameter>
 	</parameters>
 </function>
@@ -2802,6 +2731,20 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
+	<name>GetEndFrame</name>
+	<summary>Get the end frame number of the moveable's active animation.</summary>
+	<description>This is the "End Frame" set in WADTool for the animation.()</description>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>End frame number of the active animation.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
 	<name>GetRoom</name>
 	<summary>Get the current room of the object</summary>
 	<returns>
@@ -2829,15 +2772,29 @@ most can just be ignored (see usage).</description>
 	<module>Objects.Moveable</module>
 	<caller>Moveable</caller>
 	<name>SetRoomNumber</name>
-	<summary>Set room number of object 
- Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.</summary>
+	<summary>Set the room ID of a moveable.</summary>
+	<description>Use this if not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.</description>
 	<parameters>
 		<parameter>
-			<name>ID</name>
+			<name>roomID</name>
 			<type>int</type>
-			<description>the ID of the new room</description>
+			<description>New room's ID.</description>
 		</parameter>
 	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>GetMeshCount</name>
+	<summary>Get number of meshes for a particular object
+ Returns number of meshes in an object</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>number of meshes</description>
+		</return>
+	</returns>
 </function>
 
 <function>
@@ -3216,6 +3173,19 @@ most can just be ignored (see usage).</description>
 		<return>
 			<type>bool</type>
 			<description>true if the room is active</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Room</module>
+	<caller>Room</caller>
+	<name>GetColor</name>
+	<summary>Get the room's ambient light color.</summary>
+	<returns>
+		<return>
+			<type>Color</type>
+			<description>ambient light color of the room</description>
 		</return>
 	</returns>
 </function>
@@ -3638,6 +3608,35 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Static</module>
 	<caller>Static</caller>
+	<name>GetHP</name>
+	<summary>Get current HP (hit points/health points)
+ Used only with shatterable static meshes.</summary>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>the amount of HP the static currently has</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetHP</name>
+	<summary>Set current HP (hit points/health points)
+ Used only with shatterable static meshes.</summary>
+	<parameters>
+		<parameter>
+			<name>HP</name>
+			<type>int</type>
+			<description>the amount of HP to give the static</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
 	<name>GetName</name>
 	<summary>Get the static's unique string identifier</summary>
 	<returns>
@@ -3728,26 +3727,13 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
-	<name>Enable</name>
-	<summary>Enable the volume.</summary>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>Disable</name>
-	<summary>Disable the volume.</summary>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>GetActive</name>
-	<summary>Determine whether the volume is active or not</summary>
+	<name>GetName</name>
+	<summary>Get the unique string identifier of this volume.</summary>
+	<description>()</description>
 	<returns>
 		<return>
-			<type>bool</type>
-			<description>true if the volume is active</description>
+			<type>string</type>
+			<description>Name.</description>
 		</return>
 	</returns>
 </function>
@@ -3756,92 +3742,40 @@ most can just be ignored (see usage).</description>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
 	<name>GetPosition</name>
-	<summary>Get the volume's position.</summary>
+	<summary>Get the position of this volume.</summary>
+	<description>()</description>
 	<returns>
 		<return>
 			<type>Vec3</type>
-			<description>a copy of the volume's position</description>
+			<description>Position.</description>
 		</return>
 	</returns>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>SetPosition</name>
-	<summary>Set the volume's position.</summary>
-	<parameters>
-		<parameter>
-			<name>position</name>
-			<type>Vec3</type>
-			<description>the new position of the volume</description>
-		</parameter>
-	</parameters>
 </function>
 
 <function>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
 	<name>GetRotation</name>
-	<summary>Get the volume's rotation.</summary>
+	<summary>Get the rotation of this volume.</summary>
+	<description>()</description>
 	<returns>
 		<return>
 			<type>Rotation</type>
-			<description>a copy of the volume's rotation</description>
+			<description>Rotation.</description>
 		</return>
 	</returns>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>SetRotation</name>
-	<summary>Set the volume's rotation.</summary>
-	<parameters>
-		<parameter>
-			<name>rotation</name>
-			<type>Rotation</type>
-			<description>the volume's new rotation</description>
-		</parameter>
-	</parameters>
 </function>
 
 <function>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
 	<name>GetScale</name>
-	<summary>Get the volume's scale (separately on all 3 axes).</summary>
+	<summary>Get this scale of this volume.</summary>
+	<description>()</description>
 	<returns>
 		<return>
 			<type>Vec3</type>
-			<description>current volume scale</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>SetScale</name>
-	<summary>Set the volume's scale (separately on all 3 axes).</summary>
-	<parameters>
-		<parameter>
-			<name>scale</name>
-			<type>Vec3</type>
-			<description>the volume's new scale</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Volume</module>
-	<caller>Volume</caller>
-	<name>GetName</name>
-	<summary>Get the volume's unique string identifier.</summary>
-	<returns>
-		<return>
-			<type>string</type>
-			<description>the volume's name</description>
+			<description>Scale.</description>
 		</return>
 	</returns>
 </function>
@@ -3850,12 +3784,13 @@ most can just be ignored (see usage).</description>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
 	<name>SetName</name>
-	<summary>Set the volume's name (its unique string identifier).</summary>
+	<summary>Set the unique string identifier of this volume.</summary>
+	<description>()</description>
 	<parameters>
 		<parameter>
 			<name>name</name>
 			<type>string</type>
-			<description>The volume's new name</description>
+			<description>New name.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -3863,28 +3798,105 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
-	<name>ClearActivators</name>
-	<summary>Clear activator list for volumes (makes volume trigger everything again)</summary>
+	<name>SetPosition</name>
+	<summary>Set the position of this volume.</summary>
+	<description>()</description>
+	<parameters>
+		<parameter>
+			<name>pos</name>
+			<type>Vec3</type>
+			<description>New position.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>SetRotation</name>
+	<summary>Set the rotation of this volume.</summary>
+	<description>()</description>
+	<parameters>
+		<parameter>
+			<name>rot</name>
+			<type>Rotation</type>
+			<description>New rotation.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>SetScale</name>
+	<summary>Set the scale of the volume.</summary>
+	<description>()</description>
+	<parameters>
+		<parameter>
+			<name>scale</name>
+			<type>Vec3</type>
+			<description>New scale.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>GetActive</name>
+	<summary>Determine if this volume is active.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>Boolean representing active status.</description>
+		</return>
+	</returns>
 </function>
 
 <function>
 	<module>Objects.Volume</module>
 	<caller>Volume</caller>
 	<name>IsMoveableInside</name>
-	<summary>Check if specified moveable is inside the volume</summary>
+	<summary>Determine if a moveable is inside this volume.</summary>
+	<description>()</description>
 	<parameters>
 		<parameter>
 			<name>Moveable</name>
 			<type>Objects.Moveable</type>
-			<description>which should be checked for containment</description>
+			<description>to be checked for containment.</description>
 		</parameter>
 	</parameters>
 	<returns>
 		<return>
 			<type>bool</type>
-			<description>state of the moveable, true if contained, false if not</description>
+			<description>Boolean representing containment status.</description>
 		</return>
 	</returns>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>Enable</name>
+	<summary>Enable this volume.</summary>
+	<description>()</description>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>Disable</name>
+	<summary>Disable this volume.</summary>
+	<description>()</description>
+</function>
+
+<function>
+	<module>Objects.Volume</module>
+	<caller>Volume</caller>
+	<name>ClearActivators</name>
+	<summary>Clear the activators for this volume, allowing it to trigger again.</summary>
+	<description>()</description>
 </function>
 
 <function>
@@ -3892,25 +3904,25 @@ most can just be ignored (see usage).</description>
 	<name>Rotation</name>
 	<parameters>
 		<parameter>
-			<name>X</name>
+			<name>x</name>
 			<type>float</type>
-			<description>rotation about x axis</description>
+			<description>X angle component.</description>
 		</parameter>
 		<parameter>
-			<name>Y</name>
+			<name>y</name>
 			<type>float</type>
-			<description>rotation about y axis</description>
+			<description>Y angle component.</description>
 		</parameter>
 		<parameter>
-			<name>Z</name>
+			<name>z</name>
 			<type>float</type>
-			<description>rotation about z axis</description>
+			<description>Z angle component.</description>
 		</parameter>
 	</parameters>
 	<returns>
 		<return>
 			<type>Rotation</type>
-			<description>A Rotation object.</description>
+			<description>A Rotation.</description>
 		</return>
 	</returns>
 </function>
@@ -3922,13 +3934,153 @@ most can just be ignored (see usage).</description>
 		<parameter>
 			<name>rotation</name>
 			<type>Rotation</type>
-			<description>this rotation</description>
+			<description>this Rotation.</description>
 		</parameter>
 	</parameters>
 	<returns>
 		<return>
 			<type>string</type>
-			<description>A string showing the x, y, and z values of the rotation</description>
+			<description>A string showing the X, Y, and Z angle components of the Rotation.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Sound</module>
+	<name>PlayAudioTrack</name>
+	<summary>Play an audio track</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>of track (without file extension) to play</description>
+		</parameter>
+		<parameter>
+			<name>type</name>
+			<type>Sound.SoundTrackType</type>
+			<description>of the audio track to play</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Sound</module>
+	<name>SetAmbientTrack</name>
+	<summary>Set and play an ambient track</summary>
+	<parameters>
+		<parameter>
+			<name>name</name>
+			<type>string</type>
+			<description>of track (without file extension) to play</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Sound</module>
+	<name>StopAudioTracks</name>
+	<summary>Stop any audio tracks currently playing</summary>
+</function>
+
+<function>
+	<module>Sound</module>
+	<name>StopAudioTrack</name>
+	<summary>Stop audio track that is currently playing</summary>
+	<parameters>
+		<parameter>
+			<name>type</name>
+			<type>Sound.SoundTrackType</type>
+			<description>of the audio track</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Sound</module>
+	<name>GetAudioTrackLoudness</name>
+	<summary>Get current loudness level for specified track type</summary>
+	<parameters>
+		<parameter>
+			<name>type</name>
+			<type>Sound.SoundTrackType</type>
+			<description>of the audio track</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>current loudness of a specified audio track</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Sound</module>
+	<name>PlaySound</name>
+	<summary>Play sound effect</summary>
+	<parameters>
+		<parameter>
+			<name>sound</name>
+			<type>int</type>
+			<description>ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.</description>
+		</parameter>
+		<parameter>
+			<name>position</name>
+			<type>Vec3</type>
+			<description>The 3D position of the sound, i.e. where the sound "comes from". If not given, the sound will not be positional.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Sound</module>
+	<name>StopSound</name>
+	<summary>Stop sound effect</summary>
+	<parameters>
+		<parameter>
+			<name>sound</name>
+			<type>int</type>
+			<description>ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Sound</module>
+	<name>IsSoundPlaying</name>
+	<summary>Check if the sound effect is playing</summary>
+	<parameters>
+		<parameter>
+			<name>Sound</name>
+			<type>int</type>
+			<description>ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Sound</module>
+	<name>IsAudioTrackPlaying</name>
+	<summary>Check if the audio track is playing</summary>
+	<parameters>
+		<parameter>
+			<name>Track</name>
+			<type>string</type>
+			<description>filename to check. Should be without extension and without full directory path.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Sound</module>
+	<name>GetCurrentSubtitle</name>
+	<summary>Get current subtitle string for a voice track currently playing.</summary>
+	<description>Subtitle file must be in .srt format, have same filename as voice track, and be placed in same directory as voice track.
+Returns nil if no voice track is playing or no subtitle present.</description>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>current subtitle string</description>
 		</return>
 	</returns>
 </function>
@@ -3937,7 +4089,7 @@ most can just be ignored (see usage).</description>
 	<module>Strings.DisplayString</module>
 	<name>DisplayString</name>
 	<summary>Create a DisplayString.</summary>
-	<description>For use in @{Strings.ShowString | ShowString } and @{Strings.HideString | HideString }.</description>
+	<description>For use in @{Strings.ShowString|ShowString} and @{Strings.HideString|HideString}.</description>
 	<parameters>
 		<parameter>
 			<name>string</name>
@@ -3945,14 +4097,9 @@ most can just be ignored (see usage).</description>
 			<description>The string to display or key of the translated string.</description>
 		</parameter>
 		<parameter>
-			<name>x</name>
-			<type>int</type>
-			<description>X component of the string.</description>
-		</parameter>
-		<parameter>
-			<name>y</name>
-			<type>int</type>
-			<description>Y component of the string.</description>
+			<name>Position</name>
+			<type>Vec2</type>
+			<description>of the string in pixel coordinates.</description>
 		</parameter>
 		<parameter>
 			<name>scale</name>
@@ -4021,9 +4168,9 @@ __Default: empty__</description>
 	<caller>DisplayString</caller>
 	<name>GetKey</name>
 	<summary>Get the string key to use.</summary>
-	<description>If `translated` is true when @{DisplayString}
+	<description>If `isTranslated` is true when @{DisplayString}
  is called, this will be the string key for the translation that will be displayed.
- If false or omitted, this will be the string that's displayed.</description>
+ If false or omitted, this will be the string that's displayed.()</description>
 	<returns>
 		<return>
 			<type>string</type>
@@ -4037,9 +4184,9 @@ __Default: empty__</description>
 	<caller>DisplayString</caller>
 	<name>SetKey</name>
 	<summary>Set the string key to use.</summary>
-	<description>If `translated` is true when @{DisplayString}
+	<description>If `isTranslated` is true when @{DisplayString}
  is called, this will be the string key for the translation that will be displayed.
- If false or omitted, this will be the string that's displayed.</description>
+ If false or omitted, this will be the string that's displayed.()</description>
 	<parameters>
 		<parameter>
 			<name>string</name>
@@ -4054,11 +4201,12 @@ __Default: empty__</description>
 	<caller>DisplayString</caller>
 	<name>SetScale</name>
 	<summary>Set the scale of the string.</summary>
+	<description>()</description>
 	<parameters>
 		<parameter>
 			<name>scale</name>
 			<type>float</type>
-			<description>the new scale of the text, relative to the default size</description>
+			<description>New scale of the string relative to the default size.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -4068,10 +4216,11 @@ __Default: empty__</description>
 	<caller>DisplayString</caller>
 	<name>GetScale</name>
 	<summary>Get the scale of the string.</summary>
+	<description>()</description>
 	<returns>
 		<return>
 			<type>float</type>
-			<description>scale of the string</description>
+			<description>Scale.</description>
 		</return>
 	</returns>
 </function>
@@ -4081,17 +4230,12 @@ __Default: empty__</description>
 	<caller>DisplayString</caller>
 	<name>SetPosition</name>
 	<summary>Set the position of the string.</summary>
-	<description>Screen-space coordinates are expected.</description>
+	<description>Screen-space coordinates are expected.()</description>
 	<parameters>
 		<parameter>
-			<name>x</name>
-			<type>int</type>
-			<description>x-coordinate of the string</description>
-		</parameter>
-		<parameter>
-			<name>y</name>
-			<type>int</type>
-			<description>y-coordinate of the string</description>
+			<name>pos</name>
+			<type>Vec2</type>
+			<description>New position in pixel coordinates.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -4101,15 +4245,11 @@ __Default: empty__</description>
 	<caller>DisplayString</caller>
 	<name>GetPosition</name>
 	<summary>Get the position of the string.</summary>
-	<description>Screen-space coordinates are returned.</description>
+	<description>Screen-space coordinates are returned.()</description>
 	<returns>
 		<return>
-			<type>int</type>
-			<description>x-coordinate of the string</description>
-		</return>
-		<return>
-			<type>int</type>
-			<description>y-coordinate of the string</description>
+			<type>Vec2</type>
+			<description>pos Position in pixel coordinates.</description>
 		</return>
 	</returns>
 </function>
@@ -4119,6 +4259,7 @@ __Default: empty__</description>
 	<caller>DisplayString</caller>
 	<name>SetFlags</name>
 	<summary>Set the display string's flags</summary>
+	<description>()</description>
 	<parameters>
 		<parameter>
 			<name>table</name>
@@ -4198,15 +4339,218 @@ with a call to @{ShowString}, or this function will have no effect.</description
 </function>
 
 <function>
-	<module>Vec2</module>
-	<caller>Vec2</caller>
-	<name>ToLength</name>
-	<summary>Modify to match input length.</summary>
+	<module>Util</module>
+	<name>HasLineOfSight</name>
+	<summary>Determine if there is a clear line of sight between two positions.</summary>
+	<description>NOTE: Limited to room geometry. Objects are ignored.()</description>
 	<parameters>
 		<parameter>
-			<name>length</name>
+			<name>roomID</name>
 			<type>float</type>
-			<description>new length to set.</description>
+			<description>Room ID of the first position's room.</description>
+		</parameter>
+		<parameter>
+			<name>posA</name>
+			<type>Vec3</type>
+			<description>First position.</description>
+		</parameter>
+		<parameter>
+			<name>posB</name>
+			<type>Vec3</type>
+			<description>Second position.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>bool</type>
+			<description>__true__ if there is a line of sight, __false__ if not.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Util</module>
+	<name>CalculateDistance</name>
+	<summary>Calculate the distance between two positions.</summary>
+	<parameters>
+		<parameter>
+			<name>posA</name>
+			<type>Vec3</type>
+			<description>First position.</description>
+		</parameter>
+		<parameter>
+			<name>posB</name>
+			<type>Vec3</type>
+			<description>Second position.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Distance between two positions.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Util</module>
+	<name>CalculateHorizontalDistance</name>
+	<summary>Calculate the horizontal distance between two positions.</summary>
+	<parameters>
+		<parameter>
+			<name>posA</name>
+			<type>Vec3</type>
+			<description>First position.</description>
+		</parameter>
+		<parameter>
+			<name>posB</name>
+			<type>Vec3</type>
+			<description>Second position.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Horizontal distance between the two positions.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Util</module>
+	<name>GetDisplayPosition</name>
+	<summary>Get the projected display space position of a 3D world position.</summary>
+	<description>Returns nil if the world position is behind the camera view.</description>
+	<parameters>
+		<parameter>
+			<name>worldPos</name>
+			<type>Vec3</type>
+			<description>3D world position.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec2</type>
+			<description>Projected display space position in percent.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Util</module>
+	<name>PercentToScreen</name>
+	<summary>Translate a pair display position coordinates to pixel coordinates.</summary>
+	<description>To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString}.</description>
+	<parameters>
+		<parameter>
+			<name>x</name>
+			<type>float</type>
+			<description>X component of the display position.</description>
+		</parameter>
+		<parameter>
+			<name>y</name>
+			<type>float</type>
+			<description>Y component of the display position.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>x X coordinate in pixels.</description>
+		</return>
+		<return>
+			<type>int</type>
+			<description>y Y coordinate in pixels.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Util</module>
+	<name>ScreenToPercent</name>
+	<summary>Translate a pair of pixel coordinates to display position coordinates.</summary>
+	<description>To be used with @{Strings.DisplayString:GetPosition}.</description>
+	<parameters>
+		<parameter>
+			<name>x</name>
+			<type>int</type>
+			<description>X pixel coordinate to translate to display position.</description>
+		</parameter>
+		<parameter>
+			<name>y</name>
+			<type>int</type>
+			<description>Y pixel coordinate to translate to display position.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>x X component of display position.</description>
+		</return>
+		<return>
+			<type>float</type>
+			<description>y Y component of display position.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Util</module>
+	<name>PickMoveableByDisplayPosition</name>
+	<summary>Pick a moveable by the given display position.</summary>
+	<parameters>
+		<parameter>
+			<name>Display</name>
+			<type>Vec2</type>
+			<description>space position in percent.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Objects.Moveable</type>
+			<description>Picked moveable (nil if no moveable was found under the cursor).</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Util</module>
+	<name>PickStaticByDisplayPosition</name>
+	<summary>Pick a static mesh by the given display position.</summary>
+	<parameters>
+		<parameter>
+			<name>Display</name>
+			<type>Vec2</type>
+			<description>space position in percent.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Objects.Static</type>
+			<description>Picked static mesh (nil if no static mesh was found under the cursor).</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Util</module>
+	<name>PrintLog</name>
+	<summary>Write messages within the Log file</summary>
+	<parameters>
+		<parameter>
+			<name>message</name>
+			<type>string</type>
+			<description>to be displayed within the Log</description>
+		</parameter>
+		<parameter>
+			<name>logLevel</name>
+			<type>Misc.LogLevel</type>
+			<description>log level to be displayed</description>
+		</parameter>
+		<parameter>
+			<name>allowSpam</name>
+			<type>bool</type>
+			<description>true allows spamming of the message</description>
 		</parameter>
 	</parameters>
 </function>
@@ -4214,22 +4558,44 @@ with a call to @{ShowString}, or this function will have no effect.</description
 <function>
 	<module>Vec2</module>
 	<name>Vec2</name>
+	<summary>Create a Vec2 object.</summary>
+	<description>(x, y)</description>
 	<parameters>
 		<parameter>
-			<name>X</name>
+			<name>x</name>
 			<type>float</type>
-			<description>x coordinate</description>
+			<description>X component.</description>
 		</parameter>
 		<parameter>
-			<name>Y</name>
+			<name>y</name>
 			<type>float</type>
-			<description>y coordinate</description>
+			<description>Y component.</description>
 		</parameter>
 	</parameters>
 	<returns>
 		<return>
 			<type>Vec2</type>
-			<description>A Vec2 object</description>
+			<description>A new Vec2 object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec2</module>
+	<name>Vec</name>
+	<summary>Create a Vec2 object.</summary>
+	<description>(value)</description>
+	<parameters>
+		<parameter>
+			<name>value</name>
+			<type>float</type>
+			<description>X and Z component.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec2</type>
+			<description>A new Vec2 object.</description>
 		</return>
 	</returns>
 </function>
@@ -4237,18 +4603,207 @@ with a call to @{ShowString}, or this function will have no effect.</description
 <function>
 	<module>Vec2</module>
 	<name>tostring</name>
-	<summary>Metafunction; use tostring(myVector)</summary>
+	<summary>Metafunction.</summary>
+	<description>Use tostring(vector).</description>
 	<parameters>
 		<parameter>
-			<name>Vec2</name>
+			<name>This</name>
 			<type>Vec2</type>
-			<description>this Vec2</description>
+			<description>Vec2.</description>
 		</parameter>
 	</parameters>
 	<returns>
 		<return>
 			<type>string</type>
-			<description>A string showing the x and y values of the Vec2</description>
+			<description>A string showing the X and Y components of the Vec2.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec2</module>
+	<caller>Vec2</caller>
+	<name>Normalize</name>
+	<summary>Get a copy of this Vec2 normalized to length 1.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>Vec2</type>
+			<description>Normalized vector.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec2</module>
+	<caller>Vec2</caller>
+	<name>Rotate</name>
+	<summary>Get a copy of this Vec2 rotated by the input rotation in degrees.</summary>
+	<description>(rot)</description>
+	<parameters>
+		<parameter>
+			<name>rot</name>
+			<type>float</type>
+			<description>Rotation in degrees.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec2</type>
+			<description>Rotated Vec2.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec2</module>
+	<caller>Vec2</caller>
+	<name>Lerp</name>
+	<summary>Get the linearly interpolated Vec2 between this Vec2 and the input Vec2 according to the input interpolation alpha.</summary>
+	<description>(vector)</description>
+	<parameters>
+		<parameter>
+			<name>vector</name>
+			<type>Vec2</type>
+			<description>Target interpolation vector.</description>
+		</parameter>
+		<parameter>
+			<name>alpha</name>
+			<type>float</type>
+			<description>Interpolation alpha in the range [0, 1].</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec2</type>
+			<description>Linearly interpolated vector</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec2</module>
+	<caller>Vec2</caller>
+	<name>Cross</name>
+	<summary>Get the cross product of this Vec2 and the input Vec2.</summary>
+	<description>(vector)</description>
+	<parameters>
+		<parameter>
+			<name>vector</name>
+			<type>Vec2</type>
+			<description>Input vector.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec2</type>
+			<description>Cross product.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec2</module>
+	<caller>Vec2</caller>
+	<name>Dot</name>
+	<summary>Get the dot product of this Vec2 and the input Vec2.</summary>
+	<description>(vector)</description>
+	<parameters>
+		<parameter>
+			<name>vector</name>
+			<type>Vec2</type>
+			<description>Input vector.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Dot product.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec2</module>
+	<caller>Vec2</caller>
+	<name>Distance</name>
+	<summary>Get the distance between this Vec2 and the input Vec2.</summary>
+	<description>(vector)</description>
+	<parameters>
+		<parameter>
+			<name>vector</name>
+			<type>Vec2</type>
+			<description>Input vector.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Distance.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec2</module>
+	<caller>Vec2</caller>
+	<name>Length</name>
+	<summary>Get the length of this Vec2.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Length.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec3</module>
+	<name>Vec3</name>
+	<summary>Create a Vec3 object.</summary>
+	<description>(x, y, z)</description>
+	<parameters>
+		<parameter>
+			<name>x</name>
+			<type>float</type>
+			<description>X component.</description>
+		</parameter>
+		<parameter>
+			<name>y</name>
+			<type>float</type>
+			<description>Y component.</description>
+		</parameter>
+		<parameter>
+			<name>z</name>
+			<type>float</type>
+			<description>Z component.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>A new Vec3 object.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec3</module>
+	<name>Vec3</name>
+	<summary>Create a Vec3 object.</summary>
+	<description>(value)</description>
+	<parameters>
+		<parameter>
+			<name>value</name>
+			<type>float</type>
+			<description>X, Y, and Z component.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>A new Vec3 object.</description>
 		</return>
 	</returns>
 </function>
@@ -4256,46 +4811,137 @@ with a call to @{ShowString}, or this function will have no effect.</description
 <function>
 	<module>Vec3</module>
 	<caller>Vec3</caller>
-	<name>ToLength</name>
-	<summary>Modify this vector so that it becomes close to the requested length.</summary>
-	<description>Note that since the engine uses integers instead of floating-point
-numbers, this will be less accurate at smaller lengths.
-For example, if you have the vector (100, 600, 700) and set it to
-the length of 1, the vector SHOULD become approximately (0.11, 0.65, 0.75).
-However, this function would return it as (0, 1, 1).</description>
-	<parameters>
-		<parameter>
-			<name>length</name>
-			<type>float</type>
-			<description>the new length to set the vector to.</description>
-		</parameter>
-	</parameters>
+	<name>Normalize</name>
+	<summary>Get a copy of this Vec3 normalized to length 1.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>Normalized vector.</description>
+		</return>
+	</returns>
 </function>
 
 <function>
 	<module>Vec3</module>
-	<name>Vec3</name>
+	<caller>Vec3</caller>
+	<name>Rotate</name>
+	<summary>Get a copy of this Vec3 rotated by the input Rotation object.</summary>
+	<description>(rot)</description>
 	<parameters>
 		<parameter>
-			<name>X</name>
-			<type>int</type>
-			<description>x coordinate</description>
-		</parameter>
-		<parameter>
-			<name>Y</name>
-			<type>int</type>
-			<description>y coordinate</description>
-		</parameter>
-		<parameter>
-			<name>Z</name>
-			<type>int</type>
-			<description>z coordinate</description>
+			<name>rot</name>
+			<type>Rotation</type>
+			<description>Rotation object.</description>
 		</parameter>
 	</parameters>
 	<returns>
 		<return>
 			<type>Vec3</type>
-			<description>A Vec3 object.</description>
+			<description>Rotated Vec3.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec3</module>
+	<caller>Vec3</caller>
+	<name>Lerp</name>
+	<summary>Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input interpolation alpha.</summary>
+	<description>(vector)</description>
+	<parameters>
+		<parameter>
+			<name>vector</name>
+			<type>Vec3</type>
+			<description>Target interpolation vector.</description>
+		</parameter>
+		<parameter>
+			<name>alpha</name>
+			<type>float</type>
+			<description>Interpolation alpha in the range [0, 1].</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>Linearly interpolated vector</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec3</module>
+	<caller>Vec3</caller>
+	<name>Cross</name>
+	<summary>Get the cross product of this Vec3 and the input Vec3.</summary>
+	<description>(vector)</description>
+	<parameters>
+		<parameter>
+			<name>vector</name>
+			<type>Vec3</type>
+			<description>Input vector.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>Cross product.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec3</module>
+	<caller>Vec3</caller>
+	<name>Dot</name>
+	<summary>Get the dot product of this Vec3 and the input Vec3.</summary>
+	<description>(vector)</description>
+	<parameters>
+		<parameter>
+			<name>vector</name>
+			<type>Vec3</type>
+			<description>Input vector.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Dot product.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec3</module>
+	<caller>Vec3</caller>
+	<name>Distance</name>
+	<summary>Get the distance between this Vec3 and the input Vec3.</summary>
+	<description>(vector)</description>
+	<parameters>
+		<parameter>
+			<name>vector</name>
+			<type>Vec3</type>
+			<description>Input vector.</description>
+		</parameter>
+	</parameters>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Distance.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Vec3</module>
+	<caller>Vec3</caller>
+	<name>Length</name>
+	<summary>Get the length of this Vec3.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Length.</description>
 		</return>
 	</returns>
 </function>
@@ -4303,18 +4949,225 @@ However, this function would return it as (0, 1, 1).</description>
 <function>
 	<module>Vec3</module>
 	<name>tostring</name>
-	<summary>Metafunction; use tostring(myVector)</summary>
+	<summary>Metafunction.</summary>
+	<description>Use tostring(vector).</description>
 	<parameters>
 		<parameter>
-			<name>Vec3</name>
+			<name>This</name>
 			<type>Vec3</type>
-			<description>this Vec3</description>
+			<description>Vec3.</description>
 		</parameter>
 	</parameters>
 	<returns>
 		<return>
 			<type>string</type>
-			<description>A string showing the x, y, and z values of the Vec3</description>
+			<description>A string showing the X, Y, and Z components of the Vec3.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View</module>
+	<name>FadeIn</name>
+	<summary>Do a full-screen fade-in from black.</summary>
+	<parameters>
+		<parameter>
+			<name>speed</name>
+			<type>float</type>
+			<description>(default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>FadeOut</name>
+	<summary>Do a full-screen fade-to-black.</summary>
+	<description>The screen will remain black until a call to FadeIn.</description>
+	<parameters>
+		<parameter>
+			<name>speed</name>
+			<type>float</type>
+			<description>(default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>SetCineBars</name>
+	<summary>Move black cinematic bars in from the top and bottom of the game window.</summary>
+	<parameters>
+		<parameter>
+			<name>height</name>
+			<type>float</type>
+			<description>__(default 30)__ Percentage of the screen to be covered</description>
+		</parameter>
+		<parameter>
+			<name>speed</name>
+			<type>float</type>
+			<description>__(default 30)__ Coverage percent per second</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>SetFOV</name>
+	<summary>Set field of view.</summary>
+	<parameters>
+		<parameter>
+			<name>angle</name>
+			<type>float</type>
+			<description>in degrees (clamped to [10, 170])</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>GetFOV</name>
+	<summary>Get field of view.</summary>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>current FOV angle in degrees</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View</module>
+	<name>GetCameraType</name>
+	<summary>Shows the mode of the game camera.</summary>
+	<returns>
+		<return>
+			<type>View.CameraType</type>
+			<description>value used by the Main Camera.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View</module>
+	<name>GetCameraRoom</name>
+	<summary>Gets current room where camera is positioned.</summary>
+	<returns>
+		<return>
+			<type>Objects.Room</type>
+			<description>current room of the camera</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View</module>
+	<name>SetPostProcessMode</name>
+	<summary>Sets the post-process effect mode, like negative or monochrome.</summary>
+	<parameters>
+		<parameter>
+			<name>effect</name>
+			<type>View.PostProcessMode</type>
+			<description>type to set.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>SetPostProcessStrength</name>
+	<summary>Sets the post-process effect strength.</summary>
+	<parameters>
+		<parameter>
+			<name>strength</name>
+			<type>float</type>
+			<description>(default 1.0). How strong the effect is.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>SetPostProcessTint</name>
+	<summary>Sets the post-process tint.</summary>
+	<parameters>
+		<parameter>
+			<name>tint</name>
+			<type>Color</type>
+			<description>value to use.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>GetCameraPosition</name>
+	<summary>Gets current camera position.</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>current camera position</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View</module>
+	<name>GetCameraTarget</name>
+	<summary>Gets current camera target.</summary>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>current camera target</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>View</module>
+	<name>PlayFlyBy</name>
+	<summary>Enable FlyBy with specific ID</summary>
+	<parameters>
+		<parameter>
+			<name>flyby</name>
+			<type>short</type>
+			<description>(ID of flyby)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>ResetObjCamera</name>
+	<summary>Reset object camera back to Lara and deactivate object camera.</summary>
+</function>
+
+<function>
+	<module>View</module>
+	<name>FlashScreen</name>
+	<summary>Flash screen.</summary>
+	<parameters>
+		<parameter>
+			<name>color</name>
+			<type>Color</type>
+			<description>(default Color(255, 255, 255))</description>
+		</parameter>
+		<parameter>
+			<name>speed</name>
+			<type>float</type>
+			<description>(default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>View</module>
+	<name>GetAspectRatio</name>
+	<summary>Get the display resolution's aspect ratio.</summary>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Display resolution's aspect ratio.</description>
 		</return>
 	</returns>
 </function>

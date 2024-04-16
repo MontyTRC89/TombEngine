@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.1.0 Lua API</title>
+    <title>TombEngine 1.3 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -34,14 +34,18 @@
 <ul class="nowrap">
   <li>    <a href="../1 modules/Effects.html">Effects</a></li>
   <li>    <a href="../1 modules/Flow.html">Flow</a></li>
+  <li>    <a href="../1 modules/Input.html">Input</a></li>
   <li>    <a href="../1 modules/Inventory.html">Inventory</a></li>
   <li>    <a href="../1 modules/Logic.html">Logic</a></li>
-  <li>    <a href="../1 modules/Misc.html">Misc</a></li>
   <li>    <a href="../1 modules/Objects.html">Objects</a></li>
+  <li>    <a href="../1 modules/Sound.html">Sound</a></li>
   <li>    <a href="../1 modules/Strings.html">Strings</a></li>
+  <li>    <a href="../1 modules/Util.html">Util</a></li>
+  <li>    <a href="../1 modules/View.html">View</a></li>
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
+  <li>    <a href="../2 classes/View.DisplaySprite.html">View.DisplaySprite</a></li>
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
@@ -71,14 +75,19 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
-  <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
-  <li>    <a href="../4 enums/Misc.LogLevel.html">Misc.LogLevel</a></li>
-  <li>    <a href="../4 enums/Misc.SoundTrackType.html">Misc.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
+  <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
+  <li>    <a href="../4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
+  <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
+  <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
+  <li>    <a href="../4 enums/View.PostProcessMode.html">View.PostProcessMode</a></li>
+  <li>    <a href="../4 enums/View.ScaleMode.html">View.ScaleMode</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
@@ -91,7 +100,7 @@
 <div id="content">
 
 <h1>Primitive Class <code>Vec3</code></h1>
-<p>Represents a 3D vector.</p>
+<p>Represents a float-based 3D vector.</p>
 <p>
 
 </p>
@@ -101,32 +110,58 @@
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#x">x</a></td>
-	<td class="summary">(int) x coordinate</td>
+	<td class="summary">(float) X component.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#y">y</a></td>
-	<td class="summary">(int) y coordinate</td>
+	<td class="summary">(float) Y component.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#z">z</a></td>
-	<td class="summary">(int) z coordinate</td>
+	<td class="summary">(float) Z component.</td>
 	</tr>
 </table>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Vec3:ToLength">Vec3:ToLength(length)</a></td>
-	<td class="summary">Modify this vector so that it becomes close to the requested length.</td>
+	<td class="name" ><a href="#Vec3">Vec3(x, y, z)</a></td>
+	<td class="summary">Create a Vec3 object.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Vec3">Vec3(X, Y, Z)</a></td>
-	<td class="summary">
-
-</td>
+	<td class="name" ><a href="#Vec3">Vec3(value)</a></td>
+	<td class="summary">Create a Vec3 object.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#__tostring">__tostring(Vec3)</a></td>
-	<td class="summary">Metafunction; use tostring(myVector)</td>
+	<td class="name" ><a href="#Vec3:Normalize">Vec3:Normalize()</a></td>
+	<td class="summary">Get a copy of this Vec3 normalized to length 1.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Vec3:Rotate">Vec3:Rotate(rot)</a></td>
+	<td class="summary">Get a copy of this Vec3 rotated by the input Rotation object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Vec3:Lerp">Vec3:Lerp(vector, alpha)</a></td>
+	<td class="summary">Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input interpolation alpha.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Vec3:Cross">Vec3:Cross(vector)</a></td>
+	<td class="summary">Get the cross product of this Vec3 and the input Vec3.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Vec3:Dot">Vec3:Dot(vector)</a></td>
+	<td class="summary">Get the dot product of this Vec3 and the input Vec3.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Vec3:Distance">Vec3:Distance(vector)</a></td>
+	<td class="summary">Get the distance between this Vec3 and the input Vec3.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Vec3:Length">Vec3:Length()</a></td>
+	<td class="summary">Get the length of this Vec3.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#__tostring">__tostring(This)</a></td>
+	<td class="summary">Metafunction.</td>
 	</tr>
 </table>
 
@@ -142,7 +177,7 @@
     <strong>x</strong>
     </dt>
     <dd>
-    (int) x coordinate
+    (float) X component.
 
 
 
@@ -157,7 +192,7 @@
     <strong>y</strong>
     </dt>
     <dd>
-    (int) y coordinate
+    (float) Y component.
 
 
 
@@ -172,7 +207,7 @@
     <strong>z</strong>
     </dt>
     <dd>
-    (int) z coordinate
+    (float) Z component.
 
 
 
@@ -187,57 +222,27 @@
 
     <dl class="function">
     <dt>
-    <a name = "Vec3:ToLength"></a>
-    <strong>Vec3:ToLength(length)</strong>
-    </dt>
-    <dd>
-    Modify this vector so that it becomes close to the requested length. </p>
-
-<p>Note that since the engine uses integers instead of floating-point
-numbers, this will be less accurate at smaller lengths.
-For example, if you have the vector (100, 600, 700) and set it to
-the length of 1, the vector SHOULD become approximately (0.11, 0.65, 0.75).
-However, this function would return it as (0, 1, 1).
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">length</span>
-            <span class="types"><span class="type">float</span></span>
-         the new length to set the vector to.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
     <a name = "Vec3"></a>
-    <strong>Vec3(X, Y, Z)</strong>
+    <strong>Vec3(x, y, z)</strong>
     </dt>
     <dd>
-
-
-
+    Create a Vec3 object. (x, y, z)
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">X</span>
-            <span class="types"><span class="type">int</span></span>
-         x coordinate
+        <li><span class="parameter">x</span>
+            <span class="types"><span class="type">float</span></span>
+         X component.
         </li>
-        <li><span class="parameter">Y</span>
-            <span class="types"><span class="type">int</span></span>
-         y coordinate
+        <li><span class="parameter">y</span>
+            <span class="types"><span class="type">float</span></span>
+         Y component.
         </li>
-        <li><span class="parameter">Z</span>
-            <span class="types"><span class="type">int</span></span>
-         z coordinate
+        <li><span class="parameter">z</span>
+            <span class="types"><span class="type">float</span></span>
+         Z component.
         </li>
     </ul>
 
@@ -245,7 +250,221 @@ However, this function would return it as (0, 1, 1).
     <ol>
 
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        A Vec3 object.
+        A new Vec3 object.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Vec3"></a>
+    <strong>Vec3(value)</strong>
+    </dt>
+    <dd>
+    Create a Vec3 object. (value)
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">float</span></span>
+         X, Y, and Z component.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        A new Vec3 object.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Vec3:Normalize"></a>
+    <strong>Vec3:Normalize()</strong>
+    </dt>
+    <dd>
+    Get a copy of this Vec3 normalized to length 1. ()
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        Normalized vector.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Vec3:Rotate"></a>
+    <strong>Vec3:Rotate(rot)</strong>
+    </dt>
+    <dd>
+    Get a copy of this Vec3 rotated by the input Rotation object. (rot)
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rot</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+         Rotation object.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        Rotated Vec3.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Vec3:Lerp"></a>
+    <strong>Vec3:Lerp(vector, alpha)</strong>
+    </dt>
+    <dd>
+    Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input interpolation alpha. (vector)
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">vector</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Target interpolation vector.
+        </li>
+        <li><span class="parameter">alpha</span>
+            <span class="types"><span class="type">float</span></span>
+         Interpolation alpha in the range [0, 1].
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        Linearly interpolated vector
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Vec3:Cross"></a>
+    <strong>Vec3:Cross(vector)</strong>
+    </dt>
+    <dd>
+    Get the cross product of this Vec3 and the input Vec3. (vector)
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">vector</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Input vector.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        Cross product.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Vec3:Dot"></a>
+    <strong>Vec3:Dot(vector)</strong>
+    </dt>
+    <dd>
+    Get the dot product of this Vec3 and the input Vec3. (vector)
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">vector</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Input vector.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">float</span></span>
+        Dot product.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Vec3:Distance"></a>
+    <strong>Vec3:Distance(vector)</strong>
+    </dt>
+    <dd>
+    Get the distance between this Vec3 and the input Vec3. (vector)
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">vector</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Input vector.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">float</span></span>
+        Distance.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Vec3:Length"></a>
+    <strong>Vec3:Length()</strong>
+    </dt>
+    <dd>
+    Get the length of this Vec3. ()
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">float</span></span>
+        Length.
     </ol>
 
 
@@ -254,18 +473,18 @@ However, this function would return it as (0, 1, 1).
 </dd>
     <dt>
     <a name = "__tostring"></a>
-    <strong>__tostring(Vec3)</strong>
+    <strong>__tostring(This)</strong>
     </dt>
     <dd>
-    Metafunction; use tostring(myVector)
+    Metafunction.  Use tostring(vector).
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">Vec3</span>
+        <li><span class="parameter">This</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         this Vec3
+         Vec3.
         </li>
     </ul>
 
@@ -273,7 +492,7 @@ However, this function would return it as (0, 1, 1).
     <ol>
 
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        A string showing the x, y, and z values of the Vec3
+        A string showing the X, Y, and Z components of the Vec3.
     </ol>
 
 
@@ -287,7 +506,6 @@ However, this function would return it as (0, 1, 1).
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-09-30 13:48:57 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -77,7 +77,7 @@ void ControlMissile(short fxNumber)
 			SoundEffect(SFX_TR1_ATLANTEAN_EXPLODE, &fx.Pose, soundFXType);
 			TriggerExplosionSparks(fx.Pose.Position.x, fx.Pose.Position.y, fx.Pose.Position.z, 3, -2, 0, fx.RoomNumber);
 			TriggerExplosionSparks(fx.Pose.Position.x, fx.Pose.Position.y, fx.Pose.Position.z, 3, -1, 0, fx.RoomNumber);
-			TriggerShockwave(&fx.Pose, 48, 304, (GetRandomControl() & 0x1F) + 112, 128, 32, 32, 32, EulerAngles(ANGLE(12.0f), 0, 0), 0, true, false, (int)ShockwaveStyle::Normal);
+			TriggerShockwave(&fx.Pose, 48, 304, (GetRandomControl() & 0x1F) + 112, 128, 32, 32, 32, EulerAngles(ANGLE(12.0f), 0, 0), 0, true, true, false, (int)ShockwaveStyle::Normal);
 		}
 
 		if (hasHitPlayer)
@@ -152,7 +152,7 @@ void ControlNatlaGun(short fxNumber)
 		}
 
 		fxNumber = CreateNewEffect(pointColl.RoomNumber, ID_PROJ_BOMB, fx.Pose.Position);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto& fxNew = g_Level.Items[fxNumber];
@@ -169,7 +169,7 @@ void ControlNatlaGun(short fxNumber)
 short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
 	int fxNumber = CreateNewEffect(roomNumber, ID_PROJ_SHARD, Pose(x, y, z, 0, yRot, 0));
-	if (fxNumber != NO_ITEM)
+	if (fxNumber != NO_VALUE)
 	{
 		auto& fx = g_Level.Items[fxNumber];
 
@@ -187,7 +187,7 @@ short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 short BombGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
 	int fxNumber = CreateNewEffect(roomNumber, ID_PROJ_BOMB, Pose(x, y, z, 0, yRot, 0));
-	if (fxNumber != NO_ITEM)
+	if (fxNumber != NO_VALUE)
 	{
 		auto& fx = g_Level.Items[fxNumber];
 

@@ -142,7 +142,7 @@ namespace TEN::Entities::TR4
 	void TriggerRiseEffect(const ItemInfo& item)
 	{
 		int fxNumber = CreateNewEffect(item.RoomNumber, ID_BODY_PART, item.Pose);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto& fx = g_Level.Items[fxNumber];
@@ -177,7 +177,7 @@ namespace TEN::Entities::TR4
 		spark->xVel = phd_sin(fx.Pose.Orientation.y) * 4096;
 		spark->yVel = 0;
 		spark->zVel = phd_cos(fx.Pose.Orientation.y) * 4096;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->friction = 68;
 		spark->flags = 26;
 		spark->rotAng = GetRandomControl() & 0xFFF;
@@ -455,7 +455,7 @@ namespace TEN::Entities::TR4
 							item->AIBits & FOLLOW &&
 							(creature->ReachedGoal || laraAI.distance > SQUARE(BLOCK(2))))
 						{
-							if (item->Animation.RequiredState != NO_STATE)
+							if (item->Animation.RequiredState != NO_VALUE)
 								item->Animation.TargetState = item->Animation.RequiredState;
 							else if (Random::TestProbability(1 / 64.0f))
 								item->Animation.TargetState = 15;
@@ -480,7 +480,7 @@ namespace TEN::Entities::TR4
 							else
 								item->Animation.TargetState = SKELETON_STATE_ATTACK_3;
 						}
-						else if (item->HitStatus || item->Animation.RequiredState != NO_STATE)
+						else if (item->HitStatus || item->Animation.RequiredState != NO_VALUE)
 						{
 							if (Random::TestProbability(1 / 2.0f))
 							{

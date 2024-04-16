@@ -374,10 +374,9 @@ table Pendulum {
 	node: int32;
 }
 
-table EventSetCallCounters {
-	on_enter: int32;
-	on_inside: int32;
-	on_leave: int32;
+table EventSet {
+	index: int32;
+	call_counters: [int32];
 }
 
 table VolumeState {
@@ -395,6 +394,21 @@ table Volume {
 	rotation: Vector4;
 	scale: Vector3;
 	queue: [VolumeState];
+}
+
+table FishData {
+	is_patrolling: bool;
+	is_lethal: bool;
+	leader_item_number: int32;
+	life: float;
+	mesh_index: int32;
+	orientation: EulerAngles;
+	position: Vector3;
+	position_target: Vector3;
+	room_number: int32;
+	target_item_number: int32;
+	undulation: float;
+	velocity: float;
 }
 
 struct KeyValPair {
@@ -489,6 +503,7 @@ table SaveGame {
 	next_item_free: int32;
 	next_item_active: int32;
 	room_items: [int32];
+	fish_swarm: [FishData];
 	fixed_cameras: [FixedCamera];
 	sinks: [Sink];
 	static_meshes: [StaticMeshInfo];
@@ -508,15 +523,21 @@ table SaveGame {
 	action_queue: [int32];
 	soundtracks: [Soundtrack];
 	cd_flags: [int32];
+	postprocess_mode: int32;
+	postprocess_strength: float;
+	postprocess_tint: Vector3;
 	rope: Rope;
 	pendulum: Pendulum;
 	alternate_pendulum: Pendulum;
 	volumes: [Volume];
-	call_counters: [EventSetCallCounters];
+	global_event_sets: [EventSet];
+	volume_event_sets: [EventSet];
 	script_vars: UnionVec;
-	//at the moment there is no real reason to save the pre_start and
-	//post_start callbacks as OnStart will have already be called when a save
-	//is loaded, but we'll store them anyway for completeness
+	
+	// At the moment there is no real reason to save the pre_start and
+	// post_start callbacks as OnStart will have already be called when a save
+	// is loaded, but we'll store them anyway for completeness.
+	
 	callbacks_pre_start: [string];
 	callbacks_post_start: [string];
 	callbacks_pre_end: [string];
@@ -525,8 +546,8 @@ table SaveGame {
 	callbacks_post_save: [string];
 	callbacks_pre_load: [string];
 	callbacks_post_load: [string];
-	callbacks_pre_control: [string];
-	callbacks_post_control: [string];
-	}
+	callbacks_pre_loop: [string];
+	callbacks_post_loop: [string];
+}
 
 root_type TEN.Save.SaveGame;

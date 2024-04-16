@@ -24,7 +24,7 @@ static void BodyPartExplode(ItemInfo& fx)
 {
 	TriggerExplosionSparks(fx.Pose.Position.x, fx.Pose.Position.y, fx.Pose.Position.z, 3, -2, 0, fx.RoomNumber);
 	TriggerExplosionSparks(fx.Pose.Position.x, fx.Pose.Position.y, fx.Pose.Position.z, 3, -1, 0, fx.RoomNumber);
-	TriggerShockwave(&fx.Pose, 48, 304, (GetRandomControl() & 0x1F) + 112, 128, 32, 32, 32, EulerAngles(ANGLE(12.0f), 0, 0), 0, true, false, (int)ShockwaveStyle::Normal);
+	TriggerShockwave(&fx.Pose, 48, 304, (GetRandomControl() & 0x1F) + 112, 128, 32, 32, 32, EulerAngles(ANGLE(12.0f), 0, 0), 0, true, true, false, (int)ShockwaveStyle::Normal);
 	
 	if (ItemNearLara(fx.Pose.Position, BODY_PART_EXPLODE_DAMAGE_RANGE))
 		DoDamage(LaraItem, BODY_PART_EXPLODE_DAMAGE);

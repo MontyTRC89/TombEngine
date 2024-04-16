@@ -14,8 +14,8 @@ struct SinkInfo
 
 	SinkInfo(const Vector3& pos, int strength = 0, int boxIndex = 0)
 	{
-		this->Position = pos;
-		this->Strength = strength;
-		this->BoxIndex = boxIndex;
+		Position = pos;
+		Strength = strength;
+		BoxIndex = boxIndex;
 	}
 };

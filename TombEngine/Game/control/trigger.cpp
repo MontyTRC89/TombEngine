@@ -306,15 +306,15 @@ void RefreshCamera(short type, short* data)
 		if (!targetOk || (targetOk == 2 && Camera.item->LookedAt && Camera.item != Camera.lastItem))
 			Camera.item = nullptr;
 
-	if (Camera.number == -1 && Camera.timer > 0)
-		Camera.timer = -1;
+	if (Camera.number == NO_VALUE && Camera.timer > 0)
+		Camera.timer = NO_VALUE;
 }
 
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 {
-	auto bottomBlock = GetCollision(x, y, z, floor->Room).BottomBlock; 
+	auto bottomBlock = GetCollision(x, y, z, floor->RoomNumber).BottomBlock; 
 
-	if (bottomBlock->TriggerIndex == -1)
+	if (bottomBlock->TriggerIndex == NO_VALUE)
 		return nullptr;
 
 	return &g_Level.FloorData[bottomBlock->TriggerIndex];
@@ -322,7 +322,7 @@ short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 
 short* GetTriggerIndex(ItemInfo* item)
 {
-	auto roomNumber = item->RoomNumber;
+	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 	return GetTriggerIndex(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 }
@@ -396,7 +396,7 @@ void Trigger(short const value, short const flags)
 	}
 }
 
-void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activator, bool heavy, int heavyFlags)
+void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -750,8 +750,8 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 			break;
 
 		case TO_FINISH:
-			RequiredStartPos = false;
-			NextLevel = CurrentLevel + 1;
+			NextLevel = value ? value : (CurrentLevel + 1);
+			RequiredStartPos = timer;
 			break;
 
 		case TO_CD:
@@ -763,30 +763,37 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 			break;
 
 		case TO_SECRET:
-			if (!(Statistics.Level.Secrets & (1 << value)))
+			if (!(SaveGame::Statistics.Level.Secrets & (1 << value)))
 			{
 				PlaySecretTrack();
-				Statistics.Level.Secrets |= (1 << value);
-				Statistics.Game.Secrets++;
+				SaveGame::Statistics.Level.Secrets |= (1 << value);
+				SaveGame::Statistics.Game.Secrets++;
 			}
 			break;
 
-		case TO_LUAEVENT:
+		case TO_VOLUMEEVENT:
+		case TO_GLOBALEVENT:
 			trigger = *(data++);
-
-			if (g_Level.EventSets.size() > value)
 			{
-				auto& set = g_Level.EventSets[value];
+				auto& list = targetType == TO_VOLUMEEVENT ? g_Level.VolumeEventSets : g_Level.GlobalEventSets;
 
-				auto activatorType = heavy ? (int)VolumeActivatorFlags::Flyby | 
-											 (int)VolumeActivatorFlags::Moveable | 
-											 (int)VolumeActivatorFlags::NPC : (int)VolumeActivatorFlags::Player;
-
-				if (!((int)set.Activators & activatorType))
+				if (list.size() <= value)
 					continue;
 
+				auto& set = list[value];
+
+				if (targetType == TO_VOLUMEEVENT)
+				{
+					auto activatorType = heavy ? (int)ActivatorFlags::Flyby |
+												 (int)ActivatorFlags::Moveable |
+												 (int)ActivatorFlags::NPC : (int)ActivatorFlags::Player;
+
+					if (!((int)set.Activators & activatorType))
+						continue;
+				}
+
 				int eventType = trigger & TIMER_BITS;
-				if (eventType >= (int)VolumeEventType::Count)
+				if (eventType >= (int)EventType::Count)
 				{
 					TENLog("Unknown volume event type encountered for legacy trigger " + std::to_string(eventType), LogLevel::Warning);
 					continue;
@@ -814,7 +821,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, VolumeActivator activat
 
 void TestTriggers(ItemInfo* item, bool isHeavy, int heavyFlags)
 {
-	auto roomNumber = item->RoomNumber;
+	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
 	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, item->Index, isHeavy, heavyFlags);
@@ -834,45 +841,64 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ItemInfo* item)
 {
-	auto block = GetCollision(item).BottomBlock;
-	bool isLara = item->IsLara();
+	auto pointColl = GetCollision(item);
+	auto& sector = *GetCollision(item).BottomBlock;
 
-	// Monkeyswing and climb (only for Lara)
-	if (isLara)
+	bool isPlayer = item->IsLara();
+
+	// Set monkeyswing and wall climb statuses for player.
+	if (isPlayer)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 
-		// Set climb status
-		if (TestLaraNearClimbableWall(item, block))
-			lara->Control.CanClimbLadder = true;
+		// Set wall climb status.
+		if (TestLaraNearClimbableWall(item, &sector))
+		{
+			player.Control.CanClimbLadder = true;
+		}
 		else
-			lara->Control.CanClimbLadder = false;
+		{
+			player.Control.CanClimbLadder = false;
+		}
 
-		// Set monkeyswing status
-		lara->Control.CanMonkeySwing = block->Flags.Monkeyswing;
+		// Set monkey swing status.
+		player.Control.CanMonkeySwing = sector.Flags.Monkeyswing;
 	}
 
-	// Burn or drown item
-	if (block->Flags.Death && item->Pose.Position.y == item->Floor)
+	// Burn or drown item.
+	if (sector.Flags.Death && item->Pose.Position.y == item->Floor && pointColl.Position.Bridge == NO_VALUE)
 	{
-		if (isLara)
+		if (isPlayer)
 		{
+			const auto& player = GetLaraInfo(*item);
+
 			if (!IsJumpState((LaraState)item->Animation.ActiveState) || 
-				GetLaraInfo(item)->Control.WaterStatus != WaterStatus::Dry)
+				player.Control.WaterStatus != WaterStatus::Dry)
 			{
-				// To allow both lava and rapids in same level, also check floor material flag.
-				if (block->Material == MaterialType::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded)
+				// Check floor material.
+				auto material = sector.GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+				if (material == MaterialType::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded) // HACK: Allow both lava and rapids in same level.
+				{
 					KayakLaraRapidsDrown(item);
+				}
 				else
+				{
 					LavaBurn(item);
+				}
 			}
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 		{
-			if (block->Material == MaterialType::Water || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, block->Room))
-				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
+			auto material = sector.GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+			if (material == MaterialType::Water || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sector.RoomNumber))
+			{
+				// TODO: Implement correct rapids behaviour for other objects.
+				DoDamage(item, INT_MAX);
+			}
 			else
+			{
 				ItemBurn(item);
+			}
 		}
 	}
 }

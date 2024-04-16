@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.1.0 Lua API</title>
+    <title>TombEngine 1.3 Lua API</title>
     <link rel="stylesheet" href="ldoc.css" type="text/css" />
 </head>
 <body>
@@ -34,14 +34,18 @@
 <ul class="nowrap">
   <li>    <a href="1 modules/Effects.html">Effects</a></li>
   <li>    <a href="1 modules/Flow.html">Flow</a></li>
+  <li>    <a href="1 modules/Input.html">Input</a></li>
   <li>    <a href="1 modules/Inventory.html">Inventory</a></li>
   <li>    <a href="1 modules/Logic.html">Logic</a></li>
-  <li>    <a href="1 modules/Misc.html">Misc</a></li>
   <li>    <a href="1 modules/Objects.html">Objects</a></li>
+  <li>    <a href="1 modules/Sound.html">Sound</a></li>
   <li>    <a href="1 modules/Strings.html">Strings</a></li>
+  <li>    <a href="1 modules/Util.html">Util</a></li>
+  <li>    <a href="1 modules/View.html">View</a></li>
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
+  <li>    <a href="2 classes/View.DisplaySprite.html">View.DisplaySprite</a></li>
   <li>    <a href="2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
@@ -71,14 +75,19 @@
 <ul class="nowrap">
   <li>    <a href="4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
-  <li>    <a href="4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
-  <li>    <a href="4 enums/Misc.LogLevel.html">Misc.LogLevel</a></li>
-  <li>    <a href="4 enums/Misc.SoundTrackType.html">Misc.SoundTrackType</a></li>
+  <li>    <a href="4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
+  <li>    <a href="4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
+  <li>    <a href="4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
+  <li>    <a href="4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
+  <li>    <a href="4 enums/View.AlignMode.html">View.AlignMode</a></li>
+  <li>    <a href="4 enums/View.CameraType.html">View.CameraType</a></li>
+  <li>    <a href="4 enums/View.PostProcessMode.html">View.PostProcessMode</a></li>
+  <li>    <a href="4 enums/View.ScaleMode.html">View.ScaleMode</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
@@ -91,7 +100,7 @@
 <div id="content">
 
 
-  <h2>TombEngine 1.1.0 scripting interface</h2>
+  <h2>TombEngine 1.3 scripting interface</h2>
   <p>Welcome to the TombEngine scripting API. This is a work in progress and some information might be wrong or outdated. Please also note that this is primarily a reference document, not a tutorial, so expect descriptions to be fairly sparse.</p>
 
 <p>At the time of writing, there is a tutorial describing the basics of Lua, as well as a number of example scripts, on <a href="https://www.tombengine.com">the TombEngine website</a>.</p>
@@ -124,6 +133,10 @@ local door = GetMoveableByName("door_type4_14")
 		<td class="summary">Functions that (mostly) don't directly impact in-game mechanics.</td>
 	</tr>
 	<tr>
+		<td class="name"  ><a href="1 modules/Input.html">Input</a></td>
+		<td class="summary">Functions for input management.</td>
+	</tr>
+	<tr>
 		<td class="name"  ><a href="1 modules/Inventory.html">Inventory</a></td>
 		<td class="summary">Inventory manipulation</td>
 	</tr>
@@ -132,20 +145,32 @@ local door = GetMoveableByName("door_type4_14")
 		<td class="summary">Saving data, triggering functions, and callbacks for level-specific scripts.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="1 modules/Misc.html">Misc</a></td>
-		<td class="summary">Functions that don't fit in the other modules.</td>
-	</tr>
-	<tr>
 		<td class="name"  ><a href="1 modules/Objects.html">Objects</a></td>
 		<td class="summary">Moveables, statics, cameras, and so on.</td>
 	</tr>
 	<tr>
+		<td class="name"  ><a href="1 modules/Sound.html">Sound</a></td>
+		<td class="summary">Functions for sound management.</td>
+	</tr>
+	<tr>
 		<td class="name"  ><a href="1 modules/Strings.html">Strings</a></td>
-		<td class="summary">On-screen strings.</td>
+		<td class="summary">Display strings.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/Util.html">Util</a></td>
+		<td class="summary">Utility functions for various calculations.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/View.html">View</a></td>
+		<td class="summary">Functions to manage camera and game view.</td>
 	</tr>
 </table>
 <h2>2 Classes</h2>
 <table class="module_list">
+	<tr>
+		<td class="name"  ><a href="2 classes/View.DisplaySprite.html">View.DisplaySprite</a></td>
+		<td class="summary">Represents a display sprite.</td>
+	</tr>
 	<tr>
 		<td class="name"  ><a href="2 classes/Flow.Animations.html">Flow.Animations</a></td>
 		<td class="summary">New custom animations which Lara can perform.</td>
@@ -208,7 +233,7 @@ local door = GetMoveableByName("door_type4_14")
 	</tr>
 	<tr>
 		<td class="name"  ><a href="2 classes/Objects.Volume.html">Objects.Volume</a></td>
-		<td class="summary">Volumes</td>
+		<td class="summary">Activator volume.</td>
 	</tr>
 	<tr>
 		<td class="name"  ><a href="2 classes/Strings.DisplayString.html">Strings.DisplayString</a></td>
@@ -223,7 +248,7 @@ local door = GetMoveableByName("door_type4_14")
 	</tr>
 	<tr>
 		<td class="name"  ><a href="3 primitive classes/Rotation.html">Rotation</a></td>
-		<td class="summary">Represents a rotation.</td>
+		<td class="summary">Represents a degree-based 3D rotation.</td>
 	</tr>
 	<tr>
 		<td class="name"  ><a href="3 primitive classes/Vec2.html">Vec2</a></td>
@@ -231,7 +256,7 @@ local door = GetMoveableByName("door_type4_14")
 	</tr>
 	<tr>
 		<td class="name"  ><a href="3 primitive classes/Vec3.html">Vec3</a></td>
-		<td class="summary">Represents a 3D vector.</td>
+		<td class="summary">Represents a float-based 3D vector.</td>
 	</tr>
 </table>
 <h2>4 Enums</h2>
@@ -245,24 +270,20 @@ local door = GetMoveableByName("door_type4_14")
 		<td class="summary">Constants for effect IDs.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="4 enums/Misc.ActionID.html">Misc.ActionID</a></td>
+		<td class="name"  ><a href="4 enums/Flow.GameStatus.html">Flow.GameStatus</a></td>
+		<td class="summary">Constants for game statuses.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="4 enums/Input.ActionID.html">Input.ActionID</a></td>
 		<td class="summary">Constants for action key IDs.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="4 enums/Misc.CameraType.html">Misc.CameraType</a></td>
-		<td class="summary">Constants for the type of the Camera.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="4 enums/Misc.LogLevel.html">Misc.LogLevel</a></td>
-		<td class="summary">Constants for LogLevel IDs.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="4 enums/Misc.SoundTrackType.html">Misc.SoundTrackType</a></td>
-		<td class="summary">Constants for the type of the audio tracks.</td>
 	</tr>
 	<tr>
 		<td class="name"  ><a href="4 enums/Objects.AmmoType.html">Objects.AmmoType</a></td>
 		<td class="summary">Constants for player weapon ammo types.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></td>
+		<td class="summary">Constants for moveable statuses.</td>
 	</tr>
 	<tr>
 		<td class="name"  ><a href="4 enums/Objects.ObjID.html">Objects.ObjID</a></td>
@@ -275,6 +296,30 @@ local door = GetMoveableByName("door_type4_14")
 	<tr>
 		<td class="name"  ><a href="4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></td>
 		<td class="summary">Constants for room reverb types.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></td>
+		<td class="summary">Constants for the type of the audio tracks.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="4 enums/Util.LogLevel.html">Util.LogLevel</a></td>
+		<td class="summary">Constants for LogLevel IDs.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="4 enums/View.AlignMode.html">View.AlignMode</a></td>
+		<td class="summary">Constants for sprite align modes.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="4 enums/View.CameraType.html">View.CameraType</a></td>
+		<td class="summary">Constants for the type of the Camera.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="4 enums/View.PostProcessMode.html">View.PostProcessMode</a></td>
+		<td class="summary">Constants for the post-process effects to apply.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="4 enums/View.ScaleMode.html">View.ScaleMode</a></td>
+		<td class="summary">Constants for scale modes.</td>
 	</tr>
 </table>
 <h2>5 Lua utility modules</h2>
@@ -293,7 +338,6 @@ local door = GetMoveableByName("door_type4_14")
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-09-30 13:48:57 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

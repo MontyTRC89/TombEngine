@@ -44,7 +44,7 @@ namespace TEN::Entities::TR4
 
 						TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -2, 0, -item->RoomNumber);
 						TriggerExplosionSparks(sphere->x, sphere->y, sphere->z, 3, -1, 0, -item->RoomNumber);
-						TriggerShockwave((Pose*)sphere, 48, 304, (GetRandomControl() & 0x1F) + 112, 0, 96, 128, 32, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+						TriggerShockwave((Pose*)sphere, 48, 304, (GetRandomControl() & 0x1F) + 112, 0, 96, 128, 32, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 					}
 				}
 
@@ -57,7 +57,7 @@ namespace TEN::Entities::TR4
 			short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 
 			// Make the sentry gun explode?
-			while (currentItemNumber != NO_ITEM)
+			while (currentItemNumber != NO_VALUE)
 			{
 				auto* currentItem = &g_Level.Items[currentItemNumber];
 

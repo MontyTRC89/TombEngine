@@ -1,7 +1,7 @@
 #pragma once
 #include "Objects\objectslist.h"
 
-enum BLEND_MODES;
+enum class BlendMode;
 struct ItemInfo;
 
 namespace TEN::Effects
@@ -17,7 +17,7 @@ namespace TEN::Effects
 		unsigned int sprite;
 		GAME_OBJECT_ID sequence;
 		bool active;
-		BLEND_MODES blendMode;
+		BlendMode blendMode;
 	};
 	extern std::array<SimpleParticle, 15> simpleParticles;
 

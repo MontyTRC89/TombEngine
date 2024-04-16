@@ -48,7 +48,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dR = spark->dG / 2;
 		spark->dB = spark->dG / 2;
 		spark->sLife = 2;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->fadeToBlack = 0;
 		spark->flags = 20650;
 		spark->fxObj = itemNumber;
@@ -79,7 +79,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dB = 80;
 		spark->colFadeSpeed = 2;
 		spark->fadeToBlack = 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
 		spark->x = pos1->x + (GetRandomControl() & 0x1F);
 		spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;
@@ -112,7 +112,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dB = -128;
 		spark->colFadeSpeed = 2;
 		spark->fadeToBlack = 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
 		spark->x = pos1->x + (GetRandomControl() & 0x1F);
 		spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;
@@ -134,7 +134,7 @@ namespace TEN::Entities::Creatures::TR5
 	void SubmarineAttack(ItemInfo* item)
 	{
 		short itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 
 		auto* torpedoItem = &g_Level.Items[itemNumber];
@@ -395,7 +395,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		Vector3i pos;
 
-		if (item->ItemFlags[0] == NO_ITEM)
+		if (item->ItemFlags[0] == NO_VALUE)
 		{
 			bool found = false;
 			for (int i = g_Level.NumItems; i < 256; i++)
@@ -429,7 +429,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				pos.x = 4 * item->Animation.ActiveState;
 				pos.y = 4 * item->Animation.TargetState;
-				pos.z = 4 * (item->Animation.RequiredState == NO_STATE) ? 0 : item->Animation.RequiredState;
+				pos.z = 4 * (item->Animation.RequiredState == NO_VALUE) ? 0 : item->Animation.RequiredState;
 			}
 		}
 

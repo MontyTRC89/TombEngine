@@ -1,6 +1,6 @@
 #pragma once
 #include "Math/Math.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 enum class LaraWeaponType;
 enum GAME_OBJECT_ID : short;
@@ -142,7 +142,7 @@ struct Particle
 	unsigned char fadeToBlack;
 	int sLife;
 	int life;
-	BLEND_MODES blendMode;
+	BlendMode blendMode;
 	unsigned char extras;
 	signed char dynamic;
 	int fxObj;
@@ -261,9 +261,11 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vector3& color, int additional);
 void SpawnCorpseEffect(const Vector3& pos);
 void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale);
-void SpawnPlayerSplash(const ItemInfo& item, int waterHeight, int waterDepth);
+void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth);
 void Splash(ItemInfo* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
+
+void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff);

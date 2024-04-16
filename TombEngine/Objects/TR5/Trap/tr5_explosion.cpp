@@ -101,9 +101,9 @@ void ExplosionControl(short itemNumber)
 			if (item->ItemFlags[3])
 			{
 				if (flag == 2)
-					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 0, 96, 128, 24, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 0, 96, 128, 24, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 				else
-					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 128, 96, 0, 24, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+					TriggerShockwave(&pos, 48, 32 * item->ItemFlags[2] + 304, 4 * item->ItemFlags[2] + 96, 128, 96, 0, 24, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 			}
 
 			if (flag != 2)
@@ -129,49 +129,43 @@ void ExplosionControl(short itemNumber)
 				}
 			}
 
-			GetCollidedObjects(item, 2048, true, CollidedItems, CollidedMeshes, 1);
-			if (CollidedItems[0] || CollidedMeshes[0])
+			auto collObjects = GetCollidedObjects(*item, true, true, BLOCK(2), ObjectCollectionMode::All);
+			if (!collObjects.IsEmpty())
 			{
-				int i = 0;
-				while (CollidedItems[i])
+				for (auto* itemPtr : collObjects.ItemPtrs)
 				{
-					if (CollidedItems[i]->ObjectNumber >= ID_SMASH_OBJECT1 && CollidedItems[i]->ObjectNumber <= ID_SMASH_OBJECT16)
+					if (itemPtr->ObjectNumber >= ID_SMASH_OBJECT1 && itemPtr->ObjectNumber <= ID_SMASH_OBJECT16)
 					{
-						TriggerExplosionSparks(CollidedItems[i]->Pose.Position.x, CollidedItems[i]->Pose.Position.y, CollidedItems[i]->Pose.Position.z, 3, -2, 0, CollidedItems[i]->RoomNumber);
-						CollidedItems[i]->Pose.Position.y -= 128;
-						TriggerShockwave(&CollidedItems[i]->Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
-						CollidedItems[i]->Pose.Position.y += 128;
-						ExplodeItemNode(CollidedItems[i], 0, 0, 80);
-						SmashObject(CollidedItems[i]->Index);
-						KillItem(CollidedItems[i]->Index);
+						TriggerExplosionSparks(itemPtr->Pose.Position.x, itemPtr->Pose.Position.y, itemPtr->Pose.Position.z, 3, -2, 0, itemPtr->RoomNumber);
+						itemPtr->Pose.Position.y -= 128;
+						TriggerShockwave(&itemPtr->Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
+						itemPtr->Pose.Position.y += 128;
+						ExplodeItemNode(itemPtr, 0, 0, 80);
+						SmashObject(itemPtr->Index);
+						KillItem(itemPtr->Index);
 					}
-					else if (CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE7 && CollidedItems[i]->ObjectNumber != ID_SWITCH_TYPE8)
+					else if (itemPtr->ObjectNumber != ID_SWITCH_TYPE7 && itemPtr->ObjectNumber != ID_SWITCH_TYPE8)
 					{
-						if (Objects[CollidedItems[i]->ObjectNumber].intelligent)
-							DoExplosiveDamage(*LaraItem, *CollidedItems[i], *item, Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
+						if (Objects[itemPtr->ObjectNumber].intelligent)
+							DoExplosiveDamage(*LaraItem, *itemPtr, *item, Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
 					}
 					else
 					{
-						/* @FIXME This calls CrossbowHitSwitchType78() */
+						// @FIXME: This calls CrossbowHitSwitchType78()
 					}
-
-					++i;
 				}
 
-				i = 0;
-				while (CollidedMeshes[i])
+				for (auto* staticPtr : collObjects.StaticPtrs)
 				{
-					if (StaticObjects[CollidedMeshes[i]->staticNumber].shatterType != ShatterType::None)
+					if (StaticObjects[staticPtr->staticNumber].shatterType != ShatterType::None)
 					{
-						TriggerExplosionSparks(CollidedMeshes[i]->pos.Position.x, CollidedMeshes[i]->pos.Position.y, CollidedMeshes[i]->pos.Position.z, 3, -2, 0, item->RoomNumber);
-						CollidedMeshes[i]->pos.Position.y -= 128;
-						TriggerShockwave(&CollidedMeshes[i]->pos, 40, 176, 64, 128, 96, 0, 16, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
-						CollidedMeshes[i]->pos.Position.y += 128;
-						SoundEffect(GetShatterSound(CollidedMeshes[i]->staticNumber), &CollidedMeshes[i]->pos);
-						ShatterObject(NULL, CollidedMeshes[i], -128, item->RoomNumber, 0);
+						TriggerExplosionSparks(staticPtr->pos.Position.x, staticPtr->pos.Position.y, staticPtr->pos.Position.z, 3, -2, 0, item->RoomNumber);
+						staticPtr->pos.Position.y -= 128;
+						TriggerShockwave(&staticPtr->pos, 40, 176, 64, 128, 96, 0, 16, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
+						staticPtr->pos.Position.y += 128;
+						SoundEffect(GetShatterSound(staticPtr->staticNumber), &staticPtr->pos);
+						ShatterObject(nullptr, staticPtr, -128, item->RoomNumber, 0);
 					}
-
-					++i;
 				}
 
 				AlertNearbyGuards(item);

@@ -3,6 +3,8 @@
 
 #include "Game/control/control.h"
 #include "Math/Math.h"
+#include "Objects/Generic/Object/BridgeObject.h"
+#include "Objects/Generic/Object/Pushable/PushableBridge.h"
 
 using namespace TEN::Math;
 
@@ -40,14 +42,20 @@ namespace TEN::Entities::Generic
 		Oscillation = DEFAULT_OSC;
 
 		Stack.Limit = DEFAULT_STACK_LIMIT;
-		Stack.ItemNumberAbove = NO_ITEM;
-		Stack.ItemNumberBelow = NO_ITEM;
+		Stack.ItemNumberAbove = NO_VALUE;
+		Stack.ItemNumberBelow = NO_VALUE;
 
 		CanFall = false;
 		DoCenterAlign = true;
 		IsBuoyant = false;
 		UseRoomCollision = false;
 		UseBridgeCollision = false;
+
+		// Initialize bridge routines.
+		Bridge.GetFloorHeight = GetPushableBridgeFloorHeight;
+		Bridge.GetCeilingHeight = GetPushableBridgeCeilingHeight;
+		Bridge.GetFloorBorder = GetPushableBridgeFloorBorder;
+		Bridge.GetCeilingBorder = GetPushableBridgeCeilingBorder;
 
 		EdgeAttribs =
 		{
