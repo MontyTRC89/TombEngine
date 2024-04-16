@@ -218,17 +218,17 @@ void SetEntityTarget(short itemNum, short target)
 
 void ClearLOT(LOTInfo* LOT)
 {
-	LOT->Head = NO_BOX;
-	LOT->Tail = NO_BOX;
+	LOT->Head = NO_VALUE;
+	LOT->Tail = NO_VALUE;
 	LOT->SearchNumber = 0;
-	LOT->TargetBox = NO_BOX;
-	LOT->RequiredBox = NO_BOX;
+	LOT->TargetBox = NO_VALUE;
+	LOT->RequiredBox = NO_VALUE;
 
 	auto* node = LOT->Node.data();
 	for (auto& node : LOT->Node) 
 	{
-		node.exitBox = NO_BOX;
-		node.nextExpansion = NO_BOX;
+		node.exitBox = NO_VALUE;
+		node.nextExpansion = NO_VALUE;
 		node.searchNumber = 0;
 	}
 }

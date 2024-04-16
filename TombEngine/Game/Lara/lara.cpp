@@ -89,7 +89,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (!player.Control.IsLocked)
-		player.LocationPad = -1;
+		player.LocationPad = NO_VALUE;
 
 	// FAILSAFE: Force hand status reset.
 	if (item->Animation.AnimNumber == LA_STAND_IDLE &&
@@ -380,9 +380,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (HandleLaraVehicle(item, coll))
 		return;
 
-	// Handle player behavior state control.
 	HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Control);
-
 	HandleLaraMovementParameters(item, coll);
 	AnimateItem(item);
 

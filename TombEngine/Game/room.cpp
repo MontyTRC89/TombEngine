@@ -116,7 +116,7 @@ void DoFlipMap(int group)
 	FlipStats[group] = !FlipStats[group];
 
 	for (auto& creature : ActiveCreatures)
-		creature->LOT.TargetBox = NO_BOX;
+		creature->LOT.TargetBox = NO_VALUE;
 }
 
 bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID)

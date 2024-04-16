@@ -842,36 +842,42 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 void ProcessSectorFlags(ItemInfo* item)
 {
 	auto pointColl = GetCollision(item);
-	auto* sectorPtr = GetCollision(item).BottomBlock;
+	auto& sector = *GetCollision(item).BottomBlock;
 
 	bool isPlayer = item->IsLara();
 
-	// Monkeyswing and climb (only for Lara)
+	// Set monkeyswing and wall climb statuses for player.
 	if (isPlayer)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 
-		// Set climb status
-		if (TestLaraNearClimbableWall(item, sectorPtr))
-			lara->Control.CanClimbLadder = true;
+		// Set wall climb status.
+		if (TestLaraNearClimbableWall(item, &sector))
+		{
+			player.Control.CanClimbLadder = true;
+		}
 		else
-			lara->Control.CanClimbLadder = false;
+		{
+			player.Control.CanClimbLadder = false;
+		}
 
-		// Set monkeyswing status
-		lara->Control.CanMonkeySwing = sectorPtr->Flags.Monkeyswing;
+		// Set monkey swing status.
+		player.Control.CanMonkeySwing = sector.Flags.Monkeyswing;
 	}
 
-	// Burn or drown item
-	if (sectorPtr->Flags.Death && item->Pose.Position.y == item->Floor)
+	// Burn or drown item.
+	if (sector.Flags.Death && item->Pose.Position.y == item->Floor && pointColl.Position.Bridge == NO_VALUE)
 	{
 		if (isPlayer)
 		{
+			const auto& player = GetLaraInfo(*item);
+
 			if (!IsJumpState((LaraState)item->Animation.ActiveState) || 
-				GetLaraInfo(item)->Control.WaterStatus != WaterStatus::Dry)
+				player.Control.WaterStatus != WaterStatus::Dry)
 			{
-				// To allow both lava and rapids in same level, also check floor material flag.
-				if (sectorPtr->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water &&
-					Objects[ID_KAYAK_LARA_ANIMS].loaded)
+				// Check floor material.
+				auto material = sector.GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+				if (material == MaterialType::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded) // HACK: Allow both lava and rapids in same level.
 				{
 					KayakLaraRapidsDrown(item);
 				}
@@ -883,10 +889,11 @@ void ProcessSectorFlags(ItemInfo* item)
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 		{
-			if (sectorPtr->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water ||
-				TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sectorPtr->RoomNumber))
+			auto material = sector.GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+			if (material == MaterialType::Water || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sector.RoomNumber))
 			{
-				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
+				// TODO: Implement correct rapids behaviour for other objects.
+				DoDamage(item, INT_MAX);
 			}
 			else
 			{
