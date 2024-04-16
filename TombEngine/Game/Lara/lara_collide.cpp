@@ -494,6 +494,9 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 
 	if ((pointColl.Position.Floor - item->Pose.Position.y) < SWIM_WATER_DEPTH)
 		TestPlayerWaterStepOut(item, coll);
+	
+	if (waterHeight - item->Pose.Position.y <= -LARA_HEADROOM)
+		SetLaraSwimDiveAnimation(item);
 }
 
 void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
