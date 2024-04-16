@@ -145,7 +145,7 @@ namespace TEN::Entities::Creatures::TR3
 			float closestDist = INFINITY;
 			for (auto& targetItem : g_Level.Items)
 			{
-				if (!Objects.CheckID(targetItem.ObjectNumber) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
+				if (!Objects.CheckID(targetItem.ObjectNumber) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_VALUE)
 					continue;
 
 				if (SameZone(&creature, &targetItem) && item.TriggerFlags < 0)
@@ -371,7 +371,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			// Update fish room number.
 			if (pointColl.RoomNumber != fish.RoomNumber && 
-				pointColl.RoomNumber != NO_ROOM &&
+				pointColl.RoomNumber != NO_VALUE &&
 				TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
 			{
 				fish.RoomNumber = pointColl.RoomNumber;

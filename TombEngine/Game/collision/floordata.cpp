@@ -117,7 +117,7 @@ std::optional<int> FloorInfo::GetNextRoomNumber(int x, int z, bool isBelow) cons
 	const auto& tri = surface.Triangles[triID];
 
 	// Return portal room number below or above if it exists.
-	if (tri.PortalRoomNumber != NO_ROOM)
+	if (tri.PortalRoomNumber != NO_VALUE)
 		return tri.PortalRoomNumber;
 
 	return std::nullopt;
@@ -163,7 +163,7 @@ std::optional<int> FloorInfo::GetSideRoomNumber() const
 {
 	// Return side portal room number if it exists.
 	// TODO: Check how side portals work when a sector connects to multiple side rooms.
-	if (SidePortalRoomNumber != NO_ROOM)
+	if (SidePortalRoomNumber != NO_VALUE)
 		return SidePortalRoomNumber;
 
 	return std::nullopt;
