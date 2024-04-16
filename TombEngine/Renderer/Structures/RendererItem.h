@@ -36,6 +36,7 @@ namespace TEN::Renderer::Structures
 
 		int RoomNumber = NO_ROOM;
 		int PrevRoomNumber = NO_ROOM;
+
 		Vector4 Color;
 		Vector4 AmbientLight;
 		std::vector<RendererLight*> LightsToDraw;

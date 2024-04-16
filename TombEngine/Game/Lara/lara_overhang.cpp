@@ -351,8 +351,8 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Forward))
 	{
 		// Test for ledge over slope.
-		short tempRoom = probeUp.Block->GetNextRoomNumber(up.x, up.z, false).value_or(NO_ROOM);
-		if (tempRoom != NO_ROOM)
+		short tempRoom = probeUp.Block->GetNextRoomNumber(up.x, up.z, false).value_or(NO_VALUE);
+		if (tempRoom != NO_VALUE)
 		{
 			auto probeLedge = GetCollision(now.x, now.y - CLICK(3), now.z, tempRoom);
 

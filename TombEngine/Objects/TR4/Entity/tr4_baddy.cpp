@@ -1085,7 +1085,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (currentCreature->Enemy->RoomNumber == NO_ROOM ||
+				if (currentCreature->Enemy->RoomNumber == NO_VALUE ||
 					currentCreature->Enemy->Status == ITEM_INVISIBLE ||
 					currentCreature->Enemy->InDrawRoom)
 				{

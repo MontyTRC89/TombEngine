@@ -464,7 +464,7 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		weaponItemPtr->Animation.ActiveState =
 		weaponItemPtr->Animation.TargetState = WEAPON_STATE_DRAW;
 		weaponItemPtr->Status = ITEM_ACTIVE;
-		weaponItemPtr->RoomNumber = NO_ROOM;
+		weaponItemPtr->RoomNumber = NO_VALUE;
 		weaponItemPtr->Pose = laraItem.Pose;
 
 		player.LeftArm.FrameBase =

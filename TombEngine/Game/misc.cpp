@@ -115,7 +115,7 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist)
 	}
 
 	// Check for inaccessible sector.
-	if (pointColl.Block->Box == NO_ZONE)
+	if (pointColl.Block->Box == NO_VALUE)
 		return false;
 
 	// Check for stopper flag.

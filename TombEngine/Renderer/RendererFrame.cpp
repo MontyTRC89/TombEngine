@@ -45,7 +45,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		GetVisibleRooms(NO_ROOM, renderView.Camera.RoomNumber, VIEW_PORT, false, 0, onlyRooms, renderView);
+		GetVisibleRooms(NO_VALUE, renderView.Camera.RoomNumber, VIEW_PORT, false, 0, onlyRooms, renderView);
 
 		_invalidateCache = false; 
 
@@ -461,14 +461,14 @@ namespace TEN::Renderer
 				if (mesh->CacheLights || _invalidateCache)
 				{
 					// Collect all lights and return also cached light for the next frames
-					CollectLights(mesh->Pose.Position.ToVector3(),1024, room.RoomNumber, NO_ROOM, false, false, &cachedRoomLights, &lights);
+					CollectLights(mesh->Pose.Position.ToVector3(),1024, room.RoomNumber, NO_VALUE, false, false, &cachedRoomLights, &lights);
 					mesh->CacheLights = false;
 					mesh->CachedRoomLights = cachedRoomLights;
 				}
 				else
 				{
 					// Collecy only dynamic lights and use cached lights from rooms
-					CollectLights(mesh->Pose.Position.ToVector3(), 1024, room.RoomNumber, NO_ROOM, false, true, &mesh->CachedRoomLights, &lights);
+					CollectLights(mesh->Pose.Position.ToVector3(), 1024, room.RoomNumber, NO_VALUE, false, true, &mesh->CachedRoomLights, &lights);
 				}
 			}
 			mesh->LightsToDraw = lights;
@@ -548,7 +548,7 @@ namespace TEN::Renderer
 					if (light->Type == LightType::Sun)
 					{
 						// Suns from non-adjacent rooms are not added!
-						if (roomToCheck != roomNumber && (prevRoomNumber != roomToCheck || prevRoomNumber == NO_ROOM))
+						if (roomToCheck != roomNumber && (prevRoomNumber != roomToCheck || prevRoomNumber == NO_VALUE))
 						{
 							continue;
 						}
@@ -692,7 +692,7 @@ namespace TEN::Renderer
 	void Renderer::CollectLightsForCamera()
 	{
 		std::vector<RendererLight*> lightsToDraw;
-		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.RoomNumber, NO_ROOM, true, false, nullptr, &lightsToDraw);
+		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.RoomNumber, NO_VALUE, true, false, nullptr, &lightsToDraw);
 
 		if (lightsToDraw.size() > 0 && lightsToDraw.front()->CastShadows)
 		{
@@ -706,7 +706,7 @@ namespace TEN::Renderer
 	
 	void Renderer::CollectLightsForEffect(short roomNumber, RendererEffect* effect)
 	{
-		CollectLights(effect->Position, ITEM_LIGHT_COLLECTION_RADIUS, roomNumber, NO_ROOM, false, false, nullptr, &effect->LightsToDraw);
+		CollectLights(effect->Position, ITEM_LIGHT_COLLECTION_RADIUS, roomNumber, NO_VALUE, false, false, nullptr, &effect->LightsToDraw);
 	}
 
 	void Renderer::CollectLightsForItem(RendererItem* item)
@@ -719,7 +719,7 @@ namespace TEN::Renderer
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 
 		// Interpolate ambient light between rooms
-		if (item->PrevRoomNumber == NO_ROOM)
+		if (item->PrevRoomNumber == NO_VALUE)
 		{
 			item->PrevRoomNumber = nativeItem->RoomNumber;
 			item->RoomNumber = nativeItem->RoomNumber;
@@ -737,7 +737,7 @@ namespace TEN::Renderer
 			item->LightFade = std::clamp(item->LightFade, 0.0f, 1.0f);
 		}
 
-		if (item->PrevRoomNumber == NO_ROOM || item->LightFade == 1.0f)
+		if (item->PrevRoomNumber == NO_VALUE || item->LightFade == 1.0f)
 			item->AmbientLight = _rooms[nativeItem->RoomNumber].AmbientLight;
 		else
 		{
