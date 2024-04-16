@@ -24,6 +24,8 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
+#include "Game/control/box.h"
+#include "Game/control/los.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -1135,6 +1137,12 @@ void ControlWaterfallMist(short itemNumber)
 	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose);
 }
 
+static int CalculateParticleLife(int relFloorHeight, int yVel, int gravity)
+{
+	// Adjust the calculation as needed based on how you want particle life to scale with height, speed, and gravity
+	return (relFloorHeight * BLOCK(1.0f)) - (yVel / gravity);
+}
+
 void TriggerWaterfallMist(const ItemInfo& item)
 {
 	static const int scale = 3;
@@ -1183,6 +1191,20 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			auto* spark = GetFreeParticle();
 			spark->on = true;
 
+			auto orient = EulerAngles(item.Pose.Orientation.x - ANGLE(90.0f), item.Pose.Orientation.y, item.Pose.Orientation.z );
+			auto dir = orient.ToDirection();
+			auto rotMatrix = orient.ToRotationMatrix();
+
+			auto origin = GameVector(item.Pose.Position, item.RoomNumber);
+
+			//auto pointColl = GetCollision(item, dir, 0, BLOCK(8), 0);
+
+			auto pointColl =  GetCollision(origin.ToVector3i(), origin.RoomNumber, dir, BLOCK(8));
+
+			int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
+
+			g_Renderer.AddDebugLine(origin.ToVector3(), origin.ToVector3() + Vector3(0,relFloorHeight,0), Vector4(1, 0, 0, 1));
+
 			char colorOffset = (Random::GenerateInt(-8, 8));
 			spark->sR = std::clamp(int(startColor.x) + colorOffset, 0, UCHAR_MAX);
 			spark->sG = std::clamp(int(startColor.y) + colorOffset, 0, UCHAR_MAX);
@@ -1193,23 +1215,30 @@ void TriggerWaterfallMist(const ItemInfo& item)
 
 			spark->colFadeSpeed = 2;
 			spark->blendMode = BlendMode::Additive;
-			spark->life = spark->sLife = (GetRandomControl() & 3) + 46;
-			spark->fadeToBlack = 8;
+
+
+
+			spark->xVel = (800 * cos);
+			spark->yVel = -16 - (GetRandomControl() & 0xF);// Random::GenerateInt(-44, 44);
+			spark->zVel = (800 * sin);
+			spark->gravity = 104;
+
+			// Adjust particle life based on relative floor height, speed, and gravity
+			spark->life = spark->sLife = CalculateParticleLife(relFloorHeight, spark->yVel, spark->gravity);
+
+			spark->fadeToBlack = 0;
 
 			spark->x = offset * sign * sin + Random::GenerateInt(-8, 8) + item.Pose.Position.x;
 			spark->y = Random::GenerateInt(0, 16) + item.Pose.Position.y - 8;
 			spark->z = offset * sign * cos + Random::GenerateInt(-8, 8) + item.Pose.Position.z;
 
-			spark->xVel = (800 * cos);
-			spark->yVel = -16 - (GetRandomControl() & 0xF);// Random::GenerateInt(-44, 44);
-			spark->zVel = (800 * sin );
 
 			spark->friction = -2;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 			spark->scalar = scale;
 			spark->maxYvel = 0;
 			spark->rotAdd = Random::GenerateInt(-16, 16);
-			spark->gravity =104;
+
 			spark->sSize = spark->size = Random::GenerateInt(0, 5) * scale + size;
 			spark->dSize = 3 * spark->size;
 
