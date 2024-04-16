@@ -30,6 +30,19 @@ namespace TEN::Effects::Bubble
 		float Gravity			  = 0.0f;
 		float OscillationPeriod	  = 0.0f;
 		float OscillationVelocity = 0.0f;
+
+		Vector3 OldPosition = Vector3::Zero;
+		Vector4 OldColor	= Vector4::Zero;
+		Vector2 OldSize		= Vector2::Zero;
+		float OldLife		= 0.0f;
+
+		void StoreInterpolationData()
+		{
+			OldPosition = Position;
+			OldColor	 = Color;
+			OldSize		 = Size;
+			OldLife		 = Life;
+		}
 	};
 
 	extern std::vector<Bubble> Bubbles;

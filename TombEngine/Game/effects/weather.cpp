@@ -225,6 +225,8 @@ namespace TEN::Effects::Environment
 	{
 		for (auto& p : Particles)
 		{
+			p.StoreInterpolationData();
+
 			p.Life -= 2;
 
 			// Disable particle if it is dead. It will be cleaned on next call of

@@ -25,7 +25,7 @@ enum BodyPartFlags
 	BODY_NO_SHATTER_EFFECT	  = (1 << 13), // Remove shatter effect upon despawn.
 };
 
-struct SmokeSparkInfo
+struct SMOKE_SPARKS
 {
 	Vector3i position;
 	Vector3i velocity;
@@ -95,9 +95,24 @@ struct SHOCKWAVE_STRUCT
 
 	bool fadeIn = false;
 	bool HasLight = false;
+
+	short oldInnerRad;
+	short oldOuterRad;
+	byte oldR;
+	byte oldG;
+	byte oldB;
+
+	void StoreInterpolationData()
+	{
+		oldInnerRad = innerRad;
+		oldOuterRad = outerRad;
+		oldR = r;
+		oldG = g;
+		oldB = b;
+	}
 };
 
-struct GunshellInfo
+struct GUNSHELL_STRUCT
 {
 	Pose pos;
 	short fallspeed;
@@ -130,6 +145,23 @@ struct DRIP_STRUCT
 	short roomNumber;
 	byte outside;
 	byte pad;
+
+	int oldX;
+	int oldY;
+	int oldZ;
+	byte oldR;
+	byte oldG;
+	byte oldB;
+
+	void StoreInterpolationData()
+	{
+		oldX = x;
+		oldY = y;
+		oldZ = z;
+		oldR = r;
+		oldG = g;
+		oldB = b;
+	}
 };
 
 struct FIRE_LIST
@@ -224,8 +256,18 @@ struct BLOOD_STRUCT
 	int oldY;
 	int oldZ;
 	short oldRotAng;
-	unsigned char oldShade;
-	unsigned char oldSize;
+	byte oldShade;
+	byte oldSize;
+
+	void StoreInterpolationData()
+	{
+		oldX = x;
+		oldY = y;
+		oldZ = z;
+		oldRotAng = rotAng;
+		oldShade = shade;
+		oldSize = size;
+	}
 };
 
 enum class ShockwaveStyle
@@ -260,8 +302,8 @@ constexpr auto MAX_GUNSHELL = 24;
 constexpr auto MAX_SHOCKWAVE = 16;
 
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
-extern SmokeSparkInfo SmokeSparks[MAX_SPARKS_SMOKE];
-extern GunshellInfo Gunshells[MAX_GUNSHELL];
+extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];

@@ -48,7 +48,7 @@ using namespace TEN::Traps::TR5;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
-extern SmokeSparkInfo SmokeSparks[MAX_SPARKS_SMOKE];
+extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
 extern Particle Particles[MAX_PARTICLES];
@@ -277,7 +277,7 @@ namespace TEN::Renderer
 	{
 		for (int i = 0; i < 32; i++) 
 		{
-			SmokeSparkInfo* spark = &SmokeSparks[i];
+			SMOKE_SPARKS* spark = &SmokeSparks[i];
 
 			if (spark->on) 
 			{
@@ -495,8 +495,19 @@ namespace TEN::Renderer
 				}
 			}
 
-			float innerRadius = splash.innerRad;
-			float outerRadius = splash.outerRad;
+			byte oldColor = (splash.oldLife >= 32 ? 128 : (byte)((splash.oldLife / 32.0f) * 128));
+
+			if (!splash.isRipple)
+			{
+				if (splash.oldHeightSpeed < 0 && splash.oldHeight < 1024)
+				{
+					float multiplier = splash.oldHeight / 1024.0f;
+					oldColor = (float)oldColor * multiplier;
+				}
+			}
+
+			color = (byte)Lerp(oldColor, color, _interpolationFactor);
+
 			float xInner;
 			float zInner;
 			float xOuter;
@@ -507,6 +518,9 @@ namespace TEN::Renderer
 			float z2Outer;
 			float yInner = splash.y;
 			float yOuter = splash.y - splash.height;
+
+			float innerRadius = Lerp(splash.oldInnerRad, splash.innerRad, _interpolationFactor);
+			float outerRadius = Lerp(splash.oldOuterRad, splash.outerRad, _interpolationFactor);
 
 			for (int i = 0; i < NUM_POINTS; i++) 
 			{
@@ -527,12 +541,19 @@ namespace TEN::Renderer
 				x2Outer += splash.x;
 				z2Outer = outerRadius * cos(alpha * j * PI / 180);
 				z2Outer += splash.z;
+
 				AddQuad(&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
-							Vector3(xOuter, yOuter, zOuter), 
-							Vector3(x2Outer, yOuter, z2Outer), 
-							Vector3(x2Inner, yInner, z2Inner), 
-							Vector3(xInner, yInner, zInner), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
-							0, 1, { 0, 0 }, BlendMode::Additive, false, view);
+					Vector3(xOuter, yOuter, zOuter), 
+					Vector3(x2Outer, yOuter, z2Outer), 
+					Vector3(x2Inner, yInner, z2Inner), 
+					Vector3(xInner, yInner, zInner), 
+					Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
+					0, 
+					1, 
+					{ 0, 0 }, 
+					BlendMode::Additive, 
+					false, 
+					view);
 			}
 		}
 	}
@@ -552,8 +573,14 @@ namespace TEN::Renderer
 
 			AddSpriteBillboard(
 				&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble.SpriteIndex],
-				bubble.Position,
-				bubble.Color, 0.0f, 1.0f, bubble.Size / 2, BlendMode::Additive, true, view);
+				Vector3::Lerp(bubble.OldPosition, bubble.Position, _interpolationFactor),
+				Vector4::Lerp(bubble.OldColor, bubble.Color, _interpolationFactor),
+				0.0f,
+				1.0f, 
+				Vector2::Lerp(bubble.OldSize, bubble.Size, _interpolationFactor) / 2,
+				BlendMode::Additive, 
+				true, 
+				view);
 		}
 	}
 
@@ -573,10 +600,20 @@ namespace TEN::Renderer
 			auto axis = drip.Velocity;
 			drip.Velocity.Normalize(axis);
 
+			auto oldAxis = drip.OldVelocity;
+			drip.OldVelocity.Normalize(oldAxis);
+
 			AddSpriteBillboardConstrained(
 				&_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
-				drip.Position,
-				drip.Color, 0.0f, 1.0f, drip.Size, BlendMode::Additive, -axis, false, view);
+				Vector3::Lerp(drip.OldPosition, drip.Position, _interpolationFactor),
+				Vector4::Lerp(drip.OldColor, drip.Color, _interpolationFactor),
+				0.0f, 
+				1.0f,
+				Vector2::Lerp(drip.OldSize, drip.Size, _interpolationFactor),
+				BlendMode::Additive, 
+				-Vector3::Lerp(oldAxis, axis, _interpolationFactor),
+				false, 
+				view);
 		}
 	}
 
@@ -594,10 +631,21 @@ namespace TEN::Renderer
 			auto color = ripple.Color;
 			color.w = opacity;
 
+			float oldOpacity = ripple.OldColor.w * ((ripple.Flags & (int)RippleFlags::LowOpacity) ? 0.5f : 1.0f);
+			auto oldColor = ripple.OldColor;
+			oldColor.w = oldOpacity;
+
 			AddSpriteBillboardConstrainedLookAt(
 				&_sprites[ripple.SpriteIndex],
-				ripple.Position,
-				color, 0.0f, 1.0f, Vector2(ripple.Size * 2), BlendMode::Additive, ripple.Normal, true, view);
+				Vector3::Lerp(ripple.OldPosition, ripple.Position, _interpolationFactor),
+				Vector4::Lerp(oldColor, color, _interpolationFactor),
+				0.0f,
+				1.0f, 
+				Vector2(Lerp(ripple.OldSize, ripple.Size, _interpolationFactor) * 2),
+				BlendMode::Additive, 
+				ripple.Normal,
+				true,
+				view);
 		}
 	}
 
@@ -622,10 +670,30 @@ namespace TEN::Renderer
 			color.z = (int)std::clamp((int)color.z, 0, UCHAR_MAX);
 			color /= UCHAR_MAX;
 
+			auto oldColor = Vector4::Zero;
+			if (uwBlood.Init)
+				oldColor = Vector4(uwBlood.Init / 2, 0, uwBlood.Init / 16, UCHAR_MAX);
+			else
+				oldColor = Vector4(uwBlood.OldLife / 2, 0, uwBlood.OldLife / 16, UCHAR_MAX);
+
+			oldColor.x = (int)std::clamp((int)oldColor.x, 0, UCHAR_MAX);
+			oldColor.y = (int)std::clamp((int)oldColor.y, 0, UCHAR_MAX);
+			oldColor.z = (int)std::clamp((int)oldColor.z, 0, UCHAR_MAX);
+			oldColor /= UCHAR_MAX;
+
 			AddSpriteBillboard(
 				&_sprites[uwBlood.SpriteIndex],
-				uwBlood.Position,
-				color, 0.0f, 1.0f, Vector2(uwBlood.Size, uwBlood.Size) * 2, BlendMode::Additive, true, view);
+				Vector3::Lerp(uwBlood.OldPosition, uwBlood.Position, _interpolationFactor),
+				Vector4::Lerp(oldColor, color, _interpolationFactor),
+				0.0f,
+				1.0f, 
+				Vector2(
+					Lerp(uwBlood.OldSize, uwBlood.Size, _interpolationFactor), 
+					Lerp(uwBlood.OldSize, uwBlood.Size, _interpolationFactor)
+				) * 2,
+				BlendMode::Additive,
+				true, 
+				view);
 		}
 	}
 
@@ -659,6 +727,9 @@ namespace TEN::Renderer
 
 			auto pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
 
+			float innerRadius = Lerp(shockwave->oldInnerRad, shockwave->innerRad, _interpolationFactor);
+			float outerRadius = Lerp(shockwave->oldOuterRad, shockwave->outerRad, _interpolationFactor);
+
 			// Inner circle
 			if (shockwave->style == (int)ShockwaveStyle::Normal)
 			{
@@ -675,10 +746,10 @@ namespace TEN::Renderer
 				angle -= PI / 4.0f;
 			}
 
-			float x1 = (shockwave->innerRad * c);
-			float z1 = (shockwave->innerRad * s);
-			float x4 = (shockwave->outerRad * c);
-			float z4 = (shockwave->outerRad * s);
+			float x1 = (innerRadius * c);
+			float z1 = (innerRadius * s);
+			float x4 = (innerRadius * c);
+			float z4 = (innerRadius * s);
 
 			auto p1 = Vector3(x1, 0, z1);
 			auto p4 = Vector3(x4, 0, z4);
@@ -736,11 +807,11 @@ namespace TEN::Renderer
 				c = cos(angle);
 				s = sin(angle);
 
-				float x2 = (shockwave->innerRad * c);
-				float z2 = (shockwave->innerRad * s);
+				float x2 = (innerRadius * c);
+				float z2 = (innerRadius * s);
 
-				float x3 = (shockwave->outerRad * c);
-				float z3 = (shockwave->outerRad * s);
+				float x3 = (outerRadius * c);
+				float z3 = (outerRadius * s);
 
 				auto p2 = Vector3(x2, 0, z2);
 				auto p3 = Vector3(x3, 0, z3);
@@ -856,10 +927,14 @@ namespace TEN::Renderer
 
 				AddSpriteBillboard(
 					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
-					p.Position,
+					Vector3::Lerp(p.OldPosition, p.Position, _interpolationFactor),
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
-					0.0f, 1.0f, Vector2(p.Size),
-					BlendMode::Additive, true, view);
+					0.0f, 
+					1.0f, 
+					Vector2(Lerp(p.OldSize, p.Size, _interpolationFactor)),
+					BlendMode::Additive, 
+					true,
+					view);
 
 				break;
 
@@ -870,10 +945,14 @@ namespace TEN::Renderer
 
 				AddSpriteBillboard(
 					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
-					p.Position,
+					Vector3::Lerp(p.OldPosition, p.Position, _interpolationFactor),
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
-					0.0f, 1.0f, Vector2(p.Size),
-					BlendMode::Additive, true, view);
+					0.0f,
+					1.0f, 
+					Vector2(Lerp(p.OldSize, p.Size, _interpolationFactor)),
+					BlendMode::Additive,
+					true,
+					view);
 
 				break;
 
@@ -887,9 +966,15 @@ namespace TEN::Renderer
 
 				AddSpriteBillboardConstrained(
 					&_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
-					p.Position,
+					Vector3::Lerp(p.OldPosition, p.Position, _interpolationFactor),
 					Vector4(0.8f, 1.0f, 1.0f, p.Transparency()),
-					0.0f, 1.0f, Vector2(RAIN_WIDTH, p.Size), BlendMode::Additive, -v, true, view);
+					0.0f,
+					1.0f,
+					Vector2(RAIN_WIDTH, Lerp(p.OldSize, p.Size, _interpolationFactor)),
+					BlendMode::Additive, 
+					-v, 
+					true, 
+					view);
 
 				break;
 			}

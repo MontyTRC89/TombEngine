@@ -15,6 +15,21 @@ namespace TEN::Effects::Drip
 		float Life	  = 0.0f;
 		float LifeMax = 0.0f;
 		float Gravity = 0.0f;
+
+		Vector3 OldPosition = Vector3::Zero;
+		Vector4 OldColor	= Vector4::Zero;
+		Vector2 OldSize		= Vector2::Zero;
+		float OldLife		= 0.0f;
+		Vector3 OldVelocity = Vector3::Zero;
+
+		void StoreInterpolationData()
+		{
+			OldPosition = Position;
+			OldColor	 = Color;
+			OldSize		 = Size;
+			OldLife		 = Life;
+			OldVelocity	 = Velocity;
+		}
 	};
 
 	extern std::vector<Drip> Drips;

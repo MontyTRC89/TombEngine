@@ -195,6 +195,8 @@ void UpdateSparks()
 
 		if (spark->on)
 		{
+			spark->StoreInterpolationData();
+
 			spark->life--;
 
 			if (!spark->life)
@@ -1046,6 +1048,8 @@ void UpdateSplashes()
 
 		if (splash.isActive)
 		{
+			splash.StoreInterpolationData();
+
 			splash.life--;
 			if (splash.life <= 0)
 				splash.isActive = false;

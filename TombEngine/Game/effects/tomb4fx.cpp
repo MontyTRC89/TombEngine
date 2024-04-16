@@ -47,8 +47,8 @@ int NextBlood = 0;
 int NextGunShell = 0;
 
 FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
-SmokeSparkInfo SmokeSparks[MAX_SPARKS_SMOKE];
-GunshellInfo Gunshells[MAX_GUNSHELL];
+SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 FIRE_LIST Fires[MAX_FIRE_LIST];
@@ -492,7 +492,7 @@ void UpdateFireSparks()
 
 int GetFreeSmokeSpark() 
 {
-	SmokeSparkInfo* spark = &SmokeSparks[NextSmokeSpark];
+	SMOKE_SPARKS* spark = &SmokeSparks[NextSmokeSpark];
 	int sparkNum = NextSmokeSpark;
 	short minLife = 4095;
 	short minIndex = 0;
@@ -532,7 +532,7 @@ void UpdateSmoke()
 {
 	for (int i = 0; i < MAX_SPARKS_SMOKE; i++)
 	{
-		SmokeSparkInfo* spark = &SmokeSparks[i];
+		SMOKE_SPARKS* spark = &SmokeSparks[i];
 
 		if (spark->on)
 		{
@@ -652,7 +652,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 
 void TriggerShatterSmoke(int x, int y, int z)
 {
-	SmokeSparkInfo* spark = &SmokeSparks[GetFreeSmokeSpark()];
+	SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
 	
 	spark->on = true;
 	spark->sShade = 0;
@@ -786,12 +786,7 @@ void UpdateBlood()
 				continue;
 			}
 
-			blood->oldX = blood->x;
-			blood->oldY = blood->y;
-			blood->oldZ = blood->z;
-			blood->oldRotAng = blood->rotAng;
-			blood->oldSize = blood->size;
-			blood->oldShade = blood->shade;
+			blood->StoreInterpolationData();
 
 			if (blood->sLife - blood->life >= blood->colFadeSpeed)
 			{
@@ -843,7 +838,7 @@ int GetFreeGunshell()
 
 	while (true)
 	{
-		GunshellInfo* gs = &Gunshells[NextGunShell];
+		GUNSHELL_STRUCT* gs = &Gunshells[NextGunShell];
 
 		if (!gs->counter)
 			break;
@@ -1393,6 +1388,8 @@ void UpdateShockwaves()
 	{
 		if (shockwave.life <= 0)
 			continue;
+
+		shockwave.StoreInterpolationData();
 
 		shockwave.life--;
 

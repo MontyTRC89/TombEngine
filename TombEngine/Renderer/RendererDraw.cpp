@@ -39,7 +39,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
 using namespace TEN::Renderer::Structures;
 
-extern GunshellInfo Gunshells[MAX_GUNSHELL];
+extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
 namespace TEN::Renderer
 {

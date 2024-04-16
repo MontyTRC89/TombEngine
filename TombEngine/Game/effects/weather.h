@@ -22,6 +22,19 @@ namespace TEN::Effects::Environment
 		bool Stopped = false;
 
 		float Transparency() const;
+
+		Vector3 OldPosition = Vector3::Zero;
+		Vector3 OldVelocity = Vector3::Zero;
+		float OldSize = 0.0f;
+		float OldLife = 0.0f;
+
+		void StoreInterpolationData()
+		{
+			OldPosition = Position;
+			OldVelocity = Velocity;
+			OldSize = Size;
+			OldLife = Life;
+		}
 	};
 
 	class EnvironmentController

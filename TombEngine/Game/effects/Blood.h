@@ -19,6 +19,16 @@ namespace TEN::Effects::Blood
 		Vector4 OldColor	= Vector4::Zero;
 		float OldSize = 0.0f;
 		float OldOpacity = 0.0f;
+		float OldLife = 0.0f;
+
+		void StoreInterpolationData()
+		{
+			OldPosition = Position;
+			OldColor	 = Color;
+			OldSize		 = Size;
+			OldOpacity	 = Opacity;
+			OldLife		 = Life;
+		}
 	};
 
 	extern std::vector<UnderwaterBlood> UnderwaterBloodParticles;

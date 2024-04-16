@@ -110,17 +110,6 @@ struct SPLASH_SETUP
 	int room;
 };
 
-struct RIPPLE_STRUCT
-{
-	int x;
-	int y;
-	int z;
-	char flags;
-	unsigned char life;
-	unsigned char size;
-	unsigned char init;
-};
-
 struct Particle
 {
 	int x;
@@ -160,6 +149,27 @@ struct Particle
 	int fxObj;
 	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
+
+	int oldX;
+	int oldY;
+	int oldZ;
+	short oldRotAng;
+	byte oldR;
+	byte oldG; 
+	byte oldB;
+	byte oldScalar;
+
+	void StoreInterpolationData()
+	{
+		oldX = x;
+		oldY = y;
+		oldZ = z;
+		oldRotAng = rotAng;
+		oldR = r;
+		oldG = g;
+		oldB = b;
+		oldScalar = scalar;
+	}
 };
 
 struct SPLASH_STRUCT
@@ -181,6 +191,27 @@ struct SPLASH_STRUCT
 	unsigned short life;
 	bool isRipple;
 	bool isActive;
+
+	float oldX;
+	float oldY;
+	float oldZ;
+	float oldInnerRad;
+	float oldOuterRad;
+	float oldHeight;
+	unsigned short oldLife;
+	float oldHeightSpeed;
+
+	void StoreInterpolationData()
+	{
+		oldX = x;
+		oldY = y;
+		oldZ = z;
+		oldInnerRad = innerRad;
+		oldOuterRad = outerRad;
+		oldHeight = height;
+		oldLife = life;
+		oldHeightSpeed = heightSpeed;
+	}
 };
 
 struct ParticleDynamic
