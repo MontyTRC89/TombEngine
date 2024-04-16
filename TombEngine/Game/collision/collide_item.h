@@ -1,23 +1,26 @@
 #pragma once
+#include "Game/collision/Point.h"
 #include "Math/Math.h"
 
-namespace TEN::Collision::Point { class PointCollisionData; };
+using namespace TEN::Collision::Point;
+
 class FloorInfo;
 struct CollisionInfo;
 struct CollisionResult;
 struct ItemInfo;
 struct MESH_INFO;
 
-using namespace TEN::Collision::Point;
-
-constexpr auto MAX_COLLIDED_OBJECTS = 1024;
-constexpr auto ITEM_RADIUS_YMAX = BLOCK(3);
-
+constexpr auto ITEM_RADIUS_YMAX					   = BLOCK(3);
 constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30.0f;
 
 extern GameBoundingBox GlobalCollisionBounds;
-extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
-extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
+
+enum class ObjectCollectionMode
+{
+	All,
+	Items,
+	Statics
+};
 
 struct ObjectCollisionBounds
 {
@@ -25,8 +28,16 @@ struct ObjectCollisionBounds
 	std::pair<EulerAngles, EulerAngles> OrientConstraint = {};
 };
 
+struct CollidedObjectData
+{
+	std::vector<ItemInfo*>	ItemPtrs   = {};
+	std::vector<MESH_INFO*> StaticPtrs = {};
+
+	bool IsEmpty() const { return (ItemPtrs.empty() && StaticPtrs.empty()); };
+};
+
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara);
+CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible, bool ignorePlayer, float customRadius = 0.0f, ObjectCollectionMode mode = ObjectCollectionMode::All);
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll);
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll);
 

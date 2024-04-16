@@ -308,15 +308,15 @@ void RefreshCamera(short type, short* data)
 		if (!targetOk || (targetOk == 2 && Camera.item->LookedAt && Camera.item != Camera.lastItem))
 			Camera.item = nullptr;
 
-	if (Camera.number == -1 && Camera.timer > 0)
-		Camera.timer = -1;
+	if (Camera.number == NO_VALUE && Camera.timer > 0)
+		Camera.timer = NO_VALUE;
 }
 
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 {
 	const auto& bottomSector = GetPointCollision(Vector3i(x, y, z), floor->RoomNumber).GetBottomSector(); 
 
-	if (bottomSector.TriggerIndex == -1)
+	if (bottomSector.TriggerIndex == NO_VALUE)
 		return nullptr;
 
 	return &g_Level.FloorData[bottomSector.TriggerIndex];
@@ -324,7 +324,7 @@ short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 
 short* GetTriggerIndex(ItemInfo* item)
 {
-	auto roomNumber = item->RoomNumber;
+	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 	return GetTriggerIndex(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 }
@@ -823,7 +823,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 
 void TestTriggers(ItemInfo* item, bool isHeavy, int heavyFlags)
 {
-	auto roomNumber = item->RoomNumber;
+	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
 	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, item->Index, isHeavy, heavyFlags);
@@ -844,36 +844,42 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 void ProcessSectorFlags(ItemInfo* item)
 {
 	auto pointColl = GetPointCollision(*item);
-	auto* sectorPtr = &GetPointCollision(*item).GetBottomSector();
+	auto& sector = GetPointCollision(*item).GetBottomSector();
 
 	bool isPlayer = item->IsLara();
 
-	// Monkeyswing and climb (only for Lara)
+	// Set monkeyswing and wall climb statuses for player.
 	if (isPlayer)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 
-		// Set climb status
-		if (TestLaraNearClimbableWall(item, sectorPtr))
-			lara->Control.CanClimbLadder = true;
+		// Set wall climb status.
+		if (TestLaraNearClimbableWall(item, &sector))
+		{
+			player.Control.CanClimbLadder = true;
+		}
 		else
-			lara->Control.CanClimbLadder = false;
+		{
+			player.Control.CanClimbLadder = false;
+		}
 
-		// Set monkeyswing status
-		lara->Control.CanMonkeySwing = sectorPtr->Flags.Monkeyswing;
+		// Set monkey swing status.
+		player.Control.CanMonkeySwing = sector.Flags.Monkeyswing;
 	}
 
-	// Burn or drown item
-	if (sectorPtr->Flags.Death && item->Pose.Position.y == item->Floor)
+	// Burn or drown item.
+	if (sector.Flags.Death && item->Pose.Position.y == item->Floor && pointColl.GetFloorBridgeItemNumber() == NO_VALUE)
 	{
 		if (isPlayer)
 		{
+			const auto& player = GetLaraInfo(*item);
+
 			if (!IsJumpState((LaraState)item->Animation.ActiveState) || 
-				GetLaraInfo(item)->Control.WaterStatus != WaterStatus::Dry)
+				player.Control.WaterStatus != WaterStatus::Dry)
 			{
-				// To allow both lava and rapids in same level, also check floor material flag.
-				if (sectorPtr->GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true) == MaterialType::Water &&
-					Objects[ID_KAYAK_LARA_ANIMS].loaded)
+				// Check floor material.
+				auto material = sector.GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true);
+				if (material == MaterialType::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded) // HACK: Allow both lava and rapids in same level.
 				{
 					KayakLaraRapidsDrown(item);
 				}
@@ -885,10 +891,11 @@ void ProcessSectorFlags(ItemInfo* item)
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 		{
-			if (sectorPtr->GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true) == MaterialType::Water ||
-				TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sectorPtr->RoomNumber))
+			auto material = sector.GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true);
+			if (material == MaterialType::Water || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sector.RoomNumber))
 			{
-				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
+				// TODO: Implement correct rapids behaviour for other objects.
+				DoDamage(item, INT_MAX);
 			}
 			else
 			{

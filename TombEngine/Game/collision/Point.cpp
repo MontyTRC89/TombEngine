@@ -116,7 +116,7 @@ namespace TEN::Collision::Point
 			return *_floorNormal;
 
 		// Set floor normal.
-		if (GetFloorBridgeItemNumber() != NO_ITEM)
+		if (GetFloorBridgeItemNumber() != NO_VALUE)
 		{
 			_floorNormal = GetBridgeNormal(true);
 		}
@@ -134,7 +134,7 @@ namespace TEN::Collision::Point
 			return *_ceilingNormal;
 
 		// Set ceiling normal.
-		if (GetCeilingBridgeItemNumber() != NO_ITEM)
+		if (GetCeilingBridgeItemNumber() != NO_VALUE)
 		{
 			_ceilingNormal = GetBridgeNormal(false);
 		}
@@ -214,7 +214,7 @@ namespace TEN::Collision::Point
 	bool PointCollisionData::IsIllegalFloor()
 	{
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetFloorNormal());
-		short illegalSlopeAngle = (GetFloorBridgeItemNumber() != NO_ITEM) ?
+		short illegalSlopeAngle = (GetFloorBridgeItemNumber() != NO_VALUE) ?
 			DEFAULT_ILLEGAL_FLOOR_SLOPE_ANGLE :
 			GetBottomSector().GetSurfaceIllegalSlopeAngle(_position.x, _position.z, true);
 		
@@ -224,7 +224,7 @@ namespace TEN::Collision::Point
 	bool PointCollisionData::IsIllegalCeiling()
 	{
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetCeilingNormal(), -Vector3::UnitY);
-		short illegalSlopeAngle = (GetCeilingBridgeItemNumber() != NO_ITEM) ?
+		short illegalSlopeAngle = (GetCeilingBridgeItemNumber() != NO_VALUE) ?
 			DEFAULT_ILLEGAL_CEILING_SLOPE_ANGLE :
 			GetTopSector().GetSurfaceIllegalSlopeAngle(_position.x, _position.z, false);
 		

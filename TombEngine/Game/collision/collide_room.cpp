@@ -121,7 +121,7 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 	return collided;
 }
 
-static CollisionPositionData GetCollisionPositionData(PointCollisionData& pointColl)
+static CollisionPositionData GetCollisionPosition(PointCollisionData& pointColl)
 {
 	auto collPos = CollisionPositionData{};
 	collPos.Floor = pointColl.GetFloorHeight();
@@ -327,7 +327,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (ceiling != NO_HEIGHT)
 		ceiling -= probePos.y;
 
-	coll->Middle = GetCollisionPositionData(pointColl);
+	coll->Middle = GetCollisionPosition(pointColl);
 	coll->Middle.Floor = height;
 	coll->Middle.Ceiling = ceiling;
 
@@ -370,7 +370,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (ceiling != NO_HEIGHT)
 		ceiling -= probePos.y;
 
-	coll->Front = GetCollisionPositionData(pointColl);
+	coll->Front = GetCollisionPosition(pointColl);
 	coll->Front.Floor = height;
 	coll->Front.Ceiling = ceiling;
 
@@ -418,7 +418,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (ceiling != NO_HEIGHT)
 		ceiling -= probePos.y;
 
-	coll->MiddleLeft = GetCollisionPositionData(pointColl);
+	coll->MiddleLeft = GetCollisionPosition(pointColl);
 	coll->MiddleLeft.Floor = height;
 	coll->MiddleLeft.Ceiling = ceiling;
 
@@ -449,7 +449,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (ceiling != NO_HEIGHT)
 		ceiling -= probePos.y;
 
-	coll->FrontLeft = GetCollisionPositionData(pointColl);
+	coll->FrontLeft = GetCollisionPosition(pointColl);
 	coll->FrontLeft.Floor = height;
 	coll->FrontLeft.Ceiling = ceiling;
 
@@ -484,7 +484,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (ceiling != NO_HEIGHT)
 		ceiling -= probePos.y;
 
-	coll->MiddleRight = GetCollisionPositionData(pointColl);
+	coll->MiddleRight = GetCollisionPosition(pointColl);
 	coll->MiddleRight.Floor = height;
 	coll->MiddleRight.Ceiling = ceiling;
 
@@ -514,7 +514,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	if (ceiling != NO_HEIGHT)
 		ceiling -= probePos.y;
 
-	coll->FrontRight = GetCollisionPositionData(pointColl);
+	coll->FrontRight = GetCollisionPosition(pointColl);
 	coll->FrontRight.Floor = height;
 	coll->FrontRight.Ceiling = ceiling;
 

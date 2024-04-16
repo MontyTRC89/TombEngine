@@ -70,7 +70,7 @@ namespace TEN::Entities::TR4
 				}
 
 				short beetleNumber = GetFreeBeetle();
-				if (beetleNumber != NO_ITEM)
+				if (beetleNumber != NO_VALUE)
 				{
 					auto* beetle = &BeetleSwarm[beetleNumber];
 
@@ -128,7 +128,7 @@ namespace TEN::Entities::TR4
 			}
 
 			if (++i >= NUM_BEETLES)
-				return NO_ITEM;
+				return NO_VALUE;
 		}
 
 		NextBeetle = (result + 1) & (NUM_BEETLES - 1);

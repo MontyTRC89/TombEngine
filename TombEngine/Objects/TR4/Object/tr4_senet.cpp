@@ -331,7 +331,7 @@ void SenetPieceExplosionEffect(ItemInfo* item, int color, int speed)
 void TriggerItemInRoom(short room_number, int object)//originally this is in deltapak
 {
 	short num = g_Level.Rooms[room_number].itemNumber;
-	while (num != NO_ITEM)
+	while (num != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[num];
 		short nex = item->NextItem;

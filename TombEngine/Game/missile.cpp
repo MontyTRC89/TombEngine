@@ -154,7 +154,7 @@ void ControlNatlaGun(short fxNumber)
 		}
 
 		fxNumber = CreateNewEffect(pointColl.GetRoomNumber());
-		if (fxNumber != NO_ITEM)
+		if (fxNumber != NO_VALUE)
 		{
 			auto& fxNew = EffectList[fxNumber];
 
@@ -171,7 +171,7 @@ void ControlNatlaGun(short fxNumber)
 short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
 	int fxNumber = CreateNewEffect(roomNumber);
-	if (fxNumber != NO_ITEM)
+	if (fxNumber != NO_VALUE)
 	{
 		auto& fx = EffectList[fxNumber];
 
@@ -191,7 +191,7 @@ short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 short BombGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
 	int fxNumber = CreateNewEffect(roomNumber);
-	if (fxNumber != NO_ITEM)
+	if (fxNumber != NO_VALUE)
 	{
 		auto& fx = EffectList[fxNumber];
 

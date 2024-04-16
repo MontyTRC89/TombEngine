@@ -62,7 +62,7 @@ namespace TEN::Entities::Creatures::TR3
 	static void ShootHarpoon(ItemInfo* item, Vector3i pos, short velocity, short yRot, short roomNumber)
 	{
 		short harpoonItemNumber = CreateItem();
-		if (harpoonItemNumber == NO_ITEM)
+		if (harpoonItemNumber == NO_VALUE)
 			return;
 
 		auto* harpoonItem = &g_Level.Items[harpoonItemNumber];

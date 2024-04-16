@@ -133,7 +133,7 @@ short FindBridge(int tiltGrade, short orient, Vector3i& pos, int* returnHeight, 
 		}
 	}
 
-	return NO_ITEM;
+	return NO_VALUE;
 }
 
 // Get the signed difference between two orientations.

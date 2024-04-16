@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_initialise.h"
 
+#include "Game/collision/Point.h"
 #include "Game/Hud/Hud.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -18,6 +19,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Player;
 using namespace TEN::Hud;
 
@@ -29,14 +31,14 @@ GAME_OBJECT_ID		PlayerVehicleObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
 
 void BackupLara()
 {
-	if (LaraItem == nullptr || LaraItem->Index == NO_ITEM)
+	if (LaraItem == nullptr || LaraItem->Index == NO_VALUE)
 		return;
 
 	PlayerHitPoints = LaraItem->HitPoints;
 	memcpy(&PlayerBackup, &Lara, sizeof(LaraInfo));
 	memcpy(&PlayerAnim, &LaraItem->Animation, sizeof(EntityAnimationData));
 
-	if (Lara.Context.Vehicle != NO_ITEM)
+	if (Lara.Context.Vehicle != NO_VALUE)
 	{
 		PlayerVehicleObjectID = g_Level.Items[Lara.Context.Vehicle].ObjectNumber;
 	}
@@ -48,15 +50,15 @@ void BackupLara()
 
 void InitializeLara(bool restore)
 {
-	if (LaraItem == nullptr || LaraItem->Index == NO_ITEM)
+	if (LaraItem == nullptr || LaraItem->Index == NO_VALUE)
 		return;
 
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
 	LaraItem->Data = &Lara;
-	Lara.Context = PlayerContext(*LaraItem, LaraCollision);
-
 	LaraItem->Collidable = false;
+	
+	Lara.Context = PlayerContext(*LaraItem, LaraCollision);
 
 	Lara.Status.Air = LARA_AIR_MAX;
 	Lara.Status.Exposure = LARA_EXPOSURE_MAX;
@@ -64,15 +66,15 @@ void InitializeLara(bool restore)
 	Lara.Status.Stamina = LARA_STAMINA_MAX;
 
 	Lara.Control.Look.Mode = LookMode::None;
-	Lara.HitDirection = -1;
-	Lara.Control.Weapon.WeaponItem = NO_ITEM;
+	Lara.HitDirection = NO_VALUE;
+	Lara.Control.Weapon.WeaponItem = NO_VALUE;
 	Lara.Context.WaterSurfaceDist = 100;
 
-	Lara.ExtraAnim = NO_ITEM;
-	Lara.Context.Vehicle = NO_ITEM;
-	Lara.Location = -1;
-	Lara.HighestLocation = -1;
-	Lara.Control.Rope.Ptr = -1;
+	Lara.ExtraAnim = NO_VALUE;
+	Lara.Context.Vehicle = NO_VALUE;
+	Lara.Location = NO_VALUE;
+	Lara.HighestLocation = NO_VALUE;
+	Lara.Control.Rope.Ptr = NO_VALUE;
 	Lara.Control.HandStatus = HandStatus::Free;
 
 	InitializePlayerStateMachine();
@@ -131,8 +133,8 @@ void InitializeLaraAnims(ItemInfo* item)
 		player.Control.WaterStatus = WaterStatus::Dry;
 
 		// Allow player to start in crawl idle anim if start position is too low.
-		auto pointColl = GetCollision(item);
-		if (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT)
+		auto pointColl = GetPointCollision(*item);
+		if (abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight()) < LARA_HEIGHT)
 		{
 			SetAnimation(item, LA_CRAWL_IDLE);
 			player.Control.IsLow =
@@ -160,18 +162,10 @@ void InitializeLaraStartPosition(ItemInfo& playerItem)
 		if (!item.TriggerFlags || item.TriggerFlags != RequiredStartPos)
 			continue;
 
-		// HACK: For some reason, player can't be immediately updated and moved on loading.
-		// Need to simulate "game loop" happening so that its position actually updates on next loop.
-		// However, room number must be also be manually set in advance, so that startup anim detection
-		// won't fail (otherwise player may start crouching because probe uses previous room number).
-
-		InItemControlLoop = true;
-
 		playerItem.Pose = item.Pose;
-		playerItem.RoomNumber = item.RoomNumber;
-		ItemNewRoom(playerItem.Index, item.RoomNumber);
 
-		InItemControlLoop = false;
+		if (playerItem.RoomNumber != item.RoomNumber)
+			ItemNewRoom(playerItem.Index, item.RoomNumber);
 
 		TENLog("Player start position has been set according to start position of object with ID " + std::to_string(item.TriggerFlags) + ".", LogLevel::Info);
 		break;

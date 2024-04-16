@@ -178,7 +178,7 @@ namespace TEN::Entities::Vehicles
 		auto* UPVItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(UPVItem, laraItem, coll, UPVMountTypes, UPV_MOUNT_DISTANCE);
@@ -290,7 +290,7 @@ namespace TEN::Entities::Vehicles
 
 	void UPVEffects(short itemNumber)
 	{
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 
 		auto* UPVItem = &g_Level.Items[itemNumber];
@@ -948,7 +948,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD) &&
-			lara->Context.Vehicle != NO_ITEM)
+			lara->Context.Vehicle != NO_VALUE)
 		{
 			DoCurrent(UPVItem, laraItem);
 

@@ -177,7 +177,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(&item, &AI, !creature.Enemy->IsLara());
 
 			// Vehicle handling
-			if (Lara.Context.Vehicle != NO_ITEM && AI.bite)
+			if (Lara.Context.Vehicle != NO_VALUE && AI.bite)
 				creature.Mood = MoodType::Escape;
 
 			CreatureMood(&item, &AI, !creature.Enemy->IsLara());
@@ -205,7 +205,7 @@ namespace TEN::Entities::TR4
 					else
 						item.Pose.Orientation.y += ANGLE(10.0f);
 				}
-				else if (item.AIBits & MODIFY || Lara.Context.Vehicle != NO_ITEM)
+				else if (item.AIBits & MODIFY || Lara.Context.Vehicle != NO_VALUE)
 				{
 					if (abs(AI.angle) < ANGLE(2.0f))
 						item.Pose.Orientation.y += AI.angle;
@@ -229,7 +229,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (item.AIBits & PATROL1 &&
 					item.AIBits != MODIFY &&
-					Lara.Context.Vehicle == NO_ITEM)
+					Lara.Context.Vehicle == NO_VALUE)
 				{
 					item.Animation.TargetState = SAS_STATE_WALK;
 					joint2 = 0;
@@ -299,7 +299,7 @@ namespace TEN::Entities::TR4
 					creature.Mood == MoodType::Bored ||
 					!AI.ahead ||
 					item.AIBits & MODIFY ||
-					Lara.Context.Vehicle != NO_ITEM)
+					Lara.Context.Vehicle != NO_VALUE)
 				{
 					item.Animation.TargetState = SAS_STATE_IDLE;
 				}
@@ -315,7 +315,7 @@ namespace TEN::Entities::TR4
 				{
 					item.Animation.TargetState = SAS_STATE_WALK;
 				}
-				else if (Lara.Context.Vehicle != NO_ITEM &&
+				else if (Lara.Context.Vehicle != NO_VALUE &&
 					(item.AIBits == MODIFY ||
 						!item.AIBits))
 				{
@@ -363,7 +363,7 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint2 = AI.angle;
 
-				if (Lara.Context.Vehicle != NO_ITEM)
+				if (Lara.Context.Vehicle != NO_VALUE)
 				{
 					if (item.AIBits == MODIFY || !item.AIBits)
 					{
@@ -645,7 +645,7 @@ namespace TEN::Entities::TR4
 	void SasFireGrenade(ItemInfo& item, short angle1, short angle2)
 	{
 		short itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 
 		auto grenadeItem = &g_Level.Items[itemNumber];
@@ -677,7 +677,7 @@ namespace TEN::Entities::TR4
 		grenadeItem->Animation.Velocity.z = 128;
 		grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 		grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
-		grenadeItem->Animation.RequiredState = NO_STATE;
+		grenadeItem->Animation.RequiredState = NO_VALUE;
 
 		if (Random::TestProbability(3 / 4.0f))
 			grenadeItem->ItemFlags[0] = (int)ProjectileType::Grenade;

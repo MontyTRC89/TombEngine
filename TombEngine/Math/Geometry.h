@@ -54,4 +54,7 @@ namespace TEN::Math::Geometry
 	bool IsPointInBox(const Vector3& point, const BoundingBox& box);
 	bool IsPointInBox(const Vector3& point, const BoundingOrientedBox& box);
 	bool IsPointInSphere(const Vector3& point, const BoundingSphere& sphere);
+
+	// Intersection inquirers
+	bool CircleIntersects(const Vector3& circle0, const Vector3& circle1);
 }

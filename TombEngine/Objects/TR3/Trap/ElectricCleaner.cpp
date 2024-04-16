@@ -9,6 +9,7 @@
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/misc.h"
 #include "Game/Setup.h"
 
 using namespace TEN::Collision::Point;
@@ -73,102 +74,15 @@ namespace TEN::Entities::Traps
 		}
 	}
 
-	static bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir)
-	{
-		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(1));
-		auto pointColl = GetPointCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(1));
-
-		// TODO: Use floor normal directly.
-		auto floorTilt = GetSurfaceTilt(pointColl.GetFloorNormal(), true);
-
-		// Test for wall.
-		if (pointColl.GetSector().IsWall(projectedPos.x, projectedPos.z))
-			return false;
-
-		// Test for slippery slope.
-		if (pointColl.IsIllegalFloor())
-			return false;
-
-		// Flat floor.
-		if (abs(floorTilt.x) == 0 && abs(floorTilt.y) == 0)
-		{
-			// Test for step.
-			int relFloorHeight = abs(pointColl.GetFloorHeight() - item.Pose.Position.y);
-			if (relFloorHeight >= CLICK(1))
-				return false;
-		}
-		// Sloped floor.
-		else
-		{
-			// Half block.
-			int relFloorHeight = abs(pointColl.GetFloorHeight() - item.Pose.Position.y);
-			if (relFloorHeight > CLICK(2))
-				return false;
-
-			short slopeAngle = ANGLE(0.0f);
-			if (floorTilt.x > 0)
-			{
-				slopeAngle = ANGLE(-90.0f);
-			}
-			else if (floorTilt.x < 0)
-			{
-				slopeAngle = ANGLE(90.0f);
-			}
-
-			if (floorTilt.y > 0 && floorTilt.y > abs(floorTilt.x))
-			{
-				slopeAngle = ANGLE(180.0f);
-			}
-			else if (floorTilt.y < 0 && -floorTilt.y > abs(floorTilt.x))
-			{
-				slopeAngle = ANGLE(0.0f);
-			}
-
-			short dirAngle = phd_atan(dir.z, dir.x);
-			short alignAngle = Geometry::GetShortestAngle(slopeAngle, dirAngle);
-
-			// Test if slope aspect is aligned with direction.
-			if (alignAngle != 0 && alignAngle != ANGLE(180.0f))
-				return false;
-		}
-
-		// Check for diagonal split.
-		if (pointColl.IsDiagonalFloorStep())
-			return false;
-
-		// Test ceiling height.
-		int relCeilHeight = abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight());
-		int cleanerHeight = BLOCK(1);
-		if (relCeilHeight < cleanerHeight)
-			return false;
-
-		// Check for inaccessible sector.
-		if (pointColl.GetSector().Box == NO_BOX)
-			return false;
-
-		// Check for blocked grey box.
-		if (g_Level.Boxes[pointColl.GetSector().Box].flags & BLOCKABLE)
-		{
-			if (g_Level.Boxes[pointColl.GetSector().Box].flags& BLOCKED)
-				return false;
-		}
-
-		// Check for stopper flag.
-		if (pointColl.GetSector().Stopper)
-			return false;
-
-		return true;
-	}
-
 	static Vector3 GetElectricCleanerMovementDirection(const ItemInfo& item, const Vector3& dir0, const Vector3& dir1, const Vector3& dir2)
 	{
-		if (IsNextSectorValid(item, dir0))
+		if (IsNextSectorValid(item, dir0, BLOCK(1)))
 			return dir0;
 
-		if (IsNextSectorValid(item, dir1))
+		if (IsNextSectorValid(item, dir1, BLOCK(1)))
 			return dir1;
 
-		if (IsNextSectorValid(item, dir2))
+		if (IsNextSectorValid(item, dir2, BLOCK(1)))
 			return dir2;
 
 		return Vector3::Zero;
@@ -197,18 +111,18 @@ namespace TEN::Entities::Traps
 			break;
 		}
 
-		if (GetCollidedObjects(&item, CLICK(1), true, CollidedItems, CollidedMeshes, true))
+		auto collObjects = GetCollidedObjects(item, true, true);
+		if (!collObjects.IsEmpty())
 		{
-			int lp = 0;
-			while (CollidedItems[lp] != nullptr)
+			for (auto* itemPtr : collObjects.ItemPtrs)
 			{
-				if (Objects[CollidedItems[lp]->ObjectNumber].intelligent)
-				{
-					CollidedItems[lp]->HitPoints = 0;
-					ItemElectricBurn(CollidedItems[lp], 120);
-				}
+				const auto& object = Objects[itemPtr->ObjectNumber];
 
-				lp++;
+				if (object.intelligent)
+				{
+					itemPtr->HitPoints = 0;
+					ItemElectricBurn(itemPtr, 120);
+				}
 			}
 		}
 

@@ -137,7 +137,7 @@ namespace TEN::Entities::Creatures::TR5
 	void SubmarineAttack(ItemInfo* item)
 	{
 		short itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 
 		auto* torpedoItem = &g_Level.Items[itemNumber];
@@ -398,7 +398,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		Vector3i pos;
 
-		if (item->ItemFlags[0] == NO_ITEM)
+		if (item->ItemFlags[0] == NO_VALUE)
 		{
 			bool found = false;
 			for (int i = g_Level.NumItems; i < 256; i++)
@@ -432,7 +432,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				pos.x = 4 * item->Animation.ActiveState;
 				pos.y = 4 * item->Animation.TargetState;
-				pos.z = 4 * (item->Animation.RequiredState == NO_STATE) ? 0 : item->Animation.RequiredState;
+				pos.z = 4 * (item->Animation.RequiredState == NO_VALUE) ? 0 : item->Animation.RequiredState;
 			}
 		}
 

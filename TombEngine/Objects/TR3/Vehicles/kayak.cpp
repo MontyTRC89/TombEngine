@@ -148,7 +148,7 @@ namespace TEN::Entities::Vehicles
 		auto* kayak = GetKayakInfo(kayakItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(kayakItem, laraItem, coll, KayakMountTypes, KAYAK_MOUNT_DISTANCE, LARA_HEIGHT);
@@ -1005,12 +1005,14 @@ namespace TEN::Entities::Vehicles
 
 			short itemNum = g_Level.Rooms[i].itemNumber;
 
-			while (itemNum != NO_ITEM)
+			while (itemNum != NO_VALUE)
 			{
 				auto* item = &g_Level.Items[itemNum];
 				short nextItem = item->NextItem;
 
-				if (item->Collidable && item->Status != ITEM_INVISIBLE)
+				if (item->Collidable &&
+					item->Status != ITEM_INVISIBLE &&
+					item != laraItem && item != kayakItem)
 				{
 					auto* object = &Objects[item->ObjectNumber];
 
@@ -1106,7 +1108,7 @@ namespace TEN::Entities::Vehicles
 				DoDamage(laraItem, (damage - 160) * 8);
 		}
 
-		if (lara->Context.Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_VALUE)
 		{
 			if (kayakItem->RoomNumber != probe.GetRoomNumber())
 			{
@@ -1158,6 +1160,6 @@ namespace TEN::Entities::Vehicles
 
 		KayakToItemCollision(kayakItem, laraItem);
 
-		return (lara->Context.Vehicle != NO_ITEM) ? true : false;
+		return (lara->Context.Vehicle != NO_VALUE) ? true : false;
 	}
 }

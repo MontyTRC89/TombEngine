@@ -57,7 +57,7 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 		ShiftItem(item, coll);
 		item->Pose.Orientation.y -= coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE;
 	}
-	else if (coll->LastBridgeItemNumber != NO_ITEM)
+	else if (coll->LastBridgeItemNumber != NO_VALUE)
 	{
 		ShiftItem(item, coll);
 	}
@@ -652,7 +652,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			return;
 	}
 
-	if (lara->ExtraAnim == NO_ITEM)
+	if (lara->ExtraAnim == NO_VALUE)
 		TestLaraWaterDepth(item, coll);
 }
 
@@ -760,8 +760,8 @@ bool TestLaraObjectCollision(ItemInfo* item, short headingAngle, int forward, in
 	item->Pose.Position.y += down;
 	item->Pose.Position.z += phd_cos(item->Pose.Orientation.y + headingAngle) * forward + phd_sin(headingAngle + ANGLE(90.0f) * sideSign) * abs(right);
 
-	bool result = GetCollidedObjects(item, LARA_RADIUS, true, CollidedItems, CollidedMeshes, 0);
+	bool isCollided = !GetCollidedObjects(*item, true, false).IsEmpty();
 
 	item->Pose = prevPose;
-	return result;
+	return isCollided;
 }

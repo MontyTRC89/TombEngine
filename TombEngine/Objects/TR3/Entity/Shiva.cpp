@@ -343,7 +343,7 @@ namespace TEN::Entities::Creatures::TR3
 					int z = item->Pose.Position.z + BLOCK(1) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 					auto box = GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetBottomSector().Box;
 
-					if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !creature.Flags)
+					if (box != NO_VALUE && !(g_Level.Boxes[box].flags & BLOCKABLE) && !creature.Flags)
 						item->Animation.TargetState = SHIVA_STATE_WALK_BACK;
 					else
 						item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;

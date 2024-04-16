@@ -151,7 +151,7 @@ namespace TEN::Entities::TR4
 					TriggerBlood(dx, yBottom - (GetRandomControl() % dy), dz, GetRandomControl() << 1, 1);
 				}
 
-				if (LaraItem->HitPoints <= 0 && Lara.Context.Vehicle == NO_ITEM)
+				if (LaraItem->HitPoints <= 0 && Lara.Context.Vehicle == NO_VALUE)
 				{
 					int heightFromFloor = GetPointCollision(*LaraItem).GetFloorHeight() - LaraItem->Pose.Position.y;
 

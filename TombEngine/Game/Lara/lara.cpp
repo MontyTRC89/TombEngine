@@ -91,7 +91,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (!player.Control.IsLocked)
-		player.LocationPad = -1;
+		player.LocationPad = NO_VALUE;
 
 	// FAILSAFE: Force hand status reset.
 	if (item->Animation.AnimNumber == LA_STAND_IDLE &&
@@ -109,14 +109,14 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto water = GetPlayerWaterData(*item);
 	player.Context.WaterSurfaceDist = -water.HeightFromWater;
 
-	if (player.Context.Vehicle == NO_ITEM)
+	if (player.Context.Vehicle == NO_VALUE)
 		SpawnPlayerWaterSurfaceEffects(*item, water.WaterHeight, water.WaterDepth);
 
 	bool isWaterOnHeadspace = false;
 
 	// TODO: Move unrelated handling elsewhere.
 	// Handle environment state transition.
-	if (player.Context.Vehicle == NO_ITEM && player.ExtraAnim == NO_ITEM)
+	if (player.Context.Vehicle == NO_VALUE && player.ExtraAnim == NO_VALUE)
 	{
 		switch (player.Control.WaterStatus)
 		{
@@ -367,7 +367,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	// Handle look-around.
 	if (((IsHeld(In::Look) && CanPlayerLookAround(*item)) ||
 			(player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)) &&
-		player.ExtraAnim == NO_ITEM)
+		player.ExtraAnim == NO_VALUE)
 	{
 		HandlePlayerLookAround(*item);
 	}
@@ -382,19 +382,17 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	if (HandleLaraVehicle(item, coll))
 		return;
 
-	// Handle player behavior state control.
 	HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Control);
-
 	HandleLaraMovementParameters(item, coll);
 	AnimateItem(item);
 
-	if (player.ExtraAnim == NO_ITEM)
+	if (player.ExtraAnim == NO_VALUE)
 	{
 		// Check for collision with items.
 		DoObjectCollision(item, coll);
 
 		// Handle player behavior state collision.
-		if (player.Context.Vehicle == NO_ITEM)
+		if (player.Context.Vehicle == NO_VALUE)
 			HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 	}
 
@@ -468,7 +466,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	DoObjectCollision(item, coll);
 
-	if (player.Context.Vehicle == NO_ITEM)
+	if (player.Context.Vehicle == NO_VALUE)
 		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, LARA_RADIUS);
@@ -571,7 +569,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	DoObjectCollision(item, coll);
 
-	if (player.Context.Vehicle == NO_ITEM)
+	if (player.Context.Vehicle == NO_VALUE)
 		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, 0);
@@ -638,9 +636,9 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	if (isTitle)
 		ActionMap = actionMap;
 
-	if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
+	if (g_Gui.GetInventoryItemChosen() != NO_VALUE)
 	{
-		g_Gui.SetInventoryItemChosen(NO_ITEM);
+		g_Gui.SetInventoryItemChosen(NO_VALUE);
 		SayNo();
 	}
 

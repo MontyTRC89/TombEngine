@@ -326,7 +326,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 									int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 									auto ray = Ray(origin->ToVector3(), dir);
 									float bestDistance = INFINITY;
-									int bestJointIndex = NO_JOINT;
+									int bestJointIndex = NO_VALUE;
 
 									for (int i = 0; i < num; i++)
 									{
@@ -361,11 +361,11 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 									if (object->HitRoutine != nullptr)
 									{
-										object->HitRoutine(*item, *LaraItem, target2, weapon.Damage, false, NO_JOINT);
+										object->HitRoutine(*item, *LaraItem, target2, weapon.Damage, false, NO_VALUE);
 									}
 									else
 									{
-										DefaultItemHit(*item, *LaraItem, target2, weapon.Damage, false, NO_JOINT);
+										DefaultItemHit(*item, *LaraItem, target2, weapon.Damage, false, NO_VALUE);
 									}
 								}
 							}
@@ -668,7 +668,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 			}
 		}
 
-		for (short linkNumber = room.itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+		for (short linkNumber = room.itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 		{
 			const auto& item = g_Level.Items[linkNumber];
 

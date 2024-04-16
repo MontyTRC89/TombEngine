@@ -2,6 +2,7 @@ Version 1.4
 ===========
 
 * Fixed drawing of display sprites in title level.
+* Fixed drawing of smoke sprites and various other sprites.
 * Fixed player holster state and current vehicle not preserved correctly on level jump.
 * Fixed fade-in and fade-out effects not canceling correctly when next level is loaded.
 * Fixed shadows still being visible after shattering a moveable.
@@ -15,15 +16,19 @@ Version 1.4
   - Wall spikes will shatter any shatter in its path.
   - Wall spikes can be stopped by normal antitrigger or with a volume.
 * Added hub system to preserve level state on level jumps.
-* Added ember emitter object.
+* Added ember emitter.
+* Added fish emitter.
 * Added laser beam object.
 * Added TR2 dragon.
-* Added TR3 Winston (requires updated TEN Winston .wad2).
+* Added TR3 Winston (requires updated TEN .wad2 on TombEngine.com).
+* Added TR4 squishy blocks (requires updated TEN .wad2 on TombEngine.com).
 
 Lua API changes:
 * Added resetHub flag to Flow.Level, which allows to reset hub data.
+* Added Flow.GetFlipMapStatus() function to get current flipmap status.
 * Added Moveable:GetMeshCount() function to get number of moveable meshes.
 * Added Static:GetHP() and Static:SetHP() functions to change shatterable static mesh hit points.
+* Fixed Moveable:SetOnCollidedWithObject() callback.
 
 Version 1.3
 ===========
