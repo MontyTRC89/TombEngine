@@ -8,8 +8,8 @@ struct StaticAsset;
 class StaticObject
 {
 public:
-	std::string		  Name	   = {};
-	int				  ID	   = 0;
+	std::string		   Name		= {};
+	int				   ID		= 0;
 	const StaticAsset* AssetPtr = nullptr;
 
 	Pose  Pose		 = Pose::Zero;
