@@ -156,8 +156,8 @@ void Static::SetName(const std::string& name)
 
 /// Set this static's slot ID.
 // @function Static:SetSlot()
-// @tparam int slot New slot ID.
-void Static::SetSlotID(int slotID)
+// @tparam Objects.ObjID slot New slot ID.
+void Static::SetSlotID(GAME_OBJECT_ID slotID)
 {
 	_static.AssetPtr = &GetStaticAsset(slotID);
 	_static.IsDirty = true;

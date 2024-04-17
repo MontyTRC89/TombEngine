@@ -32,7 +32,7 @@ public:
 
 	// Setters
 	void SetName(const std::string& name);
-	void SetSlotID(int slotID);
+	void SetSlotID(GAME_OBJECT_ID slotID);
 	void SetPosition(const Vec3& pos);
 	void SetRotation(const Rotation& rot);
 	void SetScale(float scale);
