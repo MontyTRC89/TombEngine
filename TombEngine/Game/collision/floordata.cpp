@@ -117,7 +117,7 @@ std::optional<int> FloorInfo::GetNextRoomNumber(int x, int z, bool isBelow) cons
 	const auto& tri = surface.Triangles[triID];
 
 	// Return portal room number below or above if it exists.
-	if (tri.PortalRoomNumber != NO_ROOM)
+	if (tri.PortalRoomNumber != NO_VALUE)
 		return tri.PortalRoomNumber;
 
 	return std::nullopt;
@@ -163,7 +163,7 @@ std::optional<int> FloorInfo::GetSideRoomNumber() const
 {
 	// Return side portal room number if it exists.
 	// TODO: Check how side portals work when a sector connects to multiple side rooms.
-	if (SidePortalRoomNumber != NO_ROOM)
+	if (SidePortalRoomNumber != NO_VALUE)
 		return SidePortalRoomNumber;
 
 	return std::nullopt;
@@ -315,7 +315,7 @@ int FloorInfo::GetInsideBridgeItemNumber(const Vector3i& pos, bool testFloorBord
 	}
 
 	// 2) No bridge intersection; return invalid item number.
-	return NO_ITEM;
+	return NO_VALUE;
 }
 
 void FloorInfo::AddBridge(int itemNumber)
@@ -509,7 +509,7 @@ namespace TEN::Collision::Floordata
 				sectorPtr = &GetSideSector(*nextRoomNumber, pos.x, pos.z);
 			}
 		}
-		while (sectorPtr->GetInsideBridgeItemNumber(pos, isBottom, !isBottom) != NO_ITEM);
+		while (sectorPtr->GetInsideBridgeItemNumber(pos, isBottom, !isBottom) != NO_VALUE);
 
 		return FarthestHeightData{ *sectorPtr, pos.y };
 	}
@@ -555,7 +555,7 @@ namespace TEN::Collision::Floordata
 		bool testCeilBorder = (pos.y == floorHeight);
 		int insideBridgeItemNumber = sectorPtr->GetInsideBridgeItemNumber(pos, testFloorBorder, testCeilBorder);
 
-		if (insideBridgeItemNumber != NO_ITEM)
+		if (insideBridgeItemNumber != NO_VALUE)
 		{
 			if (isFloor ? (polarity <= 0) : (polarity >= 0))
 			{
@@ -613,7 +613,7 @@ namespace TEN::Collision::Floordata
 		bool testCeilBorder = (location.Height == floorHeight);
 		int insideBridgeItemNumber = sectorPtr->GetInsideBridgeItemNumber(Vector3i(pos.x, location.Height, pos.z), testFloorBorder, testCeilBorder);
 
-		if (insideBridgeItemNumber != NO_ITEM)
+		if (insideBridgeItemNumber != NO_VALUE)
 		{
 			auto heightData = GetFarthestHeightData(*sectorPtr, Vector3i(pos.x, location.Height, pos.z), isBottom);
 			if (!heightData.has_value())

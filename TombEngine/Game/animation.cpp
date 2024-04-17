@@ -92,7 +92,7 @@ void AnimateItem(ItemInfo* item)
 		{
 			// Reset RequiredState if already reached.
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 	}
 
@@ -115,7 +115,7 @@ void AnimateItem(ItemInfo* item)
 		{
 			// Reset RequiredState if already reached.
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 	}
 

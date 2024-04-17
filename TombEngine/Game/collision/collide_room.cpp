@@ -121,7 +121,7 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 // Overload used to quickly get point collision parameters at a given item's position.
 CollisionResult GetCollision(const ItemInfo& item)
 {
-	auto newRoomNumber = item.RoomNumber;
+	short newRoomNumber = item.RoomNumber;
 	auto floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &newRoomNumber);
 	auto probe = GetCollision(floor, item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z);
 
@@ -1246,7 +1246,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 	FloorInfo* floor;
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	short roomIndex = NO_ROOM;
+	short roomIndex = NO_VALUE;
 	do
 	{
 		int zFloor = (z - room->z) / BLOCK(1);
@@ -1275,13 +1275,13 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 
 		floor = &room->floor[zFloor + xFloor * room->zSize];
 		roomIndex = floor->SidePortalRoomNumber;
-		if (roomIndex != NO_ROOM)
+		if (roomIndex != NO_VALUE)
 		{
 			roomNumber = roomIndex;
 			room = &g_Level.Rooms[roomIndex];
 		}
 	}
-	while (roomIndex != NO_ROOM);
+	while (roomIndex != NO_VALUE);
 
 	if (TestEnvironment(ENV_FLAG_WATER, room) ||
 		TestEnvironment(ENV_FLAG_SWAMP, room))
@@ -1334,7 +1334,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	auto* room = &g_Level.Rooms[roomNumber];
 	FloorInfo* floor;
 
-	short adjoiningRoom = NO_ROOM;
+	short adjoiningRoom = NO_VALUE;
 	do
 	{
 		int xBlock = (x - room->x) / BLOCK(1);
@@ -1364,12 +1364,12 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 		floor = &room->floor[zBlock + xBlock * room->zSize];
 		adjoiningRoom = floor->SidePortalRoomNumber;
 
-		if (adjoiningRoom != NO_ROOM)
+		if (adjoiningRoom != NO_VALUE)
 		{
 			roomNumber = adjoiningRoom;
 			room = &g_Level.Rooms[adjoiningRoom];
 		}
-	} while (adjoiningRoom != NO_ROOM);
+	} while (adjoiningRoom != NO_VALUE);
 
 	if (floor->IsWall(x, z))
 		return NO_HEIGHT;

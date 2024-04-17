@@ -1,52 +1,68 @@
 #include "framework.h"
 #include "Specific/clock.h"
 
-LARGE_INTEGER PerformanceCount;
-double LdFreq;
-double LdSync;
+// Globals
+LARGE_INTEGER PerformanceCount = {};
+double		  LdFreq		   = 0.0;
+double		  LdSync		   = 0.0;
+
+int Sync()
+{
+	auto ct = LARGE_INTEGER{};
+	QueryPerformanceCounter(&ct);
+
+	double dCounter = (double)ct.LowPart + (double)ct.HighPart * (double)0xffffffff;
+	dCounter /= LdFreq;
+
+	long gameFrames = (long)dCounter - (long)LdSync;
+	LdSync = dCounter;
+	return gameFrames;
+}
 
 bool TimeReset()
 {
-	LARGE_INTEGER fq;
+	auto fq = LARGE_INTEGER{};
 	QueryPerformanceCounter(&fq);
-	LdSync = (double)fq.LowPart + (double)fq.HighPart * (double)0xffffffff;
+
+	LdSync = (double)fq.LowPart + ((double)fq.HighPart * (double)0xffffffff);
 	LdSync /= LdFreq;
 	return true;
 }
 
 bool TimeInit()
 {
-	LARGE_INTEGER fq;
+	auto fq = LARGE_INTEGER{};
 	if (!QueryPerformanceFrequency(&fq))
 		return false;
-	LdFreq = (double)fq.LowPart + (double)fq.HighPart * (double)0xFFFFFFFF;
+
+	LdFreq = (double)fq.LowPart + ((double)fq.HighPart * (double)0xffffffff);
 	LdFreq /= 60.0;
 	TimeReset();
 	return true;
 }
 
-int Sync()
+GameTime GetGameTime(int ticks)
 {
-	LARGE_INTEGER ct;
-	double dCounter;
-	QueryPerformanceCounter(&ct);
-	dCounter = (double)ct.LowPart + (double)ct.HighPart * (double)0xFFFFFFFF;
-	dCounter /= LdFreq;
-	long nFrames = long(dCounter) - long(LdSync);
-	LdSync = dCounter;
-	return nFrames;
+	auto gameTime = GameTime{};
+	int seconds = ticks / FPS;
+
+	gameTime.Days    = (seconds / (DAY_UNIT * SQUARE(TIME_UNIT)));
+	gameTime.Hours   = (seconds % (DAY_UNIT * SQUARE(TIME_UNIT))) / SQUARE(TIME_UNIT);
+	gameTime.Minutes = (seconds / TIME_UNIT) % TIME_UNIT;
+	gameTime.Seconds = seconds % TIME_UNIT;
+	return gameTime;
 }
 
-GameTime GetGameTime(int frameCount)
+bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs)
 {
-	GameTime result = {};
+	int intervalGameFrames = (int)round(intervalSecs * FPS);
+	int offsetGameFrames = (int)round(offsetSecs * FPS);
 
-	auto seconds = GameTimer / FPS;
+	if (offsetGameFrames >= intervalGameFrames)
+	{
+		TENLog("TestGlobalTimeInterval(): interval must be greater than offset.", LogLevel::Warning);
+		return false;
+	}
 
-	result.Days    = (seconds / (DAY_UNIT * TIME_UNIT * TIME_UNIT));
-	result.Hours   = (seconds % (DAY_UNIT * TIME_UNIT * TIME_UNIT)) / (TIME_UNIT * TIME_UNIT);
-	result.Minutes = (seconds / TIME_UNIT) % TIME_UNIT;
-	result.Seconds = (seconds % TIME_UNIT);
-
-	return result;
+	return ((GlobalCounter % intervalGameFrames) == offsetGameFrames);
 }

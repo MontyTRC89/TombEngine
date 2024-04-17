@@ -57,7 +57,7 @@ namespace TEN::Entities::TR4
 			short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 
 			// Make the sentry gun explode?
-			while (currentItemNumber != NO_ITEM)
+			while (currentItemNumber != NO_VALUE)
 			{
 				auto* currentItem = &g_Level.Items[currentItemNumber];
 

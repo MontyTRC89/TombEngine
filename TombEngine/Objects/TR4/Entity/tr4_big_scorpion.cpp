@@ -95,9 +95,9 @@ namespace TEN::Entities::TR4
 					creature->MaxTurn = 0;
 
 					short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-					if (linkNumber != NO_ITEM)
+					if (linkNumber != NO_VALUE)
 					{
-						for (linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+						for (linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 						{
 							auto* currentItem = &g_Level.Items[linkNumber];
 
@@ -140,7 +140,7 @@ namespace TEN::Entities::TR4
 
 					for (auto& currentCreature : ActiveCreatures)
 					{
-						if (currentCreature->ItemNumber != NO_ITEM && currentCreature->ItemNumber != itemNumber)
+						if (currentCreature->ItemNumber != NO_VALUE && currentCreature->ItemNumber != itemNumber)
 						{
 							auto* currentItem = &g_Level.Items[currentCreature->ItemNumber];
 							if (currentItem->ObjectNumber != ID_LARA)

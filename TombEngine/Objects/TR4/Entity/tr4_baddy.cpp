@@ -393,7 +393,7 @@ namespace TEN::Entities::TR4
 		auto* currentCreature = creature;
 
 		if (item->ItemFlags[1] == item->RoomNumber ||
-			g_Level.Rooms[item->RoomNumber].itemNumber == NO_ITEM)
+			g_Level.Rooms[item->RoomNumber].itemNumber == NO_VALUE)
 		{
 			currentCreature = creature;
 		}
@@ -402,7 +402,7 @@ namespace TEN::Entities::TR4
 			currentCreature = creature;
 			creature->Enemy = LaraItem;
 			ItemInfo* currentItem = nullptr;
-			for (short itemNum = g_Level.Rooms[item->RoomNumber].itemNumber; itemNum != NO_ITEM; itemNum = currentItem->NextItem)
+			for (short itemNum = g_Level.Rooms[item->RoomNumber].itemNumber; itemNum != NO_VALUE; itemNum = currentItem->NextItem)
 			{
 				currentItem = &g_Level.Items[itemNum];
 				if ((currentItem->ObjectNumber == ID_SMALLMEDI_ITEM ||
@@ -538,7 +538,7 @@ namespace TEN::Entities::TR4
 			GetCreatureMood(item, &AI, true);
 
 			// Vehicle handling
-			if (Lara.Context.Vehicle != NO_ITEM && AI.bite)
+			if (Lara.Context.Vehicle != NO_VALUE && AI.bite)
 				currentCreature->Mood = MoodType::Escape;
 
 			CreatureMood(item, &AI, true);
@@ -1085,7 +1085,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (currentCreature->Enemy->RoomNumber == NO_ROOM ||
+				if (currentCreature->Enemy->RoomNumber == NO_VALUE ||
 					currentCreature->Enemy->Status == ITEM_INVISIBLE ||
 					currentCreature->Enemy->InDrawRoom)
 				{
@@ -1110,7 +1110,7 @@ namespace TEN::Entities::TR4
 				// Cancel enemy pointer for other active baddys
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
-					if (ActiveCreatures[i]->ItemNumber != NO_ITEM && ActiveCreatures[i]->ItemNumber != itemNumber && ActiveCreatures[i]->Enemy == creature->Enemy)
+					if (ActiveCreatures[i]->ItemNumber != NO_VALUE && ActiveCreatures[i]->ItemNumber != itemNumber && ActiveCreatures[i]->Enemy == creature->Enemy)
 						ActiveCreatures[i]->Enemy = nullptr;
 				}
 

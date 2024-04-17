@@ -49,7 +49,7 @@ constexpr auto FRAME_PRIO_EXP = 1.5;
 
 void DrawBox(int boxIndex, Vector3 color)
 {
-	if (boxIndex == NO_BOX)
+	if (boxIndex == NO_VALUE)
 		return;
 
 	auto& currBox = g_Level.Boxes[boxIndex];
@@ -72,7 +72,7 @@ void DrawBox(int boxIndex, Vector3 color)
 
 void DrawNearbyPathfinding(int boxIndex)
 {
-	if (boxIndex == NO_BOX)
+	if (boxIndex == NO_VALUE)
 		return;
 
 	auto& currBox = g_Level.Boxes[boxIndex];
@@ -153,13 +153,13 @@ bool SameZone(CreatureInfo* creature, ItemInfo* target)
 
 	auto& roomSource = g_Level.Rooms[item.RoomNumber];
 	auto& boxSource = GetSector(&roomSource, item.Pose.Position.x - roomSource.x, item.Pose.Position.z - roomSource.z)->Box;
-	if (boxSource == NO_BOX)
+	if (boxSource == NO_VALUE)
 		return false;
 	item.BoxNumber = boxSource;
 
 	auto& roomTarget = g_Level.Rooms[target->RoomNumber];
 	auto& boxTarget = GetSector(&roomTarget, target->Pose.Position.x - roomTarget.x, target->Pose.Position.z - roomTarget.z)->Box;
-	if (boxTarget == NO_BOX)
+	if (boxTarget == NO_VALUE)
 		return false;
 	target->BoxNumber = boxTarget;
 
@@ -205,7 +205,7 @@ void AlertNearbyGuards(ItemInfo* item)
 	for (int i = 0; i < ActiveCreatures.size(); i++)
 	{
 		auto* currentCreature = ActiveCreatures[i];
-		if (currentCreature->ItemNumber == NO_ITEM)
+		if (currentCreature->ItemNumber == NO_VALUE)
 			continue;
 
 		auto* currentTarget = &g_Level.Items[currentCreature->ItemNumber + i];
@@ -230,7 +230,7 @@ void AlertAllGuards(short itemNumber)
 	for (int i = 0; i < ActiveCreatures.size(); i++)
 	{
 		auto* creature = ActiveCreatures[i];
-		if (creature->ItemNumber == NO_ITEM)
+		if (creature->ItemNumber == NO_VALUE)
 			continue;
 
 		auto* target = &g_Level.Items[creature->ItemNumber];
@@ -253,7 +253,7 @@ bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 	int* zone = g_Level.Zones[(int)LOT->Zone][(int)FlipStatus].data();
 
 	int boxHeight;
-	if (item->BoxNumber != NO_BOX)
+	if (item->BoxNumber != NO_VALUE)
 		boxHeight = g_Level.Boxes[item->BoxNumber].height;
 	else
 		boxHeight = item->Floor;
@@ -264,7 +264,7 @@ bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 
 	GetFloor(prevPos.x, y, prevPos.z, &roomNumber);
 	auto* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
-	if (floor->Box == NO_BOX)
+	if (floor->Box == NO_VALUE)
 		return false;
 
 	int height = g_Level.Boxes[floor->Box].height;
@@ -282,13 +282,13 @@ bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 		nextBox = floor->Box;
 	}
 
-	if (nextBox == NO_BOX)
+	if (nextBox == NO_VALUE)
 		nextHeight = height;
 	else
 		nextHeight = g_Level.Boxes[nextBox].height;
 
-	if (floor->Box == NO_BOX || !LOT->IsJumping &&
-		(LOT->Fly == NO_FLYING && item->BoxNumber != NO_BOX && zone[item->BoxNumber] != zone[floor->Box] ||
+	if (floor->Box == NO_VALUE || !LOT->IsJumping &&
+		(LOT->Fly == NO_FLYING && item->BoxNumber != NO_VALUE && zone[item->BoxNumber] != zone[floor->Box] ||
 			boxHeight - height > LOT->Step ||
 			boxHeight - height < LOT->Drop))
 	{
@@ -320,7 +320,7 @@ bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 			nextBox = floor->Box;
 		}
 
-		if (nextBox == NO_BOX)
+		if (nextBox == NO_VALUE)
 			nextHeight = height;
 		else
 			nextHeight = g_Level.Boxes[nextBox].height;
@@ -848,7 +848,7 @@ void CreatureDie(int itemNumber, bool doExplosion, int flags)
 bool BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT)
 {
 	auto* floor = GetFloor(x, y, z, &roomNumber);
-	if (floor->Box == NO_BOX)
+	if (floor->Box == NO_VALUE)
 		return true;
 
 	if (LOT->IsJumping)
@@ -903,14 +903,14 @@ int CreatureCreature(short itemNumber)
 		}
 
 		link = linked->NextItem;
-	} while (link != NO_ITEM);
+	} while (link != NO_VALUE);
 
 	return 0;
 }
 
 bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber) 
 {
-	if (boxNumber == NO_BOX)
+	if (boxNumber == NO_VALUE)
 		return false;
 
 	const auto& creature = *GetCreatureInfo(item);
@@ -936,7 +936,7 @@ bool ValidBox(ItemInfo* item, short zoneNumber, short boxNumber)
 
 bool EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber) 
 {
-	if (boxNumber == NO_BOX)
+	if (boxNumber == NO_VALUE)
 		return false;
 
 	const auto& box = g_Level.Boxes[boxNumber];
@@ -955,7 +955,7 @@ bool EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 
 void TargetBox(LOTInfo* LOT, int boxNumber)
 {
-	if (boxNumber == NO_BOX)
+	if (boxNumber == NO_VALUE)
 		return;
 	auto* box = &g_Level.Boxes[boxNumber];
 
@@ -972,23 +972,23 @@ void TargetBox(LOTInfo* LOT, int boxNumber)
 
 bool UpdateLOT(LOTInfo* LOT, int depth)
 {
-	if (LOT->RequiredBox != NO_BOX && LOT->RequiredBox != LOT->TargetBox)
+	if (LOT->RequiredBox != NO_VALUE && LOT->RequiredBox != LOT->TargetBox)
 	{
 		LOT->TargetBox = LOT->RequiredBox;
 
 		auto* node = &LOT->Node[LOT->RequiredBox];
-		if (node->nextExpansion == NO_BOX && LOT->Tail != LOT->RequiredBox)
+		if (node->nextExpansion == NO_VALUE && LOT->Tail != LOT->RequiredBox)
 		{
 			node->nextExpansion = LOT->Head;
 
-			if (LOT->Head == NO_BOX)
+			if (LOT->Head == NO_VALUE)
 				LOT->Tail = LOT->TargetBox;
 
 			LOT->Head = LOT->TargetBox;
 		}
 
 		node->searchNumber = ++LOT->SearchNumber;
-		node->exitBox = NO_BOX;
+		node->exitBox = NO_VALUE;
 	}
 
 	return SearchLOT(LOT, depth);
@@ -1001,9 +1001,9 @@ bool SearchLOT(LOTInfo* LOT, int depth)
 
 	for (int i = 0; i < depth; i++)
 	{
-		if (LOT->Head == NO_BOX)
+		if (LOT->Head == NO_VALUE)
 		{
-			LOT->Tail = NO_BOX; 
+			LOT->Tail = NO_VALUE; 
 			return false;
 		}
 
@@ -1059,7 +1059,7 @@ bool SearchLOT(LOTInfo* LOT, int depth)
 					}
 				}
 
-				if (expand->nextExpansion == NO_BOX && boxNumber != LOT->Tail)
+				if (expand->nextExpansion == NO_VALUE && boxNumber != LOT->Tail)
 				{
 					LOT->Node[LOT->Tail].nextExpansion = boxNumber;
 					LOT->Tail = boxNumber;
@@ -1068,7 +1068,7 @@ bool SearchLOT(LOTInfo* LOT, int depth)
 		}
 
 		LOT->Head = node->nextExpansion;
-		node->nextExpansion = NO_BOX;
+		node->nextExpansion = NO_VALUE;
 	}
 
 	return true;
@@ -1134,7 +1134,7 @@ void InitializeCreature(short itemNumber)
 
 bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 {
-	if (enemy == nullptr || boxNumber == NO_BOX)
+	if (enemy == nullptr || boxNumber == NO_VALUE)
 		return false;
 	auto* box = &g_Level.Boxes[boxNumber];
 
@@ -1296,7 +1296,7 @@ void GetAITarget(CreatureInfo* creature)
 	if (enemy)
 		enemyObjectNumber = enemy->ObjectNumber;
 	else
-		enemyObjectNumber = NO_ITEM;
+		enemyObjectNumber = NO_VALUE;
 
 	auto* item = &g_Level.Items[creature->ItemNumber];
 
@@ -1388,7 +1388,7 @@ void GetAITarget(CreatureInfo* creature)
 			item->AIBits &= ~FOLLOW;
 		}
 	}
-	/*else if (item->objectNumber == ID_MONKEY && item->carriedItem == NO_ITEM)
+	/*else if (item->objectNumber == ID_MONKEY && item->carriedItem == NO_VALUE)
 	{
 		if (item->aiBits != MODIFY)
 		{
@@ -1415,7 +1415,7 @@ void FindAITarget(CreatureInfo* creature, short objectNumber)
 		if (targetItem->ObjectNumber != objectNumber)
 			continue;
 
-		if (targetItem->RoomNumber == NO_ROOM)
+		if (targetItem->RoomNumber == NO_VALUE)
 			continue;
 
 		if (SameZone(creature, targetItem) &&
@@ -1447,7 +1447,7 @@ void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool 
 	{
 		if (aiObject.objectNumber == objectNumber &&
 			aiObject.triggerFlags == ocb &&
-			aiObject.roomNumber != NO_ROOM)
+			aiObject.roomNumber != NO_VALUE)
 		{
 			int* zone = g_Level.Zones[(int)creature->LOT.Zone][(int)FlipStatus].data();
 			auto* room = &g_Level.Rooms[item.RoomNumber];
@@ -1456,7 +1456,7 @@ void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool 
 			room = &g_Level.Rooms[aiObject.roomNumber];
 			aiObject.boxNumber = GetSector(room, aiObject.pos.Position.x - room->x, aiObject.pos.Position.z - room->z)->Box;
 
-			if (item.BoxNumber == NO_BOX || aiObject.boxNumber == NO_BOX)
+			if (item.BoxNumber == NO_VALUE || aiObject.boxNumber == NO_VALUE)
 				return;
 
 			if (checkSameZone && (zone[item.BoxNumber] != zone[aiObject.boxNumber]))
@@ -1515,7 +1515,7 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 		isReachable = abs(enemy->Pose.Position.y - pointColl.Position.Floor) < bounds.GetHeight();
 	}
 
-	return (isReachable ? floor->Box : NO_BOX);
+	return (isReachable ? floor->Box : NO_VALUE);
 }
 
 void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
@@ -1541,15 +1541,15 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	AI->zoneNumber = zone[item->BoxNumber];
 
 	enemy->BoxNumber = TargetReachable(item, enemy);
-	AI->enemyZone = enemy->BoxNumber == NO_BOX ? NO_ZONE : zone[enemy->BoxNumber];
+	AI->enemyZone = enemy->BoxNumber == NO_VALUE ? NO_VALUE : zone[enemy->BoxNumber];
 
 	if (!object->nonLot)
 	{
-		if (enemy->BoxNumber != NO_BOX && g_Level.Boxes[enemy->BoxNumber].flags & creature->LOT.BlockMask)
+		if (enemy->BoxNumber != NO_VALUE && g_Level.Boxes[enemy->BoxNumber].flags & creature->LOT.BlockMask)
 		{
 			AI->enemyZone |= BLOCKED;
 		}
-		else if (item->BoxNumber != NO_BOX && 
+		else if (item->BoxNumber != NO_VALUE && 
 			creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
 		{
 			AI->enemyZone |= BLOCKED;
@@ -1636,7 +1636,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 				TargetBox(LOT, boxNumber);
 				creature->Mood = MoodType::Bored;
 			}
-			else if (LOT->RequiredBox == NO_BOX)
+			else if (LOT->RequiredBox == NO_VALUE)
 			{
 				TargetBox(LOT, boxNumber);
 			}
@@ -1659,7 +1659,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 	case MoodType::Escape:
 		boxNumber = LOT->Node[GetRandomControl() * LOT->ZoneCount >> 15].boxNumber;
 
-		if (ValidBox(item, AI->zoneNumber, boxNumber) && LOT->RequiredBox == NO_BOX)
+		if (ValidBox(item, AI->zoneNumber, boxNumber) && LOT->RequiredBox == NO_VALUE)
 		{
 			if (EscapeBox(item, enemy, boxNumber))
 			{
@@ -1675,7 +1675,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 		break;
 
 	case MoodType::Stalk:
-		if (LOT->RequiredBox == NO_BOX || !StalkBox(item, enemy, LOT->RequiredBox))
+		if (LOT->RequiredBox == NO_VALUE || !StalkBox(item, enemy, LOT->RequiredBox))
 		{
 			boxNumber = LOT->Node[GetRandomControl() * LOT->ZoneCount >> 15].boxNumber;
 			if (ValidBox(item, AI->zoneNumber, boxNumber))
@@ -1684,7 +1684,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 				{
 					TargetBox(LOT, boxNumber);
 				}
-				else if (LOT->RequiredBox == NO_BOX)
+				else if (LOT->RequiredBox == NO_VALUE)
 				{
 					TargetBox(LOT, boxNumber);
 					if (AI->zoneNumber != AI->enemyZone)
@@ -1696,7 +1696,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 		break;
 	}
 
-	if (LOT->TargetBox == NO_BOX)
+	if (LOT->TargetBox == NO_VALUE)
 		TargetBox(LOT, item->BoxNumber);
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
@@ -1740,10 +1740,10 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 	creature->JumpAhead = false;
 	creature->MonkeySwingAhead = false;
 
-	if (item->BoxNumber != NO_BOX)
+	if (item->BoxNumber != NO_VALUE)
 	{
 		int endBox = LOT->Node[item->BoxNumber].exitBox;
-		if (endBox != NO_BOX)
+		if (endBox != NO_VALUE)
 		{
 			int overlapIndex = g_Level.Boxes[item->BoxNumber].overlapIndex;
 			int nextBox = 0;
@@ -1755,7 +1755,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 				{
 					nextBox = g_Level.Overlaps[overlapIndex].box;
 					flags = g_Level.Overlaps[overlapIndex++].flags;
-				} while (nextBox != NO_BOX && ((flags & BOX_END_BIT) == false) && (nextBox != endBox));
+				} while (nextBox != NO_VALUE && ((flags & BOX_END_BIT) == false) && (nextBox != endBox));
 			}
 
 			if (nextBox == endBox)
@@ -1779,15 +1779,15 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 	auto* enemy = creature->Enemy;
 	auto* LOT = &creature->LOT;
 
-	if (item->BoxNumber == NO_BOX || creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
-		creature->LOT.RequiredBox = NO_BOX;
+	if (item->BoxNumber == NO_VALUE || creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
+		creature->LOT.RequiredBox = NO_VALUE;
 
-	if (creature->Mood != MoodType::Attack && creature->LOT.RequiredBox != NO_BOX && !ValidBox(item, AI->zoneNumber, creature->LOT.TargetBox))
+	if (creature->Mood != MoodType::Attack && creature->LOT.RequiredBox != NO_VALUE && !ValidBox(item, AI->zoneNumber, creature->LOT.TargetBox))
 	{
 		if (AI->zoneNumber == AI->enemyZone)
 			creature->Mood = MoodType::Bored;
 
-		creature->LOT.RequiredBox = NO_BOX;
+		creature->LOT.RequiredBox = NO_VALUE;
 	}
 
 	auto mood = creature->Mood;
@@ -1839,7 +1839,7 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 				else if (AI->zoneNumber == AI->enemyZone)
 				{
 					if (AI->distance < ATTACK_RANGE ||
-						(creature->Mood == MoodType::Stalk && LOT->RequiredBox == NO_BOX))
+						(creature->Mood == MoodType::Stalk && LOT->RequiredBox == NO_VALUE))
 						creature->Mood = MoodType::Attack;
 					else
 						creature->Mood = MoodType::Stalk;
@@ -1878,7 +1878,7 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 			LOT = &creature->LOT;
 		}
 
-		LOT->RequiredBox = NO_BOX;
+		LOT->RequiredBox = NO_VALUE;
 	}
 }
 
@@ -1889,7 +1889,7 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 	*target = item->Pose.Position;
 
 	int boxNumber = item->BoxNumber;
-	if (boxNumber == NO_BOX)
+	if (boxNumber == NO_VALUE)
 		return TARGET_TYPE::NO_TARGET;
 
 	auto* box = &g_Level.Boxes[boxNumber];
@@ -2087,9 +2087,9 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 		}
 
 		boxNumber = LOT->Node[boxNumber].exitBox;
-		if (boxNumber != NO_BOX && (g_Level.Boxes[boxNumber].flags & LOT->BlockMask))
+		if (boxNumber != NO_VALUE && (g_Level.Boxes[boxNumber].flags & LOT->BlockMask))
 			break;
-	} while (boxNumber != NO_BOX);
+	} while (boxNumber != NO_VALUE);
 
 	if (!(direction & SECONDARY_CLIP))
 	{
@@ -2148,7 +2148,7 @@ void InitializeItemBoxData()
 				continue;
 
 			auto* floor = &room.floor[index];
-			if (floor->Box == NO_BOX)
+			if (floor->Box == NO_VALUE)
 				continue;
 
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))

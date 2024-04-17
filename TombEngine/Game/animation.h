@@ -14,8 +14,6 @@ struct ItemInfo;
 struct KeyframeInterpData;
 struct ObjectInfo;
 
-constexpr auto NO_STATE = -1;
-
 struct KeyframeData
 {
 	GameBoundingBox			BoundingBox		 = GameBoundingBox::Zero;

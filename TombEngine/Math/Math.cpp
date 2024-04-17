@@ -1,4 +1,6 @@
 #include "framework.h"
+
+#include <cmath>
 #include "Math/Math.h"
 
 namespace TEN::Math

@@ -15,8 +15,8 @@
 #include "Objects/TR3/Object/Corpse.h"
 #include "Specific/level.h"
 
-using namespace TEN::Math;
 using namespace TEN::Entities::TR3;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -117,19 +117,20 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (cadaverPos == INVALID_CADAVER_POSITION)
 			{
-				float shortestDistance = INFINITY;
+				float shortestDist = INFINITY;
 				for (auto& targetItem : g_Level.Items)
 				{
-					if (!Objects.CheckID(targetItem.ObjectNumber) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
+					if (!Objects.CheckID(targetItem.ObjectNumber) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_VALUE)
 						continue;
 
 					if (SameZone(creature, &targetItem))
 					{
-						float distance = Vector3i::Distance(item->Pose.Position, targetItem.Pose.Position);
-						if (distance < shortestDistance && targetItem.ObjectNumber == ID_CORPSE && targetItem.Active && TriggerActive(&targetItem) && targetItem.ItemFlags[1] == (int)CorpseFlags::Lying)
+						float dist = Vector3i::Distance(item->Pose.Position, targetItem.Pose.Position);
+						if (dist < shortestDist && targetItem.ObjectNumber == ID_CORPSE && targetItem.Active &&
+							TriggerActive(&targetItem) && targetItem.ItemFlags[1] == (int)CorpseFlag::Grounded)
 						{
 							cadaverPos = targetItem.Pose.Position.ToVector3();
-							shortestDistance = distance;
+							shortestDist = dist;
 							item->ItemFlags[1] = ATTACK_CADAVER;
 						}
 					}
@@ -163,7 +164,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item->ItemFlags[0] = (random + 0x700) >> 7;
 
-					// Scared for less time the more compys there are - adjust this when we've got lots of them.
+					// Spooked for less time the more compys there are. Adjust when there are many of them.
 					item->ItemFlags[3] = LaraItem->Animation.Velocity.z * 2;
 				}
 			}
@@ -260,9 +261,13 @@ namespace TEN::Entities::Creatures::TR3
 						if (item->ItemFlags[1] == ATTACK_PLAYER)
 						{
 							if (Random::TestProbability(1 / 2.0f))
+							{
 								item->Animation.TargetState = COMPY_STATE_ATTACK;
+							}
 							else
+							{
 								item->Animation.TargetState = COMPY_STATE_JUMP_ATTACK;
+							}
 						}
 						else
 						{
@@ -279,9 +284,13 @@ namespace TEN::Entities::Creatures::TR3
 					if (ai.ahead && ai.distance < (COMPY_ATTACK_RANGE * 3) && item->ItemFlags[1] == ATTACK_CADAVER)
 					{
 						if (Random::TestProbability(1 / 2.0f))
+						{
 							item->Animation.TargetState = COMPY_STATE_ATTACK;
+						}
 						else
+						{
 							item->Animation.TargetState = COMPY_STATE_JUMP_ATTACK;
+						}
 					}
 					else if (ai.distance > (COMPY_ATTACK_RANGE * 3))
 					{
@@ -291,9 +300,13 @@ namespace TEN::Entities::Creatures::TR3
 				else
 				{
 					if (Random::TestProbability(COMPY_JUMP_ATTACK_CHANCE))
+					{
 						item->Animation.TargetState = COMPY_STATE_JUMP_ATTACK;
+					}
 					else
+					{
 						item->Animation.TargetState = COMPY_STATE_RUN_FORWARD;
+					}
 				}
 
 				break;

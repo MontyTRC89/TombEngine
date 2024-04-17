@@ -110,7 +110,7 @@ namespace TEN::Entities::TR4
 	static void TriggerBaboonShockwave(Pose pos, short xRot)
 	{
 		short shockwaveID = GetFreeShockwave();
-		if (shockwaveID != NO_ITEM)
+		if (shockwaveID != NO_VALUE)
 		{
 			auto* deathEffect = &ShockWaves[shockwaveID];
 
@@ -194,7 +194,7 @@ namespace TEN::Entities::TR4
 		item->Pose = baboonRespawn->Pose;
 
 		auto outsideRoom = IsRoomOutside(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-		if (item->RoomNumber != outsideRoom && outsideRoom != NO_ROOM)
+		if (item->RoomNumber != outsideRoom && outsideRoom != NO_VALUE)
 			ItemNewRoom(itemNumber, outsideRoom);
 
 		if (baboonRespawn->Count < baboonRespawn->MaxCount)
@@ -363,12 +363,12 @@ namespace TEN::Entities::TR4
 						else
 							item->Animation.TargetState = BABOON_STATE_RUN_FORWARD;
 					}
-					else if (item->Animation.RequiredState != NO_STATE)
+					else if (item->Animation.RequiredState != NO_VALUE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
 				}
-				else if (item->Animation.RequiredState != NO_STATE)
+				else if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (Random::TestProbability(0.25f))
 					item->Animation.TargetState = BABOON_STATE_WALK_FORWARD;
@@ -401,7 +401,7 @@ namespace TEN::Entities::TR4
 						// NOTE: It's not true to the original functionality, but to avoid repetitive actions,
 						// the SIT_IDLE state was given a higher chance of occurring. The EAT state was also added here. -- TokyoSU
 
-						if (item->Animation.RequiredState != NO_STATE)
+						if (item->Animation.RequiredState != NO_VALUE)
 							item->Animation.TargetState = item->Animation.RequiredState;
 						else if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = BABOON_STATE_SIT_IDLE;
@@ -417,7 +417,7 @@ namespace TEN::Entities::TR4
 					}
 					else if ((item->AIBits & FOLLOW) && AI.distance > BABOON_IDLE_RANGE)
 					{
-						if (item->Animation.RequiredState != NO_STATE)
+						if (item->Animation.RequiredState != NO_VALUE)
 							item->Animation.TargetState = item->Animation.RequiredState;
 						else
 							item->Animation.TargetState = BABOON_STATE_WALK_FORWARD;

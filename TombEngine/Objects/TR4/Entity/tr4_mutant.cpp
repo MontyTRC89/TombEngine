@@ -64,10 +64,10 @@ namespace TEN::Entities::TR4
 
 	void TriggerCrocgodMissile(Pose* src, short roomNumber, short counter)
 	{
-		short fxNumber = NO_ITEM;
+		short fxNumber = NO_VALUE;
 
 		fxNumber = CreateNewEffect(roomNumber);
-		if (fxNumber != NO_ITEM)
+		if (fxNumber != NO_VALUE)
 		{
 			auto* fx = &EffectList[fxNumber];
 			fx->pos.Position.x = src->Position.x;

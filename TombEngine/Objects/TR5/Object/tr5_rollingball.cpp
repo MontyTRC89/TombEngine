@@ -481,7 +481,7 @@ void ClassicRollingBallControl(short itemNum)
 			item->Animation.FrameNumber = 0;
 			item->Animation.ActiveState =
 			item->Animation.TargetState = GetAnimData(*item).StateID;
-			item->Animation.RequiredState = NO_STATE;
+			item->Animation.RequiredState = NO_VALUE;
 			RemoveActiveItem(itemNum);
 		}
 	}

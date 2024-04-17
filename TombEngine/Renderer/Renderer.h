@@ -258,8 +258,8 @@ namespace TEN::Renderer
 		// Preallocated pools of objects for avoiding new/delete
 		// Items and effects are safe (can't be more than 1024 items in TR), 
 		// lights should be oversized (eventually ignore lights more than MAX_LIGHTS)
-		RendererItem _items[NUM_ITEMS];
-		RendererEffect _effects[NUM_ITEMS];
+		RendererItem _items[ITEM_COUNT_MAX];
+		RendererEffect _effects[ITEM_COUNT_MAX];
 
 		// Debug variables
 		int _numDrawCalls = 0;
@@ -447,6 +447,7 @@ namespace TEN::Renderer
 		void DrawTriangles3D(RenderView& view);
 		void DrawOverlays(RenderView& view);
 		void PrepareRopes(RenderView& view);
+		void DrawFishSwarm(RenderView& view, RendererPass rendererPass);
 		void DrawBats(RenderView& view, RendererPass rendererPass);
 		void DrawRats(RenderView& view, RendererPass rendererPass);
 		void DrawScarabs(RenderView& view, RendererPass rendererPass);

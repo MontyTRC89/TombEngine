@@ -164,7 +164,7 @@ void ClockworkBeetleControl(short itemNumber)
 					beetle->ItemFlags[2] = 5;
 					short itemRoom = g_Level.Rooms[beetle->RoomNumber].itemNumber;
 
-					if (itemRoom != NO_ITEM)
+					if (itemRoom != NO_VALUE)
 					{
 						ItemInfo* item;
 						short nextItem;
@@ -190,7 +190,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 							itemRoom = nextItem;
 
-							if (itemRoom == NO_ITEM)
+							if (itemRoom == NO_VALUE)
 								return;
 						}
 
@@ -305,7 +305,7 @@ void UseClockworkBeetle(short flag)
 	{
 		short itemNumber = CreateItem();
 
-		if (itemNumber != NO_ITEM)
+		if (itemNumber != NO_VALUE)
 		{
 			auto* item = &g_Level.Items[itemNumber];
 
@@ -333,7 +333,7 @@ void UseClockworkBeetle(short flag)
 				ItemInfo* item2;
 				short itemRoom = g_Level.Rooms[item->RoomNumber].itemNumber;
 
-				if (itemRoom != NO_ITEM)
+				if (itemRoom != NO_VALUE)
 				{
 					while (true)
 					{
@@ -356,7 +356,7 @@ void UseClockworkBeetle(short flag)
 
 						itemRoom = nextItem;
 
-						if (itemRoom == NO_ITEM)
+						if (itemRoom == NO_VALUE)
 						{
 							if (!item->ItemFlags[0])
 								item->ItemFlags[3] = 150;

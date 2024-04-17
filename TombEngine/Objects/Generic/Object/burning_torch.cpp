@@ -232,14 +232,13 @@ namespace TEN::Entities::Generic
 			item->Pose.Orientation.z = 0;
 		}
 
-		auto velocity = Vector3i(
+		auto vel = Vector3i(
 			item->Animation.Velocity.z * phd_sin(item->Pose.Orientation.y),
 			item->Animation.Velocity.y,
-			item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.y)
-		);
+			item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.y));
 
 		auto prevPos = item->Pose.Position;
-		item->Pose.Position += Vector3i(velocity.x, 0, velocity.z);
+		item->Pose.Position += Vector3i(vel.x, 0, vel.z);
 
 		if (TestEnvironment(ENV_FLAG_WATER, item) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item))
@@ -251,26 +250,31 @@ namespace TEN::Entities::Generic
 				item->ItemFlags[3] = 0;
 		}
 		else
+		{
 			item->Animation.Velocity.y += 6;
+		}
 
 		item->Pose.Position.y += item->Animation.Velocity.y;
-		DoProjectileDynamics(itemNumber, prevPos.x, prevPos.y, prevPos.z, velocity.x, velocity.y, velocity.z);
+		DoProjectileDynamics(itemNumber, prevPos.x, prevPos.y, prevPos.z, vel.x, vel.y, vel.z);
 
 		// Collide with entities.
-		if (GetCollidedObjects(item, 0, true, CollidedItems, CollidedMeshes, true))
+		auto collObjects = GetCollidedObjects(*item, true, true);
+		if (!collObjects.IsEmpty())
 		{
 			LaraCollision.Setup.EnableObjectPush = true;
-			if (CollidedItems[0])
+			if (!collObjects.ItemPtrs.empty())
 			{
-				if (!Objects[CollidedItems[0]->ObjectNumber].intelligent &&
-					CollidedItems[0]->ObjectNumber != ID_LARA)
+				const auto& object = Objects[collObjects.ItemPtrs.front()->ObjectNumber];
+
+				if (!object.intelligent &&
+					!collObjects.ItemPtrs.front()->IsLara())
 				{
-					ObjectCollision(CollidedItems[0]->Index, item, &LaraCollision);
+					ObjectCollision(collObjects.ItemPtrs.front()->Index, item, &LaraCollision);
 				}
 			}
-			else if (CollidedMeshes[0])
+			else if (!collObjects.StaticPtrs.empty())
 			{
-				ItemPushStatic(item, *CollidedMeshes[0], &LaraCollision);
+				ItemPushStatic(item, *collObjects.StaticPtrs.front(), &LaraCollision);
 			}
 			
 			item->Animation.Velocity.z = -int(item->Animation.Velocity.z / 1.5f);

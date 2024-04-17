@@ -67,7 +67,7 @@ void InitializePuzzleDone(short itemNumber)
 	auto& receptacleItem = g_Level.Items[itemNumber];
 	const auto& anim = GetAnimData(receptacleItem);
 
-	receptacleItem.Animation.RequiredState = NO_STATE;
+	receptacleItem.Animation.RequiredState = NO_VALUE;
 	receptacleItem.Animation.FrameNumber = anim.EndFrameNumber;
 }
 
@@ -108,7 +108,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		puzzleType = PuzzleType::Specfic;
 	}
 
-	if (((IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_ITEM) &&
+	if (((IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_VALUE) &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		player.Control.HandStatus == HandStatus::Free &&
@@ -128,7 +128,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		{
 			if (!player.Control.IsMoving)
 			{
-				if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
+				if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
 				{
 					if (g_Gui.IsObjectInInventory(receptacleItem.ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
 						g_Gui.SetEnterInventory(receptacleItem.ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
@@ -150,7 +150,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 				if (!MoveLaraPosition(pos, &receptacleItem, laraItem))
 				{
 					player.Context.InteractedItem = itemNumber;
-					g_Gui.SetInventoryItemChosen(NO_ITEM);
+					g_Gui.SetInventoryItemChosen(NO_VALUE);
 					receptacleItem.Pose.Orientation.y = prevYOrient;
 					return;
 				}
@@ -173,7 +173,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 				receptacleItem.ItemFlags[0] = 1;
 			}
 
-			g_Gui.SetInventoryItemChosen(NO_ITEM);
+			g_Gui.SetInventoryItemChosen(NO_VALUE);
 			ResetPlayerFlex(laraItem);
 			laraItem->Animation.FrameNumber = 0;
 			player.Control.IsMoving = false;
@@ -281,7 +281,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			if (!MoveLaraPosition(pos, &receptacleItem, laraItem))
 			{
 				player.Context.InteractedItem = itemNumber;
-				g_Gui.SetInventoryItemChosen(NO_ITEM);
+				g_Gui.SetInventoryItemChosen(NO_VALUE);
 				receptacleItem.Pose.Orientation.y = prevYOrient;
 				return;
 			}
@@ -348,7 +348,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 		item->Animation.FrameNumber = 0;
 		item->Animation.ActiveState =
 		item->Animation.TargetState = GetAnimData(*item).StateID;
-		item->Animation.RequiredState = NO_STATE;
+		item->Animation.RequiredState = NO_VALUE;
 		item->ResetModelToDefault();
 
 		AddActiveItem(itemNumber);
@@ -447,7 +447,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	short triggerType = (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS;
 
-	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_ITEM);
+	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_VALUE);
 
 	bool isPlayerAvailable = (player->Control.Look.OpticRange == 0 &&
 							 laraItem->Animation.ActiveState == LS_IDLE &&
@@ -464,7 +464,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				if (keyHoleItem->Status != ITEM_NOT_ACTIVE && triggerType != TRIGGER_TYPES::SWITCH)
 					return;
 
-				if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
+				if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
 				{
 					if (g_Gui.IsObjectInInventory(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)))
 						g_Gui.SetEnterInventory(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1));
@@ -511,7 +511,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				keyHoleItem->Status = ITEM_ACTIVE;
 			}
 
-			g_Gui.SetInventoryItemChosen(NO_ITEM);
+			g_Gui.SetInventoryItemChosen(NO_VALUE);
 			return;
 		}
 

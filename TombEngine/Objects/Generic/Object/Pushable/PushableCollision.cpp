@@ -82,7 +82,7 @@ namespace TEN::Entities::Generic
 			else
 			{
 				pushable.IsOnEdge = true;
-				if (!pushable.CanFall || pushable.Stack.ItemNumberAbove != NO_ITEM)
+				if (!pushable.CanFall || pushable.Stack.ItemNumberAbove != NO_VALUE)
 					return false;
 			}
 		}
@@ -116,28 +116,24 @@ namespace TEN::Entities::Generic
 		// Test object collision.
 		auto prevPos = pushableItem.Pose.Position;
 		pushableItem.Pose.Position = targetPos;
-		GetCollidedObjects(&pushableItem, BLOCK(0.25f), true, &CollidedItems[0], &CollidedMeshes[0], true);
+		auto collObjects = GetCollidedObjects(pushableItem, true, true);
 		pushableItem.Pose.Position = prevPos;
 
-		if (CollidedMeshes[0])
+		if (!collObjects.StaticPtrs.empty())
 			return false;
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		for (const auto* itemPtr : collObjects.ItemPtrs)
 		{
-			if (CollidedItems[i] == nullptr)
-				break;
-
-			const auto& item = *CollidedItems[i];
-			const auto& object = Objects[item.ObjectNumber];
+			const auto& object = Objects[itemPtr->ObjectNumber];
 
 			if (object.isPickup)
 				continue;
 
-			if (!item.IsBridge())
+			if (!itemPtr->IsBridge())
 				return false;
 
-			const auto& bridge = GetBridgeObject(item);
-			if (!bridge.GetFloorHeight(item, item.Pose.Position).has_value())
+			const auto& bridge = GetBridgeObject(*itemPtr);
+			if (!bridge.GetFloorHeight(*itemPtr, itemPtr->Pose.Position).has_value())
 				return false;
 		}
 
@@ -191,34 +187,30 @@ namespace TEN::Entities::Generic
 		// Collide with objects.
 		auto prevPos = LaraItem->Pose.Position;
 		LaraItem->Pose.Position = pointColl.Coordinates;
-		GetCollidedObjects(LaraItem, LARA_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], true);
+		auto collObjects = GetCollidedObjects(*LaraItem, true, true);
 		LaraItem->Pose.Position = prevPos;
 
-		if (CollidedMeshes[0])
+		if (!collObjects.StaticPtrs.empty())
 			return false;
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		for (const auto* itemPtr : collObjects.ItemPtrs)
 		{
-			if (CollidedItems[i] == nullptr)
-				break;
+			const auto& object = Objects[itemPtr->ObjectNumber];
 
-			const auto& item = *CollidedItems[i];
-			const auto& object = Objects[item.ObjectNumber];
-
-			if (&item == &pushableItem)
+			if (itemPtr->Index == pushableItem.Index)
 				continue;
 
 			if (object.isPickup)
 				continue;
 
-			if (!item.IsBridge())
+			if (!itemPtr->IsBridge())
 			{
 				return false;
 			}
 			else
 			{
-				const auto& bridge = GetBridgeObject(item);
-				if (!bridge.GetFloorHeight(item, item.Pose.Position).has_value())
+				const auto& bridge = GetBridgeObject(*itemPtr);
+				if (!bridge.GetFloorHeight(*itemPtr, itemPtr->Pose.Position).has_value())
 					return false;
 			}
 		}
