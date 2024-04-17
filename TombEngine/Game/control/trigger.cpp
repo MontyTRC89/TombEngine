@@ -516,8 +516,11 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
-			if (GetCollision(floor, x, y, z).Position.Floor == y)
+		{
+			auto pointColl = GetCollision(floor, x, y, z);
+			if (pointColl.Position.Floor == y && pointColl.Position.Bridge == NO_VALUE)
 				break;
+		}
 			return;
 
 		case TRIGGER_TYPES::KEY:
