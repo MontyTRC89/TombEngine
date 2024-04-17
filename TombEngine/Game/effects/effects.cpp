@@ -1936,8 +1936,9 @@ void ProcessEffects(ItemInfo* item)
 	
 	if (item->Effect.Type != EffectType::Sparks && item->Effect.Type != EffectType::Smoke)
 	{
+		const auto& bounds = GameBoundingBox(item);
 		int waterHeight = GetWaterHeight(item);
-		int itemLevel = item->Pose.Position.y - GameBoundingBox(item).GetHeight() / 3;
+		int itemLevel = item->Pose.Position.y + bounds.Y2 - (bounds.GetHeight() / 3);
 
 		if (waterHeight != NO_HEIGHT && itemLevel > waterHeight)
 		{
