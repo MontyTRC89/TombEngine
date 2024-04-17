@@ -20,7 +20,7 @@ using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
 //namespace TEN::Animation
-{
+//{
 	constexpr auto VERTICAL_VELOCITY_GRAVITY_THRESHOLD = CLICK(0.5f);
 
 	// TODO: Arm anim object in savegame.
@@ -507,4 +507,4 @@ using TEN::Renderer::g_Renderer;
 		auto nextBoneOffset = GetJointOffset(objectID, boneID + 1);
 		return nextBoneOffset.Length();
 	}
-}
+//}

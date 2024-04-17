@@ -15,7 +15,7 @@ struct KeyframeInterpData;
 struct ObjectInfo;
 
 //namespace TEN::Animation
-{
+//{
 	struct KeyframeData
 	{
 		GameBoundingBox			BoundingBox = GameBoundingBox::Zero;
@@ -122,4 +122,4 @@ struct ObjectInfo;
 	Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int boneID);
 	Quaternion GetBoneOrientation(const ItemInfo& item, int boneID);
 	float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneID);
-}
+//}
