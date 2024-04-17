@@ -644,15 +644,15 @@ namespace TEN::Entities::TR4
 					auto floor = GetCollision(x, y, z, item->RoomNumber).Block;
 					if (floor->Stopper)
 					{
-						for (int i = 0; i < room->mesh.size(); i++)
+						for (int i = 0; i < room->Statics.size(); i++)
 						{
-							auto* staticMesh = &room->mesh[i];
+							auto& staticObj = room->Statics[i];
 
-							if (abs(pos.x - staticMesh->pos.Position.x) < BLOCK(1) && 
-								abs(pos.z - staticMesh->pos.Position.z) < BLOCK(1) &&
-								StaticObjects[staticMesh->staticNumber].shatterType != ShatterType::None)
+							if (abs(pos.x - staticObj.Pose.Position.x) < BLOCK(1) && 
+								abs(pos.z - staticObj.Pose.Position.z) < BLOCK(1) &&
+								staticObj.AssetPtr->shatterType != ShatterType::None)
 							{
-								ShatterObject(0, staticMesh, -128, LaraItem->RoomNumber, 0);
+								ShatterObject(0, &staticObj, -128, LaraItem->RoomNumber, 0);
 								SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 								floor->Stopper = false;
 								TestTriggers(item, true);

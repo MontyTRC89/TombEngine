@@ -422,6 +422,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\savegame.h" />
     <ClInclude Include="Game\Setup.h" />
     <ClInclude Include="Game\spotcam.h" />
+    <ClInclude Include="Game\StaticObject.h" />
     <ClInclude Include="Math\Constants.h" />
     <ClInclude Include="Math\Geometry.h" />
     <ClInclude Include="Math\Interpolation.h" />
@@ -931,6 +932,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\savegame.cpp" />
     <ClCompile Include="Game\Setup.cpp" />
     <ClCompile Include="Game\spotcam.cpp" />
+    <ClCompile Include="Game\StaticObject.cpp" />
     <ClCompile Include="Math\Geometry.cpp" />
     <ClCompile Include="Math\Interpolation.cpp" />
     <ClCompile Include="Math\Legacy.cpp" />

@@ -12,7 +12,7 @@ constexpr auto DEFAULT_RADIUS = 10;
 constexpr auto GRAVITY		  = 6.0f;
 constexpr auto SWAMP_GRAVITY  = GRAVITY / 3.0f;
 
-constexpr auto MAX_STATICS = 1000;
+constexpr auto STATIC_COUNT_MAX = 1000;
 
 enum JointRotationFlags
 {
@@ -47,10 +47,10 @@ enum class LotType
 
 enum class HitEffect
 {
-    None,
-    Blood,
-    Smoke,
-    Richochet,
+	None,
+	Blood,
+	Smoke,
+	Richochet,
 	NonExplosive,
 	Special
 };
@@ -69,6 +69,7 @@ enum class ShatterType
 	Explode
 };
 
+// MoveableAsset
 struct ObjectInfo
 {
 	bool loaded = false; // IsLoaded
@@ -110,6 +111,20 @@ struct ObjectInfo
 	void SetHitEffect(bool isSolid = false, bool isAlive = false);
 };
 
+struct StaticAsset
+{
+	int ID = 0;
+	int meshNumber = 0; // g_Level.meshes index. TODO: Contain here.
+
+	GameBoundingBox visibilityBox = {};
+	GameBoundingBox collisionBox  = {};
+
+	ShatterType shatterType	 = ShatterType::None;
+	int			shatterSound = 0;
+
+	int flags = 0;
+};
+
 class ObjectHandler
 {
 private:
@@ -125,19 +140,11 @@ private:
 	ObjectInfo& GetFirstAvailableObject();
 };
 
-struct StaticInfo
-{
-	int meshNumber;
-	int flags;
-	GameBoundingBox visibilityBox;
-	GameBoundingBox collisionBox;
-	ShatterType shatterType;
-	int shatterSound;
-};
-
 extern ObjectHandler Objects;
-extern StaticInfo StaticObjects[MAX_STATICS];
+extern StaticAsset	 StaticAssets[STATIC_COUNT_MAX];
 
 void InitializeGameFlags();
 void InitializeSpecialEffects();
 void InitializeObjects();
+
+StaticAsset& GetStaticAsset(int id);

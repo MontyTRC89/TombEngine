@@ -266,9 +266,9 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 
 	bool hasHit = false;
 
-	MESH_INFO* mesh = nullptr;
+	StaticObject* staticObjPtr = nullptr;
 	auto vector = Vector3i::Zero;
-	int itemNumber = ObjectOnLOS2(origin, target, &vector, &mesh);
+	int itemNumber = ObjectOnLOS2(origin, target, &vector, &staticObjPtr);
 
 	if (itemNumber != NO_LOS_ITEM)
 	{
@@ -284,14 +284,14 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			{
 				if (itemNumber < 0)
 				{
-					if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
+					if (staticObjPtr->AssetPtr->shatterType != ShatterType::None)
 					{
 						const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
-						mesh->HitPoints -= weapon.Damage;
+						staticObjPtr->HitPoints -= weapon.Damage;
 						ShatterImpactData.impactDirection = dir;
-						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
-						ShatterObject(nullptr, mesh, 128, target2.RoomNumber, 0);
-						SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
+						ShatterImpactData.impactLocation = Vector3(staticObjPtr->Pose.Position.x, staticObjPtr->Pose.Position.y, staticObjPtr->Pose.Position.z);
+						ShatterObject(nullptr, staticObjPtr, 128, target2.RoomNumber, 0);
+						SoundEffect(GetShatterSound(*staticObjPtr->AssetPtr), (Pose*)staticObjPtr);
 					}
 
 					TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
@@ -637,7 +637,7 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 	return true;
 }
 
-int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObjectID)
+int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, StaticObject** mesh, GAME_OBJECT_ID priorityObjectID)
 {
 	ClosestItem = NO_LOS_ITEM;
 	ClosestDist = SQUARE(target->x - origin->x) + SQUARE(target->y - origin->y) + SQUARE(target->z - origin->z);
@@ -650,16 +650,16 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 
 		if (mesh)
 		{
-			for (int m = 0; m < room.mesh.size(); m++)
+			for (int m = 0; m < room.Statics.size(); m++)
 			{
-				auto& meshp = room.mesh[m];
+				auto& meshp = room.Statics[m];
 
-				if (meshp.flags & StaticMeshFlags::SM_VISIBLE)
+				if (meshp.Flags & StaticMeshFlags::SM_VISIBLE)
 				{
 					auto bounds = GetBoundsAccurate(meshp, false);
-					pose = Pose(meshp.pos.Position, EulerAngles(0, meshp.pos.Orientation.y, 0));
+					pose = Pose(meshp.Pose.Position, EulerAngles(0, meshp.Pose.Orientation.y, 0));
 
-					if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp.staticNumber))
+					if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp.AssetPtr->ID))
 					{
 						*mesh = &meshp;
 						target->RoomNumber = LosRooms[r];
@@ -792,18 +792,18 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 			continue;
 
 		// Run through statics.
-		for (const auto& staticObject : g_Level.Rooms[neighborRoomNumber].mesh)
+		for (const auto& staticObject : g_Level.Rooms[neighborRoomNumber].Statics)
 		{
 			// Check if static is visible.
-			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+			if (!(staticObject.Flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
 			// Check if static is solid (if applicable).
-			if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
+			if (onlySolid && !(staticObject.Flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
 			// Test ray-box intersection.
-			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
+			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.Pose);
 			float intersectDist = 0.0f;
 			if (box.Intersects(origin, dir, intersectDist))
 			{

@@ -547,16 +547,16 @@ namespace TEN::Entities::Creatures::TR5
 					// If floor is stopped, then try to find static meshes and shatter them, activating heavy triggers below
 					if (floor->Stopper)
 					{
-						for (int i = 0; i < room->mesh.size(); i++)
+						for (int i = 0; i < room->Statics.size(); i++)
 						{
-							auto* mesh = &room->mesh[i];
+							auto& staticObj = room->Statics[i];
 
-							if (!((mesh->pos.Position.z ^ pos.z) & 0xFFFFFC00) && !((mesh->pos.Position.x ^ pos.x) & 0xFFFFFC00))
+							if (!((staticObj.Pose.Position.z ^ pos.z) & 0xFFFFFC00) && !((staticObj.Pose.Position.x ^ pos.x) & 0xFFFFFC00))
 							{
-								if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
+								if (staticObj.AssetPtr->shatterType != ShatterType::None)
 								{
-									ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
-									SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
+									ShatterObject(0, &staticObj, -64, LaraItem->RoomNumber, 0);
+									SoundEffect(GetShatterSound(*staticObj.AssetPtr), &staticObj.Pose);
 
 									floor->Stopper = false;
 

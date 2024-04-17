@@ -1,6 +1,6 @@
 #pragma once
 
-struct MESH_INFO;
+class StaticObject;
 struct LevelCameraInfo;
 struct SinkInfo;
 struct SoundSourceInfo;
@@ -10,7 +10,7 @@ struct ROOM_INFO;
 
 using VarMapVal = std::variant<
 	short,
-	std::reference_wrapper<MESH_INFO>,
+	std::reference_wrapper<StaticObject>,
 	std::reference_wrapper<LevelCameraInfo>,
 	std::reference_wrapper<SinkInfo>,
 	std::reference_wrapper<SoundSourceInfo>,

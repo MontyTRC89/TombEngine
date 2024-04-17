@@ -395,86 +395,73 @@ namespace TEN::Renderer
 	void Renderer::CollectStatics(short roomNumber, RenderView& renderView)
 	{
 		if (_rooms.size() < roomNumber)
-		{
 			return;
-		}
 
-		RendererRoom& room = _rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
+		auto& rRoom = _rooms[roomNumber];
+		auto& nativeRoom = g_Level.Rooms[rRoom.RoomNumber];
 
-		if (r->mesh.empty())
-		{
+		if (nativeRoom.Statics.empty())
 			return;
-		}
 
-		for (int i = 0; i < room.Statics.size(); i++)
+		for (int i = 0; i < rRoom.Statics.size(); i++)
 		{
-			auto* mesh = &room.Statics[i];
-			MESH_INFO* nativeMesh = &r->mesh[i];
+			auto& rStatic = rRoom.Statics[i];
+			auto& nativeStatic = nativeRoom.Statics[i];
 
-			if (nativeMesh->Dirty || _invalidateCache)
+			if (nativeStatic.IsDirty || _invalidateCache)
 			{
-				mesh->ObjectNumber = nativeMesh->staticNumber;
-				mesh->Color = nativeMesh->color;
-				mesh->OriginalVisibilityBox = StaticObjects[mesh->ObjectNumber].visibilityBox;
-				mesh->Pose = nativeMesh->pos;
-				mesh->Scale = nativeMesh->scale;
-				mesh->Update();
+				rStatic.ObjectNumber = nativeStatic.AssetPtr->ID;
+				rStatic.Color = nativeStatic.Color;
+				rStatic.OriginalVisibilityBox = nativeStatic.AssetPtr->visibilityBox;
+				rStatic.Pose = nativeStatic.Pose;
+				rStatic.Scale = nativeStatic.Scale;
+				rStatic.Update();
 
-				nativeMesh->Dirty = false;
+				nativeStatic.IsDirty = false;
 			}
 
-			if (!(nativeMesh->flags & StaticMeshFlags::SM_VISIBLE))
-			{
+			if (!(nativeStatic.Flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
-			}
 
-			if (!_staticObjects[mesh->ObjectNumber].has_value())
-			{
+			if (!_staticObjects[rStatic.ObjectNumber].has_value())
 				continue;
-			}
 
-			auto& obj = *_staticObjects[mesh->ObjectNumber];
-
-			if (obj.ObjectMeshes.empty())
-			{
+			auto& rObject = *_staticObjects[rStatic.ObjectNumber];
+			if (rObject.ObjectMeshes.empty())
 				continue;
-			}
 
-			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->VisibilityBox.Center, mesh->VisibilitySphereRadius))
-			{
+			if (!renderView.Camera.Frustum.SphereInFrustum(rStatic.VisibilityBox.Center, rStatic.VisibilitySphereRadius))
 				continue;
-			}
 			 
-			// Collect the lights
-			std::vector<RendererLight*> lights;
-			std::vector<RendererLightNode> cachedRoomLights;
-			if (obj.ObjectMeshes.front()->LightMode != LightMode::Static)
+			// Collect lights.
+			auto lightPtrs = std::vector<RendererLight*>{};
+			auto cachedRoomLights = std::vector<RendererLightNode>{};
+			if (rObject.ObjectMeshes.front()->LightMode != LightMode::Static)
 			{
-				if (mesh->CacheLights || _invalidateCache)
+				if (rStatic.CacheLights || _invalidateCache)
 				{
-					// Collect all lights and return also cached light for the next frames
-					CollectLights(mesh->Pose.Position.ToVector3(),1024, room.RoomNumber, NO_VALUE, false, false, &cachedRoomLights, &lights);
-					mesh->CacheLights = false;
-					mesh->CachedRoomLights = cachedRoomLights;
+					// Collect all lights and return cached light for following frames.
+					CollectLights(rStatic.Pose.Position.ToVector3(), 1024, rRoom.RoomNumber, NO_VALUE, false, false, &cachedRoomLights, &lightPtrs);
+					rStatic.CacheLights = false;
+					rStatic.CachedRoomLights = cachedRoomLights;
 				}
 				else
 				{
-					// Collecy only dynamic lights and use cached lights from rooms
-					CollectLights(mesh->Pose.Position.ToVector3(), 1024, room.RoomNumber, NO_VALUE, false, true, &mesh->CachedRoomLights, &lights);
+					// Collecy only dynamic lights and use cached lights from rooms.
+					CollectLights(rStatic.Pose.Position.ToVector3(), 1024, rRoom.RoomNumber, NO_VALUE, false, true, &rStatic.CachedRoomLights, &lightPtrs);
 				}
 			}
-			mesh->LightsToDraw = lights;
+			rStatic.LightsToDraw = lightPtrs;
 
-			// At this point, we are sure that we must draw the static mesh
-			room.StaticsToDraw.push_back(mesh);
+			// Add static to draw list.
+			rRoom.StaticsToDraw.push_back(&rStatic);
 
-			if (renderView.SortedStaticsToDraw.find(mesh->ObjectNumber) == renderView.SortedStaticsToDraw.end())
+			if (renderView.SortedStaticsToDraw.find(rStatic.ObjectNumber) == renderView.SortedStaticsToDraw.end())
 			{
-				std::vector<RendererStatic*> vec;
-				renderView.SortedStaticsToDraw.insert(std::pair<int, std::vector<RendererStatic*>>(mesh->ObjectNumber, std::vector<RendererStatic*>()));
+				auto staticPtrs = std::vector<RendererStatic*>{};
+				renderView.SortedStaticsToDraw.insert(std::pair<int, std::vector<RendererStatic*>>(rStatic.ObjectNumber, std::vector<RendererStatic*>()));
 			}
-			renderView.SortedStaticsToDraw[mesh->ObjectNumber].push_back(mesh);
+			renderView.SortedStaticsToDraw[rStatic.ObjectNumber].push_back(&rStatic);
 		}
 	}
 

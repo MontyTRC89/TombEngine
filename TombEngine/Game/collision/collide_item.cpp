@@ -210,14 +210,14 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 		if (mode == ObjectCollectionMode::All ||
 			mode == ObjectCollectionMode::Statics)
 		{
-			for (auto& staticObj : neighborRoom.mesh)
+			for (auto& staticObj : neighborRoom.Statics)
 			{
 				// Discard invisible statics.
-				if (!(staticObj.flags & StaticMeshFlags::SM_VISIBLE))
+				if (!(staticObj.Flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
 				// Test rough distance to discard statics beyond collision check threshold.
-				float dist = Vector3i::Distance(staticObj.pos.Position, collidingItem.Pose.Position);
+				float dist = Vector3i::Distance(staticObj.Pose.Position, collidingItem.Pose.Position);
 				if (dist > COLLISION_CHECK_DISTANCE)
 					continue;
 
@@ -225,22 +225,22 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 				// Test rough vertical distance to discard statics not intersecting vertically.
 				if (((collidingItem.Pose.Position.y + collidingBounds.Y1) - ROUGH_BOX_HEIGHT_MIN) >
-					((staticObj.pos.Position.y + bounds.Y2) + ROUGH_BOX_HEIGHT_MIN))
+					((staticObj.Pose.Position.y + bounds.Y2) + ROUGH_BOX_HEIGHT_MIN))
 				{
 					continue;
 				}
 				if (((collidingItem.Pose.Position.y + collidingBounds.Y2) + ROUGH_BOX_HEIGHT_MIN) <
-					((staticObj.pos.Position.y + bounds.Y1) - ROUGH_BOX_HEIGHT_MIN))
+					((staticObj.Pose.Position.y + bounds.Y1) - ROUGH_BOX_HEIGHT_MIN))
 				{
 					continue;
 				}
 
 				// Test rough circle intersection to discard statics not intersecting horizontally.
-				auto circle = Vector3(staticObj.pos.Position.x, staticObj.pos.Position.z, (bounds.GetExtents() * Vector3(1.0f, 0.0f, 1.0f)).Length());
+				auto circle = Vector3(staticObj.Pose.Position.x, staticObj.Pose.Position.z, (bounds.GetExtents() * Vector3(1.0f, 0.0f, 1.0f)).Length());
 				if (!Geometry::CircleIntersects(circle, collidingCircle))
 					continue;
 
-				auto box0 = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
+				auto box0 = bounds.ToBoundingOrientedBox(staticObj.Pose.Position);
 				auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
 
 				// Override extents if specified.
@@ -337,14 +337,14 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 				itemNumber = item2->NextItem;
 			}
 
-			for (auto& mesh : g_Level.Rooms[i].mesh)
+			for (auto& mesh : g_Level.Rooms[i].Statics)
 			{
-				if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
+				if (!(mesh.Flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
-				if (Vector3i::Distance(item->Pose.Position, mesh.pos.Position) < COLLISION_CHECK_DISTANCE)
+				if (Vector3i::Distance(item->Pose.Position, mesh.Pose.Position) < COLLISION_CHECK_DISTANCE)
 				{
-					const auto& bBox = GetBoundsAccurate(mesh, false).ToBoundingOrientedBox(mesh.pos);
+					const auto& bBox = GetBoundsAccurate(mesh, false).ToBoundingOrientedBox(mesh.Pose);
 					float distance;
 
 					if (bBox.Intersects(origin, direction, distance) && distance < (coll->Setup.Radius * 2))
@@ -597,7 +597,7 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 	return false;
 }
 
-bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius)
+bool TestBoundsCollideStatic(ItemInfo* item, const StaticObject& mesh, int radius)
 {
 	const auto& bounds = GetBoundsAccurate(mesh, false);
 
@@ -605,17 +605,17 @@ bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius)
 		return false;
 
 	const auto& itemBounds = GetBestFrame(*item).BoundingBox;
-	if (mesh.pos.Position.y + bounds.Y2 <= item->Pose.Position.y + itemBounds.Y1)
+	if (mesh.Pose.Position.y + bounds.Y2 <= item->Pose.Position.y + itemBounds.Y1)
 		return false;
 
-	if (mesh.pos.Position.y + bounds.Y1 >= item->Pose.Position.y + itemBounds.Y2)
+	if (mesh.Pose.Position.y + bounds.Y1 >= item->Pose.Position.y + itemBounds.Y2)
 		return false;
 
-	float sinY = phd_sin(mesh.pos.Orientation.y);
-	float cosY = phd_cos(mesh.pos.Orientation.y);
+	float sinY = phd_sin(mesh.Pose.Orientation.y);
+	float cosY = phd_cos(mesh.Pose.Orientation.y);
 
-	int x = item->Pose.Position.x - mesh.pos.Position.x;
-	int z = item->Pose.Position.z - mesh.pos.Position.z;
+	int x = item->Pose.Position.x - mesh.Pose.Position.x;
+	int z = item->Pose.Position.z - mesh.Pose.Position.z;
 	int dx = (x * cosY) - (z * sinY);
 	int dz = (z * cosY) + (x * sinY);
 
@@ -803,15 +803,15 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2)
 }
 
 // NOTE: Previously ItemPushLaraStatic().
-bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
+bool ItemPushStatic(ItemInfo* item, const StaticObject& mesh, CollisionInfo* coll)
 {
 	const auto& bounds = GetBoundsAccurate(mesh, false);
 
-	float sinY = phd_sin(mesh.pos.Orientation.y);
-	float cosY = phd_cos(mesh.pos.Orientation.y);
+	float sinY = phd_sin(mesh.Pose.Orientation.y);
+	float cosY = phd_cos(mesh.Pose.Orientation.y);
 	
-	auto direction = item->Pose.Position - mesh.pos.Position;
-	auto dz = item->Pose.Position.z - mesh.pos.Position.z;
+	auto direction = item->Pose.Position - mesh.Pose.Position;
+	auto dz = item->Pose.Position.z - mesh.Pose.Position.z;
 	auto rx = (direction.x * cosY) - (direction.z * sinY);
 	auto rz = (direction.z * cosY) + (direction.x * sinY);
 	auto minX = bounds.X1 - coll->Setup.Radius;
@@ -840,8 +840,8 @@ bool ItemPushStatic(ItemInfo* item, const MESH_INFO& mesh, CollisionInfo* coll)
 	else
 		rz -= bottom;
 
-	item->Pose.Position.x = mesh.pos.Position.x + cosY * rx + sinY * rz;
-	item->Pose.Position.z = mesh.pos.Position.z + cosY * rz - sinY * rx;
+	item->Pose.Position.x = mesh.Pose.Position.x + cosY * rx + sinY * rz;
+	item->Pose.Position.z = mesh.Pose.Position.z + cosY * rz - sinY * rx;
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -942,16 +942,16 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 		if (!g_Level.Rooms[i].Active())
 			continue;
 
-		for (auto& mesh : g_Level.Rooms[i].mesh)
+		for (auto& mesh : g_Level.Rooms[i].Statics)
 		{
 			// Only process meshes which are visible and solid.
-			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE) || !(mesh.flags & StaticMeshFlags::SM_SOLID))
+			if (!(mesh.Flags & StaticMeshFlags::SM_VISIBLE) || !(mesh.Flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
-			float distance = Vector3i::Distance(item->Pose.Position, mesh.pos.Position);
+			float distance = Vector3i::Distance(item->Pose.Position, mesh.Pose.Position);
 			if (distance < COLLISION_CHECK_DISTANCE)
 			{
-				if (CollideSolidBounds(item, GetBoundsAccurate(mesh, false), mesh.pos, coll))
+				if (CollideSolidBounds(item, GetBoundsAccurate(mesh, false), mesh.Pose, coll))
 					coll->HitStatic = true;
 			}
 		}
@@ -1887,17 +1887,17 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		for (auto& staticObject : neighborRoom.mesh)
+		for (auto& staticObject : neighborRoom.Statics)
 		{
-			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+			if (!(staticObject.Flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
 			// For Lara, solid static mesh collisions are directly managed by GetCollisionInfo,
 			// so we bypass them here to avoid interference.
-			if (isPlayer && (staticObject.flags & StaticMeshFlags::SM_SOLID))
+			if (isPlayer && (staticObject.Flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
-			if (Vector3i::Distance(staticObject.pos.Position, item->Pose.Position) >= COLLISION_CHECK_DISTANCE)
+			if (Vector3i::Distance(staticObject.Pose.Position, item->Pose.Position) >= COLLISION_CHECK_DISTANCE)
 				continue;
 
 			if (!TestBoundsCollideStatic(item, staticObject, coll->Setup.Radius))
@@ -1908,9 +1908,9 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			// HACK: Shatter statics only by harmful vehicles.
 			if (!isPlayer && 
 				!isHarmless && abs(item->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
-				StaticObjects[staticObject.staticNumber].shatterType != ShatterType::None)
+				staticObject.AssetPtr->shatterType != ShatterType::None)
 			{
-				SoundEffect(GetShatterSound(staticObject.staticNumber), &staticObject.pos);
+				SoundEffect(GetShatterSound(*staticObject.AssetPtr), &staticObject.Pose);
 				ShatterObject(nullptr, &staticObject, -128, item->RoomNumber, 0);
 			}
 			else if (coll->Setup.EnableObjectPush)

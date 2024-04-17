@@ -86,15 +86,15 @@ namespace TEN::Entities::TR4
 		{
 			auto* room = &g_Level.Rooms[item->RoomNumber];
 
-			for (int i = 0; i < room->mesh.size(); i++)
+			for (int i = 0; i < room->Statics.size(); i++)
 			{
-				auto* mesh = &room->mesh[i];
+				auto* staticPtr = &room->Statics[i];
 
-				if (((mesh->pos.Position.z / BLOCK(1)) == (z / BLOCK(1))) &&
-					((mesh->pos.Position.x / BLOCK(1)) == (x / BLOCK(1))) &&
-					StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
+				if (((staticPtr->Pose.Position.z / BLOCK(1)) == (z / BLOCK(1))) &&
+					((staticPtr->Pose.Position.x / BLOCK(1)) == (x / BLOCK(1))) &&
+					staticPtr->AssetPtr->shatterType != ShatterType::None)
 				{
-					ShatterObject(nullptr, mesh, -64, item->RoomNumber, 0);
+					ShatterObject(nullptr, staticPtr, -64, item->RoomNumber, 0);
 					SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 
 					probe.Block = false;

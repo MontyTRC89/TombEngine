@@ -1056,16 +1056,21 @@ void PlaySecretTrack()
 	PlaySoundTrack(SoundTracks.at(SecretSoundIndex).Name, SoundTrackType::OneShot);
 }
 
-int GetShatterSound(int shatterID)
+int GetShatterSound(const StaticAsset& asset)
 {
-	auto fxID = StaticObjects[shatterID].shatterSound;
-	if (fxID != -1 && fxID < NUM_SFX)
-		return fxID;
+	auto soundID = asset.shatterSound;
+	if (soundID != NO_VALUE && soundID < NUM_SFX)
+		return soundID;
 
-	if (shatterID < 3)
+	// HACK
+	if (asset.ID < 3)
+	{
 		return SFX_TR5_SMASH_WOOD;
+	}
 	else
+	{
 		return SFX_TR4_SMASH_ROCK;
+	}
 }
 
 void PlaySoundSources()

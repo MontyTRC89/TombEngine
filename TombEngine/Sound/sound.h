@@ -160,7 +160,7 @@ void PauseAllSounds(SoundPauseMode mode);
 void ResumeAllSounds(SoundPauseMode mode);
 void SayNo();
 void PlaySoundSources();
-int  GetShatterSound(int shatterID);
+int GetShatterSound(const StaticAsset& asset);
 
 void PlaySoundTrack(const std::string& trackName, SoundTrackType mode, QWORD position = 0);
 void PlaySoundTrack(const std::string& trackName, short mask = 0);

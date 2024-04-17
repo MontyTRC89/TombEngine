@@ -194,17 +194,19 @@ FloorInfo* GetSector(ROOM_INFO* room, int x, int z)
 	return &room->floor[sectorID];
 }
 
-GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox)
+GameBoundingBox& GetBoundsAccurate(const StaticObject& staticObj, bool getVisibilityBox)
 {
 	static auto bounds = GameBoundingBox();
 
 	if (getVisibilityBox)
 	{
-		bounds = StaticObjects[mesh.staticNumber].visibilityBox * mesh.scale;
+		staticObj.AssetPtr->ID;
+
+		bounds = staticObj.AssetPtr->visibilityBox * staticObj.Scale;
 	}
 	else
 	{
-		bounds = StaticObjects[mesh.staticNumber].collisionBox * mesh.scale;
+		bounds = staticObj.AssetPtr->collisionBox * staticObj.Scale;
 	}
 
 	return bounds;

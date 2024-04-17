@@ -133,7 +133,7 @@ bool Targetable(ItemInfo* item, AI_INFO* ai)
 		enemy->Pose.Position.z,
 		enemy->RoomNumber); // TODO: Check why this line didn't exist in the first place. -- TokyoSU 2022.08.05
 
-	MESH_INFO* mesh = nullptr;
+	StaticObject* mesh = nullptr;
 	Vector3i vector = {};
 	int losItemIndex = ObjectOnLOS2(&origin, &target, &vector, &mesh);
 	if (losItemIndex == item->Index)

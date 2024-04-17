@@ -190,13 +190,13 @@ namespace TEN::Entities::TR4
 
 				if (currentFloor.Stopper)
 				{
-					for (auto& mesh : room.mesh)
+					for (auto& staticObj : room.Statics)
 					{
-						if (abs(pos.x - mesh.pos.Position.x) < BLOCK(1) &&
-							abs(pos.z - mesh.pos.Position.z) < BLOCK(1) &&
-							StaticObjects[mesh.staticNumber].shatterType == ShatterType::None)
+						if (abs(pos.x - staticObj.Pose.Position.x) < BLOCK(1) &&
+							abs(pos.z - staticObj.Pose.Position.z) < BLOCK(1) &&
+							staticObj.AssetPtr->shatterType == ShatterType::None)
 						{
-							ShatterObject(nullptr, &mesh, -64, LaraItem->RoomNumber, 0);
+							ShatterObject(nullptr, &staticObj, -64, LaraItem->RoomNumber, 0);
 							SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 
 							currentFloor.Stopper = false;

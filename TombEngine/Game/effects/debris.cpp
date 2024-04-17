@@ -14,7 +14,7 @@ using namespace TEN::Math::Random;
 ShatterImpactInfo ShatterImpactData;
 SHATTER_ITEM ShatterItem;
 short SmashedMeshCount;
-MESH_INFO* SmashedMesh[32];
+StaticObject* SmashedMesh[32];
 short SmashedMeshRoom[32];
 std::array<DebrisFragment, MAX_DEBRIS> DebrisFragments;
 
@@ -57,7 +57,7 @@ DebrisFragment* GetFreeDebrisFragment()
 	return nullptr;
 }
 
-void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumber, int noZXVel)
+void ShatterObject(SHATTER_ITEM* item, StaticObject* staticPtr, int num, short roomNumber, int noZXVel)
 {
 	int meshIndex = 0;
 	short yRot = 0;
@@ -65,22 +65,22 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 	Vector3 pos;
 	bool isStatic;
 
-	if (mesh)
+	if (staticPtr != nullptr)
 	{
-		if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+		if (!(staticPtr->Flags & StaticMeshFlags::SM_VISIBLE))
 			return;
 
 		isStatic = true;
-		meshIndex = StaticObjects[mesh->staticNumber].meshNumber;
-		yRot = mesh->pos.Orientation.y;
-		pos = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
-		scale = mesh->scale;
+		meshIndex = staticPtr->AssetPtr->meshNumber;
+		yRot = staticPtr->Pose.Orientation.y;
+		pos = Vector3(staticPtr->Pose.Position.x, staticPtr->Pose.Position.y, staticPtr->Pose.Position.z);
+		scale = staticPtr->Scale;
 
-		if (mesh->HitPoints <= 0)
-			mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
+		if (staticPtr->HitPoints <= 0)
+			staticPtr->Flags &= ~StaticMeshFlags::SM_VISIBLE;
 
 		SmashedMeshRoom[SmashedMeshCount] = roomNumber;
-		SmashedMesh[SmashedMeshCount] = mesh;
+		SmashedMesh[SmashedMeshCount] = staticPtr;
 		SmashedMeshCount++;
 	}
 	else
@@ -182,7 +182,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 				fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
 				fragment->roomNumber = roomNumber;
 				fragment->numBounces = 0;
-				fragment->color = isStatic ? mesh->color : item->color;
+				fragment->color = isStatic ? staticPtr->Color : item->color;
 				fragment->lightMode = fragmentsMesh->lightMode;
 			}
 		}

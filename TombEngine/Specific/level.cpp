@@ -263,18 +263,17 @@ void LoadItems()
 void LoadObjects()
 {
 	Objects.Initialize();
-	std::memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
+	std::memset(StaticAssets, 0, sizeof(StaticAsset) * STATIC_COUNT_MAX);
 
-	int numMeshes = ReadInt32();
-	TENLog("Num meshes: " + std::to_string(numMeshes), LogLevel::Info);
+	int meshCount = ReadInt32();
+	TENLog("Meshes: " + std::to_string(meshCount), LogLevel::Info);
 
-	g_Level.Meshes.reserve(numMeshes);
-	for (int i = 0; i < numMeshes; i++)
+	g_Level.Meshes.reserve(meshCount);
+	for (int i = 0; i < meshCount; i++)
 	{
-		MESH mesh;
+		auto mesh = MESH{};
 
 		mesh.lightMode = (LightMode)ReadUInt8();
-
 		mesh.sphere.Center.x = ReadFloat();
 		mesh.sphere.Center.y = ReadFloat();
 		mesh.sphere.Center.z = ReadFloat();
@@ -415,64 +414,62 @@ void LoadObjects()
 		}
 	}
 
-	int numModels = ReadInt32();
-	TENLog("Num models: " + std::to_string(numModels), LogLevel::Info);
+	int movCount = ReadInt32();
+	TENLog("Moveables: " + std::to_string(movCount), LogLevel::Info);
 
-	for (int i = 0; i < numModels; i++)
+	for (int i = 0; i < movCount; i++)
 	{
-		int objNum = ReadInt32();
-		MoveablesIds.push_back(objNum);
+		int id = ReadInt32();
+		MoveablesIds.push_back(id);
+		auto& asset = Objects[id];
 
-		Objects[objNum].loaded = true;
-		Objects[objNum].nmeshes = ReadInt32();
-		Objects[objNum].meshIndex = ReadInt32();
-		Objects[objNum].boneIndex = ReadInt32();
-		Objects[objNum].frameBase = ReadInt32();
-		Objects[objNum].animIndex = ReadInt32();
-
-		Objects[objNum].loaded = true;
+		asset.loaded = true;
+		asset.nmeshes = ReadInt32();
+		asset.meshIndex = ReadInt32();
+		asset.boneIndex = ReadInt32();
+		asset.frameBase = ReadInt32();
+		asset.animIndex = ReadInt32();
+		asset.loaded = true;
 	}
 
-	TENLog("Initializing objects...", LogLevel::Info);
+	TENLog("Initializing object assets...", LogLevel::Info);
 	InitializeObjects();
 
-	int numStatics = ReadInt32();
-	TENLog("Num statics: " + std::to_string(numStatics), LogLevel::Info);
+	int staticCount = ReadInt32();
+	TENLog("Statics: " + std::to_string(staticCount), LogLevel::Info);
 
-	for (int i = 0; i < numStatics; i++)
+	for (int i = 0; i < staticCount; i++)
 	{
-		int meshID = ReadInt32();
-
-		if (meshID >= MAX_STATICS)
+		int id = ReadInt32();
+		if (id >= STATIC_COUNT_MAX)
 		{
-			TENLog("Static with ID " + std::to_string(meshID) + " detected, while maximum is " + std::to_string(MAX_STATICS) + ". " +
-				   "Change static mesh ID in WadTool to a value below maximum.", LogLevel::Warning);
+			TENLog(
+				"Attempted to load static ID " + std::to_string(id) + ". Change static ID in WadTool to value below max (" + std::to_string(STATIC_COUNT_MAX) + "). ",
+				LogLevel::Warning);
 			
-			meshID = 0;
+			id = 0;
 		}
 
-		StaticObjectsIds.push_back(meshID);
+		StaticObjectsIds.push_back(id);
+		auto& asset = GetStaticAsset[id];
 
-		StaticObjects[meshID].meshNumber = (short)ReadInt32();
-
-		StaticObjects[meshID].visibilityBox.X1 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.X2 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Y1 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Y2 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Z1 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Z2 = ReadInt16();
-
-		StaticObjects[meshID].collisionBox.X1 = ReadInt16();
-		StaticObjects[meshID].collisionBox.X2 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Y1 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Y2 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Z1 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Z2 = ReadInt16();
-
-		StaticObjects[meshID].flags = (short)ReadInt16();
-
-		StaticObjects[meshID].shatterType = (ShatterType)ReadInt16();
-		StaticObjects[meshID].shatterSound = (short)ReadInt16();
+		asset.ID = id;
+		asset.meshNumber = ReadInt32();
+		asset.visibilityBox.X1 = ReadInt16();
+		asset.visibilityBox.X2 = ReadInt16();
+		asset.visibilityBox.Y1 = ReadInt16();
+		asset.visibilityBox.Y2 = ReadInt16();
+		asset.visibilityBox.Z1 = ReadInt16();
+		asset.visibilityBox.Z2 = ReadInt16();
+		asset.collisionBox.X1 = ReadInt16();
+		asset.collisionBox.X2 = ReadInt16();
+		asset.collisionBox.Y1 = ReadInt16();
+		asset.collisionBox.Y2 = ReadInt16();
+		asset.collisionBox.Z1 = ReadInt16();
+		asset.collisionBox.Z2 = ReadInt16();
+		asset.flags = ReadInt16();
+		asset.shatterType = (ShatterType)ReadInt16();
+		asset.shatterSound = ReadInt16();
 	}
 }
 
@@ -849,27 +846,29 @@ void ReadRooms()
 			room.lights.push_back(light);
 		}
 		
-		int numStatics = ReadInt32();
-		room.mesh.reserve(numStatics);
-		for (int j = 0; j < numStatics; j++)
+		// Load statics.
+		int staticCount = ReadInt32();
+		room.Statics.reserve(staticCount);
+		for (int j = 0; j < staticCount; j++)
 		{
-			auto& mesh = room.mesh.emplace_back();
+			auto& staticObj = room.Statics.emplace_back();
 
-			mesh.roomNumber = i;
-			mesh.pos.Position.x = ReadInt32();
-			mesh.pos.Position.y = ReadInt32();
-			mesh.pos.Position.z = ReadInt32();
-			mesh.pos.Orientation.y = ReadUInt16();
-			mesh.pos.Orientation.x = ReadUInt16();
-			mesh.pos.Orientation.z = ReadUInt16();
-			mesh.scale = ReadFloat();
-			mesh.flags = ReadUInt16();
-			mesh.color = ReadVector4();
-			mesh.staticNumber = ReadUInt16();
-			mesh.HitPoints = ReadInt16();
-			mesh.Name = ReadString();
+			staticObj.ID = j;
+			staticObj.RoomNumber = i;
+			staticObj.Pose.Position.x = ReadInt32();
+			staticObj.Pose.Position.y = ReadInt32();
+			staticObj.Pose.Position.z = ReadInt32();
+			staticObj.Pose.Orientation.y = ReadUInt16();
+			staticObj.Pose.Orientation.x = ReadUInt16();
+			staticObj.Pose.Orientation.z = ReadUInt16();
+			staticObj.Scale = ReadFloat();
+			staticObj.Flags = ReadUInt16();
+			staticObj.Color = ReadVector4();
+			staticObj.AssetPtr = &GetStaticAsset(ReadUInt16());
+			staticObj.HitPoints = ReadInt16();
+			staticObj.Name = ReadString();
 
-			g_GameScriptEntities->AddName(mesh.Name, mesh);
+			g_GameScriptEntities->AddName(staticObj.Name, staticObj);
 		}
 
 		int numTriggerVolumes = ReadInt32();
@@ -1448,8 +1447,11 @@ void LoadSprites()
 		int spriteID = ReadInt32();
 		short negLength = ReadInt16();
 		short offset = ReadInt16();
+
 		if (spriteID >= ID_NUMBER_OBJECTS)
-			StaticObjects[spriteID - ID_NUMBER_OBJECTS].meshNumber = offset;
+		{
+			GetStaticAsset(spriteID - ID_NUMBER_OBJECTS).meshNumber = offset;
+		}
 		else
 		{
 			Objects[spriteID].nmeshes = negLength;

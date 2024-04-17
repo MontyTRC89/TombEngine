@@ -3,11 +3,11 @@
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 
-struct ItemInfo;
 class FloorInfo;
-struct ROOM_INFO;
-struct MESH_INFO;
+class StaticObject;
 enum RoomEnvFlags;
+struct ItemInfo;
+struct ROOM_INFO;
 
 constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBound.
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.

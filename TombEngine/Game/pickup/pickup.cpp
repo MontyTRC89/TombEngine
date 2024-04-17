@@ -894,11 +894,9 @@ void DropPickups(ItemInfo* item)
 			}
 		}
 
-		for (auto* staticPtr : collObjects.StaticPtrs)
+		for (const auto* staticPtr : collObjects.StaticPtrs)
 		{
-			auto& object = StaticObjects[staticPtr->staticNumber];
-
-			auto box = object.collisionBox.ToBoundingOrientedBox(staticPtr->pos);
+			auto box = staticPtr->AssetPtr->collisionBox.ToBoundingOrientedBox(staticPtr->Pose);
 			if (box.Intersects(sphere))
 			{
 				collidedWithObject = true;
@@ -994,14 +992,14 @@ const GameBoundingBox* FindPlinth(ItemInfo* item)
 {
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	
-	for (int i = 0; i < room->mesh.size(); i++)
+	for (int i = 0; i < room->Statics.size(); i++)
 	{
-		auto* mesh = &room->mesh[i];
+		auto* mesh = &room->Statics[i];
 
-		if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+		if (!(mesh->Flags & StaticMeshFlags::SM_VISIBLE))
 			continue;
 
-		if (item->Pose.Position.x != mesh->pos.Position.x || item->Pose.Position.z != mesh->pos.Position.z)
+		if (item->Pose.Position.x != mesh->Pose.Position.x || item->Pose.Position.z != mesh->Pose.Position.z)
 			continue;
 
 		const auto& bounds = GetBestFrame(*item).BoundingBox;

@@ -5,7 +5,7 @@ class FloorInfo;
 struct CollisionInfo;
 struct CollisionResult;
 struct ItemInfo;
-struct MESH_INFO;
+class StaticObject;
 
 constexpr auto ITEM_RADIUS_YMAX					   = BLOCK(3);
 constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30.0f;
@@ -27,8 +27,8 @@ struct ObjectCollisionBounds
 
 struct CollidedObjectData
 {
-	std::vector<ItemInfo*>	ItemPtrs   = {};
-	std::vector<MESH_INFO*> StaticPtrs = {};
+	std::vector<ItemInfo*>	   ItemPtrs	  = {};
+	std::vector<StaticObject*> StaticPtrs = {};
 
 	bool IsEmpty() const { return (ItemPtrs.empty() && StaticPtrs.empty()); };
 };
@@ -48,10 +48,10 @@ bool ItemNearTarget(const Vector3i& origin, ItemInfo* targetEntity, int radius);
 bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int velocity, short turnRate);
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius);
-bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius);
+bool TestBoundsCollideStatic(ItemInfo* item, const StaticObject& mesh, int radius);
 bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool enableSpasm, char bigPushFlags);
 bool ItemPushItem(ItemInfo* item, ItemInfo* item2);
-bool ItemPushStatic(ItemInfo* laraItem, const MESH_INFO& mesh, CollisionInfo* coll);
+bool ItemPushStatic(ItemInfo* laraItem, const StaticObject& mesh, CollisionInfo* coll);
 void ItemPushBridge(ItemInfo& item, CollisionInfo& coll);
 
 bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll);

@@ -981,16 +981,16 @@ const std::vector<byte> SaveGame::Build()
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		for (int j = 0; j < room->mesh.size(); j++)
+		for (int j = 0; j < room->Statics.size(); j++)
 		{
 			Save::StaticMeshInfoBuilder staticMesh{ fbb };
 
-			staticMesh.add_pose(&FromPose(room->mesh[j].pos));
-			staticMesh.add_scale(room->mesh[j].scale);
-			staticMesh.add_color(&FromVector4(room->mesh[j].color));
+			staticMesh.add_pose(&FromPose(room->Statics[j].Pose));
+			staticMesh.add_scale(room->Statics[j].Scale);
+			staticMesh.add_color(&FromVector4(room->Statics[j].Color));
 
-			staticMesh.add_flags(room->mesh[j].flags);
-			staticMesh.add_hit_points(room->mesh[j].HitPoints);
+			staticMesh.add_flags(room->Statics[j].Flags);
+			staticMesh.add_hit_points(room->Statics[j].HitPoints);
 			staticMesh.add_room_number(room->index);
 			staticMesh.add_number(j);
 			staticMeshes.push_back(staticMesh.Finish());
@@ -2167,19 +2167,19 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 		auto room = &g_Level.Rooms[staticMesh->room_number()];
 		int number = staticMesh->number();
 
-		room->mesh[number].pos = ToPose(*staticMesh->pose());
-		room->mesh[number].roomNumber = staticMesh->room_number();
-		room->mesh[number].scale = staticMesh->scale();
-		room->mesh[number].color = ToVector4(staticMesh->color());
+		room->Statics[number].Pose = ToPose(*staticMesh->pose());
+		room->Statics[number].RoomNumber = staticMesh->room_number();
+		room->Statics[number].Scale = staticMesh->scale();
+		room->Statics[number].Color = ToVector4(staticMesh->color());
 
-		room->mesh[number].flags = staticMesh->flags();
-		room->mesh[number].HitPoints = staticMesh->hit_points();
+		room->Statics[number].Flags = staticMesh->flags();
+		room->Statics[number].HitPoints = staticMesh->hit_points();
 		
-		if (!room->mesh[number].flags)
+		if (!room->Statics[number].Flags)
 		{
 			short roomNumber = staticMesh->room_number();
-			FloorInfo* floor = GetFloor(room->mesh[number].pos.Position.x, room->mesh[number].pos.Position.y, room->mesh[number].pos.Position.z, &roomNumber);
-			TestTriggers(room->mesh[number].pos.Position.x, room->mesh[number].pos.Position.y, room->mesh[number].pos.Position.z, staticMesh->room_number(), true, 0);
+			FloorInfo* floor = GetFloor(room->Statics[number].Pose.Position.x, room->Statics[number].Pose.Position.y, room->Statics[number].Pose.Position.z, &roomNumber);
+			TestTriggers(room->Statics[number].Pose.Position.x, room->Statics[number].Pose.Position.y, room->Statics[number].Pose.Position.z, staticMesh->room_number(), true, 0);
 			floor->Stopper = false;
 		}
 	}

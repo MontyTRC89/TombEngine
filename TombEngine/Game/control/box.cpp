@@ -2141,9 +2141,9 @@ void InitializeItemBoxData()
 
 	for (auto& room : g_Level.Rooms)
 	{
-		for (const auto& mesh : room.mesh)
+		for (const auto& mesh : room.Statics)
 		{
-			long index = ((mesh.pos.Position.z - room.z) / BLOCK(1)) + room.zSize * ((mesh.pos.Position.x - room.x) / BLOCK(1));
+			long index = ((mesh.Pose.Position.z - room.z) / BLOCK(1)) + room.zSize * ((mesh.Pose.Position.x - room.x) / BLOCK(1));
 			if (index > room.floor.size())
 				continue;
 
@@ -2153,11 +2153,11 @@ void InitializeItemBoxData()
 
 			if (!(g_Level.Boxes[floor->Box].flags & BLOCKED))
 			{
-				int floorHeight = floor->GetSurfaceHeight(mesh.pos.Position.x, mesh.pos.Position.z, true);
+				int floorHeight = floor->GetSurfaceHeight(mesh.Pose.Position.x, mesh.Pose.Position.z, true);
 				const auto& bBox = GetBoundsAccurate(mesh, false);
 
-				if (floorHeight <= mesh.pos.Position.y - bBox.Y2 + CLICK(2) &&
-					floorHeight < mesh.pos.Position.y - bBox.Y1)
+				if (floorHeight <= mesh.Pose.Position.y - bBox.Y2 + CLICK(2) &&
+					floorHeight < mesh.Pose.Position.y - bBox.Y1)
 				{
 					if (bBox.X1 == 0 || bBox.X2 == 0 || bBox.Z1 == 0 || bBox.Z2 == 0 ||
 					  ((bBox.X1 < 0) ^ (bBox.X2 < 0)) && ((bBox.Z1 < 0) ^ (bBox.Z2 < 0)))

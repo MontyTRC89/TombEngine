@@ -33,7 +33,7 @@ using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
 ObjectHandler Objects;
-StaticInfo StaticObjects[MAX_STATICS];
+StaticAsset	  StaticAssets[STATIC_COUNT_MAX];
 
 void ObjectHandler::Initialize() 
 { 
@@ -47,7 +47,7 @@ bool ObjectHandler::CheckID(GAME_OBJECT_ID objectID, bool isSilent)
 		if (!isSilent)
 		{
 			TENLog(
-				"Attempted to access unavailable slot ID (" + std::to_string(objectID) + "). " +
+				"Attempted to access unavailable slot ID " + std::to_string(objectID) + ". " +
 				"Check if last accessed item exists in level.", LogLevel::Warning, LogConfig::Debug);
 		}
 
@@ -157,11 +157,6 @@ void InitializeSpecialEffects()
 	TEN::Entities::Creatures::TR3::ClearFishSwarm();
 }
 
-void CustomObjects()
-{
-	
-}
-
 void InitializeObjects()
 {
 	AllocTR4Objects();
@@ -202,9 +197,6 @@ void InitializeObjects()
 	InitializeTR3Objects(); // Standard TR3 objects
 	InitializeTR4Objects(); // Standard TR4 objects
 
-	// User defined objects
-	CustomObjects();
-
 	HairEffect.Initialize();
 	InitializeSpecialEffects();
 
@@ -222,4 +214,15 @@ void InitializeObjects()
 	SequenceUsed[3] = 0;
 	SequenceUsed[4] = 0;
 	SequenceUsed[5] = 0;
+}
+
+StaticAsset& GetStaticAsset(int id)
+{
+	if (id < 0 || id > STATIC_COUNT_MAX)
+	{
+		TENLog("GetStaticAsset(): ID " + std::to_string(id) + " out of range.");
+		return StaticAssets[0];
+	}
+
+	return StaticAssets[id];
 }

@@ -157,7 +157,7 @@ namespace TEN::Scripting::Util
 		auto realScreenPos = PercentToScreen(screenPos.x, screenPos.y);
 		auto ray = GetRayFrom2DPosition(Vector2((int)std::get<0>(realScreenPos), (int)std::get<1>(realScreenPos)));
 
-		MESH_INFO* mesh = nullptr;
+		StaticObject* mesh = nullptr;
 		auto vector = Vector3i::Zero;
 		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, &mesh, GAME_OBJECT_ID::ID_LARA);
 

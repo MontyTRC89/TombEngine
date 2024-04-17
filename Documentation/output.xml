@@ -3473,26 +3473,99 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Static</module>
 	<caller>Static</caller>
-	<name>Enable</name>
-	<summary>Enable the static, for cases when it was shattered or manually disabled before.</summary>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>Disable</name>
-	<summary>Disable the static</summary>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>GetActive</name>
-	<summary>Get static mesh visibility</summary>
+	<name>GetName</name>
+	<summary>Get this static's unique string identifier.</summary>
+	<description>()</description>
 	<returns>
 		<return>
-			<type>bool</type>
-			<description>visibility state</description>
+			<type>string</type>
+			<description>Name.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetSlot</name>
+	<summary>Get this static's slot ID.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>string</type>
+			<description>Slot ID.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetPosition</name>
+	<summary>Get this static's position.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>Vec3</type>
+			<description>Position.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetRotation</name>
+	<summary>Get this static's rotation.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>Rotation</type>
+			<description> Rotation.
+ Doesn't guarantee the returned value will be identical to a value set via SetRotation(),
+ only that the angle measures will be mathematically equal. E.g. 90 degrees = -270 degrees = 450 degrees.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetScale</name>
+	<summary>Get this static's scale.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>float</type>
+			<description>Scale.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetColor</name>
+	<summary>Get this static's color.</summary>
+	<description>()</description>
+	<returns>
+		<return>
+			<type>Color</type>
+			<description>Color.</description>
+		</return>
+	</returns>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>GetHP</name>
+	<summary>Get this static's hit points.</summary>
+	<description>Used only with shatterable statics.()</description>
+	<returns>
+		<return>
+			<type>int</type>
+			<description>Hit points.</description>
 		</return>
 	</returns>
 </function>
@@ -3501,11 +3574,12 @@ most can just be ignored (see usage).</description>
 	<module>Objects.Static</module>
 	<caller>Static</caller>
 	<name>GetSolid</name>
-	<summary>Get static mesh solid collision state</summary>
+	<summary>Get this static's solid collision status.</summary>
+	<description>()</description>
 	<returns>
 		<return>
 			<type>bool</type>
-			<description>solid collision state (true if solid, false if soft)</description>
+			<description>Solid collision status.</description>
 		</return>
 	</returns>
 </function>
@@ -3513,136 +3587,13 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Static</module>
 	<caller>Static</caller>
-	<name>SetSolid</name>
-	<summary>Set static mesh solid collision state</summary>
-	<parameters>
-		<parameter>
-			<name>solidState</name>
+	<name>GetActive</name>
+	<summary>Get this static's visibility status.</summary>
+	<description>()</description>
+	<returns>
+		<return>
 			<type>bool</type>
-			<description>if set, collision will be solid, if not, will be soft</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>GetPosition</name>
-	<summary>Get the static's position</summary>
-	<returns>
-		<return>
-			<type>Vec3</type>
-			<description>a copy of the static's position</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>SetPosition</name>
-	<summary>Set the static's position</summary>
-	<parameters>
-		<parameter>
-			<name>position</name>
-			<type>Vec3</type>
-			<description>the new position of the static</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>GetRotation</name>
-	<summary>Get the static's rotation</summary>
-	<returns>
-		<return>
-			<type>Rotation</type>
-			<description>a copy of the static's rotation</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>SetRotation</name>
-	<summary>Set the static's rotation</summary>
-	<parameters>
-		<parameter>
-			<name>rotation</name>
-			<type>Rotation</type>
-			<description>the static's new rotation</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>GetScale</name>
-	<summary>Get the static's scale</summary>
-	<returns>
-		<return>
-			<type>float</type>
-			<description>current static scale</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>SetScale</name>
-	<summary>Set the static's scale</summary>
-	<parameters>
-		<parameter>
-			<name>scale</name>
-			<type>Scale</type>
-			<description>the static's new scale</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>GetHP</name>
-	<summary>Get current HP (hit points/health points)
- Used only with shatterable static meshes.</summary>
-	<returns>
-		<return>
-			<type>int</type>
-			<description>the amount of HP the static currently has</description>
-		</return>
-	</returns>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>SetHP</name>
-	<summary>Set current HP (hit points/health points)
- Used only with shatterable static meshes.</summary>
-	<parameters>
-		<parameter>
-			<name>HP</name>
-			<type>int</type>
-			<description>the amount of HP to give the static</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>GetName</name>
-	<summary>Get the static's unique string identifier</summary>
-	<returns>
-		<return>
-			<type>string</type>
-			<description>the static's name</description>
+			<description>Visibility status.</description>
 		</return>
 	</returns>
 </function>
@@ -3651,41 +3602,28 @@ most can just be ignored (see usage).</description>
 	<module>Objects.Static</module>
 	<caller>Static</caller>
 	<name>SetName</name>
-	<summary>Set the static's name (its unique string identifier)
- e.g.</summary>
-	<description>"my\_vase" or "oldrubble"</description>
+	<summary>Set this static's unique string identifier.</summary>
+	<description>()</description>
 	<parameters>
 		<parameter>
 			<name>name</name>
 			<type>string</type>
-			<description>The static's new name</description>
+			<description>New name.</description>
 		</parameter>
 	</parameters>
-</function>
-
-<function>
-	<module>Objects.Static</module>
-	<caller>Static</caller>
-	<name>GetSlot</name>
-	<summary>Get the static's slot number (as listed in Tomb Editor and WadTool)</summary>
-	<returns>
-		<return>
-			<type>string</type>
-			<description>the static's slot number</description>
-		</return>
-	</returns>
 </function>
 
 <function>
 	<module>Objects.Static</module>
 	<caller>Static</caller>
 	<name>SetSlot</name>
-	<summary>Set the static's slot number (as listed in Tomb Editor and WadTool)</summary>
+	<summary>Set this static's slot ID.</summary>
+	<description>()</description>
 	<parameters>
 		<parameter>
 			<name>slot</name>
 			<type>int</type>
-			<description>The static's slot number</description>
+			<description>New slot ID.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -3693,26 +3631,59 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Static</module>
 	<caller>Static</caller>
-	<name>GetColor</name>
-	<summary>Get the static's color</summary>
-	<returns>
-		<return>
-			<type>Color</type>
-			<description>a copy of the static's color</description>
-		</return>
-	</returns>
+	<name>SetPosition</name>
+	<summary>Set this static's position.</summary>
+	<description>()</description>
+	<parameters>
+		<parameter>
+			<name>pos</name>
+			<type>Vec3</type>
+			<description>New position.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetRotation</name>
+	<summary>Set this static's rotation.</summary>
+	<description>()</description>
+	<parameters>
+		<parameter>
+			<name>rot</name>
+			<type>Rotation</type>
+			<description>New rotation.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetScale</name>
+	<summary>Set this static's scale.</summary>
+	<description>()</description>
+	<parameters>
+		<parameter>
+			<name>scale</name>
+			<type>Scale</type>
+			<description>New scale.</description>
+		</parameter>
+	</parameters>
 </function>
 
 <function>
 	<module>Objects.Static</module>
 	<caller>Static</caller>
 	<name>SetColor</name>
-	<summary>Set the static's color</summary>
+	<summary>Set this static's color.</summary>
+	<description>()</description>
 	<parameters>
 		<parameter>
 			<name>color</name>
 			<type>Color</type>
-			<description>the new color of the static</description>
+			<description>New color.</description>
 		</parameter>
 	</parameters>
 </function>
@@ -3720,8 +3691,55 @@ most can just be ignored (see usage).</description>
 <function>
 	<module>Objects.Static</module>
 	<caller>Static</caller>
+	<name>SetHP</name>
+	<summary>Set this static's hit points.</summary>
+	<description>Used only with shatterable statics.()</description>
+	<parameters>
+		<parameter>
+			<name>hisPoints</name>
+			<type>int</type>
+			<description>New hit points.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>SetSolid</name>
+	<summary>Set this static's solid collision status.</summary>
+	<description>()</description>
+	<parameters>
+		<parameter>
+			<name>isSolid</name>
+			<type>bool</type>
+			<description>Solid collision status.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>Enable</name>
+	<summary>Enable this static.</summary>
+	<description>used in cases where it was previously shattered or manually disabled.()</description>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
+	<name>Disable</name>
+	<summary>Disable this static.</summary>
+	<description>()</description>
+</function>
+
+<function>
+	<module>Objects.Static</module>
+	<caller>Static</caller>
 	<name>Shatter</name>
-	<summary>Shatter static mesh</summary>
+	<summary>Shatter this static.</summary>
+	<description>()</description>
 </function>
 
 <function>

@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/StaticObject.h"
 #include "Math/Math.h"
 
 using namespace TEN::Math;
@@ -72,19 +73,6 @@ struct ROOM_LIGHT
 	bool castShadows;
 };
 
-struct MESH_INFO
-{
-	Pose pos;
-	int roomNumber;
-	float scale;
-	short staticNumber;
-	short flags;
-	Vector4 color;
-	short HitPoints;
-	std::string Name;
-	bool Dirty;
-};
-
 struct ROOM_INFO
 {
 	int index;
@@ -110,7 +98,7 @@ struct ROOM_INFO
 
 	std::vector<FloorInfo>	   floor		  = {};
 	std::vector<ROOM_LIGHT>	   lights		  = {};
-	std::vector<MESH_INFO>	   mesh			  = {};
+	std::vector<StaticObject>  Statics		  = {};
 	std::vector<TriggerVolume> triggerVolumes = {};
 
 	std::vector<Vector3>   positions = {};
@@ -133,5 +121,5 @@ Vector3i GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 void InitializeNeighborRoomList();
 
-GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox);
+GameBoundingBox& GetBoundsAccurate(const StaticObject& staticObj, bool getVisibilityBox);
 FloorInfo* GetSector(ROOM_INFO* room, int x, int z);

@@ -82,19 +82,19 @@ namespace TEN::Entities::Traps
 			pointColl1.Block->Stopper)
 		{
 			auto& room = g_Level.Rooms[item.RoomNumber];
-			for (auto& mesh : room.mesh)
+			for (auto& staticObj : room.Statics)
 			{
-				if ((abs(pointColl0.Coordinates.x - mesh.pos.Position.x) < BLOCK(1) &&
-					abs(pointColl0.Coordinates.z - mesh.pos.Position.z) < BLOCK(1)) ||
-					abs(pointColl1.Coordinates.x - mesh.pos.Position.x) < BLOCK(1) &&
-					abs(pointColl1.Coordinates.z - mesh.pos.Position.z) < BLOCK(1) &&
-					StaticObjects[mesh.staticNumber].shatterType != ShatterType::None)
+				if ((abs(pointColl0.Coordinates.x - staticObj.Pose.Position.x) < BLOCK(1) &&
+					abs(pointColl0.Coordinates.z - staticObj.Pose.Position.z) < BLOCK(1)) ||
+					abs(pointColl1.Coordinates.x - staticObj.Pose.Position.x) < BLOCK(1) &&
+					abs(pointColl1.Coordinates.z - staticObj.Pose.Position.z) < BLOCK(1) &&
+					staticObj.AssetPtr->shatterType != ShatterType::None)
 				{					
-					if (mesh.HitPoints != 0)
+					if (staticObj.HitPoints != 0)
 						continue;
 
-					mesh.HitPoints -= 1;
-					ShatterObject(nullptr, &mesh, -64, LaraItem->RoomNumber, 0);
+					staticObj.HitPoints -= 1;
+					ShatterObject(nullptr, &staticObj, -64, LaraItem->RoomNumber, 0);
 					SoundEffect(SFX_TR4_SMASH_ROCK, &item.Pose);
 					TestTriggers(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber, true);
 				}
