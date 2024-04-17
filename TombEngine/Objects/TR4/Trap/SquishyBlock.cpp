@@ -121,7 +121,7 @@ namespace TEN::Entities::Traps
 			}
 			else
 			{
-				if (item.Animation.FrameNumber == GetAnimData(item).frameEnd)
+				if (item.Animation.FrameNumber == GetAnimData(item).EndFrameNumber)
 				{
 					if (item.HitPoints != NOT_TARGETABLE && item.HitPoints)
 					{
@@ -155,7 +155,7 @@ namespace TEN::Entities::Traps
 		}
 		else
 		{
-			if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == FALLING_BLOCK_IMPACT_FRAME)
+			if (item.Animation.FrameNumber == FALLING_BLOCK_IMPACT_FRAME)
 				Camera.bounce = -96;
 
 			AnimateItem(&item);
@@ -180,8 +180,8 @@ namespace TEN::Entities::Traps
 
 		if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_BAKED_MOTION)
 		{
-			int frameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
-			if (!frameNumber || frameNumber == SQUISHY_BLOCK_LETHAL_FRAME)
+			int frameNumber = item.Animation.FrameNumber;
+			if (frameNumber == 0 || frameNumber == SQUISHY_BLOCK_LETHAL_FRAME)
 				DoDamage(playerItem, INT_MAX);
 		}
 		else if (item.Animation.ActiveState == SQUISHY_BLOCK_STATE_COLLIDE_RIGHT ||
@@ -201,7 +201,7 @@ namespace TEN::Entities::Traps
 		if (!TestCollision(&item, playerItem))
 			return;
 
-		if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) <= FALLING_BLOCK_IMPACT_FRAME)
+		if (item.Animation.FrameNumber <= FALLING_BLOCK_IMPACT_FRAME)
 		{
 			item.Animation.FrameNumber += FALLING_BLOCK_NEXT_FRAME;
 

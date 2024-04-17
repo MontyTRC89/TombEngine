@@ -47,15 +47,15 @@ namespace TEN::Entities::TR3
 
 		if (item.TriggerFlags == 1)
 		{
-			item.ItemFlags[1] = (int)CorpseFlags::Hanging;
-			item.Animation.AnimNumber = CORPSE_ANIM_HANGING;
-			item.Animation.ActiveState = CORPSE_STATE_HANGING;
+			item.ItemFlags[1] = (int)CorpseFlag::Hang;
+			item.Animation.AnimNumber = CORPSE_ANIM_HANG;
+			item.Animation.ActiveState = CORPSE_STATE_HANG;
 		}
 		else
 		{
-			item.ItemFlags[1] = (int)CorpseFlags::Lying;
-			item.Animation.AnimNumber = CORPSE_ANIM_LYING;
-			item.Animation.ActiveState = CORPSE_STATE_LYING;
+			item.ItemFlags[1] = (int)CorpseFlag::Grounded;
+			item.Animation.AnimNumber = CORPSE_ANIM_GROUNDED;
+			item.Animation.ActiveState = CORPSE_STATE_GROUNDED;
 		}
 
 		AddActiveItem(itemNumber);
@@ -109,8 +109,8 @@ namespace TEN::Entities::TR3
 
 				item.Animation.IsAirborne = false;
 				item.Animation.Velocity = Vector3::Zero;
-				item.Animation.TargetState = CORPSE_STATE_LANDING;
-				item.Animation.AnimNumber = CORPSE_ANIM_LANDING;
+				item.Animation.TargetState = CORPSE_STATE_LAND;
+				item.Animation.AnimNumber = CORPSE_ANIM_LAND;
 				AlignEntityToSurface(&item, Vector2(Objects[item.ObjectNumber].radius));
 
 				item.ItemFlags[1] = (int)CorpseFlag::Grounded;
@@ -160,9 +160,9 @@ namespace TEN::Entities::TR3
 
 			if (target.ItemFlags[1] == (int)CorpseFlag::Hang)
 			{
-				target.ItemFlags[1] = (int)CorpseFlags::Falling;
-				target.Animation.AnimNumber = CORPSE_ANIM_FALLING;
-				target.Animation.ActiveState = CORPSE_STATE_FALLING;
+				target.ItemFlags[1] = (int)CorpseFlag::Fall;
+				target.Animation.AnimNumber = CORPSE_ANIM_FALL;
+				target.Animation.ActiveState = CORPSE_STATE_FALL;
 			}
 		}
 		else if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)

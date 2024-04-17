@@ -150,7 +150,7 @@ namespace TEN::Entities::Generic
 				UseForcedFixedCamera = 0;
 		}
 
-		if (trapDoorItem->Animation.ActiveState == 1 && TestLastFrame(trapDoorItem)))
+		if (trapDoorItem->Animation.ActiveState == 1 && TestLastFrame(trapDoorItem))
 			ObjectCollision(itemNumber, laraItem, coll);
 	}
 

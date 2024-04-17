@@ -110,7 +110,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 	int staticCount = 0;
 
 	// Establish parameters of colliding item.
-	const auto& collidingBounds = GetBestFrame(collidingItem).BoundingBox;
+	const auto& collidingBounds = GetClosestKeyframe(collidingItem).BoundingBox;
 	auto collidingExtents = collidingBounds.GetExtents();
 	auto collidingSphere = BoundingSphere(collidingBounds.GetCenter() + collidingItem.Pose.Position.ToVector3(), collidingExtents.Length());
 	auto collidingCircle = Vector3(collidingSphere.Center.x, collidingSphere.Center.z, (customRadius > 0.0f) ? customRadius : std::hypot(collidingExtents.x, collidingExtents.z));
@@ -167,7 +167,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					if (dist > COLLISION_CHECK_DISTANCE)
 						continue;
 
-					const auto& bounds = GetBestFrame(item).BoundingBox;
+					const auto& bounds = GetClosestKeyframe(item).BoundingBox;
 					auto extents = bounds.GetExtents();
 
 					// If item bounding box extents is below tolerance threshold, discard object.

@@ -95,7 +95,7 @@ namespace TEN::Animation
 		}
 		else
 		{
-			if (item.RoomNumber == NO_ROOM)
+			if (item.RoomNumber == NO_VALUE)
 			{
 				SoundEffect(SoundID, &item.Pose, SoundEnvironment::Always);
 			}
