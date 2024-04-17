@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR2/Trap/tr2_springboard.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"

@@ -3,7 +3,7 @@
 #include "Game/items.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Sound/sound.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/debris.h"

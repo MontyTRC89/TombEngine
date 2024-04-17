@@ -9,7 +9,7 @@
 #include "Math/Math.h"
 #include "Game/control/box.h"
 #include "Game/items.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/Gui.h"
 #include "Game/Hud/Hud.h"
 #include "Game/Hud/PickupSummary.h"

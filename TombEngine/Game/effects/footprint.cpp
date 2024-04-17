@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/effects/Footprint.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/control.h"

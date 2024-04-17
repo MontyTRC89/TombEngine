@@ -2,7 +2,7 @@
 #include "tr4_fourblades.h"
 #include "Specific/level.h"
 #include "Game/control/control.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/items.h"
 
 namespace TEN::Entities::TR4

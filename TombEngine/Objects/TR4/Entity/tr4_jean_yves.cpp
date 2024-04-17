@@ -2,7 +2,7 @@
 #include "Objects/TR4/Entity/tr4_jean_yves.h"
 
 #include "Game/control/control.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"

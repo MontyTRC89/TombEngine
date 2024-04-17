@@ -1,5 +1,5 @@
 #pragma once
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/itemdata/itemdata.h"
 #include "Math/Math.h"
 #include "Specific/BitField.h"

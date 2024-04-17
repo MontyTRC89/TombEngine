@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR3/Entity/tr3_tribesman.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"

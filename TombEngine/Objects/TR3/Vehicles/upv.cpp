@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR3/Vehicles/upv.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Game/collision/collide_item.h"

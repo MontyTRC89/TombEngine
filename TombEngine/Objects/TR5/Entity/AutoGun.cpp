@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR5/Entity/AutoGun.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"

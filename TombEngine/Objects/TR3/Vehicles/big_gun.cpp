@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR3/Vehicles/big_gun.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/collision/collide_room.h"

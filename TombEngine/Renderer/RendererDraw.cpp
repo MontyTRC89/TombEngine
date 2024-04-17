@@ -6,7 +6,7 @@
 #include <filesystem>
 
 #include "ConstantBuffers/CameraMatrixBuffer.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"

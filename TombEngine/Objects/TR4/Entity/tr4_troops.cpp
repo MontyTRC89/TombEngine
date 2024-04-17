@@ -10,7 +10,7 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/people.h"
 #include "Game/itemdata/creature_info.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"

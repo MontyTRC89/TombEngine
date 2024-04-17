@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/misc.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"

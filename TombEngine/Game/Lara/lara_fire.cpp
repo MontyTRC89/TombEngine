@@ -2,7 +2,7 @@
 #include "Game/Lara/lara_fire.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/los.h"

@@ -4,7 +4,7 @@
 #include "Sound/sound.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Math/Math.h"
 
 namespace TEN::Entities::TR4

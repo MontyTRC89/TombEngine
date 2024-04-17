@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR1/Entity/SkateboardKid.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/misc.h"

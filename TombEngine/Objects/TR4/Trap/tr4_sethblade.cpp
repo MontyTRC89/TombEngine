@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR4/Trap/tr4_sethblade.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Setup.h"

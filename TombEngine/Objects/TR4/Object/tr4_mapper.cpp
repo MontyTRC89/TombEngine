@@ -4,7 +4,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Sound/sound.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"

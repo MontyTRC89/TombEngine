@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Switches/fullblock_switch.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"

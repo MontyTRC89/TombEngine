@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/Effects/tr4_locusts.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/tomb4fx.h"

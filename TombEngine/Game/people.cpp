@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/people.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/control/los.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"

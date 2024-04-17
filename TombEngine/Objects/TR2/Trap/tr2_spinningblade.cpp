@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR2/Trap/tr2_spinningblade.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"

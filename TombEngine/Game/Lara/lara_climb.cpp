@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_climb.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"

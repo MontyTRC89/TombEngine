@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_two_guns.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"

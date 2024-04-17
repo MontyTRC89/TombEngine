@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Math/Objects/GameBoundingBox.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/items.h"
 #include "Game/Setup.h"
 #include "Math/Objects/EulerAngles.h"

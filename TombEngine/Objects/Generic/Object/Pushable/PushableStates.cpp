@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Object/Pushable/PushableStates.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/control/flipeffect.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"

@@ -2,7 +2,7 @@
 #include "Game/pickup/pickup.h"
 
 #include "pickuputil.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/debris.h"

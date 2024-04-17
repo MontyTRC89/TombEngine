@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR3/Entity/SophiaLeigh.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"

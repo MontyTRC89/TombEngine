@@ -6,7 +6,7 @@
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_item.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/items.h"
 
 using namespace TEN::Input;

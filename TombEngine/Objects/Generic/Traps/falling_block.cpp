@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Traps/falling_block.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"

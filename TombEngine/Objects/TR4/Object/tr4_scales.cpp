@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR4/Object/tr4_scales.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
 #include "Game/effects/Drip.h"

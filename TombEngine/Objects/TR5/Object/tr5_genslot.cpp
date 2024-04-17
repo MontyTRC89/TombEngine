@@ -4,7 +4,7 @@
 #include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 

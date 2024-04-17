@@ -7,7 +7,7 @@
 #include "Game/spotcam.h"
 #include "Objects/objectslist.h"
 #include "Objects/Generic/Switches/generic_switch.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 
 using namespace TEN::Entities::Switches;
 

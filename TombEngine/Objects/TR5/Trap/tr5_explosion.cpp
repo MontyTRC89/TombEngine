@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR5/Trap/tr5_explosion.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"

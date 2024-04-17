@@ -4,7 +4,7 @@
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/collision/collide_item.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Game/room.h"

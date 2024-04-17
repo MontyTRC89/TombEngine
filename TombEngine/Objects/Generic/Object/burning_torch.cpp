@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Object/burning_torch.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/los.h"

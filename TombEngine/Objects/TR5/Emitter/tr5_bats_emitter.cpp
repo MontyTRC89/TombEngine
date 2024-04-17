@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"

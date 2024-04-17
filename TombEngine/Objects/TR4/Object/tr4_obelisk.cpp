@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR4/Object/tr4_obelisk.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"

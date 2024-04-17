@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR1/Entity/tr1_doppelganger.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"

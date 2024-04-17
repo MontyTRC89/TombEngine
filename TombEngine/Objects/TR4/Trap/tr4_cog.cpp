@@ -7,7 +7,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/items.h"
 
 namespace TEN::Entities::TR4
