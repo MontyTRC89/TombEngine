@@ -15,6 +15,15 @@ namespace TEN::Effects::Hair
 			Vector3	   Position	   = Vector3::Zero;
 			Vector3	   Velocity	   = Vector3::Zero;
 			Quaternion Orientation = Quaternion::Identity;
+
+			Vector3 OldPosition = Vector3::Zero;
+			Quaternion OldOrientation = Quaternion::Identity;
+
+			void StoreInterpolationData()
+			{
+				OldPosition = Position;
+				OldOrientation = Orientation;
+			}
 		};
 
 	public:
