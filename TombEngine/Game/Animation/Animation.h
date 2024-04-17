@@ -18,8 +18,8 @@ struct ObjectInfo;
 //{
 	struct KeyframeData
 	{
-		GameBoundingBox			BoundingBox = GameBoundingBox::Zero;
-		Vector3					Offset = Vector3::Zero;
+		GameBoundingBox			BoundingBox		 = GameBoundingBox::Zero;
+		Vector3					Offset			 = Vector3::Zero;
 		std::vector<Quaternion> BoneOrientations = {};
 	};
 
@@ -34,8 +34,8 @@ struct ObjectInfo;
 
 	struct StateDispatchData
 	{
-		int StateID = 0;
-		int NextAnimNumber = 0;
+		int StateID			= 0;
+		int NextAnimNumber	= 0;
 		int NextFrameNumber = 0;
 		std::pair<int, int> FrameNumberRange = {};
 	};
@@ -44,19 +44,19 @@ struct ObjectInfo;
 	{
 		using AnimCommandPtr = std::unique_ptr<AnimCommand>;
 
-		int StateID = 0;
-		int EndFrameNumber = 0;
-		int NextAnimNumber = 0;
+		int StateID			= 0;
+		int EndFrameNumber	= 0;
+		int NextAnimNumber	= 0;
 		int NextFrameNumber = 0;
-		int Interpolation = 0;
+		int Interpolation	= 0;
 
 		// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 		Vector3 VelocityStart = Vector3::Zero;
-		Vector3 VelocityEnd = Vector3::Zero;
+		Vector3 VelocityEnd	  = Vector3::Zero;
 
-		std::vector<KeyframeData>	   Keyframes = {};
+		std::vector<KeyframeData>	   Keyframes  = {};
 		std::vector<StateDispatchData> Dispatches = {};
-		std::vector<AnimCommandPtr>	   Commands = {};
+		std::vector<AnimCommandPtr>	   Commands	  = {};
 
 		KeyframeInterpData	GetKeyframeInterpData(int frameNumber) const;
 		const KeyframeData& GetClosestKeyframe(int frameNumber) const;
@@ -64,9 +64,9 @@ struct ObjectInfo;
 
 	struct BoneMutator
 	{
-		Vector3		Offset = Vector3::Zero;
+		Vector3		Offset	 = Vector3::Zero;
 		EulerAngles Rotation = EulerAngles::Identity;
-		Vector3		Scale = Vector3::One;
+		Vector3		Scale	 = Vector3::One;
 
 		bool IsEmpty() const;
 	};
