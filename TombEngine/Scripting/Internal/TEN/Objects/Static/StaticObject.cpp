@@ -18,10 +18,6 @@
 static auto IndexError = index_error_maker(Static, ScriptReserved_Static);
 static auto NewIndexError = newindex_error_maker(Static, ScriptReserved_Static);
 
-Static::Static(StaticObject& staticObj) : _static(staticObj)
-{
-};
-
 void Static::Register(sol::table& parent)
 {
 	parent.new_usertype<Static>(
@@ -53,6 +49,10 @@ void Static::Register(sol::table& parent)
 		ScriptReserved_Disable, &Static::Disable,
 		ScriptReserved_Shatter, &Static::Shatter);
 }
+
+Static::Static(StaticObject& staticObj) : _static(staticObj)
+{
+};
 
 /// Get this static's unique string identifier.
 // @function Static:GetName()

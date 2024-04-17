@@ -16,9 +16,8 @@ public:
 
 	// Constructors and destructors
 	Static(StaticObject& staticObj);
-	~Static() = default;
-
 	Static(const Static& staticObj) = delete;
+	~Static() = default;
 
 	// Getters
 	std::string GetName() const;
