@@ -429,11 +429,11 @@ void LoadObjects()
 
 				for (int i = 0; i < commandCount; i++)
 				{
-					auto commandType = (AnimCommandType)ReadInt32();
+					auto type = (AnimCommandType)ReadInt32();
 
 					// Interpret raw animation command data.
 					auto command = AnimData::AnimCommandPtr{};
-					switch (commandType)
+					switch (type)
 					{
 					case AnimCommandType::MoveOrigin:
 					{
