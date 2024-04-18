@@ -178,53 +178,45 @@ static int zLOS(const GameVector& origin, GameVector& target, std::optional<std:
 
 static bool ClipTarget(const GameVector& origin, GameVector& target)
 {
-	int x, y, z, wx, wy, wz;
-
 	short roomNumber = target.RoomNumber;
-	if (target.y > GetFloorHeight(GetFloor(target.x, target.y, target.z, &roomNumber), target.x, target.y, target.z))
+	auto* sectorPtr = GetFloor(target.x, target.y, target.z, &roomNumber);
+
+	if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
 	{
-		x = (7 * (target.x - origin.x) >> 3) + origin.x;
-		y = (7 * (target.y - origin.y) >> 3) + origin.y;
-		z = (7 * (target.z - origin.z) >> 3) + origin.z;
+		auto pos = (((target.ToVector3i() - origin.ToVector3i()) * 7) / 8) + origin.ToVector3i();
+		auto wPos = Vector3i::Zero;
 
 		for (int i = 3; i > 0; --i)
 		{
-			wx = ((target.x - x) * i >> 2) + x;
-			wy = ((target.y - y) * i >> 2) + y;
-			wz = ((target.z - z) * i >> 2) + z;
+			wPos = (((target.ToVector3i() - pos) * i) / 4) + pos;
 
-			if (wy < GetFloorHeight(GetFloor(wx, wy, wz, &roomNumber), wx, wy, wz))
+			sectorPtr = GetFloor(wPos.x, wPos.y, wPos.z, &roomNumber);
+			if (wPos.y < GetFloorHeight(sectorPtr, wPos.x, wPos.y, wPos.z))
 				break;
 		}
 
-		target.x = wx;
-		target.y = wy;
-		target.z = wz;
-		target.RoomNumber = roomNumber;
+		target = GameVector(wPos, roomNumber);
 		return false;
 	}
 
 	roomNumber = target.RoomNumber;
-	if (target.y < GetCeiling(GetFloor(target.x, target.y, target.z, &roomNumber), target.x, target.y, target.z))
+	auto* sector = GetFloor(target.x, target.y, target.z, &roomNumber);
+
+	if (target.y < GetCeiling(sector, target.x, target.y, target.z))
 	{
-		x = (7 * (target.x - origin.x) >> 3) + origin.x;
-		y = (7 * (target.y - origin.y) >> 3) + origin.y;
-		z = (7 * (target.z - origin.z) >> 3) + origin.z;
+		auto pos = (((target.ToVector3i() - origin.ToVector3i()) * 7) / 8) + origin.ToVector3i();
+		auto wPos = Vector3i::Zero;
 
 		for (int i = 3; i > 0; --i)
 		{
-			wx = ((target.x - x) * i >> 2) + x;
-			wy = ((target.y - y) * i >> 2) + y;
-			wz = ((target.z - z) * i >> 2) + z;
+			wPos = (((target.ToVector3i() - pos) * i) / 4) + pos;
 
-			if (wy > GetCeiling(GetFloor(wx, wy, wz, &roomNumber), wx, wy, wz))
+			sectorPtr = GetFloor(wPos.x, wPos.y, wPos.z, &roomNumber);
+			if (wPos.y < GetFloorHeight(sectorPtr, wPos.x, wPos.y, wPos.z))
 				break;
 		}
 
-		target.x = wx;
-		target.y = wy;
-		target.z = wz;
-		target.RoomNumber = roomNumber;
+		target = GameVector(wPos, roomNumber);
 		return false;
 	}
 

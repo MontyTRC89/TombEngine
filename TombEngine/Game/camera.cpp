@@ -35,7 +35,7 @@ using TEN::Renderer::g_Renderer;
 constexpr auto CAMERA_OBJECT_COLL_DIST_THRESHOLD   = BLOCK(4);
 constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
-struct OLD_CAMERA
+struct PrevCameraData
 {
 	Pose pos;
 	Pose pos2;
@@ -61,7 +61,7 @@ struct ObjectCameraInfo
 CAMERA_INFO		 Camera;
 ScreenEffectData g_ScreenEffect;
 
-OLD_CAMERA OldCam;
+PrevCameraData PrevCamera;
 GameVector LastTarget;
 
 Vector3 LastIdeal;
@@ -72,7 +72,7 @@ ObjectCameraInfo ItemCamera;
 GameVector ForcedFixedCamera;
 bool UseForcedFixedCamera;
 
-CameraType BinocularOldCamera;
+CameraType PrevBinocularCameraType;
 
 short CurrentFOV;
 short LastFOV;
@@ -527,19 +527,19 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	UpdateAzimuthAngle(playerItem);
 	UpdateListenerPosition(playerItem);
 
-	OldCam.pos.Orientation = playerItem.Pose.Orientation;
-	OldCam.pos2.Orientation.x = player.ExtraHeadRot.x;
-	OldCam.pos2.Orientation.y = player.ExtraHeadRot.y;
-	OldCam.pos2.Position.x = player.ExtraTorsoRot.x;
-	OldCam.pos2.Position.y = player.ExtraTorsoRot.y;
-	OldCam.pos.Position = playerItem.Pose.Position;
-	OldCam.ActiveState = playerItem.Animation.ActiveState;
-	OldCam.TargetState = playerItem.Animation.TargetState;
-	OldCam.targetDistance = Camera.targetDistance;
-	OldCam.targetElevation = Camera.targetElevation;
-	OldCam.actualElevation = Camera.actualElevation;
-	OldCam.actualAngle = Camera.actualAngle;
-	OldCam.target = Camera.LookAt;
+	PrevCamera.pos.Orientation = playerItem.Pose.Orientation;
+	PrevCamera.pos2.Orientation.x = player.ExtraHeadRot.x;
+	PrevCamera.pos2.Orientation.y = player.ExtraHeadRot.y;
+	PrevCamera.pos2.Position.x = player.ExtraTorsoRot.x;
+	PrevCamera.pos2.Position.y = player.ExtraTorsoRot.y;
+	PrevCamera.pos.Position = playerItem.Pose.Position;
+	PrevCamera.ActiveState = playerItem.Animation.ActiveState;
+	PrevCamera.TargetState = playerItem.Animation.TargetState;
+	PrevCamera.targetDistance = Camera.targetDistance;
+	PrevCamera.targetElevation = Camera.targetElevation;
+	PrevCamera.actualElevation = Camera.actualElevation;
+	PrevCamera.actualAngle = Camera.actualAngle;
+	PrevCamera.target = Camera.LookAt;
 	LastIdeal = idealPos;
 	LastIdealRoomNumber = idealRoomNumber;
 
@@ -616,21 +616,21 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* item, int boneID, ItemInfo* targ
 	auto idealPos = GetJointPosition(item, boneID, Vector3i::Zero).ToVector3();
 	auto lookAt = GetJointPosition(targetItem, targetBoneID, Vector3i::Zero).ToVector3();
 
-	if (OldCam.pos.Position != idealPos ||
-		OldCam.targetDistance != Camera.targetDistance  ||
-		OldCam.targetElevation != Camera.targetElevation ||
-		OldCam.actualElevation != Camera.actualElevation ||
-		OldCam.actualAngle != Camera.actualAngle ||
-		OldCam.target != Camera.LookAt ||
+	if (PrevCamera.pos.Position != idealPos ||
+		PrevCamera.targetDistance != Camera.targetDistance  ||
+		PrevCamera.targetElevation != Camera.targetElevation ||
+		PrevCamera.actualElevation != Camera.actualElevation ||
+		PrevCamera.actualAngle != Camera.actualAngle ||
+		PrevCamera.target != Camera.LookAt ||
 		Camera.oldType != Camera.type ||
 		Lara.Control.Look.IsUsingBinoculars)
 	{
-		OldCam.pos.Position = idealPos;
-		OldCam.targetDistance = Camera.targetDistance;
-		OldCam.targetElevation = Camera.targetElevation;
-		OldCam.actualElevation = Camera.actualElevation;
-		OldCam.actualAngle = Camera.actualAngle;
-		OldCam.target = Camera.LookAt;
+		PrevCamera.pos.Position = idealPos;
+		PrevCamera.targetDistance = Camera.targetDistance;
+		PrevCamera.targetElevation = Camera.targetElevation;
+		PrevCamera.actualElevation = Camera.actualElevation;
+		PrevCamera.actualAngle = Camera.actualAngle;
+		PrevCamera.target = Camera.LookAt;
 		LastIdeal = idealPos;
 		LastIdealRoomNumber = ideal->RoomNumber;
 		LastTarget = Vector3i(lookAt);
@@ -1117,7 +1117,7 @@ void BinocularCamera(ItemInfo* item)
 			player.Control.Look.IsUsingBinoculars = false;
 			player.Inventory.IsBusy = false;
 
-			Camera.type = BinocularOldCamera;
+			Camera.type = PrevBinocularCameraType;
 			AlterFOV(LastFOV);
 			return;
 		}
