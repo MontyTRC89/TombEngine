@@ -93,49 +93,52 @@ float4 PSFinalPass(PixelShaderInput input) : SV_TARGET
 
 float3 LensFlare(float2 uv, float2 pos)
 {
-    float intensity = 1.5;
-	float2 main = uv-pos;
-	float2 uvd = uv*(length(uv));
-	
-	float dist=length(main); dist = pow(dist,.1);
-	
-	
-	float f1 = max(0.01-pow(length(uv+1.2*pos),1.9),.0)*7.0;
+	float intensity = 1.5f;
+	float2 main = uv - pos;
+	float2 uvd = uv * (length(uv));
 
-	float f2 = max(1.0/(1.0+32.0*pow(length(uvd+0.8*pos),2.0)),.0)*00.1;
-	float f22 = max(1.0/(1.0+32.0*pow(length(uvd+0.85*pos),2.0)),.0)*00.08;
-	float f23 = max(1.0/(1.0+32.0*pow(length(uvd+0.9*pos),2.0)),.0)*00.06;
+	float dist = length(main);
+	dist = pow(dist, 0.1f);
+
+	float f1 = max(0.01f - pow(length(uv + 1.2f * pos), 1.9f), 0.0f) * 7.0f;
+
+	float f2 = max(1.0f / (1.0f + 32.0f * pow(length(uvd + 0.8f * pos), 2.0f)), 0.0f) * 00.1f;
+	float f22 = max(1.0f / (1.0f + 32.0f * pow(length(uvd + 0.85f * pos), 2.0f)), 0.0f) * 00.08f;
+	float f23 = max(1.0f / (1.0f + 32.0f * pow(length(uvd + 0.9f * pos), 2.0f)), 0.0f) * 00.06f;
+
+	float2 uvx = lerp(uv, uvd, -0.5f);
+
+	float f4 = max(0.01f - pow(length(uvx + 0.4f * pos), 2.4f), 0.0f) * 6.0f;
+	float f42 = max(0.01f - pow(length(uvx + 0.45f * pos), 2.4f), 0.0f) * 5.0f;
+	float f43 = max(0.01f - pow(length(uvx + 0.5f * pos), 2.4f), 0.0f) * 3.0f;
+
+	uvx = lerp(uv, uvd, -0.4f);
+
+	float f5 = max(0.01f - pow(length(uvx + 0.2f * pos), 5.5f), 0.0f) * 2.0f;
+	float f52 = max(0.01f - pow(length(uvx + 0.4f * pos), 5.5f), 0.0f) * 2.0f;
+	float f53 = max(0.01f - pow(length(uvx + 0.6f * pos), 5.5f), 0.0f) * 2.0f;
+
+	uvx = lerp(uv, uvd, -0.5f);
+
+	float f6 = max(0.01f - pow(length(uvx - 0.3f * pos), 1.6f), 0.0f) * 6.0f;
+	float f62 = max(0.01f - pow(length(uvx - 0.325f * pos), 1.6f), 0.0f) * 3.0f;
+	float f63 = max(0.01f - pow(length(uvx - 0.35f * pos), 1.6f), 0.0f) * 5.0f;
+
+	float3 c = float3(0.0f, 0.0f, 0.0f);
+
+	c.r += f2 + f4 + f5 + f6; 
+	c.g += f22 + f42 + f52 + f62; 
+	c.b += f23 + f43 + f53 + f63;
 	
-	float2 uvx = lerp(uv,uvd,-0.5);
-	
-	float f4 = max(0.01-pow(length(uvx+0.4*pos),2.4),.0)*6.0;
-	float f42 = max(0.01-pow(length(uvx+0.45*pos),2.4),.0)*5.0;
-	float f43 = max(0.01-pow(length(uvx+0.5*pos),2.4),.0)*3.0;
-	
-	uvx = lerp(uv,uvd,-.4);
-	
-	float f5 = max(0.01-pow(length(uvx+0.2*pos),5.5),.0)*2.0;
-	float f52 = max(0.01-pow(length(uvx+0.4*pos),5.5),.0)*2.0;
-	float f53 = max(0.01-pow(length(uvx+0.6*pos),5.5),.0)*2.0;
-	
-	uvx = lerp(uv,uvd,-0.5);
-	
-	float f6 = max(0.01-pow(length(uvx-0.3*pos),1.6),.0)*6.0;
-	float f62 = max(0.01-pow(length(uvx-0.325*pos),1.6),.0)*3.0;
-	float f63 = max(0.01-pow(length(uvx-0.35*pos),1.6),.0)*5.0;
-	
-	float3 c = float3(0,0,0);
-	
-	c.r+=f2+f4+f5+f6; c.g+=f22+f42+f52+f62; c.b+=f23+f43+f53+f63;
-	c = c*1.3 - float3(length(uvd)*.05,length(uvd)*.05,length(uvd)*.05);
-	
+	c = c * 1.3f - float3(length(uvd) * 0.05f, length(uvd) * 0.05f, length(uvd) * 0.05f);
+
 	return c * intensity;
 }
 
-float3 LensFlareColorCorrection(float3 color, float factor,float factor2) // color modifier
+float3 LensFlareColorCorrection(float3 color, float factor,float factor2) 
 {
-	float w = color.x+color.y+color.z;
-	return lerp(color,float3(w,w,w)*factor,w*factor2);
+	float w = color.x + color.y + color.z;
+	return lerp(color, float3(w, w, w) * factor, w * factor2);
 }
 
 float4 PSLensFlare(PixelShaderInput input) : SV_Target
@@ -159,8 +162,9 @@ float4 PSLensFlare(PixelShaderInput input) : SV_Target
 		position = input.PositionCopy;
 		 
 
-	color.xyz += max(float3(0,0,0), float3(1.5,1.2,1.2)*float3(3,3,3)*LensFlare(position.xy,  offset.xy));
-	//color.xyz = LensFlareColorCorrection(color,.5,.1);
+	float3 lensFlareColor = max(float3(0.0f, 0.0f, 0.0f), float3(4.5f, 3.6f, 3.6f) * LensFlare(position.xy, offset.xy));
+	lensFlareColor = LensFlareColorCorrection(lensFlareColor, 0.5f, 0.1f);
+	color.xyz += lensFlareColor;
 	
-	return color; // float4(output, color.a);
+	return color;
 }
