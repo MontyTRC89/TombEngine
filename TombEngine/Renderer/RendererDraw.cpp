@@ -208,10 +208,10 @@ namespace TEN::Renderer
 
 			RendererObject& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectNumber);
 
-			_stItem.World = item->World;
+			_stItem.World = item->InterpolatedWorld;
 			_stItem.Color = item->Color;
 			_stItem.AmbientLight = item->AmbientLight;
-			memcpy(_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
+			memcpy(_stItem.BonesMatrices, item->InterpolatedAnimationTransforms, sizeof(Matrix) * MAX_BONES);
 			for (int k = 0; k < MAX_BONES; k++)
 				_stItem.BoneLightModes[k] = (int)LightMode::Static;
 
@@ -2308,7 +2308,7 @@ namespace TEN::Renderer
 		RendererObject& moveableObj = *_moveableObjects[item->ObjectNumber];
 
 		// Bind item main properties
-		_stItem.World = item->InterpolatedWorld; // item->World;
+		_stItem.World = item->InterpolatedWorld;
 		_stItem.Color = item->Color;
 		_stItem.AmbientLight = item->AmbientLight;
 		memcpy(_stItem.BonesMatrices, item->InterpolatedAnimationTransforms, sizeof(Matrix) * MAX_BONES);

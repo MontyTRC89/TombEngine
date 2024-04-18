@@ -745,6 +745,11 @@ int FindItem(ItemInfo* item)
 
 void UpdateAllItems()
 {
+	for (int i = 0; i < g_Level.Items.size(); i++)
+	{
+		g_Level.Items[i].StoreInterpolationData();
+	}
+
 	InItemControlLoop = true;
 
 	short itemNumber = NextItemActive;

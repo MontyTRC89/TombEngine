@@ -73,6 +73,8 @@ namespace TEN::Effects
 			if (!p.active)
 				continue;
 
+			p.StoreInterpolationData();
+
 			p.age+= p.ageRate;
 			if (p.life < p.age)
 				p.active = false;

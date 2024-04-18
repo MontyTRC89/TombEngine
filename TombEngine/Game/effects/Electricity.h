@@ -39,24 +39,66 @@ namespace TEN::Effects::Electricity
 		int rotation;
 		int type;
 		int flags;
+
+		Vector3 oldPos1;
+		Vector3 oldPos2;
+		Vector3 oldPos3;
+		Vector3 oldPos4;
+		byte oldR;
+		byte oldG;
+		byte oldB;
+		float oldLife;
+
+		void StoreInterpolationData()
+		{
+			oldPos1 = pos1;
+			oldPos2 = pos2;
+			oldPos3 = pos3;
+			oldPos4 = pos4;
+			oldR = r;
+			oldG = g;
+			oldB = b;
+			oldLife = life;
+		}
 	};
 
 	struct HelicalLaser
 	{
 		unsigned int NumSegments = 0;
 
-		Vector3 Origin		  = Vector3::Zero;
-		Vector3 Target		  = Vector3::Zero;
+		Vector3 Origin = Vector3::Zero;
+		Vector3 Target = Vector3::Zero;
 		short	Orientation2D = 0;
 		Vector3 LightPosition = Vector3::Zero; // TODO: Use light cone instead?
-		Vector4 Color		  = Vector4::Zero;
+		Vector4 Color = Vector4::Zero;
 
-		float Life		= 0.0f;
-		float Radius	= 0.0f;
-		float Length	= 0.0f;
+		float Life = 0.0f;
+		float Radius = 0.0f;
+		float Length = 0.0f;
 		float LengthEnd = 0.0f;
-		float Opacity	= 0.0f;
-		short Rotation	= 0;
+		float Opacity = 0.0f;
+		short Rotation = 0;
+
+		Vector3 OldOrigin = Vector3::Zero;
+		Vector3 OldTarget = Vector3::Zero;
+		float OldLife = 0.0f;
+		float OldRadius = 0.0f;
+		float OldLength = 0.0f;
+		float OldOpacity = 0.0f;
+		Vector4 OldColor = Vector4::Zero;
+		short OldOrientation2D = 0;
+
+		void StoreInterpolationData()
+		{
+			OldOrigin = Origin;
+			OldTarget = Target;
+			OldLife = Life;
+			OldRadius = Radius;
+			OldLength = Length;
+			OldOpacity = Opacity;
+			OldColor = Color;
+			OldOrientation2D = Orientation2D;
+		}
 	};
 
 	extern std::vector<Electricity>	 ElectricityArcs;

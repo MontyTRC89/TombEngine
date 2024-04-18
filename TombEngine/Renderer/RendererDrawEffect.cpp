@@ -169,14 +169,16 @@ namespace TEN::Renderer
 			if (laser.Life <= 0.0f)
 				continue;
 
-			auto color = laser.Color;
-			color.w = laser.Opacity;
+			auto color = Vector4::Lerp(laser.OldColor, laser.Color, _interpolationFactor);
+			color.w = Lerp(laser.OldOpacity, laser.Opacity, _interpolationFactor);
 
-			ElectricityKnots[0] = laser.Target;
-			ElectricityKnots[1] = laser.Origin;
+			Vector3 laserTarget = Vector3::Lerp(laser.OldTarget, laser.Target, _interpolationFactor);
+
+			ElectricityKnots[0] = laserTarget;
+			ElectricityKnots[1] = Vector3::Lerp(laser.OldOrigin, laser.Origin, _interpolationFactor);
 			
 			for (int j = 0; j < 2; j++)
-				ElectricityKnots[j] -= laser.Target;
+				ElectricityKnots[j] -= laserTarget;
 
 			CalculateHelixSpline(laser, ElectricityKnots, ElectricityBuffer);
 
@@ -189,9 +191,9 @@ namespace TEN::Renderer
 				auto& interpPosArray = ElectricityBuffer;
 				for (int s = 0; s < laser.NumSegments ; s++)
 				{
-					auto origin = laser.Target + interpPosArray[bufferIndex];
+					auto origin = laserTarget + interpPosArray[bufferIndex];
 					bufferIndex++;
-					auto target = laser.Target + interpPosArray[bufferIndex];
+					auto target = laserTarget + interpPosArray[bufferIndex];
 
 					auto center = (origin + target) / 2;
 					auto direction = target - origin;
@@ -201,7 +203,13 @@ namespace TEN::Renderer
 						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 						center,
 						color,
-						PI_DIV_2, 1.0f, Vector2(5 * 8.0f, Vector3::Distance(origin, target)), BlendMode::Additive, direction, true, view);							
+						PI_DIV_2,
+						1.0f, 
+						Vector2(5 * 8.0f, Vector3::Distance(origin, target)),
+						BlendMode::Additive, 
+						direction,
+						true, 
+						view);							
 				}
 			}				
 		}
@@ -220,12 +228,12 @@ namespace TEN::Renderer
 			if (arc.life <= 0)
 				continue;
 
-			ElectricityKnots[0] = arc.pos1;
-			ElectricityKnots[1] = arc.pos1;
-			ElectricityKnots[2] = arc.pos2;
-			ElectricityKnots[3] = arc.pos3;
-			ElectricityKnots[4] = arc.pos4;
-			ElectricityKnots[5] = arc.pos4;
+			ElectricityKnots[0] = Vector3::Lerp(arc.oldPos1, arc.pos1, _interpolationFactor);
+			ElectricityKnots[1] = Vector3::Lerp(arc.oldPos1, arc.pos1, _interpolationFactor);
+			ElectricityKnots[2] = Vector3::Lerp(arc.oldPos2, arc.pos2, _interpolationFactor);
+			ElectricityKnots[3] = Vector3::Lerp(arc.oldPos3, arc.pos3, _interpolationFactor);
+			ElectricityKnots[4] = Vector3::Lerp(arc.oldPos4, arc.pos4, _interpolationFactor);
+			ElectricityKnots[5] = Vector3::Lerp(arc.oldPos4, arc.pos4, _interpolationFactor);
 
 			for (int j = 0; j < ElectricityKnots.size(); j++)
 				ElectricityKnots[j] -= LaraItem->Pose.Position.ToVector3();
@@ -239,6 +247,7 @@ namespace TEN::Renderer
 				int bufferIndex = 0;
 
 				auto& interpPosArray = ElectricityBuffer;
+
 				for (int s = 0; s < ((arc.segments * 3) - 1); s++)
 				{
 					auto origin = (LaraItem->Pose.Position + interpPosArray[bufferIndex]).ToVector3();
@@ -263,11 +272,36 @@ namespace TEN::Renderer
 						b = (arc.life * arc.b) / 16;
 					}
 
+
+					byte oldR, oldG, oldB;
+					if (arc.oldLife >= 16)
+					{
+						oldR = arc.oldR;
+						oldG = arc.oldG;
+						oldB = arc.oldB;
+					}
+					else
+					{
+						oldR = (arc.oldLife * arc.oldR) / 16;
+						oldG = (arc.oldLife * arc.oldG) / 16;
+						oldB = (arc.oldLife * arc.oldB) / 16;
+					}
+
+					r = (byte)Lerp(oldR, r, _interpolationFactor);
+					g = (byte)Lerp(oldG, g, _interpolationFactor);
+					b = (byte)Lerp(oldB, b, _interpolationFactor);
+
 					AddSpriteBillboardConstrained(
 						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 						center,
 						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BlendMode::Additive, direction, true, view);
+						PI_DIV_2,
+						1.0f,
+						Vector2(arc.width * 8, Vector3::Distance(origin, target)),
+						BlendMode::Additive,
+						direction,
+						true,
+						view);
 				}
 			}
 		}
@@ -1490,8 +1524,19 @@ namespace TEN::Renderer
 			if (!CheckIfSlotExists(ID_EXPLOSION_SPRITES, "Explosion particles rendering"))
 				return;
 
-			AddSpriteBillboard(&_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], 
-				e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BlendMode::Additive, true, view);
+			AddSpriteBillboard(
+				&_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], 
+				Vector3::Lerp(e.oldPos, e.pos, _interpolationFactor),
+				Vector4::Lerp(e.oldTint, e.tint, _interpolationFactor),
+				Lerp(e.oldRotation, e.rotation, _interpolationFactor),
+				1.0f,
+				{ 
+					Lerp(e.oldSize, e.size, _interpolationFactor), 
+					Lerp(e.oldSize, e.size, _interpolationFactor)
+				},
+				BlendMode::Additive,
+				true, 
+				view);
 		}
 	}
 
@@ -1506,7 +1551,19 @@ namespace TEN::Renderer
 			if (!CheckIfSlotExists(s.sequence, "Particle rendering"))
 				continue;
 
-			AddSpriteBillboard(&_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BlendMode::AlphaBlend, true, view);
+			AddSpriteBillboard(
+				&_sprites[Objects[s.sequence].meshIndex + s.sprite],
+				Vector3::Lerp(s.oldWorldPosition, s.worldPosition, _interpolationFactor), 
+				Vector4(1.0f), 
+				0, 
+				1.0f, 
+				{
+					Lerp(s.oldSize, s.size, _interpolationFactor),
+					Lerp(s.oldSize, s.size, _interpolationFactor) / 2 
+				},
+				BlendMode::AlphaBlend, 
+				true, 
+				view);
 		}
 	}
 }
