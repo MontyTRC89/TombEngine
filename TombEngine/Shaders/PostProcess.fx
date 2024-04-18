@@ -146,25 +146,20 @@ float4 PSLensFlare(PixelShaderInput input) : SV_Target
 	float4 color = ColorTexture.Sample(ColorSampler, input.UV);
 	
 	float4 position = input.PositionCopy;
+	float3 totalLensFlareColor = float3(0.0f, 0.0f, 0.0f);
 
-	     position.xyz /= position.w;
-        position.xyz = position.xyz * 0.5f + 0.5f; 
-        position.y = 1.0f - position.y;
+	for (int i = 0; i < NumLensFlares; i++)
+	{
+		float4 lensFlarePosition = float4(LensFlares[i].Position, 1.0f);
+        lensFlarePosition = mul(mul(lensFlarePosition, View), Projection); 
+		lensFlarePosition.xyz /= lensFlarePosition.w;
 
-	float4 offset = float4(0,-5000,0, 1.0);
-        offset = mul(mul(offset, View), Projection); 
-		offset.xyz /= offset.w;
+		float3 lensFlareColor = max(float3(0.0f, 0.0f, 0.0f), float3(4.5f, 3.6f, 3.6f) * LensFlare(position.xy, lensFlarePosition.xy));
+		lensFlareColor = LensFlareColorCorrection(lensFlareColor, 0.5f, 0.1f);
+		totalLensFlareColor += lensFlareColor;
+	}
 
-        //offset.xyz /= offset.w;
-       // offset.xyz = offset.xyz * 0.5f + 0.5f; 
-       // offset.y = 1.0f - offset.y;
+	color.xyz += totalLensFlareColor;
 
-		position = input.PositionCopy;
-		 
-
-	float3 lensFlareColor = max(float3(0.0f, 0.0f, 0.0f), float3(4.5f, 3.6f, 3.6f) * LensFlare(position.xy, offset.xy));
-	lensFlareColor = LensFlareColorCorrection(lensFlareColor, 0.5f, 0.1f);
-	color.xyz += lensFlareColor;
-	
 	return color;
 }

@@ -732,6 +732,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Structures\RendererFogBulb.h" />
     <ClInclude Include="Renderer\Structures\RendererHudBar.h" />
     <ClInclude Include="Renderer\Structures\RendererItem.h" />
+    <ClInclude Include="Renderer\Structures\RendererLensFlare.h" />
     <ClInclude Include="Renderer\Structures\RendererLight.h" />
     <ClInclude Include="Renderer\Structures\RendererLine2D.h" />
     <ClInclude Include="Renderer\Structures\RendererLine3D.h" />

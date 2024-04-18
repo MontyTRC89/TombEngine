@@ -4,6 +4,12 @@ namespace TEN::Renderer::ConstantBuffers
 {
 	using namespace DirectX::SimpleMath;
 
+	struct alignas(16) ShaderLensFlare
+	{
+		Vector3 Position;
+		float Padding;
+	};
+
 	struct alignas(16) CPostProcessBuffer
 	{
 		float CinematicBarsHeight;
@@ -15,5 +21,9 @@ namespace TEN::Renderer::ConstantBuffers
 		Vector3 Tint;
 		//--
 		Vector4 SSAOKernel[64];
+		//--
+		ShaderLensFlare LensFlares[4];
+		//--
+		int NumLensFlares;
 	};
 }
