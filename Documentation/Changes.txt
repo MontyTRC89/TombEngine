@@ -4,6 +4,8 @@ Version 1.4
 * Fixed drawing of display sprites in title level.
 * Fixed drawing of smoke sprites and various other sprites.
 * Fixed player holster state and current vehicle not preserved correctly on level jump.
+* Fixed diving when swimming over sinks.
+* Fixed fire item effect not extinguishing in water.
 * Fixed fade-in and fade-out effects not canceling correctly when next level is loaded.
 * Fixed shadows still being visible after shattering a moveable.
 * Fixed FOV interpolation at the end of the flyby sequence.

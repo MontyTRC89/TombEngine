@@ -729,8 +729,8 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 GameStatus HandleGlobalInputEvents(bool isTitle)
 {
-	constexpr auto DEATH_NO_INPUT_TIMEOUT = 5 * FPS;
-	constexpr auto DEATH_INPUT_TIMEOUT	  = 10 * FPS;
+	constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
+	constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
 
 	if (isTitle)
 		return GameStatus::Normal;
