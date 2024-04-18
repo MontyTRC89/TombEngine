@@ -33,7 +33,6 @@ using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
 ObjectHandler Objects;
-StaticAsset	  StaticAssets[STATIC_COUNT_MAX];
 
 void ObjectHandler::Initialize() 
 { 
@@ -216,13 +215,12 @@ void InitializeObjects()
 	SequenceUsed[5] = 0;
 }
 
-StaticAsset& GetStaticAsset(int id)
+StaticAsset& GetStaticAsset(GAME_OBJECT_ID id)
 {
-	if (id < 0 || id > STATIC_COUNT_MAX)
-	{
-		TENLog("GetStaticAsset(): ID " + std::to_string(id) + " out of range.");
-		return StaticAssets[0];
-	}
+	auto it = g_Level.StaticAssets.find(id);
+	if (it != g_Level.StaticAssets.end())
+		return it->second;
 
-	return StaticAssets[id];
+	TENLog("GetStaticAsset(): ID " + std::to_string(id) + " out of range. Returning static asset 0.");
+	return g_Level.StaticAssets[(GAME_OBJECT_ID)0];
 }

@@ -28,7 +28,7 @@ namespace TEN::Renderer
 
 		_moveableObjects.resize(ID_NUMBER_OBJECTS);
 		_spriteSequences.resize(ID_NUMBER_OBJECTS);
-		_staticObjects.resize(STATIC_COUNT_MAX);
+		_staticObjects.resize(STATIC_ASSET_COUNT_MAX);
 		_rooms.resize(g_Level.Rooms.size());
 
 		_meshes.clear();
@@ -798,8 +798,8 @@ namespace TEN::Renderer
 		totalIndices = 0;
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
-			int staticID = StaticObjectsIds[i];
-			const auto& staticObj = StaticObjects[staticID];
+			auto staticID = (GAME_OBJECT_ID)StaticObjectsIds[i];
+			const auto& staticObj = GetStaticAsset(staticID);
 			const auto& mesh = g_Level.Meshes[staticObj.meshNumber];
 
 			for (auto& bucket : mesh.buckets)
@@ -816,8 +816,8 @@ namespace TEN::Renderer
 		lastIndex = 0;
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
-			int staticAssetID = StaticObjectsIds[i];
-			auto& staticAsset = StaticObjects[staticAssetID];
+			auto staticAssetID = (GAME_OBJECT_ID)StaticObjectsIds[i];
+			auto& staticAsset = GetStaticAsset(staticAssetID);
 
 			_staticObjects[staticAssetID] = RendererObject();
 			auto& staticObject = *_staticObjects[staticAssetID];

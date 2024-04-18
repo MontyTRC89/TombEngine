@@ -12,8 +12,6 @@ constexpr auto DEFAULT_RADIUS = 10;
 constexpr auto GRAVITY		  = 6.0f;
 constexpr auto SWAMP_GRAVITY  = GRAVITY / 3.0f;
 
-constexpr auto STATIC_COUNT_MAX = 1000;
-
 enum JointRotationFlags
 {
 	ROT_X = (1 << 2),
@@ -141,10 +139,9 @@ private:
 };
 
 extern ObjectHandler Objects;
-extern StaticAsset	 StaticAssets[STATIC_COUNT_MAX];
 
 void InitializeGameFlags();
 void InitializeSpecialEffects();
 void InitializeObjects();
 
-StaticAsset& GetStaticAsset(int id);
+StaticAsset& GetStaticAsset(GAME_OBJECT_ID id);

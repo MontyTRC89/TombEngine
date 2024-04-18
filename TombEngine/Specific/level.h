@@ -14,12 +14,16 @@
 
 using namespace TEN::Control::Volumes;
 
+enum GAME_OBJECT_ID : short;
+struct BOX_INFO;
 struct ChunkId;
 struct LEB128;
+struct OVERLAP;
 struct SampleInfo;
 struct SinkInfo;
-struct BOX_INFO;
-struct OVERLAP;
+struct StaticAsset;
+
+constexpr auto STATIC_ASSET_COUNT_MAX = 1000;
 
 struct TEXTURE
 {
@@ -90,9 +94,10 @@ struct LEVEL
 {
 	// Object data
 	int					  NumItems = 0;
-	std::vector<ItemInfo> Items	   = {};
-	std::vector<MESH>	  Meshes   = {};
-	std::vector<int>	  Bones	   = {};
+	std::vector<ItemInfo> Items	   = {}; // Moveables
+	std::vector<MESH>	  Meshes   = {}; // TODO: Contain in MoveableAsset and StaticAsset.
+	std::vector<int>	  Bones	   = {}; // TODO: Contain in MoveableAsset.
+	std::unordered_map<GAME_OBJECT_ID, StaticAsset> StaticAssets = {};
 
 	// Animation data
 	std::vector<AnimData>				Anims	 = {};

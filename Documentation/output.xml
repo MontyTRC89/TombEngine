@@ -3622,7 +3622,7 @@ most can just be ignored (see usage).</description>
 	<parameters>
 		<parameter>
 			<name>slot</name>
-			<type>int</type>
+			<type>Objects.ObjID</type>
 			<description>New slot ID.</description>
 		</parameter>
 	</parameters>

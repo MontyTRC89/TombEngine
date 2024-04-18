@@ -18,6 +18,7 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Game/spotcam.h"
+#include "Objects/game_object_ids.h"
 #include "Objects/Generic/Doors/generic_doors.h"
 #include "Objects/Sink.h"
 #include "Renderer/Renderer.h"
@@ -263,8 +264,9 @@ void LoadItems()
 void LoadObjects()
 {
 	Objects.Initialize();
-	std::memset(StaticAssets, 0, sizeof(StaticAsset) * STATIC_COUNT_MAX);
+	//std::memset(g_Level.StaticAssets, 0, sizeof(StaticAsset) * STATIC_ASSET_COUNT_MAX);
 
+	// Load meshes.
 	int meshCount = ReadInt32();
 	TENLog("Meshes: " + std::to_string(meshCount), LogLevel::Info);
 
@@ -440,18 +442,18 @@ void LoadObjects()
 
 	for (int i = 0; i < staticCount; i++)
 	{
-		int id = ReadInt32();
-		if (id >= STATIC_COUNT_MAX)
+		auto id = (GAME_OBJECT_ID)ReadInt32();
+		if (id >= STATIC_ASSET_COUNT_MAX)
 		{
 			TENLog(
-				"Attempted to load static ID " + std::to_string(id) + ". Change static ID in WadTool to value below max (" + std::to_string(STATIC_COUNT_MAX) + "). ",
+				"Attempted to load static ID " + std::to_string(id) + ". Change static ID in WadTool to value below max (" + std::to_string(STATIC_ASSET_COUNT_MAX) + "). ",
 				LogLevel::Warning);
 			
-			id = 0;
+			id = (GAME_OBJECT_ID)0;
 		}
 
 		StaticObjectsIds.push_back(id);
-		auto& asset = GetStaticAsset[id];
+		auto& asset = GetStaticAsset(id);
 
 		asset.ID = id;
 		asset.meshNumber = ReadInt32();
@@ -864,7 +866,7 @@ void ReadRooms()
 			staticObj.Scale = ReadFloat();
 			staticObj.Flags = ReadUInt16();
 			staticObj.Color = ReadVector4();
-			staticObj.AssetPtr = &GetStaticAsset(ReadUInt16());
+			staticObj.AssetPtr = &GetStaticAsset((GAME_OBJECT_ID)ReadUInt16());
 			staticObj.HitPoints = ReadInt16();
 			staticObj.Name = ReadString();
 
@@ -1450,7 +1452,7 @@ void LoadSprites()
 
 		if (spriteID >= ID_NUMBER_OBJECTS)
 		{
-			GetStaticAsset(spriteID - ID_NUMBER_OBJECTS).meshNumber = offset;
+			GetStaticAsset(GAME_OBJECT_ID(spriteID - ID_NUMBER_OBJECTS)).meshNumber = offset;
 		}
 		else
 		{
