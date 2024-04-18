@@ -215,7 +215,7 @@ void InitializeObjects()
 	SequenceUsed[5] = 0;
 }
 
-StaticAsset& GetStaticAsset(GAME_OBJECT_ID id)
+const StaticAsset& GetStaticAsset(GAME_OBJECT_ID id)
 {
 	auto it = g_Level.StaticAssets.find(id);
 	if (it != g_Level.StaticAssets.end())

@@ -817,7 +817,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < StaticObjectsIds.size(); i++)
 		{
 			auto staticAssetID = (GAME_OBJECT_ID)StaticObjectsIds[i];
-			auto& staticAsset = GetStaticAsset(staticAssetID);
+			const auto& staticAsset = GetStaticAsset(staticAssetID);
 
 			_staticObjects[staticAssetID] = RendererObject();
 			auto& staticObject = *_staticObjects[staticAssetID];

@@ -144,4 +144,4 @@ void InitializeGameFlags();
 void InitializeSpecialEffects();
 void InitializeObjects();
 
-StaticAsset& GetStaticAsset(GAME_OBJECT_ID id);
+const StaticAsset& GetStaticAsset(GAME_OBJECT_ID id);

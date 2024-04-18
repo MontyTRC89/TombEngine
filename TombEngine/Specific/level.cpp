@@ -264,7 +264,6 @@ void LoadItems()
 void LoadObjects()
 {
 	Objects.Initialize();
-	//std::memset(g_Level.StaticAssets, 0, sizeof(StaticAsset) * STATIC_ASSET_COUNT_MAX);
 
 	// Load meshes.
 	int meshCount = ReadInt32();
@@ -453,7 +452,7 @@ void LoadObjects()
 		}
 
 		StaticObjectsIds.push_back(id);
-		auto& asset = GetStaticAsset(id);
+		auto& asset = g_Level.StaticAssets[id];
 
 		asset.ID = id;
 		asset.meshNumber = ReadInt32();
@@ -1452,7 +1451,7 @@ void LoadSprites()
 
 		if (spriteID >= ID_NUMBER_OBJECTS)
 		{
-			GetStaticAsset(GAME_OBJECT_ID(spriteID - ID_NUMBER_OBJECTS)).meshNumber = offset;
+			g_Level.StaticAssets[GAME_OBJECT_ID(spriteID - ID_NUMBER_OBJECTS)].meshNumber = offset;
 		}
 		else
 		{
