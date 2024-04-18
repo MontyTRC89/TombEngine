@@ -355,6 +355,8 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psPostProcessNegative;
 		ComPtr<ID3D11PixelShader> _psPostProcessExclusion;
 		ComPtr<ID3D11PixelShader> _psPostProcessFinalPass;
+		ComPtr<ID3D11PixelShader> _psPostProcessLensFlare;
+
 		bool _doingFullscreenPass = false;
 
 		// SSAO

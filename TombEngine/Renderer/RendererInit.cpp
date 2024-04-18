@@ -297,12 +297,13 @@ namespace TEN::Renderer
 			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 		Utils::throwIfFailed(_device->CreateInputLayout(postProcessInputLayoutItems, 3, blob->GetBufferPointer(), blob->GetBufferSize(), &_fullscreenTriangleInputLayout));
-
+		        
 		_psPostProcessCopy = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\PostProcess.fx"), "PSCopy", "ps_5_0", nullptr, blob);
 		_psPostProcessMonochrome = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\PostProcess.fx"), "PSMonochrome", "ps_5_0", nullptr, blob);
 		_psPostProcessNegative = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\PostProcess.fx"), "PSNegative", "ps_5_0", nullptr, blob);
 		_psPostProcessExclusion = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\PostProcess.fx"), "PSExclusion", "ps_5_0", nullptr, blob);
 		_psPostProcessFinalPass = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\PostProcess.fx"), "PSFinalPass", "ps_5_0", nullptr, blob);
+		_psPostProcessLensFlare = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\PostProcess.fx"), "PSLensFlare", "ps_5_0", nullptr, blob);
 	}
 
 	void Renderer::CreateSSAONoiseTexture()

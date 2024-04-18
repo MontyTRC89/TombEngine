@@ -72,9 +72,22 @@ namespace TEN::Renderer
 			BindRenderTargetAsTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
 			DrawTriangles(3, 0);
 
-			destinationRenderTarget = 0;
-			currentRenderTarget = 1;
+			destinationRenderTarget = destinationRenderTarget == 1 ? 0 : 1;
+			currentRenderTarget = currentRenderTarget == 1 ? 0 : 1;
 		}  
+		 
+		// Lens flare
+		{
+			_context->ClearRenderTargetView(_postProcessRenderTarget[destinationRenderTarget].RenderTargetView.Get(), clearColor);
+			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destinationRenderTarget].RenderTargetView.GetAddressOf(), nullptr);
+
+			_context->PSSetShader(_psPostProcessLensFlare.Get(), nullptr, 0);
+			BindRenderTargetAsTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
+			DrawTriangles(3, 0);
+
+			destinationRenderTarget = destinationRenderTarget == 1 ? 0 : 1;
+			currentRenderTarget = currentRenderTarget == 1 ? 0 : 1;
+		} 
 
 		// Do the final pass
 		_context->PSSetShader(_psPostProcessFinalPass.Get(), nullptr, 0);
