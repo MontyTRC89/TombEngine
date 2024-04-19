@@ -12,8 +12,9 @@ Version 1.4
 * Fixed sounds resuming in pause mode while switching between apps.
 * Fixed slide directions.
 * Fixed occasional collision warnings in a log when teeth spikes object was activated.
-* Fixed T-Rex's head rotation
-* Fixed Climbable Pushables collision during continuous pulling action.
+* Fixed climbable pushables collision during continuous pulling action.
+* Fixed collision for solid static meshes with zero collision box.
+* Fixed T-Rex's head rotation.
 * Auto-switch to a crawl state if player start position is in a crawlspace.
 * Revise wall spikes:
   - Wall spikes now stop when they touch a pushable, another spike wall or a normal wall.
