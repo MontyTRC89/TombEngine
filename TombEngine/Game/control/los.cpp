@@ -241,7 +241,7 @@ bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<in
 		losAxis1 = xLOS(*origin, *target, roomNumbers);
 	}
 
-	if (losAxis1)
+	if (losAxis1 != 0)
 	{
 		GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 
@@ -716,7 +716,7 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 	return true;
 }
 
-int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObjectID)
+int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** staticPtrPtr, GAME_OBJECT_ID priorityObjectID)
 {
 	ClosestItem = NO_VALUE;
 	ClosestDist = SQUARE(target->x - origin->x) + SQUARE(target->y - origin->y) + SQUARE(target->z - origin->z);
@@ -727,7 +727,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 
 		auto pose = Pose::Zero;
 
-		if (mesh)
+		if (staticPtrPtr != nullptr)
 		{
 			for (int m = 0; m < room.mesh.size(); m++)
 			{
@@ -740,14 +740,14 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 
 					if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp.staticNumber))
 					{
-						*mesh = &meshp;
+						*staticPtrPtr = &meshp;
 						target->RoomNumber = LosRooms[r];
 					}
 				}
 			}
 		}
 
-		for (short linkNumber = room.itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
+		for (int linkNumber = room.itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 		{
 			const auto& item = g_Level.Items[linkNumber];
 

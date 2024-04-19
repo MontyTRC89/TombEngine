@@ -45,8 +45,7 @@ namespace TEN::Scripting::Util
 		auto vector1 = posB.ToGameVector();
 
 		auto vector = Vector3i::Zero;
-		return (LOS(&vector0, &vector1) &&
-			ObjectOnLOS2(&vector0, &vector1, &vector, nullptr) == NO_VALUE);
+		return (LOS(&vector0, &vector1) && ObjectOnLOS2(&vector0, &vector1, &vector, nullptr) == NO_VALUE);
 	}
 
 	///Calculate the distance between two positions.
