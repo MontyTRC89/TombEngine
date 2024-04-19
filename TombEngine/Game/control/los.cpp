@@ -42,14 +42,11 @@ static int xLOS(const GameVector& origin, GameVector& target, std::optional<std:
 	NumberLosRooms = 1;
 	LosRooms[0] = origin.RoomNumber;
 
+	if (roomNumbers.has_value())
+		roomNumbers.value()->insert(origin.RoomNumber);
+
 	short roomNumber0 = origin.RoomNumber;
 	short roomNumber1 = origin.RoomNumber;
-
-	if (roomNumbers.has_value())
-	{
-		roomNumbers.value()->insert(roomNumber0);
-		roomNumbers.value()->insert(roomNumber1);
-	}
 
 	bool isNegative = (dx < 0);
 	int sign = (isNegative ? -1 : 1);
@@ -64,12 +61,12 @@ static int xLOS(const GameVector& origin, GameVector& target, std::optional<std:
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		if (roomNumber0 != roomNumber1)
 		{
-			if (roomNumbers.has_value())
-				roomNumbers.value()->insert(roomNumber0);
-
 			roomNumber1 = roomNumber0;
 			LosRooms[NumberLosRooms] = roomNumber0;
 			++NumberLosRooms;
+
+			if (roomNumbers.has_value())
+				roomNumbers.value()->insert(roomNumber0);
 		}
 
 		if (y > GetFloorHeight(sectorPtr, x, y, z) ||
@@ -82,12 +79,12 @@ static int xLOS(const GameVector& origin, GameVector& target, std::optional<std:
 		sectorPtr = GetFloor(x + sign, y, z, &roomNumber0);
 		if (roomNumber0 != roomNumber1)
 		{
-			if (roomNumbers.has_value())
-				roomNumbers.value()->insert(roomNumber0);
-
 			roomNumber1 = roomNumber0;
 			LosRooms[NumberLosRooms] = roomNumber0;
 			++NumberLosRooms;
+
+			if (roomNumbers.has_value())
+				roomNumbers.value()->insert(roomNumber0);
 		}
 
 		if (y > GetFloorHeight(sectorPtr, x + sign, y, z) ||
@@ -121,6 +118,9 @@ static int zLOS(const GameVector& origin, GameVector& target, std::optional<std:
 	NumberLosRooms = 1;
 	LosRooms[0] = origin.RoomNumber;
 
+	if (roomNumbers.has_value())
+		roomNumbers.value()->insert(origin.RoomNumber);
+
 	short roomNumber0 = origin.RoomNumber;
 	short roomNumber1 = origin.RoomNumber;
 
@@ -140,6 +140,9 @@ static int zLOS(const GameVector& origin, GameVector& target, std::optional<std:
 			roomNumber1 = roomNumber0;
 			LosRooms[NumberLosRooms] = roomNumber0;
 			++NumberLosRooms;
+
+			if (roomNumbers.has_value())
+				roomNumbers.value()->insert(roomNumber0);
 		}
 
 		if (y > GetFloorHeight(sectorPtr, x, y, z) ||
@@ -155,6 +158,9 @@ static int zLOS(const GameVector& origin, GameVector& target, std::optional<std:
 			roomNumber1 = roomNumber0;
 			LosRooms[NumberLosRooms] = roomNumber0;
 			++NumberLosRooms;
+
+			if (roomNumbers.has_value())
+				roomNumbers.value()->insert(roomNumber0);
 		}
 
 		if (y > GetFloorHeight(sectorPtr, x, y, z + sign) ||
