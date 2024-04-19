@@ -1277,6 +1277,8 @@ namespace TEN::Renderer
 					_numTriangles++;
 				}
 			}
+
+			SetCullMode(CullMode::CounterClockwise);
 		}
 	}
 

@@ -3,6 +3,7 @@ Version 1.4
 
 * Fixed drawing of display sprites in title level.
 * Fixed drawing of smoke sprites and various other sprites.
+* Fixed drawing of transparent surfaces when debris are present in scene.
 * Fixed player holster state and current vehicle not preserved correctly on level jump.
 * Fixed diving when swimming over sinks.
 * Fixed fire item effect not extinguishing in water.
