@@ -32,6 +32,7 @@ Lua API changes:
 * Added resetHub flag to Flow.Level, which allows to reset hub data.
 * Added Flow.GetFlipMapStatus() function to get current flipmap status.
 * Added Moveable:GetMeshCount() function to get number of moveable meshes.
+* Added timeout parameter for Moveable:Enable() function.
 * Added Static:GetHP() and Static:SetHP() functions to change shatterable static mesh hit points.
 * Fixed Moveable:SetOnCollidedWithObject() callback.
 
