@@ -97,6 +97,8 @@ static int xLOS(const GameVector& origin, GameVector& target, std::optional<std:
 		x += BLOCK(sign);
 		y += dy * sign;
 		z += dz * sign;
+
+		g_Renderer.AddDebugSphere(BoundingSphere(Vector3(x, y, z), 20), Color(1, 0, 0));
 	}
 
 	if (flag != 1)
@@ -173,6 +175,8 @@ static int zLOS(const GameVector& origin, GameVector& target, std::optional<std:
 		x += dx * sign;
 		y += dy * sign;
 		z += BLOCK(sign);
+
+		g_Renderer.AddDebugSphere(BoundingSphere(Vector3(x, y, z), 20), Color(0, 1, 0));
 	}
 
 	if (flag != 1)
@@ -187,42 +191,32 @@ static bool ClipTarget(const GameVector& origin, GameVector& target)
 	short roomNumber = target.RoomNumber;
 	auto* sectorPtr = GetFloor(target.x, target.y, target.z, &roomNumber);
 
+	auto dir = target.ToVector3() - origin.ToVector3();
+	dir.Normalize();
+
+	auto ray = Ray(origin.ToVector3(), dir);
+	
+	// TODO: Broken.
 	if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
 	{
-		auto pos = (((target.ToVector3i() - origin.ToVector3i()) * 7) / 8) + origin.ToVector3i();
-		auto wPos = Vector3i::Zero;
-
-		for (int i = 3; i > 0; --i)
+		for (const auto& tri : sectorPtr->FloorSurface.Triangles)
 		{
-			wPos = (((target.ToVector3i() - pos) * i) / 4) + pos;
-
-			sectorPtr = GetFloor(wPos.x, wPos.y, wPos.z, &roomNumber);
-			if (wPos.y < GetFloorHeight(sectorPtr, wPos.x, wPos.y, wPos.z))
-				break;
+			float dist = 0.0f;
+			if (ray.Intersects(tri.Plane, dist))
+				target = GameVector(ray.position + ray.direction * dist, roomNumber);
 		}
 
-		target = GameVector(wPos, roomNumber);
 		return false;
 	}
-
-	roomNumber = target.RoomNumber;
-	auto* sector = GetFloor(target.x, target.y, target.z, &roomNumber);
-
-	if (target.y < GetCeiling(sector, target.x, target.y, target.z))
+	else if (target.y < GetCeiling(sectorPtr, target.x, target.y, target.z))
 	{
-		auto pos = (((target.ToVector3i() - origin.ToVector3i()) * 7) / 8) + origin.ToVector3i();
-		auto wPos = Vector3i::Zero;
-
-		for (int i = 3; i > 0; --i)
+		for (const auto& tri : sectorPtr->CeilingSurface.Triangles)
 		{
-			wPos = (((target.ToVector3i() - pos) * i) / 4) + pos;
-
-			sectorPtr = GetFloor(wPos.x, wPos.y, wPos.z, &roomNumber);
-			if (wPos.y < GetFloorHeight(sectorPtr, wPos.x, wPos.y, wPos.z))
-				break;
+			float dist = 0.0f;
+			if (ray.Intersects(tri.Plane, dist))
+				target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), dir, dist), roomNumber);
 		}
 
-		target = GameVector(wPos, roomNumber);
 		return false;
 	}
 
@@ -251,6 +245,7 @@ bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<in
 	{
 		GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 
+		g_Renderer.PrintDebugMessage("Clipping...");
 		if (ClipTarget(*origin, *target) && losAxis0 == 1 && losAxis1 == 1)
 			return true;
 	}

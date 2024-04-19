@@ -183,9 +183,9 @@ CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3&
 
 CollisionResult GetCollision(const Vector3i& pos, int roomNumber, const Vector3i& offset)
 {
-	auto dir = offset;
+	auto dir = offset.ToVector3();
+	float dist = dir.Length();
 	dir.Normalize();
-	float dist = offset.Length();
 
 	return GetCollision(pos, roomNumber, dir, dist);
 }

@@ -61,9 +61,39 @@ LaraInfo Lara = {};
 ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 
+#include <Game/control/los.h>
+#include "Specific/Input/Input.h"
+#include <OISKeyboard.h>
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
+
+	//--------
+
+	static auto rot = EulerAngles::Identity;
+	if (KeyMap[OIS::KC_T])
+	{
+		rot.x += ANGLE(2);
+	}
+	else if (KeyMap[OIS::KC_G])
+	{
+		rot.x -= ANGLE(2);
+	}
+
+	auto dir = (item->Pose.Orientation + rot).ToDirection();
+
+	auto origin = (item->Pose.Position + Vector3i(0, -BLOCK(1), 0)).ToVector3();
+	auto target = Geometry::TranslatePoint(origin, dir, BLOCK(5));
+
+	auto o = GameVector(origin, item->RoomNumber);
+	auto t = GameVector(target, item->RoomNumber);
+	bool los = LOS(&o, &t);
+
+	g_Renderer.AddDebugLine(o.ToVector3(), t.ToVector3(), Vector4::One);
+	g_Renderer.AddDebugSphere(BoundingSphere(t.ToVector3(), 100), Color(0, 0, 1));
+
+	//--------
 
 	// Update reference move axis.
 	if (GetMoveAxis() != Vector2::Zero)

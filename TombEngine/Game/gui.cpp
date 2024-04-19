@@ -2457,7 +2457,7 @@ namespace TEN::Gui
 				}
 				else
 				{
-					BinocularOldCamera = Camera.oldType;
+					PrevBinocularCameraType = Camera.oldType;
 				}
 
 				return;

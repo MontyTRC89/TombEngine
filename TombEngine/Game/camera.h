@@ -137,7 +137,7 @@ extern ScreenEffectData g_ScreenEffect;
 
 extern GameVector ForcedFixedCamera;
 extern bool UseForcedFixedCamera;
-extern CameraType BinocularOldCamera;
+extern CameraType PrevBinocularCameraType;
 extern short CurrentFOV;
 extern short LastFOV;
 
