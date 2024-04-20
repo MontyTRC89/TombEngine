@@ -16,8 +16,8 @@ Basic cameras that can point at Lara or at a CAMERA_TARGET.
 @pragma nostrip
 */
 
-static auto index_error = index_error_maker(CameraObject, ScriptReserved_Camera);
-static auto newindex_error = newindex_error_maker(CameraObject, ScriptReserved_Camera);
+static auto IndexError = index_error_maker(CameraObject, ScriptReserved_Camera);
+static auto NewIndexError = newindex_error_maker(CameraObject, ScriptReserved_Camera);
 
 CameraObject::CameraObject(LevelCameraInfo & ref) : m_camera{ref}
 {};
@@ -26,8 +26,8 @@ void CameraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<CameraObject>(ScriptReserved_Camera,
 		sol::no_constructor, // ability to spawn new ones could be added later
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 
 		/// Get the camera's position
 		// @function Camera:GetPosition

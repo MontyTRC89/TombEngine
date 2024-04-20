@@ -44,11 +44,13 @@
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/LaserBeam.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -84,6 +86,7 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace TEN::Traps::TR5;
+using namespace TEN::Entities::Creatures::TR3;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -231,6 +234,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
+		UpdateFishSwarm();
 		UpdateLocusts();
 		UpdateUnderwaterBloodParticles();
 
@@ -299,10 +303,11 @@ unsigned CALLBACK GameMain(void *)
 GameStatus DoLevel(int levelIndex, bool loadGame)
 {
 	bool isTitle = !levelIndex;
+	auto loadType = loadGame ? LevelLoadType::Load : (SaveGame::IsOnHub(levelIndex) ? LevelLoadType::Hub : LevelLoadType::New);
 
 	TENLog(isTitle ? "DoTitle" : "DoLevel", LogLevel::Info);
 
-	// Load the level. Fall back to title if unsuccessful.
+	// Load level. Fall back to title if unsuccessful.
 	if (!LoadLevelFile(levelIndex))
 		return isTitle ? GameStatus::ExitGame : GameStatus::ExitToTitle;
 
@@ -314,7 +319,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeItemBoxData();
 
 	// Initialize scripting.
-	InitializeScripting(levelIndex, loadGame);
+	InitializeScripting(levelIndex, loadType);
 	InitializeNodeScripts();
 
 	// Initialize menu and inventory state.
@@ -429,6 +434,7 @@ void CleanUp()
 	ClearDrips();
 	ClearRipples();
 	ClearLaserBarrierEffects();
+	ClearLaserBeamEffects();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();
@@ -452,12 +458,12 @@ void CleanUp()
 	ClearObjCamera();
 }
 
-void InitializeScripting(int levelIndex, bool loadGame)
+void InitializeScripting(int levelIndex, LevelLoadType type)
 {
 	TENLog("Loading level script...", LogLevel::Info);
 
 	g_GameStringsHandler->ClearDisplayStrings();
-	g_GameScript->ResetScripts(!levelIndex || loadGame);
+	g_GameScript->ResetScripts(!levelIndex || type != LevelLoadType::New);
 
 	auto* level = g_GameFlow->GetLevel(levelIndex);
 
@@ -477,7 +483,7 @@ void InitializeScripting(int levelIndex, bool loadGame)
 	}
 
 	// Play default background music.
-	if (!loadGame)
+	if (type != LevelLoadType::Load)
 		PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
 }
 
@@ -495,8 +501,8 @@ void DeInitializeScripting(int levelIndex, GameStatus reason)
 
 void InitializeOrLoadGame(bool loadGame)
 {
-	g_Gui.SetInventoryItemChosen(NO_ITEM);
-	g_Gui.SetEnterInventory(NO_ITEM);
+	g_Gui.SetInventoryItemChosen(NO_VALUE);
+	g_Gui.SetEnterInventory(NO_VALUE);
 
 	// Restore the game?
 	if (loadGame)
@@ -520,19 +526,21 @@ void InitializeOrLoadGame(bool loadGame)
 	else
 	{
 		// If not loading a savegame, clear all info.
-		Statistics.Level = {};
+		SaveGame::Statistics.Level = {};
 
 		if (InitializeGame)
 		{
 			// Clear all game info as well.
-			Statistics.Game = {};
+			SaveGame::Statistics.Game = {};
 			GameTimer = 0;
 			InitializeGame = false;
 
+			SaveGame::ResetHub();
 			TENLog("Starting new game.", LogLevel::Info);
 		}
 		else
 		{
+			SaveGame::LoadHub(CurrentLevel);
 			TENLog("Starting new level.", LogLevel::Info);
 		}
 
@@ -600,6 +608,7 @@ GameStatus DoGameLoop(int levelIndex)
 
 void EndGameLoop(int levelIndex, GameStatus reason)
 {
+	SaveGame::SaveHub(levelIndex);
 	DeInitializeScripting(levelIndex, reason);
 
 	StopAllSounds();
@@ -633,7 +642,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 		g_Gui.GetInventoryMode() != InventoryMode::Save &&
 		g_GameFlow->IsLoadSaveEnabled())
 	{
-		SaveGame::LoadSavegameInfos();
+		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 		g_Gui.CallInventory(LaraItem, false);
 	}
@@ -641,7 +650,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 		g_Gui.GetInventoryMode() != InventoryMode::Load &&
 		g_GameFlow->IsLoadSaveEnabled())
 	{
-		SaveGame::LoadSavegameInfos();
+		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))
@@ -653,7 +662,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 		if (g_Gui.CallPause())
 			result = GameStatus::ExitToTitle;
 	}
-	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_ITEM) &&
+	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_VALUE) &&
 			 LaraItem->HitPoints > 0 && !Lara.Control.Look.IsUsingBinoculars)
 	{
 		if (g_Gui.CallInventory(LaraItem, true))
@@ -671,8 +680,8 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 GameStatus HandleGlobalInputEvents(bool isTitle)
 {
-	constexpr auto DEATH_NO_INPUT_TIMEOUT = 5 * FPS;
-	constexpr auto DEATH_INPUT_TIMEOUT	  = 10 * FPS;
+	constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
+	constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
 
 	if (isTitle)
 		return GameStatus::Normal;

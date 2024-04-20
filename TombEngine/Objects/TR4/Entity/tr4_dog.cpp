@@ -179,7 +179,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 
 				if (item->Animation.ActiveState == DOG_STATE_STALK_IDLE &&
-					item->Animation.RequiredState != NO_STATE)
+					item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;

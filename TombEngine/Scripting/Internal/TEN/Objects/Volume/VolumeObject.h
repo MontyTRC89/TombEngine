@@ -9,31 +9,40 @@ class Vec3;
 
 class Volume : public NamedBase<Volume, TriggerVolume&>
 {
+private:
+	TriggerVolume& _volume;
+
 public:
 	using IdentifierType = std::reference_wrapper<TriggerVolume>;
-	Volume(TriggerVolume& volume);
-	~Volume() = default;
-
-	Volume& operator =(const Volume& other) = delete;
-	Volume(const Volume& other) = delete;
 
 	static void Register(sol::table& parent);
 
+	// Cosntructors and destructors
+	Volume(TriggerVolume& volume);
+	Volume(const Volume& other) = delete;
+	~Volume() = default;
+
+	// Getters
+	std::string GetName() const;
+	Vec3		GetPos() const;
+	Rotation	GetRot() const;
+	Vec3		GetScale() const;
+
+	// Setters
+	void SetName(const std::string& name);
+	void SetRot(const Rotation& rot);
+	void SetPos(const Vec3& pos);
+	void SetScale(const Vec3& scale);
+
+	// Inquirers
+	bool GetActive() const;
+	bool IsMoveableInside(const Moveable& mov);
+
+	// Utilities
 	void Enable();
 	void Disable();
-	[[nodiscard]] bool GetActive() const;
-	[[nodiscard]] Rotation GetRot() const;
-	void SetRot(const Rotation& rot);
-	[[nodiscard]] Vec3 GetPos() const;
-	void SetPos(const Vec3& pos);
-	[[nodiscard]] Vec3 GetScale() const;
-	void SetScale(const Vec3& scale);
-	[[nodiscard]] std::string GetName() const;
-	void SetName(const std::string& name);
-
 	void ClearActivators();
-	[[nodiscard]] bool IsMoveableInside(const Moveable& moveable);
 
-private:
-	TriggerVolume& m_volume;
+	// Operators
+	Volume& operator =(const Volume& other) = delete;
 };

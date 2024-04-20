@@ -145,7 +145,7 @@ namespace TEN::Entities::Creatures::TR1
 			switch (item->Animation.ActiveState)
 			{
 			case BIG_RAT_STATE_IDLE:
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (ai.bite && ai.distance < BIG_RAT_LAND_BITE_ATTACK_RANGE)
 					item->Animation.TargetState = BIG_RAT_STATE_LAND_BITE_ATTACK;
@@ -180,7 +180,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BIG_RAT_STATE_LAND_BITE_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE && ai.ahead &&
+				if (item->Animation.RequiredState == NO_VALUE && ai.ahead &&
 					item->TouchBits.Test(BigRatBite.BoneID))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_BITE_ATTACK_DAMAGE);
@@ -191,7 +191,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BIG_RAT_STATE_POUNCE_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE && ai.ahead &&
+				if (item->Animation.RequiredState == NO_VALUE && ai.ahead &&
 					item->TouchBits.Test(BigRatBite.BoneID))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_POUNCE_ATTACK_DAMAGE);
@@ -222,7 +222,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BIG_RAT_STATE_SWIM_BITE_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE && ai.ahead &&
+				if (item->Animation.RequiredState == NO_VALUE && ai.ahead &&
 					item->TouchBits.Test(BigRatBite.BoneID))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_BITE_ATTACK_DAMAGE);

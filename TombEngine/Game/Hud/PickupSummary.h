@@ -16,7 +16,7 @@ namespace TEN::Hud
 		Vector2		Position	= Vector2::Zero;
 		Vector2		Origin		= Vector2::Zero;
 		Vector2		Target		= Vector2::Zero;
-		EulerAngles Orientation = EulerAngles::Zero;
+		EulerAngles Orientation = EulerAngles::Identity;
 
 		float Life		   = 0.0f;
 		float Scale		   = 0.0f;

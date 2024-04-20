@@ -67,8 +67,8 @@ namespace TEN::Entities::Creatures::TR2
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		auto pos = GetJointPosition(item, WorkerFlamethrowerBite.BoneID, WorkerFlamethrowerBite.Position);
 

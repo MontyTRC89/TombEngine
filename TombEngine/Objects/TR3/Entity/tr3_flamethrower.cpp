@@ -61,8 +61,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		short angle = 0;
 		short tilt = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		auto pos = GetJointPosition(item, FlamethrowerBite);
 		int randomInt = GetRandomControl();
@@ -101,7 +101,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+					if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
 						continue;
 
 					target = &g_Level.Items[currentCreature->ItemNumber];

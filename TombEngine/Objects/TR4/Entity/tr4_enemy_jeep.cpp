@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
 	{
 		short grenadeItemNumber = CreateItem();
 
-		if (grenadeItemNumber != NO_ITEM)
+		if (grenadeItemNumber != NO_VALUE)
 		{
 			auto* grenadeItem = &g_Level.Items[grenadeItemNumber];
 
@@ -53,7 +53,7 @@ namespace TEN::Entities::TR4
 
 			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
-			grenadeItem->Animation.RequiredState = NO_STATE;
+			grenadeItem->Animation.RequiredState = NO_VALUE;
 			grenadeItem->Animation.Velocity.z = 32;
 			grenadeItem->Animation.Velocity.y = -32 * phd_sin(grenadeItem->Pose.Orientation.x);
 			grenadeItem->HitPoints = 120;
@@ -162,7 +162,7 @@ namespace TEN::Entities::TR4
 				if (item->ItemFlags[0] < 0)
 					item->ItemFlags[0] = 0;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.distance > pow(BLOCK(1), 2) || Lara.Location >= item->ItemFlags[3])
 					item->Animation.TargetState = 1;
@@ -294,7 +294,7 @@ namespace TEN::Entities::TR4
 					{
 						aiObject = &g_Level.AIObjects[i];
 
-						if (g_Level.AIObjects[i].triggerFlags == item->ItemFlags[3] && g_Level.AIObjects[i].roomNumber != NO_ROOM)
+						if (g_Level.AIObjects[i].triggerFlags == item->ItemFlags[3] && g_Level.AIObjects[i].roomNumber != NO_VALUE)
 						{
 							aiObject = &g_Level.AIObjects[i];
 							break;
