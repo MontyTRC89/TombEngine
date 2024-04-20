@@ -425,7 +425,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\spotcam.h" />
     <ClInclude Include="Math\Constants.h" />
     <ClInclude Include="Math\Geometry.h" />
-    <ClInclude Include="Math\Interpolation.h" />
     <ClInclude Include="Math\Legacy.h" />
     <ClInclude Include="Math\Math.h" />
     <ClInclude Include="Math\Objects\AxisAngle.h" />
@@ -438,6 +437,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Math\Objects\Vector3i.h" />
     <ClInclude Include="Math\Random.h" />
     <ClInclude Include="Math\Solvers.h" />
+    <ClInclude Include="Math\Utils.h" />
     <ClInclude Include="Objects\Effects\Boss.h" />
     <ClInclude Include="Objects\Effects\effect_objects.h" />
     <ClInclude Include="Objects\Effects\EmberEmitter.h" />
@@ -934,9 +934,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Setup.cpp" />
     <ClCompile Include="Game\spotcam.cpp" />
     <ClCompile Include="Math\Geometry.cpp" />
-    <ClCompile Include="Math\Interpolation.cpp" />
     <ClCompile Include="Math\Legacy.cpp" />
-    <ClCompile Include="Math\Math.cpp" />
     <ClCompile Include="Math\Objects\AxisAngle.cpp" />
     <ClCompile Include="Math\Objects\EulerAngles.cpp" />
     <ClCompile Include="Math\Objects\GameBoundingBox.cpp" />
@@ -947,6 +945,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Math\Objects\Vector3i.cpp" />
     <ClCompile Include="Math\Random.cpp" />
     <ClCompile Include="Math\Solvers.cpp" />
+    <ClCompile Include="Math\Utils.cpp" />
     <ClCompile Include="Objects\Effects\Boss.cpp" />
     <ClCompile Include="Objects\Effects\effect_objects.cpp" />
     <ClCompile Include="Objects\Effects\EmberEmitter.cpp" />
