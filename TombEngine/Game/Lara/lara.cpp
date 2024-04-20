@@ -91,7 +91,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	bool los = LOS(&o, &t);
 
 	g_Renderer.AddDebugLine(o.ToVector3(), t.ToVector3(), Vector4::One);
-	g_Renderer.AddDebugSphere(BoundingSphere(t.ToVector3(), 100), Color(0, 0, 1));
+	g_Renderer.AddDebugTarget(t.ToVector3(), Quaternion::Identity, 100, Color(1, 0, 1));
 
 	//--------
 

@@ -67,7 +67,7 @@ static int xLOS(const GameVector& origin, GameVector& target, std::optional<std:
 
 	while (isNegative ? (x > target.x) : (x < target.x))
 	{
-		g_Renderer.AddDebugSphere(BoundingSphere(Vector3(x, y, z), 20), Color(1, 0, 0));
+		g_Renderer.AddDebugTarget(Vector3(x, y, z), Quaternion::Identity, 20, Color(1, 0, 0));
 
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		if (roomNumber0 != roomNumber1)
@@ -146,7 +146,7 @@ static int zLOS(const GameVector& origin, GameVector& target, std::optional<std:
 
 	while (isNegative ? (z > target.z) : (z < target.z))
 	{
-		g_Renderer.AddDebugSphere(BoundingSphere(Vector3(x, y, z), 20), Color(0, 1, 0));
+		g_Renderer.AddDebugTarget(Vector3(x, y, z), Quaternion::Identity, 20, Color(0, 1, 0));
 
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		if (roomNumber0 != roomNumber1)
