@@ -193,55 +193,41 @@ static int zLOS(const GameVector& origin, GameVector& target, std::optional<std:
 	return flag;
 }
 
-static float FloorToNearestBlock(float value)
+static std::pair<TriangleMesh, TriangleMesh> GenerateSurfaceTriangleMeshes(const Vector3& pos, const FloorInfo& sector, bool isFloor)
 {
-	return FloorToStep(value, BLOCK(1));
-}
+	auto base = Vector3(FloorToStep(pos.x, BLOCK(1)), 0.0f, FloorToStep(pos.z, BLOCK(1)));
+	auto corner0 = base;
+	auto corner1 = base + Vector3(0.0f, 0.0f, BLOCK(1));
+	auto corner2 = base + Vector3(BLOCK(1), 0.0f, BLOCK(1));
+	auto corner3 = base + Vector3(BLOCK(1), 0.0f, 0.0f);
 
-static float CeilToNearestBlock(float value)
-{
-	return CeilToStep(value, BLOCK(1));
-}
-
-static std::pair<Triangle, Triangle> GenerateSurfaceTriangles(const Vector3& pos, const FloorInfo& sector, bool isFloor)
-{
-	auto base = Vector3(FloorToNearestBlock(pos.x), 0.0f, FloorToNearestBlock(pos.z));
-
-	int x0 = base.x;
-	int z0 = base.z;
-	int x1 = base.x;
-	int z1 = base.z + BLOCK(1);
-	int x2 = base.x + BLOCK(1);
-	int z2 = base.z + BLOCK(1);
-	int x3 = base.x + BLOCK(1);
-	int z3 = base.z;
-
-	if (!sector.IsSurfaceSplit(isFloor) || sector.FloorSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
+	const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
+	if (!sector.IsSurfaceSplit(isFloor) || surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
 	{
-		auto tri0Vertex0 = Vector3(x0, sector.GetSurfaceHeight(x0 + 1, z0 + 1, isFloor, 0), z0);
-		auto tri0Vertex1 = Vector3(x1, sector.GetSurfaceHeight(x1 + 1, z1 - 1, isFloor, 0), z1);
-		auto tri0Vertex2 = Vector3(x2, sector.GetSurfaceHeight(x2 - 1, z2 - 1, isFloor, 0), z2);
+		auto tri0Vertex0 = Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 0), corner0.z);
+		auto tri0Vertex1 = Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z);
+		auto tri0Vertex2 = Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 0), corner2.z);
 
-		auto tri1Vertex0 = Vector3(x0, sector.GetSurfaceHeight(x0 + 1, z0 + 1, isFloor, 1), z0);
-		auto tri1Vertex1 = Vector3(x2, sector.GetSurfaceHeight(x2 - 1, z2 - 1, isFloor, 1), z2);
-		auto tri1Vertex2 = Vector3(x3, sector.GetSurfaceHeight(x3 - 1, z3 + 1, isFloor, 1), z3);
+		auto tri1Vertex0 = Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 1), corner0.z);
+		auto tri1Vertex1 = Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 1), corner2.z);
+		auto tri1Vertex2 = Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z);
 
-		auto tri0 = Triangle(tri0Vertex0, tri0Vertex1, tri0Vertex2);
-		auto tri1 = Triangle(tri1Vertex0, tri1Vertex1, tri1Vertex2);
+		auto tri0 = TriangleMesh(tri0Vertex0, tri0Vertex1, tri0Vertex2);
+		auto tri1 = TriangleMesh(tri1Vertex0, tri1Vertex1, tri1Vertex2);
 		return std::pair(tri0, tri1);
 	}
 	else
 	{
-		auto tri0Vertex0 = Vector3(x1, sector.GetSurfaceHeight(x1 + 1, z1 - 1, isFloor, 0), z1);
-		auto tri0Vertex1 = Vector3(x2, sector.GetSurfaceHeight(x2 - 1, z2 - 1, isFloor, 0), z2);
-		auto tri0Vertex2 = Vector3(x3, sector.GetSurfaceHeight(x3 - 1, z3 + 1, isFloor, 0), z3);
+		auto tri0Vertex0 = Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z);
+		auto tri0Vertex1 = Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 0), corner2.z);
+		auto tri0Vertex2 = Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z);
 
-		auto tri1Vertex0 = Vector3(x0, sector.GetSurfaceHeight(x0 + 1, z0 + 1, isFloor, 1), z0);
-		auto tri1Vertex1 = Vector3(x1, sector.GetSurfaceHeight(x1 + 1, z1 - 1, isFloor, 1), z1);
-		auto tri1Vertex2 = Vector3(x3, sector.GetSurfaceHeight(x3 - 1, z3 + 1, isFloor, 1), z3);
+		auto tri1Vertex0 = Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 0), corner0.z);
+		auto tri1Vertex1 = Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z);
+		auto tri1Vertex2 = Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z);
 
-		auto tri0 = Triangle(tri0Vertex0, tri0Vertex1, tri0Vertex2);
-		auto tri1 = Triangle(tri1Vertex0, tri1Vertex1, tri1Vertex2);
+		auto tri0 = TriangleMesh(tri0Vertex0, tri0Vertex1, tri0Vertex2);
+		auto tri1 = TriangleMesh(tri1Vertex0, tri1Vertex1, tri1Vertex2);
 		return std::pair(tri0, tri1);
 	}
 }
@@ -260,17 +246,17 @@ static bool ClipTarget(const GameVector& origin, GameVector& target)
 	// Clip floor.
 	if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
 	{
-		auto triPair = GenerateSurfaceTriangles(target.ToVector3(), *sectorPtr, true);
+		auto meshPair = GenerateSurfaceTriangleMeshes(target.ToVector3(), *sectorPtr, true);
 
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex0, 20), Color(1, 1, 0));
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex1, 20), Color(1, 1, 0));
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex2, 20), Color(1, 1, 0));
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex0, 20), Color(1, 1, 0));
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex1, 20), Color(1, 1, 0));
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex2, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.first.Vertices[0], 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.first.Vertices[1], 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.first.Vertices[2], 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.second.Vertices[0], 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.second.Vertices[1], 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.second.Vertices[2], 20), Color(1, 1, 0));
 
 		float dist = 0.0f;
-		if (triPair.first.Intersects(ray, dist) || triPair.second.Intersects(ray, dist))
+		if (meshPair.first.Intersects(ray, dist) || meshPair.second.Intersects(ray, dist))
 			target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), ray.direction, dist), roomNumber);
 
 		return false;
@@ -278,17 +264,17 @@ static bool ClipTarget(const GameVector& origin, GameVector& target)
 	// Clip ceiling.
 	else if (target.y < GetCeiling(sectorPtr, target.x, target.y, target.z))
 	{
-		auto triPair = GenerateSurfaceTriangles(target.ToVector3(), *sectorPtr, false);
+		auto meshPair = GenerateSurfaceTriangleMeshes(target.ToVector3(), *sectorPtr, false);
 
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex0, 20), Color(1, 1, 0));
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex1, 20), Color(1, 1, 0));
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex2, 20), Color(1, 1, 0));
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex0, 20), Color(1, 1, 0));
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex1, 20), Color(1, 1, 0));
-		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex2, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.first.Vertices[0], 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.first.Vertices[1], 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.first.Vertices[2], 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.second.Vertices[0], 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.second.Vertices[1], 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(meshPair.second.Vertices[2], 20), Color(1, 1, 0));
 
 		float dist = 0.0f;
-		if (triPair.first.Intersects(ray, dist) || triPair.second.Intersects(ray, dist))
+		if (meshPair.first.Intersects(ray, dist) || meshPair.second.Intersects(ray, dist))
 			target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), ray.direction, dist), roomNumber);
 
 		return false;
