@@ -965,6 +965,10 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	// Get DX static bounds in global coordinates.
 	auto staticBounds = box.ToBoundingOrientedBox(pose);
 
+	// Ignore processing null bounds.
+	if (Vector3(staticBounds.Extents) == Vector3::Zero)
+		return false;
+
 	// Get local TR bounds and DX item bounds in global coordinates.
 	auto itemBBox = GameBoundingBox(item);
 	auto itemBounds = itemBBox.ToBoundingOrientedBox(item->Pose);

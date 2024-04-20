@@ -1277,6 +1277,8 @@ namespace TEN::Renderer
 					_numTriangles++;
 				}
 			}
+
+			SetCullMode(CullMode::CounterClockwise);
 		}
 
 		// TODO: temporary fix, we need to remove every use of SpriteBatch and PrimitiveBatch because
