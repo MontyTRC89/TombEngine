@@ -13,8 +13,10 @@
 #include "Math/Math.h"
 #include "Specific/level.h"
 #include "Renderer/RenderView.h"
+#include "Objects/Effects/lens_flare.h"
 
 using namespace TEN::Math;
+using namespace TEN::Entities::Effects;
 
 namespace TEN::Renderer
 {
@@ -27,10 +29,10 @@ namespace TEN::Renderer
 		_visitedRoomsStack.clear();
 
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
-		{ 
+		{
 			auto& room = _rooms[i];
-			                         
-			room.ItemsToDraw.clear();        
+
+			room.ItemsToDraw.clear();
 			room.EffectsToDraw.clear();
 			room.StaticsToDraw.clear();
 			room.LightsToDraw.clear();
@@ -47,7 +49,7 @@ namespace TEN::Renderer
 
 		GetVisibleRooms(NO_VALUE, renderView.Camera.RoomNumber, VIEW_PORT, false, 0, onlyRooms, renderView);
 
-		_invalidateCache = false; 
+		_invalidateCache = false;
 
 		// Prepare real DX scissor test rectangle.
 		for (auto* roomPtr : renderView.RoomsToDraw)
@@ -56,17 +58,17 @@ namespace TEN::Renderer
 			roomPtr->ClipBounds.Bottom = (1.0f - roomPtr->ViewPort.y) * _screenHeight * 0.5f;
 			roomPtr->ClipBounds.Right = (roomPtr->ViewPort.z + 1.0f) * _screenWidth * 0.5f;
 			roomPtr->ClipBounds.Top = (1.0f - roomPtr->ViewPort.w) * _screenHeight * 0.5f;
-		} 
+		}
 
 		// Collect fog bulbs.
 		std::vector<RendererFogBulb> tempFogBulbs;
 		tempFogBulbs.reserve(MAX_FOG_BULBS_DRAW);
 
-		for (auto& room : _rooms)     
+		for (auto& room : _rooms)
 		{
 			if (!g_Level.Rooms[room.RoomNumber].Active())
 				continue;
-			      
+
 			for (const auto& light : room.Lights)
 			{
 				if (light.Type != LightType::FogBulb)
@@ -76,7 +78,7 @@ namespace TEN::Renderer
 				if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out * 1.2f))
 				{
 					RendererFogBulb bulb;
-					
+
 					bulb.Position = light.Position;
 					bulb.Density = light.Intensity;
 					bulb.Color = light.Color;
@@ -88,7 +90,7 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		
+
 		// Sort fog bulbs.
 		std::sort(
 			tempFogBulbs.begin(),
@@ -100,6 +102,26 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < std::min(MAX_FOG_BULBS_DRAW, (int)tempFogBulbs.size()); i++)
 			renderView.FogBulbsToDraw.push_back(tempFogBulbs[i]);
+
+		// Collect lens flares
+		for (auto lensFlare : LensFlares)
+		{
+			if (Vector3::Distance(lensFlare.Position, renderView.Camera.WorldPosition) < BLOCK(32))
+			{
+				Vector3 lensFlareToCamera = lensFlare.Position - renderView.Camera.WorldPosition;
+				Vector3 cameraDirection = renderView.Camera.WorldDirection;
+
+				lensFlareToCamera.Normalize();
+				cameraDirection.Normalize();
+
+				if (lensFlareToCamera.Dot(cameraDirection) >= 0.0f)
+				{
+					RendererLensFlare lensFlareToDraw;
+					lensFlareToDraw.Position = lensFlare.Position;
+					renderView.LensFlaresToDraw.push_back(lensFlareToDraw);
+				}
+			}
+		}
 	}
 
 	bool Renderer::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)

@@ -23,6 +23,6 @@ namespace TEN::Entities::Effects
 
 	void ClearLensFlares()
 	{
-		LensFlare.clear();
+		LensFlares.clear();
 	}
 }

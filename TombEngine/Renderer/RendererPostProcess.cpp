@@ -83,16 +83,19 @@ namespace TEN::Renderer
 
 			_context->PSSetShader(_psPostProcessLensFlare.Get(), nullptr, 0);
 
-			_stPostProcessBuffer.LensFlares[0].Position = Vector3(0, -10000, 0);
-			_stPostProcessBuffer.NumLensFlares = 1;
-			_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());	
+			for (int i = 0; i < view.LensFlaresToDraw.size(); i++)
+			{
+				_stPostProcessBuffer.LensFlares[i].Position = view.LensFlaresToDraw[i].Position;
+			}
+			_stPostProcessBuffer.NumLensFlares = (int)view.LensFlaresToDraw.size();
+			_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
 
 			BindRenderTargetAsTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
 			DrawTriangles(3, 0);
 
 			destinationRenderTarget = destinationRenderTarget == 1 ? 0 : 1;
 			currentRenderTarget = currentRenderTarget == 1 ? 0 : 1;
-		} 
+		}
 
 		// Do the final pass
 		_context->PSSetShader(_psPostProcessFinalPass.Get(), nullptr, 0);

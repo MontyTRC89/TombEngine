@@ -60,6 +60,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
+#include "Objects/Effects/lens_flare.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects;
@@ -87,6 +88,7 @@ using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace TEN::Traps::TR5;
 using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Effects;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -140,6 +142,7 @@ GameStatus ControlPhase(int numFrames)
 	ClearFires();
 	g_Renderer.ClearDynamicLights();
 	RegeneratePickups();
+	ClearLensFlares();
 
 	numFrames = std::clamp(numFrames, 0, 10);
 
