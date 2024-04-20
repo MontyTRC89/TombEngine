@@ -52,6 +52,7 @@ static int xLOS(const GameVector& origin, GameVector& target, std::vector<const 
 	NumberLosRooms = 1;
 	LosRooms[0] = origin.RoomNumber;
 
+	// Collect room number.
 	if (roomNumbers.has_value())
 		roomNumbers.value()->insert(origin.RoomNumber);
 
@@ -69,6 +70,7 @@ static int xLOS(const GameVector& origin, GameVector& target, std::vector<const 
 	{
 		g_Renderer.AddDebugTarget(Vector3(x, y, z), Quaternion::Identity, 20, Color(1, 0, 0));
 
+		// Collect sector pointer.
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		sectorPtrs.push_back(sectorPtr);
 
@@ -78,6 +80,7 @@ static int xLOS(const GameVector& origin, GameVector& target, std::vector<const 
 			LosRooms[NumberLosRooms] = roomNumber0;
 			++NumberLosRooms;
 
+			// Collect room number.
 			if (roomNumbers.has_value())
 				roomNumbers.value()->insert(roomNumber0);
 		}
@@ -96,6 +99,7 @@ static int xLOS(const GameVector& origin, GameVector& target, std::vector<const 
 			LosRooms[NumberLosRooms] = roomNumber0;
 			++NumberLosRooms;
 
+			// Collect room number.
 			if (roomNumbers.has_value())
 				roomNumbers.value()->insert(roomNumber0);
 		}
@@ -150,6 +154,7 @@ static int zLOS(const GameVector& origin, GameVector& target, std::vector<const 
 	{
 		g_Renderer.AddDebugTarget(Vector3(x, y, z), Quaternion::Identity, 20, Color(0, 1, 0));
 
+		// Collect sector pointer.
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		sectorPtrs.push_back(sectorPtr);
 
@@ -159,6 +164,7 @@ static int zLOS(const GameVector& origin, GameVector& target, std::vector<const 
 			LosRooms[NumberLosRooms] = roomNumber0;
 			++NumberLosRooms;
 
+			// Collect room number.
 			if (roomNumbers.has_value())
 				roomNumbers.value()->insert(roomNumber0);
 		}
@@ -177,6 +183,7 @@ static int zLOS(const GameVector& origin, GameVector& target, std::vector<const 
 			LosRooms[NumberLosRooms] = roomNumber0;
 			++NumberLosRooms;
 
+			// Collect room number.
 			if (roomNumbers.has_value())
 				roomNumbers.value()->insert(roomNumber0);
 		}
@@ -240,6 +247,12 @@ static std::pair<TriangleMesh, TriangleMesh> GenerateSurfaceTriangleMeshPair(con
 	}
 }
 
+// TODO
+static std::vector<TriangleMesh> GenerateTiltBridgeCollisionMeshes(const std::array<Vector3, 8> corners, const Vector3& offset)
+{
+	return {};
+}
+
 static bool ClipTarget(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs)
 {
 	static const auto TILT_BRIDGE_MOV_ASSET_IDS = std::vector
@@ -285,7 +298,44 @@ static bool ClipTarget(const GameVector& origin, GameVector& target, std::vector
 				auto corners = std::array<Vector3, 8>{};
 				box.GetCorners(corners.data());
 
-				// TODO: Tilted bridges.
+				// Determine relative offset.
+				auto offset = Vector3::Zero;
+				switch (bridgeItem.ObjectNumber)
+				{
+				default:
+				case ID_BRIDGE_TILT1:
+					offset = Vector3(0.0f, CLICK(1), 0.0f);
+					break;
+
+				case ID_BRIDGE_TILT2:
+					offset = Vector3(0.0f, CLICK(2), 0.0f);
+					break;
+
+				case ID_BRIDGE_TILT3:
+					offset = Vector3(0.0f, CLICK(3), 0.0f);
+					break;
+
+				case ID_BRIDGE_TILT4:
+					offset = Vector3(0.0f, CLICK(4), 0.0f);
+					break;
+				}
+
+				// Calculate absolute offset.
+				auto rotMatrix = bridgeItem.Pose.Orientation.ToRotationMatrix();
+				offset = Vector3::Transform(offset, rotMatrix);
+
+				// Collide generated triangle meshes.
+				auto meshes = GenerateTiltBridgeCollisionMeshes(corners, offset);
+				for (const auto& mesh : meshes)
+				{
+					float dist = 0.0f;
+					if (mesh.Intersects(ray, dist) && dist < closestDist)
+					{
+						isClipped = true;
+						closestDist = dist;
+						target = GameVector(Geometry::TranslatePoint(ray.position, ray.direction, dist), sectorPtr->RoomNumber);
+					}
+				}
 			}
 		}
 
@@ -323,7 +373,7 @@ static bool ClipTarget(const GameVector& origin, GameVector& target, std::vector
 	return !isClipped;
 }
 
-// NOTE: Accurate with axis-aligned walls and floors/ceilings. Ignores diagonal walls, and objects.
+// NOTE: Accurate with axis-aligned walls, flat bridges, and floors/ceilings. Ignores diagonal walls, tilted bridges, and objects.
 bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<int>*> roomNumbers)
 {
 	int losAxis0 = 0;
@@ -354,7 +404,7 @@ bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<in
 	return false;
 }
 
-// NOTE: Coarsely accurate with walls and floors/ceilings. Ignores objects.
+// NOTE: Coarsely accurate with walls and floors/ceilings. Ignores bridges and objects.
 bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 {
 	constexpr auto STEP_COUNT = 8;
