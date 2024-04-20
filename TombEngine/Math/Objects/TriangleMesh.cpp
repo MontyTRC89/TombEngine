@@ -27,8 +27,8 @@ namespace TEN::Math
 		normal.Normalize();
 
 		// Calculate determinant.
-		auto h = ray.direction.Cross(edge1);
-		float det = edge0.Dot(h);
+		auto dirCrossEdge1 = ray.direction.Cross(edge1);
+		float det = edge0.Dot(dirCrossEdge1);
 
 		// Test if ray and triangle are parallel.
 		if (det > -EPSILON && det < EPSILON)
@@ -37,17 +37,17 @@ namespace TEN::Math
 		float invDet = 1.0f / det;
 
 		// Calculate barycentric coordinates.
-		float s = (ray.position - Vertices[0]).Dot(h) * invDet;
-		if (s < 0.0f || s > 1.0f)
+		float baryCoordVert0 = (ray.position - Vertices[0]).Dot(dirCrossEdge1) * invDet;
+		if (baryCoordVert0 < 0.0f || baryCoordVert0 > 1.0f)
 			return false;
 
-		auto q = (ray.position - Vertices[0]).Cross(edge0);
-		float t = ray.direction.Dot(q) * invDet;
-		if (t < 0.0f || s + t > 1.0f)
+		auto rayToVert0CrossEdge0 = (ray.position - Vertices[0]).Cross(edge0);
+		float baryCoordVert1 = ray.direction.Dot(rayToVert0CrossEdge0) * invDet;
+		if (baryCoordVert1 < 0.0f || baryCoordVert0 + baryCoordVert1 > 1.0f)
 			return false;
 
 		// Calculate distance along ray to intersection point.
-		dist = edge1.Dot(q) * invDet;
+		dist = edge1.Dot(rayToVert0CrossEdge0) * invDet;
 		return true;
 	}
 }
