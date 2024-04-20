@@ -43,7 +43,7 @@ namespace TEN::Math
 
 		auto rayToVert0CrossEdge0 = (ray.position - Vertices[0]).Cross(edge0);
 		float baryCoordVert1 = ray.direction.Dot(rayToVert0CrossEdge0) * invDet;
-		if (baryCoordVert1 < 0.0f || baryCoordVert0 + baryCoordVert1 > 1.0f)
+		if (baryCoordVert1 < 0.0f || (baryCoordVert0 + baryCoordVert1) > 1.0f)
 			return false;
 
 		// Calculate distance along ray to intersection point.
