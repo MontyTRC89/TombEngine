@@ -15,20 +15,31 @@ CreatureInfo* GetCreatureInfo(ItemInfo* item)
 	return (CreatureInfo*)item->Data;
 }
 
-void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
+void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature, std::vector<GAME_OBJECT_ID> ignoredItemIds)
 {
 	float nearestDistance = INFINITY;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
 		auto* targetEntity = &g_Level.Items[i];
-
-		if (targetEntity == nullptr)
+		if (targetEntity == nullptr || (targetEntity->Index == item->Index)) // Ignore itself !
 			continue;
 
-		if (targetEntity != item &&
-			targetEntity->HitPoints > 0 &&
-			targetEntity->Status != ITEM_INVISIBLE)
+		bool checkPassed = true;
+		for (auto& itemId : ignoredItemIds)
+		{
+			if (itemId == ID_NO_OBJECT) // NOTE: if there is any ID_NO_OBJECT then ignore the other itemids and attack the target !
+			{
+				checkPassed = true; // just-in-case checkPassed was false !
+				break;
+			}
+			else if (targetEntity->ObjectNumber == itemId)
+				checkPassed = false;
+		}
+
+		if ((targetEntity != item &&
+			 targetEntity->HitPoints > 0 &&
+			 targetEntity->Status != ITEM_INVISIBLE) && checkPassed)
 		{
 			float distance = Vector3i::Distance(item->Pose.Position, targetEntity->Pose.Position);
 			if (distance < nearestDistance)

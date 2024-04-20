@@ -104,58 +104,26 @@ namespace TEN::Entities::Creatures::TR3
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != RAPTOR_STATE_DEATH)
+			{
 				SetAnimation(item, RaptorDeathAnims[Random::GenerateInt(0, (int)RaptorDeathAnims.size() - 1)]);
+				item->Pose.Position.y = GetCollision(item).Position.Floor; // NOTE: Do that so when the raptor die during pit jump, he go down to the bottom floor instead of staying midair !
+			}
 		}
 		else
 		{
-			if (creature->Enemy == nullptr || Random::TestProbability(RAPTOR_SWITCH_TARGET_CHANCE))
-			{
-				ItemInfo* nearestItem = nullptr;
-				float minDistance = INFINITY;
-
-				for (auto& currentCreature : ActiveCreatures)
-				{
-					if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
-						continue;
-
-					auto* targetItem = &g_Level.Items[currentCreature->ItemNumber];
-
-					int distance = Vector3i::Distance(item->Pose.Position, targetItem->Pose.Position);
-					if (distance < minDistance && item->HitPoints > 0)
-					{
-						nearestItem = targetItem;
-						minDistance = distance;
-					}
-				}
-
-				if (nearestItem != nullptr &&
-					(nearestItem->ObjectNumber != ID_RAPTOR ||
-						(Random::TestProbability(1 / 30.0f) && minDistance < SQUARE(BLOCK(2)))))
-				{
-					creature->Enemy = nearestItem;
-				}
-
-				int distance = Vector3i::Distance(item->Pose.Position, LaraItem->Pose.Position);
-				if (distance <= minDistance)
-					creature->Enemy = LaraItem;
-			}
-
-			if (item->AIBits)
-				GetAITarget(creature);
+			// Raptor ignore other raptor and mini-raptor but target anything else (TRex is not ignored) !
+			TargetNearestEntity(item, creature, { ID_RAPTOR, ID_COMPSOGNATHUS });
 
 			AI_INFO AI;
+			if (item->AIBits)
+				GetAITarget(creature);
 			CreatureAIInfo(item, &AI);
-
-			if (AI.ahead)
-				head = AI.angle;
-
 			GetCreatureMood(item, &AI, true);
 			CreatureMood(item, &AI, true);
-
 			if (creature->Mood == MoodType::Bored)
 				creature->MaxTurn /= 2;
-
 			angle = CreatureTurn(item, creature->MaxTurn);
+			if (AI.ahead) head = AI.angle;
 			neck = -angle * 6;
 
 			switch (item->Animation.ActiveState)
@@ -207,7 +175,15 @@ namespace TEN::Entities::Creatures::TR3
 				creature->Flags &= ~1;
 
 				if (canJump1block || canJump2blocks)
-					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+				{
+					creature->MaxTurn = 0;
+					SetAnimation(item, RAPTOR_ANIM_JUMP_START);
+					if (canJump1block)
+						item->Animation.TargetState = RAPTOR_STATE_JUMP_1BLOCK;
+					else
+						item->Animation.TargetState = RAPTOR_STATE_JUMP_2BLOCK;
+					creature->LOT.IsJumping = true;
+				}
 				else if (creature->Mood != MoodType::Bored)
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 				else if (AI.ahead && Random::TestProbability(RAPTOR_ROAR_CHANCE))
@@ -226,7 +202,15 @@ namespace TEN::Entities::Creatures::TR3
 				tilt = angle;
 
 				if (canJump1block || canJump2blocks)
-					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+				{
+					creature->MaxTurn = 0;
+					SetAnimation(item, RAPTOR_ANIM_JUMP_START);
+					if (canJump1block)
+						item->Animation.TargetState = RAPTOR_STATE_JUMP_1BLOCK;
+					else
+						item->Animation.TargetState = RAPTOR_STATE_JUMP_2BLOCK;
+					creature->LOT.IsJumping = true;
+				}
 				else if (item->TouchBits.Test(RaptorAttackJoints))
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 				else if (creature->Flags & 2)
@@ -237,13 +221,10 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (AI.bite && AI.distance < RAPTOR_RUN_ATTACK_RANGE)
 				{
-					if (item->Animation.TargetState == RAPTOR_STATE_RUN_FORWARD)
-					{
-						if (Random::TestProbability(0.25f))
-							item->Animation.TargetState = RAPTOR_STATE_IDLE;
-						else
-							item->Animation.TargetState = RAPTOR_STATE_RUN_BITE_ATTACK;
-					}
+					if (Random::TestProbability(0.25f))
+						item->Animation.TargetState = RAPTOR_STATE_IDLE;
+					else
+						item->Animation.TargetState = RAPTOR_STATE_RUN_BITE_ATTACK;
 				}
 				else if (AI.ahead && creature->Mood != MoodType::Escape &&
 					Random::TestProbability(RAPTOR_ROAR_CHANCE))
@@ -263,9 +244,9 @@ namespace TEN::Entities::Creatures::TR3
 				creature->MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
 				tilt = angle;
 
-				if (creature->Enemy->IsLara())
+				if (creature->Enemy != nullptr)
 				{
-					if (!(creature->Flags & 1) &&
+					if (creature->Enemy->IsLara() && !(creature->Flags & 1) &&
 						item->TouchBits.Test(RaptorAttackJoints))
 					{
 						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
@@ -277,10 +258,7 @@ namespace TEN::Entities::Creatures::TR3
 
 						item->Animation.RequiredState = RAPTOR_STATE_IDLE;
 					}
-				}
-				else
-				{
-					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
+					else if (!(creature->Flags & 1))
 					{
 						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
@@ -300,9 +278,9 @@ namespace TEN::Entities::Creatures::TR3
 				creature->MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
 				tilt = angle;
 
-				if (creature->Enemy->IsLara())
+				if (creature->Enemy != nullptr)
 				{
-					if (!(creature->Flags & 1) &&
+					if (creature->Enemy->IsLara() && !(creature->Flags & 1) &&
 						item->TouchBits.Test(RaptorAttackJoints))
 					{
 						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
@@ -314,10 +292,7 @@ namespace TEN::Entities::Creatures::TR3
 
 						item->Animation.RequiredState = RAPTOR_STATE_IDLE;
 					}
-				}
-				else
-				{
-					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
+					else if (!(creature->Flags & 1))
 					{
 						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
@@ -337,9 +312,9 @@ namespace TEN::Entities::Creatures::TR3
 				creature->MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
 				tilt = angle;
 
-				if (creature->Enemy->IsLara())
+				if (creature->Enemy != nullptr)
 				{
-					if (!(creature->Flags & 1) &&
+					if (creature->Enemy->IsLara() && !(creature->Flags & 1) &&
 						item->TouchBits.Test(RaptorAttackJoints))
 					{
 						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
@@ -350,10 +325,7 @@ namespace TEN::Entities::Creatures::TR3
 						if (LaraItem->HitPoints <= 0)
 							creature->Flags |= 2;
 					}
-				}
-				else
-				{
-					if (!(creature->Flags & 1) && creature->Enemy != nullptr)
+					else if (!(creature->Flags & 1))
 					{
 						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
@@ -382,8 +354,7 @@ namespace TEN::Entities::Creatures::TR3
 			item->Animation.ActiveState != RAPTOR_STATE_CLIMB &&
 			item->Animation.ActiveState != RAPTOR_STATE_JUMP_START)
 		{
-			int vault = CreatureVault(itemNumber, angle, 2, 384);
-			switch (vault)
+			switch (CreatureVault(itemNumber, angle, 2, CLICK(2.5f)))
 			{
 			case 2:
 				SetAnimation(item, RAPTOR_ANIM_VAULT_2CLICK);
