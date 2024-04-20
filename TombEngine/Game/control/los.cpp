@@ -38,7 +38,7 @@ enum class RoomLosClipType
 	Surface
 };
 
-static int xLOS(const GameVector& origin, GameVector& target, std::optional<std::set<int>*> roomNumbers)
+static int xLOS(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs, std::optional<std::set<int>*> roomNumbers)
 {
 	int flag = 1;
 
@@ -70,6 +70,8 @@ static int xLOS(const GameVector& origin, GameVector& target, std::optional<std:
 		g_Renderer.AddDebugTarget(Vector3(x, y, z), Quaternion::Identity, 20, Color(1, 0, 0));
 
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
+		sectorPtrs.push_back(sectorPtr);
+
 		if (roomNumber0 != roomNumber1)
 		{
 			roomNumber1 = roomNumber0;
@@ -117,7 +119,7 @@ static int xLOS(const GameVector& origin, GameVector& target, std::optional<std:
 	return flag;
 }
 
-static int zLOS(const GameVector& origin, GameVector& target, std::optional<std::set<int>*> roomNumbers)
+static int zLOS(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs, std::optional<std::set<int>*> roomNumbers)
 {
 	int flag = 1;
 
@@ -149,6 +151,8 @@ static int zLOS(const GameVector& origin, GameVector& target, std::optional<std:
 		g_Renderer.AddDebugTarget(Vector3(x, y, z), Quaternion::Identity, 20, Color(0, 1, 0));
 
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
+		sectorPtrs.push_back(sectorPtr);
+
 		if (roomNumber0 != roomNumber1)
 		{
 			roomNumber1 = roomNumber0;
@@ -236,41 +240,87 @@ static std::pair<TriangleMesh, TriangleMesh> GenerateSurfaceTriangleMeshPair(con
 	}
 }
 
-static bool ClipTarget(const GameVector& origin, GameVector& target)
+static bool ClipTarget(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs)
 {
-	short roomNumber = target.RoomNumber;
-	auto* sectorPtr = GetFloor(target.x, target.y, target.z, &roomNumber);
+	static const auto TILT_BRIDGE_MOV_ASSET_IDS = std::vector
+	{
+		ID_BRIDGE_TILT1,
+		ID_BRIDGE_TILT2,
+		ID_BRIDGE_TILT3,
+		ID_BRIDGE_TILT4
+	};
 
 	auto dir = target.ToVector3() - origin.ToVector3();
 	dir.Normalize();
 	auto ray = Ray(origin.ToVector3(), dir);
 
-	// TODO: Bridges.
-	
+	bool isClipped = false;
+
+	// Clip bridge.
+	for (const auto* sectorPtr : sectorPtrs)
+	{
+		// Run through all bridges in sector.
+		float closestDist = INFINITY;
+		for (int itemNumber : sectorPtr->BridgeItemNumbers)
+		{
+			const auto& bridgeItem = g_Level.Items[itemNumber];
+
+			// TODO: Not the right check.
+			//if (bridgeItem.Status == ItemStatus::ITEM_NOT_ACTIVE)
+			//	continue;
+
+			auto box = GameBoundingBox(&bridgeItem).ToBoundingOrientedBox(bridgeItem.Pose);
+			if (!Contains(TILT_BRIDGE_MOV_ASSET_IDS, bridgeItem.ObjectNumber))
+			{
+				float dist = 0.0f;
+				if (box.Intersects(ray.position, ray.direction, dist) && dist < closestDist)
+				{
+					isClipped = true;
+					closestDist = dist;
+					target = GameVector(Geometry::TranslatePoint(ray.position, ray.direction, dist), sectorPtr->RoomNumber);
+				}
+			}
+			else
+			{
+				auto corners = std::array<Vector3, 8>{};
+				box.GetCorners(corners.data());
+
+				// TODO: Tilted bridges.
+			}
+		}
+
+		// Found bridge; exit loop early.
+		if (closestDist != INFINITY)
+			break;
+	}
+
+	short roomNumber = target.RoomNumber;
+	auto* sectorPtr = GetFloor(target.x, target.y, target.z, &roomNumber);
+
 	// Clip floor.
 	if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
 	{
+		isClipped = true;
+
 		auto meshPair = GenerateSurfaceTriangleMeshPair(target.ToVector3(), *sectorPtr, true);
 
 		float dist = 0.0f;
 		if (meshPair.first.Intersects(ray, dist) || meshPair.second.Intersects(ray, dist))
-			target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), ray.direction, dist), roomNumber);
-
-		return false;
+			target = GameVector(Geometry::TranslatePoint(ray.position, ray.direction, dist), roomNumber);
 	}
 	// Clip ceiling.
 	else if (target.y < GetCeiling(sectorPtr, target.x, target.y, target.z))
 	{
-		auto meshPair = GenerateSurfaceTriangleMeshPair(target.ToVector3(), *sectorPtr, false);
+		isClipped = true;
+
+		auto meshPair = GenerateSurfaceTriangleMeshPair(ray.position, *sectorPtr, false);
 
 		float dist = 0.0f;
 		if (meshPair.first.Intersects(ray, dist) || meshPair.second.Intersects(ray, dist))
 			target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), ray.direction, dist), roomNumber);
-
-		return false;
 	}
 
-	return true;
+	return !isClipped;
 }
 
 // NOTE: Accurate with axis-aligned walls and floors/ceilings. Ignores diagonal walls, and objects.
@@ -279,23 +329,25 @@ bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<in
 	int losAxis0 = 0;
 	int losAxis1 = 0;
 
+	auto sectorPtrs = std::vector<const FloorInfo*>{};
+
 	target->RoomNumber = origin->RoomNumber;
 	if (abs(target->z - origin->z) > abs(target->x - origin->x))
 	{
-		losAxis0 = xLOS(*origin, *target, roomNumbers);
-		losAxis1 = zLOS(*origin, *target, roomNumbers);
+		losAxis0 = xLOS(*origin, *target, sectorPtrs, roomNumbers);
+		losAxis1 = zLOS(*origin, *target, sectorPtrs, roomNumbers);
 	}
 	else
 	{
-		losAxis0 = zLOS(*origin, *target, roomNumbers);
-		losAxis1 = xLOS(*origin, *target, roomNumbers);
+		losAxis0 = zLOS(*origin, *target, sectorPtrs, roomNumbers);
+		losAxis1 = xLOS(*origin, *target, sectorPtrs, roomNumbers);
 	}
 
 	if (losAxis1 != 0)
 	{
 		GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 
-		if (ClipTarget(*origin, *target) && losAxis0 == 1 && losAxis1 == 1)
+		if (ClipTarget(*origin, *target, sectorPtrs) && losAxis0 == 1 && losAxis1 == 1)
 			return true;
 	}
 
