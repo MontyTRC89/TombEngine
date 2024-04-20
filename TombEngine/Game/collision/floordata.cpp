@@ -169,10 +169,12 @@ std::optional<int> FloorInfo::GetSideRoomNumber() const
 	return std::nullopt;
 }
 
-int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
+int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor, int triID) const
 {
 	// Get triangle.
-	const auto& tri = GetSurfaceTriangle(x, z, isFloor);
+	const auto& tri = (triID == NO_VALUE) ?
+		GetSurfaceTriangle(x, z, isFloor) :
+		isFloor ? FloorSurface.Triangles[triID] : CeilingSurface.Triangles[triID];
 
 	// Calculate relative plane height at intersection using plane equation.
 	auto sectorPoint = GetSectorPoint(x, z);

@@ -172,66 +172,13 @@ namespace TEN::Collision::Los
 	// TODO: Accurate room LOS. For now, simply wraps legacy functions.
 	RoomLosData GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
 	{
-		// WIP potential perfect O(log n) method.
-		/*// 1) Collide axis-aligned walls.
-		auto roomNumbers = std::set<int>{};
-		auto losOrigin = GameVector(origin, originRoomNumber);
-		auto losTarget = GameVector(target, originRoomNumber);
-		LOS(&losOrigin, &losTarget, &roomNumbers);
-
-		auto dir = target - origin;
-		dir.Normalize();
-
-		float distMax = Vector3::Distance(origin, target);
-		float dist = distMax;
-		float stepLength = distMax;
-
-		auto pos = target;
-		short roomNumber = originRoomNumber;
-
-		// check origin to skip binary search.
-
-		bool isFirst = true;
-		while (stepLength > 1.0f && dist <= distMax)
-		{
-			auto& sector = *GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-			int floorHeight = GetFloorHeight(&sector, pos.x, pos.y, pos.z);
-			int ceilHeight = GetCeiling(&sector, pos.x, pos.y, pos.z);
-
-			stepLength /= 2;
-
-			if (pos.y > floorHeight || pos.y < ceilHeight)
-			{
-				dist -= stepLength;
-			}
-			else
-			{
-				if (isFirst)
-					break;
-
-				dist += stepLength;
-			}
-
-			pos = Geometry::TranslatePoint(origin, dir, dist);
-		}
-
-		auto intersect = std::pair(pos, roomNumber);
-		return RoomLosData{ intersect, roomNumbers };
-
-		//---------------*/
-
 		auto losOrigin = GameVector(origin, originRoomNumber);
 		auto losTarget = GameVector(target, originRoomNumber);
 
 		float distSqr = 0.0f;
 		auto roomNumbers = std::set<int>{};
 
-		// 1) Collide axis-aligned walls.
 		if (!LOS(&losOrigin, &losTarget, &roomNumbers))
-			distSqr = Vector3::DistanceSquared(origin, losTarget.ToVector3());
-
-		// 2) Collide diagonal walls and floors/ceilings.
-		if (!LOSAndReturnTarget(&losOrigin, &losTarget, 0))
 			distSqr = Vector3::DistanceSquared(origin, losTarget.ToVector3());
 
 		// Calculate intersection.

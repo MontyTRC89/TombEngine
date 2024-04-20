@@ -3,6 +3,16 @@
 
 namespace TEN::Math
 {
+	float FloorToStep(float value, float step)
+	{
+		return (std::floor(value / step) * step);
+	}
+
+	float CeilToStep(float value, float step)
+	{
+		return (std::ceil(value / step) * step);
+	}
+
 	float Luma(const Vector3& color)
 	{
 		constexpr auto RED_COEFF   = 0.2126f;

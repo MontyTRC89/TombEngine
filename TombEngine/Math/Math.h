@@ -7,6 +7,7 @@
 #include "Math/Objects/GameBoundingBox.h"
 #include "Math/Objects/GameVector.h"
 #include "Math/Objects/Pose.h"
+#include "Math/Objects/Triangle.h"
 #include "Math/Objects/Vector2i.h"
 #include "Math/Objects/Vector3i.h"
 #include "Math/Random.h"
@@ -16,6 +17,9 @@ namespace TEN::Math
 {
 	constexpr inline auto OFFSET_RADIUS = [](auto x) { return ((x * SQRT_2) + 4); };
 	constexpr inline auto MESH_BITS		= [](auto x) { return (1 << x); };
+
+	float FloorToStep(float value, float step);
+	float CeilToStep(float value, float step);
 
 	float Luma(const Vector3& color);
 	Vector3 Screen(const Vector3& ambient, const Vector3& tint);

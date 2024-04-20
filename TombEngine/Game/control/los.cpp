@@ -30,6 +30,13 @@ int ClosestItem;
 int ClosestDist;
 Vector3i ClosestCoord;
 
+enum class LosAxis
+{
+	InnerWall,
+	OuterWall,
+	ClipSurface
+};
+
 static int xLOS(const GameVector& origin, GameVector& target, std::optional<std::set<int>*> roomNumbers)
 {
 	int dx = target.x - origin.x;
@@ -58,6 +65,8 @@ static int xLOS(const GameVector& origin, GameVector& target, std::optional<std:
 	int flag = 1;
 	while (isNegative ? (x > target.x) : (x < target.x))
 	{
+		g_Renderer.AddDebugSphere(BoundingSphere(Vector3(x, y, z), 20), Color(1, 0, 0));
+
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		if (roomNumber0 != roomNumber1)
 		{
@@ -97,8 +106,6 @@ static int xLOS(const GameVector& origin, GameVector& target, std::optional<std:
 		x += BLOCK(sign);
 		y += dy * sign;
 		z += dz * sign;
-
-		g_Renderer.AddDebugSphere(BoundingSphere(Vector3(x, y, z), 20), Color(1, 0, 0));
 	}
 
 	if (flag != 1)
@@ -136,6 +143,8 @@ static int zLOS(const GameVector& origin, GameVector& target, std::optional<std:
 	int flag = 1;
 	while (isNegative ? (z > target.z) : (z < target.z))
 	{
+		g_Renderer.AddDebugSphere(BoundingSphere(Vector3(x, y, z), 20), Color(0, 1, 0));
+
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		if (roomNumber0 != roomNumber1)
 		{
@@ -175,8 +184,6 @@ static int zLOS(const GameVector& origin, GameVector& target, std::optional<std:
 		x += dx * sign;
 		y += dy * sign;
 		z += BLOCK(sign);
-
-		g_Renderer.AddDebugSphere(BoundingSphere(Vector3(x, y, z), 20), Color(0, 1, 0));
 	}
 
 	if (flag != 1)
@@ -186,6 +193,59 @@ static int zLOS(const GameVector& origin, GameVector& target, std::optional<std:
 	return flag;
 }
 
+static float FloorToNearestBlock(float value)
+{
+	return FloorToStep(value, BLOCK(1));
+}
+
+static float CeilToNearestBlock(float value)
+{
+	return CeilToStep(value, BLOCK(1));
+}
+
+static std::pair<Triangle, Triangle> GenerateSurfaceTriangles(const Vector3& pos, const FloorInfo& sector, bool isFloor)
+{
+	auto base = Vector3(FloorToNearestBlock(pos.x), 0.0f, FloorToNearestBlock(pos.z));
+
+	int x0 = base.x;
+	int z0 = base.z;
+	int x1 = base.x;
+	int z1 = base.z + BLOCK(1);
+	int x2 = base.x + BLOCK(1);
+	int z2 = base.z + BLOCK(1);
+	int x3 = base.x + BLOCK(1);
+	int z3 = base.z;
+
+	if (!sector.IsSurfaceSplit(isFloor) || sector.FloorSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
+	{
+		auto tri0Vertex0 = Vector3(x0, sector.GetSurfaceHeight(x0 + 1, z0 + 1, isFloor, 0), z0);
+		auto tri0Vertex1 = Vector3(x1, sector.GetSurfaceHeight(x1 + 1, z1 - 1, isFloor, 0), z1);
+		auto tri0Vertex2 = Vector3(x2, sector.GetSurfaceHeight(x2 - 1, z2 - 1, isFloor, 0), z2);
+
+		auto tri1Vertex0 = Vector3(x0, sector.GetSurfaceHeight(x0 + 1, z0 + 1, isFloor, 1), z0);
+		auto tri1Vertex1 = Vector3(x2, sector.GetSurfaceHeight(x2 - 1, z2 - 1, isFloor, 1), z2);
+		auto tri1Vertex2 = Vector3(x3, sector.GetSurfaceHeight(x3 - 1, z3 + 1, isFloor, 1), z3);
+
+		auto tri0 = Triangle(tri0Vertex0, tri0Vertex1, tri0Vertex2);
+		auto tri1 = Triangle(tri1Vertex0, tri1Vertex1, tri1Vertex2);
+		return std::pair(tri0, tri1);
+	}
+	else
+	{
+		auto tri0Vertex0 = Vector3(x1, sector.GetSurfaceHeight(x1 + 1, z1 - 1, isFloor, 0), z1);
+		auto tri0Vertex1 = Vector3(x2, sector.GetSurfaceHeight(x2 - 1, z2 - 1, isFloor, 0), z2);
+		auto tri0Vertex2 = Vector3(x3, sector.GetSurfaceHeight(x3 - 1, z3 + 1, isFloor, 0), z3);
+
+		auto tri1Vertex0 = Vector3(x0, sector.GetSurfaceHeight(x0 + 1, z0 + 1, isFloor, 1), z0);
+		auto tri1Vertex1 = Vector3(x1, sector.GetSurfaceHeight(x1 + 1, z1 - 1, isFloor, 1), z1);
+		auto tri1Vertex2 = Vector3(x3, sector.GetSurfaceHeight(x3 - 1, z3 + 1, isFloor, 1), z3);
+
+		auto tri0 = Triangle(tri0Vertex0, tri0Vertex1, tri0Vertex2);
+		auto tri1 = Triangle(tri1Vertex0, tri1Vertex1, tri1Vertex2);
+		return std::pair(tri0, tri1);
+	}
+}
+
 static bool ClipTarget(const GameVector& origin, GameVector& target)
 {
 	short roomNumber = target.RoomNumber;
@@ -193,29 +253,43 @@ static bool ClipTarget(const GameVector& origin, GameVector& target)
 
 	auto dir = target.ToVector3() - origin.ToVector3();
 	dir.Normalize();
-
 	auto ray = Ray(origin.ToVector3(), dir);
+
+	// TODO: Bridges.
 	
-	// TODO: Broken.
+	// Clip floor.
 	if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
 	{
-		for (const auto& tri : sectorPtr->FloorSurface.Triangles)
-		{
-			float dist = 0.0f;
-			if (ray.Intersects(tri.Plane, dist))
-				target = GameVector(ray.position + ray.direction * dist, roomNumber);
-		}
+		auto triPair = GenerateSurfaceTriangles(target.ToVector3(), *sectorPtr, true);
+
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex0, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex1, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex2, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex0, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex1, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex2, 20), Color(1, 1, 0));
+
+		float dist = 0.0f;
+		if (triPair.first.Intersects(ray, dist) || triPair.second.Intersects(ray, dist))
+			target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), ray.direction, dist), roomNumber);
 
 		return false;
 	}
+	// Clip ceiling.
 	else if (target.y < GetCeiling(sectorPtr, target.x, target.y, target.z))
 	{
-		for (const auto& tri : sectorPtr->CeilingSurface.Triangles)
-		{
-			float dist = 0.0f;
-			if (ray.Intersects(tri.Plane, dist))
-				target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), dir, dist), roomNumber);
-		}
+		auto triPair = GenerateSurfaceTriangles(target.ToVector3(), *sectorPtr, false);
+
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex0, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex1, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.first.Vertex2, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex0, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex1, 20), Color(1, 1, 0));
+		g_Renderer.AddDebugSphere(BoundingSphere(triPair.second.Vertex2, 20), Color(1, 1, 0));
+
+		float dist = 0.0f;
+		if (triPair.first.Intersects(ray, dist) || triPair.second.Intersects(ray, dist))
+			target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), ray.direction, dist), roomNumber);
 
 		return false;
 	}
@@ -245,7 +319,6 @@ bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<in
 	{
 		GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 
-		g_Renderer.PrintDebugMessage("Clipping...");
 		if (ClipTarget(*origin, *target) && losAxis0 == 1 && losAxis1 == 1)
 			return true;
 	}

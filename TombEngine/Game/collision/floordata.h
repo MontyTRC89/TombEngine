@@ -159,7 +159,7 @@ public:
 	std::optional<int> GetNextRoomNumber(const Vector3i& pos, bool isBelow) const;
 	std::optional<int> GetSideRoomNumber() const;
 
-	int GetSurfaceHeight(int x, int z, bool isFloor) const;
+	int GetSurfaceHeight(int x, int z, bool isFloor, int triID = NO_VALUE) const;
 	int GetSurfaceHeight(const Vector3i& pos, bool isFloor) const;
 	int GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const;
 
