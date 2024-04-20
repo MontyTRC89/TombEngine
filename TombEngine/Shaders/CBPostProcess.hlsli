@@ -18,7 +18,7 @@ cbuffer CBPostProcess : register(b7)
     //--
     float4 SSAOKernel[64];
     //--
-    ShaderLensFlare LensFlares[4];
+    ShaderLensFlare LensFlares[8];
     //--
     int NumLensFlares;
 };

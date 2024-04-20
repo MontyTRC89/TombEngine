@@ -91,7 +91,6 @@ namespace TEN::Renderer
 			}
 		}
 
-		// Sort fog bulbs.
 		std::sort(
 			tempFogBulbs.begin(),
 			tempFogBulbs.end(),
@@ -104,9 +103,14 @@ namespace TEN::Renderer
 			renderView.FogBulbsToDraw.push_back(tempFogBulbs[i]);
 
 		// Collect lens flares
+		std::vector<RendererLensFlare> tempLensFlares;
+		tempLensFlares.reserve(MAX_LENS_FLARES_DRAW);
+
 		for (auto lensFlare : LensFlares)
 		{
-			if (Vector3::Distance(lensFlare.Position, renderView.Camera.WorldPosition) < BLOCK(32))
+			float distance = Vector3::Distance(lensFlare.Position, renderView.Camera.WorldPosition);
+
+			if (lensFlare.RoomNumber == Camera.pos.RoomNumber && distance < BLOCK(20))
 			{
 				Vector3 lensFlareToCamera = lensFlare.Position - renderView.Camera.WorldPosition;
 				Vector3 cameraDirection = renderView.Camera.WorldDirection;
@@ -118,10 +122,22 @@ namespace TEN::Renderer
 				{
 					RendererLensFlare lensFlareToDraw;
 					lensFlareToDraw.Position = lensFlare.Position;
-					renderView.LensFlaresToDraw.push_back(lensFlareToDraw);
+					lensFlareToDraw.Distance = distance;
+					tempLensFlares.push_back(lensFlareToDraw);
 				}
 			}
 		}
+
+		std::sort(
+			tempLensFlares.begin(),
+			tempLensFlares.end(),
+			[](const RendererLensFlare& lensFlare0, const RendererLensFlare& lensFlare1)
+			{
+				return lensFlare0.Distance < lensFlare1.Distance;
+			});
+
+		for (int i = 0; i < std::min(MAX_LENS_FLARES_DRAW, (int)tempLensFlares.size()); i++)
+			renderView.LensFlaresToDraw.push_back(tempLensFlares[i]);
 	}
 
 	bool Renderer::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)

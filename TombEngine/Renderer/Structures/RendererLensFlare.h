@@ -9,6 +9,6 @@ namespace TEN::Renderer::Structures
 	struct RendererLensFlare
 	{
 		Vector3 Position;
-		float Padding;
+		float Distance;
 	};
 }

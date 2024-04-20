@@ -50,7 +50,7 @@ namespace TEN::Renderer
 		{
 			_context->ClearRenderTargetView(_postProcessRenderTarget[destinationRenderTarget].RenderTargetView.Get(), clearColor);
 			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destinationRenderTarget].RenderTargetView.GetAddressOf(), nullptr);
-			
+
 			switch (_postProcessMode)
 			{
 			case PostProcessMode::Monochrome:
@@ -64,19 +64,20 @@ namespace TEN::Renderer
 			case PostProcessMode::Exclusion:
 				_context->PSSetShader(_psPostProcessExclusion.Get(), nullptr, 0);
 				break;
-				 
+
 			default:
 				return;
 			}
 
 			BindRenderTargetAsTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
-			DrawTriangles(3, 0); 
+			DrawTriangles(3, 0);
 
 			destinationRenderTarget = destinationRenderTarget == 1 ? 0 : 1;
 			currentRenderTarget = currentRenderTarget == 1 ? 0 : 1;
-		}  
-		 
-		// Lens flare
+		}
+
+		// Lens flares
+		if (view.LensFlaresToDraw.size() > 0)
 		{
 			_context->ClearRenderTargetView(_postProcessRenderTarget[destinationRenderTarget].RenderTargetView.Get(), clearColor);
 			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destinationRenderTarget].RenderTargetView.GetAddressOf(), nullptr);

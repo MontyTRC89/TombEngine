@@ -1,4 +1,5 @@
 #include <SimpleMath.h>
+#include "Renderer/RendererEnums.h"
 
 namespace TEN::Renderer::ConstantBuffers
 {
@@ -22,7 +23,7 @@ namespace TEN::Renderer::ConstantBuffers
 		//--
 		Vector4 SSAOKernel[64];
 		//--
-		ShaderLensFlare LensFlares[4];
+		ShaderLensFlare LensFlares[MAX_LENS_FLARES_DRAW];
 		//--
 		int NumLensFlares;
 	};
