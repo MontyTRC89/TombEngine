@@ -15,6 +15,7 @@ Version 1.4
 * Fixed occasional collision warnings in a log when teeth spikes object was activated.
 * Fixed climbable pushables collision during continuous pulling action.
 * Fixed collision for solid static meshes with zero collision box.
+* Fixed bottom collision for solid static meshes.
 * Fixed T-Rex's head rotation.
 * Auto-switch to a crawl state if player start position is in a crawlspace.
 * Allow directional flame emitter (negative OCBs) to be rotated at any angle.
