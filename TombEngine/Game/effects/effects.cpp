@@ -939,14 +939,17 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 
 		float xAngle = item->Pose.Orientation.x;
 		float yAngle = item->Pose.Orientation.y;
+		
+		Vector3 dir;
+		dir.x = phd_cos(xAngle) * phd_sin(yAngle);
+		dir.y = phd_sin(xAngle);
+		dir.z = phd_cos(xAngle) * phd_cos(yAngle);
 
-		float xDir = phd_cos(yAngle) * phd_cos(xAngle);
-		float zDir = phd_sin(yAngle) * phd_cos(xAngle);
-		float yDir = phd_sin(xAngle);
+		dir.Normalize();
 
-		sptr->xVel += xDir * (size - (size >> 2));
-		sptr->yVel += yDir * (size - (size >> 2));
-		sptr->zVel += zDir * (size - (size >> 2));
+		sptr->xVel += dir.x * (size - (size >> 2));
+		sptr->yVel -= dir.y * (size - (size >> 2));
+		sptr->zVel += dir.z * (size - (size >> 2));
 	}
 }
 
