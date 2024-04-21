@@ -632,6 +632,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR5\Emitter\tr5_rats_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_smoke_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_spider_emitter.h" />
+    <ClInclude Include="Objects\TR5\Emitter\Waterfall.h" />
     <ClInclude Include="Objects\TR5\Entity\AutoGun.h" />
     <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_brownbeast.h" />
@@ -1129,6 +1130,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR5\Emitter\tr5_rats_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_smoke_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_spider_emitter.cpp" />
+    <ClCompile Include="Objects\TR5\Emitter\Waterfall.cpp" />
     <ClCompile Include="Objects\TR5\Entity\AutoGun.cpp" />
     <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_brownbeast.cpp" />

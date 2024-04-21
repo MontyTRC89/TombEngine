@@ -1137,12 +1137,6 @@ void ControlWaterfallMist(short itemNumber)
 	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose);
 }
 
-static int CalculateParticleLife(int relFloorHeight, int yVel, int gravity)
-{
-	// Adjust the calculation as needed based on how you want particle life to scale with height, speed, and gravity
-	return (relFloorHeight * BLOCK(1.0f)) - (yVel / gravity);
-}
-
 void TriggerWaterfallMist(const ItemInfo& item)
 {
 	static const int scale = 3;
@@ -1191,11 +1185,19 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			auto* spark = GetFreeParticle();
 			spark->on = true;
 
+			spark->xVel = (BLOCK(0.6f) * cos);
+			spark->yVel = 16 - (GetRandomControl() & 0xF);// Random::GenerateInt(-44, 44);
+			spark->zVel = (BLOCK(0.6f) * sin);
+
+			spark->x = offset * sign * sin + Random::GenerateInt(-8, 8) + item.Pose.Position.x;
+			spark->y = Random::GenerateInt(0, 16) + item.Pose.Position.y - 8;
+			spark->z = offset * sign * cos + Random::GenerateInt(-8, 8) + item.Pose.Position.z;
+
 			auto orient = EulerAngles(item.Pose.Orientation.x - ANGLE(90.0f), item.Pose.Orientation.y, item.Pose.Orientation.z );
 			auto dir = orient.ToDirection();
 			auto rotMatrix = orient.ToRotationMatrix();
 
-			auto origin = GameVector(item.Pose.Position, item.RoomNumber);
+			auto origin = GameVector(Vector3(spark->x, spark->y, spark->z - BLOCK(0.2)), item.RoomNumber);
 
 			//auto pointColl = GetCollision(item, dir, 0, BLOCK(8), 0);
 
@@ -1218,19 +1220,15 @@ void TriggerWaterfallMist(const ItemInfo& item)
 
 
 
-			spark->xVel = (800 * cos);
-			spark->yVel = -16 - (GetRandomControl() & 0xF);// Random::GenerateInt(-44, 44);
-			spark->zVel = (800 * sin);
-			spark->gravity = 104;
+
+			spark->gravity = (relFloorHeight *2) /FPS;
 
 			// Adjust particle life based on relative floor height, speed, and gravity
-			spark->life = spark->sLife = CalculateParticleLife(relFloorHeight, spark->yVel, spark->gravity);
+			spark->life = spark->sLife =  172;
 
 			spark->fadeToBlack = 0;
 
-			spark->x = offset * sign * sin + Random::GenerateInt(-8, 8) + item.Pose.Position.x;
-			spark->y = Random::GenerateInt(0, 16) + item.Pose.Position.y - 8;
-			spark->z = offset * sign * cos + Random::GenerateInt(-8, 8) + item.Pose.Position.z;
+
 
 
 			spark->friction = -2;
@@ -1239,11 +1237,11 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			spark->maxYvel = 0;
 			spark->rotAdd = Random::GenerateInt(-16, 16);
 
-			spark->sSize = spark->size = Random::GenerateInt(0, 5) * scale + size;
+			spark->sSize = spark->size = Random::GenerateInt(0, 5) * scale + size *2;
 			spark->dSize = 3 * spark->size;
 
 			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 70 ? 34 : 0);
-			spark->flags = 538;
+			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE;
 
 			if (sign == 1)
 			{

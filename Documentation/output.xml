@@ -1931,9 +1931,9 @@ e.g. `myItem.action = ItemAction.EXAMINE`</description>
 <function>
 	<module>Objects.Moveable</module>
 	<name>Moveable</name>
-	<summary>For more information on each parameter, see the
-associated getters and setters.</summary>
-	<description>If you do not know what to set for these,
+	<summary>Used to generate a new moveable dynamically at runtime.</summary>
+	<description>For more information on each parameter, see the
+associated getters and setters. If you do not know what to set for these,
 most can just be ignored (see usage).</description>
 	<parameters>
 		<parameter>
@@ -1954,7 +1954,7 @@ most can just be ignored (see usage).</description>
 		<parameter>
 			<name>rotation</name>
 			<type>Rotation</type>
-			<description>rotation about x, y, and z axes (default Rotation(0, 0, 0))</description>
+			<description>rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))</description>
 		</parameter>
 		<parameter>
 			<name>roomID</name>
@@ -1964,7 +1964,7 @@ most can just be ignored (see usage).</description>
 		<parameter>
 			<name>animNumber</name>
 			<type>int</type>
-			<description>anim number</description>
+			<description>animation number</description>
 		</parameter>
 		<parameter>
 			<name>frameNumber</name>
@@ -2092,66 +2092,6 @@ most can just be ignored (see usage).</description>
 			<name>status</name>
 			<type>Objects.MoveableStatus</type>
 			<description>The new status of the moveable.</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
-	<name>SetOnHit</name>
-	<summary>Set the name of the function to be called when the moveable is shot by Lara.</summary>
-	<description>Note that this will be triggered twice when shot with both pistols at once.</description>
-	<parameters>
-		<parameter>
-			<name>callback</name>
-			<type>function</type>
-			<description>function in LevelFuncs hierarchy to call when moveable is shot</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
-	<name>SetOnCollidedWithObject</name>
-	<summary>Set the function to be called when this moveable collides with another moveable</summary>
-	<parameters>
-		<parameter>
-			<name>func</name>
-			<type>function</type>
-			<description>callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
-	<name>SetOnCollidedWithRoom</name>
-	<summary>Set the function called when this moveable collides with room geometry (e.g.</summary>
-	<description>a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.</description>
-	<parameters>
-		<parameter>
-			<name>func</name>
-			<type>function</type>
-			<description>callback function to be called (must be in LevelFuncs hierarchy)</description>
-		</parameter>
-	</parameters>
-</function>
-
-<function>
-	<module>Objects.Moveable</module>
-	<caller>Moveable</caller>
-	<name>SetOnKilled</name>
-	<summary>Set the name of the function to be called when the moveable is destroyed/killed
- Note that enemy death often occurs at the end of an animation, and not at the exact moment
- the enemy's HP becomes zero.</summary>
-	<parameters>
-		<parameter>
-			<name>callback</name>
-			<type>function</type>
-			<description>function in LevelFuncs hierarchy to call when enemy is killed</description>
 		</parameter>
 	</parameters>
 </function>
@@ -2620,6 +2560,66 @@ most can just be ignored (see usage).</description>
 			<name>stateID</name>
 			<type>int</type>
 			<description>state from object</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetOnHit</name>
+	<summary>Set the name of the function to be called when the moveable is shot by Lara.</summary>
+	<description>Note that this will be triggered twice when shot with both pistols at once.</description>
+	<parameters>
+		<parameter>
+			<name>callback</name>
+			<type>function</type>
+			<description>function in LevelFuncs hierarchy to call when moveable is shot</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetOnCollidedWithObject</name>
+	<summary>Set the function to be called when this moveable collides with another moveable</summary>
+	<parameters>
+		<parameter>
+			<name>func</name>
+			<type>function</type>
+			<description>callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetOnCollidedWithRoom</name>
+	<summary>Set the function called when this moveable collides with room geometry (e.g.</summary>
+	<description>a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.</description>
+	<parameters>
+		<parameter>
+			<name>func</name>
+			<type>function</type>
+			<description>callback function to be called (must be in LevelFuncs hierarchy)</description>
+		</parameter>
+	</parameters>
+</function>
+
+<function>
+	<module>Objects.Moveable</module>
+	<caller>Moveable</caller>
+	<name>SetOnKilled</name>
+	<summary>Set the name of the function to be called when the moveable is destroyed/killed
+ Note that enemy death often occurs at the end of an animation, and not at the exact moment
+ the enemy's HP becomes zero.</summary>
+	<parameters>
+		<parameter>
+			<name>callback</name>
+			<type>function</type>
+			<description>function in LevelFuncs hierarchy to call when enemy is killed</description>
 		</parameter>
 	</parameters>
 </function>
