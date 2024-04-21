@@ -347,14 +347,6 @@ static std::vector<TriangleMesh> GenerateTiltBridgeTriangleMeshes(const Bounding
 
 static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs)
 {
-	static const auto TILT_BRIDGE_MOV_ASSET_IDS = std::vector
-	{
-		ID_BRIDGE_TILT1,
-		ID_BRIDGE_TILT2,
-		ID_BRIDGE_TILT3,
-		ID_BRIDGE_TILT4
-	};
-
 	auto dir = target.ToVector3() - origin.ToVector3();
 	dir.Normalize();
 	auto ray = Ray(origin.ToVector3(), dir);
@@ -373,57 +365,45 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 			if (bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
 				continue;
 
-			auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
-			if (!Contains(TILT_BRIDGE_MOV_ASSET_IDS, bridgeMov.ObjectNumber))
+			// Determine relative tilt offset.
+			auto offset = Vector3::Zero;
+			switch (bridgeMov.ObjectNumber)
 			{
-				// Collide bridge box.
+			default:
+				break;
+
+			case ID_BRIDGE_TILT1:
+				offset = Vector3(0.0f, CLICK(1), 0.0f);
+				break;
+
+			case ID_BRIDGE_TILT2:
+				offset = Vector3(0.0f, CLICK(2), 0.0f);
+				break;
+
+			case ID_BRIDGE_TILT3:
+				offset = Vector3(0.0f, CLICK(3), 0.0f);
+				break;
+
+			case ID_BRIDGE_TILT4:
+				offset = Vector3(0.0f, CLICK(4), 0.0f);
+				break;
+			}
+
+			// Calculate absolute offset.
+			auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
+			offset = Vector3::Transform(offset, rotMatrix);
+
+			// Collide bridge mesh.
+			auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
+			auto tris = GenerateTiltBridgeTriangleMeshes(box, offset);
+			for (const auto& tri : tris)
+			{
 				float dist = 0.0f;
-				if (box.Intersects(ray.position, ray.direction, dist) && dist < closestDist)
+				if (tri.Intersects(ray, dist) && dist < closestDist)
 				{
 					isClipped = true;
 					closestDist = dist;
 					target = GameVector(Geometry::TranslatePoint(ray.position, ray.direction, dist), sectorPtr->RoomNumber);
-				}
-			}
-			else
-			{
-				// Determine relative tilt offset.
-				auto offset = Vector3::Zero;
-				switch (bridgeMov.ObjectNumber)
-				{
-				default:
-				case ID_BRIDGE_TILT1:
-					offset = Vector3(0.0f, CLICK(1), 0.0f);
-					break;
-
-				case ID_BRIDGE_TILT2:
-					offset = Vector3(0.0f, CLICK(2), 0.0f);
-					break;
-
-				case ID_BRIDGE_TILT3:
-					offset = Vector3(0.0f, CLICK(3), 0.0f);
-					break;
-
-				case ID_BRIDGE_TILT4:
-					offset = Vector3(0.0f, CLICK(4), 0.0f);
-					break;
-				}
-
-				// Calculate absolute offset.
-				auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
-				offset = Vector3::Transform(offset, rotMatrix);
-
-				// Collide bridge mesh.
-				auto meshes = GenerateTiltBridgeTriangleMeshes(box, offset);
-				for (const auto& mesh : meshes)
-				{
-					float dist = 0.0f;
-					if (mesh.Intersects(ray, dist) && dist < closestDist)
-					{
-						isClipped = true;
-						closestDist = dist;
-						target = GameVector(Geometry::TranslatePoint(ray.position, ray.direction, dist), sectorPtr->RoomNumber);
-					}
 				}
 			}
 		}
