@@ -370,9 +370,8 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 		{
 			const auto& bridgeMov = g_Level.Items[itemNumber];
 
-			// TODO: Not the right check.
-			//if (bridgeItem.Status == ItemStatus::ITEM_NOT_ACTIVE)
-			//	continue;
+			if (bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
+				continue;
 
 			auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
 			if (!Contains(TILT_BRIDGE_MOV_ASSET_IDS, bridgeMov.ObjectNumber))
