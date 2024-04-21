@@ -68,7 +68,7 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		auto& creature = *GetCreatureInfo(&item);
 
-		return (creature.Enemy && creature.Enemy->BoxNumber != NO_BOX &&
+		return (creature.Enemy && creature.Enemy->BoxNumber != NO_VALUE &&
 			(g_Level.Boxes[creature.Enemy->BoxNumber].flags & BLOCKABLE));
 	}
 
@@ -92,7 +92,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto headOrient = EulerAngles::Zero;
+		auto headOrient = EulerAngles::Identity;
 
 		if (item.HitPoints <= 0)
 		{
@@ -140,7 +140,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (creature.Mood == MoodType::Bored)
 				{
-					if (item.Animation.RequiredState != NO_STATE)
+					if (item.Animation.RequiredState != NO_VALUE)
 					{
 						item.Animation.TargetState = item.Animation.RequiredState;
 					}

@@ -25,6 +25,8 @@ private:
 
 	LuaHandler m_handler;
 
+	void PrepareInventoryObjects();
+
 public:
 	int FogInDistance  = 0;
 	int FogOutDistance = 0;
@@ -61,7 +63,8 @@ public:
 	int			GetNumLevels() const;
 	void		EndLevel(std::optional<int> nextLevel, std::optional<int> startPosIndex);
 	GameStatus	GetGameStatus();
-	void		FlipMap(int flipmap);
+	void		FlipMap(int group);
+	bool		GetFlipMapStatus(std::optional<int> group);
 	void		SaveGame(int slot);
 	void		LoadGame(int slot);
 	void		DeleteSaveGame(int slot);

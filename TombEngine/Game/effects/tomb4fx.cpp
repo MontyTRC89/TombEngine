@@ -1214,7 +1214,7 @@ void ExplodingDeath(short itemNumber, short flags)
 		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_DO_EXPLOSION)))
 		{
 			short fxNumber = CreateNewEffect(item->RoomNumber);
-			if (fxNumber != NO_ITEM)
+			if (fxNumber != NO_VALUE)
 			{
 				FX_INFO* fx = &EffectList[fxNumber];
 

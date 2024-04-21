@@ -78,8 +78,8 @@ namespace TEN::Entities::Doors
 		auto* r = &g_Level.Rooms[doorItem->RoomNumber];
 		doorData->d1.floor = GetSector(r, doorItem->Pose.Position.x - r->x + xOffset, doorItem->Pose.Position.z - r->z + zOffset);
 
-		auto roomNumber = doorData->d1.floor->WallPortalRoomNumber;
-		if (roomNumber == NO_ROOM)
+		auto roomNumber = doorData->d1.floor->SidePortalRoomNumber;
+		if (roomNumber == NO_VALUE)
 			boxNumber = doorData->d1.floor->Box;
 		else
 		{
@@ -87,7 +87,7 @@ namespace TEN::Entities::Doors
 			boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x + xOffset, doorItem->Pose.Position.z - b->z + zOffset)->Box;
 		}
 
-		doorData->d1.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX; 
+		doorData->d1.block = (boxNumber != NO_VALUE && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
 		doorData->d1.data = *doorData->d1.floor;
 
 		if (r->flippedRoom != -1)
@@ -95,8 +95,8 @@ namespace TEN::Entities::Doors
 			r = &g_Level.Rooms[r->flippedRoom];
 			doorData->d1flip.floor = GetSector(r, doorItem->Pose.Position.x - r->x + xOffset, doorItem->Pose.Position.z - r->z + zOffset);
 				
-			roomNumber = doorData->d1flip.floor->WallPortalRoomNumber;
-			if (roomNumber == NO_ROOM)
+			roomNumber = doorData->d1flip.floor->SidePortalRoomNumber;
+			if (roomNumber == NO_VALUE)
 				boxNumber = doorData->d1flip.floor->Box;
 			else
 			{
@@ -104,18 +104,18 @@ namespace TEN::Entities::Doors
 				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x + xOffset, doorItem->Pose.Position.z - b->z + zOffset)->Box;
 			}
 
-			doorData->d1flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
+			doorData->d1flip.block = (boxNumber != NO_VALUE && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
 			doorData->d1flip.data = *doorData->d1flip.floor;
 		}
 		else
 			doorData->d1flip.floor = NULL;
 
-		twoRoom = doorData->d1.floor->WallPortalRoomNumber;
+		twoRoom = doorData->d1.floor->SidePortalRoomNumber;
 
 		ShutThatDoor(&doorData->d1, doorData);
 		ShutThatDoor(&doorData->d1flip, doorData);
 
-		if (twoRoom == NO_ROOM)
+		if (twoRoom == NO_VALUE)
 		{
 			doorData->d2.floor = NULL;
 			doorData->d2flip.floor = NULL;
@@ -125,8 +125,8 @@ namespace TEN::Entities::Doors
 			r = &g_Level.Rooms[twoRoom];
 			doorData->d2.floor = GetSector(r, doorItem->Pose.Position.x - r->x, doorItem->Pose.Position.z - r->z);
 
-			roomNumber = doorData->d2.floor->WallPortalRoomNumber;
-			if (roomNumber == NO_ROOM)
+			roomNumber = doorData->d2.floor->SidePortalRoomNumber;
+			if (roomNumber == NO_VALUE)
 				boxNumber = doorData->d2.floor->Box;
 			else
 			{
@@ -134,7 +134,7 @@ namespace TEN::Entities::Doors
 				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x, doorItem->Pose.Position.z - b->z)->Box;
 			}
 
-			doorData->d2.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
+			doorData->d2.block = (boxNumber != NO_VALUE && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
 			doorData->d2.data = *doorData->d2.floor;
 
 			if (r->flippedRoom != -1)
@@ -142,8 +142,8 @@ namespace TEN::Entities::Doors
 				r = &g_Level.Rooms[r->flippedRoom];
 				doorData->d2flip.floor = GetSector(r, doorItem->Pose.Position.x - r->x, doorItem->Pose.Position.z - r->z);
 
-				roomNumber = doorData->d2flip.floor->WallPortalRoomNumber;
-				if (roomNumber == NO_ROOM)
+				roomNumber = doorData->d2flip.floor->SidePortalRoomNumber;
+				if (roomNumber == NO_VALUE)
 					boxNumber = doorData->d2flip.floor->Box;
 				else
 				{
@@ -151,7 +151,7 @@ namespace TEN::Entities::Doors
 					boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x, doorItem->Pose.Position.z - b->z)->Box;
 				}
 
-				doorData->d2flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX; 
+				doorData->d2flip.block = (boxNumber != NO_VALUE && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
 				doorData->d2flip.data = *doorData->d2flip.floor;
 			}
 			else
@@ -186,7 +186,7 @@ namespace TEN::Entities::Doors
 			{
 				if (!laraInfo->Control.IsMoving)
 				{
-					if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
+					if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
 					{
 						if (g_Gui.IsObjectInInventory(ID_CROWBAR_ITEM))
 						{
@@ -216,7 +216,7 @@ namespace TEN::Entities::Doors
 					}
 				}
 
-				g_Gui.SetInventoryItemChosen(NO_ITEM);
+				g_Gui.SetInventoryItemChosen(NO_VALUE);
 
 				if (MoveLaraPosition(CrowbarDoorPos, doorItem, laraItem))
 				{
@@ -398,44 +398,46 @@ namespace TEN::Entities::Doors
 			*doorPos->floor = doorPos->data;
 
 			short boxIndex = doorPos->block;
-			if (boxIndex != NO_BOX)
+			if (boxIndex != NO_VALUE)
 			{
 				g_Level.Boxes[boxIndex].flags &= ~BLOCKED;
 				for (auto& currentCreature : ActiveCreatures)
-					currentCreature->LOT.TargetBox = NO_BOX;
+					currentCreature->LOT.TargetBox = NO_VALUE;
 			}
 		}
 	}
 
 	void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	{
+		static const auto WALL_PLANE = Plane(-Vector3::UnitY, -CLICK(127));
+
 		FloorInfo* floor = doorPos->floor;
 
 		if (floor)
 		{
-			floor->Box = NO_BOX;
+			floor->Box = NO_VALUE;
 			floor->TriggerIndex = 0;
 
 			// FIXME: HACK!!!!!!!
 			// We should find a better way of dealing with doors using new floordata.
 
-			floor->WallPortalRoomNumber = -1;
+			floor->SidePortalRoomNumber = -1;
 			floor->FloorSurface.Triangles[0].PortalRoomNumber =
 			floor->FloorSurface.Triangles[1].PortalRoomNumber =
 			floor->CeilingSurface.Triangles[0].PortalRoomNumber =
-			floor->CeilingSurface.Triangles[1].PortalRoomNumber = NO_ROOM;
+			floor->CeilingSurface.Triangles[1].PortalRoomNumber = NO_VALUE;
 			floor->FloorSurface.Triangles[0].Plane =
 			floor->FloorSurface.Triangles[1].Plane =
 			floor->CeilingSurface.Triangles[0].Plane =
 			floor->CeilingSurface.Triangles[1].Plane = WALL_PLANE;
 
 			short boxIndex = doorPos->block;
-			if (boxIndex != NO_BOX)
+			if (boxIndex != NO_VALUE)
 			{
 				g_Level.Boxes[boxIndex].flags |= BLOCKED;
 
 				for (auto& currentCreature : ActiveCreatures)
-					currentCreature->LOT.TargetBox = NO_BOX;
+					currentCreature->LOT.TargetBox = NO_VALUE;
 			}
 		}
 	}

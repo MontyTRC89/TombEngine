@@ -361,7 +361,7 @@ std::unique_ptr<Moveable> LaraObject::GetVehicle() const
 {
 	auto* lara = GetLaraInfo(m_item);
 
-	if (lara->Context.Vehicle == NO_ITEM)
+	if (lara->Context.Vehicle == NO_VALUE)
 		return nullptr;
 
 	return std::make_unique<Moveable>(lara->Context.Vehicle);
@@ -391,7 +391,7 @@ std::unique_ptr<Moveable> LaraObject::GetPlayerInteractedMoveable() const
 {
 	const auto& player = GetLaraInfo(*m_item);
 
-	if (player.Context.InteractedItem == NO_ITEM)
+	if (player.Context.InteractedItem == NO_VALUE)
 		return nullptr;
 
 	return std::make_unique<Moveable>(player.Context.InteractedItem);

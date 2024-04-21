@@ -62,24 +62,19 @@ namespace TEN::Entities::Effects
 
 	void BurnNearbyItems(ItemInfo* item, int radius)
 	{
-		GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
-
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		auto collObjects = GetCollidedObjects(*item, true, false, radius, ObjectCollectionMode::Items);
+		for (auto* itemPtr : collObjects.ItemPtrs)
 		{
-			auto* currentItem = CollidedItems[i];
-			if (!currentItem)
-				break;
-
-			if (TestEnvironment(ENV_FLAG_WATER, currentItem->RoomNumber))
+			if (TestEnvironment(ENV_FLAG_WATER, itemPtr->RoomNumber))
 				continue;
 
-			if ((!currentItem->IsCreature() && !currentItem->IsLara()) || currentItem->HitPoints <= 0)
+			if ((!itemPtr->IsCreature() && !itemPtr->IsLara()) || itemPtr->HitPoints <= 0)
 				continue;
 
-			if (currentItem->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
+			if (itemPtr->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
 				continue;
 
-			ItemBurn(currentItem, currentItem->IsLara() ? -1 : FLAME_ITEM_BURN_TIMEOUT);
+			ItemBurn(itemPtr, itemPtr->IsLara() ? -1 : FLAME_ITEM_BURN_TIMEOUT);
 		}
 	}
 

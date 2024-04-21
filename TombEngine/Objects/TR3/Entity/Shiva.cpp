@@ -277,8 +277,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (item->HitPoints <= 0)
 		{
@@ -341,7 +341,7 @@ namespace TEN::Entities::Creatures::TR3
 					int z = item->Pose.Position.z + BLOCK(1) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
 					auto box = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock->Box;
 
-					if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !creature.Flags)
+					if (box != NO_VALUE && !(g_Level.Boxes[box].flags & BLOCKABLE) && !creature.Flags)
 						item->Animation.TargetState = SHIVA_STATE_WALK_BACK;
 					else
 						item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
@@ -495,8 +495,8 @@ namespace TEN::Entities::Creatures::TR3
 
 			case SHIVA_STATE_KILL:
 				creature.MaxTurn = 0;
-				extraHeadRot = EulerAngles::Zero;
-				extraTorsoRot = EulerAngles::Zero;
+				extraHeadRot = EulerAngles::Identity;
+				extraTorsoRot = EulerAngles::Identity;
 
 				if (item->Animation.FrameNumber == GetFrameIndex(item, 10) ||
 					item->Animation.FrameNumber == GetFrameIndex(item, 21) ||

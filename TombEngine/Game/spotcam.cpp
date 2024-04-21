@@ -484,7 +484,7 @@ void CalculateSpotCameras()
 		}
 
 		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
-		if (outsideRoom == NO_ROOM)
+		if (outsideRoom == NO_VALUE)
 		{
 			Camera.pos.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
 			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
@@ -640,7 +640,7 @@ void CalculateSpotCameras()
 					CurrentSplineCamera = FirstCamera;
 					SpotcamLoopCnt++;
 				}
-				else if (s->flags & SCF_PAN_TO_LARA_CAM || SplineToCamera)
+				else if (s->flags & SCF_CUT_TO_LARA_CAM || SplineToCamera)
 				{
 					if (CheckTrigger)
 					{
@@ -671,7 +671,7 @@ void CalculateSpotCameras()
 					Camera.type = CameraType::Chase;
 					Camera.speed = 1;
 
-					if (s->flags & SCF_PAN_TO_LARA_CAM)
+					if (s->flags & SCF_CUT_TO_LARA_CAM)
 					{
 						Camera.pos.x = InitialCameraPosition.x;
 						Camera.pos.y = InitialCameraPosition.y;
@@ -735,7 +735,7 @@ void CalculateSpotCameras()
 					CameraXtarget[3] = Camera.target.x;
 					CameraYtarget[3] = Camera.target.y;
 					CameraZtarget[3] = Camera.target.z;
-					CameraFOV[3] = CurrentFOV;
+					CameraFOV[3] = LastFOV;
 					CameraSpeed[3] = CameraSpeed[2];
 					CameraRoll[3] = 0;
 
@@ -745,7 +745,7 @@ void CalculateSpotCameras()
 					CameraXtarget[4] = Camera.target.x;
 					CameraYtarget[4] = Camera.target.y;
 					CameraZtarget[4] = Camera.target.z;
-					CameraFOV[4] = CurrentFOV;
+					CameraFOV[4] = LastFOV;
 					CameraSpeed[4] = CameraSpeed[2] >> 1;
 					CameraRoll[4] = 0;
 

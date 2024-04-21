@@ -4,9 +4,9 @@ namespace TEN::Entities::Vehicles
 {
 	struct BigGunInfo
 	{
-		EulerAngles BaseOrientation = EulerAngles::Zero;
-		EulerAngles TurnRate = EulerAngles::Zero;
-		EulerAngles Rotation = EulerAngles::Zero;
+		EulerAngles BaseOrientation = EulerAngles::Identity;
+		EulerAngles TurnRate = EulerAngles::Identity;
+		EulerAngles Rotation = EulerAngles::Identity;
 		short BarrelRotation = 0;
 		int XOrientFrame = 0;
 

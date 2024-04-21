@@ -10,9 +10,10 @@
 #include "Specific/level.h"
 
 // Creatures
+#include "Objects/TR2/Entity/Bartoli.h" // OK
+#include "Objects/TR2/Entity/Dragon.h" // OK
 #include "Objects/TR2/Entity/tr2_barracuda.h" // OK
 #include "Objects/TR2/Entity/tr2_bird_monster.h" // OK
-#include "Objects/TR2/Entity/tr2_dragon.h" // OK
 #include "Objects/TR2/Entity/tr2_eagle_or_crow.h" // OK
 #include "Objects/TR2/Entity/tr2_knife_thrower.h" // OK
 #include "Objects/TR2/Entity/tr2_mercenary.h" // OK
@@ -430,35 +431,51 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_FRONT];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_DRAGON_BACK, GetObjectName(ID_DRAGON_FRONT));
-		obj->Initialize = InitializeCreature;
-		obj->collision = DragonCollision;
-		obj->control = DragonControl;
+		CheckIfSlotExists(ID_DRAGON_BACK, "ID_DRAGON_BACK");
+		obj->Initialize = InitializeDragon;
+		obj->collision = CollideDragonFront;
+		obj->control = ControlDragon;
 		obj->HitPoints = 300;
 		obj->pivotLength = 300;
 		obj->radius = 256;
+		obj->shadowType = ShadowMode::All;
 		obj->intelligent = true;
+		obj->LotType = LotType::Blockable;
 		obj->SetBoneRotationFlags(10, ROT_Z);
-		obj->SetHitEffect();
+		obj->SetHitEffect(HitEffect::NonExplosive);
 	}
 
 	obj = &Objects[ID_DRAGON_BACK];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_MARCO_BARTOLI, GetObjectName(ID_DRAGON_BACK));
-		obj->Initialize = InitializeCreature;
-		obj->collision = DragonCollision;
-		obj->control = DragonControl;
-		obj->radius = 256;
-		obj->SetHitEffect();
+		CheckIfSlotExists(ID_DRAGON_FRONT, "ID_DRAGON_FRONT");
+		CheckIfSlotExists(ID_DRAGON_BONE_FRONT, "ID_DRAGON_BONE_FRONT");
+		CheckIfSlotExists(ID_DRAGON_BONE_BACK, "ID_DRAGON_BONE_BACK");
+		obj->collision = CollideDragonBack;
+		obj->SetHitEffect(false, true);
+		obj->shadowType = ShadowMode::All;
+	}
+
+	obj = &Objects[ID_DRAGON_BONE_FRONT];
+	if (obj->loaded)
+	{
+		obj->shadowType = ShadowMode::All;
+	}
+
+	obj = &Objects[ID_DRAGON_BONE_BACK];
+	if (obj->loaded)
+	{
+		obj->shadowType = ShadowMode::All;
 	}
 
 	obj = &Objects[ID_MARCO_BARTOLI];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_DRAGON_BACK, GetObjectName(ID_MARCO_BARTOLI));
+		CheckIfSlotExists(ID_SPHERE_OF_DOOM, "ID_SPHERE_OF_DOOM");
+		CheckIfSlotExists(ID_SPHERE_OF_DOOM2, "ID_SPHERE_OF_DOOM2");
+		CheckIfSlotExists(ID_SPHERE_OF_DOOM3, "ID_SPHERE_OF_DOOM3");
 		obj->Initialize = InitializeBartoli;
-		obj->control = BartoliControl;
+		obj->control = ControlBartoli;
 	}
 
 	// TODO: Recreate renderer for skidoo.
@@ -488,6 +505,27 @@ static void StartEntity(ObjectInfo* obj)
 static void StartObject(ObjectInfo* obj)
 {
 	InitProjectile(obj, ControlMissile, ID_KNIFETHROWER_KNIFE);
+
+	obj = &Objects[ID_SPHERE_OF_DOOM];
+	if (obj->loaded)
+	{
+		obj->control = ControlBartoliTransformEffect;
+		obj->shadowType = ShadowMode::None;
+	}
+
+	obj = &Objects[ID_SPHERE_OF_DOOM2];
+	if (obj->loaded)
+	{
+		obj->control = ControlBartoliTransformEffect;
+		obj->shadowType = ShadowMode::None;
+	}
+
+	obj = &Objects[ID_SPHERE_OF_DOOM3];
+	if (obj->loaded)
+	{
+		obj->control = ControlBartoliTransformEffect;
+		obj->shadowType = ShadowMode::None;
+	}
 }
 
 static void StartTrap(ObjectInfo* obj)

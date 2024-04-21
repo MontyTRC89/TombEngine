@@ -74,7 +74,7 @@ namespace TEN::Entities::Traps
 		}
 
 		int dartItemNumber = CreateItem();
-		if (dartItemNumber == NO_ITEM)
+		if (dartItemNumber == NO_VALUE)
 			return;
 
 		ItemInfo* dartItem = &g_Level.Items[dartItemNumber];
