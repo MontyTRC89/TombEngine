@@ -209,18 +209,17 @@ static int zRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 
 static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos, const FloorInfo& sector, bool isFloor)
 {
-	auto meshes = std::vector<TriangleMesh>{};
-
-	const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
-
 	auto base = Vector3(FloorToStep(pos.x, BLOCK(1)), 0.0f, FloorToStep(pos.z, BLOCK(1)));
 	auto corner0 = base;
 	auto corner1 = base + Vector3(0.0f, 0.0f, BLOCK(1));
 	auto corner2 = base + Vector3(BLOCK(1), 0.0f, BLOCK(1));
 	auto corner3 = base + Vector3(BLOCK(1), 0.0f, 0.0f);
 
+	auto meshes = std::vector<TriangleMesh>{};
 	if (sector.IsSurfaceSplit(isFloor))
 	{
+		const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
+
 		if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
 		{
 			// Calculate triangle 0.
@@ -368,37 +367,38 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 			}
 			else
 			{
-				auto corners = std::array<Vector3, 8>{};
-				box.GetCorners(corners.data());
-
 				// Determine relative offset.
-				auto offset = Vector3::Zero;
+				auto tiltOffset = Vector3::Zero;
 				switch (bridgeItem.ObjectNumber)
 				{
 				default:
 				case ID_BRIDGE_TILT1:
-					offset = Vector3(0.0f, CLICK(1), 0.0f);
+					tiltOffset = Vector3(0.0f, CLICK(1), 0.0f);
 					break;
 
 				case ID_BRIDGE_TILT2:
-					offset = Vector3(0.0f, CLICK(2), 0.0f);
+					tiltOffset = Vector3(0.0f, CLICK(2), 0.0f);
 					break;
 
 				case ID_BRIDGE_TILT3:
-					offset = Vector3(0.0f, CLICK(3), 0.0f);
+					tiltOffset = Vector3(0.0f, CLICK(3), 0.0f);
 					break;
 
 				case ID_BRIDGE_TILT4:
-					offset = Vector3(0.0f, CLICK(4), 0.0f);
+					tiltOffset = Vector3(0.0f, CLICK(4), 0.0f);
 					break;
 				}
 
 				// Calculate absolute offset.
 				auto rotMatrix = bridgeItem.Pose.Orientation.ToRotationMatrix();
-				offset = Vector3::Transform(offset, rotMatrix);
+				tiltOffset = Vector3::Transform(tiltOffset, rotMatrix);
+
+				// Get box corners.
+				auto corners = std::array<Vector3, 8>{};
+				box.GetCorners(corners.data());
 
 				// Collide generated triangle meshes.
-				auto meshes = GenerateTiltBridgeTriangleMeshes(corners, offset);
+				auto meshes = GenerateTiltBridgeTriangleMeshes(corners, tiltOffset);
 				for (const auto& mesh : meshes)
 				{
 					float dist = 0.0f;
@@ -457,7 +457,7 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 	return !isClipped;
 }
 
-// NOTE: Accurate with axis-aligned walls, flat bridges, and floors/ceilings. Ignores diagonal walls, tilted bridges, and objects.
+// NOTE: Accurate walls, floors/ceilings, and flat bridges. Ignores tilted bridges and objects.
 bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<int>*> roomNumbers)
 {
 	int losAxis0 = 0;
@@ -488,76 +488,19 @@ bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<in
 	return false;
 }
 
-// NOTE: Coarsely accurate with walls and floors/ceilings. Ignores bridges and objects.
+// Deprecated. Legacy version was coarse, new version simply wraps more accurate LOS().
 bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 {
-	constexpr auto STEP_COUNT = 8;
+	if (!LOS(origin, target))
+		return true;
 
-	auto pos = origin->ToVector3i();
-	short roomNumber = origin->RoomNumber;
-	short roomNumber2 = roomNumber;
+	auto dir = target->ToVector3() - origin->ToVector3();
+	dir.Normalize();
 
-	auto step = (target->ToVector3i() - origin->ToVector3i()) / STEP_COUNT;
+	*target = GameVector(Geometry::TranslatePoint(target->ToVector3(), -dir, push), target->RoomNumber);
+	GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 
-	bool flag = false;
-	bool result = false;
-
-	int i = 0;
-	for (i = 0; i < STEP_COUNT; ++i)
-	{
-		roomNumber2 = roomNumber;
-		auto* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-
-		if (g_Level.Rooms[roomNumber2].flags & ENV_FLAG_SWAMP)
-		{
-			flag = true;
-			break;
-		}
-
-		int floorHeight = GetFloorHeight(floor, pos.x, pos.y, pos.z);
-		int ceilingHeight = GetCeiling(floor, pos.x, pos.y, pos.z);
-		if (ceilingHeight < floorHeight)
-		{
-			if (pos.y > floorHeight)
-			{
-				if (pos.y - floorHeight >= push)
-				{
-					flag = true;
-					break;
-				}
-
-				pos.y = floorHeight;
-			}
-
-			if (pos.y < ceilingHeight)
-			{
-				if (ceilingHeight - pos.y >= push)
-				{
-					flag = true;
-					break;
-				}
-
-				pos.y = ceilingHeight;
-			}
-
-			result = true;
-		}
-		else if (result)
-		{
-			flag = true;
-			break;
-		}
-
-		pos += step;
-	}
-
-	if (i != 0)
-		pos -= step;
-
-	GetFloor(pos.x, pos.y, pos.z, &roomNumber2);
-	*target = GameVector(pos, roomNumber2);
-
-	return !flag;
+	return false;
 }
 
 bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, bool isFiring)
