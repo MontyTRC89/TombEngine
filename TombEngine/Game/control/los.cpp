@@ -403,14 +403,10 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 				{
 					isClipped = true;
 					closestDist = dist;
-					target = GameVector(Geometry::TranslatePoint(ray.position, ray.direction, dist), sectorPtr->RoomNumber);
+					target.RoomNumber = sectorPtr->RoomNumber;
 				}
 			}
 		}
-
-		// Found bridge; exit loop early.
-		if (closestDist != INFINITY)
-			break;
 	}
 
 	short roomNumber = target.RoomNumber;
@@ -419,8 +415,6 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 	// 2) Clip floor.
 	if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
 	{
-		isClipped = true;
-
 		// Collide floor collision mesh.
 		auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, true);
 		for (const auto& tri : tris)
@@ -428,8 +422,9 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 			float dist = 0.0f;
 			if (tri.Intersects(ray, dist) && dist < closestDist)
 			{
+				isClipped = true;
 				closestDist = dist;
-				target = GameVector(Geometry::TranslatePoint(ray.position, ray.direction, dist), roomNumber);
+				target.RoomNumber = roomNumber;
 			}
 		}
 	}
@@ -437,8 +432,6 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 	// 3) Clip ceiling.
 	if (target.y < GetCeiling(sectorPtr, target.x, target.y, target.z))
 	{
-		isClipped = true;
-
 		// Collide ceiling collision mesh.
 		auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, false);
 		for (const auto& tri : tris)
@@ -446,11 +439,15 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 			float dist = 0.0f;
 			if (tri.Intersects(ray, dist) && dist < closestDist)
 			{
+				isClipped = true;
 				closestDist = dist;
-				target = GameVector(Geometry::TranslatePoint(ray.position, ray.direction, dist), roomNumber);
+				target.RoomNumber = roomNumber;
 			}
 		}
 	}
+
+	if (isClipped)
+		target = GameVector(Geometry::TranslatePoint(ray.position, ray.direction, closestDist), target.RoomNumber);
 
 	return !isClipped;
 }
