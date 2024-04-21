@@ -68,8 +68,6 @@ static int xRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 
 	while (isNegative ? (x > target.x) : (x < target.x))
 	{
-		g_Renderer.AddDebugTarget(Vector3(x, y, z), Quaternion::Identity, 20, Color(1, 0, 0));
-
 		// Collect sector pointer.
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		sectorPtrs.push_back(sectorPtr);
@@ -152,8 +150,6 @@ static int zRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 
 	while (isNegative ? (z > target.z) : (z < target.z))
 	{
-		g_Renderer.AddDebugTarget(Vector3(x, y, z), Quaternion::Identity, 20, Color(0, 1, 0));
-
 		// Collect sector pointer.
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		sectorPtrs.push_back(sectorPtr);
@@ -319,10 +315,34 @@ static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos
 	return meshes;
 }
 
-// TODO
-static std::vector<TriangleMesh> GenerateTiltBridgeTriangleMeshes(const std::array<Vector3, 8> corners, const Vector3& offset)
+static std::vector<TriangleMesh> GenerateTiltBridgeTriangleMeshes(const BoundingOrientedBox& box, const Vector3& offset)
 {
-	return {};
+	// Get box corners.
+	auto corners = std::array<Vector3, 8>{};
+	box.GetCorners(corners.data());
+
+	// Offset key corners.
+	corners[1] += offset;
+	corners[3] -= offset;
+	corners[5] += offset;
+	corners[7] -= offset;
+
+	// Calculate collision mesh.
+	auto meshes = std::vector<TriangleMesh>{};
+	meshes.push_back(TriangleMesh(corners[0], corners[1], corners[4]));
+	meshes.push_back(TriangleMesh(corners[1], corners[4], corners[5]));
+	meshes.push_back(TriangleMesh(corners[2], corners[3], corners[6]));
+	meshes.push_back(TriangleMesh(corners[3], corners[6], corners[7]));
+	meshes.push_back(TriangleMesh(corners[0], corners[1], corners[2]));
+	meshes.push_back(TriangleMesh(corners[0], corners[2], corners[3]));
+	meshes.push_back(TriangleMesh(corners[0], corners[3], corners[4]));
+	meshes.push_back(TriangleMesh(corners[3], corners[4], corners[7]));
+	meshes.push_back(TriangleMesh(corners[1], corners[2], corners[5]));
+	meshes.push_back(TriangleMesh(corners[2], corners[5], corners[6]));
+	meshes.push_back(TriangleMesh(corners[4], corners[5], corners[6]));
+	meshes.push_back(TriangleMesh(corners[4], corners[6], corners[7]));
+
+	return meshes;
 }
 
 static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs)
@@ -348,15 +368,16 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 		// Run through all bridges in sector.
 		for (int itemNumber : sectorPtr->BridgeItemNumbers)
 		{
-			const auto& bridgeItem = g_Level.Items[itemNumber];
+			const auto& bridgeMov = g_Level.Items[itemNumber];
 
 			// TODO: Not the right check.
 			//if (bridgeItem.Status == ItemStatus::ITEM_NOT_ACTIVE)
 			//	continue;
 
-			auto box = GameBoundingBox(&bridgeItem).ToBoundingOrientedBox(bridgeItem.Pose);
-			if (!Contains(TILT_BRIDGE_MOV_ASSET_IDS, bridgeItem.ObjectNumber))
+			auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
+			if (!Contains(TILT_BRIDGE_MOV_ASSET_IDS, bridgeMov.ObjectNumber))
 			{
+				// Collide bridge box.
 				float dist = 0.0f;
 				if (box.Intersects(ray.position, ray.direction, dist) && dist < closestDist)
 				{
@@ -367,38 +388,34 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 			}
 			else
 			{
-				// Determine relative offset.
-				auto tiltOffset = Vector3::Zero;
-				switch (bridgeItem.ObjectNumber)
+				// Determine relative tilt offset.
+				auto offset = Vector3::Zero;
+				switch (bridgeMov.ObjectNumber)
 				{
 				default:
 				case ID_BRIDGE_TILT1:
-					tiltOffset = Vector3(0.0f, CLICK(1), 0.0f);
+					offset = Vector3(0.0f, CLICK(1), 0.0f);
 					break;
 
 				case ID_BRIDGE_TILT2:
-					tiltOffset = Vector3(0.0f, CLICK(2), 0.0f);
+					offset = Vector3(0.0f, CLICK(2), 0.0f);
 					break;
 
 				case ID_BRIDGE_TILT3:
-					tiltOffset = Vector3(0.0f, CLICK(3), 0.0f);
+					offset = Vector3(0.0f, CLICK(3), 0.0f);
 					break;
 
 				case ID_BRIDGE_TILT4:
-					tiltOffset = Vector3(0.0f, CLICK(4), 0.0f);
+					offset = Vector3(0.0f, CLICK(4), 0.0f);
 					break;
 				}
 
 				// Calculate absolute offset.
-				auto rotMatrix = bridgeItem.Pose.Orientation.ToRotationMatrix();
-				tiltOffset = Vector3::Transform(tiltOffset, rotMatrix);
+				auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
+				offset = Vector3::Transform(offset, rotMatrix);
 
-				// Get box corners.
-				auto corners = std::array<Vector3, 8>{};
-				box.GetCorners(corners.data());
-
-				// Collide generated triangle meshes.
-				auto meshes = GenerateTiltBridgeTriangleMeshes(corners, tiltOffset);
+				// Collide bridge mesh.
+				auto meshes = GenerateTiltBridgeTriangleMeshes(box, offset);
 				for (const auto& mesh : meshes)
 				{
 					float dist = 0.0f;
@@ -425,6 +442,7 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 	{
 		isClipped = true;
 
+		// Collide floor collision mesh.
 		auto meshes = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, true);
 		for (const auto& mesh : meshes)
 		{
@@ -442,6 +460,7 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 	{
 		isClipped = true;
 
+		// Collide ceiling collision mesh.
 		auto meshes = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, false);
 		for (const auto& mesh : meshes)
 		{

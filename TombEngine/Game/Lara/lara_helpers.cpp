@@ -1666,12 +1666,12 @@ int GetPlayerStrafeTurnStateID(const ItemInfo& item)
 
 	const auto& player = GetLaraInfo(item);
 
-	short deltaAngele = Geometry::GetShortestAngle(player.Control.HeadingOrientTarget.y, item.Pose.Orientation.y);
-	if (deltaAngele >= DELTA_ANGLE_CONSTRAINT)
+	short deltaAngle = Geometry::GetShortestAngle(player.Control.HeadingOrientTarget.y, item.Pose.Orientation.y);
+	if (deltaAngle >= DELTA_ANGLE_CONSTRAINT)
 	{
 		return LS_TURN_LEFT_SLOW;
 	}
-	else if (deltaAngele <= -DELTA_ANGLE_CONSTRAINT)
+	else if (deltaAngle <= -DELTA_ANGLE_CONSTRAINT)
 	{
 		return LS_TURN_RIGHT_SLOW;
 	}
