@@ -327,22 +327,22 @@ static std::vector<TriangleMesh> GenerateTiltBridgeTriangleMeshes(const Bounding
 	corners[5] += offset;
 	corners[7] -= offset;
 
-	// Calculate collision mesh.
-	auto tris = std::vector<TriangleMesh>{};
-	tris.push_back(TriangleMesh(corners[0], corners[1], corners[4]));
-	tris.push_back(TriangleMesh(corners[1], corners[4], corners[5]));
-	tris.push_back(TriangleMesh(corners[2], corners[3], corners[6]));
-	tris.push_back(TriangleMesh(corners[3], corners[6], corners[7]));
-	tris.push_back(TriangleMesh(corners[0], corners[1], corners[2]));
-	tris.push_back(TriangleMesh(corners[0], corners[2], corners[3]));
-	tris.push_back(TriangleMesh(corners[0], corners[3], corners[4]));
-	tris.push_back(TriangleMesh(corners[3], corners[4], corners[7]));
-	tris.push_back(TriangleMesh(corners[1], corners[2], corners[5]));
-	tris.push_back(TriangleMesh(corners[2], corners[5], corners[6]));
-	tris.push_back(TriangleMesh(corners[4], corners[5], corners[6]));
-	tris.push_back(TriangleMesh(corners[4], corners[6], corners[7]));
-
-	return tris;
+	// Calculate and return collision mesh.
+	return std::vector<TriangleMesh>
+	{
+		TriangleMesh(corners[0], corners[1], corners[4]),
+		TriangleMesh(corners[1], corners[4], corners[5]),
+		TriangleMesh(corners[2], corners[3], corners[6]),
+		TriangleMesh(corners[3], corners[6], corners[7]),
+		TriangleMesh(corners[0], corners[1], corners[2]),
+		TriangleMesh(corners[0], corners[2], corners[3]),
+		TriangleMesh(corners[0], corners[3], corners[4]),
+		TriangleMesh(corners[3], corners[4], corners[7]),
+		TriangleMesh(corners[1], corners[2], corners[5]),
+		TriangleMesh(corners[2], corners[5], corners[6]),
+		TriangleMesh(corners[4], corners[5], corners[6]),
+		TriangleMesh(corners[4], corners[6], corners[7])
+	};
 }
 
 static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs)
