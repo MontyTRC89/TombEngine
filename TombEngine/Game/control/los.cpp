@@ -211,7 +211,7 @@ static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos
 	auto corner2 = base + Vector3(BLOCK(1), 0.0f, BLOCK(1));
 	auto corner3 = base + Vector3(BLOCK(1), 0.0f, 0.0f);
 
-	auto meshes = std::vector<TriangleMesh>{};
+	auto tris = std::vector<TriangleMesh>{};
 	if (sector.IsSurfaceSplit(isFloor))
 	{
 		const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
@@ -231,8 +231,8 @@ static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos
 				Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
 
 			// Collect surface triangles.
-			meshes.push_back(tri0);
-			meshes.push_back(tri1);
+			tris.push_back(tri0);
+			tris.push_back(tri1);
 
 			// Calculate and collect diagonal wall triangles.
 			if (tri0.Vertices[0] != tri1.Vertices[0] && tri0.Vertices[2] != tri1.Vertices[1])
@@ -240,18 +240,18 @@ static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos
 				auto tri2 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[0], tri0.Vertices[2]);
 				auto tri3 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[1]);
 
-				meshes.push_back(tri2);
-				meshes.push_back(tri3);
+				tris.push_back(tri2);
+				tris.push_back(tri3);
 			}
 			else if (tri0.Vertices[0] != tri1.Vertices[0] && tri0.Vertices[2] == tri1.Vertices[1])
 			{
 				auto tri2 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[0], tri0.Vertices[2]);
-				meshes.push_back(tri2);
+				tris.push_back(tri2);
 			}
 			else if (tri0.Vertices[2] == tri1.Vertices[1] && tri0.Vertices[2] != tri1.Vertices[1])
 			{
 				auto tri2 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[1]);
-				meshes.push_back(tri2);
+				tris.push_back(tri2);
 			}
 		}
 		else if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_1)
@@ -269,8 +269,8 @@ static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos
 				Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
 
 			// Collect surface triangles.
-			meshes.push_back(tri0);
-			meshes.push_back(tri1);
+			tris.push_back(tri0);
+			tris.push_back(tri1);
 
 			// Calculate and collect diagonal wall triangles.
 			if (tri0.Vertices[1] != tri1.Vertices[0] && tri0.Vertices[2] != tri1.Vertices[2])
@@ -278,18 +278,18 @@ static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos
 				auto tri2 = TriangleMesh(tri0.Vertices[1], tri1.Vertices[0], tri0.Vertices[2]);
 				auto tri3 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[2]);
 
-				meshes.push_back(tri2);
-				meshes.push_back(tri3);
+				tris.push_back(tri2);
+				tris.push_back(tri3);
 			}
 			else if (tri0.Vertices[1] != tri1.Vertices[0] && tri0.Vertices[2] == tri1.Vertices[2])
 			{
 				auto tri2 = TriangleMesh(tri0.Vertices[1], tri1.Vertices[0], tri0.Vertices[2]);
-				meshes.push_back(tri2);
+				tris.push_back(tri2);
 			}
 			else if (tri0.Vertices[2] == tri1.Vertices[2] && tri0.Vertices[2] != tri1.Vertices[2])
 			{
 				auto tri2 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[2]);
-				meshes.push_back(tri2);
+				tris.push_back(tri2);
 			}
 		}
 	}
@@ -308,11 +308,11 @@ static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos
 			Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
 
 		// Collect surface triangles.
-		meshes.push_back(tri0);
-		meshes.push_back(tri1);
+		tris.push_back(tri0);
+		tris.push_back(tri1);
 	}
 
-	return meshes;
+	return tris;
 }
 
 static std::vector<TriangleMesh> GenerateTiltBridgeTriangleMeshes(const BoundingOrientedBox& box, const Vector3& offset)
@@ -328,21 +328,21 @@ static std::vector<TriangleMesh> GenerateTiltBridgeTriangleMeshes(const Bounding
 	corners[7] -= offset;
 
 	// Calculate collision mesh.
-	auto meshes = std::vector<TriangleMesh>{};
-	meshes.push_back(TriangleMesh(corners[0], corners[1], corners[4]));
-	meshes.push_back(TriangleMesh(corners[1], corners[4], corners[5]));
-	meshes.push_back(TriangleMesh(corners[2], corners[3], corners[6]));
-	meshes.push_back(TriangleMesh(corners[3], corners[6], corners[7]));
-	meshes.push_back(TriangleMesh(corners[0], corners[1], corners[2]));
-	meshes.push_back(TriangleMesh(corners[0], corners[2], corners[3]));
-	meshes.push_back(TriangleMesh(corners[0], corners[3], corners[4]));
-	meshes.push_back(TriangleMesh(corners[3], corners[4], corners[7]));
-	meshes.push_back(TriangleMesh(corners[1], corners[2], corners[5]));
-	meshes.push_back(TriangleMesh(corners[2], corners[5], corners[6]));
-	meshes.push_back(TriangleMesh(corners[4], corners[5], corners[6]));
-	meshes.push_back(TriangleMesh(corners[4], corners[6], corners[7]));
+	auto tris = std::vector<TriangleMesh>{};
+	tris.push_back(TriangleMesh(corners[0], corners[1], corners[4]));
+	tris.push_back(TriangleMesh(corners[1], corners[4], corners[5]));
+	tris.push_back(TriangleMesh(corners[2], corners[3], corners[6]));
+	tris.push_back(TriangleMesh(corners[3], corners[6], corners[7]));
+	tris.push_back(TriangleMesh(corners[0], corners[1], corners[2]));
+	tris.push_back(TriangleMesh(corners[0], corners[2], corners[3]));
+	tris.push_back(TriangleMesh(corners[0], corners[3], corners[4]));
+	tris.push_back(TriangleMesh(corners[3], corners[4], corners[7]));
+	tris.push_back(TriangleMesh(corners[1], corners[2], corners[5]));
+	tris.push_back(TriangleMesh(corners[2], corners[5], corners[6]));
+	tris.push_back(TriangleMesh(corners[4], corners[5], corners[6]));
+	tris.push_back(TriangleMesh(corners[4], corners[6], corners[7]));
 
-	return meshes;
+	return tris;
 }
 
 static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs)
@@ -443,11 +443,11 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 		isClipped = true;
 
 		// Collide floor collision mesh.
-		auto meshes = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, true);
-		for (const auto& mesh : meshes)
+		auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, true);
+		for (const auto& tri : tris)
 		{
 			float dist = 0.0f;
-			if (mesh.Intersects(ray, dist) && dist < closestDist)
+			if (tri.Intersects(ray, dist) && dist < closestDist)
 			{
 				closestDist = dist;
 				target = GameVector(Geometry::TranslatePoint(ray.position, ray.direction, dist), roomNumber);
@@ -461,11 +461,11 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 		isClipped = true;
 
 		// Collide ceiling collision mesh.
-		auto meshes = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, false);
-		for (const auto& mesh : meshes)
+		auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, false);
+		for (const auto& tri : tris)
 		{
 			float dist = 0.0f;
-			if (mesh.Intersects(ray, dist) && dist < closestDist)
+			if (tri.Intersects(ray, dist) && dist < closestDist)
 			{
 				closestDist = dist;
 				target = GameVector(Geometry::TranslatePoint(ray.position, ray.direction, dist), roomNumber);
