@@ -30,35 +30,26 @@ enum class SectorClipType
 	OutOfBounds
 };
 
+struct SectorClipData
+{
+	SectorClipType Type = SectorClipType::Unobstructed;
+
+	GameVector					  Intersect	  = GameVector();
+	std::vector<Vector3i>		  Positions	  = {}; // temp
+	std::vector<const FloorInfo*> SectorPtrs  = {};
+	std::vector<int>			  RoomNumbers = {};
+};
+
 // Globals
+int LosRoomNumbers[20];
 int LosRoomCount;
-int LosRooms[20];
 int ClosestItem;
 int ClosestDist;
 Vector3i ClosestCoord;
 
-static void CollectRoomLosData(const FloorInfo& sector, std::vector<const FloorInfo*>& sectorPtrs,
-							   short roomNumber0, short& roomNumber1, std::optional<std::set<int>*> roomNumbers)
+static SectorClipData GetSingleAxisSectorClip(const GameVector& origin, GameVector& target, bool xFirst)
 {
-	// Collect sector.
-	sectorPtrs.push_back(&sector);
-
-	// Collect room number.
-	if (roomNumber0 != roomNumber1)
-	{
-		roomNumber1 = roomNumber0;
-		LosRooms[LosRoomCount] = roomNumber0;
-		++LosRoomCount;
-
-		if (roomNumbers.has_value())
-			roomNumbers.value()->insert(roomNumber0);
-	}
-}
-
-static SectorClipType ClipSector(const GameVector& origin, GameVector& target, bool xFirst,
-								 std::vector<const FloorInfo*>& sectorPtrs, std::optional<std::set<int>*> roomNumbers)
-{
-	auto clipType = SectorClipType::Unobstructed;
+	auto sectorClip = SectorClipData{};
 
 	// Calculate step.
 	auto step = Vector3i::Zero;
@@ -66,7 +57,7 @@ static SectorClipType ClipSector(const GameVector& origin, GameVector& target, b
 	{
 		step.x = target.x - origin.x;
 		if (step.x == 0)
-			return clipType;
+			return sectorClip;
 
 		step.y = BLOCK(target.y - origin.y) / step.x;
 		step.z = BLOCK(target.z - origin.z) / step.x;
@@ -75,18 +66,14 @@ static SectorClipType ClipSector(const GameVector& origin, GameVector& target, b
 	{
 		step.z = target.z - origin.z;
 		if (step.z == 0)
-			return clipType;
+			return sectorClip;
 
-		// Collect room number.
 		step.x = BLOCK(target.x - origin.x) / step.z;
 		step.y = BLOCK(target.y - origin.y) / step.z;
 	}
 
 	// Collect room number.
-	LosRoomCount = 1;
-	LosRooms[0] = origin.RoomNumber;
-	if (roomNumbers.has_value())
-		roomNumbers.value()->insert(origin.RoomNumber);
+	sectorClip.RoomNumbers.push_back(origin.RoomNumber);
 
 	bool isNegative = xFirst ? (step.x < 0) : (step.z < 0);
 	int sign = isNegative ? -1 : 1;
@@ -106,42 +93,71 @@ static SectorClipType ClipSector(const GameVector& origin, GameVector& target, b
 		pos.x = (((pos.z - origin.z) * step.x) / BLOCK(1)) + origin.x;
 	}
 
-	short roomNumber0 = origin.RoomNumber;
-	short roomNumber1 = origin.RoomNumber;
+	FloorInfo* sectorPtr = nullptr;
+	FloorInfo* prevSectorPtr = nullptr;
+	short roomNumber = origin.RoomNumber;
+	short prevRoomNumber = origin.RoomNumber;
 
 	while (xFirst ? (isNegative ? (pos.x > target.x) : (pos.x < target.x)) : (isNegative ? (pos.z > target.z) : (pos.z < target.z)))
 	{
 		g_Renderer.AddDebugTarget(pos.ToVector3(), Quaternion::Identity, 50, Color(1, 0, 1));
 		g_Renderer.AddDebugTarget(Vector3(pos.x + (xFirst ? sign : 0), pos.y, pos.z + (xFirst ? 0 : sign)), Quaternion::Identity, 50, Color(1, 1, 0));
+		
+		sectorPtr = GetFloor(pos.x, pos.y, pos.z, &prevRoomNumber);
 
-		auto* sectorPtr = GetFloor(pos.x, pos.y, pos.z, &roomNumber0);
-		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
+		// Collect sector.
+		if (sectorPtr != prevSectorPtr)
+		{
+			sectorClip.Positions.push_back(pos);
+			sectorClip.SectorPtrs.push_back(sectorPtr);
+		}
+		prevSectorPtr = sectorPtr;
 
+		// Collect room number.
+		if (roomNumber != prevRoomNumber)
+			sectorClip.RoomNumbers.push_back(prevRoomNumber);
+		roomNumber = prevRoomNumber;
+
+		// Test for sector edge obstruction.
 		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z) ||
 			pos.y < GetCeiling(sectorPtr, pos.x, pos.y, pos.z))
 		{
-			clipType = SectorClipType::Obstructed;
+			sectorClip.Type = SectorClipType::Obstructed;
 			break;
 		}
 
-		sectorPtr = GetFloor(pos.x + (xFirst ? sign : 0), pos.y, pos.z + (xFirst ? 0 : sign), &roomNumber0);
-		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
+		auto boundPos = pos + Vector3i(xFirst ? sign : 0, 0, !xFirst ? sign : 0);
+		sectorPtr = GetFloor(boundPos.x, boundPos.y, boundPos.z, &prevRoomNumber);
 
-		if (pos.y > GetFloorHeight(sectorPtr, pos.x + (xFirst ? sign : 0), pos.y, pos.z + (xFirst ? 0 : sign)) ||
-			pos.y < GetCeiling(sectorPtr, pos.x + (xFirst ? sign : 0), pos.y, pos.z + (xFirst ? 0 : sign)))
+		// Collect sector.
+		if (sectorPtr != prevSectorPtr)
 		{
-			clipType = SectorClipType::OutOfBounds;
+			sectorClip.Positions.push_back(boundPos);
+			sectorClip.SectorPtrs.push_back(sectorPtr);
+		}
+		prevSectorPtr = sectorPtr;
+
+		// Collect room number.
+		if (roomNumber != prevRoomNumber)
+			sectorClip.RoomNumbers.push_back(prevRoomNumber);
+		roomNumber = prevRoomNumber;
+
+		// Test for out-of-bounds sector edge obstruction.
+		if (pos.y > GetFloorHeight(sectorPtr, boundPos.x, boundPos.y, boundPos.z) ||
+			pos.y < GetCeiling(sectorPtr, boundPos.x, boundPos.y, boundPos.z))
+		{
+			sectorClip.Type = SectorClipType::OutOfBounds;
 			break;
 		}
 
-		pos += Vector3i(xFirst ? BLOCK(1) : step.x, step.y, xFirst ? step.z : BLOCK(1)) * sign;
+		pos += Vector3i(xFirst ? BLOCK(1) : step.x, step.y, !xFirst ? BLOCK(1) : step.z) * sign;
 	}
 
-	if (clipType != SectorClipType::Unobstructed)
+	if (sectorClip.Type != SectorClipType::Unobstructed)
 		target = GameVector(pos, target.RoomNumber);
 
-	target.RoomNumber = (clipType != SectorClipType::OutOfBounds) ? roomNumber0 : roomNumber1;
-	return clipType;
+	target.RoomNumber = (sectorClip.Type != SectorClipType::OutOfBounds) ? prevRoomNumber : roomNumber;
+	return sectorClip;
 }
 
 static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos, const FloorInfo& sector, bool isFloor)
@@ -286,7 +302,7 @@ static std::vector<TriangleMesh> GenerateTiltBridgeTriangleMeshes(const Bounding
 	};
 }
 
-static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs)
+static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, const std::vector<const FloorInfo*>& sectorPtrs, const std::vector<Vector3i>& posList)
 {
 	auto dir = target.ToVector3() - origin.ToVector3();
 	dir.Normalize();
@@ -296,6 +312,7 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 	float closestDist = INFINITY;
 
 	// 1) Clip bridge.
+	int i = 0;
 	for (const auto* sectorPtr : sectorPtrs)
 	{
 		// Run through all bridges in sector.
@@ -348,18 +365,16 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 				}
 			}
 		}
-	}
 
-	// Get sector pointer and update intersection room number.
-	auto* sectorPtr = GetFloor(target.x, target.y, target.z, &target.RoomNumber);
+		g_Renderer.PrintDebugMessage("%d", sectorPtr);
 
-	// 2) Clip floor.
-	if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
-	{
-		// Collide floor collision mesh.
-		auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, true);
+		auto tris = GenerateSectorTriangleMeshes(posList[i].ToVector3(), *sectorPtr, true);
 		for (const auto& tri : tris)
 		{
+			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[0], 20), Color(1, 1, 1));
+			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[1], 20), Color(1, 1, 1));
+			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[2], 20), Color(1, 1, 1));
+
 			float dist = 0.0f;
 			if (tri.Intersects(ray, dist) && dist < closestDist)
 			{
@@ -367,7 +382,37 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 				closestDist = dist;
 			}
 		}
+
+		// Clipped bridge; break early.
+		if (isClipped)
+			break;
+
+		i++;
 	}
+	g_Renderer.PrintDebugMessage("-----");
+
+	// Get sector pointer and update intersection room number.
+	auto* sectorPtr = GetFloor(target.x, target.y, target.z, &target.RoomNumber);
+
+	// 2) Clip floor.
+	/*if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
+	{
+		// Collide floor collision mesh.
+		auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, true);
+		for (const auto& tri : tris)
+		{
+			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[0], 20), Color(1, 1, 1));
+			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[1], 20), Color(1, 1, 1));
+			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[2], 20), Color(1, 1, 1));
+
+			float dist = 0.0f;
+			if (tri.Intersects(ray, dist) && dist < closestDist)
+			{
+				isClipped = true;
+				closestDist = dist;
+			}
+		}
+	}*/
 
 	// 3) Clip ceiling.
 	if (target.y < GetCeiling(sectorPtr, target.x, target.y, target.z))
@@ -391,35 +436,47 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 	return !isClipped;
 }
 
-// NOTE: Accurate walls, floors/ceilings, and flat bridges. Ignores tilted bridges and objects.
+// NOTE: Room LOS.
 bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<int>*> roomNumbers)
 {
-	auto clipType0 = SectorClipType::Unobstructed;
-	auto clipType1 = SectorClipType::Unobstructed;
+	target->RoomNumber = origin->RoomNumber;
+
+	bool xFirst = (abs(target->z - origin->z) > abs(target->x - origin->x));
+
+	auto sectorClip0 = GetSingleAxisSectorClip(*origin, *target, xFirst);
+	auto sectorClip1 = GetSingleAxisSectorClip(*origin, *target, !xFirst);
+
+	auto roomNumbers2 = std::vector<int>{};
+	roomNumbers2.insert(roomNumbers2.end(), sectorClip0.RoomNumbers.begin(), sectorClip0.RoomNumbers.end());
+	roomNumbers2.insert(roomNumbers2.end(), sectorClip1.RoomNumbers.begin(), sectorClip1.RoomNumbers.end());
+
+	// HACK: Transplant room numbers to legacy globals.
+	LosRoomCount = 0;
+	int i = 0;
+	for (int roomNumber : roomNumbers2)
+	{
+		LosRoomNumbers[i] = roomNumber;
+		LosRoomCount++;
+
+		i++;
+		if (i >= 20)
+			break;
+	}
+
+	GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 
 	auto sectorPtrs = std::vector<const FloorInfo*>{};
+	sectorPtrs.insert(sectorPtrs.end(), sectorClip0.SectorPtrs.begin(), sectorClip0.SectorPtrs.end());
+	sectorPtrs.insert(sectorPtrs.end(), sectorClip1.SectorPtrs.begin(), sectorClip1.SectorPtrs.end());
 
-	target->RoomNumber = origin->RoomNumber;
-	if (abs(target->z - origin->z) > abs(target->x - origin->x))
-	{
-		clipType0 = ClipSector(*origin, *target, true, sectorPtrs, roomNumbers);
-		clipType1 = ClipSector(*origin, *target, false, sectorPtrs, roomNumbers);
-	}
-	else
-	{
-		clipType0 = ClipSector(*origin, *target, false, sectorPtrs, roomNumbers);
-		clipType1 = ClipSector(*origin, *target, true, sectorPtrs, roomNumbers);
-	}
+	auto posList = std::vector<Vector3i>{};
+	posList.insert(posList.end(), sectorClip0.Positions.begin(), sectorClip0.Positions.end());
+	posList.insert(posList.end(), sectorClip1.Positions.begin(), sectorClip1.Positions.end());
 
-	if (clipType1 != SectorClipType::OutOfBounds)
+	if (ClipRoomLosIntersect(*origin, *target, sectorPtrs, posList) &&
+		sectorClip0.Type == SectorClipType::Unobstructed && sectorClip1.Type == SectorClipType::Unobstructed)
 	{
-		GetFloor(target->x, target->y, target->z, &target->RoomNumber);
-
-		if (ClipRoomLosIntersect(*origin, *target, sectorPtrs) &&
-			clipType0 == SectorClipType::Unobstructed && clipType1 == SectorClipType::Unobstructed)
-		{
-			return true;
-		}
+		return true;
 	}
 
 	return false;
@@ -839,7 +896,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 
 	for (int r = 0; r < LosRoomCount; ++r)
 	{
-		auto& room = g_Level.Rooms[LosRooms[r]];
+		auto& room = g_Level.Rooms[LosRoomNumbers[r]];
 
 		auto pose = Pose::Zero;
 
@@ -857,7 +914,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 					if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp.staticNumber))
 					{
 						*staticPtrPtr = &meshp;
-						target->RoomNumber = LosRooms[r];
+						target->RoomNumber = LosRoomNumbers[r];
 					}
 				}
 			}
@@ -883,7 +940,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 			pose = Pose(item.Pose.Position, EulerAngles(0, item.Pose.Orientation.y, 0));
 
 			if (DoRayBox(*origin, *target, bounds, pose, *vec, linkNumber))
-				target->RoomNumber = LosRooms[r];
+				target->RoomNumber = LosRoomNumbers[r];
 		}
 	}
 

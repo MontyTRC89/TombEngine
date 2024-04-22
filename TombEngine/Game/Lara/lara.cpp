@@ -93,6 +93,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	g_Renderer.AddDebugLine(o.ToVector3(), t.ToVector3(), Vector4::One);
 	g_Renderer.AddDebugTarget(t.ToVector3(), Quaternion::Identity, 100, Color(1, 1, 1));
 
+	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);
+	//g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));
+
 	//--------
 
 	// Update reference move axis.
@@ -124,9 +127,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	if (!player.Control.IsLocked)
 		player.LocationPad = -1;
-
-	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);
-	g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));
 
 	// FAILSAFE: Force hand status reset.
 	if (item->Animation.AnimNumber == LA_STAND_IDLE &&
