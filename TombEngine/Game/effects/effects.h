@@ -15,7 +15,7 @@ constexpr auto MAX_DYNAMICS = 64;
 constexpr auto MAX_SPLASHES = 8;
 constexpr auto NUM_EFFECTS	= 256;
 
-constexpr auto MAX_PARTICLES		 = 4096;
+constexpr auto MAX_PARTICLES		 = 8192;
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 
 enum SpriteEnumFlag
@@ -160,6 +160,7 @@ struct Particle
 	int fxObj;
 	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
+	GameVector targetPos;
 };
 
 struct SPLASH_STRUCT

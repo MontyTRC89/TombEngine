@@ -20,6 +20,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
+#include "Objects/TR5/Emitter/Waterfall.h"
 #include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
@@ -205,6 +206,18 @@ void UpdateSparks()
 					ParticleDynamics[spark->dynamic].On = false;
 
 				spark->on = false;
+				continue;
+			}
+
+			if (spark->fxObj == ID_WATERFALL_EMITTER && spark->y >= spark->targetPos.y)
+			{
+				spark->y = spark->targetPos.y;
+				spark->x = spark->targetPos.x;
+				spark->z = spark->targetPos.z;
+				spark->on = false;
+				//if (spark->spriteIndex == Objects[ID_DEFAULT_SPRITES].meshIndex + 0)
+				if (Random::GenerateInt(0, 100) > 80 )
+					TriggerWaterfallEmitterMist(Vector3(spark->targetPos.x, spark->targetPos.y, spark->targetPos.z), spark->roomNumber);
 				continue;
 			}
 			
@@ -1154,8 +1167,8 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	float cos = phd_cos(angle);
 	float sin = phd_sin(angle);
 
-	int maxPosX =  width * sin + item.Pose.Position.x;
-	int maxPosZ =  width * cos + item.Pose.Position.z;
+	int maxPosX = width * sin + item.Pose.Position.x;
+	int maxPosZ = width * cos + item.Pose.Position.z;
 	int minPosX = -width * sin + item.Pose.Position.x;
 	int minPosZ = -width * cos + item.Pose.Position.z;
 
@@ -1168,7 +1181,7 @@ void TriggerWaterfallMist(const ItemInfo& item)
 	float finalFade = ((fadeMin >= 1.0f) && (fadeMin == fadeMax)) ? 1.0f : std::max(fadeMin, fadeMax);
 
 	auto startColor = item.Model.Color / 4.0f * finalFade * float(UCHAR_MAX);
-	auto endColor   = item.Model.Color / 8.0f * finalFade * float(UCHAR_MAX);
+	auto endColor = item.Model.Color / 8.0f * finalFade * float(UCHAR_MAX);
 
 	float step = size * scale;
 	int currentStep = 0;
@@ -1185,63 +1198,38 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			auto* spark = GetFreeParticle();
 			spark->on = true;
 
-			spark->xVel = (BLOCK(0.6f) * cos);
-			spark->yVel = 16 - (GetRandomControl() & 0xF);// Random::GenerateInt(-44, 44);
-			spark->zVel = (BLOCK(0.6f) * sin);
+			char colorOffset = (Random::GenerateInt(-8, 8));
+			spark->sR = std::clamp(int(startColor.x) + colorOffset, 0, UCHAR_MAX);
+			spark->sG = std::clamp(int(startColor.y) + colorOffset, 0, UCHAR_MAX);
+			spark->sB = std::clamp(int(startColor.z) + colorOffset, 0, UCHAR_MAX);
+			spark->dR = std::clamp(int(endColor.x) + colorOffset, 0, UCHAR_MAX);
+			spark->dG = std::clamp(int(endColor.y) + colorOffset, 0, UCHAR_MAX);
+			spark->dB = std::clamp(int(endColor.z) + colorOffset, 0, UCHAR_MAX);
+
+			spark->colFadeSpeed = 1;
+			spark->blendMode = BlendMode::Additive;
+			spark->life = spark->sLife = Random::GenerateInt(8, 12);
+			spark->fadeToBlack = spark->life - 6;
 
 			spark->x = offset * sign * sin + Random::GenerateInt(-8, 8) + item.Pose.Position.x;
 			spark->y = Random::GenerateInt(0, 16) + item.Pose.Position.y - 8;
 			spark->z = offset * sign * cos + Random::GenerateInt(-8, 8) + item.Pose.Position.z;
 
-			auto orient = EulerAngles(item.Pose.Orientation.x - ANGLE(90.0f), item.Pose.Orientation.y, item.Pose.Orientation.z );
-			auto dir = orient.ToDirection();
-			auto rotMatrix = orient.ToRotationMatrix();
+			spark->xVel = 0;
+			spark->yVel = Random::GenerateInt(-64, 64);
+			spark->zVel = 0;
 
-			auto origin = GameVector(Vector3(spark->x, spark->y, spark->z - BLOCK(0.2)), item.RoomNumber);
-
-			//auto pointColl = GetCollision(item, dir, 0, BLOCK(8), 0);
-
-			auto pointColl =  GetCollision(origin.ToVector3i(), origin.RoomNumber, dir, BLOCK(8));
-
-			int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
-
-			g_Renderer.AddDebugLine(origin.ToVector3(), origin.ToVector3() + Vector3(0,relFloorHeight,0), Vector4(1, 0, 0, 1));
-
-			char colorOffset = (Random::GenerateInt(-8, 8));
-			spark->sR = std::clamp(int(startColor.x) + colorOffset, 0, UCHAR_MAX);
-			spark->sG = std::clamp(int(startColor.y) + colorOffset, 0, UCHAR_MAX);
-			spark->sB = std::clamp(int(startColor.z) + colorOffset, 0, UCHAR_MAX);
-			spark->dR = std::clamp(int(endColor.x)   + colorOffset, 0, UCHAR_MAX);
-			spark->dG = std::clamp(int(endColor.y)   + colorOffset, 0, UCHAR_MAX);
-			spark->dB = std::clamp(int(endColor.z)   + colorOffset, 0, UCHAR_MAX);
-
-			spark->colFadeSpeed = 2;
-			spark->blendMode = BlendMode::Additive;
-
-
-
-
-			spark->gravity = (relFloorHeight *2) /FPS;
-
-			// Adjust particle life based on relative floor height, speed, and gravity
-			spark->life = spark->sLife =  172;
-
-			spark->fadeToBlack = 0;
-
-
-
-
-			spark->friction = -2;
+			spark->friction = 0;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 			spark->scalar = scale;
 			spark->maxYvel = 0;
 			spark->rotAdd = Random::GenerateInt(-16, 16);
+			spark->gravity = -spark->yVel >> 2;
+			spark->sSize = spark->size = Random::GenerateInt(0, 3) * scale + size;
+			spark->dSize = 2 * spark->size;
 
-			spark->sSize = spark->size = Random::GenerateInt(0, 5) * scale + size *2;
-			spark->dSize = 3 * spark->size;
-
-			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 70 ? 34 : 0);
-			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE;
+			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 95 ? 17 : 0);
+			spark->flags = 538;
 
 			if (sign == 1)
 			{
