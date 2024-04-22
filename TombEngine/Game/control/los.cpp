@@ -23,7 +23,7 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
-enum class ClipType
+enum class SectorClipType
 {
 	Unobstructed,
 	Obstructed,
@@ -55,16 +55,32 @@ static void CollectRoomLosData(const FloorInfo& sector, std::vector<const FloorI
 	}
 }
 
-static ClipType xRoomLos(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs, std::optional<std::set<int>*> roomNumbers)
+static SectorClipType ClipSector(const GameVector& origin, GameVector& target, bool xFirst,
+								 std::vector<const FloorInfo*>& sectorPtrs, std::optional<std::set<int>*> roomNumbers)
 {
-	auto clipType = ClipType::Unobstructed;
+	auto clipType = SectorClipType::Unobstructed;
 
-	int dx = target.x - origin.x;
-	if (dx == 0)
-		return clipType;
+	// Calculate step.
+	auto step = Vector3i::Zero;
+	if (xFirst)
+	{
+		step.x = target.x - origin.x;
+		if (step.x == 0)
+			return clipType;
 
-	int dy = BLOCK(target.y - origin.y) / dx;
-	int dz = BLOCK(target.z - origin.z) / dx;
+		step.y = BLOCK(target.y - origin.y) / step.x;
+		step.z = BLOCK(target.z - origin.z) / step.x;
+	}
+	else
+	{
+		step.z = target.z - origin.z;
+		if (step.z == 0)
+			return clipType;
+
+		// Collect room number.
+		step.x = BLOCK(target.x - origin.x) / step.z;
+		step.y = BLOCK(target.y - origin.y) / step.z;
+	}
 
 	// Collect room number.
 	LosRoomCount = 1;
@@ -72,21 +88,31 @@ static ClipType xRoomLos(const GameVector& origin, GameVector& target, std::vect
 	if (roomNumbers.has_value())
 		roomNumbers.value()->insert(origin.RoomNumber);
 
-	bool isNegative = (dx < 0);
+	bool isNegative = xFirst ? (step.x < 0) : (step.z < 0);
 	int sign = isNegative ? -1 : 1;
 
+	// Calculate initial position.
 	auto pos = Vector3i::Zero;
-	pos.x = isNegative ? (origin.x & (UINT_MAX - WALL_MASK)) : (origin.x | WALL_MASK);
-	pos.y = (((pos.x - origin.x) * dy) / BLOCK(1)) + origin.y;
-	pos.z = (((pos.x - origin.x) * dz) / BLOCK(1)) + origin.z;
+	if (xFirst)
+	{
+		pos.x = isNegative ? (origin.x & (UINT_MAX - WALL_MASK)) : (origin.x | WALL_MASK);
+		pos.y = (((pos.x - origin.x) * step.y) / BLOCK(1)) + origin.y;
+		pos.z = (((pos.x - origin.x) * step.z) / BLOCK(1)) + origin.z;
+	}
+	else
+	{
+		pos.z = isNegative ? (origin.z & (UINT_MAX - WALL_MASK)) : (origin.z | WALL_MASK);
+		pos.y = (((pos.z - origin.z) * step.y) / BLOCK(1)) + origin.y;
+		pos.x = (((pos.z - origin.z) * step.x) / BLOCK(1)) + origin.x;
+	}
 
 	short roomNumber0 = origin.RoomNumber;
 	short roomNumber1 = origin.RoomNumber;
 
-	while (isNegative ? (pos.x > target.x) : (pos.x < target.x))
+	while (xFirst ? (isNegative ? (pos.x > target.x) : (pos.x < target.x)) : (isNegative ? (pos.z > target.z) : (pos.z < target.z)))
 	{
 		g_Renderer.AddDebugTarget(pos.ToVector3(), Quaternion::Identity, 50, Color(1, 0, 1));
-		g_Renderer.AddDebugTarget(Vector3(pos.x + sign, pos.y, pos.z), Quaternion::Identity, 50, Color(1, 1, 0));
+		g_Renderer.AddDebugTarget(Vector3(pos.x + (xFirst ? sign : 0), pos.y, pos.z + (xFirst ? 0 : sign)), Quaternion::Identity, 50, Color(1, 1, 0));
 
 		auto* sectorPtr = GetFloor(pos.x, pos.y, pos.z, &roomNumber0);
 		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
@@ -94,87 +120,27 @@ static ClipType xRoomLos(const GameVector& origin, GameVector& target, std::vect
 		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z) ||
 			pos.y < GetCeiling(sectorPtr, pos.x, pos.y, pos.z))
 		{
-			clipType = ClipType::Obstructed;
+			clipType = SectorClipType::Obstructed;
 			break;
 		}
 
-		sectorPtr = GetFloor(pos.x + sign, pos.y, pos.z, &roomNumber0);
+		sectorPtr = GetFloor(pos.x + (xFirst ? sign : 0), pos.y, pos.z + (xFirst ? 0 : sign), &roomNumber0);
 		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
 
-		if (pos.y > GetFloorHeight(sectorPtr, pos.x + sign, pos.y, pos.z) ||
-			pos.y < GetCeiling(sectorPtr, pos.x + sign, pos.y, pos.z))
+		if (pos.y > GetFloorHeight(sectorPtr, pos.x + (xFirst ? sign : 0), pos.y, pos.z + (xFirst ? 0 : sign)) ||
+			pos.y < GetCeiling(sectorPtr, pos.x + (xFirst ? sign : 0), pos.y, pos.z + (xFirst ? 0 : sign)))
 		{
-			clipType = ClipType::OutOfBounds;
+			clipType = SectorClipType::OutOfBounds;
 			break;
 		}
 
-		pos += Vector3i(BLOCK(1), dy, dz) * sign;
+		pos += Vector3i(xFirst ? BLOCK(1) : step.x, step.y, xFirst ? step.z : BLOCK(1)) * sign;
 	}
 
-	if (clipType != ClipType::Unobstructed)
+	if (clipType != SectorClipType::Unobstructed)
 		target = GameVector(pos, target.RoomNumber);
 
-	target.RoomNumber = (clipType != ClipType::OutOfBounds) ? roomNumber0 : roomNumber1;
-	return clipType;
-}
-
-static ClipType zRoomLos(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs, std::optional<std::set<int>*> roomNumbers)
-{
-	auto clipType = ClipType::Unobstructed;
-
-	int dz = target.z - origin.z;
-	if (dz == 0)
-		return clipType;
-
-	// Collect room number.
-	int dx = BLOCK(target.x - origin.x) / dz;
-	int dy = BLOCK(target.y - origin.y) / dz;
-
-	LosRoomCount = 1;
-	LosRooms[0] = origin.RoomNumber;
-	if (roomNumbers.has_value())
-		roomNumbers.value()->insert(origin.RoomNumber);
-
-	bool isNegative = (dz < 0);
-	int sign = isNegative ? -1 : 1;
-
-	auto pos = Vector3i::Zero;
-	pos.z = isNegative ? (origin.z & (UINT_MAX - WALL_MASK)) : (origin.z | WALL_MASK);
-	pos.y = (((pos.z - origin.z) * dy) / BLOCK(1)) + origin.y;
-	pos.x = (((pos.z - origin.z) * dx) / BLOCK(1)) + origin.x;
-
-	short roomNumber0 = origin.RoomNumber;
-	short roomNumber1 = origin.RoomNumber;
-
-	while (isNegative ? (pos.z > target.z) : (pos.z < target.z))
-	{
-		auto* sectorPtr = GetFloor(pos.x, pos.y, pos.z, &roomNumber0);
-		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
-
-		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z) ||
-			pos.y < GetCeiling(sectorPtr, pos.x, pos.y, pos.z))
-		{
-			clipType = ClipType::Obstructed;
-			break;
-		}
-
-		sectorPtr = GetFloor(pos.x, pos.y, pos.z + sign, &roomNumber0);
-		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
-
-		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z + sign) ||
-			pos.y < GetCeiling(sectorPtr, pos.x, pos.y, pos.z + sign))
-		{
-			clipType = ClipType::OutOfBounds;
-			break;
-		}
-
-		pos += Vector3i(dx, dy, BLOCK(1)) * sign;
-	}
-
-	if (clipType != ClipType::Unobstructed)
-		target = GameVector(pos, target.RoomNumber);
-
-	target.RoomNumber = (clipType != ClipType::OutOfBounds) ? roomNumber0 : roomNumber1;
+	target.RoomNumber = (clipType != SectorClipType::OutOfBounds) ? roomNumber0 : roomNumber1;
 	return clipType;
 }
 
@@ -428,29 +394,29 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 // NOTE: Accurate walls, floors/ceilings, and flat bridges. Ignores tilted bridges and objects.
 bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<int>*> roomNumbers)
 {
-	auto clipType0 = ClipType::Unobstructed;
-	auto clipType1 = ClipType::Unobstructed;
+	auto clipType0 = SectorClipType::Unobstructed;
+	auto clipType1 = SectorClipType::Unobstructed;
 
 	auto sectorPtrs = std::vector<const FloorInfo*>{};
 
 	target->RoomNumber = origin->RoomNumber;
 	if (abs(target->z - origin->z) > abs(target->x - origin->x))
 	{
-		clipType0 = xRoomLos(*origin, *target, sectorPtrs, roomNumbers);
-		clipType1 = zRoomLos(*origin, *target, sectorPtrs, roomNumbers);
+		clipType0 = ClipSector(*origin, *target, true, sectorPtrs, roomNumbers);
+		clipType1 = ClipSector(*origin, *target, false, sectorPtrs, roomNumbers);
 	}
 	else
 	{
-		clipType0 = zRoomLos(*origin, *target, sectorPtrs, roomNumbers);
-		clipType1 = xRoomLos(*origin, *target, sectorPtrs, roomNumbers);
+		clipType0 = ClipSector(*origin, *target, false, sectorPtrs, roomNumbers);
+		clipType1 = ClipSector(*origin, *target, true, sectorPtrs, roomNumbers);
 	}
 
-	if (clipType1 != ClipType::OutOfBounds)
+	if (clipType1 != SectorClipType::OutOfBounds)
 	{
 		GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 
 		if (ClipRoomLosIntersect(*origin, *target, sectorPtrs) &&
-			clipType0 == ClipType::Unobstructed && clipType1 == ClipType::Unobstructed)
+			clipType0 == SectorClipType::Unobstructed && clipType1 == SectorClipType::Unobstructed)
 		{
 			return true;
 		}
