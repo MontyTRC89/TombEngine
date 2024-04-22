@@ -23,19 +23,19 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
+enum class ClipType
+{
+	Unobstructed,
+	Obstructed,
+	OutOfBounds
+};
+
 // Globals
 int LosRoomCount;
 int LosRooms[20];
 int ClosestItem;
 int ClosestDist;
 Vector3i ClosestCoord;
-
-enum class RoomLosClipType
-{
-	Unobstructed,
-	Obstructed,
-	OutOfBounds
-};
 
 static void CollectRoomLosData(const FloorInfo& sector, std::vector<const FloorInfo*>& sectorPtrs,
 							   short roomNumber0, short& roomNumber1, std::optional<std::set<int>*> roomNumbers)
@@ -55,13 +55,13 @@ static void CollectRoomLosData(const FloorInfo& sector, std::vector<const FloorI
 	}
 }
 
-static int xRoomLos(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs, std::optional<std::set<int>*> roomNumbers)
+static ClipType xRoomLos(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs, std::optional<std::set<int>*> roomNumbers)
 {
-	int flag = 1;
+	auto clipType = ClipType::Unobstructed;
 
 	int dx = target.x - origin.x;
 	if (dx == 0)
-		return flag;
+		return clipType;
 
 	int dy = BLOCK(target.y - origin.y) / dx;
 	int dz = BLOCK(target.z - origin.z) / dx;
@@ -73,7 +73,7 @@ static int xRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 		roomNumbers.value()->insert(origin.RoomNumber);
 
 	bool isNegative = (dx < 0);
-	int sign = (isNegative ? -1 : 1);
+	int sign = isNegative ? -1 : 1;
 
 	auto pos = Vector3i::Zero;
 	pos.x = isNegative ? (origin.x & (UINT_MAX - WALL_MASK)) : (origin.x | WALL_MASK);
@@ -94,7 +94,7 @@ static int xRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z) ||
 			pos.y < GetCeiling(sectorPtr, pos.x, pos.y, pos.z))
 		{
-			flag = -1;
+			clipType = ClipType::Obstructed;
 			break;
 		}
 
@@ -104,27 +104,27 @@ static int xRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 		if (pos.y > GetFloorHeight(sectorPtr, pos.x + sign, pos.y, pos.z) ||
 			pos.y < GetCeiling(sectorPtr, pos.x + sign, pos.y, pos.z))
 		{
-			flag = 0;
+			clipType = ClipType::OutOfBounds;
 			break;
 		}
 
 		pos += Vector3i(BLOCK(1), dy, dz) * sign;
 	}
 
-	if (flag != 1)
+	if (clipType != ClipType::Unobstructed)
 		target = GameVector(pos, target.RoomNumber);
 
-	target.RoomNumber = (flag != 0) ? roomNumber0 : roomNumber1;
-	return flag;
+	target.RoomNumber = (clipType != ClipType::OutOfBounds) ? roomNumber0 : roomNumber1;
+	return clipType;
 }
 
-static int zRoomLos(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs, std::optional<std::set<int>*> roomNumbers)
+static ClipType zRoomLos(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs, std::optional<std::set<int>*> roomNumbers)
 {
-	int flag = 1;
+	auto clipType = ClipType::Unobstructed;
 
 	int dz = target.z - origin.z;
 	if (dz == 0)
-		return flag;
+		return clipType;
 
 	// Collect room number.
 	int dx = BLOCK(target.x - origin.x) / dz;
@@ -136,7 +136,7 @@ static int zRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 		roomNumbers.value()->insert(origin.RoomNumber);
 
 	bool isNegative = (dz < 0);
-	int sign = (isNegative ? -1 : 1);
+	int sign = isNegative ? -1 : 1;
 
 	auto pos = Vector3i::Zero;
 	pos.z = isNegative ? (origin.z & (UINT_MAX - WALL_MASK)) : (origin.z | WALL_MASK);
@@ -154,7 +154,7 @@ static int zRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z) ||
 			pos.y < GetCeiling(sectorPtr, pos.x, pos.y, pos.z))
 		{
-			flag = -1;
+			clipType = ClipType::Obstructed;
 			break;
 		}
 
@@ -164,18 +164,18 @@ static int zRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z + sign) ||
 			pos.y < GetCeiling(sectorPtr, pos.x, pos.y, pos.z + sign))
 		{
-			flag = 0;
+			clipType = ClipType::OutOfBounds;
 			break;
 		}
 
 		pos += Vector3i(dx, dy, BLOCK(1)) * sign;
 	}
 
-	if (flag != 1)
+	if (clipType != ClipType::Unobstructed)
 		target = GameVector(pos, target.RoomNumber);
 
-	target.RoomNumber = (flag != 0) ? roomNumber0 : roomNumber1;
-	return flag;
+	target.RoomNumber = (clipType != ClipType::OutOfBounds) ? roomNumber0 : roomNumber1;
+	return clipType;
 }
 
 static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos, const FloorInfo& sector, bool isFloor)
@@ -428,29 +428,32 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 // NOTE: Accurate walls, floors/ceilings, and flat bridges. Ignores tilted bridges and objects.
 bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<int>*> roomNumbers)
 {
-	int losAxis0 = 0;
-	int losAxis1 = 0;
+	auto clipType0 = ClipType::Unobstructed;
+	auto clipType1 = ClipType::Unobstructed;
 
 	auto sectorPtrs = std::vector<const FloorInfo*>{};
 
 	target->RoomNumber = origin->RoomNumber;
 	if (abs(target->z - origin->z) > abs(target->x - origin->x))
 	{
-		losAxis0 = xRoomLos(*origin, *target, sectorPtrs, roomNumbers);
-		losAxis1 = zRoomLos(*origin, *target, sectorPtrs, roomNumbers);
+		clipType0 = xRoomLos(*origin, *target, sectorPtrs, roomNumbers);
+		clipType1 = zRoomLos(*origin, *target, sectorPtrs, roomNumbers);
 	}
 	else
 	{
-		losAxis0 = zRoomLos(*origin, *target, sectorPtrs, roomNumbers);
-		losAxis1 = xRoomLos(*origin, *target, sectorPtrs, roomNumbers);
+		clipType0 = zRoomLos(*origin, *target, sectorPtrs, roomNumbers);
+		clipType1 = xRoomLos(*origin, *target, sectorPtrs, roomNumbers);
 	}
 
-	if (losAxis1 != 0)
+	if (clipType1 != ClipType::OutOfBounds)
 	{
 		GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 
-		if (ClipRoomLosIntersect(*origin, *target, sectorPtrs) && losAxis0 == 1 && losAxis1 == 1)
+		if (ClipRoomLosIntersect(*origin, *target, sectorPtrs) &&
+			clipType0 == ClipType::Unobstructed && clipType1 == ClipType::Unobstructed)
+		{
 			return true;
+		}
 	}
 
 	return false;
