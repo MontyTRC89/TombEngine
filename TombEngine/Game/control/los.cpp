@@ -24,19 +24,37 @@ using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
 // Globals
-int NumberLosRooms;
+int LosRoomCount;
 int LosRooms[20];
 int ClosestItem;
 int ClosestDist;
 Vector3i ClosestCoord;
 
-// TODO: Figure out what the flags mean in xLOS and zLOS.
+// TODO: Figure out what the flags mean in xRoomLos and zRoomLos.
 enum class RoomLosClipType
 {
 	InnerWall,
 	OuterWall,
 	Surface
 };
+
+static void CollectRoomLosData(const FloorInfo& sector, std::vector<const FloorInfo*>& sectorPtrs,
+							   short roomNumber0, short& roomNumber1, std::optional<std::set<int>*> roomNumbers)
+{
+	// Collect sector.
+	sectorPtrs.push_back(&sector);
+
+	// Collect room number.
+	if (roomNumber0 != roomNumber1)
+	{
+		roomNumber1 = roomNumber0;
+		LosRooms[LosRoomCount] = roomNumber0;
+		++LosRoomCount;
+
+		if (roomNumbers.has_value())
+			roomNumbers.value()->insert(roomNumber0);
+	}
+}
 
 static int xRoomLos(const GameVector& origin, GameVector& target, std::vector<const FloorInfo*>& sectorPtrs, std::optional<std::set<int>*> roomNumbers)
 {
@@ -49,15 +67,11 @@ static int xRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 	int dy = BLOCK(target.y - origin.y) / dx;
 	int dz = BLOCK(target.z - origin.z) / dx;
 
-	NumberLosRooms = 1;
-	LosRooms[0] = origin.RoomNumber;
-
 	// Collect room number.
+	LosRoomCount = 1;
+	LosRooms[0] = origin.RoomNumber;
 	if (roomNumbers.has_value())
 		roomNumbers.value()->insert(origin.RoomNumber);
-
-	short roomNumber0 = origin.RoomNumber;
-	short roomNumber1 = origin.RoomNumber;
 
 	bool isNegative = (dx < 0);
 	int sign = (isNegative ? -1 : 1);
@@ -66,22 +80,13 @@ static int xRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 	int y = (((x - origin.x) * dy) / BLOCK(1)) + origin.y;
 	int z = (((x - origin.x) * dz) / BLOCK(1)) + origin.z;
 
+	short roomNumber0 = origin.RoomNumber;
+	short roomNumber1 = origin.RoomNumber;
+
 	while (isNegative ? (x > target.x) : (x < target.x))
 	{
-		// Collect sector pointer.
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
-		sectorPtrs.push_back(sectorPtr);
-
-		if (roomNumber0 != roomNumber1)
-		{
-			roomNumber1 = roomNumber0;
-			LosRooms[NumberLosRooms] = roomNumber0;
-			++NumberLosRooms;
-
-			// Collect room number.
-			if (roomNumbers.has_value())
-				roomNumbers.value()->insert(roomNumber0);
-		}
+		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
 
 		if (y > GetFloorHeight(sectorPtr, x, y, z) ||
 			y < GetCeiling(sectorPtr, x, y, z))
@@ -91,16 +96,7 @@ static int xRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 		}
 
 		sectorPtr = GetFloor(x + sign, y, z, &roomNumber0);
-		if (roomNumber0 != roomNumber1)
-		{
-			roomNumber1 = roomNumber0;
-			LosRooms[NumberLosRooms] = roomNumber0;
-			++NumberLosRooms;
-
-			// Collect room number.
-			if (roomNumbers.has_value())
-				roomNumbers.value()->insert(roomNumber0);
-		}
+		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
 
 		if (y > GetFloorHeight(sectorPtr, x + sign, y, z) ||
 			y < GetCeiling(sectorPtr, x + sign, y, z))
@@ -129,41 +125,31 @@ static int zRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 	if (dz == 0)
 		return flag;
 
+	// Collect room number.
 	int dx = BLOCK(target.x - origin.x) / dz;
 	int dy = BLOCK(target.y - origin.y) / dz;
 
-	NumberLosRooms = 1;
+	LosRoomCount = 1;
 	LosRooms[0] = origin.RoomNumber;
-
 	if (roomNumbers.has_value())
 		roomNumbers.value()->insert(origin.RoomNumber);
-
-	short roomNumber0 = origin.RoomNumber;
-	short roomNumber1 = origin.RoomNumber;
 
 	bool isNegative = (dz < 0);
 	int sign = (isNegative ? -1 : 1);
 
 	int z = isNegative ? (origin.z & (UINT_MAX - WALL_MASK)) : (origin.z | WALL_MASK);
-	int x = (((z - origin.z) * dx) / BLOCK(1)) + origin.x;
 	int y = (((z - origin.z) * dy) / BLOCK(1)) + origin.y;
+	int x = (((z - origin.z) * dx) / BLOCK(1)) + origin.x;
+
+	short roomNumber0 = origin.RoomNumber;
+	short roomNumber1 = origin.RoomNumber;
 
 	while (isNegative ? (z > target.z) : (z < target.z))
 	{
 		// Collect sector pointer.
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		sectorPtrs.push_back(sectorPtr);
-
-		if (roomNumber0 != roomNumber1)
-		{
-			roomNumber1 = roomNumber0;
-			LosRooms[NumberLosRooms] = roomNumber0;
-			++NumberLosRooms;
-
-			// Collect room number.
-			if (roomNumbers.has_value())
-				roomNumbers.value()->insert(roomNumber0);
-		}
+		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
 
 		if (y > GetFloorHeight(sectorPtr, x, y, z) ||
 			y < GetCeiling(sectorPtr, x, y, z))
@@ -173,16 +159,8 @@ static int zRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 		}
 
 		sectorPtr = GetFloor(x, y, z + sign, &roomNumber0);
-		if (roomNumber0 != roomNumber1)
-		{
-			roomNumber1 = roomNumber0;
-			LosRooms[NumberLosRooms] = roomNumber0;
-			++NumberLosRooms;
-
-			// Collect room number.
-			if (roomNumbers.has_value())
-				roomNumbers.value()->insert(roomNumber0);
-		}
+		sectorPtrs.push_back(sectorPtr);
+		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
 
 		if (y > GetFloorHeight(sectorPtr, x, y, z + sign) ||
 			y < GetCeiling(sectorPtr, x, y, z + sign))
@@ -389,7 +367,7 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 				break;
 			}
 
-			// Calculate absolute offset.
+			// Calculate absolute tilt offset.
 			auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
 			offset = Vector3::Transform(offset, rotMatrix);
 
@@ -409,8 +387,8 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 		}
 	}
 
-	short roomNumber = target.RoomNumber;
-	auto* sectorPtr = GetFloor(target.x, target.y, target.z, &roomNumber);
+	// Get sector pointer and update intersection room number.
+	auto* sectorPtr = GetFloor(target.x, target.y, target.z, &target.RoomNumber);
 
 	// 2) Clip floor.
 	if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
@@ -424,7 +402,6 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 			{
 				isClipped = true;
 				closestDist = dist;
-				target.RoomNumber = roomNumber;
 			}
 		}
 	}
@@ -441,7 +418,6 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, s
 			{
 				isClipped = true;
 				closestDist = dist;
-				target.RoomNumber = roomNumber;
 			}
 		}
 	}
@@ -895,7 +871,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 	ClosestItem = NO_VALUE;
 	ClosestDist = SQUARE(target->x - origin->x) + SQUARE(target->y - origin->y) + SQUARE(target->z - origin->z);
 
-	for (int r = 0; r < NumberLosRooms; ++r)
+	for (int r = 0; r < LosRoomCount; ++r)
 	{
 		auto& room = g_Level.Rooms[LosRooms[r]];
 
