@@ -188,6 +188,7 @@ namespace TEN::Entities::Creatures::TR2
 					}
 					else
 					{
+						creature->Flags = 0;
 						item->Animation.TargetState = WORKER_SHOTGUN_STATE_WALKING_ATTACK;
 					}
 				}
