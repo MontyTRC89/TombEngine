@@ -30,12 +30,11 @@ int ClosestItem;
 int ClosestDist;
 Vector3i ClosestCoord;
 
-// TODO: Figure out what the flags mean in xRoomLos and zRoomLos.
 enum class RoomLosClipType
 {
-	InnerWall,
-	OuterWall,
-	Surface
+	Unobstructed,
+	Obstructed,
+	OutOfBounds
 };
 
 static void CollectRoomLosData(const FloorInfo& sector, std::vector<const FloorInfo*>& sectorPtrs,
@@ -76,45 +75,44 @@ static int xRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 	bool isNegative = (dx < 0);
 	int sign = (isNegative ? -1 : 1);
 
-	int x = isNegative ? (origin.x & (UINT_MAX - WALL_MASK)) : (origin.x | WALL_MASK);
-	int y = (((x - origin.x) * dy) / BLOCK(1)) + origin.y;
-	int z = (((x - origin.x) * dz) / BLOCK(1)) + origin.z;
+	auto pos = Vector3i::Zero;
+	pos.x = isNegative ? (origin.x & (UINT_MAX - WALL_MASK)) : (origin.x | WALL_MASK);
+	pos.y = (((pos.x - origin.x) * dy) / BLOCK(1)) + origin.y;
+	pos.z = (((pos.x - origin.x) * dz) / BLOCK(1)) + origin.z;
 
 	short roomNumber0 = origin.RoomNumber;
 	short roomNumber1 = origin.RoomNumber;
 
-	while (isNegative ? (x > target.x) : (x < target.x))
+	while (isNegative ? (pos.x > target.x) : (pos.x < target.x))
 	{
-		g_Renderer.AddDebugTarget(Vector3(x, y, z), Quaternion::Identity, 50, Color(1, 0, 1));
-		g_Renderer.AddDebugTarget(Vector3(x + sign, y, z), Quaternion::Identity, 50, Color(1, 1, 0));
+		g_Renderer.AddDebugTarget(pos.ToVector3(), Quaternion::Identity, 50, Color(1, 0, 1));
+		g_Renderer.AddDebugTarget(Vector3(pos.x + sign, pos.y, pos.z), Quaternion::Identity, 50, Color(1, 1, 0));
 
-		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
+		auto* sectorPtr = GetFloor(pos.x, pos.y, pos.z, &roomNumber0);
 		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
 
-		if (y > GetFloorHeight(sectorPtr, x, y, z) ||
-			y < GetCeiling(sectorPtr, x, y, z))
+		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z) ||
+			pos.y < GetCeiling(sectorPtr, pos.x, pos.y, pos.z))
 		{
 			flag = -1;
 			break;
 		}
 
-		sectorPtr = GetFloor(x + sign, y, z, &roomNumber0);
+		sectorPtr = GetFloor(pos.x + sign, pos.y, pos.z, &roomNumber0);
 		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
 
-		if (y > GetFloorHeight(sectorPtr, x + sign, y, z) ||
-			y < GetCeiling(sectorPtr, x + sign, y, z))
+		if (pos.y > GetFloorHeight(sectorPtr, pos.x + sign, pos.y, pos.z) ||
+			pos.y < GetCeiling(sectorPtr, pos.x + sign, pos.y, pos.z))
 		{
 			flag = 0;
 			break;
 		}
 
-		x += BLOCK(sign);
-		y += dy * sign;
-		z += dz * sign;
+		pos += Vector3i(BLOCK(1), dy, dz) * sign;
 	}
 
 	if (flag != 1)
-		target = GameVector(x, y, z, target.RoomNumber);
+		target = GameVector(pos, target.RoomNumber);
 
 	target.RoomNumber = (flag != 0) ? roomNumber0 : roomNumber1;
 	return flag;
@@ -140,45 +138,41 @@ static int zRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 	bool isNegative = (dz < 0);
 	int sign = (isNegative ? -1 : 1);
 
-	int z = isNegative ? (origin.z & (UINT_MAX - WALL_MASK)) : (origin.z | WALL_MASK);
-	int y = (((z - origin.z) * dy) / BLOCK(1)) + origin.y;
-	int x = (((z - origin.z) * dx) / BLOCK(1)) + origin.x;
+	auto pos = Vector3i::Zero;
+	pos.z = isNegative ? (origin.z & (UINT_MAX - WALL_MASK)) : (origin.z | WALL_MASK);
+	pos.y = (((pos.z - origin.z) * dy) / BLOCK(1)) + origin.y;
+	pos.x = (((pos.z - origin.z) * dx) / BLOCK(1)) + origin.x;
 
 	short roomNumber0 = origin.RoomNumber;
 	short roomNumber1 = origin.RoomNumber;
 
-	while (isNegative ? (z > target.z) : (z < target.z))
+	while (isNegative ? (pos.z > target.z) : (pos.z < target.z))
 	{
-		// Collect sector pointer.
-		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
-		sectorPtrs.push_back(sectorPtr);
+		auto* sectorPtr = GetFloor(pos.x, pos.y, pos.z, &roomNumber0);
 		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
 
-		if (y > GetFloorHeight(sectorPtr, x, y, z) ||
-			y < GetCeiling(sectorPtr, x, y, z))
+		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z) ||
+			pos.y < GetCeiling(sectorPtr, pos.x, pos.y, pos.z))
 		{
 			flag = -1;
 			break;
 		}
 
-		sectorPtr = GetFloor(x, y, z + sign, &roomNumber0);
-		sectorPtrs.push_back(sectorPtr);
+		sectorPtr = GetFloor(pos.x, pos.y, pos.z + sign, &roomNumber0);
 		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
 
-		if (y > GetFloorHeight(sectorPtr, x, y, z + sign) ||
-			y < GetCeiling(sectorPtr, x, y, z + sign))
+		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z + sign) ||
+			pos.y < GetCeiling(sectorPtr, pos.x, pos.y, pos.z + sign))
 		{
 			flag = 0;
 			break;
 		}
 
-		x += dx * sign;
-		y += dy * sign;
-		z += BLOCK(sign);
+		pos += Vector3i(dx, dy, BLOCK(1)) * sign;
 	}
 
 	if (flag != 1)
-		target = GameVector(x, y, z, target.RoomNumber);
+		target = GameVector(pos, target.RoomNumber);
 
 	target.RoomNumber = (flag != 0) ? roomNumber0 : roomNumber1;
 	return flag;
