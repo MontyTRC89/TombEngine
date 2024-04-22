@@ -85,6 +85,9 @@ static int xRoomLos(const GameVector& origin, GameVector& target, std::vector<co
 
 	while (isNegative ? (x > target.x) : (x < target.x))
 	{
+		g_Renderer.AddDebugTarget(Vector3(x, y, z), Quaternion::Identity, 50, Color(1, 0, 1));
+		g_Renderer.AddDebugTarget(Vector3(x + sign, y, z), Quaternion::Identity, 50, Color(1, 1, 0));
+
 		auto* sectorPtr = GetFloor(x, y, z, &roomNumber0);
 		CollectRoomLosData(*sectorPtr, sectorPtrs, roomNumber0, roomNumber1, roomNumbers);
 
