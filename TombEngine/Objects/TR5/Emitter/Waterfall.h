@@ -58,6 +58,6 @@ extern std::vector<WaterfallParticle> WaterfallParticles;
 WaterfallParticle GetFreeWaterfallParticle();
 
 	void InitializeWaterfall(short itemNumber);
-	void TriggerWaterfallEmitterMist(const Vector3& pos, short room);
+	void TriggerWaterfallEmitterMist(const Vector3& pos, short room, short scalar, short size);
 	void WaterfallControl(short itemNumber);
 

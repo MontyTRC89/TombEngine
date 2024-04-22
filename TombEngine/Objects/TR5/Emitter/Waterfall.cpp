@@ -36,6 +36,7 @@ std::vector<WaterfallParticle> WaterfallParticles = {};
 
 		int size = 2;
 		int width = 1;
+		int waterHeight = 0;
 		short angle = item.Pose.Orientation.y;
 
 		if (item.TriggerFlags != 0)
@@ -84,7 +85,7 @@ std::vector<WaterfallParticle> WaterfallParticles = {};
 				for (int sign = -1; sign <= 1; sign += 2)
 				{
 					//if (Wibble & 7)
-					if (Random::GenerateInt(0, 100) > std::clamp((width / 100) * 3, 20,85)) //(width/100)*3)
+					if (Random::GenerateInt(0, 100) > std::clamp((width / 100) * 3, 20, 85)) //(width/100)*3)
 					{
 
 						auto* spark = GetFreeParticle();
@@ -110,12 +111,21 @@ std::vector<WaterfallParticle> WaterfallParticles = {};
 						auto origin2 = Geometry::TranslatePoint(Vector3(spark->x, spark->y, spark->z), orient2, BLOCK(0.3));
 
 						auto pointColl = GetCollision(origin2, origin.RoomNumber, dir, BLOCK(8));
+				
 
 						int relFloorHeight = pointColl.Position.Floor - spark->y;
-
-						//g_Renderer.AddDebugLine(origin2, origin2 + Vector3(0, relFloorHeight, 0), Vector4(1, 0, 0, 1));
-
+				
 						spark->targetPos = GameVector(origin2.x, origin2.y + relFloorHeight, origin2.z, pointColl.RoomNumber);
+
+						if (TestEnvironment(ENV_FLAG_WATER, spark->targetPos.ToVector3i(), spark->roomNumber) ||
+							TestEnvironment(ENV_FLAG_SWAMP, spark->targetPos.ToVector3i(), spark->roomNumber))
+						{
+							 waterHeight = GetWaterDepth(spark->targetPos.x, spark->targetPos.y, spark->targetPos.z, item.RoomNumber);
+						}
+						
+						spark->targetPos.y -= waterHeight;
+
+						//g_Renderer.AddDebugLine(origin2, spark->targetPos.ToVector3(), Vector4(1, 0, 0, 1));
 
 						char colorOffset = (Random::GenerateInt(-8, 8));
 						spark->sR = std::clamp(int(startColor.x) + colorOffset, 0, UCHAR_MAX);
@@ -127,7 +137,7 @@ std::vector<WaterfallParticle> WaterfallParticles = {};
 						spark->roomNumber = pointColl.RoomNumber;
 						spark->colFadeSpeed = 2;
 						spark->blendMode = BlendMode::Additive;
-
+						spark->roomNumber = pointColl.RoomNumber;
 						spark->gravity = (relFloorHeight / 2) / FPS; // Adjust gravity based on relative floor height
 						spark->life = spark->sLife = WATERFALL_MAX_LIFE;
 						spark->fxObj = ID_WATERFALL_EMITTER;
@@ -141,7 +151,7 @@ std::vector<WaterfallParticle> WaterfallParticles = {};
 						spark->sSize = spark->size = Random::GenerateInt(3, 10) * scale + size * 2;//-5,5
 						spark->dSize = (1 * spark->size);
 
-						spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 70 ? 34 : 0);
+						spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? 34 : 0);
 						spark->flags = SP_SCALE | SP_DEF | SP_ROTATE;
 					}
 
@@ -156,12 +166,9 @@ std::vector<WaterfallParticle> WaterfallParticles = {};
 		}
 	}
 
-	void TriggerWaterfallEmitterMist(const Vector3& pos, short room)
+	void TriggerWaterfallEmitterMist(const Vector3& pos, short room, short scalar, short size)
 	{
-		static const int scale = Random::GenerateInt(5, 7);
-
-		int size = 5;
-
+		static const int scale =  Random::GenerateInt(3, 7);
 		short angle = pos.y ;
 
 
@@ -199,7 +206,7 @@ std::vector<WaterfallParticle> WaterfallParticles = {};
 
 		spark->colFadeSpeed = 1;
 		spark->blendMode = BlendMode::Additive;
-		spark->life =  spark->sLife = Random::GenerateInt(8, 12);
+		spark->life = spark->sLife = 8;
 		spark->fadeToBlack = spark->life ;
 
 		spark->x = cos * Random::GenerateInt(-12, 12) + pos.x;
@@ -207,19 +214,24 @@ std::vector<WaterfallParticle> WaterfallParticles = {};
 		spark->z = sin*  Random::GenerateInt(-12, 12) + pos.z;
 
 		spark->xVel = 0;
-		spark->yVel = -Random::GenerateInt(-64, 64);
+		spark->yVel = -Random::GenerateInt(63, 64);
 		spark->zVel = 0;
 
-		spark->friction = 0;
+		spark->friction = 3;
 		spark->rotAng = GetRandomControl() & 0xFFF;
-		spark->scalar = scale;
-		spark->maxYvel = 0;
+		spark->scalar = scalar;
+		
 		spark->rotAdd = Random::GenerateInt(-16, 16);
-		spark->gravity = spark->yVel;
-		spark->sSize = spark->size = Random::GenerateInt(2, 5) * scale + size;
-		spark->dSize = 2 * spark->size;
+		spark->gravity = spark->maxYvel = -64;
 
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 70 ? 34 : 0);
-		spark->flags = 538;
+		float size1 = (GetRandomControl() & 3) + (size * 2) + 4;
+		spark->size =  spark->sSize = size1  /  2 ;
+		spark->dSize = size1;
+
+		spark->extras = 0;
+		spark->dynamic = -3;
+
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? 34 : 35);
+		spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 		
 	}
