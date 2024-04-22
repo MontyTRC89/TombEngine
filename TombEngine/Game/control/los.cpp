@@ -375,12 +375,12 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, c
 			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[1], 20), Color(1, 1, 1));
 			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[2], 20), Color(1, 1, 1));
 
-			float dist = 0.0f;
+			/*float dist = 0.0f;
 			if (tri.Intersects(ray, dist) && dist < closestDist)
 			{
 				isClipped = true;
 				closestDist = dist;
-			}
+			}*/
 		}
 
 		// Clipped bridge; break early.
@@ -395,7 +395,7 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, c
 	auto* sectorPtr = GetFloor(target.x, target.y, target.z, &target.RoomNumber);
 
 	// 2) Clip floor.
-	/*if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
+	if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
 	{
 		// Collide floor collision mesh.
 		auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, true);
@@ -412,7 +412,7 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, c
 				closestDist = dist;
 			}
 		}
-	}*/
+	}
 
 	// 3) Clip ceiling.
 	if (target.y < GetCeiling(sectorPtr, target.x, target.y, target.z))
@@ -465,10 +465,10 @@ bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<in
 
 	GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 
+	//temp
 	auto sectorPtrs = std::vector<const FloorInfo*>{};
 	sectorPtrs.insert(sectorPtrs.end(), sectorClip0.SectorPtrs.begin(), sectorClip0.SectorPtrs.end());
 	sectorPtrs.insert(sectorPtrs.end(), sectorClip1.SectorPtrs.begin(), sectorClip1.SectorPtrs.end());
-
 	auto posList = std::vector<Vector3i>{};
 	posList.insert(posList.end(), sectorClip0.Positions.begin(), sectorClip0.Positions.end());
 	posList.insert(posList.end(), sectorClip1.Positions.begin(), sectorClip1.Positions.end());
