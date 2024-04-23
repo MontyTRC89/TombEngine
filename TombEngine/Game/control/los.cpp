@@ -145,8 +145,8 @@ static SectorTraceData GetSingleAxisSectorTrace(const GameVector& origin, GameVe
 		roomNumber = prevRoomNumber;
 
 		// Test for out-of-bounds sector edge obstruction.
-		if (pos.y > GetFloorHeight(sectorPtr, boundPos.x, boundPos.y, boundPos.z) ||
-			pos.y < GetCeiling(sectorPtr, boundPos.x, boundPos.y, boundPos.z))
+		if (boundPos.y > GetFloorHeight(sectorPtr, boundPos.x, boundPos.y, boundPos.z) ||
+			boundPos.y < GetCeiling(sectorPtr, boundPos.x, boundPos.y, boundPos.z))
 		{
 			trace.Type = SectorClipType::OutOfBounds;
 			break;

@@ -20,12 +20,9 @@ namespace TEN::Collision::Los
 	{
 		bool IsIntersected = false;
 
-		std::pair<Vector3, int> Intersect	= {};
-		std::vector<const FloorInfo*> SectorPtrs = {};
-		std::set<int>			RoomNumbers = {};
-
-		// temp
-		std::vector<Vector3i> Positions = {};
+		std::pair<Vector3, int>		  Intersect	  = {};
+		std::set<int>				  RoomNumbers = {};
+		std::vector<const FloorInfo*> SectorPtrs  = {};
 	};
 
 	static std::vector<ItemInfo*> GetNearbyMoveablePtrs(const std::set<int>& roomNumbers)
@@ -180,6 +177,19 @@ namespace TEN::Collision::Los
 		return losInstances;
 	}
 
+	static int GetSurfaceTriangleHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
+	{
+		// Get triangle.
+		const auto& tri = isFloor ? sector.FloorSurface.Triangles[triID] : sector.CeilingSurface.Triangles[triID];
+
+		// Calculate relative plane height at intersection using plane equation.
+		auto normal = tri.Plane.Normal();
+		float relPlaneHeight = -((normal.x * relX) + (normal.z * relZ)) / normal.y;
+
+		// Return sector floor or ceiling height.
+		return (tri.Plane.D() + relPlaneHeight);
+	}
+
 	static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos, const FloorInfo& sector, bool isFloor)
 	{
 		auto base = Vector3(FloorToStep(pos.x, BLOCK(1)), 0.0f, FloorToStep(pos.z, BLOCK(1)));
@@ -293,39 +303,50 @@ namespace TEN::Collision::Los
 	}
 
 	static std::vector<TriangleMesh> GenerateBridgeTriangleMeshes(const BoundingOrientedBox& box, const Vector3& offset)
-{
-	// Get box corners.
-	auto corners = std::array<Vector3, 8>{};
-	box.GetCorners(corners.data());
-
-	// Offset key corners.
-	corners[1] += offset;
-	corners[3] -= offset;
-	corners[5] += offset;
-	corners[7] -= offset;
-
-	// Calculate and return collision mesh.
-	return std::vector<TriangleMesh>
 	{
-		TriangleMesh(corners[0], corners[1], corners[4]),
-		TriangleMesh(corners[1], corners[4], corners[5]),
-		TriangleMesh(corners[2], corners[3], corners[6]),
-		TriangleMesh(corners[3], corners[6], corners[7]),
-		TriangleMesh(corners[0], corners[1], corners[2]),
-		TriangleMesh(corners[0], corners[2], corners[3]),
-		TriangleMesh(corners[0], corners[3], corners[4]),
-		TriangleMesh(corners[3], corners[4], corners[7]),
-		TriangleMesh(corners[1], corners[2], corners[5]),
-		TriangleMesh(corners[2], corners[5], corners[6]),
-		TriangleMesh(corners[4], corners[5], corners[6]),
-		TriangleMesh(corners[4], corners[6], corners[7])
-	};
-}
+		// Get box corners.
+		auto corners = std::array<Vector3, 8>{};
+		box.GetCorners(corners.data());
+
+		// Offset key corners.
+		corners[1] += offset;
+		corners[3] -= offset;
+		corners[5] += offset;
+		corners[7] -= offset;
+
+		// Calculate and return collision mesh.
+		return std::vector<TriangleMesh>
+		{
+			TriangleMesh(corners[0], corners[1], corners[4]),
+			TriangleMesh(corners[1], corners[4], corners[5]),
+			TriangleMesh(corners[2], corners[3], corners[6]),
+			TriangleMesh(corners[3], corners[6], corners[7]),
+			TriangleMesh(corners[0], corners[1], corners[2]),
+			TriangleMesh(corners[0], corners[2], corners[3]),
+			TriangleMesh(corners[0], corners[3], corners[4]),
+			TriangleMesh(corners[3], corners[4], corners[7]),
+			TriangleMesh(corners[1], corners[2], corners[5]),
+			TriangleMesh(corners[2], corners[5], corners[6]),
+			TriangleMesh(corners[4], corners[5], corners[6]),
+			TriangleMesh(corners[4], corners[6], corners[7])
+		};
+	}
+
+	static std::vector<Vector3i> GetSectorTraceIntercepts(const Ray& ray, float distMax)
+	{
+		auto intercepts = std::vector<Vector3i>{};
+
+		// TODO: Implement some algorithm or whatever.
+
+		return intercepts;
+	}
 
 	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray)
 	{
+		float intersectClosestDist = INFINITY;
+		int intersectRoomNumber = trace.Intersect.second;
+
 		// Run through sectors sorted by distance.
-		float closestDist = INFINITY;
 		for (const auto* sectorPtr : trace.SectorPtrs)
 		{
 			// 1) Clip bridge.
@@ -370,10 +391,10 @@ namespace TEN::Collision::Los
 				for (const auto& tri : tris)
 				{
 					float dist = 0.0f;
-					if (tri.Intersects(ray, dist) && dist < closestDist)
+					if (tri.Intersects(ray, dist) && dist < intersectClosestDist)
 					{
-						closestDist = dist;
-						trace.Intersect.second = sectorPtr->RoomNumber;
+						intersectClosestDist = dist;
+						intersectRoomNumber = sectorPtr->RoomNumber;
 					}
 				}
 			}
@@ -382,41 +403,82 @@ namespace TEN::Collision::Los
 			/*auto floorTris = GenerateSectorTriangleMeshes(posList[i].ToVector3(), *sectorPtr, true);
 			for (const auto& tri : floorTris)
 			{
-			float dist = 0.0f;
-			if (tri.Intersects(ray, dist) && dist < closestDist)
-			closestDist = dist;
+				float dist = 0.0f;
+				if (tri.Intersects(ray, dist) && dist < closestDist)
+				{	
+					closestDist = dist;
+					roomNumber = sectorPtr->RoomNumber;
+				}
 			}
 
 			// 3) Clip ceiling.
 			auto ceilTris = GenerateSectorTriangleMeshes(posList[i].ToVector3(), *sectorPtr, false);
 			for (const auto& tri : ceilTris)
 			{
-			float dist = 0.0f;
-			if (tri.Intersects(ray, dist) && dist < closestDist)
-			closestDist = dist;
+				float dist = 0.0f;
+				if (tri.Intersects(ray, dist) && dist < closestDist)
+				{	
+					closestDist = dist;
+					roomNumber = sectorPtr->RoomNumber;
+				}
 			}*/
 		}
 
 		// Clip trace intersection (if applicable).
-		if (closestDist != INFINITY)
-			trace.Intersect = std::pair(Geometry::TranslatePoint(ray.position, ray.direction, closestDist), trace.Intersect.second);
+		if (intersectClosestDist != INFINITY)
+		{
+			auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, intersectClosestDist);
+			trace.Intersect = std::pair(intersectPos, intersectRoomNumber);
+		}
 	}
 
-	static std::vector<Vector3i> GetSectorTracePositions()
-	{
-		return {};
-	}
-
-	static SectorTraceData GetSectorTrace(const Vector3& origin, const Vector3& target)
+	static SectorTraceData GetSectorTrace(const Vector3& origin, int originRoomNumber, const Vector3& target)
 	{
 		auto trace = SectorTraceData{};
-
-		// TODO
 
 		// Create ray.
 		auto dir = target - origin;
 		dir.Normalize();
 		auto ray = Ray(origin, dir);
+
+		// Establish base data.
+		FloorInfo* sectorPtr = nullptr;
+		FloorInfo* prevSectorPtr = nullptr;
+		short roomNumber = originRoomNumber;
+		short prevRoomNumber = originRoomNumber;
+
+		auto sectorPtrs = std::vector<const FloorInfo*>{};
+		auto posList = std::vector<Vector3i>{};
+
+		// Run through sector trace intercepts.
+		auto intercepts = GetSectorTraceIntercepts(ray, Vector3::Distance(origin, target));
+		for (const auto& intercept : intercepts)
+		{
+			sectorPtr = GetFloor(intercept.x, intercept.y, intercept.z, &prevRoomNumber);
+
+			// TODO: Duplicates.
+			// Collect sector.
+			if (sectorPtr != prevSectorPtr)
+			{
+				posList.push_back(intercept);
+				sectorPtrs.push_back(sectorPtr);
+			}
+			prevSectorPtr = sectorPtr;
+
+			// Collect room number.
+			if (roomNumber != prevRoomNumber)
+				trace.RoomNumbers.insert(prevRoomNumber);
+			roomNumber = prevRoomNumber;
+
+			// Test for obstruction.
+			if (intercept.y > GetFloorHeight(sectorPtr, intercept.x, intercept.y, intercept.z) ||
+				intercept.y < GetCeiling(sectorPtr, intercept.x, intercept.y, intercept.z))
+			{
+				trace.IsIntersected = true;
+				trace.Intersect = std::pair(intercept.ToVector3(), roomNumber);
+				break;
+			}
+		}
 
 		// Clip and return trace.
 		ClipSectorTrace(trace, ray);
@@ -427,7 +489,7 @@ namespace TEN::Collision::Los
 	{
 		auto roomLos = RoomLosData{};
 
-		auto trace = GetSectorTrace(origin, target);
+		auto trace = GetSectorTrace(origin, originRoomNumber, target);
 		if (trace.IsIntersected)
 			roomLos.Intersect = trace.Intersect;
 
