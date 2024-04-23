@@ -634,12 +634,6 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	if (isTitle)
 		ActionMap = actionMap;
 
-	if (g_Gui.GetInventoryItemChosen() != NO_VALUE)
-	{
-		g_Gui.SetInventoryItemChosen(NO_VALUE);
-		SayNo();
-	}
-
 	// Update player animations.
 	g_Renderer.UpdateLaraAnimations(true);
 
