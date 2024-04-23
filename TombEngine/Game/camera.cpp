@@ -160,7 +160,7 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 	float dist = Vector3::Distance(origin, target);
 
 	// Run through LOS instances.
-	auto losInstances = GetLosInstances(origin, originRoomNumber, dir, dist, true, true, false);
+	auto losInstances = GetLosInstances(origin, originRoomNumber, dir, dist, true, false, true);
 	for (const auto& losInstance : losInstances)
 	{
 		// Test object collidability (if applicable).

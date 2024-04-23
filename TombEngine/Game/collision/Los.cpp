@@ -79,7 +79,7 @@ namespace TEN::Collision::Los
 	}
 
 	std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRoomNumber, const Vector3& dir, float dist,
-												 bool collideMoveables, bool collideStatics, bool collideSpheres)
+												 bool collideMoveables, bool collideSpheres, bool collideStatics)
 	{
 		auto losInstances = std::vector<LosInstanceData>{};
 
@@ -322,17 +322,8 @@ namespace TEN::Collision::Los
 	};
 }
 
-	static SectorTraceData GetSectorTrace(const Vector3& origin, const Vector3& target)
+	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray)
 	{
-		auto trace = SectorTraceData{};
-
-		// TODO
-
-		// Create ray.
-		auto dir = target - origin;
-		dir.Normalize();
-		auto ray = Ray(origin, dir);
-
 		// Run through sectors sorted by distance.
 		float closestDist = INFINITY;
 		for (const auto* sectorPtr : trace.SectorPtrs)
@@ -409,7 +400,26 @@ namespace TEN::Collision::Los
 		// Clip trace intersection (if applicable).
 		if (closestDist != INFINITY)
 			trace.Intersect = std::pair(Geometry::TranslatePoint(ray.position, ray.direction, closestDist), trace.Intersect.second);
+	}
 
+	static std::vector<Vector3i> GetSectorTracePositions()
+	{
+		return {};
+	}
+
+	static SectorTraceData GetSectorTrace(const Vector3& origin, const Vector3& target)
+	{
+		auto trace = SectorTraceData{};
+
+		// TODO
+
+		// Create ray.
+		auto dir = target - origin;
+		dir.Normalize();
+		auto ray = Ray(origin, dir);
+
+		// Clip and return trace.
+		ClipSectorTrace(trace, ray);
 		return trace;
 	}
 
@@ -480,7 +490,7 @@ namespace TEN::Collision::Los
 
 	std::optional<MoveableLosData> GetMoveableSphereLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer)
 	{
-		auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false, false, true);
+		auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false, true, false);
 		for (auto& losInstance : losInstances)
 		{
 			// 1) Check for sphere LOS.
@@ -509,7 +519,7 @@ namespace TEN::Collision::Los
 
 	std::optional<StaticLosData> GetStaticLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
 	{
-		auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false, true, false);
+		auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false, false, true);
 		for (auto& losInstance : losInstances)
 		{
 			// 1) FAILSAFE: Ignore sphere LOS.

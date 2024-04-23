@@ -39,7 +39,7 @@ namespace TEN::Collision::Los
 	};
 
 	std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRoomNumber, const Vector3& dir, float dist,
-												 bool collideMoveables = true, bool collideStatics = true, bool collideSpheres = false);
+												 bool collideMoveables, bool collideSpheres, bool collideStatics);
 
 	RoomLosData					   GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target);
 	std::optional<MoveableLosData> GetMoveableLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer = true);
