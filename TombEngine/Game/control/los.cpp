@@ -30,7 +30,7 @@ enum class SectorClipType
 	OutOfBounds
 };
 
-struct SectorClipData
+struct SectorTraceData
 {
 	SectorClipType Type = SectorClipType::Unobstructed;
 
@@ -47,17 +47,17 @@ int ClosestItem;
 int ClosestDist;
 Vector3i ClosestCoord;
 
-static SectorClipData GetSingleAxisSectorClip(const GameVector& origin, GameVector& target, bool xFirst)
+static SectorTraceData GetSingleAxisSectorTrace(const GameVector& origin, GameVector& target, bool isX)
 {
-	auto sectorClip = SectorClipData{};
+	auto trace = SectorTraceData{};
 
 	// Calculate step.
 	auto step = Vector3i::Zero;
-	if (xFirst)
+	if (isX)
 	{
 		step.x = target.x - origin.x;
 		if (step.x == 0)
-			return sectorClip;
+			return trace;
 
 		step.y = BLOCK(target.y - origin.y) / step.x;
 		step.z = BLOCK(target.z - origin.z) / step.x;
@@ -66,21 +66,21 @@ static SectorClipData GetSingleAxisSectorClip(const GameVector& origin, GameVect
 	{
 		step.z = target.z - origin.z;
 		if (step.z == 0)
-			return sectorClip;
+			return trace;
 
 		step.x = BLOCK(target.x - origin.x) / step.z;
 		step.y = BLOCK(target.y - origin.y) / step.z;
 	}
 
 	// Collect room number.
-	sectorClip.RoomNumbers.push_back(origin.RoomNumber);
+	trace.RoomNumbers.push_back(origin.RoomNumber);
 
-	bool isNegative = xFirst ? (step.x < 0) : (step.z < 0);
+	bool isNegative = isX ? (step.x < 0) : (step.z < 0);
 	int sign = isNegative ? -1 : 1;
 
 	// Calculate initial position.
 	auto pos = Vector3i::Zero;
-	if (xFirst)
+	if (isX)
 	{
 		pos.x = isNegative ? (origin.x & (UINT_MAX - WALL_MASK)) : (origin.x | WALL_MASK);
 		pos.y = (((pos.x - origin.x) * step.y) / BLOCK(1)) + origin.y;
@@ -98,66 +98,66 @@ static SectorClipData GetSingleAxisSectorClip(const GameVector& origin, GameVect
 	short roomNumber = origin.RoomNumber;
 	short prevRoomNumber = origin.RoomNumber;
 
-	while (xFirst ? (isNegative ? (pos.x > target.x) : (pos.x < target.x)) : (isNegative ? (pos.z > target.z) : (pos.z < target.z)))
+	while (isX ? (isNegative ? (pos.x > target.x) : (pos.x < target.x)) : (isNegative ? (pos.z > target.z) : (pos.z < target.z)))
 	{
 		g_Renderer.AddDebugTarget(pos.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
-		g_Renderer.AddDebugTarget(Vector3(pos.x + (xFirst ? sign : 0), pos.y, pos.z + (xFirst ? 0 : sign)), Quaternion::Identity, 50, Color(0, 1, 0));
+		g_Renderer.AddDebugTarget(Vector3(pos.x + (isX ? sign : 0), pos.y, pos.z + (isX ? 0 : sign)), Quaternion::Identity, 50, Color(0, 1, 0));
 		
 		sectorPtr = GetFloor(pos.x, pos.y, pos.z, &prevRoomNumber);
 
 		// Collect sector.
 		if (sectorPtr != prevSectorPtr)
 		{
-			sectorClip.Positions.push_back(pos);
-			sectorClip.SectorPtrs.push_back(sectorPtr);
+			trace.Positions.push_back(pos);
+			trace.SectorPtrs.push_back(sectorPtr);
 		}
 		prevSectorPtr = sectorPtr;
 
 		// Collect room number.
 		if (roomNumber != prevRoomNumber)
-			sectorClip.RoomNumbers.push_back(prevRoomNumber);
+			trace.RoomNumbers.push_back(prevRoomNumber);
 		roomNumber = prevRoomNumber;
 
 		// Test for sector edge obstruction.
 		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z) ||
 			pos.y < GetCeiling(sectorPtr, pos.x, pos.y, pos.z))
 		{
-			sectorClip.Type = SectorClipType::Obstructed;
+			trace.Type = SectorClipType::Obstructed;
 			break;
 		}
 
-		auto boundPos = pos + Vector3i(xFirst ? sign : 0, 0, !xFirst ? sign : 0);
+		auto boundPos = pos + Vector3i(isX ? sign : 0, 0, !isX ? sign : 0);
 		sectorPtr = GetFloor(boundPos.x, boundPos.y, boundPos.z, &prevRoomNumber);
 
 		// Collect sector.
 		if (sectorPtr != prevSectorPtr)
 		{
-			sectorClip.Positions.push_back(boundPos);
-			sectorClip.SectorPtrs.push_back(sectorPtr);
+			trace.Positions.push_back(boundPos);
+			trace.SectorPtrs.push_back(sectorPtr);
 		}
 		prevSectorPtr = sectorPtr;
 
 		// Collect room number.
 		if (roomNumber != prevRoomNumber)
-			sectorClip.RoomNumbers.push_back(prevRoomNumber);
+			trace.RoomNumbers.push_back(prevRoomNumber);
 		roomNumber = prevRoomNumber;
 
 		// Test for out-of-bounds sector edge obstruction.
 		if (pos.y > GetFloorHeight(sectorPtr, boundPos.x, boundPos.y, boundPos.z) ||
 			pos.y < GetCeiling(sectorPtr, boundPos.x, boundPos.y, boundPos.z))
 		{
-			sectorClip.Type = SectorClipType::OutOfBounds;
+			trace.Type = SectorClipType::OutOfBounds;
 			break;
 		}
 
-		pos += Vector3i(xFirst ? BLOCK(1) : step.x, step.y, !xFirst ? BLOCK(1) : step.z) * sign;
+		pos += Vector3i(isX ? BLOCK(1) : step.x, step.y, !isX ? BLOCK(1) : step.z) * sign;
 	}
 
-	if (sectorClip.Type != SectorClipType::Unobstructed)
+	if (trace.Type != SectorClipType::Unobstructed)
 		target = GameVector(pos, target.RoomNumber);
 
-	target.RoomNumber = (sectorClip.Type != SectorClipType::OutOfBounds) ? prevRoomNumber : roomNumber;
-	return sectorClip;
+	target.RoomNumber = (trace.Type != SectorClipType::OutOfBounds) ? prevRoomNumber : roomNumber;
+	return trace;
 }
 
 static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos, const FloorInfo& sector, bool isFloor)
@@ -272,7 +272,7 @@ static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos
 	return tris;
 }
 
-static std::vector<TriangleMesh> GenerateTiltBridgeTriangleMeshes(const BoundingOrientedBox& box, const Vector3& offset)
+static std::vector<TriangleMesh> GenerateBridgeTriangleMeshes(const BoundingOrientedBox& box, const Vector3& offset)
 {
 	// Get box corners.
 	auto corners = std::array<Vector3, 8>{};
@@ -353,7 +353,7 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, c
 
 			// Collide bridge mesh.
 			auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
-			auto tris = GenerateTiltBridgeTriangleMeshes(box, offset);
+			auto tris = GenerateBridgeTriangleMeshes(box, offset);
 			for (const auto& tri : tris)
 			{
 				float dist = 0.0f;
@@ -431,21 +431,52 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, c
 	return !isClipped;
 }
 
+static void ClipSectorTrace(SectorTraceData& trace)
+{
+	// TODO. Maybe can be inside GetSectorTrace() if the function doesn't get too long.
+}
+
+static std::optional<SectorTraceData> GetSectorTrace(const GameVector& origin, const GameVector& target)
+{
+	auto trace = SectorTraceData{};
+
+	// TODO
+
+	// Clip and return trace.
+	ClipSectorTrace(trace);
+	return trace;
+}
+
+// TODO: This will be GetRoomLos() in the new Los.cpp.
+bool NewLos(const GameVector* origin, GameVector* target)
+{
+	auto trace = GetSectorTrace(*origin, *target);
+	if (trace.has_value())
+	{
+		*target = trace->Intersect;
+
+		// HACK: Transplant LOS room data to legacy globals.
+		LosRoomCount = std::min((int)trace->RoomNumbers.size(), 20);
+		for (int i = 0; i < LosRoomCount; i++)
+			LosRoomNumbers[i] = trace->RoomNumbers[i];
+	}
+
+	return !trace.has_value();
+}
+
 // NOTE: Room LOS.
 bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<int>*> roomNumbers)
 {
 	target->RoomNumber = origin->RoomNumber;
 
 	bool xFirst = (abs(target->z - origin->z) > abs(target->x - origin->x));
-
-	auto sectorClip0 = GetSingleAxisSectorClip(*origin, *target, xFirst);
-	auto sectorClip1 = GetSingleAxisSectorClip(*origin, *target, !xFirst);
-
-	auto roomNumbers2 = std::vector<int>{};
-	roomNumbers2.insert(roomNumbers2.end(), sectorClip0.RoomNumbers.begin(), sectorClip0.RoomNumbers.end());
-	roomNumbers2.insert(roomNumbers2.end(), sectorClip1.RoomNumbers.begin(), sectorClip1.RoomNumbers.end());
+	auto sectorTrace0 = GetSingleAxisSectorTrace(*origin, *target, xFirst);
+	auto sectorTrace1 = GetSingleAxisSectorTrace(*origin, *target, !xFirst);
 
 	// HACK: Transplant room numbers to legacy globals.
+	auto roomNumbers2 = std::vector<int>{};
+	roomNumbers2.insert(roomNumbers2.end(), sectorTrace0.RoomNumbers.begin(), sectorTrace0.RoomNumbers.end());
+	roomNumbers2.insert(roomNumbers2.end(), sectorTrace1.RoomNumbers.begin(), sectorTrace1.RoomNumbers.end());
 	LosRoomCount = 0;
 	int i = 0;
 	for (int roomNumber : roomNumbers2)
@@ -462,14 +493,14 @@ bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<in
 
 	//temp
 	auto sectorPtrs = std::vector<const FloorInfo*>{};
-	sectorPtrs.insert(sectorPtrs.end(), sectorClip0.SectorPtrs.begin(), sectorClip0.SectorPtrs.end());
-	sectorPtrs.insert(sectorPtrs.end(), sectorClip1.SectorPtrs.begin(), sectorClip1.SectorPtrs.end());
+	sectorPtrs.insert(sectorPtrs.end(), sectorTrace0.SectorPtrs.begin(), sectorTrace0.SectorPtrs.end());
+	sectorPtrs.insert(sectorPtrs.end(), sectorTrace1.SectorPtrs.begin(), sectorTrace1.SectorPtrs.end());
 	auto posList = std::vector<Vector3i>{};
-	posList.insert(posList.end(), sectorClip0.Positions.begin(), sectorClip0.Positions.end());
-	posList.insert(posList.end(), sectorClip1.Positions.begin(), sectorClip1.Positions.end());
+	posList.insert(posList.end(), sectorTrace0.Positions.begin(), sectorTrace0.Positions.end());
+	posList.insert(posList.end(), sectorTrace1.Positions.begin(), sectorTrace1.Positions.end());
 
 	if (ClipRoomLosIntersect(*origin, *target, sectorPtrs, posList) &&
-		sectorClip0.Type == SectorClipType::Unobstructed && sectorClip1.Type == SectorClipType::Unobstructed)
+		sectorTrace0.Type == SectorClipType::Unobstructed && sectorTrace1.Type == SectorClipType::Unobstructed)
 	{
 		return true;
 	}
@@ -477,7 +508,7 @@ bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<in
 	return false;
 }
 
-// Deprecated. Legacy version was coarse, new version simply wraps more accurate LOS().
+// Deprecated.
 bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 {
 	if (!LOS(origin, target))

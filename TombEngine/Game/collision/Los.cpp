@@ -169,7 +169,8 @@ namespace TEN::Collision::Los
 		return losInstances;
 	}
 
-	// TODO: Accurate room LOS. For now, simply wraps legacy functions.
+	// TODO: Static functions for room LOS here.
+
 	RoomLosData GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
 	{
 		auto losOrigin = GameVector(origin, originRoomNumber);
