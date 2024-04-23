@@ -179,19 +179,20 @@ namespace TEN::Collision::Los
 
 	static int GetSurfaceTriangleHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
 	{
-		// Get triangle.
 		const auto& tri = isFloor ? sector.FloorSurface.Triangles[triID] : sector.CeilingSurface.Triangles[triID];
 
-		// Calculate relative plane height at intersection using plane equation.
 		auto normal = tri.Plane.Normal();
 		float relPlaneHeight = -((normal.x * relX) + (normal.z * relZ)) / normal.y;
-
-		// Return sector floor or ceiling height.
 		return (tri.Plane.D() + relPlaneHeight);
 	}
 
 	static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos, const FloorInfo& sector, bool isFloor)
 	{
+		constexpr auto CORNER_0 = Vector3(0.0f, 0.0f, 0.0f);
+		constexpr auto CORNER_1 = Vector3(0.0f, 0.0f, BLOCK(1));
+		constexpr auto CORNER_2 = Vector3(BLOCK(1), 0.0f, BLOCK(1));
+		constexpr auto CORNER_3 = Vector3(BLOCK(1), 0.0f, 0.0f);
+
 		auto base = Vector3(FloorToStep(pos.x, BLOCK(1)), 0.0f, FloorToStep(pos.z, BLOCK(1)));
 		auto corner0 = base;
 		auto corner1 = base + Vector3(0.0f, 0.0f, BLOCK(1));
