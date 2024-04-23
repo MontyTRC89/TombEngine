@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Los.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/debris.h"
 #include "Game/items.h"
@@ -19,6 +20,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Collision::Los;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
@@ -431,37 +433,22 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, c
 	return !isClipped;
 }
 
-static void ClipSectorTrace(SectorTraceData& trace)
+// TODO: Will replace function below.
+bool nLOS(const GameVector* origin, GameVector* target)
 {
-	// TODO. Maybe can be inside GetSectorTrace() if the function doesn't get too long.
-}
+	auto roomLos = GetRoomLos(origin->ToVector3(), origin->RoomNumber, target->ToVector3());
+	if (roomLos.Intersect.has_value())
+		*target = GameVector(roomLos.Intersect->first, roomLos.Intersect->second);
 
-static std::optional<SectorTraceData> GetSectorTrace(const GameVector& origin, const GameVector& target)
-{
-	auto trace = SectorTraceData{};
+	auto roomNumbers = std::vector<int>{};
+	roomNumbers.insert(roomNumbers.end(), roomLos.RoomNumbers.begin(), roomLos.RoomNumbers.end());
 
-	// TODO
+	// HACK: Transplant LOS room data to legacy globals.
+	LosRoomCount = std::min((int)roomNumbers.size(), 20);
+	for (int i = 0; i < LosRoomCount; i++)
+		LosRoomNumbers[i] = roomNumbers[i];
 
-	// Clip and return trace.
-	ClipSectorTrace(trace);
-	return trace;
-}
-
-// TODO: This will be GetRoomLos() in the new Los.cpp.
-bool NewLos(const GameVector* origin, GameVector* target)
-{
-	auto trace = GetSectorTrace(*origin, *target);
-	if (trace.has_value())
-	{
-		*target = trace->Intersect;
-
-		// HACK: Transplant LOS room data to legacy globals.
-		LosRoomCount = std::min((int)trace->RoomNumbers.size(), 20);
-		for (int i = 0; i < LosRoomCount; i++)
-			LosRoomNumbers[i] = trace->RoomNumbers[i];
-	}
-
-	return !trace.has_value();
+	return !roomLos.Intersect.has_value();
 }
 
 // NOTE: Room LOS.
