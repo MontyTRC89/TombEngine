@@ -39,6 +39,12 @@ namespace TEN::Effects::Environment
 	constexpr auto DUST_LIFE = 40;
 	constexpr auto DUST_SPAWN_RADIUS = (10 * 1024);
 
+	constexpr auto METEOR_PARTICLES_MAX_COUNT = 10;
+	constexpr auto METEOR_PARTICLES_MAX_LIFE = 150;
+	constexpr auto METEOR_PARTICLES_SPEED = 32.0f;
+	constexpr auto METEOR_PARTICLES_SPAWN_DENSITY = 4;
+	constexpr auto METEOR_PARTICLES_FADE_TIME = 30;
+
 	EnvironmentController Weather;
 
 	float WeatherParticle::Transparency() const
@@ -72,8 +78,11 @@ namespace TEN::Effects::Environment
 		UpdateWind(level);
 		UpdateFlash(level);
 		UpdateWeather(level);
+		UpdateStarfield(level);
+
 		SpawnWeatherParticles(level);
 		SpawnDustParticles(level);
+		SpawnMeteorParticles(level);
 	}
 
 	void EnvironmentController::Clear()
@@ -93,6 +102,10 @@ namespace TEN::Effects::Environment
 
 		// Clear weather
 		Particles.clear();
+
+		// Clear starfield
+		ResetStarField = true;
+		Meteors.clear();
 	}
 
 	void EnvironmentController::Flash(int r, int g, int b, float speed)
@@ -219,6 +232,74 @@ namespace TEN::Effects::Environment
 
 		if (FlashProgress == 0.0f)
 			FlashColorBase = Vector3::Zero;
+	}
+
+	void EnvironmentController::UpdateStarfield(ScriptInterfaceLevel* level)
+	{
+		if (ResetStarField)
+		{
+			Stars.clear();
+			Stars.reserve(StarsCount);
+
+			for (int i = 0; i < StarsCount; i++)
+			{
+				Vector3 starDirection = Random::GenerateDirectionInCone(-Vector3::UnitY, 70.0f);
+				starDirection.Normalize();
+
+				StarParticle star;
+				star.Direction = starDirection;
+				star.Color = Vector3(
+					Random::GenerateFloat(0.6f, 1.0f),
+					Random::GenerateFloat(0.6f, 1.0f),
+					Random::GenerateFloat(0.6f, 1.0f)
+				);
+				star.Scale = Random::GenerateFloat(0.5f, 1.5f);
+
+				float cosine = Vector3::UnitY.Dot(starDirection);
+				float maxCosine = cos(DEG_TO_RAD(50));
+				float minCosine = cos(DEG_TO_RAD(70));
+
+				if (cosine >= minCosine && cosine <= maxCosine)
+				{
+					star.Extinction = (cosine - minCosine) / (maxCosine - minCosine);
+				}
+				else
+				{
+					star.Extinction = 1.0f;
+				}
+
+				Stars.push_back(star);
+			}
+
+			ResetStarField = false;
+		}
+
+		for (auto& s : Stars)
+		{
+			s.Blinking = Random::GenerateFloat(0.5f, 1.0f);
+		}
+
+		for (auto& m : Meteors)
+		{
+			//p.StoreInterpolationData();
+
+			m.Life--;
+
+			if (m.Life <= 0)
+			{
+				m.Active = false;
+				continue;
+			}
+
+			if (m.Life <= METEOR_PARTICLES_FADE_TIME)
+				m.Fade = m.Life / (float)METEOR_PARTICLES_FADE_TIME;
+			else if (m.Life >= METEOR_PARTICLES_MAX_LIFE - METEOR_PARTICLES_FADE_TIME)
+				m.Fade = (METEOR_PARTICLES_MAX_LIFE - m.Life) / (float)METEOR_PARTICLES_FADE_TIME;
+			else 
+				m.Fade = 1.0f;
+
+			m.Position += m.Direction * METEOR_PARTICLES_SPEED;
+		}
 	}
 
 	void EnvironmentController::UpdateWeather(ScriptInterfaceLevel* level)
@@ -516,6 +597,49 @@ namespace TEN::Effects::Environment
 				part.StartLife = part.Life;
 
 				Particles.push_back(part);
+			}
+		}
+	}
+
+	void EnvironmentController::SpawnMeteorParticles(ScriptInterfaceLevel* level)
+	{
+		// Clean up dead particles
+		if (Meteors.size() > 0)
+			Meteors.erase(std::remove_if(Meteors.begin(), Meteors.end(), [](const MeteorParticle& part) { return !part.Active; }), Meteors.end());
+
+		//if (level->GetWeatherType() == WeatherType::None || level->GetWeatherStrength() == 0.0f)
+		//	return;
+
+		int newParticlesCount = 0;
+		int density = METEOR_PARTICLES_SPAWN_DENSITY;
+
+		if (density > 0.0f /* && level->GetWeatherType() != WeatherType::None */)
+		{
+			while (Meteors.size() < METEOR_PARTICLES_MAX_COUNT)
+			{
+				if (newParticlesCount > density)
+					break;
+
+				newParticlesCount++;
+
+				auto part = MeteorParticle();
+
+				part.Active = true;
+				part.Life = METEOR_PARTICLES_MAX_LIFE;
+				part.StartPosition = part.Position = Random::GenerateDirectionInCone(-Vector3::UnitY, 40.0f) * BLOCK(1.5f);
+				part.Fade = 0.0f;
+				part.Color = Vector3(
+					Random::GenerateFloat(0.6f, 1.0f),
+					Random::GenerateFloat(0.6f, 1.0f),
+					Random::GenerateFloat(0.6f, 1.0f)
+				);
+
+				Vector2 horizontalDirection = Random::GenerateDirection2D();
+				part.Direction = Random::GenerateDirectionInCone(Vector3(horizontalDirection.x, 0, horizontalDirection.y), 10.0f);
+				if (part.Direction.y < 0.0f)
+					part.Direction.y = -part.Direction.y;
+
+				Meteors.push_back(part);
 			}
 		}
 	}

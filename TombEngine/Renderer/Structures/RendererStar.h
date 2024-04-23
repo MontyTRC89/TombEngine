@@ -6,11 +6,12 @@ namespace TEN::Renderer::Structures
 {
 	using namespace DirectX::SimpleMath;
 
-	struct RendererLensFlare
+	struct RendererStar
 	{
-		Vector3 Position;
 		Vector3 Direction;
-		float Distance;
-		bool Sun;
+		Vector3 Color;
+		float Blinking;
+		float Scale;
+		float Extinction;
 	};
 }

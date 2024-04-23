@@ -2,9 +2,33 @@
 #include <SimpleMath.h>
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Math/Math.h"
+#include "Objects/Effects/lens_flare.h"
+
+using namespace TEN::Entities::Effects;
 
 namespace TEN::Effects::Environment 
 {
+	struct StarParticle
+	{
+		Vector3 Position = Vector3::Zero;
+		Vector3 Direction = Vector3::Zero;
+		Vector3 Color = Vector3::Zero;
+		float Extinction = 1.0f;
+		float Scale = 1.0f;
+		float Blinking = 1.0f;
+	};
+
+	struct MeteorParticle
+	{
+		Vector3 Position = Vector3::Zero;
+		Vector3 Direction = Vector3::Zero;
+		Vector3 StartPosition = Vector3::Zero;
+		Vector3 Color = Vector3::Zero;
+		float Life;
+		bool Active;
+		float Fade;
+	};
+
 	struct WeatherParticle
 	{
 		WeatherType Type = WeatherType::None;
@@ -52,6 +76,8 @@ namespace TEN::Effects::Environment
 		void Clear();
 
 		const std::vector<WeatherParticle>& GetParticles() const { return Particles; }
+		const std::vector<StarParticle>& GetStars() const { return Stars; }
+		const std::vector<MeteorParticle>& GetMeteors() { return Meteors; }
 
 	private:
 		// Weather
@@ -80,6 +106,16 @@ namespace TEN::Effects::Environment
 		byte StormSkyColor = 1;
 		byte StormSkyColor2 = 1;
 
+		// Starfield
+		int StarsCount = 3000;
+		std::vector<StarParticle> Stars;
+		std::vector<MeteorParticle> Meteors;
+		bool ResetStarField = true;
+
+		// Lens flare
+		LensFlare GlobalLensFlare;
+
+		void UpdateStarfield(ScriptInterfaceLevel* level);
 		void UpdateSky(ScriptInterfaceLevel* level);
 		void UpdateStorm(ScriptInterfaceLevel* level);
 		void UpdateWind(ScriptInterfaceLevel* level);
@@ -89,6 +125,7 @@ namespace TEN::Effects::Environment
 
 		void SpawnDustParticles(ScriptInterfaceLevel* level);
 		void SpawnWeatherParticles(ScriptInterfaceLevel* level);
+		void SpawnMeteorParticles(ScriptInterfaceLevel* level);
 	};
 
 	extern EnvironmentController Weather;

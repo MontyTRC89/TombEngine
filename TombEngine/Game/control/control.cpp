@@ -243,6 +243,7 @@ GameStatus ControlPhase(int numFrames)
 	UpdateBeetleSwarm();
 	UpdateLocusts();
 	UpdateUnderwaterBloodParticles();
+	SetupGlobalLensFlare(180.0f, 30.0f);
 
 	// Update HUD.
 	g_Hud.Update(*LaraItem);

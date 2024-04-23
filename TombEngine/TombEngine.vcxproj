@@ -750,6 +750,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Structures\RendererSpriteBucket.h" />
     <ClInclude Include="Renderer\Structures\RendererSpriteSequence.h" />
     <ClInclude Include="Renderer\Structures\RendererSpriteToDraw.h" />
+    <ClInclude Include="Renderer\Structures\RendererStar.h" />
     <ClInclude Include="Renderer\Structures\RendererStatic.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererTriangle3D.h" />

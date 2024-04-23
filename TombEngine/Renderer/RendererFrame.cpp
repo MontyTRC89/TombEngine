@@ -108,23 +108,25 @@ namespace TEN::Renderer
 
 		for (auto lensFlare : LensFlares)
 		{
-			float distance = Vector3::Distance(lensFlare.Position, renderView.Camera.WorldPosition);
-
-			if (lensFlare.RoomNumber == Camera.pos.RoomNumber && distance < BLOCK(20))
+			Vector3 lensFlareToCamera = lensFlare.Position - renderView.Camera.WorldPosition;
+			float distance = 0.0f;
+			if (!lensFlare.Sun)
 			{
-				Vector3 lensFlareToCamera = lensFlare.Position - renderView.Camera.WorldPosition;
-				Vector3 cameraDirection = renderView.Camera.WorldDirection;
+				distance = lensFlareToCamera.Length();
+			}	
+			lensFlareToCamera.Normalize();
+			
+			Vector3 cameraDirection = renderView.Camera.WorldDirection;
+			cameraDirection.Normalize();
 
-				lensFlareToCamera.Normalize();
-				cameraDirection.Normalize();
-
-				if (lensFlareToCamera.Dot(cameraDirection) >= 0.0f)
-				{
-					RendererLensFlare lensFlareToDraw;
-					lensFlareToDraw.Position = lensFlare.Position;
-					lensFlareToDraw.Distance = distance;
-					tempLensFlares.push_back(lensFlareToDraw);
-				}
+			if (lensFlareToCamera.Dot(cameraDirection) >= 0.0f)
+			{
+				RendererLensFlare lensFlareToDraw;
+				lensFlareToDraw.Position = lensFlare.Position;
+				lensFlareToDraw.Distance = distance;
+				lensFlareToDraw.Direction = lensFlareToCamera;
+				lensFlareToDraw.Sun = lensFlare.Sun;
+				tempLensFlares.push_back(lensFlareToDraw);
 			}
 		}
 
@@ -133,11 +135,18 @@ namespace TEN::Renderer
 			tempLensFlares.end(),
 			[](const RendererLensFlare& lensFlare0, const RendererLensFlare& lensFlare1)
 			{
-				return lensFlare0.Distance < lensFlare1.Distance;
+				if (lensFlare0.Sun && !lensFlare1.Sun)
+					return true;
+				else if (!lensFlare0.Sun && lensFlare1.Sun)
+					return false;
+				else
+					return lensFlare0.Distance < lensFlare1.Distance;
 			});
 
 		for (int i = 0; i < std::min(MAX_LENS_FLARES_DRAW, (int)tempLensFlares.size()); i++)
+		{
 			renderView.LensFlaresToDraw.push_back(tempLensFlares[i]);
+		}
 	}
 
 	bool Renderer::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)

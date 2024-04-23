@@ -31,6 +31,7 @@
 #include "Specific/level.h"
 #include "Specific/winmain.h"
 #include "Renderer/Structures/RendererSortableObject.h"
+#include "Game/effects/weather.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects::Hair;
@@ -38,6 +39,7 @@ using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
 using namespace TEN::Renderer::Structures;
+using namespace TEN::Effects::Environment;
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
@@ -2819,11 +2821,143 @@ namespace TEN::Renderer
 
 		_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
+		int starsCount = (int)Weather.GetStars().size();
+		if (starsCount > 0)
+		{
+			SetDepthState(DepthState::Read);
+			SetBlendMode(BlendMode::Additive);
+			SetCullMode(CullMode::None);
+
+			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+			_context->VSSetShader(_vsInstancedSprites.Get(), nullptr, 0);
+			_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
+
+			// Set up vertex buffer and parameters.
+			UINT stride = sizeof(Vertex);
+			UINT offset = 0;
+			_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+
+			BindTexture(TextureRegister::ColorMap, _sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE3].Texture, SamplerStateRegister::LinearClamp);
+
+			int drawnStars = 0;
+			while (drawnStars < starsCount)
+			{
+				int starsToDraw = (starsCount - drawnStars) > 100 ? 100 : (starsCount - drawnStars);
+				int i = 0;
+
+				for (int i = 0; i < starsToDraw; i++)
+				{
+					auto& s = Weather.GetStars()[drawnStars + i];
+
+					RendererSpriteToDraw rDrawSprite;
+					rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE3];	
+
+					constexpr auto STAR_SIZE = 2;
+
+					rDrawSprite.Type = SpriteType::Billboard;
+					rDrawSprite.pos = renderView.Camera.WorldPosition + s.Direction * BLOCK(1);
+					rDrawSprite.Rotation = 0;
+					rDrawSprite.Scale = 1;
+					rDrawSprite.Width = STAR_SIZE * s.Scale;
+					rDrawSprite.Height = STAR_SIZE * s.Scale;
+
+					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+					_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
+						s.Color.x,
+						s.Color.y,
+						s.Color.z,
+						s.Blinking * s.Extinction);
+					_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
+					_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = 0;
+
+					// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].x = rDrawSprite.Sprite->UV[0].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].y = rDrawSprite.Sprite->UV[1].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].z = rDrawSprite.Sprite->UV[2].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].w = rDrawSprite.Sprite->UV[3].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].x = rDrawSprite.Sprite->UV[0].y;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].y = rDrawSprite.Sprite->UV[1].y;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].z = rDrawSprite.Sprite->UV[2].y;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].w = rDrawSprite.Sprite->UV[3].y;
+				}
+
+				_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
+
+				// Draw sprites with instancing.
+				DrawInstancedTriangles(4, starsToDraw, 0);
+
+				drawnStars += starsToDraw;
+			}
+
+			// Draw meteor
+			if (Weather.GetMeteors().size() > 0)
+			{
+				RendererSpriteToDraw rDrawSprite;
+				rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE3];
+				BindTexture(TextureRegister::ColorMap, rDrawSprite.Sprite->Texture, SamplerStateRegister::LinearClamp);
+
+				int meteorsCount = 0;
+
+				for (int i = 0; i < Weather.GetMeteors().size(); i++)
+				{
+					MeteorParticle meteor = Weather.GetMeteors()[i];
+
+					if (meteor.Active == false)
+						continue;
+
+					rDrawSprite.Type = SpriteType::CustomBillboard;
+					rDrawSprite.pos = renderView.Camera.WorldPosition + meteor.Position;
+					rDrawSprite.Rotation = 0;
+					rDrawSprite.Scale = 1;
+					rDrawSprite.Width = 2;
+					rDrawSprite.Height = 192;
+					rDrawSprite.ConstrainAxis = meteor.Direction;
+
+					_stInstancedSpriteBuffer.Sprites[meteorsCount].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+					_stInstancedSpriteBuffer.Sprites[meteorsCount].Color = Vector4(
+						meteor.Color.x,
+						meteor.Color.y,
+						meteor.Color.z,
+						meteor.Fade
+					);
+					_stInstancedSpriteBuffer.Sprites[meteorsCount].IsBillboard = 1;
+					_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = 0;
+
+					// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
+					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[0].x = rDrawSprite.Sprite->UV[0].x;
+					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[0].y = rDrawSprite.Sprite->UV[1].x;
+					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[0].z = rDrawSprite.Sprite->UV[2].x;
+					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[0].w = rDrawSprite.Sprite->UV[3].x;
+					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[1].x = rDrawSprite.Sprite->UV[0].y;
+					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[1].y = rDrawSprite.Sprite->UV[1].y;
+					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[1].z = rDrawSprite.Sprite->UV[2].y;
+					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[1].w = rDrawSprite.Sprite->UV[3].y;
+
+					meteorsCount++;
+				}
+
+				_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
+
+				// Draw sprites with instancing.
+				DrawInstancedTriangles(4, meteorsCount, 0);
+			}
+
+			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		}
+
 		// Draw horizon.
 		if (_moveableObjects[ID_HORIZON].has_value())
 		{
+			SetDepthState(DepthState::None);
+			SetBlendMode(BlendMode::Opaque);
+			SetCullMode(CullMode::CounterClockwise);
+
 			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			_context->VSSetShader(_vsSky.Get(), nullptr, 0);
+			_context->PSSetShader(_psSky.Get(), nullptr, 0);
 
 			auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
@@ -2831,7 +2965,7 @@ namespace TEN::Renderer
 			_stStatic.Color = Vector4::One;
 			_stStatic.ApplyFogBulbs = 1;
 			_cbStatic.UpdateData(_stStatic, _context.Get());
-			 
+
 			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			{
 				auto* meshPtr = moveableObj.ObjectMeshes[k];
@@ -2856,6 +2990,60 @@ namespace TEN::Renderer
 					_numMoveablesDrawCalls++;
 				}
 			}
+		}
+
+		// Eventually draw the sun sprite
+		if (renderView.LensFlaresToDraw.size() > 0 && renderView.LensFlaresToDraw[0].Sun)
+		{
+			SetDepthState(DepthState::Read);
+			SetBlendMode(BlendMode::Additive);
+			SetCullMode(CullMode::None);
+
+			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+			_context->VSSetShader(_vsInstancedSprites.Get(), nullptr, 0);
+			_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
+
+			// Set up vertex buffer and parameters.
+			UINT stride = sizeof(Vertex);
+			UINT offset = 0;
+			_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+
+			RendererSpriteToDraw rDrawSprite;
+			rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE3];
+
+			constexpr auto SUN_SIZE = 64;
+
+			rDrawSprite.Type = SpriteType::Billboard;
+			rDrawSprite.pos = renderView.Camera.WorldPosition + renderView.LensFlaresToDraw[0].Direction * BLOCK(1);
+			rDrawSprite.Rotation = 0;
+			rDrawSprite.Scale = 1;
+			rDrawSprite.Width = SUN_SIZE;
+			rDrawSprite.Height = SUN_SIZE;
+
+			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+			_stInstancedSpriteBuffer.Sprites[0].Color = Vector4::One;
+			_stInstancedSpriteBuffer.Sprites[0].IsBillboard = 1;
+			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = 0;
+
+			// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].x = rDrawSprite.Sprite->UV[0].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].y = rDrawSprite.Sprite->UV[1].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].z = rDrawSprite.Sprite->UV[2].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].w = rDrawSprite.Sprite->UV[3].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].x = rDrawSprite.Sprite->UV[0].y;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].y = rDrawSprite.Sprite->UV[1].y;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].z = rDrawSprite.Sprite->UV[2].y;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].w = rDrawSprite.Sprite->UV[3].y;
+
+			BindTexture(TextureRegister::ColorMap, rDrawSprite.Sprite->Texture, SamplerStateRegister::LinearClamp);
+
+			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
+
+			// Draw sprites with instancing.
+			DrawInstancedTriangles(4, 1, 0);
+
+			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		}
 
 		// Clear just the Z-buffer to start drawing on top of horizon.

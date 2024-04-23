@@ -66,6 +66,7 @@
 #include "Renderer/ConstantBuffers/SMAABuffer.h"
 #include "Renderer/Structures/RendererObject.h"
 #include "Graphics/Vertices/PostProcessVertex.h"
+#include "Renderer/Structures/RendererStar.h"
 
 enum GAME_OBJECT_ID : short;
 class EulerAngles;
@@ -377,6 +378,7 @@ namespace TEN::Renderer
 		VertexBuffer<Vertex> _sortedPolygonsVertexBuffer;
 		IndexBuffer _sortedPolygonsIndexBuffer;
 
+		// Used for variable framerate
 		float _interpolationFactor = 0.0f;
 
 		// Private functions
