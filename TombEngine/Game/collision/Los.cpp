@@ -110,9 +110,9 @@ namespace TEN::Collision::Los
 						{
 							auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
 							auto offset = intersectPos - movPtr->Pose.Position.ToVector3();
-							int intersectRoomNumber = GetCollision(movPtr->Pose.Position, movPtr->RoomNumber, offset).RoomNumber;
+							int roomNumber = GetCollision(movPtr->Pose.Position, movPtr->RoomNumber, offset).RoomNumber;
 
-							losInstances.push_back(LosInstanceData{ movPtr, NO_VALUE, intersectPos, intersectRoomNumber, intersectDist });
+							losInstances.push_back(LosInstanceData{ movPtr, NO_VALUE, intersectPos, roomNumber, intersectDist });
 						}
 					}
 				}
@@ -132,9 +132,9 @@ namespace TEN::Collision::Los
 							{
 								auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
 								auto offset = intersectPos - movPtr->Pose.Position.ToVector3();
-								int intersectRoomNumber = GetCollision(movPtr->Pose.Position, movPtr->RoomNumber, offset).RoomNumber;
+								int roomNumber = GetCollision(movPtr->Pose.Position, movPtr->RoomNumber, offset).RoomNumber;
 
-								losInstances.push_back(LosInstanceData{ movPtr, i, intersectPos, intersectRoomNumber, intersectDist });
+								losInstances.push_back(LosInstanceData{ movPtr, i, intersectPos, roomNumber, intersectDist });
 							}
 						}
 					}
@@ -157,9 +157,9 @@ namespace TEN::Collision::Los
 					{
 						auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
 						auto offset = intersectPos - staticPtr->pos.Position.ToVector3();
-						int intersectRoomNumber = GetCollision(staticPtr->pos.Position, staticPtr->roomNumber, offset).RoomNumber;
+						int roomNumber = GetCollision(staticPtr->pos.Position, staticPtr->roomNumber, offset).RoomNumber;
 
-						losInstances.push_back(LosInstanceData{ staticPtr, NO_VALUE, intersectPos, intersectRoomNumber, intersectDist });
+						losInstances.push_back(LosInstanceData{ staticPtr, NO_VALUE, intersectPos, roomNumber, intersectDist });
 					}
 				}
 			}
@@ -344,8 +344,8 @@ namespace TEN::Collision::Los
 
 	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray)
 	{
-		float intersectClosestDist = INFINITY;
-		int intersectRoomNumber = trace.Intersect.second;
+		float closestDist = INFINITY;
+		int roomNumber = trace.Intersect.second;
 
 		// Run through sectors sorted by distance.
 		for (const auto* sectorPtr : trace.SectorPtrs)
@@ -392,10 +392,10 @@ namespace TEN::Collision::Los
 				for (const auto& tri : tris)
 				{
 					float dist = 0.0f;
-					if (tri.Intersects(ray, dist) && dist < intersectClosestDist)
+					if (tri.Intersects(ray, dist) && dist < closestDist)
 					{
-						intersectClosestDist = dist;
-						intersectRoomNumber = sectorPtr->RoomNumber;
+						closestDist = dist;
+						roomNumber = sectorPtr->RoomNumber;
 					}
 				}
 			}
@@ -426,10 +426,10 @@ namespace TEN::Collision::Los
 		}
 
 		// Clip trace intersection (if applicable).
-		if (intersectClosestDist != INFINITY)
+		if (closestDist != INFINITY)
 		{
-			auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, intersectClosestDist);
-			trace.Intersect = std::pair(intersectPos, intersectRoomNumber);
+			auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
+			trace.Intersect = std::pair(intersectPos, roomNumber);
 		}
 	}
 
