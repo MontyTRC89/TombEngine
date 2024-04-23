@@ -100,8 +100,8 @@ static SectorClipData GetSingleAxisSectorClip(const GameVector& origin, GameVect
 
 	while (xFirst ? (isNegative ? (pos.x > target.x) : (pos.x < target.x)) : (isNegative ? (pos.z > target.z) : (pos.z < target.z)))
 	{
-		g_Renderer.AddDebugTarget(pos.ToVector3(), Quaternion::Identity, 50, Color(1, 0, 1));
-		g_Renderer.AddDebugTarget(Vector3(pos.x + (xFirst ? sign : 0), pos.y, pos.z + (xFirst ? 0 : sign)), Quaternion::Identity, 50, Color(1, 1, 0));
+		g_Renderer.AddDebugTarget(pos.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
+		g_Renderer.AddDebugTarget(Vector3(pos.x + (xFirst ? sign : 0), pos.y, pos.z + (xFirst ? 0 : sign)), Quaternion::Identity, 50, Color(0, 1, 0));
 		
 		sectorPtr = GetFloor(pos.x, pos.y, pos.z, &prevRoomNumber);
 
@@ -320,7 +320,7 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, c
 		{
 			const auto& bridgeMov = g_Level.Items[itemNumber];
 
-			if (bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
+			if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
 				continue;
 
 			// Determine relative tilt offset.
@@ -371,9 +371,8 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, c
 		auto tris = GenerateSectorTriangleMeshes(posList[i].ToVector3(), *sectorPtr, true);
 		for (const auto& tri : tris)
 		{
-			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[0], 20), Color(1, 1, 1));
-			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[1], 20), Color(1, 1, 1));
-			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[2], 20), Color(1, 1, 1));
+			constexpr auto offset = Vector3(0.0f, -1.0f, 0.0f);
+			g_Renderer.AddDebugTriangle(tri.Vertices[0] + offset, tri.Vertices[1] + offset, tri.Vertices[2] + offset, Color(1.0f, 1.0f, 0.0f, 0.2f));
 
 			/*float dist = 0.0f;
 			if (tri.Intersects(ray, dist) && dist < closestDist)
@@ -401,10 +400,6 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, c
 		auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, true);
 		for (const auto& tri : tris)
 		{
-			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[0], 20), Color(1, 1, 1));
-			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[1], 20), Color(1, 1, 1));
-			g_Renderer.AddDebugSphere(BoundingSphere(tri.Vertices[2], 20), Color(1, 1, 1));
-
 			float dist = 0.0f;
 			if (tri.Intersects(ray, dist) && dist < closestDist)
 			{

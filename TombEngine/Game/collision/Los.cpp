@@ -25,8 +25,8 @@ namespace TEN::Collision::Los
 		{
 			auto& item = g_Level.Items[itemNumber];
 
-			// 1) Check if item is invisible.
-			if (item.Status == ITEM_INVISIBLE)
+			// 1) Check item status.
+			if (item.Status == ItemStatus::ITEM_INVISIBLE || item.Status == ItemStatus::ITEM_DEACTIVATED)
 				continue;
 
 			// 2) Check if room is active.
