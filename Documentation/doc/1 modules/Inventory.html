@@ -124,6 +124,18 @@
 	<td class="name" ><a href="#SetItemCount">SetItemCount(objectID, count)</a></td>
 	<td class="summary">Set the amount of an item in the player's inventory.</td>
 	</tr>
+	<tr>
+	<td class="name" ><a href="#GetChosenItem">GetChosenItem()</a></td>
+	<td class="summary">Get last selected item in the player's inventory.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetChosenItem">SetChosenItem(objectID)</a></td>
+	<td class="summary">Set last selected item in the player's inventory.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ClearChosenItem">ClearChosenItem()</a></td>
+	<td class="summary">Clear last selected item in the player's inventory.</td>
+	</tr>
 </table>
 
 <br/>
@@ -240,6 +252,70 @@
          The amount of items to set. -1 indicates infinity.
         </li>
     </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetChosenItem"></a>
+    <strong>GetChosenItem()</strong>
+    </dt>
+    <dd>
+    Get last selected item in the player's inventory.
+ This value will be valid only for a single frame after exiting inventory, after which Lara says "No".
+ Therefore, this function must be preferably used either in OnLoop events or callbacks.
+ If you have used this function and you want to avoid "No" sound, you should use ClearChosenItem function.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
+        Last selected item in the inventory.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetChosenItem"></a>
+    <strong>SetChosenItem(objectID)</strong>
+    </dt>
+    <dd>
+    Set last selected item in the player's inventory.
+ You will be able to select only objects which already exist in inventory.
+ Will only be valid for the next frame. If not processed by the game, Lara will say "No".
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">objectID</span>
+            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
+         Object ID of the item to select from inventory.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ClearChosenItem"></a>
+    <strong>ClearChosenItem()</strong>
+    </dt>
+    <dd>
+    Clear last selected item in the player's inventory.
+ This function is needed to avoid Lara saying "No" after selecting particular item in inventory.
+
+
+
 
 
 
