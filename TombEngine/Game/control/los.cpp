@@ -43,8 +43,7 @@ struct SectorTraceData
 };
 
 // Globals
-int LosRoomNumbers[20];
-int LosRoomCount;
+auto LosRoomNumbers = std::vector<int>{};
 int ClosestItem;
 int ClosestDist;
 Vector3i ClosestCoord;
@@ -440,13 +439,9 @@ bool nLOS(const GameVector* origin, GameVector* target)
 	if (roomLos.Intersect.has_value())
 		*target = GameVector(roomLos.Intersect->first, roomLos.Intersect->second);
 
-	auto roomNumbers = std::vector<int>{};
-	roomNumbers.insert(roomNumbers.end(), roomLos.RoomNumbers.begin(), roomLos.RoomNumbers.end());
-
-	// HACK: Transplant LOS room data to legacy globals.
-	LosRoomCount = std::min((int)roomNumbers.size(), 20);
-	for (int i = 0; i < LosRoomCount; i++)
-		LosRoomNumbers[i] = roomNumbers[i];
+	// HACK: Transplant LOS room numbers to legacy global.
+	LosRoomNumbers.clear();
+	LosRoomNumbers.insert(LosRoomNumbers.end(), roomLos.RoomNumbers.begin(), roomLos.RoomNumbers.end());
 
 	return !roomLos.Intersect.has_value();
 }
@@ -460,21 +455,10 @@ bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<in
 	auto sectorTrace0 = GetSingleAxisSectorTrace(*origin, *target, xFirst);
 	auto sectorTrace1 = GetSingleAxisSectorTrace(*origin, *target, !xFirst);
 
-	// HACK: Transplant room numbers to legacy globals.
-	auto roomNumbers2 = std::vector<int>{};
-	roomNumbers2.insert(roomNumbers2.end(), sectorTrace0.RoomNumbers.begin(), sectorTrace0.RoomNumbers.end());
-	roomNumbers2.insert(roomNumbers2.end(), sectorTrace1.RoomNumbers.begin(), sectorTrace1.RoomNumbers.end());
-	LosRoomCount = 0;
-	int i = 0;
-	for (int roomNumber : roomNumbers2)
-	{
-		LosRoomNumbers[i] = roomNumber;
-		LosRoomCount++;
-
-		i++;
-		if (i >= 20)
-			break;
-	}
+	// HACK: Transplant LOS room numbers to legacy global.
+	LosRoomNumbers.clear();
+	LosRoomNumbers.insert(LosRoomNumbers.end(), sectorTrace0.RoomNumbers.begin(), sectorTrace0.RoomNumbers.end());
+	LosRoomNumbers.insert(LosRoomNumbers.end(), sectorTrace1.RoomNumbers.begin(), sectorTrace1.RoomNumbers.end());
 
 	GetFloor(target->x, target->y, target->z, &target->RoomNumber);
 
@@ -907,9 +891,9 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 	ClosestItem = NO_VALUE;
 	ClosestDist = SQUARE(target->x - origin->x) + SQUARE(target->y - origin->y) + SQUARE(target->z - origin->z);
 
-	for (int r = 0; r < LosRoomCount; ++r)
+	for (int roomNumber : LosRoomNumbers)
 	{
-		auto& room = g_Level.Rooms[LosRoomNumbers[r]];
+		auto& room = g_Level.Rooms[roomNumber];
 
 		auto pose = Pose::Zero;
 
@@ -927,7 +911,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 					if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp.staticNumber))
 					{
 						*staticPtrPtr = &meshp;
-						target->RoomNumber = LosRoomNumbers[r];
+						target->RoomNumber = roomNumber;
 					}
 				}
 			}
@@ -953,7 +937,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 			pose = Pose(item.Pose.Position, EulerAngles(0, item.Pose.Orientation.y, 0));
 
 			if (DoRayBox(*origin, *target, bounds, pose, *vec, linkNumber))
-				target->RoomNumber = LosRoomNumbers[r];
+				target->RoomNumber = LosRoomNumbers[roomNumber];
 		}
 	}
 
