@@ -59,8 +59,8 @@ namespace TEN::Collision::Los
 					continue;
 
 				// 2) Run through statics in room.
-				for (auto& staticObject : neighborRoom.mesh)
-					staticPtrs.push_back(&staticObject);
+				for (auto& staticObj : neighborRoom.mesh)
+					staticPtrs.push_back(&staticObj);
 			}
 		}
 
@@ -175,25 +175,24 @@ namespace TEN::Collision::Los
 		auto losOrigin = GameVector(origin, originRoomNumber);
 		auto losTarget = GameVector(target, originRoomNumber);
 
-		float distSqr = 0.0f;
+		float dist = 0.0f;
 		auto roomNumbers = std::set<int>{};
 
 		if (!LOS(&losOrigin, &losTarget, &roomNumbers))
-			distSqr = Vector3::DistanceSquared(origin, losTarget.ToVector3());
+			dist = Vector3::Distance(origin, losTarget.ToVector3());
 
-		// Calculate intersection.
-		auto intersect = std::pair<Vector3, int>();
-		if (distSqr == 0.0f)
-		{
-			intersect = std::pair(target, losTarget.RoomNumber);
-		}
-		else
+		// TODO: Check.
+		// Calculate intersection (if applicable).
+		auto intersect = std::optional<std::pair<Vector3, int>>();
+		if (dist != 0.0f)
 		{
 			auto dir = target - origin;
 			dir.Normalize();
-			intersect = std::pair(Geometry::TranslatePoint(origin, dir, sqrt(distSqr)), losTarget.RoomNumber);
+
+			intersect = std::pair(Geometry::TranslatePoint(origin, dir, dist), losTarget.RoomNumber);
 		}
 
+		// Return room LOS.
 		return RoomLosData{ intersect, roomNumbers };
 	}
 
@@ -272,13 +271,13 @@ namespace TEN::Collision::Los
 			if (!std::holds_alternative<MESH_INFO*>(*losInstance.ObjectPtr))
 				continue;
 
-			auto& staticObject = *std::get<MESH_INFO*>(*losInstance.ObjectPtr);
+			auto& staticObj = *std::get<MESH_INFO*>(*losInstance.ObjectPtr);
 
 			// 4) Check if static is solid (if applicable).
-			if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
+			if (onlySolid && !(staticObj.flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
-			return StaticLosData{ staticObject, std::pair(losInstance.Position, losInstance.RoomNumber) };
+			return StaticLosData{ staticObj, std::pair(losInstance.Position, losInstance.RoomNumber) };
 		}
 
 		return std::nullopt;
