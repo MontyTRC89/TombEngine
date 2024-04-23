@@ -761,7 +761,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			if (switchOff)
 				break;
 
-			PlaySoundTrack(value, flags);
+			PlaySoundTrack(value, flags & CODE_BITS);
 			break;
 
 		case TO_CUTSCENE:
