@@ -291,6 +291,8 @@ namespace TEN::Effects::Environment
 				continue;
 			}
 
+			m.StoreInterpolationData();
+
 			if (m.Life <= METEOR_PARTICLES_FADE_TIME)
 				m.Fade = m.Life / (float)METEOR_PARTICLES_FADE_TIME;
 			else if (m.Life >= METEOR_PARTICLES_MAX_LIFE - METEOR_PARTICLES_FADE_TIME)

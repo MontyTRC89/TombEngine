@@ -2907,7 +2907,9 @@ namespace TEN::Renderer
 						continue;
 
 					rDrawSprite.Type = SpriteType::CustomBillboard;
-					rDrawSprite.pos = renderView.Camera.WorldPosition + meteor.Position;
+					rDrawSprite.pos = 
+						renderView.Camera.WorldPosition + 
+						Vector3::Lerp(meteor.OldPosition, meteor.Position, _interpolationFactor);
 					rDrawSprite.Rotation = 0;
 					rDrawSprite.Scale = 1;
 					rDrawSprite.Width = 2;
@@ -2919,7 +2921,7 @@ namespace TEN::Renderer
 						meteor.Color.x,
 						meteor.Color.y,
 						meteor.Color.z,
-						meteor.Fade
+						Lerp(meteor.OldFade, meteor.Fade, _interpolationFactor)
 					);
 					_stInstancedSpriteBuffer.Sprites[meteorsCount].IsBillboard = 1;
 					_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = 0;

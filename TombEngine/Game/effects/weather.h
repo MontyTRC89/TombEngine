@@ -27,6 +27,15 @@ namespace TEN::Effects::Environment
 		float Life;
 		bool Active;
 		float Fade;
+
+		Vector3 OldPosition = Vector3::Zero;
+		float OldFade = 0.0f;
+
+		void StoreInterpolationData()
+		{
+			OldPosition = Position;
+			OldFade = Fade;
+		}
 	};
 
 	struct WeatherParticle
