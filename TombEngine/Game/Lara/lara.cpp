@@ -88,12 +88,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto origin = (item->Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
 	auto target = Geometry::TranslatePoint(origin, dir, BLOCK(10));
 
-	auto o = GameVector(origin, item->RoomNumber);
-	auto t = GameVector(target, item->RoomNumber);
-	bool los = LOS(&o, &t);
-	//g_Renderer.AddDebugLine(o.ToVector3(), t.ToVector3(), Vector4::One);
-	//g_Renderer.AddDebugTarget(t.ToVector3(), Quaternion::Identity, 100, Color(1, 1, 1));
-
 	auto roomLos = GetRoomLos(origin, item->RoomNumber, target);
 	g_Renderer.AddDebugLine(origin, roomLos.Intersect.has_value() ? roomLos.Intersect->first : target, Vector4::One);
 	g_Renderer.AddDebugTarget(roomLos.Intersect.has_value() ? roomLos.Intersect->first : target, Quaternion::Identity, 100, Color(1, 1, 1));

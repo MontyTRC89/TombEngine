@@ -184,7 +184,10 @@ namespace TEN::Collision::Los
 	{
 		auto deltaPos = target - origin;
 
-		// 1) Calculate X axis positions.
+		// 1) Collect origin.
+		trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, origin });
+
+		// 2) Calculate and collect X axis positions.
 		if (deltaPos.x != 0)
 		{
 			// Calculate step.
@@ -212,7 +215,7 @@ namespace TEN::Collision::Los
 			}
 		}
 
-		// 2) Calculate Z axis positions.
+		// 3) Calculate and collect Z axis positions.
 		if (deltaPos.z != 0)
 		{
 			// Calculate step.
@@ -240,7 +243,7 @@ namespace TEN::Collision::Los
 			}
 		}
 
-		// 3) Sort intercepts by distance from origin.
+		// 4) Sort intercepts by distance from origin.
 		std::sort(
 			trace.Intercepts.begin(), trace.Intercepts.end(),
 			[origin](const SectorTraceData::InterceptData& intercept0, const SectorTraceData::InterceptData& intercept1)
@@ -252,7 +255,7 @@ namespace TEN::Collision::Los
 			});
 
 
-		// 4) Set sector pointers.
+		// 5) Set sector pointers.
 		short roomNumber = originRoomNumber;
 		for (auto& intercept : trace.Intercepts)
 		{
@@ -401,7 +404,7 @@ namespace TEN::Collision::Los
 		for (const auto& tri : tris)
 		{
 			auto offset = (Vector3::UnitY * 4) * (isFloor ? -1 : 1);
-			g_Renderer.AddDebugTriangle(tri.Vertices[0] + offset, tri.Vertices[1] + offset, tri.Vertices[2] + offset, Color(1, 1, 0, 0.1f));
+			g_Renderer.AddDebugTriangle(tri.Vertices[0] + offset, tri.Vertices[1] + offset, tri.Vertices[2] + offset, Color(1.0f, 1.0f, 0.0f, 0.1f));
 		}
 
 		return tris;
@@ -437,7 +440,7 @@ namespace TEN::Collision::Los
 		};
 	}
 
-	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray)
+	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray, float distMax)
 	{
 		float closestDist = INFINITY;
 		int roomNumber = NO_VALUE;
@@ -446,6 +449,9 @@ namespace TEN::Collision::Los
 		const FloorInfo* prevSectorPtr = nullptr;
 		for (const auto& intercept : trace.Intercepts)
 		{
+			// Debug
+			g_Renderer.AddDebugTarget(intercept.Position.ToVector3(), Quaternion::Identity, 30, Color(1.0f, 0.0f, 0.0f));
+
 			// 1) Clip wall.
 			if (intercept.Position.y > GetFloorHeight(intercept.SectorPtr, intercept.Position.x, intercept.Position.y, intercept.Position.z) ||
 				intercept.Position.y < GetCeiling(intercept.SectorPtr, intercept.Position.x, intercept.Position.y, intercept.Position.z))
@@ -462,7 +468,7 @@ namespace TEN::Collision::Los
 				for (const auto& tri : floorTris)
 				{
 					float dist = 0.0f;
-					if (tri.Intersects(ray, dist) && dist < closestDist)
+					if (tri.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
 						closestDist = dist;
 				}
 
@@ -471,7 +477,7 @@ namespace TEN::Collision::Los
 				for (const auto& tri : ceilTris)
 				{
 					float dist = 0.0f;
-					if (tri.Intersects(ray, dist) && dist < closestDist)
+					if (tri.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
 						closestDist = dist;
 				}
 
@@ -517,26 +523,19 @@ namespace TEN::Collision::Los
 					for (const auto& tri : bridgeTris)
 					{
 						float dist = 0.0f;
-						if (tri.Intersects(ray, dist) && dist < closestDist)
+						if (tri.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
 							closestDist = dist;
 					}
 				}
 			}
 			prevSectorPtr = intercept.SectorPtr;
 
-			// Has clip; set room number and break early.
+			// Has clip; set intersection ang return early.
 			if (closestDist != INFINITY)
 			{
-				roomNumber = intercept.SectorPtr->RoomNumber;
-				break;
+				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
+				trace.Intersect = std::pair(intersectPos, intercept.SectorPtr->RoomNumber);
 			}
-		}
-
-		// Set new intersection (if applicable).
-		if (closestDist != INFINITY && roomNumber != NO_VALUE)
-		{
-			auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
-			trace.Intersect = std::pair(intersectPos, roomNumber);
 		}
 	}
 
@@ -547,10 +546,13 @@ namespace TEN::Collision::Los
 		dir.Normalize();
 		auto ray = Ray(origin, dir);
 
+		// Calculate max ray distance.
+		float distMax = Vector3::Distance(origin, target);
+
 		// Calculate trace.
 		auto trace = SectorTraceData{};
 		SetSectorTraceIntercepts(trace, origin, originRoomNumber, target);
-		ClipSectorTrace(trace, ray);
+		ClipSectorTrace(trace, ray, distMax);
 
 		// Return trace.
 		return trace;
