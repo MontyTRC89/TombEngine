@@ -64,6 +64,8 @@ CollisionInfo LaraCollision = {};
 #include <Game/control/los.h>
 #include "Specific/Input/Input.h"
 #include <OISKeyboard.h>
+#include <Game/collision/Los.h>
+using namespace TEN::Collision::Los;
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
@@ -89,9 +91,12 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto o = GameVector(origin, item->RoomNumber);
 	auto t = GameVector(target, item->RoomNumber);
 	bool los = LOS(&o, &t);
+	//g_Renderer.AddDebugLine(o.ToVector3(), t.ToVector3(), Vector4::One);
+	//g_Renderer.AddDebugTarget(t.ToVector3(), Quaternion::Identity, 100, Color(1, 1, 1));
 
-	g_Renderer.AddDebugLine(o.ToVector3(), t.ToVector3(), Vector4::One);
-	g_Renderer.AddDebugTarget(t.ToVector3(), Quaternion::Identity, 100, Color(1, 1, 1));
+	auto roomLos = GetRoomLos(origin, item->RoomNumber, target);
+	g_Renderer.AddDebugLine(origin, roomLos.Intersect.has_value() ? roomLos.Intersect->first : target, Vector4::One);
+	g_Renderer.AddDebugTarget(roomLos.Intersect.has_value() ? roomLos.Intersect->first : target, Quaternion::Identity, 100, Color(1, 1, 1));
 
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);
 	//g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));

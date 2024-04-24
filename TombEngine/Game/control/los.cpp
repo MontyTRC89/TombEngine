@@ -101,8 +101,8 @@ static SectorTraceData GetSingleAxisSectorTrace(const GameVector& origin, GameVe
 
 	while (isX ? (isNegative ? (pos.x > target.x) : (pos.x < target.x)) : (isNegative ? (pos.z > target.z) : (pos.z < target.z)))
 	{
-		g_Renderer.AddDebugTarget(pos.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
-		g_Renderer.AddDebugTarget(Vector3(pos.x + (isX ? sign : 0), pos.y, pos.z + (isX ? 0 : sign)), Quaternion::Identity, 50, Color(0, 1, 0));
+		//g_Renderer.AddDebugTarget(pos.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
+		//g_Renderer.AddDebugTarget(Vector3(pos.x + (isX ? sign : 0), pos.y, pos.z + (isX ? 0 : sign)), Quaternion::Identity, 50, Color(0, 1, 0));
 		
 		sectorPtr = GetFloor(pos.x, pos.y, pos.z, &prevRoomNumber);
 

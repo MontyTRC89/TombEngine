@@ -372,14 +372,14 @@ namespace TEN::Collision::Los
 		zIntercept.x = (((zIntercept.z - origin.z) * zStep.x) / BLOCK(1)) + origin.x;
 		zIntercept.y = (((zIntercept.z - origin.z) * zStep.y) / BLOCK(1)) + origin.y;
 
-		//g_Renderer.AddDebugTarget(xIntercept.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
-		//g_Renderer.AddDebugTarget(Vector3(xIntercept.x + (isX ? sign : 0), xIntercept.y, xIntercept.z + (isX ? 0 : sign)), Quaternion::Identity, 50, Color(0, 1, 0));
-
 		while ((xIsNegative ? (xIntercept.x > target.x) : (xIntercept.x < target.x)) ||
 			   (zIsNegative ? (zIntercept.z > target.z) : (zIntercept.z < target.z)))
 		{
 			if ((xIsNegative ? (xIntercept.x > target.x) : (xIntercept.x < target.x)))
 			{
+				g_Renderer.AddDebugTarget(xIntercept.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
+				g_Renderer.AddDebugTarget((xIntercept + Vector3i(xSign, 0, 0)).ToVector3(), Quaternion::Identity, 50, Color(0, 1, 0));
+
 				posList.push_back(xIntercept);
 				posList.push_back(xIntercept + Vector3i(xSign, 0, 0));
 
@@ -388,6 +388,9 @@ namespace TEN::Collision::Los
 
 			if (zIsNegative ? (zIntercept.z > target.z) : (zIntercept.z < target.z))
 			{
+				g_Renderer.AddDebugTarget(zIntercept.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
+				g_Renderer.AddDebugTarget((zIntercept + Vector3i(zSign, 0, 0)).ToVector3(), Quaternion::Identity, 50, Color(0, 1, 0));
+
 				posList.push_back(zIntercept);
 				posList.push_back(zIntercept + Vector3i(0, 0, zSign));
 
