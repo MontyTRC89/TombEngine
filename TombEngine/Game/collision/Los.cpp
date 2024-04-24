@@ -78,21 +78,16 @@ namespace TEN::Collision::Los
 		return staticPtrs;
 	}
 
-	std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int originRoomNumber, const Vector3& dir, float dist,
+	std::vector<LosInstanceData> GetLosInstances(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
 												 bool collideMoveables, bool collideSpheres, bool collideStatics)
 	{
 		auto losInstances = std::vector<LosInstanceData>{};
 
-		// Calculate target.
-		auto target = Geometry::TranslatePoint(origin, dir, dist);
-
 		// 1) Collect room LOS instance.
-		auto roomLos = GetRoomLos(origin, originRoomNumber, target);
+		auto roomLos = GetRoomLos(origin, roomNumber, dir, dist);
 		if (roomLos.Intersect.has_value())
 		{
-			target = roomLos.Intersect->first;
-			dist = Vector3::Distance(origin, target);
-
+			dist = Vector3::Distance(origin, roomLos.Intersect->first);
 			losInstances.push_back(LosInstanceData{ {}, NO_VALUE, roomLos.Intersect->first, roomLos.Intersect->second, dist });
 		}
 
@@ -440,7 +435,7 @@ namespace TEN::Collision::Los
 		};
 	}
 
-	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray, float distMax, bool ignoreBridges)
+	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray, float distMax, bool collideBridges)
 	{
 		float closestDist = INFINITY;
 		int roomNumber = NO_VALUE;
@@ -481,8 +476,8 @@ namespace TEN::Collision::Los
 						closestDist = dist;
 				}
 
-				// 4) Clip bridge.
-				if (!ignoreBridges)
+				// 4) Clip bridge (if applicable).
+				if (collideBridges)
 				{
 					for (int movID : intercept.SectorPtr->BridgeItemNumbers)
 					{
@@ -542,7 +537,7 @@ namespace TEN::Collision::Los
 		}
 	}
 
-	static SectorTraceData GetSectorTrace(const Vector3& origin, int originRoomNumber, const Vector3& target, bool ignoreBridges)
+	static SectorTraceData GetSectorTrace(const Vector3& origin, int originRoomNumber, const Vector3& target, bool collideBridges)
 	{
 		// Create ray.
 		auto dir = target - origin;
@@ -555,18 +550,19 @@ namespace TEN::Collision::Los
 		// Calculate trace.
 		auto trace = SectorTraceData{};
 		SetSectorTraceIntercepts(trace, origin, originRoomNumber, target);
-		ClipSectorTrace(trace, ray, distMax, ignoreBridges);
+		ClipSectorTrace(trace, ray, distMax, collideBridges);
 
 		// Return trace.
 		return trace;
 	}
 
-	RoomLosData GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, bool ignoreBridges)
+	RoomLosData GetRoomLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
 		auto roomLos = RoomLosData{};
 
 		// Get trace.
-		auto trace = GetSectorTrace(origin, originRoomNumber, target, ignoreBridges);
+		auto target = Geometry::TranslatePoint(origin, dir, dist);
+		auto trace = GetSectorTrace(origin, roomNumber, target, collideBridges);
 
 		// Set room LOS.
 		roomLos.Intersect = trace.Intersect;
@@ -576,7 +572,7 @@ namespace TEN::Collision::Los
 		return roomLos;
 	}
 
-	std::optional<MoveableLosData> GetMoveableLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer)
+	std::optional<MoveableLosData> GetMoveableLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer)
 	{
 		auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, true, false, false);
 		for (auto& losInstance : losInstances)
@@ -596,7 +592,7 @@ namespace TEN::Collision::Los
 			auto& item = *std::get<ItemInfo*>(*losInstance.ObjectPtr);
 
 			// 4) Check if moveable is not player (if applicable).
-			if (ignorePlayer && item.ObjectNumber == ID_LARA)
+			if (!collidePlayer && item.ObjectNumber == ID_LARA)
 				continue;
 
 			return MoveableLosData{ item, std::pair(losInstance.Position, losInstance.RoomNumber), NO_VALUE };
@@ -605,7 +601,7 @@ namespace TEN::Collision::Los
 		return std::nullopt;
 	}
 
-	std::optional<MoveableLosData> GetMoveableSphereLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer)
+	std::optional<MoveableLosData> GetMoveableSphereLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer)
 	{
 		auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false, true, false);
 		for (auto& losInstance : losInstances)
@@ -625,7 +621,7 @@ namespace TEN::Collision::Los
 			auto& mov = *std::get<ItemInfo*>(*losInstance.ObjectPtr);
 
 			// 4) Check if moveable is not player (if applicable).
-			if (ignorePlayer && mov.ObjectNumber == ID_LARA)
+			if (!collidePlayer && mov.ObjectNumber == ID_LARA)
 				continue;
 
 			return MoveableLosData{ mov, std::pair(losInstance.Position, losInstance.RoomNumber), losInstance.SphereID };
@@ -634,7 +630,7 @@ namespace TEN::Collision::Los
 		return std::nullopt;
 	}
 
-	std::optional<StaticLosData> GetStaticLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool onlySolid)
+	std::optional<StaticLosData> GetStaticLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideOnlySolid)
 	{
 		auto losInstances = GetLosInstances(origin, roomNumber, dir, dist, false, false, true);
 		for (auto& losInstance : losInstances)
@@ -654,7 +650,7 @@ namespace TEN::Collision::Los
 			auto& staticObj = *std::get<MESH_INFO*>(*losInstance.ObjectPtr);
 
 			// 4) Check if static is solid (if applicable).
-			if (onlySolid && !(staticObj.flags & StaticMeshFlags::SM_SOLID))
+			if (collideOnlySolid && !(staticObj.flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
 			return StaticLosData{ staticObj, std::pair(losInstance.Position, losInstance.RoomNumber) };

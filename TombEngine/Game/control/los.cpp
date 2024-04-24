@@ -34,7 +34,11 @@ Vector3i ClosestCoord;
 // Deprecated.
 bool LOS(const GameVector* origin, GameVector* target)
 {
-	auto roomLos = GetRoomLos(origin->ToVector3(), origin->RoomNumber, target->ToVector3());
+	auto dir = target->ToVector3() - origin->ToVector3();
+	dir.Normalize();
+	float dist = Vector3::Distance(origin->ToVector3(), target->ToVector3());
+
+	auto roomLos = GetRoomLos(origin->ToVector3(), origin->RoomNumber, dir, dist);
 	if (roomLos.Intersect.has_value())
 		*target = GameVector(roomLos.Intersect->first, roomLos.Intersect->second);
 
