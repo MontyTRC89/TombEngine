@@ -96,15 +96,15 @@ static SectorTraceData GetSingleAxisSectorTrace(const GameVector& origin, GameVe
 
 	FloorInfo* sectorPtr = nullptr;
 	FloorInfo* prevSectorPtr = nullptr;
-	short roomNumber = origin.RoomNumber;
 	short prevRoomNumber = origin.RoomNumber;
+	short roomNumber = origin.RoomNumber;
 
 	while (isX ? (isNegative ? (pos.x > target.x) : (pos.x < target.x)) : (isNegative ? (pos.z > target.z) : (pos.z < target.z)))
 	{
 		//g_Renderer.AddDebugTarget(pos.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
 		//g_Renderer.AddDebugTarget(Vector3(pos.x + (isX ? sign : 0), pos.y, pos.z + (isX ? 0 : sign)), Quaternion::Identity, 50, Color(0, 1, 0));
 		
-		sectorPtr = GetFloor(pos.x, pos.y, pos.z, &prevRoomNumber);
+		sectorPtr = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 
 		// Collect sector.
 		if (sectorPtr != prevSectorPtr)
@@ -115,9 +115,9 @@ static SectorTraceData GetSingleAxisSectorTrace(const GameVector& origin, GameVe
 		prevSectorPtr = sectorPtr;
 
 		// Collect room number.
-		if (roomNumber != prevRoomNumber)
-			trace.RoomNumbers.push_back(prevRoomNumber);
-		roomNumber = prevRoomNumber;
+		if (prevRoomNumber != roomNumber)
+			trace.RoomNumbers.push_back(roomNumber);
+		prevRoomNumber = roomNumber;
 
 		// Test for sector edge obstruction.
 		if (pos.y > GetFloorHeight(sectorPtr, pos.x, pos.y, pos.z) ||
@@ -128,7 +128,7 @@ static SectorTraceData GetSingleAxisSectorTrace(const GameVector& origin, GameVe
 		}
 
 		auto boundPos = pos + Vector3i(isX ? sign : 0, 0, !isX ? sign : 0);
-		sectorPtr = GetFloor(boundPos.x, boundPos.y, boundPos.z, &prevRoomNumber);
+		sectorPtr = GetFloor(boundPos.x, boundPos.y, boundPos.z, &roomNumber);
 
 		// Collect sector.
 		if (sectorPtr != prevSectorPtr)
@@ -139,9 +139,9 @@ static SectorTraceData GetSingleAxisSectorTrace(const GameVector& origin, GameVe
 		prevSectorPtr = sectorPtr;
 
 		// Collect room number.
-		if (roomNumber != prevRoomNumber)
-			trace.RoomNumbers.push_back(prevRoomNumber);
-		roomNumber = prevRoomNumber;
+		if (prevRoomNumber != roomNumber)
+			trace.RoomNumbers.push_back(roomNumber);
+		prevRoomNumber = roomNumber;
 
 		// Test for out-of-bounds sector edge obstruction.
 		if (boundPos.y > GetFloorHeight(sectorPtr, boundPos.x, boundPos.y, boundPos.z) ||
@@ -157,7 +157,7 @@ static SectorTraceData GetSingleAxisSectorTrace(const GameVector& origin, GameVe
 	if (trace.Type != SectorClipType::Unobstructed)
 		target = GameVector(pos, target.RoomNumber);
 
-	target.RoomNumber = (trace.Type != SectorClipType::OutOfBounds) ? prevRoomNumber : roomNumber;
+	target.RoomNumber = (trace.Type != SectorClipType::OutOfBounds) ? roomNumber : prevRoomNumber;
 	return trace;
 }
 
