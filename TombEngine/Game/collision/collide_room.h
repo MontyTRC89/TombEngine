@@ -149,8 +149,8 @@ int	  GetQuadrant(short angle);
 short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance);
 
 FloorInfo* GetFloor(int x, int y, int z, short* roomNumber);
-int GetFloorHeight(FloorInfo* floor, int x, int y, int z);
-int GetCeiling(FloorInfo* floor, int x, int y, int z);
+int GetFloorHeight(const FloorInfo* floor, int x, int y, int z);
+int GetCeiling(const FloorInfo* floor, int x, int y, int z);
 int GetDistanceToFloor(int itemNumber, bool precise = true);
 
 int GetWaterSurface(int x, int y, int z, short roomNumber);

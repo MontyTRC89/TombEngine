@@ -180,14 +180,91 @@ namespace TEN::Collision::Los
 		return losInstances;
 	}
 
-	static void SetSectorTraceInterceptPositions(SectorTraceData& trace)
+	static void SetSectorTraceIntercepts(SectorTraceData& trace, const Vector3i& origin, int originRoomNumber, const Vector3i& target)
 	{
+		auto deltaPos = target - origin;
 
-	}
+		// 1) Calculate X axis positions.
+		if (deltaPos.x != 0)
+		{
+			// Calculate step.
+			auto step = Vector3i(
+				deltaPos.x,
+				BLOCK(deltaPos.y) / deltaPos.x,
+				BLOCK(deltaPos.z) / deltaPos.x);
 
-	static void SetSectorTraceInterceptSectorPtrs(SectorTraceData& trace)
-	{
+			bool isNegative = (step.x < 0);
+			int sign = isNegative ? -1 : 1;
 
+			// Calculate initial position.
+			auto interceptPos = Vector3i::Zero;
+			interceptPos.x = isNegative ? (origin.x & (UINT_MAX - WALL_MASK)) : (origin.x | WALL_MASK);
+			interceptPos.y = (((interceptPos.x - origin.x) * step.y) / BLOCK(1)) + origin.y;
+			interceptPos.z = (((interceptPos.x - origin.x) * step.z) / BLOCK(1)) + origin.z;
+
+			// Collect intercept positions.
+			while (isNegative ? (interceptPos.x > target.x) : (interceptPos.x < target.x))
+			{
+				g_Renderer.AddDebugTarget(interceptPos.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
+				g_Renderer.AddDebugTarget((interceptPos + Vector3i(sign, 0, 0)).ToVector3(), Quaternion::Identity, 50, Color(0, 1, 0));
+
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos });
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos + Vector3i(sign, 0, 0) });
+
+				interceptPos += Vector3i(BLOCK(1), step.y, step.z) * sign;
+			}
+		}
+
+		// 2) Calculate Z axis positions.
+		if (deltaPos.z != 0)
+		{
+			// Calculate step.
+			auto step = Vector3i(
+				BLOCK(deltaPos.x) / deltaPos.z,
+				BLOCK(deltaPos.y) / deltaPos.z,
+				deltaPos.z);
+
+			bool isNegative = (step.z < 0);
+			int sign = isNegative ? -1 : 1;
+
+			// Calculate initial position.
+			auto interceptPos = Vector3i::Zero;
+			interceptPos.z = isNegative ? (origin.z & (UINT_MAX - WALL_MASK)) : (origin.z | WALL_MASK);
+			interceptPos.x = (((interceptPos.z - origin.z) * step.x) / BLOCK(1)) + origin.x;
+			interceptPos.y = (((interceptPos.z - origin.z) * step.y) / BLOCK(1)) + origin.y;
+
+			// Collect positions.
+			while (isNegative ? (interceptPos.z > target.z) : (interceptPos.z < target.z))
+			{
+				g_Renderer.AddDebugTarget(interceptPos.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
+				g_Renderer.AddDebugTarget((interceptPos + Vector3i(sign, 0, 0)).ToVector3(), Quaternion::Identity, 50, Color(0, 1, 0));
+
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos });
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos + Vector3i(0, 0, sign) });
+
+				interceptPos += Vector3i(step.x, step.y, BLOCK(1)) * sign;
+			}
+		}
+
+		// 3) Sort intercepts by distance from origin.
+		std::sort(
+			trace.Intercepts.begin(), trace.Intercepts.end(),
+			[origin](const SectorTraceData::InterceptData& intercept0, const SectorTraceData::InterceptData& intercept1)
+			{
+				float distSqr0 = Vector3i::DistanceSquared(origin, intercept0.Position);
+				float distSqr1 = Vector3i::DistanceSquared(origin, intercept1.Position);
+
+				return (distSqr0 < distSqr1);
+			});
+
+
+		// 4) Set sector pointers.
+		short roomNumber = originRoomNumber;
+		for (auto& intercept : trace.Intercepts)
+		{
+			auto* sectorPtr = GetFloor(intercept.Position.x, intercept.Position.y, intercept.Position.z, &roomNumber);
+			intercept.SectorPtr = sectorPtr;
+		}
 	}
 
 	static int GetSurfaceTriangleHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
@@ -346,95 +423,102 @@ namespace TEN::Collision::Los
 		};
 	}
 
-	// TODO: Unique pointers.
 	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray)
 	{
 		float closestDist = INFINITY;
 		int roomNumber = NO_VALUE;
 
 		// Run through intercepts sorted by distance.
+		const FloorInfo* prevSectorPtr = nullptr;
 		for (const auto& intercept : trace.Intercepts)
 		{
-			// 1) Clip bridge.
-			for (int movID : intercept.SectorPtr->BridgeItemNumbers)
+			// 1) Clip wall.
+			if (intercept.Position.y > GetFloorHeight(intercept.SectorPtr, intercept.Position.x, intercept.Position.y, intercept.Position.z) ||
+				intercept.Position.y < GetCeiling(intercept.SectorPtr, intercept.Position.x, intercept.Position.y, intercept.Position.z))
 			{
-				const auto& bridgeMov = g_Level.Items[movID];
+				float dist = Vector3::Distance(ray.position, intercept.Position.ToVector3());
+				if (dist < closestDist)
+					closestDist = dist;
+			}
 
-				if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
-					continue;
-
-				// Determine relative tilt offset.
-				auto offset = Vector3::Zero;
-				switch (bridgeMov.ObjectNumber)
-				{
-				default:
-					break;
-
-				case ID_BRIDGE_TILT1:
-					offset = Vector3(0.0f, CLICK(1), 0.0f);
-					break;
-
-				case ID_BRIDGE_TILT2:
-					offset = Vector3(0.0f, CLICK(2), 0.0f);
-					break;
-
-				case ID_BRIDGE_TILT3:
-					offset = Vector3(0.0f, CLICK(3), 0.0f);
-					break;
-
-				case ID_BRIDGE_TILT4:
-					offset = Vector3(0.0f, CLICK(4), 0.0f);
-					break;
-				}
-
-				// Calculate absolute tilt offset.
-				auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
-				offset = Vector3::Transform(offset, rotMatrix);
-
-				// Collide bridge mesh.
-				auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
-				auto tris = GenerateBridgeTriangleMeshes(box, offset);
-				for (const auto& tri : tris)
+			if (intercept.SectorPtr != prevSectorPtr)
+			{
+				// 2) Clip floor.
+				auto floorTris = GenerateSectorTriangleMeshes(intercept.Position.ToVector3(), *intercept.SectorPtr, true);
+				for (const auto& tri : floorTris)
 				{
 					float dist = 0.0f;
 					if (tri.Intersects(ray, dist) && dist < closestDist)
-					{
 						closestDist = dist;
-						roomNumber = intercept.SectorPtr->RoomNumber;
+				}
+
+				// 3) Clip ceiling.
+				auto ceilTris = GenerateSectorTriangleMeshes(intercept.Position.ToVector3(), *intercept.SectorPtr, false);
+				for (const auto& tri : ceilTris)
+				{
+					float dist = 0.0f;
+					if (tri.Intersects(ray, dist) && dist < closestDist)
+						closestDist = dist;
+				}
+
+				// 4) Clip bridge.
+				for (int movID : intercept.SectorPtr->BridgeItemNumbers)
+				{
+					const auto& bridgeMov = g_Level.Items[movID];
+
+					if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
+						continue;
+
+					// Determine relative tilt offset.
+					auto offset = Vector3::Zero;
+					switch (bridgeMov.ObjectNumber)
+					{
+					default:
+						break;
+
+					case ID_BRIDGE_TILT1:
+						offset = Vector3(0.0f, CLICK(1), 0.0f);
+						break;
+
+					case ID_BRIDGE_TILT2:
+						offset = Vector3(0.0f, CLICK(2), 0.0f);
+						break;
+
+					case ID_BRIDGE_TILT3:
+						offset = Vector3(0.0f, CLICK(3), 0.0f);
+						break;
+
+					case ID_BRIDGE_TILT4:
+						offset = Vector3(0.0f, CLICK(4), 0.0f);
+						break;
+					}
+
+					// Calculate absolute tilt offset.
+					auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
+					offset = Vector3::Transform(offset, rotMatrix);
+
+					// Collide bridge mesh.
+					auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
+					auto bridgeTris = GenerateBridgeTriangleMeshes(box, offset);
+					for (const auto& tri : bridgeTris)
+					{
+						float dist = 0.0f;
+						if (tri.Intersects(ray, dist) && dist < closestDist)
+							closestDist = dist;
 					}
 				}
 			}
+			prevSectorPtr = intercept.SectorPtr;
 
-			// 2) Clip floor.
-			auto floorTris = GenerateSectorTriangleMeshes(intercept.Position.ToVector3(), *intercept.SectorPtr, true);
-			for (const auto& tri : floorTris)
+			// Has clip; set room number and break early.
+			if (closestDist != INFINITY)
 			{
-				float dist = 0.0f;
-				if (tri.Intersects(ray, dist) && dist < closestDist)
-				{	
-					closestDist = dist;
-					roomNumber = intercept.SectorPtr->RoomNumber;
-				}
-			}
-
-			// 3) Clip ceiling.
-			auto ceilTris = GenerateSectorTriangleMeshes(intercept.Position.ToVector3(), *intercept.SectorPtr, false);
-			for (const auto& tri : ceilTris)
-			{
-				float dist = 0.0f;
-				if (tri.Intersects(ray, dist) && dist < closestDist)
-				{	
-					closestDist = dist;
-					roomNumber = intercept.SectorPtr->RoomNumber;
-				}
-			}
-
-			// Has clip; break early.
-			if (closestDist != INFINITY && roomNumber != NO_VALUE)
+				roomNumber = intercept.SectorPtr->RoomNumber;
 				break;
+			}
 		}
 
-		// Clip trace intersection (if applicable).
+		// Set new intersection (if applicable).
 		if (closestDist != INFINITY && roomNumber != NO_VALUE)
 		{
 			auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
@@ -444,116 +528,17 @@ namespace TEN::Collision::Los
 
 	static SectorTraceData GetSectorTrace(const Vector3& origin, int originRoomNumber, const Vector3& target)
 	{
-		auto trace = SectorTraceData{};
-
 		// Create ray.
 		auto dir = target - origin;
 		dir.Normalize();
 		auto ray = Ray(origin, dir);
 
-		auto deltaPos = target - origin;
-
-		// TODO: Split.
-		// 1) Calculate X axis intercept positions.
-		if (deltaPos.x != 0)
-		{
-			// Calculate step.
-			auto step = Vector3i(
-				deltaPos.x,
-				BLOCK(deltaPos.y) / deltaPos.x,
-				BLOCK(deltaPos.z) / deltaPos.x);
-
-			bool isNegative = (step.x < 0);
-			int sign = isNegative ? -1 : 1;
-
-			// Calculate initial intercept position.
-			auto interceptPos = Vector3i::Zero;
-			interceptPos.x = isNegative ? ((int)round(origin.x) & (UINT_MAX - WALL_MASK)) : ((int)round(origin.x) | WALL_MASK);
-			interceptPos.y = (((interceptPos.x - origin.x) * step.y) / BLOCK(1)) + origin.y;
-			interceptPos.z = (((interceptPos.x - origin.x) * step.z) / BLOCK(1)) + origin.z;
-
-			// Collect intercept positions.
-			while (isNegative ? (interceptPos.x > target.x) : (interceptPos.x < target.x))
-			{
-				g_Renderer.AddDebugTarget(interceptPos.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
-				g_Renderer.AddDebugTarget((interceptPos + Vector3i(sign, 0, 0)).ToVector3(), Quaternion::Identity, 50, Color(0, 1, 0));
-
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos });
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos + Vector3i(sign, 0, 0) });
-
-				interceptPos += Vector3i(BLOCK(1), step.y, step.z) * sign;
-			}
-		}
-
-		// 2) Calculate Z axis intercept positions.
-		if (deltaPos.z != 0)
-		{
-			// Calculate step.
-			auto step = Vector3i(
-				BLOCK(deltaPos.x) / deltaPos.z,
-				BLOCK(deltaPos.y) / deltaPos.z,
-				deltaPos.z);
-
-			bool isNegative = (step.z < 0);
-			int sign = isNegative ? -1 : 1;
-
-			// Calculate initial intercept position.
-			auto interceptPos = Vector3i::Zero;
-			interceptPos.z = isNegative ? ((int)round(origin.z) & (UINT_MAX - WALL_MASK)) : ((int)round(origin.z) | WALL_MASK);
-			interceptPos.x = (((interceptPos.z - origin.z) * step.x) / BLOCK(1)) + origin.x;
-			interceptPos.y = (((interceptPos.z - origin.z) * step.y) / BLOCK(1)) + origin.y;
-
-			// Collect intercept positions.
-			while (isNegative ? (interceptPos.z > target.z) : (interceptPos.z < target.z))
-			{
-				g_Renderer.AddDebugTarget(interceptPos.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
-				g_Renderer.AddDebugTarget((interceptPos + Vector3i(sign, 0, 0)).ToVector3(), Quaternion::Identity, 50, Color(0, 1, 0));
-
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos });
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos + Vector3i(0, 0, sign) });
-
-				interceptPos += Vector3i(step.x, step.y, BLOCK(1)) * sign;
-			}
-		}
-
-		// 3) Sort intercepts by distance from origin.
-		std::sort(
-			trace.Intercepts.begin(), trace.Intercepts.end(),
-			[origin](const SectorTraceData::InterceptData& intercept0, const SectorTraceData::InterceptData& intercept1)
-			{
-				float distSqr0 = Vector3i::DistanceSquared(origin, intercept0.Position);
-				float distSqr1 = Vector3i::DistanceSquared(origin, intercept1.Position);
-
-				return (distSqr0 < distSqr1);
-			});
-
-		FloorInfo* sectorPtr = nullptr;
-		FloorInfo* prevSectorPtr = nullptr;
-		short roomNumber = originRoomNumber;
-		short prevRoomNumber = originRoomNumber;
-
-		// TODO: Split.
-		// 4) Set intercept sector pointers.
-		for (auto& intercept : trace.Intercepts)
-		{
-			sectorPtr = GetFloor(intercept.Position.x, intercept.Position.y, intercept.Position.z, &roomNumber);
-			prevSectorPtr = sectorPtr;
-			prevRoomNumber = roomNumber;
-
-			// Collect sector pointer.
-			intercept.SectorPtr = sectorPtr;
-
-			// Test for wall intersection.
-			if (intercept.Position.y > GetFloorHeight(sectorPtr, intercept.Position.x, intercept.Position.y, intercept.Position.z) ||
-				intercept.Position.y < GetCeiling(sectorPtr, intercept.Position.x, intercept.Position.y, intercept.Position.z))
-			{
-				trace.Intersect = std::pair(intercept.Position.ToVector3(), prevRoomNumber);
-				break;
-			}
-		}
-
-		// 5) Clip and return trace.
+		// Calculate trace.
+		auto trace = SectorTraceData{};
+		SetSectorTraceIntercepts(trace, origin, originRoomNumber, target);
 		ClipSectorTrace(trace, ray);
+
+		// Return trace.
 		return trace;
 	}
 
