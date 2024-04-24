@@ -6,7 +6,7 @@
 struct MESH_INFO;
 
 // Legacy LOS functions
-bool LOS(const GameVector* origin, GameVector* target, std::optional<std::set<int>*> roomNumbers = std::nullopt);
-bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push); // Deprecated.
+bool LOS(const GameVector* origin, GameVector* target);
+bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push);
 bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, bool isFiring);
 int	 ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObjectID = GAME_OBJECT_ID::ID_NO_OBJECT);

@@ -481,6 +481,7 @@ namespace TEN::Collision::Los
 			{
 				g_Renderer.PrintDebugMessage("%d", intercept.SectorPtr);
 
+				// TODO: Bugged.
 				// 2) Clip floor.
 				auto floorTris = GenerateSectorTriangleMeshes(intercept.Position.ToVector3(), *intercept.SectorPtr, true);
 				for (const auto& tri : floorTris)
@@ -490,6 +491,7 @@ namespace TEN::Collision::Los
 						closestDist = dist;
 				}
 
+				// TODO: Bugged.
 				// 3) Clip ceiling.
 				auto ceilTris = GenerateSectorTriangleMeshes(intercept.Position.ToVector3(), *intercept.SectorPtr, false);
 				for (const auto& tri : ceilTris)
@@ -559,6 +561,39 @@ namespace TEN::Collision::Los
 			}
 		}
 
+		// NOTE: This old clip worked somehow, but it missed many potential intersections.
+		// 2) Clip floor.
+		/*if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
+		{
+			// Collide floor collision mesh.
+			auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, true);
+			for (const auto& tri : tris)
+			{
+				float dist = 0.0f;
+				if (tri.Intersects(ray, dist) && dist < closestDist)
+				{
+					isClipped = true;
+					closestDist = dist;
+				}
+			}
+		}
+
+		// 3) Clip ceiling.
+		if (target.y < GetCeiling(sectorPtr, target.x, target.y, target.z))
+		{
+			// Collide ceiling collision mesh.
+			auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, false);
+			for (const auto& tri : tris)
+			{
+				float dist = 0.0f;
+				if (tri.Intersects(ray, dist) && dist < closestDist)
+				{
+					isClipped = true;
+					closestDist = dist;
+				}
+			}
+		}*/
+
 		g_Renderer.PrintDebugMessage("------");
 
 		// Set new intersection (if applicable).
@@ -598,30 +633,6 @@ namespace TEN::Collision::Los
 			roomLos.RoomNumbers.insert(intercept.SectorPtr->RoomNumber);
 
 		return roomLos;
-
-		// Legacy wrapper version.
-		/*auto losOrigin = GameVector(origin, originRoomNumber);
-		auto losTarget = GameVector(target, originRoomNumber);
-
-		float dist = 0.0f;
-		auto roomNumbers = std::set<int>{};
-
-		if (!LOS(&losOrigin, &losTarget, &roomNumbers))
-			dist = Vector3::Distance(origin, losTarget.ToVector3());
-
-		// TODO: Check.
-		// Calculate intersection (if applicable).
-		auto intersect = std::optional<std::pair<Vector3, int>>();
-		if (dist != 0.0f)
-		{
-			auto dir = target - origin;
-			dir.Normalize();
-
-			intersect = std::pair(Geometry::TranslatePoint(origin, dir, dist), losTarget.RoomNumber);
-		}
-
-		// Return room LOS.
-		return RoomLosData{ intersect, roomNumbers };*/
 	}
 
 	std::optional<MoveableLosData> GetMoveableLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool ignorePlayer)
