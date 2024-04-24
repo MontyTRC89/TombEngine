@@ -5,12 +5,15 @@
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
-#include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
+#include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {
@@ -124,7 +127,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					if (ai.distance < SQUARE(BLOCK(3)) || ai.zoneNumber != ai.enemyZone)
 					{
-						item->Animation.TargetState = (GetRandomControl() >= 0x4000) ? WORKER_SHOTGUN_STATE_KNEEL_ATTACK_AIM : WORKER_SHOTGUN_STATE_STANDING_ATTACK_AIM;
+						item->Animation.TargetState = Random::TestProbability(1 / 2.0f) ? WORKER_SHOTGUN_STATE_KNEEL_ATTACK_AIM : WORKER_SHOTGUN_STATE_STANDING_ATTACK_AIM;
 					}
 					else
 					{
@@ -188,8 +191,8 @@ namespace TEN::Entities::Creatures::TR2
 					}
 					else
 					{
-						creature->Flags = 0;
 						item->Animation.TargetState = WORKER_SHOTGUN_STATE_WALKING_ATTACK;
+						creature->Flags = 0;
 					}
 				}
 				else if (creature->Mood == MoodType::Attack || !ai.ahead)
