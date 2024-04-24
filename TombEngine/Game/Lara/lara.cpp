@@ -86,7 +86,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto dir = (item->Pose.Orientation + rot).ToDirection();
 
 	auto origin = (item->Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
-	auto target = Geometry::TranslatePoint(origin, dir, BLOCK(5));
+	auto target = Geometry::TranslatePoint(origin, dir, BLOCK(10));
 
 	auto o = GameVector(origin, item->RoomNumber);
 	auto t = GameVector(target, item->RoomNumber);

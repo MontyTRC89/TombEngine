@@ -197,21 +197,18 @@ namespace TEN::Collision::Los
 			int sign = isNegative ? -1 : 1;
 
 			// Calculate initial position.
-			auto interceptPos = Vector3i::Zero;
-			interceptPos.x = isNegative ? (origin.x & (UINT_MAX - WALL_MASK)) : (origin.x | WALL_MASK);
-			interceptPos.y = (((interceptPos.x - origin.x) * step.y) / BLOCK(1)) + origin.y;
-			interceptPos.z = (((interceptPos.x - origin.x) * step.z) / BLOCK(1)) + origin.z;
+			auto pos = Vector3i::Zero;
+			pos.x = isNegative ? (origin.x & (UINT_MAX - WALL_MASK)) : (origin.x | WALL_MASK);
+			pos.y = (((pos.x - origin.x) * step.y) / BLOCK(1)) + origin.y;
+			pos.z = (((pos.x - origin.x) * step.z) / BLOCK(1)) + origin.z;
 
 			// Collect intercept positions.
-			while (isNegative ? (interceptPos.x > target.x) : (interceptPos.x < target.x))
+			while (isNegative ? (pos.x > target.x) : (pos.x < target.x))
 			{
-				g_Renderer.AddDebugTarget(interceptPos.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
-				g_Renderer.AddDebugTarget((interceptPos + Vector3i(sign, 0, 0)).ToVector3(), Quaternion::Identity, 50, Color(0, 1, 0));
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(sign, 0, 0) });
 
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos });
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos + Vector3i(sign, 0, 0) });
-
-				interceptPos += Vector3i(BLOCK(1), step.y, step.z) * sign;
+				pos += Vector3i(BLOCK(1), step.y, step.z) * sign;
 			}
 		}
 
@@ -228,21 +225,18 @@ namespace TEN::Collision::Los
 			int sign = isNegative ? -1 : 1;
 
 			// Calculate initial position.
-			auto interceptPos = Vector3i::Zero;
-			interceptPos.z = isNegative ? (origin.z & (UINT_MAX - WALL_MASK)) : (origin.z | WALL_MASK);
-			interceptPos.x = (((interceptPos.z - origin.z) * step.x) / BLOCK(1)) + origin.x;
-			interceptPos.y = (((interceptPos.z - origin.z) * step.y) / BLOCK(1)) + origin.y;
+			auto pos = Vector3i::Zero;
+			pos.z = isNegative ? (origin.z & (UINT_MAX - WALL_MASK)) : (origin.z | WALL_MASK);
+			pos.x = (((pos.z - origin.z) * step.x) / BLOCK(1)) + origin.x;
+			pos.y = (((pos.z - origin.z) * step.y) / BLOCK(1)) + origin.y;
 
 			// Collect positions.
-			while (isNegative ? (interceptPos.z > target.z) : (interceptPos.z < target.z))
+			while (isNegative ? (pos.z > target.z) : (pos.z < target.z))
 			{
-				g_Renderer.AddDebugTarget(interceptPos.ToVector3(), Quaternion::Identity, 50, Color(0, 0, 1));
-				g_Renderer.AddDebugTarget((interceptPos + Vector3i(sign, 0, 0)).ToVector3(), Quaternion::Identity, 50, Color(0, 1, 0));
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(0, 0, sign) });
 
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos });
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, interceptPos + Vector3i(0, 0, sign) });
-
-				interceptPos += Vector3i(step.x, step.y, BLOCK(1)) * sign;
+				pos += Vector3i(step.x, step.y, BLOCK(1)) * sign;
 			}
 		}
 
@@ -403,9 +397,10 @@ namespace TEN::Collision::Los
 			}
 		}
 
+		// Debug
 		for (const auto& tri : tris)
 		{
-			auto offset = Vector3::UnitY * (isFloor ? -1 : 1);
+			auto offset = (Vector3::UnitY * 4) * (isFloor ? -1 : 1);
 			g_Renderer.AddDebugTriangle(tri.Vertices[0] + offset, tri.Vertices[1] + offset, tri.Vertices[2] + offset, Color(1, 1, 0, 0.1f));
 		}
 
@@ -462,9 +457,6 @@ namespace TEN::Collision::Los
 
 			if (intercept.SectorPtr != prevSectorPtr)
 			{
-				g_Renderer.PrintDebugMessage("%d", intercept.SectorPtr);
-
-				// TODO: Bugged.
 				// 2) Clip floor.
 				auto floorTris = GenerateSectorTriangleMeshes(intercept.Position.ToVector3(), *intercept.SectorPtr, true);
 				for (const auto& tri : floorTris)
@@ -474,7 +466,6 @@ namespace TEN::Collision::Los
 						closestDist = dist;
 				}
 
-				// TODO: Bugged.
 				// 3) Clip ceiling.
 				auto ceilTris = GenerateSectorTriangleMeshes(intercept.Position.ToVector3(), *intercept.SectorPtr, false);
 				for (const auto& tri : ceilTris)
@@ -527,10 +518,7 @@ namespace TEN::Collision::Los
 					{
 						float dist = 0.0f;
 						if (tri.Intersects(ray, dist) && dist < closestDist)
-						{
-							g_Renderer.PrintDebugMessage("%.3f", dist);
 							closestDist = dist;
-						}
 					}
 				}
 			}
@@ -543,41 +531,6 @@ namespace TEN::Collision::Los
 				break;
 			}
 		}
-
-		// NOTE: This old clip worked somehow, but it missed many potential intersections.
-		// 2) Clip floor.
-		/*if (target.y > GetFloorHeight(sectorPtr, target.x, target.y, target.z))
-		{
-			// Collide floor collision mesh.
-			auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, true);
-			for (const auto& tri : tris)
-			{
-				float dist = 0.0f;
-				if (tri.Intersects(ray, dist) && dist < closestDist)
-				{
-					isClipped = true;
-					closestDist = dist;
-				}
-			}
-		}
-
-		// 3) Clip ceiling.
-		if (target.y < GetCeiling(sectorPtr, target.x, target.y, target.z))
-		{
-			// Collide ceiling collision mesh.
-			auto tris = GenerateSectorTriangleMeshes(target.ToVector3(), *sectorPtr, false);
-			for (const auto& tri : tris)
-			{
-				float dist = 0.0f;
-				if (tri.Intersects(ray, dist) && dist < closestDist)
-				{
-					isClipped = true;
-					closestDist = dist;
-				}
-			}
-		}*/
-
-		g_Renderer.PrintDebugMessage("------");
 
 		// Set new intersection (if applicable).
 		if (closestDist != INFINITY && roomNumber != NO_VALUE)
