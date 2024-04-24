@@ -1877,7 +1877,7 @@ namespace TEN::Gui
 		AlterFOV(ANGLE(DEFAULT_FOV), false);
 		lara->Inventory.IsBusy = false;
 		InventoryItemChosen = NO_VALUE;
-		UseItem = false;
+		ItemUsed = false;
 
 		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].HasInfinite())
 		{
@@ -2031,7 +2031,7 @@ namespace TEN::Gui
 		}
 	}
 
-	void GuiController::UseCurrentItem(ItemInfo* item)
+	void GuiController::UseItem(ItemInfo* item, int objectNumber)
 	{
 		const std::vector<int> CrouchStates =
 		{
@@ -2058,7 +2058,7 @@ namespace TEN::Gui
 		lara->Inventory.OldBusy = false;
 		item->MeshBits = ALL_JOINT_BITS;
 
-		InventoryItemChosen = InventoryObjectTable[LastInvItem].ObjectNumber;
+		InventoryItemChosen = objectNumber;
 
 		// Use item event handling.
 		g_GameScript->OnUseItem((GAME_OBJECT_ID)InventoryItemChosen);
@@ -2622,7 +2622,7 @@ namespace TEN::Gui
 					case MenuType::Equip:
 					case MenuType::Use:
 						MenuActive = false;
-						UseItem = true;
+						ItemUsed = true;
 						break;
 
 					case MenuType::Diary:
@@ -3350,7 +3350,7 @@ namespace TEN::Gui
 				break;
 			}
 
-			if (UseItem && NoAction())
+			if (ItemUsed && NoAction())
 				exitLoop = true;
 
 			SetEnterInventory(NO_VALUE);
@@ -3361,8 +3361,8 @@ namespace TEN::Gui
 		LastInvItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
 		UpdateWeaponStatus(item);
 
-		if (UseItem)
-			UseCurrentItem(item);
+		if (ItemUsed)
+			UseItem(item, InventoryObjectTable[LastInvItem].ObjectNumber);
 
 		AlterFOV(LastFOV);
 		ResumeAllSounds(SoundPauseMode::Inventory);

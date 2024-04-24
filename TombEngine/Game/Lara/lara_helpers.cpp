@@ -276,49 +276,6 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 	}
 }
 
-static void UsePlayerMedipack(ItemInfo& item)
-{
-	auto& player = GetLaraInfo(item);
-
-	// Can't use medipack; return early.
-	if (item.HitPoints <= 0 ||
-		(item.HitPoints >= LARA_HEALTH_MAX && player.Status.Poison == 0))
-	{
-		return;
-	}
-
-	bool hasUsedMedipack = false;
-
-	if (IsClicked(In::SmallMedipack) &&
-		player.Inventory.TotalSmallMedipacks != 0)
-	{
-		hasUsedMedipack = true;
-
-		item.HitPoints += LARA_HEALTH_MAX / 2;
-		if (item.HitPoints > LARA_HEALTH_MAX)
-			item.HitPoints = LARA_HEALTH_MAX;
-
-		if (player.Inventory.TotalSmallMedipacks != -1)
-			player.Inventory.TotalSmallMedipacks--;
-	}
-	else if (IsClicked(In::LargeMedipack) &&
-		player.Inventory.TotalLargeMedipacks != 0)
-	{
-		hasUsedMedipack = true;
-		item.HitPoints = LARA_HEALTH_MAX;
-
-		if (player.Inventory.TotalLargeMedipacks != -1)
-			player.Inventory.TotalLargeMedipacks--;
-	}
-
-	if (hasUsedMedipack)
-	{
-		player.Status.Poison = 0;
-		SaveGame::Statistics.Game.HealthUsed++;
-		SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-	}
-}
-
 static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
 {
 	static const auto SCROLL_WEAPON_TYPES = std::vector<LaraWeaponType>
@@ -376,8 +333,11 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	auto& player = GetLaraInfo(item);
 
 	// Handle medipacks.
-	if (IsClicked(In::SmallMedipack) || IsClicked(In::LargeMedipack))
-		UsePlayerMedipack(item);
+	if (IsClicked(In::SmallMedipack))
+		g_Gui.UseItem(&item, GAME_OBJECT_ID::ID_SMALLMEDI_ITEM);
+	
+	if (IsClicked(In::LargeMedipack))
+		g_Gui.UseItem(&item, GAME_OBJECT_ID::ID_BIGMEDI_ITEM);
 
 	// Handle weapon scroll request.
 	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
