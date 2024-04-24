@@ -537,34 +537,24 @@ namespace TEN::Collision::Los
 		}
 	}
 
-	static SectorTraceData GetSectorTrace(const Vector3& origin, int originRoomNumber, const Vector3& target, bool collideBridges)
+	static SectorTraceData GetSectorTrace(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
-		// Create ray.
-		auto dir = target - origin;
-		dir.Normalize();
+		auto target = Geometry::TranslatePoint(origin, dir, dist);
 		auto ray = Ray(origin, dir);
 
-		// Calculate max ray distance.
-		float distMax = Vector3::Distance(origin, target);
-
-		// Calculate trace.
 		auto trace = SectorTraceData{};
-		SetSectorTraceIntercepts(trace, origin, originRoomNumber, target);
-		ClipSectorTrace(trace, ray, distMax, collideBridges);
+		SetSectorTraceIntercepts(trace, origin, roomNumber, target);
+		ClipSectorTrace(trace, ray, dist, collideBridges);
 
-		// Return trace.
 		return trace;
 	}
 
 	RoomLosData GetRoomLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
+		auto trace = GetSectorTrace(origin, roomNumber, dir, dist, collideBridges);
+
 		auto roomLos = RoomLosData{};
 
-		// Get trace.
-		auto target = Geometry::TranslatePoint(origin, dir, dist);
-		auto trace = GetSectorTrace(origin, roomNumber, target, collideBridges);
-
-		// Set room LOS.
 		roomLos.Intersect = trace.Intersect;
 		for (const auto& intercept : trace.Intercepts)
 			roomLos.RoomNumbers.insert(intercept.SectorPtr->RoomNumber);
