@@ -31,7 +31,7 @@ namespace TEN::Math
 		float det = edge0.Dot(dirCrossEdge1);
 
 		// Test if ray and triangle are parallel.
-		if (det > -EPSILON && det < EPSILON)
+		if (abs(det) < EPSILON)
 			return false;
 
 		float invDet = 1.0f / det;
@@ -47,7 +47,11 @@ namespace TEN::Math
 			return false;
 
 		// Calculate distance along ray to intersection point.
-		dist = edge1.Dot(rayToVert0CrossEdge0) * invDet;
+		float intersectDist = edge1.Dot(rayToVert0CrossEdge0) * invDet;
+		if (intersectDist < 0.0f)
+			return false;
+
+		dist = intersectDist;
 		return true;
 	}
 }

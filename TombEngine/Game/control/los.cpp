@@ -367,8 +367,6 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, c
 			}
 		}
 
-		g_Renderer.PrintDebugMessage("%d", sectorPtr);
-
 		auto tris = GenerateSectorTriangleMeshes(posList[i].ToVector3(), *sectorPtr, true);
 		for (const auto& tri : tris)
 		{
@@ -389,7 +387,6 @@ static bool ClipRoomLosIntersect(const GameVector& origin, GameVector& target, c
 
 		i++;
 	}
-	g_Renderer.PrintDebugMessage("-----");
 
 	// Get sector pointer and update intersection room number.
 	auto* sectorPtr = GetFloor(target.x, target.y, target.z, &target.RoomNumber);
