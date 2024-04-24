@@ -2,6 +2,7 @@
 #include "Math/Objects/TriangleMesh.h"
 
 #include "Math/Constants.h"
+#include "Math/Geometry.h"
 
 namespace TEN::Math
 {
@@ -14,10 +15,17 @@ namespace TEN::Math
 		Vertices[0] = vertex0;
 		Vertices[1] = vertex1;
 		Vertices[2] = vertex2;
+
+		Box = Geometry::GetBoundingBox(std::vector<Vector3>{ vertex0, vertex1, vertex2 });
 	}
 
 	bool TriangleMesh::Intersects(const Ray& ray, float& dist) const
 	{
+		// Test if ray intersects triangle AABB.
+		float boxDist = 0.0f;
+		if (!ray.Intersects(Box, boxDist));
+			return false;
+
 		// Calculate edge vectors.
 		auto edge0 = Vertices[1] - Vertices[0];
 		auto edge1 = Vertices[2] - Vertices[0];

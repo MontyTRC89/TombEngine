@@ -10,6 +10,7 @@ namespace TEN::Math
 	public:
 		// Members
 		std::array<Vector3, VERTEX_COUNT> Vertices = {};
+		BoundingBox						  Box	   = {};
 
 		// Constructors
 		TriangleMesh();

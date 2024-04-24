@@ -253,15 +253,24 @@ namespace TEN::Collision::Los
 		short roomNumber = originRoomNumber;
 		for (auto& intercept : trace.Intercepts)
 		{
-			// TODO: Not accurate traversing rooms vertically.
+			// TODO: Room traversal is wrong.
 			auto* sectorPtr = GetFloor(intercept.Position.x, intercept.Position.y, intercept.Position.z, &roomNumber);
 			intercept.SectorPtr = sectorPtr;
+
+			g_Renderer.PrintDebugMessage("%d", intercept.SectorPtr->RoomNumber);
 		}
+
+		g_Renderer.PrintDebugMessage("--------");
 	}
 
 	static int GetSurfaceTriangleHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
 	{
+		constexpr auto AXIS_OFFSET = -BLOCK(0.5f);
+
 		const auto& tri = isFloor ? sector.FloorSurface.Triangles[triID] : sector.CeilingSurface.Triangles[triID];
+
+		relX += AXIS_OFFSET;
+		relZ += AXIS_OFFSET;
 
 		auto normal = tri.Plane.Normal();
 		float relPlaneHeight = -((normal.x * relX) + (normal.z * relZ)) / normal.y;
@@ -280,10 +289,10 @@ namespace TEN::Collision::Los
 		bool isTri1Portal = surface.Triangles[1].PortalRoomNumber != NO_VALUE;
 
 		auto base = Vector3(FloorToStep(pos.x, BLOCK(1)), 0.0f, FloorToStep(pos.z, BLOCK(1)));
-		auto corner0 = base;
-		auto corner1 = base + Vector3(0.0f, 0.0f, BLOCK(1));
-		auto corner2 = base + Vector3(BLOCK(1), 0.0f, BLOCK(1));
-		auto corner3 = base + Vector3(BLOCK(1), 0.0f, 0.0f);
+		auto corner0 = base + REL_CORNER_0;
+		auto corner1 = base + REL_CORNER_1;
+		auto corner2 = base + REL_CORNER_2;
+		auto corner3 = base + REL_CORNER_3;
 
 		auto tris = std::vector<TriangleMesh>{};
 		if (sector.IsSurfaceSplit(isFloor))
@@ -294,18 +303,18 @@ namespace TEN::Collision::Los
 				{
 					// Surface triangle 0.
 					auto tri0 = TriangleMesh(
-						Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 0), corner0.z),
-						Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z),
-						Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 0), corner2.z));
+						Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 0, isFloor), corner0.z),
+						Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 0, isFloor), corner1.z),
+						Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 0, isFloor), corner2.z));
 
 					if (!isTri0Portal)
 						tris.push_back(tri0);
 
 					// Surface triangle 1.
 					auto tri1 = TriangleMesh(
-						Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 1), corner0.z),
-						Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 1), corner2.z),
-						Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
+						Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 1, isFloor), corner0.z),
+						Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 1, isFloor), corner2.z),
+						Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 1, isFloor), corner3.z));
 
 					if (!isTri1Portal)
 						tris.push_back(tri1);
@@ -334,18 +343,18 @@ namespace TEN::Collision::Los
 				{
 					// Surface triangle 0.
 					auto tri0 = TriangleMesh(
-						Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z),
-						Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 0), corner2.z),
-						Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 0), corner3.z));
+						Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 0, isFloor), corner1.z),
+						Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 0, isFloor), corner2.z),
+						Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 0, isFloor), corner3.z));
 
 					if (!isTri0Portal)
 						tris.push_back(tri0);
 
 					// Surface triangle 1.
 					auto tri1 = TriangleMesh(
-						Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 1), corner0.z),
-						Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 1), corner1.z),
-						Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
+						Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 1, isFloor), corner0.z),
+						Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 1, isFloor), corner1.z),
+						Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 1, isFloor), corner3.z));
 
 					if (!isTri1Portal)
 						tris.push_back(tri1);
@@ -378,9 +387,9 @@ namespace TEN::Collision::Los
 			if (!isTri0Portal)
 			{
 				auto tri0 = TriangleMesh(
-					Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 0), corner0.z),
-					Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z),
-					Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 0), corner2.z));
+					Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 0, isFloor), corner0.z),
+					Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 0, isFloor), corner1.z),
+					Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 0, isFloor), corner2.z));
 				tris.push_back(tri0);
 			}
 
@@ -388,9 +397,9 @@ namespace TEN::Collision::Los
 			if (!isTri1Portal)
 			{
 				auto tri1 = TriangleMesh(
-					Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 1), corner0.z),
-					Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 1), corner2.z),
-					Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
+					Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 1, isFloor), corner0.z),
+					Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 1, isFloor), corner2.z),
+					Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 1, isFloor), corner3.z));
 				tris.push_back(tri1);
 			}
 		}
