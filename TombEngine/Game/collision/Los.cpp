@@ -249,11 +249,11 @@ namespace TEN::Collision::Los
 				return (distSqr0 < distSqr1);
 			});
 
-
 		// 5) Set sector pointers.
 		short roomNumber = originRoomNumber;
 		for (auto& intercept : trace.Intercepts)
 		{
+			// TODO: Not accurate traversing rooms vertically.
 			auto* sectorPtr = GetFloor(intercept.Position.x, intercept.Position.y, intercept.Position.z, &roomNumber);
 			intercept.SectorPtr = sectorPtr;
 		}
