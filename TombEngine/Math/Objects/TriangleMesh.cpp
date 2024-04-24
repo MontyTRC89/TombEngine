@@ -23,7 +23,7 @@ namespace TEN::Math
 	{
 		// Test if ray intersects triangle AABB.
 		float boxDist = 0.0f;
-		if (!ray.Intersects(Box, boxDist));
+		if (!ray.Intersects(Box, boxDist))
 			return false;
 
 		// Calculate edge vectors.
