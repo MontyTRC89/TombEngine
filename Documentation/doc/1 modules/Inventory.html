@@ -125,16 +125,16 @@
 	<td class="summary">Set the amount of an item in the player's inventory.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetChosenItem">GetChosenItem()</a></td>
-	<td class="summary">Get last selected item in the player's inventory.</td>
+	<td class="name" ><a href="#GetUsedItem">GetUsedItem()</a></td>
+	<td class="summary">Get last item used in the player's inventory.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SetChosenItem">SetChosenItem(objectID)</a></td>
-	<td class="summary">Set last selected item in the player's inventory.</td>
+	<td class="name" ><a href="#SetUsedItem">SetUsedItem(objectID)</a></td>
+	<td class="summary">Set last item used in the player's inventory.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#ClearChosenItem">ClearChosenItem()</a></td>
-	<td class="summary">Clear last selected item in the player's inventory.</td>
+	<td class="name" ><a href="#ClearUsedItem">ClearUsedItem()</a></td>
+	<td class="summary">Clear last item used in the player's inventory.</td>
 	</tr>
 </table>
 
@@ -259,14 +259,13 @@
 
 </dd>
     <dt>
-    <a name = "GetChosenItem"></a>
-    <strong>GetChosenItem()</strong>
+    <a name = "GetUsedItem"></a>
+    <strong>GetUsedItem()</strong>
     </dt>
     <dd>
-    Get last selected item in the player's inventory.
+    Get last item used in the player's inventory.
  This value will be valid only for a single frame after exiting inventory, after which Lara says "No".
- Therefore, this function must be preferably used either in OnLoop events or callbacks.
- If you have used this function and you want to avoid "No" sound, you should use ClearChosenItem function.
+ Therefore, this function must be preferably used either in OnLoop or OnUseItem events.
 
 
 
@@ -275,7 +274,7 @@
     <ol>
 
            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-        Last selected item in the inventory.
+        Last item used in the inventory.
     </ol>
 
 
@@ -283,12 +282,12 @@
 
 </dd>
     <dt>
-    <a name = "SetChosenItem"></a>
-    <strong>SetChosenItem(objectID)</strong>
+    <a name = "SetUsedItem"></a>
+    <strong>SetUsedItem(objectID)</strong>
     </dt>
     <dd>
-    Set last selected item in the player's inventory.
- You will be able to select only objects which already exist in inventory.
+    Set last item used in the player's inventory.
+ You will be able to specify only objects which already exist in the inventory.
  Will only be valid for the next frame. If not processed by the game, Lara will say "No".
 
 
@@ -307,12 +306,13 @@
 
 </dd>
     <dt>
-    <a name = "ClearChosenItem"></a>
-    <strong>ClearChosenItem()</strong>
+    <a name = "ClearUsedItem"></a>
+    <strong>ClearUsedItem()</strong>
     </dt>
     <dd>
-    Clear last selected item in the player's inventory.
- This function is needed to avoid Lara saying "No" after selecting particular item in inventory.
+    Clear last item used in the player's inventory.
+ When this function is used in OnUseItem level function, it allows to override existing item functionality.
+ For items without existing functionality, this function is needed to avoid Lara saying "No" after using it.
 
 
 

@@ -6,6 +6,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/control/control.h"
+#include "Game/control/volume.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
@@ -2053,80 +2054,149 @@ namespace TEN::Gui
 		auto* lara = GetLaraInfo(item);
 
 		int prevOpticRange = lara->Control.Look.OpticRange;
-		short inventoryObject = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
-		short gameObject = InventoryObjectTable[inventoryObject].ObjectNumber;
-
-		item->MeshBits = ALL_JOINT_BITS;
 		lara->Control.Look.OpticRange = 0;
 		lara->Inventory.OldBusy = false;
+		item->MeshBits = ALL_JOINT_BITS;
 
-		if (lara->Control.WaterStatus == WaterStatus::Dry ||
-			lara->Control.WaterStatus == WaterStatus::Wade)
+		InventoryItemChosen = InventoryObjectTable[LastInvItem].ObjectNumber;
+
+		// Use item event handling.
+		g_GameScript->OnUseItem((GAME_OBJECT_ID)InventoryItemChosen);
+		HandleAllGlobalEvents(EventType::UseItem, (Activator)item->Index);
+
+		// Quickly discard further processing, if chosen item was reset on the script.
+		if (InventoryItemChosen == NO_VALUE)
+			return;
+
+		if (InventoryItemChosen == ID_PISTOLS_ITEM ||
+			InventoryItemChosen == ID_UZI_ITEM ||
+			InventoryItemChosen == ID_REVOLVER_ITEM)
 		{
-			if (gameObject == ID_PISTOLS_ITEM)
+			if (lara->Control.WaterStatus != WaterStatus::Dry &&
+				lara->Control.WaterStatus != WaterStatus::Wade)
 			{
-				lara->Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
-
-				if (lara->Control.HandStatus != HandStatus::Free)
-					return;
-
-				if (lara->Control.Weapon.GunType == LaraWeaponType::Pistol)
-					lara->Control.HandStatus = HandStatus::WeaponDraw;
-
 				return;
 			}
 
-			if (gameObject == ID_UZI_ITEM)
+			switch (InventoryItemChosen)
 			{
-				lara->Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+				case ID_PISTOLS_ITEM:
+					lara->Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
+					break;
 
-				if (lara->Control.HandStatus != HandStatus::Free)
+				case ID_UZI_ITEM:
+					lara->Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+					break;
+
+				case ID_REVOLVER_ITEM:
+					lara->Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+					break;
+
+				default:
 					return;
-
-				if (lara->Control.Weapon.GunType == LaraWeaponType::Uzi)
-					lara->Control.HandStatus = HandStatus::WeaponDraw;
-
-				return;
 			}
+
+			if (lara->Control.HandStatus == HandStatus::Free &&
+				lara->Control.Weapon.GunType == lara->Control.Weapon.RequestGunType)
+			{
+				lara->Control.HandStatus = HandStatus::WeaponDraw;
+			}
+			
+			InventoryItemChosen = NO_VALUE;
+			return;
 		}
 
-		if (gameObject != ID_SHOTGUN_ITEM &&
-			gameObject != ID_REVOLVER_ITEM &&
-			gameObject != ID_HK_ITEM &&
-			gameObject != ID_CROSSBOW_ITEM &&
-			gameObject != ID_GRENADE_GUN_ITEM &&
-			gameObject != ID_ROCKET_LAUNCHER_ITEM &&
-			gameObject != ID_HARPOON_ITEM)
+		if (InventoryItemChosen == ID_SHOTGUN_ITEM ||
+			InventoryItemChosen == ID_HK_ITEM ||
+			InventoryItemChosen == ID_CROSSBOW_ITEM ||
+			InventoryItemChosen == ID_GRENADE_GUN_ITEM ||
+			InventoryItemChosen == ID_ROCKET_LAUNCHER_ITEM ||
+			InventoryItemChosen == ID_HARPOON_ITEM)
 		{
-			if (gameObject == ID_FLARE_INV_ITEM)
+			if (InventoryItemChosen != ID_HARPOON_ITEM &&
+				lara->Control.WaterStatus != WaterStatus::Dry &&
+				lara->Control.WaterStatus != WaterStatus::Wade)
 			{
-				if (lara->Control.HandStatus == HandStatus::Free)
+				return;
+			}
+
+			if (TestState(item->Animation.ActiveState, CrouchStates) ||
+				TestState(item->Animation.ActiveState, CrawlStates))
+			{
+				return;
+			}
+
+			switch (InventoryItemChosen)
+			{
+				case ID_SHOTGUN_ITEM:
+					lara->Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
+					break;
+
+				case ID_REVOLVER_ITEM:
+					lara->Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+					break;
+
+				case ID_HK_ITEM:
+					lara->Control.Weapon.RequestGunType = LaraWeaponType::HK;
+					break;
+
+				case ID_CROSSBOW_ITEM:
+					lara->Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
+					break;
+
+				case ID_GRENADE_GUN_ITEM:
+					lara->Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
+					break;
+
+				case ID_HARPOON_ITEM:
+					lara->Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
+					break;
+
+				case ID_ROCKET_LAUNCHER_ITEM:
+					lara->Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+					break;
+
+				default:
+					return;
+			}
+
+			if (lara->Control.HandStatus == HandStatus::Free &&
+				lara->Control.Weapon.GunType == lara->Control.Weapon.RequestGunType)
+			{
+				lara->Control.HandStatus = HandStatus::WeaponDraw;
+			}
+
+			InventoryItemChosen = NO_VALUE;
+			return;
+		}
+
+		switch (InventoryItemChosen)
+		{
+			case ID_FLARE_INV_ITEM:
+				if (lara->Control.HandStatus != HandStatus::Free)
 				{
-					if (!TestState(item->Animation.ActiveState, CrawlStates))
+					return;
+				}
+
+				if (!TestState(item->Animation.ActiveState, CrawlStates))
+				{
+					if (lara->Control.Weapon.GunType != LaraWeaponType::Flare)
 					{
-						if (lara->Control.Weapon.GunType != LaraWeaponType::Flare)
-						{
-							// HACK.
-							ClearAllActions();
-							ActionMap[(int)In::Flare].Update(1.0f);
+						// HACK.
+						ClearAllActions();
+						ActionMap[(int)In::Flare].Update(1.0f);
 
-							HandleWeapon(*item);
-							ClearAllActions();
-						}
-
-						return;
+						HandleWeapon(*item);
+						ClearAllActions();
 					}
 				}
 
-				SayNo();
+				InventoryItemChosen = NO_VALUE;
 				return;
-			}
 
-			switch (inventoryObject)
-			{
-			case INV_OBJECT_BINOCULARS:
+			case ID_BINOCULARS_ITEM:
 				if (((item->Animation.ActiveState == LS_IDLE && item->Animation.AnimNumber == LA_STAND_IDLE) ||
-						(lara->Control.IsLow && !IsHeld(In::Crouch))) &&
+					(lara->Control.IsLow && !IsHeld(In::Crouch))) &&
 					!UseSpotCam && !TrackCameraInit)
 				{
 					lara->Control.Look.OpticRange = 128;
@@ -2150,14 +2220,14 @@ namespace TEN::Gui
 					BinocularOldCamera = Camera.oldType;
 				}
 
+				InventoryItemChosen = NO_VALUE;
 				return;
 
-			case INV_OBJECT_SMALL_MEDIPACK:
+			case ID_SMALLMEDI_ITEM:
 
 				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) &&
 					lara->Status.Poison == 0)
 				{
-					SayNo();
 					return;
 				}
 
@@ -2176,16 +2246,16 @@ namespace TEN::Gui
 					SaveGame::Statistics.Game.HealthUsed++;
 				}
 				else
-					SayNo();
+					return;
 
+				InventoryItemChosen = NO_VALUE;
 				return;
 
-			case INV_OBJECT_LARGE_MEDIPACK:
+			case ID_BIGMEDI_ITEM:
 
 				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) &&
 					lara->Status.Poison == 0)
 				{
-					SayNo();
 					return;
 				}
 
@@ -2201,115 +2271,13 @@ namespace TEN::Gui
 					SaveGame::Statistics.Game.HealthUsed++;
 				}
 				else
-					SayNo();
+					return;
 
+				InventoryItemChosen = NO_VALUE;
 				return;
 
 			default:
-				InventoryItemChosen = gameObject;
 				return;
-			}
-
-			return;
-		}
-
-		if (lara->Control.HandStatus == HandStatus::Busy)
-		{
-			SayNo();
-			return;
-		}
-
-		if (TestState(item->Animation.ActiveState, CrouchStates) ||
-			TestState(item->Animation.ActiveState, CrawlStates))
-		{
-			SayNo();
-			return;
-		}
-
-		if (gameObject == ID_SHOTGUN_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
-
-			if (lara->Control.HandStatus != HandStatus::Free)
-				return;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Shotgun)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
-
-			return;
-		}
-
-		if (gameObject == ID_REVOLVER_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
-
-			if (lara->Control.HandStatus != HandStatus::Free)
-				return;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
-
-			return;
-		}
-		else if (gameObject == ID_HK_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::HK;
-
-			if (lara->Control.HandStatus != HandStatus::Free)
-				return;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::HK)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
-
-			return;
-		}
-		else if (gameObject == ID_CROSSBOW_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
-
-			if (lara->Control.HandStatus != HandStatus::Free)
-				return;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
-
-			return;
-		}
-		else if (gameObject == ID_GRENADE_GUN_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
-
-			if (lara->Control.HandStatus != HandStatus::Free)
-				return;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::GrenadeLauncher)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
-
-			return;
-		}
-		else if (gameObject == ID_HARPOON_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
-
-			if (lara->Control.HandStatus != HandStatus::Free)
-				return;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::HarpoonGun)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
-
-			return;
-		}
-		else if (gameObject == ID_ROCKET_LAUNCHER_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
-
-			if (lara->Control.HandStatus != HandStatus::Free)
-				return;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::RocketLauncher)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
-
-			return;
 		}
 	}
 
