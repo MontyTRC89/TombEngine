@@ -442,8 +442,10 @@ namespace TEN::Collision::Los
 
 		// Run through intercepts sorted by distance.
 		const FloorInfo* prevSectorPtr = nullptr;
-		for (const auto& intercept : trace.Intercepts)
+		for (int i = 0; i < trace.Intercepts.size(); i++)
 		{
+			const auto& intercept = trace.Intercepts[i];
+
 			// Debug
 			g_Renderer.AddDebugTarget(intercept.Position.ToVector3(), Quaternion::Identity, 30, Color(1.0f, 0.0f, 0.0f));
 
@@ -528,11 +530,14 @@ namespace TEN::Collision::Los
 			}
 			prevSectorPtr = intercept.SectorPtr;
 
-			// Has clip; set intersection ang return early.
+			// Has clip; set intersect and trim vector.
 			if (closestDist != INFINITY)
 			{
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
+
 				trace.Intersect = std::pair(intersectPos, intercept.SectorPtr->RoomNumber);
+				trace.Intercepts.erase((trace.Intercepts.begin() + i) + 1, trace.Intercepts.end());
+				return;
 			}
 		}
 	}
