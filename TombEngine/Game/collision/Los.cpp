@@ -283,6 +283,10 @@ namespace TEN::Collision::Los
 		constexpr auto REL_CORNER_2 = Vector3(BLOCK(1), 0.0f, BLOCK(1));
 		constexpr auto REL_CORNER_3 = Vector3(BLOCK(1), 0.0f, 0.0f);
 
+		const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
+		bool isTri0Portal = surface.Triangles[0].PortalRoomNumber != NO_VALUE;
+		bool isTri1Portal = surface.Triangles[1].PortalRoomNumber != NO_VALUE;
+
 		auto base = Vector3(FloorToStep(pos.x, BLOCK(1)), 0.0f, FloorToStep(pos.z, BLOCK(1)));
 		auto corner0 = base;
 		auto corner1 = base + Vector3(0.0f, 0.0f, BLOCK(1));
@@ -292,138 +296,117 @@ namespace TEN::Collision::Los
 		auto tris = std::vector<TriangleMesh>{};
 		if (sector.IsSurfaceSplit(isFloor))
 		{
-			const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
-
-			if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
+			if (!isTri0Portal || !isTri1Portal)
 			{
-				// Calculate triangle 0.
-				auto tri0 = TriangleMesh(
-					Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 0), corner0.z),
-					Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z),
-					Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 0), corner2.z));
-
-				// Calculate triangle 1.
-				auto tri1 = TriangleMesh(
-					Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 1), corner0.z),
-					Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 1), corner2.z),
-					Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
-
-				// Calculate triangle 0.
-				//auto tri0 = TriangleMesh(
-				//	Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 0, isFloor), corner0.z),
-				//	Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 0, isFloor), corner1.z),
-				//	Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 0, isFloor), corner2.z));
-
-				//// Calculate triangle 1.
-				//auto tri1 = TriangleMesh(
-				//	Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 1, isFloor), corner0.z),
-				//	Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 1, isFloor), corner2.z),
-				//	Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 1, isFloor), corner3.z));
-
-				// Collect surface triangles.
-				tris.push_back(tri0);
-				tris.push_back(tri1);
-
-				// Calculate and collect diagonal wall triangles.
-				if (tri0.Vertices[0] != tri1.Vertices[0] && tri0.Vertices[2] != tri1.Vertices[1])
+				if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
 				{
-					auto tri2 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[0], tri0.Vertices[2]);
-					auto tri3 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[1]);
+					// Surface triangle 0.
+					auto tri0 = TriangleMesh(
+						Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 0), corner0.z),
+						Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z),
+						Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 0), corner2.z));
 
-					tris.push_back(tri2);
-					tris.push_back(tri3);
+					if (!isTri0Portal)
+						tris.push_back(tri0);
+
+					// Surface triangle 1.
+					auto tri1 = TriangleMesh(
+						Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 1), corner0.z),
+						Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 1), corner2.z),
+						Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
+
+					if (!isTri1Portal)
+						tris.push_back(tri1);
+
+					// Diagonal wall triangles.
+					if (tri0.Vertices[0] != tri1.Vertices[0] && tri0.Vertices[2] != tri1.Vertices[1])
+					{
+						auto tri2 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[0], tri0.Vertices[2]);
+						tris.push_back(tri2);
+
+						auto tri3 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[1]);
+						tris.push_back(tri3);
+					}
+					else if (tri0.Vertices[0] != tri1.Vertices[0] && tri0.Vertices[2] == tri1.Vertices[1])
+					{
+						auto tri2 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[0], tri0.Vertices[2]);
+						tris.push_back(tri2);
+					}
+					else if (tri0.Vertices[2] == tri1.Vertices[1] && tri0.Vertices[2] != tri1.Vertices[1])
+					{
+						auto tri2 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[1]);
+						tris.push_back(tri2);
+					}
 				}
-				else if (tri0.Vertices[0] != tri1.Vertices[0] && tri0.Vertices[2] == tri1.Vertices[1])
+				else if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_1)
 				{
-					auto tri2 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[0], tri0.Vertices[2]);
-					tris.push_back(tri2);
-				}
-				else if (tri0.Vertices[2] == tri1.Vertices[1] && tri0.Vertices[2] != tri1.Vertices[1])
-				{
-					auto tri2 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[1]);
-					tris.push_back(tri2);
-				}
-			}
-			else if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_1)
-			{
-				// Calculate triangle 0.
-				auto tri1 = TriangleMesh(
-					Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z),
-					Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 0), corner2.z),
-					Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 0), corner3.z));
+					// Surface triangle 0.
+					auto tri0 = TriangleMesh(
+						Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z),
+						Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 0), corner2.z),
+						Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 0), corner3.z));
 
-				// Calculate triangle 1.
-				auto tri0 = TriangleMesh(
-					Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 1), corner0.z),
-					Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 1), corner1.z),
-					Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
+					if (!isTri0Portal)
+						tris.push_back(tri0);
 
-				// Calculate triangle 0.
-				//auto tri1 = TriangleMesh(
-				//	Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 0, isFloor), corner1.z),
-				//	Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 0, isFloor), corner2.z),
-				//	Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 0, isFloor), corner3.z));
+					// Surface triangle 1.
+					auto tri1 = TriangleMesh(
+						Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 1), corner0.z),
+						Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 1), corner1.z),
+						Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
 
-				//// Calculate triangle 1.
-				//auto tri0 = TriangleMesh(
-				//	Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 1, isFloor), corner0.z),
-				//	Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 1, isFloor), corner1.z),
-				//	Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 1, isFloor), corner3.z));
+					if (!isTri1Portal)
+						tris.push_back(tri1);
 
-				// Collect surface triangles.
-				tris.push_back(tri0);
-				tris.push_back(tri1);
+					// Diagonal wall triangles.
+					if (tri1.Vertices[1] != tri0.Vertices[0] && tri1.Vertices[2] != tri0.Vertices[2])
+					{
+						auto tri2 = TriangleMesh(tri1.Vertices[1], tri0.Vertices[0], tri1.Vertices[2]);
+						tris.push_back(tri2);
 
-				// Calculate and collect diagonal wall triangles.
-				if (tri0.Vertices[1] != tri1.Vertices[0] && tri0.Vertices[2] != tri1.Vertices[2])
-				{
-					auto tri2 = TriangleMesh(tri0.Vertices[1], tri1.Vertices[0], tri0.Vertices[2]);
-					auto tri3 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[2]);
-
-					tris.push_back(tri2);
-					tris.push_back(tri3);
-				}
-				else if (tri0.Vertices[1] != tri1.Vertices[0] && tri0.Vertices[2] == tri1.Vertices[2])
-				{
-					auto tri2 = TriangleMesh(tri0.Vertices[1], tri1.Vertices[0], tri0.Vertices[2]);
-					tris.push_back(tri2);
-				}
-				else if (tri0.Vertices[2] == tri1.Vertices[2] && tri0.Vertices[2] != tri1.Vertices[2])
-				{
-					auto tri2 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[2]);
-					tris.push_back(tri2);
+						auto tri3 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[2], tri0.Vertices[2]);
+						tris.push_back(tri3);
+					}
+					else if (tri1.Vertices[1] != tri0.Vertices[0] && tri1.Vertices[2] == tri0.Vertices[2])
+					{
+						auto tri2 = TriangleMesh(tri1.Vertices[1], tri0.Vertices[0], tri1.Vertices[2]);
+						tris.push_back(tri2);
+					}
+					else if (tri1.Vertices[2] == tri0.Vertices[2] && tri1.Vertices[2] != tri0.Vertices[2])
+					{
+						auto tri2 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[2], tri0.Vertices[2]);
+						tris.push_back(tri2);
+					}
 				}
 			}
 		}
 		else
 		{
-			// Calculate triangle 0.
-			auto tri0 = TriangleMesh(
-				Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 0), corner0.z),
-				Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z),
-				Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 0), corner2.z));
+			// Surface triangle 0.
+			if (!isTri0Portal)
+			{
+				auto tri0 = TriangleMesh(
+					Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 0), corner0.z),
+					Vector3(corner1.x, sector.GetSurfaceHeight(corner1.x, corner1.z - 1, isFloor, 0), corner1.z),
+					Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 0), corner2.z));
+				tris.push_back(tri0);
+			}
 
-			// Calculate triangle 1.
-			auto tri1 = TriangleMesh(
-				Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 1), corner0.z),
-				Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 1), corner2.z),
-				Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
-			
-			// Calculate triangle 0.
-			//auto tri0 = TriangleMesh(
-			//	Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 0, isFloor), corner0.z),
-			//	Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 0, isFloor), corner1.z),
-			//	Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 0, isFloor), corner2.z));
+			// Surface triangle 1.
+			if (!isTri1Portal)
+			{
+				auto tri1 = TriangleMesh(
+					Vector3(corner0.x, sector.GetSurfaceHeight(corner0.x, corner0.z, isFloor, 1), corner0.z),
+					Vector3(corner2.x, sector.GetSurfaceHeight(corner2.x - 1, corner2.z - 1, isFloor, 1), corner2.z),
+					Vector3(corner3.x, sector.GetSurfaceHeight(corner3.x - 1, corner3.z, isFloor, 1), corner3.z));
+				tris.push_back(tri1);
+			}
+		}
 
-			//// Calculate triangle 1.
-			//auto tri1 = TriangleMesh(
-			//	Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 1, isFloor), corner0.z),
-			//	Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 1, isFloor), corner2.z),
-			//	Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 1, isFloor), corner3.z));
-
-			// Collect surface triangles.
-			tris.push_back(tri0);
-			tris.push_back(tri1);
+		for (const auto& tri : tris)
+		{
+			auto offset = Vector3::UnitY * (isFloor ? -1 : 1);
+			g_Renderer.AddDebugTriangle(tri.Vertices[0] + offset, tri.Vertices[1] + offset, tri.Vertices[2] + offset, Color(1, 1, 0, 0.1f));
 		}
 
 		return tris;
