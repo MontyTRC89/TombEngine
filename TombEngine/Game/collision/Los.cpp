@@ -440,7 +440,7 @@ namespace TEN::Collision::Los
 		};
 	}
 
-	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray, float distMax)
+	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray, float distMax, bool ignoreBridges)
 	{
 		float closestDist = INFINITY;
 		int roomNumber = NO_VALUE;
@@ -482,49 +482,52 @@ namespace TEN::Collision::Los
 				}
 
 				// 4) Clip bridge.
-				for (int movID : intercept.SectorPtr->BridgeItemNumbers)
+				if (!ignoreBridges)
 				{
-					const auto& bridgeMov = g_Level.Items[movID];
-
-					if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
-						continue;
-
-					// Determine relative tilt offset.
-					auto offset = Vector3::Zero;
-					switch (bridgeMov.ObjectNumber)
+					for (int movID : intercept.SectorPtr->BridgeItemNumbers)
 					{
-					default:
-						break;
+						const auto& bridgeMov = g_Level.Items[movID];
 
-					case ID_BRIDGE_TILT1:
-						offset = Vector3(0.0f, CLICK(1), 0.0f);
-						break;
+						if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
+							continue;
 
-					case ID_BRIDGE_TILT2:
-						offset = Vector3(0.0f, CLICK(2), 0.0f);
-						break;
+						// Determine relative tilt offset.
+						auto offset = Vector3::Zero;
+						switch (bridgeMov.ObjectNumber)
+						{
+						default:
+							break;
 
-					case ID_BRIDGE_TILT3:
-						offset = Vector3(0.0f, CLICK(3), 0.0f);
-						break;
+						case ID_BRIDGE_TILT1:
+							offset = Vector3(0.0f, CLICK(1), 0.0f);
+							break;
 
-					case ID_BRIDGE_TILT4:
-						offset = Vector3(0.0f, CLICK(4), 0.0f);
-						break;
-					}
+						case ID_BRIDGE_TILT2:
+							offset = Vector3(0.0f, CLICK(2), 0.0f);
+							break;
 
-					// Calculate absolute tilt offset.
-					auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
-					offset = Vector3::Transform(offset, rotMatrix);
+						case ID_BRIDGE_TILT3:
+							offset = Vector3(0.0f, CLICK(3), 0.0f);
+							break;
 
-					// Collide bridge mesh.
-					auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
-					auto bridgeTris = GenerateBridgeTriangleMeshes(box, offset);
-					for (const auto& tri : bridgeTris)
-					{
-						float dist = 0.0f;
-						if (tri.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
-							closestDist = dist;
+						case ID_BRIDGE_TILT4:
+							offset = Vector3(0.0f, CLICK(4), 0.0f);
+							break;
+						}
+
+						// Calculate absolute tilt offset.
+						auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
+						offset = Vector3::Transform(offset, rotMatrix);
+
+						// Collide bridge mesh.
+						auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
+						auto bridgeTris = GenerateBridgeTriangleMeshes(box, offset);
+						for (const auto& tri : bridgeTris)
+						{
+							float dist = 0.0f;
+							if (tri.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
+								closestDist = dist;
+						}
 					}
 				}
 			}
@@ -539,7 +542,7 @@ namespace TEN::Collision::Los
 		}
 	}
 
-	static SectorTraceData GetSectorTrace(const Vector3& origin, int originRoomNumber, const Vector3& target)
+	static SectorTraceData GetSectorTrace(const Vector3& origin, int originRoomNumber, const Vector3& target, bool ignoreBridges)
 	{
 		// Create ray.
 		auto dir = target - origin;
@@ -552,18 +555,18 @@ namespace TEN::Collision::Los
 		// Calculate trace.
 		auto trace = SectorTraceData{};
 		SetSectorTraceIntercepts(trace, origin, originRoomNumber, target);
-		ClipSectorTrace(trace, ray, distMax);
+		ClipSectorTrace(trace, ray, distMax, ignoreBridges);
 
 		// Return trace.
 		return trace;
 	}
 
-	RoomLosData GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
+	RoomLosData GetRoomLos(const Vector3& origin, int originRoomNumber, const Vector3& target, bool ignoreBridges)
 	{
 		auto roomLos = RoomLosData{};
 
 		// Get trace.
-		auto trace = GetSectorTrace(origin, originRoomNumber, target);
+		auto trace = GetSectorTrace(origin, originRoomNumber, target, ignoreBridges);
 
 		// Set room LOS.
 		roomLos.Intersect = trace.Intersect;
