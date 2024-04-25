@@ -35,6 +35,12 @@ using TEN::Renderer::g_Renderer;
 constexpr auto CAMERA_OBJECT_COLL_DIST_THRESHOLD   = BLOCK(4);
 constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
+struct CameraLosData
+{
+	bool					IsIntersected = false;
+	std::pair<Vector3, int> Position	  = {};
+};
+
 struct PrevCameraData
 {
 	Pose pos;
@@ -151,58 +157,54 @@ static bool TestCameraCollidableStatic(const MESH_INFO& staticObject)
 	return true;
 }
 
-static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector3& origin, int originRoomNumber, const Vector3& target)
+static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
 {
 	constexpr auto DIST_BUFFER = BLOCK(0.1f);
 
 	auto dir = target - origin;
 	dir.Normalize();
 	float dist = Vector3::Distance(origin, target);
+	auto los = GetLos(origin, originRoomNumber, dir, dist, true, false, true);
 
-	// Run through LOS instances.
-	auto losInstances = GetLosInstances(origin, originRoomNumber, dir, dist, true, false, true);
-	for (const auto& losInstance : losInstances)
+	float closestDist = INFINITY;
+	auto cameraLos = CameraLosData{ los.Room.IsIntersected, los.Room.Position };
+
+	for (const auto& movLos : los.Moveables)
 	{
-		// Test object collidability (if applicable).
-		if (losInstance.Object.has_value())
+		if (!TestCameraCollidableItem(movLos.Moveable))
+			continue;
+
+		if (movLos.Distance < closestDist)
 		{
-			// FAILSAFE: Ignore sphere.
-			if (losInstance.SphereID != NO_VALUE)
-				continue;
-
-			if (std::holds_alternative<ItemInfo*>(*losInstance.Object))
-			{
-				const auto& item = *std::get<ItemInfo*>(*losInstance.Object);
-				if (!TestCameraCollidableItem(item))
-					continue;
-
-			}
-			else if (std::holds_alternative<MESH_INFO*>(*losInstance.Object))
-			{
-				const auto& staticObj = *std::get<MESH_INFO*>(*losInstance.Object);
-				if (!TestCameraCollidableStatic(staticObj))
-					continue;
-			}
+			closestDist = movLos.Distance;
+			auto cameraLos = CameraLosData{ true, movLos.Intersect };
+			break;
 		}
-
-		// TODO: Shift instead.
-		// Apply distance buffer.
-		auto intersect = std::pair(losInstance.Position, losInstance.RoomNumber);
-		if (losInstance.Distance < dist)
-		{
-			float currentDist = Vector3::Distance(origin, losInstance.Position);
-			float targetDist = std::max(currentDist - DIST_BUFFER, DIST_BUFFER);
-			dist = currentDist - targetDist;
-
-			intersect.first = Geometry::TranslatePoint(losInstance.Position, -dir, dist);
-			intersect.second = GetCollision(losInstance.Position, losInstance.RoomNumber, -dir, dist).RoomNumber;
-		}
-
-		return intersect;
 	}
 
-	// No intersection; return nullopt.
-	return std::nullopt;
+	for (const auto& staticLos : los.Statics)
+	{
+		if (!TestCameraCollidableStatic(staticLos.Static))
+			continue;
+
+		if (staticLos.Distance < closestDist)
+		{
+			closestDist = staticLos.Distance;
+			auto cameraLos = CameraLosData{ true, staticLos.Intersect };
+			break;
+		}
+	}
+
+	// Apply distance buffer.
+	float currentDist = Vector3::Distance(origin, cameraLos.Position.first);
+	float targetDist = std::max(currentDist - DIST_BUFFER, DIST_BUFFER);
+	dist = currentDist - targetDist;
+
+	cameraLos.Position = std::pair(
+		Geometry::TranslatePoint(cameraLos.Position.first, -dir, dist),
+		GetCollision(cameraLos.Position.first, cameraLos.Position.second, -dir, dist).RoomNumber);
+
+	return cameraLos;
 }
 
 std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, int push, bool yFirst)
@@ -415,11 +417,7 @@ void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	// Define landmarks.
 	auto lookAt = basePos + GetCameraPlayerOffset(playerItem, coll);
 	auto idealPos = std::pair(Geometry::TranslatePoint(lookAt, dir, dist), Camera.LookAtRoomNumber);
-
-	// Calculate LOS intersection.
-	auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos.first);
-	if (intersect.has_value())
-		idealPos = *intersect;
+	idealPos = GetCameraLos(Camera.LookAt, Camera.LookAtRoomNumber, idealPos.first).Position;
 
 	// Update camera.
 	Camera.LookAt += (lookAt - Camera.LookAt) * (1.0f / Camera.speed);
@@ -548,12 +546,9 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	Camera.RoomNumber = idealRoomNumber;
 
 	// Assess LOS.
-	auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, Camera.Position);
-	if (intersect.has_value())
-	{
-		Camera.Position = intersect->first;
-		Camera.RoomNumber = intersect->second;
-	}
+	auto cameraLos = GetCameraLos(Camera.LookAt, Camera.LookAtRoomNumber, Camera.Position).Position;
+	Camera.Position = cameraLos.first;
+	Camera.RoomNumber = cameraLos.second;
 
 	// Bounce.
 	if (Camera.bounce != 0)
@@ -744,13 +739,8 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		auto dir = -EulerAngles(Camera.actualElevation, Camera.actualAngle, 0).ToDirection();
 
 		// Calcuate ideal position.
-		auto idealPos = std::pair(
-			Geometry::TranslatePoint(Camera.LookAt, dir, Camera.targetDistance), Camera.LookAtRoomNumber);
-		
-		// Assess LOS.
-		auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos.first);
-		if (intersect.has_value())
-			idealPos = *intersect;
+		auto idealPos = std::pair(Geometry::TranslatePoint(Camera.LookAt, dir, Camera.targetDistance), Camera.LookAtRoomNumber);
+		idealPos = GetCameraLos(Camera.LookAt, Camera.LookAtRoomNumber, idealPos.first).Position;
 
 		// Apply strafe camera effects.
 		if (IsPlayerStrafing(playerItem))
@@ -792,13 +782,12 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			auto idealPos = std::pair(
 				Geometry::TranslatePoint(Camera.LookAt, dir, Camera.targetDistance), Camera.LookAtRoomNumber);
 
-			// Assess LOS.
-			auto intersect = GetCameraLosIntersect(Camera.LookAt, Camera.LookAtRoomNumber, idealPos.first);
-			if (intersect.has_value())
-				idealPos = *intersect;
+			// Get camera LOS.
+			auto cameraLos = GetCameraLos(Camera.LookAt, Camera.LookAtRoomNumber, idealPos.first);
+			idealPos = cameraLos.Position;
 
 			// Has no LOS intersection.
-			if (!intersect.has_value())
+			if (!cameraLos.IsIntersected)
 			{
 				// Initial swivel is clear; set ideal.
 				if (i == 0)
