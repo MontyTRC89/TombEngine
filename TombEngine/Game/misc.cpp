@@ -40,7 +40,7 @@ void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
 	}
 }
 
-bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist)
+bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, float canFloat)
 {
 	auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, dist);
 	auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, dist);
@@ -59,15 +59,22 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist)
 	{
 		// Test for step.
 		int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
-		if (relFloorHeight >= CLICK(1) && item.Pose.Position.y >= pointColl.Position.Floor)
-			return false;
+
+		if (relFloorHeight >= CLICK(1) && item.Pose.Position.y >= pointColl.Position.Floor && canFloat)
+				return false;
+		
+		else if (relFloorHeight >= CLICK(1) && !canFloat)
+				return false;		
 	}
 	// Sloped floor.
 	else
 	{
 		// Half block.
 		int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
-		if (relFloorHeight > CLICK(1))
+		if (relFloorHeight > CLICK(1) && canFloat)
+			return false;
+
+		else if (relFloorHeight > CLICK(2) && !canFloat)
 			return false;
 
 		short slopeAngle = ANGLE(0.0f);
@@ -104,8 +111,16 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist)
 	// Test ceiling height.
 	int relCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
 
-	if (relCeilHeight <= height)
-		return false;
+	if (canFloat)
+	{
+		if (relCeilHeight <= height)
+			return false;
+	}
+	else
+	{
+		if (relCeilHeight < BLOCK(1))
+			return false;
+	}
 
 	// Check for blocked grey box.
 	if (g_Level.Boxes[pointColl.Block->Box].flags & BLOCKABLE)
