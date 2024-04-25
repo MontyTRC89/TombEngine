@@ -181,7 +181,7 @@ namespace TEN::Gui
 		bool PerformWaterskinCombine(ItemInfo* item, bool flag);
 		void DrawCompass(ItemInfo* item);
 		void CancelInventorySelection();
-		void UseItem(ItemInfo* item, int objectNumber);
+		void UseItem(ItemInfo& item, int objectNumber);
 
 		// Getters
 		const InventoryRing& GetRing(RingTypes ringType);

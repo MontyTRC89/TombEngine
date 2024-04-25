@@ -334,10 +334,13 @@ void HandlePlayerQuickActions(ItemInfo& item)
 
 	// Handle medipacks.
 	if (IsClicked(In::SmallMedipack))
-		g_Gui.UseItem(&item, GAME_OBJECT_ID::ID_SMALLMEDI_ITEM);
-	
-	if (IsClicked(In::LargeMedipack))
-		g_Gui.UseItem(&item, GAME_OBJECT_ID::ID_BIGMEDI_ITEM);
+	{
+		g_Gui.UseItem(item, GAME_OBJECT_ID::ID_SMALLMEDI_ITEM);
+	}
+	else if (IsClicked(In::LargeMedipack))
+	{
+		g_Gui.UseItem(item, GAME_OBJECT_ID::ID_BIGMEDI_ITEM);
+	}
 
 	// Handle weapon scroll request.
 	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
@@ -379,7 +382,7 @@ void HandlePlayerQuickActions(ItemInfo& item)
 
 	// TODO: 10th possible weapon, probably grapple gun.
 	/*if (IsClicked(In::Weapon10) && player.Weapons[(int)LaraWeaponType::].Present)
-	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
+		player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
 }
 
 bool CanPlayerLookAround(const ItemInfo& item)
