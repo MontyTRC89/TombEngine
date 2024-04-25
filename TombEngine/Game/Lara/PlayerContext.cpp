@@ -190,7 +190,7 @@ namespace TEN::Entities::Player
 		}
 
 		// 3) Check for death floor (if applicable).
-		if (setup.TestDeathFloor && pointColl.Block->Flags.Death)
+		if (setup.TestDeathFloor && pointColl.Block->Flags.Death && pointColl.Position.Bridge == NO_VALUE)
 			return false;
 
 		// LOS setup at upper floor bound.
