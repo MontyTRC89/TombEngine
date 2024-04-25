@@ -27,7 +27,6 @@ namespace TEN::Effects::EmberEmitter
 		
 		if (item.TriggerFlags < 0)
 		{
-
 			if (item.TriggerFlags > -11)
 				item.TriggerFlags = -11;
 

@@ -40,7 +40,7 @@ void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
 	}
 }
 
-bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, float canFloat)
+bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, bool canFloat)
 {
 	auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, dist);
 	auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, dist);
@@ -61,10 +61,13 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, flo
 		int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
 
 		if (relFloorHeight >= CLICK(1) && item.Pose.Position.y >= pointColl.Position.Floor && canFloat)
-				return false;
-		
+		{
+			return false;
+		}		
 		else if (relFloorHeight >= CLICK(1) && !canFloat)
-				return false;		
+		{
+			return false;
+		}
 	}
 	// Sloped floor.
 	else
