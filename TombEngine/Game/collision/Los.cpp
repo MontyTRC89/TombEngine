@@ -91,6 +91,9 @@ namespace TEN::Collision::Los
 			auto movs = GetNearbyMoveables(los.Room.RoomNumbers);
 			for (auto* mov : movs)
 			{
+				if (mov->IsBridge())
+					continue;
+
 				// 2) Collect moveable LOS instances.
 				if (collideMoveables)
 				{
@@ -105,7 +108,7 @@ namespace TEN::Collision::Los
 							auto offset = intersectPos - mov->Pose.Position.ToVector3();
 							int roomNumber = GetCollision(mov->Pose.Position, mov->RoomNumber, offset).RoomNumber;
 
-							los.Moveables.push_back(MoveableLosData{ *mov, std::pair(intersectPos, roomNumber), intersectDist });
+							los.Moveables.push_back(MoveableLosData{ mov, std::pair(intersectPos, roomNumber), intersectDist });
 						}
 					}
 				}
@@ -127,7 +130,7 @@ namespace TEN::Collision::Los
 								auto offset = intersectPos - mov->Pose.Position.ToVector3();
 								int roomNumber = GetCollision(mov->Pose.Position, mov->RoomNumber, offset).RoomNumber;
 
-								los.MoveableSpheres.push_back(MoveableSphereLosData{ *mov, std::pair(intersectPos, roomNumber), i, intersectDist });
+								los.MoveableSpheres.push_back(MoveableSphereLosData{ mov, std::pair(intersectPos, roomNumber), i, intersectDist });
 							}
 						}
 					}
@@ -168,7 +171,7 @@ namespace TEN::Collision::Los
 						auto offset = intersectPos - staticObj->pos.Position.ToVector3();
 						int roomNumber = GetCollision(staticObj->pos.Position, staticObj->roomNumber, offset).RoomNumber;
 
-						los.Statics.push_back(StaticLosData{ *staticObj, std::pair(intersectPos, roomNumber), intersectDist });
+						los.Statics.push_back(StaticLosData{ staticObj, std::pair(intersectPos, roomNumber), intersectDist });
 					}
 				}
 			}
@@ -600,11 +603,11 @@ namespace TEN::Collision::Los
 		for (auto& movLos : los.Moveables)
 		{
 			// 1) Check if moveable is not player (if applicable).
-			if (!collidePlayer && movLos.Moveable.ObjectNumber == ID_LARA)
+			if (!collidePlayer && movLos.Moveable->ObjectNumber == ID_LARA)
 				continue;
 
 			// 2) Check if moveable is deactivated.
-			if (movLos.Moveable.Status == ItemStatus::ITEM_DEACTIVATED)
+			if (movLos.Moveable->Status == ItemStatus::ITEM_DEACTIVATED)
 				continue;
 
 			return movLos;
@@ -619,11 +622,11 @@ namespace TEN::Collision::Los
 		for (auto& movSphereLos : los.MoveableSpheres)
 		{
 			// 1) Check if moveable is not player (if applicable).
-			if (!collidePlayer && movSphereLos.Moveable.ObjectNumber == ID_LARA)
+			if (!collidePlayer && movSphereLos.Moveable->ObjectNumber == ID_LARA)
 				continue;
 
 			// 2) Check if moveable is deactivated.
-			if (movSphereLos.Moveable.Status == ItemStatus::ITEM_DEACTIVATED)
+			if (movSphereLos.Moveable->Status == ItemStatus::ITEM_DEACTIVATED)
 				continue;
 
 			return movSphereLos;
@@ -638,11 +641,11 @@ namespace TEN::Collision::Los
 		for (auto& staticLos : los.Statics)
 		{
 			// 1) Check if static is solid (if applicable).
-			if (collideOnlySolid && !(staticLos.Static.flags & StaticMeshFlags::SM_SOLID))
+			if (collideOnlySolid && !(staticLos.Static->flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
 			// 2) Check if static is visible.
-			if (!(staticLos.Static.flags & StaticMeshFlags::SM_VISIBLE))
+			if (!(staticLos.Static->flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
 			return staticLos;

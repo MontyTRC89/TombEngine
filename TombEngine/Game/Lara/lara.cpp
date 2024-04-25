@@ -89,8 +89,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto target = Geometry::TranslatePoint(origin, dir, BLOCK(10));
 
 	auto roomLos = GetRoomLos(origin, item->RoomNumber, dir, BLOCK(10));
-	g_Renderer.AddDebugLine(origin, roomLos.Intersect.has_value() ? roomLos.Intersect->first : target, Vector4::One);
-	g_Renderer.AddDebugTarget(roomLos.Intersect.has_value() ? roomLos.Intersect->first : target, Quaternion::Identity, 100, Color(1, 1, 1));
+	g_Renderer.AddDebugLine(origin, roomLos.Position.first, Vector4::One);
+	g_Renderer.AddDebugTarget(roomLos.Position.first, Quaternion::Identity, 100, Color(1, 1, 1));
 
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);
 	//g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));

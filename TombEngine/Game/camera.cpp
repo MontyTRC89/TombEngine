@@ -99,7 +99,7 @@ int RumbleCounter = 0;
 
 static bool TestCameraCollidableBox(const BoundingOrientedBox& box)
 {
-	// Test if any 2 box extents are smaller than threshold.
+	// Test if any 2 box extents are below threshold.
 	if ((abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
 		(abs(box.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||
 		(abs(box.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(box.Extents.z) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD))
@@ -161,6 +161,7 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 {
 	constexpr auto DIST_BUFFER = BLOCK(0.1f);
 
+	// Get LOS.
 	auto dir = target - origin;
 	dir.Normalize();
 	float dist = Vector3::Distance(origin, target);
@@ -169,9 +170,10 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 	float closestDist = INFINITY;
 	auto cameraLos = CameraLosData{ los.Room.IsIntersected, los.Room.Position };
 
+	// Run through moveables.
 	for (const auto& movLos : los.Moveables)
 	{
-		if (!TestCameraCollidableItem(movLos.Moveable))
+		if (!TestCameraCollidableItem(*movLos.Moveable))
 			continue;
 
 		if (movLos.Distance < closestDist)
@@ -182,9 +184,10 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 		}
 	}
 
+	// Run through statics.
 	for (const auto& staticLos : los.Statics)
 	{
-		if (!TestCameraCollidableStatic(staticLos.Static))
+		if (!TestCameraCollidableStatic(*staticLos.Static))
 			continue;
 
 		if (staticLos.Distance < closestDist)
@@ -195,11 +198,11 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 		}
 	}
 
-	// Apply distance buffer.
 	float currentDist = Vector3::Distance(origin, cameraLos.Position.first);
 	float targetDist = std::max(currentDist - DIST_BUFFER, DIST_BUFFER);
 	dist = currentDist - targetDist;
 
+	// Apply distance buffer. TODO: Shift instead.
 	cameraLos.Position = std::pair(
 		Geometry::TranslatePoint(cameraLos.Position.first, -dir, dist),
 		GetCollision(cameraLos.Position.first, cameraLos.Position.second, -dir, dist).RoomNumber);

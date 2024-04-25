@@ -39,14 +39,14 @@ bool LOS(const GameVector* origin, GameVector* target)
 	float dist = Vector3::Distance(origin->ToVector3(), target->ToVector3());
 
 	auto roomLos = GetRoomLos(origin->ToVector3(), origin->RoomNumber, dir, dist);
-	if (roomLos.Intersect.has_value())
-		*target = GameVector(roomLos.Intersect->first, roomLos.Intersect->second);
+	if (roomLos.IsIntersected)
+		*target = GameVector(roomLos.Position.first, roomLos.Position.second);
 
 	// HACK: Transplant LOS room numbers to legacy global.
 	LosRoomNumbers.clear();
 	LosRoomNumbers.insert(LosRoomNumbers.end(), roomLos.RoomNumbers.begin(), roomLos.RoomNumbers.end());
 
-	return !roomLos.Intersect.has_value();
+	return !roomLos.IsIntersected;
 }
 
 // Deprecated.

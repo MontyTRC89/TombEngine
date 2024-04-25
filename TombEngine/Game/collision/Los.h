@@ -16,7 +16,7 @@ namespace TEN::Collision::Los
 
 	struct MoveableLosData
 	{
-		ItemInfo&				Moveable;
+		ItemInfo*				Moveable;
 		std::pair<Vector3, int> Intersect = {};
 
 		float Distance = 0.0f;
@@ -24,7 +24,7 @@ namespace TEN::Collision::Los
 	
 	struct MoveableSphereLosData
 	{
-		ItemInfo&				Moveable;
+		ItemInfo*				Moveable;
 		std::pair<Vector3, int> Intersect = {};
 		int						SphereID  = NO_VALUE;
 
@@ -33,7 +33,7 @@ namespace TEN::Collision::Los
 	
 	struct StaticLosData
 	{
-		MESH_INFO&				Static;
+		MESH_INFO*				Static;
 		std::pair<Vector3, int> Intersect = {};
 
 		float Distance = 0.0f;
