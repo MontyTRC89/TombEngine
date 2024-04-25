@@ -6,12 +6,12 @@ struct MESH_INFO;
 
 namespace TEN::Collision::Los
 {
-	using LosObjectPtr = std::variant<ItemInfo*, MESH_INFO*>;
+	using LosObject = std::variant<ItemInfo*, MESH_INFO*>;
 
 	struct LosInstanceData
 	{
-		std::optional<LosObjectPtr> ObjectPtr = std::nullopt;
-		int							SphereID  = NO_VALUE;
+		std::optional<LosObject> Object	  = std::nullopt;
+		int						 SphereID = NO_VALUE;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;

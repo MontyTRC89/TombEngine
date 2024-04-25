@@ -164,23 +164,23 @@ static std::optional<std::pair<Vector3, int>> GetCameraLosIntersect(const Vector
 	for (const auto& losInstance : losInstances)
 	{
 		// Test object collidability (if applicable).
-		if (losInstance.ObjectPtr.has_value())
+		if (losInstance.Object.has_value())
 		{
 			// FAILSAFE: Ignore sphere.
 			if (losInstance.SphereID != NO_VALUE)
 				continue;
 
-			if (std::holds_alternative<ItemInfo*>(*losInstance.ObjectPtr))
+			if (std::holds_alternative<ItemInfo*>(*losInstance.Object))
 			{
-				const auto& item = *std::get<ItemInfo*>(*losInstance.ObjectPtr);
+				const auto& item = *std::get<ItemInfo*>(*losInstance.Object);
 				if (!TestCameraCollidableItem(item))
 					continue;
 
 			}
-			else if (std::holds_alternative<MESH_INFO*>(*losInstance.ObjectPtr))
+			else if (std::holds_alternative<MESH_INFO*>(*losInstance.Object))
 			{
-				const auto& staticObject = *std::get<MESH_INFO*>(*losInstance.ObjectPtr);
-				if (!TestCameraCollidableStatic(staticObject))
+				const auto& staticObj = *std::get<MESH_INFO*>(*losInstance.Object);
+				if (!TestCameraCollidableStatic(staticObj))
 					continue;
 			}
 		}
@@ -1262,31 +1262,31 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 			Camera.underwater = false;
 	}
 
-	const ItemInfo* itemPtr = nullptr;
+	const ItemInfo* item = nullptr;
 	bool isFixedCamera = false;
 	if (Camera.item != nullptr && (Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
 	{
-		itemPtr = Camera.item;
+		item = Camera.item;
 		isFixedCamera = true;
 	}
 	else
 	{
-		itemPtr = &playerItem;
+		item = &playerItem;
 		isFixedCamera = false;
 	}
 
 	// TODO: Use DX box.
-	auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
-	auto bounds = GameBoundingBox(itemPtr);
+	auto box = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
+	auto bounds = GameBoundingBox(item);
 
 	int x = 0;
-	int y = itemPtr->Pose.Position.y + bounds.Y2 + ((bounds.Y1 - bounds.Y2) / 2 * 1.5f);
+	int y = item->Pose.Position.y + bounds.Y2 + ((bounds.Y1 - bounds.Y2) / 2 * 1.5f);
 	int z = 0;
-	if (itemPtr->IsLara())
+	if (item->IsLara())
 	{
 		float heightCoeff = IsUsingModernControls() ? 0.9f : 0.75f;
-		auto offset = GetCameraPlayerOffset(*itemPtr, coll) * heightCoeff;
-		y = itemPtr->Pose.Position.y + offset.y;
+		auto offset = GetCameraPlayerOffset(*item, coll) * heightCoeff;
+		y = item->Pose.Position.y + offset.y;
 	}
 
 	// Make player look toward target item.
@@ -1294,12 +1294,12 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 	{
 		if (!isFixedCamera)
 		{
-			auto deltaPos = Camera.item->Pose.Position - itemPtr->Pose.Position;
-			float dist = Vector3i::Distance(Camera.item->Pose.Position, itemPtr->Pose.Position);
+			auto deltaPos = Camera.item->Pose.Position - item->Pose.Position;
+			float dist = Vector3i::Distance(Camera.item->Pose.Position, item->Pose.Position);
 
 			auto lookOrient = EulerAngles(
 				phd_atan(dist, y - (bounds.Y1 + bounds.Y2) / 2 - Camera.item->Pose.Position.y),
-				phd_atan(deltaPos.z, deltaPos.x) - itemPtr->Pose.Orientation.y,
+				phd_atan(deltaPos.z, deltaPos.x) - item->Pose.Orientation.y,
 				0) / 2;
 
 			if (lookOrient.y > ANGLE(-50.0f) &&	lookOrient.y < ANGLE(50.0f) &&
@@ -1354,7 +1354,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 				y -= CLICK(1);
 		}
 
-		Camera.LookAtRoomNumber = itemPtr->RoomNumber;
+		Camera.LookAtRoomNumber = item->RoomNumber;
 
 		if (Camera.fixedCamera || player.Control.Look.IsUsingBinoculars)
 		{
@@ -1370,29 +1370,29 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		Camera.fixedCamera = false;
 		if (Camera.type == CameraType::Look)
 		{
-			LookCamera(*itemPtr, coll);
+			LookCamera(*item, coll);
 		}
 		else
 		{
-			CombatCamera(*itemPtr);
+			CombatCamera(*item);
 		}
 	}
 	else
 	{
 		LastTarget = GameVector(Camera.LookAt, Camera.LookAtRoomNumber);
 
-		Camera.LookAtRoomNumber = itemPtr->RoomNumber;
+		Camera.LookAtRoomNumber = item->RoomNumber;
 		Camera.LookAt.y = y;
 
-		x = itemPtr->Pose.Position.x;
-		z = itemPtr->Pose.Position.z;
+		x = item->Pose.Position.x;
+		z = item->Pose.Position.z;
 
 		// -- Troye 2022.8.7
 		if (Camera.flags == CameraFlag::FollowCenter)
 		{
 			int shift = (bounds.Z1 + bounds.Z2) / 2;
-			x += shift * phd_sin(itemPtr->Pose.Orientation.y);
-			z += shift * phd_cos(itemPtr->Pose.Orientation.y);
+			x += shift * phd_sin(item->Pose.Orientation.y);
+			z += shift * phd_cos(item->Pose.Orientation.y);
 		}
 
 		Camera.LookAt.x = x;
@@ -1400,7 +1400,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 
 		// CameraFlag::FollowCenter sets target on item and
 		// ConfirmCameraTargetPos() overrides this target, hence flag check. -- Troye 2022.8.7
-		if (itemPtr->IsLara() && Camera.flags != CameraFlag::FollowCenter)
+		if (item->IsLara() && Camera.flags != CameraFlag::FollowCenter)
 			ConfirmCameraTargetPos();
 
 		if (isFixedCamera == Camera.fixedCamera)
@@ -1448,7 +1448,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		}
 		else
 		{
-			ChaseCamera(*itemPtr);
+			ChaseCamera(*item);
 		}
 	}
 
