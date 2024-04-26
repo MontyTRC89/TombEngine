@@ -1252,20 +1252,14 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 
 PlayerWaterData GetPlayerWaterData(ItemInfo& item)
 {
-	bool isWater = TestEnvironment(ENV_FLAG_WATER, &item);
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, &item);
-	bool isCold = TestEnvironment(ENV_FLAG_COLD, &item);
-
-	int waterDepth = GetWaterDepth(&item);
-	int waterHeight = GetWaterHeight(&item);
-
 	auto pointColl = GetPointCollision(item);
-	int heightFromWater = (waterHeight == NO_HEIGHT) ? NO_HEIGHT : (std::min(item.Pose.Position.y, pointColl.GetFloorHeight()) - waterHeight);
+	int heightFromWater = (pointColl.GetWaterTopHeight() == NO_HEIGHT) ?
+		NO_HEIGHT : (std::min(item.Pose.Position.y, pointColl.GetFloorHeight()) - pointColl.GetWaterTopHeight());
 
 	return PlayerWaterData
 	{
-		isWater, isSwamp, isCold,
-		waterDepth, waterHeight, heightFromWater
+		TestEnvironment(ENV_FLAG_WATER, &item), TestEnvironment(ENV_FLAG_SWAMP, &item), TestEnvironment(ENV_FLAG_COLD, &item),
+		pointColl.GetWaterBottomHeight(), pointColl.GetWaterTopHeight(), heightFromWater
 	};
 }
 

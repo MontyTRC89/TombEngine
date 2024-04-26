@@ -372,7 +372,7 @@ namespace TEN::Collision::Point
 
 	PointCollisionData GetPointCollision(const ItemInfo& item)
 	{
-		return PointCollisionData(item.Pose.Position, item.RoomNumber);
+		return GetPointCollision(item.Pose.Position, item.RoomNumber);
 	}
 
 	PointCollisionData GetPointCollision(const ItemInfo& item, const Vector3& dir, float dist)

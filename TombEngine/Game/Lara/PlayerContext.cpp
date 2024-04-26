@@ -178,14 +178,14 @@ namespace TEN::Entities::Player
 		short aspectAngleDelta = Geometry::GetShortestAngle(setup.HeadingAngle, aspectAngle);
 
 		// 1) Check for illegal slope below floor (if applicable).
-		if (setup.TestIllegalFloorBelow &&
+		if (setup.TestSteepFloorBelow &&
 			(pointColl.IsSteepFloor() && abs(aspectAngleDelta) <= SLOPE_ASPECT_ANGLE_DELTA_MAX))
 		{
 			return false;
 		}
 		
 		// 1) Check for illegal slope above floor (if applicable).
-		if (setup.TestIllegalFloorAbove &&
+		if (setup.TestSteepFloorAbove &&
 			(pointColl.IsSteepFloor() && abs(aspectAngleDelta) >= SLOPE_ASPECT_ANGLE_DELTA_MAX))
 		{
 			return false;
