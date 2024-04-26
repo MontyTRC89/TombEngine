@@ -177,7 +177,7 @@ namespace TEN::Collision::Point
 		if (_waterSurfaceHeight.has_value())
 			return *_waterSurfaceHeight;
 
-		// Set water surface height.
+		// Set water surface height. TODO: Calculate here.
 		_waterSurfaceHeight = GetWaterSurface(_position.x, _position.y, _position.z, _roomNumber);
 
 		return *_waterSurfaceHeight;
@@ -188,7 +188,7 @@ namespace TEN::Collision::Point
 		if (_waterBottomHeight.has_value())
 			return *_waterBottomHeight;
 
-		// Set water bottom height.
+		// Set water bottom height. TODO: Calculate here.
 		_waterBottomHeight = GetWaterDepth(_position.x, _position.y, _position.z, _roomNumber);
 
 		return *_waterBottomHeight;
@@ -199,7 +199,7 @@ namespace TEN::Collision::Point
 		if (_waterTopHeight.has_value())
 			return *_waterTopHeight;
 
-		// Set water top height.
+		// Set water top height. TODO: Calculate here.
 		_waterTopHeight = GetWaterHeight(_position.x, _position.y, _position.z, _roomNumber);
 
 		return *_waterTopHeight;
