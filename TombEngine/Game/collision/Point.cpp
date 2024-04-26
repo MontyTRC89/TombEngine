@@ -34,56 +34,56 @@ namespace TEN::Collision::Point
 
 	FloorInfo& PointCollisionData::GetSector()
 	{
-		if (_sectorPtr != nullptr)
-			return *_sectorPtr;
+		if (_sector != nullptr)
+			return *_sector;
 
-		// Set current sector pointer.
+		// Set current sector.
 		short probeRoomNumber = _roomNumber;
-		_sectorPtr = GetFloor(_position.x, _position.y, _position.z, &probeRoomNumber);
+		_sector = GetFloor(_position.x, _position.y, _position.z, &probeRoomNumber);
 
-		return *_sectorPtr;
+		return *_sector;
 	}
 
 	FloorInfo& PointCollisionData::GetBottomSector()
 	{
-		if (_bottomSectorPtr != nullptr)
-			return *_bottomSectorPtr;
+		if (_bottomSector != nullptr)
+			return *_bottomSector;
 
-		// Set bottom sector pointer.
-		auto* bottomSectorPtr = &GetSector();
-		auto roomNumberBelow = bottomSectorPtr->GetNextRoomNumber(_position, true);
+		// Set bottom sector.
+		auto* bottomSector = &GetSector();
+		auto roomNumberBelow = bottomSector->GetNextRoomNumber(_position, true);
 		while (roomNumberBelow.has_value())
 		{
-			int roomNumber = roomNumberBelow.value_or(bottomSectorPtr->RoomNumber);
+			int roomNumber = roomNumberBelow.value_or(bottomSector->RoomNumber);
 			auto& room = g_Level.Rooms[roomNumber];
 
-			bottomSectorPtr = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
-			roomNumberBelow = bottomSectorPtr->GetNextRoomNumber(_position, true);
+			bottomSector = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
+			roomNumberBelow = bottomSector->GetNextRoomNumber(_position, true);
 		}
-		_bottomSectorPtr = bottomSectorPtr;
+		_bottomSector = bottomSector;
 
-		return *_bottomSectorPtr;
+		return *_bottomSector;
 	}
 
 	FloorInfo& PointCollisionData::GetTopSector()
 	{
-		if (_topSectorPtr != nullptr)
-			return *_topSectorPtr;
+		if (_topSector != nullptr)
+			return *_topSector;
 
-		// Set top sector pointer.
-		auto* topSectorPtr = &GetSector();
-		auto roomNumberAbove = topSectorPtr->GetNextRoomNumber(_position, false);
+		// Set top sector.
+		auto* topSector = &GetSector();
+		auto roomNumberAbove = topSector->GetNextRoomNumber(_position, false);
 		while (roomNumberAbove.has_value())
 		{
-			int roomNumber = roomNumberAbove.value_or(topSectorPtr->RoomNumber);
+			int roomNumber = roomNumberAbove.value_or(topSector->RoomNumber);
 			auto& room = g_Level.Rooms[roomNumber];
 
-			topSectorPtr = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
-			roomNumberAbove = topSectorPtr->GetNextRoomNumber(_position, false);
+			topSector = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
+			roomNumberAbove = topSector->GetNextRoomNumber(_position, false);
 		}
-		_topSectorPtr = topSectorPtr;
+		_topSector = topSector;
 
-		return *_topSectorPtr;
+		return *_topSector;
 	}
 
 	int PointCollisionData::GetFloorHeight()
@@ -340,7 +340,7 @@ namespace TEN::Collision::Point
 	PointCollisionData GetPointCollision(const Vector3i& pos, int roomNumber)
 	{
 		// HACK: Ensure room number is correct if position extends to another room.
-		// Accounts for some calls to this function which directly pass offset position instead of using dedicated overloads to probe.
+		// Accounts for some calls to this function which directly pass offset position instead of using dedicated probe overloads.
 		GetFloor(pos.x, pos.y, pos.z, (short*)&roomNumber);
 
 		return PointCollisionData(pos, roomNumber);

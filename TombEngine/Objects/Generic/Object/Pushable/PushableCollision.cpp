@@ -37,10 +37,6 @@ namespace TEN::Entities::Generic
 			pointColl = GetPointCollision(pushableItem);
 			AddPushableBridge(pushableItem);
 		}
-		else
-		{
-			pointColl = GetPointCollision(pushableItem);
-		}
 
 		// 1) Check for wall.
 		if (pointColl.GetSector().IsWall(pushableItem.Pose.Position.x, pushableItem.Pose.Position.z))
