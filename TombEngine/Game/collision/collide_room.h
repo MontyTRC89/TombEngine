@@ -16,8 +16,8 @@ constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBou
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.
 constexpr auto COLLISION_CHECK_DISTANCE = BLOCK(8);
 
-constexpr auto DEFAULT_ILLEGAL_FLOOR_SLOPE_ANGLE   = ANGLE(36.0f);
-constexpr auto DEFAULT_ILLEGAL_CEILING_SLOPE_ANGLE = ANGLE(45.0f);
+constexpr auto DEFAULT_STEEP_FLOOR_SLOPE_ANGLE   = ANGLE(36.0f);
+constexpr auto DEFAULT_STEEP_CEILING_SLOPE_ANGLE = ANGLE(45.0f);
 
 enum class CollisionType
 {

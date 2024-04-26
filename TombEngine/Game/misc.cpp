@@ -55,7 +55,7 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist)
 		return false;
 
 	// Test for slippery slope.
-	if (pointColl.IsIllegalFloor())
+	if (pointColl.IsSteepFloor())
 		return false;
 
 	// Flat floor.

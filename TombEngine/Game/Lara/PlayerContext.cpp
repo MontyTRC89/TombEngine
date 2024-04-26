@@ -179,14 +179,14 @@ namespace TEN::Entities::Player
 
 		// 1) Check for illegal slope below floor (if applicable).
 		if (setup.TestIllegalFloorBelow &&
-			(pointColl.IsIllegalFloor() && abs(aspectAngleDelta) <= SLOPE_ASPECT_ANGLE_DELTA_MAX))
+			(pointColl.IsSteepFloor() && abs(aspectAngleDelta) <= SLOPE_ASPECT_ANGLE_DELTA_MAX))
 		{
 			return false;
 		}
 		
 		// 1) Check for illegal slope above floor (if applicable).
 		if (setup.TestIllegalFloorAbove &&
-			(pointColl.IsIllegalFloor() && abs(aspectAngleDelta) >= SLOPE_ASPECT_ANGLE_DELTA_MAX))
+			(pointColl.IsSteepFloor() && abs(aspectAngleDelta) >= SLOPE_ASPECT_ANGLE_DELTA_MAX))
 		{
 			return false;
 		}
@@ -407,7 +407,7 @@ namespace TEN::Entities::Player
 
 		// 2) Assess point collision.
 		if (abs(relFloorHeight) <= ABS_FLOOR_BOUND && // Floor height is within upper/lower floor bounds.
-			pointColl.IsIllegalFloor())			  // Floor is a slippery slope.
+			pointColl.IsSteepFloor())			  // Floor is a slippery slope.
 		{
 			return true;
 		}
@@ -543,7 +543,7 @@ namespace TEN::Entities::Player
 			// Assess point collision.
 			if (floorHeightDelta > FLOOR_BOUND ||				 // Avoid floor height delta beyond crawl stepup threshold.
 				floorToCeilHeight <= FLOOR_TO_CEIL_HEIGHT_MAX || // Avoid narrow spaces.
-				pointColl1.IsIllegalFloor())					 // Avoid slippery floor slopes.
+				pointColl1.IsSteepFloor())					 // Avoid slippery floor slopes.
 			{
 				return false;
 			}
@@ -609,7 +609,7 @@ namespace TEN::Entities::Player
 		auto pointColl = GetPointCollision(item);
 
 		// 2) Test for slippery ceiling slope and check if overhang climb is disabled.
-		if (pointColl.IsIllegalCeiling() && !g_GameFlow->HasOverhangClimb())
+		if (pointColl.IsSteepCeiling() && !g_GameFlow->HasOverhangClimb())
 			return true;
 
 		// 3) Assess point collision.
@@ -667,7 +667,7 @@ namespace TEN::Entities::Player
 			return false;
 
 		// 2) Test for illegal ceiling.
-		if (pointColl.IsIllegalCeiling())
+		if (pointColl.IsSteepCeiling())
 			return false;
 
 		int vPos = item.Pose.Position.y;

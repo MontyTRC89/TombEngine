@@ -57,8 +57,8 @@ namespace TEN::Collision::Point
 
 		// Inquirers
 		bool IsWall();
-		bool IsIllegalFloor();
-		bool IsIllegalCeiling();
+		bool IsSteepFloor();
+		bool IsSteepCeiling();
 		bool IsDiagonalFloorStep();
 		bool IsDiagonalCeilingStep();
 		bool IsDiagonalFloorSplit();

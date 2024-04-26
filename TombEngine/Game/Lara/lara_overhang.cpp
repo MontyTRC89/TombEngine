@@ -972,7 +972,7 @@ bool LadderMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 {
 	auto probe = GetPointCollision(*item);
 
-	if (probe.IsIllegalCeiling())
+	if (probe.IsSteepCeiling())
 		return false;
 
 	if (probe.GetBottomSector().Flags.Monkeyswing && (item->Pose.Position.y - coll->Setup.Height - CLICK(0.5f) <= probe.GetCeilingHeight()))

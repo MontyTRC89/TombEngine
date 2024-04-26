@@ -749,7 +749,7 @@ namespace TEN::Entities::Vehicles
 		short angle = motorbikeItem->Pose.Orientation.y + ANGLE(90.0f);
 		auto collResult = GetPointCollision(*motorbikeItem, angle, MOTORBIKE_RADIUS);
 
-		if (collResult.IsIllegalFloor() || collResult.GetFloorHeight() == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
+		if (collResult.IsSteepFloor() || collResult.GetFloorHeight() == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
 			return false;
 
 		if (abs(collResult.GetFloorHeight() - motorbikeItem->Pose.Position.y) > CLICK(1))

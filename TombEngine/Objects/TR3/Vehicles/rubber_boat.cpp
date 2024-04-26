@@ -611,7 +611,7 @@ namespace TEN::Entities::Vehicles
 		if ((pointColl.GetFloorHeight() - sBoatItem->Pose.Position.y) < -512)
 			return false;
 
-		if (pointColl.IsIllegalFloor() || pointColl.GetFloorHeight() == NO_HEIGHT)
+		if (pointColl.IsSteepFloor() || pointColl.GetFloorHeight() == NO_HEIGHT)
 			return false;
 
 		if ((pointColl.GetCeilingHeight() - sBoatItem->Pose.Position.y) > -LARA_HEIGHT ||

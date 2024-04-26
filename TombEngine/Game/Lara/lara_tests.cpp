@@ -881,7 +881,7 @@ bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 	int vPos = item->Pose.Position.y;
 
 	if (coll->CollisionType == CollisionType::Front ||
-		pointColl.IsIllegalFloor() ||
+		pointColl.IsSteepFloor() ||
 		(pointColl.GetFloorHeight() - vPos) <= 0)
 	{
 		return false;
@@ -1602,7 +1602,7 @@ CrawlVaultTestResult TestLaraCrawlVaultTolerance(ItemInfo* item, CollisionInfo* 
 	auto probeB = GetPointCollision(*item, item->Pose.Orientation.y, testSetup.DestDist, -LARA_HEIGHT_CRAWL);		// Approximate destination.
 	auto probeMiddle = GetPointCollision(*item);
 
-	bool isSlope = testSetup.CheckSlope ? probeB.IsIllegalFloor() : false;
+	bool isSlope = testSetup.CheckSlope ? probeB.IsSteepFloor() : false;
 	bool isDeath = testSetup.CheckDeath ? probeB.GetSector().Flags.Death : false;
 
 	// Discard walls.

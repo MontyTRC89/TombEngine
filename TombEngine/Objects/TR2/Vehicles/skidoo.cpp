@@ -189,7 +189,7 @@ namespace TEN::Entities::Vehicles
 
 		auto probe = GetPointCollision(*skidooItem, angle, -SKIDOO_DISMOUNT_DISTANCE);
 
-		if ((probe.IsIllegalFloor() || probe.GetFloorHeight() == NO_HEIGHT) ||
+		if ((probe.IsSteepFloor() || probe.GetFloorHeight() == NO_HEIGHT) ||
 			abs(probe.GetFloorHeight() - skidooItem->Pose.Position.y) > CLICK(2) ||
 			((probe.GetCeilingHeight() - skidooItem->Pose.Position.y) > -LARA_HEIGHT ||
 				(probe.GetFloorHeight() - probe.GetCeilingHeight()) < LARA_HEIGHT))

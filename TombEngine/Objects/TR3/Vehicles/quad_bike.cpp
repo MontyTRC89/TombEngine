@@ -240,7 +240,7 @@ namespace TEN::Entities::Vehicles
 
 		auto pointColl = GetPointCollision(Vector3i(x, y, z), quadBikeItem->RoomNumber);
 
-		if (pointColl.IsIllegalFloor() ||
+		if (pointColl.IsSteepFloor() ||
 			pointColl.GetFloorHeight() == NO_HEIGHT)
 		{
 			return false;

@@ -211,24 +211,24 @@ namespace TEN::Collision::Point
 				GetFloorHeight() <= GetCeilingHeight());
 	}
 
-	bool PointCollisionData::IsIllegalFloor()
+	bool PointCollisionData::IsSteepFloor()
 	{
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetFloorNormal());
-		short illegalSlopeAngle = (GetFloorBridgeItemNumber() != NO_VALUE) ?
-			DEFAULT_ILLEGAL_FLOOR_SLOPE_ANGLE :
+		short steepSlopeAngle = (GetFloorBridgeItemNumber() != NO_VALUE) ?
+			DEFAULT_STEEP_FLOOR_SLOPE_ANGLE :
 			GetBottomSector().GetSurfaceIllegalSlopeAngle(_position.x, _position.z, true);
 		
-		return (abs(slopeAngle) >= illegalSlopeAngle);
+		return (abs(slopeAngle) >= steepSlopeAngle);
 	}
 
-	bool PointCollisionData::IsIllegalCeiling()
+	bool PointCollisionData::IsSteepCeiling()
 	{
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetCeilingNormal(), -Vector3::UnitY);
-		short illegalSlopeAngle = (GetCeilingBridgeItemNumber() != NO_VALUE) ?
-			DEFAULT_ILLEGAL_CEILING_SLOPE_ANGLE :
+		short steepSlopeAngle = (GetCeilingBridgeItemNumber() != NO_VALUE) ?
+			DEFAULT_STEEP_CEILING_SLOPE_ANGLE :
 			GetTopSector().GetSurfaceIllegalSlopeAngle(_position.x, _position.z, false);
 		
-		return (abs(slopeAngle) >= illegalSlopeAngle);
+		return (abs(slopeAngle) >= steepSlopeAngle);
 	}
 
 	bool PointCollisionData::IsDiagonalFloorStep()

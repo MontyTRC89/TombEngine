@@ -376,7 +376,7 @@ namespace TEN::Entities::Vehicles
 
 		auto probe = GetPointCollision(Vector3i(x, y, z), jeepItem->RoomNumber);
 
-		if (probe.IsIllegalFloor() || probe.GetFloorHeight() == NO_HEIGHT)
+		if (probe.IsSteepFloor() || probe.GetFloorHeight() == NO_HEIGHT)
 			return false;
 
 		if (abs(probe.GetFloorHeight() - jeepItem->Pose.Position.y) > BLOCK(1 / 2.0f))

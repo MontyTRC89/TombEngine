@@ -128,8 +128,8 @@ static CollisionPositionData GetCollisionPosition(PointCollisionData& pointColl)
 	collPos.Ceiling = pointColl.GetCeilingHeight();
 	collPos.Bridge = pointColl.GetFloorBridgeItemNumber();
 	collPos.SplitAngle = pointColl.GetBottomSector().FloorSurface.SplitAngle;
-	collPos.FloorSlope = pointColl.IsIllegalFloor();
-	collPos.CeilingSlope = pointColl.IsIllegalCeiling();
+	collPos.FloorSlope = pointColl.IsSteepFloor();
+	collPos.CeilingSlope = pointColl.IsSteepCeiling();
 	collPos.DiagonalStep = pointColl.IsDiagonalFloorStep();
 
 	return collPos;

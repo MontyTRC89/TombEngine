@@ -86,7 +86,7 @@ namespace TEN::Entities::Generic
 		}
 
 		// 3) Check for slippery floor slope.
-		if (pointColl.IsIllegalFloor())
+		if (pointColl.IsSteepFloor())
 			return false;
 
 		// 4) Check for diagonal floor step.

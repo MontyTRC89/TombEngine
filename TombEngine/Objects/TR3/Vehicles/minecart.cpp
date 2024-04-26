@@ -264,7 +264,7 @@ namespace TEN::Entities::Vehicles
 
 		auto probe = GetPointCollision(*minecartItem, angle, -MINECART_DISMOUNT_DISTANCE);
 
-		if (probe.IsIllegalFloor() || probe.GetFloorHeight() == NO_HEIGHT)
+		if (probe.IsSteepFloor() || probe.GetFloorHeight() == NO_HEIGHT)
 			return false;
 
 		if (abs(probe.GetFloorHeight() - minecartItem->Pose.Position.y) > CLICK(2))

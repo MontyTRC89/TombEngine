@@ -244,7 +244,7 @@ namespace TEN::Entities::Vehicles
 		if ((probe.GetFloorHeight() - speedboatItem->Pose.Position.y) < -CLICK(2))
 			return false;
 
-		if (probe.IsIllegalFloor() ||
+		if (probe.IsSteepFloor() ||
 			probe.GetFloorHeight() == NO_HEIGHT)
 		{
 			return false;
