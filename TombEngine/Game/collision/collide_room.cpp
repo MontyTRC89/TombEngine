@@ -1090,7 +1090,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 
 	if (TestEnvironment(ENV_FLAG_WATER, room))
 	{
-		while (sector->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(NO_VALUE) != NO_VALUE)
+		while (sector->GetNextRoomNumber(Vector3i(x, y, z), false).has_value())
 		{
 			room = &g_Level.Rooms[sector->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(sector->RoomNumber)];
 			if (!TestEnvironment(ENV_FLAG_WATER, room))
@@ -1103,7 +1103,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 	}
 	else
 	{
-		while (sector->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(NO_VALUE) != NO_VALUE)
+		while (sector->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 		{
 			room = &g_Level.Rooms[sector->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(sector->RoomNumber)];
 			if (TestEnvironment(ENV_FLAG_WATER, room))
@@ -1282,7 +1282,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, room) ||
 		TestEnvironment(ENV_FLAG_SWAMP, room))
 	{
-		while (sector->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(NO_VALUE) != NO_VALUE)
+		while (sector->GetNextRoomNumber(Vector3i(x, y, z), false).has_value())
 		{
 			auto* room = &g_Level.Rooms[sector->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(sector->RoomNumber)];
 
@@ -1295,11 +1295,11 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			sector = GetSector(room, x - room->x, z - room->z);
 		}
 
-		return GetPointCollision(Vector3i(x, y, z), sector->RoomNumber).GetSector().GetSurfaceHeight(Vector3i(x, y, z), false);
+		return sector->GetSurfaceHeight(Vector3i(x, y, z), false);
 	}
-	else if (sector->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(NO_VALUE) != NO_VALUE)
+	else if (sector->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 	{
-		while (sector->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(NO_VALUE) != NO_VALUE)
+		while (sector->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
 		{
 			auto* room2 = &g_Level.Rooms[sector->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(sector->RoomNumber)];
 
@@ -1312,7 +1312,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			sector = GetSector(room2, x - room2->x, z - room2->z);
 		}
 
-		return GetPointCollision(Vector3i(x, y, z), sector->RoomNumber).GetSector().GetSurfaceHeight(Vector3i(x, y, z), true);
+		return sector->GetSurfaceHeight(Vector3i(x, y, z), true);
 	}
 
 	return NO_HEIGHT;
