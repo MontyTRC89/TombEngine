@@ -147,7 +147,7 @@ namespace TEN::Entities::Creatures::TR3
 			float closestDist = INFINITY;
 			for (auto& targetItem : g_Level.Items)
 			{
-				if (!Objects.CheckID(targetItem.ObjectNumber) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_ROOM)
+				if (!Objects.CheckID(targetItem.ObjectNumber) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_VALUE)
 					continue;
 
 				if (SameZone(&creature, &targetItem) && item.TriggerFlags < 0)

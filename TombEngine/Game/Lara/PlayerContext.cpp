@@ -192,7 +192,7 @@ namespace TEN::Entities::Player
 		}
 
 		// 3) Check for death floor (if applicable).
-		if (setup.TestDeathFloor && pointColl.GetSector().Flags.Death)
+		if (setup.TestDeathFloor && pointColl.GetSector().Flags.Death && pointColl.GetFloorBridgeItemNumber() == NO_VALUE)
 			return false;
 
 		// LOS setup at upper floor bound.

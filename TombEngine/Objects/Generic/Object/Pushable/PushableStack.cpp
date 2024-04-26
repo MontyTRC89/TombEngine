@@ -158,7 +158,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (roomNumber != NO_ROOM)
+		if (roomNumber != NO_VALUE)
 		{
 			short currentItemNumber = g_Level.Rooms[roomNumber].itemNumber;
 			while (currentItemNumber != NO_VALUE)

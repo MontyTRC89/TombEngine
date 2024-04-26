@@ -1,12 +1,14 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Inventory/InventoryHandler.h"
 
+#include "Game/gui.h"
 #include "Game/Hud/Hud.h"
 #include "Game/Lara/lara.h"
 #include "Game/pickup/pickup.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 
 using namespace TEN::Hud;
+using namespace TEN::Gui;
 
 /***
 Inventory manipulation
@@ -59,6 +61,36 @@ namespace TEN::Scripting::InventoryHandler
 		SetInventoryCount(objectID, count);
 	}
 
+	/// Get last selected item in the player's inventory.
+	// This value will be valid only for a single frame after exiting inventory, after which Lara says "No".
+	// Therefore, this function must be preferably used either in OnLoop events or callbacks.
+	// If you have used this function and you want to avoid "No" sound, you should use ClearChosenItem function.
+	//@function GetChosenItem
+	//@treturn Objects.ObjID Last selected item in the inventory.
+	static GAME_OBJECT_ID GetChosenItem()
+	{
+		return (GAME_OBJECT_ID)g_Gui.GetInventoryItemChosen();
+	}
+
+	/// Set last selected item in the player's inventory.
+	// You will be able to select only objects which already exist in inventory.
+	// Will only be valid for the next frame. If not processed by the game, Lara will say "No".
+	//@function SetChosenItem
+	//@tparam Objects.ObjID objectID Object ID of the item to select from inventory.
+	static void SetChosenItem(GAME_OBJECT_ID objectID)
+	{
+		if (g_Gui.IsObjectInInventory(objectID))
+			g_Gui.SetInventoryItemChosen(objectID);
+	}
+
+	/// Clear last selected item in the player's inventory.
+	// This function is needed to avoid Lara saying "No" after selecting particular item in inventory.
+	//@function ClearChosenItem
+	static void ClearChosenItem()
+	{
+		g_Gui.SetInventoryItemChosen(GAME_OBJECT_ID::ID_NO_OBJECT);
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
 		auto tableInventory = sol::table{ state->lua_state(), sol::create };
@@ -68,5 +100,8 @@ namespace TEN::Scripting::InventoryHandler
 		tableInventory.set_function(ScriptReserved_TakeInvItem, &TakeItem);
 		tableInventory.set_function(ScriptReserved_GetInvItemCount, &GetItemCount);
 		tableInventory.set_function(ScriptReserved_SetInvItemCount, &SetItemCount);
+		tableInventory.set_function(ScriptReserved_SetChosenItem, &SetChosenItem);
+		tableInventory.set_function(ScriptReserved_GetChosenItem, &GetChosenItem);
+		tableInventory.set_function(ScriptReserved_ClearChosenItem, &ClearChosenItem);
 	}
 }

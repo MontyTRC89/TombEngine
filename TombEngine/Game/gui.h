@@ -180,6 +180,7 @@ namespace TEN::Gui
 		void DrawAmmoSelector();
 		bool PerformWaterskinCombine(ItemInfo* item, bool flag);
 		void DrawCompass(ItemInfo* item);
+		void CancelInventorySelection();
 
 		// Getters
 		const InventoryRing& GetRing(RingTypes ringType);

@@ -243,7 +243,7 @@ void KillItem(short const itemNumber)
 			}
 		}
 
-		if (item->RoomNumber != NO_ROOM)
+		if (item->RoomNumber != NO_VALUE)
 		{
 			if (g_Level.Rooms[item->RoomNumber].itemNumber == itemNumber)
 			{
@@ -336,7 +336,7 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->RoomNumber != NO_ROOM)
+		if (item->RoomNumber != NO_VALUE)
 		{
 			auto* room = &g_Level.Rooms[item->RoomNumber];
 

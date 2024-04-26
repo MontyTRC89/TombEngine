@@ -116,7 +116,7 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNumbersPtr, int attatchedToSwitc
 	return k;
 }
 
-int SwitchTrigger(short itemNumber, short timer)
+bool SwitchTrigger(short itemNumber, short timer)
 {
 	auto& item = g_Level.Items[itemNumber];
 	const auto& player = Lara;
@@ -129,7 +129,7 @@ int SwitchTrigger(short itemNumber, short timer)
 		item.Status = ITEM_ACTIVE;
 		item.ItemFlags[1] = false;
 	
-		return 1;
+		return true;
 	}
 
 	if (item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16 &&
@@ -139,13 +139,13 @@ int SwitchTrigger(short itemNumber, short timer)
 		item.Status = ITEM_DEACTIVATED;
 		item.ItemFlags[1] = false;
 	
-		return 1;
+		return true;
 	}
 
 	if ((item.ObjectNumber >= ID_PUZZLE_DONE1 && item.ObjectNumber <= ID_PUZZLE_DONE16) ||
 		(item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16))
 	{
-		return 0;
+		return false;
 	}
 
 	// Handle reusable receptacles.
@@ -158,7 +158,7 @@ int SwitchTrigger(short itemNumber, short timer)
 		item.Status = ITEM_ACTIVE;
 		item.ItemFlags[5] = (int)ReusableReceptacleState::Done;
 		item.ItemFlags[1] = false;
-		return 1;
+		return true;
 	}
 
 	if (item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16 && 
@@ -169,11 +169,11 @@ int SwitchTrigger(short itemNumber, short timer)
 		item.Status = ITEM_DEACTIVATED;
 		item.ItemFlags[5] = (int)ReusableReceptacleState::Empty;
 		item.ItemFlags[1] = false;
-		return 1;
+		return true;
 	}
 
 	if (item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16)
-		return 0;
+		return false;
 
 	// Handle switches.
 	if (item.Status == ITEM_DEACTIVATED)
@@ -188,7 +188,7 @@ int SwitchTrigger(short itemNumber, short timer)
 			if (timer != 1)
 				item.Timer = FPS * timer;
 
-			return 1;
+			return true;
 		}
 	
 		if (item.TriggerFlags >= 0 || item.Animation.ActiveState != SWITCH_OFF)
@@ -199,12 +199,12 @@ int SwitchTrigger(short itemNumber, short timer)
 			if (!item.ItemFlags[0] == 0)
 				item.Flags |= ONESHOT;
 
-			return 1;
+			return true;
 		}
 		else
 		{
 			item.Status = ITEM_ACTIVE;
-			return 1;
+			return true;
 		}
 	}
 	else if (item.Status != ITEM_NOT_ACTIVE)
@@ -213,13 +213,14 @@ int SwitchTrigger(short itemNumber, short timer)
 			item.Animation.AnimNumber == GetAnimIndex(item, 2) &&
 			item.Animation.FrameNumber == GetFrameIndex(&item, 0))
 		{
-			return 1;
+			return true;
 		}
 
-		return ((item.Flags & ONESHOT) >> 8);
+		if (item.Flags & ONESHOT)
+			return true;
 	}
 
-	return 0;
+	return false;
 }
 
 int KeyTrigger(short itemNumber)
@@ -400,15 +401,11 @@ void Trigger(short const value, short const flags)
 
 void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bool heavy, int heavyFlags)
 {
-	int flip = -1;
-	int flipAvailable = 0;
-	int newEffect = -1;
-	int switchOff = 0;
-	//int switchFlag = 0;
-	short objectNumber = 0;
+	bool switchOff = false;
+	bool flipAvailable = false;
+	int flip = NO_VALUE;
+	int newEffect = NO_VALUE;
 	int keyResult = 0;
-	short cameraFlags = 0;
-	short cameraTimer = 0;
 	int spotCamIndex = 0;
 
 	auto data = GetTriggerIndex(floor, x, y, z);
@@ -468,13 +465,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			if (!SwitchTrigger(value, timer))
 				return;
 
-			objectNumber = g_Level.Items[value].ObjectNumber;
-			//This disables the antitrigger of the Valve switch (ocb 5). I don't know the purpose of this in TR4.
-			//if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
-				//switchFlag = 1;
-
-			switchOff = (g_Level.Items[value].Animation.ActiveState == 1);
-
+			switchOff = (triggerType == TRIGGER_TYPES::SWITCH && timer && g_Level.Items[value].Animation.ActiveState == 1);
 			break;
 
 		case TRIGGER_TYPES::MONKEY:
@@ -518,8 +509,11 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
-			if (GetPointCollision(Vector3i(x, y, z), floor->RoomNumber).GetFloorHeight() == y)
+		{
+			auto pointColl = GetPointCollision(Vector3i(x, y, z), floor->RoomNumber);
+			if (pointColl.GetFloorHeight() == y && pointColl.GetFloorBridgeItemNumber() == NO_VALUE)
 				break;
+		}
 			return;
 
 		case TRIGGER_TYPES::KEY:
@@ -570,8 +564,8 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 
 			if (keyResult >= 2 ||
 				(triggerType == TRIGGER_TYPES::ANTIPAD ||
-					triggerType == TRIGGER_TYPES::ANTITRIGGER ||
-					triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER) &&
+				 triggerType == TRIGGER_TYPES::ANTITRIGGER ||
+				 triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER) &&
 				item->Flags & ATONESHOT)
 				break;
 
@@ -655,7 +649,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			if (triggerType == TRIGGER_TYPES::COMBAT)
 				break;
 
-			if (triggerType == TRIGGER_TYPES::SWITCH && timer && switchOff)
+			if (switchOff)
 				break;
 
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
@@ -671,6 +665,9 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			trigger = *(data++);
 
 			if (keyResult == 1)
+				break;
+
+			if (switchOff)
 				break;
 
 			if (triggerType == TRIGGER_TYPES::ANTIPAD ||
@@ -747,17 +744,26 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			break;
 
 		case TO_FLIPEFFECT:
+			if (switchOff)
+				break;
+
 			TriggerTimer = timer;
 			newEffect = value;
 			break;
 
 		case TO_FINISH:
+			if (switchOff)
+				break;
+
 			NextLevel = value ? value : (CurrentLevel + 1);
 			RequiredStartPos = timer;
 			break;
 
 		case TO_CD:
-			PlaySoundTrack(value, flags);
+			if (switchOff)
+				break;
+
+			PlaySoundTrack(value, flags & CODE_BITS);
 			break;
 
 		case TO_CUTSCENE:
@@ -765,6 +771,9 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			break;
 
 		case TO_SECRET:
+			if (switchOff)
+				break;
+
 			if (!(SaveGame::Statistics.Level.Secrets & (1 << value)))
 			{
 				PlaySecretTrack();
@@ -776,6 +785,8 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 		case TO_VOLUMEEVENT:
 		case TO_GLOBALEVENT:
 			trigger = *(data++);
+
+			if (!switchOff)
 			{
 				auto& list = targetType == TO_VOLUMEEVENT ? g_Level.VolumeEventSets : g_Level.GlobalEventSets;
 
@@ -814,10 +825,10 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 	if (cameraItem && (Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
 		Camera.item = cameraItem;
 
-	if (flip != -1)
+	if (flip != NO_VALUE)
 		DoFlipMap(flip);
 
-	if (newEffect != -1 && (flip || !flipAvailable))
+	if (newEffect != NO_VALUE && (flip || !flipAvailable))
 		FlipEffect = newEffect;
 }
 

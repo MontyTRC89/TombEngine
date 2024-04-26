@@ -196,7 +196,7 @@ namespace TEN::Entities::TR4
 		item->Pose = baboonRespawn->Pose;
 
 		auto outsideRoom = IsRoomOutside(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-		if (item->RoomNumber != outsideRoom && outsideRoom != NO_ROOM)
+		if (item->RoomNumber != outsideRoom && outsideRoom != NO_VALUE)
 			ItemNewRoom(itemNumber, outsideRoom);
 
 		if (baboonRespawn->Count < baboonRespawn->MaxCount)

@@ -80,7 +80,7 @@ namespace TEN::Entities::Doors
 		doorData->d1.floor = GetSector(r, doorItem->Pose.Position.x - r->x + xOffset, doorItem->Pose.Position.z - r->z + zOffset);
 
 		auto roomNumber = doorData->d1.floor->SidePortalRoomNumber;
-		if (roomNumber == NO_ROOM)
+		if (roomNumber == NO_VALUE)
 			boxNumber = doorData->d1.floor->Box;
 		else
 		{
@@ -97,7 +97,7 @@ namespace TEN::Entities::Doors
 			doorData->d1flip.floor = GetSector(r, doorItem->Pose.Position.x - r->x + xOffset, doorItem->Pose.Position.z - r->z + zOffset);
 				
 			roomNumber = doorData->d1flip.floor->SidePortalRoomNumber;
-			if (roomNumber == NO_ROOM)
+			if (roomNumber == NO_VALUE)
 				boxNumber = doorData->d1flip.floor->Box;
 			else
 			{
@@ -116,7 +116,7 @@ namespace TEN::Entities::Doors
 		ShutThatDoor(&doorData->d1, doorData);
 		ShutThatDoor(&doorData->d1flip, doorData);
 
-		if (twoRoom == NO_ROOM)
+		if (twoRoom == NO_VALUE)
 		{
 			doorData->d2.floor = NULL;
 			doorData->d2flip.floor = NULL;
@@ -127,7 +127,7 @@ namespace TEN::Entities::Doors
 			doorData->d2.floor = GetSector(r, doorItem->Pose.Position.x - r->x, doorItem->Pose.Position.z - r->z);
 
 			roomNumber = doorData->d2.floor->SidePortalRoomNumber;
-			if (roomNumber == NO_ROOM)
+			if (roomNumber == NO_VALUE)
 				boxNumber = doorData->d2.floor->Box;
 			else
 			{
@@ -144,7 +144,7 @@ namespace TEN::Entities::Doors
 				doorData->d2flip.floor = GetSector(r, doorItem->Pose.Position.x - r->x, doorItem->Pose.Position.z - r->z);
 
 				roomNumber = doorData->d2flip.floor->SidePortalRoomNumber;
-				if (roomNumber == NO_ROOM)
+				if (roomNumber == NO_VALUE)
 					boxNumber = doorData->d2flip.floor->Box;
 				else
 				{
@@ -426,7 +426,7 @@ namespace TEN::Entities::Doors
 			floor->FloorSurface.Triangles[0].PortalRoomNumber =
 			floor->FloorSurface.Triangles[1].PortalRoomNumber =
 			floor->CeilingSurface.Triangles[0].PortalRoomNumber =
-			floor->CeilingSurface.Triangles[1].PortalRoomNumber = NO_ROOM;
+			floor->CeilingSurface.Triangles[1].PortalRoomNumber = NO_VALUE;
 			floor->FloorSurface.Triangles[0].Plane =
 			floor->FloorSurface.Triangles[1].Plane =
 			floor->CeilingSurface.Triangles[0].Plane =

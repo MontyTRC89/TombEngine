@@ -333,6 +333,12 @@ namespace TEN::Entities::Generic
 					auto movementDir = pushableItem.Pose.Position.ToVector3() - playerItem.Pose.Position.ToVector3();
 					movementDir.Normalize();
 					playerItem.Pose.Position = playerItem.Pose.Position + movementDir * BLOCK(1);
+
+					RemovePushableBridge(pushableItem);
+				}
+				else
+				{
+					RemovePushableBridge(pushableItem);
 				}
 				break;
 

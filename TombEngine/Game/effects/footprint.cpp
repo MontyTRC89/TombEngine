@@ -169,7 +169,7 @@ namespace TEN::Effects::Footprint
 
 		// Don't process material if foot hit bridge object.
 		// TODO: Handle bridges once bridge collision is less stupid.
-		if (pointColl.GetFloorBridgeItemNumber() >= 0)
+		if (pointColl.GetFloorBridgeItemNumber() != NO_VALUE)
 			return;
 
 		// Get and emit footstep sound for floor material.

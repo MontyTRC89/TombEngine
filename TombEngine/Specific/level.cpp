@@ -1486,7 +1486,7 @@ void GetCarriedItems()
 					item2.CarriedItem = item.CarriedItem;
 					item.CarriedItem = linkNumber;
 					RemoveDrawnItem(linkNumber);
-					item2.RoomNumber = NO_ROOM;
+					item2.RoomNumber = NO_VALUE;
 				}
 			}
 		}
@@ -1515,7 +1515,7 @@ void GetAIPickups()
 					item->ItemFlags[3] = object->triggerFlags;
 
 					if (object->objectNumber != ID_AI_GUARD)
-						object->roomNumber = NO_ROOM;
+						object->roomNumber = NO_VALUE;
 				}
 			}
 

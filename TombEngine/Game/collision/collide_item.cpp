@@ -969,6 +969,10 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	// Get DX static bounds in global coordinates.
 	auto staticBounds = box.ToBoundingOrientedBox(pose);
 
+	// Ignore processing null bounds.
+	if (Vector3(staticBounds.Extents) == Vector3::Zero)
+		return false;
+
 	// Get local TR bounds and DX item bounds in global coordinates.
 	auto itemBBox = GameBoundingBox(item);
 	auto itemBounds = itemBBox.ToBoundingOrientedBox(item->Pose);
@@ -1009,10 +1013,6 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	// Get and test DX item collision bounds.
 	auto collBounds = collBox.ToBoundingOrientedBox(Pose(item->Pose.Position));
 	bool intersects = staticBounds.Intersects(collBounds);
-
-	// Check if previous item horizontal position intersects bounds.
-	auto prevCollBounds = collBox.ToBoundingOrientedBox(Pose(coll->Setup.PrevPosition));
-	bool prevHorIntersects = staticBounds.Intersects(prevCollBounds);
 
 	// Draw item coll bounds.
 	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
@@ -1072,7 +1072,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		auto distanceToVerticalPlane = height / 2 - yPoint;
 
 		// Correct position according to top/bottom bounds, if collided and plane is nearby.
-		if (intersects && prevHorIntersects && minDistance < height)
+		if (intersects && minDistance < height)
 		{
 			if (bottom)
 			{

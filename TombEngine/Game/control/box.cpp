@@ -1424,7 +1424,7 @@ void FindAITarget(CreatureInfo* creature, short objectNumber)
 		if (targetItem->ObjectNumber != objectNumber)
 			continue;
 
-		if (targetItem->RoomNumber == NO_ROOM)
+		if (targetItem->RoomNumber == NO_VALUE)
 			continue;
 
 		if (SameZone(creature, targetItem) &&
@@ -1456,7 +1456,7 @@ void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool 
 	{
 		if (aiObject.objectNumber == objectNumber &&
 			aiObject.triggerFlags == ocb &&
-			aiObject.roomNumber != NO_ROOM)
+			aiObject.roomNumber != NO_VALUE)
 		{
 			int* zone = g_Level.Zones[(int)creature->LOT.Zone][(int)FlipStatus].data();
 			auto* room = &g_Level.Rooms[item.RoomNumber];

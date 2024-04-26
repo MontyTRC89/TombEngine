@@ -296,7 +296,7 @@ namespace TEN::Entities::TR4
 					{
 						aiObject = &g_Level.AIObjects[i];
 
-						if (g_Level.AIObjects[i].triggerFlags == item->ItemFlags[3] && g_Level.AIObjects[i].roomNumber != NO_ROOM)
+						if (g_Level.AIObjects[i].triggerFlags == item->ItemFlags[3] && g_Level.AIObjects[i].roomNumber != NO_VALUE)
 						{
 							aiObject = &g_Level.AIObjects[i];
 							break;

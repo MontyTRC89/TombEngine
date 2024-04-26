@@ -939,22 +939,19 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 		sptr->xVel = (GetRandomControl() & 0xFF) - 128;
 		sptr->zVel = (GetRandomControl() & 0xFF) - 128;
 
-		if (item->Pose.Orientation.y == 0)
-		{
-			sptr->zVel = -(size - (size >> 2));
-		}
-		else if (item->Pose.Orientation.y == ANGLE(90.0f))
-		{
-			sptr->xVel = -(size - (size >> 2));
-		}
-		else if (item->Pose.Orientation.y == ANGLE(-180.0f))
-		{
-			sptr->zVel = size - (size >> 2);
-		}
-		else
-		{
-			sptr->xVel = size - (size >> 2);
-		}
+		float xAngle = item->Pose.Orientation.x + ANGLE(180); // Nullmesh is rotated 180 degrees in editor
+		float yAngle = item->Pose.Orientation.y;
+		
+		Vector3 dir;
+		dir.x = phd_cos(xAngle) * phd_sin(yAngle);
+		dir.y = phd_sin(xAngle);
+		dir.z = phd_cos(xAngle) * phd_cos(yAngle);
+
+		dir.Normalize();
+
+		sptr->xVel += dir.x * (size - (size >> 2));
+		sptr->yVel -= dir.y * (size - (size >> 2));
+		sptr->zVel += dir.z * (size - (size >> 2));
 	}
 }
 
@@ -1942,8 +1939,9 @@ void ProcessEffects(ItemInfo* item)
 	
 	if (item->Effect.Type != EffectType::Sparks && item->Effect.Type != EffectType::Smoke)
 	{
+		const auto& bounds = GameBoundingBox(item);
 		int waterHeight = GetWaterHeight(item);
-		int itemLevel = item->Pose.Position.y - GameBoundingBox(item).GetHeight() / 3;
+		int itemLevel = item->Pose.Position.y + bounds.Y2 - (bounds.GetHeight() / 3);
 
 		if (waterHeight != NO_HEIGHT && itemLevel > waterHeight)
 		{

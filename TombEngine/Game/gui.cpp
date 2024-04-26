@@ -3427,6 +3427,15 @@ namespace TEN::Gui
 		}
 	}
 
+	void GuiController::CancelInventorySelection()
+	{
+		if (GetInventoryItemChosen() != NO_VALUE)
+		{
+			SetInventoryItemChosen(NO_VALUE);
+			SayNo();
+		}
+	}
+
 	void GuiController::DrawCompass(ItemInfo* item)
 	{
 		constexpr auto POS_2D	  = Vector2(130.0f, 450.0f);

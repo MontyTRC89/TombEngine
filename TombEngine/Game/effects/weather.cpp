@@ -476,7 +476,7 @@ namespace TEN::Effects::Environment
 				
 				auto outsideRoom = IsRoomOutside(xPos, yPos, zPos);
 				
-				if (outsideRoom == NO_ROOM)
+				if (outsideRoom == NO_VALUE)
 					continue;
 
 				if (g_Level.Rooms[outsideRoom].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))

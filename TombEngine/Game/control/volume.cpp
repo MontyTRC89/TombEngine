@@ -138,7 +138,7 @@ namespace TEN::Control::Volumes
 
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, ActivatorFlags activatorFlag, Activator activator)
 	{
-		if (roomNumber == NO_ROOM)
+		if (roomNumber == NO_VALUE)
 			return;
 
 		for (int currentRoomIndex : g_Level.Rooms[roomNumber].neighbors)
