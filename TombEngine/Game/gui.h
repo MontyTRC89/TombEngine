@@ -139,7 +139,7 @@ namespace TEN::Gui
 		// Inventory variables
 		short CombineObject1;
 		short CombineObject2;
-		bool UseItem;
+		bool ItemUsed;
 		char SeperateTypeFlag;
 		char CombineTypeFlag;
 		InventoryRing Rings[2];
@@ -181,6 +181,7 @@ namespace TEN::Gui
 		bool PerformWaterskinCombine(ItemInfo* item, bool flag);
 		void DrawCompass(ItemInfo* item);
 		void CancelInventorySelection();
+		void UseItem(ItemInfo& item, int objectNumber);
 
 		// Getters
 		const InventoryRing& GetRing(RingTypes ringType);
@@ -221,7 +222,6 @@ namespace TEN::Gui
 		void SeparateObject(ItemInfo* item, int objectNumber);
 		void InsertObjectIntoList(int objectNumber);
 		void InsertObjectIntoList_v2(int objectNumber);
-		void UseCurrentItem(ItemInfo* item);
 		void SpinBack(EulerAngles& orient);
 		void UpdateWeaponStatus(ItemInfo* item);
 		void DoStatisticsMode();

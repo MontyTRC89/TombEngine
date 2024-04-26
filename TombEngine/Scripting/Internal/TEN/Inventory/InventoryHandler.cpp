@@ -61,32 +61,32 @@ namespace TEN::Scripting::InventoryHandler
 		SetInventoryCount(objectID, count);
 	}
 
-	/// Get last selected item in the player's inventory.
+	/// Get last item used in the player's inventory.
 	// This value will be valid only for a single frame after exiting inventory, after which Lara says "No".
-	// Therefore, this function must be preferably used either in OnLoop events or callbacks.
-	// If you have used this function and you want to avoid "No" sound, you should use ClearChosenItem function.
-	//@function GetChosenItem
-	//@treturn Objects.ObjID Last selected item in the inventory.
-	static GAME_OBJECT_ID GetChosenItem()
+	// Therefore, this function must be preferably used either in OnLoop or OnUseItem events.
+	//@function GetUsedItem
+	//@treturn Objects.ObjID Last item used in the inventory.
+	static GAME_OBJECT_ID GetUsedItem()
 	{
 		return (GAME_OBJECT_ID)g_Gui.GetInventoryItemChosen();
 	}
 
-	/// Set last selected item in the player's inventory.
-	// You will be able to select only objects which already exist in inventory.
+	/// Set last item used in the player's inventory.
+	// You will be able to specify only objects which already exist in the inventory.
 	// Will only be valid for the next frame. If not processed by the game, Lara will say "No".
-	//@function SetChosenItem
+	//@function SetUsedItem
 	//@tparam Objects.ObjID objectID Object ID of the item to select from inventory.
-	static void SetChosenItem(GAME_OBJECT_ID objectID)
+	static void SetUsedItem(GAME_OBJECT_ID objectID)
 	{
 		if (g_Gui.IsObjectInInventory(objectID))
 			g_Gui.SetInventoryItemChosen(objectID);
 	}
 
-	/// Clear last selected item in the player's inventory.
-	// This function is needed to avoid Lara saying "No" after selecting particular item in inventory.
-	//@function ClearChosenItem
-	static void ClearChosenItem()
+	/// Clear last item used in the player's inventory.
+	// When this function is used in OnUseItem level function, it allows to override existing item functionality.
+	// For items without existing functionality, this function is needed to avoid Lara saying "No" after using it.
+	//@function ClearUsedItem
+	static void ClearUsedItem()
 	{
 		g_Gui.SetInventoryItemChosen(GAME_OBJECT_ID::ID_NO_OBJECT);
 	}
@@ -100,8 +100,8 @@ namespace TEN::Scripting::InventoryHandler
 		tableInventory.set_function(ScriptReserved_TakeInvItem, &TakeItem);
 		tableInventory.set_function(ScriptReserved_GetInvItemCount, &GetItemCount);
 		tableInventory.set_function(ScriptReserved_SetInvItemCount, &SetItemCount);
-		tableInventory.set_function(ScriptReserved_SetChosenItem, &SetChosenItem);
-		tableInventory.set_function(ScriptReserved_GetChosenItem, &GetChosenItem);
-		tableInventory.set_function(ScriptReserved_ClearChosenItem, &ClearChosenItem);
+		tableInventory.set_function(ScriptReserved_SetUsedItem, &SetUsedItem);
+		tableInventory.set_function(ScriptReserved_GetUsedItem, &GetUsedItem);
+		tableInventory.set_function(ScriptReserved_ClearUsedItem, &ClearUsedItem);
 	}
 }
