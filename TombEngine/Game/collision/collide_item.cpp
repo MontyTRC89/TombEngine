@@ -1291,7 +1291,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	{
 		int bs = 0;
 
-		if (pointColl.IsIllegalFloor() && prevPointColl.GetFloorHeight() < pointColl.GetFloorHeight())
+		if (pointColl.IsSteepFloor() && prevPointColl.GetFloorHeight() < pointColl.GetFloorHeight())
 		{
 			int yAngle = (long)((unsigned short)item->Pose.Orientation.y);
 
@@ -1360,7 +1360,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			item->Pose.Position.z = z;
 		}
 		// Hit a steep slope?
-		else if (pointColl.IsIllegalFloor())
+		else if (pointColl.IsSteepFloor())
 		{
 			// Need to know which direction the slope is.
 
