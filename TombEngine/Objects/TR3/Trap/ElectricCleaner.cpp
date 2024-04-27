@@ -72,13 +72,13 @@ namespace TEN::Entities::Traps
 
 	static Vector3 GetElectricCleanerMovementDirection(const ItemInfo& item, const Vector3& dir0, const Vector3& dir1, const Vector3& dir2)
 	{
-		if (IsNextSectorValid(item, dir0, BLOCK(1)))
+		if (IsNextSectorValid(item, dir0, BLOCK(1), false))
 			return dir0;
 
-		if (IsNextSectorValid(item, dir1, BLOCK(1)))
+		if (IsNextSectorValid(item, dir1, BLOCK(1), false))
 			return dir1;
 
-		if (IsNextSectorValid(item, dir2, BLOCK(1)))
+		if (IsNextSectorValid(item, dir2, BLOCK(1), false))
 			return dir2;
 
 		return Vector3::Zero;
