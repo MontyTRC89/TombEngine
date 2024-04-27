@@ -337,12 +337,9 @@ namespace TEN::Collision::Los
 			if (intercept.Sector != prevSector)
 			{
 				// 2) Clip sector.
-				if (true)
-				{
-					float dist = 0.0f;
-					if (intercept.Sector->Mesh.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
-						closestDist = dist;
-				}
+				float dist = 0.0f;
+				if (intercept.Sector->Mesh.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
+					closestDist = dist;
 
 				// 3) Clip bridge (if applicable).
 				if (collideBridges)
