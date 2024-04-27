@@ -75,10 +75,13 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, boo
 		// Half block.
 		int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
 		if (relFloorHeight > CLICK(1) && canFloat)
+		{
 			return false;
-
+		}
 		else if (relFloorHeight > CLICK(2) && !canFloat)
+		{
 			return false;
+		}
 
 		short slopeAngle = ANGLE(0.0f);
 		if (pointColl.FloorTilt.x > 0)
