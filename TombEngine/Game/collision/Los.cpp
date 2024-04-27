@@ -106,7 +106,12 @@ namespace TEN::Collision::Los
 						auto offset = intersectPos - mov->Pose.Position.ToVector3();
 						int roomNumber = GetCollision(mov->Pose.Position, mov->RoomNumber, offset).RoomNumber;
 
-						los.Moveables.push_back(MoveableLosData{ mov, std::pair(intersectPos, roomNumber), intersectDist });
+						auto movLos = MoveableLosData{};
+						movLos.Moveable = mov;
+						movLos.Intersect = std::pair(intersectPos, roomNumber);
+						movLos.IsOriginContained = (box.Contains(origin) == ContainmentType::CONTAINS);
+						movLos.Distance = intersectDist;
+						los.Moveables.push_back(std::move(movLos));
 					}
 				}
 
@@ -125,7 +130,13 @@ namespace TEN::Collision::Los
 							auto offset = intersectPos - mov->Pose.Position.ToVector3();
 							int roomNumber = GetCollision(mov->Pose.Position, mov->RoomNumber, offset).RoomNumber;
 
-							los.MoveableSpheres.push_back(MoveableSphereLosData{ mov, std::pair(intersectPos, roomNumber), i, intersectDist });
+							auto sphereLos = SphereLosData{};
+							sphereLos.Moveable = mov;
+							sphereLos.Intersect = std::pair(intersectPos, roomNumber);
+							sphereLos.SphereID = i;
+							sphereLos.IsOriginContained = (sphere.Contains(origin) == ContainmentType::CONTAINS);
+							sphereLos.Distance = intersectDist;
+							los.Spheres.push_back(std::move(sphereLos));
 						}
 					}
 				}
@@ -141,10 +152,10 @@ namespace TEN::Collision::Los
 
 			// Sort moveable sphere LOS instances.
 			std::sort(
-				los.MoveableSpheres.begin(), los.MoveableSpheres.end(),
-				[](const auto& movSphereLos0, const auto& movSphereLos1)
+				los.Spheres.begin(), los.Spheres.end(),
+				[](const auto& sphereLos0, const auto& sphereLos1)
 				{
-					return (movSphereLos0.Distance < movSphereLos1.Distance);
+					return (sphereLos0.Distance < sphereLos1.Distance);
 				});
 		}
 
@@ -163,7 +174,12 @@ namespace TEN::Collision::Los
 					auto offset = intersectPos - staticObj->pos.Position.ToVector3();
 					int roomNumber = GetCollision(staticObj->pos.Position, staticObj->roomNumber, offset).RoomNumber;
 
-					los.Statics.push_back(StaticLosData{ staticObj, std::pair(intersectPos, roomNumber), intersectDist });
+					auto staticLos = StaticLosData{};
+					staticLos.Static = staticObj;
+					staticLos.Intersect = std::pair(intersectPos, roomNumber);
+					staticLos.IsOriginContained = (box.Contains(origin) == ContainmentType::CONTAINS);
+					staticLos.Distance = intersectDist;
+					los.Statics.push_back(std::move(staticLos));
 				}
 			}
 
@@ -577,9 +593,9 @@ namespace TEN::Collision::Los
 
 		// Create and return room LOS.
 		auto roomLos = RoomLosData{};
-		roomLos.IsIntersected = trace.Intersect.has_value();
 		roomLos.Position = trace.Intersect.value_or(std::pair(Geometry::TranslatePoint(origin, dir, dist), roomNumber));
 		roomLos.RoomNumbers = roomNumbers;
+		roomLos.IsIntersected = trace.Intersect.has_value();
 		roomLos.Distance = trace.Intersect.has_value() ? Vector3::Distance(origin, trace.Intersect->first) : dist;
 		return roomLos;
 	}
@@ -603,20 +619,20 @@ namespace TEN::Collision::Los
 		return std::nullopt;
 	}
 
-	std::optional<MoveableSphereLosData> GetMoveableSphereLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer)
+	std::optional<SphereLosData> GetSphereLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer)
 	{
 		auto los = GetLos(origin, roomNumber, dir, dist, false, true, false);
-		for (auto& movSphereLos : los.MoveableSpheres)
+		for (auto& sphereLos : los.Spheres)
 		{
 			// 1) Check if moveable is not player (if applicable).
-			if (!collidePlayer && movSphereLos.Moveable->ObjectNumber == ID_LARA)
+			if (!collidePlayer && sphereLos.Moveable->ObjectNumber == ID_LARA)
 				continue;
 
 			// 2) Check if moveable is deactivated.
-			if (movSphereLos.Moveable->Status == ItemStatus::ITEM_DEACTIVATED)
+			if (sphereLos.Moveable->Status == ItemStatus::ITEM_DEACTIVATED)
 				continue;
 
-			return movSphereLos;
+			return sphereLos;
 		}
 
 		return std::nullopt;

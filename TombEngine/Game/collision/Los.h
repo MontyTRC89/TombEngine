@@ -8,11 +8,11 @@ namespace TEN::Collision::Los
 {
 	struct RoomLosData
 	{
-		bool					IsIntersected = false;
 		std::pair<Vector3, int> Position	  = {};
 		std::set<int>			RoomNumbers	  = {};
 
-		float Distance = 0.0f;
+		bool  IsIntersected = false;
+		float Distance		= 0.0f;
 	};
 
 	struct MoveableLosData
@@ -20,16 +20,18 @@ namespace TEN::Collision::Los
 		ItemInfo*				Moveable;
 		std::pair<Vector3, int> Intersect = {};
 
+		bool  IsOriginContained = false;
 		float Distance = 0.0f;
 	};
 	
-	struct MoveableSphereLosData
+	struct SphereLosData
 	{
 		ItemInfo*				Moveable;
 		std::pair<Vector3, int> Intersect = {};
 		int						SphereID  = 0;
 
-		float Distance = 0.0f;
+		bool  IsOriginContained = false;
+		float Distance			= 0.0f;
 	};
 	
 	struct StaticLosData
@@ -37,15 +39,16 @@ namespace TEN::Collision::Los
 		MESH_INFO*				Static;
 		std::pair<Vector3, int> Intersect = {};
 
+		bool  IsOriginContained = false;
 		float Distance = 0.0f;
 	};
 
 	struct LosData
 	{
-		RoomLosData						   Room			   = {};
-		std::vector<MoveableLosData>	   Moveables	   = {};
-		std::vector<MoveableSphereLosData> MoveableSpheres = {};
-		std::vector<StaticLosData>		   Statics		   = {};
+		RoomLosData					 Room	   = {};
+		std::vector<MoveableLosData> Moveables = {};
+		std::vector<SphereLosData>	 Spheres   = {};
+		std::vector<StaticLosData>	 Statics   = {};
 	};
 
 	// Low-level LOS getter
@@ -53,10 +56,10 @@ namespace TEN::Collision::Los
 				   bool collideMoveables, bool collideSpheres, bool collideStatics);
 
 	// Basic high-level LOS getters
-	RoomLosData							 GetRoomLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges = true);
-	std::optional<MoveableLosData>		 GetMoveableLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer = false);
-	std::optional<MoveableSphereLosData> GetMoveableSphereLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer = false);
-	std::optional<StaticLosData>		 GetStaticLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideOnlySolid = true);
+	RoomLosData					   GetRoomLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges = true);
+	std::optional<MoveableLosData> GetMoveableLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer = false);
+	std::optional<SphereLosData>   GetSphereLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer = false);
+	std::optional<StaticLosData>   GetStaticLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideOnlySolid = true);
 
 	std::pair<GameVector, GameVector> GetRayFrom2DPosition(const Vector2& screenPos);
 }
