@@ -507,7 +507,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 			pose = Pose(item.Pose.Position, EulerAngles(0, item.Pose.Orientation.y, 0));
 
 			if (DoRayBox(*origin, *target, bounds, pose, *vec, linkNumber))
-				target->RoomNumber = LosRoomNumbers[roomNumber];
+				target->RoomNumber = roomNumber;
 		}
 	}
 
