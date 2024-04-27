@@ -676,20 +676,7 @@ static Plane ConvertFakePlaneToPlane(const Vector3& fakePlane, bool isFloor)
 	return Plane(normal, dist);
 }
 
-static void SetRoomSectorPositions(ROOM_INFO& room)
-{
-	auto base = Vector2i(room.x, room.z);
-	for (int i = 0; i < room.xSize; i++)
-	{
-		for (int j = 0; j < room.zSize; j++)
-		{
-			auto& sector = room.floor[(i * room.zSize) + j];
-			sector.Position = base + Vector2i(BLOCK(i), BLOCK(j));
-		}
-	}
-}
-
-static int GetSurfaceTriangleHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
+static int GetSurfaceTriangleVertexHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
 {
 	constexpr auto AXIS_OFFSET = -BLOCK(0.5f);
 
@@ -703,6 +690,7 @@ static int GetSurfaceTriangleHeight(const FloorInfo& sector, int relX, int relZ,
 	return (tri.Plane.D() + relPlaneHeight);
 }
 
+// NOTE: Only generates mesh for floor, ceiling, and diagonal walls.
 static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 {
 	constexpr auto REL_CORNER_0 = Vector2i(0, 0);
@@ -722,8 +710,8 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 	auto surfaces = std::vector<const SectorSurfaceData*>{ &sector.FloorSurface, &sector.CeilingSurface };
 	for (const auto& surface : surfaces)
 	{
-		bool isTri0Portal = surface->Triangles[0].PortalRoomNumber != NO_VALUE;
-		bool isTri1Portal = surface->Triangles[1].PortalRoomNumber != NO_VALUE;
+		bool isTri0Portal = (surface->Triangles[0].PortalRoomNumber != NO_VALUE);
+		bool isTri1Portal = (surface->Triangles[1].PortalRoomNumber != NO_VALUE);
 
 		if (sector.IsSurfaceSplit(isFloor))
 		{
@@ -733,18 +721,18 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 				{
 					// Surface triangle 0.
 					auto tri0 = TriangleMesh(
-						Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
-						Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
-						Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
+						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
+						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
+						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
 
 					if (!isTri0Portal)
 						tris.push_back(tri0);
 
 					// Surface triangle 1.
 					auto tri1 = TriangleMesh(
-						Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
-						Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
-						Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
+						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
+						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
+						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
 
 					if (!isTri1Portal)
 						tris.push_back(tri1);
@@ -773,18 +761,18 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 				{
 					// Surface triangle 0.
 					auto tri0 = TriangleMesh(
-						Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
-						Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y),
-						Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y));
+						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
+						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y),
+						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y));
 
 					if (!isTri0Portal)
 						tris.push_back(tri0);
 
 					// Surface triangle 1.
 					auto tri1 = TriangleMesh(
-						Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
-						Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y),
-						Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
+						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
+						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y),
+						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
 
 					if (!isTri1Portal)
 						tris.push_back(tri1);
@@ -817,9 +805,9 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 			if (!isTri0Portal)
 			{
 				auto tri0 = TriangleMesh(
-					Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
-					Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
-					Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
+					Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
+					Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
+					Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
 				tris.push_back(tri0);
 			}
 
@@ -827,9 +815,9 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 			if (!isTri1Portal)
 			{
 				auto tri1 = TriangleMesh(
-					Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
-					Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
-					Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
+					Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
+					Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
+					Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
 				tris.push_back(tri1);
 			}
 		}
@@ -838,18 +826,6 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 	}
 
 	return CollisionMesh(tris);
-}
-
-static void SetRoomSectorCollisionMeshes(ROOM_INFO& room)
-{
-	for (int i = 0; i < room.xSize; i++)
-	{
-		for (int j = 0; j < room.zSize; j++)
-		{
-			auto& sector = room.floor[(i * room.zSize) + j];
-			sector.Mesh = GenerateSectorCollisionMesh(sector);
-		}
-	}
 }
 
 void ReadRooms()
@@ -950,55 +926,58 @@ void ReadRooms()
 		room.zSize = ReadInt32();
 		room.xSize = ReadInt32();
 
+		auto base = Vector2i(room.x, room.z);
 		room.floor.reserve(room.zSize * room.xSize);
-		for (int j = 0; j < (room.zSize * room.xSize); j++)
+		for (int j = 0; j < room.xSize; j++)
 		{
-			auto sector = FloorInfo{};
+			for (int k = 0; k < room.zSize; k++)
+			{
+				auto sector = FloorInfo{};
 
-			sector.TriggerIndex = ReadInt32();
-			sector.Box = ReadInt32();
+				sector.Position = base + Vector2i(BLOCK(j), BLOCK(k));
+				sector.RoomNumber = i;
 
-			sector.FloorSurface.Triangles[0].Material =
-			sector.FloorSurface.Triangles[1].Material =
-			sector.CeilingSurface.Triangles[0].Material =
-			sector.CeilingSurface.Triangles[1].Material = (MaterialType)ReadInt32();
+				sector.TriggerIndex = ReadInt32();
+				sector.Box = ReadInt32();
 
-			sector.Stopper = (bool)ReadInt32();
+				sector.FloorSurface.Triangles[0].Material =
+				sector.FloorSurface.Triangles[1].Material =
+				sector.CeilingSurface.Triangles[0].Material =
+				sector.CeilingSurface.Triangles[1].Material = (MaterialType)ReadInt32();
 
-			sector.FloorSurface.SplitAngle = FROM_RAD(ReadFloat());
-			sector.FloorSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
-			sector.FloorSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
-			sector.FloorSurface.Triangles[0].PortalRoomNumber = ReadInt32();
-			sector.FloorSurface.Triangles[1].PortalRoomNumber = ReadInt32();
-			sector.FloorSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
-			sector.FloorSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
+				sector.Stopper = (bool)ReadInt32();
 
-			sector.CeilingSurface.SplitAngle = FROM_RAD(ReadFloat());
-			sector.CeilingSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
-			sector.CeilingSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
-			sector.CeilingSurface.Triangles[0].PortalRoomNumber = ReadInt32();
-			sector.CeilingSurface.Triangles[1].PortalRoomNumber = ReadInt32();
-			sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
-			sector.CeilingSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
+				sector.FloorSurface.SplitAngle = FROM_RAD(ReadFloat());
+				sector.FloorSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+				sector.FloorSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+				sector.FloorSurface.Triangles[0].PortalRoomNumber = ReadInt32();
+				sector.FloorSurface.Triangles[1].PortalRoomNumber = ReadInt32();
+				sector.FloorSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
+				sector.FloorSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
 
-			sector.SidePortalRoomNumber = ReadInt32();
-			sector.Flags.Death = ReadBool();
-			sector.Flags.Monkeyswing = ReadBool();
-			sector.Flags.ClimbNorth = ReadBool();
-			sector.Flags.ClimbSouth = ReadBool();
-			sector.Flags.ClimbEast = ReadBool();
-			sector.Flags.ClimbWest = ReadBool();
-			sector.Flags.MarkTriggerer = ReadBool();
-			sector.Flags.MarkTriggererActive = 0; // TODO: Needs to be written to and read from savegames.
-			sector.Flags.MarkBeetle = ReadBool();
+				sector.CeilingSurface.SplitAngle = FROM_RAD(ReadFloat());
+				sector.CeilingSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+				sector.CeilingSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+				sector.CeilingSurface.Triangles[0].PortalRoomNumber = ReadInt32();
+				sector.CeilingSurface.Triangles[1].PortalRoomNumber = ReadInt32();
+				sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
+				sector.CeilingSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
+				sector.Mesh = GenerateSectorCollisionMesh(sector);
 
-			sector.RoomNumber = i;
+				sector.SidePortalRoomNumber = ReadInt32();
+				sector.Flags.Death = ReadBool();
+				sector.Flags.Monkeyswing = ReadBool();
+				sector.Flags.ClimbNorth = ReadBool();
+				sector.Flags.ClimbSouth = ReadBool();
+				sector.Flags.ClimbEast = ReadBool();
+				sector.Flags.ClimbWest = ReadBool();
+				sector.Flags.MarkTriggerer = ReadBool();
+				sector.Flags.MarkTriggererActive = 0; // TODO: Needs to be written to and read from savegames.
+				sector.Flags.MarkBeetle = ReadBool();
 
-			room.floor.push_back(sector);
+				room.floor.push_back(sector);
+			}
 		}
-
-		SetRoomSectorPositions(room);
-		SetRoomSectorCollisionMeshes(room);
 
 		room.ambient = ReadVector3();
 
