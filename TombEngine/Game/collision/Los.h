@@ -27,8 +27,8 @@ namespace TEN::Collision::Los
 	struct SphereLosData
 	{
 		ItemInfo*				Moveable  = nullptr;
-		std::pair<Vector3, int> Intersect = {};
 		int						SphereID  = 0;
+		std::pair<Vector3, int> Intersect = {};
 
 		bool  IsOriginContained = false;
 		float Distance			= 0.0f;

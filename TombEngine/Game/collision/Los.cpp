@@ -132,8 +132,8 @@ namespace TEN::Collision::Los
 
 							auto sphereLos = SphereLosData{};
 							sphereLos.Moveable = mov;
-							sphereLos.Intersect = std::pair(intersectPos, roomNumber);
 							sphereLos.SphereID = i;
+							sphereLos.Intersect = std::pair(intersectPos, roomNumber);
 							sphereLos.IsOriginContained = (sphere.Contains(origin) == ContainmentType::CONTAINS);
 							sphereLos.Distance = intersectDist;
 							los.Spheres.push_back(std::move(sphereLos));
