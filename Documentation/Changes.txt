@@ -2,6 +2,8 @@ Version 1.5
 ===========
 
 * Fixed original issue with classic switch off trigger wrongly activating some trigger actions.
+* Fixed incorrect diving animation when swandiving from a high place.
+* Fixed AI for skidoo driver and worker with shotgun TR2 enemies.
 
 Lua API changes:
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
