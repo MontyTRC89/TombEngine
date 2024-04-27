@@ -24,8 +24,8 @@ namespace TEN::Collision::Los
 			Vector3i		 Position = Vector3i::Zero;
 		};
 
-		std::vector<InterceptData>			   Intercepts = {};
 		std::optional<std::pair<Vector3, int>> Intersect  = {};
+		std::vector<InterceptData>			   Intercepts = {};
 	};
 
 	static std::vector<ItemInfo*> GetNearbyMoveables(const std::set<int>& roomNumbers)
