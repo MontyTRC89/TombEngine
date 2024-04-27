@@ -270,11 +270,7 @@ namespace TEN::Collision::Los
 			// TODO: Room traversal is wrong.
 			auto* sector = GetFloor(intercept.Position.x, intercept.Position.y, intercept.Position.z, &roomNumber);
 			intercept.Sector = sector;
-
-			g_Renderer.PrintDebugMessage("%d", intercept.Sector->RoomNumber);
 		}
-
-		g_Renderer.PrintDebugMessage("--------");
 	}
 
 	static int GetSurfaceTriangleHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
@@ -421,7 +417,7 @@ namespace TEN::Collision::Los
 		// Debug
 		for (const auto& tri : tris)
 		{
-			auto offset = (Vector3::UnitY * 4) * (isFloor ? -1 : 1);
+			auto offset = Vector3::UnitY * (isFloor ? -1 : 1);
 			g_Renderer.AddDebugTriangle(tri.Vertices[0] + offset, tri.Vertices[1] + offset, tri.Vertices[2] + offset, Color(1.0f, 1.0f, 0.0f, 0.1f));
 		}
 
@@ -469,7 +465,6 @@ namespace TEN::Collision::Los
 		{
 			const auto& intercept = trace.Intercepts[i];
 
-			// Debug
 			g_Renderer.AddDebugTarget(intercept.Position.ToVector3(), Quaternion::Identity, 30, Color(1.0f, 0.0f, 0.0f));
 
 			// 1) Clip wall.
@@ -594,6 +589,7 @@ namespace TEN::Collision::Los
 		roomLos.IsIntersected = trace.Intersect.has_value();
 		roomLos.Position = trace.Intersect.value_or(std::pair(Geometry::TranslatePoint(origin, dir, dist), roomNumber));
 		roomLos.RoomNumbers = roomNumbers;
+		roomLos.Distance = trace.Intersect.has_value() ? Vector3::Distance(origin, trace.Intersect->first) : dist;
 		return roomLos;
 	}
 

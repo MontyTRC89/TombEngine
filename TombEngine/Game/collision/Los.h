@@ -8,10 +8,11 @@ namespace TEN::Collision::Los
 {
 	struct RoomLosData
 	{
-		bool IsIntersected = false;
+		bool					IsIntersected = false;
+		std::pair<Vector3, int> Position	  = {};
+		std::set<int>			RoomNumbers	  = {};
 
-		std::pair<Vector3, int> Position	= {};
-		std::set<int>			RoomNumbers = {};
+		float Distance = 0.0f;
 	};
 
 	struct MoveableLosData
@@ -26,7 +27,7 @@ namespace TEN::Collision::Los
 	{
 		ItemInfo*				Moveable;
 		std::pair<Vector3, int> Intersect = {};
-		int						SphereID  = NO_VALUE;
+		int						SphereID  = 0;
 
 		float Distance = 0.0f;
 	};

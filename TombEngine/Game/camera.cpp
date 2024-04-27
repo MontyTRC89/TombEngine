@@ -39,6 +39,8 @@ struct CameraLosData
 {
 	bool					IsIntersected = false;
 	std::pair<Vector3, int> Position	  = {};
+
+	float Distance = 0.0f;
 };
 
 struct PrevCameraData
@@ -167,45 +169,39 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 	float dist = Vector3::Distance(origin, target);
 	auto los = GetLos(origin, originRoomNumber, dir, dist, true, false, true);
 
-	float closestDist = INFINITY;
-	auto cameraLos = CameraLosData{ los.Room.IsIntersected, los.Room.Position };
+	auto cameraLos = CameraLosData{ los.Room.IsIntersected, los.Room.Position, los.Room.Distance };
 
-	// Run through moveables.
+	// Run through sorted moveable LOS instances.
 	for (const auto& movLos : los.Moveables)
 	{
 		if (!TestCameraCollidableItem(*movLos.Moveable))
 			continue;
 
-		if (movLos.Distance < closestDist)
+		if (movLos.Distance < cameraLos.Distance)
 		{
-			closestDist = movLos.Distance;
-			auto cameraLos = CameraLosData{ true, movLos.Intersect };
+			cameraLos = CameraLosData{ true, movLos.Intersect, movLos.Distance };
 			break;
 		}
 	}
 
-	// Run through statics.
+	// Run through sorted static LOS instances.
 	for (const auto& staticLos : los.Statics)
 	{
 		if (!TestCameraCollidableStatic(*staticLos.Static))
 			continue;
 
-		if (staticLos.Distance < closestDist)
+		if (staticLos.Distance < cameraLos.Distance)
 		{
-			closestDist = staticLos.Distance;
-			auto cameraLos = CameraLosData{ true, staticLos.Intersect };
+			cameraLos = CameraLosData{ true, staticLos.Intersect, staticLos.Distance };
 			break;
 		}
 	}
 
-	float currentDist = Vector3::Distance(origin, cameraLos.Position.first);
-	float targetDist = std::max(currentDist - DIST_BUFFER, DIST_BUFFER);
-	dist = currentDist - targetDist;
-
 	// Apply distance buffer. TODO: Shift instead.
+	cameraLos.Distance = cameraLos.Distance - std::max(cameraLos.Distance - DIST_BUFFER, DIST_BUFFER);
 	cameraLos.Position = std::pair(
-		Geometry::TranslatePoint(cameraLos.Position.first, -dir, dist),
-		GetCollision(cameraLos.Position.first, cameraLos.Position.second, -dir, dist).RoomNumber);
+		Geometry::TranslatePoint(cameraLos.Position.first, -dir, cameraLos.Distance),
+		GetCollision(cameraLos.Position.first, cameraLos.Position.second, -dir, cameraLos.Distance).RoomNumber);
 
 	return cameraLos;
 }
