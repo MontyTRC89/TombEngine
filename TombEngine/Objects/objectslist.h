@@ -50,5 +50,12 @@ template <typename T> std::enable_if_t<std::is_same_v<T, std::underlying_type_t<
 		SPR_GUI_UP,
 		SPR_GUI_LEFT,
 		SPR_GUI_RIGHT,
-		SPR_LIGHTHING
+		SPR_LIGHTHING,
+		SPR_LENS_FLARE_BLEND1,
+		SPR_LENS_FLARE_BLEND2,
+		SPR_LENS_FLARE_BLEND3,
+		SPR_LENS_FLARE,
+		SPR_WHITE_BOX,
+		SPR_WATERFALL,
+		SPR_WATERFALL2
 	};

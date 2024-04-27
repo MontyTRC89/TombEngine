@@ -143,7 +143,7 @@ const auto WATERFALL_MIST_END_COLOR = Color(0.6f, 0.6f, 0.6f);
 					spark->sSize = spark->size = Random::GenerateInt(3, 10) * scale + size * 2;
 					spark->dSize = (1 * spark->size);
 
-					spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? 34 : 0);
+					spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? SPR_WATERFALL : 0);
 					spark->flags = SP_SCALE | SP_DEF | SP_ROTATE;
 				}
 
@@ -217,6 +217,6 @@ const auto WATERFALL_MIST_END_COLOR = Color(0.6f, 0.6f, 0.6f);
 		spark->dSize = size1;
 		spark->extras = 0;
 		spark->dynamic = -3;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? 34 : 35);
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? SPR_WATERFALL : SPR_WATERFALL2);
 		spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;		
 	}
