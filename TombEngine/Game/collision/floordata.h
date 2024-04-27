@@ -56,7 +56,7 @@ enum class ClimbDirectionFlags
 };
 
 // NOTE: Describes vertical room location.
-class RoomVector 
+class RoomVector
 {
 public:
 	// Members
@@ -136,12 +136,15 @@ class FloorInfo
 {
 public:
 	// Components
-	int				  RoomNumber		   = 0;
-	int				  SidePortalRoomNumber = 0;
-	SectorSurfaceData FloorSurface		   = {};
-	SectorSurfaceData CeilingSurface	   = {};
-	std::set<int>	  BridgeItemNumbers	   = {};
-	SectorFlagData	  Flags				   = {};
+	Vector2i Position			  = Vector2i::Zero;
+	int		 RoomNumber			  = 0;
+	int		 SidePortalRoomNumber = 0;
+
+	CollisionMesh	  Mesh				= {};
+	SectorSurfaceData FloorSurface		= {};
+	SectorSurfaceData CeilingSurface	= {};
+	std::set<int>	  BridgeItemNumbers = {};
+	SectorFlagData	  Flags				= {};
 
 	int	 Box		  = 0;
 	int	 TriggerIndex = 0;

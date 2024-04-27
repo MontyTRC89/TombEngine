@@ -280,158 +280,7 @@ namespace TEN::Collision::Los
 		}
 	}
 
-	static int GetSurfaceTriangleHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
-	{
-		constexpr auto AXIS_OFFSET = -BLOCK(0.5f);
-
-		const auto& tri = isFloor ? sector.FloorSurface.Triangles[triID] : sector.CeilingSurface.Triangles[triID];
-
-		relX += AXIS_OFFSET;
-		relZ += AXIS_OFFSET;
-
-		auto normal = tri.Plane.Normal();
-		float relPlaneHeight = -((normal.x * relX) + (normal.z * relZ)) / normal.y;
-		return (tri.Plane.D() + relPlaneHeight);
-	}
-
-	static std::vector<TriangleMesh> GenerateSectorTriangleMeshes(const Vector3& pos, const FloorInfo& sector, bool isFloor)
-	{
-		constexpr auto REL_CORNER_0 = Vector3(0.0f, 0.0f, 0.0f);
-		constexpr auto REL_CORNER_1 = Vector3(0.0f, 0.0f, BLOCK(1));
-		constexpr auto REL_CORNER_2 = Vector3(BLOCK(1), 0.0f, BLOCK(1));
-		constexpr auto REL_CORNER_3 = Vector3(BLOCK(1), 0.0f, 0.0f);
-
-		const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
-		bool isTri0Portal = surface.Triangles[0].PortalRoomNumber != NO_VALUE;
-		bool isTri1Portal = surface.Triangles[1].PortalRoomNumber != NO_VALUE;
-
-		auto base = Vector3(FloorToStep(pos.x, BLOCK(1)), 0.0f, FloorToStep(pos.z, BLOCK(1)));
-		auto corner0 = base + REL_CORNER_0;
-		auto corner1 = base + REL_CORNER_1;
-		auto corner2 = base + REL_CORNER_2;
-		auto corner3 = base + REL_CORNER_3;
-
-		auto tris = std::vector<TriangleMesh>{};
-		if (sector.IsSurfaceSplit(isFloor))
-		{
-			if (!isTri0Portal || !isTri1Portal)
-			{
-				if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
-				{
-					// Surface triangle 0.
-					auto tri0 = TriangleMesh(
-						Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 0, isFloor), corner0.z),
-						Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 0, isFloor), corner1.z),
-						Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 0, isFloor), corner2.z));
-
-					if (!isTri0Portal)
-						tris.push_back(tri0);
-
-					// Surface triangle 1.
-					auto tri1 = TriangleMesh(
-						Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 1, isFloor), corner0.z),
-						Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 1, isFloor), corner2.z),
-						Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 1, isFloor), corner3.z));
-
-					if (!isTri1Portal)
-						tris.push_back(tri1);
-
-					// Diagonal wall triangles.
-					if (tri0.Vertices[0] != tri1.Vertices[0] && tri0.Vertices[2] != tri1.Vertices[1])
-					{
-						auto tri2 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[0], tri0.Vertices[2]);
-						tris.push_back(tri2);
-
-						auto tri3 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[1]);
-						tris.push_back(tri3);
-					}
-					else if (tri0.Vertices[0] != tri1.Vertices[0] && tri0.Vertices[2] == tri1.Vertices[1])
-					{
-						auto tri2 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[0], tri0.Vertices[2]);
-						tris.push_back(tri2);
-					}
-					else if (tri0.Vertices[2] == tri1.Vertices[1] && tri0.Vertices[2] != tri1.Vertices[1])
-					{
-						auto tri2 = TriangleMesh(tri1.Vertices[0], tri0.Vertices[2], tri1.Vertices[1]);
-						tris.push_back(tri2);
-					}
-				}
-				else if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_1)
-				{
-					// Surface triangle 0.
-					auto tri0 = TriangleMesh(
-						Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 0, isFloor), corner1.z),
-						Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 0, isFloor), corner2.z),
-						Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 0, isFloor), corner3.z));
-
-					if (!isTri0Portal)
-						tris.push_back(tri0);
-
-					// Surface triangle 1.
-					auto tri1 = TriangleMesh(
-						Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 1, isFloor), corner0.z),
-						Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 1, isFloor), corner1.z),
-						Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 1, isFloor), corner3.z));
-
-					if (!isTri1Portal)
-						tris.push_back(tri1);
-
-					// Diagonal wall triangles.
-					if (tri1.Vertices[1] != tri0.Vertices[0] && tri1.Vertices[2] != tri0.Vertices[2])
-					{
-						auto tri2 = TriangleMesh(tri1.Vertices[1], tri0.Vertices[0], tri1.Vertices[2]);
-						tris.push_back(tri2);
-
-						auto tri3 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[2], tri0.Vertices[2]);
-						tris.push_back(tri3);
-					}
-					else if (tri1.Vertices[1] != tri0.Vertices[0] && tri1.Vertices[2] == tri0.Vertices[2])
-					{
-						auto tri2 = TriangleMesh(tri1.Vertices[1], tri0.Vertices[0], tri1.Vertices[2]);
-						tris.push_back(tri2);
-					}
-					else if (tri1.Vertices[2] == tri0.Vertices[2] && tri1.Vertices[2] != tri0.Vertices[2])
-					{
-						auto tri2 = TriangleMesh(tri0.Vertices[0], tri1.Vertices[2], tri0.Vertices[2]);
-						tris.push_back(tri2);
-					}
-				}
-			}
-		}
-		else
-		{
-			// Surface triangle 0.
-			if (!isTri0Portal)
-			{
-				auto tri0 = TriangleMesh(
-					Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 0, isFloor), corner0.z),
-					Vector3(corner1.x, GetSurfaceTriangleHeight(sector, REL_CORNER_1.x, REL_CORNER_1.z, 0, isFloor), corner1.z),
-					Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 0, isFloor), corner2.z));
-				tris.push_back(tri0);
-			}
-
-			// Surface triangle 1.
-			if (!isTri1Portal)
-			{
-				auto tri1 = TriangleMesh(
-					Vector3(corner0.x, GetSurfaceTriangleHeight(sector, REL_CORNER_0.x, REL_CORNER_0.z, 1, isFloor), corner0.z),
-					Vector3(corner2.x, GetSurfaceTriangleHeight(sector, REL_CORNER_2.x, REL_CORNER_2.z, 1, isFloor), corner2.z),
-					Vector3(corner3.x, GetSurfaceTriangleHeight(sector, REL_CORNER_3.x, REL_CORNER_3.z, 1, isFloor), corner3.z));
-				tris.push_back(tri1);
-			}
-		}
-
-		// Debug
-		for (const auto& tri : tris)
-		{
-			auto offset = Vector3::UnitY * (isFloor ? -1 : 1);
-			g_Renderer.AddDebugTriangle(tri.Vertices[0] + offset, tri.Vertices[1] + offset, tri.Vertices[2] + offset, Color(1.0f, 1.0f, 0.0f, 0.1f));
-		}
-
-		return tris;
-	}
-
-	static std::vector<TriangleMesh> GenerateBridgeTriangleMeshes(const BoundingOrientedBox& box, const Vector3& offset)
+	static CollisionMesh GenerateBridgeCollisionMesh(const BoundingOrientedBox& box, const Vector3& offset)
 	{
 		// Get box corners.
 		auto corners = std::array<Vector3, 8>{};
@@ -444,7 +293,7 @@ namespace TEN::Collision::Los
 		corners[7] -= offset;
 
 		// Calculate and return collision mesh.
-		return std::vector<TriangleMesh>
+		auto tris = std::vector<TriangleMesh>
 		{
 			TriangleMesh(corners[0], corners[1], corners[4]),
 			TriangleMesh(corners[1], corners[4], corners[5]),
@@ -459,6 +308,7 @@ namespace TEN::Collision::Los
 			TriangleMesh(corners[4], corners[5], corners[6]),
 			TriangleMesh(corners[4], corners[6], corners[7])
 		};
+		return CollisionMesh(tris);
 	}
 
 	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray, float distMax, bool collideBridges)
@@ -483,27 +333,18 @@ namespace TEN::Collision::Los
 					closestDist = dist;
 			}
 
+			// Ensure sector is unique.
 			if (intercept.Sector != prevSector)
 			{
-				// 2) Clip floor.
-				auto floorTris = GenerateSectorTriangleMeshes(intercept.Position.ToVector3(), *intercept.Sector, true);
-				for (const auto& tri : floorTris)
+				// 2) Clip sector.
+				if (true)
 				{
 					float dist = 0.0f;
-					if (tri.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
+					if (intercept.Sector->Mesh.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
 						closestDist = dist;
 				}
 
-				// 3) Clip ceiling.
-				auto ceilTris = GenerateSectorTriangleMeshes(intercept.Position.ToVector3(), *intercept.Sector, false);
-				for (const auto& tri : ceilTris)
-				{
-					float dist = 0.0f;
-					if (tri.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
-						closestDist = dist;
-				}
-
-				// 4) Clip bridge (if applicable).
+				// 3) Clip bridge (if applicable).
 				if (collideBridges)
 				{
 					for (int movID : intercept.Sector->BridgeItemNumbers)
@@ -541,15 +382,14 @@ namespace TEN::Collision::Los
 						auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
 						offset = Vector3::Transform(offset, rotMatrix);
 
-						// Collide bridge mesh.
+						// Generate bridge collision mesh.
 						auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
-						auto bridgeTris = GenerateBridgeTriangleMeshes(box, offset);
-						for (const auto& tri : bridgeTris)
-						{
-							float dist = 0.0f;
-							if (tri.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
-								closestDist = dist;
-						}
+						auto collMesh = GenerateBridgeCollisionMesh(box, offset);
+
+						// Collide bridge collision mesh.
+						float dist = 0.0f;
+						if (collMesh.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
+							closestDist = dist;
 					}
 				}
 			}
