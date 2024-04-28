@@ -126,14 +126,17 @@ int DrawPhase(bool isTitle, float interpolateFactor)
 		g_Renderer.Render(interpolateFactor);
 	}
 
+	g_Renderer.Lock();
+
 	//Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
 }
 
 GameStatus ControlPhase(int numFrames)
 {
-	auto time1 = std::chrono::high_resolution_clock::now();
+	static int framesCount = 0;
 
+	auto time1 = std::chrono::high_resolution_clock::now();
 	bool isTitle = (CurrentLevel == 0);
 
 	g_Renderer.PrepareScene();
@@ -151,9 +154,6 @@ GameStatus ControlPhase(int numFrames)
 	}
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
-
-	bool isFirstTime = true;
-	static int framesCount = 0;
 
 	// Save current state to old variables for interpolation
 	SaveOldState();
@@ -281,13 +281,6 @@ GameStatus ControlPhase(int numFrames)
 	// Update timers.
 	GameTimer++;
 	GlobalCounter++;
-
-	// Add renderer objects on the first processed frame.
-	if (isFirstTime)
-	{
-		g_Renderer.Lock();
-		isFirstTime = false;
-	}
 
 	using ns = std::chrono::nanoseconds;
 	using get_time = std::chrono::steady_clock;
@@ -622,41 +615,8 @@ GameStatus DoGameLoop(int levelIndex)
 			controlCalls++;
 		}
 
-		if (!levelIndex)
-		{
-			UpdateInputActions(LaraItem);
-
-			auto invStatus = g_Gui.TitleOptions(LaraItem);
-
-			switch (invStatus)
-			{
-			case InventoryResult::NewGame:
-			case InventoryResult::NewGameSelectedLevel:
-				status = GameStatus::NewGame;
-				break;
-
-			case InventoryResult::LoadGame:
-				status = GameStatus::LoadGame;
-				break;
-
-			case InventoryResult::ExitGame:
-				status = GameStatus::ExitGame;
-				break;
-			}
-
-			if (invStatus != InventoryResult::None)
-				break;
-		}
-		else
-		{
-			if (status == GameStatus::ExitToTitle ||
-				status == GameStatus::LaraDead ||
-				status == GameStatus::LoadGame ||
-				status == GameStatus::LevelComplete)
-			{
-				break;
-			}
-		}
+		if (status != GameStatus::Normal)
+			break;
 
 		float interpolateFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
 		DrawPhase(!levelIndex, interpolateFactor);
@@ -686,23 +646,39 @@ void SaveOldState()
 void HandleControls(bool isTitle)
 {
 	// Poll input devices and update input variables.
-	if (!isTitle)
-	{
-		// TODO: To allow cutscene skipping later, don't clear Deselect action.
-		UpdateInputActions(LaraItem, true);
-	}
-	else
-	{
+	// TODO: To allow cutscene skipping later, don't clear Deselect action.
+	UpdateInputActions(LaraItem, true);
+
+	if (isTitle)
 		ClearAction(In::Look);
-	}
 }
 
 GameStatus HandleMenuCalls(bool isTitle)
 {
 	auto result = GameStatus::Normal;
 
-	if (isTitle || ScreenFading)
+	if (ScreenFading)
 		return result;
+
+	if (isTitle)
+	{
+		auto invStatus = g_Gui.TitleOptions(LaraItem);
+
+		switch (invStatus)
+		{
+		case InventoryResult::NewGame:
+		case InventoryResult::NewGameSelectedLevel:
+			return GameStatus::NewGame;
+
+		case InventoryResult::LoadGame:
+			return GameStatus::LoadGame;
+
+		case InventoryResult::ExitGame:
+			return GameStatus::ExitGame;
+		}
+
+		return result;
+	}
 
 	// Does the player want to enter inventory?
 	if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&

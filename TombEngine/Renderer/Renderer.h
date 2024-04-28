@@ -202,7 +202,6 @@ namespace TEN::Renderer
 		std::vector<RendererStringToDraw> _stringsToDraw;
 		float _blinkColorValue = 0.0f;
 		float _blinkTime		  = 0.0f;
-		bool  _isBlinkUpdated  = false;
 
 		// Graphics resources
 		Texture2D _logo;
@@ -309,7 +308,7 @@ namespace TEN::Renderer
 		bool _isWindowed;
 		float _farView = DEFAULT_FAR_VIEW;
 
-		// A flag to prevent extra renderer object addition
+		// A flag to prevent extra renderer object additions
 		bool _isLocked = false;
 
 		// Caching state changes

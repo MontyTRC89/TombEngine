@@ -1638,7 +1638,19 @@ namespace TEN::Renderer
 		_currentCausticsFrame++;
 		_currentCausticsFrame %= 32;
 
-		_isBlinkUpdated = false;
+		constexpr auto BLINK_VALUE_MAX = 1.0f;
+		constexpr auto BLINK_VALUE_MIN = 0.1f;
+		constexpr auto BLINK_TIME_STEP = 0.2f;
+
+		// Calculate blink increment based on sine wave.
+		_blinkColorValue = ((sin(_blinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
+
+		// Update blink time.
+		_blinkTime += BLINK_TIME_STEP;
+		if (_blinkTime > PI_MUL_2)
+			_blinkTime -= PI_MUL_2;
+
+		_isLocked = false;
 	}
 
 	void Renderer::ClearScene()
@@ -1655,7 +1667,6 @@ namespace TEN::Renderer
 		using get_time = std::chrono::steady_clock;
 
 		ResetDebugVariables();
-		_isLocked = false;
 		_doingFullscreenPass = false;
 
 		auto& level = *g_GameFlow->GetLevel(CurrentLevel);
@@ -3098,6 +3109,7 @@ namespace TEN::Renderer
 
 		//_gameCamera = _currentGameCamera;
 		RenderScene(&_backBuffer, true, _gameCamera);
+
 		_context->ClearState();
 		_swapChain->Present(1, 0);
 	}
