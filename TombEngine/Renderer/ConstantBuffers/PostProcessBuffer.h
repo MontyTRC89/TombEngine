@@ -8,7 +8,10 @@ namespace TEN::Renderer::ConstantBuffers
 	struct alignas(16) ShaderLensFlare
 	{
 		Vector3 Position;
-		float Padding;
+		float Padding1;
+		//--
+		Vector3 Color;
+		float Padding2;
 	};
 
 	struct alignas(16) CPostProcessBuffer

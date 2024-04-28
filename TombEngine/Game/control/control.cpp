@@ -243,8 +243,16 @@ GameStatus ControlPhase(int numFrames)
 	UpdateBeetleSwarm();
 	UpdateLocusts();
 	UpdateUnderwaterBloodParticles();
-	SetupGlobalLensFlare(180.0f, 30.0f);
 
+	if (g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareEnabled())
+	{
+		SetupGlobalLensFlare(
+			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlarePosition(),
+			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareColor(),
+			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareSpriteID()
+		);
+	}
+	
 	// Update HUD.
 	g_Hud.Update(*LaraItem);
 	UpdateFadeScreenAndCinematicBars();

@@ -9,8 +9,10 @@ namespace TEN::Renderer::Structures
 	struct RendererLensFlare
 	{
 		Vector3 Position;
+		Vector3 Color;
 		Vector3 Direction;
 		float Distance;
-		bool Sun;
+		bool Global;
+		int SpriteIndex;
 	};
 }

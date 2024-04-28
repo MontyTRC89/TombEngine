@@ -35,7 +35,7 @@
   <li>    <a href="../1 modules/Effects.html">Effects</a></li>
   <li>    <a href="../1 modules/Flow.html">Flow</a></li>
   <li>    <a href="../1 modules/Input.html">Input</a></li>
-  <li>    <here>Inventory</here></li>
+  <li>    <a href="../1 modules/Inventory.html">Inventory</a></li>
   <li>    <a href="../1 modules/Logic.html">Logic</a></li>
   <li>    <a href="../1 modules/Objects.html">Objects</a></li>
   <li>    <a href="../1 modules/Sound.html">Sound</a></li>
@@ -54,7 +54,7 @@
   <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
   <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
-  <li>    <a href="../2 classes/Flow.Starfield.html">Flow.Starfield</a></li>
+  <li>    <here>Flow.Starfield</here></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
@@ -101,30 +101,45 @@
 
 <div id="content">
 
-<h1>Table <code>Inventory</code></h1>
-<p>Inventory manipulation</p>
+<h1>Class <code>Flow.Starfield</code></h1>
+<p>Starfield</p>
 <p>
 
 </p>
 
 
+<h2><a href="#Members">Members</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#starsCount">starsCount</a></td>
+	<td class="summary">(int) Stars count.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#meteorsCount">meteorsCount</a></td>
+	<td class="summary">(int) Meteors count.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#meteorsSpawnDensity">meteorsSpawnDensity</a></td>
+	<td class="summary">(int) Meteors spawn density.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#meteorsSpeed">meteorsSpeed</a></td>
+	<td class="summary">(float) Meteors speed.</td>
+	</tr>
+</table>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#GiveItem">GiveItem(objectID[, count][, addToPickupSummary])</a></td>
-	<td class="summary">Add an item to the player's inventory.</td>
+	<td class="name" ><a href="#Starfield">Starfield(starsCount)</a></td>
+	<td class="summary">
+
+</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#TakeItem">TakeItem(Object[, count])</a></td>
-	<td class="summary">Remove an item from the player's inventory.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#GetItemCount">GetItemCount(objectID)</a></td>
-	<td class="summary">Get the amount of an item held in the player's inventory.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#SetItemCount">SetItemCount(objectID, count)</a></td>
-	<td class="summary">Set the amount of an item in the player's inventory.</td>
+	<td class="name" ><a href="#Starfield">Starfield(starsCount, meteorsCount)</a></td>
+	<td class="summary">
+
+</td>
 	</tr>
 </table>
 
@@ -132,90 +147,109 @@
 <br/>
 
 
+    <h2 class="section-header "><a name="Members"></a>Members</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "starsCount"></a>
+    <strong>starsCount</strong>
+    </dt>
+    <dd>
+
+<p>(int) Stars count. </p>
+
+<pre><code>    Values can be between [0, 6000], 0 resulting in no stars being rendered, and 6000 resulting in the maximum number of stars being rendered.
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "meteorsCount"></a>
+    <strong>meteorsCount</strong>
+    </dt>
+    <dd>
+
+<p>(int) Meteors count. </p>
+
+<pre><code>    Values can be between [0, 100], 0 resulting in no meteors being rendered, and 100 resulting in the maximum number of meteors being rendered.
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "meteorsSpawnDensity"></a>
+    <strong>meteorsSpawnDensity</strong>
+    </dt>
+    <dd>
+    (int) Meteors spawn density.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "meteorsSpeed"></a>
+    <strong>meteorsSpeed</strong>
+    </dt>
+    <dd>
+    (float) Meteors speed.
+
+
+
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "GiveItem"></a>
-    <strong>GiveItem(objectID[, count][, addToPickupSummary])</strong>
+    <a name = "Starfield"></a>
+    <strong>Starfield(starsCount)</strong>
     </dt>
     <dd>
-    Add an item to the player's inventory.
+
+
+
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">objectID</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         Object ID of the item to add.
-        </li>
-        <li><span class="parameter">count</span>
+        <li><span class="parameter">starsCount</span>
             <span class="types"><span class="type">int</span></span>
-         The amount of items to add. Default is the yield from a single pickup, e.g. 1 from a medipack, 12 from a flare pack.
-         (<em>optional</em>)
-        </li>
-        <li><span class="parameter">addToPickupSummary</span>
-            <span class="types"><span class="type">bool</span></span>
-         If true, display the item in the pickup summary. Default is false.
-         (<em>optional</em>)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "TakeItem"></a>
-    <strong>TakeItem(Object[, count])</strong>
-    </dt>
-    <dd>
-    Remove an item from the player's inventory.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">Object</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         ID of the item to remove.
-        </li>
-        <li><span class="parameter">count</span>
-            <span class="types"><span class="type">int</span></span>
-         The amount of items to remove. Default is the yield from a single pickup, e.g. 1 from a medipack, 12 from a flare pack.
-         (<em>optional</em>)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "GetItemCount"></a>
-    <strong>GetItemCount(objectID)</strong>
-    </dt>
-    <dd>
-    Get the amount of an item held in the player's inventory.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">objectID</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         Object ID of the item to check.
+         Stars count
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">int</span></span>
-        The amount of items. -1 indicates infinity.
+           <span class="types"><a class="type" href="../2 classes/Flow.Starfield.html#Starfield">Starfield</a></span>
+        A starfield object with only stars enabled.
     </ol>
 
 
@@ -223,26 +257,34 @@
 
 </dd>
     <dt>
-    <a name = "SetItemCount"></a>
-    <strong>SetItemCount(objectID, count)</strong>
+    <a name = "Starfield"></a>
+    <strong>Starfield(starsCount, meteorsCount)</strong>
     </dt>
     <dd>
-    Set the amount of an item in the player's inventory.
+
+
+
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">objectID</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         Object ID of the item amount to set.
-        </li>
-        <li><span class="parameter">count</span>
+        <li><span class="parameter">starsCount</span>
             <span class="types"><span class="type">int</span></span>
-         The amount of items to set. -1 indicates infinity.
+         Stars count
+        </li>
+        <li><span class="parameter">meteorsCount</span>
+            <span class="types"><span class="type">int</span></span>
+         Stars count
         </li>
     </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Flow.Starfield.html#Starfield">Starfield</a></span>
+        A starfield object with boths stars and meteors enabled.
+    </ol>
 
 
 

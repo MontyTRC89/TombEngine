@@ -10,14 +10,16 @@ namespace TEN::Entities::Effects
 	struct LensFlare
 	{
 		Vector3 Position;
+		Vector3 Color;
 		short RoomNumber;
-		bool Sun;
+		bool Global;
+		int SpriteIndex;
 	};
 
 	extern std::vector<LensFlare> LensFlares;
 
 	void LensFlareControl(short itemNumber);
 	void ClearLensFlares();
-	void SetupLensFlare(Vector3 position, short roomNumber, bool global);
-	void SetupGlobalLensFlare(float yaw, float pitch);
+	void SetupLensFlare(Vector3 position, Vector3 color, short roomNumber, bool global, int spriteIndex);
+	void SetupGlobalLensFlare(Vector2 yawAndPitchInDegrees, Vector3 color, int spriteIndex);
 }

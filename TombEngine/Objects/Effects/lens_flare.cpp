@@ -14,7 +14,12 @@ namespace TEN::Entities::Effects
 
 		if (TriggerActive(item))
 		{
-			SetupLensFlare(item->Pose.Position.ToVector3(), item->RoomNumber, false);
+			SetupLensFlare(
+				item->Pose.Position.ToVector3(),
+				Vector3::One,
+				item->RoomNumber, 
+				false, 
+				SPR_LENSFLARE3);
 		}
 	}
 
@@ -23,19 +28,23 @@ namespace TEN::Entities::Effects
 		LensFlares.clear();
 	}
 
-	void SetupGlobalLensFlare(float yaw, float pitch)
+	void SetupGlobalLensFlare(Vector2 yawAndPitchInDegrees, Vector3 color, int spriteIndex)
 	{
 		Vector3 position = Camera.pos.ToVector3();
-		Matrix rotation = Matrix::CreateFromYawPitchRoll(DEG_TO_RAD(yaw), DEG_TO_RAD(pitch), 0);
+		Matrix rotation = Matrix::CreateFromYawPitchRoll(
+			DEG_TO_RAD(yawAndPitchInDegrees.x), 
+			DEG_TO_RAD(yawAndPitchInDegrees.y), 
+			0
+		);
 		position += Vector3::Transform(Vector3(0, 0, BLOCK(256)), rotation);
-		SetupLensFlare(position, NO_VALUE, true);
+		SetupLensFlare(position, color, NO_VALUE, true, spriteIndex);
 	}
 
-	void SetupLensFlare(Vector3 position, short roomNumber, bool sun)
+	void SetupLensFlare(Vector3 position, Vector3 color, short roomNumber, bool global, int spriteIndex)
 	{
 		Vector3 lensFlarePosition;
 
-		if (sun)
+		if (global)
 		{
 			if (g_Level.Rooms[Camera.pos.RoomNumber].flags & ENV_FLAG_NO_LENSFLARE)
 			{
@@ -80,7 +89,7 @@ namespace TEN::Entities::Effects
 
 		if (roomNumber != NO_VALUE)
 		{
-			if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_NOT_NEAR_OUTSIDE || !sun)
+			if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_NOT_NEAR_OUTSIDE || !global)
 			{
 				GameVector source = { Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.RoomNumber };
 				GameVector destination = { (int)lensFlarePosition.x, (int)lensFlarePosition.y, (int)lensFlarePosition.z, roomNumber };
@@ -88,15 +97,19 @@ namespace TEN::Entities::Effects
 			}
 		}
 
-		if (!flareVisible && !sun)
+		if (!flareVisible && !global)
 		{
 			return;
 		}
 
 		LensFlare lensFlare;
+
 		lensFlare.Position = position;
 		lensFlare.RoomNumber = roomNumber;
-		lensFlare.Sun = sun;
+		lensFlare.Global = global;
+		lensFlare.Color = color;
+		lensFlare.SpriteIndex = spriteIndex;
+
 		LensFlares.push_back(lensFlare);
 	}
 }

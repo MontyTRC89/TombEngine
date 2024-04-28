@@ -52,6 +52,14 @@ void Level::Register(sol::table& parent)
 //@mem layer2
 		"layer2", &Level::Layer2,
 
+/// (@{Flow.Starfield}) Starfield  
+//@mem starfield
+		"starfield", & Level::Starfield,
+
+/// (@{Flow.LensFlare}) Global lens flare 
+//@mem lensFlare
+		"lensFlare", & Level::LensFlare,
+
 /// (@{Flow.Fog}) omni fog RGB color and distance.
 // As seen in TR4's Desert Railroad.
 // If not provided, distance fog will be black.
@@ -276,4 +284,54 @@ int Level::GetSecrets() const
 std::string Level::GetAmbientTrack() const
 {
 	return AmbientTrack;
+}
+
+bool Level::GetLensFlareEnabled() const
+{
+	return LensFlare.GetEnabled();
+}
+
+Vector2 Level::GetLensFlarePosition() const
+{
+	return LensFlare.GetPosition();
+}
+
+RGBAColor8Byte Level::GetLensFlareColor() const
+{
+	return LensFlare.GetColor();
+}
+
+int Level::GetLensFlareSpriteID() const
+{
+	return LensFlare.GetSunSpriteID();
+}
+
+bool Level::GetStarfieldEnabled() const
+{
+	return Starfield.GetEnabled();
+}
+
+bool Level::GetStarfieldMeteorsEnabled() const
+{
+	return Starfield.GetMeteorsEnabled();
+}
+
+int Level::GetStarfieldStarsCount() const
+{
+	return Starfield.GetStarsCount();
+}
+
+int Level::GetStarfieldMeteorsCount() const
+{
+	return Starfield.GetMeteorsCount();
+}
+
+int Level::GetStarfieldMeteorsSpawnDensity() const
+{
+	return Starfield.GetMeteorsSpawnDensity();
+}
+
+float Level::GetStarfieldMeteorsSpeed() const
+{
+	return Starfield.GetMeteorsSpeed();
 }

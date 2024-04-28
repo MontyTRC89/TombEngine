@@ -3,7 +3,10 @@
 struct ShaderLensFlare
 {
     float3 Position;
-    float Padding;
+    float Padding1;
+    //--
+    float3 Color;
+    float Padding2;
 };
 
 cbuffer CBPostProcess : register(b7)

@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include "Scripting/Internal/TEN/Flow/SkyLayer/SkyLayer.h"
+#include "Scripting/Internal/TEN/Flow/LensFlare/LensFlare.h"
+#include "Scripting/Internal/TEN/Flow/Starfield/Starfield.h"
 #include "Scripting/Internal/TEN/Flow/Mirror/Mirror.h"
 #include "Scripting/Internal/TEN/Flow/Fog/Fog.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
@@ -31,7 +33,10 @@ struct Level : public ScriptInterfaceLevel
 	Mirror		Mirror		 = {};
 	int			LevelFarView = 0;
 	std::string AmbientTrack = {};
-	
+
+	LensFlare	LensFlare = {};
+	Starfield	Starfield = {};
+
 	WeatherType Weather			= WeatherType::None;
 	float		WeatherStrength = 1.0f;
 	bool		Storm			= false;
@@ -62,4 +67,14 @@ struct Level : public ScriptInterfaceLevel
 	int GetSecrets() const override;
 	std::string GetAmbientTrack() const override;
 	bool GetResetHubEnabled() const override;
+	bool GetLensFlareEnabled() const override;
+	Vector2 GetLensFlarePosition() const override;
+	RGBAColor8Byte GetLensFlareColor() const override;
+	int GetLensFlareSpriteID() const override;
+	bool GetStarfieldEnabled() const override;
+	bool GetStarfieldMeteorsEnabled() const override;
+	int GetStarfieldStarsCount() const override;
+	int GetStarfieldMeteorsCount() const override;
+	int GetStarfieldMeteorsSpawnDensity() const override;
+	float GetStarfieldMeteorsSpeed() const override;
 };

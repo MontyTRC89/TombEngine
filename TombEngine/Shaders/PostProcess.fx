@@ -102,9 +102,9 @@ float3 LensFlare(float2 uv, float2 pos)
 
 	float f1 = max(0.01f - pow(length(uv + 1.2f * pos), 1.9f), 0.0f) * 7.0f;
 
-	float f2 = max(1.0f / (1.0f + 32.0f * pow(length(uvd + 0.8f * pos), 2.0f)), 0.0f) * 00.1f;
-	float f22 = max(1.0f / (1.0f + 32.0f * pow(length(uvd + 0.85f * pos), 2.0f)), 0.0f) * 00.08f;
-	float f23 = max(1.0f / (1.0f + 32.0f * pow(length(uvd + 0.9f * pos), 2.0f)), 0.0f) * 00.06f;
+	float f2 = max(1.0f / (1.0f + 32.0f * pow(length(uvd + 0.8f * pos), 2.0f)), 0.0f) * 0.1f;
+	float f22 = max(1.0f / (1.0f + 32.0f * pow(length(uvd + 0.85f * pos), 2.0f)), 0.0f) * 0.08f;
+	float f23 = max(1.0f / (1.0f + 32.0f * pow(length(uvd + 0.9f * pos), 2.0f)), 0.0f) * 0.06f;
 
 	float2 uvx = lerp(uv, uvd, -0.5f);
 
@@ -154,7 +154,10 @@ float4 PSLensFlare(PixelShaderInput input) : SV_Target
         lensFlarePosition = mul(mul(lensFlarePosition, View), Projection); 
 		lensFlarePosition.xyz /= lensFlarePosition.w;
 
-		float3 lensFlareColor = max(float3(0.0f, 0.0f, 0.0f), float3(4.5f, 3.6f, 3.6f) * LensFlare(position.xy, lensFlarePosition.xy));
+		float3 lensFlareColor = max(float3(0.0f, 0.0f, 0.0f),
+			LensFlares[i].Color *
+			float3(4.5f, 3.6f, 3.6f) * 
+			LensFlare(position.xy, lensFlarePosition.xy));
 		lensFlareColor = LensFlareColorCorrection(lensFlareColor, 0.5f, 0.1f);
 		totalLensFlareColor += lensFlareColor;
 	}

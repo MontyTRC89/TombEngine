@@ -8,6 +8,33 @@ using namespace TEN::Entities::Effects;
 
 namespace TEN::Effects::Environment 
 {
+	constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 32;
+	constexpr auto WEATHER_PARTICLES_MAX_COUNT = 2048;
+	constexpr auto WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY = 5.0f;
+
+	constexpr auto MAX_DUST_SIZE = 25.0f;
+	constexpr auto MAX_SNOW_SIZE = 32.0f;
+	constexpr auto MAX_RAIN_SIZE = 128.0f;
+
+	constexpr auto WEATHER_PARTICLE_HORIZONTAL_SPEED = 8.0f;
+	constexpr auto MAX_SNOW_SPEED = 128.0f;
+	constexpr auto MAX_RAIN_SPEED = 256.0f;
+	constexpr auto MAX_DUST_SPEED = 1.0f;
+
+	constexpr auto WEATHER_PARTICLES_TRANSPARENCY = 0.8f;
+	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 20.0f;
+	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_MELT_FACTOR = 1.0f - (1.0f / (WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE * 2));
+
+	constexpr auto DUST_SPAWN_DENSITY = 300;
+	constexpr auto DUST_LIFE = 40;
+	constexpr auto DUST_SPAWN_RADIUS = (10 * 1024);
+
+	constexpr auto METEOR_PARTICLES_MAX_COUNT = 10;
+	constexpr auto METEOR_PARTICLES_MAX_LIFE = 150;
+	constexpr auto METEOR_PARTICLES_SPEED = 32.0f;
+	constexpr auto METEOR_PARTICLES_SPAWN_DENSITY = 4;
+	constexpr auto METEOR_PARTICLES_FADE_TIME = 30;
+
 	struct StarParticle
 	{
 		Vector3 Position = Vector3::Zero;
@@ -116,7 +143,6 @@ namespace TEN::Effects::Environment
 		byte StormSkyColor2 = 1;
 
 		// Starfield
-		int StarsCount = 3000;
 		std::vector<StarParticle> Stars;
 		std::vector<MeteorParticle> Meteors;
 		bool ResetStarField = true;

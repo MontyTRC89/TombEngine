@@ -110,7 +110,7 @@ namespace TEN::Renderer
 		{
 			Vector3 lensFlareToCamera = lensFlare.Position - renderView.Camera.WorldPosition;
 			float distance = 0.0f;
-			if (!lensFlare.Sun)
+			if (!lensFlare.Global)
 			{
 				distance = lensFlareToCamera.Length();
 			}	
@@ -122,10 +122,14 @@ namespace TEN::Renderer
 			if (lensFlareToCamera.Dot(cameraDirection) >= 0.0f)
 			{
 				RendererLensFlare lensFlareToDraw;
+
 				lensFlareToDraw.Position = lensFlare.Position;
 				lensFlareToDraw.Distance = distance;
+				lensFlareToDraw.Color = lensFlare.Color;
+				lensFlareToDraw.SpriteIndex = lensFlare.SpriteIndex;
 				lensFlareToDraw.Direction = lensFlareToCamera;
-				lensFlareToDraw.Sun = lensFlare.Sun;
+				lensFlareToDraw.Global = lensFlare.Global;
+
 				tempLensFlares.push_back(lensFlareToDraw);
 			}
 		}
@@ -135,9 +139,9 @@ namespace TEN::Renderer
 			tempLensFlares.end(),
 			[](const RendererLensFlare& lensFlare0, const RendererLensFlare& lensFlare1)
 			{
-				if (lensFlare0.Sun && !lensFlare1.Sun)
+				if (lensFlare0.Global && !lensFlare1.Global)
 					return true;
-				else if (!lensFlare0.Sun && lensFlare1.Sun)
+				else if (!lensFlare0.Global && lensFlare1.Global)
 					return false;
 				else
 					return lensFlare0.Distance < lensFlare1.Distance;

@@ -2821,8 +2821,7 @@ namespace TEN::Renderer
 
 		_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
-		int starsCount = (int)Weather.GetStars().size();
-		if (starsCount > 0)
+		if (Weather.GetStars().size() > 0)
 		{
 			SetDepthState(DepthState::Read);
 			SetBlendMode(BlendMode::Additive);
@@ -2841,6 +2840,8 @@ namespace TEN::Renderer
 			BindTexture(TextureRegister::ColorMap, _sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE3].Texture, SamplerStateRegister::LinearClamp);
 
 			int drawnStars = 0;
+			int starsCount = (int)Weather.GetStars().size();
+
 			while (drawnStars < starsCount)
 			{
 				int starsToDraw = (starsCount - drawnStars) > 100 ? 100 : (starsCount - drawnStars);
@@ -2851,7 +2852,7 @@ namespace TEN::Renderer
 					auto& s = Weather.GetStars()[drawnStars + i];
 
 					RendererSpriteToDraw rDrawSprite;
-					rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE3];	
+					rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE3];
 
 					constexpr auto STAR_SIZE = 2;
 
@@ -2890,7 +2891,7 @@ namespace TEN::Renderer
 				drawnStars += starsToDraw;
 			}
 
-			// Draw meteor
+			// Draw meteors
 			if (Weather.GetMeteors().size() > 0)
 			{
 				RendererSpriteToDraw rDrawSprite;
@@ -2907,8 +2908,8 @@ namespace TEN::Renderer
 						continue;
 
 					rDrawSprite.Type = SpriteType::CustomBillboard;
-					rDrawSprite.pos = 
-						renderView.Camera.WorldPosition + 
+					rDrawSprite.pos =
+						renderView.Camera.WorldPosition +
 						Vector3::Lerp(meteor.OldPosition, meteor.Position, _interpolationFactor);
 					rDrawSprite.Rotation = 0;
 					rDrawSprite.Scale = 1;
@@ -2995,7 +2996,7 @@ namespace TEN::Renderer
 		}
 
 		// Eventually draw the sun sprite
-		if (renderView.LensFlaresToDraw.size() > 0 && renderView.LensFlaresToDraw[0].Sun)
+		if (renderView.LensFlaresToDraw.size() > 0 && renderView.LensFlaresToDraw[0].Global)
 		{
 			SetDepthState(DepthState::Read);
 			SetBlendMode(BlendMode::Additive);
@@ -3012,7 +3013,7 @@ namespace TEN::Renderer
 			_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
 			RendererSpriteToDraw rDrawSprite;
-			rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE3];
+			rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + renderView.LensFlaresToDraw[0].SpriteIndex];
 
 			constexpr auto SUN_SIZE = 64;
 

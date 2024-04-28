@@ -18,33 +18,6 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Effects::Environment 
 {
-	constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 32;
-	constexpr auto WEATHER_PARTICLES_MAX_COUNT = 2048;
-	constexpr auto WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY = 5.0f;
-
-	constexpr auto MAX_DUST_SIZE = 25.0f;
-	constexpr auto MAX_SNOW_SIZE = 32.0f;
-	constexpr auto MAX_RAIN_SIZE = 128.0f;
-
-	constexpr auto WEATHER_PARTICLE_HORIZONTAL_SPEED = 8.0f;
-	constexpr auto MAX_SNOW_SPEED = 128.0f;
-	constexpr auto MAX_RAIN_SPEED = 256.0f;
-	constexpr auto MAX_DUST_SPEED = 1.0f;
-
-	constexpr auto WEATHER_PARTICLES_TRANSPARENCY = 0.8f;
-	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 20.0f;
-	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_MELT_FACTOR = 1.0f - (1.0f / (WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE * 2));
-
-	constexpr auto DUST_SPAWN_DENSITY = 300;
-	constexpr auto DUST_LIFE = 40;
-	constexpr auto DUST_SPAWN_RADIUS = (10 * 1024);
-
-	constexpr auto METEOR_PARTICLES_MAX_COUNT = 10;
-	constexpr auto METEOR_PARTICLES_MAX_LIFE = 150;
-	constexpr auto METEOR_PARTICLES_SPEED = 32.0f;
-	constexpr auto METEOR_PARTICLES_SPAWN_DENSITY = 4;
-	constexpr auto METEOR_PARTICLES_FADE_TIME = 30;
-
 	EnvironmentController Weather;
 
 	float WeatherParticle::Transparency() const
@@ -236,12 +209,17 @@ namespace TEN::Effects::Environment
 
 	void EnvironmentController::UpdateStarfield(ScriptInterfaceLevel* level)
 	{
+		if (!level->GetStarfieldEnabled())
+			return;
+
 		if (ResetStarField)
 		{
-			Stars.clear();
-			Stars.reserve(StarsCount);
+			int starsCount = level->GetStarfieldStarsCount();
 
-			for (int i = 0; i < StarsCount; i++)
+			Stars.clear();
+			Stars.reserve(starsCount);
+
+			for (int i = 0; i < starsCount; i++)
 			{
 				Vector3 starDirection = Random::GenerateDirectionInCone(-Vector3::UnitY, 70.0f);
 				starDirection.Normalize();
@@ -279,29 +257,30 @@ namespace TEN::Effects::Environment
 			s.Blinking = Random::GenerateFloat(0.5f, 1.0f);
 		}
 
-		for (auto& m : Meteors)
+		if (level->GetStarfieldMeteorsEnabled())
 		{
-			//p.StoreInterpolationData();
-
-			m.Life--;
-
-			if (m.Life <= 0)
+			for (auto& m : Meteors)
 			{
-				m.Active = false;
-				continue;
+				m.Life--;
+
+				if (m.Life <= 0)
+				{
+					m.Active = false;
+					continue;
+				}
+
+				m.StoreInterpolationData();
+
+				if (m.Life <= METEOR_PARTICLES_FADE_TIME)
+					m.Fade = m.Life / (float)METEOR_PARTICLES_FADE_TIME;
+				else if (m.Life >= METEOR_PARTICLES_MAX_LIFE - METEOR_PARTICLES_FADE_TIME)
+					m.Fade = (METEOR_PARTICLES_MAX_LIFE - m.Life) / (float)METEOR_PARTICLES_FADE_TIME;
+				else
+					m.Fade = 1.0f;
+
+				m.Position += m.Direction * level->GetStarfieldMeteorsSpeed();
 			}
-
-			m.StoreInterpolationData();
-
-			if (m.Life <= METEOR_PARTICLES_FADE_TIME)
-				m.Fade = m.Life / (float)METEOR_PARTICLES_FADE_TIME;
-			else if (m.Life >= METEOR_PARTICLES_MAX_LIFE - METEOR_PARTICLES_FADE_TIME)
-				m.Fade = (METEOR_PARTICLES_MAX_LIFE - m.Life) / (float)METEOR_PARTICLES_FADE_TIME;
-			else 
-				m.Fade = 1.0f;
-
-			m.Position += m.Direction * METEOR_PARTICLES_SPEED;
-		}
+		}		
 	}
 
 	void EnvironmentController::UpdateWeather(ScriptInterfaceLevel* level)
@@ -609,15 +588,16 @@ namespace TEN::Effects::Environment
 		if (Meteors.size() > 0)
 			Meteors.erase(std::remove_if(Meteors.begin(), Meteors.end(), [](const MeteorParticle& part) { return !part.Active; }), Meteors.end());
 
-		//if (level->GetWeatherType() == WeatherType::None || level->GetWeatherStrength() == 0.0f)
-		//	return;
+		if (!level->GetStarfieldMeteorsEnabled())
+			return;
 
 		int newParticlesCount = 0;
-		int density = METEOR_PARTICLES_SPAWN_DENSITY;
+		int density = level->GetStarfieldMeteorsSpawnDensity();
+		int meteorsCount = level->GetStarfieldMeteorsCount();
 
-		if (density > 0.0f /* && level->GetWeatherType() != WeatherType::None */)
-		{
-			while (Meteors.size() < METEOR_PARTICLES_MAX_COUNT)
+		if (density > 0)
+		{	
+			while (Meteors.size() < meteorsCount)
 			{
 				if (newParticlesCount > density)
 					break;

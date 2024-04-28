@@ -264,7 +264,9 @@ Specify which translations in the strings table correspond to which languages.
 	Animations::Register(tableFlow);
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
-	
+	LensFlare::Register(tableFlow);
+	Starfield::Register(tableFlow);
+
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
 	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);

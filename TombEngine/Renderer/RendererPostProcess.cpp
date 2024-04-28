@@ -87,6 +87,7 @@ namespace TEN::Renderer
 			for (int i = 0; i < view.LensFlaresToDraw.size(); i++)
 			{
 				_stPostProcessBuffer.LensFlares[i].Position = view.LensFlaresToDraw[i].Position;
+				_stPostProcessBuffer.LensFlares[i].Color = view.LensFlaresToDraw[i].Color;
 			}
 			_stPostProcessBuffer.NumLensFlares = (int)view.LensFlaresToDraw.size();
 			_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
