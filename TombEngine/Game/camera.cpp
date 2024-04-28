@@ -166,6 +166,9 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 	// Get LOS.
 	auto dir = target - origin;
 	dir.Normalize();
+	if (dir.Length() == 0.0f)
+		return CameraLosData{ false, std::pair(origin, originRoomNumber), 0.0f };
+
 	float dist = Vector3::Distance(origin, target);
 	auto los = GetLos(origin, originRoomNumber, dir, dist, true, false, true);
 
@@ -198,10 +201,13 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 	}
 
 	// Apply distance buffer. TODO: Shift instead.
-	cameraLos.Distance = cameraLos.Distance - std::max(cameraLos.Distance - DIST_BUFFER, DIST_BUFFER);
-	cameraLos.Position = std::pair(
-		Geometry::TranslatePoint(cameraLos.Position.first, -dir, cameraLos.Distance),
-		GetCollision(cameraLos.Position.first, cameraLos.Position.second, -dir, cameraLos.Distance).RoomNumber);
+	if (cameraLos.Distance < DIST_BUFFER)
+	{
+		cameraLos.Distance = DIST_BUFFER;
+		cameraLos.Position = std::pair(
+			Geometry::TranslatePoint(cameraLos.Position.first, -dir, cameraLos.Distance),
+			GetCollision(cameraLos.Position.first, cameraLos.Position.second, -dir, cameraLos.Distance).RoomNumber);
+	}
 
 	return cameraLos;
 }

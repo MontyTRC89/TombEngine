@@ -14,6 +14,10 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
+// TODO:
+// Always ensure direction is a unit vector.
+// Correct room probing.
+
 namespace TEN::Collision::Los
 {
 	struct SectorTraceData
@@ -322,7 +326,7 @@ namespace TEN::Collision::Los
 		{
 			const auto& intercept = trace.Intercepts[i];
 
-			g_Renderer.AddDebugTarget(intercept.Position.ToVector3(), Quaternion::Identity, 30, Color(1.0f, 0.0f, 0.0f));
+			//g_Renderer.AddDebugTarget(intercept.Position.ToVector3(), Quaternion::Identity, 30, Color(1.0f, 0.0f, 0.0f));
 
 			// 1) Clip wall.
 			if (intercept.Position.y > GetFloorHeight(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z) ||

@@ -34,6 +34,13 @@ Vector3i ClosestCoord;
 // Deprecated.
 bool LOS(const GameVector* origin, GameVector* target)
 {
+	if (origin->ToVector3() == target->ToVector3())
+	{
+		LosRoomNumbers.clear();
+		LosRoomNumbers.push_back(origin->RoomNumber);
+		return true;
+	}
+
 	auto dir = target->ToVector3() - origin->ToVector3();
 	dir.Normalize();
 	float dist = Vector3::Distance(origin->ToVector3(), target->ToVector3());

@@ -67,12 +67,8 @@ CollisionInfo LaraCollision = {};
 #include <Game/collision/Los.h>
 using namespace TEN::Collision::Los;
 
-void LaraControl(ItemInfo* item, CollisionInfo* coll)
+static void HandleLosDebug(const ItemInfo& item)
 {
-	auto& player = GetLaraInfo(*item);
-
-	//--------
-
 	static auto rot = EulerAngles::Identity;
 	if (KeyMap[OIS::KC_T])
 	{
@@ -83,14 +79,49 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		rot.x -= ANGLE(2);
 	}
 
-	auto dir = (item->Pose.Orientation + rot).ToDirection();
+	auto dir = (item.Pose.Orientation + rot).ToDirection();
 
-	auto origin = (item->Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
+	auto origin = (item.Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
 	auto target = Geometry::TranslatePoint(origin, dir, BLOCK(10));
+	auto los = GetLos(origin, item.RoomNumber, dir, BLOCK(10), true, true, true);
 
-	auto roomLos = GetRoomLos(origin, item->RoomNumber, dir, BLOCK(10));
-	g_Renderer.AddDebugLine(origin, roomLos.Position.first, Vector4::One);
-	g_Renderer.AddDebugTarget(roomLos.Position.first, Quaternion::Identity, 100, Color(1, 1, 1));
+	float closestDist = los.Room.Distance;
+	target = los.Room.Position.first;
+
+	for (const auto& movLos : los.Moveables)
+	{
+		if (movLos.Moveable->ObjectNumber == ID_LARA)
+			continue;
+
+		if (movLos.Distance < closestDist)
+		{
+			closestDist = movLos.Distance;
+			target = movLos.Intersect.first;
+			break;
+		}
+	}
+
+	for (const auto& staticLos : los.Statics)
+	{
+		if (staticLos.Distance < closestDist)
+		{
+			closestDist = staticLos.Distance;
+			target = staticLos.Intersect.first;
+			break;
+		}
+	}
+
+	g_Renderer.AddDebugLine(origin, target, Vector4::One);
+	g_Renderer.AddDebugTarget(target, Quaternion::Identity, 100, Color(1, 1, 1));
+}
+
+void LaraControl(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	//--------
+
+	HandleLosDebug(*item);
 
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);
 	//g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));
