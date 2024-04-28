@@ -284,9 +284,38 @@ namespace TEN::Collision::Los
 		}
 	}
 
-	static CollisionMesh GenerateBridgeCollisionMesh(const BoundingOrientedBox& box, const Vector3& offset)
+	static CollisionMesh GenerateBridgeCollisionMesh(const ItemInfo& bridgeMov)
 	{
+		// Determine relative tilt offset.
+		auto offset = Vector3::Zero;
+		switch (bridgeMov.ObjectNumber)
+		{
+		case ID_BRIDGE_TILT1:
+			offset = Vector3(0.0f, CLICK(1), 0.0f);
+			break;
+
+		case ID_BRIDGE_TILT2:
+			offset = Vector3(0.0f, CLICK(2), 0.0f);
+			break;
+
+		case ID_BRIDGE_TILT3:
+			offset = Vector3(0.0f, CLICK(3), 0.0f);
+			break;
+
+		case ID_BRIDGE_TILT4:
+			offset = Vector3(0.0f, CLICK(4), 0.0f);
+			break;
+
+		default:
+			break;
+		}
+
+		// Calculate absolute tilt offset.
+		auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
+		offset = Vector3::Transform(offset, rotMatrix);
+
 		// Get box corners.
+		auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
 		auto corners = std::array<Vector3, 8>{};
 		box.GetCorners(corners.data());
 
@@ -326,8 +355,6 @@ namespace TEN::Collision::Los
 		{
 			const auto& intercept = trace.Intercepts[i];
 
-			//g_Renderer.AddDebugTarget(intercept.Position.ToVector3(), Quaternion::Identity, 30, Color(1.0f, 0.0f, 0.0f));
-
 			// 1) Clip wall.
 			if (intercept.Position.y > GetFloorHeight(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z) ||
 				intercept.Position.y < GetCeiling(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z))
@@ -355,39 +382,8 @@ namespace TEN::Collision::Los
 						if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
 							continue;
 
-						// Determine relative tilt offset.
-						auto offset = Vector3::Zero;
-						switch (bridgeMov.ObjectNumber)
-						{
-						default:
-							break;
+						auto collMesh = GenerateBridgeCollisionMesh(bridgeMov);
 
-						case ID_BRIDGE_TILT1:
-							offset = Vector3(0.0f, CLICK(1), 0.0f);
-							break;
-
-						case ID_BRIDGE_TILT2:
-							offset = Vector3(0.0f, CLICK(2), 0.0f);
-							break;
-
-						case ID_BRIDGE_TILT3:
-							offset = Vector3(0.0f, CLICK(3), 0.0f);
-							break;
-
-						case ID_BRIDGE_TILT4:
-							offset = Vector3(0.0f, CLICK(4), 0.0f);
-							break;
-						}
-
-						// Calculate absolute tilt offset.
-						auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
-						offset = Vector3::Transform(offset, rotMatrix);
-
-						// Generate bridge collision mesh.
-						auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
-						auto collMesh = GenerateBridgeCollisionMesh(box, offset);
-
-						// Collide bridge collision mesh.
 						float dist = 0.0f;
 						if (collMesh.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
 							closestDist = dist;
@@ -424,7 +420,7 @@ namespace TEN::Collision::Los
 
 	RoomLosData GetRoomLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
-		// Get sector trace.
+		// Get sector trace. NOTE: dir must be a unit vector.
 		auto trace = GetSectorTrace(origin, roomNumber, dir, dist, collideBridges);
 
 		// Collect unique room numbers.
