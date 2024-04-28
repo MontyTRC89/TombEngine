@@ -153,7 +153,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					}
 					else if (item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
-						SetAnimation(item, LA_SWANDIVE_DIVE);
+						SetAnimation(item, LA_SWANDIVE_FREEFALL_DIVE);
 						item->Animation.Velocity.y /= 2;
 						item->Pose.Orientation.x = ANGLE(-85.0f);
 						player.Control.HandStatus = HandStatus::Free;
@@ -641,12 +641,6 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 
 	if (isTitle)
 		ActionMap = actionMap;
-
-	if (g_Gui.GetInventoryItemChosen() != NO_VALUE)
-	{
-		g_Gui.SetInventoryItemChosen(NO_VALUE);
-		SayNo();
-	}
 
 	// Update player animations.
 	g_Renderer.UpdateLaraAnimations(true);

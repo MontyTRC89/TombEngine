@@ -1454,14 +1454,13 @@ namespace TEN::Renderer
 				}
 			}
 
-			SetCullMode(CullMode::CounterClockwise);
-		}
+			// TODO: temporary fix, we need to remove every use of SpriteBatch and PrimitiveBatch because
+			// they mess up render states cache.
 
-		// TODO: temporary fix, we need to remove every use of SpriteBatch and PrimitiveBatch because
-		// they mess up render states cache
-		SetBlendMode(BlendMode::Opaque, true);
-		SetDepthState(DepthState::Write, true);
-		SetCullMode(CullMode::CounterClockwise, true);
+			SetBlendMode(BlendMode::Opaque, true);
+			SetDepthState(DepthState::Write, true);
+			SetCullMode(CullMode::CounterClockwise, true);
+		}
 	}
 
 	void Renderer::PrepareSmokeParticles(RenderView& view)

@@ -939,22 +939,19 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 		sptr->xVel = (GetRandomControl() & 0xFF) - 128;
 		sptr->zVel = (GetRandomControl() & 0xFF) - 128;
 
-		if (item->Pose.Orientation.y == 0)
-		{
-			sptr->zVel = -(size - (size >> 2));
-		}
-		else if (item->Pose.Orientation.y == ANGLE(90.0f))
-		{
-			sptr->xVel = -(size - (size >> 2));
-		}
-		else if (item->Pose.Orientation.y == ANGLE(-180.0f))
-		{
-			sptr->zVel = size - (size >> 2);
-		}
-		else
-		{
-			sptr->xVel = size - (size >> 2);
-		}
+		float xAngle = item->Pose.Orientation.x + ANGLE(180); // Nullmesh is rotated 180 degrees in editor
+		float yAngle = item->Pose.Orientation.y;
+		
+		Vector3 dir;
+		dir.x = phd_cos(xAngle) * phd_sin(yAngle);
+		dir.y = phd_sin(xAngle);
+		dir.z = phd_cos(xAngle) * phd_cos(yAngle);
+
+		dir.Normalize();
+
+		sptr->xVel += dir.x * (size - (size >> 2));
+		sptr->yVel -= dir.y * (size - (size >> 2));
+		sptr->zVel += dir.z * (size - (size >> 2));
 	}
 }
 

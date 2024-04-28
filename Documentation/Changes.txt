@@ -1,3 +1,13 @@
+Version 1.5
+===========
+
+* Fixed original issue with classic switch off trigger wrongly activating some trigger actions.
+* Fixed incorrect diving animation when swandiving from a high place.
+* Fixed AI for skidoo driver and worker with shotgun TR2 enemies.
+
+Lua API changes:
+* Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
+
 Version 1.4
 ===========
 
@@ -15,8 +25,10 @@ Version 1.4
 * Fixed occasional collision warnings in a log when teeth spikes object was activated.
 * Fixed climbable pushables collision during continuous pulling action.
 * Fixed collision for solid static meshes with zero collision box.
+* Fixed bottom collision for solid static meshes.
 * Fixed T-Rex's head rotation.
 * Auto-switch to a crawl state if player start position is in a crawlspace.
+* Allow directional flame emitter (negative OCBs) to be rotated at any angle.
 * Revise wall spikes:
   - Wall spikes now stop when they touch a pushable, another spike wall or a normal wall.
   - Wall spikes will shatter any shatter in its path.

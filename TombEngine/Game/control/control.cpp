@@ -214,6 +214,14 @@ GameStatus ControlPhase(int numFrames)
 	// Smash shatters and clear stopper flags under them.
 	UpdateShatters();
 
+	// Clear last selected item in inventory (need to be after on loop event handling, so they can detect that).
+	g_Gui.CancelInventorySelection();
+
+	// Control lock is processed after handling scripts, because builder may want to
+	// process input externally, while still locking Lara from input.
+	if (!isTitle && Lara.Control.IsLocked)
+		ClearAllActions();
+
 	// Update weather.
 	Weather.Update();
 
@@ -252,7 +260,7 @@ GameStatus ControlPhase(int numFrames)
 			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareSpriteID()
 		);
 	}
-	
+
 	// Update HUD.
 	g_Hud.Update(*LaraItem);
 	UpdateFadeScreenAndCinematicBars();

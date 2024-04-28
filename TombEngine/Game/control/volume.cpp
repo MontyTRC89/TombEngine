@@ -89,14 +89,16 @@ namespace TEN::Control::Volumes
 		return nullptr;
 	}
 
-	void HandleEvent(Event& event, Activator& activator)
+	bool HandleEvent(Event& event, Activator& activator)
 	{
 		if (event.Function.empty() || event.CallCounter == 0 || event.CallCounter < NO_CALL_COUNTER)
-			return;
+			return false;
 
 		g_GameScript->ExecuteFunction(event.Function, activator, event.Data);
 		if (event.CallCounter != NO_CALL_COUNTER)
 			event.CallCounter--;
+
+		return true;
 	}
 
 	bool HandleEvent(const std::string& name, EventType eventType, Activator activator)
