@@ -1492,7 +1492,7 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
 	// Setup.
-	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
+	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item) + (IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f));
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : STEPUP_HEIGHT;

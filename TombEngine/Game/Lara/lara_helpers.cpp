@@ -1714,7 +1714,8 @@ short GetPlayerHeadingAngleY(const ItemInfo& item)
 
 		// TEMP HACK
 		// TODO: No hardcoding. Must pass some kind of argument to this function while keeping calls clean.
-		if (IsPlayerStrafing(item) && (item.Animation.ActiveState == LS_RUN_FORWARD ||
+		if (IsPlayerStrafing(item) &&
+			(item.Animation.ActiveState == LS_RUN_FORWARD ||
 			item.Animation.ActiveState == LS_WALK_FORWARD))
 		{
 			if (abs(moveAxisAngle) > ANGLE(90.0f))

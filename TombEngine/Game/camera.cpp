@@ -200,7 +200,6 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 		}
 	}
 
-	// Apply distance buffer. TODO: Shift instead.
 	if (cameraLos.Distance < DIST_BUFFER)
 	{
 		cameraLos.Distance = DIST_BUFFER;
@@ -224,23 +223,17 @@ std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, i
 		int buffer = CLICK(1) - 1;
 		if ((collidedPos.first.y - buffer) < pointColl.Position.Ceiling &&
 			(collidedPos.first.y + buffer) > pointColl.Position.Floor &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor &&
-			pointColl.Position.Ceiling != NO_HEIGHT &&
-			pointColl.Position.Floor != NO_HEIGHT)
+			pointColl.Position.Ceiling < pointColl.Position.Floor)
 		{
 			collidedPos.first.y = (pointColl.Position.Floor + pointColl.Position.Ceiling) / 2;
 		}
 		else if ((collidedPos.first.y + buffer) > pointColl.Position.Floor &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor &&
-			pointColl.Position.Ceiling != NO_HEIGHT &&
-			pointColl.Position.Floor != NO_HEIGHT)
+			pointColl.Position.Ceiling < pointColl.Position.Floor)
 		{
 			collidedPos.first.y = pointColl.Position.Floor - buffer;
 		}
 		else if ((collidedPos.first.y - buffer) < pointColl.Position.Ceiling &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor &&
-			pointColl.Position.Ceiling != NO_HEIGHT &&
-			pointColl.Position.Floor != NO_HEIGHT)
+			pointColl.Position.Ceiling < pointColl.Position.Floor)
 		{
 			collidedPos.first.y = pointColl.Position.Ceiling + buffer;
 		}
@@ -248,8 +241,6 @@ std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, i
 
 	pointColl = GetCollision(collidedPos.first.x - push, collidedPos.first.y, collidedPos.first.z, roomNumber);
 	if (collidedPos.first.y > pointColl.Position.Floor ||
-		pointColl.Position.Floor == NO_HEIGHT ||
-		pointColl.Position.Ceiling == NO_HEIGHT ||
 		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
 		collidedPos.first.y < pointColl.Position.Ceiling)
 	{
@@ -258,8 +249,6 @@ std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, i
 
 	pointColl = GetCollision(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z - push, roomNumber);
 	if (collidedPos.first.y > pointColl.Position.Floor ||
-		pointColl.Position.Floor == NO_HEIGHT ||
-		pointColl.Position.Ceiling == NO_HEIGHT ||
 		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
 		collidedPos.first.y < pointColl.Position.Ceiling)
 	{
@@ -268,8 +257,6 @@ std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, i
 
 	pointColl = GetCollision(collidedPos.first.x + push, collidedPos.first.y, collidedPos.first.z, roomNumber);
 	if (collidedPos.first.y > pointColl.Position.Floor ||
-		pointColl.Position.Floor == NO_HEIGHT ||
-		pointColl.Position.Ceiling == NO_HEIGHT ||
 		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
 		collidedPos.first.y < pointColl.Position.Ceiling)
 	{
@@ -278,8 +265,6 @@ std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, i
 
 	pointColl = GetCollision(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z + push, roomNumber);
 	if (collidedPos.first.y > pointColl.Position.Floor ||
-		pointColl.Position.Floor == NO_HEIGHT ||
-		pointColl.Position.Ceiling == NO_HEIGHT ||
 		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
 		collidedPos.first.y < pointColl.Position.Ceiling)
 	{
@@ -293,23 +278,17 @@ std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, i
 		int buffer = CLICK(1) - 1;
 		if ((collidedPos.first.y - buffer) < pointColl.Position.Ceiling &&
 			(collidedPos.first.y + buffer) > pointColl.Position.Floor &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor &&
-			pointColl.Position.Ceiling != NO_HEIGHT &&
-			pointColl.Position.Floor != NO_HEIGHT)
+			pointColl.Position.Ceiling < pointColl.Position.Floor)
 		{
 			collidedPos.first.y = (pointColl.Position.Floor + pointColl.Position.Ceiling) / 2;
 		}
 		else if ((collidedPos.first.y + buffer) > pointColl.Position.Floor &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor &&
-			pointColl.Position.Ceiling != NO_HEIGHT &&
-			pointColl.Position.Floor != NO_HEIGHT)
+			pointColl.Position.Ceiling < pointColl.Position.Floor)
 		{
 			collidedPos.first.y = pointColl.Position.Floor - buffer;
 		}
 		else if ((collidedPos.first.y - buffer) < pointColl.Position.Ceiling &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor &&
-			pointColl.Position.Ceiling != NO_HEIGHT &&
-			pointColl.Position.Floor != NO_HEIGHT)
+			pointColl.Position.Ceiling < pointColl.Position.Floor)
 		{
 			collidedPos.first.y = pointColl.Position.Ceiling + buffer;
 		}
@@ -318,8 +297,6 @@ std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, i
 	pointColl = GetCollision(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z, roomNumber);
 	if (collidedPos.first.y > pointColl.Position.Floor ||
 		collidedPos.first.y < pointColl.Position.Ceiling ||
-		pointColl.Position.Floor == NO_HEIGHT ||
-		pointColl.Position.Ceiling == NO_HEIGHT ||
 		pointColl.Position.Ceiling >= pointColl.Position.Floor)
 	{
 		return collidedPos;
@@ -423,6 +400,8 @@ void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	auto lookAt = basePos + GetCameraPlayerOffset(playerItem, coll);
 	auto idealPos = std::pair(Geometry::TranslatePoint(lookAt, dir, dist), Camera.LookAtRoomNumber);
 	idealPos = GetCameraLos(Camera.LookAt, Camera.LookAtRoomNumber, idealPos.first).Position;
+
+	//idealPos = GetCameraWallShift(idealPos.first, idealPos.second, CLICK(1.5f), true);
 
 	// Update camera.
 	Camera.LookAt += (lookAt - Camera.LookAt) * (1.0f / Camera.speed);
@@ -687,21 +666,15 @@ void RefreshFixedCamera(int cameraID)
 
 static void ClampCameraAltitudeAngle(bool isUnderwater)
 {
-	constexpr auto MODERN_CAMERA_ABOVE_WATER_ANGLE_CONSTRAINT = std::pair<short, short>(ANGLE(-80.0f), ANGLE(70.0f));
-	constexpr auto MODERN_CAMERA_UNDERWATER_ANGLE_CONSTRAINT  = std::pair<short, short>(ANGLE(-80.0f), ANGLE(80.0f));
-	constexpr auto TANK_CAMERA_ANGLE_CONSTRAINT				  = std::pair<short, short>(ANGLE(-80.0f), ANGLE(70.0f));
+	constexpr auto ANGLE_CONSTRAINT = std::pair<short, short>(ANGLE(-80.0f), ANGLE(70.0f));
 
-	const auto& angleConstraint = IsUsingModernControls() ?
-		(isUnderwater ? MODERN_CAMERA_UNDERWATER_ANGLE_CONSTRAINT : MODERN_CAMERA_ABOVE_WATER_ANGLE_CONSTRAINT) :
-		TANK_CAMERA_ANGLE_CONSTRAINT;
-
-	if (Camera.actualElevation > angleConstraint.second)
+	if (Camera.actualElevation > ANGLE_CONSTRAINT.second)
 	{
-		Camera.actualElevation = angleConstraint.second;
+		Camera.actualElevation = ANGLE_CONSTRAINT.second;
 	}
-	else if (Camera.actualElevation < angleConstraint.first)
+	else if (Camera.actualElevation < ANGLE_CONSTRAINT.first)
 	{
-		Camera.actualElevation = angleConstraint.first;
+		Camera.actualElevation = ANGLE_CONSTRAINT.first;
 	}
 }
 
