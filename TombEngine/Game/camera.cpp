@@ -205,8 +205,8 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 	{
 		cameraLos.Distance = DIST_BUFFER;
 		cameraLos.Position = std::pair(
-			Geometry::TranslatePoint(cameraLos.Position.first, -dir, cameraLos.Distance),
-			GetCollision(cameraLos.Position.first, cameraLos.Position.second, -dir, cameraLos.Distance).RoomNumber);
+			Geometry::TranslatePoint(origin, dir, cameraLos.Distance),
+			GetCollision(origin, originRoomNumber, dir, cameraLos.Distance).RoomNumber);
 	}
 
 	return cameraLos;
