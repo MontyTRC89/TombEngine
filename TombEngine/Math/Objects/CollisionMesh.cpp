@@ -16,7 +16,7 @@ namespace TEN::Math
 
 	bool CollisionMesh::Intersects(const Ray& ray, float& dist) const
 	{
-		// TODO: Spacial partitioning, BVH tree, whatever.
+		// TODO: Vertex indexing, spacial partitioning, BVH tree, whatever.
 
 		for (const auto& tri : _triangles)
 		{

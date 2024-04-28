@@ -12,15 +12,14 @@ namespace TEN::Math
 
 	TriangleMesh::TriangleMesh(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
 	{
-		_vertices.resize(VERTEX_COUNT);
 		_vertices[0] = vertex0;
 		_vertices[1] = vertex1;
 		_vertices[2] = vertex2;
 
-		_box = Geometry::GetBoundingBox(_vertices);
+		_box = Geometry::GetBoundingBox(std::vector<Vector3>{ _vertices[0], _vertices[1], _vertices[2] });
 	}
 
-	const std::vector<Vector3>& TriangleMesh::GetVertices() const
+	const std::array<Vector3, TriangleMesh::VERTEX_COUNT>& TriangleMesh::GetVertices() const
 	{
 		return _vertices;
 	}

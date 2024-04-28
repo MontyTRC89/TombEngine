@@ -9,8 +9,8 @@ namespace TEN::Math
 		static constexpr auto VERTEX_COUNT = 3;
 
 		// Members
-		std::vector<Vector3> _vertices = {};
-		BoundingBox			 _box	   = {};
+		std::array<Vector3, VERTEX_COUNT> _vertices = {};
+		BoundingBox						  _box		= BoundingBox();
 
 	public:
 		// Constructors
@@ -18,7 +18,7 @@ namespace TEN::Math
 		TriangleMesh(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2);
 
 		// Getters
-		const std::vector<Vector3>& GetVertices() const;
+		const std::array<Vector3, VERTEX_COUNT>& GetVertices() const;
 
 		// Inquirers
 		bool Intersects(const Ray& ray, float& dist) const;
