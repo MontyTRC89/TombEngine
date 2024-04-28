@@ -270,6 +270,7 @@ GameStatus ControlPhase(int numFrames)
 		RumbleScreen();
 
 	PlaySoundSources();
+	Sound_UpdateScene();
 	DoFlipEffect(FlipEffect, LaraItem);
 
 	// Post-loop script and event handling.
@@ -661,8 +662,6 @@ GameStatus DoGameLoop(int levelIndex)
 		float interpolateFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
 		DrawPhase(!levelIndex, interpolateFactor);
 		drawCalls++;
-
-		Sound_UpdateScene();
 	}
 
 	EndGameLoop(levelIndex, status);
