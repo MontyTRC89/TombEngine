@@ -127,8 +127,5 @@ namespace TEN::Renderer
 		}
 
 		_spriteBatch->End();
-
-		_isBlinkUpdated = false;
-		_stringsToDraw.clear();
 	}
 }

@@ -598,6 +598,7 @@ namespace TEN::Renderer
 		void DumpGameScene();
 		void RenderInventory();
 		void RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view);
+		void PrepareScene();
 		void ClearScene();
 		void SaveScreenshot();
 		void PrintDebugMessage(LPCSTR message, ...);
@@ -616,7 +617,6 @@ namespace TEN::Renderer
 		void SetFullScreen();
 		bool IsFullsScreen();
 		void RenderTitleImage();
-		void ClearDynamicLights();
 
 		void AddLine2D(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
 

@@ -34,8 +34,6 @@ namespace TEN::Renderer
 	{
 		_shadowLight = nullptr;
 
-		ClearSceneItems();
-
 		_moveableObjects.resize(0);
 		_staticObjects.resize(0);
 		_sprites.resize(0);
@@ -58,14 +56,6 @@ namespace TEN::Renderer
 			item.ItemNumber = NO_VALUE;
 			item.LightsToDraw.clear();
 		}
-	}
-
-	void Renderer::ClearSceneItems()
-	{
-		_lines2DToDraw.clear();
-		_lines3DToDraw.clear();
-		_triangles3DToDraw.clear();
-		_gameCamera.Clear();
 	}
 
 	void Renderer::Lock()

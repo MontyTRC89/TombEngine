@@ -1627,22 +1627,26 @@ namespace TEN::Renderer
 		_dynamicLights.push_back(dynamicLight);
 	}
 
-	void Renderer::ClearDynamicLights()
+	void Renderer::PrepareScene()
 	{
 		_dynamicLights.clear();
-	}
-
-	void Renderer::ClearScene()
-	{
-		ResetAnimations();
-
-		ClearSceneItems();
-		ClearShadowMap();
+		_lines2DToDraw.clear();
+		_lines3DToDraw.clear();
+		_triangles3DToDraw.clear();
+		_stringsToDraw.clear();
 
 		_currentCausticsFrame++;
 		_currentCausticsFrame %= 32;
 
-		CalculateFrameRate();
+		_isBlinkUpdated = false;
+	}
+
+	void Renderer::ClearScene()
+	{
+		_gameCamera.Clear();
+
+		ResetAnimations();
+		ClearShadowMap();
 	}
 
 	void Renderer::RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view)
@@ -1934,6 +1938,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 
 		ClearScene();
+		CalculateFrameRate();
 	}
 
 	void Renderer::RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere)

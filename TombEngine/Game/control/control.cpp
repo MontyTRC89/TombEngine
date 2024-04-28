@@ -126,9 +126,6 @@ int DrawPhase(bool isTitle, float interpolateFactor)
 		g_Renderer.Render(interpolateFactor);
 	}
 
-	// Clear display sprites.
-	ClearDisplaySprites();
-
 	//Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
 }
@@ -139,10 +136,11 @@ GameStatus ControlPhase(int numFrames)
 
 	bool isTitle = (CurrentLevel == 0);
 
-	ClearFires();
-	g_Renderer.ClearDynamicLights();
+	g_Renderer.PrepareScene();
 	RegeneratePickups();
+	ClearFires();
 	ClearLensFlares();
+	ClearDisplaySprites();
 
 	numFrames = std::clamp(numFrames, 0, 10);
 
@@ -270,8 +268,9 @@ GameStatus ControlPhase(int numFrames)
 		RumbleScreen();
 
 	PlaySoundSources();
-	Sound_UpdateScene();
 	DoFlipEffect(FlipEffect, LaraItem);
+
+	Sound_UpdateScene();
 
 	// Post-loop script and event handling.
 	g_GameScript->OnLoop(DELTA_TIME, true);
