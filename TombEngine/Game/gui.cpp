@@ -274,7 +274,9 @@ namespace TEN::Gui
 
 	void GuiController::DrawInventory()
 	{
+		g_Renderer.PrepareScene();
 		g_Renderer.RenderInventory();
+		g_Renderer.Lock(); // TODO: When inventory is converted to 60 FPS, move this lock call outside of render loop.
 	}
 
 	InventoryResult GuiController::TitleOptions(ItemInfo* item)
@@ -3374,6 +3376,7 @@ namespace TEN::Gui
 			UseItem(*item, InventoryObjectTable[LastInvItem].ObjectNumber);
 
 		AlterFOV(LastFOV);
+		g_Renderer.PrepareScene();
 		ResumeAllSounds(SoundPauseMode::Inventory);
 
 		lara->Inventory.IsBusy = lara->Inventory.OldBusy;

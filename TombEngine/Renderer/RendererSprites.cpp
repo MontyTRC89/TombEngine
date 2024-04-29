@@ -10,9 +10,6 @@ namespace TEN::Renderer
 	void Renderer::AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
 		Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
-		if (_isLocked)
-			return;
-
 		if (scale <= 0.0f)
 			scale = 1.0f;
 
@@ -44,9 +41,6 @@ namespace TEN::Renderer
 		float scale, Vector2 size, BlendMode blendMode, const Vector3& constrainAxis,
 		bool softParticles, RenderView& view, SpriteRenderType renderType)
 	{
-		if (_isLocked)
-			return;
-
 		if (scale <= 0.0f)
 			scale = 1.0f;
 
@@ -79,9 +73,6 @@ namespace TEN::Renderer
 		float scale, Vector2 size, BlendMode blendMode, const Vector3& lookAtAxis,
 		bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
-		if (_isLocked)
-			return;
-
 		if (scale <= 0.0f)
 			scale = 1.0f;
 
@@ -121,9 +112,6 @@ namespace TEN::Renderer
 		const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3, float orient2D,
 		float scale, Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
-		if (_isLocked)
-			return;
-
 		if (scale <= 0.0f)
 			scale = 1.0f;
 
@@ -164,9 +152,6 @@ namespace TEN::Renderer
 		const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
 		BlendMode blendMode, RenderView& view, SpriteRenderType renderType)
 	{
-		if (_isLocked)
-			return;
-
 		auto sprite = RendererSpriteToDraw{};
 
 		sprite.Type = SpriteType::ThreeD;

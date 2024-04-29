@@ -1627,22 +1627,38 @@ namespace TEN::Renderer
 		_dynamicLights.push_back(dynamicLight);
 	}
 
-	void Renderer::ClearDynamicLights()
+	void Renderer::PrepareScene()
 	{
 		_dynamicLights.clear();
-	}
-
-	void Renderer::ClearScene()
-	{
-		ResetItems();
-
-		ClearSceneItems();
-		ClearShadowMap();
+		_lines2DToDraw.clear();
+		_lines3DToDraw.clear();
+		_triangles3DToDraw.clear();
+		_stringsToDraw.clear();
 
 		_currentCausticsFrame++;
 		_currentCausticsFrame %= 32;
 
-		CalculateFrameRate();
+		constexpr auto BLINK_VALUE_MAX = 1.0f;
+		constexpr auto BLINK_VALUE_MIN = 0.1f;
+		constexpr auto BLINK_TIME_STEP = 0.2f;
+
+		// Calculate blink increment based on sine wave.
+		_blinkColorValue = ((sin(_blinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
+
+		// Update blink time.
+		_blinkTime += BLINK_TIME_STEP;
+		if (_blinkTime > PI_MUL_2)
+			_blinkTime -= PI_MUL_2;
+
+		_isLocked = false;
+	}
+
+	void Renderer::ClearScene()
+	{
+		_gameCamera.Clear();
+
+		ResetItems();
+		ClearShadowMap();
 	}
 
 	void Renderer::RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view)
@@ -1651,7 +1667,6 @@ namespace TEN::Renderer
 		using get_time = std::chrono::steady_clock;
 
 		ResetDebugVariables();
-		_isLocked = false;
 		_doingFullscreenPass = false;
 
 		auto& level = *g_GameFlow->GetLevel(CurrentLevel);
@@ -1934,6 +1949,7 @@ namespace TEN::Renderer
 		DrawAllStrings();
 
 		ClearScene();
+		CalculateFrameRate();
 	}
 
 	void Renderer::RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere)

@@ -202,7 +202,6 @@ namespace TEN::Renderer
 		std::vector<RendererStringToDraw> _stringsToDraw;
 		float _blinkColorValue = 0.0f;
 		float _blinkTime		  = 0.0f;
-		bool  _isBlinkUpdated  = false;
 
 		// Graphics resources
 		Texture2D _logo;
@@ -309,7 +308,7 @@ namespace TEN::Renderer
 		bool _isWindowed;
 		float _farView = DEFAULT_FAR_VIEW;
 
-		// A flag to prevent extra renderer object addition
+		// A flag to prevent extra renderer object additions
 		bool _isLocked = false;
 
 		// Caching state changes
@@ -407,7 +406,6 @@ namespace TEN::Renderer
 		void CollectLightsForCamera();
 		void CalculateLightFades(RendererItem* item);
 		void CollectEffects(short roomNumber);
-		void ClearSceneItems();
 		void ClearShadowMap();
 		void CalculateSSAO(RenderView& view);
 		void UpdateItemAnimations(RenderView& view);
@@ -598,6 +596,7 @@ namespace TEN::Renderer
 		void DumpGameScene();
 		void RenderInventory();
 		void RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view);
+		void PrepareScene();
 		void ClearScene();
 		void SaveScreenshot();
 		void PrintDebugMessage(LPCSTR message, ...);
@@ -616,7 +615,6 @@ namespace TEN::Renderer
 		void SetFullScreen();
 		bool IsFullsScreen();
 		void RenderTitleImage();
-		void ClearDynamicLights();
 
 		void AddLine2D(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
 
