@@ -217,6 +217,8 @@ void UpdateDebris()
 	{
 		if (deb.active)
 		{
+			deb.StoreInterpolationData();
+
 			FloorInfo* floor;
 			short roomNumber;
 

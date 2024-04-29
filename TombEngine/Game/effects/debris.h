@@ -71,6 +71,12 @@ struct DebrisFragment
 	bool active;
 	bool isStatic;
 	Matrix Transform;
+	Matrix OldTransform;
+
+	void StoreInterpolationData()
+	{
+		OldTransform = Transform;
+	}
 };
 
 extern SHATTER_ITEM ShatterItem;

@@ -89,6 +89,8 @@ struct FX_INFO
 	Vector4 color;
 	short flag1;
 	short flag2;
+
+	bool DisableInterpolation;
 };
 
 struct NODEOFFSET_INFO

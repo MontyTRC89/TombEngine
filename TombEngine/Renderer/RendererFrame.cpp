@@ -878,16 +878,32 @@ namespace TEN::Renderer
 
 			RendererEffect *newEffect = &_effects[fxNum];
 
-			Matrix translation = Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
-			Matrix rotation = fx->pos.Orientation.ToRotationMatrix();
-
+			newEffect->Translation = Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
+			newEffect->Rotation = fx->pos.Orientation.ToRotationMatrix();
+			newEffect->Scale = Matrix::CreateScale(1.0f);
+			newEffect->World = newEffect->Rotation * newEffect->Translation;
 			newEffect->ObjectNumber = fx->objectNumber;
 			newEffect->RoomNumber = fx->roomNumber;
 			newEffect->Position = fx->pos.Position.ToVector3();
 			newEffect->AmbientLight = room.AmbientLight;
 			newEffect->Color = fx->color;
-			newEffect->World = rotation * translation;
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
+
+			if (fx->DisableInterpolation)
+			{
+				// In this way the interpolation will return always the same result
+				newEffect->OldPosition = newEffect->Position;
+				newEffect->OldTranslation = newEffect->Translation;
+				newEffect->OldRotation = newEffect->Rotation;
+				newEffect->OldWorld = newEffect->World;
+				newEffect->OldScale = newEffect->Scale;
+			}
+
+			newEffect->InterpolatedPosition = Vector3::Lerp(newEffect->OldPosition, newEffect->Position, _interpolationFactor);
+			newEffect->InterpolatedTranslation = Matrix::Lerp(newEffect->OldTranslation, newEffect->Translation, _interpolationFactor);
+			newEffect->InterpolatedRotation = Matrix::Lerp(newEffect->InterpolatedRotation, newEffect->Rotation, _interpolationFactor);
+			newEffect->InterpolatedWorld = Matrix::Lerp(newEffect->OldWorld, newEffect->World, _interpolationFactor);
+			newEffect->InterpolatedScale = Matrix::Lerp(newEffect->OldScale, newEffect->Scale, _interpolationFactor);
 
 			CollectLightsForEffect(fx->roomNumber, newEffect);
 

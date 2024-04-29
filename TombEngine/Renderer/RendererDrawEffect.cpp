@@ -1320,7 +1320,7 @@ namespace TEN::Renderer
 	{
 		const auto& room = _rooms[effect->RoomNumber];
 
-		_stStatic.World = effect->World;
+		_stStatic.World = effect->InterpolatedWorld;
 		_stStatic.Color = effect->Color;
 		_stStatic.AmbientLight = effect->AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Dynamic;
@@ -1419,7 +1419,7 @@ namespace TEN::Renderer
 						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[deb.mesh.tex]), SamplerStateRegister::LinearClamp);
 					}
 
-					_stStatic.World = deb.Transform;
+					_stStatic.World = Matrix::Lerp(deb.OldTransform, deb.Transform, _interpolationFactor);
 					_stStatic.Color = deb.color;
 					_stStatic.AmbientLight = _rooms[deb.roomNumber].AmbientLight;
 					_stStatic.LightMode = (int)deb.lightMode;

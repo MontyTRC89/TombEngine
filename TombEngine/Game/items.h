@@ -122,7 +122,6 @@ struct ItemInfo
 	EntityEffectData	Effect	  = {};
 	EntityModelData		Model	  = {};
 
-	Pose	   OldPose = Pose::Zero;
 	Pose	   StartPose  = Pose::Zero;
 	Pose	   Pose		  = Pose::Zero;
 	RoomVector Location	  = {}; // NOTE: Describes vertical position in room.
@@ -175,11 +174,6 @@ struct ItemInfo
 	bool IsBridge() const;
 
 	bool DisableInterpolation = false;
-
-	void StoreInterpolationData()
-	{
-		OldPose = Pose;
-	}
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);
