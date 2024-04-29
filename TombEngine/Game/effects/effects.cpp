@@ -216,8 +216,8 @@ void UpdateSparks()
 				spark->z = spark->targetPos.z;
 				spark->on = false;
 
-				if (Random::GenerateInt(0, 100) > 60 )
-					TriggerWaterfallEmitterMist(Vector3(spark->targetPos.x, spark->targetPos.y, spark->targetPos.z), spark->roomNumber, spark->scalar, spark->size);
+				if (Random::GenerateInt(0, 100) > 50 )
+					TriggerWaterfallEmitterMist(Vector3(spark->targetPos.x, spark->targetPos.y, spark->targetPos.z), spark->roomNumber, spark->scalar, spark->size, Color(spark->sR, spark->sG, spark->sB));
 				
 				continue;
 			}

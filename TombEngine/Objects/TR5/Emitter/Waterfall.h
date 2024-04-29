@@ -5,5 +5,5 @@
 using namespace TEN::Math;
 
 void InitializeWaterfall(short itemNumber);
-void TriggerWaterfallEmitterMist(const Vector3& pos, short room, short scalar, short size);
+void TriggerWaterfallEmitterMist(const Vector3& pos, short room, short scalar, short size, Color color);
 void WaterfallControl(short itemNumber);

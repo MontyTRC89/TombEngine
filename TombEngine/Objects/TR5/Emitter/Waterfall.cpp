@@ -15,8 +15,7 @@ using TEN::Renderer::g_Renderer;
 	
 const auto WATERFALL_MAX_LIFE = 100;
 const auto MAX_INVERSE_SCALE_FACTOR = 50.0f;
-const auto WATERFALL_MIST_START_COLOR = Color(0.6f, 0.6f, 0.6f);
-const auto WATERFALL_MIST_END_COLOR = Color(0.6f, 0.6f, 0.6f);
+const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 
 	void InitializeWaterfall(short itemNumber)
 	{
@@ -157,7 +156,7 @@ const auto WATERFALL_MIST_END_COLOR = Color(0.6f, 0.6f, 0.6f);
 		}
 	}
 
-	void TriggerWaterfallEmitterMist(const Vector3& pos, short room, short scalar, short size)
+	void TriggerWaterfallEmitterMist(const Vector3& pos, short room, short scalar, short size, Color color)
 	{
 		short angle = pos.y ;
 
@@ -177,8 +176,10 @@ const auto WATERFALL_MIST_END_COLOR = Color(0.6f, 0.6f, 0.6f);
 
 		float finalFade = ((fadeMin >= 1.0f) && (fadeMin == fadeMax)) ? 1.0f : std::max(fadeMin, fadeMax);
 
-		auto startColor = WATERFALL_MIST_START_COLOR * finalFade * float(UCHAR_MAX);
-		auto endColor = WATERFALL_MIST_START_COLOR * finalFade * float(UCHAR_MAX);
+		auto ccl = Color(40.0f, 40.0f, 40.0f);
+
+		auto startColor = (color + ccl) * finalFade ;
+		auto endColor = (color + ccl) * finalFade ;
 		
 		auto* spark = GetFreeParticle();
 		
@@ -207,16 +208,16 @@ const auto WATERFALL_MIST_END_COLOR = Color(0.6f, 0.6f, 0.6f);
 
 		spark->friction = 3;
 		spark->rotAng = GetRandomControl() & 0xFFF;
-		spark->scalar = scalar;
+		spark->scalar = scalar = 3 ? scalar - 1 : scalar + 4 ;
 		
 		spark->rotAdd = Random::GenerateInt(-16, 16);
 		spark->gravity = spark->maxYvel = -64;
 
-		float size1 = (GetRandomControl() & 3) + (size * 2) + 4;
-		spark->size =  spark->sSize = size1  /  2 ;
+		float size1 = (GetRandomControl() & 8) + (size * 4) + scalar;
+		spark->size = spark->sSize = size1 / 4;
 		spark->dSize = size1;
 		spark->extras = 0;
-		spark->dynamic = -3;
+
 		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? SPR_WATERFALL : SPR_WATERFALL2);
 		spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;		
 	}
