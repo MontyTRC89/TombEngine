@@ -158,7 +158,7 @@ GameStatus ControlPhase(int numFrames)
 	static int framesCount = 0;
 
 	// Save current state to old variables for interpolation
-	SaveOldState();
+	SetupInterpolation();
 	g_Renderer.SaveOldState();
 
 	// Controls are polled before OnLoop, so input data could be
@@ -680,9 +680,12 @@ void EndGameLoop(int levelIndex, GameStatus reason)
 	StopRumble();
 }
 
-void SaveOldState()
+void SetupInterpolation()
 {
-
+	for (int i = 0; i < g_Level.Items.size(); i++)
+	{
+		g_Level.Items[i].DisableInterpolation = false;
+	}
 }
 
 void HandleControls(bool isTitle)

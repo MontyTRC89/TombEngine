@@ -502,7 +502,7 @@ namespace TEN::Renderer
 		void SetScissor(RendererRectangle rectangle);
 		bool SetupBlendModeAndAlphaTest(BlendMode blendMode, RendererPass rendererPass, int drawPass);
 		void SortAndPrepareSprites(RenderView& view);
-		void ResetAnimations();
+		void ResetItems();
 		void ResetScissor();
 		void ResetDebugVariables();
 		float CalculateFrameRate();

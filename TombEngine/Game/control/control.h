@@ -105,6 +105,6 @@ void InitializeOrLoadGame(bool loadGame);
 void InitializeScripting(int levelIndex, LevelLoadType type);
 void DeInitializeScripting(int levelIndex);
 
-void SaveOldState();
+void SetupInterpolation();
 
 unsigned CALLBACK GameMain(void*);

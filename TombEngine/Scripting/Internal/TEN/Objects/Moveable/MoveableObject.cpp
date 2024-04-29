@@ -601,6 +601,8 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 
 	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
+
+	m_item->DisableInterpolation = true;
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
@@ -631,6 +633,8 @@ void Moveable::SetRot(const Rotation& rot)
 
 	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
+
+	m_item->DisableInterpolation = true;
 }
 
 short Moveable::GetHP() const

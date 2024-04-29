@@ -420,7 +420,7 @@ namespace TEN::Renderer
 					// Blow up sphere radius by half for cases of too small calculated spheres.
 					if (renderView.Camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
 						inFrustum = true;
-				
+
 				if (!inFrustum)
 					continue;
 			}
@@ -436,12 +436,23 @@ namespace TEN::Renderer
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
+			if (item->DisableInterpolation)
+			{
+				// In this way the interpolation will return always the same result
+				newItem->OldPosition = newItem->Position;
+				newItem->OldTranslation = newItem->Translation;
+				newItem->OldRotation = newItem->Rotation;
+				newItem->OldWorld = newItem->World;
+				for (int j = 0; j < MAX_BONES; j++)
+					newItem->OldAnimationTransforms[j] = newItem->AnimationTransforms[j];
+			}
+
 			newItem->InterpolatedPosition = Vector3::Lerp(newItem->OldPosition, newItem->Position, _interpolationFactor);
 			newItem->InterpolatedTranslation = Matrix::Lerp(newItem->OldTranslation, newItem->Translation, _interpolationFactor);
 			newItem->InterpolatedRotation = Matrix::Lerp(newItem->InterpolatedRotation, newItem->Rotation, _interpolationFactor);
 			newItem->InterpolatedWorld = Matrix::Lerp(newItem->OldWorld, newItem->World, _interpolationFactor);
 			for (int j = 0; j < MAX_BONES; j++)
-				newItem->InterpolatedAnimationTransforms[j] = Matrix::Lerp(newItem->OldAnimationTransforms[j], newItem->AnimationTransforms[j], _interpolationFactor);	
+				newItem->InterpolatedAnimationTransforms[j] = Matrix::Lerp(newItem->OldAnimationTransforms[j], newItem->AnimationTransforms[j], _interpolationFactor);
 
 			CalculateLightFades(newItem);
 			CollectLightsForItem(newItem);
@@ -884,10 +895,12 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::ResetAnimations()
+	void Renderer::ResetItems()
 	{
 		for (int i = 0; i < ITEM_COUNT_MAX; i++)
+		{
 			_items[i].DoneAnimations = false;
+		}
 	}
 
 

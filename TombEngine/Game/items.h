@@ -174,6 +174,8 @@ struct ItemInfo
 	bool IsCreature() const;
 	bool IsBridge() const;
 
+	bool DisableInterpolation = false;
+
 	void StoreInterpolationData()
 	{
 		OldPose = Pose;

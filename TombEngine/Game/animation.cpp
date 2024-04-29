@@ -60,6 +60,8 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				{
 					UpdateItemRoom(item.Index);
 				}
+
+				item.DisableInterpolation = true;
 			}
 
 			commandDataPtr += 3;

@@ -1,3 +1,6 @@
+#ifndef CBCAMERASHADER
+#define CBCAMERASHADER
+
 #include "./Math.hlsli"
 
 cbuffer CBCamera : register(b0)
@@ -35,3 +38,5 @@ cbuffer CBCamera : register(b0)
 	//--
 	ShaderFogBulb FogBulbs[MAX_FOG_BULBS];
 };
+
+#endif
