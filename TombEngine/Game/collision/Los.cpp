@@ -14,10 +14,6 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
-// TODO:
-// Always ensure direction is a unit vector.
-// Correct room probing.
-
 namespace TEN::Collision::Los
 {
 	struct SectorTraceData
@@ -61,10 +57,11 @@ namespace TEN::Collision::Los
 
 	static std::vector<MESH_INFO*> GetNearbyStatics(const std::set<int>& roomNumbers)
 	{
-		// Collect static.
+		// Collect statics.
 		auto statics = std::vector<MESH_INFO*>{};
 		for (int roomNumber : roomNumbers)
 		{
+			// Run through neighbor rooms.
 			const auto& room = g_Level.Rooms[roomNumber];
 			for (auto& neighborRoomNumber : room.neighbors)
 			{
@@ -73,9 +70,15 @@ namespace TEN::Collision::Los
 				if (!neighborRoom.Active())
 					continue;
 
-				// 2) Run through statics in room.
+				// Run through statics.
 				for (auto& staticObj : neighborRoom.mesh)
+				{
+					// 2) Check if static is visible.
+					if (!(staticObj.flags & StaticMeshFlags::SM_VISIBLE))
+						continue;
+
 					statics.push_back(&staticObj);
+				}
 			}
 		}
 
@@ -115,7 +118,7 @@ namespace TEN::Collision::Los
 						movLos.Intersect = std::pair(intersectPos, roomNumber);
 						movLos.IsOriginContained = (bool)box.Contains(origin);
 						movLos.Distance = intersectDist;
-						los.Moveables.push_back(std::move(movLos));
+						los.Moveables.push_back(movLos);
 					}
 				}
 
@@ -140,7 +143,7 @@ namespace TEN::Collision::Los
 							sphereLos.Intersect = std::pair(intersectPos, roomNumber);
 							sphereLos.IsOriginContained = (bool)sphere.Contains(origin);
 							sphereLos.Distance = intersectDist;
-							los.Spheres.push_back(std::move(sphereLos));
+							los.Spheres.push_back(sphereLos);
 						}
 					}
 				}
@@ -183,7 +186,7 @@ namespace TEN::Collision::Los
 					staticLos.Intersect = std::pair(intersectPos, roomNumber);
 					staticLos.IsOriginContained = (bool)box.Contains(origin);
 					staticLos.Distance = intersectDist;
-					los.Statics.push_back(std::move(staticLos));
+					los.Statics.push_back(staticLos);
 				}
 			}
 
@@ -265,8 +268,8 @@ namespace TEN::Collision::Los
 		auto trace = SectorTraceData{};
 
 		// Calculate base data.
-		auto target = Geometry::TranslatePoint(origin, dir, dist);
 		auto ray = Ray(origin, dir);
+		auto target = Geometry::TranslatePoint(origin, dir, dist);
 		auto deltaPos = target - origin;
 
 		// 1) Collect origin.
@@ -418,13 +421,13 @@ namespace TEN::Collision::Los
 			}
 		}
 
-		// 8) Return trace.
+		// 8) Return sector trace.
 		return trace;
 	}
 
 	RoomLosData GetRoomLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
-		// Get sector trace. NOTE: dir must be a unit vector.
+		// Get sector trace.
 		auto trace = GetSectorTrace(origin, roomNumber, dir, dist, collideBridges);
 
 		// Collect unique room numbers.
@@ -456,10 +459,6 @@ namespace TEN::Collision::Los
 			if (!collidePlayer && movLos.Moveable->ObjectNumber == ID_LARA)
 				continue;
 
-			// 2) Check if moveable is deactivated.
-			if (movLos.Moveable->Status == ItemStatus::ITEM_DEACTIVATED)
-				continue;
-
 			return movLos;
 		}
 
@@ -473,10 +472,6 @@ namespace TEN::Collision::Los
 		{
 			// 1) Check if moveable is not player (if applicable).
 			if (!collidePlayer && sphereLos.Moveable->ObjectNumber == ID_LARA)
-				continue;
-
-			// 2) Check if moveable is deactivated.
-			if (sphereLos.Moveable->Status == ItemStatus::ITEM_DEACTIVATED)
 				continue;
 
 			return sphereLos;
