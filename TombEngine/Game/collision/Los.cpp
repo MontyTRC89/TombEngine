@@ -99,6 +99,7 @@ namespace TEN::Collision::Los
 
 		// 1) Collect room LOS instance.
 		los.Room = GetRoomLos(origin, roomNumber, dir, dist);
+		dist = los.Room.Distance;
 
 		if (collideMoveables || collideSpheres)
 		{
@@ -370,9 +371,11 @@ namespace TEN::Collision::Los
 		float offset = CLICK(0.25f);
 		auto doOffset = false;
 
-		// 7) Run through intercepts sorted by distance.
-		float closestDist = INFINITY;
 		const FloorInfo* prevSector = nullptr;
+		float closestDist = dist;
+		bool hasClip = false;
+
+		// 7) Run through intercepts sorted by distance.
 		for (int i = 0; i < trace.Intercepts.size(); i++)
 		{
 			const auto& intercept = trace.Intercepts[i];
@@ -384,12 +387,18 @@ namespace TEN::Collision::Los
 			doOffset = !doOffset;
 
 			// 7.1) Clip wall.
-			if (intercept.Position.y > GetFloorHeight(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z) ||
-				intercept.Position.y < GetCeiling(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z))
+			if (i != 0 && i != trace.Intercepts.size())
 			{
-				float intersectDist = Vector3::Distance(ray.position, intercept.Position.ToVector3());
-				if (intersectDist < closestDist)
-					closestDist = intersectDist;
+				if (intercept.Position.y > GetFloorHeight(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z) ||
+					intercept.Position.y < GetCeiling(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z))
+				{
+					float intersectDist = Vector3::Distance(ray.position, intercept.Position.ToVector3());
+					if (intersectDist < closestDist)
+					{
+						closestDist = intersectDist;
+						hasClip = true;
+					}
+				}
 			}
 
 			// Ensure sector is unique.
@@ -397,8 +406,11 @@ namespace TEN::Collision::Los
 			{
 				// 7.2) Clip sector floor and ceiling.
 				float intersectDist = 0.0f;
-				if (intercept.Sector->Mesh.Intersects(ray, intersectDist) && intersectDist < closestDist && intersectDist <= dist)
+				if (intercept.Sector->Mesh.Intersects(ray, intersectDist) && intersectDist < closestDist)
+				{
 					closestDist = intersectDist;
+					hasClip = true;
+				}
 
 				// 7.3) Clip bridge (if applicable).
 				if (collideBridges)
@@ -413,15 +425,18 @@ namespace TEN::Collision::Los
 						auto collMesh = GenerateBridgeCollisionMesh(bridgeMov);
 
 						float intersectDist = 0.0f;
-						if (collMesh.Intersects(ray, intersectDist) && intersectDist < closestDist && intersectDist <= dist)
+						if (collMesh.Intersects(ray, intersectDist) && intersectDist < closestDist)
+						{
 							closestDist = intersectDist;
+							hasClip = true;
+						}
 					}
 				}
 			}
 			prevSector = intercept.Sector;
 
 			// 7.4) Has clip; set intersect and trim vector.
-			if (closestDist != INFINITY)
+			if (hasClip)
 			{
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
 

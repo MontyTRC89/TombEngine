@@ -37,7 +37,7 @@ constexpr auto ITEM_DEATH_TIMEOUT = 4 * FPS;
 
 BoundingOrientedBox ItemInfo::GetBox() const
 {
-	GameBoundingBox(this).ToBoundingOrientedBox(Pose);
+	return GameBoundingBox(this).ToBoundingOrientedBox(Pose);
 }
 
 bool ItemInfo::TestOcb(short ocbFlags) const
