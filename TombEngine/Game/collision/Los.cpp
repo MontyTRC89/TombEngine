@@ -113,7 +113,7 @@ namespace TEN::Collision::Los
 						auto movLos = MoveableLosData{};
 						movLos.Moveable = mov;
 						movLos.Intersect = std::pair(intersectPos, roomNumber);
-						movLos.IsOriginContained = (box.Contains(origin) == ContainmentType::CONTAINS);
+						movLos.IsOriginContained = (bool)box.Contains(origin);
 						movLos.Distance = intersectDist;
 						los.Moveables.push_back(std::move(movLos));
 					}
@@ -138,7 +138,7 @@ namespace TEN::Collision::Los
 							sphereLos.Moveable = mov;
 							sphereLos.SphereID = i;
 							sphereLos.Intersect = std::pair(intersectPos, roomNumber);
-							sphereLos.IsOriginContained = (sphere.Contains(origin) == ContainmentType::CONTAINS);
+							sphereLos.IsOriginContained = (bool)sphere.Contains(origin);
 							sphereLos.Distance = intersectDist;
 							los.Spheres.push_back(std::move(sphereLos));
 						}
@@ -181,7 +181,7 @@ namespace TEN::Collision::Los
 					auto staticLos = StaticLosData{};
 					staticLos.Static = staticObj;
 					staticLos.Intersect = std::pair(intersectPos, roomNumber);
-					staticLos.IsOriginContained = (box.Contains(origin) == ContainmentType::CONTAINS);
+					staticLos.IsOriginContained = (bool)box.Contains(origin);
 					staticLos.Distance = intersectDist;
 					los.Statics.push_back(std::move(staticLos));
 				}
@@ -198,90 +198,6 @@ namespace TEN::Collision::Los
 
 		// Return sorted LOS.
 		return los;
-	}
-	
-	static void SetSectorTraceIntercepts(SectorTraceData& trace, const Vector3i& origin, int originRoomNumber, const Vector3i& target)
-	{
-		auto deltaPos = target - origin;
-
-		// 1) Collect origin.
-		trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, origin });
-
-		// 2) Calculate and collect X axis positions.
-		if (deltaPos.x != 0)
-		{
-			// Calculate step.
-			auto step = Vector3i(
-				deltaPos.x,
-				BLOCK(deltaPos.y) / deltaPos.x,
-				BLOCK(deltaPos.z) / deltaPos.x);
-
-			bool isNegative = (step.x < 0);
-			int sign = isNegative ? -1 : 1;
-
-			// Calculate initial position.
-			auto pos = Vector3i::Zero;
-			pos.x = isNegative ? (origin.x & (UINT_MAX - WALL_MASK)) : (origin.x | WALL_MASK);
-			pos.y = (((pos.x - origin.x) * step.y) / BLOCK(1)) + origin.y;
-			pos.z = (((pos.x - origin.x) * step.z) / BLOCK(1)) + origin.z;
-
-			// Collect intercept positions.
-			while (isNegative ? (pos.x > target.x) : (pos.x < target.x))
-			{
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(sign, 0, 0) });
-
-				pos += Vector3i(BLOCK(1), step.y, step.z) * sign;
-			}
-		}
-
-		// 3) Calculate and collect Z axis positions.
-		if (deltaPos.z != 0)
-		{
-			// Calculate step.
-			auto step = Vector3i(
-				BLOCK(deltaPos.x) / deltaPos.z,
-				BLOCK(deltaPos.y) / deltaPos.z,
-				deltaPos.z);
-
-			bool isNegative = (step.z < 0);
-			int sign = isNegative ? -1 : 1;
-
-			// Calculate initial position.
-			auto pos = Vector3i::Zero;
-			pos.z = isNegative ? (origin.z & (UINT_MAX - WALL_MASK)) : (origin.z | WALL_MASK);
-			pos.x = (((pos.z - origin.z) * step.x) / BLOCK(1)) + origin.x;
-			pos.y = (((pos.z - origin.z) * step.y) / BLOCK(1)) + origin.y;
-
-			// Collect positions.
-			while (isNegative ? (pos.z > target.z) : (pos.z < target.z))
-			{
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(0, 0, sign) });
-
-				pos += Vector3i(step.x, step.y, BLOCK(1)) * sign;
-			}
-		}
-
-		// 4) Sort intercepts by distance from origin.
-		std::sort(
-			trace.Intercepts.begin(), trace.Intercepts.end(),
-			[origin](const SectorTraceData::InterceptData& intercept0, const SectorTraceData::InterceptData& intercept1)
-			{
-				float distSqr0 = Vector3i::DistanceSquared(origin, intercept0.Position);
-				float distSqr1 = Vector3i::DistanceSquared(origin, intercept1.Position);
-
-				return (distSqr0 < distSqr1);
-			});
-
-		// 5) Set sector pointers.
-		short roomNumber = originRoomNumber;
-		for (auto& intercept : trace.Intercepts)
-		{
-			// TODO: Room traversal is wrong.
-			auto* sector = GetFloor(intercept.Position.x, intercept.Position.y, intercept.Position.z, &roomNumber);
-			intercept.Sector = sector;
-		}
 	}
 
 	static CollisionMesh GenerateBridgeCollisionMesh(const ItemInfo& bridgeMov)
@@ -344,35 +260,128 @@ namespace TEN::Collision::Los
 		return CollisionMesh(tris);
 	}
 
-	static void ClipSectorTrace(SectorTraceData& trace, const Ray& ray, float distMax, bool collideBridges)
+	static SectorTraceData GetSectorTrace(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
-		float closestDist = INFINITY;
-		int roomNumber = NO_VALUE;
+		auto trace = SectorTraceData{};
 
-		// Run through intercepts sorted by distance.
+		// Calculate base data.
+		auto target = Geometry::TranslatePoint(origin, dir, dist);
+		auto ray = Ray(origin, dir);
+		auto deltaPos = target - origin;
+
+		// 1) Collect origin.
+		trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, origin });
+
+		// 2) Collect X axis positions.
+		if (deltaPos.x != 0)
+		{
+			// Calculate step.
+			auto step = Vector3i(
+				deltaPos.x,
+				BLOCK(deltaPos.y) / deltaPos.x,
+				BLOCK(deltaPos.z) / deltaPos.x);
+
+			bool isNegative = (step.x < 0);
+			int sign = isNegative ? -1 : 1;
+
+			// Calculate initial position.
+			auto pos = Vector3i::Zero;
+			pos.x = isNegative ? ((int)round(origin.x) & (UINT_MAX - WALL_MASK)) : ((int)round(origin.x) | WALL_MASK);
+			pos.y = (((pos.x - origin.x) * step.y) / BLOCK(1)) + origin.y;
+			pos.z = (((pos.x - origin.x) * step.z) / BLOCK(1)) + origin.z;
+
+			// Collect intercept positions.
+			while (isNegative ? (pos.x > target.x) : (pos.x < target.x))
+			{
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(sign, 0, 0) });
+
+				pos += Vector3i(BLOCK(1), step.y, step.z) * sign;
+			}
+		}
+
+		// 3) Collect Z axis positions.
+		if (deltaPos.z != 0)
+		{
+			// Calculate step.
+			auto step = Vector3i(
+				BLOCK(deltaPos.x) / deltaPos.z,
+				BLOCK(deltaPos.y) / deltaPos.z,
+				deltaPos.z);
+
+			bool isNegative = (step.z < 0);
+			int sign = isNegative ? -1 : 1;
+
+			// Calculate initial position.
+			auto pos = Vector3i::Zero;
+			pos.z = isNegative ? ((int)round(origin.z) & (UINT_MAX - WALL_MASK)) : ((int)round(origin.z) | WALL_MASK);
+			pos.x = (((pos.z - origin.z) * step.x) / BLOCK(1)) + origin.x;
+			pos.y = (((pos.z - origin.z) * step.y) / BLOCK(1)) + origin.y;
+
+			// Collect positions.
+			while (isNegative ? (pos.z > target.z) : (pos.z < target.z))
+			{
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
+				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(0, 0, sign) });
+
+				pos += Vector3i(step.x, step.y, BLOCK(1)) * sign;
+			}
+		}
+
+		// 4) Collect target.
+		trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, target });
+
+		// 5) Sort intercepts by distance from origin.
+		std::sort(
+			trace.Intercepts.begin(), trace.Intercepts.end(),
+			[origin](const SectorTraceData::InterceptData& intercept0, const SectorTraceData::InterceptData& intercept1)
+			{
+				float distSqr0 = Vector3i::DistanceSquared(origin, intercept0.Position);
+				float distSqr1 = Vector3i::DistanceSquared(origin, intercept1.Position);
+
+				return (distSqr0 < distSqr1);
+			});
+
+		// 6) Set sector pointers.
+		int probeRoomNumber = roomNumber;
+		for (auto& intercept : trace.Intercepts)
+			intercept.Sector = GetFloor(intercept.Position.x, intercept.Position.y, intercept.Position.z, (short*)&probeRoomNumber);
+
+		//debug
+		float offset = CLICK(0.25f);
+		auto doOffset = false;
+
+		// 7) Run through intercepts sorted by distance.
+		float closestDist = INFINITY;
 		const FloorInfo* prevSector = nullptr;
 		for (int i = 0; i < trace.Intercepts.size(); i++)
 		{
 			const auto& intercept = trace.Intercepts[i];
 
-			// 1) Clip wall.
+			//debug
+			auto pos2D = g_Renderer.Get2DPosition(intercept.Position.ToVector3() + Vector3(0, doOffset ? offset : 0, 0));
+			if (pos2D.has_value())
+				g_Renderer.AddDebugString(std::to_string(intercept.Sector->RoomNumber), *pos2D, Color(1, 1, 1), 1, 0, RendererDebugPage::None);
+			doOffset = !doOffset;
+
+			// 7.1) Clip wall.
 			if (intercept.Position.y > GetFloorHeight(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z) ||
 				intercept.Position.y < GetCeiling(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z))
 			{
-				float dist = Vector3::Distance(ray.position, intercept.Position.ToVector3());
-				if (dist < closestDist)
-					closestDist = dist;
+				float intersectDist = Vector3::Distance(ray.position, intercept.Position.ToVector3());
+				if (intersectDist < closestDist)
+					closestDist = intersectDist;
 			}
 
 			// Ensure sector is unique.
 			if (intercept.Sector != prevSector)
 			{
-				// 2) Clip sector.
-				float dist = 0.0f;
-				if (intercept.Sector->Mesh.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
-					closestDist = dist;
+				// 7.2) Clip sector floor and ceiling.
+				float intersectDist = 0.0f;
+				if (intercept.Sector->Mesh.Intersects(ray, intersectDist) && intersectDist < closestDist && intersectDist <= dist)
+					closestDist = intersectDist;
 
-				// 3) Clip bridge (if applicable).
+				// 7.3) Clip bridge (if applicable).
 				if (collideBridges)
 				{
 					for (int movID : intercept.Sector->BridgeItemNumbers)
@@ -384,37 +393,32 @@ namespace TEN::Collision::Los
 
 						auto collMesh = GenerateBridgeCollisionMesh(bridgeMov);
 
-						float dist = 0.0f;
-						if (collMesh.Intersects(ray, dist) && dist < closestDist && dist <= distMax)
-							closestDist = dist;
+						float intersectDist = 0.0f;
+						if (collMesh.Intersects(ray, intersectDist) && intersectDist < closestDist && intersectDist <= dist)
+							closestDist = intersectDist;
 					}
 				}
 			}
 			prevSector = intercept.Sector;
 
-			// Has clip; set intersect and trim vector.
+			// 7.4) Has clip; set intersect and trim vector.
 			if (closestDist != INFINITY)
 			{
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
 
+				//debug
+				auto pos2D = g_Renderer.Get2DPosition(intersectPos);
+				if (pos2D.has_value())
+					g_Renderer.AddDebugString(std::to_string(intercept.Sector->RoomNumber), *pos2D, Color(1, 1, 1), 1, 0, RendererDebugPage::None);
+
 				// TODO: Get exact boundary position.
 				trace.Intersect = std::pair(intersectPos, intercept.Sector->RoomNumber);
 				trace.Intercepts.erase((trace.Intercepts.begin() + i) + 1, trace.Intercepts.end());
-				return;
+				break;
 			}
 		}
-	}
 
-	static SectorTraceData GetSectorTrace(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
-	{
-		// Calculate target and create ray.
-		auto target = Geometry::TranslatePoint(origin, dir, dist);
-		auto ray = Ray(origin, dir);
-
-		// Get and return sector trace.
-		auto trace = SectorTraceData{};
-		SetSectorTraceIntercepts(trace, origin, roomNumber, target);
-		ClipSectorTrace(trace, ray, dist, collideBridges);
+		// 8) Return trace.
 		return trace;
 	}
 
@@ -428,12 +432,18 @@ namespace TEN::Collision::Los
 		for (const auto& intercept : trace.Intercepts)
 			roomNumbers.insert(intercept.Sector->RoomNumber);
 
+		// Calculate position data.
+		bool hasIntersect = trace.Intersect.has_value();
+		float losDist = hasIntersect ? Vector3::Distance(origin, trace.Intersect->first) : dist;
+		auto losPos = Geometry::TranslatePoint(origin, dir, losDist);
+		int losRoomNumber = hasIntersect ? trace.Intersect->second : trace.Intercepts.back().Sector->RoomNumber;
+
 		// Create and return room LOS.
 		auto roomLos = RoomLosData{};
-		roomLos.Position = trace.Intersect.value_or(std::pair(Geometry::TranslatePoint(origin, dir, dist), roomNumber));
+		roomLos.Position = std::pair(losPos, losRoomNumber);
 		roomLos.RoomNumbers = roomNumbers;
-		roomLos.IsIntersected = trace.Intersect.has_value();
-		roomLos.Distance = trace.Intersect.has_value() ? Vector3::Distance(origin, trace.Intersect->first) : dist;
+		roomLos.IsIntersected = hasIntersect;
+		roomLos.Distance = losDist;
 		return roomLos;
 	}
 

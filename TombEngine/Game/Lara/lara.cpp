@@ -81,9 +81,14 @@ static void HandleLosDebug(const ItemInfo& item)
 
 	auto dir = (item.Pose.Orientation + rot).ToDirection();
 
+	float dist = BLOCK(1.25f);
+
+	short roomNumber = item.RoomNumber;
+	GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber);
+
 	auto origin = (item.Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
-	auto target = Geometry::TranslatePoint(origin, dir, BLOCK(10));
-	auto los = GetLos(origin, item.RoomNumber, dir, BLOCK(10), true, true, true);
+	auto target = Geometry::TranslatePoint(origin, dir, dist);
+	auto los = GetLos(origin, roomNumber, dir, dist, true, true, true);
 
 	float closestDist = los.Room.Distance;
 	target = los.Room.Position.first;
