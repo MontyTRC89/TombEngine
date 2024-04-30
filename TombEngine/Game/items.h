@@ -149,6 +149,8 @@ struct ItemInfo
 	short		  AfterDeath  = 0;
 	short		  CarriedItem = 0;
 
+	BoundingOrientedBox GetBox() const;
+
 	// OCB utilities
 	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);

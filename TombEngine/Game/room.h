@@ -84,6 +84,9 @@ struct MESH_INFO
 	short HitPoints;
 	std::string Name;
 	bool Dirty;
+
+	BoundingOrientedBox GetBox() const;
+	BoundingOrientedBox GetVisibilityBox() const;
 };
 
 struct ROOM_INFO

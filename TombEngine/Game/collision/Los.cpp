@@ -116,7 +116,7 @@ namespace TEN::Collision::Los
 				// 2) Collect moveable LOS instances.
 				if (collideMoveables)
 				{
-					auto box = GameBoundingBox(mov).ToBoundingOrientedBox(mov->Pose);
+					auto box = mov->GetBox();
 
 					float intersectDist = 0.0f;
 					if (box.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
@@ -188,7 +188,7 @@ namespace TEN::Collision::Los
 				if (!(staticObj->flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
-				auto box = GetBoundsAccurate(*staticObj, false).ToBoundingOrientedBox(staticObj->pos);
+				auto box = staticObj->GetBox();
 
 				float intersectDist = 0.0f;
 				if (box.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
@@ -250,7 +250,7 @@ namespace TEN::Collision::Los
 		offset = Vector3::Transform(offset, rotMatrix);
 
 		// Get box corners.
-		auto box = GameBoundingBox(&bridgeMov).ToBoundingOrientedBox(bridgeMov.Pose);
+		auto box = bridgeMov.GetBox();
 		auto corners = std::array<Vector3, 8>{};
 		box.GetCorners(corners.data());
 

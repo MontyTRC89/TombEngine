@@ -22,6 +22,16 @@ int  FlipMap[MAX_FLIPMAP];
 
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
+BoundingOrientedBox MESH_INFO::GetBox() const
+{
+	return GetBoundsAccurate(*this, false).ToBoundingOrientedBox(pos);
+}
+
+BoundingOrientedBox MESH_INFO::GetVisibilityBox() const
+{
+	return GetBoundsAccurate(*this, true).ToBoundingOrientedBox(pos);
+}
+
 bool ROOM_INFO::Active() const
 {
 	if (flipNumber == NO_ROOM)
