@@ -587,8 +587,6 @@ GameStatus DoGameLoop(int levelIndex)
 	int controlCalls = 0;
 	int drawCalls = 0;
 
-	memcpy(&PreviousCamera , &Camera, sizeof(CAMERA_INFO));
-
 	while (DoTheGame)
 	{
 		if (App.ResetClock)
@@ -609,18 +607,30 @@ GameStatus DoGameLoop(int levelIndex)
 
 		while (controlLag >= controlFrameTime)
 		{
-			memcpy(&PreviousCamera, &Camera, sizeof(CAMERA_INFO));
 			status = ControlPhase(0);
 			controlLag -= controlFrameTime;
 			controlCalls++;
+
+			if (!g_Configuration.EnableVariableFramerate)
+			{
+				if (status != GameStatus::Normal)
+					break;
+
+				float interpolateFactor = 0.0f;
+				DrawPhase(!levelIndex, interpolateFactor);
+				drawCalls++;
+			}
 		}
 
-		if (status != GameStatus::Normal)
-			break;
+		if (g_Configuration.EnableVariableFramerate)
+		{
+			if (status != GameStatus::Normal)
+				break;
 
-		float interpolateFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
-		DrawPhase(!levelIndex, interpolateFactor);
-		drawCalls++;
+			float interpolateFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
+			DrawPhase(!levelIndex, interpolateFactor);
+			drawCalls++;
+		}
 	}
 
 	EndGameLoop(levelIndex, status);

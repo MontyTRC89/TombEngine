@@ -470,11 +470,12 @@ namespace TEN::Gui
 			Caustics,
 			Antialiasing,
 			AmbientOcclusion,
+			VariableFramerate,
 			Save,
 			Cancel
 		};
 
-		static const int numDisplaySettingsOptions = 7;
+		static const int numDisplaySettingsOptions = 8;
 
 		OptionCount = numDisplaySettingsOptions;
 
@@ -531,6 +532,12 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
 				break;
+
+			case DisplaySettingsOption::VariableFramerate:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableVariableFramerate = !CurrentSettings.Configuration.EnableVariableFramerate;
+				break;
+
 			}
 		}
 
@@ -576,6 +583,11 @@ namespace TEN::Gui
 			case DisplaySettingsOption::AmbientOcclusion:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
+				break;
+
+			case DisplaySettingsOption::VariableFramerate:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableVariableFramerate = !CurrentSettings.Configuration.EnableVariableFramerate;
 				break;
 			}
 		}

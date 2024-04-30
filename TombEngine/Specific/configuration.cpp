@@ -187,7 +187,8 @@ bool SaveConfiguration()
 		SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, g_Configuration.ShadowBlobsMax) != ERROR_SUCCESS ||
 		SetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, g_Configuration.EnableCaustics) != ERROR_SUCCESS ||
 		SetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, (DWORD)g_Configuration.AntialiasingMode) != ERROR_SUCCESS ||
-		SetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, g_Configuration.EnableAmbientOcclusion) != ERROR_SUCCESS)
+		SetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, g_Configuration.EnableAmbientOcclusion) != ERROR_SUCCESS ||
+		SetBoolRegKey(graphicsKey, REGKEY_VARIABLE_FRAMERATE, g_Configuration.EnableVariableFramerate) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
@@ -314,6 +315,7 @@ void InitDefaultConfiguration()
 	g_Configuration.EnableCaustics = true;
 	g_Configuration.AntialiasingMode = AntialiasingMode::Medium;
 	g_Configuration.EnableAmbientOcclusion = true;
+	g_Configuration.EnableVariableFramerate = true;
 
 	g_Configuration.SoundDevice = 1;
 	g_Configuration.EnableSound = true;
@@ -362,6 +364,7 @@ bool LoadConfiguration()
 	bool enableCaustics = false;
 	DWORD antialiasingMode = 1;
 	bool enableAmbientOcclusion = false;
+	bool enableVariableFramerate = false;
 
 	// Load Graphics keys.
 	if (GetDWORDRegKey(graphicsKey, REGKEY_SCREEN_WIDTH, &screenWidth, 0) != ERROR_SUCCESS ||
@@ -372,7 +375,8 @@ bool LoadConfiguration()
 		GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, &shadowBlobsMax, GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX) != ERROR_SUCCESS ||
 		GetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, &enableCaustics, true) != ERROR_SUCCESS ||
 		GetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, &antialiasingMode, true) != ERROR_SUCCESS ||
-		GetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, &enableAmbientOcclusion, false) != ERROR_SUCCESS)
+		GetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, &enableAmbientOcclusion, false) != ERROR_SUCCESS ||
+		GetBoolRegKey(graphicsKey, REGKEY_VARIABLE_FRAMERATE, &enableVariableFramerate, false) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
@@ -500,6 +504,7 @@ bool LoadConfiguration()
 	g_Configuration.AntialiasingMode = AntialiasingMode(antialiasingMode);
 	g_Configuration.ShadowMapSize = shadowMapSize;
 	g_Configuration.EnableAmbientOcclusion = enableAmbientOcclusion;
+	g_Configuration.EnableVariableFramerate = enableVariableFramerate;
 
 	g_Configuration.EnableSound = enableSound;
 	g_Configuration.EnableReverb = enableReverb;
