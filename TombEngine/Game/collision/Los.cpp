@@ -88,6 +88,13 @@ namespace TEN::Collision::Los
 	LosData GetLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
 				   bool collideMoveables, bool collideSpheres, bool collideStatics)
 	{
+		// FAILSAFE.
+		if (dir == Vector3::Zero)
+		{
+			TENLog("GetLos(): dir is not a unit vector.", LogLevel::Warning);
+			return LosData{ RoomLosData{ std::pair(origin, roomNumber), {}, false, 0.0f }, {}, {}, {} };
+		}
+
 		auto los = LosData{};
 
 		// 1) Collect room LOS instance.
@@ -427,6 +434,13 @@ namespace TEN::Collision::Los
 
 	RoomLosData GetRoomLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
+		// FAILSAFE.
+		if (dir == Vector3::Zero)
+		{
+			TENLog("GetRoomLos(): dir is not a unit vector.", LogLevel::Warning);
+			return RoomLosData{ std::pair(origin, roomNumber), {}, false, 0.0f };
+		}
+
 		// Get sector trace.
 		auto trace = GetSectorTrace(origin, roomNumber, dir, dist, collideBridges);
 

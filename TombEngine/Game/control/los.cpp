@@ -34,8 +34,11 @@ Vector3i ClosestCoord;
 // Deprecated.
 bool LOS(const GameVector* origin, GameVector* target)
 {
-	if (origin->ToVector3() == target->ToVector3())
+	// FAILSAFE.
+	if (origin->ToVector3i() == target->ToVector3i())
 	{
+		TENLog("Deprecated LOS(): dir is not a unit vector.", LogLevel::Warning);
+
 		LosRoomNumbers.clear();
 		LosRoomNumbers.push_back(origin->RoomNumber);
 		return true;

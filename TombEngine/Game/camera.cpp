@@ -159,12 +159,9 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 {
 	constexpr auto DIST_BUFFER = BLOCK(0.1f);
 
-	// Get LOS.
+	// Get raw LOS.
 	auto dir = target - origin;
 	dir.Normalize();
-	if (dir == Vector3::Zero)
-		return CameraLosData{ false, std::pair(origin, originRoomNumber), 0.0f };
-
 	float dist = Vector3::Distance(origin, target);
 	auto los = GetLos(origin, originRoomNumber, dir, dist, true, false, true);
 
