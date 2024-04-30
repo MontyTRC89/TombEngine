@@ -1108,6 +1108,16 @@ namespace TEN::Renderer
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 0.5f);
 		
 		_swapChain->Present(0, 0);
+
+		if (g_Configuration.EnableVariableFramerate)
+		{
+			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+			_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
+
+			RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 0.5f);
+
+			_swapChain->Present(0, 0);
+		}
 	}
 
 	void Renderer::RenderTitle()
