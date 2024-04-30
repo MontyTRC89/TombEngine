@@ -105,7 +105,12 @@ namespace TEN::Collision::Los
 			auto movs = GetNearbyMoveables(los.Room.RoomNumbers);
 			for (auto* mov : movs)
 			{
+				// Check if moveable is bridge.
 				if (mov->IsBridge())
+					continue;
+
+				// Check moveable status.
+				if (mov->Status == ItemStatus::ITEM_INVISIBLE || mov->Status == ItemStatus::ITEM_DEACTIVATED)
 					continue;
 
 				// 2) Collect moveable LOS instances.
@@ -179,6 +184,10 @@ namespace TEN::Collision::Los
 			auto statics = GetNearbyStatics(los.Room.RoomNumbers);
 			for (auto* staticObj : statics)
 			{
+				// Check static visibility.
+				if (!(staticObj->flags & StaticMeshFlags::SM_VISIBLE))
+					continue;
+
 				auto box = GetBoundsAccurate(*staticObj, false).ToBoundingOrientedBox(staticObj->pos);
 
 				float intersectDist = 0.0f;
@@ -469,8 +478,8 @@ namespace TEN::Collision::Los
 		auto los = GetLos(origin, roomNumber, dir, dist, true, false, false);
 		for (auto& movLos : los.Moveables)
 		{
-			// 1) Check if moveable is not player (if applicable).
-			if (!collidePlayer && movLos.Moveable->ObjectNumber == ID_LARA)
+			// Check if moveable is not player (if applicable).
+			if (!collidePlayer && movLos.Moveable->IsLara())
 				continue;
 
 			return movLos;
@@ -484,8 +493,8 @@ namespace TEN::Collision::Los
 		auto los = GetLos(origin, roomNumber, dir, dist, false, true, false);
 		for (auto& sphereLos : los.Spheres)
 		{
-			// 1) Check if moveable is not player (if applicable).
-			if (!collidePlayer && sphereLos.Moveable->ObjectNumber == ID_LARA)
+			// Check if moveable is not player (if applicable).
+			if (!collidePlayer && sphereLos.Moveable->IsLara())
 				continue;
 
 			return sphereLos;
@@ -499,12 +508,8 @@ namespace TEN::Collision::Los
 		auto los = GetLos(origin, roomNumber, dir, dist, false, false, true);
 		for (auto& staticLos : los.Statics)
 		{
-			// 1) Check if static is solid (if applicable).
+			// Check if static is solid (if applicable).
 			if (collideOnlySolid && !(staticLos.Static->flags & StaticMeshFlags::SM_SOLID))
-				continue;
-
-			// 2) Check if static is visible.
-			if (!(staticLos.Static->flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
 			return staticLos;

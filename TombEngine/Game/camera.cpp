@@ -115,7 +115,7 @@ static bool TestCameraCollidableBox(const BoundingOrientedBox& box)
 static bool TestCameraCollidableItem(const ItemInfo& item)
 {
 	// 1) Check if item is player or bridge.
-	if (item.IsLara() || item.IsBridge())
+	if (item.IsLara())
 		return false;
 
 	// 2) Test distance.
