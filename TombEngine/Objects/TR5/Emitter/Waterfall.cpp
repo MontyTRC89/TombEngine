@@ -2,6 +2,7 @@
 #include "Objects/TR5/Emitter/Waterfall.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/camera.h"
 #include "Game/Setup.h"
@@ -10,6 +11,7 @@
 #include "Specific/clock.h"
 #include "Renderer/Renderer.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 	
@@ -102,11 +104,11 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 					auto origin = GameVector(Vector3(spark->x, spark->y, spark->z), item.RoomNumber);
 					auto origin2 = Geometry::TranslatePoint(Vector3(spark->x, spark->y, spark->z), orient2, BLOCK(0.3));
 
-					auto pointColl = GetCollision(origin2, origin.RoomNumber, dir, BLOCK(8));
+					auto pointColl = GetPointCollision(origin2, origin.RoomNumber, dir, BLOCK(8));
 				
-					int relFloorHeight = pointColl.Position.Floor - spark->y;
+					int relFloorHeight = pointColl.GetFloorHeight() - spark->y;
 				
-					spark->targetPos = GameVector(origin2.x, origin2.y + relFloorHeight, origin2.z, pointColl.RoomNumber);
+					spark->targetPos = GameVector(origin2.x, origin2.y + relFloorHeight, origin2.z, pointColl.GetRoomNumber());
 
 					if (TestEnvironment(ENV_FLAG_WATER, spark->targetPos.ToVector3i(), spark->roomNumber) ||
 						TestEnvironment(ENV_FLAG_SWAMP, spark->targetPos.ToVector3i(), spark->roomNumber))
@@ -125,10 +127,10 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 					spark->dR = std::clamp(int(endColor.x) + colorOffset, 0, UCHAR_MAX);
 					spark->dG = std::clamp(int(endColor.y) + colorOffset, 0, UCHAR_MAX);
 					spark->dB = std::clamp(int(endColor.z) + colorOffset, 0, UCHAR_MAX);
-					spark->roomNumber = pointColl.RoomNumber;
+					spark->roomNumber = pointColl.GetRoomNumber();
 					spark->colFadeSpeed = 2;
 					spark->blendMode = BlendMode::Additive;
-					spark->roomNumber = pointColl.RoomNumber;
+
 					spark->gravity = (relFloorHeight / 2) / FPS; // Adjust gravity based on relative floor height
 					spark->life = spark->sLife = WATERFALL_MAX_LIFE;
 					spark->fxObj = ID_WATERFALL_EMITTER;
