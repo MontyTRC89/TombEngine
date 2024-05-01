@@ -54,14 +54,14 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 		ShiftItem(item, coll);
 
 		if (!IsUsingModernControls())
-			item->Pose.Orientation.y += ANGLE(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+			item->Pose.Orientation.y += coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE;
 	}
 	else if (coll->CollisionType == CollisionType::Right)
 	{
 		ShiftItem(item, coll);
 
 		if (!IsUsingModernControls())
-			item->Pose.Orientation.y -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+			item->Pose.Orientation.y -= coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE;
 	}
 	else if (coll->LastBridgeItemNumber != NO_VALUE)
 	{
@@ -211,14 +211,14 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 		ShiftItem(item, coll);
 
 		if (!IsUsingModernControls())
-			item->Pose.Orientation.y += ANGLE(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL);
+			item->Pose.Orientation.y += coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL;
 	}
 	else if (coll->CollisionType == CollisionType::Right)
 	{
 		ShiftItem(item, coll);
 
 		if (!IsUsingModernControls())
-			item->Pose.Orientation.y -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL);
+			item->Pose.Orientation.y -= coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL;
 	}
 
 	return false;
