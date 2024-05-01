@@ -2828,8 +2828,14 @@ namespace TEN::Entities::Player
 
 	// Steps:
 	// 1) Prioritise finding valid position on current attractor.
-	// 2) If valid position on CURRENT attractor is UNAVAILABLE/BLOCKED, find nearest connecting attractor at PLAYER'S HAND.
+	// 2) If valid position on CURRENT attractor is UNAVAILABLE/BLOCKED, find nearest connecting attractor.
+	//		Whether centre, left, or right, same thing: probe at next theoretical position (3 total: 1 flat and 2 for corners).
 	// 3) If valid position on CONNECTING attractor (can probe multiple) is UNAVAILABLE/BLOCKED, FAIL the probe.
+	//
+	// Blocks include:
+	// 1) Corner.
+	// 2) End of attractor.
+	// 3) Wall or object.
 	static std::optional<AttractorCollisionData> GetEdgeHangFlatShimmyClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
 																							  bool isGoingRight)
 	{
