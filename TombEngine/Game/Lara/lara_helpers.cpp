@@ -1598,7 +1598,7 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 	case ClimbContextAlignType::OffsetBlend:
 	{
 		// No attractor; break.
-		if (climbContext.AttractorPtr == nullptr)
+		if (climbContext.Attractor == nullptr)
 		{
 			TENLog("SetPlayerClimb() attempted to reference missing attractor for offset blend.", LogLevel::Warning);
 			break;
@@ -1606,7 +1606,7 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 		// Get parent target.
 		auto target = GetAttractorParentTarget(
-			*climbContext.AttractorPtr, climbContext.ChainDistance, item.Pose.Orientation.y,
+			*climbContext.Attractor, climbContext.ChainDistance, item.Pose.Orientation.y,
 			climbContext.RelPosOffset, climbContext.RelOrientOffset);
 
 		// Calculate offsets.
@@ -1621,7 +1621,7 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 	case ClimbContextAlignType::AttractorParent:
 	{
 		// No attractor; break.
-		if (climbContext.AttractorPtr == nullptr)
+		if (climbContext.Attractor == nullptr)
 		{
 			TENLog("SetPlayerClimb() attempted to parent missing attractor.", LogLevel::Warning);
 			break;
@@ -1629,7 +1629,7 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 		// Get parent target.
 		auto target = GetAttractorParentTarget(
-			*climbContext.AttractorPtr, climbContext.ChainDistance, item.Pose.Orientation.y,
+			*climbContext.Attractor, climbContext.ChainDistance, item.Pose.Orientation.y,
 			climbContext.RelPosOffset, climbContext.RelOrientOffset);
 
 		// Calculate relative delta position and orientation.
@@ -1638,7 +1638,7 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 		// Attach player to attractor.
 		player.Context.Attractor.Attach(
-			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
+			item, *climbContext.Attractor, climbContext.ChainDistance,
 			climbContext.RelPosOffset, climbContext.RelOrientOffset,
 			relDeltaPos, relDeltaOrient);
 	}

@@ -50,11 +50,11 @@ namespace TEN::Entities::Player
 		int DestFloorToCeilHeightMin = 0;
 		int DestFloorToCeilHeightMax = 0;
 
-		bool FindHighest		  = false;
-		bool TestSwampDepth		  = false;
-		bool TestEdgeFront		  = false;
-		bool TestDestSpace		  = false;
-		bool TestDestIllegalSlope = false;
+		bool FindHighest		= false;
+		bool TestSwampDepth		= false;
+		bool TestEdgeFront		= false;
+		bool TestDestSpace		= false;
+		bool TestDestSteepFloor = false;
 	};
 
 	struct WallEdgeMountClimbSetupData
@@ -89,16 +89,16 @@ namespace TEN::Entities::Player
 		int DestFloorToCeilHeightMin = 0;
 		int DestFloorToCeilHeightMax = 0;
 
-		bool TestIllegalSlope = false;
+		bool TestSteepFloor = false;
 	};
 
 	struct ClimbContextData
 	{
-		AttractorObject*	AttractorPtr	= nullptr;
-		float		ChainDistance	= 0.0f;
-		Vector3		RelPosOffset	= Vector3::Zero;
-		EulerAngles RelOrientOffset = EulerAngles::Identity;
-		int			TargetStateID	= 0;
+		AttractorObject* Attractor		 = nullptr;
+		float			 ChainDistance	 = 0.0f;
+		Vector3			 RelPosOffset	 = Vector3::Zero;
+		EulerAngles		 RelOrientOffset = EulerAngles::Identity;
+		int				 TargetStateID	 = 0;
 
 		ClimbContextAlignType AlignType = ClimbContextAlignType::None;
 

@@ -221,14 +221,14 @@ namespace TEN::Entities::Player
 		short aspectAngle = Geometry::GetSurfaceAspectAngle(pointColl.GetFloorNormal());
 		short aspectAngleDelta = Geometry::GetShortestAngle(setup.HeadingAngle, aspectAngle);
 
-		// 1) Check for illegal slope below floor (if applicable).
+		// 1) Check for steep floor below floor (if applicable).
 		if (setup.TestSteepFloorBelow &&
 			(pointColl.IsSteepFloor() && abs(aspectAngleDelta) <= SLOPE_ASPECT_ANGLE_DELTA_MAX))
 		{
 			return false;
 		}
 		
-		// 1) Check for illegal slope above floor (if applicable).
+		// 1) Check for steep floor above floor (if applicable).
 		if (setup.TestSteepFloorAbove &&
 			(pointColl.IsSteepFloor() && abs(aspectAngleDelta) >= SLOPE_ASPECT_ANGLE_DELTA_MAX))
 		{
@@ -710,7 +710,7 @@ namespace TEN::Entities::Player
 		if (!pointColl.GetBottomSector().Flags.Monkeyswing)
 			return false;
 
-		// 2) Test for illegal ceiling.
+		// 2) Test for steep ceiling.
 		if (pointColl.IsSteepCeiling())
 			return false;
 
@@ -1107,8 +1107,8 @@ namespace TEN::Entities::Player
 			attracColl.HeadingAngle, coll.Setup.Radius, -CLICK(1));
 
 		// TODO: This check fails for no reason.
-		// 2) Test for illegal slope (if applicable).
-		if (setup.TestIllegalSlope)
+		// 2) Test for steep floor (if applicable).
+		if (setup.TestSteepFloor)
 		{
 			if (pointCollFront.IsSteepFloor())
 				return false;
@@ -1150,7 +1150,7 @@ namespace TEN::Entities::Player
 		{
 			CLICK(3),				  // Edge-to-ceil height lower bound.
 			LARA_HEIGHT, -MAX_HEIGHT, // Destination floor-to-ceil range.
-			false					  // Test illegal slope.
+			false					  // Test steep floor.
 		};
 
 		return TestLedgeClimbSetup(item, coll, SETUP);
@@ -1162,7 +1162,7 @@ namespace TEN::Entities::Player
 		{
 			(int)CLICK(0.6f),				// Edge-to-ceil height lower bound.
 			LARA_HEIGHT_CRAWL, LARA_HEIGHT, // Destination floor-to-ceil range.
-			true							// Test illegal slope.
+			true							// Test steep floor.
 		};
 
 		return TestLedgeClimbSetup(item, coll, SETUP);
@@ -1174,7 +1174,7 @@ namespace TEN::Entities::Player
 		{
 			CLICK(1),				  // Edge-to-ceil height lower bound.
 			LARA_HEIGHT, -MAX_HEIGHT, // Destination floor-to-ceil range.
-			false					  // Test illegal slope.
+			false					  // Test steep floor.
 		};
 
 		return TestLedgeClimbSetup(item, coll, SETUP);
@@ -1233,7 +1233,7 @@ namespace TEN::Entities::Player
 				continue;
 
 			// 2.3) Test if edge slope is illegal.
-			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 2.4) Test edge angle relation.
@@ -1329,8 +1329,8 @@ namespace TEN::Entities::Player
 					continue;
 			}
 
-			// 2.13) Test for illegal slope at destination (if applicable).
-			if (setup.TestDestIllegalSlope)
+			// 2.13) Test for steep floor at destination (if applicable).
+			if (setup.TestDestSteepFloor)
 			{
 				if (setup.TestEdgeFront ? pointCollFront.IsSteepFloor() : pointCollBack.IsSteepFloor())
 					continue;
@@ -1382,7 +1382,7 @@ namespace TEN::Entities::Player
 			false,							   // Test swamp depth.
 			true,							   // Test edge front.
 			true,							   // Test ledge heights.
-			true							   // Test ledge illegal slope.
+			true							   // Test ledge steep floor.
 		};
 		constexpr auto VERTICAL_OFFSET = CLICK(2);
 
@@ -1391,7 +1391,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -1417,7 +1417,7 @@ namespace TEN::Entities::Player
 			false,								  // Test swamp depth.
 			true,								  // Test edge front.
 			true,								  // Test ledge heights.
-			true								  // Test ledge illegal slope.
+			true								  // Test ledge steep floor.
 		};
 		constexpr auto VERTICAL_OFFSET = CLICK(3);
 
@@ -1426,7 +1426,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -1452,7 +1452,7 @@ namespace TEN::Entities::Player
 			false,							// Test swamp depth.
 			true,							// Test edge front.
 			true,							// Test ledge heights.
-			true							// Test ledge illegal slope.
+			true							// Test ledge steep floor.
 		};
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
@@ -1461,7 +1461,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -1487,7 +1487,7 @@ namespace TEN::Entities::Player
 			false,							   // Test swamp depth.
 			true,							   // Test edge front.
 			true,							   // Test ledge heights.
-			true							   // Test ledge illegal slope.
+			true							   // Test ledge steep floor.
 		};
 		constexpr auto VERTICAL_OFFSET = CLICK(2);
 
@@ -1496,7 +1496,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -1522,7 +1522,7 @@ namespace TEN::Entities::Player
 			false,								  // Test swamp depth.
 			true,								  // Test edge front.
 			true,								  // Test ledge heights.
-			true								  // Test ledge illegal slope.
+			true								  // Test ledge steep floor.
 		};
 		constexpr auto VERTICAL_OFFSET = CLICK(3);
 
@@ -1531,7 +1531,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -1560,7 +1560,7 @@ namespace TEN::Entities::Player
 			false,								  // Test swamp depth.
 			true,								  // Test edge front.
 			false,								  // Test ledge heights.
-			false								  // Test ledge illegal slope.
+			false								  // Test ledge steep floor.
 		};
 
 		const auto& player = GetLaraInfo(item);
@@ -1572,7 +1572,7 @@ namespace TEN::Entities::Player
 			int relEdgeHeight = attracColl->Intersection.y - item.Pose.Position.y;
 
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, -relEdgeHeight, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -1597,7 +1597,7 @@ namespace TEN::Entities::Player
 			relCeilHeight >= UPPER_CEIL_BOUND)	// Ceiling height is within upper ceiling bound.
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = nullptr;
+			context.Attractor = nullptr;
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, -relCeilHeight, 0.0f);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -1612,9 +1612,9 @@ namespace TEN::Entities::Player
 	}
 
 	// TODO: pass setup struct.
-	static std::optional<AttractorCollisionData> GetClimbableWallMountAttractorCollisionData(const ItemInfo& item, const CollisionInfo& coll,
-																							 const WallEdgeMountClimbSetupData& setup,
-																							 const std::vector<AttractorCollisionData>& attracColls)
+	static std::optional<AttractorCollisionData> GetClimbableWallMountAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
+																						 const WallEdgeMountClimbSetupData& setup,
+																						 const std::vector<AttractorCollisionData>& attracColls)
 	{
 		const auto& player = GetLaraInfo(item);
 
@@ -1631,8 +1631,8 @@ namespace TEN::Entities::Player
 			if (attracColl.Distance2D > range2D)
 				continue;
 
-			// 3) Test if wall edge slope is illegal.
-			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+			// 3) Test if wall edge is steep.
+			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 4) Test wall edge angle relation.
@@ -1704,11 +1704,11 @@ namespace TEN::Entities::Player
 			return std::nullopt;
 
 		// 2) Get climbable wall mount climb context.
-		auto attracColl = GetClimbableWallMountAttractorCollisionData(item, coll, SETUP, attracColls);
+		auto attracColl = GetClimbableWallMountAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -1808,7 +1808,7 @@ namespace TEN::Entities::Player
 			false,								// Test swamp depth.
 			false,								// Test edge front.
 			true,								// Test ledge heights.
-			true								// Test ledge illegal slope.
+			true								// Test ledge steep floor.
 		};
 
 		// Get crawling vault climb context.
@@ -1816,7 +1816,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
@@ -1842,7 +1842,7 @@ namespace TEN::Entities::Player
 			false,								 // Test swamp depth.
 			false,								 // Test edge front.
 			true,								 // Test ledge heights.
-			false								 // Test ledge illegal slope.
+			false								 // Test ledge steep floor.
 		};
 
 		// Crouch action held; return nullopt.
@@ -1854,7 +1854,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->ChainDistance;
@@ -1880,7 +1880,7 @@ namespace TEN::Entities::Player
 			false,								  // Test swamp depth.
 			true,								  // Test edge front.
 			true,								  // Test ledge heights.
-			true								  // Test ledge illegal slope.
+			true								  // Test ledge steep floor.
 		};
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
@@ -1890,7 +1890,7 @@ namespace TEN::Entities::Player
 
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -1916,7 +1916,7 @@ namespace TEN::Entities::Player
 			false,						   // Test swamp depth.
 			false,						   // Test edge front.
 			true,						   // Test ledge heights.
-			false						   // Test ledge illegal slope.
+			false						   // Test ledge steep floor.
 		};
 
 		// 1) Get edge crawl vault climb context.
@@ -1924,7 +1924,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.ChainDistance = attracColl->ChainDistance;
@@ -1940,7 +1940,7 @@ namespace TEN::Entities::Player
 		int relFloorHeight = pointCollFront.GetFloorHeight() - item.Pose.Position.y;
 
 		// TODO
-		// 2) Get illegal slope crawl vault climb context (special case).
+		// 2) Get steep floor crawl vault climb context (special case).
 		if (pointCollFront.IsSteepFloor() &&
 			true
 			/*relFloorHeight <= SETUP.LowerEdgeBound &&							// Within lower floor bound.
@@ -1954,7 +1954,7 @@ namespace TEN::Entities::Player
 			(probeA.GetCeilingHeight() - y) < -testSetup.GapMin*/)									// Ceiling height is permissive.
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = nullptr;
+			context.Attractor = nullptr;
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3::Zero;
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2033,7 +2033,7 @@ namespace TEN::Entities::Player
 			false,							 // Test swamp depth.
 			true,							 // Test edge front.
 			true,							 // Test ledge heights.
-			true							 // Test ledge illegal slope.
+			true							 // Test ledge steep floor.
 		};
 		constexpr auto VERTICAL_OFFSET = -CLICK(1);
 
@@ -2046,7 +2046,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2072,7 +2072,7 @@ namespace TEN::Entities::Player
 			false,								 // Test swamp depth.
 			true,								 // Test edge front.
 			true,								 // Test ledge heights.
-			true								 // Test ledge illegal slope.
+			true								 // Test ledge steep floor.
 		};
 
 		// Crouch action held and extended crawl moveset enabled; return nullopt.
@@ -2084,7 +2084,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2110,7 +2110,7 @@ namespace TEN::Entities::Player
 			false,							   // Test swamp depth.
 			true,							   // Test edge front.
 			true,							   // Test ledge heights.
-			true							   // Test ledge illegal slope.
+			true							   // Test ledge steep floor.
 		};
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
@@ -2123,7 +2123,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2149,7 +2149,7 @@ namespace TEN::Entities::Player
 			false,							 // Test swamp depth.
 			true,							 // Test edge front.
 			true,							 // Test ledge heights.
-			true							 // Test ledge illegal slope.
+			true							 // Test ledge steep floor.
 		};
 		constexpr auto VERTICAL_OFFSET = -CLICK(1);
 
@@ -2162,7 +2162,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2188,7 +2188,7 @@ namespace TEN::Entities::Player
 			false,								 // Test swamp depth.
 			true,								 // Test edge front.
 			true,								 // Test ledge heights.
-			true								 // Test ledge illegal slope.
+			true								 // Test ledge steep floor.
 		};
 
 		// Extended crawl moveset disabled; return nullopt.
@@ -2200,7 +2200,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2226,7 +2226,7 @@ namespace TEN::Entities::Player
 			false,							// Test swamp depth.
 			true,							// Test edge front.
 			true,							// Test ledge heights.
-			true							// Test ledge illegal slope.
+			true							// Test ledge steep floor.
 		};
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
@@ -2239,7 +2239,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2263,11 +2263,11 @@ namespace TEN::Entities::Player
 		};
 
 		// Get climbable wall mount climb context.
-		auto attracColl = GetClimbableWallMountAttractorCollisionData(item, coll, SETUP, attracColls);
+		auto attracColl = GetClimbableWallMountAttractorCollision(item, coll, SETUP, attracColls);
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = nullptr;
+			context.Attractor = nullptr;
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2413,8 +2413,8 @@ namespace TEN::Entities::Player
 			if (attracColl.Distance2D > range2D)
 				continue;
 
-			// 3) Test if edge slope is illegal.
-			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+			// 3) Test if edge slope is steep.
+			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 4) Test edge angle relation.
@@ -2474,7 +2474,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
@@ -2512,7 +2512,7 @@ namespace TEN::Entities::Player
 				LS_STAND_EDGE_HANG_DESCENT_BACK_FLIP : LS_STAND_EDGE_HANG_DESCENT_BACK;
 
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2546,7 +2546,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
@@ -2580,7 +2580,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2624,8 +2624,8 @@ namespace TEN::Entities::Player
 			if (attracColl.Distance2D > range2D)
 				continue;
 
-			// 3) Test if edge slope is illegal.
-			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+			// 3) Test if edge slope is steep.
+			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 4) Test edge angle relation.
@@ -2741,7 +2741,7 @@ namespace TEN::Entities::Player
 				LS_EDGE_HANG_SWING_CATCH : LS_EDGE_HANG_IDLE;
 
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2790,7 +2790,7 @@ namespace TEN::Entities::Player
 
 			// Get monkey swing catch climb context.
 			auto context = ClimbContextData{};
-			context.AttractorPtr = nullptr;
+			context.Attractor = nullptr;
 			context.ChainDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, item.Pose.Position.y - (pointColl.GetCeilingHeight() + LARA_HEIGHT_MONKEY), 0.0f);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -2960,8 +2960,8 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// 3.2) Test if edge slope is illegal.
-			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+			// 3.2) Test if edge slope is steep.
+			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 3.3) Test if connecting edge heading angle is within cornering threshold.
@@ -3007,8 +3007,8 @@ namespace TEN::Entities::Player
 				continue;
 			}
 
-			// 2) Test if edge slope is illegal.
-			if (abs(attracColl.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+			// 2) Test if edge slope is steep.
+			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 3) Test edge angle relation.
@@ -3060,8 +3060,8 @@ namespace TEN::Entities::Player
 					if (attracColl2.Attractor->GetType() != AttractorType::WallEdge)
 						continue;
 
-					// 2) Test if edge slope is illegal.
-					if (abs(attracColl2.SlopeAngle) >= ILLEGAL_FLOOR_SLOPE_ANGLE)
+					// 2) Test if edge slope is steep.
+					if (abs(attracColl2.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
 						continue;
 
 					// 3) Test edge angle relation.
@@ -3109,7 +3109,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -3140,7 +3140,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -3163,7 +3163,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -3189,7 +3189,7 @@ namespace TEN::Entities::Player
 				Vector3(-coll.Setup.Radius, VERTICAL_OFFSET, -coll.Setup.Radius * 2); // TODO
 
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = relPosOffset;
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -3233,7 +3233,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -3254,7 +3254,7 @@ namespace TEN::Entities::Player
 			short deltaHeadingAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, attracColl->HeadingAngle);
 
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.TargetStateID = (deltaHeadingAngle >= ANGLE(0.0f)) ? LS_EDGE_HANG_SHIMMY_90_OUTER_RIGHT : LS_EDGE_HANG_SHIMMY_90_INNER_RIGHT;
 
@@ -3321,7 +3321,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -3356,7 +3356,7 @@ namespace TEN::Entities::Player
 		if (attracColl.has_value())
 		{
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
@@ -3399,7 +3399,7 @@ namespace TEN::Entities::Player
 
 		// 3) Create and return climb context.
 		auto context = ClimbContextData{};
-		context.AttractorPtr = player.Context.Attractor.Ptr;
+		context.Attractor = player.Context.Attractor.Ptr;
 		context.ChainDistance = player.Context.Attractor.ChainDistance;
 		context.RelPosOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
 		context.RelOrientOffset = EulerAngles::Identity;
@@ -3427,7 +3427,7 @@ namespace TEN::Entities::Player
 		{
 			// Create and return climb context.
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(90.0f), 0);
@@ -3444,7 +3444,7 @@ namespace TEN::Entities::Player
 		{
 			// Create and return climb context.
 			auto context = ClimbContextData{};
-			context.AttractorPtr = attracColl->Attractor;
+			context.Attractor = attracColl->Attractor;
 			context.ChainDistance = attracColl->ChainDistance;
 			context.RelPosOffset = Vector3(coll.Setup.Radius, coll.Setup.Height, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(-90.0f), 0);

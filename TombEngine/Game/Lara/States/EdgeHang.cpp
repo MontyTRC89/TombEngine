@@ -75,7 +75,7 @@ namespace TEN::Entities::Player
 		auto& player = GetLaraInfo(item);
 
 		// No attractor; detach.
-		if (climbContext.AttractorPtr == nullptr)
+		if (climbContext.Attractor == nullptr)
 		{
 			player.Control.IsHanging = false;
 			player.Context.Attractor.Detach(item);
@@ -105,7 +105,7 @@ namespace TEN::Entities::Player
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
 		player.Context.Attractor.Update(
-			item, *climbContext.AttractorPtr, climbContext.ChainDistance,
+			item, *climbContext.Attractor, climbContext.ChainDistance,
 			relPosOffset, relOrientOffset);
 	}
 	
