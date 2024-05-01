@@ -1120,8 +1120,22 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::RenderTitle()
+	void Renderer::RenderTitle(float interpolationFactor)
 	{
+		_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpolationFactor);
+		_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpolationFactor);
+		_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpolationFactor);
+		_gameCamera.Camera.Projection = Matrix::Lerp(_oldGameCamera.Camera.Projection, _currentGameCamera.Camera.Projection, interpolationFactor);
+		_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
+		_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
+		_gameCamera.Camera.Frustum = _currentGameCamera.Camera.Frustum;
+		_gameCamera.Camera.ViewSize = _currentGameCamera.Camera.ViewSize;
+		_gameCamera.Camera.InvViewSize = _currentGameCamera.Camera.InvViewSize;
+		_gameCamera.Camera.NearPlane = _currentGameCamera.Camera.NearPlane;
+		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
+
+		_interpolationFactor = interpolationFactor;
+
 		RenderScene(&_dumpScreenRenderTarget, false, _gameCamera);
 
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);

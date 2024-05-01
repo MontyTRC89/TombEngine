@@ -115,21 +115,18 @@ short NextFxFree;
 
 int ControlPhaseTime;
 
-int DrawPhase(bool isTitle, float interpolateFactor)
+void DrawPhase(bool isTitle, float interpolationFactor)
 {
 	if (isTitle)
 	{
-		g_Renderer.RenderTitle();
+		g_Renderer.RenderTitle(interpolationFactor);
 	}
 	else
 	{
-		g_Renderer.Render(interpolateFactor);
+		g_Renderer.Render(interpolationFactor);
 	}
 
 	g_Renderer.Lock();
-
-	//Camera.numberFrames = g_Renderer.Synchronize();
-	return Camera.numberFrames;
 }
 
 GameStatus ControlPhase(int numFrames)
@@ -155,9 +152,7 @@ GameStatus ControlPhase(int numFrames)
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 
-	// Save current state to old variables for interpolation
 	SetupInterpolation();
-	g_Renderer.SaveOldState();
 
 	// Controls are polled before OnLoop, so input data could be
 	// overwritten by script API methods.
@@ -616,8 +611,8 @@ GameStatus DoGameLoop(int levelIndex)
 				if (status != GameStatus::Normal)
 					break;
 
-				float interpolateFactor = 0.0f;
-				DrawPhase(!levelIndex, interpolateFactor);
+				float interpolationFactor = 0.0f;
+				DrawPhase(!levelIndex, interpolationFactor);
 				drawCalls++;
 			}
 		}
@@ -627,8 +622,8 @@ GameStatus DoGameLoop(int levelIndex)
 			if (status != GameStatus::Normal)
 				break;
 
-			float interpolateFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
-			DrawPhase(!levelIndex, interpolateFactor);
+			float interpolationFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
+			DrawPhase(!levelIndex, interpolationFactor);
 			drawCalls++;
 		}
 	}

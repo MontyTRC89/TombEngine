@@ -3069,15 +3069,15 @@ namespace TEN::Renderer
 		_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	}
 
-	void Renderer::Render(float interpolateFactor)
+	void Renderer::Render(float interpolationFactor)
 	{
 		//RenderToCubemap(reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
 	
 		// Interpolate camera
-		_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpolateFactor);
-		_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpolateFactor);
-		_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpolateFactor);
-		_gameCamera.Camera.Projection = Matrix::Lerp(_oldGameCamera.Camera.Projection, _currentGameCamera.Camera.Projection, interpolateFactor);
+		_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpolationFactor);
+		_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpolationFactor);
+		_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpolationFactor);
+		_gameCamera.Camera.Projection = Matrix::Lerp(_oldGameCamera.Camera.Projection, _currentGameCamera.Camera.Projection, interpolationFactor);
 		_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
 		_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
 		_gameCamera.Camera.Frustum=_currentGameCamera.Camera.Frustum;
@@ -3086,7 +3086,7 @@ namespace TEN::Renderer
 		_gameCamera.Camera.NearPlane = _currentGameCamera.Camera.NearPlane;
 		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
 
-		_interpolationFactor = interpolateFactor;
+		_interpolationFactor = interpolationFactor;
 
 		RenderScene(&_backBuffer, true, _gameCamera);
 

@@ -749,7 +749,7 @@ namespace TEN::Gui
 				}
 				else
 				{
-					g_Renderer.RenderTitle();
+					g_Renderer.RenderTitle(0);
 					Camera.numberFrames = g_Renderer.Synchronize();
 					int numFrames = Camera.numberFrames;
 					ControlPhase(numFrames);

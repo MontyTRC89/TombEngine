@@ -587,8 +587,8 @@ namespace TEN::Renderer
 		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
 		void Initialize(int w, int h, bool windowed, HWND handle);
-		void Render(float interpolateFactor);
-		void RenderTitle();
+		void Render(float interpolationFactor);
+		void RenderTitle(float interpolationFactor);
 		void Lock();
 		bool PrepareDataForTheRenderer();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
