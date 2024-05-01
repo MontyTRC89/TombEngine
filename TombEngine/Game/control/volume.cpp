@@ -49,7 +49,7 @@ namespace TEN::Control::Volumes
 		}
 	}
 
-	BoundingOrientedBox ConstructRoughBox(ItemInfo& item, const CollisionSetup& coll)
+	BoundingOrientedBox ConstructRoughBox(ItemInfo& item, const CollisionSetupData& coll)
 	{
 		auto pBounds = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 		auto pos = Vector3(item.Pose.Position.x, pBounds.Center.y, item.Pose.Position.z);
@@ -246,7 +246,7 @@ namespace TEN::Control::Volumes
 		TestVolumes(roomNumber, box, ActivatorFlags::Static, mesh);
 	}
 
-	void TestVolumes(short itemNumber, const CollisionSetup* coll)
+	void TestVolumes(short itemNumber, const CollisionSetupData* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		auto box = (coll != nullptr) ?

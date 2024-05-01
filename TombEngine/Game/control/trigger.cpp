@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
@@ -24,6 +25,7 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 
@@ -313,12 +315,12 @@ void RefreshCamera(short type, short* data)
 
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 {
-	auto bottomBlock = GetCollision(x, y, z, floor->RoomNumber).BottomBlock; 
+	const auto& bottomSector = GetPointCollision(Vector3i(x, y, z), floor->RoomNumber).GetBottomSector(); 
 
-	if (bottomBlock->TriggerIndex == NO_VALUE)
+	if (bottomSector.TriggerIndex == NO_VALUE)
 		return nullptr;
 
-	return &g_Level.FloorData[bottomBlock->TriggerIndex];
+	return &g_Level.FloorData[bottomSector.TriggerIndex];
 }
 
 short* GetTriggerIndex(ItemInfo* item)
@@ -508,8 +510,8 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
 		{
-			auto pointColl = GetCollision(floor, x, y, z);
-			if (pointColl.Position.Floor == y && pointColl.Position.Bridge == NO_VALUE)
+			auto pointColl = GetPointCollision(Vector3i(x, y, z), floor->RoomNumber);
+			if (pointColl.GetFloorHeight() == y && pointColl.GetFloorBridgeItemNumber() == NO_VALUE)
 				break;
 		}
 			return;
@@ -852,8 +854,8 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ItemInfo* item)
 {
-	auto pointColl = GetCollision(item);
-	auto& sector = *GetCollision(item).BottomBlock;
+	auto pointColl = GetPointCollision(*item);
+	auto& sector = GetPointCollision(*item).GetBottomSector();
 
 	bool isPlayer = item->IsLara();
 
@@ -877,7 +879,7 @@ void ProcessSectorFlags(ItemInfo* item)
 	}
 
 	// Burn or drown item.
-	if (sector.Flags.Death && item->Pose.Position.y == item->Floor && pointColl.Position.Bridge == NO_VALUE)
+	if (sector.Flags.Death && item->Pose.Position.y == item->Floor && pointColl.GetFloorBridgeItemNumber() == NO_VALUE)
 	{
 		if (isPlayer)
 		{
@@ -887,7 +889,7 @@ void ProcessSectorFlags(ItemInfo* item)
 				player.Control.WaterStatus != WaterStatus::Dry)
 			{
 				// Check floor material.
-				auto material = sector.GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+				auto material = sector.GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true);
 				if (material == MaterialType::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded) // HACK: Allow both lava and rapids in same level.
 				{
 					KayakLaraRapidsDrown(item);
@@ -900,7 +902,7 @@ void ProcessSectorFlags(ItemInfo* item)
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 		{
-			auto material = sector.GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+			auto material = sector.GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true);
 			if (material == MaterialType::Water || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sector.RoomNumber))
 			{
 				// TODO: Implement correct rapids behaviour for other objects.

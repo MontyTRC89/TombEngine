@@ -2,13 +2,14 @@
 #include "Game/misc.h"
 
 #include "Game/animation.h"
+#include "Game/collision/Point.h"
 #include "Game/Lara/lara.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-using std::vector;
+using namespace TEN::Collision::Point;
 
 CreatureInfo* GetCreatureInfo(ItemInfo* item)
 {
@@ -43,24 +44,26 @@ void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
 bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, bool canFloat)
 {
 	auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, dist);
-	auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, dist);
+	auto pointColl = GetPointCollision(item.Pose.Position, item.RoomNumber, dir, dist);
 	int height = GameBoundingBox(&item).GetHeight();
 
+	// TODO: Use floor normal directly.
+	auto floorTilt = GetSurfaceTilt(pointColl.GetFloorNormal(), true);
+
 	// Test for wall.
-	if (pointColl.Block->IsWall(projectedPos.x, projectedPos.z))
+	if (pointColl.GetSector().IsWall(projectedPos.x, projectedPos.z))
 		return false;
 
 	// Test for slippery slope.
-	if (pointColl.Position.FloorSlope)
+	if (pointColl.IsSteepFloor())
 		return false;
 
 	// Flat floor.
-	if ((abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0))
+	if ((abs(floorTilt.x) == 0 && abs(floorTilt.y) == 0))
 	{
 		// Test for step.
-		int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
-
-		if (relFloorHeight >= CLICK(1) && item.Pose.Position.y >= pointColl.Position.Floor && canFloat)
+		int relFloorHeight = abs(pointColl.GetFloorHeight() - item.Pose.Position.y);
+		if (relFloorHeight >= CLICK(1) && item.Pose.Position.y >= pointColl.GetFloorHeight() && canFloat)
 		{
 			return false;
 		}		
@@ -73,7 +76,7 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, boo
 	else
 	{
 		// Half block.
-		int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
+		int relFloorHeight = abs(pointColl.GetFloorHeight() - item.Pose.Position.y);
 		if (relFloorHeight > CLICK(1) && canFloat)
 		{
 			return false;
@@ -84,20 +87,20 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, boo
 		}
 
 		short slopeAngle = ANGLE(0.0f);
-		if (pointColl.FloorTilt.x > 0)
+		if (floorTilt.x > 0)
 		{
 			slopeAngle = ANGLE(-90.0f);
 		}
-		else if (pointColl.FloorTilt.x < 0)
+		else if (floorTilt.x < 0)
 		{
 			slopeAngle = ANGLE(90.0f);
 		}
 
-		if (pointColl.FloorTilt.y > 0 && pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
+		if (floorTilt.y > 0 && floorTilt.y > abs(floorTilt.x))
 		{
 			slopeAngle = ANGLE(180.0f);
 		}
-		else if (pointColl.FloorTilt.y < 0 && -pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
+		else if (floorTilt.y < 0 && -floorTilt.y > abs(floorTilt.x))
 		{
 			slopeAngle = ANGLE(0.0f);
 		}
@@ -111,11 +114,11 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, boo
 	}
 
 	// Check for diagonal split.
-	if (pointColl.Position.DiagonalStep)
+	if (pointColl.IsDiagonalFloorStep())
 		return false;
 
 	// Test ceiling height.
-	int relCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+	int relCeilHeight = abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight());
 
 	if (canFloat)
 	{
@@ -129,18 +132,18 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, boo
 	}
 
 	// Check for blocked grey box.
-	if (g_Level.Boxes[pointColl.Block->Box].flags & BLOCKABLE)
+	if (g_Level.Boxes[pointColl.GetSector().Box].flags & BLOCKABLE)
 	{
-		if (g_Level.Boxes[pointColl.Block->Box].flags & BLOCKED)
+		if (g_Level.Boxes[pointColl.GetSector().Box].flags & BLOCKED)
 			return false;
 	}
 
 	// Check for inaccessible sector.
-	if (pointColl.Block->Box == NO_VALUE)
+	if (pointColl.GetSector().Box == NO_VALUE)
 		return false;
 
 	// Check for stopper flag.
-	if (pointColl.Block->Stopper)
+	if (pointColl.GetSector().Stopper)
 		return false;
 
 	return true;
