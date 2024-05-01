@@ -389,6 +389,10 @@ namespace TEN::Collision::Los
 			// 7.1) Clip wall.
 			if (i != 0 && i != trace.Intercepts.size())
 			{
+				// TODO
+				/*auto pointColl = GetPointCollision(intercept.Position, intercept.Sector->RoomNumber);
+				if (intercept.Position.y > pointColl.GetFloorHeight() ||
+					intercept.Position.y < pointColl.GetCeilingHeight())*/
 				if (intercept.Position.y > GetFloorHeight(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z) ||
 					intercept.Position.y < GetCeiling(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z))
 				{
