@@ -102,7 +102,7 @@ namespace TEN::Entities::Traps
 				if (pointColl.GetRoomNumber() != item.RoomNumber)
 					ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
-				if (!IsNextSectorValid(item, forwardDir, BLOCK(0.5f)))
+				if (!IsNextSectorValid(item, forwardDir, BLOCK(0.5f), true))
 				{
 					switch (headingAngle)
 					{

@@ -53,14 +53,6 @@ static constexpr char ScriptReserved_DisplayStringSetScale[]		= "SetScale";
 static constexpr char ScriptReserved_DisplayStringSetColor[]		= "SetColor";
 static constexpr char ScriptReserved_DisplaySpriteDraw[]			= "Draw";
 
-// Built-in LevelFuncs
-static constexpr char ScriptReserved_OnStart[]			= "OnStart";
-static constexpr char ScriptReserved_OnLoad[]			= "OnLoad";
-static constexpr char ScriptReserved_OnLoop[]			= "OnLoop";
-static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase"; // DEPRECATED
-static constexpr char ScriptReserved_OnSave[]			= "OnSave";
-static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";
-
 static constexpr char ScriptReserved_EndReasonExitToTitle[]		= "EXITTOTITLE";
 static constexpr char ScriptReserved_EndReasonLevelComplete[]	= "LEVELCOMPLETE";
 static constexpr char ScriptReserved_EndReasonLoadGame[]		= "LOADGAME";
@@ -81,15 +73,25 @@ static constexpr char ScriptReserved_PostLoop[]			= "POSTLOOP";
 static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
 static constexpr char ScriptReserved_PostControlPhase[]	= "POSTCONTROLPHASE";
 
-// Event types
-static constexpr char ScriptReserved_EventOnEnter[]	= "ENTER";
-static constexpr char ScriptReserved_EventOnInside[] = "INSIDE";
-static constexpr char ScriptReserved_EventOnLeave[]	= "LEAVE";
-static constexpr char ScriptReserved_EventOnLoad[] = "LOAD";
-static constexpr char ScriptReserved_EventOnSave[] = "SAVE";
-static constexpr char ScriptReserved_EventOnStart[] = "START";
-static constexpr char ScriptReserved_EventOnEnd[] = "END";
-static constexpr char ScriptReserved_EventOnLoop[] = "LOOP";
+// Built-in LevelFuncs
+static constexpr char ScriptReserved_OnStart[]			= "OnStart";
+static constexpr char ScriptReserved_OnLoad[]			= "OnLoad";
+static constexpr char ScriptReserved_OnLoop[]			= "OnLoop";
+static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase"; // DEPRECATED
+static constexpr char ScriptReserved_OnSave[]			= "OnSave";
+static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";
+static constexpr char ScriptReserved_OnUseItem[]		= "OnUseItem";
+
+// Event types (volume events + global events)
+static constexpr char ScriptReserved_EventOnEnter[]		= "ENTER";
+static constexpr char ScriptReserved_EventOnInside[]	= "INSIDE";
+static constexpr char ScriptReserved_EventOnLeave[]		= "LEAVE";
+static constexpr char ScriptReserved_EventOnStart[]		= "START";
+static constexpr char ScriptReserved_EventOnLoad[]		= "LOAD";
+static constexpr char ScriptReserved_EventOnLoop[]		= "LOOP";
+static constexpr char ScriptReserved_EventOnSave[]		= "SAVE";
+static constexpr char ScriptReserved_EventOnEnd[]		= "END";
+static constexpr char ScriptReserved_EventOnUseItem[]	= "USEITEM";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";
@@ -259,9 +261,9 @@ static constexpr char ScriptReserved_GiveInvItem[]					= "GiveItem";
 static constexpr char ScriptReserved_TakeInvItem[]					= "TakeItem";
 static constexpr char ScriptReserved_GetInvItemCount[]				= "GetItemCount";
 static constexpr char ScriptReserved_SetInvItemCount[]				= "SetItemCount";
-static constexpr char ScriptReserved_GetChosenItem[]				= "GetChosenItem";
-static constexpr char ScriptReserved_SetChosenItem[]				= "SetChosenItem";
-static constexpr char ScriptReserved_ClearChosenItem[]				= "ClearChosenItem";
+static constexpr char ScriptReserved_GetUsedItem[]					= "GetUsedItem";
+static constexpr char ScriptReserved_SetUsedItem[]					= "SetUsedItem";
+static constexpr char ScriptReserved_ClearUsedItem[]				= "ClearUsedItem";
 static constexpr char ScriptReserved_GetMoveableByName[]			= "GetMoveableByName";
 static constexpr char ScriptReserved_GetStaticByName[]				= "GetStaticByName";
 static constexpr char ScriptReserved_GetMoveablesBySlot[]			= "GetMoveablesBySlot";

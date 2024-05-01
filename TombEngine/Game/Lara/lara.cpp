@@ -154,7 +154,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					}
 					else if (item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
-						SetAnimation(item, LA_SWANDIVE_DIVE);
+						SetAnimation(item, LA_SWANDIVE_FREEFALL_DIVE);
 						item->Animation.Velocity.y /= 2;
 						item->Pose.Orientation.x = ANGLE(-85.0f);
 						player.Control.HandStatus = HandStatus::Free;
