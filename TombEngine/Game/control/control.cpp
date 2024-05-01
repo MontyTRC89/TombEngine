@@ -153,6 +153,7 @@ GameStatus ControlPhase(int numFrames)
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 
 	SetupInterpolation();
+	g_Renderer.SaveOldState();
 
 	// Controls are polled before OnLoop, so input data could be
 	// overwritten by script API methods.
