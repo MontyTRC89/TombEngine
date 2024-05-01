@@ -367,10 +367,15 @@ namespace TEN::Collision::Los
 		// 6) Set sector pointers.
 		int probeRoomNumber = roomNumber;
 		for (auto& intercept : trace.Intercepts)
-			intercept.Sector = GetFloor(intercept.Position.x, intercept.Position.y, intercept.Position.z, (short*)&probeRoomNumber);
+		{
+			auto pointColl = GetPointCollision(intercept.Position, probeRoomNumber);
+
+			intercept.Sector = &pointColl.GetSector();
+			probeRoomNumber = pointColl.GetRoomNumber();
+		}
 
 		//debug
-		float offset = CLICK(0.25f);
+		auto offset = Vector3(0, CLICK(0.1f), 0);
 		auto doOffset = false;
 
 		const FloorInfo* prevSector = nullptr;
@@ -383,20 +388,18 @@ namespace TEN::Collision::Los
 			const auto& intercept = trace.Intercepts[i];
 
 			//debug
-			auto pos2D = g_Renderer.Get2DPosition(intercept.Position.ToVector3() + Vector3(0, doOffset ? offset : 0, 0));
+			auto pos2D = g_Renderer.Get2DPosition(intercept.Position.ToVector3() + (offset * (doOffset ? 1 : -1)));
 			if (pos2D.has_value())
 				g_Renderer.AddDebugString(std::to_string(intercept.Sector->RoomNumber), *pos2D, Color(1, 1, 1), 1, 0, RendererDebugPage::None);
 			doOffset = !doOffset;
+			g_Renderer.AddDebugTarget(intercept.Position.ToVector3(), Quaternion::Identity, 20, Color(1, 0, 0));
 
 			// 7.1) Clip wall.
 			if (i != 0 && i != trace.Intercepts.size())
 			{
-				// TODO
-				/*auto pointColl = GetPointCollision(intercept.Position, intercept.Sector->RoomNumber);
+				auto pointColl = GetPointCollision(intercept.Position, intercept.Sector->RoomNumber);
 				if (intercept.Position.y > pointColl.GetFloorHeight() ||
-					intercept.Position.y < pointColl.GetCeilingHeight())*/
-				if (intercept.Position.y > GetFloorHeight(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z) ||
-					intercept.Position.y < GetCeiling(intercept.Sector, intercept.Position.x, intercept.Position.y, intercept.Position.z))
+					intercept.Position.y < pointColl.GetCeilingHeight())
 				{
 					float intersectDist = Vector3::Distance(ray.position, intercept.Position.ToVector3());
 					if (intersectDist < closestDist)
