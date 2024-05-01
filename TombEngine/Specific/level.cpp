@@ -703,7 +703,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 	auto corner2 = sector.Position + REL_CORNER_2;
 	auto corner3 = sector.Position + REL_CORNER_3;
 
-	auto tris = std::vector<TriangleMesh>{};
+	auto tris = std::vector<CollisionTriangle>{};
 
 	// Collect triangles.
 	bool isFloor = true;
@@ -720,7 +720,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 				if (surface->SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
 				{
 					// Surface triangle 0.
-					auto tri0 = TriangleMesh(
+					auto tri0 = CollisionTriangle(
 						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
 						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
 						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
@@ -729,7 +729,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 						tris.push_back(tri0);
 
 					// Surface triangle 1.
-					auto tri1 = TriangleMesh(
+					auto tri1 = CollisionTriangle(
 						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
 						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
 						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
@@ -740,27 +740,27 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 					// Diagonal wall triangles.
 					if (tri0.GetVertices()[0] != tri1.GetVertices()[0] && tri0.GetVertices()[2] != tri1.GetVertices()[1])
 					{
-						auto tri2 = TriangleMesh(tri0.GetVertices()[0], tri1.GetVertices()[0], tri0.GetVertices()[2]);
+						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[0], tri0.GetVertices()[2]);
 						tris.push_back(tri2);
 
-						auto tri3 = TriangleMesh(tri1.GetVertices()[0], tri0.GetVertices()[2], tri1.GetVertices()[1]);
+						auto tri3 = CollisionTriangle(tri1.GetVertices()[0], tri0.GetVertices()[2], tri1.GetVertices()[1]);
 						tris.push_back(tri3);
 					}
 					else if (tri0.GetVertices()[0] != tri1.GetVertices()[0] && tri0.GetVertices()[2] == tri1.GetVertices()[1])
 					{
-						auto tri2 = TriangleMesh(tri0.GetVertices()[0], tri1.GetVertices()[0], tri0.GetVertices()[2]);
+						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[0], tri0.GetVertices()[2]);
 						tris.push_back(tri2);
 					}
 					else if (tri0.GetVertices()[2] == tri1.GetVertices()[1] && tri0.GetVertices()[2] != tri1.GetVertices()[1])
 					{
-						auto tri2 = TriangleMesh(tri1.GetVertices()[0], tri0.GetVertices()[2], tri1.GetVertices()[1]);
+						auto tri2 = CollisionTriangle(tri1.GetVertices()[0], tri0.GetVertices()[2], tri1.GetVertices()[1]);
 						tris.push_back(tri2);
 					}
 				}
 				else if (surface->SplitAngle == SectorSurfaceData::SPLIT_ANGLE_1)
 				{
 					// Surface triangle 0.
-					auto tri0 = TriangleMesh(
+					auto tri0 = CollisionTriangle(
 						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
 						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y),
 						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y));
@@ -769,7 +769,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 						tris.push_back(tri0);
 
 					// Surface triangle 1.
-					auto tri1 = TriangleMesh(
+					auto tri1 = CollisionTriangle(
 						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
 						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y),
 						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
@@ -780,20 +780,20 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 					// Diagonal wall triangles.
 					if (tri1.GetVertices()[1] != tri0.GetVertices()[0] && tri1.GetVertices()[2] != tri0.GetVertices()[2])
 					{
-						auto tri2 = TriangleMesh(tri1.GetVertices()[1], tri0.GetVertices()[0], tri1.GetVertices()[2]);
+						auto tri2 = CollisionTriangle(tri1.GetVertices()[1], tri0.GetVertices()[0], tri1.GetVertices()[2]);
 						tris.push_back(tri2);
 
-						auto tri3 = TriangleMesh(tri0.GetVertices()[0], tri1.GetVertices()[2], tri0.GetVertices()[2]);
+						auto tri3 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[2], tri0.GetVertices()[2]);
 						tris.push_back(tri3);
 					}
 					else if (tri1.GetVertices()[1] != tri0.GetVertices()[0] && tri1.GetVertices()[2] == tri0.GetVertices()[2])
 					{
-						auto tri2 = TriangleMesh(tri1.GetVertices()[1], tri0.GetVertices()[0], tri1.GetVertices()[2]);
+						auto tri2 = CollisionTriangle(tri1.GetVertices()[1], tri0.GetVertices()[0], tri1.GetVertices()[2]);
 						tris.push_back(tri2);
 					}
 					else if (tri1.GetVertices()[2] == tri0.GetVertices()[2] && tri1.GetVertices()[2] != tri0.GetVertices()[2])
 					{
-						auto tri2 = TriangleMesh(tri0.GetVertices()[0], tri1.GetVertices()[2], tri0.GetVertices()[2]);
+						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[2], tri0.GetVertices()[2]);
 						tris.push_back(tri2);
 					}
 				}
@@ -804,7 +804,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 			// Surface triangle 0.
 			if (!isTri0Portal)
 			{
-				auto tri0 = TriangleMesh(
+				auto tri0 = CollisionTriangle(
 					Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
 					Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
 					Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
@@ -814,7 +814,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 			// Surface triangle 1.
 			if (!isTri1Portal)
 			{
-				auto tri1 = TriangleMesh(
+				auto tri1 = CollisionTriangle(
 					Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
 					Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
 					Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));

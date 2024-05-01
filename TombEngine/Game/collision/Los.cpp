@@ -264,20 +264,20 @@ namespace TEN::Collision::Los
 		corners[7] -= offset;
 
 		// Calculate and return collision mesh.
-		auto tris = std::vector<TriangleMesh>
+		auto tris = std::vector<CollisionTriangle>
 		{
-			TriangleMesh(corners[0], corners[1], corners[4]),
-			TriangleMesh(corners[1], corners[4], corners[5]),
-			TriangleMesh(corners[2], corners[3], corners[6]),
-			TriangleMesh(corners[3], corners[6], corners[7]),
-			TriangleMesh(corners[0], corners[1], corners[2]),
-			TriangleMesh(corners[0], corners[2], corners[3]),
-			TriangleMesh(corners[0], corners[3], corners[4]),
-			TriangleMesh(corners[3], corners[4], corners[7]),
-			TriangleMesh(corners[1], corners[2], corners[5]),
-			TriangleMesh(corners[2], corners[5], corners[6]),
-			TriangleMesh(corners[4], corners[5], corners[6]),
-			TriangleMesh(corners[4], corners[6], corners[7])
+			CollisionTriangle(corners[0], corners[1], corners[4]),
+			CollisionTriangle(corners[1], corners[4], corners[5]),
+			CollisionTriangle(corners[2], corners[3], corners[6]),
+			CollisionTriangle(corners[3], corners[6], corners[7]),
+			CollisionTriangle(corners[0], corners[1], corners[2]),
+			CollisionTriangle(corners[0], corners[2], corners[3]),
+			CollisionTriangle(corners[0], corners[3], corners[4]),
+			CollisionTriangle(corners[3], corners[4], corners[7]),
+			CollisionTriangle(corners[1], corners[2], corners[5]),
+			CollisionTriangle(corners[2], corners[5], corners[6]),
+			CollisionTriangle(corners[4], corners[5], corners[6]),
+			CollisionTriangle(corners[4], corners[6], corners[7])
 		};
 		return CollisionMesh(tris);
 	}
