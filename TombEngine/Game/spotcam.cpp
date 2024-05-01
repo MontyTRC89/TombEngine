@@ -484,7 +484,7 @@ void CalculateSpotCameras()
 		}
 
 		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
-		if (outsideRoom == NO_ROOM)
+		if (outsideRoom == NO_VALUE)
 		{
 			Camera.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
 			short roomNumber = Camera.RoomNumber;

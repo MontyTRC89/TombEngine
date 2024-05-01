@@ -68,7 +68,7 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		auto& creature = *GetCreatureInfo(&item);
 
-		return (creature.Enemy && creature.Enemy->BoxNumber != NO_BOX &&
+		return (creature.Enemy && creature.Enemy->BoxNumber != NO_VALUE &&
 			(g_Level.Boxes[creature.Enemy->BoxNumber].flags & BLOCKABLE));
 	}
 

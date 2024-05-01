@@ -38,8 +38,8 @@ using namespace TEN::Utils;
 const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 {
 	ID_EXPANDING_PLATFORM,
-	ID_SQUISHY_BLOCK1,
-	ID_SQUISHY_BLOCK2,
+	ID_SQUISHY_BLOCK_HORIZONTAL,
+	ID_SQUISHY_BLOCK_VERTICAL,
 
 	ID_FALLING_BLOCK,
 	ID_FALLING_BLOCK2,
@@ -830,9 +830,6 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 
 void ReadRooms()
 {
-	constexpr auto ILLEGAL_FLOOR_SLOPE_ANGLE   = ANGLE(36.0f);
-	constexpr auto ILLEGAL_CEILING_SLOPE_ANGLE = ANGLE(45.0f);
-
 	int roomCount = ReadInt32();
 	TENLog("Rooms: " + std::to_string(roomCount), LogLevel::Info);
 
@@ -948,16 +945,16 @@ void ReadRooms()
 				sector.Stopper = (bool)ReadInt32();
 
 				sector.FloorSurface.SplitAngle = FROM_RAD(ReadFloat());
-				sector.FloorSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
-				sector.FloorSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+				sector.FloorSurface.Triangles[0].SteepSlopeAngle = DEFAULT_STEEP_FLOOR_SLOPE_ANGLE;
+				sector.FloorSurface.Triangles[1].SteepSlopeAngle = DEFAULT_STEEP_FLOOR_SLOPE_ANGLE;
 				sector.FloorSurface.Triangles[0].PortalRoomNumber = ReadInt32();
 				sector.FloorSurface.Triangles[1].PortalRoomNumber = ReadInt32();
 				sector.FloorSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
 				sector.FloorSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
 
 				sector.CeilingSurface.SplitAngle = FROM_RAD(ReadFloat());
-				sector.CeilingSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
-				sector.CeilingSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+				sector.CeilingSurface.Triangles[0].SteepSlopeAngle = DEFAULT_STEEP_CEILING_SLOPE_ANGLE;
+				sector.CeilingSurface.Triangles[1].SteepSlopeAngle = DEFAULT_STEEP_CEILING_SLOPE_ANGLE;
 				sector.CeilingSurface.Triangles[0].PortalRoomNumber = ReadInt32();
 				sector.CeilingSurface.Triangles[1].PortalRoomNumber = ReadInt32();
 				sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
@@ -1644,7 +1641,7 @@ void GetCarriedItems()
 					item2.CarriedItem = item.CarriedItem;
 					item.CarriedItem = linkNumber;
 					RemoveDrawnItem(linkNumber);
-					item2.RoomNumber = NO_ROOM;
+					item2.RoomNumber = NO_VALUE;
 				}
 			}
 		}
@@ -1673,7 +1670,7 @@ void GetAIPickups()
 					item->ItemFlags[3] = object->triggerFlags;
 
 					if (object->objectNumber != ID_AI_GUARD)
-						object->roomNumber = NO_ROOM;
+						object->roomNumber = NO_VALUE;
 				}
 			}
 

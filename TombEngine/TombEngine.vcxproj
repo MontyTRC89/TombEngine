@@ -338,6 +338,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Game\collision\Los.h" />
+    <ClInclude Include="Game\collision\Point.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\DisplaySprite.h" />
     <ClInclude Include="Game\GuiObjects.h" />
@@ -608,6 +609,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Object\tr4_senet.h" />
     <ClInclude Include="Objects\TR4\Trap\SpikyCeiling.h" />
     <ClInclude Include="Objects\TR4\Trap\SpikyWall.h" />
+    <ClInclude Include="Objects\TR4\Trap\SquishyBlock.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_birdblade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_blade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_catwalkblade.h" />
@@ -860,6 +862,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\collision\Los.cpp" />
+    <ClCompile Include="Game\collision\Point.cpp" />
     <ClCompile Include="Game\collision\sphere.cpp" />
     <ClCompile Include="Game\control\box.cpp" />
     <ClCompile Include="Game\control\control.cpp" />
@@ -1109,6 +1112,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\tr4_objects.cpp" />
     <ClCompile Include="Objects\TR4\Trap\SpikyCeiling.cpp" />
     <ClCompile Include="Objects\TR4\Trap\SpikyWall.cpp" />
+    <ClCompile Include="Objects\TR4\Trap\SquishyBlock.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_birdblade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_blade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_catwalkblade.cpp" />

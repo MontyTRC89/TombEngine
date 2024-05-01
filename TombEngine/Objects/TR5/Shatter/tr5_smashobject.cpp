@@ -6,6 +6,8 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 
+using namespace TEN::Collision::Room;
+
 void InitializeSmashObject(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -14,9 +16,9 @@ void InitializeSmashObject(short itemNumber)
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	// NOTE: Avoids crash when attempting to access Boxes[] array while box is equal to NO_BOX. -- TokyoSU 2022.12.20
+	// NOTE: Avoids crash when attempting to access Boxes[] array while box is equal to NO_VALUE. -- TokyoSU 2022.12.20
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
-	if (floor->Box == NO_BOX)
+	if (floor->Box == NO_VALUE)
 	{
 		TENLog("Smash object with ID " + std::to_string(itemNumber) + " may be inside a wall." , LogLevel::Warning);
 		return;
@@ -40,7 +42,7 @@ void SmashObject(short itemNumber)
 
 	SoundEffect(SFX_TR5_SMASH_GLASS, &item->Pose);
 
-	item->Collidable = 0;
+	item->Collidable = false;
 	item->MeshBits = 0xFFFE;
 
 	ExplodingDeath(itemNumber, BODY_DO_EXPLOSION | BODY_NO_BOUNCE);

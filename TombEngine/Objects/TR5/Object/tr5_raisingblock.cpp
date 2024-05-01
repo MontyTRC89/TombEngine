@@ -74,7 +74,7 @@ namespace TEN::Entities::Generic
 		short roomNumber = item->RoomNumber;
 		auto* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
-		if (floor->Box != NO_BOX)
+		if (floor->Box != NO_VALUE)
 			g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 
 		// Set mutators to EulerAngles identity by default.

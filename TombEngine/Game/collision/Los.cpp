@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/collision/Los.h"
 
+#include "Game/collision/Point.h"
 #include "Game/collision/sphere.h"
 #include "Game/items.h"
 #include "Game/room.h"
@@ -10,6 +11,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
@@ -124,7 +126,7 @@ namespace TEN::Collision::Los
 					{
 						auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
 						auto offset = intersectPos - mov->Pose.Position.ToVector3();
-						int roomNumber = GetCollision(mov->Pose.Position, mov->RoomNumber, offset).RoomNumber;
+						int roomNumber = GetPointCollision(mov->Pose.Position, mov->RoomNumber, offset).GetRoomNumber();
 
 						auto movLos = MoveableLosData{};
 						movLos.Moveable = mov;
@@ -148,7 +150,7 @@ namespace TEN::Collision::Los
 						{
 							auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
 							auto offset = intersectPos - mov->Pose.Position.ToVector3();
-							int roomNumber = GetCollision(mov->Pose.Position, mov->RoomNumber, offset).RoomNumber;
+							int roomNumber = GetPointCollision(mov->Pose.Position, mov->RoomNumber, offset).GetRoomNumber();
 
 							auto sphereLos = SphereLosData{};
 							sphereLos.Moveable = mov;
@@ -196,7 +198,7 @@ namespace TEN::Collision::Los
 				{
 					auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
 					auto offset = intersectPos - staticObj->pos.Position.ToVector3();
-					int roomNumber = GetCollision(staticObj->pos.Position, staticObj->roomNumber, offset).RoomNumber;
+					int roomNumber = GetPointCollision(staticObj->pos.Position, staticObj->roomNumber, offset).GetRoomNumber();
 
 					auto staticLos = StaticLosData{};
 					staticLos.Static = staticObj;

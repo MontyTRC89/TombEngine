@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Los.h"
+#include "Game/collision/Point.h"
 #include "Game/control/los.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -25,6 +26,7 @@
 #include "Specific/trutils.h"
 
 using namespace TEN::Collision::Los;
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
@@ -196,7 +198,7 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 		cameraLos.Distance = DIST_BUFFER;
 		cameraLos.Position = std::pair(
 			Geometry::TranslatePoint(origin, dir, cameraLos.Distance),
-			GetCollision(origin, originRoomNumber, dir, cameraLos.Distance).RoomNumber);
+			GetPointCollision(origin, originRoomNumber, dir, cameraLos.Distance).GetRoomNumber());
 	}
 
 	return cameraLos;
@@ -205,95 +207,94 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, int push, bool yFirst)
 {
 	auto collidedPos = std::pair(pos, roomNumber);
-	auto pointColl = CollisionResult{};
+	auto pointColl = GetPointCollision(pos, roomNumber);
 
 	if (yFirst)
 	{
-		pointColl = GetCollision(pos, roomNumber);
 
 		int buffer = CLICK(1) - 1;
-		if ((collidedPos.first.y - buffer) < pointColl.Position.Ceiling &&
-			(collidedPos.first.y + buffer) > pointColl.Position.Floor &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor)
+		if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
+			(collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
+			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
 		{
-			collidedPos.first.y = (pointColl.Position.Floor + pointColl.Position.Ceiling) / 2;
+			collidedPos.first.y = (pointColl.GetFloorHeight() + pointColl.GetCeilingHeight()) / 2;
 		}
-		else if ((collidedPos.first.y + buffer) > pointColl.Position.Floor &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor)
+		else if ((collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
+			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
 		{
-			collidedPos.first.y = pointColl.Position.Floor - buffer;
+			collidedPos.first.y = pointColl.GetFloorHeight() - buffer;
 		}
-		else if ((collidedPos.first.y - buffer) < pointColl.Position.Ceiling &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor)
+		else if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
+			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
 		{
-			collidedPos.first.y = pointColl.Position.Ceiling + buffer;
+			collidedPos.first.y = pointColl.GetCeilingHeight() + buffer;
 		}
 	}
 
-	pointColl = GetCollision(collidedPos.first.x - push, collidedPos.first.y, collidedPos.first.z, roomNumber);
-	if (collidedPos.first.y > pointColl.Position.Floor ||
-		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
-		collidedPos.first.y < pointColl.Position.Ceiling)
+	pointColl = GetPointCollision(Vector3i(collidedPos.first.x - push, collidedPos.first.y, collidedPos.first.z), roomNumber);
+	if (collidedPos.first.y > pointColl.GetFloorHeight() ||
+		pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
+		collidedPos.first.y < pointColl.GetCeilingHeight())
 	{
 		collidedPos.first.x = ((int)collidedPos.first.x & (~WALL_MASK)) + push;
 	}
 
-	pointColl = GetCollision(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z - push, roomNumber);
-	if (collidedPos.first.y > pointColl.Position.Floor ||
-		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
-		collidedPos.first.y < pointColl.Position.Ceiling)
+	pointColl = GetPointCollision(Vector3i(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z - push), roomNumber);
+	if (collidedPos.first.y > pointColl.GetFloorHeight() ||
+		pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
+		collidedPos.first.y < pointColl.GetCeilingHeight())
 	{
 		collidedPos.first.z = ((int)collidedPos.first.z & (~WALL_MASK)) + push;
 	}
 
-	pointColl = GetCollision(collidedPos.first.x + push, collidedPos.first.y, collidedPos.first.z, roomNumber);
-	if (collidedPos.first.y > pointColl.Position.Floor ||
-		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
-		collidedPos.first.y < pointColl.Position.Ceiling)
+	pointColl = GetPointCollision(Vector3i(collidedPos.first.x + push, collidedPos.first.y, collidedPos.first.z), roomNumber);
+	if (collidedPos.first.y > pointColl.GetFloorHeight() ||
+		pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
+		collidedPos.first.y < pointColl.GetCeilingHeight())
 	{
 		collidedPos.first.x = ((int)collidedPos.first.x | WALL_MASK) - push;
 	}
 
-	pointColl = GetCollision(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z + push, roomNumber);
-	if (collidedPos.first.y > pointColl.Position.Floor ||
-		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
-		collidedPos.first.y < pointColl.Position.Ceiling)
+	pointColl = GetPointCollision(Vector3i(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z + push), roomNumber);
+	if (collidedPos.first.y > pointColl.GetFloorHeight() ||
+		pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
+		collidedPos.first.y < pointColl.GetCeilingHeight())
 	{
 		collidedPos.first.z = ((int)collidedPos.first.z | WALL_MASK) - push;
 	}
 
 	if (!yFirst)
 	{
-		pointColl = GetCollision(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z, roomNumber);
+		pointColl = GetPointCollision(Vector3i(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z), roomNumber);
 
 		int buffer = CLICK(1) - 1;
-		if ((collidedPos.first.y - buffer) < pointColl.Position.Ceiling &&
-			(collidedPos.first.y + buffer) > pointColl.Position.Floor &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor)
+		if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
+			(collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
+			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
 		{
-			collidedPos.first.y = (pointColl.Position.Floor + pointColl.Position.Ceiling) / 2;
+			collidedPos.first.y = (pointColl.GetFloorHeight() + pointColl.GetCeilingHeight()) / 2;
 		}
-		else if ((collidedPos.first.y + buffer) > pointColl.Position.Floor &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor)
+		else if ((collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
+			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
 		{
-			collidedPos.first.y = pointColl.Position.Floor - buffer;
+			collidedPos.first.y = pointColl.GetFloorHeight() - buffer;
 		}
-		else if ((collidedPos.first.y - buffer) < pointColl.Position.Ceiling &&
-			pointColl.Position.Ceiling < pointColl.Position.Floor)
+		else if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
+			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
 		{
-			collidedPos.first.y = pointColl.Position.Ceiling + buffer;
+			collidedPos.first.y = pointColl.GetCeilingHeight() + buffer;
 		}
 	}
 
-	pointColl = GetCollision(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z, roomNumber);
-	if (collidedPos.first.y > pointColl.Position.Floor ||
-		collidedPos.first.y < pointColl.Position.Ceiling ||
-		pointColl.Position.Ceiling >= pointColl.Position.Floor)
+	pointColl = GetPointCollision(collidedPos.first, roomNumber);
+	if (collidedPos.first.y > pointColl.GetFloorHeight() ||
+		collidedPos.first.y < pointColl.GetCeilingHeight() ||
+		pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight())
 	{
 		return collidedPos;
 	}
 
-	collidedPos.second = pointColl.RoomNumber;
+	collidedPos.second = pointColl.GetRoomNumber();
 	return collidedPos;
 }
 
@@ -328,8 +329,8 @@ static Vector3 GetCameraPlayerOffset(const ItemInfo& item, const CollisionInfo& 
 	}
 
 	// Get floor-to-ceiling height.
-	auto pointColl = GetCollision(item);
-	int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+	auto pointColl = GetPointCollision(item);
+	int floorToCeilHeight = abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight());
 
 	// Return offset.
 	return Vector3(
@@ -551,7 +552,7 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	if (TestEnvironment(ENV_FLAG_SWAMP, Camera.RoomNumber))
 		Camera.Position.y = g_Level.Rooms[Camera.RoomNumber].y - BUFFER;
 
-	Camera.RoomNumber = GetCollision(Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.RoomNumber).RoomNumber;
+	Camera.RoomNumber = GetPointCollision(Camera.Position, Camera.RoomNumber).GetRoomNumber();
 	LookAt(Camera, 0);
 	Camera.oldType = Camera.type;
 }
@@ -615,7 +616,7 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* item, int boneID, ItemInfo* targ
 	float speedAlpha = 1.0f;
 
 	Camera.Position = Vector3::Lerp(Camera.Position, ideal->ToVector3(), speedAlpha);
-	Camera.RoomNumber = GetCollision(Camera.Position, Camera.RoomNumber).RoomNumber;
+	Camera.RoomNumber = GetPointCollision(Camera.Position, Camera.RoomNumber).GetRoomNumber();
 	LookAt(Camera, 0);
 
 	auto angle = Camera.LookAt - Camera.Position;
@@ -722,7 +723,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 				float dist = std::max(Vector3::Distance(Camera.LookAt, idealPos.first) * STRAFE_CAMERA_DIST_OFFSET_COEFF, STRAFE_CAMERA_ZOOM_BUFFER);
 				idealPos = std::pair(
 					Geometry::TranslatePoint(Camera.LookAt, dir, dist),
-					GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, dist).RoomNumber);
+					GetPointCollision(Camera.LookAt, Camera.LookAtRoomNumber, dir, dist).GetRoomNumber());
 			}
 		}
 		else
@@ -813,15 +814,15 @@ void ChaseCamera(const ItemInfo& playerItem)
 	Camera.targetElevation += playerItem.Pose.Orientation.x;
 	UpdateCameraSphere(playerItem);
 
-	auto pointColl = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, 0, 0, CLICK(1));
+	auto pointColl = GetPointCollision(Camera.LookAt, Camera.LookAtRoomNumber, 0, 0, CLICK(1));
 
-	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.RoomNumber))
-		Camera.LookAt.y = g_Level.Rooms[pointColl.RoomNumber].maxceiling - CLICK(1);
+	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.GetRoomNumber()))
+		Camera.LookAt.y = g_Level.Rooms[pointColl.GetRoomNumber()].maxceiling - CLICK(1);
 
 	int vPos = Camera.LookAt.y;
-	pointColl = GetCollision(Camera.LookAt.x, vPos, Camera.LookAt.z, Camera.LookAtRoomNumber);
-	if (((vPos < pointColl.Position.Ceiling || pointColl.Position.Floor < vPos) || pointColl.Position.Floor <= pointColl.Position.Ceiling) ||
-		(pointColl.Position.Floor == NO_HEIGHT || pointColl.Position.Ceiling == NO_HEIGHT))
+	pointColl = GetPointCollision(Vector3i(Camera.LookAt.x, vPos, Camera.LookAt.z), Camera.LookAtRoomNumber);
+	if (((vPos < pointColl.GetCeilingHeight() || pointColl.GetFloorHeight() < vPos) || pointColl.GetFloorHeight() <= pointColl.GetCeilingHeight()) ||
+		(pointColl.GetFloorHeight() == NO_HEIGHT || pointColl.GetCeilingHeight() == NO_HEIGHT))
 	{
 		TargetSnaps++;
 		Camera.LookAt = LastTarget.ToVector3();
@@ -855,42 +856,42 @@ void CombatCamera(const ItemInfo& playerItem)
 		Camera.targetElevation = player.ExtraHeadRot.x + player.ExtraTorsoRot.x + playerItem.Pose.Orientation.x - ANGLE(15.0f);
 	}
 
-	auto pointColl = GetCollision(Camera.LookAt, Camera.LookAtRoomNumber, 0, 0, CLICK(1));
-	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.RoomNumber))
-		Camera.LookAt.y = g_Level.Rooms[pointColl.RoomNumber].y - CLICK(1);
+	auto pointColl = GetPointCollision(Camera.LookAt, Camera.LookAtRoomNumber, 0, 0, CLICK(1));
+	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.GetRoomNumber()))
+		Camera.LookAt.y = g_Level.Rooms[pointColl.GetRoomNumber()].y - CLICK(1);
 
-	pointColl = GetCollision(Camera.LookAt.x, Camera.LookAt.y, Camera.LookAt.z, Camera.LookAtRoomNumber);
-	Camera.LookAtRoomNumber = pointColl.RoomNumber;
+	pointColl = GetPointCollision(Camera.LookAt, Camera.LookAtRoomNumber);
+	Camera.LookAtRoomNumber = pointColl.GetRoomNumber();
 
-	if ((pointColl.Position.Ceiling + BUFFER) > (pointColl.Position.Floor - BUFFER) &&
-		pointColl.Position.Floor != NO_HEIGHT &&
-		pointColl.Position.Ceiling != NO_HEIGHT)
+	if ((pointColl.GetCeilingHeight() + BUFFER) > (pointColl.GetFloorHeight() - BUFFER) &&
+		pointColl.GetFloorHeight() != NO_HEIGHT &&
+		pointColl.GetCeilingHeight() != NO_HEIGHT)
 	{
-		Camera.LookAt.y = (pointColl.Position.Ceiling + pointColl.Position.Floor) / 2;
+		Camera.LookAt.y = (pointColl.GetCeilingHeight() + pointColl.GetFloorHeight()) / 2;
 		Camera.targetElevation = 0;
 	}
-	else if (Camera.LookAt.y > (pointColl.Position.Floor - BUFFER) &&
-		pointColl.Position.Floor != NO_HEIGHT)
+	else if (Camera.LookAt.y > (pointColl.GetFloorHeight() - BUFFER) &&
+		pointColl.GetFloorHeight() != NO_HEIGHT)
 	{
-		Camera.LookAt.y = pointColl.Position.Floor - BUFFER;
+		Camera.LookAt.y = pointColl.GetFloorHeight() - BUFFER;
 		Camera.targetElevation = 0;
 	}
-	else if (Camera.LookAt.y < (pointColl.Position.Ceiling + BUFFER) &&
-		pointColl.Position.Ceiling != NO_HEIGHT)
+	else if (Camera.LookAt.y < (pointColl.GetCeilingHeight() + BUFFER) &&
+		pointColl.GetCeilingHeight() != NO_HEIGHT)
 	{
-		Camera.LookAt.y = pointColl.Position.Ceiling + BUFFER;
+		Camera.LookAt.y = pointColl.GetCeilingHeight() + BUFFER;
 		Camera.targetElevation = 0;
 	}
 
 	int y = Camera.LookAt.y;
-	pointColl = GetCollision(Camera.LookAt.x, y, Camera.LookAt.z, Camera.LookAtRoomNumber);
-	Camera.LookAtRoomNumber = pointColl.RoomNumber;
+	pointColl = GetPointCollision(Vector3i(Camera.LookAt.x, y, Camera.LookAt.z), Camera.LookAtRoomNumber);
+	Camera.LookAtRoomNumber = pointColl.GetRoomNumber();
 
-	if (y < pointColl.Position.Ceiling ||
-		y > pointColl.Position.Floor ||
-		pointColl.Position.Ceiling >= pointColl.Position.Floor ||
-		pointColl.Position.Floor == NO_HEIGHT ||
-		pointColl.Position.Ceiling == NO_HEIGHT)
+	if (y < pointColl.GetCeilingHeight() ||
+		y > pointColl.GetFloorHeight() ||
+		pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
+		pointColl.GetFloorHeight() == NO_HEIGHT ||
+		pointColl.GetCeilingHeight() == NO_HEIGHT)
 	{
 		TargetSnaps++;
 		Camera.LookAt = LastTarget.ToVector3();
@@ -1087,20 +1088,20 @@ void BinocularCamera(ItemInfo* item)
 	int y = item->Pose.Position.y - CLICK(2);
 	int z = item->Pose.Position.z;
 
-	auto probe = GetCollision(x, y, z, item->RoomNumber);
-	if (probe.Position.Ceiling <= (y - CLICK(1)))
+	auto pointColl = GetPointCollision(Vector3i(x, y, z), item->RoomNumber);
+	if (pointColl.GetCeilingHeight() <= (y - CLICK(1)))
 	{
 		y -= CLICK(1);
 	}
 	else
 	{
-		y = probe.Position.Ceiling + CLICK(0.25f);
+		y = pointColl.GetCeilingHeight() + CLICK(0.25f);
 	}
 
 	Camera.Position.x = x;
 	Camera.Position.y = y;
 	Camera.Position.z = z;
-	Camera.RoomNumber = probe.RoomNumber;
+	Camera.RoomNumber = pointColl.GetRoomNumber();
 
 	float l = BLOCK(20.25f) * phd_cos(player.Control.Look.Orientation.x);
 	float tx = x + l * phd_sin(item->Pose.Orientation.y + player.Control.Look.Orientation.y);
@@ -1140,7 +1141,7 @@ void BinocularCamera(ItemInfo* item)
 		}
 	}
 
-	Camera.LookAtRoomNumber = GetCollision(Camera.Position.x, Camera.Position.y, Camera.Position.z, Camera.LookAtRoomNumber).RoomNumber;
+	Camera.LookAtRoomNumber = GetPointCollision(Camera.Position, Camera.LookAtRoomNumber).GetRoomNumber();
 	LookAt(Camera, 0);
 	UpdateListenerPosition(*item);
 	Camera.oldType = Camera.type;
@@ -1176,12 +1177,12 @@ void ConfirmCameraTargetPos()
 	}
 
 	int y = Camera.LookAt.y;
-	auto pointColl = GetCollision(Camera.LookAt.x, y, Camera.LookAt.z, Camera.LookAtRoomNumber);
-	if (y < pointColl.Position.Ceiling ||
-		pointColl.Position.Floor < y ||
-		pointColl.Position.Floor <= pointColl.Position.Ceiling ||
-		pointColl.Position.Floor == NO_HEIGHT ||
-		pointColl.Position.Ceiling == NO_HEIGHT)
+	auto pointColl = GetPointCollision(Vector3i(Camera.LookAt.x, y, Camera.LookAt.z), Camera.LookAtRoomNumber);
+	if (y < pointColl.GetCeilingHeight() ||
+		pointColl.GetFloorHeight() < y ||
+		pointColl.GetFloorHeight() <= pointColl.GetCeilingHeight() ||
+		pointColl.GetFloorHeight() == NO_HEIGHT ||
+		pointColl.GetCeilingHeight() == NO_HEIGHT)
 	{
 		Camera.LookAt = pos;
 	}
@@ -1389,7 +1390,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 			Camera.speed = 1.0f;
 		}
 
-		Camera.LookAtRoomNumber = GetCollision(x, y, z, Camera.LookAtRoomNumber).RoomNumber;
+		Camera.LookAtRoomNumber = GetPointCollision(Vector3i(x, y, z), Camera.LookAtRoomNumber).GetRoomNumber();
 
 		if (abs(LastTarget.x - Camera.LookAt.x) < 4 &&
 			abs(LastTarget.y - Camera.LookAt.y) < 4 &&

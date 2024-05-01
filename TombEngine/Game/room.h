@@ -12,7 +12,6 @@ struct TriggerVolume;
 
 constexpr auto MAX_FLIPMAP	= 256;
 constexpr auto NUM_ROOMS	= 1024;
-constexpr auto NO_ROOM		= -1;
 constexpr auto OUTSIDE_Z	= 64;
 constexpr auto OUTSIDE_SIZE = 1024;
 
@@ -132,10 +131,14 @@ struct ROOM_INFO
 void DoFlipMap(int group);
 bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID);
 bool IsPointInRoom(const Vector3i& pos, int roomNumber);
-int FindRoomNumber(const Vector3i& pos, int startRoomNumber = NO_ROOM);
+int FindRoomNumber(const Vector3i& pos, int startRoomNumber = NO_VALUE);
 Vector3i GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 void InitializeNeighborRoomList();
 
 GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox);
-FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
+
+namespace TEN::Collision::Room
+{
+	FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
+}

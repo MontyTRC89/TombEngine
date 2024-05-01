@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -20,9 +21,15 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Config;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
+
+constexpr auto DEFLECT_STRAIGHT_ANGLE		= ANGLE(5.0f);
+constexpr auto DEFLECT_DIAGONAL_ANGLE		= ANGLE(12.0f);
+constexpr auto DEFLECT_STRAIGHT_ANGLE_CRAWL = ANGLE(2.0f);
+constexpr auto DEFLECT_DIAGONAL_ANGLE_CRAWL = ANGLE(5.0f);
 
 // -----------------------------
 // COLLISION TEST FUNCTIONS
@@ -124,11 +131,11 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 	switch (coll->CollisionType)
 	{
 	case CollisionType::Left:
-		item->Pose.Orientation.y += ANGLE(DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y += DEFLECT_STRAIGHT_ANGLE;
 		break;
 
 	case CollisionType::Right:
-		item->Pose.Orientation.y -= ANGLE(DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y -= DEFLECT_STRAIGHT_ANGLE;
 		break;
 
 	case CollisionType::Top:
@@ -160,11 +167,11 @@ void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll)
 	switch (coll->CollisionType)
 	{
 	case CollisionType::Left:
-		item->Pose.Orientation.y += ANGLE(DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y += DEFLECT_STRAIGHT_ANGLE;
 		break;
 
 	case CollisionType::Right:
-		item->Pose.Orientation.y -= ANGLE(DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y -= DEFLECT_STRAIGHT_ANGLE;
 		break;
 
 	case CollisionType::Top:
@@ -237,12 +244,12 @@ bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType == CollisionType::Left)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.y += ANGLE(coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y += coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE;
 	}
 	else if (coll->CollisionType == CollisionType::Right)
 	{
 		ShiftItem(item, coll);
-		item->Pose.Orientation.y -= ANGLE(coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE);
+		item->Pose.Orientation.y -= coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE;
 	}
 
 	return false;
@@ -499,11 +506,17 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Orientation.y -= ANGLE(5.0f);
 	}
 
-	auto pointColl = GetCollision(item);
+	auto pointColl = GetPointCollision(*item);
 	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
-	if ((pointColl.Position.Floor - item->Pose.Position.y) < SWIM_WATER_DEPTH)
+	if ((pointColl.GetFloorHeight() - item->Pose.Position.y) < SWIM_WATER_DEPTH)
+	{
 		TestPlayerWaterStepOut(item, coll);
+	}
+	else if ((waterHeight - item->Pose.Position.y) <= -LARA_HEADROOM)
+	{
+		SetLaraSwimDiveAnimation(item);
+	}
 }
 
 void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
@@ -782,8 +795,8 @@ bool TestLaraObjectCollision(ItemInfo* item, short headingAngle, int forward, in
 	item->Pose.Position.y += down;
 	item->Pose.Position.z += phd_cos(item->Pose.Orientation.y + headingAngle) * forward + phd_sin(headingAngle + ANGLE(90.0f) * sideSign) * abs(right);
 
-	bool result = GetCollidedObjects(item, LARA_RADIUS, true, CollidedItems, CollidedMeshes, 0);
+	bool isCollided = !GetCollidedObjects(*item, true, false).IsEmpty();
 
 	item->Pose = prevPose;
-	return result;
+	return isCollided;
 }

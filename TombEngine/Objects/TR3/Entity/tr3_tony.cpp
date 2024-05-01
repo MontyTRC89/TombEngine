@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
@@ -18,6 +19,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Boss;
 
@@ -412,10 +414,10 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 		}
 
-		auto probe = GetCollision(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, fx.roomNumber);
+		auto pointColl = GetPointCollision(fx.pos.Position, fx.roomNumber);
 
-		if (fx.pos.Position.y >= probe.Position.Floor ||
-			fx.pos.Position.y < probe.Position.Ceiling)
+		if (fx.pos.Position.y >= pointColl.GetFloorHeight() ||
+			fx.pos.Position.y < pointColl.GetCeilingHeight())
 		{
 			Vector3i pos;
 			int debrisCount = type == TonyFlameType::InFront ? 7 : 3;
@@ -427,13 +429,13 @@ namespace TEN::Entities::Creatures::TR3
 				for (int x = 0; x < 2; x++)
 					TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -1, 0, fx.roomNumber);
 
-				probe = GetCollision(LaraItem); // TODO: Deal with LaraItem global.
-				pos.y = probe.Position.Ceiling + CLICK(1);
+				pointColl = GetPointCollision(*LaraItem); // TODO: Deal with LaraItem global.
+				pos.y = pointColl.GetCeilingHeight() + CLICK(1);
 				pos.x = LaraItem->Pose.Position.x + (GetRandomControl() & 1023) - CLICK(2);
 				pos.z = LaraItem->Pose.Position.z + (GetRandomControl() & 1023) - CLICK(2);
 
-				TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, probe.RoomNumber);
-				TriggerFireBall(nullptr, TonyFlameType::ShowerFromCeiling, &pos, probe.RoomNumber, 0, 0); // Fallthrough is intended.
+				TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, pointColl.GetRoomNumber());
+				TriggerFireBall(nullptr, TonyFlameType::ShowerFromCeiling, &pos, pointColl.GetRoomNumber(), 0, 0); // Fallthrough is intended.
 
 			case TonyFlameType::InFront:
 			case TonyFlameType::ShowerFromCeiling:
@@ -450,7 +452,7 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 		}
 
-		if (TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber))
+		if (TestEnvironment(ENV_FLAG_WATER, pointColl.GetRoomNumber()))
 		{
 			KillEffect(fxNumber);
 			return;
@@ -468,7 +470,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		if (probe.RoomNumber != fx.roomNumber)
+		if (pointColl.GetRoomNumber() != fx.roomNumber)
 			EffectNewRoom(fxNumber, LaraItem->RoomNumber);
 
 		if (LightIntensityTable[fx.flag1])

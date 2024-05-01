@@ -74,10 +74,10 @@ public:
 
 struct SectorSurfaceTriangleData
 {
-	Plane		 Plane			   = {};
-	int			 PortalRoomNumber  = 0;
-	short		 IllegalSlopeAngle = 0;
-	MaterialType Material		   = MaterialType::Stone;
+	Plane		 Plane			  = {};
+	int			 PortalRoomNumber = 0;
+	short		 SteepSlopeAngle  = 0;
+	MaterialType Material		  = MaterialType::Stone;
 };
 
 struct SectorSurfaceData

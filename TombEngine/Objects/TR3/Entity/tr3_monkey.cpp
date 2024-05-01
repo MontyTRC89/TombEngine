@@ -349,7 +349,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature->Enemy->ObjectNumber == ID_KEY_ITEM4) &&
 					item->Animation.FrameNumber == (GetAnimData(item).frameBase + 12))
 				{
-					if (creature->Enemy->RoomNumber == NO_ROOM ||
+					if (creature->Enemy->RoomNumber == NO_VALUE ||
 						creature->Enemy->Status == ITEM_INVISIBLE ||
 						creature->Enemy->Flags & -32768)
 					{
@@ -359,7 +359,7 @@ namespace TEN::Entities::Creatures::TR3
 					{
 						item->CarriedItem = creature->Enemy->Index;
 						RemoveDrawnItem(creature->Enemy->Index);
-						creature->Enemy->RoomNumber = NO_ROOM;
+						creature->Enemy->RoomNumber = NO_VALUE;
 						creature->Enemy->CarriedItem = NO_VALUE;
 
 						for (auto& currentCreature : ActiveCreatures)
