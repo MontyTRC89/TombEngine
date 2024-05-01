@@ -113,6 +113,7 @@ local strings =
 	vehicle_actions = { "Vehicle Actions" },
 	view = { "View" },
 	volumetric_fog = { "Volumetric Fog" },
+	variable_framerate = { "Variable Framerate" },
 	waiting_for_input = { "Waiting For Input" },
 	window_title = { "TombEngine" },
 	windowed = { "Windowed" },
