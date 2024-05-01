@@ -519,10 +519,17 @@ namespace TEN::Collision::Floordata
 
 	std::optional<int> GetSurfaceHeight(const RoomVector& location, int x, int z, bool isFloor)
 	{
+		enum class Polarity
+		{
+			None,
+			Floor,
+			Ceiling
+		};
+
 		auto* sector = &GetSideSector(location.RoomNumber, x, z);
 
 		auto pos = Vector3i(x, location.Height, z);
-		int polarity = 0;
+		auto polarity = Polarity::None;
 
 		if (sector->IsWall(x, z))
 		{
@@ -531,7 +538,7 @@ namespace TEN::Collision::Floordata
 			if (!sector->IsWall(x, z))
 			{
 				pos.y = sector->GetSurfaceHeight(x, z, isFloor);
-				polarity = isFloor ? -1 : 1;
+				polarity = isFloor ? Polarity::Floor : Polarity::Ceiling;
 			}
 			else
 			{
@@ -540,7 +547,7 @@ namespace TEN::Collision::Floordata
 				if (!sector->IsWall(x, z))
 				{
 					pos.y = sector->GetSurfaceHeight(x, z, !isFloor);
-					polarity = isFloor ? 1 : -1;
+					polarity = isFloor ? Polarity::Ceiling : Polarity::Floor;
 				}
 				else
 				{
@@ -560,14 +567,14 @@ namespace TEN::Collision::Floordata
 
 		if (insideBridgeItemNumber != NO_VALUE)
 		{
-			if (isFloor ? (polarity <= 0) : (polarity >= 0))
+			if (polarity == Polarity::None || (isFloor ? (polarity == Polarity::Floor) : (polarity == Polarity::Ceiling)))
 			{
 				auto heightData = GetFarthestHeightData(*sector, pos, !isFloor);
 				if (heightData.has_value())
 					return heightData->Height;
 			}
 
-			if (isFloor ? (polarity >= 0) : (polarity <= 0))
+			if (polarity == Polarity::None || (isFloor ? (polarity == Polarity::Ceiling) : (polarity == Polarity::Floor)))
 			{
 				auto heightData = GetFarthestHeightData(*sector, pos, isFloor);
 				if (!heightData.has_value())
@@ -578,7 +585,7 @@ namespace TEN::Collision::Floordata
 			}
 		}
 
-		if (isFloor ? (polarity >= 0) : (polarity <= 0))
+		if (polarity == Polarity::None || (isFloor ? (polarity == Polarity::Ceiling) : (polarity == Polarity::Floor)))
 		{
 			auto nextRoomNumber = sector->GetNextRoomNumber(pos, isFloor);
 			while (nextRoomNumber.has_value())
