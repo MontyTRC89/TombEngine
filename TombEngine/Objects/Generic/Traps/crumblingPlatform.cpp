@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/setup.h"
@@ -11,6 +12,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
 
 // NOTES:
@@ -139,8 +141,8 @@ namespace TEN::Entities::Traps
 				item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_FALL;
 				item.ItemFlags[1] = CRUMBLING_PLATFORM_VELOCITY_MIN;
 
-				auto pointColl = GetCollision(item);
-				pointColl.Block->RemoveBridge(itemNumber);
+				auto pointColl = GetPointCollision(item);
+				pointColl.GetSector().RemoveBridge(itemNumber);
 			}
 		}
 
@@ -152,8 +154,8 @@ namespace TEN::Entities::Traps
 
 			// Get point collision.
 			auto box = GameBoundingBox(&item);
-			auto pointColl = GetCollision(item);
-			int relFloorHeight = (item.Pose.Position.y - pointColl.Position.Floor) - box.Y1 ;
+			auto pointColl = GetPointCollision(item);
+			int relFloorHeight = (item.Pose.Position.y - pointColl.GetFloorHeight()) - box.Y1 ;
 
 			// Airborne.
 			if (relFloorHeight <= fallVel)
@@ -168,11 +170,11 @@ namespace TEN::Entities::Traps
 			else
 			{
 				item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_LAND;
-				item.Pose.Position.y = pointColl.Position.Floor;
+				item.Pose.Position.y = pointColl.GetFloorHeight();
 			}
 
 			// Update room number.
-			int probedRoomNumber = pointColl.RoomNumber;
+			int probedRoomNumber = pointColl.GetRoomNumber();
 			if (item.RoomNumber != probedRoomNumber)
 				ItemNewRoom(itemNumber, probedRoomNumber);
 		}

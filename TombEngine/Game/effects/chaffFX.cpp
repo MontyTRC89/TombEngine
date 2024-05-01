@@ -70,10 +70,10 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 		if (dx < -MAX_TRIGGER_RANGE || dx > MAX_TRIGGER_RANGE || dz < -MAX_TRIGGER_RANGE || dz > MAX_TRIGGER_RANGE)
 			return;
 
-		ColorData color;
-		color.r = 255;
-		color.g = (GetRandomDraw() & 127) + 64;
-		color.b = 192 - color.g;
+		auto color = Color();
+		color.x = 1.0f;
+		color.y = Random::GenerateFloat(0.25f, 0.75f);
+		color.z = 0.75f - color.G();
 
 		TriggerChaffSparkles(pos, vel, color, age, item);
 
@@ -91,7 +91,7 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 	}
 }
 
-void TriggerChaffSparkles(const Vector3i& pos, const Vector3i& vel, const ColorData& color, int age, const ItemInfo& item)
+void TriggerChaffSparkles(const Vector3i& pos, const Vector3i& vel, const Color& color, int age, const ItemInfo& item)
 {
 	TEN::Effects::Spark::TriggerFlareSparkParticles(pos, vel, color, item.RoomNumber);
 }

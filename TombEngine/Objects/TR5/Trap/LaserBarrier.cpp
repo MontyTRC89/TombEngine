@@ -3,12 +3,14 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 
 namespace TEN::Traps::TR5
@@ -85,8 +87,8 @@ namespace TEN::Traps::TR5
 		auto& item = g_Level.Items[itemNumber];
 
 		// Initialize barrier height.
-		auto pointColl = GetCollision(&item);
-		float barrierHeight = item.Pose.Position.y - pointColl.Position.Ceiling;
+		auto pointColl = GetPointCollision(item);
+		float barrierHeight = item.Pose.Position.y - pointColl.GetCeilingHeight();
 		item.ItemFlags[0] = barrierHeight;
 
 		// Initialize barrier effect.

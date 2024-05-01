@@ -1,5 +1,8 @@
 #pragma once
+#include "Game/collision/Point.h"
 #include "Math/Math.h"
+
+using namespace TEN::Collision::Point;
 
 namespace TEN::Collision::Attractor { class AttractorCollisionData; };
 class FloorInfo;
@@ -10,14 +13,17 @@ struct MESH_INFO;
 
 using namespace TEN::Collision::Attractor;
 
-constexpr auto MAX_COLLIDED_OBJECTS = 1024;
-constexpr auto ITEM_RADIUS_YMAX = BLOCK(3);
-
+constexpr auto ITEM_RADIUS_YMAX					   = BLOCK(3);
 constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30.0f;
 
 extern GameBoundingBox GlobalCollisionBounds;
-extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
-extern MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
+
+enum class ObjectCollectionMode
+{
+	All,
+	Items,
+	Statics
+};
 
 struct ObjectCollisionBounds
 {
@@ -25,8 +31,16 @@ struct ObjectCollisionBounds
 	std::pair<EulerAngles, EulerAngles> OrientConstraint = {};
 };
 
+struct CollidedObjectData
+{
+	std::vector<ItemInfo*>	ItemPtrs   = {};
+	std::vector<MESH_INFO*> StaticPtrs = {};
+
+	bool IsEmpty() const { return (ItemPtrs.empty() && StaticPtrs.empty()); };
+};
+
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara);
+CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible, bool ignorePlayer, float customRadius = 0.0f, ObjectCollectionMode mode = ObjectCollectionMode::All);
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll);
 bool TestForObjectOnLedge(const AttractorCollisionData& attracColl, float radius, float down, bool testAttracFront);
 
@@ -48,7 +62,7 @@ void ItemPushBridge(ItemInfo& item, CollisionInfo& coll);
 
 bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
-void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& collResult);
+void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData& pointColl);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void ObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

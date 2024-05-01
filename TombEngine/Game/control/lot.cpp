@@ -10,6 +10,8 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Room;
+
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
 
@@ -49,7 +51,7 @@ void DisableEntityAI(short itemNumber)
 		return;
 
 	auto* creature = GetCreatureInfo(item);
-	creature->ItemNumber = NO_ITEM;
+	creature->ItemNumber = NO_VALUE;
 	KillItem(creature->AITargetNumber);
 	ActiveCreatures.erase(std::find(ActiveCreatures.begin(), ActiveCreatures.end(), creature));
 	item->Data = nullptr;
@@ -88,13 +90,13 @@ void InitializeSlot(short itemNumber, bool makeTarget)
 	creature->LOT.IsMonkeying = false;
 	creature->LOT.Fly = NO_FLYING;
 	creature->LOT.BlockMask = BLOCKED;
-	creature->AITargetNumber = NO_ITEM;
+	creature->AITargetNumber = NO_VALUE;
 	creature->AITarget = nullptr;
 
 	if (makeTarget)
 	{
 		creature->AITargetNumber = CreateItem();
-		if (creature->AITargetNumber != NO_ITEM)
+		if (creature->AITargetNumber != NO_VALUE)
 			creature->AITarget = &g_Level.Items[creature->AITargetNumber];
 	}
 
@@ -210,7 +212,7 @@ void SetEntityTarget(short itemNum, short target)
 
 	creature->AITargetNumber = target;
 
-	if (creature->AITargetNumber != NO_ITEM)
+	if (creature->AITargetNumber != NO_VALUE)
 		creature->AITarget = &g_Level.Items[creature->AITargetNumber];
 	else
 		creature->AITarget = nullptr;
@@ -218,17 +220,17 @@ void SetEntityTarget(short itemNum, short target)
 
 void ClearLOT(LOTInfo* LOT)
 {
-	LOT->Head = NO_BOX;
-	LOT->Tail = NO_BOX;
+	LOT->Head = NO_VALUE;
+	LOT->Tail = NO_VALUE;
 	LOT->SearchNumber = 0;
-	LOT->TargetBox = NO_BOX;
-	LOT->RequiredBox = NO_BOX;
+	LOT->TargetBox = NO_VALUE;
+	LOT->RequiredBox = NO_VALUE;
 
 	auto* node = LOT->Node.data();
 	for (auto& node : LOT->Node) 
 	{
-		node.exitBox = NO_BOX;
-		node.nextExpansion = NO_BOX;
+		node.exitBox = NO_VALUE;
+		node.nextExpansion = NO_VALUE;
 		node.searchNumber = 0;
 	}
 }

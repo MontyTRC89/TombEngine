@@ -1,11 +1,7 @@
 #pragma once
-#include <SimpleMath.h>
-#include <optional>
 
 namespace TEN::Math::Solvers
 {
-	using namespace DirectX::SimpleMath;
-
 	struct QuadraticSolution
 	{
 		float Root0 = 0.0f;

@@ -5,6 +5,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
@@ -22,6 +23,7 @@
 #include "Specific/trutils.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -87,8 +89,8 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	auto pointColl = GetCollision(item);
-	int waterDepth = GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, pointColl.RoomNumber);
+	auto pointColl = GetPointCollision(*item);
+	int waterDepth = GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, pointColl.GetRoomNumber());
 
 	if (waterDepth == NO_HEIGHT)
 	{
@@ -101,7 +103,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
 		ResetPlayerLean(item);
 		item->Animation.TargetState = LS_IDLE;
-		item->Pose.Position.y = pointColl.Position.Floor;
+		item->Pose.Position.y = pointColl.GetFloorHeight();
 		item->Animation.IsAirborne = false;
 		item->Animation.Velocity = Vector3::Zero;
 		player.Control.WaterStatus = WaterStatus::Wade;
@@ -194,8 +196,8 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 
 	bool atLeastOnePoleCollided = false;
 
-	if (GetCollidedObjects(item, BLOCK(1), true, CollidedItems, nullptr, false) &&
-		CollidedItems[0] != nullptr)
+	auto collObjects = GetCollidedObjects(*item, true, false, BLOCK(1), ObjectCollectionMode::Items);
+	if (!collObjects.IsEmpty())
 	{
 		auto laraBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
 
@@ -213,16 +215,12 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 
 		//g_Renderer.AddDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
 
-		int i = 0;
-		while (CollidedItems[i] != nullptr)
+		for (const auto* itemPtr : collObjects.ItemPtrs)
 		{
-			auto*& object = CollidedItems[i];
-			i++;
-
-			if (object->ObjectNumber != ID_POLEROPE)
+			if (itemPtr->ObjectNumber != ID_POLEROPE)
 				continue;
 
-			auto poleBox = GameBoundingBox(object).ToBoundingOrientedBox(object->Pose);
+			auto poleBox = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
 			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0.0f, coll->Setup.Radius);
 
 			//g_Renderer.AddDebugBox(poleBox, Vector4(0, 0, 1, 1), RendererDebugPage::CollisionStats);

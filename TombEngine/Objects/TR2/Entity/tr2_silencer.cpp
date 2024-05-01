@@ -116,7 +116,7 @@ namespace TEN::Entities::Creatures::TR2
 				if (ai.ahead)
 					extraHeadRot.y = ai.angle;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 
 				break;
@@ -321,7 +321,7 @@ namespace TEN::Entities::Creatures::TR2
 					extraHeadRot.y = ai.angle;
 				}
 
-				if (item->Animation.RequiredState == NO_STATE &&
+				if (item->Animation.RequiredState == NO_VALUE &&
 					(item->Animation.AnimNumber == GetAnimIndex(*item, SILENCER_ANIM_RUN_FORWARD_SHOOT_LEFT) &&
 						item->Animation.FrameNumber == GetFrameIndex(item, 1) ||
 					item->Animation.AnimNumber == GetAnimIndex(*item, SILENCER_ANIM_RUN_FORWARD_SHOOT_RIGHT) &&

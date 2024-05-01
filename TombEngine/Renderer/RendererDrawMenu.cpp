@@ -609,7 +609,7 @@ namespace TEN::Renderer
 		// Savegame listing
 		for (int n = 0; n < SAVEGAME_MAX; n++)
 		{
-			auto& save = SavegameInfos[n];
+			auto& save = SaveGame::Infos[n];
 
 			if (!save.Present)
 			{
@@ -658,19 +658,19 @@ namespace TEN::Renderer
 		GetNextLinePosition(&y);
 
 		// Distance travelled
-		sprintf(buffer, "%dm", Statistics.Game.Distance / UnitsToMeters);
+		sprintf(buffer, "%dm", SaveGame::Statistics.Game.Distance / UnitsToMeters);
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_DISTANCE_TRAVELLED), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
 
 		// Ammo used
-		sprintf(buffer, "%d", Statistics.Game.AmmoUsed);
+		sprintf(buffer, "%d", SaveGame::Statistics.Game.AmmoUsed);
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AMMO_USED), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
 
 		// Medipacks used
-		sprintf(buffer, "%d", Statistics.Game.HealthUsed);
+		sprintf(buffer, "%d", SaveGame::Statistics.Game.HealthUsed);
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_USED_MEDIPACKS), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
@@ -678,7 +678,7 @@ namespace TEN::Renderer
 		// Secrets found in Level
 		if (g_GameFlow->GetLevel(CurrentLevel)->GetSecrets() > 0)
 		{
-			std::bitset<32> levelSecretBitSet(Statistics.Level.Secrets);
+			std::bitset<32> levelSecretBitSet(SaveGame::Statistics.Level.Secrets);
 			sprintf(buffer, "%d / %d", (int)levelSecretBitSet.count(), g_GameFlow->GetLevel(CurrentLevel)->GetSecrets());
 			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_LEVEL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
@@ -688,7 +688,7 @@ namespace TEN::Renderer
 		// Secrets found total
 		if (g_GameFlow->TotalNumberOfSecrets > 0)
 		{
-			sprintf(buffer, "%d / %d", Statistics.Game.Secrets, g_GameFlow->TotalNumberOfSecrets);
+			sprintf(buffer, "%d / %d", SaveGame::Statistics.Game.Secrets, g_GameFlow->TotalNumberOfSecrets);
 			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TOTAL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
 		}

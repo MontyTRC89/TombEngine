@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -10,6 +11,7 @@
 #include "Renderer/Renderer.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
@@ -368,7 +370,7 @@ namespace TEN::Collision::Attractor
 		auto segmentOrient = isChain ? Geometry::GetOrientToPoint(points[segmentID], points[segmentID + 1]) : refOrient;
 
 		// Set data.
-		AttractorPtr = &attrac;
+		Attractor = &attrac;
 		SegmentID = segmentID;
 		Intersection = intersect;
 		Distance2D = Vector2::Distance(Vector2(pos.x, pos.z), Vector2(intersect.x, intersect.z));
@@ -395,38 +397,38 @@ namespace TEN::Collision::Attractor
 	}
 	
 	// Debug
-	static std::vector<AttractorObject*> GetDebugAttractorPtrs()
+	static std::vector<AttractorObject*> GetDebugAttractors()
 	{
 		auto& player = GetLaraInfo(*LaraItem);
 
-		auto debugAttracPtrs = std::vector<AttractorObject*>{};
-		debugAttracPtrs.push_back(&*player.Context.DebugAttracs.Attrac0);
-		debugAttracPtrs.push_back(&*player.Context.DebugAttracs.Attrac1);
-		debugAttracPtrs.push_back(&*player.Context.DebugAttracs.Attrac2);
+		auto debugAttracs = std::vector<AttractorObject*>{};
+		debugAttracs.push_back(&*player.Context.DebugAttracs.Attrac0);
+		debugAttracs.push_back(&*player.Context.DebugAttracs.Attrac1);
+		debugAttracs.push_back(&*player.Context.DebugAttracs.Attrac2);
 
 		for (auto& attrac : player.Context.DebugAttracs.Attracs)
-			debugAttracPtrs.push_back(&attrac);
+			debugAttracs.push_back(&attrac);
 
-		return debugAttracPtrs;
+		return debugAttracs;
 	}
 
 	// TODO: Spacial partitioning may be ideal here. Would require a general collision refactor. -- Sezz 2023.07.30
-	static std::vector<AttractorObject*> GetNearbyAttractorPtrs(const Vector3& pos, int roomNumber, float radius)
+	static std::vector<AttractorObject*> GetNearbyAttractors(const Vector3& pos, int roomNumber, float radius)
 	{
 		constexpr auto SECTOR_SEARCH_DEPTH = 2;
 
-		auto nearbyAttracPtrs = std::vector<AttractorObject*>{};
+		auto nearbyAttracs = std::vector<AttractorObject*>{};
 
 		auto sphere = BoundingSphere(pos, radius);
 		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::AttractorStats);
 
 		// TEMP
 		// 1) Collect debug attractors.
-		auto debugAttracPtrs = GetDebugAttractorPtrs();
-		for (auto* attracPtr : debugAttracPtrs)
+		auto debugAttracs = GetDebugAttractors();
+		for (auto* attrac : debugAttracs)
 		{
-			if (sphere.Intersects(attracPtr->GetBox()))
-				nearbyAttracPtrs.push_back(attracPtr);
+			if (sphere.Intersects(attrac->GetBox()))
+				nearbyAttracs.push_back(attrac);
 		}
 
 		// 2) Collect room attractors in neighbor rooms.
@@ -440,16 +442,16 @@ namespace TEN::Collision::Attractor
 			for (auto& attrac : neighborRoom.Attractors)
 			{
 				if (sphere.Intersects(attrac.GetBox()))
-					nearbyAttracPtrs.push_back(&attrac);
+					nearbyAttracs.push_back(&attrac);
 			}
 		}
 
 		// Collect bridge item numbers from neighbor sectors.
 		auto bridgeItemNumbers = std::set<int>{};
-		auto sectorPtrs = GetNeighborSectorPtrs(pos, roomNumber, SECTOR_SEARCH_DEPTH);
-		for (const auto* sectorPtr : sectorPtrs)
+		auto sectors = GetNeighborSectors(pos, roomNumber, SECTOR_SEARCH_DEPTH);
+		for (const auto* sector : sectors)
 		{
-			for (int bridgeItemNumber : sectorPtr->BridgeItemNumbers)
+			for (int bridgeItemNumber : sector->BridgeItemNumbers)
 				bridgeItemNumbers.insert(bridgeItemNumber);
 		}
 
@@ -461,11 +463,11 @@ namespace TEN::Collision::Attractor
 
 			auto& attrac = *bridgeItem.Attractor;//bridge.Attractor;
 			if (sphere.Intersects(attrac.GetBox()))
-				nearbyAttracPtrs.push_back(&attrac);
+				nearbyAttracs.push_back(&attrac);
 		}
 
 		// Return pointers to approximately nearby attractors from sphere-AABB tests.
-		return nearbyAttracPtrs;
+		return nearbyAttracs;
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float radius,
@@ -473,18 +475,18 @@ namespace TEN::Collision::Attractor
 	{
 		constexpr auto COLL_COUNT_MAX = 64;
 
-		// Get pointers to approximately nearby attractors.
-		auto attracPtrs = GetNearbyAttractorPtrs(pos, roomNumber, radius);
+		// Get approximately nearby attractors.
+		auto attracs = GetNearbyAttractors(pos, roomNumber, radius);
 
 		// Collect attractor collisions.
 		auto attracColls = std::vector<AttractorCollisionData>{};
-		attracColls.reserve(attracPtrs.size());
-		for (auto* attracPtr : attracPtrs)
+		attracColls.reserve(attracs.size());
+		for (auto* attrac : attracs)
 		{
 			// Get collisions for every segment.
-			for (int i = 0; i < attracPtr->GetSegmentCount(); i++)
+			for (int i = 0; i < attrac->GetSegmentCount(); i++)
 			{
-				auto attracColl = GetAttractorCollision(*attracPtr, i, pos, headingAngle, axis);
+				auto attracColl = GetAttractorCollision(*attrac, i, pos, headingAngle, axis);
 
 				// Filter out non-intersection.
 				if (attracColl.Distance3D > radius)
@@ -520,7 +522,7 @@ namespace TEN::Collision::Attractor
 		auto relOffset = Vector3(right, down, forward);
 		auto rotMatrix = AxisAngle(axis, headingAngle).ToRotationMatrix();
 		auto probePos = pos + Vector3::Transform(relOffset, rotMatrix);
-		int probeRoomNumber = GetCollision(pos, roomNumber, headingAngle, forward, down, right).RoomNumber;
+		int probeRoomNumber = GetPointCollision(pos, roomNumber, headingAngle, forward, down, right).GetRoomNumber();
 
 		return GetAttractorCollisions(probePos, probeRoomNumber, headingAngle, radius);
 	}
@@ -581,18 +583,18 @@ namespace TEN::Collision::Attractor
 	{
 		constexpr auto RADIUS = BLOCK(5);
 
-		auto uniqueAttracPtrs = std::set<AttractorObject*>{};
+		auto uniqueAttracs = std::set<AttractorObject*>{};
 
 		auto attracColls = GetAttractorCollisions(pos, roomNumber, headingAngle, 0.0f, 0.0f, 0.0f, RADIUS);
 		for (const auto& attracColl : attracColls)
 		{
-			uniqueAttracPtrs.insert(attracColl.AttractorPtr);
-			attracColl.AttractorPtr->DrawDebug(attracColl.SegmentID);
+			uniqueAttracs.insert(attracColl.Attractor);
+			attracColl.Attractor->DrawDebug(attracColl.SegmentID);
 		}
 
 		if (g_Renderer.GetDebugPage() == RendererDebugPage::AttractorStats)
 		{
-			g_Renderer.PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracPtrs.size());
+			g_Renderer.PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracs.size());
 			g_Renderer.PrintDebugMessage("Nearby attractor segments: %d", (int)attracColls.size());
 		}
 	}

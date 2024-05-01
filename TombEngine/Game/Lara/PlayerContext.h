@@ -17,22 +17,22 @@ namespace TEN::Entities::Player
 {
 	struct PlayerAttractorData
 	{
-		AttractorObject*	Ptr				= nullptr;
-		float		ChainDistance   = 0.0f;
-		Vector3		RelPosOffset	= Vector3::Zero;
-		EulerAngles RelOrientOffset = EulerAngles::Identity;
+		AttractorObject* Ptr			 = nullptr;
+		float			 ChainDistance	 = 0.0f;
+		Vector3			 RelPosOffset	 = Vector3::Zero;
+		EulerAngles		 RelOrientOffset = EulerAngles::Identity;
 
 		Vector3		RelDeltaPos	   = Vector3::Zero;
 		EulerAngles RelDeltaOrient = EulerAngles::Identity;
 
 		~PlayerAttractorData();
 
-		void Attach(ItemInfo& playerItem, Attractor& attrac, float chainDist,
+		void Attach(ItemInfo& playerItem, AttractorObject& attrac, float chainDist,
 					const Vector3& relPosOffset, const EulerAngles& relOrientOffset,
 					const Vector3& relDeltaPos, const EulerAngles& relDeltaOrient);
 		void Detach(ItemInfo& playerItem);
 
-		void Update(ItemInfo& playerItem, Attractor& attrac, float chainDist,
+		void Update(ItemInfo& playerItem, AttractorObject& attrac, float chainDist,
 					const Vector3& relPosOffset, const EulerAngles& relOrientOffset);
 	};
 

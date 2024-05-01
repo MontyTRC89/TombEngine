@@ -49,7 +49,7 @@ namespace TEN::Control::Volumes
 		}
 	}
 
-	BoundingOrientedBox ConstructRoughBox(ItemInfo& item, const CollisionSetup& coll)
+	BoundingOrientedBox ConstructRoughBox(ItemInfo& item, const CollisionSetupData& coll)
 	{
 		auto pBounds = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 		auto pos = Vector3(item.Pose.Position.x, pBounds.Center.y, item.Pose.Position.z);
@@ -89,14 +89,16 @@ namespace TEN::Control::Volumes
 		return nullptr;
 	}
 
-	void HandleEvent(Event& event, Activator& activator)
+	bool HandleEvent(Event& event, Activator& activator)
 	{
 		if (event.Function.empty() || event.CallCounter == 0 || event.CallCounter < NO_CALL_COUNTER)
-			return;
+			return false;
 
 		g_GameScript->ExecuteFunction(event.Function, activator, event.Data);
 		if (event.CallCounter != NO_CALL_COUNTER)
 			event.CallCounter--;
+
+		return true;
 	}
 
 	bool HandleEvent(const std::string& name, EventType eventType, Activator activator)
@@ -138,7 +140,7 @@ namespace TEN::Control::Volumes
 
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, ActivatorFlags activatorFlag, Activator activator)
 	{
-		if (roomNumber == NO_ROOM)
+		if (roomNumber == NO_VALUE)
 			return;
 
 		for (int currentRoomIndex : g_Level.Rooms[roomNumber].neighbors)
@@ -244,7 +246,7 @@ namespace TEN::Control::Volumes
 		TestVolumes(roomNumber, box, ActivatorFlags::Static, mesh);
 	}
 
-	void TestVolumes(short itemNumber, const CollisionSetup* coll)
+	void TestVolumes(short itemNumber, const CollisionSetupData* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		auto box = (coll != nullptr) ?

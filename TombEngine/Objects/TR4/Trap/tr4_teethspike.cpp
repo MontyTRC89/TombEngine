@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -10,6 +11,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Math/Math.h"
+
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::TR4
 {
@@ -148,9 +151,9 @@ namespace TEN::Entities::TR4
 					TriggerBlood(dx, yBottom - (GetRandomControl() % dy), dz, GetRandomControl() << 1, 1);
 				}
 
-				if (LaraItem->HitPoints <= 0 && Lara.Context.Vehicle == NO_ITEM)
+				if (LaraItem->HitPoints <= 0 && Lara.Context.Vehicle == NO_VALUE)
 				{
-					int heightFromFloor = GetCollision(LaraItem).Position.Floor - LaraItem->Pose.Position.y;
+					int heightFromFloor = GetPointCollision(*LaraItem).GetFloorHeight() - LaraItem->Pose.Position.y;
 
 					if (item->Pose.Position.y >= LaraItem->Pose.Position.y && heightFromFloor < CLICK(1) && 
 						intersection == ContainmentType::CONTAINS)

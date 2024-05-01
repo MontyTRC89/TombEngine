@@ -18,14 +18,17 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Objects/Generic/puzzles_keys.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/Effects/tr4_locusts.h"
 
+
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Hair;
+using namespace TEN::Entities::Creatures::TR3;
 
 int FlipEffect;
 
@@ -88,6 +91,7 @@ void ClearSwarmEnemies(ItemInfo* item)
 	ClearRats();
 	ClearBeetleSwarm();
 	ClearLocusts();
+	ClearFishSwarm();
 }
 
 void FlashOrange(ItemInfo* item) 
@@ -205,7 +209,7 @@ void LaraHandsFree(ItemInfo* item)
 
 void KillActiveBaddys(ItemInfo* item)
 {
-	if (NextItemActive != NO_ITEM)
+	if (NextItemActive != NO_VALUE)
 	{
 		short itemNumber = NextItemActive;
 
@@ -226,7 +230,7 @@ void KillActiveBaddys(ItemInfo* item)
 			}
 
 			itemNumber = targetItem->NextActive;
-		} while (itemNumber != NO_ITEM);
+		} while (itemNumber != NO_VALUE);
 	}
 
 	FlipEffect = -1;

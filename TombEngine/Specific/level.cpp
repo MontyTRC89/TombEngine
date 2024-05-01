@@ -40,8 +40,8 @@ using namespace TEN::Utils;
 const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 {
 	ID_EXPANDING_PLATFORM,
-	ID_SQUISHY_BLOCK1,
-	ID_SQUISHY_BLOCK2,
+	ID_SQUISHY_BLOCK_HORIZONTAL,
+	ID_SQUISHY_BLOCK_VERTICAL,
 
 	ID_FALLING_BLOCK,
 	ID_FALLING_BLOCK2,
@@ -207,7 +207,7 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	InitializeItemArray(NUM_ITEMS);
+	InitializeItemArray(ITEM_COUNT_MAX);
 
 	if (g_Level.NumItems > 0)
 	{
@@ -501,6 +501,7 @@ void LoadCameras()
 
 	NumberSpotcams = ReadInt32();
 
+	// TODO: Read properly!
 	if (NumberSpotcams != 0)
 		ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
 
@@ -791,16 +792,16 @@ void ReadRooms()
 			sector.Stopper = (bool)ReadInt32();
 
 			sector.FloorSurface.SplitAngle = FROM_RAD(ReadFloat());
-			sector.FloorSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
-			sector.FloorSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+			sector.FloorSurface.Triangles[0].SteepSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+			sector.FloorSurface.Triangles[1].SteepSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
 			sector.FloorSurface.Triangles[0].PortalRoomNumber = ReadInt32();
 			sector.FloorSurface.Triangles[1].PortalRoomNumber = ReadInt32();
 			sector.FloorSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
 			sector.FloorSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
 
 			sector.CeilingSurface.SplitAngle = FROM_RAD(ReadFloat());
-			sector.CeilingSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
-			sector.CeilingSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+			sector.CeilingSurface.Triangles[0].SteepSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+			sector.CeilingSurface.Triangles[1].SteepSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
 			sector.CeilingSurface.Triangles[0].PortalRoomNumber = ReadInt32();
 			sector.CeilingSurface.Triangles[1].PortalRoomNumber = ReadInt32();
 			sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
@@ -933,8 +934,8 @@ void ReadRooms()
 		room.reverbType = (ReverbType)ReadInt32();
 		room.flipNumber = ReadInt32();
 
-		room.itemNumber = NO_ITEM;
-		room.fxNumber = NO_ITEM;
+		room.itemNumber = NO_VALUE;
+		room.fxNumber = NO_VALUE;
 		room.index = i;
 
 		g_GameScriptEntities->AddName(room.name, room);
@@ -1302,7 +1303,7 @@ bool LoadLevel(int levelIndex)
 
 		// Initialize the game
 		InitializeGameFlags();
-		InitializeLara(!(InitializeGame || CurrentLevel <= 1));
+		InitializeLara(!InitializeGame && CurrentLevel > 0);
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
@@ -1489,7 +1490,7 @@ void LoadSprites()
 void GetCarriedItems()
 {
 	for (int i = 0; i < g_Level.NumItems; ++i)
-		g_Level.Items[i].CarriedItem = NO_ITEM;
+		g_Level.Items[i].CarriedItem = NO_VALUE;
 
 	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
@@ -1499,7 +1500,7 @@ void GetCarriedItems()
 		if (object.intelligent ||
 			(item.ObjectNumber >= ID_SEARCH_OBJECT1 && item.ObjectNumber <= ID_SEARCH_OBJECT3))
 		{
-			for (short linkNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+			for (short linkNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 			{
 				auto& item2 = g_Level.Items[linkNumber];
 
@@ -1511,7 +1512,7 @@ void GetCarriedItems()
 					item2.CarriedItem = item.CarriedItem;
 					item.CarriedItem = linkNumber;
 					RemoveDrawnItem(linkNumber);
-					item2.RoomNumber = NO_ROOM;
+					item2.RoomNumber = NO_VALUE;
 				}
 			}
 		}
@@ -1540,7 +1541,7 @@ void GetAIPickups()
 					item->ItemFlags[3] = object->triggerFlags;
 
 					if (object->objectNumber != ID_AI_GUARD)
-						object->roomNumber = NO_ROOM;
+						object->roomNumber = NO_VALUE;
 				}
 			}
 

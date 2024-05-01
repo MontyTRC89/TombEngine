@@ -215,7 +215,7 @@ namespace TEN::Entities::TR4
 				else if ((AI.angle >= AHMET_VIEW_ANGLE || AI.angle <= -AHMET_VIEW_ANGLE) ||
 					AI.distance >= AHMET_IDLE_RANGE)
 				{
-					if (item->Animation.RequiredState != NO_STATE)
+					if (item->Animation.RequiredState != NO_VALUE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else
 					{

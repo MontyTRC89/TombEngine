@@ -2,12 +2,14 @@
 #include "Objects/Generic/Object/Pushable/PushableStack.h"
 
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushable/PushableBridge.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::Generic
 {
@@ -44,8 +46,8 @@ namespace TEN::Entities::Generic
 			int x = pushableItem.Pose.Position.x;
 			int z = pushableItem.Pose.Position.z;
 			
-			auto pointColl = GetCollision(&pushableItem);
-			int y = pointColl.Position.Floor;
+			auto pointColl = GetPointCollision(pushableItem);
+			int y = pointColl.GetFloorHeight();
 			
 			stackGroups.emplace(Vector3i(x, y, z), std::vector<int>()).first->second.push_back(itemNumber);
 		}
@@ -105,7 +107,7 @@ namespace TEN::Entities::Generic
 
 	void StackPushable(int itemNumber, int targetItemNumber)
 	{
-		if (targetItemNumber == NO_ITEM)
+		if (targetItemNumber == NO_VALUE)
 			return;
 
 		auto& pushableItem = g_Level.Items[itemNumber];
@@ -124,14 +126,14 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (pushable.Stack.ItemNumberBelow == NO_ITEM)
+		if (pushable.Stack.ItemNumberBelow == NO_VALUE)
 			return;
 
 		auto& lowerPushableItem = g_Level.Items[pushable.Stack.ItemNumberBelow];
 		auto& lowerPushable = GetPushableInfo(lowerPushableItem);
 
-		pushable.Stack.ItemNumberBelow = NO_ITEM;
-		lowerPushable.Stack.ItemNumberAbove = NO_ITEM;
+		pushable.Stack.ItemNumberBelow = NO_VALUE;
+		lowerPushable.Stack.ItemNumberAbove = NO_VALUE;
 	}
 
 	int SearchNearPushablesStack(int itemNumber)
@@ -140,15 +142,15 @@ namespace TEN::Entities::Generic
 
 		int pushabelStackFound = FindPushableStackInRoom(itemNumber, pushableItem.RoomNumber);
 
-		if (pushabelStackFound != NO_ITEM)
+		if (pushabelStackFound != NO_VALUE)
 			return pushabelStackFound;
 
 		// Otherwise, check room below.
-		//auto collisionResult = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);		
+		//auto collisionResult = GetPointCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);		
 		//auto roomNumberBelow = collisionResult.Block->GetRoomNumberBelow(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z).value();
 		//pushabelStackFound = FindPushableStackInRoom(itemNumber, roomNumberBelow);
 
-		return NO_ITEM;
+		return NO_VALUE;
 	}
 
 	int FindPushableStackInRoom(int itemNumber, int roomNumber)
@@ -156,10 +158,10 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (roomNumber != NO_ROOM)
+		if (roomNumber != NO_VALUE)
 		{
 			short currentItemNumber = g_Level.Rooms[roomNumber].itemNumber;
-			while (currentItemNumber != NO_ITEM)
+			while (currentItemNumber != NO_VALUE)
 			{
 				auto& currentItem = g_Level.Items[currentItemNumber];
 
@@ -169,19 +171,19 @@ namespace TEN::Entities::Generic
 					(currentItem.Pose.Position.y > pushableItem.Pose.Position.y))
 				{
 					// Find top item.
-					if (pushable.Stack.ItemNumberAbove == NO_ITEM)
+					if (pushable.Stack.ItemNumberAbove == NO_VALUE)
 					{
 						return currentItemNumber;
 					}
 					else
 					{
 						int topItemNumber = pushable.Stack.ItemNumberAbove;
-						while (topItemNumber != NO_ITEM)
+						while (topItemNumber != NO_VALUE)
 						{
 							auto& topItem = g_Level.Items[topItemNumber];
 							auto& topPushable = GetPushableInfo(topItem);
 
-							if (topPushable.Stack.ItemNumberAbove == NO_ITEM)
+							if (topPushable.Stack.ItemNumberAbove == NO_VALUE)
 							{
 								return topItemNumber;
 							}
@@ -199,7 +201,7 @@ namespace TEN::Entities::Generic
 			}
 		}
 
-		return NO_ITEM;
+		return NO_VALUE;
 	}
 
 	int GetPushableCountInStack(int itemNumber)
@@ -208,7 +210,7 @@ namespace TEN::Entities::Generic
 		auto& pushableCopy = GetPushableInfo(pushableItemCopy);
 
 		int count = 1;
-		while (pushableCopy.Stack.ItemNumberAbove != NO_ITEM)
+		while (pushableCopy.Stack.ItemNumberAbove != NO_VALUE)
 		{
 			// Filter out current pushable item.
 			if (pushableCopy.Stack.ItemNumberAbove == itemNumber)
@@ -239,7 +241,7 @@ namespace TEN::Entities::Generic
 
 		int totalHeight = pushableCopy.Height;
 
-		while (pushableCopy.Stack.ItemNumberAbove != NO_ITEM)
+		while (pushableCopy.Stack.ItemNumberAbove != NO_VALUE)
 		{
 			pushableItemCopy = g_Level.Items[pushableCopy.Stack.ItemNumberAbove];
 			pushableCopy = GetPushableInfo(pushableItemCopy);
@@ -256,7 +258,7 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		int currentItemNumber = pushable.Stack.ItemNumberAbove;
-		while (currentItemNumber != NO_ITEM)
+		while (currentItemNumber != NO_VALUE)
 		{
 			auto& currentPushableItem = g_Level.Items[currentItemNumber];
 			auto& currentPushable = GetPushableInfo(currentPushableItem);
@@ -277,7 +279,7 @@ namespace TEN::Entities::Generic
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		int currentItemNumber = pushable.Stack.ItemNumberAbove;
-		while (currentItemNumber != NO_ITEM)
+		while (currentItemNumber != NO_VALUE)
 		{
 			auto& currentPushableItem = g_Level.Items[currentItemNumber];
 			auto& currentPushable = GetPushableInfo(currentPushableItem);
@@ -310,7 +312,7 @@ namespace TEN::Entities::Generic
 		auto* pushableItemPtr = &g_Level.Items[pushableItem.Index];
 		const auto* pushablePtr = &GetPushableInfo(*pushableItemPtr);
 
-		while (pushablePtr->Stack.ItemNumberAbove != NO_ITEM)
+		while (pushablePtr->Stack.ItemNumberAbove != NO_VALUE)
 		{
 			if (pushablePtr->Stack.ItemNumberAbove == pushableItem.Index)
 				break;

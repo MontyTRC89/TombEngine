@@ -233,7 +233,8 @@ enum class RendererPass
 enum class SpriteRenderType
 {
 	Default,
-	LaserBarrier
+	LaserBarrier,
+	LaserBeam
 };
 
 enum class RendererObjectType

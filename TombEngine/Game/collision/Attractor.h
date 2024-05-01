@@ -75,7 +75,7 @@ namespace TEN::Collision::Attractor
 	{
 	public:
 		// Members
-		AttractorObject* AttractorPtr = nullptr;
+		AttractorObject* Attractor = nullptr;
 
 		unsigned int SegmentID	   = 0;
 		Vector3		 Intersection  = Vector3::Zero;
