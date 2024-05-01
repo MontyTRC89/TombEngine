@@ -1604,7 +1604,7 @@ namespace TEN::Renderer
 			dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
 		}
 
-		dynamicLight.RoomNumber = NO_ROOM;
+		dynamicLight.RoomNumber = NO_VALUE;
 		dynamicLight.Intensity = 1.0f;
 		dynamicLight.Position = Vector3(float(x), float(y), float(z));
 		dynamicLight.Out = falloff * 256.0f;

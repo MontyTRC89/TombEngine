@@ -3,10 +3,13 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::Point;
 
 void FallingCeilingControl(short itemNumber)
 {
@@ -29,12 +32,12 @@ void FallingCeilingControl(short itemNumber)
 		RemoveActiveItem(itemNumber);
 	else
 	{
-		auto probe = GetCollision(item);
+		auto probe = GetPointCollision(*item);
 
-		item->Floor = probe.Position.Floor;
+		item->Floor = probe.GetFloorHeight();
 
-		if (probe.RoomNumber != item->RoomNumber)
-			ItemNewRoom(itemNumber, probe.RoomNumber);
+		if (probe.GetRoomNumber() != item->RoomNumber)
+			ItemNewRoom(itemNumber, probe.GetRoomNumber());
 
 		if (item->Animation.ActiveState == 1)
 		{

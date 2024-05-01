@@ -162,6 +162,9 @@ GameStatus ControlPhase(int numFrames)
 		g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
 		HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
 
+		// Clear last selected item in inventory (need to be after on loop event handling, so they can detect that).
+		g_Gui.CancelInventorySelection();
+
 		// Control lock is processed after handling scripts, because builder may want to
 		// process input externally, while still locking Lara from input.
 		if (!isTitle && Lara.Control.IsLocked)
@@ -680,8 +683,8 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 GameStatus HandleGlobalInputEvents(bool isTitle)
 {
-	constexpr auto DEATH_NO_INPUT_TIMEOUT = 5 * FPS;
-	constexpr auto DEATH_INPUT_TIMEOUT	  = 10 * FPS;
+	constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
+	constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
 
 	if (isTitle)
 		return GameStatus::Normal;

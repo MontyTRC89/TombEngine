@@ -1,16 +1,37 @@
+Version 1.5
+===========
+
+* Fixed original issue with classic switch off trigger wrongly activating some trigger actions.
+* Fixed incorrect diving animation when swandiving from a high place.
+* Fixed camera rotating with Lara's hips when climbing out of water.
+* Fixed AI for skidoo driver and worker with shotgun TR2 enemies.
+* Fixed Ember emitter crashing when ocb is between -1 and -10 
+* Fixed Electric cleaner and Squishy block not detecting collision with certain block heights.
+
+Lua API changes:
+* Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
+
 Version 1.4
 ===========
 
 * Fixed drawing of display sprites in title level.
 * Fixed drawing of smoke sprites and various other sprites.
+* Fixed drawing of transparent surfaces when debris are present in scene.
 * Fixed player holster state and current vehicle not preserved correctly on level jump.
+* Fixed diving when swimming over sinks.
+* Fixed fire item effect not extinguishing in water.
 * Fixed fade-in and fade-out effects not canceling correctly when next level is loaded.
 * Fixed shadows still being visible after shattering a moveable.
 * Fixed FOV interpolation at the end of the flyby sequence.
 * Fixed sounds resuming in pause mode while switching between apps.
 * Fixed slide directions.
 * Fixed occasional collision warnings in a log when teeth spikes object was activated.
+* Fixed climbable pushables collision during continuous pulling action.
+* Fixed collision for solid static meshes with zero collision box.
+* Fixed bottom collision for solid static meshes.
+* Fixed T-Rex's head rotation.
 * Auto-switch to a crawl state if player start position is in a crawlspace.
+* Allow directional flame emitter (negative OCBs) to be rotated at any angle.
 * Revise wall spikes:
   - Wall spikes now stop when they touch a pushable, another spike wall or a normal wall.
   - Wall spikes will shatter any shatter in its path.
@@ -27,6 +48,7 @@ Lua API changes:
 * Added resetHub flag to Flow.Level, which allows to reset hub data.
 * Added Flow.GetFlipMapStatus() function to get current flipmap status.
 * Added Moveable:GetMeshCount() function to get number of moveable meshes.
+* Added timeout parameter for Moveable:Enable() function.
 * Added Static:GetHP() and Static:SetHP() functions to change shatterable static mesh hit points.
 * Fixed Moveable:SetOnCollidedWithObject() callback.
 

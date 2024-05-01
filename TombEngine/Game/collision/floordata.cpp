@@ -1,6 +1,8 @@
 #include "framework.h"
 #include "Game/collision/floordata.h"
+
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
@@ -11,6 +13,7 @@
 #include "Specific/trutils.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using namespace TEN::Utils;
@@ -59,7 +62,7 @@ Vector3 FloorInfo::GetSurfaceNormal(int x, int z, bool isFloor) const
 short FloorInfo::GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const
 {
 	const auto& tri = GetSurfaceTriangle(x, z, isFloor);
-	return tri.IllegalSlopeAngle;
+	return tri.SteepSlopeAngle;
 }
 
 MaterialType FloorInfo::GetSurfaceMaterial(int x, int z, bool isFloor) const
@@ -117,7 +120,7 @@ std::optional<int> FloorInfo::GetNextRoomNumber(int x, int z, bool isBelow) cons
 	const auto& tri = surface.Triangles[triID];
 
 	// Return portal room number below or above if it exists.
-	if (tri.PortalRoomNumber != NO_ROOM)
+	if (tri.PortalRoomNumber != NO_VALUE)
 		return tri.PortalRoomNumber;
 
 	return std::nullopt;
@@ -163,7 +166,7 @@ std::optional<int> FloorInfo::GetSideRoomNumber() const
 {
 	// Return side portal room number if it exists.
 	// TODO: Check how side portals work when a sector connects to multiple side rooms.
-	if (SidePortalRoomNumber != NO_ROOM)
+	if (SidePortalRoomNumber != NO_VALUE)
 		return SidePortalRoomNumber;
 
 	return std::nullopt;
@@ -776,8 +779,7 @@ namespace TEN::Collision::Floordata
 	{
 		constexpr auto VERTICAL_MARGIN = 4;
 
-		auto bounds = GameBoundingBox(&item);
-		auto box = bounds.ToBoundingOrientedBox(item.Pose);
+		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 		
 		auto origin = Vector3(pos.x, pos.y + (useBottomHeight ? VERTICAL_MARGIN : -VERTICAL_MARGIN), pos.z);
 		auto dir = useBottomHeight ? -Vector3::UnitY : Vector3::UnitY;
@@ -785,7 +787,7 @@ namespace TEN::Collision::Floordata
 		// Ray intersects box; return bridge box height.
 		float dist = 0.0f;
 		if (box.Intersects(origin, dir, dist))
-			return (item.Pose.Position.y + (useBottomHeight ? bounds.Y2 : bounds.Y1));
+			return Geometry::TranslatePoint(origin, dir, dist).y;
 
 		return std::nullopt;
 	}
@@ -897,7 +899,7 @@ namespace TEN::Collision::Floordata
 		constexpr auto MINECART_STOP_COLOR			 = Vector4(0.4f, 1.0f, 1.0f, 1.0f);
 
 		// Get point collision.
-		auto pointColl = GetCollision(item);
+		auto pointColl = GetPointCollision(item);
 		auto pos = item.Pose.Position.ToVector3();
 
 		// Run through neighboring rooms.
@@ -913,50 +915,50 @@ namespace TEN::Collision::Floordata
 				pos.x = BLOCK(roomGridCoord.x) + neighborRoom.x;
 				pos.z = BLOCK(roomGridCoord.y) + neighborRoom.z;
 
-				pointColl = GetCollision(pos, neighborRoomNumber);
-				pos.y = pointColl.Position.Floor;
+				pointColl = GetPointCollision(pos, neighborRoomNumber);
+				pos.y = pointColl.GetFloorHeight();
 
 				float verticalOffset = STRING_SPACING;
 
 				// Stopper
-				if (pointColl.Block->Stopper)
+				if (pointColl.GetSector().Stopper)
 				{
 					DrawSectorFlagLabel(pos, "Stopper", STOPPER_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
 
 				// Death
-				if (pointColl.Block->Flags.Death)
+				if (pointColl.GetSector().Flags.Death)
 				{
 					DrawSectorFlagLabel(pos, "Death", DEATH_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
 
 				// Monkey Swing
-				if (pointColl.Block->Flags.Monkeyswing)
+				if (pointColl.GetSector().Flags.Monkeyswing)
 				{
 					DrawSectorFlagLabel(pos, "Monkey Swing", MONKEY_SWING_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
 
 				// Beetle / Minecart Right
-				if (pointColl.Block->Flags.MarkBeetle)
+				if (pointColl.GetSector().Flags.MarkBeetle)
 				{
-					auto labelString = std::string("Beetle") + (!pointColl.Block->Flags.MinecartStop() ? " / Minecart Right" : "");
+					auto labelString = std::string("Beetle") + (!pointColl.GetSector().Flags.MinecartStop() ? " / Minecart Right" : "");
 					DrawSectorFlagLabel(pos, labelString, BEETLE_MINECART_RIGHT_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
 
 				// Activator / Minecart Left
-				if (pointColl.Block->Flags.MarkTriggerer)
+				if (pointColl.GetSector().Flags.MarkTriggerer)
 				{
-					auto labelString = std::string("Activator") + (!pointColl.Block->Flags.MinecartStop() ? " / Minecart Left" : "");
+					auto labelString = std::string("Activator") + (!pointColl.GetSector().Flags.MinecartStop() ? " / Minecart Left" : "");
 					DrawSectorFlagLabel(pos, labelString, ACTIVATOR_MINECART_LEFT_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
 
 				// Minecart Stop
-				if (pointColl.Block->Flags.MinecartStop())
+				if (pointColl.GetSector().Flags.MinecartStop())
 				{
 					DrawSectorFlagLabel(pos, "Minecart Stop", MINECART_STOP_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
