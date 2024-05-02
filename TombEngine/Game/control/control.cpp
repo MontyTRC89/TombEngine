@@ -601,20 +601,6 @@ GameStatus DoGameLoop(int levelIndex)
 			controlLag += frameTime;
 		}
 
-		while (controlLag >= controlFrameTime)
-		{
-			status = ControlPhase(0);
-			controlLag -= controlFrameTime;
-			controlCalls++;
-
-			if (!g_Configuration.EnableVariableFramerate)
-			{
-				float interpolationFactor = 0.0f;
-				DrawPhase(!levelIndex, interpolationFactor);
-				drawCalls++;
-			}
-		}
-
 		if (g_Configuration.EnableVariableFramerate)
 		{
 			float interpolationFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
@@ -622,9 +608,21 @@ GameStatus DoGameLoop(int levelIndex)
 			drawCalls++;
 		}
 
+		while (controlLag >= controlFrameTime)
+		{
+			if (!g_Configuration.EnableVariableFramerate)
+			{
+				DrawPhase(!levelIndex, 0.0f);
+				drawCalls++;
+			}
+
+			status = ControlPhase(0);
+			controlLag -= controlFrameTime;
+			controlCalls++;
+		}
+
 		if (status != GameStatus::Normal)
 			break;
-
 	}
 
 	EndGameLoop(levelIndex, status);
