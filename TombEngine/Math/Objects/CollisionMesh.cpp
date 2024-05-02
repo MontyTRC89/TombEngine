@@ -16,12 +16,23 @@ namespace TEN::Math
 		_vertices[1] = vertex1;
 		_vertices[2] = vertex2;
 
+		// TODO: Must determine polarity in some way.
+		auto edge0 = vertex1 - vertex0;
+		auto edge1 = vertex2 - vertex0;
+		_normal = edge0.Cross(edge1);
+		_normal.Normalize();
+
 		_box = Geometry::GetBoundingBox(std::vector<Vector3>{ _vertices[0], _vertices[1], _vertices[2] });
 	}
 
 	const std::array<Vector3, CollisionTriangle::VERTEX_COUNT>& CollisionTriangle::GetVertices() const
 	{
 		return _vertices;
+	}
+
+	const Vector3& CollisionTriangle::GetNormal() const
+	{
+		return _normal;
 	}
 
 	bool CollisionTriangle::Intersects(const Ray& ray, float& dist) const
@@ -77,16 +88,32 @@ namespace TEN::Math
 		_triangles = tris;
 	}
 
+	const std::vector<CollisionTriangle>& CollisionMesh::GetTriangles() const
+	{
+		return _triangles;
+	}
+
+	// NOTE: Extremely inefficient.
 	bool CollisionMesh::Intersects(const Ray& ray, float& dist) const
 	{
-		// TODO: Vertex indexing, spacial partitioning, BVH tree, whatever.
+		// TODO: Vertex indexing, spacial partitioning/BVH tree, and whatever else is necessary to make this performant.
+
+		float closestDist = INFINITY;
+		bool isIntersected = false;
 
 		for (const auto& tri : _triangles)
 		{
-			if (tri.Intersects(ray, dist))
-				return true;
+			float intersectDist = 0.0f;
+			if (tri.Intersects(ray, intersectDist) && intersectDist < closestDist)
+			{
+				closestDist = intersectDist;
+				isIntersected = true;
+			}
 		}
 
-		return false;
+		if (isIntersected)
+			dist = closestDist;
+
+		return isIntersected;
 	}
 }

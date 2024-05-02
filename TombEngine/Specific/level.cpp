@@ -690,8 +690,9 @@ static int GetSurfaceTriangleVertexHeight(const FloorInfo& sector, int relX, int
 	return (tri.Plane.D() + relPlaneHeight);
 }
 
-// NOTE: Only generates mesh for floor, ceiling, and diagonal walls.
-static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
+// TODO: Doesn't generate cardinal walls.
+static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
+												 const FloorInfo* prevSectorX, const FloorInfo* prevSectorZ, bool isXEnd, bool isZEnd)
 {
 	constexpr auto REL_CORNER_0 = Vector2i(0, 0);
 	constexpr auto REL_CORNER_1 = Vector2i(0, BLOCK(1));
@@ -820,6 +821,9 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector)
 					Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
 				tris.push_back(tri1);
 			}
+
+			// Cardinal wall triangles.
+
 		}
 
 		isFloor = false;
@@ -959,7 +963,17 @@ void ReadRooms()
 				sector.CeilingSurface.Triangles[1].PortalRoomNumber = ReadInt32();
 				sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
 				sector.CeilingSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
-				sector.Mesh = GenerateSectorCollisionMesh(sector);
+
+				if (j > 0 && j < (room.xSize - 1) &&
+					k > 0 && k < (room.zSize - 1))
+				{
+					const FloorInfo* prevXSector = (j != 1) ? &room.floor[((j - 1) * room.zSize) + k] : nullptr;
+					const FloorInfo* prevZSector = (k != 1) ? &room.floor[(j * room.zSize) + (k - 1)] : nullptr;
+					bool isXEnd = (j == (room.xSize - 2));
+					bool isZEnd = (k == (room.zSize - 2));
+
+					sector.Mesh = GenerateSectorCollisionMesh(sector, prevXSector, prevZSector, isXEnd, isZEnd);
+				}
 
 				sector.SidePortalRoomNumber = ReadInt32();
 				sector.Flags.Death = ReadBool();

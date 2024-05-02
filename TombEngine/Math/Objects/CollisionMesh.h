@@ -10,6 +10,7 @@ namespace TEN::Math
 
 		// Members
 		std::array<Vector3, VERTEX_COUNT> _vertices = {};
+		Vector3							  _normal	= Vector3::Zero;
 		BoundingBox						  _box		= BoundingBox();
 
 	public:
@@ -19,6 +20,7 @@ namespace TEN::Math
 
 		// Getters
 		const std::array<Vector3, VERTEX_COUNT>& GetVertices() const;
+		const Vector3&							 GetNormal() const;
 
 		// Inquirers
 		bool Intersects(const Ray& ray, float& dist) const;
@@ -34,6 +36,9 @@ namespace TEN::Math
 		// Constructors
 		CollisionMesh();
 		CollisionMesh(const std::vector<CollisionTriangle>& tris);
+
+		// Getters
+		const std::vector<CollisionTriangle>& GetTriangles() const;
 
 		// Inquireres
 		bool Intersects(const Ray& ray, float& dist) const;
