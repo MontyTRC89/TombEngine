@@ -825,6 +825,18 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			// Cardinal wall triangles on X axis.
 			if (prevSectorX != nullptr)
 			{
+				if (surface->SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
+				{
+					if (sector.IsWall(0))
+					{
+
+					}
+				}
+				else
+				{
+
+				}
+
 				// TODO: Full wall needs to reference floor and ceiling.
 
 				// TODO: Correct triangle ID.

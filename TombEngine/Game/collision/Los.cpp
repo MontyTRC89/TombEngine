@@ -546,11 +546,14 @@ namespace TEN::Collision::Los
 	{
 		auto posPair = g_Renderer.GetRay(screenPos);
 
-		auto origin = GameVector(posPair.first, Camera.RoomNumber);
-		auto target = GameVector(posPair.second, Camera.RoomNumber);
+		auto dir = posPair.second - posPair.first;
+		dir.Normalize();
+		float dist = Vector3::Distance(posPair.first, posPair.second);
 
-		// TODO
-		//LOS(&origin, &target);
+		auto roomLos = GetRoomLos(posPair.first, Camera.RoomNumber, dir, dist);
+
+		auto origin = GameVector(posPair.first, Camera.RoomNumber);
+		auto target = GameVector(roomLos.Position.first, roomLos.Position.second);
 		return std::pair<GameVector, GameVector>(origin, target);
 	}
 }
