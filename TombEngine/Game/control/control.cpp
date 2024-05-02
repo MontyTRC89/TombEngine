@@ -129,7 +129,7 @@ void DrawPhase(bool isTitle, float interpolationFactor)
 	g_Renderer.Lock();
 }
 
-GameStatus ControlPhase(int numFrames)
+GameStatus ControlPhase()
 {
 	static int framesCount = 0;
 
@@ -141,8 +141,6 @@ GameStatus ControlPhase(int numFrames)
 	ClearFires();
 	ClearLensFlares();
 	ClearDisplaySprites();
-
-	numFrames = std::clamp(numFrames, 0, 10);
 
 	if (TrackCameraInit)
 	{
@@ -568,7 +566,7 @@ GameStatus DoGameLoop(int levelIndex)
 	// Before entering actual game loop, ControlPhase must be
 	// called once to sort out various runtime shenanigangs (e.g. hair).
 
-	status = ControlPhase(numFrames);
+	status = ControlPhase();
 
 	LARGE_INTEGER lastTime;
 	LARGE_INTEGER currentTime;
@@ -603,7 +601,7 @@ GameStatus DoGameLoop(int levelIndex)
 
 		while (controlLag >= controlFrameTime)
 		{
-			status = ControlPhase(0);
+			status = ControlPhase();
 			controlLag -= controlFrameTime;
 			controlCalls++;
 

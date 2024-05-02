@@ -876,7 +876,7 @@ namespace TEN::Renderer
 
 			DrawFullScreenImage(texture.ShaderResourceView.Get(), Smoothstep(currentFade), _backBuffer.RenderTargetView.Get(), _backBuffer.DepthStencilView.Get());
 			Synchronize();
-			_swapChain->Present(0, 0);
+			_swapChain->Present(1, 0);
 			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		}
 	}
@@ -956,6 +956,9 @@ namespace TEN::Renderer
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 		_context->RSSetViewports(1, &_viewport);
 		ResetScissor();
+
+		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), Colors::Black);
 
 		if (background != nullptr)
 		{
@@ -1091,7 +1094,7 @@ namespace TEN::Renderer
 			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
 				DrawLoadingBar(percentage);
 
-			_swapChain->Present(0, 0);
+			_swapChain->Present(1, 0);
 			_context->ClearState();
 
 			Synchronize();
@@ -1107,17 +1110,7 @@ namespace TEN::Renderer
 		
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 0.5f);
 		
-		_swapChain->Present(0, 0);
-
-		if (g_Configuration.EnableVariableFramerate)
-		{
-			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
-			_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
-
-			RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 0.5f);
-
-			_swapChain->Present(0, 0);
-		}
+		_swapChain->Present(1, 0);
 	}
 
 	void Renderer::RenderTitle(float interpolationFactor)
@@ -1141,10 +1134,10 @@ namespace TEN::Renderer
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 
-		RenderInventoryScene(&_backBuffer, nullptr, 1.0f);
+		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 1.0f);
 		DrawAllStrings();
 
-		_swapChain->Present(0, 0);
+		_swapChain->Present(1, 0);
 	}
 
 	void Renderer::DrawDebugInfo(RenderView& view)

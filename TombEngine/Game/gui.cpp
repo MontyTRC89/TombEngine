@@ -745,14 +745,19 @@ namespace TEN::Gui
 				if (fromPauseMenu)
 				{
 					g_Renderer.RenderInventory();
-					Camera.numberFrames = g_Renderer.Synchronize();
+					if (!g_Configuration.EnableVariableFramerate)
+					{
+						g_Renderer.Synchronize();
+					}
 				}
 				else
 				{
 					g_Renderer.RenderTitle(0);
-					Camera.numberFrames = g_Renderer.Synchronize();
-					int numFrames = Camera.numberFrames;
-					ControlPhase(numFrames);
+					if (!g_Configuration.EnableVariableFramerate)
+					{
+						g_Renderer.Synchronize();
+					}
+					ControlPhase();
 				}
 			}
 		}
@@ -3323,7 +3328,6 @@ namespace TEN::Gui
 			}
 
 			DrawInventory();
-			DrawCompass(item);
 
 			switch (InvMode)
 			{
@@ -3381,7 +3385,10 @@ namespace TEN::Gui
 
 			SetEnterInventory(NO_VALUE);
 
-			Camera.numberFrames = g_Renderer.Synchronize();
+			if (!g_Configuration.EnableVariableFramerate)
+			{
+				g_Renderer.Synchronize();
+			}
 		}
 
 		LastInvItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
