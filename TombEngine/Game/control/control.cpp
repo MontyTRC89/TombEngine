@@ -609,9 +609,6 @@ GameStatus DoGameLoop(int levelIndex)
 
 			if (!g_Configuration.EnableVariableFramerate)
 			{
-				if (status != GameStatus::Normal)
-					break;
-
 				float interpolationFactor = 0.0f;
 				DrawPhase(!levelIndex, interpolationFactor);
 				drawCalls++;
@@ -620,13 +617,14 @@ GameStatus DoGameLoop(int levelIndex)
 
 		if (g_Configuration.EnableVariableFramerate)
 		{
-			if (status != GameStatus::Normal)
-				break;
-
 			float interpolationFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
 			DrawPhase(!levelIndex, interpolationFactor);
 			drawCalls++;
 		}
+
+		if (status != GameStatus::Normal)
+			break;
+
 	}
 
 	EndGameLoop(levelIndex, status);
