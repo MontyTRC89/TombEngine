@@ -24,6 +24,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/volume.h"
 #include "Game/effects/Hair.h"
@@ -47,6 +48,7 @@
 #include "Specific/winmain.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
@@ -208,7 +210,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			// pre-TR5 bug where player would keep submerged until root mesh was above water level.
 			isWaterOnHeadspace = TestEnvironment(
 				ENV_FLAG_WATER, item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z,
-				GetCollision(item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z, item->RoomNumber).RoomNumber);
+				GetPointCollision(*item, 0, 0, -CLICK(1)).GetRoomNumber());
 
 			if (water.WaterDepth == NO_HEIGHT || abs(water.HeightFromWater) >= CLICK(1) || isWaterOnHeadspace ||
 				item->Animation.AnimNumber == LA_UNDERWATER_RESURFACE || item->Animation.AnimNumber == LA_ONWATER_DIVE)
@@ -334,7 +336,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	if (DebugMode)
 	{
-		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
+		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().Box);
 		DrawNearbySectorFlags(*item);
 	}
 }

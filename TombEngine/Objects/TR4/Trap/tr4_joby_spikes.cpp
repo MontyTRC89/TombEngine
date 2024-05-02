@@ -2,12 +2,15 @@
 #include "tr4_joby_spikes.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/animation.h"
 #include "Sound/sound.h"
 #include "Game/Lara/lara.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
+
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::TR4
 {
@@ -22,13 +25,13 @@ namespace TEN::Entities::TR4
         item->Pose.Orientation.y = GetRandomControl() * 1024;
         item->ItemFlags[2] = GetRandomControl() & 1;
 
-        auto probe = GetCollision(item);
+        auto probe = GetPointCollision(*item);
 
         // TODO: Check this optimized division.
-        //v6 = 1321528399i64 * ((probe.Position.Floor - probe.Position.Ceiling) << 12);
+        //v6 = 1321528399i64 * ((probe.GetFloorHeight() - probe.GetCeilingHeight()) << 12);
         //item->itemFlags[3] = (HIDWORD(v6) >> 31) + (SHIDWORD(v6) >> 10);
 
-        item->ItemFlags[3] = (short)((probe.Position.Floor - probe.Position.Ceiling) * 1024 * 12 / 13);
+        item->ItemFlags[3] = (short)((probe.GetFloorHeight() - probe.GetCeilingHeight()) * 1024 * 12 / 13);
     }
 
     void JobySpikesControl(short itemNumber)

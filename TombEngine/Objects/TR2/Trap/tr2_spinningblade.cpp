@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -10,6 +11,8 @@
 #include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::Point;
 
 void InitializeSpinningBlade(short itemNumber)
 {
@@ -30,7 +33,7 @@ void SpinningBladeControl(short itemNumber)
 			int x = item->Pose.Position.x + BLOCK(3) * phd_sin(item->Pose.Orientation.y) / 2;
 			int z = item->Pose.Position.z + BLOCK(3) * phd_cos(item->Pose.Orientation.y) / 2;
 
-			int floorHeight = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+			int floorHeight = GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetFloorHeight();
 			if (floorHeight == NO_HEIGHT)
 				item->Animation.TargetState = 1;
 		}
@@ -55,13 +58,13 @@ void SpinningBladeControl(short itemNumber)
 
 	AnimateItem(item);
 
-	auto probe = GetCollision(item);
+	auto pointColl = GetPointCollision(*item);
 
-	item->Floor = probe.Position.Floor;
-	item->Pose.Position.y = probe.Position.Floor;
+	item->Floor = pointColl.GetFloorHeight();
+	item->Pose.Position.y = pointColl.GetFloorHeight();
 
-	if (probe.RoomNumber != item->RoomNumber)
-		ItemNewRoom(itemNumber, probe.RoomNumber);
+	if (pointColl.GetRoomNumber() != item->RoomNumber)
+		ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
 	if (isSpinning && item->Animation.ActiveState == 1)
 		item->Pose.Orientation.y += -ANGLE(180.0f);

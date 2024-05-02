@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -18,6 +19,7 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
@@ -212,7 +214,7 @@ namespace TEN::Entities::Vehicles
 		int x = kayakItem->Pose.Position.x + (zOffset * sinY) + (xOffset * cosY);
 		int z = kayakItem->Pose.Position.z + (zOffset * cosY) - (xOffset * sinY);
 
-		int probedRoomNumber = GetCollision(x, kayakItem->Pose.Position.y, z, kayakItem->RoomNumber).RoomNumber;
+		int probedRoomNumber = GetPointCollision(Vector3i(x, kayakItem->Pose.Position.y, z), kayakItem->RoomNumber).GetRoomNumber();
 		int waterHeight = GetWaterHeight(x, kayakItem->Pose.Position.y, z, probedRoomNumber);
 
 		//if (waterHeight != NO_HEIGHT)
@@ -405,8 +407,8 @@ namespace TEN::Entities::Vehicles
 			x = 0;
 			z = 0;
 
-			auto probe = GetCollision(old->x, pos->y, pos->z, kayakItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			auto probe = GetPointCollision(Vector3i(old->x, pos->y, pos->z), kayakItem->RoomNumber);
+			if (probe.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->z > old->z)
 					z = -zShift - 1;
@@ -414,8 +416,8 @@ namespace TEN::Entities::Vehicles
 					z = BLOCK(1) - zShift;
 			}
 
-			probe = GetCollision(pos->x, pos->y, old->z, kayakItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			probe = GetPointCollision(Vector3i(pos->x, pos->y, old->z), kayakItem->RoomNumber);
+			if (probe.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->x > old->x)
 					x = -xShift - 1;
@@ -533,22 +535,22 @@ namespace TEN::Entities::Vehicles
 
 		kayakItem->Pose.Orientation.y += rot;
 
-		auto probe = GetCollision(kayakItem);
-		int probedRoomNum = probe.RoomNumber;
+		auto probe = GetPointCollision(*kayakItem);
+		int probedRoomNum = probe.GetRoomNumber();
 
 		height2 = GetWaterHeight(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z, probedRoomNum);
 		if (height2 == NO_HEIGHT)
-			height2 = probe.Position.Floor;
+			height2 = probe.GetFloorHeight();
 
 		if (height2 < (kayakItem->Pose.Position.y - KAYAK_COLLIDE))
 			KayakDoShift(kayakItem, (Vector3i*)&kayakItem->Pose, &oldPos[8]);
 
-		probe = GetCollision(kayakItem);
-		probedRoomNum = probe.RoomNumber;
+		probe = GetPointCollision(*kayakItem);
+		probedRoomNum = probe.GetRoomNumber();
 
 		height2 = GetWaterHeight(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z, probedRoomNum);
 		if (height2 == NO_HEIGHT)
-			height2 = probe.Position.Floor;
+			height2 = probe.GetFloorHeight();
 
 		if (height2 == NO_HEIGHT)
 		{
@@ -1081,13 +1083,13 @@ namespace TEN::Entities::Vehicles
 		KayakToBackground(kayakItem, laraItem);
 		TestTriggers(kayakItem, false);
 
-		auto probe = GetCollision(kayakItem);
-		int water = GetWaterHeight(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z, probe.RoomNumber);
+		auto probe = GetPointCollision(*kayakItem);
+		int water = GetWaterHeight(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z, probe.GetRoomNumber());
 		kayak->WaterHeight = water;
 
 		if (kayak->WaterHeight == NO_HEIGHT)
 		{
-			water = probe.Position.Floor;
+			water = probe.GetFloorHeight();
 			kayak->WaterHeight = water;
 			kayak->TrueWater = false;
 		}
@@ -1108,10 +1110,10 @@ namespace TEN::Entities::Vehicles
 
 		if (lara->Context.Vehicle != NO_VALUE)
 		{
-			if (kayakItem->RoomNumber != probe.RoomNumber)
+			if (kayakItem->RoomNumber != probe.GetRoomNumber())
 			{
-				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(laraItem->Index, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
+				ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 			}
 
 			laraItem->Pose.Position = kayakItem->Pose.Position;

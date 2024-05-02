@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -17,6 +18,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
 
@@ -215,10 +217,9 @@ void ElectricityWiresControl(short itemNumber)
 			for (int j = 0; j < object.nmeshes; j++)
 			{
 				auto collPos = GetJointPosition(itemPtr, j);
+				auto pointCollJointRoom = GetPointCollision(collPos, itemPtr->RoomNumber).GetRoomNumber();
 
-				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, itemPtr->RoomNumber).RoomNumber;
-
-				if (!isWaterNearby && isTouchingWater && roomNumber == collJointRoom)
+				if (!isWaterNearby && isTouchingWater && roomNumber == pointCollJointRoom)
 					isWaterNearby = true;
 			}
 
