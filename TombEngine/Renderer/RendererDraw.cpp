@@ -1523,8 +1523,8 @@ namespace TEN::Renderer
 					auto vertices = std::array<Vector3, AXIS_COUNT>
 					{
 						center + Vector3(sin(angle) * abs(x), z, cos(angle) * abs(x)),
-							center + Vector3(cos(angle) * abs(x), sin(angle) * abs(x), z),
-							center + Vector3(z, sin(angle) * abs(x), cos(angle) * abs(x))
+						center + Vector3(cos(angle) * abs(x), sin(angle) * abs(x), z),
+						center + Vector3(z, sin(angle) * abs(x), cos(angle) * abs(x))
 					};
 
 					if (j > 0)

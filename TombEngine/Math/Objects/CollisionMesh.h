@@ -26,6 +26,13 @@ namespace TEN::Math
 		bool Intersects(const Ray& ray, float& dist) const;
 	};
 
+	// TODO
+	struct CollisionMeshCollisionData
+	{
+		const CollisionTriangle& Triangle;
+		float Distance = 0.0f;
+	};
+
 	class CollisionMesh
 	{
 	private:

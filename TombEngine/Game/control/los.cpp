@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Los.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/debris.h"
 #include "Game/items.h"
@@ -21,6 +22,7 @@
 #include "Specific/trutils.h"
 
 using namespace TEN::Collision::Los;
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
@@ -66,8 +68,11 @@ bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 	auto dir = target->ToVector3() - origin->ToVector3();
 	dir.Normalize();
 
+	auto offset = target->ToVector3() - origin->ToVector3();
+	auto pointColl = GetPointCollision(target->ToVector3i(), target->RoomNumber, offset);
+
 	*target = GameVector(Geometry::TranslatePoint(target->ToVector3(), -dir, push), target->RoomNumber);
-	GetFloor(target->x, target->y, target->z, &target->RoomNumber);
+	target->RoomNumber = GetPointCollision(target->ToVector3i(), target->RoomNumber).GetRoomNumber();
 
 	return false;
 }
