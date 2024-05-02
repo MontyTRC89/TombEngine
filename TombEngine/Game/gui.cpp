@@ -2808,7 +2808,6 @@ namespace TEN::Gui
 
 		float multiplier = g_Configuration.EnableVariableFramerate ? 2.0f : 1.0f;
 
-
 		if (ring.CurrentObjectList <= 0)
 			return;
 
@@ -3134,13 +3133,13 @@ namespace TEN::Gui
 				if (!i && !ring.ObjectListMovement)
 				{
 					if (invObject.RotFlags & INV_ROT_X)
-						listObject.Orientation.x += ANGLE(5.0f);
+						listObject.Orientation.x += ANGLE(5.0f / multiplier);
 
 					if (invObject.RotFlags & INV_ROT_Y)
-						listObject.Orientation.y += ANGLE(5.0f);
+						listObject.Orientation.y += ANGLE(5.0f / multiplier);
 
 					if (invObject.RotFlags & INV_ROT_Z)
-						listObject.Orientation.z += ANGLE(5.0f);
+						listObject.Orientation.z += ANGLE(5.0f / multiplier);
 				}
 				else
 				{
