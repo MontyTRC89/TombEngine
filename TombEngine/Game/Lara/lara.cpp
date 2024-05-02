@@ -132,8 +132,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	const auto& room = g_Level.Rooms[item->RoomNumber];
 	for (const auto& sector : room.floor)
 	{
-		//for (const auto& tri : sector.Mesh.GetTriangles())
-		//	g_Renderer.AddDebugTriangle(tri.GetVertices()[0], tri.GetVertices()[1], tri.GetVertices()[2], Color(1, 1, 0, 0.5f));
+		for (const auto& tri : sector.Mesh.GetTriangles())
+			g_Renderer.AddDebugTriangle(tri.GetVertices()[0], tri.GetVertices()[1], tri.GetVertices()[2], Color(1, 1, 0, 0.5f));
 	}
 
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);

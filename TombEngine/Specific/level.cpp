@@ -822,8 +822,40 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				tris.push_back(tri1);
 			}
 
-			// Cardinal wall triangles.
+			// Cardinal wall triangles on X axis.
+			if (prevSectorX != nullptr)
+			{
+				// TODO: Full wall needs to reference floor and ceiling.
 
+				// TODO: Correct triangle ID.
+				auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
+				auto vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
+				auto vertex2 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner0.y);
+				auto vertex3 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner1.y);
+
+				// TODO: Triangular steps.
+				if (vertex0.y != vertex2.y && vertex1.y != vertex3.y)
+				{
+					auto tri0 = CollisionTriangle(vertex0, vertex1, vertex2);
+					auto tri1 = CollisionTriangle(vertex1, vertex2, vertex3);
+
+					tris.push_back(tri0);
+					tris.push_back(tri1);
+				}
+
+				// TODO: Walls at ends where no further sectors exist.
+				if (isXEnd)
+				{
+
+				}
+			}
+
+			// TODO
+			// Cardinal wall triangles on Z axis.
+			if (prevSectorZ != nullptr)
+			{
+
+			}
 		}
 
 		isFloor = false;
