@@ -554,6 +554,6 @@ namespace TEN::Collision::Los
 
 		auto origin = GameVector(posPair.first, Camera.RoomNumber);
 		auto target = GameVector(roomLos.Position.first, roomLos.Position.second);
-		return std::pair<GameVector, GameVector>(origin, target);
+		return std::pair(origin, target);
 	}
 }
