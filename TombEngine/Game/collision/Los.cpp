@@ -26,7 +26,7 @@ namespace TEN::Collision::Los
 			Vector3i		 Position = Vector3i::Zero;
 		};
 
-		std::optional<std::pair<Vector3, int>> Intersect  = {};
+		std::optional<std::pair<Vector3, int>> Position	  = {};
 		std::vector<InterceptData>			   Intercepts = {};
 	};
 
@@ -291,10 +291,10 @@ namespace TEN::Collision::Los
 		auto target = Geometry::TranslatePoint(origin, dir, dist);
 		auto deltaPos = target - origin;
 
-		// 1) Collect origin.
+		// 1) Collect origin as intercept.
 		trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, origin });
 
-		// 2) Collect X axis positions.
+		// 2) Collect X axis intercepts.
 		if (deltaPos.x != 0)
 		{
 			// Calculate step.
@@ -322,7 +322,7 @@ namespace TEN::Collision::Los
 			}
 		}
 
-		// 3) Collect Z axis positions.
+		// 3) Collect Z axis intercepts.
 		if (deltaPos.z != 0)
 		{
 			// Calculate step.
@@ -350,7 +350,7 @@ namespace TEN::Collision::Los
 			}
 		}
 
-		// 4) Collect target.
+		// 4) Collect target as intercept.
 		trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, target });
 
 		// 5) Sort intercepts by distance from origin.
@@ -364,7 +364,7 @@ namespace TEN::Collision::Los
 				return (distSqr0 < distSqr1);
 			});
 
-		// 6) Set sector pointers.
+		// 6) Set intercept sector pointers.
 		int probeRoomNumber = roomNumber;
 		for (auto& intercept : trace.Intercepts)
 		{
@@ -382,7 +382,7 @@ namespace TEN::Collision::Los
 		float closestDist = dist;
 		bool hasClip = false;
 
-		// 7) Run through intercepts sorted by distance.
+		// 7) Run through intercepts to find clip.
 		for (int i = 0; i < trace.Intercepts.size(); i++)
 		{
 			const auto& intercept = trace.Intercepts[i];
@@ -455,7 +455,7 @@ namespace TEN::Collision::Los
 					g_Renderer.AddDebugString(std::to_string(intercept.Sector->RoomNumber), *pos2D, Color(1, 1, 1), 1, 0, RendererDebugPage::None);
 
 				// TODO: Get exact boundary position.
-				trace.Intersect = std::pair(intersectPos, intercept.Sector->RoomNumber);
+				trace.Position = std::pair(intersectPos, intercept.Sector->RoomNumber);
 				trace.Intercepts.erase((trace.Intercepts.begin() + i) + 1, trace.Intercepts.end());
 				break;
 			}
@@ -483,10 +483,10 @@ namespace TEN::Collision::Los
 			roomNumbers.insert(intercept.Sector->RoomNumber);
 
 		// Calculate position data.
-		bool hasIntersect = trace.Intersect.has_value();
-		float losDist = hasIntersect ? Vector3::Distance(origin, trace.Intersect->first) : dist;
+		bool hasIntersect = trace.Position.has_value();
+		float losDist = hasIntersect ? Vector3::Distance(origin, trace.Position->first) : dist;
 		auto losPos = Geometry::TranslatePoint(origin, dir, losDist);
-		int losRoomNumber = hasIntersect ? trace.Intersect->second : trace.Intercepts.back().Sector->RoomNumber;
+		int losRoomNumber = hasIntersect ? trace.Position->second : trace.Intercepts.back().Sector->RoomNumber;
 
 		// Create and return room LOS.
 		auto roomLos = RoomLosData{};
