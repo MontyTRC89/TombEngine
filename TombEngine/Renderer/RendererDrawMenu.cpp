@@ -1137,6 +1137,7 @@ namespace TEN::Renderer
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 1.0f);
 		DrawAllStrings();
 
+		_context->ClearState();
 		_swapChain->Present(1, 0);
 	}
 
