@@ -124,13 +124,13 @@ namespace TEN::Collision::Los
 					float intersectDist = 0.0f;
 					if (box.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
 					{
-						auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
-						auto offset = intersectPos - mov->Pose.Position.ToVector3();
+						auto pos = Geometry::TranslatePoint(origin, dir, intersectDist);
+						auto offset = pos - mov->Pose.Position.ToVector3();
 						int roomNumber = GetPointCollision(mov->Pose.Position, mov->RoomNumber, offset).GetRoomNumber();
 
 						auto movLos = MoveableLosData{};
 						movLos.Moveable = mov;
-						movLos.Intersect = std::pair(intersectPos, roomNumber);
+						movLos.Position = std::pair(pos, roomNumber);
 						movLos.IsOriginContained = (bool)box.Contains(origin);
 						movLos.Distance = intersectDist;
 						los.Moveables.push_back(movLos);
@@ -148,14 +148,14 @@ namespace TEN::Collision::Los
 						float intersectDist = 0.0f;
 						if (sphere.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
 						{
-							auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
-							auto offset = intersectPos - mov->Pose.Position.ToVector3();
+							auto pos = Geometry::TranslatePoint(origin, dir, intersectDist);
+							auto offset = pos - mov->Pose.Position.ToVector3();
 							int roomNumber = GetPointCollision(mov->Pose.Position, mov->RoomNumber, offset).GetRoomNumber();
 
 							auto sphereLos = SphereLosData{};
 							sphereLos.Moveable = mov;
 							sphereLos.SphereID = i;
-							sphereLos.Intersect = std::pair(intersectPos, roomNumber);
+							sphereLos.Position = std::pair(pos, roomNumber);
 							sphereLos.IsOriginContained = (bool)sphere.Contains(origin);
 							sphereLos.Distance = intersectDist;
 							los.Spheres.push_back(sphereLos);
@@ -196,13 +196,13 @@ namespace TEN::Collision::Los
 				float intersectDist = 0.0f;
 				if (box.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
 				{
-					auto intersectPos = Geometry::TranslatePoint(origin, dir, intersectDist);
-					auto offset = intersectPos - staticObj->pos.Position.ToVector3();
+					auto pos = Geometry::TranslatePoint(origin, dir, intersectDist);
+					auto offset = pos - staticObj->pos.Position.ToVector3();
 					int roomNumber = GetPointCollision(staticObj->pos.Position, staticObj->roomNumber, offset).GetRoomNumber();
 
 					auto staticLos = StaticLosData{};
 					staticLos.Static = staticObj;
-					staticLos.Intersect = std::pair(intersectPos, roomNumber);
+					staticLos.Position = std::pair(pos, roomNumber);
 					staticLos.IsOriginContained = (bool)box.Contains(origin);
 					staticLos.Distance = intersectDist;
 					los.Statics.push_back(staticLos);

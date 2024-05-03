@@ -103,7 +103,7 @@ static void HandleLosDebug(const ItemInfo& item)
 		if (movLos.Distance < closestDist)
 		{
 			closestDist = movLos.Distance;
-			target = movLos.Intersect.first;
+			target = movLos.Position.first;
 			break;
 		}
 	}
@@ -113,7 +113,7 @@ static void HandleLosDebug(const ItemInfo& item)
 		if (staticLos.Distance < closestDist)
 		{
 			closestDist = staticLos.Distance;
-			target = staticLos.Intersect.first;
+			target = staticLos.Position.first;
 			break;
 		}
 	}

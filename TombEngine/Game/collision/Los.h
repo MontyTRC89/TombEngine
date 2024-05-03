@@ -17,8 +17,8 @@ namespace TEN::Collision::Los
 
 	struct MoveableLosData
 	{
-		ItemInfo*				Moveable  = nullptr;
-		std::pair<Vector3, int> Intersect = {};
+		ItemInfo*				Moveable = nullptr;
+		std::pair<Vector3, int> Position = {};
 
 		bool  IsOriginContained = false;
 		float Distance			= 0.0f;
@@ -26,9 +26,9 @@ namespace TEN::Collision::Los
 	
 	struct SphereLosData
 	{
-		ItemInfo*				Moveable  = nullptr;
-		int						SphereID  = 0;
-		std::pair<Vector3, int> Intersect = {};
+		ItemInfo*				Moveable = nullptr;
+		int						SphereID = 0;
+		std::pair<Vector3, int> Position = {};
 
 		bool  IsOriginContained = false;
 		float Distance			= 0.0f;
@@ -36,8 +36,8 @@ namespace TEN::Collision::Los
 	
 	struct StaticLosData
 	{
-		MESH_INFO*				Static	  = nullptr;
-		std::pair<Vector3, int> Intersect = {};
+		MESH_INFO*				Static	 = nullptr;
+		std::pair<Vector3, int> Position = {};
 
 		bool  IsOriginContained = false;
 		float Distance			= 0.0f;
