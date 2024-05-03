@@ -49,10 +49,10 @@ enum class MaterialType
 
 enum class ClimbDirectionFlags
 {
-	North = (1 << 8),
-	East  = (1 << 9),
-	South = (1 << 10),
-	West  = (1 << 11)
+	North = 1 << 8,
+	East  = 1 << 9,
+	South = 1 << 10,
+	West  = 1 << 11
 };
 
 // NOTE: Describes vertical room location.
@@ -187,7 +187,7 @@ namespace TEN::Collision::Floordata
 	Vector2i				GetSectorPoint(int x, int z);
 	Vector2i				GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds = true);
 	std::vector<Vector2i>	GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
-	std::vector<FloorInfo*> GetNeighborSectorPtrs(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
+	std::vector<FloorInfo*> GetNeighborSectors(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
 
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomGridCoord);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
