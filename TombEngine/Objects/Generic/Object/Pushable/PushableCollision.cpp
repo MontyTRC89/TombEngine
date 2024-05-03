@@ -34,7 +34,10 @@ namespace TEN::Entities::Generic
 		if (pushable.UseRoomCollision)
 		{
 			RemovePushableBridge(pushableItem);
+
 			pointColl = GetPointCollision(pushableItem);
+			pointColl.GetFloorHeight();
+
 			AddPushableBridge(pushableItem);
 		}
 
