@@ -39,11 +39,15 @@ namespace TEN::Effects::Streamer
 
 			std::array<Vector3, VERTEX_COUNT> Vertices = {};
 
+			std::array<Vector3, VERTEX_COUNT> OldVertices = {};
+			Vector4	  OldColor = Vector4::Zero;
+
 			void InitializeVertices(const Vector3& pos, float width);
 			void Update();
 
 		private:
 			void TransformVertices(float vel, float scaleRate);
+			void StoreInterpolationData();
 		};
 
 		// Members

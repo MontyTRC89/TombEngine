@@ -88,14 +88,32 @@ namespace TEN::Renderer
 			{
 				bool isLastSubdivision = (i == (LaserBeamEffect::SUBDIVISION_COUNT - 1));
 
+				Vector4 color = Vector4::Lerp(beam.OldColor, beam.Color, _interpolationFactor);
+
 				AddColoredQuad(
-					beam.Vertices[i],
-					beam.Vertices[isLastSubdivision ? 0 : (i + 1)],
-					beam.Vertices[LaserBeamEffect::SUBDIVISION_COUNT + (isLastSubdivision ? 0 : (i + 1))],
-					beam.Vertices[LaserBeamEffect::SUBDIVISION_COUNT + i],
-					beam.Color, beam.Color,
-					beam.Color, beam.Color,
-					BlendMode::Additive, view, SpriteRenderType::LaserBeam);
+					Vector3::Lerp(
+						beam.OldVertices[i],
+						beam.Vertices[i], 
+						_interpolationFactor),
+					Vector3::Lerp(
+						beam.OldVertices[isLastSubdivision ? 0 : (i + 1)], 
+						beam.Vertices[isLastSubdivision ? 0 : (i + 1)],
+						_interpolationFactor),
+					Vector3::Lerp(
+						beam.OldVertices[LaserBeamEffect::SUBDIVISION_COUNT + (isLastSubdivision ? 0 : (i + 1))],
+						beam.Vertices[LaserBeamEffect::SUBDIVISION_COUNT + (isLastSubdivision ? 0 : (i + 1))],
+						_interpolationFactor),
+					Vector3::Lerp(
+						beam.OldVertices[LaserBeamEffect::SUBDIVISION_COUNT + i],
+						beam.Vertices[LaserBeamEffect::SUBDIVISION_COUNT + i],
+						_interpolationFactor),
+					color,
+					color,
+					color,
+					color,
+					BlendMode::Additive,
+					view,
+					SpriteRenderType::LaserBeam);
 			}
 		}
 	}
@@ -126,29 +144,44 @@ namespace TEN::Renderer
 						if (segment.Flags & (int)StreamerFlags::FadeLeft)
 						{
 							AddColoredQuad(
-								segment.Vertices[0], segment.Vertices[1],
-								prevSegment.Vertices[1], prevSegment.Vertices[0],
-								Vector4::Zero, segment.Color,
-								prevSegment.Color, Vector4::Zero,
-								blendMode, view);
+								Vector3::Lerp(segment.OldVertices[0], segment.Vertices[0], _interpolationFactor), 
+								Vector3::Lerp(segment.OldVertices[1], segment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.OldVertices[1], prevSegment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.OldVertices[0], prevSegment.Vertices[0], _interpolationFactor),
+								Vector4::Zero, 
+								Vector4::Lerp(segment.OldColor, segment.Color, _interpolationFactor),
+								Vector4::Lerp(prevSegment.OldColor, prevSegment.Color, _interpolationFactor),
+								Vector4::Zero,
+								blendMode,
+								view);
 						}
 						else if (segment.Flags & (int)StreamerFlags::FadeRight)
 						{
 							AddColoredQuad(
-								segment.Vertices[0], segment.Vertices[1],
-								prevSegment.Vertices[1], prevSegment.Vertices[0],
-								segment.Color, Vector4::Zero,
-								Vector4::Zero, prevSegment.Color,
-								blendMode, view);
+								Vector3::Lerp(segment.OldVertices[0], segment.Vertices[0], _interpolationFactor),
+								Vector3::Lerp(segment.OldVertices[1], segment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.OldVertices[1], prevSegment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.OldVertices[0], prevSegment.Vertices[0], _interpolationFactor),
+								Vector4::Lerp(segment.OldColor, segment.Color, _interpolationFactor),
+								Vector4::Zero,
+								Vector4::Zero,
+								Vector4::Lerp(prevSegment.OldColor, prevSegment.Color, _interpolationFactor),
+								blendMode,
+								view);
 						}
 						else
 						{
 							AddColoredQuad(
-								segment.Vertices[0], segment.Vertices[1],
-								prevSegment.Vertices[1], prevSegment.Vertices[0],
-								segment.Color, segment.Color,
-								prevSegment.Color, prevSegment.Color,
-								blendMode, view);
+								Vector3::Lerp(segment.OldVertices[0], segment.Vertices[0], _interpolationFactor),
+								Vector3::Lerp(segment.OldVertices[1], segment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.OldVertices[1], prevSegment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.OldVertices[0], prevSegment.Vertices[0], _interpolationFactor),
+								Vector4::Lerp(segment.OldColor, segment.Color, _interpolationFactor),
+								Vector4::Lerp(segment.OldColor, segment.Color, _interpolationFactor),
+								Vector4::Lerp(prevSegment.OldColor, prevSegment.Color, _interpolationFactor),
+								Vector4::Lerp(prevSegment.OldColor, prevSegment.Color, _interpolationFactor),
+								blendMode, 
+								view);
 						}
 					}
 				}
@@ -1505,16 +1538,36 @@ namespace TEN::Renderer
 			if (!s.active) continue;
 
 			if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Spark particle rendering"))
+			{
 				return;
+			}
 
-			Vector3 v;
-			s.velocity.Normalize(v);
+			Vector3 oldVelocity;
+			Vector3 velocity;
+			s.oldVelocity.Normalize(oldVelocity);
+			s.velocity.Normalize(velocity);
+
+			velocity = Vector3::Lerp(oldVelocity, velocity, _interpolationFactor);
+			velocity.Normalize();
 
 			float normalizedLife = s.age / s.life;
 			auto height = Lerp(1.0f, 0.0f, normalizedLife);
 			auto color = Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 
-			AddSpriteBillboardConstrained(&_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BlendMode::Additive, -v, false, view);
+			AddSpriteBillboardConstrained(
+				&_sprites[Objects[ID_SPARK_SPRITE].meshIndex],
+				Vector3::Lerp(s.oldPos, s.pos, _interpolationFactor), 
+				color, 
+				0,
+				1,
+				{ 
+					s.width, 
+					s.height * height 
+				},
+				BlendMode::Additive, 
+				-velocity,
+				false, 
+				view);
 		}
 	}
 

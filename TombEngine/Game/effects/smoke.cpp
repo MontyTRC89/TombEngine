@@ -45,18 +45,14 @@ namespace TEN::Effects::Smoke
 			if (!s.active)
 				continue;
 
+			s.StoreInterpolationData();
+
 			s.age += 1;
 			if (s.age > s.life)
 			{
 				s.active = false;
 				continue;
 			}
-
-			// Interpolation
-			s.oldPosition = s.position;
-			s.oldColor = s.color;
-			s.oldRotation = s.rotation;
-			s.oldSize = s.size;
 
 			s.velocity.y += s.gravity;
 
@@ -114,11 +110,6 @@ namespace TEN::Effects::Smoke
 		s.affectedByWind = true;
 		s.active = true;
 		s.room = room;
-
-		s.oldPosition = s.position;
-		s.oldColor = s.color;
-		s.oldRotation = s.rotation;
-		s.oldSize = s.size;
 	}
 
 	//TODO: add additional "Weapon Special" param or something. Currently initial == 2 means Rocket Launcher backwards smoke.
@@ -205,11 +196,6 @@ namespace TEN::Effects::Smoke
 		s.angularVelocity = Random::GenerateFloat(-PI_DIV_4, PI_DIV_4);
 		s.angularDrag = 0.95f;
 		s.room = roomNumber;
-
-		s.oldPosition = s.position;
-		s.oldColor = s.color;
-		s.oldRotation = s.rotation;
-		s.oldSize = s.size;
 	}
 
 	void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int velocity, int moving)
@@ -233,11 +219,6 @@ namespace TEN::Effects::Smoke
 		s.destinationSize = Random::GenerateFloat(128, 160);
 		s.angularVelocity = Random::GenerateFloat(-1, 1);
 		s.angularDrag = Random::GenerateFloat(0.97f, 0.999f);
-
-		s.oldPosition = s.position;
-		s.oldColor = s.color;
-		s.oldRotation = s.rotation;
-		s.oldSize = s.size;
 	}
 
 	void TriggerRocketSmoke(int x, int y, int z)
@@ -257,11 +238,6 @@ namespace TEN::Effects::Smoke
 		s.destinationSize = Random::GenerateFloat(1024, 1152);
 		s.angularVelocity = Random::GenerateFloat(-0.6f, 0.6f);
 		s.angularDrag = Random::GenerateFloat(0.87f, 0.99f);
-
-		s.oldPosition = s.position;
-		s.oldColor = s.color;
-		s.oldRotation = s.rotation;
-		s.oldSize = s.size;
 	}
 
 	void SpawnCorpseEffect(const Vector3& pos)
@@ -285,11 +261,6 @@ namespace TEN::Effects::Smoke
 		smoke.destinationSize = Random::GenerateFloat(BLOCK(1), BLOCK(1.1f));
 		smoke.angularVelocity = Random::GenerateFloat(-0.1f, 0.1f);
 		smoke.angularDrag = Random::GenerateFloat(0.8f, 0.9f);
-
-		smoke.oldPosition = smoke.position;
-		smoke.oldColor = smoke.color;
-		smoke.oldRotation = smoke.rotation;
-		smoke.oldSize = smoke.size;
 	}
 
 	void TriggerBreathSmoke(long x, long y, long z, short angle)
@@ -313,10 +284,5 @@ namespace TEN::Effects::Smoke
 		s.destinationSize = Random::GenerateFloat(128, 160);
 		s.angularVelocity = Random::GenerateFloat(-0.5f, 0.5f);
 		s.angularDrag = Random::GenerateFloat(0.95f, 0.95f);
-
-		s.oldPosition = s.position;
-		s.oldColor = s.color;
-		s.oldRotation = s.rotation;
-		s.oldSize = s.size;
 	}
 }

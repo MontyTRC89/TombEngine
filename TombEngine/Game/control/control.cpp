@@ -602,7 +602,6 @@ GameStatus DoGameLoop(int levelIndex)
 		while (controlLag >= controlFrameTime)
 		{
 #if _DEBUG
-
 			constexpr auto DEBUG_SKIP_FRAMES = 10;
 
 			if (controlLag >= DEBUG_SKIP_FRAMES * controlFrameTime)

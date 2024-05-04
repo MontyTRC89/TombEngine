@@ -21,6 +21,8 @@ namespace TEN::Effects::Streamer
 
 	void Streamer::StreamerSegment::Update()
 	{
+		StoreInterpolationData();
+
 		// Update opacity.
 		if (Color.w > 0.0f)
 			Color.w = InterpolateCos(0.0f, OpacityMax, Life / LifeMax);
@@ -34,6 +36,13 @@ namespace TEN::Effects::Streamer
 
 		// Update life.
 		Life -= 1.0f;
+	}
+
+	void Streamer::StreamerSegment::StoreInterpolationData()
+	{
+		OldVertices[0] = Vertices[0];
+		OldVertices[1] = Vertices[1];
+		OldColor = Color;
 	}
 
 	void Streamer::StreamerSegment::TransformVertices(float vel, float scaleRate)

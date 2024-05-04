@@ -22,6 +22,15 @@ namespace TEN::Effects::Spark
 		float width;
 		float height;
 		bool active;
+
+		Vector3 oldPos;
+		Vector3 oldVelocity;
+
+		void StoreInterpolationData()
+		{
+			oldPos = pos;
+			oldVelocity = velocity;
+		}
 	};
 	extern std::array<SparkParticle, 128> SparkParticles;
 			
