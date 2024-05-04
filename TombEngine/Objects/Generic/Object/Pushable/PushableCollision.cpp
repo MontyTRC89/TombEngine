@@ -13,8 +13,8 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
@@ -34,7 +34,10 @@ namespace TEN::Entities::Generic
 		if (pushable.UseRoomCollision)
 		{
 			RemovePushableBridge(pushableItem);
+
 			pointColl = GetPointCollision(pushableItem);
+			pointColl.GetFloorHeight();
+
 			AddPushableBridge(pushableItem);
 		}
 
@@ -307,7 +310,9 @@ namespace TEN::Entities::Generic
 			RemovePushableBridge(item);
 
 			pointColl = GetPointCollision(item);
-			waterHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+			pointColl.GetFloorHeight();
+
+			waterHeight = pointColl.GetWaterSurfaceHeight();
 
 			if (waterHeight == NO_HEIGHT && TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
 				waterHeight = g_Level.Rooms[item.RoomNumber].maxceiling;
@@ -316,8 +321,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			pointColl = GetPointCollision(item);
-			waterHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
+			waterHeight = pointColl.GetWaterSurfaceHeight();
 
 			if (waterHeight == NO_HEIGHT && TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
 				waterHeight = g_Level.Rooms[item.RoomNumber].maxceiling;
