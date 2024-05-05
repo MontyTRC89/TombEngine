@@ -18,6 +18,9 @@ using TEN::Renderer::g_Renderer;
 const auto WATERFALL_MAX_LIFE = 100;
 const auto MAX_INVERSE_SCALE_FACTOR = 50.0f;
 const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
+constexpr auto WATERFALL_SPLASH = 0;
+constexpr auto WATERFALL_STREAM1_SPRITE = 1;
+constexpr auto WATERFALL_STREAM2_SPRITE = 2;
 
 	void InitializeWaterfall(short itemNumber)
 	{
@@ -144,7 +147,7 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 					spark->sSize = spark->size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
 					spark->dSize = item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(98.0f, 174.0f);
 
-					spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? SPR_WATERFALL : 0);
+					spark->spriteIndex = Objects[ID_WATERFALL_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? WATERFALL_SPLASH : 0);
 					spark->flags = SP_SCALE | SP_DEF | SP_ROTATE;
 				}
 
@@ -222,6 +225,6 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 		spark->size = spark->sSize = size1 / 4;
 		spark->dSize = size1;
 
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? SPR_WATERFALL : SPR_WATERFALL2);
+		spark->spriteIndex = Objects[ID_WATERFALL_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? WATERFALL_STREAM1_SPRITE : WATERFALL_STREAM2_SPRITE);
 		spark->flags = SP_SCALE | SP_DEF | SP_ROTATE;		
 	}
