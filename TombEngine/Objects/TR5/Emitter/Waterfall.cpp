@@ -62,7 +62,7 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 
 		float finalFade = ((fadeMin >= 1.0f) && (fadeMin == fadeMax)) ? 1.0f : std::max(fadeMin, fadeMax);
 
-		auto startColor = item.Model.Color / 4.0f * finalFade * float(UCHAR_MAX);
+		auto startColor = item.Model.Color / 4.0f * finalFade * float(SCHAR_MAX);
 		auto endColor = item.Model.Color / 8.0f * finalFade * float(UCHAR_MAX);
 
 		// Calculate the inverse scale factor based on size
@@ -82,7 +82,7 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 
 			for (int sign = -1; sign <= 1; sign += 2)
 			{
-				if (Random::GenerateInt(0, 100) > std::clamp((width / 100) * 3, 20, 85))
+				if (Random::GenerateInt(0, 100) > std::clamp((width / 100) * 3, 30, 50))
 				{
 					auto* spark = GetFreeParticle();
 
