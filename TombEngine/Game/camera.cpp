@@ -175,7 +175,7 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 
 		if (movLos.Distance < cameraLos.Distance)
 		{
-			cameraLos = CameraLosData{ true, movLos.Intersect, movLos.Distance };
+			cameraLos = CameraLosData{ true, movLos.Position, movLos.Distance };
 			break;
 		}
 	}
@@ -188,7 +188,7 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 
 		if (staticLos.Distance < cameraLos.Distance)
 		{
-			cameraLos = CameraLosData{ true, staticLos.Intersect, staticLos.Distance };
+			cameraLos = CameraLosData{ true, staticLos.Position, staticLos.Distance };
 			break;
 		}
 	}
