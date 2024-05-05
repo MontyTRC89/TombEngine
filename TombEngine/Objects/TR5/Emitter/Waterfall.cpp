@@ -137,12 +137,12 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 					spark->fadeToBlack = 0;
 
 					spark->rotAng = GetRandomControl() & 0xFFF;
-					spark->scalar = (size + Random::GenerateInt(-5, 5)) / 5;
+					spark->scalar = (size + Random::GenerateInt(0, 5)) / 5;
 					spark->maxYvel = 0;
 					spark->rotAdd = Random::GenerateInt(-16, 16);
 
 					spark->sSize = spark->size = Random::GenerateInt(3, 10) * scale + size * 2;
-					spark->dSize = (1 * spark->size);
+					spark->dSize = spark->size;
 
 					spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? SPR_WATERFALL : 0);
 					spark->flags = SP_SCALE | SP_DEF | SP_ROTATE;
