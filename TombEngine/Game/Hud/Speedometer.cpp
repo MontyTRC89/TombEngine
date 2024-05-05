@@ -64,13 +64,15 @@ namespace TEN::Hud
 		AddDisplaySprite(
 			ID_SPEEDOMETER, DIAL_ELEMENT_SPRITE_ID,
 			POS, 0, SCALE, color,
-			DIAL_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend);
+			DIAL_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend,
+			DisplaySpriteSource::DrawPhase);
 
 		// Draw pointer.
 		AddDisplaySprite(
 			ID_SPEEDOMETER, POINTER_ELEMENT_SPRITE_ID,
 			POS, _pointerAngle + ORIENT_OFFSET, SCALE, color,
-			POINTER_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend);
+			POINTER_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend,
+			DisplaySpriteSource::DrawPhase);
 	}
 
 	void SpeedometerController::Clear()

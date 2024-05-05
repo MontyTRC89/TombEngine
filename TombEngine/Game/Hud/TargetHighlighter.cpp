@@ -144,7 +144,7 @@ namespace TEN::Hud
 		AddDisplaySprite(
 			SPRITE_SEQUENCE_OBJECT_ID, STATIC_ELEMENT_SPRITE_ID,
 			*Position, Orientation, Vector2(Scale), Color,
-			PRIORITY, ALIGN_MODE, SCALE_MODE, BLEND_MODE);
+			PRIORITY, ALIGN_MODE, SCALE_MODE, BLEND_MODE, DisplaySpriteSource::DrawPhase);
 
 		// Draw animated outer segment elements.
 		for (const auto& segment : Segments)
@@ -156,7 +156,7 @@ namespace TEN::Hud
 			AddDisplaySprite(
 				SPRITE_SEQUENCE_OBJECT_ID, SEGMENT_ELEMENT_SPRITE_ID,
 				pos, orient, scale, Color,
-				PRIORITY, ALIGN_MODE, SCALE_MODE, BLEND_MODE);
+				PRIORITY, ALIGN_MODE, SCALE_MODE, BLEND_MODE, DisplaySpriteSource::DrawPhase);
 		}
 	}
 

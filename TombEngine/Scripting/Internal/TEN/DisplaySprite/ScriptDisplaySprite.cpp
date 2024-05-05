@@ -220,6 +220,7 @@ namespace TEN::Scripting::DisplaySprite
 			priority.value_or(DEFAULT_PRIORITY),
 			alignMode.value_or(DEFAULT_ALIGN_MODE),
 			scaleMode.value_or(DEFAULT_SCALE_MODE),
-			blendMode.value_or(DEFAULT_BLEND_MODE));
+			blendMode.value_or(DEFAULT_BLEND_MODE), 
+			DisplaySpriteSource::ControlPhase);
 	}
 }

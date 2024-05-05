@@ -32,6 +32,7 @@
 #include "Specific/winmain.h"
 #include "Renderer/Structures/RendererSortableObject.h"
 #include "Game/effects/weather.h"
+#include "Game/effects/DisplaySprite.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects::Hair;
@@ -40,6 +41,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
 using namespace TEN::Renderer::Structures;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::DisplaySprite;
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
@@ -1667,6 +1669,7 @@ namespace TEN::Renderer
 		using get_time = std::chrono::steady_clock;
 
 		ResetDebugVariables();
+
 		_doingFullscreenPass = false;
 
 		auto& level = *g_GameFlow->GetLevel(CurrentLevel);
@@ -1902,6 +1905,8 @@ namespace TEN::Renderer
 		DrawTriangles3D(view);
 
 		// Draw HUD.
+		ClearDrawPhaseDisplaySprites();
+
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		g_Hud.Draw(*LaraItem);
 		

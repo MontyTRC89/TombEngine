@@ -140,7 +140,7 @@ GameStatus ControlPhase()
 	RegeneratePickups();
 	ClearFires();
 	ClearLensFlares();
-	ClearDisplaySprites();
+	ClearAllDisplaySprites();
 
 	if (TrackCameraInit)
 	{
@@ -438,7 +438,7 @@ void CleanUp()
 	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
-	ClearDisplaySprites();
+	ClearAllDisplaySprites();
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
