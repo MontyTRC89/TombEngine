@@ -82,7 +82,7 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 
 			for (int sign = -1; sign <= 1; sign += 2)
 			{
-				if (Random::GenerateInt(0, 100) > std::clamp((width / 100) * 3, 30, 50))
+				if (Random::GenerateInt(0, 100) > std::clamp((width / 100) * 3, 30, 60))
 				{
 					auto* spark = GetFreeParticle();
 
@@ -137,12 +137,12 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 					spark->fadeToBlack = 0;
 
 					spark->rotAng = GetRandomControl() & 0xFFF;
-					spark->scalar = (size + Random::GenerateInt(0, 5)) / 5;
+					spark->scalar = item.TriggerFlags < 10 ? Random::GenerateInt(2, 4) : Random::GenerateInt(3, 5);
 					spark->maxYvel = 0;
 					spark->rotAdd = Random::GenerateInt(-16, 16);
 
-					spark->sSize = spark->size = Random::GenerateInt(3, 10) * scale + size * 2;
-					spark->dSize = spark->size;
+					spark->sSize = spark->size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
+					spark->dSize = item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(98.0f, 174.0f);
 
 					spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? SPR_WATERFALL : 0);
 					spark->flags = SP_SCALE | SP_DEF | SP_ROTATE;
