@@ -188,12 +188,12 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 		spark->on = true;
 		spark->roomNumber = room;
 		char colorOffset = (Random::GenerateInt(-8, 8));
-		spark->sR =  std::clamp(int(startColor.x) + colorOffset, 0, UCHAR_MAX);
-		spark->sG =  std::clamp(int(startColor.y) + colorOffset, 0, UCHAR_MAX);
-		spark->sB = std::clamp(int(startColor.z) + colorOffset, 0, UCHAR_MAX);
-		spark->dR = std::clamp(int(endColor.x) + colorOffset, 0, UCHAR_MAX);
-		spark->dG = std::clamp(int(endColor.y) + colorOffset, 0, UCHAR_MAX);
-		spark->dB = std::clamp(int(endColor.z) + colorOffset, 0, UCHAR_MAX);
+		spark->sR =  std::clamp(int(startColor.x) + colorOffset, 0, SCHAR_MAX);
+		spark->sG =  std::clamp(int(startColor.y) + colorOffset, 0, SCHAR_MAX);
+		spark->sB = std::clamp(int(startColor.z) + colorOffset, 0, SCHAR_MAX);
+		spark->dR = std::clamp(int(endColor.x) + colorOffset, 0, SCHAR_MAX);
+		spark->dG = std::clamp(int(endColor.y) + colorOffset, 0, SCHAR_MAX);
+		spark->dB = std::clamp(int(endColor.z) + colorOffset, 0, SCHAR_MAX);
 
 		spark->colFadeSpeed = 1;
 		spark->blendMode = BlendMode::Additive;
@@ -210,7 +210,10 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 
 		spark->friction = 3;
 		spark->rotAng = GetRandomControl() & 0xFFF;
-		spark->scalar = scalar = 3 ? scalar - 1 : scalar + 4 ;
+
+		auto scale = scalar = 3 ? scalar - 1 : scalar + 4;
+		scale = std::clamp(int(scale), 2, 9);
+		spark->scalar = scale;
 		
 		spark->rotAdd = Random::GenerateInt(-16, 16);
 		spark->gravity = spark->maxYvel = -64;
@@ -218,8 +221,7 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 		float size1 = (GetRandomControl() & 8) + (size * 4) + scalar;
 		spark->size = spark->sSize = size1 / 4;
 		spark->dSize = size1;
-		spark->extras = 0;
 
 		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 40 ? SPR_WATERFALL : SPR_WATERFALL2);
-		spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;		
+		spark->flags = SP_SCALE | SP_DEF | SP_ROTATE;		
 	}
