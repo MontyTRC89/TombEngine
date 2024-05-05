@@ -82,7 +82,7 @@ const auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 
 			for (int sign = -1; sign <= 1; sign += 2)
 			{
-				if (Random::GenerateInt(0, 100) > std::clamp((width / 100) * 3, 30, 60))
+				if (Random::GenerateInt(0, 100) > std::clamp((width / 100) * 3, 30, 80))
 				{
 					auto* spark = GetFreeParticle();
 
