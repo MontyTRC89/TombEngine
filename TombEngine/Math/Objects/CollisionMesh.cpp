@@ -10,17 +10,18 @@ namespace TEN::Math
 	{
 	}
 
-	CollisionTriangle::CollisionTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
+	CollisionTriangle::CollisionTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal)
 	{
 		_vertices[0] = vertex0;
 		_vertices[1] = vertex1;
 		_vertices[2] = vertex2;
 
 		// TODO: Must determine polarity in some way.
-		auto edge0 = vertex1 - vertex0;
+		/*auto edge0 = vertex1 - vertex0;
 		auto edge1 = vertex2 - vertex0;
 		_normal = edge0.Cross(edge1);
-		_normal.Normalize();
+		_normal.Normalize();*/
+		_normal = normal;
 
 		_box = Geometry::GetBoundingBox(std::vector<Vector3>{ _vertices[0], _vertices[1], _vertices[2] });
 	}
@@ -93,7 +94,7 @@ namespace TEN::Math
 		return _triangles;
 	}
 
-	// NOTE: Extremely inefficient.
+	// NOTE: O(n).
 	bool CollisionMesh::Intersects(const Ray& ray, float& dist) const
 	{
 		// TODO: Vertex indexing, spacial partitioning/BVH tree, and whatever else is necessary to make this performant.

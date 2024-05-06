@@ -122,6 +122,275 @@ static void HandleLosDebug(const ItemInfo& item)
 	g_Renderer.AddDebugTarget(target, Quaternion::Identity, 100, Color(1, 1, 1));
 }
 
+static int GetSurfaceTriangleVertexHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
+{
+	constexpr auto AXIS_OFFSET = -BLOCK(0.5f);
+
+	const auto& tri = isFloor ? sector.FloorSurface.Triangles[triID] : sector.CeilingSurface.Triangles[triID];
+
+	relX += AXIS_OFFSET;
+	relZ += AXIS_OFFSET;
+
+	auto normal = tri.Plane.Normal();
+	float relPlaneHeight = -((normal.x * relX) + (normal.z * relZ)) / normal.y;
+	return (tri.Plane.D() + relPlaneHeight);
+}
+
+static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
+												 const FloorInfo* prevSectorX, const FloorInfo* prevSectorZ, bool isXEnd, bool isZEnd)
+{
+	constexpr auto REL_CORNER_0 = Vector2i(0, 0);
+	constexpr auto REL_CORNER_1 = Vector2i(0, BLOCK(1));
+	constexpr auto REL_CORNER_2 = Vector2i(BLOCK(1), BLOCK(1));
+	constexpr auto REL_CORNER_3 = Vector2i(BLOCK(1), 0);
+
+	auto corner0 = sector.Position + REL_CORNER_0;
+	auto corner1 = sector.Position + REL_CORNER_1;
+	auto corner2 = sector.Position + REL_CORNER_2;
+	auto corner3 = sector.Position + REL_CORNER_3;
+
+	auto tris = std::vector<CollisionTriangle>{};
+
+	// Collect triangles.
+	bool isFloor = true;
+	for (int i = 0; i < 2; i++)
+	{
+		const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
+
+		bool isTri0Portal = (surface.Triangles[0].PortalRoomNumber != NO_VALUE);
+		bool isTri1Portal = (surface.Triangles[1].PortalRoomNumber != NO_VALUE);
+
+		// todo: wall check.
+		/*if (sector.IsSurfaceSplit(isFloor))
+		{
+			if (!isTri0Portal || !isTri1Portal)
+			{
+				if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
+				{
+					// Surface triangle 0.
+					auto tri0 = CollisionTriangle(
+						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
+						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
+						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
+
+					if (!isTri0Portal)
+						tris.push_back(tri0);
+
+					// Surface triangle 1.
+					auto tri1 = CollisionTriangle(
+						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
+						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
+						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
+
+					if (!isTri1Portal)
+						tris.push_back(tri1);
+
+					// Diagonal wall triangles.
+					if (tri0.GetVertices()[0] != tri1.GetVertices()[0] && tri0.GetVertices()[2] != tri1.GetVertices()[1])
+					{
+						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[0], tri0.GetVertices()[2]);
+						tris.push_back(tri2);
+
+						auto tri3 = CollisionTriangle(tri1.GetVertices()[0], tri0.GetVertices()[2], tri1.GetVertices()[1]);
+						tris.push_back(tri3);
+					}
+					else if (tri0.GetVertices()[0] != tri1.GetVertices()[0] && tri0.GetVertices()[2] == tri1.GetVertices()[1])
+					{
+						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[0], tri0.GetVertices()[2]);
+						tris.push_back(tri2);
+					}
+					else if (tri0.GetVertices()[2] == tri1.GetVertices()[1] && tri0.GetVertices()[2] != tri1.GetVertices()[1])
+					{
+						auto tri2 = CollisionTriangle(tri1.GetVertices()[0], tri0.GetVertices()[2], tri1.GetVertices()[1]);
+						tris.push_back(tri2);
+					}
+				}
+				else if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_1)
+				{
+					// Surface triangle 0.
+					auto tri0 = CollisionTriangle(
+						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
+						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y),
+						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y));
+
+					if (!isTri0Portal)
+						tris.push_back(tri0);
+
+					// Surface triangle 1.
+					auto tri1 = CollisionTriangle(
+						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
+						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y),
+						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
+
+					if (!isTri1Portal)
+						tris.push_back(tri1);
+
+					// Diagonal wall triangles.
+					if (tri1.GetVertices()[1] != tri0.GetVertices()[0] && tri1.GetVertices()[2] != tri0.GetVertices()[2])
+					{
+						auto tri2 = CollisionTriangle(tri1.GetVertices()[1], tri0.GetVertices()[0], tri1.GetVertices()[2]);
+						tris.push_back(tri2);
+
+						auto tri3 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[2], tri0.GetVertices()[2]);
+						tris.push_back(tri3);
+					}
+					else if (tri1.GetVertices()[1] != tri0.GetVertices()[0] && tri1.GetVertices()[2] == tri0.GetVertices()[2])
+					{
+						auto tri2 = CollisionTriangle(tri1.GetVertices()[1], tri0.GetVertices()[0], tri1.GetVertices()[2]);
+						tris.push_back(tri2);
+					}
+					else if (tri1.GetVertices()[2] == tri0.GetVertices()[2] && tri1.GetVertices()[2] != tri0.GetVertices()[2])
+					{
+						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[2], tri0.GetVertices()[2]);
+						tris.push_back(tri2);
+					}
+				}
+			}
+		}
+		else*/
+		{
+			// Surface triangle 0.
+			/*if (!isTri0Portal)
+			{
+				auto tri0 = CollisionTriangle(
+					Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
+					Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
+					Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
+				tris.push_back(tri0);
+			}*/
+
+			// Surface triangle 1.
+			/*if (!isTri1Portal)
+			{
+				auto tri1 = CollisionTriangle(
+					Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
+					Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
+					Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
+				tris.push_back(tri1);
+			}*/
+
+			// Cardinal wall triangles on X axis.
+			if (prevSectorX != nullptr)
+			{
+				// TODO: Wall portals.
+				const auto& prevSurfaceX = isFloor ? prevSectorX->FloorSurface : prevSectorX->CeilingSurface;
+
+				// TODO: Full wall needs to reference floor and ceiling.
+				if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
+				{
+					if (sector.IsWall(1) && isFloor)
+					{
+						const auto& ceilSurface = sector.CeilingSurface;
+					}
+				}
+				else
+				{
+					if (sector.IsWall(0))
+					{
+
+					}
+				}
+
+				bool prevSectorTriID = (prevSurfaceX.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_1) ? 1 : 0;
+
+				auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
+				auto vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
+
+				if (vertex0.x < 19000 && vertex0.x > 18200 && vertex0.z < 16600 && vertex0.z > 14900)
+				{
+					g_Renderer.PrintDebugMessage("%d", GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor));
+					g_Renderer.PrintDebugMessage("%d", GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, prevSectorTriID, isFloor));
+				}
+
+				auto vertex2 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, prevSectorTriID, isFloor), corner0.y);
+				auto vertex3 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, prevSectorTriID, isFloor), corner1.y);
+
+				auto tPos0 = g_Renderer.Get2DPosition(vertex0);
+				auto tPos1 = g_Renderer.Get2DPosition(vertex1);
+				auto tPos2 = g_Renderer.Get2DPosition(vertex2);
+				auto tPos3 = g_Renderer.Get2DPosition(vertex3);
+				if (tPos0.has_value())
+					g_Renderer.AddDebugString("0", *tPos0, Color(1, 1, 1), 1, 0, RendererDebugPage::None);
+				if (tPos1.has_value())
+					g_Renderer.AddDebugString("1", *tPos1, Color(1, 1, 1), 1, 0, RendererDebugPage::None);
+				if (tPos2.has_value())
+					g_Renderer.AddDebugString("2", *tPos2, Color(1, 1, 1), 1, 0, RendererDebugPage::None);
+				if (tPos3.has_value())
+					g_Renderer.AddDebugString("3", *tPos3, Color(1, 1, 1), 1, 0, RendererDebugPage::None);
+
+				// Wall triangles.
+				if (vertex0.y != vertex2.y && vertex1.y != vertex3.y) // TODO: Always true?
+				{
+					auto tri0 = CollisionTriangle(vertex0, vertex1, vertex2);
+					auto tri1 = CollisionTriangle(vertex1, vertex2, vertex3);
+
+					tris.push_back(tri0);
+					tris.push_back(tri1);
+				}
+				else if (vertex0.y == vertex2.y && vertex1.y != vertex3.y)
+				{
+					auto tri0 = CollisionTriangle(vertex0, vertex1, vertex3);
+					tris.push_back(tri0);
+				}
+				else if (vertex0.y != vertex2.y && vertex1.y == vertex3.y)
+				{
+					auto tri0 = CollisionTriangle(vertex1, vertex0, vertex1);
+					tris.push_back(tri0);
+				}
+
+				// TODO: Walls at ends where no further sectors exist.
+				if (isXEnd)
+				{
+
+				}
+			}
+
+			// TODO
+			// Cardinal wall triangles on Z axis.
+			if (prevSectorZ != nullptr)
+			{
+
+			}
+		}
+
+		isFloor = false;
+	}
+
+	return CollisionMesh(tris);
+}
+
+void HandleRoomCollisionMesh()
+{
+	auto& room = g_Level.Rooms[LaraItem->RoomNumber];
+
+	for (const auto& sector : room.floor)
+	{
+		for (const auto& tri : sector.Mesh.GetTriangles())
+			g_Renderer.AddDebugTriangle(tri.GetVertices()[0], tri.GetVertices()[1], tri.GetVertices()[2], Color(1, 1, 0, 0.2f));
+	}
+
+	if (!IsClicked(In::Walk))
+		return;
+
+	for (int j = 0; j < room.xSize; j++)
+	{
+		for (int k = 0; k < room.zSize; k++)
+		{
+			if (j > 0 && j < (room.xSize - 1) &&
+				k > 0 && k < (room.zSize - 1))
+			{
+				const FloorInfo* prevXSector = (j != 1) ? &room.floor[((j - 1) * room.zSize) + k] : nullptr;
+				const FloorInfo* prevZSector = (k != 1) ? &room.floor[(j * room.zSize) + (k - 1)] : nullptr;
+				bool isXEnd = (j == (room.xSize - 2));
+				bool isZEnd = (k == (room.zSize - 2));
+
+				auto& sector = room.floor[(j * room.zSize) + k];
+				sector.Mesh = GenerateSectorCollisionMesh(sector, prevXSector, prevZSector, isXEnd, isZEnd);
+			}
+		}
+	}
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
@@ -129,12 +398,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	//--------
 
 	HandleLosDebug(*item);
+	HandleRoomCollisionMesh();
+
 	const auto& room = g_Level.Rooms[item->RoomNumber];
-	for (const auto& sector : room.floor)
-	{
-		//for (const auto& tri : sector.Mesh.GetTriangles())
-		//	g_Renderer.AddDebugTriangle(tri.GetVertices()[0], tri.GetVertices()[1], tri.GetVertices()[2], Color(1, 1, 0, 0.5f));
-	}
 
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);
 	//g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));
