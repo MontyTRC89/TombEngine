@@ -410,7 +410,7 @@ void HandleRoomCollisionMesh()
 				{
 					if (tempPrevSectorX.SidePortalRoomNumber != NO_VALUE)
 					{
-						const auto& prevRoomZ = g_Level.Rooms[tempPrevSectorX.SidePortalRoomNumber];
+						const auto& prevRoomZ = g_Level.Rooms[tempPrevSectorZ.SidePortalRoomNumber];
 						auto prevRoomGridCoordZ = GetRoomGridCoord(prevRoomZ.index, prevRoomZ.x + BLOCK(x), prevRoomZ.z); // TODO
 
 						prevSectorX = &prevRoomZ.floor[(prevRoomGridCoordZ.x * prevRoomZ.zSize) + prevRoomGridCoordZ.y];
