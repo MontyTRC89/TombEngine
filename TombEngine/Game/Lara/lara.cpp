@@ -372,69 +372,66 @@ void HandleRoomCollisionMesh()
 	if (!IsClicked(In::Walk))
 		return;
 
-	for (int x = 0; x < room.xSize; x++)
+	// Run through sectors (ignoring border).
+	for (int x = 1; x < (room.xSize - 1); x++)
 	{
-		for (int z = 0; z < room.zSize; z++)
+		for (int z = 1; z < (room.zSize - 1); z++)
 		{
-			if (x > 0 && x < (room.xSize - 1) &&
-				z > 0 && z < (room.zSize - 1))
+			auto& sector = room.floor[(x * room.zSize) + z];
+
+			// Get previous X sector.
+			const auto& tempPrevSectorX = room.floor[((x - 1) * room.zSize) + z];
+			const FloorInfo* prevSectorX = nullptr;
+			if (x != 1)
 			{
-				auto& sector = room.floor[(x * room.zSize) + z];
-
-				// Get previous X sector.
-				const auto& tempPrevSectorX = room.floor[((x - 1) * room.zSize) + z];
-				const FloorInfo* prevSectorX = nullptr;
-				if (x != 1)
-				{
-					prevSectorX = &tempPrevSectorX;
-				}
-				else
-				{
-					if (tempPrevSectorX.SidePortalRoomNumber != NO_VALUE)
-					{
-						const auto& prevRoomX = g_Level.Rooms[tempPrevSectorX.SidePortalRoomNumber];
-						auto prevRoomGridCoordX = GetRoomGridCoord(prevRoomX.index, prevRoomX.x, prevRoomX.z + BLOCK(z)); // TODO
-
-						prevSectorX = &prevRoomX.floor[(prevRoomGridCoordX.x * prevRoomX.zSize) + prevRoomGridCoordX.y];
-					}
-				}
-
-				// Get previous Z sector.
-				const auto& tempPrevSectorZ = room.floor[(x * room.zSize) + (z - 1)];
-				const FloorInfo* prevSectorZ = nullptr;
-				if (z != 1)
-				{
-					prevSectorZ = &tempPrevSectorZ;
-				}
-				else
-				{
-					if (tempPrevSectorX.SidePortalRoomNumber != NO_VALUE)
-					{
-						const auto& prevRoomZ = g_Level.Rooms[tempPrevSectorZ.SidePortalRoomNumber];
-						auto prevRoomGridCoordZ = GetRoomGridCoord(prevRoomZ.index, prevRoomZ.x + BLOCK(x), prevRoomZ.z); // TODO
-
-						prevSectorX = &prevRoomZ.floor[(prevRoomGridCoordZ.x * prevRoomZ.zSize) + prevRoomGridCoordZ.y];
-					}
-				}
-
-				// Test if at room edge on X axis.
-				bool isXEnd = (x == (room.xSize - 2));
-				if (isXEnd)
-				{
-					const auto& nextSectorX = room.floor[((x + 1) * room.zSize) + z];
-					isXEnd = (nextSectorX.SidePortalRoomNumber == NO_VALUE);
-				}
-
-				// Test if at room edge on Z axis.
-				bool isZEnd = (z == (room.zSize - 2));
-				if (isZEnd)
-				{
-					const auto& nextSectorZ = room.floor[(x * room.zSize) + (z + 1)];
-					isZEnd = (nextSectorZ.SidePortalRoomNumber == NO_VALUE);
-				}
-
-				sector.Mesh = GenerateSectorCollisionMesh(sector, prevSectorX, prevSectorZ, isXEnd, isZEnd);
+				prevSectorX = &tempPrevSectorX;
 			}
+			else
+			{
+				if (tempPrevSectorX.SidePortalRoomNumber != NO_VALUE)
+				{
+					const auto& prevRoomX = g_Level.Rooms[tempPrevSectorX.SidePortalRoomNumber];
+					auto prevRoomGridCoordX = GetRoomGridCoord(prevRoomX.index, prevRoomX.x, prevRoomX.z + BLOCK(z)); // TODO
+
+					prevSectorX = &prevRoomX.floor[(prevRoomGridCoordX.x * prevRoomX.zSize) + prevRoomGridCoordX.y];
+				}
+			}
+
+			// Get previous Z sector.
+			const auto& tempPrevSectorZ = room.floor[(x * room.zSize) + (z - 1)];
+			const FloorInfo* prevSectorZ = nullptr;
+			if (z != 1)
+			{
+				prevSectorZ = &tempPrevSectorZ;
+			}
+			else
+			{
+				if (tempPrevSectorX.SidePortalRoomNumber != NO_VALUE)
+				{
+					const auto& prevRoomZ = g_Level.Rooms[tempPrevSectorZ.SidePortalRoomNumber];
+					auto prevRoomGridCoordZ = GetRoomGridCoord(prevRoomZ.index, prevRoomZ.x + BLOCK(x), prevRoomZ.z); // TODO
+
+					prevSectorX = &prevRoomZ.floor[(prevRoomGridCoordZ.x * prevRoomZ.zSize) + prevRoomGridCoordZ.y];
+				}
+			}
+
+			// Test if at room edge on X axis.
+			bool isXEnd = (x == (room.xSize - 2));
+			if (isXEnd)
+			{
+				const auto& nextSectorX = room.floor[((x + 1) * room.zSize) + z];
+				isXEnd = (nextSectorX.SidePortalRoomNumber == NO_VALUE);
+			}
+
+			// Test if at room edge on Z axis.
+			bool isZEnd = (z == (room.zSize - 2));
+			if (isZEnd)
+			{
+				const auto& nextSectorZ = room.floor[(x * room.zSize) + (z + 1)];
+				isZEnd = (nextSectorZ.SidePortalRoomNumber == NO_VALUE);
+			}
+
+			sector.Mesh = GenerateSectorCollisionMesh(sector, prevSectorX, prevSectorZ, isXEnd, isZEnd);
 		}
 	}
 }

@@ -98,6 +98,8 @@ namespace TEN::Math
 	bool CollisionMesh::Intersects(const Ray& ray, float& dist) const
 	{
 		// TODO: Vertex indexing, spacial partitioning/BVH tree, and whatever else is necessary to make this performant.
+		// TODO: If triangles are made to be collidable only from the "front" as determined by the normal,
+		// loop can end early. Best case becomes O(1).
 
 		float closestDist = INFINITY;
 		bool isIntersected = false;
