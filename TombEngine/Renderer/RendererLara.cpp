@@ -345,7 +345,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		// First matrix is Lara's head matrix, then all hair unit segment matrices.
 		// Bones are adjusted at load time to account for this.
 		_stItem.World = Matrix::Identity;
-		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimationTransforms[LM_HEAD] * _laraWorldMatrix;
+		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimationTransforms[LM_HEAD] * itemToDraw->InterpolatedWorld;
 
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{
