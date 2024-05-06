@@ -973,13 +973,13 @@ void ReadRooms()
 
 		auto base = Vector2i(room.x, room.z);
 		room.floor.reserve(room.zSize * room.xSize);
-		for (int j = 0; j < room.xSize; j++)
+		for (int x = 0; x < room.xSize; x++)
 		{
-			for (int k = 0; k < room.zSize; k++)
+			for (int z = 0; z < room.zSize; z++)
 			{
 				auto sector = FloorInfo{};
 
-				sector.Position = base + Vector2i(BLOCK(j), BLOCK(k));
+				sector.Position = base + Vector2i(BLOCK(x), BLOCK(z));
 				sector.RoomNumber = i;
 
 				sector.TriggerIndex = ReadInt32();
@@ -1008,13 +1008,13 @@ void ReadRooms()
 				sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
 				sector.CeilingSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
 
-				if (j > 0 && j < (room.xSize - 1) &&
-					k > 0 && k < (room.zSize - 1))
+				if (x > 0 && x < (room.xSize - 1) &&
+					z > 0 && z < (room.zSize - 1))
 				{
-					const FloorInfo* prevXSector = (j != 1) ? &room.floor[((j - 1) * room.zSize) + k] : nullptr;
-					const FloorInfo* prevZSector = (k != 1) ? &room.floor[(j * room.zSize) + (k - 1)] : nullptr;
-					bool isXEnd = (j == (room.xSize - 2));
-					bool isZEnd = (k == (room.zSize - 2));
+					const FloorInfo* prevXSector = (x != 1) ? &room.floor[((x - 1) * room.zSize) + z] : nullptr;
+					const FloorInfo* prevZSector = (z != 1) ? &room.floor[(x * room.zSize) + (z - 1)] : nullptr;
+					bool isXEnd = (x == (room.xSize - 2));
+					bool isZEnd = (z == (room.zSize - 2));
 
 					sector.Mesh = GenerateSectorCollisionMesh(sector, prevXSector, prevZSector, isXEnd, isZEnd);
 				}
