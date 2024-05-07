@@ -51,22 +51,9 @@ constexpr auto WATERFALL_STREAM2_SPRITE = 2;
 
 		float cos = phd_cos(angle - ANGLE(90.0f));
 		float sin = phd_sin(angle + ANGLE(90.0f));
-
-		int maxPosX = width * sin + item.Pose.Position.x;
-		int maxPosZ = width * cos + item.Pose.Position.z;
-		int minPosX = -width * sin + item.Pose.Position.x;
-		int minPosZ = -width * cos + item.Pose.Position.z;
-
-		float fadeMin = GetParticleDistanceFade(Vector3i(minPosX, item.Pose.Position.y, minPosZ));
-		float fadeMax = GetParticleDistanceFade(Vector3i(maxPosX, item.Pose.Position.y, maxPosZ));
-
-		if ((fadeMin == 0.0f) && (fadeMin == fadeMax))
-			return;
-
-		float finalFade = ((fadeMin >= 1.0f) && (fadeMin == fadeMax)) ? 1.0f : std::max(fadeMin, fadeMax);
-
-		auto startColor = item.Model.Color / 4.0f * finalFade * float(SCHAR_MAX);
-		auto endColor = item.Model.Color / 8.0f * finalFade * float(UCHAR_MAX);
+		
+		auto startColor = item.Model.Color / 4.0f  * float(SCHAR_MAX);
+		auto endColor = item.Model.Color / 8.0f * float(UCHAR_MAX);
 
 		// Calculate the inverse scale factor based on size
 		float inverseScaleFactor = MAX_INVERSE_SCALE_FACTOR / size;
@@ -121,8 +108,6 @@ constexpr auto WATERFALL_STREAM2_SPRITE = 2;
 						
 					spark->targetPos.y -= waterHeight;
 
-					//g_Renderer.AddDebugLine(origin2, spark->targetPos.ToVector3(), Vector4(1, 0, 0, 1));
-
 					char colorOffset = (Random::GenerateInt(-8, 8));
 					spark->sR = std::clamp(int(startColor.x) + colorOffset, 0, UCHAR_MAX);
 					spark->sG = std::clamp(int(startColor.y) + colorOffset, 0, UCHAR_MAX);
@@ -173,30 +158,22 @@ constexpr auto WATERFALL_STREAM2_SPRITE = 2;
 		int minPosX =  sin + pos.x;
 		int minPosZ =  cos + pos.z;
 
-		float fadeMin = GetParticleDistanceFade(Vector3i(minPosX, pos.y, minPosZ));
-		float fadeMax = GetParticleDistanceFade(Vector3i(maxPosX, pos.y, maxPosZ));
+		auto colorOffset = Color(40.0f, 40.0f, 40.0f);
 
-		if ((fadeMin == 0.0f) && (fadeMin == fadeMax))
-			return;
-
-		float finalFade = ((fadeMin >= 1.0f) && (fadeMin == fadeMax)) ? 1.0f : std::max(fadeMin, fadeMax);
-
-		auto ccl = Color(40.0f, 40.0f, 40.0f);
-
-		auto startColor = (color + ccl) * finalFade ;
-		auto endColor = (color + ccl) * finalFade ;
+		auto startColor = (color + colorOffset);
+		auto endColor = (color + colorOffset);
 		
 		auto* spark = GetFreeParticle();
 		
 		spark->on = true;
 		spark->roomNumber = room;
-		char colorOffset = (Random::GenerateInt(-8, 8));
-		spark->sR =  std::clamp(int(startColor.x) + colorOffset, 0, SCHAR_MAX);
-		spark->sG =  std::clamp(int(startColor.y) + colorOffset, 0, SCHAR_MAX);
-		spark->sB = std::clamp(int(startColor.z) + colorOffset, 0, SCHAR_MAX);
-		spark->dR = std::clamp(int(endColor.x) + colorOffset, 0, SCHAR_MAX);
-		spark->dG = std::clamp(int(endColor.y) + colorOffset, 0, SCHAR_MAX);
-		spark->dB = std::clamp(int(endColor.z) + colorOffset, 0, SCHAR_MAX);
+		char colorVariation = (Random::GenerateInt(-8, 8));
+		spark->sR =  std::clamp(int(startColor.x) + colorVariation, 0, SCHAR_MAX);
+		spark->sG =  std::clamp(int(startColor.y) + colorVariation, 0, SCHAR_MAX);
+		spark->sB = std::clamp(int(startColor.z) + colorVariation, 0, SCHAR_MAX);
+		spark->dR = std::clamp(int(endColor.x) + colorVariation, 0, SCHAR_MAX);
+		spark->dG = std::clamp(int(endColor.y) + colorVariation, 0, SCHAR_MAX);
+		spark->dB = std::clamp(int(endColor.z) + colorVariation, 0, SCHAR_MAX);
 
 		spark->colFadeSpeed = 1;
 		spark->blendMode = BlendMode::Additive;
