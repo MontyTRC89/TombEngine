@@ -3072,6 +3072,11 @@ namespace TEN::Renderer
 
 		// Clear just the Z-buffer to start drawing on top of horizon.
 		_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+		// Reset the GPU state
+		SetDepthState(DepthState::Write);
+		SetBlendMode(BlendMode::Opaque);
+		SetCullMode(CullMode::CounterClockwise);
 	}
 
 	void Renderer::Render(float interpolationFactor)
