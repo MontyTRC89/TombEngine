@@ -12,6 +12,7 @@ public:
 	RGBAColor8Byte(Vector3 const &);
 	RGBAColor8Byte(Vector4 const &);
 
+	operator Color() const;
 	operator Vector3() const;
 	operator Vector4() const;
 	operator D3DCOLOR() const;

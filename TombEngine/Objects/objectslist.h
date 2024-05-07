@@ -32,8 +32,8 @@ template <typename T> std::enable_if_t<std::is_same_v<T, std::underlying_type_t<
 		SPR_SPLASH4,
 		SPR_SPLASH,
 		SPR_RIPPLES,
-		SPR_LENSFLARE,
-		SPR_LENSFLARE_LIGHT,
+		SPR_LENS_FLARE_,
+		SPR_LENS_FLARE__LIGHT,
 		SPR_BULLETIMPACT,
 		SPR_BUBBLES,
 		SPR_UNDERWATERDUST,
@@ -51,8 +51,8 @@ template <typename T> std::enable_if_t<std::is_same_v<T, std::underlying_type_t<
 		SPR_GUI_LEFT,
 		SPR_GUI_RIGHT,
 		SPR_LIGHTHING,
-		SPR_LENSFLARE1,
-		SPR_LENSFLARE2,
-		SPR_LENSFLARE3,
-		SPR_LENSFLARE4
+		SPR_LENS_FLARE_1,
+		SPR_LENS_FLARE_2,
+		SPR_LENS_FLARE_3,
+		SPR_LENS_FLARE_4
 	};

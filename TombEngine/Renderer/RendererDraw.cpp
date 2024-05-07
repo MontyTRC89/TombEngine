@@ -2782,6 +2782,9 @@ namespace TEN::Renderer
 	
 	void Renderer::DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget)
 	{
+		constexpr auto STAR_SIZE = 2;
+		constexpr auto SUN_SIZE	 = 64;
+
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
 		bool anyOutsideRooms = false;
@@ -2858,38 +2861,36 @@ namespace TEN::Renderer
 			UINT offset = 0;
 			_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
-			BindTexture(TextureRegister::ColorMap, _sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE3].Texture, SamplerStateRegister::LinearClamp);
+			BindTexture(TextureRegister::ColorMap, _sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_3].Texture, SamplerStateRegister::LinearClamp);
 
 			int drawnStars = 0;
-			int starsCount = (int)Weather.GetStars().size();
+			int starCount = (int)Weather.GetStars().size();
 
-			while (drawnStars < starsCount)
+			while (drawnStars < starCount)
 			{
-				int starsToDraw = (starsCount - drawnStars) > 100 ? 100 : (starsCount - drawnStars);
+				int starsToDraw = (starCount - drawnStars) > 100 ? 100 : (starCount - drawnStars);
 				int i = 0;
 
 				for (int i = 0; i < starsToDraw; i++)
 				{
-					auto& s = Weather.GetStars()[drawnStars + i];
+					auto& star = Weather.GetStars()[drawnStars + i];
 
 					RendererSpriteToDraw rDrawSprite;
-					rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE3];
-
-					constexpr auto STAR_SIZE = 2;
+					rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_3];
 
 					rDrawSprite.Type = SpriteType::Billboard;
-					rDrawSprite.pos = renderView.Camera.WorldPosition + s.Direction * BLOCK(1);
+					rDrawSprite.pos = renderView.Camera.WorldPosition + star.Direction * BLOCK(1);
 					rDrawSprite.Rotation = 0;
 					rDrawSprite.Scale = 1;
-					rDrawSprite.Width = STAR_SIZE * s.Scale;
-					rDrawSprite.Height = STAR_SIZE * s.Scale;
+					rDrawSprite.Width = STAR_SIZE * star.Scale;
+					rDrawSprite.Height = STAR_SIZE * star.Scale;
 
 					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
 					_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
-						s.Color.x,
-						s.Color.y,
-						s.Color.z,
-						s.Blinking * s.Extinction);
+						star.Color.x,
+						star.Color.y,
+						star.Color.z,
+						star.Blinking * star.Extinction);
 					_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
 					_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = 0;
 
@@ -2916,14 +2917,14 @@ namespace TEN::Renderer
 			if (Weather.GetMeteors().size() > 0)
 			{
 				RendererSpriteToDraw rDrawSprite;
-				rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE3];
+				rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_3];
 				BindTexture(TextureRegister::ColorMap, rDrawSprite.Sprite->Texture, SamplerStateRegister::LinearClamp);
 
-				int meteorsCount = 0;
+				int meteorCount = 0;
 
 				for (int i = 0; i < Weather.GetMeteors().size(); i++)
 				{
-					MeteorParticle meteor = Weather.GetMeteors()[i];
+					auto meteor = Weather.GetMeteors()[i];
 
 					if (meteor.Active == false)
 						continue;
@@ -2938,33 +2939,32 @@ namespace TEN::Renderer
 					rDrawSprite.Height = 192;
 					rDrawSprite.ConstrainAxis = meteor.Direction;
 
-					_stInstancedSpriteBuffer.Sprites[meteorsCount].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
-					_stInstancedSpriteBuffer.Sprites[meteorsCount].Color = Vector4(
+					_stInstancedSpriteBuffer.Sprites[meteorCount].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+					_stInstancedSpriteBuffer.Sprites[meteorCount].Color = Vector4(
 						meteor.Color.x,
 						meteor.Color.y,
 						meteor.Color.z,
-						Lerp(meteor.OldFade, meteor.Fade, _interpolationFactor)
-					);
-					_stInstancedSpriteBuffer.Sprites[meteorsCount].IsBillboard = 1;
+						Lerp(meteor.OldFade, meteor.Fade, _interpolationFactor));
+					_stInstancedSpriteBuffer.Sprites[meteorCount].IsBillboard = 1;
 					_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = 0;
 
 					// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
-					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[0].x = rDrawSprite.Sprite->UV[0].x;
-					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[0].y = rDrawSprite.Sprite->UV[1].x;
-					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[0].z = rDrawSprite.Sprite->UV[2].x;
-					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[0].w = rDrawSprite.Sprite->UV[3].x;
-					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[1].x = rDrawSprite.Sprite->UV[0].y;
-					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[1].y = rDrawSprite.Sprite->UV[1].y;
-					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[1].z = rDrawSprite.Sprite->UV[2].y;
-					_stInstancedSpriteBuffer.Sprites[meteorsCount].UV[1].w = rDrawSprite.Sprite->UV[3].y;
+					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[0].x = rDrawSprite.Sprite->UV[0].x;
+					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[0].y = rDrawSprite.Sprite->UV[1].x;
+					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[0].z = rDrawSprite.Sprite->UV[2].x;
+					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[0].w = rDrawSprite.Sprite->UV[3].x;
+					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[1].x = rDrawSprite.Sprite->UV[0].y;
+					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[1].y = rDrawSprite.Sprite->UV[1].y;
+					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[1].z = rDrawSprite.Sprite->UV[2].y;
+					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[1].w = rDrawSprite.Sprite->UV[3].y;
 
-					meteorsCount++;
+					meteorCount++;
 				}
 
 				_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
 
 				// Draw sprites with instancing.
-				DrawInstancedTriangles(4, meteorsCount, 0);
+				DrawInstancedTriangles(4, meteorCount, 0);
 			}
 
 			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -3016,8 +3016,8 @@ namespace TEN::Renderer
 			}
 		}
 
-		// Eventually draw the sun sprite
-		if (renderView.LensFlaresToDraw.size() > 0 && renderView.LensFlaresToDraw[0].Global)
+		// Eventually draw the sun sprite.
+		if (!renderView.LensFlaresToDraw.empty() && renderView.LensFlaresToDraw[0].IsGlobal)
 		{
 			SetDepthState(DepthState::Read);
 			SetBlendMode(BlendMode::Additive);
@@ -3035,8 +3035,6 @@ namespace TEN::Renderer
 
 			RendererSpriteToDraw rDrawSprite;
 			rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + renderView.LensFlaresToDraw[0].SpriteIndex];
-
-			constexpr auto SUN_SIZE = 64;
 
 			rDrawSprite.Type = SpriteType::Billboard;
 			rDrawSprite.pos = renderView.Camera.WorldPosition + renderView.LensFlaresToDraw[0].Direction * BLOCK(1);

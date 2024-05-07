@@ -40,6 +40,7 @@
 #include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Math/Math.h"
+#include "Objects/Effects/LensFlare.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"
@@ -60,7 +61,6 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
-#include "Objects/Effects/lens_flare.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects;
@@ -249,8 +249,7 @@ GameStatus ControlPhase()
 		SetupGlobalLensFlare(
 			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlarePosition(),
 			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareColor(),
-			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareSpriteID()
-		);
+			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareSpriteID());
 	}
 
 	// Update HUD.

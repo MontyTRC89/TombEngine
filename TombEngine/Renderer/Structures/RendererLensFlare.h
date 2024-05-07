@@ -1,18 +1,17 @@
 #pragma once
-#include <SimpleMath.h>
 #include "Renderer/RendererEnums.h"
 
 namespace TEN::Renderer::Structures
 {
-	using namespace DirectX::SimpleMath;
-
 	struct RendererLensFlare
 	{
-		Vector3 Position;
-		Vector3 Color;
-		Vector3 Direction;
-		float Distance;
-		bool Global;
-		int SpriteIndex;
+		int SpriteIndex = 0;
+
+		Vector3 Position  = Vector3::Zero;
+		Vector3 Direction = Vector3::Zero;
+		Color	Color	  = {};
+
+		float Distance = 0.0f;
+		bool  IsGlobal = false;
 	};
 }

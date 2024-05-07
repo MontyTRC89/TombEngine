@@ -160,7 +160,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->flags = SP_SCALE | SP_DEF;
 		spark->scalar = 3;
 		spark->maxYvel = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE_LIGHT;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE__LIGHT;
 		spark->gravity = 0;
 		spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 	}

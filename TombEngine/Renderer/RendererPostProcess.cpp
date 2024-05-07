@@ -20,15 +20,15 @@ namespace TEN::Renderer
 		_stPostProcessBuffer.Tint = _postProcessTint;
 		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
 
-		// Common vertex shader to all fullscreen effects
+		// Common vertex shader to all fullscreen effects.
 		_context->VSSetShader(_vsPostProcess.Get(), nullptr, 0);
 
-		// We draw a fullscreen triangle
+		// Draw fullscreen triangle.
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_fullscreenTriangleInputLayout.Get());
 
-		UINT stride = sizeof(PostProcessVertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(PostProcessVertex);
+		unsigned int offset = 0;
 
 		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
@@ -41,15 +41,15 @@ namespace TEN::Renderer
 		BindRenderTargetAsTexture(TextureRegister::ColorMap, &_renderTarget, SamplerStateRegister::PointWrap);
 		DrawTriangles(3, 0);
 
-		// Let's do ping-pong between the two post-process render targets
+		// Ping-pong between two post-process render targets.
 		int currentRenderTarget = 0;
-		int destinationRenderTarget = 1;
+		int destRenderTarget = 1;
 
-		// Apply color scheme
+		// Apply color scheme.
 		if (_postProcessMode != PostProcessMode::None && _postProcessStrength > EPSILON)
 		{
-			_context->ClearRenderTargetView(_postProcessRenderTarget[destinationRenderTarget].RenderTargetView.Get(), clearColor);
-			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destinationRenderTarget].RenderTargetView.GetAddressOf(), nullptr);
+			_context->ClearRenderTargetView(_postProcessRenderTarget[destRenderTarget].RenderTargetView.Get(), clearColor);
+			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destRenderTarget].RenderTargetView.GetAddressOf(), nullptr);
 
 			switch (_postProcessMode)
 			{
@@ -72,22 +72,22 @@ namespace TEN::Renderer
 			BindRenderTargetAsTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
 			DrawTriangles(3, 0);
 
-			destinationRenderTarget = destinationRenderTarget == 1 ? 0 : 1;
-			currentRenderTarget = currentRenderTarget == 1 ? 0 : 1;
+			destRenderTarget = (destRenderTarget == 1) ? 0 : 1;
+			currentRenderTarget = (currentRenderTarget == 1) ? 0 : 1;
 		}
 
-		// Lens flares
-		if (view.LensFlaresToDraw.size() > 0)
+		// Lens flares.
+		if (!view.LensFlaresToDraw.empty())
 		{
-			_context->ClearRenderTargetView(_postProcessRenderTarget[destinationRenderTarget].RenderTargetView.Get(), clearColor);
-			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destinationRenderTarget].RenderTargetView.GetAddressOf(), nullptr);
+			_context->ClearRenderTargetView(_postProcessRenderTarget[destRenderTarget].RenderTargetView.Get(), clearColor);
+			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destRenderTarget].RenderTargetView.GetAddressOf(), nullptr);
 
 			_context->PSSetShader(_psPostProcessLensFlare.Get(), nullptr, 0);
 
 			for (int i = 0; i < view.LensFlaresToDraw.size(); i++)
 			{
 				_stPostProcessBuffer.LensFlares[i].Position = view.LensFlaresToDraw[i].Position;
-				_stPostProcessBuffer.LensFlares[i].Color = view.LensFlaresToDraw[i].Color;
+				_stPostProcessBuffer.LensFlares[i].Color = view.LensFlaresToDraw[i].Color.ToVector3();
 			}
 			_stPostProcessBuffer.NumLensFlares = (int)view.LensFlaresToDraw.size();
 			_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
@@ -95,11 +95,11 @@ namespace TEN::Renderer
 			BindRenderTargetAsTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
 			DrawTriangles(3, 0);
 
-			destinationRenderTarget = destinationRenderTarget == 1 ? 0 : 1;
-			currentRenderTarget = currentRenderTarget == 1 ? 0 : 1;
+			destRenderTarget = (destRenderTarget) == 1 ? 0 : 1;
+			currentRenderTarget = (currentRenderTarget == 1) ? 0 : 1;
 		}
 
-		// Do the final pass
+		// Do final pass.
 		_context->PSSetShader(_psPostProcessFinalPass.Get(), nullptr, 0);
 
 		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), Colors::Black);

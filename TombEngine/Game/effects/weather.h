@@ -1,8 +1,7 @@
 #pragma once
-#include <SimpleMath.h>
-#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Math/Math.h"
-#include "Objects/Effects/lens_flare.h"
+#include "Objects/Effects/LensFlare.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Entities::Effects;
 

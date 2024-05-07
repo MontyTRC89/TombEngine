@@ -1,22 +1,22 @@
 #include "framework.h"
 #include "Renderer/Renderer.h"
 
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Game/spotcam.h"
 #include "Game/Setup.h"
+#include "Game/spotcam.h"
 #include "Math/Math.h"
-#include "Specific/level.h"
+#include "Objects/Effects/LensFlare.h"
 #include "Renderer/RenderView.h"
-#include "Objects/Effects/lens_flare.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/level.h"
 
-using namespace TEN::Math;
 using namespace TEN::Entities::Effects;
+using namespace TEN::Math;
 
 namespace TEN::Renderer
 {
@@ -92,8 +92,7 @@ namespace TEN::Renderer
 		}
 
 		std::sort(
-			tempFogBulbs.begin(),
-			tempFogBulbs.end(),
+			tempFogBulbs.begin(), tempFogBulbs.end(),
 			[](const RendererFogBulb& bulb0, const RendererFogBulb& bulb1)
 			{
 				return bulb0.Distance < bulb1.Distance;
@@ -102,55 +101,56 @@ namespace TEN::Renderer
 		for (int i = 0; i < std::min(MAX_FOG_BULBS_DRAW, (int)tempFogBulbs.size()); i++)
 			renderView.FogBulbsToDraw.push_back(tempFogBulbs[i]);
 
-		// Collect lens flares
-		std::vector<RendererLensFlare> tempLensFlares;
+		// Collect lens flares.
+		auto tempLensFlares = std::vector<RendererLensFlare>{};
 		tempLensFlares.reserve(MAX_LENS_FLARES_DRAW);
 
-		for (auto lensFlare : LensFlares)
+		for (const auto& lensFlare : LensFlares)
 		{
-			Vector3 lensFlareToCamera = lensFlare.Position - renderView.Camera.WorldPosition;
-			float distance = 0.0f;
-			if (!lensFlare.Global)
-			{
-				distance = lensFlareToCamera.Length();
-			}	
+			auto lensFlareToCamera = lensFlare.Position - renderView.Camera.WorldPosition;
+			
+			float dist = 0.0f;
+			if (!lensFlare.IsGlobal)
+				dist = lensFlareToCamera.Length();
 			lensFlareToCamera.Normalize();
 			
-			Vector3 cameraDirection = renderView.Camera.WorldDirection;
-			cameraDirection.Normalize();
+			auto cameraDir = renderView.Camera.WorldDirection;
+			cameraDir.Normalize();
 
-			if (lensFlareToCamera.Dot(cameraDirection) >= 0.0f)
+			if (lensFlareToCamera.Dot(cameraDir) >= 0.0f)
 			{
-				RendererLensFlare lensFlareToDraw;
-
+				auto lensFlareToDraw = RendererLensFlare{};
 				lensFlareToDraw.Position = lensFlare.Position;
-				lensFlareToDraw.Distance = distance;
+				lensFlareToDraw.Distance = dist;
 				lensFlareToDraw.Color = lensFlare.Color;
 				lensFlareToDraw.SpriteIndex = lensFlare.SpriteIndex;
 				lensFlareToDraw.Direction = lensFlareToCamera;
-				lensFlareToDraw.Global = lensFlare.Global;
+				lensFlareToDraw.IsGlobal = lensFlare.IsGlobal;
 
 				tempLensFlares.push_back(lensFlareToDraw);
 			}
 		}
 
 		std::sort(
-			tempLensFlares.begin(),
-			tempLensFlares.end(),
+			tempLensFlares.begin(), tempLensFlares.end(),
 			[](const RendererLensFlare& lensFlare0, const RendererLensFlare& lensFlare1)
 			{
-				if (lensFlare0.Global && !lensFlare1.Global)
+				if (lensFlare0.IsGlobal && !lensFlare1.IsGlobal)
+				{
 					return true;
-				else if (!lensFlare0.Global && lensFlare1.Global)
+				}
+				else if (!lensFlare0.IsGlobal && lensFlare1.IsGlobal)
+				{
 					return false;
+				}
 				else
+				{
 					return lensFlare0.Distance < lensFlare1.Distance;
+				}
 			});
 
 		for (int i = 0; i < std::min(MAX_LENS_FLARES_DRAW, (int)tempLensFlares.size()); i++)
-		{
 			renderView.LensFlaresToDraw.push_back(tempLensFlares[i]);
-		}
 	}
 
 	bool Renderer::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)

@@ -9,7 +9,7 @@ namespace sol { class state; }
 struct LensFlare
 {
     bool Enabled;
-    int SunSpriteID = SPR_LENSFLARE3; // Index into sprites
+    int SunSpriteID = SPR_LENS_FLARE_3; // Index into sprites
     byte R;
     byte G;
     byte B;

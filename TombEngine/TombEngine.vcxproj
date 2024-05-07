@@ -442,7 +442,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Effects\EmberEmitter.h" />
     <ClInclude Include="Objects\Effects\enemy_missile.h" />
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
-    <ClInclude Include="Objects\Effects\lens_flare.h" />
+    <ClInclude Include="Objects\Effects\LensFlare.h" />
     <ClInclude Include="Objects\Effects\tr4_locusts.h" />
     <ClInclude Include="Objects\Effects\tr5_electricity.h" />
     <ClInclude Include="Objects\Generic\Doors\double_doors.h" />
@@ -956,7 +956,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Effects\EmberEmitter.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
-    <ClCompile Include="Objects\Effects\lens_flare.cpp" />
+    <ClCompile Include="Objects\Effects\LensFlare.cpp" />
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
     <ClCompile Include="Objects\Effects\tr5_electricity.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />
