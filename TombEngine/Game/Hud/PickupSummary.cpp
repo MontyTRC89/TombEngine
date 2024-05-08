@@ -215,7 +215,10 @@ namespace TEN::Hud
 		_displayPickups.erase(
 			std::remove_if(
 				_displayPickups.begin(), _displayPickups.end(),
-				[](const DisplayPickup& pickup) { return ((pickup.Life <= 0.0f) && pickup.IsOffscreen()); }),
+				[](const DisplayPickup& pickup)
+				{
+					return ((pickup.Life <= 0.0f) && pickup.IsOffscreen());
+				}),
 			_displayPickups.end());
 	}
 

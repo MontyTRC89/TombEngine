@@ -46,6 +46,21 @@ namespace TEN::Hud
 		// Utilities
 		void Update(const Vector3& targetPos, bool isActive, bool doPulse);
 		void Draw() const;
+
+		Vector2 PrevPosition	= Vector2::Zero;
+		short	PrevOrientation = 0;
+		float	PrevScale		= 0.0f;
+		Vector4 PrevColor		= Vector4::Zero;
+		std::array<SegmentData, SEGMENT_COUNT> PrevSegments = {};
+
+		void StoreInterpolationData()
+		{
+			PrevPosition = *Position;
+			PrevOrientation = Orientation;
+			PrevScale = Scale;
+			PrevColor = Color;
+			PrevSegments = Segments;
+		}
 	};
 
 	class TargetHighlighterController

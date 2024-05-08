@@ -729,7 +729,7 @@ namespace TEN::Renderer
 		// Draw count string.
 		if (pickup.Count != 1)
 		{
-			auto countString = (pickup.Count != -1) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
+			auto countString = (pickup.Count != NO_VALUE) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
 			auto countStringPos = pickup.Position + COUNT_STRING_OFFSET;
 
 			AddString(countString, countStringPos, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
@@ -1118,12 +1118,12 @@ namespace TEN::Renderer
 		_swapChain->Present(1, 0);
 	}
 
-	void Renderer::RenderTitle(float interpolationFactor)
+	void Renderer::RenderTitle(float interpFactor)
 	{
-		_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpolationFactor);
-		_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpolationFactor);
-		_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpolationFactor);
-		_gameCamera.Camera.Projection = Matrix::Lerp(_oldGameCamera.Camera.Projection, _currentGameCamera.Camera.Projection, interpolationFactor);
+		_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpFactor);
+		_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpFactor);
+		_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpFactor);
+		_gameCamera.Camera.Projection = Matrix::Lerp(_oldGameCamera.Camera.Projection, _currentGameCamera.Camera.Projection, interpFactor);
 		_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
 		_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
 		_gameCamera.Camera.Frustum = _currentGameCamera.Camera.Frustum;
@@ -1132,7 +1132,7 @@ namespace TEN::Renderer
 		_gameCamera.Camera.NearPlane = _currentGameCamera.Camera.NearPlane;
 		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
 
-		_interpolationFactor = interpolationFactor;
+		_interpolationFactor = interpFactor;
 
 		RenderScene(&_dumpScreenRenderTarget, false, _gameCamera);
 

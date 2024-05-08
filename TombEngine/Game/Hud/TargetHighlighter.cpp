@@ -74,6 +74,9 @@ namespace TEN::Hud
 		constexpr auto ORIENT_LERP_ALPHA	   = 0.1f;
 		constexpr auto RADIUS_LERP_ALPHA	   = 0.2f;
 
+		if (Position.has_value())
+			StoreInterpolationData();
+
 		// Update active status.
 		IsActive = isActive;
 
@@ -137,23 +140,30 @@ namespace TEN::Hud
 		if (!Position.has_value())
 			return;
 
+		auto pos0 = Vector2::Lerp(*Position, PrevPosition, g_Renderer.GetInterpolationFactor());
+		short orient0 = (short)Lerp(PrevOrientation, Orientation, g_Renderer.GetInterpolationFactor()); // TODO: use Geometry::GetShortestAngle()
+		float scale = Lerp(PrevScale, Scale, g_Renderer.GetInterpolationFactor());
+		auto color = Color::Lerp(PrevColor, Color, g_Renderer.GetInterpolationFactor());
+
 		// Draw main static element.
 		AddDisplaySprite(
 			SPRITE_SEQUENCE_OBJECT_ID, STATIC_ELEMENT_SPRITE_ID,
-			*Position, Orientation, Vector2(Scale), Color,
+			pos0, orient0, Vector2(scale), color,
 			PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fill,
 			BlendMode::Additive, DisplaySpritePhase::Draw);
 
 		// Draw animated outer segment elements.
-		for (const auto& segment : Segments)
+		for (int i = 0; i < Segments.size(); i++)
 		{
-			auto pos = *Position + segment.PosOffset;
-			short orient = Orientation + segment.OrientOffset;
-			auto scale = Vector2(Scale / 2);
+			const auto& segment = Segments[i];
+			const auto& prevSegment = PrevSegments[i];
+
+			auto pos1 = pos0 + Vector2::Lerp(prevSegment.PosOffset, segment.PosOffset, g_Renderer.GetInterpolationFactor());
+			short orient1 = orient0 + (short)Lerp(prevSegment.OrientOffset, segment.OrientOffset, g_Renderer.GetInterpolationFactor()); // TODO: use Geometry::GetShortestAngle()
 
 			AddDisplaySprite(
 				SPRITE_SEQUENCE_OBJECT_ID, SEGMENT_ELEMENT_SPRITE_ID,
-				pos, orient, scale, Color,
+				pos1, orient1, Vector2(scale / 2), color,
 				PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fill,
 				BlendMode::Additive, DisplaySpritePhase::Draw);
 		}

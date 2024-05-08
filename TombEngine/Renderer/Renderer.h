@@ -377,7 +377,7 @@ namespace TEN::Renderer
 		VertexBuffer<Vertex> _sortedPolygonsVertexBuffer;
 		IndexBuffer _sortedPolygonsIndexBuffer;
 
-		// Used for variable framerate
+		// Variable framerate.
 		float _interpolationFactor = 0.0f;
 
 		// Private functions
@@ -587,8 +587,8 @@ namespace TEN::Renderer
 		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
 		void Initialize(int w, int h, bool windowed, HWND handle);
-		void Render(float interpolationFactor);
-		void RenderTitle(float interpolationFactor);
+		void Render(float interpFactor);
+		void RenderTitle(float interpFactor);
 		void Lock();
 		bool PrepareDataForTheRenderer();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
@@ -641,9 +641,11 @@ namespace TEN::Renderer
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
 		void SaveOldState();
-		Vector2i GetScreenResolution() const;
-		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;
-		Vector3 GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
+
+		float						GetInterpolationFactor() const;
+		Vector2i					GetScreenResolution() const;
+		std::optional<Vector2>		Get2DPosition(const Vector3& pos) const;
+		Vector3						GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 		std::pair<Vector3, Vector3> GetRay(const Vector2& pos) const;
 		
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,

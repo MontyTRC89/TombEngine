@@ -519,6 +519,11 @@ namespace TEN::Renderer
 		return s;
 	}
 
+	float Renderer::GetInterpolationFactor() const
+	{
+		return _interpolationFactor;
+	}
+
 	Vector2i Renderer::GetScreenResolution() const
 	{
 		return Vector2i(_screenWidth, _screenHeight);
