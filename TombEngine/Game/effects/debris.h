@@ -71,11 +71,12 @@ struct DebrisFragment
 	bool active;
 	bool isStatic;
 	Matrix Transform;
-	Matrix OldTransform;
+
+	Matrix PrevTransform = Matrix::Identity;
 
 	void StoreInterpolationData()
 	{
-		OldTransform = Transform;
+		PrevTransform = Transform;
 	}
 };
 

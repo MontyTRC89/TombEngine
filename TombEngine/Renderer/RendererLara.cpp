@@ -352,9 +352,9 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 			const auto& segment = unit.Segments[i];
 			auto worldMatrix = 
 				Matrix::CreateFromQuaternion(
-					Quaternion::Lerp(segment.OldOrientation, segment.Orientation, _interpolationFactor)) *
+					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, _interpolationFactor)) *
 				Matrix::CreateTranslation(
-					Vector3::Lerp(segment.OldPosition, segment.Position, _interpolationFactor));
+					Vector3::Lerp(segment.PrevPosition, segment.Position, _interpolationFactor));
 
 			_stItem.BonesMatrices[i + 1] = worldMatrix;
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;

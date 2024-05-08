@@ -192,7 +192,10 @@ namespace TEN::Effects::Streamer
 		pool.erase(
 			std::remove_if(
 				pool.begin(), pool.end(),
-				[](const auto& streamer) { return streamer.Segments.empty(); }),
+				[](const auto& streamer)
+				{
+					return streamer.Segments.empty();
+				}),
 			pool.end());
 	}
 

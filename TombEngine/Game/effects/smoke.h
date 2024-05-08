@@ -28,17 +28,17 @@ namespace TEN::Effects::Smoke
 		bool affectedByWind;
 		bool active;
 
-		Vector4 oldColor;
-		Vector3 oldPosition;
-		float oldRotation;
-		float oldSize;
+		Vector3 PrevPosition = Vector3::Zero;
+		float	PrevRotation = 0.0f;
+		Vector4 PrevColor	 = Vector4::Zero;
+		float	PrevSize	 = 0.0f;
 
 		void StoreInterpolationData()
 		{
-			oldColor = color;
-			oldPosition = position;
-			oldRotation = rotation;
-			oldSize = size;
+			PrevPosition = position;
+			PrevRotation = rotation;
+			PrevColor = color;
+			PrevSize = size;
 		}
 	};
 	extern std::array<SmokeParticle, 128> SmokeParticles;

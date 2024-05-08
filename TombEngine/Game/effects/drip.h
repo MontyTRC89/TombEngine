@@ -16,19 +16,19 @@ namespace TEN::Effects::Drip
 		float LifeMax = 0.0f;
 		float Gravity = 0.0f;
 
-		Vector3 OldPosition = Vector3::Zero;
-		Vector4 OldColor	= Vector4::Zero;
-		Vector2 OldSize		= Vector2::Zero;
-		float OldLife		= 0.0f;
-		Vector3 OldVelocity = Vector3::Zero;
+		Vector3 PrevPosition = Vector3::Zero;
+		Vector3 PrevVelocity = Vector3::Zero;
+		Vector2 PrevSize	 = Vector2::Zero;
+		Vector4 PrevColor	 = Vector4::Zero;
+		float	PrevLife	 = 0.0f;
 
 		void StoreInterpolationData()
 		{
-			OldPosition = Position;
-			OldColor	 = Color;
-			OldSize		 = Size;
-			OldLife		 = Life;
-			OldVelocity	 = Velocity;
+			PrevPosition = Position;
+			PrevColor = Color;
+			PrevSize = Size;
+			PrevLife = Life;
+			PrevVelocity = Velocity;
 		}
 	};
 

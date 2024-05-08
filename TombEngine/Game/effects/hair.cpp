@@ -25,10 +25,8 @@ namespace TEN::Effects::Hair
 
 	void HairUnit::Update(const ItemInfo& item, int hairUnitIndex)
 	{
-		for (int i = 0; i < Segments.size(); i++)
-		{
-			Segments[i].StoreInterpolationData();
-		}
+		for (auto& segment : Segments)
+			segment.StoreInterpolationData();
 
 		const auto& player = GetLaraInfo(item);
 

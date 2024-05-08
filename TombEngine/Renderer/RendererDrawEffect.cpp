@@ -634,14 +634,14 @@ namespace TEN::Renderer
 			auto axis = drip.Velocity;
 			drip.Velocity.Normalize(axis);
 
-			auto prevAxis = drip.OldVelocity;
-			drip.OldVelocity.Normalize(prevAxis);
+			auto prevAxis = drip.PrevVelocity;
+			drip.PrevVelocity.Normalize(prevAxis);
 
 			AddSpriteBillboardConstrained(
 				&_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
-				Vector3::Lerp(drip.OldPosition, drip.Position, _interpolationFactor),
-				Vector4::Lerp(drip.OldColor, drip.Color, _interpolationFactor),
-				0.0f, 1.0f, Vector2::Lerp(drip.OldSize, drip.Size, _interpolationFactor),
+				Vector3::Lerp(drip.PrevPosition, drip.Position, _interpolationFactor),
+				Vector4::Lerp(drip.PrevColor, drip.Color, _interpolationFactor),
+				0.0f, 1.0f, Vector2::Lerp(drip.PrevSize, drip.Size, _interpolationFactor),
 				BlendMode::Additive, -Vector3::Lerp(prevAxis, axis, _interpolationFactor), false, view);
 		}
 	}
@@ -1382,7 +1382,7 @@ namespace TEN::Renderer
 						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[deb.mesh.tex]), SamplerStateRegister::LinearClamp);
 					}
 
-					_stStatic.World = Matrix::Lerp(deb.OldTransform, deb.Transform, _interpolationFactor);
+					_stStatic.World = Matrix::Lerp(deb.PrevTransform, deb.Transform, _interpolationFactor);
 					_stStatic.Color = deb.color;
 					_stStatic.AmbientLight = _rooms[deb.roomNumber].AmbientLight;
 					_stStatic.LightMode = (int)deb.lightMode;
@@ -1441,13 +1441,13 @@ namespace TEN::Renderer
 
 			AddSpriteBillboard(
 				&_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + smoke.sprite],
-				Vector3::Lerp(smoke.oldPosition, smoke.position, _interpolationFactor),
-				Vector4::Lerp(smoke.oldColor, smoke.color, _interpolationFactor),
-				Lerp(smoke.oldRotation, smoke.rotation, _interpolationFactor),
+				Vector3::Lerp(smoke.PrevPosition, smoke.position, _interpolationFactor),
+				Vector4::Lerp(smoke.PrevColor, smoke.color, _interpolationFactor),
+				Lerp(smoke.PrevRotation, smoke.rotation, _interpolationFactor),
 				1.0f,
 				Vector2(
-					Lerp(smoke.oldSize, smoke.size, _interpolationFactor),
-					Lerp(smoke.oldSize, smoke.size, _interpolationFactor)),
+					Lerp(smoke.PrevSize, smoke.size, _interpolationFactor),
+					Lerp(smoke.PrevSize, smoke.size, _interpolationFactor)),
 				BlendMode::AlphaBlend, true, view);
 		}
 	}
@@ -1469,7 +1469,7 @@ namespace TEN::Renderer
 
 			Vector3 prevVelocity;
 			Vector3 velocity;
-			s.oldVelocity.Normalize(prevVelocity);
+			s.PrevVelocity.Normalize(prevVelocity);
 			s.velocity.Normalize(velocity);
 
 			velocity = Vector3::Lerp(prevVelocity, velocity, _interpolationFactor);
@@ -1481,7 +1481,7 @@ namespace TEN::Renderer
 
 			AddSpriteBillboardConstrained(
 				&_sprites[Objects[ID_SPARK_SPRITE].meshIndex],
-				Vector3::Lerp(s.oldPos, s.pos, _interpolationFactor), 
+				Vector3::Lerp(s.PrevPosition, s.pos, _interpolationFactor), 
 				color, 
 				0, 1,
 				Vector2(
@@ -1531,11 +1531,11 @@ namespace TEN::Renderer
 
 			AddSpriteBillboard(
 				&_sprites[Objects[part.sequence].meshIndex + part.sprite],
-				Vector3::Lerp(part.oldWorldPosition, part.worldPosition, _interpolationFactor),
+				Vector3::Lerp(part.PrevWorldPosition, part.worldPosition, _interpolationFactor),
 				Color(1.0f, 1.0f, 1.0f), 0, 1.0f,
 				Vector2(
-					Lerp(part.oldSize, part.size, _interpolationFactor),
-					Lerp(part.oldSize, part.size, _interpolationFactor) / 2),
+					Lerp(part.PrevSize, part.size, _interpolationFactor),
+					Lerp(part.PrevSize, part.size, _interpolationFactor) / 2),
 				BlendMode::AlphaBlend, true, view);
 		}
 	}

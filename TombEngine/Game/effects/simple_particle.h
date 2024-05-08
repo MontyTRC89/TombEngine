@@ -22,13 +22,13 @@ namespace TEN::Effects
 		bool active;
 		BlendMode blendMode;
 
-		Vector3 oldWorldPosition;
-		float oldSize;
+		Vector3 PrevWorldPosition = Vector3::Zero;
+		float	PrevSize		  = 0.0f;
 
 		void StoreInterpolationData()
 		{
-			oldWorldPosition = worldPosition;
-			oldSize = size;
+			PrevWorldPosition = worldPosition;
+			PrevSize = size;
 		}
 	};
 	extern std::array<SimpleParticle, 15> simpleParticles;
