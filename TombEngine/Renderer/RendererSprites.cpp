@@ -39,7 +39,7 @@ namespace TEN::Renderer
 
 	void Renderer::AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
 		float scale, Vector2 size, BlendMode blendMode, const Vector3& constrainAxis,
-		bool isSoft, RenderView& view, SpriteRenderType renderType)
+		bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (scale <= 0.0f)
 			scale = 1.0f;
@@ -58,7 +58,7 @@ namespace TEN::Renderer
 		spr.Height = size.y;
 		spr.BlendMode = blendMode;
 		spr.ConstrainAxis = constrainAxis;
-		spr.SoftParticle = isSoft;
+		spr.SoftParticle = isSoftParticle;
 		spr.c1 = color;
 		spr.c2 = color;
 		spr.c3 = color;
@@ -259,24 +259,17 @@ namespace TEN::Renderer
 	void Renderer::DrawSprites(RenderView& view, RendererPass rendererPass)
 	{
 		if (view.SpritesToDraw.empty())
-		{
 			return;
-		}
 
-		// Draw instanced sprites
+		// Draw instanced sprites.
 		bool wasGPUSet = false;
-
 		for (auto& spriteBucket : _spriteBuckets)
 		{
 			if (spriteBucket.SpritesToDraw.size() == 0 || !spriteBucket.IsBillboard)
-			{
 				continue;
-			}
 
 			if (!SetupBlendModeAndAlphaTest(spriteBucket.BlendMode, rendererPass, 0))
-			{
 				continue;
-			}     
 
 			if (!wasGPUSet)
 			{
@@ -291,8 +284,8 @@ namespace TEN::Renderer
 				_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
 
 				// Set up vertex buffer and parameters.
-				UINT stride = sizeof(Vertex);
-				UINT offset = 0;
+				unsigned int stride = sizeof(Vertex);
+				unsigned int offset = 0;
 				_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
 				wasGPUSet = true;
@@ -329,20 +322,16 @@ namespace TEN::Renderer
 			_numInstancedSpritesDrawCalls++;
 		}
 
-		// Draw 3D non instanced sprites
+		// Draw 3D non-instanced sprites.
 		wasGPUSet = false;
 
 		for (auto& spriteBucket : _spriteBuckets)
 		{
 			if (spriteBucket.SpritesToDraw.empty() || spriteBucket.IsBillboard)
-			{
 				continue;
-			}
 
 			if (!SetupBlendModeAndAlphaTest(spriteBucket.BlendMode, rendererPass, 0))
-			{
 				continue;
-			}
 
 			if (!wasGPUSet)
 			{

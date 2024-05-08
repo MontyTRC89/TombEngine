@@ -718,8 +718,13 @@ namespace TEN::Renderer
 		constexpr auto COUNT_STRING_INF	   = "Inf";
 		constexpr auto COUNT_STRING_OFFSET = Vector2(DISPLAY_SPACE_RES.x / 40, 0.0f);
 
+		auto pos = Vector2::Lerp(pickup.PrevPosition, pickup.Position, _interpolationFactor);
+		auto orient = EulerAngles::Lerp(pickup.PrevOrientation, pickup.Orientation, _interpolationFactor);
+		float scale = Lerp(pickup.PrevScale, pickup.Scale, _interpolationFactor);
+		float opacity = Lerp(pickup.PrevOpacity, pickup.Opacity, _interpolationFactor);
+
 		// Draw display pickup.
-		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
+		DrawObjectIn2DSpace(pickup.ObjectID, pos, orient, scale);
 
 		// Draw count string.
 		if (pickup.Count != 1)

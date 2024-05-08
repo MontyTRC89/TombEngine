@@ -1714,7 +1714,7 @@ namespace TEN::Renderer
 		PrepareLaserBarriers(view);
 		PrepareSingleLaserBeam(view);
 
-		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected for a later stage.
+		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected at a later stage.
 		SortAndPrepareSprites(view);
 
 		auto time2 = std::chrono::high_resolution_clock::now();
@@ -1726,7 +1726,7 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Write, true);
 		SetCullMode(CullMode::CounterClockwise, true);
 
-		// Bind constant buffers
+		// Bind constant buffers.
 		BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
 		BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
 		BindConstantBufferVS(ConstantBufferRegister::InstancedStatics, _cbInstancedStaticMeshBuffer.get());
@@ -1763,7 +1763,7 @@ namespace TEN::Renderer
 		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), _debugPage == RendererDebugPage::WireframeMode ? Colors::White : Colors::Black);
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		// Reset viewport and scissor
+		// Reset viewport and scissor.
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
@@ -1812,7 +1812,7 @@ namespace TEN::Renderer
 		// Draw horizon and sky.
 		DrawHorizonAndSky(view, _renderTarget.DepthStencilView.Get());
 		 
-		// Build G-Buffer (Normals + Depth).
+		// Build G-Buffer (normals + depth).
 		_context->ClearRenderTargetView(_normalsRenderTarget.RenderTargetView.Get(), Colors::Black);
 		_context->ClearRenderTargetView(_depthRenderTarget.RenderTargetView.Get(), Colors::White);
 
@@ -1831,7 +1831,7 @@ namespace TEN::Renderer
 		DrawRats(view, RendererPass::GBuffer);
 		DrawLocusts(view, RendererPass::GBuffer);
 
-		// Calculate ambient occlusion
+		// Calculate ambient occlusion.
 		if (g_Configuration.EnableAmbientOcclusion)
 		{
 			_doingFullscreenPass = true;
@@ -1849,8 +1849,7 @@ namespace TEN::Renderer
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 		
-		// Bind main render target again.
-		// At this point, main depth buffer is already filled and avoids overdraw in following steps.
+		// Bind main render target again. Main depth buffer is already filled and avoids overdraw in following steps.
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 		
 		// Draw opaque, alpha test, and fast alpha blend faces.
@@ -1883,7 +1882,7 @@ namespace TEN::Renderer
 		DrawFishSwarm(view, RendererPass::Additive);
 
 		// Collect all non-commutative transparent faces.
-		// NOTE: Sorted sprites are already collected at the beginning of the frame.
+		// NOTE: Sorted sprites already collected at beginning of frame.
 		DrawRooms(view, RendererPass::CollectTransparentFaces);
 		DrawItems(view, RendererPass::CollectTransparentFaces);
 		DrawStatics(view, RendererPass::CollectTransparentFaces);
@@ -1896,11 +1895,11 @@ namespace TEN::Renderer
 		// Draw sorted faces.
 		DrawSortedFaces(view);
 		    
-		// HACK: Draw gunflashes after everything because they are very near the camera.
+		// HACK: Gunflashes drawn after everything because they are very near the camera.
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
 
-		// Draw 3D debug lines and trianges.
+		// Draw 3D debug lines and triangles.
 		DrawLines3D(view);
 		DrawTriangles3D(view);
 
@@ -2000,7 +1999,7 @@ namespace TEN::Renderer
 			SetCullMode(CullMode::Clockwise);
 		}
 
-		RenderView view = RenderView(&Camera, 0, PI / 2.0f, 32, DEFAULT_FAR_VIEW, ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE);
+		auto view = RenderView(&Camera, 0, PI / 2.0f, 32, DEFAULT_FAR_VIEW, ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE);
 
 		CCameraMatrixBuffer cameraConstantBuffer;
 		cameraConstantBuffer.DualParaboloidView = Matrix::CreateLookAt(position, position + Vector3(0, 0, 1024), -Vector3::UnitY);
@@ -2016,12 +2015,10 @@ namespace TEN::Renderer
 			_context->VSSetShader(_vsRoomAmbientSky.Get(), nullptr, 0);
 
 			if (Lara.Control.Look.OpticRange != 0)
-			{
 				AlterFOV(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
-			}
 
-			UINT stride = sizeof(Vertex);
-			UINT offset = 0;
+			unsigned int stride = sizeof(Vertex);
+			unsigned int offset = 0;
 
 			// Draw sky.
 			auto rotation = Matrix::CreateRotationX(PI);
@@ -2220,13 +2217,13 @@ namespace TEN::Renderer
 
 	void Renderer::DrawItems(RenderView& view, RendererPass rendererPass)
 	{
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 
 		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		// Set shaders	
+		// Set shaders.
 		if (rendererPass == RendererPass::GBuffer)
 		{
 			_context->VSSetShader(_vsGBufferItems.Get(), nullptr, 0);

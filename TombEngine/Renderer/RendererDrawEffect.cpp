@@ -1300,17 +1300,13 @@ namespace TEN::Renderer
 		BindStaticLights(effect->LightsToDraw);
 		_cbStatic.UpdateData(_stStatic, _context.Get());
 
-		auto* meshPtr = effect->Mesh;
-		auto m_lastBlendMode = BlendMode::Unknown;
-
-		for (auto& bucket : meshPtr->Buckets) 
+		auto& mesh = *effect->Mesh;
+		for (auto& bucket : mesh.Buckets) 
 		{
 			if (bucket.NumVertices == 0)
-			{
 				continue;
-			}
 
-			int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+			int passes = (rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest) ? 2 : 1;
 
 			for (int p = 0; p < passes; p++)
 			{
