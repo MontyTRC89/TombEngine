@@ -247,9 +247,9 @@ GameStatus ControlPhase()
 	if (g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareEnabled())
 	{
 		SetupGlobalLensFlare(
-			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlarePosition(),
+			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareRotation(),
 			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareColor(),
-			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareSpriteID());
+			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareSunSpriteID());
 	}
 
 	// Update HUD.

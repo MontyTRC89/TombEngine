@@ -1,34 +1,39 @@
 #pragma once
-
-#include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Objects/game_object_ids.h"
 #include "Objects/objectslist.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
 
 namespace sol { class state; }
 
-struct LensFlare
+namespace TEN::Scripting
 {
-    bool Enabled;
-    int SunSpriteID = SPR_LENS_FLARE_3; // Index into sprites
-    byte R;
-    byte G;
-    byte B;
-    float Yaw;
-    float Pitch;
+	class LensFlare
+	{
+	private:
+		// Members
+		int _sunSpriteID = SPRITE_TYPES::SPR_LENS_FLARE_3;
+		bool _isEnabled;
 
-    LensFlare() = default;
-    LensFlare(Vec2 const& yawPitchInDegrees, ScriptColor const& col);
+		Rotation	_rotation = {};
+		ScriptColor _color	  = 0;
 
-    void SetColor(ScriptColor const& color);
-    ScriptColor GetColor() const;
+	public:
+		static void Register(sol::table& table);
 
-    void SetPosition(Vec2 const& yawPitchInDegrees);
-    Vec2 GetPosition() const;
+		// Constructors
+		LensFlare() = default;
+		LensFlare(const Rotation& rot, const ScriptColor& color);
 
-    void SetSunSpriteID(int const& spriteIndex);
-    int GetSunSpriteID() const;
+		// Getters
+		bool		GetEnabled() const;
+		int			GetSunSpriteID() const;
+		Rotation	GetRotation() const;
+		ScriptColor GetColor() const;
 
-    bool GetEnabled() const;
-
-    static void Register(sol::table&);
-};
+		// Setters
+		void SetSunSpriteID(int spriteID);
+		void SetRotation(const Rotation& rot);
+		void SetColor(const ScriptColor& color);
+	};
+}

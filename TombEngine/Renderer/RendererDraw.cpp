@@ -2932,7 +2932,7 @@ namespace TEN::Renderer
 					rDrawSprite.Type = SpriteType::CustomBillboard;
 					rDrawSprite.pos =
 						renderView.Camera.WorldPosition +
-						Vector3::Lerp(meteor.OldPosition, meteor.Position, _interpolationFactor);
+						Vector3::Lerp(meteor.PrevPosition, meteor.Position, _interpolationFactor);
 					rDrawSprite.Rotation = 0;
 					rDrawSprite.Scale = 1;
 					rDrawSprite.Width = 2;
@@ -2944,7 +2944,7 @@ namespace TEN::Renderer
 						meteor.Color.x,
 						meteor.Color.y,
 						meteor.Color.z,
-						Lerp(meteor.OldFade, meteor.Fade, _interpolationFactor));
+						Lerp(meteor.PrevFade, meteor.Fade, _interpolationFactor));
 					_stInstancedSpriteBuffer.Sprites[meteorCount].IsBillboard = 1;
 					_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = 0;
 
@@ -3029,17 +3029,17 @@ namespace TEN::Renderer
 			_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
 
 			// Set up vertex buffer and parameters.
-			UINT stride = sizeof(Vertex);
-			UINT offset = 0;
+			unsigned int stride = sizeof(Vertex);
+			unsigned int offset = 0;
 			_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
-			RendererSpriteToDraw rDrawSprite;
-			rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + renderView.LensFlaresToDraw[0].SpriteIndex];
+			auto rDrawSprite = RendererSpriteToDraw{};
+			rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + renderView.LensFlaresToDraw[0].SpriteID];
 
 			rDrawSprite.Type = SpriteType::Billboard;
 			rDrawSprite.pos = renderView.Camera.WorldPosition + renderView.LensFlaresToDraw[0].Direction * BLOCK(1);
-			rDrawSprite.Rotation = 0;
-			rDrawSprite.Scale = 1;
+			rDrawSprite.Rotation = 0.0f;
+			rDrawSprite.Scale = 1.0f;
 			rDrawSprite.Width = SUN_SIZE;
 			rDrawSprite.Height = SUN_SIZE;
 
@@ -3081,7 +3081,7 @@ namespace TEN::Renderer
 	{
 		//RenderToCubemap(reflectionCubemap, Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos - 1024, LaraItem->pos.zPos), LaraItem->roomNumber);
 	
-		// Interpolate camera
+		// Interpolate camera.
 		_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpolationFactor);
 		_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpolationFactor);
 		_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpolationFactor);
@@ -3142,9 +3142,7 @@ namespace TEN::Renderer
 			for (auto& bucket : mesh->Buckets)
 			{
 				if (bucket.NumVertices == 0)
-				{
 					continue;
-				}
 				
 				if (rendererPass == RendererPass::ShadowMap)
 				{

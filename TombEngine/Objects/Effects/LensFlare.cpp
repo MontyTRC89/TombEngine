@@ -3,13 +3,16 @@
 
 #include "Game/camera.h"
 #include "Game/control/los.h"
+#include "Math/Math.h"
 #include "Specific/level.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::Effects
 {
 	std::vector<LensFlare> LensFlares;
 
-	static void SetupLensFlare(const Vector3& pos, int roomNumber, const Color& color, bool isGlobal, int spriteIndex)
+	static void SetupLensFlare(const Vector3& pos, int roomNumber, const Color& color, bool isGlobal, int spriteID)
 	{
 		auto lensFlarePos = Vector3::Zero;
 		if (isGlobal)
@@ -67,7 +70,7 @@ namespace TEN::Entities::Effects
 		lensFlare.RoomNumber = roomNumber;
 		lensFlare.IsGlobal = isGlobal;
 		lensFlare.Color = color;
-		lensFlare.SpriteIndex = spriteIndex;
+		lensFlare.SpriteID = spriteID;
 
 		LensFlares.push_back(lensFlare);
 	}
@@ -77,7 +80,7 @@ namespace TEN::Entities::Effects
 		auto& item = g_Level.Items[itemNumber];
 
 		if (TriggerActive(&item))
-			SetupLensFlare(item.Pose.Position.ToVector3(), item.RoomNumber, Color(), false, SPR_LENS_FLARE_3);
+			SetupLensFlare(item.Pose.Position.ToVector3(), item.RoomNumber, Color(), false, SPRITE_TYPES::SPR_LENS_FLARE_3);
 	}
 
 	void ClearLensFlares()
@@ -85,15 +88,14 @@ namespace TEN::Entities::Effects
 		LensFlares.clear();
 	}
 
-	void SetupGlobalLensFlare(const Vector2& yawAndPitchInDegrees, const Color& color, int spriteIndex)
+	void SetupGlobalLensFlare(const EulerAngles& orient, const Color& color, int spriteID)
 	{
-		auto pos = Camera.pos.ToVector3();
-		auto rotMatrix = Matrix::CreateFromYawPitchRoll(
-			DEG_TO_RAD(yawAndPitchInDegrees.x), 
-			DEG_TO_RAD(yawAndPitchInDegrees.y), 
-			0.0f);
+		constexpr auto BASE_POS = Vector3(0.0f, 0.0f, BLOCK(256));
 
-		pos += Vector3::Transform(Vector3(0.0f, 0.0f, BLOCK(256)), rotMatrix);
-		SetupLensFlare(pos, NO_VALUE, color, true, spriteIndex);
+		auto pos = Camera.pos.ToVector3();
+		auto rotMatrix = orient.ToRotationMatrix();
+
+		pos += Vector3::Transform(BASE_POS, rotMatrix);
+		SetupLensFlare(pos, NO_VALUE, color, true, spriteID);
 	}
 }

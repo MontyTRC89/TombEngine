@@ -28,39 +28,41 @@ namespace TEN::Effects::Environment
 	constexpr auto DUST_LIFE = 40;
 	constexpr auto DUST_SPAWN_RADIUS = (10 * 1024);
 
-	constexpr auto METEOR_PARTICLES_MAX_COUNT = 10;
-	constexpr auto METEOR_PARTICLES_MAX_LIFE = 150;
-	constexpr auto METEOR_PARTICLES_SPEED = 32.0f;
-	constexpr auto METEOR_PARTICLES_SPAWN_DENSITY = 4;
-	constexpr auto METEOR_PARTICLES_FADE_TIME = 30;
+	constexpr auto METEOR_PARTICLE_COUNT_MAX = 10;
+	constexpr auto METEOR_PARTICLE_LIFE_MAX = 150;
+	constexpr auto METEOR_PARTICLE_VELOCITY = 32.0f;
+	constexpr auto METEOR_PARTICLE_SPAWN_DENSITY = 4;
+	constexpr auto METEOR_PARTICLE_FADE_TIME = 30.0f;
 
 	struct StarParticle
 	{
-		Vector3 Position = Vector3::Zero;
+		Vector3 Position  = Vector3::Zero;
 		Vector3 Direction = Vector3::Zero;
-		Vector3 Color = Vector3::Zero;
+		Vector3 Color	  = Vector3::Zero;
+
 		float Extinction = 1.0f;
-		float Scale = 1.0f;
-		float Blinking = 1.0f;
+		float Scale		 = 1.0f;
+		float Blinking	 = 1.0f;
 	};
 
 	struct MeteorParticle
 	{
-		Vector3 Position = Vector3::Zero;
-		Vector3 Direction = Vector3::Zero;
+		Vector3 Position	  = Vector3::Zero;
+		Vector3 Direction	  = Vector3::Zero;
 		Vector3 StartPosition = Vector3::Zero;
-		Vector3 Color = Vector3::Zero;
-		float Life;
-		bool Active;
-		float Fade;
+		Vector3 Color		  = Vector3::Zero;
 
-		Vector3 OldPosition = Vector3::Zero;
-		float OldFade = 0.0f;
+		bool  Active = false;
+		float Life	 = 0.0f;
+		float Fade	 = 0.0f;
+
+		Vector3 PrevPosition = Vector3::Zero;
+		float	PrevFade	 = 0.0f;
 
 		void StoreInterpolationData()
 		{
-			OldPosition = Position;
-			OldFade = Fade;
+			PrevPosition = Position;
+			PrevFade = Fade;
 		}
 	};
 
@@ -68,7 +70,7 @@ namespace TEN::Effects::Environment
 	{
 		WeatherType Type = WeatherType::None;
 
-		int Room = -1;
+		int Room = NO_VALUE;
 		Vector3 Position = Vector3::Zero;
 		Vector3 Velocity = Vector3::Zero;
 
@@ -142,12 +144,12 @@ namespace TEN::Effects::Environment
 		byte StormSkyColor2 = 1;
 
 		// Starfield
-		std::vector<StarParticle> Stars;
-		std::vector<MeteorParticle> Meteors;
+		std::vector<StarParticle>	Stars	= {};
+		std::vector<MeteorParticle> Meteors = {};
 		bool ResetStarField = true;
 
 		// Lens flare
-		LensFlare GlobalLensFlare;
+		LensFlare GlobalLensFlare = {};
 
 		void UpdateStarfield(ScriptInterfaceLevel* level);
 		void UpdateSky(ScriptInterfaceLevel* level);

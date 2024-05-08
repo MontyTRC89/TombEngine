@@ -1,36 +1,42 @@
 #pragma once
 
-#include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
-
 namespace sol { class state; }
 
-struct Starfield
+namespace TEN::Scripting
 {
-    int StarsCount = 0; // No need for StarryNight flag, if stars count = 0, shader is bypassed
+	class Starfield
+	{
+	private:
+		// Constants
+		static const auto STAR_COUNT_MAX  = 6000;
+		static const auto METEOR_COUNT_MAX = 100;
 
-    int MeteorsCount = 0; // No need for EnableMeteors flag, if meteors count = 0, shader is bypassed
-    int MeteorsSpawnDensity = 0;
-    int MeteorsSpeed = 0;
+		// Members
+		int	  _starCount		  = 0;
+		int	  _meteorCount		  = 0;
+		int	  _meteorSpawnDensity = 0;
+		float _meteorVelocity	  = 0;
 
-    Starfield() = default;
-    Starfield(int starsCount);
-    Starfield(int starsCount, int meteorsCount, int meteorsSpawnDensity, int meteorsSpeed);
+	public:
+		static void Register(sol::table& table);
 
-    void SetStarsCount(int const& starsCount);
-    int GetStarsCount() const;
+		// Constructors
+		Starfield() = default;
+		Starfield(int starCount);
+		Starfield(int starCount, int meteorCount, int meteorSpawnDensity, float meteorVel);
 
-    void SetMeteorsCount(int const& meteorsCount);
-    int GetMeteorsCount() const;
+		// Getters
+		bool  GetStarsEnabled() const;
+		bool  GetMeteorsEnabled() const;
+		int	  GetStarCount() const;
+		int	  GetMeteorCount() const;
+		int	  GetMeteorSpawnDensity() const;
+		float GetMeteorVelocity() const;
 
-    void SetMeteorsSpawnDensity(int const& spawnDensity);
-    int GetMeteorsSpawnDensity() const;
-
-    void SetMeteorsSpeed(float const& meteorsSpeed);
-    float GetMeteorsSpeed() const;
-
-    bool GetEnabled() const;
-    bool GetMeteorsEnabled() const;
-
-    static void Register(sol::table&);
-};
+		// Setters
+		void SetStarCount(int count);
+		void SetMeteorCount(int count);
+		void SetMeteorSpawnDensity(int spawnDensity);
+		void SetMeteorVelocity(float vel);
+	};
+}

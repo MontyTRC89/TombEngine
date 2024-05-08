@@ -1,10 +1,12 @@
 #pragma once
 
+class EulerAngles;
+
 namespace TEN::Entities::Effects
 {
 	struct LensFlare
 	{
-		int SpriteIndex = 0;
+		int SpriteID = 0;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;	
@@ -17,5 +19,5 @@ namespace TEN::Entities::Effects
 
 	void ControlLensFlare(int itemNumber);
 	void ClearLensFlares();
-	void SetupGlobalLensFlare(const Vector2& yawAndPitchInDegrees, const Color& color, int spriteIndex);
+	void SetupGlobalLensFlare(const EulerAngles& orient, const Color& color, int spriteID);
 }

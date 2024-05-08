@@ -1,6 +1,9 @@
 #include "framework.h"
-#include "FlowLevel.h"
+#include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
+
 #include "Scripting/Internal/ScriptAssert.h"
+
+using namespace TEN::Scripting;
 
 /***
 Stores level metadata.
@@ -15,12 +18,14 @@ These are things things which aren't present in the compiled level file itself.
 	@treturn Level a Level object
 	*/
 void Level::Register(sol::table& parent)
-{	
-	parent.new_usertype<Level>("Level",
+{
+	// Register type.
+	parent.new_usertype<Level>(
+		"Level",
 		sol::constructors<Level()>(),
 		sol::call_constructor, sol::constructors<Level()>(),
-/// (string) string key for the level's (localised) name.
-// Corresponds to an entry in strings.lua.
+
+		// Corresponds to an entry in strings.lua.
 //@mem nameKey
 		"nameKey", &Level::NameStringKey,
 
@@ -52,13 +57,13 @@ void Level::Register(sol::table& parent)
 //@mem layer2
 		"layer2", &Level::Layer2,
 
-/// (@{Flow.Starfield}) Starfield  
-//@mem starfield
-		"starfield", & Level::Starfield,
+		/// (@{Flow.Starfield}) Starfield.
+		// @mem starfield
+		"starfield", &Level::Starfield,
 
-/// (@{Flow.LensFlare}) Global lens flare 
-//@mem lensFlare
-		"lensFlare", & Level::LensFlare,
+		/// (@{Flow.LensFlare}) Global lens flare .
+		// @mem lensFlare
+		"lensFlare", &Level::LensFlare,
 
 /// (@{Flow.Fog}) omni fog RGB color and distance.
 // As seen in TR4's Desert Railroad.
@@ -291,24 +296,24 @@ bool Level::GetLensFlareEnabled() const
 	return LensFlare.GetEnabled();
 }
 
-Vector2 Level::GetLensFlarePosition() const
-{
-	return LensFlare.GetPosition();
-}
-
-RGBAColor8Byte Level::GetLensFlareColor() const
-{
-	return LensFlare.GetColor();
-}
-
-int Level::GetLensFlareSpriteID() const
+int Level::GetLensFlareSunSpriteID() const
 {
 	return LensFlare.GetSunSpriteID();
 }
 
-bool Level::GetStarfieldEnabled() const
+EulerAngles Level::GetLensFlareRotation() const
 {
-	return Starfield.GetEnabled();
+	return LensFlare.GetRotation().ToEulerAngles();
+}
+
+Color Level::GetLensFlareColor() const
+{
+	return LensFlare.GetColor();
+}
+
+bool Level::GetStarfieldStarsEnabled() const
+{
+	return Starfield.GetStarsEnabled();
 }
 
 bool Level::GetStarfieldMeteorsEnabled() const
@@ -316,22 +321,22 @@ bool Level::GetStarfieldMeteorsEnabled() const
 	return Starfield.GetMeteorsEnabled();
 }
 
-int Level::GetStarfieldStarsCount() const
+int Level::GetStarfieldStarCount() const
 {
-	return Starfield.GetStarsCount();
+	return Starfield.GetStarCount();
 }
 
-int Level::GetStarfieldMeteorsCount() const
+int Level::GetStarfieldMeteorCount() const
 {
-	return Starfield.GetMeteorsCount();
+	return Starfield.GetMeteorCount();
 }
 
-int Level::GetStarfieldMeteorsSpawnDensity() const
+int Level::GetStarfieldMeteorSpawnDensity() const
 {
-	return Starfield.GetMeteorsSpawnDensity();
+	return Starfield.GetMeteorSpawnDensity();
 }
 
-float Level::GetStarfieldMeteorsSpeed() const
+float Level::GetStarfieldMeteorVelocity() const
 {
-	return Starfield.GetMeteorsSpeed();
+	return Starfield.GetMeteorVelocity();
 }

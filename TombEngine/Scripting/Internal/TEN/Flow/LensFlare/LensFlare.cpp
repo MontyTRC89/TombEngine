@@ -1,85 +1,108 @@
 #include "framework.h"
-#include "LensFlare.h"
-#include <Specific\level.h>
+#include "Scripting/Internal/TEN/Flow/LensFlare/LensFlare.h"
 
-/***
-LensFlare
+#include "Objects/game_object_ids.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Specific\level.h"
 
-@tenclass Flow.LensFlare
-@pragma nostrip
-*/
+/// Represents a lens flare.
+//
+// @tenclass Flow.LensFlare
+// @pragma nostrip
 
-void LensFlare::Register(sol::table& parent)
+namespace TEN::Scripting
 {
-	using ctors = sol::constructors<LensFlare(Vec2 const&, ScriptColor const&)>;
-	parent.new_usertype<LensFlare>("LensFlare",
-		ctors(),
-		sol::call_constructor, ctors(),
+	void LensFlare::Register(sol::table& parent)
+	{
+		using ctors = sol::constructors<
+			LensFlare(const Rotation& rot, const ScriptColor& color)>;
 
-		/// (@{Color}) RGB lens flare color
-		//@mem lensFlareColor
-		"color", sol::property(&LensFlare::GetColor, &LensFlare::SetColor),
+		// Register type.
+		parent.new_usertype<LensFlare>(
+			"LensFlare",
+			ctors(),
+			sol::call_constructor, ctors(),
 
-		/*** (@{Vec2}) Lens flare orientation.
+			"GetEnabled", &LensFlare::GetEnabled,
+			"GetSunSpriteID", &LensFlare::GetSunSpriteID,
+			"GetRotation", &LensFlare::GetRotation,
+			"GetColor", &LensFlare::GetColor,
+			"SetSunSpriteID", &LensFlare::SetSunSpriteID,
+			"SetRotation", &LensFlare::SetRotation,
+			"SetColor", &LensFlare::SetColor);
+	}
 
-		This is the position of the lens flare in the sky. The X value is the horizontal position, and the Y value is the vertical position. Angles must be specified in degrees.
+	/// Create a LensFlare object.
+	// @function LensFlare()
+	// @tparam Rotation Rotation.
+	// @tparam Color Color.
+	// @treturn LensFlare A new LensFlare object.
+	LensFlare::LensFlare(const Rotation& rot, const ScriptColor& color)
+	{
+		_isEnabled = true;
+		_color = color;
+		_rotation = rot;
+	}
 
-		@mem lensFlarePosition*/
-		"position", sol::property(&LensFlare::GetPosition, &LensFlare::SetPosition)
-	);
-}
+	/// Get the lens flare's enabled status.
+	// @function LensFlare:GetEnabled()
+	// @treturn bool Lens flare's enabled status.
+	bool LensFlare::GetEnabled() const
+	{
+		return _isEnabled;
+	}
 
-/***
-@tparam Vec2 yawPitchInDegrees Position of the lens flare (yaw and pitch) in degrees
-@tparam Color color RGB color
-@treturn LensFlare A lens flare object.
-@function LensFlare
-*/
-LensFlare::LensFlare(Vec2 const& yawPitchInDegrees, ScriptColor const& col)
-{
-	SetColor(col);
-	SetPosition(yawPitchInDegrees);
-	Enabled = true;
-}
+	/// Get the sun's sprite ID.
+	// @function LensFlare:GetObjectID()
+	// @treturn int Sprite ID.
+	int LensFlare::GetSunSpriteID() const
+	{
+		return _sunSpriteID;
+	}
 
-void LensFlare::SetColor(ScriptColor const& col)
-{
-	R = col.GetR();
-	G = col.GetG();
-	B = col.GetB();
-}
+	// Get the lens flare's euler rotation.
+	// @function LensFlare:GetRotation()
+	// @treturn Rotation Rotation.
+	Rotation LensFlare::GetRotation() const
+	{
+		return _rotation;
+	}
 
+	// Get the lens flare's color.
+	// @function LensFlare:SetColor()
+	ScriptColor LensFlare::GetColor() const
+	{
+		return _color;
+	}
 
-ScriptColor LensFlare::GetColor() const
-{
-	return ScriptColor{ R, G, B };
-}
+	// Set the lens flare's sun sprite ID.
+	// @function LensFlare:SetSunbjectID()
+	// @tparam int New sprite ID.
+	void LensFlare::SetSunSpriteID(int spriteID)
+	{
+		// Sprite ID out of range; return early.
+		if (spriteID < 0 || g_Level.Sprites.size() > spriteID)
+		{
+			TENLog("Sub sprite ID out of range.");
+			return;
+		}
 
-void LensFlare::SetPosition(Vec2 const& yawPitchInDegrees)
-{
-	Yaw = yawPitchInDegrees.x;
-	Pitch = yawPitchInDegrees.y;
-}
+		_sunSpriteID = spriteID;
+	}
 
+	// Set the lens flare's euler rotation.
+	// @function LensFlare:SetRotation(Rotation)
+	// @tparam Rotation New euler rotation.
+	void LensFlare::SetRotation(const Rotation& rot)
+	{
+		_rotation = rot;
+	}
 
-Vec2 LensFlare::GetPosition() const
-{
-	return Vec2{ Yaw, Pitch };
-}
-
-bool LensFlare::GetEnabled() const
-{
-	return Enabled;
-}
-
-void LensFlare::SetSunSpriteID(int const& spriteIndex)
-{
-	assertion(spriteIndex >= 0 && spriteIndex < g_Level.Sprites.size(), "Sprite Index must be in a valid range");
-
-	SunSpriteID = spriteIndex;
-}
-
-int LensFlare::GetSunSpriteID() const
-{
-	return SunSpriteID;
+	// Set the lens flare's color.
+	// @function LensFlare:SetColor(Color)
+	// @tparam Color New color.
+	void LensFlare::SetColor(const ScriptColor& color)
+	{
+		_color = color;
+	}
 }

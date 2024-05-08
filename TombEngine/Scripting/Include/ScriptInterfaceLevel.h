@@ -48,14 +48,18 @@ public:
 	virtual int GetSecrets() const = 0;
 	virtual std::string GetAmbientTrack() const = 0;
 	virtual bool GetResetHubEnabled() const = 0;
-	virtual bool GetLensFlareEnabled() const = 0;
-	virtual Vector2 GetLensFlarePosition() const = 0;
-	virtual RGBAColor8Byte GetLensFlareColor() const = 0;
-	virtual int GetLensFlareSpriteID() const = 0;
-	virtual bool GetStarfieldEnabled() const = 0;
-	virtual bool GetStarfieldMeteorsEnabled() const = 0;
-	virtual int GetStarfieldStarsCount() const = 0;
-	virtual int GetStarfieldMeteorsCount() const = 0;
-	virtual int GetStarfieldMeteorsSpawnDensity() const = 0;
-	virtual float GetStarfieldMeteorsSpeed() const = 0;
+
+	// Lens flare getters
+	virtual bool		GetLensFlareEnabled() const = 0;
+	virtual int			GetLensFlareSunSpriteID() const = 0;
+	virtual EulerAngles GetLensFlareRotation() const = 0;
+	virtual Color		GetLensFlareColor() const = 0;
+
+	// Starfield getters
+	virtual bool  GetStarfieldStarsEnabled() const = 0;
+	virtual bool  GetStarfieldMeteorsEnabled() const = 0;
+	virtual int	  GetStarfieldStarCount() const = 0;
+	virtual int	  GetStarfieldMeteorCount() const = 0;
+	virtual int	  GetStarfieldMeteorSpawnDensity() const = 0;
+	virtual float GetStarfieldMeteorVelocity() const = 0;
 };

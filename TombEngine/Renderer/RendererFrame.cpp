@@ -123,7 +123,7 @@ namespace TEN::Renderer
 				lensFlareToDraw.Position = lensFlare.Position;
 				lensFlareToDraw.Distance = dist;
 				lensFlareToDraw.Color = lensFlare.Color;
-				lensFlareToDraw.SpriteIndex = lensFlare.SpriteIndex;
+				lensFlareToDraw.SpriteID = lensFlare.SpriteID;
 				lensFlareToDraw.Direction = lensFlareToCamera;
 				lensFlareToDraw.IsGlobal = lensFlare.IsGlobal;
 
@@ -136,17 +136,12 @@ namespace TEN::Renderer
 			[](const RendererLensFlare& lensFlare0, const RendererLensFlare& lensFlare1)
 			{
 				if (lensFlare0.IsGlobal && !lensFlare1.IsGlobal)
-				{
 					return true;
-				}
-				else if (!lensFlare0.IsGlobal && lensFlare1.IsGlobal)
-				{
+
+				if (!lensFlare0.IsGlobal && lensFlare1.IsGlobal)
 					return false;
-				}
-				else
-				{
-					return lensFlare0.Distance < lensFlare1.Distance;
-				}
+
+				return (lensFlare0.Distance < lensFlare1.Distance);
 			});
 
 		for (int i = 0; i < std::min(MAX_LENS_FLARES_DRAW, (int)tempLensFlares.size()); i++)
