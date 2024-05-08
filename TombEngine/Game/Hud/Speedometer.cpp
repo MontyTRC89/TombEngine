@@ -30,6 +30,8 @@ namespace TEN::Hud
 			return;
 		}
 
+		StoreInterpolationData();
+
 		// Update life and updated value status.
 		_life = std::clamp(_life + (_hasValueUpdated ? 1.0f : -1.0f), 0.0f, LIFE_MAX * FPS);
 		_hasValueUpdated = false;
@@ -57,6 +59,8 @@ namespace TEN::Hud
 
 		if (_life <= 0.0f)
 			return;
+
+		// TODO: Interpolation.
 
 		auto color = Color(1.0f, 1.0f, 1.0f, _opacity);
 
