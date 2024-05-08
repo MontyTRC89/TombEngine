@@ -19,10 +19,7 @@ namespace TEN::Scripting
 
 		// Register type.
 		parent.new_usertype<LensFlare>(
-			"LensFlare",
-			ctors(),
-			sol::call_constructor, ctors(),
-
+			"LensFlare", ctors(), sol::call_constructor, ctors(),
 			"GetEnabled", &LensFlare::GetEnabled,
 			"GetSunSpriteID", &LensFlare::GetSunSpriteID,
 			"GetRotation", &LensFlare::GetRotation,
@@ -60,7 +57,7 @@ namespace TEN::Scripting
 		return _sunSpriteID;
 	}
 
-	// Get the lens flare's euler rotation.
+	/// Get the lens flare's euler rotation.
 	// @function LensFlare:GetRotation()
 	// @treturn Rotation Rotation.
 	Rotation LensFlare::GetRotation() const
@@ -68,14 +65,14 @@ namespace TEN::Scripting
 		return _rotation;
 	}
 
-	// Get the lens flare's color.
+	/// Get the lens flare's color.
 	// @function LensFlare:SetColor()
 	ScriptColor LensFlare::GetColor() const
 	{
 		return _color;
 	}
 
-	// Set the lens flare's sun sprite ID.
+	/// Set the lens flare's sun sprite ID.
 	// @function LensFlare:SetSunbjectID()
 	// @tparam int New sprite ID.
 	void LensFlare::SetSunSpriteID(int spriteID)
@@ -90,7 +87,7 @@ namespace TEN::Scripting
 		_sunSpriteID = spriteID;
 	}
 
-	// Set the lens flare's euler rotation.
+	/// Set the lens flare's euler rotation.
 	// @function LensFlare:SetRotation(Rotation)
 	// @tparam Rotation New euler rotation.
 	void LensFlare::SetRotation(const Rotation& rot)
@@ -98,7 +95,7 @@ namespace TEN::Scripting
 		_rotation = rot;
 	}
 
-	// Set the lens flare's color.
+	/// Set the lens flare's color.
 	// @function LensFlare:SetColor(Color)
 	// @tparam Color New color.
 	void LensFlare::SetColor(const ScriptColor& color)

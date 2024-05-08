@@ -21,10 +21,7 @@ namespace TEN::Scripting
 		
 		// Register type.
 		parent.new_usertype<Starfield>(
-			"Starfield",
-			ctors(),
-			sol::call_constructor, ctors(),
-			
+			"Starfield", ctors(), sol::call_constructor, ctors(),
 			"GetStarsEnabled", &Starfield::GetStarsEnabled,
 			"GetMeteorsEnabled", &Starfield::GetMeteorsEnabled,
 			"GetStarCount", &Starfield::GetStarCount,
