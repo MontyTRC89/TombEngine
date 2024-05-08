@@ -144,13 +144,13 @@ namespace TEN::Renderer
 						if (segment.Flags & (int)StreamerFlags::FadeLeft)
 						{
 							AddColoredQuad(
-								Vector3::Lerp(segment.OldVertices[0], segment.Vertices[0], _interpolationFactor), 
-								Vector3::Lerp(segment.OldVertices[1], segment.Vertices[1], _interpolationFactor),
-								Vector3::Lerp(prevSegment.OldVertices[1], prevSegment.Vertices[1], _interpolationFactor),
-								Vector3::Lerp(prevSegment.OldVertices[0], prevSegment.Vertices[0], _interpolationFactor),
+								Vector3::Lerp(segment.PrevVertices[0], segment.Vertices[0], _interpolationFactor), 
+								Vector3::Lerp(segment.PrevVertices[1], segment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.PrevVertices[1], prevSegment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.PrevVertices[0], prevSegment.Vertices[0], _interpolationFactor),
 								Vector4::Zero, 
-								Vector4::Lerp(segment.OldColor, segment.Color, _interpolationFactor),
-								Vector4::Lerp(prevSegment.OldColor, prevSegment.Color, _interpolationFactor),
+								Vector4::Lerp(segment.PrevColor, segment.Color, _interpolationFactor),
+								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, _interpolationFactor),
 								Vector4::Zero,
 								blendMode,
 								view);
@@ -158,28 +158,28 @@ namespace TEN::Renderer
 						else if (segment.Flags & (int)StreamerFlags::FadeRight)
 						{
 							AddColoredQuad(
-								Vector3::Lerp(segment.OldVertices[0], segment.Vertices[0], _interpolationFactor),
-								Vector3::Lerp(segment.OldVertices[1], segment.Vertices[1], _interpolationFactor),
-								Vector3::Lerp(prevSegment.OldVertices[1], prevSegment.Vertices[1], _interpolationFactor),
-								Vector3::Lerp(prevSegment.OldVertices[0], prevSegment.Vertices[0], _interpolationFactor),
-								Vector4::Lerp(segment.OldColor, segment.Color, _interpolationFactor),
+								Vector3::Lerp(segment.PrevVertices[0], segment.Vertices[0], _interpolationFactor),
+								Vector3::Lerp(segment.PrevVertices[1], segment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.PrevVertices[1], prevSegment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.PrevVertices[0], prevSegment.Vertices[0], _interpolationFactor),
+								Vector4::Lerp(segment.PrevColor, segment.Color, _interpolationFactor),
 								Vector4::Zero,
 								Vector4::Zero,
-								Vector4::Lerp(prevSegment.OldColor, prevSegment.Color, _interpolationFactor),
+								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, _interpolationFactor),
 								blendMode,
 								view);
 						}
 						else
 						{
 							AddColoredQuad(
-								Vector3::Lerp(segment.OldVertices[0], segment.Vertices[0], _interpolationFactor),
-								Vector3::Lerp(segment.OldVertices[1], segment.Vertices[1], _interpolationFactor),
-								Vector3::Lerp(prevSegment.OldVertices[1], prevSegment.Vertices[1], _interpolationFactor),
-								Vector3::Lerp(prevSegment.OldVertices[0], prevSegment.Vertices[0], _interpolationFactor),
-								Vector4::Lerp(segment.OldColor, segment.Color, _interpolationFactor),
-								Vector4::Lerp(segment.OldColor, segment.Color, _interpolationFactor),
-								Vector4::Lerp(prevSegment.OldColor, prevSegment.Color, _interpolationFactor),
-								Vector4::Lerp(prevSegment.OldColor, prevSegment.Color, _interpolationFactor),
+								Vector3::Lerp(segment.PrevVertices[0], segment.Vertices[0], _interpolationFactor),
+								Vector3::Lerp(segment.PrevVertices[1], segment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.PrevVertices[1], prevSegment.Vertices[1], _interpolationFactor),
+								Vector3::Lerp(prevSegment.PrevVertices[0], prevSegment.Vertices[0], _interpolationFactor),
+								Vector4::Lerp(segment.PrevColor, segment.Color, _interpolationFactor),
+								Vector4::Lerp(segment.PrevColor, segment.Color, _interpolationFactor),
+								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, _interpolationFactor),
+								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, _interpolationFactor),
 								blendMode, 
 								view);
 						}
@@ -202,13 +202,13 @@ namespace TEN::Renderer
 			if (laser.Life <= 0.0f)
 				continue;
 
-			auto color = Vector4::Lerp(laser.OldColor, laser.Color, _interpolationFactor);
-			color.w = Lerp(laser.OldOpacity, laser.Opacity, _interpolationFactor);
+			auto color = Vector4::Lerp(laser.PrevColor, laser.Color, _interpolationFactor);
+			color.w = Lerp(laser.PrevOpacity, laser.Opacity, _interpolationFactor);
 
-			Vector3 laserTarget = Vector3::Lerp(laser.OldTarget, laser.Target, _interpolationFactor);
+			Vector3 laserTarget = Vector3::Lerp(laser.PrevTarget, laser.Target, _interpolationFactor);
 
 			ElectricityKnots[0] = laserTarget;
-			ElectricityKnots[1] = Vector3::Lerp(laser.OldOrigin, laser.Origin, _interpolationFactor);
+			ElectricityKnots[1] = Vector3::Lerp(laser.PrevOrigin, laser.Origin, _interpolationFactor);
 			
 			for (int j = 0; j < 2; j++)
 				ElectricityKnots[j] -= laserTarget;
@@ -261,12 +261,12 @@ namespace TEN::Renderer
 			if (arc.life <= 0)
 				continue;
 
-			ElectricityKnots[0] = Vector3::Lerp(arc.oldPos1, arc.pos1, _interpolationFactor);
-			ElectricityKnots[1] = Vector3::Lerp(arc.oldPos1, arc.pos1, _interpolationFactor);
-			ElectricityKnots[2] = Vector3::Lerp(arc.oldPos2, arc.pos2, _interpolationFactor);
-			ElectricityKnots[3] = Vector3::Lerp(arc.oldPos3, arc.pos3, _interpolationFactor);
-			ElectricityKnots[4] = Vector3::Lerp(arc.oldPos4, arc.pos4, _interpolationFactor);
-			ElectricityKnots[5] = Vector3::Lerp(arc.oldPos4, arc.pos4, _interpolationFactor);
+			ElectricityKnots[0] = Vector3::Lerp(arc.PrevPos1, arc.pos1, _interpolationFactor);
+			ElectricityKnots[1] = Vector3::Lerp(arc.PrevPos1, arc.pos1, _interpolationFactor);
+			ElectricityKnots[2] = Vector3::Lerp(arc.PrevPos2, arc.pos2, _interpolationFactor);
+			ElectricityKnots[3] = Vector3::Lerp(arc.PrevPos3, arc.pos3, _interpolationFactor);
+			ElectricityKnots[4] = Vector3::Lerp(arc.PrevPos4, arc.pos4, _interpolationFactor);
+			ElectricityKnots[5] = Vector3::Lerp(arc.PrevPos4, arc.pos4, _interpolationFactor);
 
 			for (int j = 0; j < ElectricityKnots.size(); j++)
 				ElectricityKnots[j] -= LaraItem->Pose.Position.ToVector3();
@@ -307,17 +307,17 @@ namespace TEN::Renderer
 
 
 					byte oldR, oldG, oldB;
-					if (arc.oldLife >= 16)
+					if (arc.PrevLife >= 16)
 					{
-						oldR = arc.oldR;
-						oldG = arc.oldG;
-						oldB = arc.oldB;
+						oldR = arc.PrevR;
+						oldG = arc.PrevG;
+						oldB = arc.PrevB;
 					}
 					else
 					{
-						oldR = (arc.oldLife * arc.oldR) / 16;
-						oldG = (arc.oldLife * arc.oldG) / 16;
-						oldB = (arc.oldLife * arc.oldB) / 16;
+						oldR = (arc.PrevLife * arc.PrevR) / 16;
+						oldG = (arc.PrevLife * arc.PrevG) / 16;
+						oldB = (arc.PrevLife * arc.PrevB) / 16;
 					}
 
 					r = (byte)Lerp(oldR, r, _interpolationFactor);
@@ -640,11 +640,11 @@ namespace TEN::Renderer
 
 			AddSpriteBillboard(
 				&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble.SpriteIndex],
-				Vector3::Lerp(bubble.OldPosition, bubble.Position, _interpolationFactor),
-				Vector4::Lerp(bubble.OldColor, bubble.Color, _interpolationFactor),
+				Vector3::Lerp(bubble.PrevPosition, bubble.Position, _interpolationFactor),
+				Vector4::Lerp(bubble.PrevColor, bubble.Color, _interpolationFactor),
 				0.0f,
 				1.0f, 
-				Vector2::Lerp(bubble.OldSize, bubble.Size, _interpolationFactor) / 2,
+				Vector2::Lerp(bubble.PrevSize, bubble.Size, _interpolationFactor) / 2,
 				BlendMode::Additive, 
 				true, 
 				view);
@@ -698,17 +698,17 @@ namespace TEN::Renderer
 			auto color = ripple.Color;
 			color.w = opacity;
 
-			float oldOpacity = ripple.OldColor.w * ((ripple.Flags & (int)RippleFlags::LowOpacity) ? 0.5f : 1.0f);
-			auto oldColor = ripple.OldColor;
+			float oldOpacity = ripple.PrevColor.w * ((ripple.Flags & (int)RippleFlags::LowOpacity) ? 0.5f : 1.0f);
+			auto oldColor = ripple.PrevColor;
 			oldColor.w = oldOpacity;
 
 			AddSpriteBillboardConstrainedLookAt(
 				&_sprites[ripple.SpriteIndex],
-				Vector3::Lerp(ripple.OldPosition, ripple.Position, _interpolationFactor),
+				Vector3::Lerp(ripple.PrevPosition, ripple.Position, _interpolationFactor),
 				Vector4::Lerp(oldColor, color, _interpolationFactor),
 				0.0f,
 				1.0f, 
-				Vector2(Lerp(ripple.OldSize, ripple.Size, _interpolationFactor) * 2),
+				Vector2(Lerp(ripple.PrevSize, ripple.Size, _interpolationFactor) * 2),
 				BlendMode::Additive, 
 				ripple.Normal,
 				true,
@@ -741,7 +741,7 @@ namespace TEN::Renderer
 			if (uwBlood.Init)
 				oldColor = Vector4(uwBlood.Init / 2, 0, uwBlood.Init / 16, UCHAR_MAX);
 			else
-				oldColor = Vector4(uwBlood.OldLife / 2, 0, uwBlood.OldLife / 16, UCHAR_MAX);
+				oldColor = Vector4(uwBlood.PrevLife / 2, 0, uwBlood.PrevLife / 16, UCHAR_MAX);
 
 			oldColor.x = (int)std::clamp((int)oldColor.x, 0, UCHAR_MAX);
 			oldColor.y = (int)std::clamp((int)oldColor.y, 0, UCHAR_MAX);
@@ -750,13 +750,13 @@ namespace TEN::Renderer
 
 			AddSpriteBillboard(
 				&_sprites[uwBlood.SpriteIndex],
-				Vector3::Lerp(uwBlood.OldPosition, uwBlood.Position, _interpolationFactor),
+				Vector3::Lerp(uwBlood.PrevPosition, uwBlood.Position, _interpolationFactor),
 				Vector4::Lerp(oldColor, color, _interpolationFactor),
 				0.0f,
 				1.0f, 
 				Vector2(
-					Lerp(uwBlood.OldSize, uwBlood.Size, _interpolationFactor), 
-					Lerp(uwBlood.OldSize, uwBlood.Size, _interpolationFactor)
+					Lerp(uwBlood.PrevSize, uwBlood.Size, _interpolationFactor), 
+					Lerp(uwBlood.PrevSize, uwBlood.Size, _interpolationFactor)
 				) * 2,
 				BlendMode::Additive,
 				true, 
@@ -994,11 +994,11 @@ namespace TEN::Renderer
 
 				AddSpriteBillboard(
 					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
-					Vector3::Lerp(p.OldPosition, p.Position, _interpolationFactor),
+					Vector3::Lerp(p.PrevPosition, p.Position, _interpolationFactor),
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 
 					1.0f, 
-					Vector2(Lerp(p.OldSize, p.Size, _interpolationFactor)),
+					Vector2(Lerp(p.PrevSize, p.Size, _interpolationFactor)),
 					BlendMode::Additive, 
 					true,
 					view);
@@ -1012,11 +1012,11 @@ namespace TEN::Renderer
 
 				AddSpriteBillboard(
 					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
-					Vector3::Lerp(p.OldPosition, p.Position, _interpolationFactor),
+					Vector3::Lerp(p.PrevPosition, p.Position, _interpolationFactor),
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f,
 					1.0f, 
-					Vector2(Lerp(p.OldSize, p.Size, _interpolationFactor)),
+					Vector2(Lerp(p.PrevSize, p.Size, _interpolationFactor)),
 					BlendMode::Additive,
 					true,
 					view);
@@ -1033,11 +1033,11 @@ namespace TEN::Renderer
 
 				AddSpriteBillboardConstrained(
 					&_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
-					Vector3::Lerp(p.OldPosition, p.Position, _interpolationFactor),
+					Vector3::Lerp(p.PrevPosition, p.Position, _interpolationFactor),
 					Vector4(0.8f, 1.0f, 1.0f, p.Transparency()),
 					0.0f,
 					1.0f,
-					Vector2(RAIN_WIDTH, Lerp(p.OldSize, p.Size, _interpolationFactor)),
+					Vector2(RAIN_WIDTH, Lerp(p.PrevSize, p.Size, _interpolationFactor)),
 					BlendMode::Additive, 
 					-v, 
 					true, 

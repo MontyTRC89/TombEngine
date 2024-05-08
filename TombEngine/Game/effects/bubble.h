@@ -31,17 +31,17 @@ namespace TEN::Effects::Bubble
 		float OscillationPeriod	  = 0.0f;
 		float OscillationVelocity = 0.0f;
 
-		Vector3 OldPosition = Vector3::Zero;
-		Vector4 OldColor	= Vector4::Zero;
-		Vector2 OldSize		= Vector2::Zero;
-		float OldLife		= 0.0f;
+		Vector3 PrevPosition = Vector3::Zero;
+		Vector4 PrevColor	 = Vector4::Zero;
+		Vector2 PrevSize	 = Vector2::Zero;
+		float	PrevLife	 = 0.0f;
 
 		void StoreInterpolationData()
 		{
-			OldPosition = Position;
-			OldColor	 = Color;
-			OldSize		 = Size;
-			OldLife		 = Life;
+			PrevPosition = Position;
+			PrevColor = Color;
+			PrevSize = Size;
+			PrevLife = Life;
 		}
 	};
 

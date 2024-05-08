@@ -15,19 +15,19 @@ namespace TEN::Effects::Blood
 		float Size	  = 0.0f;
 		float Opacity = 0.0f;
 
-		Vector3 OldPosition = Vector3::Zero;
-		Vector4 OldColor	= Vector4::Zero;
-		float OldSize = 0.0f;
-		float OldOpacity = 0.0f;
-		float OldLife = 0.0f;
+		Vector3 PrevPosition = Vector3::Zero;
+		Vector4 PrevColor	 = Vector4::Zero;
+		float	PrevLife	 = 0.0f;
+		float	PrevSize	 = 0.0f;
+		float	PrevOpacity	 = 0.0f;
 
 		void StoreInterpolationData()
 		{
-			OldPosition = Position;
-			OldColor	 = Color;
-			OldSize		 = Size;
-			OldOpacity	 = Opacity;
-			OldLife		 = Life;
+			PrevPosition = Position;
+			PrevColor = Color;
+			PrevLife = Life;
+			PrevSize = Size;
+			PrevOpacity = Opacity;
 		}
 	};
 

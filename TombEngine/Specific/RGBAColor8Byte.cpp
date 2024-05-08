@@ -99,11 +99,6 @@ RGBAColor8Byte::operator Color() const
 	return Color(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b));
 }
 
-RGBAColor8Byte::operator Color() const
-{
-	return Color(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b));
-}
-
 RGBAColor8Byte::operator Vector3() const
 {
 	return Vector3(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b));

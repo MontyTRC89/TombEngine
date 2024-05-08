@@ -24,15 +24,15 @@ namespace TEN::Effects::Ripple
 		float FadeDuration = 0.0f;
 		int	  Flags		   = 0;
 
-		Vector3 OldPosition;
-		Vector4 OldColor;
-		float OldSize;
+		Vector3 PrevPosition = Vector3::Zero;
+		Vector4 PrevColor	 = Vector4::Zero;
+		float	PrevSize	 = 0.0f;
 
 		void StoreInterpolationData()
 		{
-			OldPosition = Position;
-			OldColor	 = Color;
-			OldSize		 = Size;
+			PrevPosition = Position;
+			PrevColor = Color;
+			PrevSize = Size;
 		}
 	};
 

@@ -24,10 +24,10 @@ namespace TEN::Effects::DisplaySprite
 		Stretch
 	};
 
-	enum class DisplaySpriteSource
+	enum class DisplaySpritePhase
 	{
-		ControlPhase,
-		DrawPhase
+		Control,
+		Draw
 	};
 	
 	struct DisplaySprite
@@ -45,14 +45,14 @@ namespace TEN::Effects::DisplaySprite
 		DisplaySpriteScaleMode ScaleMode = DisplaySpriteScaleMode::Fit;
 		BlendMode			   BlendMode = BlendMode::AlphaBlend;
 
-		DisplaySpriteSource Source = DisplaySpriteSource::ControlPhase;
+		DisplaySpritePhase Source = DisplaySpritePhase::Control;
 	};
 
 	extern std::vector<DisplaySprite> DisplaySprites;
 	
 	void AddDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vector2& pos, short orient, const Vector2& scale, const Vector4& color,
 						  int priority, DisplaySpriteAlignMode alignMode, DisplaySpriteScaleMode scaleMode, 
-						  BlendMode blendMode, DisplaySpriteSource source);
+						  BlendMode blendMode, DisplaySpritePhase source);
 	void ClearAllDisplaySprites();
 	void ClearDrawPhaseDisplaySprites();
 }

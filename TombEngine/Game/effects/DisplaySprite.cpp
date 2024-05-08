@@ -15,7 +15,7 @@ namespace TEN::Effects::DisplaySprite
 
 	void AddDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vector2& pos, short orient, const Vector2& scale, const Vector4& color,
 						  int priority, DisplaySpriteAlignMode alignMode, DisplaySpriteScaleMode scaleMode, 
-						  BlendMode blendMode, DisplaySpriteSource source)
+						  BlendMode blendMode, DisplaySpritePhase source)
 	{
 		auto displaySprite = DisplaySprite{};
 		displaySprite.ObjectID = objectID;
@@ -40,8 +40,13 @@ namespace TEN::Effects::DisplaySprite
 
 	void ClearDrawPhaseDisplaySprites()
 	{
-		DisplaySprites.erase(std::remove_if(DisplaySprites.begin(), DisplaySprites.end(),
-						[](const DisplaySprite& displaySprite) { return displaySprite.Source == DisplaySpriteSource::DrawPhase; }),
-						DisplaySprites.end());
+		DisplaySprites.erase(
+			std::remove_if(
+				DisplaySprites.begin(), DisplaySprites.end(),
+				[](const DisplaySprite& displaySprite)
+				{
+					return (displaySprite.Source == DisplaySpritePhase::Draw);
+				}),
+			DisplaySprites.end());
 	}
 }

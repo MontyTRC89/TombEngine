@@ -133,9 +133,6 @@ namespace TEN::Hud
 		constexpr auto STATIC_ELEMENT_SPRITE_ID	 = 0;
 		constexpr auto SEGMENT_ELEMENT_SPRITE_ID = 1;
 		constexpr auto PRIORITY					 = 0; // TODO: Check later. May interfere with Lua display sprites. -- Sezz 2023.10.06
-		constexpr auto ALIGN_MODE				 = DisplaySpriteAlignMode::Center;
-		constexpr auto SCALE_MODE				 = DisplaySpriteScaleMode::Fill;
-		constexpr auto BLEND_MODE				 = BlendMode::Additive;
 
 		if (!Position.has_value())
 			return;
@@ -144,7 +141,8 @@ namespace TEN::Hud
 		AddDisplaySprite(
 			SPRITE_SEQUENCE_OBJECT_ID, STATIC_ELEMENT_SPRITE_ID,
 			*Position, Orientation, Vector2(Scale), Color,
-			PRIORITY, ALIGN_MODE, SCALE_MODE, BLEND_MODE, DisplaySpriteSource::DrawPhase);
+			PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fill,
+			BlendMode::Additive, DisplaySpritePhase::Draw);
 
 		// Draw animated outer segment elements.
 		for (const auto& segment : Segments)
@@ -156,7 +154,8 @@ namespace TEN::Hud
 			AddDisplaySprite(
 				SPRITE_SEQUENCE_OBJECT_ID, SEGMENT_ELEMENT_SPRITE_ID,
 				pos, orient, scale, Color,
-				PRIORITY, ALIGN_MODE, SCALE_MODE, BLEND_MODE, DisplaySpriteSource::DrawPhase);
+				PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fill,
+				BlendMode::Additive, DisplaySpritePhase::Draw);
 		}
 	}
 

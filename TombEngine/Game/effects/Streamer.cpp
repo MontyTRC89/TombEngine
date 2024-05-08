@@ -38,13 +38,6 @@ namespace TEN::Effects::Streamer
 		Life -= 1.0f;
 	}
 
-	void Streamer::StreamerSegment::StoreInterpolationData()
-	{
-		OldVertices[0] = Vertices[0];
-		OldVertices[1] = Vertices[1];
-		OldColor = Color;
-	}
-
 	void Streamer::StreamerSegment::TransformVertices(float vel, float scaleRate)
 	{
 		// Apply expansion.

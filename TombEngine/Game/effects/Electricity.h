@@ -40,25 +40,25 @@ namespace TEN::Effects::Electricity
 		int type;
 		int flags;
 
-		Vector3 oldPos1;
-		Vector3 oldPos2;
-		Vector3 oldPos3;
-		Vector3 oldPos4;
-		byte oldR;
-		byte oldG;
-		byte oldB;
-		float oldLife;
+		Vector3 PrevPos1 = Vector3::Zero;
+		Vector3 PrevPos2 = Vector3::Zero;
+		Vector3 PrevPos3 = Vector3::Zero;
+		Vector3 PrevPos4 = Vector3::Zero;
+		byte	PrevR	 = 0;
+		byte	PrevG	 = 0;
+		byte	PrevB	 = 0;
+		float	PrevLife = 0.0f;
 
 		void StoreInterpolationData()
 		{
-			oldPos1 = pos1;
-			oldPos2 = pos2;
-			oldPos3 = pos3;
-			oldPos4 = pos4;
-			oldR = r;
-			oldG = g;
-			oldB = b;
-			oldLife = life;
+			PrevPos1 = pos1;
+			PrevPos2 = pos2;
+			PrevPos3 = pos3;
+			PrevPos4 = pos4;
+			PrevR = r;
+			PrevG = g;
+			PrevB = b;
+			PrevLife = life;
 		}
 	};
 
@@ -66,38 +66,38 @@ namespace TEN::Effects::Electricity
 	{
 		unsigned int NumSegments = 0;
 
-		Vector3 Origin = Vector3::Zero;
-		Vector3 Target = Vector3::Zero;
+		Vector3 Origin		  = Vector3::Zero;
+		Vector3 Target		  = Vector3::Zero;
 		short	Orientation2D = 0;
 		Vector3 LightPosition = Vector3::Zero; // TODO: Use light cone instead?
-		Vector4 Color = Vector4::Zero;
+		Vector4 Color		  = Vector4::Zero;
 
-		float Life = 0.0f;
-		float Radius = 0.0f;
-		float Length = 0.0f;
+		float Life		= 0.0f;
+		float Radius	= 0.0f;
+		float Length	= 0.0f;
 		float LengthEnd = 0.0f;
-		float Opacity = 0.0f;
-		short Rotation = 0;
+		float Opacity	= 0.0f;
+		short Rotation	= 0;
 
-		Vector3 OldOrigin = Vector3::Zero;
-		Vector3 OldTarget = Vector3::Zero;
-		float OldLife = 0.0f;
-		float OldRadius = 0.0f;
-		float OldLength = 0.0f;
-		float OldOpacity = 0.0f;
-		Vector4 OldColor = Vector4::Zero;
-		short OldOrientation2D = 0;
+		Vector3 PrevOrigin		  = Vector3::Zero;
+		Vector3 PrevTarget		  = Vector3::Zero;
+		short	PrevOrientation2D = 0;
+		Vector4 PrevColor		  = Vector4::Zero;
+		float	PrevLife		  = 0.0f;
+		float	PrevRadius		  = 0.0f;
+		float	PrevLength		  = 0.0f;
+		float	PrevOpacity		  = 0.0f;
 
 		void StoreInterpolationData()
 		{
-			OldOrigin = Origin;
-			OldTarget = Target;
-			OldLife = Life;
-			OldRadius = Radius;
-			OldLength = Length;
-			OldOpacity = Opacity;
-			OldColor = Color;
-			OldOrientation2D = Orientation2D;
+			PrevOrigin = Origin;
+			PrevTarget = Target;
+			PrevOrientation2D = Orientation2D;
+			PrevColor = Color;
+			PrevLife = Life;
+			PrevRadius = Radius;
+			PrevLength = Length;
+			PrevOpacity = Opacity;
 		}
 	};
 

@@ -59,9 +59,9 @@ using namespace TEN::Gui;
 
 using TEN::Renderer::g_Renderer;
 
-LaraInfo Lara = {};
-LaraInfo OldLara = {};
-ItemInfo* LaraItem;
+LaraInfo	  Lara			= {};
+LaraInfo	  PrevLara		= {};
+ItemInfo*	  LaraItem		= nullptr;
 CollisionInfo LaraCollision = {};
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
