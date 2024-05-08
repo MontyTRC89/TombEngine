@@ -183,34 +183,34 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 		auto surfTri0 = CollisionTriangle();
 		if (!isSplit || isSplitAngle0)
 		{
-			auto vertex00 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
-			auto vertex01 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
-			auto vertex02 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
-			surfTri0 = CollisionTriangle(vertex00, vertex01, vertex02, GetTriangleNormal(vertex00, vertex01, vertex02) * (isFloor ? -1 : 1));
+			auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
+			auto vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
+			auto vertex2 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
+			surfTri0 = CollisionTriangle(vertex0, vertex1, vertex2, GetTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
 		}
 		else
 		{
-			auto vertex00 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
-			auto vertex01 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
-			auto vertex02 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y);
-			surfTri0 = CollisionTriangle(vertex00, vertex01, vertex02, GetTriangleNormal(vertex00, vertex01, vertex02) * (isFloor ? -1 : 1));
+			auto vertex0 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
+			auto vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
+			auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y);
+			surfTri0 = CollisionTriangle(vertex0, vertex1, vertex2, GetTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
 		}
 		
 		// 2) Calculate surface triangle 1.
 		auto surfTri1 = CollisionTriangle();
 		if (!isSplit || isSplitAngle0)
 		{
-			auto vertex10 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
-			auto vertex11 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y);
-			auto vertex12 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
-			surfTri1 = CollisionTriangle(vertex10, vertex11, vertex12, GetTriangleNormal(vertex10, vertex11, vertex12) * (isFloor ? -1 : 1));
+			auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
+			auto vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y);
+			auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
+			surfTri1 = CollisionTriangle(vertex0, vertex1, vertex2, GetTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
 		}
 		else
 		{
-			auto vertex10 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
-			auto vertex11 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y);
-			auto vertex12 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
-			surfTri1 = CollisionTriangle(vertex10, vertex11, vertex12, GetTriangleNormal(vertex10, vertex11, vertex12) * (isFloor ? -1 : 1));
+			auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
+			auto vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y);
+			auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
+			surfTri1 = CollisionTriangle(vertex0, vertex1, vertex2, GetTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
 		}
 
 		bool isSurf0Wall = sector.IsWall(0);
