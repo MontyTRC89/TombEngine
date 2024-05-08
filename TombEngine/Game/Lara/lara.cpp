@@ -63,6 +63,7 @@ LaraInfo Lara = {};
 ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 
+//debug
 #include <Game/control/los.h>
 #include "Specific/Input/Input.h"
 #include <OISKeyboard.h>
@@ -136,6 +137,15 @@ static int GetSurfaceTriangleVertexHeight(const FloorInfo& sector, int relX, int
 	return (tri.Plane.D() + relPlaneHeight);
 }
 
+static Vector3 GetTriangleNormal(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
+{
+	auto edge0 = vertex1 - vertex0;
+	auto edge1 = vertex2 - vertex0;
+	auto normal = edge0.Cross(edge1);
+	normal.Normalize();
+	return normal;
+}
+
 static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 												 const FloorInfo* prevSectorX, const FloorInfo* prevSectorZ, bool isXEnd, bool isZEnd)
 {
@@ -157,120 +167,124 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 	{
 		const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
 
-		bool isTri0Portal = (surface.Triangles[0].PortalRoomNumber != NO_VALUE);
-		bool isTri1Portal = (surface.Triangles[1].PortalRoomNumber != NO_VALUE);
+		bool isSurfTri0Portal = (surface.Triangles[0].PortalRoomNumber != NO_VALUE);
+		bool isSurfTri1Portal = (surface.Triangles[1].PortalRoomNumber != NO_VALUE);
+
+		bool isSplit = sector.IsSurfaceSplit(isFloor);
+		bool isSplitAngle0 = (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+
+		// Define surface triangle 0.
+		auto vertex00 = Vector3::Zero;
+		auto vertex01 = Vector3::Zero;
+		auto vertex02 = Vector3::Zero;
+		auto surfTri0 = CollisionTriangle();
+		if (!isSplit || isSplitAngle0)
+		{
+			vertex00 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
+			vertex01 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
+			vertex02 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
+		}
+		else
+		{
+			vertex00 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
+			vertex01 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
+			vertex02 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y);
+		}
+		surfTri0 = CollisionTriangle(vertex00, vertex01, vertex02, GetTriangleNormal(vertex00, vertex01, vertex02) * (isFloor ? -1 : 1));
+		
+		// Define surface triangle 1.
+		auto vertex10 = Vector3::Zero;
+		auto vertex11 = Vector3::Zero;
+		auto vertex12 = Vector3::Zero;
+		auto surfTri1 = CollisionTriangle();
+		if (!isSplit || isSplitAngle0)
+		{
+			vertex10 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
+			vertex11 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y);
+			vertex12 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
+		}
+		else
+		{
+			vertex10 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
+			vertex11 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y);
+			vertex12 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
+		}
+		surfTri1 = CollisionTriangle(vertex10, vertex11, vertex12, GetTriangleNormal(vertex10, vertex11, vertex12) * (isFloor ? -1 : 1));
 
 		// todo: wall check.
-		/*if (sector.IsSurfaceSplit(isFloor))
+		if (sector.IsSurfaceSplit(isFloor))
 		{
-			if (!isTri0Portal || !isTri1Portal)
+			if (!isSurfTri0Portal || !isSurfTri1Portal)
 			{
 				if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
 				{
-					// Surface triangle 0.
-					auto tri0 = CollisionTriangle(
-						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
-						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
-						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
+					// Surface triangles
+					if (!isSurfTri0Portal)
+						tris.push_back(surfTri0);
+					if (!isSurfTri1Portal)
+						tris.push_back(surfTri1);
 
-					if (!isTri0Portal)
-						tris.push_back(tri0);
-
-					// Surface triangle 1.
-					auto tri1 = CollisionTriangle(
-						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
-						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
-						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
-
-					if (!isTri1Portal)
-						tris.push_back(tri1);
-
+					// TODO: Criss-cross case?
 					// Diagonal wall triangles.
-					if (tri0.GetVertices()[0] != tri1.GetVertices()[0] && tri0.GetVertices()[2] != tri1.GetVertices()[1])
+					if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[0] && surfTri0.GetVertices()[2] != surfTri1.GetVertices()[1])
 					{
-						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[0], tri0.GetVertices()[2]);
+						auto tri2 = CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[0], surfTri0.GetVertices()[2]);
 						tris.push_back(tri2);
 
-						auto tri3 = CollisionTriangle(tri1.GetVertices()[0], tri0.GetVertices()[2], tri1.GetVertices()[1]);
+						auto tri3 = CollisionTriangle(surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], surfTri1.GetVertices()[1]);
 						tris.push_back(tri3);
 					}
-					else if (tri0.GetVertices()[0] != tri1.GetVertices()[0] && tri0.GetVertices()[2] == tri1.GetVertices()[1])
+					else if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[0] && surfTri0.GetVertices()[2] == surfTri1.GetVertices()[1])
 					{
-						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[0], tri0.GetVertices()[2]);
+						auto tri2 = CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[0], surfTri0.GetVertices()[2]);
 						tris.push_back(tri2);
 					}
-					else if (tri0.GetVertices()[2] == tri1.GetVertices()[1] && tri0.GetVertices()[2] != tri1.GetVertices()[1])
+					else if (surfTri0.GetVertices()[2] == surfTri1.GetVertices()[1] && surfTri0.GetVertices()[2] != surfTri1.GetVertices()[1])
 					{
-						auto tri2 = CollisionTriangle(tri1.GetVertices()[0], tri0.GetVertices()[2], tri1.GetVertices()[1]);
+						auto tri2 = CollisionTriangle(surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], surfTri1.GetVertices()[1]);
 						tris.push_back(tri2);
 					}
 				}
 				else if (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_1)
 				{
-					// Surface triangle 0.
-					auto tri0 = CollisionTriangle(
-						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
-						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y),
-						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y));
-
-					if (!isTri0Portal)
-						tris.push_back(tri0);
-
-					// Surface triangle 1.
-					auto tri1 = CollisionTriangle(
-						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
-						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y),
-						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
-
-					if (!isTri1Portal)
-						tris.push_back(tri1);
+					// Surface triangles.
+					if (!isSurfTri0Portal)
+						tris.push_back(surfTri0);
+					if (!isSurfTri1Portal)
+						tris.push_back(surfTri1);
 
 					// Diagonal wall triangles.
-					if (tri1.GetVertices()[1] != tri0.GetVertices()[0] && tri1.GetVertices()[2] != tri0.GetVertices()[2])
+					if (surfTri1.GetVertices()[1] != surfTri0.GetVertices()[0] && surfTri1.GetVertices()[2] != surfTri0.GetVertices()[2])
 					{
-						auto tri2 = CollisionTriangle(tri1.GetVertices()[1], tri0.GetVertices()[0], tri1.GetVertices()[2]);
+						auto tri2 = CollisionTriangle(surfTri1.GetVertices()[1], surfTri0.GetVertices()[0], surfTri1.GetVertices()[2]);
 						tris.push_back(tri2);
 
-						auto tri3 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[2], tri0.GetVertices()[2]);
+						auto tri3 = CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], surfTri0.GetVertices()[2]);
 						tris.push_back(tri3);
 					}
-					else if (tri1.GetVertices()[1] != tri0.GetVertices()[0] && tri1.GetVertices()[2] == tri0.GetVertices()[2])
+					else if (surfTri1.GetVertices()[1] != surfTri0.GetVertices()[0] && surfTri1.GetVertices()[2] == surfTri0.GetVertices()[2])
 					{
-						auto tri2 = CollisionTriangle(tri1.GetVertices()[1], tri0.GetVertices()[0], tri1.GetVertices()[2]);
+						auto tri2 = CollisionTriangle(surfTri1.GetVertices()[1], surfTri0.GetVertices()[0], surfTri1.GetVertices()[2]);
 						tris.push_back(tri2);
 					}
-					else if (tri1.GetVertices()[2] == tri0.GetVertices()[2] && tri1.GetVertices()[2] != tri0.GetVertices()[2])
+					else if (surfTri1.GetVertices()[2] == surfTri0.GetVertices()[2] && surfTri1.GetVertices()[2] != surfTri0.GetVertices()[2])
 					{
-						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[2], tri0.GetVertices()[2]);
+						auto tri2 = CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], surfTri0.GetVertices()[2]);
 						tris.push_back(tri2);
 					}
 				}
 			}
 		}
-		else*/
+		else
 		{
-			// Surface triangle 0.
-			/*if (!isTri0Portal)
-			{
-				auto tri0 = CollisionTriangle(
-					Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
-					Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
-					Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
-				tris.push_back(tri0);
-			}*/
-
-			// Surface triangle 1.
-			/*if (!isTri1Portal)
-			{
-				auto tri1 = CollisionTriangle(
-					Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
-					Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
-					Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
-				tris.push_back(tri1);
-			}*/
+			// Surface triangles.
+			if (!isSurfTri0Portal)
+				tris.push_back(surfTri0);
+			if (!isSurfTri1Portal)
+				tris.push_back(surfTri1);
 
 			// Cardinal wall triangles on X axis.
-			if (prevSectorX != nullptr)
+			/*if (prevSectorX != nullptr)
 			{
 				// TODO: Wall portals.
 				const auto& prevSurfaceX = isFloor ? prevSectorX->FloorSurface : prevSectorX->CeilingSurface;
@@ -321,21 +335,21 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				// Wall triangles.
 				if (vertex0.y != vertex2.y && vertex1.y != vertex3.y) // TODO: Always true?
 				{
-					auto tri0 = CollisionTriangle(vertex0, vertex1, vertex2);
-					auto tri1 = CollisionTriangle(vertex1, vertex2, vertex3);
+					auto surfTri0 = CollisionTriangle(vertex0, vertex1, vertex2);
+					auto surfTri1 = CollisionTriangle(vertex1, vertex2, vertex3);
 
-					tris.push_back(tri0);
-					tris.push_back(tri1);
+					tris.push_back(surfTri0);
+					tris.push_back(surfTri1);
 				}
 				else if (vertex0.y == vertex2.y && vertex1.y != vertex3.y)
 				{
-					auto tri0 = CollisionTriangle(vertex0, vertex1, vertex3);
-					tris.push_back(tri0);
+					auto surfTri0 = CollisionTriangle(vertex0, vertex1, vertex3);
+					tris.push_back(surfTri0);
 				}
 				else if (vertex0.y != vertex2.y && vertex1.y == vertex3.y)
 				{
-					auto tri0 = CollisionTriangle(vertex1, vertex0, vertex1);
-					tris.push_back(tri0);
+					auto surfTri0 = CollisionTriangle(vertex1, vertex0, vertex1);
+					tris.push_back(surfTri0);
 				}
 
 				// TODO: Walls at ends where no further sectors exist.
@@ -350,7 +364,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			if (prevSectorZ != nullptr)
 			{
 
-			}
+			}*/
 		}
 
 		isFloor = false;
@@ -366,7 +380,13 @@ void HandleRoomCollisionMesh()
 	for (const auto& sector : room.floor)
 	{
 		for (const auto& tri : sector.Mesh.GetTriangles())
+		{
 			g_Renderer.AddDebugTriangle(tri.GetVertices()[0], tri.GetVertices()[1], tri.GetVertices()[2], Color(1, 1, 0, 0.2f));
+
+			auto origin = (tri.GetVertices()[0] + tri.GetVertices()[1] + tri.GetVertices()[2]) / 3;
+			auto target = Geometry::TranslatePoint(origin, tri.GetNormal(), BLOCK(0.25f));
+			g_Renderer.AddDebugLine(origin, target, Color(1, 1, 0));
+		}
 	}
 
 	if (!IsClicked(In::Walk))
@@ -406,7 +426,7 @@ void HandleRoomCollisionMesh()
 			}
 			else
 			{
-				if (tempPrevSectorX.SidePortalRoomNumber != NO_VALUE)
+				if (tempPrevSectorZ.SidePortalRoomNumber != NO_VALUE)
 				{
 					const auto& prevRoomZ = g_Level.Rooms[tempPrevSectorZ.SidePortalRoomNumber];
 					auto prevRoomGridCoordZ = GetRoomGridCoord(prevRoomZ.index, prevRoomZ.x + BLOCK(x), prevRoomZ.z); // TODO

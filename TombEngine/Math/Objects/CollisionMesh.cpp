@@ -15,14 +15,7 @@ namespace TEN::Math
 		_vertices[0] = vertex0;
 		_vertices[1] = vertex1;
 		_vertices[2] = vertex2;
-
-		// TODO: Must determine polarity in some way.
-		/*auto edge0 = vertex1 - vertex0;
-		auto edge1 = vertex2 - vertex0;
-		_normal = edge0.Cross(edge1);
-		_normal.Normalize();*/
 		_normal = normal;
-
 		_box = Geometry::GetBoundingBox(std::vector<Vector3>{ _vertices[0], _vertices[1], _vertices[2] });
 	}
 
