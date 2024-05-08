@@ -39,7 +39,7 @@ namespace TEN::Renderer
 
 	void Renderer::AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
 		float scale, Vector2 size, BlendMode blendMode, const Vector3& constrainAxis,
-		bool softParticles, RenderView& view, SpriteRenderType renderType)
+		bool isSoft, RenderView& view, SpriteRenderType renderType)
 	{
 		if (scale <= 0.0f)
 			scale = 1.0f;
@@ -58,7 +58,7 @@ namespace TEN::Renderer
 		spr.Height = size.y;
 		spr.BlendMode = blendMode;
 		spr.ConstrainAxis = constrainAxis;
-		spr.SoftParticle = softParticles;
+		spr.SoftParticle = isSoft;
 		spr.c1 = color;
 		spr.c2 = color;
 		spr.c3 = color;
