@@ -224,39 +224,79 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 		if (!isSurf1Wall && !isSurfTri1Portal)
 			tris.push_back(surfTri1);
 
-		// TODO: Full walls.
 		// 4) Generate and collect diagonal wall triangles.
-		if ((!isSurf0Wall || !isSurf1Wall) &&
-			sector.IsSurfaceSplit(isFloor) && (!isSurfTri0Portal || !isSurfTri1Portal))
+		if (sector.IsSurfaceSplit(isFloor) && !(isSurf0Wall && isSurf1Wall))
 		{
-			if (isSurfSplitAngle0)
+			// Full wall.
+			if ((isSurf0Wall || isSurf1Wall) && isFloor)
 			{
-				if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[0])
+				if (isSurfSplitAngle0)
 				{
-					const auto& normal0 = ((surfTri0.GetVertices()[0].y > surfTri1.GetVertices()[0].y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * (isFloor ? 1 : -1);
-					auto wallTri0 = CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], normal0);
+					int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, isSurf0Wall ? 1 : 0, true);
+					int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, isSurf0Wall ? 1 : 0, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, isSurf0Wall ? 1 : 0, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, isSurf0Wall ? 1 : 0, false);
+
+					auto vertex0 = Vector3(corner0.x, floorHeight0, corner0.y);
+					auto vertex1 = Vector3(corner2.x, floorHeight1, corner2.y);
+					auto vertex2 = Vector3(corner0.x, ceilHeight0, corner0.y);
+					auto vertex3 = Vector3(corner2.x, ceilHeight1, corner2.y);
+
+					auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL);
+					auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL);
 					tris.push_back(wallTri0);
+					tris.push_back(wallTri1);
 				}
-				if (surfTri0.GetVertices()[2] != surfTri1.GetVertices()[1])
+				else
 				{
-					const auto& normal1 = ((surfTri0.GetVertices()[2].y > surfTri1.GetVertices()[1].y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * (isFloor ? 1 : -1);
-					auto wallTri1 = CollisionTriangle(surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], surfTri1.GetVertices()[1], normal1);
+					int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, isSurf0Wall ? 1 : 0, true);
+					int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, isSurf0Wall ? 1 : 0, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, isSurf0Wall ? 1 : 0, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, isSurf0Wall ? 1 : 0, false);
+
+					auto vertex0 = Vector3(corner1.x, floorHeight0, corner1.y);
+					auto vertex1 = Vector3(corner3.x, floorHeight1, corner3.y);
+					auto vertex2 = Vector3(corner1.x, ceilHeight0, corner1.y);
+					auto vertex3 = Vector3(corner3.x, ceilHeight1, corner3.y);
+
+					auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
+					auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
+					tris.push_back(wallTri0);
 					tris.push_back(wallTri1);
 				}
 			}
-			else
+			// Step wall.
+			else if (!isSurfTri0Portal || !isSurfTri1Portal)
 			{
-				if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[1])
+				if (isSurfSplitAngle0)
 				{
-					const auto& normal0 = ((surfTri0.GetVertices()[0].y > surfTri1.GetVertices()[1].y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-					auto wallTri0 = CollisionTriangle(surfTri1.GetVertices()[1], surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], normal0);
-					tris.push_back(wallTri0);
+					if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[0])
+					{
+						const auto& normal0 = ((surfTri0.GetVertices()[0].y > surfTri1.GetVertices()[0].y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * (isFloor ? 1 : -1);
+						auto wallTri0 = CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], normal0);
+						tris.push_back(wallTri0);
+					}
+					if (surfTri0.GetVertices()[2] != surfTri1.GetVertices()[1])
+					{
+						const auto& normal1 = ((surfTri0.GetVertices()[2].y > surfTri1.GetVertices()[1].y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * (isFloor ? 1 : -1);
+						auto wallTri1 = CollisionTriangle(surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], surfTri1.GetVertices()[1], normal1);
+						tris.push_back(wallTri1);
+					}
 				}
-				if (surfTri0.GetVertices()[2] != surfTri1.GetVertices()[2])
+				else
 				{
-					const auto& normal1 = ((surfTri0.GetVertices()[2].y > surfTri1.GetVertices()[2].y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-					auto wallTri1 = CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], surfTri0.GetVertices()[2], normal1);
-					tris.push_back(wallTri1);
+					if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[1])
+					{
+						const auto& normal0 = ((surfTri0.GetVertices()[0].y > surfTri1.GetVertices()[1].y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
+						auto wallTri0 = CollisionTriangle(surfTri1.GetVertices()[1], surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], normal0);
+						tris.push_back(wallTri0);
+					}
+					if (surfTri0.GetVertices()[2] != surfTri1.GetVertices()[2])
+					{
+						const auto& normal1 = ((surfTri0.GetVertices()[2].y > surfTri1.GetVertices()[2].y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
+						auto wallTri1 = CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], surfTri0.GetVertices()[2], normal1);
+						tris.push_back(wallTri1);
+					}
 				}
 			}
 		}
@@ -292,7 +332,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 
 			// TODO: Full wall  (floor only), fix ghost walls near room border, fix function below to get previous sector from an adjoining room.
 			
-			// Collect wall between current and previous sectors.
+			// Collect step wall.
 			if (!(usePrevTri1 ? isPrevSurf1Wall : isPrevSurf0Wall))
 			{
 				if (vertex0 != vertex2)
