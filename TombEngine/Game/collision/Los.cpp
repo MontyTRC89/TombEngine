@@ -263,6 +263,7 @@ namespace TEN::Collision::Los
 		corners[5] += offset;
 		corners[7] -= offset;
 
+		// TODO: Normals.
 		// Calculate and return collision mesh.
 		auto tris = std::vector<CollisionTriangle>
 		{
@@ -394,7 +395,7 @@ namespace TEN::Collision::Los
 			doOffset = !doOffset;
 			g_Renderer.AddDebugTarget(intercept.Position.ToVector3(), Quaternion::Identity, 20, Color(1, 0, 0));
 
-			// 7.1) Clip wall.
+			// TEMP: Legacy-style wall clip.
 			if (i != 0 && i != trace.Intercepts.size())
 			{
 				auto pointColl = GetPointCollision(intercept.Position, intercept.Sector->RoomNumber);
@@ -413,7 +414,7 @@ namespace TEN::Collision::Los
 			// Ensure sector is unique.
 			if (intercept.Sector != prevSector)
 			{
-				// 7.2) Clip sector floor and ceiling.
+				// 7.1) Clip sector.
 				float intersectDist = 0.0f;
 				if (intercept.Sector->Mesh.Intersects(ray, intersectDist) && intersectDist < closestDist)
 				{
