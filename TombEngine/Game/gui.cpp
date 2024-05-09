@@ -2028,6 +2028,8 @@ namespace TEN::Gui
 
 	void GuiController::FadeAmmoSelector()
 	{
+		float multiplier = g_Configuration.EnableVariableFramerate ? g_Renderer.GetScreenRefreshRate() / 30.0f : 1.0f;
+		
 		if (Rings[(int)RingTypes::Inventory].RingActive)
 		{
 			AmmoSelectorFadeVal = 0;
@@ -2035,7 +2037,7 @@ namespace TEN::Gui
 		else if (AmmoSelectorFadeDir == 1)
 		{
 			if (AmmoSelectorFadeVal < 128)
-				AmmoSelectorFadeVal += 32;
+				AmmoSelectorFadeVal += 32 / multiplier;
 
 			if (AmmoSelectorFadeVal > 128)
 			{
@@ -2046,7 +2048,7 @@ namespace TEN::Gui
 		else if (AmmoSelectorFadeDir == 2)
 		{
 			if (AmmoSelectorFadeVal > 0)
-				AmmoSelectorFadeVal -= 32;
+				AmmoSelectorFadeVal -= 32 / multiplier;
 
 			if (AmmoSelectorFadeVal < 0)
 			{
@@ -2737,6 +2739,8 @@ namespace TEN::Gui
 	{
 		if (!AmmoSelectorFlag)
 			return;
+
+		float multiplier = g_Configuration.EnableVariableFramerate ? g_Renderer.GetScreenRefreshRate() / 30.0f : 1.0f;
 	
 		int xPos = (2 * PHD_CENTER_X - OBJLIST_SPACING) / 2;
 		if (NumAmmoSlots == 2)
@@ -2753,13 +2757,13 @@ namespace TEN::Gui
 				if (n == *CurrentAmmoType)
 				{
 					if (invObject->RotFlags & INV_ROT_X)
-						AmmoObjectList[n].Orientation.x += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.x += ANGLE(5.0f / multiplier);
 
 					if (invObject->RotFlags & INV_ROT_Y)
-						AmmoObjectList[n].Orientation.y += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.y += ANGLE(5.0f / multiplier);
 
 					if (invObject->RotFlags & INV_ROT_Z)
-						AmmoObjectList[n].Orientation.z += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.z += ANGLE(5.0f / multiplier);
 				}
 				else
 					SpinBack(AmmoObjectList[n].Orientation);
