@@ -179,7 +179,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 		bool isSurfSplit = sector.IsSurfaceSplit(isFloor);
 		bool isSurfSplitAngle0 = (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 
-		// 1) Calculate surface triangle 0.
+		// 1) Generate surface triangle 0.
 		auto surfTri0 = CollisionTriangle();
 		if (!isSurfSplit || isSurfSplitAngle0)
 		{
@@ -196,7 +196,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			surfTri0 = CollisionTriangle(vertex0, vertex1, vertex2, GetTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
 		}
 		
-		// 2) Calculate surface triangle 1.
+		// 2) Generate surface triangle 1.
 		auto surfTri1 = CollisionTriangle();
 		if (!isSurfSplit || isSurfSplitAngle0)
 		{
@@ -225,7 +225,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			tris.push_back(surfTri1);
 
 		// TODO: Full walls.
-		// 4) Collect diagonal wall triangles.
+		// 4) Generate and collect diagonal wall triangles.
 		if ((!isSurf0Wall || !isSurf1Wall) &&
 			sector.IsSurfaceSplit(isFloor) && (!isSurfTri0Portal || !isSurfTri1Portal))
 		{
@@ -274,17 +274,41 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			bool isPrevSurfTri0Portal = (prevSurface.Triangles[0].PortalRoomNumber != NO_VALUE);
 			bool isPrevSurfTri1Portal = (prevSurface.Triangles[1].PortalRoomNumber != NO_VALUE);
 
-			int height0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor);
-			int height1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor);
-			int height2 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor);
-			int height3 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor);
+			// Calculate current sector corner heights.
+			int height0 = 0;
+			int height1 = 0;
+			if (!isSurfSplit || isSurfSplitAngle0)
+			{
+				height0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor);
+				height1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor);
+			}
+			else
+			{
+				height0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor);
+				height1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor);
+			}
 
+			// Calculate previous sector corner heights.
+			int prevHeight0 = 0;
+			int prevHeight1 = 0;
+			if (!isSurfSplit || isSurfSplitAngle0)
+			{
+				prevHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor);
+				prevHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor);
+			}
+			else
+			{
+				prevHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor);
+				prevHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor);
+			}
+
+			// Determine wall vertices.
 			auto vertex0 = Vector3(corner0.x, height0, corner0.y);
 			auto vertex1 = Vector3(corner1.x, height1, corner1.y);
-			auto vertex2 = Vector3(corner0.x, height2, corner0.y);
-			auto vertex3 = Vector3(corner1.x, height3, corner1.y);
+			auto vertex2 = Vector3(corner0.x, prevHeight0, corner0.y);
+			auto vertex3 = Vector3(corner1.x, prevHeight1, corner1.y);
 
-			// TODO: Full wall, fix function below to get previous sector from an adjoining room.
+			// TODO: Full wall, end wall, fix ghost walls near room border, fix function below to get previous sector from an adjoining room.
 
 			if (vertex0 != vertex2)
 			{
