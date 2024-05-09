@@ -465,12 +465,20 @@ namespace TEN::Renderer
 		sd.BufferDesc.Height = h;
 		if (!g_Configuration.EnableVariableFramerate)
 		{
+			_refreshRate = 30;
+
 			sd.BufferDesc.RefreshRate.Numerator = 0;
 			sd.BufferDesc.RefreshRate.Denominator = 0;
 		}
 		else
 		{
-			sd.BufferDesc.RefreshRate.Numerator = 60;
+			_refreshRate = GetCurrentScreenRefreshRate();
+			if (_refreshRate == 0)
+			{
+				_refreshRate = 60;
+			}
+			
+			sd.BufferDesc.RefreshRate.Numerator = _refreshRate;
 			sd.BufferDesc.RefreshRate.Denominator = 1;
 		}
 		sd.BufferDesc.RefreshRate.Numerator = 60;

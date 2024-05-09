@@ -529,6 +529,11 @@ namespace TEN::Renderer
 		return Vector2i(_screenWidth, _screenHeight);
 	}
 
+	int Renderer::GetScreenRefreshRate() const
+	{
+		return _refreshRate;
+	}
+
 	std::optional<Vector2> Renderer::Get2DPosition(const Vector3& pos) const
 	{
 		auto point = Vector4(pos.x, pos.y, pos.z, 1.0f);

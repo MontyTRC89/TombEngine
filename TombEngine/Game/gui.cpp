@@ -2806,7 +2806,7 @@ namespace TEN::Gui
 		const auto& player = GetLaraInfo(*item);
 		auto& ring = Rings[(int)ringType];
 
-		float multiplier = g_Configuration.EnableVariableFramerate ? 2.0f : 1.0f;
+		float multiplier = g_Configuration.EnableVariableFramerate ? g_Renderer.GetScreenRefreshRate() / 30.0f : 1.0f;
 
 		if (ring.CurrentObjectList <= 0)
 			return;

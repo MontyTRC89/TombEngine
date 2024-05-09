@@ -305,6 +305,7 @@ namespace TEN::Renderer
 		// Screen settings
 		int _screenWidth;
 		int _screenHeight;
+		int _refreshRate;
 		bool _isWindowed;
 		float _farView = DEFAULT_FAR_VIEW;
 
@@ -644,6 +645,7 @@ namespace TEN::Renderer
 
 		float						GetInterpolationFactor() const;
 		Vector2i					GetScreenResolution() const;
+		int							GetScreenRefreshRate() const;
 		std::optional<Vector2>		Get2DPosition(const Vector3& pos) const;
 		Vector3						GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
 		std::pair<Vector3, Vector3> GetRay(const Vector2& pos) const;

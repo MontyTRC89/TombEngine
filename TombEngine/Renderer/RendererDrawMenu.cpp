@@ -892,28 +892,29 @@ namespace TEN::Renderer
 
 		static EulerAngles orient = EulerAngles::Identity;
 		static float scaler = 1.2f;
+		float multiplier = g_Configuration.EnableVariableFramerate ? g_Renderer.GetScreenRefreshRate() / 30.0f : 1.0f;
 
 		short invItem = g_Gui.GetRing(RingTypes::Inventory).CurrentObjectList[g_Gui.GetRing(RingTypes::Inventory).CurrentObjectInList].InventoryItem;
 
 		auto& object = InventoryObjectTable[invItem];
 
 		if (IsHeld(In::Forward))
-			orient.x += ANGLE(3.0f);
+			orient.x += ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Back))
-			orient.x -= ANGLE(3.0f);
+			orient.x -= ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Left))
-			orient.y += ANGLE(3.0f);
+			orient.y += ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Right))
-			orient.y -= ANGLE(3.0f);
+			orient.y -= ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Sprint))
-			scaler += 0.03f;
+			scaler += 0.03f / multiplier;
 
 		if (IsHeld(In::Crouch))
-			scaler -= 0.03f;
+			scaler -= 0.03f / multiplier;
 
 		if (scaler > 1.6f)
 			scaler = 1.6f;

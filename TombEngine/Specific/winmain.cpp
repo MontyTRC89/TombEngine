@@ -60,6 +60,22 @@ Vector2i GetScreenResolution()
 	return resolution;
 }
 
+int GetCurrentScreenRefreshRate()
+{
+	DEVMODE devmode;
+	memset(&devmode, 0, sizeof(devmode));
+	devmode.dmSize = sizeof(devmode);
+	
+	if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devmode))
+	{
+		return devmode.dmDisplayFrequency;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 std::vector<Vector2i> GetAllSupportedScreenResolutions()
 {
 	auto resList = std::vector<Vector2i>{};
