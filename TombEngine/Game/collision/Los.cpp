@@ -224,24 +224,36 @@ namespace TEN::Collision::Los
 
 	static CollisionMesh GenerateBridgeCollisionMesh(const ItemInfo& bridgeMov)
 	{
+		constexpr auto UP_NORMAL	= Vector3(0.0f, -1.0f, 0.0f);
+		constexpr auto DOWN_NORMAL	= Vector3(0.0f, 1.0f, 0.0f);
+		constexpr auto NORTH_NORMAL = Vector3(0.0f, 0.0f, 1.0f);
+		constexpr auto SOUTH_NORMAL = Vector3(0.0f, 0.0f, -1.0f);
+		constexpr auto EAST_NORMAL	= Vector3(1.0f, 0.0f, 0.0f);
+		constexpr auto WEST_NORMAL	= Vector3(-1.0f, 0.0f, 0.0f);
+
 		// Determine relative tilt offset.
 		auto offset = Vector3::Zero;
+		auto tiltRotMatrix = Matrix::Identity;
 		switch (bridgeMov.ObjectNumber)
 		{
 		case ID_BRIDGE_TILT1:
 			offset = Vector3(0.0f, CLICK(1), 0.0f);
+			tiltRotMatrix = EulerAngles(0, 0, -ANGLE(45.0f * 0.25f)).ToRotationMatrix();
 			break;
 
 		case ID_BRIDGE_TILT2:
 			offset = Vector3(0.0f, CLICK(2), 0.0f);
+			tiltRotMatrix = EulerAngles(0, 0, -ANGLE(45.0f * 0.5f)).ToRotationMatrix();
 			break;
 
 		case ID_BRIDGE_TILT3:
 			offset = Vector3(0.0f, CLICK(3), 0.0f);
+			tiltRotMatrix = EulerAngles(0, 0, -ANGLE(45.0f * 0.75f)).ToRotationMatrix();
 			break;
 
 		case ID_BRIDGE_TILT4:
 			offset = Vector3(0.0f, CLICK(4), 0.0f);
+			tiltRotMatrix = EulerAngles(0, 0, -ANGLE(45.0f)).ToRotationMatrix();
 			break;
 
 		default:
@@ -263,23 +275,33 @@ namespace TEN::Collision::Los
 		corners[5] += offset;
 		corners[7] -= offset;
 
-		// TODO: Normals.
 		// Calculate and return collision mesh.
 		auto tris = std::vector<CollisionTriangle>
 		{
-			CollisionTriangle(corners[0], corners[1], corners[4]),
-			CollisionTriangle(corners[1], corners[4], corners[5]),
-			CollisionTriangle(corners[2], corners[3], corners[6]),
-			CollisionTriangle(corners[3], corners[6], corners[7]),
-			CollisionTriangle(corners[0], corners[1], corners[2]),
-			CollisionTriangle(corners[0], corners[2], corners[3]),
-			CollisionTriangle(corners[0], corners[3], corners[4]),
-			CollisionTriangle(corners[3], corners[4], corners[7]),
-			CollisionTriangle(corners[1], corners[2], corners[5]),
-			CollisionTriangle(corners[2], corners[5], corners[6]),
-			CollisionTriangle(corners[4], corners[5], corners[6]),
-			CollisionTriangle(corners[4], corners[6], corners[7])
+			CollisionTriangle(corners[0], corners[1], corners[4], Vector3::Transform(UP_NORMAL, rotMatrix * tiltRotMatrix)),
+			CollisionTriangle(corners[1], corners[4], corners[5], Vector3::Transform(UP_NORMAL, rotMatrix * tiltRotMatrix)),
+			CollisionTriangle(corners[2], corners[3], corners[6], Vector3::Transform(DOWN_NORMAL, rotMatrix * tiltRotMatrix)),
+			CollisionTriangle(corners[3], corners[6], corners[7], Vector3::Transform(DOWN_NORMAL, rotMatrix * tiltRotMatrix)),
+			CollisionTriangle(corners[0], corners[1], corners[2], Vector3::Transform(SOUTH_NORMAL, rotMatrix)),
+			CollisionTriangle(corners[0], corners[2], corners[3], Vector3::Transform(SOUTH_NORMAL, rotMatrix)),
+			CollisionTriangle(corners[0], corners[3], corners[4], Vector3::Transform(EAST_NORMAL, rotMatrix)),
+			CollisionTriangle(corners[3], corners[4], corners[7], Vector3::Transform(EAST_NORMAL, rotMatrix)),
+			CollisionTriangle(corners[1], corners[2], corners[5], Vector3::Transform(WEST_NORMAL, rotMatrix)),
+			CollisionTriangle(corners[2], corners[5], corners[6], Vector3::Transform(WEST_NORMAL, rotMatrix)),
+			CollisionTriangle(corners[4], corners[5], corners[6], Vector3::Transform(NORTH_NORMAL, rotMatrix)),
+			CollisionTriangle(corners[4], corners[6], corners[7], Vector3::Transform(NORTH_NORMAL, rotMatrix))
 		};
+
+		//debug
+		for (const auto& tri : tris)
+		{
+			g_Renderer.AddDebugTriangle(tri.GetVertices()[0], tri.GetVertices()[1], tri.GetVertices()[2], Color(1, 1, 0, 0.2f));
+
+			auto origin = (tri.GetVertices()[0] + tri.GetVertices()[1] + tri.GetVertices()[2]) / 3;
+			auto target = Geometry::TranslatePoint(origin, tri.GetNormal(), BLOCK(0.25f));
+			g_Renderer.AddDebugLine(origin, target, Color(1, 1, 0));
+		}
+
 		return CollisionMesh(tris);
 	}
 
