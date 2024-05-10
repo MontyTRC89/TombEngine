@@ -75,6 +75,17 @@ namespace TEN::Entities::Effects
 		LensFlares.push_back(lensFlare);
 	}
 
+	void SetupGlobalLensFlare(const EulerAngles& orient, const Color& color, int spriteID)
+	{
+		constexpr auto BASE_POS = Vector3(0.0f, 0.0f, BLOCK(256));
+
+		auto pos = Camera.pos.ToVector3();
+		auto rotMatrix = orient.ToRotationMatrix();
+
+		pos += Vector3::Transform(BASE_POS, rotMatrix);
+		SetupLensFlare(pos, NO_VALUE, color, true, spriteID);
+	}
+
 	void ControlLensFlare(int itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
@@ -86,16 +97,5 @@ namespace TEN::Entities::Effects
 	void ClearLensFlares()
 	{
 		LensFlares.clear();
-	}
-
-	void SetupGlobalLensFlare(const EulerAngles& orient, const Color& color, int spriteID)
-	{
-		constexpr auto BASE_POS = Vector3(0.0f, 0.0f, BLOCK(256));
-
-		auto pos = Camera.pos.ToVector3();
-		auto rotMatrix = orient.ToRotationMatrix();
-
-		pos += Vector3::Transform(BASE_POS, rotMatrix);
-		SetupLensFlare(pos, NO_VALUE, color, true, spriteID);
 	}
 }
