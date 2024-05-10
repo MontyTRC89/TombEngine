@@ -227,7 +227,7 @@ namespace TEN::Entities::Generic
 	void SetPushableStopperFlag(bool isStopper, const Vector3i& pos, int roomNumber)
 	{
 		auto pointColl = GetPointCollision(pos, roomNumber);
-		pointColl.GetSector().Stopper = isStopper; 
+		pointColl.GetSector().Stopper = isStopper;
 
 		// TODO: There is a problem, it also has to set/reset the flag in the flipped room.
 		// Because when flipmaps happens, it forgets about the old flag.
