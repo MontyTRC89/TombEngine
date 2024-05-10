@@ -161,7 +161,10 @@ namespace TEN::Collision::Attractor
 	void AttractorObject::Update(const std::vector<Vector3>& points, int roomNumber)
 	{
 		if (points.empty())
+		{
 			TENLog("Attempted to update attractor to invalid state.", LogLevel::Warning);
+			return;
+		}
 
 		_points = points;
 		_roomNumber = roomNumber;
@@ -279,7 +282,7 @@ namespace TEN::Collision::Attractor
 			if (segmentID == 0)
 				g_Renderer.AddDebugLine(origin, Geometry::TranslatePoint(origin, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
 			
-			// Draw end indicator line
+			// Draw end indicator line.
 			if (segmentID == (GetSegmentCount() - 1))
 				g_Renderer.AddDebugLine(target, Geometry::TranslatePoint(target, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
 
@@ -340,7 +343,7 @@ namespace TEN::Collision::Attractor
 		unsigned int segmentCount = attrac.GetSegmentCount();
 		if (segmentID >= segmentCount)
 		{
-			TENLog("Attempted to get attractor collision data for invalid segment ID " + std::to_string(segmentID) + ".", LogLevel::Warning);
+			TENLog("Attempted to get attractor collision for invalid segment ID " + std::to_string(segmentID) + ".", LogLevel::Warning);
 			segmentID = std::clamp<unsigned int>(segmentID, 0, segmentCount - 1);
 		}
 
