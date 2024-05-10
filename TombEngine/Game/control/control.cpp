@@ -247,7 +247,7 @@ GameStatus ControlPhase()
 	if (g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareEnabled())
 	{
 		SetupGlobalLensFlare(
-			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareRotation(),
+			EulerAngles(g_GameFlow->GetLevel(CurrentLevel)->GetLensFlarePitch(), g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareYaw(), 0),
 			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareColor(),
 			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareSunSpriteID());
 	}

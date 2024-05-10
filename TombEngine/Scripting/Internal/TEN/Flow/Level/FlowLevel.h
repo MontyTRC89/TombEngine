@@ -72,10 +72,11 @@ struct Level : public ScriptInterfaceLevel
 	bool GetResetHubEnabled() const override;
 
 	// Lens flare getters
-	bool		GetLensFlareEnabled() const override;
-	int			GetLensFlareSunSpriteID() const override;
-	EulerAngles GetLensFlareRotation() const override;
-	Color		GetLensFlareColor() const override;
+	bool  GetLensFlareEnabled() const override;
+	int	  GetLensFlareSunSpriteID() const override;
+	short GetLensFlarePitch() const override;
+	short GetLensFlareYaw() const override;
+	Color GetLensFlareColor() const override;
 
 	// Starfield getters
 	bool  GetStarfieldStarsEnabled() const override;

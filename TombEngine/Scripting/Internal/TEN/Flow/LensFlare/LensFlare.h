@@ -23,17 +23,19 @@ namespace TEN::Scripting
 
 		// Constructors
 		LensFlare() = default;
-		LensFlare(const Rotation& rot, const ScriptColor& color);
+		LensFlare(float pitch, float yaw, const ScriptColor& color);
 
 		// Getters
 		bool		GetEnabled() const;
 		int			GetSunSpriteID() const;
-		Rotation	GetRotation() const;
+		float		GetPitch() const;
+		float		GetYaw() const;
 		ScriptColor GetColor() const;
 
 		// Setters
 		void SetSunSpriteID(int spriteID);
-		void SetRotation(const Rotation& rot);
+		void SetPitch(float pitch);
+		void SetYaw(float yaw);
 		void SetColor(const ScriptColor& color);
 	};
 }

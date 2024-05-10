@@ -50,10 +50,11 @@ public:
 	virtual bool GetResetHubEnabled() const = 0;
 
 	// Lens flare getters
-	virtual bool		GetLensFlareEnabled() const = 0;
-	virtual int			GetLensFlareSunSpriteID() const = 0;
-	virtual EulerAngles GetLensFlareRotation() const = 0;
-	virtual Color		GetLensFlareColor() const = 0;
+	virtual bool  GetLensFlareEnabled() const = 0;
+	virtual int	  GetLensFlareSunSpriteID() const = 0;
+	virtual short GetLensFlarePitch() const = 0;
+	virtual short GetLensFlareYaw() const = 0;
+	virtual Color GetLensFlareColor() const = 0;
 
 	// Starfield getters
 	virtual bool  GetStarfieldStarsEnabled() const = 0;

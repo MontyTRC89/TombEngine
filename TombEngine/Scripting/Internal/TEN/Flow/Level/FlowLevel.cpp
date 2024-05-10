@@ -301,9 +301,14 @@ int Level::GetLensFlareSunSpriteID() const
 	return LensFlare.GetSunSpriteID();
 }
 
-EulerAngles Level::GetLensFlareRotation() const
+short Level::GetLensFlarePitch() const
 {
-	return LensFlare.GetRotation().ToEulerAngles();
+	return ANGLE(LensFlare.GetPitch());
+}
+
+short Level::GetLensFlareYaw() const
+{
+	return ANGLE(LensFlare.GetYaw());
 }
 
 Color Level::GetLensFlareColor() const
