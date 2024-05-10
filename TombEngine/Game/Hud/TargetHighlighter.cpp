@@ -141,7 +141,7 @@ namespace TEN::Hud
 			return;
 
 		auto pos0 = Vector2::Lerp(*Position, PrevPosition, g_Renderer.GetInterpolationFactor());
-		short orient0 = (short)Lerp(PrevOrientation, Orientation, g_Renderer.GetInterpolationFactor()); // TODO: use Geometry::GetShortestAngle()
+		short orient0 = PrevOrientation + (Geometry::GetShortestAngle(PrevOrientation, Orientation) * g_Renderer.GetInterpolationFactor());
 		float scale = Lerp(PrevScale, Scale, g_Renderer.GetInterpolationFactor());
 		auto color = Color::Lerp(PrevColor, Color, g_Renderer.GetInterpolationFactor());
 
@@ -159,7 +159,7 @@ namespace TEN::Hud
 			const auto& prevSegment = PrevSegments[i];
 
 			auto pos1 = pos0 + Vector2::Lerp(prevSegment.PosOffset, segment.PosOffset, g_Renderer.GetInterpolationFactor());
-			short orient1 = orient0 + (short)Lerp(prevSegment.OrientOffset, segment.OrientOffset, g_Renderer.GetInterpolationFactor()); // TODO: use Geometry::GetShortestAngle()
+			short orient1 = orient0 + (prevSegment.OrientOffset + (Geometry::GetShortestAngle(prevSegment.OrientOffset, segment.OrientOffset) * g_Renderer.GetInterpolationFactor()));
 
 			AddDisplaySprite(
 				SPRITE_SEQUENCE_OBJECT_ID, SEGMENT_ELEMENT_SPRITE_ID,
