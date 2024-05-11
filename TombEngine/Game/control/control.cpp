@@ -598,6 +598,8 @@ GameStatus DoGameLoop(int levelIndex)
 			controlLag += frameTime;
 		}
 
+		bool legacy30FPSdoneDraw = false;
+
 		while (controlLag >= controlFrameTime)
 		{
 #if _DEBUG
@@ -615,22 +617,27 @@ GameStatus DoGameLoop(int levelIndex)
 			controlLag -= controlFrameTime;
 			controlCalls++;
 
-			if (!g_Configuration.EnableVariableFramerate)
-			{
-				DrawPhase(!levelIndex, 0.0f);
-				drawCalls++;
-			}
+			legacy30FPSdoneDraw = false;
 		}
 
 		if (status != GameStatus::Normal)
 			break;
 
 		if (!g_Configuration.EnableVariableFramerate)
-			continue;
-
-		float interpolationFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
-		DrawPhase(!levelIndex, interpolationFactor);
-		drawCalls++;
+		{
+			if (!legacy30FPSdoneDraw)
+			{
+				DrawPhase(!levelIndex, 0.0f);
+				drawCalls++;
+				legacy30FPSdoneDraw = true;
+			}
+		}
+		else
+		{
+			float interpolationFactor = std::min((float)controlLag / (float)controlFrameTime, 1.0f);
+			DrawPhase(!levelIndex, interpolationFactor);
+			drawCalls++;
+		}
 	}
 
 	EndGameLoop(levelIndex, status);
