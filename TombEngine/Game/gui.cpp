@@ -193,6 +193,11 @@ namespace TEN::Gui
 		return false;
 	}
 
+	float GuiController::GetSpinSpeed()
+	{
+		return g_Configuration.EnableVariableFramerate ? (g_Renderer.GetScreenRefreshRate() / 30.0f) : 1.0f;
+	}
+
 	bool GuiController::CanDeselect() const
 	{
 		return !(IsHeld(In::Select) || IsHeld(In::Action));
@@ -2028,8 +2033,6 @@ namespace TEN::Gui
 
 	void GuiController::FadeAmmoSelector()
 	{
-		float multiplier = g_Configuration.EnableVariableFramerate ? g_Renderer.GetScreenRefreshRate() / 30.0f : 1.0f;
-		
 		if (Rings[(int)RingTypes::Inventory].RingActive)
 		{
 			AmmoSelectorFadeVal = 0;
@@ -2037,7 +2040,7 @@ namespace TEN::Gui
 		else if (AmmoSelectorFadeDir == 1)
 		{
 			if (AmmoSelectorFadeVal < 128)
-				AmmoSelectorFadeVal += 32 / multiplier;
+				AmmoSelectorFadeVal += 32 / GetSpinSpeed();
 
 			if (AmmoSelectorFadeVal > 128)
 			{
@@ -2048,7 +2051,7 @@ namespace TEN::Gui
 		else if (AmmoSelectorFadeDir == 2)
 		{
 			if (AmmoSelectorFadeVal > 0)
-				AmmoSelectorFadeVal -= 32 / multiplier;
+				AmmoSelectorFadeVal -= 32 / GetSpinSpeed();
 
 			if (AmmoSelectorFadeVal < 0)
 			{
@@ -2732,15 +2735,13 @@ namespace TEN::Gui
 
 	void GuiController::SpinBack(EulerAngles& orient)
 	{
-		orient.Lerp(EulerAngles::Identity, 1.0f / 8);
+		orient.Lerp(EulerAngles::Identity, 1.0f / (8.0f * GetSpinSpeed()));
 	}
 
 	void GuiController::DrawAmmoSelector()
 	{
 		if (!AmmoSelectorFlag)
 			return;
-
-		float multiplier = g_Configuration.EnableVariableFramerate ? g_Renderer.GetScreenRefreshRate() / 30.0f : 1.0f;
 	
 		int xPos = (2 * PHD_CENTER_X - OBJLIST_SPACING) / 2;
 		if (NumAmmoSlots == 2)
@@ -2757,13 +2758,13 @@ namespace TEN::Gui
 				if (n == *CurrentAmmoType)
 				{
 					if (invObject->RotFlags & INV_ROT_X)
-						AmmoObjectList[n].Orientation.x += ANGLE(5.0f / multiplier);
+						AmmoObjectList[n].Orientation.x += ANGLE(5.0f / GetSpinSpeed());
 
 					if (invObject->RotFlags & INV_ROT_Y)
-						AmmoObjectList[n].Orientation.y += ANGLE(5.0f / multiplier);
+						AmmoObjectList[n].Orientation.y += ANGLE(5.0f / GetSpinSpeed());
 
 					if (invObject->RotFlags & INV_ROT_Z)
-						AmmoObjectList[n].Orientation.z += ANGLE(5.0f / multiplier);
+						AmmoObjectList[n].Orientation.z += ANGLE(5.0f / GetSpinSpeed());
 				}
 				else
 					SpinBack(AmmoObjectList[n].Orientation);
@@ -2809,8 +2810,6 @@ namespace TEN::Gui
 	{
 		const auto& player = GetLaraInfo(*item);
 		auto& ring = Rings[(int)ringType];
-
-		float multiplier = g_Configuration.EnableVariableFramerate ? g_Renderer.GetScreenRefreshRate() / 30.0f : 1.0f;
 
 		if (ring.CurrentObjectList <= 0)
 			return;
@@ -3137,13 +3136,13 @@ namespace TEN::Gui
 				if (!i && !ring.ObjectListMovement)
 				{
 					if (invObject.RotFlags & INV_ROT_X)
-						listObject.Orientation.x += ANGLE(5.0f / multiplier);
+						listObject.Orientation.x += ANGLE(5.0f / GetSpinSpeed());
 
 					if (invObject.RotFlags & INV_ROT_Y)
-						listObject.Orientation.y += ANGLE(5.0f / multiplier);
+						listObject.Orientation.y += ANGLE(5.0f / GetSpinSpeed());
 
 					if (invObject.RotFlags & INV_ROT_Z)
-						listObject.Orientation.z += ANGLE(5.0f / multiplier);
+						listObject.Orientation.z += ANGLE(5.0f / GetSpinSpeed());
 				}
 				else
 				{
@@ -3199,17 +3198,17 @@ namespace TEN::Gui
 				if (ring.NumObjectsInList != 1 && (ringType != RingTypes::Ammo || CombineRingFadeVal == 128))
 				{
 					if (ring.ObjectListMovement > 0)
-						ring.ObjectListMovement += ANGLE(45.0f / multiplier);
+						ring.ObjectListMovement += ANGLE(45.0f / GetSpinSpeed());
 
 					if (ring.ObjectListMovement < 0)
-						ring.ObjectListMovement -= ANGLE(45.0f / multiplier);
+						ring.ObjectListMovement -= ANGLE(45.0f / GetSpinSpeed());
 
 					if (IsHeld(In::Left))
 					{
 						if (!ring.ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							ring.ObjectListMovement += ANGLE(45.0f / multiplier);
+							ring.ObjectListMovement += ANGLE(45.0f / GetSpinSpeed());
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
@@ -3221,7 +3220,7 @@ namespace TEN::Gui
 						if (!ring.ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							ring.ObjectListMovement -= ANGLE(45.0f / multiplier);
+							ring.ObjectListMovement -= ANGLE(45.0f / GetSpinSpeed());
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
