@@ -34,6 +34,12 @@ namespace TEN::Hud
 
 		std::array<SegmentData, SEGMENT_COUNT> Segments = {};
 
+		Vector2 PrevPosition	= Vector2::Zero;
+		short	PrevOrientation = 0;
+		float	PrevScale		= 0.0f;
+		Vector4 PrevColor		= Vector4::Zero;
+		std::array<SegmentData, SEGMENT_COUNT> PrevSegments = {};
+
 		// Getters
 		float	GetScale(float cameraDist) const;
 		float	GetRadius() const;
@@ -46,12 +52,6 @@ namespace TEN::Hud
 		// Utilities
 		void Update(const Vector3& targetPos, bool isActive, bool doPulse);
 		void Draw() const;
-
-		Vector2 PrevPosition	= Vector2::Zero;
-		short	PrevOrientation = 0;
-		float	PrevScale		= 0.0f;
-		Vector4 PrevColor		= Vector4::Zero;
-		std::array<SegmentData, SEGMENT_COUNT> PrevSegments = {};
 
 		void StoreInterpolationData()
 		{

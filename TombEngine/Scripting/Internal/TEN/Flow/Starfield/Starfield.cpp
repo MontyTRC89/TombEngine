@@ -50,8 +50,14 @@ namespace TEN::Scripting
 	// @treturn Starfield A new Starfield object.
 	Starfield::Starfield(int starCount, int meteorCount, int meteorSpawnDensity, float meteorVel)
 	{
-		_starCount = starCount;
-		_meteorCount = meteorCount;
+		if (starCount < 0 || starCount > STAR_COUNT_MAX)
+			TENLog("Star count must be in range [0, " + std::to_string(STAR_COUNT_MAX) + "].", LogLevel::Warning);
+
+		if (meteorCount < 0 || meteorCount > METEOR_COUNT_MAX)
+			TENLog("Meteor count must be in range [0, " + std::to_string(METEOR_COUNT_MAX) + "].", LogLevel::Warning);
+
+		_starCount = std::clamp(starCount, 0, STAR_COUNT_MAX);
+		_meteorCount = std::clamp(meteorCount, 0, METEOR_COUNT_MAX);
 		_meteorSpawnDensity = meteorSpawnDensity;
 		_meteorVelocity = meteorVel;
 	}
@@ -109,15 +115,10 @@ namespace TEN::Scripting
 	// @tparam int New count.
 	void Starfield::SetStarCount(int count)
 	{
-		// Star count out of range; set max.
 		if (count < 0 || count > STAR_COUNT_MAX)
-		{
 			TENLog("Star count must be in range [0, " + std::to_string(STAR_COUNT_MAX) + "].", LogLevel::Warning);
-			_starCount = STAR_COUNT_MAX;
-			return;
-		}
 
-		_starCount = count;
+		_starCount = std::clamp(count, 0, STAR_COUNT_MAX);
 	}
 
 	/// Set the starfield's number of meteors.
@@ -125,15 +126,10 @@ namespace TEN::Scripting
 	// @tparam int New count.
 	void Starfield::SetMeteorCount(int count)
 	{
-		// Meteor count out of range; set max.
 		if (count < 0 || count > METEOR_COUNT_MAX)
-		{
 			TENLog("Meteor count must be in range [0, " + std::to_string(METEOR_COUNT_MAX) + "].", LogLevel::Warning);
-			_meteorCount = METEOR_COUNT_MAX;
-			return;
-		}
 
-		_meteorCount = count;
+		_meteorCount = std::clamp(count, 0, METEOR_COUNT_MAX);
 	}
 
 	/// Set the starfield's meteor spawn density.

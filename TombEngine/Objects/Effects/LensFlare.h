@@ -17,7 +17,8 @@ namespace TEN::Entities::Effects
 
 	extern std::vector<LensFlare> LensFlares;
 
+	void SetupGlobalLensFlare(const EulerAngles& orient, const Color& color, int spriteID);
+
 	void ControlLensFlare(int itemNumber);
 	void ClearLensFlares();
-	void SetupGlobalLensFlare(const EulerAngles& orient, const Color& color, int spriteID);
 }

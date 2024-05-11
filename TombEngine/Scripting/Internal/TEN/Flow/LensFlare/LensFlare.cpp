@@ -15,30 +15,33 @@ namespace TEN::Scripting
 	void LensFlare::Register(sol::table& parent)
 	{
 		using ctors = sol::constructors<
-			LensFlare(const Rotation& rot, const ScriptColor& color)>;
+			LensFlare(float pitch, float yaw, const ScriptColor& color)>;
 
 		// Register type.
 		parent.new_usertype<LensFlare>(
 			"LensFlare", ctors(), sol::call_constructor, ctors(),
 			"GetEnabled", &LensFlare::GetEnabled,
 			"GetSunSpriteID", &LensFlare::GetSunSpriteID,
-			"GetRotation", &LensFlare::GetRotation,
+			"GetPitch", &LensFlare::GetPitch,
+			"GetYaw", &LensFlare::GetYaw,
 			"GetColor", &LensFlare::GetColor,
 			"SetSunSpriteID", &LensFlare::SetSunSpriteID,
-			"SetRotation", &LensFlare::SetRotation,
+			"SetPitch", &LensFlare::SetPitch,
+			"SetYaw", &LensFlare::SetYaw,
 			"SetColor", &LensFlare::SetColor);
 	}
 
 	/// Create a LensFlare object.
 	// @function LensFlare()
-	// @tparam Rotation Rotation.
+	// @tparam float Pitch angle in degrees.
+	// @tparam float Yaw angle in degrees.
 	// @tparam Color Color.
 	// @treturn LensFlare A new LensFlare object.
-	LensFlare::LensFlare(const Rotation& rot, const ScriptColor& color)
+	LensFlare::LensFlare(float pitch, float yaw, const ScriptColor& color)
 	{
 		_isEnabled = true;
 		_color = color;
-		_rotation = rot;
+		_rotation = Rotation(pitch, yaw, 0.0f);
 	}
 
 	/// Get the lens flare's enabled status.
@@ -50,19 +53,27 @@ namespace TEN::Scripting
 	}
 
 	/// Get the sun's sprite ID.
-	// @function LensFlare:GetObjectID()
+	// @function LensFlare:GetSunSpriteID()
 	// @treturn int Sprite ID.
 	int LensFlare::GetSunSpriteID() const
 	{
 		return _sunSpriteID;
 	}
 
-	/// Get the lens flare's euler rotation.
-	// @function LensFlare:GetRotation()
-	// @treturn Rotation Rotation.
-	Rotation LensFlare::GetRotation() const
+	/// Get the lens flare's pitch angle in degrees.
+	// @function LensFlare:GetPitch()
+	// @treturn float Pitch angle in degrees.
+	float LensFlare::GetPitch() const
 	{
-		return _rotation;
+		return _rotation.x;
+	}
+	
+	/// Get the lens flare's yaw angle in degrees.
+	// @function LensFlare:GetYaw()
+	// @treturn float Yaw angle in degrees.
+	float LensFlare::GetYaw() const
+	{
+		return _rotation.y;
 	}
 
 	/// Get the lens flare's color.
@@ -73,28 +84,36 @@ namespace TEN::Scripting
 	}
 
 	/// Set the lens flare's sun sprite ID.
-	// @function LensFlare:SetSunbjectID()
+	// @function LensFlare:SetSunSpriteID()
 	// @tparam int New sprite ID.
 	void LensFlare::SetSunSpriteID(int spriteID)
 	{
 		// Sprite ID out of range; return early.
 		if (spriteID < 0 || g_Level.Sprites.size() > spriteID)
 		{
-			TENLog("Sub sprite ID out of range.");
+			TENLog("Sun sprite ID out of range.");
 			return;
 		}
 
 		_sunSpriteID = spriteID;
 	}
 
-	/// Set the lens flare's euler rotation.
-	// @function LensFlare:SetRotation(Rotation)
-	// @tparam Rotation New euler rotation.
-	void LensFlare::SetRotation(const Rotation& rot)
+	/// Set the lens flare's pitch angle.
+	// @function LensFlare:SetPitch(float)
+	// @tparam float New pitch angle in degrees.
+	void LensFlare::SetPitch(float pitch)
 	{
-		_rotation = rot;
+		_rotation.x = pitch;
 	}
 
+	/// Set the lens flare's yaw angle.
+	// @function LensFlare:SetYaw(float)
+	// @tparam float New yaw angle in degrees.
+	void LensFlare::SetYaw(float yaw)
+	{
+		_rotation.y = yaw;
+	}
+	
 	/// Set the lens flare's color.
 	// @function LensFlare:SetColor(Color)
 	// @tparam Color New color.
