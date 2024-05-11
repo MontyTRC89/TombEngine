@@ -580,8 +580,10 @@ Vec3 Moveable::GetPos() const
 // @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
 void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 {
-	auto prevPos = m_item->Pose.Position.ToVector3();
-	m_item->Pose.Position = pos.ToVector3i();
+	auto newPos = pos.ToVector3i();
+	bool bigDistance = Vector3i::Distance(newPos, m_item->Pose.Position) > CLICK(1);
+	
+	m_item->Pose.Position = newPos;
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 
@@ -590,8 +592,7 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 		bool isRoomUpdated = m_item->IsLara() ? UpdateLaraRoom(m_item, pos.y) : UpdateItemRoom(m_item->Index);
 
 		// In case direct portal room update didn't happen and distance between old and new points is significant, do predictive room update.
-		if (!isRoomUpdated && 
-			(willUpdate || Vector3::Distance(prevPos, m_item->Pose.Position.ToVector3()) > BLOCK(1)))
+		if (!isRoomUpdated && (willUpdate || bigDistance))
 		{
 			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
 			if (potentialNewRoom != m_item->RoomNumber)
@@ -602,7 +603,8 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
 
-	m_item->DisableInterpolation = true;
+	if (bigDistance)
+		m_item->DisableInterpolation = true;
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
@@ -627,14 +629,16 @@ Rotation Moveable::GetRot() const
 
 void Moveable::SetRot(const Rotation& rot)
 {
-	m_item->Pose.Orientation.x = ANGLE(rot.x);
-	m_item->Pose.Orientation.y = ANGLE(rot.y);
-	m_item->Pose.Orientation.z = ANGLE(rot.z);
+	auto newRot = rot.ToEulerAngles();
+	bool bigRotation = EulerAngles::Compare(newRot, m_item->Pose.Orientation, ANGLE(30.0f));
+
+	m_item->Pose.Orientation = newRot;
 
 	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
 
-	m_item->DisableInterpolation = true;
+	if (bigRotation)
+		m_item->DisableInterpolation = true;
 }
 
 short Moveable::GetHP() const
