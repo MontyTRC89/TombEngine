@@ -630,7 +630,7 @@ Rotation Moveable::GetRot() const
 void Moveable::SetRot(const Rotation& rot)
 {
 	auto newRot = rot.ToEulerAngles();
-	bool bigRotation = EulerAngles::Compare(newRot, m_item->Pose.Orientation, ANGLE(30.0f));
+	bool bigRotation = !EulerAngles::Compare(newRot, m_item->Pose.Orientation, ANGLE(30.0f));
 
 	m_item->Pose.Orientation = newRot;
 
