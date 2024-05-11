@@ -202,7 +202,7 @@ void LookAt(CAMERA_INFO* cam, short roll)
 
 	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(BLOCK(1));
 
-	g_Renderer.UpdateCameraMatrices(cam, r, fov, levelFarView);
+	g_Renderer.UpdateCameraMatrices(cam, r, fov, levelFarView); 
 }
 
 void AlterFOV(short value, bool store)

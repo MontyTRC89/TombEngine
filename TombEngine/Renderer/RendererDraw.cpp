@@ -1652,6 +1652,8 @@ namespace TEN::Renderer
 		if (_blinkTime > PI_MUL_2)
 			_blinkTime -= PI_MUL_2;
 
+		_oldGameCamera = _currentGameCamera;
+
 		_isLocked = false;
 	}
 
@@ -1771,6 +1773,7 @@ namespace TEN::Renderer
 		CCameraMatrixBuffer cameraConstantBuffer;
 		view.FillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.Frame = GlobalCounter;
+		cameraConstantBuffer.RefreshRate = _refreshRate;
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 		cameraConstantBuffer.DualParaboloidView = Matrix::CreateLookAt(LaraItem->Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3() + Vector3(0, 0, 1024), -Vector3::UnitY);
 
