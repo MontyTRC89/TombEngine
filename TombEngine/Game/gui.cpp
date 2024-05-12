@@ -279,7 +279,6 @@ namespace TEN::Gui
 
 	void GuiController::DrawInventory()
 	{
-		g_Renderer.PrepareScene();
 		g_Renderer.RenderInventory();
 		g_Renderer.Lock(); // TODO: When inventory is converted to 60 FPS, move this lock call outside of render loop.
 	}
@@ -3273,8 +3272,13 @@ namespace TEN::Gui
 
 		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
 		{
-			g_Gui.DrawInventory();
-			g_Renderer.Synchronize();
+			g_Renderer.PrepareScene();
+			g_Renderer.RenderInventory();
+			g_Renderer.Lock();
+			if (!g_Configuration.EnableVariableFramerate)
+			{
+				g_Renderer.Synchronize();
+			}
 
 			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
 			{
@@ -3329,7 +3333,7 @@ namespace TEN::Gui
 				exitLoop = true;
 			}
 
-			DrawInventory();
+			g_Renderer.PrepareScene();
 
 			switch (InvMode)
 			{
@@ -3387,6 +3391,8 @@ namespace TEN::Gui
 
 			SetEnterInventory(NO_VALUE);
 
+			g_Renderer.RenderInventory();
+			g_Renderer.Lock();
 			if (!g_Configuration.EnableVariableFramerate)
 			{
 				g_Renderer.Synchronize();
