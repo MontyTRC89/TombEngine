@@ -1191,7 +1191,6 @@ namespace TEN::Gui
 
 		case Menu::Display:
 			HandleDisplaySettingsInput(true);
-			App.ResetClock = true;
 			return InventoryResult::None;
 
 		case Menu::GeneralActions:
@@ -1199,12 +1198,10 @@ namespace TEN::Gui
 		case Menu::QuickActions:
 		case Menu::MenuActions:
 			HandleControlSettingsInput(item, true);
-			App.ResetClock = true;
 			return InventoryResult::None;
 
 		case Menu::OtherSettings:
 			HandleOtherSettingsInput(true);
-			App.ResetClock = true;
 			return InventoryResult::None;
 		}
 
@@ -1288,7 +1285,6 @@ namespace TEN::Gui
 			}
 		}
 
-		App.ResetClock = true;
 		return InventoryResult::None;
 	}
 
@@ -3270,20 +3266,92 @@ namespace TEN::Gui
 
 		bool doExitToTitle = false;
 
+		LARGE_INTEGER lastTime;
+		LARGE_INTEGER currentTime;
+		double controlLag = 0;
+		double frameTime = 0;
+		constexpr auto controlFrameTime = 1000.0f / 30.0f;
+
+		LARGE_INTEGER frequency;
+		QueryPerformanceFrequency(&frequency);
+		QueryPerformanceCounter(&lastTime);
+
+		int controlCalls = 0;
+		int drawCalls = 0;
+
 		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
 		{
-			g_Renderer.PrepareScene();
-			g_Renderer.RenderInventory();
-			g_Renderer.Lock();
-			if (!g_Configuration.EnableVariableFramerate)
+			if (ThreadEnded)
 			{
-				g_Renderer.Synchronize();
+				App.ResetClock = true;
+				return false;
 			}
 
-			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
+			if (App.ResetClock)
 			{
-				doExitToTitle = true;
+				App.ResetClock = false;
+				QueryPerformanceCounter(&lastTime);
+				currentTime = lastTime;
+				controlLag = 0;
+				frameTime = 0;
+			}
+			else
+			{
+				QueryPerformanceCounter(&currentTime);
+				frameTime = (currentTime.QuadPart - lastTime.QuadPart) * 1000.0 / frequency.QuadPart;
+				lastTime = currentTime;
+				controlLag += frameTime;
+			}
+
+			bool legacy30FPSdoneDraw = false;
+
+			while (controlLag >= controlFrameTime)
+			{
+#if _DEBUG
+				constexpr auto DEBUG_SKIP_FRAMES = 10;
+
+				if (controlLag >= DEBUG_SKIP_FRAMES * controlFrameTime)
+				{
+					TENLog("Game loop is running too slow!", LogLevel::Warning);
+					App.ResetClock = true;
+					break;
+				}
+#endif
+				g_Renderer.PrepareScene();
+
+				if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
+				{
+					doExitToTitle = true;
+					break;
+				}
+
+				controlLag -= controlFrameTime;
+				controlCalls++;
+
+				legacy30FPSdoneDraw = false;
+			}
+
+			if (doExitToTitle)
+			{
 				break;
+			}
+
+			if (!g_Configuration.EnableVariableFramerate)
+			{
+				if (!legacy30FPSdoneDraw)
+				{
+					g_Renderer.RenderInventory();
+					g_Renderer.Lock();
+					g_Renderer.Synchronize();
+					drawCalls++;
+					legacy30FPSdoneDraw = true;
+				}
+			}
+			else
+			{
+				g_Renderer.RenderInventory();
+				g_Renderer.Lock();
+				drawCalls++;
 			}
 		}
 
@@ -3350,6 +3418,8 @@ namespace TEN::Gui
 				lastTime = currentTime;
 				controlLag += frameTime;
 			}
+
+			bool legacy30FPSdoneDraw = false;
 
 			while (controlLag >= controlFrameTime)
 			{
@@ -3433,16 +3503,27 @@ namespace TEN::Gui
 				SetEnterInventory(NO_VALUE);
 				controlLag -= controlFrameTime;
 				controlCalls++;
+
+				legacy30FPSdoneDraw = false;
 			}
 
-			g_Renderer.RenderInventory();
-			g_Renderer.Lock();
 			if (!g_Configuration.EnableVariableFramerate)
 			{
-				g_Renderer.Synchronize();
+				if (!legacy30FPSdoneDraw)
+				{
+					g_Renderer.RenderInventory();
+					g_Renderer.Lock();
+					g_Renderer.Synchronize();
+					drawCalls++;
+					legacy30FPSdoneDraw = true;
+				}
 			}
-
-			drawCalls++;
+			else
+			{
+				g_Renderer.RenderInventory();
+				g_Renderer.Lock();
+				drawCalls++;
+			}
 		}
 
 		LastInvItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;

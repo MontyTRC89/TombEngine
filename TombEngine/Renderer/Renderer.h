@@ -202,6 +202,7 @@ namespace TEN::Renderer
 		std::vector<RendererStringToDraw> _stringsToDraw;
 		float _blinkColorValue = 0.0f;
 		float _blinkTime		  = 0.0f;
+		float _oldBlinkTime = 0.0f;
 
 		// Graphics resources
 		Texture2D _logo;

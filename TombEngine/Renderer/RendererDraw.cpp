@@ -1648,7 +1648,7 @@ namespace TEN::Renderer
 		_blinkColorValue = ((sin(_blinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
 
 		// Update blink time.
-		_blinkTime += BLINK_TIME_STEP;
+		_blinkTime += BLINK_TIME_STEP / (g_Configuration.EnableVariableFramerate ? (g_Renderer.GetScreenRefreshRate() / 30.0f) : 1.0f);
 		if (_blinkTime > PI_MUL_2)
 			_blinkTime -= PI_MUL_2;
 
