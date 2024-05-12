@@ -3313,6 +3313,19 @@ namespace TEN::Gui
 		InitializeInventory(item);
 		Camera.numberFrames = 2;
 
+		LARGE_INTEGER lastTime;
+		LARGE_INTEGER currentTime;
+		double controlLag = 0;
+		double frameTime = 0;
+		constexpr auto controlFrameTime = 1000.0f / 30.0f;
+
+		LARGE_INTEGER frequency;
+		QueryPerformanceFrequency(&frequency);
+		QueryPerformanceCounter(&lastTime);
+
+		int controlCalls = 0;
+		int drawCalls = 0;
+
 		bool exitLoop = false;
 		while (!exitLoop)
 		{
@@ -3322,74 +3335,105 @@ namespace TEN::Gui
 				return false;
 			}
 
-			TimeInMenu++;
-			GameTimer++;
-
-			UpdateInputActions(item);
-
-			if (GuiIsDeselected() || IsClicked(In::Inventory))
+			if (App.ResetClock)
 			{
-				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				exitLoop = true;
+				App.ResetClock = false;
+				QueryPerformanceCounter(&lastTime);
+				currentTime = lastTime;
+				controlLag = 0;
+				frameTime = 0;
+			}
+			else
+			{
+				QueryPerformanceCounter(&currentTime);
+				frameTime = (currentTime.QuadPart - lastTime.QuadPart) * 1000.0 / frequency.QuadPart;
+				lastTime = currentTime;
+				controlLag += frameTime;
 			}
 
-			g_Renderer.PrepareScene();
-
-			switch (InvMode)
+			while (controlLag >= controlFrameTime)
 			{
-			case InventoryMode::InGame:
-				DoInventory(item);
-				break;
+#if _DEBUG
+				constexpr auto DEBUG_SKIP_FRAMES = 10;
 
-			case InventoryMode::Statistics:
-				DoStatisticsMode();
-				break;
-
-			case InventoryMode::Examine:
-				DoExamineMode();
-				break;
-
-			case InventoryMode::Diary:
-				DoDiary(item);
-				break;
-
-			case InventoryMode::Load:
-				switch (DoLoad())
+				if (controlLag >= DEBUG_SKIP_FRAMES * controlFrameTime)
 				{
-				case LoadResult::Load:
-					doLoad = true;
+					TENLog("Game loop is running too slow!", LogLevel::Warning);
+					App.ResetClock = true;
+					break;
+				}
+#endif
+				TimeInMenu++;
+				GameTimer++;
+
+				UpdateInputActions(item);
+
+				if (GuiIsDeselected() || IsClicked(In::Inventory))
+				{
+					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 					exitLoop = true;
-					break;
-
-				case LoadResult::Cancel:
-					exitLoop = !resetMode;
-
-					if (resetMode)
-						SetInventoryMode(InventoryMode::InGame);
-
-					break;
-
-				case LoadResult::None:
-					break;
 				}
 
-				break;
+				g_Renderer.PrepareScene();
 
-			case InventoryMode::Save:
-				if (DoSave())
+				switch (InvMode)
 				{
-					exitLoop = !resetMode;
-					if (resetMode)
-						SetInventoryMode(InventoryMode::InGame);
+				case InventoryMode::InGame:
+					DoInventory(item);
+					break;
+
+				case InventoryMode::Statistics:
+					DoStatisticsMode();
+					break;
+
+				case InventoryMode::Examine:
+					DoExamineMode();
+					break;
+
+				case InventoryMode::Diary:
+					DoDiary(item);
+					break;
+
+				case InventoryMode::Load:
+					switch (DoLoad())
+					{
+					case LoadResult::Load:
+						doLoad = true;
+						exitLoop = true;
+						break;
+
+					case LoadResult::Cancel:
+						exitLoop = !resetMode;
+
+						if (resetMode)
+							SetInventoryMode(InventoryMode::InGame);
+
+						break;
+
+					case LoadResult::None:
+						break;
+					}
+
+					break;
+
+				case InventoryMode::Save:
+					if (DoSave())
+					{
+						exitLoop = !resetMode;
+						if (resetMode)
+							SetInventoryMode(InventoryMode::InGame);
+					}
+
+					break;
 				}
 
-				break;
+				if (ItemUsed && NoAction())
+					exitLoop = true;
+
+				SetEnterInventory(NO_VALUE);
+				controlLag -= controlFrameTime;
+				controlCalls++;
 			}
-
-			if (ItemUsed && NoAction())
-				exitLoop = true;
-
-			SetEnterInventory(NO_VALUE);
 
 			g_Renderer.RenderInventory();
 			g_Renderer.Lock();
@@ -3397,6 +3441,8 @@ namespace TEN::Gui
 			{
 				g_Renderer.Synchronize();
 			}
+
+			drawCalls++;
 		}
 
 		LastInvItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
