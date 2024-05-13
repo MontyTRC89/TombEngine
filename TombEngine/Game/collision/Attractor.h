@@ -36,6 +36,7 @@ namespace TEN::Collision::Attractor
 
 	public:
 		// Constructors
+		AttractorObject();
 		AttractorObject(AttractorType type, const std::vector<Vector3>& points, int roomNumber);
 
 		// Destructors
@@ -103,10 +104,6 @@ namespace TEN::Collision::Attractor
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
 															   float forward, float down, float right, float radius,
 															   const Vector3& axis = Vector3::UnitY);
-
-	// Utilities
-	std::vector<Vector3> GetBridgeAttractorPoints(const ItemInfo& bridgeItem);
-	AttractorObject		 GenerateBridgeAttractor(const ItemInfo& bridgeItem);
 
 	// Debug
 	void DrawNearbyAttractors(const Vector3& pos, int roomNumber, short headingAngle);

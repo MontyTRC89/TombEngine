@@ -178,9 +178,6 @@ struct ItemInfo
 	short		  AfterDeath  = 0;
 	short		  CarriedItem = 0;
 
-	// TODO: Temporary.
-	std::optional<AttractorObject> Attractor = std::nullopt;
-
 	void HandleOffsetBlend();
 
 	// OCB utilities

@@ -705,10 +705,12 @@ void InitializeItem(short itemNumber)
 	if (object.Initialize != nullptr)
 		Objects[item->ObjectNumber].Initialize(itemNumber);
 
-	// TODO: Temporary.
 	// Initialize bridge attractor.
 	if (item->IsBridge())
-		item->Attractor = GenerateBridgeAttractor(*item);
+	{
+		auto& bridge = GetBridgeObject(*item);
+		bridge.Initialize(*item);
+	}
 }
 
 short CreateItem()
@@ -878,17 +880,16 @@ void UpdateAllItems()
 
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
-			// TODO: Temporary.
 			auto prevPose = item->Pose;
 
 			if (Objects[item->ObjectNumber].control != nullptr)
 				Objects[item->ObjectNumber].control(itemNumber);
 
-			// TODO: Temporary.
-			if (item->Pose != prevPose)
+			// Update bridge.
+			if (item->IsBridge() && item->Pose != prevPose)
 			{
-				if (item->Attractor.has_value())
-					item->Attractor->Update(GetBridgeAttractorPoints(*item), item->RoomNumber);
+				auto& bridge = GetBridgeObject(*item);
+				bridge.Update(*item);
 			}
 
 			TestVolumes(itemNumber);
@@ -900,7 +901,9 @@ void UpdateAllItems()
 				KillItem(itemNumber);
 		}
 		else
+		{
 			KillItem(itemNumber);
+		}
 
 		itemNumber = nextItem;
 	}

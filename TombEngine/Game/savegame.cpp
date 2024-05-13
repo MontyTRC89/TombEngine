@@ -313,28 +313,28 @@ const std::vector<byte> SaveGame::Build()
 	subsuitVelocity.push_back(Lara.Control.Subsuit.Velocity[1]);
 	auto subsuitVelocityOffset = fbb.CreateVector(subsuitVelocity);
 
+	// TODO: Also save bridge's player item number vector.
+	// TODO: Save in bridge.
 	// Store room or bridge attractor.
-	int roomNumber = NO_ROOM;
-	int roomAttracID = -1;
-	int bridgeItemNumber = NO_ITEM;
+	int roomNumber = NO_VALUE;
+	int roomAttracID = NO_VALUE;
+	int bridgeItemNumber = NO_VALUE;
 	if (Lara.Context.Attractor.Ptr != nullptr)
 	{
 		// Find room attractor.
 		bool hasRoomAttrac = false;
-		for (int i = 0; i < g_Level.Rooms.size(); i++)
+		for (const auto& room : g_Level.Rooms)
 		{
 			if (hasRoomAttrac)
 				break;
 
-			const auto& room = g_Level.Rooms[i];
 			for (int j = 0; j < room.Attractors.size(); j++)
 			{
 				const auto& attrac = room.Attractors[j];
 				if (&attrac == Lara.Context.Attractor.Ptr)
 				{
-					roomNumber = i;
+					roomNumber = room.index;
 					roomAttracID = j;
-
 					hasRoomAttrac = true;
 					break;
 				}
@@ -344,11 +344,12 @@ const std::vector<byte> SaveGame::Build()
 		// Find bridge attractor.
 		if (!hasRoomAttrac)
 		{
-			for (const auto& item : g_Level.Items)
+			for (auto& item : g_Level.Items)
 			{
-				if (item.Attractor.has_value())
+				if (item.IsBridge())
 				{
-					if (&*item.Attractor == Lara.Context.Attractor.Ptr)
+					auto& bridge = GetBridgeObject(item);
+					if (&bridge.GetAttractor() == Lara.Context.Attractor.Ptr)
 					{
 						bridgeItemNumber = item.Index;
 						break;
@@ -1870,20 +1871,26 @@ static void ParsePlayer(const Save::SaveGame* s)
 	int roomAttracID = s->lara()->context()->attractor()->room_attrac_id();
 	int bridgeItemNumber = s->lara()->context()->attractor()->bridge_item_number();
 
-	// Retrieve attractor pointer.
-	Attractor* attracPtr = nullptr;
-	if (roomNumber != NO_ROOM)
+	// TODO: Save in bridge.
+	// Retrieve attractor.
+	AttractorObject* attrac = nullptr;
+	if (roomNumber != NO_VALUE)
 	{
-		attracPtr = &g_Level.Rooms[roomNumber].Attractors[roomAttracID];
+		auto& room = g_Level.Rooms[roomNumber];
+		attrac = &room.Attractors[roomAttracID];
 	}
-	else if (bridgeItemNumber != NO_ITEM)
+	else if (bridgeItemNumber != NO_VALUE)
 	{
-		if (g_Level.Items[bridgeItemNumber].Attractor.has_value())
-			attracPtr = &*g_Level.Items[bridgeItemNumber].Attractor;
+		auto& item = g_Level.Items[bridgeItemNumber];
+		if (item.IsBridge())
+		{
+			auto& bridge = GetBridgeObject(item);
+			attrac = &bridge.GetAttractor();
+		}
 	}
 
 	Lara.Context.Attractor.ChainDistance = s->lara()->context()->attractor()->chain_distance();
-	Lara.Context.Attractor.Ptr = attracPtr;
+	Lara.Context.Attractor.Ptr = attrac;
 	Lara.Context.Attractor.RelDeltaOrient = ToEulerAngles(s->lara()->context()->attractor()->rel_delta_orient());
 	Lara.Context.Attractor.RelDeltaPos = ToVector3(s->lara()->context()->attractor()->rel_delta_pos());
 	Lara.Context.Attractor.RelOrientOffset = ToEulerAngles(s->lara()->context()->attractor()->rel_orient_offset());
@@ -1894,19 +1901,19 @@ static void ParsePlayer(const Save::SaveGame* s)
 	Lara.Context.WaterCurrentPull.y = s->lara()->context()->water_current_pull()->y();
 	Lara.Context.WaterCurrentPull.z = s->lara()->context()->water_current_pull()->z();
 	Lara.Context.InteractedItem = s->lara()->context()->interacted_item_number();
-	Lara.Context.NextCornerPos = ToPose(*s->lara()->context()->next_corner_pose());
+	//Lara.Context.NextCornerPos = ToPose(*s->lara()->context()->next_corner_pose()); TODO: Remove from savegame.
 	Lara.Context.ProjectedFloorHeight = s->lara()->context()->projected_floor_height();
-	Lara.Context.TargetOrientation = ToEulerAngles(s->lara()->context()->target_orient());
+	//Lara.Context.TargetOrientation = ToEulerAngles(s->lara()->context()->target_orient());
 	Lara.Context.Vehicle = s->lara()->context()->vehicle_item_number();
 	Lara.Context.WaterSurfaceDist = s->lara()->context()->water_surface_dist();
 	Lara.Control.CanMonkeySwing = s->lara()->control()->can_monkey_swing();
-	Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
+	//Lara.Control.CanClimbLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
 	Lara.Control.Count.Pose = s->lara()->control()->count()->pose();
 	Lara.Control.Count.PositionAdjust = s->lara()->control()->count()->position_adjust();
 	Lara.Control.Count.Run = s->lara()->control()->count()->run_jump();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
-	Lara.Control.IsClimbingLadder = s->lara()->control()->is_climbing_ladder();
+	//Lara.Control.IsClimbingLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.IsLow = s->lara()->control()->is_low();
 	Lara.Control.IsMoving = s->lara()->control()->is_moving();
 	Lara.Control.JumpDirection = (JumpDirection)s->lara()->control()->jump_direction();
@@ -2440,10 +2447,12 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 			item->MeshBits = 0x00100;
 		}
 
-		// TODO: Temporary.
 		// Initialize bridge attractor.
 		if (item->IsBridge())
-			item->Attractor = GenerateBridgeAttractor(*item);
+		{
+			auto& bridge = GetBridgeObject(*item);
+			bridge.Initialize(*item);
+		}
 
 		// Post-load specific hacks for objects.
 		if (item->ObjectNumber >= ID_PUZZLE_HOLE1 && item->ObjectNumber <= ID_PUZZLE_HOLE16 &&

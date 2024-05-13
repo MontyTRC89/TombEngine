@@ -917,12 +917,9 @@ void ReadRooms()
 			int pointCount = ReadInt32();
 			points.reserve(pointCount);
 			for (int k = 0; k < pointCount; k++)
-				points.push_back(ReadVector3());
-
-			if (points.empty())
 			{
-				TENLog("Failed to load invalid attractor " + std::to_string(j) + " in room " + std::to_string(i), LogLevel::Warning);
-				continue;
+				auto point = ReadVector3();
+				points.push_back(point);
 			}
 
 			room.Attractors.push_back(AttractorObject(type, points, i));

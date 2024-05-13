@@ -17,6 +17,12 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Attractor
 {
+	AttractorObject::AttractorObject()
+	{
+		_points.push_back(Vector3::Zero);
+		Cache();
+	}
+
 	AttractorObject::AttractorObject(AttractorType type, const std::vector<Vector3>& points, int roomNumber)
 	{
 		assertion(!points.empty(), "Attempted to initialize invalid attractor.");
@@ -462,9 +468,9 @@ namespace TEN::Collision::Attractor
 		for (int bridgeItemNumber : bridgeItemNumbers)
 		{
 			auto& bridgeItem = g_Level.Items[bridgeItemNumber];
-			//auto& bridge = GetBridgeObject(bridgeItem);
+			auto& bridge = GetBridgeObject(bridgeItem);
 
-			auto& attrac = *bridgeItem.Attractor;//bridge.Attractor;
+			auto& attrac = bridge.GetAttractor();
 			if (sphere.Intersects(attrac.GetBox()))
 				nearbyAttracs.push_back(&attrac);
 		}
@@ -530,58 +536,6 @@ namespace TEN::Collision::Attractor
 		return GetAttractorCollisions(probePos, probeRoomNumber, headingAngle, radius);
 	}
 	
-	std::vector<Vector3> GetBridgeAttractorPoints(const ItemInfo& bridgeItem)
-	{
-		constexpr auto TILT_STEP = CLICK(1);
-
-		// Determine tilt offset.
-		int tiltOffset = 0;
-		switch (bridgeItem.ObjectNumber)
-		{
-		default:
-		case ID_BRIDGE_FLAT:
-			break;
-
-		case ID_BRIDGE_TILT1:
-			tiltOffset = TILT_STEP;
-			break;
-
-		case ID_BRIDGE_TILT2:
-			tiltOffset = TILT_STEP * 2;
-			break;
-
-		case ID_BRIDGE_TILT3:
-			tiltOffset = TILT_STEP * 3;
-			break;
-
-		case ID_BRIDGE_TILT4:
-			tiltOffset = TILT_STEP * 4;
-			break;
-		}
-
-		// Get corners.
-		auto corners = std::array<Vector3, 8>{};
-		auto box = GameBoundingBox(&bridgeItem).ToBoundingOrientedBox(bridgeItem.Pose);
-		box.GetCorners(corners.data());
-
-		// Collect relevant points.
-		auto offset = Vector3(0.0f, tiltOffset, 0.0f);
-		return std::vector<Vector3>
-		{
-			corners[0],
-			corners[4],
-			corners[5] + offset,
-			corners[1] + offset,
-			corners[0]
-		};
-	}
-
-	AttractorObject GenerateBridgeAttractor(const ItemInfo& bridgeItem)
-	{
-		auto points = GetBridgeAttractorPoints(bridgeItem);
-		return AttractorObject(AttractorType::Edge, points, bridgeItem.RoomNumber);
-	}
-
 	void DrawNearbyAttractors(const Vector3& pos, int roomNumber, short headingAngle)
 	{
 		constexpr auto RADIUS = BLOCK(5);
