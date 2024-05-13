@@ -449,39 +449,23 @@ void HandleRoomCollisionMesh()
 			auto& sector = room.floor[(x * room.zSize) + z];
 
 			// Get previous X sector.
-			const auto& tempPrevSectorX = room.floor[((x - 1) * room.zSize) + z];
-			const FloorInfo* prevSectorX = nullptr;
-			if (x != 1)
+			const auto* prevSectorX = &room.floor[((x - 1) * room.zSize) + z];
+			if (prevSectorX->SidePortalRoomNumber != NO_VALUE)
 			{
-				prevSectorX = &tempPrevSectorX;
-			}
-			else
-			{
-				if (tempPrevSectorX.SidePortalRoomNumber != NO_VALUE)
-				{
-					const auto& prevRoomX = g_Level.Rooms[tempPrevSectorX.SidePortalRoomNumber];
-					auto prevRoomGridCoordX = GetRoomGridCoord(prevRoomX.index, prevRoomX.x, prevRoomX.z + BLOCK(z)); // TODO
+				const auto& prevRoomX = g_Level.Rooms[prevSectorX->SidePortalRoomNumber];
+				auto prevRoomGridCoordX = GetRoomGridCoord(prevSectorX->SidePortalRoomNumber, prevSectorX->Position.x, prevSectorX->Position.y);
 
-					prevSectorX = &prevRoomX.floor[(prevRoomGridCoordX.x * prevRoomX.zSize) + prevRoomGridCoordX.y];
-				}
+				prevSectorX = &prevRoomX.floor[(prevRoomGridCoordX.x * prevRoomX.zSize) + prevRoomGridCoordX.y];
 			}
 
 			// Get previous Z sector.
-			const auto& tempPrevSectorZ = room.floor[(x * room.zSize) + (z - 1)];
-			const FloorInfo* prevSectorZ = nullptr;
-			if (z != 1)
+			const auto* prevSectorZ = &room.floor[(x * room.zSize) + (z - 1)];
+			if (prevSectorZ->SidePortalRoomNumber != NO_VALUE)
 			{
-				prevSectorZ = &tempPrevSectorZ;
-			}
-			else
-			{
-				if (tempPrevSectorZ.SidePortalRoomNumber != NO_VALUE)
-				{
-					const auto& prevRoomZ = g_Level.Rooms[tempPrevSectorZ.SidePortalRoomNumber];
-					auto prevRoomGridCoordZ = GetRoomGridCoord(prevRoomZ.index, prevRoomZ.x + BLOCK(x), prevRoomZ.z); // TODO
+				const auto& prevRoomZ = g_Level.Rooms[prevSectorZ->SidePortalRoomNumber];
+				auto prevRoomGridCoordZ = GetRoomGridCoord(prevSectorZ->SidePortalRoomNumber, prevSectorZ->Position.x, prevSectorZ->Position.y);
 
-					prevSectorX = &prevRoomZ.floor[(prevRoomGridCoordZ.x * prevRoomZ.zSize) + prevRoomGridCoordZ.y];
-				}
+				prevSectorZ = &prevRoomZ.floor[(prevRoomGridCoordZ.x * prevRoomZ.zSize) + prevRoomGridCoordZ.y];
 			}
 
 			// Test if at room edge on X axis.
