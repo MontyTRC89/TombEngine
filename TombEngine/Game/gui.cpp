@@ -3256,6 +3256,8 @@ namespace TEN::Gui
 
 	bool GuiController::CallPause()
 	{
+		constexpr auto CONTROL_FRAME_TIME = 1000.0f / 30.0f;
+
 		g_Renderer.DumpGameScene();
 		PauseAllSounds(SoundPauseMode::Pause);
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
@@ -3270,7 +3272,6 @@ namespace TEN::Gui
 		LARGE_INTEGER currentTime;
 		double controlLag = 0;
 		double frameTime = 0;
-		constexpr auto controlFrameTime = 1000.0f / 30.0f;
 
 		LARGE_INTEGER frequency;
 		QueryPerformanceFrequency(&frequency);
@@ -3303,16 +3304,16 @@ namespace TEN::Gui
 				controlLag += frameTime;
 			}
 
-			bool legacy30FPSdoneDraw = false;
+			bool legacy30FpsDoneDraw = false;
 
-			while (controlLag >= controlFrameTime)
+			while (controlLag >= CONTROL_FRAME_TIME)
 			{
 #if _DEBUG
 				constexpr auto DEBUG_SKIP_FRAMES = 10;
 
-				if (controlLag >= DEBUG_SKIP_FRAMES * controlFrameTime)
+				if (controlLag >= (DEBUG_SKIP_FRAMES * CONTROL_FRAME_TIME))
 				{
-					TENLog("Game loop is running too slow!", LogLevel::Warning);
+					TENLog("Game loop is running too slow.", LogLevel::Warning);
 					App.ResetClock = true;
 					break;
 				}
@@ -3325,26 +3326,24 @@ namespace TEN::Gui
 					break;
 				}
 
-				controlLag -= controlFrameTime;
+				controlLag -= CONTROL_FRAME_TIME;
 				controlCalls++;
 
-				legacy30FPSdoneDraw = false;
+				legacy30FpsDoneDraw = false;
 			}
 
 			if (doExitToTitle)
-			{
 				break;
-			}
 
 			if (!g_Configuration.EnableVariableFramerate)
 			{
-				if (!legacy30FPSdoneDraw)
+				if (!legacy30FpsDoneDraw)
 				{
 					g_Renderer.RenderInventory();
 					g_Renderer.Lock();
 					g_Renderer.Synchronize();
 					drawCalls++;
-					legacy30FPSdoneDraw = true;
+					legacy30FpsDoneDraw = true;
 				}
 			}
 			else
@@ -3356,9 +3355,13 @@ namespace TEN::Gui
 		}
 
 		if (doExitToTitle)
+		{
 			StopAllSounds();
+		}
 		else
+		{
 			ResumeAllSounds(SoundPauseMode::Pause);
+		}
 
 		App.ResetClock = true;
 
@@ -3367,6 +3370,8 @@ namespace TEN::Gui
 
 	bool GuiController::CallInventory(ItemInfo* item, bool resetMode)
 	{
+		constexpr auto CONTROL_FRAME_TIME = 1000.0f / 30.0f;
+
 		auto* lara = GetLaraInfo(item);
 
 		bool doLoad = false;
@@ -3387,7 +3392,6 @@ namespace TEN::Gui
 		LARGE_INTEGER currentTime;
 		double controlLag = 0;
 		double frameTime = 0;
-		constexpr auto controlFrameTime = 1000.0f / 30.0f;
 
 		LARGE_INTEGER frequency;
 		QueryPerformanceFrequency(&frequency);
@@ -3421,16 +3425,16 @@ namespace TEN::Gui
 				controlLag += frameTime;
 			}
 
-			bool legacy30FPSdoneDraw = false;
+			bool legacy30FpsDoneDraw = false;
 
-			while (controlLag >= controlFrameTime)
+			while (controlLag >= CONTROL_FRAME_TIME)
 			{
 #if _DEBUG
-				constexpr auto DEBUG_SKIP_FRAMES = 10;
+				constexpr auto DEBUG_SKIP_FRAME_COUNT = 10;
 
-				if (controlLag >= DEBUG_SKIP_FRAMES * controlFrameTime)
+				if (controlLag >= (DEBUG_SKIP_FRAME_COUNT * CONTROL_FRAME_TIME))
 				{
-					TENLog("Game loop is running too slow!", LogLevel::Warning);
+					TENLog("Game loop is running too slow.", LogLevel::Warning);
 					App.ResetClock = true;
 					break;
 				}
@@ -3503,21 +3507,21 @@ namespace TEN::Gui
 					exitLoop = true;
 
 				SetEnterInventory(NO_VALUE);
-				controlLag -= controlFrameTime;
+				controlLag -= CONTROL_FRAME_TIME;
 				controlCalls++;
 
-				legacy30FPSdoneDraw = false;
+				legacy30FpsDoneDraw = false;
 			}
 
 			if (!g_Configuration.EnableVariableFramerate)
 			{
-				if (!legacy30FPSdoneDraw)
+				if (!legacy30FpsDoneDraw)
 				{
 					g_Renderer.RenderInventory();
 					g_Renderer.Lock();
 					g_Renderer.Synchronize();
 					drawCalls++;
-					legacy30FPSdoneDraw = true;
+					legacy30FpsDoneDraw = true;
 				}
 			}
 			else
