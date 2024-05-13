@@ -3360,6 +3360,8 @@ namespace TEN::Gui
 		else
 			ResumeAllSounds(SoundPauseMode::Pause);
 
+		App.ResetClock = true;
+
 		return doExitToTitle;
 	}
 
