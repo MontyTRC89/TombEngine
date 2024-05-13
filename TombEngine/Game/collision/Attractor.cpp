@@ -422,14 +422,13 @@ namespace TEN::Collision::Attractor
 	}
 
 	// TODO: Spacial partitioning may be ideal here. Would require a general collision refactor. -- Sezz 2023.07.30
-	static std::vector<AttractorObject*> GetNearbyAttractors(const Vector3& pos, int roomNumber, float radius)
+	static std::vector<AttractorObject*> GetNearbyAttractors(const Vector3& pos, int roomNumber, const BoundingSphere& sphere)
 	{
 		constexpr auto SECTOR_SEARCH_DEPTH = 2;
 
-		auto nearbyAttracs = std::vector<AttractorObject*>{};
-
-		auto sphere = BoundingSphere(pos, radius);
 		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::AttractorStats);
+
+		auto nearbyAttracs = std::vector<AttractorObject*>{};
 
 		// TEMP
 		// 1) Collect debug attractors.
@@ -485,22 +484,28 @@ namespace TEN::Collision::Attractor
 		constexpr auto COLL_COUNT_MAX = 64;
 
 		// Get approximately nearby attractors.
-		auto attracs = GetNearbyAttractors(pos, roomNumber, radius);
+		auto sphere = BoundingSphere(pos, radius);
+		auto attracs = GetNearbyAttractors(pos, roomNumber, sphere);
 
 		// Collect attractor collisions.
 		auto attracColls = std::vector<AttractorCollisionData>{};
-		attracColls.reserve(attracs.size());
 		for (auto* attrac : attracs)
 		{
-			// Get collisions for every segment.
+			// Collide segments.
+			const auto& points = attrac->GetPoints();
 			for (int i = 0; i < attrac->GetSegmentCount(); i++)
 			{
-				auto attracColl = GetAttractorCollision(*attrac, i, pos, headingAngle, axis);
+				// Calculate segment direction.
+				auto dir = (points.size() > 1) ? (points[i + 1] - points[i]) : Vector3::One;
+				dir.Normalize();
 
-				// Filter out non-intersection.
-				if (attracColl.Distance3D > radius)
+				// Test if segment intersects sphere.
+				float dist = 0.0f;
+				if (!sphere.Intersects(pos, dir, dist) || dist > attrac->GetSegmentLengths()[i])
 					continue;
 
+				// Collect attractor collision.
+				auto attracColl = GetAttractorCollision(*attrac, i, pos, headingAngle, axis);
 				attracColls.push_back(std::move(attracColl));
 			}
 		}
