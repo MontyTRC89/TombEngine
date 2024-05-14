@@ -86,6 +86,7 @@ namespace TEN::Renderer
 		_vsInstancedSprites = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\InstancedSprites.fx"), "VS", "vs_5_0", nullptr, blob);
 		_psInstancedSprites = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\InstancedSprites.fx"), "PS", "ps_5_0", nullptr, blob);
 		_vsGBufferRooms = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\GBuffer.fx"), "VSRooms", "vs_5_0", nullptr, blob);
+		_vsGBufferRoomsAnimated = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\GBuffer.fx"), "VSRooms", "vs_5_0", &roomDefinesAnimated[0], blob);
 		_vsGBufferItems = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\GBuffer.fx"), "VSItems", "vs_5_0", nullptr, blob);
 		_vsGBufferStatics = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\GBuffer.fx"), "VSStatics", "vs_5_0", nullptr, blob);
 		_vsGBufferInstancedStatics = Utils::compileVertexShader(_device.Get(), GetAssetPath(L"Shaders\\GBuffer.fx"), "VSInstancedStatics", "vs_5_0", nullptr, blob);

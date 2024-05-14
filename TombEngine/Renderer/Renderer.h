@@ -151,6 +151,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psHUDTexture;
 		ComPtr<ID3D11PixelShader> _psHUDBarColor;
 		ComPtr<ID3D11VertexShader> _vsGBufferRooms;
+		ComPtr<ID3D11VertexShader> _vsGBufferRoomsAnimated;
 		ComPtr<ID3D11VertexShader> _vsGBufferItems;
 		ComPtr<ID3D11VertexShader> _vsGBufferStatics;
 		ComPtr<ID3D11VertexShader> _vsGBufferInstancedStatics;

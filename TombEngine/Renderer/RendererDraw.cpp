@@ -2630,7 +2630,6 @@ namespace TEN::Renderer
 		{
 			if (rendererPass == RendererPass::GBuffer)
 			{
-				_context->VSSetShader(_vsGBufferRooms.Get(), nullptr, 0);
 				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
 			}
 			else
@@ -2707,6 +2706,17 @@ namespace TEN::Renderer
 						else
 						{
 							_context->VSSetShader(_vsRoomsAnimatedTextures.Get(), nullptr, 0);
+						}
+					}
+					else
+					{
+						if (animated == 0)
+						{
+							_context->VSSetShader(_vsGBufferRooms.Get(), nullptr, 0);
+						}
+						else
+						{
+							_context->VSSetShader(_vsGBufferRoomsAnimated.Get(), nullptr, 0);
 						}
 					}
 
