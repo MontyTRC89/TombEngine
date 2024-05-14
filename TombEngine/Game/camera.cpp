@@ -39,10 +39,11 @@ constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
 struct CameraLosData
 {
-	bool					IsIntersected = false;
-	std::pair<Vector3, int> Position	  = {};
+	std::pair<Vector3, int> Position = {};
+	std::optional<Vector3>	Normal	 = std::nullopt;
 
-	float Distance = 0.0f;
+	bool  IsIntersected = false;
+	float Distance		= 0.0f;
 };
 
 struct PrevCameraData
@@ -165,9 +166,18 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 	float dist = Vector3::Distance(origin, target);
 	auto los = GetLos(origin, originRoomNumber, dir, dist, true, false, true);
 
-	auto cameraLos = CameraLosData{ los.Room.IsIntersected, los.Room.Position, los.Room.Distance };
+	// Set room LOS.
+	auto cameraLos = CameraLosData{};
+	cameraLos.Normal = los.Room.Triangle.has_value() ? los.Room.Triangle.value()->GetNormal() : std::optional<Vector3>();
+	cameraLos.Position = los.Room.Position;
+	cameraLos.IsIntersected = los.Room.IsIntersected;
+	cameraLos.Distance = los.Room.Distance;
 
-	// Run through sorted moveable LOS instances.
+	bool hasObjectLos = false;
+
+	// TODO: Maybe calculate an object LOS "normal" as the direction from the object to the origin?
+
+	// Set moveable LOS instances.
 	for (const auto& movLos : los.Moveables)
 	{
 		if (!TestCameraCollidableItem(*movLos.Moveable))
@@ -175,12 +185,15 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 
 		if (movLos.Distance < cameraLos.Distance)
 		{
-			cameraLos = CameraLosData{ true, movLos.Position, movLos.Distance };
+			cameraLos.Normal = std::nullopt;
+			cameraLos.Position = movLos.Position;
+			cameraLos.IsIntersected = true;
+			cameraLos.Distance = movLos.Distance;
 			break;
 		}
 	}
 
-	// Run through sorted static LOS instances.
+	// Set static LOS.
 	for (const auto& staticLos : los.Statics)
 	{
 		if (!TestCameraCollidableStatic(*staticLos.Static))
@@ -188,11 +201,22 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 
 		if (staticLos.Distance < cameraLos.Distance)
 		{
-			cameraLos = CameraLosData{ true, staticLos.Position, staticLos.Distance };
+			cameraLos.Normal = std::nullopt;
+			cameraLos.Position = staticLos.Position;
+			cameraLos.IsIntersected = true;
+			cameraLos.Distance = staticLos.Distance;
 			break;
 		}
 	}
 
+
+	if (hasObjectLos)
+	{
+
+	}
+
+
+	// TODO: Shift instead of this.
 	if (cameraLos.Distance < DIST_BUFFER)
 	{
 		cameraLos.Distance = DIST_BUFFER;

@@ -88,12 +88,13 @@ namespace TEN::Math
 	}
 
 	// NOTE: O(n).
-	bool CollisionMesh::Intersects(const Ray& ray, float& dist) const
+	std::optional<CollisionMeshCollisionData> CollisionMesh::GetIntersection(const Ray& ray) const
 	{
 		// TODO: Vertex indexing, spacial partitioning/BVH tree, and whatever else is necessary to make this performant.
 		// TODO: If triangles are made to be collidable only from the "front" as determined by the normal,
 		// loop can end early. Best case becomes O(1).
 
+		const CollisionTriangle* closestTri = nullptr;
 		float closestDist = INFINITY;
 		bool isIntersected = false;
 
@@ -102,14 +103,15 @@ namespace TEN::Math
 			float intersectDist = 0.0f;
 			if (tri.Intersects(ray, intersectDist) && intersectDist < closestDist)
 			{
+				closestTri = &tri;
 				closestDist = intersectDist;
 				isIntersected = true;
 			}
 		}
 
 		if (isIntersected)
-			dist = closestDist;
+			return CollisionMeshCollisionData{ *closestTri, closestDist };
 
-		return isIntersected;
+		return std::nullopt;
 	}
 }

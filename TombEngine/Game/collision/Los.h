@@ -1,15 +1,19 @@
 #pragma once
+#include "Math/Math.h"
 
 class GameVector;
 struct ItemInfo;
 struct MESH_INFO;
 
+using namespace TEN::Math;
+
 namespace TEN::Collision::Los
 {
 	struct RoomLosData
 	{
-		std::pair<Vector3, int> Position	= {};
-		std::set<int>			RoomNumbers = {};
+		std::optional<const CollisionTriangle*> Triangle	= std::nullopt;
+		std::pair<Vector3, int>					Position	= {};
+		std::set<int>							RoomNumbers = {};
 
 		bool  IsIntersected = false;
 		float Distance		= 0.0f;

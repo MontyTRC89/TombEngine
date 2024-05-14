@@ -26,8 +26,9 @@ namespace TEN::Collision::Los
 			Vector3i		 Position = Vector3i::Zero;
 		};
 
-		std::optional<std::pair<Vector3, int>> Position	  = {};
-		std::vector<InterceptData>			   Intercepts = {};
+		std::optional<const CollisionTriangle*> Triangle   = std::nullopt;
+		std::optional<std::pair<Vector3, int>>	Position   = std::nullopt;
+		std::vector<InterceptData>				Intercepts = {};
 	};
 
 	static std::vector<ItemInfo*> GetNearbyMoveables(const std::set<int>& roomNumbers)
@@ -94,7 +95,7 @@ namespace TEN::Collision::Los
 		if (dir == Vector3::Zero)
 		{
 			TENLog("GetLos(): dir is not a unit vector.", LogLevel::Warning);
-			return LosData{ RoomLosData{ std::pair(origin, roomNumber), {}, false, 0.0f }, {}, {}, {} };
+			return LosData{ RoomLosData{ std::nullopt, std::pair(origin, roomNumber), {}, false, 0.0f }, {}, {}, {} };
 		}
 
 		auto los = LosData{};
@@ -404,6 +405,7 @@ namespace TEN::Collision::Los
 		auto doOffset = false;
 
 		const FloorInfo* prevSector = nullptr;
+		const CollisionTriangle* closestTri = nullptr;
 		float closestDist = dist;
 		bool hasClip = false;
 
@@ -440,10 +442,11 @@ namespace TEN::Collision::Los
 			if (intercept.Sector != prevSector)
 			{
 				// 7.1) Clip sector.
-				float intersectDist = 0.0f;
-				if (intercept.Sector->Mesh.Intersects(ray, intersectDist) && intersectDist < closestDist)
+				auto meshColl = intercept.Sector->Mesh.GetIntersection(ray);
+				if (meshColl.has_value() && meshColl->Distance < closestDist)
 				{
-					closestDist = intersectDist;
+					closestTri = &meshColl->Triangle;
+					closestDist = meshColl->Distance;
 					hasClip = true;
 				}
 
@@ -464,10 +467,11 @@ namespace TEN::Collision::Los
 
 						auto collMesh = GenerateBridgeCollisionMesh(bridgeMov);
 
-						float intersectDist = 0.0f;
-						if (collMesh.Intersects(ray, intersectDist) && intersectDist < closestDist)
+						auto meshColl = collMesh.GetIntersection(ray);
+						if (meshColl.has_value() && meshColl->Distance < closestDist)
 						{
-							closestDist = intersectDist;
+							closestTri = &meshColl->Triangle;
+							closestDist = meshColl->Distance;
 							hasClip = true;
 						}
 					}
@@ -485,7 +489,7 @@ namespace TEN::Collision::Los
 				if (pos2D.has_value())
 					g_Renderer.AddDebugString(std::to_string(intercept.Sector->RoomNumber), *pos2D, Color(1, 1, 1), 1, 0, RendererDebugPage::None);
 
-				// TODO: Get exact boundary position.
+				trace.Triangle = (closestTri != nullptr) ? closestTri : std::optional<const CollisionTriangle*>();
 				trace.Position = std::pair(intersectPos, intercept.Sector->RoomNumber);
 				trace.Intercepts.erase((trace.Intercepts.begin() + i) + 1, trace.Intercepts.end());
 				break;
@@ -502,7 +506,7 @@ namespace TEN::Collision::Los
 		if (dir == Vector3::Zero)
 		{
 			TENLog("GetRoomLos(): dir is not a unit vector.", LogLevel::Warning);
-			return RoomLosData{ std::pair(origin, roomNumber), {}, false, 0.0f };
+			return RoomLosData{ {}, std::pair(origin, roomNumber), {}, false, 0.0f };
 		}
 
 		// Get sector trace.
@@ -521,6 +525,7 @@ namespace TEN::Collision::Los
 
 		// Create and return room LOS.
 		auto roomLos = RoomLosData{};
+		roomLos.Triangle = trace.Triangle;
 		roomLos.Position = std::pair(losPos, losRoomNumber);
 		roomLos.RoomNumbers = roomNumbers;
 		roomLos.IsIntersected = hasIntersect;

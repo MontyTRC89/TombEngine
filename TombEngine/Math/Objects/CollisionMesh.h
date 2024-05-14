@@ -26,7 +26,6 @@ namespace TEN::Math
 		bool Intersects(const Ray& ray, float& dist) const;
 	};
 
-	// TODO
 	struct CollisionMeshCollisionData
 	{
 		const CollisionTriangle& Triangle;
@@ -48,6 +47,6 @@ namespace TEN::Math
 		const std::vector<CollisionTriangle>& GetTriangles() const;
 
 		// Inquireres
-		bool Intersects(const Ray& ray, float& dist) const;
+		std::optional<CollisionMeshCollisionData> GetIntersection(const Ray& ray) const;
 	};
 }
