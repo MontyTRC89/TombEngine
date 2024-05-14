@@ -579,6 +579,8 @@ GameStatus DoGameLoop(int levelIndex)
 
 	int controlCalls = 0;
 	int drawCalls = 0;
+	
+	bool legacy30FPSdoneDraw = false;
 
 	while (DoTheGame)
 	{
@@ -597,8 +599,6 @@ GameStatus DoGameLoop(int levelIndex)
 			lastTime = currentTime;
 			controlLag += frameTime;
 		}
-
-		bool legacy30FPSdoneDraw = false;
 
 		while (controlLag >= controlFrameTime)
 		{

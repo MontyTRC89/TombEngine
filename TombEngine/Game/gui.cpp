@@ -3280,6 +3280,8 @@ namespace TEN::Gui
 		int controlCalls = 0;
 		int drawCalls = 0;
 
+		bool legacy30FpsDoneDraw = false;
+
 		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
 		{
 			if (ThreadEnded)
@@ -3303,8 +3305,6 @@ namespace TEN::Gui
 				lastTime = currentTime;
 				controlLag += frameTime;
 			}
-
-			bool legacy30FpsDoneDraw = false;
 
 			while (controlLag >= CONTROL_FRAME_TIME)
 			{
@@ -3400,7 +3400,9 @@ namespace TEN::Gui
 		int controlCalls = 0;
 		int drawCalls = 0;
 
+		bool legacy30FpsDoneDraw = false;
 		bool exitLoop = false;
+
 		while (!exitLoop)
 		{
 			if (ThreadEnded)
@@ -3424,8 +3426,6 @@ namespace TEN::Gui
 				lastTime = currentTime;
 				controlLag += frameTime;
 			}
-
-			bool legacy30FpsDoneDraw = false;
 
 			while (controlLag >= CONTROL_FRAME_TIME)
 			{
