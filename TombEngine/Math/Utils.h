@@ -20,4 +20,5 @@ namespace TEN::Math
 	// Misc.
 	float FloorToStep(float value, float step);
 	float CeilToStep(float value, float step);
+	float RoundToStep(float value, float step);
 }

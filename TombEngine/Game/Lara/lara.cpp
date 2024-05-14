@@ -126,6 +126,7 @@ static void HandleLosDebug(const ItemInfo& item)
 static int GetSurfaceTriangleVertexHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
 {
 	constexpr auto AXIS_OFFSET = -BLOCK(0.5f);
+	constexpr auto HEIGHT_STEP = BLOCK(1 / 32.0f);
 
 	const auto& tri = isFloor ? sector.FloorSurface.Triangles[triID] : sector.CeilingSurface.Triangles[triID];
 
@@ -134,7 +135,7 @@ static int GetSurfaceTriangleVertexHeight(const FloorInfo& sector, int relX, int
 
 	auto normal = tri.Plane.Normal();
 	float relPlaneHeight = -((normal.x * relX) + (normal.z * relZ)) / normal.y;
-	return (tri.Plane.D() + relPlaneHeight);
+	return (int)RoundToStep(tri.Plane.D() + relPlaneHeight, HEIGHT_STEP);
 }
 
 static Vector3 GetRawSurfaceTriangleNormal(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
@@ -225,8 +226,9 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			tris.push_back(surfTri1);
 
 		// 4) Generate and collect diagonal wall triangles.
-		if (sector.IsSurfaceSplit(isFloor) && !(isSurf0Wall && isSurf1Wall))
+		if (sector.IsSurfaceSplit(isFloor) && !(isSurf0Wall && isSurf1Wall)) // Can set wall.
 		{
+			// TODO: when surface meets wall at one corner.
 			// Full wall.
 			if ((isSurf0Wall || isSurf1Wall) && isFloor)
 			{
@@ -314,39 +316,80 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			bool isPrevSurfTri0Portal = (prevSurface.Triangles[0].PortalRoomNumber != NO_VALUE);
 			bool isPrevSurfTri1Portal = (prevSurface.Triangles[1].PortalRoomNumber != NO_VALUE);
 
-			// Calculate current sector corner heights.
+			// TODO: use isSplit bools instead.
 			bool useTri0 = (!isSurfSplit || isSurfSplitAngle0);
-			int height0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, isFloor);
-			int height1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, isFloor);
-
-			// Calculate previous sector corner heights.
 			bool usePrevTri1 = (!isPrevSurfSplit || isPrevSurfSplitAngle0);
-			int prevHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, isFloor);
-			int prevHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, isFloor);
 
-			// Determine wall vertices.
-			auto vertex0 = Vector3(corner0.x, height0, corner0.y);
-			auto vertex1 = Vector3(corner1.x, height1, corner1.y);
-			auto vertex2 = Vector3(corner0.x, prevHeight0, corner0.y);
-			auto vertex3 = Vector3(corner1.x, prevHeight1, corner1.y);
+			bool isSurfWall = (useTri0 ? isSurf0Wall : isSurf1Wall);
+			bool isPrevSurfWall = (usePrevTri1 ? isPrevSurf1Wall : isPrevSurf0Wall);
 
-			// TODO: Fix false walls inside walls.
-
-			// TODO: protal?
-			// Collect step wall.
-			if (!(usePrevTri1 ? isPrevSurf1Wall : isPrevSurf0Wall))
+			// TODO: When not split.
+			// Wall behind.
+			if (!isSurfWall || !isPrevSurfWall) // Can set wall.
 			{
-				if (vertex0 != vertex2)
+				// TODO: when surface meets wall at one corner.
+				// 
+				// Full wall referencing current sector.
+				if ((!isSurfWall && isPrevSurfWall) && isFloor)
 				{
-					const auto& normal0 = ((vertex0.y > vertex2.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-					auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, normal0);
+					int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, true);
+					int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, useTri0 ? 0 : 1, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, useTri0 ? 0 : 1, false);
+
+					auto vertex0 = Vector3(corner0.x, floorHeight0, corner0.y);
+					auto vertex1 = Vector3(corner1.x, floorHeight1, corner1.y);
+					auto vertex2 = Vector3(corner0.x, ceilHeight0, corner0.y);
+					auto vertex3 = Vector3(corner1.x, ceilHeight1, corner1.y);
+
+					auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL);
+					auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
 					tris.push_back(wallTri0);
-				}
-				if (vertex1 != vertex3)
-				{
-					const auto& normal1 = ((vertex1.y > vertex3.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-					auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, normal1);
 					tris.push_back(wallTri1);
+				}
+				// Full wall referencing previous sector.
+				else if ((isSurfWall && !isPrevSurfWall) && isFloor)
+				{
+					int floorHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, true);
+					int floorHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, false);
+
+					auto vertex0 = Vector3(corner0.x, floorHeight0, corner0.y);
+					auto vertex1 = Vector3(corner1.x, floorHeight1, corner1.y);
+					auto vertex2 = Vector3(corner0.x, ceilHeight0, corner0.y);
+					auto vertex3 = Vector3(corner1.x, ceilHeight1, corner1.y);
+
+					auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, WEST_WALL_NORMAL);
+					auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL);
+					tris.push_back(wallTri0);
+					tris.push_back(wallTri1);
+				}
+				// Step wall.
+				else if (!isSurfWall && !isPrevSurfWall)
+				{
+					int height0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, isFloor);
+					int height1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, isFloor);
+					int prevHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, isFloor);
+					int prevHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, isFloor);
+
+					auto vertex0 = Vector3(corner0.x, height0, corner0.y);
+					auto vertex1 = Vector3(corner1.x, height1, corner1.y);
+					auto vertex2 = Vector3(corner0.x, prevHeight0, corner0.y);
+					auto vertex3 = Vector3(corner1.x, prevHeight1, corner1.y);
+
+					if (vertex0 != vertex2)
+					{
+						const auto& normal0 = ((vertex0.y > vertex2.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
+						auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, normal0);
+						tris.push_back(wallTri0);
+					}
+					if (vertex1 != vertex3)
+					{
+						const auto& normal1 = ((vertex1.y > vertex3.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
+						auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, normal1);
+						tris.push_back(wallTri1);
+					}
 				}
 			}
 

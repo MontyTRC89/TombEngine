@@ -86,11 +86,16 @@ namespace TEN::Math
 
 	float FloorToStep(float value, float step)
 	{
-		return (std::floor(value / step) * step);
+		return (floor(value / step) * step);
 	}
 
 	float CeilToStep(float value, float step)
 	{
-		return (std::ceil(value / step) * step);
+		return (ceil(value / step) * step);
+	}
+
+	float RoundToStep(float value, float step)
+	{
+		return (round(value / step) * step);
 	}
 }
