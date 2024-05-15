@@ -248,7 +248,6 @@ void InitializeCamera()
 
 	Camera.targetDistance = BLOCK(1.5f);
 	Camera.item = nullptr;
-	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
 	Camera.speed = 1;
 	Camera.flags = CF_NONE;

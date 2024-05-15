@@ -28,7 +28,6 @@ struct CAMERA_INFO
 	int flags;
 	bool fixedCamera;
 	bool underwater;
-	int numberFrames;
 	int bounce;
 	int targetDistance;
 	short targetAngle;

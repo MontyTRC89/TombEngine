@@ -3386,7 +3386,6 @@ namespace TEN::Gui
 			SetInventoryMode(InventoryMode::InGame);
 
 		InitializeInventory(item);
-		Camera.numberFrames = 2;
 
 		LARGE_INTEGER lastTime;
 		LARGE_INTEGER currentTime;
