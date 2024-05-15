@@ -5,6 +5,6 @@
 
 ## Links to issue this pull request concerns (if applicable)
 
-(replace this paragraph with links to issues this PR concers, otherwise please write "n/a")
+(replace this paragraph with links to issues this PR concerns, otherwise please write "n/a")
 
 ## Description of pull request 
