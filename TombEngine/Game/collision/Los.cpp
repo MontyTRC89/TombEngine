@@ -337,22 +337,6 @@ namespace TEN::Collision::Los
 			doOffset = !doOffset;
 			g_Renderer.AddDebugTarget(intercept.Position.ToVector3(), Quaternion::Identity, 20, Color(1, 0, 0));
 
-			// TEMP: Legacy-style wall clip.
-			if (i != 0 && i != trace.Intercepts.size())
-			{
-				auto pointColl = GetPointCollision(intercept.Position, intercept.Sector->RoomNumber);
-				if (intercept.Position.y > pointColl.GetFloorHeight() ||
-					intercept.Position.y < pointColl.GetCeilingHeight())
-				{
-					float intersectDist = Vector3::Distance(ray.position, intercept.Position.ToVector3());
-					if (intersectDist < closestDist)
-					{
-						closestDist = intersectDist;
-						hasClip = true;
-					}
-				}
-			}
-
 			// Clip unique sector.
 			if (intercept.Sector != prevSector)
 			{
