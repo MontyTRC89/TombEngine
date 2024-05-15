@@ -61,34 +61,34 @@ namespace TEN::Entities::Generic
 
 	void InitializeRaisingBlock(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-		item->Data = BridgeObject();
-		auto& bridge = GetBridgeObject(*item);
+		auto& item = g_Level.Items[itemNumber];
+		item.Data = BridgeObject();
+		auto& bridge = GetBridgeObject(item);
 
-		// Initialize routines.
+		bridge.Initialize(item);
 		bridge.GetFloorHeight = GetRaisingBlockFloorHeight;
 		bridge.GetCeilingHeight = GetRaisingBlockCeilingHeight;
 		bridge.GetFloorBorder = GetRaisingBlockFloorBorder;
 		bridge.GetCeilingBorder = GetRaisingBlockCeilingBorder;
 
-		short roomNumber = item->RoomNumber;
-		auto* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+		short roomNumber = item.RoomNumber;
+		auto* floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber);
 
 		if (floor->Box != NO_VALUE)
 			g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 
 		// Set mutators to EulerAngles identity by default.
-		for (auto& mutator : item->Model.Mutators)
+		for (auto& mutator : item.Model.Mutators)
 			mutator.Scale.y = 0;
 
-		if (item->TriggerFlags < 0)
+		if (item.TriggerFlags < 0)
 		{
-			item->AIBits |= ALL_AIOBJ;
+			item.AIBits |= ALL_AIOBJ;
 			AddActiveItem(itemNumber);
-			item->Status = ITEM_ACTIVE;
+			item.Status = ITEM_ACTIVE;
 		}
 
-		TEN::Collision::Floordata::UpdateBridgeItem(*item);
+		TEN::Collision::Floordata::UpdateBridgeItem(item);
 	}
 
 	void ShakeRaisingBlock(ItemInfo* item)

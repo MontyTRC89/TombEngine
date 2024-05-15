@@ -123,7 +123,7 @@ namespace TEN::Entities::Generic
 		item.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(item);
 
-		// Initialize routines.
+		bridge.Initialize(item);
 		bridge.GetFloorHeight = GetExpandingPlatformFloorHeight;
 		bridge.GetCeilingHeight = GetExpandingPlatformCeilingHeight;
 		bridge.GetFloorBorder = ExpandingPlatformFloorBorder;

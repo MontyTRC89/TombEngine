@@ -59,7 +59,7 @@ namespace TEN::Entities::Generic
 		item.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(item);
 
-		// Initialize routines.
+		bridge.Initialize(item);
 		bridge.GetFloorHeight = GetFallingBlockFloorHeight;
 		bridge.GetCeilingHeight = GetFallingBlockCeilingHeight;
 		bridge.GetFloorBorder = GetFallingBlockFloorBorder;

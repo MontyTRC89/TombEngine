@@ -223,91 +223,6 @@ namespace TEN::Collision::Los
 		return los;
 	}
 
-	static CollisionMesh GenerateBridgeCollisionMesh(const ItemInfo& bridgeMov)
-	{
-		constexpr auto UP_NORMAL	  = Vector3(0.0f, -1.0f, 0.0f);
-		constexpr auto DOWN_NORMAL	  = Vector3(0.0f, 1.0f, 0.0f);
-		constexpr auto FORWARD_NORMAL = Vector3(0.0f, 0.0f, 1.0f);
-		constexpr auto BACK_NORMAL	  = Vector3(0.0f, 0.0f, -1.0f);
-		constexpr auto RIGHT_NORMAL	  = Vector3(1.0f, 0.0f, 0.0f);
-		constexpr auto LEFT_NORMAL	  = Vector3(-1.0f, 0.0f, 0.0f);
-
-		// Determine relative tilt offset.
-		auto offset = Vector3::Zero;
-		auto tiltRotMatrix = Matrix::Identity;
-		switch (bridgeMov.ObjectNumber)
-		{
-		case ID_BRIDGE_TILT1:
-			offset = Vector3(0.0f, CLICK(1), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(45.0f * 0.25f)).ToRotationMatrix();
-			break;
-
-		case ID_BRIDGE_TILT2:
-			offset = Vector3(0.0f, CLICK(2), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(45.0f * 0.5f)).ToRotationMatrix();
-			break;
-
-		case ID_BRIDGE_TILT3:
-			offset = Vector3(0.0f, CLICK(3), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(45.0f * 0.75f)).ToRotationMatrix();
-			break;
-
-		case ID_BRIDGE_TILT4:
-			offset = Vector3(0.0f, CLICK(4), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(45.0f)).ToRotationMatrix();
-			break;
-
-		default:
-			break;
-		}
-
-		// Calculate absolute tilt offset.
-		auto rotMatrix = bridgeMov.Pose.Orientation.ToRotationMatrix();
-		offset = Vector3::Transform(offset, rotMatrix);
-
-		// Get box corners.
-		auto box = bridgeMov.GetBox();
-		auto corners = std::array<Vector3, 8>{};
-		box.GetCorners(corners.data());
-
-		// Offset key corners.
-		corners[1] += offset;
-		corners[3] -= offset;
-		corners[5] += offset;
-		corners[7] -= offset;
-
-		// TODO: Inaccurate tilt rotation.
-
-		// Calculate and return collision mesh.
-		auto tris = std::vector<CollisionTriangle>
-		{
-			CollisionTriangle(corners[0], corners[1], corners[4], Vector3::Transform(UP_NORMAL, rotMatrix * tiltRotMatrix)),
-			CollisionTriangle(corners[1], corners[4], corners[5], Vector3::Transform(UP_NORMAL, rotMatrix * tiltRotMatrix)),
-			CollisionTriangle(corners[2], corners[3], corners[6], Vector3::Transform(DOWN_NORMAL, rotMatrix * tiltRotMatrix)),
-			CollisionTriangle(corners[3], corners[6], corners[7], Vector3::Transform(DOWN_NORMAL, rotMatrix * tiltRotMatrix)),
-			CollisionTriangle(corners[4], corners[5], corners[6], Vector3::Transform(FORWARD_NORMAL, rotMatrix)),
-			CollisionTriangle(corners[4], corners[6], corners[7], Vector3::Transform(FORWARD_NORMAL, rotMatrix)),
-			CollisionTriangle(corners[0], corners[1], corners[2], Vector3::Transform(BACK_NORMAL, rotMatrix)),
-			CollisionTriangle(corners[0], corners[2], corners[3], Vector3::Transform(BACK_NORMAL, rotMatrix)),
-			CollisionTriangle(corners[0], corners[3], corners[4], Vector3::Transform(RIGHT_NORMAL, rotMatrix)),
-			CollisionTriangle(corners[3], corners[4], corners[7], Vector3::Transform(RIGHT_NORMAL, rotMatrix)),
-			CollisionTriangle(corners[1], corners[2], corners[5], Vector3::Transform(LEFT_NORMAL, rotMatrix)),
-			CollisionTriangle(corners[2], corners[5], corners[6], Vector3::Transform(LEFT_NORMAL, rotMatrix))
-		};
-
-		//debug
-		for (const auto& tri : tris)
-		{
-			g_Renderer.AddDebugTriangle(tri.GetVertices()[0], tri.GetVertices()[1], tri.GetVertices()[2], Color(1, 1, 0, 0.2f));
-
-			auto origin = (tri.GetVertices()[0] + tri.GetVertices()[1] + tri.GetVertices()[2]) / 3;
-			auto target = Geometry::TranslatePoint(origin, tri.GetNormal(), BLOCK(0.25f));
-			g_Renderer.AddDebugLine(origin, target, Color(1, 1, 0));
-		}
-
-		return CollisionMesh(tris);
-	}
-
 	static SectorTraceData GetSectorTrace(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
 		auto trace = SectorTraceData{};
@@ -390,7 +305,7 @@ namespace TEN::Collision::Los
 				return (distSqr0 < distSqr1);
 			});
 
-		// 6) Set intercept sector pointers.
+		// 6) Set intercept sectors.
 		int probeRoomNumber = roomNumber;
 		for (auto& intercept : trace.Intercepts)
 		{
@@ -438,7 +353,7 @@ namespace TEN::Collision::Los
 				}
 			}
 
-			// Ensure sector is unique.
+			// Clip unique sector.
 			if (intercept.Sector != prevSector)
 			{
 				// 7.1) Clip sector.
@@ -461,13 +376,12 @@ namespace TEN::Collision::Los
 						visitedBridgeMovIds.insert(bridgeMovID);
 
 						const auto& bridgeMov = g_Level.Items[bridgeMovID];
+						const auto& bridge = GetBridgeObject(bridgeMov);
 
 						if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
 							continue;
 
-						auto collMesh = GenerateBridgeCollisionMesh(bridgeMov);
-
-						auto meshColl = collMesh.GetIntersection(ray);
+						auto meshColl = bridge.GetCollisionMesh().GetIntersection(ray);
 						if (meshColl.has_value() && meshColl->Distance < closestDist)
 						{
 							closestTri = &meshColl->Triangle;

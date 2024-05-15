@@ -87,7 +87,7 @@ namespace TEN::Entities::Traps
 		item.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(item);
 
-		// Initialize routines.
+		bridge.Initialize(item);
 		bridge.GetFloorHeight = GetCrumblingPlatformFloorHeight;
 		bridge.GetCeilingHeight = GetCrumblingPlatformCeilingHeight;
 		bridge.GetFloorBorder = GetCrumblingPlatformFloorBorder;
