@@ -581,7 +581,7 @@ Vec3 Moveable::GetPos() const
 void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 {
 	auto newPos = pos.ToVector3i();
-	bool bigDistance = Vector3i::Distance(newPos, m_item->Pose.Position) > CLICK(1);
+	bool bigDistance = Vector3i::Distance(newPos, m_item->Pose.Position) > BLOCK(1);
 	
 	m_item->Pose.Position = newPos;
 
