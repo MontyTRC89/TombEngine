@@ -1,6 +1,6 @@
 What you will read under has been agreed by the current active team in order to keep a good flow of work and proper management. You are welcome to put suggestions in the comments in order to discuss it with the TEN team.
 
-# General rules
+# Contributor General rules
 
 **1. Developer**
 
