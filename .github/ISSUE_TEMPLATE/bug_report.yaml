@@ -10,13 +10,16 @@ body:
     value: |
       Please follow this document in order to report a bug 
 
-- type: input
+- type: dropdown
   attributes:
-    label: Engine version
+    label: TombEngine version
     description: |
-      - Please specify TombEngine Version Number in the following input box.
-    placeholder: |
-      - TombEngine Version Number 1.1.0
+      Please select the TombEngine Version from the dropdown list.
+    options:
+      - 1.4
+      - 1.3
+      - 1.2
+      - 1.1
   validations:
     required: true
 
@@ -85,7 +88,7 @@ body:
     placeholder: |
       A description of any additional content here.
   validations:
-    required: true
+    required: false
 
 - type: textarea
   attributes:
