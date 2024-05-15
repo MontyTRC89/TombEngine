@@ -73,14 +73,13 @@ body:
     label: Screenshots
     description: |
       Please check this box if you have provided screenshots or any other media for this issue
-      **note** If you do not provide screenshots or anything else, it may be hard for devs to investigate
-      provide a link to your screenshot here or simply drag and drop your screenshot into this textbox
+      **note** If you do not provide screenshots or anything else, the development team will not be able to investigate the issue and this will be closed without further investigation.
     placeholder: |
-      A description of any additional content here.
+      Please provide a link to your screenshot here or simply drag and drop your screenshot into this textbox
   validations:
     required: true
 
-- type: textarea
+- type: checkbox
   attributes:
     label: Additional Content
     description: |
