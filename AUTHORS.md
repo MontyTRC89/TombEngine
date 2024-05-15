@@ -1,6 +1,6 @@
 # Credit List
 
-This is the credit list of **all** the people who contribute to TombEngine in any shape or form. 
+This is the credit list of **all** the people who contributed to TombEngine in any shape or form. 
 
 ## Developers
 
