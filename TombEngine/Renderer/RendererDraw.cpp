@@ -2679,69 +2679,48 @@ namespace TEN::Renderer
 
 			for (int i = (int)view.RoomsToDraw.size() - 1; i >= 0; i--)
 			{
-				int index = i;
-				RendererRoom* room = view.RoomsToDraw[index];
-				ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];				
+				const auto& room = *view.RoomsToDraw[i];
+				const auto& nativeRoom = g_Level.Rooms[room.RoomNumber];				
 
 				if (rendererPass != RendererPass::GBuffer)
 				{
-					_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
-					_stRoom.AmbientColor = room->AmbientLight;
+					_stRoom.Caustics = int(g_Configuration.EnableCaustics && (nativeRoom.flags & ENV_FLAG_WATER));
+					_stRoom.AmbientColor = room.AmbientLight;
 					BindRoomLights(view.LightsToDraw);
 				}
 
-				_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
+				_stRoom.Water = (nativeRoom.flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
 				_cbRoom.UpdateData(_stRoom, _context.Get());
 
-				SetScissor(room->ClipBounds);
+				SetScissor(room.ClipBounds);
 
 				for (int animated = 0; animated < 2; animated++)
 				{
 					if (rendererPass != RendererPass::GBuffer)
 					{
-						if (animated == 0)
-						{
-							_context->VSSetShader(_vsRooms.Get(), nullptr, 0);
-						}
-						else
-						{
-							_context->VSSetShader(_vsRoomsAnimatedTextures.Get(), nullptr, 0);
-						}
+						_context->VSSetShader((animated == 0) ? _vsRooms.Get() : _vsRoomsAnimatedTextures.Get(), nullptr, 0);
 					}
 					else
 					{
-						if (animated == 0)
-						{
-							_context->VSSetShader(_vsGBufferRooms.Get(), nullptr, 0);
-						}
-						else
-						{
-							_context->VSSetShader(_vsGBufferRoomsAnimated.Get(), nullptr, 0);
-						}
+						_context->VSSetShader((animated == 0) ? _vsGBufferRooms.Get() : _vsGBufferRoomsAnimated.Get(), nullptr, 0);
 					}
 
-					for (auto& bucket : room->Buckets)
+					for (const auto& bucket : room.Buckets)
 					{
 						if ((animated == 1) ^ bucket.Animated)
-						{
 							continue;
-						}
 
 						if (bucket.NumVertices == 0)
-						{
 							continue;
-						}
 
 						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 						for (int p = 0; p < passes; p++)
 						{
 							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-							{
 								continue;
-							}
 
-							// Draw geometry
+							// Draw geometry.
 							if (animated)
 							{
 								BindTexture(TextureRegister::ColorMap,
@@ -2750,7 +2729,7 @@ namespace TEN::Renderer
 								BindTexture(TextureRegister::NormalMap,
 									&std::get<1>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-								RendererAnimatedTextureSet& set = _animatedTextureSets[bucket.Texture];
+								const auto& set = _animatedTextureSets[bucket.Texture];
 								_stAnimated.NumFrames = set.NumTextures;
 								_stAnimated.Type = 0;
 								_stAnimated.Fps = set.Fps;
@@ -2759,7 +2738,7 @@ namespace TEN::Renderer
 								{
 									if (j >= _stAnimated.Textures.size())
 									{
-										TENLog("Animated frame " + std::to_string(j) + " is out of bounds, too many frames in sequence.");
+										TENLog("Animated frame " + std::to_string(j) + " out of bounds. Too many frames in sequence.");
 										break;
 									}
 
@@ -2772,10 +2751,12 @@ namespace TEN::Renderer
 							}
 							else
 							{
-								BindTexture(TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
+								BindTexture(
+									TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
 									SamplerStateRegister::AnisotropicClamp);
-								BindTexture(TextureRegister::NormalMap,
-									&std::get<1>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+								BindTexture(
+									TextureRegister::NormalMap, &std::get<1>(_roomTextures[bucket.Texture]),
+									SamplerStateRegister::AnisotropicClamp);
 							}
 
 							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);

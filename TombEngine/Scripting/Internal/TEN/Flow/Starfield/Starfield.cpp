@@ -45,8 +45,8 @@ namespace TEN::Scripting
 
 	/// Create a starfield object with stars and meteors.
 	// @function Starfield()
-	// @tparam int starCount Star count.
-	// @tparam int meteorCount Meteor count.
+	// @tparam int starCount Star count (6000 max).
+	// @tparam int meteorCount Meteor count (100 max).
 	// @treturn Starfield A new Starfield object.
 	Starfield::Starfield(int starCount, int meteorCount, int meteorSpawnDensity, float meteorVel)
 	{
@@ -110,7 +110,7 @@ namespace TEN::Scripting
 		return _meteorVelocity;
 	}
 
-	/// Set the starfield's number of stars.
+	/// Set the starfield's number of stars (6000 max).
 	// @function Starfield:SetStarCount(int)
 	// @tparam int New count.
 	void Starfield::SetStarCount(int count)
@@ -121,7 +121,7 @@ namespace TEN::Scripting
 		_starCount = std::clamp(count, 0, STAR_COUNT_MAX);
 	}
 
-	/// Set the starfield's number of meteors.
+	/// Set the starfield's number of meteors (100 max).
 	// @function Starfield:SetMeteorCount(int)
 	// @tparam int New count.
 	void Starfield::SetMeteorCount(int count)
