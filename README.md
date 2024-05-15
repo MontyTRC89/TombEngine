@@ -1,5 +1,7 @@
 # TombEngine 
 
+![Logo](https://github.com/MontyTRC89/TombEngine/assets/80340234/f22c9ca9-7159-467f-b8ad-7bb32274a278)
+
 In the year 2000, Core Design granted us a great gift: their TR4-based Level Editor, which allowed people to create custom levels. It was, unfortunately, quite limited, hence why over the decades it was upgraded massively with fan projects such as Tomb Raider Engine Patcher (TREP) and Tomb Raider Next Generation (TRNG).
 - TREP was a tool which allowed modification of the executable to expand certain limits and implement new features.
 - TRNG built upon TREP and provided many new tools, including a scripting language, expanding even more limits with its own .DLL.
@@ -39,55 +41,4 @@ Visual Studio may also warn about NuGet packages. To fix:
 
 # Disclaimer
 We do not and have never worked for Core Design, Eidos Interactive, or Square Enix. This is a hobby project. Tomb Raider is a registered trademark of Square Enix; TombEngine is not be sold. The code is open-source to encourage contributions and to be used for study purposes. We are not responsible for illegal uses of this source code. This source code is released as-is and continues to be maintained by non-paid contributors in their free time.
-
-# Credit List
-
-## Developers
-
-- MontyTRC (Project Leader)
-
-- Gancian (general coding)
-- Krystian (general coding)
-- Kubsy (Some cleanups and fixes)
-- l.m. (general coding, Lua enhancements, bug fixing)
-- Lwmte (sound refactoring, general coding, code cleanups, bug fixing)
-- Moooonyeah (Jumanji) (entity decompilation)
-- Raildex (renderer refactoring, particle coding, general coding) 
-- RicardoLuis0 (general coding)
-- Sezz (player state refactoring, general coding, code cleanups, bug fixing, assets)
-- Squidshire (Hispidence) (Lua implementation, bug fixing)
-- Stranger1992 (sound asset refactoring and organisation, assets)
-- TokyoSU (entity and vehicle decompilation)
-- Tomo (general coding, bug fixing)
-- Troye (general coding, refactoring)
-- WolfCheese (general coding)
-
-## Testers
-- Adngel
-- Caesum
-- Dustie
-- GeckoKid
-- JoeyQuint
-- Kamillos
-- Kubsy
-- LGG_PRODUCTION
-- Lore
-- RemRem
-- Stranger1992
-- WolfCheese
-
-## Assets and Miscellaneous
-
-- Geckokid (Sprites and test level creator).
-
-### Animations
-- SrDanielPonces (Diagonal shimmy transitions, backwards monkey swinging)
-- Krystian (Flexibility crawlspace, slope climbing animations)
-- Sezz (Additional Animations for player state refactoring) 
-- Naotheia (Underwater puzzle placement, crouch 180° turn, crawl 180° turn, water surface 180° turn)
-- JoeyQuint (Standing 180° turn, monkey swing 180° turn)
-
-### TombEngine Marketing 
-- Kubsy (Twitter and forum posts)
-- Stranger1992 (This website, Facebook, Instagram, Youtube and Twitch.
 
