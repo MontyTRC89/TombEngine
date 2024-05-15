@@ -228,13 +228,11 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 		// 4) Generate and collect diagonal wall triangles.
 		if (sector.IsSurfaceSplit(isFloor) && !(isSurf0Wall && isSurf1Wall)) // Can set wall.
 		{
-			// TODO: when surface meets wall at one corner.
 			// Full wall.
 			if ((isSurf0Wall || isSurf1Wall) && isFloor)
 			{
 				if (isSurfSplitAngle0)
 				{
-					// TODO: Correct ceil triangle.
 					int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, isSurf0Wall ? 1 : 0, true);
 					int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, isSurf0Wall ? 1 : 0, true);
 					int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, isSurf0Wall ? 1 : 0, false);
@@ -245,14 +243,19 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					auto vertex2 = Vector3(corner0.x, ceilHeight0, corner0.y);
 					auto vertex3 = Vector3(corner2.x, ceilHeight1, corner2.y);
 
-					auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL);
-					auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL);
-					tris.push_back(wallTri0);
-					tris.push_back(wallTri1);
+					if (vertex0 != vertex2)
+					{
+						auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL);
+						tris.push_back(wallTri0);
+					}
+					if (vertex1 != vertex3)
+					{
+						auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL);
+						tris.push_back(wallTri1);
+					}
 				}
 				else
 				{
-					// TODO: Correct ceil triangle.
 					int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, isSurf0Wall ? 1 : 0, true);
 					int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, isSurf0Wall ? 1 : 0, true);
 					int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, isSurf0Wall ? 1 : 0, false);
@@ -263,12 +266,20 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					auto vertex2 = Vector3(corner1.x, ceilHeight0, corner1.y);
 					auto vertex3 = Vector3(corner3.x, ceilHeight1, corner3.y);
 
-					auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
-					auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
-					tris.push_back(wallTri0);
-					tris.push_back(wallTri1);
+					if (vertex0 != vertex2)
+					{
+						auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
+						tris.push_back(wallTri0);
+					}
+					if (vertex1 != vertex3)
+					{
+						auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
+						tris.push_back(wallTri1);
+					}
 				}
 			}
+			// TODO: Some phantom walls above ceilings are generated.
+			// TODO: Second criss-cross case.
 			// Step wall.
 			else if (!isSurfTri0Portal || !isSurfTri1Portal)
 			{
@@ -305,6 +316,8 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			}
 		}
 
+		//goto skip;
+
 		// 5) Collect cardinal wall triangles on X axis.
 		if (prevSectorX != nullptr)
 		{
@@ -318,18 +331,15 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			bool isPrevSurfTri0Portal = (prevSurface.Triangles[0].PortalRoomNumber != NO_VALUE);
 			bool isPrevSurfTri1Portal = (prevSurface.Triangles[1].PortalRoomNumber != NO_VALUE);
 
-			// TODO: use isSplit bools instead.
 			bool useTri0 = (!isSurfSplit || isSurfSplitAngle0);
 			bool usePrevTri1 = (!isPrevSurfSplit || isPrevSurfSplitAngle0);
 
 			bool isSurfWall = (useTri0 ? isSurf0Wall : isSurf1Wall);
 			bool isPrevSurfWall = (usePrevTri1 ? isPrevSurf1Wall : isPrevSurf0Wall);
 
-			// TODO: When not split.
 			// Wall behind.
 			if (!isSurfWall || !isPrevSurfWall) // Can set wall.
 			{
-				// TODO: when surface meets wall at one corner.
 				// Full wall referencing current sector.
 				if ((!isSurfWall && isPrevSurfWall) && isFloor)
 				{
@@ -347,10 +357,16 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					auto vertex2 = Vector3(corner0.x, ceilHeight0, corner0.y);
 					auto vertex3 = Vector3(corner1.x, ceilHeight1, corner1.y);
 
-					auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL);
-					auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
-					tris.push_back(wallTri0);
-					tris.push_back(wallTri1);
+					if (vertex0 != vertex2)
+					{
+						auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL);
+						tris.push_back(wallTri0);
+					}
+					if (vertex1 != vertex3)
+					{
+						auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
+						tris.push_back(wallTri1);
+					}
 				}
 				// Full wall referencing previous sector.
 				else if ((isSurfWall && !isPrevSurfWall) && isFloor)
@@ -369,10 +385,16 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					auto vertex2 = Vector3(corner0.x, ceilHeight0, corner0.y);
 					auto vertex3 = Vector3(corner1.x, ceilHeight1, corner1.y);
 
-					auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, WEST_WALL_NORMAL);
-					auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL);
-					tris.push_back(wallTri0);
-					tris.push_back(wallTri1);
+					if (vertex0 != vertex2)
+					{
+						auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, WEST_WALL_NORMAL);
+						tris.push_back(wallTri0);
+					}
+					if (vertex1 != vertex3)
+					{
+						auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL);
+						tris.push_back(wallTri1);
+					}
 				}
 				// Step wall.
 				else if (!isSurfWall && !isPrevSurfWall)
@@ -387,16 +409,17 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					auto vertex2 = Vector3(corner0.x, prevHeight0, corner0.y);
 					auto vertex3 = Vector3(corner1.x, prevHeight1, corner1.y);
 
+					bool isSecondCrissCrossCase = (vertex1.y < vertex3.y);
 					if (vertex0 != vertex2)
 					{
 						const auto& normal0 = ((vertex0.y > vertex2.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-						auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, normal0);
+						auto wallTri0 = isSecondCrissCrossCase ? CollisionTriangle(vertex0, vertex2, vertex3, normal0) : CollisionTriangle(vertex0, vertex1, vertex2, normal0);
 						tris.push_back(wallTri0);
 					}
 					if (vertex1 != vertex3)
 					{
 						const auto& normal1 = ((vertex1.y > vertex3.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-						auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, normal1);
+						auto wallTri1 = isSecondCrissCrossCase ? CollisionTriangle(vertex0, vertex1, vertex3, normal1) : CollisionTriangle(vertex1, vertex2, vertex3, normal1);
 						tris.push_back(wallTri1);
 					}
 				}
@@ -425,6 +448,8 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				tris.push_back(endWallTri1);
 			}
 		}
+
+		//skip:
 
 		// TODO
 		// 6) Collect cardinal wall triangles on Z axis.
