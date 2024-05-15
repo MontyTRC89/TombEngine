@@ -1,6 +1,6 @@
 What you will read under has been agreed by the current active team in order to keep a good flow of work and proper management. You are welcome to put suggestions in the comments in order to discuss it with the TEN team.
 
-## General rules
+# General rules
 
 **1. Developer**
 
@@ -39,7 +39,7 @@ What you will read under has been agreed by the current active team in order to 
 - Give the Developer as much detail as you can about the bug you're writing for, and an easy way to reproduce it.
 - Update and comment the issue with the tests you've done and your findings after fixes.
 
-### Coding Conventions
+# Coding Conventions
 
 ## General Rules
 
