@@ -11,7 +11,7 @@ What you will read under has been agreed by the current active team in order to 
 - If you are allowed to merge PRs, do not do such until code has been properly reviewed, preferably by more than one person.
 - Merge PRs using **squash and merge** mode to preserve main branch history in original state. For squash merge commit, leave list of commits in commit description (GitHub does it automatically in both desktop client and web interface).
 - Do not revert active development branch to a previous commit unless you are absolutely sure there will be no regressions. Do not revert parts of code to a previous state for the same reasons. In both of those cases, the entire team needs to be aware of it and agree on the decision.
-- There are **three key branches** arranged in a hierarchy: `master`, `develop`, and `test`. `master` is to be used for releases, and nothing else. `develop` is based on `master` and may be used for active development. **Every PR should use it as its base**. `test` is based on `develop` and serves as the "freshest" branch where testing and bugfixes occur. To keep in sync, for release period they are to be merged in the following order: `test` -> `develop` -> `master`.
+- There are **two key branches** arranged in a hierarchy: `master`, `develop`. `master` is to be used for releases, and nothing else. `develop` is based on `master` and may be used for active development. **Every PR should use it as its base**. To keep in sync, for release period they are to be merged in the following order: `develop` -> `master`.
  
 **2. Tester**
 
