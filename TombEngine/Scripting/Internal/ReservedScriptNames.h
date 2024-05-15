@@ -37,6 +37,22 @@ static constexpr char ScriptReserved_MoveableStatus[]	= "MoveableStatus";
 static constexpr char ScriptReserved_Lara[]							= "Lara";
 static constexpr char ScriptReserved_GetPlayerInteractedMoveable[]	= "GetInteractedMoveable";
 
+// DisplaySprite object
+static constexpr char ScriptReserved_DisplaySprite[]				= "DisplaySprite";
+static constexpr char ScriptReserved_DisplayStringGetObjectID[]		= "GetObjectID";
+static constexpr char ScriptReserved_DisplayStringGetSpriteID[]		= "GetSpriteID";
+static constexpr char ScriptReserved_DisplayStringGetPosition[]		= "GetPosition";
+static constexpr char ScriptReserved_DisplayStringGetRotation[]		= "GetRotation";
+static constexpr char ScriptReserved_DisplayStringGetScale[]		= "GetScale";
+static constexpr char ScriptReserved_DisplayStringGetColor[]		= "GetColor";
+static constexpr char ScriptReserved_DisplayStringSetObjectID[]		= "SetObjectID";
+static constexpr char ScriptReserved_DisplayStringSetSpriteID[]		= "SetSpriteID";
+static constexpr char ScriptReserved_DisplayStringSetPosition[]		= "SetPosition";
+static constexpr char ScriptReserved_DisplayStringSetRotation[]		= "SetRotation";
+static constexpr char ScriptReserved_DisplayStringSetScale[]		= "SetScale";
+static constexpr char ScriptReserved_DisplayStringSetColor[]		= "SetColor";
+static constexpr char ScriptReserved_DisplaySpriteDraw[]			= "Draw";
+
 static constexpr char ScriptReserved_EndReasonExitToTitle[]		= "EXITTOTITLE";
 static constexpr char ScriptReserved_EndReasonLevelComplete[]	= "LEVELCOMPLETE";
 static constexpr char ScriptReserved_EndReasonLoadGame[]		= "LOADGAME";
