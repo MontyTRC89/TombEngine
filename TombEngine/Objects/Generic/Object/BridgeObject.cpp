@@ -41,22 +41,22 @@ namespace TEN::Entities::Generic
 		{
 		case ID_BRIDGE_TILT1:
 			offset = Vector3(0.0f, CLICK(1), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(45.0f * 0.25f)).ToRotationMatrix();
+			tiltRotMatrix = EulerAngles(0, 0, ANGLE(-45.0f * 0.25f)).ToRotationMatrix();
 			break;
 
 		case ID_BRIDGE_TILT2:
 			offset = Vector3(0.0f, CLICK(2), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(45.0f * 0.5f)).ToRotationMatrix();
+			tiltRotMatrix = EulerAngles(0, 0, ANGLE(-45.0f * 0.5f)).ToRotationMatrix();
 			break;
 
 		case ID_BRIDGE_TILT3:
 			offset = Vector3(0.0f, CLICK(3), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(45.0f * 0.75f)).ToRotationMatrix();
+			tiltRotMatrix = EulerAngles(0, 0, ANGLE(-45.0f * 0.75f)).ToRotationMatrix();
 			break;
 
 		case ID_BRIDGE_TILT4:
 			offset = Vector3(0.0f, CLICK(4), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(45.0f)).ToRotationMatrix();
+			tiltRotMatrix = EulerAngles(0, 0, ANGLE(-45.0f)).ToRotationMatrix();
 			break;
 
 		default:
@@ -78,15 +78,13 @@ namespace TEN::Entities::Generic
 		corners[5] += offset;
 		corners[7] -= offset;
 
-		// TODO: Inaccurate tilt rotation.
-
 		// Calculate triangles.
 		auto tris = std::vector<CollisionTriangle>
 		{
-			CollisionTriangle(corners[0], corners[1], corners[4], Vector3::Transform(UP_NORMAL, rotMatrix * tiltRotMatrix)),
-			CollisionTriangle(corners[1], corners[4], corners[5], Vector3::Transform(UP_NORMAL, rotMatrix * tiltRotMatrix)),
-			CollisionTriangle(corners[2], corners[3], corners[6], Vector3::Transform(DOWN_NORMAL, rotMatrix * tiltRotMatrix)),
-			CollisionTriangle(corners[3], corners[6], corners[7], Vector3::Transform(DOWN_NORMAL, rotMatrix * tiltRotMatrix)),
+			CollisionTriangle(corners[0], corners[1], corners[4], Vector3::Transform(UP_NORMAL, tiltRotMatrix * rotMatrix)),
+			CollisionTriangle(corners[1], corners[4], corners[5], Vector3::Transform(UP_NORMAL, tiltRotMatrix * rotMatrix)),
+			CollisionTriangle(corners[2], corners[3], corners[6], Vector3::Transform(DOWN_NORMAL, tiltRotMatrix * rotMatrix)),
+			CollisionTriangle(corners[3], corners[6], corners[7], Vector3::Transform(DOWN_NORMAL, tiltRotMatrix * rotMatrix)),
 			CollisionTriangle(corners[4], corners[5], corners[6], Vector3::Transform(FORWARD_NORMAL, rotMatrix)),
 			CollisionTriangle(corners[4], corners[6], corners[7], Vector3::Transform(FORWARD_NORMAL, rotMatrix)),
 			CollisionTriangle(corners[0], corners[1], corners[2], Vector3::Transform(BACK_NORMAL, rotMatrix)),
