@@ -50,7 +50,9 @@ body:
   attributes:
     label: To Reproduce
     description: |
-      To reproduce the behaviour, please provide detailed steps for the development team to follow. This can be done through screenshots or a written guide. | **If the bug cannot be reproduced, and if the issue is not adequately explained, it will be closed without further investigation**
+      To reproduce the behaviour, please provide detailed steps for the development team to follow. This can be done through screenshots or a written guide
+
+      **If the bug cannot be reproduced, and if the issue is not adequately explained, it will be closed without further investigation**
     placeholder: |
      Provide detailed reproducible steps here. 
   validations:
@@ -81,9 +83,10 @@ body:
   attributes:
     label: Additional Content
     description: |
-      Add any other context about the problem here. |
-      * Are you testing a build of a TombEngine that has not yet been released? If so please give some context. |
-      * Did you get any asset from the TombEngine website that has presented a bug? If so: please state or upload the asset in question _in a .zip file_.
+      Add any other context about the problem here. 
+
+      * Are you testing an build of a TombEngine that has not yet been released? If so please give some context.
+      *  Did you get any asset from the TombEngine website that has presented a bug? 
     placeholder: |
       A description of any additional content here.
   validations:
@@ -93,8 +96,8 @@ body:
   attributes:
     label: Minimal reproduction project 
     description: |
-      **Please upload a .zip file containing your level and all assets needed to compile the level and a cut-down version of your level where the bug presents itself** |
-      The project can be uploaded as a zip file (10 mb max) or provide a link from a cloud storage service. |
+      **Please upload a .zip file containing your level and all assets needed to compile the level and a cut-down version of your level where the bug presents itself**
+      The project can be uploaded as a zip file (10 mb max) or provide a link from google drive, dropbox etc.
       **Note** if you do not provide this, your issue may be rejected
     placeholder: |
       Download link to your project 
