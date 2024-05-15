@@ -278,38 +278,46 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					}
 				}
 			}
-			// TODO: Some phantom walls above ceilings are generated.
-			// TODO: Second criss-cross case.
 			// Step wall.
-			else if (!isSurfTri0Portal || !isSurfTri1Portal)
+			else if (!(isSurf0Wall || isSurf1Wall) && !(isSurfTri0Portal && isSurfTri1Portal))
 			{
 				if (isSurfSplitAngle0)
 				{
+					bool isSecondCrissCrossCase = (surfTri0.GetVertices()[2].y < surfTri1.GetVertices()[1].y); // TODO: Check when diagonal criss-cross becomes possible.
 					if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[0])
 					{
 						const auto& normal0 = ((surfTri0.GetVertices()[0].y > surfTri1.GetVertices()[0].y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * (isFloor ? 1 : -1);
-						auto wallTri0 = CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], normal0);
+						auto wallTri0 = isSecondCrissCrossCase ?
+							CollisionTriangle(surfTri0.GetVertices()[0], surfTri0.GetVertices()[2], surfTri1.GetVertices()[1], normal0) :
+							CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], normal0);
 						tris.push_back(wallTri0);
 					}
 					if (surfTri0.GetVertices()[2] != surfTri1.GetVertices()[1])
 					{
 						const auto& normal1 = ((surfTri0.GetVertices()[2].y > surfTri1.GetVertices()[1].y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * (isFloor ? 1 : -1);
-						auto wallTri1 = CollisionTriangle(surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], surfTri1.GetVertices()[1], normal1);
+						auto wallTri1 = isSecondCrissCrossCase ?
+							CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[0], surfTri1.GetVertices()[1], normal1) :
+							CollisionTriangle(surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], surfTri1.GetVertices()[1], normal1);
 						tris.push_back(wallTri1);
 					}
 				}
 				else
 				{
+					bool isSecondCrissCrossCase = (surfTri1.GetVertices()[2].y < surfTri0.GetVertices()[2].y); // TODO: Check when diagonal criss-cross becomes possible.
 					if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[1])
 					{
 						const auto& normal0 = ((surfTri0.GetVertices()[0].y > surfTri1.GetVertices()[1].y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-						auto wallTri0 = CollisionTriangle(surfTri1.GetVertices()[1], surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], normal0);
+						auto wallTri0 = isSecondCrissCrossCase ?
+							CollisionTriangle(surfTri1.GetVertices()[1], surfTri1.GetVertices()[2], surfTri0.GetVertices()[2], normal0) :
+							CollisionTriangle(surfTri1.GetVertices()[1], surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], normal0);
 						tris.push_back(wallTri0);
 					}
 					if (surfTri0.GetVertices()[2] != surfTri1.GetVertices()[2])
 					{
 						const auto& normal1 = ((surfTri0.GetVertices()[2].y > surfTri1.GetVertices()[2].y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-						auto wallTri1 = CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], surfTri0.GetVertices()[2], normal1);
+						auto wallTri1 = isSecondCrissCrossCase ?
+							CollisionTriangle(surfTri1.GetVertices()[1], surfTri0.GetVertices()[0], surfTri0.GetVertices()[2], normal1) :
+							CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], surfTri0.GetVertices()[2], normal1);
 						tris.push_back(wallTri1);
 					}
 				}
