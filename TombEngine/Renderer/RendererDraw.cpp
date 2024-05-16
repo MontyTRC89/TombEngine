@@ -3123,7 +3123,7 @@ namespace TEN::Renderer
 						for (int p = 0; p < bucket.Polygons.size(); p++)
 						{
 							auto centre = Vector3::Transform(
-								bucket.Polygons[p].Centre, itemToDraw->AnimationTransforms[boneIndex] * itemToDraw->World);
+								bucket.Polygons[p].Centre, itemToDraw->InterpolatedAnimationTransforms[boneIndex] * itemToDraw->InterpolatedWorld);
 							int distance = (centre - cameraPos).Length();
 
 							RendererSortableObject object;
@@ -3566,10 +3566,10 @@ namespace TEN::Renderer
 		RendererObject& moveableObj = *_moveableObjects[objectInfo->Item->ObjectNumber];
 
 		// Bind item main properties
-		_stItem.World = objectInfo->Item->World;
+		_stItem.World = objectInfo->Item->InterpolatedWorld;
 		_stItem.Color = objectInfo->Item->Color;
 		_stItem.AmbientLight = objectInfo->Item->AmbientLight;
-		memcpy(_stItem.BonesMatrices, objectInfo->Item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
+		memcpy(_stItem.BonesMatrices, objectInfo->Item->InterpolatedAnimationTransforms, sizeof(Matrix) * MAX_BONES);
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
