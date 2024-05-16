@@ -15,6 +15,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed AI for skidoo driver and worker with shotgun TR2 enemies.
 * Fixed Ember emitter crashing when ocb is between -1 and -10 
 * Fixed Electric cleaner and Squishy block not detecting collision with certain block heights.
+* Fixed Squishy blocks crashing the level.
 
 ### Features/Amendments
 
