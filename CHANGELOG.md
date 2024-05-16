@@ -4,10 +4,10 @@ Here you will find the full changelog of TEN's releases from Version 1.0 and up
 
 The dates are in European standard format where date is presented as **YYYY-MM-DD**
 
-### Version 1.4 - 2024-04-21
+## Version 1.4 - 2024-04-21
 ===========
 
-## Bug Fixes
+### Bug Fixes
 * Fixed drawing of display sprites in title level.
 * Fixed drawing of smoke sprites and various other sprites.
 * Fixed drawing of transparent surfaces when debris are present in scene.
@@ -25,7 +25,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fixed bottom collision for solid static meshes.
 * Fixed T-Rex's head rotation.
 
-## Features/Amendments
+### Features/Amendments
 * Auto-switch to a crawl state if player start position is in a crawlspace.
 * Allow directional flame emitter (negative OCBs) to be rotated at any angle.
 * Revise wall spikes:
@@ -40,7 +40,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Added TR3 Winston (requires updated TEN .wad2 on TombEngine.com).
 * Added TR4 squishy blocks (requires updated TEN .wad2 on TombEngine.com).
 
-## Lua API changes
+### Lua API changes
 * Added resetHub flag to Flow.Level, which allows to reset hub data.
 * Added Flow.GetFlipMapStatus() function to get current flipmap status.
 * Added Moveable:GetMeshCount() function to get number of moveable meshes.
@@ -48,10 +48,10 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Added Static:GetHP() and Static:SetHP() functions to change shatterable static mesh hit points.
 * Fixed Moveable:SetOnCollidedWithObject() callback.
 
-### Version 1.3 - 2024-01-06
+## Version 1.3 - 2024-01-06
 ===========
 
-## Bug Fixes
+### Bug Fixes
 * Fixed crash if title logo is removed from Textures folder.
 * Fixed crash if unknown player state ID is encountered.
 * Fixed bug with OCB 2 on pushables, and some other pushable bugs.
@@ -73,7 +73,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fixed incorrect light collection in some cases.
 * Fixed normal mapping for rooms, items, and statics.'
 
-## Features/Amendments
+### Features/Amendments
 * Added ambient occlusion (SSAO).
 * Added new post-process workflow (monochrome, negative, exclusion) with tinting.
 * Added SMAA antialiasing instead of MSAA.
@@ -97,7 +97,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
   - OCB 0: Wolf starts in walking animation, ready to chase Lara.
   - OCB 1: Wolf starts in sleeping animation.
 
-## Lua API changes
+### Lua API changes
 * Added Lara:GetInteractedMoveable() which returns currently interacted moveable by Lara.
 * Added Moveable:SetStatus() to set the current status of the moveable.
 * Added Room:GetColor() to get room's ambient light color.
@@ -105,10 +105,10 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Added View.GetCameraPosition(), View.GetCameraTarget() and View.GetCameraRoom() functions.
 * Added View.SetPostProcessMode(), View.SetPostProcessStrength() and View.SetPostProcessTint() functions.
 
-### Version 1.2 - 2023-11-11
+## Version 1.2 - 2023-11-11
 ===========
 
-## Bug Fixes
+### Bug Fixes
 * Fix burning torch not working properly if there are more than 256 objects in a level.
 * Fix grenade and rocket projectiles smoke offset in certain directions.
 * Fix projectiles flying through animating objects.
@@ -133,7 +133,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix camera snap when disengaging the look-around mode.
 * Fix TR4 mapper not being visible.
 
-## Features/Amendments
+### Features/Amendments
 * Improve head-on wall collision.
 * Overhaul pushables:
  - Separate climbable and non-climbable pushable object slots.
@@ -157,7 +157,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Add basic mouse input handling. Allows for binding of mouse inputs in control settings.
 * Add settings for Mouse Sensitivity and Mouse Smoothing (not used in-game yet).
 
-## Lua API changes
+### Lua API changes
 * Split and organize functions in `Misc` namespace to appropriate new namespaces.
 * Make Vec2 and Vec3 objects float-based instead of integer-based.
 * Add DisplaySprite object.
@@ -183,10 +183,10 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Add DisplayString::SetScale() function to resize text.
 * Add DisplayString::GetScale() function to get text scale.
 
-### Version 1.1.0 - 2023-07-29
+## Version 1.1.0 - 2023-07-29
 ==============
 
-## Bug Fixes
+### Bug Fixes
 * Fix enemies shooting Lara through static meshes and moveables.
 * Fix skeletons and mummies not being affected by explosive weapons.
 * Fix crash on loading if static meshes with IDs above maximum are present.
@@ -217,7 +217,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix incorrect culling for scaled static meshes.
 * Fix normal mapping.
 
-## Features/Amendments
+### Features/Amendments
 * Add ability to save screenshot in the "Screenshots" subfolder by pressing the "Print screen" key.
 * Implement separate audio track channel for playing voiceovers with subtitles in .srt format.
 * Don't stop ambience when Lara dies.
@@ -235,16 +235,16 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Add TR1 skateboard kid.
 * Add TR1 Kold.
 
-## Lua API changes
+### Lua API changes
 * Add soundtrack functions:
   - Misc::GetAudioTrackLoudness() for getting current loudness of a given track type.
   - Misc::IsAudioTrackPlaying() for checking if a given track type is playing.
   - Misc::GetCurrentSubtitle() for getting current subtitle string for the voice track.
 
-### Version 1.0.9 - 2023-06-03
+## Version 1.0.9 - 2023-06-03
 =============
 
-## Bug fixes
+### Bug fixes
 * Fix cold bar triggered in non-water rooms.
 * Fix spiky wall speed value and change it via OCB number or Lua (Moveable::SetItemFlags[0]).
 * Fix bats emitter crashing the game if little beetle object does not exist in wad.
@@ -266,7 +266,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix rendering for static meshes with custom blending modes and alpha transparency.
 * Fix inconsistent multiline string spacing on different display modes.
 
-## Features/Amendments
+### Features/Amendments
 * Remove search object 4 hardcoded meshswap activated with a flipmap.
 * Add TR1 cowboy.
 * Add TR3 wall mounted blade.
@@ -292,7 +292,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Add "Reset to defaults" entry to controls menu and automatically bind XBOX gamepad profile if connected.
 * Add 64-bit executable and place both 32-bit and 64-bit versions into /Bin subdirectory.
 
-## Lua API changes
+### Lua API changes
 * Add Vec2 class.
 * Add function String::SetTranslated().
 * Add function Misc::IsStringDisplaying().
@@ -302,10 +302,10 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 	- PRESAVE, POSTSAVE
 	- PRELOAD, POSTLOAD
 
-### Version 1.0.8 - 2023-04-10
+## Version 1.0.8 - 2023-04-10
 =============
 
-## Bug fixes
+### Bug fixes
 * Fix bubbles phasing through ceilings.
 * Fix object camera not clearing at level end.
 * Fix double breath sound effect when coming up for air.
@@ -325,7 +325,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 	- Please note you must use the patched version found here: https://github.com/TombEngine/Resources/blob/main/Wad2%20Objects/tr5_Imp.wad2
 * Fix and improve wraith tails.
 
-## Features/Amedments
+### Features/Amedments
 * Add dedicated WRAITH_TRAP object with enhanced effects.
 	- OCB 0: Effect disabled.
 	- OCB 1: Effect enabled.
@@ -346,14 +346,14 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Restored inventory compass.
 * Allow dynamic segment count for hair object.
 
-## Lua API changes
+### Lua API changes
 * Add function Misc::IsSoundPlaying() 
 * Add function DisplayString::SetFlags()
 
-### Version 1.0.7 - 2023-02-26
+## Version 1.0.7 - 2023-02-26
 =============
 
-## Bug fixes
+### Bug fixes
 * Fix spark particles not being cleared on level reload.
 * Fix visible but inactive enemies (e.g. Shiva or Xian guardians) taking damage.
 * Fix blockable LOT type enemies (e.g. T-Rex and Shiva) not being able to step up 1 click or drop 2 clicks.
@@ -375,7 +375,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix TR3 big gun spawning rocket with 0 life which caused an immediate explosion.
 * Fix TR3 Tony and add boss effect for him.
 
-## Features/Amendments
+### Features/Amendments
 * Add TR3 civvy.
 * Add TR3 electric cleaner.
 * Add TR3 Sophia Leigh with following OCBs:	
@@ -393,15 +393,15 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Prevent Lara from drawing weapons during parallel bar swinging.
 * Further renderer performance optimizations and bugfixes.
 
-## Lua API changes
+### Lua API changes
 * Fix Camera:SetPosition not updating camera position when it is played simultaneously.
 * Add Moveable:GetAirborne and Moveable:SetAirborne.
 * Add Moveable:GetLocationAI and Moveable:SetLocationAI.
 
-### Version 1.0.6 - 2023-01-29
+## Version 1.0.6 - 2023-01-29
 =============
 
-## Bug FIxes
+### Bug FIxes
 * Fix major pathfinding bug which could have caused lots of issues with enemy behaviour.
 * Fix potential random crashes due to incorrect rendering behaviour.
 * Fix savegame crash for disabled enemies with partially set activation mask.
@@ -428,7 +428,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix grenade and rocket launcher lighting.
 * Fix ceiling trapdoor and floor trapdoor that Lara couldn't open manually.
 
-## Features/Amendments
+### Features/Amendments
 * Make enemies drop pickups at first available bounding box corner point, not centerpoint.
 * Restore original volumetric explosion effects.
 * Add TR3 lizard and Puna.
@@ -440,7 +440,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Lua Moveable functions Enable and Disable now correctly trigger and antitrigger the moveable.
 * Improve level loading speed a lot.
 
-## Lua API changes
+### Lua API changes
 * Moveable:SetVisible has been added. MakeInvisible is now an alias for SetVisible(false).
 * Moveable:MeshIsVisible is now GetMeshVisible.
 * Moveable:SetMeshVisible has been added to replace ShowMesh/HideMesh.
@@ -452,10 +452,10 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Add new function Misc::GetCameraType()
 * Add new functions Moveable:GetAirborne() and Moveable:SetAirborne(bool input)
 
-### Version 1.0.5 - 2022-12-30
+## Version 1.0.5 - 2022-12-30
 =============
 
-## Bug fixes
+### Bug fixes
 * Fix combined items not existing in inventory upon game reload.
 * Fix classic rollingball not behaving properly in rooms beyond the distance of 32 blocks.
 * Fix rollingball not killing Lara under certain movement angles.
@@ -481,7 +481,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix bone rotations of some entities.
 * Fix Lara's animation for cog switch release.
 
-## Features/Amendments
+### Features/Amendments
 * Added new OCB to cog switch object: 
 	- Use OCB 0 to have the traditional behaviour.
 	- Use any other OCB to can use the Cog Switch without need of any door linked.
@@ -490,13 +490,13 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Draw real mesh for darts.
 * Added warning log when one slot requires another slot which is missing.
 
-## Lua API changes
+### Lua API changes
 * Add new Room class and several methods for it.
 
-### Version 1.0.4 - 2022-12-16
+## Version 1.0.4 - 2022-12-16
 =============
 
-## Features/Amendments
+### Features/Amendments
 * Add generic assignable effects for moveables - fire, sparks, smoke and laser / electric ignite.
 * Add ability to burn enemies with FLAME_EMITTER_1 and death blocks.
 * Add wireframe mode and other visual debug information (switch by F10/F11 debug page scroll hotkeys).
@@ -519,7 +519,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
     - Fix grenade shooting.
     - Fix AI_MODIFY and AI_GUARD behaviour.
  
-## Bug fixes
+### Bug fixes
 * Fix choppy camera movement in several cases.
 * Fix Lara's vertical position when shimmying around steep slope corners.
 * Fix legacy pickup triggers not working in certain cases.
@@ -548,7 +548,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix current soundtrack fading into silence if incoming one doesn't exist.
 * Fix crash if there is an attempt to display a string with missing characters.
 
-## Lua API changes
+### Lua API changes
 * Add new Volume class and several methods for it.
 * Add new Moveable functions: GetEffect, SetEffect and SetCustomEffect (for colored fire).
 * Add new Lara functions: GetTarget, GetVehicle and TorchIsLit.
@@ -566,10 +566,10 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix Rotation class using integers under the hood which prevented using fractional rotation values.
 * Fix distance tests failing on a very high distances.
 
-### Version 1.0.3 - 2022-11-18
+## Version 1.0.3 - 2022-11-18
 =============
 
-## Features/Amendments
+### Features/Amendments
 * Add ledge jumps (Lara object must be updated with new animations to make it work).
 * Allow any object slot to be used as a meshswap.
 * Add OCB 1 for rollingball to make it silent.
@@ -583,7 +583,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Adjust sprint jump timing.
 * Backport DAMOCLES_SWORD from TR1.
 
-## Bug fixes
+### Bug fixes
 * Fix going into inventory and load/save dialogs during fade-ins and fade-outs.
 * Fix savegames not preserving save number and game timer.
 * Fix dodgy weapon lock angle constraints.
@@ -615,7 +615,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix SAS_DRAG_BLOKE object interaction.
 * Fix KILLER_STATUE not triggering.
 
-## Lua API changes
+### Lua API changes
 * A new class has been added, LaraObject, for Lara-specific functions. The built-in "Lara" variable now uses this class.
 * Add functions for Lara object:
   - GetPoison / SetPoison
@@ -635,10 +635,10 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Add SetTotalSecretCount option to gameflow script to set overall amount of secrets.
 * Raised the maximum value on Moveable.SetHP to 32767 (its internal numeric maximum).
 
-### Version 1.0.2 - 2022-09-16
+## Version 1.0.2 - 2022-09-16
 =============
 
-## Features/Amendments
+### Features/Amendments
 * Fix removing Pistols with TakeItem and SetItemCount.
 * Allow saving and loading of Vec3s in LevelVars and GameVars.
 * Support volume triggers made with node editor.
@@ -663,7 +663,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
   - 6 for hole switch
   - any other OCBs play corresponding switch on anim or OCB+1 switch off anim.
 
-## Bug fixes
+### Bug fixes
 * Fix incorrect pole mounting.
 * Fix zeroed forward velocity upon landing.
 * Fix incorrect behaviour when falling on statics from the top after monkeyswing.
@@ -677,7 +677,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix stargate blades needlessly pushing the player around while hardly doing any damage.
 * Fix weapon hotkeys and add missing crossbow hotkey.
 
-## Lua API changes
+### Lua API changes
 * Util.ShortenTENCalls no longer needs to be called; it is now automatic for both level scripts and Gameflow.lua.
 * Flow.InvID has been removed; any function taking a pickup (e.g. GiveItem) now takes an Objects.ObjID instead.
 * Add Enable, Disable, GetActive, Get/SetSolid functions for static meshes.
@@ -691,15 +691,15 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Rework GiveItem, TakeItem, and SetItemCount (e.g. SetItemCount with a value of -1 can give infinite ammo/consumables).
 
 
-### Version 1.0.1 - 2022-08-16
+## Version 1.0.1 - 2022-08-16
 =============
 
-## Features
+### Features
 * Added antialiasing support.
 * Added static mesh scaling support.
 * Added free rotation for teeth spikes instead of using OCB codes.
 
-## Bug fixes
+### Bug fixes
 * Fix some issues with shimmying between diagonal ledges and walls.
 * Fix rope transparency.
 * Fix objects disappearing under certain angles at the edges of the screen.
@@ -718,7 +718,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix falling block breaking too early if placed on a vertical portal.
 * Fix crashes when loading image files are missing.
 
-## Amendments
+### Amendments
 * Disable trigger check for puzzle holes.
 * Clear locusts and other swarm enemies on level reload.
 * Enhance cobra AI and fix targeting.
@@ -734,7 +734,7 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * EventSequence.lua has been added and documented.
 
 
-### Version 1.0 - 2022-08-06
+## Version 1.0 - 2022-08-06
 ===========
 
 First beta release.
