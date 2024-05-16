@@ -5,7 +5,6 @@ Here you will find the full changelog of TEN's releases from Version 1.0 and up
 The dates are in European standard format where date is presented as **YYYY-MM-DD**
 
 ## Version 1.4 - 2024-04-21
-===========
 
 ### Bug Fixes
 * Fixed drawing of display sprites in title level.
@@ -49,7 +48,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fixed Moveable:SetOnCollidedWithObject() callback.
 
 ## Version 1.3 - 2024-01-06
-===========
 
 ### Bug Fixes
 * Fixed crash if title logo is removed from Textures folder.
@@ -106,7 +104,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Added View.SetPostProcessMode(), View.SetPostProcessStrength() and View.SetPostProcessTint() functions.
 
 ## Version 1.2 - 2023-11-11
-===========
 
 ### Bug Fixes
 * Fix burning torch not working properly if there are more than 256 objects in a level.
@@ -184,7 +181,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Add DisplayString::GetScale() function to get text scale.
 
 ## Version 1.1.0 - 2023-07-29
-==============
 
 ### Bug Fixes
 * Fix enemies shooting Lara through static meshes and moveables.
@@ -242,7 +238,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
   - Misc::GetCurrentSubtitle() for getting current subtitle string for the voice track.
 
 ## Version 1.0.9 - 2023-06-03
-=============
 
 ### Bug fixes
 * Fix cold bar triggered in non-water rooms.
@@ -303,7 +298,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 	- PRELOAD, POSTLOAD
 
 ## Version 1.0.8 - 2023-04-10
-=============
 
 ### Bug fixes
 * Fix bubbles phasing through ceilings.
@@ -351,7 +345,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Add function DisplayString::SetFlags()
 
 ## Version 1.0.7 - 2023-02-26
-=============
 
 ### Bug fixes
 * Fix spark particles not being cleared on level reload.
@@ -399,7 +392,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Add Moveable:GetLocationAI and Moveable:SetLocationAI.
 
 ## Version 1.0.6 - 2023-01-29
-=============
 
 ### Bug FIxes
 * Fix major pathfinding bug which could have caused lots of issues with enemy behaviour.
@@ -453,7 +445,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Add new functions Moveable:GetAirborne() and Moveable:SetAirborne(bool input)
 
 ## Version 1.0.5 - 2022-12-30
-=============
 
 ### Bug fixes
 * Fix combined items not existing in inventory upon game reload.
@@ -494,7 +485,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Add new Room class and several methods for it.
 
 ## Version 1.0.4 - 2022-12-16
-=============
 
 ### Features/Amendments
 * Add generic assignable effects for moveables - fire, sparks, smoke and laser / electric ignite.
@@ -567,7 +557,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Fix distance tests failing on a very high distances.
 
 ## Version 1.0.3 - 2022-11-18
-=============
 
 ### Features/Amendments
 * Add ledge jumps (Lara object must be updated with new animations to make it work).
@@ -636,7 +625,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 * Raised the maximum value on Moveable.SetHP to 32767 (its internal numeric maximum).
 
 ## Version 1.0.2 - 2022-09-16
-=============
 
 ### Features/Amendments
 * Fix removing Pistols with TakeItem and SetItemCount.
@@ -692,7 +680,6 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 
 
 ## Version 1.0.1 - 2022-08-16
-=============
 
 ### Features
 * Added antialiasing support.
@@ -735,6 +722,5 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 
 
 ## Version 1.0 - 2022-08-06
-===========
 
 First beta release.
