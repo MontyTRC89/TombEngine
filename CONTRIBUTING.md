@@ -4,7 +4,7 @@ What you will read under has been agreed by the current active team in order to 
 
 **1. Developer**
 
-- If you wish to contribute to the TEN project, you must read and follow the coding convention used by the team, available here : [#294 ](https://github.com/MontyTRC89/TombEngine/issues/294)
+- If you wish to contribute to the TEN project, you must read and follow the coding convention used by the team, available here: https://github.com/MontyTRC89/TombEngine/blob/master/CONTRIBUTING.md#coding-conventions
 - Do not work directly on master nor any branch which may be developed by several members. Create your branch, and name it with a clear description of the feature/set of features you are working on. You may regularly merge/rebase master or the active development branch with yours.
 - Be respectful to other developers. Disagreements may occur on code style, changes, and should be discussed directly with the person who pushed or merged the commit/branch. If you are unsure of what some parts of the code means, or why a decision was made, contact the team as a whole so they can be explained to you.
 - Do not make a pull request until your branch and features are extensively tested by the QA team. You are invited to test your feature set as much as you can too.
