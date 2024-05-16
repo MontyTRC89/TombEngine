@@ -580,7 +580,7 @@ GameStatus DoGameLoop(int levelIndex)
 	int controlCalls = 0;
 	int drawCalls = 0;
 	
-	bool legacy30FPSdoneDraw = false;
+	bool legacy30FpsDoneDraw = false;
 
 	while (DoTheGame)
 	{
@@ -617,7 +617,7 @@ GameStatus DoGameLoop(int levelIndex)
 			controlLag -= controlFrameTime;
 			controlCalls++;
 
-			legacy30FPSdoneDraw = false;
+			legacy30FpsDoneDraw = false;
 		}
 
 		if (status != GameStatus::Normal)
@@ -625,11 +625,11 @@ GameStatus DoGameLoop(int levelIndex)
 
 		if (!g_Configuration.EnableVariableFramerate)
 		{
-			if (!legacy30FPSdoneDraw)
+			if (!legacy30FpsDoneDraw)
 			{
 				DrawPhase(!levelIndex, 0.0f);
 				drawCalls++;
-				legacy30FPSdoneDraw = true;
+				legacy30FpsDoneDraw = true;
 			}
 		}
 		else
