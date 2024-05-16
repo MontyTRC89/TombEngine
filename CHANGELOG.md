@@ -4,6 +4,21 @@ Here you will find the full changelog of TEN's releases from Version 1.0 and up
 
 The dates are in European standard format where date is presented as **YYYY-MM-DD**
 
+## Version 1.5 - xxxx-xx-xx
+
+### Bug fixes
+* Fixed original issue with classic switch off trigger wrongly activating some trigger actions.
+* Fixed incorrect diving animation when swandiving from a high place.
+* Fixed camera rotating with Lara's hips when climbing out of water.
+* Fixed AI for skidoo driver and worker with shotgun TR2 enemies.
+* Fixed Ember emitter crashing when ocb is between -1 and -10 
+* Fixed Electric cleaner and Squishy block not detecting collision with certain block heights.
+
+### Features/Amendments
+
+### Lua API changes
+* Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
+
 ## Version 1.4 - 2024-04-21
 
 ### Bug Fixes
