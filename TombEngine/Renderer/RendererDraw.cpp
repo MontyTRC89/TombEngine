@@ -2878,7 +2878,10 @@ namespace TEN::Renderer
 
 			while (drawnStars < starCount)
 			{
-				int starsToDraw = (starCount - drawnStars) > 100 ? 100 : (starCount - drawnStars);
+				int starsToDraw =
+					(starCount - drawnStars) > INSTANCED_SPRITES_BUCKET_SIZE ? 
+					INSTANCED_SPRITES_BUCKET_SIZE : 
+					(starCount - drawnStars);
 				int i = 0;
 
 				for (int i = 0; i < starsToDraw; i++)
@@ -2930,51 +2933,61 @@ namespace TEN::Renderer
 				rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_3];
 				BindTexture(TextureRegister::ColorMap, rDrawSprite.Sprite->Texture, SamplerStateRegister::LinearClamp);
 
-				int meteorCount = 0;
+				int drawnMeteors = 0;
+				int meteorsCount = (int)Weather.GetMeteors().size();
 
-				for (int i = 0; i < Weather.GetMeteors().size(); i++)
+				while (drawnMeteors < meteorsCount)
 				{
-					auto meteor = Weather.GetMeteors()[i];
+					int meteorsToDraw =
+						(meteorsCount - drawnMeteors) > INSTANCED_SPRITES_BUCKET_SIZE ?
+						INSTANCED_SPRITES_BUCKET_SIZE :
+						(meteorsCount - drawnMeteors);
+					int i = 0;
 
-					if (meteor.Active == false)
-						continue;
+					for (int i = 0; i < meteorsToDraw; i++)
+					{
+						auto meteor = Weather.GetMeteors()[drawnMeteors + i];
 
-					rDrawSprite.Type = SpriteType::CustomBillboard;
-					rDrawSprite.pos =
-						renderView.Camera.WorldPosition +
-						Vector3::Lerp(meteor.PrevPosition, meteor.Position, _interpolationFactor);
-					rDrawSprite.Rotation = 0;
-					rDrawSprite.Scale = 1;
-					rDrawSprite.Width = 2;
-					rDrawSprite.Height = 192;
-					rDrawSprite.ConstrainAxis = meteor.Direction;
+						if (meteor.Active == false)
+							continue;
 
-					_stInstancedSpriteBuffer.Sprites[meteorCount].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
-					_stInstancedSpriteBuffer.Sprites[meteorCount].Color = Vector4(
-						meteor.Color.x,
-						meteor.Color.y,
-						meteor.Color.z,
-						Lerp(meteor.PrevFade, meteor.Fade, _interpolationFactor));
-					_stInstancedSpriteBuffer.Sprites[meteorCount].IsBillboard = 1;
-					_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = 0;
+						rDrawSprite.Type = SpriteType::CustomBillboard;
+						rDrawSprite.pos =
+							renderView.Camera.WorldPosition +
+							Vector3::Lerp(meteor.PrevPosition, meteor.Position, _interpolationFactor);
+						rDrawSprite.Rotation = 0;
+						rDrawSprite.Scale = 1;
+						rDrawSprite.Width = 2;
+						rDrawSprite.Height = 192;
+						rDrawSprite.ConstrainAxis = meteor.Direction;
 
-					// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
-					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[0].x = rDrawSprite.Sprite->UV[0].x;
-					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[0].y = rDrawSprite.Sprite->UV[1].x;
-					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[0].z = rDrawSprite.Sprite->UV[2].x;
-					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[0].w = rDrawSprite.Sprite->UV[3].x;
-					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[1].x = rDrawSprite.Sprite->UV[0].y;
-					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[1].y = rDrawSprite.Sprite->UV[1].y;
-					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[1].z = rDrawSprite.Sprite->UV[2].y;
-					_stInstancedSpriteBuffer.Sprites[meteorCount].UV[1].w = rDrawSprite.Sprite->UV[3].y;
+						_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+						_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
+							meteor.Color.x,
+							meteor.Color.y,
+							meteor.Color.z,
+							Lerp(meteor.PrevFade, meteor.Fade, _interpolationFactor));
+						_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
+						_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = 0;
 
-					meteorCount++;
+						// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
+						_stInstancedSpriteBuffer.Sprites[i].UV[0].x = rDrawSprite.Sprite->UV[0].x;
+						_stInstancedSpriteBuffer.Sprites[i].UV[0].y = rDrawSprite.Sprite->UV[1].x;
+						_stInstancedSpriteBuffer.Sprites[i].UV[0].z = rDrawSprite.Sprite->UV[2].x;
+						_stInstancedSpriteBuffer.Sprites[i].UV[0].w = rDrawSprite.Sprite->UV[3].x;
+						_stInstancedSpriteBuffer.Sprites[i].UV[1].x = rDrawSprite.Sprite->UV[0].y;
+						_stInstancedSpriteBuffer.Sprites[i].UV[1].y = rDrawSprite.Sprite->UV[1].y;
+						_stInstancedSpriteBuffer.Sprites[i].UV[1].z = rDrawSprite.Sprite->UV[2].y;
+						_stInstancedSpriteBuffer.Sprites[i].UV[1].w = rDrawSprite.Sprite->UV[3].y;
+					}
+
+					_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
+
+					// Draw sprites with instancing.
+					DrawInstancedTriangles(4, meteorsToDraw, 0);
+
+					drawnMeteors += meteorsToDraw;
 				}
-
-				_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
-
-				// Draw sprites with instancing.
-				DrawInstancedTriangles(4, meteorCount, 0);
 			}
 
 			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

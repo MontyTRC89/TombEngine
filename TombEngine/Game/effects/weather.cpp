@@ -645,10 +645,12 @@ namespace TEN::Effects::Environment
 
 		int density = level.GetStarfieldMeteorSpawnDensity();
 		if (density > 0)
-		{	
-			for (int i = 0; i < level.GetStarfieldMeteorCount(); i++)
+		{
+			int newParticlesCount = 0;
+
+			while (Meteors.size() < level.GetStarfieldMeteorCount())
 			{
-				if (i > density)
+				if (newParticlesCount > density)
 					break;
 
 				auto horizontalDir = Random::GenerateDirection2D();
@@ -658,7 +660,7 @@ namespace TEN::Effects::Environment
 				part.Active = true;
 				part.Life = METEOR_PARTICLE_LIFE_MAX;
 				part.StartPosition =
-				part.Position = Random::GenerateDirectionInCone(-Vector3::UnitY, 40.0f) * BLOCK(1.5f);
+					part.Position = Random::GenerateDirectionInCone(-Vector3::UnitY, 40.0f) * BLOCK(1.5f);
 				part.Fade = 0.0f;
 				part.Color = Vector3(
 					Random::GenerateFloat(0.6f, 1.0f),
@@ -670,6 +672,8 @@ namespace TEN::Effects::Environment
 					part.Direction.y = -part.Direction.y;
 
 				Meteors.push_back(part);
+
+				newParticlesCount++;
 			}
 		}
 	}
