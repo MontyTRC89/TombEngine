@@ -4,6 +4,8 @@ Here you will find the full changelog of TEN's releases from Version 1.0 and up
 
 The dates are in European standard format where date is presented as **YYYY-MM-DD**
 
+TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
+
 ## Version 1.5 - xxxx-xx-xx
 
 ### Bug fixes
