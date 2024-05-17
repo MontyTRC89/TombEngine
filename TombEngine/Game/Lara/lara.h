@@ -93,9 +93,9 @@ constexpr auto WADE_WATER_DEPTH		= STEPUP_HEIGHT;
 constexpr auto SWIM_WATER_DEPTH		= CLICK(2.75f);
 constexpr auto SLOPE_DIFFERENCE		= 60;
 
-extern LaraInfo Lara;
-extern LaraInfo PrevLara;
-extern ItemInfo* LaraItem;
+extern LaraInfo		 Lara;
+extern LaraInfo		 PrevLara;
+extern ItemInfo*	 LaraItem;
 extern CollisionInfo LaraCollision;
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll);

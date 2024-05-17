@@ -3547,8 +3547,8 @@ namespace TEN::Renderer
 
 	void Renderer::DrawItemSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view)
 	{
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
@@ -3561,25 +3561,24 @@ namespace TEN::Renderer
 		_context->VSSetShader(_vsItems.Get(), nullptr, 0);
 		_context->PSSetShader(_psItems.Get(), nullptr, 0);
 
-		ItemInfo* nativeItem = &g_Level.Items[objectInfo->Item->ItemNumber];
-		RendererRoom* room = &_rooms[objectInfo->Item->RoomNumber];
-		RendererObject& moveableObj = *_moveableObjects[objectInfo->Item->ObjectNumber];
-
-		// Bind item main properties
+		// Bind main item properties.
 		_stItem.World = objectInfo->Item->InterpolatedWorld;
 		_stItem.Color = objectInfo->Item->Color;
 		_stItem.AmbientLight = objectInfo->Item->AmbientLight;
 		memcpy(_stItem.BonesMatrices, objectInfo->Item->InterpolatedAnimationTransforms, sizeof(Matrix) * MAX_BONES);
 
+		const auto& moveableObj = *_moveableObjects[objectInfo->Item->ObjectNumber];
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
 
 		BindMoveableLights(objectInfo->Item->LightsToDraw, objectInfo->Item->RoomNumber, objectInfo->Item->PrevRoomNumber, objectInfo->Item->LightFade);
 		_cbItem.UpdateData(_stItem, _context.Get());
 
-		BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[objectInfo->Bucket->Texture]),
+		BindTexture(
+			TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[objectInfo->Bucket->Texture]),
 			SamplerStateRegister::AnisotropicClamp);
-		BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[objectInfo->Bucket->Texture]),
+		BindTexture(
+			TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[objectInfo->Bucket->Texture]),
 			SamplerStateRegister::AnisotropicClamp);
 
 		_sortedPolygonsIndexBuffer.Update(_context.Get(), _sortedPolygonsIndices, 0, (int)_sortedPolygonsIndices.size());
