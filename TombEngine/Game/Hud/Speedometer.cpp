@@ -48,7 +48,7 @@ namespace TEN::Hud
 	void SpeedometerController::Draw() const
 	{
 		constexpr auto POS						 = Vector2(DISPLAY_SPACE_RES.x - (DISPLAY_SPACE_RES.x / 6), DISPLAY_SPACE_RES.y - (DISPLAY_SPACE_RES.y / 10));
-		constexpr auto ORIENT_OFFSET			 = ANGLE(90.0f);
+		constexpr auto POINTER_ANGLE_OFFSET		 = ANGLE(90.0f);
 		constexpr auto SCALE					 = Vector2(0.35f);
 		constexpr auto DIAL_ELEMENT_SPRITE_ID	 = 0;
 		constexpr auto POINTER_ELEMENT_SPRITE_ID = 1;
@@ -60,9 +60,8 @@ namespace TEN::Hud
 		if (_life <= 0.0f)
 			return;
 
-		// TODO: Interpolation.
-
-		auto color = Color(1.0f, 1.0f, 1.0f, _opacity);
+		short pointerAngle = (short)Lerp(_prevPointerAngle, _pointerAngle, g_Renderer.GetInterpolationFactor());
+		auto color = Color(1.0f, 1.0f, 1.0f, Lerp(_prevOpacity, _opacity, g_Renderer.GetInterpolationFactor()));
 
 		// Draw dial.
 		AddDisplaySprite(
@@ -74,7 +73,7 @@ namespace TEN::Hud
 		// Draw pointer.
 		AddDisplaySprite(
 			ID_SPEEDOMETER, POINTER_ELEMENT_SPRITE_ID,
-			POS, _pointerAngle + ORIENT_OFFSET, SCALE, color,
+			POS, pointerAngle + POINTER_ANGLE_OFFSET, SCALE, color,
 			POINTER_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend,
 			DisplaySpritePhase::Draw);
 	}
