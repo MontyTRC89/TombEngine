@@ -486,7 +486,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				{
 					bool isCeilSurfSplit = sector.IsSurfaceSplit(false);
 					bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-					bool useCeilTri0 = (!isCeilSurfSplit || isCeilSurfSplitAngle0);
+					bool useCeilTri0 = !(!isCeilSurfSplit || isCeilSurfSplitAngle0);
 
 					int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, true);
 					int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, true);
@@ -514,7 +514,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				{
 					bool isPrevCeilSurfSplit = prevSectorZ->IsSurfaceSplit(false);
 					bool isPrevCeilSurfSplitAngle0 = (prevSectorZ->CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-					bool usePrevCeilTri1 = (!isPrevCeilSurfSplit || isPrevCeilSurfSplitAngle0);
+					bool usePrevCeilTri1 = !(!isPrevCeilSurfSplit || isPrevCeilSurfSplitAngle0);
 
 					int floorHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, true);
 					int floorHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevTri1 ? 1 : 0, true);
