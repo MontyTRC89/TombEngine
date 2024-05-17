@@ -920,7 +920,8 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData&
 			}
 		}
 		// Push item.
-		else if (Vector2(deltaPose.Position.x, deltaPose.Position.z).Length() <= coll.Setup.Radius &&
+		else if (TestBoundsCollide(&bridgeItem, &item, coll.Setup.Radius) &&
+			Vector2(deltaPose.Position.x, deltaPose.Position.z).Length() <= coll.Setup.Radius &&
 			(deltaPos != Vector3i::Zero || deltaOrient != EulerAngles::Identity))
 		{
 			ItemPushItem(&bridgeItem, &item);
