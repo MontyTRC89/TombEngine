@@ -15,6 +15,12 @@ struct RatData
 	byte Flags;
 	
 	Matrix Transform;
+	Matrix OldTransform;
+
+	void StoreInterpolationData()
+	{
+		OldTransform = Transform;
+	}
 };
 
 extern int NextRat;

@@ -646,7 +646,7 @@ namespace TEN::Renderer
 						
 					for (auto& poly : bucket.Polygons)
 					{
-						auto worldMatrix = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
+						auto worldMatrix = Matrix::Lerp(fish.OldTransform, fish.Transform, _interpolationFactor);
 						auto center = Vector3::Transform(poly.Centre, worldMatrix);
 						float dist = Vector3::Distance(center, view.Camera.WorldPosition);
 
@@ -707,7 +707,7 @@ namespace TEN::Renderer
 
 					const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
 
-					_stStatic.World = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
+					_stStatic.World = Matrix::Lerp(fish.OldTransform, fish.Transform, _interpolationFactor);
 					_stStatic.Color = Vector4::One;
 					_stStatic.AmbientLight = _rooms[fish.RoomNumber].AmbientLight;
 
@@ -763,8 +763,10 @@ namespace TEN::Renderer
 						{
 							for (int p = 0; p < bucket.Polygons.size(); p++)
 							{
+								Matrix transform = Matrix::Lerp(bat->OldTransform, bat->Transform, _interpolationFactor);	
+
 								auto centre = Vector3::Transform(
-									bucket.Polygons[p].Centre, bat->Transform);
+									bucket.Polygons[p].Centre, transform);
 								int distance = (centre - view.Camera.WorldPosition).Length();
 
 								RendererSortableObject object;
@@ -774,7 +776,7 @@ namespace TEN::Renderer
 								object.Bucket = &bucket;
 								object.Mesh = mesh;
 								object.Polygon = &bucket.Polygons[p];
-								object.World = bat->Transform;
+								object.World = transform;
 								object.Room = &_rooms[bat->RoomNumber];
 
 								view.TransparentObjectsToDraw.push_back(object);
@@ -794,9 +796,11 @@ namespace TEN::Renderer
 
 				if (bat->On)
 				{
+					Matrix transform = Matrix::Lerp(bat->OldTransform, bat->Transform, _interpolationFactor);
+
 					RendererRoom& room = _rooms[bat->RoomNumber];
 
-					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].World = bat->Transform;
+					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].World = transform;
 					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Ambient = room.AmbientLight;
 					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Color = Vector4::One;
 					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].LightMode = (int)mesh->LightMode;
@@ -879,6 +883,8 @@ namespace TEN::Renderer
 
 				if (beetle->On)
 				{
+					Matrix transform = Matrix::Lerp(beetle->OldTransform, beetle->Transform, _interpolationFactor);
+
 					for (int j = 0; j < mesh->Buckets.size(); j++)
 					{
 						auto& bucket = mesh->Buckets[j];
@@ -888,7 +894,7 @@ namespace TEN::Renderer
 							for (int p = 0; p < bucket.Polygons.size(); p++)
 							{
 								auto centre = Vector3::Transform(
-									bucket.Polygons[p].Centre, beetle->Transform);
+									bucket.Polygons[p].Centre, transform);
 								int distance = (centre - view.Camera.WorldPosition).Length();
 
 								RendererSortableObject object;
@@ -898,7 +904,7 @@ namespace TEN::Renderer
 								object.Bucket = &bucket;
 								object.Mesh = mesh;
 								object.Polygon = &bucket.Polygons[p];
-								object.World = beetle->Transform;
+								object.World = transform;
 								object.Room = &_rooms[beetle->RoomNumber];
 
 								view.TransparentObjectsToDraw.push_back(object);
@@ -920,9 +926,11 @@ namespace TEN::Renderer
 
 				if (beetle.On)
 				{
+					Matrix transform = Matrix::Lerp(beetle.OldTransform, beetle.Transform, _interpolationFactor);
+
 					auto& room = _rooms[beetle.RoomNumber];
 
-					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = beetle.Transform;
+					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = transform;
 					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Ambient = room.AmbientLight;
 					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Color = Vector4::One;
 					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].LightMode = (int)mesh->LightMode;
@@ -1021,8 +1029,10 @@ namespace TEN::Renderer
 						{
 							for (int p = 0; p < bucket.Polygons.size(); p++)
 							{
+								Matrix transform = Matrix::Lerp(locust->OldTransform, locust->Transform, _interpolationFactor);	
+
 								auto centre = Vector3::Transform(
-									bucket.Polygons[p].Centre, locust->Transform);
+									bucket.Polygons[p].Centre, transform);
 								int distance = (centre - view.Camera.WorldPosition).Length();
 
 								RendererSortableObject object;
@@ -1032,7 +1042,7 @@ namespace TEN::Renderer
 								object.Bucket = &bucket;
 								object.Mesh = mesh;
 								object.Polygon = &bucket.Polygons[p];
-								object.World = locust->Transform;
+								object.World = transform;
 								object.Room = &_rooms[locust->roomNumber];
 
 								view.TransparentObjectsToDraw.push_back(object);
@@ -1088,7 +1098,7 @@ namespace TEN::Renderer
 					{
 						RendererMesh* mesh = GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
 
-						_stStatic.World = locust->Transform;
+						_stStatic.World = Matrix::Lerp(locust->OldTransform, locust->Transform, _interpolationFactor);
 						_stStatic.Color = Vector4::One;
 						_stStatic.AmbientLight = _rooms[locust->roomNumber].AmbientLight;
 						_cbStatic.UpdateData(_stStatic, _context.Get());

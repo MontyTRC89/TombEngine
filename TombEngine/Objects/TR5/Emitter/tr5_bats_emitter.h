@@ -18,6 +18,12 @@ struct BatData
 	byte Flags;
 
 	Matrix Transform;
+	Matrix OldTransform;
+
+	void StoreInterpolationData()
+	{
+		OldTransform = Transform;
+	}
 };
 
 extern int NextBat;

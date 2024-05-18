@@ -15,6 +15,12 @@ struct LOCUST_INFO
     BYTE counter;
 
     Matrix Transform;
+    Matrix OldTransform;
+
+    void StoreInterpolationData()
+    {
+        OldTransform = Transform;
+    }
 };
 
 namespace TEN::Entities::TR4 

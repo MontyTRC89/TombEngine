@@ -14,6 +14,12 @@ namespace TEN::Entities::TR4
 		byte Flags;
 
 		Matrix Transform;
+		Matrix OldTransform;
+
+		void StoreInterpolationData()
+		{
+			OldTransform = Transform;
+		}
 	};
 
 	constexpr auto NUM_BEETLES = 256;

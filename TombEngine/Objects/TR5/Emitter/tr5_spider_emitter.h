@@ -13,6 +13,14 @@ struct SpiderData
 	short VerticalVelocity;
 
 	byte Flags;
+
+	Matrix Transform;
+	Matrix OldTransform;
+
+	void StoreInterpolationData()
+	{
+		OldTransform = Transform;
+	}
 };
 
 extern int NextSpider;
