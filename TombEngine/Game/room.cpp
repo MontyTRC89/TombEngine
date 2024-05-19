@@ -397,7 +397,7 @@ namespace TEN::Collision::Room
 		auto corner2 = sector.Position + REL_CORNER_2;
 		auto corner3 = sector.Position + REL_CORNER_3;
 
-		auto tris = std::vector<CollisionTriangle>{};
+		auto collMesh = CollisionMesh();
 
 		// Collect triangles.
 		bool isFloor = true;
@@ -409,37 +409,43 @@ namespace TEN::Collision::Room
 			bool isSurfSplitAngle0 = (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 
 			// 1) Generate surface triangle 0.
-			auto surfTri0 = CollisionTriangle();
+			auto surfTri0Vertices = std::array<Vector3, CollisionTriangle::VERTEX_COUNT>{};
+			auto surfTri0Normal = Vector3::Zero;
 			if (!isSurfSplit || isSurfSplitAngle0)
 			{
 				auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
 				auto vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
 				auto vertex2 = Vector3(corner2.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
-				surfTri0 = CollisionTriangle(vertex0, vertex1, vertex2, GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
+				surfTri0Vertices = { vertex0, vertex1, vertex2 };
+				surfTri0Normal = GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2)* (isFloor ? -1 : 1);
 			}
 			else
 			{
 				auto vertex0 = Vector3(corner1.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
 				auto vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
 				auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y);
-				surfTri0 = CollisionTriangle(vertex0, vertex1, vertex2, GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
+				surfTri0Vertices = { vertex0, vertex1, vertex2 };
+				surfTri0Normal = GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1);
 			}
 		
 			// 2) Generate surface triangle 1.
-			auto surfTri1 = CollisionTriangle();
+			auto surfTri1Vertices = std::array<Vector3, CollisionTriangle::VERTEX_COUNT>{};
+			auto surfTri1Normal = Vector3::Zero;
 			if (!isSurfSplit || isSurfSplitAngle0)
 			{
 				auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
 				auto vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y);
 				auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
-				surfTri1 = CollisionTriangle(vertex0, vertex1, vertex2, GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
+				surfTri1Vertices = { vertex0, vertex1, vertex2 };
+				surfTri1Normal = GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1);
 			}
 			else
 			{
 				auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
 				auto vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y);
 				auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
-				surfTri1 = CollisionTriangle(vertex0, vertex1, vertex2, GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
+				surfTri1Vertices = { vertex0, vertex1, vertex2 };
+				surfTri1Normal = GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1);
 			}
 
 			bool isSurf0Wall = sector.IsWall(0);
@@ -449,9 +455,9 @@ namespace TEN::Collision::Room
 
 			// 3) Collect surface triangles.
 			if (!isSurf0Wall && !isSurfTri0Portal)
-				tris.push_back(surfTri0);
+				collMesh.InsertTriangle(surfTri0Vertices[0], surfTri0Vertices[1], surfTri0Vertices[2], surfTri0Normal);
 			if (!isSurf1Wall && !isSurfTri1Portal)
-				tris.push_back(surfTri1);
+				collMesh.InsertTriangle(surfTri1Vertices[0], surfTri1Vertices[1], surfTri1Vertices[2], surfTri1Normal);
 
 			// 4) Generate and collect diagonal wall triangles.
 			if (sector.IsSurfaceSplit(isFloor) && !(isSurf0Wall && isSurf1Wall)) // Can set wall.
@@ -472,15 +478,9 @@ namespace TEN::Collision::Room
 						auto vertex3 = Vector3(corner2.x, ceilHeight1, corner2.y);
 
 						if (vertex0 != vertex2)
-						{
-							auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL);
-							tris.push_back(wallTri0);
-						}
+							collMesh.InsertTriangle(vertex0, vertex1, vertex2, isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL);
 						if (vertex1 != vertex3)
-						{
-							auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL);
-							tris.push_back(wallTri1);
-						}
+							collMesh.InsertTriangle(vertex1, vertex2, vertex3, isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL);
 					}
 					else
 					{
@@ -495,15 +495,9 @@ namespace TEN::Collision::Room
 						auto vertex3 = Vector3(corner3.x, ceilHeight1, corner3.y);
 
 						if (vertex0 != vertex2)
-						{
-							auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
-							tris.push_back(wallTri0);
-						}
+							collMesh.InsertTriangle(vertex0, vertex1, vertex2, isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
 						if (vertex1 != vertex3)
-						{
-							auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
-							tris.push_back(wallTri1);
-						}
+							collMesh.InsertTriangle(vertex1, vertex2, vertex3, isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
 					}
 				}
 				// Step wall.
@@ -512,43 +506,39 @@ namespace TEN::Collision::Room
 					if (isSurfSplitAngle0)
 					{
 						// TODO: Check when diagonal criss-cross becomes possible.
-						bool isSecondCrissCrossCase = (isFloor ? (surfTri0.GetVertices()[2].y < surfTri1.GetVertices()[1].y) : !(surfTri0.GetVertices()[2].y < surfTri1.GetVertices()[1].y));
-						if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[0])
+						bool isSecondCrissCrossCase = (isFloor ? (surfTri0Vertices[2].y < surfTri1Vertices[1].y) : !(surfTri0Vertices[2].y < surfTri1Vertices[1].y));
+						if (surfTri0Vertices[0] != surfTri1Vertices[0])
 						{
-							const auto& normal0 = ((surfTri0.GetVertices()[0].y > surfTri1.GetVertices()[0].y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * (isFloor ? 1 : -1);
-							auto wallTri0 = isSecondCrissCrossCase ?
-								CollisionTriangle(surfTri0.GetVertices()[0], surfTri0.GetVertices()[2], surfTri1.GetVertices()[1], normal0) :
-								CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], normal0);
-							tris.push_back(wallTri0);
+							const auto& normal0 = ((surfTri0Vertices[0].y > surfTri1Vertices[0].y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * (isFloor ? 1 : -1);
+							isSecondCrissCrossCase ?
+								collMesh.InsertTriangle(surfTri0Vertices[0], surfTri0Vertices[2], surfTri1Vertices[1], normal0) :
+								collMesh.InsertTriangle(surfTri0Vertices[0], surfTri1Vertices[0], surfTri0Vertices[2], normal0);
 						}
-						if (surfTri0.GetVertices()[2] != surfTri1.GetVertices()[1])
+						if (surfTri0Vertices[2] != surfTri1Vertices[1])
 						{
-							const auto& normal1 = ((surfTri0.GetVertices()[2].y > surfTri1.GetVertices()[1].y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * (isFloor ? 1 : -1);
-							auto wallTri1 = isSecondCrissCrossCase ?
-								CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[0], surfTri1.GetVertices()[1], normal1) :
-								CollisionTriangle(surfTri1.GetVertices()[0], surfTri0.GetVertices()[2], surfTri1.GetVertices()[1], normal1);
-							tris.push_back(wallTri1);
+							const auto& normal1 = ((surfTri0Vertices[2].y > surfTri1Vertices[1].y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * (isFloor ? 1 : -1);
+							isSecondCrissCrossCase ?
+								collMesh.InsertTriangle(surfTri0Vertices[0], surfTri1Vertices[0], surfTri1Vertices[1], normal1) :
+								collMesh.InsertTriangle(surfTri1Vertices[0], surfTri0Vertices[2], surfTri1Vertices[1], normal1);
 						}
 					}
 					else
 					{
 						// TODO: Check when diagonal criss-cross becomes possible.
-						bool isSecondCrissCrossCase = (isFloor ? (surfTri1.GetVertices()[2].y < surfTri0.GetVertices()[2].y) : !(surfTri1.GetVertices()[2].y < surfTri0.GetVertices()[2].y));
-						if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[1])
+						bool isSecondCrissCrossCase = (isFloor ? (surfTri1Vertices[2].y < surfTri0Vertices[2].y) : !(surfTri1Vertices[2].y < surfTri0Vertices[2].y));
+						if (surfTri0Vertices[0] != surfTri1Vertices[1])
 						{
-							const auto& normal0 = ((surfTri0.GetVertices()[0].y > surfTri1.GetVertices()[1].y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-							auto wallTri0 = isSecondCrissCrossCase ?
-								CollisionTriangle(surfTri1.GetVertices()[1], surfTri1.GetVertices()[2], surfTri0.GetVertices()[2], normal0) :
-								CollisionTriangle(surfTri1.GetVertices()[1], surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], normal0);
-							tris.push_back(wallTri0);
+							const auto& normal0 = ((surfTri0Vertices[0].y > surfTri1Vertices[1].y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
+							isSecondCrissCrossCase ?
+								collMesh.InsertTriangle(surfTri1Vertices[1], surfTri1Vertices[2], surfTri0Vertices[2], normal0) :
+								collMesh.InsertTriangle(surfTri1Vertices[1], surfTri0Vertices[0], surfTri1Vertices[2], normal0);
 						}
-						if (surfTri0.GetVertices()[2] != surfTri1.GetVertices()[2])
+						if (surfTri0Vertices[2] != surfTri1Vertices[2])
 						{
-							const auto& normal1 = ((surfTri0.GetVertices()[2].y > surfTri1.GetVertices()[2].y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-							auto wallTri1 = isSecondCrissCrossCase ?
-								CollisionTriangle(surfTri1.GetVertices()[1], surfTri0.GetVertices()[0], surfTri0.GetVertices()[2], normal1) :
-								CollisionTriangle(surfTri0.GetVertices()[0], surfTri1.GetVertices()[2], surfTri0.GetVertices()[2], normal1);
-							tris.push_back(wallTri1);
+							const auto& normal1 = ((surfTri0Vertices[2].y > surfTri1Vertices[2].y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
+							isSecondCrissCrossCase ?
+								collMesh.InsertTriangle(surfTri1Vertices[1], surfTri0Vertices[0], surfTri0Vertices[2], normal1) :
+								collMesh.InsertTriangle(surfTri0Vertices[0], surfTri1Vertices[2], surfTri0Vertices[2], normal1);
 						}
 					}
 				}
@@ -593,15 +583,9 @@ namespace TEN::Collision::Room
 						auto vertex3 = Vector3(corner1.x, ceilHeight1, corner1.y);
 
 						if (vertex0 != vertex2)
-						{
-							auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL);
-							tris.push_back(wallTri0);
-						}
+							collMesh.InsertTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL);
 						if (vertex1 != vertex3)
-						{
-							auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
-							tris.push_back(wallTri1);
-						}
+							collMesh.InsertTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
 					}
 					// Full wall referencing previous sector.
 					else if ((isSurfWall && !isPrevSurfWall) && isFloor)
@@ -621,15 +605,9 @@ namespace TEN::Collision::Room
 						auto vertex3 = Vector3(corner1.x, ceilHeight1, corner1.y);
 
 						if (vertex0 != vertex2)
-						{
-							auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, WEST_WALL_NORMAL);
-							tris.push_back(wallTri0);
-						}
+							collMesh.InsertTriangle(vertex0, vertex1, vertex2, WEST_WALL_NORMAL);
 						if (vertex1 != vertex3)
-						{
-							auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL);
-							tris.push_back(wallTri1);
-						}
+							collMesh.InsertTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL);
 					}
 					// Step wall.
 					else if (!isSurfWall && !isPrevSurfWall)
@@ -648,14 +626,16 @@ namespace TEN::Collision::Room
 						if (vertex0 != vertex2)
 						{
 							const auto& normal0 = ((vertex0.y > vertex2.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-							auto wallTri0 = isSecondCrissCrossCase ? CollisionTriangle(vertex0, vertex2, vertex3, normal0) : CollisionTriangle(vertex0, vertex1, vertex2, normal0);
-							tris.push_back(wallTri0);
+							isSecondCrissCrossCase ?
+								collMesh.InsertTriangle(vertex0, vertex2, vertex3, normal0) :
+								collMesh.InsertTriangle(vertex0, vertex1, vertex2, normal0);
 						}
 						if (vertex1 != vertex3)
 						{
 							const auto& normal1 = ((vertex1.y > vertex3.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-							auto wallTri1 = isSecondCrissCrossCase ? CollisionTriangle(vertex0, vertex1, vertex3, normal1) : CollisionTriangle(vertex1, vertex2, vertex3, normal1);
-							tris.push_back(wallTri1);
+							isSecondCrissCrossCase ?
+								collMesh.InsertTriangle(vertex0, vertex1, vertex3, normal1) :
+								collMesh.InsertTriangle(vertex1, vertex2, vertex3, normal1);
 						}
 					}
 				}
@@ -677,10 +657,8 @@ namespace TEN::Collision::Room
 					auto endVertex2 = Vector3(corner2.x, ceilHeight0, corner2.y);
 					auto endVertex3 = Vector3(corner3.x, ceilHeight1, corner3.y);
 
-					auto endWallTri0 = CollisionTriangle(endVertex0, endVertex1, endVertex2, WEST_WALL_NORMAL);
-					auto endWallTri1 = CollisionTriangle(endVertex1, endVertex2, endVertex3, WEST_WALL_NORMAL);
-					tris.push_back(endWallTri0);
-					tris.push_back(endWallTri1);
+					collMesh.InsertTriangle(endVertex0, endVertex1, endVertex2, WEST_WALL_NORMAL);
+					collMesh.InsertTriangle(endVertex1, endVertex2, endVertex3, WEST_WALL_NORMAL);
 				}
 			}
 
@@ -724,15 +702,9 @@ namespace TEN::Collision::Room
 						auto vertex3 = Vector3(corner0.x, ceilHeight1, corner0.y);
 
 						if (vertex0 != vertex2)
-						{
-							auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL);
-							tris.push_back(wallTri0);
-						}
+							collMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL);
 						if (vertex1 != vertex3)
-						{
-							auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
-							tris.push_back(wallTri1);
-						}
+							collMesh.InsertTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
 					}
 					// Full wall referencing previous sector.
 					else if ((isSurfWall && !isPrevSurfWall) && isFloor)
@@ -752,15 +724,9 @@ namespace TEN::Collision::Room
 						auto vertex3 = Vector3(corner0.x, ceilHeight1, corner0.y);
 
 						if (vertex0 != vertex2)
-						{
-							auto wallTri0 = CollisionTriangle(vertex0, vertex1, vertex2, SOUTH_WALL_NORMAL);
-							tris.push_back(wallTri0);
-						}
+							collMesh.InsertTriangle(vertex0, vertex1, vertex2, SOUTH_WALL_NORMAL);
 						if (vertex1 != vertex3)
-						{
-							auto wallTri1 = CollisionTriangle(vertex1, vertex2, vertex3, SOUTH_WALL_NORMAL);
-							tris.push_back(wallTri1);
-						}
+							collMesh.InsertTriangle(vertex1, vertex2, vertex3, SOUTH_WALL_NORMAL);
 					}
 					// Step wall.
 					else if (!isSurfWall && !isPrevSurfWall)
@@ -779,14 +745,16 @@ namespace TEN::Collision::Room
 						if (vertex0 != vertex2)
 						{
 							const auto& normal0 = ((vertex0.y > vertex2.y) ? NORTH_WALL_NORMAL : SOUTH_WALL_NORMAL) * (isFloor ? 1 : -1);
-							auto wallTri0 = isSecondCrissCrossCase ? CollisionTriangle(vertex0, vertex2, vertex3, normal0) : CollisionTriangle(vertex0, vertex1, vertex2, normal0);
-							tris.push_back(wallTri0);
+							isSecondCrissCrossCase ?
+								collMesh.InsertTriangle(vertex0, vertex2, vertex3, normal0) :
+								collMesh.InsertTriangle(vertex0, vertex1, vertex2, normal0);
 						}
 						if (vertex1 != vertex3)
 						{
 							const auto& normal1 = ((vertex1.y > vertex3.y) ? NORTH_WALL_NORMAL : SOUTH_WALL_NORMAL) * (isFloor ? 1 : -1);
-							auto wallTri1 = isSecondCrissCrossCase ? CollisionTriangle(vertex0, vertex1, vertex3, normal1) : CollisionTriangle(vertex1, vertex2, vertex3, normal1);
-							tris.push_back(wallTri1);
+							isSecondCrissCrossCase ?
+								collMesh.InsertTriangle(vertex0, vertex1, vertex3, normal1) :
+								collMesh.InsertTriangle(vertex1, vertex2, vertex3, normal1);
 						}
 					}
 				}
@@ -808,17 +776,15 @@ namespace TEN::Collision::Room
 					auto endVertex2 = Vector3(corner1.x, ceilHeight0, corner1.y);
 					auto endVertex3 = Vector3(corner2.x, ceilHeight1, corner2.y);
 
-					auto endWallTri0 = CollisionTriangle(endVertex0, endVertex1, endVertex2, SOUTH_WALL_NORMAL);
-					auto endWallTri1 = CollisionTriangle(endVertex1, endVertex2, endVertex3, SOUTH_WALL_NORMAL);
-					tris.push_back(endWallTri0);
-					tris.push_back(endWallTri1);
+					collMesh.InsertTriangle(endVertex0, endVertex1, endVertex2, SOUTH_WALL_NORMAL);
+					collMesh.InsertTriangle(endVertex1, endVertex2, endVertex3, SOUTH_WALL_NORMAL);
 				}
 			}
 
 			isFloor = false;
 		}
 
-		return CollisionMesh(tris);
+		return collMesh;
 	}
 
 	void GenerateRoomCollisionMesh(ROOM_INFO& room)

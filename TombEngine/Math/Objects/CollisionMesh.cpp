@@ -6,20 +6,14 @@
 
 namespace TEN::Math
 {
-	CollisionTriangle::CollisionTriangle()
-	{
-	}
-
 	CollisionTriangle::CollisionTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal)
 	{
-		_vertices[0] = vertex0;
-		_vertices[1] = vertex1;
-		_vertices[2] = vertex2;
+		_vertices = std::array<const Vector3*, VERTEX_COUNT>{ &vertex0, &vertex1, &vertex2 };
 		_normal = normal;
-		_box = Geometry::GetBoundingBox(std::vector<Vector3>{ _vertices[0], _vertices[1], _vertices[2] });
+		_box = Geometry::GetBoundingBox(std::vector<Vector3>{ vertex0, vertex1, vertex2 });
 	}
 
-	const std::array<Vector3, CollisionTriangle::VERTEX_COUNT>& CollisionTriangle::GetVertices() const
+	const std::array<const Vector3*, CollisionTriangle::VERTEX_COUNT>& CollisionTriangle::GetVertices() const
 	{
 		return _vertices;
 	}
@@ -37,8 +31,8 @@ namespace TEN::Math
 			return false;
 
 		// Calculate edge vectors.
-		auto edge0 = _vertices[1] - _vertices[0];
-		auto edge1 = _vertices[2] - _vertices[0];
+		auto edge0 = *_vertices[1] - *_vertices[0];
+		auto edge1 = *_vertices[2] - *_vertices[0];
 
 		// Calculate normal.
 		auto normal = edge0.Cross(edge1);
@@ -55,11 +49,11 @@ namespace TEN::Math
 		float invDet = 1.0f / det;
 
 		// Calculate barycentric coordinates.
-		float baryCoordVert0 = (ray.position - _vertices[0]).Dot(dirCrossEdge1) * invDet;
+		float baryCoordVert0 = (ray.position - *_vertices[0]).Dot(dirCrossEdge1) * invDet;
 		if (baryCoordVert0 < 0.0f || baryCoordVert0 > 1.0f)
 			return false;
 
-		auto rayToVert0CrossEdge0 = (ray.position - _vertices[0]).Cross(edge0);
+		auto rayToVert0CrossEdge0 = (ray.position - *_vertices[0]).Cross(edge0);
 		float baryCoordVert1 = ray.direction.Dot(rayToVert0CrossEdge0) * invDet;
 		if (baryCoordVert1 < 0.0f || (baryCoordVert0 + baryCoordVert1) > 1.0f)
 			return false;
@@ -113,5 +107,14 @@ namespace TEN::Math
 			return CollisionMeshCollisionData{ *closestTri, closestDist };
 
 		return std::nullopt;
+	}
+
+	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal)
+	{
+		const auto& insertedVertex0 = *_vertices.insert(vertex0).first;
+		const auto& insertedVertex1 = *_vertices.insert(vertex1).first;
+		const auto& insertedVertex2 = *_vertices.insert(vertex2).first;
+
+		_triangles.push_back(CollisionTriangle(insertedVertex0, insertedVertex1, insertedVertex2, normal));
 	}
 }
