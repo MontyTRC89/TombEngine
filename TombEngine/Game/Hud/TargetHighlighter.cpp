@@ -140,10 +140,25 @@ namespace TEN::Hud
 		if (!Position.has_value())
 			return;
 
-		auto pos0 = Vector2::Lerp(*Position, PrevPosition, g_Renderer.GetInterpolationFactor());
-		short orient0 = PrevOrientation + (Geometry::GetShortestAngle(PrevOrientation, Orientation) * g_Renderer.GetInterpolationFactor());
-		float scale = Lerp(PrevScale, Scale, g_Renderer.GetInterpolationFactor());
-		auto color = Color::Lerp(PrevColor, Color, g_Renderer.GetInterpolationFactor());
+		auto pos0 = Vector2::Lerp(
+			PrevPosition,
+			*Position,
+			g_Renderer.GetInterpolationFactor()
+		);
+		
+		short orient0 = PrevOrientation + Geometry::GetShortestAngle(PrevOrientation, Orientation) * g_Renderer.GetInterpolationFactor();
+		
+		float scale = Lerp(
+			PrevScale,
+			Scale,
+			g_Renderer.GetInterpolationFactor()
+		);
+		
+		auto color = Color::Lerp(
+			PrevColor,
+			Color,
+			g_Renderer.GetInterpolationFactor()
+		);
 
 		// Draw main static element.
 		AddDisplaySprite(
