@@ -91,16 +91,9 @@ short LastFOV;
 int RumbleTimer = 0;
 int RumbleCounter = 0;
 
-// NOTE: Function label comments will be a temporary reference until a camera class
-// is created to keep them neatly organised as private methods. -- Sezz 2024.03.13
-
 // ----------------
 // HELPER FUNCTIONS
 // ----------------
-
-// GetCameraLos()
-// GetCameraRelativeShift()
-// GetCameraPlayerOffset()
 
 static bool TestCameraCollidableBox(const BoundingOrientedBox& box)
 {
@@ -208,13 +201,6 @@ static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, c
 			break;
 		}
 	}
-
-
-	if (hasObjectLos)
-	{
-
-	}
-
 
 	// TODO: Shift instead of this.
 	if (cameraLos.Distance < DIST_BUFFER)
@@ -363,9 +349,9 @@ static Vector3 GetCameraPlayerOffset(const ItemInfo& item, const CollisionInfo& 
 		0.0f);
 }
 
-// ----------------
-// CAMERA FUNCTIONS
-// ----------------
+// --------------
+// MAIN FUNCTIONS
+// --------------
 
 void UpdatePlayerRefCameraOrient(ItemInfo& item)
 {
@@ -754,6 +740,8 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		{
 			AlterFOV((short)Lerp(CurrentFOV, ANGLE(DEFAULT_FOV), STRAFE_CAMERA_FOV_LERP_ALPHA / 2));
 		}
+
+		//idealPos = GetCameraWallShift(idealPos.first, idealPos.second, CLICK(1.5f), true);
 
 		// Update camera.
 		float speedCoeff = (Camera.type != CameraType::Look) ? 0.2f : 1.0f;

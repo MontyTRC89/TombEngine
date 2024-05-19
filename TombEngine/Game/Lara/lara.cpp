@@ -123,7 +123,7 @@ static void HandleLosDebug(const ItemInfo& item)
 	g_Renderer.AddDebugTarget(target, Quaternion::Identity, 100, Color(1, 1, 1));
 }
 
-static int GetSurfaceTriangleVertexHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
+static int GetSurfaceTriangleVertexY(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
 {
 	constexpr auto AXIS_OFFSET = -BLOCK(0.5f);
 	constexpr auto HEIGHT_STEP = BLOCK(1 / 32.0f);
@@ -184,16 +184,16 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 		auto surfTri0 = CollisionTriangle();
 		if (!isSurfSplit || isSurfSplitAngle0)
 		{
-			auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
-			auto vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
-			auto vertex2 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
+			auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
+			auto vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
+			auto vertex2 = Vector3(corner2.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
 			surfTri0 = CollisionTriangle(vertex0, vertex1, vertex2, GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
 		}
 		else
 		{
-			auto vertex0 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
-			auto vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
-			auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y);
+			auto vertex0 = Vector3(corner1.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
+			auto vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
+			auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y);
 			surfTri0 = CollisionTriangle(vertex0, vertex1, vertex2, GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
 		}
 		
@@ -201,16 +201,16 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 		auto surfTri1 = CollisionTriangle();
 		if (!isSurfSplit || isSurfSplitAngle0)
 		{
-			auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
-			auto vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y);
-			auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
+			auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
+			auto vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y);
+			auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
 			surfTri1 = CollisionTriangle(vertex0, vertex1, vertex2, GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
 		}
 		else
 		{
-			auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
-			auto vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y);
-			auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
+			auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
+			auto vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y);
+			auto vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
 			surfTri1 = CollisionTriangle(vertex0, vertex1, vertex2, GetRawSurfaceTriangleNormal(vertex0, vertex1, vertex2) * (isFloor ? -1 : 1));
 		}
 
@@ -233,10 +233,10 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			{
 				if (isSurfSplitAngle0)
 				{
-					int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, isSurf0Wall ? 1 : 0, true);
-					int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, isSurf0Wall ? 1 : 0, true);
-					int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, isSurf0Wall ? 1 : 0, false);
-					int ceilHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, isSurf0Wall ? 1 : 0, false);
+					int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, isSurf0Wall ? 1 : 0, true);
+					int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, isSurf0Wall ? 1 : 0, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, isSurf0Wall ? 1 : 0, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, isSurf0Wall ? 1 : 0, false);
 
 					auto vertex0 = Vector3(corner0.x, floorHeight0, corner0.y);
 					auto vertex1 = Vector3(corner2.x, floorHeight1, corner2.y);
@@ -256,10 +256,10 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				}
 				else
 				{
-					int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, isSurf0Wall ? 1 : 0, true);
-					int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, isSurf0Wall ? 1 : 0, true);
-					int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, isSurf0Wall ? 1 : 0, false);
-					int ceilHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, isSurf0Wall ? 1 : 0, false);
+					int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, isSurf0Wall ? 1 : 0, true);
+					int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, isSurf0Wall ? 1 : 0, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, isSurf0Wall ? 1 : 0, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, isSurf0Wall ? 1 : 0, false);
 
 					auto vertex0 = Vector3(corner1.x, floorHeight0, corner1.y);
 					auto vertex1 = Vector3(corner3.x, floorHeight1, corner3.y);
@@ -355,10 +355,10 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 					bool useCeilTri0 = (!isCeilSurfSplit || isCeilSurfSplitAngle0);
 
-					int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, true);
-					int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, true);
-					int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, useCeilTri0 ? 0 : 1, false);
-					int ceilHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, useCeilTri0 ? 0 : 1, false);
+					int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, true);
+					int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useCeilTri0 ? 0 : 1, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, useCeilTri0 ? 0 : 1, false);
 
 					auto vertex0 = Vector3(corner0.x, floorHeight0, corner0.y);
 					auto vertex1 = Vector3(corner1.x, floorHeight1, corner1.y);
@@ -383,10 +383,10 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					bool isPrevCeilSurfSplitAngle0 = (prevSectorX->CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 					bool usePrevCeilTri1 = (!isPrevCeilSurfSplit || isPrevCeilSurfSplitAngle0);
 
-					int floorHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, true);
-					int floorHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, true);
-					int ceilHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevCeilTri1 ? 1 : 0, false);
-					int ceilHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevCeilTri1 ? 1 : 0, false);
+					int floorHeight0 = GetSurfaceTriangleVertexY(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, true);
+					int floorHeight1 = GetSurfaceTriangleVertexY(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexY(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevCeilTri1 ? 1 : 0, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexY(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevCeilTri1 ? 1 : 0, false);
 
 					auto vertex0 = Vector3(corner0.x, floorHeight0, corner0.y);
 					auto vertex1 = Vector3(corner1.x, floorHeight1, corner1.y);
@@ -407,10 +407,10 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				// Step wall.
 				else if (!isSurfWall && !isPrevSurfWall)
 				{
-					int height0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, isFloor);
-					int height1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, isFloor);
-					int prevHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, isFloor);
-					int prevHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, isFloor);
+					int height0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, isFloor);
+					int height1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, isFloor);
+					int prevHeight0 = GetSurfaceTriangleVertexY(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, isFloor);
+					int prevHeight1 = GetSurfaceTriangleVertexY(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, isFloor);
 
 					auto vertex0 = Vector3(corner0.x, height0, corner0.y);
 					auto vertex1 = Vector3(corner1.x, height1, corner1.y);
@@ -440,10 +440,10 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 				bool useCeilTri0 = (!isCeilSurfSplit || isCeilSurfSplitAngle0);
 
-				int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useTri0 ? 0 : 1, true);
-				int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, !useTri0 ? 0 : 1, true);
-				int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useCeilTri0 ? 0 : 1, false);
-				int ceilHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, !useCeilTri0 ? 0 : 1, false);
+				int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useTri0 ? 0 : 1, true);
+				int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, !useTri0 ? 0 : 1, true);
+				int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useCeilTri0 ? 0 : 1, false);
+				int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, !useCeilTri0 ? 0 : 1, false);
 
 				auto endVertex0 = Vector3(corner2.x, floorHeight0, corner2.y);
 				auto endVertex1 = Vector3(corner3.x, floorHeight1, corner3.y);
@@ -487,10 +487,10 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					bool useCeilTri0 = !(isCeilSurfSplit || !isCeilSurfSplitAngle0);
 
 					// TODO: Check.
-					int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, true);
-					int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, true);
-					int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, useCeilTri0 ? 0 : 1, false);
-					int ceilHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, useCeilTri0 ? 0 : 1, false);
+					int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, true);
+					int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, useCeilTri0 ? 0 : 1, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useCeilTri0 ? 0 : 1, false);
 
 					auto vertex0 = Vector3(corner3.x, floorHeight0, corner3.y);
 					auto vertex1 = Vector3(corner0.x, floorHeight1, corner0.y);
@@ -515,10 +515,10 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					bool isPrevCeilSurfSplitAngle0 = (prevSectorZ->CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 					bool usePrevCeilTri1 = !(isPrevCeilSurfSplit || !isPrevCeilSurfSplitAngle0);
 
-					int floorHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, true);
-					int floorHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevTri1 ? 1 : 0, true);
-					int ceilHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevCeilTri1 ? 1 : 0, false);
-					int ceilHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevCeilTri1 ? 1 : 0, false);
+					int floorHeight0 = GetSurfaceTriangleVertexY(*prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, true);
+					int floorHeight1 = GetSurfaceTriangleVertexY(*prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevTri1 ? 1 : 0, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexY(*prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevCeilTri1 ? 1 : 0, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexY(*prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevCeilTri1 ? 1 : 0, false);
 
 					auto vertex0 = Vector3(corner3.x, floorHeight0, corner3.y);
 					auto vertex1 = Vector3(corner0.x, floorHeight1, corner0.y);
@@ -539,10 +539,10 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				// Step wall.
 				else if (!isSurfWall && !isPrevSurfWall)
 				{
-					int height0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, isFloor);
-					int height1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, isFloor);
-					int prevHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, isFloor);
-					int prevHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevTri1 ? 1 : 0, isFloor);
+					int height0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, isFloor);
+					int height1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, isFloor);
+					int prevHeight0 = GetSurfaceTriangleVertexY(*prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, isFloor);
+					int prevHeight1 = GetSurfaceTriangleVertexY(*prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevTri1 ? 1 : 0, isFloor);
 
 					auto vertex0 = Vector3(corner3.x, height0, corner3.y);
 					auto vertex1 = Vector3(corner0.x, height1, corner0.y);
@@ -572,10 +572,10 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 				bool useCeilTri0 = !(isCeilSurfSplit || !isCeilSurfSplitAngle0);
 
-				int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, !useTri0 ? 0 : 1, true);
-				int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useTri0 ? 0 : 1, true);
-				int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, !useCeilTri0 ? 0 : 1, false);
-				int ceilHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useCeilTri0 ? 0 : 1, false);
+				int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, !useTri0 ? 0 : 1, true);
+				int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useTri0 ? 0 : 1, true);
+				int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, !useCeilTri0 ? 0 : 1, false);
+				int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useCeilTri0 ? 0 : 1, false);
 
 				auto endVertex0 = Vector3(corner1.x, floorHeight0, corner1.y);
 				auto endVertex1 = Vector3(corner2.x, floorHeight1, corner2.y);
@@ -603,11 +603,11 @@ void HandleRoomCollisionMesh()
 	{
 		for (const auto& tri : sector.Mesh.GetTriangles())
 		{
-			g_Renderer.AddDebugTriangle(tri.GetVertices()[0], tri.GetVertices()[1], tri.GetVertices()[2], Color(1, 1, 0, 0.2f));
+			//g_Renderer.AddDebugTriangle(tri.GetVertices()[0], tri.GetVertices()[1], tri.GetVertices()[2], Color(1, 1, 0, 0.2f));
 
 			auto origin = (tri.GetVertices()[0] + tri.GetVertices()[1] + tri.GetVertices()[2]) / 3;
 			auto target = Geometry::TranslatePoint(origin, tri.GetNormal(), BLOCK(0.25f));
-			g_Renderer.AddDebugLine(origin, target, Color(1, 1, 0));
+			//g_Renderer.AddDebugLine(origin, target, Color(1, 1, 0));
 		}
 	}
 

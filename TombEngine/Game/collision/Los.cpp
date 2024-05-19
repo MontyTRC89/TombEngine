@@ -109,12 +109,16 @@ namespace TEN::Collision::Los
 			auto movs = GetNearbyMoveables(los.Room.RoomNumbers);
 			for (auto* mov : movs)
 			{
-				// Check if moveable is bridge.
-				if (mov->IsBridge())
+				// Check if moveable is collidable.
+				if (!mov->Collidable)
 					continue;
 
 				// Check moveable status.
 				if (mov->Status == ItemStatus::ITEM_INVISIBLE || mov->Status == ItemStatus::ITEM_DEACTIVATED)
+					continue;
+
+				// Ignore bridges (handled as part of room).
+				if (mov->IsBridge())
 					continue;
 
 				// 2) Collect moveable LOS instances.
@@ -364,15 +368,6 @@ namespace TEN::Collision::Los
 
 						if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
 							continue;
-
-						//debug
-						for (const auto& tri : bridge.GetCollisionMesh().GetTriangles())
-						{
-							g_Renderer.AddDebugTriangle(tri.GetVertices()[0], tri.GetVertices()[1], tri.GetVertices()[2], Color(1, 1, 0, 0.2f));
-
-							auto center = (tri.GetVertices()[0] + tri.GetVertices()[1] + tri.GetVertices()[2]) / 3;
-							g_Renderer.AddDebugLine(center, Geometry::TranslatePoint(center, tri.GetNormal(), BLOCK(0.2f)), Color(1, 1, 0));
-						}
 
 						auto meshColl = bridge.GetCollisionMesh().GetIntersection(ray);
 						if (meshColl.has_value() && meshColl->Distance < closestDist)
