@@ -184,23 +184,23 @@ namespace TEN::Hud
 
 		// Loop over player targets.
 		auto itemNumbers = std::vector<int>{};
-		for (const auto* itemPtr : player.TargetList)
+		for (const auto* item : player.TargetList)
 		{
-			if (itemPtr == nullptr)
+			if (item == nullptr)
 				continue;
 
 			// Collect item number.
-			if (itemPtr->HitPoints != NOT_TARGETABLE)
-				itemNumbers.push_back(itemPtr->Index);
+			if (item->HitPoints != NOT_TARGETABLE)
+				itemNumbers.push_back(item->Index);
 
 			// Find crosshair at item number key.
-			auto it = _crosshairs.find(itemPtr->Index);
+			auto it = _crosshairs.find(item->Index);
 			if (it == _crosshairs.end())
 				continue;
 
 			// Set crosshair as primary or peripheral.
 			auto& crosshair = it->second;
-			if (player.TargetEntity != nullptr && itemPtr->Index == player.TargetEntity->Index)
+			if (player.TargetEntity != nullptr && item->Index == player.TargetEntity->Index)
 			{
 				crosshair.SetPrimary();
 			}
