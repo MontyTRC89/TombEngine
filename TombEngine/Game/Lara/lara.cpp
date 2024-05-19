@@ -283,7 +283,8 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			{
 				if (isSurfSplitAngle0)
 				{
-					bool isSecondCrissCrossCase = (surfTri0.GetVertices()[2].y < surfTri1.GetVertices()[1].y); // TODO: Check when diagonal criss-cross becomes possible.
+					// TODO: Check when diagonal criss-cross becomes possible.
+					bool isSecondCrissCrossCase = (isFloor ? (surfTri0.GetVertices()[2].y < surfTri1.GetVertices()[1].y) : !(surfTri0.GetVertices()[2].y < surfTri1.GetVertices()[1].y));
 					if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[0])
 					{
 						const auto& normal0 = ((surfTri0.GetVertices()[0].y > surfTri1.GetVertices()[0].y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * (isFloor ? 1 : -1);
@@ -303,7 +304,8 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				}
 				else
 				{
-					bool isSecondCrissCrossCase = (surfTri1.GetVertices()[2].y < surfTri0.GetVertices()[2].y); // TODO: Check when diagonal criss-cross becomes possible.
+					// TODO: Check when diagonal criss-cross becomes possible.
+					bool isSecondCrissCrossCase = (isFloor ? (surfTri1.GetVertices()[2].y < surfTri0.GetVertices()[2].y) : !(surfTri1.GetVertices()[2].y < surfTri0.GetVertices()[2].y));
 					if (surfTri0.GetVertices()[0] != surfTri1.GetVertices()[1])
 					{
 						const auto& normal0 = ((surfTri0.GetVertices()[0].y > surfTri1.GetVertices()[1].y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
@@ -323,8 +325,6 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				}
 			}
 		}
-
-		//goto skip;
 
 		// 5) Collect cardinal wall triangles on X axis.
 		if (prevSectorX != nullptr)
@@ -417,7 +417,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					auto vertex2 = Vector3(corner0.x, prevHeight0, corner0.y);
 					auto vertex3 = Vector3(corner1.x, prevHeight1, corner1.y);
 
-					bool isSecondCrissCrossCase = (vertex1.y < vertex3.y);
+					bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
 					if (vertex0 != vertex2)
 					{
 						const auto& normal0 = ((vertex0.y > vertex2.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
@@ -457,8 +457,6 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			}
 		}
 
-		//skip:
-
 		// 6) Collect cardinal wall triangles on Z axis.
 		if (prevSectorZ != nullptr)
 		{
@@ -472,8 +470,8 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			bool isPrevSurfTri0Portal = (prevSurface.Triangles[0].PortalRoomNumber != NO_VALUE);
 			bool isPrevSurfTri1Portal = (prevSurface.Triangles[1].PortalRoomNumber != NO_VALUE);
 
-			bool useTri0 = !(!isSurfSplit || isSurfSplitAngle0);
-			bool usePrevTri1 = !(!isPrevSurfSplit || isPrevSurfSplitAngle0);
+			bool useTri0 = !(isSurfSplit || !isSurfSplitAngle0);
+			bool usePrevTri1 = !(isPrevSurfSplit || !isPrevSurfSplitAngle0);
 
 			bool isSurfWall = (useTri0 ? isSurf0Wall : isSurf1Wall);
 			bool isPrevSurfWall = (usePrevTri1 ? isPrevSurf1Wall : isPrevSurf0Wall);
@@ -486,8 +484,9 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				{
 					bool isCeilSurfSplit = sector.IsSurfaceSplit(false);
 					bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-					bool useCeilTri0 = !(!isCeilSurfSplit || isCeilSurfSplitAngle0);
+					bool useCeilTri0 = !(isCeilSurfSplit || !isCeilSurfSplitAngle0);
 
+					// TODO: Check.
 					int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, true);
 					int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, true);
 					int ceilHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, useCeilTri0 ? 0 : 1, false);
@@ -514,17 +513,17 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 				{
 					bool isPrevCeilSurfSplit = prevSectorZ->IsSurfaceSplit(false);
 					bool isPrevCeilSurfSplitAngle0 = (prevSectorZ->CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-					bool usePrevCeilTri1 = !(!isPrevCeilSurfSplit || isPrevCeilSurfSplitAngle0);
+					bool usePrevCeilTri1 = !(isPrevCeilSurfSplit || !isPrevCeilSurfSplitAngle0);
 
-					int floorHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, true);
-					int floorHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevTri1 ? 1 : 0, true);
-					int ceilHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevCeilTri1 ? 1 : 0, false);
-					int ceilHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevCeilTri1 ? 1 : 0, false);
+					int floorHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_0.x, REL_CORNER_0.y, usePrevTri1 ? 1 : 0, true);
+					int floorHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_0.x, REL_CORNER_0.y, usePrevCeilTri1 ? 1 : 0, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_3.x, REL_CORNER_3.y, usePrevCeilTri1 ? 1 : 0, false);
 
-					auto vertex0 = Vector3(corner2.x, floorHeight0, corner2.y);
-					auto vertex1 = Vector3(corner1.x, floorHeight1, corner1.y);
-					auto vertex2 = Vector3(corner2.x, ceilHeight0, corner2.y);
-					auto vertex3 = Vector3(corner1.x, ceilHeight1, corner1.y);
+					auto vertex0 = Vector3(corner0.x, floorHeight0, corner0.y);
+					auto vertex1 = Vector3(corner3.x, floorHeight1, corner3.y);
+					auto vertex2 = Vector3(corner0.x, ceilHeight0, corner0.y);
+					auto vertex3 = Vector3(corner3.x, ceilHeight1, corner3.y);
 
 					if (vertex0 != vertex2)
 					{
@@ -550,7 +549,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					auto vertex2 = Vector3(corner3.x, prevHeight0, corner3.y);
 					auto vertex3 = Vector3(corner0.x, prevHeight1, corner0.y);
 
-					bool isSecondCrissCrossCase = (vertex1.y < vertex3.y);
+					bool isSecondCrissCrossCase = isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y);
 					if (vertex0 != vertex2)
 					{
 						const auto& normal0 = ((vertex0.y > vertex2.y) ? NORTH_WALL_NORMAL : SOUTH_WALL_NORMAL) * (isFloor ? 1 : -1);
@@ -571,7 +570,7 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 			{
 				bool isCeilSurfSplit = sector.IsSurfaceSplit(false);
 				bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-				bool useCeilTri0 = (!isCeilSurfSplit || isCeilSurfSplitAngle0);
+				bool useCeilTri0 = !(isCeilSurfSplit || !isCeilSurfSplitAngle0);
 
 				int floorHeight0 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, !useTri0 ? 0 : 1, true);
 				int floorHeight1 = GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useTri0 ? 0 : 1, true);
