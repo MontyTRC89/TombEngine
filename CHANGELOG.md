@@ -22,7 +22,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 
-## Version 1.4 - 2024-04-21
+## [Version 1.4](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.1) - 2024-04-21
 
 ### Bug Fixes
 * Fixed drawing of display sprites in title level.
@@ -65,7 +65,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Static:GetHP() and Static:SetHP() functions to change shatterable static mesh hit points.
 * Fixed Moveable:SetOnCollidedWithObject() callback.
 
-## Version 1.3 - 2024-01-06
+## [Version 1.3](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7) - 2024-01-06
 
 ### Bug Fixes
 * Fixed crash if title logo is removed from Textures folder.
@@ -121,7 +121,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added View.GetCameraPosition(), View.GetCameraTarget() and View.GetCameraRoom() functions.
 * Added View.SetPostProcessMode(), View.SetPostProcessStrength() and View.SetPostProcessTint() functions.
 
-## Version 1.2 - 2023-11-11
+## [Version 1.2](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.9) - 2023-11-11
 
 ### Bug Fixes
 * Fix burning torch not working properly if there are more than 256 objects in a level.
@@ -198,7 +198,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Add DisplayString::SetScale() function to resize text.
 * Add DisplayString::GetScale() function to get text scale.
 
-## Version 1.1.0 - 2023-07-29
+## [Version 1.1.0](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.8) - 2023-07-29
 
 ### Bug Fixes
 * Fix enemies shooting Lara through static meshes and moveables.
@@ -255,7 +255,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - Misc::IsAudioTrackPlaying() for checking if a given track type is playing.
   - Misc::GetCurrentSubtitle() for getting current subtitle string for the voice track.
 
-## Version 1.0.9 - 2023-06-03
+## [Version 1.0.9](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.7) - 2023-06-03
 
 ### Bug fixes
 * Fix cold bar triggered in non-water rooms.
@@ -315,7 +315,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 	- PRESAVE, POSTSAVE
 	- PRELOAD, POSTLOAD
 
-## Version 1.0.8 - 2023-04-10
+## [Version 1.0.8](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.6) - 2023-04-10
 
 ### Bug fixes
 * Fix bubbles phasing through ceilings.
@@ -362,7 +362,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Add function Misc::IsSoundPlaying() 
 * Add function DisplayString::SetFlags()
 
-## Version 1.0.7 - 2023-02-26
+## [Version 1.0.7](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.5) - 2023-02-26
 
 ### Bug fixes
 * Fix spark particles not being cleared on level reload.
@@ -409,7 +409,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Add Moveable:GetAirborne and Moveable:SetAirborne.
 * Add Moveable:GetLocationAI and Moveable:SetLocationAI.
 
-## Version 1.0.6 - 2023-01-29
+## [Version 1.0.6](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.4) - 2023-01-29
 
 ### Bug FIxes
 * Fix major pathfinding bug which could have caused lots of issues with enemy behaviour.
@@ -462,7 +462,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Add new function Misc::GetCameraType()
 * Add new functions Moveable:GetAirborne() and Moveable:SetAirborne(bool input)
 
-## Version 1.0.5 - 2022-12-30
+## [Version 1.0.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.3) - 2022-12-30
 
 ### Bug fixes
 * Fix combined items not existing in inventory upon game reload.
@@ -502,7 +502,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Lua API changes
 * Add new Room class and several methods for it.
 
-## Version 1.0.4 - 2022-12-16
+## [Version 1.0.4](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.2) - 2022-12-16
 
 ### Features/Amendments
 * Add generic assignable effects for moveables - fire, sparks, smoke and laser / electric ignite.
@@ -574,7 +574,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fix Rotation class using integers under the hood which prevented using fractional rotation values.
 * Fix distance tests failing on a very high distances.
 
-## Version 1.0.3 - 2022-11-18
+## [Version 1.0.3](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.1) - 2022-11-18
 
 ### Features/Amendments
 * Add ledge jumps (Lara object must be updated with new animations to make it work).
@@ -642,7 +642,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Add SetTotalSecretCount option to gameflow script to set overall amount of secrets.
 * Raised the maximum value on Moveable.SetHP to 32767 (its internal numeric maximum).
 
-## Version 1.0.2 - 2022-09-16
+## [Version 1.0.2](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6) - 2022-09-16
 
 ### Features/Amendments
 * Fix removing Pistols with TakeItem and SetItemCount.
@@ -697,7 +697,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Rework GiveItem, TakeItem, and SetItemCount (e.g. SetItemCount with a value of -1 can give infinite ammo/consumables).
 
 
-## Version 1.0.1 - 2022-08-16
+## [Version 1.0.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.5.2) - 2022-08-16
 
 ### Features
 * Added antialiasing support.
@@ -739,6 +739,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * EventSequence.lua has been added and documented.
 
 
-## Version 1.0 - 2022-08-06
+## [Version 1.0](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.5.1) - 2022-08-06
 
 First beta release.
