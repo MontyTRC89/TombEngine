@@ -515,15 +515,15 @@ static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
 					bool isPrevCeilSurfSplitAngle0 = (prevSectorZ->CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 					bool usePrevCeilTri1 = !(isPrevCeilSurfSplit || !isPrevCeilSurfSplitAngle0);
 
-					int floorHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_0.x, REL_CORNER_0.y, usePrevTri1 ? 1 : 0, true);
-					int floorHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, true);
-					int ceilHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_0.x, REL_CORNER_0.y, usePrevCeilTri1 ? 1 : 0, false);
-					int ceilHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_3.x, REL_CORNER_3.y, usePrevCeilTri1 ? 1 : 0, false);
+					int floorHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, true);
+					int floorHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevTri1 ? 1 : 0, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevCeilTri1 ? 1 : 0, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexHeight(*prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevCeilTri1 ? 1 : 0, false);
 
-					auto vertex0 = Vector3(corner0.x, floorHeight0, corner0.y);
-					auto vertex1 = Vector3(corner3.x, floorHeight1, corner3.y);
-					auto vertex2 = Vector3(corner0.x, ceilHeight0, corner0.y);
-					auto vertex3 = Vector3(corner3.x, ceilHeight1, corner3.y);
+					auto vertex0 = Vector3(corner3.x, floorHeight0, corner3.y);
+					auto vertex1 = Vector3(corner0.x, floorHeight1, corner0.y);
+					auto vertex2 = Vector3(corner3.x, ceilHeight0, corner3.y);
+					auto vertex3 = Vector3(corner0.x, ceilHeight1, corner0.y);
 
 					if (vertex0 != vertex2)
 					{
