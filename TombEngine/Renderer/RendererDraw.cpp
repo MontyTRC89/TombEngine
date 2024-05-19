@@ -1067,8 +1067,8 @@ namespace TEN::Renderer
 						if (bucket.NumVertices == 0)
 							continue;
 
-						int passes = (rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1);
-						for (int p = 0; p < passes; p++)
+						int passCount = (rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest) ? 2 : 1;
+						for (int p = 0; p < passCount; p++)
 						{
 							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
 								continue;
