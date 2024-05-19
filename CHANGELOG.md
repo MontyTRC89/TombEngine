@@ -151,24 +151,24 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Features/Amendments
 * Improve head-on wall collision.
 * Overhaul pushables:
- - Separate climbable and non-climbable pushable object slots.
- - Add new pushable OCB to manipulate pushable properties.
- - Add new animations for pushing pushables off edgees (TR1-3 and TR4-5 versions).
- - Fix pushables not working with raising blocks.
- - Fix miscellaneous pushable bugs.
+  - Separate climbable and non-climbable pushable object slots.
+  - Add new pushable OCB to manipulate pushable properties.
+  - Add new animations for pushing pushables off edgees (TR1-3 and TR4-5 versions).
+  - Fix pushables not working with raising blocks.
+  - Fix miscellaneous pushable bugs.
 * Overhaul look-around feature:
- - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
- - Improve look camera movement and control.
- - Re-enable looking while performing up jump, backward jump, or backward crawl.
- - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
+  - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
+  - Improve look camera movement and control.
+  - Re-enable looking while performing up jump, backward jump, or backward crawl.
+  - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
 * Add target highlighter system with toggle in Sound and Gameplay settings.
 * Add sprint slide state 191.
 * Add swinging blade.
 * Add crumbling platform and add new OCBs for behaviour:
- - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
- - OCB > 0: When the player steps on the platform, it will crumble after the number of frames set in the OCB.
- - A positive value results in activation via player collision.
- - A negative value requires a trigger to activate.
+  - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
+  - OCB > 0: When the player steps on the platform, it will crumble after the number of frames set in the OCB.
+  - A positive value results in activation via player collision.
+  - A negative value requires a trigger to activate.
 * Add basic mouse input handling. Allows for binding of mouse inputs in control settings.
 * Add settings for Mouse Sensitivity and Mouse Smoothing (not used in-game yet).
 
