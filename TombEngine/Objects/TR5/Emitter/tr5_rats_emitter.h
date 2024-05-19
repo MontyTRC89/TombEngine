@@ -14,12 +14,12 @@ struct RatData
 
 	byte Flags;
 	
-	Matrix Transform;
-	Matrix OldTransform;
+	Matrix Transform	 = Matrix::Identity;
+	Matrix PrevTransform = Matrix::Identity;
 
 	void StoreInterpolationData()
 	{
-		OldTransform = Transform;
+		PrevTransform = Transform;
 	}
 };
 
