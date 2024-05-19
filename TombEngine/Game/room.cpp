@@ -336,31 +336,6 @@ void InitializeNeighborRoomList()
 	}
 }
 
-static int GetSurfaceTriangleVertexY(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
-{
-	constexpr auto AXIS_OFFSET = -BLOCK(0.5f);
-	constexpr auto HEIGHT_STEP = BLOCK(1 / 32.0f);
-
-	const auto& tri = isFloor ? sector.FloorSurface.Triangles[triID] : sector.CeilingSurface.Triangles[triID];
-
-	relX += AXIS_OFFSET;
-	relZ += AXIS_OFFSET;
-
-	auto normal = tri.Plane.Normal();
-	float relPlaneHeight = -((normal.x * relX) + (normal.z * relZ)) / normal.y;
-	return (int)RoundToStep(tri.Plane.D() + relPlaneHeight, HEIGHT_STEP);
-}
-
-static Vector3 GetRawSurfaceTriangleNormal(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
-{
-	auto edge0 = vertex1 - vertex0;
-	auto edge1 = vertex2 - vertex0;
-	auto normal = edge0.Cross(edge1);
-	normal.Normalize();
-	return normal;
-}
-
-
 namespace TEN::Collision::Room
 {
 	// TODO: Can use floordata's GetRoomGridCoord()?
@@ -374,6 +349,30 @@ namespace TEN::Collision::Room
 			return nullptr;
 
 		return &room->floor[sectorID];
+	}
+
+	static int GetSurfaceTriangleVertexY(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
+	{
+		constexpr auto AXIS_OFFSET = -BLOCK(0.5f);
+		constexpr auto HEIGHT_STEP = BLOCK(1 / 32.0f);
+
+		const auto& tri = isFloor ? sector.FloorSurface.Triangles[triID] : sector.CeilingSurface.Triangles[triID];
+
+		relX += AXIS_OFFSET;
+		relZ += AXIS_OFFSET;
+
+		auto normal = tri.Plane.Normal();
+		float relPlaneHeight = -((normal.x * relX) + (normal.z * relZ)) / normal.y;
+		return (int)RoundToStep(tri.Plane.D() + relPlaneHeight, HEIGHT_STEP);
+	}
+
+	static Vector3 GetRawSurfaceTriangleNormal(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
+	{
+		auto edge0 = vertex1 - vertex0;
+		auto edge1 = vertex2 - vertex0;
+		auto normal = edge0.Cross(edge1);
+		normal.Normalize();
+		return normal;
 	}
 
 	static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
