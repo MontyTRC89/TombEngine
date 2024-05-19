@@ -211,28 +211,31 @@ namespace TEN::Entities::Generic
 
 	void TrapDoorControl(short itemNumber)
 	{
-		auto* trapDoorItem = &g_Level.Items[itemNumber];
+		auto& trapDoorItem = g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(trapDoorItem);
+		
+		bridge.Update(trapDoorItem);
 
-	if (TriggerActive(trapDoorItem))
-	{
-		if (!trapDoorItem->Animation.ActiveState && trapDoorItem->TriggerFlags >= 0)
-			trapDoorItem->Animation.TargetState = 1;
-	}
-	else
-	{
-		trapDoorItem->Status = ITEM_ACTIVE;
+		if (TriggerActive(&trapDoorItem))
+		{
+			if (!trapDoorItem.Animation.ActiveState && trapDoorItem.TriggerFlags >= 0)
+				trapDoorItem.Animation.TargetState = 1;
+		}
+		else
+		{
+			trapDoorItem.Status = ITEM_ACTIVE;
 
-			if (trapDoorItem->Animation.ActiveState == 1)
-				trapDoorItem->Animation.TargetState = 0;
+			if (trapDoorItem.Animation.ActiveState == 1)
+				trapDoorItem.Animation.TargetState = 0;
 		}
 
-		AnimateItem(trapDoorItem);
+		AnimateItem(&trapDoorItem);
 
-		if (trapDoorItem->Animation.ActiveState == 1 && (trapDoorItem->ItemFlags[2] || JustLoaded))
+		if (trapDoorItem.Animation.ActiveState == 1 && (trapDoorItem.ItemFlags[2] || JustLoaded))
 		{
 			OpenTrapDoor(itemNumber);
 		}
-		else if (!trapDoorItem->Animation.ActiveState && !trapDoorItem->ItemFlags[2])
+		else if (!trapDoorItem.Animation.ActiveState && !trapDoorItem.ItemFlags[2])
 		{
 			CloseTrapDoor(itemNumber);
 		}

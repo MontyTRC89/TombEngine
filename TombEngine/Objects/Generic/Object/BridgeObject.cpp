@@ -17,12 +17,24 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::Initialize(const ItemInfo& item)
 	{
+		UpdateBridgeItem(item);
 		UpdateCollisionMesh(item);
+		//InitializeAttractor(item);
+
+		PrevPose = item.Pose;
 	}
 
 	void BridgeObject::Update(const ItemInfo& item)
 	{
+		// Bridge not moved; return early.
+		if (item.Pose == PrevPose)
+			return;
+
+		UpdateBridgeItem(item);
 		UpdateCollisionMesh(item);
+		//UpdateAttractor(item);
+
+		PrevPose = item.Pose;
 	}
 
 	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)

@@ -95,6 +95,9 @@ namespace TEN::Entities::Generic
 	void FallingBlockControl(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(*item);
+
+		bridge.Update(*item);
 
 		if (item->TriggerFlags)
 		{

@@ -110,13 +110,14 @@ namespace TEN::Entities::Generic
 	void ControlRaisingBlock(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(*item);
+
+		bridge.Update(*item);
 
 		if (TriggerActive(item))
 		{
 			if (!item->ItemFlags[2])
-			{
 				item->ItemFlags[2] = 1;
-			}
 
 			if (item->TriggerFlags < 0)
 			{

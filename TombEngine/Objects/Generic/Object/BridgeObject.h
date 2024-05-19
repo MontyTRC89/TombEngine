@@ -1,14 +1,12 @@
 #pragma once
 #include "Math/Math.h"
 
-class Vector3i;
 struct ItemInfo;
 
 using namespace TEN::Math;
 
 namespace TEN::Entities::Generic
 {
-	// TODO: Bridge properties.
 	class BridgeObject
 	{
 	private:
@@ -16,6 +14,8 @@ namespace TEN::Entities::Generic
 		CollisionMesh _collisionMesh = CollisionMesh();
 
 	public:
+		Pose PrevPose = Pose::Zero;
+
 		// Routines
 		std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetFloorHeight	  = nullptr;
 		std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetCeilingHeight = nullptr;

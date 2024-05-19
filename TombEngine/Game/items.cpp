@@ -762,18 +762,9 @@ void UpdateAllItems()
 
 		if (item.AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
-			auto prevPose = item.Pose;
-
 			const auto& object = Objects[item.ObjectNumber];
 			if (object.control != nullptr)
 				object.control(itemNumber);
-
-			// Update bridge.
-			if (item.IsBridge() && item.Pose != prevPose)
-			{
-				auto& bridge = GetBridgeObject(item);
-				bridge.Update(item);
-			}
 
 			TestVolumes(itemNumber);
 			ProcessEffects(&item);

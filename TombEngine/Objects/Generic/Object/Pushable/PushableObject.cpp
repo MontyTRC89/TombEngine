@@ -94,6 +94,7 @@ namespace TEN::Entities::Generic
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
+		auto& bridge = GetBridgeObject(pushableItem);
 
 		if (Lara.Context.InteractedItem == itemNumber && Lara.Control.IsMoving)
 			return;
@@ -101,6 +102,9 @@ namespace TEN::Entities::Generic
 		// Handle behaviour and sound state.
 		HandlePushableBehaviorState(pushableItem);
 		HandlePushableSoundState(pushableItem);
+
+		// TODO: Unclear how to update properly.
+		// bridge.Update(pushableItem);
 
 		// Update bridge.
 		AddPushableStackBridge(pushableItem, false);
