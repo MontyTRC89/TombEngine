@@ -15,6 +15,7 @@
 #include "Game/Lara/lara_initialise.h"
 #include "Game/misc.h"
 #include "Game/pickup/pickup.h"
+#include "Game/room.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Game/spotcam.h"
@@ -32,6 +33,7 @@
 using TEN::Renderer::g_Renderer;
 
 using namespace TEN::Entities::Doors;
+using namespace TEN::Collision::Room;
 using namespace TEN::Input;
 using namespace TEN::Utils;
 
@@ -674,211 +676,12 @@ static Plane ConvertFakePlaneToPlane(const Vector3& fakePlane, bool isFloor)
 	return Plane(normal, dist);
 }
 
-static int GetSurfaceTriangleVertexHeight(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor)
-{
-	constexpr auto AXIS_OFFSET = -BLOCK(0.5f);
-
-	const auto& tri = isFloor ? sector.FloorSurface.Triangles[triID] : sector.CeilingSurface.Triangles[triID];
-
-	relX += AXIS_OFFSET;
-	relZ += AXIS_OFFSET;
-
-	auto normal = tri.Plane.Normal();
-	float relPlaneHeight = -((normal.x * relX) + (normal.z * relZ)) / normal.y;
-	return (tri.Plane.D() + relPlaneHeight);
-}
-
-// TODO: Doesn't generate cardinal walls.
-static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
-												 const FloorInfo* prevSectorX, const FloorInfo* prevSectorZ, bool isXEnd, bool isZEnd)
-{
-	constexpr auto REL_CORNER_0 = Vector2i(0, 0);
-	constexpr auto REL_CORNER_1 = Vector2i(0, BLOCK(1));
-	constexpr auto REL_CORNER_2 = Vector2i(BLOCK(1), BLOCK(1));
-	constexpr auto REL_CORNER_3 = Vector2i(BLOCK(1), 0);
-
-	auto corner0 = sector.Position + REL_CORNER_0;
-	auto corner1 = sector.Position + REL_CORNER_1;
-	auto corner2 = sector.Position + REL_CORNER_2;
-	auto corner3 = sector.Position + REL_CORNER_3;
-
-	auto tris = std::vector<CollisionTriangle>{};
-
-	// Collect triangles.
-	bool isFloor = true;
-	auto surfaces = std::vector<const SectorSurfaceData*>{ &sector.FloorSurface, &sector.CeilingSurface };
-	for (const auto& surface : surfaces)
-	{
-		bool isTri0Portal = (surface->Triangles[0].PortalRoomNumber != NO_VALUE);
-		bool isTri1Portal = (surface->Triangles[1].PortalRoomNumber != NO_VALUE);
-
-		if (sector.IsSurfaceSplit(isFloor))
-		{
-			if (!isTri0Portal || !isTri1Portal)
-			{
-				if (surface->SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
-				{
-					// Surface triangle 0.
-					auto tri0 = CollisionTriangle(
-						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
-						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
-						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
-
-					if (!isTri0Portal)
-						tris.push_back(tri0);
-
-					// Surface triangle 1.
-					auto tri1 = CollisionTriangle(
-						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
-						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
-						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
-
-					if (!isTri1Portal)
-						tris.push_back(tri1);
-
-					// Diagonal wall triangles.
-					if (tri0.GetVertices()[0] != tri1.GetVertices()[0] && tri0.GetVertices()[2] != tri1.GetVertices()[1])
-					{
-						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[0], tri0.GetVertices()[2]);
-						tris.push_back(tri2);
-
-						auto tri3 = CollisionTriangle(tri1.GetVertices()[0], tri0.GetVertices()[2], tri1.GetVertices()[1]);
-						tris.push_back(tri3);
-					}
-					else if (tri0.GetVertices()[0] != tri1.GetVertices()[0] && tri0.GetVertices()[2] == tri1.GetVertices()[1])
-					{
-						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[0], tri0.GetVertices()[2]);
-						tris.push_back(tri2);
-					}
-					else if (tri0.GetVertices()[2] == tri1.GetVertices()[1] && tri0.GetVertices()[2] != tri1.GetVertices()[1])
-					{
-						auto tri2 = CollisionTriangle(tri1.GetVertices()[0], tri0.GetVertices()[2], tri1.GetVertices()[1]);
-						tris.push_back(tri2);
-					}
-				}
-				else if (surface->SplitAngle == SectorSurfaceData::SPLIT_ANGLE_1)
-				{
-					// Surface triangle 0.
-					auto tri0 = CollisionTriangle(
-						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
-						Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y),
-						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y));
-
-					if (!isTri0Portal)
-						tris.push_back(tri0);
-
-					// Surface triangle 1.
-					auto tri1 = CollisionTriangle(
-						Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
-						Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y),
-						Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
-
-					if (!isTri1Portal)
-						tris.push_back(tri1);
-
-					// Diagonal wall triangles.
-					if (tri1.GetVertices()[1] != tri0.GetVertices()[0] && tri1.GetVertices()[2] != tri0.GetVertices()[2])
-					{
-						auto tri2 = CollisionTriangle(tri1.GetVertices()[1], tri0.GetVertices()[0], tri1.GetVertices()[2]);
-						tris.push_back(tri2);
-
-						auto tri3 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[2], tri0.GetVertices()[2]);
-						tris.push_back(tri3);
-					}
-					else if (tri1.GetVertices()[1] != tri0.GetVertices()[0] && tri1.GetVertices()[2] == tri0.GetVertices()[2])
-					{
-						auto tri2 = CollisionTriangle(tri1.GetVertices()[1], tri0.GetVertices()[0], tri1.GetVertices()[2]);
-						tris.push_back(tri2);
-					}
-					else if (tri1.GetVertices()[2] == tri0.GetVertices()[2] && tri1.GetVertices()[2] != tri0.GetVertices()[2])
-					{
-						auto tri2 = CollisionTriangle(tri0.GetVertices()[0], tri1.GetVertices()[2], tri0.GetVertices()[2]);
-						tris.push_back(tri2);
-					}
-				}
-			}
-		}
-		else
-		{
-			// Surface triangle 0.
-			if (!isTri0Portal)
-			{
-				auto tri0 = CollisionTriangle(
-					Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y),
-					Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y),
-					Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y));
-				tris.push_back(tri0);
-			}
-
-			// Surface triangle 1.
-			if (!isTri1Portal)
-			{
-				auto tri1 = CollisionTriangle(
-					Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y),
-					Vector3(corner2.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y),
-					Vector3(corner3.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y));
-				tris.push_back(tri1);
-			}
-
-			// Cardinal wall triangles on X axis.
-			if (prevSectorX != nullptr)
-			{
-				if (surface->SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0)
-				{
-					if (sector.IsWall(0))
-					{
-
-					}
-				}
-				else
-				{
-
-				}
-
-				// TODO: Full wall needs to reference floor and ceiling.
-
-				// TODO: Correct triangle ID.
-				auto vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
-				auto vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
-				auto vertex2 = Vector3(corner0.x, GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner0.y);
-				auto vertex3 = Vector3(corner1.x, GetSurfaceTriangleVertexHeight(*prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner1.y);
-
-				// TODO: Triangular steps.
-				if (vertex0.y != vertex2.y && vertex1.y != vertex3.y)
-				{
-					auto tri0 = CollisionTriangle(vertex0, vertex1, vertex2);
-					auto tri1 = CollisionTriangle(vertex1, vertex2, vertex3);
-
-					tris.push_back(tri0);
-					tris.push_back(tri1);
-				}
-
-				// TODO: Walls at ends where no further sectors exist.
-				if (isXEnd)
-				{
-
-				}
-			}
-
-			// TODO
-			// Cardinal wall triangles on Z axis.
-			if (prevSectorZ != nullptr)
-			{
-
-			}
-		}
-
-		isFloor = false;
-	}
-
-	return CollisionMesh(tris);
-}
-
 void ReadRooms()
 {
 	int roomCount = ReadInt32();
 	TENLog("Rooms: " + std::to_string(roomCount), LogLevel::Info);
 
+	// Load rooms.
 	g_Level.Rooms.reserve(roomCount);
 	for (int i = 0; i < roomCount; i++)
 	{
@@ -1006,17 +809,6 @@ void ReadRooms()
 				sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
 				sector.CeilingSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
 
-				if (x > 0 && x < (room.xSize - 1) &&
-					z > 0 && z < (room.zSize - 1))
-				{
-					const FloorInfo* prevXSector = (x != 1) ? &room.floor[((x - 1) * room.zSize) + z] : nullptr;
-					const FloorInfo* prevZSector = (z != 1) ? &room.floor[(x * room.zSize) + (z - 1)] : nullptr;
-					bool isXEnd = (x == (room.xSize - 2));
-					bool isZEnd = (z == (room.zSize - 2));
-
-					sector.Mesh = GenerateSectorCollisionMesh(sector, prevXSector, prevZSector, isXEnd, isZEnd);
-				}
-
 				sector.SidePortalRoomNumber = ReadInt32();
 				sector.Flags.Death = ReadBool();
 				sector.Flags.Monkeyswing = ReadBool();
@@ -1125,6 +917,10 @@ void ReadRooms()
 
 		g_GameScriptEntities->AddName(room.name, room);
 	}
+
+	// Generate room collision meshes.
+	for (auto& room : g_Level.Rooms)
+		GenerateRoomCollisionMesh(room);
 }
 
 void LoadRooms()
@@ -1136,9 +932,9 @@ void LoadRooms()
 	ReadRooms();
 	BuildOutsideRoomsTable();
 
-	int numFloorData = ReadInt32(); 
-	g_Level.FloorData.resize(numFloorData);
-	ReadBytes(g_Level.FloorData.data(), numFloorData * sizeof(short));
+	int floorDataCount = ReadInt32(); 
+	g_Level.FloorData.resize(floorDataCount);
+	ReadBytes(g_Level.FloorData.data(), floorDataCount * sizeof(short));
 }
 
 void FreeLevel()

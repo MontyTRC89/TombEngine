@@ -141,4 +141,6 @@ GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox)
 namespace TEN::Collision::Room
 {
 	FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
+
+	void GenerateRoomCollisionMesh(ROOM_INFO& room);
 }
