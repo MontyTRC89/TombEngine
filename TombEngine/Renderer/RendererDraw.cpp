@@ -646,7 +646,7 @@ namespace TEN::Renderer
 						
 					for (auto& poly : bucket.Polygons)
 					{
-						auto worldMatrix = Matrix::Lerp(fish.OldTransform, fish.Transform, _interpolationFactor);
+						auto worldMatrix = Matrix::Lerp(fish.PrevTransform, fish.Transform, _interpolationFactor);
 						auto center = Vector3::Transform(poly.Centre, worldMatrix);
 						float dist = Vector3::Distance(center, view.Camera.WorldPosition);
 
@@ -707,7 +707,7 @@ namespace TEN::Renderer
 
 					const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
 
-					_stStatic.World = Matrix::Lerp(fish.OldTransform, fish.Transform, _interpolationFactor);
+					_stStatic.World = Matrix::Lerp(fish.PrevTransform, fish.Transform, _interpolationFactor);
 					_stStatic.Color = Vector4::One;
 					_stStatic.AmbientLight = _rooms[fish.RoomNumber].AmbientLight;
 
@@ -745,76 +745,67 @@ namespace TEN::Renderer
 		if (!Objects[ID_BATS_EMITTER].loaded)
 			return;
 
-		auto* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
+		auto& mesh = *GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			for (int i = 0; i < NUM_BATS; i++)
+			for (const auto& bat : Bats)
 			{
-				auto* bat = &Bats[i];
+				if (!bat.On)
+					continue;
 
-				if (bat->On)
+				for (auto& bucket : mesh.Buckets)
 				{
-					for (int j = 0; j < mesh->Buckets.size(); j++)
+					if (!IsSortedBlendMode(bucket.BlendMode))
+						continue;
+
+					for (int p = 0; p < bucket.Polygons.size(); p++)
 					{
-						auto& bucket = mesh->Buckets[j];
+						auto transformMatrix = Matrix::Lerp(bat.PrevTransform, bat.Transform, _interpolationFactor);	
+						auto centre = Vector3::Transform(bucket.Polygons[p].Centre, transformMatrix);
+						float dist = (centre - view.Camera.WorldPosition).Length();
 
-						if (IsSortedBlendMode(bucket.BlendMode))
-						{
-							for (int p = 0; p < bucket.Polygons.size(); p++)
-							{
-								Matrix transform = Matrix::Lerp(bat->OldTransform, bat->Transform, _interpolationFactor);	
+						auto object = RendererSortableObject{};
+						object.ObjectType = RendererObjectType::MoveableAsStatic;
+						object.Centre = centre;
+						object.Distance = dist;
+						object.Bucket = &bucket;
+						object.Mesh = &mesh;
+						object.Polygon = &bucket.Polygons[p];
+						object.World = transformMatrix;
+						object.Room = &_rooms[bat.RoomNumber];
 
-								auto centre = Vector3::Transform(
-									bucket.Polygons[p].Centre, transform);
-								int distance = (centre - view.Camera.WorldPosition).Length();
-
-								RendererSortableObject object;
-								object.ObjectType = RendererObjectType::MoveableAsStatic;
-								object.Centre = centre;
-								object.Distance = distance;
-								object.Bucket = &bucket;
-								object.Mesh = mesh;
-								object.Polygon = &bucket.Polygons[p];
-								object.World = transform;
-								object.Room = &_rooms[bat->RoomNumber];
-
-								view.TransparentObjectsToDraw.push_back(object);
-							}
-						}
+						view.TransparentObjectsToDraw.push_back(object);
 					}
 				}
 			}
 		}
 		else
 		{
-			int batsCount = 0;
-
+			int batCount = 0;
 			for (int i = 0; i < NUM_BATS; i++)
 			{
-				auto* bat = &Bats[i];
+				const auto& bat = Bats[i];
 
-				if (bat->On)
+				if (bat.On)
 				{
-					Matrix transform = Matrix::Lerp(bat->OldTransform, bat->Transform, _interpolationFactor);
+					auto& room = _rooms[bat.RoomNumber];
 
-					RendererRoom& room = _rooms[bat->RoomNumber];
+					auto transformMatrix = Matrix::Lerp(bat.PrevTransform, bat.Transform, _interpolationFactor);
 
-					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].World = transform;
-					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Ambient = room.AmbientLight;
-					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].Color = Vector4::One;
-					_stInstancedStaticMeshBuffer.StaticMeshes[batsCount].LightMode = (int)mesh->LightMode;
+					_stInstancedStaticMeshBuffer.StaticMeshes[batCount].World = transformMatrix;
+					_stInstancedStaticMeshBuffer.StaticMeshes[batCount].Ambient = room.AmbientLight;
+					_stInstancedStaticMeshBuffer.StaticMeshes[batCount].Color = Vector4::One;
+					_stInstancedStaticMeshBuffer.StaticMeshes[batCount].LightMode = (int)mesh.LightMode;
 
 					if (rendererPass != RendererPass::GBuffer)
-					{
-						BindInstancedStaticLights(room.LightsToDraw, batsCount);
-					}
+						BindInstancedStaticLights(room.LightsToDraw, batCount);
 
-					batsCount++;
+					batCount++;
 				}
 
-				if (batsCount == INSTANCED_STATIC_MESH_BUCKET_SIZE ||
-					(i == NUM_BATS - 1 && batsCount > 0))
+				if (batCount == INSTANCED_STATIC_MESH_BUCKET_SIZE ||
+					(i == (NUM_BATS - 1) && batCount > 0))
 				{
 					if (rendererPass == RendererPass::GBuffer)
 					{
@@ -827,40 +818,35 @@ namespace TEN::Renderer
 						_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
 					}
 
-					UINT stride = sizeof(Vertex);
-					UINT offset = 0;
+					unsigned int stride = sizeof(Vertex);
+					unsigned int offset = 0;
 
 					_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 					_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 					_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
 
-					for (auto& bucket : mesh->Buckets)
+					for (auto& bucket : mesh.Buckets)
 					{
 						if (bucket.NumVertices == 0)
-						{
 							continue;
-						}
 
-						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
-
-						for (int p = 0; p < passes; p++)
+						int passCount = (rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest) ? 2 : 1;
+						for (int p = 0; p < passCount; p++)
 						{
 							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-							{
 								continue;
-							}
 
 							BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 							BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-							DrawIndexedInstancedTriangles(bucket.NumIndices, batsCount, bucket.StartIndex, 0);
+							DrawIndexedInstancedTriangles(bucket.NumIndices, batCount, bucket.StartIndex, 0);
 
 							_numMoveablesDrawCalls++;
 						}
 					}
 
-					batsCount = 0;
+					batCount = 0;
 				}
 			}
 		}
@@ -869,79 +855,68 @@ namespace TEN::Renderer
 	void Renderer::DrawScarabs(RenderView& view, RendererPass rendererPass)
 	{
 		if (!Objects[ID_LITTLE_BEETLE].loaded)
-		{
 			return;
-		}
 
-		RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
+		auto& mesh = *GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
+			for (const auto& beetle : TEN::Entities::TR4::BeetleSwarm)
 			{
-				auto beetle = &TEN::Entities::TR4::BeetleSwarm[i];
+				if (!beetle.On)
+					continue;
 
-				if (beetle->On)
+				auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, _interpolationFactor);
+
+				for (auto& bucket : mesh.Buckets)
 				{
-					Matrix transform = Matrix::Lerp(beetle->OldTransform, beetle->Transform, _interpolationFactor);
+					if (!IsSortedBlendMode(bucket.BlendMode))
+						continue;
 
-					for (int j = 0; j < mesh->Buckets.size(); j++)
+					for (int p = 0; p < bucket.Polygons.size(); p++)
 					{
-						auto& bucket = mesh->Buckets[j];
+						auto centre = Vector3::Transform(bucket.Polygons[p].Centre, transformMatrix);
+						float dist = (centre - view.Camera.WorldPosition).Length();
 
-						if (IsSortedBlendMode(bucket.BlendMode))
-						{
-							for (int p = 0; p < bucket.Polygons.size(); p++)
-							{
-								auto centre = Vector3::Transform(
-									bucket.Polygons[p].Centre, transform);
-								int distance = (centre - view.Camera.WorldPosition).Length();
+						auto object = RendererSortableObject{};
+						object.ObjectType = RendererObjectType::MoveableAsStatic;
+						object.Centre = centre;
+						object.Distance = dist;
+						object.Bucket = &bucket;
+						object.Mesh = &mesh;
+						object.Polygon = &bucket.Polygons[p];
+						object.World = transformMatrix;
+						object.Room = &_rooms[beetle.RoomNumber];
 
-								RendererSortableObject object;
-								object.ObjectType = RendererObjectType::MoveableAsStatic;
-								object.Centre = centre;
-								object.Distance = distance;
-								object.Bucket = &bucket;
-								object.Mesh = mesh;
-								object.Polygon = &bucket.Polygons[p];
-								object.World = transform;
-								object.Room = &_rooms[beetle->RoomNumber];
-
-								view.TransparentObjectsToDraw.push_back(object);
-							}
-						}
+						view.TransparentObjectsToDraw.push_back(object);
 					}
 				}
 			}
 		}
 		else
 		{	
-			std::vector<std::vector<BeetleData>> beetlesBuckets;
-
-			unsigned int beetleCount = 0;
-
+			int beetleCount = 0;
 			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
 				const auto& beetle = TEN::Entities::TR4::BeetleSwarm[i];
 
 				if (beetle.On)
 				{
-					Matrix transform = Matrix::Lerp(beetle.OldTransform, beetle.Transform, _interpolationFactor);
-
 					auto& room = _rooms[beetle.RoomNumber];
 
-					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = transform;
+					auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, _interpolationFactor);
+
+					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = transformMatrix;
 					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Ambient = room.AmbientLight;
 					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Color = Vector4::One;
-					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].LightMode = (int)mesh->LightMode;
+					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].LightMode = (int)mesh.LightMode;
 
 					if (rendererPass != RendererPass::GBuffer)
 					{
-						std::vector<RendererLight*> lights;
+						auto lights = std::vector<RendererLight*>{};
 						for (int i = 0; i < std::min((int)room.LightsToDraw.size(), MAX_LIGHTS_PER_ITEM); i++)
-						{
 							lights.push_back(room.LightsToDraw[i]);
-						}
+						
 						BindInstancedStaticLights(lights, beetleCount);
 					}
 
@@ -970,21 +945,16 @@ namespace TEN::Renderer
 
 					_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
 
-					for (const auto& bucket : mesh->Buckets)
+					for (auto& bucket : mesh.Buckets)
 					{
 						if (bucket.NumVertices == 0)
-						{
 							continue;
-						}
 
-						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
-
-						for (int p = 0; p < passes; p++)
+						int passCount = (rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest) ? 2 : 1;
+						for (int p = 0; p < passCount; p++)
 						{
 							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-							{
 								continue;
-							}
 
 							BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 							BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
@@ -1004,50 +974,42 @@ namespace TEN::Renderer
 	void Renderer::DrawLocusts(RenderView& view, RendererPass rendererPass)
 	{
 		if (!Objects[ID_LOCUSTS].loaded)
-		{
 			return;
-		}
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			ObjectInfo* obj = &Objects[ID_LOCUSTS];
-			RendererObject& moveableObj = *_moveableObjects[ID_LOCUSTS];
+			auto* obj = &Objects[ID_LOCUSTS];
+			auto& moveableObj = *_moveableObjects[ID_LOCUSTS];
 
-			for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
+			for (const auto& locust : TEN::Entities::TR4::Locusts)
 			{
-				LOCUST_INFO* locust = &TEN::Entities::TR4::Locusts[i];
+				if (!locust.on)
+					continue;
 
-				if (locust->on)
+				auto& mesh = *GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust.counter & 3));
+
+				for (auto& bucket : mesh.Buckets)
 				{
-					RendererMesh* mesh = GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
+					if (!IsSortedBlendMode(bucket.BlendMode))
+						continue;
 
-					for (int j = 0; j < mesh->Buckets.size(); j++)
+					for (int p = 0; p < bucket.Polygons.size(); p++)
 					{
-						auto& bucket = mesh->Buckets[j];
+						auto transformMatrix = Matrix::Lerp(locust.PrevTransform, locust.Transform, _interpolationFactor);	
+						auto centre = Vector3::Transform(bucket.Polygons[p].Centre, transformMatrix);
+						float dist = (centre - view.Camera.WorldPosition).Length();
 
-						if (IsSortedBlendMode(bucket.BlendMode))
-						{
-							for (int p = 0; p < bucket.Polygons.size(); p++)
-							{
-								Matrix transform = Matrix::Lerp(locust->OldTransform, locust->Transform, _interpolationFactor);	
+						auto object = RendererSortableObject{};
+						object.ObjectType = RendererObjectType::MoveableAsStatic;
+						object.Centre = centre;
+						object.Distance = dist;
+						object.Bucket = &bucket;
+						object.Mesh = &mesh;
+						object.Polygon = &bucket.Polygons[p];
+						object.World = transformMatrix;
+						object.Room = &_rooms[locust.roomNumber];
 
-								auto centre = Vector3::Transform(
-									bucket.Polygons[p].Centre, transform);
-								int distance = (centre - view.Camera.WorldPosition).Length();
-
-								RendererSortableObject object;
-								object.ObjectType = RendererObjectType::MoveableAsStatic;
-								object.Centre = centre;
-								object.Distance = distance;
-								object.Bucket = &bucket;
-								object.Mesh = mesh;
-								object.Polygon = &bucket.Polygons[p];
-								object.World = transform;
-								object.Room = &_rooms[locust->roomNumber];
-
-								view.TransparentObjectsToDraw.push_back(object);
-							}
-						}
+						view.TransparentObjectsToDraw.push_back(object);
 					}
 				}
 			}
@@ -1055,15 +1017,13 @@ namespace TEN::Renderer
 		else
 		{
 			int activeLocustsExist = false;
-			for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
+			for (const auto& locust : TEN::Entities::TR4::Locusts)
 			{
-				LOCUST_INFO* locust = &TEN::Entities::TR4::Locusts[i];
+				if (!locust.on)
+					continue;
 
-				if (locust->on)
-				{
-					activeLocustsExist = true;
-					break;
-				}
+				activeLocustsExist = true;
+				break;
 			}
 
 			if (activeLocustsExist)
@@ -1079,53 +1039,46 @@ namespace TEN::Renderer
 					_context->PSSetShader(_psStatics.Get(), nullptr, 0);
 				}
 
-				UINT stride = sizeof(Vertex);
-				UINT offset = 0;
+				unsigned int stride = sizeof(Vertex);
+				unsigned int offset = 0;
 
 				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-				ObjectInfo* obj = &Objects[ID_LOCUSTS];
-				RendererObject& moveableObj = *_moveableObjects[ID_LOCUSTS];
+				auto* obj = &Objects[ID_LOCUSTS];
+				auto& moveableObj = *_moveableObjects[ID_LOCUSTS];
 
 				_stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
 
-				for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
+				for (const auto& locust : TEN::Entities::TR4::Locusts)
 				{
-					LOCUST_INFO* locust = &TEN::Entities::TR4::Locusts[i];
+					if (!locust.on)
+						continue;
 
-					if (locust->on)
+					auto& mesh = *GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust.counter & 3));
+
+					_stStatic.World = Matrix::Lerp(locust.PrevTransform, locust.Transform, _interpolationFactor);
+					_stStatic.Color = Vector4::One;
+					_stStatic.AmbientLight = _rooms[locust.roomNumber].AmbientLight;
+					_cbStatic.UpdateData(_stStatic, _context.Get());
+
+					for (auto& bucket : mesh.Buckets)
 					{
-						RendererMesh* mesh = GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
+						if (bucket.NumVertices == 0)
+							continue;
 
-						_stStatic.World = Matrix::Lerp(locust->OldTransform, locust->Transform, _interpolationFactor);
-						_stStatic.Color = Vector4::One;
-						_stStatic.AmbientLight = _rooms[locust->roomNumber].AmbientLight;
-						_cbStatic.UpdateData(_stStatic, _context.Get());
-
-						for (auto& bucket : mesh->Buckets)
+						int passCount = (rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest) ? 2 : 1;
+						for (int p = 0; p < passCount; p++)
 						{
-							if (bucket.NumVertices == 0)
-							{
+							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
 								continue;
-							}
 
-							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+							BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+							BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-							for (int p = 0; p < passes; p++)
-							{
-								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-								{
-									continue;
-								}
+							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
-								BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-								BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-
-								DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-								_numMoveablesDrawCalls++;
-							}
+							_numMoveablesDrawCalls++;
 						}
 					}
 				}
