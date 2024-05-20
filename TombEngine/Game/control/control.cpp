@@ -240,6 +240,7 @@ GameStatus ControlPhase()
 	UpdateBeetleSwarm();
 	UpdateLocusts();
 	UpdateUnderwaterBloodParticles();
+	UpdateFishSwarm();
 
 	if (g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareEnabled())
 	{
