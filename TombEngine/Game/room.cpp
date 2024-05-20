@@ -784,6 +784,7 @@ namespace TEN::Collision::Room
 			isFloor = false;
 		}
 
+		collMesh.UpdateBvh();
 		return collMesh;
 	}
 

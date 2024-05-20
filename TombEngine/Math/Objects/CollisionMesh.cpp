@@ -23,6 +23,11 @@ namespace TEN::Math
 		return _normal;
 	}
 
+	const BoundingBox& CollisionTriangle::GetBox() const
+	{
+		return _box;
+	}
+
 	bool CollisionTriangle::Intersects(const Ray& ray, float& dist) const
 	{
 		// Test if ray intersects triangle AABB.
@@ -67,6 +72,102 @@ namespace TEN::Math
 		return true;
 	}
 
+	bool CollisionMesh::BvhNode::IsLeaf() const
+	{
+		return (LeftChildIndex == NO_VALUE && RightChildIndex == NO_VALUE);
+	}
+
+	CollisionMesh::Bvh::Bvh(const std::vector<CollisionTriangle>& tris)
+	{
+		auto triIndices = std::vector<int>{};
+		triIndices.reserve(tris.size());
+		for (int i = 0; i < tris.size(); ++i)
+			triIndices.push_back(i);
+		
+		Build(0, (int)tris.size(), triIndices, tris);
+	}
+
+	int CollisionMesh::Bvh::Build(int start, int end, const std::vector<int>& triIndices, const std::vector<CollisionTriangle>& tris)
+	{
+		constexpr auto TRI_COUNT_PER_LEAF_MAX = 4;
+
+		// FAILSAFE.
+		if (start >= end)
+			return NO_VALUE;
+
+		auto node = BvhNode{};
+
+		// Combine boxes.
+		node.Box = tris[triIndices[start]].GetBox();
+		for (int i = start; i < end; i++)
+			node.Box = Geometry::CombineBoundingBoxes(node.Box, tris[triIndices[i]].GetBox());
+
+		if ((end - start) <= TRI_COUNT_PER_LEAF_MAX)
+		{
+			node.TriangleIndices.insert(node.TriangleIndices.end(), triIndices.begin() + start, triIndices.begin() + end);
+			Nodes.push_back(node);
+			return int(Nodes.size() - 1);
+		}
+
+		int mid = (start + end) / 2;
+		node.LeftChildIndex = Build(start, mid, triIndices, tris);
+		node.RightChildIndex = Build(mid, end, triIndices, tris);
+		Nodes.push_back(node);
+
+		return int(Nodes.size() - 1);
+	}
+
+	std::optional<CollisionMeshCollisionData> CollisionMesh::Bvh::GetIntersection(const Ray& ray, const std::vector<CollisionTriangle>& tris) const
+	{
+		if (Nodes.empty())
+			return std::nullopt;
+
+		const CollisionTriangle* closestTri = nullptr;
+		float closestDist = INFINITY;
+		bool isIntersected = false;
+
+		std::function<void(int)> traverseBvh = [&](int nodeIndex)
+		{
+			// Invalid node; return early.
+			if (nodeIndex == NO_VALUE)
+				return;
+
+			const auto& node = Nodes[nodeIndex];
+
+			// Test node intersection.
+			float dist = 0.0f;
+			if (!node.Box.Intersects(ray.position, ray.direction, dist))
+				return;
+
+			// Traverse nodes.
+			if (node.IsLeaf())
+			{
+				for (int triIndex : node.TriangleIndices)
+				{
+					float dist = 0.0f;
+					if (tris[triIndex].Intersects(ray, dist) && dist < closestDist)
+					{
+						closestTri = &tris[triIndex];
+						closestDist = dist;
+						isIntersected = true;
+					}
+				}
+			}
+			else
+			{
+				traverseBvh(node.LeftChildIndex);
+				traverseBvh(node.RightChildIndex);
+			}
+		};
+
+		traverseBvh(0);
+
+		if (isIntersected)
+			return CollisionMeshCollisionData{ *closestTri, closestDist };
+
+		return std::nullopt;
+	}
+
 	CollisionMesh::CollisionMesh()
 	{
 	}
@@ -81,32 +182,9 @@ namespace TEN::Math
 		return _triangles;
 	}
 
-	// NOTE: O(n).
 	std::optional<CollisionMeshCollisionData> CollisionMesh::GetIntersection(const Ray& ray) const
 	{
-		// TODO: Vertex indexing, spacial partitioning/BVH tree, and whatever else is necessary to make this performant.
-		// TODO: If triangles are made to be collidable only from the "front" as determined by the normal,
-		// loop can end early. Best case becomes O(1).
-
-		const CollisionTriangle* closestTri = nullptr;
-		float closestDist = INFINITY;
-		bool isIntersected = false;
-
-		for (const auto& tri : _triangles)
-		{
-			float intersectDist = 0.0f;
-			if (tri.Intersects(ray, intersectDist) && intersectDist < closestDist)
-			{
-				closestTri = &tri;
-				closestDist = intersectDist;
-				isIntersected = true;
-			}
-		}
-
-		if (isIntersected)
-			return CollisionMeshCollisionData{ *closestTri, closestDist };
-
-		return std::nullopt;
+		return _bvh.GetIntersection(ray, _triangles);
 	}
 
 	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal)
@@ -116,5 +194,10 @@ namespace TEN::Math
 		const auto& insertedVertex2 = *_vertices.insert(vertex2).first;
 
 		_triangles.push_back(CollisionTriangle(insertedVertex0, insertedVertex1, insertedVertex2, normal));
+	}
+
+	void CollisionMesh::UpdateBvh()
+	{
+		_bvh = CollisionMesh::Bvh(_triangles);
 	}
 }

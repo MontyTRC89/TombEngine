@@ -216,24 +216,41 @@ namespace TEN::Math::Geometry
 
 	BoundingBox GetBoundingBox(const std::vector<Vector3>& points)
 	{
-		auto maxPoint = Vector3(-INFINITY);
 		auto minPoint = Vector3(INFINITY);
+		auto maxPoint = Vector3(-INFINITY);
 
 		// Determine max and min AABB points.
 		for (const auto& point : points)
 		{
-			maxPoint = Vector3(
-				std::max(maxPoint.x, point.x),
-				std::max(maxPoint.y, point.y),
-				std::max(maxPoint.z, point.z));
-
 			minPoint = Vector3(
 				std::min(minPoint.x, point.x),
 				std::min(minPoint.y, point.y),
 				std::min(minPoint.z, point.z));
+
+			maxPoint = Vector3(
+				std::max(maxPoint.x, point.x),
+				std::max(maxPoint.y, point.y),
+				std::max(maxPoint.z, point.z));
 		}
 
 		// Construct and return AABB.
+		auto center = (minPoint + maxPoint) / 2;
+		auto extents = (maxPoint - minPoint) / 2;
+		return BoundingBox(center, extents);
+	}
+
+	BoundingBox CombineBoundingBoxes(const BoundingBox& box0, const BoundingBox& box1)
+	{
+		auto minPoint = Vector3(
+			std::min(box0.Center.x - box0.Extents.x, box1.Center.x - box1.Extents.x),
+			std::min(box0.Center.y - box0.Extents.y, box1.Center.y - box1.Extents.y),
+			std::min(box0.Center.z - box0.Extents.z, box1.Center.z - box1.Extents.z));
+
+		auto maxPoint = Vector3(
+			std::max(box0.Center.x + box0.Extents.x, box1.Center.x + box1.Extents.x),
+			std::max(box0.Center.y + box0.Extents.y, box1.Center.y + box1.Extents.y),
+			std::max(box0.Center.z + box0.Extents.z, box1.Center.z + box1.Extents.z));
+
 		auto center = (minPoint + maxPoint) / 2;
 		auto extents = (maxPoint - minPoint) / 2;
 		return BoundingBox(center, extents);
