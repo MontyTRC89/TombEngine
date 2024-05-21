@@ -186,7 +186,7 @@ namespace TEN::Physics
 		int vertexID1 = NO_VALUE;
 		int vertexID2 = NO_VALUE;
 
-		// Add new vertices and get their IDs.
+		// Add new vertices and get IDs.
 		if (!Contains(_vertices, vertex0))
 		{
 			_vertices.push_back(vertex0);
@@ -203,7 +203,7 @@ namespace TEN::Physics
 			vertexID2 = (int)_vertices.size() - 1;
 		}
 
-		// Get vertex IDs if vertices already exist.
+		// Get IDs of existing vertices.
 		if (vertexID0 == NO_VALUE || vertexID1 == NO_VALUE || vertexID2 == NO_VALUE)
 		{
 			for (int i = 0; i < _vertices.size(); i++)
