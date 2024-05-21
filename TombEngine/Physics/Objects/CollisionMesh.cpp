@@ -114,9 +114,9 @@ namespace TEN::Physics
 		return int(Nodes.size() - 1);
 	}
 
-	std::optional<CollisionMeshCollisionData> CollisionMesh::Bvh::GetIntersection(const Ray& ray,
-																				  const std::vector<CollisionTriangle>& tris,
-																				  const std::vector<Vector3>& vertices) const
+	std::optional<CollisionMeshCollisionData> CollisionMesh::Bvh::GetCollision(const Ray& ray,
+																			   const std::vector<CollisionTriangle>& tris,
+																			   const std::vector<Vector3>& vertices) const
 	{
 		if (Nodes.empty())
 			return std::nullopt;
@@ -175,9 +175,9 @@ namespace TEN::Physics
 		_triangles = tris;
 	}
 
-	std::optional<CollisionMeshCollisionData> CollisionMesh::GetIntersection(const Ray& ray) const
+	std::optional<CollisionMeshCollisionData> CollisionMesh::GetCollision(const Ray& ray) const
 	{
-		return _bvh.GetIntersection(ray, _triangles, _vertices);
+		return _bvh.GetCollision(ray, _triangles, _vertices);
 	}
 
 	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal)

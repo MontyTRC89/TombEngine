@@ -325,11 +325,12 @@ namespace TEN::Collision::Los
 		auto offset = Vector3(0, CLICK(0.1f), 0);
 		auto doOffset = false;
 
-		int prevRoomNumber = NO_VALUE;
-		const FloorInfo* prevSector = nullptr;
 		const CollisionTriangle* closestTri = nullptr;
 		float closestDist = dist;
 		bool hasClip = false;
+
+		int prevRoomNumber = NO_VALUE;
+		const FloorInfo* prevSector = nullptr;
 
 		// 7) Run through intercepts to find clip.
 		auto visitedBridgeMovIds = std::set<int>{};
@@ -348,7 +349,9 @@ namespace TEN::Collision::Los
 			if (intercept.Sector->RoomNumber != prevRoomNumber)
 			{
 				const auto& room = g_Level.Rooms[intercept.Sector->RoomNumber];
-				auto meshColl = room.CollisionMesh.GetIntersection(ray);
+
+				// Collide room collision mesh.
+				auto meshColl = room.CollisionMesh.GetCollision(ray);
 				if (meshColl.has_value() && meshColl->Distance < closestDist)
 				{
 					closestTri = &meshColl->Triangle;
@@ -358,32 +361,33 @@ namespace TEN::Collision::Los
 			}
 			prevRoomNumber = intercept.Sector->RoomNumber;
 
-			// 7.2) Clip unique sector.
-			if (intercept.Sector != prevSector)
+			// 7.2) Clip bridges in unique sector (if applicable).
+			if (collideBridges && intercept.Sector != prevSector)
 			{
-				// Clip bridge (if applicable).
-				if (collideBridges)
+				for (int bridgeMovID : intercept.Sector->BridgeItemNumbers)
 				{
-					// TODO: May clip bridge if it hangs past current sector.
-					for (int bridgeMovID : intercept.Sector->BridgeItemNumbers)
+					if (Contains(visitedBridgeMovIds, bridgeMovID))
+						continue;
+					visitedBridgeMovIds.insert(bridgeMovID);
+
+					const auto& bridgeMov = g_Level.Items[bridgeMovID];
+					const auto& bridge = GetBridgeObject(bridgeMov);
+
+					if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
+						continue;
+
+					// Collide bridge collision mesh.
+					auto meshColl = bridge.GetCollisionMesh().GetCollision(ray);
+					if (meshColl.has_value() && meshColl->Distance < closestDist)
 					{
-						if (Contains(visitedBridgeMovIds, bridgeMovID))
-							continue;
-						visitedBridgeMovIds.insert(bridgeMovID);
-
-						const auto& bridgeMov = g_Level.Items[bridgeMovID];
-						const auto& bridge = GetBridgeObject(bridgeMov);
-
-						if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
+						// Ensure bridge clip is within current room.
+						auto pointColl = GetPointCollision(Geometry::TranslatePoint(ray.position, ray.direction, meshColl->Distance), intercept.Sector->RoomNumber);
+						if (pointColl.GetRoomNumber() != intercept.Sector->RoomNumber)
 							continue;
 
-						auto meshColl = bridge.GetCollisionMesh().GetIntersection(ray);
-						if (meshColl.has_value() && meshColl->Distance < closestDist)
-						{
-							closestTri = &meshColl->Triangle;
-							closestDist = meshColl->Distance;
-							hasClip = true;
-						}
+						closestTri = &meshColl->Triangle;
+						closestDist = meshColl->Distance;
+						hasClip = true;
 					}
 				}
 			}
