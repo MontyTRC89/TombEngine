@@ -58,7 +58,7 @@ namespace TEN::Physics
 			Bvh(const std::vector<CollisionTriangle>& tris);
 
 			// Utilities
-			std::optional<CollisionMeshCollisionData> GetCollision(const Ray& ray,
+			std::optional<CollisionMeshCollisionData> GetCollision(const Ray& ray, float dist,
 																   const std::vector<CollisionTriangle>& tris,
 																   const std::vector<Vector3>& vertices) const;
 
@@ -77,7 +77,7 @@ namespace TEN::Physics
 		CollisionMesh(const std::vector<CollisionTriangle>& tris);
 
 		// Getters
-		std::optional<CollisionMeshCollisionData> GetCollision(const Ray& ray) const;
+		std::optional<CollisionMeshCollisionData> GetCollision(const Ray& ray, float dist) const;
 
 		// Utilities
 		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal);

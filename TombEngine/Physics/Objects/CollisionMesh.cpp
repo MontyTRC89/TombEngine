@@ -114,7 +114,7 @@ namespace TEN::Physics
 		return int(Nodes.size() - 1);
 	}
 
-	std::optional<CollisionMeshCollisionData> CollisionMesh::Bvh::GetCollision(const Ray& ray,
+	std::optional<CollisionMeshCollisionData> CollisionMesh::Bvh::GetCollision(const Ray& ray, float dist,
 																			   const std::vector<CollisionTriangle>& tris,
 																			   const std::vector<Vector3>& vertices) const
 	{
@@ -135,8 +135,8 @@ namespace TEN::Physics
 
 			// TODO: Distance cap?
 			// Test node intersection.
-			float dist = 0.0f;
-			if (!node.Box.Intersects(ray.position, ray.direction, dist))
+			float intersectDist = 0.0f;
+			if (!node.Box.Intersects(ray.position, ray.direction, intersectDist) || intersectDist > dist)
 				return;
 
 			// Traverse nodes.
@@ -144,12 +144,12 @@ namespace TEN::Physics
 			{
 				for (int triID : node.TriangleIds)
 				{
-					float dist = 0.0f;
-
-					if (tris[triID].Intersects(vertices, ray, dist) && dist < closestDist)
+					float intersectDist = 0.0f;
+					if (tris[triID].Intersects(vertices, ray, intersectDist) &&
+						intersectDist <= dist && intersectDist < closestDist)
 					{
 						closestTri = &tris[triID];
-						closestDist = dist;
+						closestDist = intersectDist;
 						isIntersected = true;
 					}
 				}
@@ -175,9 +175,9 @@ namespace TEN::Physics
 		_triangles = tris;
 	}
 
-	std::optional<CollisionMeshCollisionData> CollisionMesh::GetCollision(const Ray& ray) const
+	std::optional<CollisionMeshCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
 	{
-		return _bvh.GetCollision(ray, _triangles, _vertices);
+		return _bvh.GetCollision(ray, dist, _triangles, _vertices);
 	}
 
 	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal)

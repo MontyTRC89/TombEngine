@@ -351,7 +351,7 @@ namespace TEN::Collision::Los
 				const auto& room = g_Level.Rooms[intercept.Sector->RoomNumber];
 
 				// Collide room collision mesh.
-				auto meshColl = room.CollisionMesh.GetCollision(ray);
+				auto meshColl = room.CollisionMesh.GetCollision(ray, dist);
 				if (meshColl.has_value() && meshColl->Distance < closestDist)
 				{
 					closestTri = &meshColl->Triangle;
@@ -377,7 +377,7 @@ namespace TEN::Collision::Los
 						continue;
 
 					// Collide bridge collision mesh.
-					auto meshColl = bridge.GetCollisionMesh().GetCollision(ray);
+					auto meshColl = bridge.GetCollisionMesh().GetCollision(ray, dist);
 					if (meshColl.has_value() && meshColl->Distance < closestDist)
 					{
 						// Ensure bridge clip is within current room.
