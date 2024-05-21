@@ -84,7 +84,7 @@ static void HandleLosDebug(const ItemInfo& item)
 
 	auto dir = (item.Pose.Orientation + rot).ToDirection();
 
-	float dist = BLOCK(1.25f);
+	float dist = BLOCK(1.5f);
 
 	short roomNumber = item.RoomNumber;
 	GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber);

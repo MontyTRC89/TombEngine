@@ -81,7 +81,7 @@ namespace TEN::Physics
 		triIds.reserve(tris.size());
 		for (int i = 0; i < tris.size(); ++i)
 			triIds.push_back(i);
-		
+
 		Generate(tris, triIds, 0, (int)tris.size());
 	}
 
@@ -225,6 +225,6 @@ namespace TEN::Physics
 
 	void CollisionMesh::UpdateBvh()
 	{
-		_bvh = CollisionMesh::Bvh(_triangles);
+		_bvh = Bvh(_triangles);
 	}
 }
