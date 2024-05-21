@@ -140,7 +140,6 @@ public:
 	int		 RoomNumber			  = 0;
 	int		 SidePortalRoomNumber = 0;
 
-	CollisionMesh	  Mesh				= {};
 	SectorSurfaceData FloorSurface		= {};
 	SectorSurfaceData CeilingSurface	= {};
 	std::set<int>	  BridgeItemNumbers = {};

@@ -99,7 +99,7 @@ namespace TEN::Math
 
 		// Combine boxes.
 		node.Box = tris[triIndices[start]].GetBox();
-		for (int i = start; i < end; i++)
+		for (int i = (start + 1); i < end; i++)
 			node.Box = Geometry::CombineBoundingBoxes(node.Box, tris[triIndices[i]].GetBox());
 
 		if ((end - start) <= TRI_COUNT_PER_LEAF_MAX)
@@ -113,7 +113,6 @@ namespace TEN::Math
 		node.LeftChildIndex = Build(start, mid, triIndices, tris);
 		node.RightChildIndex = Build(mid, end, triIndices, tris);
 		Nodes.push_back(node);
-
 		return int(Nodes.size() - 1);
 	}
 
@@ -134,6 +133,7 @@ namespace TEN::Math
 
 			const auto& node = Nodes[nodeIndex];
 
+			// TODO: Distance cap?
 			// Test node intersection.
 			float dist = 0.0f;
 			if (!node.Box.Intersects(ray.position, ray.direction, dist))
@@ -159,8 +159,9 @@ namespace TEN::Math
 				traverseBvh(node.RightChildIndex);
 			}
 		};
-
-		traverseBvh(0);
+		
+		// Traverse BVH from root node.
+		traverseBvh((int)Nodes.size() - 1);
 
 		if (isIntersected)
 			return CollisionMeshCollisionData{ *closestTri, closestDist };

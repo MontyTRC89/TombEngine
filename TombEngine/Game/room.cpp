@@ -375,8 +375,8 @@ namespace TEN::Collision::Room
 		return normal;
 	}
 
-	static CollisionMesh GenerateSectorCollisionMesh(const FloorInfo& sector,
-													 const FloorInfo& prevSectorX, const FloorInfo& prevSectorZ, bool isXEnd, bool isZEnd)
+	static void CollectSectorCollisionTriangles(CollisionMesh& collMesh, const FloorInfo& sector,
+												const FloorInfo& prevSectorX, const FloorInfo& prevSectorZ, bool isXEnd, bool isZEnd)
 	{
 		constexpr auto NORTH_WALL_NORMAL	  = Vector3(0.0f, 0.0f, 1.0f);
 		constexpr auto SOUTH_WALL_NORMAL	  = Vector3(0.0f, 0.0f, -1.0f);
@@ -396,8 +396,6 @@ namespace TEN::Collision::Room
 		auto corner1 = sector.Position + REL_CORNER_1;
 		auto corner2 = sector.Position + REL_CORNER_2;
 		auto corner3 = sector.Position + REL_CORNER_3;
-
-		auto collMesh = CollisionMesh();
 
 		// Collect triangles.
 		bool isFloor = true;
@@ -783,9 +781,6 @@ namespace TEN::Collision::Room
 
 			isFloor = false;
 		}
-
-		collMesh.UpdateBvh();
-		return collMesh;
 	}
 
 	void GenerateRoomCollisionMesh(ROOM_INFO& room)
@@ -833,8 +828,10 @@ namespace TEN::Collision::Room
 					isZEnd = (nextSectorZ.SidePortalRoomNumber == NO_VALUE);
 				}
 
-				sector.Mesh = GenerateSectorCollisionMesh(sector, *prevSectorX, *prevSectorZ, isXEnd, isZEnd);
+				CollectSectorCollisionTriangles(room.CollisionMesh, sector, *prevSectorX, *prevSectorZ, isXEnd, isZEnd);
 			}
 		}
+
+		room.CollisionMesh.UpdateBvh();
 	}
 }

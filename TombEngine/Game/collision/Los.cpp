@@ -323,6 +323,7 @@ namespace TEN::Collision::Los
 		auto offset = Vector3(0, CLICK(0.1f), 0);
 		auto doOffset = false;
 
+		int prevRoomNumber = NO_VALUE;
 		const FloorInfo* prevSector = nullptr;
 		const CollisionTriangle* closestTri = nullptr;
 		float closestDist = dist;
@@ -341,19 +342,24 @@ namespace TEN::Collision::Los
 			doOffset = !doOffset;
 			g_Renderer.AddDebugTarget(intercept.Position.ToVector3(), Quaternion::Identity, 20, Color(1, 0, 0));
 
-			// Clip unique sector.
-			if (intercept.Sector != prevSector)
+			// 7.1) Clip unique room.
+			if (intercept.Sector->RoomNumber != prevRoomNumber)
 			{
-				// 7.1) Clip sector.
-				auto meshColl = intercept.Sector->Mesh.GetIntersection(ray);
+				const auto& room = g_Level.Rooms[intercept.Sector->RoomNumber];
+				auto meshColl = room.CollisionMesh.GetIntersection(ray);
 				if (meshColl.has_value() && meshColl->Distance < closestDist)
 				{
 					closestTri = &meshColl->Triangle;
 					closestDist = meshColl->Distance;
 					hasClip = true;
 				}
+			}
+			prevRoomNumber = intercept.Sector->RoomNumber;
 
-				// 7.3) Clip bridge (if applicable).
+			// 7.2) Clip unique sector.
+			if (intercept.Sector != prevSector)
+			{
+				// Clip bridge (if applicable).
 				if (collideBridges)
 				{
 					// TODO: May clip bridge if it hangs past current sector.
@@ -381,7 +387,7 @@ namespace TEN::Collision::Los
 			}
 			prevSector = intercept.Sector;
 
-			// 7.4) Has clip; set intersect and trim vector.
+			// 7.3) Has clip; set intersect and trim vector.
 			if (hasClip)
 			{
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
