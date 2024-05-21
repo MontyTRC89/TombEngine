@@ -1,6 +1,6 @@
 #pragma once
 
-namespace TEN::Math
+namespace TEN::Physics
 {
 	class CollisionTriangle
 	{
@@ -73,7 +73,7 @@ namespace TEN::Math
 
 	public:
 		// Constructors
-		CollisionMesh();
+		CollisionMesh() = default;
 		CollisionMesh(const std::vector<CollisionTriangle>& tris);
 
 		// Getters

@@ -1,13 +1,13 @@
 #include "framework.h"
-#include "Math/Objects/CollisionMesh.h"
+#include "Physics/Objects/CollisionMesh.h"
 
-#include "Math/Constants.h"
-#include "Math/Geometry.h"
+#include "Math/Math.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Math;
 using namespace TEN::Utils;
 
-namespace TEN::Math
+namespace TEN::Physics
 {
 	CollisionTriangle::CollisionTriangle(int vertexID0, int vertexID1, int vertexID2, const Vector3& normal, const BoundingBox& box)
 	{
@@ -168,10 +168,6 @@ namespace TEN::Math
 			return CollisionMeshCollisionData{ *closestTri, closestDist };
 
 		return std::nullopt;
-	}
-
-	CollisionMesh::CollisionMesh()
-	{
 	}
 
 	CollisionMesh::CollisionMesh(const std::vector<CollisionTriangle>& tris)

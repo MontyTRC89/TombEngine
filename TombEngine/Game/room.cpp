@@ -10,11 +10,13 @@
 #include "Renderer/Renderer.h"
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
+#include "Physics/Physics.h"
 #include "Specific/trutils.h"
 
-using namespace TEN::Math;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
+using namespace TEN::Math;
+using namespace TEN::Physics;
 using namespace TEN::Renderer;
 using namespace TEN::Utils;
 

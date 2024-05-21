@@ -5,8 +5,10 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Physics/Physics.h"
 
 using namespace TEN::Math;
+using namespace TEN::Physics;
 
 namespace TEN::Entities::Generic
 {
@@ -89,7 +91,7 @@ namespace TEN::Entities::Generic
 		corners[3] -= offset;
 		corners[5] += offset;
 		corners[7] -= offset;
-
+		
 		// Set collision mesh.
 		_collisionMesh = CollisionMesh();
 		_collisionMesh.InsertTriangle(corners[0], corners[1], corners[4], Vector3::Transform(UP_NORMAL, tiltRotMatrix * rotMatrix));

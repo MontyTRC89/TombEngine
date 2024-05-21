@@ -1,7 +1,9 @@
 #pragma once
 #include "Math/Math.h"
+#include "Physics/Physics.h"
 
 using namespace TEN::Math;
+using namespace TEN::Physics;
 
 enum GAME_OBJECT_ID : short;
 enum class ReverbType;
@@ -111,7 +113,7 @@ struct ROOM_INFO
 	std::string name = {};
 	std::vector<std::string> tags = {};
 
-	CollisionMesh			   CollisionMesh  = {};
+	CollisionMesh			   CollisionMesh  = TEN::Physics::CollisionMesh();
 	std::vector<FloorInfo>	   floor		  = {};
 	std::vector<ROOM_LIGHT>	   lights		  = {};
 	std::vector<MESH_INFO>	   mesh			  = {};
