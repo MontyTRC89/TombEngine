@@ -3,19 +3,17 @@
 
 #include "Math/Constants.h"
 #include "Math/Geometry.h"
+#include "Specific/trutils.h"
+
+using namespace TEN::Utils;
 
 namespace TEN::Math
 {
-	CollisionTriangle::CollisionTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal)
+	CollisionTriangle::CollisionTriangle(int vertexID0, int vertexID1, int vertexID2, const Vector3& normal, const BoundingBox& box)
 	{
-		_vertices = std::array<const Vector3*, VERTEX_COUNT>{ &vertex0, &vertex1, &vertex2 };
+		_vertexIds = std::array<int, VERTEX_COUNT>{ vertexID0, vertexID1, vertexID2 };
 		_normal = normal;
-		_box = Geometry::GetBoundingBox(std::vector<Vector3>{ vertex0, vertex1, vertex2 });
-	}
-
-	const std::array<const Vector3*, CollisionTriangle::VERTEX_COUNT>& CollisionTriangle::GetVertices() const
-	{
-		return _vertices;
+		_box = box;
 	}
 
 	const Vector3& CollisionTriangle::GetNormal() const
@@ -28,7 +26,7 @@ namespace TEN::Math
 		return _box;
 	}
 
-	bool CollisionTriangle::Intersects(const Ray& ray, float& dist) const
+	bool CollisionTriangle::Intersects(const std::vector<Vector3>& vertices, const Ray& ray, float& dist) const
 	{
 		// Test if ray intersects triangle AABB.
 		float boxDist = 0.0f;
@@ -36,8 +34,8 @@ namespace TEN::Math
 			return false;
 
 		// Calculate edge vectors.
-		auto edge0 = *_vertices[1] - *_vertices[0];
-		auto edge1 = *_vertices[2] - *_vertices[0];
+		auto edge0 = vertices[_vertexIds[1]] - vertices[_vertexIds[0]];
+		auto edge1 = vertices[_vertexIds[2]] - vertices[_vertexIds[0]];
 
 		// Calculate normal.
 		auto normal = edge0.Cross(edge1);
@@ -54,11 +52,11 @@ namespace TEN::Math
 		float invDet = 1.0f / det;
 
 		// Calculate barycentric coordinates.
-		float baryCoordVert0 = (ray.position - *_vertices[0]).Dot(dirCrossEdge1) * invDet;
+		float baryCoordVert0 = (ray.position - vertices[_vertexIds[0]]).Dot(dirCrossEdge1) * invDet;
 		if (baryCoordVert0 < 0.0f || baryCoordVert0 > 1.0f)
 			return false;
 
-		auto rayToVert0CrossEdge0 = (ray.position - *_vertices[0]).Cross(edge0);
+		auto rayToVert0CrossEdge0 = (ray.position - vertices[_vertexIds[0]]).Cross(edge0);
 		float baryCoordVert1 = ray.direction.Dot(rayToVert0CrossEdge0) * invDet;
 		if (baryCoordVert1 < 0.0f || (baryCoordVert0 + baryCoordVert1) > 1.0f)
 			return false;
@@ -74,20 +72,20 @@ namespace TEN::Math
 
 	bool CollisionMesh::BvhNode::IsLeaf() const
 	{
-		return (LeftChildIndex == NO_VALUE && RightChildIndex == NO_VALUE);
+		return (LeftChildID == NO_VALUE && RightChildID == NO_VALUE);
 	}
 
 	CollisionMesh::Bvh::Bvh(const std::vector<CollisionTriangle>& tris)
 	{
-		auto triIndices = std::vector<int>{};
-		triIndices.reserve(tris.size());
+		auto triIds = std::vector<int>{};
+		triIds.reserve(tris.size());
 		for (int i = 0; i < tris.size(); ++i)
-			triIndices.push_back(i);
+			triIds.push_back(i);
 		
-		Build(0, (int)tris.size(), triIndices, tris);
+		Generate(tris, triIds, 0, (int)tris.size());
 	}
 
-	int CollisionMesh::Bvh::Build(int start, int end, const std::vector<int>& triIndices, const std::vector<CollisionTriangle>& tris)
+	int CollisionMesh::Bvh::Generate(const std::vector<CollisionTriangle>& tris, const std::vector<int>& triIds, int start, int end)
 	{
 		constexpr auto TRI_COUNT_PER_LEAF_MAX = 4;
 
@@ -98,25 +96,27 @@ namespace TEN::Math
 		auto node = BvhNode{};
 
 		// Combine boxes.
-		node.Box = tris[triIndices[start]].GetBox();
+		node.Box = tris[triIds[start]].GetBox();
 		for (int i = (start + 1); i < end; i++)
-			node.Box = Geometry::CombineBoundingBoxes(node.Box, tris[triIndices[i]].GetBox());
+			node.Box = Geometry::CombineBoundingBoxes(node.Box, tris[triIds[i]].GetBox());
 
 		if ((end - start) <= TRI_COUNT_PER_LEAF_MAX)
 		{
-			node.TriangleIndices.insert(node.TriangleIndices.end(), triIndices.begin() + start, triIndices.begin() + end);
+			node.TriangleIds.insert(node.TriangleIds.end(), triIds.begin() + start, triIds.begin() + end);
 			Nodes.push_back(node);
 			return int(Nodes.size() - 1);
 		}
 
 		int mid = (start + end) / 2;
-		node.LeftChildIndex = Build(start, mid, triIndices, tris);
-		node.RightChildIndex = Build(mid, end, triIndices, tris);
+		node.LeftChildID = Generate(tris, triIds, start, mid);
+		node.RightChildID = Generate(tris, triIds, mid, end);
 		Nodes.push_back(node);
 		return int(Nodes.size() - 1);
 	}
 
-	std::optional<CollisionMeshCollisionData> CollisionMesh::Bvh::GetIntersection(const Ray& ray, const std::vector<CollisionTriangle>& tris) const
+	std::optional<CollisionMeshCollisionData> CollisionMesh::Bvh::GetIntersection(const Ray& ray,
+																				  const std::vector<CollisionTriangle>& tris,
+																				  const std::vector<Vector3>& vertices) const
 	{
 		if (Nodes.empty())
 			return std::nullopt;
@@ -125,13 +125,13 @@ namespace TEN::Math
 		float closestDist = INFINITY;
 		bool isIntersected = false;
 
-		std::function<void(int)> traverseBvh = [&](int nodeIndex)
+		std::function<void(int)> traverseBvh = [&](int nodeID)
 		{
 			// Invalid node; return early.
-			if (nodeIndex == NO_VALUE)
+			if (nodeID == NO_VALUE)
 				return;
 
-			const auto& node = Nodes[nodeIndex];
+			const auto& node = Nodes[nodeID];
 
 			// TODO: Distance cap?
 			// Test node intersection.
@@ -142,12 +142,13 @@ namespace TEN::Math
 			// Traverse nodes.
 			if (node.IsLeaf())
 			{
-				for (int triIndex : node.TriangleIndices)
+				for (int triID : node.TriangleIds)
 				{
 					float dist = 0.0f;
-					if (tris[triIndex].Intersects(ray, dist) && dist < closestDist)
+
+					if (tris[triID].Intersects(vertices, ray, dist) && dist < closestDist)
 					{
-						closestTri = &tris[triIndex];
+						closestTri = &tris[triID];
 						closestDist = dist;
 						isIntersected = true;
 					}
@@ -155,8 +156,8 @@ namespace TEN::Math
 			}
 			else
 			{
-				traverseBvh(node.LeftChildIndex);
-				traverseBvh(node.RightChildIndex);
+				traverseBvh(node.LeftChildID);
+				traverseBvh(node.RightChildID);
 			}
 		};
 		
@@ -178,23 +179,52 @@ namespace TEN::Math
 		_triangles = tris;
 	}
 
-	const std::vector<CollisionTriangle>& CollisionMesh::GetTriangles() const
-	{
-		return _triangles;
-	}
-
 	std::optional<CollisionMeshCollisionData> CollisionMesh::GetIntersection(const Ray& ray) const
 	{
-		return _bvh.GetIntersection(ray, _triangles);
+		return _bvh.GetIntersection(ray, _triangles, _vertices);
 	}
 
 	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal)
 	{
-		const auto& insertedVertex0 = *_vertices.insert(vertex0).first;
-		const auto& insertedVertex1 = *_vertices.insert(vertex1).first;
-		const auto& insertedVertex2 = *_vertices.insert(vertex2).first;
+		int vertexID0 = NO_VALUE;
+		int vertexID1 = NO_VALUE;
+		int vertexID2 = NO_VALUE;
 
-		_triangles.push_back(CollisionTriangle(insertedVertex0, insertedVertex1, insertedVertex2, normal));
+		// Add new vertices and get their IDs.
+		if (!Contains(_vertices, vertex0))
+		{
+			_vertices.push_back(vertex0);
+			vertexID0 = (int)_vertices.size() - 1;
+		}
+		if (!Contains(_vertices, vertex1))
+		{
+			_vertices.push_back(vertex1);
+			vertexID1 = (int)_vertices.size() - 1;
+		}
+		if (!Contains(_vertices, vertex2))
+		{
+			_vertices.push_back(vertex2);
+			vertexID2 = (int)_vertices.size() - 1;
+		}
+
+		// Get vertex IDs if vertices already exist.
+		if (vertexID0 == NO_VALUE || vertexID1 == NO_VALUE || vertexID2 == NO_VALUE)
+		{
+			for (int i = 0; i < _vertices.size(); i++)
+			{
+				const auto& vertex = _vertices[i];
+
+				if (vertexID0 == NO_VALUE && vertex == vertex0)
+					vertexID0 = i;
+				if (vertexID1 == NO_VALUE && vertex == vertex1)
+					vertexID1 = i;
+				if (vertexID2 == NO_VALUE && vertex == vertex2)
+					vertexID2 = i;
+			}
+		}
+		
+		auto box = Geometry::GetBoundingBox(std::vector<Vector3>{ vertex0, vertex1, vertex2 });
+		_triangles.push_back(CollisionTriangle(vertexID0, vertexID1, vertexID2, normal, box));
 	}
 
 	void CollisionMesh::UpdateBvh()

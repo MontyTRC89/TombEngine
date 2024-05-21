@@ -10,21 +10,20 @@ namespace TEN::Math
 
 	private:
 		// Members
-		std::array<const Vector3*, VERTEX_COUNT> _vertices = {};
-		Vector3		_normal	= Vector3::Zero;
-		BoundingBox _box	= BoundingBox();
+		std::array<int, VERTEX_COUNT> _vertexIds = {};
+		Vector3						  _normal	 = Vector3::Zero;
+		BoundingBox					  _box		 = BoundingBox();
 
 	public:
 		// Constructors
-		CollisionTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal = Vector3::Zero);
+		CollisionTriangle(int vertID0, int vertID1, int vertID2, const Vector3& normal, const BoundingBox& box);
 
 		// Getters
-		const std::array<const Vector3*, VERTEX_COUNT>& GetVertices() const; //temp
 		const Vector3&	   GetNormal() const;
 		const BoundingBox& GetBox() const;
 
 		// Inquirers
-		bool Intersects(const Ray& ray, float& dist) const;
+		bool Intersects(const std::vector<Vector3>& vertices, const Ray& ray, float& dist) const;
 	};
 
 	struct CollisionMeshCollisionData
@@ -33,16 +32,17 @@ namespace TEN::Math
 		float Distance = 0.0f;
 	};
 
+	// Note: Utilizes bounding volume hierarchy.
 	class CollisionMesh
 	{
 	private:
 		struct BvhNode
 		{
-			std::vector<int> TriangleIndices = {}; // NOTE: Only leaf nodes store triangles directly.
-			BoundingBox		 Box			 = BoundingBox();
+			std::vector<int> TriangleIds = {}; // NOTE: Only leaf nodes store triangles directly.
+			BoundingBox		 Box		 = BoundingBox();
 
-			int LeftChildIndex	= NO_VALUE;
-			int RightChildIndex = NO_VALUE;
+			int LeftChildID	 = NO_VALUE;
+			int RightChildID = NO_VALUE;
 
 			bool IsLeaf() const;
 		};
@@ -58,15 +58,17 @@ namespace TEN::Math
 			Bvh(const std::vector<CollisionTriangle>& tris);
 
 			// Utilities
-			std::optional<CollisionMeshCollisionData> GetIntersection(const Ray& ray, const std::vector<CollisionTriangle>& tris) const;
+			std::optional<CollisionMeshCollisionData> GetIntersection(const Ray& ray,
+																	  const std::vector<CollisionTriangle>& tris,
+																	  const std::vector<Vector3>& vertices) const;
 
 		private:
-			int Build(int start, int end, const std::vector<int>& trIndices, const std::vector<CollisionTriangle>& tris);
+			int Generate(const std::vector<CollisionTriangle>& tris, const std::vector<int>& triIds, int start, int end);
 		};
 
 		// Members
 		std::vector<CollisionTriangle> _triangles = {};
-		std::set<Vector3>			   _vertices  = {};
+		std::vector<Vector3>		   _vertices  = {};
 		Bvh							   _bvh		  = Bvh();
 
 	public:
@@ -75,11 +77,10 @@ namespace TEN::Math
 		CollisionMesh(const std::vector<CollisionTriangle>& tris);
 
 		// Getters
-		const std::vector<CollisionTriangle>&	  GetTriangles() const; //temp
 		std::optional<CollisionMeshCollisionData> GetIntersection(const Ray& ray) const;
 
 		// Utilities
-		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal = Vector3::Zero);
+		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal);
 		void UpdateBvh();
 	};
 }

@@ -72,12 +72,6 @@ using namespace TEN::Collision::Los;
 
 static void HandleLosDebug(const ItemInfo& item)
 {
-	const auto& room = g_Level.Rooms[item.RoomNumber];
-	for (const auto& tri : room.CollisionMesh.GetTriangles())
-	{
-		//g_Renderer.AddDebugTriangle(*tri.GetVertices()[0], *tri.GetVertices()[1], *tri.GetVertices()[2], Color(1, 1, 0, 0.2f));
-	}
-
 	static auto rot = EulerAngles::Identity;
 	if (KeyMap[OIS::KC_T])
 	{
