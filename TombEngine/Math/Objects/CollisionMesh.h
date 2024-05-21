@@ -16,7 +16,7 @@ namespace TEN::Math
 
 	public:
 		// Constructors
-		CollisionTriangle(int vertID0, int vertID1, int vertID2, const Vector3& normal, const BoundingBox& box);
+		CollisionTriangle(int vertexID0, int vertexID1, int vertexID2, const Vector3& normal, const BoundingBox& box);
 
 		// Getters
 		const Vector3&	   GetNormal() const;
