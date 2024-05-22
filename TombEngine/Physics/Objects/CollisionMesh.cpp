@@ -43,12 +43,8 @@ namespace TEN::Physics
 		auto edge0 = vertices[_vertexIds[1]] - vertices[_vertexIds[0]];
 		auto edge1 = vertices[_vertexIds[2]] - vertices[_vertexIds[0]];
 
-		// Calculate normal.
-		auto normal = edge0.Cross(edge1);
-		normal.Normalize();
-
 		// Test if ray is facing triangle.
-		if (ray.direction.Dot(normal) <= -EPSILON)
+		if (ray.direction.Dot(_normal) > EPSILON)
 			return false;
 
 		// Calculate determinant.
