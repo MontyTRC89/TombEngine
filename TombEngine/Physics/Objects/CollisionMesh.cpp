@@ -47,6 +47,10 @@ namespace TEN::Physics
 		auto normal = edge0.Cross(edge1);
 		normal.Normalize();
 
+		// Test if ray is facing triangle.
+		if (ray.direction.Dot(normal) <= -EPSILON)
+			return false;
+
 		// Calculate determinant.
 		auto dirCrossEdge1 = ray.direction.Cross(edge1);
 		float det = edge0.Dot(dirCrossEdge1);
