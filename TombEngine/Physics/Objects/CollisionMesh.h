@@ -14,13 +14,16 @@ namespace TEN::Physics
 		Vector3						  _normal	 = Vector3::Zero;
 		BoundingBox					  _box		 = BoundingBox();
 
+		int _portalRoomNumber = NO_VALUE;
+
 	public:
 		// Constructors
-		CollisionTriangle(int vertexID0, int vertexID1, int vertexID2, const Vector3& normal, const BoundingBox& box);
+		CollisionTriangle(int vertexID0, int vertexID1, int vertexID2, const Vector3& normal, const BoundingBox& box, int portalRoomNumber);
 
 		// Getters
 		const Vector3&	   GetNormal() const;
 		const BoundingBox& GetBox() const;
+		int				   GetPortalRoomNumber() const;
 
 		// Inquirers
 		bool Intersects(const std::vector<Vector3>& vertices, const Ray& ray, float& dist) const;
@@ -80,7 +83,7 @@ namespace TEN::Physics
 		std::optional<CollisionMeshCollisionData> GetCollision(const Ray& ray, float dist) const;
 
 		// Utilities
-		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal);
+		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, int portalRoomNumber = NO_VALUE);
 		void UpdateBvh();
 	};
 }

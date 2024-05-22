@@ -9,11 +9,12 @@ using namespace TEN::Utils;
 
 namespace TEN::Physics
 {
-	CollisionTriangle::CollisionTriangle(int vertexID0, int vertexID1, int vertexID2, const Vector3& normal, const BoundingBox& box)
+	CollisionTriangle::CollisionTriangle(int vertexID0, int vertexID1, int vertexID2, const Vector3& normal, const BoundingBox& box, int portalRoomNumber)
 	{
 		_vertexIds = std::array<int, VERTEX_COUNT>{ vertexID0, vertexID1, vertexID2 };
 		_normal = normal;
 		_box = box;
+		_portalRoomNumber = portalRoomNumber;
 	}
 
 	const Vector3& CollisionTriangle::GetNormal() const
@@ -24,6 +25,11 @@ namespace TEN::Physics
 	const BoundingBox& CollisionTriangle::GetBox() const
 	{
 		return _box;
+	}
+
+	int CollisionTriangle::GetPortalRoomNumber() const
+	{
+		return _portalRoomNumber;
 	}
 
 	bool CollisionTriangle::Intersects(const std::vector<Vector3>& vertices, const Ray& ray, float& dist) const
@@ -100,18 +106,22 @@ namespace TEN::Physics
 		for (int i = (start + 1); i < end; i++)
 			node.Box = Geometry::CombineBoundingBoxes(node.Box, tris[triIds[i]].GetBox());
 
+		// Leaf node.
 		if ((end - start) <= TRI_COUNT_PER_LEAF_MAX)
 		{
 			node.TriangleIds.insert(node.TriangleIds.end(), triIds.begin() + start, triIds.begin() + end);
 			Nodes.push_back(node);
 			return int(Nodes.size() - 1);
 		}
-
-		int mid = (start + end) / 2;
-		node.LeftChildID = Generate(tris, triIds, start, mid);
-		node.RightChildID = Generate(tris, triIds, mid, end);
-		Nodes.push_back(node);
-		return int(Nodes.size() - 1);
+		// Split node.
+		else
+		{
+			int mid = (start + end) / 2;
+			node.LeftChildID = Generate(tris, triIds, start, mid);
+			node.RightChildID = Generate(tris, triIds, mid, end);
+			Nodes.push_back(node);
+			return int(Nodes.size() - 1);
+		}
 	}
 
 	std::optional<CollisionMeshCollisionData> CollisionMesh::Bvh::GetCollision(const Ray& ray, float dist,
@@ -180,7 +190,7 @@ namespace TEN::Physics
 		return _bvh.GetCollision(ray, dist, _triangles, _vertices);
 	}
 
-	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal)
+	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, int portalRoomNumber)
 	{
 		int vertexID0 = NO_VALUE;
 		int vertexID1 = NO_VALUE;
@@ -220,7 +230,7 @@ namespace TEN::Physics
 		}
 		
 		auto box = Geometry::GetBoundingBox(std::vector<Vector3>{ vertex0, vertex1, vertex2 });
-		_triangles.push_back(CollisionTriangle(vertexID0, vertexID1, vertexID2, normal, box));
+		_triangles.push_back(CollisionTriangle(vertexID0, vertexID1, vertexID2, normal, box, portalRoomNumber));
 	}
 
 	void CollisionMesh::UpdateBvh()
