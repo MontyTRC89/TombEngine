@@ -13,6 +13,7 @@ namespace TEN::Entities::Generic
 	{
 	private:
 		// Members
+		BoundingBox	  _box			 = BoundingBox();
 		CollisionMesh _collisionMesh = CollisionMesh();
 
 	public:
@@ -25,6 +26,7 @@ namespace TEN::Entities::Generic
 		std::function<int(const ItemInfo& item)> GetCeilingBorder = nullptr;
 
 		// Getters
+		const BoundingBox&	 GetBox() const;
 		const CollisionMesh& GetCollisionMesh() const;
 
 		// Utilities
@@ -34,6 +36,7 @@ namespace TEN::Entities::Generic
 	private:
 		// Helpers
 		void UpdateCollisionMesh(const ItemInfo& item);
+		void UpdateBox(const ItemInfo& item);
 	};
 
 	const BridgeObject& GetBridgeObject(const ItemInfo& item);

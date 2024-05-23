@@ -17,9 +17,15 @@ namespace TEN::Entities::Generic
 		return _collisionMesh;
 	}
 
+	const BoundingBox& BridgeObject::GetBox() const
+	{
+		return _box;
+	}
+
 	void BridgeObject::Initialize(const ItemInfo& item)
 	{
 		UpdateBridgeItem(item);
+		UpdateBox(item);
 		UpdateCollisionMesh(item);
 		//InitializeAttractor(item);
 
@@ -33,10 +39,22 @@ namespace TEN::Entities::Generic
 			return;
 
 		UpdateBridgeItem(item);
+		UpdateBox(item);
 		UpdateCollisionMesh(item);
 		//UpdateAttractor(item);
 
 		PrevPose = item.Pose;
+	}
+
+	void BridgeObject::UpdateBox(const ItemInfo& item)
+	{
+		auto corners = std::array<Vector3, BoundingOrientedBox::CORNER_COUNT>{};
+		item.GetBox().GetCorners(corners.data());
+
+		// TODO: Avoid making second copy of corners.
+		auto cornersVector = std::vector<Vector3>{};
+		cornersVector.insert(cornersVector.begin(), corners.begin(), corners.end());
+		_box = Geometry::GetBoundingBox(cornersVector);
 	}
 
 	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
