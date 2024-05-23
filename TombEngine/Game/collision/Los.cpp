@@ -421,14 +421,14 @@ namespace TEN::Collision::Los
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
 
 				// Triangle is room portal; continue trace from new room.
-				if (closestTri->IsPortal())
+				/*if (closestTri->IsPortal())
 				{
 					ray.position = intersectPos;
 					rayRoomNumber = closestTri->GetPortalRoomNumber();
 					rayDist = Vector3::Distance(intersectPos, target);
 				}
 				// Triangle is tangible; fill remaining room trace data.
-				else
+				else*/
 				{
 					roomTrace.Triangle = closestTri;
 					roomTrace.Position = std::pair(intersectPos, rayRoomNumber);

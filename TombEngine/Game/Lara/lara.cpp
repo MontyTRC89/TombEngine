@@ -68,6 +68,7 @@ CollisionInfo LaraCollision = {};
 #include "Specific/Input/Input.h"
 #include <OISKeyboard.h>
 #include <Game/collision/Los.h>
+using namespace TEN::Collision::Room;
 using namespace TEN::Collision::Los;
 
 static void HandleLosDebug(const ItemInfo& item)
@@ -131,7 +132,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	HandleLosDebug(*item);
 
-	const auto& room = g_Level.Rooms[item->RoomNumber];
+	auto& room = g_Level.Rooms[item->RoomNumber];
+	GenerateRoomCollisionMesh(room);
 	room.CollisionMesh.DrawDebug();
 
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);

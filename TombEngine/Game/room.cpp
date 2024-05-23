@@ -378,7 +378,9 @@ namespace TEN::Collision::Room
 	}
 
 	static void CollectSectorCollisionTriangles(CollisionMesh& collMesh, const FloorInfo& sector,
-												const FloorInfo& prevSectorX, const FloorInfo& prevSectorZ, bool isXEnd, bool isZEnd)
+												const FloorInfo& prevSectorX, const FloorInfo& nextSectorX,
+												const FloorInfo& prevSectorZ, const FloorInfo& nextSectorZ,
+												bool isXEnd, bool isZEnd)
 	{
 		constexpr auto NORTH_WALL_NORMAL	  = Vector3(0.0f, 0.0f, 1.0f);
 		constexpr auto SOUTH_WALL_NORMAL	  = Vector3(0.0f, 0.0f, -1.0f);
@@ -628,6 +630,7 @@ namespace TEN::Collision::Room
 						auto vertex2 = Vector3(corner0.x, prevHeight0, corner0.y);
 						auto vertex3 = Vector3(corner1.x, prevHeight1, corner1.y);
 
+						// TODO: Block wall formation if it belongs to a sector in another room.
 						bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
 						if (vertex0 != vertex2)
 						{
@@ -644,6 +647,30 @@ namespace TEN::Collision::Room
 								collMesh.InsertTriangle(vertex1, vertex2, vertex3, normal1);
 						}
 					}
+				}
+
+				// Collect wall portal to previous sector.
+				if (sector.RoomNumber != prevSectorX.RoomNumber && isFloor)
+				{
+					// TODO: Check sectors with different triangle normals.
+					int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, true);
+					int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, !useTri0 ? 0 : 1, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, false);
+
+					int prevFloorHeight0 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, true);
+					int prevFloorHeight1 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, useTri0 ? 0 : 1, true);
+					int prevCeilHeight0 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, !useTri0 ? 0 : 1, false);
+					int prevCeilHeight1 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, useTri0 ? 0 : 1, false);
+
+					// TODO: Criss-cross.
+					auto vertex0 = Vector3(corner0.x, (floorHeight0 < prevFloorHeight0) ? floorHeight0 : prevFloorHeight0, corner0.y);
+					auto vertex1 = Vector3(corner1.x, (floorHeight1 < prevFloorHeight1) ? floorHeight1 : prevFloorHeight1, corner1.y);
+					auto vertex2 = Vector3(corner0.x, (ceilHeight0 > prevCeilHeight0) ? ceilHeight0 : prevCeilHeight0, corner0.y);
+					auto vertex3 = Vector3(corner1.x, (ceilHeight1 > prevCeilHeight1) ? ceilHeight1 : prevCeilHeight1, corner1.y);
+
+					collMesh.InsertTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL, prevSectorX.RoomNumber);
+					collMesh.InsertTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL, prevSectorX.RoomNumber);
 				}
 
 				// Collect end wall.
@@ -765,6 +792,30 @@ namespace TEN::Collision::Room
 					}
 				}
 
+				// Collect wall portal to previous sector.
+				if (sector.RoomNumber != prevSectorZ.RoomNumber && isFloor)
+				{
+					// TODO: Check sectors with different triangle normals.
+					int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, true);
+					int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, !useTri0 ? 0 : 1, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, false);
+
+					int prevFloorHeight0 = GetSurfaceTriangleVertexY(prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, useTri0 ? 0 : 1, true);
+					int prevFloorHeight1 = GetSurfaceTriangleVertexY(prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, true);
+					int prevCeilHeight0 = GetSurfaceTriangleVertexY(prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, !useTri0 ? 0 : 1, false);
+					int prevCeilHeight1 = GetSurfaceTriangleVertexY(prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, false);
+
+					// TODO: Criss-cross.
+					auto vertex0 = Vector3(corner3.x, (floorHeight0 < prevFloorHeight0) ? floorHeight0 : prevFloorHeight0, corner3.y);
+					auto vertex1 = Vector3(corner0.x, (floorHeight1 < prevFloorHeight1) ? floorHeight1 : prevFloorHeight1, corner0.y);
+					auto vertex2 = Vector3(corner3.x, (ceilHeight0 > prevCeilHeight0) ? ceilHeight0 : prevCeilHeight0, corner3.y);
+					auto vertex3 = Vector3(corner0.x, (ceilHeight1 > prevCeilHeight1) ? ceilHeight1 : prevCeilHeight1, corner0.y);
+
+					collMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL, prevSectorZ.RoomNumber);
+					collMesh.InsertTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL, prevSectorZ.RoomNumber);
+				}
+
 				// Collect end wall.
 				if (isZEnd && isFloor)
 				{
@@ -782,8 +833,8 @@ namespace TEN::Collision::Room
 					auto endVertex2 = Vector3(corner1.x, ceilHeight0, corner1.y);
 					auto endVertex3 = Vector3(corner2.x, ceilHeight1, corner2.y);
 
-					collMesh.InsertTriangle(endVertex0, endVertex1, endVertex2, SOUTH_WALL_NORMAL);
-					collMesh.InsertTriangle(endVertex1, endVertex2, endVertex3, SOUTH_WALL_NORMAL);
+					collMesh.InsertTriangle(endVertex0, endVertex1, endVertex2, SOUTH_WALL_NORMAL, nextSectorZ.SidePortalRoomNumber);
+					collMesh.InsertTriangle(endVertex1, endVertex2, endVertex3, SOUTH_WALL_NORMAL, nextSectorZ.SidePortalRoomNumber);
 				}
 			}
 
@@ -793,6 +844,8 @@ namespace TEN::Collision::Room
 
 	void GenerateRoomCollisionMesh(ROOM_INFO& room)
 	{
+		room.CollisionMesh = CollisionMesh();
+
 		// Run through sectors (ignoring border).
 		for (int x = 1; x < (room.xSize - 1); x++)
 		{
@@ -810,6 +863,16 @@ namespace TEN::Collision::Room
 					prevSectorX = &prevRoomX.floor[(prevRoomGridCoordX.x * prevRoomX.zSize) + prevRoomGridCoordX.y];
 				}
 
+				// Get next X sector.
+				const auto* nextSectorX = &room.floor[((x + 1) * room.zSize) + z];
+				if (nextSectorX->SidePortalRoomNumber != NO_VALUE)
+				{
+					const auto& nextRoomX = g_Level.Rooms[nextSectorX->SidePortalRoomNumber];
+					auto nextRoomGridCoordX = GetRoomGridCoord(nextSectorX->SidePortalRoomNumber, nextSectorX->Position.x, nextSectorX->Position.y);
+
+					nextSectorX = &nextRoomX.floor[(nextRoomGridCoordX.x * nextRoomX.zSize) + nextRoomGridCoordX.y];
+				}
+
 				// Get previous Z sector.
 				const auto* prevSectorZ = &room.floor[(x * room.zSize) + (z - 1)];
 				if (prevSectorZ->SidePortalRoomNumber != NO_VALUE)
@@ -820,15 +883,23 @@ namespace TEN::Collision::Room
 					prevSectorZ = &prevRoomZ.floor[(prevRoomGridCoordZ.x * prevRoomZ.zSize) + prevRoomGridCoordZ.y];
 				}
 
-				// Test if at room edge on X axis.
+				// Get next Z sector.
+				const auto* nextSectorZ = &room.floor[(x * room.zSize) + (z + 1)];
+				if (nextSectorZ->SidePortalRoomNumber != NO_VALUE)
+				{
+					const auto& nextRoomZ = g_Level.Rooms[nextSectorZ->SidePortalRoomNumber];
+					auto nextRoomGridCoordZ = GetRoomGridCoord(nextSectorZ->SidePortalRoomNumber, nextSectorZ->Position.x, nextSectorZ->Position.y);
+
+					nextSectorZ = &nextRoomZ.floor[(nextRoomGridCoordZ.x * nextRoomZ.zSize) + nextRoomGridCoordZ.y];
+				}
+
+				// Get end status.
 				bool isXEnd = (x == (room.xSize - 2));
 				if (isXEnd)
 				{
 					const auto& nextSectorX = room.floor[((x + 1) * room.zSize) + z];
 					isXEnd = (nextSectorX.SidePortalRoomNumber == NO_VALUE);
 				}
-
-				// Test if at room edge on Z axis.
 				bool isZEnd = (z == (room.zSize - 2));
 				if (isZEnd)
 				{
@@ -836,7 +907,8 @@ namespace TEN::Collision::Room
 					isZEnd = (nextSectorZ.SidePortalRoomNumber == NO_VALUE);
 				}
 
-				CollectSectorCollisionTriangles(room.CollisionMesh, sector, *prevSectorX, *prevSectorZ, isXEnd, isZEnd);
+				// Collect triangles for collision mesh.
+				CollectSectorCollisionTriangles(room.CollisionMesh, sector, *prevSectorX, *nextSectorX , *prevSectorZ, *nextSectorZ, isXEnd, isZEnd);
 			}
 		}
 
