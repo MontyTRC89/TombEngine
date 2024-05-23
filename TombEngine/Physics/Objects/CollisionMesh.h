@@ -28,6 +28,9 @@ namespace TEN::Physics
 		// Inquirers
 		bool Intersects(const std::vector<Vector3>& vertices, const Ray& ray, float& dist) const;
 		bool IsPortal() const;
+
+		// Debug
+		void DrawDebug(const std::vector<Vector3>& vertices) const;
 	};
 
 	struct CollisionMeshCollisionData
@@ -85,6 +88,9 @@ namespace TEN::Physics
 
 		// Utilities
 		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, int portalRoomNumber = NO_VALUE);
-		void UpdateBvh();
+		void GenerateBvh();
+
+		// Debug
+		void DrawDebug() const;
 	};
 }

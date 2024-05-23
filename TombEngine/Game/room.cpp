@@ -840,6 +840,6 @@ namespace TEN::Collision::Room
 			}
 		}
 
-		room.CollisionMesh.UpdateBvh();
+		room.CollisionMesh.GenerateBvh();
 	}
 }

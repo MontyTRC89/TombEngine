@@ -132,6 +132,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	HandleLosDebug(*item);
 
 	const auto& room = g_Level.Rooms[item->RoomNumber];
+	room.CollisionMesh.DrawDebug();
 
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);
 	//g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));

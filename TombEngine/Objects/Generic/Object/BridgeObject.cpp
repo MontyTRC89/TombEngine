@@ -124,7 +124,7 @@ namespace TEN::Entities::Generic
 		_collisionMesh.InsertTriangle(corners[3], corners[4], corners[7], Vector3::Transform(RIGHT_NORMAL, rotMatrix));
 		_collisionMesh.InsertTriangle(corners[1], corners[2], corners[5], Vector3::Transform(LEFT_NORMAL, rotMatrix));
 		_collisionMesh.InsertTriangle(corners[2], corners[5], corners[6], Vector3::Transform(LEFT_NORMAL, rotMatrix));
-		_collisionMesh.UpdateBvh();
+		_collisionMesh.GenerateBvh();
 	}
 
 	const BridgeObject& GetBridgeObject(const ItemInfo& item)

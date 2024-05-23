@@ -3,9 +3,11 @@
 
 #include "Math/Math.h"
 #include "Specific/trutils.h"
+#include "Renderer/Renderer.h"
 
 using namespace TEN::Math;
 using namespace TEN::Utils;
+using TEN::Renderer::g_Renderer;
 
 namespace TEN::Physics
 {
@@ -79,6 +81,17 @@ namespace TEN::Physics
 	bool CollisionTriangle::IsPortal() const
 	{
 		return (_portalRoomNumber != NO_VALUE);
+	}
+
+	void CollisionTriangle::DrawDebug(const std::vector<Vector3>& vertices) const
+	{
+		const auto& vertex0 = vertices[_vertexIds[0]];
+		const auto& vertex1 = vertices[_vertexIds[1]];
+		const auto& vertex2 = vertices[_vertexIds[2]];
+		g_Renderer.AddDebugTriangle(vertex0, vertex1, vertex2, Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f, 0.2f));
+
+		auto center = (vertex0 + vertex1 + vertex2) / 3;
+		g_Renderer.AddDebugLine(center, Geometry::TranslatePoint(center, _normal, BLOCK(0.2f)), Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f));
 	}
 
 	bool CollisionMesh::BvhNode::IsLeaf() const
@@ -236,9 +249,15 @@ namespace TEN::Physics
 		auto box = Geometry::GetBoundingBox(std::vector<Vector3>{ vertex0, vertex1, vertex2 });
 		_triangles.push_back(CollisionTriangle(vertexID0, vertexID1, vertexID2, normal, box, portalRoomNumber));
 	}
-
-	void CollisionMesh::UpdateBvh()
+	
+	void CollisionMesh::GenerateBvh()
 	{
 		_bvh = Bvh(_triangles);
+	}
+
+	void CollisionMesh::DrawDebug() const
+	{
+		for (const auto& tri : _triangles)
+			tri.DrawDebug(_vertices);
 	}
 }
