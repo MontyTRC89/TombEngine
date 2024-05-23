@@ -649,19 +649,30 @@ namespace TEN::Collision::Room
 					}
 				}
 
-				// Collect wall portal to previous sector.
+				// Collect wall portal to previous room's sector.
 				if (sector.RoomNumber != prevSectorX.RoomNumber && isFloor)
 				{
-					// TODO: Check sectors with different triangle normals.
+					bool isCeilSurfSplit = sector.IsSurfaceSplit(false);
+					bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+					bool useCeilTri0 = (!isCeilSurfSplit || isCeilSurfSplitAngle0);
+					
+					bool isPrevFloorSurfSplit = prevSectorX.IsSurfaceSplit(true);
+					bool isPrevFloorSurfSplitAngle0 = (prevSectorX.FloorSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+					bool usePrevFloorTri0 = !(!isPrevFloorSurfSplit || isPrevFloorSurfSplitAngle0);
+					
+					bool isPrevCeilSurfSplit = prevSectorX.IsSurfaceSplit(false);
+					bool isPrevCeilSurfSplitAngle0 = (prevSectorX.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+					bool usePrevCeilTri0 = !(!isPrevCeilSurfSplit || isPrevCeilSurfSplitAngle0);
+
 					int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, true);
 					int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, true);
-					int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, !useTri0 ? 0 : 1, false);
-					int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, useTri0 ? 0 : 1, false);
+					int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useCeilTri0 ? 0 : 1, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, useCeilTri0 ? 0 : 1, false);
 
-					int prevFloorHeight0 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, true);
-					int prevFloorHeight1 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, useTri0 ? 0 : 1, true);
-					int prevCeilHeight0 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, !useTri0 ? 0 : 1, false);
-					int prevCeilHeight1 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, useTri0 ? 0 : 1, false);
+					int prevFloorHeight0 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevFloorTri0 ? 0 : 1, true);
+					int prevFloorHeight1 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevFloorTri0 ? 0 : 1, true);
+					int prevCeilHeight0 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevCeilTri0 ? 0 : 1, false);
+					int prevCeilHeight1 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevCeilTri0 ? 0 : 1, false);
 
 					// TODO: Criss-cross.
 					auto vertex0 = Vector3(corner0.x, (floorHeight0 < prevFloorHeight0) ? floorHeight0 : prevFloorHeight0, corner0.y);
@@ -671,6 +682,41 @@ namespace TEN::Collision::Room
 
 					collMesh.InsertTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL, prevSectorX.RoomNumber);
 					collMesh.InsertTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL, prevSectorX.RoomNumber);
+				}
+
+				// Collect wall portal to next room's sector.
+				if (sector.RoomNumber != nextSectorX.RoomNumber && isFloor)
+				{
+					bool isCeilSurfSplit = sector.IsSurfaceSplit(false);
+					bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+					bool useCeilTri0 = (!isCeilSurfSplit || isCeilSurfSplitAngle0);
+
+					bool isNextFloorSurfSplit = prevSectorX.IsSurfaceSplit(true);
+					bool isNextFloorSurfSplitAngle0 = (prevSectorX.FloorSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+					bool useNextFloorTri0 = !(!isNextFloorSurfSplit || isNextFloorSurfSplitAngle0);
+
+					bool isNextCeilSurfSplit = prevSectorX.IsSurfaceSplit(false);
+					bool isNextCeilSurfSplitAngle0 = (prevSectorX.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+					bool useNextCeilTri0 = !(!isNextCeilSurfSplit || isNextCeilSurfSplitAngle0);
+
+					int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, !useTri0 ? 0 : 1, true);
+					int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useTri0 ? 0 : 1, true);
+					int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, !useCeilTri0 ? 0 : 1, false);
+					int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useCeilTri0 ? 0 : 1, false);
+
+					int nextFloorHeight0 = GetSurfaceTriangleVertexY(nextSectorX, REL_CORNER_0.x, REL_CORNER_0.y, !useNextFloorTri0 ? 0 : 1, true);
+					int nextFloorHeight1 = GetSurfaceTriangleVertexY(nextSectorX, REL_CORNER_1.x, REL_CORNER_1.y, !useNextFloorTri0 ? 0 : 1, true);
+					int nextCeilHeight0 = GetSurfaceTriangleVertexY(nextSectorX, REL_CORNER_0.x, REL_CORNER_0.y, !useNextCeilTri0 ? 0 : 1, false);
+					int nextCeilHeight1 = GetSurfaceTriangleVertexY(nextSectorX, REL_CORNER_1.x, REL_CORNER_1.y, !useNextCeilTri0 ? 0 : 1, false);
+
+					// TODO: Criss-cross.
+					auto vertex0 = Vector3(corner3.x, (floorHeight0 < nextFloorHeight0) ? floorHeight0 : nextFloorHeight0, corner3.y);
+					auto vertex1 = Vector3(corner2.x, (floorHeight1 < nextFloorHeight1) ? floorHeight1 : nextFloorHeight1, corner2.y);
+					auto vertex2 = Vector3(corner3.x, (ceilHeight0 > nextCeilHeight0) ? ceilHeight0 : nextCeilHeight0, corner3.y);
+					auto vertex3 = Vector3(corner2.x, (ceilHeight1 > nextCeilHeight1) ? ceilHeight1 : nextCeilHeight1, corner2.y);
+
+					collMesh.InsertTriangle(vertex0, vertex1, vertex2, WEST_WALL_NORMAL, nextSectorX.RoomNumber);
+					collMesh.InsertTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL, nextSectorX.RoomNumber);
 				}
 
 				// Collect end wall.
