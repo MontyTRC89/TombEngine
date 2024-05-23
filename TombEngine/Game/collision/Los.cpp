@@ -28,12 +28,19 @@ namespace TEN::Collision::Los
 			Vector3i		 Position = Vector3i::Zero;
 		};
 
-		std::optional<const CollisionTriangle*> Triangle   = std::nullopt;
-		std::optional<std::pair<Vector3, int>>	Position   = std::nullopt;
-		std::vector<InterceptData>				Intercepts = {};
+		std::vector<InterceptData> Intercepts = {};
 	};
 
-	static std::vector<ItemInfo*> GetNearbyMoveables(const std::set<int>& roomNumbers)
+	struct RoomTraceData
+	{
+		std::optional<const CollisionTriangle*> Triangle	= std::nullopt;
+		std::pair<Vector3, int>					Position	= {};
+		std::vector<int>						RoomNumbers = {};
+
+		bool IsIntersected = false;
+	};
+
+	static std::vector<ItemInfo*> GetNearbyMoveables(const std::vector<int>& roomNumbers)
 	{
 		// Collect moveables.
 		auto movs = std::vector<ItemInfo*>{};
@@ -60,7 +67,7 @@ namespace TEN::Collision::Los
 		return movs;
 	}
 
-	static std::vector<MESH_INFO*> GetNearbyStatics(const std::set<int>& roomNumbers)
+	static std::vector<MESH_INFO*> GetNearbyStatics(const std::vector<int>& roomNumbers)
 	{
 		// Collect statics.
 		auto statics = std::vector<MESH_INFO*>{};
@@ -225,24 +232,21 @@ namespace TEN::Collision::Los
 				});
 		}
 
-		// Return sorted LOS.
+		// 5) Return sorted LOS.
 		return los;
 	}
-
-	static SectorTraceData GetSectorTrace(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
+	
+	static SectorTraceData GetSectorTrace(const Vector3& origin, int roomNumber, const Vector3& target)
 	{
-		auto trace = SectorTraceData{};
+		auto sectorTrace = SectorTraceData{};
 
-		// Calculate base data.
-		auto ray = Ray(origin, dir);
-		auto target = Geometry::TranslatePoint(origin, dir, dist);
 		auto deltaPos = target - origin;
 
 		// 1) Collect origin as intercept.
-		trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, origin });
+		sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, origin });
 
 		// 2) Collect X axis intercepts.
-		if (deltaPos.x != 0)
+		if (deltaPos.x != 0.0f)
 		{
 			// Calculate step.
 			auto step = Vector3i(
@@ -262,15 +266,15 @@ namespace TEN::Collision::Los
 			// Collect intercept positions.
 			while (isNegative ? (pos.x > target.x) : (pos.x < target.x))
 			{
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(sign, 0, 0) });
+				sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
+				sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(sign, 0, 0) });
 
 				pos += Vector3i(BLOCK(1), step.y, step.z) * sign;
 			}
 		}
 
 		// 3) Collect Z axis intercepts.
-		if (deltaPos.z != 0)
+		if (deltaPos.z != 0.0f)
 		{
 			// Calculate step.
 			auto step = Vector3i(
@@ -290,128 +294,155 @@ namespace TEN::Collision::Los
 			// Collect positions.
 			while (isNegative ? (pos.z > target.z) : (pos.z < target.z))
 			{
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
-				trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(0, 0, sign) });
+				sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
+				sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(0, 0, sign) });
 
 				pos += Vector3i(step.x, step.y, BLOCK(1)) * sign;
 			}
 		}
 
 		// 4) Collect target as intercept.
-		trace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, target });
+		sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, target });
 
 		// 5) Sort intercepts by distance from origin.
 		std::sort(
-			trace.Intercepts.begin(), trace.Intercepts.end(),
+			sectorTrace.Intercepts.begin(), sectorTrace.Intercepts.end(),
 			[origin](const SectorTraceData::InterceptData& intercept0, const SectorTraceData::InterceptData& intercept1)
 			{
 				float distSqr0 = Vector3i::DistanceSquared(origin, intercept0.Position);
 				float distSqr1 = Vector3i::DistanceSquared(origin, intercept1.Position);
-
 				return (distSqr0 < distSqr1);
 			});
 
-		// 6) Set intercept sectors.
-		int probeRoomNumber = roomNumber;
-		for (auto& intercept : trace.Intercepts)
+		// 6) Clean intercepts.
+		for (int i = 0; i < sectorTrace.Intercepts.size();)
 		{
-			auto pointColl = GetPointCollision(intercept.Position, probeRoomNumber);
+			auto& intercept = sectorTrace.Intercepts[i];
 
+			auto pointColl = GetPointCollision(intercept.Position, roomNumber);
 			intercept.Sector = &pointColl.GetSector();
-			probeRoomNumber = pointColl.GetRoomNumber();
+
+			// 6.1) Trim intercepts beyond current room.
+			if (intercept.Sector->RoomNumber != roomNumber)
+			{
+				sectorTrace.Intercepts.erase(sectorTrace.Intercepts.begin() + i, sectorTrace.Intercepts.end());
+				break;
+			}
+
+			// TODO: Pass bound to this function so I don't have to do this.
+			// 6.2) Remove intercepts of duplicate sectors.
+			if (i > 0 && intercept.Sector == sectorTrace.Intercepts[i - 1].Sector)
+			{
+				sectorTrace.Intercepts.erase(sectorTrace.Intercepts.begin() + i);
+				continue;
+			}
+
+			i++;
 		}
 
-		//debug
-		auto offset = Vector3(0, CLICK(0.1f), 0);
-		auto doOffset = false;
+		// 7) Return sector trace.
+		return sectorTrace;
+	}
 
-		const CollisionTriangle* closestTri = nullptr;
-		float closestDist = dist;
-		bool hasClip = false;
+	static RoomTraceData GetRoomTrace(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
+	{
+		auto roomTrace = RoomTraceData{};
 
-		int prevRoomNumber = NO_VALUE;
-		const FloorInfo* prevSector = nullptr;
+		// 1) Set base data.
+		auto ray = Ray(origin, dir);
+		int rayRoomNumber = roomNumber;
+		float rayDist = dist;
+		auto target = Geometry::TranslatePoint(origin, dir, dist);
 
-		// 7) Run through intercepts to find clip.
-		auto visitedBridgeMovIds = std::set<int>{};
-		for (int i = 0; i < trace.Intercepts.size(); i++)
+		// 2) Find room trace.
+		bool contTrace = true;
+		while (contTrace)
 		{
-			const auto& intercept = trace.Intercepts[i];
+			// 2.1) Collect room number.
+			roomTrace.RoomNumbers.push_back(rayRoomNumber);
 
-			//debug
-			auto pos2D = g_Renderer.Get2DPosition(intercept.Position.ToVector3() + (offset * (doOffset ? 1 : -1)));
-			if (pos2D.has_value())
-				g_Renderer.AddDebugString(std::to_string(intercept.Sector->RoomNumber), *pos2D, Color(1, 1, 1), 1, 0, RendererDebugPage::None);
-			doOffset = !doOffset;
-			g_Renderer.AddDebugTarget(intercept.Position.ToVector3(), Quaternion::Identity, 20, Color(1, 0, 0));
+			const CollisionTriangle* closestTri = nullptr;
+			float closestDist = rayDist;
 
-			// 7.1) Clip unique room.
-			if (intercept.Sector->RoomNumber != prevRoomNumber)
+			// 2.2) Clip room.
+			const auto& room = g_Level.Rooms[rayRoomNumber];
+			auto meshColl = room.CollisionMesh.GetCollision(ray, closestDist);
+			if (meshColl.has_value())
 			{
-				const auto& room = g_Level.Rooms[intercept.Sector->RoomNumber];
-
-				// Collide room collision mesh.
-				auto meshColl = room.CollisionMesh.GetCollision(ray, dist);
-				if (meshColl.has_value() && meshColl->Distance < closestDist)
-				{
-					closestTri = &meshColl->Triangle;
-					closestDist = meshColl->Distance;
-					hasClip = true;
-				}
+				closestTri = &meshColl->Triangle;
+				closestDist = meshColl->Distance;
 			}
-			prevRoomNumber = intercept.Sector->RoomNumber;
 
-			// 7.2) Clip bridges in unique sector (if applicable).
-			if (collideBridges && intercept.Sector != prevSector)
+			// 2.3) Clip bridges (if applicable).
+			if (collideBridges)
 			{
-				for (int bridgeMovID : intercept.Sector->BridgeItemNumbers)
+				auto sectorTrace = GetSectorTrace(ray.position, rayRoomNumber, target);
+
+				// Run through intercepts in trace.
+				auto visitedBridgeMovIds = std::set<int>{};
+				for (int i = 0; i < sectorTrace.Intercepts.size(); i++)
 				{
-					if (Contains(visitedBridgeMovIds, bridgeMovID))
-						continue;
-					visitedBridgeMovIds.insert(bridgeMovID);
-
-					const auto& bridgeMov = g_Level.Items[bridgeMovID];
-					const auto& bridge = GetBridgeObject(bridgeMov);
-
-					if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
-						continue;
-
-					// Collide bridge collision mesh.
-					auto meshColl = bridge.GetCollisionMesh().GetCollision(ray, dist);
-					if (meshColl.has_value() && meshColl->Distance < closestDist)
+					// Run through bridges in sector.
+					const auto& intercept = sectorTrace.Intercepts[i];
+					for (int bridgeMovID : intercept.Sector->BridgeItemNumbers)
 					{
-						// Ensure bridge clip is within current room.
-						auto pointColl = GetPointCollision(Geometry::TranslatePoint(ray.position, ray.direction, meshColl->Distance), intercept.Sector->RoomNumber);
-						if (pointColl.GetRoomNumber() != intercept.Sector->RoomNumber)
+						// Check if bridge was already visited.
+						if (Contains(visitedBridgeMovIds, bridgeMovID))
+							continue;
+						visitedBridgeMovIds.insert(bridgeMovID);
+
+						const auto& bridgeMov = g_Level.Items[bridgeMovID];
+						const auto& bridge = GetBridgeObject(bridgeMov);
+
+						// Check bridge status.
+						if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
 							continue;
 
-						closestTri = &meshColl->Triangle;
-						closestDist = meshColl->Distance;
-						hasClip = true;
+						// Clip bridge.
+						auto meshColl = bridge.GetCollisionMesh().GetCollision(ray, dist);
+						if (meshColl.has_value() && meshColl->Distance < closestDist)
+						{
+							closestTri = &meshColl->Triangle;
+							closestDist = meshColl->Distance;
+							contTrace = false;
+						}
 					}
+
+					if (!contTrace)
+						break;
 				}
 			}
-			prevSector = intercept.Sector;
 
-			// 7.3) Has clip; set intersect and trim vector.
-			if (hasClip)
+			// 3) Set room trace or continue from new room.
+			if (closestTri != nullptr)
 			{
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
 
-				//debug
-				auto pos2D = g_Renderer.Get2DPosition(intersectPos);
-				if (pos2D.has_value())
-					g_Renderer.AddDebugString(std::to_string(intercept.Sector->RoomNumber), *pos2D, Color(1, 1, 1), 1, 0, RendererDebugPage::None);
-
-				trace.Triangle = (closestTri != nullptr) ? closestTri : std::optional<const CollisionTriangle*>();
-				trace.Position = std::pair(intersectPos, intercept.Sector->RoomNumber);
-				trace.Intercepts.erase((trace.Intercepts.begin() + i) + 1, trace.Intercepts.end());
-				break;
+				// Triangle is room portal; continue trace from new room.
+				if (closestTri->IsPortal())
+				{
+					ray.position = intersectPos;
+					rayRoomNumber = closestTri->GetPortalRoomNumber();
+					rayDist = Vector3::Distance(intersectPos, target);
+				}
+				// Triangle is tangible; fill remaining room trace data.
+				else
+				{
+					roomTrace.Triangle = closestTri;
+					roomTrace.Position = std::pair(intersectPos, rayRoomNumber);
+					roomTrace.IsIntersected = true;
+					contTrace = false;
+				}
+			}
+			else
+			{
+				roomTrace.Position = std::pair(target, rayRoomNumber);
+				contTrace = false;
 			}
 		}
 
-		// 8) Return sector trace.
-		return trace;
+		// 4) Return room trace.
+		return roomTrace;
 	}
 
 	RoomLosData GetRoomLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
@@ -423,26 +454,20 @@ namespace TEN::Collision::Los
 			return RoomLosData{ {}, std::pair(origin, roomNumber), {}, false, 0.0f };
 		}
 
-		// Get sector trace.
-		auto trace = GetSectorTrace(origin, roomNumber, dir, dist, collideBridges);
-
-		// Collect unique room numbers.
-		auto roomNumbers = std::set<int>{};
-		for (const auto& intercept : trace.Intercepts)
-			roomNumbers.insert(intercept.Sector->RoomNumber);
+		// Get room trace.
+		auto roomTrace = GetRoomTrace(origin, roomNumber, dir, dist, collideBridges);
 
 		// Calculate position data.
-		bool hasIntersect = trace.Position.has_value();
-		float losDist = hasIntersect ? Vector3::Distance(origin, trace.Position->first) : dist;
+		float losDist = roomTrace.IsIntersected ? Vector3::Distance(origin, roomTrace.Position.first) : dist;
 		auto losPos = Geometry::TranslatePoint(origin, dir, losDist);
-		int losRoomNumber = hasIntersect ? trace.Position->second : trace.Intercepts.back().Sector->RoomNumber;
+		int losRoomNumber = roomTrace.Position.second;
 
 		// Create and return room LOS.
 		auto roomLos = RoomLosData{};
-		roomLos.Triangle = trace.Triangle;
+		roomLos.Triangle = roomTrace.Triangle;
 		roomLos.Position = std::pair(losPos, losRoomNumber);
-		roomLos.RoomNumbers = roomNumbers;
-		roomLos.IsIntersected = hasIntersect;
+		roomLos.RoomNumbers = roomTrace.RoomNumbers;
+		roomLos.IsIntersected = roomTrace.IsIntersected;
 		roomLos.Distance = losDist;
 		return roomLos;
 	}

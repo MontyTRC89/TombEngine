@@ -27,6 +27,7 @@ namespace TEN::Physics
 
 		// Inquirers
 		bool Intersects(const std::vector<Vector3>& vertices, const Ray& ray, float& dist) const;
+		bool IsPortal() const;
 	};
 
 	struct CollisionMeshCollisionData

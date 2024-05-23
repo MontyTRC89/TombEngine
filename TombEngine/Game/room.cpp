@@ -454,10 +454,16 @@ namespace TEN::Collision::Room
 			bool isSurfTri1Portal = (surface.Triangles[1].PortalRoomNumber != NO_VALUE);
 
 			// 3) Collect surface triangles.
-			if (!isSurf0Wall && !isSurfTri0Portal)
-				collMesh.InsertTriangle(surfTri0Vertices[0], surfTri0Vertices[1], surfTri0Vertices[2], surfTri0Normal);
-			if (!isSurf1Wall && !isSurfTri1Portal)
-				collMesh.InsertTriangle(surfTri1Vertices[0], surfTri1Vertices[1], surfTri1Vertices[2], surfTri1Normal);
+			if (!isSurf0Wall)
+			{
+				int portalRoomNumber = isSurfTri0Portal ? surface.Triangles[0].PortalRoomNumber : NO_VALUE;
+				collMesh.InsertTriangle(surfTri0Vertices[0], surfTri0Vertices[1], surfTri0Vertices[2], surfTri0Normal, portalRoomNumber);
+			}
+			if (!isSurf1Wall)
+			{
+				int portalRoomNumber = isSurfTri1Portal ? surface.Triangles[1].PortalRoomNumber : NO_VALUE;
+				collMesh.InsertTriangle(surfTri1Vertices[0], surfTri1Vertices[1], surfTri1Vertices[2], surfTri1Normal, portalRoomNumber);
+			}
 
 			// 4) Generate and collect diagonal wall triangles.
 			if (sector.IsSurfaceSplit(isFloor) && !(isSurf0Wall && isSurf1Wall)) // Can set wall.

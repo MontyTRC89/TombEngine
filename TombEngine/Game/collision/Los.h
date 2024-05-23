@@ -15,7 +15,7 @@ namespace TEN::Collision::Los
 	{
 		std::optional<const CollisionTriangle*> Triangle	= std::nullopt;
 		std::pair<Vector3, int>					Position	= {};
-		std::set<int>							RoomNumbers = {};
+		std::vector<int>						RoomNumbers = {};
 
 		bool  IsIntersected = false;
 		float Distance		= 0.0f;

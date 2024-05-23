@@ -76,6 +76,11 @@ namespace TEN::Physics
 		return true;
 	}
 
+	bool CollisionTriangle::IsPortal() const
+	{
+		return (_portalRoomNumber != NO_VALUE);
+	}
+
 	bool CollisionMesh::BvhNode::IsLeaf() const
 	{
 		return (LeftChildID == NO_VALUE && RightChildID == NO_VALUE);
@@ -143,7 +148,6 @@ namespace TEN::Physics
 
 			const auto& node = Nodes[nodeID];
 
-			// TODO: Distance cap?
 			// Test node intersection.
 			float intersectDist = 0.0f;
 			if (!node.Box.Intersects(ray.position, ray.direction, intersectDist) || intersectDist > dist)
