@@ -52,6 +52,8 @@ namespace TEN::Collision::Los
 			if (mov.Status == ItemStatus::ITEM_INVISIBLE || mov.Status == ItemStatus::ITEM_DEACTIVATED)
 				continue;
 
+			// TODO: Must check roomNumbers vector.
+			
 			// 2) Check if room is active.
 			const auto& room = g_Level.Rooms[mov.RoomNumber];
 			if (!room.Active())
