@@ -702,7 +702,6 @@ namespace TEN::Collision::Room
 					collMesh.InsertTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL, prevSectorX.RoomNumber);
 				}
 
-				// TODO: Inaccurate heights.
 				// Collect wall portal to next room's sector.
 				if (sector.RoomNumber != nextSectorX.RoomNumber && isFloor)
 				{
@@ -710,12 +709,12 @@ namespace TEN::Collision::Room
 					bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 					bool useCeilTri0 = (!isCeilSurfSplit || isCeilSurfSplitAngle0);
 
-					bool isNextFloorSurfSplit = prevSectorX.IsSurfaceSplit(true);
-					bool isNextFloorSurfSplitAngle0 = (prevSectorX.FloorSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+					bool isNextFloorSurfSplit = nextSectorX.IsSurfaceSplit(true);
+					bool isNextFloorSurfSplitAngle0 = (nextSectorX.FloorSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 					bool useNextFloorTri0 = !(!isNextFloorSurfSplit || isNextFloorSurfSplitAngle0);
 
-					bool isNextCeilSurfSplit = prevSectorX.IsSurfaceSplit(false);
-					bool isNextCeilSurfSplitAngle0 = (prevSectorX.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+					bool isNextCeilSurfSplit = nextSectorX.IsSurfaceSplit(false);
+					bool isNextCeilSurfSplitAngle0 = (nextSectorX.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 					bool useNextCeilTri0 = !(!isNextCeilSurfSplit || isNextCeilSurfSplitAngle0);
 
 					int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, !useTri0 ? 0 : 1, true);
@@ -738,7 +737,6 @@ namespace TEN::Collision::Room
 					collMesh.InsertTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL, nextSectorX.RoomNumber);
 				}
 
-				// TODO: Wall steps.
 				// Collect end wall.
 				if (isXEnd && isFloor)
 				{
