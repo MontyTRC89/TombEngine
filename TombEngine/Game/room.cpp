@@ -630,25 +630,43 @@ namespace TEN::Collision::Room
 						auto vertex2 = Vector3(corner0.x, prevHeight0, corner0.y);
 						auto vertex3 = Vector3(corner1.x, prevHeight1, corner1.y);
 
-						// TODO: Block wall formation if it belongs to a sector in another room.
 						bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
-						if (vertex0 != vertex2)
+						if (sector.RoomNumber == prevSectorX.RoomNumber)
 						{
-							const auto& normal0 = ((vertex0.y > vertex2.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-							isSecondCrissCrossCase ?
-								collMesh.InsertTriangle(vertex0, vertex2, vertex3, normal0) :
-								collMesh.InsertTriangle(vertex0, vertex1, vertex2, normal0);
+							if (vertex0 != vertex2)
+							{
+								const auto& normal0 = ((vertex0.y > vertex2.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
+								isSecondCrissCrossCase ?
+									collMesh.InsertTriangle(vertex0, vertex2, vertex3, normal0) :
+									collMesh.InsertTriangle(vertex0, vertex1, vertex2, normal0);
+							}
+							if (vertex1 != vertex3)
+							{
+								const auto& normal1 = ((vertex1.y > vertex3.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
+								isSecondCrissCrossCase ?
+									collMesh.InsertTriangle(vertex0, vertex1, vertex3, normal1) :
+									collMesh.InsertTriangle(vertex1, vertex2, vertex3, normal1);
+							}
 						}
-						if (vertex1 != vertex3)
+						else // Avoid forming wall beloning to previous sector's room.
 						{
-							const auto& normal1 = ((vertex1.y > vertex3.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-							isSecondCrissCrossCase ?
-								collMesh.InsertTriangle(vertex0, vertex1, vertex3, normal1) :
-								collMesh.InsertTriangle(vertex1, vertex2, vertex3, normal1);
+							if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
+							{
+								isSecondCrissCrossCase ?
+									collMesh.InsertTriangle(vertex0, vertex2, vertex3, EAST_WALL_NORMAL) :
+									collMesh.InsertTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL);
+							}
+							if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
+							{
+								isSecondCrissCrossCase ?
+									collMesh.InsertTriangle(vertex0, vertex1, vertex3, EAST_WALL_NORMAL) :
+									collMesh.InsertTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
+							}
 						}
 					}
 				}
 
+				// TODO: Inaccurate heights.
 				// Collect wall portal to previous room's sector.
 				if (sector.RoomNumber != prevSectorX.RoomNumber && isFloor)
 				{
@@ -684,6 +702,7 @@ namespace TEN::Collision::Room
 					collMesh.InsertTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL, prevSectorX.RoomNumber);
 				}
 
+				// TODO: Inaccurate heights.
 				// Collect wall portal to next room's sector.
 				if (sector.RoomNumber != nextSectorX.RoomNumber && isFloor)
 				{
@@ -719,6 +738,7 @@ namespace TEN::Collision::Room
 					collMesh.InsertTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL, nextSectorX.RoomNumber);
 				}
 
+				// TODO: Wall steps.
 				// Collect end wall.
 				if (isXEnd && isFloor)
 				{
@@ -821,19 +841,37 @@ namespace TEN::Collision::Room
 						auto vertex3 = Vector3(corner0.x, prevHeight1, corner0.y);
 
 						bool isSecondCrissCrossCase = isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y);
-						if (vertex0 != vertex2)
+						if (sector.RoomNumber == prevSectorZ.RoomNumber)
 						{
-							const auto& normal0 = ((vertex0.y > vertex2.y) ? NORTH_WALL_NORMAL : SOUTH_WALL_NORMAL) * (isFloor ? 1 : -1);
-							isSecondCrissCrossCase ?
-								collMesh.InsertTriangle(vertex0, vertex2, vertex3, normal0) :
-								collMesh.InsertTriangle(vertex0, vertex1, vertex2, normal0);
+							if (vertex0 != vertex2)
+							{
+								const auto& normal0 = ((vertex0.y > vertex2.y) ? NORTH_WALL_NORMAL : SOUTH_WALL_NORMAL) * (isFloor ? 1 : -1);
+								isSecondCrissCrossCase ?
+									collMesh.InsertTriangle(vertex0, vertex2, vertex3, normal0) :
+									collMesh.InsertTriangle(vertex0, vertex1, vertex2, normal0);
+							}
+							if (vertex1 != vertex3)
+							{
+								const auto& normal1 = ((vertex1.y > vertex3.y) ? NORTH_WALL_NORMAL : SOUTH_WALL_NORMAL) * (isFloor ? 1 : -1);
+								isSecondCrissCrossCase ?
+									collMesh.InsertTriangle(vertex0, vertex1, vertex3, normal1) :
+									collMesh.InsertTriangle(vertex1, vertex2, vertex3, normal1);
+							}
 						}
-						if (vertex1 != vertex3)
+						else // Avoid forming wall beloning to previous sector's room.
 						{
-							const auto& normal1 = ((vertex1.y > vertex3.y) ? NORTH_WALL_NORMAL : SOUTH_WALL_NORMAL) * (isFloor ? 1 : -1);
-							isSecondCrissCrossCase ?
-								collMesh.InsertTriangle(vertex0, vertex1, vertex3, normal1) :
-								collMesh.InsertTriangle(vertex1, vertex2, vertex3, normal1);
+							if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
+							{
+								isSecondCrissCrossCase ?
+									collMesh.InsertTriangle(vertex0, vertex2, vertex3, NORTH_WALL_NORMAL) :
+									collMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL);
+							}
+							if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
+							{
+								isSecondCrissCrossCase ?
+									collMesh.InsertTriangle(vertex0, vertex1, vertex3, NORTH_WALL_NORMAL) :
+									collMesh.InsertTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
+							}
 						}
 					}
 				}
