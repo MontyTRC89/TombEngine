@@ -401,6 +401,10 @@ namespace TEN::Collision::Room
 		auto corner2 = sector.Position + REL_CORNER_2;
 		auto corner3 = sector.Position + REL_CORNER_3;
 
+		auto box = BoundingBox(Vector3(corner0.x, 0, corner0.y), Vector3(BLOCK(1), BLOCK(1), BLOCK(1)));
+		//g_Renderer.AddDebugBox(box, Color(1, 1, 1));
+		g_Renderer.AddDebugSphere(BoundingSphere(Vector3(corner0.x, -3328, corner0.y), 0.1f), Color(1, 1, 1));
+
 		// Collect triangles.
 		bool isFloor = true;
 		for (int i = 0; i < 2; i++)

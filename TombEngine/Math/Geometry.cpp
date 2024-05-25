@@ -214,6 +214,20 @@ namespace TEN::Math::Geometry
 			slopeAngle * sinDeltaAngle);
 	}
 
+	BoundingBox GetBoundingBox(const BoundingOrientedBox& box)
+	{
+		// Get corners.
+		auto corners = std::array<Vector3, BoundingOrientedBox::CORNER_COUNT>{};
+		box.GetCorners(corners.data());
+
+		// Transfer corners to vector.
+		auto cornersVector = std::vector<Vector3>{};
+		cornersVector.insert(cornersVector.end(), corners.begin(), corners.end());
+
+		// Return bounding box.
+		return Geometry::GetBoundingBox(cornersVector);
+	}
+
 	BoundingBox GetBoundingBox(const std::vector<Vector3>& points)
 	{
 		auto minPoint = Vector3(INFINITY);

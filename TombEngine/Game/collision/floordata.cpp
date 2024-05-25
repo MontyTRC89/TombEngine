@@ -429,9 +429,9 @@ namespace TEN::Collision::Floordata
 	std::vector<FloorInfo*> GetNeighborSectors(const Vector3i& pos, int roomNumber, unsigned int searchDepth)
 	{
 		auto sectors = std::vector<FloorInfo*>{};
+		auto& room = g_Level.Rooms[roomNumber];
 
 		// Run through neighbor rooms.
-		auto& room = g_Level.Rooms[roomNumber];
 		for (int neighborRoomNumber : room.neighbors)
 		{
 			// Collect neighbor sectors.
@@ -808,7 +808,10 @@ namespace TEN::Collision::Floordata
 		return (item.Pose.Position.y + (isBottom ? bounds.Y2 : bounds.Y1));
 	}
 
-	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
+	// TODO: Complexity is O(n * m), where n is the number of sectors in a room and m is the number of neighbor rooms.
+	// Sectors should be partitioned in a static bounding volume hierarchy to allow O(log n) complexity for bridge containment operations.
+	// Additionally, bridges should be assigned per-room rather than per-sector. Within a given room, they should be spatially partitioned
+	// in a dynamic bounding volume hierarchy. This will achieve O(log n) complexity in every case.
 	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval)
 	{
 		constexpr auto SECTOR_EXTENTS = Vector3(BLOCK(0.5f));
@@ -823,52 +826,29 @@ namespace TEN::Collision::Floordata
 		if (item.Flags & IFLAG_KILLED)
 			forceRemoval = true;
 
-		// Get bridge OBB.
-		auto bridgeBox = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		// Calculate bridge boxes.
+		auto bridgeObb = item.GetBox();
+		auto bridgeAabb = Geometry::GetBoundingBox(bridgeObb);
 
-		// Get bridge OBB corners. NOTE: only 0, 1, 4, 5 are relevant.
-		auto corners = std::array<Vector3, 8>{};
-		bridgeBox.GetCorners(corners.data());
-
-		const auto& room = g_Level.Rooms[item.RoomNumber];
-
-		// Get projected AABB min and max of bridge OBB.
-		float xMin = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.x) / BLOCK(1));
-		float zMin = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.z) / BLOCK(1));
-		float xMax =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.x) / BLOCK(1));
-		float zMax =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.z) / BLOCK(1));
-
-		// Run through sectors enclosed in projected bridge AABB.
-		for (int x = 0; x < room.xSize; x++)
+		// Update neighbor room sectors.
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		for (int neighborRoomNumber : room.neighbors)
 		{
-			for (int z = 0; z < room.zSize; z++)
+			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+			for (auto& sector : neighborRoom.floor)
 			{
-				float pX = (room.x + BLOCK(x)) + BLOCK(0.5f);
-				float pZ = (room.z + BLOCK(z)) + BLOCK(0.5f);
-				float offX = pX - item.Pose.Position.x;
-				float offZ = pZ - item.Pose.Position.z;
-
-				// Clean previous bridge state.
-				RemoveBridge(item.Index, offX, offZ);
-
-				// In sweep mode; don't try readding to sector.
+				// Clear leftover bridge assignment.
+				sector.RemoveBridge(item.Index);
 				if (forceRemoval)
 					continue;
 
-				// Sector is outside enclosed AABB space; ignore precise check.
-				if (x < xMin || z < zMin ||
-					x > xMax || z > zMax)
-				{
+				// Test if bridge AABB intersects sector.
+				if (!bridgeAabb.Intersects(sector.Box))
 					continue;
-				}
 
-				// Sector is in enclosed bridge AABB space; do more precise test.
-				// Construct OBB within same plane as bridge OBB and test intersection.
-				auto sectorBox = BoundingOrientedBox(Vector3(pX, bridgeBox.Center.y, pZ), SECTOR_EXTENTS, Vector4::UnitY);
-
-				// Add bridge to current sector if intersection is valid.
-				if (bridgeBox.Intersects(sectorBox))
-					AddBridge(item.Index, offX, offZ);
+				// Add bridge if within sector.
+				if (bridgeObb.Intersects(sector.Box))
+					sector.AddBridge(item.Index);
 			}
 		}
 	}
@@ -911,7 +891,7 @@ namespace TEN::Collision::Floordata
 		auto pointColl = GetPointCollision(item);
 		auto pos = item.Pose.Position.ToVector3();
 
-		// Run through neighboring rooms.
+		// Run through neighbor rooms.
 		const auto& room = g_Level.Rooms[item.RoomNumber];
 		for (int neighborRoomNumber : room.neighbors)
 		{

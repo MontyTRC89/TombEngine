@@ -678,6 +678,9 @@ static Plane ConvertFakePlaneToPlane(const Vector3& fakePlane, bool isFloor)
 
 void ReadRooms()
 {
+	constexpr auto SECTOR_BOX_CENTER_OFFSET = Vector3(BLOCK(0.5f), 0.0f, BLOCK(0.5f));
+	constexpr auto SECTOR_BOX_EXTENTS		= Vector3(BLOCK(0.5f), BLOCK(4096), BLOCK(0.5f));
+
 	int roomCount = ReadInt32();
 	TENLog("Rooms: " + std::to_string(roomCount), LogLevel::Info);
 
@@ -771,8 +774,8 @@ void ReadRooms()
 
 		room.zSize = ReadInt32();
 		room.xSize = ReadInt32();
+		auto roomPos = Vector2i(room.x, room.z);
 
-		auto base = Vector2i(room.x, room.z);
 		room.floor.reserve(room.zSize * room.xSize);
 		for (int x = 0; x < room.xSize; x++)
 		{
@@ -780,11 +783,12 @@ void ReadRooms()
 			{
 				auto sector = FloorInfo{};
 
-				sector.Position = base + Vector2i(BLOCK(x), BLOCK(z));
+				sector.Position = roomPos + Vector2i(BLOCK(x), BLOCK(z));
 				sector.RoomNumber = i;
+				sector.Box = BoundingBox(Vector3(sector.Position.x, 0.0f, sector.Position.y) + SECTOR_BOX_CENTER_OFFSET, SECTOR_BOX_EXTENTS);
 
 				sector.TriggerIndex = ReadInt32();
-				sector.Box = ReadInt32();
+				sector.PathfindingBoxID = ReadInt32();
 
 				sector.FloorSurface.Triangles[0].Material =
 				sector.FloorSurface.Triangles[1].Material =

@@ -25,10 +25,20 @@ namespace TEN::Collision::Los
 		struct InterceptData
 		{
 			const FloorInfo* Sector	  = nullptr;
-			Vector3i		 Position = Vector3i::Zero;
+			float			 Distance = 0.0f;
 		};
 
 		std::vector<InterceptData> Intercepts = {};
+
+		void Sort()
+		{
+			std::sort(
+				Intercepts.begin(), Intercepts.end(),
+				[](const InterceptData& intercept0, const InterceptData& intercept1)
+				{
+					return (intercept0.Distance < intercept1.Distance);
+				});
+		}
 	};
 
 	struct RoomTraceData
@@ -238,111 +248,23 @@ namespace TEN::Collision::Los
 		return los;
 	}
 	
-	static SectorTraceData GetSectorTrace(const Vector3& origin, int roomNumber, const Vector3& target)
+	static SectorTraceData GetSectorTrace(const Ray& ray, int roomNumber, float dist)
 	{
 		auto sectorTrace = SectorTraceData{};
 
-		auto deltaPos = target - origin;
-
-		// 1) Collect origin as intercept.
-		sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, origin });
-
-		// 2) Collect X axis intercepts.
-		if (deltaPos.x != 0.0f)
+		// 1) Collect sector intercepts.
+		const auto& room = g_Level.Rooms[roomNumber];
+		for (const auto& sector : room.floor)
 		{
-			// Calculate step.
-			auto step = Vector3i(
-				deltaPos.x,
-				BLOCK(deltaPos.y) / deltaPos.x,
-				BLOCK(deltaPos.z) / deltaPos.x);
-
-			bool isNegative = (step.x < 0);
-			int sign = isNegative ? -1 : 1;
-
-			// Calculate initial position.
-			auto pos = Vector3i::Zero;
-			pos.x = isNegative ? ((int)round(origin.x) & (UINT_MAX - WALL_MASK)) : ((int)round(origin.x) | WALL_MASK);
-			pos.y = (((pos.x - origin.x) * step.y) / BLOCK(1)) + origin.y;
-			pos.z = (((pos.x - origin.x) * step.z) / BLOCK(1)) + origin.z;
-
-			// Collect intercept positions.
-			while (isNegative ? (pos.x > target.x) : (pos.x < target.x))
-			{
-				sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
-				sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(sign, 0, 0) });
-
-				pos += Vector3i(BLOCK(1), step.y, step.z) * sign;
-			}
+			float intersectDist = 0.0f;
+			if (ray.Intersects(sector.Box, intersectDist) && intersectDist <= dist)
+				sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ &sector, intersectDist });
 		}
 
-		// 3) Collect Z axis intercepts.
-		if (deltaPos.z != 0.0f)
-		{
-			// Calculate step.
-			auto step = Vector3i(
-				BLOCK(deltaPos.x) / deltaPos.z,
-				BLOCK(deltaPos.y) / deltaPos.z,
-				deltaPos.z);
+		// 2) Sort intercepts.
+		sectorTrace.Sort();
 
-			bool isNegative = (step.z < 0);
-			int sign = isNegative ? -1 : 1;
-
-			// Calculate initial position.
-			auto pos = Vector3i::Zero;
-			pos.z = isNegative ? ((int)round(origin.z) & (UINT_MAX - WALL_MASK)) : ((int)round(origin.z) | WALL_MASK);
-			pos.x = (((pos.z - origin.z) * step.x) / BLOCK(1)) + origin.x;
-			pos.y = (((pos.z - origin.z) * step.y) / BLOCK(1)) + origin.y;
-
-			// Collect positions.
-			while (isNegative ? (pos.z > target.z) : (pos.z < target.z))
-			{
-				sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos });
-				sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, pos + Vector3i(0, 0, sign) });
-
-				pos += Vector3i(step.x, step.y, BLOCK(1)) * sign;
-			}
-		}
-
-		// 4) Collect target as intercept.
-		sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ nullptr, target });
-
-		// 5) Sort intercepts by distance from origin.
-		std::sort(
-			sectorTrace.Intercepts.begin(), sectorTrace.Intercepts.end(),
-			[origin](const SectorTraceData::InterceptData& intercept0, const SectorTraceData::InterceptData& intercept1)
-			{
-				float distSqr0 = Vector3i::DistanceSquared(origin, intercept0.Position);
-				float distSqr1 = Vector3i::DistanceSquared(origin, intercept1.Position);
-				return (distSqr0 < distSqr1);
-			});
-
-		// 6) Clean intercepts.
-		for (int i = 0; i < sectorTrace.Intercepts.size();)
-		{
-			auto& intercept = sectorTrace.Intercepts[i];
-
-			auto pointColl = GetPointCollision(intercept.Position, roomNumber);
-			intercept.Sector = &pointColl.GetSector();
-
-			// 6.1) Trim intercepts beyond current room.
-			if (intercept.Sector->RoomNumber != roomNumber)
-			{
-				sectorTrace.Intercepts.erase(sectorTrace.Intercepts.begin() + i, sectorTrace.Intercepts.end());
-				break;
-			}
-
-			// TODO: Pass bound to this function so I don't have to do this.
-			// 6.2) Remove intercepts of duplicate sectors.
-			if (i > 0 && intercept.Sector == sectorTrace.Intercepts[i - 1].Sector)
-			{
-				sectorTrace.Intercepts.erase(sectorTrace.Intercepts.begin() + i);
-				continue;
-			}
-
-			i++;
-		}
-
-		// 7) Return sector trace.
+		// 3) Return sector trace.
 		return sectorTrace;
 	}
 
@@ -350,15 +272,13 @@ namespace TEN::Collision::Los
 	{
 		auto roomTrace = RoomTraceData{};
 
-		// 1) Set base data.
+		// 1) Initialize ray.
 		auto ray = Ray(origin, dir);
 		int rayRoomNumber = roomNumber;
 		float rayDist = dist;
-		auto target = Geometry::TranslatePoint(origin, dir, dist);
 
-		// 2) Find room trace.
-		bool contTrace = true;
-		while (contTrace)
+		// 2) Fill room trace.
+		while (true)
 		{
 			// 2.1) Collect room number.
 			roomTrace.RoomNumbers.push_back(rayRoomNumber);
@@ -378,16 +298,20 @@ namespace TEN::Collision::Los
 			// 2.3) Clip bridges (if applicable).
 			if (collideBridges)
 			{
-				auto sectorTrace = GetSectorTrace(ray.position, rayRoomNumber, target);
+				auto sectorTrace = GetSectorTrace(ray, rayRoomNumber, closestDist);
 
-				// Run through intercepts in trace.
 				auto visitedBridgeMovIds = std::set<int>{};
+				bool hasBridge = false;
+
+				// Run through intercepts in sector trace.
 				for (int i = 0; i < sectorTrace.Intercepts.size(); i++)
 				{
 					// Run through bridges in sector.
 					const auto& intercept = sectorTrace.Intercepts[i];
 					for (int bridgeMovID : intercept.Sector->BridgeItemNumbers)
 					{
+						g_Renderer.PrintDebugMessage("%d", bridgeMovID);
+
 						// Check if bridge was already visited.
 						if (Contains(visitedBridgeMovIds, bridgeMovID))
 							continue;
@@ -406,16 +330,16 @@ namespace TEN::Collision::Los
 						{
 							closestTri = &meshColl->Triangle;
 							closestDist = meshColl->Distance;
-							contTrace = false;
+							hasBridge = true;
 						}
 					}
 
-					if (!contTrace)
+					if (hasBridge)
 						break;
 				}
 			}
 
-			// 3) Set room trace or continue from new room.
+			// 2.4) Return room trace or continue from new room.
 			if (closestTri != nullptr)
 			{
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
@@ -425,7 +349,7 @@ namespace TEN::Collision::Los
 				{
 					ray.position = intersectPos;
 					rayRoomNumber = closestTri->GetPortalRoomNumber();
-					rayDist = Vector3::Distance(intersectPos, target);
+					rayDist -= closestDist;
 				}
 				// Triangle is tangible; fill remaining room trace data.
 				else
@@ -436,17 +360,17 @@ namespace TEN::Collision::Los
 					roomTrace.Triangle = closestTri;
 					roomTrace.Position = std::pair(intersectPos, rayRoomNumber);
 					roomTrace.IsIntersected = true;
-					contTrace = false;
+					return roomTrace;
 				}
 			}
 			else
 			{
-				roomTrace.Position = std::pair(target, rayRoomNumber);
-				contTrace = false;
+				roomTrace.Position = std::pair(Geometry::TranslatePoint(ray.position, ray.direction, rayDist), rayRoomNumber);
+				return roomTrace;
 			}
 		}
 
-		// 4) Return room trace.
+		// FAILSAFE.
 		return roomTrace;
 	}
 

@@ -135,19 +135,20 @@ struct SectorFlagData
 class FloorInfo
 {
 public:
-	// Components
-	Vector2i Position			  = Vector2i::Zero;
-	int		 RoomNumber			  = 0;
-	int		 SidePortalRoomNumber = 0;
+	// Members
+	Vector2i		  Position		 = Vector2i::Zero;
+	int				  RoomNumber	 = 0;
+	BoundingBox		  Box			 = BoundingBox();
+	SectorSurfaceData FloorSurface	 = {};
+	SectorSurfaceData CeilingSurface = {};
+	SectorFlagData	  Flags			 = {};
 
-	SectorSurfaceData FloorSurface		= {};
-	SectorSurfaceData CeilingSurface	= {};
-	std::set<int>	  BridgeItemNumbers = {};
-	SectorFlagData	  Flags				= {};
+	std::set<int> BridgeItemNumbers	   = {};
+	int			  SidePortalRoomNumber = 0;
 
-	int	 Box		  = 0;
-	int	 TriggerIndex = 0;
-	bool Stopper	  = true;
+	int	 PathfindingBoxID = 0;
+	int	 TriggerIndex	  = 0;
+	bool Stopper		  = true;
 
 	// Getters
 	int								 GetSurfaceTriangleID(int x, int z, bool isFloor) const;
