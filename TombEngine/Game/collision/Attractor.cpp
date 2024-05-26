@@ -482,7 +482,7 @@ namespace TEN::Collision::Attractor
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float radius,
-														   const Vector3& axis)
+															   const Vector3& axis)
 	{
 		constexpr auto COLL_COUNT_MAX = 64;
 
