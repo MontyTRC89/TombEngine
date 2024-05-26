@@ -109,39 +109,6 @@ namespace TEN::Physics
 		Generate(tris, triIds, 0, (int)tris.size());
 	}
 
-	int CollisionMesh::Bvh::Generate(const std::vector<CollisionTriangle>& tris, const std::vector<int>& triIds, int start, int end)
-	{
-		constexpr auto TRI_COUNT_PER_LEAF_MAX = 4;
-
-		// FAILSAFE.
-		if (start >= end)
-			return NO_VALUE;
-
-		auto node = BvhNode{};
-
-		// Combine boxes.
-		node.Box = tris[triIds[start]].GetBox();
-		for (int i = (start + 1); i < end; i++)
-			node.Box = Geometry::CombineBoundingBoxes(node.Box, tris[triIds[i]].GetBox());
-
-		// Leaf node.
-		if ((end - start) <= TRI_COUNT_PER_LEAF_MAX)
-		{
-			node.TriangleIds.insert(node.TriangleIds.end(), triIds.begin() + start, triIds.begin() + end);
-			Nodes.push_back(node);
-			return int(Nodes.size() - 1);
-		}
-		// Split node.
-		else
-		{
-			int mid = (start + end) / 2;
-			node.LeftChildID = Generate(tris, triIds, start, mid);
-			node.RightChildID = Generate(tris, triIds, mid, end);
-			Nodes.push_back(node);
-			return int(Nodes.size() - 1);
-		}
-	}
-
 	std::optional<CollisionMeshCollisionData> CollisionMesh::Bvh::GetCollision(const Ray& ray, float dist,
 																			   const std::vector<CollisionTriangle>& tris,
 																			   const std::vector<Vector3>& vertices) const
@@ -195,6 +162,39 @@ namespace TEN::Physics
 			return CollisionMeshCollisionData{ *closestTri, closestDist };
 
 		return std::nullopt;
+	}
+
+	int CollisionMesh::Bvh::Generate(const std::vector<CollisionTriangle>& tris, const std::vector<int>& triIds, int start, int end)
+	{
+		constexpr auto TRI_COUNT_PER_LEAF_MAX = 4;
+
+		// FAILSAFE.
+		if (start >= end)
+			return NO_VALUE;
+
+		auto node = BvhNode{};
+
+		// Combine boxes.
+		node.Box = tris[triIds[start]].GetBox();
+		for (int i = (start + 1); i < end; i++)
+			node.Box = Geometry::CombineBoundingBoxes(node.Box, tris[triIds[i]].GetBox());
+
+		// Leaf node.
+		if ((end - start) <= TRI_COUNT_PER_LEAF_MAX)
+		{
+			node.TriangleIds.insert(node.TriangleIds.end(), triIds.begin() + start, triIds.begin() + end);
+			Nodes.push_back(node);
+			return int(Nodes.size() - 1);
+		}
+		// Split node.
+		else
+		{
+			int mid = (start + end) / 2;
+			node.LeftChildID = Generate(tris, triIds, start, mid);
+			node.RightChildID = Generate(tris, triIds, mid, end);
+			Nodes.push_back(node);
+			return int(Nodes.size() - 1);
+		}
 	}
 
 	CollisionMesh::CollisionMesh(const std::vector<CollisionTriangle>& tris)
