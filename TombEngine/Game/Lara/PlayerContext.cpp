@@ -232,7 +232,7 @@ namespace TEN::Entities::Player
 		dir.Normalize();
 
 		// 4) Assess static LOS.
-		auto losInteresect = GetStaticLos(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
+		auto losInteresect = GetStaticLosCollision(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
 		if (losInteresect.has_value())
 			return false;
 
@@ -722,7 +722,7 @@ namespace TEN::Entities::Player
 		dir.Normalize();
 
 		// 3) Assess static LOS.
-		auto staticLos = GetStaticLos(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
+		auto staticLos = GetStaticLosCollision(origin, item.RoomNumber, dir, Vector3::Distance(origin, target), false);
 		if (staticLos.has_value())
 			return false;
 

@@ -37,7 +37,7 @@ using TEN::Renderer::g_Renderer;
 constexpr auto CAMERA_OBJECT_COLL_DIST_THRESHOLD   = BLOCK(4);
 constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
-struct CameraLosData
+struct CameraLosCollision
 {
 	std::pair<Vector3, int> Position = {};
 	std::optional<Vector3>	Normal	 = std::nullopt;
@@ -149,69 +149,70 @@ static bool TestCameraCollidableStatic(const MESH_INFO& staticObj)
 	return true;
 }
 
-static CameraLosData GetCameraLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
+static CameraLosCollision GetCameraLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
 {
 	constexpr auto DIST_BUFFER = BLOCK(0.1f);
 
-	// Get raw LOS.
+	// Get raw LOS collision.
 	auto dir = target - origin;
 	dir.Normalize();
 	float dist = Vector3::Distance(origin, target);
-	auto los = GetLos(origin, originRoomNumber, dir, dist, true, false, true);
+	auto losColl = GetLosCollision(origin, originRoomNumber, dir, dist, true, false, true);
 
-	// Set room LOS.
-	auto cameraLos = CameraLosData{};
-	cameraLos.Normal = los.Room.Triangle.has_value() ? los.Room.Triangle.value()->GetNormal() : std::optional<Vector3>();
-	cameraLos.Position = los.Room.Position;
-	cameraLos.IsIntersected = los.Room.IsIntersected;
-	cameraLos.Distance = los.Room.Distance;
+	// 1) Clip room LOS collision.
+	auto cameraLosColl = CameraLosCollision{};
+	cameraLosColl.Normal = losColl.Room.Triangle.has_value() ? losColl.Room.Triangle.value()->GetNormal() : std::optional<Vector3>();
+	cameraLosColl.Position = losColl.Room.Position;
+	cameraLosColl.IsIntersected = losColl.Room.IsIntersected;
+	cameraLosColl.Distance = losColl.Room.Distance;
 
 	bool hasObjectLos = false;
 
-	// TODO: Maybe calculate an object LOS "normal" as the direction from the object to the origin?
+	// TODO: Maybe calculate an object LOS collision "normal" as the direction from the object to the origin?
 
-	// Set moveable LOS instances.
-	for (const auto& movLos : los.Moveables)
+	// 2) Clip moveable LOS collision.
+	for (const auto& movLosColl : losColl.Moveables)
 	{
-		if (!TestCameraCollidableItem(*movLos.Moveable))
+		if (!TestCameraCollidableItem(*movLosColl.Moveable))
 			continue;
 
-		if (movLos.Distance < cameraLos.Distance)
+		if (movLosColl.Distance < cameraLosColl.Distance)
 		{
-			cameraLos.Normal = std::nullopt;
-			cameraLos.Position = movLos.Position;
-			cameraLos.IsIntersected = true;
-			cameraLos.Distance = movLos.Distance;
+			cameraLosColl.Normal = std::nullopt;
+			cameraLosColl.Position = movLosColl.Position;
+			cameraLosColl.IsIntersected = true;
+			cameraLosColl.Distance = movLosColl.Distance;
 			break;
 		}
 	}
 
-	// Set static LOS.
-	for (const auto& staticLos : los.Statics)
+	// 3) Clip static LOS collision.
+	for (const auto& staticLosColl : losColl.Statics)
 	{
-		if (!TestCameraCollidableStatic(*staticLos.Static))
+		if (!TestCameraCollidableStatic(*staticLosColl.Static))
 			continue;
 
-		if (staticLos.Distance < cameraLos.Distance)
+		if (staticLosColl.Distance < cameraLosColl.Distance)
 		{
-			cameraLos.Normal = std::nullopt;
-			cameraLos.Position = staticLos.Position;
-			cameraLos.IsIntersected = true;
-			cameraLos.Distance = staticLos.Distance;
+			cameraLosColl.Normal = std::nullopt;
+			cameraLosColl.Position = staticLosColl.Position;
+			cameraLosColl.IsIntersected = true;
+			cameraLosColl.Distance = staticLosColl.Distance;
 			break;
 		}
 	}
 
 	// TODO: Shift instead of this.
-	if (cameraLos.Distance < DIST_BUFFER)
+	if (cameraLosColl.Distance < DIST_BUFFER)
 	{
-		cameraLos.Distance = DIST_BUFFER;
-		cameraLos.Position = std::pair(
-			Geometry::TranslatePoint(origin, dir, cameraLos.Distance),
-			GetPointCollision(origin, originRoomNumber, dir, cameraLos.Distance).GetRoomNumber());
+		cameraLosColl.Distance = DIST_BUFFER;
+		cameraLosColl.Position = std::pair(
+			Geometry::TranslatePoint(origin, dir, cameraLosColl.Distance),
+			GetPointCollision(origin, originRoomNumber, dir, cameraLosColl.Distance).GetRoomNumber());
 	}
 
-	return cameraLos;
+	// 4) Return camera LOS collision.
+	return cameraLosColl;
 }
 
 std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, int push, bool yFirst)
