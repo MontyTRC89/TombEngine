@@ -49,6 +49,7 @@ namespace TEN::Collision::Los
 		float Distance			= 0.0f;
 	};
 
+	// LosCollision
 	struct LosData
 	{
 		RoomLosData					 Room	   = {};

@@ -812,45 +812,17 @@ namespace TEN::Collision::Floordata
 	// Sectors should be partitioned in a static bounding volume hierarchy to allow O(log n) complexity for bridge containment operations.
 	// Additionally, bridges should be assigned per-room rather than per-sector. Within a given room, they should be spatially partitioned
 	// in a dynamic bounding volume hierarchy. This will achieve O(log n) complexity in every case.
-	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval)
+	void UpdateBridgeItem(ItemInfo& item, bool forceRemoval)
 	{
-		constexpr auto SECTOR_EXTENTS = Vector3(BLOCK(0.5f));
-
-		if (!Objects.CheckID(item.ObjectNumber))
+		if (!item.IsBridge())
 			return;
 
-		if (!Objects[item.ObjectNumber].loaded)
-			return;
+		auto& bridge = GetBridgeObject(item);
 
-		// Force removal if item was killed.
-		if (item.Flags & IFLAG_KILLED)
-			forceRemoval = true;
+		if (item.Flags & IFLAG_KILLED || forceRemoval)
+			bridge.RemoveFromSectors(item);
 
-		// Calculate bridge boxes.
-		auto bridgeObb = item.GetBox();
-		auto bridgeAabb = Geometry::GetBoundingBox(bridgeObb);
-
-		// Update neighbor room sectors.
-		auto& room = g_Level.Rooms[item.RoomNumber];
-		for (int neighborRoomNumber : room.neighbors)
-		{
-			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-			for (auto& sector : neighborRoom.floor)
-			{
-				// Clear leftover bridge assignment.
-				sector.RemoveBridge(item.Index);
-				if (forceRemoval)
-					continue;
-
-				// Test if bridge AABB intersects sector.
-				if (!bridgeAabb.Intersects(sector.Box))
-					continue;
-
-				// Add bridge if within sector.
-				if (bridgeObb.Intersects(sector.Box))
-					sector.AddBridge(item.Index);
-			}
-		}
+		bridge.Update(item);
 	}
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials)

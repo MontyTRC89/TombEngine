@@ -59,14 +59,13 @@ namespace TEN::Entities::Generic
 		item.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(item);
 
-		bridge.Initialize(item);
 		bridge.GetFloorHeight = GetFallingBlockFloorHeight;
 		bridge.GetCeilingHeight = GetFallingBlockCeilingHeight;
 		bridge.GetFloorBorder = GetFallingBlockFloorBorder;
 		bridge.GetCeilingBorder = GetFallingBlockCeilingBorder;
+		bridge.Initialize(item);
 
 		item.MeshBits = 1;
-		TEN::Collision::Floordata::UpdateBridgeItem(item);
 
 		// Set mutators to EulerAngles identity by default.
 		for (auto& mutator : item.Model.Mutators)

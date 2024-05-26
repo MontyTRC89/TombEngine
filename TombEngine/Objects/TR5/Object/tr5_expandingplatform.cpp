@@ -123,11 +123,11 @@ namespace TEN::Entities::Generic
 		item.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(item);
 
-		bridge.Initialize(item);
 		bridge.GetFloorHeight = GetExpandingPlatformFloorHeight;
 		bridge.GetCeilingHeight = GetExpandingPlatformCeilingHeight;
 		bridge.GetFloorBorder = ExpandingPlatformFloorBorder;
 		bridge.GetCeilingBorder = ExpandingPlatformCeilingBorder;
+		bridge.Initialize(item);
 
 		short roomNumber = item.RoomNumber;
 		FloorInfo* floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber);
@@ -142,8 +142,6 @@ namespace TEN::Entities::Generic
 			AddActiveItem(itemNumber);
 			item.Status = ITEM_ACTIVE;
 		}
-
-		UpdateBridgeItem(item);
 	}
 
 	bool IsInFrontOfExpandingPlatform(const ItemInfo& item, const Vector3i& pos, int margin)

@@ -333,30 +333,34 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 	}
 	else
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
-		if (item->RoomNumber != NO_VALUE)
+		if (item.RoomNumber != NO_VALUE)
 		{
-			auto* room = &g_Level.Rooms[item->RoomNumber];
-
-			if (room->itemNumber == itemNumber)
-				room->itemNumber = item->NextItem;
+			auto& room = g_Level.Rooms[item.RoomNumber];
+			if (room.itemNumber == itemNumber)
+			{
+				room.itemNumber = item.NextItem;
+			}
 			else
 			{
-				for (short linkNumber = room->itemNumber; linkNumber != -1; linkNumber = g_Level.Items[linkNumber].NextItem)
+				for (int linkNumber = room.itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 				{
-					if (g_Level.Items[linkNumber].NextItem == itemNumber)
+					auto& linkItem = g_Level.Items[linkNumber];
+					if (linkItem.NextItem == itemNumber)
 					{
-						g_Level.Items[linkNumber].NextItem = item->NextItem;
+						linkItem.NextItem = item.NextItem;
 						break;
 					}
 				}
 			}
 		}
 
-		item->RoomNumber = roomNumber;
-		item->NextItem = g_Level.Rooms[roomNumber].itemNumber;
-		g_Level.Rooms[roomNumber].itemNumber = itemNumber;
+		item.RoomNumber = roomNumber;
+		auto& room = g_Level.Rooms[roomNumber];
+
+		item.NextItem = g_Level.Rooms[roomNumber].itemNumber;
+		room.itemNumber = itemNumber;
 	}
 }
 
@@ -807,13 +811,10 @@ void UpdateAllEffects()
 
 bool UpdateItemRoom(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	auto roomNumber = GetPointCollision(
-		Vector3i(item->Pose.Position.x, item->Pose.Position.y - CLICK(2), item->Pose.Position.z),
-		item->RoomNumber).GetRoomNumber();
-
-	if (roomNumber != item->RoomNumber)
+	int roomNumber = GetPointCollision(item.Pose.Position + Vector3i(0, -CLICK(2), 0), item.RoomNumber).GetRoomNumber();
+	if (roomNumber != item.RoomNumber)
 	{
 		ItemNewRoom(itemNumber, roomNumber);
 		return true;

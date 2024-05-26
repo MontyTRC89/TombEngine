@@ -15,6 +15,7 @@ namespace TEN::Entities::Generic
 		// Members
 		BoundingBox	  _box			 = BoundingBox();
 		CollisionMesh _collisionMesh = CollisionMesh();
+		//Attractor	  _attractor	 = Attractor();
 
 	public:
 		Pose PrevPose = Pose::Zero;
@@ -28,15 +29,19 @@ namespace TEN::Entities::Generic
 		// Getters
 		const BoundingBox&	 GetBox() const;
 		const CollisionMesh& GetCollisionMesh() const;
+		//const Attractor&	 GetAttractor() const;
 
 		// Utilities
 		void Initialize(const ItemInfo& item);
 		void Update(const ItemInfo& item);
+		void RemoveFromSectors(const ItemInfo& item) const;
 
 	private:
 		// Helpers
-		void UpdateCollisionMesh(const ItemInfo& item);
 		void UpdateBox(const ItemInfo& item);
+		void UpdateCollisionMesh(const ItemInfo& item);
+		//void UpdateAttractor(const ItemInfo& item);
+		void UpdateSectors(const ItemInfo& item);
 	};
 
 	const BridgeObject& GetBridgeObject(const ItemInfo& item);

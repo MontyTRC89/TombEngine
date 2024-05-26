@@ -82,13 +82,12 @@ namespace TEN::Entities::Generic
 		trapDoorItem.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(trapDoorItem);
 
-		bridge.Initialize(trapDoorItem);
 		bridge.GetFloorHeight = GetTrapDoorFloorHeight;
 		bridge.GetCeilingHeight = GetTrapDoorCeilingHeight;
 		bridge.GetFloorBorder = GetTrapDoorFloorBorder;
 		bridge.GetCeilingBorder = GetTrapDoorCeilingBorder;
+		bridge.Initialize(trapDoorItem);
 
-		UpdateBridgeItem(trapDoorItem);
 		CloseTrapDoor(itemNumber);
 	}
 

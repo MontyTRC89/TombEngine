@@ -1,33 +1,42 @@
 #include "framework.h"
 #include "Objects/Generic/Object/BridgeObject.h"
 
+//#include "Game/collision/Attractor.h"
 #include "Game/items.h"
+#include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Physics/Physics.h"
+#include "Specific/level.h"
 
+//using namespace TEN::Colllision::Attractor;
 using namespace TEN::Math;
 using namespace TEN::Physics;
 
 namespace TEN::Entities::Generic
 {
-	const CollisionMesh& BridgeObject::GetCollisionMesh() const
-	{
-		return _collisionMesh;
-	}
-
 	const BoundingBox& BridgeObject::GetBox() const
 	{
 		return _box;
 	}
 
+	const CollisionMesh& BridgeObject::GetCollisionMesh() const
+	{
+		return _collisionMesh;
+	}
+
+	/*const Attractor& BridgeObject::GetAttractor() const
+	{
+		reutrn _attractor;
+	}*/
+
 	void BridgeObject::Initialize(const ItemInfo& item)
 	{
-		UpdateBridgeItem(item);
 		UpdateBox(item);
 		UpdateCollisionMesh(item);
 		//InitializeAttractor(item);
+		UpdateSectors(item);
 
 		PrevPose = item.Pose;
 	}
@@ -38,23 +47,29 @@ namespace TEN::Entities::Generic
 		if (item.Pose == PrevPose)
 			return;
 
-		UpdateBridgeItem(item);
+		UpdateItemRoom(item.Index);
 		UpdateBox(item);
 		UpdateCollisionMesh(item);
 		//UpdateAttractor(item);
+		UpdateSectors(item);
 
 		PrevPose = item.Pose;
 	}
 
+	void BridgeObject::RemoveFromSectors(const ItemInfo& item) const
+	{
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		for (int neighborRoomNumber : room.neighbors)
+		{
+			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+			for (auto& sector : neighborRoom.floor)
+				sector.RemoveBridge(item.Index);
+		}
+	}
+
 	void BridgeObject::UpdateBox(const ItemInfo& item)
 	{
-		auto corners = std::array<Vector3, BoundingOrientedBox::CORNER_COUNT>{};
-		item.GetBox().GetCorners(corners.data());
-
-		// TODO: Avoid making second copy of corners.
-		auto cornersVector = std::vector<Vector3>{};
-		cornersVector.insert(cornersVector.begin(), corners.begin(), corners.end());
-		_box = Geometry::GetBoundingBox(cornersVector);
+		_box = Geometry::GetBoundingBox(item.GetBox());
 	}
 
 	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
@@ -125,6 +140,36 @@ namespace TEN::Entities::Generic
 		_collisionMesh.InsertTriangle(corners[1], corners[2], corners[5], Vector3::Transform(LEFT_NORMAL, rotMatrix));
 		_collisionMesh.InsertTriangle(corners[2], corners[5], corners[6], Vector3::Transform(LEFT_NORMAL, rotMatrix));
 		_collisionMesh.GenerateBvh();
+	}
+
+	/*void BridgeObject::UpdateAttractor(const ItemInfo& item)
+	{
+	}*/
+
+	void BridgeObject::UpdateSectors(const ItemInfo& item)
+	{
+		// Calculate bridge OBB.
+		auto box = item.GetBox();
+
+		// Update neighbor room sectors.
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		for (int neighborRoomNumber : room.neighbors)
+		{
+			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+			for (auto& sector : neighborRoom.floor)
+			{
+				// Clear previous bridge assignment.
+				sector.RemoveBridge(item.Index);
+
+				// Test if bridge AABB intersects sector.
+				if (!_box.Intersects(sector.Box))
+					continue;
+
+				// Add bridge if within sector.
+				if (box.Intersects(sector.Box))
+					sector.AddBridge(item.Index);
+			}
+		}
 	}
 
 	const BridgeObject& GetBridgeObject(const ItemInfo& item)

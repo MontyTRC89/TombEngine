@@ -51,20 +51,22 @@ namespace TEN::Entities::Generic
 		item.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(item);
 
-		bridge.Initialize(item);
 		bridge.GetFloorHeight = GetTwoBlockPlatformFloorHeight;
 		bridge.GetCeilingHeight = GetTwoBlockPlatformCeilingHeight;
 		bridge.GetFloorBorder = GetTwoBlockPlatformFloorBorder;
 		bridge.GetCeilingBorder = GetTwoBlockPlatformCeilingBorder;
+		bridge.Initialize(item);
 
 		item.ItemFlags[0] = item.Pose.Position.y;
 		item.ItemFlags[1] = 1;
-		UpdateBridgeItem(item);
 	}
 
 	void TwoBlockPlatformControl(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(*item);
+
+		bridge.Update(*item);
 
 		if (TriggerActive(item))
 		{

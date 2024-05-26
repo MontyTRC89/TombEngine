@@ -304,14 +304,11 @@ namespace TEN::Collision::Los
 				bool hasBridge = false;
 
 				// Run through intercepts in sector trace.
-				for (int i = 0; i < sectorTrace.Intercepts.size(); i++)
+				for (const auto& intercept : sectorTrace.Intercepts)
 				{
 					// Run through bridges in sector.
-					const auto& intercept = sectorTrace.Intercepts[i];
 					for (int bridgeMovID : intercept.Sector->BridgeItemNumbers)
 					{
-						g_Renderer.PrintDebugMessage("%d", bridgeMovID);
-
 						// Check if bridge was already visited.
 						if (Contains(visitedBridgeMovIds, bridgeMovID))
 							continue;
@@ -339,23 +336,24 @@ namespace TEN::Collision::Los
 				}
 			}
 
-			// 2.4) Return room trace or continue from new room.
+			// 2.4) Return room trace or retrace new room from portal.
 			if (closestTri != nullptr)
 			{
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
 
-				// Triangle is room portal; continue trace from new room.
-				if (closestTri->IsPortal() && rayRoomNumber != closestTri->GetPortalRoomNumber())
+				// Room portal triangle; update ray to retrace from new room.
+				if (closestTri->IsPortal() &&
+					rayRoomNumber != closestTri->GetPortalRoomNumber()) // FAILSAFE: Prevent infinite loop.
 				{
 					ray.position = intersectPos;
 					rayRoomNumber = closestTri->GetPortalRoomNumber();
 					rayDist -= closestDist;
 				}
-				// Triangle is tangible; fill remaining room trace data.
+				// Tangible triangle; set remaining room trace data.
 				else
 				{
 					if (closestTri->IsPortal())
-						TENLog("GetRoomTrace(): Room portal cannot  to itself.", LogLevel::Warning);
+						TENLog("GetRoomTrace(): Room portal cannot link back to itself.", LogLevel::Warning);
 
 					roomTrace.Triangle = closestTri;
 					roomTrace.Position = std::pair(intersectPos, rayRoomNumber);
@@ -379,7 +377,7 @@ namespace TEN::Collision::Los
 		// FAILSAFE.
 		if (dir == Vector3::Zero)
 		{
-			TENLog("GetRoomLos(): dir is not a unit vector.", LogLevel::Warning);
+			TENLog("GetRoomLos(): Direction is not a unit vector.", LogLevel::Warning);
 			return RoomLosData{ {}, std::pair(origin, roomNumber), {}, false, 0.0f };
 		}
 

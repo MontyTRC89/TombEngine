@@ -87,11 +87,11 @@ namespace TEN::Entities::Traps
 		item.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(item);
 
-		bridge.Initialize(item);
 		bridge.GetFloorHeight = GetCrumblingPlatformFloorHeight;
 		bridge.GetCeilingHeight = GetCrumblingPlatformCeilingHeight;
 		bridge.GetFloorBorder = GetCrumblingPlatformFloorBorder;
 		bridge.GetCeilingBorder = GetCrumblingPlatformCeilingBorder;
+		bridge.Initialize(item);
 
 		int delayInFrameTime = (item.TriggerFlags != 0) ? std::abs(item.TriggerFlags) : (int)round(CRUMBLING_PLATFORM_DELAY * FPS);
 		item.ItemFlags[0] = delayInFrameTime;
@@ -112,6 +112,9 @@ namespace TEN::Entities::Traps
 	void ControlCrumblingPlatform(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(item);
+
+		bridge.Update(item);
 
 		// OCB < 0; must be activated by trigger.
 		if (item.TriggerFlags < 0)
