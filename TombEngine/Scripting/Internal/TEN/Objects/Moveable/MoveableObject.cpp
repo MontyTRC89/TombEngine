@@ -10,6 +10,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/objectslist.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
@@ -600,7 +601,10 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 	}
 
 	if (m_item->IsBridge())
-		UpdateBridgeItem(*m_item);
+	{
+		auto& bridge = GetBridgeObject(*m_item);
+		bridge.Update(*m_item);
+	}
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
@@ -630,7 +634,10 @@ void Moveable::SetRot(const Rotation& rot)
 	m_item->Pose.Orientation.z = ANGLE(rot.z);
 
 	if (m_item->IsBridge())
-		UpdateBridgeItem(*m_item);
+	{
+		auto& bridge = GetBridgeObject(*m_item);
+		bridge.Update(*m_item);
+	}
 }
 
 short Moveable::GetHP() const

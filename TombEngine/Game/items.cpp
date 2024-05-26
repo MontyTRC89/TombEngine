@@ -268,7 +268,10 @@ void KillItem(short const itemNumber)
 		// AI target generation uses a hack with making a dummy item without ObjectNumber.
 		// Therefore, a check should be done here to prevent access violation.
 		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && item->IsBridge())
-			UpdateBridgeItem(*item, true);
+		{
+			auto& bridge = GetBridgeObject(*item);
+			bridge.RemoveFromSectors(*item);
+		}
 
 		GameScriptHandleKilled(itemNumber, true);
 

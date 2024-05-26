@@ -148,6 +148,13 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::UpdateSectors(const ItemInfo& item)
 	{
+		// CLear bridge assignment if killed.
+		if (item.Flags & IFLAG_KILLED)
+		{
+			RemoveFromSectors(item);
+			return;
+		}
+
 		// Calculate bridge OBB.
 		auto box = item.GetBox();
 

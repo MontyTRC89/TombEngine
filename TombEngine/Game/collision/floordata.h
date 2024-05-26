@@ -201,8 +201,7 @@ namespace TEN::Collision::Floordata
 	void RemoveBridge(int itemNumber, int x = 0, int z = 0);
 
 	std::optional<int> GetBridgeItemIntersect(const ItemInfo& item, const Vector3i& pos, bool useBottomHeight);
-	int	 GetBridgeBorder(const ItemInfo& item, bool isBottom);
-	void UpdateBridgeItem(ItemInfo& item, bool forceRemoval = false);
+	int				   GetBridgeBorder(const ItemInfo& item, bool isBottom);
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials);
 	

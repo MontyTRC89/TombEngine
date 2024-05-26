@@ -66,8 +66,6 @@ namespace TEN::Entities::Generic
 		auto* item = &g_Level.Items[itemNumber];
 		auto& bridge = GetBridgeObject(*item);
 
-		bridge.Update(*item);
-
 		if (TriggerActive(item))
 		{
 			if (item->TriggerFlags)
@@ -84,20 +82,7 @@ namespace TEN::Entities::Generic
 					return;
 				}
 
-				int distToPortal = *&g_Level.Rooms[item->RoomNumber].maxceiling - item->Pose.Position.y;
-				if (distToPortal <= speed)
-					UpdateBridgeItem(*item);
-
-				auto probe = GetPointCollision(*item);
-
-				item->Floor = probe.GetFloorHeight();
-
-				if (probe.GetRoomNumber() != item->RoomNumber)
-				{
-					UpdateBridgeItem(*item, true);
-					ItemNewRoom(itemNumber, probe.GetRoomNumber());
-					UpdateBridgeItem(*item);
-				}
+				item->Floor = GetPointCollision(*item).GetFloorHeight();
 			}
 			else
 			{
@@ -148,5 +133,7 @@ namespace TEN::Entities::Generic
 				}
 			}
 		}
+
+		bridge.Update(*item);
 	}
 }

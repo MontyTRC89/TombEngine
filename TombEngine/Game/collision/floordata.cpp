@@ -808,23 +808,6 @@ namespace TEN::Collision::Floordata
 		return (item.Pose.Position.y + (isBottom ? bounds.Y2 : bounds.Y1));
 	}
 
-	// TODO: Complexity is O(n * m), where n is the number of sectors in a room and m is the number of neighbor rooms.
-	// Sectors should be partitioned in a static bounding volume hierarchy to allow O(log n) complexity for bridge containment operations.
-	// Additionally, bridges should be assigned per-room rather than per-sector. Within a given room, they should be spatially partitioned
-	// in a dynamic bounding volume hierarchy. This will achieve O(log n) complexity in every case.
-	void UpdateBridgeItem(ItemInfo& item, bool forceRemoval)
-	{
-		if (!item.IsBridge())
-			return;
-
-		auto& bridge = GetBridgeObject(item);
-
-		if (item.Flags & IFLAG_KILLED || forceRemoval)
-			bridge.RemoveFromSectors(item);
-
-		bridge.Update(item);
-	}
-
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials)
 	{
 		return Contains(materials, refMaterial);

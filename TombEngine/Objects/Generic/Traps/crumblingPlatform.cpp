@@ -95,7 +95,6 @@ namespace TEN::Entities::Traps
 
 		int delayInFrameTime = (item.TriggerFlags != 0) ? std::abs(item.TriggerFlags) : (int)round(CRUMBLING_PLATFORM_DELAY * FPS);
 		item.ItemFlags[0] = delayInFrameTime;
-		UpdateBridgeItem(item);
 	}
 
 	static void ActivateCrumblingPlatform(short itemNumber)
@@ -143,9 +142,7 @@ namespace TEN::Entities::Traps
 			{
 				item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_FALL;
 				item.ItemFlags[1] = CRUMBLING_PLATFORM_VELOCITY_MIN;
-
-				auto pointColl = GetPointCollision(item);
-				pointColl.GetSector().RemoveBridge(itemNumber);
+				bridge.RemoveFromSectors(item);
 			}
 		}
 
