@@ -293,7 +293,7 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 	return true;
 }
 
-bool TestForObjectOnLedge(const AttractorCollisionData& attracColl, float radius, float down, bool testAttracFront)
+bool TestForObjectOnLedge(const AttractorCollision& attracColl, float radius, float down, bool testAttracFront)
 {
 	constexpr auto PASS_COUNT = 3;
 

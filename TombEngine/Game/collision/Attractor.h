@@ -89,7 +89,7 @@ namespace TEN::Collision::Attractor
 		bool  IsInFront	   = false;
 
 		// Constructors
-		AttractorCollisionData() {};
+		AttractorCollisionData() = default;
 		AttractorCollisionData(AttractorObject& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis);
 	};
 

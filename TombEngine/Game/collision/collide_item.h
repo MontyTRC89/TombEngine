@@ -4,7 +4,7 @@
 
 using namespace TEN::Collision::Point;
 
-namespace TEN::Collision::Attractor { class AttractorCollisionData; };
+namespace TEN::Collision::Attractor { class AttractorCollision; };
 class FloorInfo;
 struct CollisionInfo;
 struct CollisionResult;
@@ -42,7 +42,7 @@ struct CollidedObjectData
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible, bool ignorePlayer, float customRadius = 0.0f, ObjectCollectionMode mode = ObjectCollectionMode::All);
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll);
-bool TestForObjectOnLedge(const AttractorCollisionData& attracColl, float radius, float down, bool testAttracFront);
+bool TestForObjectOnLedge(const AttractorCollision& attracColl, float radius, float down, bool testAttracFront);
 
 bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem);
 bool AlignLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem);

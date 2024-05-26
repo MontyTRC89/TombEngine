@@ -39,6 +39,7 @@ namespace TEN::Math::Geometry
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
 	EulerAngles GetRelOrientToNormal(short orient, const Vector3& normal, const Vector3& axis = Vector3::UnitY);
 	BoundingBox GetBoundingBox(const std::vector<Vector3>& points);
+	BoundingBox CombineBoundingBoxes(const BoundingBox& box0, const BoundingBox& box1);
 
 	// Converters
 	Quaternion ConvertDirectionToQuat(const Vector3& dir);

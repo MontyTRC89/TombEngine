@@ -62,19 +62,20 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	HandleAttractorDebug(*item);
 
-	static int bridgeItemNumber = NO_ITEM;
-	if (coll->LastBridgeItemNumber != NO_ITEM)
+	static int bridgeItemNumber = NO_VALUE;
+	if (coll->LastBridgeItemNumber != NO_VALUE)
 		bridgeItemNumber = coll->LastBridgeItemNumber;
 
-	if (bridgeItemNumber != NO_ITEM)
+	if (bridgeItemNumber != NO_VALUE)
 	{
 		constexpr auto TRANSLATE_STEP = BLOCK(0.1f);
 
 		auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+		auto& bridge = GetBridgeObject(bridgeItem);
 
 		// Force detachment.
 		if (KeyMap[OIS::KeyCode::KC_V])
-			bridgeItem.Attractor->DetachAllPlayers();
+			bridge.GetAttractor().DetachAllPlayers();
 
 		// Move bridge.
 		if (KeyMap[OIS::KeyCode::KC_K])
@@ -99,8 +100,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		if (KeyMap[OIS::KeyCode::KC_B])
 			bridgeItem.Pose.Orientation.y += ANGLE(2.0f);
 
-		if (bridgeItem.Attractor.has_value())
-			bridgeItem.Attractor->Update(GenerateBridgeAttractor(bridgeItem).GetPoints(), bridgeItem.RoomNumber);
+		bridge.Update(bridgeItem);
 	}
 
 	//----------
@@ -374,7 +374,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	// Draw debug.
 	if (DebugMode)
 	{
-		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().Box);
+		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().PathfindingBoxID);
 		DrawNearbySectorFlags(*item);
 		DrawNearbyAttractors(item->Pose.Position.ToVector3(), item->RoomNumber, item->Pose.Orientation.y);
 

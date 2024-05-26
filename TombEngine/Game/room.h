@@ -90,6 +90,56 @@ struct MESH_INFO
 	bool Dirty;
 };
 
+class AttractorHandler
+{
+private:
+	struct BvhNode
+	{
+		std::vector<int> AttractorIds = {}; // NOTE: Only leaf nodes store triangles directly.
+		BoundingBox		 Box		  = BoundingBox();
+
+		int LeftChildID	 = NO_VALUE;
+		int RightChildID = NO_VALUE;
+
+		bool IsLeaf() const;
+	};
+
+	class Bvh
+	{
+	public:
+		// Members
+		std::vector<BvhNode> Nodes = {};
+
+		// Constructors
+		Bvh() = default;
+		Bvh(const std::vector<AttractorObject>& attracs);
+
+		// Utilities
+		std::vector<AttractorObject*> GetBoundedAttractors(const BoundingSphere& sphere, std::vector<AttractorObject>& attracs);
+
+	private:
+		// Helpers
+		int Generate(const std::vector<AttractorObject>& attracs, const std::vector<int>& attracIds, int start, int end);
+	};
+
+	// Members
+	std::vector<AttractorObject> _attractors = {};
+	Bvh							 _bvh		 = Bvh();
+
+public:
+	// Constructors
+	AttractorHandler() = default;
+	AttractorHandler(std::vector<AttractorObject>& attracs);
+
+	// Getters
+	std::vector<AttractorObject>& GetAttractors();
+	std::vector<AttractorObject*> GetBoundedAttractors(const BoundingSphere& sphere);
+
+	// Utilities
+	void InsertAttractor(const AttractorObject& attrac);
+	void GenerateBvh();
+};
+
 struct ROOM_INFO
 {
 	int index;
@@ -113,9 +163,9 @@ struct ROOM_INFO
 	std::string name = {};
 	std::vector<std::string> tags = {};
 
+	AttractorHandler		   Attractors	  = {};
 	std::vector<FloorInfo>	   floor		  = {};
 	std::vector<TriggerVolume> triggerVolumes = {};
-	std::vector<AttractorObject>	   Attractors	  = {};
 
 	std::vector<MESH_INFO>	mesh	  = {};
 	std::vector<ROOM_LIGHT> lights	  = {};

@@ -9,10 +9,12 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
+using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Attractor
@@ -421,17 +423,14 @@ namespace TEN::Collision::Attractor
 		return debugAttracs;
 	}
 
-	// TODO: Spacial partitioning may be ideal here. Would require a general collision refactor. -- Sezz 2023.07.30
 	static std::vector<AttractorObject*> GetNearbyAttractors(const Vector3& pos, int roomNumber, const BoundingSphere& sphere)
 	{
-		constexpr auto SECTOR_SEARCH_DEPTH = 2;
-
 		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::AttractorStats);
 
 		auto nearbyAttracs = std::vector<AttractorObject*>{};
 
 		// TEMP
-		// 1) Collect debug attractors.
+		// Collect debug attractors.
 		auto debugAttracs = GetDebugAttractors();
 		for (auto* attrac : debugAttracs)
 		{
@@ -439,47 +438,51 @@ namespace TEN::Collision::Attractor
 				nearbyAttracs.push_back(attrac);
 		}
 
-		// 2) Collect room attractors in neighbor rooms.
+		// 1) Collect room attractors.
 		auto& room = g_Level.Rooms[roomNumber];
 		for (int neighborRoomNumber : room.neighbors)
 		{
+			// Check if room is active.
 			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 			if (!neighborRoom.Active())
 				continue;
 
-			for (auto& attrac : neighborRoom.Attractors)
+			auto attracs = neighborRoom.Attractors.GetBoundedAttractors(sphere);
+			nearbyAttracs.insert(nearbyAttracs.end(), attracs.begin(), attracs.end());
+		}
+
+		auto visitedBridgeItemNumbers = std::set<int>{};
+
+		// 2) Collect bridge attractors.
+		auto sectorSearchDepth = ceil(sphere.Radius / BLOCK(1));
+		auto sectors = GetNeighborSectors(pos, roomNumber, sectorSearchDepth);
+		for (const auto* sector : sectors)
+		{
+			// Test if sphere intersects sector.
+			if (!sector->Box.Intersects(sphere))
+				continue;
+
+			// Run through bridges in sector.
+			for (int bridgeItemNumber : sector->BridgeItemNumbers)
 			{
-				if (sphere.Intersects(attrac.GetBox()))
-					nearbyAttracs.push_back(&attrac);
+				// Test if bridge was already visited.
+				if (Contains(visitedBridgeItemNumbers, bridgeItemNumber))
+					continue;
+				visitedBridgeItemNumbers.insert(bridgeItemNumber);
+
+				auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+				auto& bridge = GetBridgeObject(bridgeItem);
+
+				nearbyAttracs.push_back(&bridge.GetAttractor());
 			}
 		}
 
-		// Collect bridge item numbers from neighbor sectors.
-		auto bridgeItemNumbers = std::set<int>{};
-		auto sectors = GetNeighborSectors(pos, roomNumber, SECTOR_SEARCH_DEPTH);
-		for (const auto* sector : sectors)
-		{
-			for (int bridgeItemNumber : sector->BridgeItemNumbers)
-				bridgeItemNumbers.insert(bridgeItemNumber);
-		}
-
-		// 3) Collect bridge attractors.
-		for (int bridgeItemNumber : bridgeItemNumbers)
-		{
-			auto& bridgeItem = g_Level.Items[bridgeItemNumber];
-			auto& bridge = GetBridgeObject(bridgeItem);
-
-			auto& attrac = bridge.GetAttractor();
-			if (sphere.Intersects(attrac.GetBox()))
-				nearbyAttracs.push_back(&attrac);
-		}
-
-		// Return pointers to approximately nearby attractors from sphere-AABB tests.
+		// 3) Return approximately nearby attractors from sphere-AABB tests.
 		return nearbyAttracs;
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float radius,
-															   const Vector3& axis)
+														   const Vector3& axis)
 	{
 		constexpr auto COLL_COUNT_MAX = 64;
 
@@ -530,8 +533,8 @@ namespace TEN::Collision::Attractor
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
-															   float forward, float down, float right, float radius,
-															   const Vector3& axis)
+														   float forward, float down, float right, float radius,
+														   const Vector3& axis)
 	{
 		auto relOffset = Vector3(right, down, forward);
 		auto rotMatrix = AxisAngle(axis, headingAngle).ToRotationMatrix();

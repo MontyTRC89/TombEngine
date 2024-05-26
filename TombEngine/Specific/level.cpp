@@ -780,7 +780,7 @@ void ReadRooms()
 			auto sector = FloorInfo{};
 
 			sector.TriggerIndex = ReadInt32();
-			sector.Box = ReadInt32();
+			sector.PathfindingBoxID = ReadInt32();
 
 			sector.FloorSurface.Triangles[0].Material =
 			sector.FloorSurface.Triangles[1].Material =

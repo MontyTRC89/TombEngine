@@ -2,6 +2,7 @@
 #include "Game/room.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Attractor.h"
 #include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
@@ -12,9 +13,10 @@
 #include "Objects/game_object_ids.h"
 #include "Specific/trutils.h"
 
-using namespace TEN::Math;
+using namespace TEN::Collision::Attractor;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
+using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace TEN::Utils;
 
@@ -23,6 +25,119 @@ bool FlipStats[MAX_FLIPMAP];
 int  FlipMap[MAX_FLIPMAP];
 
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
+
+bool AttractorHandler::BvhNode::IsLeaf() const
+{
+	return (LeftChildID == NO_VALUE && RightChildID == NO_VALUE);
+}
+
+AttractorHandler::Bvh::Bvh(const std::vector<AttractorObject>& attracs)
+{
+	auto attracIds = std::vector<int>{};
+	attracIds.reserve(attracs.size());
+	for (int i = 0; i < attracs.size(); ++i)
+		attracIds.push_back(i);
+
+	Generate(attracs, attracIds, 0, (int)attracs.size());
+}
+
+std::vector<AttractorObject*> AttractorHandler::Bvh::GetBoundedAttractors(const BoundingSphere& sphere, std::vector<AttractorObject>& attracs)
+{
+	if (Nodes.empty())
+		return {};
+
+	auto boundedAttracs = std::vector<AttractorObject*>{};
+
+	std::function<void(int)> traverseBvh = [&](int nodeID)
+	{
+		// Invalid node; return early.
+		if (nodeID == NO_VALUE)
+			return;
+
+		const auto& node = Nodes[nodeID];
+
+		// Test node intersection.
+		if (!node.Box.Intersects(sphere))
+			return;
+
+		// Traverse nodes.
+		if (node.IsLeaf())
+		{
+			for (int attracID : node.AttractorIds)
+			{
+				if (attracs[attracID].GetBox().Intersects(sphere))
+					boundedAttracs.push_back(&attracs[attracID]);
+			}
+		}
+		else
+		{
+			traverseBvh(node.LeftChildID);
+			traverseBvh(node.RightChildID);
+		}
+	};
+
+	// Traverse BVH from root node.
+	traverseBvh((int)Nodes.size() - 1);
+	return boundedAttracs;
+}
+
+int AttractorHandler::Bvh::Generate(const std::vector<AttractorObject>& attracs, const std::vector<int>& attracIds, int start, int end)
+{
+	constexpr auto ATTRAC_COUNT_PER_LEAF_MAX = 4;
+
+	// FAILSAFE.
+	if (start >= end)
+		return NO_VALUE;
+
+	auto node = BvhNode{};
+
+	// Combine boxes.
+	node.Box = attracs[attracIds[start]].GetBox();
+	for (int i = (start + 1); i < end; i++)
+		node.Box = Geometry::CombineBoundingBoxes(node.Box, attracs[attracIds[i]].GetBox());
+
+	// Leaf node.
+	if ((end - start) <= ATTRAC_COUNT_PER_LEAF_MAX)
+	{
+		node.AttractorIds.insert(node.AttractorIds.end(), attracIds.begin() + start, attracIds.begin() + end);
+		Nodes.push_back(node);
+		return int(Nodes.size() - 1);
+	}
+	// Split node.
+	else
+	{
+		int mid = (start + end) / 2;
+		node.LeftChildID = Generate(attracs, attracIds, start, mid);
+		node.RightChildID = Generate(attracs, attracIds, mid, end);
+		Nodes.push_back(node);
+		return int(Nodes.size() - 1);
+	}
+}
+
+AttractorHandler::AttractorHandler(std::vector<AttractorObject>& attracs)
+{
+	_attractors = attracs;
+}
+
+std::vector<AttractorObject>& AttractorHandler::GetAttractors()
+{
+	return _attractors;
+}
+
+std::vector<AttractorObject*> AttractorHandler::GetBoundedAttractors(const BoundingSphere& sphere)
+{
+	return _bvh.GetBoundedAttractors(sphere, _attractors);
+}
+
+void AttractorHandler::InsertAttractor(const AttractorObject& attrac)
+{
+	_attractors.push_back(attrac);
+}
+
+void AttractorHandler::GenerateBvh()
+{
+	_bvh = Bvh(_attractors);
+}
 
 bool ROOM_INFO::Active() const
 {
@@ -70,8 +185,10 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 		// Clear bridge.
 		if (item.IsBridge())
 		{
+			auto& bridge = GetBridgeObject(item);
+
 			UpdateBridgeItem(item, true);
-			item.Attractor->DetachAllPlayers();
+			bridge.GetAttractor().DetachAllPlayers();
 		}
 	}
 }
@@ -97,7 +214,7 @@ void DoFlipMap(int group)
 			RemoveRoomFlipItems(room);
 
 			// Detach players from attractors.
-			for (auto& attrac : room.Attractors)
+			for (auto& attrac : room.Attractors.GetAttractors())
 				attrac.DetachAllPlayers();
 
 			// Swap rooms.
