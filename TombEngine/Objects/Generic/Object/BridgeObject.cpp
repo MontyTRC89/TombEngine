@@ -135,10 +135,10 @@ namespace TEN::Entities::Generic
 		_collisionMesh.InsertTriangle(corners[4], corners[6], corners[7], Vector3::Transform(FORWARD_NORMAL, rotMatrix));
 		_collisionMesh.InsertTriangle(corners[0], corners[1], corners[2], Vector3::Transform(BACK_NORMAL, rotMatrix));
 		_collisionMesh.InsertTriangle(corners[0], corners[2], corners[3], Vector3::Transform(BACK_NORMAL, rotMatrix));
-		_collisionMesh.InsertTriangle(corners[0], corners[3], corners[4], Vector3::Transform(RIGHT_NORMAL, rotMatrix));
-		_collisionMesh.InsertTriangle(corners[3], corners[4], corners[7], Vector3::Transform(RIGHT_NORMAL, rotMatrix));
 		_collisionMesh.InsertTriangle(corners[1], corners[2], corners[5], Vector3::Transform(LEFT_NORMAL, rotMatrix));
 		_collisionMesh.InsertTriangle(corners[2], corners[5], corners[6], Vector3::Transform(LEFT_NORMAL, rotMatrix));
+		_collisionMesh.InsertTriangle(corners[0], corners[3], corners[4], Vector3::Transform(RIGHT_NORMAL, rotMatrix));
+		_collisionMesh.InsertTriangle(corners[3], corners[4], corners[7], Vector3::Transform(RIGHT_NORMAL, rotMatrix));
 		_collisionMesh.GenerateBvh();
 	}
 
@@ -155,7 +155,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		// Calculate bridge OBB.
+		// Get bridge box.
 		auto box = item.GetBox();
 
 		// Update neighbor room sectors.
