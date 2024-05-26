@@ -426,7 +426,7 @@ namespace TEN::Collision::Floordata
 		return roomGridCoords;
 	}
 
-	std::vector<FloorInfo*> GetNeighborSectors(const Vector3i& pos, int roomNumber, unsigned int searchDepth)
+	std::vector<FloorInfo*> GetNeighborSectors(const Vector3i& pos, int roomNumber, unsigned int searchDepth, bool searchNeighborRooms)
 	{
 		auto sectors = std::vector<FloorInfo*>{};
 		auto& room = g_Level.Rooms[roomNumber];
@@ -438,6 +438,10 @@ namespace TEN::Collision::Floordata
 			auto roomGridCoords = GetNeighborRoomGridCoords(pos, neighborRoomNumber, searchDepth);
 			for (const auto& roomGridCoord : roomGridCoords)
 				sectors.push_back(&GetFloor(neighborRoomNumber, roomGridCoord));
+
+			// Return sectors of origin room if not searching neighbor rooms.
+			if (!searchNeighborRooms)
+				return sectors;
 		}
 
 		// Return neighbor sectors.
