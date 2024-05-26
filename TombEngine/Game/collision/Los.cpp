@@ -299,12 +299,11 @@ namespace TEN::Collision::Los
 			// 2.3) Clip bridges (if applicable).
 			if (collideBridges)
 			{
-				auto sectorTrace = GetSectorTrace(ray, rayRoomNumber, closestDist);
-
 				auto visitedBridgeMovIds = std::set<int>{};
 				bool hasBridge = false;
 
 				// Run through intercepts in sector trace.
+				auto sectorTrace = GetSectorTrace(ray, rayRoomNumber, closestDist);
 				for (const auto& intercept : sectorTrace.Intercepts)
 				{
 					// Run through bridges in sector.
@@ -350,7 +349,7 @@ namespace TEN::Collision::Los
 					rayRoomNumber = closestTri->GetPortalRoomNumber();
 					rayDist -= closestDist;
 				}
-				// Tangible triangle; set remaining room trace data.
+				// Tangible triangle; collect remaining room trace data.
 				else
 				{
 					if (closestTri->IsPortal())
