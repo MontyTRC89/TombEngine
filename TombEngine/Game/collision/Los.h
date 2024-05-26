@@ -57,11 +57,11 @@ namespace TEN::Collision::Los
 		std::vector<StaticLosCollision>	  Statics	= {};
 	};
 
-	// Low-level LOS getter
+	// Low-level LOS collision
 	LosCollision GetLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
 								 bool collideMoveables, bool collideSpheres, bool collideStatics);
 
-	// Basic high-level LOS getters
+	// High-level LOS collision
 	RoomLosCollision					GetRoomLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges = true);
 	std::optional<MoveableLosCollision> GetMoveableLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer = false);
 	std::optional<SphereLosCollision>   GetSphereLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer = false);
