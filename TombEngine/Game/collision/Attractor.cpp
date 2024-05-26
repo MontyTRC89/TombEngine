@@ -423,11 +423,11 @@ namespace TEN::Collision::Attractor
 		return debugAttracs;
 	}
 
-	static std::vector<AttractorObject*> GetNearbyAttractors(const Vector3& pos, int roomNumber, const BoundingSphere& sphere)
+	static std::vector<AttractorObject*> GetBoundedAttractors(const Vector3& pos, int roomNumber, const BoundingSphere& sphere)
 	{
 		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::AttractorStats);
 
-		auto nearbyAttracs = std::vector<AttractorObject*>{};
+		auto boundedAttracs = std::vector<AttractorObject*>{};
 
 		// TEMP
 		// Collect debug attractors.
@@ -435,7 +435,7 @@ namespace TEN::Collision::Attractor
 		for (auto* attrac : debugAttracs)
 		{
 			if (sphere.Intersects(attrac->GetBox()))
-				nearbyAttracs.push_back(attrac);
+				boundedAttracs.push_back(attrac);
 		}
 
 		// 1) Collect room attractors.
@@ -447,8 +447,9 @@ namespace TEN::Collision::Attractor
 			if (!neighborRoom.Active())
 				continue;
 
+			// Collect bounded room attractors.
 			auto attracs = neighborRoom.Attractors.GetBoundedAttractors(sphere);
-			nearbyAttracs.insert(nearbyAttracs.end(), attracs.begin(), attracs.end());
+			boundedAttracs.insert(boundedAttracs.end(), attracs.begin(), attracs.end());
 		}
 
 		auto visitedBridgeItemNumbers = std::set<int>{};
@@ -459,7 +460,7 @@ namespace TEN::Collision::Attractor
 		for (const auto* sector : sectors)
 		{
 			// Test if sphere intersects sector.
-			if (!sector->Box.Intersects(sphere))
+			if (!sphere.Intersects(sector->Box))
 				continue;
 
 			// Run through bridges in sector.
@@ -473,12 +474,17 @@ namespace TEN::Collision::Attractor
 				auto& bridgeItem = g_Level.Items[bridgeItemNumber];
 				auto& bridge = GetBridgeObject(bridgeItem);
 
-				nearbyAttracs.push_back(&bridge.GetAttractor());
+				// Test if sphere intersects bridge attractor box.
+				if (!sphere.Intersects(bridge.GetAttractor().GetBox()))
+					continue;
+
+				// Collect bounded bridge attractor.
+				boundedAttracs.push_back(&bridge.GetAttractor());
 			}
 		}
 
-		// 3) Return approximately nearby attractors from sphere-AABB tests.
-		return nearbyAttracs;
+		// 3) Return bounded attractors from sphere-AABB intersections.
+		return boundedAttracs;
 	}
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float radius,
@@ -486,9 +492,9 @@ namespace TEN::Collision::Attractor
 	{
 		constexpr auto COLL_COUNT_MAX = 64;
 
-		// Get approximately nearby attractors.
+		// Get bounded attractors.
 		auto sphere = BoundingSphere(pos, radius);
-		auto attracs = GetNearbyAttractors(pos, roomNumber, sphere);
+		auto attracs = GetBoundedAttractors(pos, roomNumber, sphere);
 
 		// Collect attractor collisions.
 		auto attracColls = std::vector<AttractorCollisionData>{};
