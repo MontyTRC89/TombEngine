@@ -92,7 +92,14 @@ static void HandleLosDebug(const ItemInfo& item)
 
 	auto origin = (item.Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
 	auto target = Geometry::TranslatePoint(origin, dir, dist);
+	
+	auto start = std::chrono::high_resolution_clock::now();
+
 	auto los = GetLosCollision(origin, roomNumber, dir, dist, true, true, true);
+	
+	auto end = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+	//g_Renderer.PrintDebugMessage("%d", duration.count());
 
 	float closestDist = los.Room.Distance;
 	target = los.Room.Position.first;

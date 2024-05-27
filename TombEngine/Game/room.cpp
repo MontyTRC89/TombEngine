@@ -86,7 +86,7 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 		if (item.IsBridge())
 		{
 			auto& bridge = GetBridgeObject(item);
-			bridge.RemoveFromSectors(item);
+			bridge.DeassignSectors(item);
 		}
 	}
 }
