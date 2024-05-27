@@ -44,7 +44,8 @@ namespace TEN::Collision::Los
 	struct RoomTraceData
 	{
 		std::optional<const CollisionTriangle*> Triangle	= std::nullopt;
-		std::pair<Vector3, int>					Position	= {};
+		Vector3									Position	= Vector3::Zero;
+		int										RoomNumber	= 0;
 		std::vector<int>						RoomNumbers = {};
 
 		bool IsIntersected = false;
@@ -116,7 +117,7 @@ namespace TEN::Collision::Los
 		if (dir == Vector3::Zero)
 		{
 			TENLog("GetLos(): dir is not a unit vector.", LogLevel::Warning);
-			return LosCollisionData{ RoomLosCollisionData{ std::nullopt, std::pair(origin, roomNumber), {}, false, 0.0f }, {}, {}, {} };
+			return LosCollisionData{ RoomLosCollisionData{ std::nullopt, origin, roomNumber, {}, false, 0.0f }, {}, {}, {} };
 		}
 
 		auto losColl = LosCollisionData{};
@@ -156,7 +157,8 @@ namespace TEN::Collision::Los
 
 						auto movLosColl = MoveableLosCollisionData{};
 						movLosColl.Moveable = mov;
-						movLosColl.Position = std::pair(pos, roomNumber);
+						movLosColl.Position = pos;
+						movLosColl.RoomNumber = roomNumber;
 						movLosColl.IsOriginContained = (bool)box.Contains(origin);
 						movLosColl.Distance = intersectDist;
 						losColl.Moveables.push_back(movLosColl);
@@ -181,7 +183,8 @@ namespace TEN::Collision::Los
 							auto sphereLosColl = SphereLosCollisionData{};
 							sphereLosColl.Moveable = mov;
 							sphereLosColl.SphereID = i;
-							sphereLosColl.Position = std::pair(pos, roomNumber);
+							sphereLosColl.Position = pos;
+							sphereLosColl.RoomNumber = roomNumber;
 							sphereLosColl.IsOriginContained = (bool)sphere.Contains(origin);
 							sphereLosColl.Distance = intersectDist;
 							losColl.Spheres.push_back(sphereLosColl);
@@ -228,7 +231,8 @@ namespace TEN::Collision::Los
 
 					auto staticLosColl = StaticLosCollisionData{};
 					staticLosColl.Static = staticObj;
-					staticLosColl.Position = std::pair(pos, roomNumber);
+					staticLosColl.Position = pos;
+					staticLosColl.RoomNumber = roomNumber;
 					staticLosColl.IsOriginContained = (bool)box.Contains(origin);
 					staticLosColl.Distance = intersectDist;
 					losColl.Statics.push_back(staticLosColl);
@@ -356,14 +360,16 @@ namespace TEN::Collision::Los
 						TENLog("GetRoomTrace(): Room portal cannot link back to itself.", LogLevel::Warning);
 
 					roomTrace.Triangle = closestTri;
-					roomTrace.Position = std::pair(intersectPos, rayRoomNumber);
+					roomTrace.Position = intersectPos;
+					roomTrace.RoomNumber = rayRoomNumber;
 					roomTrace.IsIntersected = true;
 					return roomTrace;
 				}
 			}
 			else
 			{
-				roomTrace.Position = std::pair(Geometry::TranslatePoint(ray.position, ray.direction, rayDist), rayRoomNumber);
+				roomTrace.Position = Geometry::TranslatePoint(ray.position, ray.direction, rayDist);
+				roomTrace.RoomNumber = rayRoomNumber;
 				return roomTrace;
 			}
 		}
@@ -378,21 +384,22 @@ namespace TEN::Collision::Los
 		if (dir == Vector3::Zero)
 		{
 			TENLog("GetRoomLos(): Direction is not a unit vector.", LogLevel::Warning);
-			return RoomLosCollisionData{ {}, std::pair(origin, roomNumber), {}, false, 0.0f };
+			return RoomLosCollisionData{ {}, origin, roomNumber, {}, false, 0.0f };
 		}
 
 		// Get room trace.
 		auto roomTrace = GetRoomTrace(origin, roomNumber, dir, dist, collideBridges);
 
 		// Calculate position data.
-		float losDist = roomTrace.IsIntersected ? Vector3::Distance(origin, roomTrace.Position.first) : dist;
+		float losDist = roomTrace.IsIntersected ? Vector3::Distance(origin, roomTrace.Position) : dist;
 		auto losPos = Geometry::TranslatePoint(origin, dir, losDist);
-		int losRoomNumber = roomTrace.Position.second;
+		int losRoomNumber = roomTrace.RoomNumber;
 
 		// Create and return room LOS collision.
 		auto roomLosColl = RoomLosCollisionData{};
 		roomLosColl.Triangle = roomTrace.Triangle;
-		roomLosColl.Position = std::pair(losPos, losRoomNumber);
+		roomLosColl.Position = losPos;
+		roomLosColl.RoomNumber = losRoomNumber;
 		roomLosColl.RoomNumbers = roomTrace.RoomNumbers;
 		roomLosColl.IsIntersected = roomTrace.IsIntersected;
 		roomLosColl.Distance = losDist;
@@ -455,7 +462,7 @@ namespace TEN::Collision::Los
 		auto roomLosColl = GetRoomLosCollision(posPair.first, Camera.RoomNumber, dir, dist);
 
 		auto origin = GameVector(posPair.first, Camera.RoomNumber);
-		auto target = GameVector(roomLosColl.Position.first, roomLosColl.Position.second);
+		auto target = GameVector(roomLosColl.Position, roomLosColl.RoomNumber);
 		return std::pair(origin, target);
 	}
 }

@@ -102,7 +102,7 @@ static void HandleLosDebug(const ItemInfo& item)
 	//g_Renderer.PrintDebugMessage("%d", duration.count());
 
 	float closestDist = los.Room.Distance;
-	target = los.Room.Position.first;
+	target = los.Room.Position;
 
 	for (const auto& movLos : los.Moveables)
 	{
@@ -112,7 +112,7 @@ static void HandleLosDebug(const ItemInfo& item)
 		if (movLos.Distance < closestDist)
 		{
 			closestDist = movLos.Distance;
-			target = movLos.Position.first;
+			target = movLos.Position;
 			break;
 		}
 	}
@@ -122,7 +122,7 @@ static void HandleLosDebug(const ItemInfo& item)
 		if (staticLos.Distance < closestDist)
 		{
 			closestDist = staticLos.Distance;
-			target = staticLos.Position.first;
+			target = staticLos.Position;
 			break;
 		}
 	}

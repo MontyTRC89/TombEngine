@@ -162,7 +162,7 @@ static CameraLosCollision GetCameraLos(const Vector3& origin, int originRoomNumb
 	// 1) Clip room LOS collision.
 	auto cameraLosColl = CameraLosCollision{};
 	cameraLosColl.Normal = losColl.Room.Triangle.has_value() ? losColl.Room.Triangle.value()->GetNormal() : std::optional<Vector3>();
-	cameraLosColl.Position = losColl.Room.Position;
+	cameraLosColl.Position = std::pair(losColl.Room.Position, losColl.Room.RoomNumber);
 	cameraLosColl.IsIntersected = losColl.Room.IsIntersected;
 	cameraLosColl.Distance = losColl.Room.Distance;
 
@@ -179,7 +179,7 @@ static CameraLosCollision GetCameraLos(const Vector3& origin, int originRoomNumb
 		if (movLosColl.Distance < cameraLosColl.Distance)
 		{
 			cameraLosColl.Normal = std::nullopt;
-			cameraLosColl.Position = movLosColl.Position;
+			cameraLosColl.Position = std::pair(movLosColl.Position, movLosColl.RoomNumber);
 			cameraLosColl.IsIntersected = true;
 			cameraLosColl.Distance = movLosColl.Distance;
 			break;
@@ -195,7 +195,7 @@ static CameraLosCollision GetCameraLos(const Vector3& origin, int originRoomNumb
 		if (staticLosColl.Distance < cameraLosColl.Distance)
 		{
 			cameraLosColl.Normal = std::nullopt;
-			cameraLosColl.Position = staticLosColl.Position;
+			cameraLosColl.Position = std::pair(staticLosColl.Position, staticLosColl.RoomNumber);
 			cameraLosColl.IsIntersected = true;
 			cameraLosColl.Distance = staticLosColl.Distance;
 			break;

@@ -50,7 +50,7 @@ bool LOS(const GameVector* origin, GameVector* target)
 
 	auto roomLosColl = GetRoomLosCollision(origin->ToVector3(), origin->RoomNumber, dir, dist);
 	if (roomLosColl.IsIntersected)
-		*target = GameVector(roomLosColl.Position.first, roomLosColl.Position.second);
+		*target = GameVector(roomLosColl.Position, roomLosColl.RoomNumber);
 
 	// HACK: Transplant LOS room numbers to legacy global.
 	LosRoomNumbers.clear();
