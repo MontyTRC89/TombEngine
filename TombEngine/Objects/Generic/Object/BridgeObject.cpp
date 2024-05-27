@@ -38,13 +38,14 @@ namespace TEN::Entities::Generic
 		//InitializeAttractor(item);
 		UpdateSectors(item);
 
-		PrevPose = item.Pose;
+		_prevPose = item.Pose;
+		_prevRoomNumber = item.RoomNumber;
 	}
 
 	void BridgeObject::Update(const ItemInfo& item)
 	{
 		// Bridge not moved; return early.
-		if (item.Pose == PrevPose)
+		if (item.Pose == _prevPose && item.RoomNumber == _prevRoomNumber)
 			return;
 
 		UpdateItemRoom(item.Index);
@@ -53,7 +54,8 @@ namespace TEN::Entities::Generic
 		//UpdateAttractor(item);
 		UpdateSectors(item);
 
-		PrevPose = item.Pose;
+		_prevPose = item.Pose;
+		_prevRoomNumber = item.RoomNumber;
 	}
 
 	void BridgeObject::RemoveFromSectors(const ItemInfo& item) const

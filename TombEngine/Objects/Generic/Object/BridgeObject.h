@@ -17,9 +17,10 @@ namespace TEN::Entities::Generic
 		CollisionMesh _collisionMesh = CollisionMesh();
 		//Attractor	  _attractor	 = Attractor();
 
-	public:
-		Pose PrevPose = Pose::Zero;
+		Pose _prevPose		 = Pose::Zero;
+		int	 _prevRoomNumber = 0;
 
+	public:
 		// Routines
 		std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetFloorHeight	  = nullptr;
 		std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetCeilingHeight = nullptr;
