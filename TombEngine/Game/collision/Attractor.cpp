@@ -455,7 +455,7 @@ namespace TEN::Collision::Attractor
 		auto visitedBridgeItemNumbers = std::set<int>{};
 
 		// 2) Collect bridge attractors.
-		auto sectorSearchDepth = ceil(sphere.Radius / BLOCK(1));
+		unsigned int sectorSearchDepth = (int)ceil(sphere.Radius / BLOCK(1));
 		auto sectors = GetNeighborSectors(pos, roomNumber, sectorSearchDepth);
 		for (const auto* sector : sectors)
 		{
@@ -508,6 +508,7 @@ namespace TEN::Collision::Attractor
 				auto dir = (points.size() > 1) ? (points[i + 1] - points[i]) : Vector3::One;
 				dir.Normalize();
 
+				// TODO: Short segment may be ignored even if it intersects.
 				// Test if segment intersects sphere.
 				float dist = 0.0f;
 				if (!sphere.Intersects(pos, dir, dist) || dist > attrac->GetSegmentLengths()[i])
