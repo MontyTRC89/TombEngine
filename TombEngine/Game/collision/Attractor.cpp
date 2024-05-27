@@ -492,11 +492,11 @@ namespace TEN::Collision::Attractor
 	{
 		constexpr auto COLL_COUNT_MAX = 64;
 
-		// Get bounded attractors.
+		// 1) Get bounded attractors.
 		auto sphere = BoundingSphere(pos, radius);
 		auto attracs = GetBoundedAttractors(pos, roomNumber, sphere);
 
-		// Collect attractor collisions.
+		// 2) Collect attractor collisions.
 		auto attracColls = std::vector<AttractorCollisionData>{};
 		for (auto* attrac : attracs)
 		{
@@ -520,7 +520,7 @@ namespace TEN::Collision::Attractor
 			}
 		}
 
-		// Sort collisions by 2D then 3D distance.
+		// 3) Sort collisions by 2D then 3D distance.
 		std::sort(
 			attracColls.begin(), attracColls.end(),
 			[](const auto& attracColl0, const auto& attracColl1)
@@ -531,11 +531,11 @@ namespace TEN::Collision::Attractor
 				return (attracColl0.Distance2D < attracColl1.Distance2D);
 			});
 
-		// Trim collection.
+		// 4) Trim collection.
 		if (attracColls.size() > COLL_COUNT_MAX)
 			attracColls.resize(COLL_COUNT_MAX);
 
-		// Return attractor collisions in capped vector sorted by 2D then 3D distance.
+		// 5) Return attractor collisions in capped vector sorted by 2D then 3D distance.
 		return attracColls;
 	}
 
