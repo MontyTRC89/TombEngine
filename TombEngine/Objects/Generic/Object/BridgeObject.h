@@ -17,8 +17,10 @@ namespace TEN::Entities::Generic
 		CollisionMesh _collisionMesh = CollisionMesh();
 		//Attractor	  _attractor	 = Attractor();
 
-		Pose _prevPose		 = Pose::Zero;
-		int	 _prevRoomNumber = 0;
+		Pose				_prevPose		= Pose::Zero;
+		int					_prevRoomNumber = 0;
+		BoundingBox			_prevAabb		= BoundingBox();
+		BoundingOrientedBox _prevObb		= BoundingOrientedBox();
 
 	public:
 		// Routines
@@ -40,7 +42,7 @@ namespace TEN::Entities::Generic
 	private:
 		// Helpers
 		void InitializeAttractor(const ItemInfo& item);
-		void UpdateBox(const ItemInfo& item);
+		void UpdateAabb(const ItemInfo& item);
 		void UpdateCollisionMesh(const ItemInfo& item);
 		void UpdateAttractor(const ItemInfo& item);
 		void AssignSectors(const ItemInfo& item);

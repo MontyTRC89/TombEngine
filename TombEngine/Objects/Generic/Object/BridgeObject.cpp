@@ -33,7 +33,7 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::Initialize(const ItemInfo& item)
 	{
-		UpdateBox(item);
+		UpdateAabb(item);
 		UpdateCollisionMesh(item);
 		InitializeAttractor(item);
 		AssignSectors(item);
@@ -48,32 +48,30 @@ namespace TEN::Entities::Generic
 			return;
 
 		UpdateItemRoom(item.Index);
-		UpdateBox(item);
+		UpdateAabb(item);
 		UpdateCollisionMesh(item);
 		UpdateAttractor(item);
 		AssignSectors(item);
 
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
+		_prevAabb = _aabb;
+		_prevObb = item.GetBox();
 	}
 
 	void BridgeObject::DeassignSectors(const ItemInfo& item) const
 	{
-		// Get previous boxes.
-		auto obb = GameBoundingBox(&item).ToBoundingOrientedBox(_prevPose);
-		auto aabb = Geometry::GetBoundingBox(obb);
-
 		// Deassign sectors.
-		int sectorSearchDepth = (int)ceil(std::max(std::max(obb.Extents.x, obb.Extents.y), obb.Extents.z) / BLOCK(1));
+		int sectorSearchDepth = (int)ceil(std::max(std::max(_prevObb.Extents.x, _prevObb.Extents.y), _prevObb.Extents.z) / BLOCK(1));
 		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);
 		for (auto* sector : sectors)
 		{
 			// Test if previous AABB intersects sector.
-			if (!aabb.Intersects(sector->Aabb))
+			if (!_prevAabb.Intersects(sector->Aabb))
 				continue;
 
-			// Remove bridge if within sector.
-			if (aabb.Intersects(sector->Aabb))
+			// Remove previous bridge assignment if within sector.
+			if (_prevObb.Intersects(sector->Aabb))
 				sector->RemoveBridge(item.Index);
 		}
 	}
@@ -83,7 +81,7 @@ namespace TEN::Entities::Generic
 		// TODO
 	}
 
-	void BridgeObject::UpdateBox(const ItemInfo& item)
+	void BridgeObject::UpdateAabb(const ItemInfo& item)
 	{
 		_aabb = Geometry::GetBoundingBox(item.GetBox());
 	}
@@ -182,7 +180,7 @@ namespace TEN::Entities::Generic
 			if (!_aabb.Intersects(sector->Aabb))
 				continue;
 
-			// Add bridge if within sector.
+			// Add bridge assignment if within sector.
 			if (obb.Intersects(sector->Aabb))
 				sector->AddBridge(item.Index);
 		}
