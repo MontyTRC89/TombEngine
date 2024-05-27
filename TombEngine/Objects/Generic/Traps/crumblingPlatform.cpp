@@ -142,7 +142,7 @@ namespace TEN::Entities::Traps
 			{
 				item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_FALL;
 				item.ItemFlags[1] = CRUMBLING_PLATFORM_VELOCITY_MIN;
-				bridge.RemoveFromSectors(item);
+				bridge.DeassignSectors(item);
 			}
 		}
 

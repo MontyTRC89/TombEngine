@@ -270,7 +270,7 @@ void KillItem(short const itemNumber)
 		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && item->IsBridge())
 		{
 			auto& bridge = GetBridgeObject(*item);
-			bridge.RemoveFromSectors(*item);
+			bridge.DeassignSectors(*item);
 		}
 
 		GameScriptHandleKilled(itemNumber, true);

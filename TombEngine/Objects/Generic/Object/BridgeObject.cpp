@@ -35,8 +35,8 @@ namespace TEN::Entities::Generic
 	{
 		UpdateBox(item);
 		UpdateCollisionMesh(item);
-		//InitializeAttractor(item);
-		UpdateSectors(item);
+		InitializeAttractor(item);
+		AssignSectors(item);
 
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
@@ -51,14 +51,15 @@ namespace TEN::Entities::Generic
 		UpdateItemRoom(item.Index);
 		UpdateBox(item);
 		UpdateCollisionMesh(item);
-		//UpdateAttractor(item);
-		UpdateSectors(item);
+		UpdateAttractor(item);
+		AssignSectors(item);
 
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
 	}
 
-	void BridgeObject::RemoveFromSectors(const ItemInfo& item) const
+	// TODO: Clearning not exact. Should first move back to previous position, clear, move to current position, and update.
+	void BridgeObject::DeassignSectors(const ItemInfo& item) const
 	{
 		auto& room = g_Level.Rooms[item.RoomNumber];
 		for (int neighborRoomNumber : room.neighbors)
@@ -67,6 +68,11 @@ namespace TEN::Entities::Generic
 			for (auto& sector : neighborRoom.floor)
 				sector.RemoveBridge(item.Index);
 		}
+	}
+
+	void BridgeObject::InitializeAttractor(const ItemInfo& item)
+	{
+		// TODO
 	}
 
 	void BridgeObject::UpdateBox(const ItemInfo& item)
@@ -144,40 +150,33 @@ namespace TEN::Entities::Generic
 		_collisionMesh.GenerateBvh();
 	}
 
-	/*void BridgeObject::UpdateAttractor(const ItemInfo& item)
+	void BridgeObject::UpdateAttractor(const ItemInfo& item)
 	{
-	}*/
+		// TODO
+	}
 
-	void BridgeObject::UpdateSectors(const ItemInfo& item)
+	void BridgeObject::AssignSectors(const ItemInfo& item)
 	{
-		// CLear bridge assignment if killed.
+		// Clear sector assignments.
+		DeassignSectors(item);
 		if (item.Flags & IFLAG_KILLED)
-		{
-			RemoveFromSectors(item);
 			return;
-		}
 
-		// Get bridge box.
+		// Get bridge item box.
 		auto box = item.GetBox();
 
-		// Update neighbor room sectors.
-		auto& room = g_Level.Rooms[item.RoomNumber];
-		for (int neighborRoomNumber : room.neighbors)
+		// Update sector assignments.
+		float sectorSearchDepth = ceil(std::max(std::max(box.Extents.x, box.Extents.y), box.Extents.z) / BLOCK(1));
+		auto sectors = GetNeighborSectors(item.Pose.Position, item.RoomNumber, sectorSearchDepth);
+		for (auto* sector : sectors)
 		{
-			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-			for (auto& sector : neighborRoom.floor)
-			{
-				// Clear previous bridge assignment.
-				sector.RemoveBridge(item.Index);
+			// Test if bridge AABB intersects sector.
+			if (!_box.Intersects(sector->Box))
+				continue;
 
-				// Test if bridge AABB intersects sector.
-				if (!_box.Intersects(sector.Box))
-					continue;
-
-				// Add bridge if within sector.
-				if (box.Intersects(sector.Box))
-					sector.AddBridge(item.Index);
-			}
+			// Add bridge if within sector.
+			if (box.Intersects(sector->Box))
+				sector->AddBridge(item.Index);
 		}
 	}
 

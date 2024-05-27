@@ -35,14 +35,15 @@ namespace TEN::Entities::Generic
 		// Utilities
 		void Initialize(const ItemInfo& item);
 		void Update(const ItemInfo& item);
-		void RemoveFromSectors(const ItemInfo& item) const;
+		void DeassignSectors(const ItemInfo& item) const;
 
 	private:
 		// Helpers
+		void InitializeAttractor(const ItemInfo& item);
 		void UpdateBox(const ItemInfo& item);
 		void UpdateCollisionMesh(const ItemInfo& item);
-		//void UpdateAttractor(const ItemInfo& item);
-		void UpdateSectors(const ItemInfo& item);
+		void UpdateAttractor(const ItemInfo& item);
+		void AssignSectors(const ItemInfo& item);
 	};
 
 	const BridgeObject& GetBridgeObject(const ItemInfo& item);
