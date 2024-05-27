@@ -161,7 +161,7 @@ static CameraLosCollision GetCameraLos(const Vector3& origin, int originRoomNumb
 
 	// 1) Clip room LOS collision.
 	auto cameraLosColl = CameraLosCollision{};
-	cameraLosColl.Normal = losColl.Room.Triangle.has_value() ? losColl.Room.Triangle.value()->GetNormal() : std::optional<Vector3>();
+	cameraLosColl.Normal = (losColl.Room.Triangle != nullptr) ? losColl.Room.Triangle->GetNormal() : std::optional<Vector3>();
 	cameraLosColl.Position = std::pair(losColl.Room.Position, losColl.Room.RoomNumber);
 	cameraLosColl.IsIntersected = losColl.Room.IsIntersected;
 	cameraLosColl.Distance = losColl.Room.Distance;

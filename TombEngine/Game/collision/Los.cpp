@@ -43,10 +43,10 @@ namespace TEN::Collision::Los
 
 	struct RoomTraceData
 	{
-		std::optional<const CollisionTriangle*> Triangle	= std::nullopt;
-		Vector3									Position	= Vector3::Zero;
-		int										RoomNumber	= 0;
-		std::vector<int>						RoomNumbers = {};
+		const CollisionTriangle* Triangle	 = nullptr;
+		Vector3					 Position	 = Vector3::Zero;
+		int						 RoomNumber	 = 0;
+		std::vector<int>		 RoomNumbers = {};
 
 		bool IsIntersected = false;
 	};
@@ -117,7 +117,7 @@ namespace TEN::Collision::Los
 		if (dir == Vector3::Zero)
 		{
 			TENLog("GetLos(): dir is not a unit vector.", LogLevel::Warning);
-			return LosCollisionData{ RoomLosCollisionData{ std::nullopt, origin, roomNumber, {}, false, 0.0f }, {}, {}, {} };
+			return LosCollisionData{ RoomLosCollisionData{ nullptr, origin, roomNumber, {}, false, 0.0f }, {}, {}, {} };
 		}
 
 		auto losColl = LosCollisionData{};
@@ -262,7 +262,7 @@ namespace TEN::Collision::Los
 		for (const auto& sector : sectors)
 		{
 			float intersectDist = 0.0f;
-			if (ray.Intersects(sector->Box, intersectDist) && intersectDist <= dist)
+			if (ray.Intersects(sector->Aabb, intersectDist) && intersectDist <= dist)
 				sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ sector, intersectDist });
 		}
 
@@ -285,13 +285,10 @@ namespace TEN::Collision::Los
 		// 2) Fill room trace.
 		while (true)
 		{
-			// 2.1) Collect room number.
-			roomTrace.RoomNumbers.push_back(rayRoomNumber);
-
 			const CollisionTriangle* closestTri = nullptr;
 			float closestDist = rayDist;
 
-			// 2.2) Clip room.
+			// 2.1) Clip room.
 			const auto& room = g_Level.Rooms[rayRoomNumber];
 			auto meshColl = room.CollisionMesh.GetCollision(ray, closestDist);
 			if (meshColl.has_value())
@@ -300,7 +297,7 @@ namespace TEN::Collision::Los
 				closestDist = meshColl->Distance;
 			}
 
-			// 2.3) Clip bridges (if applicable).
+			// 2.2) Clip bridge (if applicable).
 			if (collideBridges)
 			{
 				auto visitedBridgeMovIds = std::set<int>{};
@@ -340,7 +337,10 @@ namespace TEN::Collision::Los
 				}
 			}
 
-			// 2.4) Return room trace or retrace new room from portal.
+			// 2.4) Collect room number.
+			roomTrace.RoomNumbers.push_back(rayRoomNumber);
+
+			// 2.3) Return room trace or retrace new room from portal.
 			if (closestTri != nullptr)
 			{
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
@@ -368,8 +368,10 @@ namespace TEN::Collision::Los
 			}
 			else
 			{
+				roomTrace.Triangle = nullptr;
 				roomTrace.Position = Geometry::TranslatePoint(ray.position, ray.direction, rayDist);
 				roomTrace.RoomNumber = rayRoomNumber;
+				roomTrace.IsIntersected = false;
 				return roomTrace;
 			}
 		}

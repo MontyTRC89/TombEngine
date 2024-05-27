@@ -138,7 +138,7 @@ public:
 	// Members
 	Vector2i		  Position		 = Vector2i::Zero;
 	int				  RoomNumber	 = 0;
-	BoundingBox		  Box			 = BoundingBox();
+	BoundingBox		  Aabb			 = BoundingBox();
 	SectorSurfaceData FloorSurface	 = {};
 	SectorSurfaceData CeilingSurface = {};
 	SectorFlagData	  Flags			 = {};

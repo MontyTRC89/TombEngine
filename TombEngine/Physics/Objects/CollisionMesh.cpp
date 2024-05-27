@@ -15,7 +15,7 @@ namespace TEN::Physics
 	{
 		_vertexIds = std::array<int, VERTEX_COUNT>{ vertexID0, vertexID1, vertexID2 };
 		_normal = normal;
-		_box = box;
+		_aabb = box;
 		_portalRoomNumber = portalRoomNumber;
 	}
 
@@ -24,9 +24,9 @@ namespace TEN::Physics
 		return _normal;
 	}
 
-	const BoundingBox& CollisionTriangle::GetBox() const
+	const BoundingBox& CollisionTriangle::GetAabb() const
 	{
-		return _box;
+		return _aabb;
 	}
 
 	int CollisionTriangle::GetPortalRoomNumber() const
@@ -38,7 +38,7 @@ namespace TEN::Physics
 	{
 		// Test if ray intersects triangle AABB.
 		float boxDist = 0.0f;
-		if (!ray.Intersects(_box, boxDist))
+		if (!ray.Intersects(_aabb, boxDist))
 			return false;
 
 		// Test if ray is facing triangle.
@@ -130,7 +130,7 @@ namespace TEN::Physics
 
 			// Test node intersection.
 			float intersectDist = 0.0f;
-			if (!node.Box.Intersects(ray.position, ray.direction, intersectDist) || intersectDist > dist)
+			if (!node.Aabb.Intersects(ray.position, ray.direction, intersectDist) || intersectDist > dist)
 				return;
 
 			// Traverse nodes.
@@ -175,9 +175,9 @@ namespace TEN::Physics
 		auto node = BvhNode{};
 
 		// Combine boxes.
-		node.Box = tris[triIds[start]].GetBox();
+		node.Aabb = tris[triIds[start]].GetAabb();
 		for (int i = (start + 1); i < end; i++)
-			node.Box = Geometry::CombineBoundingBoxes(node.Box, tris[triIds[i]].GetBox());
+			node.Aabb = Geometry::CombineBoundingBoxes(node.Aabb, tris[triIds[i]].GetAabb());
 
 		// Leaf node.
 		if ((end - start) <= TRI_COUNT_PER_LEAF_MAX)

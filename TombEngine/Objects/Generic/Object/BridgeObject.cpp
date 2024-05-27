@@ -16,9 +16,9 @@ using namespace TEN::Physics;
 
 namespace TEN::Entities::Generic
 {
-	const BoundingBox& BridgeObject::GetBox() const
+	const BoundingBox& BridgeObject::GetAabb() const
 	{
-		return _box;
+		return _aabb;
 	}
 
 	const CollisionMesh& BridgeObject::GetCollisionMesh() const
@@ -44,7 +44,6 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::Update(const ItemInfo& item)
 	{
-		// Bridge not moved; return early.
 		if (item.Pose == _prevPose && item.RoomNumber == _prevRoomNumber)
 			return;
 
@@ -58,15 +57,24 @@ namespace TEN::Entities::Generic
 		_prevRoomNumber = item.RoomNumber;
 	}
 
-	// TODO: Clearning not exact. Should first move back to previous position, clear, move to current position, and update.
 	void BridgeObject::DeassignSectors(const ItemInfo& item) const
 	{
-		auto& room = g_Level.Rooms[item.RoomNumber];
-		for (int neighborRoomNumber : room.neighbors)
+		// Get previous boxes.
+		auto obb = GameBoundingBox(&item).ToBoundingOrientedBox(_prevPose);
+		auto aabb = Geometry::GetBoundingBox(obb);
+
+		// Deassign sectors.
+		int sectorSearchDepth = (int)ceil(std::max(std::max(obb.Extents.x, obb.Extents.y), obb.Extents.z) / BLOCK(1));
+		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);
+		for (auto* sector : sectors)
 		{
-			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-			for (auto& sector : neighborRoom.floor)
-				sector.RemoveBridge(item.Index);
+			// Test if previous AABB intersects sector.
+			if (!aabb.Intersects(sector->Aabb))
+				continue;
+
+			// Remove bridge if within sector.
+			if (aabb.Intersects(sector->Aabb))
+				sector->RemoveBridge(item.Index);
 		}
 	}
 
@@ -77,7 +85,7 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::UpdateBox(const ItemInfo& item)
 	{
-		_box = Geometry::GetBoundingBox(item.GetBox());
+		_aabb = Geometry::GetBoundingBox(item.GetBox());
 	}
 
 	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
@@ -86,8 +94,8 @@ namespace TEN::Entities::Generic
 		constexpr auto DOWN_NORMAL	  = Vector3(0.0f, 1.0f, 0.0f);
 		constexpr auto FORWARD_NORMAL = Vector3(0.0f, 0.0f, 1.0f);
 		constexpr auto BACK_NORMAL	  = Vector3(0.0f, 0.0f, -1.0f);
-		constexpr auto RIGHT_NORMAL	  = Vector3(1.0f, 0.0f, 0.0f);
 		constexpr auto LEFT_NORMAL	  = Vector3(-1.0f, 0.0f, 0.0f);
+		constexpr auto RIGHT_NORMAL	  = Vector3(1.0f, 0.0f, 0.0f);
 
 		// Determine relative tilt offset.
 		auto offset = Vector3::Zero;
@@ -157,25 +165,25 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::AssignSectors(const ItemInfo& item)
 	{
-		// Clear sector assignments.
+		// Deassign sectors at previous position.
 		DeassignSectors(item);
 		if (item.Flags & IFLAG_KILLED)
 			return;
 
-		// Get bridge item box.
-		auto box = item.GetBox();
+		// Get OBB.
+		auto obb = item.GetBox();
 
-		// Update sector assignments.
-		float sectorSearchDepth = ceil(std::max(std::max(box.Extents.x, box.Extents.y), box.Extents.z) / BLOCK(1));
+		// Assign sectors.
+		int sectorSearchDepth = (int)ceil(std::max(std::max(obb.Extents.x, obb.Extents.y), obb.Extents.z) / BLOCK(1));
 		auto sectors = GetNeighborSectors(item.Pose.Position, item.RoomNumber, sectorSearchDepth);
 		for (auto* sector : sectors)
 		{
-			// Test if bridge AABB intersects sector.
-			if (!_box.Intersects(sector->Box))
+			// Test if AABB intersects sector.
+			if (!_aabb.Intersects(sector->Aabb))
 				continue;
 
 			// Add bridge if within sector.
-			if (box.Intersects(sector->Box))
+			if (obb.Intersects(sector->Aabb))
 				sector->AddBridge(item.Index);
 		}
 	}

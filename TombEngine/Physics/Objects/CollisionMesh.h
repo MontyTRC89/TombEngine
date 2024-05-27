@@ -12,7 +12,7 @@ namespace TEN::Physics
 		// Members
 		std::array<int, VERTEX_COUNT> _vertexIds = {};
 		Vector3						  _normal	 = Vector3::Zero;
-		BoundingBox					  _box		 = BoundingBox();
+		BoundingBox					  _aabb		 = BoundingBox();
 
 		int _portalRoomNumber = NO_VALUE;
 
@@ -22,7 +22,7 @@ namespace TEN::Physics
 
 		// Getters
 		const Vector3&	   GetNormal() const;
-		const BoundingBox& GetBox() const;
+		const BoundingBox& GetAabb() const;
 		int				   GetPortalRoomNumber() const;
 
 		// Inquirers
@@ -39,14 +39,14 @@ namespace TEN::Physics
 		float Distance = 0.0f;
 	};
 
-	// Note: Utilizes bounding volume hierarchy.
 	class CollisionMesh
 	{
 	private:
+		// Bounding volume hierarchy node
 		struct BvhNode
 		{
 			std::vector<int> TriangleIds = {}; // NOTE: Only leaf nodes store triangles directly.
-			BoundingBox		 Box		 = BoundingBox();
+			BoundingBox		 Aabb		 = BoundingBox();
 
 			int LeftChildID	 = NO_VALUE;
 			int RightChildID = NO_VALUE;
@@ -54,6 +54,7 @@ namespace TEN::Physics
 			bool IsLeaf() const;
 		};
 
+		// Bounding volume hierarchy
 		class Bvh
 		{
 		public:

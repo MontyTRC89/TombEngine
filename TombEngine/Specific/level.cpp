@@ -785,7 +785,7 @@ void ReadRooms()
 
 				sector.Position = roomPos + Vector2i(BLOCK(x), BLOCK(z));
 				sector.RoomNumber = i;
-				sector.Box = BoundingBox(Vector3(sector.Position.x, 0.0f, sector.Position.y) + SECTOR_BOX_CENTER_OFFSET, SECTOR_BOX_EXTENTS);
+				sector.Aabb = BoundingBox(Vector3(sector.Position.x, 0.0f, sector.Position.y) + SECTOR_BOX_CENTER_OFFSET, SECTOR_BOX_EXTENTS);
 
 				sector.TriggerIndex = ReadInt32();
 				sector.PathfindingBoxID = ReadInt32();

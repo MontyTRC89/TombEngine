@@ -13,7 +13,7 @@ namespace TEN::Entities::Generic
 	{
 	private:
 		// Members
-		BoundingBox	  _box			 = BoundingBox();
+		BoundingBox	  _aabb			 = BoundingBox();
 		CollisionMesh _collisionMesh = CollisionMesh();
 		//Attractor	  _attractor	 = Attractor();
 
@@ -28,7 +28,7 @@ namespace TEN::Entities::Generic
 		std::function<int(const ItemInfo& item)> GetCeilingBorder = nullptr;
 
 		// Getters
-		const BoundingBox&	 GetBox() const;
+		const BoundingBox&	 GetAabb() const;
 		const CollisionMesh& GetCollisionMesh() const;
 		//const Attractor&	 GetAttractor() const;
 

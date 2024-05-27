@@ -162,7 +162,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	//UpdateBridgeItem(g_Level.Items[43]);
 
 	for (auto& sector : room.floor)
-		g_Renderer.AddDebugBox(sector.Box, Color(1, 1, 1));
+		g_Renderer.AddDebugBox(sector.Aabb, Color(1, 1, 1));
 
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);
 	//g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));
