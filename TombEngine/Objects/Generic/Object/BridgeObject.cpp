@@ -56,7 +56,7 @@ namespace TEN::Entities::Generic
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = _aabb;
-		_prevObb = item.GetBox();
+		_prevObb = item.GetObb();
 	}
 
 	void BridgeObject::DeassignSectors(const ItemInfo& item) const
@@ -83,7 +83,7 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::UpdateAabb(const ItemInfo& item)
 	{
-		_aabb = Geometry::GetBoundingBox(item.GetBox());
+		_aabb = Geometry::GetBoundingBox(item.GetObb());
 	}
 
 	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
@@ -129,7 +129,7 @@ namespace TEN::Entities::Generic
 		offset = Vector3::Transform(offset, rotMatrix);
 
 		// Get box corners.
-		auto box = item.GetBox();
+		auto box = item.GetObb();
 		auto corners = std::array<Vector3, BoundingOrientedBox::CORNER_COUNT>{};
 		box.GetCorners(corners.data());
 
@@ -169,7 +169,7 @@ namespace TEN::Entities::Generic
 			return;
 
 		// Get OBB.
-		auto obb = item.GetBox();
+		auto obb = item.GetObb();
 
 		// Assign sectors.
 		int sectorSearchDepth = (int)ceil(std::max(std::max(obb.Extents.x, obb.Extents.y), obb.Extents.z) / BLOCK(1));

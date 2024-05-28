@@ -146,7 +146,7 @@ namespace TEN::Collision::Los
 				// 2) Collect moveable LOS collisions.
 				if (collideMoveables)
 				{
-					auto box = mov->GetBox();
+					auto box = mov->GetObb();
 
 					float intersectDist = 0.0f;
 					if (box.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
