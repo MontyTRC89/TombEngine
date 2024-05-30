@@ -16,15 +16,21 @@
 using namespace TEN::Effects::Bubble;
 
 // NOTES:
-// OCB 0:
+// OCB 0:Default Smoke
+// OCB + 1: Avoid moving the source of the steam shot.
+// OCB + 2: Disable the harm from the steam shot.
+// OCB + 8: Horizontal steam shot
+// OCB + (8 * X): x is the number of frames it pauses between steam shots
+// OCB 111: Horizontal constant steam shot from the wall (Deprecated)
 // 
 // item.ItemFlags[0]: Timer for the pause between steam shots
 // item.ItemFlags[1]: Timer for the active steam shots
 // item.ItemFlags[2]: Acceleration of the steam shot particles
 // 
 // In Underwater rooms
-// OCB 0: Standard behaviour.
-// OCB 1: When underwater, it emits bubles continuously.
+// OCB 0: Intermitent bubbles emission.
+// OCB 1: Continuous bubbles emission.
+// OCB +2: Uses big bubbles.
 // 
 // item.ItemFlags[0]: Count the number of bubles it has to spawn.
 // item.ItemFlags[1]: Flag used to spawn a serie of bubbles with no delay.
@@ -130,7 +136,8 @@ namespace TEN::Effects::SmokeEmitter
 		sptr->friction = 4;
 		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
-		if (!(GlobalCounter & 0x03))
+		bool ignoreDamage = item.TriggerFlags & 2;
+		if (!(GlobalCounter & 0x03) && !ignoreDamage)
 			sptr->flags |= SP_DAMAGE;
 
 		sptr->rotAng = Random::GenerateInt(0, 4096);
@@ -259,8 +266,10 @@ namespace TEN::Effects::SmokeEmitter
 		auto& item = g_Level.Items[itemNumber];
 
 		bool isUnderwater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
-		bool isPipeShot = item.TriggerFlags == 111;
+		
+		bool ignoreDisplacement = item.TriggerFlags & 1;
 		bool isSteamShotEffect = item.TriggerFlags & 8;
+		bool isWallShot = item.TriggerFlags == 111; //Deprecated, just kept for legacy purposes
 
 		if (isUnderwater)
 		{
@@ -279,9 +288,9 @@ namespace TEN::Effects::SmokeEmitter
 			if (bubbleSpawnRadius == 0)
 				bubbleSpawnRadius = 32; //Default value
 		}
-		else if (isPipeShot)
+		else if (isWallShot)
 		{
-			AdjustSmokeEmitterPosition(item, CLICK(2));
+			AdjustSmokeEmitterPosition(item, BLOCK(0.5f));
 		}
 		else if (isSteamShotEffect)
 		{
@@ -291,7 +300,8 @@ namespace TEN::Effects::SmokeEmitter
 
 			steamPauseTimer = OCB / 16;
 
-			AdjustSmokeEmitterPosition(item, CLICK(1));
+			if (!ignoreDisplacement)
+				AdjustSmokeEmitterPosition(item, BLOCK(0.25f));
 
 			if ((signed short)(OCB / 16) <= 0)
 			{
@@ -313,7 +323,7 @@ namespace TEN::Effects::SmokeEmitter
 		if (isUnderwater)
 		{
 			bool effectContinuousBubbles = item.TriggerFlags == 1;
-			bool effectBigBubbles = item.TriggerFlags == 2;
+			bool effectBigBubbles = item.TriggerFlags & 2;
 
 			auto& bubbleCount = item.ItemFlags[0];
 			auto& bubbleForceSpawnFlag = item.ItemFlags[1];
