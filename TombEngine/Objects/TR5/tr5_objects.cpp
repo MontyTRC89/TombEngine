@@ -73,6 +73,7 @@
 // Shatters
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
 
+using namespace TEN::Effects::SmokeEmitter;
 using namespace TEN::Effects::EmberEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
