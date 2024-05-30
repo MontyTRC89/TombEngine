@@ -16,15 +16,24 @@
 using namespace TEN::Effects::Bubble;
 
 // NOTES:
+// OCB 0:
+// 
+// item.ItemFlags[0]: Timer for the pause between steam shots
+// item.ItemFlags[1]: Timer for the active steam shots
+// item.ItemFlags[2]: Acceleration of the steam shot particles
+// 
+// In Underwater rooms
 // OCB 0: Standard behaviour.
 // OCB 1: When underwater, it emits bubles continuously.
 // 
-// item.ItemFlags[0]: When underwater, it is used to count the number of bubles it has to spawn.
-// item.ItemFlags[1]: When underwater, it's a flag used to spawn a serie of bubbles with no delay.
+// item.ItemFlags[0]: Count the number of bubles it has to spawn.
+// item.ItemFlags[1]: Flag used to spawn a serie of bubbles with no delay.
+// item.ItemFlags[2]: Radius of the bubbles spawn horizontal plane. (by default is 32).
 
 namespace TEN::Effects::SmokeEmitter
 {
 	constexpr auto SMOKE_VISIBILITY_DISTANCE_LIMIT = BLOCK(16);
+
 
 	static void AdjustSmokeEmitterPosition(ItemInfo& item, float offset)
 	{
@@ -45,7 +54,7 @@ namespace TEN::Effects::SmokeEmitter
 		}
 	}
 
-	static void SpawnSteamShotParticle(const ItemInfo& item, const short steamSize)
+	static void SpawnSteamShotParticle(const ItemInfo& item, const short currentAcceleration)
 	{
 		//If camera is far, it won't spawn more particles
 		int dx = Camera.pos.x - item.Pose.Position.x;
@@ -58,46 +67,85 @@ namespace TEN::Effects::SmokeEmitter
 		//Otherwise, continue
 		auto* sptr = GetFreeParticle();
 		sptr->on = true;
-		sptr->sR = 96;
-		sptr->sG = 96;
-		sptr->sB = 96;
-		sptr->dR = 48;
-		sptr->dG = 48;
-		sptr->dB = 48;
+
+		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
+		{
+			sptr->sR = 96;
+			sptr->sG = 96;
+			sptr->sB = 96;
+
+			sptr->dR = 96;
+			sptr->dG = 96;
+			sptr->dB = 96;
+		}
+		else if (item.ObjectNumber == ID_SMOKE_EMITTER_WHITE)
+		{
+			sptr->sR = 96;
+			sptr->sG = 96;
+			sptr->sB = 96;
+
+			sptr->dR = 64;
+			sptr->dG = 64;
+			sptr->dB = 64;
+		}
+		else
+		{
+			unsigned char r = std::clamp(item.Model.Color.x / 2.0f, 0.0f, 1.0f) * UCHAR_MAX;
+			unsigned char g = std::clamp(item.Model.Color.y / 2.0f, 0.0f, 1.0f) * UCHAR_MAX;
+			unsigned char b = std::clamp(item.Model.Color.z / 2.0f, 0.0f, 1.0f) * UCHAR_MAX;
+
+			sptr->sR = r / 3;
+			sptr->sG = g / 3;
+			sptr->sB = b / 3;
+
+			sptr->dR = r;
+			sptr->dG = g;
+			sptr->dB = b;
+		}
+		
 		sptr->fadeToBlack = 6;
-		sptr->colFadeSpeed = (GetRandomControl() & 3) + 6;
-		sptr->blendMode = BlendMode::Additive;
-		sptr->life = (GetRandomControl() & 7) + 16;
-		sptr->sLife = sptr->life;
-		sptr->x = (GetRandomControl() & 0x3F) + item.Pose.Position.x - 32;
-		sptr->y = (GetRandomControl() & 0x3F) + item.Pose.Position.y - 32;
-		sptr->z = (GetRandomControl() & 0x3F) + item.Pose.Position.z - 32;
-		int size = steamSize;
+		sptr->colFadeSpeed = Random::GenerateInt(6, 9);
 
-		if (steamSize == 4096)
-			size = (GetRandomControl() & 0x7FF) + 2048;
+		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
+			sptr->blendMode = BlendMode::Subtractive;
+		else
+			sptr->blendMode = BlendMode::Additive;
 
-		sptr->xVel = (short)((size * phd_sin(item.Pose.Orientation.y - 32768)) / BLOCK(1));
-		sptr->yVel = -16 - (GetRandomControl() & 0xF);
-		sptr->zVel = (short)((size * phd_cos(item.Pose.Orientation.y - 32768)) / BLOCK(1));
+		sptr->life = sptr->sLife = Random::GenerateInt(16, 24);
+
+		sptr->x = item.Pose.Position.x + Random::GenerateInt(-32, 32);
+		sptr->y = item.Pose.Position.y + Random::GenerateInt(-32, 32);
+		sptr->z = item.Pose.Position.z + Random::GenerateInt(-32, 32);
+
+		int acceleration = currentAcceleration;
+
+		if (currentAcceleration == 4096)
+			acceleration = Random::GenerateInt(2048, 4095);
+
+		int angle = item.Pose.Orientation.y - 32768;
+		sptr->xVel = (short)(acceleration * phd_sin(angle));
+		sptr->yVel = (short)Random::GenerateInt(-16, 0);
+		sptr->zVel = (short)(acceleration * phd_cos(angle));
+
 		sptr->friction = 4;
 		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
 		if (!(GlobalCounter & 0x03))
 			sptr->flags |= SP_DAMAGE;
 
-		sptr->rotAng = GetRandomControl() & 0xFFF;
+		sptr->rotAng = Random::GenerateInt(0, 4096);
 
-		if (GetRandomControl() & 1)
-			sptr->rotAdd = -8 - (GetRandomControl() & 7);
+		if (Random::TestProbability(0.5f))
+			sptr->rotAdd = Random::GenerateInt(-15, -7);
 		else
-			sptr->rotAdd = (GetRandomControl() & 7) + 8;
+			sptr->rotAdd = Random::GenerateInt(7,15);
 
 		sptr->scalar = 2;
-		sptr->gravity = -8 - (GetRandomControl() & 0xF);
-		sptr->maxYvel = -8 - (GetRandomControl() & 7);
-		size = (GetRandomControl() & 0x1F) + 128;
-		sptr->dSize = float(size);
+		sptr->gravity = Random::GenerateInt(-24, -15);
+		sptr->maxYvel = Random::GenerateInt(-15, -8);
+		
+		int particleSize = Random::GenerateInt(128, 160);
+		sptr->dSize = float(particleSize);
 		sptr->sSize = sptr->size = sptr->dSize / 2.0f;
 	}
 
@@ -114,12 +162,10 @@ namespace TEN::Effects::SmokeEmitter
 		//Otherwise, continue
 		auto* sptr = GetFreeParticle();
 		sptr->on = 1;
+
 		sptr->sR = 0;
 		sptr->sG = 0;
 		sptr->sB = 0;
-		sptr->dR = 64;
-		sptr->dG = 64;
-		sptr->dB = 64;
 
 		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
 		{
@@ -127,39 +173,59 @@ namespace TEN::Effects::SmokeEmitter
 			sptr->dG = 96;
 			sptr->dB = 96;
 		}
+		else if (item.ObjectNumber == ID_SMOKE_EMITTER_WHITE)
+		{
+			sptr->dR = 64;
+			sptr->dG = 64;
+			sptr->dB = 64;
+		}
+		else
+		{
+			unsigned char r = std::clamp(item.Model.Color.x / 2.0f, 0.0f, 1.0f) * UCHAR_MAX;
+			unsigned char g = std::clamp(item.Model.Color.y / 2.0f, 0.0f, 1.0f) * UCHAR_MAX;
+			unsigned char b = std::clamp(item.Model.Color.z / 2.0f, 0.0f, 1.0f) * UCHAR_MAX;
+
+			sptr->dR = r;
+			sptr->dG = g;
+			sptr->dB = b;
+		}
 
 		sptr->fadeToBlack = 16;
-		sptr->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		sptr->sLife = sptr->life = (GetRandomControl() & 7) + 28;
+		sptr->colFadeSpeed = Random::GenerateInt(8, 11);
 
 		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
 			sptr->blendMode = BlendMode::Subtractive;
 		else
 			sptr->blendMode = BlendMode::Additive;
 
-		sptr->x = (GetRandomControl() & 0x3F) + item.Pose.Position.x - 32;
-		sptr->y = (GetRandomControl() & 0x3F) + item.Pose.Position.y - 32;
-		sptr->z = (GetRandomControl() & 0x3F) + item.Pose.Position.z - 32;
-		sptr->xVel = (GetRandomControl() & 0xFF) - 128;
-		sptr->yVel = -16 - (GetRandomControl() & 0xF);
-		sptr->zVel = (GetRandomControl() & 0xFF) - 128;
+		sptr->sLife = sptr->life = Random::GenerateInt(28, 35);
+
+		sptr->x = item.Pose.Position.x + Random::GenerateInt(-32, 32);
+		sptr->y = item.Pose.Position.y + Random::GenerateInt(-32, 32);
+		sptr->z = item.Pose.Position.z + Random::GenerateInt(-32, 32);
+
+		sptr->xVel = Random::GenerateInt(-128, 128);
+		sptr->yVel = Random::GenerateInt(-16, 0);
+		sptr->zVel = Random::GenerateInt(-128, 128);
+
 		sptr->friction = 3;
 		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_OUTSIDE, item.RoomNumber))
 			sptr->flags |= SP_WIND;
 
-		sptr->rotAng = GetRandomControl() & 0xFFF;
+		sptr->rotAng = Random::GenerateInt(0, 4095);
 
-		if (GetRandomControl() & 1)
-			sptr->rotAdd = -8 - (GetRandomControl() & 7);
+		if (Random::TestProbability(0.5f))
+			sptr->rotAdd = Random::GenerateInt(-15, -7);
 		else
-			sptr->rotAdd = (GetRandomControl() & 7) + 8;
+			sptr->rotAdd = Random::GenerateInt(7, 15);
 
 		sptr->scalar = 2;
-		sptr->gravity = -8 - (GetRandomControl() & 0xF);
-		sptr->maxYvel = -8 - (GetRandomControl() & 7);
-		int size = (GetRandomControl() & 0x1F) + 128;
+		sptr->gravity = Random::GenerateInt(-24, -15);
+		sptr->maxYvel = Random::GenerateInt(-15, -7);
+
+		int size = Random::GenerateInt(128, 160);
 		sptr->dSize = float(size);
 		sptr->sSize = sptr->size = float(size / 4);
 
@@ -170,9 +236,6 @@ namespace TEN::Effects::SmokeEmitter
 			sptr->maxYvel /= 2;
 			sptr->life += 16;
 			sptr->sLife += 16;
-			sptr->dR = 32;
-			sptr->dG = 32;
-			sptr->dB = 32;
 		}
 	}
 
@@ -224,7 +287,7 @@ namespace TEN::Effects::SmokeEmitter
 		{
 			auto& OCB					= item.TriggerFlags;
 			auto& steamPauseTimer		= item.ItemFlags[0];
-			auto& steamSize			= item.ItemFlags[2];
+			auto& steamAcceleration	= item.ItemFlags[2];
 
 			steamPauseTimer = OCB / 16;
 
@@ -232,7 +295,7 @@ namespace TEN::Effects::SmokeEmitter
 
 			if ((signed short)(OCB / 16) <= 0)
 			{
-				steamSize = 4096;
+				steamAcceleration = 4096;
 				OCB |= 4;	//Keep 4 small bits,Ignore the rest
 			}
 		}
@@ -287,7 +350,7 @@ namespace TEN::Effects::SmokeEmitter
 
 			auto& steamPauseTimer			= item.ItemFlags[0];
 			auto& steamActiveTimer		= item.ItemFlags[1];
-			auto& steamSize				= item.ItemFlags[2];
+			auto& steamAcceleration		= item.ItemFlags[2];
 
 			if (steamPauseTimer)
 			{
@@ -298,15 +361,15 @@ namespace TEN::Effects::SmokeEmitter
 				if (steamPauseTimer <= 0)
 					steamActiveTimer = Random::GenerateInt(30,94);
 								
-				if (steamSize)
-					steamSize -= 256;
+				if (steamAcceleration)
+					steamAcceleration -= 256;
 			}
-			else if (steamSize < 4096)
-				steamSize += 256;
+			else if (steamAcceleration < 4096)
+				steamAcceleration += 256;
 
-			if (steamSize)
+			if (steamAcceleration)
 			{
-				SpawnSteamShotParticle(item, steamSize);
+				SpawnSteamShotParticle(item, steamAcceleration);
 
 				if (steamActiveTimer)
 					steamActiveTimer--;
@@ -320,6 +383,7 @@ namespace TEN::Effects::SmokeEmitter
 
 		//Render Normal Smoke
 		bool isWibbleCondition = (!(Wibble & 0x0F) && (item.ObjectNumber != ID_SMOKE_EMITTER || !(Wibble & 0x1F)));
+
 		if (isWibbleCondition)
 		{
 			SpawnSmokeEmitterParticle(item);
