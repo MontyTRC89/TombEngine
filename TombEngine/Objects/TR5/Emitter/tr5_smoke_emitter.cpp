@@ -15,47 +15,46 @@
 
 using namespace TEN::Effects::Bubble;
 
+static void AdjustSmokeEmitterPosition (ItemInfo* item, float offset)
+{
+	switch (item->Pose.Orientation.y)
+	{
+		case ANGLE(90.0f):
+			item->Pose.Position.x += offset;
+			break;
+		case ANGLE(-180.0f):
+			item->Pose.Position.z -= offset;
+			break;
+		case ANGLE(-90.0f):
+			item->Pose.Position.x -= offset;
+			break;
+		default:
+			item->Pose.Position.z += offset;
+		break;
+	}
+}
+
 void InitializeSmokeEmitter(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->TriggerFlags == 111)
-	{
-		if (item->Pose.Orientation.y > 0)
-		{
-			if (item->Pose.Orientation.y == ANGLE(90.0f))
-				item->Pose.Position.x += CLICK(2);
-		}
-		else if (item->Pose.Orientation.y)
-		{
-			if (item->Pose.Orientation.y == -ANGLE(180.0f))
-				item->Pose.Position.z -= CLICK(2);
-			else if (item->Pose.Orientation.y == -ANGLE(90.0f))
-				item->Pose.Position.x -= CLICK(2);
-		}
-		else
-			item->Pose.Position.z += CLICK(2);
-	}
-	else if (item->ObjectNumber != ID_SMOKE_EMITTER)
+	if (item->ObjectNumber != ID_SMOKE_EMITTER)
 		return;
-	else if (item->TriggerFlags & 8)
+
+	bool isHorizontalShot = item->TriggerFlags == 111;
+	bool isEmitterType = item->TriggerFlags & 8;
+	bool isUnderwaterRoom = (g_Level.Rooms[item->RoomNumber].flags & 1);
+	bool isBubbleCluster = item->TriggerFlags == 1;
+
+	if (isHorizontalShot)
+	{
+		AdjustSmokeEmitterPosition(item, CLICK(2));
+	}
+	else if (isEmitterType)
 	{
 		item->ItemFlags[0] = item->TriggerFlags / 16;
 
-		if (item->Pose.Orientation.y > 0)
-		{
-			if (item->Pose.Orientation.y == ANGLE(90.0f))
-				item->Pose.Position.x += CLICK(1);
-		}
-		else
-		{
-			if (item->Pose.Orientation.y == 0)
-				item->Pose.Position.z += CLICK(1);
-			else if (item->Pose.Orientation.y == -ANGLE(180.0f))
-				item->Pose.Position.z -= CLICK(1);
-			else if (item->Pose.Orientation.y == -ANGLE(90.0f))
-				item->Pose.Position.x -= CLICK(1);
-		}
+		AdjustSmokeEmitterPosition(item, CLICK(1));
 
 		if ((signed short)(item->TriggerFlags / 16) <= 0)
 		{
@@ -63,76 +62,94 @@ void InitializeSmokeEmitter(short itemNumber)
 			item->TriggerFlags |= 4;
 		}
 	}
-	else if (g_Level.Rooms[item->RoomNumber].flags & 1 && item->TriggerFlags == 1)
+	else if (isUnderwaterRoom && isBubbleCluster)
 	{
 		item->ItemFlags[0] = 20;
 		item->ItemFlags[1] = 1;
 	}
 }
 
+static void SpawnSmokeEmitterBubble(const ItemInfo& item, int radius, bool bigBubbles)
+{
+	int maxRadius = radius;
+	int minRadius = 0 - radius;
+	auto pos = Vector3(
+			item.Pose.Position.x + Random::GenerateInt(minRadius, maxRadius),
+			item.Pose.Position.y - Random::GenerateInt(-16, 16),
+			item.Pose.Position.z + Random::GenerateInt(minRadius, maxRadius));
+
+	if (bigBubbles)
+		SpawnBubble(pos, item.RoomNumber, (int)BubbleFlags::HighAmplitude | (int)BubbleFlags::LargeScale);
+	else
+		SpawnBubble(pos, item.RoomNumber);
+}
+
 void SmokeEmitterControl(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	if (!TriggerActive(item))
+	if (!TriggerActive(&item))
 		return;
 
-	if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber))
+	bool isUnderwater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
+	bool isSmokeEmitterType = item.ObjectNumber == ID_SMOKE_EMITTER;
+	bool isUnknown = item.TriggerFlags & 8;
+	bool isWibbleCondition = (!(Wibble & 0x0F) && (item.ObjectNumber != ID_SMOKE_EMITTER || !(Wibble & 0x1F)));
+	
+	if (isUnderwater)
 	{
-		if (item->ItemFlags[0] || !(GetRandomControl() & 0x1F) || item->TriggerFlags == 1)
+		bool effectContinuousBubbles = item.TriggerFlags == 1;
+		bool effectBigBubbles = item.TriggerFlags == 2;
+
+		auto& bubbleCount = item.ItemFlags[0];
+		auto& bubbleForceSpawnFlag = item.ItemFlags[1];
+
+		if (bubbleCount || Random::TestProbability(1 / 30.0f) || effectContinuousBubbles)
 		{
-			if (!(GetRandomControl() & 3) || item->ItemFlags[1])
+			if (Random::TestProbability(1 / 3.0f) || bubbleForceSpawnFlag)
 			{
-				auto pos = Vector3(
-					(GetRandomControl() & 0x3F) + item->Pose.Position.x - 32,
-					item->Pose.Position.y - (GetRandomControl() & 0x1F) - 16,
-					(GetRandomControl() & 0x3F) + item->Pose.Position.z - 32);
+				SpawnSmokeEmitterBubble(item, 32, effectBigBubbles);
 
-				if (item->TriggerFlags == 1)
-					SpawnBubble(pos, item->RoomNumber);
-				else
-					SpawnBubble(pos, item->RoomNumber);
-
-				if (item->ItemFlags[0])
+				if (bubbleCount)
 				{
-					item->ItemFlags[0]--;
+					bubbleCount--;
 
-					if (!item->ItemFlags[0])
-						item->ItemFlags[1] = 0;
+					if (!bubbleCount)
+						bubbleForceSpawnFlag = 0;
 				}
 			}
 		}
-		else if (!(GetRandomControl() & 0x1F))
+		else if (Random::TestProbability(1 / 30.0f))
 		{
-			item->ItemFlags[0] = (GetRandomControl() & 3) + 4;
+			bubbleCount = Random::GenerateInt(4, 7);
 		}
 
 		return;
 	}
 
-	if (item->ObjectNumber == ID_SMOKE_EMITTER && item->TriggerFlags & 8)
+	if (isSmokeEmitterType && isUnknown)
 	{
 		bool normal = false;
 
-		if (item->ItemFlags[0])
+		if (item.ItemFlags[0])
 		{
-			item->ItemFlags[0]--;
+			item.ItemFlags[0]--;
 
-			if (!item->ItemFlags[0])
-				item->ItemFlags[1] = (GetRandomControl() & 0x3F) + 30;
+			if (!item.ItemFlags[0])
+				item.ItemFlags[1] = (GetRandomControl() & 0x3F) + 30;
 
 			normal = true;
 
-			if (item->ItemFlags[2])
-				item->ItemFlags[2] -= 256;
+			if (item.ItemFlags[2])
+				item.ItemFlags[2] -= 256;
 		}
-		else if (item->ItemFlags[2] < 4096)
-			item->ItemFlags[2] += 256;
+		else if (item.ItemFlags[2] < 4096)
+			item.ItemFlags[2] += 256;
 
-		if (item->ItemFlags[2])
+		if (item.ItemFlags[2])
 		{
-			int dx = Camera.pos.x - item->Pose.Position.x;
-			int dz = Camera.pos.z - item->Pose.Position.z;
+			int dx = Camera.pos.x - item.Pose.Position.x;
+			int dz = Camera.pos.z - item.Pose.Position.z;
 
 			if (dx < -BLOCK(16) || dx > BLOCK(16) || dz < -BLOCK(16) || dz > BLOCK(16))
 				return;
@@ -150,17 +167,17 @@ void SmokeEmitterControl(short itemNumber)
 			sptr->blendMode = BlendMode::Additive;
 			sptr->life = (GetRandomControl() & 7) + 16;
 			sptr->sLife = sptr->life;
-			sptr->x = (GetRandomControl() & 0x3F) + item->Pose.Position.x - 32;
-			sptr->y = (GetRandomControl() & 0x3F) + item->Pose.Position.y - 32;
-			sptr->z = (GetRandomControl() & 0x3F) + item->Pose.Position.z - 32;
-			int size = item->ItemFlags[2];
+			sptr->x = (GetRandomControl() & 0x3F) + item.Pose.Position.x - 32;
+			sptr->y = (GetRandomControl() & 0x3F) + item.Pose.Position.y - 32;
+			sptr->z = (GetRandomControl() & 0x3F) + item.Pose.Position.z - 32;
+			int size = item.ItemFlags[2];
 
-			if (item->ItemFlags[2] == 4096)
+			if (item.ItemFlags[2] == 4096)
 				size = (GetRandomControl() & 0x7FF) + 2048;
 
-			sptr->xVel = (short)((size * phd_sin(item->Pose.Orientation.y - 32768)) / BLOCK(1));
+			sptr->xVel = (short)((size * phd_sin(item.Pose.Orientation.y - 32768)) / BLOCK(1));
 			sptr->yVel = -16 - (GetRandomControl() & 0xF);
-			sptr->zVel = (short)((size * phd_cos(item->Pose.Orientation.y - 32768)) / BLOCK(1));
+			sptr->zVel = (short)((size * phd_cos(item.Pose.Orientation.y - 32768)) / BLOCK(1));
 			sptr->friction = 4;
 			sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
@@ -181,20 +198,20 @@ void SmokeEmitterControl(short itemNumber)
 			sptr->dSize = float(size);
 			sptr->sSize = sptr->size = sptr->dSize / 2.0f;
 
-			if (item->ItemFlags[1])
-				item->ItemFlags[1]--;
+			if (item.ItemFlags[1])
+				item.ItemFlags[1]--;
 			else
-				item->ItemFlags[0] = item->TriggerFlags >> 4;
+				item.ItemFlags[0] = item.TriggerFlags >> 4;
 		}
 
 		if (!normal)
 			return;
 	}
 
-	if (!(Wibble & 0x0F) && (item->ObjectNumber != ID_SMOKE_EMITTER || !(Wibble & 0x1F)))
+	if (isWibbleCondition)
 	{
-		int dx = Camera.pos.x - item->Pose.Position.x;
-		int dz = Camera.pos.z - item->Pose.Position.z;
+		int dx = Camera.pos.x - item.Pose.Position.x;
+		int dz = Camera.pos.z - item.Pose.Position.z;
 
 		if (dx < -BLOCK(16) || dx > BLOCK(16) || dz < -BLOCK(16) || dz > BLOCK(16))
 			return;
@@ -208,7 +225,7 @@ void SmokeEmitterControl(short itemNumber)
 		sptr->dG = 64;
 		sptr->dB = 64;
 
-		if (item->ObjectNumber == ID_SMOKE_EMITTER_BLACK)
+		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
 		{
 			sptr->dR = 96;
 			sptr->dG = 96;
@@ -219,21 +236,21 @@ void SmokeEmitterControl(short itemNumber)
 		sptr->colFadeSpeed = (GetRandomControl() & 3) + 8;
 		sptr->sLife = sptr->life = (GetRandomControl() & 7) + 28;
 
-		if (item->ObjectNumber == ID_SMOKE_EMITTER_BLACK)
+		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
 			sptr->blendMode = BlendMode::Subtractive;
 		else
 			sptr->blendMode = BlendMode::Additive;
 
-		sptr->x = (GetRandomControl() & 0x3F) + item->Pose.Position.x - 32;
-		sptr->y = (GetRandomControl() & 0x3F) + item->Pose.Position.y - 32;
-		sptr->z = (GetRandomControl() & 0x3F) + item->Pose.Position.z - 32;
+		sptr->x = (GetRandomControl() & 0x3F) + item.Pose.Position.x - 32;
+		sptr->y = (GetRandomControl() & 0x3F) + item.Pose.Position.y - 32;
+		sptr->z = (GetRandomControl() & 0x3F) + item.Pose.Position.z - 32;
 		sptr->xVel = (GetRandomControl() & 0xFF) - 128;
 		sptr->yVel = -16 - (GetRandomControl() & 0xF);
 		sptr->zVel = (GetRandomControl() & 0xFF) - 128;
 		sptr->friction = 3;
 		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
-		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_OUTSIDE, item->RoomNumber))
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_OUTSIDE, item.RoomNumber))
 			sptr->flags |= SP_WIND;
 
 		sptr->rotAng = GetRandomControl() & 0xFFF;
@@ -250,7 +267,7 @@ void SmokeEmitterControl(short itemNumber)
 		sptr->dSize = float(size);
 		sptr->sSize = sptr->size = float(size / 4);
 
-		if (item->ObjectNumber == ID_SMOKE_EMITTER)
+		if (item.ObjectNumber == ID_SMOKE_EMITTER)
 		{
 			sptr->gravity /= 2;
 			sptr->yVel    /= 2;
