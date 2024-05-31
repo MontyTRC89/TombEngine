@@ -2,10 +2,12 @@
 #include "Physics/Objects/CollisionMesh.h"
 
 #include "Math/Math.h"
-#include "Specific/trutils.h"
 #include "Renderer/Renderer.h"
+#include "Specific/Structures/StaticBoundingVolumeHierarchy.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Math;
+using namespace TEN::Structures;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
@@ -94,26 +96,31 @@ namespace TEN::Physics
 		g_Renderer.AddDebugLine(center, Geometry::TranslatePoint(center, _normal, BLOCK(0.2f)), Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f));
 	}
 
-	bool CollisionMesh::BvhNode::IsLeaf() const
-	{
-		return (LeftChildID == NO_VALUE && RightChildID == NO_VALUE);
-	}
-
 	CollisionMesh::Bvh::Bvh(const std::vector<CollisionTriangle>& tris)
 	{
-		auto triIds = std::vector<int>{};
-		triIds.reserve(tris.size());
-		for (int i = 0; i < tris.size(); ++i)
-			triIds.push_back(i);
+		auto ids = std::vector<int>{};
+		auto aabbs = std::vector<BoundingBox>{};
 
-		Generate(tris, triIds, 0, (int)tris.size());
+		ids.reserve(tris.size());
+		aabbs.reserve(tris.size());
+
+		int i = 0;
+		for (const auto& tri : tris)
+		{
+			ids.push_back(i);
+			aabbs.push_back(tri.GetAabb());
+
+			i++;
+		}
+
+		Generate(ids, aabbs, 0, (int)tris.size());
 	}
 
 	std::optional<CollisionMeshCollisionData> CollisionMesh::Bvh::GetCollision(const Ray& ray, float dist,
 																			   const std::vector<CollisionTriangle>& tris,
 																			   const std::vector<Vector3>& vertices) const
 	{
-		if (Nodes.empty())
+		if (_nodes.empty())
 			return std::nullopt;
 
 		const CollisionTriangle* closestTri = nullptr;
@@ -126,7 +133,7 @@ namespace TEN::Physics
 			if (nodeID == NO_VALUE)
 				return;
 
-			const auto& node = Nodes[nodeID];
+			const auto& node = _nodes[nodeID];
 
 			// Test node intersection.
 			float intersectDist = 0.0f;
@@ -136,13 +143,13 @@ namespace TEN::Physics
 			// Traverse nodes.
 			if (node.IsLeaf())
 			{
-				for (int triID : node.TriangleIds)
+				for (int id : node.Ids)
 				{
 					float intersectDist = 0.0f;
-					if (tris[triID].Intersects(vertices, ray, intersectDist) &&
+					if (tris[id].Intersects(vertices, ray, intersectDist) &&
 						intersectDist <= dist && intersectDist < closestDist)
 					{
-						closestTri = &tris[triID];
+						closestTri = &tris[id];
 						closestDist = intersectDist;
 						isIntersected = true;
 					}
@@ -156,45 +163,12 @@ namespace TEN::Physics
 		};
 		
 		// Traverse BVH from root node.
-		traverseBvh((int)Nodes.size() - 1);
+		traverseBvh((int)_nodes.size() - 1);
 
 		if (isIntersected)
 			return CollisionMeshCollisionData{ *closestTri, closestDist };
 
 		return std::nullopt;
-	}
-
-	int CollisionMesh::Bvh::Generate(const std::vector<CollisionTriangle>& tris, const std::vector<int>& triIds, int start, int end)
-	{
-		constexpr auto TRI_COUNT_PER_LEAF_MAX = 4;
-
-		// FAILSAFE.
-		if (start >= end)
-			return NO_VALUE;
-
-		auto node = BvhNode{};
-
-		// Combine boxes.
-		node.Aabb = tris[triIds[start]].GetAabb();
-		for (int i = (start + 1); i < end; i++)
-			node.Aabb = Geometry::CombineBoundingBoxes(node.Aabb, tris[triIds[i]].GetAabb());
-
-		// Leaf node.
-		if ((end - start) <= TRI_COUNT_PER_LEAF_MAX)
-		{
-			node.TriangleIds.insert(node.TriangleIds.end(), triIds.begin() + start, triIds.begin() + end);
-			Nodes.push_back(node);
-			return int(Nodes.size() - 1);
-		}
-		// Split node.
-		else
-		{
-			int mid = (start + end) / 2;
-			node.LeftChildID = Generate(tris, triIds, start, mid);
-			node.RightChildID = Generate(tris, triIds, mid, end);
-			Nodes.push_back(node);
-			return int(Nodes.size() - 1);
-		}
 	}
 
 	CollisionMesh::CollisionMesh(const std::vector<CollisionTriangle>& tris)
@@ -259,5 +233,7 @@ namespace TEN::Physics
 	{
 		for (const auto& tri : _triangles)
 			tri.DrawDebug(_vertices);
+
+		//StaticBoundingVolumeHierarchy::DrawDebug();
 	}
 }

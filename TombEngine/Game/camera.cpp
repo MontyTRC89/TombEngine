@@ -129,7 +129,7 @@ static bool TestCameraCollidableItem(const ItemInfo& item)
 		return false;
 
 	// 5) Test if box is collidable.
-	if (!TestCameraCollidableBox(item.GetBox()))
+	if (!TestCameraCollidableBox(item.GetObb()))
 		return false;
 
 	return true;
@@ -1248,7 +1248,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 	}
 
 	// TODO: Use DX box.
-	auto box = item->GetBox();
+	auto box = item->GetObb();
 	auto bounds = GameBoundingBox(item);
 
 	int x = 0;
