@@ -16,16 +16,15 @@
 using namespace TEN::Effects::Bubble;
 
 // NOTES:
-// OCB 0:Default Smoke
-// OCB + 1: Avoid moving the source of the steam shot.
-// OCB + 2: Disable the harm from the steam shot.
-// OCB + 8: Horizontal steam shot
-// OCB + (8 * X): x is the number of frames it pauses between steam shots
-// OCB 111: Horizontal constant steam shot from the wall (Deprecated)
+// OCB 0:		Default smoke behaviour.
+// OCB <0:		Disables the harm from the steam shot by setting the NoDamage flag in ItemFlags[3].
+// OCB != 0:	Enables horizontal steam shot effect.
+// OCB >> 4:	Sets the number of frames it pauses between steam shots, is calculated like x = 16 * number of frames.
 // 
 // item.ItemFlags[0]: Timer for the pause between steam shots
 // item.ItemFlags[1]: Timer for the active steam shots
 // item.ItemFlags[2]: Acceleration of the steam shot particles
+// item.ItemFlags[3]: Smoke Emiter Flags
 // 
 // In Underwater rooms
 // OCB 0: Intermitent bubbles emission.
@@ -38,27 +37,12 @@ using namespace TEN::Effects::Bubble;
 
 namespace TEN::Effects::SmokeEmitter
 {
-	constexpr auto SMOKE_VISIBILITY_DISTANCE_LIMIT = BLOCK(16);
-
-
-	static void AdjustSmokeEmitterPosition(ItemInfo& item, float offset)
+	enum SmokeEmitterFlags
 	{
-		switch (item.Pose.Orientation.y)
-		{
-		case ANGLE(90.0f):
-			item.Pose.Position.x += offset;
-			break;
-		case ANGLE(-180.0f):
-			item.Pose.Position.z -= offset;
-			break;
-		case ANGLE(-90.0f):
-			item.Pose.Position.x -= offset;
-			break;
-		default:
-			item.Pose.Position.z += offset;
-			break;
-		}
-	}
+		NoDamage = (1 << 0),
+	};
+
+	constexpr auto SMOKE_VISIBILITY_DISTANCE_LIMIT = BLOCK(16);
 
 	static void SpawnSteamShotParticle(const ItemInfo& item, const short currentAcceleration)
 	{
@@ -128,15 +112,24 @@ namespace TEN::Effects::SmokeEmitter
 		if (currentAcceleration == 4096)
 			acceleration = Random::GenerateInt(2048, 4095);
 
-		int angle = item.Pose.Orientation.y - 32768;
-		sptr->xVel = (short)(acceleration * phd_sin(angle));
-		sptr->yVel = (short)Random::GenerateInt(-16, 0);
-		sptr->zVel = (short)(acceleration * phd_cos(angle));
+		int pitchAngle = item.Pose.Orientation.x + ANGLE(180);
+		int yawAngle = item.Pose.Orientation.y;
+
+		Vector3 dir;
+		dir.x = phd_cos(pitchAngle) * phd_sin(yawAngle);
+		dir.y = phd_sin(pitchAngle);
+		dir.z = phd_cos(pitchAngle) * phd_cos(yawAngle);
+
+		dir.Normalize();
+		int randomOffset = Random::GenerateInt(-8, 8);
+		sptr->xVel = dir.x * acceleration + randomOffset;
+		sptr->yVel = dir.y * acceleration + randomOffset;
+		sptr->zVel = dir.z * acceleration + randomOffset;
 
 		sptr->friction = 4;
 		sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
-		bool ignoreDamage = item.TriggerFlags & 2;
+		bool ignoreDamage = item.ItemFlags[3] & SmokeEmitterFlags::NoDamage;
 		if (!(GlobalCounter & 0x03) && !ignoreDamage)
 			sptr->flags |= SP_DAMAGE;
 
@@ -266,10 +259,7 @@ namespace TEN::Effects::SmokeEmitter
 		auto& item = g_Level.Items[itemNumber];
 
 		bool isUnderwater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
-		
-		bool ignoreDisplacement = item.TriggerFlags & 1;
-		bool isSteamShotEffect = item.TriggerFlags & 8;
-		bool isWallShot = item.TriggerFlags == 111; //Deprecated, just kept for legacy purposes
+		bool isSteamShotEffect = item.TriggerFlags != 0;
 
 		if (isUnderwater)
 		{
@@ -288,25 +278,24 @@ namespace TEN::Effects::SmokeEmitter
 			if (bubbleSpawnRadius == 0)
 				bubbleSpawnRadius = 32; //Default value
 		}
-		else if (isWallShot)
-		{
-			AdjustSmokeEmitterPosition(item, BLOCK(0.5f));
-		}
 		else if (isSteamShotEffect)
 		{
 			auto& OCB					= item.TriggerFlags;
 			auto& steamPauseTimer		= item.ItemFlags[0];
 			auto& steamAcceleration	= item.ItemFlags[2];
+			auto& steamFlags			= item.ItemFlags[3];
+
+			if (OCB < 0)
+			{
+				OCB = -OCB;
+				steamFlags |= SmokeEmitterFlags::NoDamage;
+			}
 
 			steamPauseTimer = OCB / 16;
 
-			if (!ignoreDisplacement)
-				AdjustSmokeEmitterPosition(item, BLOCK(0.25f));
-
-			if ((signed short)(OCB / 16) <= 0)
+			if ((signed short)(steamPauseTimer) <= 0)
 			{
 				steamAcceleration = 4096;
-				OCB |= 4;	//Keep 4 small bits,Ignore the rest
 			}
 		}
 	}
@@ -353,7 +342,7 @@ namespace TEN::Effects::SmokeEmitter
 		}
 
 		//Render Horizontal Steam Shot
-		bool isSteamShotEffect = item.TriggerFlags & 8;
+		bool isSteamShotEffect = item.TriggerFlags != 0;
 		if (isSteamShotEffect)
 		{
 			bool renderNormalSmoke = false;
