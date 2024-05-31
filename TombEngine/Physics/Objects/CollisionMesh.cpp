@@ -171,6 +171,14 @@ namespace TEN::Physics
 		return std::nullopt;
 	}
 
+	void CollisionMesh::Bvh::DrawDebug() const
+	{
+		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
+
+		for (const auto& node : _nodes)
+			g_Renderer.AddDebugBox(node.Aabb, BOX_COLOR);
+	}
+
 	CollisionMesh::CollisionMesh(const std::vector<CollisionTriangle>& tris)
 	{
 		_triangles = tris;
@@ -234,6 +242,6 @@ namespace TEN::Physics
 		for (const auto& tri : _triangles)
 			tri.DrawDebug(_vertices);
 
-		//StaticBoundingVolumeHierarchy::DrawDebug();
+		_bvh.DrawDebug();
 	}
 }

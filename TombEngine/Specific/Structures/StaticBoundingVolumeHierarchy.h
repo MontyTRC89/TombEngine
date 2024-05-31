@@ -26,10 +26,6 @@ namespace TEN::Structures
 		StaticBoundingVolumeHierarchy() = default;
 		StaticBoundingVolumeHierarchy(const std::vector<int>& ids, const std::vector<BoundingBox>& aabbs);
 
-		// Debug
-
-		void DrawDebug() const;
-
 	protected:
 		int Generate(const std::vector<int>& ids, const std::vector<BoundingBox>& aabbs, int start, int end);
 	};

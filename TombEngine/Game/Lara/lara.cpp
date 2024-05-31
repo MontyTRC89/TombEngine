@@ -155,8 +155,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		//bridge.Initialize(item2);
 
 		auto labelPos = g_Renderer.Get2DPosition(item2.Pose.Position.ToVector3());
-		if (labelPos.has_value())
-			g_Renderer.AddDebugString(std::to_string(item2.Index), *labelPos, Color(1,1,1), 1, 0, RendererDebugPage::None);
+		//if (labelPos.has_value())
+		//	g_Renderer.AddDebugString(std::to_string(item2.Index), *labelPos, Color(1,1,1), 1, 0, RendererDebugPage::None);
 	}
 
 	//UpdateBridgeItem(g_Level.Items[43]);
@@ -164,7 +164,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	//for (auto& sector : room.floor)
 	//	g_Renderer.AddDebugBox(sector.Aabb, Color(1, 1, 1));
 	
-	//room.CollisionMesh.DrawDebug();
+	room.CollisionMesh.DrawDebug();
 
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);
 	//g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));

@@ -19,14 +19,6 @@ namespace TEN::Structures
 		Generate(ids, aabbs, 0, (int)ids.size());
 	}
 
-	void StaticBoundingVolumeHierarchy::DrawDebug() const
-	{
-		constexpr auto BOX_COLOR = Color(1.0f, 0.0f, 1.0f);
-
-		for (const auto& node : _nodes)
-			g_Renderer.AddDebugBox(node.Aabb, BOX_COLOR);
-	}
-
 	int StaticBoundingVolumeHierarchy::Generate(const std::vector<int>& ids, const std::vector<BoundingBox>& aabbs, int start, int end)
 	{
 		constexpr auto ID_COUNT_PER_LEAF_MAX = 4;

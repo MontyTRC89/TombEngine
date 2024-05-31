@@ -63,6 +63,10 @@ namespace TEN::Physics
 			std::optional<CollisionMeshCollisionData> GetCollision(const Ray& ray, float dist,
 																   const std::vector<CollisionTriangle>& tris,
 																   const std::vector<Vector3>& vertices) const;
+
+			// Debug
+
+			void DrawDebug() const;
 		};
 
 		// Members
