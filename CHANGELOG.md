@@ -16,6 +16,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Ember emitter crashing when ocb is between -1 and -10 
 * Fixed Electric cleaner and Squishy block not detecting collision with certain block heights.
 * Fixed Squishy blocks crashing the level.
+* Fixed the path finding zones of Larson and Pierre.
+* Fixed the torch flame delay in disappearing when Lara threw or dropped the torch object.
 
 ### Features/Amendments
 
