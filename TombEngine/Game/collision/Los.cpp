@@ -260,13 +260,13 @@ namespace TEN::Collision::Los
 		// Calculate next intersection.
 		auto nextIntersect = Vector3(
 			(((pos.x + ((posStep.x > 0) ? BLOCK(1) : 0)) - ray.position.x) / ray.direction.x),
-			BLOCK(4096),
+			0.0f,
 			(((pos.z + ((posStep.z > 0) ? BLOCK(1) : 0)) - ray.position.z) / ray.direction.z));
 
 		// Calculate ray step.
 		auto rayStep = Vector3(
 			BLOCK(1) / abs(ray.direction.x),
-			BLOCK(4096),
+			0.0f,
 			BLOCK(1) / abs(ray.direction.z));
 
 		// Traverse sectors and fill trace.
@@ -289,10 +289,6 @@ namespace TEN::Collision::Los
 				currentDist = nextIntersect.z;
 				nextIntersect.z += rayStep.z;
 			}
-
-			// Terminate if max distance exceeded.
-			if (currentDist > dist)
-				break;
 		}
 
 		return sectorTrace;
