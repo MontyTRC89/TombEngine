@@ -247,9 +247,9 @@ namespace TEN::Collision::Los
 
 		// Calculate sector position.
 		auto pos = Vector3(
-			BLOCK(floor(ray.position.x / BLOCK(1))),
+			FloorToStep(ray.position.x, BLOCK(1)),
 			0.0f,
-			BLOCK(floor(ray.position.z / BLOCK(1))));
+			FloorToStep(ray.position.z, BLOCK(1)));
 
 		// Calculate sector position step.
 		auto posStep = Vector3(
