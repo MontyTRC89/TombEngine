@@ -34,6 +34,14 @@ namespace TEN::Collision::Los
 
 	static std::vector<ItemInfo*> GetNearbyMoveables(const std::vector<int>& roomNumbers)
 	{
+		// Collect neighbor room numbers.
+		auto neighborRoomNumbers = std::set<int>{};
+		for (int roomNumber : roomNumbers)
+		{
+			const auto& room = g_Level.Rooms[roomNumber];
+			neighborRoomNumbers.insert(room.neighbors.begin(), room.neighbors.end());
+		}
+
 		// Collect moveables.
 		auto movs = std::vector<ItemInfo*>{};
 		for (int movID = 0; movID < g_Level.NumItems; movID++)
@@ -44,15 +52,13 @@ namespace TEN::Collision::Los
 			if (mov.Status == ItemStatus::ITEM_INVISIBLE || mov.Status == ItemStatus::ITEM_DEACTIVATED)
 				continue;
 
-			// TODO: Must check roomNumbers vector.
-			
 			// 2) Check if room is active.
 			const auto& room = g_Level.Rooms[mov.RoomNumber];
 			if (!room.Active())
 				continue;
 
 			// 3) Test if moveable is in nearby room.
-			if (!Contains(room.neighbors, (int)mov.RoomNumber))
+			if (!Contains(neighborRoomNumbers, (int)mov.RoomNumber))
 				continue;
 
 			movs.push_back(&mov);
