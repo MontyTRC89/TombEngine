@@ -259,9 +259,9 @@ namespace TEN::Collision::Los
 
 		// Calculate next intersection.
 		auto nextIntersect = Vector3(
-			(((pos.x + ((posStep.x > 0) ? BLOCK(1) : 0)) - ray.position.x) / ray.direction.x),
+			((pos.x + ((posStep.x > 0) ? BLOCK(1) : 0)) - ray.position.x) / ray.direction.x,
 			0.0f,
-			(((pos.z + ((posStep.z > 0) ? BLOCK(1) : 0)) - ray.position.z) / ray.direction.z));
+			((pos.z + ((posStep.z > 0) ? BLOCK(1) : 0)) - ray.position.z) / ray.direction.z);
 
 		// Calculate ray step.
 		auto rayStep = Vector3(
