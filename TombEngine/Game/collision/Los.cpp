@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/collision/Los.h"
 
+#include "Game/collision/floordata.h"
 #include "Game/collision/Point.h"
 #include "Game/collision/sphere.h"
 #include "Game/items.h"
@@ -12,6 +13,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 using namespace TEN::Physics;
@@ -20,35 +22,14 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Los
 {
-	struct SectorTraceData
-	{
-		struct InterceptData
-		{
-			const FloorInfo* Sector	  = nullptr;
-			float			 Distance = 0.0f;
-		};
-
-		std::vector<InterceptData> Intercepts = {};
-
-		void Sort()
-		{
-			std::sort(
-				Intercepts.begin(), Intercepts.end(),
-				[](const InterceptData& intercept0, const InterceptData& intercept1)
-				{
-					return (intercept0.Distance < intercept1.Distance);
-				});
-		}
-	};
-
 	struct RoomTraceData
 	{
 		const CollisionTriangle* Triangle	 = nullptr;
 		Vector3					 Position	 = Vector3::Zero;
 		int						 RoomNumber	 = 0;
-		std::vector<int>		 RoomNumbers = {};
 
-		bool IsIntersected = false;
+		bool			 IsIntersected = false;
+		std::vector<int> RoomNumbers   = {};
 	};
 
 	static std::vector<ItemInfo*> GetNearbyMoveables(const std::vector<int>& roomNumbers)
@@ -251,25 +232,63 @@ namespace TEN::Collision::Los
 		// 5) Return sorted LOS collision data.
 		return losColl;
 	}
-	
-	static SectorTraceData GetSectorTrace(const Ray& ray, int roomNumber, float dist)
-	{
-		auto sectorTrace = SectorTraceData{};
 
-		// 1) Collect sector intercepts.
-		float sectorSearchDepth = ceil(dist / BLOCK(1));
-		auto sectors = GetNeighborSectors(ray.position, roomNumber, sectorSearchDepth, false);
-		for (const auto& sector : sectors)
+	static std::vector<const FloorInfo*> GetSectorTrace(const Ray& ray, int roomNumber, float dist)
+	{
+		// Reserve minimum sector trace size.
+		auto sectorTrace = std::vector<const FloorInfo*>{};
+		sectorTrace.reserve(int(dist / BLOCK(1)) + 1);
+
+		// Calculate sector position.
+		auto pos = Vector3(
+			floor(ray.position.x / BLOCK(1)) * BLOCK(1),
+			0.0f,
+			floor(ray.position.z / BLOCK(1)) * BLOCK(1));
+
+		// Calculate sector position step.
+		auto posStep = Vector3(
+			(ray.direction.x > 0) ? BLOCK(1) : -BLOCK(1),
+			0.0f,
+			(ray.direction.z > 0) ? BLOCK(1) : -BLOCK(1));
+
+		// Calculate next intersection.
+		auto nextIntersect = Vector3(
+			(((pos.x + ((posStep.x > 0) ? BLOCK(1) : 0)) - ray.position.x) / ray.direction.x),
+			BLOCK(4096),
+			(((pos.z + ((posStep.z > 0) ? BLOCK(1) : 0)) - ray.position.z) / ray.direction.z));
+
+		// Calculate ray step.
+		auto rayStep = Vector3(
+			BLOCK(1) / abs(ray.direction.x),
+			BLOCK(4096),
+			BLOCK(1) / abs(ray.direction.z));
+
+		// Traverse sectors and fill trace.
+		float currentDist = 0.0f;
+		while (currentDist <= dist)
 		{
-			float intersectDist = 0.0f;
-			if (ray.Intersects(sector->Aabb, intersectDist) && intersectDist <= dist)
-				sectorTrace.Intercepts.push_back(SectorTraceData::InterceptData{ sector, intersectDist });
+			const auto& sector = GetFloor(roomNumber, GetRoomGridCoord(roomNumber, pos.x, pos.z));
+			sectorTrace.push_back(&sector);
+
+			// Determine which axis to step along.
+			if (nextIntersect.x < nextIntersect.z)
+			{
+				pos.x += posStep.x;
+				currentDist = nextIntersect.x;
+				nextIntersect.x += rayStep.x;
+			}
+			else
+			{
+				pos.z += posStep.z;
+				currentDist = nextIntersect.z;
+				nextIntersect.z += rayStep.z;
+			}
+
+			// Terminate if max distance exceeded.
+			if (currentDist > dist)
+				break;
 		}
 
-		// 2) Sort intercepts.
-		sectorTrace.Sort();
-
-		// 3) Return sector trace.
 		return sectorTrace;
 	}
 
@@ -303,12 +322,12 @@ namespace TEN::Collision::Los
 				auto visitedBridgeMovIds = std::set<int>{};
 				bool hasBridge = false;
 
-				// Run through intercepts in sector trace.
+				// Run through sector trace.
 				auto sectorTrace = GetSectorTrace(ray, rayRoomNumber, closestDist);
-				for (const auto& intercept : sectorTrace.Intercepts)
+				for (const auto* sector : sectorTrace)
 				{
 					// Run through bridges in sector.
-					for (int bridgeMovID : intercept.Sector->BridgeItemNumbers)
+					for (int bridgeMovID : sector->BridgeItemNumbers)
 					{
 						// Check if bridge was already visited.
 						if (Contains(visitedBridgeMovIds, bridgeMovID))

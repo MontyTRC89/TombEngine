@@ -77,6 +77,7 @@ private:
 struct CAMERA_INFO
 {
 	// Camera sphere
+
 	Vector3 Position		 = Vector3::Zero;
 	int		RoomNumber		 = 0;
 	Vector3 LookAt			 = Vector3::Zero;

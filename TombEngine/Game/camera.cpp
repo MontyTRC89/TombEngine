@@ -37,7 +37,7 @@ using TEN::Renderer::g_Renderer;
 constexpr auto CAMERA_OBJECT_COLL_DIST_THRESHOLD   = BLOCK(4);
 constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
-struct CameraLosCollision
+struct CameraLosCollisionData
 {
 	std::pair<Vector3, int> Position = {};
 	std::optional<Vector3>	Normal	 = std::nullopt;
@@ -149,7 +149,7 @@ static bool TestCameraCollidableStatic(const MESH_INFO& staticObj)
 	return true;
 }
 
-static CameraLosCollision GetCameraLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
+static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
 {
 	constexpr auto DIST_BUFFER = BLOCK(0.1f);
 
@@ -160,7 +160,7 @@ static CameraLosCollision GetCameraLos(const Vector3& origin, int originRoomNumb
 	auto losColl = GetLosCollision(origin, originRoomNumber, dir, dist, true, false, true);
 
 	// 1) Clip room LOS collision.
-	auto cameraLosColl = CameraLosCollision{};
+	auto cameraLosColl = CameraLosCollisionData{};
 	cameraLosColl.Normal = (losColl.Room.Triangle != nullptr) ? losColl.Room.Triangle->GetNormal() : std::optional<Vector3>();
 	cameraLosColl.Position = std::pair(losColl.Room.Position, losColl.Room.RoomNumber);
 	cameraLosColl.IsIntersected = losColl.Room.IsIntersected;
