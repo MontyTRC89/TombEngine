@@ -112,8 +112,8 @@ namespace TEN::Effects::SmokeEmitter
 		if (currentAcceleration == 4096)
 			acceleration = Random::GenerateInt(2048, 4095);
 
-		int pitchAngle = item.Pose.Orientation.x + ANGLE(180);
-		int yawAngle = item.Pose.Orientation.y;
+		int pitchAngle = item.Pose.Orientation.x;
+		int yawAngle = item.Pose.Orientation.y + ANGLE(180);
 
 		Vector3 dir;
 		dir.x = phd_cos(pitchAngle) * phd_sin(yawAngle);
@@ -257,7 +257,7 @@ namespace TEN::Effects::SmokeEmitter
 	void InitializeSmokeEmitter(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-
+		
 		bool isUnderwater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
 		bool isSteamShotEffect = item.TriggerFlags != 0;
 
