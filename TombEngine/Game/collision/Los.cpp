@@ -22,16 +22,6 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Los
 {
-	struct RoomTraceData
-	{
-		const CollisionTriangle* Triangle	 = nullptr;
-		Vector3					 Position	 = Vector3::Zero;
-		int						 RoomNumber	 = 0;
-
-		bool			 IsIntersected = false;
-		std::vector<int> RoomNumbers   = {};
-	};
-
 	static std::vector<ItemInfo*> GetNearbyMoveables(const std::vector<int>& roomNumbers)
 	{
 		// Collect neighbor room numbers.
@@ -104,7 +94,7 @@ namespace TEN::Collision::Los
 		if (dir == Vector3::Zero)
 		{
 			TENLog("GetLosCollision(): dir is not a unit vector.", LogLevel::Warning);
-			return LosCollisionData{ RoomLosCollisionData{ nullptr, origin, roomNumber, {}, false, 0.0f }, {}, {}, {} };
+			return LosCollisionData{ RoomLosCollisionData{ nullptr, origin, roomNumber, false, {}, 0.0f }, {}, {}, {} };
 		}
 
 		auto losColl = LosCollisionData{};
@@ -242,7 +232,7 @@ namespace TEN::Collision::Los
 		return losColl;
 	}
 
-	static std::vector<const FloorInfo*> GetSectorTrace(const Ray& ray, int roomNumber, float dist)
+	static std::vector<const FloorInfo*> GetTracedSectors(const Ray& ray, int roomNumber, float dist)
 	{
 		// Reserve minimum sector trace size.
 		auto sectorTrace = std::vector<const FloorInfo*>{};
@@ -297,16 +287,23 @@ namespace TEN::Collision::Los
 		return sectorTrace;
 	}
 
-	static RoomTraceData GetRoomTrace(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
+	RoomLosCollisionData GetRoomLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
-		auto roomTrace = RoomTraceData{};
+		// FAILSAFE.
+		if (dir == Vector3::Zero)
+		{
+			TENLog("GetRoomLosCollision(): Direction is not a unit vector.", LogLevel::Warning);
+			return RoomLosCollisionData{ {}, origin, roomNumber, false, {}, 0.0f };
+		}
+
+		auto roomLosColl = RoomLosCollisionData{};
 
 		// 1) Initialize ray.
 		auto ray = Ray(origin, dir);
 		int rayRoomNumber = roomNumber;
 		float rayDist = dist;
 
-		// 2) Fill room trace.
+		// 2) Trace rooms through portals.
 		while (true)
 		{
 			const CollisionTriangle* closestTri = nullptr;
@@ -327,9 +324,9 @@ namespace TEN::Collision::Los
 				auto visitedBridgeMovIds = std::set<int>{};
 				bool hasBridge = false;
 
-				// Run through sector trace.
-				auto sectorTrace = GetSectorTrace(ray, rayRoomNumber, closestDist);
-				for (const auto* sector : sectorTrace)
+				// Run through traced sectors.
+				auto sectors = GetTracedSectors(ray, rayRoomNumber, closestDist);
+				for (const auto* sector : sectors)
 				{
 					// Run through bridges in sector.
 					for (int bridgeMovID : sector->BridgeItemNumbers)
@@ -362,9 +359,9 @@ namespace TEN::Collision::Los
 			}
 
 			// 2.4) Collect room number.
-			roomTrace.RoomNumbers.push_back(rayRoomNumber);
+			roomLosColl.RoomNumbers.push_back(rayRoomNumber);
 
-			// 2.3) Return room trace or retrace new room from portal.
+			// 2.3) Return room LOS collision or retrace from new room at portal.
 			if (closestTri != nullptr)
 			{
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
@@ -377,58 +374,32 @@ namespace TEN::Collision::Los
 					rayRoomNumber = closestTri->GetPortalRoomNumber();
 					rayDist -= closestDist;
 				}
-				// Tangible triangle; collect remaining room trace data.
+				// Tangible triangle; collect remaining room LOS collision data.
 				else
 				{
 					if (closestTri->IsPortal())
-						TENLog("GetRoomTrace(): Room portal cannot link back to itself.", LogLevel::Warning);
+						TENLog("GetRoomLosCollision(): Room portal cannot link back to itself.", LogLevel::Warning);
 
-					roomTrace.Triangle = closestTri;
-					roomTrace.Position = intersectPos;
-					roomTrace.RoomNumber = rayRoomNumber;
-					roomTrace.IsIntersected = true;
-					return roomTrace;
+					roomLosColl.Triangle = closestTri;
+					roomLosColl.Position = intersectPos;
+					roomLosColl.RoomNumber = rayRoomNumber;
+					roomLosColl.IsIntersected = true;
+					roomLosColl.Distance = Vector3::Distance(origin, intersectPos);
+					return roomLosColl;
 				}
 			}
 			else
 			{
-				roomTrace.Triangle = nullptr;
-				roomTrace.Position = Geometry::TranslatePoint(ray.position, ray.direction, rayDist);
-				roomTrace.RoomNumber = rayRoomNumber;
-				roomTrace.IsIntersected = false;
-				return roomTrace;
+				roomLosColl.Triangle = nullptr;
+				roomLosColl.Position = Geometry::TranslatePoint(ray.position, ray.direction, rayDist);
+				roomLosColl.RoomNumber = rayRoomNumber;
+				roomLosColl.IsIntersected = false;
+				roomLosColl.Distance = dist;
+				return roomLosColl;
 			}
 		}
 
 		// FAILSAFE.
-		return roomTrace;
-	}
-
-	RoomLosCollisionData GetRoomLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
-	{
-		// FAILSAFE.
-		if (dir == Vector3::Zero)
-		{
-			TENLog("GetRoomLosCollision(): Direction is not a unit vector.", LogLevel::Warning);
-			return RoomLosCollisionData{ {}, origin, roomNumber, {}, false, 0.0f };
-		}
-
-		// Get room trace.
-		auto roomTrace = GetRoomTrace(origin, roomNumber, dir, dist, collideBridges);
-
-		// Calculate position data.
-		float losDist = roomTrace.IsIntersected ? Vector3::Distance(origin, roomTrace.Position) : dist;
-		auto losPos = Geometry::TranslatePoint(origin, dir, losDist);
-		int losRoomNumber = roomTrace.RoomNumber;
-
-		// Create and return room LOS collision.
-		auto roomLosColl = RoomLosCollisionData{};
-		roomLosColl.Triangle = roomTrace.Triangle;
-		roomLosColl.Position = losPos;
-		roomLosColl.RoomNumber = losRoomNumber;
-		roomLosColl.RoomNumbers = roomTrace.RoomNumbers;
-		roomLosColl.IsIntersected = roomTrace.IsIntersected;
-		roomLosColl.Distance = losDist;
 		return roomLosColl;
 	}
 
