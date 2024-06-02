@@ -98,12 +98,12 @@ namespace TEN::Collision::Los
 	}
 	
 	LosCollisionData GetLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist,
-								 bool collideMoveables, bool collideSpheres, bool collideStatics)
+									 bool collideMoveables, bool collideSpheres, bool collideStatics)
 	{
 		// FAILSAFE.
 		if (dir == Vector3::Zero)
 		{
-			TENLog("GetLos(): dir is not a unit vector.", LogLevel::Warning);
+			TENLog("GetLosCollision(): dir is not a unit vector.", LogLevel::Warning);
 			return LosCollisionData{ RoomLosCollisionData{ nullptr, origin, roomNumber, {}, false, 0.0f }, {}, {}, {} };
 		}
 
@@ -113,8 +113,10 @@ namespace TEN::Collision::Los
 		losColl.Room = GetRoomLosCollision(origin, roomNumber, dir, dist);
 		dist = losColl.Room.Distance;
 
+		// 2) Collect moveable and sphere LOS collisions.
 		if (collideMoveables || collideSpheres)
 		{
+			// Run through nearby moveables.
 			auto movs = GetNearbyMoveables(losColl.Room.RoomNumbers);
 			for (auto* mov : movs)
 			{
@@ -130,7 +132,7 @@ namespace TEN::Collision::Los
 				if (mov->IsBridge())
 					continue;
 
-				// 2) Collect moveable LOS collisions.
+				// 2.1) Collect moveable LOS collisions.
 				if (collideMoveables)
 				{
 					auto box = mov->GetObb();
@@ -152,7 +154,7 @@ namespace TEN::Collision::Los
 					}
 				}
 
-				// 3) Collect moveable sphere LOS collisions.
+				// 2.2) Collect moveable sphere LOS collisions.
 				if (collideSpheres)
 				{
 					int sphereCount = GetSpheres(mov, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
@@ -180,7 +182,7 @@ namespace TEN::Collision::Los
 				}
 			}
 
-			// Sort moveable LOS collisions.
+			// 2.3) Sort moveable LOS collisions.
 			std::sort(
 				losColl.Moveables.begin(), losColl.Moveables.end(),
 				[](const auto& movLos0, const auto& movLos1)
@@ -188,7 +190,7 @@ namespace TEN::Collision::Los
 					return (movLos0.Distance < movLos1.Distance);
 				});
 
-			// Sort moveable sphere LOS collisions.
+			// 2.4) Sort sphere LOS collisions.
 			std::sort(
 				losColl.Spheres.begin(), losColl.Spheres.end(),
 				[](const auto& sphereLos0, const auto& sphereLos1)
@@ -197,9 +199,10 @@ namespace TEN::Collision::Los
 				});
 		}
 
-		// 4) Collect static LOS collisions.
+		// 3) Collect static LOS collisions.
 		if (collideStatics)
 		{
+			// Run through nearby statics.
 			auto statics = GetNearbyStatics(losColl.Room.RoomNumbers);
 			for (auto* staticObj : statics)
 			{
@@ -226,7 +229,7 @@ namespace TEN::Collision::Los
 				}
 			}
 
-			// Sort static LOS collisions.
+			// 3.1) Sort static LOS collisions.
 			std::sort(
 				losColl.Statics.begin(), losColl.Statics.end(),
 				[](const auto& staticLos0, const auto& staticLos1)
@@ -235,7 +238,7 @@ namespace TEN::Collision::Los
 				});
 		}
 
-		// 5) Return sorted LOS collision data.
+		// 4) Return sorted LOS collision data.
 		return losColl;
 	}
 
@@ -406,7 +409,7 @@ namespace TEN::Collision::Los
 		// FAILSAFE.
 		if (dir == Vector3::Zero)
 		{
-			TENLog("GetRoomLos(): Direction is not a unit vector.", LogLevel::Warning);
+			TENLog("GetRoomLosCollision(): Direction is not a unit vector.", LogLevel::Warning);
 			return RoomLosCollisionData{ {}, origin, roomNumber, {}, false, 0.0f };
 		}
 
