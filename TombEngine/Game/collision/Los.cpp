@@ -200,7 +200,7 @@ namespace TEN::Collision::Los
 				if (!(staticObj->flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
-				auto box = staticObj->GetBox();
+				auto box = staticObj->GetObb();
 
 				float intersectDist = 0.0f;
 				if (box.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
@@ -234,9 +234,9 @@ namespace TEN::Collision::Los
 
 	static std::vector<const FloorInfo*> GetTracedSectors(const Ray& ray, int roomNumber, float dist)
 	{
-		// Reserve minimum sector trace size.
-		auto sectorTrace = std::vector<const FloorInfo*>{};
-		sectorTrace.reserve(int(dist / BLOCK(1)) + 1);
+		// Reserve minimum sector vector size.
+		auto sectors = std::vector<const FloorInfo*>{};
+		sectors.reserve(int(dist / BLOCK(1)) + 1);
 
 		// Calculate sector position.
 		auto pos = Vector3(
@@ -262,14 +262,14 @@ namespace TEN::Collision::Los
 			0.0f,
 			BLOCK(1) / abs(ray.direction.z));
 
-		// Traverse sectors and fill trace.
+		// Traverse and collect sectors.
 		float currentDist = 0.0f;
 		while (currentDist <= dist)
 		{
 			const auto& sector = GetFloor(roomNumber, GetRoomGridCoord(roomNumber, pos.x, pos.z));
-			sectorTrace.push_back(&sector);
+			sectors.push_back(&sector);
 
-			// Determine which axis to step along.
+			// Determine axis to step along.
 			if (nextIntersect.x < nextIntersect.z)
 			{
 				pos.x += posStep.x;
@@ -284,7 +284,7 @@ namespace TEN::Collision::Los
 			}
 		}
 
-		return sectorTrace;
+		return sectors;
 	}
 
 	RoomLosCollisionData GetRoomLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
