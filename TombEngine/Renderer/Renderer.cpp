@@ -99,7 +99,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < 6; i++)
 		{
 			auto renderView = RenderView(pos, RenderTargetCube::forwardVectors[i], RenderTargetCube::upVectors[i],
-			                             dest.Resolution, dest.Resolution, Camera.RoomNumber, 10, 20480,
+			                             dest.Resolution, dest.Resolution, g_Camera.RoomNumber, 10, 20480,
 			                             90 * RADIAN);  
 			//RenderSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
 			_context->ClearState();

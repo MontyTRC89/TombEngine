@@ -81,15 +81,15 @@ void TrainControl(short itemNumber)
 		if (item->ItemFlags[1] < 0)
 			item->ItemFlags[1] = 0;
 
-		if (!Camera.UseForcedFixedCamera)
+		if (!g_Camera.UseForcedFixedCamera)
 		{
-			Camera.ForcedFixedCamera.x = item->Pose.Position.x + BLOCK(8) * sinY;
-			Camera.ForcedFixedCamera.z = item->Pose.Position.z + BLOCK(8) * cosY;
+			g_Camera.ForcedFixedCamera.x = item->Pose.Position.x + BLOCK(8) * sinY;
+			g_Camera.ForcedFixedCamera.z = item->Pose.Position.z + BLOCK(8) * cosY;
 
-			Camera.ForcedFixedCamera.y = GetPointCollision(Vector3i(Camera.ForcedFixedCamera.x, item->Pose.Position.y - CLICK(2), Camera.ForcedFixedCamera.z), item->RoomNumber).GetFloorHeight();
+			g_Camera.ForcedFixedCamera.y = GetPointCollision(Vector3i(g_Camera.ForcedFixedCamera.x, item->Pose.Position.y - CLICK(2), g_Camera.ForcedFixedCamera.z), item->RoomNumber).GetFloorHeight();
 
-			Camera.ForcedFixedCamera.RoomNumber = roomNumber;
-			Camera.UseForcedFixedCamera = true;
+			g_Camera.ForcedFixedCamera.RoomNumber = roomNumber;
+			g_Camera.UseForcedFixedCamera = true;
 		}
 	}
 	else

@@ -911,8 +911,8 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->HitPoints > 0)
 				SyncVehicleAnimation(*rBoatItem, *laraItem);
 
-			Camera.targetElevation = -ANGLE(20.0f);
-			Camera.targetDistance = BLOCK(2);
+			g_Camera.targetElevation = -ANGLE(20.0f);
+			g_Camera.targetDistance = BLOCK(2);
 		}
 		else
 		{

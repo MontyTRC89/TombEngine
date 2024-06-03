@@ -129,7 +129,7 @@ void InitializeGameFlags()
 
 	FlipEffect = -1;
 	FlipStatus = false;
-	Camera.underwater = false;
+	g_Camera.underwater = false;
 }
 
 void InitializeSpecialEffects()

@@ -278,17 +278,17 @@ void RefreshCamera(short type, short* data)
 		case TO_CAMERA:
 			data++;
 
-			if (value == Camera.last)
+			if (value == g_Camera.last)
 			{
-				Camera.number = value;
+				g_Camera.number = value;
 
-				if ((Camera.timer < 0) || (Camera.type == CameraType::Look) || (Camera.type == CameraType::Combat))
+				if ((g_Camera.timer < 0) || (g_Camera.type == CameraType::Look) || (g_Camera.type == CameraType::Combat))
 				{
-					Camera.timer = -1;
+					g_Camera.timer = -1;
 					targetOk = 0;
 					break;
 				}
-				Camera.type = CameraType::Fixed;
+				g_Camera.type = CameraType::Fixed;
 				targetOk = 1;
 			}
 			else
@@ -297,20 +297,20 @@ void RefreshCamera(short type, short* data)
 			break;
 
 		case TO_TARGET:
-			if (Camera.type == CameraType::Look || Camera.type == CameraType::Combat)
+			if (g_Camera.type == CameraType::Look || g_Camera.type == CameraType::Combat)
 				break;
 
-			Camera.item = &g_Level.Items[value];
+			g_Camera.item = &g_Level.Items[value];
 			break;
 		}
 	} while (!(trigger & END_BIT));
 
-	if (Camera.item)
-		if (!targetOk || (targetOk == 2 && Camera.item->LookedAt && Camera.item != Camera.lastItem))
-			Camera.item = nullptr;
+	if (g_Camera.item)
+		if (!targetOk || (targetOk == 2 && g_Camera.item->LookedAt && g_Camera.item != g_Camera.lastItem))
+			g_Camera.item = nullptr;
 
-	if (Camera.number == NO_VALUE && Camera.timer > 0)
-		Camera.timer = NO_VALUE;
+	if (g_Camera.number == NO_VALUE && g_Camera.timer > 0)
+		g_Camera.timer = NO_VALUE;
 }
 
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
@@ -417,7 +417,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 	short flags = *(data++);
 	short timer = flags & TIMER_BITS;
 
-	if (Camera.type != CameraType::Heavy)
+	if (g_Camera.type != CameraType::Heavy)
 		RefreshCamera(triggerType, data);
 
 	short value = 0;
@@ -641,9 +641,9 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			if (g_Level.Cameras[value].Flags & ONESHOT)
 				break;
 
-			Camera.number = value;
+			g_Camera.number = value;
 
-			if (Camera.type == CameraType::Look || Camera.type == CameraType::Combat && !(g_Level.Cameras[value].Flags & 3))
+			if (g_Camera.type == CameraType::Look || g_Camera.type == CameraType::Combat && !(g_Level.Cameras[value].Flags & 3))
 				break;
 
 			if (triggerType == TRIGGER_TYPES::COMBAT)
@@ -652,12 +652,12 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			if (switchOff)
 				break;
 
-			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
+			if (g_Camera.number != g_Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
 			{
-				Camera.timer = (trigger & TIMER_BITS) * FPS;
-				Camera.type = heavy ? CameraType::Heavy : CameraType::Fixed;
+				g_Camera.timer = (trigger & TIMER_BITS) * FPS;
+				g_Camera.type = heavy ? CameraType::Heavy : CameraType::Fixed;
 				if (trigger & ONESHOT)
-					g_Level.Cameras[Camera.number].Flags |= ONESHOT;
+					g_Level.Cameras[g_Camera.number].Flags |= ONESHOT;
 			}
 			break;
 
@@ -822,8 +822,8 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 
 	} while (!(trigger & END_BIT));
 
-	if (cameraItem && (Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
-		Camera.item = cameraItem;
+	if (cameraItem && (g_Camera.type == CameraType::Fixed || g_Camera.type == CameraType::Heavy))
+		g_Camera.item = cameraItem;
 
 	if (flip != NO_VALUE)
 		DoFlipMap(flip);

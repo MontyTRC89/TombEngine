@@ -327,6 +327,6 @@ void lara_as_surface_climb_out(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.flags = CameraFlag::FollowCenter;
-	Camera.laraNode = LM_HIPS;	// Forces the camera to follow Lara instead of snapping.
+	g_Camera.flags = CameraFlag::FollowCenter;
+	g_Camera.laraNode = LM_HIPS;	// Forces the camera to follow Lara instead of snapping.
 }

@@ -165,7 +165,7 @@ bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float
 	if (condition != SoundEnvironment::Always)
 	{
 		// Get current camera room's environment
-		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.RoomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
+		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, g_Camera.RoomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
 
 		// Don't play effect if effect's environment isn't the same as camera position's environment
 		if (condition != cameraCondition)
@@ -711,7 +711,7 @@ int Sound_GetFreeSlot()
 
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
-		float dist = Vector3(SoundSlot[i].Origin - Camera.ListenerPosition).Length();
+		float dist = Vector3(SoundSlot[i].Origin - g_Camera.ListenerPosition).Length();
 		if (dist > distMin)
 		{
 			distMin = dist;
@@ -793,7 +793,7 @@ float Sound_DistanceToListener(Pose *position)
 }
 float Sound_DistanceToListener(Vector3 position)
 {
-	return Vector3(Camera.ListenerPosition - position).Length();
+	return Vector3(g_Camera.ListenerPosition - position).Length();
 }
 
 // Calculate attenuated volume.
@@ -875,7 +875,7 @@ void Sound_UpdateScene()
 	// Apply environmental effects
 
 	static int currentReverb = -1;
-	auto roomReverb = g_Configuration.EnableReverb ? (int)g_Level.Rooms[Camera.RoomNumber].reverbType : (int)ReverbType::Small;
+	auto roomReverb = g_Configuration.EnableReverb ? (int)g_Level.Rooms[g_Camera.RoomNumber].reverbType : (int)ReverbType::Small;
 
 	if (currentReverb == -1 || roomReverb != currentReverb)
 	{
@@ -922,12 +922,12 @@ void Sound_UpdateScene()
 
 	// Apply current listener position.
 
-	auto at = Camera.LookAt - Camera.ListenerPosition;
+	auto at = g_Camera.LookAt - g_Camera.ListenerPosition;
 	at.Normalize();
 	auto mikePos = BASS_3DVECTOR(					// Pos
-		Camera.ListenerPosition.x,
-		Camera.ListenerPosition.y,
-		Camera.ListenerPosition.z);
+		g_Camera.ListenerPosition.x,
+		g_Camera.ListenerPosition.y,
+		g_Camera.ListenerPosition.z);
 	auto laraVel = BASS_3DVECTOR(					// Vel
 		Lara.Context.WaterCurrentPull.x,
 		Lara.Context.WaterCurrentPull.y,

@@ -583,11 +583,11 @@ void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnim
 	player.ExtraAnim = 1;
 	player.HitDirection = -1;
 
-	Camera.RoomNumber = playerItem.RoomNumber;
-	Camera.flags = CameraFlag::FollowCenter;
-	Camera.targetAngle = ANGLE(170.0f);
-	Camera.targetElevation = ANGLE(-25.0f);
-	Camera.targetDistance = BLOCK(2);
+	g_Camera.RoomNumber = playerItem.RoomNumber;
+	g_Camera.flags = CameraFlag::FollowCenter;
+	g_Camera.targetAngle = ANGLE(170.0f);
+	g_Camera.targetElevation = ANGLE(-25.0f);
+	g_Camera.targetDistance = BLOCK(2);
 }
 
 short CreatureEffect2(ItemInfo* item, const CreatureBiteInfo& bite, short velocity, short angle, std::function<CreatureEffectFunction> func)
@@ -1087,7 +1087,7 @@ bool SearchLOT(LOTInfo* LOT, int depth)
 CreatureAIPriority GetCreatureLOTPriority(ItemInfo* item)
 {
 	auto itemPos = item->Pose.Position.ToVector3();
-	auto cameraPos = Camera.Position;
+	auto cameraPos = g_Camera.Position;
 
 	float distance = Vector3::Distance(itemPos, cameraPos) / BLOCK(1);
 	if (distance <= HIGH_PRIO_RANGE)

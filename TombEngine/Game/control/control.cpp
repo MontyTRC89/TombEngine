@@ -128,8 +128,8 @@ int DrawPhase(bool isTitle)
 	// Clear display sprites.
 	ClearDisplaySprites();
 
-	Camera.numberFrames = g_Renderer.Synchronize();
-	return Camera.numberFrames;
+	g_Camera.numberFrames = g_Renderer.Synchronize();
+	return g_Camera.numberFrames;
 }
 
 GameStatus ControlPhase(int numFrames)
@@ -146,7 +146,7 @@ GameStatus ControlPhase(int numFrames)
 	if (TrackCameraInit)
 	{
 		UseSpotCam = false;
-		SetFov(Camera.PrevFov);
+		SetFov(g_Camera.PrevFov);
 	}
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
@@ -513,8 +513,8 @@ void InitializeOrLoadGame(bool loadGame)
 	{
 		SaveGame::Load(g_GameFlow->SelectedSaveGame);
 
-		Camera.Position = LaraItem->Pose.Position.ToVector3() + Vector3(BLOCK(0.25f));
-		Camera.LookAt = LaraItem->Pose.Position.ToVector3();
+		g_Camera.Position = LaraItem->Pose.Position.ToVector3() + Vector3(BLOCK(0.25f));
+		g_Camera.LookAt = LaraItem->Pose.Position.ToVector3();
 
 		InitializeGame = false;
 

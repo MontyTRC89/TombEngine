@@ -505,7 +505,7 @@ static void SetPlayerOptics(ItemInfo* item)
 			player.Control.Look.IsUsingLasersight = true;
 			player.Inventory.IsBusy = true;
 
-			Camera.PrevBinocularCameraType = Camera.oldType;
+			g_Camera.PrevBinocularCameraType = g_Camera.oldType;
 			return;
 		}
 	}
@@ -522,9 +522,9 @@ static void SetPlayerOptics(ItemInfo* item)
 	player.Control.Look.IsUsingLasersight = false;
 	player.Inventory.IsBusy = false;
 
-	Camera.type = Camera.PrevBinocularCameraType;
-	Camera.bounce = 0;
-	SetFov(Camera.PrevFov);
+	g_Camera.type = g_Camera.PrevBinocularCameraType;
+	g_Camera.bounce = 0;
+	SetFov(g_Camera.PrevFov);
 }
 
 static short NormalizeLookAroundTurnRate(short turnRate, short opticRange)
@@ -549,7 +549,7 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	auto& player = GetLaraInfo(item);
 
 	// Set optics.
-	Camera.type = CameraType::Look;
+	g_Camera.type = CameraType::Look;
 	SetPlayerOptics(LaraItem);
 
 	bool isSlow = IsHeld(In::Walk);
@@ -2205,7 +2205,7 @@ void ResetPlayerLookAround(ItemInfo& item, float alpha)
 	player.Control.Look.Orientation = EulerAngles::Identity;
 	return;
 
-	if (Camera.type != CameraType::Look)
+	if (g_Camera.type != CameraType::Look)
 	{
 		player.ExtraHeadRot.Lerp(EulerAngles::Identity, alpha);
 

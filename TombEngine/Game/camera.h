@@ -174,7 +174,7 @@ struct ScreenEffectData
 	float CinematicBarsSpeed			 = 0.0f;
 };
 
-extern CameraInfo		Camera;
+extern CameraInfo		g_Camera;
 extern ScreenEffectData g_ScreenEffect;
 
 std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, int push, bool yFirst);

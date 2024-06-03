@@ -1280,7 +1280,7 @@ namespace TEN::Entities::Vehicles
 		AnimateItem(laraItem);
 		SyncVehicleAnimation(*motorbikeItem, *laraItem);
 
-		Camera.targetElevation = -ANGLE(30.0f);
+		g_Camera.targetElevation = -ANGLE(30.0f);
 
 		if (motorbike->Flags & MOTORBIKE_FLAG_FALLING)
 		{

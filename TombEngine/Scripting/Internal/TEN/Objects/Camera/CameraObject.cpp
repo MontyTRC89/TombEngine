@@ -132,10 +132,10 @@ void CameraObject::SetRoomNumber(short room)
 
 void CameraObject::PlayCamera(sol::optional<Moveable&> TargetObj)
 {
-	Camera.number = m_camera.Index;
-	Camera.type = CameraType::Fixed;
+	g_Camera.number = m_camera.Index;
+	g_Camera.type = CameraType::Fixed;
 
 	if (TargetObj.has_value()) //Otherwise, it will point to Lara by default.
-		Camera.item = &g_Level.Items[TargetObj.value().GetIndex()];
+		g_Camera.item = &g_Level.Items[TargetObj.value().GetIndex()];
 }
 

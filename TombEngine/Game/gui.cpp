@@ -736,13 +736,13 @@ namespace TEN::Gui
 				if (fromPauseMenu)
 				{
 					g_Renderer.RenderInventory();
-					Camera.numberFrames = g_Renderer.Synchronize();
+					g_Camera.numberFrames = g_Renderer.Synchronize();
 				}
 				else
 				{
 					g_Renderer.RenderTitle();
-					Camera.numberFrames = g_Renderer.Synchronize();
-					int numFrames = Camera.numberFrames;
+					g_Camera.numberFrames = g_Renderer.Synchronize();
+					int numFrames = g_Camera.numberFrames;
 					ControlPhase(numFrames);
 				}
 			}
@@ -2456,7 +2456,7 @@ namespace TEN::Gui
 				}
 				else
 				{
-					Camera.PrevBinocularCameraType = Camera.oldType;
+					g_Camera.PrevBinocularCameraType = g_Camera.oldType;
 				}
 
 				case ID_GRENADE_GUN_ITEM:
@@ -2530,7 +2530,7 @@ namespace TEN::Gui
 			}
 			else
 			{
-				Camera.PrevBinocularCameraType = Camera.oldType;
+				g_Camera.PrevBinocularCameraType = g_Camera.oldType;
 			}
 
 			InventoryItemChosen = NO_VALUE;
@@ -3592,7 +3592,7 @@ namespace TEN::Gui
 			SetInventoryMode(InventoryMode::InGame);
 
 		InitializeInventory(item);
-		Camera.numberFrames = 2;
+		g_Camera.numberFrames = 2;
 
 		bool exitLoop = false;
 		while (!exitLoop)
@@ -3670,7 +3670,7 @@ namespace TEN::Gui
 
 			SetEnterInventory(NO_VALUE);
 
-			Camera.numberFrames = g_Renderer.Synchronize();
+			g_Camera.numberFrames = g_Renderer.Synchronize();
 		}
 
 		LastInvItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
@@ -3679,7 +3679,7 @@ namespace TEN::Gui
 		if (ItemUsed)
 			UseItem(*item, InventoryObjectTable[LastInvItem].ObjectNumber);
 
-		SetFov(Camera.PrevFov);
+		SetFov(g_Camera.PrevFov);
 		ResumeAllSounds(SoundPauseMode::Inventory);
 
 		lara->Inventory.IsBusy = lara->Inventory.OldBusy;

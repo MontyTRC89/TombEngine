@@ -715,7 +715,7 @@ namespace TEN::Entities::TR4
 					auto lightColor = Color(1.0f, 0.4f, 0.2f);
 					TriggerDynamicLight(pos.ToVector3(), lightColor, 0.1f);
 
-					Camera.bounce = -128;
+					g_Camera.bounce = -128;
 
 					// Lara is climbing a ladder; shake her off.
 					if (/*Lara.Control.IsClimbingLadder &&*/ // TODO: Try with only this line and include hang shimmy states.

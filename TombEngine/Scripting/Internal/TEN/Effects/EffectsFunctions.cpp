@@ -305,7 +305,7 @@ namespace TEN::Scripting::Effects
 	static void Earthquake(TypeOrNil<int> strength)
 	{
 		int str = USE_IF_HAVE(int, strength, 100);
-		Camera.bounce = -str;
+		g_Camera.bounce = -str;
 	}
 
 	void Register(sol::state* state, sol::table& parent) 

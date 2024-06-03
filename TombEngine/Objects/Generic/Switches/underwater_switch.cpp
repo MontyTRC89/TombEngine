@@ -145,10 +145,10 @@ namespace TEN::Entities::Switches
 
 				AddActiveItem(itemNumber);
 
-				Camera.ForcedFixedCamera.x = switchItem->Pose.Position.x - BLOCK(1) * phd_sin(switchItem->Pose.Orientation.y + ANGLE(90.0f));
-				Camera.ForcedFixedCamera.y = switchItem->Pose.Position.y - BLOCK(1);
-				Camera.ForcedFixedCamera.z = switchItem->Pose.Position.z - BLOCK(1) * phd_cos(switchItem->Pose.Orientation.y + ANGLE(90.0f));
-				Camera.ForcedFixedCamera.RoomNumber = switchItem->RoomNumber;
+				g_Camera.ForcedFixedCamera.x = switchItem->Pose.Position.x - BLOCK(1) * phd_sin(switchItem->Pose.Orientation.y + ANGLE(90.0f));
+				g_Camera.ForcedFixedCamera.y = switchItem->Pose.Position.y - BLOCK(1);
+				g_Camera.ForcedFixedCamera.z = switchItem->Pose.Position.z - BLOCK(1) * phd_cos(switchItem->Pose.Orientation.y + ANGLE(90.0f));
+				g_Camera.ForcedFixedCamera.RoomNumber = switchItem->RoomNumber;
 			}
 		}
 	}

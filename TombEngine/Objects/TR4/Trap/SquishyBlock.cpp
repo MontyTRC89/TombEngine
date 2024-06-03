@@ -153,13 +153,13 @@ namespace TEN::Entities::Traps
 		if (velocity < MAX_FALLING_VELOCITY)
 		{
 			SoundEffect(SFX_TR4_EARTHQUAKE_LOOP, &item.Pose);
-			Camera.bounce = (velocity - 92) / 2;
+			g_Camera.bounce = (velocity - 92) / 2;
 			velocity++;
 		}
 		else
 		{
 			if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) == FALLING_BLOCK_IMPACT_FRAME)
-				Camera.bounce = -96;
+				g_Camera.bounce = -96;
 
 			AnimateItem(&item);
 		}

@@ -1963,7 +1963,7 @@ namespace TEN::Renderer
 
 		SetCullMode((emisphere == NO_VALUE) ? CullMode::CounterClockwise : CullMode::Clockwise);
 
-		auto view = RenderView(Camera, 0.0f, PI_DIV_2, 32.0f, DEFAULT_FAR_VIEW, ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE);
+		auto view = RenderView(g_Camera, 0.0f, PI_DIV_2, 32.0f, DEFAULT_FAR_VIEW, ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE);
 
 		CCameraMatrixBuffer cameraConstantBuffer;
 		cameraConstantBuffer.DualParaboloidView = Matrix::CreateLookAt(position, position + Vector3(0, 0, 1024), -Vector3::UnitY);
@@ -2002,8 +2002,8 @@ namespace TEN::Renderer
 				{
 					auto weather = TEN::Effects::Environment::Weather;
 
-					auto translation = Matrix::CreateTranslation(Camera.Position.x + weather.SkyPosition(s) - i * SKY_SIZE,
-						Camera.Position.y - 1536.0f, Camera.Position.z);
+					auto translation = Matrix::CreateTranslation(g_Camera.Position.x + weather.SkyPosition(s) - i * SKY_SIZE,
+						g_Camera.Position.y - 1536.0f, g_Camera.Position.z);
 					auto world = rotation * translation;
 
 					_stStatic.World = (rotation * translation);
@@ -2786,8 +2786,8 @@ namespace TEN::Renderer
 			{
 				auto weather = TEN::Effects::Environment::Weather;
 
-				auto translation = Matrix::CreateTranslation(Camera.Position.x + weather.SkyPosition(s) - i * SKY_SIZE,
-					Camera.Position.y - 1536.0f, Camera.Position.z);
+				auto translation = Matrix::CreateTranslation(g_Camera.Position.x + weather.SkyPosition(s) - i * SKY_SIZE,
+					g_Camera.Position.y - 1536.0f, g_Camera.Position.z);
 				auto world = rotation * translation;
 
 				_stStatic.World = (rotation * translation);
@@ -2811,7 +2811,7 @@ namespace TEN::Renderer
 
 			auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
-			_stStatic.World = Matrix::CreateTranslation(Camera.Position.x, Camera.Position.y, Camera.Position.z);
+			_stStatic.World = Matrix::CreateTranslation(g_Camera.Position.x, g_Camera.Position.y, g_Camera.Position.z);
 			_stStatic.Color = Vector4::One;
 			_stStatic.ApplyFogBulbs = 1;
 			_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -2856,7 +2856,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RenderView& view, RendererPass rendererPass)
 	{
-		auto cameraPos = Camera.Position;
+		auto cameraPos = g_Camera.Position;
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{

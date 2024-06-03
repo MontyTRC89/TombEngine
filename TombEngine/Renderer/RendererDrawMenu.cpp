@@ -1356,10 +1356,10 @@ namespace TEN::Renderer
 				PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
 				PrintDebugMessage("Room: %d, %d, %d, %d", r->x, r->z, r->x + r->xSize * BLOCK(1), r->z + r->zSize * BLOCK(1));
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d, %d, %d ", r->y, r->minfloor, r->maxceiling);
-				PrintDebugMessage("Camera.Position: %.3f, %.3f, %.3f", Camera.Position.x, Camera.Position.y, Camera.Position.z);
-				PrintDebugMessage("Camera.LookAt: %.3f, %.3f, %.3f", Camera.LookAt.x, Camera.LookAt.y, Camera.LookAt.z);
-				PrintDebugMessage("Camera.RoomNumber: %d", Camera.RoomNumber);
-				PrintDebugMessage("Camera azimuth, altitude: %d, %d", Camera.actualAngle, Camera.actualElevation);
+				PrintDebugMessage("Camera.Position: %.3f, %.3f, %.3f", g_Camera.Position.x, g_Camera.Position.y, g_Camera.Position.z);
+				PrintDebugMessage("Camera.LookAt: %.3f, %.3f, %.3f", g_Camera.LookAt.x, g_Camera.LookAt.y, g_Camera.LookAt.z);
+				PrintDebugMessage("Camera.RoomNumber: %d", g_Camera.RoomNumber);
+				PrintDebugMessage("Camera azimuth, altitude: %d, %d", g_Camera.actualAngle, g_Camera.actualElevation);
 				break;
 
 			case RendererDebugPage::PlayerStats:

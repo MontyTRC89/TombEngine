@@ -1123,8 +1123,8 @@ namespace TEN::Entities::Vehicles
 			AnimateItem(laraItem);
 			SyncVehicleAnimation(*kayakItem, *laraItem);
 
-			Camera.targetElevation = -ANGLE(30.0f);
-			Camera.targetDistance = CLICK(8);
+			g_Camera.targetElevation = -ANGLE(30.0f);
+			g_Camera.targetDistance = CLICK(8);
 		}
 
 		if (kayak->TrueWater &&

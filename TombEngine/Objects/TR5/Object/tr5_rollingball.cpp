@@ -75,12 +75,12 @@ void RollingBallControl(short itemNumber)
 	{
 		if (abs(item->Animation.Velocity.y) > 16.0f)
 		{
-			float distance = Vector3::Distance(item->Pose.Position.ToVector3(), Camera.Position);
+			float distance = Vector3::Distance(item->Pose.Position.ToVector3(), g_Camera.Position);
 			if (distance < BLOCK(16))
 			{
 				if ((item->TriggerFlags & 1) != 1) // Flag 1 = silent.
 				{
-					Camera.bounce = -((BLOCK(16) - distance) * abs(item->Animation.Velocity.y)) / BLOCK(16);
+					g_Camera.bounce = -((BLOCK(16) - distance) * abs(item->Animation.Velocity.y)) / BLOCK(16);
 					SoundEffect(SFX_TR4_BOULDER_FALL, &item->Pose);
 				}
 			}
@@ -357,9 +357,9 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 
 				SetAnimation(lara, LA_BOULDER_DEATH);
 						
-				Camera.flags = CameraFlag::FollowCenter;
-				Camera.targetAngle = ANGLE(170);
-				Camera.targetElevation = -ANGLE(25);
+				g_Camera.flags = CameraFlag::FollowCenter;
+				g_Camera.targetAngle = ANGLE(170);
+				g_Camera.targetElevation = -ANGLE(25);
 
 				for (int i = 0; i < 15; i++)
 				{
@@ -422,9 +422,9 @@ void ClassicRollingBallControl(short itemNum)
 			item->Animation.Velocity.y = 0;
 			item->Pose.Position.y = item->Floor;
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose);
-			dist = sqrt((SQUARE(Camera.ListenerPosition.x - item->Pose.Position.x)) + (SQUARE(Camera.ListenerPosition.z - item->Pose.Position.z)));
+			dist = sqrt((SQUARE(g_Camera.ListenerPosition.x - item->Pose.Position.x)) + (SQUARE(g_Camera.ListenerPosition.z - item->Pose.Position.z)));
 			if (dist < BLOCK(10))
-				Camera.bounce = -40 * (BLOCK(10) - dist) / BLOCK(10);
+				g_Camera.bounce = -40 * (BLOCK(10) - dist) / BLOCK(10);
 		}
 
 		if (item->ObjectNumber == ID_CLASSIC_ROLLING_BALL)

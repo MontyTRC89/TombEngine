@@ -919,8 +919,8 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->HitPoints > 0)
 				SyncVehicleAnimation(*speedboatItem, *laraItem);
 
-			Camera.targetElevation = -ANGLE(20.0f);
-			Camera.targetDistance = BLOCK(2);
+			g_Camera.targetElevation = -ANGLE(20.0f);
+			g_Camera.targetDistance = BLOCK(2);
 
 			auto pitch = speedboatItem->Animation.Velocity.z;
 			speedboat->Pitch += (pitch - speedboat->Pitch) / 4;

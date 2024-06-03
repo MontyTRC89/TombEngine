@@ -33,8 +33,8 @@ void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
 	player.Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
-	Camera.flags = CameraFlag::FollowCenter;
+	g_Camera.targetDistance = BLOCK(1);
+	g_Camera.flags = CameraFlag::FollowCenter;
 
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
@@ -55,7 +55,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	player.Control.ToggleCrouch = IsUsingModernControls();
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -199,7 +199,7 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::Horizontal;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -281,7 +281,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 
 	player.Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -334,7 +334,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 
 	player.Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -388,7 +388,7 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::None;
 	player.Control.ToggleCrouch = IsUsingModernControls();
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 	
@@ -433,7 +433,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	player.Control.ToggleCrouch = IsUsingModernControls();
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -624,7 +624,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	player.Control.ToggleCrouch = IsUsingModernControls();
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -744,7 +744,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	player.Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -831,7 +831,7 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 	player.Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -892,7 +892,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 	player.Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -952,7 +952,7 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::None;
 	player.Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = BLOCK(1);
+	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
@@ -979,9 +979,9 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = 0;
-	Camera.targetDistance = BLOCK(1);
-	Camera.flags = CameraFlag::FollowCenter;
+	g_Camera.targetAngle = 0;
+	g_Camera.targetDistance = BLOCK(1);
+	g_Camera.flags = CameraFlag::FollowCenter;
 
 	ResetPlayerLean(item, 1 / 6.0f);
 

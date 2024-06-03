@@ -131,8 +131,8 @@ void SmokeEmitterControl(short itemNumber)
 
 		if (item->ItemFlags[2])
 		{
-			int dx = Camera.Position.x - item->Pose.Position.x;
-			int dz = Camera.Position.z - item->Pose.Position.z;
+			int dx = g_Camera.Position.x - item->Pose.Position.x;
+			int dz = g_Camera.Position.z - item->Pose.Position.z;
 
 			if (dx < -BLOCK(16) || dx > BLOCK(16) || dz < -BLOCK(16) || dz > BLOCK(16))
 				return;
@@ -193,8 +193,8 @@ void SmokeEmitterControl(short itemNumber)
 
 	if (!(Wibble & 0x0F) && (item->ObjectNumber != ID_SMOKE_EMITTER || !(Wibble & 0x1F)))
 	{
-		int dx = Camera.Position.x - item->Pose.Position.x;
-		int dz = Camera.Position.z - item->Pose.Position.z;
+		int dx = g_Camera.Position.x - item->Pose.Position.x;
+		int dz = g_Camera.Position.z - item->Pose.Position.z;
 
 		if (dx < -BLOCK(16) || dx > BLOCK(16) || dz < -BLOCK(16) || dz > BLOCK(16))
 			return;

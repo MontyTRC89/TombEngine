@@ -166,7 +166,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	
 	//room.CollisionMesh.DrawDebug();
 
-	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), Camera.actualAngle);
+	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), g_Camera.actualAngle);
 	//g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));
 
 	//--------
@@ -235,7 +235,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			if (water.HeightFromWater == NO_HEIGHT || water.HeightFromWater < WADE_WATER_DEPTH)
 				break;
 
-			Camera.targetElevation = ANGLE(-22.0f);
+			g_Camera.targetElevation = ANGLE(-22.0f);
 
 			// Water is at swim depth; dispatch dive.
 			if (water.WaterDepth >= SWIM_WATER_DEPTH && !water.IsSwamp)
@@ -385,7 +385,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			break;
 
 		case WaterStatus::Wade:
-			Camera.targetElevation = ANGLE(-22.0f);
+			g_Camera.targetElevation = ANGLE(-22.0f);
 
 			if (water.HeightFromWater >= WADE_WATER_DEPTH)
 			{
@@ -533,7 +533,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.PrevPosition = item->Pose.Position;
 
 	player.Control.IsLow = false;
-	Camera.targetElevation = ANGLE(-22.0f);
+	g_Camera.targetElevation = ANGLE(-22.0f);
 
 	// Handle look-around.
 	if (IsHeld(In::Look) && CanPlayerLookAround(*item))

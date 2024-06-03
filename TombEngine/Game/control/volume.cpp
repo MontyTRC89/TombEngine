@@ -28,7 +28,7 @@ namespace TEN::Control::Volumes
 		switch (volume.Type)
 		{
 		case VolumeType::Box:
-			if (roomNumber == Camera.RoomNumber)
+			if (roomNumber == g_Camera.RoomNumber)
 			{
 				g_Renderer.AddDebugBox(volume.Box, 
 					Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);
@@ -36,7 +36,7 @@ namespace TEN::Control::Volumes
 			return volume.Box.Intersects(box);
 
 		case VolumeType::Sphere:
-			if (roomNumber == Camera.RoomNumber)
+			if (roomNumber == g_Camera.RoomNumber)
 			{
 				g_Renderer.AddDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, 
 					Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);

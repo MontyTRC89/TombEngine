@@ -277,9 +277,9 @@ namespace TEN::Renderer
 			if (!door->Visited)
 			{
 				door->CameraToDoor = Vector3(
-					Camera.Position.x - (door->AbsoluteVertices[0].x),
-					Camera.Position.y - (door->AbsoluteVertices[0].y),
-					Camera.Position.z - (door->AbsoluteVertices[0].z));
+					g_Camera.Position.x - (door->AbsoluteVertices[0].x),
+					g_Camera.Position.y - (door->AbsoluteVertices[0].y),
+					g_Camera.Position.z - (door->AbsoluteVertices[0].z));
 				door->CameraToDoor.Normalize();
 			}
 
@@ -685,7 +685,7 @@ namespace TEN::Renderer
 	void Renderer::CollectLightsForCamera()
 	{
 		std::vector<RendererLight*> lightsToDraw;
-		CollectLights(Camera.Position, CAMERA_LIGHT_COLLECTION_RADIUS, Camera.RoomNumber, NO_VALUE, true, false, nullptr, &lightsToDraw);
+		CollectLights(g_Camera.Position, CAMERA_LIGHT_COLLECTION_RADIUS, g_Camera.RoomNumber, NO_VALUE, true, false, nullptr, &lightsToDraw);
 
 		if (!lightsToDraw.empty() && lightsToDraw.front()->CastShadows)
 		{
