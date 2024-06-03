@@ -143,7 +143,7 @@ static bool TestCameraCollidableStatic(const MESH_INFO& staticObj)
 		return false;
 
 	// 3) Test if box is collidable.
-	if (!TestCameraCollidableBox(staticObj.GetBox()))
+	if (!TestCameraCollidableBox(staticObj.GetObb()))
 		return false;
 
 	return true;

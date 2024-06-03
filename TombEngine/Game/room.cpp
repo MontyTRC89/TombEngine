@@ -26,12 +26,12 @@ int  FlipMap[MAX_FLIPMAP];
 
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
-BoundingOrientedBox MESH_INFO::GetBox() const
+BoundingOrientedBox MESH_INFO::GetObb() const
 {
 	return GetBoundsAccurate(*this, false).ToBoundingOrientedBox(pos);
 }
 
-BoundingOrientedBox MESH_INFO::GetVisibilityBox() const
+BoundingOrientedBox MESH_INFO::GetVisibilityObb() const
 {
 	return GetBoundsAccurate(*this, true).ToBoundingOrientedBox(pos);
 }

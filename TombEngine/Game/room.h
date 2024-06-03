@@ -86,8 +86,8 @@ struct MESH_INFO
 	std::string Name;
 	bool Dirty;
 
-	BoundingOrientedBox GetBox() const;
-	BoundingOrientedBox GetVisibilityBox() const;
+	BoundingOrientedBox GetObb() const;
+	BoundingOrientedBox GetVisibilityObb() const;
 };
 
 struct ROOM_INFO
