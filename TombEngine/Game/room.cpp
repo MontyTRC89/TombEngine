@@ -402,14 +402,11 @@ namespace TEN::Collision::Room
 		constexpr auto REL_CORNER_2 = Vector2i(BLOCK(1), BLOCK(1));
 		constexpr auto REL_CORNER_3 = Vector2i(BLOCK(1), 0);
 
+		// Calculate 2D corner positions.
 		auto corner0 = sector.Position + REL_CORNER_0;
 		auto corner1 = sector.Position + REL_CORNER_1;
 		auto corner2 = sector.Position + REL_CORNER_2;
 		auto corner3 = sector.Position + REL_CORNER_3;
-
-		auto box = BoundingBox(Vector3(corner0.x, 0, corner0.y), Vector3(BLOCK(1), BLOCK(1), BLOCK(1)));
-		//g_Renderer.AddDebugBox(box, Color(1, 1, 1));
-		g_Renderer.AddDebugSphere(BoundingSphere(Vector3(corner0.x, -3328, corner0.y), 0.1f), Color(1, 1, 1));
 
 		// Collect triangles.
 		bool isFloor = true;
@@ -938,7 +935,7 @@ namespace TEN::Collision::Room
 	{
 		room.CollisionMesh = CollisionMesh();
 
-		// Run through sectors (ignoring border).
+		// Run through room sectors (ignoring border).
 		for (int x = 1; x < (room.xSize - 1); x++)
 		{
 			for (int z = 1; z < (room.zSize - 1); z++)

@@ -141,7 +141,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	auto& room = g_Level.Rooms[item->RoomNumber];
 	GenerateRoomCollisionMesh(room);
-	//room.CollisionMesh.DrawDebug();
+	room.CollisionMesh.DrawDebug();
 
 	for (auto& item2 : g_Level.Items)
 	{

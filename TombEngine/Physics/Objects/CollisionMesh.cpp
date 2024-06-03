@@ -240,8 +240,11 @@ namespace TEN::Physics
 	void CollisionMesh::DrawDebug() const
 	{
 		for (const auto& tri : _triangles)
-			tri.DrawDebug(_vertices);
+		{
+			if (tri.IsPortal())
+				tri.DrawDebug(_vertices);
+		}
 
-		_bvh.DrawDebug();
+		//_bvh.DrawDebug();
 	}
 }

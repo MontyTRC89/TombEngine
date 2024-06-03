@@ -951,6 +951,10 @@ static bool CanControlTankCamera()
 	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
 	const auto& axis = isUsingMouse ? GetMouseAxis() : GetCameraAxis();
 
+	// Look input action resets camera.
+	if (IsReleased(In::Look))
+		return false;
+
 	// Test if player is stationary.
 	if (!IsWakeActionHeld() && (axis != Vector2::Zero || Camera.IsControllingTankCamera))
 		return true;
