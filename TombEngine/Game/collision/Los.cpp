@@ -382,7 +382,7 @@ namespace TEN::Collision::Los
 					roomLosColl.RoomNumber = rayRoomNumber;
 					roomLosColl.IsIntersected = true;
 					roomLosColl.Distance = Vector3::Distance(origin, intersectPos);
-					return roomLosColl;
+					break;
 				}
 			}
 			else
@@ -392,11 +392,11 @@ namespace TEN::Collision::Los
 				roomLosColl.RoomNumber = rayRoomNumber;
 				roomLosColl.IsIntersected = false;
 				roomLosColl.Distance = dist;
-				return roomLosColl;
+				break;
 			}
 		}
 
-		// FAILSAFE.
+		// Return room LOS collision.
 		return roomLosColl;
 	}
 
