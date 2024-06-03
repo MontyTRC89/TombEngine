@@ -125,10 +125,10 @@ namespace TEN::Collision::Los
 				// 2.1) Collect moveable LOS collisions.
 				if (collideMoveables)
 				{
-					auto box = mov->GetObb();
+					auto obb = mov->GetObb();
 
 					float intersectDist = 0.0f;
-					if (box.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
+					if (obb.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
 					{
 						auto pos = Geometry::TranslatePoint(origin, dir, intersectDist);
 						auto offset = pos - mov->Pose.Position.ToVector3();
@@ -138,7 +138,7 @@ namespace TEN::Collision::Los
 						movLosColl.Moveable = mov;
 						movLosColl.Position = pos;
 						movLosColl.RoomNumber = roomNumber;
-						movLosColl.IsOriginContained = (bool)box.Contains(origin);
+						movLosColl.IsOriginContained = (bool)obb.Contains(origin);
 						movLosColl.Distance = intersectDist;
 						losColl.Moveables.push_back(movLosColl);
 					}
@@ -200,10 +200,10 @@ namespace TEN::Collision::Los
 				if (!(staticObj->flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
-				auto box = staticObj->GetObb();
+				auto obb = staticObj->GetObb();
 
 				float intersectDist = 0.0f;
-				if (box.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
+				if (obb.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
 				{
 					auto pos = Geometry::TranslatePoint(origin, dir, intersectDist);
 					auto offset = pos - staticObj->pos.Position.ToVector3();
@@ -213,7 +213,7 @@ namespace TEN::Collision::Los
 					staticLosColl.Static = staticObj;
 					staticLosColl.Position = pos;
 					staticLosColl.RoomNumber = roomNumber;
-					staticLosColl.IsOriginContained = (bool)box.Contains(origin);
+					staticLosColl.IsOriginContained = (bool)obb.Contains(origin);
 					staticLosColl.Distance = intersectDist;
 					losColl.Statics.push_back(staticLosColl);
 				}

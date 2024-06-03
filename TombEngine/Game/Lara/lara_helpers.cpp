@@ -588,38 +588,51 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 		}
 	}
 
-	auto axisCoeff = Vector2::Zero;
-
-	// Determine X axis coefficient.
-	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
-		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
+	// Rotate.
+	if (g_Configuration.EnableTankCameraControl &&
+		(GetMouseAxis() != Vector2::Zero || GetCameraAxis() != Vector2::Zero))
 	{
-		axisCoeff.x = GetMoveAxis().y;
+		auto rot = GetCameraControlRotation() / 2;
+		player.Control.Look.Orientation.x += -rot.y;
+		player.Control.Look.Orientation.y += rot.x;
+	}
+	else
+	{
+		auto axisCoeff = Vector2::Zero;
+
+		// Determine X axis coefficient.
+		if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
+			(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
+		{
+			axisCoeff.x = GetMoveAxis().y;
+		}
+
+		// Determine Y axis coefficient.
+		if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
+			(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
+		{
+			axisCoeff.y = GetMoveAxis().x;
+		}
+
+		// Determine turn rate base.
+		short turnRateMax = isSlow ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
+		short turnRateAccel = isSlow ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
+
+		// Normalize turn rate base.
+		turnRateMax = NormalizeLookAroundTurnRate(turnRateMax, player.Control.Look.OpticRange);
+		turnRateAccel = NormalizeLookAroundTurnRate(turnRateAccel, player.Control.Look.OpticRange);
+
+		// Modulate turn rate.
+		player.Control.Look.TurnRate = EulerAngles(
+			ModulateLaraTurnRate(player.Control.Look.TurnRate.x, turnRateAccel, 0, turnRateMax, axisCoeff.x, invertXAxis),
+			ModulateLaraTurnRate(player.Control.Look.TurnRate.y, turnRateAccel, 0, turnRateMax, axisCoeff.y, false),
+			0);
+
+		// Apply turn rate.
+		player.Control.Look.Orientation += player.Control.Look.TurnRate;
 	}
 
-	// Determine Y axis coefficient.
-	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
-		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
-	{
-		axisCoeff.y = GetMoveAxis().x;
-	}
-
-	// Determine turn rate base values.
-	short turnRateMax = isSlow ? (TURN_RATE_MAX / 2) : TURN_RATE_MAX;
-	short turnRateAccel = isSlow ? (TURN_RATE_ACCEL / 2) : TURN_RATE_ACCEL;
-
-	// Normalize turn rate base values.
-	turnRateMax = NormalizeLookAroundTurnRate(turnRateMax, player.Control.Look.OpticRange);
-	turnRateAccel = NormalizeLookAroundTurnRate(turnRateAccel, player.Control.Look.OpticRange);
-
-	// Modulate turn rates.
-	player.Control.Look.TurnRate = EulerAngles(
-		ModulateLaraTurnRate(player.Control.Look.TurnRate.x, turnRateAccel, 0, turnRateMax, axisCoeff.x, invertXAxis),
-		ModulateLaraTurnRate(player.Control.Look.TurnRate.y, turnRateAccel, 0, turnRateMax, axisCoeff.y, false),
-		0);
-
-	// Apply turn rates.
-	player.Control.Look.Orientation += player.Control.Look.TurnRate;
+	// Clamp orientation.
 	player.Control.Look.Orientation = EulerAngles(
 		std::clamp(player.Control.Look.Orientation.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x),
 		std::clamp(player.Control.Look.Orientation.y, LOOKCAM_ORIENT_CONSTRAINT.first.y, LOOKCAM_ORIENT_CONSTRAINT.second.y),

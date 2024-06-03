@@ -267,6 +267,27 @@ std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, i
 	return collidedPos;
 }
 
+EulerAngles GetCameraControlRotation()
+{
+	constexpr auto SLOW_ROT_COEFF				 = 0.4f;
+	constexpr auto MOUSE_AXIS_SENSITIVITY_COEFF	 = 20.0f;
+	constexpr auto CAMERA_AXIS_SENSITIVITY_COEFF = 12.0f;
+	constexpr auto SMOOTHING_FACTOR				 = 8.0f;
+
+	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
+	auto axisSign = Vector2(g_Configuration.InvertCameraXAxis ? -1 : 1, g_Configuration.InvertCameraYAxis ? -1 : 1);
+
+	// Calculate axis.
+	auto axis = (isUsingMouse ? GetMouseAxis() : GetCameraAxis()) * axisSign;
+	float sensitivityCoeff = isUsingMouse ? MOUSE_AXIS_SENSITIVITY_COEFF : CAMERA_AXIS_SENSITIVITY_COEFF;
+	float sensitivity = sensitivityCoeff / (1.0f + (abs(axis.x) + abs(axis.y)));
+	axis *= sensitivity * (isUsingMouse ? SMOOTHING_FACTOR : 1.0f);
+
+	// Calculate and return rotation.
+	auto rotCoeff = IsHeld(In::Walk) ? SLOW_ROT_COEFF : 1.0f;
+	return EulerAngles(ANGLE(axis.x), ANGLE(axis.y), 0) * rotCoeff;
+}
+
 static Vector3 GetCameraPlayerOffset(const ItemInfo& item, const CollisionInfo& coll)
 {
 	constexpr auto VERTICAL_OFFSET_DEFAULT		  = -BLOCK(0.05f);
@@ -879,27 +900,6 @@ void CombatCamera(const ItemInfo& playerItem)
 	g_Camera.targetDistance = BLOCK(1.5f);
 
 	HandleCameraFollow(playerItem, true);
-}
-
-static EulerAngles GetCameraControlRotation()
-{
-	constexpr auto SLOW_ROT_COEFF				 = 0.4f;
-	constexpr auto MOUSE_AXIS_SENSITIVITY_COEFF	 = 20.0f;
-	constexpr auto CAMERA_AXIS_SENSITIVITY_COEFF = 12.0f;
-	constexpr auto SMOOTHING_FACTOR				 = 8.0f;
-
-	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
-	auto axisSign = Vector2(g_Configuration.InvertCameraXAxis ? -1 : 1, g_Configuration.InvertCameraYAxis ? -1 : 1);
-
-	// Calculate axis.
-	auto axis = (isUsingMouse ? GetMouseAxis() : GetCameraAxis()) * axisSign;
-	float sensitivityCoeff = isUsingMouse ? MOUSE_AXIS_SENSITIVITY_COEFF : CAMERA_AXIS_SENSITIVITY_COEFF;
-	float sensitivity = sensitivityCoeff / (1.0f + (abs(axis.x) + abs(axis.y)));
-	axis *= sensitivity * (isUsingMouse ? SMOOTHING_FACTOR : 1.0f);
-
-	// Calculate and return rotation.
-	auto rotCoeff = IsHeld(In::Walk) ? SLOW_ROT_COEFF : 1.0f;
-	return EulerAngles(ANGLE(axis.x), ANGLE(axis.y), 0) * rotCoeff;
 }
 
 static bool CanControlTankCamera()

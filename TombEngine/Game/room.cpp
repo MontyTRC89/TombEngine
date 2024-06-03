@@ -580,6 +580,7 @@ namespace TEN::Collision::Room
 				// Wall behind.
 				if (!isSurfWall || !isPrevSurfWall) // Can set wall.
 				{
+					// TODO: Must keep full wall facing current room. The other one should be generated in the previous room.
 					// Full wall referencing current sector.
 					if ((!isSurfWall && isPrevSurfWall) && isFloor)
 					{

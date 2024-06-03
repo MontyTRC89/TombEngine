@@ -178,6 +178,7 @@ extern CameraInfo		g_Camera;
 extern ScreenEffectData g_ScreenEffect;
 
 std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, int push, bool yFirst);
+EulerAngles				GetCameraControlRotation();
 
 void UpdatePlayerRefCameraOrient(ItemInfo& item);
 void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
