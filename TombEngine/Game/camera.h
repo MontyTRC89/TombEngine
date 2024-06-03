@@ -6,6 +6,8 @@ struct CollisionInfo;
 
 using namespace TEN::Math;
 
+constexpr auto DEFAULT_FOV				 = 80.0f;
+constexpr auto FADE_SCREEN_SPEED		 = 16.0f / 255.0f;
 constexpr auto LOOKCAM_ORIENT_CONSTRAINT = std::pair<EulerAngles, EulerAngles>(
 	EulerAngles(ANGLE(-70.0f), ANGLE(-90.0f), 0),
 	EulerAngles(ANGLE(60.0f), ANGLE(90.0f), 0));
@@ -74,7 +76,32 @@ private:
 	}
 };*/
 
-struct CAMERA_INFO
+struct ObjectCameraInfo
+{
+	GameVector LastAngle	= GameVector::Zero;
+	bool	   ItemCameraOn = false;
+};
+
+struct PrevCameraData
+{
+	Pose	pos	   = Pose::Zero;
+	Pose	pos2   = Pose::Zero;
+	Vector3 target = Vector3::Zero; // LookAt
+
+	// Camera sphere
+
+	short actualAngle	  = 0;
+	short actualElevation = 0;
+	short targetElevation = 0;
+	float targetDistance  = 0.0f;
+
+	// Player anim state
+
+	int ActiveState = 0;
+	int TargetState = 0;
+};
+
+struct CameraInfo
 {
 	// Camera sphere
 
@@ -89,6 +116,8 @@ struct CAMERA_INFO
 	float	targetDistance	 = 0.0f;
 	float	speed			 = 0.0f;
 	float	targetspeed		 = 0.0f;
+	short	Fov				 = 0;
+	short	PrevFov			 = 0;
 
 	EulerAngles Rotation = EulerAngles::Identity;
 
@@ -98,22 +127,37 @@ struct CAMERA_INFO
 	CameraType oldType = CameraType::Chase;
 	CameraFlag flags   = CameraFlag::None;
 
-	int bounce;
-	int shift;
-	int numberFrames;
+	int bounce		 = 0;
+	int shift		 = 0;
+	int numberFrames = 0;
+	int laraNode	 = 0;
+	int box			 = 0;
+	int number		 = 0;
+	int last		 = 0;
+	int timer		 = 0;
 
-	int laraNode;
-	int box;
-	int number;
-	int last;
-	int timer;
-	ItemInfo* item;
-	ItemInfo* lastItem;
+	ObjectCameraInfo ItemCamera = {};
+	ItemInfo*		 item		= nullptr;
+	ItemInfo*		 lastItem	= nullptr;
+
 	Vector3 ListenerPosition = Vector3::Zero;
 
 	bool fixedCamera			 = false;
 	bool underwater				 = false;
 	bool IsControllingTankCamera = false;
+
+	int TargetSnaps	  = 0;
+	int RumbleTimer	  = 0;
+	int RumbleCounter = 0;
+
+	GameVector ForcedFixedCamera	= GameVector::Zero;
+	bool	   UseForcedFixedCamera = false;
+
+	PrevCameraData PrevCamera			   = {};
+	GameVector	   PrevTarget			   = GameVector::Zero;
+	Vector3		   PrevIdeal			   = Vector3::Zero;
+	int			   PrevIdealRoomNumber	   = 0;
+	CameraType	   PrevBinocularCameraType = CameraType::Chase;
 };
 
 struct ScreenEffectData
@@ -130,26 +174,17 @@ struct ScreenEffectData
 	float CinematicBarsSpeed			 = 0.0f;
 };
 
-constexpr auto DEFAULT_FOV		 = 80.0f;
-constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
-
-extern CAMERA_INFO		Camera;
+extern CameraInfo		Camera;
 extern ScreenEffectData g_ScreenEffect;
-
-extern GameVector ForcedFixedCamera;
-extern bool UseForcedFixedCamera;
-extern CameraType PrevBinocularCameraType;
-extern short CurrentFOV;
-extern short LastFOV;
 
 std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, int push, bool yFirst);
 
 void UpdatePlayerRefCameraOrient(ItemInfo& item);
 void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
 
-void LookAt(CAMERA_INFO& camera, short roll);
-void AlterFOV(short value, bool store = true);
-short GetCurrentFOV();
+void LookAt(CameraInfo& camera, short roll);
+void SetFov(short fov, bool store = true);
+short GetCurrentFov();
 void InitializeCamera();
 void MoveCamera(const ItemInfo& playerItem, Vector3 ideal, int idealRoomNumber, float speed);
 void ChaseCamera(const ItemInfo& playerItem);

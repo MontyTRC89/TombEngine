@@ -37,7 +37,7 @@ namespace TEN::Renderer
 		float	FarPlane   = 0.0f;
 		float	FOV		   = 0.0f;
 
-		RenderViewCamera(const CAMERA_INFO& camera, float roll, float fov, float nearView, float farView, float width, float height);
+		RenderViewCamera(const CameraInfo& camera, float roll, float fov, float nearView, float farView, float width, float height);
 		RenderViewCamera(const Vector3& pos, const Vector3& dir, const Vector3& up, int roomNumber, float width, float height, float fov, float nearView, float farView);
 	};
 
@@ -54,7 +54,7 @@ namespace TEN::Renderer
 		std::map<int, std::vector<RendererStatic*>> SortedStaticsToDraw		 = {};
 		std::vector<RendererSortableObject>			TransparentObjectsToDraw = {};
 
-		RenderView(const CAMERA_INFO& camera, float roll, float fov, float nearPlane, float farPlane, float width, float height);
+		RenderView(const CameraInfo& camera, float roll, float fov, float nearPlane, float farPlane, float width, float height);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, float width, float height, int roomNumber, float nearPlane, float farPlane, float fov);
 		
 		void FillConstantBuffer(CCameraMatrixBuffer& bufferToFill);

@@ -75,8 +75,8 @@ namespace TEN::Entities::Switches
 					SetAnimation(*switchItem, 4);
 					switchItem->ItemFlags[0] = TURN_SWITCH_ANTICLOCKWISE;
 
-					ForcedFixedCamera.x = switchItem->Pose.Position.x - BLOCK(1) * phd_sin(switchItem->Pose.Orientation.y);
-					ForcedFixedCamera.z = switchItem->Pose.Position.z - BLOCK(1) * phd_cos(switchItem->Pose.Orientation.y);
+					Camera.ForcedFixedCamera.x = switchItem->Pose.Position.x - BLOCK(1) * phd_sin(switchItem->Pose.Orientation.y);
+					Camera.ForcedFixedCamera.z = switchItem->Pose.Position.z - BLOCK(1) * phd_cos(switchItem->Pose.Orientation.y);
 
 					doSwitch = -1;
 				}
@@ -96,8 +96,8 @@ namespace TEN::Entities::Switches
 
 						switchItem->ItemFlags[0] = TURN_SWITCH_CLOCKWISE;
 
-						ForcedFixedCamera.x = switchItem->Pose.Position.x + 1024 * phd_sin(switchItem->Pose.Orientation.y);
-						ForcedFixedCamera.z = switchItem->Pose.Position.z + 1024 * phd_cos(switchItem->Pose.Orientation.y);
+						Camera.ForcedFixedCamera.x = switchItem->Pose.Position.x + 1024 * phd_sin(switchItem->Pose.Orientation.y);
+						Camera.ForcedFixedCamera.z = switchItem->Pose.Position.z + 1024 * phd_cos(switchItem->Pose.Orientation.y);
 
 						doSwitch = 1;
 					}
@@ -125,9 +125,9 @@ namespace TEN::Entities::Switches
 			laraInfo->Control.HandStatus = HandStatus::Busy;
 			laraItem->Animation.ActiveState = LA_REACH;
 
-			UseForcedFixedCamera = true;
-			ForcedFixedCamera.y = switchItem->Pose.Position.y - 2048;
-			ForcedFixedCamera.RoomNumber = switchItem->RoomNumber;
+			Camera.UseForcedFixedCamera = true;
+			Camera.ForcedFixedCamera.y = switchItem->Pose.Position.y - 2048;
+			Camera.ForcedFixedCamera.RoomNumber = switchItem->RoomNumber;
 
 			AddActiveItem(itemNumber);
 
@@ -241,7 +241,7 @@ namespace TEN::Entities::Switches
 			RemoveActiveItem(itemNumber);
 
 			Lara.Control.HandStatus = HandStatus::Free;
-			UseForcedFixedCamera = 0;
+			Camera.UseForcedFixedCamera = 0;
 			switchItem->ItemFlags[1] = 2;
 		}
 	}

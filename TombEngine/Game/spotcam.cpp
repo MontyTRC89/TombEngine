@@ -122,7 +122,7 @@ void InitializeSpotCam(short Sequence)
 	Lara.Control.Look.OpticRange = 0;
 	Lara.Control.Look.IsUsingLasersight = false;
 
-	AlterFOV(ANGLE(DEFAULT_FOV), false);
+	SetFov(ANGLE(DEFAULT_FOV), false);
 
 	LaraItem->MeshBits = ALL_JOINT_BITS;
 
@@ -273,7 +273,7 @@ void InitializeSpotCam(short Sequence)
 			CameraXtarget[1] = InitialCameraTarget.x;
 			CameraYtarget[1] = InitialCameraTarget.y;
 			CameraZtarget[1] = InitialCameraTarget.z;
-			CameraFOV[1] = CurrentFOV;
+			CameraFOV[1] = Camera.Fov;
 			CameraRoll[1] = 0;
 			CameraSpeed[1] = spotcam->speed;
 
@@ -283,7 +283,7 @@ void InitializeSpotCam(short Sequence)
 			CameraXtarget[2] = InitialCameraTarget.x;
 			CameraYtarget[2] = InitialCameraTarget.y;
 			CameraZtarget[2] = InitialCameraTarget.z;
-			CameraFOV[2] = CurrentFOV;
+			CameraFOV[2] = Camera.Fov;
 			CameraRoll[2] = 0;
 			CameraSpeed[2] = spotcam->speed;
 
@@ -353,7 +353,7 @@ void CalculateSpotCameras()
 	int cn; // $s0
 
 
-	CAMERA_INFO backup;
+	CameraInfo backup;
 
 	if (Lara.Control.IsLocked)
 	{
@@ -496,7 +496,7 @@ void CalculateSpotCameras()
 			Camera.RoomNumber = outsideRoom;
 		}
 
-		AlterFOV(cfov, false);
+		SetFov(cfov, false);
 
 		LookAt(Camera, croll);
 		UpdateListenerPosition(*LaraItem);
@@ -688,7 +688,7 @@ void CalculateSpotCameras()
 
 					SpotcamOverlay = false;
 					SpotcamDontDrawLara = false;
-					AlterFOV(LastFOV);
+					SetFov(Camera.PrevFov);
 				}
 				else
 				{
@@ -712,7 +712,7 @@ void CalculateSpotCameras()
 					CameraFOV[2] = SpotCam[CurrentSplineCamera - 1].fov;
 					CameraSpeed[2] = SpotCam[CurrentSplineCamera - 1].speed;
 
-					memcpy((char*)& backup, (char*)& Camera, sizeof(CAMERA_INFO));
+					memcpy((char*)& backup, (char*)& Camera, sizeof(CameraInfo));
 					Camera.oldType = CameraType::Fixed;
 					Camera.type = CameraType::Chase;
 					Camera.speed = 1;
@@ -739,7 +739,7 @@ void CalculateSpotCameras()
 					CameraXtarget[3] = Camera.LookAt.x;
 					CameraYtarget[3] = Camera.LookAt.y;
 					CameraZtarget[3] = Camera.LookAt.z;
-					CameraFOV[3] = LastFOV;
+					CameraFOV[3] = Camera.PrevFov;
 					CameraSpeed[3] = CameraSpeed[2];
 					CameraRoll[3] = 0;
 
@@ -749,11 +749,11 @@ void CalculateSpotCameras()
 					CameraXtarget[4] = Camera.LookAt.x;
 					CameraYtarget[4] = Camera.LookAt.y;
 					CameraZtarget[4] = Camera.LookAt.z;
-					CameraFOV[4] = LastFOV;
+					CameraFOV[4] = Camera.PrevFov;
 					CameraSpeed[4] = CameraSpeed[2] >> 1;
 					CameraRoll[4] = 0;
 
-					memcpy((char*)&Camera, (char*)&backup, sizeof(CAMERA_INFO));
+					memcpy((char*)&Camera, (char*)&backup, sizeof(CameraInfo));
 
 					Camera.targetElevation = elevation;
 
@@ -791,7 +791,7 @@ void CalculateSpotCameras()
 		UseSpotCam = false;
 		Lara.Control.IsLocked = false;
 		Camera.speed = 1;
-		AlterFOV(LastFOV);
+		SetFov(Camera.PrevFov);
 		CalculateCamera(*LaraItem, LaraCollision);
 		CheckTrigger = false;
 	}

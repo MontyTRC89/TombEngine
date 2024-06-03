@@ -1435,7 +1435,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_room_items(roomItemsOffset);
 	sgb.add_flip_effect(FlipEffect);
 	sgb.add_flip_status(FlipStatus);
-	sgb.add_current_fov(LastFOV);
+	sgb.add_current_fov(Camera.PrevFov);
 	sgb.add_last_inv_item(g_Gui.GetLastInventoryItem());
 	sgb.add_static_meshes(staticMeshesOffset);
 	sgb.add_volumes(volumesOffset);
@@ -2021,7 +2021,7 @@ static void ParsePlayer(const Save::SaveGame* s)
 static void ParseEffects(const Save::SaveGame* s)
 {
 	// Restore camera FOV.
-	AlterFOV(s->current_fov());
+	SetFov(s->current_fov());
 
 	// Restore postprocess effects.
 	g_Renderer.SetPostProcessMode((PostProcessMode)s->postprocess_mode());

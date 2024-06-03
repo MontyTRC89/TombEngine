@@ -227,7 +227,7 @@ namespace TEN::Control::Volumes
 		}
 	}
 	
-	void TestVolumes(CAMERA_INFO* camera)
+	void TestVolumes(CameraInfo* camera)
 	{
 		auto pose = Pose(camera->Position, EulerAngles::Identity);
 		auto bounds = GameBoundingBox::Zero;

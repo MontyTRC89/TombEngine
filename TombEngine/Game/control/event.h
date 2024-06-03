@@ -1,7 +1,7 @@
 #pragma once
 #include <variant>
 
-struct CAMERA_INFO;
+struct CameraInfo;
 struct MESH_INFO;
 
 namespace TEN::Control::Volumes
@@ -12,7 +12,7 @@ namespace TEN::Control::Volumes
 		std::nullptr_t,
 		short,
 		MESH_INFO*,
-		CAMERA_INFO*>;
+		CameraInfo*>;
 
 	enum class ActivatorFlags
 	{

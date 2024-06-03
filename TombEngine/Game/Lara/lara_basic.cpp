@@ -84,8 +84,8 @@ void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 	{
 		player.Control.HandStatus = HandStatus::Free;
 
-		if (UseForcedFixedCamera)
-			UseForcedFixedCamera = false;
+		if (Camera.UseForcedFixedCamera)
+			Camera.UseForcedFixedCamera = false;
 	}
 }
 
@@ -1345,7 +1345,7 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 		player.Control.Look.OpticRange = 0;
 		player.Control.Look.IsUsingLasersight = false;
 		player.Inventory.IsBusy = false;
-		AlterFOV(LastFOV);
+		SetFov(Camera.PrevFov);
 	}
 
 	auto box = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);

@@ -3,7 +3,7 @@
 
 namespace TEN::Renderer
 {
-	RenderView::RenderView(const CAMERA_INFO& camera, float roll, float fov, float nearPlane, float farPlane, float width, float height) :
+	RenderView::RenderView(const CameraInfo& camera, float roll, float fov, float nearPlane, float farPlane, float width, float height) :
 		Camera(camera, roll, fov, nearPlane, farPlane, width, height) 
 	{
 		Viewport = {};
@@ -54,7 +54,7 @@ namespace TEN::Renderer
 		FogBulbsToDraw.clear();
 	}
 
-	RenderViewCamera::RenderViewCamera(const CAMERA_INFO& camera, float roll, float fov, float nearPlane, float farPlane, float width, float height)
+	RenderViewCamera::RenderViewCamera(const CameraInfo& camera, float roll, float fov, float nearPlane, float farPlane, float width, float height)
 	{
 		auto target = camera.LookAt;
 		if ((target - WorldPosition) == Vector3::Zero)

@@ -505,7 +505,7 @@ static void SetPlayerOptics(ItemInfo* item)
 			player.Control.Look.IsUsingLasersight = true;
 			player.Inventory.IsBusy = true;
 
-			PrevBinocularCameraType = Camera.oldType;
+			Camera.PrevBinocularCameraType = Camera.oldType;
 			return;
 		}
 	}
@@ -522,9 +522,9 @@ static void SetPlayerOptics(ItemInfo* item)
 	player.Control.Look.IsUsingLasersight = false;
 	player.Inventory.IsBusy = false;
 
-	Camera.type = PrevBinocularCameraType;
+	Camera.type = Camera.PrevBinocularCameraType;
 	Camera.bounce = 0;
-	AlterFOV(LastFOV);
+	SetFov(Camera.PrevFov);
 }
 
 static short NormalizeLookAroundTurnRate(short turnRate, short opticRange)

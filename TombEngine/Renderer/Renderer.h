@@ -70,7 +70,7 @@
 enum GAME_OBJECT_ID : short;
 class EulerAngles;
 struct AnimFrameInterpData;
-struct CAMERA_INFO;
+struct CameraInfo;
 
 namespace TEN::Renderer
 {
@@ -586,7 +586,7 @@ namespace TEN::Renderer
 		void RenderTitle();
 		void Lock();
 		bool PrepareDataForTheRenderer();
-		void UpdateCameraMatrices(const CAMERA_INFO& camera, float roll, float fov, float farView);
+		void UpdateCameraMatrices(const CameraInfo& camera, float roll, float fov, float farView);
 		void RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere);
 		void DumpGameScene();
 		void RenderInventory();

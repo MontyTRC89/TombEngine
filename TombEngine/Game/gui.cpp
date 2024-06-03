@@ -2184,7 +2184,7 @@ namespace TEN::Gui
 	{
 		auto* lara = GetLaraInfo(item);
 
-		AlterFOV(ANGLE(DEFAULT_FOV), false);
+		SetFov(ANGLE(DEFAULT_FOV), false);
 		lara->Inventory.IsBusy = false;
 		InventoryItemChosen = NO_VALUE;
 		ItemUsed = false;
@@ -2456,7 +2456,7 @@ namespace TEN::Gui
 				}
 				else
 				{
-					PrevBinocularCameraType = Camera.oldType;
+					Camera.PrevBinocularCameraType = Camera.oldType;
 				}
 
 				case ID_GRENADE_GUN_ITEM:
@@ -2530,7 +2530,7 @@ namespace TEN::Gui
 			}
 			else
 			{
-				PrevBinocularCameraType = Camera.oldType;
+				Camera.PrevBinocularCameraType = Camera.oldType;
 			}
 
 			InventoryItemChosen = NO_VALUE;
@@ -3679,7 +3679,7 @@ namespace TEN::Gui
 		if (ItemUsed)
 			UseItem(*item, InventoryObjectTable[LastInvItem].ObjectNumber);
 
-		AlterFOV(LastFOV);
+		SetFov(Camera.PrevFov);
 		ResumeAllSounds(SoundPauseMode::Inventory);
 
 		lara->Inventory.IsBusy = lara->Inventory.OldBusy;

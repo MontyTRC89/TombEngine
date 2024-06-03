@@ -41,7 +41,7 @@ namespace TEN::Control::Volumes
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, ActivatorFlags activatorFlag, Activator activator);
 	void TestVolumes(short itemNumber, const CollisionSetupData* coll = nullptr);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
-	void TestVolumes(CAMERA_INFO* camera);
+	void TestVolumes(CameraInfo* camera);
 
 	bool HandleEvent(Event& event, Activator& activator);
 	bool HandleEvent(const std::string& name, EventType eventType, Activator activator);

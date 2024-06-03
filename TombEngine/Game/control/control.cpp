@@ -146,7 +146,7 @@ GameStatus ControlPhase(int numFrames)
 	if (TrackCameraInit)
 	{
 		UseSpotCam = false;
-		AlterFOV(LastFOV);
+		SetFov(Camera.PrevFov);
 	}
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);

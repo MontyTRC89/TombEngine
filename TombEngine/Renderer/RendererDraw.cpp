@@ -1980,7 +1980,7 @@ namespace TEN::Renderer
 
 			if (Lara.Control.Look.OpticRange != 0)
 			{
-				AlterFOV(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
+				SetFov(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
 			}
 
 			UINT stride = sizeof(Vertex);
@@ -2762,7 +2762,7 @@ namespace TEN::Renderer
 			return;
 
 		if (Lara.Control.Look.OpticRange != 0)
-			AlterFOV(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
+			SetFov(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
 
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;

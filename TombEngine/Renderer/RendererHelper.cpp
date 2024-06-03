@@ -364,7 +364,7 @@ namespace TEN::Renderer
 		return !_isWindowed;
 	}
 
-	void Renderer::UpdateCameraMatrices(const CAMERA_INFO& camera, float roll, float fov, float farView)
+	void Renderer::UpdateCameraMatrices(const CameraInfo& camera, float roll, float fov, float farView)
 	{
 		constexpr auto NEAR_PLANE = 32.0f;
 

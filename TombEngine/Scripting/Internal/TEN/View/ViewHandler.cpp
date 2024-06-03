@@ -59,12 +59,12 @@ namespace TEN::Scripting::View
 
 	static void SetFOV(float angle)
 	{
-		AlterFOV(ANGLE(std::clamp(abs(angle), 10.0f, 170.0f)));
+		SetFov(ANGLE(std::clamp(abs(angle), 10.0f, 170.0f)));
 	}
 
 	static float GetFOV()
 	{
-		return TO_DEGREES(GetCurrentFOV());
+		return TO_DEGREES(GetCurrentFov());
 	}
 
 	static CameraType GetCameraType()
