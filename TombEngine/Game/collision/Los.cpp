@@ -32,26 +32,39 @@ namespace TEN::Collision::Los
 			neighborRoomNumbers.insert(room.neighbors.begin(), room.neighbors.end());
 		}
 
-		// Collect moveables.
+		// Run through neighbor rooms.
 		auto movs = std::vector<ItemInfo*>{};
-		for (int movID = 0; movID < g_Level.NumItems; movID++)
+		for (int neighborRoomNumber : neighborRoomNumbers)
 		{
-			auto& mov = g_Level.Items[movID];
-
-			// 1) Check moveable status.
-			if (mov.Status == ItemStatus::ITEM_INVISIBLE || mov.Status == ItemStatus::ITEM_DEACTIVATED)
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+			if (!neighborRoom.Active())
 				continue;
 
-			// 2) Check if room is active.
-			const auto& room = g_Level.Rooms[mov.RoomNumber];
-			if (!room.Active())
-				continue;
+			// Run through moveables in room.
+			int movID = neighborRoom.itemNumber;
+			while (movID != NO_VALUE)
+			{
+				auto& mov = g_Level.Items[movID];
 
-			// 3) Test if moveable is in nearby room.
-			if (!Contains(neighborRoomNumbers, (int)mov.RoomNumber))
-				continue;
+				// HACK: For some reason, infinite loop may sometimes occur.
+				if (movID == mov.NextItem)
+					break;
+				movID = mov.NextItem;
 
-			movs.push_back(&mov);
+				// 1) Ignore bridges (handled as part of room).
+				if (mov.IsBridge())
+					continue;
+
+				// 2) Check collidability.
+				if (!mov.Collidable)
+					continue;
+
+				// 3) Check status.
+				if (mov.Status == ItemStatus::ITEM_INVISIBLE || mov.Status == ItemStatus::ITEM_DEACTIVATED)
+					continue;
+
+				movs.push_back(&mov);
+			}
 		}
 
 		return movs;
@@ -59,7 +72,7 @@ namespace TEN::Collision::Los
 
 	static std::vector<MESH_INFO*> GetNearbyStatics(const std::vector<int>& roomNumbers)
 	{
-		// Collect statics.
+		// Run through neighbor rooms.
 		auto statics = std::vector<MESH_INFO*>{};
 		for (int roomNumber : roomNumbers)
 		{
@@ -67,7 +80,6 @@ namespace TEN::Collision::Los
 			const auto& room = g_Level.Rooms[roomNumber];
 			for (auto& neighborRoomNumber : room.neighbors)
 			{
-				// 1) Check if room is active.
 				auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 				if (!neighborRoom.Active())
 					continue;
@@ -75,10 +87,11 @@ namespace TEN::Collision::Los
 				// Run through statics.
 				for (auto& staticObj : neighborRoom.mesh)
 				{
-					// 2) Check if static is visible.
+					// Check visibility.
 					if (!(staticObj.flags & StaticMeshFlags::SM_VISIBLE))
 						continue;
 
+					// Collect static.
 					statics.push_back(&staticObj);
 				}
 			}
@@ -110,18 +123,6 @@ namespace TEN::Collision::Los
 			auto movs = GetNearbyMoveables(losColl.Room.RoomNumbers);
 			for (auto* mov : movs)
 			{
-				// Check if moveable is collidable.
-				if (!mov->Collidable)
-					continue;
-
-				// Check moveable status.
-				if (mov->Status == ItemStatus::ITEM_INVISIBLE || mov->Status == ItemStatus::ITEM_DEACTIVATED)
-					continue;
-
-				// Ignore bridges (handled as part of room).
-				if (mov->IsBridge())
-					continue;
-
 				// 2.1) Collect moveable LOS collisions.
 				if (collideMoveables)
 				{
@@ -196,10 +197,6 @@ namespace TEN::Collision::Los
 			auto statics = GetNearbyStatics(losColl.Room.RoomNumbers);
 			for (auto* staticObj : statics)
 			{
-				// Check static visibility.
-				if (!(staticObj->flags & StaticMeshFlags::SM_VISIBLE))
-					continue;
-
 				auto obb = staticObj->GetObb();
 
 				float intersectDist = 0.0f;
