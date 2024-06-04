@@ -155,8 +155,7 @@ namespace TEN::Entities::TR4
 				{
 					int heightFromFloor = GetPointCollision(*LaraItem).GetFloorHeight() - LaraItem->Pose.Position.y;
 
-					if (item->Pose.Position.y >= LaraItem->Pose.Position.y && heightFromFloor < CLICK(1) && 
-						intersection == ContainmentType::CONTAINS)
+					if (item->Pose.Position.y >= LaraItem->Pose.Position.y && heightFromFloor < CLICK(1))
 					{
 						SetAnimation(LaraItem, LA_SPIKE_DEATH);
 						LaraItem->Animation.IsAirborne = false;
