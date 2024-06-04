@@ -876,7 +876,7 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeRomeHammer;
 		obj->collision = GenericSphereBoxCollision;
-		obj->control = AnimatingControl;
+		obj->control = ControlRomeHammer;
 		obj->SetHitEffect(true);
 	}
 
