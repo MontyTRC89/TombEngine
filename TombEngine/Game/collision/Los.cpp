@@ -396,12 +396,13 @@ namespace TEN::Collision::Los
 			}
 		}
 
-		// Return room LOS collision.
+		// 3) Return room LOS collision.
 		return roomLosColl;
 	}
 
 	std::optional<MoveableLosCollisionData> GetMoveableLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer)
 	{
+		// Run through moveable LOS collisions.
 		auto losColl = GetLosCollision(origin, roomNumber, dir, dist, true, false, false);
 		for (auto& movLos : losColl.Moveables)
 		{
@@ -417,6 +418,7 @@ namespace TEN::Collision::Los
 
 	std::optional<SphereLosCollisionData> GetSphereLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collidePlayer)
 	{
+		// Run through sphere LOS collisions.
 		auto losColl = GetLosCollision(origin, roomNumber, dir, dist, false, true, false);
 		for (auto& sphereLos : losColl.Spheres)
 		{
@@ -432,6 +434,7 @@ namespace TEN::Collision::Los
 
 	std::optional<StaticLosCollisionData> GetStaticLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideOnlySolid)
 	{
+		// Run through static LOS collisions.
 		auto losColl = GetLosCollision(origin, roomNumber, dir, dist, false, false, true);
 		for (auto& staticLos : losColl.Statics)
 		{

@@ -27,7 +27,7 @@
 		*this = GetFrame(objectID, animNumber, frameNumber)->BoundingBox;
 	}
 
-	// TODO: Use reference, not pointer.
+	// TODO: Deprecated and to be removed. Should call item.GetObb() instead.
 	GameBoundingBox::GameBoundingBox(const ItemInfo* item)
 	{
 		auto frameData = GetFrameInterpData(*item);
