@@ -127,7 +127,6 @@ namespace TEN::Entities::Generic
 				lara->LeftArm.FrameNumber++;
 				if (lara->LeftArm.FrameNumber == 27)
 				{
-					lara->Torch.IsLit = false;
 					lara->Flare.ControlLeft = false;
 					lara->LeftArm.Locked = false;
 					lara->Torch.State = TorchState::Holding;
@@ -139,6 +138,7 @@ namespace TEN::Entities::Generic
 				{
 					laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
 					CreateFlare(*laraItem, ID_BURNING_TORCH_ITEM, true);
+					lara->Torch.IsLit = false;
 				}
 			}
 		}
@@ -147,7 +147,6 @@ namespace TEN::Entities::Generic
 			lara->LeftArm.FrameNumber++;
 			if (lara->LeftArm.FrameNumber == 41)
 			{
-				lara->Torch.IsLit = false;
 				lara->Flare.ControlLeft = false;
 				lara->LeftArm.Locked = false;
 				lara->Torch.State = TorchState::Holding;
@@ -159,6 +158,7 @@ namespace TEN::Entities::Generic
 			{
 				laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
 				CreateFlare(*laraItem, ID_BURNING_TORCH_ITEM, false);
+				lara->Torch.IsLit = false;
 			}
 		}
 		else if (lara->Torch.State == TorchState::JustLit)
