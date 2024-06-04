@@ -111,20 +111,20 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 {
 	constexpr auto DIST_BUFFER = BLOCK(0.1f);
 
-	// Get raw LOS collision.
+	// 1) Get raw LOS collision.
 	auto dir = target - origin;
 	dir.Normalize();
 	float dist = Vector3::Distance(origin, target);
 	auto losColl = GetLosCollision(origin, originRoomNumber, dir, dist, true, false, true);
 
-	// 1) Clip room LOS collision.
+	//21) Clip room LOS collision.
 	auto cameraLosColl = CameraLosCollisionData{};
 	cameraLosColl.Normal = (losColl.Room.Triangle != nullptr) ? losColl.Room.Triangle->GetNormal() : -dir;
 	cameraLosColl.Position = std::pair(losColl.Room.Position, losColl.Room.RoomNumber);
 	cameraLosColl.IsIntersected = losColl.Room.IsIntersected;
 	cameraLosColl.Distance = losColl.Room.Distance;
 
-	// 2) Clip moveable LOS collision.
+	// 3) Clip moveable LOS collision.
 	for (const auto& movLosColl : losColl.Moveables)
 	{
 		if (!TestCameraCollidableItem(*movLosColl.Moveable))
@@ -143,7 +143,7 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 		}
 	}
 
-	// 3) Clip static LOS collision.
+	// 4) Clip static LOS collision.
 	for (const auto& staticLosColl : losColl.Statics)
 	{
 		if (!TestCameraCollidableStatic(*staticLosColl.Static))
@@ -162,7 +162,7 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 		}
 	}
 
-	// TODO: Shift instead of this.
+	// TODO: Perform room geometry shift instead of this.
 	if (cameraLosColl.Distance < DIST_BUFFER)
 	{
 		cameraLosColl.Distance = DIST_BUFFER;
@@ -171,7 +171,7 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 			GetPointCollision(origin, originRoomNumber, dir, cameraLosColl.Distance).GetRoomNumber());
 	}
 
-	// 4) Return camera LOS collision.
+	// 5) Return camera LOS collision.
 	return cameraLosColl;
 }
 
