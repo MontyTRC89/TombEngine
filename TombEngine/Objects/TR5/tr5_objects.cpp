@@ -374,7 +374,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->LotType = LotType::Human;
+		obj->LotType = LotType::Basic;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 		obj->SetHitEffect();
@@ -391,7 +391,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->LotType = LotType::Human;
+		obj->LotType = LotType::Basic;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 		obj->SetHitEffect();
