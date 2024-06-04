@@ -27,8 +27,12 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll);
 
 void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll);
 void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll);
+void lara_as_walk_forward_turn_180(ItemInfo* item, CollisionInfo* coll);
+void lara_col_walk_forward_turn_180(ItemInfo* item, CollisionInfo* coll);
 void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll);
 void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll);
+void lara_as_run_forward_turn_180(ItemInfo* item, CollisionInfo* coll);
+void lara_col_run_forward_turn_180(ItemInfo* item, CollisionInfo* coll);
 void lara_as_idle(ItemInfo* item, CollisionInfo* coll);
 void lara_col_idle(ItemInfo* item, CollisionInfo* coll);
 void lara_as_pose(ItemInfo* item, CollisionInfo* coll);

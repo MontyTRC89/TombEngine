@@ -100,7 +100,7 @@ static bool TestCameraCollidableStatic(const MESH_INFO& staticObj)
 	if (distSqr >= SQUARE(CAMERA_OBJECT_COLL_DIST_THRESHOLD))
 		return false;
 
-	// 3) Test if box is collidable.
+	// 2) Test if box is collidable.
 	if (!TestCameraCollidableBox(staticObj.GetObb()))
 		return false;
 
@@ -117,7 +117,7 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 	float dist = Vector3::Distance(origin, target);
 	auto losColl = GetLosCollision(origin, originRoomNumber, dir, dist, true, false, true);
 
-	//21) Clip room LOS collision.
+	// 2) Clip room LOS collision.
 	auto cameraLosColl = CameraLosCollisionData{};
 	cameraLosColl.Normal = (losColl.Room.Triangle != nullptr) ? losColl.Room.Triangle->GetNormal() : -dir;
 	cameraLosColl.Position = std::pair(losColl.Room.Position, losColl.Room.RoomNumber);

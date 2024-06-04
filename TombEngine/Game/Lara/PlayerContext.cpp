@@ -164,6 +164,18 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
+	// TODO
+	bool CanWalkTurn180(const ItemInfo& item)
+	{
+		return false;
+	}
+
+	// TODO
+	bool CanWRunTurn180(const ItemInfo& item)
+	{
+		return false;
+	}
+
 	static bool TestGroundMovementSetup(const ItemInfo& item, const CollisionInfo& coll, const GroundMovementSetupData& setup, bool isCrawling = false)
 	{
 		constexpr auto SLOPE_ASPECT_ANGLE_DELTA_MAX = ANGLE(90.0f);
@@ -256,7 +268,7 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool CanRoll180Running(const ItemInfo& item)
+	bool CanRunRoll180(const ItemInfo& item)
 	{
 		const auto& player = GetLaraInfo(item);
 

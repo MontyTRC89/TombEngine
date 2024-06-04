@@ -245,6 +245,8 @@ namespace TEN::Entities::Player
 
 		PlayerBehaviorStateRoutines[LS_RUN_FORWARD_CANCEL] = std::pair(lara_as_null, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_SKIP_BACK] = std::pair(lara_as_skip_back, lara_col_skip_back);
+		PlayerBehaviorStateRoutines[LS_WALK_FORWARD_TURN_180] = std::pair(lara_as_walk_forward_turn_180, lara_col_walk_forward_turn_180);
+		PlayerBehaviorStateRoutines[LS_RUN_FORWARD_TURN_180] = std::pair(lara_as_run_forward_turn_180, lara_col_run_forward_turn_180);
 	}
 
 	void HandlePlayerBehaviorState(ItemInfo& item, CollisionInfo& coll, PlayerBehaviorStateRoutineType routineType)

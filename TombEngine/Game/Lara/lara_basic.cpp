@@ -202,15 +202,11 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (IsHeld(In::Walk))
 		{
-			/*short relMoveAngle = GetPlayerRelMoveAngle(*item);
-			if (abs(relMoveAngle) > ANGLE(90.0f) && HasStateDispatch(item, LS_WALK_FORWARD_TURN_180))
+			if (CanWalkTurn180(*item))
 			{
-				if (HasStateDispatch(item, LS_WALK_FORWARD_TURN_180))
-					item->Pose.Orientation.y += ANGLE(180.0f);
-
 				item->Animation.TargetState = LS_WALK_FORWARD_TURN_180;
 			}
-			else*/
+			else
 			{
 				item->Animation.TargetState = LS_WALK_FORWARD;
 			}
@@ -286,6 +282,70 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
+// State:	  LS_WALK_FORWARD_TURN_180 (208)
+// Collision: lara_col_walk_forward_turn_180()
+void lara_as_walk_forward_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::Horizontal;
+
+	if (item->HitPoints <= 0)
+	{
+		item->Animation.TargetState = LS_WALK_FORWARD;
+		return;
+	}
+
+	// Reset.
+	item->Animation.TargetState = LS_WALK_FORWARD_TURN_180;
+}
+
+// State:	LS_WALK_FORWARD_TURN_180 (208)
+// Control: lara_as_walk_forward_turn_180()
+void lara_col_walk_forward_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	// Setup.
+	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
+	item->Animation.IsAirborne = false;
+	item->Animation.Velocity.y = 0;
+	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.BlockFloorSlopeUp = true;
+	coll->Setup.BlockFloorSlopeDown = true;
+	coll->Setup.BlockDeathFloorDown = true;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
+	GetCollisionInfo(coll, item);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+		return;
+	}
+
+	if (CanFall(*item, *coll))
+	{
+		SetLaraFallAnimation(item);
+		return;
+	}
+
+	if (CanSlide(*item, *coll))
+	{
+		SetLaraSlideAnimation(item, coll);
+		return;
+	}
+
+	LaraDeflectEdge(item, coll);
+
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CollisionType::Front)
+	{
+		HandlePlayerElevationChange(item, coll);
+		return;
+	}
+}
+
 // State:	  LS_RUN_FORWARD (1)
 // Collision: lara_col_run_forward()
 void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
@@ -332,7 +392,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll)) &&
-		CanRoll180Running(*item))
+		CanRunRoll180(*item))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;
@@ -379,7 +439,14 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			}
 			else
 			{
-				item->Animation.TargetState = LS_RUN_FORWARD;
+				if (CanRunTurn180(*item))
+				{
+					item->Animation.TargetState = LS_RUN_FORWARD_TURN_180;
+				}
+				else
+				{
+					item->Animation.TargetState = LS_RUN_FORWARD;
+				}
 			}
 		}
 
@@ -464,6 +531,72 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CollisionType::Front)
+	{
+		HandlePlayerElevationChange(item, coll);
+		return;
+	}
+}
+
+// State:	  LS_RUN_FORWARD_TURN_180 (209)
+// Collision: lara_col_run_forward_turn_180()
+void lara_as_run_forward_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.Look.Mode = LookMode::Horizontal;
+
+	if (item->HitPoints <= 0)
+	{
+		item->Animation.TargetState = LS_RUN_FORWARD;
+		return;
+	}
+
+	// Reset.
+	item->Animation.TargetState = LS_RUN_FORWARD_TURN_180;
+}
+
+// State:	LS_RUN_FORWARD_TURN_180 (209)
+// Control: lara_as_run_forward_turn_180()
+void lara_col_run_forward_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	// Setup.
+	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item);
+	item->Animation.IsAirborne = false;
+	item->Animation.Velocity.y = 0;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.BlockFloorSlopeUp = true;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
+	GetCollisionInfo(coll, item);
+	LaraResetGravityStatus(item, coll);
+
+	if (TestLaraHitCeiling(coll))
+	{
+		SetLaraHitCeiling(item, coll);
+		return;
+	}
+
+	if (CanFall(*item, *coll))
+	{
+		SetLaraFallAnimation(item);
+		return;
+	}
+
+	if (CanSlide(*item, *coll))
+	{
+		SetLaraSlideAnimation(item, coll);
+		return;
+	}
+
+	if (TestAndDoLaraLadderClimb(item, coll))
+		return;
+
+	LaraDeflectEdge(item, coll);
+	
+	if (CanChangeElevation(*item, *coll))
 	{
 		HandlePlayerElevationChange(item, coll);
 		return;

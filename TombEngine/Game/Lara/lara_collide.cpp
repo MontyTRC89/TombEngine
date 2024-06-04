@@ -278,7 +278,9 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 				item->Animation.TargetState = LS_IDLE;
 			}
 			else
+			{
 				item->Animation.TargetState = LS_TURN_LEFT_SLOW;
+			}
 		}
 		else if (IsHeld(In::Right))
 		{
@@ -288,10 +290,14 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 				item->Animation.TargetState = LS_IDLE;
 			}
 			else
+			{
 				item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
+			}
 		}
 		else
+		{
 			item->Animation.TargetState = LS_IDLE;
+		}
 
 		AnimateItem(item);
 
