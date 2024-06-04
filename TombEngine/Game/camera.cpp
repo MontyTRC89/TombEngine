@@ -40,7 +40,7 @@ constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 struct CameraLosCollisionData
 {
 	std::pair<Vector3, int> Position = {};
-	std::optional<Vector3>	Normal	 = std::nullopt;
+	Vector3					Normal	 = Vector3::Zero;
 
 	bool  IsIntersected = false;
 	float Distance		= 0.0f;
@@ -119,14 +119,10 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 
 	// 1) Clip room LOS collision.
 	auto cameraLosColl = CameraLosCollisionData{};
-	cameraLosColl.Normal = (losColl.Room.Triangle != nullptr) ? losColl.Room.Triangle->GetNormal() : std::optional<Vector3>();
+	cameraLosColl.Normal = (losColl.Room.Triangle != nullptr) ? losColl.Room.Triangle->GetNormal() : -dir;
 	cameraLosColl.Position = std::pair(losColl.Room.Position, losColl.Room.RoomNumber);
 	cameraLosColl.IsIntersected = losColl.Room.IsIntersected;
 	cameraLosColl.Distance = losColl.Room.Distance;
-
-	bool hasObjectLos = false;
-
-	// TODO: Maybe calculate an object LOS collision "normal" as the direction from the object to the origin?
 
 	// 2) Clip moveable LOS collision.
 	for (const auto& movLosColl : losColl.Moveables)
@@ -136,7 +132,10 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 
 		if (movLosColl.Distance < cameraLosColl.Distance)
 		{
-			cameraLosColl.Normal = std::nullopt;
+			auto normal = movLosColl.Moveable->GetObb().Center - origin;
+			normal.Normalize();
+
+			cameraLosColl.Normal = normal;
 			cameraLosColl.Position = std::pair(movLosColl.Position, movLosColl.RoomNumber);
 			cameraLosColl.IsIntersected = true;
 			cameraLosColl.Distance = movLosColl.Distance;
@@ -152,7 +151,10 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 
 		if (staticLosColl.Distance < cameraLosColl.Distance)
 		{
-			cameraLosColl.Normal = std::nullopt;
+			auto normal = staticLosColl.Static->GetObb().Center - origin;
+			normal.Normalize();
+
+			cameraLosColl.Normal = normal;
 			cameraLosColl.Position = std::pair(staticLosColl.Position, staticLosColl.RoomNumber);
 			cameraLosColl.IsIntersected = true;
 			cameraLosColl.Distance = staticLosColl.Distance;
