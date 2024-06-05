@@ -83,7 +83,9 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 			return (y > pointColl.GetFloorHeight());
 		}
 		else
-			return (y < collPos.GetCeilingHeight());
+		{
+			return (y < pointColl.GetCeilingHeight());
+		}
 	};
 
 	bool hasCollided =
@@ -274,7 +276,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->CeilingNormal = pointColl.GetCeilingNormal();
 	coll->FloorTilt = GetSurfaceTilt(pointColl.GetFloorNormal(), true).ToVector2();
 	coll->CeilingTilt = GetSurfaceTilt(pointColl.GetCeilingNormal(), false).ToVector2();
-	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
+	//coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
 	// Debug angle and distance
 	// g_Renderer.PrintDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);

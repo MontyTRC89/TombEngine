@@ -501,7 +501,8 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 
 	if ((pointColl.GetFloorHeight() - item->Pose.Position.y) < SWIM_WATER_DEPTH)
 	{
-		TestPlayerWaterStepOut(item, coll);
+		// TODO: Find fix for this branch.
+		//TestPlayerWaterStepOut(item, coll);
 	}
 	else if ((waterHeight - item->Pose.Position.y) <= -LARA_HEADROOM)
 	{

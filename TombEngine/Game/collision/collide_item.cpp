@@ -293,7 +293,7 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 	return true;
 }
 
-bool TestForObjectOnLedge(const AttractorCollision& attracColl, float radius, float down, bool testAttracFront)
+bool TestForObjectOnLedge(const AttractorCollisionData& attracColl, float radius, float down, bool testAttracFront)
 {
 	constexpr auto PASS_COUNT = 3;
 
@@ -314,7 +314,7 @@ bool TestForObjectOnLedge(const AttractorCollision& attracColl, float radius, fl
 	auto dir = EulerAngles(0, headingAngle, 0).ToDirection();
 
 	// Run through neighbor rooms.
-	const auto& room = g_Level.Rooms[attracColl.AttractorPtr->GetRoomNumber()];
+	const auto& room = g_Level.Rooms[attracColl.Attractor->GetRoomNumber()];
 	for (int roomNumber : room.neighbors)
 	{
 		const auto& neighborRoom = g_Level.Rooms[roomNumber];

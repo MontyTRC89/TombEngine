@@ -856,7 +856,7 @@ void ProcessSectorFlags(ItemInfo* item)
 	bool isPlayer = item->IsLara();
 
 	auto pointColl = GetPointCollision(*item);
-	const auto& sector = GetCollision(item).GetBottomSector();
+	const auto& sector = GetPointCollision(*item).GetBottomSector();
 
 	if (isPlayer)
 	{
@@ -869,6 +869,8 @@ void ProcessSectorFlags(ItemInfo* item)
 	{
 		if (isPlayer)
 		{
+			const auto& player = GetLaraInfo(*item);
+			
 			if (!IsJumpState(item->Animation.ActiveState) || 
 				player.Control.WaterStatus != WaterStatus::Dry)
 			{

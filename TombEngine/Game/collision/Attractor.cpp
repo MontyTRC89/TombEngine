@@ -65,9 +65,9 @@ namespace TEN::Collision::Attractor
 		return _length;
 	}
 
-	const BoundingBox& AttractorObject::GetBox() const
+	const BoundingBox& AttractorObject::GetAabb() const
 	{
-		return _box;
+		return _aabb;
 	}
 
 	bool AttractorObject::IsLooped() const
@@ -83,7 +83,7 @@ namespace TEN::Collision::Attractor
 
 	unsigned int AttractorObject::GetSegmentCount() const
 	{
-		return std::max<unsigned int>(_points.size() - 1, 1);
+		return std::max<unsigned int>((int)_points.size() - 1, 1);
 	}
 
 	unsigned int AttractorObject::GetSegmentIDAtChainDistance(float chainDist) const
@@ -340,7 +340,7 @@ namespace TEN::Collision::Attractor
 		}
 
 		// Cache box.
-		_box = Geometry::GetBoundingBox(_points);
+		_aabb = Geometry::GetBoundingBox(_points);
 	}
 
 	AttractorCollisionData::AttractorCollisionData(AttractorObject& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis)
@@ -434,11 +434,11 @@ namespace TEN::Collision::Attractor
 		auto debugAttracs = GetDebugAttractors();
 		for (auto* attrac : debugAttracs)
 		{
-			if (sphere.Intersects(attrac->GetBox()))
+			if (sphere.Intersects(attrac->GetAabb()))
 				boundedAttracs.push_back(attrac);
 		}
 
-		// 1) Collect room attractors.
+		// 1) Collect bounded room attractors.
 		auto& room = g_Level.Rooms[roomNumber];
 		for (int neighborRoomNumber : room.neighbors)
 		{
@@ -447,14 +447,13 @@ namespace TEN::Collision::Attractor
 			if (!neighborRoom.Active())
 				continue;
 
-			// Collect bounded room attractors.
 			auto attracs = neighborRoom.Attractors.GetBoundedAttractors(sphere);
 			boundedAttracs.insert(boundedAttracs.end(), attracs.begin(), attracs.end());
 		}
 
 		auto visitedBridgeItemNumbers = std::set<int>{};
 
-		// 2) Collect bridge attractors.
+		// 2) Collect bounded bridge attractors.
 		unsigned int sectorSearchDepth = (int)ceil(sphere.Radius / BLOCK(1));
 		auto sectors = GetNeighborSectors(pos, roomNumber, sectorSearchDepth);
 		for (const auto* sector : sectors)
@@ -475,15 +474,14 @@ namespace TEN::Collision::Attractor
 				auto& bridge = GetBridgeObject(bridgeItem);
 
 				// Test if sphere intersects bridge attractor box.
-				if (!sphere.Intersects(bridge.GetAttractor().GetBox()))
+				if (!sphere.Intersects(bridge.GetAttractor().GetAabb()))
 					continue;
 
-				// Collect bounded bridge attractor.
 				boundedAttracs.push_back(&bridge.GetAttractor());
 			}
 		}
 
-		// 3) Return bounded attractors from sphere-AABB intersections.
+		// 3) Return bounded attractors.
 		return boundedAttracs;
 	}
 
@@ -508,7 +506,6 @@ namespace TEN::Collision::Attractor
 				auto dir = (points.size() > 1) ? (points[i + 1] - points[i]) : Vector3::One;
 				dir.Normalize();
 
-				// TODO: Short segment may be ignored even if it intersects.
 				// Test if segment intersects sphere.
 				float dist = 0.0f;
 				if (!sphere.Intersects(pos, dir, dist) || dist > attrac->GetSegmentLengths()[i])

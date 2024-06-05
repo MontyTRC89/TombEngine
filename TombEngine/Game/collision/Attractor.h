@@ -30,7 +30,7 @@ namespace TEN::Collision::Attractor
 		int					 _roomNumber	 = 0;
 		std::vector<float>	 _segmentLengths = {};
 		float				 _length		 = 0.0f;
-		BoundingBox			 _box			 = BoundingBox();
+		BoundingBox			 _aabb			 = BoundingBox();
 
 		std::set<int> _attachedPlayerItemNumbers = {};
 
@@ -48,7 +48,7 @@ namespace TEN::Collision::Attractor
 		int							GetRoomNumber() const;
 		const std::vector<float>&	GetSegmentLengths() const;
 		float						GetLength() const;
-		const BoundingBox&			GetBox() const;
+		const BoundingBox&			GetAabb() const;
 
 		// Inquirers
 		bool IsLooped() const;

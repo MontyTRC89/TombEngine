@@ -678,9 +678,6 @@ static Plane ConvertFakePlaneToPlane(const Vector3& fakePlane, bool isFloor)
 
 void ReadRooms()
 {
-	constexpr auto ILLEGAL_FLOOR_SLOPE_ANGLE   = ANGLE(36.0f);
-	constexpr auto ILLEGAL_CEILING_SLOPE_ANGLE = ANGLE(45.0f);
-
 	int roomCount = ReadInt32();
 	TENLog("Rooms: " + std::to_string(roomCount), LogLevel::Info);
 
@@ -790,16 +787,16 @@ void ReadRooms()
 			sector.Stopper = (bool)ReadInt32();
 
 			sector.FloorSurface.SplitAngle = FROM_RAD(ReadFloat());
-			sector.FloorSurface.Triangles[0].SteepSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
-			sector.FloorSurface.Triangles[1].SteepSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+			sector.FloorSurface.Triangles[0].SteepSlopeAngle = STEEP_FLOOR_SLOPE_ANGLE;
+			sector.FloorSurface.Triangles[1].SteepSlopeAngle = STEEP_FLOOR_SLOPE_ANGLE;
 			sector.FloorSurface.Triangles[0].PortalRoomNumber = ReadInt32();
 			sector.FloorSurface.Triangles[1].PortalRoomNumber = ReadInt32();
 			sector.FloorSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
 			sector.FloorSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
 
 			sector.CeilingSurface.SplitAngle = FROM_RAD(ReadFloat());
-			sector.CeilingSurface.Triangles[0].SteepSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
-			sector.CeilingSurface.Triangles[1].SteepSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+			sector.CeilingSurface.Triangles[0].SteepSlopeAngle = STEEP_CEILING_SLOPE_ANGLE;
+			sector.CeilingSurface.Triangles[1].SteepSlopeAngle = STEEP_CEILING_SLOPE_ANGLE;
 			sector.CeilingSurface.Triangles[0].PortalRoomNumber = ReadInt32();
 			sector.CeilingSurface.Triangles[1].PortalRoomNumber = ReadInt32();
 			sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
@@ -907,6 +904,8 @@ void ReadRooms()
 
 		// Load attractors.
 		int attracCount = ReadInt32();
+		auto attracs = std::vector<AttractorObject>{};
+		attracs.reserve(attracCount);
 		for (int j = 0; j < attracCount; j++)
 		{
 			auto type = (AttractorType)ReadInt32();
@@ -920,8 +919,9 @@ void ReadRooms()
 				points.push_back(point);
 			}
 
-			room.Attractors.push_back(AttractorObject(type, points, i));
+			attracs.push_back(AttractorObject(type, points, i));
 		}
+		room.Attractors = AttractorHandler(attracs);
 
 		room.flippedRoom = ReadInt32();
 		room.flags = ReadInt32();

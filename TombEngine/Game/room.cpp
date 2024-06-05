@@ -65,7 +65,7 @@ std::vector<AttractorObject*> AttractorHandler::Bvh::GetBoundedAttractors(const 
 		{
 			for (int attracID : node.AttractorIds)
 			{
-				if (attracs[attracID].GetBox().Intersects(sphere))
+				if (attracs[attracID].GetAabb().Intersects(sphere))
 					boundedAttracs.push_back(&attracs[attracID]);
 			}
 		}
@@ -92,9 +92,9 @@ int AttractorHandler::Bvh::Generate(const std::vector<AttractorObject>& attracs,
 	auto node = BvhNode{};
 
 	// Combine boxes.
-	node.Box = attracs[attracIds[start]].GetBox();
+	node.Box = attracs[attracIds[start]].GetAabb();
 	for (int i = (start + 1); i < end; i++)
-		node.Box = Geometry::CombineBoundingBoxes(node.Box, attracs[attracIds[i]].GetBox());
+		node.Box = Geometry::CombineBoundingBoxes(node.Box, attracs[attracIds[i]].GetAabb());
 
 	// Leaf node.
 	if ((end - start) <= ATTRAC_COUNT_PER_LEAF_MAX)
