@@ -9,6 +9,8 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+constexpr auto KILLER_STATUE_DAMAGE = 200;
+
 void InitializeKillerStatue(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -29,7 +31,7 @@ void KillerStatueControl(short itemNumber)
 
 	if (item->TouchBits & 0x80 && item->Animation.ActiveState == 2)
 	{
-		DoDamage(LaraItem, 20);
+		DoDamage(LaraItem, KILLER_STATUE_DAMAGE);
 
 		int x = LaraItem->Pose.Position.x + (GetRandomControl() - BLOCK(16)) / CLICK(1);
 		int z = LaraItem->Pose.Position.z + (GetRandomControl() - BLOCK(16)) / CLICK(1);
