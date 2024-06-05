@@ -111,7 +111,7 @@ namespace TEN::Entities::TR4
 					KillItem(itemNumber);
 
 					laraItem->Animation.AnimNumber = LA_MINE_DEATH;
-					laraItem->Animation.FrameNumber = GetAnimData(*mineItem).frameBase;
+					laraItem->Animation.FrameNumber = GetAnimData(*laraItem).frameBase;
 					laraItem->Animation.ActiveState = LS_DEATH;
 					laraItem->Animation.Velocity.z = 0;
 
