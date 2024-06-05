@@ -858,6 +858,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_FLOOR_4BLADES];
 		if (obj->loaded)
 		{
+			obj->Initialize = InitializeFourBlades;
 			obj->control = FourBladesControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
@@ -866,6 +867,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_CEILING_4BLADES];
 		if (obj->loaded)
 		{
+			obj->Initialize = InitializeFourBlades;
 			obj->control = FourBladesControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);

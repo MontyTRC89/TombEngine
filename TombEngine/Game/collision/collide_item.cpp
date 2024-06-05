@@ -708,7 +708,8 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 	// Snap to new position.
 	else
 	{
-		item1->Pose.Position = item0->Pose.Position + newDeltaPos;
+		if (item0->ItemFlags[4] == 0)
+			item1->Pose.Position = item0->Pose.Position + newDeltaPos;
 	}
 
 	if (item1->IsLara() && enableSpasm && bounds.GetHeight() > CLICK(1))
