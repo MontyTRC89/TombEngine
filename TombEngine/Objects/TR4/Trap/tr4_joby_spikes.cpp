@@ -14,76 +14,97 @@ using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::TR4
 {
+    constexpr auto JOBY_SPIKES_DAMAGE = 8;
+    constexpr auto JOBY_SPIKES_EXTRA_ROTATION_SPEED = 2;
+    constexpr auto JOBY_SPIKES_SCALE_INCREMENT = 3;
+    constexpr auto JOBY_SPIKES_MAX_SCALE = 3328; //3 blocks + 1 click
+    //TODO: Need to test and adapt formula for scaling to other heights.
+
     void InitializeJobySpikes(short itemNumber)
     {
-        auto* item = &g_Level.Items[itemNumber];
+        auto& item = g_Level.Items[itemNumber];
+
+        auto& angleRotationSpeed    = item.ItemFlags[0];
+        auto& spikeLength           = item.ItemFlags[1];
+        auto& clockworkDirection    = item.ItemFlags[2];
+        auto& maxExtensionLength    = item.ItemFlags[3];
 
 		// Set bone mutators to EulerAngles identity by default.
-		for (auto& mutator : item->Model.Mutators)
+		for (auto& mutator : item.Model.Mutators)
             mutator.Scale.y = 0.0f;
 
-        item->Pose.Orientation.y = GetRandomControl() * 1024;
-        item->ItemFlags[2] = GetRandomControl() & 1;
+        item.Pose.Orientation.y = Random::GenerateInt(0, INT16_MAX) * 1024;
+        clockworkDirection = Random::GenerateInt(0, 1);
 
-        auto probe = GetPointCollision(*item);
+        auto probe = GetPointCollision(item);
 
-        // TODO: Check this optimized division.
-        //v6 = 1321528399i64 * ((probe.GetFloorHeight() - probe.GetCeilingHeight()) << 12);
-        //item->itemFlags[3] = (HIDWORD(v6) >> 31) + (SHIDWORD(v6) >> 10);
-
-        item->ItemFlags[3] = (short)((probe.GetFloorHeight() - probe.GetCeilingHeight()) * 1024 * 12 / 13);
+        int floorHeight = probe.GetFloorHeight();
+        int ceilingHeight = probe.GetCeilingHeight();
+        maxExtensionLength = (short)(4096 * (floorHeight - ceilingHeight) / JOBY_SPIKES_MAX_SCALE);
     }
 
     void JobySpikesControl(short itemNumber)
     {
-        auto* item = &g_Level.Items[itemNumber];
+        auto& item = g_Level.Items[itemNumber];
 
-        if (!TriggerActive(item))
+        if (!TriggerActive(&item))
             return;
 
-       SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose);
-       auto frameData = GetFrameInterpData(*LaraItem);
+        auto& angleRotationSpeed    = item.ItemFlags[0];
+        auto& spikeLength           = item.ItemFlags[1];
+        auto& clockworkDirection    = item.ItemFlags[2];
+        auto& maxExtensionLength    = item.ItemFlags[3];
 
-        int dy = LaraItem->Pose.Position.y + frameData.FramePtr0->BoundingBox.Y1;
-        int dl = 3328 * item->ItemFlags[1] / 4096;
+        SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item.Pose);
+        auto frameData = GetFrameInterpData(*LaraItem);
+
+        //Damage routine
+        int LaraY = LaraItem->Pose.Position.y + frameData.FramePtr0->BoundingBox.Y1;
+        int spikeY = JOBY_SPIKES_MAX_SCALE * spikeLength / 4096;
 
         if (LaraItem->HitPoints > 0)
         {
-            if (item->Pose.Position.y + dl > dy)
+            if (item.Pose.Position.y + spikeY > LaraY)
             {
-                if (abs(item->Pose.Position.x - LaraItem->Pose.Position.x) < CLICK(2))
+                if (abs(item.Pose.Position.x - LaraItem->Pose.Position.x) < BLOCK(0.5))
                 {
-                    if (abs(item->Pose.Position.z - LaraItem->Pose.Position.z) < CLICK(2))
+                    if (abs(item.Pose.Position.z - LaraItem->Pose.Position.z) < BLOCK(0.5))
                     {
-                        int x = (GetRandomControl() & 0x7F) + LaraItem->Pose.Position.x - 64;
-                        int y = dy + GetRandomControl() % (item->Pose.Position.y - dy + dl);
-                        int z = (GetRandomControl() & 0x7F) + LaraItem->Pose.Position.z - 64;
+                        DoDamage(LaraItem, JOBY_SPIKES_DAMAGE);
 
-                        DoBloodSplat(x, y, z, (GetRandomControl() & 3) + 2, 2 * GetRandomControl(), item->RoomNumber);
-                        DoDamage(LaraItem, 8);
+                        int bloodPosX = LaraItem->Pose.Position.x + Random::GenerateInt(-64, 64);
+                        int bloodPosY = LaraY + Random::GenerateInt( 0, item.Pose.Position.y - LaraY + spikeY);
+                        int bloodPosZ = LaraItem->Pose.Position.z + Random::GenerateInt(-64, 64);
+
+                        DoBloodSplat(bloodPosX, bloodPosY, bloodPosZ, Random::GenerateInt (2,5), 2 * GetRandomControl(), item.RoomNumber);
+                        
                     }
                 }
             }
         }
 
-        if (item->ItemFlags[2])
+        //Rotation routine
+        if (clockworkDirection == 1)
         {
-            if (item->ItemFlags[0] > -4096)
-                item->ItemFlags[0] = item->ItemFlags[1] + (item->ItemFlags[1] / 64) - 2;
+            if (angleRotationSpeed < 4096)
+                angleRotationSpeed = (spikeLength / 64) + spikeLength + JOBY_SPIKES_EXTRA_ROTATION_SPEED;
         }
-        else if (item->ItemFlags[0] < 4096)
-            item->ItemFlags[0] = (item->ItemFlags[1] / 64) + item->ItemFlags[1] + 2;
+        else
+        {
+            if (angleRotationSpeed > -4096)
+                angleRotationSpeed = spikeLength + (spikeLength / 64) - JOBY_SPIKES_EXTRA_ROTATION_SPEED;
+        }
 
-        if (item->ItemFlags[1] < item->ItemFlags[3])
-            item->ItemFlags[1] += 3;
+        if (spikeLength < maxExtensionLength)
+            spikeLength += JOBY_SPIKES_SCALE_INCREMENT;
 
-        item->Pose.Orientation.y += item->ItemFlags[0];
+        item.Pose.Orientation.y += angleRotationSpeed;
 
-		// Update bone mutators.
-		if (item->ItemFlags[1])
+		// Scale routine
+		if (spikeLength)
 		{
-            for (auto& mutator : item->Model.Mutators)
-				mutator.Scale = Vector3(1.0f, item->ItemFlags[1] / 4096.0f, 1.0f);
+            for (auto& mutator : item.Model.Mutators)
+				mutator.Scale = Vector3(1.0f, spikeLength / 4096.0f, 1.0f);
 		}
     }
 }

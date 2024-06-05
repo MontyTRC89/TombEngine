@@ -819,7 +819,6 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeJobySpikes;
 			obj->control = JobySpikesControl;
-			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
 		}
 
