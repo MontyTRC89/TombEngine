@@ -782,13 +782,13 @@ static void HandlePlayerTurnX(ItemInfo& item, float alpha)
 	player.Control.HeadingOrientTarget.x = headingAngle;
 }
 
-static void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing)
+static void HandlePlayerTurnY(ItemInfo& item, float alpha, bool isStrafing, short yAngleOffset)
 {
 	constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
 	auto& player = GetLaraInfo(item);
 
-	short headingAngle = (isStrafing ? player.Control.RefCameraOrient.y : GetPlayerHeadingAngleY(item));
+	short headingAngle = (isStrafing ? player.Control.RefCameraOrient.y : (GetPlayerHeadingAngleY(item) + yAngleOffset));
 	auto targetOrient = EulerAngles(item.Pose.Orientation.x, headingAngle, item.Pose.Orientation.z);
 
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, headingAngle);
@@ -932,7 +932,7 @@ void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha)
 }
 
 // NOTE: Modern control version.
-void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool isStrafing, int flags)
+void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool isStrafing, int flags, short yAngleOffset)
 {
 	// 1) X axis turn.
 	if (flags & (int)PlayerTurnFlags::TurnX)
@@ -940,7 +940,7 @@ void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool 
 
 	// 2) Y axis turn.
 	if (flags & (int)PlayerTurnFlags::TurnY)
-		HandlePlayerTurnY(item, turnAlpha, isStrafing);
+		HandlePlayerTurnY(item, turnAlpha, isStrafing, yAngleOffset);
 
 	// 3) Flex.
 	if (flags & (int)PlayerTurnFlags::VerticalFlex)

@@ -164,16 +164,11 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	// TODO
-	bool CanWalkTurn180(const ItemInfo& item)
+	bool CanWalkRunTurn180(const ItemInfo& item)
 	{
-		return false;
-	}
+		constexpr auto BASE_ANGLE = ANGLE(90.0f);
 
-	// TODO
-	bool CanWRunTurn180(const ItemInfo& item)
-	{
-		return false;
+		return (abs(GetPlayerRelHeadingAngleY(item)) > BASE_ANGLE);
 	}
 
 	static bool TestGroundMovementSetup(const ItemInfo& item, const CollisionInfo& coll, const GroundMovementSetupData& setup, bool isCrawling = false)

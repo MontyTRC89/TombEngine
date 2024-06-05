@@ -44,7 +44,7 @@ void HandlePlayerTurnLean(ItemInfo* item, CollisionInfo* coll, short baseRate, s
 void HandlePlayerCrawlTurnFlex(ItemInfo& item);
 void HandlePlayerTurn(ItemInfo& item, short turnRateAccel, short turnRateMin, short turnRateMax, short leanRate, short leanAngleMax);
 void HandlePlayerSwimTurnFlex(ItemInfo& item, float alpha);
-void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool isStrafing, int flags);
+void HandlePlayerTurn(ItemInfo& item, float turnAlpha, short leanAngleMax, bool isStrafing, int flags, short yAngleOffset = ANGLE(0.0f));
 void HandlePlayerUpJumpShift(ItemInfo& item);
 void HandlePlayerFlyCheat(ItemInfo& item);
 void HandlePlayerWetnessDrips(ItemInfo& item);
