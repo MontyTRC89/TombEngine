@@ -123,7 +123,7 @@ namespace TEN::Entities::Generic
 		if (!collObjects.Statics.empty())
 			return false;
 
-		for (const auto* itemPtr : collObjects.ItemPtrs)
+		for (const auto* itemPtr : collObjects.Items)
 		{
 			const auto& object = Objects[itemPtr->ObjectNumber];
 
@@ -194,7 +194,7 @@ namespace TEN::Entities::Generic
 		if (!collObjects.Statics.empty())
 			return false;
 
-		for (const auto* itemPtr : collObjects.ItemPtrs)
+		for (const auto* itemPtr : collObjects.Items)
 		{
 			const auto& object = Objects[itemPtr->ObjectNumber];
 
