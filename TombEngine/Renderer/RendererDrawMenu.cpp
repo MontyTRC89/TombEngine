@@ -60,7 +60,7 @@ namespace TEN::Renderer
 	constexpr auto LogoWidth = 300;
 	constexpr auto LogoHeight = 150;
 
-	// Used with distance travelled
+	// Used with distance traveled
 	constexpr auto UnitsToMeters = 419;
 
 	// Helper functions to jump caret to new line
@@ -73,8 +73,8 @@ namespace TEN::Renderer
 	inline int SF_Center(bool selected = false) { return (int)PrintStringFlags::Outline | (int)PrintStringFlags::Center | (selected ? (int)PrintStringFlags::Blink : 0); }
 	
 	// Helper functions to get specific generic strings
-	inline const char* Str_Enabled(bool enabled = false) { return g_GameFlow->GetString(enabled ? STRING_ENABLED : STRING_DISABLED); }
-	inline const char* Str_LoadSave(bool save = false) { return g_GameFlow->GetString(save ? STRING_SAVE_GAME : STRING_LOAD_GAME); }
+	inline std::string GetStringOnOff(bool on = false) { return g_GameFlow->GetString(on ? STRING_ON: STRING_OFF); }
+	inline std::string GetStringSaveLoad(bool save = false) { return g_GameFlow->GetString(save ? STRING_SAVE_GAME : STRING_LOAD_GAME); }
 
 	// These bars are only used in menus.
 	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
@@ -211,22 +211,22 @@ namespace TEN::Renderer
 
 			// Tank camera control
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TANK_CAMERA_CONTROL), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableTankCameraControl), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableTankCameraControl), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
 			GetNextLinePosition(&y);
 
 			// Invert camera X axis
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_INVERT_CAMERA_X_AXIS), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 2));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.InvertCameraXAxis), PRINTSTRING_COLOR_WHITE, SF(titleOption == 2));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.InvertCameraXAxis), PRINTSTRING_COLOR_WHITE, SF(titleOption == 2));
 			GetNextLinePosition(&y);
 
 			// Invert camera Y axis
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_INVERT_CAMERA_Y_AXIS), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 3));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.InvertCameraYAxis), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.InvertCameraYAxis), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
 			GetNextLinePosition(&y);
 
 			// Rumble
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
 			GetNextBlockPosition(&y);
 
 			// Mouse sensitivity
@@ -263,37 +263,37 @@ namespace TEN::Renderer
 
 			// Walk toggle
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_WALK_TOGGLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 2));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableWalkToggle), PRINTSTRING_COLOR_WHITE, SF(titleOption == 2));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableWalkToggle), PRINTSTRING_COLOR_WHITE, SF(titleOption == 2));
 			GetNextLinePosition(&y);
 
 			// Crouch toggle
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_CROUCH_TOGGLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 3));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableCrouchToggle), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableCrouchToggle), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
 			GetNextLinePosition(&y);
 
 			// Auto grab
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_CLIMB), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoClimb), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableAutoClimb), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
 			GetNextLinePosition(&y);
 
 			// Auto monkey swing jump
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_MONKEY_SWING_JUMP), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoMonkeySwingJump), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableAutoMonkeySwingJump), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
 			GetNextLinePosition(&y);
 
 			// Auto targeting
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGETING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoTargeting), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableAutoTargeting), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
 			GetNextLinePosition(&y);
 
 			// Opposite action roll
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_OPPOSITE_ACTION_ROLL), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 7));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableOppositeActionRoll), PRINTSTRING_COLOR_WHITE, SF(titleOption == 7));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableOppositeActionRoll), PRINTSTRING_COLOR_WHITE, SF(titleOption == 7));
 			GetNextBlockPosition(&y);
 
 			// Target highlighter
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TARGET_HIGHLIGHTER), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 8));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableTargetHighlighter), PRINTSTRING_COLOR_WHITE, SF(titleOption == 8));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableTargetHighlighter), PRINTSTRING_COLOR_WHITE, SF(titleOption == 8));
 
 			y = MenuVerticalBottomOptions;
 
@@ -320,7 +320,7 @@ namespace TEN::Renderer
 
 			// Windowed mode
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_WINDOWED), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableWindowedMode), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableWindowedMode), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
 			GetNextLinePosition(&y);
 
 			// Enable dynamic shadows
@@ -330,7 +330,7 @@ namespace TEN::Renderer
 
 			// Enable caustics
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_CAUSTICS), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 3));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableCaustics), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableCaustics), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
 			GetNextLinePosition(&y);
 
 			// Enable antialiasing
@@ -340,12 +340,12 @@ namespace TEN::Renderer
 
 			// Enable ambient occlusion
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AMBIENT_OCCLUSION), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAmbientOcclusion), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableAmbientOcclusion), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
 			GetNextBlockPosition(&y);
 
 			// Subtitles
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SUBTITLES), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableSubtitles), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableSubtitles), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
 
 			y = MenuVerticalBottomOptions;
 
@@ -381,7 +381,7 @@ namespace TEN::Renderer
 
 			// Reverb
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_REVERB), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 2));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(titleOption == 2));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(titleOption == 2));
 			GetNextBlockPosition(&y);
 
 			y = MenuVerticalBottomOptions;
@@ -737,7 +737,7 @@ namespace TEN::Renderer
 		char stringBuffer[255];
 
 		// Heading
-		AddString(MenuCenterEntry, MenuVerticalNarrowLineSpacing, Str_LoadSave(g_Gui.GetInventoryMode() == InventoryMode::Save), 
+		AddString(MenuCenterEntry, MenuVerticalNarrowLineSpacing, GetStringSaveLoad(g_Gui.GetInventoryMode() == InventoryMode::Save), 
 			PRINTSTRING_COLOR_ORANGE, SF_Center());
 		GetNextBlockPosition(&y);
 

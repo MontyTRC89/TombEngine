@@ -943,7 +943,7 @@ namespace TEN::Gui
 
 			case GameplaySettingsOption::AutoMonkeySwingJump:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableMonkeySwingJump = !CurrentSettings.Configuration.EnableAutoMonkeySwingJump;
+				CurrentSettings.Configuration.EnableAutoMonkeySwingJump = !CurrentSettings.Configuration.EnableAutoMonkeySwingJump;
 				break;
 
 			case GameplaySettingsOption::AutoTargeting:
