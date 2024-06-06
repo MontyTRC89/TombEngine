@@ -65,7 +65,7 @@ namespace TEN::Entities::Effects
 	void BurnNearbyItems(ItemInfo* item, int radius)
 	{
 		auto collObjects = GetCollidedObjects(*item, true, false, radius, ObjectCollectionMode::Items);
-		for (auto* itemPtr : collObjects.ItemPtrs)
+		for (auto* itemPtr : collObjects.Items)
 		{
 			if (TestEnvironment(ENV_FLAG_WATER, itemPtr->RoomNumber))
 				continue;

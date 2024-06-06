@@ -82,11 +82,10 @@ namespace TEN::Entities::Traps
 					flag = item->ItemFlags[1] == 1 ? 2 : 0;
 				}
 
-				SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 1.5f);
-				SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
-				TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, flag, item->RoomNumber);
-
-				for (int i = 0; i < item->ItemFlags[2]; ++i)
+			auto collObjects = GetCollidedObjects(*item, true, true, BLOCK(2), ObjectCollectionMode::All);
+			if (!collObjects.IsEmpty())
+			{
+				for (auto* itemPtr : collObjects.Items)
 				{
 					TriggerExplosionSparks(
 						item->Pose.Position.x + (GetRandomControl() % 128 - 64) * item->ItemFlags[2],
@@ -131,8 +130,7 @@ namespace TEN::Entities::Traps
 					}
 				}
 
-				auto collObjects = GetCollidedObjects(*item, true, true, BLOCK(2), ObjectCollectionMode::All);
-				if (!collObjects.IsEmpty())
+				for (auto* staticPtr : collObjects.Statics)
 				{
 					for (auto* itemPtr : collObjects.ItemPtrs)
 					{

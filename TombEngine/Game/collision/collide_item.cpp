@@ -204,7 +204,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 					// Test accurate box intersection.
 					if (box0.Intersects(box1))
-						collObjects.ItemPtrs.push_back(&item);
+						collObjects.Items.push_back(&item);
 				}
 				while (itemNumber != NO_VALUE);
 			}
@@ -253,7 +253,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 				// Test accurate box intersection.
 				if (box0.Intersects(box1))
-					collObjects.StaticPtrs.push_back(&staticObj);
+					collObjects.Statics.push_back(&staticObj);
 			}
 		}
 	}
