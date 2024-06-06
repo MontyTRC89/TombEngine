@@ -500,7 +500,7 @@ namespace TEN::Renderer
 		_postProcessRenderTarget[1] = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
 		_tempRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
 		_dumpScreenRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D24_UNORM_S8_UINT);
-		_shadowMap = Texture2DArray(_device.Get(), Config::g_Configuration.ShadowMapSize, 6, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D24_UNORM_S8_UINT);
+		_shadowMap = Texture2DArray(_device.Get(), Config::g_Config.ShadowMapSize, 6, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D24_UNORM_S8_UINT);
 		_depthRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, false, DXGI_FORMAT_UNKNOWN);
 		_normalsRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
 		_SSAORenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
@@ -520,8 +520,8 @@ namespace TEN::Renderer
 
 		_shadowMapViewport.TopLeftX = 0;
 		_shadowMapViewport.TopLeftY = 0;
-		_shadowMapViewport.Width = Config::g_Configuration.ShadowMapSize;
-		_shadowMapViewport.Height = Config::g_Configuration.ShadowMapSize;
+		_shadowMapViewport.Width = Config::g_Config.ShadowMapSize;
+		_shadowMapViewport.Height = Config::g_Config.ShadowMapSize;
 		_shadowMapViewport.MinDepth = 0.0f;
 		_shadowMapViewport.MaxDepth = 1.0f;
 
@@ -529,7 +529,7 @@ namespace TEN::Renderer
 			_viewport.MinDepth, _viewport.MaxDepth);
 
 		// Low AA is done with FXAA, Medium - High AA are done with SMAA.
-		if (Config::g_Configuration.AntialiasingMode > AntialiasingMode::Low)
+		if (Config::g_Config.AntialiasingMode > AntialiasingMode::Low)
 		{
 			InitializeSMAA();
 		}
@@ -556,7 +556,7 @@ namespace TEN::Renderer
 		auto renderTargetMetricsMacro = D3D10_SHADER_MACRO{ "SMAA_RT_METRICS", pixelSizeText.c_str() };
 		defines.push_back(renderTargetMetricsMacro);
 
-		if (Config::g_Configuration.AntialiasingMode == AntialiasingMode::Medium)
+		if (Config::g_Config.AntialiasingMode == AntialiasingMode::Medium)
 		{
 			defines.push_back({ "SMAA_PRESET_HIGH", nullptr });
 		}

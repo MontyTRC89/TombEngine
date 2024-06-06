@@ -153,7 +153,7 @@ bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 
 bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
 {
-	if (!g_Configuration.EnableSound)
+	if (!g_Config.EnableSound)
 		return false;
 
 	if (effectID >= g_Level.SoundMap.size())
@@ -437,7 +437,7 @@ float GetSoundTrackLoudness(SoundTrackType mode)
 {
 	float result = 0.0f;
 
-	if (!g_Configuration.EnableSound)
+	if (!g_Config.EnableSound)
 		return result;
 
 	if (!BASS_ChannelIsActive(SoundtrackSlot[(int)mode].Channel))
@@ -449,7 +449,7 @@ float GetSoundTrackLoudness(SoundTrackType mode)
 
 std::optional<std::string> GetCurrentSubtitle()
 {
-	if (!g_Configuration.EnableSound || !g_Configuration.EnableSubtitles)
+	if (!g_Config.EnableSound || !g_Config.EnableSubtitles)
 		return std::nullopt;
 
 	auto channel = SoundtrackSlot[(int)SoundTrackType::Voice].Channel;
@@ -473,7 +473,7 @@ std::optional<std::string> GetCurrentSubtitle()
 
 void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD position)
 {
-	if (!g_Configuration.EnableSound)
+	if (!g_Config.EnableSound)
 		return;
 
 	if (track.empty())
@@ -869,13 +869,13 @@ bool  Sound_UpdateEffectAttributes(int index, float pitch, float gain)
 // Must be called every frame to update camera position and 3D parameters.
 void Sound_UpdateScene()
 {
-	if (!g_Configuration.EnableSound)
+	if (!g_Config.EnableSound)
 		return;
 
 	// Apply environmental effects
 
 	static int currentReverb = -1;
-	auto roomReverb = g_Configuration.EnableReverb ? (int)g_Level.Rooms[g_Camera.RoomNumber].reverbType : (int)ReverbType::Small;
+	auto roomReverb = g_Config.EnableReverb ? (int)g_Level.Rooms[g_Camera.RoomNumber].reverbType : (int)ReverbType::Small;
 
 	if (currentReverb == -1 || roomReverb != currentReverb)
 	{
@@ -946,13 +946,13 @@ void Sound_Init(const std::string& gameDirectory)
 	FullAudioDirectory = gameDirectory + TRACKS_PATH;
 	EnumerateLegacyTracks();
 
-	if (!g_Configuration.EnableSound)
+	if (!g_Config.EnableSound)
 		return;
 	
 	// HACK: Manually force-load ADPCM codec, because on Win11 systems it may suddenly unload otherwise.
 	ADPCMLibrary = LoadLibrary("msadp32.acm");
 
-	BASS_Init(g_Configuration.SoundDevice, 44100, BASS_DEVICE_3D, WindowsHandle, NULL);
+	BASS_Init(g_Config.SoundDevice, 44100, BASS_DEVICE_3D, WindowsHandle, NULL);
 	if (Sound_CheckBASSError("Initializing BASS sound device", true))
 		return;
 
@@ -1008,7 +1008,7 @@ void Sound_Init(const std::string& gameDirectory)
 // Must be called on engine quit.
 void Sound_DeInit()
 {
-	if (!g_Configuration.EnableSound)
+	if (!g_Config.EnableSound)
 		return;
 
 	TENLog("Shutting down BASS...", LogLevel::Info);

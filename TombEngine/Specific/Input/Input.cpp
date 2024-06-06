@@ -219,8 +219,8 @@ namespace TEN::Input
 				// If controller is XInput and default bindings were successfully assigned, save configuration.
 				if (ApplyDefaultXInputBindings())
 				{
-					g_Configuration.EnableRumble = (OisRumble != nullptr);
-					g_Configuration.EnableTankCameraControl = true;
+					g_Config.EnableRumble = (OisRumble != nullptr);
+					g_Config.EnableTankCameraControl = true;
 					SaveConfiguration();
 				}
 			}
@@ -465,7 +465,7 @@ namespace TEN::Input
 				(((rawAxes.y - -DISPLAY_SPACE_RES.y) * 2) / (DISPLAY_SPACE_RES.y - -DISPLAY_SPACE_RES.y)) - 1.0f);
 
 			// Apply sensitivity.
-			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
+			float sensitivity = (g_Config.MouseSensitivity * 0.1f) + 0.4f;
 			normAxes *= sensitivity;
 
 			// Set mouse axis values.
@@ -631,7 +631,7 @@ namespace TEN::Input
 		static bool dbFullscreen = true;
 		if ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN] && dbFullscreen)
 		{
-			g_Configuration.EnableWindowedMode = !g_Configuration.EnableWindowedMode;
+			g_Config.EnableWindowedMode = !g_Config.EnableWindowedMode;
 			SaveConfiguration();
 			g_Renderer.ToggleFullScreen();
 		}
@@ -726,7 +726,7 @@ namespace TEN::Input
 
 	void Rumble(float power, float delayInSec, RumbleMode mode)
 	{
-		if (!g_Configuration.EnableRumble)
+		if (!g_Config.EnableRumble)
 			return;
 
 		power = std::clamp(power, 0.0f, 1.0f);
@@ -790,10 +790,10 @@ namespace TEN::Input
 			ApplyBindings(DefaultXInputBindings);
 
 			for (int i = 0; i < (int)In::Count; i++)
-				g_Configuration.KeyBindings[i] = Bindings[1][i];
+				g_Config.KeyBindings[i] = Bindings[1][i];
 
 			// Additionally enable tank camera control and vibration.
-			g_Configuration.EnableRumble = g_Configuration.EnableTankCameraControl = true;
+			g_Config.EnableRumble = g_Config.EnableTankCameraControl = true;
 
 			return true;
 		}

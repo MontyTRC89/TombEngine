@@ -47,7 +47,7 @@ namespace TEN::Renderer
 	void Renderer::RenderBlobShadows(RenderView& renderView)
 	{
 		auto nearestSpheres = std::vector<Sphere>{};
-		nearestSpheres.reserve(g_Configuration.ShadowBlobCountMax);
+		nearestSpheres.reserve(g_Config.ShadowBlobCountMax);
 
 		// Collect player spheres.
 		static const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
@@ -96,7 +96,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (nearestSpheres.size() > g_Configuration.ShadowBlobCountMax)
+		if (nearestSpheres.size() > g_Config.ShadowBlobCountMax)
 		{
 			std::sort(nearestSpheres.begin(), nearestSpheres.end(), [](const Sphere& a, const Sphere& b)
 				{
@@ -104,8 +104,8 @@ namespace TEN::Renderer
 					return Vector3::Distance(laraPos.ToVector3(), a.position) < Vector3::Distance(laraPos.ToVector3(), b.position);
 				});
 
-			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Configuration.ShadowBlobCountMax, _stShadowMap.Spheres);
-			_stShadowMap.NumSpheres = g_Configuration.ShadowBlobCountMax;
+			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Config.ShadowBlobCountMax, _stShadowMap.Spheres);
+			_stShadowMap.NumSpheres = g_Config.ShadowBlobCountMax;
 		}
 		else
 		{
@@ -131,7 +131,7 @@ namespace TEN::Renderer
 			return;
 
 		// Only render for Lara if such setting is active
-		if (g_Configuration.ShadowType == ShadowMode::Player && _moveableObjects[item->ObjectNumber].value().ShadowType != ShadowMode::Player)
+		if (g_Config.ShadowType == ShadowMode::Player && _moveableObjects[item->ObjectNumber].value().ShadowType != ShadowMode::Player)
 			return;
 
 		// No shadow light found
@@ -1760,7 +1760,7 @@ namespace TEN::Renderer
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
 
-		cameraConstantBuffer.AmbientOcclusion = g_Configuration.EnableAmbientOcclusion ? 1 : 0;
+		cameraConstantBuffer.AmbientOcclusion = g_Config.EnableAmbientOcclusion ? 1 : 0;
 		cameraConstantBuffer.AmbientOcclusionExponent = 2;
 
 		// Set fog bulbs.
@@ -1805,7 +1805,7 @@ namespace TEN::Renderer
 		DrawLocusts(view, RendererPass::GBuffer);
 
 		// Calculate ambient occlusion
-		if (g_Configuration.EnableAmbientOcclusion)
+		if (g_Config.EnableAmbientOcclusion)
 		{
 			_doingFullscreenPass = true;
 			CalculateSSAO(view);
@@ -1886,7 +1886,7 @@ namespace TEN::Renderer
 		// Apply antialiasing.
 		if (doAntialiasing)
 		{
-			switch (g_Configuration.AntialiasingMode)
+			switch (g_Config.AntialiasingMode)
 			{
 			case AntialiasingMode::None:
 				break;
@@ -2236,7 +2236,7 @@ namespace TEN::Renderer
 	{
 		RenderBlobShadows(renderView);
 
-		if (g_Configuration.ShadowType != ShadowMode::None)
+		if (g_Config.ShadowType != ShadowMode::None)
 		{
 			for (auto room : renderView.RoomsToDraw)
 				for (auto itemToDraw : room->ItemsToDraw)
@@ -2623,7 +2623,7 @@ namespace TEN::Renderer
 				if (_shadowLight != nullptr)
 				{
 					memcpy(&_stShadowMap.Light, _shadowLight, sizeof(ShaderLight));
-					_stShadowMap.ShadowMapSize = g_Configuration.ShadowMapSize;
+					_stShadowMap.ShadowMapSize = g_Config.ShadowMapSize;
 					_stShadowMap.CastShadows = true;
 
 					BindTexture(TextureRegister::ShadowMap, &_shadowMap, SamplerStateRegister::ShadowMap);
@@ -2636,7 +2636,7 @@ namespace TEN::Renderer
 				_cbShadowMap.UpdateData(_stShadowMap, _context.Get());
 			}
 
-			if (g_Configuration.EnableAmbientOcclusion && rendererPass != RendererPass::GBuffer)
+			if (g_Config.EnableAmbientOcclusion && rendererPass != RendererPass::GBuffer)
 			{
 				BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAOBlurredRenderTarget, SamplerStateRegister::PointWrap);
 			}
@@ -2649,7 +2649,7 @@ namespace TEN::Renderer
 
 				if (rendererPass != RendererPass::GBuffer)
 				{
-					_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
+					_stRoom.Caustics = (int)(g_Config.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
 					_stRoom.AmbientColor = room->AmbientLight;
 					BindRoomLights(view.LightsToDraw);
 				}
@@ -3227,7 +3227,7 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
 
-		_stRoom.Caustics = (int)(g_Configuration.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
+		_stRoom.Caustics = (int)(g_Config.EnableCaustics && (nativeRoom->flags & ENV_FLAG_WATER));
 		_stRoom.AmbientColor = objectInfo->Room->AmbientLight;
 		BindRoomLights(view.LightsToDraw);
 		_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;

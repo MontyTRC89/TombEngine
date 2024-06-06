@@ -170,8 +170,8 @@ namespace TEN::Entities::Generic
 		auto* ropeItem = &g_Level.Items[itemNumber];
 		auto* rope = &Ropes[ropeItem->TriggerFlags];
 
-		laraInfo->Control.ToggleClimb = g_Configuration.EnableAutoClimb;
-		if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
+		laraInfo->Control.ToggleClimb = g_Config.EnableAutoClimb;
+		if (IsClicked(In::Action) && g_Config.EnableAutoClimb)
 			laraInfo->Control.ToggleClimb = false;
 
 		if (HasClimbAction(*laraItem) &&

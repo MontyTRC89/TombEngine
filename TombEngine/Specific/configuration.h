@@ -128,7 +128,7 @@ namespace TEN::Config
 		std::string			  AdapterName				 = {};
 	};
 
-	extern GameConfiguration g_Configuration;
+	extern GameConfiguration g_Config;
 
 	int	 SetupDialog();
 	void InitDefaultConfiguration();

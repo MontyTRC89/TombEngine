@@ -456,9 +456,9 @@ namespace TEN::Gui
 
 		// Get current display mode.
 		CurrentSettings.SelectedScreenResolution = 0;
-		for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
+		for (int i = 0; i < g_Config.SupportedScreenResolutions.size(); i++)
 		{
-			auto screenRes = g_Configuration.SupportedScreenResolutions[i];
+			auto screenRes = g_Config.SupportedScreenResolutions[i];
 			if (screenRes.x == CurrentSettings.Configuration.ScreenWidth &&
 				screenRes.y == CurrentSettings.Configuration.ScreenHeight)
 			{
@@ -601,10 +601,10 @@ namespace TEN::Gui
 
 			case ControlsSettingsOption::Apply:
 				{
-				bool indicateRumble = CurrentSettings.Configuration.EnableRumble && !g_Configuration.EnableRumble;
+				bool indicateRumble = CurrentSettings.Configuration.EnableRumble && !g_Config.EnableRumble;
 
 				// Save configuration.
-				g_Configuration = CurrentSettings.Configuration;
+				g_Config = CurrentSettings.Configuration;
 				SaveConfiguration();
 
 				// Rumble if setting was changed.
@@ -618,8 +618,8 @@ namespace TEN::Gui
 
 			case ControlsSettingsOption::Cancel:
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				SetVolumeTracks(g_Configuration.MusicVolume);
-				SetVolumeFX(g_Configuration.SfxVolume);
+				SetVolumeTracks(g_Config.MusicVolume);
+				SetVolumeFX(g_Config.SfxVolume);
 				MenuToDisplay = Menu::Options;
 				SelectedOption = 0;
 				break;
@@ -824,7 +824,7 @@ namespace TEN::Gui
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 					CurrentSettings.Configuration.KeyBindings = Bindings[1];
-					g_Configuration.KeyBindings = Bindings[1];
+					g_Config.KeyBindings = Bindings[1];
 					SaveConfiguration();
 					MenuToDisplay = Menu::Controls;
 					SelectedOption = 0;
@@ -994,7 +994,7 @@ namespace TEN::Gui
 			{
 			case GameplaySettingsOption::Apply:
 				// Save configuration.
-				g_Configuration = CurrentSettings.Configuration;
+				g_Config = CurrentSettings.Configuration;
 				SaveConfiguration();
 
 				MenuToDisplay = Menu::Options;
@@ -1003,8 +1003,8 @@ namespace TEN::Gui
 
 			case GameplaySettingsOption::Cancel:
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				SetVolumeTracks(g_Configuration.MusicVolume);
-				SetVolumeFX(g_Configuration.SfxVolume);
+				SetVolumeTracks(g_Config.MusicVolume);
+				SetVolumeFX(g_Config.SfxVolume);
 				MenuToDisplay = Menu::Options;
 				SelectedOption = 1;
 				break;
@@ -1108,7 +1108,7 @@ namespace TEN::Gui
 			{
 			case DisplaySettingsOption::ScreenResolution:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				if (CurrentSettings.SelectedScreenResolution < g_Configuration.SupportedScreenResolutions.size() - 1)
+				if (CurrentSettings.SelectedScreenResolution < g_Config.SupportedScreenResolutions.size() - 1)
 					CurrentSettings.SelectedScreenResolution++;
 
 				break;
@@ -1197,11 +1197,11 @@ namespace TEN::Gui
 			if (SelectedOption == DisplaySettingsOption::Apply)
 			{
 				// Save configuration.
-				auto screenRes = g_Configuration.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
+				auto screenRes = g_Config.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
 				CurrentSettings.Configuration.ScreenWidth = screenRes.x;
 				CurrentSettings.Configuration.ScreenHeight = screenRes.y;
 
-				g_Configuration = CurrentSettings.Configuration;
+				g_Config = CurrentSettings.Configuration;
 				SaveConfiguration();
 
 				// Reset screen and go back.
@@ -1242,8 +1242,8 @@ namespace TEN::Gui
 			MenuToDisplay = Menu::Options;
 			SelectedOption = 3;
 
-			SetVolumeTracks(g_Configuration.MusicVolume);
-			SetVolumeFX(g_Configuration.SfxVolume);
+			SetVolumeTracks(g_Config.MusicVolume);
+			SetVolumeFX(g_Config.SfxVolume);
 			return;
 		}
 
@@ -1371,7 +1371,7 @@ namespace TEN::Gui
 			if (SelectedOption == SoundSettingsOption::Apply)
 			{
 				// Save configuration.
-				g_Configuration = CurrentSettings.Configuration;
+				g_Config = CurrentSettings.Configuration;
 				SaveConfiguration();
 
 				MenuToDisplay = Menu::Options;
@@ -1380,8 +1380,8 @@ namespace TEN::Gui
 			else if (SelectedOption == SoundSettingsOption::Cancel)
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				SetVolumeTracks(g_Configuration.MusicVolume);
-				SetVolumeFX(g_Configuration.SfxVolume);
+				SetVolumeTracks(g_Config.MusicVolume);
+				SetVolumeFX(g_Config.SfxVolume);
 				MenuToDisplay = Menu::Options;
 				SelectedOption = 3;
 			}
@@ -1390,7 +1390,7 @@ namespace TEN::Gui
 
 	void GuiController::BackupOptions()
 	{
-		CurrentSettings.Configuration = g_Configuration;
+		CurrentSettings.Configuration = g_Config;
 	}
 
 	void GuiController::HandleOptionsInput()

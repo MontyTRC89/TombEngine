@@ -398,7 +398,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			player.Control.IsRunJumpQueued = CanQueueRunningJump(*item, *coll);
 	}
 
-	if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll)) &&
+	if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll)) &&
 		CanRunRoll180(*item))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
@@ -705,7 +705,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Jump))
 	{
 		if ((IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) &&
-			g_Configuration.EnableAutoClimb)
+			g_Config.EnableAutoClimb)
 		{
 			auto vaultContext = TestLaraVault(item, coll);
 			if (vaultContext.has_value())
@@ -728,7 +728,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
+	if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll))
 	{
 		if (IsHeld(In::Walk) || CanTurn180(*item, *coll))
 		{
@@ -1320,7 +1320,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Jump))
 		{
-			if (IsHeld(In::Forward) && g_Configuration.EnableAutoClimb)
+			if (IsHeld(In::Forward) && g_Config.EnableAutoClimb)
 			{
 				auto vaultContext = TestLaraVault(item, coll);
 				if (vaultContext.has_value())
@@ -1343,7 +1343,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
-		if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll)) &&
+		if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll)) &&
 			!isWading)
 		{
 			item->Animation.TargetState = LS_ROLL_180_FORWARD;
@@ -1713,7 +1713,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump))
 	{
-		if (IsHeld(In::Forward) && g_Configuration.EnableAutoClimb)
+		if (IsHeld(In::Forward) && g_Config.EnableAutoClimb)
 		{
 			auto vaultContext = TestLaraVault(item, coll);
 			if (vaultContext.has_value())
@@ -1738,7 +1738,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsUsingEnhancedControls())
 	{
-		if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll)) &&
+		if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll)) &&
 			!isWading)
 		{
 			item->Animation.TargetState = LS_ROLL_180_FORWARD;

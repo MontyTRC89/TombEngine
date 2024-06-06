@@ -478,8 +478,8 @@ void lara_as_rope_idle(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.Look.Mode = LookMode::Free;
 
-	lara->Control.ToggleClimb = g_Configuration.EnableAutoClimb;
-	if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
+	lara->Control.ToggleClimb = g_Config.EnableAutoClimb;
+	if (IsClicked(In::Action) && g_Config.EnableAutoClimb)
 		lara->Control.ToggleClimb = false;
 
 	if (!HasClimbAction(*item))
@@ -492,8 +492,8 @@ void lara_col_rope_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.ToggleClimb = g_Configuration.EnableAutoClimb;
-	if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
+	lara->Control.ToggleClimb = g_Config.EnableAutoClimb;
+	if (IsClicked(In::Action) && g_Config.EnableAutoClimb)
 		lara->Control.ToggleClimb = false;
 
 	if (HasClimbAction(*item))

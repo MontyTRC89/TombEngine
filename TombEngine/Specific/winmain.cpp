@@ -196,7 +196,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
-			if (!g_Configuration.EnableWindowedMode)
+			if (!g_Config.EnableWindowedMode)
 				g_Renderer.ToggleFullScreen(true);
 
 			if (!DebugMode && ThreadHandle > 0)
@@ -211,7 +211,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		if (!g_Configuration.EnableWindowedMode)
+		if (!g_Config.EnableWindowedMode)
 			ShowWindow(hWnd, SW_MINIMIZE);
 
 		if (!DebugMode)
@@ -379,8 +379,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	RECT rect;
 	rect.left = 0;
 	rect.top = 0;
-	rect.right = g_Configuration.ScreenWidth;
-	rect.bottom = g_Configuration.ScreenHeight;
+	rect.right = g_Config.ScreenWidth;
+	rect.bottom = g_Config.ScreenHeight;
 	AdjustWindowRect(&rect, WS_CAPTION, false);
 
 	// Calculate window resolution.
@@ -424,7 +424,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 		// Initialize renderer.
-		g_Renderer.Initialize(g_Configuration.ScreenWidth, g_Configuration.ScreenHeight, g_Configuration.EnableWindowedMode, App.WindowHandle);
+		g_Renderer.Initialize(g_Config.ScreenWidth, g_Config.ScreenHeight, g_Config.EnableWindowedMode, App.WindowHandle);
 
 		// Initialize audio.
 		Sound_Init(gameDir);

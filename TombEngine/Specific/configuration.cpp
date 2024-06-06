@@ -16,7 +16,7 @@ using namespace TEN::Renderer;
 
 namespace TEN::Config
 {
-	GameConfiguration g_Configuration;
+	GameConfiguration g_Config;
 
 	static void LoadResolutionsInCombobox(HWND handle)
 	{
@@ -24,9 +24,9 @@ namespace TEN::Config
 
 		SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
-		for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
+		for (int i = 0; i < g_Config.SupportedScreenResolutions.size(); i++)
 		{
-			auto screenRes = g_Configuration.SupportedScreenResolutions[i];
+			auto screenRes = g_Config.SupportedScreenResolutions[i];
 
 			char* str = (char*)malloc(255);
 			ZeroMemory(str, 255);
@@ -86,21 +86,21 @@ namespace TEN::Config
 			LoadSoundDevicesInCombobox(handle);
 
 			// Set some default values.
-			g_Configuration.EnableAutoTargeting = true;
+			g_Config.EnableAutoTargeting = true;
 
-			g_Configuration.AntialiasingMode = AntialiasingMode::Low;
+			g_Config.AntialiasingMode = AntialiasingMode::Low;
 			SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_SETCHECK, 1, 0);
 
-			g_Configuration.ShadowType = ShadowMode::Player;
+			g_Config.ShadowType = ShadowMode::Player;
 			SendDlgItemMessage(handle, IDC_SHADOWS, BM_SETCHECK, 1, 0);
 
-			g_Configuration.EnableCaustics = true;
+			g_Config.EnableCaustics = true;
 			SendDlgItemMessage(handle, IDC_CAUSTICS, BM_SETCHECK, 1, 0);
 
-			g_Configuration.EnableWindowedMode = true;
+			g_Config.EnableWindowedMode = true;
 			SendDlgItemMessage(handle, IDC_WINDOWED, BM_SETCHECK, 1, 0);
 
-			g_Configuration.EnableSound = true;
+			g_Config.EnableSound = true;
 			SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_SETCHECK, 1, 0);
 
 			break;
@@ -115,16 +115,16 @@ namespace TEN::Config
 				{
 				case IDOK:
 					// Get values from dialog components.
-					g_Configuration.EnableWindowedMode = (SendDlgItemMessage(handle, IDC_WINDOWED, BM_GETCHECK, 0, 0));
-					g_Configuration.ShadowType = (ShadowMode)(SendDlgItemMessage(handle, IDC_SHADOWS, BM_GETCHECK, 0, 0));
-					g_Configuration.EnableCaustics = (SendDlgItemMessage(handle, IDC_CAUSTICS, BM_GETCHECK, 0, 0));
-					g_Configuration.AntialiasingMode = (AntialiasingMode)(SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_GETCHECK, 0, 0));
-					g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
+					g_Config.EnableWindowedMode = (SendDlgItemMessage(handle, IDC_WINDOWED, BM_GETCHECK, 0, 0));
+					g_Config.ShadowType = (ShadowMode)(SendDlgItemMessage(handle, IDC_SHADOWS, BM_GETCHECK, 0, 0));
+					g_Config.EnableCaustics = (SendDlgItemMessage(handle, IDC_CAUSTICS, BM_GETCHECK, 0, 0));
+					g_Config.AntialiasingMode = (AntialiasingMode)(SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_GETCHECK, 0, 0));
+					g_Config.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
 					selectedMode = (SendDlgItemMessage(handle, IDC_RESOLUTION, CB_GETCURSEL, 0, 0));
-					mode = g_Configuration.SupportedScreenResolutions[selectedMode];
-					g_Configuration.ScreenWidth = mode.x;
-					g_Configuration.ScreenHeight = mode.y;
-					g_Configuration.SoundDevice = (SendDlgItemMessage(handle, IDC_SNDADAPTER, CB_GETCURSEL, 0, 0)) + 1;
+					mode = g_Config.SupportedScreenResolutions[selectedMode];
+					g_Config.ScreenWidth = mode.x;
+					g_Config.ScreenHeight = mode.y;
+					g_Config.SoundDevice = (SendDlgItemMessage(handle, IDC_SNDADAPTER, CB_GETCURSEL, 0, 0)) + 1;
 
 					// Save configuration.
 					SaveConfiguration();
@@ -197,17 +197,17 @@ namespace TEN::Config
 		}
 
 		// Set Graphics keys.
-		if (SetDWORDRegKey(graphicsKey, REGKEY_SCREEN_WIDTH, g_Configuration.ScreenWidth) != ERROR_SUCCESS ||
-			SetDWORDRegKey(graphicsKey, REGKEY_SCREEN_HEIGHT, g_Configuration.ScreenHeight) != ERROR_SUCCESS ||
-			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_WINDOWED_MODE, g_Configuration.EnableWindowedMode) != ERROR_SUCCESS ||
-			SetDWORDRegKey(graphicsKey, REGKEY_SHADOWS, (DWORD)g_Configuration.ShadowType) != ERROR_SUCCESS ||
-			SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_MAP_SIZE, g_Configuration.ShadowMapSize) != ERROR_SUCCESS ||
-			SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOB_COUNT_MAX, g_Configuration.ShadowBlobCountMax) != ERROR_SUCCESS ||
-			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, g_Configuration.EnableCaustics) != ERROR_SUCCESS ||
-			SetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, (DWORD)g_Configuration.AntialiasingMode) != ERROR_SUCCESS ||
-			SetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, g_Configuration.EnableAmbientOcclusion) != ERROR_SUCCESS ||
-			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, g_Configuration.EnableTargetHighlighter) != ERROR_SUCCESS ||
-			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(graphicsKey, REGKEY_SCREEN_WIDTH, g_Config.ScreenWidth) != ERROR_SUCCESS ||
+			SetDWORDRegKey(graphicsKey, REGKEY_SCREEN_HEIGHT, g_Config.ScreenHeight) != ERROR_SUCCESS ||
+			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_WINDOWED_MODE, g_Config.EnableWindowedMode) != ERROR_SUCCESS ||
+			SetDWORDRegKey(graphicsKey, REGKEY_SHADOWS, (DWORD)g_Config.ShadowType) != ERROR_SUCCESS ||
+			SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_MAP_SIZE, g_Config.ShadowMapSize) != ERROR_SUCCESS ||
+			SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOB_COUNT_MAX, g_Config.ShadowBlobCountMax) != ERROR_SUCCESS ||
+			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, g_Config.EnableCaustics) != ERROR_SUCCESS ||
+			SetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, (DWORD)g_Config.AntialiasingMode) != ERROR_SUCCESS ||
+			SetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, g_Config.EnableAmbientOcclusion) != ERROR_SUCCESS ||
+			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, g_Config.EnableTargetHighlighter) != ERROR_SUCCESS ||
+			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_SUBTITLES, g_Config.EnableSubtitles) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
@@ -225,11 +225,11 @@ namespace TEN::Config
 		}
 
 		// Set Sound keys.
-		if (SetDWORDRegKey(soundKey, REGKEY_SOUND_DEVICE, g_Configuration.SoundDevice) != ERROR_SUCCESS ||
-			SetBoolRegKey(soundKey, REGKEY_ENABLE_SOUND, g_Configuration.EnableSound) != ERROR_SUCCESS ||
-			SetBoolRegKey(soundKey, REGKEY_ENABLE_REVERB, g_Configuration.EnableReverb) != ERROR_SUCCESS ||
-			SetDWORDRegKey(soundKey, REGKEY_MUSIC_VOLUME, g_Configuration.MusicVolume) != ERROR_SUCCESS ||
-			SetDWORDRegKey(soundKey, REGKEY_SFX_VOLUME, g_Configuration.SfxVolume) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(soundKey, REGKEY_SOUND_DEVICE, g_Config.SoundDevice) != ERROR_SUCCESS ||
+			SetBoolRegKey(soundKey, REGKEY_ENABLE_SOUND, g_Config.EnableSound) != ERROR_SUCCESS ||
+			SetBoolRegKey(soundKey, REGKEY_ENABLE_REVERB, g_Config.EnableReverb) != ERROR_SUCCESS ||
+			SetDWORDRegKey(soundKey, REGKEY_MUSIC_VOLUME, g_Config.MusicVolume) != ERROR_SUCCESS ||
+			SetDWORDRegKey(soundKey, REGKEY_SFX_VOLUME, g_Config.SfxVolume) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
@@ -249,19 +249,19 @@ namespace TEN::Config
 		}
 
 		// Set Controls keys.
-		if (SetDWORDRegKey(controlsKey, REGKEY_CONTROL_MODE, (DWORD)g_Configuration.ControlMode) != ERROR_SUCCESS ||
-			SetDWORDRegKey(controlsKey, REGKEY_SWIM_CONTROL_MODE, (DWORD)g_Configuration.SwimControlMode) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_WALK_TOGGLE, g_Configuration.EnableWalkToggle) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_CROUCH_TOGGLE, g_Configuration.EnableCrouchToggle) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_CLIMB, g_Configuration.EnableAutoClimb) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_MONKEY_SWING_JUMP, g_Configuration.EnableAutoMonkeySwingJump) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, g_Configuration.EnableOppositeActionRoll) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_X_AXIS, g_Configuration.InvertCameraXAxis) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_Y_AXIS, g_Configuration.InvertCameraYAxis) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableTankCameraControl) != ERROR_SUCCESS ||
-			SetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(controlsKey, REGKEY_CONTROL_MODE, (DWORD)g_Config.ControlMode) != ERROR_SUCCESS ||
+			SetDWORDRegKey(controlsKey, REGKEY_SWIM_CONTROL_MODE, (DWORD)g_Config.SwimControlMode) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_WALK_TOGGLE, g_Config.EnableWalkToggle) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_CROUCH_TOGGLE, g_Config.EnableCrouchToggle) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_CLIMB, g_Config.EnableAutoClimb) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_MONKEY_SWING_JUMP, g_Config.EnableAutoMonkeySwingJump) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_TARGETING, g_Config.EnableAutoTargeting) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, g_Config.EnableOppositeActionRoll) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, g_Config.EnableRumble) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_X_AXIS, g_Config.InvertCameraXAxis) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_Y_AXIS, g_Config.InvertCameraYAxis) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Config.EnableTankCameraControl) != ERROR_SUCCESS ||
+			SetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, g_Config.MouseSensitivity) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
@@ -283,13 +283,13 @@ namespace TEN::Config
 		}
 
 		// Open and set Controls\\KeyBindings keys.
-		g_Configuration.KeyBindings.resize((int)In::Count);
+		g_Config.KeyBindings.resize((int)In::Count);
 		for (int i = 0; i < (int)In::Count; i++)
 		{
 			char buffer[9];
 			sprintf(buffer, "Action%d", i);
 
-			if (SetDWORDRegKey(keyBindingsKey, buffer, g_Configuration.KeyBindings[i]) != ERROR_SUCCESS)
+			if (SetDWORDRegKey(keyBindingsKey, buffer, g_Config.KeyBindings[i]) != ERROR_SUCCESS)
 			{
 				RegCloseKey(rootKey);
 				RegCloseKey(graphicsKey);
@@ -317,43 +317,43 @@ namespace TEN::Config
 		auto screenRes = GetScreenResolution();
 
 		// Controls
-		g_Configuration.EnableTankCameraControl = false;
-		g_Configuration.InvertCameraXAxis = false;
-		g_Configuration.InvertCameraYAxis = false;
-		g_Configuration.EnableRumble = true;
-		g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
+		g_Config.EnableTankCameraControl = false;
+		g_Config.InvertCameraXAxis = false;
+		g_Config.InvertCameraYAxis = false;
+		g_Config.EnableRumble = true;
+		g_Config.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
 
 		// Gameplay
-		g_Configuration.ControlMode = ControlMode::Enhanced;
-		g_Configuration.SwimControlMode = SwimControlMode::Omnidirectional;
-		g_Configuration.EnableWalkToggle = false;
-		g_Configuration.EnableCrouchToggle = false;
-		g_Configuration.EnableAutoClimb = false;
-		g_Configuration.EnableAutoMonkeySwingJump = false;
-		g_Configuration.EnableAutoTargeting = true;
-		g_Configuration.EnableOppositeActionRoll = true;
-		g_Configuration.EnableTargetHighlighter = true;
+		g_Config.ControlMode = ControlMode::Enhanced;
+		g_Config.SwimControlMode = SwimControlMode::Omnidirectional;
+		g_Config.EnableWalkToggle = false;
+		g_Config.EnableCrouchToggle = false;
+		g_Config.EnableAutoClimb = false;
+		g_Config.EnableAutoMonkeySwingJump = false;
+		g_Config.EnableAutoTargeting = true;
+		g_Config.EnableOppositeActionRoll = true;
+		g_Config.EnableTargetHighlighter = true;
 
 		// Graphics
-		g_Configuration.ScreenWidth = screenRes.x;
-		g_Configuration.ScreenHeight = screenRes.y;
-		g_Configuration.ShadowType = ShadowMode::Player;
-		g_Configuration.ShadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
-		g_Configuration.ShadowBlobCountMax = GameConfiguration::DEFAULT_SHADOW_BLOB_COUNT_MAX;
-		g_Configuration.EnableAmbientOcclusion = true;
-		g_Configuration.EnableCaustics = true;
-		g_Configuration.AntialiasingMode = AntialiasingMode::Medium;
-		g_Configuration.EnableSubtitles = true;
+		g_Config.ScreenWidth = screenRes.x;
+		g_Config.ScreenHeight = screenRes.y;
+		g_Config.ShadowType = ShadowMode::Player;
+		g_Config.ShadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
+		g_Config.ShadowBlobCountMax = GameConfiguration::DEFAULT_SHADOW_BLOB_COUNT_MAX;
+		g_Config.EnableAmbientOcclusion = true;
+		g_Config.EnableCaustics = true;
+		g_Config.AntialiasingMode = AntialiasingMode::Medium;
+		g_Config.EnableSubtitles = true;
 
 		// Sound
-		g_Configuration.SoundDevice = 1;
-		g_Configuration.EnableSound = true;
-		g_Configuration.EnableReverb = true;
-		g_Configuration.MusicVolume = GameConfiguration::SOUND_VOLUME_MAX;
-		g_Configuration.SfxVolume = GameConfiguration::SOUND_VOLUME_MAX;
+		g_Config.SoundDevice = 1;
+		g_Config.EnableSound = true;
+		g_Config.EnableReverb = true;
+		g_Config.MusicVolume = GameConfiguration::SOUND_VOLUME_MAX;
+		g_Config.SfxVolume = GameConfiguration::SOUND_VOLUME_MAX;
 
-		g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
-		g_Configuration.AdapterName = g_Renderer.GetDefaultAdapterName();
+		g_Config.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
+		g_Config.AdapterName = g_Renderer.GetDefaultAdapterName();
 	}
 
 	static LONG GetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD* nValue, DWORD nDefaultValue)
@@ -546,14 +546,14 @@ namespace TEN::Config
 					return false;
 				}
 
-				g_Configuration.KeyBindings.push_back(tempAction);
+				g_Config.KeyBindings.push_back(tempAction);
 				Bindings[1][i] = tempAction;
 			}
 		}
 		else
 		{
 			// "KeyBindings" key doesn't exist; use default bindings.
-			g_Configuration.KeyBindings = Bindings[0];
+			g_Config.KeyBindings = Bindings[0];
 		}
 
 		RegCloseKey(rootKey);
@@ -563,37 +563,37 @@ namespace TEN::Config
 		RegCloseKey(keyBindingsKey);
 
 		// All configuration values found; apply configuration.
-		g_Configuration.ScreenWidth = screenWidth;
-		g_Configuration.ScreenHeight = screenHeight;
-		g_Configuration.EnableWindowedMode = enableWindowedMode;
-		g_Configuration.ShadowType = ShadowMode(shadowMode);
-		g_Configuration.ShadowBlobCountMax = shadowBlobsMax;
-		g_Configuration.EnableCaustics = enableCaustics;
-		g_Configuration.AntialiasingMode = AntialiasingMode(antialiasingMode);
-		g_Configuration.ShadowMapSize = shadowMapSize;
-		g_Configuration.EnableAmbientOcclusion = enableAmbientOcclusion;
-		g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
-		g_Configuration.EnableSubtitles = enableSubtitles;
+		g_Config.ScreenWidth = screenWidth;
+		g_Config.ScreenHeight = screenHeight;
+		g_Config.EnableWindowedMode = enableWindowedMode;
+		g_Config.ShadowType = ShadowMode(shadowMode);
+		g_Config.ShadowBlobCountMax = shadowBlobsMax;
+		g_Config.EnableCaustics = enableCaustics;
+		g_Config.AntialiasingMode = AntialiasingMode(antialiasingMode);
+		g_Config.ShadowMapSize = shadowMapSize;
+		g_Config.EnableAmbientOcclusion = enableAmbientOcclusion;
+		g_Config.EnableTargetHighlighter = enableTargetHighlighter;
+		g_Config.EnableSubtitles = enableSubtitles;
 
-		g_Configuration.EnableSound = enableSound;
-		g_Configuration.EnableReverb = enableReverb;
-		g_Configuration.MusicVolume = musicVolume;
-		g_Configuration.SfxVolume = sfxVolume;
-		g_Configuration.SoundDevice = soundDevice;
+		g_Config.EnableSound = enableSound;
+		g_Config.EnableReverb = enableReverb;
+		g_Config.MusicVolume = musicVolume;
+		g_Config.SfxVolume = sfxVolume;
+		g_Config.SoundDevice = soundDevice;
 
-		g_Configuration.ControlMode = (ControlMode)controlMode;
-		g_Configuration.SwimControlMode = (SwimControlMode)swimControlMode;
-		g_Configuration.EnableWalkToggle = enableWalkToggle;
-		g_Configuration.EnableCrouchToggle = enableCrouchToggle;
-		g_Configuration.EnableAutoClimb = enableAutoClimb;
-		g_Configuration.EnableAutoMonkeySwingJump = enableAutoMonkeySwingJump;
-		g_Configuration.EnableAutoTargeting = enableAutoTargeting;
-		g_Configuration.EnableOppositeActionRoll = enableOppositeActionRoll;
-		g_Configuration.EnableRumble = enableRumble;
-		g_Configuration.InvertCameraXAxis = invertCameraXAxis;
-		g_Configuration.InvertCameraYAxis = invertCameraYAxis;
-		g_Configuration.EnableTankCameraControl = enableThumbstickCamera;
-		g_Configuration.MouseSensitivity = mouseSensitivity;
+		g_Config.ControlMode = (ControlMode)controlMode;
+		g_Config.SwimControlMode = (SwimControlMode)swimControlMode;
+		g_Config.EnableWalkToggle = enableWalkToggle;
+		g_Config.EnableCrouchToggle = enableCrouchToggle;
+		g_Config.EnableAutoClimb = enableAutoClimb;
+		g_Config.EnableAutoMonkeySwingJump = enableAutoMonkeySwingJump;
+		g_Config.EnableAutoTargeting = enableAutoTargeting;
+		g_Config.EnableOppositeActionRoll = enableOppositeActionRoll;
+		g_Config.EnableRumble = enableRumble;
+		g_Config.InvertCameraXAxis = invertCameraXAxis;
+		g_Config.InvertCameraYAxis = invertCameraYAxis;
+		g_Config.EnableTankCameraControl = enableThumbstickCamera;
+		g_Config.MouseSensitivity = mouseSensitivity;
 
 		// Set legacy variables.
 		SetVolumeTracks(musicVolume);
@@ -606,26 +606,26 @@ namespace TEN::Config
 
 	bool IsUsingClassicControls()
 	{
-		return (g_Configuration.ControlMode == ControlMode::Classic);
+		return (g_Config.ControlMode == ControlMode::Classic);
 	}
 
 	bool IsUsingEnhancedControls()
 	{
-		return (g_Configuration.ControlMode == ControlMode::Enhanced);
+		return (g_Config.ControlMode == ControlMode::Enhanced);
 	}
 
 	bool IsUsingModernControls()
 	{
-		return (g_Configuration.ControlMode == ControlMode::Modern);
+		return (g_Config.ControlMode == ControlMode::Modern);
 	}
 
 	bool IsUsingOmnidirectionalSwimControls()
 	{
-		return (g_Configuration.SwimControlMode == SwimControlMode::Omnidirectional);
+		return (g_Config.SwimControlMode == SwimControlMode::Omnidirectional);
 	}
 
 	bool IsUsingPlanarSwimControls()
 	{
-		return (g_Configuration.SwimControlMode == SwimControlMode::Planar);
+		return (g_Config.SwimControlMode == SwimControlMode::Planar);
 	}
 }

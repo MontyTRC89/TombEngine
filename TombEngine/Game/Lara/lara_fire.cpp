@@ -891,7 +891,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 
 void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 {
-	if (!g_Configuration.EnableAutoTargeting)
+	if (!g_Config.EnableAutoTargeting)
 		return;
 
 	auto& player = *GetLaraInfo(&laraItem);

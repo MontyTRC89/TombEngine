@@ -277,7 +277,7 @@ EulerAngles GetCameraControlRotation()
 	constexpr auto SMOOTHING_FACTOR				 = 8.0f;
 
 	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
-	auto axisSign = Vector2(g_Configuration.InvertCameraXAxis ? -1 : 1, g_Configuration.InvertCameraYAxis ? -1 : 1);
+	auto axisSign = Vector2(g_Config.InvertCameraXAxis ? -1 : 1, g_Config.InvertCameraYAxis ? -1 : 1);
 
 	// Calculate axis.
 	auto axis = (isUsingMouse ? GetMouseAxis() : GetCameraAxis()) * axisSign;
@@ -906,7 +906,7 @@ void CombatCamera(const ItemInfo& playerItem)
 
 static bool CanControlTankCamera(const ItemInfo& playerItem)
 {
-	if (!g_Configuration.EnableTankCameraControl)
+	if (!g_Config.EnableTankCameraControl)
 		return false;
 
 	const auto& player = GetLaraInfo(playerItem);
@@ -1422,7 +1422,7 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, fl
 
 void UpdateListenerPosition(const ItemInfo& item)
 {
-	float persp = ((g_Configuration.ScreenWidth / 2) * phd_cos(g_Camera.Fov / 2)) / phd_sin(g_Camera.Fov / 2);
+	float persp = ((g_Config.ScreenWidth / 2) * phd_cos(g_Camera.Fov / 2)) / phd_sin(g_Camera.Fov / 2);
 	g_Camera.ListenerPosition = g_Camera.Position + (persp * Vector3(phd_sin(g_Camera.actualAngle), 0.0f, phd_cos(g_Camera.actualAngle)));
 }
 

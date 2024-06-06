@@ -35,7 +35,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Free;
-	player.Control.ToggleClimb = g_Configuration.EnableAutoClimb;
+	player.Control.ToggleClimb = g_Config.EnableAutoClimb;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -65,7 +65,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
+	if (IsClicked(In::Action) && g_Config.EnableAutoClimb)
 		player.Control.ToggleClimb = false;
 
 	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
@@ -79,7 +79,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
+		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
@@ -208,7 +208,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
-	player.Control.ToggleClimb = g_Configuration.EnableAutoClimb;
+	player.Control.ToggleClimb = g_Config.EnableAutoClimb;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -240,12 +240,12 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
+	if (IsClicked(In::Action) && g_Config.EnableAutoClimb)
 		player.Control.ToggleClimb = false;
 
 	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
 	{
-		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
+		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll))
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_180;
 			return;
@@ -382,7 +382,7 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
-	player.Control.ToggleClimb = g_Configuration.EnableAutoClimb;
+	player.Control.ToggleClimb = g_Config.EnableAutoClimb;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -405,7 +405,7 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
+	if (IsClicked(In::Action) && g_Config.EnableAutoClimb)
 		player.Control.ToggleClimb = false;
 
 	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
@@ -466,7 +466,7 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
-	player.Control.ToggleClimb = g_Configuration.EnableAutoClimb;
+	player.Control.ToggleClimb = g_Config.EnableAutoClimb;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -489,7 +489,7 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
+	if (IsClicked(In::Action) && g_Config.EnableAutoClimb)
 		player.Control.ToggleClimb = false;
 
 	if (HasClimbAction(*item) && player.Control.CanMonkeySwing)
@@ -573,7 +573,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
-	player.Control.ToggleClimb = g_Configuration.EnableAutoClimb;
+	player.Control.ToggleClimb = g_Config.EnableAutoClimb;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -586,7 +586,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
+	if (IsClicked(In::Action) && g_Config.EnableAutoClimb)
 		player.Control.ToggleClimb = false;
 
 	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)
@@ -667,7 +667,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
-	player.Control.ToggleClimb = g_Configuration.EnableAutoClimb;
+	player.Control.ToggleClimb = g_Config.EnableAutoClimb;
 	player.ExtraTorsoRot = EulerAngles::Identity;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -680,7 +680,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
+	if (IsClicked(In::Action) && g_Config.EnableAutoClimb)
 		player.Control.ToggleClimb = false;
 
 	if (IsHeld(In::Action) && player.Control.CanMonkeySwing)

@@ -480,8 +480,8 @@ void InitializeScripting(int levelIndex, LevelLoadType type)
 		{
 			g_Renderer.AddString(
 				key,
-				Vector2(((float)pos.x / (float)g_Configuration.ScreenWidth * DISPLAY_SPACE_RES.x),
-				((float)pos.y / (float)g_Configuration.ScreenHeight * DISPLAY_SPACE_RES.y)),
+				Vector2(((float)pos.x / (float)g_Config.ScreenWidth * DISPLAY_SPACE_RES.x),
+				((float)pos.y / (float)g_Config.ScreenHeight * DISPLAY_SPACE_RES.y)),
 				Color(color), scale, flags);
 		});
 	}

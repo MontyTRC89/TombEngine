@@ -108,8 +108,8 @@ namespace TEN::Scripting::Util
 	//end
 	static std::tuple<int, int> PercentToScreen(float x, float y)
 	{
-		float fWidth = g_Configuration.ScreenWidth;
-		float fHeight = g_Configuration.ScreenHeight;
+		float fWidth = g_Config.ScreenWidth;
+		float fHeight = g_Config.ScreenHeight;
 		int resX = (int)std::round(fWidth / 100.0f * x);
 		int resY = (int)std::round(fHeight / 100.0f * y);
 
@@ -125,8 +125,8 @@ namespace TEN::Scripting::Util
 	//@treturn float y Y component of display position.
 	static std::tuple<float, float> ScreenToPercent(int x, int y)
 	{
-		float fWidth = g_Configuration.ScreenWidth;
-		float fHeight = g_Configuration.ScreenHeight;
+		float fWidth = g_Config.ScreenWidth;
+		float fHeight = g_Config.ScreenHeight;
 		float resX = x / fWidth * 100.0f;
 		float resY = y / fHeight * 100.0f;
 		return std::make_tuple(resX, resY);

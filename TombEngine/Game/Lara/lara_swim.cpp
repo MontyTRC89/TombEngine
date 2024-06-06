@@ -43,7 +43,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll)) &&
+	if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll)) &&
 		!hasDivesuit)
 	{
 		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);

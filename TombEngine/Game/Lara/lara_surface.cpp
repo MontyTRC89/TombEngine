@@ -76,7 +76,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 	
-	if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
+	if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll))
 	{
 		item->Animation.TargetState = LS_ROLL_180_FORWARD;
 		return;

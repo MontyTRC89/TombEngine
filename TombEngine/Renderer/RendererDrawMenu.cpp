@@ -113,7 +113,7 @@ namespace TEN::Renderer
 		auto titleOption = g_Gui.GetSelectedOption();
 
 		char stringBuffer[32] = {};
-		auto screenResolution = g_Configuration.SupportedScreenResolutions[g_Gui.GetCurrentSettings().SelectedScreenResolution];
+		auto screenResolution = g_Config.SupportedScreenResolutions[g_Gui.GetCurrentSettings().SelectedScreenResolution];
 		sprintf(stringBuffer, "%d x %d", screenResolution.x, screenResolution.y);
 
 		auto* shadowMode = g_Gui.GetCurrentSettings().Configuration.ShadowType != ShadowMode::None ?
@@ -1174,7 +1174,7 @@ namespace TEN::Renderer
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-		switch (g_Configuration.AntialiasingMode)
+		switch (g_Config.AntialiasingMode)
 		{
 		case AntialiasingMode::None:
 			break;
@@ -1275,7 +1275,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("RENDERER STATS");
 				PrintDebugMessage("FPS: %3.2f", _fps);
 				PrintDebugMessage("Resolution: %d x %d", _screenWidth, _screenHeight);
-				PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
+				PrintDebugMessage("GPU: %s", g_Config.AdapterName.c_str());
 				PrintDebugMessage("Update time: %d", _timeUpdate);
 				PrintDebugMessage("Frame time: %d", _timeFrame);
 				PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
@@ -1328,7 +1328,7 @@ namespace TEN::Renderer
 				_spriteBatch->Draw(_SSAOBlurredRenderTarget.ShaderResourceView.Get(), rect);
 				thumbY += thumbWidth / aspectRatio;
 				  
-				if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
+				if (g_Config.AntialiasingMode > AntialiasingMode::Low)
 				{
 					rect.left = _screenWidth - thumbWidth;
 					rect.top = thumbY;

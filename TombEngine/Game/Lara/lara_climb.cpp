@@ -985,8 +985,8 @@ bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.Velocity.y = 0;
 	item->Animation.IsAirborne = false;
 
-	lara->Control.ToggleClimb = g_Configuration.EnableAutoClimb;
-	if (IsClicked(In::Action) && g_Configuration.EnableAutoClimb)
+	lara->Control.ToggleClimb = g_Config.EnableAutoClimb;
+	if (IsClicked(In::Action) && g_Config.EnableAutoClimb)
 		lara->Control.ToggleClimb = false;
 
 	if (HasClimbAction(*item) && item->HitPoints > 0 || item->Animation.AnimNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim

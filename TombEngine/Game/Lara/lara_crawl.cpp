@@ -91,7 +91,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
+		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll))
 		{
 			item->Animation.TargetState = LS_CROUCH_TURN_180;
 			return;
@@ -471,7 +471,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
-		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Configuration.EnableOppositeActionRoll))
+		if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll))
 		{
 			item->Animation.TargetState = LS_CRAWL_TURN_180;
 			return;

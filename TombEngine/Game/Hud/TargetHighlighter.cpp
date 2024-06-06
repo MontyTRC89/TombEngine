@@ -164,7 +164,7 @@ namespace TEN::Hud
 	void TargetHighlighterController::Update(const ItemInfo& playerItem)
 	{
 		// Check if target highlighter is enabled.
-		if (!g_Configuration.EnableTargetHighlighter)
+		if (!g_Config.EnableTargetHighlighter)
 		{
 			if (!_crosshairs.empty())
 				_crosshairs.clear();
@@ -352,7 +352,7 @@ namespace TEN::Hud
 			crosshair.IsPrimary ? primaryCount++ : peripheralCount++;
 
 		g_Renderer.PrintDebugMessage("TARGET HIGHLIGHTER DEBUG");
-		g_Renderer.PrintDebugMessage(g_Configuration.EnableTargetHighlighter ? "Enabled" : "Disabled");
+		g_Renderer.PrintDebugMessage(g_Config.EnableTargetHighlighter ? "Enabled" : "Disabled");
 		g_Renderer.PrintDebugMessage("Primary crosshairs: %d", primaryCount);
 		g_Renderer.PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
 	}
