@@ -38,7 +38,7 @@ namespace TEN::Config
 	constexpr auto REGKEY_ENABLE_WINDOWED_MODE		= "EnableWindowedMode";
 	constexpr auto REGKEY_SHADOWS					= "ShadowsMode";
 	constexpr auto REGKEY_SHADOW_MAP_SIZE			= "ShadowMapSize";
-	constexpr auto REGKEY_SHADOW_BLOBS_MAX			= "ShadowBlobsMax";
+	constexpr auto REGKEY_SHADOW_BLOB_COUNT_MAX		= "ShadowBlobCountMax";
 	constexpr auto REGKEY_ENABLE_CAUSTICS			= "EnableCaustics";
 	constexpr auto REGKEY_ANTIALIASING_MODE			= "AntialiasingMode";
 	constexpr auto REGKEY_AMBIENT_OCCLUSION			= "AmbientOcclusion";
@@ -68,11 +68,23 @@ namespace TEN::Config
 		Count
 	};
 
+	// TODO
+	enum class WindowMode
+	{
+		Windowed,
+		Fullscreen,
+
+		Count
+	};
+
 	struct GameConfiguration
 	{
-		static constexpr auto DEFAULT_SHADOW_MAP_SIZE	= 1024;
-		static constexpr auto DEFAULT_SHADOW_BLOBS_MAX	= 16;
-		static constexpr auto DEFAULT_MOUSE_SENSITIVITY = 6;
+		static constexpr auto DEFAULT_MOUSE_SENSITIVITY		= 6;
+		static constexpr auto DEFAULT_SHADOW_MAP_SIZE		= 1024;
+		static constexpr auto DEFAULT_SHADOW_BLOB_COUNT_MAX	= 16;
+		static constexpr auto MOUSE_SENSITIVITY_MAX			= 35;
+		static constexpr auto MOUSE_SENSITIVITY_MIN			= 1;
+		static constexpr auto SOUND_VOLUME_MAX				= 100;
 
 		// Controls
 		std::vector<int> KeyBindings			 = {};
@@ -99,7 +111,7 @@ namespace TEN::Config
 		bool			 EnableWindowedMode		= false;
 		ShadowMode		 ShadowType				= ShadowMode::None;
 		int				 ShadowMapSize			= DEFAULT_SHADOW_MAP_SIZE;
-		int				 ShadowBlobsMax			= DEFAULT_SHADOW_BLOBS_MAX;
+		int				 ShadowBlobCountMax		= DEFAULT_SHADOW_BLOB_COUNT_MAX;
 		bool			 EnableCaustics			= false;
 		bool			 EnableAmbientOcclusion = false;
 		AntialiasingMode AntialiasingMode		= AntialiasingMode::None;
@@ -118,20 +130,10 @@ namespace TEN::Config
 
 	extern GameConfiguration g_Configuration;
 
-	void LoadResolutionsInCombobox(HWND handle);
-	void LoadSoundDevicesInCombobox(HWND handle);
-	BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
 	int	 SetupDialog();
 	void InitDefaultConfiguration();
 	bool LoadConfiguration();
 	bool SaveConfiguration();
-	void SaveAudioConfig();
-	LONG GetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD* nValue, DWORD nDefaultValue);
-	LONG GetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool* bValue, bool bDefaultValue);
-	LONG GetStringRegKey(HKEY hKey, LPCSTR strValueName, char** strValue, char* strDefaultValue);
-	LONG SetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD nValue);
-	LONG SetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool bValue);
-	LONG SetStringRegKey(HKEY hKey, LPCSTR strValueName, char* strValue);
 
 	bool IsUsingClassicControls();
 	bool IsUsingEnhancedControls();

@@ -40,12 +40,7 @@ namespace TEN::Gui
 	constexpr int PHD_CENTER_Y	  = DISPLAY_SPACE_RES.y / 2;
 	constexpr int OBJLIST_SPACING = PHD_CENTER_X / 2;
 
-	constexpr auto VOLUME_MAX			 = 100;
-	constexpr auto VOLUME_STEP			 = VOLUME_MAX / 20;
-	constexpr auto MOUSE_SENSITIVITY_MAX = 35;
-	constexpr auto MOUSE_SENSITIVITY_MIN = 1;
-	constexpr auto MOUSE_SMOOTHING_MAX	 = 5;
-	constexpr auto MOUSE_SMOOTHING_MIN	 = 0;
+	constexpr auto SOUND_VOLUME_STEP	 = GameConfiguration::SOUND_VOLUME_MAX / 20;
 
 	GuiController g_Gui;
 
@@ -533,11 +528,11 @@ namespace TEN::Gui
 			switch (SelectedOption)
 			{
 			case ControlsSettingsOption::MouseSensitivity:
-				if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MIN)
+				if (CurrentSettings.Configuration.MouseSensitivity > GameConfiguration::MOUSE_SENSITIVITY_MIN)
 				{
 					CurrentSettings.Configuration.MouseSensitivity -= 1;
-					if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MIN)
-						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MIN;
+					if (CurrentSettings.Configuration.MouseSensitivity < GameConfiguration::MOUSE_SENSITIVITY_MIN)
+						CurrentSettings.Configuration.MouseSensitivity = GameConfiguration::MOUSE_SENSITIVITY_MIN;
 
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				}
@@ -551,11 +546,11 @@ namespace TEN::Gui
 			switch (SelectedOption)
 			{
 			case ControlsSettingsOption::MouseSensitivity:
-				if (CurrentSettings.Configuration.MouseSensitivity < MOUSE_SENSITIVITY_MAX)
+				if (CurrentSettings.Configuration.MouseSensitivity < GameConfiguration::MOUSE_SENSITIVITY_MAX)
 				{
 					CurrentSettings.Configuration.MouseSensitivity += 1;
-					if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MAX)
-						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MAX;
+					if (CurrentSettings.Configuration.MouseSensitivity > GameConfiguration::MOUSE_SENSITIVITY_MAX)
+						CurrentSettings.Configuration.MouseSensitivity = GameConfiguration::MOUSE_SENSITIVITY_MAX;
 
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				}
@@ -1271,7 +1266,7 @@ namespace TEN::Gui
 			case SoundSettingsOption::MusicVolume:
 				if (CurrentSettings.Configuration.MusicVolume > 0)
 				{
-					CurrentSettings.Configuration.MusicVolume -= VOLUME_STEP;
+					CurrentSettings.Configuration.MusicVolume -= SOUND_VOLUME_STEP;
 					if (CurrentSettings.Configuration.MusicVolume < 0)
 						CurrentSettings.Configuration.MusicVolume = 0;
 
@@ -1284,7 +1279,7 @@ namespace TEN::Gui
 			case SoundSettingsOption::SfxVolume:
 				if (CurrentSettings.Configuration.SfxVolume > 0)
 				{
-					CurrentSettings.Configuration.SfxVolume -= VOLUME_STEP;
+					CurrentSettings.Configuration.SfxVolume -= SOUND_VOLUME_STEP;
 					if (CurrentSettings.Configuration.SfxVolume < 0)
 						CurrentSettings.Configuration.SfxVolume = 0;
 
@@ -1308,11 +1303,11 @@ namespace TEN::Gui
 			switch (SelectedOption)
 			{
 			case SoundSettingsOption::MusicVolume:
-				if (CurrentSettings.Configuration.MusicVolume < VOLUME_MAX)
+				if (CurrentSettings.Configuration.MusicVolume < GameConfiguration::SOUND_VOLUME_MAX)
 				{
-					CurrentSettings.Configuration.MusicVolume += VOLUME_STEP;
-					if (CurrentSettings.Configuration.MusicVolume > VOLUME_MAX)
-						CurrentSettings.Configuration.MusicVolume = VOLUME_MAX;
+					CurrentSettings.Configuration.MusicVolume += SOUND_VOLUME_STEP;
+					if (CurrentSettings.Configuration.MusicVolume > GameConfiguration::SOUND_VOLUME_MAX)
+						CurrentSettings.Configuration.MusicVolume = GameConfiguration::SOUND_VOLUME_MAX;
 
 					SetVolumeTracks(CurrentSettings.Configuration.MusicVolume);
 					isVolumeAdjusted = true;
@@ -1321,11 +1316,11 @@ namespace TEN::Gui
 				break;
 
 			case SoundSettingsOption::SfxVolume:
-				if (CurrentSettings.Configuration.SfxVolume < VOLUME_MAX)
+				if (CurrentSettings.Configuration.SfxVolume < GameConfiguration::SOUND_VOLUME_MAX)
 				{
-					CurrentSettings.Configuration.SfxVolume += VOLUME_STEP;
-					if (CurrentSettings.Configuration.SfxVolume > VOLUME_MAX)
-						CurrentSettings.Configuration.SfxVolume = VOLUME_MAX;
+					CurrentSettings.Configuration.SfxVolume += SOUND_VOLUME_STEP;
+					if (CurrentSettings.Configuration.SfxVolume > GameConfiguration::SOUND_VOLUME_MAX)
+						CurrentSettings.Configuration.SfxVolume = GameConfiguration::SOUND_VOLUME_MAX;
 
 					SetVolumeFX(CurrentSettings.Configuration.SfxVolume);
 					isVolumeAdjusted = true;

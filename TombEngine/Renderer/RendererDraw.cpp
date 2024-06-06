@@ -47,7 +47,7 @@ namespace TEN::Renderer
 	void Renderer::RenderBlobShadows(RenderView& renderView)
 	{
 		auto nearestSpheres = std::vector<Sphere>{};
-		nearestSpheres.reserve(g_Configuration.ShadowBlobsMax);
+		nearestSpheres.reserve(g_Configuration.ShadowBlobCountMax);
 
 		// Collect player spheres.
 		static const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
@@ -96,7 +96,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (nearestSpheres.size() > g_Configuration.ShadowBlobsMax)
+		if (nearestSpheres.size() > g_Configuration.ShadowBlobCountMax)
 		{
 			std::sort(nearestSpheres.begin(), nearestSpheres.end(), [](const Sphere& a, const Sphere& b)
 				{
@@ -104,8 +104,8 @@ namespace TEN::Renderer
 					return Vector3::Distance(laraPos.ToVector3(), a.position) < Vector3::Distance(laraPos.ToVector3(), b.position);
 				});
 
-			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Configuration.ShadowBlobsMax, _stShadowMap.Spheres);
-			_stShadowMap.NumSpheres = g_Configuration.ShadowBlobsMax;
+			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Configuration.ShadowBlobCountMax, _stShadowMap.Spheres);
+			_stShadowMap.NumSpheres = g_Configuration.ShadowBlobCountMax;
 		}
 		else
 		{
@@ -131,7 +131,7 @@ namespace TEN::Renderer
 			return;
 
 		// Only render for Lara if such setting is active
-		if (g_Configuration.ShadowType == ShadowMode::Lara && _moveableObjects[item->ObjectNumber].value().ShadowType != ShadowMode::Lara)
+		if (g_Configuration.ShadowType == ShadowMode::Player && _moveableObjects[item->ObjectNumber].value().ShadowType != ShadowMode::Player)
 			return;
 
 		// No shadow light found

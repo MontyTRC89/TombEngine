@@ -18,7 +18,7 @@ namespace TEN::Config
 {
 	GameConfiguration g_Configuration;
 
-	void LoadResolutionsInCombobox(HWND handle)
+	static void LoadResolutionsInCombobox(HWND handle)
 	{
 		HWND cbHandle = GetDlgItem(handle, IDC_RESOLUTION);
 
@@ -26,11 +26,11 @@ namespace TEN::Config
 
 		for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
 		{
-			auto screenResolution = g_Configuration.SupportedScreenResolutions[i];
+			auto screenRes = g_Configuration.SupportedScreenResolutions[i];
 
 			char* str = (char*)malloc(255);
 			ZeroMemory(str, 255);
-			sprintf(str, "%d x %d", screenResolution.x, screenResolution.y);
+			sprintf(str, "%d x %d", screenRes.x, screenRes.y);
 
 			SendMessageA(cbHandle, CB_ADDSTRING, i, (LPARAM)(str));
 
@@ -41,7 +41,7 @@ namespace TEN::Config
 		SendMessageA(cbHandle, CB_SETMINVISIBLE, 20, 0);
 	}
 
-	void LoadSoundDevicesInCombobox(HWND handle)
+	static void LoadSoundDevicesInCombobox(HWND handle)
 	{
 		HWND cbHandle = GetDlgItem(handle, IDC_SNDADAPTER);
 
@@ -59,7 +59,7 @@ namespace TEN::Config
 		SendMessageA(cbHandle, CB_SETCURSEL, 0, 0);
 	}
 
-	BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
+	static BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		Vector2i mode;
 		int selectedMode;
@@ -91,7 +91,7 @@ namespace TEN::Config
 			g_Configuration.AntialiasingMode = AntialiasingMode::Low;
 			SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_SETCHECK, 1, 0);
 
-			g_Configuration.ShadowType = ShadowMode::Lara;
+			g_Configuration.ShadowType = ShadowMode::Player;
 			SendDlgItemMessage(handle, IDC_SHADOWS, BM_SETCHECK, 1, 0);
 
 			g_Configuration.EnableCaustics = true;
@@ -160,6 +160,22 @@ namespace TEN::Config
 		return true;
 	}
 
+	static LONG SetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD nValue)
+	{
+		return RegSetValueExA(hKey, strValueName, 0, REG_DWORD, reinterpret_cast<LPBYTE>(&nValue), sizeof(DWORD));
+	}
+
+	static LONG SetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool bValue)
+	{
+		return SetDWORDRegKey(hKey, strValueName, (bValue ? 1 : 0));
+	}
+
+	static LONG SetStringRegKey(HKEY hKey, LPCSTR strValueName, char* strValue)
+	{
+		// TODO: Fix this line.
+		return 1; // RegSetValueExA(hKey, strValueName, 0, REG_DWORD, reinterpret_cast<LPBYTE>(&nValue), sizeof(DWORD));
+	}
+
 	bool SaveConfiguration()
 	{
 		// Open root key.
@@ -186,7 +202,7 @@ namespace TEN::Config
 			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_WINDOWED_MODE, g_Configuration.EnableWindowedMode) != ERROR_SUCCESS ||
 			SetDWORDRegKey(graphicsKey, REGKEY_SHADOWS, (DWORD)g_Configuration.ShadowType) != ERROR_SUCCESS ||
 			SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_MAP_SIZE, g_Configuration.ShadowMapSize) != ERROR_SUCCESS ||
-			SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, g_Configuration.ShadowBlobsMax) != ERROR_SUCCESS ||
+			SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOB_COUNT_MAX, g_Configuration.ShadowBlobCountMax) != ERROR_SUCCESS ||
 			SetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, g_Configuration.EnableCaustics) != ERROR_SUCCESS ||
 			SetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, (DWORD)g_Configuration.AntialiasingMode) != ERROR_SUCCESS ||
 			SetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, g_Configuration.EnableAmbientOcclusion) != ERROR_SUCCESS ||
@@ -293,12 +309,6 @@ namespace TEN::Config
 		return true;
 	}
 
-	void SaveAudioConfig()
-	{
-		SetVolumeTracks(g_Configuration.MusicVolume);
-		SetVolumeFX(g_Configuration.SfxVolume);
-	}
-
 	void InitDefaultConfiguration()
 	{
 		// Include default device in list.
@@ -306,23 +316,14 @@ namespace TEN::Config
 
 		auto screenRes = GetScreenResolution();
 
-		g_Configuration.ScreenWidth = screenRes.x;
-		g_Configuration.ScreenHeight = screenRes.y;
-		g_Configuration.ShadowType = ShadowMode::Lara;
-		g_Configuration.ShadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
-		g_Configuration.ShadowBlobsMax = GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX;
-		g_Configuration.EnableCaustics = true;
-		g_Configuration.AntialiasingMode = AntialiasingMode::Medium;
-		g_Configuration.EnableAmbientOcclusion = true;
-		g_Configuration.EnableTargetHighlighter = true;
-		g_Configuration.EnableSubtitles = true;
+		// Controls
+		g_Configuration.EnableTankCameraControl = false;
+		g_Configuration.InvertCameraXAxis = false;
+		g_Configuration.InvertCameraYAxis = false;
+		g_Configuration.EnableRumble = true;
+		g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
 
-		g_Configuration.SoundDevice = 1;
-		g_Configuration.EnableSound = true;
-		g_Configuration.EnableReverb = true;
-		g_Configuration.MusicVolume = 100;
-		g_Configuration.SfxVolume = 100;
-
+		// Gameplay
 		g_Configuration.ControlMode = ControlMode::Enhanced;
 		g_Configuration.SwimControlMode = SwimControlMode::Omnidirectional;
 		g_Configuration.EnableWalkToggle = false;
@@ -331,14 +332,73 @@ namespace TEN::Config
 		g_Configuration.EnableAutoMonkeySwingJump = false;
 		g_Configuration.EnableAutoTargeting = true;
 		g_Configuration.EnableOppositeActionRoll = true;
-		g_Configuration.EnableRumble = true;
-		g_Configuration.InvertCameraXAxis = false;
-		g_Configuration.InvertCameraYAxis = false;
-		g_Configuration.EnableTankCameraControl = false;
-		g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
+		g_Configuration.EnableTargetHighlighter = true;
+
+		// Graphics
+		g_Configuration.ScreenWidth = screenRes.x;
+		g_Configuration.ScreenHeight = screenRes.y;
+		g_Configuration.ShadowType = ShadowMode::Player;
+		g_Configuration.ShadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
+		g_Configuration.ShadowBlobCountMax = GameConfiguration::DEFAULT_SHADOW_BLOB_COUNT_MAX;
+		g_Configuration.EnableAmbientOcclusion = true;
+		g_Configuration.EnableCaustics = true;
+		g_Configuration.AntialiasingMode = AntialiasingMode::Medium;
+		g_Configuration.EnableSubtitles = true;
+
+		// Sound
+		g_Configuration.SoundDevice = 1;
+		g_Configuration.EnableSound = true;
+		g_Configuration.EnableReverb = true;
+		g_Configuration.MusicVolume = GameConfiguration::SOUND_VOLUME_MAX;
+		g_Configuration.SfxVolume = GameConfiguration::SOUND_VOLUME_MAX;
 
 		g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
 		g_Configuration.AdapterName = g_Renderer.GetDefaultAdapterName();
+	}
+
+	static LONG GetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD* nValue, DWORD nDefaultValue)
+	{
+		*nValue = nDefaultValue;
+
+		DWORD dwBufferSize(sizeof(DWORD));
+		DWORD nResult(0);
+		LONG nError = ::RegQueryValueEx(
+			hKey,
+			strValueName,
+			0,
+			NULL,
+			reinterpret_cast<LPBYTE>(&nResult),
+			&dwBufferSize);
+
+		if (ERROR_SUCCESS == nError)
+			*nValue = nResult;
+
+		return nError;
+	}
+
+	static LONG GetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool* bValue, bool bDefaultValue)
+	{
+		DWORD nDefValue((bDefaultValue) ? 1 : 0);
+		DWORD nResult(nDefValue);
+
+		LONG nError = GetDWORDRegKey(hKey, strValueName, &nResult, nDefValue);
+		if (ERROR_SUCCESS == nError)
+			*bValue = (nResult != 0);
+
+		return nError;
+	}
+
+	static LONG GetStringRegKey(HKEY hKey, LPCSTR strValueName, char** strValue, char* strDefaultValue)
+	{
+		*strValue = strDefaultValue;
+		char szBuffer[512];
+		DWORD dwBufferSize = sizeof(szBuffer);
+
+		ULONG nError = RegQueryValueEx(hKey, strValueName, 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
+		if (ERROR_SUCCESS == nError)
+			*strValue = szBuffer;
+
+		return nError;
 	}
 
 	bool LoadConfiguration()
@@ -365,7 +425,7 @@ namespace TEN::Config
 		bool enableWindowedMode = false;
 		DWORD shadowMode = 1;
 		DWORD shadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
-		DWORD shadowBlobsMax = GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX;
+		DWORD shadowBlobsMax = GameConfiguration::DEFAULT_SHADOW_BLOB_COUNT_MAX;
 		bool enableCaustics = false;
 		DWORD antialiasingMode = (DWORD)AntialiasingMode::High;
 		bool enableAmbientOcclusion = false;
@@ -378,7 +438,7 @@ namespace TEN::Config
 			GetBoolRegKey(graphicsKey, REGKEY_ENABLE_WINDOWED_MODE, &enableWindowedMode, false) != ERROR_SUCCESS ||
 			GetDWORDRegKey(graphicsKey, REGKEY_SHADOWS, &shadowMode, 1) != ERROR_SUCCESS ||
 			GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_MAP_SIZE, &shadowMapSize, GameConfiguration::DEFAULT_SHADOW_MAP_SIZE) != ERROR_SUCCESS ||
-			GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, &shadowBlobsMax, GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX) != ERROR_SUCCESS ||
+			GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOB_COUNT_MAX, &shadowBlobsMax, GameConfiguration::DEFAULT_SHADOW_BLOB_COUNT_MAX) != ERROR_SUCCESS ||
 			GetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, &enableCaustics, true) != ERROR_SUCCESS ||
 			GetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, &antialiasingMode, true) != ERROR_SUCCESS ||
 			GetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, &enableAmbientOcclusion, false) != ERROR_SUCCESS ||
@@ -507,7 +567,7 @@ namespace TEN::Config
 		g_Configuration.ScreenHeight = screenHeight;
 		g_Configuration.EnableWindowedMode = enableWindowedMode;
 		g_Configuration.ShadowType = ShadowMode(shadowMode);
-		g_Configuration.ShadowBlobsMax = shadowBlobsMax;
+		g_Configuration.ShadowBlobCountMax = shadowBlobsMax;
 		g_Configuration.EnableCaustics = enableCaustics;
 		g_Configuration.AntialiasingMode = AntialiasingMode(antialiasingMode);
 		g_Configuration.ShadowMapSize = shadowMapSize;
@@ -542,66 +602,6 @@ namespace TEN::Config
 		DefaultConflict();
 
 		return true;
-	}
-
-	LONG SetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD nValue)
-	{
-		return RegSetValueExA(hKey, strValueName, 0, REG_DWORD, reinterpret_cast<LPBYTE>(&nValue), sizeof(DWORD));
-	}
-
-	LONG SetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool bValue)
-	{
-		return SetDWORDRegKey(hKey, strValueName, (bValue ? 1 : 0));
-	}
-
-	LONG SetStringRegKey(HKEY hKey, LPCSTR strValueName, char* strValue)
-	{
-		return 1; // RegSetValueExA(hKey, strValueName, 0, REG_DWORD, reinterpret_cast<LPBYTE>(&nValue), sizeof(DWORD));
-	}
-
-	LONG GetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD* nValue, DWORD nDefaultValue)
-	{
-		*nValue = nDefaultValue;
-
-		DWORD dwBufferSize(sizeof(DWORD));
-		DWORD nResult(0);
-		LONG nError = ::RegQueryValueEx(
-			hKey,
-			strValueName,
-			0,
-			NULL,
-			reinterpret_cast<LPBYTE>(&nResult),
-			&dwBufferSize);
-
-		if (ERROR_SUCCESS == nError)
-			*nValue = nResult;
-
-		return nError;
-	}
-
-	LONG GetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool* bValue, bool bDefaultValue)
-	{
-		DWORD nDefValue((bDefaultValue) ? 1 : 0);
-		DWORD nResult(nDefValue);
-
-		LONG nError = GetDWORDRegKey(hKey, strValueName, &nResult, nDefValue);
-		if (ERROR_SUCCESS == nError)
-			*bValue = (nResult != 0);
-
-		return nError;
-	}
-
-	LONG GetStringRegKey(HKEY hKey, LPCSTR strValueName, char** strValue, char* strDefaultValue)
-	{
-		*strValue = strDefaultValue;
-		char szBuffer[512];
-		DWORD dwBufferSize = sizeof(szBuffer);
-
-		ULONG nError = RegQueryValueEx(hKey, strValueName, 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
-		if (ERROR_SUCCESS == nError)
-			*strValue = szBuffer;
-
-		return nError;
 	}
 
 	bool IsUsingClassicControls()
