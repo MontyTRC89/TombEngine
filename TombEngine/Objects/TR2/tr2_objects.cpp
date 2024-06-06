@@ -41,6 +41,7 @@
 #include "Objects/TR2/Vehicles/skidoo.h"
 
 using namespace TEN::Entities::Creatures::TR2;
+using namespace TEN::Entities::Traps;
 
 static void StartEntity(ObjectInfo* obj)
 {
