@@ -420,9 +420,8 @@ namespace TEN::Entities
 			obj->intelligent = true;
 			obj->explodableMeshbits = 0x40;
 			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
-			obj->SetBoneRotationFlags(1, ROT_X | ROT_X);
-			obj->SetBoneRotationFlags(2, ROT_X | ROT_Z);
-			obj->SetBoneRotationFlags(3, ROT_X | ROT_Z);
+			obj->SetBoneRotationFlags(2, ROT_Z);
+			obj->SetBoneRotationFlags(3, ROT_Z);
 			obj->SetHitEffect(true);
 		}
 
