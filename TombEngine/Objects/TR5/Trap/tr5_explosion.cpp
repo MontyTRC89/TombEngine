@@ -82,10 +82,11 @@ namespace TEN::Entities::Traps
 					flag = item->ItemFlags[1] == 1 ? 2 : 0;
 				}
 
-			auto collObjects = GetCollidedObjects(*item, true, true, BLOCK(2), ObjectCollectionMode::All);
-			if (!collObjects.IsEmpty())
-			{
-				for (auto* itemPtr : collObjects.Items)
+				SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 1.5f);
+				SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
+				TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, flag, item->RoomNumber);
+
+				for (int i = 0; i < item->ItemFlags[2]; ++i)
 				{
 					TriggerExplosionSparks(
 						item->Pose.Position.x + (GetRandomControl() % 128 - 64) * item->ItemFlags[2],
@@ -130,9 +131,10 @@ namespace TEN::Entities::Traps
 					}
 				}
 
-				for (auto* staticPtr : collObjects.Statics)
+				auto collObjects = GetCollidedObjects(*item, true, true, BLOCK(2), ObjectCollectionMode::All);
+				if (!collObjects.IsEmpty())
 				{
-					for (auto* itemPtr : collObjects.ItemPtrs)
+					for (auto* itemPtr : collObjects.Items)
 					{
 						if (itemPtr->ObjectNumber >= ID_SMASH_OBJECT1 && itemPtr->ObjectNumber <= ID_SMASH_OBJECT16)
 						{
@@ -155,7 +157,7 @@ namespace TEN::Entities::Traps
 						}
 					}
 
-					for (auto* staticPtr : collObjects.StaticPtrs)
+					for (auto* staticPtr : collObjects.Statics)
 					{
 						if (StaticObjects[staticPtr->staticNumber].shatterType != ShatterType::None)
 						{
