@@ -10,7 +10,7 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
     void CogControl(short itemNumber)
     {

@@ -3,7 +3,7 @@
 
 #include "Game/Setup.h"
 
-namespace TEN::Entities::Traps::TR1
+namespace TEN::Entities::Traps
 {
 	constexpr auto SWINGING_BLADE_HARM_DAMAGE = 100;
 

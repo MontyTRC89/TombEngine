@@ -76,7 +76,6 @@
 using namespace TEN::Effects::EmberEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
-using namespace TEN::Traps::TR5;
 using namespace TEN::Entities::Traps;
 
 static void StartEntity(ObjectInfo *obj)

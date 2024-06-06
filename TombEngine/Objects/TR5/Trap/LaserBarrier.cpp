@@ -13,7 +13,7 @@
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 
-namespace TEN::Traps::TR5
+namespace TEN::Entities::Traps
 {
 	// NOTES:
 	// item.ItemFlags[0] = barrier height.

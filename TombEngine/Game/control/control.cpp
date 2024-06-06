@@ -85,8 +85,8 @@ using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using namespace TEN::Traps::TR5;
 using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Traps;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;

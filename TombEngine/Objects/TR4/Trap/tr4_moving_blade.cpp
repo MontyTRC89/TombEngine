@@ -9,7 +9,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
     void MovingBladeControl(short itemNumber)
     {

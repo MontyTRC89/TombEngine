@@ -9,7 +9,7 @@
 // item.ItemFlags[3] = Damage.
 // item.ItemFlags[4] = if 0, it pushes Lara away when collides.
 
-namespace TEN::Traps::TR5
+namespace TEN::Entities::Traps
 {
 	constexpr auto ROME_HAMMER_HARM_DAMAGE = 250;
 	constexpr auto ROME_HAMMER_JOINT = MESH_BITS(1);

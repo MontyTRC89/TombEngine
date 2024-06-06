@@ -10,7 +10,7 @@
 
 using namespace TEN::Collision::Point;
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
 	void InitializeSlicerDicer(short itemNumber)
 	{

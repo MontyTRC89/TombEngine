@@ -21,7 +21,7 @@ constexpr auto HAMMER_OCB4_INTERVAL = 60;
 constexpr auto HAMMER_HIT_FRAME = 8;        //frame the hammer explodes pushables
 constexpr auto HAMMER_CLOSED_FRAME = 52;    //frame the hammer is fully closed
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
 
     enum HammerState

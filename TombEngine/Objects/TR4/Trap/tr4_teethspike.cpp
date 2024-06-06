@@ -14,7 +14,7 @@
 
 using namespace TEN::Collision::Point;
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
 	constexpr auto TEETH_SPIKE_HARM_DAMAGE_CONSTANT = 8;
 	constexpr auto TEETH_SPIKE_HARM_DAMAGE_EMERGING = 30;

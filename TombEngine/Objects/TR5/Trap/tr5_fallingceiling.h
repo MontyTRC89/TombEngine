@@ -1,3 +1,6 @@
 #pragma once
 
-void FallingCeilingControl(short itemNumber);
+namespace TEN::Entities::Traps
+{
+	void FallingCeilingControl(short itemNumber);
+}

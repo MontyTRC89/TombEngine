@@ -3,7 +3,7 @@
 struct ItemInfo;
 struct CollisionInfo;
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
 	void InitializeMine(short itemNumber);
 	void MineControl(short itemNumber);

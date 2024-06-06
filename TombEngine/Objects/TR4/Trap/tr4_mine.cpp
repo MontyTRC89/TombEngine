@@ -13,7 +13,7 @@
 
 using namespace TEN::Effects::Environment;
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
 	void InitializeMine(short itemNumber)
 	{

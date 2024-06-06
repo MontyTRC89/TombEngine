@@ -12,7 +12,7 @@
 
 using namespace TEN::Collision::Point;
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
     constexpr auto JOBY_SPIKES_DAMAGE = 8;
     constexpr auto JOBY_SPIKES_EXTRA_ROTATION_SPEED = 2;

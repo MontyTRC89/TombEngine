@@ -3,5 +3,8 @@
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
 
-void TrainControl(short itemNumber);
-void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+namespace TEN::Entities::Traps
+{
+	void TrainControl(short itemNumber);
+	void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+}
