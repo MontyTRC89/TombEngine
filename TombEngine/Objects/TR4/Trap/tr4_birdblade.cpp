@@ -7,6 +7,13 @@
 
 namespace TEN::Entities::Traps
 {
+	void InitializeBirdBlade(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		item.ItemFlags[4] = 1;
+	}
+
 	void BirdBladeControl(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];

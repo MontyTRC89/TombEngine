@@ -32,6 +32,7 @@ namespace TEN::Entities::Traps
 		
 		item.ItemFlags[2] = item.TriggerFlags >= 0 ? 1 : abs(item.TriggerFlags);		//ItemFlags[2] stores blade timer.
 		item.ItemFlags[3] = SETH_BLADE_HARM_DAMAGE;										//ItemFlags[3] stored blade harm damage.
+		item.ItemFlags[4] = 1;
 	}
 
 	void SethBladeControl(short itemNumber)

@@ -775,6 +775,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_PLOUGH];
 		if (obj->loaded)
 		{
+			obj->Initialize = InitializePlough;
 			obj->control = PloughControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
@@ -808,6 +809,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_BIRD_BLADE];
 		if (obj->loaded)
 		{
+			obj->Initialize = InitializeBirdBlade;
 			obj->control = BirdBladeControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
@@ -833,22 +835,6 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->control = SpikeballControl;
-			obj->collision = GenericSphereBoxCollision;
-			obj->SetHitEffect(true);
-		}
-
-		obj = &Objects[ID_CHAIN];
-		if (obj->loaded)
-		{
-			obj->control = ChainControl;
-			obj->collision = GenericSphereBoxCollision;
-			obj->SetHitEffect(true);
-		}
-
-		obj = &Objects[ID_PLOUGH];
-		if (obj->loaded)
-		{
-			obj->control = PloughControl;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
 		}

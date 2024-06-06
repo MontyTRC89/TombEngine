@@ -7,18 +7,25 @@
 
 namespace TEN::Entities::Traps
 {
+	void InitializePlough(short itemNumber)
+	{
+		auto & item = g_Level.Items[itemNumber];
+
+		item.ItemFlags[4] = 1;
+	}
+
 	void PloughControl(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
-		item->ItemFlags[3] = 50;
+		item.ItemFlags[3] = 50;
 
-		if (TriggerActive(item))
+		if (TriggerActive(&item))
 		{
-			*((int*)&item->ItemFlags) = 0x3F000;
-			AnimateItem(item);
+			*((int*)&item.ItemFlags) = 0x3F000;
+			AnimateItem(&item);
 		}
 		else
-			*((int*)&item->ItemFlags) = 0;
+			*((int*)&item.ItemFlags) = 0;
 	}
 }
