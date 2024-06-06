@@ -904,9 +904,13 @@ void CombatCamera(const ItemInfo& playerItem)
 	HandleCameraFollow(playerItem, true);
 }
 
-static bool CanControlTankCamera()
+static bool CanControlTankCamera(const ItemInfo& playerItem)
 {
 	if (!g_Configuration.EnableTankCameraControl)
+		return false;
+
+	const auto& player = GetLaraInfo(playerItem);
+	if (player.Control.IsLocked)
 		return false;
 
 	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
@@ -933,6 +937,8 @@ void UpdateCameraSphere(const ItemInfo& playerItem)
 	constexpr auto COMBAT_CAMERA_REBOUND_ALPHA		= 0.3f;
 	constexpr auto LOCKED_CAMERA_ALTITUDE_ROT_ALPHA = 1 / 8.0f;
 
+	const auto& player = GetLaraInfo(playerItem);
+
 	if (g_Camera.laraNode != NO_VALUE)
 	{
 		auto origin = GetJointPosition(playerItem, g_Camera.laraNode, Vector3i::Zero);
@@ -945,7 +951,7 @@ void UpdateCameraSphere(const ItemInfo& playerItem)
 	}
 	else
 	{
-		if (IsUsingModernControls())
+		if (IsUsingModernControls() && !player.Control.IsLocked)
 		{
 			g_Camera.Rotation.Lerp(GetCameraControlRotation(), CONTROLLED_CAMERA_ROT_LERP_ALPHA);
 
@@ -965,7 +971,7 @@ void UpdateCameraSphere(const ItemInfo& playerItem)
 		}
 		else
 		{
-			if (CanControlTankCamera())
+			if (CanControlTankCamera(playerItem))
 			{
 				g_Camera.Rotation.Lerp(GetCameraControlRotation(), CONTROLLED_CAMERA_ROT_LERP_ALPHA);
 
