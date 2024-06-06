@@ -52,6 +52,7 @@ local strings =
 	antialiasing = { "Antialiasing" },
 	apply = { "Apply" },
 	auto_climb = { "Auto Climb" },
+	auto_monkey_swing_jump = { "Auto Monkey Jump" },
 	auto_targeting = { "Auto Targeting" },
 	back = { "Back" },
 	cancel = { "Cancel" },

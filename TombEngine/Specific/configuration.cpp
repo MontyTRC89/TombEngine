@@ -238,6 +238,7 @@ namespace TEN::Config
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_WALK_TOGGLE, g_Configuration.EnableWalkToggle) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_CROUCH_TOGGLE, g_Configuration.EnableCrouchToggle) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_CLIMB, g_Configuration.EnableAutoClimb) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_MONKEY_SWING_JUMP, g_Configuration.EnableAutoMonkeySwingJump) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, g_Configuration.EnableOppositeActionRoll) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
@@ -327,6 +328,7 @@ namespace TEN::Config
 		g_Configuration.EnableWalkToggle = false;
 		g_Configuration.EnableCrouchToggle = false;
 		g_Configuration.EnableAutoClimb = false;
+		g_Configuration.EnableAutoMonkeySwingJump = false;
 		g_Configuration.EnableAutoTargeting = true;
 		g_Configuration.EnableOppositeActionRoll = true;
 		g_Configuration.EnableRumble = true;
@@ -433,6 +435,7 @@ namespace TEN::Config
 		bool enableWalkToggle = false;
 		bool enableCrouchToggle = false;
 		bool enableAutoClimb = false;
+		bool enableAutoMonkeySwingJump = false;
 		bool enableAutoTargeting = true;
 		bool enableOppositeActionRoll = true;
 		bool enableRumble = true;
@@ -447,6 +450,7 @@ namespace TEN::Config
 			GetBoolRegKey(controlsKey, REGKEY_ENABLE_WALK_TOGGLE, &enableCrouchToggle, false) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_ENABLE_CROUCH_TOGGLE, &enableCrouchToggle, false) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_CLIMB, &enableAutoClimb, false) != ERROR_SUCCESS ||
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_MONKEY_SWING_JUMP, &enableAutoMonkeySwingJump, false) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, &enableOppositeActionRoll, true) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
@@ -522,6 +526,7 @@ namespace TEN::Config
 		g_Configuration.EnableWalkToggle = enableWalkToggle;
 		g_Configuration.EnableCrouchToggle = enableCrouchToggle;
 		g_Configuration.EnableAutoClimb = enableAutoClimb;
+		g_Configuration.EnableAutoMonkeySwingJump = enableAutoMonkeySwingJump;
 		g_Configuration.EnableAutoTargeting = enableAutoTargeting;
 		g_Configuration.EnableOppositeActionRoll = enableOppositeActionRoll;
 		g_Configuration.EnableRumble = enableRumble;

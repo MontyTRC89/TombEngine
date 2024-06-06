@@ -1566,7 +1566,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 			break;
 
 		// Run through statics.
-		for (auto* staticPtr : collObjects.StaticPtrs)
+		for (auto* staticPtr : collObjects.Statics)
 		{
 			hasHit = hasHitNotByEmitter = doShatter = true;
 			doExplosion = isExplosive;
@@ -1587,7 +1587,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		}
 
 		// Run through items.
-		for (auto* itemPtr : collObjects.ItemPtrs)
+		for (auto* itemPtr : collObjects.Items)
 		{
 			// Object was already affected by collision, skip it.
 			if (std::find(affectedObjects.begin(), affectedObjects.end(), itemPtr->Index) != affectedObjects.end())

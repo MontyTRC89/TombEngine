@@ -865,6 +865,7 @@ namespace TEN::Gui
 			WalkToggle,
 			CrouchToggle,
 			AutoClimb,
+			AutoMonkeySwingJump,
 			AutoTargeting,
 			OppositeActionRoll,
 
@@ -938,6 +939,11 @@ namespace TEN::Gui
 			case GameplaySettingsOption::AutoClimb:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAutoClimb = !CurrentSettings.Configuration.EnableAutoClimb;
+				break;
+
+			case GameplaySettingsOption::AutoMonkeySwingJump:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableMonkeySwingJump = !CurrentSettings.Configuration.EnableAutoMonkeySwingJump;
 				break;
 
 			case GameplaySettingsOption::AutoTargeting:

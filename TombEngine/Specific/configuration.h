@@ -22,14 +22,15 @@ namespace TEN::Config
 	constexpr auto REGKEY_MOUSE_SENSITIVITY		   = "MouseSensitivity";
 
 	// Gameplay keys
-	constexpr auto REGKEY_CONTROL_MODE				  = "ControlMode";
-	constexpr auto REGKEY_SWIM_CONTROL_MODE			  = "SwimControlMode";
-	constexpr auto REGKEY_ENABLE_WALK_TOGGLE		  = "EnableWalkToggle";
-	constexpr auto REGKEY_ENABLE_CROUCH_TOGGLE		  = "EnableCrouchToggle";
-	constexpr auto REGKEY_ENABLE_AUTO_CLIMB			  = "EnableAutoClimb";
-	constexpr auto REGKEY_ENABLE_AUTO_TARGETING		  = "EnableAutoTargeting";
-	constexpr auto REGKEY_ENABLE_OPPOSITE_ACTION_ROLL = "EnableOppositeActionRoll";
-	constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER	  = "EnableTargetHighlighter";
+	constexpr auto REGKEY_CONTROL_MODE					= "ControlMode";
+	constexpr auto REGKEY_SWIM_CONTROL_MODE				= "SwimControlMode";
+	constexpr auto REGKEY_ENABLE_WALK_TOGGLE			= "EnableWalkToggle";
+	constexpr auto REGKEY_ENABLE_CROUCH_TOGGLE			= "EnableCrouchToggle";
+	constexpr auto REGKEY_ENABLE_AUTO_CLIMB				= "EnableAutoClimb";
+	constexpr auto REGKEY_ENABLE_AUTO_MONKEY_SWING_JUMP = "EnableAutoMonkeySwingJump";
+	constexpr auto REGKEY_ENABLE_AUTO_TARGETING			= "EnableAutoTargeting";
+	constexpr auto REGKEY_ENABLE_OPPOSITE_ACTION_ROLL	= "EnableOppositeActionRoll";
+	constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER		= "EnableTargetHighlighter";
 
 	// Graphics keys
 	constexpr auto REGKEY_SCREEN_WIDTH				= "ScreenWidth";
@@ -82,14 +83,15 @@ namespace TEN::Config
 		int				 MouseSensitivity		 = DEFAULT_MOUSE_SENSITIVITY;
 
 		// Gameplay
-		ControlMode		ControlMode				 = ControlMode::Classic;
-		SwimControlMode SwimControlMode			 = SwimControlMode::Omnidirectional;
-		bool			EnableWalkToggle		 = false;
-		bool			EnableCrouchToggle		 = false;
-		bool			EnableAutoClimb			 = false;
-		bool			EnableAutoTargeting		 = false;
-		bool			EnableOppositeActionRoll = false;
-		bool			EnableTargetHighlighter  = false;
+		ControlMode		ControlMode				  = ControlMode::Classic;
+		SwimControlMode SwimControlMode			  = SwimControlMode::Omnidirectional;
+		bool			EnableWalkToggle		  = false;
+		bool			EnableCrouchToggle		  = false;
+		bool			EnableAutoClimb			  = false;
+		bool			EnableAutoMonkeySwingJump = false;
+		bool			EnableAutoTargeting		  = false;
+		bool			EnableOppositeActionRoll  = false;
+		bool			EnableTargetHighlighter	  = false;
 		
 		// Graphics
 		int				 ScreenWidth			= 0;

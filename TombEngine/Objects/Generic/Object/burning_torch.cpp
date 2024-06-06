@@ -261,19 +261,19 @@ namespace TEN::Entities::Generic
 		if (!collObjects.IsEmpty())
 		{
 			LaraCollision.Setup.EnableObjectPush = true;
-			if (!collObjects.ItemPtrs.empty())
+			if (!collObjects.Items.empty())
 			{
-				const auto& object = Objects[collObjects.ItemPtrs.front()->ObjectNumber];
+				const auto& object = Objects[collObjects.Items.front()->ObjectNumber];
 
 				if (!object.intelligent &&
-					!collObjects.ItemPtrs.front()->IsLara())
+					!collObjects.Items.front()->IsLara())
 				{
-					ObjectCollision(collObjects.ItemPtrs.front()->Index, item, &LaraCollision);
+					ObjectCollision(collObjects.Items.front()->Index, item, &LaraCollision);
 				}
 			}
-			else if (!collObjects.StaticPtrs.empty())
+			else if (!collObjects.Statics.empty())
 			{
-				ItemPushStatic(item, *collObjects.StaticPtrs.front(), &LaraCollision);
+				ItemPushStatic(item, *collObjects.Statics.front(), &LaraCollision);
 			}
 			
 			item->Animation.Velocity.z = -int(item->Animation.Velocity.z / 1.5f);
