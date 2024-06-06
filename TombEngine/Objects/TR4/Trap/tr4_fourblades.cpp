@@ -10,10 +10,10 @@
 // item.ItemFlags[3] = Damage.
 // item.ItemFlags[4] = if 1, it won't push Lara away when collides.
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-	constexpr auto FOUR_BLADES_HARM_DAMAGE_EMERGE = 20;
-	constexpr auto FOUR_BLADES_HARM_DAMAGE_CUT = 200;
+	constexpr auto FOUR_BLADES_DAMAGE_EMERGE = 20;
+	constexpr auto FOUR_BLADES_DAMAGE_CUT = 200;
 	constexpr auto FOUR_BLADES_JOINT = MESH_BITS(1) | MESH_BITS(2) | MESH_BITS(3) | MESH_BITS(4);
 
 	void InitializeFourBlades(short itemNumber)
@@ -48,11 +48,11 @@ namespace TEN::Entities::TR4
 
 				if (frameNumber >= 6 && frameNumber <= 7)
 				{
-					item.ItemFlags[3] = FOUR_BLADES_HARM_DAMAGE_EMERGE;	
+					item.ItemFlags[3] = FOUR_BLADES_DAMAGE_EMERGE;	
 				}
 				else if (frameNumber >= 55 && frameNumber <= 57)
 				{
-					item.ItemFlags[3] = FOUR_BLADES_HARM_DAMAGE_CUT;
+					item.ItemFlags[3] = FOUR_BLADES_DAMAGE_CUT;
 				}
 			}
 
