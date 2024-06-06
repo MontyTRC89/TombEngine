@@ -126,6 +126,12 @@ namespace TEN::Config
 
 		std::vector<Vector2i> SupportedScreenResolutions = {};
 		std::string			  AdapterName				 = {};
+
+		bool IsUsingClassicControls() const;
+		bool IsUsingEnhancedControls() const;
+		bool IsUsingModernControls() const;
+		bool IsUsingOmnidirectionalSwimControls() const;
+		bool IsUsingPlanarSwimControls() const;
 	};
 
 	extern GameConfiguration g_Config;
@@ -134,10 +140,4 @@ namespace TEN::Config
 	void InitDefaultConfiguration();
 	bool LoadConfiguration();
 	bool SaveConfiguration();
-
-	bool IsUsingClassicControls();
-	bool IsUsingEnhancedControls();
-	bool IsUsingModernControls();
-	bool IsUsingOmnidirectionalSwimControls();
-	bool IsUsingPlanarSwimControls();
 }

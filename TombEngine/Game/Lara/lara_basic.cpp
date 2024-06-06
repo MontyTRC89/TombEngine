@@ -145,7 +145,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	player.Control.Count.Run = std::clamp<unsigned int>(
 		player.Control.Count.Run + 1,
-		0, IsUsingModernControls() ? (PLAYER_MODERN_CONTROL_RUN_JUMP_TIME / 2) : (PLAYER_TANK_CONTROL_RUN_JUMP_TIME / 2) + 4);
+		0, g_Config.IsUsingModernControls() ? (PLAYER_MODERN_CONTROL_RUN_JUMP_TIME / 2) : (PLAYER_TANK_CONTROL_RUN_JUMP_TIME / 2) + 4);
 
 	if (item->HitPoints <= 0)
 	{
@@ -161,7 +161,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Turn.
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		if (!(CanWalkRunTurn180(*item) && HasStateDispatch(item, LS_WALK_FORWARD_TURN_180)))
 			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, LARA_LEAN_MAX / 2, IsPlayerStrafing(*item), TURN_FLAGS);
@@ -170,11 +170,11 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			if (IsUsingClassicControls())
+			if (g_Config.IsUsingClassicControls())
 			{
 				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 			}
-			else if (IsUsingEnhancedControls())
+			else if (g_Config.IsUsingEnhancedControls())
 			{
 				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 				HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
@@ -182,7 +182,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsUsingModernControls() ?
+	if (g_Config.IsUsingModernControls() ?
 		(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
 		IsHeld(In::Forward))
 	{
@@ -372,7 +372,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Turn.
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		if (!(CanWalkRunTurn180(*item) && HasStateDispatch(item, LS_RUN_FORWARD_TURN_180)))
 			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, LARA_LEAN_MAX, IsPlayerStrafing(*item), TURN_FLAGS);
@@ -394,7 +394,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
-		if (!IsUsingClassicControls())
+		if (!g_Config.IsUsingClassicControls())
 			player.Control.IsRunJumpQueued = CanQueueRunningJump(*item, *coll);
 	}
 
@@ -411,7 +411,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsUsingModernControls() ?
+	if (g_Config.IsUsingModernControls() ?
 		(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
 		IsHeld(In::Forward))
 	{
@@ -461,7 +461,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Reset.
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		item->Animation.TargetState = HasStateDispatch(item, LS_RUN_FORWARD_CANCEL) ? LS_RUN_FORWARD_CANCEL : LS_IDLE;
 	}
@@ -653,7 +653,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		player.Control.ToggleWalk = true;
 
 	// Turn.
-	if (IsUsingClassicControls())
+	if (g_Config.IsUsingClassicControls())
 	{
 		if ((IsHeld(In::Forward) || abs(player.Control.TurnRate.y) >= LARA_MED_TURN_RATE_MAX) &&
 			(IsHeld(In::Left) || IsHeld(In::Right)))
@@ -665,7 +665,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			ResetPlayerTurnRateY(*item);
 		}
 	}
-	else if (IsUsingEnhancedControls())
+	else if (g_Config.IsUsingEnhancedControls())
 	{
 		// Jump locks orientation.
 		if (!IsHeld(In::Jump))
@@ -682,7 +682,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 	}
-	else if (IsUsingModernControls())
+	else if (g_Config.IsUsingModernControls())
 	{
 		float turnAlpha = isWading ?
 			PLAYER_WADE_TURN_ALPHA * (isInSwamp ? 0.5f : 1.0f) :
@@ -754,7 +754,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -925,7 +925,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !IsUsingModernControls()))
+	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !g_Config.IsUsingModernControls()))
 	{
 		if (CanSidestepLeft(*item, *coll))
 		{
@@ -938,7 +938,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
-	else if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && !IsUsingModernControls()))
+	else if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && !g_Config.IsUsingModernControls()))
 	{
 		if (CanSidestepRight(*item, *coll))
 		{
@@ -1078,7 +1078,7 @@ void lara_as_hop_back(ItemInfo* item, CollisionInfo* coll)
 		HandlePlayerTurnLean(item, coll, LARA_LEAN_RATE / 4, LARA_LEAN_MAX / 3);
 	}
 
-	if (!IsUsingClassicControls())
+	if (!g_Config.IsUsingClassicControls())
 	{
 		if (IsHeld(In::Roll))
 		{
@@ -1249,7 +1249,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Turn.
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		float turnAlpha = isWading ? (PLAYER_WADE_TURN_ALPHA * (isInSwamp ? 0.5f : 1.0f)) : PLAYER_STANDARD_TURN_ALPHA;
 		HandlePlayerTurn(*item, turnAlpha, 0, true, TURN_FLAGS);
@@ -1258,7 +1258,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (isWading)
 		{
-			if (IsUsingClassicControls())
+			if (g_Config.IsUsingClassicControls())
 			{
 				ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_WADE_TURN_RATE_MAX / 2);
 			}
@@ -1273,7 +1273,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsUsingClassicControls())
+	if (g_Config.IsUsingClassicControls())
 	{
 		if (IsHeld(In::Forward))
 		{
@@ -1600,7 +1600,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		// Turn.
 		HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, true, TURN_FLAGS);
@@ -1652,7 +1652,7 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 
 	// Setup.
-	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item) + (IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f));
+	player.Control.HeadingOrient.y = GetPlayerHeadingAngleY(*item) + (g_Config.IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f));
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
 	coll->Setup.LowerFloorBound = isWading ? NO_LOWER_BOUND : STEPUP_HEIGHT;
@@ -1736,7 +1736,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsUsingEnhancedControls())
+	if (g_Config.IsUsingEnhancedControls())
 	{
 		if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll)) &&
 			!isWading)
@@ -1872,7 +1872,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Turn.
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, true, TURN_FLAGS);
 	}
@@ -1889,7 +1889,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && !IsUsingModernControls()))
+	if (IsHeld(In::StepRight) || ((IsHeld(In::Walk) && IsHeld(In::Right)) && !g_Config.IsUsingModernControls()))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
@@ -1980,7 +1980,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Turn.
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, true, TURN_FLAGS);
 	}
@@ -1997,7 +1997,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !IsUsingModernControls()))
+	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !g_Config.IsUsingModernControls()))
 	{
 		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
@@ -2220,7 +2220,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Turn.
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		float turnAlpha = PLAYER_WADE_TURN_ALPHA / (isInSwamp ? 3 : 1);
 		short leanAngleMax = LARA_LEAN_MAX * (isInSwamp ? 0.6f : 1.0f);
@@ -2230,7 +2230,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Left) || IsHeld(In::Right))
 		{
-			short turnRateMax = (IsUsingClassicControls() && !isInSwamp) ? LARA_FAST_TURN_RATE_MAX : LARA_MED_TURN_RATE_MAX;
+			short turnRateMax = (g_Config.IsUsingClassicControls() && !isInSwamp) ? LARA_FAST_TURN_RATE_MAX : LARA_MED_TURN_RATE_MAX;
 			float leanCoeff = isInSwamp ? 0.6f : 1.0f;
 
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, turnRateMax);
@@ -2238,7 +2238,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsUsingModernControls() ?
+	if (g_Config.IsUsingModernControls() ?
 		(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
 		IsHeld(In::Forward))
 	{
@@ -2334,7 +2334,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// Turn.
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		HandlePlayerTurn(*item, PLAYER_SPRINT_TURN_ALPHA, LARA_LEAN_MAX, false, TURN_FLAGS);
 	}
@@ -2370,7 +2370,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsUsingModernControls() ?
+	if (g_Config.IsUsingModernControls() ?
 		(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
 		IsHeld(In::Forward))
 	{
@@ -2487,7 +2487,7 @@ void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_TANK_CONTROL_RUN_JUMP_TIME);
 
 	// Turn.
-	if (IsUsingClassicControls())
+	if (g_Config.IsUsingClassicControls())
 	{
 		ResetPlayerTurnRateY(*item);
 	}
@@ -2552,7 +2552,7 @@ void lara_as_sprint_slide(ItemInfo* item, CollisionInfo* coll)
 		player.Control.Count.Run = PLAYER_TANK_CONTROL_RUN_JUMP_TIME;
 
 	// Turn.
-	if (IsUsingClassicControls())
+	if (g_Config.IsUsingClassicControls())
 	{
 		ResetPlayerTurnRateY(*item);
 	}

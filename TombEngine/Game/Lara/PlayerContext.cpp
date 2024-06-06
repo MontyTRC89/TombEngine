@@ -292,7 +292,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = GroundMovementSetupData
 		{
-			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f))),
+			short(GetPlayerHeadingAngleY(item) + (g_Config.IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f))),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by run backward state.
 			false, false, false
 		};
@@ -315,7 +315,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = GroundMovementSetupData
 		{
-			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f))),
+			short(GetPlayerHeadingAngleY(item) + (g_Config.IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f))),
 			STEPUP_HEIGHT, -STEPUP_HEIGHT // NOTE: Bounds defined by walk backward state.
 		};
 
@@ -340,7 +340,7 @@ namespace TEN::Entities::Player
 		auto setup = GroundMovementSetupData{};
 
 		// Wade case.
-		short headingAngle = (IsUsingModernControls() ? player.Control.RefCameraOrient.y : item.Pose.Orientation.y) + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f));
+		short headingAngle = (g_Config.IsUsingModernControls() ? player.Control.RefCameraOrient.y : item.Pose.Orientation.y) + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f));
 		if (player.Control.WaterStatus == WaterStatus::Wade)
 		{
 			setup = GroundMovementSetupData
@@ -402,7 +402,7 @@ namespace TEN::Entities::Player
 
 		auto setup = GroundMovementSetupData
 		{
-			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f))),
+			short(GetPlayerHeadingAngleY(item) + (g_Config.IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f))),
 			-MAX_HEIGHT, -STEPUP_HEIGHT, // NOTE: Bounds defined by walk backward state.
 			false, false, false
 		};
@@ -594,7 +594,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = GroundMovementSetupData
 		{
-			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f))),
+			short(GetPlayerHeadingAngleY(item) + (g_Config.IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f))),
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // NOTE: Bounds defined by crawl backward state.
 		};
 
@@ -770,7 +770,7 @@ namespace TEN::Entities::Player
 	{
 		auto setup = MonkeySwingMovementSetupData
 		{
-			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f))),
+			short(GetPlayerHeadingAngleY(item) + (g_Config.IsUsingModernControls() ? ANGLE(0.0f) : ANGLE(180.0f))),
 			MONKEY_STEPUP_HEIGHT, -MONKEY_STEPUP_HEIGHT // NOTE: Bounds defined by monkey backward state.
 		};
 
@@ -783,7 +783,7 @@ namespace TEN::Entities::Player
 
 		auto setup = MonkeySwingMovementSetupData
 		{
-			short((IsUsingModernControls() ? player.Control.RefCameraOrient.y : item.Pose.Orientation.y) + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
+			short((g_Config.IsUsingModernControls() ? player.Control.RefCameraOrient.y : item.Pose.Orientation.y) + (isGoingRight ? ANGLE(90.0f) : ANGLE(-90.0f))),
 			(int)CLICK(0.5f), -(int)CLICK(0.5f) // NOTE: Bounds defined by monkey shimmy left/right states.
 		};
 
@@ -913,7 +913,7 @@ namespace TEN::Entities::Player
 
 		auto setup = JumpSetupData
 		{
-			short(GetPlayerHeadingAngleY(item) + (IsUsingModernControls() ? ANGLE(0.0f) : relHeadingAngle)),
+			short(GetPlayerHeadingAngleY(item) + (g_Config.IsUsingModernControls() ? ANGLE(0.0f) : relHeadingAngle)),
 			CLICK(0.85f)
 		};
 
@@ -973,7 +973,7 @@ namespace TEN::Entities::Player
 		const auto& player = GetLaraInfo(item);
 
 		// Check running jump timer.
-		int jumpTime = IsUsingModernControls() ? PLAYER_MODERN_CONTROL_RUN_JUMP_TIME : PLAYER_TANK_CONTROL_RUN_JUMP_TIME;
+		int jumpTime = g_Config.IsUsingModernControls() ? PLAYER_MODERN_CONTROL_RUN_JUMP_TIME : PLAYER_TANK_CONTROL_RUN_JUMP_TIME;
 		if (player.Control.Count.Run < jumpTime)
 			return false;
 
@@ -999,7 +999,7 @@ namespace TEN::Entities::Player
 			return false;
 
 		// 3) Check running jump timer.
-		int jumpTime = IsUsingModernControls() ? PLAYER_MODERN_CONTROL_SPRINT_JUMP_TIME : PLAYER_TANK_CONTROL_SPRINT_JUMP_TIME;
+		int jumpTime = g_Config.IsUsingModernControls() ? PLAYER_MODERN_CONTROL_SPRINT_JUMP_TIME : PLAYER_TANK_CONTROL_SPRINT_JUMP_TIME;
 		if (player.Control.Count.Run < jumpTime)
 			return false;
 

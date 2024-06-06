@@ -460,7 +460,7 @@ static void UpdateAzimuthAngle(const ItemInfo& item)
 	constexpr auto AUTO_ROT_DELTA_ANGLE_MAX = BASE_ANGLE * 1.5f;
 	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.05f;
 
-	if (!IsUsingModernControls() || IsPlayerStrafing(item))
+	if (!g_Config.IsUsingModernControls() || IsPlayerStrafing(item))
 		return;
 
 	float vel = Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length();
@@ -667,7 +667,7 @@ static bool TestCameraStrafeZoom(const ItemInfo& playerItem)
 {
 	const auto& player = GetLaraInfo(playerItem);
 
-	if (!IsUsingModernControls())
+	if (!g_Config.IsUsingModernControls())
 		return false;
 
 	if (player.Control.HandStatus == HandStatus::WeaponDraw ||
@@ -696,7 +696,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 	ClampCameraAltitudeAngle(player.Control.WaterStatus == WaterStatus::Underwater);
 
 	// Move camera.
-	if (IsUsingModernControls() || g_Camera.IsControllingTankCamera)
+	if (g_Config.IsUsingModernControls() || g_Camera.IsControllingTankCamera)
 	{
 		// Calcuate direction.
 		auto dir = -EulerAngles(g_Camera.actualElevation, g_Camera.actualAngle, 0).ToDirection();
@@ -951,7 +951,7 @@ void UpdateCameraSphere(const ItemInfo& playerItem)
 	}
 	else
 	{
-		if (IsUsingModernControls() && !player.Control.IsLocked)
+		if (g_Config.IsUsingModernControls() && !player.Control.IsLocked)
 		{
 			g_Camera.Rotation.Lerp(GetCameraControlRotation(), CONTROLLED_CAMERA_ROT_LERP_ALPHA);
 
@@ -1227,7 +1227,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 	int z = 0;
 	if (item->IsLara())
 	{
-		float heightCoeff = IsUsingModernControls() ? 0.9f : 0.75f;
+		float heightCoeff = g_Config.IsUsingModernControls() ? 0.9f : 0.75f;
 		auto offset = GetCameraPlayerOffset(*item, coll) * heightCoeff;
 		y = item->Pose.Position.y + offset.y;
 	}
@@ -1293,7 +1293,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		{
 			g_Camera.PrevTarget = GameVector(g_Camera.LookAt, g_Camera.LookAtRoomNumber);
 
-			if (!IsUsingModernControls())
+			if (!g_Config.IsUsingModernControls())
 				y -= CLICK(1);
 		}
 

@@ -103,7 +103,7 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 
 bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
 {
-	return (abs(Geometry::GetShortestAngle(coll->NearestLedgeAngle, IsUsingModernControls() ? GetPlayerHeadingAngleY(*item) : item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
+	return (abs(Geometry::GetShortestAngle(coll->NearestLedgeAngle, g_Config.IsUsingModernControls() ? GetPlayerHeadingAngleY(*item) : item->Pose.Orientation.y)) <= LARA_GRAB_THRESHOLD);
 }
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
@@ -1209,7 +1209,7 @@ bool IsPlayerStrafing(const ItemInfo& item)
 	const auto& player = GetLaraInfo(item);
 
 	// 1) Check if modern control mode is set.
-	if (!IsUsingModernControls())
+	if (!g_Config.IsUsingModernControls())
 		return false;
 
 	// 2) Test for strafe state.
@@ -1250,7 +1250,7 @@ bool IsPlayerInCombat(const ItemInfo& item)
 
 bool HasOppositeAction(const ItemInfo& item)
 {
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		if ((IsHeld(In::Forward) && IsHeld(In::Back)) ||
 			(IsHeld(In::Left) && IsHeld(In::Right)))
@@ -1276,7 +1276,7 @@ bool HasClimbAction(const ItemInfo& item)
 bool HasCrouchAction(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
-	return IsUsingModernControls() ? player.Control.ToggleCrouch : IsHeld(In::Crouch);
+	return g_Config.IsUsingModernControls() ? player.Control.ToggleCrouch : IsHeld(In::Crouch);
 }
 
 std::optional<VaultTestResult> TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup)

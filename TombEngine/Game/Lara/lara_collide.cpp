@@ -53,14 +53,14 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	{
 		ShiftItem(item, coll);
 
-		if (!IsUsingModernControls())
+		if (!g_Config.IsUsingModernControls())
 			item->Pose.Orientation.y += coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE;
 	}
 	else if (coll->CollisionType == CollisionType::Right)
 	{
 		ShiftItem(item, coll);
 
-		if (!IsUsingModernControls())
+		if (!g_Config.IsUsingModernControls())
 			item->Pose.Orientation.y -= coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE : DEFLECT_STRAIGHT_ANGLE;
 	}
 	else if (coll->LastBridgeItemNumber != NO_VALUE)
@@ -210,14 +210,14 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 	{
 		ShiftItem(item, coll);
 
-		if (!IsUsingModernControls())
+		if (!g_Config.IsUsingModernControls())
 			item->Pose.Orientation.y += coll->DiagonalStepAtLeft() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL;
 	}
 	else if (coll->CollisionType == CollisionType::Right)
 	{
 		ShiftItem(item, coll);
 
-		if (!IsUsingModernControls())
+		if (!g_Config.IsUsingModernControls())
 			item->Pose.Orientation.y -= coll->DiagonalStepAtRight() ? DEFLECT_DIAGONAL_ANGLE_CRAWL : DEFLECT_STRAIGHT_ANGLE_CRAWL;
 	}
 
@@ -575,22 +575,22 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			{
 				if (item->Pose.Orientation.x > ANGLE(5.0f))
 				{
-					if (!IsUsingModernControls())
+					if (!g_Config.IsUsingModernControls())
 						item->Pose.Orientation.x += ANGLE(0.5f);
 				}
 				else if (item->Pose.Orientation.x < -ANGLE(5.0f))
 				{
-					if (!IsUsingModernControls())
+					if (!g_Config.IsUsingModernControls())
 						item->Pose.Orientation.x -= ANGLE(0.5f);
 				}
 				else if (item->Pose.Orientation.x > 0)
 				{
-					if (!IsUsingModernControls())
+					if (!g_Config.IsUsingModernControls())
 						item->Pose.Orientation.x += 45;
 				}
 				else if (item->Pose.Orientation.x < 0)
 				{
-					if (!IsUsingModernControls())
+					if (!g_Config.IsUsingModernControls())
 						item->Pose.Orientation.x -= 45;
 				}
 				else
@@ -601,7 +601,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 			}
 			else
 			{
-				if (!IsUsingModernControls())
+				if (!g_Config.IsUsingModernControls())
 					item->Pose.Orientation.x -= ANGLE(1.0f);
 
 				flag = 1;
@@ -609,13 +609,13 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		}
 		else
 		{
-			if (!IsUsingModernControls())
+			if (!g_Config.IsUsingModernControls())
 				item->Pose.Orientation.x += ANGLE(1.0f);
 
 			flag = 1;
 		}
 
-		if (!IsUsingModernControls())
+		if (!g_Config.IsUsingModernControls())
 		{
 			if (coll0.CollisionType == CollisionType::Left)
 			{
@@ -640,7 +640,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 	case CollisionType::Top:
 		if (item->Pose.Orientation.x >= -ANGLE(45.0f))
 		{
-			if (!IsUsingModernControls())
+			if (!g_Config.IsUsingModernControls())
 				item->Pose.Orientation.x -= ANGLE(1.0f);
 
 			flag = 1;
@@ -654,14 +654,14 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CollisionType::Left:
-		if (!IsUsingModernControls())
+		if (!g_Config.IsUsingModernControls())
 			item->Pose.Orientation.y += ANGLE(2.0f);
 
 		flag = 1;
 		break;
 
 	case CollisionType::Right:
-		if (!IsUsingModernControls())
+		if (!g_Config.IsUsingModernControls())
 			item->Pose.Orientation.y -= ANGLE(2.0f);
 
 		flag = 1;
@@ -680,7 +680,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		flag = 1;
 		item->Pose.Position.y += coll->Middle.Floor;
 
-		if (!IsUsingModernControls())
+		if (!g_Config.IsUsingModernControls())
 			item->Pose.Orientation.x += ANGLE(1.0f);
 	}
 

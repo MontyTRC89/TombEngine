@@ -80,7 +80,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsUsingModernControls() && ((IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))))
+	if (g_Config.IsUsingModernControls() && ((IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))))
 	{
 		item->Animation.TargetState = LS_RUN_FORWARD;
 	}

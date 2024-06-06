@@ -22,7 +22,7 @@ namespace TEN::Entities::Player
 		constexpr auto LIGHT_FALLOFF = 0.1f;
 		constexpr auto LIGHT_COLOR	 = Color(0.6f, 0.6f, 0.6f);
 
-		if (!IsUsingModernControls())
+		if (!g_Config.IsUsingModernControls())
 		{
 			if (IsHeld(In::Forward))
 			{
@@ -50,11 +50,11 @@ namespace TEN::Entities::Player
 				LIGHT_FALLOFF * UCHAR_MAX, LIGHT_COLOR.R() * UCHAR_MAX, LIGHT_COLOR.G() * UCHAR_MAX, LIGHT_COLOR.B() * UCHAR_MAX);
 		}
 
-		if (IsUsingModernControls() ?
+		if (g_Config.IsUsingModernControls() ?
 			(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)):
 			IsHeld(In::Jump))
 		{
-			if (IsUsingModernControls())
+			if (g_Config.IsUsingModernControls())
 				HandlePlayerTurn(*item, PLAYER_FLY_CHEAT_TURN_ALPHA, 0, false, TURN_FLAGS);
 
 			float velCoeff = IsHeld(In::Sprint) ? 2.5f : 1.0f;

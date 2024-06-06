@@ -18,6 +18,31 @@ namespace TEN::Config
 {
 	GameConfiguration g_Config;
 
+	bool GameConfiguration::IsUsingClassicControls() const
+	{
+		return (ControlMode == ControlMode::Classic);
+	}
+
+	bool GameConfiguration::IsUsingEnhancedControls() const
+	{
+		return (ControlMode == ControlMode::Enhanced);
+	}
+
+	bool GameConfiguration::IsUsingModernControls() const
+	{
+		return (ControlMode == ControlMode::Modern);
+	}
+
+	bool GameConfiguration::IsUsingOmnidirectionalSwimControls() const
+	{
+		return (SwimControlMode == SwimControlMode::Omnidirectional);
+	}
+
+	bool GameConfiguration::IsUsingPlanarSwimControls() const
+	{
+		return (SwimControlMode == SwimControlMode::Planar);
+	}
+
 	static void LoadResolutionsInCombobox(HWND handle)
 	{
 		HWND cbHandle = GetDlgItem(handle, IDC_RESOLUTION);
@@ -602,30 +627,5 @@ namespace TEN::Config
 		DefaultConflict();
 
 		return true;
-	}
-
-	bool IsUsingClassicControls()
-	{
-		return (g_Config.ControlMode == ControlMode::Classic);
-	}
-
-	bool IsUsingEnhancedControls()
-	{
-		return (g_Config.ControlMode == ControlMode::Enhanced);
-	}
-
-	bool IsUsingModernControls()
-	{
-		return (g_Config.ControlMode == ControlMode::Modern);
-	}
-
-	bool IsUsingOmnidirectionalSwimControls()
-	{
-		return (g_Config.SwimControlMode == SwimControlMode::Omnidirectional);
-	}
-
-	bool IsUsingPlanarSwimControls()
-	{
-		return (g_Config.SwimControlMode == SwimControlMode::Planar);
 	}
 }

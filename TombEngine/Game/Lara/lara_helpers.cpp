@@ -81,7 +81,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	if ((!player.Control.IsMoving || (player.Control.IsMoving && !(IsHeld(In::Left) || IsHeld(In::Right)))) &&
 		(!player.Control.IsLow && item->Animation.ActiveState != LS_DEATH)) // HACK: Don't interfere with surface alignment in crouch, crawl, and death states.
 	{
-		if (IsUsingModernControls())
+		if (g_Config.IsUsingModernControls())
 		{
 			// TODO: Must check. Condition is probably more precise.
 			if (GetMoveAxis() == Vector2::Zero)
@@ -100,7 +100,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		ResetPlayerFlex(item, 0.1f);
 	}
 
-	if (!IsUsingModernControls())
+	if (!g_Config.IsUsingModernControls())
 	{
 		// Apply and reset turn rate.
 		item->Pose.Orientation.y += player.Control.TurnRate.y;
@@ -404,7 +404,7 @@ bool CanPlayerLookAround(const ItemInfo& item)
 	const auto& player = GetLaraInfo(item);
 
 	// 1) Check for modern control mode.
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 		return false;
 
 	// 2) Check if look mode is not None.
@@ -978,7 +978,7 @@ void HandlePlayerUpJumpShift(ItemInfo& item)
 
 	// Determine shift type.
 	auto shiftType = ShiftType::ForwardPassive;
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		if (GetMoveAxis() != Vector2::Zero)
 		{
@@ -1564,7 +1564,7 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 {
 	const auto& player = GetLaraInfo(item);
 
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		if (IsPlayerStrafing(item) || IsHeld(In::Walk))
 		{
@@ -1655,7 +1655,7 @@ short GetPlayerHeadingAngleX(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		if (GetMoveAxis() == Vector2::Zero)
 			return player.Control.HeadingOrientTarget.x;
@@ -1672,7 +1672,7 @@ short GetPlayerHeadingAngleY(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
 
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 	{
 		// Player is strafing and horizontal velocity is 0; return reference camera azimuth angle.
 		float vel = Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length();
@@ -1977,7 +1977,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	// Determine relative orientation adhering to floor normal.
-	auto floorNormal = IsUsingClassicControls() ? -Vector3::UnitY : GetPointCollision(*item).GetFloorNormal();
+	auto floorNormal = g_Config.IsUsingClassicControls() ? -Vector3::UnitY : GetPointCollision(*item).GetFloorNormal();
 	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
 	// Apply extra rotation according to alpha.
@@ -2052,7 +2052,7 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 
 	// TODO: Hack. Regrab occurs.
-	if (IsUsingModernControls())
+	if (g_Config.IsUsingModernControls())
 		item->Pose.Position.y += 20;
 
 	item->Animation.IsAirborne = true;
