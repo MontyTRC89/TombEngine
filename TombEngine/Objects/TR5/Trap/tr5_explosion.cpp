@@ -155,7 +155,7 @@ void ExplosionControl(short itemNumber)
 					}
 				}
 
-				for (auto* staticPtr : collObjects.StaticPtrs)
+				for (auto* staticPtr : collObjects.Statics)
 				{
 					if (StaticObjects[staticPtr->staticNumber].shatterType != ShatterType::None)
 					{

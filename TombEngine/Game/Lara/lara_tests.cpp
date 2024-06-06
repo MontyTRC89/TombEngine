@@ -1795,7 +1795,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 
 		//g_Renderer.AddDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
 
-		for (const auto* itemPtr : collObjects.ItemPtrs)
+		for (const auto* itemPtr : collObjects.Items)
 		{
 			if (itemPtr->ObjectNumber != ID_POLEROPE)
 				continue;

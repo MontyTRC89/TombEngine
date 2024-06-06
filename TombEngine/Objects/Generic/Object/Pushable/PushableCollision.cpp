@@ -120,7 +120,7 @@ namespace TEN::Entities::Generic
 		auto collObjects = GetCollidedObjects(pushableItem, true, true);
 		pushableItem.Pose.Position = prevPos;
 
-		if (!collObjects.StaticPtrs.empty())
+		if (!collObjects.Statics.empty())
 			return false;
 
 		for (const auto* itemPtr : collObjects.ItemPtrs)
@@ -191,7 +191,7 @@ namespace TEN::Entities::Generic
 		auto collObjects = GetCollidedObjects(*LaraItem, true, true);
 		LaraItem->Pose.Position = prevPos;
 
-		if (!collObjects.StaticPtrs.empty())
+		if (!collObjects.Statics.empty())
 			return false;
 
 		for (const auto* itemPtr : collObjects.ItemPtrs)
