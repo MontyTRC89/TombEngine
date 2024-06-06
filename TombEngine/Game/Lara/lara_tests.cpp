@@ -1427,7 +1427,7 @@ std::optional<VaultTestResult> TestLaraLadderMount(ItemInfo* item, CollisionInfo
 	return std::nullopt;
 }
 
-std::optional<VaultTestResult> TestLaraMonkeyAutoJump(ItemInfo* item, CollisionInfo* coll)
+std::optional<VaultTestResult> TestLaraAutoMonkeySwingJump(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1530,8 +1530,8 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 	// In this case, they fail due to a reliance on ShiftItem(). @Sezz 2021.02.05
 
 	// Auto jump to monkey swing.
-	vaultResult = TestLaraMonkeyAutoJump(item, coll);
-	if (vaultResult.has_value() && g_GameFlow->HasMonkeyAutoJump())
+	vaultResult = TestLaraAutoMonkeySwingJump(item, coll);
+	if (vaultResult.has_value() && g_Configuration.EnableAutoMonkeySwingJump)
 	{
 		vaultResult->TargetState = LS_AUTO_JUMP;
 		if (!HasStateDispatch(item, vaultResult->TargetState))

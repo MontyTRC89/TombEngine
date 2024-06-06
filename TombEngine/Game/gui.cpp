@@ -886,7 +886,9 @@ namespace TEN::Gui
 			Reverb,
 			MusicVolume,
 			SfxVolume,
+
 			Subtitles,
+			AutoMonkeySwingJump,
 			AutoTargeting,
 			TargetHighlighter,
 			ToggleRumble,
@@ -895,12 +897,12 @@ namespace TEN::Gui
 			MouseSmoothing,
 
 			Apply,
-			Cancel
+			Cancel,
+
+			Count
 		};
 
-		static const auto numOtherSettingsOptions = 11;
-
-		OptionCount = numOtherSettingsOptions;
+		OptionCount = (int)OtherSettingsOption::Count - 1;
 
 		if (GuiIsDeselected())
 		{
@@ -923,6 +925,11 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.EnableReverb = !CurrentSettings.Configuration.EnableReverb;
 				break;
 
+			case OtherSettingsOption::AutoMonkeySwingJump:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableAutoMonkeySwingJump = !CurrentSettings.Configuration.EnableAutoMonkeySwingJump;
+				break;
+				
 			case OtherSettingsOption::Subtitles:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
