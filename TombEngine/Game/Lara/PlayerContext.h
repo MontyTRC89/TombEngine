@@ -46,7 +46,7 @@ namespace TEN::Entities::Player
 	bool CanStrikeAfkPose(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanTurn180(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanTurnFast(const ItemInfo& item, const CollisionInfo& coll, bool isGoingRight);
-	bool CanWalkRunTurn180(const ItemInfo& item);
+	bool CanPerformTurnaround(const ItemInfo& item);
 	bool CanRunRoll180(const ItemInfo& item);
 	bool CanRunForward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanRunBackward(const ItemInfo& item, const CollisionInfo& coll);

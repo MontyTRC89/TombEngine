@@ -163,7 +163,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	// Turn.
 	if (g_Config.IsUsingModernControls())
 	{
-		if (!(CanWalkRunTurn180(*item) && HasStateDispatch(item, LS_WALK_FORWARD_TURN_180)))
+		if (!(CanPerformTurnaround(*item) && HasStateDispatch(item, LS_WALK_FORWARD_TURN_180)))
 			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, LARA_LEAN_MAX / 2, IsPlayerStrafing(*item), TURN_FLAGS);
 	}
 	else
@@ -203,7 +203,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (IsHeld(In::Walk))
 		{
-			if (CanWalkRunTurn180(*item) && HasStateDispatch(item, LS_WALK_FORWARD_TURN_180))
+			if (CanPerformTurnaround(*item) && HasStateDispatch(item, LS_WALK_FORWARD_TURN_180))
 			{
 				item->Animation.TargetState = LS_WALK_FORWARD_TURN_180;
 			}
@@ -300,7 +300,7 @@ void lara_as_walk_forward_turn_180(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA / 2, 0, false, TURN_FLAGS, Y_ANGLE_OFFEST);
+	HandlePlayerTurn(*item, PLAYER_TURNAROUND_TURN_ALPHA, 0, false, TURN_FLAGS, Y_ANGLE_OFFEST);
 
 	// Reset.
 	item->Animation.TargetState = LS_WALK_FORWARD;
@@ -374,7 +374,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	// Turn.
 	if (g_Config.IsUsingModernControls())
 	{
-		if (!(CanWalkRunTurn180(*item) && HasStateDispatch(item, LS_RUN_FORWARD_TURN_180)))
+		if (!(CanPerformTurnaround(*item) && HasStateDispatch(item, LS_RUN_FORWARD_TURN_180)))
 			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, LARA_LEAN_MAX, IsPlayerStrafing(*item), TURN_FLAGS);
 	}
 	else
@@ -446,7 +446,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			}
 			else
 			{
-				if (CanWalkRunTurn180(*item) && HasStateDispatch(item, LS_RUN_FORWARD_TURN_180))
+				if (CanPerformTurnaround(*item) && HasStateDispatch(item, LS_RUN_FORWARD_TURN_180))
 				{
 					item->Animation.TargetState = LS_RUN_FORWARD_TURN_180;
 				}
@@ -561,7 +561,7 @@ void lara_as_run_forward_turn_180(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA / 2, 0, false, TURN_FLAGS, Y_ANGLE_OFFEST);
+	HandlePlayerTurn(*item, PLAYER_TURNAROUND_TURN_ALPHA, 0, false, TURN_FLAGS, Y_ANGLE_OFFEST);
 
 	// Reset.
 	item->Animation.TargetState = LS_RUN_FORWARD;
@@ -691,7 +691,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
 			bool isJumpingDirectionally = (IsPlayerStrafing(*item) || (IsHeld(In::Jump) && IsHeld(In::Walk)));
-			bool isWalkRunTurning180 = (CanWalkRunTurn180(*item) && GetMoveAxis() != Vector2::Zero); // TODO: Something more accurate.
+			bool isWalkRunTurning180 = (CanPerformTurnaround(*item) && HasStateDispatch(item, LS_WALK_FORWARD_TURN_180) && GetMoveAxis() != Vector2::Zero); // TODO: Something more accurate.
 			
 			if (!isJumpingDirectionally && !isWalkRunTurning180)
 				HandlePlayerTurn(*item, turnAlpha, 0, false, TURN_FLAGS);
@@ -797,7 +797,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			{
 				if (CanWalkForward(*item, *coll))
 				{
-					if (CanWalkRunTurn180(*item) && HasStateDispatch(item, LS_WALK_FORWARD_TURN_180))
+					if (CanPerformTurnaround(*item) && HasStateDispatch(item, LS_WALK_FORWARD_TURN_180))
 					{
 						item->Animation.TargetState = LS_WALK_FORWARD_TURN_180;
 					}
@@ -811,7 +811,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 			else if (CanRunForward(*item, *coll))
 			{
-				if (CanWalkRunTurn180(*item) && HasStateDispatch(item, LS_RUN_FORWARD_TURN_180))
+				if (CanPerformTurnaround(*item) && HasStateDispatch(item, LS_RUN_FORWARD_TURN_180))
 				{
 					item->Animation.TargetState = LS_RUN_FORWARD_TURN_180;
 				}

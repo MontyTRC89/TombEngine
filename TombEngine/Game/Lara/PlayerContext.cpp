@@ -164,9 +164,9 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool CanWalkRunTurn180(const ItemInfo& item)
+	bool CanPerformTurnaround(const ItemInfo& item)
 	{
-		constexpr auto BASE_ANGLE = ANGLE(90.0f);
+		constexpr auto BASE_ANGLE = ANGLE(110.0f);
 
 		return (abs(GetPlayerRelHeadingAngleY(item)) > BASE_ANGLE);
 	}
