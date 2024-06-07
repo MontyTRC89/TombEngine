@@ -300,10 +300,10 @@ void lara_as_walk_forward_turn_180(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, false, TURN_FLAGS, Y_ANGLE_OFFEST);
+	HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA / 2, 0, false, TURN_FLAGS, Y_ANGLE_OFFEST);
 
 	// Reset.
-	item->Animation.TargetState = LS_WALK_FORWARD_TURN_180;
+	item->Animation.TargetState = LS_WALK_FORWARD;
 }
 
 // State:	LS_WALK_FORWARD_TURN_180 (208)
@@ -561,10 +561,10 @@ void lara_as_run_forward_turn_180(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, false, TURN_FLAGS, Y_ANGLE_OFFEST);
+	HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA / 2, 0, false, TURN_FLAGS, Y_ANGLE_OFFEST);
 
 	// Reset.
-	item->Animation.TargetState = LS_RUN_FORWARD_TURN_180;
+	item->Animation.TargetState = LS_RUN_FORWARD;
 }
 
 // State:	LS_RUN_FORWARD_TURN_180 (209)

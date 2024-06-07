@@ -7,6 +7,7 @@ using namespace TEN::Math;
 namespace TEN::Config
 {
 	// Directories
+
 	constexpr auto REGKEY_ROOT		   = "Software\\TombEngine\\1.4.0";
 	constexpr auto REGKEY_CONTROLS	   = "Controls";
 	constexpr auto REGKEY_KEY_BINDINGS = "KeyBindings";
@@ -15,6 +16,7 @@ namespace TEN::Config
 	constexpr auto REGKEY_SOUND		   = "Sound";
 
 	// Controls keys
+
 	constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA = "EnableThumbstickCamera";
 	constexpr auto REGKEY_INVERT_CAMERA_X_AXIS	   = "InvertCameraXAxis";
 	constexpr auto REGKEY_INVERT_CAMERA_Y_AXIS	   = "InvertCameraYAxis";
@@ -22,6 +24,7 @@ namespace TEN::Config
 	constexpr auto REGKEY_MOUSE_SENSITIVITY		   = "MouseSensitivity";
 
 	// Gameplay keys
+
 	constexpr auto REGKEY_CONTROL_MODE					= "ControlMode";
 	constexpr auto REGKEY_SWIM_CONTROL_MODE				= "SwimControlMode";
 	constexpr auto REGKEY_ENABLE_WALK_TOGGLE			= "EnableWalkToggle";
@@ -33,6 +36,7 @@ namespace TEN::Config
 	constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER		= "EnableTargetHighlighter";
 
 	// Graphics keys
+
 	constexpr auto REGKEY_SCREEN_WIDTH				= "ScreenWidth";
 	constexpr auto REGKEY_SCREEN_HEIGHT				= "ScreenHeight";
 	constexpr auto REGKEY_ENABLE_WINDOWED_MODE		= "EnableWindowedMode";
@@ -45,6 +49,7 @@ namespace TEN::Config
 	constexpr auto REGKEY_ENABLE_SUBTITLES			= "EnableSubtitles";
 
 	// Sound keys
+
 	constexpr auto REGKEY_SOUND_DEVICE	= "SoundDevice";
 	constexpr auto REGKEY_ENABLE_SOUND	= "EnableSound";
 	constexpr auto REGKEY_ENABLE_REVERB = "EnableReverb";
@@ -87,6 +92,7 @@ namespace TEN::Config
 		static constexpr auto SOUND_VOLUME_MAX				= 100;
 
 		// Controls
+
 		std::vector<int> KeyBindings			 = {};
 		bool			 EnableTankCameraControl = false;
 		bool			 InvertCameraXAxis		 = false;
@@ -95,6 +101,7 @@ namespace TEN::Config
 		int				 MouseSensitivity		 = DEFAULT_MOUSE_SENSITIVITY;
 
 		// Gameplay
+
 		ControlMode		ControlMode				  = ControlMode::Classic;
 		SwimControlMode SwimControlMode			  = SwimControlMode::Omnidirectional;
 		bool			EnableWalkToggle		  = false;
@@ -106,6 +113,7 @@ namespace TEN::Config
 		bool			EnableTargetHighlighter	  = false;
 		
 		// Graphics
+
 		int				 ScreenWidth			= 0;
 		int				 ScreenHeight			= 0;
 		bool			 EnableWindowedMode		= false;
@@ -118,6 +126,7 @@ namespace TEN::Config
 		bool			 EnableSubtitles		= false;
 
 		// Sound
+
 		int	 SoundDevice  = 0;
 		bool EnableSound  = false;
 		bool EnableReverb = false;
@@ -126,6 +135,8 @@ namespace TEN::Config
 
 		std::vector<Vector2i> SupportedScreenResolutions = {};
 		std::string			  AdapterName				 = {};
+
+		// Inquirers
 
 		bool IsUsingClassicControls() const;
 		bool IsUsingEnhancedControls() const;
