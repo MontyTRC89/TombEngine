@@ -234,8 +234,8 @@ void CollectMultiplePickups(int itemNumber)
 	auto& firstItem = g_Level.Items[itemNumber];
 	
 	auto collObjects = GetCollidedObjects(firstItem, true, true, LARA_RADIUS, ObjectCollectionMode::Items);
-	collObjects.ItemPtrs.push_back(&firstItem);
-	for (auto* itemPtr : collObjects.ItemPtrs)
+	collObjects.Items.push_back(&firstItem);
+	for (auto* itemPtr : collObjects.Items)
 	{
 		if (!Objects[itemPtr->ObjectNumber].isPickup)
 			continue;
@@ -886,7 +886,7 @@ void DropPickups(ItemInfo* item)
 		// Iterate through all found items and statics around, and determine if dummy sphere
 		// intersects any of those. If so, try other corner.
 
-		for (const auto* itemPtr : collObjects.ItemPtrs)
+		for (const auto* itemPtr : collObjects.Items)
 		{
 			auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
 			if (box.Intersects(sphere))
@@ -896,7 +896,7 @@ void DropPickups(ItemInfo* item)
 			}
 		}
 
-		for (auto* staticPtr : collObjects.StaticPtrs)
+		for (auto* staticPtr : collObjects.Statics)
 		{
 			auto& object = StaticObjects[staticPtr->staticNumber];
 

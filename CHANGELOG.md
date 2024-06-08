@@ -16,12 +16,15 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Ember emitter crashing when ocb is between -1 and -10 
 * Fixed Electric cleaner and Squishy block not detecting collision with certain block heights.
 * Fixed Squishy blocks crashing the level.
+* Fixed the path finding zones of Larson and Pierre.
+* Fixed the torch flame delay in disappearing when Lara threw or dropped the torch object.
 
 ### Features/Amendments
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Input.KeyClearAll()
+* Removed anims.monkeyAutoJump. It is now a player menu configuration.
 
 ## [Version 1.4](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.1) - 2024-04-21
 

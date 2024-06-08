@@ -16,7 +16,7 @@ Display strings.
 StringsHandler::StringsHandler(sol::state* lua, sol::table& parent) :
 	LuaHandler(lua)
 {
-	auto table = sol::table(m_lua->lua_state(), sol::create);
+	auto table = sol::table(_lua->lua_state(), sol::create);
 	parent.set(ScriptReserved_Strings, table);
 
 /***
