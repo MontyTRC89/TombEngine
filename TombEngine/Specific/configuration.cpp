@@ -219,7 +219,7 @@ namespace TEN::Config
 		g_Config.SwimControlMode = SwimControlMode::Omnidirectional;
 		g_Config.EnableWalkToggle = false;
 		g_Config.EnableCrouchToggle = false;
-		g_Config.EnableAutoClimb = false;
+		g_Config.EnableClimbToggle = false;
 		g_Config.EnableAutoMonkeySwingJump = false;
 		g_Config.EnableAutoTargeting = true;
 		g_Config.EnableOppositeActionRoll = true;
@@ -323,7 +323,7 @@ namespace TEN::Config
 			SetDWORDRegKey(gameplayKey, REGKEY_SWIM_CONTROL_MODE, (DWORD)g_Config.SwimControlMode) != ERROR_SUCCESS ||
 			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_WALK_TOGGLE, g_Config.EnableWalkToggle) != ERROR_SUCCESS ||
 			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_CROUCH_TOGGLE, g_Config.EnableCrouchToggle) != ERROR_SUCCESS ||
-			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_CLIMB, g_Config.EnableAutoClimb) != ERROR_SUCCESS ||
+			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_CLIMB_TOGGLE, g_Config.EnableClimbToggle) != ERROR_SUCCESS ||
 			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_MONKEY_SWING_JUMP, g_Config.EnableAutoMonkeySwingJump) != ERROR_SUCCESS ||
 			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, g_Config.EnableAutoTargeting) != ERROR_SUCCESS ||
 			SetBoolRegKey(gameplayKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, g_Config.EnableOppositeActionRoll) != ERROR_SUCCESS ||
@@ -533,7 +533,7 @@ namespace TEN::Config
 		DWORD swimControlMode = (DWORD)SwimControlMode::Omnidirectional;
 		bool enableWalkToggle = false;
 		bool enableCrouchToggle = false;
-		bool enableAutoClimb = false;
+		bool enableClimbToggle = false;
 		bool enableAutoMonkeySwingJump = false;
 		bool enableAutoTargeting = true;
 		bool enableOppositeActionRoll = true;
@@ -545,7 +545,7 @@ namespace TEN::Config
 			GetDWORDRegKey(gameplayKey, REGKEY_SWIM_CONTROL_MODE, &swimControlMode, (DWORD)SwimControlMode::Omnidirectional) != ERROR_SUCCESS ||
 			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_WALK_TOGGLE, &enableCrouchToggle, false) != ERROR_SUCCESS ||
 			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_CROUCH_TOGGLE, &enableCrouchToggle, false) != ERROR_SUCCESS ||
-			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_CLIMB, &enableAutoClimb, false) != ERROR_SUCCESS ||
+			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_CLIMB_TOGGLE, &enableClimbToggle, false) != ERROR_SUCCESS ||
 			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_MONKEY_SWING_JUMP, &enableAutoMonkeySwingJump, false) != ERROR_SUCCESS ||
 			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
 			GetBoolRegKey(gameplayKey, REGKEY_ENABLE_OPPOSITE_ACTION_ROLL, &enableOppositeActionRoll, true) != ERROR_SUCCESS ||
@@ -669,7 +669,7 @@ namespace TEN::Config
 		g_Config.SwimControlMode = (SwimControlMode)swimControlMode;
 		g_Config.EnableWalkToggle = enableWalkToggle;
 		g_Config.EnableCrouchToggle = enableCrouchToggle;
-		g_Config.EnableAutoClimb = enableAutoClimb;
+		g_Config.EnableClimbToggle = enableClimbToggle;
 		g_Config.EnableAutoMonkeySwingJump = enableAutoMonkeySwingJump;
 		g_Config.EnableAutoTargeting = enableAutoTargeting;
 		g_Config.EnableOppositeActionRoll = enableOppositeActionRoll;

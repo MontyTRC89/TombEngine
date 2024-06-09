@@ -859,7 +859,7 @@ namespace TEN::Gui
 			SwimControlMode,
 			WalkToggle,
 			CrouchToggle,
-			AutoClimb,
+			ClimbToggle,
 			AutoMonkeySwingJump,
 			AutoTargeting,
 			OppositeActionRoll,
@@ -932,9 +932,9 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.EnableCrouchToggle = !CurrentSettings.Configuration.EnableCrouchToggle;
 				break;
 
-			case GameplaySettingsOption::AutoClimb:
+			case GameplaySettingsOption::ClimbToggle:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableAutoClimb = !CurrentSettings.Configuration.EnableAutoClimb;
+				CurrentSettings.Configuration.EnableClimbToggle = !CurrentSettings.Configuration.EnableClimbToggle;
 				break;
 
 			case GameplaySettingsOption::AutoMonkeySwingJump:

@@ -87,7 +87,7 @@
 #define STRING_CROUCH_TOGGLE			"crouch_toggle"
 #define STRING_WALK_TOGGLE				"walk_toggle"
 #define STRING_OPPOSITE_ACTION_ROLL		"opposite_action_roll"
-#define STRING_AUTO_CLIMB				"auto_climb"
+#define STRING_CLIMB_TOGGLE				"climb_toggle"
 #define STRING_AUTO_MONKEY_SWING_JUMP	"auto_monkey_swing_jump"
 #define STRING_AUTO_TARGETING			"auto_targeting"
 #define STRING_TANK_CAMERA_CONTROL		"tank_camera_control"

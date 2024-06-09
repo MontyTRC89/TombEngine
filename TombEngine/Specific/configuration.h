@@ -29,7 +29,7 @@ namespace TEN::Config
 	constexpr auto REGKEY_SWIM_CONTROL_MODE				= "SwimControlMode";
 	constexpr auto REGKEY_ENABLE_WALK_TOGGLE			= "EnableWalkToggle";
 	constexpr auto REGKEY_ENABLE_CROUCH_TOGGLE			= "EnableCrouchToggle";
-	constexpr auto REGKEY_ENABLE_AUTO_CLIMB				= "EnableAutoClimb";
+	constexpr auto REGKEY_ENABLE_CLIMB_TOGGLE				= "EnableClimbToggle";
 	constexpr auto REGKEY_ENABLE_AUTO_MONKEY_SWING_JUMP = "EnableAutoMonkeySwingJump";
 	constexpr auto REGKEY_ENABLE_AUTO_TARGETING			= "EnableAutoTargeting";
 	constexpr auto REGKEY_ENABLE_OPPOSITE_ACTION_ROLL	= "EnableOppositeActionRoll";
@@ -114,7 +114,7 @@ namespace TEN::Config
 		SwimControlMode SwimControlMode			  = SwimControlMode::Omnidirectional;
 		bool			EnableWalkToggle		  = false;
 		bool			EnableCrouchToggle		  = false;
-		bool			EnableAutoClimb			  = false;
+		bool			EnableClimbToggle		  = false;
 		bool			EnableAutoMonkeySwingJump = false;
 		bool			EnableAutoTargeting		  = false;
 		bool			EnableOppositeActionRoll  = false;

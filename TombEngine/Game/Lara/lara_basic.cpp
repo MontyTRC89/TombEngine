@@ -705,7 +705,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Jump))
 	{
 		if ((IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) &&
-			g_Config.EnableAutoClimb)
+			g_Config.EnableClimbToggle)
 		{
 			auto vaultContext = TestLaraVault(item, coll);
 			if (vaultContext.has_value())
@@ -1320,7 +1320,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Jump))
 		{
-			if (IsHeld(In::Forward) && g_Config.EnableAutoClimb)
+			if (IsHeld(In::Forward) && g_Config.EnableClimbToggle)
 			{
 				auto vaultContext = TestLaraVault(item, coll);
 				if (vaultContext.has_value())
@@ -1713,7 +1713,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Jump))
 	{
-		if (IsHeld(In::Forward) && g_Config.EnableAutoClimb)
+		if (IsHeld(In::Forward) && g_Config.EnableClimbToggle)
 		{
 			auto vaultContext = TestLaraVault(item, coll);
 			if (vaultContext.has_value())

@@ -295,9 +295,9 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableCrouchToggle), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
 			GetNextLinePosition(&y);
 
-			// Auto grab
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_CLIMB), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
-			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableAutoClimb), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
+			// Climb toggle
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_CLIMB_TOGGLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableClimbToggle), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
 			GetNextLinePosition(&y);
 
 			// Auto monkey swing jump
