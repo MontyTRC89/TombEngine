@@ -291,7 +291,7 @@ namespace TEN::Config
 			return false;
 		}
 
-		// Open and set Controls\\KeyBindings keys.
+		// Set Controls\\KeyBindings keys.
 		g_Config.KeyBindings.resize((int)In::Count);
 		for (int i = 0; i < (int)In::Count; i++)
 		{

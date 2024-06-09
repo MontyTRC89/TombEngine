@@ -240,7 +240,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockFloorSlopeUp = true;
 	coll->Setup.BlockFloorSlopeDown = true;
 	coll->Setup.BlockDeathFloorDown = true;
-	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y + (item->Animation.Velocity.z >= 0.0f ? 0 : ANGLE(180.0f));
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraHitCeiling(coll))
@@ -485,7 +485,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y;
+	coll->Setup.ForwardAngle = player.Control.HeadingOrient.y + (item->Animation.Velocity.z >= 0.0f ? 0 : ANGLE(180.0f));
 	GetCollisionInfo(coll, item);
 	LaraResetGravityStatus(item, coll);
 
