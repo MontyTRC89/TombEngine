@@ -357,12 +357,12 @@ void FlowHandler::LoadFlowScript()
 	}
 }
 
-char const * FlowHandler::GetString(const char* id) const
+std::string FlowHandler::GetString(const std::string& id) const
 {
-	if (!ScriptAssert(_translationMap.find(id) != _translationMap.end(), std::string{ "Couldn't find string " } + id))
+	if (!ScriptAssert(_translationMap.find(id) != _translationMap.end(), std::string("Couldn't find string ") + id))
 		return id;
 
-	return _translationMap.at(std::string(id)).at(0).c_str();
+	return _translationMap.at(id).at(0);
 }
 
 Settings* FlowHandler::GetSettings()
