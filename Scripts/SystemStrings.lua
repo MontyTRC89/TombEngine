@@ -131,7 +131,9 @@ local strings =
 	waiting_for_input = { "Waiting For Input..." },
 	walk_toggle = { "Walk Toggle" },
 	window_title = { "TombEngine" },
-	windowed = { "Windowed" },
+	window_mode = { "Window Mode" },
+	window_mode_fullscreen = { "Fullscreen" },
+	window_mode_windowed = { "Windowed" },
 	unlimited = { "Unlimited %s" }
 }
 

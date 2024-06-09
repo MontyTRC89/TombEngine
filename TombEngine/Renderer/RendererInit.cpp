@@ -23,14 +23,14 @@ static std::wstring GetAssetPath(const wchar_t* fileName)
 
 namespace TEN::Renderer
 {
-	void Renderer::Initialize(int w, int h, bool windowed, HWND handle)
+	void Renderer::Initialize(int width, int height, bool isWindowed, HWND handle)
 	{
 		TENLog("Initializing DX11...", LogLevel::Info);
 
-		_screenWidth = w;
-		_screenHeight = h;
-		_isWindowed = windowed;
-		InitializeScreen(w, h, handle, false);
+		_screenWidth = width;
+		_screenHeight = height;
+		_isWindowed = isWindowed;
+		InitializeScreen(width, height, handle, false);
 		InitializeCommonTextures();
 
 		// Initialize render states

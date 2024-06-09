@@ -866,6 +866,7 @@ namespace TEN::Gui
 
 			TargetHighlighter,
 			//InteractionHints,
+			Subtitles,
 
 			Apply,
 			Cancel,
@@ -955,6 +956,11 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableTargetHighlighter = !CurrentSettings.Configuration.EnableTargetHighlighter;
 				break;
+
+			case GameplaySettingsOption::Subtitles:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
+				break;
 			}
 		}
 
@@ -1017,13 +1023,12 @@ namespace TEN::Gui
 		enum DisplaySettingsOption
 		{
 			ScreenResolution,
-			Windowed,
+			WindowModeOption,
+			//FrameRateModeOption,
 			ShadowType,
 			Caustics,
 			Antialiasing,
 			AmbientOcclusion,
-
-			Subtitles,
 
 			Apply,
 			Cancel,
@@ -1052,14 +1057,34 @@ namespace TEN::Gui
 
 				break;
 
-			case DisplaySettingsOption::Windowed:
+			case DisplaySettingsOption::WindowModeOption:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableWindowedMode = !CurrentSettings.Configuration.EnableWindowedMode;
+				if (CurrentSettings.Configuration.WindowMode == WindowMode::Windowed)
+				{
+					CurrentSettings.Configuration.WindowMode = WindowMode::Fullscreen;
+				}
+				else
+				{
+					CurrentSettings.Configuration.WindowMode = WindowMode(int(CurrentSettings.Configuration.WindowMode) - 1);
+				}
+				
 				break;
+				
+			/*case DisplaySettingsOption::FrameRateModeOption:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				if (CurrentSettings.Configuration.FrameRateMode == FrameRateMode::Thirty)
+				{
+					CurrentSettings.Configuration.FrameRateMode = FrameRateMode::Sixty;
+				}
+				else
+				{
+					CurrentSettings.Configuration.FrameRateMode = FrameRateMode(int(CurrentSettings.Configuration.FrameRateMode) - 1);
+				}
+				
+				break;*/
 
 			case DisplaySettingsOption::ShadowType:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-
 				if (CurrentSettings.Configuration.ShadowType == ShadowMode::None)
 				{
 					CurrentSettings.Configuration.ShadowType = ShadowMode::All;
@@ -1078,7 +1103,6 @@ namespace TEN::Gui
 
 			case DisplaySettingsOption::Antialiasing:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-
 				if (CurrentSettings.Configuration.AntialiasingMode == AntialiasingMode::None)
 				{
 					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode::High;
@@ -1094,11 +1118,6 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
 				break;
-
-			case DisplaySettingsOption::Subtitles:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
-				break;
 			}
 		}
 
@@ -1113,10 +1132,31 @@ namespace TEN::Gui
 
 				break;
 
-			case DisplaySettingsOption::Windowed:
+			case DisplaySettingsOption::WindowModeOption:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableWindowedMode = !CurrentSettings.Configuration.EnableWindowedMode;
+				if (CurrentSettings.Configuration.WindowMode == WindowMode::Fullscreen)
+				{
+					CurrentSettings.Configuration.WindowMode = WindowMode::Windowed;
+				}
+				else
+				{
+					CurrentSettings.Configuration.WindowMode = WindowMode(int(CurrentSettings.Configuration.WindowMode) + 1);
+				}
+
 				break;
+
+			/*case DisplaySettingsOption::FrameRateModeOption:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				if (CurrentSettings.Configuration.FrameRateMode == FrameRateMode::Sixty)
+				{
+					CurrentSettings.Configuration.FrameRateMode = FrameRateMode::Thirty;
+				}
+				else
+				{
+					CurrentSettings.Configuration.FrameRateMode = FrameRateMode(int(CurrentSettings.Configuration.FrameRateMode) + 1);
+				}
+
+				break;*/
 
 			case DisplaySettingsOption::ShadowType:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -1138,7 +1178,6 @@ namespace TEN::Gui
 
 			case DisplaySettingsOption::Antialiasing:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-
 				if (CurrentSettings.Configuration.AntialiasingMode == AntialiasingMode::High)
 				{
 					CurrentSettings.Configuration.AntialiasingMode = AntialiasingMode::None;
@@ -1153,11 +1192,6 @@ namespace TEN::Gui
 			case DisplaySettingsOption::AmbientOcclusion:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
-				break;
-
-			case DisplaySettingsOption::Subtitles:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
 				break;
 			}
 		}
@@ -1205,8 +1239,10 @@ namespace TEN::Gui
 				SaveConfiguration();
 
 				// Reset screen and go back.
-				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.ScreenWidth, CurrentSettings.Configuration.ScreenHeight, 
-					CurrentSettings.Configuration.EnableWindowedMode);
+				g_Renderer.ChangeScreenResolution(
+					CurrentSettings.Configuration.ScreenWidth,
+					CurrentSettings.Configuration.ScreenHeight,
+					CurrentSettings.Configuration.WindowMode == WindowMode::Windowed);
 
 				MenuToDisplay = Menu::Options;
 				SelectedOption = 2;

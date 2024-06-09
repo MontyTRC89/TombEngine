@@ -581,7 +581,7 @@ namespace TEN::Renderer
 		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
 		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
-		void Initialize(int w, int h, bool windowed, HWND handle);
+		void Initialize(int width, int height, bool isWindowed, HWND handle);
 		void Render();
 		void RenderTitle();
 		void Lock();
@@ -624,7 +624,7 @@ namespace TEN::Renderer
 		void AddDebugSphere(const Vector3& center, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 		void AddDebugSphere(const BoundingSphere& sphere, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 
-		void ChangeScreenResolution(int width, int height, bool windowed);
+		void ChangeScreenResolution(int width, int height, bool isWindowed);
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void UpdateLaraAnimations(bool force);
 		void UpdateItemAnimations(int itemNumber, bool force);

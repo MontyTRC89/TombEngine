@@ -26,8 +26,8 @@
 #define IDC_NOSOUND                     1038
 #define IDC_ENABLE_SOUNDS               1038
 #define IDC_RENDEROPTIONS               1043
-#define IDC_WINDOWED                    1045
-#define IDC_VOLUMEFOG                   1049
+#define IDC_WINDOW_MODE                 1045
+#define IDC_VOLUME_FOG                  1049
 #define IDC_SHADOWS                     1049
 #define IDC_NOFMV                       1050
 #define IDC_GROUP_RENDER_OPTIONS        1060

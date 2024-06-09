@@ -8,7 +8,7 @@
 
 namespace TEN::Renderer 
 {
-	void Renderer::ChangeScreenResolution(int width, int height, bool windowed) 
+	void Renderer::ChangeScreenResolution(int width, int height, bool isWindowed) 
 	{
 		ID3D11RenderTargetView* nullViews[] = { nullptr };
 		_context->OMSetRenderTargets(0, nullViews, NULL);
@@ -37,7 +37,7 @@ namespace TEN::Renderer
 
 		_screenWidth = width;
 		_screenHeight = height;
-		_isWindowed = windowed;
+		_isWindowed = isWindowed;
 
 		InitializeScreen(width, height, WindowsHandle, true);
 	}

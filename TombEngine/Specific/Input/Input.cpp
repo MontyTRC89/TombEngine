@@ -631,7 +631,7 @@ namespace TEN::Input
 		static bool dbFullscreen = true;
 		if ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN] && dbFullscreen)
 		{
-			g_Config.EnableWindowedMode = !g_Config.EnableWindowedMode;
+			g_Config.WindowMode = (g_Config.WindowMode == WindowMode::Windowed) ? WindowMode::Windowed : WindowMode::Fullscreen;
 			SaveConfiguration();
 			g_Renderer.ToggleFullScreen();
 		}

@@ -57,7 +57,7 @@ void SetVolumeTracks(int vol)
 {
 	GlobalMusicVolume = vol;
 
-	float fVol = static_cast<float>(vol) / 100.0f;
+	float fVol = vol / 100.0f;
 	for (int i = 0; i < (int)SoundTrackType::Count; i++)
 	{
 		if (BASS_ChannelIsActive(SoundtrackSlot[i].Channel))

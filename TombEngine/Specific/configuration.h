@@ -34,19 +34,19 @@ namespace TEN::Config
 	constexpr auto REGKEY_ENABLE_AUTO_TARGETING			= "EnableAutoTargeting";
 	constexpr auto REGKEY_ENABLE_OPPOSITE_ACTION_ROLL	= "EnableOppositeActionRoll";
 	constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER		= "EnableTargetHighlighter";
+	constexpr auto REGKEY_ENABLE_SUBTITLES				= "EnableSubtitles";
 
 	// Graphics keys
-
 	constexpr auto REGKEY_SCREEN_WIDTH				= "ScreenWidth";
 	constexpr auto REGKEY_SCREEN_HEIGHT				= "ScreenHeight";
-	constexpr auto REGKEY_ENABLE_WINDOWED_MODE		= "EnableWindowedMode";
+	constexpr auto REGKEY_WINDOW_MODE				= "WindowMode";
+	constexpr auto REGKEY_FRAME_RATE_MODE			= "FrameRateMode";
 	constexpr auto REGKEY_SHADOWS					= "ShadowsMode";
 	constexpr auto REGKEY_SHADOW_MAP_SIZE			= "ShadowMapSize";
 	constexpr auto REGKEY_SHADOW_BLOB_COUNT_MAX		= "ShadowBlobCountMax";
 	constexpr auto REGKEY_ENABLE_CAUSTICS			= "EnableCaustics";
 	constexpr auto REGKEY_ANTIALIASING_MODE			= "AntialiasingMode";
 	constexpr auto REGKEY_AMBIENT_OCCLUSION			= "AmbientOcclusion";
-	constexpr auto REGKEY_ENABLE_SUBTITLES			= "EnableSubtitles";
 
 	// Sound keys
 
@@ -73,11 +73,19 @@ namespace TEN::Config
 		Count
 	};
 
-	// TODO
 	enum class WindowMode
 	{
 		Windowed,
 		Fullscreen,
+
+		Count
+	};
+
+	enum class FrameRateMode
+	{
+		Thirty,
+		Sixty,
+		//UnlimitedPower,
 
 		Count
 	};
@@ -111,19 +119,20 @@ namespace TEN::Config
 		bool			EnableAutoTargeting		  = false;
 		bool			EnableOppositeActionRoll  = false;
 		bool			EnableTargetHighlighter	  = false;
+		bool			EnableSubtitles			  = false;
 		
 		// Graphics
 
 		int				 ScreenWidth			= 0;
 		int				 ScreenHeight			= 0;
-		bool			 EnableWindowedMode		= false;
+		WindowMode		 WindowMode				= WindowMode::Windowed;
+		FrameRateMode	 FrameRateMode			= FrameRateMode::Thirty;
 		ShadowMode		 ShadowType				= ShadowMode::None;
 		int				 ShadowMapSize			= DEFAULT_SHADOW_MAP_SIZE;
 		int				 ShadowBlobCountMax		= DEFAULT_SHADOW_BLOB_COUNT_MAX;
 		bool			 EnableCaustics			= false;
 		bool			 EnableAmbientOcclusion = false;
 		AntialiasingMode AntialiasingMode		= AntialiasingMode::None;
-		bool			 EnableSubtitles		= false;
 
 		// Sound
 

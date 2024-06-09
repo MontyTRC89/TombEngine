@@ -112,6 +112,36 @@ namespace TEN::Renderer
 		int y = 0;
 		auto titleOption = g_Gui.GetSelectedOption();
 
+		auto controlModeIDString = std::string();
+		switch (g_Gui.GetCurrentSettings().Configuration.ControlMode)
+		{
+		default:
+		case ControlMode::Classic:
+			controlModeIDString = STRING_CONTROL_MODE_CLASSIC;
+			break;
+
+		case ControlMode::Enhanced:
+			controlModeIDString = STRING_CONTROL_MODE_ENHANCED;
+			break;
+
+		case ControlMode::Modern:
+			controlModeIDString = STRING_CONTROL_MODE_MODERN;
+			break;
+		}
+
+		auto swimControlModeIDString = std::string();
+		switch (g_Gui.GetCurrentSettings().Configuration.SwimControlMode)
+		{
+		default:
+		case SwimControlMode::Omnidirectional:
+			swimControlModeIDString = STRING_SWIM_CONTROL_MODE_OMNI;
+			break;
+
+		case SwimControlMode::Planar:
+			swimControlModeIDString = STRING_SWIM_CONTROL_MODE_PLANAR;
+			break;
+		}
+
 		char stringBuffer[32] = {};
 		auto screenResolution = g_Config.SupportedScreenResolutions[g_Gui.GetCurrentSettings().SelectedScreenResolution];
 		sprintf(stringBuffer, "%d x %d", screenResolution.x, screenResolution.y);
@@ -119,54 +149,48 @@ namespace TEN::Renderer
 		auto* shadowMode = g_Gui.GetCurrentSettings().Configuration.ShadowType != ShadowMode::None ?
 			(g_Gui.GetCurrentSettings().Configuration.ShadowType == ShadowMode::Player ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
 
-		auto antialiasingModeIdString = std::string();
+		auto windowModeIDString = std::string();
+		switch (g_Gui.GetCurrentSettings().Configuration.WindowMode)
+		{
+		case WindowMode::Windowed:
+			windowModeIDString = STRING_WINDOW_MODE_WINDOWED;
+			break;
+
+		case WindowMode::Fullscreen:
+			windowModeIDString = STRING_WINDOW_MODE_FULLSCREEN;
+			break;
+		}
+
+		auto frameRateModeIDString = std::string();
+		switch (g_Gui.GetCurrentSettings().Configuration.FrameRateMode)
+		{
+		case FrameRateMode::Thirty:
+			frameRateModeIDString = STRING_FRAME_RATE_MODE_30;
+			break;
+
+		case FrameRateMode::Sixty:
+			frameRateModeIDString = STRING_FRAME_RATE_MODE_60;
+			break;
+		}
+
+		auto antialiasingModeIDString = std::string();
 		switch (g_Gui.GetCurrentSettings().Configuration.AntialiasingMode)
 		{
 		default:
 		case AntialiasingMode::None:
-			antialiasingModeIdString = STRING_ANTIALIASING_NONE;
+			antialiasingModeIDString = STRING_ANTIALIASING_NONE;
 			break;
 
 		case AntialiasingMode::Low:
-			antialiasingModeIdString = STRING_ANTIALIASING_LOW;
+			antialiasingModeIDString = STRING_ANTIALIASING_LOW;
 			break;
 
 		case AntialiasingMode::Medium:
-			antialiasingModeIdString = STRING_ANTIALIASING_MEDIUM;
+			antialiasingModeIDString = STRING_ANTIALIASING_MEDIUM;
 			break;
 
 		case AntialiasingMode::High:
-			antialiasingModeIdString = STRING_ANTIALIASING_HIGH;
-			break;
-		}
-
-		auto controlModeIdString = std::string();
-		switch (g_Gui.GetCurrentSettings().Configuration.ControlMode)
-		{
-		default:
-		case ControlMode::Classic:
-			controlModeIdString = STRING_CONTROL_MODE_CLASSIC;
-			break;
-
-		case ControlMode::Enhanced:
-			controlModeIdString = STRING_CONTROL_MODE_ENHANCED;
-			break;
-
-		case ControlMode::Modern:
-			controlModeIdString = STRING_CONTROL_MODE_MODERN;
-			break;
-		}
-
-		auto swimControlModeIdString = std::string();
-		switch (g_Gui.GetCurrentSettings().Configuration.SwimControlMode)
-		{
-		default:
-		case SwimControlMode::Omnidirectional:
-			swimControlModeIdString = STRING_SWIM_CONTROL_MODE_OMNI;
-			break;
-
-		case SwimControlMode::Planar:
-			swimControlModeIdString = STRING_SWIM_CONTROL_MODE_PLANAR;
+			antialiasingModeIDString = STRING_ANTIALIASING_HIGH;
 			break;
 		}
 
@@ -253,12 +277,12 @@ namespace TEN::Renderer
 
 			// Control mode
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_CONTROL_MODE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 0));
-			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(controlModeIdString.c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == 0));
+			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(controlModeIDString.c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == 0));
 			GetNextLinePosition(&y);
 
 			// Swim control mode
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SWIM_CONTROL_MODE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
-			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(swimControlModeIdString.c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
+			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(swimControlModeIDString.c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
 			GetNextLinePosition(&y);
 
 			// Walk toggle
@@ -294,15 +318,20 @@ namespace TEN::Renderer
 			// Target highlighter
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TARGET_HIGHLIGHTER), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 8));
 			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableTargetHighlighter), PRINTSTRING_COLOR_WHITE, SF(titleOption == 8));
+			GetNextLinePosition(&y);
+
+			// Subtitles
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SUBTITLES), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 9));
+			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableSubtitles), PRINTSTRING_COLOR_WHITE, SF(titleOption == 9));
 
 			y = MenuVerticalBottomOptions;
 
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 9));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 10));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 10));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 11));
 			break;
 
 		case Menu::Display:
@@ -318,10 +347,15 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(titleOption == 0));
 			GetNextLinePosition(&y);
 
-			// Windowed mode
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_WINDOWED), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
-			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableWindowedMode), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
+			// Window mode
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_WINDOW_MODE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 1));
+			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(windowModeIDString.c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == 1));
 			GetNextLinePosition(&y);
+
+			// Frame rate mode
+			/*AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_FRAME_RATE_MODE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 2));
+			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(frameRateModeIDString.c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == 2));
+			GetNextLinePosition(&y);*/
 
 			// Enable dynamic shadows
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SHADOWS), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 2));
@@ -335,7 +369,7 @@ namespace TEN::Renderer
 
 			// Enable antialiasing
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_ANTIALIASING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
-			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(antialiasingModeIdString.c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
+			AddString(MenuRightSideEntry, y, g_GameFlow->GetString(antialiasingModeIDString.c_str()), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
 			GetNextLinePosition(&y);
 
 			// Enable ambient occlusion
@@ -343,18 +377,14 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableAmbientOcclusion), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
 			GetNextBlockPosition(&y);
 
-			// Subtitles
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SUBTITLES), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
-			AddString(MenuRightSideEntry, y, GetStringOnOff(g_Gui.GetCurrentSettings().Configuration.EnableSubtitles), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
-
 			y = MenuVerticalBottomOptions;
 
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 7));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 6));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 8));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 7));
 			break;
 
 		case Menu::Sound:

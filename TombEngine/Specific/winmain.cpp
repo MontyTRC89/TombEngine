@@ -163,9 +163,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	// Disables ALT + SPACE
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
-	{
 		return 0;
-	}
 
 	if (msg > WM_CLOSE)
 	{
@@ -188,15 +186,13 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
 
 	if (receivedWmClose)
-	{
 		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
-	}
 
 	if ((short)wParam)
 	{
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
-			if (!g_Config.EnableWindowedMode)
+			if (g_Config.WindowMode != WindowMode::Windowed)
 				g_Renderer.ToggleFullScreen(true);
 
 			if (!DebugMode && ThreadHandle > 0)
@@ -211,7 +207,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		if (!g_Config.EnableWindowedMode)
+		if (g_Config.WindowMode != WindowMode::Windowed )
 			ShowWindow(hWnd, SW_MINIMIZE);
 
 		if (!DebugMode)
@@ -424,7 +420,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 		// Initialize renderer.
-		g_Renderer.Initialize(g_Config.ScreenWidth, g_Config.ScreenHeight, g_Config.EnableWindowedMode, App.WindowHandle);
+		g_Renderer.Initialize(g_Config.ScreenWidth, g_Config.ScreenHeight, g_Config.WindowMode == WindowMode::Windowed, App.WindowHandle);
 
 		// Initialize audio.
 		Sound_Init(gameDir);
