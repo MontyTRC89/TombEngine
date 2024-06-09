@@ -1276,7 +1276,7 @@ bool HasClimbAction(const ItemInfo& item)
 bool HasCrouchAction(const ItemInfo& item)
 {
 	const auto& player = GetLaraInfo(item);
-	return g_Config.IsUsingModernControls() ? player.Control.ToggleCrouch : IsHeld(In::Crouch);
+	return (g_Config.EnableCrouchToggle ? player.Control.ToggleCrouch : IsHeld(In::Crouch));
 }
 
 std::optional<VaultTestResult> TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup)

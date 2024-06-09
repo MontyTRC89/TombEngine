@@ -29,13 +29,14 @@ void lara_as_crawl_vault(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	// Setup
+	// Setup.
 	player.Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	g_Camera.targetDistance = BLOCK(1);
 	g_Camera.flags = CameraFlag::FollowCenter;
 
+	// Reset.
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
 
@@ -51,8 +52,9 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	player.Control.Look.Mode = LookMode::Free;
-	player.Control.ToggleCrouch = g_Config.IsUsingModernControls();
+	player.Control.ToggleCrouch = g_Config.EnableCrouchToggle;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	g_Camera.targetDistance = BLOCK(1);
@@ -66,6 +68,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Death.
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_DEATH;
@@ -75,6 +78,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	if (player.Control.Look.IsUsingBinoculars)
 		return;
 
+	// Turn.
 	if (g_Config.IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
@@ -86,7 +90,8 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
 	}
 
-	if (IsClicked(In::Crouch) && g_Config.IsUsingModernControls())
+	// Toggle crouch.
+	if (IsClicked(In::Crouch) && g_Config.EnableCrouchToggle)
 		player.Control.ToggleCrouch = false;
 
 	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
@@ -142,6 +147,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -217,6 +223,7 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_CROUCH_IDLE;
 }
 
@@ -280,6 +287,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
+	player.Control.ToggleCrouch = g_Config.EnableCrouchToggle;
 	coll->Setup.EnableSpasm = false;
 	g_Camera.targetDistance = BLOCK(1);
 
@@ -291,7 +299,10 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
+	if (IsClicked(In::Crouch) && g_Config.EnableCrouchToggle)
+		player.Control.ToggleCrouch = false;
+
+	if ((HasCrouchAction(*item)|| player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll))
 		{
@@ -316,6 +327,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -333,6 +345,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Vertical;
+	player.Control.ToggleCrouch = g_Config.EnableCrouchToggle;
 	coll->Setup.EnableSpasm = false;
 	g_Camera.targetDistance = BLOCK(1);
 
@@ -344,7 +357,10 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
+	if (IsClicked(In::Crouch) && g_Config.EnableCrouchToggle)
+		player.Control.ToggleCrouch = false;
+
+	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll))
 		{
@@ -369,6 +385,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_IDLE;
 }
 
@@ -386,7 +403,7 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::None;
-	player.Control.ToggleCrouch = g_Config.IsUsingModernControls();
+	player.Control.ToggleCrouch = g_Config.EnableCrouchToggle;
 	coll->Setup.EnableSpasm = false;
 	g_Camera.targetDistance = BLOCK(1);
 
@@ -407,6 +424,7 @@ void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_CROUCH_IDLE;
 }
 
@@ -430,7 +448,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Free;
-	player.Control.ToggleCrouch = g_Config.IsUsingModernControls();
+	player.Control.ToggleCrouch = g_Config.EnableCrouchToggle;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	g_Camera.targetDistance = BLOCK(1);
@@ -466,7 +484,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
 	}
 
-	if (IsClicked(In::Crouch) && g_Config.IsUsingModernControls())
+	if (IsClicked(In::Crouch) && g_Config.EnableCrouchToggle)
 		player.Control.ToggleCrouch = false;
 
 	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
@@ -563,6 +581,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_CROUCH_IDLE;
 	player.Control.HandStatus = HandStatus::Free;
 }
@@ -621,7 +640,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 
 	player.Control.Look.Mode = LookMode::Horizontal;
 	player.Control.HandStatus = HandStatus::Busy;
-	player.Control.ToggleCrouch = g_Config.IsUsingModernControls();
+	player.Control.ToggleCrouch = g_Config.EnableCrouchToggle;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	g_Camera.targetDistance = BLOCK(1);
@@ -674,6 +693,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
 
@@ -742,6 +762,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 
 	player.Control.Look.Mode = LookMode::Horizontal;
 	player.Control.HandStatus = HandStatus::Busy;
+	player.Control.ToggleCrouch = g_Config.EnableCrouchToggle;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	g_Camera.targetDistance = BLOCK(1);
@@ -760,7 +781,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 		HandlePlayerCrawlTurnFlex(*item);
 	}
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
+	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (IsHeld(In::Back))
 		{
@@ -772,6 +793,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
 
@@ -827,21 +849,24 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	player.Control.Look.Mode = LookMode::Vertical;
 	player.Control.HandStatus = HandStatus::Busy;
+	player.Control.ToggleCrouch = g_Config.EnableCrouchToggle;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
+	// Death.
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
+	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll))
 		{
@@ -872,6 +897,7 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
 
@@ -890,6 +916,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 
 	player.Control.Look.Mode = LookMode::Vertical;
 	player.Control.HandStatus = HandStatus::Busy;
+	player.Control.ToggleCrouch = g_Config.EnableCrouchToggle;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	g_Camera.targetDistance = BLOCK(1);
@@ -902,7 +929,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
+	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		if (IsHeld(In::Sprint) && CanCrouchRoll(*item, *coll))
 		{
@@ -933,6 +960,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_CRAWL_IDLE;
 }
 
@@ -951,17 +979,19 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 	player.Control.Look.Mode = LookMode::None;
 	player.Control.HandStatus = HandStatus::Busy;
+	player.Control.ToggleCrouch = g_Config.EnableCrouchToggle;
 	coll->Setup.EnableSpasm = false;
 	g_Camera.targetDistance = BLOCK(1);
 
 	AlignLaraToSurface(item);
 
-	if ((IsHeld(In::Crouch) || player.Control.KeepLow) && CanCrouch(*item, *coll))
+	if ((HasCrouchAction(*item) || player.Control.KeepLow) && CanCrouch(*item, *coll))
 	{
 		item->Animation.TargetState = LS_CRAWL_IDLE;
 		return;
 	}
 
+	// Reset.
 	item->Animation.TargetState = LS_CROUCH_IDLE;
 	player.Control.HandStatus = HandStatus::Free;
 }
