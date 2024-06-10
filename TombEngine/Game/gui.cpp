@@ -3102,11 +3102,11 @@ namespace TEN::Gui
 
 					if (AmmoObjectList[n].Amount == -1)
 					{
-						sprintf(&invTextBuffer[0], g_GameFlow->GetString(STRING_UNLIMITED), g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
+						sprintf(&invTextBuffer[0], g_GameFlow->GetString(STRING_UNLIMITED).c_str(), g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
 					}
 					else
 					{
-						sprintf(&invTextBuffer[0], "%d x %s", AmmoObjectList[n].Amount, g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
+						sprintf(&invTextBuffer[0], "%d x %s", AmmoObjectList[n].Amount, g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName).c_str());
 					}
 
 					// CHECK: AmmoSelectorFadeVal is never true and therefore the string is never printed.
@@ -3411,11 +3411,11 @@ namespace TEN::Gui
 							numItems = player.Inventory.Puzzles[invObject.ObjectNumber - ID_PUZZLE_ITEM1];
 							if (numItems <= 1)
 							{
-								sprintf(textBuffer, g_GameFlow->GetString(invObject.ObjectName));
+								sprintf(textBuffer, g_GameFlow->GetString(invObject.ObjectName).c_str());
 							}
 							else
 							{
-								sprintf(textBuffer, "%d x %s", numItems, g_GameFlow->GetString(invObject.ObjectName));
+								sprintf(textBuffer, "%d x %s", numItems, g_GameFlow->GetString(invObject.ObjectName).c_str());
 							}
 						}
 
@@ -3429,16 +3429,16 @@ namespace TEN::Gui
 						{
 							if (numItems == -1)
 							{
-								sprintf(textBuffer, g_GameFlow->GetString(STRING_UNLIMITED), g_GameFlow->GetString(invObject.ObjectName));
+								sprintf(textBuffer, g_GameFlow->GetString(STRING_UNLIMITED).c_str(), g_GameFlow->GetString(invObject.ObjectName));
 							}
 							else
 							{
-								sprintf(textBuffer, "%d x %s", numItems, g_GameFlow->GetString(invObject.ObjectName));
+								sprintf(textBuffer, "%d x %s", numItems, g_GameFlow->GetString(invObject.ObjectName).c_str());
 							}
 						}
 						else
 						{
-							sprintf(textBuffer, g_GameFlow->GetString(invObject.ObjectName));
+							sprintf(textBuffer, g_GameFlow->GetString(invObject.ObjectName).c_str());
 						}
 					}
 

@@ -392,7 +392,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	App.WindowHandle = CreateWindowEx(
 		0,
 		"TombEngine",
-		g_GameFlow->GetString(STRING_WINDOW_TITLE),
+		g_GameFlow->GetString(STRING_WINDOW_TITLE).c_str(),
 		WS_OVERLAPPED | WS_CAPTION | WS_MINIMIZEBOX,
 		windowPos.x,
 		windowPos.y,
