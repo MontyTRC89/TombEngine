@@ -412,14 +412,8 @@ namespace TEN::Config
 
 		DWORD dwBufferSize(sizeof(DWORD));
 		DWORD nResult(0);
-		LONG nError = ::RegQueryValueEx(
-			hKey,
-			strValueName,
-			0,
-			NULL,
-			reinterpret_cast<LPBYTE>(&nResult),
-			&dwBufferSize);
 
+		LONG nError = RegQueryValueEx(hKey, strValueName, 0, NULL, reinterpret_cast<LPBYTE>(&nResult), &dwBufferSize);
 		if (ERROR_SUCCESS == nError)
 			*nValue = nResult;
 
