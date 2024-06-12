@@ -623,12 +623,13 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 	player.Control.CanLook = !((isWading && isInSwamp) || item->Animation.AnimNumber == LA_SWANDIVE_ROLL);
-
 	player.Control.Look.Mode = LookMode::Free;
 
+	// Death.
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_DEATH;
@@ -649,7 +650,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (player.Control.Look.IsUsingBinoculars)
 		return;
 
-	if (IsClicked(In::Walk))
+	// Toggle walk (if toggle enabled).
+	if (IsClicked(In::Walk) && g_Config.EnableWalkToggle)
 		player.Control.ToggleWalk = true;
 
 	// Turn.
@@ -702,6 +704,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
+	// Jump.
 	if (IsHeld(In::Jump))
 	{
 		if ((IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) &&
@@ -728,6 +731,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
+	// Turn or roll 180.
 	if (IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll))
 	{
 		if (IsHeld(In::Walk) || CanTurn180(*item, *coll))
@@ -742,22 +746,26 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Crouch.
 	if (IsHeld(In::Crouch) && CanCrouch(*item, *coll))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
 	}
 
+	// Look.
 	if (IsHeld(In::Look) && CanPlayerLookAround(*item))
 	{
 		item->Animation.TargetState = LS_IDLE;
 		return;
 	}
 
-	if (g_Config.IsUsingModernControls())
+	// Move forward or back.
+	if (g_Config.IsUsingClassicControls() || g_Config.IsUsingEnhancedControls())
 	{
-		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+		if (IsHeld(In::Forward))
 		{
+			// Climb.
 			if (IsHeld(In::Action))
 			{
 				auto vaultContext = TestLaraVault(item, coll);
@@ -769,6 +777,104 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				}
 			}
 
+			// Wade, walk, run, or sprint.
+			if (CanWadeForward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_WADE_FORWARD;
+				return;
+			}
+			else if (IsHeld(In::Walk))
+			{
+				if (CanWalkForward(*item, *coll))
+				{
+					item->Animation.TargetState = LS_WALK_FORWARD;
+					return;
+				}
+			}
+			else if (CanRunForward(*item, *coll))
+			{
+				if (IsHeld(In::Sprint))
+				{
+					item->Animation.TargetState = LS_SPRINT;
+				}
+				else
+				{
+					item->Animation.TargetState = LS_RUN_FORWARD;
+				}
+
+				return;
+			}
+		}
+		else if (IsHeld(In::Back))
+		{
+			// Wade, walk, or hop back.
+			if (CanWadeBackward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_WALK_BACK;
+				return;
+			}
+			else if (IsHeld(In::Walk))
+			{
+				if (CanWalkBackward(*item, *coll))
+				{
+					item->Animation.TargetState = LS_WALK_BACK;
+					return;
+				}
+			}
+			else if (CanRunBackward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_HOP_BACK;
+				return;
+			}
+		}
+
+		// Turn left/right.
+		if (IsHeld(In::Left))
+		{
+			if ((IsHeld(In::Sprint) || CanTurnFast(*item, *coll, false)) &&
+				!isWading)
+			{
+				item->Animation.TargetState = LS_TURN_LEFT_FAST;
+			}
+			else
+			{
+				item->Animation.TargetState = LS_TURN_LEFT_SLOW;
+			}
+
+			return;
+		}
+		else if (IsHeld(In::Right))
+		{
+			if ((IsHeld(In::Sprint) || CanTurnFast(*item, *coll, true)) &&
+				!isWading)
+			{
+				item->Animation.TargetState = LS_TURN_RIGHT_FAST;
+			}
+			else
+			{
+				item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
+			}
+
+			return;
+		}
+	}
+	else if (g_Config.IsUsingModernControls())
+	{
+		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+		{
+			// CLimb.
+			if (IsHeld(In::Action))
+			{
+				auto vaultContext = TestLaraVault(item, coll);
+				if (vaultContext.has_value())
+				{
+					item->Animation.TargetState = vaultContext->TargetState;
+					SetLaraVault(item, coll, *vaultContext);
+					return;
+				}
+			}
+
+			// Walk or skip back.
 			if (CanStrafeBackward(*item, *coll))
 			{
 				if (CanWadeBackward(*item, *coll))
@@ -788,6 +894,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 
+			// Wade, walk, run, or sprint.
 			if (CanWadeForward(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WADE_FORWARD;
@@ -831,100 +938,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 	}
-	else
-	{
-		if (IsHeld(In::Forward))
-		{
-			if (IsHeld(In::Action))
-			{
-				auto vaultContext = TestLaraVault(item, coll);
-				if (vaultContext.has_value())
-				{
-					item->Animation.TargetState = vaultContext->TargetState;
-					SetLaraVault(item, coll, *vaultContext);
-					return;
-				}
-			}
 
-			if (CanWadeForward(*item, *coll))
-			{
-				item->Animation.TargetState = LS_WADE_FORWARD;
-				return;
-			}
-			else if (IsHeld(In::Walk))
-			{
-				if (CanWalkForward(*item, *coll))
-				{
-					item->Animation.TargetState = LS_WALK_FORWARD;
-					return;
-				}
-			}
-			else if (CanRunForward(*item, *coll))
-			{
-				if (IsHeld(In::Sprint))
-				{
-					item->Animation.TargetState = LS_SPRINT;
-				}
-				else
-				{
-					item->Animation.TargetState = LS_RUN_FORWARD;
-				}
-
-				return;
-			}
-		}
-		else if (IsHeld(In::Back))
-		{
-			if (CanWadeBackward(*item, *coll))
-			{
-				item->Animation.TargetState = LS_WALK_BACK;
-				return;
-			}
-			else if (IsHeld(In::Walk))
-			{
-				if (CanWalkBackward(*item, *coll))
-				{
-					item->Animation.TargetState = LS_WALK_BACK;
-					return;
-				}
-			}
-			else if (CanRunBackward(*item, *coll))
-			{
-				item->Animation.TargetState = LS_HOP_BACK;
-				return;
-			}
-		}
-
-		if (IsHeld(In::Left))
-		{
-			if ((IsHeld(In::Sprint) || CanTurnFast(*item, *coll, false)) &&
-				!isWading)
-			{
-				item->Animation.TargetState = LS_TURN_LEFT_FAST;
-			}
-			else
-			{
-				item->Animation.TargetState = LS_TURN_LEFT_SLOW;
-			}
-
-			return;
-		}
-		else if (IsHeld(In::Right))
-		{
-			if ((IsHeld(In::Sprint) || CanTurnFast(*item, *coll, true)) &&
-				!isWading)
-			{
-				item->Animation.TargetState = LS_TURN_RIGHT_FAST;
-			}
-			else
-			{
-				item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
-			}
-
-			return;
-		}
-	}
-
+	// Sidestep.
 	if (IsHeld(In::StepLeft) || ((IsHeld(In::Walk) && IsHeld(In::Left)) && !g_Config.IsUsingModernControls()))
 	{
 		if (CanSidestepLeft(*item, *coll))
@@ -952,6 +967,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// AFK pose.
 	if (CanStrikeAfkPose(*item, *coll) && player.Control.Count.Pose >= PLAYER_POSE_TIME)
 	{
 		item->Animation.TargetState = LS_POSE;
@@ -1236,12 +1252,13 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 	player.Control.CanLook = (isWading && isInSwamp) ? false : true;
-
 	player.Control.Look.Mode = LookMode::Vertical;
 
+	// Death.
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_DEATH;
@@ -1273,53 +1290,13 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (g_Config.IsUsingClassicControls())
+	// Move.
+	if (g_Config.IsUsingEnhancedControls() || g_Config.IsUsingModernControls())
 	{
-		if (IsHeld(In::Forward))
-		{
-			if (IsHeld(In::Action))
-			{
-				auto vaultContext = TestLaraVault(item, coll);
-				if (vaultContext.has_value())
-				{
-					item->Animation.TargetState = vaultContext->TargetState;
-					SetLaraVault(item, coll, *vaultContext);
-					return;
-				}
-			}
-
-			if (CanWadeForward(*item, *coll))
-			{
-				item->Animation.TargetState = LS_WADE_FORWARD;
-				return;
-			}
-			else if (IsHeld(In::Walk))
-			{
-				if (CanWalkForward(*item, *coll))
-				{
-					item->Animation.TargetState = LS_WALK_FORWARD;
-					return;
-				}
-			}
-			else if (CanRunForward(*item, *coll))
-			{
-				if (IsHeld(In::Sprint))
-				{
-					item->Animation.TargetState = LS_SPRINT;
-				}
-				else
-				{
-					item->Animation.TargetState = LS_RUN_FORWARD;
-				}
-
-				return;
-			}
-		}
-	}
-	else
-	{
+		// Jump or climb.
 		if (IsHeld(In::Jump))
 		{
+			// Climb with Jump.
 			if (IsHeld(In::Forward) && g_Config.EnableClimbToggle)
 			{
 				auto vaultContext = TestLaraVault(item, coll);
@@ -1331,6 +1308,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 				}
 			}
 
+			// Jump.
 			if (CanPerformJump(*item, *coll))
 			{
 				auto jumpDirection = GetPlayerJumpDirection(*item, *coll);
@@ -1343,6 +1321,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
+		// Roll 180.
 		if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll)) &&
 			!isWading)
 		{
@@ -1350,53 +1329,64 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 
+		// Crouch.
 		if (IsHeld(In::Crouch) && CanCrouch(*item, *coll))
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			return;
 		}
+	}
 
-		if (IsHeld(In::Forward))
+	// Move forward.
+	if (IsHeld(In::Forward))
+	{
+		// Climb.
+		if (IsHeld(In::Action))
 		{
-			if (IsHeld(In::Action))
+			auto vaultContext = TestLaraVault(item, coll);
+			if (vaultContext.has_value())
 			{
-				auto vaultContext = TestLaraVault(item, coll);
-				if (vaultContext.has_value())
-				{
-					item->Animation.TargetState = vaultContext->TargetState;
-					SetLaraVault(item, coll, *vaultContext);
-					return;
-				}
-			}
-
-			if (CanWadeForward(*item, *coll))
-			{
-				item->Animation.TargetState = LS_WADE_FORWARD;
-				return;
-			}
-			else if (IsHeld(In::Walk))
-			{
-				if (CanWalkForward(*item, *coll))
-				{
-					item->Animation.TargetState = LS_WALK_FORWARD;
-					return;
-				}
-			}
-			else if (CanRunForward(*item, *coll))
-			{
-				if (IsHeld(In::Sprint))
-				{
-					item->Animation.TargetState = LS_SPRINT;
-				}
-				else
-				{
-					item->Animation.TargetState = LS_RUN_FORWARD;
-				}
-
+				item->Animation.TargetState = vaultContext->TargetState;
+				SetLaraVault(item, coll, *vaultContext);
 				return;
 			}
 		}
-		else if (IsHeld(In::Back))
+
+		// Wade.
+		if (CanWadeForward(*item, *coll))
+		{
+			item->Animation.TargetState = LS_WADE_FORWARD;
+			return;
+		}
+		// Walk.
+		else if (IsHeld(In::Walk))
+		{
+			if (CanWalkForward(*item, *coll))
+			{
+				item->Animation.TargetState = LS_WALK_FORWARD;
+				return;
+			}
+		}
+		// Run.
+		else if (CanRunForward(*item, *coll))
+		{
+			if (IsHeld(In::Sprint))
+			{
+				item->Animation.TargetState = LS_SPRINT;
+			}
+			else
+			{
+				item->Animation.TargetState = LS_RUN_FORWARD;
+			}
+
+			return;
+		}
+	}
+
+	// Move back.
+	if (g_Config.IsUsingEnhancedControls() || g_Config.IsUsingModernControls())
+	{
+		if (IsHeld(In::Back))
 		{
 			if (CanWadeBackward(*item, *coll))
 			{
@@ -1413,12 +1403,54 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 			}
 			else if (CanRunBackward(*item, *coll))
 			{
-				item->Animation.TargetState = LS_HOP_BACK;
-				return;
+				if (g_Config.IsUsingEnhancedControls())
+				{
+					item->Animation.TargetState = LS_HOP_BACK;
+					return;
+				}
+				else if (g_Config.IsUsingModernControls())
+				{
+					item->Animation.TargetState = LS_SKIP_BACK;
+					return;
+				}
 			}
 		}
 	}
 
+	// Turn left/right.
+	if (g_Config.IsUsingClassicControls() || g_Config.IsUsingEnhancedControls())
+	{
+		if (IsHeld(In::Left) && item->Animation.ActiveState == LS_TURN_LEFT_SLOW)
+		{
+			if (player.Control.TurnRate.y < -LARA_MED_TURN_RATE_MAX &&
+				!isWading)
+			{
+				item->Animation.TargetState = LS_TURN_LEFT_FAST;
+			}
+			else
+			{
+				item->Animation.TargetState = LS_TURN_LEFT_SLOW;
+			}
+
+			return;
+		}
+		else if (IsHeld(In::Right) && item->Animation.ActiveState == LS_TURN_RIGHT_SLOW)
+		{
+			if (player.Control.TurnRate.y > LARA_MED_TURN_RATE_MAX &&
+				!isWading)
+			{
+				item->Animation.TargetState = LS_TURN_RIGHT_FAST;
+			}
+			else
+			{
+				item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
+			}
+
+			return;
+		}
+	}
+
+	// Sidestep.
 	if (IsHeld(In::StepLeft) || (IsHeld(In::Walk) && IsHeld(In::Left)) &&
 		CanSidestepLeft(*item, *coll))
 	{
@@ -1429,35 +1461,6 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		CanSidestepRight(*item, *coll))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
-		return;
-	}
-
-	if (IsHeld(In::Left) && item->Animation.ActiveState == LS_TURN_LEFT_SLOW)
-	{
-		if (player.Control.TurnRate.y < -LARA_MED_TURN_RATE_MAX &&
-			!isWading)
-		{
-			item->Animation.TargetState = LS_TURN_LEFT_FAST;
-		}
-		else
-		{
-			item->Animation.TargetState = LS_TURN_LEFT_SLOW;
-		}
-
-		return;
-	}
-	else if (IsHeld(In::Right) && item->Animation.ActiveState == LS_TURN_RIGHT_SLOW)
-	{
-		if (player.Control.TurnRate.y > LARA_MED_TURN_RATE_MAX &&
-			!isWading)
-		{
-			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
-		}
-		else
-		{
-			item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
-		}
-
 		return;
 	}
 
