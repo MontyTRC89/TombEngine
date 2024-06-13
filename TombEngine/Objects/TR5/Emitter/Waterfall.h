@@ -1,9 +1,9 @@
 #pragma once
-#include "Game/items.h"
-#include "Math/Math.h"
 
-using namespace TEN::Math;
+namespace TEN::Effects::WaterfallEmitter
+{
+	void InitializeWaterfall(short itemNumber);
+	void ControlWaterfall(short itemNumber);
 
-void InitializeWaterfall(short itemNumber);
-void TriggerWaterfallEmitterMist(const Vector3& pos, short room, short scalar, short size, Color color);
-void WaterfallControl(short itemNumber);
+	void SpawnWaterfallMist(const Vector3& pos, int roomNumber, float scalar, float size, const Color& color);
+}

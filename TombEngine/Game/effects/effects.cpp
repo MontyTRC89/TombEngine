@@ -3,6 +3,8 @@
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
+#include "Game/control/box.h"
+#include "Game/control/los.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/effects/Blood.h"
@@ -26,8 +28,6 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Game/control/box.h"
-#include "Game/control/los.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Blood;
@@ -38,8 +38,9 @@ using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::WaterfallEmitter;
 using namespace TEN::Math;
-using namespace TEN::Math::Random;
+using namespace TEN::Math::Random; // TODO: No.
 
 using TEN::Renderer::g_Renderer;
 
@@ -194,181 +195,179 @@ void UpdateSparks()
 		LaraItem->Pose.Position.z + bounds.Z1,
 		LaraItem->Pose.Position.z + bounds.Z2);
 
-	for (int i = 0; i < MAX_PARTICLES; i++)
+	for (auto& part : Particles)
 	{
-		auto* spark = &Particles[i];
+		if (!part.on)
+			continue;
 
-		if (spark->on)
+		part.life--;
+
+		if (!part.life)
 		{
-			spark->life--;
+			if (part.dynamic != NO_VALUE)
+				ParticleDynamics[part.dynamic].On = false;
 
-			if (!spark->life)
-			{
-				if (spark->dynamic != -1)
-					ParticleDynamics[spark->dynamic].On = false;
+			part.on = false;
+			continue;
+		}
 
-				spark->on = false;
-				continue;
-			}
+		if (part.fxObj == ID_WATERFALL_EMITTER && part.y >= part.targetPos.y)
+		{
+			part.on = false;
+			part.y = part.targetPos.y;
+			part.x = part.targetPos.x;
+			part.z = part.targetPos.z;
 
-			if (spark->fxObj == ID_WATERFALL_EMITTER && spark->y >= spark->targetPos.y)
-			{
-				spark->y = spark->targetPos.y;
-				spark->x = spark->targetPos.x;
-				spark->z = spark->targetPos.z;
-				spark->on = false;
-
-				if (Random::GenerateInt(0, 100) > 50 )
-					TriggerWaterfallEmitterMist(Vector3(spark->targetPos.x, spark->targetPos.y, spark->targetPos.z), spark->roomNumber, spark->scalar, spark->size, Color(spark->sR, spark->sG, spark->sB));
+			if (Random::TestProbability(1 / 2.0f))
+				SpawnWaterfallMist(Vector3(part.targetPos.x, part.targetPos.y, part.targetPos.z), part.roomNumber, part.scalar, part.size, Color(part.sR, part.sG, part.sB));
 				
+			continue;
+		}
+			
+		int life = part.sLife - part.life;
+		if (life < part.colFadeSpeed)
+		{
+			int dl = (life << 16) / part.colFadeSpeed;
+			part.r = part.sR + (dl * (part.dR - part.sR) >> 16);
+			part.g = part.sG + (dl * (part.dG - part.sG) >> 16);
+			part.b = part.sB + (dl * (part.dB - part.sB) >> 16);
+		}
+		else if (part.life >= part.fadeToBlack)
+		{
+			part.r = part.dR;
+			part.g = part.dG;
+			part.b = part.dB;
+		}
+		else
+		{
+			part.r = (part.dR * (((part.life - part.fadeToBlack) << 16) / part.fadeToBlack + 0x10000)) >> 16;
+			part.g = (part.dG * (((part.life - part.fadeToBlack) << 16) / part.fadeToBlack + 0x10000)) >> 16;
+			part.b = (part.dB * (((part.life - part.fadeToBlack) << 16) / part.fadeToBlack + 0x10000)) >> 16;
+
+			if (part.r < 8 && part.g < 8 && part.b < 8)
+			{
+				part.on = 0;
 				continue;
 			}
-			
-			int life = spark->sLife - spark->life;
-			if (life < spark->colFadeSpeed)
+		}
+
+		if (part.life == part.colFadeSpeed)
+		{
+			if (part.flags & SP_UNDERWEXP)
+				part.dSize /= 4;
+		}
+
+		if (part.flags & SP_ROTATE)
+			part.rotAng = (part.rotAng + part.rotAdd) & 0x0FFF;
+
+		if (part.sLife - part.life == part.extras >> 3 &&
+			part.extras & 7)
+		{
+			int explosionType;
+
+			if (part.flags & SP_UNDERWEXP)
 			{
-				int dl = (life << 16) / spark->colFadeSpeed;
-				spark->r = spark->sR + (dl * (spark->dR - spark->sR) >> 16);
-				spark->g = spark->sG + (dl * (spark->dG - spark->sG) >> 16);
-				spark->b = spark->sB + (dl * (spark->dB - spark->sB) >> 16);
+				explosionType = 1;
 			}
-			else if (spark->life >= spark->fadeToBlack)
+			else if (part.flags & SP_PLASMAEXP)
 			{
-				spark->r = spark->dR;
-				spark->g = spark->dG;
-				spark->b = spark->dB;
+				explosionType = 2;
 			}
 			else
 			{
-				spark->r = (spark->dR * (((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000)) >> 16;
-				spark->g = (spark->dG * (((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000)) >> 16;
-				spark->b = (spark->dB * (((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000)) >> 16;
-
-				if (spark->r < 8 && spark->g < 8 && spark->b < 8)
-				{
-					spark->on = 0;
-					continue;
-				}
+				explosionType = 0;
 			}
 
-			if (spark->life == spark->colFadeSpeed)
+			for (int j = 0; j < (part.extras & 7); j++)
 			{
-				if (spark->flags & SP_UNDERWEXP)
-					spark->dSize /= 4;
-			}
-
-			if (spark->flags & SP_ROTATE)
-				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0x0FFF;
-
-			if (spark->sLife - spark->life == spark->extras >> 3 &&
-				spark->extras & 7)
-			{
-				int explosionType;
-
-				if (spark->flags & SP_UNDERWEXP)
+				if (part.flags & SP_COLOR)
 				{
-					explosionType = 1;
-				}
-				else if (spark->flags & SP_PLASMAEXP)
-				{
-					explosionType = 2;
+					TriggerExplosionSparks(
+						part.x, part.y, part.z,
+						(part.extras & 7) - 1,
+						part.dynamic,
+						explosionType,
+						part.roomNumber, 
+						Vector3(part.dR, part.dG, part.dB), 
+						Vector3(part.sR, part.sG, part.sB));
 				}
 				else
 				{
-					explosionType = 0;
+					TriggerExplosionSparks(
+						part.x, part.y, part.z,
+						(part.extras & 7) - 1,
+						part.dynamic,
+						explosionType,
+						part.roomNumber);
 				}
-
-				for (int j = 0; j < (spark->extras & 7); j++)
-				{
-					if (spark->flags & SP_COLOR)
-					{
-						TriggerExplosionSparks(
-							spark->x, spark->y, spark->z,
-							(spark->extras & 7) - 1,
-							spark->dynamic,
-							explosionType,
-							spark->roomNumber, 
-							Vector3(spark->dR, spark->dG, spark->dB), 
-							Vector3(spark->sR, spark->sG, spark->sB));
-					}
-					else
-					{
-						TriggerExplosionSparks(
-							spark->x, spark->y, spark->z,
-							(spark->extras & 7) - 1,
-							spark->dynamic,
-							explosionType,
-							spark->roomNumber);
-					}
 					
-					spark->dynamic = -1;
-				}
-
-				if (explosionType == 1)
-				{
-					TriggerExplosionBubble(
-						spark->x,
-						spark->y,
-						spark->z,
-						spark->roomNumber);
-				}
-
-				spark->extras = 0;
+				part.dynamic = -1;
 			}
 
-			spark->yVel += spark->gravity;
-			if (spark->maxYvel)
+			if (explosionType == 1)
 			{
-				if (spark->yVel > spark->maxYvel)
-					spark->yVel = spark->maxYvel;
+				TriggerExplosionBubble(
+					part.x,
+					part.y,
+					part.z,
+					part.roomNumber);
 			}
 
-			if (spark->friction & 0xF)
-			{
-				spark->xVel -= spark->xVel >> (spark->friction & 0xF);
-				spark->zVel -= spark->zVel >> (spark->friction & 0xF);
-			}
+			part.extras = 0;
+		}
 
-			if (spark->friction & 0xF0)
-				spark->yVel -= spark->yVel >> (spark->friction >> 4);
+		part.yVel += part.gravity;
+		if (part.maxYvel)
+		{
+			if (part.yVel > part.maxYvel)
+				part.yVel = part.maxYvel;
+		}
 
-			spark->x += spark->xVel >> 5;
-			spark->y += spark->yVel >> 5;
-			spark->z += spark->zVel >> 5;
+		if (part.friction & 0xF)
+		{
+			part.xVel -= part.xVel >> (part.friction & 0xF);
+			part.zVel -= part.zVel >> (part.friction & 0xF);
+		}
 
-			if (spark->flags & SP_WIND)
-			{
-				spark->x += Weather.Wind().x;
-				spark->z += Weather.Wind().z;
-			}
+		if (part.friction & 0xF0)
+			part.yVel -= part.yVel >> (part.friction >> 4);
 
-			int dl = ((spark->sLife - spark->life) * 65536) / spark->sLife;
-			spark->size = (spark->sSize + ((dl * (spark->dSize - spark->sSize)) / 65536));
+		part.x += part.xVel >> 5;
+		part.y += part.yVel >> 5;
+		part.z += part.zVel >> 5;
+
+		if (part.flags & SP_WIND)
+		{
+			part.x += Weather.Wind().x;
+			part.z += Weather.Wind().z;
+		}
+
+		int dl = ((part.sLife - part.life) * 65536) / part.sLife;
+		part.size = (part.sSize + ((dl * (part.dSize - part.sSize)) / 65536));
 		
-			if (spark->flags & SP_EXPLOSION)
-				SetSpriteSequence(*spark, ID_EXPLOSION_SPRITES);
+		if (part.flags & SP_EXPLOSION)
+			SetSpriteSequence(part, ID_EXPLOSION_SPRITES);
 
-			if ((spark->flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
-				(spark->flags & SP_DAMAGE) || 
-				(spark->flags & SP_POISON))
+		if ((part.flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
+			(part.flags & SP_DAMAGE) || 
+			(part.flags & SP_POISON))
+		{
+			int ds = part.size * (part.scalar / 2.0);
+
+			if (part.x + ds > DeadlyBounds.X1 && part.x - ds < DeadlyBounds.X2)
 			{
-				int ds = spark->size * (spark->scalar / 2.0);
-
-				if (spark->x + ds > DeadlyBounds.X1 && spark->x - ds < DeadlyBounds.X2)
+				if (part.y + ds > DeadlyBounds.Y1 && part.y - ds < DeadlyBounds.Y2)
 				{
-					if (spark->y + ds > DeadlyBounds.Y1 && spark->y - ds < DeadlyBounds.Y2)
+					if (part.z + ds > DeadlyBounds.Z1 && part.z - ds < DeadlyBounds.Z2)
 					{
-						if (spark->z + ds > DeadlyBounds.Z1 && spark->z - ds < DeadlyBounds.Z2)
-						{
-							if (spark->flags & SP_FIRE)
-								ItemBurn(LaraItem);
+						if (part.flags & SP_FIRE)
+							ItemBurn(LaraItem);
 
-							if (spark->flags & SP_DAMAGE)
-								DoDamage(LaraItem, 2);
+						if (part.flags & SP_DAMAGE)
+							DoDamage(LaraItem, 2);
 
-							if (spark->flags & SP_POISON)
-								Lara.Status.Poison += 5;
-						}
+						if (part.flags & SP_POISON)
+							Lara.Status.Poison += 5;
 					}
 				}
 			}
