@@ -9,26 +9,32 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+// NOTES:
+// ItemFlags[0]: Delay between darts in frame time.
+// ItemFlags[1]: Timer counter in frame time.
+
 namespace TEN::Entities::Traps
 {
 	constexpr auto DART_DEFAULT_DAMAGE = 25;
 	constexpr auto DART_DEFAULT_SPEED = BLOCK(0.25f);
-	constexpr auto DART_DEFAULT_DELAY = 30;
-	constexpr auto DART_DEFAULT_HOMMING_DELAY = 24;
+	constexpr auto DART_DEFAULT_DELAY = 32;
+	constexpr auto DART_DEFAULT_HOMING_DELAY = 24;
 
 	void InitializeDartEmitter(short itemNumber)
 	{
 		ItemInfo& item = g_Level.Items[itemNumber];
 
+		auto& delay = item.ItemFlags[0];
+
 		if (item.ObjectNumber == ID_HOMING_DART_EMITTER)
 		{
-			if (item.ItemFlags[0] == 0)
-				item.ItemFlags[0] = DART_DEFAULT_HOMMING_DELAY;
+			if (delay == 0)
+				delay = DART_DEFAULT_HOMING_DELAY;
 		}
 		else
 		{
-			if (item.ItemFlags[0] == 0)
-				item.ItemFlags[0] = DART_DEFAULT_DELAY;
+			if (delay == 0)
+				delay = DART_DEFAULT_DELAY;
 		}
 	}
 
@@ -83,14 +89,17 @@ namespace TEN::Entities::Traps
 		{
 			if (item.Active)
 			{
-				if (item.Timer > 0)
+				auto& delay =		item.ItemFlags[0];
+				auto& timer =		item.ItemFlags[1];
+
+				if (timer > 0)
 				{
-					item.Timer--;
+					timer--;
 					return;
 				}
 				else
 				{
-					item.Timer = item.ItemFlags[0];
+					timer = delay;
 				}
 			}
 
