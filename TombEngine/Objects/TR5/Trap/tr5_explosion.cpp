@@ -132,7 +132,7 @@ void ExplosionControl(short itemNumber)
 			auto collObjects = GetCollidedObjects(*item, true, true, BLOCK(2), ObjectCollectionMode::All);
 			if (!collObjects.IsEmpty())
 			{
-				for (auto* itemPtr : collObjects.ItemPtrs)
+				for (auto* itemPtr : collObjects.Items)
 				{
 					if (itemPtr->ObjectNumber >= ID_SMASH_OBJECT1 && itemPtr->ObjectNumber <= ID_SMASH_OBJECT16)
 					{
@@ -155,7 +155,7 @@ void ExplosionControl(short itemNumber)
 					}
 				}
 
-				for (auto* staticPtr : collObjects.StaticPtrs)
+				for (auto* staticPtr : collObjects.Statics)
 				{
 					if (StaticObjects[staticPtr->staticNumber].shatterType != ShatterType::None)
 					{
