@@ -354,6 +354,7 @@ void StartTraps(ObjectInfo* object)
 	object = &Objects[ID_DART_EMITTER];
 	if (object->loaded)
 	{
+		object->Initialize = InitializeDartEmitter;
 		object->control = DartEmitterControl;
 		object->drawRoutine = nullptr;
 		object->usingDrawAnimatingItem = false;
@@ -362,6 +363,7 @@ void StartTraps(ObjectInfo* object)
 	object = &Objects[ID_HOMING_DART_EMITTER];
 	if (object->loaded)
 	{
+		object->Initialize = InitializeDartEmitter;
 		object->control = DartEmitterControl;
 		object->drawRoutine = nullptr;
 		object->usingDrawAnimatingItem = false;

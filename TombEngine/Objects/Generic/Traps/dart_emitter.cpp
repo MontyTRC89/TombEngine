@@ -12,6 +12,25 @@
 namespace TEN::Entities::Traps
 {
 	constexpr auto DART_DEFAULT_DAMAGE = 25;
+	constexpr auto DART_DEFAULT_SPEED = BLOCK(0.25f);
+	constexpr auto DART_DEFAULT_DELAY = 30;
+	constexpr auto DART_DEFAULT_HOMMING_DELAY = 24;
+
+	void InitializeDartEmitter(short itemNumber)
+	{
+		ItemInfo& item = g_Level.Items[itemNumber];
+
+		if (item.ObjectNumber == ID_HOMING_DART_EMITTER)
+		{
+			if (item.ItemFlags[0] == 0)
+				item.ItemFlags[0] = DART_DEFAULT_HOMMING_DELAY;
+		}
+		else
+		{
+			if (item.ItemFlags[0] == 0)
+				item.ItemFlags[0] = DART_DEFAULT_DELAY;
+		}
+	}
 
 	void DartControl(short itemNumber)
 	{
@@ -58,50 +77,58 @@ namespace TEN::Entities::Traps
 
 	void DartEmitterControl(short itemNumber)
 	{
-		ItemInfo* item = &g_Level.Items[itemNumber];
+		ItemInfo& item = g_Level.Items[itemNumber];
 
-		if (item->Active)
+		if (TriggerActive(&item))
 		{
-			if (item->Timer > 0)
+			if (item.Active)
 			{
-				item->Timer--;
+				if (item.Timer > 0)
+				{
+					item.Timer--;
+					return;
+				}
+				else
+				{
+					item.Timer = item.ItemFlags[0];
+				}
+			}
+
+			int dartItemNumber = CreateItem();
+			if (dartItemNumber == NO_VALUE)
 				return;
-			}
-			else
-			{
-				item->Timer = 24;
-			}
+
+			ItemInfo& dartItem = g_Level.Items[dartItemNumber];
+			dartItem.ObjectNumber = ID_DARTS;
+			dartItem.RoomNumber = item.RoomNumber;
+
+			dartItem.Pose.Position.x = item.Pose.Position.x;
+			dartItem.Pose.Position.y = item.Pose.Position.y - CLICK(0.9);
+			dartItem.Pose.Position.z = item.Pose.Position.z;
+
+			InitializeItem(dartItemNumber);
+
+			dartItem.Pose.Orientation.x = item.Pose.Orientation.x - ANGLE(180.0f);
+			dartItem.Pose.Orientation.y = item.Pose.Orientation.y;
+			dartItem.Pose.Orientation.z = item.Pose.Orientation.z;
+			dartItem.Animation.Velocity.z = DART_DEFAULT_SPEED;
+			dartItem.TriggerFlags = item.TriggerFlags;
+			dartItem.Model.Color = item.Model.Color;
+
+			for (int i = 0; i < 4; i++)
+				TriggerDartSmoke(dartItem.Pose.Position.x, dartItem.Pose.Position.y, dartItem.Pose.Position.z, 0, 0, false);
+
+			AddActiveItem(dartItemNumber);
+			dartItem.Status = ITEM_ACTIVE;
+
+			SoundEffect(SFX_TR4_DART_SPIT, &dartItem.Pose);
 		}
-
-		int dartItemNumber = CreateItem();
-		if (dartItemNumber == NO_VALUE)
-			return;
-
-		ItemInfo* dartItem = &g_Level.Items[dartItemNumber];
-
-		dartItem->ObjectNumber = ID_DARTS;
-		dartItem->RoomNumber = item->RoomNumber;
-
-		dartItem->Pose.Position.x = item->Pose.Position.x;
-		dartItem->Pose.Position.y = item->Pose.Position.y - CLICK(0.9);
-		dartItem->Pose.Position.z = item->Pose.Position.z;
-
-		InitializeItem(dartItemNumber);
-
-		dartItem->Pose.Orientation.x = item->Pose.Orientation.x - ANGLE(180.0f);
-		dartItem->Pose.Orientation.y = item->Pose.Orientation.y;
-		dartItem->Pose.Orientation.z = item->Pose.Orientation.z;
-		dartItem->Animation.Velocity.z = BLOCK(0.25f);
-		dartItem->TriggerFlags = item->TriggerFlags;
-		dartItem->Model.Color = item->Model.Color;
-
-		for (int i = 0; i < 4; i++)
-			TriggerDartSmoke(dartItem->Pose.Position.x, dartItem->Pose.Position.y, dartItem->Pose.Position.z, 0, 0, false);
-
-		AddActiveItem(dartItemNumber);
-		dartItem->Status = ITEM_ACTIVE;
-
-		SoundEffect(SFX_TR4_DART_SPIT, &dartItem->Pose);
+		else
+		{
+			item.Status = ITEM_NOT_ACTIVE;
+			RemoveActiveItem(itemNumber, false);
+			item.Active = false;
+		}
 	}
 
 	void TriggerDartSmoke(int x, int y, int z, int xv, int zv, bool hit)
