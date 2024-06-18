@@ -21,15 +21,6 @@ namespace TEN::Entities::Traps
 		{
 		   item.Status = ITEM_ACTIVE;
 			AnimateItem(&item);
-
-			if (item.TriggerFlags == 666)
-			{
-				auto pos = GetJointPosition(item, 0);
-				SoundEffect(SFX_TR4_LIBRARY_COG_LOOP, (Pose*)&pos); // Shouldnt this be TR4_LIBRARY_COG_LOOP? Changed. Rollback if incorrect. Stranger1992 06/06/22
-
-				if (item.Animation.FrameNumber == GetAnimData(item).frameEnd)
-				   item.Flags &= 0xC1;
-			}
 		}
 		else if (item.TriggerFlags == 2)
 		{
