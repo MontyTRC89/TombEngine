@@ -1,24 +1,26 @@
 #include "framework.h"
-#include "tr4_joby_spikes.h"
-#include "Specific/level.h"
+#include "Objects/TR4/Trap/tr4_joby_spikes.h"
+
+#include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/control/control.h"
-#include "Game/animation.h"
-#include "Sound/sound.h"
-#include "Game/Lara/lara.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
 
+// TODO: Need to test and adapt formula for scaling to other heights.
+
 namespace TEN::Entities::Traps
 {
-    constexpr auto JOBY_SPIKES_DAMAGE = 8;
+    constexpr auto JOBY_SPIKES_HARM_DAMAGE          = 8;
     constexpr auto JOBY_SPIKES_EXTRA_ROTATION_SPEED = 2;
-    constexpr auto JOBY_SPIKES_SCALE_INCREMENT = 3;
-    constexpr auto JOBY_SPIKES_MAX_SCALE = 3328; //3 blocks + 1 click
-    //TODO: Need to test and adapt formula for scaling to other heights.
+    constexpr auto JOBY_SPIKES_SCALE_INCREMENT      = 3;
+    constexpr auto JOBY_SPIKES_MAX_SCALE            = BLOCK(3.25f);
 
     void InitializeJobySpikes(short itemNumber)
     {
@@ -26,24 +28,21 @@ namespace TEN::Entities::Traps
 
         auto& angleRotationSpeed    = item.ItemFlags[0];
         auto& spikeLength           = item.ItemFlags[1];
-        auto& clockworkDirection    = item.ItemFlags[2];
+        auto& clockworkDirection    = item.ItemFlags[2]; // ??
         auto& maxExtensionLength    = item.ItemFlags[3];
 
 		// Set bone mutators to EulerAngles identity by default.
 		for (auto& mutator : item.Model.Mutators)
             mutator.Scale.y = 0.0f;
 
-        item.Pose.Orientation.y = Random::GenerateInt(0, INT16_MAX) * 1024;
+        item.Pose.Orientation.y = Random::GenerateInt(0, INT16_MAX) * ANGLE(5.5f);
         clockworkDirection = Random::GenerateInt(0, 1);
 
-        auto probe = GetPointCollision(item);
-
-        int floorHeight = probe.GetFloorHeight();
-        int ceilingHeight = probe.GetCeilingHeight();
-        maxExtensionLength = (short)(4096 * (floorHeight - ceilingHeight) / JOBY_SPIKES_MAX_SCALE);
+        auto pointColl = GetPointCollision(item);
+        maxExtensionLength = (short)(4096 * (pointColl.GetFloorHeight() - pointColl.GetCeilingHeight()) / JOBY_SPIKES_MAX_SCALE);
     }
 
-    void JobySpikesControl(short itemNumber)
+    void ControlJobySpikes(short itemNumber)
     {
         auto& item = g_Level.Items[itemNumber];
 
@@ -58,22 +57,22 @@ namespace TEN::Entities::Traps
         SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item.Pose);
         auto frameData = GetFrameInterpData(*LaraItem);
 
-        //Damage routine
-        int LaraY = LaraItem->Pose.Position.y + frameData.FramePtr0->BoundingBox.Y1;
-        int spikeY = JOBY_SPIKES_MAX_SCALE * spikeLength / 4096;
+        // Damage player.
+        int playerHeight = LaraItem->Pose.Position.y + frameData.FramePtr0->BoundingBox.Y1;
+        int spikeHeight = JOBY_SPIKES_MAX_SCALE * spikeLength / 4096;
 
         if (LaraItem->HitPoints > 0)
         {
-            if (item.Pose.Position.y + spikeY > LaraY)
+            if (item.Pose.Position.y + spikeHeight > playerHeight)
             {
                 if (abs(item.Pose.Position.x - LaraItem->Pose.Position.x) < BLOCK(0.5))
                 {
                     if (abs(item.Pose.Position.z - LaraItem->Pose.Position.z) < BLOCK(0.5))
                     {
-                        DoDamage(LaraItem, JOBY_SPIKES_DAMAGE);
+                        DoDamage(LaraItem, JOBY_SPIKES_HARM_DAMAGE);
 
                         int bloodPosX = LaraItem->Pose.Position.x + Random::GenerateInt(-64, 64);
-                        int bloodPosY = LaraY + Random::GenerateInt( 0, item.Pose.Position.y - LaraY + spikeY);
+                        int bloodPosY = playerHeight + Random::GenerateInt( 0, item.Pose.Position.y - playerHeight + spikeHeight);
                         int bloodPosZ = LaraItem->Pose.Position.z + Random::GenerateInt(-64, 64);
 
                         DoBloodSplat(bloodPosX, bloodPosY, bloodPosZ, Random::GenerateInt (2,5), 2 * GetRandomControl(), item.RoomNumber);
@@ -83,7 +82,7 @@ namespace TEN::Entities::Traps
             }
         }
 
-        //Rotation routine
+        // Rotate.
         if (clockworkDirection == 1)
         {
             if (angleRotationSpeed < 4096)
@@ -100,7 +99,7 @@ namespace TEN::Entities::Traps
 
         item.Pose.Orientation.y += angleRotationSpeed;
 
-		// Scale routine
+		// Scale.
 		if (spikeLength)
 		{
             for (auto& mutator : item.Model.Mutators)

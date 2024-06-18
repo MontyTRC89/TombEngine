@@ -6,6 +6,6 @@ struct CollisionInfo;
 namespace TEN::Entities::Traps
 {
 	void InitializeMine(short itemNumber);
-	void MineControl(short itemNumber);
-	void MineCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void ControlMine(short itemNumber);
+	void CollideMine(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
 }

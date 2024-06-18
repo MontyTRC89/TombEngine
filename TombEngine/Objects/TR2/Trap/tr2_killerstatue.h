@@ -3,5 +3,5 @@
 namespace TEN::Entities::Traps
 {
 	void InitializeKillerStatue(short itemNumber);
-	void KillerStatueControl(short itemNumber);
+	void ControlKillerStatue(short itemNumber);
 }

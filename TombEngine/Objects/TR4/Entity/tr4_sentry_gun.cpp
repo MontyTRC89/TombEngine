@@ -19,23 +19,21 @@
 using namespace TEN::Gui;
 
 // NOTES:
-// item.ItemFlags[0] = Duration of the shooting flash light
-// item.ItemFlags[1] = Angle of Radar mesh
-// item.ItemFlags[2] = Angle of gun Barrel mesh
-// item.ItemFlags[3] = ID of the item that deactivate the sentry gun if it's in Lara's inventory.
+// item.ItemFlags[0] = Gun flash duration in frame time.
+// item.ItemFlags[1] = Radar angle.
+// item.ItemFlags[2] = Barrel angle.
+// item.ItemFlags[3] = Object ID of inventory item which deactivates sentry gun if present.
 
 namespace TEN::Entities::TR4
 {
-	constexpr auto SENTRYGUN_DAMAGE_SHOOT = 5;
+	constexpr auto SENTRYGUN_SHOT_DAMAGE = 5;
 
-	const auto SentryGunRadarJoints = std::vector<unsigned int>{ 3 };
-	const auto SentryGunBarrelJoints = std::vector<unsigned int>{ 4 };
-	const auto SentryGunWeaknessJoints = std::vector<unsigned int>{ 6 };
-	const auto SentryGunFlashJoints = std::vector<unsigned int>{ 8 };
-
-	const auto SentryGunBodyJoints = std::vector<unsigned int>{ 7, 9 };
+	const auto SentryGunRadarJoints	  = std::vector<unsigned int>{ 3 };
+	const auto SentryGunBarrelJoints  = std::vector<unsigned int>{ 4 };
+	const auto SentryGunFuelCanJoints = std::vector<unsigned int>{ 6 };
+	const auto SentryGunFlashJoints	  = std::vector<unsigned int>{ 8 };
+	const auto SentryGunBodyJoints	  = std::vector<unsigned int>{ 7, 9 };
 	
-
 	const auto SentryGunFlameOffset = Vector3i(-140, 0, 0);
 	const auto SentryGunBite = CreatureBiteInfo(Vector3::Zero, 8);
 
@@ -45,20 +43,20 @@ namespace TEN::Entities::TR4
 
 		InitializeCreature(itemNumber);
 
-		auto& flashLightTimer			= item.ItemFlags[0];
-		auto& angleRadar				= item.ItemFlags[1];
-		auto& angleGunBarrel			= item.ItemFlags[2];
-		auto& deactivatorItemID		= item.ItemFlags[3];
+		auto& flashDuration = item.ItemFlags[0];
+		auto& radarAngle = item.ItemFlags[1];
+		auto& barrelAngle = item.ItemFlags[2];
+		auto& deactivatorItemObjctID = item.ItemFlags[3];
 
-		flashLightTimer = 0;
-		angleRadar = 768;
-		angleGunBarrel = 0;
+		flashDuration = 0;
+		radarAngle = 768;
+		barrelAngle = 0;
 
-		if (deactivatorItemID == 0)
-			deactivatorItemID = ID_PUZZLE_ITEM5;
+		if (deactivatorItemObjctID == 0)
+			deactivatorItemObjctID = ID_PUZZLE_ITEM5;
 	}
 
-	void SentryGunControl(short itemNumber)
+	void ControlSentryGun(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
 			return;
@@ -66,103 +64,110 @@ namespace TEN::Entities::TR4
 		auto& item = g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(&item);
 
-		auto& flashLightTimer			= item.ItemFlags[0];
-		auto& angleRadar				= item.ItemFlags[1];
-		auto& angleGunBarrel			= item.ItemFlags[2];
-		auto& deactivatorItemID		= item.ItemFlags[3];
+		auto& flashDuration = item.ItemFlags[0];
+		auto& radarAngle = item.ItemFlags[1];
+		auto& barrelAngle = item.ItemFlags[2];
+		auto& deactivatorItemObjectID = item.ItemFlags[3];
 
-		int anglePitchBody = 0;
+		int headingAngle = 0;
 
-		if (!creature)
+		// TODO: Why this check?
+		if (creature == nullptr)
 			return;
 
 		// Was fuel can exploded?
-		if (item.MeshBits.Test(SentryGunWeaknessJoints))
+		if (item.MeshBits.Test(SentryGunFuelCanJoints))
 		{
-			if (flashLightTimer)
+			if (flashDuration)
 			{
 				auto pos = GetJointPosition(item, SentryGunBite);
-				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * flashLightTimer + 12, 24, 16, 4);
-				flashLightTimer--;
+				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * flashDuration + 12, 24, 16, 4);
+				flashDuration--;
 			}
 
-			if (flashLightTimer & 1)
+			if (flashDuration & 1)
+			{
 				item.MeshBits.Set(SentryGunFlashJoints);
+			}
 			else
+			{
 				item.MeshBits.Clear(SentryGunFlashJoints);
+			}
 
 			if (item.TriggerFlags == 0)
 			{
 				item.Pose.Position.y -= CLICK(2);
 
-				AI_INFO AI;
-				CreatureAIInfo(&item, &AI);
+				AI_INFO ai;
+				CreatureAIInfo(&item, &ai);
 
 				item.Pose.Position.y += CLICK(2);
 
-				int deltaAngle = AI.angle - creature->JointRotation[0];
+				int deltaAngle = ai.angle - creature->JointRotation[0];
 
-				AI.ahead = true;
-				if (deltaAngle <= -ANGLE(90.0f) || deltaAngle >= ANGLE(90.0f))
-					AI.ahead = false;
+				ai.ahead = true;
+				if (deltaAngle <= ANGLE(-90.0f) || deltaAngle >= ANGLE(90.0f))
+					ai.ahead = false;
 
-				if (Targetable(&item, &AI))
+				if (Targetable(&item, &ai))
 				{
-					if (AI.distance < pow(BLOCK(9), 2))
+					if (ai.distance < SQUARE(BLOCK(9)))
 					{
-						if (!g_Gui.IsObjectInInventory(deactivatorItemID) && !flashLightTimer)
+						if (!g_Gui.IsObjectInInventory(deactivatorItemObjectID) && !flashDuration)
 						{
-							if (AI.distance <= pow(BLOCK(2), 2))
+							if (ai.distance <= SQUARE(BLOCK(2)))
 							{
-								// Throw fire
+								// Throw fire.
 								ThrowFire(itemNumber, 7, SentryGunFlameOffset, SentryGunFlameOffset);
-								anglePitchBody = phd_sin((GlobalCounter & 0x1F) * 2048) * 4096;
+								headingAngle = phd_sin((GlobalCounter & 0x1F) * 2048) * 4096; // TODO: Demagic.
 							}
 							else
 							{
-								// Shot to Lara with bullets
-								anglePitchBody = 0;
-								flashLightTimer = 2;
+								// Shoot player.
+								headingAngle = 0;
+								flashDuration = 2;
 
-								ShotLara(&item, &AI, SentryGunBite, creature->JointRotation[0], SENTRYGUN_DAMAGE_SHOOT);
+								ShotLara(&item, &ai, SentryGunBite, creature->JointRotation[0], SENTRYGUN_SHOT_DAMAGE);
 								SoundEffect(SFX_TR4_AUTOGUNS, &item.Pose);
 
-								angleGunBarrel += 256;
-								if (angleGunBarrel > 6144)
-									angleGunBarrel = 6144;
+								barrelAngle += ANGLE(1.5f);
+								if (barrelAngle > ANGLE(45.0f))
+									barrelAngle = ANGLE(45.0f);
 							}
 						}
 
-						deltaAngle = anglePitchBody + AI.angle - creature->JointRotation[0];
+						deltaAngle = (headingAngle + ai.angle) - creature->JointRotation[0];
 						if (deltaAngle <= ANGLE(10.0f))
 						{
-							if (deltaAngle < -ANGLE(10.0f))
-								deltaAngle = -ANGLE(10.0f);
+							if (deltaAngle < ANGLE(-10.0f))
+								deltaAngle = ANGLE(-10.0f);
 						}
 						else
+						{
 							deltaAngle = ANGLE(10.0f);
+						}
 
 						creature->JointRotation[0] += deltaAngle;
 
-						CreatureJoint(&item, 1, -AI.xAngle);
+						CreatureJoint(&item, 1, -ai.xAngle);
 					}
 				}
 
-				// Rotating gunbarrel
-				angleGunBarrel -= 32;
-				if (angleGunBarrel < 0)
-					angleGunBarrel = 0;
+				// Rotate barrel.
+				barrelAngle -= 32;
+				if (barrelAngle < 0)
+					barrelAngle = 0;
 
-				creature->JointRotation[3] += angleGunBarrel;
+				creature->JointRotation[3] += barrelAngle;
 
-				// Rotating radar
-				creature->JointRotation[2] += angleRadar;
-				if (creature->JointRotation[2] > ANGLE(90.0f) || creature->JointRotation[2] < -ANGLE(90.0f))
-					angleRadar = -angleRadar;
+				// Rotate radar.
+				creature->JointRotation[2] += radarAngle;
+				if (creature->JointRotation[2] > ANGLE(90.0f) || creature->JointRotation[2] < ANGLE(-90.0f))
+					radarAngle = -radarAngle;
 			}
 			else
 			{
-				// Stuck sentry gun 
+				// Stuck sentry gun.
 				CreatureJoint(&item, 0, (GetRandomControl() & 0x7FF) - 1024);
 				CreatureJoint(&item, 1, ANGLE(45.0f));
 				CreatureJoint(&item, 2, (GetRandomControl() & 0x3FFF) - ANGLE(45.0f));
@@ -174,7 +179,7 @@ namespace TEN::Entities::TR4
 			DisableEntityAI(itemNumber);
 			KillItem(itemNumber);
 
-			item.Flags |= 1u;
+			item.Flags |= 1;
 			item.Status = ITEM_DEACTIVATED;
 
 			RemoveAllItemsInRoom(item.RoomNumber, ID_SMOKE_EMITTER_BLACK);

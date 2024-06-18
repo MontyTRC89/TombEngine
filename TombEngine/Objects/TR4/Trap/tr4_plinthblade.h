@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::Traps
 {
-	void PlinthBladeControl(short itemNumber);
+	void ControlPlinthBlade(short itemNumber);
 }

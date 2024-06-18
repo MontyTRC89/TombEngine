@@ -13,42 +13,46 @@ using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::Traps
 {
-	void FallingCeilingControl(short itemNumber)
+	constexpr auto FALLING_CEILING_HARM_DAMAGE = 300;
+
+	void ControlFallingCeiling(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
-		if (item->Animation.ActiveState)
+		if (item.Animation.ActiveState)
 		{
-			if (item->Animation.ActiveState == 1 && item->TouchBits.TestAny())
-				DoDamage(LaraItem, 300);
+			if (item.Animation.ActiveState == 1 && item.TouchBits.TestAny())
+				DoDamage(LaraItem, FALLING_CEILING_HARM_DAMAGE);
 		}
 		else
 		{
-			item->Animation.TargetState = 1;
-			item->Animation.IsAirborne = true;
+			item.Animation.TargetState = 1;
+			item.Animation.IsAirborne = true;
 		}
 
-		AnimateItem(item);
+		AnimateItem(&item);
 
-		if (item->Status == ITEM_DEACTIVATED)
+		if (item.Status == ITEM_DEACTIVATED)
+		{
 			RemoveActiveItem(itemNumber);
+		}
 		else
 		{
-			auto probe = GetPointCollision(*item);
+			auto pointColl = GetPointCollision(item);
 
-			item->Floor = probe.GetFloorHeight();
+			item.Floor = pointColl.GetFloorHeight();
 
-			if (probe.GetRoomNumber() != item->RoomNumber)
-				ItemNewRoom(itemNumber, probe.GetRoomNumber());
+			if (pointColl.GetRoomNumber() != item.RoomNumber)
+				ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
-			if (item->Animation.ActiveState == 1)
+			if (item.Animation.ActiveState == 1)
 			{
-				if (item->Pose.Position.y >= item->Floor)
+				if (item.Pose.Position.y >= item.Floor)
 				{
-					item->Pose.Position.y = item->Floor;
-					item->Animation.TargetState = 2;
-					item->Animation.IsAirborne = false;
-					item->Animation.Velocity.y = 0.0f;
+					item.Pose.Position.y = item.Floor;
+					item.Animation.TargetState = 2;
+					item.Animation.IsAirborne = false;
+					item.Animation.Velocity.y = 0.0f;
 				}
 			}
 		}

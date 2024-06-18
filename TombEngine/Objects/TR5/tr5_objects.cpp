@@ -853,7 +853,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeVentilator;
-		obj->control = VentilatorControl;
+		obj->control = ControlVentilator;
 		obj->SetHitEffect(true);
 	}
 
@@ -861,7 +861,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeVentilator;
-		obj->control = VentilatorControl;
+		obj->control = ControlVentilator;
 		obj->SetHitEffect(true);
 	}
 
@@ -884,7 +884,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->collision = TrapCollision;
-		obj->control = FallingCeilingControl;
+		obj->control = ControlFallingCeiling;
 	}
 
 	obj = &Objects[ID_ROLLINGBALL];
@@ -934,7 +934,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeExplosion;
-		obj->control = ExplosionControl;
+		obj->control = ControlExplosion;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -983,8 +983,8 @@ static void StartSwitch(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeWreckingBall;
-		obj->collision = WreckingBallCollision;
-		obj->control = WreckingBallControl;
+		obj->collision = CollideWreckingBall;
+		obj->control = ControlWreckingBall;
 		obj->SetHitEffect(true);
 	}
 }

@@ -535,7 +535,7 @@ static void StartTrap(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSpinningBlade;
-		obj->control = SpinningBladeControl;
+		obj->control = ControlSpinningBlade;
 		obj->collision = ObjectCollision;
 	}
 
@@ -549,7 +549,7 @@ static void StartTrap(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeKillerStatue;
-		obj->control = KillerStatueControl;
+		obj->control = ControlKillerStatue;
 		obj->collision = ObjectCollision;
 		obj->SetHitEffect(true);
 	}

@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::Traps
 {
-	void FallingCeilingControl(short itemNumber);
+	void ControlFallingCeiling(short itemNumber);
 }

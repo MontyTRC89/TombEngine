@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::Traps
 {
-	void CatwalkBladeControl(short itemNumber);
+	void ControlCatwalkBlade(short itemNumber);
 }

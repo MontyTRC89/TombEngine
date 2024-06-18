@@ -347,7 +347,7 @@ void StartTraps(ObjectInfo* object)
 	if (object->loaded)
 	{
 		object->collision = ObjectCollision;
-		object->control = DartControl;
+		object->control = ControlDart;
 		object->shadowType = ShadowMode::All;
 	}
 
@@ -355,7 +355,7 @@ void StartTraps(ObjectInfo* object)
 	if (object->loaded)
 	{
 		object->Initialize = InitializeDartEmitter;
-		object->control = DartEmitterControl;
+		object->control = ControlDartEmitter;
 		object->drawRoutine = nullptr;
 		object->usingDrawAnimatingItem = false;
 	}
@@ -364,7 +364,7 @@ void StartTraps(ObjectInfo* object)
 	if (object->loaded)
 	{
 		object->Initialize = InitializeDartEmitter;
-		object->control = DartEmitterControl;
+		object->control = ControlDartEmitter;
 		object->drawRoutine = nullptr;
 		object->usingDrawAnimatingItem = false;
 	}

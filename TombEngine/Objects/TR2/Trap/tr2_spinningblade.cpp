@@ -24,7 +24,7 @@ namespace TEN::Entities::Traps
 		SetAnimation(item, 3);
 	}
 
-	void SpinningBladeControl(short itemNumber)
+	void ControlSpinningBlade(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -42,10 +42,10 @@ namespace TEN::Entities::Traps
 				int relFloorHeight = abs(floorHeight - item.Pose.Position.y);
 				int relCeilHeight = abs(aheadPointColl.GetCeilingHeight() - floorHeight);
 
-				if (floorHeight == NO_HEIGHT || //Is a wall
-					aheadPointColl.GetSector().Stopper || //Is a stopper flag tile
-					relCeilHeight < BLOCK(1) || // Ceiling is lower than 1 BLOCK
-					relFloorHeight >= CLICK(2.5)) // There is a step
+				if (floorHeight == NO_HEIGHT || // Is wall.
+					aheadPointColl.GetSector().Stopper || // Sector has stopper flag.
+					relCeilHeight < BLOCK(1) || // Ceiling is lower than 1 block.
+					relFloorHeight >= CLICK(2.5)) // Is step.
 
 					item.Animation.TargetState = 1;
 			}

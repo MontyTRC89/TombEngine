@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::Traps
 {
-	void HammerControl(short itemNumber);
+	void ControlHammer(short itemNumber);
 }

@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::Traps
 {
-	void MovingBladeControl(short itemNumber);
+	void ControlMovingBlade(short itemNumber);
 }

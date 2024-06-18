@@ -3,5 +3,5 @@
 namespace TEN::Entities::Traps
 {
 	void InitializeFourBlades(short itemNumber);
-	void FourBladesControl(short itemNumber);
+	void ControlFourBlades(short itemNumber);
 }

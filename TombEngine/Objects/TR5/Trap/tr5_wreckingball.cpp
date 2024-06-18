@@ -19,20 +19,18 @@
 
 using namespace TEN::Effects::Environment;
 
-
-// TODO: Refactor code.
+// TODO: Refactor.
 //			- Modularize.
-//			- Reduce magic numbers.
-//			- Revise logic to remove constrains and allow it being in different levels structures.
-//			- Edit management of the base object (item2).
-//			- Find a method to make the light effect optional for the level designer.
+//			- Remove all legacy magic garbage.
+//			- Revise logic to remove constrains and allow it to move around different structures.
+//			- Change management of base object (item2).
+//			- Make light effect optional.
 // 
 // NOTES
 // ItemFlags[0] = ??
 // ItemFlags[1] = ??
 // ItemFlags[2] = ??
-// ItemFlags[3] = ID of the base (by default ANIMATING16)
-
+// ItemFlags[3] = Base object ID (by default ANIMATING16)
 
 namespace TEN::Entities::Traps
 {
@@ -42,68 +40,63 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
+		auto pointColl = GetPointCollision(item);
+
 		item.ItemFlags[3] = FindAllItems(ID_ANIMATING16)[0];
+		item.Pose.Position.y = pointColl.GetCeilingHeight() + 1644;
 
-		short RoomNumber = item.RoomNumber;
-		item.Pose.Position.y = GetCeiling(GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &RoomNumber), item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z) + 1644;
-		GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &RoomNumber);
-
-		if (RoomNumber != item.RoomNumber)
-			ItemNewRoom(itemNumber, RoomNumber);
+		if (pointColl.GetRoomNumber() != item.RoomNumber)
+			ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 	}
 
-	void WreckingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void CollideWreckingBall(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		if (TestBoundsCollide(&item, laraItem, coll->Setup.Radius))
+		if (TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 		{
-			int x = laraItem->Pose.Position.x;
-			int y = laraItem->Pose.Position.y;
-			int z = laraItem->Pose.Position.z;
+			auto prevPos = playerItem->Pose.Position;
 
 			bool test = false;
-			if ((x & WALL_MASK) > CLICK(1) &&
-				(x & WALL_MASK) < CLICK(3) &&
-				(z & WALL_MASK) > CLICK(1) &&
-				(z & WALL_MASK) < CLICK(3))
+			if ((prevPos.x & WALL_MASK) > CLICK(1) &&
+				(prevPos.x & WALL_MASK) < CLICK(3) &&
+				(prevPos.z & WALL_MASK) > CLICK(1) &&
+				(prevPos.z & WALL_MASK) < CLICK(3))
 			{
 				test = true;
 			}
 
 			int damage = (item.Animation.Velocity.y > 0.0f) ? 96 : 0;
 
-			if (ItemPushItem(&item, laraItem, coll, coll->Setup.EnableSpasm, 1))
+			if (ItemPushItem(&item, playerItem, coll, coll->Setup.EnableSpasm, 1))
 			{
 				if (test)
-					DoDamage(laraItem, INT_MAX);
+				{
+					DoDamage(playerItem, INT_MAX);
+				}
 				else
-					DoDamage(laraItem, damage);
+				{
+					DoDamage(playerItem, damage);
+				}
 
-				x -= laraItem->Pose.Position.x;
-				y -= laraItem->Pose.Position.y;
-				z -= laraItem->Pose.Position.z;
+				prevPos -= playerItem->Pose.Position;
 
-				if (damage)
+				if (damage != 0)
 				{
 					for (int i = 14 + (GetRandomControl() & 3); i > 0; --i)
 					{
-						TriggerBlood(laraItem->Pose.Position.x + (GetRandomControl() & 63) - 32, laraItem->Pose.Position.y - (GetRandomControl() & 511) - 256,
-							laraItem->Pose.Position.z + (GetRandomControl() & 63) - 32, -1, 1);
+						TriggerBlood(playerItem->Pose.Position.x + (GetRandomControl() & 63) - 32, playerItem->Pose.Position.y - (GetRandomControl() & 511) - 256,
+							playerItem->Pose.Position.z + (GetRandomControl() & 63) - 32, -1, 1);
 					}
 				}
 
 				if (!coll->Setup.EnableObjectPush || test)
-				{
-					laraItem->Pose.Position.x += x;
-					laraItem->Pose.Position.y += y;
-					laraItem->Pose.Position.z += z;
-				}
+					playerItem->Pose.Position += prevPos;
 			}
 		}
 	}
 
-	void WreckingBallControl(short itemNumber)
+	void ControlWreckingBall(short itemNumber)
 	{
 		int x, z, oldX, oldZ, wx, wz, flagX, flagZ, height, dx, dz, ceilingX, ceilingZ, adx, adz;
 		short room;
@@ -158,15 +151,23 @@ namespace TEN::Entities::Traps
 			wx = 0;
 
 			if (dx < 0)
+			{
 				wx = -1024;
+			}
 			else if (dx > 0)
+			{
 				wx = 1024;
+			}
 			wz = 0;
 
 			if (dz < 0)
+			{
 				wz = -1024;
+			}
 			else if (dz > 0)
+			{
 				wz = 1024;
+			}
 
 			room = item.RoomNumber;
 			ceilingX = GetCeiling(GetFloor(item.Pose.Position.x + wx, item2.Pose.Position.y, item.Pose.Position.z, &room), item.Pose.Position.x + wx, item2.Pose.Position.y, item.Pose.Position.z);
@@ -174,21 +175,33 @@ namespace TEN::Entities::Traps
 
 			ceilingZ = GetCeiling(GetFloor(item.Pose.Position.x, item2.Pose.Position.y, item.Pose.Position.z + wz, &room), item.Pose.Position.x, item2.Pose.Position.y, item.Pose.Position.z + wz);
 			if (ceilingX <= item2.Pose.Position.y && ceilingX != NO_HEIGHT)
+			{
 				flagX = 1;
+			}
 			else
+			{
 				flagX = 0;
+			}
 
 			if (ceilingZ <= item2.Pose.Position.y && ceilingZ != NO_HEIGHT)
+			{
 				flagZ = 1;
+			}
 			else
+			{
 				flagZ = 0;
+			}
 
 			if (!item.ItemFlags[0])
 			{
 				if (flagX && dx && (abs(dx) > abs(dz) || !flagZ || GetRandomControl() & 1))
+				{
 					item.ItemFlags[0] = 1;
+				}
 				else if (flagZ && dz)
+				{
 					item.ItemFlags[0] = 2;
+				}
 			}
 
 			if (item.ItemFlags[0] == 1)
@@ -200,11 +213,17 @@ namespace TEN::Entities::Traps
 					adx = 32;
 
 				if (dx > 0)
+				{
 					item.Pose.Position.x += adx;
+				}
 				else if (dx < 0)
+				{
 					item.Pose.Position.x -= adx;
+				}
 				else
+				{
 					item.ItemFlags[0] = 0;
+				}
 			}
 
 			if (item.ItemFlags[0] == 2)
@@ -216,11 +235,17 @@ namespace TEN::Entities::Traps
 					adz = 32;
 
 				if (dz > 0)
+				{
 					item.Pose.Position.z += adz;
+				}
 				else if (dz < 0)
+				{
 					item.Pose.Position.z -= adz;
+				}
 				else
+				{
 					item.ItemFlags[0] = 0;
+				}
 			}
 
 			if (item.ItemFlags[1] == -1 && (oldX != item.Pose.Position.x || oldZ != item.Pose.Position.z))
@@ -247,9 +272,13 @@ namespace TEN::Entities::Traps
 		else if (item.ItemFlags[1] == 1)
 		{
 			if (!item.TriggerFlags)
+			{
 				--item.TriggerFlags;
+			}
 			else if (!item.Animation.ActiveState)
+			{
 				item.Animation.TargetState = 1;
+			}
 			else if (item.Animation.FrameNumber == GetAnimData(item).frameEnd)
 			{
 				SoundEffect(SFX_TR5_BASE_CLAW_DROP, &item.Pose);
@@ -280,7 +309,9 @@ namespace TEN::Entities::Traps
 				}
 			}
 			else if (height - item.Pose.Position.y < 1536 && item.Animation.ActiveState)
+			{
 				item.Animation.TargetState = 0;
+			}
 		}
 		else if (item.ItemFlags[1] == 3)
 		{
@@ -307,7 +338,9 @@ namespace TEN::Entities::Traps
 				}
 			}
 			else if (!item.ItemFlags[0])
+			{
 				SoundEffect(SFX_TR5_BASE_CLAW_WINCH_UP_LOOP, &item.Pose);
+			}
 		}
 
 		item2.Pose.Position.x = item.Pose.Position.x;

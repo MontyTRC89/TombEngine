@@ -1,20 +1,21 @@
 #include "framework.h"
-#include "tr4_plough.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Objects/TR4/Trap/tr4_plough.h"
+
 #include "Game/animation.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
+#include "Specific/level.h"
 
 namespace TEN::Entities::Traps
 {
 	void InitializePlough(short itemNumber)
 	{
-		auto & item = g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
 		item.ItemFlags[4] = 1;
 	}
 
-	void PloughControl(short itemNumber)
+	void ControlPlough(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -26,6 +27,8 @@ namespace TEN::Entities::Traps
 			AnimateItem(&item);
 		}
 		else
+		{
 			*((int*)&item.ItemFlags) = 0;
+		}
 	}
 }

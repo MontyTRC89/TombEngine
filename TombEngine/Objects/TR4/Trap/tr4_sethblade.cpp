@@ -35,7 +35,7 @@ namespace TEN::Entities::Traps
 		item.ItemFlags[4] = 1;
 	}
 
-	void SethBladeControl(short itemNumber)
+	void ControlSethBlade(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 

@@ -706,10 +706,9 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 		item1->Pose.Position.Lerp(item0->Pose.Position + newDeltaPos, SOFT_PUSH_LERP_ALPHA);
 	}
 	// Snap to new position.
-	else
+	else if (coll->Setup.EnableObjectPush)
 	{
-		if (coll->Setup.EnableObjectPush)
-			item1->Pose.Position = item0->Pose.Position + newDeltaPos;
+		item1->Pose.Position = item0->Pose.Position + newDeltaPos;
 	}
 
 	if (item1->IsLara() && enableSpasm && bounds.GetHeight() > CLICK(1))

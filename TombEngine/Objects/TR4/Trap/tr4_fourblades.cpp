@@ -1,20 +1,22 @@
 #include "framework.h"
-#include "tr4_fourblades.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Objects/TR4/Trap/tr4_fourblades.h"
+
 #include "Game/animation.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
+#include "Specific/level.h"
 
 // NOTES:
-// item.ItemFlags[0] = Meshes that hurts Lara
+// item.ItemFlags[0] = Damage joints.
 // item.ItemFlags[3] = Damage.
-// item.ItemFlags[4] = if 1, it won't push Lara away when collides.
+// item.ItemFlags[4] = Push player (bool).
 
 namespace TEN::Entities::Traps
 {
-	constexpr auto FOUR_BLADES_DAMAGE_EMERGE = 20;
-	constexpr auto FOUR_BLADES_DAMAGE_CUT = 200;
-	constexpr auto FOUR_BLADES_JOINT = MESH_BITS(1) | MESH_BITS(2) | MESH_BITS(3) | MESH_BITS(4);
+	constexpr auto FOUR_BLADES_EMERGE_HARM_DAMAGE = 20;
+	constexpr auto FOUR_BLADES_IDLE_HARM_DAMAGE	  = 200;
+
+	constexpr auto FOUR_BLADES_HARM_JOINTS = MESH_BITS(1) | MESH_BITS(2) | MESH_BITS(3) | MESH_BITS(4);
 
 	void InitializeFourBlades(short itemNumber)
 	{
@@ -23,7 +25,7 @@ namespace TEN::Entities::Traps
 		item.ItemFlags[4] = 1;
 	}
 
-	void FourBladesControl(short itemNumber)
+	void ControlFourBlades(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
@@ -44,15 +46,15 @@ namespace TEN::Entities::Traps
 			}
 			else
 			{
-				item.ItemFlags[0] = FOUR_BLADES_JOINT;
+				item.ItemFlags[0] = FOUR_BLADES_HARM_JOINTS;
 
 				if (frameNumber >= 6 && frameNumber <= 7)
 				{
-					item.ItemFlags[3] = FOUR_BLADES_DAMAGE_EMERGE;	
+					item.ItemFlags[3] = FOUR_BLADES_EMERGE_HARM_DAMAGE;	
 				}
 				else if (frameNumber >= 55 && frameNumber <= 57)
 				{
-					item.ItemFlags[3] = FOUR_BLADES_DAMAGE_CUT;
+					item.ItemFlags[3] = FOUR_BLADES_IDLE_HARM_DAMAGE;
 				}
 			}
 
