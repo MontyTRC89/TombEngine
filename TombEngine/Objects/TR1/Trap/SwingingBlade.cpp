@@ -57,6 +57,17 @@ namespace TEN::Entities::Traps
 				// Unset harm joints.
 				item.ItemFlags[0] = 0;
 			}
+			else
+			{
+				if (item.Animation.AnimNumber == GetAnimIndex(item, SWINGING_BLADE_ANIM_DISABLED) &&
+					item.Animation.FrameNumber == GetAnimData(item).frameEnd)
+				{
+					item.Flags &= 0xC1;
+					RemoveActiveItem(itemNumber, false);
+					item.Active = false;
+					item.Status = ITEM_NOT_ACTIVE;
+				}
+			}
 		}
 
 		AnimateItem(&item);
