@@ -73,8 +73,8 @@
 // Shatters
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
 
-using namespace TEN::Effects::SmokeEmitter;
 using namespace TEN::Effects::EmberEmitter;
+using namespace TEN::Effects::SmokeEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Traps::TR5;
@@ -734,7 +734,7 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSmokeEmitter;
-		obj->control = SmokeEmitterControl;
+		obj->control = ControlSmokeEmitter;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -743,7 +743,7 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSmokeEmitter;
-		obj->control = SmokeEmitterControl;
+		obj->control = ControlSmokeEmitter;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -752,7 +752,7 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSmokeEmitter;
-		obj->control = SmokeEmitterControl;
+		obj->control = ControlSmokeEmitter;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
