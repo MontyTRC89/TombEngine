@@ -38,6 +38,8 @@ using namespace TEN::Math;
 namespace TEN::Effects::SmokeEmitter
 {
 	constexpr auto SMOKE_VISIBILITY_DISTANCE_MAX = BLOCK(16);
+	constexpr auto SMOKE_ACCEL_MAX = 4096;
+	constexpr auto BUBBLES_DEFAULT_RADIUS = 32;
 
 	enum SmokeEmitterFlags
 	{
@@ -49,26 +51,25 @@ namespace TEN::Effects::SmokeEmitter
 		auto& part = *GetFreeParticle();
 		part.on = true;
 
-		// TODO: Convert from constant normal color representation to legacy.
 		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
 		{
-			part.sR = 96;
-			part.sG = 96;
-			part.sB = 96;
+			part.sR = 0.40f * UCHAR_MAX;
+			part.sG = 0.40f * UCHAR_MAX;
+			part.sB = 0.40f * UCHAR_MAX;
 
-			part.dR = 96;
-			part.dG = 96;
-			part.dB = 96;
+			part.dR = 0.40f * UCHAR_MAX;
+			part.dG = 0.40f * UCHAR_MAX;
+			part.dB = 0.40f * UCHAR_MAX;
 		}
 		else if (item.ObjectNumber == ID_SMOKE_EMITTER_WHITE)
 		{
-			part.sR = 96;
-			part.sG = 96;
-			part.sB = 96;
+			part.sR = 0.40f * UCHAR_MAX;
+			part.sG = 0.40f * UCHAR_MAX;
+			part.sB = 0.40f * UCHAR_MAX;
 
-			part.dR = 64;
-			part.dG = 64;
-			part.dB = 64;
+			part.dR = 0.25f * UCHAR_MAX;
+			part.dG = 0.25f * UCHAR_MAX;
+			part.dB = 0.25f * UCHAR_MAX;
 		}
 		else
 		{
@@ -103,10 +104,9 @@ namespace TEN::Effects::SmokeEmitter
 		part.y = item.Pose.Position.y + Random::GenerateInt(-32, 32);
 		part.z = item.Pose.Position.z + Random::GenerateInt(-32, 32);
 
-		// TODO: Demagic.
 		int accel = currentAccel;
-		if (currentAccel == 4096)
-			accel = Random::GenerateInt(2048, 4095);
+		if (currentAccel == SMOKE_ACCEL_MAX)
+			accel = Random::GenerateInt(SMOKE_ACCEL_MAX/2, SMOKE_ACCEL_MAX-1);
 
 		int pitchAngle = item.Pose.Orientation.x;
 		int yawAngle = item.Pose.Orientation.y + ANGLE(180);
@@ -161,15 +161,15 @@ namespace TEN::Effects::SmokeEmitter
 
 		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
 		{
-			part.dR = 96;
-			part.dG = 96;
-			part.dB = 96;
+			part.dR = 0.40f * UCHAR_MAX;
+			part.dG = 0.40f * UCHAR_MAX;
+			part.dB = 0.40f * UCHAR_MAX;
 		}
 		else if (item.ObjectNumber == ID_SMOKE_EMITTER_WHITE)
 		{
-			part.dR = 64;
-			part.dG = 64;
-			part.dB = 64;
+			part.dR = 0.25f * UCHAR_MAX;
+			part.dG = 0.25f * UCHAR_MAX;
+			part.dB = 0.25f * UCHAR_MAX;
 		}
 		else
 		{
@@ -275,7 +275,7 @@ namespace TEN::Effects::SmokeEmitter
 			}
 
 			if (bubbleSpawnRadius == 0)
-				bubbleSpawnRadius = 32; // Default value. TODO: Make constant.
+				bubbleSpawnRadius = BUBBLES_DEFAULT_RADIUS;
 		}
 		else if (isSteamEffect)
 		{
@@ -293,7 +293,7 @@ namespace TEN::Effects::SmokeEmitter
 			steamPauseTimer = ocb / 16;
 
 			if (steamPauseTimer <= 0)
-				steamAccel = 4096;
+				steamAccel = SMOKE_ACCEL_MAX;
 		}
 	}
 
@@ -358,7 +358,7 @@ namespace TEN::Effects::SmokeEmitter
 				if (steamAccel)
 					steamAccel -= 256;
 			}
-			else if (steamAccel < 4096)
+			else if (steamAccel < SMOKE_ACCEL_MAX)
 			{
 				steamAccel += 256;
 			}
