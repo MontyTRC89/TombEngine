@@ -353,7 +353,10 @@ namespace TEN::Effects::SmokeEmitter
 				steamPauseTimer--;
 
 				if (steamPauseTimer <= 0)
-					steamActiveTimer = Random::GenerateInt(30,94);
+				{
+					steamActiveTimer = Random::GenerateInt(30, 94);
+					SoundEffect(SFX_TR4_STEAM, &item.Pose);
+				}
 								
 				if (steamAccel)
 					steamAccel -= 256;
@@ -375,6 +378,9 @@ namespace TEN::Effects::SmokeEmitter
 				{
 					steamPauseTimer = item.TriggerFlags >> 4;
 				}
+
+				// TODO: assign the final sound ID for the Steam Emitter Loop sound
+				SoundEffect(1158, &item.Pose);
 			}
 
 			if (!drawNormalSmoke)
