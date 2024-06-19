@@ -35,6 +35,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
+* Added Input.KeyClearAll()
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
 
 ## [Version 1.4](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.1) - 2024-04-21
