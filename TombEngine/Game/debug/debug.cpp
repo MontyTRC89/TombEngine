@@ -92,7 +92,7 @@ namespace TEN::Debug
 		g_Renderer.AddDebugTarget(center, orient, radius, color, page);
 	}
 
-	void DrawDebugBox(const std::array<Vector3, BOX_CORNER_COUNT>& corners, const Color& color, RendererDebugPage page, bool isWireframe)
+	void DrawDebugBox(const std::array<Vector3, BOX_VERTEX_COUNT>& corners, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
 		g_Renderer.AddDebugBox(corners, color, page, isWireframe);
 	}
