@@ -48,46 +48,51 @@ namespace TEN::Effects::SmokeEmitter
 
 	static void SpawnSteamParticle(const ItemInfo& item, int currentAccel)
 	{
+		constexpr auto COLOR_BLACK		 = Color(0.4f, 0.4f, 0.4f);
+		constexpr auto COLOR_WHITE_START = Color(0.4f, 0.4f, 0.4f);
+		constexpr auto COLOR_WHITE_END	 = Color(0.25f, 0.25f, 0.25f);
+		constexpr auto LIFE_MAX			 = 24;
+		constexpr auto LIFE_MIN			 = 16;
+		constexpr auto FADE_SPEED_MAX	 = 9;
+		constexpr auto FADE_SPEED_MIN	 = 6;
+
 		auto& part = *GetFreeParticle();
 		part.on = true;
 
 		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
 		{
-			part.sR = 0.4f * UCHAR_MAX;
-			part.sG = 0.4f * UCHAR_MAX;
-			part.sB = 0.4f * UCHAR_MAX;
-
-			part.dR = 0.4f * UCHAR_MAX;
-			part.dG = 0.4f * UCHAR_MAX;
-			part.dB = 0.4f * UCHAR_MAX;
+			part.sR = COLOR_BLACK.R() * UCHAR_MAX;
+			part.sG = COLOR_BLACK.G() * UCHAR_MAX;
+			part.sB = COLOR_BLACK.B() * UCHAR_MAX;
+			part.dR = COLOR_BLACK.R() * UCHAR_MAX;
+			part.dG = COLOR_BLACK.G() * UCHAR_MAX;
+			part.dB = COLOR_BLACK.B() * UCHAR_MAX;
 		}
 		else if (item.ObjectNumber == ID_SMOKE_EMITTER_WHITE)
 		{
-			part.sR = 0.4f * UCHAR_MAX;
-			part.sG = 0.4f * UCHAR_MAX;
-			part.sB = 0.4f * UCHAR_MAX;
-
-			part.dR = 0.25f * UCHAR_MAX;
-			part.dG = 0.25f * UCHAR_MAX;
-			part.dB = 0.25f * UCHAR_MAX;
+			part.sR = COLOR_WHITE_START.R() * UCHAR_MAX;
+			part.sG = COLOR_WHITE_START.G() * UCHAR_MAX;
+			part.sB = COLOR_WHITE_START.B() * UCHAR_MAX;
+			part.dR = COLOR_WHITE_END.R() * UCHAR_MAX;
+			part.dG = COLOR_WHITE_END.G() * UCHAR_MAX;
+			part.dB = COLOR_WHITE_END.B() * UCHAR_MAX;
 		}
 		else
 		{
-			unsigned char r = std::clamp(item.Model.Color.x / 2.0f, 0.0f, 1.0f) * UCHAR_MAX;
-			unsigned char g = std::clamp(item.Model.Color.y / 2.0f, 0.0f, 1.0f) * UCHAR_MAX;
-			unsigned char b = std::clamp(item.Model.Color.z / 2.0f, 0.0f, 1.0f) * UCHAR_MAX;
+			unsigned char r = std::clamp(item.Model.Color.x / 2, 0.0f, 1.0f) * UCHAR_MAX;
+			unsigned char g = std::clamp(item.Model.Color.y / 2, 0.0f, 1.0f) * UCHAR_MAX;
+			unsigned char b = std::clamp(item.Model.Color.z / 2, 0.0f, 1.0f) * UCHAR_MAX;
 
 			part.sR = r / 3;
 			part.sG = g / 3;
 			part.sB = b / 3;
-
 			part.dR = r;
 			part.dG = g;
 			part.dB = b;
 		}
 		
 		part.fadeToBlack = 6;
-		part.colFadeSpeed = Random::GenerateInt(6, 9);
+		part.colFadeSpeed = Random::GenerateInt(FADE_SPEED_MIN, FADE_SPEED_MAX);
 
 		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
 		{
@@ -98,7 +103,8 @@ namespace TEN::Effects::SmokeEmitter
 			part.blendMode = BlendMode::Additive;
 		}
 
-		part.life = part.sLife = Random::GenerateInt(16, 24);
+		part.life =
+		part.sLife = Random::GenerateInt(LIFE_MIN, LIFE_MAX);
 
 		part.x = item.Pose.Position.x + Random::GenerateInt(-32, 32);
 		part.y = item.Pose.Position.y + Random::GenerateInt(-32, 32);
@@ -109,7 +115,7 @@ namespace TEN::Effects::SmokeEmitter
 			accel = Random::GenerateInt(SMOKE_ACCEL_MAX / 2, SMOKE_ACCEL_MAX - 1);
 
 		int pitchAngle = item.Pose.Orientation.x;
-		int yawAngle = item.Pose.Orientation.y + ANGLE(180);
+		int yawAngle = item.Pose.Orientation.y + ANGLE(180.0f);
 
 		auto dir = Vector3::Zero;;
 		dir.x = phd_cos(pitchAngle) * phd_sin(yawAngle);
@@ -126,10 +132,10 @@ namespace TEN::Effects::SmokeEmitter
 		part.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
 		bool ignoreDamage = item.ItemFlags[3] & SmokeEmitterFlags::NoDamage;
-		if (!(GlobalCounter & 0x03) && !ignoreDamage)
+		if (!(GlobalCounter & 0x03) && !ignoreDamage) // TODO: No hex.
 			part.flags |= SP_DAMAGE;
 
-		part.rotAng = Random::GenerateInt(0, 4096);
+		part.rotAng = Random::GenerateAngle(ANGLE(0.0f), ANGLE(22.5f));
 
 		if (Random::TestProbability(1 / 2.0f))
 		{

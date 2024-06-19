@@ -41,7 +41,7 @@ using namespace TEN::Math::Random;
 using TEN::Renderer::g_Renderer;
 
 // New particle class
-Particle Particles[MAX_PARTICLES];
+Particle Particles[PARTICLE_COUNT_MAX];
 ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
 FX_INFO EffectList[NUM_EFFECTS];
@@ -79,7 +79,7 @@ void DetatchSpark(int number, SpriteEnumFlag type)
 {
 	auto* sptr = &Particles[0];
 
-	for (int lp = 0; lp < MAX_PARTICLES; lp++, sptr++)
+	for (int lp = 0; lp < PARTICLE_COUNT_MAX; lp++, sptr++)
 	{
 		if (sptr->on && (sptr->flags & type) && sptr->fxObj == number)
 		{
@@ -121,46 +121,42 @@ void DetatchSpark(int number, SpriteEnumFlag type)
 
 Particle* GetFreeParticle()
 {
-	int result = -1;
+	int partID = NO_VALUE;
 
-	// Get first free available spark
-
-	for (int i = 0; i < MAX_PARTICLES; i++)
+	// Get first free available particle.
+	for (int i = 0; i < PARTICLE_COUNT_MAX; i++)
 	{
-		auto* particle = &Particles[i];
-
-		if (!particle->on)
+		const auto& part = Particles[i];
+		if (!part.on)
 		{
-			result = i;
+			partID = i;
 			break;
 		}
 	}
 
-	// No free sparks left, hijack existing one with less possible life
-
-	int life = INT_MAX;
-	if (result == -1)
+	// No free particles; get particle with shortest life.
+	float shortestLife = INFINITY;
+	if (partID == NO_VALUE)
 	{
-		for (int i = 0; i < MAX_PARTICLES; i++)
+		for (int i = 0; i < PARTICLE_COUNT_MAX; i++)
 		{
-			auto* particle = &Particles[i];
+			const auto& part = Particles[i];
 
-			if (particle->life < life && particle->dynamic == -1 && !(particle->flags & SP_EXPLOSION))
+			if (part.life < shortestLife && part.dynamic == NO_VALUE && !(part.flags & SP_EXPLOSION))
 			{
-				result = i;
-				life = particle->life;
+				partID = i;
+				shortestLife = part.life;
 			}
 		}
 	}
 
-	auto* spark = &Particles[result];
+	auto& part = Particles[partID];
+	part.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	part.blendMode = BlendMode::Additive;
+	part.extras = 0;
+	part.dynamic = NO_VALUE;
 
-	spark->extras = 0;
-	spark->dynamic = -1;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-	spark->blendMode = BlendMode::Additive;
-
-	return spark;
+	return &part;
 }
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
@@ -191,7 +187,7 @@ void UpdateSparks()
 		LaraItem->Pose.Position.z + bounds.Z1,
 		LaraItem->Pose.Position.z + bounds.Z2);
 
-	for (int i = 0; i < MAX_PARTICLES; i++)
+	for (int i = 0; i < PARTICLE_COUNT_MAX; i++)
 	{
 		auto* spark = &Particles[i];
 
@@ -359,7 +355,7 @@ void UpdateSparks()
 		}
 	}
 
-	for (int i = 0; i < MAX_PARTICLES; i++)
+	for (int i = 0; i < PARTICLE_COUNT_MAX; i++)
 	{
 		auto* spark = &Particles[i];
 
