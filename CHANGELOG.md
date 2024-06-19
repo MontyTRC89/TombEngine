@@ -11,20 +11,20 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Bug fixes
 * Fixed original issue with classic switch off trigger wrongly activating some trigger actions.
 * Fixed incorrect diving animation when swandiving from a high place.
-* Fixed camera rotating with Lara's hips when climbing out of water.
+* Fixed camera rotating with player's hips when climbing out of water.
 * Fixed AI for skidoo driver and worker with shotgun TR2 enemies.
-* Fixed Ember emitter crashing when ocb is between -1 and -10 
-* Fixed Electric cleaner and Squishy block not detecting collision with certain block heights.
-* Fixed Squishy blocks crashing the level.
-* Fixed the path finding zones of Larson and Pierre.
-* Fixed the torch flame delay in disappearing when Lara threw or dropped the torch object.
-* Fixed Dart emitters which was failing when it was antitriggered.
-* Fixed Homing Dart emitter which was spawning darts continously while Lara was on the trigger.
-* Fixed Floor 4 blades and ceiling 4 blades collision.
-* Fixed Joby spikes collision and abnormal streetching.
-* Fixed Sentry Gun to rotate its parts correctly.
-* Fixed Teeth Spikes bug, now they will activates the Lara impale animation.
-* Fixed TR4 mine with OCB1, to don't crash the game when Lara steps the mine.
+* Fixed ember emitter crashing when ocb is between -1 and -10.
+* Fixed electric cleaner and squishy block not detecting collision with certain block heights.
+* Fixed squishy blocks crashing the level.
+* Fixed Larson and Pierre pathfinding.
+* Fixed torch flame delay when the player throws or drops a torch.
+* Fixed dart emitters failing with antitrigger.
+* Fixed homing dart emitter spawning darts continously when player is on its trigger.
+* Fixed four blade trap floor and ceiling collision.
+* Fixed Joby spikes collision and deformation.
+* Fixed sentry gun joint rotation.
+* Fixed teeth spikes not triggering the player impale animation.
+* Fixed TR4 mine crash with OCB1 when triggered.
 
 ### Features/Amendments
 * Changed Rome Hammer for it to don't hurt Lara while it's deactivated.
