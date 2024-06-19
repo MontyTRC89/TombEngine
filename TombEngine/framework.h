@@ -21,7 +21,7 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-#include "Game/debug/debug.h"
+#include "Game/Debug/Debug.h"
 
 using namespace TEN::Debug;
 

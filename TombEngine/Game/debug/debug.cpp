@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/debug/debug.h"
+#include "Game/Debug/Debug.h"
 
 #include <spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
