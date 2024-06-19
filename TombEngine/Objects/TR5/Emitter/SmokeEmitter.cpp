@@ -1,9 +1,9 @@
 #include "framework.h"
-#include "tr5_smoke_emitter.h"
+#include "Objects/TR5/Emitter/SmokeEmitter.h"
 
+#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/control/trigger.h"
-#include "Game/collision/collide_room.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -366,7 +366,7 @@ namespace TEN::Effects::SmokeEmitter
 				steamAccel += 256;
 			}
 
-			if (steamAccel)
+			if (steamAccel != 0)
 			{
 				SpawnSteamParticle(item, steamAccel);
 
@@ -379,7 +379,7 @@ namespace TEN::Effects::SmokeEmitter
 					steamPauseTimer = item.TriggerFlags >> 4;
 				}
 
-				// TODO: assign the final sound ID for the Steam Emitter Loop sound
+				// TODO: Assign final sound ID for steam emitter loop.
 				SoundEffect(1158, &item.Pose);
 			}
 
