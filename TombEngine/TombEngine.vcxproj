@@ -340,6 +340,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Game\collision\Point.h" />
+    <ClInclude Include="Game\Debug\Debug.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\DisplaySprite.h" />
     <ClInclude Include="Game\GuiObjects.h" />
@@ -385,7 +386,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\control\event.h" />
-    <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\Blood.h" />
     <ClInclude Include="Game\effects\Drip.h" />
     <ClInclude Include="Game\effects\Electricity.h" />
@@ -869,7 +869,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\control\lot.cpp" />
     <ClCompile Include="Game\control\trigger.cpp" />
     <ClCompile Include="Game\control\volume.cpp" />
-    <ClCompile Include="Game\debug\debug.cpp" />
+    <ClCompile Include="Game\Debug\Debug.cpp" />
     <ClCompile Include="Game\effects\Blood.cpp" />
     <ClCompile Include="Game\effects\Bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />

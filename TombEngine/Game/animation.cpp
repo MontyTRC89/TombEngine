@@ -506,7 +506,7 @@ const AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumb
 	const auto& object = Objects[objectID];
 
 	int animIndex = object.animIndex + animNumber;
-	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
+	TENAssert(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
 
 	const auto& anim = GetAnimData(object, animNumber);
 

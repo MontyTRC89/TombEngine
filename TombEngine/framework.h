@@ -23,4 +23,6 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+using namespace TEN::Debug;
+
 constexpr auto NO_VALUE = -1;
