@@ -38,8 +38,8 @@ using namespace TEN::Math;
 namespace TEN::Effects::SmokeEmitter
 {
 	constexpr auto SMOKE_VISIBILITY_DISTANCE_MAX = BLOCK(16);
-	constexpr auto SMOKE_ACCEL_MAX = 4096;
-	constexpr auto BUBBLES_DEFAULT_RADIUS = 32;
+	constexpr auto SMOKE_ACCEL_MAX				 = BLOCK(4);
+	constexpr auto BUBBLE_DEFAULT_RADIUS		 = BLOCK(1 / 32.0f);
 
 	enum SmokeEmitterFlags
 	{
@@ -53,19 +53,19 @@ namespace TEN::Effects::SmokeEmitter
 
 		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
 		{
-			part.sR = 0.40f * UCHAR_MAX;
-			part.sG = 0.40f * UCHAR_MAX;
-			part.sB = 0.40f * UCHAR_MAX;
+			part.sR = 0.4f * UCHAR_MAX;
+			part.sG = 0.4f * UCHAR_MAX;
+			part.sB = 0.4f * UCHAR_MAX;
 
-			part.dR = 0.40f * UCHAR_MAX;
-			part.dG = 0.40f * UCHAR_MAX;
-			part.dB = 0.40f * UCHAR_MAX;
+			part.dR = 0.4f * UCHAR_MAX;
+			part.dG = 0.4f * UCHAR_MAX;
+			part.dB = 0.4f * UCHAR_MAX;
 		}
 		else if (item.ObjectNumber == ID_SMOKE_EMITTER_WHITE)
 		{
-			part.sR = 0.40f * UCHAR_MAX;
-			part.sG = 0.40f * UCHAR_MAX;
-			part.sB = 0.40f * UCHAR_MAX;
+			part.sR = 0.4f * UCHAR_MAX;
+			part.sG = 0.4f * UCHAR_MAX;
+			part.sB = 0.4f * UCHAR_MAX;
 
 			part.dR = 0.25f * UCHAR_MAX;
 			part.dG = 0.25f * UCHAR_MAX;
@@ -106,7 +106,7 @@ namespace TEN::Effects::SmokeEmitter
 
 		int accel = currentAccel;
 		if (currentAccel == SMOKE_ACCEL_MAX)
-			accel = Random::GenerateInt(SMOKE_ACCEL_MAX/2, SMOKE_ACCEL_MAX-1);
+			accel = Random::GenerateInt(SMOKE_ACCEL_MAX / 2, SMOKE_ACCEL_MAX - 1);
 
 		int pitchAngle = item.Pose.Orientation.x;
 		int yawAngle = item.Pose.Orientation.y + ANGLE(180);
@@ -161,9 +161,9 @@ namespace TEN::Effects::SmokeEmitter
 
 		if (item.ObjectNumber == ID_SMOKE_EMITTER_BLACK)
 		{
-			part.dR = 0.40f * UCHAR_MAX;
-			part.dG = 0.40f * UCHAR_MAX;
-			part.dB = 0.40f * UCHAR_MAX;
+			part.dR = 0.4f * UCHAR_MAX;
+			part.dG = 0.4f * UCHAR_MAX;
+			part.dB = 0.4f * UCHAR_MAX;
 		}
 		else if (item.ObjectNumber == ID_SMOKE_EMITTER_WHITE)
 		{
@@ -275,7 +275,7 @@ namespace TEN::Effects::SmokeEmitter
 			}
 
 			if (bubbleSpawnRadius == 0)
-				bubbleSpawnRadius = BUBBLES_DEFAULT_RADIUS;
+				bubbleSpawnRadius = BUBBLE_DEFAULT_RADIUS;
 		}
 		else if (isSteamEffect)
 		{
