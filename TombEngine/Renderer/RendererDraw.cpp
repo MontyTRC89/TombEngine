@@ -1236,7 +1236,7 @@ namespace TEN::Renderer
 		AddDebugLine(origin2, target2, color);
 	}
 
-	void Renderer::AddDebugBox(const std::array<Vector3, 8>& corners, const Color& color, RendererDebugPage page, bool isWireframe)
+	void Renderer::AddDebugBox(const std::array<Vector3, BOX_CORNER_COUNT>& corners, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
 		constexpr auto LINE_COUNT  = 12;
 		constexpr auto PLANE_COUNT = 6;
@@ -1349,15 +1349,13 @@ namespace TEN::Renderer
 
 	void Renderer::AddDebugBox(const BoundingOrientedBox& box, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
-		constexpr auto CORNER_COUNT = 8;
-
 		if (_isLocked)
 			return;
 
 		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
 			return;
 
-		auto corners = std::array<Vector3, CORNER_COUNT>{};
+		auto corners = std::array<Vector3, BOX_CORNER_COUNT>{};
 		box.GetCorners(corners.data());
 
 		AddDebugBox(corners, color, page, isWireframe);
@@ -1365,15 +1363,13 @@ namespace TEN::Renderer
 
 	void Renderer::AddDebugBox(const BoundingBox& box, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
-		constexpr auto CORNER_COUNT = 8;
-
 		if (_isLocked)
 			return;
 
 		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
 			return;
 
-		auto corners = std::array<Vector3, CORNER_COUNT>{};
+		auto corners = std::array<Vector3, BOX_CORNER_COUNT>{};
 		box.GetCorners(corners.data());
 
 		AddDebugBox(corners, color, page, isWireframe);

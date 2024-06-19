@@ -18,10 +18,10 @@
 #include <string>
 #include <vector>
 
-#include "Game/debug/debug.h"
-
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
+
+#include "Game/debug/debug.h"
 
 using namespace TEN::Debug;
 

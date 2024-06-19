@@ -16,6 +16,10 @@
 	constexpr auto SQUARE = [](auto x) { return (x * x); };
 	constexpr auto CUBE	  = [](auto x) { return (x * x * x); };
 
+	// Geometry constants
+
+	constexpr auto BOX_CORNER_COUNT = 8;
+
 	// World constants
 
 	constexpr auto BLOCK_UNIT = 1024;

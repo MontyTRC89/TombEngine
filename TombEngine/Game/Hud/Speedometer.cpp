@@ -3,12 +3,10 @@
 
 #include "Game/effects/DisplaySprite.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Math;
-using TEN::Renderer::g_Renderer;
 
 namespace TEN::Hud
 {
@@ -80,10 +78,10 @@ namespace TEN::Hud
 
 	void SpeedometerController::DrawDebug() const
 	{
-		g_Renderer.PrintDebugMessage("SPEEDOMETER DEBUG");
-		g_Renderer.PrintDebugMessage("Value: %.3f", _value);
-		g_Renderer.PrintDebugMessage("Pointer angle: %.3f", _pointerAngle);
-		g_Renderer.PrintDebugMessage("Opacity: %.3f", _opacity);
-		g_Renderer.PrintDebugMessage("Life: %.3f", _life / FPS);
+		PrintDebugMessage("SPEEDOMETER DEBUG");
+		PrintDebugMessage("Value: %.3f", _value);
+		PrintDebugMessage("Pointer angle: %.3f", _pointerAngle);
+		PrintDebugMessage("Opacity: %.3f", _opacity);
+		PrintDebugMessage("Life: %.3f", _life / FPS);
 	}
 }
