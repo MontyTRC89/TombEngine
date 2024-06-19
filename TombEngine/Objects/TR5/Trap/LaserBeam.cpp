@@ -21,7 +21,7 @@ using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
-namespace TEN::Traps::TR5
+namespace TEN::Entities::Traps
 {
 	constexpr auto LASER_BEAM_LIGHT_INTENSITY	  = 0.2f;
 	constexpr auto LASER_BEAM_LIGHT_AMPLITUDE_MAX = 0.1f;

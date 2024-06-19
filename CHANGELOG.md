@@ -11,18 +11,31 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Bug fixes
 * Fixed original issue with classic switch off trigger wrongly activating some trigger actions.
 * Fixed incorrect diving animation when swandiving from a high place.
-* Fixed camera rotating with Lara's hips when climbing out of water.
+* Fixed camera rotating with player's hips when climbing out of water.
 * Fixed AI for skidoo driver and worker with shotgun TR2 enemies.
-* Fixed Ember emitter crashing when ocb is between -1 and -10 
-* Fixed Electric cleaner and Squishy block not detecting collision with certain block heights.
-* Fixed Squishy blocks crashing the level.
-* Fixed the path finding zones of Larson and Pierre.
-* Fixed the torch flame delay in disappearing when Lara threw or dropped the torch object.
+* Fixed ember emitter crashing when ocb is between -1 and -10.
+* Fixed electric cleaner and squishy block not detecting collision with certain block heights.
+* Fixed squishy blocks crashing the level.
+* Fixed Larson and Pierre pathfinding.
+* Fixed torch flame delay when the player throws or drops a torch.
+* Fixed dart emitters failing with antitrigger.
+* Fixed homing dart emitter spawning darts continously when player is on its trigger.
+* Fixed four blade trap floor and ceiling collision.
+* Fixed Joby spikes collision and deformation.
+* Fixed sentry gun joint rotation.
+* Fixed teeth spikes not triggering the player impale animation.
+* Fixed TR4 mine crash with OCB1 when triggered.
 
 ### Features/Amendments
+* Changed Rome Hammer for it to don't hurt Lara while it's deactivated.
+* Changed Statue with blade damage, from 20 to 200.
+* Enhaced Rolling Spindle detection to avoid them going down through pits.
+* Enhaced Sentry Guns, with a new ItemFlags[3] to contain the ID of the inventory item that deactivates the sentry guns (by default PUZZLE_ITEM5 ID)
+* Enhaced Dart Emitter, with a new ItemFlags[0] to contain the number of frames between shots (by default 32 in dart emitter, and 24 in homing dar emitter).
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
+* Added Input.KeyClearAll()
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
 
 ## [Version 1.4](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.1) - 2024-04-21
