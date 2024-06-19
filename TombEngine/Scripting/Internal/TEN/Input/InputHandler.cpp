@@ -92,9 +92,7 @@ namespace TEN::Scripting::Input
 	static void KeyClearAll()
 	{
 		for (auto& queue : ActionQueue)
-		{
 			queue = QueueState::Clear;
-		}
 	}
 
 	/// Get the display position of the cursor in percent.
