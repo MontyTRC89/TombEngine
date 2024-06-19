@@ -30,7 +30,7 @@
 #include "Objects/TR1/Trap/SwingingBlade.h"
 
 using namespace TEN::Entities::Creatures::TR1;
-using namespace TEN::Entities::Traps::TR1;
+using namespace TEN::Entities::Traps;
 
 static void StartEntity(ObjectInfo* obj)
 {

@@ -3,7 +3,7 @@
 struct BiteInfo;
 struct ItemInfo;
 
-namespace TEN::Entities::Traps::TR1
+namespace TEN::Entities::Traps
 {
 	void InitializeSlammingDoors(short itemNumber);
 	void ControlSlammingDoors(short itemNumber);

@@ -18,8 +18,20 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Squishy blocks crashing the level.
 * Fixed the path finding zones of Larson and Pierre.
 * Fixed the torch flame delay in disappearing when Lara threw or dropped the torch object.
+* Fixed Dart emitters which was failing when it was antitriggered.
+* Fixed Homing Dart emitter which was spawning darts continously while Lara was on the trigger.
+* Fixed Floor 4 blades and ceiling 4 blades collision.
+* Fixed Joby spikes collision and abnormal streetching.
+* Fixed Sentry Gun to rotate its parts correctly.
+* Fixed Teeth Spikes bug, now they will activates the Lara impale animation.
+* Fixed TR4 mine with OCB1, to don't crash the game when Lara steps the mine.
 
 ### Features/Amendments
+* Changed Rome Hammer for it to don't hurt Lara while it's deactivated.
+* Changed Statue with blade damage, from 20 to 200.
+* Enhaced Rolling Spindle detection to avoid them going down through pits.
+* Enhaced Sentry Guns, with a new ItemFlags[3] to contain the ID of the inventory item that deactivates the sentry guns (by default PUZZLE_ITEM5 ID)
+* Enhaced Dart Emitter, with a new ItemFlags[0] to contain the number of frames between shots (by default 32 in dart emitter, and 24 in homing dar emitter).
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
