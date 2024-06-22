@@ -3,7 +3,7 @@
 
 #include "Game/effects/DisplaySprite.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Effects::DisplaySprite;
@@ -20,9 +20,9 @@ namespace TEN::Hud
 
 	void SpeedometerController::Update()
 	{
-		constexpr auto DIAL_ANGLE_MAX		 = ANGLE(120.0f);
-		constexpr auto DIAL_ANGLE_LERP_ALPHA = 0.25f;
-		constexpr auto FADE_TIME			 = 0.2f;
+		constexpr auto POINTER_ANGLE_MAX		= ANGLE(120.0f);
+		constexpr auto POINTER_ANGLE_LERP_ALPHA = 0.25f;
+		constexpr auto FADE_TIME				= 0.2f;
 
 		if (!_hasValueUpdated && _life <= 0.0f &&
 			_value <= 0.0f && _pointerAngle <= 0.0f)
@@ -39,7 +39,7 @@ namespace TEN::Hud
 			_value = 0.0f;
 
 		// Update appearance.
-		_pointerAngle = Lerp(_pointerAngle, DIAL_ANGLE_MAX * _value, DIAL_ANGLE_LERP_ALPHA);
+		_pointerAngle = Lerp(_pointerAngle, POINTER_ANGLE_MAX * _value, POINTER_ANGLE_LERP_ALPHA);
 		_opacity = std::clamp(_life / std::round(FADE_TIME * FPS), 0.0f, 1.0f);
 	}
 
@@ -64,13 +64,13 @@ namespace TEN::Hud
 		AddDisplaySprite(
 			ID_SPEEDOMETER, DIAL_ELEMENT_SPRITE_ID,
 			POS, 0, SCALE, color,
-			DIAL_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
+			DIAL_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend);
 
 		// Draw pointer.
 		AddDisplaySprite(
 			ID_SPEEDOMETER, POINTER_ELEMENT_SPRITE_ID,
 			POS, _pointerAngle + ORIENT_OFFSET, SCALE, color,
-			POINTER_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BLEND_MODES::BLENDMODE_ALPHABLEND);
+			POINTER_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend);
 	}
 
 	void SpeedometerController::Clear()

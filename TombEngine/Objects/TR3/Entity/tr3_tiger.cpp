@@ -79,7 +79,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
 
 		if (item->HitPoints <= 0)
 		{
@@ -109,7 +109,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 				}

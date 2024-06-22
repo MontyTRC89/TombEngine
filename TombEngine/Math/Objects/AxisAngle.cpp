@@ -17,8 +17,8 @@ using namespace TEN::Math;
 		auto normalizedAxis = axis;
 		normalizedAxis.Normalize();
 
-		Axis = normalizedAxis;
-		Angle = angle;
+		_axis = normalizedAxis;
+		_angle = angle;
 	}
 
 	AxisAngle::AxisAngle(const EulerAngles& eulers)
@@ -34,8 +34,8 @@ using namespace TEN::Math;
 		axis.Normalize();
 		float angle = 2.0f * acos(quat.w);
 
-		Axis = axis;
-		Angle = FROM_RAD(angle);
+		_axis = axis;
+		_angle = FROM_RAD(angle);
 	}
 
 	AxisAngle::AxisAngle(const Matrix& rotMatrix)
@@ -54,23 +54,23 @@ using namespace TEN::Math;
 		auto rotAxis = Vector3::TransformNormal(Vector3::Right, rotMatrix);
 		
 		// Check if rotation axis and unit axis are pointing in opposite directions.
-		float dot = rotAxis.Dot(Axis);
+		float dot = rotAxis.Dot(_axis);
 		if (dot < 0.0f)
 		{
-			// Negate angle and unit axis to ensure the angle stays within [0, PI] range.
-			Angle = -Angle;
-			Axis = -Axis;
+			// Negate angle and unit axis to ensure angle stays within [0, PI] range.
+			_angle = -_angle;
+			_axis = -_axis;
 		}
 	}
 
 	Vector3 AxisAngle::GetAxis() const
 	{
-		return Axis;
+		return _axis;
 	}
 
 	short AxisAngle::GetAngle() const
 	{
-		return Angle;
+		return _angle;
 	}
 
 	void AxisAngle::SetAxis(const Vector3& axis)
@@ -78,12 +78,12 @@ using namespace TEN::Math;
 		auto normalizedAxis = axis;
 		normalizedAxis.Normalize();
 		
-		Axis = normalizedAxis;
+		_axis = normalizedAxis;
 	}
 
 	void AxisAngle::SetAngle(short angle)
 	{
-		Angle = angle;
+		_angle = angle;
 	}
 
 	void AxisAngle::Slerp(const AxisAngle& axisAngleTo, float alpha)
@@ -118,7 +118,7 @@ using namespace TEN::Math;
 	Vector3 AxisAngle::ToDirection() const
 	{
 		// TODO: Works, but need to find a way without EulerAngles. -- Sezz 2023.03.08
-		auto refDir = Geometry::RotatePoint(Vector3::Right, EulerAngles(Axis));
+		auto refDir = Geometry::RotatePoint(Vector3::Right, EulerAngles(_axis));
 		return Geometry::RotatePoint(refDir, *this);
 	}
 
@@ -129,17 +129,17 @@ using namespace TEN::Math;
 
 	Quaternion AxisAngle::ToQuaternion() const
 	{
-		return Quaternion::CreateFromAxisAngle(Axis, TO_RAD(Angle));
+		return Quaternion::CreateFromAxisAngle(_axis, TO_RAD(_angle));
 	}
 
 	Matrix AxisAngle::ToRotationMatrix() const
 	{
-		return Matrix::CreateFromAxisAngle(Axis, TO_RAD(Angle));
+		return Matrix::CreateFromAxisAngle(_axis, TO_RAD(_angle));
 	}
 
 	bool AxisAngle::operator ==(const AxisAngle& axisAngle) const
 	{
-		return ((Axis == axisAngle.GetAxis()) && (Angle == axisAngle.GetAngle()));
+		return ((_axis == axisAngle.GetAxis()) && (_angle == axisAngle.GetAngle()));
 	}
 
 	bool AxisAngle::operator !=(const AxisAngle& axisAngle) const
@@ -149,8 +149,8 @@ using namespace TEN::Math;
 
 	AxisAngle& AxisAngle::operator =(const AxisAngle& axisAngle)
 	{
-		Axis = axisAngle.GetAxis();
-		Angle = axisAngle.GetAngle();
+		_axis = axisAngle.GetAxis();
+		_angle = axisAngle.GetAngle();
 		return *this;
 	}
 

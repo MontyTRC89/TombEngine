@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Input/InputHandler.h"
 
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
@@ -86,6 +86,14 @@ namespace TEN::Scripting::Input
 
 		ActionQueue[actionID] = QueueState::Clear;
 	}
+#
+	/// Clear all action keys.
+	// @function KeyClear
+	static void KeyClearAll()
+	{
+		for (auto& queue : ActionQueue)
+			queue = QueueState::Clear;
+	}
 
 	/// Get the display position of the cursor in percent.
 	// @function GetMouseDisplayPosition()
@@ -110,6 +118,7 @@ namespace TEN::Scripting::Input
 		table.set_function(ScriptReserved_KeyIsHit, &KeyIsHit);
 		table.set_function(ScriptReserved_KeyPush, &KeyPush);
 		table.set_function(ScriptReserved_KeyClear, &KeyClear);
+		table.set_function(ScriptReserved_KeyClearAll, &KeyClearAll);
 
 		table.set_function(ScriptReserved_GetMouseDisplayPosition, &GetMouseDisplayPosition);
 		table.set_function(ScriptReserved_GetCursorDisplayPosition, &GetMouseDisplayPosition);

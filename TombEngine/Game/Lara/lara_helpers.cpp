@@ -7,6 +7,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
@@ -21,7 +22,7 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
@@ -37,6 +38,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
@@ -142,7 +144,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 		else if (player.Status.Air < LARA_AIR_MAX && item.HitPoints >= 0)
 		{
 			// HACK: Special case for UPV.
-			if (player.Context.Vehicle == NO_ITEM)
+			if (player.Context.Vehicle == NO_VALUE)
 			{
 				player.Status.Air += 10;
 				if (player.Status.Air > LARA_AIR_MAX)
@@ -155,14 +157,14 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 			if (player.Control.WaterStatus == WaterStatus::Dry)
 			{
 				// HACK: Special case for UPV.
-				if (player.Context.Vehicle != NO_ITEM)
+				if (player.Context.Vehicle != NO_VALUE)
 				{
 					const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
 					if (vehicleItem.ObjectNumber == ID_UPV)
 					{
-						auto pointColl = GetCollision(&item, 0, 0, CLICK(1));
+						auto pointColl = GetPointCollision(item, 0, 0, CLICK(1));
 
-						water.IsCold = (water.IsCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber));
+						water.IsCold = (water.IsCold || TestEnvironment(ENV_FLAG_COLD, pointColl.GetRoomNumber()));
 						if (water.IsCold)
 						{
 							player.Status.Exposure--;
@@ -276,49 +278,6 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 	}
 }
 
-static void UsePlayerMedipack(ItemInfo& item)
-{
-	auto& player = GetLaraInfo(item);
-
-	// Can't use medipack; return early.
-	if (item.HitPoints <= 0 ||
-		(item.HitPoints >= LARA_HEALTH_MAX && player.Status.Poison == 0))
-	{
-		return;
-	}
-
-	bool hasUsedMedipack = false;
-
-	if (IsClicked(In::SmallMedipack) &&
-		player.Inventory.TotalSmallMedipacks != 0)
-	{
-		hasUsedMedipack = true;
-
-		item.HitPoints += LARA_HEALTH_MAX / 2;
-		if (item.HitPoints > LARA_HEALTH_MAX)
-			item.HitPoints = LARA_HEALTH_MAX;
-
-		if (player.Inventory.TotalSmallMedipacks != -1)
-			player.Inventory.TotalSmallMedipacks--;
-	}
-	else if (IsClicked(In::LargeMedipack) &&
-		player.Inventory.TotalLargeMedipacks != 0)
-	{
-		hasUsedMedipack = true;
-		item.HitPoints = LARA_HEALTH_MAX;
-
-		if (player.Inventory.TotalLargeMedipacks != -1)
-			player.Inventory.TotalLargeMedipacks--;
-	}
-
-	if (hasUsedMedipack)
-	{
-		player.Status.Poison = 0;
-		Statistics.Game.HealthUsed++;
-		SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-	}
-}
-
 static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
 {
 	static const auto SCROLL_WEAPON_TYPES = std::vector<LaraWeaponType>
@@ -376,8 +335,14 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	auto& player = GetLaraInfo(item);
 
 	// Handle medipacks.
-	if (IsClicked(In::SmallMedipack) || IsClicked(In::LargeMedipack))
-		UsePlayerMedipack(item);
+	if (IsClicked(In::SmallMedipack))
+	{
+		g_Gui.UseItem(item, GAME_OBJECT_ID::ID_SMALLMEDI_ITEM);
+	}
+	else if (IsClicked(In::LargeMedipack))
+	{
+		g_Gui.UseItem(item, GAME_OBJECT_ID::ID_BIGMEDI_ITEM);
+	}
 
 	// Handle weapon scroll request.
 	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
@@ -419,7 +384,7 @@ void HandlePlayerQuickActions(ItemInfo& item)
 
 	// TODO: 10th possible weapon, probably grapple gun.
 	/*if (IsClicked(In::Weapon10) && player.Weapons[(int)LaraWeaponType::].Present)
-	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
+		player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
 }
 
 bool CanPlayerLookAround(const ItemInfo& item)
@@ -648,7 +613,7 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	player.ExtraHeadRot = player.Control.Look.Orientation / 2;
 	if (player.Control.HandStatus != HandStatus::Busy &&
 		!player.LeftArm.Locked && !player.RightArm.Locked &&
-		player.Context.Vehicle == NO_ITEM)
+		player.Context.Vehicle == NO_VALUE)
 	{
 		player.ExtraTorsoRot = player.ExtraHeadRot;
 	}
@@ -660,12 +625,12 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Context.Vehicle == NO_ITEM)
+	if (lara->Context.Vehicle == NO_VALUE)
 		return false;
 
 	if (!g_Level.Items[lara->Context.Vehicle].Active)
 	{
-		lara->Context.Vehicle = NO_ITEM;
+		lara->Context.Vehicle = NO_VALUE;
 		item->Animation.IsAirborne = true;
 		SetAnimation(item, LA_FALL_START);
 		return false;
@@ -724,7 +689,7 @@ void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 
-	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+	if (coll->CollisionType == CollisionType::Left || coll->CollisionType == CollisionType::Right)
 		maxAngleNormalized *= 0.6f;
 
 	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
@@ -925,7 +890,7 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 	static bool dbFlyCheat = true;
 	if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
 	{
-		if (player.Context.Vehicle == NO_ITEM)
+		if (player.Context.Vehicle == NO_VALUE)
 		{
 			GivePlayerItemsCheat(item);
 			GivePlayerWeaponsCheat(item);
@@ -963,7 +928,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 	for (auto& node : player.Effect.DripNodes)
 	{
 		auto pos = GetJointPosition(&item, jointIndex);
-		int roomNumber = GetRoom(item.Location, pos).RoomNumber;
+		int roomNumber = GetRoomVector(item.Location, pos).RoomNumber;
 		jointIndex++;
 
 		// Node underwater; set max wetness value.
@@ -1000,7 +965,7 @@ void HandlePlayerDiveBubbles(ItemInfo& item)
 	for (auto& node : player.Effect.BubbleNodes)
 	{
 		auto pos = GetJointPosition(&item, jointIndex);
-		int roomNumber = GetRoom(item.Location, pos).RoomNumber;
+		int roomNumber = GetRoomVector(item.Location, pos).RoomNumber;
 		jointIndex++;
 
 		// Node inactive; continue.
@@ -1250,20 +1215,14 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 
 PlayerWaterData GetPlayerWaterData(ItemInfo& item)
 {
-	bool isWater = TestEnvironment(ENV_FLAG_WATER, &item);
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, &item);
-	bool isCold = TestEnvironment(ENV_FLAG_COLD, &item);
-
-	int waterDepth = GetWaterDepth(&item);
-	int waterHeight = GetWaterHeight(&item);
-
-	auto pointColl = GetCollision(item);
-	int heightFromWater = (waterHeight == NO_HEIGHT) ? NO_HEIGHT : (std::min(item.Pose.Position.y, pointColl.Position.Floor) - waterHeight);
+	auto pointColl = GetPointCollision(item);
+	int heightFromWater = (pointColl.GetWaterTopHeight() == NO_HEIGHT) ?
+		NO_HEIGHT : (std::min(item.Pose.Position.y, pointColl.GetFloorHeight()) - pointColl.GetWaterTopHeight());
 
 	return PlayerWaterData
 	{
-		isWater, isSwamp, isCold,
-		waterDepth, waterHeight, heightFromWater
+		TestEnvironment(ENV_FLAG_WATER, &item), TestEnvironment(ENV_FLAG_SWAMP, &item), TestEnvironment(ENV_FLAG_COLD, &item),
+		pointColl.GetWaterBottomHeight(), pointColl.GetWaterTopHeight(), heightFromWater
 	};
 }
 
@@ -1293,23 +1252,50 @@ JumpDirection GetPlayerJumpDirection(const ItemInfo& item, const CollisionInfo& 
 	return JumpDirection::None;
 }
 
-short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
+static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)
+{
+	auto tilt = GetSurfaceTilt(floorNormal, true);
+
+	short headingAngle = ANGLE(0.0f);
+	if (tilt.x > 2)
+	{
+		headingAngle = ANGLE(-90.0f);
+	}
+	else if (tilt.x < -2)
+	{
+		headingAngle = ANGLE(90.0f);
+	}
+
+	if (tilt.y > 2 && tilt.y > abs(tilt.x))
+	{
+		headingAngle = ANGLE(180.0f);
+	}
+	else if (tilt.y < -2 && -tilt.y > abs(tilt.x))
+	{
+		headingAngle = ANGLE(0.0f);
+	}
+
+	return headingAngle;
+}
+
+short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;
-	auto probe = GetCollision(item);
+	auto pointColl = GetPointCollision(*item);
 
 	// Ground is flat.
-	if (probe.FloorTilt == Vector2::Zero)
-		return headingAngle;
+	if (pointColl.GetFloorNormal() == -Vector3::UnitY)
+		return coll->Setup.ForwardAngle;
 
-	// Get either:
-	// a) the surface aspect angle (extended slides), or
-	// b) the derived nearest cardinal direction from it (original slides).
-	headingAngle = Geometry::GetSurfaceAspectAngle(probe.FloorNormal);
+	// Return slide heading angle.
 	if (g_GameFlow->HasSlideExtended())
-		return headingAngle;
+	{
+		return Geometry::GetSurfaceAspectAngle(pointColl.GetFloorNormal());
+	}
 	else
-		return (GetQuadrant(headingAngle) * ANGLE(90.0f));
+	{
+		return GetLegacySlideHeadingAngle(pointColl.GetFloorNormal());
+	}
 }
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
@@ -1497,7 +1483,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 	if (g_GameFlow->HasSlideExtended())
 	{
-		auto probe = GetCollision(item);
+		auto probe = GetPointCollision(*item);
 		short minSlideAngle = ANGLE(33.75f);
 		//short steepness = Geometry::GetSurfaceSlopeAngle(probe.FloorTilt);
 		//short direction = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
@@ -1518,7 +1504,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	// Determine relative orientation adhering to floor normal.
-	auto floorNormal = GetCollision(item).FloorNormal;
+	auto floorNormal = GetPointCollision(*item).GetFloorNormal();
 	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
 	// Apply extra rotation according to alpha.
@@ -1610,7 +1596,8 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	static short oldAngle = 1;
 
 	short aspectAngle = Geometry::GetSurfaceAspectAngle(coll->FloorNormal);
-	short angle = GetQuadrant(aspectAngle) * ANGLE(90.0f);
+	short angle = GetLegacySlideHeadingAngle(coll->FloorNormal);
+
 	short delta = angle - item->Pose.Orientation.y;
 
 	ShiftItem(item, coll);
@@ -1641,7 +1628,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 // TODO: Do it later.
 void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 {
-	short headinAngle = GetLaraSlideDirection(item, coll);
+	short headinAngle = GetPlayerSlideHeadingAngle(item, coll);
 	short deltaAngle = headinAngle - item->Pose.Orientation.y;
 
 	if (!g_GameFlow->HasSlideExtended())
@@ -1718,10 +1705,10 @@ void SetLaraVehicle(ItemInfo* item, ItemInfo* vehicle)
 
 	if (vehicle == nullptr)
 	{
-		if (lara->Context.Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_VALUE)
 			g_Level.Items[lara->Context.Vehicle].Active = false;
 
-		lara->Context.Vehicle = NO_ITEM;
+		lara->Context.Vehicle = NO_VALUE;
 	}
 	else
 	{
@@ -1742,23 +1729,23 @@ void ResetPlayerFlex(ItemInfo* item, float alpha)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.ExtraHeadRot.Lerp(EulerAngles::Zero, alpha);
-	player.ExtraTorsoRot.Lerp(EulerAngles::Zero, alpha);
+	player.ExtraHeadRot.Lerp(EulerAngles::Identity, alpha);
+	player.ExtraTorsoRot.Lerp(EulerAngles::Identity, alpha);
 }
 
 void ResetPlayerLookAround(ItemInfo& item, float alpha)
 {
 	auto& player = GetLaraInfo(item);
 
-	player.Control.Look.Orientation = EulerAngles::Zero;
+	player.Control.Look.Orientation = EulerAngles::Identity;
 
 	if (Camera.type != CameraType::Look)
 	{
-		player.ExtraHeadRot.Lerp(EulerAngles::Zero, alpha);
+		player.ExtraHeadRot.Lerp(EulerAngles::Identity, alpha);
 
 		if (player.Control.HandStatus != HandStatus::Busy &&
 			!player.LeftArm.Locked && !player.RightArm.Locked &&
-			player.Context.Vehicle == NO_ITEM)
+			player.Context.Vehicle == NO_VALUE)
 		{
 			player.ExtraTorsoRot = player.ExtraHeadRot;
 		}

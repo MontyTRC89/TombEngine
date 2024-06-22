@@ -123,6 +123,7 @@
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,7 +139,10 @@
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)Specific\savegame\schema\
+      <Command>CD $(ProjectDir)..\Documentation\
+CALL compile.bat .
+
+CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
 
 md "$(SolutionDir)Build\$(Configuration)\Shaders"
@@ -149,7 +153,7 @@ xcopy /Y "$(SolutionDir)Libs\bass\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
-      <Message>Generating savegame flatbuffer and copying needed files...</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -170,6 +174,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -185,7 +190,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)Specific\savegame\schema\
+      <Command>CD $(ProjectDir)..\Documentation\
+CALL compile.bat .
+
+CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
 
 md "$(SolutionDir)Build\$(Configuration)\Shaders"
@@ -196,7 +204,7 @@ xcopy /Y "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
-      <Message>Generating savegame flatbuffer and copying needed files...</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -227,6 +235,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -245,7 +254,10 @@ del "$(TargetDir)*.exp" /q
 del "$(TargetDir)OIS_d.dll" /q</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)Specific\savegame\schema\
+      <Command>CD $(ProjectDir)..\Documentation\
+CALL compile.bat .
+
+CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
 
 md "$(SolutionDir)Build\$(Configuration)\Shaders"
@@ -258,7 +270,7 @@ xcopy /Y "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating savegame flatbuffer and copying needed files...</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -289,6 +301,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -306,7 +319,10 @@ del "$(TargetDir)*.exp" /q
 del "$(TargetDir)OIS_d.dll" /q</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)Specific\savegame\schema\
+      <Command>CD $(ProjectDir)..\Documentation\
+CALL compile.bat .
+
+CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
 
 md "$(SolutionDir)Build\$(Configuration)\Shaders"
@@ -319,10 +335,12 @@ xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating savegame flatbuffer and copying needed files...</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Game\collision\Point.h" />
+    <ClInclude Include="Game\Debug\Debug.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\DisplaySprite.h" />
     <ClInclude Include="Game\GuiObjects.h" />
@@ -368,7 +386,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\control\event.h" />
-    <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\Blood.h" />
     <ClInclude Include="Game\effects\Drip.h" />
     <ClInclude Include="Game\effects\Electricity.h" />
@@ -410,7 +427,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\spotcam.h" />
     <ClInclude Include="Math\Constants.h" />
     <ClInclude Include="Math\Geometry.h" />
-    <ClInclude Include="Math\Interpolation.h" />
     <ClInclude Include="Math\Legacy.h" />
     <ClInclude Include="Math\Math.h" />
     <ClInclude Include="Math\Objects\AxisAngle.h" />
@@ -422,8 +438,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Math\Objects\Vector3i.h" />
     <ClInclude Include="Math\Random.h" />
     <ClInclude Include="Math\Solvers.h" />
+    <ClInclude Include="Math\Utils.h" />
     <ClInclude Include="Objects\Effects\Boss.h" />
     <ClInclude Include="Objects\Effects\effect_objects.h" />
+    <ClInclude Include="Objects\Effects\EmberEmitter.h" />
     <ClInclude Include="Objects\Effects\enemy_missile.h" />
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
     <ClInclude Include="Objects\Effects\tr4_locusts.h" />
@@ -481,9 +499,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR1\Trap\SlammingDoors.h" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
     <ClInclude Include="Objects\TR1\Trap\SwingingBlade.h" />
+    <ClInclude Include="Objects\TR2\Entity\Bartoli.h" />
+    <ClInclude Include="Objects\TR2\Entity\Dragon.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_barracuda.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_bird_monster.h" />
-    <ClInclude Include="Objects\TR2\Entity\tr2_dragon.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_eagle_or_crow.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_knife_thrower.h" />
     <ClInclude Include="Objects\TR2\Entity\tr2_mercenary.h" />
@@ -509,6 +528,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR2\Vehicles\speedboat_info.h" />
     <ClInclude Include="Objects\TR2\tr2_objects.h" />
     <ClInclude Include="Objects\TR3\Entity\Compsognathus.h" />
+    <ClInclude Include="Objects\TR3\Entity\FishSwarm.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
     <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
@@ -518,7 +538,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\WaspMutant.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_civvy.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_cobra.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_fish_emitter.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_flamethrower.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_monkey.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_gun.h" />
@@ -529,6 +548,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_trex.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tribesman.h" />
+    <ClInclude Include="Objects\TR3\Entity\Winston.h" />
     <ClInclude Include="Objects\TR3\Object\Corpse.h" />
     <ClInclude Include="Objects\TR3\Trap\ElectricCleaner.h" />
     <ClInclude Include="Objects\TR3\Trap\train.h" />
@@ -545,7 +565,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Vehicles\rubber_boat_info.h" />
     <ClInclude Include="Objects\TR3\Vehicles\upv.h" />
     <ClInclude Include="Objects\TR3\Vehicles\upv_info.h" />
-    <ClInclude Include="Objects\TR3\fish.h" />
     <ClInclude Include="Objects\TR3\tr3_objects.h" />
     <ClInclude Include="Objects\TR4\Entity\Wraith.h" />
     <ClInclude Include="Objects\TR4\Entity\WraithInfo.h" />
@@ -589,6 +608,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Object\tr4_senet.h" />
     <ClInclude Include="Objects\TR4\Trap\SpikyCeiling.h" />
     <ClInclude Include="Objects\TR4\Trap\SpikyWall.h" />
+    <ClInclude Include="Objects\TR4\Trap\SquishyBlock.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_birdblade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_blade.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_catwalkblade.h" />
@@ -652,6 +672,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h" />
     <ClInclude Include="Objects\TR5\Switch\tr5_raisingcog.h" />
     <ClInclude Include="Objects\TR5\Trap\LaserBarrier.h" />
+    <ClInclude Include="Objects\TR5\Trap\LaserBeam.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_explosion.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_fallingceiling.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_romehammer.h" />
@@ -663,54 +684,76 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Utils\object_helper.h" />
     <ClInclude Include="Objects\game_object_ids.h" />
     <ClInclude Include="Objects\objectslist.h" />
-    <ClInclude Include="Renderer\ConstantBuffers\ShaderFogBulb.h" />
-    <ClInclude Include="Renderer\ConstantBuffers\SkyBuffer.h" />
-    <ClInclude Include="Renderer\ConstantBuffer\ConstantBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\AnimatedBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\BlendingBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\CameraMatrixBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\ConstantBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\HUDBarBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\HUDBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\InstancedSpriteBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\InstancedStaticBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\ItemBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\LightBuffer.h" />
-    <ClInclude Include="Renderer\ConstantBuffers\MiscBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\RoomBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\ShaderFogBulb.h" />
     <ClInclude Include="Renderer\ConstantBuffers\ShaderLight.h" />
     <ClInclude Include="Renderer\ConstantBuffers\ShadowLightBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\SMAABuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\SpriteBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\StaticBuffer.h" />
     <ClInclude Include="Renderer\Frustum.h" />
-    <ClInclude Include="Renderer\IndexBuffer\IndexBuffer.h" />
-    <ClInclude Include="Renderer\Quad\RenderQuad.h" />
+    <ClInclude Include="Renderer\Graphics\IndexBuffer.h" />
+    <ClInclude Include="Renderer\Graphics\RenderTarget2D.h" />
+    <ClInclude Include="Renderer\Graphics\RenderTargetCube.h" />
+    <ClInclude Include="Renderer\Graphics\Texture2D.h" />
+    <ClInclude Include="Renderer\Graphics\Texture2DArray.h" />
+    <ClInclude Include="Renderer\Graphics\TextureBase.h" />
+    <ClInclude Include="Renderer\Graphics\VertexBuffer.h" />
+    <ClInclude Include="Renderer\Graphics\Vertices\PostProcessVertex.h" />
+    <ClInclude Include="Renderer\Graphics\Vertices\SpriteVertex.h" />
+    <ClInclude Include="Renderer\Graphics\Vertices\Vertex.h" />
+    <ClInclude Include="Renderer\Renderer.h" />
+    <ClInclude Include="Renderer\RendererEnums.h" />
     <ClInclude Include="Renderer\RendererSprite2D.h" />
-    <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h" />
-    <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
-    <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
-    <ClInclude Include="Renderer\RenderView\RenderView.h" />
-    <ClInclude Include="Renderer\Renderer11.h" />
-    <ClInclude Include="Renderer\Renderer11Enums.h" />
     <ClInclude Include="Renderer\RendererBucket.h" />
     <ClInclude Include="Renderer\RendererPolygon.h" />
     <ClInclude Include="Renderer\RendererRectangle.h" />
     <ClInclude Include="Renderer\RendererSpriteVertex.h" />
-    <ClInclude Include="Renderer\RendererSprites.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
-    <ClInclude Include="Renderer\RendererVertex.h" />
+    <ClInclude Include="Renderer\RendererUtils.h" />
+    <ClInclude Include="Renderer\RenderView.h" />
+    <ClInclude Include="Renderer\SMAA\AreaTex.h" />
+    <ClInclude Include="Renderer\SMAA\SearchTex.h" />
+    <ClInclude Include="Renderer\Structures\RendererAnimatedTexture.h" />
+    <ClInclude Include="Renderer\Structures\RendererAnimatedTextureSet.h" />
     <ClInclude Include="Renderer\Structures\RendererBone.h" />
+    <ClInclude Include="Renderer\Structures\RendererBucket.h" />
     <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
     <ClInclude Include="Renderer\Structures\RendererDoor.h" />
+    <ClInclude Include="Renderer\Structures\RendererEffect.h" />
     <ClInclude Include="Renderer\Structures\RendererFogBulb.h" />
+    <ClInclude Include="Renderer\Structures\RendererHudBar.h" />
+    <ClInclude Include="Renderer\Structures\RendererItem.h" />
     <ClInclude Include="Renderer\Structures\RendererLight.h" />
+    <ClInclude Include="Renderer\Structures\RendererLine2D.h" />
+    <ClInclude Include="Renderer\Structures\RendererLine3D.h" />
+    <ClInclude Include="Renderer\Structures\RendererMesh.h" />
+    <ClInclude Include="Renderer\Structures\RendererObject.h" />
+    <ClInclude Include="Renderer\Structures\RendererPolygon.h" />
+    <ClInclude Include="Renderer\Structures\RendererRectangle.h" />
     <ClInclude Include="Renderer\Structures\RendererRoom.h" />
+    <ClInclude Include="Renderer\Structures\RendererRoomAmbientMap.h" />
+    <ClInclude Include="Renderer\Structures\RendererRoomNode.h" />
+    <ClInclude Include="Renderer\Structures\RendererSortableObject.h" />
+    <ClInclude Include="Renderer\Structures\RendererSprite.h" />
+    <ClInclude Include="Renderer\Structures\RendererSprite2D.h" />
+    <ClInclude Include="Renderer\Structures\RendererSpriteBucket.h" />
+    <ClInclude Include="Renderer\Structures\RendererSpriteSequence.h" />
+    <ClInclude Include="Renderer\Structures\RendererSpriteToDraw.h" />
+    <ClInclude Include="Renderer\Structures\RendererStatic.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
-    <ClInclude Include="Renderer\Texture2DArray\Texture2DArray.h" />
-    <ClInclude Include="Renderer\Texture2D\Texture2D.h" />
-    <ClInclude Include="Renderer\TextureBase.h" />
-    <ClInclude Include="Renderer\Utils.h" />
-    <ClInclude Include="Renderer\VertexBuffer\VertexBuffer.h" />
+    <ClInclude Include="Renderer\Structures\RendererTriangle3D.h" />
     <ClInclude Include="Scripting\Include\Flow\ScriptInterfaceFlowHandler.h" />
     <ClInclude Include="Scripting\Include\Objects\ScriptInterfaceObjectsHandler.h" />
     <ClInclude Include="Scripting\Include\ScriptInterfaceGame.h" />
@@ -775,6 +818,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Vec3\Vec3.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\AlignModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\CameraTypes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\View\PostProcessEffects.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\ScaleModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\ViewHandler.h" />
     <ClInclude Include="Sound\sound.h" />
@@ -816,6 +860,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
+    <ClCompile Include="Game\collision\Point.cpp" />
     <ClCompile Include="Game\collision\sphere.cpp" />
     <ClCompile Include="Game\control\box.cpp" />
     <ClCompile Include="Game\control\control.cpp" />
@@ -824,7 +869,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\control\lot.cpp" />
     <ClCompile Include="Game\control\trigger.cpp" />
     <ClCompile Include="Game\control\volume.cpp" />
-    <ClCompile Include="Game\debug\debug.cpp" />
+    <ClCompile Include="Game\Debug\Debug.cpp" />
     <ClCompile Include="Game\effects\Blood.cpp" />
     <ClCompile Include="Game\effects\Bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
@@ -891,9 +936,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Setup.cpp" />
     <ClCompile Include="Game\spotcam.cpp" />
     <ClCompile Include="Math\Geometry.cpp" />
-    <ClCompile Include="Math\Interpolation.cpp" />
     <ClCompile Include="Math\Legacy.cpp" />
-    <ClCompile Include="Math\Math.cpp" />
     <ClCompile Include="Math\Objects\AxisAngle.cpp" />
     <ClCompile Include="Math\Objects\EulerAngles.cpp" />
     <ClCompile Include="Math\Objects\GameBoundingBox.cpp" />
@@ -903,8 +946,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Math\Objects\Vector3i.cpp" />
     <ClCompile Include="Math\Random.cpp" />
     <ClCompile Include="Math\Solvers.cpp" />
+    <ClCompile Include="Math\Utils.cpp" />
     <ClCompile Include="Objects\Effects\Boss.cpp" />
     <ClCompile Include="Objects\Effects\effect_objects.cpp" />
+    <ClCompile Include="Objects\Effects\EmberEmitter.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
@@ -962,9 +1007,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Objects\TR1\Trap\SlammingDoors.cpp" />
     <ClCompile Include="Objects\TR1\Trap\SwingingBlade.cpp" />
+    <ClCompile Include="Objects\TR2\Entity\Bartoli.cpp" />
+    <ClCompile Include="Objects\TR2\Entity\Dragon.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_barracuda.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_bird_monster.cpp" />
-    <ClCompile Include="Objects\TR2\Entity\tr2_dragon.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_eagle_or_crow.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_knife_thrower.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_mercenary.cpp" />
@@ -988,6 +1034,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR2\Vehicles\skidoo.cpp" />
     <ClCompile Include="Objects\TR2\Vehicles\speedboat.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Compsognathus.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\FishSwarm.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Shiva.cpp" />
@@ -995,7 +1042,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_civvy.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_claw_mutant.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_cobra.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_fish_emitter.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_flamethrower.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_monkey.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_gun.cpp" />
@@ -1009,6 +1055,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\TwinAutoGun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\WaspMutant.cpp" />
     <ClCompile Include="Objects\TR3\Object\corpse.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Winston.cpp" />
     <ClCompile Include="Objects\TR3\tr3_objects.cpp" />
     <ClCompile Include="Objects\TR3\Trap\ElectricCleaner.cpp" />
     <ClCompile Include="Objects\TR3\Trap\train.cpp" />
@@ -1061,6 +1108,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\tr4_objects.cpp" />
     <ClCompile Include="Objects\TR4\Trap\SpikyCeiling.cpp" />
     <ClCompile Include="Objects\TR4\Trap\SpikyWall.cpp" />
+    <ClCompile Include="Objects\TR4\Trap\SquishyBlock.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_birdblade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_blade.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_catwalkblade.cpp" />
@@ -1120,6 +1168,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR5\Switch\tr5_raisingcog.cpp" />
     <ClCompile Include="Objects\TR5\tr5_objects.cpp" />
     <ClCompile Include="Objects\TR5\Trap\LaserBarrier.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\LaserBeam.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_explosion.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_fallingceiling.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_romehammer.cpp" />
@@ -1129,41 +1178,24 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Utils\object_helper.cpp" />
     <ClCompile Include="Objects\Utils\VehicleHelpers.cpp" />
     <ClCompile Include="Renderer\Frustum.cpp" />
-    <ClCompile Include="Renderer\Quad\RenderQuad.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Renderer\IndexBuffer\IndexBuffer.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Renderer\Renderer11.cpp" />
-    <ClCompile Include="Renderer\Renderer11Compatibility.cpp" />
-    <ClCompile Include="Renderer\Renderer11Debug.cpp" />
-    <ClCompile Include="Renderer\Renderer11Draw.cpp" />
-    <ClCompile Include="Renderer\Renderer11Draw2D.cpp" />
-    <ClCompile Include="Renderer\Renderer11DrawEffect.cpp" />
-    <ClCompile Include="Renderer\Renderer11DrawMenu.cpp" />
-    <ClCompile Include="Renderer\Renderer11Frame.cpp" />
-    <ClCompile Include="Renderer\Renderer11Helper.cpp" />
-    <ClCompile Include="Renderer\Renderer11Init.cpp" />
-    <ClCompile Include="Renderer\Renderer11Lara.cpp" />
-    <ClCompile Include="Renderer\Renderer11PostProcess.cpp" />
-    <ClCompile Include="Renderer\Renderer11Settings.cpp" />
-    <ClCompile Include="Renderer\Renderer11String.cpp" />
+    <ClCompile Include="Renderer\Renderer.cpp" />
+    <ClCompile Include="Renderer\RendererAntialiasing.cpp" />
+    <ClCompile Include="Renderer\RendererCompatibility.cpp" />
+    <ClCompile Include="Renderer\RendererDebug.cpp" />
+    <ClCompile Include="Renderer\RendererDraw.cpp" />
+    <ClCompile Include="Renderer\RendererDraw2D.cpp" />
+    <ClCompile Include="Renderer\RendererDrawEffect.cpp" />
+    <ClCompile Include="Renderer\RendererDrawMenu.cpp" />
+    <ClCompile Include="Renderer\RendererFrame.cpp" />
+    <ClCompile Include="Renderer\RendererHelper.cpp" />
+    <ClCompile Include="Renderer\RendererInit.cpp" />
+    <ClCompile Include="Renderer\RendererLara.cpp" />
+    <ClCompile Include="Renderer\RendererPostProcess.cpp" />
+    <ClCompile Include="Renderer\RendererSettings.cpp" />
     <ClCompile Include="Renderer\RendererSprites.cpp" />
-    <ClCompile Include="Renderer\RenderTarget2D\RenderTarget2D.cpp" />
-    <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp" />
-    <ClCompile Include="Renderer\RenderTargetCube\RenderTargetCube.cpp" />
-    <ClCompile Include="Renderer\RenderView\RenderView.cpp" />
-    <ClCompile Include="Renderer\Texture2DArray\Texture2DArray.cpp" />
-    <ClCompile Include="Renderer\Texture2D\Texture2D.cpp" />
-    <ClCompile Include="Renderer\Utils.cpp" />
-    <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
+    <ClCompile Include="Renderer\RendererString.cpp" />
+    <ClCompile Include="Renderer\RendererUtils.cpp" />
+    <ClCompile Include="Renderer\RenderView.cpp" />
     <ClCompile Include="Scripting\Internal\LuaHandler.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptAssert.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptInterfaceState.cpp" />
@@ -1220,7 +1252,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <None Include="Resources.aps" />
     <None Include="RuleSet.ruleset" />
     <None Include="Shaders\AnimatedTextures.hlsli" />
-    <None Include="Shaders\CameraMatrixBuffer.hlsli">
+    <None Include="Shaders\CBCamera.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1232,6 +1264,15 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <FileType>Text</FileType>
     </None>
     <None Include="Shaders\Blending.hlsli" />
+    <None Include="Shaders\CBPostProcess.hlsli">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Shaders\CBStatic.hlsli">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Shaders\SMAA.hlsli">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="Shaders\ShaderLight.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -1239,6 +1280,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="Shaders\Shadows.hlsli" />
+    <None Include="Shaders\SpriteEffects.hlsli">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="Shaders\VertexEffects.hlsli" />
     <None Include="Shaders\VertexInput.hlsli">
       <DeploymentContent>true</DeploymentContent>
@@ -1251,55 +1295,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <Image Include="ten.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\HUD\DX11_PS_HUD.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <FileType>Document</FileType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
-    </None>
-    <None Include="Shaders\HUD\DX11_PS_HUDBar.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <FileType>Document</FileType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <AllResourcesBound Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </AllResourcesBound>
-      <AllResourcesBound Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </AllResourcesBound>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <AllResourcesBound Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </AllResourcesBound>
-      <AllResourcesBound Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </AllResourcesBound>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\HUD\DX11_VS_HUD.hlsl">
+    <None Include="Shaders\HUD.hlsl">
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -1320,7 +1316,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\DX11_AmbientCubeMap.fx">
+    <None Include="Shaders\FullscreenQuad.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1331,40 +1327,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <FileType>Document</FileType>
     </None>
-    <None Include="Shaders\DX11_FinalPass.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <FileType>Document</FileType>
-    </None>
-    <None Include="Shaders\DX11_FullscreenQuad.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <FileType>Document</FileType>
-    </None>
-    <None Include="Shaders\DX11_Hairs.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <FileType>Document</FileType>
-    </None>
-    <None Include="Shaders\DX11_Inventory.fx">
+    <None Include="Shaders\Inventory.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1387,7 +1350,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.1</ShaderModel>
     </None>
-    <None Include="Shaders\DX11_InstancedSprites.fx">
+    <None Include="Shaders\InstancedSprites.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1410,7 +1373,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.1</ShaderModel>
     </None>
-    <None Include="Shaders\DX11_Items.fx">
+    <None Include="Shaders\Items.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1433,7 +1396,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.1</ShaderModel>
     </None>
-    <None Include="Shaders\DX11_Rooms.fx">
+    <None Include="Shaders\Rooms.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1460,7 +1423,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SHADOW_MAP_SIZE=512</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SHADOW_MAP_SIZE=512</PreprocessorDefinitions>
     </None>
-    <None Include="Shaders\DX11_ShadowMap.fx">
+    <None Include="Shaders\ShadowMap.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1471,7 +1434,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <FileType>Document</FileType>
     </None>
-    <None Include="Shaders\DX11_Sky.fx">
+    <None Include="Shaders\Sky.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1482,7 +1445,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <FileType>Document</FileType>
     </None>
-    <None Include="Shaders\DX11_Solid.fx">
+    <None Include="Shaders\Solid.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1493,7 +1456,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <FileType>Document</FileType>
     </None>
-    <None Include="Shaders\DX11_Sprites.fx">
+    <None Include="Shaders\Sprites.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1504,7 +1467,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <FileType>Document</FileType>
     </None>
-    <None Include="Shaders\DX11_Statics.fx">
+    <None Include="Shaders\Statics.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1517,7 +1480,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\DX11_InstancedStatics.fx">
+    <None Include="Shaders\InstancedStatics.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1527,6 +1490,34 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\GBuffer.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\RoomAmbient.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Shaders\SMAA.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\FXAA.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\SSAO.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\PostProcess.fx">
+      <DeploymentContent>true</DeploymentContent>
     </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

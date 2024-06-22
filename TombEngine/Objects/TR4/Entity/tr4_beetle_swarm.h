@@ -12,6 +12,8 @@ namespace TEN::Entities::TR4
 		bool On;
 
 		byte Flags;
+
+		Matrix Transform;
 	};
 
 	constexpr auto NUM_BEETLES = 256;

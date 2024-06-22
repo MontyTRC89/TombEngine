@@ -3,7 +3,7 @@
 
 #include <CommCtrl.h>
 
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "resource.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Internal/LanguageScript.h"
@@ -186,7 +186,8 @@ bool SaveConfiguration()
 		SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_MAP_SIZE, g_Configuration.ShadowMapSize) != ERROR_SUCCESS ||
 		SetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, g_Configuration.ShadowBlobsMax) != ERROR_SUCCESS ||
 		SetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, g_Configuration.EnableCaustics) != ERROR_SUCCESS ||
-		SetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, (DWORD)g_Configuration.AntialiasingMode) != ERROR_SUCCESS)
+		SetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, (DWORD)g_Configuration.AntialiasingMode) != ERROR_SUCCESS ||
+		SetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, g_Configuration.EnableAmbientOcclusion) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
@@ -229,6 +230,7 @@ bool SaveConfiguration()
 
 	// Set Gameplay keys.
 	if (SetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_MONKEY_JUMP, g_Configuration.EnableAutoMonkeySwingJump) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, g_Configuration.EnableTargetHighlighter) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS ||
@@ -311,7 +313,8 @@ void InitDefaultConfiguration()
 	g_Configuration.ShadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
 	g_Configuration.ShadowBlobsMax = GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX;
 	g_Configuration.EnableCaustics = true;
-	g_Configuration.AntialiasingMode = AntialiasingMode::Low;
+	g_Configuration.AntialiasingMode = AntialiasingMode::Medium;
+	g_Configuration.EnableAmbientOcclusion = true;
 
 	g_Configuration.SoundDevice = 1;
 	g_Configuration.EnableSound = true;
@@ -320,8 +323,9 @@ void InitDefaultConfiguration()
 	g_Configuration.SfxVolume = 100;
 
 	g_Configuration.EnableSubtitles = true;
+	g_Configuration.EnableAutoMonkeySwingJump = false;
 	g_Configuration.EnableAutoTargeting = true;
-	g_Configuration.EnableTargetHighlighter = false;
+	g_Configuration.EnableTargetHighlighter = true;
 	g_Configuration.EnableRumble = true;
 	g_Configuration.EnableThumbstickCamera = false;
 
@@ -359,6 +363,7 @@ bool LoadConfiguration()
 	DWORD shadowBlobsMax = GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX;
 	bool enableCaustics = false;
 	DWORD antialiasingMode = 1;
+	bool enableAmbientOcclusion = false;
 
 	// Load Graphics keys.
 	if (GetDWORDRegKey(graphicsKey, REGKEY_SCREEN_WIDTH, &screenWidth, 0) != ERROR_SUCCESS ||
@@ -368,7 +373,8 @@ bool LoadConfiguration()
 		GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_MAP_SIZE, &shadowMapSize, GameConfiguration::DEFAULT_SHADOW_MAP_SIZE) != ERROR_SUCCESS ||
 		GetDWORDRegKey(graphicsKey, REGKEY_SHADOW_BLOBS_MAX, &shadowBlobsMax, GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX) != ERROR_SUCCESS ||
 		GetBoolRegKey(graphicsKey, REGKEY_ENABLE_CAUSTICS, &enableCaustics, true) != ERROR_SUCCESS ||
-		GetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, &antialiasingMode, true) != ERROR_SUCCESS)
+		GetDWORDRegKey(graphicsKey, REGKEY_ANTIALIASING_MODE, &antialiasingMode, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(graphicsKey, REGKEY_AMBIENT_OCCLUSION, &enableAmbientOcclusion, false) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
@@ -415,6 +421,7 @@ bool LoadConfiguration()
 		return false;
 	}
 
+	bool enableAutoMonkeySwingJump = false;
 	bool enableSubtitles = true;
 	bool enableAutoTargeting = true;
 	bool enableTargetHighlighter = true;
@@ -422,7 +429,8 @@ bool LoadConfiguration()
 	bool enableThumbstickCamera = true;
 
 	// Load Gameplay keys.
-	if (GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS ||
+	if (GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_MONKEY_JUMP, &enableAutoMonkeySwingJump, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, &enableTargetHighlighter, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
@@ -495,6 +503,7 @@ bool LoadConfiguration()
 	g_Configuration.EnableCaustics = enableCaustics;
 	g_Configuration.AntialiasingMode = AntialiasingMode(antialiasingMode);
 	g_Configuration.ShadowMapSize = shadowMapSize;
+	g_Configuration.EnableAmbientOcclusion = enableAmbientOcclusion;
 
 	g_Configuration.EnableSound = enableSound;
 	g_Configuration.EnableReverb = enableReverb;
@@ -502,11 +511,12 @@ bool LoadConfiguration()
 	g_Configuration.SfxVolume = sfxVolume;
 	g_Configuration.SoundDevice = soundDevice;
 
+	g_Configuration.EnableSubtitles = enableSubtitles;
+	g_Configuration.EnableAutoMonkeySwingJump = enableAutoMonkeySwingJump;
 	g_Configuration.EnableAutoTargeting = enableAutoTargeting;
 	g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
 	g_Configuration.EnableRumble = enableRumble;
 	g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
-	g_Configuration.EnableSubtitles = enableSubtitles;
 
 	g_Configuration.MouseSensitivity = mouseSensitivity;
 	g_Configuration.MouseSmoothing = mouseSmoothing;

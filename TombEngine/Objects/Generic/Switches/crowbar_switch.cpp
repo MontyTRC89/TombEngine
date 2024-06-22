@@ -77,7 +77,7 @@ namespace TEN::Entities::Switches
 						else
 							laraInfo->Context.InteractedItem = itemNumber;
 
-						g_Gui.SetInventoryItemChosen(NO_ITEM);
+						g_Gui.SetInventoryItemChosen(NO_VALUE);
 					}
 					else
 						doSwitch = -1;
@@ -106,7 +106,7 @@ namespace TEN::Entities::Switches
 						else
 							laraInfo->Context.InteractedItem = itemNumber;
 
-						g_Gui.SetInventoryItemChosen(NO_ITEM);
+						g_Gui.SetInventoryItemChosen(NO_VALUE);
 					}
 					else
 						doSwitch = -1;

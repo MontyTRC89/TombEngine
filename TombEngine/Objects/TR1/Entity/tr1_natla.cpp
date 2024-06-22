@@ -59,8 +59,8 @@ namespace TEN::Entities::Creatures::TR1
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		AI_INFO ai;
 		int timer = creature->Flags & NATLA_TIMER;
@@ -301,7 +301,7 @@ namespace TEN::Entities::Creatures::TR1
 			case NATLA_STATE_AIM:
 				creature->MaxTurn = NATLA_FLY_ANGLE_SPEED;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 				}
@@ -319,7 +319,7 @@ namespace TEN::Entities::Creatures::TR1
 			case NATLA_STATE_SHOOT:
 				creature->MaxTurn = NATLA_FLY_ANGLE_SPEED;
 
-				if (item->Animation.RequiredState == NO_STATE && ai.ahead)
+				if (item->Animation.RequiredState == NO_VALUE && ai.ahead)
 				{
 					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle, BombGun);
 					CreatureEffect2(item, NatlaGunBite, NATLA_GUN_VELOCITY, ai.angle + (GetRandomControl() - ANGLE(45.0f)) / 4, BombGun);

@@ -246,7 +246,7 @@ namespace TEN::Entities::Creatures::TR3
 	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const CreatureBiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
 	{
 		int fxNumber = CreateNewEffect(item.RoomNumber);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto& fx = EffectList[fxNumber];
@@ -806,7 +806,7 @@ namespace TEN::Entities::Creatures::TR3
 			spark->fadeToBlack = 0;
 			spark->life =
 			spark->sLife = mulSqr * 9;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->x = pos.x;
 			spark->y = pos.y;
 			spark->z = pos.z;

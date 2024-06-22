@@ -149,6 +149,10 @@ struct Volume;
 struct VolumeBuilder;
 struct VolumeT;
 
+struct FishData;
+struct FishDataBuilder;
+struct FishDataT;
+
 struct KeyValPair;
 
 struct ScriptTable;
@@ -5877,6 +5881,185 @@ inline flatbuffers::Offset<Volume> CreateVolumeDirect(
 
 flatbuffers::Offset<Volume> CreateVolume(flatbuffers::FlatBufferBuilder &_fbb, const VolumeT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct FishDataT : public flatbuffers::NativeTable {
+  typedef FishData TableType;
+  bool is_patrolling = false;
+  bool is_lethal = false;
+  int32_t leader_item_number = 0;
+  float life = 0.0f;
+  int32_t mesh_index = 0;
+  std::unique_ptr<TEN::Save::EulerAngles> orientation{};
+  std::unique_ptr<TEN::Save::Vector3> position{};
+  std::unique_ptr<TEN::Save::Vector3> position_target{};
+  int32_t room_number = 0;
+  int32_t target_item_number = 0;
+  float undulation = 0.0f;
+  float velocity = 0.0f;
+};
+
+struct FishData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FishDataT NativeTableType;
+  typedef FishDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_IS_PATROLLING = 4,
+    VT_IS_LETHAL = 6,
+    VT_LEADER_ITEM_NUMBER = 8,
+    VT_LIFE = 10,
+    VT_MESH_INDEX = 12,
+    VT_ORIENTATION = 14,
+    VT_POSITION = 16,
+    VT_POSITION_TARGET = 18,
+    VT_ROOM_NUMBER = 20,
+    VT_TARGET_ITEM_NUMBER = 22,
+    VT_UNDULATION = 24,
+    VT_VELOCITY = 26
+  };
+  bool is_patrolling() const {
+    return GetField<uint8_t>(VT_IS_PATROLLING, 0) != 0;
+  }
+  bool is_lethal() const {
+    return GetField<uint8_t>(VT_IS_LETHAL, 0) != 0;
+  }
+  int32_t leader_item_number() const {
+    return GetField<int32_t>(VT_LEADER_ITEM_NUMBER, 0);
+  }
+  float life() const {
+    return GetField<float>(VT_LIFE, 0.0f);
+  }
+  int32_t mesh_index() const {
+    return GetField<int32_t>(VT_MESH_INDEX, 0);
+  }
+  const TEN::Save::EulerAngles *orientation() const {
+    return GetStruct<const TEN::Save::EulerAngles *>(VT_ORIENTATION);
+  }
+  const TEN::Save::Vector3 *position() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_POSITION);
+  }
+  const TEN::Save::Vector3 *position_target() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_POSITION_TARGET);
+  }
+  int32_t room_number() const {
+    return GetField<int32_t>(VT_ROOM_NUMBER, 0);
+  }
+  int32_t target_item_number() const {
+    return GetField<int32_t>(VT_TARGET_ITEM_NUMBER, 0);
+  }
+  float undulation() const {
+    return GetField<float>(VT_UNDULATION, 0.0f);
+  }
+  float velocity() const {
+    return GetField<float>(VT_VELOCITY, 0.0f);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_IS_PATROLLING) &&
+           VerifyField<uint8_t>(verifier, VT_IS_LETHAL) &&
+           VerifyField<int32_t>(verifier, VT_LEADER_ITEM_NUMBER) &&
+           VerifyField<float>(verifier, VT_LIFE) &&
+           VerifyField<int32_t>(verifier, VT_MESH_INDEX) &&
+           VerifyField<TEN::Save::EulerAngles>(verifier, VT_ORIENTATION) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION_TARGET) &&
+           VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
+           VerifyField<int32_t>(verifier, VT_TARGET_ITEM_NUMBER) &&
+           VerifyField<float>(verifier, VT_UNDULATION) &&
+           VerifyField<float>(verifier, VT_VELOCITY) &&
+           verifier.EndTable();
+  }
+  FishDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FishDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<FishData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FishDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct FishDataBuilder {
+  typedef FishData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_is_patrolling(bool is_patrolling) {
+    fbb_.AddElement<uint8_t>(FishData::VT_IS_PATROLLING, static_cast<uint8_t>(is_patrolling), 0);
+  }
+  void add_is_lethal(bool is_lethal) {
+    fbb_.AddElement<uint8_t>(FishData::VT_IS_LETHAL, static_cast<uint8_t>(is_lethal), 0);
+  }
+  void add_leader_item_number(int32_t leader_item_number) {
+    fbb_.AddElement<int32_t>(FishData::VT_LEADER_ITEM_NUMBER, leader_item_number, 0);
+  }
+  void add_life(float life) {
+    fbb_.AddElement<float>(FishData::VT_LIFE, life, 0.0f);
+  }
+  void add_mesh_index(int32_t mesh_index) {
+    fbb_.AddElement<int32_t>(FishData::VT_MESH_INDEX, mesh_index, 0);
+  }
+  void add_orientation(const TEN::Save::EulerAngles *orientation) {
+    fbb_.AddStruct(FishData::VT_ORIENTATION, orientation);
+  }
+  void add_position(const TEN::Save::Vector3 *position) {
+    fbb_.AddStruct(FishData::VT_POSITION, position);
+  }
+  void add_position_target(const TEN::Save::Vector3 *position_target) {
+    fbb_.AddStruct(FishData::VT_POSITION_TARGET, position_target);
+  }
+  void add_room_number(int32_t room_number) {
+    fbb_.AddElement<int32_t>(FishData::VT_ROOM_NUMBER, room_number, 0);
+  }
+  void add_target_item_number(int32_t target_item_number) {
+    fbb_.AddElement<int32_t>(FishData::VT_TARGET_ITEM_NUMBER, target_item_number, 0);
+  }
+  void add_undulation(float undulation) {
+    fbb_.AddElement<float>(FishData::VT_UNDULATION, undulation, 0.0f);
+  }
+  void add_velocity(float velocity) {
+    fbb_.AddElement<float>(FishData::VT_VELOCITY, velocity, 0.0f);
+  }
+  explicit FishDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<FishData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FishData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FishData> CreateFishData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    bool is_patrolling = false,
+    bool is_lethal = false,
+    int32_t leader_item_number = 0,
+    float life = 0.0f,
+    int32_t mesh_index = 0,
+    const TEN::Save::EulerAngles *orientation = 0,
+    const TEN::Save::Vector3 *position = 0,
+    const TEN::Save::Vector3 *position_target = 0,
+    int32_t room_number = 0,
+    int32_t target_item_number = 0,
+    float undulation = 0.0f,
+    float velocity = 0.0f) {
+  FishDataBuilder builder_(_fbb);
+  builder_.add_velocity(velocity);
+  builder_.add_undulation(undulation);
+  builder_.add_target_item_number(target_item_number);
+  builder_.add_room_number(room_number);
+  builder_.add_position_target(position_target);
+  builder_.add_position(position);
+  builder_.add_orientation(orientation);
+  builder_.add_mesh_index(mesh_index);
+  builder_.add_life(life);
+  builder_.add_leader_item_number(leader_item_number);
+  builder_.add_is_lethal(is_lethal);
+  builder_.add_is_patrolling(is_patrolling);
+  return builder_.Finish();
+}
+
+struct FishData::Traits {
+  using type = FishData;
+  static auto constexpr Create = CreateFishData;
+};
+
+flatbuffers::Offset<FishData> CreateFishData(flatbuffers::FlatBufferBuilder &_fbb, const FishDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct ScriptTableT : public flatbuffers::NativeTable {
   typedef ScriptTable TableType;
   std::vector<TEN::Save::KeyValPair> keys_vals{};
@@ -6925,6 +7108,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   int32_t next_item_free = 0;
   int32_t next_item_active = 0;
   std::vector<int32_t> room_items{};
+  std::vector<std::unique_ptr<TEN::Save::FishDataT>> fish_swarm{};
   std::vector<std::unique_ptr<TEN::Save::FXInfoT>> fxinfos{};
   int32_t next_fx_free = 0;
   int32_t next_fx_active = 0;
@@ -6947,6 +7131,9 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::vector<int32_t> action_queue{};
   std::vector<std::unique_ptr<TEN::Save::SoundtrackT>> soundtracks{};
   std::vector<int32_t> cd_flags{};
+  int32_t postprocess_mode = 0;
+  float postprocess_strength = 0.0f;
+  std::unique_ptr<TEN::Save::Vector3> postprocess_tint{};
   std::unique_ptr<TEN::Save::RopeT> rope{};
   std::unique_ptr<TEN::Save::PendulumT> pendulum{};
   std::unique_ptr<TEN::Save::PendulumT> alternate_pendulum{};
@@ -6980,45 +7167,49 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_NEXT_ITEM_FREE = 16,
     VT_NEXT_ITEM_ACTIVE = 18,
     VT_ROOM_ITEMS = 20,
-    VT_FXINFOS = 22,
-    VT_NEXT_FX_FREE = 24,
-    VT_NEXT_FX_ACTIVE = 26,
-    VT_FIXED_CAMERAS = 28,
-    VT_SINKS = 30,
-    VT_STATIC_MESHES = 32,
-    VT_FLYBY_CAMERAS = 34,
-    VT_PARTICLES = 36,
-    VT_RATS = 38,
-    VT_SPIDERS = 40,
-    VT_SCARABS = 42,
-    VT_BATS = 44,
-    VT_FLIP_MAPS = 46,
-    VT_FLIP_STATS = 48,
-    VT_FLIP_EFFECT = 50,
-    VT_FLIP_TIMER = 52,
-    VT_FLIP_STATUS = 54,
-    VT_CURRENT_FOV = 56,
-    VT_LAST_INV_ITEM = 58,
-    VT_ACTION_QUEUE = 60,
-    VT_SOUNDTRACKS = 62,
-    VT_CD_FLAGS = 64,
-    VT_ROPE = 66,
-    VT_PENDULUM = 68,
-    VT_ALTERNATE_PENDULUM = 70,
-    VT_VOLUMES = 72,
-    VT_GLOBAL_EVENT_SETS = 74,
-    VT_VOLUME_EVENT_SETS = 76,
-    VT_SCRIPT_VARS = 78,
-    VT_CALLBACKS_PRE_START = 80,
-    VT_CALLBACKS_POST_START = 82,
-    VT_CALLBACKS_PRE_END = 84,
-    VT_CALLBACKS_POST_END = 86,
-    VT_CALLBACKS_PRE_SAVE = 88,
-    VT_CALLBACKS_POST_SAVE = 90,
-    VT_CALLBACKS_PRE_LOAD = 92,
-    VT_CALLBACKS_POST_LOAD = 94,
-    VT_CALLBACKS_PRE_LOOP = 96,
-    VT_CALLBACKS_POST_LOOP = 98
+    VT_FISH_SWARM = 22,
+    VT_FXINFOS = 24,
+    VT_NEXT_FX_FREE = 26,
+    VT_NEXT_FX_ACTIVE = 28,
+    VT_FIXED_CAMERAS = 30,
+    VT_SINKS = 32,
+    VT_STATIC_MESHES = 34,
+    VT_FLYBY_CAMERAS = 36,
+    VT_PARTICLES = 38,
+    VT_RATS = 40,
+    VT_SPIDERS = 42,
+    VT_SCARABS = 44,
+    VT_BATS = 46,
+    VT_FLIP_MAPS = 48,
+    VT_FLIP_STATS = 50,
+    VT_FLIP_EFFECT = 52,
+    VT_FLIP_TIMER = 54,
+    VT_FLIP_STATUS = 56,
+    VT_CURRENT_FOV = 58,
+    VT_LAST_INV_ITEM = 60,
+    VT_ACTION_QUEUE = 62,
+    VT_SOUNDTRACKS = 64,
+    VT_CD_FLAGS = 66,
+    VT_POSTPROCESS_MODE = 68,
+    VT_POSTPROCESS_STRENGTH = 70,
+    VT_POSTPROCESS_TINT = 72,
+    VT_ROPE = 74,
+    VT_PENDULUM = 76,
+    VT_ALTERNATE_PENDULUM = 78,
+    VT_VOLUMES = 80,
+    VT_GLOBAL_EVENT_SETS = 82,
+    VT_VOLUME_EVENT_SETS = 84,
+    VT_SCRIPT_VARS = 86,
+    VT_CALLBACKS_PRE_START = 88,
+    VT_CALLBACKS_POST_START = 90,
+    VT_CALLBACKS_PRE_END = 92,
+    VT_CALLBACKS_POST_END = 94,
+    VT_CALLBACKS_PRE_SAVE = 96,
+    VT_CALLBACKS_POST_SAVE = 98,
+    VT_CALLBACKS_PRE_LOAD = 100,
+    VT_CALLBACKS_POST_LOAD = 102,
+    VT_CALLBACKS_PRE_LOOP = 104,
+    VT_CALLBACKS_POST_LOOP = 106
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -7046,6 +7237,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::Vector<int32_t> *room_items() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_ROOM_ITEMS);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>> *fish_swarm() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>> *>(VT_FISH_SWARM);
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *>(VT_FXINFOS);
@@ -7112,6 +7306,15 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::Vector<int32_t> *cd_flags() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_CD_FLAGS);
+  }
+  int32_t postprocess_mode() const {
+    return GetField<int32_t>(VT_POSTPROCESS_MODE, 0);
+  }
+  float postprocess_strength() const {
+    return GetField<float>(VT_POSTPROCESS_STRENGTH, 0.0f);
+  }
+  const TEN::Save::Vector3 *postprocess_tint() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_POSTPROCESS_TINT);
   }
   const TEN::Save::Rope *rope() const {
     return GetPointer<const TEN::Save::Rope *>(VT_ROPE);
@@ -7184,6 +7387,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_NEXT_ITEM_ACTIVE) &&
            VerifyOffset(verifier, VT_ROOM_ITEMS) &&
            verifier.VerifyVector(room_items()) &&
+           VerifyOffset(verifier, VT_FISH_SWARM) &&
+           verifier.VerifyVector(fish_swarm()) &&
+           verifier.VerifyVectorOfTables(fish_swarm()) &&
            VerifyOffset(verifier, VT_FXINFOS) &&
            verifier.VerifyVector(fxinfos()) &&
            verifier.VerifyVectorOfTables(fxinfos()) &&
@@ -7232,6 +7438,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVectorOfTables(soundtracks()) &&
            VerifyOffset(verifier, VT_CD_FLAGS) &&
            verifier.VerifyVector(cd_flags()) &&
+           VerifyField<int32_t>(verifier, VT_POSTPROCESS_MODE) &&
+           VerifyField<float>(verifier, VT_POSTPROCESS_STRENGTH) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_POSTPROCESS_TINT) &&
            VerifyOffset(verifier, VT_ROPE) &&
            verifier.VerifyTable(rope()) &&
            VerifyOffset(verifier, VT_PENDULUM) &&
@@ -7317,6 +7526,9 @@ struct SaveGameBuilder {
   void add_room_items(flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items) {
     fbb_.AddOffset(SaveGame::VT_ROOM_ITEMS, room_items);
   }
+  void add_fish_swarm(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>>> fish_swarm) {
+    fbb_.AddOffset(SaveGame::VT_FISH_SWARM, fish_swarm);
+  }
   void add_fxinfos(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos) {
     fbb_.AddOffset(SaveGame::VT_FXINFOS, fxinfos);
   }
@@ -7382,6 +7594,15 @@ struct SaveGameBuilder {
   }
   void add_cd_flags(flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags) {
     fbb_.AddOffset(SaveGame::VT_CD_FLAGS, cd_flags);
+  }
+  void add_postprocess_mode(int32_t postprocess_mode) {
+    fbb_.AddElement<int32_t>(SaveGame::VT_POSTPROCESS_MODE, postprocess_mode, 0);
+  }
+  void add_postprocess_strength(float postprocess_strength) {
+    fbb_.AddElement<float>(SaveGame::VT_POSTPROCESS_STRENGTH, postprocess_strength, 0.0f);
+  }
+  void add_postprocess_tint(const TEN::Save::Vector3 *postprocess_tint) {
+    fbb_.AddStruct(SaveGame::VT_POSTPROCESS_TINT, postprocess_tint);
   }
   void add_rope(flatbuffers::Offset<TEN::Save::Rope> rope) {
     fbb_.AddOffset(SaveGame::VT_ROPE, rope);
@@ -7456,6 +7677,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>>> fish_swarm = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos = 0,
     int32_t next_fx_free = 0,
     int32_t next_fx_active = 0,
@@ -7478,6 +7700,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> action_queue = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Soundtrack>>> soundtracks = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags = 0,
+    int32_t postprocess_mode = 0,
+    float postprocess_strength = 0.0f,
+    const TEN::Save::Vector3 *postprocess_tint = 0,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
@@ -7513,6 +7738,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_alternate_pendulum(alternate_pendulum);
   builder_.add_pendulum(pendulum);
   builder_.add_rope(rope);
+  builder_.add_postprocess_tint(postprocess_tint);
+  builder_.add_postprocess_strength(postprocess_strength);
+  builder_.add_postprocess_mode(postprocess_mode);
   builder_.add_cd_flags(cd_flags);
   builder_.add_soundtracks(soundtracks);
   builder_.add_action_queue(action_queue);
@@ -7534,6 +7762,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_next_fx_active(next_fx_active);
   builder_.add_next_fx_free(next_fx_free);
   builder_.add_fxinfos(fxinfos);
+  builder_.add_fish_swarm(fish_swarm);
   builder_.add_room_items(room_items);
   builder_.add_next_item_active(next_item_active);
   builder_.add_next_item_free(next_item_free);
@@ -7563,6 +7792,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
     const std::vector<int32_t> *room_items = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::FishData>> *fish_swarm = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos = nullptr,
     int32_t next_fx_free = 0,
     int32_t next_fx_active = 0,
@@ -7585,6 +7815,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     const std::vector<int32_t> *action_queue = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::Soundtrack>> *soundtracks = nullptr,
     const std::vector<int32_t> *cd_flags = nullptr,
+    int32_t postprocess_mode = 0,
+    float postprocess_strength = 0.0f,
+    const TEN::Save::Vector3 *postprocess_tint = 0,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
@@ -7605,6 +7838,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto rooms__ = rooms ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Room>>(*rooms) : 0;
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto room_items__ = room_items ? _fbb.CreateVector<int32_t>(*room_items) : 0;
+  auto fish_swarm__ = fish_swarm ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FishData>>(*fish_swarm) : 0;
   auto fxinfos__ = fxinfos ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>>(*fxinfos) : 0;
   auto fixed_cameras__ = fixed_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>>(*fixed_cameras) : 0;
   auto sinks__ = sinks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>>(*sinks) : 0;
@@ -7644,6 +7878,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       next_item_free,
       next_item_active,
       room_items__,
+      fish_swarm__,
       fxinfos__,
       next_fx_free,
       next_fx_active,
@@ -7666,6 +7901,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       action_queue__,
       soundtracks__,
       cd_flags__,
+      postprocess_mode,
+      postprocess_strength,
+      postprocess_tint,
       rope,
       pendulum,
       alternate_pendulum,
@@ -9348,6 +9586,65 @@ inline flatbuffers::Offset<Volume> CreateVolume(flatbuffers::FlatBufferBuilder &
       _queue);
 }
 
+inline FishDataT *FishData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<FishDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void FishData::UnPackTo(FishDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = is_patrolling(); _o->is_patrolling = _e; }
+  { auto _e = is_lethal(); _o->is_lethal = _e; }
+  { auto _e = leader_item_number(); _o->leader_item_number = _e; }
+  { auto _e = life(); _o->life = _e; }
+  { auto _e = mesh_index(); _o->mesh_index = _e; }
+  { auto _e = orientation(); if (_e) _o->orientation = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
+  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = position_target(); if (_e) _o->position_target = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = room_number(); _o->room_number = _e; }
+  { auto _e = target_item_number(); _o->target_item_number = _e; }
+  { auto _e = undulation(); _o->undulation = _e; }
+  { auto _e = velocity(); _o->velocity = _e; }
+}
+
+inline flatbuffers::Offset<FishData> FishData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FishDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFishData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<FishData> CreateFishData(flatbuffers::FlatBufferBuilder &_fbb, const FishDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FishDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _is_patrolling = _o->is_patrolling;
+  auto _is_lethal = _o->is_lethal;
+  auto _leader_item_number = _o->leader_item_number;
+  auto _life = _o->life;
+  auto _mesh_index = _o->mesh_index;
+  auto _orientation = _o->orientation ? _o->orientation.get() : 0;
+  auto _position = _o->position ? _o->position.get() : 0;
+  auto _position_target = _o->position_target ? _o->position_target.get() : 0;
+  auto _room_number = _o->room_number;
+  auto _target_item_number = _o->target_item_number;
+  auto _undulation = _o->undulation;
+  auto _velocity = _o->velocity;
+  return TEN::Save::CreateFishData(
+      _fbb,
+      _is_patrolling,
+      _is_lethal,
+      _leader_item_number,
+      _life,
+      _mesh_index,
+      _orientation,
+      _position,
+      _position_target,
+      _room_number,
+      _target_item_number,
+      _undulation,
+      _velocity);
+}
+
 inline ScriptTableT *ScriptTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<ScriptTableT>();
   UnPackTo(_o.get(), _resolver);
@@ -9746,6 +10043,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = next_item_free(); _o->next_item_free = _e; }
   { auto _e = next_item_active(); _o->next_item_active = _e; }
   { auto _e = room_items(); if (_e) { _o->room_items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->room_items[_i] = _e->Get(_i); } } }
+  { auto _e = fish_swarm(); if (_e) { _o->fish_swarm.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fish_swarm[_i] = std::unique_ptr<TEN::Save::FishDataT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = fxinfos(); if (_e) { _o->fxinfos.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fxinfos[_i] = std::unique_ptr<TEN::Save::FXInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = next_fx_free(); _o->next_fx_free = _e; }
   { auto _e = next_fx_active(); _o->next_fx_active = _e; }
@@ -9768,6 +10066,9 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = action_queue(); if (_e) { _o->action_queue.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->action_queue[_i] = _e->Get(_i); } } }
   { auto _e = soundtracks(); if (_e) { _o->soundtracks.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->soundtracks[_i] = std::unique_ptr<TEN::Save::SoundtrackT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = cd_flags(); if (_e) { _o->cd_flags.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->cd_flags[_i] = _e->Get(_i); } } }
+  { auto _e = postprocess_mode(); _o->postprocess_mode = _e; }
+  { auto _e = postprocess_strength(); _o->postprocess_strength = _e; }
+  { auto _e = postprocess_tint(); if (_e) _o->postprocess_tint = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeT>(_e->UnPack(_resolver)); }
   { auto _e = pendulum(); if (_e) _o->pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
   { auto _e = alternate_pendulum(); if (_e) _o->alternate_pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
@@ -9804,6 +10105,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _next_item_free = _o->next_item_free;
   auto _next_item_active = _o->next_item_active;
   auto _room_items = _fbb.CreateVector(_o->room_items);
+  auto _fish_swarm = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FishData>> (_o->fish_swarm.size(), [](size_t i, _VectorArgs *__va) { return CreateFishData(*__va->__fbb, __va->__o->fish_swarm[i].get(), __va->__rehasher); }, &_va );
   auto _fxinfos = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>> (_o->fxinfos.size(), [](size_t i, _VectorArgs *__va) { return CreateFXInfo(*__va->__fbb, __va->__o->fxinfos[i].get(), __va->__rehasher); }, &_va );
   auto _next_fx_free = _o->next_fx_free;
   auto _next_fx_active = _o->next_fx_active;
@@ -9826,6 +10128,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _action_queue = _fbb.CreateVector(_o->action_queue);
   auto _soundtracks = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Soundtrack>> (_o->soundtracks.size(), [](size_t i, _VectorArgs *__va) { return CreateSoundtrack(*__va->__fbb, __va->__o->soundtracks[i].get(), __va->__rehasher); }, &_va );
   auto _cd_flags = _fbb.CreateVector(_o->cd_flags);
+  auto _postprocess_mode = _o->postprocess_mode;
+  auto _postprocess_strength = _o->postprocess_strength;
+  auto _postprocess_tint = _o->postprocess_tint ? _o->postprocess_tint.get() : 0;
   auto _rope = _o->rope ? CreateRope(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _pendulum = _o->pendulum ? CreatePendulum(_fbb, _o->pendulum.get(), _rehasher) : 0;
   auto _alternate_pendulum = _o->alternate_pendulum ? CreatePendulum(_fbb, _o->alternate_pendulum.get(), _rehasher) : 0;
@@ -9854,6 +10159,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _next_item_free,
       _next_item_active,
       _room_items,
+      _fish_swarm,
       _fxinfos,
       _next_fx_free,
       _next_fx_active,
@@ -9876,6 +10182,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _action_queue,
       _soundtracks,
       _cd_flags,
+      _postprocess_mode,
+      _postprocess_strength,
+      _postprocess_tint,
       _rope,
       _pendulum,
       _alternate_pendulum,

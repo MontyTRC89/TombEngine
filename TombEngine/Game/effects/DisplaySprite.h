@@ -1,6 +1,6 @@
 #pragma once
 #include "Objects/game_object_ids.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 namespace TEN::Effects::DisplaySprite
 {
@@ -37,12 +37,12 @@ namespace TEN::Effects::DisplaySprite
 		int					   Priority	 = 0;
 		DisplaySpriteAlignMode AlignMode = DisplaySpriteAlignMode::Center;
 		DisplaySpriteScaleMode ScaleMode = DisplaySpriteScaleMode::Fit;
-		BLEND_MODES			   BlendMode = BLENDMODE_ALPHABLEND;
+		BlendMode			   BlendMode = BlendMode::AlphaBlend;
 	};
 
 	extern std::vector<DisplaySprite> DisplaySprites;
 	
 	void AddDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vector2& pos, short orient, const Vector2& scale, const Vector4& color,
-						  int priority, DisplaySpriteAlignMode alignMode, DisplaySpriteScaleMode scaleMode, BLEND_MODES blendMode);
+						  int priority, DisplaySpriteAlignMode alignMode, DisplaySpriteScaleMode scaleMode, BlendMode blendMode);
 	void ClearDisplaySprites();
 }

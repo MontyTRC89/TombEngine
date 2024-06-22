@@ -90,6 +90,7 @@ public:
 	[[nodiscard]] short GetLocationAI() const;
 	void SetLocationAI(short value);
 
+	[[nodiscard]] short GetMeshCount() const;
 	[[nodiscard]] bool GetMeshVisible(int meshId) const;
 	void SetMeshVisible(int meshId, bool isVisible);
 	void ShatterMesh(int meshId);
@@ -110,7 +111,7 @@ public:
 	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
 	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
 
-	void EnableItem();
+	void EnableItem(sol::optional<float> timer);
 	void DisableItem();
 	void MakeInvisible();
 	void SetVisible(bool isVisible);

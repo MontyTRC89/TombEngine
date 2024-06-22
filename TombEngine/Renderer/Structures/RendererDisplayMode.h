@@ -1,6 +1,6 @@
 #pragma once
 
-namespace TEN::Renderer
+namespace TEN::Renderer::Structures
 {
 	struct RendererDisplayMode
 	{

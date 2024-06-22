@@ -33,7 +33,7 @@ enum SPOTCAM_FLAGS
 	SCF_TRACKING_CAM			= (1 << 3),
 	SCF_HIDE_LARA				= (1 << 4),
 	SCF_FOCUS_LARA_HEAD			= (1 << 5),
-	SCF_PAN_TO_LARA_CAM			= (1 << 6),
+	SCF_CUT_TO_LARA_CAM			= (1 << 6),
 	SCF_CUT_TO_CAM				= (1 << 7),
 	SCF_STOP_MOVEMENT			= (1 << 8),  // Stop movement for a given time (cf. `Timer` field).
 	SCF_DISABLE_BREAKOUT		= (1 << 9),  // Disable breaking out from cutscene using LOOK key.

@@ -7,7 +7,7 @@
 #include "Game/lara/lara_fire.h"
 #include "Game/lara/lara_helpers.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
 
@@ -59,19 +59,6 @@ namespace TEN::Hud
 	{
 		IsPrimary = false;
 		ColorTarget = COLOR_GRAY;
-	}
-
-	bool CrosshairData::IsOffscreen() const
-	{
-		if (!Position.has_value())
-			return true;
-
-		// TODO: Not working?
-		float screenEdgeThreshold = GetRadius();
-		return (Position->x <= -screenEdgeThreshold ||
-				Position->y <= -screenEdgeThreshold ||
-				Position->x >= (DISPLAY_SPACE_RES.x + screenEdgeThreshold) ||
-				Position->y >= (DISPLAY_SPACE_RES.y + screenEdgeThreshold));
 	}
 
 	void CrosshairData::Update(const Vector3& targetPos, bool isActive, bool doPulse)
@@ -148,9 +135,9 @@ namespace TEN::Hud
 		constexpr auto PRIORITY					 = 0; // TODO: Check later. May interfere with Lua display sprites. -- Sezz 2023.10.06
 		constexpr auto ALIGN_MODE				 = DisplaySpriteAlignMode::Center;
 		constexpr auto SCALE_MODE				 = DisplaySpriteScaleMode::Fill;
-		constexpr auto BLEND_MODE				 = BLEND_MODES::BLENDMODE_ALPHABLEND;
+		constexpr auto BLEND_MODE				 = BlendMode::Additive;
 
-		if (IsOffscreen())
+		if (!Position.has_value())
 			return;
 
 		// Draw main static element.
@@ -194,7 +181,8 @@ namespace TEN::Hud
 				continue;
 
 			// Collect item number.
-			itemNumbers.push_back(itemPtr->Index);
+			if (itemPtr->HitPoints != NOT_TARGETABLE)
+				itemNumbers.push_back(itemPtr->Index);
 
 			// Find crosshair at item number key.
 			auto it = _crosshairs.find(itemPtr->Index);
@@ -203,8 +191,7 @@ namespace TEN::Hud
 
 			// Set crosshair as primary or peripheral.
 			auto& crosshair = it->second;
-			if (player.TargetEntity != nullptr &&
-				itemPtr->Index == player.TargetEntity->Index)
+			if (player.TargetEntity != nullptr && itemPtr->Index == player.TargetEntity->Index)
 			{
 				crosshair.SetPrimary();
 			}
@@ -313,8 +300,7 @@ namespace TEN::Hud
 	// TODO: If crosshair happens to be in view upon spawn, first frame is sometimes garbage.
 	void TargetHighlighterController::AddCrosshair(int itemNumber, const Vector3& targetPos)
 	{
-		constexpr auto SCALE_START		  = 0.75f;
-		constexpr auto RADIUS_SCALE_START = 1.5f * SQRT_2;
+		constexpr auto RADIUS_SCALE_START = 0.25f;
 		constexpr auto ANGLE_STEP		  = ANGLE(360.0f / CrosshairData::SEGMENT_COUNT);
 
 		auto pos = g_Renderer.Get2DPosition(targetPos);
@@ -328,7 +314,7 @@ namespace TEN::Hud
 		crosshair.IsPrimary = false;
 		crosshair.Position = *pos;
 		crosshair.Orientation = 0;
-		crosshair.Scale = SCALE_START;
+		crosshair.Scale = 0.0f;
 		crosshair.Color = CrosshairData::COLOR_GRAY;
 		crosshair.Color.w = 0.0f;
 		crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
@@ -358,21 +344,14 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::DrawDebug() const
 	{
-		unsigned int visibleCount = 0;
 		unsigned int primaryCount = 0;
 		unsigned int peripheralCount = 0;
 
 		for (const auto& [itemNumber, crosshair] : _crosshairs)
-		{
 			crosshair.IsPrimary ? primaryCount++ : peripheralCount++;
-			
-			if (!crosshair.IsOffscreen())
-				visibleCount++;
-		}
 
 		g_Renderer.PrintDebugMessage("TARGET HIGHLIGHTER DEBUG");
 		g_Renderer.PrintDebugMessage(g_Configuration.EnableTargetHighlighter ? "Enabled" : "Disabled");
-		g_Renderer.PrintDebugMessage("Visible crosshairs: %d", visibleCount);
 		g_Renderer.PrintDebugMessage("Primary crosshairs: %d", primaryCount);
 		g_Renderer.PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
 	}

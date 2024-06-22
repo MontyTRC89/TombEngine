@@ -1,6 +1,6 @@
 #pragma once
 #include "Math/Math.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 enum class LaraWeaponType;
 enum GAME_OBJECT_ID : short;
@@ -154,7 +154,7 @@ struct Particle
 	unsigned char fadeToBlack;
 	int sLife;
 	int life;
-	BLEND_MODES blendMode;
+	BlendMode blendMode;
 	unsigned char extras;
 	signed char dynamic;
 	int fxObj;
@@ -211,7 +211,7 @@ extern FX_INFO EffectList[NUM_EFFECTS];
 template <typename TEffect>
 TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
 {
-	assertion(effects.size() <= countMax, "Too many particle effects.");
+	TENAssert(effects.size() <= countMax, "Too many particle effects.");
 
 	// Add and return new effect.
 	if (effects.size() < countMax)

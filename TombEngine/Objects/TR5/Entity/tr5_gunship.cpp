@@ -170,7 +170,7 @@ namespace TEN::Entities::Creatures::TR5
 				spark->dR = 0;
 				spark->dG = 0;
 				spark->colFadeSpeed = 12;
-				spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+				spark->blendMode = BlendMode::Additive;
 				spark->fadeToBlack = 0;
 				spark->life = 12;
 				spark->sLife = 12;

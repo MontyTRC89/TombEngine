@@ -1,18 +1,21 @@
 #pragma once
 
-class Frustum
+namespace TEN::Renderer
 {
-public:
+	class Frustum
+	{
+	public:
 
-	Frustum() = default;
+		Frustum() = default;
 
-	void Update(const Matrix& view, const Matrix& projection);
-	bool PointInFrustum(const Vector3& position) const;
-	bool SphereInFrustum(const Vector3& position, float radius) const;
-	bool AABBInFrustum(const Vector3& min, const Vector3& max) const;
+		void Update(const Matrix& view, const Matrix& projection);
+		bool PointInFrustum(const Vector3& position) const;
+		bool SphereInFrustum(const Vector3& position, float radius) const;
+		bool AABBInFrustum(const Vector3& min, const Vector3& max) const;
 
-private:
+	private:
 
-	void NormalizePlane(int side);
-	std::array<std::array<float, 4>, 6> m_frustum = {};
-};
+		void NormalizePlane(int side);
+		std::array<std::array<float, 4>, 6> frustum = {};
+	};
+}

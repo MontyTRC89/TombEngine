@@ -44,7 +44,7 @@ private:
 	// A map between moveables and the engine entities they represent. This is needed
 	// so that something that is killed by the engine can notify all corresponding
 	// Lua variables which can then become invalid.
-	std::unordered_map<ItemInfo *, std::unordered_set<Moveable*>>	m_moveables{};
+	std::unordered_map<ItemInfo *, std::unordered_set<Moveable*>>	moveables{};
 	std::unordered_map<std::string, VarMapVal>						m_nameMap{};
 	std::unordered_map<std::string, short>	 						m_itemsMapName{};
 	// A set of items that are visible, collidable, and have Lua OnCollide callbacks.

@@ -59,7 +59,7 @@ namespace TEN::Entities::Creatures::TR5
 	static void HydraBubblesAttack(Pose* pos, short roomNumber, int count)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
-		if (fxNumber != NO_ITEM)
+		if (fxNumber != NO_VALUE)
 		{
 			auto* fx = &EffectList[fxNumber];
 
@@ -91,7 +91,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dG = spark->dR / 2;
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->dynamic = -1;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 		spark->x = (GetRandomControl() & 0xF) - 8;
@@ -139,7 +139,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dG = spark->dR / 2;
 		spark->fadeToBlack = 4;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->dynamic = -1;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 		spark->x = (GetRandomControl() & 0xF) - 8;

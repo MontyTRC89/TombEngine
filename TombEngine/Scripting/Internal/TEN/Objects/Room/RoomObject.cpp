@@ -1,7 +1,7 @@
 #pragma once
 #include "framework.h"
 
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
@@ -20,8 +20,8 @@ Rooms
 @pragma nostrip
 */
 
-static auto index_error = index_error_maker(Room, ScriptReserved_Volume);
-static auto newindex_error = newindex_error_maker(Room, ScriptReserved_Volume);
+static auto IndexError = index_error_maker(Room, ScriptReserved_Volume);
+static auto NewIndexError = newindex_error_maker(Room, ScriptReserved_Volume);
 
 Room::Room(ROOM_INFO& room) : m_room{ room }
 {};
@@ -30,8 +30,8 @@ void Room::Register(sol::table& parent)
 {
 	parent.new_usertype<Room>(ScriptReserved_Room,
 		sol::no_constructor,
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 
 		/// Determine whether the room is active or not 
 		// @function Room:GetActive

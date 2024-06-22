@@ -15,13 +15,11 @@ struct ItemInfo;
 // Portal:			Link from one room to another allowing traversal between them.
 // Room number:		Unique ID of a room.
 // Room grid coord: Relative 2D grid coordinate of a room (e.g. [0, 0] denotes the first sector).
-// Sector/block:	Collision data describing a single grid division within a room.
+// Sector:			Collision data describing a single grid division within a room.
 // Sector point:	Relative 2D position within a sector (range [0, BLOCK(1)) on each axis).
 // Surface:			Floor or ceiling consisting of two triangles.
-// Triangle:		Surface subdivision.
+// Triangle:		Surface subdivision. Only 2 per surface can exist.
 // Wall:			Inferred from a high floor or ceiling. Note that true "walls" don't exist in floordata, only surface heights.
-
-const auto WALL_PLANE = Plane(-Vector3::UnitY, -CLICK(127));
 
 enum class MaterialType
 {
@@ -51,10 +49,10 @@ enum class MaterialType
 
 enum class ClimbDirectionFlags
 {
-	North = (1 << 8),
-	East  = (1 << 9),
-	South = (1 << 10),
-	West  = (1 << 11)
+	North = 1 << 8,
+	East  = 1 << 9,
+	South = 1 << 10,
+	West  = 1 << 11
 };
 
 // NOTE: Describes vertical room location.
@@ -76,10 +74,10 @@ public:
 
 struct SectorSurfaceTriangleData
 {
-	Plane		 Plane			   = {};
-	int			 PortalRoomNumber  = 0;
-	short		 IllegalSlopeAngle = 0;
-	MaterialType Material		   = MaterialType::Stone;
+	Plane		 Plane			  = {};
+	int			 PortalRoomNumber = 0;
+	short		 SteepSlopeAngle  = 0;
+	MaterialType Material		  = MaterialType::Stone;
 };
 
 struct SectorSurfaceData
@@ -137,9 +135,9 @@ struct SectorFlagData
 class FloorInfo
 {
 public:
-	// Components
+	// Members
 	int				  RoomNumber		   = 0;
-	int				  WallPortalRoomNumber = 0;
+	int				  SidePortalRoomNumber = 0;
 	SectorSurfaceData FloorSurface		   = {};
 	SectorSurfaceData CeilingSurface	   = {};
 	std::set<int>	  BridgeItemNumbers	   = {};
@@ -150,20 +148,16 @@ public:
 	bool Stopper	  = true;
 
 	// Getters
+	int								 GetSurfaceTriangleID(int x, int z, bool isFloor) const;
 	const SectorSurfaceTriangleData& GetSurfaceTriangle(int x, int z, bool isFloor) const;
-	int		GetSurfaceTriangleID(int x, int z, bool isFloor) const;
-	Vector3 GetSurfaceNormal(int x, int z, bool isFloor) const;
-	Vector3 GetSurfaceNormal(int triID, bool isFloor) const;
-	short	GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const;
-	MaterialType GetSurfaceMaterial(int x, int z, bool isFloor) const;
+	Vector3							 GetSurfaceNormal(int triID, bool isFloor) const;
+	Vector3							 GetSurfaceNormal(int x, int z, bool isFloor) const;
+	short							 GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const;
+	MaterialType					 GetSurfaceMaterial(int x, int z, bool isFloor) const;
 
-	std::optional<int> GetRoomNumberAbove(int triID) const;
-	std::optional<int> GetRoomNumberAbove(int x, int z) const;
-	std::optional<int> GetRoomNumberAbove(const Vector3i& pos) const;
-	std::optional<int> GetRoomNumberBelow(int triID) const;
-	std::optional<int> GetRoomNumberBelow(int x, int z) const;
-	std::optional<int> GetRoomNumberBelow(const Vector3i& pos) const;
-	std::optional<int> GetRoomNumberAtSide() const;
+	std::optional<int> GetNextRoomNumber(int x, int z, bool isBelow) const;
+	std::optional<int> GetNextRoomNumber(const Vector3i& pos, bool isBelow) const;
+	std::optional<int> GetSideRoomNumber() const;
 
 	int GetSurfaceHeight(int x, int z, bool isFloor) const;
 	int GetSurfaceHeight(const Vector3i& pos, bool isFloor) const;
@@ -190,21 +184,15 @@ namespace TEN::Collision::Floordata
 	Vector2i				GetSectorPoint(int x, int z);
 	Vector2i				GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds = true);
 	std::vector<Vector2i>	GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
-	std::vector<FloorInfo*> GetNeighborSectorPtrs(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
+	std::vector<FloorInfo*> GetNeighborSectors(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
 
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomGridCoord);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
-	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
-	FloorInfo& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber = nullptr);
-	FloorInfo& GetTopFloor(int roomNumber, int x, int z, int* topRoomNumber = nullptr);
-	
-	std::optional<int> GetBottomHeight(FloorInfo& startSector, Vector3i pos, int* bottomRoomNumberPtr = nullptr, FloorInfo** bottomSectorPtr = nullptr);
-	std::optional<int> GetTopHeight(FloorInfo& startSector, Vector3i pos, int* topRoomNumberPtr = nullptr, FloorInfo** topSectorPtr = nullptr);
+	FloorInfo& GetFarthestSector(int roomNumber, int x, int z, bool isBottom);
+	FloorInfo& GetSideSector(int roomNumber, int x, int z);
+
 	std::optional<int> GetSurfaceHeight(const RoomVector& location, int x, int z, bool isFloor);
-	
-	std::optional<RoomVector> GetBottomRoom(RoomVector location, const Vector3i& pos);
-	std::optional<RoomVector> GetTopRoom(RoomVector location, const Vector3i& pos);
-	RoomVector				  GetRoom(RoomVector location, const Vector3i& pos);
+	RoomVector		   GetRoomVector(RoomVector location, const Vector3i& pos);
 
 	void AddBridge(int itemNumber, int x = 0, int z = 0);
 	void RemoveBridge(int itemNumber, int x = 0, int z = 0);

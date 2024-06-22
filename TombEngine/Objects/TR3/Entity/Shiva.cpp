@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
@@ -13,10 +14,11 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
@@ -109,7 +111,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto effectPos = Random::GeneratePointInSphere(sphere);
 
 		smoke.on = true;
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.blendMode = BlendMode::Additive;
 
 		smoke.x = effectPos.x;
 		smoke.y = effectPos.y;
@@ -277,8 +279,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (item->HitPoints <= 0)
 		{
@@ -339,9 +341,9 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					int x = item->Pose.Position.x + BLOCK(1) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
 					int z = item->Pose.Position.z + BLOCK(1) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
-					auto box = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock->Box;
+					auto box = GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetBottomSector().Box;
 
-					if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !creature.Flags)
+					if (box != NO_VALUE && !(g_Level.Boxes[box].flags & BLOCKABLE) && !creature.Flags)
 						item->Animation.TargetState = SHIVA_STATE_WALK_BACK;
 					else
 						item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
@@ -495,8 +497,8 @@ namespace TEN::Entities::Creatures::TR3
 
 			case SHIVA_STATE_KILL:
 				creature.MaxTurn = 0;
-				extraHeadRot = EulerAngles::Zero;
-				extraTorsoRot = EulerAngles::Zero;
+				extraHeadRot = EulerAngles::Identity;
+				extraTorsoRot = EulerAngles::Identity;
 
 				if (item->Animation.FrameNumber == GetFrameIndex(item, 10) ||
 					item->Animation.FrameNumber == GetFrameIndex(item, 21) ||

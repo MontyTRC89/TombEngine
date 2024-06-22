@@ -3,7 +3,7 @@
 
 #include "Game/pickup/pickup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Math;
@@ -34,7 +34,7 @@ namespace TEN::Hud
 		constexpr auto SCALE_MIN		   = 0.25f;
 		constexpr auto HIDE_VEL_MAX		   = DISPLAY_SPACE_RES.x * 0.03f;
 		constexpr auto HIDE_VEL_ACCEL	   = HIDE_VEL_MAX / 4;
-		constexpr auto POS_LERP_ALPHA	   = 0.2f;
+		constexpr auto POS_LERP_ALPHA	   = 0.15f;
 		constexpr auto STRING_SCALAR_ALPHA = 0.25f;
 		constexpr auto ROT_RATE			   = ANGLE(360.0f / (LIFE_MAX * FPS));
 		constexpr auto ROT				   = EulerAngles(0, ROT_RATE, 0);
@@ -196,7 +196,7 @@ namespace TEN::Hud
 
 	DisplayPickup& PickupSummaryController::GetNewDisplayPickup()
 	{
-		assertion(_displayPickups.size() <= DISPLAY_PICKUP_COUNT_MAX, "Display pickup overflow.");
+		TENAssert(_displayPickups.size() <= DISPLAY_PICKUP_COUNT_MAX, "Display pickup overflow.");
 
 		// Add and return new display pickup.
 		if (_displayPickups.size() < DISPLAY_PICKUP_COUNT_MAX)
@@ -213,7 +213,10 @@ namespace TEN::Hud
 		_displayPickups.erase(
 			std::remove_if(
 				_displayPickups.begin(), _displayPickups.end(),
-				[](const DisplayPickup& pickup) { return ((pickup.Life <= 0.0f) && pickup.IsOffscreen()); }),
+				[](const DisplayPickup& pickup)
+				{
+					return ((pickup.Life <= 0.0f) && pickup.IsOffscreen());
+				}),
 			_displayPickups.end());
 	}
 

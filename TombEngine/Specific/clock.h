@@ -11,14 +11,16 @@ constexpr auto DAY_UNIT   = 24;
 
 struct GameTime
 {
-	int Days;
-	int Hours;
-	int Minutes;
-	int Seconds;
+	int Days	= 0;
+	int Hours	= 0;
+	int Minutes = 0;
+	int Seconds = 0;
 };
 
-int Sync();
+int	 Sync();
 bool TimeInit();
 bool TimeReset();
 
-GameTime GetGameTime(int frameCount);
+GameTime GetGameTime(int ticks);
+
+bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs = 0.0f);

@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/weather.h"
@@ -10,10 +11,11 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
 using TEN::Renderer::g_Renderer;
 
@@ -253,8 +255,8 @@ namespace TEN::Effects::Hair
 	{
 		constexpr auto VELOCITY_COEFF = 0.75f;
 
-		auto pointColl = GetCollision(segment.Position.x, segment.Position.y, segment.Position.z, roomNumber);
-		int floorHeight = pointColl.Position.Floor;
+		auto pointColl = GetPointCollision(segment.Position, roomNumber);
+		int floorHeight = pointColl.GetFloorHeight();
 
 		Segments[0].Velocity = segment.Position;
 		segment.Position += segment.Velocity * VELOCITY_COEFF;
@@ -263,7 +265,7 @@ namespace TEN::Effects::Hair
 		if (isOnLand)
 		{
 			// Let wind affect position.
-			if (TestEnvironment(ENV_FLAG_WIND, pointColl.RoomNumber))
+			if (TestEnvironment(ENV_FLAG_WIND, pointColl.GetRoomNumber()))
 				segment.Position += Weather.Wind() * 2;
 
 			// Apply gravity.

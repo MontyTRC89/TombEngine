@@ -12,12 +12,14 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Math;
+using TEN::Renderer::g_Renderer;
 
 // Globals
 int NumberLosRooms;
@@ -284,6 +286,8 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 				{
 					if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
 					{
+						const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
+						mesh->HitPoints -= weapon.Damage;
 						ShatterImpactData.impactDirection = dir;
 						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 						ShatterObject(nullptr, mesh, 128, target2.RoomNumber, 0);
@@ -322,7 +326,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 									int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 									auto ray = Ray(origin->ToVector3(), dir);
 									float bestDistance = INFINITY;
-									int bestJointIndex = NO_JOINT;
+									int bestJointIndex = NO_VALUE;
 
 									for (int i = 0; i < num; i++)
 									{
@@ -357,11 +361,11 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 									if (object->HitRoutine != nullptr)
 									{
-										object->HitRoutine(*item, *LaraItem, target2, weapon.Damage, false, NO_JOINT);
+										object->HitRoutine(*item, *LaraItem, target2, weapon.Damage, false, NO_VALUE);
 									}
 									else
 									{
-										DefaultItemHit(*item, *LaraItem, target2, weapon.Damage, false, NO_JOINT);
+										DefaultItemHit(*item, *LaraItem, target2, weapon.Damage, false, NO_VALUE);
 									}
 								}
 							}
@@ -664,7 +668,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 			}
 		}
 
-		for (short linkNumber = room.itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+		for (short linkNumber = room.itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 		{
 			const auto& item = g_Level.Items[linkNumber];
 

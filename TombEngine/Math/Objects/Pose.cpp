@@ -9,7 +9,7 @@ using namespace TEN::Math;
 
 //namespace TEN::Math
 //{
-	const Pose Pose::Zero = Pose(Vector3i::Zero, EulerAngles::Zero);
+	const Pose Pose::Zero = Pose(Vector3i::Zero, EulerAngles::Identity);
 
 	Pose::Pose()
 	{

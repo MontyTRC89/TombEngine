@@ -21,7 +21,7 @@ namespace TEN::Effects::Boss
 			return;
 
 		int itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 
 		auto& shieldItem = g_Level.Items[itemNumber];
@@ -50,7 +50,7 @@ namespace TEN::Effects::Boss
 			return;
 
 		int itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 
 		auto& shockwaveItem = g_Level.Items[itemNumber];
@@ -163,7 +163,7 @@ namespace TEN::Effects::Boss
 		auto effectPos = Random::GeneratePointInSphere(sphere);
 
 		smoke.on = true;
-		smoke.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		smoke.blendMode = BlendMode::Additive;
 
 		smoke.x = effectPos.x;
 		smoke.y = effectPos.y;

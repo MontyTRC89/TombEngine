@@ -1,7 +1,7 @@
 #pragma once
 #include "Math/Math.h"
 #include "Specific/Input/Input.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -22,6 +22,7 @@ constexpr auto REGKEY_SHADOW_MAP_SIZE	   = "ShadowMapSize";
 constexpr auto REGKEY_SHADOW_BLOBS_MAX	   = "ShadowBlobsMax";
 constexpr auto REGKEY_ENABLE_CAUSTICS	   = "EnableCaustics";
 constexpr auto REGKEY_ANTIALIASING_MODE	   = "AntialiasingMode";
+constexpr auto REGKEY_AMBIENT_OCCLUSION	   = "AmbientOcclusion";
 
 // Sound keys
 constexpr auto REGKEY_SOUND_DEVICE	= "SoundDevice";
@@ -32,6 +33,7 @@ constexpr auto REGKEY_SFX_VOLUME	= "SfxVolume";
 
 // Gameplay keys
 constexpr auto REGKEY_ENABLE_SUBTITLES			= "EnableSubtitles";
+constexpr auto REGKEY_ENABLE_AUTO_MONKEY_JUMP	= "EnableAutoMonkeySwingJump";
 constexpr auto REGKEY_ENABLE_AUTO_TARGETING		= "EnableAutoTargeting";
 constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER = "EnableTargetHighlighter";
 constexpr auto REGKEY_ENABLE_RUMBLE				= "EnableRumble";
@@ -56,6 +58,7 @@ struct GameConfiguration
 	int		   ShadowMapSize	  = DEFAULT_SHADOW_MAP_SIZE;
 	int		   ShadowBlobsMax	  = DEFAULT_SHADOW_BLOBS_MAX;
 	bool	   EnableCaustics	  = false;
+	bool	   EnableAmbientOcclusion = false;
 	AntialiasingMode AntialiasingMode = AntialiasingMode::None;
 
 	// Sound
@@ -67,6 +70,7 @@ struct GameConfiguration
 
 	// Gameplay
 	bool EnableSubtitles		 = false;
+	bool EnableAutoMonkeySwingJump	 = false;
 	bool EnableAutoTargeting	 = false;
 	bool EnableTargetHighlighter = false;
 	bool EnableRumble			 = false;
