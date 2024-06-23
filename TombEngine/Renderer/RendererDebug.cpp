@@ -38,11 +38,6 @@ namespace TEN::Renderer
 		_currentLineHeight;
 	}
 
-	bool Renderer::PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message)
-	{
-		return true;
-	}
-
 	void Renderer::PrintDebugMessage(LPCSTR msg, va_list args)
 	{
 		constexpr auto LINE_X_POS	= DISPLAY_SPACE_RES.x / 100;
