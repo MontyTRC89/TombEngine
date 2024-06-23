@@ -288,7 +288,7 @@ namespace TEN::Renderer
 		int _numCheckPortalCalls = 0;
 		int _numGetVisibleRoomsCalls = 0;
 
-		int _currentY;
+		float _currentLineHeight = 0.0f;;
 
 		RendererDebugPage _debugPage = RendererDebugPage::None;
 
@@ -593,7 +593,8 @@ namespace TEN::Renderer
 		void RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view);
 		void ClearScene();
 		void SaveScreenshot();
-		void PrintDebugMessage(LPCSTR message, ...);
+		void PrintDebugMessage(LPCSTR msg, va_list args);
+		void PrintDebugMessage(LPCSTR msg, ...);
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool goBack);
 		void DrawDisplayPickup(const DisplayPickup& pickup);

@@ -4,6 +4,7 @@
 #include <spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <stdarg.h>
 
 #include "Renderer/Renderer.h"
 
@@ -69,7 +70,10 @@ namespace TEN::Debug
 
 	void PrintDebugMessage(LPCSTR msg, ...)
 	{
-		g_Renderer.PrintDebugMessage(msg);
+		auto args = va_list{};
+		va_start(args, msg);
+		g_Renderer.PrintDebugMessage(msg, args);
+		va_end(args);
 	}
 
 	void DrawDebug2DLine(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page)
