@@ -205,8 +205,8 @@ BoundingOrientedBox ItemInfo::GetObb() const
 		return BoundingOrientedBox(frameData.Keyframe0.Aabb.Center, frameData.Keyframe0.Aabb.Extents, Pose.Orientation.ToQuaternion());
 
 	return BoundingOrientedBox(
-		Pose.Position.ToVector3() + (frameData.Keyframe0.Aabb.Center + ((frameData.Keyframe1.Aabb.Center - frameData.Keyframe0.Aabb.Center) * frameData.Alpha)),
-		frameData.Keyframe0.Aabb.Extents + ((frameData.Keyframe1.Aabb.Extents - frameData.Keyframe0.Aabb.Extents) * frameData.Alpha),
+		Pose.Position.ToVector3() + Vector3::Lerp(frameData.Keyframe0.Aabb.Center, frameData.Keyframe1.Aabb.Center, frameData.Alpha),
+		Vector3::Lerp(frameData.Keyframe0.Aabb.Extents, frameData.Keyframe1.Aabb.Extents, frameData.Alpha),
 		Pose.Orientation.ToQuaternion());
 }
 
