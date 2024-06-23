@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
 #include "Game/items.h"
@@ -15,6 +16,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
@@ -144,7 +146,7 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 					break;
 				}
 
-				int roomNumberAtPos = GetCollision(item).RoomNumber;
+				int roomNumberAtPos = GetPointCollision(item).GetRoomNumber();
 				bool isWater = TestEnvironment(ENV_FLAG_WATER, roomNumberAtPos);
 				bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, roomNumberAtPos);
 
@@ -228,7 +230,7 @@ void AnimateItem(ItemInfo* item)
 		if (!item->IsLara())
 		{
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 	}
 
@@ -250,7 +252,7 @@ void AnimateItem(ItemInfo* item)
 			}
 
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 		else
 		{
@@ -267,7 +269,7 @@ void AnimateItem(ItemInfo* item)
 		if (!item->IsLara())
 		{
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}*/
 	}
 
@@ -360,7 +362,7 @@ bool HasStateDispatch(const ItemInfo* item, int targetState)
 	if (anim.NumStateDispatches <= 0)
 		return false;
 
-	if (targetState == NO_STATE)
+	if (targetState == NO_VALUE)
 		targetState = item->Animation.TargetState;
 
 	// Iterate over animation's state dispatches.
@@ -398,7 +400,7 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 {
 	const auto& object = Objects[item->Animation.AnimObjectID];
 
-	if (animNumber == NO_ANIM)
+	if (animNumber == NO_VALUE)
 		animNumber = item->Animation.AnimNumber - object.animIndex;
 
 	// Animation to test doesn't match; return early.
@@ -501,7 +503,7 @@ const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 
 const AnimData& GetAnimData(const ItemInfo& item, int animNumber)
 {
-	if (animNumber == NO_ANIM)
+	if (animNumber == NO_VALUE)
 		return GetAnimData(item.Animation.AnimNumber);
 
 	const auto& object = Objects[item.Animation.AnimObjectID];
@@ -544,7 +546,7 @@ const AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumb
 	const auto& object = Objects[objectID];
 
 	int animIndex = object.animIndex + animNumber;
-	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
+	TENAssert(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
 
 	const auto& anim = GetAnimData(object, animNumber);
 

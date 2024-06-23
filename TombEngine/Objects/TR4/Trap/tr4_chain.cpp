@@ -1,40 +1,41 @@
 #include "framework.h"
-#include "tr4_chain.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Objects/TR4/Trap/tr4_chain.h"
+
 #include "Game/animation.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
+#include "Specific/level.h"
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-	void ChainControl(short itemNumber)
+	void ControlChain(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
-		if (item->TriggerFlags)
+		if (item.TriggerFlags)
 		{
-			item->ItemFlags[2] = 1;
-			item->ItemFlags[3] = 75;
+			item.ItemFlags[2] = 1;
+			item.ItemFlags[3] = 75;
 
-			if (TriggerActive(item))
+			if (TriggerActive(&item))
 			{
-				*((int*)&item->ItemFlags[0]) = 0x787E;
-				AnimateItem(item);
+				*((int*)&item.ItemFlags[0]) = 0x787E;
+				AnimateItem(&item);
 				return;
 			}
 		}
 		else
 		{
-			item->ItemFlags[3] = 25;
+			item.ItemFlags[3] = 25;
 
-			if (TriggerActive(item))
+			if (TriggerActive(&item))
 			{
-				*((int*)&item->ItemFlags[0]) = 0x780;
-				AnimateItem(item);
+				*((int*)&item.ItemFlags[0]) = 0x780;
+				AnimateItem(&item);
 				return;
 			}
 		}
 
-		*((int*)&item->ItemFlags[0]) = 0;
+		*((int*)&item.ItemFlags[0]) = 0;
 	}
 }

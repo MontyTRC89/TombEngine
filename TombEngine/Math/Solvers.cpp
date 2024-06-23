@@ -56,7 +56,7 @@ namespace TEN::Math::Solvers
 
 		float a = flipXY ? (scaledTarget.y - origin.y) : (scaledTarget.x - origin.x);
 		float b = flipXY ? (scaledTarget.x - origin.x) : (scaledTarget.y - origin.y);
-		assertion(abs(a) >= EPSILON, "SolveIK2D() failed.");
+		TENAssert(abs(a) >= EPSILON, "SolveIK2D() failed.");
 
 		float m = ((SQUARE(length0) - SQUARE(length1)) + (SQUARE(a) + SQUARE(b))) / (2.0f * a);
 		float n = b / a;

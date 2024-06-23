@@ -20,8 +20,8 @@ namespace TEN::Renderer::Structures
 		Matrix Scale;
 		Matrix AnimationTransforms[MAX_BONES];
 
-		int RoomNumber = NO_ROOM;
-		int PrevRoomNumber = NO_ROOM;
+		int RoomNumber = NO_VALUE;
+		int PrevRoomNumber = NO_VALUE;
 		Vector4 Color;
 		Vector4 AmbientLight;
 		std::vector<RendererLight*> LightsToDraw;

@@ -17,7 +17,6 @@ The following constants are inside Flow.GameStatus.
 	NORMAL
 	NEW_GAME
 	LOAD_GAME
-	SAVE_GAME
 	EXIT_TO_TITLE
 	EXIT_GAME
 	LARA_DEAD

@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
@@ -20,6 +21,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
@@ -129,19 +131,19 @@ namespace TEN::Entities::TR4
 		int dx = 870 * phd_sin(item->Pose.Orientation.y);
 		int dz = 870 * phd_cos(item->Pose.Orientation.y);
 
-		int ceiling = GetCollision(x, y, z, item->RoomNumber).Position.Ceiling;
+		int ceiling = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetCeilingHeight();
 
 		x += dx;
 		z += dz;
-		int height1 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height1 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height2 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height3 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		bool canJump = false;
 		if ((y < (height1 - CLICK(1.5f)) || y < (height2 - CLICK(1.5f))) &&
@@ -152,7 +154,7 @@ namespace TEN::Entities::TR4
 
 		x = item->Pose.Position.x - dx;
 		z = item->Pose.Position.z - dz;
-		int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height4 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		AI_INFO AI;
 		short angle = 0;
@@ -181,7 +183,7 @@ namespace TEN::Entities::TR4
 				creature.Flags = 0;
 				creature.LOT.IsJumping = false;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;

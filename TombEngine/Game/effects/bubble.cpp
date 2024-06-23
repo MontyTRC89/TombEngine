@@ -147,9 +147,9 @@ namespace TEN::Effects::Bubble
 			if (bubble.Life <= 0.0f)
 				continue;
 
-			// Update room number. TODO: Should use GetCollision(), but calling it for each bubble is very inefficient.
+			// Update room number. TODO: Should use GetPointCollision(), but calling it for each bubble is very inefficient.
 			auto roomVector = RoomVector(bubble.RoomNumber, int(bubble.Position.y - bubble.Gravity));
-			int roomNumber = GetRoom(roomVector, Vector3i(bubble.Position.x, bubble.Position.y - bubble.Gravity, bubble.Position.z)).RoomNumber;
+			int roomNumber = GetRoomVector(roomVector, Vector3i(bubble.Position.x, bubble.Position.y - bubble.Gravity, bubble.Position.z)).RoomNumber;
 			int prevRoomNumber = bubble.RoomNumber;
 			bubble.RoomNumber = roomNumber;
 

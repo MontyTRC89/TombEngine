@@ -3,15 +3,17 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 
-namespace TEN::Traps::TR5
+namespace TEN::Entities::Traps
 {
 	// NOTES:
 	// item.ItemFlags[0] = barrier height.
@@ -58,7 +60,7 @@ namespace TEN::Traps::TR5
 		auto beamOffset = Vector3(0.0f, -LaserBarrierBeam::HEIGHT, 0.0f);
 		for (auto& beam : Beams)
 		{
-			assertion(beam.VertexPoints.size() == baseVertices.size(), "Laser barrier beam vertex count out of sync.");
+			TENAssert(beam.VertexPoints.size() == baseVertices.size(), "Laser barrier beam vertex count out of sync.");
 
 			for (int i = 0; i < beam.VertexPoints.size(); i++)
 				beam.VertexPoints[i] = baseVertices[i] + beamOffset;
@@ -85,8 +87,8 @@ namespace TEN::Traps::TR5
 		auto& item = g_Level.Items[itemNumber];
 
 		// Initialize barrier height.
-		auto pointColl = GetCollision(&item);
-		float barrierHeight = item.Pose.Position.y - pointColl.Position.Ceiling;
+		auto pointColl = GetPointCollision(item);
+		float barrierHeight = item.Pose.Position.y - pointColl.GetCeilingHeight();
 		item.ItemFlags[0] = barrierHeight;
 
 		// Initialize barrier effect.

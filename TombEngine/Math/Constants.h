@@ -4,6 +4,7 @@
 //namespace TEN::Math
 //{
 	// Math constants
+
 	constexpr auto PI		= 3.14159265358979323846264338327950288419716939937510f;
 	constexpr auto PI_MUL_2 = PI * 2;
 	constexpr auto PI_DIV_2 = PI / 2;
@@ -16,6 +17,7 @@
 	constexpr auto CUBE	  = [](auto x) { return (x * x * x); };
 
 	// World constants
+
 	constexpr auto BLOCK_UNIT = 1024;
 	constexpr auto NO_HEIGHT  = INT_MIN + UCHAR_MAX;
 	constexpr auto MAX_HEIGHT = INT_MIN + 1; // NOTE: +1 prevents issues with sign change.

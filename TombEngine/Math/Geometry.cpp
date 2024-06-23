@@ -190,7 +190,7 @@ namespace TEN::Math::Geometry
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target)
 	{
 		if (origin == target)
-			return EulerAngles::Zero;
+			return EulerAngles::Identity;
 
 		return EulerAngles(target - origin);
 	}
@@ -383,5 +383,10 @@ namespace TEN::Math::Geometry
 		float radiusSqr = SQUARE(sphere.Radius);
 
 		return (distSqr <= radiusSqr);
+	}
+
+	bool CircleIntersects(const Vector3& circle0, const Vector3& circle1)
+	{
+		return (sqrt(SQUARE(circle1.x - circle0.x) + SQUARE(circle1.y - circle0.y)) <= (circle0.z + circle1.z));
 	}
 }

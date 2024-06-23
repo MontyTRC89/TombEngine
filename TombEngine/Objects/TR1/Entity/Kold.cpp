@@ -66,8 +66,8 @@ namespace TEN::Entities::Creatures::TR1
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (creature.MuzzleFlash[0].Delay != 0)
 			creature.MuzzleFlash[0].Delay--;
@@ -98,7 +98,7 @@ namespace TEN::Entities::Creatures::TR1
 			case KOLD_STATE_IDLE:
 				creature.MaxTurn = 0;
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
@@ -162,7 +162,7 @@ namespace TEN::Entities::Creatures::TR1
 				creature.MaxTurn = 0;
 				creature.Flags = 0;
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = KOLD_STATE_IDLE;
 				}

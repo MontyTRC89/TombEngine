@@ -70,7 +70,7 @@ namespace TEN::Entities::Generic
 
 		// Set mutators to EulerAngles identity by default.
 		for (auto& mutator : item.Model.Mutators)
-			mutator.Rotation = EulerAngles::Zero;
+			mutator.Rotation = EulerAngles::Identity;
 	}
 
 	void FallingBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

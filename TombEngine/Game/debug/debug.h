@@ -9,37 +9,40 @@ constexpr bool DebugBuild = false;
 #include <string_view>
 #include <iostream>
 
-enum class LogLevel
+namespace TEN::Debug
 {
-	Error,
-	Warning,
-	Info
-};
-
-enum class LogConfig
-{
-	Debug,
-	All
-};
-
-void TENLog(std::string_view str, LogLevel level = LogLevel::Info, LogConfig config = LogConfig::All, bool allowSpam = false);
-void ShutdownTENLog();
-void InitTENLog(const std::string& logDirContainingDir);
-
-class TENScriptException : public std::runtime_error
-{
-public:
-	using std::runtime_error::runtime_error;
-};
-
-inline void assertion(const bool& expr, const char* msg) 
-{
-	if constexpr (DebugBuild) 
+	enum class LogLevel
 	{
-		if (!expr)
+		Error,
+		Warning,
+		Info
+	};
+
+	enum class LogConfig
+	{
+		Debug,
+		All
+	};
+
+	class TENScriptException : public std::runtime_error
+	{
+	public:
+		using std::runtime_error::runtime_error;
+	};
+
+	void InitTENLog(const std::string& logDirContainingDir);
+	void ShutdownTENLog();
+	void TENLog(const std::string_view& string, LogLevel level = LogLevel::Info, LogConfig config = LogConfig::All, bool allowSpam = false);
+
+	inline void TENAssert(const bool& cond, const char* msg)
+	{
+		if constexpr (DebugBuild)
 		{
-			TENLog(msg, LogLevel::Error);
-			throw std::runtime_error(msg);
+			if (!cond)
+			{
+				TENLog(msg, LogLevel::Error);
+				throw std::runtime_error(msg);
+			}
 		}
-	}
-};
+	};
+}
