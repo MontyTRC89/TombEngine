@@ -7,6 +7,7 @@
 #include "Game/control/control.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/floordata.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
@@ -19,6 +20,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Math;
 
@@ -72,7 +74,7 @@ namespace TEN::Entities::TR3
 			bool isWater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
 			float verticalVelCoeff = isWater ? 81.0f : 1.0f;
 			
-			int roomNumber = GetCollision(&item).RoomNumber;
+			int roomNumber = GetPointCollision(item).GetRoomNumber();
 			if (item.RoomNumber != roomNumber)
 			{
 				if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber) &&
@@ -92,10 +94,10 @@ namespace TEN::Entities::TR3
 				ItemNewRoom(itemNumber, roomNumber);
 			}
 
-			auto pointColl = GetCollision(&item);
+			auto pointColl = GetPointCollision(item);
 			item.Animation.IsAirborne = true;
 
-			if (pointColl.Position.Floor < item.Pose.Position.y)
+			if (pointColl.GetFloorHeight() < item.Pose.Position.y)
 			{
 				if (!isWater)
 				{

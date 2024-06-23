@@ -50,9 +50,8 @@ struct ObjectInfo;
 		int NextFrameNumber = 0;
 		int Interpolation	= 0;
 
-		// CONVENTION: +X = Right, +Y = Down, +Z = Forward.
-		Vector3 VelocityStart = Vector3::Zero;
-		Vector3 VelocityEnd	  = Vector3::Zero;
+		Vector3 VelocityStart = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward.
+		Vector3 VelocityEnd	  = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 
 		std::vector<KeyframeData>	   Keyframes  = {};
 		std::vector<StateDispatchData> Dispatches = {};

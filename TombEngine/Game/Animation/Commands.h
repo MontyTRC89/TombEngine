@@ -19,8 +19,8 @@ namespace TEN::Animation
 	{
 		Always,
 		Land,
-		Water,
-		Swamp,
+		ShallowWater,
+		Quicksand,
 		Underwater
 	};
 

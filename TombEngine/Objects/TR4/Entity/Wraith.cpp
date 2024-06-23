@@ -2,6 +2,7 @@
 #include "Objects/TR4/Entity/Wraith.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/flipeffect.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -18,6 +19,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Streamer;
@@ -303,11 +305,11 @@ namespace TEN::Entities::TR4
 			item.Pose.Orientation.x += angleV;
 		}
 
-		auto pointColl = GetCollision(&item);
+		auto pointColl = GetPointCollision(item);
 
 		bool hasHitWall = false;
-		if (pointColl.Position.Floor < item.Pose.Position.y ||
-			pointColl.Position.Ceiling > item.Pose.Position.y)
+		if (pointColl.GetFloorHeight() < item.Pose.Position.y ||
+			pointColl.GetCeilingHeight() > item.Pose.Position.y)
 		{
 			hasHitWall = true;
 		}
@@ -317,8 +319,8 @@ namespace TEN::Entities::TR4
 		item.Pose.Position.y += item.Animation.Velocity.z * phd_sin(item.Pose.Orientation.x);
 		item.Pose.Position.z += item.Animation.Velocity.z * phd_cos(item.Pose.Orientation.y);
 
-		if (pointColl.RoomNumber != item.RoomNumber)
-			ItemNewRoom(itemNumber, pointColl.RoomNumber);
+		if (pointColl.GetRoomNumber() != item.RoomNumber)
+			ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
 		for (int linkItemNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkItemNumber != NO_VALUE; linkItemNumber = g_Level.Items[linkItemNumber].NextItem)
 		{
@@ -550,10 +552,10 @@ namespace TEN::Entities::TR4
 		}
 
 		// Check if WRAITH is below floor or above ceiling and spawn wall effect
-		pointColl = GetCollision(&item);
+		pointColl = GetPointCollision(item);
 
-		if (pointColl.Position.Floor < item.Pose.Position.y ||
-			pointColl.Position.Ceiling > item.Pose.Position.y)
+		if (pointColl.GetFloorHeight() < item.Pose.Position.y ||
+			pointColl.GetCeilingHeight() > item.Pose.Position.y)
 		{
 			if (!hasHitWall)
 				WraithWallEffect(prevPos, item.Pose.Orientation.y - ANGLE(180.0f), item.ObjectNumber);

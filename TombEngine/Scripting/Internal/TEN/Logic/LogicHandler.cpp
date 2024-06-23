@@ -65,7 +65,8 @@ static const std::unordered_map<std::string, EventType> EVENT_TYPES
 	{ ScriptReserved_EventOnLoad, EventType::Load },
 	{ ScriptReserved_EventOnSave, EventType::Save },
 	{ ScriptReserved_EventOnStart, EventType::Start },
-	{ ScriptReserved_EventOnEnd, EventType::End }
+	{ ScriptReserved_EventOnEnd, EventType::End },
+	{ ScriptReserved_EventOnUseItem, EventType::UseItem }
 };
 
 enum class LevelEndReason
@@ -293,6 +294,7 @@ Possible event type values:
 	START
 	END
 	LOOP
+	USEITEM
 
 @function HandleEvent
 @tparam string name Name of the event set to find.
@@ -457,6 +459,7 @@ void LogicHandler::FreeLevelScripts()
 	m_onLoop = sol::nil;
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
+	m_onUseItem = sol::nil;
 	m_handler.GetState()->collect_garbage();
 }
 
@@ -999,6 +1002,12 @@ void LogicHandler::OnEnd(GameStatus reason)
 		CallLevelFuncByName(name, endReason);
 }
 
+void LogicHandler::OnUseItem(GAME_OBJECT_ID objectNumber)
+{
+	if (m_onUseItem.valid())
+		CallLevelFunc(m_onUseItem, objectNumber);
+}
+
 /*** Special tables
 
 TombEngine uses the following tables for specific things.
@@ -1142,4 +1151,5 @@ void LogicHandler::InitCallbacks()
 	assignCB(m_onLoop, ScriptReserved_OnLoop);
 	assignCB(m_onSave, ScriptReserved_OnSave);
 	assignCB(m_onEnd, ScriptReserved_OnEnd);
+	assignCB(m_onUseItem, ScriptReserved_OnUseItem);
 }

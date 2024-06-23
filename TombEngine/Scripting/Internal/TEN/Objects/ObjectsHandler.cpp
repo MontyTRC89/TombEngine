@@ -184,7 +184,7 @@ void ObjectsHandler::TestCollidingObjects()
 		{
 			// Test against other moveables.
 			auto collObjects = GetCollidedObjects(item, true, false);
-			for (const auto& collidedItemPtr : collObjects.ItemPtrs)
+			for (const auto& collidedItemPtr : collObjects.Items)
 				g_GameScript->ExecuteFunction(item.Callbacks.OnObjectCollided, itemNumber0, collidedItemPtr->Index);
 		}
 

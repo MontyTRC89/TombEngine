@@ -23,10 +23,6 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-#if __cplusplus >= 202002L
-#define USE_FEATURE_IF_CPP20(x) x
-#else
-#define USE_FEATURE_IF_CPP20(x)
-#endif
+using namespace TEN::Debug;
 
 constexpr auto NO_VALUE = -1;

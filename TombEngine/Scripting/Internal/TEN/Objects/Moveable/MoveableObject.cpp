@@ -1074,7 +1074,8 @@ void Moveable::UnswapMesh(int meshId)
 
 /// Enable the item, as if a trigger for it had been stepped on.
 // @function Moveable:Enable
-void Moveable::EnableItem()
+// @tparam float timeout time (in seconds) after which moveable automatically disables (optional).
+void Moveable::EnableItem(sol::optional<float> timer)
 {
 	if (m_num == NO_VALUE)
 		return;
@@ -1084,6 +1085,7 @@ void Moveable::EnableItem()
 		wasInvisible = true;
 
 	m_item->Flags |= CODE_BITS;
+	m_item->Timer = timer.has_value() ? (timer.value() * FPS) : 0;
 	Trigger(m_num);
 
 	// Try add colliding in case the item went from invisible -> activated
@@ -1159,7 +1161,7 @@ void Moveable::SetVisible(bool isVisible)
 		{
 			if(!(m_item->Flags & IFLAG_KILLED))
 			{
-				EnableItem();
+				EnableItem(sol::nullopt);
 			}
 			else
 			{

@@ -88,7 +88,7 @@ namespace TEN::Animation
 			const auto& player = GetLaraInfo(item);	
 			if (EnvCondition == SoundEffectEnvCondition::Always ||
 				(EnvCondition == SoundEffectEnvCondition::Land && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
-				(EnvCondition == SoundEffectEnvCondition::Water && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
+				(EnvCondition == SoundEffectEnvCondition::ShallowWater && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
 			{
 				SoundEffect(SoundID, &item.Pose, SoundEnvironment::Always);
 			}
@@ -102,7 +102,7 @@ namespace TEN::Animation
 			else if (TestEnvironment(ENV_FLAG_WATER, &item))
 			{
 				if (EnvCondition == SoundEffectEnvCondition::Always ||
-					(EnvCondition == SoundEffectEnvCondition::Water && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
+					(EnvCondition == SoundEffectEnvCondition::ShallowWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
 				{
 					SoundEffect(SoundID, &item.Pose, SoundEnvironment::Always);
 				}

@@ -37,8 +37,6 @@ using namespace TEN::Utils;
 const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 {
 	ID_EXPANDING_PLATFORM,
-	ID_SQUISHY_BLOCK_HORIZONTAL,
-	ID_SQUISHY_BLOCK_VERTICAL,
 
 	ID_FALLING_BLOCK,
 	ID_FALLING_BLOCK2,
@@ -475,7 +473,7 @@ void LoadObjects()
 						}
 						else if (playInWater)
 						{
-							envCond = SoundEffectEnvCondition::Water;
+							envCond = SoundEffectEnvCondition::ShallowWater;
 						}
 						else if (playOnLand)
 						{
@@ -864,16 +862,16 @@ void ReadRooms()
 			sector.Stopper = (bool)ReadInt32();
 
 			sector.FloorSurface.SplitAngle = FROM_RAD(ReadFloat());
-			sector.FloorSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
-			sector.FloorSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+			sector.FloorSurface.Triangles[0].SteepSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+			sector.FloorSurface.Triangles[1].SteepSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
 			sector.FloorSurface.Triangles[0].PortalRoomNumber = ReadInt32();
 			sector.FloorSurface.Triangles[1].PortalRoomNumber = ReadInt32();
 			sector.FloorSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
 			sector.FloorSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
 
 			sector.CeilingSurface.SplitAngle = FROM_RAD(ReadFloat());
-			sector.CeilingSurface.Triangles[0].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
-			sector.CeilingSurface.Triangles[1].IllegalSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+			sector.CeilingSurface.Triangles[0].SteepSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+			sector.CeilingSurface.Triangles[1].SteepSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
 			sector.CeilingSurface.Triangles[0].PortalRoomNumber = ReadInt32();
 			sector.CeilingSurface.Triangles[1].PortalRoomNumber = ReadInt32();
 			sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);

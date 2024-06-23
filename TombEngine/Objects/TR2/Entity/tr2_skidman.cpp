@@ -131,6 +131,9 @@ namespace TEN::Entities::Creatures::TR2
 		int skidooItemNumber = (short)riderItem.ItemFlags[0];
 		auto* skidooItem = &g_Level.Items[skidooItemNumber];
 
+		if (!CreatureActive(skidooItemNumber))
+			return;
+
 		if (!skidooItem->Data)
 		{
 			EnableEntityAI(skidooItemNumber, true);

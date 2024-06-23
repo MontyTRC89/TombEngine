@@ -3,6 +3,7 @@
 
 #include "Game/Animation/Animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
@@ -16,6 +17,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
@@ -251,14 +253,14 @@ namespace TEN::Entities::TR4
 			int y = horseItem->Pose.Position.y;
 			int z = horseItem->Pose.Position.z + 341 * phd_cos(horseItem->Pose.Orientation.y);
 
-			auto probe = GetCollision(x, y, z, item->RoomNumber);
-			int height1 = probe.Position.Floor;
+			auto probe = GetPointCollision(Vector3i(x, y, z), item->RoomNumber);
+			int height1 = probe.GetFloorHeight();
 
 			x = horseItem->Pose.Position.x - 341 * phd_sin(horseItem->Pose.Orientation.y);
 			y = horseItem->Pose.Position.y;
 			z = horseItem->Pose.Position.z - 341 * phd_cos(horseItem->Pose.Orientation.y);
 
-			int height2 = GetCollision(x, y, z, probe.RoomNumber).Position.Floor;
+			int height2 = GetPointCollision(Vector3i(x, y, z), probe.GetRoomNumber()).GetFloorHeight();
 
 			xRot = phd_atan(682, height2 - height1);
 		}

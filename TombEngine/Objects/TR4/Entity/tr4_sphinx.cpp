@@ -2,6 +2,7 @@
 #include "Objects/TR4/Entity/tr4_sphinx.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -12,6 +13,8 @@
 #include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::TR4
 {
@@ -78,11 +81,11 @@ namespace TEN::Entities::TR4
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z + 614 * phd_cos(item->Pose.Orientation.y);
 
-		auto probe = GetCollision(x, y, z, item->RoomNumber);
+		auto pointColl = GetPointCollision(Vector3i(x, y, z), item->RoomNumber);
 
-		int height1 = probe.Position.Floor;
+		int height1 = pointColl.GetFloorHeight();
 
-		if (item->Animation.ActiveState == SPHINX_STATE_RUN_FORWARD && probe.Block->Stopper)
+		if (item->Animation.ActiveState == SPHINX_STATE_RUN_FORWARD && pointColl.GetSector().Stopper)
 		{
 			auto* room = &g_Level.Rooms[item->RoomNumber];
 
@@ -97,8 +100,6 @@ namespace TEN::Entities::TR4
 					ShatterObject(nullptr, mesh, -64, item->RoomNumber, 0);
 					SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 
-					probe.Block = false;
-
 					TestTriggers(x, y, z, item->RoomNumber, true);
 				}
 			}
@@ -108,7 +109,7 @@ namespace TEN::Entities::TR4
 		y = item->Pose.Position.y;
 		z = item->Pose.Position.z - 614 * phd_cos(item->Pose.Orientation.y);
 
-		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height2 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		phd_atan(1228, height2 - height1);
 

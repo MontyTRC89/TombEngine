@@ -3,6 +3,7 @@
 
 #include "Game/Animation/Animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/collision/sphere.h"
@@ -17,6 +18,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
@@ -163,7 +165,7 @@ namespace TEN::Entities::Creatures::TR3
 			int y = item->Pose.Position.y;
 			int z = item->Pose.Position.z + BLOCK(1) * phd_cos(item->Pose.Orientation.y + laraAI.angle);
 
-			int height = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+			int height = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 			bool cover = (item->Pose.Position.y > (height + CLICK(3)) && item->Pose.Position.y < (height + CLICK(4.5f)) && laraAI.distance > pow(BLOCK(1), 2));
 
 			auto* enemy = creature->Enemy;

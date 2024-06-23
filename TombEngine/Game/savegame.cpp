@@ -2007,7 +2007,7 @@ static void ParseEffects(const Save::SaveGame* s)
 	// Restore soundtracks.
 	for (int i = 0; i < s->soundtracks()->size(); i++)
 	{
-		assertion(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
+		TENAssert(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
 
 		auto track = s->soundtracks()->Get(i);
 		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position());
@@ -2225,7 +2225,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 	// Restore action queue.
 	for (int i = 0; i < s->action_queue()->size(); i++)
 	{
-		assertion(i < ActionQueue.size(), "Action queue size was changed");
+		TENAssert(i < ActionQueue.size(), "Action queue size was changed");
 		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
 	}
 

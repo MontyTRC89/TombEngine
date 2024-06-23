@@ -82,13 +82,13 @@ using TEN::Renderer::g_Renderer;
 		ExecuteAnimCommands(*item, true);
 		item->Animation.FrameNumber++;
 
-		const auto* animPtr = &GetAnimData(*item);
+		const auto* anim = &GetAnimData(*item);
 
 		if (SetStateDispatch(*item))
 		{
-			animPtr = &GetAnimData(*item);
+			anim = &GetAnimData(*item);
 
-			item->Animation.ActiveState = animPtr->StateID;
+			item->Animation.ActiveState = anim->StateID;
 
 			if (!item->IsLara())
 			{
@@ -98,19 +98,19 @@ using TEN::Renderer::g_Renderer;
 			}
 		}
 
-		if (item->Animation.FrameNumber > animPtr->EndFrameNumber)
+		if (item->Animation.FrameNumber > anim->EndFrameNumber)
 		{
 			ExecuteAnimCommands(*item, false);
 
-			item->Animation.AnimNumber = animPtr->NextAnimNumber;
-			item->Animation.FrameNumber = animPtr->NextFrameNumber;
+			item->Animation.AnimNumber = anim->NextAnimNumber;
+			item->Animation.FrameNumber = anim->NextFrameNumber;
 
-			animPtr = &GetAnimData(*item);
+			anim = &GetAnimData(*item);
 
-			if (item->Animation.ActiveState != animPtr->StateID)
+			if (item->Animation.ActiveState != anim->StateID)
 			{
 				item->Animation.ActiveState =
-					item->Animation.TargetState = animPtr->StateID;
+					item->Animation.TargetState = anim->StateID;
 			}
 
 			if (!item->IsLara())
@@ -122,14 +122,14 @@ using TEN::Renderer::g_Renderer;
 		}
 
 		// NOTE: Must use non-zero frame count in this edge case.
-		unsigned int frameCount = animPtr->EndFrameNumber;
+		unsigned int frameCount = anim->EndFrameNumber;
 		if (frameCount == 0)
 			frameCount = 1;
 
 		int currentFrameNumber = item->Animation.FrameNumber;
 
-		auto animAccel = (animPtr->VelocityEnd - animPtr->VelocityStart) / frameCount;
-		auto animVel = animPtr->VelocityStart + (animAccel * currentFrameNumber);
+		auto animAccel = (anim->VelocityEnd - anim->VelocityStart) / frameCount;
+		auto animVel = anim->VelocityStart + (animAccel * currentFrameNumber);
 
 		if (item->Animation.IsAirborne)
 		{

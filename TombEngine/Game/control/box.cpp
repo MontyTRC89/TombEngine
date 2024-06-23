@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/effects/smoke.h"
@@ -22,6 +23,8 @@
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Renderer/Renderer.h"
 
+using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Room;
 using namespace TEN::Effects::Smoke;
 
 constexpr auto ESCAPE_DIST = BLOCK(5);
@@ -610,22 +613,28 @@ void CreatureUnderwater(ItemInfo* item, int depth)
 		waterLevel = 0;
 	}
 	else
+	{
 		waterHeight = GetWaterHeight(item);
+	}
 
 	int y = waterHeight + waterLevel;
 
 	if (item->Pose.Position.y < y)
 	{
-		int height = GetCollision(item).Position.Floor;
+		int height = GetPointCollision(*item).GetFloorHeight();
 
 		item->Pose.Position.y = y;
 		if (y > height)
 			item->Pose.Position.y = height;
 
 		if (item->Pose.Orientation.x > ANGLE(2.0f))
+		{
 			item->Pose.Orientation.x -= ANGLE(2.0f);
+		}
 		else if (item->Pose.Orientation.x > 0)
+		{
 			item->Pose.Orientation.x = 0;
+		}
 	}
 }
 
@@ -633,7 +642,7 @@ void CreatureFloat(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	auto pointColl = GetCollision(item);
+	auto pointColl = GetPointCollision(*item);
 
 	item->HitPoints = NOT_TARGETABLE;
 	item->Pose.Orientation.x = 0;
@@ -651,9 +660,9 @@ void CreatureFloat(short itemNumber)
 
 	AnimateItem(item);
 
-	item->Floor = pointColl.Position.Floor;
-	if (pointColl.RoomNumber != item->RoomNumber)
-		ItemNewRoom(itemNumber, pointColl.RoomNumber);
+	item->Floor = pointColl.GetFloorHeight();
+	if (pointColl.GetRoomNumber() != item->RoomNumber)
+		ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
 	if (item->Pose.Position.y <= waterLevel)
 	{
@@ -1510,9 +1519,9 @@ int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 	}
 	else
 	{
-		auto pointColl = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
+		auto pointColl = GetPointCollision(enemy->Pose.Position, floor->RoomNumber);
 		auto bounds = GameBoundingBox(item);
-		isReachable = abs(enemy->Pose.Position.y - pointColl.Position.Floor) < bounds.GetHeight();
+		isReachable = abs(enemy->Pose.Position.y - pointColl.GetFloorHeight()) < bounds.GetHeight();
 	}
 
 	return (isReachable ? floor->Box : NO_VALUE);
@@ -2126,7 +2135,7 @@ void AdjustStopperFlag(ItemInfo* item, int direction)
 
 	x = item->Pose.Position.x + BLOCK(1) * phd_sin(direction);
 	z = item->Pose.Position.z + BLOCK(1) * phd_cos(direction);
-	room = &g_Level.Rooms[GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).RoomNumber];
+	room = &g_Level.Rooms[GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetRoomNumber()];
 
 	floor = GetSector(room, x - room->x, z - room->z);
 	floor->Stopper = !floor->Stopper;
@@ -2190,18 +2199,18 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 	}
 
 	int vPos = item.Pose.Position.y;
-	auto pointCollA = GetCollision(&item, item.Pose.Orientation.y, stepDist);
-	auto pointCollB = GetCollision(&item, item.Pose.Orientation.y, stepDist * 2);
-	auto pointCollC = GetCollision(&item, item.Pose.Orientation.y, stepDist * 3);
+	auto pointCollA = GetPointCollision(item, item.Pose.Orientation.y, stepDist);
+	auto pointCollB = GetPointCollision(item, item.Pose.Orientation.y, stepDist * 2);
+	auto pointCollC = GetPointCollision(item, item.Pose.Orientation.y, stepDist * 3);
 
 	switch (jumpDistType)
 	{
 	default:
 	case JumpDistance::Block1:
 		if (item.BoxNumber == creature.Enemy->BoxNumber ||
-			vPos >= (pointCollA.Position.Floor - STEPUP_HEIGHT) ||
-			vPos >= (pointCollB.Position.Floor + CLICK(1)) ||
-			vPos <= (pointCollB.Position.Floor - CLICK(1)))
+			vPos >= (pointCollA.GetFloorHeight() - STEPUP_HEIGHT) ||
+			vPos >= (pointCollB.GetFloorHeight() + CLICK(1)) ||
+			vPos <= (pointCollB.GetFloorHeight() - CLICK(1)))
 		{
 			return false;
 		}
@@ -2210,10 +2219,10 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 
 	case JumpDistance::Block2:
 		if (item.BoxNumber == creature.Enemy->BoxNumber ||
-			vPos >= (pointCollA.Position.Floor - STEPUP_HEIGHT) ||
-			vPos >= (pointCollB.Position.Floor - STEPUP_HEIGHT) ||
-			vPos >= (pointCollC.Position.Floor + CLICK(1)) ||
-			vPos <= (pointCollC.Position.Floor - CLICK(1)))
+			vPos >= (pointCollA.GetFloorHeight() - STEPUP_HEIGHT) ||
+			vPos >= (pointCollB.GetFloorHeight() - STEPUP_HEIGHT) ||
+			vPos >= (pointCollC.GetFloorHeight() + CLICK(1)) ||
+			vPos <= (pointCollC.GetFloorHeight() - CLICK(1)))
 		{
 			return false;
 		}

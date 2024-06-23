@@ -4,6 +4,7 @@
 #include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/chaffFX.h"
@@ -18,6 +19,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 constexpr auto FLARE_LIFE_MAX	 = 60.0f * FPS;
@@ -325,7 +327,7 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 
 	flareItem.Pose.Position = pos;
 
-	int floorHeight = GetCollision(pos.x, pos.y, pos.z, laraItem.RoomNumber).Position.Floor;
+	int floorHeight = GetPointCollision(pos, laraItem.RoomNumber).GetFloorHeight();
 	auto isCollided = !GetCollidedObjects(flareItem, true, true).IsEmpty();
 	bool hasLanded = false;
 
