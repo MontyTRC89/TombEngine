@@ -58,8 +58,8 @@ namespace TEN::Animation
 	bool BoneMutator::IsEmpty() const
 	{
 		return (Offset == Vector3::Zero &&
-			Rotation == EulerAngles::Identity &&
-			Scale == Vector3::One);
+				Rotation == EulerAngles::Identity &&
+				Scale == Vector3::One);
 	};
 
 	static void ExecuteAnimCommands(ItemInfo& item, bool isFrameBased)
