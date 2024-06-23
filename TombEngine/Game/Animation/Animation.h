@@ -18,9 +18,12 @@ struct ObjectInfo;
 //{
 	struct KeyframeData
 	{
-		GameBoundingBox			BoundingBox		 = GameBoundingBox::Zero;
+		BoundingBox				Aabb			 = DirectX::BoundingBox();
 		Vector3					Offset			 = Vector3::Zero;
 		std::vector<Quaternion> BoneOrientations = {};
+
+		// Deprecated.
+		GameBoundingBox BoundingBox = GameBoundingBox::Zero;
 	};
 
 	struct KeyframeInterpData

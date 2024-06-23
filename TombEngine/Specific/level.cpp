@@ -399,6 +399,7 @@ void LoadObjects()
 				keyframe.BoundingBox.Y2 = ReadInt32();
 				keyframe.BoundingBox.Z1 = ReadInt32();
 				keyframe.BoundingBox.Z2 = ReadInt32();
+				keyframe.Aabb = Geometry::GetAabb(keyframe.BoundingBox.ToBoundingOrientedBox(Pose::Zero));
 				keyframe.Offset = ReadVector3();
 
 				int boneCount = ReadInt32();
