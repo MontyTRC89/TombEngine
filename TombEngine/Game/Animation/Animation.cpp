@@ -37,10 +37,8 @@ namespace TEN::Animation
 		// FAILSAFE: Clamp frame number.
 		frameNumber = std::clamp(frameNumber, 0, EndFrameNumber);
 
-		// Normalize frame number into keyframe range.
+		// Calculate keyframes defining interpolated frame.
 		float keyframeNumber = frameNumber / (float)Interpolation;
-
-		// Determine keyframes defining interpolated frame.
 		const auto& keyframe0 = Keyframes[(int)floor(keyframeNumber)];
 		const auto& keyframe1 = Keyframes[(int)ceil(keyframeNumber)];
 
