@@ -116,8 +116,9 @@ bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int>& flags)
 
 void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 {
-	bool isMeshSwapPresent = (Objects[ObjectNumber].meshSwapSlot != -1 && 
-							  Objects[Objects[ObjectNumber].meshSwapSlot].loaded);
+	const auto& object = Objects[ObjectNumber];
+
+	bool isMeshSwapPresent = (object.meshSwapSlot != NO_VALUE && Objects[object.meshSwapSlot].loaded);
 
 	for (int i = 0; i < Model.MeshIndex.size(); i++)
 	{
@@ -129,7 +130,8 @@ void ItemInfo::SetMeshSwapFlags(unsigned int flags, bool clear)
 			}
 			else
 			{
-				Model.MeshIndex[i] = Objects[Objects[ObjectNumber].meshSwapSlot].meshIndex + i;
+				const auto& meshSwapObject = Objects[object.meshSwapSlot];
+				Model.MeshIndex[i] = meshSwapObject.meshIndex + i;
 			}
 		}
 		else
@@ -148,15 +150,17 @@ void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool cle
 
 void ItemInfo::ResetModelToDefault()
 {
-	if (Objects[ObjectNumber].nmeshes > 0)
+	const auto& object = Objects[ObjectNumber];
+
+	if (object.nmeshes > 0)
 	{
-		Model.MeshIndex.resize(Objects[ObjectNumber].nmeshes);
-		Model.BaseMesh = Objects[ObjectNumber].meshIndex;
+		Model.MeshIndex.resize(object.nmeshes);
+		Model.BaseMesh = object.meshIndex;
 
 		for (int i = 0; i < Model.MeshIndex.size(); i++)
 			Model.MeshIndex[i] = Model.BaseMesh + i;
 
-		Model.Mutators.resize(Objects[ObjectNumber].nmeshes);
+		Model.Mutators.resize(object.nmeshes);
 		for (auto& mutator : Model.Mutators)
 			mutator = {};
 	}
