@@ -1128,14 +1128,14 @@ namespace TEN::Renderer
 		if (CurrentLevel == 0)
 			return;
 
+		_currentLineHeight = DISPLAY_SPACE_RES.y / 30;
+
 		const auto& room = g_Level.Rooms[LaraItem->RoomNumber];
 
 		float aspectRatio = _screenWidth / (float)_screenHeight;
 		int thumbWidth = _screenWidth / 6;
 		auto rect = RECT{};
 		int thumbY = 0;
-
-		_currentLineHeight = DISPLAY_SPACE_RES.y / 30;
 
 		switch (_debugPage)
 		{
@@ -1160,8 +1160,7 @@ namespace TEN::Renderer
 			PrintDebugMessage("    Instanced Sprites: %d", _numInstancedSpritesDrawCalls);
 			PrintDebugMessage("TOTAL triangles: %d", _numTriangles);
 			PrintDebugMessage("Sprites: %d", view.SpritesToDraw.size());
-			PrintDebugMessage("SORTED draw calls: %d", (_numSortedRoomsDrawCalls + _numSortedMoveablesDrawCalls + _numSortedStaticsDrawCalls
-				+ _numSortedSpritesDrawCalls));
+			PrintDebugMessage("SORTED draw calls: %d", (_numSortedRoomsDrawCalls + _numSortedMoveablesDrawCalls + _numSortedStaticsDrawCalls + _numSortedSpritesDrawCalls));
 			PrintDebugMessage("    Rooms: %d", _numSortedRoomsDrawCalls);
 			PrintDebugMessage("    Movables: %d", _numSortedMoveablesDrawCalls);
 			PrintDebugMessage("    Statics: %d", _numSortedStaticsDrawCalls);
@@ -1187,9 +1186,6 @@ namespace TEN::Renderer
 			rect.top = thumbY;
 			rect.right = rect.left + thumbWidth;
 			rect.bottom = rect.top + thumbWidth / aspectRatio;
-				   
-			//_spriteBatch->Draw(_depthRenderTarget.ShaderResourceView.Get(), rect);
-			//thumbY += thumbWidth / aspectRatio;
 
 			rect.left = _screenWidth - thumbWidth;
 			rect.top = thumbY;
