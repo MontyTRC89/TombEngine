@@ -59,8 +59,8 @@ namespace TEN::Entities::Traps
 			}
 			else
 			{
-				if (item.Animation.AnimNumber == GetAnimIndex(item, SWINGING_BLADE_ANIM_DISABLED) &&
-					item.Animation.FrameNumber == GetAnimData(item).frameEnd)
+				if (item.Animation.AnimNumber == SWINGING_BLADE_ANIM_DISABLED &&
+					TestLastFrame(item))
 				{
 					item.Flags &= 0xC1;
 					RemoveActiveItem(itemNumber, false);

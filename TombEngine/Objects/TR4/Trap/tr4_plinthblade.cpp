@@ -12,13 +12,13 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		if (!TriggerActive(item))
+		if (!TriggerActive(&item))
 		{
 			item.Animation.FrameNumber = 0;
 		}
 		else
 		{
-			int frameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
+			int frameNumber = item.Animation.FrameNumber;
 
 			if (TestLastFrame(item))
 			{

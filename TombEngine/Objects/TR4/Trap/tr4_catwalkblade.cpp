@@ -12,7 +12,7 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		if (!TriggerActive(item))
+		if (!TriggerActive(&item))
 		{
 			item.Animation.FrameNumber = 0;
 		}

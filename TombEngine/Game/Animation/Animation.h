@@ -14,8 +14,9 @@ struct ItemInfo;
 struct KeyframeInterpData;
 struct ObjectInfo;
 
-namespace TEN::Animation
-{
+// TODO: Uncomment namespace.
+//namespace TEN::Animation
+//{
 	struct KeyframeData
 	{
 		BoundingBox				Aabb			 = DirectX::BoundingBox();
@@ -124,4 +125,4 @@ namespace TEN::Animation
 	Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int boneID);
 	Quaternion GetBoneOrientation(const ItemInfo& item, int boneID);
 	float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneID);
-}
+//}

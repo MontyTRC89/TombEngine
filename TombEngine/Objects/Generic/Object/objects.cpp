@@ -230,8 +230,8 @@ void InitializeAnimating(short itemNumber)
 {
 	/*auto* item = &g_Level.Items[itemNumber];
 	item->ActiveState = 0;
-	item->animNumber = Objects[item->objectNumber].animIndex;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;*/
+	item->animNumber = 0;
+	item->frameNumber = 0;*/
 }
 
 void AnimatingControl(short itemNumber)
@@ -248,7 +248,7 @@ void AnimatingControl(short itemNumber)
 			auto pos = GetJointPosition(item, 0);
 			SoundEffect(SFX_TR4_HELICOPTER_LOOP, (Pose*)&pos);
 
-			if (item.Animation.FrameNumber == GetAnimData(item).frameEnd)
+			if (TestLastFrame(item))
 			{
 				item.Flags &= 0xC1;
 				RemoveActiveItem(itemNumber);
@@ -263,9 +263,9 @@ void AnimatingControl(short itemNumber)
 	}
 
 	// TODO: ID_SHOOT_SWITCH2 is probably the bell in Trajan Markets, use Lua for that.
-	/*if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
+	/*if (TestLastFrame(*item))
 	{
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->frameNumber = 0;
 		RemoveActiveItem(itemNumber);
 		item->aiBits = 0;
 		item->status = ITEM_NOT_ACTIVE;
