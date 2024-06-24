@@ -188,7 +188,7 @@ namespace TEN::Entities::Creatures::TR5
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		SetAnimation(&item, HEAVY_GUARD_ANIM_IDLE);
+		SetAnimation(item, HEAVY_GUARD_ANIM_IDLE);
 	}
 
 	void HeavyGuardControl(short itemNumber)
@@ -236,7 +236,7 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			if (item.Animation.ActiveState != HEAVY_GUARD_STATE_DEATH && item.TriggerFlags != 1)
 			{
-				SetAnimation(&item, HEAVY_GUARD_ANIM_DEATH);
+				SetAnimation(item, HEAVY_GUARD_ANIM_DEATH);
 			}
 			else if (item.TriggerFlags == 1)
 			{
@@ -276,7 +276,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 
 				default:
-					SetAnimation(&item, HEAVY_GUARD_ANIM_FALL_DEATH_START);
+					SetAnimation(item, HEAVY_GUARD_ANIM_FALL_DEATH_START);
 					creature.LOT.IsJumping = true;
 					break;
 				}

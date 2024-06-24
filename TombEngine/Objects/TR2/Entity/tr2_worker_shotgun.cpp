@@ -73,7 +73,7 @@ namespace TEN::Entities::Creatures::TR2
 		auto& item = g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-		SetAnimation(&item, 5);
+		SetAnimation(item, 5);
 	}
 
 	void WorkerShotgunControl(short itemNumber)

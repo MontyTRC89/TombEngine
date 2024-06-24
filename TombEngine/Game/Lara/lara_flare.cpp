@@ -158,7 +158,7 @@ void UndrawFlare(ItemInfo& laraItem)
 	}
 	else if (laraItem.Animation.AnimNumber == LA_DISCARD_FLARE)
 	{
-		SetAnimation(&laraItem, LA_STAND_IDLE);
+		SetAnimation(laraItem, LA_STAND_IDLE);
 	}
 
 	if (armFrame >= 33 && armFrame < 72)

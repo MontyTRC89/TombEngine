@@ -111,7 +111,7 @@ namespace TEN::Entities::TR4
 		auto& item = g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-		SetAnimation(&item, SAS_ANIM_STAND);
+		SetAnimation(item, SAS_ANIM_STAND);
 	}
 
 	void InitializeInjuredSas(short itemNumber)
@@ -543,7 +543,7 @@ namespace TEN::Entities::TR4
 			if (FlashGrenadeAftershockTimer > 100 &&
 				item.Animation.ActiveState != SAS_STATE_BLIND)
 			{
-				SetAnimation(&item, SAS_ANIM_BLIND, Random::GenerateInt(0, 8));
+				SetAnimation(item, SAS_ANIM_BLIND, Random::GenerateInt(0, 8));
 				creature.MaxTurn = 0;
 			}
 		}
@@ -551,7 +551,7 @@ namespace TEN::Entities::TR4
 		{
 			if (item.Animation.ActiveState != SAS_STATE_DEATH)
 			{
-				SetAnimation(&item, SAS_ANIM_DEATH);
+				SetAnimation(item, SAS_ANIM_DEATH);
 			}
 		}
 

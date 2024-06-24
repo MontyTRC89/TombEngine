@@ -98,7 +98,7 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			// Avoid doing the death animation if summoned.
 			if (item.Animation.ActiveState != LIZARD_STATE_DEATH)
-				SetAnimation(&item, LIZARD_ANIM_DEATH);
+				SetAnimation(item, LIZARD_ANIM_DEATH);
 
 			// Explode if summoned.
 			if (item.TestFlagField(0, 1) && item.Animation.FrameNumber == 50)
@@ -373,22 +373,22 @@ namespace TEN::Entities::Creatures::TR3
 			switch (CreatureVault(itemNumber, headingAngle, 2, LIZARD_VAULT_SHIFT))
 			{
 			case 2:
-				SetAnimation(&item, LIZARD_ANIM_VAULT_2_STEPS_UP);
+				SetAnimation(item, LIZARD_ANIM_VAULT_2_STEPS_UP);
 				creature.MaxTurn = 0;
 				break;
 
 			case 3:
-				SetAnimation(&item, LIZARD_ANIM_VAULT_3_STEPS_UP);
+				SetAnimation(item, LIZARD_ANIM_VAULT_3_STEPS_UP);
 				creature.MaxTurn = 0;
 				break;
 
 			case 4:
-				SetAnimation(&item, LIZARD_ANIM_VAULT_4_STEPS_UP);
+				SetAnimation(item, LIZARD_ANIM_VAULT_4_STEPS_UP);
 				creature.MaxTurn = 0;
 				break;
 
 			case -4:
-				SetAnimation(&item, LIZARD_ANIM_VAULT_4_STEPS_DOWN);
+				SetAnimation(item, LIZARD_ANIM_VAULT_4_STEPS_DOWN);
 				creature.MaxTurn = 0;
 				break;
 			}

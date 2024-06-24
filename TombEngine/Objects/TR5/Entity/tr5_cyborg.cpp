@@ -122,7 +122,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto& item = g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-		SetAnimation(&item, CYBORG_ANIM_IDLE);
+		SetAnimation(item, CYBORG_ANIM_IDLE);
 	}
 
 	void CyborgControl(short itemNumber)
@@ -238,7 +238,7 @@ namespace TEN::Entities::Creatures::TR5
 					{
 						DropPickups(&item);
 						DoDamage(&item, INT_MAX);
-						SetAnimation(&item, CYBORG_ANIM_ELECTROCUTION_DEATH);
+						SetAnimation(item, CYBORG_ANIM_ELECTROCUTION_DEATH);
 					}
 				
 					break;
@@ -279,7 +279,7 @@ namespace TEN::Entities::Creatures::TR5
 				item.Animation.ActiveState = CYBORG_STATE_RUN;
 
 				if (item.HitPoints <= 0)
-					SetAnimation(&item, CYBORG_ANIM_CHOKE_DEATH);
+					SetAnimation(item, CYBORG_ANIM_CHOKE_DEATH);
 			}
 			// Keep cyborg invincible if not in gassed room or shocked in water.
 			else
@@ -357,7 +357,7 @@ namespace TEN::Entities::Creatures::TR5
 						{
 							if (canJump1block || canJump2blocks)
 							{
-								SetAnimation(&item, CYBORG_ANIM_LEAP_FORWARD_START);
+								SetAnimation(item, CYBORG_ANIM_LEAP_FORWARD_START);
 								creature.MaxTurn = 0;
 
 								if (canJump2blocks)
@@ -411,7 +411,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					if (canJump1block || canJump2blocks)
 					{
-						SetAnimation(&item, CYBORG_ANIM_LEAP_FORWARD_START);
+						SetAnimation(item, CYBORG_ANIM_LEAP_FORWARD_START);
 						creature.MaxTurn = 0;
 
 						if (canJump2blocks)
@@ -455,7 +455,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else if (canJump1block || canJump2blocks)
 				{
-					SetAnimation(&item, CYBORG_ANIM_LEAP_FORWARD_START);
+					SetAnimation(item, CYBORG_ANIM_LEAP_FORWARD_START);
 					creature.MaxTurn = 0;
 
 					if (canJump2blocks)
@@ -652,32 +652,32 @@ namespace TEN::Entities::Creatures::TR5
 			switch (CreatureVault(itemNumber, headingAngle, 2, 260) + 4)
 			{
 			case 0:
-				SetAnimation(&item, CYBORG_ANIM_6CLICK_JUMPDOWN);
+				SetAnimation(item, CYBORG_ANIM_6CLICK_JUMPDOWN);
 				creature.MaxTurn = 0;
 				break;
 
 			case 1:
-				SetAnimation(&item, CYBORG_ANIM_4CLICK_JUMPDOWN);
+				SetAnimation(item, CYBORG_ANIM_4CLICK_JUMPDOWN);
 				creature.MaxTurn = 0;
 				break;
 
 			case 2:
-				SetAnimation(&item, CYBORG_ANIM_3CLICK_JUMPDOWN);
+				SetAnimation(item, CYBORG_ANIM_3CLICK_JUMPDOWN);
 				creature.MaxTurn = 0;
 				break;
 
 			case 6:
-				SetAnimation(&item, CYBORG_ANIM_CLIMBUP_3CLICK);
+				SetAnimation(item, CYBORG_ANIM_CLIMBUP_3CLICK);
 				creature.MaxTurn = 0;
 				break;
 
 			case 7:
-				SetAnimation(&item, CYBORG_ANIM_CLIMBUP_4CLICK);
+				SetAnimation(item, CYBORG_ANIM_CLIMBUP_4CLICK);
 				creature.MaxTurn = 0;
 				break;
 
 			case 8:
-				SetAnimation(&item, CYBORG_ANIM_CLIMBUP_6CLICK);
+				SetAnimation(item, CYBORG_ANIM_CLIMBUP_6CLICK);
 				creature.MaxTurn = 0;
 				break;
 

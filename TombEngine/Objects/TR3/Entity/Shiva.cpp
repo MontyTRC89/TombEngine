@@ -256,7 +256,7 @@ namespace TEN::Entities::Creatures::TR3
 		item.Status &= ~ITEM_INVISIBLE; // Draw the statue from the start.
 
 		InitializeCreature(itemNumber);
-		SetAnimation(&item, SHIVA_ANIM_INACTIVE);
+		SetAnimation(item, SHIVA_ANIM_INACTIVE);
 		item.ItemFlags[0] = 0; // Joint index when swapping mesh.
 		item.ItemFlags[1] = 1; // Immune state. true = immune to damage.
 		item.ItemFlags[2] = 1; // If 1, swap to stone. If 2, swap to normal.

@@ -173,7 +173,7 @@ namespace TEN::Entities::Creatures::TR2
 		const auto& object = Objects[item.ObjectNumber];
 
 		InitializeCreature(itemNumber);
-		SetAnimation(&item, SWORD_GUARDIAN_ANIM_AWAKE);
+		SetAnimation(item, SWORD_GUARDIAN_ANIM_AWAKE);
 		item.Status &= ~ITEM_INVISIBLE;
 
 		item.ItemFlags[0] = 0; // Joint index for mesh swap.

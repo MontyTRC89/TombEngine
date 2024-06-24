@@ -165,7 +165,7 @@ namespace TEN::Entities::Creatures::TR3
 		item.Animation.Velocity.y = -50.0f;
 		item.Pose.Orientation.x = 0;
 		item.Pose.Orientation.z = 0;
-		SetAnimation(&item, LA_FALL_BACK);
+		SetAnimation(item, LA_FALL_BACK);
 	}
 
 	static void TriggerKnockback(ItemInfo& item, int life = 32)
@@ -702,7 +702,7 @@ namespace TEN::Entities::Creatures::TR3
 		item.ItemFlags[4] = 0;								// Charged state (true or false).
 		item.ItemFlags[5] = 0;								// Death count.
 		item.ItemFlags[7] = 0;								// Explode count.
-		SetAnimation(&item, SOPHIALEIGH_ANIM_SUMMON_START); // Always starts with projectile attack.
+		SetAnimation(item, SOPHIALEIGH_ANIM_SUMMON_START); // Always starts with projectile attack.
 	}
 
 	void SophiaLeighControl(short itemNumber)
@@ -719,7 +719,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (item.HitPoints <= 0)
 		{
 			if (item.Animation.ActiveState != SOPHIALEIGH_STATE_DEATH)
-				SetAnimation(&item, SOPHIALEIGH_ANIM_DEATH);
+				SetAnimation(item, SOPHIALEIGH_ANIM_DEATH);
 
 			int endFrameNumber = GetAnimData(object, SOPHIALEIGH_ANIM_DEATH).EndFrameNumber;
 			if (item.Animation.FrameNumber >= endFrameNumber)
@@ -761,22 +761,22 @@ namespace TEN::Entities::Creatures::TR3
 			{
 			case 2:
 				creature.MaxTurn = 0;
-				SetAnimation(&item, SOPHIALEIGH_ANIM_CLIMB2CLICK);
+				SetAnimation(item, SOPHIALEIGH_ANIM_CLIMB2CLICK);
 				break;
 
 			case 3:
 				creature.MaxTurn = 0;
-				SetAnimation(&item, SOPHIALEIGH_ANIM_CLIMB3CLICK);
+				SetAnimation(item, SOPHIALEIGH_ANIM_CLIMB3CLICK);
 				break;
 
 			case 4:
 				creature.MaxTurn = 0;
-				SetAnimation(&item, SOPHIALEIGH_ANIM_CLIMB4CLICK);
+				SetAnimation(item, SOPHIALEIGH_ANIM_CLIMB4CLICK);
 				break;
 
 			case -4:
 				creature.MaxTurn = 0;
-				SetAnimation(&item, SOPHIALEIGH_ANIM_FALL4CLICK);
+				SetAnimation(item, SOPHIALEIGH_ANIM_FALL4CLICK);
 				break;
 			}
 		}

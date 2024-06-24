@@ -194,7 +194,7 @@ namespace TEN::Entities::Creatures::TR2
 		auto& item = g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-		SetAnimation(&item, SPEAR_GUARDIAN_ANIM_AWAKE);
+		SetAnimation(item, SPEAR_GUARDIAN_ANIM_AWAKE);
 		item.Status &= ~ITEM_INVISIBLE;
 
 		item.ItemFlags[0] = 0; // Joint index for mesh swap.

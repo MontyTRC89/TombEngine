@@ -279,7 +279,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto& item = g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-		SetAnimation(&item, PUNA_ANIM_IDLE);
+		SetAnimation(item, PUNA_ANIM_IDLE);
 		CheckForRequiredObjects(item);
 
 		// Save Puna's default angle. It will be used while waiting (i.e. an active lizard is nearby).
@@ -319,7 +319,7 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			if (item.Animation.ActiveState != PUNA_STATE_DEATH)
 			{
-				SetAnimation(&item, PUNA_ANIM_DEATH);
+				SetAnimation(item, PUNA_ANIM_DEATH);
 				SoundEffect(SFX_TR3_PUNA_BOSS_DEATH, &item.Pose);
 				item.ItemFlags[(int)BossItemFlags::DeathCount] = 1;
 				creature.MaxTurn = 0;

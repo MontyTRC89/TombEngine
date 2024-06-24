@@ -32,7 +32,7 @@ namespace TEN::Entities::Creatures::TR2
 		auto& item = g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-		SetAnimation(&item, 12);
+		SetAnimation(item, 12);
 	}
 
 	static void ShootWorkerMachineGun(ItemInfo& item, AI_INFO& ai, const EulerAngles& extraTorsoRot)

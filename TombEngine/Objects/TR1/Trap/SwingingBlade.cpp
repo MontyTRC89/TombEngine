@@ -26,7 +26,7 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		SetAnimation(&item, SWINGING_BLADE_ANIM_DISABLED);
+		SetAnimation(item, SWINGING_BLADE_ANIM_DISABLED);
 		
 		// Used for damage in GenericSphereBoxCollision().
 		item.ItemFlags[3] = SWINGING_BLADE_HARM_DAMAGE;

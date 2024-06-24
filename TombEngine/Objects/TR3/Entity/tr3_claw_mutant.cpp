@@ -307,7 +307,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (item.HitPoints <= 0)
 		{
 			if (item.Animation.ActiveState != CLAW_MUTANT_STATE_DEATH)
-				SetAnimation(&item, CLAW_MUTANT_ANIM_DEATH);
+				SetAnimation(item, CLAW_MUTANT_ANIM_DEATH);
 
 			int endFrameNumber = GetAnimData(item, CLAW_MUTANT_ANIM_DEATH).EndFrameNumber;
 			if (item.Animation.FrameNumber >= endFrameNumber)

@@ -28,7 +28,7 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		SetAnimation(&item, SETHBLADE_ANIM_IDLE);
+		SetAnimation(item, SETHBLADE_ANIM_IDLE);
 		
 		item.ItemFlags[2] = item.TriggerFlags >= 0 ? 1 : abs(item.TriggerFlags);		//ItemFlags[2] stores blade timer.
 		item.ItemFlags[3] = SETH_BLADE_HARM_DAMAGE;										//ItemFlags[3] stored blade harm damage.

@@ -172,15 +172,15 @@ namespace TEN::Entities::Creatures::TR5
 		switch (item.TriggerFlags)
 		{
 		case IMP_OCB_ROLL:
-			SetAnimation(&item, IMP_ANIM_ROLL);
+			SetAnimation(item, IMP_ANIM_ROLL);
 			break;
 
 		case IMP_OCB_CLIMB_UP:
-			SetAnimation(&item, IMP_ANIM_VAULT_UP_1_STEP);
+			SetAnimation(item, IMP_ANIM_VAULT_UP_1_STEP);
 			break;
 
 		default:
-			SetAnimation(&item, IMP_ANIM_IDLE);
+			SetAnimation(item, IMP_ANIM_IDLE);
 			break;
 		}
 	}

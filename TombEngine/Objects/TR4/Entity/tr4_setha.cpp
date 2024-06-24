@@ -113,7 +113,7 @@ namespace TEN::Entities::TR4
 		auto& item = g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-		SetAnimation(&item, SETH_ANIM_IDLE);
+		SetAnimation(item, SETH_ANIM_IDLE);
 	}
 
 	void SethControl(short itemNumber)
