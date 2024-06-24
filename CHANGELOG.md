@@ -9,10 +9,10 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## Version 1.5 - xxxx-xx-xx
 
 ### Bug fixes
-* Fixed original issue with classic switch off trigger wrongly activating some trigger actions.
+* Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
 * Fixed incorrect diving animation when swandiving from a high place.
-* Fixed camera rotating with player's hips when climbing out of water.
-* Fixed AI for skidoo driver and worker with shotgun TR2 enemies.
+* Fixed camera rotating with the player's hips when climbing out of water.
+* Fixed AI for TR2 skidoo driver and worker with shotgun.
 * Fixed ember emitter crashing when ocb is between -1 and -10.
 * Fixed electric cleaner and squishy block not detecting collision with certain block heights.
 * Fixed squishy blocks crashing the level.
@@ -24,14 +24,14 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Joby spikes collision and deformation.
 * Fixed sentry gun joint rotation.
 * Fixed teeth spikes not triggering the player impale animation.
-* Fixed TR4 mine crash with OCB1 when triggered.
+* Fixed TR4 mine crash with OCB 1 when triggered.
 
 ### Features/Amendments
-* Changed Rome Hammer for it to don't hurt Lara while it's deactivated.
+* Changed Rome Hammer to not hurt player whilst deactivated.
 * Changed Statue with blade damage, from 20 to 200.
 * Enhaced Rolling Spindle detection to avoid them going down through pits.
-* Enhaced Sentry Guns, with a new ItemFlags[3] to contain the ID of the inventory item that deactivates the sentry guns (by default PUZZLE_ITEM5 ID)
-* Enhaced Dart Emitter, with a new ItemFlags[0] to contain the number of frames between shots (by default 32 in dart emitter, and 24 in homing dar emitter).
+* Enhaced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
+* Enhaced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
