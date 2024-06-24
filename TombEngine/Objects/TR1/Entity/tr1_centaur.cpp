@@ -64,7 +64,7 @@ namespace TEN::Entities::Creatures::TR1
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != CENTAUR_STATE_DEATH)
-				SetAnimation(item, CENTAUR_ANIM_DEATH);
+				SetAnimation(*item, CENTAUR_ANIM_DEATH);
 		}
 		else
 		{

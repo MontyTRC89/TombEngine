@@ -32,7 +32,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState != 5)
-				SetAnimation(item, 4);
+				SetAnimation(*item, 4);
 
 			CreatureFloat(itemNumber);
 			return;

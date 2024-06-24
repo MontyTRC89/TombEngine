@@ -188,7 +188,7 @@ namespace TEN::Entities::Traps
 			AlignEntityToSurface(&item, radius);
 
 			// Deactivate.
-			if (TestLastFrame(&item))
+			if (TestLastFrame(*&item))
 			{
 				RemoveActiveItem(itemNumber);
 				item.Status = ITEM_NOT_ACTIVE;

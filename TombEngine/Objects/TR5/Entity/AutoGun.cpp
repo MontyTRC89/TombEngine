@@ -88,7 +88,7 @@ namespace TEN::Entities::Creatures::TR5
 		if (!TriggerActive(&item))
 			return;
 
-		if (TestLastFrame(&item))
+		if (TestLastFrame(*&item))
 		{
 			auto& autoGun = *GetCreatureInfo(&item);
 

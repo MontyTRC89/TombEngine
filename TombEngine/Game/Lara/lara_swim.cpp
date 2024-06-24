@@ -40,7 +40,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if ((IsHeld(In::Roll) || (IsHeld(In::Forward) && IsHeld(In::Back))) && laraType != LaraType::Divesuit)
 	{
-		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
+		SetAnimation(*item, LA_UNDERWATER_ROLL_180_START);
 		return;
 	}
 
@@ -85,7 +85,7 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Roll) && laraType != LaraType::Divesuit)
 	{
-		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
+		SetAnimation(*item, LA_UNDERWATER_ROLL_180_START);
 		return;
 	}
 
@@ -127,7 +127,7 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 
 	if (IsHeld(In::Roll) && laraType != LaraType::Divesuit)
 	{
-		SetAnimation(item, LA_UNDERWATER_ROLL_180_START);
+		SetAnimation(*item, LA_UNDERWATER_ROLL_180_START);
 		return;
 	}
 

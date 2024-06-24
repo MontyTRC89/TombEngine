@@ -75,25 +75,17 @@ struct ObjectInfo;
 	};
 
 	// Animation controller
+
 	void AnimateItem(ItemInfo* item);
 
 	// Inquirers
+
 	bool TestStateDispatch(const ItemInfo& item, int targetStateID = NO_VALUE);
 	bool TestLastFrame(const ItemInfo& item, int animNumber = NO_VALUE);
-	bool TestLastFrame(ItemInfo* item, int animNumber = NO_VALUE); // Deprecated.
 	bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber);
 
-	// Entity translation
-	void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-	void TranslateItem(ItemInfo* item, const EulerAngles& orient, float dist);
-	void TranslateItem(ItemInfo* item, const Vector3& dir, float dist);
-
-	// Setters
-	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber = 0);
-	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber = 0);
-	void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Deprecated.
-
 	// Getters
+
 	const AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
 	const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 	const AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_VALUE);
@@ -105,24 +97,32 @@ struct ObjectInfo;
 	const KeyframeData& GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber);
 	const KeyframeData& GetClosestKeyframe(const ItemInfo& item);
 
+	int	  GetNextAnimState(const ItemInfo& item);
+	int	  GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber);
+	int	  GetFrameCount(GAME_OBJECT_ID objectID, int animNumber); // TODO: Not needed? Not the "real" frame count anyway since 0 isn't counted.
+	int	  GetFrameCount(const ItemInfo& item);
 	float GetEffectiveGravity(float verticalVel);
 
-	int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber); // TODO: Not needed? Not the "real" frame count anyway since 0 isn't counted.
-	int GetFrameCount(const ItemInfo& item);
-
-	int	 GetNextAnimState(const ItemInfo& item);
-	int	 GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber);
-	bool SetStateDispatch(ItemInfo& item, int targetStateID = NO_VALUE);
-
-	void ClampRotation(Pose& outPose, short angle, short rot);
-	void DrawAnimatingItem(ItemInfo* item);
-
-	Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset = Vector3i::Zero);
-	Vector3i GetJointPosition(ItemInfo* item, int boneID, const Vector3i& relOffset = Vector3i::Zero);
-	Vector3i GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite);
-	Vector3i GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite);
-
+	Vector3i   GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset = Vector3i::Zero);
+	Vector3i   GetJointPosition(ItemInfo* item, int boneID, const Vector3i& relOffset = Vector3i::Zero);
+	Vector3i   GetJointPosition(ItemInfo* item, const CreatureBiteInfo& bite);
+	Vector3i   GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite);
 	Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int boneID);
 	Quaternion GetBoneOrientation(const ItemInfo& item, int boneID);
 	float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneID);
+
+	// Setters
+
+	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber = 0);
+	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber = 0);
+	bool SetStateDispatch(ItemInfo& item, int targetStateID = NO_VALUE);
+
+	// Utilities
+
+	void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
+	void TranslateItem(ItemInfo* item, const EulerAngles& orient, float dist);
+	void TranslateItem(ItemInfo* item, const Vector3& dir, float dist);
+
+	void ClampRotation(Pose& outPose, short angle, short rot);
+	void DrawAnimatingItem(ItemInfo* item);
 //}

@@ -338,7 +338,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 		item->ItemFlags[5] = (int)ReusableReceptacleState::Done;
-		SetAnimation(item, 0);
+		SetAnimation(*item, 0);
 		item->ResetModelToDefault();	
 	}
 	else
@@ -368,7 +368,7 @@ void PuzzleHole(ItemInfo* item, short itemNumber)
 
 	item->ObjectNumber = GAME_OBJECT_ID(item->ObjectNumber - (ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1));
 	item->ItemFlags[5] = (int)ReusableReceptacleState::Empty;
-	SetAnimation(item, 0);
+	SetAnimation(*item, 0);
 	item->ResetModelToDefault();
 }
 

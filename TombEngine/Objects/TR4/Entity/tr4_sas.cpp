@@ -608,7 +608,7 @@ namespace TEN::Entities::TR4
 			{
 				if (MoveLaraPosition(SasDragBodyPosition, &item, laraItem))
 				{
-					SetAnimation(laraItem, LA_DRAG_BODY);
+					SetAnimation(*laraItem, LA_DRAG_BODY);
 					ResetPlayerFlex(laraItem);
 					laraItem->Pose.Orientation.y = item.Pose.Orientation.y;
 					player.Control.HandStatus = HandStatus::Busy;
@@ -632,7 +632,7 @@ namespace TEN::Entities::TR4
 				return;
 			}
 
-			if (!TestLastFrame(&item))
+			if (!TestLastFrame(*&item))
 				return;
 
 			auto pos = GetJointPosition(&item, 0);

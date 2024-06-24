@@ -267,14 +267,14 @@ namespace TEN::Entities::Vehicles
 			return true;
 
 		if ((laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_RIGHT || laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_LEFT) &&
-			TestLastFrame(laraItem))
+			TestLastFrame(*laraItem))
 		{
 			if (laraItem->Animation.ActiveState == QBIKE_STATE_DISMOUNT_LEFT)
 				laraItem->Pose.Orientation.y += ANGLE(90.0f);
 			else
 				laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 
-			SetAnimation(laraItem, LA_STAND_IDLE);
+			SetAnimation(*laraItem, LA_STAND_IDLE);
 			TranslateItem(laraItem, laraItem->Pose.Orientation.y, -QBIKE_DISMOUNT_DISTANCE);
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
@@ -283,7 +283,7 @@ namespace TEN::Entities::Vehicles
 
 			if (laraItem->Animation.ActiveState == QBIKE_STATE_FALL_OFF)
 			{
-				SetAnimation(laraItem, LA_FREEFALL);
+				SetAnimation(*laraItem, LA_FREEFALL);
 				auto pos = GetJointPosition(laraItem, LM_HIPS);
 				laraItem->Pose.Position = pos;
 				laraItem->Animation.IsAirborne = true;

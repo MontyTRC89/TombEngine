@@ -221,7 +221,7 @@ namespace TEN::Entities::Doors
 
 				if (MoveLaraPosition(CrowbarDoorPos, doorItem, laraItem))
 				{
-					SetAnimation(laraItem, LA_DOOR_OPEN_CROWBAR);
+					SetAnimation(*laraItem, LA_DOOR_OPEN_CROWBAR);
 					doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 
 					AddActiveItem(itemNumber);

@@ -1023,7 +1023,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.TestAny())
 					{
-						SetAnimation(LaraItem, LA_JUMP_UP);
+						SetAnimation(*LaraItem, LA_JUMP_UP);
 						LaraItem->Animation.IsAirborne = true;
 						LaraItem->Animation.Velocity.y = 2;
 						LaraItem->Animation.Velocity.y = 1;
@@ -1264,27 +1264,27 @@ namespace TEN::Entities::TR4
 			switch (vault)
 			{
 			case 2:
-				SetAnimation(item, BADDY_ANIM_CLIMB_2_STEPS);
+				SetAnimation(*item, BADDY_ANIM_CLIMB_2_STEPS);
 				creature->MaxTurn = 0;
 				break;
 
 			case 3:
-				SetAnimation(item, BADDY_ANIM_CLIMB_3_STEPS);
+				SetAnimation(*item, BADDY_ANIM_CLIMB_3_STEPS);
 				creature->MaxTurn = 0;
 				break;
 
 			case 4:
-				SetAnimation(item, BADDY_ANIM_CLIMB_4_STEPS);
+				SetAnimation(*item, BADDY_ANIM_CLIMB_4_STEPS);
 				creature->MaxTurn = 0;
 				break;
 
 			case -3:
-				SetAnimation(item, BADDY_ANIM_JUMP_OFF_3_STEPS);
+				SetAnimation(*item, BADDY_ANIM_JUMP_OFF_3_STEPS);
 				creature->MaxTurn = 0;
 				break;
 
 			case -4:
-				SetAnimation(item, BADDY_ANIM_JUMP_OFF_4_STEPS);
+				SetAnimation(*item, BADDY_ANIM_JUMP_OFF_4_STEPS);
 				creature->MaxTurn = 0;
 				break;
 
@@ -1294,7 +1294,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			SetAnimation(item, BADDY_ANIM_BLIND, Random::GenerateInt(0, 8));
+			SetAnimation(*item, BADDY_ANIM_BLIND, Random::GenerateInt(0, 8));
 			creature->MaxTurn = 0;
 		}
 	}

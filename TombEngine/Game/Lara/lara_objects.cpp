@@ -41,7 +41,7 @@ void lara_as_pickup(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetElevation = -ANGLE(15.0f);
 	Camera.targetDistance = BLOCK(1);
 
-	if (TestLastFrame(item))
+	if (TestLastFrame(*item))
 		item->Animation.TargetState = GetNextAnimState(*item);
 }
 
@@ -104,13 +104,13 @@ void lara_col_turn_switch(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (item->Animation.AnimNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_CONTINUE)
 		{
-			SetAnimation(item, LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END);
+			SetAnimation(*item, LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END);
 			item->Pose.Orientation.y -= ANGLE(90.0f);
 		}
 
 		if (item->Animation.AnimNumber == LA_TURNSWITCH_PUSH_CLOCKWISE_CONTINUE)
 		{
-			SetAnimation(item, LA_TURNSWITCH_PUSH_CLOCKWISE_END);
+			SetAnimation(*item, LA_TURNSWITCH_PUSH_CLOCKWISE_END);
 			item->Pose.Orientation.y += ANGLE(90.0f);
 		}
 	}
@@ -147,7 +147,7 @@ void lara_as_use_puzzle(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetElevation = -ANGLE(25.0f);
 	Camera.targetDistance = BLOCK(1);
 
-	if (TestLastFrame(item) && item->ItemFlags[0])
+	if (TestLastFrame(*item) && item->ItemFlags[0])
 	{
 		item->Animation.ActiveState = LS_MISC_CONTROL;
 		item->Animation.AnimNumber = item->ItemFlags[0];
@@ -316,9 +316,9 @@ void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.Velocity.y = -(20 * distance + 64);
 	}
 
-	if (TestLastFrame(item))
+	if (TestLastFrame(*item))
 	{
-		SetAnimation(item, LA_REACH);
+		SetAnimation(*item, LA_REACH);
 		TranslateItem(item, item->Pose.Orientation, 700);
 		item->Pose.Position.y -= 361;
 	}
@@ -367,7 +367,7 @@ void lara_as_tightrope_dismount(ItemInfo* item, CollisionInfo* coll)
 	DoLaraTightropeLean(item);
 
 	if (item->Animation.AnimNumber == LA_TIGHTROPE_END &&
-		TestLastFrame(item))
+		TestLastFrame(*item))
 	{
 		item->Pose.Orientation.z = 0;
 		lara->ExtraTorsoRot.z = 0;
@@ -418,7 +418,7 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 	DoLaraTightropeBalanceRegen(item);
 	DoLaraTightropeLean(item);
 
-	if (TestLastFrame(item))
+	if (TestLastFrame(*item))
 	{
 		// HACK: Set position command can't move Lara laterally?
 		if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_LEFT)
@@ -591,7 +591,7 @@ void lara_as_rope_up(ItemInfo* item, CollisionInfo* coll)
 	{
 		Camera.targetAngle = ANGLE(30.0f);
 
-		if (TestLastFrame(item))
+		if (TestLastFrame(*item))
 		{
 			item->Animation.FrameNumber = 0;
 			lara->Control.Rope.Segment -= 2;

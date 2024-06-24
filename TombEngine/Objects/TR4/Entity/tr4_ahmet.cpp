@@ -108,7 +108,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-		SetAnimation(item, AHMET_ANIM_IDLE);
+		SetAnimation(*item, AHMET_ANIM_IDLE);
 		item->ItemFlags[0] = item->Pose.Position.x / BLOCK(1);
 		item->ItemFlags[1] = (item->Pose.Position.y * 4) / BLOCK(1);
 		item->ItemFlags[2] = item->Pose.Position.z / BLOCK(1);
@@ -137,7 +137,7 @@ namespace TEN::Entities::TR4
 			if (item->Animation.ActiveState == AHMET_STATE_DEATH)
 			{
 				// Don't clear.
-				if (TestLastFrame(item))
+				if (TestLastFrame(*item))
 				{
 					item->Animation.FrameNumber = GetAnimData(*item).EndFrameNumber - 1;
 					item->Collidable = false;
@@ -145,7 +145,7 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				SetAnimation(item, AHMET_ANIM_DEATH);
+				SetAnimation(*item, AHMET_ANIM_DEATH);
 				Lara.Context.InteractedItem = itemNumber; // TODO: Check if it's really required! -- TokyoSU 3/8/2022
 			}
 			
@@ -385,7 +385,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->Animation.ActiveState != AHMET_STATE_DEATH || !TestLastFrame(item))
+		if (item->Animation.ActiveState != AHMET_STATE_DEATH || !TestLastFrame(*item))
 			return false;
 
 		Weather.Flash(255, 64, 0, 0.03f);
@@ -398,7 +398,7 @@ namespace TEN::Entities::TR4
 		if (item->RoomNumber != outsideRoom)
 			ItemNewRoom(itemNumber, outsideRoom);
 
-		SetAnimation(item, AHMET_ANIM_IDLE);
+		SetAnimation(*item, AHMET_ANIM_IDLE);
 		item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 		AddActiveItem(itemNumber);
 

@@ -189,7 +189,7 @@ namespace TEN::Entities::Switches
 			}
 
 			if (laraItem->Animation.AnimNumber == LA_TURNSWITCH_PUSH_CLOCKWISE_END &&
-				TestLastFrame(laraItem) && 
+				TestLastFrame(*laraItem) && 
 				!switchItem->ItemFlags[1])
 				switchItem->ItemFlags[1] = 1;
 
@@ -214,7 +214,7 @@ namespace TEN::Entities::Switches
 			}
 
 			if (laraItem->Animation.AnimNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END &&
-				TestLastFrame(laraItem) &&
+				TestLastFrame(*laraItem) &&
 				!switchItem->ItemFlags[1])
 			{
 				switchItem->ItemFlags[1] = 1;

@@ -40,7 +40,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-		SetAnimation(item, 0);
+		SetAnimation(*item, 0);
 
 		if (!item->TriggerFlags)
 			return;
@@ -356,7 +356,7 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			// When Larson dies, it activates trigger at start position
 			if (item->ObjectNumber == ID_LARSON &&
-				TestLastFrame(item))
+				TestLastFrame(*item))
 			{
 				short roomNumber = item->ItemFlags[2] & 0xFF;
 				short floorHeight = item->ItemFlags[2] & 0xFF00;

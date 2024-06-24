@@ -237,86 +237,10 @@ using TEN::Renderer::g_Renderer;
 		return (item.Animation.FrameNumber >= anim.EndFrameNumber);
 	}
 
-	bool TestLastFrame(ItemInfo* item, int animNumber)
-	{
-		return TestLastFrame(*item, animNumber);
-	}
-
 	bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber)
 	{
 		return (item.Animation.FrameNumber >= lowFrameNumber &&
-			item.Animation.FrameNumber <= highFrameNumber);
-	}
-
-	void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
-	{
-		item->Pose.Translate(headingAngle, forward, down, right);
-	}
-
-	void TranslateItem(ItemInfo* item, const EulerAngles& orient, float dist)
-	{
-		item->Pose.Translate(orient, dist);
-	}
-
-	void TranslateItem(ItemInfo* item, const Vector3& dir, float dist)
-	{
-		item->Pose.Translate(dir, dist);
-	}
-
-	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
-	{
-		// Animation already set; return early.
-		if (item.Animation.AnimObjectID == animObjectID &&
-			item.Animation.AnimNumber == animNumber &&
-			item.Animation.FrameNumber == frameNumber)
-		{
-			return;
-		}
-
-		const auto& animObject = Objects[animObjectID];
-
-		// Animation missing; return early.
-		if (animNumber < 0 || animNumber >= animObject.Animations.size())
-		{
-			TENLog(
-				"Attempted to set missing animation " + std::to_string(animNumber) +
-				((animObjectID == item.ObjectNumber) ? "" : (" from moveable " + GetObjectName(animObjectID))) +
-				" for object " + GetObjectName(item.ObjectNumber),
-				LogLevel::Warning);
-
-			return;
-		}
-
-		const auto& anim = GetAnimData(animObject, animNumber);
-
-		// Frame missing; return early.
-		if (frameNumber < 0 || frameNumber > anim.EndFrameNumber)
-		{
-			TENLog(
-				"Attempted to set missing frame " + std::to_string(frameNumber) +
-				" from animation " + std::to_string(animNumber) +
-				((animObjectID == item.ObjectNumber) ? "" : (" from moveable " + GetObjectName(animObjectID))) +
-				" for object " + GetObjectName(item.ObjectNumber),
-				LogLevel::Warning);
-
-			return;
-		}
-
-		item.Animation.AnimObjectID = animObjectID;
-		item.Animation.AnimNumber = animNumber;
-		item.Animation.FrameNumber = frameNumber;
-		item.Animation.ActiveState =
-			item.Animation.TargetState = anim.StateID;
-	}
-
-	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber)
-	{
-		SetAnimation(item, item.ObjectNumber, animNumber, frameNumber);
-	}
-
-	void SetAnimation(ItemInfo* item, int animNumber, int frameNumber)
-	{
-		SetAnimation(*item, item->ObjectNumber, animNumber, frameNumber);
+				item.Animation.FrameNumber <= highFrameNumber);
 	}
 
 	const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
@@ -371,22 +295,6 @@ using TEN::Renderer::g_Renderer;
 		return anim.GetClosestKeyframe(item.Animation.FrameNumber);
 	}
 
-	float GetEffectiveGravity(float verticalVel)
-	{
-		return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
-	}
-
-	int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber)
-	{
-		const auto& anim = GetAnimData(objectID, animNumber);
-		return anim.EndFrameNumber;
-	}
-
-	int GetFrameCount(const ItemInfo& item)
-	{
-		return GetFrameCount(item.Animation.AnimObjectID, item.Animation.AnimNumber);
-	}
-
 	int GetNextAnimState(const ItemInfo& item)
 	{
 		return GetNextAnimState(item.Animation.AnimObjectID, item.Animation.AnimNumber);
@@ -400,57 +308,20 @@ using TEN::Renderer::g_Renderer;
 		return nextAnim.StateID;
 	}
 
-	bool SetStateDispatch(ItemInfo& item, int targetStateID)
+	int GetFrameCount(GAME_OBJECT_ID objectID, int animNumber)
 	{
-		// Set target state ID.
-		if (targetStateID != NO_VALUE)
-			item.Animation.TargetState = targetStateID;
-
-		const auto& anim = GetAnimData(item);
-
-		// No dispatches; return early.
-		if (anim.Dispatches.empty())
-			return false;
-
-		// Active and target state IDs already match; return early.
-		if (item.Animation.ActiveState == item.Animation.TargetState)
-			return false;
-
-		// Iterate over state dispatches.
-		for (const auto& dispatch : anim.Dispatches)
-		{
-			// State ID mismatch; continue.
-			if (dispatch.StateID != item.Animation.TargetState)
-				continue;
-
-			// Set new animation and frame numbers if current frame number is within dispatch range.
-			if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
-			{
-				item.Animation.AnimNumber = dispatch.NextAnimNumber;
-				item.Animation.FrameNumber = dispatch.NextFrameNumber;
-				return true;
-			}
-		}
-
-		return false;
+		const auto& anim = GetAnimData(objectID, animNumber);
+		return anim.EndFrameNumber;
 	}
 
-	void DrawAnimatingItem(ItemInfo* item)
+	int GetFrameCount(const ItemInfo& item)
 	{
-		// TODO: to refactor
-		// Empty stub because actually we disable items drawing when drawRoutine pointer is nullptr in ObjectInfo
+		return GetFrameCount(item.Animation.AnimObjectID, item.Animation.AnimNumber);
 	}
 
-	void ClampRotation(Pose& outPose, short angle, short rot)
+	float GetEffectiveGravity(float verticalVel)
 	{
-		if (angle <= rot)
-		{
-			outPose.Orientation.y += (angle >= -rot) ? angle : -rot;
-		}
-		else
-		{
-			outPose.Orientation.y += rot;
-		}
+		return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
 	}
 
 	Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset)
@@ -504,5 +375,123 @@ using TEN::Renderer::g_Renderer;
 
 		auto nextBoneOffset = GetJointOffset(objectID, boneID + 1);
 		return nextBoneOffset.Length();
+	}
+
+	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
+	{
+		// Animation already set; return early.
+		if (item.Animation.AnimObjectID == animObjectID &&
+			item.Animation.AnimNumber == animNumber &&
+			item.Animation.FrameNumber == frameNumber)
+		{
+			return;
+		}
+
+		const auto& animObject = Objects[animObjectID];
+
+		// Animation missing; return early.
+		if (animNumber < 0 || animNumber >= animObject.Animations.size())
+		{
+			TENLog(
+				"Attempted to set missing animation " + std::to_string(animNumber) +
+				((animObjectID == item.ObjectNumber) ? "" : (" from moveable " + GetObjectName(animObjectID))) +
+				" for object " + GetObjectName(item.ObjectNumber),
+				LogLevel::Warning);
+
+			return;
+		}
+
+		const auto& anim = GetAnimData(animObject, animNumber);
+
+		// Frame missing; return early.
+		if (frameNumber < 0 || frameNumber > anim.EndFrameNumber)
+		{
+			TENLog(
+				"Attempted to set missing frame " + std::to_string(frameNumber) +
+				" from animation " + std::to_string(animNumber) +
+				((animObjectID == item.ObjectNumber) ? "" : (" from moveable " + GetObjectName(animObjectID))) +
+				" for object " + GetObjectName(item.ObjectNumber),
+				LogLevel::Warning);
+
+			return;
+		}
+
+		item.Animation.AnimObjectID = animObjectID;
+		item.Animation.AnimNumber = animNumber;
+		item.Animation.FrameNumber = frameNumber;
+		item.Animation.ActiveState =
+			item.Animation.TargetState = anim.StateID;
+	}
+
+	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber)
+	{
+		SetAnimation(item, item.ObjectNumber, animNumber, frameNumber);
+	}
+
+	bool SetStateDispatch(ItemInfo& item, int targetStateID)
+	{
+		// Set target state ID.
+		if (targetStateID != NO_VALUE)
+			item.Animation.TargetState = targetStateID;
+
+		const auto& anim = GetAnimData(item);
+
+		// No dispatches; return early.
+		if (anim.Dispatches.empty())
+			return false;
+
+		// Active and target state IDs already match; return early.
+		if (item.Animation.ActiveState == item.Animation.TargetState)
+			return false;
+
+		// Iterate over state dispatches.
+		for (const auto& dispatch : anim.Dispatches)
+		{
+			// State ID mismatch; continue.
+			if (dispatch.StateID != item.Animation.TargetState)
+				continue;
+
+			// Set new animation and frame numbers if current frame number is within dispatch range.
+			if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
+			{
+				item.Animation.AnimNumber = dispatch.NextAnimNumber;
+				item.Animation.FrameNumber = dispatch.NextFrameNumber;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
+	{
+		item->Pose.Translate(headingAngle, forward, down, right);
+	}
+
+	void TranslateItem(ItemInfo* item, const EulerAngles& orient, float dist)
+	{
+		item->Pose.Translate(orient, dist);
+	}
+
+	void TranslateItem(ItemInfo* item, const Vector3& dir, float dist)
+	{
+		item->Pose.Translate(dir, dist);
+	}
+
+	void ClampRotation(Pose& outPose, short angle, short rot)
+	{
+		if (angle <= rot)
+		{
+			outPose.Orientation.y += (angle >= -rot) ? angle : -rot;
+		}
+		else
+		{
+			outPose.Orientation.y += rot;
+		}
+	}
+
+	// TODO: Refactor. Empty stub because moveable drawing is disabled when DrawRoutine pointer is nullptr in ObjectInfo.
+	void DrawAnimatingItem(ItemInfo* item)
+	{
 	}
 //}

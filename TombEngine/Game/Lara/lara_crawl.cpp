@@ -890,7 +890,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 		TranslateItem(item, item->Pose.Orientation.y, -BLOCK(1.0f / 4));
 		GetCollisionInfo(coll, item);
 		SnapItemToLedge(item, coll);
-		SetAnimation(item, LA_REACH_TO_HANG, 12);
+		SetAnimation(*item, LA_REACH_TO_HANG, 12);
 
 		GetCollisionInfo(coll, item);
 		item->Animation.IsAirborne = true;

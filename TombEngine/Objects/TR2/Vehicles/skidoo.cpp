@@ -208,14 +208,14 @@ namespace TEN::Entities::Vehicles
 		if (lara->Context.Vehicle != NO_VALUE)
 		{
 			if ((laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_RIGHT || laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_LEFT) &&
-				TestLastFrame(laraItem))
+				TestLastFrame(*laraItem))
 			{
 				if (laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_LEFT)
 					laraItem->Pose.Orientation.y += ANGLE(90.0f);
 				else
 					laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 
-				SetAnimation(laraItem, LA_STAND_IDLE);
+				SetAnimation(*laraItem, LA_STAND_IDLE);
 				TranslateItem(laraItem, laraItem->Pose.Orientation.y, -SKIDOO_DISMOUNT_DISTANCE);
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
@@ -227,9 +227,9 @@ namespace TEN::Entities::Vehicles
 				SetLaraVehicle(laraItem, nullptr);
 			}
 			else if (laraItem->Animation.ActiveState == SKIDOO_STATE_JUMP_OFF &&
-				(skidooItem->Pose.Position.y == skidooItem->Floor || TestLastFrame(laraItem)))
+				(skidooItem->Pose.Position.y == skidooItem->Floor || TestLastFrame(*laraItem)))
 			{
-				SetAnimation(laraItem, LA_FREEFALL);
+				SetAnimation(*laraItem, LA_FREEFALL);
 
 				if (skidooItem->Pose.Position.y == skidooItem->Floor)
 				{

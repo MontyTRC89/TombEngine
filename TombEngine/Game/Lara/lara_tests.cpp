@@ -168,7 +168,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 				{
 					LaraSnapToEdgeOfBlock(item, coll, GetQuadrant(item->Pose.Orientation.y));
 					item->Pose.Position.y = coll->Setup.PrevPosition.y;
-					SetAnimation(item, LA_REACH_TO_HANG, 21);
+					SetAnimation(*item, LA_REACH_TO_HANG, 21);
 				}
 
 				result = true;
@@ -184,7 +184,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		}
 		else // Death or action release
 		{
-			SetAnimation(item, LA_FALL_START);
+			SetAnimation(*item, LA_FALL_START);
 			item->Pose.Position.y += CLICK(1);
 			item->Animation.IsAirborne = true;
 			item->Animation.Velocity.z = 2;
@@ -246,7 +246,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 				if (item->Animation.ActiveState == LS_SHIMMY_LEFT ||
 					item->Animation.ActiveState == LS_SHIMMY_RIGHT)
 				{
-					SetAnimation(item, LA_REACH_TO_HANG, 21);
+					SetAnimation(*item, LA_REACH_TO_HANG, 21);
 				}
 
 				result = true;
@@ -254,7 +254,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		}
 		else // Death, incorrect ledge or ACTION release
 		{
-			SetAnimation(item, LA_JUMP_UP, 9);
+			SetAnimation(*item, LA_JUMP_UP, 9);
 			item->Pose.Position.x += coll->Shift.Position.x;
 			item->Pose.Position.y += GameBoundingBox(item).Y2 * 1.8f;
 			item->Pose.Position.z += coll->Shift.Position.z;
@@ -277,7 +277,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 
 	if (CanGrabMonkeySwing(*item, *coll))
 	{
-		SetAnimation(item, LA_REACH_TO_MONKEY);
+		SetAnimation(*item, LA_REACH_TO_MONKEY);
 		ResetPlayerFlex(item);
 		item->Animation.Velocity.z = 0;
 		item->Animation.Velocity.y = 0;
@@ -304,11 +304,11 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestHangSwingIn(item, coll))
 	{
-		SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
+		SetAnimation(*item, LA_REACH_TO_HANG_OSCILLATE);
 		ResetPlayerFlex(item);
 	}
 	else
-		SetAnimation(item, LA_REACH_TO_HANG);
+		SetAnimation(*item, LA_REACH_TO_HANG);
 
 	auto bounds = GameBoundingBox(item);
 	if (edgeCatch <= 0)
@@ -342,7 +342,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 
 	if (CanGrabMonkeySwing(*item, *coll))
 	{
-		SetAnimation(item, LA_JUMP_UP_TO_MONKEY);
+		SetAnimation(*item, LA_JUMP_UP_TO_MONKEY);
 		item->Animation.Velocity.z = 0;
 		item->Animation.Velocity.y = 0;
 		item->Animation.IsAirborne = false;
@@ -366,7 +366,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 		return false;
 	}
 
-	SetAnimation(item, LA_REACH_TO_HANG, 12);
+	SetAnimation(*item, LA_REACH_TO_HANG, 12);
 
 	auto bounds = GameBoundingBox(item);
 	if (edgeCatch <= 0)
@@ -889,11 +889,11 @@ bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 
 	if ((pointColl.GetFloorHeight() - vPos) >= -CLICK(0.5f))
 	{
-		SetAnimation(item, LA_STAND_IDLE);
+		SetAnimation(*item, LA_STAND_IDLE);
 	}
 	else
 	{
-		SetAnimation(item, LA_ONWATER_TO_WADE_1_STEP);
+		SetAnimation(*item, LA_ONWATER_TO_WADE_1_STEP);
 		item->Animation.TargetState = LS_IDLE;
 	}
 
@@ -961,24 +961,24 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 		if (headroom < LARA_HEIGHT)
 		{
 			if (g_GameFlow->HasCrawlExtended())
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_1_STEP);
+				SetAnimation(*item, LA_ONWATER_TO_CROUCH_1_STEP);
 			else
 				return false;
 		}
 		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_1_STEP);
+			SetAnimation(*item, LA_ONWATER_TO_STAND_1_STEP);
 	}
 	else if (frontFloor > CLICK(0.5f))
 	{
 		if (headroom < LARA_HEIGHT)
 		{
 			if (g_GameFlow->HasCrawlExtended())
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1_STEP);
+				SetAnimation(*item, LA_ONWATER_TO_CROUCH_M1_STEP);
 			else
 				return false;
 		}
 		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_M1_STEP);
+			SetAnimation(*item, LA_ONWATER_TO_STAND_M1_STEP);
 	}
 
 	else
@@ -986,12 +986,12 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 		if (headroom < LARA_HEIGHT)
 		{
 			if (g_GameFlow->HasCrawlExtended())
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_0_STEP);
+				SetAnimation(*item, LA_ONWATER_TO_CROUCH_0_STEP);
 			else
 				return false;
 		}
 		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_0_STEP);
+			SetAnimation(*item, LA_ONWATER_TO_STAND_0_STEP);
 	}
 
 	if (coll->Front.Bridge == NO_VALUE)
@@ -1066,7 +1066,7 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 		break;
 	}
 
-	SetAnimation(item, LA_ONWATER_IDLE);
+	SetAnimation(*item, LA_ONWATER_IDLE);
 	item->Animation.TargetState = LS_LADDER_IDLE;
 	AnimateItem(item);
 
@@ -1098,7 +1098,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 
 	else if (waterDepth <= (LARA_HEIGHT - (LARA_HEADROOM / 2)))
 	{
-		SetAnimation(item, LA_UNDERWATER_TO_STAND);
+		SetAnimation(*item, LA_UNDERWATER_TO_STAND);
 		ResetPlayerLean(item);
 		item->Animation.TargetState = LS_IDLE;
 		item->Pose.Position.y = pointColl.GetFloorHeight();

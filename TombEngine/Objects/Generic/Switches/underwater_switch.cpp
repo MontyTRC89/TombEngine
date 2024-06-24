@@ -135,7 +135,7 @@ namespace TEN::Entities::Switches
 
 			if (doInteraction)
 			{
-				SetAnimation(laraItem, LA_UNDERWATER_CEILING_SWITCH_PULL);
+				SetAnimation(*laraItem, LA_UNDERWATER_CEILING_SWITCH_PULL);
 				laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
 				laraItem->Animation.Velocity.y = 0;
 				lara->Control.IsMoving = false;

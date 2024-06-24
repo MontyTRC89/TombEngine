@@ -181,7 +181,7 @@ namespace TEN::Entities::Generic
 				// Align player.
 				if (MoveLaraPosition(PushableBlockPos, &pushableItem, playerItem))
 				{
-					SetAnimation(playerItem, LA_PUSHABLE_GRAB);
+					SetAnimation(*playerItem, LA_PUSHABLE_GRAB);
 					playerItem->Pose.Orientation = pushableItem.Pose.Orientation;
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
@@ -205,7 +205,7 @@ namespace TEN::Entities::Generic
 		{
 			// Not holding Action; do normal collision routine.
 			if (playerItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
-				!TestLastFrame(playerItem, LA_PUSHABLE_GRAB) ||
+				!TestLastFrame(*playerItem, LA_PUSHABLE_GRAB) ||
 				player.Context.NextCornerPos.Position.x != itemNumber)
 			{
 				// NOTE: If using room collision, use bridge collision.

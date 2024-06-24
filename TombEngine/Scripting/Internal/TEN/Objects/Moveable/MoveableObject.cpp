@@ -830,7 +830,7 @@ int Moveable::GetAnimNumber() const
 
 void Moveable::SetAnimNumber(int animNumber)
 {
-	SetAnimation(m_item, animNumber);
+	SetAnimation(*m_item, animNumber);
 }
 
 int Moveable::GetFrameNumber() const

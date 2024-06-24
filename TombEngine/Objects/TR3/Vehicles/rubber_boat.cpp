@@ -769,7 +769,7 @@ namespace TEN::Entities::Vehicles
 		auto* lara = GetLaraInfo(laraItem);
 
 		if ((laraItem->Animation.ActiveState == RBOAT_STATE_JUMP_RIGHT || laraItem->Animation.ActiveState == RBOAT_STATE_JUMP_LEFT) &&
-			TestLastFrame(laraItem))
+			TestLastFrame(*laraItem))
 		{
 			if (laraItem->Animation.ActiveState == RBOAT_STATE_JUMP_LEFT)
 				laraItem->Pose.Orientation.y -= ANGLE(90.0f);

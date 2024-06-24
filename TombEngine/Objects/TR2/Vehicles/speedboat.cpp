@@ -265,14 +265,14 @@ namespace TEN::Entities::Vehicles
 
 		if ((laraItem->Animation.ActiveState == SPEEDBOAT_STATE_DISMOUNT_LEFT ||
 			laraItem->Animation.ActiveState == SPEEDBOAT_STATE_DISMOUNT_RIGHT) &&
-			TestLastFrame(laraItem))
+			TestLastFrame(*laraItem))
 		{
 			if (laraItem->Animation.ActiveState == SPEEDBOAT_STATE_DISMOUNT_LEFT)
 				laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 			else if (laraItem->Animation.ActiveState == SPEEDBOAT_STATE_DISMOUNT_RIGHT)
 				laraItem->Pose.Orientation.y += ANGLE(90.0f);
 
-			SetAnimation(laraItem, LA_JUMP_FORWARD);
+			SetAnimation(*laraItem, LA_JUMP_FORWARD);
 			laraItem->Animation.IsAirborne = true;
 			laraItem->Animation.Velocity.z = 40;
 			laraItem->Animation.Velocity.y = -50;

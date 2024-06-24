@@ -489,7 +489,7 @@ namespace TEN::Entities::Creatures::TR5
 				else
 					item.Pose.Orientation.y -= HEAVY_GUARD_IDLE_TURN_RATE_MAX;
 
-				if (TestLastFrame(&item))
+				if (TestLastFrame(*&item))
 					item.Pose.Orientation.y += ANGLE(180.0f);
 
 				break;

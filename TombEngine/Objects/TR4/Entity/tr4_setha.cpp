@@ -342,7 +342,7 @@ namespace TEN::Entities::TR4
 
 			case SETH_STATE_HARD_RECOIL:
 				if (item->Animation.AnimNumber == SETH_ANIM_HARD_RECOIL_START &&
-					TestLastFrame(item))
+					TestLastFrame(*item))
 				{
 					if (Random::TestProbability(SETH_HARD_RECOIL_RECOVER_CHANCE))
 						item->Animation.RequiredState = SETH_STATE_HARD_RECOIL_RECOVER;
@@ -474,13 +474,13 @@ namespace TEN::Entities::TR4
 					if (item->Animation.ActiveState <= SETH_STATE_SINGLE_PROJECTILE_ATTACK)
 					{
 						if (abs(height4 - item->Pose.Position.y) >= BLOCK(0.5f))
-							SetAnimation(item, SETH_ANIM_SOFT_RECOIL);
+							SetAnimation(*item, SETH_ANIM_SOFT_RECOIL);
 						else
-							SetAnimation(item, SETH_ANIM_HARD_RECOIL_START);
+							SetAnimation(*item, SETH_ANIM_HARD_RECOIL_START);
 					}
 					else
 					{
-						SetAnimation(item, SETH_ANIM_HOVER_RECOIL);
+						SetAnimation(*item, SETH_ANIM_HOVER_RECOIL);
 					}
 				}
 			}

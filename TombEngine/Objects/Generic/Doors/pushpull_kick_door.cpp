@@ -78,7 +78,7 @@ namespace TEN::Entities::Doors
 				{
 					if (MoveLaraPosition(PullDoorPos, doorItem, laraItem))
 					{
-						SetAnimation(laraItem, LA_DOOR_OPEN_PULL);
+						SetAnimation(*laraItem, LA_DOOR_OPEN_PULL);
 						doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PULL;
 						openTheDoor = true;
 					}
@@ -91,7 +91,7 @@ namespace TEN::Entities::Doors
 					{
 						if (MoveLaraPosition(KickDoorPos, doorItem, laraItem))
 						{
-							SetAnimation(laraItem, LA_DOOR_OPEN_KICK);
+							SetAnimation(*laraItem, LA_DOOR_OPEN_KICK);
 							doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
 							openTheDoor = true;
 						}
@@ -102,7 +102,7 @@ namespace TEN::Entities::Doors
 					{
 						if (MoveLaraPosition(PushDoorPos, doorItem, laraItem))
 						{
-							SetAnimation(laraItem, LA_DOOR_OPEN_PUSH);
+							SetAnimation(*laraItem, LA_DOOR_OPEN_PUSH);
 							doorItem->Animation.TargetState = STATE_PUSHPULL_KICK_DOOR_PUSH;
 							openTheDoor = true;
 						}

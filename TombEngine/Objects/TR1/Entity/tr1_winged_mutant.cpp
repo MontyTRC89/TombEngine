@@ -177,19 +177,19 @@ namespace TEN::Entities::Creatures::TR1
 		if (item->TestOcb(WMUTANT_OCB_START_AERIAL))
 		{
 			SwitchPathfinding(creature, WMUTANT_PATH_AERIAL);
-			SetAnimation(item, WMUTANT_ANIM_FLY);
+			SetAnimation(*item, WMUTANT_ANIM_FLY);
 			item->SetFlagField(WMUTANT_CONF_PATHFINDING_MODE, WMUTANT_PATH_AERIAL);
 		}
 		else if (item->TestOcb(WMUTANT_OCB_START_INACTIVE))
 		{
 			SwitchPathfinding(creature, WMUTANT_PATH_GROUND);
-			SetAnimation(item, WMUTANT_ANIM_INACTIVE);
+			SetAnimation(*item, WMUTANT_ANIM_INACTIVE);
 			item->SetFlagField(WMUTANT_CONF_PATHFINDING_MODE, WMUTANT_PATH_GROUND);
 		}
 		else if (item->TestOcb(WMUTANT_OCB_START_POSE))
 		{
 			SwitchPathfinding(creature, WMUTANT_PATH_GROUND);
-			SetAnimation(item, WMUTANT_ANIM_INACTIVE);
+			SetAnimation(*item, WMUTANT_ANIM_INACTIVE);
 			item->SetFlagField(WMUTANT_CONF_PATHFINDING_MODE, WMUTANT_PATH_GROUND);
 		}
 

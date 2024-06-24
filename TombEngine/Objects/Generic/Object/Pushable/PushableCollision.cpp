@@ -225,7 +225,7 @@ namespace TEN::Entities::Generic
 
 		// If player is grabbing, check push and pull actions.
 		if (LaraItem->Animation.ActiveState != LS_PUSHABLE_GRAB || 
-			!TestLastFrame(LaraItem, LA_PUSHABLE_GRAB))
+			!TestLastFrame(*LaraItem, LA_PUSHABLE_GRAB))
 		{
 			return false;
 		}

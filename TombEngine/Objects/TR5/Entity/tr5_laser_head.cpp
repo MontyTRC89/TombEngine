@@ -456,7 +456,7 @@ namespace TEN::Entities::Creatures::TR5
 					auto& tentacleItem = g_Level.Items[guardian->Tentacles[i]];
 
 					if (tentacleItem.Animation.AnimNumber == 1 &&
-						TestLastFrame(&tentacleItem) && tentacleItem.MeshBits.Test(1))
+						TestLastFrame(*&tentacleItem) && tentacleItem.MeshBits.Test(1))
 					{
 						SoundEffect(SFX_TR5_SMASH_ROCK2, &item->Pose);
 						ExplodeItemNode(&tentacleItem, 0, 0, 128);
@@ -492,7 +492,7 @@ namespace TEN::Entities::Creatures::TR5
 				short tentacleItemNumber = guardian->Tentacles[i];
 				auto& tentacleItem = g_Level.Items[tentacleItemNumber];
 
-				if (tentacleItem.Animation.AnimNumber == 0 && !TestLastFrame(&tentacleItem))
+				if (tentacleItem.Animation.AnimNumber == 0 && !TestLastFrame(*&tentacleItem))
 				{
 					break;
 				}

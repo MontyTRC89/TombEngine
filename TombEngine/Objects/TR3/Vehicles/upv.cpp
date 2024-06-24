@@ -708,7 +708,7 @@ namespace TEN::Entities::Vehicles
 
 				laraItem->Pose.Position = Vector3i(LPos.x, LPos.y, LPos.z);
 
-				SetAnimation(laraItem, LA_UNDERWATER_IDLE);
+				SetAnimation(*laraItem, LA_UNDERWATER_IDLE);
 				laraItem->Animation.Velocity.y = 0;
 				laraItem->Animation.IsAirborne = false;
 				laraItem->Pose.Orientation.x = laraItem->Pose.Orientation.z = 0;
@@ -746,7 +746,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Position.y = vec.y;
 				laraItem->Pose.Position.z = vec.z;
 
-				SetAnimation(laraItem, LA_ONWATER_IDLE);
+				SetAnimation(*laraItem, LA_ONWATER_IDLE);
 				laraItem->Animation.IsAirborne = false;
 				laraItem->Animation.Velocity.y = 0;
 				laraItem->Pose.Orientation.x = 0;
@@ -780,7 +780,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
 
-				SetAnimation(laraItem, LA_UNDERWATER_DEATH, 17);
+				SetAnimation(*laraItem, LA_UNDERWATER_DEATH, 17);
 				laraItem->Animation.IsAirborne = false;
 				laraItem->Animation.Velocity.y = 0;
 			
@@ -1000,7 +1000,7 @@ namespace TEN::Entities::Vehicles
 
 			UPV->TurnRate.x = 0;
 
-			SetAnimation(UPVItem, UPV_ANIM_IDLE);
+			SetAnimation(*UPVItem, UPV_ANIM_IDLE);
 			UPVItem->Animation.Velocity.y = 0;
 			UPVItem->Animation.Velocity.z = 0;
 			UPVItem->Animation.IsAirborne = true;

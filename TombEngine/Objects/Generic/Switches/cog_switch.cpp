@@ -149,7 +149,7 @@ namespace TEN::Entities::Switches
 		}
 		else
 		{
-			if (TestLastFrame(switchItem) &&
+			if (TestLastFrame(*switchItem) &&
 				LaraItem->Animation.AnimNumber == LA_COGWHEEL_RELEASE)
 			{
 				switchItem->Animation.ActiveState = SWITCH_OFF;

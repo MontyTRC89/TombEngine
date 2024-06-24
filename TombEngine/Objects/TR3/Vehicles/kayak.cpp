@@ -918,7 +918,7 @@ namespace TEN::Entities::Vehicles
 			{
 				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));
 
-				SetAnimation(laraItem, LA_JUMP_FORWARD);
+				SetAnimation(*laraItem, LA_JUMP_FORWARD);
 				laraItem->Pose.Position = vec;
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y - ANGLE(90.0f);
@@ -939,7 +939,7 @@ namespace TEN::Entities::Vehicles
 			{
 				auto vec = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 350, 500));
 
-				SetAnimation(laraItem, LA_JUMP_FORWARD);
+				SetAnimation(*laraItem, LA_JUMP_FORWARD);
 				laraItem->Pose.Position = vec;
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y + ANGLE(90.0f);

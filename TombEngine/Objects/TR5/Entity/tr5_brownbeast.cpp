@@ -41,7 +41,7 @@ namespace TEN::Entities::Creatures::TR5
 		auto* item = &g_Level.Items[itemNumber];
 
 		InitializeCreature(itemNumber);
-		SetAnimation(item, 0);
+		SetAnimation(*item, 0);
 	}
 
 	void ControlBrowsBeast(short itemNumber)
@@ -58,7 +58,7 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			item->HitPoints = 0;
 			if (item->Animation.ActiveState != 7)
-				SetAnimation(item, 10);
+				SetAnimation(*item, 10);
 		}
 		else
 		{

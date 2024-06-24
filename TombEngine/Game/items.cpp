@@ -552,7 +552,7 @@ void InitializeItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	SetAnimation(item, 0);
+	SetAnimation(*item, 0);
 	item->Animation.RequiredState = NO_VALUE;
 	item->Animation.Velocity = Vector3::Zero;
 

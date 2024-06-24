@@ -456,11 +456,11 @@ namespace TEN::Entities::Vehicles
 
 		if (laraItem->Animation.ActiveState == JS_DISMOUNT)
 		{
-			if (TestLastFrame(laraItem))
+			if (TestLastFrame(*laraItem))
 			{
 				laraItem->Pose.Orientation.y += ANGLE(90.0f);
 				TranslateItem(laraItem, laraItem->Pose.Orientation.y, -JEEP_DISMOUNT_DISTANCE);
-				SetAnimation(laraItem, LA_STAND_SOLID);
+				SetAnimation(*laraItem, LA_STAND_SOLID);
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
 				SetLaraVehicle(laraItem, nullptr);

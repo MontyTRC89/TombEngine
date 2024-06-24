@@ -80,12 +80,12 @@ namespace TEN::Entities::TR4
 
 		if (item->TriggerFlags == 2)
 		{
-			SetAnimation(item, MUMMY_ANIM_COLLAPSE_END);
+			SetAnimation(*item, MUMMY_ANIM_COLLAPSE_END);
 			item->Status -= ITEM_INVISIBLE;
 		}
 		else
 		{
-			SetAnimation(item, MUMMY_ANIM_ARMS_CROSSED);
+			SetAnimation(*item, MUMMY_ANIM_ARMS_CROSSED);
 		}
 	}
 
@@ -146,7 +146,7 @@ namespace TEN::Entities::TR4
 					}
 					else
 					{
-						SetAnimation(item, MUMMY_ANIM_COLLAPSE_START);
+						SetAnimation(*item, MUMMY_ANIM_COLLAPSE_START);
 						item->Pose.Orientation.y += AI.angle;
 						creature->MaxTurn = 0;
 					}
@@ -199,7 +199,7 @@ namespace TEN::Entities::TR4
 				{
 					creature->MaxTurn = 0;
 
-					if (TestLastFrame(item))
+					if (TestLastFrame(*item))
 						item->TriggerFlags = 0;
 				}
 				else
@@ -281,7 +281,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits.Test(MummySwipeAttackJoints))
 					{
-						if (item->Animation.FrameNumber > 0 && !TestLastFrame(item))
+						if (item->Animation.FrameNumber > 0 && !TestLastFrame(*item))
 						{
 							DoDamage(creature->Enemy, MUMMY_SWIPE_ATTACK_DAMAGE);
 

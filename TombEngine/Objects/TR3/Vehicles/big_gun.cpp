@@ -288,9 +288,9 @@ namespace TEN::Entities::Vehicles
 			AnimateItem(laraItem);
 			SyncVehicleAnim(*bigGunItem, *laraItem);
 
-			if (bigGun->Flags & BGUN_FLAG_DISMOUNT && TestLastFrame(laraItem))
+			if (bigGun->Flags & BGUN_FLAG_DISMOUNT && TestLastFrame(*laraItem))
 			{
-				SetAnimation(laraItem, LA_STAND_IDLE);
+				SetAnimation(*laraItem, LA_STAND_IDLE);
 				SetLaraVehicle(laraItem, nullptr);
 				lara->Control.HandStatus = HandStatus::Free;
 				bigGunItem->HitPoints = 0;

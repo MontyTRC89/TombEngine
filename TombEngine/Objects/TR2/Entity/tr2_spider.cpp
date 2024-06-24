@@ -91,7 +91,7 @@ namespace TEN::Entities::Creatures::TR2
 			if (item->Animation.ActiveState != SPIDER_STATE_DEATH)
 			{
 				SoundEffect(SFX_TR2_SPIDER_EXPLODE, &item->Pose);
-				SetAnimation(item, SMALL_SPIDER_ANIM_DEATH);
+				SetAnimation(*item, SMALL_SPIDER_ANIM_DEATH);
 				ExplodingDeath(itemNumber, 0);
 				DisableEntityAI(itemNumber);
 				KillItem(itemNumber);
@@ -196,7 +196,7 @@ namespace TEN::Entities::Creatures::TR2
 			if (CreatureVault(itemNumber, headingAngle, 2, 0) == 2)
 			{
 				creature->MaxTurn = 0;
-				SetAnimation(item, SMALL_SPIDER_ANIM_LONG_JUMP_ATTACK); // HACK: Long jump serves as climb.
+				SetAnimation(*item, SMALL_SPIDER_ANIM_LONG_JUMP_ATTACK); // HACK: Long jump serves as climb.
 				return;
 			}
 		}

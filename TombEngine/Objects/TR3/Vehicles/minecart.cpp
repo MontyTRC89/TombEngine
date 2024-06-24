@@ -768,13 +768,13 @@ namespace TEN::Entities::Vehicles
 
 		case MINECART_STATE_DISMOUNT_LEFT:
 			if (laraItem->Animation.AnimNumber == MINECART_ANIM_DISMOUNT_LEFT &&
-				TestLastFrame(laraItem))
+				TestLastFrame(*laraItem))
 			{
 				auto pos = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 640, 0));
 				laraItem->Pose.Position = pos;
 				laraItem->Pose.Orientation = EulerAngles(0, minecartItem->Pose.Orientation.y + ANGLE(90.0f), 0);
 
-				SetAnimation(laraItem, LA_STAND_SOLID);
+				SetAnimation(*laraItem, LA_STAND_SOLID);
 				lara->Control.HandStatus = HandStatus::Free;
 				SetLaraVehicle(laraItem, nullptr);
 			}
@@ -783,13 +783,13 @@ namespace TEN::Entities::Vehicles
 
 		case MINECART_STATE_DISMOUNT_RIGHT:
 			if (laraItem->Animation.AnimNumber == MINECART_ANIM_DISMOUNT_RIGHT &&
-				TestLastFrame(laraItem))
+				TestLastFrame(*laraItem))
 			{
 				auto pos = GetJointPosition(laraItem, LM_HIPS, Vector3i(0, 640, 0));
 				laraItem->Pose.Position = pos;
 				laraItem->Pose.Orientation = EulerAngles(0, minecartItem->Pose.Orientation.y - ANGLE(90.0f), 0);
 
-				SetAnimation(laraItem, LA_STAND_SOLID);
+				SetAnimation(*laraItem, LA_STAND_SOLID);
 				lara->Control.HandStatus = HandStatus::Free;
 				SetLaraVehicle(laraItem, nullptr);
 			}

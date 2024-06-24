@@ -661,7 +661,7 @@ namespace TEN::Entities::Generic
 		item->Pose.Orientation.x = 0;
 		item->Pose.Position.y += 320;
 
-		SetAnimation(item, stumble ? LA_JUMP_WALL_SMASH_START : LA_FALL_START);
+		SetAnimation(*item, stumble ? LA_JUMP_WALL_SMASH_START : LA_FALL_START);
 
 		item->Animation.Velocity.y = 0;
 		item->Animation.IsAirborne = true;
@@ -712,7 +712,7 @@ namespace TEN::Entities::Generic
 				}
 			}
 
-			if (item->Animation.AnimNumber == LA_ROPE_DOWN && TestLastFrame(item))
+			if (item->Animation.AnimNumber == LA_ROPE_DOWN && TestLastFrame(*item))
 			{
 				SoundEffect(SFX_TR4_LARA_POLE_SLIDE_LOOP, &LaraItem->Pose);
 				item->Animation.FrameNumber = 0;
