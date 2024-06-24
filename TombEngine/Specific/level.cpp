@@ -459,26 +459,31 @@ void LoadObjects()
 					case AnimCommandType::SoundEffect:
 					{
 						int soundData = ReadInt32();
+
+						int soundID = soundData & 0xFFF;
 						int frameNumber = ReadInt32();
-
-						bool playInWater = ((soundData & 0x8000) != 0);
-						bool playOnLand = ((soundData & 0x4000) != 0);
-						bool playAlways = ((playInWater && playOnLand) || (!playInWater && !playOnLand));
-
-						int soundID = soundData & 0x3FFF;
 						auto envCond = SoundEffectEnvCondition::Always;
 
-						if (playAlways)
+						bool playOnLand = ((soundData & 0x4000) != 0);
+						bool playInShallowWater = ((soundData & 0x8000) != 0);
+						bool playInQuicksand = ((soundData & 0x1000) != 0);
+						bool playUnderwater = ((soundData & 0x2000) != 0);
+
+						if (playOnLand)
 						{
-							envCond = SoundEffectEnvCondition::Always;
+							envCond = SoundEffectEnvCondition::Land;
 						}
-						else if (playInWater)
+						else if (playInShallowWater)
 						{
 							envCond = SoundEffectEnvCondition::ShallowWater;
 						}
-						else if (playOnLand)
+						else if (playInQuicksand)
 						{
-							envCond = SoundEffectEnvCondition::Land;
+							envCond = SoundEffectEnvCondition::Quicksand;
+						}
+						else if (playUnderwater)
+						{
+							envCond = SoundEffectEnvCondition::Underwater;
 						}
 
 						command = std::make_unique<SoundEffectCommand>(soundID, frameNumber, envCond);
