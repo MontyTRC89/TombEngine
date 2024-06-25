@@ -22,6 +22,16 @@
 		Z2 = (int)round(z2);
 	}
 
+	GameBoundingBox::GameBoundingBox(const BoundingBox& aabb)
+	{
+		X1 = aabb.Center.x - aabb.Extents.x;
+		X2 = aabb.Center.x + aabb.Extents.x;
+		Y1 = aabb.Center.y - aabb.Extents.y;
+		Y2 = aabb.Center.y + aabb.Extents.y;
+		Z1 = aabb.Center.z - aabb.Extents.z;
+		Z2 = aabb.Center.z + aabb.Extents.z;
+	}
+
 	GameBoundingBox::GameBoundingBox(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 	{
 		*this = GetKeyframe(objectID, animNumber, frameNumber).BoundingBox;

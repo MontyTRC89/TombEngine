@@ -393,13 +393,11 @@ void LoadObjects()
 			anim.Keyframes.resize(frameCount);
 			for (auto& keyframe : anim.Keyframes)
 			{
-				keyframe.BoundingBox.X1 = ReadInt32();
-				keyframe.BoundingBox.X2 = ReadInt32();
-				keyframe.BoundingBox.Y1 = ReadInt32();
-				keyframe.BoundingBox.Y2 = ReadInt32();
-				keyframe.BoundingBox.Z1 = ReadInt32();
-				keyframe.BoundingBox.Z2 = ReadInt32();
-				keyframe.Aabb = Geometry::GetAabb(keyframe.BoundingBox.ToBoundingOrientedBox(Pose::Zero));
+				auto center = ReadVector3();
+				auto extents = ReadVector3();
+				keyframe.Aabb = BoundingBox(center, extents);
+				keyframe.BoundingBox = GameBoundingBox(keyframe.Aabb);
+
 				keyframe.Offset = ReadVector3();
 
 				int boneCount = ReadInt32();
