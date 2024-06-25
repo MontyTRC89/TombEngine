@@ -458,43 +458,17 @@ void LoadObjects()
 
 					case AnimCommandType::SoundEffect:
 					{
-						int soundData = ReadInt32();
-
-						int soundID = soundData & 0xFFF;
+						int soundID = ReadInt32();
 						int frameNumber = ReadInt32();
-						auto envCond = SoundEffectEnvCondition::Always;
-
-						bool playOnLand = ((soundData & 0x4000) != 0);
-						bool playInShallowWater = ((soundData & 0x8000) != 0);
-						bool playInQuicksand = ((soundData & 0x1000) != 0);
-						bool playUnderwater = ((soundData & 0x2000) != 0);
-
-						if (playOnLand)
-						{
-							envCond = SoundEffectEnvCondition::Land;
-						}
-						else if (playInShallowWater)
-						{
-							envCond = SoundEffectEnvCondition::ShallowWater;
-						}
-						else if (playInQuicksand)
-						{
-							envCond = SoundEffectEnvCondition::Quicksand;
-						}
-						else if (playUnderwater)
-						{
-							envCond = SoundEffectEnvCondition::Underwater;
-						}
-
+						auto envCond = (SoundEffectEnvCondition)ReadInt32();
 						command = std::make_unique<SoundEffectCommand>(soundID, frameNumber, envCond);
 					}
 						break;
 
-					case AnimCommandType::Flipeffect:
+					case AnimCommandType::FlipEffect:
 					{
 						int flipEffectID = ReadInt32();
 						int frameNumber = ReadInt32();
-
 						command = std::make_unique<FlipEffectCommand>(flipEffectID, frameNumber);
 					}
 						break;

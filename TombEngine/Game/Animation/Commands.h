@@ -12,7 +12,7 @@ namespace TEN::Animation
 		AttackReady,
 		Deactivate,
 		SoundEffect,
-		Flipeffect
+		FlipEffect
 	};
 
 	enum class SoundEffectEnvCondition
