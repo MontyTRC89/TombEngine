@@ -385,8 +385,7 @@ namespace TEN::Effects::SmokeEmitter
 					steamPauseTimer = item.TriggerFlags >> 4;
 				}
 
-				// TODO: Assign final sound ID for steam emitter loop.
-				SoundEffect(1158, &item.Pose);
+				SoundEffect(SFX_TEN_STEAM_EMITTER_LOOP, &item.Pose);
 			}
 
 			if (!drawNormalSmoke)
