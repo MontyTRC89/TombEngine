@@ -86,7 +86,7 @@ int GetNormalizedArmAnimFrame(GAME_OBJECT_ID animObjectID, int frameNumber)
 	{
 		const auto& anim = GetAnimData(animObjectID, i);
 
-		if (frameNumber <= anim.EndFrameNumber + i)
+		if (frameNumber <= (anim.EndFrameNumber + i))
 			return frameNumber;
 
 		frameNumber -= (i == 0) ? anim.EndFrameNumber : (int)anim.Keyframes.size();
@@ -242,23 +242,22 @@ void Renderer::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::Flare:
 		case LaraWeaponType::Torch:
 			// Left arm
-			ItemInfo tempItem;
-			tempItem.Animation.AnimObjectID = Lara.LeftArm.AnimObjectID;
-			tempItem.Animation.AnimNumber = Lara.LeftArm.AnimNumber;
-			tempItem.Animation.FrameNumber = Lara.LeftArm.FrameNumber;
+			auto leftAnimData = GetNormalizedArmAnimFrame(Lara.LeftArm.AnimObjectID, Lara.LeftArm.FrameNumber);
+			const auto& leftAnim = GetAnimData(Lara.LeftArm.AnimObjectID, Lara.LeftArm.AnimNumber);
+			auto leftFrame = leftAnim.GetKeyframeInterpData(leftAnimData).Keyframe0;
 
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 
 			// HACK: Mask head and torso when taking out flare.
 			if (!Lara.Control.IsLow &&
-				tempItem.Animation.AnimNumber > 1 &&
-				tempItem.Animation.AnimNumber < 4)
+				Lara.LeftArm.AnimNumber > 1 &&
+				Lara.LeftArm.AnimNumber < 4)
 			{
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 			}
 
-			auto frameDataLeft = GetFrameInterpData(tempItem);
-			UpdateAnimation(&rItem, playerObject, frameDataLeft, mask);
+			auto interpDataLeft = KeyframeInterpData(leftFrame, leftFrame, 0.0f);
+			UpdateAnimation(&rItem, playerObject, interpDataLeft, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
@@ -277,7 +276,7 @@ void Renderer::UpdateLaraAnimations(bool force)
 	rItem.DoneAnimations = true;
 }
 
-void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
+void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 {
 	// Don't draw player if using optics.
 	if (Lara.Control.Look.OpticRange != 0 || SpotcamDontDrawLara)
