@@ -1216,7 +1216,7 @@ enum SOUND_EFFECTS
 
 	// New sounds
 
-	SFX_TEN_SMOKE_EMITTER_LOOP = 1194,
+	SFX_TEN_STEAM_EMITTER_LOOP = 1194,
 
 	// Custom Sound Effects from 1195 onwards
 
