@@ -85,7 +85,7 @@ namespace TEN::Entities::Creatures::TR5
 				SoundEffect(SFX_TR4_HK_FIRE, &item->Pose, SoundEnvironment::Land, 0.8f);
 
 			if (!(GlobalCounter & 1))
-				return AnimateItem(item);
+				return AnimateItem(*item);
 
 			Vector3i hitPos;
 			MESH_INFO* hitMesh = nullptr;
@@ -94,7 +94,7 @@ namespace TEN::Entities::Creatures::TR5
 			if (objOnLos == NO_LOS_ITEM || objOnLos < 0)
 			{
 				if (GunShipCounter >= 15)
-					return AnimateItem(item);
+					return AnimateItem(*item);
 
 				TriggerDynamicLight(
 					origin.x, origin.y, origin.z, 16,
@@ -185,7 +185,7 @@ namespace TEN::Entities::Creatures::TR5
 				spark->flags = SP_NONE;
 			}
 
-			AnimateItem(item);
+			AnimateItem(*item);
 		}
 	}
 }

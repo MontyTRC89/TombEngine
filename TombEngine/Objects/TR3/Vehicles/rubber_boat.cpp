@@ -173,7 +173,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.Velocity.y = 0;
 		lara->Control.WaterStatus = WaterStatus::Dry;
 
-		AnimateItem(laraItem);
+		AnimateItem(*laraItem);
 	}
 
 	void DrawRubberBoat(ItemInfo* rBoatItem)
@@ -906,7 +906,7 @@ namespace TEN::Entities::Vehicles
 			rBoatItem->Pose.Orientation.z += rBoat->LeanAngle;
 			laraItem->Pose = rBoatItem->Pose;
 
-			AnimateItem(laraItem);
+			AnimateItem(*laraItem);
 
 			if (laraItem->HitPoints > 0)
 				SyncVehicleAnim(*rBoatItem, *laraItem);

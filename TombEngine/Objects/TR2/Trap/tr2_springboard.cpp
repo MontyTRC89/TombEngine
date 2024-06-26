@@ -30,5 +30,5 @@ void SpringBoardControl(short itemNumber)
 		item.Animation.TargetState = 1;
 	}
 
-	AnimateItem(&item);
+	AnimateItem(item);
 }

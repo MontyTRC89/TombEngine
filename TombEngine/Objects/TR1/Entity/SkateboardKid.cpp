@@ -225,7 +225,7 @@ namespace TEN::Entities::Creatures::TR1
 		skateItem.Pose.Position = item.Pose.Position;
 		skateItem.Pose.Orientation = item.Pose.Orientation;
 		UpdateItemRoom(item.ItemFlags[0]);
-		AnimateItem(&skateItem);
+		AnimateItem(skateItem);
 
 		CreatureJoint(&item, 0, extraHeadRot.y);
 		CreatureJoint(&item, 1, extraTorsoRot.x);

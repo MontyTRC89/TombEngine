@@ -757,7 +757,7 @@ namespace TEN::Entities::TR4
 				if (horseItem->RoomNumber != item->RoomNumber)
 					ItemNewRoom(item->ItemFlags[0], item->RoomNumber);
 				
-				AnimateItem(horseItem);
+				AnimateItem(*horseItem);
 			}
 		}
 

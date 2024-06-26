@@ -79,7 +79,7 @@ namespace TEN::Entities::Switches
 					switchItem->Status = ITEM_ACTIVE;
 
 					AddActiveItem(itemNumber);
-					AnimateItem(switchItem);
+					AnimateItem(*switchItem);
 					return;
 				}
 			}
@@ -103,7 +103,7 @@ namespace TEN::Entities::Switches
 					switchItem->Status = ITEM_ACTIVE;
 
 					AddActiveItem(itemNumber);
-					AnimateItem(switchItem);
+					AnimateItem(*switchItem);
 				}
 				else
 					lara->Context.InteractedItem = itemNumber;

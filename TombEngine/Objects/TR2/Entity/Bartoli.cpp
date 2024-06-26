@@ -65,7 +65,7 @@ namespace TEN::Entities::Creatures::TR2
 				return;
 		}
 
-		AnimateItem(&item);
+		AnimateItem(item);
 
 		effectTimer++;
 		if ((effectTimer & 7) == 0)

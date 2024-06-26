@@ -150,6 +150,6 @@ namespace TEN::Entities::Doors
 			doorData->opened = true;
 		}
 
-		AnimateItem(doorItem);
+		AnimateItem(*doorItem);
 	}
 }

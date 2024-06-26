@@ -205,7 +205,7 @@ namespace TEN::Entities::Traps
 			break;
 		}
 
-		AnimateItem(&item);
+		AnimateItem(item);
 	}
 
 	void CollideCrumblingPlatform(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

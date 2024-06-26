@@ -198,7 +198,7 @@ namespace TEN::Entities::Creatures::TR5
 			item.MeshBits.Clear(AutoGunClosedHatchJoints);
 			item.MeshBits.Clear(AutoGunFlashJoints);
 
-			AnimateItem(&item);
+			AnimateItem(item);
 		}		
 	}
 }

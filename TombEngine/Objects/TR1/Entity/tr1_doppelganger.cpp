@@ -143,6 +143,6 @@ namespace TEN::Entities::Creatures::TR1
 		}
 
 		ItemNewRoom(itemNumber, GetPointCollision(item).GetRoomNumber());
-		AnimateItem(&item);
+		AnimateItem(item);
 	}
 }

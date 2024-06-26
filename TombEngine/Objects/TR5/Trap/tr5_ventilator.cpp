@@ -148,7 +148,7 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		AnimateItem(&item);
+		AnimateItem(item);
 
 		int xChange = 0;
 		int zChange = 0;

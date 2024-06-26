@@ -125,7 +125,7 @@ namespace TEN::Entities::Switches
 	{
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		AnimateItem(switchItem);
+		AnimateItem(*switchItem);
 
 		if (switchItem->Animation.ActiveState == SWITCH_ON)
 		{

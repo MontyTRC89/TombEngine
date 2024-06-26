@@ -360,6 +360,6 @@ namespace TEN::Entities::Traps
 		if (room != item.RoomNumber)
 			ItemNewRoom(itemNumber, room);
 
-		AnimateItem(&item);
+		AnimateItem(item);
 	}
 }

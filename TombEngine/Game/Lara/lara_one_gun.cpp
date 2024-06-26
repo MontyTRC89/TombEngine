@@ -349,7 +349,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	item.Pose.Position = laraItem.Pose.Position;
 	item.RoomNumber = laraItem.RoomNumber;
 
-	AnimateItem(&item);
+	AnimateItem(item);
 
 	player.LeftArm.AnimObjectID =
 	player.RightArm.AnimObjectID = GetWeaponObjectID(weaponType);
@@ -486,7 +486,7 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		weaponItemPtr = &g_Level.Items[player.Control.Weapon.WeaponItem];
 	}
 
-	AnimateItem(weaponItemPtr);
+	AnimateItem(*weaponItemPtr);
 
 	if (weaponItemPtr->Animation.ActiveState != WEAPON_STATE_AIM &&
 		weaponItemPtr->Animation.ActiveState != WEAPON_STATE_UNDERWATER_AIM)
@@ -524,7 +524,7 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	item.Animation.TargetState = WEAPON_STATE_UNDRAW;
 	item.Pose = laraItem.Pose;
-	AnimateItem(&item);
+	AnimateItem(item);
 
 	if (item.Status == ITEM_DEACTIVATED)
 	{

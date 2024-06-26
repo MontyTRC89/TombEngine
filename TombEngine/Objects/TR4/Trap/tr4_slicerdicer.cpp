@@ -47,6 +47,6 @@ namespace TEN::Entities::Traps
 		if (item.RoomNumber != probedRoomNumber)
 			ItemNewRoom(itemNumber, probedRoomNumber);
 
-		AnimateItem(&item);
+		AnimateItem(item);
 	}
 }

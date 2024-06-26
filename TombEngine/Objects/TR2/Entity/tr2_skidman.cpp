@@ -165,7 +165,7 @@ namespace TEN::Entities::Creatures::TR2
 			}
 			else
 			{
-				AnimateItem(&riderItem);
+				AnimateItem(riderItem);
 			}
 
 			if (skidooItem->Animation.ActiveState == SMAN_STATE_MOVING || skidooItem->Animation.ActiveState == SMAN_STATE_WAIT)

@@ -76,7 +76,7 @@ struct ObjectInfo;
 
 	// Animation controller
 
-	void AnimateItem(ItemInfo* item);
+	void AnimateItem(ItemInfo& item);
 
 	// Inquirers
 

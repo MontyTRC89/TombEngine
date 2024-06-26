@@ -39,7 +39,7 @@ namespace TEN::Entities::Traps
 				*((int*)&item.ItemFlags[0]) = 6;
 			}
 
-			AnimateItem(&item);
+			AnimateItem(item);
 		}
 	}
 }

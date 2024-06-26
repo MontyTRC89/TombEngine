@@ -223,7 +223,7 @@ namespace TEN::Entities::Vehicles
 		quadBikeItem->HitPoints = 1;
 		quadBike->Revs = 0;
 
-		AnimateItem(laraItem);
+		AnimateItem(*laraItem);
 	}
 
 	static int CanQuadbikeGetOff(ItemInfo* laraItem, int direction)
@@ -1184,7 +1184,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Pose = quadBikeItem->Pose;
 				
 			AnimateQuadBike(quadBikeItem, laraItem, collide, dead);
-			AnimateItem(laraItem);
+			AnimateItem(*laraItem);
 			SyncVehicleAnim(*quadBikeItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(30.0f);

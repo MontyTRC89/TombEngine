@@ -369,7 +369,7 @@ namespace TEN::Entities::Vehicles
 				ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 			}
 
-			AnimateItem(laraItem);
+			AnimateItem(*laraItem);
 
 			if (skidooItem->Pose.Position.y == skidooItem->Floor)
 				ExplodeVehicle(laraItem, skidooItem);
@@ -401,7 +401,7 @@ namespace TEN::Entities::Vehicles
 		else
 			laraItem->Pose.Orientation.x = laraItem->Pose.Orientation.z = 0;
 
-		AnimateItem(laraItem);
+		AnimateItem(*laraItem);
 
 		if (!dead && drive >= 0 && banditSkidoo)
 			SkidooGuns(skidooItem, laraItem);

@@ -80,8 +80,9 @@ namespace TEN::Entities::Switches
 
 						do
 						{
-							AnimateItem(laraItem);
-						} while (laraItem->Animation.TargetState != LS_SWITCH_DOWN);
+							AnimateItem(*laraItem);
+						}
+						while (laraItem->Animation.TargetState != LS_SWITCH_DOWN);
 
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
 						lara->Control.HandStatus = HandStatus::Busy;
@@ -89,7 +90,7 @@ namespace TEN::Entities::Switches
 						switchItem->Status = ITEM_ACTIVE;
 
 						AddActiveItem(itemNumber);
-						AnimateItem(switchItem);
+						AnimateItem(*switchItem);
 					}
 				}
 			}

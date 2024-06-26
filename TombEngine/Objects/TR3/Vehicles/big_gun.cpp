@@ -285,7 +285,7 @@ namespace TEN::Entities::Vehicles
 		{
 		case BGUN_STATE_MOUNT:
 		case BGUN_STATE_DISMOUNT:
-			AnimateItem(laraItem);
+			AnimateItem(*laraItem);
 			SyncVehicleAnim(*bigGunItem, *laraItem);
 
 			if (bigGun->Flags & BGUN_FLAG_DISMOUNT && TestLastFrame(*laraItem))

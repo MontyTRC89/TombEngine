@@ -49,7 +49,7 @@ void ControlAnimatingSlots(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
-		AnimateItem(item);
+		AnimateItem(*item);
 }
 
 void ControlTriggerTriggerer(short itemNumber)
@@ -241,7 +241,7 @@ void AnimatingControl(short itemNumber)
 	if (TriggerActive(&item))
 	{
 		item.Status = ITEM_ACTIVE;
-		AnimateItem(&item);
+		AnimateItem(item);
 
 		if (item.TriggerFlags == 666) //OCB used for the helicopter animating in the Train level.
 		{

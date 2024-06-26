@@ -21,7 +21,7 @@ namespace TEN::Entities::TR4
 			if (item->HitStatus)
 				LaraItem->HitPoints = item->HitPoints;
 
-			AnimateItem(item);
+			AnimateItem(*item);
 		}
 	}
 }

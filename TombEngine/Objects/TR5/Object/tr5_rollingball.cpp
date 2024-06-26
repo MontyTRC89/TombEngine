@@ -389,7 +389,7 @@ void ClassicRollingBallControl(short itemNum)
 	{
 		if (item->Animation.TargetState == 2)
 		{
-			AnimateItem(item);
+			AnimateItem(*item);
 			return;
 		}
 
@@ -407,7 +407,7 @@ void ClassicRollingBallControl(short itemNum)
 		int oldx = item->Pose.Position.x;
 		int oldz = item->Pose.Position.z;
 
-		AnimateItem(item);
+		AnimateItem(*item);
 
 		auto pointColl = GetPointCollision(*item);
 

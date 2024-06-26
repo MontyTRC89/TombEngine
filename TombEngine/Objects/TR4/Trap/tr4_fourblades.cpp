@@ -58,7 +58,7 @@ namespace TEN::Entities::Traps
 				}
 			}
 
-			AnimateItem(&item);
+			AnimateItem(item);
 		}
 	}
 }

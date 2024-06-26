@@ -24,7 +24,7 @@ namespace TEN::Entities::Traps
 		if (TriggerActive(&item))
 		{
 			*((int*)&item.ItemFlags) = 0x3F000;
-			AnimateItem(&item);
+			AnimateItem(item);
 		}
 		else
 		{

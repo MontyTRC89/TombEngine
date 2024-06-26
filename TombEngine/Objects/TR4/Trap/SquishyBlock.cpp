@@ -138,7 +138,7 @@ namespace TEN::Entities::Traps
 			}
 		}
 
-		AnimateItem(&item);		
+		AnimateItem(item);		
 	}
 
 	void ControlFallingSquishyBlock(short itemNumber)
@@ -161,7 +161,7 @@ namespace TEN::Entities::Traps
 			if (item.Animation.FrameNumber == FALLING_BLOCK_IMPACT_FRAME)
 				Camera.bounce = -96;
 
-			AnimateItem(&item);
+			AnimateItem(item);
 		}
 	}
 

@@ -72,6 +72,6 @@ namespace TEN::Entities::TR4
             }
         }
 
-        AnimateItem(item);
+        AnimateItem(*item);
     }
 }

@@ -221,7 +221,7 @@ namespace TEN::Entities::Vehicles
 		lara->Control.WaterStatus = WaterStatus::Dry;
 		UPVItem->HitPoints = 1;
 
-		AnimateItem(laraItem);
+		AnimateItem(*laraItem);
 	}
 
 	static void FireUPVHarpoon(ItemInfo* UPVItem, ItemInfo* laraItem)
@@ -973,7 +973,7 @@ namespace TEN::Entities::Vehicles
 
 			laraItem->Pose = UPVItem->Pose;
 
-			AnimateItem(laraItem);
+			AnimateItem(*laraItem);
 			BackgroundCollision(UPVItem, laraItem);
 			DoVehicleCollision(UPVItem, UPV_RADIUS);
 
@@ -991,7 +991,7 @@ namespace TEN::Entities::Vehicles
 		}
 		else if (UPV->Flags & UPV_FLAG_DEAD)
 		{
-			AnimateItem(laraItem);
+			AnimateItem(*laraItem);
 
 			if (probe.GetRoomNumber() != UPVItem->RoomNumber)
 				ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
@@ -1004,7 +1004,7 @@ namespace TEN::Entities::Vehicles
 			UPVItem->Animation.Velocity.y = 0;
 			UPVItem->Animation.Velocity.z = 0;
 			UPVItem->Animation.IsAirborne = true;
-			AnimateItem(UPVItem);
+			AnimateItem(*UPVItem);
 
 			return true;
 		}

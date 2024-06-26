@@ -131,7 +131,7 @@ namespace TEN::Entities::TR3
 			}
 		}
 
-		AnimateItem(&item);
+		AnimateItem(item);
 
 		if (!TriggerActive(&item))
 			return;

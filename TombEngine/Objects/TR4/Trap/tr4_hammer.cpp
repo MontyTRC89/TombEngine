@@ -193,6 +193,6 @@ namespace TEN::Entities::Traps
 				item.Flags &= ~CODE_BITS;
 		}
 
-		AnimateItem(&item);
+		AnimateItem(item);
 	}
 }

@@ -188,7 +188,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		autoGun.JointRotation[0] += deltaAngle;
 		CreatureJoint(&item, 1, tiltAngle);
-		AnimateItem(&item);
+		AnimateItem(item);
 	}
 
 	void HitTwinAutoGun(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)

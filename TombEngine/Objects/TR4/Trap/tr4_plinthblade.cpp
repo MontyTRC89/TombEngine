@@ -29,7 +29,7 @@ namespace TEN::Entities::Traps
 				item.ItemFlags[3] = 200;
 			}
 
-			AnimateItem(&item);
+			AnimateItem(item);
 		}
 	}
 }

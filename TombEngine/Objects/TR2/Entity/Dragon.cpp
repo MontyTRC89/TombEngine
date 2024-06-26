@@ -666,7 +666,7 @@ namespace TEN::Entities::Creatures::TR2
 					player.Control.IsMoving = false;
 					player.Control.HandStatus = HandStatus::Busy;
 
-					AnimateItem(&playerItem);
+					AnimateItem(playerItem);
 
 					// Setting ItemFlags[1] to negative value sets defeat status and triggers death.
 					item.ItemFlags[1] = -1 * (100 - GetAnimData(playerItem).EndFrameNumber);

@@ -225,7 +225,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.Velocity.y = 0;
 		lara->Control.WaterStatus = WaterStatus::Dry;
 
-		AnimateItem(laraItem);
+		AnimateItem(*laraItem);
 	}
 
 	bool TestSpeedboatDismount(ItemInfo* speedboatItem, int direction)
@@ -914,7 +914,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Pose = speedboatItem->Pose;
 			speedboatItem->Pose.Orientation.z += speedboat->LeanAngle;
 
-			AnimateItem(laraItem);
+			AnimateItem(*laraItem);
 
 			if (laraItem->HitPoints > 0)
 				SyncVehicleAnim(*speedboatItem, *laraItem);

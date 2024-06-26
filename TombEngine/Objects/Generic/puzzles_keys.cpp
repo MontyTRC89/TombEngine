@@ -238,7 +238,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	if (triggerType != TRIGGER_TYPES::SWITCH)
 		return;
 
-	AnimateItem(&receptacleItem);
+	AnimateItem(receptacleItem);
 
 	// Start level with correct object when loading game.
 	if (receptacleItem.ItemFlags[5] == (int)ReusableReceptacleState::Empty)

@@ -30,7 +30,7 @@ namespace TEN::Entities::Traps
 			item.Animation.IsAirborne = true;
 		}
 
-		AnimateItem(&item);
+		AnimateItem(item);
 
 		if (item.Status == ITEM_DEACTIVATED)
 		{

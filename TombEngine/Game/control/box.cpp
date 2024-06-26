@@ -576,7 +576,7 @@ void CreatureKill(ItemInfo* creatureItem, int creatureAnimNumber, int playerAnim
 	if (creatureItem->RoomNumber != playerItem.RoomNumber)
 		ItemNewRoom(playerItem.Index, creatureItem->RoomNumber);
 
-	AnimateItem(&playerItem);
+	AnimateItem(playerItem);
 	playerItem.HitPoints = -1;
 	player.Control.HandStatus = HandStatus::Busy;
 	player.Control.Weapon.GunType = LaraWeaponType::None;
@@ -658,7 +658,7 @@ void CreatureFloat(short itemNumber)
 	if (item->Pose.Position.y < waterLevel)
 		item->Pose.Position.y = waterLevel;
 
-	AnimateItem(item);
+	AnimateItem(*item);
 
 	item->Floor = pointColl.GetFloorHeight();
 	if (pointColl.GetRoomNumber() != item->RoomNumber)
@@ -771,7 +771,7 @@ bool CreatureAnimation(short itemNumber, short headingAngle, short tiltAngle)
 
 	auto prevPos = item.Pose.Position;
 
-	AnimateItem(&item);
+	AnimateItem(item);
 	ProcessSectorFlags(&item);
 	CreatureHealth(&item);
 

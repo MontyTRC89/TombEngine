@@ -1228,5 +1228,5 @@ void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int state
 	m_item->Animation.AnimNumber = animNumber;
 	m_item->Animation.ActiveState = stateID;
 	m_item->Animation.FrameNumber = 0;
-	AnimateItem(m_item);
+	AnimateItem(*m_item);
 }

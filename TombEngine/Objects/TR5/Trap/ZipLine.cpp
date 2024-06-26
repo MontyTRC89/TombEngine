@@ -114,11 +114,11 @@ namespace TEN::Entities::Traps
 
 		if (zipLineItem.Animation.ActiveState == 1)
 		{
-			AnimateItem(&zipLineItem);
+			AnimateItem(zipLineItem);
 			return;
 		}
 
-		AnimateItem(&zipLineItem);
+		AnimateItem(zipLineItem);
 
 		// Accelerate.
 		if (zipLineItem.Animation.Velocity.y < VEL_MAX)

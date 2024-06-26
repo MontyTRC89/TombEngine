@@ -68,7 +68,7 @@ namespace TEN::Entities::Traps
 			isSpinning = false;
 		}
 
-		AnimateItem(&item);
+		AnimateItem(item);
 
 		auto pointColl = GetPointCollision(item);
 

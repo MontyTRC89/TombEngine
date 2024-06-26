@@ -216,7 +216,7 @@ namespace TEN::Entities::Vehicles
 		jeep->Revs = 0;
 		jeep->Gear = 0;
 
-		AnimateItem(laraItem);
+		AnimateItem(*laraItem);
 	}
 
 	static int DoJeepShift(ItemInfo* jeepItem, Vector3i* pos, Vector3i* old)
@@ -1399,7 +1399,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Pose = jeepItem->Pose;
 
 			AnimateJeep(jeepItem, laraItem, collide, dead);
-			AnimateItem(laraItem);
+			AnimateItem(*laraItem);
 			SyncVehicleAnim(*jeepItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(30.0f);

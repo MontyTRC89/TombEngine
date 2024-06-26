@@ -35,7 +35,7 @@ namespace TEN::Entities::Traps
 				*((int*)&item.ItemFlags[0]) = 0x7FF800;
 			}
 
-			AnimateItem(&item);
+			AnimateItem(item);
 		}
 		else
 		{

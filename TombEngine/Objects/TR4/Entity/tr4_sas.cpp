@@ -572,7 +572,7 @@ namespace TEN::Entities::TR4
 			if (Random::TestProbability(1 / 128.0f))
 			{
 				item.Animation.TargetState = 2;
-				AnimateItem(&item);
+				AnimateItem(item);
 			}
 			else if (!(byte)GetRandomControl())
 			{
@@ -583,11 +583,11 @@ namespace TEN::Entities::TR4
 			Random::TestProbability(1 / 128.0f))
 		{
 			item.Animation.TargetState = 5;
-			AnimateItem(&item);
+			AnimateItem(item);
 		}
 		else
 		{
-			AnimateItem(&item);
+			AnimateItem(item);
 		}
 	}
 

@@ -69,53 +69,53 @@ using TEN::Renderer::g_Renderer;
 			command->Execute(item, isFrameBased);
 	}
 
-	void AnimateItem(ItemInfo* item)
+	void AnimateItem(ItemInfo& item)
 	{
-		if (!item->IsLara())
+		if (!item.IsLara())
 		{
-			item->TouchBits.ClearAll();
-			item->HitStatus = false;
+			item.TouchBits.ClearAll();
+			item.HitStatus = false;
 		}
 
-		ExecuteAnimCommands(*item, true);
-		item->Animation.FrameNumber++;
+		ExecuteAnimCommands(item, true);
+		item.Animation.FrameNumber++;
 
-		const auto* anim = &GetAnimData(*item);
+		const auto* anim = &GetAnimData(item);
 
-		if (SetStateDispatch(*item))
+		if (SetStateDispatch(item))
 		{
-			anim = &GetAnimData(*item);
+			anim = &GetAnimData(item);
 
-			item->Animation.ActiveState = anim->StateID;
+			item.Animation.ActiveState = anim->StateID;
 
-			if (!item->IsLara())
+			if (!item.IsLara())
 			{
 				// Reset RequiredState if already reached.
-				if (item->Animation.RequiredState == item->Animation.ActiveState)
-					item->Animation.RequiredState = NO_VALUE;
+				if (item.Animation.RequiredState == item.Animation.ActiveState)
+					item.Animation.RequiredState = NO_VALUE;
 			}
 		}
 
-		if (item->Animation.FrameNumber > anim->EndFrameNumber)
+		if (item.Animation.FrameNumber > anim->EndFrameNumber)
 		{
-			ExecuteAnimCommands(*item, false);
+			ExecuteAnimCommands(item, false);
 
-			item->Animation.AnimNumber = anim->NextAnimNumber;
-			item->Animation.FrameNumber = anim->NextFrameNumber;
+			item.Animation.AnimNumber = anim->NextAnimNumber;
+			item.Animation.FrameNumber = anim->NextFrameNumber;
 
-			anim = &GetAnimData(*item);
+			anim = &GetAnimData(item);
 
-			if (item->Animation.ActiveState != anim->StateID)
+			if (item.Animation.ActiveState != anim->StateID)
 			{
-				item->Animation.ActiveState =
-					item->Animation.TargetState = anim->StateID;
+				item.Animation.ActiveState =
+					item.Animation.TargetState = anim->StateID;
 			}
 
-			if (!item->IsLara())
+			if (!item.IsLara())
 			{
 				// Reset RequiredState if already reached.
-				if (item->Animation.RequiredState == item->Animation.ActiveState)
-					item->Animation.RequiredState = NO_VALUE;
+				if (item.Animation.RequiredState == item.Animation.ActiveState)
+					item.Animation.RequiredState = NO_VALUE;
 			}
 		}
 
@@ -124,83 +124,83 @@ using TEN::Renderer::g_Renderer;
 		if (frameCount == 0)
 			frameCount = 1;
 
-		int currentFrameNumber = item->Animation.FrameNumber;
+		int currentFrameNumber = item.Animation.FrameNumber;
 
 		auto animAccel = (anim->VelocityEnd - anim->VelocityStart) / frameCount;
 		auto animVel = anim->VelocityStart + (animAccel * currentFrameNumber);
 
-		if (item->Animation.IsAirborne)
+		if (item.Animation.IsAirborne)
 		{
-			if (item->IsLara())
+			if (item.IsLara())
 			{
-				if (TestEnvironment(ENV_FLAG_SWAMP, item))
+				if (TestEnvironment(ENV_FLAG_SWAMP, &item))
 				{
-					item->Animation.Velocity.z -= item->Animation.Velocity.z / 8;
-					if (abs(item->Animation.Velocity.z) < 8.0f)
+					item.Animation.Velocity.z -= item.Animation.Velocity.z / 8;
+					if (abs(item.Animation.Velocity.z) < 8.0f)
 					{
-						item->Animation.IsAirborne = false;
-						item->Animation.Velocity.z = 0.0f;
+						item.Animation.IsAirborne = false;
+						item.Animation.Velocity.z = 0.0f;
 					}
 
-					if (item->Animation.Velocity.y > VERTICAL_VELOCITY_GRAVITY_THRESHOLD)
-						item->Animation.Velocity.y /= 2;
-					item->Animation.Velocity.y -= item->Animation.Velocity.y / 4;
+					if (item.Animation.Velocity.y > VERTICAL_VELOCITY_GRAVITY_THRESHOLD)
+						item.Animation.Velocity.y /= 2;
+					item.Animation.Velocity.y -= item.Animation.Velocity.y / 4;
 
-					if (item->Animation.Velocity.y < 4.0f)
-						item->Animation.Velocity.y = 4.0f;
-					item->Pose.Position.y += item->Animation.Velocity.y;
+					if (item.Animation.Velocity.y < 4.0f)
+						item.Animation.Velocity.y = 4.0f;
+					item.Pose.Position.y += item.Animation.Velocity.y;
 				}
 				else
 				{
-					item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
-					item->Animation.Velocity.z += animAccel.z;
+					item.Animation.Velocity.y += GetEffectiveGravity(item.Animation.Velocity.y);
+					item.Animation.Velocity.z += animAccel.z;
 
-					item->Pose.Position.y += item->Animation.Velocity.y;
+					item.Pose.Position.y += item.Animation.Velocity.y;
 				}
 			}
 			else
 			{
-				item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
-				item->Pose.Position.y += item->Animation.Velocity.y;
+				item.Animation.Velocity.y += GetEffectiveGravity(item.Animation.Velocity.y);
+				item.Pose.Position.y += item.Animation.Velocity.y;
 			}
 		}
 		else
 		{
-			if (item->IsLara())
+			if (item.IsLara())
 			{
-				const auto& player = GetLaraInfo(*item);
+				const auto& player = GetLaraInfo(item);
 
-				bool isInSwamp = (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item));
-				item->Animation.Velocity.z = isInSwamp ? (animVel.z / 2) : animVel.z;
+				bool isInSwamp = (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, &item));
+				item.Animation.Velocity.z = isInSwamp ? (animVel.z / 2) : animVel.z;
 			}
 			else
 			{
-				item->Animation.Velocity.x = animVel.x;
-				item->Animation.Velocity.z = animVel.z;
+				item.Animation.Velocity.x = animVel.x;
+				item.Animation.Velocity.z = animVel.z;
 			}
 		}
 
-		if (item->IsLara())
+		if (item.IsLara())
 		{
-			const auto& player = GetLaraInfo(*item);
+			const auto& player = GetLaraInfo(item);
 
-			item->Animation.Velocity.x = animVel.x;
+			item.Animation.Velocity.x = animVel.x;
 
-			if (player.Control.Rope.Ptr != -1)
-				DelAlignLaraToRope(item);
+			if (player.Control.Rope.Ptr != NO_VALUE)
+				DelAlignLaraToRope(&item);
 
 			if (!player.Control.IsMoving)
-				TranslateItem(item, player.Control.MoveAngle, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
+				TranslateItem(&item, player.Control.MoveAngle, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
 
 			// Update matrices.
 			g_Renderer.UpdateLaraAnimations(true);
 		}
 		else
 		{
-			TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity.z, 0.0f, item->Animation.Velocity.x);
+			TranslateItem(&item, item.Pose.Orientation.y, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
 
 			// Update matrices.
-			g_Renderer.UpdateItemAnimations(item->Index, true);
+			g_Renderer.UpdateItemAnimations(item.Index, true);
 		}
 	}
 

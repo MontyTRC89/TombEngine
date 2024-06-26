@@ -384,7 +384,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 	HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Control);
 	HandleLaraMovementParameters(item, coll);
-	AnimateItem(item);
+	AnimateItem(*item);
 
 	if (player.ExtraAnim == NO_VALUE)
 	{
@@ -461,7 +461,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	if (player.Context.WaterCurrentActive && player.Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
-	AnimateItem(item);
+	AnimateItem(*item);
 	TranslateItem(item, player.Control.MoveAngle, item->Animation.Velocity.y);
 
 	DoObjectCollision(item, coll);
@@ -564,7 +564,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	if (player.Context.WaterCurrentActive && player.Control.WaterStatus != WaterStatus::FlyCheat)
 		LaraWaterCurrent(item, coll);
 
-	AnimateItem(item);
+	AnimateItem(*item);
 	TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.y);
 
 	DoObjectCollision(item, coll);

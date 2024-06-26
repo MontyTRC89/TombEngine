@@ -213,7 +213,7 @@ namespace TEN::Entities::Vehicles
 		motorbike->Revs = 0;
 		motorbike->LightPower = 0;
 
-		AnimateItem(laraItem);
+		AnimateItem(*laraItem);
 	}
 
 	static int DoMotorbikeShift(ItemInfo* motorbikeItem, Vector3i* pos, Vector3i* old)
@@ -1276,7 +1276,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Pose = motorbikeItem->Pose;
 
 		AnimateMotorbike(motorbikeItem, laraItem, collide, isDead);
-		AnimateItem(laraItem);
+		AnimateItem(*laraItem);
 		SyncVehicleAnim(*motorbikeItem, *laraItem);
 
 		Camera.targetElevation = -ANGLE(30.0f);

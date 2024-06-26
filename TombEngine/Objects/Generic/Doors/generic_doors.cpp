@@ -387,7 +387,7 @@ namespace TEN::Entities::Doors
 			}*/
 		}
 
-		AnimateItem(doorItem);
+		AnimateItem(*doorItem);
 	}
 
 	void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)

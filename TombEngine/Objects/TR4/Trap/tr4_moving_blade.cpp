@@ -19,7 +19,7 @@ namespace TEN::Entities::Traps
         if (TriggerActive(&item))
         {
             item.ItemFlags[3] = 50;
-            AnimateItem(&item);
+            AnimateItem(item);
         }
         else
         {

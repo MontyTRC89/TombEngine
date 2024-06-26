@@ -47,6 +47,6 @@ namespace TEN::Entities::Traps
 			DoBloodSplat(x, y, z, LaraItem->Animation.Velocity.z, d, LaraItem->RoomNumber);
 		}
 
-		AnimateItem(&item);
+		AnimateItem(item);
 	}
 }
