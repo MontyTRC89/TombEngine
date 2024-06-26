@@ -395,7 +395,7 @@ void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 				if (!probeWall.GetSector().IsWall((up.x - slopeData.Offset.x), (up.z - slopeData.Offset.z)) &&
 					(probeNow.GetCeilingHeight() - probeWall.GetCeilingHeight()) > CLICK(0.5f)) // No wall or downward ceiling step.
 				{
-					TranslateItem(item, 0, -CLICK(1), -CLICK(1));
+					item->Pose.Translate(0, -CLICK(1), -CLICK(1));
 					SetAnimation(*item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_CLIMB_UP_LEFT : LA_OVERHANG_CLIMB_UP_RIGHT);
 					//item->TargetState = 62;
 				}
@@ -655,7 +655,7 @@ void lara_as_slopeclimbup(ItemInfo* item, CollisionInfo* coll)
 		int length = GetFrameCount(*item);
 		int dPos = CLICK(1) - (frame * CLICK(1) / length);
 
-		TranslateItem(item, 0, dPos, dPos);
+		item->Pose.Translate(0, dPos, dPos);
 		if (item->Animation.AnimNumber == LA_OVERHANG_CLIMB_UP_LEFT)
 			SetAnimation(*item, frame <= 2 * length / 3 ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
 		else
@@ -685,7 +685,7 @@ void lara_as_slopeclimbdown(ItemInfo* item, CollisionInfo* coll)
 		int length = GetFrameCount(*item);
 		int dPos = frame * CLICK(1) / length;
 
-		TranslateItem(item, 0, dPos, dPos);
+		item->Pose.Translate(0, dPos, dPos);
 		if (item->Animation.AnimNumber == LA_OVERHANG_CLIMB_DOWN_LEFT)
 			SetAnimation(*item, frame <= length / 2 ? LA_OVERHANG_DROP_LEFT : LA_OVERHANG_DROP_RIGHT);
 		else

@@ -319,7 +319,7 @@ void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 	if (TestLastFrame(*item))
 	{
 		SetAnimation(*item, LA_REACH);
-		TranslateItem(item, item->Pose.Orientation, 700);
+		item->Pose.Translate(item->Pose.Orientation, 700);
 		item->Pose.Position.y -= 361;
 	}
 }
@@ -422,9 +422,9 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 	{
 		// HACK: Set position command can't move Lara laterally?
 		if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_LEFT)
-			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(90.0f), CLICK(1));
+			item->Pose.Translate(coll->Setup.ForwardAngle - ANGLE(90.0f), CLICK(1));
 		else if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_RIGHT)
-			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(90.0f), CLICK(1));
+			item->Pose.Translate(coll->Setup.ForwardAngle + ANGLE(90.0f), CLICK(1));
 
 		item->Animation.Velocity.y = 10;
 	}

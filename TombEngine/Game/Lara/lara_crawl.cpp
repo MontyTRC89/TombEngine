@@ -887,7 +887,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 		coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 		coll->Setup.ForwardAngle = player.Control.MoveAngle;
 
-		TranslateItem(item, item->Pose.Orientation.y, -BLOCK(1.0f / 4));
+		item->Pose.Translate(item->Pose.Orientation.y, -BLOCK(1.0f / 4));
 		GetCollisionInfo(coll, item);
 		SnapItemToLedge(item, coll);
 		SetAnimation(*item, LA_REACH_TO_HANG, 12);

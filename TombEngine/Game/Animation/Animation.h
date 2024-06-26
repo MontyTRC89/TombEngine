@@ -109,7 +109,6 @@ struct ObjectInfo;
 	Vector3i   GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite);
 	Vector3	   GetJointOffset(GAME_OBJECT_ID objectID, int boneID);
 	Quaternion GetBoneOrientation(const ItemInfo& item, int boneID);
-	float	   GetBoneLength(GAME_OBJECT_ID objectID, int boneID);
 
 	// Setters
 
@@ -118,10 +117,6 @@ struct ObjectInfo;
 	bool SetStateDispatch(ItemInfo& item, int targetStateID = NO_VALUE);
 
 	// Utilities
-
-	void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down = 0.0f, float right = 0.0f);
-	void TranslateItem(ItemInfo* item, const EulerAngles& orient, float dist);
-	void TranslateItem(ItemInfo* item, const Vector3& dir, float dist);
 
 	void ClampRotation(Pose& outPose, short angle, short rot);
 	void DrawAnimatingItem(ItemInfo* item);

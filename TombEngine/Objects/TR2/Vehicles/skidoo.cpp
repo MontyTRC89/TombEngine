@@ -216,7 +216,7 @@ namespace TEN::Entities::Vehicles
 					laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 
 				SetAnimation(*laraItem, LA_STAND_IDLE);
-				TranslateItem(laraItem, laraItem->Pose.Orientation.y, -SKIDOO_DISMOUNT_DISTANCE);
+				laraItem->Pose.Translate(laraItem->Pose.Orientation.y, -SKIDOO_DISMOUNT_DISTANCE);
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
 				lara->Control.HandStatus = HandStatus::Free;
@@ -881,7 +881,7 @@ namespace TEN::Entities::Vehicles
 		else
 			skidooItem->Pose.Orientation.y += skidoo->TurnRate + skidoo->ExtraRotation;
 
-		TranslateItem(skidooItem, skidoo->MomentumAngle, skidooItem->Animation.Velocity.z);
+		skidooItem->Pose.Translate(skidoo->MomentumAngle, skidooItem->Animation.Velocity.z);
 
 		int slip = SKIDOO_SLIP * phd_sin(skidooItem->Pose.Orientation.x);
 		if (abs(slip) > (SKIDOO_SLIP / 2))

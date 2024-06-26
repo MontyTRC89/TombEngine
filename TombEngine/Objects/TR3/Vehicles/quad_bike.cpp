@@ -275,7 +275,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 
 			SetAnimation(*laraItem, LA_STAND_IDLE);
-			TranslateItem(laraItem, laraItem->Pose.Orientation.y, -QBIKE_DISMOUNT_DISTANCE);
+			laraItem->Pose.Translate(laraItem->Pose.Orientation.y, -QBIKE_DISMOUNT_DISTANCE);
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
 			SetLaraVehicle(laraItem, nullptr);
@@ -544,7 +544,7 @@ namespace TEN::Entities::Vehicles
 		else
 			speed = quadBikeItem->Animation.Velocity.z;
 
-		TranslateItem(quadBikeItem, quadBike->MomentumAngle, speed);
+		quadBikeItem->Pose.Translate(quadBike->MomentumAngle, speed);
 
 		int slip = QBIKE_SLIP * phd_sin(quadBikeItem->Pose.Orientation.x);
 		if (abs(slip) > QBIKE_SLIP / 2)

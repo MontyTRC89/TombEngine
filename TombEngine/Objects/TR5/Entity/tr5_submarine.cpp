@@ -487,7 +487,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		item->Pose.Orientation.z += 16 * item->Animation.Velocity.z;
 
-		TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
+		item->Pose.Translate(item->Pose.Orientation, item->Animation.Velocity.z);
 		
 		auto probe = GetPointCollision(*item);
 

@@ -28,7 +28,7 @@ void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapToAngle)
 {
-	TranslateItem(item, coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier));
+	item->Pose.Translate(coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier));
 	item->Pose.Orientation = EulerAngles(
 		0,
 		snapToAngle ? coll->NearestLedgeAngle : item->Pose.Orientation.y,
@@ -45,7 +45,7 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float off
 
 	coll->Setup.ForwardAngle = backup;
 
-	TranslateItem(item, ledgeAngle, distance + (coll->Setup.Radius * offsetMultiplier));
+	item->Pose.Translate(ledgeAngle, distance + (coll->Setup.Radius * offsetMultiplier));
 	item->Pose.Orientation = EulerAngles(0, ledgeAngle, 0);
 }
 
@@ -189,7 +189,7 @@ static void HandleDiagonalShift(ItemInfo& item, CollisionInfo& coll, const Vecto
 	// HACK: Force slight push left to avoid getting stuck.
 	float alpha = 1.0f - ((float)deltaAngle / (float)ANGLE(90.0f));
 	if (alpha >= 0.5f)
-		TranslateItem(&item, perpSplitAngle, item.Animation.Velocity.z * alpha);
+		item.Pose.Translate(perpSplitAngle, item.Animation.Velocity.z * alpha);
 
 	// Set shift.
 	coll.Shift.Position.x += coll.Setup.PrevPosition.x - pos.x;

@@ -443,7 +443,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 				laraItem->Pose.Orientation.z = 0;
-				TranslateItem(laraItem, laraItem->Pose.Orientation.y, -MOTORBIKE_DISMOUNT_DISTANCE);
+				laraItem->Pose.Translate(laraItem->Pose.Orientation.y, -MOTORBIKE_DISMOUNT_DISTANCE);
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Status.Stamina = LARA_STAMINA_MAX;
 				SetLaraVehicle(laraItem, nullptr);
@@ -614,7 +614,7 @@ namespace TEN::Entities::Vehicles
 		else
 			speed = motorbikeItem->Animation.Velocity.z;
 
-		TranslateItem(motorbikeItem, motorbike->MomentumAngle, speed);
+		motorbikeItem->Pose.Translate(motorbike->MomentumAngle, speed);
 
 		if (motorbikeItem->Pose.Position.y >= floorHeight)
 		{

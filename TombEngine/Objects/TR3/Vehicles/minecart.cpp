@@ -537,7 +537,9 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 		else
-			TranslateItem(minecartItem, minecartItem->Pose.Orientation.y, minecartItem->Animation.Velocity.z);
+		{
+			minecartItem->Pose.Translate(minecartItem->Pose.Orientation.y, minecartItem->Animation.Velocity.z);
+		}
 
 		minecart->FloorHeightMiddle = GetVehicleHeight(minecartItem, 0, 0, true, &Vector3i());
 
@@ -826,7 +828,7 @@ namespace TEN::Entities::Vehicles
 				if ((Wibble & 7) == 0)
 					SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SoundEnvironment::Always);
 
-				TranslateItem(minecartItem, minecartItem->Pose.Orientation.y, MINECART_TURN_DEATH_ANIM_VELOCITY);
+				minecartItem->Pose.Translate(minecartItem->Pose.Orientation.y, MINECART_TURN_DEATH_ANIM_VELOCITY);
 			}
 			else
 			{

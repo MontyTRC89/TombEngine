@@ -693,7 +693,7 @@ void HarpoonBoltControl(short itemNumber)
 	}
 
 	auto prevPos = harpoonItem.Pose.Position;
-	TranslateItem(&harpoonItem, harpoonItem.Pose.Orientation, harpoonItem.Animation.Velocity.z);
+	harpoonItem.Pose.Translate(harpoonItem.Pose.Orientation, harpoonItem.Animation.Velocity.z);
 
 	int damage = Weapons[(int)LaraWeaponType::HarpoonGun].Damage;
 	HandleProjectile(harpoonItem, *LaraItem, prevPos, (ProjectileType)harpoonItem.ItemFlags[0], damage);
@@ -1016,7 +1016,7 @@ void RocketControl(short itemNumber)
 
 	// Update rocket position.
 	auto prevPos = rocketItem.Pose.Position;
-	TranslateItem(&rocketItem, rocketItem.Pose.Orientation, rocketItem.Animation.Velocity.z);
+	rocketItem.Pose.Translate(rocketItem.Pose.Orientation, rocketItem.Animation.Velocity.z);
 
 	HandleProjectile(rocketItem, *LaraItem, prevPos, ProjectileType::Explosive, Weapons[(int)LaraWeaponType::RocketLauncher].ExplosiveDamage);
 }
@@ -1131,7 +1131,7 @@ void CrossbowBoltControl(short itemNumber)
 	}
 
 	auto prevPos = boltItem.Pose.Position;
-	TranslateItem(&boltItem, boltItem.Pose.Orientation, boltItem.Animation.Velocity.z);
+	boltItem.Pose.Translate(boltItem.Pose.Orientation, boltItem.Animation.Velocity.z);
 
 	int damage = (boltItem.ItemFlags[0] == (int)ProjectileType::Explosive) ?
 		Weapons[(int)LaraWeaponType::Crossbow].ExplosiveDamage : Weapons[(int)LaraWeaponType::Crossbow].Damage;

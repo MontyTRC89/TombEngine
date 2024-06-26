@@ -127,7 +127,7 @@ namespace TEN::Entities::Traps
 		// Translate.
 		// TODO: Use proper calculation of the trajectory instead of bitwise operation.
 		auto headingOrient = EulerAngles(0, zipLineItem.Pose.Orientation.y, 0);
-		TranslateItem(&zipLineItem, headingOrient, zipLineItem.Animation.Velocity.y);
+		zipLineItem.Pose.Translate(headingOrient, zipLineItem.Animation.Velocity.y);
 		zipLineItem.Pose.Position.y += ((int)zipLineItem.Animation.Velocity.y >> 2);
 
 		int vPos = zipLineItem.Pose.Position.y + CLICK(0.25f);

@@ -868,7 +868,7 @@ namespace TEN::Entities::Vehicles
 			if (!(IsHeld(In::Left) ) && !(IsHeld(In::Right)))
 				ResetVehicleLean(UPVItem, 12.0f);
 
-			TranslateItem(UPVItem, UPVItem->Pose.Orientation, UPVItem->Animation.Velocity.z);
+			UPVItem->Pose.Translate(UPVItem->Pose.Orientation, UPVItem->Animation.Velocity.z);
 		}
 
 		int newHeight = GetPointCollision(*UPVItem).GetFloorHeight();

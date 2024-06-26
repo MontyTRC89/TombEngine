@@ -16,7 +16,7 @@ namespace TEN::Animation
 		if (isFrameBased)
 			return;
 
-		TranslateItem(&item, item.Pose.Orientation.y, RelOffset.z, RelOffset.y, RelOffset.x);
+		item.Pose.Translate(item.Pose.Orientation.y, RelOffset.z, RelOffset.y, RelOffset.x);
 
 		if (item.IsLara())
 		{

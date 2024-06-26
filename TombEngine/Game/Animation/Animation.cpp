@@ -190,14 +190,14 @@ using TEN::Renderer::g_Renderer;
 				DelAlignLaraToRope(&item);
 
 			if (!player.Control.IsMoving)
-				TranslateItem(&item, player.Control.MoveAngle, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
+				item.Pose.Translate(player.Control.MoveAngle, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
 
 			// Update matrices.
 			g_Renderer.UpdateLaraAnimations(true);
 		}
 		else
 		{
-			TranslateItem(&item, item.Pose.Orientation.y, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
+			item.Pose.Translate(item.Pose.Orientation.y, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
 
 			// Update matrices.
 			g_Renderer.UpdateItemAnimations(item.Index, true);
@@ -208,7 +208,7 @@ using TEN::Renderer::g_Renderer;
 	{
 		const auto& anim = GetAnimData(item);
 
-		// Iterate over state dispatches.
+		// Run through state dispatches.
 		for (const auto& dispatch : anim.Dispatches)
 		{
 			// State ID mismatch; continue.
@@ -365,18 +365,6 @@ using TEN::Renderer::g_Renderer;
 		return Geometry::ConvertDirectionToQuat(dir);
 	}
 
-	// NOTE: Will not work for bones at ends of hierarchies.
-	float GetBoneLength(GAME_OBJECT_ID objectID, int boneID)
-	{
-		const auto& object = Objects[objectID];
-
-		if (object.nmeshes == boneID)
-			return 0.0f;
-
-		auto nextBoneOffset = GetJointOffset(objectID, boneID + 1);
-		return nextBoneOffset.Length();
-	}
-
 	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
 	{
 		// Animation already set; return early.
@@ -420,7 +408,7 @@ using TEN::Renderer::g_Renderer;
 		item.Animation.AnimNumber = animNumber;
 		item.Animation.FrameNumber = frameNumber;
 		item.Animation.ActiveState =
-			item.Animation.TargetState = anim.StateID;
+		item.Animation.TargetState = anim.StateID;
 	}
 
 	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber)
@@ -444,7 +432,7 @@ using TEN::Renderer::g_Renderer;
 		if (item.Animation.ActiveState == item.Animation.TargetState)
 			return false;
 
-		// Iterate over state dispatches.
+		// Run through state dispatches.
 		for (const auto& dispatch : anim.Dispatches)
 		{
 			// State ID mismatch; continue.
@@ -461,21 +449,6 @@ using TEN::Renderer::g_Renderer;
 		}
 
 		return false;
-	}
-
-	void TranslateItem(ItemInfo* item, short headingAngle, float forward, float down, float right)
-	{
-		item->Pose.Translate(headingAngle, forward, down, right);
-	}
-
-	void TranslateItem(ItemInfo* item, const EulerAngles& orient, float dist)
-	{
-		item->Pose.Translate(orient, dist);
-	}
-
-	void TranslateItem(ItemInfo* item, const Vector3& dir, float dist)
-	{
-		item->Pose.Translate(dir, dist);
 	}
 
 	void ClampRotation(Pose& outPose, short angle, short rot)
