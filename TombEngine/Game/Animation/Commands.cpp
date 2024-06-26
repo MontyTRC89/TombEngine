@@ -120,6 +120,7 @@ namespace TEN::Animation
 		if (!isFrameBased || item.Animation.FrameNumber != FrameNumber)
 			return;
 
-		DoFlipEffect(FlipEffectID & 0x3FFF, &item);
+		int flipEffectID = FlipEffectID & 0x3FFF; // Bits 1-14.
+		DoFlipEffect(flipEffectID, &item);
 	}
 }
