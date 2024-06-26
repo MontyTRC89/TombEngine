@@ -60,14 +60,14 @@ namespace TEN::Effects::Footprint
 			{ MaterialType::Concrete, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS },
 			{ MaterialType::OldWood, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD },
 			{ MaterialType::OldMetal, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL },
-			{ MaterialType::Custom1, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_01 },
-			{ MaterialType::Custom2, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_02 },
-			{ MaterialType::Custom3, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_03 },
-			{ MaterialType::Custom4, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_04 },
-			{ MaterialType::Custom5, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_05 },
-			{ MaterialType::Custom6, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_06 },
-			{ MaterialType::Custom7, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_07 },
-			{ MaterialType::Custom8, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_08 }
+			{ MaterialType::Custom1, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_1 },
+			{ MaterialType::Custom2, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_2 },
+			{ MaterialType::Custom3, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_3 },
+			{ MaterialType::Custom4, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_4 },
+			{ MaterialType::Custom5, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_5 },
+			{ MaterialType::Custom6, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_6 },
+			{ MaterialType::Custom7, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_7 },
+			{ MaterialType::Custom8, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_8 }
 		};
 
 		auto it = SOUND_MAP.find(material);
