@@ -432,6 +432,10 @@ void LoadObjects()
 					auto command = AnimData::AnimCommandPtr{};
 					switch (type)
 					{
+					default:
+					case AnimCommandType::None:
+						continue;
+
 					case AnimCommandType::MoveOrigin:
 					{
 						auto relOffset = ReadVector3();
@@ -470,9 +474,6 @@ void LoadObjects()
 						command = std::make_unique<FlipEffectCommand>(flipEffectID, frameNumber);
 					}
 						break;
-
-					default:
-						continue;
 					}
 
 					anim.Commands.push_back(std::move(command));
