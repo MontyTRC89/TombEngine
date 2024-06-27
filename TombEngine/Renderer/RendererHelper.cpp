@@ -29,7 +29,6 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
-
 extern GameConfiguration g_Configuration;
 extern ScriptInterfaceFlowHandler *g_GameFlow;
 

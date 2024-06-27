@@ -1,7 +1,5 @@
 #include "Scripting/Internal/TEN/Flow/FlowHandler.h"
 
-#include <filesystem>
-
 #include "Game/Gui.h"
 #include "Game/savegame.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"

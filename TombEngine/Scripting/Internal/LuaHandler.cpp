@@ -1,8 +1,7 @@
 #include "Scripting/Internal/LuaHandler.h"
 
-#include <filesystem>
-
-LuaHandler::LuaHandler(sol::state* lua) : _lua{ lua }
+LuaHandler::LuaHandler(sol::state* lua) :
+	_lua{ lua }
 {
 }
 

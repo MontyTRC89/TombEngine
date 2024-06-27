@@ -1,7 +1,5 @@
 #include "Game/Lara/lara_helpers.h"
 
-#include <OISKeyboard.h>
-
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
