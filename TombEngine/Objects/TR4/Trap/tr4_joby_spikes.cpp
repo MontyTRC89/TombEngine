@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Trap/tr4_joby_spikes.h"
 
 #include "Game/animation.h"

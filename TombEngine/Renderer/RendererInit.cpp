@@ -1,16 +1,12 @@
-#include "framework.h"
-#include <string>
-#include <memory>
-#include <filesystem>
 #include "Renderer/Renderer.h"
+
+#include "Renderer/SMAA/AreaTex.h"
+#include "Renderer/SMAA/SearchTex.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/configuration.h"
 #include "Specific/memory/Vector.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
-#include "Renderer/SMAA/AreaTex.h"
-#include "Renderer/SMAA/SearchTex.h"
-#include <random>
 
 extern GameConfiguration g_Configuration;
 

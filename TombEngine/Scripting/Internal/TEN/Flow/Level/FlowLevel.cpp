@@ -1,5 +1,5 @@
-#include "framework.h"
-#include "FlowLevel.h"
+#include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
+
 #include "Scripting/Internal/ScriptAssert.h"
 
 /***

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Entity/tr3_scuba_diver.h"
 
 #include "Game/collision/collide_room.h"

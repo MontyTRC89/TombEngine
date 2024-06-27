@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/View/ViewHandler.h"
 
 #include "Game/camera.h"

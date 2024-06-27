@@ -1,5 +1,5 @@
 #pragma once
-#include <SimpleMath.h>
+
 #include "Renderer/Structures/RendererSprite.h"
 #include "Renderer/RendererEnums.h"
 

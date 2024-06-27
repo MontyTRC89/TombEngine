@@ -1,8 +1,6 @@
 #pragma once
-#include "Math/Math.h"
-#include "Specific/newtypes.h"
 
-using namespace TEN::Math;
+#include "Specific/newtypes.h"
 
 struct ItemInfo;
 

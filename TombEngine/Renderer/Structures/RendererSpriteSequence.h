@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 
 namespace TEN::Renderer::Structures
 {

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 
@@ -18,7 +17,6 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Setup.h"
-#include "Math/Random.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
@@ -26,7 +24,6 @@
 using std::vector;
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
 {

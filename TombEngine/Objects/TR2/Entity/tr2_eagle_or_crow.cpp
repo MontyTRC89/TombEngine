@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR2/Entity/tr2_eagle_or_crow.h"
 
 #include "Game/collision/collide_room.h"

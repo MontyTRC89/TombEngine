@@ -1,6 +1,4 @@
 #pragma once
-#include <functional>
-#include <string>
 
 #include "Scripting/Internal/ScriptAssert.h"
 
@@ -38,4 +36,3 @@ template <typename T, typename S> callbackRemoveName NamedBase<T, S>::s_callback
 		std::terminate();
 		return false;
 	};
-

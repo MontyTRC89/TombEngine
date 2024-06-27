@@ -1,11 +1,9 @@
 #pragma once
-#include <SimpleMath.h>
+
 #include "Renderer/RendererEnums.h"
 
 namespace TEN::Renderer::ConstantBuffers
 {
-	using namespace DirectX::SimpleMath;
-
 	struct alignas(16) InstancedSprite
 	{
 		Matrix World;

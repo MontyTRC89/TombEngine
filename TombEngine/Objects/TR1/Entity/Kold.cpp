@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR1/Entity/Kold.h"
 
 #include "Game/control/box.h"

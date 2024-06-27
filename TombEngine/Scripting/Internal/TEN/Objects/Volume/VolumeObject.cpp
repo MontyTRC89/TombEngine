@@ -1,5 +1,4 @@
 #pragma once
-#include "framework.h"
 #include "Scripting/Internal/TEN/Objects/Volume/VolumeObject.h"
 
 #include "Scripting/Internal/ReservedScriptNames.h"

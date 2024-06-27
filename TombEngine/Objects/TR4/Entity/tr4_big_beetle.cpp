@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Entity/tr4_big_beetle.h"
 
 #include "Game/control/control.h"
@@ -10,9 +9,7 @@
 #include "Game/people.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Math/Math.h"
 
-using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {

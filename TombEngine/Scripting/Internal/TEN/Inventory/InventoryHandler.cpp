@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Inventory/InventoryHandler.h"
 
 #include "Game/gui.h"

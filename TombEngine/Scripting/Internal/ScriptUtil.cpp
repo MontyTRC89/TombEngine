@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Scripting/Internal/ScriptUtil.h"
 
 sol::table MakeSpecialTableBase(sol::state* state, const std::string& name)

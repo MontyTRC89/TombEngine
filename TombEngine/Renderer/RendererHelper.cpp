@@ -1,8 +1,4 @@
-#include "framework.h"
-
-#include <algorithm>
 #include <ctime>
-#include <filesystem>
 #include <ScreenGrab.h>
 #include <wincodec.h>
 
@@ -27,14 +23,12 @@
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
-#include "Math/Math.h"
 #include "Renderer/RenderView.h"
 #include "Renderer/Renderer.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
-using namespace TEN::Math;
 
 extern GameConfiguration g_Configuration;
 extern ScriptInterfaceFlowHandler *g_GameFlow;

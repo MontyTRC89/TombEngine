@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 
 #include "Game/collision/collide_room.h"

@@ -1,11 +1,8 @@
-#include "framework.h"
 #include "Objects/Effects/EmberEmitter.h"
 
 #include "Game/effects/effects.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 
-using namespace TEN::Math;
 
 namespace TEN::Effects::EmberEmitter
 {

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/Lara/lara.h"
 
 #include "Game/Lara/lara_basic.h"
@@ -54,7 +53,6 @@ using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
-using namespace TEN::Math;
 using namespace TEN::Gui;
 
 using TEN::Renderer::g_Renderer;

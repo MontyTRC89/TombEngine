@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "Game/items.h"
 #include "Specific/level.h"

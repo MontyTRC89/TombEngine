@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Entity/tr4_jean_yves.h"
 
 #include "Game/control/control.h"
@@ -6,10 +5,8 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/level.h"
 
-using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR5/Entity/tr5_lion.h"
 
 #include "Game/collision/collide_room.h"
@@ -11,10 +10,8 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/level.h"
 
-using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {

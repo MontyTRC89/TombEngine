@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Entity/Winston.h"
 
 #include "Game/collision/collide_room.h"
@@ -12,11 +11,9 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
-using namespace TEN::Math;
 
 // NOTES:
 // ItemFlags[0]: defeat timer.

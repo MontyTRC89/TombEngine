@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR1/tr1_objects.h"
 
 #include "Game/control/box.h"

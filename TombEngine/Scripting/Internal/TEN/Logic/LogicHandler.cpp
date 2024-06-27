@@ -1,7 +1,4 @@
-#include "framework.h"
-#include "LogicHandler.h"
-
-#include <filesystem>
+#include "Scripting/Internal/TEN/Logic/LogicHandler.h"
 
 #include "Game/control/volume.h"
 #include "Game/effects/Electricity.h"

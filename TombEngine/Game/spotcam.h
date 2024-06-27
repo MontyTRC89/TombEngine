@@ -1,5 +1,4 @@
 #pragma once
-#include "Math/Math.h"
 #include "Specific/clock.h"
 
 constexpr auto MAX_SPOTCAMS = 256;

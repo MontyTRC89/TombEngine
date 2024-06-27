@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "tr5_teleporter.h"
 #include "Game/items.h"
 #include "Specific/level.h"

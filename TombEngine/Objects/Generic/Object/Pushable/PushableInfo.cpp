@@ -1,12 +1,9 @@
-#include "framework.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 
 #include "Game/control/control.h"
-#include "Math/Math.h"
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/Generic/Object/Pushable/PushableBridge.h"
 
-using namespace TEN::Math;
 
 namespace TEN::Entities::Generic
 {

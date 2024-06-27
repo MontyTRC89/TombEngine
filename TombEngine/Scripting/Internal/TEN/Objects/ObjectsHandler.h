@@ -1,6 +1,4 @@
 #pragma once
-#include <unordered_map>
-#include <unordered_set>
 
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"

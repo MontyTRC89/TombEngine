@@ -1,7 +1,6 @@
 #pragma once
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara_struct.h"
-#include "Math/Math.h"
 #include "Renderer/RendererEnums.h"
 
 enum class LaraWeaponType;

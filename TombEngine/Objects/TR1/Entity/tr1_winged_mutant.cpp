@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR1/Entity/tr1_winged_mutant.h"
 
 #include "Game/collision/collide_room.h"
@@ -11,11 +10,9 @@
 #include "Game/misc.h"
 #include "Game/missile.h"
 #include "Game/people.h"
-#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {

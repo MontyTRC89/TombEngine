@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Specific/BitField.h"
 
 namespace TEN::Utils

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "ObjectsHandler.h"
 
 #include "Game/collision/collide_item.h"

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/control/los.h"
 
 #include "Game/animation.h"
@@ -9,7 +8,6 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
 #include "Renderer/Renderer.h"
@@ -18,7 +16,6 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
-using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
 // Globals

@@ -1,10 +1,7 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
 
-#include "Math/Math.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 
-using namespace TEN::Math;
 
 /*** Represents a degree-based 3D rotation.
 All values are clamped to the range [0.0, 360.0].

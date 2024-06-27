@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR2/Entity/tr2_worker_machinegun.h"
 
 #include "Game/animation.h"

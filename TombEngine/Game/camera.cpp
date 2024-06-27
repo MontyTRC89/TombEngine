@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/camera.h"
 
 #include "Game/animation.h"
@@ -16,7 +15,6 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Game/spotcam.h"
-#include "Math/Math.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
@@ -27,7 +25,6 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
-using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
 constexpr auto PARTICLE_FADE_THRESHOLD = BLOCK(14);

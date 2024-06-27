@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/effects/Drip.h"
 
 #include "Game/collision/collide_room.h"
@@ -9,7 +8,6 @@
 #include "Game/effects/weather.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
@@ -17,7 +15,6 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Collision::Floordata;
-using namespace TEN::Math;
 
 namespace TEN::Effects::Drip
 {

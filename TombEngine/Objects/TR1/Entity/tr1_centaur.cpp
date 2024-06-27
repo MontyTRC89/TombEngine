@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR1/Entity/tr1_centaur.h"
 
 #include "Game/animation.h"
@@ -14,11 +13,9 @@
 #include "Game/missile.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {

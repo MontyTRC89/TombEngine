@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/effects/effects.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
@@ -19,7 +18,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer.h"
 #include "Sound/sound.h"
@@ -35,8 +33,6 @@ using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Spark;
-using namespace TEN::Math;
-using namespace TEN::Math::Random;
 
 using TEN::Renderer::g_Renderer;
 
@@ -553,13 +549,13 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 			for (int i = 0; i < 3; i++)
 			{
 				if (colorS[i] != lowestS)
-					colorS[i] = int(colorS[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+					colorS[i] = int(colorS[i] + Random::GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
 
 				if (colorD[i] != lowestD)
-					colorD[i] = int(colorD[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+					colorD[i] = int(colorD[i] + Random::GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
 
-				colorS[i] = int(colorS[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
-				colorD[i] = int(colorD[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+				colorS[i] = int(colorS[i] * (1.0f + Random::GenerateFloat(-LUMA_SHIFT, 0)));
+				colorD[i] = int(colorD[i] * (1.0f + Random::GenerateFloat(-LUMA_SHIFT, 0)));
 
 				colorS[i] = std::clamp(colorS[i], 0, UCHAR_MAX);
 				colorD[i] = std::clamp(colorD[i], 0, UCHAR_MAX);
@@ -1565,12 +1561,12 @@ void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1
 		for (int i = 0; i < 3; i++)
 		{
 			if (colorS[i] != lowestS)
-				colorS[i] = int(colorS[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+				colorS[i] = int(colorS[i] + Random::GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
 			if (colorD[i] != lowestD)
-				colorD[i] = int(colorD[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+				colorD[i] = int(colorD[i] + Random::GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
 
-			colorS[i] = int(colorS[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
-			colorD[i] = int(colorD[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+			colorS[i] = int(colorS[i] * (1.0f + Random::GenerateFloat(-LUMA_SHIFT, 0)));
+			colorD[i] = int(colorD[i] * (1.0f + Random::GenerateFloat(-LUMA_SHIFT, 0)));
 
 			colorS[i] =	std::clamp(colorS[i], 0, UCHAR_MAX);
 			colorD[i] =	std::clamp(colorD[i], 0, UCHAR_MAX);
@@ -1838,63 +1834,63 @@ void ProcessEffects(ItemInfo* item)
 		switch (item->Effect.Type)
 		{
 		case EffectType::Fire:
-			if (TestProbability(1 / 8.0f))
-				TriggerFireFlame(pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
+			if (Random::TestProbability(1 / 8.0f))
+				TriggerFireFlame(pos.x, pos.y, pos.z, Random::TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium);
 			
 			break;
 
 		case EffectType::Custom:
-			if (TestProbability(1 / 8.0f))			
+			if (Random::TestProbability(1 / 8.0f))
 			{
 				TriggerFireFlame(
-					pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium,
+					pos.x, pos.y, pos.z, Random::TestProbability(1 / 10.0f) ? FlameType::Trail : FlameType::Medium,
 					item->Effect.PrimaryEffectColor, item->Effect.SecondaryEffectColor);
 			}
 
 			break;
 
 		case EffectType::Sparks:
-			if (TestProbability(1 / 10.0f))
+			if (Random::TestProbability(1 / 10.0f))
 			{
 				TriggerElectricSpark(
 					GameVector(pos, item->RoomNumber),
 					EulerAngles(0, Random::GenerateAngle(0, ANGLE(359.0f)), 0), 2);
 			}
 
-			if (TestProbability(1 / 64.0f))
+			if (Random::TestProbability(1 / 64.0f))
 				TriggerRocketSmoke(pos.x, pos.y, pos.z);
 
 			break;
 
 		case EffectType::ElectricIgnite:
-			if (TestProbability(1 / 1.0f))
+			if (Random::TestProbability(1 / 1.0f))
 			{
 				TriggerElectricSpark(
 					GameVector(pos, item->RoomNumber),
 					EulerAngles(0, Random::GenerateAngle(0, ANGLE(359.0f)), 0), 2);
 			}
 
-			if (TestProbability(1 / 1.0f))
+			if (Random::TestProbability(1 / 1.0f))
 			{
 				TriggerFireFlame(
-					pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium,
+					pos.x, pos.y, pos.z, Random::TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium,
 					Vector3(0.2f, 0.5f, 1.0f), Vector3(0.2f, 0.8f, 1.0f));
 			}
 
 			break;
 
 		case EffectType::RedIgnite:
-			if (TestProbability(1 / 1.0f))
+			if (Random::TestProbability(1 / 1.0f))
 			{
 				TriggerFireFlame(
-					pos.x, pos.y, pos.z, TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium,
+					pos.x, pos.y, pos.z, Random::TestProbability(1 / 10.0f) ? FlameType::Medium : FlameType::Medium,
 					Vector3(1.0f, 0.5f, 0.2f), Vector3(0.6f, 0.1f, 0.0f));
 			}
 
 			break;
 
 		case EffectType::Smoke:
-			if (TestProbability(1 / 32.0f))
+			if (Random::TestProbability(1 / 32.0f))
 				TriggerRocketSmoke(pos.x, pos.y, pos.z);
 			
 			break;
@@ -1980,7 +1976,7 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale)
 	spark.flags = SP_EXPDEF | SP_DEF | SP_SCALE;
 	spark.rotAng = Random::GenerateInt(0, 4096); // NOTE: Effect angles use [0, 4096] range.
 
-	if (TestProbability(1 / 2.0f))
+	if (Random::TestProbability(1 / 2.0f))
 		spark.rotAdd = -32 - (GetRandomControl() & 0x1F);
 	else
 		spark.rotAdd = (GetRandomControl() & 0x1F) + 32;

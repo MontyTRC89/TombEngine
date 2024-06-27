@@ -1,13 +1,10 @@
-#include "framework.h"
 #include "Objects/TR1/Trap/SlammingDoors.h"
 
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Math/Math.h"
 
-using namespace TEN::Math;
 
 namespace TEN::Entities::Traps
 {

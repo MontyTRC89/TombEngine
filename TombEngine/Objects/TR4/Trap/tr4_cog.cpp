@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Trap/tr4_cog.h"
 
 #include "Game/animation.h"

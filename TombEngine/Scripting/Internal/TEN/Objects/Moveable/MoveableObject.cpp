@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
 #include "Game/collision/floordata.h"
@@ -9,7 +8,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
@@ -23,7 +21,6 @@
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
-using namespace TEN::Math;
 
 /***
 Represents any object inside the game world.

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/spotcam.h"
 
 #include "Game/animation.h"

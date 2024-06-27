@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Renderer/Graphics/Vertices/Vertex.h"
 #include "Renderer/RendererEnums.h"
 #include "Renderer/Structures/RendererBucket.h"
@@ -9,7 +10,6 @@
 #include "Renderer/Structures/RendererSpriteToDraw.h"
 #include "Renderer/Structures/RendererStatic.h"
 #include "Specific/fast_vector.h"
-#include <SimpleMath.h>
 
 namespace TEN::Renderer::Structures
 {

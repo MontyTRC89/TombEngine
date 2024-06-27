@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/control/flipeffect.h"
 
 #include "Game/camera.h"

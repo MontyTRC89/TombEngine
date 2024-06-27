@@ -1,7 +1,6 @@
 #pragma once
-#include <SimpleMath.h>
+
 #include "Scripting/Include/ScriptInterfaceLevel.h"
-#include "Math/Math.h"
 
 namespace TEN::Effects::Environment 
 {

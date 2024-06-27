@@ -1,12 +1,9 @@
-#include "framework.h"
 #include "Game/effects/Electricity.h"
 
 #include "Game/effects/effects.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 
-using namespace TEN::Math;
 
 namespace TEN::Effects::Electricity
 {

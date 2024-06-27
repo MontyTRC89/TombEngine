@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR2/Trap/tr2_spinningblade.h"
 
 #include "Game/animation.h"

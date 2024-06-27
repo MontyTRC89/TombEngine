@@ -3,10 +3,8 @@
 #include "Game/control/trigger.h"
 #include "Game/items.h"
 #include "Game/room.h"
-#include "Math/Math.h"
 
 class FloorInfo;
-class GameBoundingBox;
 struct AnimData;
 struct CollisionInfo;
 struct ItemInfo;

@@ -1,12 +1,9 @@
 #pragma once
-#include "Math/Math.h"
 
-using namespace TEN::Math;
 
 enum GAME_OBJECT_ID : short;
 enum class ReverbType;
 class FloorInfo;
-class GameBoundingBox;
 struct BUCKET;
 struct TriggerVolume;
 

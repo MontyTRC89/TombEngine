@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Renderer/Renderer.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
@@ -10,11 +9,8 @@
 #include "Game/Lara/lara.h"
 #include "Game/spotcam.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Renderer/RenderView.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Renderer
 {
@@ -833,4 +829,3 @@ namespace TEN::Renderer
 	}
 
 } // namespace TEN::Renderer
-

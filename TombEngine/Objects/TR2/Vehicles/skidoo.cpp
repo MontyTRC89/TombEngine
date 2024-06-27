@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR2/Vehicles/skidoo.h"
 
 #include "Game/animation.h"
@@ -19,12 +18,10 @@
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Math/Math.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {

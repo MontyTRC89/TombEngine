@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR5/Entity/tr5_lagoon_witch.h"
 
 #include "Game/control/box.h"

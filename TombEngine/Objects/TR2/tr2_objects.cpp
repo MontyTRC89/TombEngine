@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR2/tr2_objects.h"
 
 #include "Game/collision/collide_item.h"

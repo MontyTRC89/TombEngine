@@ -1,6 +1,4 @@
 #pragma once
-#include "framework.h"
-#include "Math/Math.h"
 
 namespace TEN::Entities::TR4 
 {

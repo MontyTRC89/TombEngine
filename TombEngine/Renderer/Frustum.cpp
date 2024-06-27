@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Frustum.h"
 
 namespace TEN::Renderer

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/camera.h"
 #include "Renderer/ConstantBuffers/CameraMatrixBuffer.h"
 #include "Renderer/Frustum.h"

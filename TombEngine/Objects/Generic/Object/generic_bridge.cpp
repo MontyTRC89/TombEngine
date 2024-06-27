@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Generic/Object/generic_bridge.h"
 
 #include "Game/collision/floordata.h"

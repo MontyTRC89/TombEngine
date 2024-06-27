@@ -1,7 +1,5 @@
 #pragma once
-#include "Math/Math.h"
 
-using namespace TEN::Math;
 
 enum class LaraWeaponType;
 struct ItemInfo;

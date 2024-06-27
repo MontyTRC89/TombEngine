@@ -1,7 +1,5 @@
-#include "framework.h"
 #include "Game/effects/smoke.h"
 
-#include <algorithm>
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/weather.h"
@@ -9,11 +7,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Environment;
-using namespace TEN::Math;
 
 namespace TEN::Effects::Smoke
 {

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Util/Util.h"
 
 #include "Game/collision/collide_room.h"

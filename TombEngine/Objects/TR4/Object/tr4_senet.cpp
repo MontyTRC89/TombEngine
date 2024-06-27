@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Object/tr4_senet.h"
 
 #include "Sound/sound.h"

@@ -1,12 +1,7 @@
 #pragma once
-#include <wrl/client.h>
-#include <CommonStates.h>
-#include <SpriteFont.h>
-#include <PrimitiveBatch.h>
-#include <d3d9types.h>
-#include <SimpleMath.h>
+
 #include <PostProcess.h>
-#include "Math/Math.h"
+
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/animation.h"
@@ -68,7 +63,6 @@
 #include "Graphics/Vertices/PostProcessVertex.h"
 
 enum GAME_OBJECT_ID : short;
-class EulerAngles;
 struct AnimFrameInterpData;
 struct CAMERA_INFO;
 

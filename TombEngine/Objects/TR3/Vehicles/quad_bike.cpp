@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Vehicles/quad_bike.h"
 
 #include "Game/animation.h"
@@ -16,7 +15,6 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
@@ -25,7 +23,6 @@
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {

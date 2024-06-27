@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/Lara/lara_initialise.h"
 
 #include "Game/collision/Point.h"

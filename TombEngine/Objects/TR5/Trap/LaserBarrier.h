@@ -1,7 +1,5 @@
 #pragma once
-#include "Math/Math.h"
 
-using namespace TEN::Math;
 
 struct CollisionInfo;
 struct ItemInfo;

@@ -1,7 +1,3 @@
-#include "framework.h"
-
-#include <codecvt>
-#include <filesystem>
 
 #include "Renderer/Renderer.h"
 #include "Renderer/RendererEnums.h"

@@ -1,8 +1,8 @@
-#include "framework.h"
 #include "Renderer/Renderer.h"
+
 #include "Game/camera.h"
 #include "Game/effects/tomb4fx.h"
-#include "Math/Math.h"
+#include "Graphics/RenderTargetCube.h"
 #include "Renderer/Structures/RendererRectangle.h"
 #include "Renderer/RenderView.h"
 #include "Renderer/RendererUtils.h"
@@ -10,7 +10,6 @@
 #include "Renderer/Structures/RendererHudBar.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/clock.h"
-#include "Graphics/RenderTargetCube.h"
 
 namespace TEN::Renderer
 {

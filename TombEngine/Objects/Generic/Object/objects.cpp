@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Generic/Object/objects.h"
 
 #include "Game/animation.h"

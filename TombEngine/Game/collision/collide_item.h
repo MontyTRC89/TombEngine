@@ -1,6 +1,6 @@
 #pragma once
+
 #include "Game/collision/Point.h"
-#include "Math/Math.h"
 
 using namespace TEN::Collision::Point;
 

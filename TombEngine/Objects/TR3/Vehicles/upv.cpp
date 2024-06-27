@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Vehicles/upv.h"
 
 #include "Game/animation.h"

@@ -1,6 +1,5 @@
 #pragma once
 
-class Vector3i;
 
 namespace TEN::Entities::Creatures::TR5
 {
