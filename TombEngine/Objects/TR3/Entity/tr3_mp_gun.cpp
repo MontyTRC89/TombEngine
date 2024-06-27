@@ -72,7 +72,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;
 
-		if (item->BoxNumber != NO_VALUE && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
+		if (item->BoxNumber != NO_VALUE && (g_Level.PathfindingBoxes[item->BoxNumber].flags & BLOCKED))
 		{
 			DoDamage(item, 20);
 			DoLotsOfBlood(item->Pose.Position.x, item->Pose.Position.y - (GetRandomControl() & 255) - 32, item->Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() * 2, item->RoomNumber, 3);

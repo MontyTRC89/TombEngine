@@ -1,16 +1,19 @@
 #pragma once
-#if _DEBUG
-constexpr bool DebugBuild = true;
-#else
-constexpr bool DebugBuild = false;
-#endif
 
 #include <stdexcept>
 #include <string_view>
 #include <iostream>
 
+#include "Renderer/RendererEnums.h"
+
 namespace TEN::Debug
 {
+#if _DEBUG
+	constexpr bool DebugBuild = true;
+#else
+	constexpr bool DebugBuild = false;
+#endif
+
 	enum class LogLevel
 	{
 		Error,
@@ -32,9 +35,9 @@ namespace TEN::Debug
 
 	void InitTENLog(const std::string& logDirContainingDir);
 	void ShutdownTENLog();
-	void TENLog(const std::string_view& string, LogLevel level = LogLevel::Info, LogConfig config = LogConfig::All, bool allowSpam = false);
+	void TENLog(const std::string_view& msg, LogLevel level = LogLevel::Info, LogConfig config = LogConfig::All, bool allowSpam = false);
 
-	inline void TENAssert(const bool& cond, const char* msg)
+	inline void TENAssert(const bool& cond, const std::string& msg)
 	{
 		if constexpr (DebugBuild)
 		{
@@ -45,4 +48,18 @@ namespace TEN::Debug
 			}
 		}
 	};
+
+	void PrintDebugMessage(LPCSTR msg, ...);
+	void DrawDebug2DLine(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
+	void DrawDebugLine(const Vector3& origin, const Vector3& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
+	void DrawDebugTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Color& color, RendererDebugPage page = RendererDebugPage::None);
+	void DrawDebugTarget(const Vector3& center, const Quaternion& orient, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None);
+	void DrawDebugBox(const std::array<Vector3, BOX_VERTEX_COUNT>& corners, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+	void DrawDebugBox(const Vector3& min, const Vector3& max, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+	void DrawDebugBox(const BoundingOrientedBox& box, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+	void DrawDebugBox(const BoundingBox& box, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+	void DrawDebugCone(const Vector3& center, const Quaternion& orient, float radius, float length, const Vector4& color, RendererDebugPage page, bool isWireframe = true);
+	void DrawDebugCylinder(const Vector3& center, const Quaternion& orient, float radius, float length, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+	void DrawDebugSphere(const Vector3& center, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+	void DrawDebugSphere(const BoundingSphere& sphere, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 }

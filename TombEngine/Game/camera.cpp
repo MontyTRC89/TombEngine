@@ -1486,7 +1486,7 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, item->Pose, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &item->Pose, RADIUS);
 
-		TEN::Renderer::g_Renderer.AddDebugBox(
+		DrawDebugBox(
 			bounds.ToBoundingOrientedBox(item->Pose),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
 	}
@@ -1509,7 +1509,7 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, mesh->pos, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &mesh->pos, RADIUS);
 
-		TEN::Renderer::g_Renderer.AddDebugBox(
+		DrawDebugBox(
 			bounds.ToBoundingOrientedBox(mesh->pos),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
 	}

@@ -182,7 +182,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto jointHeadRot = EulerAngles::Identity;
 		auto jointTorsoRot = EulerAngles::Identity;
 
-		if (item.BoxNumber != NO_VALUE && (g_Level.Boxes[item.BoxNumber].flags & BLOCKED) && item.HitPoints > 0)
+		if (item.BoxNumber != NO_VALUE && (g_Level.PathfindingBoxes[item.BoxNumber].flags & BLOCKED) && item.HitPoints > 0)
 		{
 			DoDamage(&item, INT_MAX);
 			DoLotsOfBlood(item.Pose.Position.x, item.Pose.Position.y - (GetRandomControl() & 255) - 32, item.Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item.RoomNumber, 3);

@@ -350,9 +350,9 @@ namespace TEN::Hud
 		for (const auto& [itemNumber, crosshair] : _crosshairs)
 			crosshair.IsPrimary ? primaryCount++ : peripheralCount++;
 
-		g_Renderer.PrintDebugMessage("TARGET HIGHLIGHTER DEBUG");
-		g_Renderer.PrintDebugMessage(g_Configuration.EnableTargetHighlighter ? "Enabled" : "Disabled");
-		g_Renderer.PrintDebugMessage("Primary crosshairs: %d", primaryCount);
-		g_Renderer.PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
+		PrintDebugMessage("TARGET HIGHLIGHTER DEBUG");
+		PrintDebugMessage(g_Configuration.EnableTargetHighlighter ? "Enabled" : "Disabled");
+		PrintDebugMessage("Primary crosshairs: %d", primaryCount);
+		PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
 	}
 }
