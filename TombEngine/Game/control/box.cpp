@@ -21,7 +21,6 @@
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
-#include "Renderer/Renderer.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Room;
@@ -69,7 +68,7 @@ void DrawBox(int boxIndex, Vector3 color)
 	for (int i = 0; i <= 10; i++)
 	{
 		dBox.Extents = extents + Vector3(i);
-		TEN::Renderer::g_Renderer.AddDebugBox(dBox, Vector4(color.x, color.y, color.z, 1), RendererDebugPage::PathfindingStats);
+		DrawDebugBox(dBox, Vector4(color.x, color.y, color.z, 1), RendererDebugPage::PathfindingStats);
 	}
 }
 

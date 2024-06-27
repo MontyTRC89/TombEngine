@@ -22,7 +22,6 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
@@ -46,7 +45,6 @@ using namespace TEN::Entities::Player;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 using namespace TEN::Math;
-using namespace TEN::Renderer;
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -1490,7 +1488,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 		//int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
 		//short deltaAngle = abs((short)(direction - item->Pose.Orientation.y));
 
-		//g_Renderer.PrintDebugMessage("%d", slideVelocity);
+		//PrintDebugMessage("%d", slideVelocity);
 
 		//lara->ExtraVelocity.x += slideVelocity;
 		//lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
