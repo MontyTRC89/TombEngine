@@ -10,6 +10,7 @@
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/RendererEnums.h"
+#include "Specific/clock.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Bubble;
@@ -48,13 +49,18 @@ namespace TEN::Effects::SmokeEmitter
 
 	static void SpawnSteamParticle(const ItemInfo& item, int currentAccel)
 	{
-		constexpr auto COLOR_BLACK		 = Color(0.4f, 0.4f, 0.4f);
-		constexpr auto COLOR_WHITE_START = Color(0.4f, 0.4f, 0.4f);
-		constexpr auto COLOR_WHITE_END	 = Color(0.25f, 0.25f, 0.25f);
-		constexpr auto LIFE_MAX			 = 24;
-		constexpr auto LIFE_MIN			 = 16;
-		constexpr auto FADE_SPEED_MAX	 = 9;
-		constexpr auto FADE_SPEED_MIN	 = 6;
+		constexpr auto COLOR_BLACK			= Color(0.4f, 0.4f, 0.4f);
+		constexpr auto COLOR_WHITE_START	= Color(0.4f, 0.4f, 0.4f);
+		constexpr auto COLOR_WHITE_END		= Color(0.25f, 0.25f, 0.25f);
+		constexpr auto LIFE_MAX				= 24;
+		constexpr auto LIFE_MIN				= 16;
+		constexpr auto PART_SIZE_MAX		= 160.0f;
+		constexpr auto PART_SIZE_MIN		= 128.0f;
+		constexpr auto FADE_SPEED_MAX		= 9;
+		constexpr auto FADE_SPEED_MIN		= 6;
+		constexpr auto DAMAGE_TIME_INTERVAL = 0.2f;
+
+		static const auto SPHERE = BoundingSphere(Vector3::Zero, 32.0f);
 
 		auto& part = *GetFreeParticle();
 		part.on = true;
@@ -106,9 +112,10 @@ namespace TEN::Effects::SmokeEmitter
 		part.life =
 		part.sLife = Random::GenerateInt(LIFE_MIN, LIFE_MAX);
 
-		part.x = item.Pose.Position.x + Random::GenerateInt(-32, 32);
-		part.y = item.Pose.Position.y + Random::GenerateInt(-32, 32);
-		part.z = item.Pose.Position.z + Random::GenerateInt(-32, 32);
+		auto pos = item.Pose.Position.ToVector3() + Random::GeneratePointInSphere(SPHERE);
+		part.x = pos.x;
+		part.y = pos.y;
+		part.z = pos.z;
 
 		int accel = currentAccel;
 		if (currentAccel == SMOKE_ACCEL_MAX)
@@ -132,25 +139,17 @@ namespace TEN::Effects::SmokeEmitter
 		part.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
 		bool ignoreDamage = item.ItemFlags[3] & SmokeEmitterFlags::NoDamage;
-		if (!(GlobalCounter & 0x03) && !ignoreDamage) // TODO: No hex.
+		if (!ignoreDamage && TestGlobalTimeInterval(DAMAGE_TIME_INTERVAL)) // TODO: Check interval.
 			part.flags |= SP_DAMAGE;
 
 		part.rotAng = Random::GenerateAngle(ANGLE(0.0f), ANGLE(22.5f));
-
-		if (Random::TestProbability(1 / 2.0f))
-		{
-			part.rotAdd = Random::GenerateInt(-15, -7);
-		}
-		else
-		{
-			part.rotAdd = Random::GenerateInt(7, 15);
-		}
+		part.rotAdd = Random::GenerateAngle(ANGLE(0.04f), ANGLE(0.08f)) * (Random::TestProbability(1 / 2.0f) ? 1 : -1);
 
 		part.scalar = 2;
-		part.gravity = Random::GenerateInt(-24, -15);
-		part.maxYvel = Random::GenerateInt(-15, -8);
+		part.gravity = Random::GenerateFloat(-24.0f, -15.0f);
+		part.maxYvel = Random::GenerateFloat(-15.0f, -8.0f);
 		
-		float size = Random::GenerateFloat(128.0f, 160.0f);
+		float size = Random::GenerateFloat(PART_SIZE_MIN, PART_SIZE_MAX);
 		part.dSize = size;
 		part.sSize =
 		part.size = part.dSize / 2;
