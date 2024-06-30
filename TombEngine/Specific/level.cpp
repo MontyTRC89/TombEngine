@@ -398,7 +398,7 @@ void LoadObjects()
 				keyframe.Aabb = BoundingBox(center, extents);
 				keyframe.BoundingBox = GameBoundingBox(keyframe.Aabb);
 
-				keyframe.Offset = ReadVector3();
+				keyframe.RootOffset = ReadVector3();
 
 				int boneCount = ReadInt32();
 				keyframe.BoneOrientations.resize(boneCount);

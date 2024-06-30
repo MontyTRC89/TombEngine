@@ -18,7 +18,7 @@ namespace TEN::Animation
 	struct KeyframeData
 	{
 		BoundingBox				Aabb			 = DirectX::BoundingBox();
-		Vector3					Offset			 = Vector3::Zero;
+		Vector3					RootOffset		 = Vector3::Zero;
 		std::vector<Quaternion> BoneOrientations = {};
 
 		// Deprecated.

@@ -78,12 +78,12 @@ namespace TEN::Renderer
 			bool calculateMatrix = (mask >> bonePtr->Index) & 1;
 			if (calculateMatrix)
 			{
-				auto offset0 = interpData.Keyframe0.Offset;
+				auto offset0 = interpData.Keyframe0.RootOffset;
 				auto rotMatrix = Matrix::CreateFromQuaternion(interpData.Keyframe0.BoneOrientations[bonePtr->Index]);
 				
 				if (interpData.Alpha != 0.0f)
 				{
-					auto offset1 = interpData.Keyframe1.Offset;
+					auto offset1 = interpData.Keyframe1.RootOffset;
 					offset0 = Vector3::Lerp(offset0, offset1, interpData.Alpha);
 
 					auto rotMatrix2 = Matrix::CreateFromQuaternion(interpData.Keyframe1.BoneOrientations[bonePtr->Index]);
