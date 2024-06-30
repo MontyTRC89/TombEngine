@@ -31,6 +31,7 @@
 #include "Specific/level.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;

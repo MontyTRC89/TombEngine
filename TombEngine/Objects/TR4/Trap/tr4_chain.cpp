@@ -6,6 +6,8 @@
 #include "Game/items.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::Traps
 {
 	void ControlChain(short itemNumber)

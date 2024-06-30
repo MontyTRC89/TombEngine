@@ -6,6 +6,8 @@
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 void SpringBoardControl(short itemNumber)
 {
 	auto& item = g_Level.Items[itemNumber];

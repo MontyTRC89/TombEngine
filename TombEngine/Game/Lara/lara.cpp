@@ -57,6 +57,7 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Gui;
 
+using namespace TEN::Animation;
 using TEN::Renderer::g_Renderer;
 
 LaraInfo Lara = {};

@@ -12,6 +12,8 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Animation;
+
 bool ShotLara(ItemInfo* item, AI_INFO* AI, const CreatureBiteInfo& gun, short extraRotation, int damage)
 {
 	auto* creature = GetCreatureInfo(item);

@@ -67,6 +67,8 @@
 #include "Renderer/Structures/RendererObject.h"
 #include "Graphics/Vertices/PostProcessVertex.h"
 
+using namespace TEN::Animation;
+
 enum GAME_OBJECT_ID : short;
 class EulerAngles;
 struct AnimFrameInterpData;

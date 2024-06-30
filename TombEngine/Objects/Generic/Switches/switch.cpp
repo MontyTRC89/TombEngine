@@ -14,6 +14,8 @@
 #include "Specific/Input/Input.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Animation;
+
 // NOTE: we need to decompile/inspect if these functions are still needed
 
 void ProcessExplodingSwitchType8(ItemInfo* item) 

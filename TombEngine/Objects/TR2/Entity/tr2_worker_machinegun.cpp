@@ -11,6 +11,8 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::Creatures::TR2
 {
 	const auto WorkerMachineGunBite = CreatureBiteInfo(Vector3(0, 380, 37), 9);

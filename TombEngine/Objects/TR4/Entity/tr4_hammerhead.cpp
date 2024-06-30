@@ -11,6 +11,8 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::TR4
 {
 	constexpr auto HAMMERHEAD_BITE_ATTACK_DAMAGE = 120;

@@ -9,6 +9,8 @@
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::Traps
 {
 	void VentilatorEffect(GameBoundingBox* bounds, int intensity, short rot, int speed)

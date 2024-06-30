@@ -27,6 +27,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Utils;

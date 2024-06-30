@@ -9,6 +9,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1

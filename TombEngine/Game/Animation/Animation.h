@@ -1,8 +1,8 @@
 #pragma once
+
 #include "Game/Animation/Commands.h"
 #include "Math/Math.h"
 
-using namespace TEN::Animation;
 using namespace TEN::Math;
 
 enum GAME_OBJECT_ID : short;
@@ -11,12 +11,10 @@ class Pose;
 class Vector3i;
 struct CreatureBiteInfo;
 struct ItemInfo;
-struct KeyframeInterpData;
 struct ObjectInfo;
 
-// TODO: Uncomment namespace.
-//namespace TEN::Animation
-//{
+namespace TEN::Animation
+{
 	struct KeyframeData
 	{
 		BoundingBox				Aabb			 = DirectX::BoundingBox();
@@ -120,4 +118,4 @@ struct ObjectInfo;
 
 	void ClampRotation(Pose& outPose, short angle, short rot);
 	void DrawAnimatingItem(ItemInfo* item);
-//}
+}

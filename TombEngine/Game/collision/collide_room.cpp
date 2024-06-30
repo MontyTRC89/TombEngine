@@ -12,6 +12,7 @@
 #include "Math/Math.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Room;

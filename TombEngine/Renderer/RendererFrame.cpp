@@ -14,6 +14,7 @@
 #include "Specific/level.h"
 #include "Renderer/RenderView.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Math;
 
 namespace TEN::Renderer

@@ -16,6 +16,7 @@
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Gui;
 using namespace TEN::Hud;
 using namespace TEN::Input;

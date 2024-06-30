@@ -13,6 +13,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::Creatures::TR5
 {
 	int GunShipCounter = 0;

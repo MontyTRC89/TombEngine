@@ -11,6 +11,7 @@
 #include "Math/Math.h"
 #include "Objects/Effects/enemy_missile.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Entities::Effects;
 using namespace TEN::Math;
 

@@ -18,6 +18,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 

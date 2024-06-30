@@ -15,6 +15,7 @@
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 

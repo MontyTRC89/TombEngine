@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Objects/Generic/Doors/generic_doors.h"
-#include "Specific/level.h"
+
 #include "Game/control/control.h"
 #include "Game/control/box.h"
 #include "Game/items.h"
@@ -19,6 +19,7 @@
 #include "Objects/Generic/Doors/double_doors.h"
 #include "Game/collision/collide_item.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Doors

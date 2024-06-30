@@ -12,6 +12,7 @@
 #include "Game/misc.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::Creatures::TR1

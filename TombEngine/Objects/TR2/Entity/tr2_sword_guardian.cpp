@@ -16,6 +16,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto SWORD_GUARDIAN_ATTACK_DAMAGE = 300;

@@ -20,6 +20,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 

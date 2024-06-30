@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/Generic/Switches/generic_switch.h"
+
 #include "Specific/Input/Input.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -12,6 +13,7 @@
 #include "Game/Animation/Animation.h"
 #include "Game/items.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 

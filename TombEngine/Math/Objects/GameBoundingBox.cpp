@@ -8,6 +8,8 @@
 #include "Math/Objects/Pose.h"
 #include "Objects/game_object_ids.h"
 
+using namespace TEN::Animation;
+
 //namespace TEN::Math
 //{
 	const GameBoundingBox GameBoundingBox::Zero = GameBoundingBox(0, 0, 0, 0, 0, 0);

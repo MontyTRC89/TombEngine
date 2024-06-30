@@ -9,6 +9,8 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::Traps
 {
 	constexpr auto KILLER_STATUE_HARM_DAMAGE = 200;

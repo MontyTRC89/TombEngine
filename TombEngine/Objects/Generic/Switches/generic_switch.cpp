@@ -1,14 +1,16 @@
 #include "framework.h"
+#include "Objects/Generic/Switches/generic_switch.h"
+
 #include "Game/Animation/Animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Switches

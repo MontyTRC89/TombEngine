@@ -15,6 +15,7 @@
 #include "Objects/objectslist.h"
 #include "Renderer/RendererEnums.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4

@@ -13,6 +13,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Input;
 

@@ -17,6 +17,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Entities::Effects;
 using namespace TEN::Input;
 

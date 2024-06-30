@@ -12,6 +12,7 @@
 #include "Specific/LevelCameraInfo.h"
 #include "Specific/newtypes.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Control::Volumes;
 
 struct ChunkId;

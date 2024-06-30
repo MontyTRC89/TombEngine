@@ -22,6 +22,7 @@
 #include "Objects/objectslist.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Room;
 using namespace TEN::Effects::Smoke;

@@ -11,6 +11,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;

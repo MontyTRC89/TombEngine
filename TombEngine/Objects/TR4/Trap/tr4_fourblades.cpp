@@ -6,6 +6,8 @@
 #include "Game/items.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 // NOTES:
 // item.ItemFlags[0] = Damage joints.
 // item.ItemFlags[3] = Damage.

@@ -1,9 +1,11 @@
 #pragma once
+
 #include "Game/control/box.h"
 #include "Objects/objectslist.h"
 #include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
+namespace TEN::Animation { struct AnimData; }
 class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;

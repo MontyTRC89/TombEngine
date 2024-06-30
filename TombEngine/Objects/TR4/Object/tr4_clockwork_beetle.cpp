@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
+
 #include "Game/items.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
@@ -9,6 +10,7 @@
 #include "Game/collision/Point.h"
 #include "Game/effects/debris.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
 
 void ClockworkBeetleControl(short itemNumber)

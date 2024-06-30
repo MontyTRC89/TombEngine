@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/TR4/Object/tr4_mapper.h"
+
 #include "Specific/level.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
@@ -12,6 +13,7 @@
 #include "Game/items.h"
 #include "Renderer/RendererEnums.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::TR4

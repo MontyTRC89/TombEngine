@@ -11,6 +11,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::Traps
 {
 	void ControlCog(short itemNumber)

@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR4/Entity/tr4_troops.h"
 
+#include "Game/Animation/Animation.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/control/control.h"
@@ -10,12 +11,12 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/people.h"
 #include "Game/itemdata/creature_info.h"
-#include "Game/Animation/Animation.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4

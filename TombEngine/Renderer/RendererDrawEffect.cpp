@@ -34,6 +34,7 @@
 #include "Specific/level.h"
 #include "Structures/RendererSpriteBucket.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;

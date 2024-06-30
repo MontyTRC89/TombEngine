@@ -19,6 +19,8 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::Doors
 {
 	void InitializeSteelDoor(short itemNumber)

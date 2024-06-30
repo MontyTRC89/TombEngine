@@ -21,6 +21,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;

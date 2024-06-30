@@ -19,6 +19,7 @@
 #include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Math;
 using namespace TEN::Math::Random;
 using namespace TEN::Effects::Spark;

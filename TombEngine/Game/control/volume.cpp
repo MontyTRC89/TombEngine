@@ -12,6 +12,8 @@
 #include "Game/Setup.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Control::Volumes
 {
 	constexpr auto CAM_SIZE = 32;

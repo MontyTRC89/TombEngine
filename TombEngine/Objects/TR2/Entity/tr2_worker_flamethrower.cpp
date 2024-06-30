@@ -15,6 +15,8 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto WORKER_FLAME_ATTACK_RANGE = SQUARE(BLOCK(2));

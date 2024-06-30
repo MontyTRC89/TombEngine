@@ -19,6 +19,7 @@
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Game/itemdata/door_data.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Entities::Switches;
 
 namespace TEN::Entities::Doors

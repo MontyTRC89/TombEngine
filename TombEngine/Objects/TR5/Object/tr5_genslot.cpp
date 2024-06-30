@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "tr5_genslot.h"
+
 #include "Game/items.h"
 #include "Specific/level.h"
 #include "Game/control/control.h"
@@ -7,6 +8,8 @@
 #include "Game/Animation/Animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
+
+using namespace TEN::Animation;
 
 void GenSlot1Control(short itemNumber)
 {

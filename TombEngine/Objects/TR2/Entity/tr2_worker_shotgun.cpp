@@ -13,6 +13,7 @@
 #include "Math/Math.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2

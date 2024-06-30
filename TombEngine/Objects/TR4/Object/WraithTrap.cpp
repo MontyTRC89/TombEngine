@@ -12,6 +12,7 @@
 #include "Specific/level.h"
 #include "Game/Setup.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;

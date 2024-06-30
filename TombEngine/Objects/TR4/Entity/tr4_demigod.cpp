@@ -18,6 +18,7 @@
 #include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4

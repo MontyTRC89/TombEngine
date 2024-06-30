@@ -8,6 +8,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::TR4
 {
 	void LaraDoubleControl(short itemNumber)

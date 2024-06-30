@@ -19,6 +19,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Effects::Smoke;
 
 namespace TEN::Entities::Creatures::TR2

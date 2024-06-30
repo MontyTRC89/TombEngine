@@ -9,6 +9,7 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
 
 CreatureInfo* GetCreatureInfo(ItemInfo* item)

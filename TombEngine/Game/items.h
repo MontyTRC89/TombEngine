@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/Animation/Animation.h"
 #include "Game/itemdata/itemdata.h"
 #include "Math/Math.h"
@@ -6,6 +7,7 @@
 #include "Objects/game_object_ids.h"
 #include "Specific/newtypes.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Utils;
 
 constexpr auto ITEM_COUNT_MAX  = 1024;

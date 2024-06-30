@@ -16,6 +16,7 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Math;
 using namespace TEN::Renderer;

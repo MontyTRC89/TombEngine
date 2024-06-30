@@ -34,6 +34,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Math;
 
 extern GameConfiguration g_Configuration;

@@ -28,11 +28,11 @@
 #include "Specific/Input/Input.h"
 #include "Specific/trutils.h"
 
-using TEN::Renderer::g_Renderer;
-
+using namespace TEN::Animation;
 using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
 using namespace TEN::Utils;
+using TEN::Renderer::g_Renderer;
 
 const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 {

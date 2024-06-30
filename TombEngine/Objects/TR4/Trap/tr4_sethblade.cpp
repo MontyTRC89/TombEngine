@@ -7,6 +7,8 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::Traps
 {
 	constexpr auto SETH_BLADE_HARM_DAMAGE = 1000;

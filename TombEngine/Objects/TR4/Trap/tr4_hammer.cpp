@@ -14,6 +14,8 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 // NOTES:
 // ItemFlags[0] | ItemFlags[1] = Harm joints.
 // ItemFlags[2] = Timer in frame time before next activation.

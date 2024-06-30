@@ -16,6 +16,7 @@
 #include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Math;
 

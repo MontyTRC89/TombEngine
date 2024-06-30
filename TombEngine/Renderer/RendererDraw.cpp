@@ -33,6 +33,7 @@
 #include "Renderer/Structures/RendererSortableObject.h"
 
 using namespace std::chrono;
+using namespace TEN::Animation;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;

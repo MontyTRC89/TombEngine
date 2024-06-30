@@ -14,6 +14,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
+
 namespace TEN::Entities::TR4
 {
 	constexpr auto GUIDE_ATTACK_DAMAGE = 20;
