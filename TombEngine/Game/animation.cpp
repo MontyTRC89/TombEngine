@@ -181,7 +181,7 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 					break;
 
 				case SoundEnvironment::Underwater:
-					if (isWater)
+					if (isWater || isSwamp)
 						soundEnv = SoundEnvironment::Underwater;
 
 					break;
