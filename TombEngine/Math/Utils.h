@@ -8,10 +8,14 @@ namespace TEN::Math
 	// Interpolation
 
 	float Lerp(float value0, float value1, float alpha);
-	float InterpolateCos(float value0, float value1, float alpha);
-	float InterpolateCubic(float value0, float value1, float value2, float value3, float alpha);
-	float Smoothstep(float alpha);
 	float Smoothstep(float value0, float value1, float alpha);
+	float Smoothstep(float alpha);
+	float EaseInSine(float value0, float value1, float alpha);
+	float EaseInSine(float alpha);
+	float EaseOutSine(float value0, float value1, float alpha);
+	float EaseOutSine(float alpha);
+	float EaseInOutSine(float value0, float value1, float alpha);
+	float EaseInOutSine(float alpha);
 
 	// Color
 

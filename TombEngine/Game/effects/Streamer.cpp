@@ -23,7 +23,7 @@ namespace TEN::Effects::Streamer
 	{
 		// Update opacity.
 		if (Color.w > 0.0f)
-			Color.w = InterpolateCos(0.0f, OpacityMax, Life / LifeMax);
+			Color.w = EaseInOutSine(0.0f, OpacityMax, Life / LifeMax);
 
 		// TODO: Not working.
 		// Update orientation.
@@ -66,7 +66,7 @@ namespace TEN::Effects::Streamer
 		float lifeMax = std::min(round(life * FPS), (float)SEGMENT_COUNT_MAX);
 
 		float alpha = (segmentCount / lifeMax) * FADE_IN_COEFF;
-		float opacityMax = InterpolateCos(0.0f, color.w, alpha);
+		float opacityMax = EaseInOutSine(0.0f, color.w, alpha);
 
 		segment.Orientation = AxisAngle(dir, orient);
 		segment.Color = Vector4(color.x, color.y, color.z, opacityMax);
