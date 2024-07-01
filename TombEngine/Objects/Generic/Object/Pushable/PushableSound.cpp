@@ -57,11 +57,8 @@ namespace TEN::Entities::Generic
 			{ MaterialType::Custom8, PushableSoundData{ SFX_TR4_PUSHABLE_SOUND, SFX_TR4_PUSH_BLOCK_END, SFX_TR4_BOULDER_FALL } }
 		};
 
-		// TODO: Uncomment when we get actual sounds for them.
-		//auto it = SOUND_DATA_MAP.find(material);
-		//return ((it != SOUND_DATA_MAP.end()) ? it->second : SOUND_DATA_DEFAULT);
-
-		return DEFAULT_SOUND_DATA;
+		auto it = SOUND_DATA_MAP.find(material);
+		return ((it != SOUND_DATA_MAP.end()) ? it->second : DEFAULT_SOUND_DATA);
 	}
 
 	static std::optional<int> GetPushableSoundID(const ItemInfo& pushableItem, PushableSoundType soundType)
