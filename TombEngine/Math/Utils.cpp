@@ -11,25 +11,6 @@ namespace TEN::Math
 		return (((1.0f - alpha) * value0) + (alpha * value1));
 	}
 
-	float InterpolateCos(float value0, float value1, float alpha)
-	{
-		alpha = std::clamp(alpha, 0.0f, 1.0f);
-		return Lerp(value0, value1, (1 - cos(alpha * PI)) * 0.5f);
-	}
-
-	float InterpolateCubic(float value0, float value1, float value2, float value3, float alpha)
-	{
-		alpha = std::clamp(alpha, 0.0f, 1.0f);
-
-		float p = (value3 - value2) - (value0 - value1);
-		float q = (value0 - value1) - p;
-		float r = value2 - value0;
-		float s = value1;
-		float x = alpha;
-		float xSquared = SQUARE(x);
-		return ((p * xSquared * x) + (q * xSquared) + (r * x) + s);
-	}
-
 	float Smoothstep(float alpha)
 	{
 		return Smoothstep(0.0f, 1.0f, alpha);
@@ -39,21 +20,47 @@ namespace TEN::Math
 	{
 		alpha = std::clamp(alpha, value0, value1);
 
-		// Don't process if input value is same as one of the values.
-		if (alpha == value0)
-		{
-			return value0;
-		}
-		else if (alpha == value1)
-		{
-			return value1;
-		}
-
 		// Scale, bias, and saturate alpha to [0, 1] range.
 		alpha = std::clamp((alpha - value0) / (value1 - value0), 0.0f, 1.0f);
 
 		// Evaluate polynomial.
-		return (CUBE(alpha) * (alpha * (alpha * 6 - 15) + 10));
+		return (CUBE(alpha) * (alpha * ((alpha * 6) - 15) + 10));
+	}
+
+	float EaseInSine(float value0, float value1, float alpha)
+	{
+		alpha = std::clamp(alpha, 0.0f, 1.0f);
+		alpha = 1.0f - cos((alpha * PI) / 2);
+		return value0 + (value1 - value0) * alpha;
+	}
+
+	float EaseInSine(float alpha)
+	{
+		return EaseInSine(0.0f, 1.0f, alpha);
+	}
+
+	float EaseOutSine(float value0, float value1, float alpha)
+	{
+		alpha = std::clamp(alpha, 0.0f, 1.0f);
+		alpha = sin((alpha * PI) / 2);
+		return (value0 + (value1 - value0) * alpha);
+	}
+	
+	float EaseOutSine(float alpha)
+	{
+		return EaseOutSine(0.0f, 1.0f, alpha);
+	}
+
+	float EaseInOutSine(float value0, float value1, float alpha)
+	{
+		alpha = std::clamp(alpha, 0.0f, 1.0f);
+		alpha = (1 - cos(alpha * PI)) / 2;
+		return Lerp(value0, value1, alpha);
+	}
+	
+	float EaseInOutSine(float alpha)
+	{
+		return EaseInOutSine(0.0f, 1.0f, alpha);
 	}
 
 	float Luma(const Vector3& color)
