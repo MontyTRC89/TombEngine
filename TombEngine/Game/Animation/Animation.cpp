@@ -82,8 +82,10 @@ namespace TEN::Animation
 
 		const auto* anim = &GetAnimData(item);
 
-		if (SetStateDispatch(item))
+		const auto* dispatch = GetStateDispatch(item);
+		if (dispatch != nullptr)
 		{
+			SetStateDispatch(item, *dispatch);
 			anim = &GetAnimData(item);
 
 			item.Animation.ActiveState = anim->StateID;
@@ -204,21 +206,8 @@ namespace TEN::Animation
 
 	bool TestStateDispatch(const ItemInfo& item, int targetStateID)
 	{
-		const auto& anim = GetAnimData(item);
-
-		// Run through state dispatches.
-		for (const auto& dispatch : anim.Dispatches)
-		{
-			// State ID mismatch; continue.
-			if (dispatch.StateID != ((targetStateID == NO_VALUE) ? item.Animation.TargetState : targetStateID))
-				continue;
-
-			// Test if current frame is within dispatch range.
-			if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
-				return true;
-		}
-
-		return false;
+		const auto* dispatch = GetStateDispatch(item, targetStateID);
+		return (dispatch != nullptr);
 	}
 
 	bool TestLastFrame(const ItemInfo& item, int animNumber)
@@ -291,6 +280,25 @@ namespace TEN::Animation
 	{
 		const auto& anim = GetAnimData(item);
 		return anim.GetClosestKeyframe(item.Animation.FrameNumber);
+	}
+
+	const StateDispatchData* GetStateDispatch(const ItemInfo& item, int targetStateID)
+	{
+		const auto& anim = GetAnimData(item);
+
+		// Run through state dispatches.
+		for (const auto& dispatch : anim.Dispatches)
+		{
+			// State ID mismatch; continue.
+			if (dispatch.StateID != ((targetStateID == NO_VALUE) ? item.Animation.TargetState : targetStateID))
+				continue;
+
+			// Test if current frame is within dispatch range.
+			if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
+				return &dispatch;
+		}
+
+		return nullptr;
 	}
 
 	int GetNextAnimState(const ItemInfo& item)
@@ -414,39 +422,10 @@ namespace TEN::Animation
 		SetAnimation(item, item.ObjectNumber, animNumber, frameNumber);
 	}
 
-	bool SetStateDispatch(ItemInfo& item, int targetStateID)
+	void SetStateDispatch(ItemInfo& item, const StateDispatchData& dispatch)
 	{
-		// Set target state ID.
-		if (targetStateID != NO_VALUE)
-			item.Animation.TargetState = targetStateID;
-
-		const auto& anim = GetAnimData(item);
-
-		// No dispatches; return early.
-		if (anim.Dispatches.empty())
-			return false;
-
-		// Active and target state IDs already match; return early.
-		if (item.Animation.ActiveState == item.Animation.TargetState)
-			return false;
-
-		// Run through state dispatches.
-		for (const auto& dispatch : anim.Dispatches)
-		{
-			// State ID mismatch; continue.
-			if (dispatch.StateID != item.Animation.TargetState)
-				continue;
-
-			// Set new animation and frame numbers if current frame number is within dispatch range.
-			if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
-			{
-				item.Animation.AnimNumber = dispatch.NextAnimNumber;
-				item.Animation.FrameNumber = dispatch.NextFrameNumber;
-				return true;
-			}
-		}
-
-		return false;
+		item.Animation.AnimNumber = dispatch.NextAnimNumber;
+		item.Animation.FrameNumber = dispatch.NextFrameNumber;
 	}
 
 	void ClampRotation(Pose& outPose, short angle, short rot)

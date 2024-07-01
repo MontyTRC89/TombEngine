@@ -17,9 +17,9 @@ namespace TEN::Animation
 {
 	struct KeyframeData
 	{
-		BoundingBox				Aabb			 = DirectX::BoundingBox();
 		Vector3					RootOffset		 = Vector3::Zero;
 		std::vector<Quaternion> BoneOrientations = {};
+		BoundingBox				Aabb			 = DirectX::BoundingBox();
 
 		// Deprecated.
 		GameBoundingBox BoundingBox = GameBoundingBox::Zero;
@@ -98,6 +98,8 @@ namespace TEN::Animation
 	const KeyframeData& GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber);
 	const KeyframeData& GetClosestKeyframe(const ItemInfo& item);
 
+	const StateDispatchData* GetStateDispatch(const ItemInfo& item, int targetStateID = NO_VALUE);
+
 	int	  GetNextAnimState(const ItemInfo& item);
 	int	  GetNextAnimState(GAME_OBJECT_ID objectID, int animNumber);
 	int	  GetFrameCount(GAME_OBJECT_ID objectID, int animNumber); // TODO: Not needed? Not the "real" frame count anyway since 0 isn't counted.
@@ -115,7 +117,7 @@ namespace TEN::Animation
 
 	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber = 0);
 	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber = 0);
-	bool SetStateDispatch(ItemInfo& item, int targetStateID = NO_VALUE);
+	void SetStateDispatch(ItemInfo& item, const StateDispatchData& dispatch);
 
 	// Utilities
 

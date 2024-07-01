@@ -1043,16 +1043,20 @@ void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (CanStepUp(*item, *coll))
 		{
-			if (SetStateDispatch(*item, LS_STEP_UP))
+			const auto* dispatch = GetStateDispatch(*item, LS_STEP_UP);
+			if (dispatch != nullptr)
 			{
+				SetStateDispatch(*item, *dispatch);
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
 			}
 		}
 		else if (CanStepDown(*item, *coll))
 		{
-			if (SetStateDispatch(*item, LS_STEP_DOWN))
+			const auto* dispatch = GetStateDispatch(*item, LS_STEP_DOWN);
+			if (dispatch != nullptr)
 			{
+				SetStateDispatch(*item, *dispatch);
 				item->Pose.Position.y += coll->Middle.Floor;
 				return;
 			}
