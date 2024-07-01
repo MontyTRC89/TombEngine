@@ -108,7 +108,7 @@ namespace TEN::Animation
 			if (item.Animation.ActiveState != anim->StateID)
 			{
 				item.Animation.ActiveState =
-					item.Animation.TargetState = anim->StateID;
+				item.Animation.TargetState = anim->StateID;
 			}
 
 			if (!item.IsLara())
@@ -180,6 +180,7 @@ namespace TEN::Animation
 			}
 		}
 
+		// Update animation.
 		if (item.IsLara())
 		{
 			const auto& player = GetLaraInfo(item);
@@ -192,14 +193,11 @@ namespace TEN::Animation
 			if (!player.Control.IsMoving)
 				item.Pose.Translate(player.Control.MoveAngle, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
 
-			// Update matrices.
 			g_Renderer.UpdateLaraAnimations(true);
 		}
 		else
 		{
 			item.Pose.Translate(item.Pose.Orientation.y, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
-
-			// Update matrices.
 			g_Renderer.UpdateItemAnimations(item.Index, true);
 		}
 	}
