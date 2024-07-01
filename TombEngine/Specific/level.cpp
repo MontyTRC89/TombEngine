@@ -384,6 +384,7 @@ void LoadObjects()
 			anim.EndFrameNumber = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
+			anim.BlendFrameDuration = ReadInt32();
 			anim.Interpolation = ReadInt32();
 			anim.VelocityStart = ReadVector3();
 			anim.VelocityEnd = ReadVector3();
@@ -414,6 +415,7 @@ void LoadObjects()
 				dispatch.StateID = ReadInt32();
 				dispatch.NextAnimNumber = ReadInt32();
 				dispatch.NextFrameNumber = ReadInt32();
+				dispatch.BlendFrameDuration = ReadInt32();
 				dispatch.FrameNumberRange.first = ReadInt32();
 				dispatch.FrameNumberRange.second = ReadInt32();
 			}
