@@ -15,6 +15,14 @@ struct ObjectInfo;
 
 namespace TEN::Animation
 {
+	enum class AnimBlendType
+	{
+		Linear,
+		Smooth,
+		EaseIn,
+		EaseOut
+	};
+
 	struct KeyframeData
 	{
 		Vector3					RootOffset		 = Vector3::Zero;
@@ -36,10 +44,11 @@ namespace TEN::Animation
 
 	struct StateDispatchData
 	{
-		int StateID			   = 0;
-		int NextAnimNumber	   = 0;
-		int NextFrameNumber	   = 0;
-		int BlendFrameDuration = 0;
+		int			  StateID			 = 0;
+		int			  NextAnimNumber	 = 0;
+		int			  NextFrameNumber	 = 0;
+		int			  BlendFrameDuration = 0;
+		AnimBlendType BlendType			 = AnimBlendType::Linear;
 
 		std::pair<int, int> FrameNumberRange = {};
 	};
@@ -47,13 +56,14 @@ namespace TEN::Animation
 	struct AnimData
 	{
 		using AnimCommandPtr = std::unique_ptr<AnimCommand>;
-
-		int StateID			   = 0;
-		int EndFrameNumber	   = 0;
-		int NextAnimNumber	   = 0;
-		int NextFrameNumber	   = 0;
-		int BlendFrameDuration = 0;
-		int Interpolation	   = 0;
+		
+		int			  StateID			 = 0;
+		int			  EndFrameNumber	 = 0;
+		int			  NextAnimNumber	 = 0;
+		int			  NextFrameNumber	 = 0;
+		int			  Interpolation		 = 0;
+		int			  BlendFrameDuration = 0;
+		AnimBlendType BlendType			 = AnimBlendType::Linear;
 
 		Vector3 VelocityStart = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 		Vector3 VelocityEnd	  = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward.
