@@ -30,8 +30,7 @@ namespace TEN::Math
 	float EaseInSine(float value0, float value1, float alpha)
 	{
 		alpha = std::clamp(alpha, 0.0f, 1.0f);
-		alpha = 1.0f - cos((alpha * PI) / 2);
-		return value0 + (value1 - value0) * alpha;
+		return Lerp(value0, value1, 1 - cos((alpha * PI) / 2));
 	}
 
 	float EaseInSine(float alpha)
@@ -42,8 +41,7 @@ namespace TEN::Math
 	float EaseOutSine(float value0, float value1, float alpha)
 	{
 		alpha = std::clamp(alpha, 0.0f, 1.0f);
-		alpha = sin((alpha * PI) / 2);
-		return (value0 + (value1 - value0) * alpha);
+		return Lerp(value0, value1, sin((alpha * PI) / 2));
 	}
 	
 	float EaseOutSine(float alpha)
@@ -54,8 +52,7 @@ namespace TEN::Math
 	float EaseInOutSine(float value0, float value1, float alpha)
 	{
 		alpha = std::clamp(alpha, 0.0f, 1.0f);
-		alpha = (1 - cos(alpha * PI)) / 2;
-		return Lerp(value0, value1, alpha);
+		return Lerp(value0, value1, (1 - cos(alpha * PI)) / 2);
 	}
 	
 	float EaseInOutSine(float alpha)
