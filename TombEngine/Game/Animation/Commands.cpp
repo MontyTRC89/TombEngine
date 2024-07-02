@@ -2,12 +2,16 @@
 #include "Game/Animation/Commands.h"
 
 #include "Game/camera.h"
-#include "Game/control/flipeffect.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
+#include "Game/control/flipeffect.h"
 #include "Game/items.h"
 #include "Game/lara/lara.h"
 #include "Game/lara/lara_helpers.h"
 #include "Game/Setup.h"
+#include "Sound/sound.h"
+
+using namespace TEN::Collision::Point;
 
 namespace TEN::Animation
 {
@@ -16,13 +20,13 @@ namespace TEN::Animation
 		if (isFrameBased)
 			return;
 
-		item.Pose.Translate(item.Pose.Orientation.y, RelOffset.z, RelOffset.y, RelOffset.x);
+		item.Pose.Translate(item.Pose.Orientation.y, _relOffset.z, _relOffset.y, _relOffset.x);
 
 		if (item.IsLara())
 		{
 			// NOTE: GameBoundingBox constructor always clamps to last frame to avoid errors.
 			auto bounds = GameBoundingBox(&item);
-			UpdateLaraRoom(&item, -bounds.GetHeight() / 2, -RelOffset.x, -RelOffset.z);
+			UpdateLaraRoom(&item, -bounds.GetHeight() / 2, -_relOffset.x, -_relOffset.z);
 		}
 		else
 		{
@@ -36,7 +40,7 @@ namespace TEN::Animation
 			return;
 
 		item.Animation.IsAirborne = true;
-		item.Animation.Velocity = JumpVelocity;
+		item.Animation.Velocity = _jumpVelocity;
 
 		if (item.IsLara())
 		{
@@ -73,54 +77,60 @@ namespace TEN::Animation
 
 	void SoundEffectCommand::Execute(ItemInfo& item, bool isFrameBased) const
 	{
-		if (!isFrameBased || item.Animation.FrameNumber != FrameNumber)
+		if (!isFrameBased || item.Animation.FrameNumber != _frameNumber)
 			return;
 
-		const auto& object = Objects[item.ObjectNumber];
-		if (object.waterCreature)
+		int roomNumberAtPos = GetPointCollision(item).GetRoomNumber();
+		bool isWater = TestEnvironment(ENV_FLAG_WATER, roomNumberAtPos);
+		bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, roomNumberAtPos);
+
+		// Get sound environment for sound effect.
+		auto soundEnv = std::optional<SoundEnvironment>();
+		switch (_envCondition)
 		{
-			SoundEffect(SoundID, &item.Pose, TestEnvironment(ENV_FLAG_WATER, &item) ? SoundEnvironment::Water : SoundEnvironment::Land);
-			return;
+		case SoundEffectEnvCondition::Always:
+			soundEnv = SoundEnvironment::Always;
+			break;
+
+		case SoundEffectEnvCondition::Land:
+			if (!isWater && !isSwamp)
+				soundEnv = SoundEnvironment::Land;
+
+			break;
+
+		case SoundEffectEnvCondition::ShallowWater:
+			if (isWater)
+			{
+				// HACK: Must update assets before removing this exception for water creatures.
+				const auto& object = Objects[item.ObjectNumber];
+				soundEnv = object.waterCreature ? SoundEnvironment::Underwater : SoundEnvironment::ShallowWater;
+			}
+
+			break;
+
+		case SoundEffectEnvCondition::Quicksand:
+			if (isSwamp)
+				soundEnv = SoundEnvironment::Swamp;
+
+			break;
+
+		case SoundEffectEnvCondition::Underwater:
+			if (isWater || isSwamp)
+				soundEnv = SoundEnvironment::Underwater;
+
+			break;
 		}
 
-		if (item.IsLara())
-		{
-			const auto& player = GetLaraInfo(item);	
-			if (EnvCondition == SoundEffectEnvCondition::Always ||
-				(EnvCondition == SoundEffectEnvCondition::Land && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
-				(EnvCondition == SoundEffectEnvCondition::ShallowWater && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
-			{
-				SoundEffect(SoundID, &item.Pose, SoundEnvironment::Always);
-			}
-		}
-		else
-		{
-			if (item.RoomNumber == NO_VALUE)
-			{
-				SoundEffect(SoundID, &item.Pose, SoundEnvironment::Always);
-			}
-			else if (TestEnvironment(ENV_FLAG_WATER, &item))
-			{
-				if (EnvCondition == SoundEffectEnvCondition::Always ||
-					(EnvCondition == SoundEffectEnvCondition::ShallowWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
-				{
-					SoundEffect(SoundID, &item.Pose, SoundEnvironment::Always);
-				}
-			}
-			else if (EnvCondition == SoundEffectEnvCondition::Always ||
-				(EnvCondition == SoundEffectEnvCondition::Land && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
-			{
-				SoundEffect(SoundID, &item.Pose, SoundEnvironment::Always);
-			}
-		}
+		if (soundEnv.has_value())
+			SoundEffect(_soundID, &item.Pose, *soundEnv);
 	}
 
 	void FlipEffectCommand::Execute(ItemInfo& item, bool isFrameBased) const
 	{
-		if (!isFrameBased || item.Animation.FrameNumber != FrameNumber)
+		if (!isFrameBased || item.Animation.FrameNumber != _frameNumber)
 			return;
 
-		int flipEffectID = FlipEffectID & 0x3FFF; // Bits 1-14.
+		int flipEffectID = _flipEffectID & 0x3FFF; // Bits 1-14.
 		DoFlipEffect(flipEffectID, &item);
 	}
 }
