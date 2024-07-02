@@ -384,9 +384,9 @@ void LoadObjects()
 			anim.EndFrameNumber = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
+			anim.Interpolation = ReadInt32();
 			anim.BlendFrameDuration = ReadInt32();
 			anim.BlendType = (AnimBlendType)ReadInt32();
-			anim.Interpolation = ReadInt32();
 			anim.VelocityStart = ReadVector3();
 			anim.VelocityEnd = ReadVector3();
 
