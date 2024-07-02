@@ -381,10 +381,10 @@ void LoadObjects()
 		for (auto& anim : object.Animations)
 		{
 			anim.StateID = ReadInt32();
+			anim.Interpolation = ReadInt32();
 			anim.EndFrameNumber = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
-			anim.Interpolation = ReadInt32();
 			anim.BlendFrameDuration = ReadInt32();
 			anim.BlendType = (AnimBlendType)ReadInt32();
 			anim.VelocityStart = ReadVector3();

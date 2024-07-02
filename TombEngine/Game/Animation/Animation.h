@@ -58,10 +58,10 @@ namespace TEN::Animation
 		using AnimCommandPtr = std::unique_ptr<AnimCommand>;
 		
 		int			  StateID			 = 0;
+		int			  Interpolation		 = 0;
 		int			  EndFrameNumber	 = 0;
 		int			  NextAnimNumber	 = 0;
 		int			  NextFrameNumber	 = 0;
-		int			  Interpolation		 = 0;
 		int			  BlendFrameDuration = 0;
 		AnimBlendType BlendType			 = AnimBlendType::Linear;
 
