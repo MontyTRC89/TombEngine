@@ -11,11 +11,6 @@ namespace TEN::Math
 		return (((1.0f - alpha) * value0) + (alpha * value1));
 	}
 
-	float Smoothstep(float alpha)
-	{
-		return Smoothstep(0.0f, 1.0f, alpha);
-	}
-
 	float Smoothstep(float value0, float value1, float alpha)
 	{
 		alpha = std::clamp(alpha, value0, value1);
@@ -25,6 +20,11 @@ namespace TEN::Math
 
 		// Evaluate polynomial.
 		return (CUBE(alpha) * (alpha * ((alpha * 6) - 15) + 10));
+	}
+
+	float Smoothstep(float alpha)
+	{
+		return Smoothstep(0.0f, 1.0f, alpha);
 	}
 
 	float EaseInSine(float value0, float value1, float alpha)
