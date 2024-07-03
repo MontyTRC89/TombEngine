@@ -1081,7 +1081,7 @@ static PlayerLimbRotationData SolvePlayerLegIK(const ItemInfo& item, const Playe
 	auto end = Geometry::TranslatePoint(middle, dir, length1);
 
 	// Clamp end point to floor.
-	int floorHeight = GetCollision(pos2.x, pos2.y, pos2.z, item.RoomNumber).Position.Floor - heelHeight;
+	int floorHeight = GetPointCollision(pos2, item.RoomNumber).GetFloorHeight()  - heelHeight;
 	if (end.y > floorHeight)
 		end.y = floorHeight;
 
@@ -1095,12 +1095,12 @@ static PlayerLimbRotationData SolvePlayerLegIK(const ItemInfo& item, const Playe
 	// Debug
 	if (true)
 	{
-		g_Renderer.AddDebugSphere(pole, 25, Vector4::One);
-		g_Renderer.AddDebugSphere(ik3DSol.Base, 50, Vector4::One);
-		g_Renderer.AddDebugSphere(ik3DSol.Middle, 50, Vector4::One);
-		g_Renderer.AddDebugSphere(ik3DSol.End, 50, Vector4::One);
-		g_Renderer.AddDebugLine(ik3DSol.Base, ik3DSol.Middle, Vector4::One);
-		g_Renderer.AddDebugLine(ik3DSol.Middle, ik3DSol.End, Vector4::One);
+		DrawDebugSphere(pole, 25, Vector4::One);
+		DrawDebugSphere(ik3DSol.Base, 50, Vector4::One);
+		DrawDebugSphere(ik3DSol.Middle, 50, Vector4::One);
+		DrawDebugSphere(ik3DSol.End, 50, Vector4::One);
+		DrawDebugLine(ik3DSol.Base, ik3DSol.Middle, Vector4::One);
+		DrawDebugLine(ik3DSol.Middle, ik3DSol.End, Vector4::One);
 
 		auto refBase = ik3DSol.Base;
 		refBase = Geometry::TranslatePoint(refBase, item.Pose.Orientation.y, BLOCK(0.5f));
@@ -1111,8 +1111,8 @@ static PlayerLimbRotationData SolvePlayerLegIK(const ItemInfo& item, const Playe
 		auto middleDir = middleOrient.ToDirection();
 		auto refEnd = Geometry::TranslatePoint(refMiddle, middleDir, length1);
 
-		g_Renderer.AddDebugLine(refBase, refMiddle, Vector4::One);
-		g_Renderer.AddDebugLine(refMiddle, refEnd, Vector4::One);
+		DrawDebugLine(refBase, refMiddle, Vector4::One);
+		DrawDebugLine(refMiddle, refEnd, Vector4::One);
 	}
 
 	return limbRot;
@@ -1138,23 +1138,23 @@ void HandlePlayerLegIK(ItemInfo& item)
 	auto rFootPos = GetJointPosition(&item, LM_RFOOT);
 
 	// Get point collision.
-	auto lPointColl = GetCollision(lFootPos.x, lFootPos.y, lFootPos.z, item.RoomNumber);
-	auto rPointColl = GetCollision(rFootPos.x, rFootPos.y, rFootPos.z, item.RoomNumber);
+	auto lPointColl = GetPointCollision(lFootPos, item.RoomNumber);
+	auto rPointColl = GetPointCollision(rFootPos, item.RoomNumber);
 
 	// Get height values.
 	int vPos = item.Pose.Position.y;
 	int vPosVisual = vPos + player.VerticalOffset;
-	int lFloorHeight = lPointColl.Position.Floor;
-	int rFloorHeight = rPointColl.Position.Floor;
+	int lFloorHeight = lPointColl.GetFloorHeight();
+	int rFloorHeight = rPointColl.GetFloorHeight();
 
 	// Determine enquiries.
 	bool isUpright			   = ((vPosVisual - hipsPos.y) >= (LARA_HEIGHT * UPRIGHT_COEFF));
-	bool isLeftFloorSteppable  = (!lPointColl.Position.FloorSlope && !lPointColl.BottomBlock->Flags.Death);
-	bool isRightFloorSteppable = (!rPointColl.Position.FloorSlope && !rPointColl.BottomBlock->Flags.Death);
+	bool isLeftFloorSteppable  = (!lPointColl.IsSteepFloor()  && !lPointColl.GetBottomSector().Flags.Death);
+	bool isRightFloorSteppable = (!rPointColl.IsSteepFloor() && !rPointColl.GetBottomSector().Flags.Death);
 
 	// Solve foot roll.
-	player.JointRot.LeftLeg.End = GetPlayerFootRoll(item, player.JointRot.LeftLeg, lPointColl.FloorNormal, lFootPos.y - lFloorHeight, HEEL_HEIGHT, ALPHA);
-	player.JointRot.RightLeg.End = GetPlayerFootRoll(item, player.JointRot.RightLeg, rPointColl.FloorNormal, rFootPos.y - rFloorHeight, HEEL_HEIGHT, ALPHA);
+	player.JointRot.LeftLeg.End = GetPlayerFootRoll(item, player.JointRot.LeftLeg, lPointColl.GetFloorNormal(), lFootPos.y - lFloorHeight, HEEL_HEIGHT, ALPHA);
+	player.JointRot.RightLeg.End = GetPlayerFootRoll(item, player.JointRot.RightLeg, rPointColl.GetFloorNormal(), rFootPos.y - rFloorHeight, HEEL_HEIGHT, ALPHA);
 
 	// Solve IK.
 	if (lFloorHeight != rFloorHeight)
