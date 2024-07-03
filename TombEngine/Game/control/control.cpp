@@ -44,11 +44,13 @@
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/LaserBeam.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -74,8 +76,10 @@ using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Streamer;
+using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::Traps;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
@@ -83,7 +87,6 @@ using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using namespace TEN::Traps::TR5;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -159,6 +162,9 @@ GameStatus ControlPhase(int numFrames)
 		g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
 		HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
 
+		// Clear last selected item in inventory (need to be after on loop event handling, so they can detect that).
+		g_Gui.CancelInventorySelection();
+
 		// Control lock is processed after handling scripts, because builder may want to
 		// process input externally, while still locking Lara from input.
 		if (!isTitle && Lara.Control.IsLocked)
@@ -231,6 +237,7 @@ GameStatus ControlPhase(int numFrames)
 		UpdateExplosionParticles();
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
+		UpdateFishSwarm();
 		UpdateLocusts();
 		UpdateUnderwaterBloodParticles();
 
@@ -430,6 +437,7 @@ void CleanUp()
 	ClearDrips();
 	ClearRipples();
 	ClearLaserBarrierEffects();
+	ClearLaserBeamEffects();
 	DisableSmokeParticles();
 	DisableSparkParticles();
 	DisableDebris();
@@ -496,8 +504,8 @@ void DeInitializeScripting(int levelIndex, GameStatus reason)
 
 void InitializeOrLoadGame(bool loadGame)
 {
-	g_Gui.SetInventoryItemChosen(NO_ITEM);
-	g_Gui.SetEnterInventory(NO_ITEM);
+	g_Gui.SetInventoryItemChosen(NO_VALUE);
+	g_Gui.SetEnterInventory(NO_VALUE);
 
 	// Restore the game?
 	if (loadGame)
@@ -657,7 +665,7 @@ GameStatus HandleMenuCalls(bool isTitle)
 		if (g_Gui.CallPause())
 			result = GameStatus::ExitToTitle;
 	}
-	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_ITEM) &&
+	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_VALUE) &&
 			 LaraItem->HitPoints > 0 && !Lara.Control.Look.IsUsingBinoculars)
 	{
 		if (g_Gui.CallInventory(LaraItem, true))
@@ -675,8 +683,8 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 GameStatus HandleGlobalInputEvents(bool isTitle)
 {
-	constexpr auto DEATH_NO_INPUT_TIMEOUT = 5 * FPS;
-	constexpr auto DEATH_INPUT_TIMEOUT	  = 10 * FPS;
+	constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
+	constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
 
 	if (isTitle)
 		return GameStatus::Normal;

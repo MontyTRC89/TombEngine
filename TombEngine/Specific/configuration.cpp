@@ -230,6 +230,7 @@ bool SaveConfiguration()
 
 	// Set Gameplay keys.
 	if (SetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, g_Configuration.EnableSubtitles) != ERROR_SUCCESS ||
+		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_MONKEY_JUMP, g_Configuration.EnableAutoMonkeySwingJump) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, g_Configuration.EnableAutoTargeting) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, g_Configuration.EnableTargetHighlighter) != ERROR_SUCCESS ||
 		SetBoolRegKey(gameplayKey, REGKEY_ENABLE_IK, g_Configuration.EnableIK) != ERROR_SUCCESS ||
@@ -323,6 +324,7 @@ void InitDefaultConfiguration()
 	g_Configuration.SfxVolume = 100;
 
 	g_Configuration.EnableSubtitles = true;
+	g_Configuration.EnableAutoMonkeySwingJump = false;
 	g_Configuration.EnableAutoTargeting = true;
 	g_Configuration.EnableTargetHighlighter = true;
 	g_Configuration.EnableIK = true;
@@ -421,6 +423,7 @@ bool LoadConfiguration()
 		return false;
 	}
 
+	bool enableAutoMonkeySwingJump = false;
 	bool enableSubtitles = true;
 	bool enableAutoTargeting = true;
 	bool enableTargetHighlighter = true;
@@ -429,7 +432,8 @@ bool LoadConfiguration()
 	bool enableThumbstickCamera = true;
 
 	// Load Gameplay keys.
-	if (GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS ||
+	if (GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_MONKEY_JUMP, &enableAutoMonkeySwingJump, true) != ERROR_SUCCESS ||
+		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_SUBTITLES, &enableSubtitles, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_AUTO_TARGETING, &enableAutoTargeting, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_TARGET_HIGHLIGHTER, &enableTargetHighlighter, true) != ERROR_SUCCESS ||
 		GetBoolRegKey(gameplayKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
@@ -511,11 +515,12 @@ bool LoadConfiguration()
 	g_Configuration.SfxVolume = sfxVolume;
 	g_Configuration.SoundDevice = soundDevice;
 
+	g_Configuration.EnableSubtitles = enableSubtitles;
+	g_Configuration.EnableAutoMonkeySwingJump = enableAutoMonkeySwingJump;
 	g_Configuration.EnableAutoTargeting = enableAutoTargeting;
 	g_Configuration.EnableTargetHighlighter = enableTargetHighlighter;
 	g_Configuration.EnableRumble = enableRumble;
 	g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
-	g_Configuration.EnableSubtitles = enableSubtitles;
 
 	g_Configuration.MouseSensitivity = mouseSensitivity;
 	g_Configuration.MouseSmoothing = mouseSmoothing;

@@ -23,10 +23,12 @@
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Objects/Generic/puzzles_keys.h"
 #include "Objects/Sink.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
@@ -34,13 +36,13 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
-#include "Renderer/Renderer.h"
 
 using namespace flatbuffers;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
-using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Items;
+using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Gui;
@@ -849,6 +851,28 @@ const std::vector<byte> SaveGame::Build()
 	}
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
 
+	std::vector<flatbuffers::Offset<Save::FishData>> fishSwarm;
+	for (const auto& fish : FishSwarm)
+	{
+		Save::FishDataBuilder fishSave{ fbb };
+		fishSave.add_is_lethal(fish.IsLethal);
+		fishSave.add_is_patrolling(fish.IsPatrolling);
+		fishSave.add_leader_item_number((fish.LeaderItemPtr == nullptr) ? -1 : fish.LeaderItemPtr->Index);
+		fishSave.add_life(fish.Life);
+		fishSave.add_mesh_index(fish.MeshIndex);
+		fishSave.add_orientation(&FromEulerAngles(fish.Orientation));
+		fishSave.add_position(&FromVector3(fish.Position));
+		fishSave.add_position_target(&FromVector3(fish.PositionTarget));
+		fishSave.add_room_number(fish.RoomNumber);
+		fishSave.add_target_item_number((fish.TargetItemPtr == nullptr) ? -1 : fish.TargetItemPtr->Index);
+		fishSave.add_undulation(fish.Undulation);
+		fishSave.add_velocity(fish.Velocity);
+
+		auto fishSaveOffset = fishSave.Finish();
+		fishSwarm.push_back(fishSaveOffset);
+	}
+	auto fishSwarmOffset = fbb.CreateVector(fishSwarm);
+
 	// TODO: In future, we should save only active FX, not whole array.
 	// This may come together with Monty's branch merge -- Lwmte, 10.07.22
 
@@ -981,7 +1005,7 @@ const std::vector<byte> SaveGame::Build()
 			{
 				auto& entry = currVolume.StateQueue[k];
 
-				int activator = NO_ITEM;
+				int activator = NO_VALUE;
 				if (std::holds_alternative<short>(entry.Activator))
 					activator = std::get<short>(entry.Activator);
 				else
@@ -1384,6 +1408,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_next_item_free(NextItemFree);
 	sgb.add_next_item_active(NextItemActive);
 	sgb.add_items(serializedItemsOffset);
+	sgb.add_fish_swarm(fishSwarmOffset);
 	sgb.add_fxinfos(serializedEffectsOffset);
 	sgb.add_next_fx_free(NextFxFree);
 	sgb.add_next_fx_active(NextFxActive);
@@ -1985,12 +2010,35 @@ static void ParseEffects(const Save::SaveGame* s)
 	// Restore soundtracks.
 	for (int i = 0; i < s->soundtracks()->size(); i++)
 	{
-		assertion(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
+		TENAssert(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
 
 		auto track = s->soundtracks()->Get(i);
 		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position());
 	}
 
+	// Load fish swarm.
+	for (int i = 0; i < s->fish_swarm()->size(); i++)
+	{
+		const auto& fishSave = s->fish_swarm()->Get(i);
+		auto fish = FishData{};
+
+		fish.IsLethal = fishSave->is_lethal();
+		fish.IsPatrolling = fishSave->is_patrolling();
+		fish.LeaderItemPtr = (fishSave->leader_item_number() == -1) ? nullptr : &g_Level.Items[fishSave->leader_item_number()];
+		fish.Life = fishSave->life();
+		fish.MeshIndex = fishSave->mesh_index();
+		fish.Orientation = ToEulerAngles(fishSave->orientation());
+		fish.Position = ToVector3(fishSave->position());
+		fish.PositionTarget = ToVector3(fishSave->position_target());
+		fish.RoomNumber = fishSave->room_number();
+		fish.TargetItemPtr = (fishSave->target_item_number() == -1) ? nullptr : &g_Level.Items[fishSave->target_item_number()];
+		fish.Undulation = fishSave->undulation();
+		fish.Velocity = fishSave->velocity();
+
+		FishSwarm.push_back(fish);
+	}
+
+	// Load particles.
 	for (int i = 0; i < s->particles()->size(); i++)
 	{
 		auto* particleInfo = s->particles()->Get(i);
@@ -2180,7 +2228,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 	// Restore action queue.
 	for (int i = 0; i < s->action_queue()->size(); i++)
 	{
-		assertion(i < ActionQueue.size(), "Action queue size was changed");
+		TENAssert(i < ActionQueue.size(), "Action queue size was changed");
 		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
 	}
 
@@ -2297,7 +2345,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		item->Active = savedItem->active();
 		item->HitStatus = savedItem->hit_stauts();
-		item->Status = savedItem->status();
+		item->Status = (ItemStatus)savedItem->status();
 		item->AIBits = savedItem->ai_bits();
 		item->Animation.IsAirborne = savedItem->is_airborne();
 		item->Collidable = savedItem->collidable();

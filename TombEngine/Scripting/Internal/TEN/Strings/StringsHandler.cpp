@@ -16,7 +16,7 @@ Display strings.
 StringsHandler::StringsHandler(sol::state* lua, sol::table& parent) :
 	LuaHandler(lua)
 {
-	auto table = sol::table(m_lua->lua_state(), sol::create);
+	auto table = sol::table(_lua->lua_state(), sol::create);
 	parent.set(ScriptReserved_Strings, table);
 
 /***
@@ -27,6 +27,10 @@ Show some text on-screen.
 If not given, the string will have an "infinite" life, and will show
 until @{HideString} is called or until the level is finished.
 Default: nil (i.e. infinite)
+@tparam bool autoDelete should be string automatically deleted after timeout is reached.
+If not given, the string will remain allocated even after timeout is reached, and can be
+shown again without re-initialization.
+Default: false
 */
 	table.set_function(ScriptReserved_ShowString, &StringsHandler::ShowString, this);
 
@@ -36,7 +40,7 @@ Hide some on-screen text.
 @tparam DisplayString str the string object to hide. Must previously have been shown
 with a call to @{ShowString}, or this function will have no effect.
 */
-	table.set_function(ScriptReserved_HideString, [this](const DisplayString& string) { ShowString(string, 0.0f); });
+	table.set_function(ScriptReserved_HideString, [this](const DisplayString& string) { ShowString(string, 0.0f, false); });
 
 /***
 Checks if the string is shown
@@ -84,11 +88,12 @@ bool StringsHandler::SetDisplayString(DisplayStringID id, const UserDisplayStrin
 	return m_userDisplayStrings.insert_or_assign(id, displayString).second;
 }
 
-void StringsHandler::ShowString(const DisplayString& str, sol::optional<float> numSeconds)
+void StringsHandler::ShowString(const DisplayString& str, sol::optional<float> numSeconds, sol::optional<bool> autoDelete)
 {
 	auto it = m_userDisplayStrings.find(str.GetID());
 	it->second._timeRemaining = numSeconds.value_or(0.0f);
 	it->second._isInfinite = !numSeconds.has_value();
+	it->second._deleteWhenZero = autoDelete.value_or(false);
 }
 
 bool StringsHandler::IsStringDisplaying(const DisplayString& displayString)

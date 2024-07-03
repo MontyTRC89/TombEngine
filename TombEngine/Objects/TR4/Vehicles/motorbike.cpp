@@ -5,6 +5,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
@@ -23,6 +24,7 @@
 #include "Specific/level.h"
 
 using std::vector;
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
 
@@ -158,7 +160,7 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(motorbikeItem, laraItem, coll, MotorbikeMountTypes, MOTORBIKE_MOUNT_DISTANCE);
@@ -188,7 +190,7 @@ namespace TEN::Entities::Vehicles
 			/*if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
 				SetAnimation(*laraItem, ID_MOTORBIKE_LARA_ANIMS, MOTORBIKE_ANIM_UNLOCK);
-				g_Gui.SetInventoryItemChosen(NO_ITEM);
+				g_Gui.SetInventoryItemChosen(NO_VALUE);
 				motorbike->Flags |= MOTORBIKE_FLAG_NITRO;
 			}
 			else
@@ -259,7 +261,7 @@ namespace TEN::Entities::Vehicles
 			x = 0;
 			z = 0;
 
-			int floorHeight = GetCollision(old->x, pos->y, pos->z, motorbikeItem->RoomNumber).Position.Floor;
+			int floorHeight = GetPointCollision(Vector3i(old->x, pos->y, pos->z), motorbikeItem->RoomNumber).GetFloorHeight();
 			if (floorHeight < (old->y - CLICK(1)))
 			{
 				if (pos->z > old->z)
@@ -268,7 +270,7 @@ namespace TEN::Entities::Vehicles
 					z = BLOCK(1) - shiftZ;
 			}
 
-			floorHeight = GetCollision(pos->x, pos->y, old->z, motorbikeItem->RoomNumber).Position.Floor;
+			floorHeight = GetPointCollision(Vector3i(pos->x, pos->y, old->z), motorbikeItem->RoomNumber).GetFloorHeight();
 			if (floorHeight < (old->y - CLICK(1)))
 			{
 				if (pos->x > old->x)
@@ -398,7 +400,7 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Context.Vehicle == NO_ITEM)
+		if (lara->Context.Vehicle == NO_VALUE)
 			return;
 
 		if (laraItem->Animation.ActiveState != MOTORBIKE_STATE_MOUNT && laraItem->Animation.ActiveState != MOTORBIKE_STATE_DISMOUNT)
@@ -430,7 +432,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (lara->Context.Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_VALUE)
 		{
 			auto* item = &g_Level.Items[lara->Context.Vehicle];
 
@@ -606,7 +608,7 @@ namespace TEN::Entities::Vehicles
 				motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y;
 		}
 
-		floorHeight = GetCollision(motorbikeItem).Position.Floor;
+		floorHeight = GetPointCollision(*motorbikeItem).GetFloorHeight();
 		if (motorbikeItem->Pose.Position.y >= floorHeight)
 			speed = motorbikeItem->Animation.Velocity.z * phd_cos(motorbikeItem->Pose.Orientation.x);
 		else
@@ -702,7 +704,7 @@ namespace TEN::Entities::Vehicles
 		if (rot1)
 			rot2 = rot1;
 
-		floorHeight = GetCollision(motorbikeItem).Position.Floor;
+		floorHeight = GetPointCollision(*motorbikeItem).GetFloorHeight();
 		if (floorHeight < (motorbikeItem->Pose.Position.y - CLICK(1)))
 			DoMotorbikeShift(motorbikeItem, (Vector3i*)&motorbikeItem->Pose, &oldPos);
 
@@ -745,18 +747,18 @@ namespace TEN::Entities::Vehicles
 		auto* lara = GetLaraInfo(laraItem);
 
 		short angle = motorbikeItem->Pose.Orientation.y + ANGLE(90.0f);
-		auto collResult = GetCollision(motorbikeItem, angle, MOTORBIKE_RADIUS);
+		auto collResult = GetPointCollision(*motorbikeItem, angle, MOTORBIKE_RADIUS);
 
-		if (collResult.Position.FloorSlope || collResult.Position.Floor == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
+		if (collResult.IsSteepFloor() || collResult.GetFloorHeight() == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
 			return false;
 
-		if (abs(collResult.Position.Floor - motorbikeItem->Pose.Position.y) > CLICK(1))
+		if (abs(collResult.GetFloorHeight() - motorbikeItem->Pose.Position.y) > CLICK(1))
 			return false;
 
-		if ((collResult.Position.Ceiling - motorbikeItem->Pose.Position.y) > -LARA_HEIGHT)
+		if ((collResult.GetCeilingHeight() - motorbikeItem->Pose.Position.y) > -LARA_HEIGHT)
 			return false;
 
-		if ((collResult.Position.Floor - collResult.Position.Ceiling) < LARA_HEIGHT)
+		if ((collResult.GetFloorHeight() - collResult.GetCeilingHeight()) < LARA_HEIGHT)
 			return false;
 
 		return true;
@@ -1162,7 +1164,7 @@ namespace TEN::Entities::Vehicles
 		int heightFrontRight = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), true, &frontRight);
 		int heightFrontMiddle = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, 0, true, &frontMiddle);
 
-		auto probe = GetCollision(motorbikeItem);
+		auto probe = GetPointCollision(*motorbikeItem);
 
 		TestTriggers(motorbikeItem, true);
 		TestTriggers(motorbikeItem, false);
@@ -1187,7 +1189,7 @@ namespace TEN::Entities::Vehicles
 			DrawMotorbikeLight(motorbikeItem);
 			motorbikeItem->MeshBits.Set(MotorbikeHeadLightJoints);
 
-			drive = MotorbikeUserControl(motorbikeItem, laraItem, probe.Position.Floor, &pitch);
+			drive = MotorbikeUserControl(motorbikeItem, laraItem, probe.GetFloorHeight(), &pitch);
 			HandleVehicleSpeedometer(motorbikeItem->Animation.Velocity.z, MOTORBIKE_ACCEL_MAX / (float)VEHICLE_VELOCITY_SCALE);
 		}
 		else
@@ -1224,14 +1226,14 @@ namespace TEN::Entities::Vehicles
 		if (motorbike->Velocity < MOTORBIKE_ACCEL_1)
 			DrawMotorBikeSmoke(motorbikeItem, laraItem);
 
-		motorbikeItem->Floor = probe.Position.Floor;
+		motorbikeItem->Floor = probe.GetFloorHeight();
 
 		int rotation = motorbike->Velocity / 4;
 		motorbike->LeftWheelRotation -= rotation;
 		motorbike->RightWheelsRotation -= rotation;
 
 		int newY = motorbikeItem->Pose.Position.y;
-		motorbikeItem->Animation.Velocity.y = DoMotorBikeDynamics(probe.Position.Floor, motorbikeItem->Animation.Velocity.y, &motorbikeItem->Pose.Position.y, 0);
+		motorbikeItem->Animation.Velocity.y = DoMotorBikeDynamics(probe.GetFloorHeight(), motorbikeItem->Animation.Velocity.y, &motorbikeItem->Pose.Position.y, 0);
 		motorbike->Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike->Velocity, MOTORBIKE_RADIUS, &motorbike->TurnRate, MOTORBIKE_WAKE_OFFSET);
 
 		int r1 = (frontRight.y + frontLeft.y) / 2;
@@ -1265,10 +1267,10 @@ namespace TEN::Entities::Vehicles
 		motorbikeItem->Pose.Orientation.x += (xRot - motorbikeItem->Pose.Orientation.x) / 4;
 		motorbikeItem->Pose.Orientation.z += (zRot - motorbikeItem->Pose.Orientation.z) / 4;
 
-		if (probe.RoomNumber != motorbikeItem->RoomNumber)
+		if (probe.GetRoomNumber() != motorbikeItem->RoomNumber)
 		{
-			ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-			ItemNewRoom(laraItem->Index, probe.RoomNumber);
+			ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
+			ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 		}
 
 		laraItem->Pose = motorbikeItem->Pose;

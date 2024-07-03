@@ -33,6 +33,7 @@ constexpr auto REGKEY_SFX_VOLUME	= "SfxVolume";
 
 // Gameplay keys
 constexpr auto REGKEY_ENABLE_SUBTITLES			= "EnableSubtitles";
+constexpr auto REGKEY_ENABLE_AUTO_MONKEY_JUMP	= "EnableAutoMonkeySwingJump";
 constexpr auto REGKEY_ENABLE_AUTO_TARGETING		= "EnableAutoTargeting";
 constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER = "EnableTargetHighlighter";
 constexpr auto REGKEY_ENABLE_IK					= "EnableIK";
@@ -70,6 +71,7 @@ struct GameConfiguration
 
 	// Gameplay
 	bool EnableSubtitles		 = false;
+	bool EnableAutoMonkeySwingJump	 = false;
 	bool EnableAutoTargeting	 = false;
 	bool EnableTargetHighlighter = false;
 	bool EnableIK				= false;

@@ -6,6 +6,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/control/control.h"
+#include "Game/control/volume.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
@@ -885,7 +886,9 @@ namespace TEN::Gui
 			Reverb,
 			MusicVolume,
 			SfxVolume,
+
 			Subtitles,
+			AutoMonkeySwingJump,
 			AutoTargeting,
 			TargetHighlighter,
 			IK,
@@ -895,12 +898,12 @@ namespace TEN::Gui
 			MouseSmoothing,
 
 			Apply,
-			Cancel
+			Cancel,
+
+			Count
 		};
 
-		static const auto numOtherSettingsOptions = 12;
-
-		OptionCount = numOtherSettingsOptions;
+		OptionCount = (int)OtherSettingsOption::Count - 1;
 
 		if (GuiIsDeselected())
 		{
@@ -923,6 +926,11 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.EnableReverb = !CurrentSettings.Configuration.EnableReverb;
 				break;
 
+			case OtherSettingsOption::AutoMonkeySwingJump:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableAutoMonkeySwingJump = !CurrentSettings.Configuration.EnableAutoMonkeySwingJump;
+				break;
+				
 			case OtherSettingsOption::Subtitles:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
@@ -1553,7 +1561,7 @@ namespace TEN::Gui
 		Rings[(int)RingTypes::Inventory].NumObjectsInList = 0;
 
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-			Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem = NO_ITEM;
+			Rings[(int)RingTypes::Inventory].CurrentObjectList[i].InventoryItem = NO_VALUE;
 
 		Ammo.CurrentPistolsAmmoType = 0;
 		Ammo.CurrentUziAmmoType = 0;
@@ -1789,7 +1797,7 @@ namespace TEN::Gui
 		Rings[(int)RingTypes::Ammo].NumObjectsInList = 0;
 
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-			Rings[(int)RingTypes::Ammo].CurrentObjectList[i].InventoryItem = NO_ITEM;
+			Rings[(int)RingTypes::Ammo].CurrentObjectList[i].InventoryItem = NO_VALUE;
 
 		if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
 		{
@@ -1872,7 +1880,7 @@ namespace TEN::Gui
 	{
 		g_Gui.SetMenuToDisplay(Menu::Title);
 		g_Gui.SetSelectedOption(0);
-		g_Gui.SetLastInventoryItem(NO_ITEM);
+		g_Gui.SetLastInventoryItem(NO_VALUE);
 	}
 
 	void GuiController::InitializeInventory(ItemInfo* item)
@@ -1881,8 +1889,8 @@ namespace TEN::Gui
 
 		AlterFOV(ANGLE(DEFAULT_FOV), false);
 		lara->Inventory.IsBusy = false;
-		InventoryItemChosen = NO_ITEM;
-		UseItem = false;
+		InventoryItemChosen = NO_VALUE;
+		ItemUsed = false;
 
 		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].HasInfinite())
 		{
@@ -1918,9 +1926,9 @@ namespace TEN::Gui
 		Ammo.AmountGrenadeAmmo3 = lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].GetCount();
 		ConstructObjectList(item);
 
-		if (EnterInventory == NO_ITEM)
+		if (EnterInventory == NO_VALUE)
 		{
-			if (LastInvItem != NO_ITEM)
+			if (LastInvItem != NO_VALUE)
 			{
 				if (IsItemInInventory(LastInvItem))
 				{
@@ -1952,7 +1960,7 @@ namespace TEN::Gui
 					}
 					else
 					{
-						LastInvItem = NO_ITEM;
+						LastInvItem = NO_VALUE;
 					}
 				}
 			}
@@ -2036,16 +2044,16 @@ namespace TEN::Gui
 		}
 	}
 
-	void GuiController::UseCurrentItem(ItemInfo* item)
+	void GuiController::UseItem(ItemInfo& item, int objectNumber)
 	{
-		const std::vector<int> CrouchStates =
+		const auto CROUCH_STATES = std::vector<int>
 		{
 			LS_CROUCH_IDLE,
 			LS_CROUCH_TURN_LEFT,
 			LS_CROUCH_TURN_RIGHT,
 			LS_CROUCH_TURN_180
 		};
-		const std::vector<int> CrawlStates =
+		const auto CRAWL_STATES = std::vector<int>
 		{
 			LS_CRAWL_IDLE,
 			LS_CRAWL_FORWARD,
@@ -2056,265 +2064,232 @@ namespace TEN::Gui
 			LS_CRAWL_TO_HANG
 		};
 
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(item);
 
-		int prevOpticRange = lara->Control.Look.OpticRange;
-		short inventoryObject = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
-		short gameObject = InventoryObjectTable[inventoryObject].ObjectNumber;
+		short prevOpticRange = player.Control.Look.OpticRange;
+		player.Control.Look.OpticRange = 0;
+		player.Inventory.OldBusy = false;
+		item.MeshBits = ALL_JOINT_BITS;
 
-		item->MeshBits = ALL_JOINT_BITS;
-		lara->Control.Look.OpticRange = 0;
-		lara->Inventory.OldBusy = false;
+		InventoryItemChosen = objectNumber;
 
-		if (lara->Control.WaterStatus == WaterStatus::Dry ||
-			lara->Control.WaterStatus == WaterStatus::Wade)
+		// Use item event handling.
+		g_GameScript->OnUseItem((GAME_OBJECT_ID)InventoryItemChosen);
+		HandleAllGlobalEvents(EventType::UseItem, (Activator)item.Index);
+
+		// Quickly discard further processing if chosen item was reset in script.
+		if (InventoryItemChosen == NO_VALUE)
+			return;
+
+		if (InventoryItemChosen == ID_PISTOLS_ITEM ||
+			InventoryItemChosen == ID_UZI_ITEM ||
+			InventoryItemChosen == ID_REVOLVER_ITEM)
 		{
-			if (gameObject == ID_PISTOLS_ITEM)
+			if (player.Control.WaterStatus != WaterStatus::Dry &&
+				player.Control.WaterStatus != WaterStatus::Wade)
 			{
-				lara->Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
-
-				if (lara->Control.HandStatus != HandStatus::Free)
-					return;
-
-				if (lara->Control.Weapon.GunType == LaraWeaponType::Pistol)
-					lara->Control.HandStatus = HandStatus::WeaponDraw;
-
 				return;
 			}
 
-			if (gameObject == ID_UZI_ITEM)
+			switch (InventoryItemChosen)
 			{
-				lara->Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+				case ID_PISTOLS_ITEM:
+					player.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
+					break;
 
-				if (lara->Control.HandStatus != HandStatus::Free)
+				case ID_UZI_ITEM:
+					player.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+					break;
+
+				case ID_REVOLVER_ITEM:
+					player.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+					break;
+
+				default:
 					return;
-
-				if (lara->Control.Weapon.GunType == LaraWeaponType::Uzi)
-					lara->Control.HandStatus = HandStatus::WeaponDraw;
-
-				return;
 			}
+
+			if (player.Control.HandStatus == HandStatus::Free &&
+				player.Control.Weapon.GunType == player.Control.Weapon.RequestGunType)
+			{
+				player.Control.HandStatus = HandStatus::WeaponDraw;
+			}
+			
+			InventoryItemChosen = NO_VALUE;
+			return;
 		}
 
-		if (gameObject != ID_SHOTGUN_ITEM &&
-			gameObject != ID_REVOLVER_ITEM &&
-			gameObject != ID_HK_ITEM &&
-			gameObject != ID_CROSSBOW_ITEM &&
-			gameObject != ID_GRENADE_GUN_ITEM &&
-			gameObject != ID_ROCKET_LAUNCHER_ITEM &&
-			gameObject != ID_HARPOON_ITEM)
+		if (InventoryItemChosen == ID_SHOTGUN_ITEM ||
+			InventoryItemChosen == ID_HK_ITEM ||
+			InventoryItemChosen == ID_CROSSBOW_ITEM ||
+			InventoryItemChosen == ID_GRENADE_GUN_ITEM ||
+			InventoryItemChosen == ID_ROCKET_LAUNCHER_ITEM ||
+			InventoryItemChosen == ID_HARPOON_ITEM)
 		{
-			if (gameObject == ID_FLARE_INV_ITEM)
+			if (InventoryItemChosen != ID_HARPOON_ITEM &&
+				player.Control.WaterStatus != WaterStatus::Dry &&
+				player.Control.WaterStatus != WaterStatus::Wade)
 			{
-				if (lara->Control.HandStatus == HandStatus::Free)
-				{
-					if (!TestState(item->Animation.ActiveState, CrawlStates))
-					{
-						if (lara->Control.Weapon.GunType != LaraWeaponType::Flare)
-						{
-							// HACK.
-							ClearAllActions();
-							ActionMap[(int)In::Flare].Update(1.0f);
-
-							HandleWeapon(*item);
-							ClearAllActions();
-						}
-
-						return;
-					}
-				}
-
-				SayNo();
 				return;
 			}
 
-			switch (inventoryObject)
+			if (TestState(item.Animation.ActiveState, CROUCH_STATES) ||
+				TestState(item.Animation.ActiveState, CRAWL_STATES))
 			{
-			case INV_OBJECT_BINOCULARS:
-				if (((item->Animation.ActiveState == LS_IDLE && item->Animation.AnimNumber == LA_STAND_IDLE) ||
-						(lara->Control.IsLow && !IsHeld(In::Crouch))) &&
-					!UseSpotCam && !TrackCameraInit)
-				{
-					lara->Control.Look.OpticRange = 128;
-					lara->Control.Look.IsUsingBinoculars = true;
-					lara->Inventory.OldBusy = true;
-
-					// TODO: To prevent Lara from crouching or performing other actions, the inherent state of
-					// LA_BINOCULARS_IDLE must be changed to LS_IDLE. @Sezz 2022.05.19
-					//SetAnimation(item, LA_BINOCULARS_IDLE);
-
-					if (lara->Control.HandStatus != HandStatus::Free)
-						lara->Control.HandStatus = HandStatus::WeaponUndraw;
-				}
-
-				if (prevOpticRange)
-				{
-					lara->Control.Look.OpticRange = prevOpticRange;
-				}
-				else
-				{
-					BinocularOldCamera = Camera.oldType;
-				}
-
-				return;
-
-			case INV_OBJECT_SMALL_MEDIPACK:
-
-				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) &&
-					lara->Status.Poison == 0)
-				{
-					SayNo();
-					return;
-				}
-
-				if (lara->Inventory.TotalSmallMedipacks != 0)
-				{
-					if (lara->Inventory.TotalSmallMedipacks != -1)
-						lara->Inventory.TotalSmallMedipacks--;
-
-					lara->Status.Poison = 0;
-					item->HitPoints += LARA_HEALTH_MAX / 2;
-
-					if (item->HitPoints > LARA_HEALTH_MAX)
-						item->HitPoints = LARA_HEALTH_MAX;
-
-					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-					SaveGame::Statistics.Game.HealthUsed++;
-				}
-				else
-					SayNo();
-
-				return;
-
-			case INV_OBJECT_LARGE_MEDIPACK:
-
-				if ((item->HitPoints <= 0 || item->HitPoints >= LARA_HEALTH_MAX) &&
-					lara->Status.Poison == 0)
-				{
-					SayNo();
-					return;
-				}
-
-				if (lara->Inventory.TotalLargeMedipacks != 0)
-				{
-					if (lara->Inventory.TotalLargeMedipacks != -1)
-						lara->Inventory.TotalLargeMedipacks--;
-
-					lara->Status.Poison = 0;
-					item->HitPoints = LARA_HEALTH_MAX;
-
-					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-					SaveGame::Statistics.Game.HealthUsed++;
-				}
-				else
-					SayNo();
-
-				return;
-
-			default:
-				InventoryItemChosen = gameObject;
 				return;
 			}
 
+			switch (InventoryItemChosen)
+			{
+				case ID_SHOTGUN_ITEM:
+					player.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
+					break;
+
+				case ID_REVOLVER_ITEM:
+					player.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+					break;
+
+				case ID_HK_ITEM:
+					player.Control.Weapon.RequestGunType = LaraWeaponType::HK;
+					break;
+
+				case ID_CROSSBOW_ITEM:
+					player.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
+					break;
+
+				case ID_GRENADE_GUN_ITEM:
+					player.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
+					break;
+
+				case ID_HARPOON_ITEM:
+					player.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
+					break;
+
+				case ID_ROCKET_LAUNCHER_ITEM:
+					player.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+					break;
+
+				default:
+					return;
+			}
+
+			if (player.Control.HandStatus == HandStatus::Free &&
+				player.Control.Weapon.GunType == player.Control.Weapon.RequestGunType)
+			{
+				player.Control.HandStatus = HandStatus::WeaponDraw;
+			}
+
+			InventoryItemChosen = NO_VALUE;
 			return;
 		}
 
-		if (lara->Control.HandStatus == HandStatus::Busy)
+		switch (InventoryItemChosen)
 		{
-			SayNo();
-			return;
-		}
-
-		if (TestState(item->Animation.ActiveState, CrouchStates) ||
-			TestState(item->Animation.ActiveState, CrawlStates))
-		{
-			SayNo();
-			return;
-		}
-
-		if (gameObject == ID_SHOTGUN_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
-
-			if (lara->Control.HandStatus != HandStatus::Free)
+		case ID_FLARE_INV_ITEM:
+			if (player.Control.HandStatus != HandStatus::Free)
 				return;
 
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Shotgun)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
+			if (!TestState(item.Animation.ActiveState, CRAWL_STATES))
+			{
+				if (player.Control.Weapon.GunType != LaraWeaponType::Flare)
+				{
+					// HACK.
+					ClearAllActions();
+					ActionMap[(int)In::Flare].Update(1.0f);
 
+					HandleWeapon(item);
+					ClearAllActions();
+				}
+			}
+
+			InventoryItemChosen = NO_VALUE;
 			return;
-		}
 
-		if (gameObject == ID_REVOLVER_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+		case ID_BINOCULARS_ITEM:
+			if (((item.Animation.ActiveState == LS_IDLE && item.Animation.AnimNumber == LA_STAND_IDLE) ||
+				(player.Control.IsLow && !IsHeld(In::Crouch))) &&
+				!UseSpotCam && !TrackCameraInit)
+			{
+				player.Control.Look.OpticRange = ANGLE(0.7f);
+				player.Control.Look.IsUsingBinoculars = true;
+				player.Inventory.OldBusy = true;
 
-			if (lara->Control.HandStatus != HandStatus::Free)
-				return;
+				// TODO: To prevent Lara from crouching or performing other actions, the inherent state of
+				// LA_BINOCULARS_IDLE must be changed to LS_IDLE. @Sezz 2022.05.19
+				//SetAnimation(item, LA_BINOCULARS_IDLE);
 
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
+				if (player.Control.HandStatus != HandStatus::Free)
+					player.Control.HandStatus = HandStatus::WeaponUndraw;
+			}
 
+			if (prevOpticRange != ANGLE(0.0f))
+			{
+				player.Control.Look.OpticRange = prevOpticRange;
+			}
+			else
+			{
+				BinocularOldCamera = Camera.oldType;
+			}
+
+			InventoryItemChosen = NO_VALUE;
 			return;
-		}
-		else if (gameObject == ID_HK_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::HK;
 
-			if (lara->Control.HandStatus != HandStatus::Free)
+		case ID_SMALLMEDI_ITEM:
+			if ((item.HitPoints <= 0 || item.HitPoints >= LARA_HEALTH_MAX) &&
+				player.Status.Poison == 0)
+			{
 				return;
+			}
 
-			if (lara->Control.Weapon.GunType == LaraWeaponType::HK)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
+			if (player.Inventory.TotalSmallMedipacks != 0)
+			{
+				if (player.Inventory.TotalSmallMedipacks != NO_VALUE)
+					player.Inventory.TotalSmallMedipacks--;
 
+				player.Status.Poison = 0;
+				item.HitPoints += LARA_HEALTH_MAX / 2;
+
+				if (item.HitPoints > LARA_HEALTH_MAX)
+					item.HitPoints = LARA_HEALTH_MAX;
+
+				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+				SaveGame::Statistics.Game.HealthUsed++;
+			}
+			else
+			{
+				return;
+			}
+
+			InventoryItemChosen = NO_VALUE;
 			return;
-		}
-		else if (gameObject == ID_CROSSBOW_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
 
-			if (lara->Control.HandStatus != HandStatus::Free)
+		case ID_BIGMEDI_ITEM:
+			if ((item.HitPoints <= 0 || item.HitPoints >= LARA_HEALTH_MAX) &&
+				player.Status.Poison == 0)
+			{
 				return;
+			}
 
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
+			if (player.Inventory.TotalLargeMedipacks != 0)
+			{
+				if (player.Inventory.TotalLargeMedipacks != NO_VALUE)
+					player.Inventory.TotalLargeMedipacks--;
 
+				player.Status.Poison = 0;
+				item.HitPoints = LARA_HEALTH_MAX;
+
+				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+				SaveGame::Statistics.Game.HealthUsed++;
+			}
+			else
+			{
+				return;
+			}
+
+			InventoryItemChosen = NO_VALUE;
 			return;
-		}
-		else if (gameObject == ID_GRENADE_GUN_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
-			if (lara->Control.HandStatus != HandStatus::Free)
-				return;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::GrenadeLauncher)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
-
-			return;
-		}
-		else if (gameObject == ID_HARPOON_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
-
-			if (lara->Control.HandStatus != HandStatus::Free)
-				return;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::HarpoonGun)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
-
-			return;
-		}
-		else if (gameObject == ID_ROCKET_LAUNCHER_ITEM)
-		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
-
-			if (lara->Control.HandStatus != HandStatus::Free)
-				return;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::RocketLauncher)
-				lara->Control.HandStatus = HandStatus::WeaponDraw;
-
+		default:
 			return;
 		}
 	}
@@ -2660,7 +2635,7 @@ namespace TEN::Gui
 					case MenuType::Equip:
 					case MenuType::Use:
 						MenuActive = false;
-						UseItem = true;
+						ItemUsed = true;
 						break;
 
 					case MenuType::Diary:
@@ -3388,10 +3363,10 @@ namespace TEN::Gui
 				break;
 			}
 
-			if (UseItem && NoAction())
+			if (ItemUsed && NoAction())
 				exitLoop = true;
 
-			SetEnterInventory(NO_ITEM);
+			SetEnterInventory(NO_VALUE);
 
 			Camera.numberFrames = g_Renderer.Synchronize();
 		}
@@ -3399,8 +3374,8 @@ namespace TEN::Gui
 		LastInvItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
 		UpdateWeaponStatus(item);
 
-		if (UseItem)
-			UseCurrentItem(item);
+		if (ItemUsed)
+			UseItem(*item, InventoryObjectTable[LastInvItem].ObjectNumber);
 
 		AlterFOV(LastFOV);
 		ResumeAllSounds(SoundPauseMode::Inventory);
@@ -3430,6 +3405,15 @@ namespace TEN::Gui
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			SetInventoryMode(InventoryMode::None);
+		}
+	}
+
+	void GuiController::CancelInventorySelection()
+	{
+		if (GetInventoryItemChosen() != NO_VALUE)
+		{
+			SetInventoryItemChosen(NO_VALUE);
+			SayNo();
 		}
 	}
 

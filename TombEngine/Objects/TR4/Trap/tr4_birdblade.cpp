@@ -1,33 +1,45 @@
 #include "framework.h"
-#include "tr4_birdblade.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Objects/TR4/Trap/tr4_birdblade.h"
+
 #include "Game/animation.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
+#include "Specific/level.h"
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-	void BirdBladeControl(short itemNumber)
+	void InitializeBirdBlade(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
-		item->ItemFlags[3] = 100;
+		item.ItemFlags[4] = 1;
+	}
 
-		if (!TriggerActive(item))
+	void ControlBirdBlade(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		item.ItemFlags[3] = 100;
+
+		if (!TriggerActive(&item))
 		{
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
-			*((int*)&item->ItemFlags[0]) = 0;
+			item.Animation.FrameNumber = GetAnimData(item).frameBase;
+			*((int*)&item.ItemFlags[0]) = 0;
 		}
 		else
 		{
-			int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+			int frameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 
 			if (frameNumber <= 14 || frameNumber >= 31)
-				*((int*)&item->ItemFlags[0]) = 0;
+			{
+				*((int*)&item.ItemFlags[0]) = 0;
+			}
 			else
-				*((int*)&item->ItemFlags[0]) = 6;
+			{
+				*((int*)&item.ItemFlags[0]) = 6;
+			}
 
-			AnimateItem(item);
+			AnimateItem(&item);
 		}
 	}
 }
