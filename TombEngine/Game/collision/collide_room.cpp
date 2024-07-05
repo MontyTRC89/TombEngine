@@ -11,13 +11,11 @@
 #include "Game/room.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
-#include "Renderer/Renderer.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Room;
 using namespace TEN::Math;
-using namespace TEN::Renderer;
 
 void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 {
@@ -299,8 +297,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
 	// Debug angle and distance
-	// g_Renderer.PrintDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
-	// g_Renderer.PrintDebugMessage("Nearest dist:  %f", coll->NearestLedgeDistance);
+	// PrintDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
+	// PrintDebugMessage("Nearest dist:  %f", coll->NearestLedgeDistance);
 	
 	// TEST 2: CENTERPOINT PROBE
 
@@ -339,7 +337,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xFront;
 	probePos.z = entityPos.z + zFront;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
+	DrawDebugSphere(probePos.ToVector3(), 32, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
 
 	pointColl = GetPointCollision(probePos, topRoomNumber);
 
@@ -394,7 +392,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xLeft;
 	probePos.z = entityPos.z + zLeft;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 0, 1, 1), RendererDebugPage::CollisionStats);
+	DrawDebugSphere(probePos.ToVector3(), 32, Vector4(0, 0, 1, 1), RendererDebugPage::CollisionStats);
 
 	pointColl = GetPointCollision(probePos, item->RoomNumber);
 
@@ -460,7 +458,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xRight;
 	probePos.z = entityPos.z + zRight;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
+	DrawDebugSphere(probePos.ToVector3(), 32, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 	pointColl = GetPointCollision(probePos, item->RoomNumber);
 
@@ -807,7 +805,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			}
 
 			// Debug probe point
-			// g_Renderer.AddDebugSphere(Vector3(eX, y, eZ), 16, Vector4(1, 1, 0, 1), RendererDebugPage::CollisionStats);
+			// DrawDebugSphere(Vector3(eX, y, eZ), 16, Vector4(1, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 			// Determine front floor probe offset.
 			// It is needed to identify if there is bridge or ceiling split in front.
@@ -849,7 +847,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto fpZ = eZ + floorProbeOffset * cosForwardAngle;
 
 			// Debug probe point.
-			// g_Renderer.AddDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
+			// DrawDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 			// Get true room number and block, based on derived height
 			room = GetRoomVector(item->Location, Vector3i(fpX, height, fpZ)).RoomNumber;
@@ -865,7 +863,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto ray = Ray(Vector3(eX, cY, eZ), direction);
 
 			// Debug ray direction.
-			// g_Renderer.AddDebugLine(Vector3(eX, y, eZ), Vector3(eX, y, eZ) + direction * 256, Vector4(1, 0, 0, 1));
+			// DrawDebugLine(Vector3(eX, y, eZ), Vector3(eX, y, eZ) + direction * 256, Vector4(1, 0, 0, 1));
 
 			// Keep origin ray to calculate true centerpoint distance to ledge later.
 			if (p == 0)
@@ -920,7 +918,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				auto cZ = fZ + BLOCK(1) + 1;
 
 				// Debug used block
-				// g_Renderer.AddDebugSphere(Vector3(round(eX / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f), y, round(eZ / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f)), 16, Vector4::One, RendererDebugPage::CollisionStats);
+				// DrawDebugSphere(Vector3(round(eX / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f), y, round(eZ / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f)), 16, Vector4::One, RendererDebugPage::CollisionStats);
 
 				// Get split angle coordinates.
 				auto sX = fX + 1 + BLOCK(0.5f);

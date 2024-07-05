@@ -75,7 +75,7 @@ namespace TEN::Entities::Generic
 		auto* floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber);
 
 		if (floor->PathfindingBoxID != NO_VALUE)
-			g_Level.Boxes[floor->PathfindingBoxID].flags &= ~BLOCKED;
+			g_Level.PathfindingBoxes[floor->PathfindingBoxID].flags &= ~BLOCKED;
 
 		// Set mutators to EulerAngles identity by default.
 		for (auto& mutator : item.Model.Mutators)

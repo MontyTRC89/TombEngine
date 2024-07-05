@@ -410,7 +410,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->Initialize = InitializeSentryGun;
-			obj->control = SentryGunControl;
+			obj->control = ControlSentryGun;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->damageType = DamageMode::None;
@@ -420,9 +420,8 @@ namespace TEN::Entities
 			obj->intelligent = true;
 			obj->explodableMeshbits = 0x40;
 			obj->SetBoneRotationFlags(0, ROT_X | ROT_Y);
-			obj->SetBoneRotationFlags(1, ROT_X | ROT_X);
-			obj->SetBoneRotationFlags(2, ROT_X | ROT_Z);
-			obj->SetBoneRotationFlags(3, ROT_X | ROT_Z);
+			obj->SetBoneRotationFlags(2, ROT_Z);
+			obj->SetBoneRotationFlags(3, ROT_Z);
 			obj->SetHitEffect(true);
 		}
 
@@ -768,7 +767,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_CHAIN];
 		if (obj->loaded)
 		{
-			obj->control = ChainControl;
+			obj->control = ControlChain;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
 		}
@@ -776,7 +775,8 @@ namespace TEN::Entities
 		obj = &Objects[ID_PLOUGH];
 		if (obj->loaded)
 		{
-			obj->control = PloughControl;
+			obj->Initialize = InitializePlough;
+			obj->control = ControlPlough;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
 		}
@@ -784,8 +784,8 @@ namespace TEN::Entities
 		obj = &Objects[ID_CATWALK_BLADE];
 		if (obj->loaded)
 		{
-			obj->control = CatwalkBladeControl;
-			obj->collision = BladeCollision;
+			obj->control = ControlCatwalkBlade;
+			obj->collision = CollideBlade;
 			obj->SetHitEffect(true);
 		}
 
@@ -793,7 +793,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->Initialize = InitializeSethBlade;
-			obj->control = SethBladeControl;
+			obj->control = ControlSethBlade;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
 		}
@@ -801,15 +801,16 @@ namespace TEN::Entities
 		obj = &Objects[ID_PLINTH_BLADE];
 		if (obj->loaded)
 		{
-			obj->control = PlinthBladeControl;
-			obj->collision = BladeCollision;
+			obj->control = ControlPlinthBlade;
+			obj->collision = CollideBlade;
 			obj->SetHitEffect(true);
 		}
 
 		obj = &Objects[ID_BIRD_BLADE];
 		if (obj->loaded)
 		{
-			obj->control = BirdBladeControl;
+			obj->Initialize = InitializeBirdBlade;
+			obj->control = ControlBirdBlade;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
 		}
@@ -818,39 +819,22 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->Initialize = InitializeJobySpikes;
-			obj->control = JobySpikesControl;
-			obj->collision = GenericSphereBoxCollision;
+			obj->control = ControlJobySpikes;
 			obj->SetHitEffect(true);
 		}
 
 		obj = &Objects[ID_MOVING_BLADE];
 		if (obj->loaded)
 		{
-			obj->control = MovingBladeControl;
-			obj->collision = BladeCollision;
+			obj->control = ControlMovingBlade;
+			obj->collision = CollideBlade;
 			obj->SetHitEffect(true);
 		}
 
 		obj = &Objects[ID_SPIKEBALL];
 		if (obj->loaded)
 		{
-			obj->control = SpikeballControl;
-			obj->collision = GenericSphereBoxCollision;
-			obj->SetHitEffect(true);
-		}
-
-		obj = &Objects[ID_CHAIN];
-		if (obj->loaded)
-		{
-			obj->control = ChainControl;
-			obj->collision = GenericSphereBoxCollision;
-			obj->SetHitEffect(true);
-		}
-
-		obj = &Objects[ID_PLOUGH];
-		if (obj->loaded)
-		{
-			obj->control = PloughControl;
+			obj->control = ControlSpikeball;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
 		}
@@ -858,7 +842,8 @@ namespace TEN::Entities
 		obj = &Objects[ID_FLOOR_4BLADES];
 		if (obj->loaded)
 		{
-			obj->control = FourBladesControl;
+			obj->Initialize = InitializeFourBlades;
+			obj->control = ControlFourBlades;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
 		}
@@ -866,7 +851,8 @@ namespace TEN::Entities
 		obj = &Objects[ID_CEILING_4BLADES];
 		if (obj->loaded)
 		{
-			obj->control = FourBladesControl;
+			obj->Initialize = InitializeFourBlades;
+			obj->control = ControlFourBlades;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
 		}
@@ -883,8 +869,8 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->Initialize = InitializeSlicerDicer;
-			obj->control = SlicerDicerControl;
-			obj->collision = BladeCollision;
+			obj->control = ControlSlicerDicer;
+			obj->collision = CollideBlade;
 			obj->SetHitEffect(true);
 		}
 
@@ -892,8 +878,8 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->Initialize = InitializeMine;
-			obj->control = MineControl;
-			obj->collision = MineCollision;
+			obj->control = ControlMine;
+			obj->collision = CollideMine;
 		}
 
 		obj = &Objects[ID_SPIKY_WALL];
@@ -917,8 +903,8 @@ namespace TEN::Entities
 		obj = &Objects[ID_COG];
 		if (obj->loaded)
 		{
-			obj->control = CogControl;
-			obj->collision = CogCollision;
+			obj->control = ControlCog;
+			obj->collision = CollideCog;
 			obj->SetHitEffect(true);
 		}
 
@@ -946,7 +932,7 @@ namespace TEN::Entities
 		obj = &Objects[ID_HAMMER];
 		if (obj->loaded)
 		{
-			obj->control = HammerControl;
+			obj->control = ControlHammer;
 			obj->collision = GenericSphereBoxCollision;
 			obj->SetHitEffect(true);
 		}

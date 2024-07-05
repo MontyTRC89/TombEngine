@@ -1042,7 +1042,7 @@ public:
 
 	Ammo& operator --()
 	{
-		assertion(Count > 0, "Ammo count is already 0.");
+		TENAssert(Count > 0, "Ammo count is already 0.");
 		--Count;
 		return *this;
 	}

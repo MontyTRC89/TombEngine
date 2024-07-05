@@ -79,15 +79,15 @@ using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Streamer;
+using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::Traps;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using namespace TEN::Traps::TR5;
-using namespace TEN::Entities::Creatures::TR3;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;

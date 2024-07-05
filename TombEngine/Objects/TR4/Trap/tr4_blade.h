@@ -3,7 +3,7 @@
 struct ItemInfo;
 struct CollisionInfo;
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-	void BladeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void CollideBlade(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
 }

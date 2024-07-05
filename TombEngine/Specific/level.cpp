@@ -961,7 +961,7 @@ void FreeLevel()
 	g_Level.Meshes.resize(0);
 	MoveablesIds.resize(0);
 	SpriteSequencesIds.resize(0);
-	g_Level.Boxes.resize(0);
+	g_Level.PathfindingBoxes.resize(0);
 	g_Level.Overlaps.resize(0);
 	g_Level.Anims.resize(0);
 	g_Level.Changes.resize(0);
@@ -1376,8 +1376,8 @@ void LoadBoxes()
 	// Read boxes
 	int numBoxes = ReadInt32();
 	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
-	g_Level.Boxes.resize(numBoxes);
-	ReadBytes(g_Level.Boxes.data(), numBoxes * sizeof(BOX_INFO));
+	g_Level.PathfindingBoxes.resize(numBoxes);
+	ReadBytes(g_Level.PathfindingBoxes.data(), numBoxes * sizeof(BOX_INFO));
 
 	// Read overlaps
 	int numOverlaps = ReadInt32();
@@ -1411,8 +1411,8 @@ void LoadBoxes()
 	// By default all blockable boxes are blocked
 	for (int i = 0; i < numBoxes; i++)
 	{
-		if (g_Level.Boxes[i].flags & BLOCKABLE)
-			g_Level.Boxes[i].flags |= BLOCKED;
+		if (g_Level.PathfindingBoxes[i].flags & BLOCKABLE)
+			g_Level.PathfindingBoxes[i].flags |= BLOCKED;
 	}
 }
 

@@ -14,7 +14,7 @@ namespace TEN::Structures
 
 	StaticBoundingVolumeHierarchy::StaticBoundingVolumeHierarchy(const std::vector<int>& ids, const std::vector<BoundingBox>& aabbs)
 	{
-		assertion(ids.size() == aabbs.size(), "StaticBoundingVolumeHierarchy(): ID and AABB counts must be equal.");
+		TENAssert(ids.size() == aabbs.size(), "StaticBoundingVolumeHierarchy(): ID and AABB counts must be equal.");
 
 		Generate(ids, aabbs, 0, (int)ids.size());
 	}
