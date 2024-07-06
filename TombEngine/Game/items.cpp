@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/items.h"
 
+#include "Game/Animation/Animation.h"
 #include "Game/collision/floordata.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
@@ -26,6 +27,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Room;
@@ -169,6 +171,32 @@ void ItemInfo::ResetModelToDefault()
 		Model.Mutators.clear();
 		Model.MeshIndex.clear();
 	}
+}
+
+void ItemInfo::SetAnimBlend(int frameDuration, const BezierCurve2D& curve)
+{
+	// No new blend; return early.
+	if (frameDuration <= 0)
+		return;
+
+	const auto& object = Objects[ObjectNumber];
+	const auto& frameInterp = GetFrameInterpData(*this);
+
+	Animation.Blend.IsEnabled = true;
+	Animation.Blend.FrameNumber = 0;
+	Animation.Blend.FrameCount = frameDuration;
+	Animation.Blend.Curve = curve;
+	Animation.Blend.RootOffset = Vector3::Lerp(frameInterp.Keyframe0.RootOffset, frameInterp.Keyframe1.RootOffset, frameInterp.Alpha);
+
+	Animation.Blend.BoneOrientations.clear();
+	Animation.Blend.BoneOrientations.reserve(object.nmeshes);
+	for (int i = 0; i < object.nmeshes; i++)
+		Animation.Blend.BoneOrientations.push_back(GetBoneOrientation(*this, i));
+}
+
+void ItemInfo::DisableAnimBlend()
+{
+	Animation.Blend = {};
 }
 
 bool ItemInfo::IsLara() const

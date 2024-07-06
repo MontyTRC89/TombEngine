@@ -388,7 +388,7 @@ namespace TEN::Renderer
 		void BindConstantBufferPS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
 		void BuildHierarchy(RendererObject* obj);
 		void BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
-		void UpdateAnimation(RendererItem* item, RendererObject& obj, const KeyframeInterpData& interpData, int mask, bool useObjectWorldRotation = false);
+		void UpdateAnimation(RendererItem* item, RendererObject& obj, const KeyframeInterpData& interpData, int mask, bool useObjectWorldRotation = false, const MoveableAnimBlendData* = nullptr);
 		bool CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView);
 		void GetVisibleRooms(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView);
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
@@ -639,7 +639,10 @@ namespace TEN::Renderer
 
 		Vector2i GetScreenResolution() const;
 		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;
-		Vector3 GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
+
+		Vector3	   GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
+		Quaternion GetMoveableBoneOrientation(int itemNumber, int boneID);
+
 		std::pair<Vector3, Vector3> GetRay(const Vector2& pos) const;
 		
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,

@@ -69,7 +69,7 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 bool LaraDeflectTopSide(ItemInfo* item, CollisionInfo* coll)
 {
 	// HACK: If we are falling down, collision is CollisionType::Clamp and
-	// HitStatic flag is set, it means we've collided static from the top.
+	// HitStatic flag is set, static is collided from top.
 
 	if (coll->CollisionType == CollisionType::Clamp &&
 		coll->HitStatic && item->Animation.Velocity.y > 0.0f)
@@ -102,14 +102,14 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 				}
 				else
 				{
-					SetAnimation(*item, LA_LAND);
+					SetAnimation(*item, LA_LAND, 0, PLAYER_DEFAULT_ANIM_BLEND_FRAME_DURATION, AnimBlendMode::EaseOut);
 					LaraSnapToHeight(item, coll);
 				}
 			}
 			// TODO: Demagic. This is Lara's running velocity. Jumps have a minimum of 50.
 			else if (abs(item->Animation.Velocity.z) > 47.0f)
 			{
-				SetAnimation(*item, LA_JUMP_WALL_SMASH_START, 1);
+				SetAnimation(*item, LA_JUMP_WALL_SMASH_START, 1, PLAYER_DEFAULT_ANIM_BLEND_FRAME_DURATION, AnimBlendMode::EaseOut);
 				Rumble(0.5f, 0.15f);
 			}
 
@@ -291,8 +291,8 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 	default:
 		item->Animation.TargetState = LS_IDLE;
 
-		if (item->Animation.AnimNumber != LA_STAND_SOLID)
-			SetAnimation(*item, LA_STAND_SOLID);
+		if (item->Animation.AnimNumber != LA_STAND_IDLE)
+			SetAnimation(*item, LA_STAND_IDLE, 0, PLAYER_DEFAULT_ANIM_BLEND_FRAME_DURATION, AnimBlendMode::EaseOut);
 
 		break;
 	}
@@ -325,10 +325,7 @@ void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_CRAWL_IDLE;
 
 		if (item->Animation.AnimNumber != LA_CRAWL_IDLE)
-		{
-			item->Animation.AnimNumber = LA_CRAWL_IDLE;
-			item->Animation.FrameNumber = 0;
-		}
+			SetAnimation(*item, LA_CRAWL_IDLE, 0, PLAYER_DEFAULT_ANIM_BLEND_FRAME_DURATION, AnimBlendMode::EaseOut);
 
 		break;
 	}
@@ -361,10 +358,7 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_MONKEY_IDLE;
 
 		if (item->Animation.AnimNumber != LA_MONKEY_IDLE)
-		{
-			item->Animation.AnimNumber = LA_MONKEY_IDLE;
-			item->Animation.FrameNumber = 0;
-		}
+			SetAnimation(*item, LA_MONKEY_IDLE, 0, PLAYER_DEFAULT_ANIM_BLEND_FRAME_DURATION, AnimBlendMode::EaseOut);
 
 		break;
 	}

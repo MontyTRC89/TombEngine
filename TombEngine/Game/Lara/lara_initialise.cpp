@@ -24,10 +24,10 @@ using namespace TEN::Entities::Player;
 using namespace TEN::Hud;
 
 // Globals
-int					PlayerHitPoints		  = 0;
-LaraInfo			PlayerBackup		  = {};
-EntityAnimationData PlayerAnim			  = {};
-GAME_OBJECT_ID		PlayerVehicleObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
+int				 PlayerHitPoints	   = 0;
+LaraInfo		 PlayerBackup		   = {};
+MoveableAnimData PlayerAnim			   = {};
+GAME_OBJECT_ID	 PlayerVehicleObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
 
 void BackupLara()
 {
@@ -36,7 +36,7 @@ void BackupLara()
 
 	PlayerHitPoints = LaraItem->HitPoints;
 	memcpy(&PlayerBackup, &Lara, sizeof(LaraInfo));
-	memcpy(&PlayerAnim, &LaraItem->Animation, sizeof(EntityAnimationData));
+	memcpy(&PlayerAnim, &LaraItem->Animation, sizeof(MoveableAnimData));
 
 	if (Lara.Context.Vehicle != NO_VALUE)
 	{

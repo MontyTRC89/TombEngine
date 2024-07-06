@@ -82,6 +82,7 @@ namespace TEN::Animation
 
 		const auto* anim = &GetAnimData(item);
 
+		// Handle dispatch.
 		const auto* dispatch = GetStateDispatch(item);
 		if (dispatch != nullptr)
 		{
@@ -98,10 +99,12 @@ namespace TEN::Animation
 			}
 		}
 
+		// Handle link.
 		if (item.Animation.FrameNumber > anim->EndFrameNumber)
 		{
 			ExecuteAnimCommands(item, false);
 
+			item.SetAnimBlend(anim->BlendFrameCount, anim->BlendCurve);
 			item.Animation.AnimNumber = anim->NextAnimNumber;
 			item.Animation.FrameNumber = anim->NextFrameNumber;
 
@@ -119,6 +122,21 @@ namespace TEN::Animation
 				if (item.Animation.RequiredState == item.Animation.ActiveState)
 					item.Animation.RequiredState = NO_VALUE;
 			}
+		}
+		
+		// Update blend.
+		if (item.Animation.Blend.IsEnabled)
+		{
+			item.Animation.Blend.FrameNumber++;
+			if (item.Animation.Blend.FrameNumber > item.Animation.Blend.FrameCount)
+				item.DisableAnimBlend();
+		}
+
+		if (item.IsLara())
+		{
+			PrintDebugMessage(std::string(std::string("Blend enabled: ") + (item.Animation.Blend.IsEnabled ? "Yes" : "No")).c_str());
+			PrintDebugMessage("Frame number: %d", item.Animation.Blend.FrameNumber);
+			PrintDebugMessage("Frame count: %d", item.Animation.Blend.FrameCount);
 		}
 
 		// NOTE: Must use non-zero frame count in this edge case.
@@ -330,6 +348,25 @@ namespace TEN::Animation
 		return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
 	}
 
+	const BezierCurve2D& GetAnimBlendCurve(AnimBlendMode blendMode)
+	{
+		switch (blendMode)
+		{
+		default:
+		case AnimBlendMode::Linear:
+			return BezierCurve2D::Linear;
+
+		case AnimBlendMode::EaseInOut:
+			return BezierCurve2D::EaseInOut;
+
+		case AnimBlendMode::EaseIn:
+			return BezierCurve2D::EaseIn;
+
+		case AnimBlendMode::EaseOut:
+			return BezierCurve2D::EaseOut;
+		}
+	}
+
 	Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset)
 	{
 		// Use matrices done in renderer to transform relative offset.
@@ -361,17 +398,10 @@ namespace TEN::Animation
 
 	Quaternion GetBoneOrientation(const ItemInfo& item, int boneID)
 	{
-		static const auto REF_DIR = Vector3::UnitZ;
-
-		auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneID);
-		auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneID, REF_DIR);
-
-		auto dir = target - origin;
-		dir.Normalize();
-		return Geometry::ConvertDirectionToQuat(dir);
+		return g_Renderer.GetMoveableBoneOrientation(item.Index, boneID);
 	}
 
-	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
+	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber, int blendFrameCount, AnimBlendMode blendMode)
 	{
 		// Animation already set; return early.
 		if (item.Animation.AnimObjectID == animObjectID &&
@@ -410,6 +440,7 @@ namespace TEN::Animation
 			return;
 		}
 
+		item.SetAnimBlend(blendFrameCount, GetAnimBlendCurve(blendMode));
 		item.Animation.AnimObjectID = animObjectID;
 		item.Animation.AnimNumber = animNumber;
 		item.Animation.FrameNumber = frameNumber;
@@ -417,13 +448,14 @@ namespace TEN::Animation
 		item.Animation.TargetState = anim.StateID;
 	}
 
-	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber)
+	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber, int blendFrameCount, AnimBlendMode blendMode)
 	{
-		SetAnimation(item, item.ObjectNumber, animNumber, frameNumber);
+		SetAnimation(item, item.ObjectNumber, animNumber, frameNumber, blendFrameCount, blendMode);
 	}
 
 	void SetStateDispatch(ItemInfo& item, const StateDispatchData& dispatch)
 	{
+		item.SetAnimBlend(dispatch.BlendFrameCount, dispatch.BlendCurve);
 		item.Animation.AnimNumber = dispatch.NextAnimNumber;
 		item.Animation.FrameNumber = dispatch.NextFrameNumber;
 	}

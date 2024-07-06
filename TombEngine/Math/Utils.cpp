@@ -11,11 +11,6 @@ namespace TEN::Math
 		return (((1.0f - alpha) * value0) + (alpha * value1));
 	}
 
-	float Smoothstep(float alpha)
-	{
-		return Smoothstep(0.0f, 1.0f, alpha);
-	}
-
 	float Smoothstep(float value0, float value1, float alpha)
 	{
 		alpha = std::clamp(alpha, value0, value1);
@@ -24,13 +19,18 @@ namespace TEN::Math
 		alpha = std::clamp((alpha - value0) / (value1 - value0), 0.0f, 1.0f);
 
 		// Evaluate polynomial.
-		return (CUBE(alpha) * (alpha * ((alpha * 6) - 15) + 10));
+		return (CUBE(alpha) * (alpha * ((alpha * 6) - 15.0f) + 10.0f));
+	}
+
+	float Smoothstep(float alpha)
+	{
+		return Smoothstep(0.0f, 1.0f, alpha);
 	}
 
 	float EaseInSine(float value0, float value1, float alpha)
 	{
 		alpha = std::clamp(alpha, 0.0f, 1.0f);
-		return Lerp(value0, value1, 1 - cos((alpha * PI) / 2));
+		return Lerp(value0, value1, 1.0f - cos((alpha * PI) / 2));
 	}
 
 	float EaseInSine(float alpha)
@@ -52,7 +52,7 @@ namespace TEN::Math
 	float EaseInOutSine(float value0, float value1, float alpha)
 	{
 		alpha = std::clamp(alpha, 0.0f, 1.0f);
-		return Lerp(value0, value1, (1 - cos(alpha * PI)) / 2);
+		return Lerp(value0, value1, (1.0f - cos(alpha * PI)) / 2);
 	}
 	
 	float EaseInOutSine(float alpha)
@@ -62,9 +62,9 @@ namespace TEN::Math
 
 	float Luma(const Vector3& color)
 	{
-		constexpr auto RED_COEFF = 0.2126f;
+		constexpr auto RED_COEFF   = 0.2126f;
 		constexpr auto GREEN_COEFF = 0.7152f;
-		constexpr auto BLUE_COEFF = 0.0722f;
+		constexpr auto BLUE_COEFF  = 0.0722f;
 
 		// Use Rec.709 trichromat formula to get perceptive luma value.
 		return float((color.x * RED_COEFF) + (color.y * GREEN_COEFF) + (color.z * BLUE_COEFF));

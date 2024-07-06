@@ -8,6 +8,7 @@
 #include "Specific/newtypes.h"
 
 using namespace TEN::Animation;
+using namespace TEN::Math;
 using namespace TEN::Utils;
 
 constexpr auto ITEM_COUNT_MAX  = 1024;
@@ -59,15 +60,26 @@ enum AIObjectType
 	ALL_AIOBJ = GUARD | AMBUSH | PATROL1 | MODIFY | FOLLOW | PATROL2
 };
 
-struct EntityAnimationData
+struct MoveableAnimBlendData
 {
-	GAME_OBJECT_ID AnimObjectID = ID_NO_OBJECT;
+	bool IsEnabled = false;
 
-	int AnimNumber	  = 0;
-	int FrameNumber	  = 0;
-	int ActiveState	  = 0;
-	int TargetState	  = 0;
-	int RequiredState = NO_VALUE;
+	int			  FrameNumber = 0;
+	int			  FrameCount  = 0;
+	BezierCurve2D Curve		  = {};
+
+	Vector3					RootOffset		 = Vector3::Zero;
+	std::vector<Quaternion> BoneOrientations = {};
+};
+
+struct MoveableAnimData
+{
+	GAME_OBJECT_ID AnimObjectID	 = ID_NO_OBJECT;
+	int			   AnimNumber	 = 0;
+	int			   FrameNumber	 = 0;
+	int			   ActiveState	 = 0;
+	int			   TargetState	 = 0;
+	int			   RequiredState = NO_VALUE;
 
 	// TODO: Have 3 velocity members:
 	// ControlVelocity:		 relative velocity derived from animation.
@@ -76,6 +88,8 @@ struct EntityAnimationData
 	Vector3 Velocity = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward.
 
 	bool IsAirborne = false;
+
+	MoveableAnimBlendData Blend = {};
 };
 
 struct EntityCallbackData
@@ -118,11 +132,11 @@ struct ItemInfo
 	int NextItem   = 0;
 	int NextActive = 0;
 
-	ItemData			Data	  = {};
-	EntityAnimationData Animation = {};
-	EntityCallbackData	Callbacks = {};
-	EntityEffectData	Effect	  = {};
-	EntityModelData		Model	  = {};
+	ItemData		   Data		 = {};
+	MoveableAnimData   Animation = {};
+	EntityCallbackData Callbacks = {};
+	EntityEffectData   Effect	 = {};
+	EntityModelData	   Model	 = {};
 
 	Pose	   StartPose  = Pose::Zero;
 	Pose	   Pose		  = Pose::Zero;
@@ -172,6 +186,11 @@ struct ItemInfo
 	void SetMeshSwapFlags(unsigned int flags, bool clear = false);
 	void SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear = false);
 	void ResetModelToDefault();
+
+	// Anim blend utilities
+
+	void SetAnimBlend(int frameDuration, const BezierCurve2D& curve);
+	void DisableAnimBlend();
 
 	// Inquirers
 

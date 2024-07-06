@@ -385,8 +385,8 @@ void LoadObjects()
 			anim.EndFrameNumber = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
-			anim.BlendFrameDuration = ReadInt32();
-			anim.BlendType = (AnimBlendType)ReadInt32();
+			anim.BlendFrameCount = ReadInt32();
+			anim.BlendCurve = GetAnimBlendCurve((AnimBlendMode)ReadInt32());
 			anim.VelocityStart = ReadVector3();
 			anim.VelocityEnd = ReadVector3();
 
@@ -416,8 +416,8 @@ void LoadObjects()
 				dispatch.StateID = ReadInt32();
 				dispatch.NextAnimNumber = ReadInt32();
 				dispatch.NextFrameNumber = ReadInt32();
-				dispatch.BlendFrameDuration = ReadInt32();
-				dispatch.BlendType = (AnimBlendType)ReadInt32();
+				dispatch.BlendFrameCount = ReadInt32();
+				dispatch.BlendCurve = GetAnimBlendCurve((AnimBlendMode)ReadInt32());
 				dispatch.FrameNumberRange.first = ReadInt32();
 				dispatch.FrameNumberRange.second = ReadInt32();
 			}

@@ -432,6 +432,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Math\Legacy.h" />
     <ClInclude Include="Math\Math.h" />
     <ClInclude Include="Math\Objects\AxisAngle.h" />
+    <ClInclude Include="Math\Objects\BezierCurve2D.h" />
     <ClInclude Include="Math\Objects\EulerAngles.h" />
     <ClInclude Include="Math\Objects\GameBoundingBox.h" />
     <ClInclude Include="Math\Objects\GameVector.h" />
@@ -941,6 +942,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Math\Geometry.cpp" />
     <ClCompile Include="Math\Legacy.cpp" />
     <ClCompile Include="Math\Objects\AxisAngle.cpp" />
+    <ClCompile Include="Math\Objects\BezierCurve2D.cpp" />
     <ClCompile Include="Math\Objects\EulerAngles.cpp" />
     <ClCompile Include="Math\Objects\GameBoundingBox.cpp" />
     <ClCompile Include="Math\Objects\GameVector.cpp" />
