@@ -28,5 +28,5 @@ namespace TEN::Math
 	float FloorToStep(float value, float step);
 	float CeilToStep(float value, float step);
 	float RoundToStep(float value, float step);
-	float Remap(float value, float range0Min, float range0Max, float range1Min, float range1Max);
+	float Remap(float value, float min0, float max0, float min1, float max1);
 }

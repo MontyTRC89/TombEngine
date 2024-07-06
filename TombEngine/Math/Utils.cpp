@@ -103,9 +103,9 @@ namespace TEN::Math
 		return (round(value / step) * step);
 	}
 
-	float Remap(float value, float range0Min, float range0Max, float range1Min, float range1Max)
+	float Remap(float value, float min0, float max0, float min1, float max1)
 	{
-		float alpha = (value - range0Min) / (range0Max - range0Min);
-		return Lerp(range1Min, range1Max, alpha);
+		float alpha = (value - min0) / (max0 - min0);
+		return Lerp(min1, max1, alpha);
 	}
 }
