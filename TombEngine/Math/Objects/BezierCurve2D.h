@@ -17,9 +17,9 @@ namespace TEN::Math
 		// Presets
 
 		static const BezierCurve2D Linear;
-		static const BezierCurve2D EaseInOut;
 		static const BezierCurve2D EaseIn;
 		static const BezierCurve2D EaseOut;
+		static const BezierCurve2D EaseInOut;
 
 		// Constructors
 

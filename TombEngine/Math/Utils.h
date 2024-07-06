@@ -23,9 +23,10 @@ namespace TEN::Math
 	Vector3 Screen(const Vector3& ambient, const Vector3& tint);
 	Vector4 Screen(const Vector4& ambient, const Vector4& tint);
 
-	// Misc.
+	// Value manipulation
 
 	float FloorToStep(float value, float step);
 	float CeilToStep(float value, float step);
 	float RoundToStep(float value, float step);
+	float Remap(float value, float range0Min, float range0Max, float range1Min, float range1Max);
 }

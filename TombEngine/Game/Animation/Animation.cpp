@@ -242,10 +242,10 @@ namespace TEN::Animation
 		return (item.Animation.FrameNumber >= anim.EndFrameNumber);
 	}
 
-	bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber)
+	bool TestAnimFrameRange(const ItemInfo& item, int frameNumberLow, int frameNumberHigh)
 	{
-		return (item.Animation.FrameNumber >= lowFrameNumber &&
-				item.Animation.FrameNumber <= highFrameNumber);
+		return (item.Animation.FrameNumber >= frameNumberLow &&
+				item.Animation.FrameNumber <= frameNumberHigh);
 	}
 
 	const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
@@ -308,11 +308,11 @@ namespace TEN::Animation
 		for (const auto& dispatch : anim.Dispatches)
 		{
 			// State ID mismatch; continue.
-			if (dispatch.StateID != ((targetStateID == NO_VALUE) ? item.Animation.TargetState : targetStateID))
+			if (dispatch.TargetStateID != ((targetStateID == NO_VALUE) ? item.Animation.TargetState : targetStateID))
 				continue;
 
 			// Test if current frame is within dispatch range.
-			if (TestAnimFrameRange(item, dispatch.FrameNumberRange.first, dispatch.FrameNumberRange.second))
+			if (TestAnimFrameRange(item, dispatch.FrameNumberLow, dispatch.FrameNumberHigh))
 				return &dispatch;
 		}
 
@@ -455,9 +455,14 @@ namespace TEN::Animation
 
 	void SetStateDispatch(ItemInfo& item, const StateDispatchData& dispatch)
 	{
+		float frameNumber = Remap(
+			item.Animation.FrameNumber,
+			dispatch.FrameNumberLow, dispatch.FrameNumberHigh,
+			dispatch.NextFrameNumberLow, dispatch.NextFrameNumberHigh);
+
 		item.SetAnimBlend(dispatch.BlendFrameCount, dispatch.BlendCurve);
 		item.Animation.AnimNumber = dispatch.NextAnimNumber;
-		item.Animation.FrameNumber = dispatch.NextFrameNumber;
+		item.Animation.FrameNumber = (int)round(frameNumber);
 	}
 
 	void ClampRotation(Pose& outPose, short angle, short rot)

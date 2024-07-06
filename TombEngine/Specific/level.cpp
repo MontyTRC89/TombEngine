@@ -413,13 +413,14 @@ void LoadObjects()
 			anim.Dispatches.resize(dispatchCount);
 			for (auto& dispatch : anim.Dispatches)
 			{
-				dispatch.StateID = ReadInt32();
+				dispatch.TargetStateID = ReadInt32();
 				dispatch.NextAnimNumber = ReadInt32();
-				dispatch.NextFrameNumber = ReadInt32();
+				dispatch.NextFrameNumberLow = // TODO: Update level writer.
+				dispatch.NextFrameNumberHigh = ReadInt32();
 				dispatch.BlendFrameCount = ReadInt32();
 				dispatch.BlendCurve = GetAnimBlendCurve((AnimBlendMode)ReadInt32());
-				dispatch.FrameNumberRange.first = ReadInt32();
-				dispatch.FrameNumberRange.second = ReadInt32();
+				dispatch.FrameNumberLow = ReadInt32();
+				dispatch.FrameNumberHigh = ReadInt32();
 			}
 
 			// Load animation commands.

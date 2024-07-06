@@ -18,9 +18,9 @@ namespace TEN::Animation
 	enum class AnimBlendMode
 	{
 		Linear,
-		EaseInOut,
 		EaseIn,
-		EaseOut
+		EaseOut,
+		EaseInOut
 	};
 
 	struct KeyframeData
@@ -44,13 +44,15 @@ namespace TEN::Animation
 
 	struct StateDispatchData
 	{
-		int			  StateID		  = 0;
-		int			  NextAnimNumber  = 0;
-		int			  NextFrameNumber = 0;
-		int			  BlendFrameCount = 0;
-		BezierCurve2D BlendCurve	  = {};
+		int TargetStateID	= 0;
+		int FrameNumberLow	= 0;
+		int FrameNumberHigh = 0;
 
-		std::pair<int, int> FrameNumberRange = {};
+		int			  NextAnimNumber	  = 0;
+		int			  NextFrameNumberLow  = 0;
+		int			  NextFrameNumberHigh = 0;
+		int			  BlendFrameCount	  = 0;
+		BezierCurve2D BlendCurve		  = {};
 	};
 
 	struct AnimData
@@ -93,7 +95,7 @@ namespace TEN::Animation
 
 	bool TestStateDispatch(const ItemInfo& item, int targetStateID = NO_VALUE);
 	bool TestLastFrame(const ItemInfo& item, int animNumber = NO_VALUE);
-	bool TestAnimFrameRange(const ItemInfo& item, int lowFrameNumber, int highFrameNumber);
+	bool TestAnimFrameRange(const ItemInfo& item, int frameNumberLow, int frameNumberHigh);
 
 	// Getters
 
