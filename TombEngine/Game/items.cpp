@@ -173,10 +173,10 @@ void ItemInfo::ResetModelToDefault()
 	}
 }
 
-void ItemInfo::SetAnimBlend(int frameDuration, const BezierCurve2D& curve)
+void ItemInfo::SetAnimBlend(int frameCount, const BezierCurve2D& curve)
 {
 	// No new blend; return early.
-	if (frameDuration <= 0)
+	if (frameCount <= 0)
 		return;
 
 	const auto& object = Objects[ObjectNumber];
@@ -184,7 +184,7 @@ void ItemInfo::SetAnimBlend(int frameDuration, const BezierCurve2D& curve)
 
 	Animation.Blend.IsEnabled = true;
 	Animation.Blend.FrameNumber = 0;
-	Animation.Blend.FrameCount = frameDuration;
+	Animation.Blend.FrameCount = frameCount;
 	Animation.Blend.Curve = curve;
 	Animation.Blend.RootOffset = Vector3::Lerp(frameInterp.Keyframe0.RootOffset, frameInterp.Keyframe1.RootOffset, frameInterp.Alpha);
 

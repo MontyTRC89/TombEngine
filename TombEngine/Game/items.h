@@ -189,7 +189,7 @@ struct ItemInfo
 
 	// Anim blend utilities
 
-	void SetAnimBlend(int frameDuration, const BezierCurve2D& curve);
+	void SetAnimBlend(int frameCount, const BezierCurve2D& curve);
 	void DisableAnimBlend();
 
 	// Inquirers
