@@ -308,7 +308,7 @@ namespace TEN::Animation
 		for (const auto& dispatch : anim.Dispatches)
 		{
 			// State ID mismatch; continue.
-			if (dispatch.TargetStateID != ((targetStateID == NO_VALUE) ? item.Animation.TargetState : targetStateID))
+			if (dispatch.StateID != ((targetStateID == NO_VALUE) ? item.Animation.TargetState : targetStateID))
 				continue;
 
 			// Test if current frame is within dispatch range.
@@ -348,25 +348,6 @@ namespace TEN::Animation
 		return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
 	}
 
-	const BezierCurve2D& GetAnimBlendCurve(AnimBlendMode blendMode)
-	{
-		switch (blendMode)
-		{
-		default:
-		case AnimBlendMode::Linear:
-			return BezierCurve2D::Linear;
-
-		case AnimBlendMode::EaseInOut:
-			return BezierCurve2D::EaseInOut;
-
-		case AnimBlendMode::EaseIn:
-			return BezierCurve2D::EaseIn;
-
-		case AnimBlendMode::EaseOut:
-			return BezierCurve2D::EaseOut;
-		}
-	}
-
 	Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset)
 	{
 		// Use matrices done in renderer to transform relative offset.
@@ -401,7 +382,7 @@ namespace TEN::Animation
 		return g_Renderer.GetMoveableBoneOrientation(item.Index, boneID);
 	}
 
-	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber, int blendFrameCount, AnimBlendMode blendMode)
+	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber, int blendFrameCount, const BezierCurve2D& blendCurve)
 	{
 		// Animation already set; return early.
 		if (item.Animation.AnimObjectID == animObjectID &&
@@ -440,7 +421,7 @@ namespace TEN::Animation
 			return;
 		}
 
-		item.SetAnimBlend(blendFrameCount, GetAnimBlendCurve(blendMode));
+		item.SetAnimBlend(blendFrameCount, blendCurve);
 		item.Animation.AnimObjectID = animObjectID;
 		item.Animation.AnimNumber = animNumber;
 		item.Animation.FrameNumber = frameNumber;
@@ -448,9 +429,9 @@ namespace TEN::Animation
 		item.Animation.TargetState = anim.StateID;
 	}
 
-	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber, int blendFrameCount, AnimBlendMode blendMode)
+	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber, int blendFrameCount, const BezierCurve2D& blendCurve)
 	{
-		SetAnimation(item, item.ObjectNumber, animNumber, frameNumber, blendFrameCount, blendMode);
+		SetAnimation(item, item.ObjectNumber, animNumber, frameNumber, blendFrameCount, blendCurve);
 	}
 
 	void SetStateDispatch(ItemInfo& item, const StateDispatchData& dispatch)

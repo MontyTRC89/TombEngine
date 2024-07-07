@@ -15,14 +15,6 @@ struct ObjectInfo;
 
 namespace TEN::Animation
 {
-	enum class AnimBlendMode
-	{
-		Linear,
-		EaseIn,
-		EaseOut,
-		EaseInOut
-	};
-
 	struct KeyframeData
 	{
 		Vector3					RootOffset		 = Vector3::Zero;
@@ -44,7 +36,7 @@ namespace TEN::Animation
 
 	struct StateDispatchData
 	{
-		int TargetStateID	= 0;
+		int StateID			= 0;
 		int FrameNumberLow	= 0;
 		int FrameNumberHigh = 0;
 
@@ -117,7 +109,6 @@ namespace TEN::Animation
 	int	  GetFrameCount(GAME_OBJECT_ID objectID, int animNumber); // TODO: Not needed? Not the "real" frame count anyway since 0 isn't counted.
 	int	  GetFrameCount(const ItemInfo& item);
 	float GetEffectiveGravity(float verticalVel);
-	const BezierCurve2D& GetAnimBlendCurve(AnimBlendMode blendMode);
 
 	Vector3i   GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset = Vector3i::Zero);
 	Vector3i   GetJointPosition(ItemInfo* item, int boneID, const Vector3i& relOffset = Vector3i::Zero);
@@ -128,8 +119,8 @@ namespace TEN::Animation
 
 	// Setters
 
-	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber = 0, int blendFrameCount = 0, AnimBlendMode blendMode = AnimBlendMode::Linear);
-	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber = 0, int blendFrameCount = 0, AnimBlendMode blendMode = AnimBlendMode::Linear);
+	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber = 0, int blendFrameCount = 0, const BezierCurve2D& blendCurve = BezierCurve2D::Linear);
+	void SetAnimation(ItemInfo& item, int animNumber, int frameNumber = 0, int blendFrameCount = 0, const BezierCurve2D& blendCurve = BezierCurve2D::Linear);
 	void SetStateDispatch(ItemInfo& item, const StateDispatchData& dispatch);
 
 	// Utilities

@@ -386,7 +386,28 @@ void LoadObjects()
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
 			anim.BlendFrameCount = ReadInt32();
-			anim.BlendCurve = GetAnimBlendCurve((AnimBlendMode)ReadInt32());
+
+			// TODO: Write bezier curve.
+			int curveType = ReadInt32();
+			switch (curveType)
+			{
+			case 0:
+				anim.BlendCurve = BezierCurve2D::Linear;
+				break;
+
+			case 1:
+				anim.BlendCurve = BezierCurve2D::EaseIn;
+				break;
+
+			case 2:
+				anim.BlendCurve = BezierCurve2D::EaseOut;
+				break;
+
+			case 3:
+				anim.BlendCurve = BezierCurve2D::EaseInOut;
+				break;
+			}
+
 			anim.VelocityStart = ReadVector3();
 			anim.VelocityEnd = ReadVector3();
 
@@ -413,12 +434,33 @@ void LoadObjects()
 			anim.Dispatches.resize(dispatchCount);
 			for (auto& dispatch : anim.Dispatches)
 			{
-				dispatch.TargetStateID = ReadInt32();
+				dispatch.StateID = ReadInt32();
 				dispatch.NextAnimNumber = ReadInt32();
 				dispatch.NextFrameNumberLow = // TODO: Update level writer.
 				dispatch.NextFrameNumberHigh = ReadInt32();
 				dispatch.BlendFrameCount = ReadInt32();
-				dispatch.BlendCurve = GetAnimBlendCurve((AnimBlendMode)ReadInt32());
+
+				// TODO: Write bezier curve.
+				int curveType = ReadInt32();
+				switch (curveType)
+				{
+				case 0:
+					dispatch.BlendCurve = BezierCurve2D::Linear;
+					break;
+
+				case 1:
+					dispatch.BlendCurve = BezierCurve2D::EaseIn;
+					break;
+
+				case 2:
+					dispatch.BlendCurve = BezierCurve2D::EaseOut;
+					break;
+
+				case 3:
+					dispatch.BlendCurve = BezierCurve2D::EaseInOut;
+					break;
+				}
+
 				dispatch.FrameNumberLow = ReadInt32();
 				dispatch.FrameNumberHigh = ReadInt32();
 			}
