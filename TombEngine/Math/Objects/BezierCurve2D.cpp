@@ -16,22 +16,22 @@ namespace TEN::Math
 		_controlPoints[3] = end;
 	}
 
-	const Vector2& BezierCurve2D::GetStart() const
+	Vector2& BezierCurve2D::GetStart()
 	{
 		return _controlPoints[0];
 	}
 
-	const Vector2& BezierCurve2D::GetEnd() const
+	Vector2& BezierCurve2D::GetEnd()
 	{
 		return _controlPoints[3];
 	}
 
-	const Vector2& BezierCurve2D::GetStartHandle() const
+	Vector2& BezierCurve2D::GetStartHandle()
 	{
 		return _controlPoints[1];
 	}
 
-	const Vector2& BezierCurve2D::GetEndHandle() const
+	Vector2& BezierCurve2D::GetEndHandle()
 	{
 		return _controlPoints[2];
 	}
@@ -87,25 +87,5 @@ namespace TEN::Math
 		}
 
 		return point.y;
-	}
-
-	void BezierCurve2D::SetStart(const Vector2& point)
-	{
-		_controlPoints[0] = point;
-	}
-
-	void BezierCurve2D::SetEnd(const Vector2& point)
-	{
-		_controlPoints[3] = point;
-	}
-
-	void BezierCurve2D::SetStartHandle(const Vector2& point)
-	{
-		_controlPoints[1] = point;
-	}
-
-	void BezierCurve2D::SetEndHandle(const Vector2& point)
-	{
-		_controlPoints[2] = point;
 	}
 }
