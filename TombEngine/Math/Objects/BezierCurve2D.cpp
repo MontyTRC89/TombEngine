@@ -56,7 +56,7 @@ namespace TEN::Math
 		constexpr auto TOLERANCE = EPSILON * 200;
 
 		// Directly return Y for exact endpoint.
-		if (x <= TOLERANCE)
+		if (x <= (_controlPoints.front().x + TOLERANCE))
 		{
 			return _controlPoints.front().y;
 		}
