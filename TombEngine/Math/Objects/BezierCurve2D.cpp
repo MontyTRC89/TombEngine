@@ -49,13 +49,16 @@ namespace TEN::Math
 
 		float low = 0.0f;
 		float high = 1.0f;
+		auto point = Vector2::Zero;
 
 		// Binary search for approximate Y.
 		float alpha = 0.5f;
 		while ((high - low) > TOLERANCE)
 		{
 			alpha = (low + high) / 2;
-			if (GetPoint(alpha).x < x)
+			point = GetPoint(alpha);
+
+			if (point.x < x)
 			{
 				low = alpha;
 			}
@@ -65,6 +68,6 @@ namespace TEN::Math
 			}
 		}
 
-		return GetPoint(alpha).y;
+		return point.y;
 	}
 }
