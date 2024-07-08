@@ -55,8 +55,6 @@ namespace TEN::Math
 	{
 		constexpr auto TOLERANCE = EPSILON * 200;
 
-		x = std::clamp(x, 0.0f, _controlPoints.back().x);
-
 		// Directly return Y for exact endpoint.
 		if (x <= TOLERANCE)
 		{
