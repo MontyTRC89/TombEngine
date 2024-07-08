@@ -388,10 +388,10 @@ void LoadObjects()
 			anim.BlendFrameCount = ReadInt32();
 
 			auto start = ReadVector2();
+			auto end = ReadVector2();
 			auto startHandle = ReadVector2();
 			auto endHandle = ReadVector2();
-			auto end = ReadVector2();
-			anim.BlendCurve = BezierCurve2D(start, startHandle, endHandle, end);
+			anim.BlendCurve = BezierCurve2D(start, end, startHandle, endHandle);
 
 			anim.VelocityStart = ReadVector3();
 			anim.VelocityEnd = ReadVector3();
@@ -428,10 +428,10 @@ void LoadObjects()
 				dispatch.BlendFrameCount = ReadInt32();
 
 				auto start = ReadVector2();
+				auto end = ReadVector2();
 				auto startHandle = ReadVector2();
 				auto endHandle = ReadVector2();
-				auto end = ReadVector2();
-				dispatch.BlendCurve = BezierCurve2D(start, startHandle, endHandle, end);
+				dispatch.BlendCurve = BezierCurve2D(start, end, startHandle, endHandle);
 			}
 
 			// Load animation commands.
