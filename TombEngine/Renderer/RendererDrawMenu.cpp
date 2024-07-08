@@ -1445,6 +1445,10 @@ namespace TEN::Renderer
 			PrintDebugMessage("Front left ceil: %d", LaraCollision.FrontLeft.Ceiling);
 			PrintDebugMessage("Front right ceil: %d", LaraCollision.FrontRight.Ceiling);
 			break;
+
+		case RendererDebugPage::RoomMeshStats:
+			PrintDebugMessage("ROOM MESH STATS");
+			break;
 				
 		case RendererDebugPage::PathfindingStats:
 			PrintDebugMessage("PATHFINDING STATS");

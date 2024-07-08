@@ -146,6 +146,7 @@ enum class RendererDebugPage
 	PlayerStats,
 	InputStats,
 	CollisionStats,
+	RoomMeshStats,
 	PathfindingStats,
 	WireframeMode,
 

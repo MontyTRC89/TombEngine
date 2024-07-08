@@ -2,14 +2,12 @@
 #include "Physics/Objects/CollisionMesh.h"
 
 #include "Math/Math.h"
-#include "Renderer/Renderer.h"
 #include "Specific/Structures/StaticBoundingVolumeHierarchy.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Math;
 using namespace TEN::Structures;
 using namespace TEN::Utils;
-using TEN::Renderer::g_Renderer;
 
 namespace TEN::Physics
 {
@@ -90,10 +88,10 @@ namespace TEN::Physics
 		const auto& vertex0 = vertices[_vertexIds[0]];
 		const auto& vertex1 = vertices[_vertexIds[1]];
 		const auto& vertex2 = vertices[_vertexIds[2]];
-		g_Renderer.AddDebugTriangle(vertex0, vertex1, vertex2, Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f, 0.2f));
+		DrawDebugTriangle(vertex0, vertex1, vertex2, Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f, 0.2f), RendererDebugPage::RoomMeshStats);
 
 		auto center = (vertex0 + vertex1 + vertex2) / 3;
-		g_Renderer.AddDebugLine(center, Geometry::TranslatePoint(center, _normal, BLOCK(0.2f)), Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f));
+		DrawDebugLine(center, Geometry::TranslatePoint(center, _normal, BLOCK(0.2f)), Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f), RendererDebugPage::RoomMeshStats);
 	}
 
 	CollisionMesh::Bvh::Bvh(const std::vector<CollisionTriangle>& tris)
@@ -176,7 +174,7 @@ namespace TEN::Physics
 		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
 
 		for (const auto& node : _nodes)
-			g_Renderer.AddDebugBox(node.Aabb, BOX_COLOR);
+			DrawDebugBox(node.Aabb, BOX_COLOR, RendererDebugPage::RoomMeshStats);
 	}
 
 	CollisionMesh::CollisionMesh(const std::vector<CollisionTriangle>& tris)

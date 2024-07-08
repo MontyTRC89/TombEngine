@@ -56,8 +56,7 @@ using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Gui;
-
-using TEN::Renderer::g_Renderer;
+using namespace TEN::Renderer;
 
 LaraInfo Lara = {};
 ItemInfo* LaraItem;
@@ -99,7 +98,7 @@ static void HandleLosDebug(const ItemInfo& item)
 	
 	auto end = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-	//g_Renderer.PrintDebugMessage("%d", duration.count());
+	//PrintDebugMessage("%d", duration.count());
 
 	float closestDist = los.Room.Distance;
 	target = los.Room.Position;
@@ -127,8 +126,8 @@ static void HandleLosDebug(const ItemInfo& item)
 		}
 	}
 
-	g_Renderer.AddDebugLine(origin, target, Vector4::One);
-	g_Renderer.AddDebugTarget(target, Quaternion::Identity, 100, Color(1, 1, 1));
+	DrawDebugLine(origin, target, Vector4::One);
+	DrawDebugTarget(target, Quaternion::Identity, 100, Color(1, 1, 1));
 }
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
@@ -156,18 +155,18 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 		auto labelPos = g_Renderer.Get2DPosition(item2.Pose.Position.ToVector3());
 		//if (labelPos.has_value())
-		//	g_Renderer.AddDebugString(std::to_string(item2.Index), *labelPos, Color(1,1,1), 1, 0, RendererDebugPage::None);
+		//	PrintDebugString(std::to_string(item2.Index), *labelPos, Color(1,1,1), 1, 0, RendererDebugPage::None);
 	}
 
 	//UpdateBridgeItem(g_Level.Items[43]);
 
 	//for (auto& sector : room.floor)
-	//	g_Renderer.AddDebugBox(sector.Aabb, Color(1, 1, 1));
+	//	DrawDebugBox(sector.Aabb, Color(1, 1, 1));
 	
 	//room.CollisionMesh.DrawDebug();
 
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), g_Camera.actualAngle);
-	//g_Renderer.PrintDebugMessage("%d", abs(deltaAngle));
+	//PrintDebugMessage("%d", abs(deltaAngle));
 
 	//--------
 
