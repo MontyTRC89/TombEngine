@@ -28,12 +28,19 @@ namespace TEN::Math
 
 		// Getters
 
-		Vector2& GetStart();
-		Vector2& GetEnd();
-		Vector2& GetStartHandle();
-		Vector2& GetEndHandle();
+		const Vector2& GetStart() const;
+		const Vector2& GetEnd() const;
+		const Vector2& GetStartHandle() const;
+		const Vector2& GetEndHandle() const;
 
 		Vector2 GetPoint(float alpha) const;
 		float	GetY(float x) const;
+
+		// Setters
+
+		void SetStart(const Vector2& point);
+		void SetEnd(const Vector2& point);
+		void SetStartHandle(const Vector2& point);
+		void SetEndHandle(const Vector2& point);
 	};
 }

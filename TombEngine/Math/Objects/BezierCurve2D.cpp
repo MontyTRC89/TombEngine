@@ -10,28 +10,28 @@ namespace TEN::Math
 
 	BezierCurve2D::BezierCurve2D(const Vector2& start, const Vector2& end, const Vector2& startHandle, const Vector2& endHandle)
 	{
-		_controlPoints[0] = start;
-		_controlPoints[1] = startHandle;
-		_controlPoints[2] = endHandle;
-		_controlPoints[3] = end;
+		SetStart(start);
+		SetEnd(end);
+		SetStartHandle(startHandle);
+		SetEndHandle(endHandle);
 	}
 
-	Vector2& BezierCurve2D::GetStart()
+	const Vector2& BezierCurve2D::GetStart() const
 	{
 		return _controlPoints[0];
 	}
 
-	Vector2& BezierCurve2D::GetEnd()
+	const Vector2& BezierCurve2D::GetEnd() const
 	{
 		return _controlPoints[3];
 	}
 
-	Vector2& BezierCurve2D::GetStartHandle()
+	const Vector2& BezierCurve2D::GetStartHandle() const
 	{
 		return _controlPoints[1];
 	}
 
-	Vector2& BezierCurve2D::GetEndHandle()
+	const Vector2& BezierCurve2D::GetEndHandle() const
 	{
 		return _controlPoints[2];
 	}
@@ -56,13 +56,13 @@ namespace TEN::Math
 		constexpr auto TOLERANCE = EPSILON * 200;
 
 		// Directly return Y for exact endpoint.
-		if (x <= (_controlPoints.front().x + TOLERANCE))
+		if (x <= (GetStart().x + TOLERANCE))
 		{
-			return _controlPoints.front().y;
+			return GetStart().y;
 		}
-		else if (x >= (_controlPoints.back().x - TOLERANCE))
+		else if (x >= (GetEnd().x - TOLERANCE))
 		{
-			return _controlPoints.back().y;
+			return GetEnd().y;
 		}
 
 		float low = 0.0f;
@@ -87,5 +87,25 @@ namespace TEN::Math
 		}
 
 		return point.y;
+	}
+
+	void BezierCurve2D::SetStart(const Vector2& point)
+	{
+		_controlPoints[0] = point;
+	}
+
+	void BezierCurve2D::SetEnd(const Vector2& point)
+	{
+		_controlPoints[3] = point;
+	}
+
+	void BezierCurve2D::SetStartHandle(const Vector2& point)
+	{
+		_controlPoints[1] = point;
+	}
+
+	void BezierCurve2D::SetEndHandle(const Vector2& point)
+	{
+		_controlPoints[2] = point;
 	}
 }
