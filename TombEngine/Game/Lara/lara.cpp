@@ -137,28 +137,44 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	//--------
 
 	// Sphere-triangle collision debug.
-	/*auto sphere = BoundingSphere(item->Pose.Position.ToVector3(), BLOCK(0.9f));
+	auto sphere = BoundingSphere(Geometry::TranslatePoint(item->Pose.Position.ToVector3(), g_Camera.actualAngle, BLOCK(0.6f)) + Vector3(0, -BLOCK(1), 0), BLOCK(0.5f));
+	
 	auto meshColl = g_Level.Rooms[item->RoomNumber].CollisionMesh.GetCollision(sphere);
+
+	auto offsets = std::vector<Vector3>{};
 	if (meshColl.has_value())
 	{
-		for (const auto& tangent : meshColl->Tangents)
+		for (int i = 0; i < meshColl->Count; i++)
+		{
+			const auto& tangent = meshColl->Tangents[i];
+			const auto& normal = meshColl->Triangles[i]->GetNormal();
+
 			DrawDebugTarget(tangent, Quaternion::Identity, BLOCK(0.2f), Color(1, 0, 0));
 
-		const auto& normal = meshColl->Triangles[0]->GetNormal();
-		const auto& tangent = meshColl->Tangents[0];
+			// Calculate and collect tanget offset.
+			float dist = abs(sphere.Radius - Vector3::Distance(sphere.Center, tangent));
+			auto offset = Geometry::TranslatePoint(Vector3::Zero, normal, dist);
+			offsets.push_back(offset);
+		}
 
-		// Calculate and collect tanget offset.
-		float dist = abs(sphere.Radius - Vector3::Distance(sphere.Center, tangent));
-		auto offset = Geometry::TranslatePoint(Vector3::Zero, normal, dist);
-		DrawDebugSphere(BoundingSphere(sphere.Center + offset, sphere.Radius), Color(1, 1, 1));
+		auto median = Vector3::Zero;
+		for (const auto& offset : offsets)
+			median += offset;
+		median /= (int)offsets.size();
+
+		PrintDebugMessage("%d", meshColl->Count);
+		DrawDebugSphere(BoundingSphere(sphere.Center + median, sphere.Radius), Color(1, 1, 1, 0.1f), RendererDebugPage::None, false);
 	}
-	DrawDebugSphere(sphere, Color(1, 1, 1));*/
+	else
+	{
+		DrawDebugSphere(sphere, Color(1, 1, 1, 0.1f), RendererDebugPage::None, false);
+	}
 
 	//HandleLosDebug(*item);
 
 	auto& room = g_Level.Rooms[item->RoomNumber];
 	//GenerateRoomCollisionMesh(room);
-	//room.CollisionMesh.DrawDebug();
+	room.CollisionMesh.DrawDebug();
 
 	for (auto& item2 : g_Level.Items)
 	{

@@ -60,13 +60,17 @@ namespace TEN::Renderer
 		if ((target - WorldPosition) == Vector3::Zero)
 			target.y -= 10.0f;
 
+		auto dir = target - camera.Position;
+		dir.Normalize();
+		target = Geometry::TranslatePoint(target, dir, camera.Radius);
+
 		auto rotMatrix = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
 		auto up = -Vector3::UnitY;
 		up = Vector3::Transform(up, rotMatrix);
 		up.Normalize();
 
 		RoomNumber = camera.RoomNumber;
-		WorldPosition = camera.Position;
+		WorldPosition = camera.Position + camera.Offset;
 		WorldDirection = target - WorldPosition;
 		WorldDirection.Normalize();
 		View = Matrix::CreateLookAt(WorldPosition, target, up);
