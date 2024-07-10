@@ -27,13 +27,17 @@ namespace TEN::Physics
 		CollisionTriangle(int vertexID0, int vertexID1, int vertexID2, const Vector3& normal, const BoundingBox& box, int portalRoomNumber);
 
 		// Getters
+
 		const Vector3&	   GetNormal() const;
 		const BoundingBox& GetAabb() const;
 		int				   GetPortalRoomNumber() const;
 
+		Vector3 GetTangent(const std::vector<Vector3>& vertices, const BoundingSphere& sphere) const;
+
 		// Inquirers
 
 		bool Intersects(const std::vector<Vector3>& vertices, const Ray& ray, float& dist) const;
+		bool Intersects(const std::vector<Vector3>& vertices, const BoundingSphere& sphere) const;
 		bool IsPortal() const;
 
 		// Debug
@@ -41,10 +45,18 @@ namespace TEN::Physics
 		void DrawDebug(const std::vector<Vector3>& vertices) const;
 	};
 
-	struct CollisionMeshCollisionData
+	struct CollisionMeshRayCollisionData
 	{
 		const CollisionTriangle& Triangle;
 		float Distance = 0.0f;
+	};
+	
+	struct CollisionMeshSphereCollisionData
+	{
+		std::vector<const CollisionTriangle*> Triangles = {};
+		std::vector<Vector3>				  Tangents	= {};
+
+		unsigned int Count = 0;
 	};
 
 	class CollisionMesh
@@ -60,9 +72,12 @@ namespace TEN::Physics
 
 			// Utilities
 
-			std::optional<CollisionMeshCollisionData> GetCollision(const Ray& ray, float dist,
-																   const std::vector<CollisionTriangle>& tris,
-																   const std::vector<Vector3>& vertices) const;
+			std::optional<CollisionMeshRayCollisionData>	GetCollision(const Ray& ray, float dist,
+																		 const std::vector<CollisionTriangle>& tris,
+																		 const std::vector<Vector3>& vertices) const;
+			std::optional<CollisionMeshSphereCollisionData> GetCollision(const BoundingSphere& sphere,
+																		 const std::vector<CollisionTriangle>& tris,
+																		 const std::vector<Vector3>& vertices) const;
 
 			// Debug
 
@@ -83,7 +98,8 @@ namespace TEN::Physics
 
 		// Getters
 
-		std::optional<CollisionMeshCollisionData> GetCollision(const Ray& ray, float dist) const;
+		std::optional<CollisionMeshRayCollisionData>	GetCollision(const Ray& ray, float dist) const;
+		std::optional<CollisionMeshSphereCollisionData> GetCollision(const BoundingSphere& sphere) const;
 
 		// Utilities
 

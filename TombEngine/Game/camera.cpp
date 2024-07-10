@@ -110,8 +110,6 @@ static bool TestCameraCollidableStatic(const MESH_INFO& staticObj)
 
 static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
 {
-	constexpr auto DIST_BUFFER = BLOCK(0.1f);
-
 	// 1) Get raw LOS collision.
 	auto dir = target - origin;
 	dir.Normalize();
@@ -166,21 +164,65 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 		}
 	}
 
-	// TODO: Perform room geometry shift instead of this.
-	if (cameraLosColl.Distance < DIST_BUFFER)
-	{
-		cameraLosColl.Distance = DIST_BUFFER;
-		cameraLosColl.Position = Geometry::TranslatePoint(origin, dir, cameraLosColl.Distance);;
-		cameraLosColl.RoomNumber = GetPointCollision(origin, originRoomNumber, dir, cameraLosColl.Distance).GetRoomNumber();
-	}
-
 	// 5) Return camera LOS collision.
 	return cameraLosColl;
 }
 
-void SetCameraWallShift()
+bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& normal)
 {
+	auto deltaPos = target - origin;
+	float dotProduct = deltaPos.Dot(normal);
 
+	return (dotProduct >= 0.0f);
+}
+
+// TODO: More precise math. This will fail in critical cases.
+static Vector3 GetCameraWallOffset()
+{
+	// 1) Define camera sphere.
+	auto sphere = BoundingSphere(g_Camera.Position, BLOCK(0.05f));// g_Camera.Radius); // TODO
+
+	// 2) Collect room mesh triangle tangent offsets.
+	auto offsets = std::vector<Vector3>{};
+	const auto& room = g_Level.Rooms[g_Camera.RoomNumber];
+	for (int neighborRoomNumber : room.neighbors)
+	{
+		const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+
+		auto meshColl = neighborRoom.CollisionMesh.GetCollision(sphere);
+		if (meshColl.has_value())
+		{
+			// Run through triangle mesh collisions.
+			for (int i = 0; i < meshColl->Count; i++)
+			{
+				const auto& tangent = meshColl->Tangents[i];
+				const auto& normal = meshColl->Triangles[i]->GetNormal();
+
+				// Calculate and collect tanget offset.
+				float dist = abs(sphere.Radius - Vector3::Distance(sphere.Center, tangent));
+				auto offset = Geometry::TranslatePoint(Vector3::Zero, normal, dist);
+				offsets.push_back(offset);
+			}
+		}
+	}
+
+	// 3) Collect bridge mesh triangle tangent offsets.
+	unsigned int searchDepth = (unsigned int)ceil(sphere.Radius / BLOCK(1));
+	auto sectors = GetNeighborSectors(Vector3i(sphere.Center), g_Camera.RoomNumber, searchDepth);
+	// TODO
+
+	// 4) No offsets; return early.
+	if (offsets.empty())
+		return Vector3::Zero;
+
+	// 5) Calculate tangent average.
+	auto average = Vector3::Zero;
+	for (const auto& tangent : offsets)
+		average += tangent;
+	average /= offsets.size();
+
+	// 6) Calculate offset.
+	return (average);
 }
 
 EulerAngles GetCameraControlRotation()
@@ -348,7 +390,7 @@ void InitializeCamera()
 	g_Camera.RoomNumber = LaraItem->RoomNumber;
 
 	g_Camera.targetDistance = BLOCK(1.5f);
-	g_Camera.Radius = CLICK(1.5f);
+	g_Camera.Radius = BLOCK(0.1f);
 	g_Camera.item = nullptr;
 	g_Camera.numberFrames = 1;
 	g_Camera.type = CameraType::Chase;
@@ -428,12 +470,20 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	// Translate camera.
 	g_Camera.Position = Vector3::Lerp(g_Camera.Position, idealPos, 1.0f / speed);
 	g_Camera.RoomNumber = idealRoomNumber;
-	SetCameraWallShift();
+
+	// Apply wall offset.
+	g_Camera.Position += GetCameraWallOffset(); // TODO: Renderer shift, not literal shift?
 
 	// Assess LOS.
 	auto cameraLos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, g_Camera.Position);
 	g_Camera.Position = cameraLos.Position;
 	g_Camera.RoomNumber = cameraLos.RoomNumber;
+
+	// FAILSAFE
+	if (g_Camera.Position == g_Camera.LookAt)
+	{
+		g_Camera.LookAt += Vector3::One;
+	}
 
 	// Bounce.
 	if (g_Camera.bounce != 0)

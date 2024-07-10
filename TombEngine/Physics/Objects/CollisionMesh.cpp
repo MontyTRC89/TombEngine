@@ -34,6 +34,27 @@ namespace TEN::Physics
 		return _portalRoomNumber;
 	}
 
+	// TODO: Triangle treated as infinite.
+	Vector3 CollisionTriangle::GetTangent(const std::vector<Vector3>& vertices, const BoundingSphere& sphere) const
+	{
+		// Get vertices.
+		const auto& vertex0 = vertices[_vertexIds[0]];
+		const auto& vertex1 = vertices[_vertexIds[1]];
+		const auto& vertex2 = vertices[_vertexIds[2]];
+
+		// Calculate edges.
+		auto edge0 = vertex1 - vertex0;
+		auto edge1 = vertex2 - vertex0;
+
+		// Calculate edge normal.
+		auto normal = edge0.Cross(edge1);
+		normal.Normalize();
+
+		// Calculate tangent.
+		float dist = normal.Dot(sphere.Center - vertex0);
+		return (sphere.Center - (normal * dist));
+	}
+
 	bool CollisionTriangle::Intersects(const std::vector<Vector3>& vertices, const Ray& ray, float& dist) const
 	{
 		// Test if ray intersects triangle AABB.
@@ -45,9 +66,14 @@ namespace TEN::Physics
 		if (ray.direction.Dot(_normal) > EPSILON)
 			return false;
 
-		// Calculate edge vectors.
-		auto edge0 = vertices[_vertexIds[1]] - vertices[_vertexIds[0]];
-		auto edge1 = vertices[_vertexIds[2]] - vertices[_vertexIds[0]];
+		// Get vertices.
+		const auto& vertex0 = vertices[_vertexIds[0]];
+		const auto& vertex1 = vertices[_vertexIds[1]];
+		const auto& vertex2 = vertices[_vertexIds[2]];
+
+		// Calculate edges.
+		auto edge0 = vertex1 - vertex0;
+		auto edge1 = vertex2 - vertex0;
 
 		// Calculate determinant.
 		auto dirCrossEdge1 = ray.direction.Cross(edge1);
@@ -76,6 +102,26 @@ namespace TEN::Physics
 
 		dist = intersectDist;
 		return true;
+	}
+
+	bool CollisionTriangle::Intersects(const std::vector<Vector3>& vertices, const BoundingSphere& sphere) const
+	{
+		// Get vertices.
+		const auto& vertex0 = vertices[_vertexIds[0]];
+		const auto& vertex1 = vertices[_vertexIds[1]];
+		const auto& vertex2 = vertices[_vertexIds[2]];
+
+		// Calculate edges.
+		auto edge0 = vertex1 - vertex0;
+		auto edge1 = vertex2 - vertex0;
+
+		// Calculate edge normal.
+		auto normal = edge0.Cross(edge1);
+		normal.Normalize();
+
+		// Test intersection.
+		float dist = abs(normal.Dot(sphere.Center - vertex0));
+		return (dist <= sphere.Radius);
 	}
 
 	bool CollisionTriangle::IsPortal() const
@@ -114,9 +160,9 @@ namespace TEN::Physics
 		Generate(ids, aabbs, 0, (int)tris.size());
 	}
 
-	std::optional<CollisionMeshCollisionData> CollisionMesh::Bvh::GetCollision(const Ray& ray, float dist,
-																			   const std::vector<CollisionTriangle>& tris,
-																			   const std::vector<Vector3>& vertices) const
+	std::optional<CollisionMeshRayCollisionData> CollisionMesh::Bvh::GetCollision(const Ray& ray, float dist,
+																				  const std::vector<CollisionTriangle>& tris,
+																				  const std::vector<Vector3>& vertices) const
 	{
 		if (_nodes.empty())
 			return std::nullopt;
@@ -143,11 +189,13 @@ namespace TEN::Physics
 			{
 				for (int id : node.Ids)
 				{
+					const auto& tri = tris[id];
+
 					float intersectDist = 0.0f;
-					if (tris[id].Intersects(vertices, ray, intersectDist) &&
+					if (tri.Intersects(vertices, ray, intersectDist) &&
 						intersectDist <= dist && intersectDist < closestDist)
 					{
-						closestTri = &tris[id];
+						closestTri = &tri;
 						closestDist = intersectDist;
 						isIntersected = true;
 					}
@@ -164,7 +212,65 @@ namespace TEN::Physics
 		traverseBvh((int)_nodes.size() - 1);
 
 		if (isIntersected)
-			return CollisionMeshCollisionData{ *closestTri, closestDist };
+			return CollisionMeshRayCollisionData{ *closestTri, closestDist };
+
+		return std::nullopt;
+	}
+
+	std::optional<CollisionMeshSphereCollisionData> CollisionMesh::Bvh::GetCollision(const BoundingSphere& sphere,
+																					 const std::vector<CollisionTriangle>& tris,
+																					 const std::vector<Vector3>& vertices) const
+	{
+		if (_nodes.empty())
+			return std::nullopt;
+
+		auto meshColl = CollisionMeshSphereCollisionData{};
+
+		std::function<void(int)> traverseBvh = [&](int nodeID)
+		{
+			// Invalid node; return early.
+			if (nodeID == NO_VALUE)
+				return;
+
+			const auto& node = _nodes[nodeID];
+
+			// Test node intersection.
+			float intersectDist = 0.0f;
+			if (!node.Aabb.Intersects(sphere))
+				return;
+
+			// Traverse nodes.
+			if (node.IsLeaf())
+			{
+				for (int id : node.Ids)
+				{
+					const auto& tri = tris[id];
+
+					float intersectDist = 0.0f;
+					if (!tri.IsPortal() && tri.Intersects(vertices, sphere))
+					{
+						meshColl.Triangles.push_back(&tri);
+						meshColl.Tangents.push_back(tri.GetTangent(vertices, sphere));
+					}
+				}
+			}
+			else
+			{
+				traverseBvh(node.LeftChildID);
+				traverseBvh(node.RightChildID);
+			}
+		};
+		
+		// Traverse BVH from root node.
+		traverseBvh((int)_nodes.size() - 1);
+
+		if (!meshColl.Triangles.empty() && !meshColl.Tangents.empty())
+		{
+			TENAssert(meshColl.Triangles.size() == meshColl.Tangents.size(), "CollisionMesh::Bvh::GetCollision(): Triangles and Tangents out of sync.");
+			meshColl.Count = (unsigned int)meshColl.Triangles.size();
+
+			return meshColl;
+		}
 
 		return std::nullopt;
 	}
@@ -182,9 +288,14 @@ namespace TEN::Physics
 		_triangles = tris;
 	}
 
-	std::optional<CollisionMeshCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
+	std::optional<CollisionMeshRayCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
 	{
 		return _bvh.GetCollision(ray, dist, _triangles, _vertices);
+	}
+
+	std::optional<CollisionMeshSphereCollisionData> CollisionMesh::GetCollision(const BoundingSphere& sphere) const
+	{
+		return _bvh.GetCollision(sphere, _triangles, _vertices);
 	}
 
 	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, int portalRoomNumber)
@@ -226,6 +337,7 @@ namespace TEN::Physics
 			}
 		}
 		
+		// Add new triangle.
 		auto box = Geometry::GetBoundingBox(std::vector<Vector3>{ vertex0, vertex1, vertex2 });
 		_triangles.push_back(CollisionTriangle(vertexID0, vertexID1, vertexID2, normal, box, portalRoomNumber));
 	}

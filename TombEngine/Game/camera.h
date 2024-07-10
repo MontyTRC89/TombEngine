@@ -179,7 +179,6 @@ struct ScreenEffectData
 extern CameraInfo		g_Camera;
 extern ScreenEffectData g_ScreenEffect;
 
-void		SetCameraWallShift();
 EulerAngles GetCameraControlRotation();
 
 void UpdatePlayerRefCameraOrient(ItemInfo& item);

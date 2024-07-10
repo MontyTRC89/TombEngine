@@ -136,6 +136,24 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	//--------
 
+	// Sphere-triangle collision debug.
+	/*auto sphere = BoundingSphere(item->Pose.Position.ToVector3(), BLOCK(0.9f));
+	auto meshColl = g_Level.Rooms[item->RoomNumber].CollisionMesh.GetCollision(sphere);
+	if (meshColl.has_value())
+	{
+		for (const auto& tangent : meshColl->Tangents)
+			DrawDebugTarget(tangent, Quaternion::Identity, BLOCK(0.2f), Color(1, 0, 0));
+
+		const auto& normal = meshColl->Triangles[0]->GetNormal();
+		const auto& tangent = meshColl->Tangents[0];
+
+		// Calculate and collect tanget offset.
+		float dist = abs(sphere.Radius - Vector3::Distance(sphere.Center, tangent));
+		auto offset = Geometry::TranslatePoint(Vector3::Zero, normal, dist);
+		DrawDebugSphere(BoundingSphere(sphere.Center + offset, sphere.Radius), Color(1, 1, 1));
+	}
+	DrawDebugSphere(sphere, Color(1, 1, 1));*/
+
 	//HandleLosDebug(*item);
 
 	auto& room = g_Level.Rooms[item->RoomNumber];
