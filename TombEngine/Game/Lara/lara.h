@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/control/control.h"
 #include "Game/Lara/lara_struct.h"
 #include "Specific/clock.h"
@@ -11,7 +12,7 @@ constexpr auto FRONT_ARC		   = ANGLE(90.0f);
 
 // Modern control turn alphas
 
-constexpr auto PLAYER_STANDARD_TURN_ALPHA	  = 0.25f;
+constexpr auto PLAYER_DEFAULT_TURN_ALPHA	  = 0.25f;
 constexpr auto PLAYER_SPRINT_TURN_ALPHA		  = 0.06f;
 constexpr auto PLAYER_CRAWL_TURN_ALPHA		  = 0.1f;
 constexpr auto PLAYER_JUMP_PREPARE_TURN_ALPHA = 0.6f;

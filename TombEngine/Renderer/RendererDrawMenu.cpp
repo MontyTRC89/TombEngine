@@ -1384,8 +1384,8 @@ namespace TEN::Renderer
 			PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
 			PrintDebugMessage("Room Position: %d, %d, %d, %d", room.x, room.z, room.x + BLOCK(room.xSize), room.z + BLOCK(room.zSize));
 			PrintDebugMessage("Room.y, minFloor, maxCeiling: %d, %d, %d ", room.y, room.minfloor, room.maxceiling);
-			PrintDebugMessage("Camera Position: %d, %d, %d", g_Camera.Position.x, g_Camera.Position.y, g_Camera.Position.z);
-			PrintDebugMessage("Camera LookAt: %d, %d, %d", g_Camera.LookAt.x, g_Camera.LookAt.y, g_Camera.LookAt.z);
+			PrintDebugMessage("Camera Position: %.3f, %.3f, %.3f", g_Camera.Position.x, g_Camera.Position.y, g_Camera.Position.z);
+			PrintDebugMessage("Camera LookAt: %.3f, %.3f, %.3f", g_Camera.LookAt.x, g_Camera.LookAt.y, g_Camera.LookAt.z);
 			PrintDebugMessage("Camera RoomNumber: %d", g_Camera.RoomNumber);
 			break;\
 

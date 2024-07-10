@@ -458,7 +458,7 @@ static void UpdateAzimuthAngle(const ItemInfo& item)
 	constexpr auto BASE_VEL					= BLOCK(0.1f);
 	constexpr auto BASE_ANGLE				= ANGLE(90.0f);
 	constexpr auto AUTO_ROT_DELTA_ANGLE_MAX = BASE_ANGLE * 1.5f;
-	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.05f;
+	constexpr auto AZIMUTH_ANGLE_LERP_ALPHA = 0.075f;
 
 	if (!g_Config.IsUsingModernControls() || IsPlayerStrafing(item))
 		return;
@@ -508,6 +508,8 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	g_Camera.PrevCamera.target = g_Camera.LookAt;
 	g_Camera.PrevIdeal = idealPos;
 	g_Camera.PrevIdealRoomNumber = idealRoomNumber;
+
+	g_Camera.Distance = Vector3::Distance(g_Camera.LookAt, g_Camera.Position);
 
 	// Translate camera.
 	g_Camera.Position = Vector3::Lerp(g_Camera.Position, idealPos, 1.0f / speed);
@@ -684,6 +686,7 @@ static bool TestCameraStrafeZoom(const ItemInfo& playerItem)
 
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
+	constexpr auto DIST_EASE_OUT_ALPHA			   = 0.3f;
 	constexpr auto STRAFE_CAMERA_FOV			   = ANGLE(86.0f);
 	constexpr auto STRAFE_CAMERA_FOV_LERP_ALPHA	   = 0.5f;
 	constexpr auto STRAFE_CAMERA_DIST_OFFSET_COEFF = 0.5f;
@@ -701,8 +704,11 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		// Calcuate direction.
 		auto dir = -EulerAngles(g_Camera.actualElevation, g_Camera.actualAngle, 0).ToDirection();
 
+		// Calculate distance.
+		float dist = EaseOutSine(g_Camera.Distance, g_Camera.targetDistance, DIST_EASE_OUT_ALPHA);
+
 		// Calcuate ideal position.
-		auto idealPos = std::pair(Geometry::TranslatePoint(g_Camera.LookAt, dir, g_Camera.targetDistance), g_Camera.LookAtRoomNumber);
+		auto idealPos = std::pair(Geometry::TranslatePoint(g_Camera.LookAt, dir, dist), g_Camera.LookAtRoomNumber);
 		idealPos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, idealPos.first).Position;
 
 		// Apply strafe camera effects.

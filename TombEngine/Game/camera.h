@@ -113,6 +113,7 @@ struct CameraInfo
 	short	targetAngle		 = 0;
 	short	actualElevation	 = 0; // AltitudeAngle
 	short	targetElevation	 = 0;
+	float	Distance		 = 0.0f;
 	float	targetDistance	 = 0.0f;
 	float	speed			 = 0.0f;
 	float	targetspeed		 = 0.0f;

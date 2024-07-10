@@ -164,7 +164,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	if (g_Config.IsUsingModernControls())
 	{
 		if (!(CanPerformTurnaround(*item) && HasStateDispatch(item, LS_WALK_FORWARD_TURN_180)))
-			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, LARA_LEAN_MAX / 2, IsPlayerStrafing(*item), TURN_FLAGS);
+			HandlePlayerTurn(*item, PLAYER_DEFAULT_TURN_ALPHA, LARA_LEAN_MAX / 2, IsPlayerStrafing(*item), TURN_FLAGS);
 	}
 	else
 	{
@@ -292,14 +292,17 @@ void lara_as_walk_forward_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	player.Control.Look.Mode = LookMode::Horizontal;
 
+	// Death.
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_WALK_FORWARD;
 		return;
 	}
 
+	// Turn.
 	HandlePlayerTurn(*item, PLAYER_TURNAROUND_TURN_ALPHA, 0, false, TURN_FLAGS, Y_ANGLE_OFFEST);
 
 	// Reset.
@@ -360,11 +363,12 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	bool isWading = (player.Control.WaterStatus == WaterStatus::Wade);
-
 	player.Control.Look.Mode = LookMode::Horizontal;
 	player.Control.Count.Run = std::clamp<unsigned int>(player.Control.Count.Run + 1, 0, PLAYER_TANK_CONTROL_RUN_JUMP_TIME);
 
+	// Death.
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_DEATH;
@@ -375,7 +379,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	if (g_Config.IsUsingModernControls())
 	{
 		if (!(CanPerformTurnaround(*item) && HasStateDispatch(item, LS_RUN_FORWARD_TURN_180)))
-			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, LARA_LEAN_MAX, IsPlayerStrafing(*item), TURN_FLAGS);
+			HandlePlayerTurn(*item, PLAYER_DEFAULT_TURN_ALPHA, LARA_LEAN_MAX, IsPlayerStrafing(*item), TURN_FLAGS);
 	}
 	else
 	{
@@ -386,6 +390,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
+	// Jump.
 	if (IsHeld(In::Jump) || player.Control.IsRunJumpQueued)
 	{
 		if (!IsHeld(In::Sprint) && CanRunJumpForward(*item, *coll))
@@ -398,6 +403,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			player.Control.IsRunJumpQueued = CanQueueRunningJump(*item, *coll);
 	}
 
+	// Turn 180.
 	if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll)) &&
 		CanRunRoll180(*item))
 	{
@@ -405,16 +411,19 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
+	// Crouch.
 	if (IsHeld(In::Crouch) && CanCrouch(*item, *coll))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
 	}
 
+	// Move.
 	if (g_Config.IsUsingModernControls() ?
 		(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
 		IsHeld(In::Forward))
 	{
+		// Vault.
 		if (IsHeld(In::Action))
 		{
 			auto vaultContext = TestLaraVault(item, coll);
@@ -553,14 +562,17 @@ void lara_as_run_forward_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 	auto& player = GetLaraInfo(*item);
 
+	// Setup.
 	player.Control.Look.Mode = LookMode::Horizontal;
 
+	// Death.
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_RUN_FORWARD;
 		return;
 	}
 
+	// Turn.
 	HandlePlayerTurn(*item, PLAYER_TURNAROUND_TURN_ALPHA, 0, false, TURN_FLAGS, Y_ANGLE_OFFEST);
 
 	// Reset.
@@ -688,7 +700,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		float turnAlpha = isWading ?
 			PLAYER_WADE_TURN_ALPHA * (isInSwamp ? 0.5f : 1.0f) :
-			PLAYER_STANDARD_TURN_ALPHA;
+			PLAYER_DEFAULT_TURN_ALPHA;
 
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
 		{
@@ -1168,7 +1180,7 @@ void lara_as_skip_back(ItemInfo* item, CollisionInfo* coll)
 	player.Control.Look.Mode = LookMode::None;
 
 	// Turn.
-	HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, LARA_LEAN_MAX, true, TURN_FLAGS);
+	HandlePlayerTurn(*item, PLAYER_DEFAULT_TURN_ALPHA, LARA_LEAN_MAX, true, TURN_FLAGS);
 
 	if (IsHeld(In::Jump))
 	{
@@ -1268,7 +1280,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 	// Turn.
 	if (g_Config.IsUsingModernControls())
 	{
-		float turnAlpha = isWading ? (PLAYER_WADE_TURN_ALPHA * (isInSwamp ? 0.5f : 1.0f)) : PLAYER_STANDARD_TURN_ALPHA;
+		float turnAlpha = isWading ? (PLAYER_WADE_TURN_ALPHA * (isInSwamp ? 0.5f : 1.0f)) : PLAYER_DEFAULT_TURN_ALPHA;
 		HandlePlayerTurn(*item, turnAlpha, 0, true, TURN_FLAGS);
 	}
 	else
@@ -1606,7 +1618,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 	if (g_Config.IsUsingModernControls())
 	{
 		// Turn.
-		HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, true, TURN_FLAGS);
+		HandlePlayerTurn(*item, PLAYER_DEFAULT_TURN_ALPHA, 0, true, TURN_FLAGS);
 
 		if (IsPlayerStrafing(*item))
 		{
@@ -1877,7 +1889,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 	// Turn.
 	if (g_Config.IsUsingModernControls())
 	{
-		HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, true, TURN_FLAGS);
+		HandlePlayerTurn(*item, PLAYER_DEFAULT_TURN_ALPHA, 0, true, TURN_FLAGS);
 	}
 	else
 	{
@@ -1985,7 +1997,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 	// Turn.
 	if (g_Config.IsUsingModernControls())
 	{
-		HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, true, TURN_FLAGS);
+		HandlePlayerTurn(*item, PLAYER_DEFAULT_TURN_ALPHA, 0, true, TURN_FLAGS);
 	}
 	else
 	{
