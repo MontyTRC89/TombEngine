@@ -458,6 +458,100 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
+	static std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, int push, bool yFirst)
+	{
+		auto collidedPos = std::pair(pos, roomNumber);
+		auto pointColl = GetPointCollision(pos, roomNumber);
+
+		if (yFirst)
+		{
+
+			int buffer = CLICK(1) - 1;
+			if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
+				(collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
+				pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
+			{
+				collidedPos.first.y = (pointColl.GetFloorHeight() + pointColl.GetCeilingHeight()) / 2;
+			}
+			else if ((collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
+				pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
+			{
+				collidedPos.first.y = pointColl.GetFloorHeight() - buffer;
+			}
+			else if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
+				pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
+			{
+				collidedPos.first.y = pointColl.GetCeilingHeight() + buffer;
+			}
+		}
+
+		pointColl = GetPointCollision(Vector3i(collidedPos.first.x - push, collidedPos.first.y, collidedPos.first.z), roomNumber);
+		if (collidedPos.first.y > pointColl.GetFloorHeight() ||
+			pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
+			collidedPos.first.y < pointColl.GetCeilingHeight())
+		{
+			collidedPos.first.x = ((int)collidedPos.first.x & (~WALL_MASK)) + push;
+		}
+
+		pointColl = GetPointCollision(Vector3i(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z - push), roomNumber);
+		if (collidedPos.first.y > pointColl.GetFloorHeight() ||
+			pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
+			collidedPos.first.y < pointColl.GetCeilingHeight())
+		{
+			collidedPos.first.z = ((int)collidedPos.first.z & (~WALL_MASK)) + push;
+		}
+
+		pointColl = GetPointCollision(Vector3i(collidedPos.first.x + push, collidedPos.first.y, collidedPos.first.z), roomNumber);
+		if (collidedPos.first.y > pointColl.GetFloorHeight() ||
+			pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
+			collidedPos.first.y < pointColl.GetCeilingHeight())
+		{
+			collidedPos.first.x = ((int)collidedPos.first.x | WALL_MASK) - push;
+		}
+
+		pointColl = GetPointCollision(Vector3i(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z + push), roomNumber);
+		if (collidedPos.first.y > pointColl.GetFloorHeight() ||
+			pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
+			collidedPos.first.y < pointColl.GetCeilingHeight())
+		{
+			collidedPos.first.z = ((int)collidedPos.first.z | WALL_MASK) - push;
+		}
+
+		if (!yFirst)
+		{
+			pointColl = GetPointCollision(Vector3i(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z), roomNumber);
+
+			int buffer = CLICK(1) - 1;
+			if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
+				(collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
+				pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
+			{
+				collidedPos.first.y = (pointColl.GetFloorHeight() + pointColl.GetCeilingHeight()) / 2;
+			}
+			else if ((collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
+				pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
+			{
+				collidedPos.first.y = pointColl.GetFloorHeight() - buffer;
+			}
+			else if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
+				pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
+			{
+				collidedPos.first.y = pointColl.GetCeilingHeight() + buffer;
+			}
+		}
+
+		pointColl = GetPointCollision(collidedPos.first, roomNumber);
+		if (collidedPos.first.y > pointColl.GetFloorHeight() ||
+			collidedPos.first.y < pointColl.GetCeilingHeight() ||
+			pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight())
+		{
+			return collidedPos;
+		}
+
+		collidedPos.second = pointColl.GetRoomNumber();
+		return collidedPos;
+	}
+
 	void KayakToBackground(ItemInfo* kayakItem, ItemInfo* laraItem)
 	{
 		auto* kayak = GetKayakInfo(kayakItem);
@@ -560,7 +654,7 @@ namespace TEN::Entities::Vehicles
 			kayakPos.z = kayak->OldPose.Position.z;
 			kayakPos.RoomNumber = kayakItem->RoomNumber;
 
-			// HACK: Camera wall shift used.
+			// HACK: Legacy camera wall shift used.
 			auto collidedPos = GetCameraWallShift(kayak->OldPose.Position.ToVector3(), kayakItem->RoomNumber, BLOCK(0.25f), false);
 			{
 				kayakItem->Pose.Position = collidedPos.first;

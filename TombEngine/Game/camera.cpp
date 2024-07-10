@@ -178,98 +178,9 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 	return cameraLosColl;
 }
 
-std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, int push, bool yFirst)
+void SetCameraWallShift()
 {
-	auto collidedPos = std::pair(pos, roomNumber);
-	auto pointColl = GetPointCollision(pos, roomNumber);
 
-	if (yFirst)
-	{
-
-		int buffer = CLICK(1) - 1;
-		if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
-			(collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
-			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
-		{
-			collidedPos.first.y = (pointColl.GetFloorHeight() + pointColl.GetCeilingHeight()) / 2;
-		}
-		else if ((collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
-			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
-		{
-			collidedPos.first.y = pointColl.GetFloorHeight() - buffer;
-		}
-		else if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
-			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
-		{
-			collidedPos.first.y = pointColl.GetCeilingHeight() + buffer;
-		}
-	}
-
-	pointColl = GetPointCollision(Vector3i(collidedPos.first.x - push, collidedPos.first.y, collidedPos.first.z), roomNumber);
-	if (collidedPos.first.y > pointColl.GetFloorHeight() ||
-		pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
-		collidedPos.first.y < pointColl.GetCeilingHeight())
-	{
-		collidedPos.first.x = ((int)collidedPos.first.x & (~WALL_MASK)) + push;
-	}
-
-	pointColl = GetPointCollision(Vector3i(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z - push), roomNumber);
-	if (collidedPos.first.y > pointColl.GetFloorHeight() ||
-		pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
-		collidedPos.first.y < pointColl.GetCeilingHeight())
-	{
-		collidedPos.first.z = ((int)collidedPos.first.z & (~WALL_MASK)) + push;
-	}
-
-	pointColl = GetPointCollision(Vector3i(collidedPos.first.x + push, collidedPos.first.y, collidedPos.first.z), roomNumber);
-	if (collidedPos.first.y > pointColl.GetFloorHeight() ||
-		pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
-		collidedPos.first.y < pointColl.GetCeilingHeight())
-	{
-		collidedPos.first.x = ((int)collidedPos.first.x | WALL_MASK) - push;
-	}
-
-	pointColl = GetPointCollision(Vector3i(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z + push), roomNumber);
-	if (collidedPos.first.y > pointColl.GetFloorHeight() ||
-		pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight() ||
-		collidedPos.first.y < pointColl.GetCeilingHeight())
-	{
-		collidedPos.first.z = ((int)collidedPos.first.z | WALL_MASK) - push;
-	}
-
-	if (!yFirst)
-	{
-		pointColl = GetPointCollision(Vector3i(collidedPos.first.x, collidedPos.first.y, collidedPos.first.z), roomNumber);
-
-		int buffer = CLICK(1) - 1;
-		if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
-			(collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
-			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
-		{
-			collidedPos.first.y = (pointColl.GetFloorHeight() + pointColl.GetCeilingHeight()) / 2;
-		}
-		else if ((collidedPos.first.y + buffer) > pointColl.GetFloorHeight() &&
-			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
-		{
-			collidedPos.first.y = pointColl.GetFloorHeight() - buffer;
-		}
-		else if ((collidedPos.first.y - buffer) < pointColl.GetCeilingHeight() &&
-			pointColl.GetCeilingHeight() < pointColl.GetFloorHeight())
-		{
-			collidedPos.first.y = pointColl.GetCeilingHeight() + buffer;
-		}
-	}
-
-	pointColl = GetPointCollision(collidedPos.first, roomNumber);
-	if (collidedPos.first.y > pointColl.GetFloorHeight() ||
-		collidedPos.first.y < pointColl.GetCeilingHeight() ||
-		pointColl.GetCeilingHeight() >= pointColl.GetFloorHeight())
-	{
-		return collidedPos;
-	}
-
-	collidedPos.second = pointColl.GetRoomNumber();
-	return collidedPos;
 }
 
 EulerAngles GetCameraControlRotation()
@@ -389,9 +300,6 @@ void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	auto idealPos = cameraLos.Position;
 	int idealRoomNumber = cameraLos.RoomNumber;
 
-	// TODO
-	//idealPos = GetCameraWallShift(idealPos, idealRoomNumber, CLICK(1.5f), true);
-
 	// Update camera.
 	g_Camera.LookAt += (lookAt - g_Camera.LookAt) * (1.0f / g_Camera.speed);
 	MoveCamera(playerItem, idealPos, idealRoomNumber, g_Camera.speed);
@@ -440,6 +348,7 @@ void InitializeCamera()
 	g_Camera.RoomNumber = LaraItem->RoomNumber;
 
 	g_Camera.targetDistance = BLOCK(1.5f);
+	g_Camera.Radius = CLICK(1.5f);
 	g_Camera.item = nullptr;
 	g_Camera.numberFrames = 1;
 	g_Camera.type = CameraType::Chase;
@@ -519,6 +428,7 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	// Translate camera.
 	g_Camera.Position = Vector3::Lerp(g_Camera.Position, idealPos, 1.0f / speed);
 	g_Camera.RoomNumber = idealRoomNumber;
+	SetCameraWallShift();
 
 	// Assess LOS.
 	auto cameraLos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, g_Camera.Position);
@@ -731,9 +641,6 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			SetFov((short)Lerp(g_Camera.Fov, ANGLE(DEFAULT_FOV), STRAFE_CAMERA_FOV_LERP_ALPHA / 2));
 		}
 
-		// TODO
-		//idealPos = GetCameraWallShift(idealPos, idealRoomNumber, CLICK(1.5f), true);
-
 		// Update camera.
 		float speedCoeff = (g_Camera.type != CameraType::Look) ? 0.2f : 1.0f;
 		MoveCamera(playerItem, idealPos, idealRoomNumber, g_Camera.speed * speedCoeff);
@@ -793,9 +700,6 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		}
 
 		g_Camera.actualAngle = farthestIdealAzimuthAngle;
-		auto wallShift = GetCameraWallShift(farthestIdealPos, farthestIdealRoomNumber, CLICK(1.5f), true);;
-		farthestIdealPos = wallShift.first;
-		farthestIdealRoomNumber = wallShift.second;
 
 		if (isCombatCamera)
 		{

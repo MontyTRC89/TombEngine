@@ -115,6 +115,7 @@ struct CameraInfo
 	short	targetElevation	 = 0;
 	float	Distance		 = 0.0f;
 	float	targetDistance	 = 0.0f;
+	float	Radius			 = 0.0f;
 	float	speed			 = 0.0f;
 	float	targetspeed		 = 0.0f;
 	short	Fov				 = 0;
@@ -178,8 +179,8 @@ struct ScreenEffectData
 extern CameraInfo		g_Camera;
 extern ScreenEffectData g_ScreenEffect;
 
-std::pair<Vector3, int> GetCameraWallShift(const Vector3& pos, int roomNumber, int push, bool yFirst);
-EulerAngles				GetCameraControlRotation();
+void		SetCameraWallShift();
+EulerAngles GetCameraControlRotation();
 
 void UpdatePlayerRefCameraOrient(ItemInfo& item);
 void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
