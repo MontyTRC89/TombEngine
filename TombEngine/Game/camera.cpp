@@ -691,7 +691,7 @@ static bool TestCameraStrafeZoom(const ItemInfo& playerItem)
 
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
-	constexpr auto MODERN_CAMERA_DIST_LERP_ALPHA   = 0.3f;
+	constexpr auto MODERN_CAMERA_DIST_LERP_ALPHA   = 0.4f;
 	constexpr auto STRAFE_CAMERA_FOV			   = ANGLE(86.0f);
 	constexpr auto STRAFE_CAMERA_FOV_LERP_ALPHA	   = 0.5f;
 	constexpr auto STRAFE_CAMERA_DIST_OFFSET_COEFF = 0.5f;
