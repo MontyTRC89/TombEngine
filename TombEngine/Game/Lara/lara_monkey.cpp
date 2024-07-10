@@ -51,7 +51,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	if (g_Config.IsUsingModernControls())
 	{
 		if (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-			HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, false, TURN_FLAGS);
+			HandlePlayerTurn(*item, PLAYER_DEFAULT_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else if (g_Config.IsUsingEnhancedControls())
 	{
@@ -223,7 +223,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (g_Config.IsUsingModernControls())
 	{
-		HandlePlayerTurn(*item, PLAYER_STANDARD_TURN_ALPHA, 0, false, TURN_FLAGS);
+		HandlePlayerTurn(*item, PLAYER_DEFAULT_TURN_ALPHA, 0, false, TURN_FLAGS);
 	}
 	else
 	{
