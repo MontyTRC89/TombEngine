@@ -701,13 +701,9 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 	// Move camera.
 	if (g_Config.IsUsingModernControls() || g_Camera.IsControllingTankCamera)
 	{
-		// Calcuate direction.
-		auto dir = -EulerAngles(g_Camera.actualElevation, g_Camera.actualAngle, 0).ToDirection();
-
-		// Calculate distance.
-		float dist = EaseOutSine(g_Camera.Distance, g_Camera.targetDistance, DIST_EASE_OUT_ALPHA);
-
 		// Calcuate ideal position.
+		auto dir = -EulerAngles(g_Camera.actualElevation, g_Camera.actualAngle, 0).ToDirection();
+		float dist = EaseOutSine(g_Camera.Distance, g_Camera.targetDistance, DIST_EASE_OUT_ALPHA);
 		auto idealPos = std::pair(Geometry::TranslatePoint(g_Camera.LookAt, dir, dist), g_Camera.LookAtRoomNumber);
 		idealPos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, idealPos.first).Position;
 
