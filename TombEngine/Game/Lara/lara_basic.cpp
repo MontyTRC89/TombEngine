@@ -403,7 +403,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			player.Control.IsRunJumpQueued = CanQueueRunningJump(*item, *coll);
 	}
 
-	// Turn 180.
+	// Roll 180.
 	if ((IsHeld(In::Roll) || (HasOppositeAction(*item) && g_Config.EnableOppositeActionRoll)) &&
 		CanRunRoll180(*item))
 	{
@@ -418,12 +418,12 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// Move.
+	// Move forward.
 	if (g_Config.IsUsingModernControls() ?
 		(IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right)) :
 		IsHeld(In::Forward))
 	{
-		// Vault.
+		// Climb.
 		if (IsHeld(In::Action))
 		{
 			auto vaultContext = TestLaraVault(item, coll);
@@ -435,6 +435,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 
+		// Wade, walk, run, sprint, turn 180.
 		if (isWading)
 		{
 			item->Animation.TargetState = LS_WADE_FORWARD;

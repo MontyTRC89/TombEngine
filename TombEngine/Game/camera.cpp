@@ -39,8 +39,9 @@ constexpr auto CAMERA_OBJECT_COLL_EXTENT_THRESHOLD = CLICK(0.5f);
 
 struct CameraLosCollisionData
 {
-	std::pair<Vector3, int> Position = {};
-	Vector3					Normal	 = Vector3::Zero;
+	Vector3 Position   = Vector3::Zero;
+	int		RoomNumber = 0;
+	Vector3 Normal	   = Vector3::Zero;
 
 	bool  IsIntersected = false;
 	float Distance		= 0.0f;
@@ -120,7 +121,8 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 	// 2) Clip room LOS collision.
 	auto cameraLosColl = CameraLosCollisionData{};
 	cameraLosColl.Normal = (losColl.Room.Triangle != nullptr) ? losColl.Room.Triangle->GetNormal() : -dir;
-	cameraLosColl.Position = std::pair(losColl.Room.Position, losColl.Room.RoomNumber);
+	cameraLosColl.Position = losColl.Room.Position;
+	cameraLosColl.RoomNumber = losColl.Room.RoomNumber;
 	cameraLosColl.IsIntersected = losColl.Room.IsIntersected;
 	cameraLosColl.Distance = losColl.Room.Distance;
 
@@ -136,7 +138,8 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 			normal.Normalize();
 
 			cameraLosColl.Normal = normal;
-			cameraLosColl.Position = std::pair(movLosColl.Position, movLosColl.RoomNumber);
+			cameraLosColl.Position = movLosColl.Position;
+			cameraLosColl.RoomNumber = movLosColl.RoomNumber;
 			cameraLosColl.IsIntersected = true;
 			cameraLosColl.Distance = movLosColl.Distance;
 			break;
@@ -155,7 +158,8 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 			normal.Normalize();
 
 			cameraLosColl.Normal = normal;
-			cameraLosColl.Position = std::pair(staticLosColl.Position, staticLosColl.RoomNumber);
+			cameraLosColl.Position = staticLosColl.Position;
+			cameraLosColl.RoomNumber = staticLosColl.RoomNumber;
 			cameraLosColl.IsIntersected = true;
 			cameraLosColl.Distance = staticLosColl.Distance;
 			break;
@@ -166,9 +170,8 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 	if (cameraLosColl.Distance < DIST_BUFFER)
 	{
 		cameraLosColl.Distance = DIST_BUFFER;
-		cameraLosColl.Position = std::pair(
-			Geometry::TranslatePoint(origin, dir, cameraLosColl.Distance),
-			GetPointCollision(origin, originRoomNumber, dir, cameraLosColl.Distance).GetRoomNumber());
+		cameraLosColl.Position = Geometry::TranslatePoint(origin, dir, cameraLosColl.Distance);;
+		cameraLosColl.RoomNumber = GetPointCollision(origin, originRoomNumber, dir, cameraLosColl.Distance).GetRoomNumber();
 	}
 
 	// 5) Return camera LOS collision.
@@ -382,14 +385,16 @@ void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 
 	// Define landmarks.
 	auto lookAt = basePos + GetCameraPlayerOffset(playerItem, coll);
-	auto idealPos = std::pair(Geometry::TranslatePoint(lookAt, dir, dist), g_Camera.LookAtRoomNumber);
-	idealPos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, idealPos.first).Position;
+	auto cameraLos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, Geometry::TranslatePoint(lookAt, dir, dist));
+	auto idealPos = cameraLos.Position;
+	int idealRoomNumber = cameraLos.RoomNumber;
 
-	//idealPos = GetCameraWallShift(idealPos.first, idealPos.second, CLICK(1.5f), true);
+	// TODO
+	//idealPos = GetCameraWallShift(idealPos, idealRoomNumber, CLICK(1.5f), true);
 
 	// Update camera.
 	g_Camera.LookAt += (lookAt - g_Camera.LookAt) * (1.0f / g_Camera.speed);
-	MoveCamera(playerItem, idealPos.first, idealPos.second, g_Camera.speed);
+	MoveCamera(playerItem, idealPos, idealRoomNumber, g_Camera.speed);
 }
 
 void LookAt(CameraInfo& camera, short roll)
@@ -516,9 +521,9 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	g_Camera.RoomNumber = idealRoomNumber;
 
 	// Assess LOS.
-	auto cameraLos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, g_Camera.Position).Position;
-	g_Camera.Position = cameraLos.first;
-	g_Camera.RoomNumber = cameraLos.second;
+	auto cameraLos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, g_Camera.Position);
+	g_Camera.Position = cameraLos.Position;
+	g_Camera.RoomNumber = cameraLos.RoomNumber;
 
 	// Bounce.
 	if (g_Camera.bounce != 0)
@@ -686,7 +691,7 @@ static bool TestCameraStrafeZoom(const ItemInfo& playerItem)
 
 static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 {
-	constexpr auto DIST_EASE_OUT_ALPHA			   = 0.3f;
+	constexpr auto MODERN_CAMERA_DIST_LERP_ALPHA   = 0.3f;
 	constexpr auto STRAFE_CAMERA_FOV			   = ANGLE(86.0f);
 	constexpr auto STRAFE_CAMERA_FOV_LERP_ALPHA	   = 0.5f;
 	constexpr auto STRAFE_CAMERA_DIST_OFFSET_COEFF = 0.5f;
@@ -703,9 +708,10 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 	{
 		// Calcuate ideal position.
 		auto dir = -EulerAngles(g_Camera.actualElevation, g_Camera.actualAngle, 0).ToDirection();
-		float dist = EaseOutSine(g_Camera.Distance, g_Camera.targetDistance, DIST_EASE_OUT_ALPHA);
-		auto idealPos = std::pair(Geometry::TranslatePoint(g_Camera.LookAt, dir, dist), g_Camera.LookAtRoomNumber);
-		idealPos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, idealPos.first).Position;
+		float dist = Lerp(g_Camera.Distance, g_Camera.targetDistance, MODERN_CAMERA_DIST_LERP_ALPHA);
+		auto cameraLos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, Geometry::TranslatePoint(g_Camera.LookAt, dir, dist));
+		auto idealPos = cameraLos.Position;
+		int idealRoomNumber = cameraLos.RoomNumber;
 
 		// Apply strafe camera effects.
 		if (IsPlayerStrafing(playerItem))
@@ -715,10 +721,9 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			// Apply zoom if using Look action to strafe.
 			if (TestCameraStrafeZoom(playerItem))
 			{
-				float dist = std::max(Vector3::Distance(g_Camera.LookAt, idealPos.first) * STRAFE_CAMERA_DIST_OFFSET_COEFF, STRAFE_CAMERA_ZOOM_BUFFER);
-				idealPos = std::pair(
-					Geometry::TranslatePoint(g_Camera.LookAt, dir, dist),
-					GetPointCollision(g_Camera.LookAt, g_Camera.LookAtRoomNumber, dir, dist).GetRoomNumber());
+				float dist = std::max(Vector3::Distance(g_Camera.LookAt, idealPos) * STRAFE_CAMERA_DIST_OFFSET_COEFF, STRAFE_CAMERA_ZOOM_BUFFER);
+				idealPos = Geometry::TranslatePoint(g_Camera.LookAt, dir, dist);
+				idealRoomNumber = GetPointCollision(g_Camera.LookAt, g_Camera.LookAtRoomNumber, dir, dist).GetRoomNumber();
 			}
 		}
 		else
@@ -726,15 +731,17 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			SetFov((short)Lerp(g_Camera.Fov, ANGLE(DEFAULT_FOV), STRAFE_CAMERA_FOV_LERP_ALPHA / 2));
 		}
 
-		//idealPos = GetCameraWallShift(idealPos.first, idealPos.second, CLICK(1.5f), true);
+		// TODO
+		//idealPos = GetCameraWallShift(idealPos, idealRoomNumber, CLICK(1.5f), true);
 
 		// Update camera.
 		float speedCoeff = (g_Camera.type != CameraType::Look) ? 0.2f : 1.0f;
-		MoveCamera(playerItem, idealPos.first, idealPos.second, g_Camera.speed * speedCoeff);
+		MoveCamera(playerItem, idealPos, idealRoomNumber, g_Camera.speed * speedCoeff);
 	}
 	else
 	{
-		auto farthestIdealPos = std::pair<Vector3, int>(g_Camera.Position, g_Camera.RoomNumber);
+		auto farthestIdealPos = g_Camera.Position;
+		int farthestIdealRoomNumber = g_Camera.RoomNumber;
 		short farthestIdealAzimuthAngle = g_Camera.actualAngle;
 		float farthestDistSqr = INFINITY;
 
@@ -745,13 +752,12 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			short azimuthAngle = (i == 0) ? g_Camera.actualAngle : (ANGLE(360.0f / TANK_CAMERA_SWIVEL_STEP_COUNT) * (i - 1));
 			auto dir = -EulerAngles(g_Camera.actualElevation, azimuthAngle, 0).ToDirection();
 
-			// Calcuate ideal position.
-			auto idealPos = std::pair(
-				Geometry::TranslatePoint(g_Camera.LookAt, dir, g_Camera.targetDistance), g_Camera.LookAtRoomNumber);
-
 			// Get camera LOS.
-			auto cameraLos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, idealPos.first);
-			idealPos = cameraLos.Position;
+			auto cameraLos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, Geometry::TranslatePoint(g_Camera.LookAt, dir, g_Camera.targetDistance));
+
+			// Calcuate ideal position.
+			auto idealPos = cameraLos.Position;
+			int idealRoomNumber = cameraLos.RoomNumber;
 
 			// Has no LOS intersection.
 			if (!cameraLos.IsIntersected)
@@ -765,7 +771,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 				}
 
 				// Track closest ideal.
-				float distSqr = Vector3::DistanceSquared(g_Camera.Position, idealPos.first);
+				float distSqr = Vector3::DistanceSquared(g_Camera.Position, idealPos);
 				if (distSqr < farthestDistSqr)
 				{
 					farthestIdealPos = idealPos;
@@ -776,7 +782,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			// Has LOS intersection and is initial swivel step.
 			else if (i == 0)
 			{
-				float distSqr = Vector3::DistanceSquared(g_Camera.LookAt, idealPos.first);
+				float distSqr = Vector3::DistanceSquared(g_Camera.LookAt, farthestIdealPos);
 				if (distSqr > SQUARE(TANK_CAMERA_CLOSE_DIST_MIN))
 				{
 					farthestIdealPos = idealPos;
@@ -787,7 +793,9 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		}
 
 		g_Camera.actualAngle = farthestIdealAzimuthAngle;
-		farthestIdealPos = GetCameraWallShift(farthestIdealPos.first, farthestIdealPos.second, CLICK(1.5f), true);
+		auto wallShift = GetCameraWallShift(farthestIdealPos, farthestIdealRoomNumber, CLICK(1.5f), true);;
+		farthestIdealPos = wallShift.first;
+		farthestIdealRoomNumber = wallShift.second;
 
 		if (isCombatCamera)
 		{
@@ -797,7 +805,7 @@ static void HandleCameraFollow(const ItemInfo& playerItem, bool isCombatCamera)
 		}
 
 		// Update camera.
-		MoveCamera(playerItem, farthestIdealPos.first, farthestIdealPos.second, g_Camera.speed);
+		MoveCamera(playerItem, farthestIdealPos, farthestIdealRoomNumber, g_Camera.speed);
 	}
 }
 
