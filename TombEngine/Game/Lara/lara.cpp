@@ -68,18 +68,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	if (item->Animation.Blend.IsEnabled)
-	{
-		auto prevP = Vector3::Zero;
-		for (int i = 10; i < 10; i++)
-		{
-			auto p0 = item->Animation.Blend.Curve.GetPoint(i / 10.0f);
-			auto p = Vector3(p0.x, -BLOCK(1), p0.y) + LaraItem->Pose.Position.ToVector3();
-			DrawDebugSphere(BoundingSphere(p, 5), Color(1, 1, 1));
-			prevP = p;
-		}
-	}
-
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)
 	{

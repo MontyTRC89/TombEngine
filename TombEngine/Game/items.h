@@ -62,14 +62,14 @@ enum AIObjectType
 
 struct MoveableAnimBlendData
 {
-	bool IsEnabled = false;
-
 	int			  FrameNumber = 0;
 	int			  FrameCount  = 0;
 	BezierCurve2D Curve		  = {};
 
 	Vector3					RootOffset		 = Vector3::Zero;
 	std::vector<Quaternion> BoneOrientations = {};
+
+	bool IsEnabled() const { return (FrameCount != 0); }
 };
 
 struct MoveableAnimData

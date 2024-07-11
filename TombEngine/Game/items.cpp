@@ -182,7 +182,6 @@ void ItemInfo::SetAnimBlend(int frameCount, const BezierCurve2D& curve)
 	const auto& object = Objects[ObjectNumber];
 	const auto& frameInterp = GetFrameInterpData(*this);
 
-	Animation.Blend.IsEnabled = true;
 	Animation.Blend.FrameNumber = 0;
 	Animation.Blend.FrameCount = frameCount;
 	Animation.Blend.Curve = curve;
@@ -191,7 +190,10 @@ void ItemInfo::SetAnimBlend(int frameCount, const BezierCurve2D& curve)
 	Animation.Blend.BoneOrientations.clear();
 	Animation.Blend.BoneOrientations.reserve(object.nmeshes);
 	for (int i = 0; i < object.nmeshes; i++)
-		Animation.Blend.BoneOrientations.push_back(GetBoneOrientation(*this, i));
+	{
+		auto boneOrient = GetBoneOrientation(*this, i);
+		Animation.Blend.BoneOrientations.push_back(boneOrient);
+	}
 }
 
 void ItemInfo::DisableAnimBlend()

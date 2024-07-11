@@ -60,7 +60,7 @@ namespace TEN::Renderer
 		float blendAlpha = 0.0f;
 		if (blendData != nullptr)
 		{
-			float curveX = (blendData->FrameCount != 0) ? ((float)blendData->FrameNumber / ((float)blendData->FrameCount)) : 0.0f;
+			float curveX = (blendData->FrameCount != 0) ? ((float)blendData->FrameNumber / (float)blendData->FrameCount) : 0.0f;
 			blendAlpha = blendData->Curve.GetY(curveX);
 		}
 
@@ -327,7 +327,7 @@ namespace TEN::Renderer
 		}
 
 		auto frameData = GetFrameInterpData(*nativeItem);
-		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX, false, nativeItem->Animation.Blend.IsEnabled ? &nativeItem->Animation.Blend : nullptr);
+		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX, false, nativeItem->Animation.Blend.IsEnabled() ? &nativeItem->Animation.Blend : nullptr);
 
 		for (int m = 0; m < obj->nmeshes; m++)
 			itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];

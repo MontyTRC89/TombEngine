@@ -125,16 +125,17 @@ namespace TEN::Animation
 		}
 		
 		// Update blend.
-		if (item.Animation.Blend.IsEnabled)
+		if (item.Animation.Blend.IsEnabled())
 		{
 			item.Animation.Blend.FrameNumber++;
 			if (item.Animation.Blend.FrameNumber > item.Animation.Blend.FrameCount)
 				item.DisableAnimBlend();
 		}
 
+		// Debug
 		if (item.IsLara())
 		{
-			PrintDebugMessage(std::string(std::string("Blend enabled: ") + (item.Animation.Blend.IsEnabled ? "Yes" : "No")).c_str());
+			PrintDebugMessage(std::string(std::string("Blend enabled: ") + (item.Animation.Blend.IsEnabled() ? "Yes" : "No")).c_str());
 			PrintDebugMessage("Frame number: %d", item.Animation.Blend.FrameNumber);
 			PrintDebugMessage("Frame count: %d", item.Animation.Blend.FrameCount);
 		}
