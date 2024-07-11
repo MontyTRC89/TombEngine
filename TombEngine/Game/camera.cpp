@@ -181,7 +181,6 @@ bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3&
 static Vector3 GetCameraGeometryOffset()
 {
 	// 1) Define camera sphere.
-	g_Camera.Radius = BLOCK(0.1f);
 	auto sphere = BoundingSphere(g_Camera.Position, g_Camera.Radius);
 
 	const auto& room = g_Level.Rooms[g_Camera.RoomNumber];
@@ -197,8 +196,10 @@ static Vector3 GetCameraGeometryOffset()
 			const auto& normal = meshColl->Triangles[i]->GetNormal();
 
 			// Calculate and collect tanget offset.
-			float dist = abs(sphere.Radius - Vector3::Distance(sphere.Center, tangent));
+			int sign = IsPointInFront(sphere.Center, tangent, normal) ? 1 : -1;
+			float dist = sphere.Radius + (Vector3::Distance(sphere.Center, tangent) * sign);
 			auto offset = Geometry::TranslatePoint(Vector3::Zero, normal, dist);
+
 			offsets.push_back(offset);
 		}
 	}
@@ -386,7 +387,7 @@ void InitializeCamera()
 	g_Camera.RoomNumber = LaraItem->RoomNumber;
 
 	g_Camera.targetDistance = BLOCK(1.5f);
-	g_Camera.Radius = BLOCK(0.1f);
+	g_Camera.Radius = BLOCK(0.05f);
 	g_Camera.item = nullptr;
 	g_Camera.numberFrames = 1;
 	g_Camera.type = CameraType::Chase;
@@ -467,8 +468,10 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	g_Camera.Position = Vector3::Lerp(g_Camera.Position, idealPos, 1.0f / speed);
 	g_Camera.RoomNumber = idealRoomNumber;
 
+	// TODO
 	// Apply geometry offset.
-	g_Camera.Offset = GetCameraGeometryOffset();
+	g_Camera.Position += GetCameraGeometryOffset();
+	g_Camera.Offset = Vector3::Zero;
 
 	// Assess LOS.
 	auto cameraLos = GetCameraLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, g_Camera.Position);

@@ -55,6 +55,58 @@ namespace TEN::Physics
 		return (sphere.Center - (normal * dist));
 	}
 
+	// "More accurate" version but it doesn't work.
+	/*Vector3 CollisionTriangle::GetTangent(const std::vector<Vector3>& vertices, const BoundingSphere& sphere) const
+	{
+		// Get vertices.
+		const auto& vertex0 = vertices[_vertexIds[0]];
+		const auto& vertex1 = vertices[_vertexIds[1]];
+		const auto& vertex2 = vertices[_vertexIds[2]];
+
+		// Calculate edges.
+		auto edge0 = vertex1 - vertex0;
+		auto edge1 = vertex2 - vertex0;
+
+		// Calculate vectors.
+		auto v2 = sphere.Center - vertex0;
+
+		// Calculate dot products.
+		float dot00 = edge1.Dot(edge1);
+		float dot01 = edge1.Dot(edge0);
+		float dot02 = edge1.Dot(v2);
+		float dot11 = edge0.Dot(edge0);
+		float dot12 = edge0.Dot(v2);
+
+		// Calculate barycentric coordinates.
+		float invDenom = 1 / ((dot00 * dot11) - (dot01 * dot01));
+		float u = ((dot11 * dot02) - (dot01 * dot12)) * invDenom;
+		float v = ((dot00 * dot12) - (dot01 * dot02)) * invDenom;
+
+		// Check if point is in triangle
+		if (u >= 0 && v >= 0 && (u + v) <= 1)
+			return (vertex0 + (edge1 * u) + (edge0 * v));
+
+		// Clamp to nearest edge if point is outside triangle.
+		auto c1 = Geometry::GetClosestPointOnLine(vertex0, vertex1, sphere.Center);
+		auto c2 = Geometry::GetClosestPointOnLine(vertex1, vertex2, sphere.Center);
+		auto c3 = Geometry::GetClosestPointOnLine(vertex2, vertex0, sphere.Center);
+
+		float d1 = (c1 - sphere.Center).Length();
+		float d2 = (c2 - sphere.Center).Length();
+		float d3 = (c3 - sphere.Center).Length();
+
+		if (d1 < d2 && d1 < d3)
+		{
+			return c1;
+		}
+		else if (d2 < d1 && d2 < d3)
+		{
+			return c2;
+		}
+
+		return c3;
+	}*/
+
 	bool CollisionTriangle::Intersects(const std::vector<Vector3>& vertices, const Ray& ray, float& dist) const
 	{
 		// Test if ray intersects triangle AABB.

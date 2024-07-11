@@ -130,6 +130,15 @@ static void HandleLosDebug(const ItemInfo& item)
 	DrawDebugTarget(target, Quaternion::Identity, 100, Color(1, 1, 1));
 }
 
+// temp
+bool IsPointInFront2(const Vector3& origin, const Vector3& target, const Vector3& normal)
+{
+	auto deltaPos = target - origin;
+	float dotProduct = deltaPos.Dot(normal);
+
+	return (dotProduct >= 0.0f);
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
@@ -152,8 +161,10 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			DrawDebugTarget(tangent, Quaternion::Identity, BLOCK(0.2f), Color(1, 0, 0));
 
 			// Calculate and collect tanget offset.
-			float dist = abs(sphere.Radius - Vector3::Distance(sphere.Center, tangent));
+			int sign = IsPointInFront2(sphere.Center, tangent, normal) ? 1 : -1;
+			float dist = sphere.Radius + (Vector3::Distance(sphere.Center, tangent) * sign);
 			auto offset = Geometry::TranslatePoint(Vector3::Zero, normal, dist);
+
 			offsets.push_back(offset);
 		}
 
