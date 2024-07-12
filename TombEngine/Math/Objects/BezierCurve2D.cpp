@@ -53,7 +53,7 @@ namespace TEN::Math
 
 	float BezierCurve2D::GetY(float x) const
 	{
-		constexpr auto TOLERANCE = EPSILON * 200;
+		constexpr auto TOLERANCE = 0.002f;
 
 		// Directly return Y for exact endpoint.
 		if (x <= (GetStart().x + TOLERANCE))

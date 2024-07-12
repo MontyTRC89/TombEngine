@@ -42,7 +42,7 @@ extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 namespace TEN::Renderer
 {
-	void Renderer::UpdateAnimation(RendererItem* rItem, RendererObject& rObject, const KeyframeInterpData& interpData, int mask, bool useObjectWorldRotation,
+	void Renderer::UpdateAnimation(RendererItem* rendererItem, RendererObject& rendererObject, const KeyframeInterpData& interpData, int mask, bool useObjectWorldRotation,
 								   const MoveableAnimBlendData* blendData)
 	{
 		static auto boneIndices = std::vector<int>{};
@@ -52,9 +52,9 @@ namespace TEN::Renderer
 		int nextBoneID = 0;
 
 		// Push skeleton.
-		bones[nextBoneID++] = rObject.Skeleton;
+		bones[nextBoneID++] = rendererObject.Skeleton;
 
-		auto* transforms = (rItem == nullptr) ? rObject.AnimationTransforms.data() : &rItem->AnimationTransforms[0];
+		auto* transforms = (rendererItem == nullptr) ? rendererObject.AnimationTransforms.data() : &rendererItem->AnimationTransforms[0];
 
 		// Calculate blend alpha.
 		float blendAlpha = 0.0f;
@@ -79,7 +79,7 @@ namespace TEN::Renderer
 				(interpData.Alpha != 0.0f && interpData.Keyframe0.BoneOrientations.size() <= bone->Index))
 			{
 				TENLog(
-					"Attempted to animate object ID " + GetObjectName((GAME_OBJECT_ID)rItem->ObjectNumber) +
+					"Attempted to animate object ID " + GetObjectName((GAME_OBJECT_ID)rendererItem->ObjectNumber) +
 					" using incorrect animation data. Bad animations set for slot?",
 					LogLevel::Error);
 
@@ -118,10 +118,10 @@ namespace TEN::Renderer
 				}
 
 				// Store bone orientation on current frame.
-				if (rItem != nullptr)
-					rItem->BoneOrientations[bone->Index] = Quaternion::CreateFromRotationMatrix(rotMatrix0);
+				if (rendererItem != nullptr)
+					rendererItem->BoneOrientations[bone->Index] = Quaternion::CreateFromRotationMatrix(rotMatrix0);
 
-				auto tMatrix = (bone == rObject.Skeleton) ? Matrix::CreateTranslation(rootOffset0) : Matrix::Identity;
+				auto translationMatrix = (bone == rendererObject.Skeleton) ? Matrix::CreateTranslation(rootOffset0) : Matrix::Identity;
 				auto extraRotMatrix = Matrix::CreateFromQuaternion(bone->ExtraRotation);
 
 				if (useObjectWorldRotation)
@@ -138,8 +138,8 @@ namespace TEN::Renderer
 					rotMatrix0 = extraRotMatrix * rotMatrix0;
 				}
 
-				transforms[bone->Index] = rotMatrix0 * ((bone == rObject.Skeleton) ? tMatrix : bone->Transform);
-				if (bone != rObject.Skeleton)
+				transforms[bone->Index] = rotMatrix0 * ((bone == rendererObject.Skeleton) ? translationMatrix : bone->Transform);
+				if (bone != rendererObject.Skeleton)
 					transforms[bone->Index] *= transforms[bone->Parent->Index];
 			}
 
@@ -150,10 +150,10 @@ namespace TEN::Renderer
 				bones[nextBoneID++] = child;
 		}
 
-		// Apply mutators.
-		if (rItem != nullptr) 
+		// Apply mutators. TODO: Should be applied down the bone hierarchy.
+		if (rendererItem != nullptr) 
 		{
-			const auto& nativeItem = g_Level.Items[rItem->ItemNumber];
+			const auto& nativeItem = g_Level.Items[rendererItem->ItemNumber];
 
 			if (nativeItem.Model.Mutators.size() == boneIndices.size())
 			{
@@ -165,8 +165,8 @@ namespace TEN::Renderer
 
 					auto rotMatrix = mutator.Rotation.ToRotationMatrix();
 					auto scaleMatrix = Matrix::CreateScale(mutator.Scale);
-					auto tMatrix = Matrix::CreateTranslation(mutator.Offset);
-					transforms[i] = ((rotMatrix * scaleMatrix) * tMatrix) * transforms[i];
+					auto translationMatrix = Matrix::CreateTranslation(mutator.Offset);
+					transforms[i] = ((rotMatrix * scaleMatrix) * translationMatrix) * transforms[i];
 				}
 			}
 		}
