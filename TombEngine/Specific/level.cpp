@@ -495,6 +495,8 @@ void LoadObjects()
 					anim.Commands.push_back(std::move(command));
 				}
 			}
+
+			anim.Flags = ReadInt32();
 		}
 
 		Objects[objectID].loaded = true;

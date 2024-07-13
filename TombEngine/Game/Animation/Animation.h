@@ -66,6 +66,8 @@ namespace TEN::Animation
 		std::vector<StateDispatchData> Dispatches = {};
 		std::vector<AnimCommandPtr>	   Commands	  = {};
 
+		int Flags = 0;
+
 		KeyframeInterpData	GetKeyframeInterpData(int frameNumber) const;
 		const KeyframeData& GetClosestKeyframe(int frameNumber) const;
 	};
