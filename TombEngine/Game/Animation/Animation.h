@@ -15,6 +15,19 @@ struct ObjectInfo;
 
 namespace TEN::Animation
 {
+	enum class AnimFlags
+	{
+		None = 0,
+
+		RootMotionTranslationX = 1 << 0,
+		RootMotionTranslationY = 1 << 1,
+		RootMotionTranslationZ = 1 << 2,
+		RootMotionRotationX	   = 1 << 3,
+		RootMotionRotationY	   = 1 << 4,
+		RootMotionRotationZ	   = 1 << 5,
+		RootMotionCycle		   = 1 << 6
+	};
+
 	struct KeyframeData
 	{
 		Vector3					RootOffset		 = Vector3::Zero;
@@ -23,15 +36,6 @@ namespace TEN::Animation
 
 		// Deprecated.
 		GameBoundingBox BoundingBox = GameBoundingBox::Zero;
-	};
-
-	struct KeyframeInterpData
-	{
-		const KeyframeData& Keyframe0;
-		const KeyframeData& Keyframe1;
-		float Alpha = 0.0f;
-
-		KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
 	};
 
 	struct StateDispatchData
@@ -45,6 +49,23 @@ namespace TEN::Animation
 		int			  NextFrameNumberHigh = 0;
 		int			  BlendFrameCount	  = 0;
 		BezierCurve2D BlendCurve		  = {};
+	};
+
+	struct KeyframeInterpData
+	{
+		const KeyframeData& Keyframe0;
+		const KeyframeData& Keyframe1;
+		float Alpha = 0.0f;
+
+		KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
+	};
+
+	struct RootMotionData
+	{
+		Vector3		Translation = Vector3::Zero;
+		EulerAngles Rotation	= EulerAngles::Identity;
+
+		bool IsEmpty() const;
 	};
 
 	struct AnimData
@@ -66,10 +87,12 @@ namespace TEN::Animation
 		std::vector<StateDispatchData> Dispatches = {};
 		std::vector<AnimCommandPtr>	   Commands	  = {};
 
-		int Flags = 0;
+		int Flags = (int)AnimFlags::None;
 
 		KeyframeInterpData	GetKeyframeInterpData(int frameNumber) const;
 		const KeyframeData& GetClosestKeyframe(int frameNumber) const;
+		RootMotionData		GetRootMotion(int frameNumber) const;
+		RootMotionData		GetRootMotionCounteraction(int frameNumber) const;
 	};
 
 	struct BoneMutator

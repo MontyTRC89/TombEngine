@@ -312,84 +312,78 @@ namespace TEN::Renderer
 	void Renderer::CollectItems(short roomNumber, RenderView& renderView)
 	{
 		if (_rooms.size() < roomNumber)
-		{
 			return;
-		}
 
-		RendererRoom& room = _rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
+		auto& rendererRoom = _rooms[roomNumber];
+		const auto& nativeRoom = g_Level.Rooms[rendererRoom.RoomNumber];
 
-		short itemNum = NO_VALUE;
-		for (itemNum = r->itemNumber; itemNum != NO_VALUE; itemNum = g_Level.Items[itemNum].NextItem)
+		int itemNumber = NO_VALUE;
+		for (itemNumber = nativeRoom.itemNumber; itemNumber != NO_VALUE; itemNumber = g_Level.Items[itemNumber].NextItem)
 		{
-			ItemInfo* item = &g_Level.Items[itemNum];
+			const auto& item = g_Level.Items[itemNumber];
 
-			if (item->ObjectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].NextItem)
-			{
+			if (item.ObjectNumber == ID_LARA && itemNumber == g_Level.Items[itemNumber].NextItem)
 				break;
-			}
 
-			if (item->Status == ITEM_INVISIBLE)
-			{
+			if (item.Status == ITEM_INVISIBLE)
 				continue;
-			}
 
-			if (item->ObjectNumber == ID_LARA && (Lara.Control.Look.OpticRange || SpotcamOverlay || SpotcamDontDrawLara))
-			{
+			if (item.ObjectNumber == ID_LARA && (Lara.Control.Look.OpticRange || SpotcamOverlay || SpotcamDontDrawLara))
 				continue;
-			}
 
-			if (item->ObjectNumber == ID_LARA && CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
-			{
+			if (item.ObjectNumber == ID_LARA && CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
 				continue;
-			}
 
-			if (!_moveableObjects[item->ObjectNumber].has_value())
-			{
+			if (!_moveableObjects[item.ObjectNumber].has_value())
 				continue;
-			}
 
-			auto& obj = _moveableObjects[item->ObjectNumber].value();
-
-			if (obj.DoNotDraw)
-			{
+			const auto& rendererObject = _moveableObjects[item.ObjectNumber].value();
+			if (rendererObject.DoNotDraw)
 				continue;
-			}
 
-			// Clip object by frustum only if it doesn't cast shadows. Otherwise we may see
-			// disappearing shadows if object gets out of frustum.
-
-			if (obj.ShadowType == ShadowMode::None)
+			// NOTE: Clip object by frustum only if it doesn't cast shadows. Otherwise shadows may disappear if object moves outside frustum.
+			if (rendererObject.ShadowType == ShadowMode::None)
 			{
 				// Get all spheres and check if frustum intersects any of them.
 				static BoundingSphere spheres[MAX_BONES];
-				int cnt = GetSpheres(itemNum, spheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+				int count = GetSpheres(itemNumber, spheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 
+				// Blow up sphere radius by half for cases of too small calculated spheres.
 				bool inFrustum = false;
-				for (int i = 0; !inFrustum, i < cnt; i++)
-					// Blow up sphere radius by half for cases of too small calculated spheres.
+				for (int i = 0; !inFrustum, i < count; i++)
+				{
 					if (renderView.Camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
 						inFrustum = true;
+				}
 				
 				if (!inFrustum)
 					continue;
 			}
 
-			auto newItem = &_items[itemNum];
+			const auto& anim = GetAnimData(item);
+			auto rootMotionCounter = anim.GetRootMotionCounteraction(item.Animation.FrameNumber);
 
-			newItem->ItemNumber = itemNum;
-			newItem->ObjectNumber = item->ObjectNumber;
-			newItem->Color = item->Model.Color;
-			newItem->Position = item->Pose.Position.ToVector3();
-			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-			newItem->Rotation = item->Pose.Orientation.ToRotationMatrix();
-			newItem->Scale = Matrix::CreateScale(1.0f);
-			newItem->World = newItem->Rotation * newItem->Translation;
+			auto orient = item.Pose.Orientation + rootMotionCounter.Rotation;
+			auto rotMatrix = orient.ToRotationMatrix();
 
-			CalculateLightFades(newItem);
-			CollectLightsForItem(newItem);
+			auto pos = item.Pose.Position.ToVector3() + Vector3::Transform(rootMotionCounter.Translation, rotMatrix);
+			auto translationMatrix = Matrix::CreateTranslation(pos);
 
-			room.ItemsToDraw.push_back(newItem);
+			auto& newItem = _items[itemNumber];
+
+			newItem.ItemNumber = itemNumber;
+			newItem.ObjectNumber = item.ObjectNumber;
+			newItem.Color = item.Model.Color;
+			newItem.Position = item.Pose.Position.ToVector3();
+			newItem.Translation = translationMatrix;
+			newItem.Rotation = rotMatrix;
+			newItem.Scale = Matrix::CreateScale(1.0f);
+			newItem.World = newItem.Rotation * newItem.Translation;
+
+			CalculateLightFades(&newItem);
+			CollectLightsForItem(&newItem);
+
+			rendererRoom.ItemsToDraw.push_back(&newItem);
 		}
 	}
 

@@ -100,6 +100,7 @@ void Renderer::UpdateLaraAnimations(bool force)
 {
 	auto& rItem = _items[LaraItem->Index];
 	rItem.ItemNumber = LaraItem->Index;
+	const auto& nativeItem = g_Level.Items[rItem.ItemNumber];
 
 	if (!force && rItem.DoneAnimations)
 		return;
@@ -110,11 +111,17 @@ void Renderer::UpdateLaraAnimations(bool force)
 	for (auto* bonePtr : playerObject.LinearizedBones)
 		bonePtr->ExtraRotation = Quaternion::Identity;
 
-	// Player world matrix.
-	auto tMatrix = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
-	auto rotMatrix = LaraItem->Pose.Orientation.ToRotationMatrix();
+	const auto& anim = GetAnimData(nativeItem);
+	auto rootMotionCounter = anim.GetRootMotionCounteraction(nativeItem.Animation.FrameNumber);
 
-	_laraWorldMatrix = rotMatrix * tMatrix;
+	auto orient = nativeItem.Pose.Orientation + rootMotionCounter.Rotation;
+	auto rotMatrix = orient.ToRotationMatrix();
+
+	auto pos = nativeItem.Pose.Position.ToVector3() + Vector3::Transform(rootMotionCounter.Translation, rotMatrix);
+	auto translationMatrix = Matrix::CreateTranslation(pos);
+
+	// Calculate player world matrix.
+	_laraWorldMatrix = rotMatrix * translationMatrix;
 	rItem.World = _laraWorldMatrix;
 
 	// Update extra head and torso rotations.

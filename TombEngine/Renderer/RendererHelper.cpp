@@ -584,25 +584,28 @@ namespace TEN::Renderer
 	Vector3 Renderer::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
 	{
 		auto* rendererItem = &_items[itemNumber];
-
 		rendererItem->ItemNumber = itemNumber;
 
-		if (!rendererItem)
+		if (rendererItem == nullptr)
 			return Vector3::Zero;
 
 		if (!rendererItem->DoneAnimations)
 		{
 			if (itemNumber == LaraItem->Index)
+			{
 				UpdateLaraAnimations(false);
+			}
 			else
+			{
 				UpdateItemAnimations(itemNumber, false);
+			}
 		}
 
 		if (jointIndex >= MAX_BONES)
 			jointIndex = 0;
 
-		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
-		return Vector3::Transform(relOffset, world);
+		auto worldMatrix = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
+		return Vector3::Transform(relOffset, worldMatrix);
 	}
 
 	Quaternion Renderer::GetMoveableBoneOrientation(int itemNumber, int boneID)

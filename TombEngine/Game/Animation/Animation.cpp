@@ -32,6 +32,11 @@ namespace TEN::Animation
 		Alpha = alpha;
 	}
 
+	bool RootMotionData::IsEmpty() const
+	{
+		return (Translation == Vector3::Zero && Rotation == EulerAngles::Identity);
+	}
+
 	KeyframeInterpData AnimData::GetKeyframeInterpData(int frameNumber) const
 	{
 		// FAILSAFE: Clamp frame number.
@@ -53,6 +58,118 @@ namespace TEN::Animation
 	{
 		auto interpData = GetKeyframeInterpData(frameNumber);
 		return ((interpData.Alpha <= 0.5f) ? interpData.Keyframe0 : interpData.Keyframe1);
+	}
+
+	RootMotionData AnimData::GetRootMotion(int frameNumber) const
+	{
+		// Test for root motion flags.
+		bool hasTranslation = Flags & ((int)AnimFlags::RootMotionTranslationX | (int)AnimFlags::RootMotionTranslationY | (int)AnimFlags::RootMotionTranslationZ);
+		bool hasRot = Flags & ((int)AnimFlags::RootMotionRotationX | (int)AnimFlags::RootMotionRotationY | (int)AnimFlags::RootMotionRotationZ);
+		if (!hasTranslation && !hasRot)
+			return {};
+
+		// Handle base frame.
+		if (frameNumber == 0)
+		{
+			// Cycled animation; use root motion of frame 1.
+			if (Flags & (int)AnimFlags::RootMotionCycle)
+			{
+				frameNumber = 1;
+			}
+			// Uncycled animation and no preceeding reference frame; return early.
+			else
+			{
+				return {};
+			}
+		}
+
+		// Get keyframe interpolation.
+		auto keyframInterp = GetKeyframeInterpData(frameNumber);
+		auto prevKeyframInterp = GetKeyframeInterpData(frameNumber - 1);
+		
+		// Calculate relative translation.
+		auto translation = Vector3::Zero;
+		if (hasTranslation)
+		{
+			auto rootOffset = Vector3::Lerp(keyframInterp.Keyframe0.RootOffset, keyframInterp.Keyframe1.RootOffset, keyframInterp.Alpha);
+			auto prevRootOffset = Vector3::Lerp(prevKeyframInterp.Keyframe0.RootOffset, prevKeyframInterp.Keyframe1.RootOffset, prevKeyframInterp.Alpha);
+			auto rootTranslation = rootOffset - prevRootOffset;
+
+			if (Flags & (int)AnimFlags::RootMotionTranslationX)
+				translation.x = rootTranslation.x;
+			if (Flags & (int)AnimFlags::RootMotionTranslationY)
+				translation.y = rootTranslation.y;
+			if (Flags & (int)AnimFlags::RootMotionTranslationZ)
+				translation.z = rootTranslation.z;
+		}
+
+		// Calculate relative rotation.
+		auto rot = EulerAngles::Identity;
+		if (hasRot)
+		{
+			auto rootOrient = EulerAngles(Quaternion::Slerp(keyframInterp.Keyframe0.BoneOrientations.front(), keyframInterp.Keyframe1.BoneOrientations.front(), keyframInterp.Alpha));
+			auto prevRootOrient = EulerAngles(Quaternion::Slerp(prevKeyframInterp.Keyframe0.BoneOrientations.front(), prevKeyframInterp.Keyframe1.BoneOrientations.front(), prevKeyframInterp.Alpha));
+			auto rootRot = rootOrient - prevRootOrient;
+
+			if (Flags & (int)AnimFlags::RootMotionRotationX)
+				rot.x = rootRot.x;
+			if (Flags & (int)AnimFlags::RootMotionRotationY)
+				rot.y = rootRot.y;
+			if (Flags & (int)AnimFlags::RootMotionRotationZ)
+				rot.z = rootRot.z;
+		}
+
+		// Return root motion.
+		return RootMotionData{ translation, rot };
+	}
+
+	RootMotionData AnimData::GetRootMotionCounteraction(int frameNumber) const
+	{
+		// Test for root motion flags.
+		bool hasTranslation = bool(Flags & ((int)AnimFlags::RootMotionTranslationX | (int)AnimFlags::RootMotionTranslationY | (int)AnimFlags::RootMotionTranslationZ));
+		bool hasRot = bool(Flags & ((int)AnimFlags::RootMotionRotationX | (int)AnimFlags::RootMotionRotationY | (int)AnimFlags::RootMotionRotationZ));
+		if (!hasTranslation && !hasRot)
+			return {};
+
+		// No counteraction required for base frame; return early.
+		if (frameNumber == 0)
+			return {};
+
+		// Get keyframe interpolation.
+		auto keyframInterp = GetKeyframeInterpData(frameNumber);
+
+		// Get relative translation counteraction.
+		auto translation = Vector3::Zero;
+		if (hasTranslation)
+		{
+			auto baseOffset = Keyframes.front().RootOffset;
+			auto rootOffset = Vector3::Lerp(keyframInterp.Keyframe0.RootOffset, keyframInterp.Keyframe1.RootOffset, keyframInterp.Alpha);
+
+			if (Flags & (int)AnimFlags::RootMotionTranslationX)
+				translation.x = baseOffset.x - rootOffset.x;
+			if (Flags & (int)AnimFlags::RootMotionTranslationY)
+				translation.y = baseOffset.y - rootOffset.y;
+			if (Flags & (int)AnimFlags::RootMotionTranslationZ)
+				translation.z = baseOffset.z - rootOffset.z;
+		}
+
+		// Get relative rotation counteraction.
+		auto rot = EulerAngles::Identity;
+		if (hasRot)
+		{
+			auto baseOrient = EulerAngles(Keyframes.front().BoneOrientations.front());
+			auto rootOrient = EulerAngles(Quaternion::Slerp(keyframInterp.Keyframe0.BoneOrientations.front(), keyframInterp.Keyframe1.BoneOrientations.front(), keyframInterp.Alpha));
+
+			if (Flags & (int)AnimFlags::RootMotionRotationX)
+				rot.x = baseOrient.x - rootOrient.x;
+			if (Flags & (int)AnimFlags::RootMotionRotationY)
+				rot.y = baseOrient.y - rootOrient.y;
+			if (Flags & (int)AnimFlags::RootMotionRotationZ)
+				rot.z = baseOrient.z - rootOrient.z;
+		}
+
+		// Return root motion counteraction.
+		return RootMotionData{ translation, rot };
 	}
 
 	bool BoneMutator::IsEmpty() const
@@ -200,6 +317,11 @@ namespace TEN::Animation
 				item.Animation.Velocity.z = animVel.z;
 			}
 		}
+
+		// Apply root motion.
+		auto rootMotion = anim->GetRootMotion(item.Animation.FrameNumber);
+		item.Animation.Velocity += rootMotion.Translation;
+		item.Pose.Orientation += rootMotion.Rotation;
 
 		// Update animation.
 		if (item.IsLara())

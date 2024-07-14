@@ -234,14 +234,21 @@ BoundingBox ItemInfo::GetAabb() const
 
 BoundingOrientedBox ItemInfo::GetObb() const
 {
-	auto frameData = GetFrameInterpData(*this);
-	if (frameData.Alpha == 0.0f)
-		return BoundingOrientedBox(frameData.Keyframe0.Aabb.Center, frameData.Keyframe0.Aabb.Extents, Pose.Orientation.ToQuaternion());
+	// Get anim data.
+	const auto& anim = GetAnimData(*this);
+	auto keyframeInterp = anim.GetKeyframeInterpData(Animation.FrameNumber);
+	auto rootMotionCounter = anim.GetRootMotionCounteraction(Animation.FrameNumber);
 
-	return BoundingOrientedBox(
-		Pose.Position.ToVector3() + Vector3::Lerp(frameData.Keyframe0.Aabb.Center, frameData.Keyframe1.Aabb.Center, frameData.Alpha),
-		Vector3::Lerp(frameData.Keyframe0.Aabb.Extents, frameData.Keyframe1.Aabb.Extents, frameData.Alpha),
-		Pose.Orientation.ToQuaternion());
+	// Calculate offset.
+	auto relOffset = Vector3::Lerp(keyframeInterp.Keyframe0.Aabb.Center, keyframeInterp.Keyframe1.Aabb.Center, keyframeInterp.Alpha);
+	auto rotMatrix = (Pose.Orientation + rootMotionCounter.Rotation).ToRotationMatrix();
+	auto offset = Vector3::Transform(relOffset + rootMotionCounter.Translation, rotMatrix);
+
+	// Calculate extents.
+	auto extents = Vector3::Lerp(keyframeInterp.Keyframe0.Aabb.Extents, keyframeInterp.Keyframe1.Aabb.Extents, keyframeInterp.Alpha);
+
+	// Create and return OBB.
+	return BoundingOrientedBox(Pose.Position.ToVector3() + offset, extents, Pose.Orientation.ToQuaternion());
 }
 
 static void GameScriptHandleKilled(short itemNumber, bool destroyed)

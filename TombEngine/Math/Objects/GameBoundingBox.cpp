@@ -39,18 +39,21 @@ using namespace TEN::Animation;
 		*this = GetKeyframe(objectID, animNumber, frameNumber).BoundingBox;
 	}
 
-	// TODO: Use reference, not pointer.
+	// NOTE: Deprecated. Use item.GetObb() instead.
 	GameBoundingBox::GameBoundingBox(const ItemInfo* item)
 	{
-		auto frameData = GetFrameInterpData(*item);
-		if (frameData.Alpha == 0.0f)
-		{
-			*this = frameData.Keyframe0.BoundingBox;
-		}
-		else
-		{
-			*this = frameData.Keyframe0.BoundingBox + (((frameData.Keyframe1.BoundingBox - frameData.Keyframe0.BoundingBox) * frameData.Alpha));
-		}
+		const auto& anim = GetAnimData(*item);
+		auto frameData = anim.GetKeyframeInterpData(item->Animation.FrameNumber);
+		auto rootMotionCounter = anim.GetRootMotionCounteraction(item->Animation.FrameNumber);
+
+		*this = frameData.Keyframe0.BoundingBox + (((frameData.Keyframe1.BoundingBox - frameData.Keyframe0.BoundingBox) * frameData.Alpha));
+
+		X1 += rootMotionCounter.Translation.x;
+		X2 += rootMotionCounter.Translation.x;
+		Y1 += rootMotionCounter.Translation.y;
+		Y2 += rootMotionCounter.Translation.y;
+		Z1 += rootMotionCounter.Translation.z;
+		Z2 += rootMotionCounter.Translation.z;
 	}
 
 	int GameBoundingBox::GetWidth() const
