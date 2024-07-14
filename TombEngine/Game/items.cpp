@@ -180,19 +180,25 @@ void ItemInfo::SetAnimBlend(int frameCount, const BezierCurve2D& curve)
 		return;
 
 	const auto& object = Objects[ObjectNumber];
-	const auto& frameInterp = GetFrameInterpData(*this);
+
+	const auto& anim = GetAnimData(*this);
+	const auto& frameInterp = anim.GetFrameInterpolation(Animation.FrameNumber);
+	auto rootMotionCounter = anim.GetRootMotionCounteraction(Animation.FrameNumber);
+
+	auto rootOffset = Vector3::Lerp(frameInterp.Keyframe0.RootOffset, frameInterp.Keyframe1.RootOffset, frameInterp.Alpha);
+	auto boneRot = rootMotionCounter.Rotation.ToQuaternion();
 
 	Animation.Blend.FrameNumber = 0;
 	Animation.Blend.FrameCount = frameCount;
 	Animation.Blend.Curve = curve;
-	Animation.Blend.RootOffset = Vector3::Lerp(frameInterp.Keyframe0.RootOffset, frameInterp.Keyframe1.RootOffset, frameInterp.Alpha);
+	Animation.Blend.RootOffset = rootOffset + rootMotionCounter.Translation;
 
 	Animation.Blend.BoneOrientations.clear();
 	Animation.Blend.BoneOrientations.reserve(object.nmeshes);
 	for (int i = 0; i < object.nmeshes; i++)
 	{
 		auto boneOrient = GetBoneOrientation(*this, i);
-		Animation.Blend.BoneOrientations.push_back(boneOrient);
+		Animation.Blend.BoneOrientations.push_back(boneOrient * boneRot); // TODO: Check.
 	}
 }
 
@@ -236,7 +242,7 @@ BoundingOrientedBox ItemInfo::GetObb() const
 {
 	// Get anim data.
 	const auto& anim = GetAnimData(*this);
-	auto keyframeInterp = anim.GetKeyframeInterpData(Animation.FrameNumber);
+	auto keyframeInterp = anim.GetFrameInterpolation(Animation.FrameNumber);
 	auto rootMotionCounter = anim.GetRootMotionCounteraction(Animation.FrameNumber);
 
 	// Calculate offset.

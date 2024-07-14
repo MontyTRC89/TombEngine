@@ -32,7 +32,7 @@ namespace TEN::Animation
 		Alpha = alpha;
 	}
 
-	KeyframeInterpData AnimData::GetKeyframeInterpData(int frameNumber) const
+	KeyframeInterpData AnimData::GetFrameInterpolation(int frameNumber) const
 	{
 		// FAILSAFE: Clamp frame number.
 		frameNumber = std::clamp(frameNumber, 0, EndFrameNumber);
@@ -51,7 +51,7 @@ namespace TEN::Animation
 
 	const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
 	{
-		auto interpData = GetKeyframeInterpData(frameNumber);
+		auto interpData = GetFrameInterpolation(frameNumber);
 		return ((interpData.Alpha <= 0.5f) ? interpData.Keyframe0 : interpData.Keyframe1);
 	}
 
@@ -63,15 +63,13 @@ namespace TEN::Animation
 		if (!hasTranslation && !hasRot)
 			return {};
 
-		// Handle base frame.
+		// Handle frame 0.
 		if (frameNumber == 0)
 		{
-			// Cycled animation; use root motion of frame 1.
 			if (Flags & (int)AnimFlags::RootMotionCycle)
 			{
 				frameNumber = 1;
 			}
-			// Uncycled animation and no preceeding reference frame; return early.
 			else
 			{
 				return {};
@@ -79,15 +77,15 @@ namespace TEN::Animation
 		}
 
 		// Get keyframe interpolation.
-		auto keyframInterp = GetKeyframeInterpData(frameNumber);
-		auto prevKeyframInterp = GetKeyframeInterpData(frameNumber - 1);
+		auto frameInterp = GetFrameInterpolation(frameNumber);
+		auto prevFrameInterp = GetFrameInterpolation(frameNumber - 1);
 		
 		// Calculate relative translation.
 		auto translation = Vector3::Zero;
 		if (hasTranslation)
 		{
-			auto rootOffset = Vector3::Lerp(keyframInterp.Keyframe0.RootOffset, keyframInterp.Keyframe1.RootOffset, keyframInterp.Alpha);
-			auto prevRootOffset = Vector3::Lerp(prevKeyframInterp.Keyframe0.RootOffset, prevKeyframInterp.Keyframe1.RootOffset, prevKeyframInterp.Alpha);
+			auto rootOffset = Vector3::Lerp(frameInterp.Keyframe0.RootOffset, frameInterp.Keyframe1.RootOffset, frameInterp.Alpha);
+			auto prevRootOffset = Vector3::Lerp(prevFrameInterp.Keyframe0.RootOffset, prevFrameInterp.Keyframe1.RootOffset, prevFrameInterp.Alpha);
 			auto rootTranslation = rootOffset - prevRootOffset;
 
 			if (Flags & (int)AnimFlags::RootMotionTranslationX)
@@ -102,8 +100,8 @@ namespace TEN::Animation
 		auto rot = EulerAngles::Identity;
 		if (hasRot)
 		{
-			auto rootOrient = EulerAngles(Quaternion::Slerp(keyframInterp.Keyframe0.BoneOrientations.front(), keyframInterp.Keyframe1.BoneOrientations.front(), keyframInterp.Alpha));
-			auto prevRootOrient = EulerAngles(Quaternion::Slerp(prevKeyframInterp.Keyframe0.BoneOrientations.front(), prevKeyframInterp.Keyframe1.BoneOrientations.front(), prevKeyframInterp.Alpha));
+			auto rootOrient = EulerAngles(Quaternion::Slerp(frameInterp.Keyframe0.BoneOrientations.front(), frameInterp.Keyframe1.BoneOrientations.front(), frameInterp.Alpha));
+			auto prevRootOrient = EulerAngles(Quaternion::Slerp(prevFrameInterp.Keyframe0.BoneOrientations.front(), prevFrameInterp.Keyframe1.BoneOrientations.front(), prevFrameInterp.Alpha));
 			auto rootRot = rootOrient - prevRootOrient;
 
 			if (Flags & (int)AnimFlags::RootMotionRotationX)
@@ -126,19 +124,19 @@ namespace TEN::Animation
 		if (!hasTranslation && !hasRot)
 			return {};
 
-		// No counteraction required for base frame; return early.
-		if (frameNumber == 0)
-			return {};
+		// Handle frame 0.
+		if (frameNumber == 0 && Flags & (int)AnimFlags::RootMotionCycle)
+			frameNumber = 1;
 
 		// Get keyframe interpolation.
-		auto keyframInterp = GetKeyframeInterpData(frameNumber);
+		auto frameInterp = GetFrameInterpolation(frameNumber);
 
 		// Get relative translation counteraction.
 		auto translation = Vector3::Zero;
 		if (hasTranslation)
 		{
 			auto baseOffset = Keyframes.front().RootOffset;
-			auto rootOffset = Vector3::Lerp(keyframInterp.Keyframe0.RootOffset, keyframInterp.Keyframe1.RootOffset, keyframInterp.Alpha);
+			auto rootOffset = Vector3::Lerp(frameInterp.Keyframe0.RootOffset, frameInterp.Keyframe1.RootOffset, frameInterp.Alpha);
 
 			if (Flags & (int)AnimFlags::RootMotionTranslationX)
 				translation.x = baseOffset.x - rootOffset.x;
@@ -153,7 +151,7 @@ namespace TEN::Animation
 		if (hasRot)
 		{
 			auto baseOrient = EulerAngles(Keyframes.front().BoneOrientations.front());
-			auto rootOrient = EulerAngles(Quaternion::Slerp(keyframInterp.Keyframe0.BoneOrientations.front(), keyframInterp.Keyframe1.BoneOrientations.front(), keyframInterp.Alpha));
+			auto rootOrient = EulerAngles(Quaternion::Slerp(frameInterp.Keyframe0.BoneOrientations.front(), frameInterp.Keyframe1.BoneOrientations.front(), frameInterp.Alpha));
 
 			if (Flags & (int)AnimFlags::RootMotionRotationX)
 				rot.x = baseOrient.x - rootOrient.x;
@@ -385,10 +383,10 @@ namespace TEN::Animation
 		return GetAnimData(item.Animation.AnimObjectID, animNumber);
 	}
 
-	KeyframeInterpData GetFrameInterpData(const ItemInfo& item)
+	KeyframeInterpData GetFrameInterpolation(const ItemInfo& item)
 	{
 		const auto& anim = GetAnimData(item);
-		return anim.GetKeyframeInterpData(item.Animation.FrameNumber);
+		return anim.GetFrameInterpolation(item.Animation.FrameNumber);
 	}
 
 	const KeyframeData& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)

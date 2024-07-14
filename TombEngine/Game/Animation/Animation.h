@@ -87,7 +87,7 @@ namespace TEN::Animation
 
 		int Flags = (int)AnimFlags::None;
 
-		KeyframeInterpData	GetKeyframeInterpData(int frameNumber) const;
+		KeyframeInterpData	GetFrameInterpolation(int frameNumber) const;
 		const KeyframeData& GetClosestKeyframe(int frameNumber) const;
 		RootMotionData		GetRootMotion(int frameNumber) const;
 		RootMotionData		GetRootMotionCounteraction(int frameNumber) const;
@@ -118,7 +118,7 @@ namespace TEN::Animation
 	const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 	const AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_VALUE);
 
-	KeyframeInterpData	GetFrameInterpData(const ItemInfo& item);
+	KeyframeInterpData	GetFrameInterpolation(const ItemInfo& item);
 	const KeyframeData& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
 	const KeyframeData& GetKeyframe(const ItemInfo& item, int animNumber, int frameNumber = 0);
 	const KeyframeData& GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber);

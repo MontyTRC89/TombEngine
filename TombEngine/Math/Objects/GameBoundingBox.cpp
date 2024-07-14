@@ -43,10 +43,10 @@ using namespace TEN::Animation;
 	GameBoundingBox::GameBoundingBox(const ItemInfo* item)
 	{
 		const auto& anim = GetAnimData(*item);
-		auto frameData = anim.GetKeyframeInterpData(item->Animation.FrameNumber);
+		auto frameInterp = anim.GetFrameInterpolation(item->Animation.FrameNumber);
 		auto rootMotionCounter = anim.GetRootMotionCounteraction(item->Animation.FrameNumber);
 
-		*this = frameData.Keyframe0.BoundingBox + (((frameData.Keyframe1.BoundingBox - frameData.Keyframe0.BoundingBox) * frameData.Alpha));
+		*this = frameInterp.Keyframe0.BoundingBox + (((frameInterp.Keyframe1.BoundingBox - frameInterp.Keyframe0.BoundingBox) * frameInterp.Alpha));
 
 		X1 += rootMotionCounter.Translation.x;
 		X2 += rootMotionCounter.Translation.x;

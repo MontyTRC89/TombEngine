@@ -326,7 +326,7 @@ namespace TEN::Renderer
 				});
 		}
 
-		auto frameData = GetFrameInterpData(*nativeItem);
+		auto frameData = GetFrameInterpolation(*nativeItem);
 		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX, false, nativeItem->Animation.Blend.IsEnabled() ? &nativeItem->Animation.Blend : nullptr);
 
 		for (int m = 0; m < obj->nmeshes; m++)

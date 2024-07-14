@@ -56,7 +56,7 @@ namespace TEN::Entities::Traps
         auto& maxExtensionLength    = item.ItemFlags[3];
 
         SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item.Pose);
-        auto frameData = GetFrameInterpData(*LaraItem);
+        auto frameData = GetFrameInterpolation(*LaraItem);
 
         // Damage player.
         int playerHeight = LaraItem->Pose.Position.y + frameData.Keyframe0.BoundingBox.Y1;
