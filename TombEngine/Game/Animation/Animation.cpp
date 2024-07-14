@@ -32,11 +32,6 @@ namespace TEN::Animation
 		Alpha = alpha;
 	}
 
-	bool RootMotionData::IsEmpty() const
-	{
-		return (Translation == Vector3::Zero && Rotation == EulerAngles::Identity);
-	}
-
 	KeyframeInterpData AnimData::GetKeyframeInterpData(int frameNumber) const
 	{
 		// FAILSAFE: Clamp frame number.

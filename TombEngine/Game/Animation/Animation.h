@@ -64,8 +64,6 @@ namespace TEN::Animation
 	{
 		Vector3		Translation = Vector3::Zero;
 		EulerAngles Rotation	= EulerAngles::Identity;
-
-		bool IsEmpty() const;
 	};
 
 	struct AnimData
