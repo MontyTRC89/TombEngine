@@ -40,7 +40,7 @@ namespace TEN::Math
 	{
 		alpha = std::clamp(alpha, 0.0f, 1.0f);
 
-		// De Casteljau interpolation.
+		// De Casteljau interpolation for point at alpha.
 		auto points = _controlPoints;
 		for (int i = 1; i < _controlPoints.size(); i++)
 		{
@@ -53,7 +53,8 @@ namespace TEN::Math
 
 	float BezierCurve2D::GetY(float x) const
 	{
-		constexpr auto TOLERANCE = 0.002f;
+		constexpr auto TOLERANCE		   = 0.001f;
+		constexpr auto ITERATION_COUNT_MAX = 100;
 
 		// Directly return Y for exact endpoint.
 		if (x <= (GetStart().x + TOLERANCE))
@@ -65,28 +66,21 @@ namespace TEN::Math
 			return GetEnd().y;
 		}
 
-		float low = 0.0f;
-		float high = 1.0f;
-		auto point = Vector2::Zero;
-
-		// Binary search for approximate Y.
-		float alpha = 0.5f;
-		while ((high - low) > TOLERANCE)
+		// Newton-Raphson iteration for approximate Y alpha.
+		float alpha = x / GetEnd().x;
+		for (int i = 0; i < ITERATION_COUNT_MAX; i++)
 		{
-			alpha = (low + high) / 2;
-			point = GetPoint(alpha);
+			auto point = GetPoint(alpha);
+			auto derivative = GetDerivative(alpha);
 
-			if (point.x < x)
-			{
-				low = alpha;
-			}
-			else
-			{
-				high = alpha;
-			}
+			float delta = (point.x - x) / derivative.x;
+			alpha -= delta;
+
+			if (abs(delta) <= TOLERANCE)
+				break;
 		}
 
-		return point.y;
+		return GetPoint(alpha).y;
 	}
 
 	void BezierCurve2D::SetStart(const Vector2& point)
@@ -107,5 +101,26 @@ namespace TEN::Math
 	void BezierCurve2D::SetEndHandle(const Vector2& point)
 	{
 		_controlPoints[2] = point;
+	}
+
+	Vector2 BezierCurve2D::GetDerivative(float alpha) const
+	{
+		alpha = std::clamp(alpha, 0.0f, 1.0f);
+
+		auto points = _controlPoints;
+		unsigned int count = (int)_controlPoints.size() - 1;
+
+		// Calculate derivative control points.
+		for (int i = 0; i < count; i++)
+			points[i] = (_controlPoints[i + 1] - _controlPoints[i]) * count;
+
+		// Reduce points using De Casteljau interpolation.
+		for (int i = 1; i < count; i++)
+		{
+			for (int j = 0; j < (count - i); j++)
+				points[j] = Vector2::Lerp(points[j], points[j + 1], alpha);
+		}
+
+		return points.front();
 	}
 }

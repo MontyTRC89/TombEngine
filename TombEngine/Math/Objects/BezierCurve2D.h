@@ -42,5 +42,10 @@ namespace TEN::Math
 		void SetEnd(const Vector2& point);
 		void SetStartHandle(const Vector2& point);
 		void SetEndHandle(const Vector2& point);
+
+	private:
+		// Helpers
+
+		Vector2 GetDerivative(float alpha) const;
 	};
 }
