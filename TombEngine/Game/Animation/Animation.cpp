@@ -68,7 +68,16 @@ namespace TEN::Animation
 		{
 			if (Flags & (int)AnimFlags::RootMotionCycle)
 			{
-				frameNumber = 1;
+
+				if (Keyframes.size() > 1)
+				{
+					frameNumber = 1;
+				}
+				else
+				{
+					TENLog("AnimData::GetRootMotion(): Attempted to get root motion for frame 0 from cycle with 1 frame.");
+					return {};
+				}
 			}
 			else
 			{
