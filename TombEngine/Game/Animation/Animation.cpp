@@ -76,7 +76,7 @@ namespace TEN::Animation
 			}
 		}
 
-		// Get keyframe interpolation.
+		// Get frame interpolation.
 		auto frameInterp = GetFrameInterpolation(frameNumber);
 		auto prevFrameInterp = GetFrameInterpolation(frameNumber - 1);
 		
@@ -128,7 +128,7 @@ namespace TEN::Animation
 		if (frameNumber == 0)
 			return {};
 
-		// Get keyframe interpolation.
+		// Get frame interpolation.
 		auto frameInterp = GetFrameInterpolation(frameNumber);
 
 		// Get relative translation counteraction.
