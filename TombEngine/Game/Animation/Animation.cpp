@@ -119,8 +119,8 @@ namespace TEN::Animation
 	RootMotionData AnimData::GetRootMotionCounteraction(int frameNumber) const
 	{
 		// Test for root motion flags.
-		bool hasTranslation = bool(Flags & ((int)AnimFlags::RootMotionTranslationX | (int)AnimFlags::RootMotionTranslationY | (int)AnimFlags::RootMotionTranslationZ));
-		bool hasRot = bool(Flags & ((int)AnimFlags::RootMotionRotationX | (int)AnimFlags::RootMotionRotationY | (int)AnimFlags::RootMotionRotationZ));
+		bool hasTranslation = Flags & ((int)AnimFlags::RootMotionTranslationX | (int)AnimFlags::RootMotionTranslationY | (int)AnimFlags::RootMotionTranslationZ);
+		bool hasRot = Flags & ((int)AnimFlags::RootMotionRotationX | (int)AnimFlags::RootMotionRotationY | (int)AnimFlags::RootMotionRotationZ);
 		if (!hasTranslation && !hasRot)
 			return {};
 
