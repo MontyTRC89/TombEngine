@@ -125,8 +125,8 @@ namespace TEN::Animation
 			return {};
 
 		// Handle frame 0.
-		if (frameNumber == 0 && Flags & (int)AnimFlags::RootMotionCycle)
-			frameNumber = 1;
+		if (frameNumber == 0)
+			return {};
 
 		// Get keyframe interpolation.
 		auto frameInterp = GetFrameInterpolation(frameNumber);
