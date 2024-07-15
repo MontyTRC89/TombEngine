@@ -450,30 +450,41 @@ namespace TEN::Renderer
 			}
 		}
 
-		auto world = Matrix::Identity;
+		const auto& anim = GetAnimData(*nativeItem);
+		auto rootMotionCounter = anim.GetRootMotionCounteraction(nativeItem->Animation.FrameNumber);
+
+		auto orient = nativeItem->Pose.Orientation + rootMotionCounter.Rotation;
+		auto rotMatrix = orient.ToRotationMatrix();
+
+		auto pos = nativeItem->Pose.Position.ToVector3() + Vector3::Transform(rootMotionCounter.Translation, rotMatrix);
+		auto translationMatrix = Matrix::CreateTranslation(pos);
+
+		auto worldMatrix = Matrix::Identity;
 		if (worldSpace & SPHERES_SPACE_WORLD)
 		{
-			world = Matrix::CreateTranslation(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z) * local;
+			worldMatrix = Matrix::CreateTranslation(nativeItem->Pose.Position.ToVector3() + Vector3::Transform(rootMotionCounter.Translation, rotMatrix)) * local;
 		}
 		else
 		{
-			world = Matrix::Identity * local;
+			worldMatrix = Matrix::Identity * local;
 		}
 
-		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
+		worldMatrix = rotMatrix * worldMatrix;
 
-		auto& moveable = GetRendererObject(nativeItem->ObjectNumber);
+		auto& rendererObject = GetRendererObject(nativeItem->ObjectNumber);
 
-		for (int i = 0; i< moveable.ObjectMeshes.size();i++)
+		for (int i = 0; i < rendererObject.ObjectMeshes.size();i++)
 		{
-			auto mesh = moveable.ObjectMeshes[i];
+			auto mesh = rendererObject.ObjectMeshes[i];
 
 			auto pos = (Vector3)mesh->Sphere.Center;
 			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
-				pos += moveable.LinearizedBones[i]->Translation;
+				pos += rendererObject.LinearizedBones[i]->Translation;
 
-			spheres[i].Center = Vector3::Transform(pos, (itemToDraw->AnimationTransforms[i] * world));
+			spheres[i].Center = Vector3::Transform(pos, itemToDraw->AnimationTransforms[i] * worldMatrix);
 			spheres[i].Radius = mesh->Sphere.Radius;
+
+			DrawDebugSphere(BoundingSphere(spheres[i].Center, spheres[i].Radius), Color(1, 1, 1));
 
 			// Spheres debug
 			// auto v1 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
@@ -481,7 +492,7 @@ namespace TEN::Renderer
 			// AddDebugLine(v1, v2, Vector4::One);
 		}
 
-		return (int)moveable.ObjectMeshes.size();
+		return (int)rendererObject.ObjectMeshes.size();
 	}
 
 	void Renderer::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
