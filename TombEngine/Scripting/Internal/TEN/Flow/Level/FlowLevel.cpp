@@ -109,12 +109,10 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 
 		"farView", sol::property(&Level::SetLevelFarView),
 
-/*** (bool) Enable unlimited oxygen supply when in water.
-
- __(not yet implemented)__
-@mem unlimitedAir
-*/
-		"unlimitedAir", &Level::UnlimitedAir,
+/// (bool) Reset hub data.
+// Resets the state for all previous levels, including items, flipmaps and statistics.
+//@mem resetHub
+		"resetHub", &Level::ResetHub,
 
 /// (table of @{Flow.InventoryItem}s) table of inventory object overrides
 //@mem objects
@@ -169,7 +167,7 @@ void Level::SetLevelFarView(short val)
 
 RGBAColor8Byte Level::GetSkyLayerColor(int index) const
 {
-	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
 	if (index == 0)
 	{
@@ -183,7 +181,7 @@ RGBAColor8Byte Level::GetSkyLayerColor(int index) const
 
 bool Level::GetSkyLayerEnabled(int index) const
 {
-	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
 	if (index == 0)
 	{
@@ -197,7 +195,7 @@ bool Level::GetSkyLayerEnabled(int index) const
 
 short Level::GetSkyLayerSpeed(int index) const
 {
-	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
 	if (index == 0)
 	{
@@ -214,7 +212,12 @@ LaraType Level::GetLaraType() const
 	return Type;
 }
 
-bool Level::HasStorm() const
+bool Level::GetResetHubEnabled() const
+{
+	return ResetHub;
+}
+
+bool Level::GetStormEnabled() const
 {
 	return Storm;
 }

@@ -124,7 +124,7 @@ namespace TEN::Entities::Creatures::TR3
 			switch (item->Animation.ActiveState)
 			{
 			case TREX_STATE_IDLE:
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (ai.distance < pow(1500, 2) && ai.bite)
 					item->Animation.TargetState = TREX_STATE_ATTACK;
@@ -182,8 +182,8 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		CreatureJoint(item, 0, headYRot);
-		creature->JointRotation[1] = creature->JointRotation[0];
+		CreatureJoint(item, 0, headYRot / 2);
+		CreatureJoint(item, 1, headYRot / 2);
 
 		CreatureAnimation(itemNumber, headingAngle, 0);
 

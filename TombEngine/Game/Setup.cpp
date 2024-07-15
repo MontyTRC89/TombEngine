@@ -20,6 +20,7 @@
 #include "Objects/Generic/Traps/falling_block.h"
 #include "Objects/TR1/tr1_objects.h"
 #include "Objects/TR2/tr2_objects.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR3/tr3_objects.h"
 #include "Objects/TR4/tr4_objects.h"
 #include "Objects/TR5/tr5_objects.h"
@@ -153,6 +154,7 @@ void InitializeSpecialEffects()
 	NextBlood = 0;
 
 	TEN::Entities::TR4::ClearBeetleSwarm();
+	TEN::Entities::Creatures::TR3::ClearFishSwarm();
 }
 
 void CustomObjects()
@@ -187,7 +189,7 @@ void InitializeObjects()
 		obj->usingDrawAnimatingItem = true;
 		obj->damageType = DamageMode::Any;
 		obj->LotType = LotType::Basic;
-		obj->meshSwapSlot = NO_ITEM;
+		obj->meshSwapSlot = NO_VALUE;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
 	}

@@ -172,32 +172,27 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 
 void ObjectsHandler::TestCollidingObjects()
 {
-	// Remove any items which can't collide.
-	for (const auto id : m_collidingItemsToRemove)
-		m_collidingItems.erase(id);
+	// Remove items which can't collide.
+	for (int itemNumber : m_collidingItemsToRemove)
+		m_collidingItems.erase(itemNumber);
 	m_collidingItemsToRemove.clear();
 
-	for (const auto idOne : m_collidingItems)
+	for (int itemNumber0 : m_collidingItems)
 	{
-		auto item = &g_Level.Items[idOne];
-		if (!item->Callbacks.OnObjectCollided.empty())
+		auto& item = g_Level.Items[itemNumber0];
+		if (!item.Callbacks.OnObjectCollided.empty())
 		{
 			// Test against other moveables.
-			GetCollidedObjects(item, 0, true, CollidedItems, nullptr, false);
-			size_t i = 0;
-			while (CollidedItems[i])
-			{
-				short idTwo = CollidedItems[i] - &g_Level.Items[0];
-				g_GameScript->ExecuteFunction(item->Callbacks.OnObjectCollided, idOne, idTwo);
-				++i;
-			}
+			auto collObjects = GetCollidedObjects(item, true, false);
+			for (const auto& collidedItemPtr : collObjects.Items)
+				g_GameScript->ExecuteFunction(item.Callbacks.OnObjectCollided, itemNumber0, collidedItemPtr->Index);
 		}
 
-		if (!item->Callbacks.OnRoomCollided.empty())
+		if (!item.Callbacks.OnRoomCollided.empty())
 		{
 			// Test against room geometry.
-			if (TestItemRoomCollisionAABB(item))
-				g_GameScript->ExecuteFunction(item->Callbacks.OnRoomCollided, idOne);
+			if (TestItemRoomCollisionAABB(&item))
+				g_GameScript->ExecuteFunction(item.Callbacks.OnRoomCollided, itemNumber0);
 		}
 	}
 }
@@ -210,10 +205,10 @@ void ObjectsHandler::AssignLara()
 bool ObjectsHandler::NotifyKilled(ItemInfo* key)
 {
 	auto it = moveables.find(key);
-	if (std::end(moveables) != it)
+	if (it != std::end(moveables))
 	{
-		for (auto& m : moveables[key])
-			m->Invalidate();
+		for (auto* movPtr : moveables[key])
+			movPtr->Invalidate();
 		
 		return true;
 	}

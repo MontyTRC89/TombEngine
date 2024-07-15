@@ -1,29 +1,29 @@
 #pragma once
 #include <string_view>
 
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Internal/LanguageScript.h"
 #include "Scripting/Internal/LuaHandler.h"
-#include "Scripting/Internal/TEN/Logic/LogicHandler.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Logic/LogicHandler.h"
+#include "Scripting/Internal/TEN/Flow/Animations/Animations.h"
 #include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
-#include "Scripting/Internal/TEN/Flow/Animations/Animations.h"
-#include "Scripting/Include/ScriptInterfaceGame.h"
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 class FlowHandler : public ScriptInterfaceFlowHandler
 {
 private:
-	Settings m_settings;
+	LuaHandler	_handler;
+	Settings	_settings = {};
+	std::string _gameDir  = {};
 
-	std::unordered_map<std::string, std::vector<std::string>> m_translationsMap;
-	std::vector<std::string> m_languageNames;
+	std::map<int, int> _moveableMap = {};
 
-	std::map<short, short> m_itemsMap;
+	std::unordered_map<std::string, std::vector<std::string>> _translationMap = {};
+	std::vector<std::string>								  _languageNames  = {};
 
-	std::string m_gameDir;
-
-	LuaHandler m_handler;
+	void PrepareInventoryObjects();
 
 public:
 	int FogInDistance  = 0;
@@ -61,7 +61,8 @@ public:
 	int			GetNumLevels() const;
 	void		EndLevel(std::optional<int> nextLevel, std::optional<int> startPosIndex);
 	GameStatus	GetGameStatus();
-	void		FlipMap(int flipmap);
+	void		FlipMap(int group);
+	bool		GetFlipMapStatus(std::optional<int> group);
 	void		SaveGame(int slot);
 	void		LoadGame(int slot);
 	void		DeleteSaveGame(int slot);
@@ -88,12 +89,13 @@ public:
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
 	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }
 	bool HasCrawlspaceDive() const override { return Anims.HasCrawlspaceDive; }
-	bool HasMonkeyAutoJump() const override { return Anims.HasMonkeyAutoJump; }
 	bool HasAFKPose() const override { return Anims.HasPose; }
 	bool HasOverhangClimb() const override { return Anims.HasOverhangClimb; }
 	bool HasSlideExtended() const override { return Anims.HasSlideExtended; }
 	bool HasSprintJump() const override { return Anims.HasSprintJump; }
 	bool HasLedgeJumps() const override { return Anims.HasLedgeJumps; }
 	bool DoFlow() override;
-};
 
+	// NOTE: Removed. Keep for now to maintain compatibility. -- Sezz 2024.06.06
+	bool HasAutoMonkeySwingJump() const override { return Anims.HasAutoMonkeySwingJump; }
+};
