@@ -69,26 +69,29 @@ bool operator ==(const Moveable& first, const Moveable& second)
 	return first.m_item == second.m_item;
 }
 
-/*** For more information on each parameter, see the
+/*** Used to generate a new moveable dynamically at runtime. 
+For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
 most can just be ignored (see usage).
+
 	@function Moveable
 	@tparam Objects.ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
-	@tparam[opt] Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
-	@int[opt] roomID room ID item is in (default: calculated automatically)
-	@int[opt=0] animNumber anim number
-	@int[opt=0] frameNumber frame number
-	@int[opt=10] hp HP of item
-	@int[opt=0] OCB ocb of item
-	@tparam[opt] table AIBits table with AI bits (default { 0, 0, 0, 0, 0, 0 })
+	@tparam Rotation rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
+	@tparam int roomID room ID item is in (default: calculated automatically)
+	@tparam int animNumber animation number
+	@tparam int frameNumber frame number
+	@tparam int hp HP of item
+	@tparam int OCB ocb of item
+	@tparam table AIBits table with AI bits (default { 0, 0, 0, 0, 0, 0 })
 	@treturn Moveable A new Moveable object (a wrapper around the new object)
+
 	@usage 
 	local item = Moveable(
 		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
-		Vec3(18907, 0, 21201))
+		Vec3(18907, 0, 21201)) -- position
 	*/
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
@@ -1070,7 +1073,8 @@ void Moveable::UnswapMesh(int meshId)
 
 /// Enable the item, as if a trigger for it had been stepped on.
 // @function Moveable:Enable
-void Moveable::EnableItem()
+// @tparam float timeout time (in seconds) after which moveable automatically disables (optional).
+void Moveable::EnableItem(sol::optional<float> timer)
 {
 	if (m_num == NO_VALUE)
 		return;
@@ -1080,6 +1084,7 @@ void Moveable::EnableItem()
 		wasInvisible = true;
 
 	m_item->Flags |= CODE_BITS;
+	m_item->Timer = timer.has_value() ? (timer.value() * FPS) : 0;
 	Trigger(m_num);
 
 	// Try add colliding in case the item went from invisible -> activated
@@ -1155,7 +1160,7 @@ void Moveable::SetVisible(bool isVisible)
 		{
 			if(!(m_item->Flags & IFLAG_KILLED))
 			{
-				EnableItem();
+				EnableItem(sol::nullopt);
 			}
 			else
 			{

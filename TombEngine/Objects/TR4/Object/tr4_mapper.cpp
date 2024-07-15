@@ -2,6 +2,7 @@
 #include "Objects/TR4/Object/tr4_mapper.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
@@ -9,6 +10,8 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Renderer/RendererEnums.h"
+
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::TR4
 {
@@ -34,7 +37,7 @@ namespace TEN::Entities::TR4
             byte color = (GetRandomControl() & 0x1F) + 192;
             TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, color, color, 0);
 
-            int height = GetCollision(item).Position.Floor;
+            int height = GetPointCollision(*item).GetFloorHeight();
 
             for (int i = 0; i < 2; i++)
             {

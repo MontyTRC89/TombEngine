@@ -8,9 +8,9 @@ namespace TEN::Entities::Player
 		int	  LowerFloorBound = 0;
 		int	  UpperFloorBound = 0;
 
-		bool TestSlipperySlopeBelow = true;
-		bool TestSlipperySlopeAbove = true;
-		bool TestDeathFloor			= true;
+		bool TestSteepFloorBelow = true;
+		bool TestSteepFloorAbove = true;
+		bool TestDeathFloor		 = true;
 	};
 
 	struct MonkeySwingMovementSetupData

@@ -68,8 +68,8 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		auto& creature = *GetCreatureInfo(&item);
 
-		return (creature.Enemy && creature.Enemy->BoxNumber != NO_BOX &&
-			(g_Level.Boxes[creature.Enemy->BoxNumber].flags & BLOCKABLE));
+		return (creature.Enemy && creature.Enemy->BoxNumber != NO_VALUE &&
+			(g_Level.PathfindingBoxes[creature.Enemy->BoxNumber].flags & BLOCKABLE));
 	}
 
 	static void SpawnLizardGas(int itemNumber, const CreatureBiteInfo& bite, int speed)

@@ -15,11 +15,12 @@ void Animations::Register(sol::table& parent)
 		"crawlExtended", &Animations::HasCrawlExtended,
 		"crouchRoll", &Animations::HasCrouchRoll,
 		"crawlspaceSwandive", &Animations::HasCrawlspaceDive,
-		"monkeyAutoJump", &Animations::HasMonkeyAutoJump,
 		"overhangClimb", &Animations::HasOverhangClimb,
 		"slideExtended", &Animations::HasSlideExtended,
 		"sprintJump", &Animations::HasSprintJump,
 		"pose", &Animations::HasPose,
-		"ledgeJumps", &Animations::HasLedgeJumps
-		);
+		"ledgeJumps", &Animations::HasLedgeJumps,
+
+		// NOTE: Removed. Keep for now to maintain compatibility. -- Sezz 2024.06.06
+		"monkeyAutoJump", & Animations::HasAutoMonkeySwingJump);
 }

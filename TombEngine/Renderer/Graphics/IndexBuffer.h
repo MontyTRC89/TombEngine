@@ -3,7 +3,7 @@
 #include <vector>
 #include <wrl/client.h>
 #include "Renderer/RendererUtils.h"
-#include "Game/debug/debug.h"
+#include "Game/Debug/Debug.h"
 #include "Specific/fast_vector.h"
 
 namespace TEN::Renderer::Graphics

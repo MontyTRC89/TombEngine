@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -23,6 +24,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -655,7 +657,7 @@ namespace TEN::Entities::TR4
 		auto pos = GetJointPosition(&item, SasGunBite);
 		grenadeItem->Pose.Position = pos;
 
-		auto floorHeight = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber).Position.Floor;
+		auto floorHeight = GetPointCollision(pos, grenadeItem->RoomNumber).GetFloorHeight();
 		if (floorHeight < pos.y)
 		{
 			grenadeItem->Pose.Position = Vector3i(item.Pose.Position.x, pos.y, item.Pose.Position.z);

@@ -4,7 +4,7 @@ struct CollisionInfo;
 struct ItemInfo;
 struct ObjectInfo;
 
-namespace TEN::Entities::Traps::TR1
+namespace TEN::Entities::Traps
 {
 	void InitializeDamoclesSword(short itemNumber);
 

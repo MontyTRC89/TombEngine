@@ -6,6 +6,8 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 
+using namespace TEN::Collision::Room;
+
 void InitializeSmashObject(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -14,15 +16,15 @@ void InitializeSmashObject(short itemNumber)
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	// NOTE: Avoids crash when attempting to access Boxes[] array while box is equal to NO_BOX. -- TokyoSU 2022.12.20
+	// NOTE: Avoids crash when attempting to access Boxes[] array while box is equal to NO_VALUE. -- TokyoSU 2022.12.20
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
-	if (floor->Box == NO_BOX)
+	if (floor->PathfindingBoxID == NO_VALUE)
 	{
 		TENLog("Smash object with ID " + std::to_string(itemNumber) + " may be inside a wall." , LogLevel::Warning);
 		return;
 	}
 
-	auto* box = &g_Level.Boxes[floor->Box];
+	auto* box = &g_Level.PathfindingBoxes[floor->PathfindingBoxID];
 	if (box->flags & 0x8000)
 		box->flags |= BLOCKED;
 }
@@ -34,7 +36,7 @@ void SmashObject(short itemNumber)
 
 	int sector = ((item->Pose.Position.z - room->z) / 1024) + room->zSize * ((item->Pose.Position.x - room->x) / 1024);
 
-	auto* box = &g_Level.Boxes[room->floor[sector].Box];
+	auto* box = &g_Level.PathfindingBoxes[room->floor[sector].PathfindingBoxID];
 	if (box->flags & 0x8000)
 		box->flags &= ~BOX_BLOCKED;
 

@@ -2,6 +2,7 @@
 #include "Objects/Utils/VehicleHelpers.h"
 
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/Sphere.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/Streamer.h"
@@ -15,6 +16,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Hud;
@@ -155,15 +157,15 @@ namespace TEN::Entities::Vehicles
 		pos->z = vehicleItem->Pose.Position.z + (forward * cosY) - (right * sinY);
 
 		// Get collision a bit higher to be able to detect bridges.
-		auto probe = GetCollision(pos->x, pos->y - CLICK(2), pos->z, vehicleItem->RoomNumber);
+		auto probe = GetPointCollision(Vector3i(pos->x, pos->y - CLICK(2), pos->z), vehicleItem->RoomNumber);
 
-		if (pos->y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
+		if (pos->y < probe.GetCeilingHeight() || probe.GetCeilingHeight() == NO_HEIGHT)
 			return NO_HEIGHT;
 
-		if (pos->y > probe.Position.Floor && clamp)
-			pos->y = probe.Position.Floor;
+		if (pos->y > probe.GetFloorHeight() && clamp)
+			pos->y = probe.GetFloorHeight();
 
-		return probe.Position.Floor;
+		return probe.GetFloorHeight();
 	}
 
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i* pos)
@@ -176,12 +178,12 @@ namespace TEN::Entities::Vehicles
 		point = Vector3::Transform(point, world);
 		*pos = Vector3i(point);
 
-		auto pointColl = GetCollision(pos->x, pos->y, pos->z, vehicleItem->RoomNumber);
-		int height = GetWaterHeight(pos->x, pos->y, pos->z, pointColl.RoomNumber);
+		auto pointColl = GetPointCollision(*pos, vehicleItem->RoomNumber);
+		int height = GetWaterHeight(pos->x, pos->y, pos->z, pointColl.GetRoomNumber());
 
 		if (height == NO_HEIGHT)
 		{
-			height = pointColl.Position.Floor;
+			height = pointColl.GetFloorHeight();
 			if (height == NO_HEIGHT)
 				return height;
 		}

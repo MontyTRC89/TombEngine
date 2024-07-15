@@ -26,7 +26,7 @@ public:
 	std::optional<std::reference_wrapper<UserDisplayString>> GetDisplayString(DisplayStringID id);
 	bool ScheduleRemoveDisplayString(DisplayStringID id);
 
-	void ShowString(DisplayString const&, sol::optional<float> nSeconds);
+	void ShowString(DisplayString const&, sol::optional<float> nSeconds, sol::optional<bool> autoDelete);
 
 	bool IsStringDisplaying(DisplayString const& str);
 

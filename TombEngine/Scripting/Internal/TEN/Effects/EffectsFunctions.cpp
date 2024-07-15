@@ -167,7 +167,7 @@ namespace TEN::Scripting::Effects
 		constexpr float secsPerFrame = 1.0f / (float)FPS;
 
 		float life = USE_IF_HAVE(float, lifetime, 2.0f);
-		life = std::max(0.0f, life);
+		life = std::max(0.1f, life);
 		int lifeInFrames = (int)round(life / secsPerFrame);
 
 		s->life = s->sLife = lifeInFrames;
