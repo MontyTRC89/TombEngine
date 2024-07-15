@@ -51,8 +51,8 @@ namespace TEN::Animation
 
 	const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
 	{
-		auto interpData = GetFrameInterpolation(frameNumber);
-		return ((interpData.Alpha <= 0.5f) ? interpData.Keyframe0 : interpData.Keyframe1);
+		auto frameInterp = GetFrameInterpolation(frameNumber);
+		return ((frameInterp.Alpha <= 0.5f) ? frameInterp.Keyframe0 : frameInterp.Keyframe1);
 	}
 
 	RootMotionData AnimData::GetRootMotion(int frameNumber) const
