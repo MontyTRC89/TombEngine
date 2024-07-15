@@ -767,11 +767,11 @@ namespace TEN::Renderer
 		const auto& object = Objects[objectNumber];
 		if (!object.Animations.empty())
 		{
-			auto interpData = KeyframeInterpData(
+			auto frameInterp = FrameInterpData(
 				GetAnimData(object, 0).Keyframes[0],
 				GetAnimData(object, 0).Keyframes[0],
 				0.0f);
-			UpdateAnimation(nullptr, *moveableObject, interpData, 0xFFFFFFFF);
+			UpdateAnimation(nullptr, *moveableObject, frameInterp, 0xFFFFFFFF);
 		}
 
 		auto pos = _viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);

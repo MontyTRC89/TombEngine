@@ -51,13 +51,13 @@ namespace TEN::Animation
 		BezierCurve2D BlendCurve		  = {};
 	};
 
-	struct KeyframeInterpData
+	struct FrameInterpData
 	{
 		const KeyframeData& Keyframe0;
 		const KeyframeData& Keyframe1;
 		float Alpha = 0.0f;
 
-		KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
+		FrameInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
 	};
 
 	struct RootMotionData
@@ -87,7 +87,7 @@ namespace TEN::Animation
 
 		int Flags = (int)AnimFlags::None;
 
-		KeyframeInterpData	GetFrameInterpolation(int frameNumber) const;
+		FrameInterpData		GetFrameInterpolation(int frameNumber) const;
 		const KeyframeData& GetClosestKeyframe(int frameNumber) const;
 		RootMotionData		GetRootMotion(int frameNumber) const;
 		RootMotionData		GetRootMotionCounteraction(int frameNumber) const;
@@ -118,7 +118,7 @@ namespace TEN::Animation
 	const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 	const AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_VALUE);
 
-	KeyframeInterpData	GetFrameInterpolation(const ItemInfo& item);
+	FrameInterpData	GetFrameInterpolation(const ItemInfo& item);
 	const KeyframeData& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
 	const KeyframeData& GetKeyframe(const ItemInfo& item, int animNumber, int frameNumber = 0);
 	const KeyframeData& GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber);

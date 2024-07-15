@@ -42,7 +42,7 @@ extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 namespace TEN::Renderer
 {
-	void Renderer::UpdateAnimation(RendererItem* rendererItem, RendererObject& rendererObject, const KeyframeInterpData& interpData, int mask, bool useObjectWorldRotation,
+	void Renderer::UpdateAnimation(RendererItem* rendererItem, RendererObject& rendererObject, const FrameInterpData& frameInterp, int mask, bool useObjectWorldRotation,
 								   const MoveableAnimBlendData* blendData)
 	{
 		static auto boneIndices = std::vector<int>{};
@@ -75,8 +75,8 @@ namespace TEN::Renderer
 				return;
 			
 			// Bad data; return early.
-			if (interpData.Keyframe0.BoneOrientations.size() <= bone->Index ||
-				(interpData.Alpha != 0.0f && interpData.Keyframe0.BoneOrientations.size() <= bone->Index))
+			if (frameInterp.Keyframe0.BoneOrientations.size() <= bone->Index ||
+				(frameInterp.Alpha != 0.0f && frameInterp.Keyframe0.BoneOrientations.size() <= bone->Index))
 			{
 				TENLog(
 					"Attempted to animate object ID " + GetObjectName((GAME_OBJECT_ID)rendererItem->ObjectNumber) +
@@ -90,20 +90,20 @@ namespace TEN::Renderer
 			bool animateBone = (mask >> bone->Index) & 1;
 			if (animateBone)
 			{
-				auto rootOffset0 = interpData.Keyframe0.RootOffset;
-				auto rotMatrix0 = Matrix::CreateFromQuaternion(interpData.Keyframe0.BoneOrientations[bone->Index]);
+				auto rootOffset0 = frameInterp.Keyframe0.RootOffset;
+				auto rotMatrix0 = Matrix::CreateFromQuaternion(frameInterp.Keyframe0.BoneOrientations[bone->Index]);
 				
 				// Interpolate frames.
-				if (interpData.Alpha != 0.0f)
+				if (frameInterp.Alpha != 0.0f)
 				{
-					auto rootOffset1 = interpData.Keyframe1.RootOffset;
-					rootOffset0 = Vector3::Lerp(rootOffset0, rootOffset1, interpData.Alpha);
+					auto rootOffset1 = frameInterp.Keyframe1.RootOffset;
+					rootOffset0 = Vector3::Lerp(rootOffset0, rootOffset1, frameInterp.Alpha);
 
-					auto rotMatrix2 = Matrix::CreateFromQuaternion(interpData.Keyframe1.BoneOrientations[bone->Index]);
+					auto rotMatrix2 = Matrix::CreateFromQuaternion(frameInterp.Keyframe1.BoneOrientations[bone->Index]);
 
 					auto quat0 = Quaternion::CreateFromRotationMatrix(rotMatrix0);
 					auto quat1 = Quaternion::CreateFromRotationMatrix(rotMatrix2);
-					auto quat2 = Quaternion::Slerp(quat0, quat1, interpData.Alpha);
+					auto quat2 = Quaternion::Slerp(quat0, quat1, frameInterp.Alpha);
 
 					rotMatrix0 = Matrix::CreateFromQuaternion(quat2);
 				}

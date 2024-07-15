@@ -25,14 +25,14 @@ namespace TEN::Animation
 
 	// TODO: Arm anim object in savegame.
 
-	KeyframeInterpData::KeyframeInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) :
+	FrameInterpData::FrameInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) :
 		Keyframe0(keyframe0),
 		Keyframe1(keyframe1)
 	{
 		Alpha = alpha;
 	}
 
-	KeyframeInterpData AnimData::GetFrameInterpolation(int frameNumber) const
+	FrameInterpData AnimData::GetFrameInterpolation(int frameNumber) const
 	{
 		// FAILSAFE: Clamp frame number.
 		frameNumber = std::clamp(frameNumber, 0, EndFrameNumber);
@@ -45,8 +45,8 @@ namespace TEN::Animation
 		// Calculate interpolation alpha between keyframes.
 		float alpha = (1.0f / Interpolation) * (frameNumber % Interpolation);
 
-		// Return keyframe interpolation data.
-		return KeyframeInterpData(keyframe0, keyframe1, alpha);
+		// Return frame interpolation.
+		return FrameInterpData(keyframe0, keyframe1, alpha);
 	}
 
 	const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
@@ -383,7 +383,7 @@ namespace TEN::Animation
 		return GetAnimData(item.Animation.AnimObjectID, animNumber);
 	}
 
-	KeyframeInterpData GetFrameInterpolation(const ItemInfo& item)
+	FrameInterpData GetFrameInterpolation(const ItemInfo& item)
 	{
 		const auto& anim = GetAnimData(item);
 		return anim.GetFrameInterpolation(item.Animation.FrameNumber);
