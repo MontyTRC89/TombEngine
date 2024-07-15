@@ -484,8 +484,6 @@ namespace TEN::Renderer
 			spheres[i].Center = Vector3::Transform(center, itemToDraw->AnimationTransforms[i] * worldMatrix);
 			spheres[i].Radius = mesh->Sphere.Radius;
 
-			DrawDebugSphere(BoundingSphere(spheres[i].Center, spheres[i].Radius), Color(1, 1, 1));
-
 			// Spheres debug
 			// auto v1 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
 			// auto v2 = Vector3(spheres[i].Center.x + spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
