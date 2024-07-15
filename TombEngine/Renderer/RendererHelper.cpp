@@ -462,7 +462,7 @@ namespace TEN::Renderer
 		auto worldMatrix = Matrix::Identity;
 		if (worldSpace & SPHERES_SPACE_WORLD)
 		{
-			worldMatrix = Matrix::CreateTranslation(nativeItem->Pose.Position.ToVector3() + Vector3::Transform(rootMotionCounter.Translation, rotMatrix)) * local;
+			worldMatrix = translationMatrix * local;
 		}
 		else
 		{
@@ -477,11 +477,11 @@ namespace TEN::Renderer
 		{
 			auto mesh = rendererObject.ObjectMeshes[i];
 
-			auto pos = (Vector3)mesh->Sphere.Center;
+			auto center = (Vector3)mesh->Sphere.Center;
 			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
-				pos += rendererObject.LinearizedBones[i]->Translation;
+				center += rendererObject.LinearizedBones[i]->Translation;
 
-			spheres[i].Center = Vector3::Transform(pos, itemToDraw->AnimationTransforms[i] * worldMatrix);
+			spheres[i].Center = Vector3::Transform(center, itemToDraw->AnimationTransforms[i] * worldMatrix);
 			spheres[i].Radius = mesh->Sphere.Radius;
 
 			DrawDebugSphere(BoundingSphere(spheres[i].Center, spheres[i].Radius), Color(1, 1, 1));
