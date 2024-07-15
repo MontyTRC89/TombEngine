@@ -68,7 +68,6 @@ namespace TEN::Animation
 		{
 			if (Flags & (int)AnimFlags::RootMotionCycle)
 			{
-
 				if (Keyframes.size() > 1)
 				{
 					frameNumber = 1;
