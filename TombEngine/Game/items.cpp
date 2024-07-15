@@ -185,20 +185,20 @@ void ItemInfo::SetAnimBlend(int frameCount, const BezierCurve2D& curve)
 	const auto& frameInterp = anim.GetFrameInterpolation(Animation.FrameNumber);
 	auto rootMotionCounter = anim.GetRootMotionCounteraction(Animation.FrameNumber);
 
-	auto rootOffset = Vector3::Lerp(frameInterp.Keyframe0.RootOffset, frameInterp.Keyframe1.RootOffset, frameInterp.Alpha);
+	auto rootPos = Vector3::Lerp(frameInterp.Keyframe0.RootPosition, frameInterp.Keyframe1.RootPosition, frameInterp.Alpha);
 	auto boneRot = rootMotionCounter.Rotation.ToQuaternion();
 
 	Animation.Blend.FrameNumber = 0;
 	Animation.Blend.FrameCount = frameCount;
 	Animation.Blend.Curve = curve;
-	Animation.Blend.RootOffset = rootOffset + rootMotionCounter.Translation;
+	Animation.Blend.RootPos = rootPos + rootMotionCounter.Translation;
 
 	Animation.Blend.BoneOrientations.clear();
 	Animation.Blend.BoneOrientations.reserve(object.nmeshes);
 	for (int i = 0; i < object.nmeshes; i++)
 	{
 		auto boneOrient = GetBoneOrientation(*this, i);
-		Animation.Blend.BoneOrientations.push_back(boneOrient * boneRot); // TODO: Check.
+		Animation.Blend.BoneOrientations.push_back(boneOrient * boneRot); // TODO: Check rotation.
 	}
 }
 

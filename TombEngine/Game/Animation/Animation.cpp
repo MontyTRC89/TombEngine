@@ -84,9 +84,9 @@ namespace TEN::Animation
 		auto translation = Vector3::Zero;
 		if (hasTranslation)
 		{
-			auto rootOffset = Vector3::Lerp(frameInterp.Keyframe0.RootOffset, frameInterp.Keyframe1.RootOffset, frameInterp.Alpha);
-			auto prevRootOffset = Vector3::Lerp(prevFrameInterp.Keyframe0.RootOffset, prevFrameInterp.Keyframe1.RootOffset, prevFrameInterp.Alpha);
-			auto rootTranslation = rootOffset - prevRootOffset;
+			auto rootPos = Vector3::Lerp(frameInterp.Keyframe0.RootPosition, frameInterp.Keyframe1.RootPosition, frameInterp.Alpha);
+			auto prevRootPos = Vector3::Lerp(prevFrameInterp.Keyframe0.RootPosition, prevFrameInterp.Keyframe1.RootPosition, prevFrameInterp.Alpha);
+			auto rootTranslation = rootPos - prevRootPos;
 
 			if (Flags & (int)AnimFlags::RootMotionTranslationX)
 				translation.x = rootTranslation.x;
@@ -135,15 +135,15 @@ namespace TEN::Animation
 		auto translation = Vector3::Zero;
 		if (hasTranslation)
 		{
-			auto baseOffset = Keyframes.front().RootOffset;
-			auto rootOffset = Vector3::Lerp(frameInterp.Keyframe0.RootOffset, frameInterp.Keyframe1.RootOffset, frameInterp.Alpha);
+			auto basePos = Keyframes.front().RootPosition;
+			auto rootPos = Vector3::Lerp(frameInterp.Keyframe0.RootPosition, frameInterp.Keyframe1.RootPosition, frameInterp.Alpha);
 
 			if (Flags & (int)AnimFlags::RootMotionTranslationX)
-				translation.x = baseOffset.x - rootOffset.x;
+				translation.x = basePos.x - rootPos.x;
 			if (Flags & (int)AnimFlags::RootMotionTranslationY)
-				translation.y = baseOffset.y - rootOffset.y;
+				translation.y = basePos.y - rootPos.y;
 			if (Flags & (int)AnimFlags::RootMotionTranslationZ)
-				translation.z = baseOffset.z - rootOffset.z;
+				translation.z = basePos.z - rootPos.z;
 		}
 
 		// Get relative rotation counteraction.

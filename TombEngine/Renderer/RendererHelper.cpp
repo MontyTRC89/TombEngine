@@ -90,14 +90,14 @@ namespace TEN::Renderer
 			bool animateBone = (mask >> bone->Index) & 1;
 			if (animateBone)
 			{
-				auto rootOffset0 = frameInterp.Keyframe0.RootOffset;
+				auto rootPos0 = frameInterp.Keyframe0.RootPosition;
 				auto rotMatrix0 = Matrix::CreateFromQuaternion(frameInterp.Keyframe0.BoneOrientations[bone->Index]);
 				
 				// Interpolate frames.
 				if (frameInterp.Alpha != 0.0f)
 				{
-					auto rootOffset1 = frameInterp.Keyframe1.RootOffset;
-					rootOffset0 = Vector3::Lerp(rootOffset0, rootOffset1, frameInterp.Alpha);
+					auto rootPos1 = frameInterp.Keyframe1.RootPosition;
+					rootPos0 = Vector3::Lerp(rootPos0, rootPos1, frameInterp.Alpha);
 
 					auto rotMatrix2 = Matrix::CreateFromQuaternion(frameInterp.Keyframe1.BoneOrientations[bone->Index]);
 
@@ -111,7 +111,7 @@ namespace TEN::Renderer
 				// Apply blending.
 				if (blendData != nullptr)
 				{
-					rootOffset0 = Vector3::Lerp(blendData->RootOffset, rootOffset0, blendAlpha);
+					rootPos0 = Vector3::Lerp(blendData->RootPos, rootPos0, blendAlpha);
 
 					auto quat = Quaternion::Slerp(blendData->BoneOrientations[bone->Index], Quaternion::CreateFromRotationMatrix(rotMatrix0), blendAlpha);
 					rotMatrix0 = Matrix::CreateFromQuaternion(quat);
@@ -121,7 +121,7 @@ namespace TEN::Renderer
 				if (rendererItem != nullptr)
 					rendererItem->BoneOrientations[bone->Index] = Quaternion::CreateFromRotationMatrix(rotMatrix0);
 
-				auto translationMatrix = (bone == rendererObject.Skeleton) ? Matrix::CreateTranslation(rootOffset0) : Matrix::Identity;
+				auto translationMatrix = (bone == rendererObject.Skeleton) ? Matrix::CreateTranslation(rootPos0) : Matrix::Identity;
 				auto extraRotMatrix = Matrix::CreateFromQuaternion(bone->ExtraRotation);
 
 				if (useObjectWorldRotation)

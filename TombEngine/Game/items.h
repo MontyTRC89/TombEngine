@@ -66,7 +66,7 @@ struct MoveableAnimBlendData
 	int			  FrameCount  = 0;
 	BezierCurve2D Curve		  = {};
 
-	Vector3					RootOffset		 = Vector3::Zero;
+	Vector3					RootPos			 = Vector3::Zero;
 	std::vector<Quaternion> BoneOrientations = {};
 
 	bool IsEnabled() const { return (FrameCount != 0); }

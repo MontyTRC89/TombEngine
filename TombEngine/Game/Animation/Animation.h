@@ -30,7 +30,7 @@ namespace TEN::Animation
 
 	struct KeyframeData
 	{
-		Vector3					RootOffset		 = Vector3::Zero;
+		Vector3					RootPosition	 = Vector3::Zero;
 		std::vector<Quaternion> BoneOrientations = {};
 		BoundingBox				Aabb			 = DirectX::BoundingBox();
 
