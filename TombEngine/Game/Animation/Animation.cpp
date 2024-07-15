@@ -75,7 +75,7 @@ namespace TEN::Animation
 				}
 				else
 				{
-					TENLog("AnimData::GetRootMotion(): Attempted to get root motion for frame 0 from cycle with 1 frame.");
+					TENLog("AnimData::GetRootMotion(): Attempted to get root motion for frame 0 from cycle with 1 frame.", LogLevel::Info);
 					return {};
 				}
 			}
