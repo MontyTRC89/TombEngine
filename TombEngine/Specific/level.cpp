@@ -452,10 +452,10 @@ void LoadObjects()
 					case AnimCommandType::None:
 						continue;
 
-					case AnimCommandType::MoveOrigin:
+					case AnimCommandType::Translate:
 					{
-						auto relOffset = ReadVector3();
-						command = std::make_unique<MoveOriginCommand>(relOffset);
+						auto translation = ReadVector3();
+						command = std::make_unique<TranslateCommand>(translation);
 					}
 						break;
 

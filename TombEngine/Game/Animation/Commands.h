@@ -7,7 +7,7 @@ namespace TEN::Animation
 	enum class AnimCommandType
 	{
 		None,
-		MoveOrigin,
+		Translate,
 		JumpVelocity,
 		AttackReady,
 		Deactivate,
@@ -31,13 +31,13 @@ namespace TEN::Animation
 		virtual void Execute(ItemInfo& item, bool isFrameBased) const = 0;
 	};
 
-	class MoveOriginCommand : public AnimCommand
+	class TranslateCommand : public AnimCommand
 	{
 	private:
-		const Vector3 _relOffset = Vector3::Zero;
+		const Vector3 _translation = Vector3::Zero;
 		
 	public:
-		MoveOriginCommand(const Vector3& relOffset) : _relOffset(relOffset) {};
+		TranslateCommand(const Vector3& translation) : _translation(translation) {};
 		void Execute(ItemInfo& item, bool isFrameBased) const override;
 	};
 	
