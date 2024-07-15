@@ -449,21 +449,21 @@ namespace TEN::Renderer
 		{
 			const auto& mesh = *moveable.ObjectMeshes[i];
 
-			auto relPos = Vector3(mesh.Sphere.Center);
+			auto relCenter = Vector3(mesh.Sphere.Center);
 			if (flags & (int)SphereSpaceFlags::BoneOrigin)
-				relPos += moveable.LinearizedBones[i]->Translation;
+				relCenter += moveable.LinearizedBones[i]->Translation;
 
 			const auto& tMatrix = itemToDraw.AnimationTransforms[i];
-			auto pos = Vector3::Transform(relPos, tMatrix * worldMatrix);
+			auto pos = Vector3::Transform(relCenter, tMatrix * worldMatrix);
 
 			// Add sphere.
 			auto sphere = BoundingSphere(pos, mesh.Sphere.Radius);
 			spheres.push_back(sphere);
 
 			// Debug
-			/* auto linePoint0 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
+			/*auto linePoint0 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
 			 auto linePoint1 = Vector3(spheres[i].Center.x + spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
-			 AddDebugLine(linePoint0, linePoint1, Vector4::One);*/
+			 DrawDebugLine(linePoint0, linePoint1, Vector4::One);*/
 		}
 		
 		return spheres;
