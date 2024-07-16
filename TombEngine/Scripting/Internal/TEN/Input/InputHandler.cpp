@@ -86,9 +86,9 @@ namespace TEN::Scripting::Input
 
 		ActionQueue[actionID] = QueueState::Clear;
 	}
-#
+
 	/// Clear all action keys.
-	// @function KeyClear
+	// @function KeyClearAll
 	static void KeyClearAll()
 	{
 		for (auto& queue : ActionQueue)

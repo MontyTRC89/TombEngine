@@ -33,6 +33,8 @@ namespace TEN::Debug
 		using std::runtime_error::runtime_error;
 	};
 
+	// Logs
+
 	void InitTENLog(const std::string& logDirContainingDir);
 	void ShutdownTENLog();
 	void TENLog(const std::string_view& msg, LogLevel level = LogLevel::Info, LogConfig config = LogConfig::All, bool allowSpam = false);
@@ -48,6 +50,13 @@ namespace TEN::Debug
 			}
 		}
 	};
+
+	// Timers
+
+	void StartDebugTimer();
+	void EndDebugTimer();
+
+	// Objects
 
 	void PrintDebugMessage(LPCSTR msg, ...);
 	void DrawDebug2DLine(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
