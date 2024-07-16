@@ -40,10 +40,9 @@ namespace TEN::Animation
 
 	struct StateDispatchData
 	{
-		int StateID			= 0;
-		int FrameNumberLow	= 0;
-		int FrameNumberHigh = 0;
-
+		int			  StateID			  = 0;
+		int			  FrameNumberLow	  = 0;
+		int			  FrameNumberHigh	  = 0;
 		int			  NextAnimNumber	  = 0;
 		int			  NextFrameNumberLow  = 0;
 		int			  NextFrameNumberHigh = 0;
@@ -60,6 +59,12 @@ namespace TEN::Animation
 		FrameInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
 	};
 
+	struct FixedMotionData
+	{
+		Vector3 Translation = Vector3::Zero;
+		float	CurveAlpha	= 0.0f;
+	};
+
 	struct RootMotionData
 	{
 		Vector3		Translation = Vector3::Zero;
@@ -69,17 +74,17 @@ namespace TEN::Animation
 	struct AnimData
 	{
 		using AnimCommandPtr = std::unique_ptr<AnimCommand>;
-		
-		int			  StateID		  = 0;
-		int			  Interpolation	  = 0;
-		int			  EndFrameNumber  = 0;
-		int			  NextAnimNumber  = 0;
-		int			  NextFrameNumber = 0;
-		int			  BlendFrameCount = 0;
-		BezierCurve2D BlendCurve	  = {};
 
-		Vector3 VelocityStart = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward.
-		Vector3 VelocityEnd	  = Vector3::Zero; // CONVENTION: +X = Right, +Y = Down, +Z = Forward.
+		int			  StateID			= 0;
+		int			  Interpolation		= 0;
+		int			  EndFrameNumber	= 0;
+		int			  NextAnimNumber	= 0;
+		int			  NextFrameNumber   = 0;
+		int			  BlendFrameCount   = 0;
+		BezierCurve2D BlendCurve		= {};
+		BezierCurve2D FixedMotionCurveX = {};
+		BezierCurve2D FixedMotionCurveY = {};
+		BezierCurve2D FixedMotionCurveZ = {};
 
 		std::vector<KeyframeData>	   Keyframes  = {};
 		std::vector<StateDispatchData> Dispatches = {};
@@ -89,6 +94,7 @@ namespace TEN::Animation
 
 		FrameInterpData		GetFrameInterpolation(int frameNumber) const;
 		const KeyframeData& GetClosestKeyframe(int frameNumber) const;
+		FixedMotionData		GetFixedMotion(int frameNumber) const;
 		RootMotionData		GetRootMotion(int frameNumber) const;
 		RootMotionData		GetRootMotionCounteraction(int frameNumber) const;
 	};

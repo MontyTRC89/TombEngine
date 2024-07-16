@@ -387,14 +387,43 @@ void LoadObjects()
 			anim.NextFrameNumber = ReadInt32();
 			anim.BlendFrameCount = ReadInt32();
 
-			auto start = ReadVector2();
-			auto end = ReadVector2();
-			auto startHandle = ReadVector2();
-			auto endHandle = ReadVector2();
-			anim.BlendCurve = BezierCurve2D(start, end, startHandle, endHandle);
+			auto blendCurveStart = ReadVector2();
+			auto blendCurveEnd = ReadVector2();
+			auto blendCurveStartHandle = ReadVector2();
+			auto blendCurveEndHandle = ReadVector2();
+			anim.BlendCurve = BezierCurve2D(blendCurveStart, blendCurveEnd, blendCurveStartHandle, blendCurveEndHandle);
 
-			anim.VelocityStart = ReadVector3();
-			anim.VelocityEnd = ReadVector3();
+			// TODO: Write this to level file.
+			/*auto fixedMotionCurveXStart = ReadVector2();
+			auto fixedMotionCurveXEnd = ReadVector2();
+			auto fixedMotionCurveXStartHandle = ReadVector2();
+			auto fixedMotionCurveXEndHandle = ReadVector2();
+			anim.FixedMotionCurveX = BezierCurve2D(fixedMotionCurveXStart, fixedMotionCurveXEnd, fixedMotionCurveXStartHandle, fixedMotionCurveXEndHandle);
+
+			auto fixedMotionCurveYStart = ReadVector2();
+			auto fixedMotionCurveYEnd = ReadVector2();
+			auto fixedMotionCurveYStartHandle = ReadVector2();
+			auto fixedMotionCurveYEndHandle = ReadVector2();
+			anim.FixedMotionCurveY = BezierCurve2D(fixedMotionCurveYStart, fixedMotionCurveYEnd, fixedMotionCurveYStartHandle, fixedMotionCurveYEndHandle);
+
+			auto fixedMotionCurveZStart = ReadVector2();
+			auto fixedMotionCurveZEnd = ReadVector2();
+			auto fixedMotionCurveZStartHandle = ReadVector2();
+			auto fixedMotionCurveZEndHandle = ReadVector2();
+			anim.FixedMotionCurveZ = BezierCurve2D(fixedMotionCurveZStart, fixedMotionCurveZEnd, fixedMotionCurveZStartHandle, fixedMotionCurveZEndHandle);*/
+
+			// TEMP: Convert velocities to fixed velocity curves.
+			auto velStart = ReadVector3();
+			auto velEnd = ReadVector3();
+			auto startX = Vector2(0.0f, velStart.x);
+			auto startY = Vector2(0.0f, velStart.y);
+			auto startZ = Vector2(0.0f, velStart.z);
+			auto endX = Vector2(1.0f, velEnd.x);
+			auto endY = Vector2(1.0f, velEnd.y);
+			auto endZ = Vector2(1.0f, velEnd.z);
+			anim.FixedMotionCurveX = BezierCurve2D(startX, endX, startX, endX);
+			anim.FixedMotionCurveY = BezierCurve2D(startY, endY, startY, endY);
+			anim.FixedMotionCurveZ = BezierCurve2D(startZ, endZ, startZ, endZ);
 
 			// Load keyframes.
 			int frameCount = ReadInt32();

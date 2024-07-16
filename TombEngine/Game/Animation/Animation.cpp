@@ -55,6 +55,19 @@ namespace TEN::Animation
 		return ((frameInterp.Alpha <= 0.5f) ? frameInterp.Keyframe0 : frameInterp.Keyframe1);
 	}
 
+	FixedMotionData AnimData::GetFixedMotion(int frameNumber) const
+	{
+		// NOTE: Must use non-zero frame count in this edge case.
+		unsigned int frameCount = std::clamp(EndFrameNumber, 1, EndFrameNumber);
+
+		// Calculate relative translation and curve alpha.
+		float alpha = (float)frameNumber / (float)frameCount;
+		auto translation = Vector3(FixedMotionCurveX.GetY(alpha), FixedMotionCurveY.GetY(alpha), FixedMotionCurveZ.GetY(alpha));
+
+		// Return fixed motion.
+		return FixedMotionData{ translation, alpha };
+	}
+
 	RootMotionData AnimData::GetRootMotion(int frameNumber) const
 	{
 		// Test for root motion flags.
@@ -250,24 +263,8 @@ namespace TEN::Animation
 				item.DisableAnimBlend();
 		}
 
-		// Debug
-		if (item.IsLara())
-		{
-			PrintDebugMessage(std::string(std::string("Blend enabled: ") + (item.Animation.Blend.IsEnabled() ? "Yes" : "No")).c_str());
-			PrintDebugMessage("Frame number: %d", item.Animation.Blend.FrameNumber);
-			PrintDebugMessage("Frame count: %d", item.Animation.Blend.FrameCount);
-		}
-
-		// NOTE: Must use non-zero frame count in this edge case.
-		unsigned int frameCount = anim->EndFrameNumber;
-		if (frameCount == 0)
-			frameCount = 1;
-
-		int currentFrameNumber = item.Animation.FrameNumber;
-
-		auto animAccel = (anim->VelocityEnd - anim->VelocityStart) / frameCount;
-		auto animVel = anim->VelocityStart + (animAccel * currentFrameNumber);
-
+		// Apply fixed motion and gravity.
+		auto fixedMotion = anim->GetFixedMotion(item.Animation.FrameNumber);
 		if (item.Animation.IsAirborne)
 		{
 			if (item.IsLara())
@@ -291,8 +288,11 @@ namespace TEN::Animation
 				}
 				else
 				{
+					// HACK
+					float accel = (anim->FixedMotionCurveZ.GetY(1.0f) - anim->FixedMotionCurveZ.GetY(0.0f)) * fixedMotion.CurveAlpha;
+					
 					item.Animation.Velocity.y += GetEffectiveGravity(item.Animation.Velocity.y);
-					item.Animation.Velocity.z += animAccel.z;
+					item.Animation.Velocity.z += accel;
 
 					item.Pose.Position.y += item.Animation.Velocity.y;
 				}
@@ -310,12 +310,12 @@ namespace TEN::Animation
 				const auto& player = GetLaraInfo(item);
 
 				bool isInSwamp = (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, &item));
-				item.Animation.Velocity.z = isInSwamp ? (animVel.z / 2) : animVel.z;
+				item.Animation.Velocity.z = isInSwamp ? (fixedMotion.Translation.z / 2) : fixedMotion.Translation.z;
 			}
 			else
 			{
-				item.Animation.Velocity.x = animVel.x;
-				item.Animation.Velocity.z = animVel.z;
+				item.Animation.Velocity.x = fixedMotion.Translation.x;
+				item.Animation.Velocity.z = fixedMotion.Translation.z;
 			}
 		}
 
@@ -329,7 +329,7 @@ namespace TEN::Animation
 		{
 			const auto& player = GetLaraInfo(item);
 
-			item.Animation.Velocity.x = animVel.x;
+			item.Animation.Velocity.x = fixedMotion.Translation.x;
 
 			if (player.Control.Rope.Ptr != NO_VALUE)
 				DelAlignLaraToRope(&item);
@@ -343,6 +343,16 @@ namespace TEN::Animation
 		{
 			item.Pose.Translate(item.Pose.Orientation.y, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
 			g_Renderer.UpdateItemAnimations(item.Index, true);
+		}
+
+		// Debug
+		if (item.IsLara())
+		{
+			PrintDebugMessage(std::string(std::string("Fixed motion: ") + ((fixedMotion.Translation != Vector3::Zero) ? "Yes" : "No")).c_str());
+			PrintDebugMessage(std::string(std::string("Root motion: ") + ((rootMotion.Translation != Vector3::Zero && rootMotion.Rotation != EulerAngles::Identity) ? "Yes" : "No")).c_str());
+			PrintDebugMessage(std::string(std::string("Blend enabled: ") + (item.Animation.Blend.IsEnabled() ? "Yes" : "No")).c_str());
+			PrintDebugMessage("Frame number: %d", item.Animation.Blend.FrameNumber);
+			PrintDebugMessage("Frame count: %d", item.Animation.Blend.FrameCount);
 		}
 	}
 
