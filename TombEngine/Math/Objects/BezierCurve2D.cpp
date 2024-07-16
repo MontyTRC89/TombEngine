@@ -3,6 +3,7 @@
 
 namespace TEN::Math
 {
+	const BezierCurve2D BezierCurve2D::Zero		 = BezierCurve2D(Vector2::Zero, Vector2::Zero, Vector2::Zero, Vector2::Zero);
 	const BezierCurve2D BezierCurve2D::Linear	 = BezierCurve2D(Vector2::Zero, Vector2::One, Vector2::Zero, Vector2::One);
 	const BezierCurve2D BezierCurve2D::EaseIn	 = BezierCurve2D(Vector2::Zero, Vector2::One, Vector2(0.25f, 0.0f), Vector2::One);
 	const BezierCurve2D BezierCurve2D::EaseOut	 = BezierCurve2D(Vector2::Zero, Vector2::One, Vector2::Zero, Vector2(0.75f, 1.0f));
@@ -122,5 +123,18 @@ namespace TEN::Math
 		}
 
 		return points.front();
+	}
+
+	bool BezierCurve2D::operator ==(const BezierCurve2D& curve) const
+	{
+		return (GetStart() == curve.GetStart() &&
+				GetEnd() == curve.GetEnd() &&
+				GetStartHandle() == curve.GetStartHandle() &&
+				GetEndHandle() == curve.GetEndHandle());
+	}
+
+	bool BezierCurve2D::operator !=(const BezierCurve2D& curve) const
+	{
+		return !(*this == curve);
 	}
 }

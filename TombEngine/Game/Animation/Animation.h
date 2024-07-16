@@ -47,7 +47,7 @@ namespace TEN::Animation
 		int			  NextFrameNumberLow  = 0;
 		int			  NextFrameNumberHigh = 0;
 		int			  BlendFrameCount	  = 0;
-		BezierCurve2D BlendCurve		  = {};
+		BezierCurve2D BlendCurve		  = BezierCurve2D::Zero;
 	};
 
 	struct FrameInterpData
@@ -81,10 +81,10 @@ namespace TEN::Animation
 		int			  NextAnimNumber	= 0;
 		int			  NextFrameNumber   = 0;
 		int			  BlendFrameCount   = 0;
-		BezierCurve2D BlendCurve		= {};
-		BezierCurve2D FixedMotionCurveX = {};
-		BezierCurve2D FixedMotionCurveY = {};
-		BezierCurve2D FixedMotionCurveZ = {};
+		BezierCurve2D BlendCurve		= BezierCurve2D::Zero;
+		BezierCurve2D FixedMotionCurveX = BezierCurve2D::Zero;
+		BezierCurve2D FixedMotionCurveY = BezierCurve2D::Zero;
+		BezierCurve2D FixedMotionCurveZ = BezierCurve2D::Zero;
 
 		std::vector<KeyframeData>	   Keyframes  = {};
 		std::vector<StateDispatchData> Dispatches = {};

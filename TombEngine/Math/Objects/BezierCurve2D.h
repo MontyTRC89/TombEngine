@@ -16,6 +16,7 @@ namespace TEN::Math
 	public:
 		// Presets
 
+		static const BezierCurve2D Zero;
 		static const BezierCurve2D Linear;
 		static const BezierCurve2D EaseIn;
 		static const BezierCurve2D EaseOut;
@@ -42,6 +43,11 @@ namespace TEN::Math
 		void SetEnd(const Vector2& point);
 		void SetStartHandle(const Vector2& point);
 		void SetEndHandle(const Vector2& point);
+
+		// Operators
+
+		bool operator ==(const BezierCurve2D& curve) const;
+		bool operator !=(const BezierCurve2D& curve) const;
 
 	private:
 		// Helpers
