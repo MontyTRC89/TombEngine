@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Debug/Debug.h"
 
+#include <chrono>
 #include <spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -12,6 +13,8 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Debug
 {
+	static auto StartTime = std::chrono::high_resolution_clock::time_point{};
+
 	void InitTENLog(const std::string& logDirContainingDir)
 	{
 		// "true" means create new log file each time game is run.
@@ -66,6 +69,19 @@ namespace TEN::Debug
 		logger->flush();
 
 		prevString = std::string(msg);
+	}
+
+	void StartDebugTimer()
+	{
+		StartTime = std::chrono::high_resolution_clock::now();
+	}
+
+	void EndDebugTimer()
+	{
+		auto endTime = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - StartTime);
+		
+		PrintDebugMessage("Execution (microseconds): %d", duration);
 	}
 
 	void PrintDebugMessage(LPCSTR msg, ...)
