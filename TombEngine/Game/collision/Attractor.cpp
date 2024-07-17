@@ -27,7 +27,7 @@ namespace TEN::Collision::Attractor
 
 	AttractorObject::AttractorObject(AttractorType type, const std::vector<Vector3>& points, int roomNumber)
 	{
-		assertion(!points.empty(), "Attempted to initialize invalid attractor.");
+		TENAssert(!points.empty(), "Attempted to initialize invalid attractor.");
 		
 		_type = type;
 		_points = points;
@@ -250,7 +250,7 @@ namespace TEN::Collision::Attractor
 		if (_points.size() == 1)
 		{
 			// Draw sphere.
-			g_Renderer.AddDebugSphere(_points.front(), SPHERE_RADIUS, COLOR_YELLOW_TRANSLUCENT, RendererDebugPage::AttractorStats, false);
+			DrawDebugSphere(_points.front(), SPHERE_RADIUS, COLOR_YELLOW_TRANSLUCENT, RendererDebugPage::AttractorStats, false);
 
 			// Determine label parameters.
 			auto labelPos = _points.front();
@@ -268,14 +268,14 @@ namespace TEN::Collision::Attractor
 			const auto& target = _points[segmentID + 1];
 
 			// Draw main line.
-			g_Renderer.AddDebugLine(origin, target, COLOR_YELLOW_OPAQUE, RendererDebugPage::AttractorStats);
+			DrawDebugLine(origin, target, COLOR_YELLOW_OPAQUE, RendererDebugPage::AttractorStats);
 
 			auto orient = EulerAngles(0, Geometry::GetOrientToPoint(origin, target).y + ANGLE(90.0f), 0);
 			auto dir = orient.ToDirection();
 
 			// Draw segment heading indicator lines.
-			g_Renderer.AddDebugLine(origin, Geometry::TranslatePoint(origin, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
-			g_Renderer.AddDebugLine(target, Geometry::TranslatePoint(target, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
+			DrawDebugLine(origin, Geometry::TranslatePoint(origin, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
+			DrawDebugLine(target, Geometry::TranslatePoint(target, dir, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
 
 			// Determine label parameters.
 			auto labelPos = ((origin + target) / 2) + LABEL_OFFSET;
@@ -288,14 +288,14 @@ namespace TEN::Collision::Attractor
 
 			// Draw start indicator line.
 			if (segmentID == 0)
-				g_Renderer.AddDebugLine(origin, Geometry::TranslatePoint(origin, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
+				DrawDebugLine(origin, Geometry::TranslatePoint(origin, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
 			
 			// Draw end indicator line.
 			if (segmentID == (GetSegmentCount() - 1))
-				g_Renderer.AddDebugLine(target, Geometry::TranslatePoint(target, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
+				DrawDebugLine(target, Geometry::TranslatePoint(target, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
 
 			// Draw AABB.
-			//g_Renderer.AddDebugBox(_box, Vector4::One, RendererDebugPage::AttractorStats);
+			//DrawDebugBox(_box, Vector4::One, RendererDebugPage::AttractorStats);
 		}
 	}
 
@@ -425,7 +425,7 @@ namespace TEN::Collision::Attractor
 
 	static std::vector<AttractorObject*> GetBoundedAttractors(const Vector3& pos, int roomNumber, const BoundingSphere& sphere)
 	{
-		g_Renderer.AddDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::AttractorStats);
+		DrawDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::AttractorStats);
 
 		auto boundedAttracs = std::vector<AttractorObject*>{};
 
@@ -563,8 +563,8 @@ namespace TEN::Collision::Attractor
 
 		if (g_Renderer.GetDebugPage() == RendererDebugPage::AttractorStats)
 		{
-			g_Renderer.PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracs.size());
-			g_Renderer.PrintDebugMessage("Nearby attractor segments: %d", (int)attracColls.size());
+			PrintDebugMessage("Nearby attractors: %d", (int)uniqueAttracs.size());
+			PrintDebugMessage("Nearby attractor segments: %d", (int)attracColls.size());
 		}
 	}
 }
