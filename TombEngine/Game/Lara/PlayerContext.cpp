@@ -1217,7 +1217,7 @@ namespace TEN::Entities::Player
 
 		int sign = setup.TestEdgeFront ? 1 : -1;
 		float range2D = std::max<float>(OFFSET_RADIUS(coll.Setup.Radius), Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length());
-		const AttractorCollisionData* highestAttracCollPtr = nullptr;
+		const AttractorCollisionData* highestAttracColl = nullptr;
 
 		// 2) Assess attractor collision.
 		for (const auto& attracColl : attracColls)
@@ -1340,21 +1340,21 @@ namespace TEN::Entities::Player
 			// 2.14) Track highest or return lowest attractor collision.
 			if (setup.FindHighest)
 			{
-				if (highestAttracCollPtr == nullptr)
+				if (highestAttracColl == nullptr)
 				{
-					highestAttracCollPtr = &attracColl;
+					highestAttracColl = &attracColl;
 					continue;
 				}
 
-				if (attracColl.Intersection.y < highestAttracCollPtr->Intersection.y)
+				if (attracColl.Intersection.y < highestAttracColl->Intersection.y)
 				{
 					// Ensure attractors are stacked exactly.
-					auto highest2DIntersect = Vector2(highestAttracCollPtr->Intersection.x, highestAttracCollPtr->Intersection.z);
+					auto highest2DIntersect = Vector2(highestAttracColl->Intersection.x, highestAttracColl->Intersection.z);
 					auto current2DIntersect = Vector2(attracColl.Intersection.x, attracColl.Intersection.z);
 					if (Vector2::DistanceSquared(highest2DIntersect, current2DIntersect) > EPSILON)
 						continue;
 
-					highestAttracCollPtr = &attracColl;
+					highestAttracColl = &attracColl;
 				}
 			}
 			else
@@ -1364,8 +1364,8 @@ namespace TEN::Entities::Player
 		}
 
 		// Return highest attractor collision (if applicable).
-		if (highestAttracCollPtr != nullptr)
-			return *highestAttracCollPtr;
+		if (highestAttracColl != nullptr)
+			return *highestAttracColl;
 
 		// No valid edge attractor collision; return nullopt.
 		return std::nullopt;
