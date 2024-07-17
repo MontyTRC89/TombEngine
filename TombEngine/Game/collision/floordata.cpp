@@ -889,7 +889,7 @@ namespace TEN::Collision::Floordata
 		if (labelPos2D.has_value())
 		{
 			*labelPos2D += Vector2(0.0f, verticalOffset);
-			g_Renderer.AddDebugString(string, *labelPos2D, color, LABEL_SCALE, 0, RendererDebugPage::CollisionStats);
+			DrawDebugString(string, *labelPos2D, color, LABEL_SCALE, RendererDebugPage::CollisionStats);
 		}
 	}
 
