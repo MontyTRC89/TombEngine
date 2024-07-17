@@ -15,6 +15,7 @@
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_tests.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Collision::Attractor;
@@ -1584,7 +1585,7 @@ namespace TEN::Entities::Player
 		}
 
 		// Auto jump to monkey swing disabled; return nullopt.
-		if (!g_GameFlow->HasMonkeyAutoJump())
+		if (!g_Configuration.EnableAutoMonkeySwingJump)
 			return std::nullopt;
 
 		// Get point collision.
