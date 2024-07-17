@@ -117,7 +117,7 @@ namespace TEN::Entities::Player
 
 	// State:	  LS_EDGE_HANG_IDLE (10)
 	// Collision: lara_void_func()
-	void lara_as_edge_hang_idle(ItemInfo* item, CollisionInfo* coll)
+	void PlayerStateEdgeHangIdle(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
 
@@ -238,7 +238,7 @@ namespace TEN::Entities::Player
 		SetPlayerEdgeHangRelease(*item);
 	}
 
-	void lara_as_edge_hang_shimmy_up(ItemInfo* item, CollisionInfo* coll)
+	void PlayerStateEdgeHangShimmyUp(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
 
@@ -247,7 +247,7 @@ namespace TEN::Entities::Player
 		HandlePlayerAttractorParent(*item);
 	}
 
-	void lara_as_edge_hang_shimmy_down(ItemInfo* item, CollisionInfo* coll)
+	void PlayerStateEdgeHangShimmyDown(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
 
@@ -258,7 +258,7 @@ namespace TEN::Entities::Player
 
 	// State:	  LS_EDGE_HANG_SHIMMY_LEFT (30)
 	// Collision: lara_void_func()
-	void lara_as_edge_hang_shimmy_left(ItemInfo* item, CollisionInfo* coll)
+	void PlayerStateEdgeHangShimmyLeft(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
 
@@ -302,7 +302,7 @@ namespace TEN::Entities::Player
 
 	// State:	  LS_EDGE_HANG_SHIMMY_RIGHT (31)
 	// Collision: lara_void_func()
-	void lara_as_edge_hang_shimmy_right(ItemInfo* item, CollisionInfo* coll)
+	void PlayerStateEdgeHangShimmyRight(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
 
@@ -346,7 +346,7 @@ namespace TEN::Entities::Player
 
 	// State:	  LS_EDGE_HANG_SHIMMY_OUTER_LEFT (107), LS_EDGE_HANG_SHIMMY_OUTER_RIGHT (108), LS_EDGE_HANG_SHIMMY_INNER_LEFT (109), LS_EDGE_HANG_SHIMMY_INNER_RIGHT (110)
 	// Collision: lara_default_col()
-	void lara_as_edge_hang_shimmy_corner(ItemInfo* item, CollisionInfo* coll)
+	void PlayerStateEdgeHangShimmyCorner(ItemInfo* item, CollisionInfo* coll)
 	{
 		// Setup
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
@@ -359,7 +359,7 @@ namespace TEN::Entities::Player
 
 	// State:	  LS_HANDSTAND (54)
 	// Collision: lara_default_col()
-	void lara_as_edge_hang_handstand(ItemInfo* item, CollisionInfo* coll)
+	void PlayerStateEdgeHangHanstand(ItemInfo* item, CollisionInfo* coll)
 	{
 		// Setup
 		coll->Setup.EnableObjectPush = false;

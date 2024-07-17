@@ -5,11 +5,11 @@ struct ItemInfo;
 
 namespace TEN::Entities::Player
 {
-	void lara_as_edge_hang_idle(ItemInfo* item, CollisionInfo* coll);
-	void lara_as_edge_hang_shimmy_up(ItemInfo* item, CollisionInfo* coll);
-	void lara_as_edge_hang_shimmy_down(ItemInfo* item, CollisionInfo* coll);
-	void lara_as_edge_hang_shimmy_left(ItemInfo* item, CollisionInfo* coll);
-	void lara_as_edge_hang_shimmy_right(ItemInfo* item, CollisionInfo* coll);
-	void lara_as_edge_hang_shimmy_corner(ItemInfo* item, CollisionInfo* coll);
-	void lara_as_edge_hang_handstand(ItemInfo* item, CollisionInfo* coll);
+	void PlayerStateEdgeHangIdle(ItemInfo* item, CollisionInfo* coll);
+	void PlayerStateEdgeHangShimmyUp(ItemInfo* item, CollisionInfo* coll);
+	void PlayerStateEdgeHangShimmyDown(ItemInfo* item, CollisionInfo* coll);
+	void PlayerStateEdgeHangShimmyLeft(ItemInfo* item, CollisionInfo* coll);
+	void PlayerStateEdgeHangShimmyRight(ItemInfo* item, CollisionInfo* coll);
+	void PlayerStateEdgeHangShimmyCorner(ItemInfo* item, CollisionInfo* coll);
+	void PlayerStateEdgeHangHanstand(ItemInfo* item, CollisionInfo* coll);
 }
