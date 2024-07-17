@@ -180,7 +180,7 @@ void ElectricityWiresControl(short itemNumber)
 		return;
 
 	auto collObjects = GetCollidedObjects(*item, true, false, BLOCK(2), ObjectCollectionMode::Items);
-	for (auto* itemPtr : collObjects.ItemPtrs)
+	for (auto* itemPtr : collObjects.Items)
 	{
 		const auto& object = Objects[itemPtr->ObjectNumber];
 

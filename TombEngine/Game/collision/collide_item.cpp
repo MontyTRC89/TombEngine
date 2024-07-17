@@ -19,7 +19,6 @@
 #include "Game/room.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 
@@ -27,7 +26,6 @@ using namespace TEN::Collision::Attractor;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
-using namespace TEN::Renderer;
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
 
@@ -206,7 +204,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 					// Test accurate box intersection.
 					if (box0.Intersects(box1))
-						collObjects.ItemPtrs.push_back(&item);
+						collObjects.Items.push_back(&item);
 				}
 				while (itemNumber != NO_VALUE);
 			}
@@ -255,7 +253,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 				// Test accurate box intersection.
 				if (box0.Intersects(box1))
-					collObjects.StaticPtrs.push_back(&staticObj);
+					collObjects.Statics.push_back(&staticObj);
 			}
 		}
 	}
@@ -718,7 +716,7 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 		item1->Pose.Position.Lerp(item0->Pose.Position + newDeltaPos, SOFT_PUSH_LERP_ALPHA);
 	}
 	// Snap to new position.
-	else
+	else if (coll->Setup.EnableObjectPush)
 	{
 		item1->Pose.Position = item0->Pose.Position + newDeltaPos;
 	}
@@ -1001,7 +999,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	itemBounds.Extents = itemBounds.Extents - Vector3(BLOCK(1));
 
 	// Draw static bounds.
-	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RendererDebugPage::CollisionStats);
+	DrawDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RendererDebugPage::CollisionStats);
 
 	// Calculate horizontal item collision bounds according to radius.
 	GameBoundingBox collBox;
@@ -1028,7 +1026,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Draw item coll bounds.
-	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
+	DrawDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 	// Decompose static bounds into top/bottom plane vertices.
 	Vector3 corners[8];

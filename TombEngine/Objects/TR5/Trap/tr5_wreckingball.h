@@ -3,6 +3,9 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-void InitializeWreckingBall(short itemNumber);
-void WreckingBallCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll);
-void WreckingBallControl(short itemNumber);
+namespace TEN::Entities::Traps
+{
+	void InitializeWreckingBall(short itemNumber);
+	void CollideWreckingBall(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
+	void ControlWreckingBall(short itemNumber);
+}

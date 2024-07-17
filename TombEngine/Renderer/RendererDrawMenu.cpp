@@ -233,42 +233,47 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableSubtitles), PRINTSTRING_COLOR_WHITE, SF(titleOption == 3));
 			GetNextLinePosition(&y);
 
+			// Auto monkey swing jump
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_MONKEY_SWING_JUMP), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoMonkeySwingJump), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
+			GetNextLinePosition(&y);
+			
 			// Auto targeting
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTOMATIC_TARGETING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoTargeting), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGETING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoTargeting), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
 			GetNextLinePosition(&y);
 
 			// Target highlighter
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TARGET_HIGHLIGHTER), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableTargetHighlighter), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TARGET_HIGHLIGHTER), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableTargetHighlighter), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
 			GetNextLinePosition(&y);
 			
 			// Vibration
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 7));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 7));
 			GetNextLinePosition(&y);
 
 			// Thumbstick camera
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 7));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCamera), PRINTSTRING_COLOR_WHITE, SF(titleOption == 7));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 8));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCamera), PRINTSTRING_COLOR_WHITE, SF(titleOption == 8));
 			GetNextBlockPosition(&y);
 
 			// Mouse sensitivity
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SENSITIVITY), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 8));
-			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 8));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SENSITIVITY), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 9));
+			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 9));
 			GetNextLinePosition(&y);
 
 			// Mouse smoothing
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SMOOTHING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 9));
-			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSmoothing).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 9));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SMOOTHING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 10));
+			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSmoothing).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 10));
 			GetNextBlockPosition(&y);
 
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 10));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 11));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 11));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 12));
 			break;
 
 		case Menu::GeneralActions:
@@ -1122,116 +1127,112 @@ namespace TEN::Renderer
 
 	void Renderer::DrawDebugInfo(RenderView& view)
 	{
-		if (CurrentLevel != 0)
+		if (CurrentLevel == 0)
+			return;
+
+		_currentLineHeight = DISPLAY_SPACE_RES.y / 30;
+
+		const auto& room = g_Level.Rooms[LaraItem->RoomNumber];
+
+		float aspectRatio = _screenWidth / (float)_screenHeight;
+		int thumbWidth = _screenWidth / 6;
+		auto rect = RECT{};
+		int thumbY = 0;
+
+		switch (_debugPage)
 		{
-			_currentY = 20;
+		case RendererDebugPage::None:
+			break;
 
-			ROOM_INFO* r = &g_Level.Rooms[LaraItem->RoomNumber];
-
-			float aspectRatio = _screenWidth / (float)_screenHeight;
-			int thumbWidth = _screenWidth / 6;
-			RECT rect;
-			int thumbY = 0;
-
-			switch (_debugPage)
-			{
-			case RendererDebugPage::None:
-				break;
-
-			case RendererDebugPage::RendererStats:
-				PrintDebugMessage("RENDERER STATS");
-				PrintDebugMessage("FPS: %3.2f", _fps);
-				PrintDebugMessage("Resolution: %d x %d", _screenWidth, _screenHeight);
-				PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
-				PrintDebugMessage("Update time: %d", _timeUpdate);
-				PrintDebugMessage("Frame time: %d", _timeFrame);
-				PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
-				PrintDebugMessage("Room collector time: %d", _timeRoomsCollector);
-				PrintDebugMessage("TOTAL Draw calls: %d", _numDrawCalls);
-				PrintDebugMessage("    Rooms: %d", _numRoomsDrawCalls);
-				PrintDebugMessage("    Movables: %d", _numMoveablesDrawCalls);
-				PrintDebugMessage("    Statics: %d", _numStaticsDrawCalls);
-				PrintDebugMessage("    Instanced Statics: %d", _numInstancedStaticsDrawCalls);
-				PrintDebugMessage("    Sprites: %d", _numSpritesDrawCalls);
-				PrintDebugMessage("    Instanced Sprites: %d", _numInstancedSpritesDrawCalls);
-				PrintDebugMessage("TOTAL Triangles: %d", _numTriangles);
-				PrintDebugMessage("Sprites: %d", view.SpritesToDraw.size());
-				PrintDebugMessage("SORTED Draw calls: %d", (_numSortedRoomsDrawCalls + _numSortedMoveablesDrawCalls + _numSortedStaticsDrawCalls
-					+ _numSortedSpritesDrawCalls));
-				PrintDebugMessage("    Rooms: %d", _numSortedRoomsDrawCalls);
-				PrintDebugMessage("    Movables: %d", _numSortedMoveablesDrawCalls);
-				PrintDebugMessage("    Statics: %d", _numSortedStaticsDrawCalls);
-				PrintDebugMessage("    Sprites: %d", _numSortedSpritesDrawCalls);
-				PrintDebugMessage("SHADOW MAPS Draw calls: %d", _numShadowMapDrawCalls);
-				PrintDebugMessage("DEBRIS Draw calls: %d", _numDebrisDrawCalls);
-				PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
-				PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);
-				PrintDebugMessage("    GetVisibleRooms() calls: %d", _numGetVisibleRoomsCalls);
-				PrintDebugMessage("    Dot products: %d", _numDotProducts);
+		case RendererDebugPage::RendererStats:
+			PrintDebugMessage("RENDERER STATS");
+			PrintDebugMessage("FPS: %3.2f", _fps);
+			PrintDebugMessage("Resolution: %d x %d", _screenWidth, _screenHeight);
+			PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
+			PrintDebugMessage("Update time: %d", _timeUpdate);
+			PrintDebugMessage("Frame time: %d", _timeFrame);
+			PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
+			PrintDebugMessage("Room collector time: %d", _timeRoomsCollector);
+			PrintDebugMessage("TOTAL draw calls: %d", _numDrawCalls);
+			PrintDebugMessage("    Rooms: %d", _numRoomsDrawCalls);
+			PrintDebugMessage("    Movables: %d", _numMoveablesDrawCalls);
+			PrintDebugMessage("    Statics: %d", _numStaticsDrawCalls);
+			PrintDebugMessage("    Instanced Statics: %d", _numInstancedStaticsDrawCalls);
+			PrintDebugMessage("    Sprites: %d", _numSpritesDrawCalls);
+			PrintDebugMessage("    Instanced Sprites: %d", _numInstancedSpritesDrawCalls);
+			PrintDebugMessage("TOTAL triangles: %d", _numTriangles);
+			PrintDebugMessage("Sprites: %d", view.SpritesToDraw.size());
+			PrintDebugMessage("SORTED draw calls: %d", (_numSortedRoomsDrawCalls + _numSortedMoveablesDrawCalls + _numSortedStaticsDrawCalls + _numSortedSpritesDrawCalls));
+			PrintDebugMessage("    Rooms: %d", _numSortedRoomsDrawCalls);
+			PrintDebugMessage("    Movables: %d", _numSortedMoveablesDrawCalls);
+			PrintDebugMessage("    Statics: %d", _numSortedStaticsDrawCalls);
+			PrintDebugMessage("    Sprites: %d", _numSortedSpritesDrawCalls);
+			PrintDebugMessage("SHADOW MAP draw calls: %d", _numShadowMapDrawCalls);
+			PrintDebugMessage("DEBRIS draw calls: %d", _numDebrisDrawCalls);
+			PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
+			PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);
+			PrintDebugMessage("    GetVisibleRooms() calls: %d", _numGetVisibleRoomsCalls);
+			PrintDebugMessage("    Dot products: %d", _numDotProducts);
 				 
-				_spriteBatch->Begin(SpriteSortMode_Deferred, _renderStates->Opaque()); 
+			_spriteBatch->Begin(SpriteSortMode_Deferred, _renderStates->Opaque()); 
 
+			rect.left = _screenWidth - thumbWidth;
+			rect.top = thumbY;
+			rect.right = rect.left+ thumbWidth;
+			rect.bottom = rect.top+thumbWidth / aspectRatio;
+				  
+			_spriteBatch->Draw(_normalsRenderTarget.ShaderResourceView.Get(), rect);
+			thumbY += thumbWidth / aspectRatio;
+
+			rect.left = _screenWidth - thumbWidth;
+			rect.top = thumbY;
+			rect.right = rect.left + thumbWidth;
+			rect.bottom = rect.top + thumbWidth / aspectRatio;
+
+			rect.left = _screenWidth - thumbWidth;
+			rect.top = thumbY;
+			rect.right = rect.left + thumbWidth;
+			rect.bottom = rect.top + thumbWidth / aspectRatio;
+
+			_spriteBatch->Draw(_SSAOBlurredRenderTarget.ShaderResourceView.Get(), rect);
+			thumbY += thumbWidth / aspectRatio;
+				  
+			if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
+			{
 				rect.left = _screenWidth - thumbWidth;
 				rect.top = thumbY;
-				rect.right = rect.left+ thumbWidth;
-				rect.bottom = rect.top+thumbWidth / aspectRatio;
-				  
-				_spriteBatch->Draw(_normalsRenderTarget.ShaderResourceView.Get(), rect);
+				rect.right = rect.left + thumbWidth;
+				rect.bottom = rect.top + thumbWidth / aspectRatio;
+
+				_spriteBatch->Draw(_SMAAEdgesRenderTarget.ShaderResourceView.Get(), rect);
 				thumbY += thumbWidth / aspectRatio;
 
 				rect.left = _screenWidth - thumbWidth;
 				rect.top = thumbY;
 				rect.right = rect.left + thumbWidth;
 				rect.bottom = rect.top + thumbWidth / aspectRatio;
-				   
-				//_spriteBatch->Draw(_depthRenderTarget.ShaderResourceView.Get(), rect);
-				//thumbY += thumbWidth / aspectRatio;
 
-				rect.left = _screenWidth - thumbWidth;
-				rect.top = thumbY;
-				rect.right = rect.left + thumbWidth;
-				rect.bottom = rect.top + thumbWidth / aspectRatio;
-
-				_spriteBatch->Draw(_SSAOBlurredRenderTarget.ShaderResourceView.Get(), rect);
+				_spriteBatch->Draw(_SMAABlendRenderTarget.ShaderResourceView.Get(), rect);
 				thumbY += thumbWidth / aspectRatio;
-				  
-				if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
-				{
-					rect.left = _screenWidth - thumbWidth;
-					rect.top = thumbY;
-					rect.right = rect.left + thumbWidth;
-					rect.bottom = rect.top + thumbWidth / aspectRatio;
+			}
 
-					_spriteBatch->Draw(_SMAAEdgesRenderTarget.ShaderResourceView.Get(), rect);
-					thumbY += thumbWidth / aspectRatio;
+			_spriteBatch->End();
 
-					rect.left = _screenWidth - thumbWidth;
-					rect.top = thumbY;
-					rect.right = rect.left + thumbWidth;
-					rect.bottom = rect.top + thumbWidth / aspectRatio;
+			break;
 
-					_spriteBatch->Draw(_SMAABlendRenderTarget.ShaderResourceView.Get(), rect);
-					thumbY += thumbWidth / aspectRatio;
-				}
-
-				_spriteBatch->End();
-
-				break;
-
-			case RendererDebugPage::DimensionStats:
-				PrintDebugMessage("DIMENSION STATS");
-				PrintDebugMessage("Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-				PrintDebugMessage("Orient: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
-				PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("Room location: %d %d", LaraItem->Location.RoomNumber, LaraItem->Location.Height);
-				PrintDebugMessage("BoxNumber: %d", LaraItem->BoxNumber);
-				PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
-				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * BLOCK(1), r->z + r->zSize * BLOCK(1));
-				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
-				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
-				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
-				PrintDebugMessage("Camera.RoomNumber: %d", Camera.pos.RoomNumber);
-				break;
+		case RendererDebugPage::DimensionStats:
+			PrintDebugMessage("DIMENSION STATS");
+			PrintDebugMessage("Position: %d, %d, %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
+			PrintDebugMessage("Orientation: %d, %d, %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
+			PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
+			PrintDebugMessage("PathfindingBoxID: %d", LaraItem->BoxNumber);
+			PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
+			PrintDebugMessage("Room Position: %d, %d, %d, %d", room.x, room.z, room.x + BLOCK(room.xSize), room.z + BLOCK(room.zSize));
+			PrintDebugMessage("Room.y, minFloor, maxCeiling: %d, %d, %d ", room.y, room.minfloor, room.maxceiling);
+			PrintDebugMessage("Camera Position: %d, %d, %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
+			PrintDebugMessage("Camera LookAt: %d, %d, %d", Camera.target.x, Camera.target.y, Camera.target.z);
+			PrintDebugMessage("Camera RoomNumber: %d", Camera.pos.RoomNumber);
+			break;
 
 			case RendererDebugPage::PlayerStats:
 				PrintDebugMessage("PLAYER STATS");
@@ -1248,34 +1249,34 @@ namespace TEN::Renderer
 				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
 				break;
 
-			case RendererDebugPage::InputStats:
+		case RendererDebugPage::InputStats:
+		{
+			auto clickedActions = BitField((int)In::Count);
+			auto heldActions = BitField((int)In::Count);
+			auto releasedActions = BitField((int)In::Count);
+
+			for (const auto& action : ActionMap)
 			{
-				auto clickedActions = BitField((int)In::Count);
-				auto heldActions = BitField((int)In::Count);
-				auto releasedActions = BitField((int)In::Count);
+				if (action.IsClicked())
+					clickedActions.Set((int)action.GetID());
 
-				for (const auto& action : ActionMap)
-				{
-					if (action.IsClicked())
-						clickedActions.Set((int)action.GetID());
+				if (action.IsHeld())
+					heldActions.Set((int)action.GetID());
 
-					if (action.IsHeld())
-						heldActions.Set((int)action.GetID());
-
-					if (action.IsReleased())
-						releasedActions.Set((int)action.GetID());
-				}
-				
-				PrintDebugMessage("INPUT STATS");
-				PrintDebugMessage(("Clicked actions: " + clickedActions.ToString()).c_str());
-				PrintDebugMessage(("Held actions: " + heldActions.ToString()).c_str());
-				PrintDebugMessage(("Released actions: " + releasedActions.ToString()).c_str());
-				PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[(int)InputAxis::Move].x, AxisMap[(int)InputAxis::Move].y);
-				PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[(int)InputAxis::Camera].x, AxisMap[(int)InputAxis::Camera].y);
-				PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[(int)InputAxis::Mouse].x, AxisMap[(int)InputAxis::Mouse].y);
-				PrintDebugMessage("Cursor pos: %.3f, %.3f", GetMouse2DPosition().x, GetMouse2DPosition().y);
+				if (action.IsReleased())
+					releasedActions.Set((int)action.GetID());
 			}
-				break;
+				
+			PrintDebugMessage("INPUT STATS");
+			PrintDebugMessage(("Clicked actions: " + clickedActions.ToString()).c_str());
+			PrintDebugMessage(("Held actions: " + heldActions.ToString()).c_str());
+			PrintDebugMessage(("Released actions: " + releasedActions.ToString()).c_str());
+			PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[(int)InputAxis::Move].x, AxisMap[(int)InputAxis::Move].y);
+			PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[(int)InputAxis::Camera].x, AxisMap[(int)InputAxis::Camera].y);
+			PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[(int)InputAxis::Mouse].x, AxisMap[(int)InputAxis::Mouse].y);
+			PrintDebugMessage("Cursor pos: %.3f, %.3f", GetMouse2DPosition().x, GetMouse2DPosition().y);
+		}
+			break;
 
 			case RendererDebugPage::CollisionStats:
 				PrintDebugMessage("COLLISION STATS");
@@ -1298,13 +1299,12 @@ namespace TEN::Renderer
 				PrintDebugMessage("BoxNumber: %d", LaraItem->BoxNumber);
 				break;
 				
-			case RendererDebugPage::WireframeMode:
-				PrintDebugMessage("WIREFRAME MODE");
-				break;
+		case RendererDebugPage::WireframeMode:
+			PrintDebugMessage("WIREFRAME MODE");
+			break;
 
-			default:
-				break;
-			}
+		default:
+			break;
 		}
 	}
 

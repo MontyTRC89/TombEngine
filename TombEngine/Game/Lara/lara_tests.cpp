@@ -18,6 +18,7 @@
 #include "Math/Math.h"
 #include "Renderer/Renderer.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
@@ -27,7 +28,6 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 using namespace TEN::Math;
-using namespace TEN::Renderer;
 using namespace TEN::Utils;
 
 // -----------------------------
@@ -213,9 +213,9 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 		auto sphere = BoundingSphere(spherePos, poleProbeCollRadius);
 		auto offsetSphere = BoundingSphere(spherePos + sphereOffset2D, poleProbeCollRadius);
 
-		//g_Renderer.AddDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
+		//DrawDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
 
-		for (const auto* itemPtr : collObjects.ItemPtrs)
+		for (const auto* itemPtr : collObjects.Items)
 		{
 			if (itemPtr->ObjectNumber != ID_POLEROPE)
 				continue;
@@ -223,7 +223,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 			auto poleBox = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
 			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0.0f, coll->Setup.Radius);
 
-			//g_Renderer.AddDebugBox(poleBox, Vector4(0, 0, 1, 1), RendererDebugPage::CollisionStats);
+			//DrawDebugBox(poleBox, Vector4(0, 0, 1, 1), RendererDebugPage::CollisionStats);
 
 			if (poleBox.Intersects(sphere) || poleBox.Intersects(offsetSphere))
 			{

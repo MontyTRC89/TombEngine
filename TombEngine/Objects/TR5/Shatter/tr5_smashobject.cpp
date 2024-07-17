@@ -24,7 +24,7 @@ void InitializeSmashObject(short itemNumber)
 		return;
 	}
 
-	auto* box = &g_Level.Boxes[floor->PathfindingBoxID];
+	auto* box = &g_Level.PathfindingBoxes[floor->PathfindingBoxID];
 	if (box->flags & 0x8000)
 		box->flags |= BLOCKED;
 }
@@ -36,7 +36,7 @@ void SmashObject(short itemNumber)
 
 	int sector = ((item->Pose.Position.z - room->z) / 1024) + room->zSize * ((item->Pose.Position.x - room->x) / 1024);
 
-	auto* box = &g_Level.Boxes[room->floor[sector].PathfindingBoxID];
+	auto* box = &g_Level.PathfindingBoxes[room->floor[sector].PathfindingBoxID];
 	if (box->flags & 0x8000)
 		box->flags &= ~BOX_BLOCKED;
 

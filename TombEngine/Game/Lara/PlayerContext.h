@@ -79,6 +79,7 @@ namespace TEN::Entities::Player
 	};
 
 	// Basic round movement contexts
+
 	bool CanChangeElevation(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStepUp(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanStepDown(const ItemInfo& item, const CollisionInfo& coll);
@@ -96,13 +97,16 @@ namespace TEN::Entities::Player
 	bool CanWadeBackward(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Basic vault contexts
+
 	bool CanVaultFromSprint(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Slide contexts
+
 	bool CanSlide(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanSteerOnSlide(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Crouch and crawl contexts
+
 	bool IsInLowSpace(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanCrouch(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanCrouchToCrawl(const ItemInfo& item, const CollisionInfo& coll);
@@ -111,6 +115,7 @@ namespace TEN::Entities::Player
 	bool CanCrawlBackward(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Monkey swing contexts
+
 	bool CanPerformMonkeySwingStep(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanFallFromMonkeySwing(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanGrabMonkeySwing(const ItemInfo& item, const CollisionInfo& coll);
@@ -120,6 +125,7 @@ namespace TEN::Entities::Player
 	bool CanMonkeySwingShimmyRight(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Jump contexts
+
 	bool CanFall(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanLand(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanPerformJump(const ItemInfo& item, const CollisionInfo& coll);
@@ -135,30 +141,36 @@ namespace TEN::Entities::Player
 	bool CanCrawlspaceDive(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Ledge contexts
+
 	bool CanPerformLedgeJump(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanPerformLedgeHandstand(const ItemInfo& item, CollisionInfo& coll);
 	bool CanClimbLedgeToCrouch(const ItemInfo& item, CollisionInfo& coll);
 	bool CanClimbLedgeToStand(const ItemInfo& item, CollisionInfo& coll);
 
 	// Object interaction contexts
+
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Vault climb contexts
+
 	std::optional<ClimbContextData>				GetStandVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData>				GetCrawlVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData>				GetTreadWaterVaultClimbContext(ItemInfo& item, const CollisionInfo& coll);
 	std::optional<WaterTreadStepOutContextData> GetTreadWaterStepOutContext(const ItemInfo& item);
 
 	// Hang descent climb contexts
+
 	std::optional<ClimbContextData> GetStandHangDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetStandHangDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetCrawlHangDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetCrawlHangDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Jump catch climb contexts
+
 	std::optional<ClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Hang climb contexts
+
 	std::optional<ClimbContextData> GetEdgeHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetEdgeHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetEdgeHangShimmyLeftContext(const ItemInfo& item, const CollisionInfo& coll);
@@ -166,6 +178,7 @@ namespace TEN::Entities::Player
 	bool CanEdgeHangToWallClimb(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Climbable wall climb contexts
+
 	std::optional<ClimbContextData> GetWallClimbUpContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetWallClimbDownContext(const ItemInfo& item, const CollisionInfo& coll);
 	std::optional<ClimbContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll);

@@ -25,7 +25,7 @@ void InitializeLOTarray(int itemNumber)
 
 	if (!creature->LOT.Initialized)
 	{
-		creature->LOT.Node = std::vector<BoxNode>(g_Level.Boxes.size(), BoxNode{});
+		creature->LOT.Node = std::vector<BoxNode>(g_Level.PathfindingBoxes.size(), BoxNode{});
 		creature->LOT.Initialized = true;
 	}
 }
@@ -247,7 +247,7 @@ void CreateZone(ItemInfo* item)
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (int i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < g_Level.PathfindingBoxes.size(); i++)
 		{
 			node->boxNumber = i;
 			node++;
@@ -265,7 +265,7 @@ void CreateZone(ItemInfo* item)
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (int i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < g_Level.PathfindingBoxes.size(); i++)
 		{
 			if (*zone == zoneNumber || *flippedZone == flippedZoneNumber)
 			{

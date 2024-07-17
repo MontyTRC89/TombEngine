@@ -136,9 +136,9 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, boo
 		return false;
 
 	// Check for blocked grey box.
-	if (g_Level.Boxes[pointColl.GetSector().PathfindingBoxID].flags & BLOCKABLE)
+	if (g_Level.PathfindingBoxes[pointColl.GetSector().PathfindingBoxID].flags & BLOCKABLE)
 	{
-		if (g_Level.Boxes[pointColl.GetSector().PathfindingBoxID].flags & BLOCKED)
+		if (g_Level.PathfindingBoxes[pointColl.GetSector().PathfindingBoxID].flags & BLOCKED)
 			return false;
 	}
 
