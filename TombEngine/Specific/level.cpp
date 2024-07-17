@@ -888,10 +888,9 @@ void ReadRooms()
 
 			volume.Type = (VolumeType)ReadInt32();
 
-			// NOTE: Braces are necessary to ensure correct value init order.
-			auto pos = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
-			auto orient = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
-			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
+			auto pos = ReadVector3();
+			auto orient = (Quaternion)ReadVector4();
+			auto scale =ReadVector3();
 
 			volume.Enabled = ReadBool();
 			volume.DetectInAdjacentRooms = ReadBool();
