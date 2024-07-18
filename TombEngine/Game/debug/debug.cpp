@@ -135,4 +135,9 @@ namespace TEN::Debug
 	{
 		g_Renderer.AddDebugSphere(sphere, color, page, isWireframe);
 	}
+
+	RendererDebugPage GetDebugPage()
+	{
+		return g_Renderer.GetDebugPage();
+	}
 }

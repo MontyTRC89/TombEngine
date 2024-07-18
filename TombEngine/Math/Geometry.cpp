@@ -253,21 +253,13 @@ namespace TEN::Math::Geometry
 		return BoundingBox(center, extents);
 	}
 
-	BoundingBox CombineBoundingBoxes(const BoundingBox& box0, const BoundingBox& box1)
+	float GetBoundingBoxArea(const BoundingBox& box)
 	{
-		auto minPoint = Vector3(
-			std::min(box0.Center.x - box0.Extents.x, box1.Center.x - box1.Extents.x),
-			std::min(box0.Center.y - box0.Extents.y, box1.Center.y - box1.Extents.y),
-			std::min(box0.Center.z - box0.Extents.z, box1.Center.z - box1.Extents.z));
+		float width = box.Extents.x * 2;
+		float height = box.Extents.y * 2;
+		float depth = box.Extents.z * 2;
 
-		auto maxPoint = Vector3(
-			std::max(box0.Center.x + box0.Extents.x, box1.Center.x + box1.Extents.x),
-			std::max(box0.Center.y + box0.Extents.y, box1.Center.y + box1.Extents.y),
-			std::max(box0.Center.z + box0.Extents.z, box1.Center.z + box1.Extents.z));
-
-		auto center = (minPoint + maxPoint) / 2;
-		auto extents = (maxPoint - minPoint) / 2;
-		return BoundingBox(center, extents);
+		return (((width * height) + (width * depth) + (height * depth)) * 2);
 	}
 
 	Quaternion ConvertDirectionToQuat(const Vector3& dir)

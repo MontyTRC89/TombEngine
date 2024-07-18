@@ -1578,6 +1578,11 @@ namespace TEN::Renderer
 		AddDebugSphere(sphere.Center, sphere.Radius, color, page, isWireframe);
 	}
 
+	RendererDebugPage Renderer::GetDebugPage() const
+	{
+		return _debugPage;
+	}
+
 	void Renderer::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 	{
 		if (_isLocked)

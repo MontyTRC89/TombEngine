@@ -624,6 +624,8 @@ namespace TEN::Renderer
 		void AddDebugSphere(const Vector3& center, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 		void AddDebugSphere(const BoundingSphere& sphere, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 
+		RendererDebugPage GetDebugPage() const;
+
 		void ChangeScreenResolution(int width, int height, bool isWindowed);
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void UpdateLaraAnimations(bool force);

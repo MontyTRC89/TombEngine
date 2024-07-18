@@ -1,5 +1,6 @@
 #pragma once
-#include "Specific/Structures/StaticBoundingVolumeHierarchy.h"
+
+#include "Specific/Structures/BoundingVolumeHierarchy.h"
 
 using namespace TEN::Structures;
 
@@ -15,16 +16,16 @@ namespace TEN::Physics
 	private:
 		// Members
 
-		std::array<int, VERTEX_COUNT> _vertexIds = {};
-		Vector3						  _normal	 = Vector3::Zero;
-		BoundingBox					  _aabb		 = BoundingBox();
+		std::array<int, VERTEX_COUNT> _vertexIds;
+		Vector3						  _normal;
+		BoundingBox					  _aabb;
 
 		int _portalRoomNumber = NO_VALUE;
 
 	public:
 		// Constructors
 
-		CollisionTriangle(int vertexID0, int vertexID1, int vertexID2, const Vector3& normal, const BoundingBox& box, int portalRoomNumber);
+		CollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, const Vector3& normal, const BoundingBox& box, int portalRoomNumber);
 
 		// Getters
 
@@ -48,27 +49,27 @@ namespace TEN::Physics
 	struct CollisionMeshRayCollisionData
 	{
 		const CollisionTriangle& Triangle;
-		float Distance = 0.0f;
+		float Distance;
 	};
 	
 	struct CollisionMeshSphereCollisionData
 	{
-		std::vector<const CollisionTriangle*> Triangles = {};
-		std::vector<Vector3>				  Tangents	= {};
+		std::vector<const CollisionTriangle*> Triangles;
+		std::vector<Vector3>				  Tangents;
 
-		unsigned int Count = 0;
+		unsigned int Count;
 	};
 
 	class CollisionMesh
 	{
 	private:
-		class Bvh : StaticBoundingVolumeHierarchy
+		class Tree : BoundingVolumeHierarchy
 		{
 		public:
 			// Constructors
 
-			Bvh() = default;
-			Bvh(const std::vector<CollisionTriangle>& tris);
+			Tree() = default;
+			Tree(const std::vector<CollisionTriangle>& tris);
 
 			// Utilities
 
@@ -86,9 +87,9 @@ namespace TEN::Physics
 
 		// Members
 
-		std::vector<CollisionTriangle> _triangles = {};
-		std::vector<Vector3>		   _vertices  = {};
-		Bvh							   _bvh		  = Bvh();
+		std::vector<CollisionTriangle> _triangles;
+		std::vector<Vector3>		   _vertices;
+		Tree						   _tree;
 
 	public:
 		// Constructors
@@ -104,7 +105,7 @@ namespace TEN::Physics
 		// Utilities
 
 		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, int portalRoomNumber = NO_VALUE);
-		void GenerateBvh();
+		void GenerateTree();
 
 		// Debug
 
