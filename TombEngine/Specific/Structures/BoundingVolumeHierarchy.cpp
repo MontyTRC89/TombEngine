@@ -19,45 +19,45 @@ namespace TEN::Structures
 		Generate(objectIds, aabbs, 0, (int)objectIds.size());
 	}
 
-	std::vector<int> BoundingVolumeHierarchy::GetNodeCollisionObjectIds(const Ray& ray, float dist) const
+	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const Ray& ray, float dist) const
 	{
-		auto testColl = [&](const Node& node)
+		auto testCollRoutine = [&](const Node& node)
 		{
 			float intersectDist = 0.0f;
 			return (node.Aabb.Intersects(ray.position, ray.direction, intersectDist) && intersectDist <= dist);
 		};
 
-		return GetNodeCollisionObjectIds(testColl);
+		return GetBoundedObjectIds(testCollRoutine);
 	}
 
-	std::vector<int> BoundingVolumeHierarchy::GetNodeCollisionObjectIds(const BoundingBox& aabb) const
+	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const BoundingBox& aabb) const
 	{
-		auto testColl = [&](const Node& node)
+		auto testCollRoutine = [&](const Node& node)
 		{
 			return node.Aabb.Intersects(aabb);
 		};
 
-		return GetNodeCollisionObjectIds(testColl);
+		return GetBoundedObjectIds(testCollRoutine);
 	}
 
-	std::vector<int> BoundingVolumeHierarchy::GetNodeCollisionObjectIds(const BoundingOrientedBox& obb) const
+	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const BoundingOrientedBox& obb) const
 	{
-		auto testColl = [&](const Node& node)
+		auto testCollRoutine = [&](const Node& node)
 		{
 			return node.Aabb.Intersects(obb);
 		};
 
-		return GetNodeCollisionObjectIds(testColl);
+		return GetBoundedObjectIds(testCollRoutine);
 	}
 
-	std::vector<int> BoundingVolumeHierarchy::GetNodeCollisionObjectIds(const BoundingSphere& sphere) const
+	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const BoundingSphere& sphere) const
 	{
-		auto testColl = [&](const Node& node)
+		auto testCollRoutine = [&](const Node& node)
 		{
 			return node.Aabb.Intersects(sphere);
 		};
 
-		return GetNodeCollisionObjectIds(testColl);
+		return GetBoundedObjectIds(testCollRoutine);
 	}
 
 	void BoundingVolumeHierarchy::DrawDebug() const
@@ -99,13 +99,13 @@ namespace TEN::Structures
 		}
 	}
 	
-	std::vector<int> BoundingVolumeHierarchy::GetNodeCollisionObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const
+	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const
 	{
 		auto objectIds = std::vector<int>{};
 		if (_nodes.empty())
 			return objectIds;
 
-		std::function<void(int)> traverse = [&](int nodeID)
+		std::function<void(int)> traverseRoutine = [&](int nodeID)
 		{
 			// Invalid node; return early.
 			if (nodeID == NO_VALUE)
@@ -124,31 +124,15 @@ namespace TEN::Structures
 			}
 			else
 			{
-				traverse(node.Child0ID);
-				traverse(node.Child1ID);
+				traverseRoutine(node.Child0ID);
+				traverseRoutine(node.Child1ID);
 			}
 		};
 
 		// TODO: Root can be any node?
 		// Traverse BVH from root node.
-		traverse((int)_nodes.size() - 1);
+		traverseRoutine((int)_nodes.size() - 1);
 
 		return objectIds;
-	}
-
-	float BoundingVolumeHierarchy::GetCost() const
-	{
-		// Calculate cost ignoring root and leaves.
-		float cost = 0.0f;
-		for (int i = 0; i < (_nodes.size() - 1); i++)
-		{
-			const auto& node = _nodes[i];
-			if (node.IsLeaf())
-				continue;
-
-			cost += Geometry::GetBoundingBoxArea(node.Aabb);
-		}
-
-		return cost;
 	}
 }

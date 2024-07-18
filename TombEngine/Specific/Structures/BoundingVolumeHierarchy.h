@@ -30,10 +30,10 @@ namespace TEN::Structures
 
 		// Getters
 
-		std::vector<int> GetNodeCollisionObjectIds(const Ray& ray, float dist) const;
-		std::vector<int> GetNodeCollisionObjectIds(const BoundingBox& aabb) const;
-		std::vector<int> GetNodeCollisionObjectIds(const BoundingOrientedBox& obb) const;
-		std::vector<int> GetNodeCollisionObjectIds(const BoundingSphere& sphere) const;
+		std::vector<int> GetBoundedObjectIds(const Ray& ray, float dist) const;
+		std::vector<int> GetBoundedObjectIds(const BoundingBox& aabb) const;
+		std::vector<int> GetBoundedObjectIds(const BoundingOrientedBox& obb) const;
+		std::vector<int> GetBoundedObjectIds(const BoundingSphere& sphere) const;
 
 		// Debug
 
@@ -43,7 +43,6 @@ namespace TEN::Structures
 		// Helpers
 
 		int				 Generate(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end);
-		std::vector<int> GetNodeCollisionObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const;
-		float			 GetCost() const;
+		std::vector<int> GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const;
 	};
 }

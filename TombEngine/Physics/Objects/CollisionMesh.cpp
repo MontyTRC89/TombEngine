@@ -200,7 +200,7 @@ namespace TEN::Physics
 	std::optional<CollisionMeshRayCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
 	{
 		// Get triangle IDs of collided tree nodes.
-		auto triIds = _tree.GetNodeCollisionObjectIds(ray, dist);
+		auto triIds = _tree.GetBoundedObjectIds(ray, dist);
 		if (triIds.empty())
 			return std::nullopt;
 
@@ -231,8 +231,8 @@ namespace TEN::Physics
 
 	std::optional<CollisionMeshSphereCollisionData> CollisionMesh::GetCollision(const BoundingSphere& sphere) const
 	{
-		// Get triangle IDs of collided tree nodes.
-		auto triIds = _tree.GetNodeCollisionObjectIds(sphere);
+		// Get bounded triangle IDs.
+		auto triIds = _tree.GetBoundedObjectIds(sphere);
 		if (triIds.empty())
 			return std::nullopt;
 
