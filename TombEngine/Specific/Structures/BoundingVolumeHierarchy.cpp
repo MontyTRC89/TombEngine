@@ -22,10 +22,30 @@ namespace TEN::Structures
 	std::vector<int> BoundingVolumeHierarchy::GetNodeCollisionObjectIds(const Ray& ray, float dist) const
 	{
 		auto testColl = [&](const Node& node)
-			{
-				float intersectDist = 0.0f;
-				return (node.Aabb.Intersects(ray.position, ray.direction, intersectDist) && intersectDist <= dist);
-			};
+		{
+			float intersectDist = 0.0f;
+			return (node.Aabb.Intersects(ray.position, ray.direction, intersectDist) && intersectDist <= dist);
+		};
+
+		return GetNodeCollisionObjectIds(testColl);
+	}
+
+	std::vector<int> BoundingVolumeHierarchy::GetNodeCollisionObjectIds(const BoundingBox& aabb) const
+	{
+		auto testColl = [&](const Node& node)
+		{
+			return node.Aabb.Intersects(aabb);
+		};
+
+		return GetNodeCollisionObjectIds(testColl);
+	}
+
+	std::vector<int> BoundingVolumeHierarchy::GetNodeCollisionObjectIds(const BoundingOrientedBox& obb) const
+	{
+		auto testColl = [&](const Node& node)
+		{
+			return node.Aabb.Intersects(obb);
+		};
 
 		return GetNodeCollisionObjectIds(testColl);
 	}
@@ -33,9 +53,9 @@ namespace TEN::Structures
 	std::vector<int> BoundingVolumeHierarchy::GetNodeCollisionObjectIds(const BoundingSphere& sphere) const
 	{
 		auto testColl = [&](const Node& node)
-			{
-				return node.Aabb.Intersects(sphere);
-			};
+		{
+			return node.Aabb.Intersects(sphere);
+		};
 
 		return GetNodeCollisionObjectIds(testColl);
 	}

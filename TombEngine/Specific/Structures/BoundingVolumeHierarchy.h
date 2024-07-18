@@ -31,6 +31,8 @@ namespace TEN::Structures
 		// Getters
 
 		std::vector<int> GetNodeCollisionObjectIds(const Ray& ray, float dist) const;
+		std::vector<int> GetNodeCollisionObjectIds(const BoundingBox& aabb) const;
+		std::vector<int> GetNodeCollisionObjectIds(const BoundingOrientedBox& obb) const;
 		std::vector<int> GetNodeCollisionObjectIds(const BoundingSphere& sphere) const;
 
 		// Debug
