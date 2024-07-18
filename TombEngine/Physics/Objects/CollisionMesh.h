@@ -63,33 +63,11 @@ namespace TEN::Physics
 	class CollisionMesh
 	{
 	private:
-		class Tree : BoundingVolumeHierarchy
-		{
-		public:
-			// Constructors
-
-			Tree() = default;
-			Tree(const std::vector<CollisionTriangle>& tris);
-
-			// Utilities
-
-			std::optional<CollisionMeshRayCollisionData>	GetCollision(const Ray& ray, float dist,
-																		 const std::vector<CollisionTriangle>& tris,
-																		 const std::vector<Vector3>& vertices) const;
-			std::optional<CollisionMeshSphereCollisionData> GetCollision(const BoundingSphere& sphere,
-																		 const std::vector<CollisionTriangle>& tris,
-																		 const std::vector<Vector3>& vertices) const;
-
-			// Debug
-
-			void DrawDebug() const;
-		};
-
 		// Members
 
 		std::vector<CollisionTriangle> _triangles;
 		std::vector<Vector3>		   _vertices;
-		Tree						   _tree;
+		BoundingVolumeHierarchy		   _tree;
 
 	public:
 		// Constructors

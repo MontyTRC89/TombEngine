@@ -19,21 +19,13 @@ namespace TEN::Structures
 		Generate(objectIds, aabbs, 0, (int)objectIds.size());
 	}
 
-	void BoundingVolumeHierarchy::DrawDebug() const
-	{
-		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
-
-		for (const auto& node : _nodes)
-			DrawDebugBox(node.Aabb, BOX_COLOR);
-	}
-
 	std::vector<int> BoundingVolumeHierarchy::GetNodeCollisionObjectIds(const Ray& ray, float dist) const
 	{
 		auto testColl = [&](const Node& node)
-		{
-			float intersectDist = 0.0f;
-			return (node.Aabb.Intersects(ray.position, ray.direction, intersectDist) && intersectDist <= dist);
-		};
+			{
+				float intersectDist = 0.0f;
+				return (node.Aabb.Intersects(ray.position, ray.direction, intersectDist) && intersectDist <= dist);
+			};
 
 		return GetNodeCollisionObjectIds(testColl);
 	}
@@ -41,11 +33,19 @@ namespace TEN::Structures
 	std::vector<int> BoundingVolumeHierarchy::GetNodeCollisionObjectIds(const BoundingSphere& sphere) const
 	{
 		auto testColl = [&](const Node& node)
-		{
-			return node.Aabb.Intersects(sphere);
-		};
+			{
+				return node.Aabb.Intersects(sphere);
+			};
 
 		return GetNodeCollisionObjectIds(testColl);
+	}
+
+	void BoundingVolumeHierarchy::DrawDebug() const
+	{
+		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
+
+		for (const auto& node : _nodes)
+			DrawDebugBox(node.Aabb, BOX_COLOR);
 	}
 
 	int BoundingVolumeHierarchy::Generate(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end)

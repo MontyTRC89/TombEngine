@@ -28,23 +28,19 @@ namespace TEN::Structures
 		BoundingVolumeHierarchy() = default;
 		BoundingVolumeHierarchy(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs);
 
-		// Debug
-
-		void DrawDebug() const;
-
-	protected:
 		// Getters
 
 		std::vector<int> GetNodeCollisionObjectIds(const Ray& ray, float dist) const;
 		std::vector<int> GetNodeCollisionObjectIds(const BoundingSphere& sphere) const;
 
-		// Utilities
+		// Debug
 
-		int Generate(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end);
+		void DrawDebug() const;
 
 	private:
 		// Helpers
 
+		int				 Generate(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end);
 		std::vector<int> GetNodeCollisionObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const;
 		float			 GetCost() const;
 	};

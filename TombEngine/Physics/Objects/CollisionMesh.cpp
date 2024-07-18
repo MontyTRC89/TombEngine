@@ -192,32 +192,15 @@ namespace TEN::Physics
 		DrawDebugLine(center, Geometry::TranslatePoint(center, _normal, BLOCK(0.2f)), Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f), RendererDebugPage::RoomMeshStats);
 	}
 
-	CollisionMesh::Tree::Tree(const std::vector<CollisionTriangle>& tris)
+	CollisionMesh::CollisionMesh(const std::vector<CollisionTriangle>& tris)
 	{
-		auto ids = std::vector<int>{};
-		auto aabbs = std::vector<BoundingBox>{};
-
-		ids.reserve(tris.size());
-		aabbs.reserve(tris.size());
-
-		int i = 0;
-		for (const auto& tri : tris)
-		{
-			ids.push_back(i);
-			aabbs.push_back(tri.GetAabb());
-
-			i++;
-		}
-
-		Generate(ids, aabbs, 0, (int)tris.size());
+		_triangles = tris;
 	}
 
-	std::optional<CollisionMeshRayCollisionData> CollisionMesh::Tree::GetCollision(const Ray& ray, float dist,
-																				   const std::vector<CollisionTriangle>& tris,
-																				   const std::vector<Vector3>& vertices) const
+	std::optional<CollisionMeshRayCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
 	{
 		// Get triangle IDs of collided tree nodes.
-		auto triIds = GetNodeCollisionObjectIds(ray, dist);
+		auto triIds = _tree.GetNodeCollisionObjectIds(ray, dist);
 		if (triIds.empty())
 			return std::nullopt;
 
@@ -228,10 +211,10 @@ namespace TEN::Physics
 		// Find closest triangle.
 		for (int triID : triIds)
 		{
-			const auto& tri = tris[triID];
+			const auto& tri = _triangles[triID];
 
 			float intersectDist = 0.0f;
-			if (tri.Intersects(vertices, ray, intersectDist) &&
+			if (tri.Intersects(_vertices, ray, intersectDist) &&
 				intersectDist <= dist && intersectDist < closestDist)
 			{
 				closestTri = &tri;
@@ -239,19 +222,17 @@ namespace TEN::Physics
 				isIntersected = true;
 			}
 		}
-		
+
 		if (isIntersected)
 			return CollisionMeshRayCollisionData{ *closestTri, closestDist };
 
 		return std::nullopt;
 	}
 
-	std::optional<CollisionMeshSphereCollisionData> CollisionMesh::Tree::GetCollision(const BoundingSphere& sphere,
-																					  const std::vector<CollisionTriangle>& tris,
-																					  const std::vector<Vector3>& vertices) const
+	std::optional<CollisionMeshSphereCollisionData> CollisionMesh::GetCollision(const BoundingSphere& sphere) const
 	{
 		// Get triangle IDs of collided tree nodes.
-		auto triIds = GetNodeCollisionObjectIds(sphere);
+		auto triIds = _tree.GetNodeCollisionObjectIds(sphere);
 		if (triIds.empty())
 			return std::nullopt;
 
@@ -260,12 +241,12 @@ namespace TEN::Physics
 		// Collect triangles.
 		for (int triID : triIds)
 		{
-			const auto& tri = tris[triID];
+			const auto& tri = _triangles[triID];
 
-			if (!tri.IsPortal() && tri.Intersects(vertices, sphere))
+			if (!tri.IsPortal() && tri.Intersects(_vertices, sphere))
 			{
 				meshColl.Triangles.push_back(&tri);
-				meshColl.Tangents.push_back(tri.GetTangent(vertices, sphere));
+				meshColl.Tangents.push_back(tri.GetTangent(_vertices, sphere));
 				meshColl.Count++;
 			}
 		}
@@ -274,29 +255,6 @@ namespace TEN::Physics
 			return meshColl;
 
 		return std::nullopt;
-	}
-
-	void CollisionMesh::Tree::DrawDebug() const
-	{
-		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
-
-		if (GetDebugPage() == RendererDebugPage::RoomMeshStats)
-			BoundingVolumeHierarchy::DrawDebug();
-	}
-
-	CollisionMesh::CollisionMesh(const std::vector<CollisionTriangle>& tris)
-	{
-		_triangles = tris;
-	}
-
-	std::optional<CollisionMeshRayCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
-	{
-		return _tree.GetCollision(ray, dist, _triangles, _vertices);
-	}
-
-	std::optional<CollisionMeshSphereCollisionData> CollisionMesh::GetCollision(const BoundingSphere& sphere) const
-	{
-		return _tree.GetCollision(sphere, _triangles, _vertices);
 	}
 
 	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, int portalRoomNumber)
@@ -345,7 +303,22 @@ namespace TEN::Physics
 	
 	void CollisionMesh::GenerateTree()
 	{
-		_tree = Tree(_triangles);
+		auto ids = std::vector<int>{};
+		auto aabbs = std::vector<BoundingBox>{};
+
+		ids.reserve(_triangles.size());
+		aabbs.reserve(_triangles.size());
+
+		int i = 0;
+		for (const auto& tri : _triangles)
+		{
+			ids.push_back(i);
+			aabbs.push_back(tri.GetAabb());
+
+			i++;
+		}
+
+		_tree = BoundingVolumeHierarchy(ids, aabbs);
 	}
 
 	void CollisionMesh::DrawDebug() const
@@ -356,6 +329,7 @@ namespace TEN::Physics
 				tri.DrawDebug(_vertices);
 		}
 
-		//_tree.DrawDebug();
+		if (GetDebugPage() == RendererDebugPage::RoomMeshStats)
+			_tree.DrawDebug();
 	}
 }
