@@ -45,6 +45,7 @@ namespace TEN::Structures
 	private:
 		// Helpers
 
-		float GetCost() const;
+		std::vector<int> GetNodeCollisionObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const;
+		float			 GetCost() const;
 	};
 }
