@@ -42,7 +42,11 @@ namespace TEN::Structures
 	private:
 		// Helpers
 
-		int				 Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end);
 		std::vector<int> GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const;
+
+		void InsertLeaf(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
+		int	 GetSiblingNodeID(int leafNodeID);
+
+		int Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary = 0.0f);
 	};
 }

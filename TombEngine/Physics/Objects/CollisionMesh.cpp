@@ -199,7 +199,7 @@ namespace TEN::Physics
 
 	std::optional<CollisionMeshRayCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
 	{
-		// Get triangle IDs of collided tree nodes.
+		// Get bounded triangle IDs.
 		auto triIds = _tree.GetBoundedObjectIds(ray, dist);
 		if (triIds.empty())
 			return std::nullopt;
@@ -301,7 +301,7 @@ namespace TEN::Physics
 		_triangles.push_back(CollisionTriangle(vertex0ID, vertex1ID, vertex2ID, normal, box, portalRoomNumber));
 	}
 	
-	void CollisionMesh::GenerateTree()
+	void CollisionMesh::BuildTree()
 	{
 		auto ids = std::vector<int>{};
 		auto aabbs = std::vector<BoundingBox>{};
@@ -309,13 +309,12 @@ namespace TEN::Physics
 		ids.reserve(_triangles.size());
 		aabbs.reserve(_triangles.size());
 
-		int i = 0;
-		for (const auto& tri : _triangles)
+		for (int i = 0; i < _triangles.size(); i++)
 		{
+			const auto& tri = _triangles[i];
+
 			ids.push_back(i);
 			aabbs.push_back(tri.GetAabb());
-
-			i++;
 		}
 
 		_tree = BoundingVolumeHierarchy(ids, aabbs);

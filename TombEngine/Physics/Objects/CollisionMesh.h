@@ -83,7 +83,7 @@ namespace TEN::Physics
 		// Utilities
 
 		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, int portalRoomNumber = NO_VALUE);
-		void GenerateTree();
+		void BuildTree();
 
 		// Debug
 

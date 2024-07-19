@@ -1002,6 +1002,6 @@ namespace TEN::Collision::Room
 			}
 		}
 
-		room.CollisionMesh.GenerateTree();
+		room.CollisionMesh.BuildTree();
 	}
 }
