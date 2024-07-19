@@ -16,7 +16,7 @@ namespace TEN::Structures
 	{
 		TENAssert(objectIds.size() == aabbs.size(), "BoundingVolumeHierarchy(): Object ID and AABB counts must be equal.");
 
-		Generate(objectIds, aabbs, 0, (int)objectIds.size());
+		Build(objectIds, aabbs, 0, (int)objectIds.size());
 	}
 
 	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const Ray& ray, float dist) const
@@ -42,8 +42,12 @@ namespace TEN::Structures
 
 	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const BoundingOrientedBox& obb) const
 	{
+		auto aabb = Geometry::GetBoundingBox(obb);
 		auto testCollRoutine = [&](const Node& node)
 		{
+			if (!node.Aabb.Intersects(aabb))
+				return false;
+
 			return node.Aabb.Intersects(obb);
 		};
 
@@ -68,7 +72,7 @@ namespace TEN::Structures
 			DrawDebugBox(node.Aabb, BOX_COLOR);
 	}
 
-	int BoundingVolumeHierarchy::Generate(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end)
+	int BoundingVolumeHierarchy::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end)
 	{
 		// FAILSAFE.
 		if (start >= end)
@@ -84,18 +88,32 @@ namespace TEN::Structures
 		// Leaf node.
 		if ((end - start) == 1)
 		{
-			node.ObjectID = start;
+			node.ObjectID = objectIds[start];
+
+			int newNodeID = (int)_nodes.size();
 			_nodes.push_back(node);
-			return int(_nodes.size() - 1);
+			return newNodeID;
 		}
 		// Split node.
 		else
 		{
 			int mid = (start + end) / 2;
-			node.Child0ID = Generate(objectIds, aabbs, start, mid);
-			node.Child1ID = Generate(objectIds, aabbs, mid, end);
+			node.Child0ID = Build(objectIds, aabbs, start, mid);
+			node.Child1ID = Build(objectIds, aabbs, mid, end);
+
+			// Set parent ID for child nodes.
+			int newNodeID = (int)_nodes.size();
+			if (node.Child0ID != NO_VALUE)
+			{
+				_nodes[node.Child0ID].ParentID = newNodeID;
+			}
+			if (node.Child1ID != NO_VALUE)
+			{
+				_nodes[node.Child1ID].ParentID = newNodeID;
+			}
+
 			_nodes.push_back(node);
-			return int(_nodes.size() - 1);
+			return newNodeID;
 		}
 	}
 	

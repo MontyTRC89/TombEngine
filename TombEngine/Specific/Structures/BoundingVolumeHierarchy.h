@@ -10,7 +10,7 @@ namespace TEN::Structures
 			BoundingBox Aabb;
 			int			ObjectID = NO_VALUE; // NOTE: Only leaf node stores ID directly.
 
-			int ParentID = NO_VALUE; // TODO
+			int ParentID = NO_VALUE;
 			int Child0ID = NO_VALUE;
 			int Child1ID = NO_VALUE;
 
@@ -42,7 +42,7 @@ namespace TEN::Structures
 	private:
 		// Helpers
 
-		int				 Generate(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end);
+		int				 Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end);
 		std::vector<int> GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const;
 	};
 }
