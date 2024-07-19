@@ -17,9 +17,9 @@ namespace TEN::Structures
 		TENAssert(objectIds.size() == aabbs.size(), "BoundingVolumeHierarchy(): Object ID and AABB counts must be equal.");
 
 		// Debug
-		/*_nodes.clear();
-		for (int i = 0; i < objectIds.size(); i++)
-			InsertLeaf(objectIds[i], aabbs[i]);*/
+		//_nodes.clear();
+		//for (int i = 0; i < objectIds.size(); i++)
+		//	InsertLeaf(objectIds[i], aabbs[i]);
 
 		Build(objectIds, aabbs, 0, (int)objectIds.size());
 		_rootID = int(_nodes.size() - 1);
@@ -76,8 +76,8 @@ namespace TEN::Structures
 
 		for (const auto& node : _nodes)
 		{
-			if (node.IsLeaf() || _nodes[node.Child0ID].IsLeaf() || _nodes[node.Child1ID].IsLeaf())
-				continue;
+			//if (node.IsLeaf() || _nodes[node.Child0ID].IsLeaf() || _nodes[node.Child1ID].IsLeaf())
+			//	continue;
 
 			DrawDebugBox(node.Aabb, BOX_COLOR);
 		}
@@ -195,7 +195,7 @@ namespace TEN::Structures
 
 			BoundingBox::CreateMerged(_nodes[parentNodeID].Aabb, _nodes[childID0].Aabb, _nodes[childID1].Aabb);
 
-			// TODO: Add Rotat() method.
+			Rotate(leafNodeID);
 
 			parentNodeID = _nodes[parentNodeID].ParentID;
 		}
@@ -228,6 +228,65 @@ namespace TEN::Structures
 		}
 
 		return bestSiblingID;
+	}
+
+	void BoundingVolumeHierarchy::Rotate(int leafNodeID)
+	{
+		int parentNodeID = _nodes[leafNodeID].ParentID;
+		int grandParentNodeID = _nodes[parentNodeID].ParentID;
+
+		if (grandParentNodeID == NO_VALUE)
+			return;
+
+		auto& leafNode = _nodes[leafNodeID];
+		auto& parentNode = _nodes[parentNodeID];
+		auto& grandParentNode = _nodes[grandParentNodeID];
+
+		int rotatedSiblingNodeID = NO_VALUE;
+		if (grandParentNode.Child0ID != parentNodeID && grandParentNode.Child1ID == NO_VALUE)
+		{
+			rotatedSiblingNodeID = grandParentNode.Child0ID;
+		}
+		else if (grandParentNode.Child1ID != parentNodeID && grandParentNode.Child0ID == NO_VALUE)
+		{
+			rotatedSiblingNodeID = grandParentNode.Child0ID;
+		}
+
+		if (rotatedSiblingNodeID == NO_VALUE)
+			return;
+		
+		auto& rotatedSiblingNode = _nodes[rotatedSiblingNodeID];
+
+		auto mergedAabb = BoundingBox();
+		BoundingBox::CreateMerged(mergedAabb, rotatedSiblingNode.Aabb, leafNode.Aabb);
+
+		// Rotation more less optimal; return early.
+		if (Geometry::GetBoundingBoxArea(mergedAabb) > Geometry::GetBoundingBoxArea(parentNode.Aabb))
+			return;
+
+		if (parentNode.Child0ID == leafNodeID)
+		{
+			parentNode.Child0ID = NO_VALUE;
+			if (parentNode.Child1ID != NO_VALUE)
+				parentNode.Aabb = _nodes[parentNode.Child1ID].Aabb;
+		}
+		else
+		{
+			parentNode.Child1ID = NO_VALUE;
+			if (parentNode.Child0ID != NO_VALUE)
+				parentNode.Aabb = _nodes[parentNode.Child0ID].Aabb;
+		}
+		parentNode.Aabb = {};
+
+		if (grandParentNode.Child0ID == NO_VALUE)
+		{
+			grandParentNode.Child0ID = leafNodeID;
+		}
+		else
+		{
+			grandParentNode.Child1ID = leafNodeID;
+		}
+		grandParentNode.Aabb = mergedAabb;
 	}
 
 	int BoundingVolumeHierarchy::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)

@@ -46,6 +46,7 @@ namespace TEN::Structures
 
 		void InsertLeaf(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
 		int	 GetSiblingNodeID(int leafNodeID);
+		void Rotate(int leafNodeID);
 
 		int Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary = 0.0f);
 	};
