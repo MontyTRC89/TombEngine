@@ -17,12 +17,12 @@ namespace TEN::Structures
 		TENAssert(objectIds.size() == aabbs.size(), "BoundingVolumeHierarchy(): Object ID and AABB counts must be equal.");
 
 		// Debug
-		_nodes.clear();
+		/*_nodes.clear();
 		for (int i = 0; i < objectIds.size(); i++)
-			InsertLeaf(objectIds[i], aabbs[i]);
+			InsertLeaf(objectIds[i], aabbs[i]);*/
 
-		//Build(objectIds, aabbs, 0, (int)objectIds.size());
-		//_rootID = int(_nodes.size() - 1);
+		Build(objectIds, aabbs, 0, (int)objectIds.size());
+		_rootID = int(_nodes.size() - 1);
 	}
 
 	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const Ray& ray, float dist) const
