@@ -47,7 +47,7 @@ namespace TEN::Structures
 
 		void InsertLeaf(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
 
-		int	 GetFreeNodeID();
+		int	 GetNewNodeID();
 		int	 GetSiblingNodeID(int leafNodeID);
 		void RemoveNode(int nodeID);
 		void BalanceNode(int leafNodeID);
