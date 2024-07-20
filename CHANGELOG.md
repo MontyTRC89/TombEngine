@@ -38,6 +38,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Changed Water sound condition to ShallowWater.
 
 ### Lua API changes
+* Added Moveable.GetJointRotation() and optional 'offset' parameter for Moveable.GetJointRotation().
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Input.KeyClearAll()
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
