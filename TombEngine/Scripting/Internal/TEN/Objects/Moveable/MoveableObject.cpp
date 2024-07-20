@@ -365,8 +365,15 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 /// Get the object's joint position
 // @function Moveable:GetJointPosition
 // @tparam int index of a joint to get position
-// @treturn Vec3 a copy of the moveable's position
+// @tparam offset an optional joint offset
+// @treturn Vec3 a copy of the moveable's joint position
 	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
+
+/// Get the object's joint position
+// @function Moveable:GetJointRotation
+// @tparam int index of a joint to get rotation
+// @treturn Rotation a calculated copy of the moveable's joint rotation
+	ScriptReserved_GetJointRotation, & Moveable::GetJointRot,
 
 	ScriptReserved_SetPosition, & Moveable::SetPos,
 
@@ -603,10 +610,16 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 		UpdateBridgeItem(*m_item);
 }
 
-Vec3 Moveable::GetJointPos(int jointIndex) const
+Vec3 Moveable::GetJointPos(int jointIndex, sol::optional<Vec3> offset) const
 {
-	auto result = GetJointPosition(m_item, jointIndex);
+	Vector3i vec = offset.has_value() ? offset->ToVector3i() : Vector3i(0, 0, 0);
+	auto result = GetJointPosition(m_item, jointIndex, vec);
 	return Vec3(result.x, result.y, result.z);
+}
+
+Rotation Moveable::GetJointRot(int jointIndex) const
+{
+	return GetBoneOrientation(*m_item, jointIndex);
 }
 
 // This does not guarantee that the returned value will be identical
