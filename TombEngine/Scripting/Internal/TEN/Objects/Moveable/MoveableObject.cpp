@@ -365,11 +365,11 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 /// Get the object's joint position
 // @function Moveable:GetJointPosition
 // @tparam int index of a joint to get position
-// @tparam offset an optional joint offset
+// @tparam[opt] Vec3 offset a pre-rotation offset to the joint
 // @treturn Vec3 a copy of the moveable's joint position
 	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
 
-/// Get the object's joint position
+/// Get the object's joint rotation
 // @function Moveable:GetJointRotation
 // @tparam int index of a joint to get rotation
 // @treturn Rotation a calculated copy of the moveable's joint rotation
