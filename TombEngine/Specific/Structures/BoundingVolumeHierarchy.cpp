@@ -195,10 +195,30 @@ namespace TEN::Structures
 
 			BoundingBox::CreateMerged(_nodes[parentNodeID].Aabb, _nodes[childID0].Aabb, _nodes[childID1].Aabb);
 
-			Rotate(leafNodeID);
+			BalanceNode(leafNodeID);
 
 			parentNodeID = _nodes[parentNodeID].ParentID;
 		}
+	}
+
+	int BoundingVolumeHierarchy::GetFreeNodeID()
+	{
+		int nodeID = 0;
+
+		// Get existing empty node.
+		if (!_freeIds.empty())
+		{
+			nodeID = _freeIds.back();
+			_freeIds.pop_back();
+		}
+		// Get new empty node.
+		else
+		{
+			_nodes.emplace_back();
+			nodeID = int(_nodes.size() - 1);
+		}
+
+		return nodeID;
 	}
 
 	int BoundingVolumeHierarchy::GetSiblingNodeID(int leafNodeID)
@@ -230,7 +250,25 @@ namespace TEN::Structures
 		return bestSiblingID;
 	}
 
-	void BoundingVolumeHierarchy::Rotate(int leafNodeID)
+	void BoundingVolumeHierarchy::RemoveNode(int nodeID)
+	{
+		if (nodeID < 0 || nodeID >= int(_nodes.size() - 1))
+		{
+			TENLog("BoundingVolumeHierarchy attempted to remove invalid node.", LogLevel::Warning);
+			return;
+		}
+
+		// Clear node and mark free.
+		auto& node = _nodes[nodeID];
+		node = {};
+		_freeIds.push_back(nodeID);
+
+		// Clear tree if empty.
+		if (_nodes.size() == _freeIds.size())
+			*this = {};
+	}
+
+	void BoundingVolumeHierarchy::BalanceNode(int leafNodeID)
 	{
 		int parentNodeID = _nodes[leafNodeID].ParentID;
 		int grandParentNodeID = _nodes[parentNodeID].ParentID;
@@ -254,7 +292,7 @@ namespace TEN::Structures
 
 		if (rotatedSiblingNodeID == NO_VALUE)
 			return;
-		
+
 		auto& rotatedSiblingNode = _nodes[rotatedSiblingNodeID];
 
 		auto mergedAabb = BoundingBox();
@@ -333,5 +371,44 @@ namespace TEN::Structures
 			_nodes.push_back(node);
 			return newNodeID;
 		}
+	}
+
+	void BoundingVolumeHierarchy::Validate(int nodeID) const
+	{
+		if (nodeID == NO_VALUE)
+			return;
+
+		// Validate root.
+		if (nodeID == _rootID)
+			TENAssert(_nodes[nodeID].ParentID == NO_VALUE, "BVH root node cannot have parent.");
+
+		// Get nodes.
+		const auto& node = _nodes[nodeID];
+		const auto& childNode0 = _nodes[node.Child0ID];
+		const auto& childNode1 = _nodes[node.Child1ID];
+
+		int child0ID = node.Child0ID;
+		int child1ID = node.Child1ID;
+
+		// Validate leaf.
+		if (node.IsLeaf())
+		{
+			TENAssert(child0ID == NO_VALUE, "BVH leaf node 0 cannot have children.");
+			TENAssert(child1ID == NO_VALUE, "BVH leaf node 1 cannot have children.");
+			return;
+		}
+
+		// Validate parent.
+		TENAssert(_nodes[child0ID].ParentID == nodeID, "BVH node 0 has wrong parent.");
+		TENAssert(_nodes[child1ID].ParentID == nodeID, "BVH node 1 has wrong parent.");
+
+		// Validate AABB.
+		auto aabb = BoundingBox();
+		BoundingBox::CreateMerged(aabb, childNode0.Aabb, childNode1.Aabb);
+		TENAssert(*(Vector3*)&aabb.Center == node.Aabb.Center && *(Vector3*)&aabb.Extents == node.Aabb.Extents, "BVH node AABB does not contain children.");
+
+		// Validate recursively.
+		Validate(child0ID);
+		Validate(child1ID);
 	}
 }
