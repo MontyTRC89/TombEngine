@@ -16,9 +16,9 @@ namespace TEN::Physics
 	private:
 		// Members
 
-		std::array<int, VERTEX_COUNT> _vertexIds;
-		Vector3						  _normal;
-		BoundingBox					  _aabb;
+		std::array<int, VERTEX_COUNT> _vertexIds = {};
+		Vector3						  _normal	 = Vector3::Zero;
+		BoundingBox					  _aabb		 = BoundingBox();
 
 		int _portalRoomNumber = NO_VALUE;
 
@@ -54,8 +54,8 @@ namespace TEN::Physics
 	
 	struct CollisionMeshSphereCollisionData
 	{
-		std::vector<const CollisionTriangle*> Triangles;
-		std::vector<Vector3>				  Tangents;
+		std::vector<const CollisionTriangle*> Triangles = {};
+		std::vector<Vector3>				  Tangents	= {};
 
 		unsigned int Count;
 	};
@@ -65,9 +65,9 @@ namespace TEN::Physics
 	private:
 		// Members
 
-		std::vector<CollisionTriangle> _triangles;
-		std::vector<Vector3>		   _vertices;
-		BoundingVolumeHierarchy		   _tree;
+		std::vector<CollisionTriangle> _triangles = {};
+		std::vector<Vector3>		   _vertices  = {};
+		BoundingVolumeHierarchy		   _tree	  = {};
 
 	public:
 		// Constructors

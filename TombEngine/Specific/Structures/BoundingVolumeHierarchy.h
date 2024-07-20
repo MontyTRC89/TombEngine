@@ -7,8 +7,8 @@ namespace TEN::Structures
 	private:
 		struct Node
 		{
-			BoundingBox Aabb;
-			int			ObjectID = NO_VALUE; // NOTE: Only leaf node stores ID directly.
+			BoundingBox Aabb	 = BoundingBox();
+			int			ObjectID = NO_VALUE; // NOTE: Only leaf node stores object ID directly.
 
 			int ParentID = NO_VALUE;
 			int Child0ID = NO_VALUE;
@@ -19,8 +19,9 @@ namespace TEN::Structures
 
 		// Members
 
-		std::vector<Node> _nodes;
-		int				  _rootID; // TODO
+		std::vector<Node> _nodes   = {};
+		std::vector<int>  _freeIds = {};
+		int				  _rootID  = 0;
 
 	public:
 		// Constructors
@@ -48,6 +49,6 @@ namespace TEN::Structures
 		int	 GetSiblingNodeID(int leafNodeID);
 		void Rotate(int leafNodeID);
 
-		int Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary = 0.0f);
+		int Rebuild(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary = 0.0f);
 	};
 }

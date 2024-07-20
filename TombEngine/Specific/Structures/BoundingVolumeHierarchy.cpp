@@ -21,7 +21,7 @@ namespace TEN::Structures
 		//for (int i = 0; i < objectIds.size(); i++)
 		//	InsertLeaf(objectIds[i], aabbs[i]);
 
-		Build(objectIds, aabbs, 0, (int)objectIds.size());
+		Rebuild(objectIds, aabbs, 0, (int)objectIds.size());
 		_rootID = int(_nodes.size() - 1);
 	}
 
@@ -289,7 +289,7 @@ namespace TEN::Structures
 		grandParentNode.Aabb = mergedAabb;
 	}
 
-	int BoundingVolumeHierarchy::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
+	int BoundingVolumeHierarchy::Rebuild(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
 	{
 		// FAILSAFE.
 		if (start >= end)
@@ -316,8 +316,8 @@ namespace TEN::Structures
 		else
 		{
 			int mid = (start + end) / 2;
-			node.Child0ID = Build(objectIds, aabbs, start, mid);
-			node.Child1ID = Build(objectIds, aabbs, mid, end);
+			node.Child0ID = Rebuild(objectIds, aabbs, start, mid);
+			node.Child1ID = Rebuild(objectIds, aabbs, mid, end);
 
 			// Set parent ID for child nodes.
 			int newNodeID = (int)_nodes.size();
