@@ -233,7 +233,7 @@ namespace TEN::Collision::Los
 	{
 		// Reserve minimum sector vector size.
 		auto sectors = std::vector<const FloorInfo*>{};
-		sectors.reserve(int(dist / BLOCK(1)) + 1);
+		sectors.reserve(int(dist / BLOCK(1)) + 1); // Minimum size.
 
 		// Calculate sector position.
 		auto pos = Vector3(

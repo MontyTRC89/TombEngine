@@ -1,8 +1,10 @@
 #include "framework.h"
-#include "Specific/Structures/BoundingVolumeHierarchy.h"
+#include "Specific/Structures/BoundingTree.h"
 
+#include "Math/Math.h"
 #include "Renderer/Renderer.h"
 
+using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
 // TODO: Add licence? Heavily referenced this implementation, which has an MIT licence and requests attribution:
@@ -10,14 +12,14 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Structures
 {
-	bool BoundingVolumeHierarchy::Node::IsLeaf() const
+	bool BoundingTree::Node::IsLeaf() const
 	{
 		return (Child0ID == NO_VALUE && Child1ID == NO_VALUE);
 	}
 
-	BoundingVolumeHierarchy::BoundingVolumeHierarchy(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs)
+	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs)
 	{
-		TENAssert(objectIds.size() == aabbs.size(), "BoundingVolumeHierarchy(): Object ID and AABB counts must be equal.");
+		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree(): Object ID and AABB counts must be equal.");
 
 		// Debug
 		_nodes.clear();
@@ -28,7 +30,7 @@ namespace TEN::Structures
 		_rootID = int(_nodes.size() - 1);
 	}
 
-	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const Ray& ray, float dist) const
+	std::vector<int> BoundingTree::GetBoundedObjectIds(const Ray& ray, float dist) const
 	{
 		auto testCollRoutine = [&](const Node& node)
 		{
@@ -39,7 +41,7 @@ namespace TEN::Structures
 		return GetBoundedObjectIds(testCollRoutine);
 	}
 
-	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const BoundingBox& aabb) const
+	std::vector<int> BoundingTree::GetBoundedObjectIds(const BoundingBox& aabb) const
 	{
 		auto testCollRoutine = [&](const Node& node)
 		{
@@ -49,7 +51,7 @@ namespace TEN::Structures
 		return GetBoundedObjectIds(testCollRoutine);
 	}
 
-	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const BoundingOrientedBox& obb) const
+	std::vector<int> BoundingTree::GetBoundedObjectIds(const BoundingOrientedBox& obb) const
 	{
 		auto aabb = Geometry::GetBoundingBox(obb);
 		auto testCollRoutine = [&](const Node& node)
@@ -63,7 +65,7 @@ namespace TEN::Structures
 		return GetBoundedObjectIds(testCollRoutine);
 	}
 
-	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const BoundingSphere& sphere) const
+	std::vector<int> BoundingTree::GetBoundedObjectIds(const BoundingSphere& sphere) const
 	{
 		auto testCollRoutine = [&](const Node& node)
 		{
@@ -73,7 +75,7 @@ namespace TEN::Structures
 		return GetBoundedObjectIds(testCollRoutine);
 	}
 
-	void BoundingVolumeHierarchy::DrawDebug() const
+	void BoundingTree::DrawDebug() const
 	{
 		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
 
@@ -83,7 +85,7 @@ namespace TEN::Structures
 		PrintDebugMessage("%d", _rootID);
 	}
 
-	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const
+	std::vector<int> BoundingTree::GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const
 	{
 		auto objectIds = std::vector<int>{};
 		if (_nodes.empty())
@@ -104,7 +106,7 @@ namespace TEN::Structures
 			// Traverse nodes.
 			if (node.IsLeaf())
 			{
-				DrawDebugBox(node.Aabb, Color(1, 1, 1));
+				DrawDebugBox(node.Aabb, Color(1, 1, 1)); //debug
 				objectIds.push_back(node.ObjectID);
 			}
 			else
@@ -117,13 +119,10 @@ namespace TEN::Structures
 		// Traverse tree from root node.
 		traverseRoutine(_rootID);
 
-		PrintDebugMessage("found: %d", (int)objectIds.size());
-		PrintDebugMessage("root: %d", _rootID);
-
 		return objectIds;
 	}
 
-	void BoundingVolumeHierarchy::InsertLeaf(int objectID, const BoundingBox& aabb, float boundary)
+	void BoundingTree::InsertLeaf(int objectID, const BoundingBox& aabb, float boundary)
 	{
 		// Calculate AABB with expanded boundary.
 		auto expandedAabb = aabb;
@@ -139,7 +138,7 @@ namespace TEN::Structures
 		// 1) Create root.
 		if (_rootID == NO_VALUE)
 		{
-			_rootID = 0;
+			_rootID = leafNodeID;
 			return;
 		}
 
@@ -152,13 +151,20 @@ namespace TEN::Structures
 		int newParentNodeID = GetNewNodeID();
 		auto& newParentNode = _nodes[newParentNodeID];
 
-		// TODO: Something with bounding boxes is wrong.
-
 		newParentNode.ParentID = prevParentNodeID;
 		BoundingBox::CreateMerged(newParentNode.Aabb, siblingNode.Aabb, leafNode.Aabb);
 
-		// Sibling is not root; update previous parent.
-		if (prevParentNodeID != NO_VALUE)
+		newParentNode.Child0ID = siblingNodeID;
+		newParentNode.Child1ID = leafNodeID;
+		siblingNode.ParentID = newParentNodeID;
+		leafNode.ParentID = newParentNodeID;
+
+		// Set new root or update previous parent.
+		if (prevParentNodeID == NO_VALUE)
+		{
+			_rootID = newParentNodeID;
+		}
+		else
 		{
 			auto& prevParentNode = _nodes[prevParentNodeID];
 			if (prevParentNode.Child0ID == siblingNodeID)
@@ -169,21 +175,6 @@ namespace TEN::Structures
 			{
 				prevParentNode.Child1ID = newParentNodeID;
 			}
-
-			newParentNode.Child0ID = siblingNodeID;
-			newParentNode.Child0ID = leafNodeID;
-			siblingNode.ParentID = newParentNodeID;
-			leafNode.ParentID = newParentNodeID;
-		}
-		// Sibling is root; set new parent as root.
-		else
-		{
-			newParentNode.Child0ID = siblingNodeID;
-			newParentNode.Child1ID = leafNodeID;
-			siblingNode.ParentID = newParentNodeID;
-			leafNode.ParentID = newParentNodeID;
-
-			_rootID = newParentNodeID;
 		}
 
 		// 4) Retread tree branch to refit AABBs.
@@ -214,9 +205,11 @@ namespace TEN::Structures
 
 			parentNodeID = parentNode.ParentID;
 		}
+
+		//Validate(newParentNodeID);
 	}
 
-	int BoundingVolumeHierarchy::GetNewNodeID()
+	int BoundingTree::GetNewNodeID()
 	{
 		int nodeID = 0;
 
@@ -236,7 +229,7 @@ namespace TEN::Structures
 		return nodeID;
 	}
 
-	int BoundingVolumeHierarchy::GetSiblingNodeID(int leafNodeID)
+	int BoundingTree::GetSiblingNodeID(int leafNodeID)
 	{
 		const auto& leafNode = _nodes[leafNodeID];
 		int bestSiblingNodeID = _rootID;
@@ -254,7 +247,7 @@ namespace TEN::Structures
 			float area = Geometry::GetBoundingBoxArea(_nodes[bestSiblingNodeID].Aabb);
 			float mergedArea = Geometry::GetBoundingBoxArea(mergedAabb);
 
-			// Cost of creating new parent for this node and new leaf.
+			// Cost of creating new parent for current node and new leaf.
 			float cost = mergedArea * 2;
 
 			// Minimum cost of pushing leaf further down tree.
@@ -335,7 +328,7 @@ namespace TEN::Structures
 		return bestSiblingNodeID;
 	}
 
-	void BoundingVolumeHierarchy::RemoveNode(int nodeID)
+	void BoundingTree::RemoveNode(int nodeID)
 	{
 		if (nodeID < 0 || nodeID >= int(_nodes.size() - 1))
 		{
@@ -353,7 +346,7 @@ namespace TEN::Structures
 			*this = {};
 	}
 
-	void BoundingVolumeHierarchy::BalanceNode(int leafNodeID)
+	void BoundingTree::BalanceNode(int leafNodeID)
 	{
 		int parentNodeID = _nodes[leafNodeID].ParentID;
 		int grandParentNodeID = _nodes[parentNodeID].ParentID;
@@ -412,7 +405,7 @@ namespace TEN::Structures
 		grandParentNode.Aabb = mergedAabb;
 	}
 
-	int BoundingVolumeHierarchy::Rebuild(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
+	int BoundingTree::Rebuild(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
 	{
 		// FAILSAFE.
 		if (start >= end)
@@ -458,47 +451,47 @@ namespace TEN::Structures
 		}
 	}
 
-	void BoundingVolumeHierarchy::Validate(int nodeID) const
+	void BoundingTree::Validate(int nodeID) const
 	{
 		if (nodeID == NO_VALUE)
 			return;
 
 		// Validate root.
 		if (nodeID == _rootID)
-			TENAssert(_nodes[nodeID].ParentID == NO_VALUE, "BVH root node cannot have parent.");
+			TENAssert(_nodes[nodeID].ParentID == NO_VALUE, "BoundingTree root node cannot have parent.");
 
-		// Get nodes.
+		// Get node.
 		const auto& node = _nodes[nodeID];
-		const auto& childNode0 = _nodes[node.Child0ID];
-		const auto& childNode1 = _nodes[node.Child1ID];
-
-		int child0ID = node.Child0ID;
-		int child1ID = node.Child1ID;
 
 		// Validate leaf.
 		if (node.IsLeaf())
 		{
-			TENAssert(node.ObjectID != NO_VALUE, "BVH leaf node must have object ID.");
-			TENAssert(child0ID == NO_VALUE, "BVH leaf node 0 cannot have children.");
-			TENAssert(child1ID == NO_VALUE, "BVH leaf node 1 cannot have children.");
+			TENAssert(node.ObjectID != NO_VALUE, "BoundingTree leaf node must have object ID.");
+			TENAssert(node.Child0ID == NO_VALUE, "BoundingTree leaf node 0 cannot have children.");
+			TENAssert(node.Child1ID == NO_VALUE, "BoundingTree leaf node 1 cannot have children.");
 			return;
 		}
 		else
 		{
-			TENAssert(node.ObjectID == NO_VALUE, "BVH non-leaf node cannot have object ID.");
+			TENAssert(node.ObjectID == NO_VALUE, "BoundingTree non-leaf node cannot have object ID.");
 		}
 
 		// Validate parent.
-		TENAssert(_nodes[child0ID].ParentID == nodeID, "BVH node 0 has wrong parent.");
-		TENAssert(_nodes[child1ID].ParentID == nodeID, "BVH node 1 has wrong parent.");
+		if (node.Child0ID != NO_VALUE)
+			TENAssert(_nodes[node.Child0ID].ParentID == nodeID, "BoundingTree child node 0 has wrong parent " + std::to_string(_nodes[node.Child0ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
+		if (node.Child1ID != NO_VALUE)
+			TENAssert(_nodes[node.Child1ID].ParentID == nodeID, "BoundingTree child node 1 has wrong parent " + std::to_string(_nodes[node.Child1ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
 
 		// Validate AABB.
-		auto aabb = BoundingBox();
-		BoundingBox::CreateMerged(aabb, childNode0.Aabb, childNode1.Aabb);
-		TENAssert(*(Vector3*)&aabb.Center == node.Aabb.Center && *(Vector3*)&aabb.Extents == node.Aabb.Extents, "BVH node AABB does not contain children.");
+		if (node.Child0ID != NO_VALUE && node.Child1ID != NO_VALUE)
+		{
+			auto aabb = BoundingBox();
+			BoundingBox::CreateMerged(aabb, _nodes[node.Child0ID].Aabb, _nodes[node.Child1ID].Aabb);
+			TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree node AABB does not contain children.");
+		}
 
 		// Validate recursively.
-		Validate(child0ID);
-		Validate(child1ID);
+		Validate(node.Child0ID);
+		Validate(node.Child1ID);
 	}
 }

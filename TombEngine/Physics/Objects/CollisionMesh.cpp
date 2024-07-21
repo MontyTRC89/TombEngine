@@ -2,7 +2,7 @@
 #include "Physics/Objects/CollisionMesh.h"
 
 #include "Math/Math.h"
-#include "Specific/Structures/BoundingVolumeHierarchy.h"
+#include "Specific/Structures/BoundingTree.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Math;
@@ -317,7 +317,7 @@ namespace TEN::Physics
 			aabbs.push_back(tri.GetAabb());
 		}
 
-		_tree = BoundingVolumeHierarchy(ids, aabbs);
+		_tree = BoundingTree(ids, aabbs);
 	}
 
 	void CollisionMesh::DrawDebug() const

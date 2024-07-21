@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Specific/Structures/BoundingVolumeHierarchy.h"
+#include "Specific/Structures/BoundingTree.h"
 
 using namespace TEN::Structures;
 
@@ -67,7 +67,7 @@ namespace TEN::Physics
 
 		std::vector<CollisionTriangle> _triangles = {};
 		std::vector<Vector3>		   _vertices  = {};
-		BoundingVolumeHierarchy		   _tree	  = {};
+		BoundingTree				   _tree	  = {};
 
 	public:
 		// Constructors

@@ -2,7 +2,8 @@
 
 namespace TEN::Structures
 {
-	class BoundingVolumeHierarchy
+	// Bounding volume hierarchy implementation using AABBs.
+	class BoundingTree
 	{
 	private:
 		struct Node
@@ -21,13 +22,13 @@ namespace TEN::Structures
 
 		std::vector<Node> _nodes   = {};
 		std::vector<int>  _freeIds = {};
-		int				  _rootID  = 0;
+		int				  _rootID  = NO_VALUE;
 
 	public:
 		// Constructors
 
-		BoundingVolumeHierarchy() = default;
-		BoundingVolumeHierarchy(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs);
+		BoundingTree() = default;
+		BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs);
 
 		// Getters
 
