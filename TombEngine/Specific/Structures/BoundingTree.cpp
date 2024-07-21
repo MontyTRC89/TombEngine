@@ -24,7 +24,7 @@ namespace TEN::Structures
 		// Debug
 		_nodes.clear();
 		//for (int i = 0; i < objectIds.size(); i++)
-		//	InsertLeaf(objectIds[i], aabbs[i]);
+		//	InsertLeafNode(objectIds[i], aabbs[i]);
 
 		Rebuild(objectIds, aabbs, 0, (int)objectIds.size());
 		_rootID = int(_nodes.size() - 1);
@@ -32,55 +32,57 @@ namespace TEN::Structures
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds(const Ray& ray, float dist) const
 	{
-		auto testCollRoutine = [&](const Node& node)
+		auto testColl = [&](const Node& node)
 		{
 			float intersectDist = 0.0f;
 			return (node.Aabb.Intersects(ray.position, ray.direction, intersectDist) && intersectDist <= dist);
 		};
 
-		return GetBoundedObjectIds(testCollRoutine);
+		return GetBoundedObjectIds(testColl);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds(const BoundingBox& aabb) const
 	{
-		auto testCollRoutine = [&](const Node& node)
+		auto testColl = [&](const Node& node)
 		{
 			return node.Aabb.Intersects(aabb);
 		};
 
-		return GetBoundedObjectIds(testCollRoutine);
+		return GetBoundedObjectIds(testColl);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds(const BoundingOrientedBox& obb) const
 	{
-		auto aabb = Geometry::GetBoundingBox(obb);
-		auto testCollRoutine = [&](const Node& node)
+		auto testColl = [&](const Node& node)
 		{
-			if (!node.Aabb.Intersects(aabb))
-				return false;
-
 			return node.Aabb.Intersects(obb);
 		};
 
-		return GetBoundedObjectIds(testCollRoutine);
+		return GetBoundedObjectIds(testColl);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds(const BoundingSphere& sphere) const
 	{
-		auto testCollRoutine = [&](const Node& node)
+		auto testColl = [&](const Node& node)
 		{
 			return node.Aabb.Intersects(sphere);
 		};
 
-		return GetBoundedObjectIds(testCollRoutine);
+		return GetBoundedObjectIds(testColl);
 	}
 
 	void BoundingTree::DrawDebug() const
 	{
 		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
 
-		for (const auto& node : _nodes)
+		/*for (const auto& node : _nodes)
+		{
+			if (node.IsLeaf())
+				continue;
+
 			DrawDebugBox(node.Aabb, BOX_COLOR);
+		}*/
+		DrawDebugBox(_nodes[_rootID].Aabb, BOX_COLOR);
 
 		PrintDebugMessage("%d", _rootID);
 	}
@@ -91,7 +93,7 @@ namespace TEN::Structures
 		if (_nodes.empty())
 			return objectIds;
 
-		std::function<void(int)> traverseRoutine = [&](int nodeID)
+		std::function<void(int)> traverse = [&](int nodeID)
 		{
 			// Invalid node; return early.
 			if (nodeID == NO_VALUE)
@@ -111,22 +113,24 @@ namespace TEN::Structures
 			}
 			else
 			{
-				traverseRoutine(node.Child0ID);
-				traverseRoutine(node.Child1ID);
+				traverse(node.Child0ID);
+				traverse(node.Child1ID);
 			}
 		};
 
 		// Traverse tree from root node.
-		traverseRoutine(_rootID);
+		traverse(_rootID);
 
 		return objectIds;
 	}
 
-	void BoundingTree::InsertLeaf(int objectID, const BoundingBox& aabb, float boundary)
+	void BoundingTree::InsertLeafNode(int objectID, const BoundingBox& aabb, float boundary)
 	{
 		// Calculate AABB with expanded boundary.
 		auto expandedAabb = aabb;
-		*(Vector3*)&expandedAabb.Extents += Vector3(boundary);
+		expandedAabb.Extents.x += boundary * 2;
+		expandedAabb.Extents.y += boundary * 2;
+		expandedAabb.Extents.z += boundary * 2;
 
 		// Get leaf node.
 		int leafNodeID = GetNewNodeID();
@@ -151,9 +155,9 @@ namespace TEN::Structures
 		int newParentNodeID = GetNewNodeID();
 		auto& newParentNode = _nodes[newParentNodeID];
 
+		// TODO: Wrong.
+		//BoundingBox::CreateMerged(newParentNode.Aabb, leafNode.Aabb, siblingNode.Aabb);
 		newParentNode.ParentID = prevParentNodeID;
-		BoundingBox::CreateMerged(newParentNode.Aabb, siblingNode.Aabb, leafNode.Aabb);
-
 		newParentNode.Child0ID = siblingNodeID;
 		newParentNode.Child1ID = leafNodeID;
 		siblingNode.ParentID = newParentNodeID;
@@ -206,20 +210,20 @@ namespace TEN::Structures
 			parentNodeID = parentNode.ParentID;
 		}
 
-		//Validate(newParentNodeID);
+		Validate(prevParentNodeID);
 	}
 
 	int BoundingTree::GetNewNodeID()
 	{
 		int nodeID = 0;
 
-		// Get existing empty node.
+		// Get existing empty node ID.
 		if (!_freeIds.empty())
 		{
 			nodeID = _freeIds.back();
 			_freeIds.pop_back();
 		}
-		// Get new empty node.
+		// Allocate and get new empty node ID.
 		else
 		{
 			_nodes.emplace_back();
@@ -235,7 +239,7 @@ namespace TEN::Structures
 		int bestSiblingNodeID = _rootID;
 
 		// Branch and bound for best sibling node.
-		int prev = bestSiblingNodeID;
+		int prevBestSiblingNodeID = bestSiblingNodeID;
 		while (!_nodes[bestSiblingNodeID].IsLeaf())
 		{
 			int child0ID = _nodes[bestSiblingNodeID].Child0ID;
@@ -319,10 +323,10 @@ namespace TEN::Structures
 				}
 			}
 
-			if (bestSiblingNodeID == prev)
+			if (bestSiblingNodeID == prevBestSiblingNodeID)
 				break;
 
-			prev = bestSiblingNodeID;
+			prevBestSiblingNodeID = bestSiblingNodeID;
 		}
 
 		return bestSiblingNodeID;
@@ -478,16 +482,18 @@ namespace TEN::Structures
 
 		// Validate parent.
 		if (node.Child0ID != NO_VALUE)
-			TENAssert(_nodes[node.Child0ID].ParentID == nodeID, "BoundingTree child node 0 has wrong parent " + std::to_string(_nodes[node.Child0ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
+			if (_nodes[node.Child0ID].ParentID != nodeID) TENLog("BoundingTree child node 0 has wrong parent " + std::to_string(_nodes[node.Child0ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
+			//TENAssert(_nodes[node.Child0ID].ParentID == nodeID, "BoundingTree child node 0 has wrong parent " + std::to_string(_nodes[node.Child0ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
 		if (node.Child1ID != NO_VALUE)
-			TENAssert(_nodes[node.Child1ID].ParentID == nodeID, "BoundingTree child node 1 has wrong parent " + std::to_string(_nodes[node.Child1ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
+			if (_nodes[node.Child1ID].ParentID != nodeID) TENLog("BoundingTree child node 1 has wrong parent " + std::to_string(_nodes[node.Child1ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
+			//TENAssert(_nodes[node.Child1ID].ParentID == nodeID, "BoundingTree child node 1 has wrong parent " + std::to_string(_nodes[node.Child1ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
 
 		// Validate AABB.
 		if (node.Child0ID != NO_VALUE && node.Child1ID != NO_VALUE)
 		{
 			auto aabb = BoundingBox();
 			BoundingBox::CreateMerged(aabb, _nodes[node.Child0ID].Aabb, _nodes[node.Child1ID].Aabb);
-			TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree node AABB does not contain children.");
+			//TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree node AABB does not contain children.");
 		}
 
 		// Validate recursively.

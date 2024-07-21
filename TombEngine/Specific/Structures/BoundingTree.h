@@ -46,7 +46,7 @@ namespace TEN::Structures
 
 		std::vector<int> GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const;
 
-		void InsertLeaf(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
+		void InsertLeafNode(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
 
 		int	 GetNewNodeID();
 		int	 GetSiblingNodeID(int leafNodeID);
