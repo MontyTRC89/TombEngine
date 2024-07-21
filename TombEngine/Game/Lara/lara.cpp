@@ -139,9 +139,68 @@ bool IsPointInFront2(const Vector3& origin, const Vector3& target, const Vector3
 	return (dotProduct >= 0.0f);
 }
 
+//temp
+static BoundingBox GetAabb(const std::vector<Vector3>& points)
+{
+	auto maxPoint = Vector3(-INFINITY);
+	auto minPoint = Vector3(INFINITY);
+
+	// Determine max and min AABB points.
+	for (const auto& point : points)
+	{
+		maxPoint = Vector3(
+			std::max(maxPoint.x, point.x),
+			std::max(maxPoint.y, point.y),
+			std::max(maxPoint.z, point.z));
+
+		minPoint = Vector3(
+			std::min(minPoint.x, point.x),
+			std::min(minPoint.y, point.y),
+			std::min(minPoint.z, point.z));
+	}
+
+	// Construct and return AABB.
+	auto center = (minPoint + maxPoint) / 2;
+	auto extents = (maxPoint - minPoint) / 2;
+	return BoundingBox(center, extents);
+}
+
+//temp
+static BoundingBox GetAabb(const BoundingOrientedBox& obb)
+{
+	auto corners = std::array<Vector3, 8>{}; // TODO: Use BOX_VERTEX_COUNT constant when PR containing it is merged.
+	obb.GetCorners(corners.data());
+
+	auto cornerVector = std::vector<Vector3>{};
+	cornerVector.insert(cornerVector.end(), corners.begin(), corners.end());
+	return GetAabb(cornerVector);
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
+
+	// ----BoundingTree debug
+
+	auto movIds = std::vector<int>{};
+	auto aabbs = std::vector<BoundingBox>{};
+
+	const auto& room2 = g_Level.Rooms[item->RoomNumber];
+	int movID = room2.itemNumber;
+	while (movID != NO_VALUE)
+	{
+		const auto& mov = g_Level.Items[movID];
+		if (movID == mov.NextItem)
+			break;
+		movID = mov.NextItem;
+
+		movIds.push_back(movID);
+		aabbs.push_back(GetAabb(mov.GetObb()));
+	}
+
+	auto tree = BoundingTree(movIds, aabbs);
+	tree.DrawDebug();
+	//tree.Validate();
 
 	//--------
 
