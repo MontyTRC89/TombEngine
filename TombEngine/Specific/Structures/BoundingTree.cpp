@@ -17,14 +17,14 @@ namespace TEN::Structures
 		return (Child0ID == NO_VALUE && Child1ID == NO_VALUE);
 	}
 
-	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs)
+	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary)
 	{
-		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree(): Object ID and AABB counts must be equal.");
+		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree ctor: object ID and AABB counts must be equal.");
 
 		// Debug
 		_nodes.clear();
 		for (int i = 0; i < objectIds.size(); i++)
-			Insert(objectIds[i], aabbs[i]);
+			Insert(objectIds[i], aabbs[i], boundary);
 
 		//Rebuild(objectIds, aabbs, 0, (int)objectIds.size());
 		//_rootID = int(_nodes.size() - 1);
@@ -82,6 +82,61 @@ namespace TEN::Structures
 		InsertLeaf(leafID);
 	}
 
+	void BoundingTree::Move(int objectID, const BoundingBox& aabb, float boundary)
+	{
+		// TODO: Hash map instead keeping node-object pairs?
+		// Would be better to store the node ID in the external object itself,
+		// but a major disadvantage is that it requires managing a very random variable.
+		int leafID = NO_VALUE;
+		for (int i = 0; i < _nodes.size(); i++)
+		{
+			const auto& node = _nodes[i];
+			if (!node.IsLeaf())
+				continue;
+
+			if (node.ObjectID == objectID)
+			{
+				leafID = i;
+				break;
+			}
+		}
+
+		// Matching object ID not found; return early.
+		if (leafID == NO_VALUE)
+			return;
+
+		// TODO: Shrink if new aabb is considerably smaller on any axis.
+		// Previous expanded AABB contains current AABB; return early.
+		auto& leaf = _nodes[leafID];
+		if (leaf.Aabb.Contains(aabb) == ContainmentType::CONTAINS)
+			return;
+		
+		// Remove node and prune branch if necessary.
+		if (leaf.ParentID == NO_VALUE)
+		{
+			RemoveNode(leafID);
+		}
+		else
+		{
+			auto& parent = _nodes[leaf.ParentID];
+
+			if (parent.Child0ID == leafID)
+			{
+				parent.Child0ID = NO_VALUE;
+			}
+			else
+			{
+				parent.Child1ID = NO_VALUE;
+			}
+
+			// TODO: This is an obtuse way of pruning a branch. Make a prune method?
+			RefitNode(leafID);
+		}
+
+		// Reinsert node.
+		Insert(objectID, aabb, boundary);
+	}
+
 	void BoundingTree::DrawDebug() const
 	{
 		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
@@ -91,11 +146,14 @@ namespace TEN::Structures
 			//if (node.IsLeaf())
 			//	continue;
 
-			DrawDebugBox(node.Aabb, BOX_COLOR);
+			//if (!node.IsLeaf())
+			{
+			//	PrintDebugMessage("%d", node.ObjectID);
+
+				DrawDebugBox(node.Aabb, BOX_COLOR);
+			}
 		}
 		//DrawDebugBox(_nodes[_rootID].Aabb, BOX_COLOR);
-
-		PrintDebugMessage("%d", _rootID);
 	}
 
 	void BoundingTree::Validate() const
@@ -136,6 +194,8 @@ namespace TEN::Structures
 			if (_nodes[node.Child1ID].ParentID != nodeID) TENLog("BoundingTree child node 1 has wrong parent " + std::to_string(_nodes[node.Child1ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
 		//TENAssert(_nodes[node.Child1ID].ParentID == nodeID, "BoundingTree child node 1 has wrong parent " + std::to_string(_nodes[node.Child1ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
 
+		// Validate unique object ID.
+		
 		// Validate AABB.
 		if (node.Child0ID != NO_VALUE && node.Child1ID != NO_VALUE)
 		{
@@ -185,12 +245,13 @@ namespace TEN::Structures
 			if (!testCollRoutine(node))
 				return;
 
-			// Traverse nodes.
+			// Collect object ID.
 			if (node.IsLeaf())
 			{
-				DrawDebugBox(node.Aabb, Color(1, 1, 1)); //debug
+				//DrawDebugBox(node.Aabb, Color(1, 1, 1)); //debug
 				objectIds.push_back(node.ObjectID);
 			}
+			// Traverse nodes.
 			else
 			{
 				traverse(node.Child0ID);
@@ -371,38 +432,54 @@ namespace TEN::Structures
 			*this = {};
 	}
 
-	void BoundingTree::RefitNode(int leafID)
+	void BoundingTree::RefitNode(int nodeID)
 	{
-		const auto& node = _nodes[leafID];
+		const auto& leaf = _nodes[nodeID];
+
+		bool removeLeaf = false;
 
 		// Retread tree branch to refit AABBs.
-		int parentID = node.ParentID;
+		int parentID = leaf.ParentID;
 		while (parentID != NO_VALUE)
 		{
 			// TODO
-			//parentID = BalanceNode(parentNodeID);
+			//BalanceNode(parentID);
 
-			auto& parentNode = _nodes[parentID];
+			auto& parent = _nodes[parentID];
 
-			if (parentNode.Child0ID != NO_VALUE && parentNode.Child1ID != NO_VALUE)
+			if (parent.Child0ID != NO_VALUE && parent.Child1ID != NO_VALUE)
 			{
-				const auto& childNode0 = _nodes[parentNode.Child0ID];
-				const auto& childNode1 = _nodes[parentNode.Child1ID];
-				BoundingBox::CreateMerged(parentNode.Aabb, childNode0.Aabb, childNode1.Aabb);
+				const auto& child0 = _nodes[parent.Child0ID];
+				const auto& child1 = _nodes[parent.Child1ID];
+				BoundingBox::CreateMerged(parent.Aabb, child0.Aabb, child1.Aabb);
 			}
-			else if (parentNode.Child0ID != NO_VALUE)
+			else if (parent.Child0ID != NO_VALUE)
 			{
-				const auto& childNode0 = _nodes[parentNode.Child0ID];
-				parentNode.Aabb = childNode0.Aabb;
+				const auto& child0 = _nodes[parent.Child0ID];
+				parent.Aabb = child0.Aabb;
 			}
-			else
+			else if (parent.Child1ID != NO_VALUE)
 			{
-				const auto& childNode1 = _nodes[parentNode.Child1ID];
-				parentNode.Aabb = childNode1.Aabb;
+				const auto& child1 = _nodes[parent.Child1ID];
+				parent.Aabb = child1.Aabb;
 			}
 
-			parentID = parentNode.ParentID;
+			int prevParentID = parentID;
+			parentID = parent.ParentID;
+
+			// TODO: Prune method.
+			// Prune branch.
+			if (parent.IsLeaf() && parent.ObjectID == NO_VALUE)
+			{
+				removeLeaf = true;
+				RemoveNode(prevParentID);
+			}
 		}
+
+		// TODO: Prune method.
+		// Remove leaf remaining on pruned branch.
+		if (removeLeaf)
+			RemoveNode(nodeID);
 	}
 
 	// TODO: Blizzard guy's version is better.

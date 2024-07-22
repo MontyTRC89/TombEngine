@@ -185,6 +185,20 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto movIds = std::vector<int>{};
 	auto aabbs = std::vector<BoundingBox>{};
 
+	/*movIds.push_back(0);
+	aabbs.push_back(GetAabb(item->GetObb()));
+
+	static auto tree = BoundingTree(movIds, aabbs, BLOCK(1 / 16.0f));
+	tree.Move(0, GetAabb(item->GetObb()), BLOCK(1 / 16.0f));
+	tree.DrawDebug();
+	//tree.Validate();
+
+	auto movIds2 = tree.GetBoundedObjectIds();
+	//for (int movID : movIds2)
+	//	PrintDebugMessage("%d", movID);
+
+	DrawDebugBox(GetAabb(item->GetObb()), Color(1, 0, 0));*/
+
 	const auto& room2 = g_Level.Rooms[item->RoomNumber];
 	int movID = room2.itemNumber;
 	while (movID != NO_VALUE)
@@ -194,9 +208,14 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			break;
 		movID = mov.NextItem;
 
-		movIds.push_back(movID);
-		aabbs.push_back(GetAabb(mov.GetObb()));
+		if (movID != -1)
+		{
+			movIds.push_back(movID);
+			aabbs.push_back(GetAabb(mov.GetObb()));
+		}
 	}
+	movIds.push_back(item->Index);
+	aabbs.push_back(GetAabb(item->GetObb()));
 
 	auto tree = BoundingTree(movIds, aabbs);
 	tree.DrawDebug();

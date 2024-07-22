@@ -28,7 +28,7 @@ namespace TEN::Structures
 		// Constructors
 
 		BoundingTree() = default;
-		BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs);
+		BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary = 0.0f);
 
 		// Getters
 
