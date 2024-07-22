@@ -20,9 +20,11 @@ namespace TEN::Structures
 
 		// Members
 
-		std::vector<Node> _nodes   = {};
-		std::vector<int>  _freeIds = {};
-		int				  _rootID  = NO_VALUE;
+		std::vector<Node> _nodes	   = {};
+		std::vector<int>  _freeNodeIds = {};
+		int				  _rootID	   = NO_VALUE;
+
+		std::unordered_map<int, int> _leafIDMap = {}; // Key = object ID.
 
 	public:
 		// Constructors

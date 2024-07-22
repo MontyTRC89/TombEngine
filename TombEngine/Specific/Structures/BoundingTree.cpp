@@ -84,30 +84,16 @@ namespace TEN::Structures
 
 	void BoundingTree::Move(int objectID, const BoundingBox& aabb, float boundary)
 	{
-		// TODO: Hash map instead keeping node-object pairs?
-		// Would be better to store the node ID in the external object itself,
-		// but a major disadvantage is that it requires managing a very random variable.
-		int leafID = NO_VALUE;
-		for (int i = 0; i < _nodes.size(); i++)
-		{
-			const auto& node = _nodes[i];
-			if (!node.IsLeaf())
-				continue;
-
-			if (node.ObjectID == objectID)
-			{
-				leafID = i;
-				break;
-			}
-		}
-
-		// Matching object ID not found; return early.
-		if (leafID == NO_VALUE)
+		// Find leaf containing object ID.
+		auto it = _leafIDMap.find(objectID);
+		if (it == _leafIDMap.end())
 			return;
+
+		int leafID = it->second;
+		const auto& leaf = _nodes[leafID];
 
 		// TODO: Shrink if new aabb is considerably smaller on any axis.
 		// Previous expanded AABB contains current AABB; return early.
-		auto& leaf = _nodes[leafID];
 		if (leaf.Aabb.Contains(aabb) == ContainmentType::CONTAINS)
 			return;
 		
@@ -135,6 +121,39 @@ namespace TEN::Structures
 
 		// Reinsert node.
 		Insert(objectID, aabb, boundary);
+	}
+
+	void BoundingTree::Remove(int objectID)
+	{
+		// Find leaf containing object ID.
+		auto it = _leafIDMap.find(objectID);
+		if (it == _leafIDMap.end())
+			return;
+
+		int leafID = it->second;
+		const auto& leaf = _nodes[leafID];
+
+		// Remove node and prune branch if necessary.
+		if (leaf.ParentID == NO_VALUE)
+		{
+			RemoveNode(leafID);
+		}
+		else
+		{
+			auto& parent = _nodes[leaf.ParentID];
+
+			if (parent.Child0ID == leafID)
+			{
+				parent.Child0ID = NO_VALUE;
+			}
+			else
+			{
+				parent.Child1ID = NO_VALUE;
+			}
+
+			// TODO: This is an obtuse way of pruning a branch. Make a prune method?
+			RefitNode(leafID);
+		}
 	}
 
 	void BoundingTree::DrawDebug() const
@@ -269,6 +288,8 @@ namespace TEN::Structures
 	{
 		auto& leaf = _nodes[leafID];
 
+		_leafIDMap.insert({ leaf.ObjectID, leafID });
+
 		// 1) Create root if empty.
 		if (_rootID == NO_VALUE)
 		{
@@ -322,10 +343,10 @@ namespace TEN::Structures
 		int nodeID = 0;
 
 		// Get existing empty node ID.
-		if (!_freeIds.empty())
+		if (!_freeNodeIds.empty())
 		{
-			nodeID = _freeIds.back();
-			_freeIds.pop_back();
+			nodeID = _freeNodeIds.back();
+			_freeNodeIds.pop_back();
 		}
 		// Allocate and get new empty node ID.
 		else
@@ -422,13 +443,17 @@ namespace TEN::Structures
 
 	void BoundingTree::RemoveNode(int nodeID)
 	{
-		// Clear node and mark free.
 		auto& node = _nodes[nodeID];
+
+		// Clear object-node pair.
+		_leafIDMap.erase(node.ObjectID);
+
+		// Clear node and mark free.
 		node = {};
-		_freeIds.push_back(nodeID);
+		_freeNodeIds.push_back(nodeID);
 
 		// Shrink capacity if empty. NOTE: Prevents memory bloat, but may be slower.
-		if (_nodes.size() == _freeIds.size())
+		if (_nodes.size() == _freeNodeIds.size())
 			*this = {};
 	}
 
