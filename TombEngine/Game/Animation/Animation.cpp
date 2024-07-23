@@ -58,7 +58,7 @@ namespace TEN::Animation
 	FixedMotionData AnimData::GetFixedMotion(int frameNumber) const
 	{
 		// NOTE: Must use non-zero frame count in this edge case.
-		unsigned int frameCount = std::clamp(EndFrameNumber, 1, EndFrameNumber);
+		unsigned int frameCount = std::max(1, EndFrameNumber);
 
 		// Calculate relative translation and curve alpha.
 		float alpha = (float)frameNumber / (float)frameCount;
@@ -90,7 +90,7 @@ namespace TEN::Animation
 				}
 				else
 				{
-					TENLog("AnimData::GetRootMotion(): Attempted to get root motion for frame 0 from cycle with 1 frame.", LogLevel::Info);
+					TENLog("Attempted to get anim root motion for frame 0 from cycle with 1 frame.", LogLevel::Info);
 					return {};
 				}
 			}

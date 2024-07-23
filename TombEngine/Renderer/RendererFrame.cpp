@@ -345,7 +345,7 @@ namespace TEN::Renderer
 			if (rendererObject.ShadowType == ShadowMode::None)
 			{
 				// Get all spheres and check if frustum intersects any of them.
-				static BoundingSphere spheres[MAX_BONES];
+				static BoundingSphere spheres[BONE_COUNT];
 				int count = GetSpheres(itemNumber, spheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 
 				// Blow up sphere radius by half for cases of too small calculated spheres.

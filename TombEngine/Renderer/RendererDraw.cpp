@@ -212,8 +212,8 @@ namespace TEN::Renderer
 			_stItem.World = item->World;
 			_stItem.Color = item->Color;
 			_stItem.AmbientLight = item->AmbientLight;
-			memcpy(_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
-			for (int k = 0; k < MAX_BONES; k++)
+			memcpy(_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * BONE_COUNT);
+			for (int k = 0; k < BONE_COUNT; k++)
 				_stItem.BoneLightModes[k] = (int)LightMode::Static;
 
 			_cbItem.UpdateData(_stItem, _context.Get());
@@ -2297,7 +2297,7 @@ namespace TEN::Renderer
 		_stItem.World = item->World;
 		_stItem.Color = item->Color;
 		_stItem.AmbientLight = item->AmbientLight;
-		memcpy(_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
+		memcpy(_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * BONE_COUNT);
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
@@ -3319,7 +3319,7 @@ namespace TEN::Renderer
 		_stItem.World = objectInfo->Item->World;
 		_stItem.Color = objectInfo->Item->Color;
 		_stItem.AmbientLight = objectInfo->Item->AmbientLight;
-		memcpy(_stItem.BonesMatrices, objectInfo->Item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
+		memcpy(_stItem.BonesMatrices, objectInfo->Item->AnimationTransforms, sizeof(Matrix) * BONE_COUNT);
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;

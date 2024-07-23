@@ -18,9 +18,9 @@ namespace TEN::Renderer::Structures
 		Matrix Translation;
 		Matrix Rotation;
 		Matrix Scale;
-		Matrix AnimationTransforms[MAX_BONES];
+		Matrix AnimationTransforms[BONE_COUNT];
 
-		Quaternion BoneOrientations[MAX_BONES];
+		Quaternion BoneOrientations[BONE_COUNT];
 
 		int RoomNumber = NO_VALUE;
 		int PrevRoomNumber = NO_VALUE;

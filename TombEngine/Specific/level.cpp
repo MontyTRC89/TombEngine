@@ -525,7 +525,7 @@ void LoadObjects()
 				}
 			}
 
-			//anim.Flags = ReadInt32();
+			anim.Flags = ReadInt32();
 		}
 
 		Objects[objectID].loaded = true;

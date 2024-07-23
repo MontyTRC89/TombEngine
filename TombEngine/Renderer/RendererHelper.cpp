@@ -48,7 +48,7 @@ namespace TEN::Renderer
 		static auto boneIndices = std::vector<int>{};
 		boneIndices.clear();
 
-		auto bones = std::array<RendererBone*, MAX_BONES>{};
+		auto bones = std::array<RendererBone*, BONE_COUNT>{};
 		int nextBoneID = 0;
 
 		// Push skeleton.
@@ -610,7 +610,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (jointIndex >= MAX_BONES)
+		if (jointIndex >= BONE_COUNT)
 			jointIndex = 0;
 
 		auto worldMatrix = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
@@ -634,7 +634,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (boneID >= MAX_BONES)
+		if (boneID >= BONE_COUNT)
 			boneID = 0;
 
 		return rendererItem->BoneOrientations[boneID];

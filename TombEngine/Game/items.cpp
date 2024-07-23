@@ -40,6 +40,11 @@ using namespace TEN::Utils;
 
 constexpr auto ITEM_DEATH_TIMEOUT = 4 * FPS;
 
+bool MoveableAnimBlendData::IsEnabled() const
+{
+	return (FrameCount != 0);
+}
+
 bool ItemInfo::TestOcb(short ocbFlags) const
 {
 	return ((TriggerFlags & ocbFlags) == ocbFlags);
@@ -193,12 +198,10 @@ void ItemInfo::SetAnimBlend(int frameCount, const BezierCurve2D& curve)
 	Animation.Blend.Curve = curve;
 	Animation.Blend.RootPos = rootPos + rootMotionCounter.Translation;
 
-	Animation.Blend.BoneOrientations.clear();
-	Animation.Blend.BoneOrientations.reserve(object.nmeshes);
-	for (int i = 0; i < object.nmeshes; i++)
+	for (int i = 0; i < Animation.Blend.BoneOrientations.size(); i++)
 	{
 		auto boneOrient = GetBoneOrientation(*this, i);
-		Animation.Blend.BoneOrientations.push_back(boneOrient * boneRot); // TODO: Check rotation.
+		Animation.Blend.BoneOrientations[i] = boneOrient * boneRot; // TODO: Check rotation.
 	}
 }
 
@@ -593,69 +596,69 @@ void RemoveActiveItem(short itemNumber, bool killed)
 
 void InitializeItem(short itemNumber) 
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	SetAnimation(*item, 0);
-	item->Animation.RequiredState = NO_VALUE;
-	item->Animation.Velocity = Vector3::Zero;
+	SetAnimation(item, 0);
+	item.Animation.RequiredState = NO_VALUE;
+	item.Animation.Velocity = Vector3::Zero;
 
 	for (int i = 0; i < ITEM_FLAG_COUNT; i++)
-		item->ItemFlags[i] = 0;
+		item.ItemFlags[i] = 0;
 
-	item->Active = false;
-	item->Status = ITEM_NOT_ACTIVE;
-	item->Animation.IsAirborne = false;
-	item->HitStatus = false;
-	item->Collidable = true;
-	item->LookedAt = false;
-	item->Timer = 0;
-	item->HitPoints = Objects[item->ObjectNumber].HitPoints;
+	item.Active = false;
+	item.Status = ITEM_NOT_ACTIVE;
+	item.Animation.IsAirborne = false;
+	item.HitStatus = false;
+	item.Collidable = true;
+	item.LookedAt = false;
+	item.Timer = 0;
+	item.HitPoints = Objects[item.ObjectNumber].HitPoints;
 
-	if (item->ObjectNumber == ID_HK_ITEM ||
-		item->ObjectNumber == ID_HK_AMMO_ITEM ||
-		item->ObjectNumber == ID_CROSSBOW_ITEM ||
-		item->ObjectNumber == ID_REVOLVER_ITEM)
+	if (item.ObjectNumber == ID_HK_ITEM ||
+		item.ObjectNumber == ID_HK_AMMO_ITEM ||
+		item.ObjectNumber == ID_CROSSBOW_ITEM ||
+		item.ObjectNumber == ID_REVOLVER_ITEM)
 	{
-		item->MeshBits = 1;
+		item.MeshBits = 1;
 	}
 	else
 	{
-		item->MeshBits = ALL_JOINT_BITS;
+		item.MeshBits = ALL_JOINT_BITS;
 	}
 
-	item->TouchBits = NO_JOINT_BITS;
-	item->AfterDeath = 0;
+	item.TouchBits = NO_JOINT_BITS;
+	item.AfterDeath = 0;
 
-	if (item->Flags & IFLAG_INVISIBLE)
+	if (item.Flags & IFLAG_INVISIBLE)
 	{
-		item->Flags &= ~IFLAG_INVISIBLE;
-		item->Status = ITEM_INVISIBLE;
+		item.Flags &= ~IFLAG_INVISIBLE;
+		item.Status = ITEM_INVISIBLE;
 	}
-	else if (Objects[item->ObjectNumber].intelligent)
+	else if (Objects[item.ObjectNumber].intelligent)
 	{
-		item->Status = ITEM_INVISIBLE;
+		item.Status = ITEM_INVISIBLE;
 	}
 
-	if ((item->Flags & IFLAG_ACTIVATION_MASK) == IFLAG_ACTIVATION_MASK)
+	if ((item.Flags & IFLAG_ACTIVATION_MASK) == IFLAG_ACTIVATION_MASK)
 	{
-		item->Flags &= ~IFLAG_ACTIVATION_MASK;
-		item->Flags |= IFLAG_REVERSE;
+		item.Flags &= ~IFLAG_ACTIVATION_MASK;
+		item.Flags |= IFLAG_REVERSE;
 		AddActiveItem(itemNumber);
-		item->Status = ITEM_ACTIVE;
+		item.Status = ITEM_ACTIVE;
 	}
 
-	auto* room = &g_Level.Rooms[item->RoomNumber];
-	item->NextItem = room->itemNumber;
+	auto* room = &g_Level.Rooms[item.RoomNumber];
+	item.NextItem = room->itemNumber;
 	room->itemNumber = itemNumber;
 
-	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
-	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
-	item->BoxNumber = floor->PathfindingBoxID;
+	FloorInfo* floor = GetSector(room, item.Pose.Position.x - room->x, item.Pose.Position.z - room->z);
+	item.Floor = floor->GetSurfaceHeight(item.Pose.Position.x, item.Pose.Position.z, true);
+	item.BoxNumber = floor->PathfindingBoxID;
 
-	item->ResetModelToDefault();
+	item.ResetModelToDefault();
 
-	if (Objects[item->ObjectNumber].Initialize != nullptr)
-		Objects[item->ObjectNumber].Initialize(itemNumber);
+	if (Objects[item.ObjectNumber].Initialize != nullptr)
+		Objects[item.ObjectNumber].Initialize(itemNumber);
 }
 
 short CreateItem()

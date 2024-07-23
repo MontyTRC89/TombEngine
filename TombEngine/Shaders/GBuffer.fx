@@ -4,7 +4,7 @@
 #include "./Blending.hlsli"
 #include "./Math.hlsli"
 
-#define MAX_BONES 32
+#define BONE_COUNT 32
 #define INSTANCED_STATIC_MESH_BUCKET_SIZE 100
 
 cbuffer RoomBuffer : register(b5)
@@ -29,7 +29,7 @@ cbuffer InstancedStaticMeshBuffer : register(b3)
 cbuffer ItemBuffer : register(b1)
 {
 	float4x4 ItemWorld;
-	float4x4 Bones[MAX_BONES];
+	float4x4 Bones[BONE_COUNT];
 };
 
 cbuffer StaticMatrixBuffer : register(b8)

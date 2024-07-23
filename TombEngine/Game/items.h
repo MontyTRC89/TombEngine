@@ -3,8 +3,9 @@
 #include "Game/Animation/Animation.h"
 #include "Game/itemdata/itemdata.h"
 #include "Math/Math.h"
-#include "Specific/BitField.h"
 #include "Objects/game_object_ids.h"
+#include "Renderer/RendererEnums.h"
+#include "Specific/BitField.h"
 #include "Specific/newtypes.h"
 
 using namespace TEN::Animation;
@@ -66,10 +67,10 @@ struct MoveableAnimBlendData
 	int			  FrameCount  = 0;
 	BezierCurve2D Curve		  = {};
 
-	Vector3					RootPos			 = Vector3::Zero;
-	std::vector<Quaternion> BoneOrientations = {};
+	Vector3							   RootPos			= Vector3::Zero;
+	std::array<Quaternion, BONE_COUNT> BoneOrientations = {};
 
-	bool IsEnabled() const { return (FrameCount != 0); }
+	bool IsEnabled() const;
 };
 
 struct MoveableAnimData
