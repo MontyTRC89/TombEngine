@@ -460,10 +460,7 @@ namespace TEN::Renderer
 			auto sphere = BoundingSphere(pos, mesh.Sphere.Radius);
 			spheres.push_back(sphere);
 
-			// Debug
-			/*auto linePoint0 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
-			 auto linePoint1 = Vector3(spheres[i].Center.x + spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
-			 DrawDebugLine(linePoint0, linePoint1, Vector4::One);*/
+			DrawDebugSphere(sphere, Color(1, 1, 1));
 		}
 		
 		return spheres;

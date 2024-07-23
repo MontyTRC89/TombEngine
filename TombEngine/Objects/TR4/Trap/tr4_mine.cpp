@@ -29,7 +29,7 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		auto spheres = GetSpheres(*item, (int)SphereSpaceFlags::World);
+		auto spheres = GetSpheres(item, (int)SphereSpaceFlags::World);
 		if (item.ItemFlags[0] >= 150)
 		{
 			SoundEffect(SFX_TR4_EXPLOSION1, &item.Pose);
@@ -45,8 +45,8 @@ namespace TEN::Entities::Traps
 					{
 						const auto& sphere = spheres[i];
 
-						TriggerExplosionSparks(sphere.Center.x, sphere.Center.y, sphere.Center.z, 3, -2, 0, -item->RoomNumber);
-						TriggerExplosionSparks(sphere.Center.x, sphere.Center.y, sphere.Center.z, 3, -1, 0, -item->RoomNumber);
+						TriggerExplosionSparks(sphere.Center.x, sphere.Center.y, sphere.Center.z, 3, -2, 0, -item.RoomNumber);
+						TriggerExplosionSparks(sphere.Center.x, sphere.Center.y, sphere.Center.z, 3, -1, 0, -item.RoomNumber);
 						TriggerShockwave(&Pose(Vector3i(sphere.Center)), 48, 304, (GetRandomControl() & 0x1F) + 112, 0, 96, 128, 32, EulerAngles(2048, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 					}
 				}
@@ -85,7 +85,7 @@ namespace TEN::Entities::Traps
 				if (i == 0 || i > 5)
 				{
 					const auto& sphere = spheres[i];
-					AddFire(sphere.Center.x, sphere.Center.y, sphere.Center.z, item->RoomNumber, 0.25f, fade);
+					AddFire(sphere.Center.x, sphere.Center.y, sphere.Center.z, item.RoomNumber, 0.25f, fade);
 				}
 			}
 

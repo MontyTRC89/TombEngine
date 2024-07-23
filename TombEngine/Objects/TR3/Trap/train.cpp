@@ -109,7 +109,7 @@ namespace TEN::Entities::Traps
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 
-	if (!HandleItemSphereCollision(*item, *laraItem))
+	if (!HandleItemSphereCollision(item, *playerItem))
 		return;
 
 		SoundEffect(SFX_TR4_LARA_GENERAL_DEATH, &playerItem->Pose, SoundEnvironment::Always);
