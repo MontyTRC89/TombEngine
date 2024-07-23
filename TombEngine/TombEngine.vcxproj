@@ -356,6 +356,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Lara\Context\Jump.h" />
     <ClInclude Include="Game\Lara\Context\MonkeySwing.h" />
     <ClInclude Include="Game\Lara\Context\Structs.h" />
+    <ClInclude Include="Game\Lara\Context\Vault.h" />
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
@@ -910,6 +911,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\Context\GroundMovement.cpp" />
     <ClCompile Include="Game\Lara\Context\Jump.cpp" />
     <ClCompile Include="Game\Lara\Context\MonkeySwing.cpp" />
+    <ClCompile Include="Game\Lara\Context\Vault.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />

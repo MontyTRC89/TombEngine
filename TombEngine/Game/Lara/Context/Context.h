@@ -3,6 +3,7 @@
 #include "Game/Lara/Context/GroundMovement.h"
 #include "Game/Lara/Context/Jump.h"
 #include "Game/Lara/Context/MonkeySwing.h"
+#include "Game/Lara/Context/Vault.h"
 
 // TODO: Split this file out into multiple. It's getting way too large.
 // Vault, slide, climb edge, climb wall.
@@ -96,22 +97,6 @@ namespace TEN::Player
 	bool CanSlide(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanSteerOnSlide(const ItemInfo& item, const CollisionInfo& coll);
 
-	// Jump contexts
-
-	bool CanFall(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanLand(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanPerformJump(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanJumpUp(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanJumpForward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanJumpBackward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanJumpLeft(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanJumpRight(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanQueueRunningJump(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanRunJumpForward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanSprintJumpForward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanPerformSlideJump(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanCrawlspaceDive(const ItemInfo& item, const CollisionInfo& coll);
-
 	// Ledge contexts
 
 	bool CanPerformLedgeJump(const ItemInfo& item, const CollisionInfo& coll);
@@ -122,13 +107,6 @@ namespace TEN::Player
 	// Object interaction contexts
 
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
-
-	// Vault climb contexts
-
-	std::optional<ClimbContextData>				GetStandVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>				GetCrawlVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData>				GetTreadWaterVaultClimbContext(ItemInfo& item, const CollisionInfo& coll);
-	std::optional<WaterTreadStepOutContextData> GetTreadWaterStepOutContext(const ItemInfo& item);
 
 	// Hang descent climb contexts
 
