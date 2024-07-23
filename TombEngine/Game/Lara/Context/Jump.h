@@ -5,6 +5,8 @@ struct ItemInfo;
 
 namespace TEN::Player
 {
+	struct ClimbContextData;
+
 	// Jump inquirers
 
 	bool CanFall(const ItemInfo& item, const CollisionInfo& coll);
@@ -20,4 +22,8 @@ namespace TEN::Player
 	bool CanSprintJumpForward(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanPerformSlideJump(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanCrawlspaceDive(const ItemInfo& item, const CollisionInfo& coll);
+
+	// Jump catch climb contexts
+
+	std::optional<ClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 }

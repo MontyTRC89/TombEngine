@@ -109,10 +109,6 @@ namespace TEN::Player
 
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
 
-	// Jump catch climb contexts
-
-	std::optional<ClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-
 	// Hang climb contexts
 
 	std::optional<ClimbContextData> GetEdgeHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll);

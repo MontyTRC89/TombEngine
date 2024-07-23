@@ -2,11 +2,13 @@
 #include "Game/Lara/Context/Jump.h"
 
 #include "Game/animation.h"
+#include "Game/collision/Attractor.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
+#include "Game/Lara/Context/Structs.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
@@ -16,6 +18,7 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Attractor;
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
@@ -254,5 +257,237 @@ namespace TEN::Player
 	{
 		auto pointColl = GetPointCollision(item, coll.Setup.ForwardAngle, coll.Setup.Radius, -coll.Setup.Height);
 		return (abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight()) < LARA_HEIGHT || IsInLowSpace(item, coll));
+	}
+
+	static std::optional<AttractorCollisionData> GetEdgeCatchAttractorCollision(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto ATTRAC_DETECT_RADIUS		 = BLOCK(0.5f);
+		constexpr auto FLOOR_TO_EDGE_HEIGHT_MIN	 = LARA_HEIGHT_STRETCH;
+		constexpr auto WALL_EDGE_FLOOR_THRESHOLD = CLICK(0.25f);
+
+		constexpr auto POINT_COLL_BACK_DOWN_OFFSET	   = -CLICK(1);
+		constexpr auto POINT_COLL_FRONT_FORWARD_OFFSET = BLOCK(1 / 256.0f);
+
+		// Get attractor collisions.
+		auto attracColls = GetAttractorCollisions(
+			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y,
+			0.0f, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
+
+		float range2D = std::max<float>(OFFSET_RADIUS(coll.Setup.Radius), Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length());
+
+		// Assess attractor collision.
+		for (const auto& attracColl : attracColls)
+		{
+			// 1) Check attractor type.
+			if (attracColl.Attractor->GetType() != AttractorType::Edge &&
+				attracColl.Attractor->GetType() != AttractorType::WallEdge)
+			{
+				continue;
+			}
+
+			// 2) Test if edge is within 2D range.
+			if (attracColl.Distance2D > range2D)
+				continue;
+
+			// 3) Test if edge slope is steep.
+			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
+				continue;
+
+			// 4) Test edge angle relation.
+			if (!attracColl.IsInFront || !TestPlayerInteractAngle(item.Pose.Orientation.y, attracColl.HeadingAngle))
+				continue;
+
+			// Get point collision behind edge.
+			auto pointCollBack = GetPointCollision(
+				attracColl.Intersection, attracColl.Attractor->GetRoomNumber(),
+				attracColl.HeadingAngle, -coll.Setup.Radius, 0.0f, POINT_COLL_BACK_DOWN_OFFSET);
+
+			// 5) Test if edge is high enough from floor.
+			int floorToEdgeHeight = pointCollBack.GetFloorHeight() - attracColl.Intersection.y;
+			if (floorToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN)
+				continue;
+
+			// 6) Test if edge is high enough from water surface (if applicable).
+			if (pointCollBack.GetWaterTopHeight() != NO_HEIGHT && pointCollBack.GetWaterBottomHeight() != NO_HEIGHT)
+			{
+				int waterSurfaceToEdgeHeight = pointCollBack.GetWaterTopHeight() - attracColl.Intersection.y;
+				int waterBottomToEdgeHeight = pointCollBack.GetWaterBottomHeight() - attracColl.Intersection.y;
+
+				if (waterSurfaceToEdgeHeight <= FLOOR_TO_EDGE_HEIGHT_MIN &&
+					waterBottomToEdgeHeight >= 0)
+				{
+					continue;
+				}
+			}
+
+			// 7) Test if ceiling behind is adequately higher than edge.
+			int edgeToCeilHeight = pointCollBack.GetCeilingHeight() - attracColl.Intersection.y;
+			if (edgeToCeilHeight >= 0)
+				continue;
+
+			int vPos = item.Pose.Position.y - coll.Setup.Height;
+			int relEdgeHeight = attracColl.Intersection.y - vPos;
+
+			float projVerticalVel = item.Animation.Velocity.y + GetEffectiveGravity(item.Animation.Velocity.y);
+			bool isFalling = (projVerticalVel >= 0.0f);
+
+			// 8) SPECIAL CASE: Wall edge.
+			if (attracColl.Attractor->GetType() == AttractorType::WallEdge)
+			{
+				// 8.1) Test if player is falling.
+				if (!isFalling)
+					return std::nullopt;
+
+				// Get point collision in front of edge.
+				auto pointCollFront = GetPointCollision(
+					attracColl.Intersection, attracColl.Attractor->GetRoomNumber(),
+					attracColl.HeadingAngle, POINT_COLL_FRONT_FORWARD_OFFSET, 0.0f, POINT_COLL_BACK_DOWN_OFFSET);
+
+				// TODO: Can do it another way. Parent stacked WallEdge attractors to pushables and gates?
+				// 8.2) Test if wall edge is near wall.
+				if (pointCollFront.GetFloorHeight() > (attracColl.Intersection.y + WALL_EDGE_FLOOR_THRESHOLD) &&
+					pointCollFront.GetCeilingHeight() < (attracColl.Intersection.y - WALL_EDGE_FLOOR_THRESHOLD))
+				{
+					return std::nullopt;
+				}
+			}
+
+			int lowerBound = isFalling ? (int)ceil(projVerticalVel) : 0;
+			int upperBound = isFalling ? 0 : (int)floor(projVerticalVel);
+
+			// 9) Test catch trajectory.
+			if (relEdgeHeight > lowerBound ||
+				relEdgeHeight < upperBound)
+			{
+				return std::nullopt;
+			}
+
+			return attracColl;
+		}
+
+		// No valid edge attractor collision; return nullopt.
+		return std::nullopt;
+	}
+
+	const bool CanSwingOnLedge(const ItemInfo& item, const CollisionInfo& coll, const AttractorCollisionData& attracColl)
+	{
+		constexpr auto UPPER_FLOOR_BOUND = 0;
+		constexpr auto LOWER_CEIL_BOUND	 = CLICK(1.5f);
+
+		auto& player = GetLaraInfo(item);
+
+		// Get point collision.
+		auto pointColl = GetPointCollision(
+			attracColl.Intersection, item.RoomNumber,
+			attracColl.HeadingAngle, coll.Setup.Radius / 2, coll.Setup.Height);
+
+		int relFloorHeight = pointColl.GetFloorHeight() - (attracColl.Intersection.y + coll.Setup.Height);
+		int relCeilHeight = pointColl.GetCeilingHeight() - attracColl.Intersection.y;
+
+		// Assess point collision.
+		if (relFloorHeight >= UPPER_FLOOR_BOUND && // Floor height is below upper floor bound.
+			relCeilHeight <= LOWER_CEIL_BOUND)	   // Ceiling height is above lower ceiling bound.
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	static std::optional<ClimbContextData> GetEdgeJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto VERTICAL_OFFSET = LARA_HEIGHT_STRETCH;
+
+		// Get edge catch climb context.
+		auto attracColl = GetEdgeCatchAttractorCollision(item, coll);
+		if (attracColl.has_value())
+		{
+			int targetStateID = ((item.Animation.ActiveState == LS_REACH) && CanSwingOnLedge(item, coll, *attracColl)) ?
+				LS_EDGE_HANG_SWING_CATCH : LS_EDGE_HANG_IDLE;
+
+			auto context = ClimbContextData{};
+			context.Attractor = attracColl->Attractor;
+			context.ChainDistance = attracColl->ChainDistance;
+			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
+			context.RelOrientOffset = EulerAngles::Identity;
+			context.TargetStateID = targetStateID;
+			context.AlignType = ClimbContextAlignType::AttractorParent;
+			context.IsJump = false;
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+
+	static std::optional<ClimbContextData> GetMonkeySwingJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		constexpr auto ABS_CEIL_BOUND			= CLICK(0.5f);
+		constexpr auto FLOOR_TO_CEIL_HEIGHT_MAX = LARA_HEIGHT_MONKEY;
+
+		const auto& player = GetLaraInfo(item);
+
+		// 1) Check for monkey swing flag.
+		if (!player.Control.CanMonkeySwing)
+			return std::nullopt;
+
+		// 2) Check collision type.
+		if (coll.CollisionType != CollisionType::Top &&
+			coll.CollisionType != CollisionType::TopFront)
+		{
+			return std::nullopt;
+		}
+
+		// Get point collision.
+		auto pointColl = GetPointCollision(item);
+
+		int vPos = item.Pose.Position.y - coll.Setup.Height;
+		int relCeilHeight = abs(pointColl.GetCeilingHeight() - vPos);
+		int floorToCeilHeight = abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight());
+
+		// 3) Assess point collision.
+		if (relCeilHeight <= ABS_CEIL_BOUND &&			  // Ceiling height is within lower/upper ceiling bounds.
+			floorToCeilHeight > FLOOR_TO_CEIL_HEIGHT_MAX) // Floor-to-ceiling height is wide enough.
+		{
+			// HACK: Set catch animation.
+			int animNumber = (item.Animation.ActiveState == LS_JUMP_UP) ? LA_JUMP_UP_TO_MONKEY : LA_REACH_TO_MONKEY;
+			SetAnimation(*LaraItem, animNumber);
+
+			// Get monkey swing catch climb context.
+			auto context = ClimbContextData{};
+			context.Attractor = nullptr;
+			context.ChainDistance = 0.0f;
+			context.RelPosOffset = Vector3(0.0f, item.Pose.Position.y - (pointColl.GetCeilingHeight() + LARA_HEIGHT_MONKEY), 0.0f);
+			context.RelOrientOffset = EulerAngles::Identity;
+			context.TargetStateID = LS_MONKEY_IDLE;
+			context.AlignType = ClimbContextAlignType::Snap;
+			context.IsJump = false;
+
+			return context;
+		}
+
+		return std::nullopt;
+	}
+
+	// TODO: Dispatch checks. Should be added to several animations for most responsive catch actions.
+	std::optional<ClimbContextData> GetJumpCatchClimbContext(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		auto context = std::optional<ClimbContextData>();
+
+		context = GetEdgeJumpCatchClimbContext(item, coll);
+		if (context.has_value())
+		{
+			if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+
+		context = GetMonkeySwingJumpCatchClimbContext(item, coll);
+		if (context.has_value())
+		{
+			if (HasStateDispatch(&item, context->TargetStateID))
+				return context;
+		}
+
+		return std::nullopt;
 	}
 }
