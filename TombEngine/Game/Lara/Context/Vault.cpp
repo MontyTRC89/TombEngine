@@ -24,6 +24,11 @@ using namespace TEN::Input;
 
 namespace TEN::Player
 {
+	bool CanVaultFromSprint(const ItemInfo& item, const CollisionInfo& coll)
+	{
+		return !TestLaraWall(&item, OFFSET_RADIUS(coll.Setup.Radius), -BLOCK(5 / 8.0f));
+	}
+
 	static std::optional<AttractorCollisionData> GetEdgeVaultClimbAttractorCollision(const ItemInfo& item, const CollisionInfo& coll,
 																					 const EdgeVaultClimbSetupData& setup,
 																					 const std::vector<AttractorCollisionData>& attracColls)

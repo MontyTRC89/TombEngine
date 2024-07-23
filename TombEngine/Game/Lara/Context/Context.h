@@ -1,14 +1,13 @@
 #pragma once
 
+#include "Game/Lara/Context/Climb.h"
 #include "Game/Lara/Context/GroundMovement.h"
 #include "Game/Lara/Context/HangDescent.h"
 #include "Game/Lara/Context/Jump.h"
 #include "Game/Lara/Context/MonkeySwing.h"
 #include "Game/Lara/Context/Vault.h"
 
-// TODO: Split this file out into multiple. It's getting way too large.
-// Slide, climb
-// Also move PlayerContext struct back to lara_struct.h.
+// Move PlayerContext struct back to lara_struct.h?
 
 #include "Game/Lara/Context/Structs.h"
 #include "Math/Math.h"
@@ -28,7 +27,7 @@ namespace TEN::Player
 {
 	struct PlayerAttractorData
 	{
-		AttractorObject* Ptr			 = nullptr;
+		AttractorObject* Attractor		 = nullptr;
 		float			 ChainDistance	 = 0.0f;
 		Vector3			 RelPosOffset	 = Vector3::Zero;
 		EulerAngles		 RelOrientOffset = EulerAngles::Identity;
@@ -62,9 +61,9 @@ namespace TEN::Player
 	private:
 		// TODO: Make LaraInfo aware of its parent ItemInfo.
 		// Parent pointers
-		/*const ItemInfo*		 ItemPtr = nullptr;
-		const LaraInfo*		 PlayerPtr = nullptr;
-		const CollisionInfo* CollPtr = nullptr;*/
+		/*const ItemInfo*		 Item = nullptr;
+		const LaraInfo*		 Player = nullptr;
+		const CollisionInfo* Collision = nullptr;*/
 
 	public:
 		// Members
@@ -83,45 +82,18 @@ namespace TEN::Player
 		int InteractedItem = 0; // InteractedItemNumber.
 		int Vehicle		   = 0; // VehicleItemNumber.
 
-		PlayerContext() {};
+		PlayerContext() = default;
 		PlayerContext(const ItemInfo& item, const CollisionInfo& coll);
 
 		// TODO: Move all functions below into this class. Resulting syntax will be a neat player.Context.CanDoXYZ().
 	};
-
-	// Basic vault contexts
-
-	bool CanVaultFromSprint(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Slide contexts
 
 	bool CanSlide(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanSteerOnSlide(const ItemInfo& item, const CollisionInfo& coll);
 
-	// Ledge contexts
-
-	bool CanPerformLedgeJump(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanPerformLedgeHandstand(const ItemInfo& item, CollisionInfo& coll);
-	bool CanClimbLedgeToCrouch(const ItemInfo& item, CollisionInfo& coll);
-	bool CanClimbLedgeToStand(const ItemInfo& item, CollisionInfo& coll);
-
 	// Object interaction contexts
 
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
-
-	// Hang climb contexts
-
-	std::optional<ClimbContextData> GetEdgeHangShimmyUpContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetEdgeHangShimmyDownContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetEdgeHangShimmyLeftContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetEdgeHangShimmyRightContext(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanEdgeHangToWallClimb(const ItemInfo& item, const CollisionInfo& coll);
-
-	// Climbable wall climb contexts
-
-	std::optional<ClimbContextData> GetWallClimbUpContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetWallClimbDownContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetWallClimbLeftContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetWallClimbRightContext(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanWallClimbToEdgeHang(const ItemInfo& item, const CollisionInfo& coll);
 }

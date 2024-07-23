@@ -8,6 +8,10 @@ namespace TEN::Player
 	struct ClimbContextData;
 	struct WaterTreadStepOutContextData;
 
+	// Vault inquirers
+
+	bool CanVaultFromSprint(const ItemInfo& item, const CollisionInfo& coll);
+
 	// Vault contexts
 
 	std::optional<ClimbContextData>				GetStandVaultClimbContext(const ItemInfo& item, const CollisionInfo& coll);

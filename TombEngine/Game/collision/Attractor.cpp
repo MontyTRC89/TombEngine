@@ -204,7 +204,7 @@ namespace TEN::Collision::Attractor
 			auto& playerItem = g_Level.Items[itemNumber];
 			auto& player = GetLaraInfo(playerItem);
 
-			if (player.Context.Attractor.Ptr != nullptr)
+			if (player.Context.Attractor.Attractor != nullptr)
 				player.Context.Attractor.Detach(playerItem);
 		}
 	}

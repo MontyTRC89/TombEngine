@@ -40,8 +40,8 @@ namespace TEN::Player
 		auto& player = GetLaraInfo(item);
 		auto& handsAttrac = player.Context.Attractor;
 
-		const auto& points = handsAttrac.Ptr->GetPoints();
-		float length = handsAttrac.Ptr->GetLength();
+		const auto& points = handsAttrac.Attractor->GetPoints();
+		float length = handsAttrac.Attractor->GetLength();
 
 		// Calculate distances along attractor.
 		float chainDistCenter = handsAttrac.ChainDistance;
@@ -51,9 +51,9 @@ namespace TEN::Player
 		// TODO: Find connecting attractors.
 
 		// Get attractor collisions.
-		auto attracCollCenter = GetAttractorCollision(*handsAttrac.Ptr, chainDistCenter, item.Pose.Orientation.y);
-		auto attracCollLeft = GetAttractorCollision(*handsAttrac.Ptr, chainDistLeft, item.Pose.Orientation.y);
-		auto attracCollRight = GetAttractorCollision(*handsAttrac.Ptr, chainDistRight, item.Pose.Orientation.y);
+		auto attracCollCenter = GetAttractorCollision(*handsAttrac.Attractor, chainDistCenter, item.Pose.Orientation.y);
+		auto attracCollLeft = GetAttractorCollision(*handsAttrac.Attractor, chainDistLeft, item.Pose.Orientation.y);
+		auto attracCollRight = GetAttractorCollision(*handsAttrac.Attractor, chainDistRight, item.Pose.Orientation.y);
 
 		// DEBUG----
 		g_Renderer.AddDebugLine(attracCollCenter.Intersection, attracCollCenter.Intersection + Vector3(0, -CLICK(0.5f), 0), Color(1, 1, 0));

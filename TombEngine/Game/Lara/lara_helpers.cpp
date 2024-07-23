@@ -307,12 +307,12 @@ void HandlePlayerAttractorParent(ItemInfo& item)
 	auto& player = GetLaraInfo(item);
 
 	// No attractor parent; return early.
-	if (player.Context.Attractor.Ptr == nullptr)
+	if (player.Context.Attractor.Attractor == nullptr)
 		return;
 
 	// Get parent target.
 	auto target = GetAttractorParentTarget(
-		*player.Context.Attractor.Ptr, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y,
+		*player.Context.Attractor.Attractor, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y,
 		player.Context.Attractor.RelPosOffset, player.Context.Attractor.RelOrientOffset);
 
 	// Update player position.
