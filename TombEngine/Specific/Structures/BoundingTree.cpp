@@ -92,10 +92,17 @@ namespace TEN::Structures
 		int leafID = it->second;
 		const auto& leaf = _nodes[leafID];
 
-		// TODO: Shrink if new aabb is considerably smaller on any axis.
-		// Previous expanded AABB contains current AABB; return early.
+		// Previous expanded AABB contains current AABB within scale threshold; return early.
 		if (leaf.Aabb.Contains(aabb) == ContainmentType::CONTAINS)
-			return;
+		{
+			/*auto extentsThreshold = (leaf.Aabb.Extents + Vector3(boundary * 2)) / 2;
+			if (!(aabb.Extents.x < extentsThreshold.x ||
+				aabb.Extents.y < extentsThreshold.y ||
+				aabb.Extents.z < extentsThreshold.z))*/
+			{
+				return;
+			}
+		}
 		
 		// Remove node and prune branch if necessary.
 		if (leaf.ParentID == NO_VALUE)
@@ -116,7 +123,7 @@ namespace TEN::Structures
 			}
 
 			// TODO: This is an obtuse way of pruning a branch. Make a prune method?
-			RefitNode(leafID);
+			RefitLeaf(leafID);
 		}
 
 		// Reinsert node.
@@ -152,7 +159,7 @@ namespace TEN::Structures
 			}
 
 			// TODO: This is an obtuse way of pruning a branch. Make a prune method?
-			RefitNode(leafID);
+			RefitLeaf(leafID);
 		}
 	}
 
@@ -161,18 +168,7 @@ namespace TEN::Structures
 		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
 
 		for (const auto& node : _nodes)
-		{
-			//if (node.IsLeaf())
-			//	continue;
-
-			//if (!node.IsLeaf())
-			{
-			//	PrintDebugMessage("%d", node.ObjectID);
-
-				DrawDebugBox(node.Aabb, BOX_COLOR);
-			}
-		}
-		//DrawDebugBox(_nodes[_rootID].Aabb, BOX_COLOR);
+			DrawDebugBox(node.Aabb, BOX_COLOR);
 	}
 
 	void BoundingTree::Validate() const
@@ -290,24 +286,29 @@ namespace TEN::Structures
 
 		_leafIDMap.insert({ leaf.ObjectID, leafID });
 
-		// 1) Create root if empty.
+		// Create root if empty.
 		if (_rootID == NO_VALUE)
 		{
 			_rootID = leafID;
 			return;
 		}
 
-		// 2) Get best sibling for new leaf.
+		// Get sibling for new leaf.
 		int siblingID = GetBestSiblingLeafID(leafID);
 		auto& sibling = _nodes[siblingID];
 
-		// 3) Create new parent.
+		// Box is wrong?
+		//auto aabb = BoundingBox();
+		//BoundingBox::CreateMerged(aabb, sibling.Aabb, leaf.Aabb);
+
+		// TODO: Data corruption?
+		// Create new parent.
 		int prevParentID = sibling.ParentID;
 		int newParentID = GetNewNodeID();
 		auto& newParent = _nodes[newParentID];
 
-		// TODO: Attempting to merge triggers an assertion. Tree structure is invalid? AABBs currupted? No idea.
-		//BoundingBox::CreateMerged(newParentNode.Aabb, siblingNode.Aabb, node.Aabb);
+		//newParent.Aabb = aabb;
+		//BoundingBox::CreateMerged(newParent.Aabb, sibling.Aabb, leaf.Aabb);
 		newParent.ParentID = prevParentID;
 		newParent.Child0ID = siblingID;
 		newParent.Child1ID = leafID;
@@ -333,7 +334,7 @@ namespace TEN::Structures
 		}
 
 		// 4) Refit.
-		RefitNode(leafID);
+		RefitLeaf(leafID);
 
 		//Validate(prevParentID);
 	}
@@ -361,10 +362,9 @@ namespace TEN::Structures
 	int BoundingTree::GetBestSiblingLeafID(int leafID)
 	{
 		const auto& leaf = _nodes[leafID];
-		int bestSiblingID = _rootID;
 
 		// Branch and bound for best sibling.
-		int prevBestSiblingID = bestSiblingID;
+		int bestSiblingID = _rootID;
 		while (!_nodes[bestSiblingID].IsLeaf())
 		{
 			int child0ID = _nodes[bestSiblingID].Child0ID;
@@ -376,7 +376,7 @@ namespace TEN::Structures
 			float area = Geometry::GetBoundingBoxArea(_nodes[bestSiblingID].Aabb);
 			float mergedArea = Geometry::GetBoundingBoxArea(mergedAabb);
 
-			// Cost of creating new parent for current node and new leaf.
+			// Cost of creating new parent for prospective sibling and new leaf.
 			float cost = mergedArea * 2;
 
 			// Minimum cost of pushing leaf further down tree.
@@ -389,7 +389,7 @@ namespace TEN::Structures
 				const auto& child0 = _nodes[child0ID];
 
 				auto aabb = BoundingBox();
-				BoundingBox::CreateMerged(aabb, leaf.Aabb, child0.Aabb);
+				BoundingBox::CreateMerged(aabb, child0.Aabb, leaf.Aabb);
 
 				if (child0.IsLeaf())
 				{
@@ -410,7 +410,7 @@ namespace TEN::Structures
 				const auto& child1 = _nodes[child1ID];
 
 				auto aabb = BoundingBox();
-				BoundingBox::CreateMerged(aabb, leaf.Aabb, child1.Aabb);
+				BoundingBox::CreateMerged(aabb, child1.Aabb, leaf.Aabb);
 
 				if (child1.IsLeaf())
 				{
@@ -423,19 +423,16 @@ namespace TEN::Structures
 					cost1 = newArea - prevArea + inheritCost;
 				}
 			}
+
 			// Descend according to minimum cost.
 			if (cost < cost0 && cost < cost1)
 				break;
 
 			// Descend.
-			if (cost0 < cost1)
-			{
-				bestSiblingID = child0ID;
-			}
-			else
-			{
-				bestSiblingID = child1ID;
-			}
+			bestSiblingID = (cost0 < cost1) ? child0ID : child1ID;
+
+			if (bestSiblingID == NO_VALUE)
+				break;
 		}
 
 		return bestSiblingID;
@@ -445,10 +442,8 @@ namespace TEN::Structures
 	{
 		auto& node = _nodes[nodeID];
 
-		// Clear object-node pair.
-		_leafIDMap.erase(node.ObjectID);
-
 		// Clear node and mark free.
+		_leafIDMap.erase(node.ObjectID);
 		node = {};
 		_freeNodeIds.push_back(nodeID);
 
@@ -457,7 +452,7 @@ namespace TEN::Structures
 			*this = {};
 	}
 
-	void BoundingTree::RefitNode(int nodeID)
+	void BoundingTree::RefitLeaf(int nodeID)
 	{
 		const auto& leaf = _nodes[nodeID];
 

@@ -56,17 +56,13 @@ namespace TEN::Structures
 		// Helpers
 
 		std::vector<int> GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const;
+		int				 GetNewNodeID();
+		int				 GetBestSiblingLeafID(int leafID);
 
 		void InsertLeaf(int leafID);
-
-		int	 GetNewNodeID();
-		int	 GetBestSiblingLeafID(int leafID);
-		void RemoveNode(int nodeID);
-
-		void PruneBranch(int leafID);//?
-
-		void RefitNode(int leafID);
+		void RefitLeaf(int leafID);
 		void BalanceNode(int nodeID);
+		void RemoveNode(int nodeID);
 
 		int Rebuild(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary = 0.0f);
 	};
