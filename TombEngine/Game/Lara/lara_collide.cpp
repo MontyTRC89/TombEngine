@@ -12,7 +12,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
-#include "Game/Lara/PlayerContext.h"
+#include "Game/Lara/Contexts/Context.h"
 #include "Game/Setup.h"
 #include "Objects/Sink.h"
 #include "Specific/Input/Input.h"
@@ -21,7 +21,7 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Collision::Point;
-using namespace TEN::Entities::Player;
+using namespace TEN::Player;
 using namespace TEN::Input;
 
 constexpr auto DEFLECT_STRAIGHT_ANGLE		= ANGLE(5.0f);

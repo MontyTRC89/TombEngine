@@ -12,7 +12,7 @@
 
 using namespace TEN::Input;
 
-namespace TEN::Entities::Player
+namespace TEN::Player
 {
 	void lara_as_fly_cheat(ItemInfo* item, CollisionInfo* coll)
 	{

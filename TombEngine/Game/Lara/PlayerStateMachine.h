@@ -3,7 +3,7 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-namespace TEN::Entities::Player
+namespace TEN::Player
 {
 	enum class PlayerBehaviorStateRoutineType
 	{

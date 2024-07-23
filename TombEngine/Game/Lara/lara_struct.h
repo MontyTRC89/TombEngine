@@ -1,6 +1,6 @@
 #pragma once
 #include "Game/collision/Attractor.h"
-#include "Game/Lara/PlayerContext.h"
+#include "Game/Lara/Contexts/Context.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 
@@ -9,7 +9,7 @@ struct FX_INFO;
 struct ItemInfo;
 
 using namespace TEN::Collision::Attractor;
-using namespace TEN::Entities::Player;
+using namespace TEN::Player;
 using namespace TEN::Math;
 
 // Inventory object constants

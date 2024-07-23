@@ -6,7 +6,7 @@ namespace TEN::Collision::Attractor { class AttractorObject; }
 using namespace TEN::Collision::Attractor;
 using namespace TEN::Math;
 
-namespace TEN::Entities::Player
+namespace TEN::Player
 {
 	enum class ClimbContextAlignType
 	{
@@ -16,7 +16,7 @@ namespace TEN::Entities::Player
 		AttractorParent
 	};
 
-	struct GroundMovementSetupData
+	struct BasicMovementSetupData
 	{
 		short HeadingAngle	  = 0;
 		int	  LowerFloorBound = 0;

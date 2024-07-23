@@ -10,7 +10,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
-#include "Game/Lara/PlayerContext.h"
+#include "Game/Lara/Contexts/Context.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
@@ -22,7 +22,7 @@ using namespace TEN::Input;
 using namespace TEN::Renderer;
 //------
 
-namespace TEN::Entities::Player
+namespace TEN::Player
 {
 	// notes:
 	// 1. get shimmy context data (ShimmyData with attractor collisions).

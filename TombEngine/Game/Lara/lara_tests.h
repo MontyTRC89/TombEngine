@@ -1,12 +1,12 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 #include "Game/Lara/lara_struct.h"
-#include "Game/Lara/PlayerContextData.h"
+#include "Game/Lara/Contexts/Structs.h"
 
 struct CollisionInfo;
 struct ItemInfo;
 
-using namespace TEN::Entities::Player;
+using namespace TEN::Player;
 
 // -----------------------------
 // TEST FUNCTIONS

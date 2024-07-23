@@ -6,7 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
-#include "Game/Lara/PlayerContext.h"
+#include "Game/Lara/Contexts/Context.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
@@ -16,7 +16,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Entities::Generic;
-using namespace TEN::Entities::Player;
+using namespace TEN::Player;
 using namespace TEN::Input;
 
 // -----------------------------------

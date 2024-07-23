@@ -4,7 +4,7 @@
 #include "Game/camera.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/PlayerContext.h"
+#include "Game/Lara/Contexts/Context.h"
 #include "Specific/Input/Input.h"
 
 // temp
@@ -12,13 +12,13 @@
 
 using namespace TEN::Input;
 
-namespace TEN::Entities::Player
+namespace TEN::Player
 {
 	void PlayerStateWallClimbIdle(ItemInfo* item, CollisionInfo* coll)
 	{
 		auto& player = GetLaraInfo(*item);
 
-		// Setup
+		// Setup.
 		player.Control.Look.Mode = LookMode::Free;
 		player.Control.IsClimbingWall = true;
 		coll->Setup.Height = PLAYER_HEIGHT_WALL_CLIMB;
@@ -37,7 +37,8 @@ namespace TEN::Entities::Player
 		// TODO: Add GetWallClimbIdleContext() purely for the alignment?
 
 		HandlePlayerAttractorParent(*item);
-
+		
+		// Death.
 		if (item->HitPoints <= 0)
 		{
 			item->Animation.TargetState = LS_DEATH;
@@ -45,20 +46,24 @@ namespace TEN::Entities::Player
 			return;
 		}
 
+		// Climb.
 		if (IsHeld(In::Action))
 		{
+			// Hang.
 			if (IsHeld(In::Crouch) && CanWallClimbToEdgeHang(*item, *coll))
 			{
 				item->Animation.TargetState = LS_EDGE_HANG_IDLE;
 				return;
 			}
 
+			// Jump.
 			if (IsHeld(In::Jump))
 			{
 				item->Animation.TargetState = LS_JUMP_BACK;
 				return;
 			}
 
+			// Move up/down.
 			if (IsHeld(In::Forward))
 			{
 				auto climbContext = GetWallClimbUpContext(*item, *coll);
@@ -80,6 +85,7 @@ namespace TEN::Entities::Player
 				}
 			}
 
+			// Move left/right.
 			if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 			{
 				auto climbContext = GetWallClimbLeftContext(*item, *coll);
@@ -101,10 +107,12 @@ namespace TEN::Entities::Player
 				}
 			}
 
+			// Reset.
 			item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 			return;
 		}
 
+		// Reset.
 		item->Animation.TargetState = LS_REACH;
 		SetPlayerEdgeHangRelease(*item);
 	}
@@ -113,7 +121,7 @@ namespace TEN::Entities::Player
 	{
 		auto& player = GetLaraInfo(*item);
 
-		// Setup
+		// Setup.
 		player.Control.Look.Mode = LookMode::Horizontal;
 		player.Control.IsClimbingWall = true;
 		coll->Setup.EnableSpasm = false;
@@ -122,6 +130,7 @@ namespace TEN::Entities::Player
 
 		HandlePlayerAttractorParent(*item);
 
+		// Death.
 		if (item->HitPoints <= 0)
 		{
 			item->Animation.TargetState = LS_DEATH;
@@ -129,20 +138,24 @@ namespace TEN::Entities::Player
 			return;
 		}
 
+		// Climb.
 		if (IsHeld(In::Action))
 		{
+			// Hang.
 			if (IsHeld(In::Crouch) && CanWallClimbToEdgeHang(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 				return;
 			}
 
+			// Jump.
 			if (IsHeld(In::Jump))
 			{
 				item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 				return;
 			}
 
+			// Move up.
 			if (IsHeld(In::Forward))
 			{
 				auto climbContext = GetWallClimbUpContext(*item, *coll);
@@ -154,10 +167,12 @@ namespace TEN::Entities::Player
 				}
 			}
 
+			// Reset.
 			item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 			return;
 		}
 
+		// Reset.
 		item->Animation.TargetState = LS_REACH;
 		SetPlayerEdgeHangRelease(*item);
 	}
@@ -175,6 +190,7 @@ namespace TEN::Entities::Player
 
 		HandlePlayerAttractorParent(*item);
 
+		// Death.
 		if (item->HitPoints <= 0)
 		{
 			item->Animation.TargetState = LS_DEATH;
@@ -182,20 +198,24 @@ namespace TEN::Entities::Player
 			return;
 		}
 
+		// Climb.
 		if (IsHeld(In::Action))
 		{
+			// Hang.
 			if (IsHeld(In::Crouch) && CanWallClimbToEdgeHang(*item, *coll))
 			{
 				item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 				return;
 			}
 
+			// Jump.
 			if (IsHeld(In::Jump))
 			{
 				item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 				return;
 			}
 
+			// Move down.
 			if (IsHeld(In::Back))
 			{
 				auto climbContext = GetWallClimbDownContext(*item, *coll);
@@ -207,10 +227,12 @@ namespace TEN::Entities::Player
 				}
 			}
 
+			// Reset.
 			item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 			return;
 		}
 
+		// Reset.
 		item->Animation.TargetState = LS_REACH;
 		SetPlayerEdgeHangRelease(*item);
 	}
@@ -227,6 +249,7 @@ namespace TEN::Entities::Player
 		Camera.targetAngle = ANGLE(-30.0f);
 		Camera.targetElevation = ANGLE(-20.0f);
 
+		// Death.
 		if (item->HitPoints <= 0)
 		{
 			item->Animation.TargetState = LS_DEATH;
@@ -234,8 +257,10 @@ namespace TEN::Entities::Player
 			return;
 		}
 
+		// Climb.
 		if (IsHeld(In::Action))
 		{
+			// Move left.
 			if (IsHeld(In::Left) || IsHeld(In::StepLeft))
 			{
 				auto climbContext = GetWallClimbLeftContext(*item, *coll);
@@ -247,10 +272,12 @@ namespace TEN::Entities::Player
 				}
 			}
 
+			// Reset.
 			item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 			return;
 		}
 
+		// Reset.
 		item->Animation.TargetState = LS_REACH;
 		SetPlayerEdgeHangRelease(*item);
 	}
@@ -267,6 +294,7 @@ namespace TEN::Entities::Player
 		Camera.targetAngle = ANGLE(30.0f);
 		Camera.targetElevation = ANGLE(-20.0f);
 
+		// Death.
 		if (item->HitPoints <= 0)
 		{
 			item->Animation.TargetState = LS_DEATH;
@@ -274,8 +302,10 @@ namespace TEN::Entities::Player
 			return;
 		}
 
+		// Climb.
 		if (IsHeld(In::Action))
 		{
+			// Move right.
 			if (IsHeld(In::Right) || IsHeld(In::StepRight))
 			{
 				auto climbContext = GetWallClimbRightContext(*item, *coll);
@@ -287,10 +317,12 @@ namespace TEN::Entities::Player
 				}
 			}
 
+			// Reset.
 			item->Animation.TargetState = LS_WALL_CLIMB_IDLE;
 			return;
 		}
 
+		// Reset.
 		item->Animation.TargetState = LS_REACH;
 		SetPlayerEdgeHangRelease(*item);
 	}

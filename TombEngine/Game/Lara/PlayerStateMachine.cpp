@@ -23,7 +23,7 @@
 #include "Game/Lara/States/EdgeHang.h"
 #include "Game/Lara/States/WallClimb.h"
 
-namespace TEN::Entities::Player
+namespace TEN::Player
 {
 	using PlayerBehaviorStateRoutine	 = std::function<void(ItemInfo* item, CollisionInfo* coll)>;
 	using PlayerBehaviorStateRoutinePair = std::pair<PlayerBehaviorStateRoutine, PlayerBehaviorStateRoutine>;

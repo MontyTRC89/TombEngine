@@ -20,7 +20,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
-using namespace TEN::Entities::Player;
+using namespace TEN::Player;
 using namespace TEN::Hud;
 
 // Globals

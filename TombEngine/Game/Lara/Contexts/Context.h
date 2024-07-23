@@ -1,5 +1,13 @@
 #pragma once
-#include "Game/Lara/PlayerContextData.h"
+
+#include "Game/Lara/Contexts/GroundMovement.h"
+#include "Game/Lara/Contexts/MonkeySwing.h"
+
+// TODO: Split this file out into multiple. It's getting way too large.
+// Vault, jump, slide, climb edge, climb wall.
+// Also move PlayerContext struct back to lara_struct.h.
+
+#include "Game/Lara/Contexts/Structs.h"
 #include "Math/Math.h"
 
 //----debug
@@ -13,7 +21,7 @@ struct LaraInfo;
 
 using namespace TEN::Math;
 
-namespace TEN::Entities::Player
+namespace TEN::Player
 {
 	struct PlayerAttractorData
 	{
@@ -78,24 +86,6 @@ namespace TEN::Entities::Player
 		// TODO: Move all functions below into this class. Resulting syntax will be a neat player.Context.CanDoXYZ().
 	};
 
-	// Basic round movement contexts
-
-	bool CanChangeElevation(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanStepUp(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanStepDown(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanStrikeAfkPose(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanTurn180(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanTurnFast(const ItemInfo& item, const CollisionInfo& coll, bool isGoingRight);
-	bool CanRoll180Running(const ItemInfo& item);
-	bool CanRunForward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanRunBackward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanWalkForward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanWalkBackward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanSidestepLeft(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanSidestepRight(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanWadeForward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanWadeBackward(const ItemInfo& item, const CollisionInfo& coll);
-
 	// Basic vault contexts
 
 	bool CanVaultFromSprint(const ItemInfo& item, const CollisionInfo& coll);
@@ -104,25 +94,6 @@ namespace TEN::Entities::Player
 
 	bool CanSlide(const ItemInfo& item, const CollisionInfo& coll);
 	bool CanSteerOnSlide(const ItemInfo& item, const CollisionInfo& coll);
-
-	// Crouch and crawl contexts
-
-	bool IsInLowSpace(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanCrouch(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanCrouchToCrawl(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanCrouchRoll(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanCrawlForward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanCrawlBackward(const ItemInfo& item, const CollisionInfo& coll);
-
-	// Monkey swing contexts
-
-	bool CanPerformMonkeySwingStep(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanFallFromMonkeySwing(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanGrabMonkeySwing(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanMonkeySwingForward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanMonkeySwingBackward(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanMonkeySwingShimmyLeft(const ItemInfo& item, const CollisionInfo& coll);
-	bool CanMonkeySwingShimmyRight(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Jump contexts
 

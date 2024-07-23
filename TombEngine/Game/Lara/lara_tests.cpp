@@ -9,7 +9,7 @@
 #include "Game/control/control.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
-#include "Game/Lara/PlayerContext.h"
+#include "Game/Lara/Contexts/Context.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_flare.h"
@@ -25,7 +25,7 @@
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
-using namespace TEN::Entities::Player;
+using namespace TEN::Player;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Utils;

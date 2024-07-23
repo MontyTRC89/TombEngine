@@ -3,7 +3,7 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-namespace TEN::Entities::Player
+namespace TEN::Player
 {
 	void PlayerStateWallClimbIdle(ItemInfo* item, CollisionInfo* coll);
 	void PlayerStateWallClimbUp(ItemInfo* item, CollisionInfo* coll);

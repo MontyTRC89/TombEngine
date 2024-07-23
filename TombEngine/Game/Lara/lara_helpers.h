@@ -1,16 +1,16 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 
-namespace TEN::Entities::Player{ struct ClimbContextData; };
-namespace TEN::Entities::Player{ struct WaterTreadStepOutContextData; };
-namespace TEN::Entities::Player{ using JumpCatchClimbContextData = std::variant<struct ClimbContextData, struct MonkeySwingJumpCatchClimbContextData>; };
+namespace TEN::Player{ struct ClimbContextData; };
+namespace TEN::Player{ struct WaterTreadStepOutContextData; };
+namespace TEN::Player{ using JumpCatchClimbContextData = std::variant<struct ClimbContextData, struct MonkeySwingJumpCatchClimbContextData>; };
 enum class JumpDirection;
 enum class WaterStatus;
 struct ItemInfo;
 struct CollisionInfo;
 struct LaraInfo;
 
-using namespace TEN::Entities::Player;
+using namespace TEN::Player;
 
 struct PlayerWaterData
 {

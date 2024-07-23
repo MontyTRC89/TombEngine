@@ -295,7 +295,7 @@ namespace TEN::Collision::Attractor
 				DrawDebugLine(target, Geometry::TranslatePoint(target, -Vector3::UnitY, INDICATOR_LINE_LENGTH), COLOR_GREEN, RendererDebugPage::AttractorStats);
 
 			// Draw AABB.
-			//DrawDebugBox(_box, Vector4::One, RendererDebugPage::AttractorStats);
+			DrawDebugBox(_aabb, Color(1.0f, 1.0f, 1.0f, 0.1f), RendererDebugPage::AttractorStats);
 		}
 	}
 

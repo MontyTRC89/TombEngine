@@ -7,7 +7,7 @@
 #include "Game/control/control.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
-#include "Game/Lara/PlayerContext.h"
+#include "Game/Lara/Contexts/Context.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara_collide.h"
@@ -17,7 +17,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
-using namespace TEN::Entities::Player;
+using namespace TEN::Player;
 using namespace TEN::Input;
 
 // State:	  LS_CRAWL_VAULT (194)
