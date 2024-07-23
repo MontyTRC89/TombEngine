@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/Lara/Contexts/MonkeySwing.h"
+#include "Game/Lara/Context/MonkeySwing.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"

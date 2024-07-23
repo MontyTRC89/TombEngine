@@ -19,7 +19,7 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
-#include "Game/Lara/Contexts/Context.h"
+#include "Game/Lara/Context/Context.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"

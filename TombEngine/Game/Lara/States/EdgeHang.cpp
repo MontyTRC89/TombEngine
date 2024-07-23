@@ -10,7 +10,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
-#include "Game/Lara/Contexts/Context.h"
+#include "Game/Lara/Context/Context.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 

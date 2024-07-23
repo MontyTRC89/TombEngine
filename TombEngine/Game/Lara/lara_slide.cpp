@@ -4,7 +4,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
-#include "Game/Lara/Contexts/Context.h"
+#include "Game/Lara/Context/Context.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"

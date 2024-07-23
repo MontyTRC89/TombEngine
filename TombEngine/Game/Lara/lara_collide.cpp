@@ -12,7 +12,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_swim.h"
 #include "Game/Lara/lara_tests.h"
-#include "Game/Lara/Contexts/Context.h"
+#include "Game/Lara/Context/Context.h"
 #include "Game/Setup.h"
 #include "Objects/Sink.h"
 #include "Specific/Input/Input.h"

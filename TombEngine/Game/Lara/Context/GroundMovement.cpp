@@ -1,12 +1,10 @@
 #include "framework.h"
-#include "Game/Lara/Contexts/GroundMovement.h"
+#include "Game/Lara/Context/GroundMovement.h"
 
 #include "Game/animation.h"
-#include "Game/collision/Attractor.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/floordata.h"
 #include "Game/control/los.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -18,8 +16,6 @@
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 
-using namespace TEN::Collision::Attractor;
-using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 

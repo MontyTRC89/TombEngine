@@ -1,6 +1,6 @@
 #pragma once
 #include "Game/collision/Attractor.h"
-#include "Game/Lara/Contexts/Context.h"
+#include "Game/Lara/Context/Context.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
 

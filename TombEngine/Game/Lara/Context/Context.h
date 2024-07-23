@@ -1,13 +1,14 @@
 #pragma once
 
-#include "Game/Lara/Contexts/GroundMovement.h"
-#include "Game/Lara/Contexts/MonkeySwing.h"
+#include "Game/Lara/Context/GroundMovement.h"
+#include "Game/Lara/Context/Jump.h"
+#include "Game/Lara/Context/MonkeySwing.h"
 
 // TODO: Split this file out into multiple. It's getting way too large.
-// Vault, jump, slide, climb edge, climb wall.
+// Vault, slide, climb edge, climb wall.
 // Also move PlayerContext struct back to lara_struct.h.
 
-#include "Game/Lara/Contexts/Structs.h"
+#include "Game/Lara/Context/Structs.h"
 #include "Math/Math.h"
 
 //----debug
