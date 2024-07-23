@@ -2,14 +2,18 @@
 #include "Renderer/Renderer.h"
 
 #include "Specific/trutils.h"
+#include "Specific/winmain.h"
 
 namespace TEN::Renderer
 {
-	void Renderer::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RendererDebugPage page)
+	void Renderer::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, RendererDebugPage page)
 	{
 		constexpr auto FLAGS = (int)PrintStringFlags::Outline | (int)PrintStringFlags::Center;
 
-		if (_debugPage != page)
+		if (_isLocked)
+			return;
+
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
 			return;
 
 		AddString(string, pos, color, scale, FLAGS);
