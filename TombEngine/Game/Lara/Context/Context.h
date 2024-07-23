@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Game/Lara/Context/GroundMovement.h"
+#include "Game/Lara/Context/HangDescent.h"
 #include "Game/Lara/Context/Jump.h"
 #include "Game/Lara/Context/MonkeySwing.h"
 #include "Game/Lara/Context/Vault.h"
 
 // TODO: Split this file out into multiple. It's getting way too large.
-// Vault, slide, climb edge, climb wall.
+// Slide, climb
 // Also move PlayerContext struct back to lara_struct.h.
 
 #include "Game/Lara/Context/Structs.h"
@@ -107,13 +108,6 @@ namespace TEN::Player
 	// Object interaction contexts
 
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll);
-
-	// Hang descent climb contexts
-
-	std::optional<ClimbContextData> GetStandHangDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetStandHangDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetCrawlHangDescentFrontClimbContext(const ItemInfo& item, const CollisionInfo& coll);
-	std::optional<ClimbContextData> GetCrawlHangDescentBackClimbContext(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Jump catch climb contexts
 
