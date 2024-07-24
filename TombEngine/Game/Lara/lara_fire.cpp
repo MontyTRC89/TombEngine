@@ -843,6 +843,21 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	auto target = origin + (directionNorm * weapon.TargetDist);
 	auto ray = Ray(origin, directionNorm);
 
+	player.Control.Weapon.HasFired = true;
+	player.Control.Weapon.Fired = true;
+
+	auto vOrigin = GameVector(pos);
+	short roomNumber = laraItem.RoomNumber;
+	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+	vOrigin.RoomNumber = roomNumber;
+
+	if (&targetEntity == nullptr)
+	{
+		auto vTarget = GameVector(target);
+		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
+		return FireWeaponType::Miss;
+	}
+
 	auto spheres = GetSpheres(targetEntity);
 	int closestJointIndex = NO_VALUE;
 	float closestDist = INFINITY;
@@ -858,15 +873,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 			}
 		}
 	}
-
-	player.Control.Weapon.HasFired = true;
-	player.Control.Weapon.Fired = true;
 	
-	auto vOrigin = GameVector(pos);
-	short roomNumber = laraItem.RoomNumber;
-	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
-	vOrigin.RoomNumber = roomNumber;
-
 	if (closestJointIndex < 0)
 	{
 		auto vTarget = GameVector(target);
