@@ -1,8 +1,8 @@
 #pragma once
 
+#include <iostream>
 #include <stdexcept>
 #include <string_view>
-#include <iostream>
 
 #include "Renderer/RendererEnums.h"
 
@@ -59,6 +59,7 @@ namespace TEN::Debug
 	// Objects
 
 	void PrintDebugMessage(LPCSTR msg, ...);
+	void DrawDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, RendererDebugPage page = RendererDebugPage::None);
 	void DrawDebug2DLine(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
 	void DrawDebugLine(const Vector3& origin, const Vector3& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
 	void DrawDebugTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Color& color, RendererDebugPage page = RendererDebugPage::None);

@@ -96,7 +96,7 @@ void ClearRats()
 	{
 		ZeroMemory(Rats, NUM_RATS * sizeof(RatData));
 		NextRat = 0;
-		FlipEffect = -1;
+		FlipEffect = NO_VALUE;
 	}
 }
 

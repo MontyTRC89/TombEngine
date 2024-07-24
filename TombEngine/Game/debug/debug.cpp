@@ -91,6 +91,11 @@ namespace TEN::Debug
 		g_Renderer.PrintDebugMessage(msg, args);
 		va_end(args);
 	}
+	
+	void DrawDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, RendererDebugPage page)
+	{
+		g_Renderer.AddDebugString(string, pos, color, scale, page);
+	}
 
 	void DrawDebug2DLine(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page)
 	{

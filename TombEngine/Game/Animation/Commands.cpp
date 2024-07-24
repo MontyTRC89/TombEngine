@@ -79,6 +79,13 @@ namespace TEN::Animation
 	{
 		if (!isFrameBased || item.Animation.FrameNumber != _frameNumber)
 			return;
+		
+		// FAILSAFE.
+		if (item.RoomNumber == NO_VALUE)
+		{
+			SoundEffect(_soundID, &item.Pose, SoundEnvironment::Always);
+			return;
+		}
 
 		int roomNumberAtPos = GetPointCollision(item).GetRoomNumber();
 		bool isWater = TestEnvironment(ENV_FLAG_WATER, roomNumberAtPos);
