@@ -15,7 +15,7 @@ using namespace TEN::Collision::Point;
 
 namespace TEN::Animation
 {
-	void TranslateCommand::Execute(ItemInfo& item, bool isFrameBased) const
+	void MoveRootCommand::Execute(ItemInfo& item, bool isFrameBased) const
 	{
 		if (isFrameBased)
 			return;
