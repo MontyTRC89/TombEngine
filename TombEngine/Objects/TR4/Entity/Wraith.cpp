@@ -712,7 +712,7 @@ namespace TEN::Entities::TR4
 
 				if (item2->NextActive == NO_VALUE)
 				{
-					FlipEffect = -1;
+					FlipEffect = NO_VALUE;
 					return;
 				}
 			}
@@ -720,6 +720,6 @@ namespace TEN::Entities::TR4
 			item2->HitPoints = item->Index;
 		}
 
-		FlipEffect = -1;
+		FlipEffect = NO_VALUE;
 	}
 }
