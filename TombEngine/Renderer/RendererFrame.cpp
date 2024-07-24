@@ -362,7 +362,7 @@ namespace TEN::Renderer
 			if (obj.ShadowType == ShadowMode::None)
 			{
 				// Get all spheres and check if frustum intersects any of them.
-				auto spheres = GetSpheres(itemNum, (int)SphereSpaceFlags::World, Matrix::Identity);
+				auto spheres = GetSpheres(itemNum);
 
 				bool inFrustum = false;
 				for (int i = 0; !inFrustum, i < spheres.size(); i++)

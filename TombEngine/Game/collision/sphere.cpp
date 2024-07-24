@@ -13,17 +13,15 @@ using namespace TEN::Renderer;
 
 namespace TEN::Collision::Sphere
 {
-	std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, int flags)
+	std::vector<BoundingSphere> GetSpheres(const ItemInfo& item)
 	{
-		return g_Renderer.GetSpheres(item.Index, flags, Matrix::Identity);
+		return g_Renderer.GetSpheres(item.Index);
 	}
 
 	bool HandleItemSphereCollision(ItemInfo& item0, ItemInfo& item1)
 	{
-		constexpr auto FLAGS = (int)SphereSpaceFlags::World | (int)SphereSpaceFlags::BoneOrigin;
-
-		auto spheres0 = GetSpheres(item0, FLAGS);
-		auto spheres1 = GetSpheres(item1, FLAGS);
+		auto spheres0 = GetSpheres(item0);
+		auto spheres1 = GetSpheres(item1);
 
 		item1.TouchBits.ClearAll();
 
@@ -33,7 +31,7 @@ namespace TEN::Collision::Sphere
 			return false;
 		}
 
-		// Run through spheres of item 0.
+		// Run through item 0 spheres.
 		bool isCollided = false;
 		for (int i = 0; i < spheres0.size(); i++)
 		{
@@ -42,7 +40,7 @@ namespace TEN::Collision::Sphere
 			if (sphere0.Radius <= 0.0f)
 				continue;
 
-			// Run through spheres of item 1.
+			// Run through item 1 spheres.
 			for (int j = 0; j < spheres1.size(); j++)
 			{
 				// Get sphere 1.

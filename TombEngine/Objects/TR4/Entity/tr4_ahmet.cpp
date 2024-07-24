@@ -83,7 +83,7 @@ namespace TEN::Entities::TR4
 	{
 		if (!(Wibble & 7))
 		{
-			auto spheres = GetSpheres(*item, (int)SphereSpaceFlags::World);
+			auto spheres = GetSpheres(*item);
 			const auto* spherePtr = &spheres[(Wibble / 8) & 1];
 
 			// TODO

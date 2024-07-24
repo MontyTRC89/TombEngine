@@ -45,11 +45,11 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 				short prevYOrient = item->Pose.Orientation.y;
 
 				item->Pose.Orientation.y = 0;
-				auto spheres = GetSpheres(*item, (int)SphereSpaceFlags::World);
+				auto spheres = GetSpheres(*item);
 				item->Pose.Orientation.y = prevYOrient;
 
 				int deadlyBits = *((int*)&item->ItemFlags[0]); // NOTE: Value spread across ItemFlags[0] and ItemFlags[1].
-				const auto* spherePtr = &spheres[0];
+				const auto* sphere = &spheres[0];
 				int sphereIndex = 0;
 
 				if (item->ItemFlags[2] != 0)
@@ -60,12 +60,12 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 				{
 					if (collidedBits & 1)
 					{
-						GlobalCollisionBounds.X1 = spherePtr->Center.x - spherePtr->Radius - item->Pose.Position.x;
-						GlobalCollisionBounds.X2 = spherePtr->Center.x + spherePtr->Radius - item->Pose.Position.x;
-						GlobalCollisionBounds.Y1 = spherePtr->Center.y - spherePtr->Radius - item->Pose.Position.y;
-						GlobalCollisionBounds.Y2 = spherePtr->Center.y + spherePtr->Radius - item->Pose.Position.y;
-						GlobalCollisionBounds.Z1 = spherePtr->Center.z - spherePtr->Radius - item->Pose.Position.z;
-						GlobalCollisionBounds.Z2 = spherePtr->Center.z + spherePtr->Radius - item->Pose.Position.z;
+						GlobalCollisionBounds.X1 = sphere->Center.x - sphere->Radius - item->Pose.Position.x;
+						GlobalCollisionBounds.X2 = sphere->Center.x + sphere->Radius - item->Pose.Position.x;
+						GlobalCollisionBounds.Y1 = sphere->Center.y - sphere->Radius - item->Pose.Position.y;
+						GlobalCollisionBounds.Y2 = sphere->Center.y + sphere->Radius - item->Pose.Position.y;
+						GlobalCollisionBounds.Z1 = sphere->Center.z - sphere->Radius - item->Pose.Position.z;
+						GlobalCollisionBounds.Z2 = sphere->Center.z + sphere->Radius - item->Pose.Position.z;
 
 						int x = laraItem->Pose.Position.x;
 						int y = laraItem->Pose.Position.y;
@@ -98,7 +98,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 					deadlyBits >>= 1;
 
 					sphereIndex++;
-					spherePtr = &spheres[sphereIndex];
+					sphere = &spheres[sphereIndex];
 				}
 			}
 		}

@@ -409,14 +409,14 @@ namespace TEN::Renderer
 		return _meshes[meshIndex];
 	}
 
-	std::vector<BoundingSphere> Renderer::GetSpheres(int itemNumber, int flags, const Matrix& localMatrix)
+	std::vector<BoundingSphere> Renderer::GetSpheres(int itemNumber)
 	{
-		const auto* nativeItemPtr = &g_Level.Items[itemNumber];
-		if (nativeItemPtr == nullptr)
-			return {};
-
 		auto& itemToDraw = _items[itemNumber];
 		itemToDraw.ItemNumber = itemNumber;
+
+		const auto* nativeItem = &g_Level.Items[itemNumber];
+		if (nativeItem == nullptr)
+			return {};
 
 		if (!itemToDraw.DoneAnimations)
 		{
@@ -430,18 +430,11 @@ namespace TEN::Renderer
 			}
 		}
 
-		auto worldMatrix = Matrix::Identity;
-		if (flags & (int)SphereSpaceFlags::World)
-		{
-			worldMatrix = Matrix::CreateTranslation(nativeItemPtr->Pose.Position.ToVector3()) * localMatrix;
-		}
-		else
-		{
-			worldMatrix = Matrix::Identity * localMatrix;
-		}
-		worldMatrix = nativeItemPtr->Pose.Orientation.ToRotationMatrix() * worldMatrix;
+		auto translationMatrix = Matrix::CreateTranslation(nativeItem->Pose.Position.ToVector3());
+		auto rotMatrix = nativeItem->Pose.Orientation.ToRotationMatrix();
+		auto worldMatrix = rotMatrix * translationMatrix;
 
-		const auto& moveable = GetRendererObject(nativeItemPtr->ObjectNumber);
+		const auto& moveable = GetRendererObject(nativeItem->ObjectNumber);
 
 		// Collect spheres.
 		auto spheres = std::vector<BoundingSphere>{};
@@ -449,18 +442,11 @@ namespace TEN::Renderer
 		{
 			const auto& mesh = *moveable.ObjectMeshes[i];
 
-			auto relCenter = Vector3(mesh.Sphere.Center);
-			if (flags & (int)SphereSpaceFlags::BoneOrigin)
-				relCenter += moveable.LinearizedBones[i]->Translation;
+			const auto& translationMatrix = itemToDraw.AnimationTransforms[i];
+			auto pos = Vector3::Transform(mesh.Sphere.Center, translationMatrix * worldMatrix);
 
-			const auto& tMatrix = itemToDraw.AnimationTransforms[i];
-			auto pos = Vector3::Transform(relCenter, tMatrix * worldMatrix);
-
-			// Add sphere.
 			auto sphere = BoundingSphere(pos, mesh.Sphere.Radius);
 			spheres.push_back(sphere);
-
-			DrawDebugSphere(sphere, Color(1, 1, 1));
 		}
 		
 		return spheres;
