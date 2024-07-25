@@ -5,39 +5,40 @@ namespace TEN::Renderer::Structures
 {
 	struct RendererSpriteSequence
 	{
-		int Id;
-		std::vector<RendererSprite*> SpritesList;
-		int NumSprites;
+		int ID	  = 0;
+		int Count = 0;
+		std::vector<RendererSprite*> Sprites = {};
 
 		RendererSpriteSequence()
 		{
-			Id = 0;
-			NumSprites = 0;
+			ID = 0;
+			Count = 0;
 		}
 
-		RendererSpriteSequence(int id, int num)
+		RendererSpriteSequence(int id, int count)
 		{
-			Id = id;
-			NumSprites = num;
-			SpritesList = std::vector<RendererSprite*>(NumSprites);
+			ID = id;
+			Count = count;
+			Sprites = std::vector<RendererSprite*>(Count);
 		}
 
-		RendererSpriteSequence(const RendererSpriteSequence& rhs)
+		RendererSpriteSequence(const RendererSpriteSequence& spriteSeq)
 		{
-			Id = rhs.Id;
-			NumSprites = rhs.NumSprites;
-			SpritesList = rhs.SpritesList;
+			ID = spriteSeq.ID;
+			Count = spriteSeq.Count;
+			Sprites = spriteSeq.Sprites;
 		}
 
-		RendererSpriteSequence& operator=(const RendererSpriteSequence& other)
+		RendererSpriteSequence& operator=(const RendererSpriteSequence& spriteSeq)
 		{
-			if (this != &other)
+			if (this != &spriteSeq)
 			{
-				Id = other.Id;
-				NumSprites = other.NumSprites;
-				SpritesList = std::vector<RendererSprite*>(NumSprites);
-				std::copy(other.SpritesList.begin(), other.SpritesList.end(), back_inserter(SpritesList));
+				ID = spriteSeq.ID;
+				Count = spriteSeq.Count;
+				Sprites = std::vector<RendererSprite*>(Count);
+				std::copy(spriteSeq.Sprites.begin(), spriteSeq.Sprites.end(), back_inserter(Sprites));
 			}
+
 			return *this;
 		}
 	};

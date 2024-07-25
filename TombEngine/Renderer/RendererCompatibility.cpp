@@ -473,9 +473,9 @@ namespace TEN::Renderer
 
 		totalVertices = 0;
 		totalIndices = 0;
-		for (int i = 0; i < MoveablesIds.size(); i++)
+		for (int i = 0; i < MoveableAssetIds.size(); i++)
 		{
-			int objNum = MoveablesIds[i];
+			int objNum = MoveableAssetIds[i];
 			ObjectInfo* obj = &Objects[objNum];
 
 			for (int j = 0; j < obj->nmeshes; j++)
@@ -494,16 +494,16 @@ namespace TEN::Renderer
 
 		lastVertex = 0;
 		lastIndex = 0;
-		for (int i = 0; i < MoveablesIds.size(); i++)
+		for (int i = 0; i < MoveableAssetIds.size(); i++)
 		{
-			int objNum = MoveablesIds[i];
+			int objNum = MoveableAssetIds[i];
 			ObjectInfo *obj = &Objects[objNum];
 
 			if (obj->nmeshes > 0)
 			{
-				_moveableObjects[MoveablesIds[i]] = RendererObject();
-				RendererObject &moveable = *_moveableObjects[MoveablesIds[i]];
-				moveable.Id = MoveablesIds[i];
+				_moveableObjects[MoveableAssetIds[i]] = RendererObject();
+				RendererObject &moveable = *_moveableObjects[MoveableAssetIds[i]];
+				moveable.Id = MoveableAssetIds[i];
 				moveable.DoNotDraw = (obj->drawRoutine == nullptr);
 				moveable.ShadowType = obj->shadowType;
 													   
@@ -515,8 +515,8 @@ namespace TEN::Renderer
 					RendererMesh *mesh = GetRendererMeshFromTrMesh(
 						&moveable,
 						&g_Level.Meshes[obj->meshIndex + j],
-						j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
-						MoveablesIds[i] == ID_HAIR, &lastVertex, &lastIndex);
+						j, MoveableAssetIds[i] == ID_LARA_SKIN_JOINTS,
+						MoveableAssetIds[i] == ID_HAIR, &lastVertex, &lastIndex);
 
 					moveable.ObjectMeshes.push_back(mesh);
 					_meshes.push_back(mesh);
@@ -619,7 +619,7 @@ namespace TEN::Renderer
 					BuildHierarchy(&moveable);
 
 					// Fix player skin joints and hair units.
-					if (MoveablesIds[i] == ID_LARA_SKIN_JOINTS)
+					if (MoveableAssetIds[i] == ID_LARA_SKIN_JOINTS)
 					{
 						isSkinPresent = true;
 						int bonesToCheck[2] = { 0, 0 };
@@ -687,7 +687,7 @@ namespace TEN::Renderer
 							}
 						}
 					}
-					else if (MoveablesIds[i] == ID_HAIR && isSkinPresent)
+					else if (MoveableAssetIds[i] == ID_HAIR && isSkinPresent)
 					{
 						for (int j = 0; j < obj->nmeshes; j++)
 						{
@@ -796,9 +796,9 @@ namespace TEN::Renderer
 
 		totalVertices = 0;
 		totalIndices = 0;
-		for (int i = 0; i < StaticObjectsIds.size(); i++)
+		for (int i = 0; i < StaticAssetIds.size(); i++)
 		{
-			auto staticID = (GAME_OBJECT_ID)StaticObjectsIds[i];
+			auto staticID = (GAME_OBJECT_ID)StaticAssetIds[i];
 			const auto& staticObj = GetStaticAsset(staticID);
 			const auto& mesh = g_Level.Meshes[staticObj.meshNumber];
 
@@ -814,23 +814,23 @@ namespace TEN::Renderer
 
 		lastVertex = 0;
 		lastIndex = 0;
-		for (int i = 0; i < StaticObjectsIds.size(); i++)
+		for (int i = 0; i < StaticAssetIds.size(); i++)
 		{
-			auto staticAssetID = (GAME_OBJECT_ID)StaticObjectsIds[i];
+			auto staticAssetID = (GAME_OBJECT_ID)StaticAssetIds[i];
 			const auto& staticAsset = GetStaticAsset(staticAssetID);
 
 			_staticObjects[staticAssetID] = RendererObject();
-			auto& staticObject = *_staticObjects[staticAssetID];
+			auto& staticObj = *_staticObjects[staticAssetID];
 
-			staticObject.Type = 1;
-			staticObject.Id = staticAssetID;
+			staticObj.Type = 1;
+			staticObj.Id = staticAssetID;
 
-			auto& mesh = *GetRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[staticAsset.meshNumber], 0, false, false, &lastVertex, &lastIndex);
+			auto& mesh = *GetRendererMeshFromTrMesh(&staticObj, &g_Level.Meshes[staticAsset.meshNumber], 0, false, false, &lastVertex, &lastIndex);
 
-			staticObject.ObjectMeshes.push_back(&mesh);
+			staticObj.ObjectMeshes.push_back(&mesh);
 			_meshes.push_back(&mesh);
 
-			_staticObjects[staticAssetID] = staticObject;
+			_staticObjects[staticAssetID] = staticObj;
 		}
 
 		_staticsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_staticsVertices.size(), _staticsVertices.data());
@@ -838,64 +838,61 @@ namespace TEN::Renderer
 
 		TENLog("Preparing sprite data...", LogLevel::Info);
 		
-		// Step 5: prepare sprites
+		// Step 5: Prepare sprites.
 		_sprites.resize(g_Level.Sprites.size());
 
 		for (int i = 0; i < g_Level.Sprites.size(); i++)
 		{
-			SPRITE *oldSprite = &g_Level.Sprites[i];
-			_sprites[i] = RendererSprite();
-			RendererSprite &sprite = _sprites[i];
+			const auto& legacySprite = g_Level.Sprites[i];
 
-			sprite.UV[0] = Vector2(oldSprite->x1, oldSprite->y1);
-			sprite.UV[1] = Vector2(oldSprite->x2, oldSprite->y2);
-			sprite.UV[2] = Vector2(oldSprite->x3, oldSprite->y3);
-			sprite.UV[3] = Vector2(oldSprite->x4, oldSprite->y4);
-			sprite.Texture = &_spritesTextures[oldSprite->tile];
-			sprite.Width = round((oldSprite->x2 - oldSprite->x1) * (float)sprite.Texture->Width + 1.0f);
-			sprite.Height = round((oldSprite->y3 - oldSprite->y2) * (float)sprite.Texture->Height + 1.0f);
-			sprite.X = oldSprite->x1 * sprite.Texture->Width;
-			sprite.Y = oldSprite->y1 * sprite.Texture->Height;
+			_sprites[i] = RendererSprite();
+
+			auto& sprite = _sprites[i];
+			sprite.UV[0] = Vector2(legacySprite.x1, legacySprite.y1);
+			sprite.UV[1] = Vector2(legacySprite.x2, legacySprite.y2);
+			sprite.UV[2] = Vector2(legacySprite.x3, legacySprite.y3);
+			sprite.UV[3] = Vector2(legacySprite.x4, legacySprite.y4);
+			sprite.Texture = &_spritesTextures[legacySprite.tile];
+			sprite.Width = round(((legacySprite.x2 - legacySprite.x1) * sprite.Texture->Width) + 1.0f);
+			sprite.Height = round(((legacySprite.y3 - legacySprite.y2) * sprite.Texture->Height) + 1.0f);
+			sprite.X = legacySprite.x1 * sprite.Texture->Width;
+			sprite.Y = legacySprite.y1 * sprite.Texture->Height;
 		}
 
-		for (int i = 0; i < SpriteSequencesIds.size(); i++)
+		for (int i = 0; i < SpriteSequenceAssetIds.size(); i++)
 		{
-			ObjectInfo *obj = &Objects[SpriteSequencesIds[i]];
+			const auto& asset = GetSpriteSeqAsset((GAME_OBJECT_ID)SpriteSequenceAssetIds[i]);
 
-			if (obj->nmeshes < 0)
+			if (asset.SpriteCount < 0)
 			{
-				short numSprites = abs(obj->nmeshes);
-				short baseSprite = obj->meshIndex;
-				_spriteSequences[SpriteSequencesIds[i]] = RendererSpriteSequence();
+				int spriteCount = asset.SpriteCount;
+				int startIndex = asset.StartIndex;
+				_spriteSequences[SpriteSequenceAssetIds[i]] = RendererSpriteSequence();
 
 				// TODO: Why a custom =& operator is needed? It creates everytime new N null sprites
-				RendererSpriteSequence &sequence = _spriteSequences[SpriteSequencesIds[i]];
+				auto &rendererSpriteSeq = _spriteSequences[SpriteSequenceAssetIds[i]];
 
-				sequence.NumSprites = numSprites;
-				sequence.SpritesList.resize(numSprites);
-				for (int j = baseSprite; j < baseSprite + numSprites; j++)
-				{
-					sequence.SpritesList[j - baseSprite] = &_sprites[j];
-				}
+				rendererSpriteSeq.Count = spriteCount;
+				rendererSpriteSeq.Sprites.resize(spriteCount);
+				for (int j = startIndex; j < startIndex + spriteCount; j++)
+					rendererSpriteSeq.Sprites[j - startIndex] = &_sprites[j];
 
-				_spriteSequences[SpriteSequencesIds[i]] = sequence;
+				_spriteSequences[SpriteSequenceAssetIds[i]] = rendererSpriteSeq;
 
-				if (SpriteSequencesIds[i] == ID_CAUSTICS_TEXTURES)
+				if (SpriteSequenceAssetIds[i] == ID_CAUSTICS_TEXTURES)
 				{
 					_causticTextures.clear();
-					for (int j = 0; j < sequence.SpritesList.size(); j++)
+					for (int j = 0; j < rendererSpriteSeq.Sprites.size(); j++)
 					{
 						_causticTextures.push_back(
 							Texture2D(
 								_device.Get(),
 								_context.Get(),
-								sequence.SpritesList[j]->Texture->Texture.Get(),
-								sequence.SpritesList[j]->X,
-								sequence.SpritesList[j]->Y,
-								sequence.SpritesList[j]->Width,
-								sequence.SpritesList[j]->Height
-							)
-						);
+								rendererSpriteSeq.Sprites[j]->Texture->Texture.Get(),
+								rendererSpriteSeq.Sprites[j]->X,
+								rendererSpriteSeq.Sprites[j]->Y,
+								rendererSpriteSeq.Sprites[j]->Width,
+								rendererSpriteSeq.Sprites[j]->Height));
 					}
 				}
 			}

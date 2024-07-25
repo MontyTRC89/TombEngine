@@ -227,5 +227,15 @@ const StaticAsset& GetStaticAsset(GAME_OBJECT_ID id)
 		return it->second;
 
 	TENLog("GetStaticAsset(): ID " + std::to_string(id) + " out of range. Returning static asset 0.");
-	return g_Level.StaticAssets[(GAME_OBJECT_ID)0];
+	return g_Level.StaticAssets.begin()->second;
+}
+
+const SpriteSequenceAsset& GetSpriteSeqAsset(GAME_OBJECT_ID id)
+{
+	auto it = g_Level.SpriteSequenceAssets.find(id);
+	if (it != g_Level.SpriteSequenceAssets.end())
+		return it->second;
+
+	TENLog("GetSpriteSeqAssetsAsset(): ID " + std::to_string(id) + " out of range. Returning sprite sequence asset 0.");
+	return g_Level.SpriteSequenceAssets.begin()->second;
 }

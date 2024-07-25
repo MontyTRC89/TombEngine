@@ -79,9 +79,10 @@ const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 };
 
 char* LevelDataPtr;
-std::vector<int> MoveablesIds;
-std::vector<int> StaticObjectsIds;
-std::vector<int> SpriteSequencesIds;
+
+std::vector<int> MoveableAssetIds;
+std::vector<int> StaticAssetIds;
+std::vector<int> SpriteSequenceAssetIds;
 LEVEL g_Level;
 
 unsigned char ReadUInt8()
@@ -418,7 +419,7 @@ void LoadAssets()
 	for (int i = 0; i < movAssetCount; i++)
 	{
 		int id = (GAME_OBJECT_ID)ReadInt32();
-		MoveablesIds.push_back(id);
+		MoveableAssetIds.push_back(id);
 		auto& asset = Objects[id];
 
 		asset.ID = id;
@@ -435,7 +436,7 @@ void LoadAssets()
 	InitializeAssets();
 
 	int staticAssetCount = ReadInt32();
-	TENLog("Static asssets: " + std::to_string(staticAssetCount), LogLevel::Info);
+	TENLog("Static assets: " + std::to_string(staticAssetCount), LogLevel::Info);
 	for (int i = 0; i < staticAssetCount; i++)
 	{
 		auto id = (GAME_OBJECT_ID)ReadInt32();
@@ -448,7 +449,7 @@ void LoadAssets()
 			id = (GAME_OBJECT_ID)0;
 		}
 
-		StaticObjectsIds.push_back(id);
+		StaticAssetIds.push_back(id);
 		auto& asset = g_Level.StaticAssets[id];
 
 		asset.ID = id;
@@ -950,8 +951,8 @@ void FreeLevel()
 	g_Level.Rooms.resize(0);
 	g_Level.Bones.resize(0);
 	g_Level.Meshes.resize(0);
-	MoveablesIds.resize(0);
-	SpriteSequencesIds.resize(0);
+	MoveableAssetIds.resize(0);
+	SpriteSequenceAssetIds.resize(0);
 	g_Level.PathfindingBoxes.resize(0);
 	g_Level.Overlaps.resize(0);
 	g_Level.Anims.resize(0);
@@ -1422,47 +1423,46 @@ bool LoadLevelFile(int levelIndex)
 
 void LoadSprites()
 {
-	int numSprites = ReadInt32();
-	g_Level.Sprites.resize(numSprites);
+	int spriteCount = ReadInt32();
+	g_Level.Sprites.resize(spriteCount);
 
-	TENLog("Num sprites: " + std::to_string(numSprites), LogLevel::Info);
+	TENLog("Sprites: " + std::to_string(spriteCount), LogLevel::Info);
 
-	for (int i = 0; i < numSprites; i++)
+	for (int i = 0; i < spriteCount; i++)
 	{
-		auto* spr = &g_Level.Sprites[i];
-		spr->tile = ReadInt32();
-		spr->x1 = ReadFloat();
-		spr->y1 = ReadFloat();
-		spr->x2 = ReadFloat();
-		spr->y2 = ReadFloat();
-		spr->x3 = ReadFloat();
-		spr->y3 = ReadFloat();
-		spr->x4 = ReadFloat();
-		spr->y4 = ReadFloat();
+		auto& sprite = g_Level.Sprites[i];
+		sprite.tile = ReadInt32();
+		sprite.x1 = ReadFloat();
+		sprite.y1 = ReadFloat();
+		sprite.x2 = ReadFloat();
+		sprite.y2 = ReadFloat();
+		sprite.x3 = ReadFloat();
+		sprite.y3 = ReadFloat();
+		sprite.x4 = ReadFloat();
+		sprite.y4 = ReadFloat();
 	}
 
-	int numSequences = ReadInt32();
-
-	TENLog("Num sprite sequences: " + std::to_string(numSequences), LogLevel::Info);
-
-	for (int i = 0; i < numSequences; i++)
+	int spriteSeqAssetCount = ReadInt32();
+	TENLog("Sprite sequence assets: " + std::to_string(spriteSeqAssetCount), LogLevel::Info);
+	for (int i = 0; i < spriteSeqAssetCount; i++)
 	{
-		int spriteID = ReadInt32();
-		short negLength = ReadInt16();
-		short offset = ReadInt16();
+		auto id = (GAME_OBJECT_ID)ReadInt32();
+		int spriteCount = abs(ReadInt16()); // NOTE: Value is negative.
+		int startIndex = ReadInt16();
 
-		if (spriteID >= ID_NUMBER_OBJECTS)
-		{
-			g_Level.StaticAssets[GAME_OBJECT_ID(spriteID - ID_NUMBER_OBJECTS)].meshNumber = offset;
-		}
-		else
-		{
-			Objects[spriteID].nmeshes = negLength;
-			Objects[spriteID].meshIndex = offset;
-			Objects[spriteID].loaded = true;
+		// TODO: Handle error.
+		if (id < ID_HORIZON || id >= ID_NUMBER_OBJECTS)
+			continue;
 
-			SpriteSequencesIds.push_back(spriteID);
-		}
+		SpriteSequenceAssetIds.push_back(id);
+		auto& asset = g_Level.SpriteSequenceAssets[id];
+
+		asset.ID = id;
+		asset.SpriteCount = spriteCount;
+		asset.StartIndex = startIndex;
+		asset.IsLoaded = true;
+
+		SpriteSequenceAssetIds.push_back(id);
 	}
 }
 

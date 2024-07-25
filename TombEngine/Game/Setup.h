@@ -72,8 +72,6 @@ struct ObjectInfo
 {
 	int ID = 0;
 
-	bool loaded = false; // IsLoaded
-
 	int nmeshes; // BoneCount, SpriteCount
 	int meshIndex; // Base index in g_Level.Meshes.
 	int boneIndex; // Base index in g_Level.Bones.
@@ -106,6 +104,8 @@ struct ObjectInfo
 	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine = nullptr;
 	std::function<void(ItemInfo* item)> drawRoutine = nullptr;
 
+	bool loaded = false; // IsLoaded
+
 	void SetBoneRotationFlags(int boneID, int flags);
 	void SetHitEffect(HitEffect hitEffect);
 	void SetHitEffect(bool isSolid = false, bool isAlive = false);
@@ -125,11 +125,15 @@ struct StaticAsset
 	int flags = 0;
 };
 
-// TODO
-/*struct SpriteAsset
+struct SpriteSequenceAsset
 {
 	int ID = 0;
-};*/
+
+	int SpriteCount = 0;
+	int StartIndex	= 0;
+
+	bool IsLoaded = false;
+};
 
 class ObjectHandler
 {
@@ -152,5 +156,6 @@ void InitializeGameFlags();
 void InitializeSpecialEffects();
 void InitializeAssets();
 
-const ObjectInfo&  GetMoveableAsset(GAME_OBJECT_ID id);
-const StaticAsset& GetStaticAsset(GAME_OBJECT_ID id);
+const ObjectInfo&		   GetMoveableAsset(GAME_OBJECT_ID id);
+const StaticAsset&		   GetStaticAsset(GAME_OBJECT_ID id);
+const SpriteSequenceAsset& GetSpriteSeqAsset(GAME_OBJECT_ID id);

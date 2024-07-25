@@ -21,6 +21,7 @@ struct LEB128;
 struct OVERLAP;
 struct SampleInfo;
 struct SinkInfo;
+struct SpriteSequenceAsset;
 struct StaticAsset;
 
 constexpr auto STATIC_ASSET_COUNT_MAX = 1000;
@@ -98,7 +99,8 @@ struct LEVEL
 	std::vector<ItemInfo> Items	   = {}; // Moveables
 	std::vector<MESH>	  Meshes   = {}; // TODO: Contain in MoveableAsset and StaticAsset.
 	std::vector<int>	  Bones	   = {}; // TODO: Contain in MoveableAsset.
-	std::unordered_map<GAME_OBJECT_ID, StaticAsset> StaticAssets = {};
+	std::unordered_map<GAME_OBJECT_ID, StaticAsset>			StaticAssets		 = {};
+	std::unordered_map<GAME_OBJECT_ID, SpriteSequenceAsset> SpriteSequenceAssets = {};
 
 	// Animation data
 
@@ -148,9 +150,9 @@ struct LEVEL
 
 extern const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS;
 
-extern std::vector<int> MoveablesIds;
-extern std::vector<int> StaticObjectsIds;
-extern std::vector<int> SpriteSequencesIds;
+extern std::vector<int> MoveableAssetIds;
+extern std::vector<int> StaticAssetIds;
+extern std::vector<int> SpriteSequenceAssetIds;
 extern LEVEL g_Level;
 
 inline std::future<bool> LevelLoadTask;
