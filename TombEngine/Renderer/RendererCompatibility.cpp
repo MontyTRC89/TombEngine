@@ -861,12 +861,12 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < SpriteSequenceAssetIds.size(); i++)
 		{
-			const auto& asset = GetSpriteSeqAsset((GAME_OBJECT_ID)SpriteSequenceAssetIds[i]);
+			const auto& spriteSeqAsset = GetSpriteSequenceAsset((GAME_OBJECT_ID)SpriteSequenceAssetIds[i]);
 
-			if (asset.SpriteCount < 0)
+			if (spriteSeqAsset.SpriteCount < 0)
 			{
-				int spriteCount = asset.SpriteCount;
-				int startIndex = asset.StartIndex;
+				int spriteCount = spriteSeqAsset.SpriteCount;
+				int startIndex = spriteSeqAsset.StartIndex;
 				_spriteSequences[SpriteSequenceAssetIds[i]] = RendererSpriteSequence();
 
 				// TODO: Why a custom =& operator is needed? It creates everytime new N null sprites

@@ -230,7 +230,7 @@ const StaticAsset& GetStaticAsset(GAME_OBJECT_ID id)
 	return g_Level.StaticAssets.begin()->second;
 }
 
-const SpriteSequenceAsset& GetSpriteSeqAsset(GAME_OBJECT_ID id)
+const SpriteSequenceAsset& GetSpriteSequenceAsset(GAME_OBJECT_ID id)
 {
 	auto it = g_Level.SpriteSequenceAssets.find(id);
 	if (it != g_Level.SpriteSequenceAssets.end())

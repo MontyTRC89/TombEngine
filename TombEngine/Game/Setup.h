@@ -158,4 +158,4 @@ void InitializeAssets();
 
 const ObjectInfo&		   GetMoveableAsset(GAME_OBJECT_ID id);
 const StaticAsset&		   GetStaticAsset(GAME_OBJECT_ID id);
-const SpriteSequenceAsset& GetSpriteSeqAsset(GAME_OBJECT_ID id);
+const SpriteSequenceAsset& GetSpriteSequenceAsset(GAME_OBJECT_ID id);

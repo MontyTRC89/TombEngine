@@ -34,6 +34,7 @@
 #include "Specific/level.h"
 #include "Structures/RendererSpriteBucket.h"
 
+using namespace TEN::Effects;
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
@@ -198,7 +199,7 @@ namespace TEN::Renderer
 					direction.Normalize();
 
 					AddSpriteBillboardConstrained(
-						&_sprites[GetSpriteSeqAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_LIGHTHING],
+						&_sprites[GetSpriteSequenceAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_LIGHTHING],
 						center,
 						color,
 						PI_DIV_2, 1.0f, Vector2(5 * 8.0f, Vector3::Distance(origin, target)), BlendMode::Additive, direction, true, view);							
@@ -264,7 +265,7 @@ namespace TEN::Renderer
 					}
 
 					AddSpriteBillboardConstrained(
-						&_sprites[GetSpriteSeqAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_LIGHTHING],
+						&_sprites[GetSpriteSequenceAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_LIGHTHING],
 						center,
 						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
 						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BlendMode::Additive, direction, true, view);
@@ -416,7 +417,7 @@ namespace TEN::Renderer
 				axis.Normalize();
 
 				AddSpriteBillboardConstrained(
-					&_sprites[GetSpriteSeqAsset(ID_SPARK_SPRITE).StartIndex],
+					&_sprites[GetSpriteSequenceAsset(ID_SPARK_SPRITE).StartIndex],
 					pos,
 					Vector4(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
 					TO_RAD(particle.rotAng << 4),
@@ -484,7 +485,7 @@ namespace TEN::Renderer
 				x2Outer += splash.x;
 				z2Outer = outerRadius * cos(alpha * j * PI / 180);
 				z2Outer += splash.z;
-				AddQuad(&_sprites[GetSpriteSeqAsset(ID_DEFAULT_SPRITES).StartIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
+				AddQuad(&_sprites[GetSpriteSequenceAsset(ID_DEFAULT_SPRITES).StartIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
 							Vector3(xOuter, yOuter, zOuter), 
 							Vector3(x2Outer, yOuter, z2Outer), 
 							Vector3(x2Inner, yInner, z2Inner), 
@@ -508,7 +509,7 @@ namespace TEN::Renderer
 				continue;
 
 			AddSpriteBillboard(
-				&_sprites[GetSpriteSeqAsset(ID_DEFAULT_SPRITES).StartIndex + bubble.SpriteIndex],
+				&_sprites[GetSpriteSequenceAsset(ID_DEFAULT_SPRITES).StartIndex + bubble.SpriteIndex],
 				bubble.Position,
 				bubble.Color, 0.0f, 1.0f, bubble.Size / 2, BlendMode::Additive, true, view);
 		}
@@ -531,7 +532,7 @@ namespace TEN::Renderer
 			drip.Velocity.Normalize(axis);
 
 			AddSpriteBillboardConstrained(
-				&_sprites[GetSpriteSeqAsset(ID_DRIP_SPRITE).StartIndex],
+				&_sprites[GetSpriteSequenceAsset(ID_DRIP_SPRITE).StartIndex],
 				drip.Position,
 				drip.Color, 0.0f, 1.0f, drip.Size, BlendMode::Additive, -axis, false, view);
 		}
@@ -709,7 +710,7 @@ namespace TEN::Renderer
 				{
 					angle -= PI / 8.0f;
 
-					AddQuad(&_sprites[GetSpriteSeqAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_SPLASH],
+					AddQuad(&_sprites[GetSpriteSequenceAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_SPLASH],
 						pos + p1,
 						pos + p2,
 						pos + p3,
@@ -725,7 +726,7 @@ namespace TEN::Renderer
 				{
 					angle -= PI / 4.0f;
 
-					AddQuad(&_sprites[GetSpriteSeqAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_SPLASH3],
+					AddQuad(&_sprites[GetSpriteSequenceAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_SPLASH3],
 						pos + p1,
 						pos + p2,
 						pos + p3,
@@ -742,7 +743,7 @@ namespace TEN::Renderer
 				{
 					angle -= PI / 4.0f;
 
-					AddQuad(&_sprites[GetSpriteSeqAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_SPLASH3],
+					AddQuad(&_sprites[GetSpriteSequenceAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_SPLASH3],
 						pos + p4,
 						pos + p3,
 						pos + p2,
@@ -772,7 +773,7 @@ namespace TEN::Renderer
 				if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Blood rendering"))
 					return;
 
-				AddSpriteBillboard(&_sprites[GetSpriteSeqAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_BLOOD],
+				AddSpriteBillboard(&_sprites[GetSpriteSequenceAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_BLOOD],
 								   Vector3(blood->x, blood->y, blood->z),
 								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
 								   TO_RAD(blood->rotAng << 4), 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
@@ -798,7 +799,7 @@ namespace TEN::Renderer
 					return;
 
 				AddSpriteBillboard(
-					&_sprites[GetSpriteSeqAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_UNDERWATERDUST],
+					&_sprites[GetSpriteSequenceAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_UNDERWATERDUST],
 					p.Position,
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(p.Size),
@@ -812,7 +813,7 @@ namespace TEN::Renderer
 					return;
 
 				AddSpriteBillboard(
-					&_sprites[GetSpriteSeqAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_UNDERWATERDUST],
+					&_sprites[GetSpriteSequenceAsset(ID_DEFAULT_SPRITES).StartIndex + SPR_UNDERWATERDUST],
 					p.Position,
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(p.Size),
@@ -829,7 +830,7 @@ namespace TEN::Renderer
 				p.Velocity.Normalize(v);
 
 				AddSpriteBillboardConstrained(
-					&_sprites[GetSpriteSeqAsset(ID_DRIP_SPRITE).StartIndex], 
+					&_sprites[GetSpriteSequenceAsset(ID_DRIP_SPRITE).StartIndex], 
 					p.Position,
 					Vector4(0.8f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(RAIN_WIDTH, p.Size), BlendMode::Additive, -v, true, view);
@@ -906,7 +907,7 @@ namespace TEN::Renderer
 
 			// Use MP5 flash if available.
 			auto gunflash = GAME_OBJECT_ID::ID_GUN_FLASH;
-			if (Lara.Control.Weapon.GunType == LaraWeaponType::HK && GetSpriteSeqAsset(GAME_OBJECT_ID::ID_GUN_FLASH2).IsLoaded)
+			if (Lara.Control.Weapon.GunType == LaraWeaponType::HK && GetSpriteSequenceAsset(GAME_OBJECT_ID::ID_GUN_FLASH2).IsLoaded)
 			{
 				gunflash = GAME_OBJECT_ID::ID_GUN_FLASH2;
 				length += 20;
@@ -1301,7 +1302,7 @@ namespace TEN::Renderer
 			//	return;
 
 			AddSpriteBillboard(
-				&_sprites[GetSpriteSeqAsset(ID_SMOKE_SPRITES).StartIndex + smoke.sprite],
+				&_sprites[GetSpriteSequenceAsset(ID_SMOKE_SPRITES).StartIndex + smoke.sprite],
 				smoke.position,
 				smoke.color, smoke.rotation, 1.0f, { smoke.size, smoke.size }, BlendMode::AlphaBlend, true, view);
 		}
@@ -1329,7 +1330,7 @@ namespace TEN::Renderer
 			auto height = Lerp(1.0f, 0.0f, normalizedLife);
 			auto color = Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 
-			AddSpriteBillboardConstrained(&_sprites[GetSpriteSeqAsset(ID_SPARK_SPRITE).StartIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BlendMode::Additive, -v, false, view);
+			AddSpriteBillboardConstrained(&_sprites[GetSpriteSequenceAsset(ID_SPARK_SPRITE).StartIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BlendMode::Additive, -v, false, view);
 		}
 	}
 
@@ -1346,23 +1347,22 @@ namespace TEN::Renderer
 			if (!CheckIfSlotExists(ID_EXPLOSION_SPRITES, "Explosion particles rendering"))
 				return;
 
-			AddSpriteBillboard(&_sprites[GetSpriteSeqAsset(ID_EXPLOSION_SPRITES).StartIndex + e.sprite], 
+			AddSpriteBillboard(&_sprites[GetSpriteSequenceAsset(ID_EXPLOSION_SPRITES).StartIndex + e.sprite], 
 				e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BlendMode::Additive, true, view);
 		}
 	}
 
 	void Renderer::PrepareSimpleParticles(RenderView& view)
 	{
-		using namespace TEN::Effects;
-
-		for (SimpleParticle& s : simpleParticles)
+		for (const auto& part : simpleParticles)
 		{
-			if (!s.active) continue;
-
-			if (!CheckIfSlotExists(s.sequence, "Particle rendering"))
+			if (!part.active)
 				continue;
 
-			AddSpriteBillboard(&_sprites[GetSpriteSeqAsset(s.sequence).StartIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BlendMode::AlphaBlend, true, view);
+			if (!CheckIfSlotExists(part.sequence, "Particle rendering"))
+				continue;
+
+			AddSpriteBillboard(&_sprites[GetSpriteSequenceAsset(part.sequence).StartIndex + part.sprite], part.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { part.size, part.size / 2 }, BlendMode::AlphaBlend, true, view);
 		}
 	}
 }
