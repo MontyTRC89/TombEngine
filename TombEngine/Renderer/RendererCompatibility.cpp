@@ -26,9 +26,10 @@ namespace TEN::Renderer
 		_lastCullMode = CullMode::Unknown;
 		_lastDepthState = DepthState::Unknown;
 
-		_moveableObjects.resize(ID_NUMBER_OBJECTS);
-		_spriteSequences.resize(ID_NUMBER_OBJECTS);
-		_staticObjects.resize(STATIC_ASSET_COUNT_MAX);
+		// TODO: This is a lot of wasted space.
+		_moveableAssets.resize(ID_NUMBER_OBJECTS);
+		_staticAssets.resize(STATIC_ASSET_COUNT_MAX);
+		_spriteSequenceAssets.resize(ID_NUMBER_OBJECTS);
 		_rooms.resize(g_Level.Rooms.size());
 
 		_meshes.clear();
@@ -501,8 +502,8 @@ namespace TEN::Renderer
 
 			if (obj->nmeshes > 0)
 			{
-				_moveableObjects[MoveableAssetIds[i]] = RendererObject();
-				RendererObject &moveable = *_moveableObjects[MoveableAssetIds[i]];
+				_moveableAssets[MoveableAssetIds[i]] = RendererObject();
+				RendererObject &moveable = *_moveableAssets[MoveableAssetIds[i]];
 				moveable.Id = MoveableAssetIds[i];
 				moveable.DoNotDraw = (obj->drawRoutine == nullptr);
 				moveable.ShadowType = obj->shadowType;
@@ -819,8 +820,8 @@ namespace TEN::Renderer
 			auto staticAssetID = (GAME_OBJECT_ID)StaticAssetIds[i];
 			const auto& staticAsset = GetStaticAsset(staticAssetID);
 
-			_staticObjects[staticAssetID] = RendererObject();
-			auto& staticObj = *_staticObjects[staticAssetID];
+			_staticAssets[staticAssetID] = RendererObject();
+			auto& staticObj = *_staticAssets[staticAssetID];
 
 			staticObj.Type = 1;
 			staticObj.Id = staticAssetID;
@@ -830,7 +831,7 @@ namespace TEN::Renderer
 			staticObj.ObjectMeshes.push_back(&mesh);
 			_meshes.push_back(&mesh);
 
-			_staticObjects[staticAssetID] = staticObj;
+			_staticAssets[staticAssetID] = staticObj;
 		}
 
 		_staticsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_staticsVertices.size(), _staticsVertices.data());
@@ -863,37 +864,27 @@ namespace TEN::Renderer
 		{
 			const auto& spriteSeqAsset = GetSpriteSequenceAsset((GAME_OBJECT_ID)SpriteSequenceAssetIds[i]);
 
-			if (spriteSeqAsset.SpriteCount < 0)
+			auto &rendererSpriteSeq = _spriteSequenceAssets[SpriteSequenceAssetIds[i]];
+			rendererSpriteSeq.Sprites.resize(spriteSeqAsset.SpriteCount);
+			for (int j = 0; j < spriteSeqAsset.SpriteCount; j++)
+				rendererSpriteSeq.Sprites[j] = &_sprites[spriteSeqAsset.StartIndex + j];
+
+			_spriteSequenceAssets[SpriteSequenceAssetIds[i]] = rendererSpriteSeq;
+
+			if (SpriteSequenceAssetIds[i] == ID_CAUSTICS_TEXTURES)
 			{
-				int spriteCount = spriteSeqAsset.SpriteCount;
-				int startIndex = spriteSeqAsset.StartIndex;
-				_spriteSequences[SpriteSequenceAssetIds[i]] = RendererSpriteSequence();
-
-				// TODO: Why a custom =& operator is needed? It creates everytime new N null sprites
-				auto &rendererSpriteSeq = _spriteSequences[SpriteSequenceAssetIds[i]];
-
-				rendererSpriteSeq.Count = spriteCount;
-				rendererSpriteSeq.Sprites.resize(spriteCount);
-				for (int j = startIndex; j < startIndex + spriteCount; j++)
-					rendererSpriteSeq.Sprites[j - startIndex] = &_sprites[j];
-
-				_spriteSequences[SpriteSequenceAssetIds[i]] = rendererSpriteSeq;
-
-				if (SpriteSequenceAssetIds[i] == ID_CAUSTICS_TEXTURES)
+				_causticTextures.clear();
+				for (int j = 0; j < rendererSpriteSeq.Sprites.size(); j++)
 				{
-					_causticTextures.clear();
-					for (int j = 0; j < rendererSpriteSeq.Sprites.size(); j++)
-					{
-						_causticTextures.push_back(
-							Texture2D(
-								_device.Get(),
-								_context.Get(),
-								rendererSpriteSeq.Sprites[j]->Texture->Texture.Get(),
-								rendererSpriteSeq.Sprites[j]->X,
-								rendererSpriteSeq.Sprites[j]->Y,
-								rendererSpriteSeq.Sprites[j]->Width,
-								rendererSpriteSeq.Sprites[j]->Height));
-					}
+					_causticTextures.push_back(
+						Texture2D(
+							_device.Get(),
+							_context.Get(),
+							rendererSpriteSeq.Sprites[j]->Texture->Texture.Get(),
+							rendererSpriteSeq.Sprites[j]->X,
+							rendererSpriteSeq.Sprites[j]->Y,
+							rendererSpriteSeq.Sprites[j]->Width,
+							rendererSpriteSeq.Sprites[j]->Height));
 				}
 			}
 		}

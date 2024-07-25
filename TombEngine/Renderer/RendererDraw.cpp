@@ -126,11 +126,11 @@ namespace TEN::Renderer
 	void Renderer::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
 		// Doesn't cast shadow
-		if (_moveableObjects[item->ObjectNumber].value().ShadowType == ShadowMode::None)
+		if (_moveableAssets[item->ObjectNumber].value().ShadowType == ShadowMode::None)
 			return;
 
 		// Only render for Lara if such setting is active
-		if (g_Configuration.ShadowType == ShadowMode::Lara && _moveableObjects[item->ObjectNumber].value().ShadowType != ShadowMode::Lara)
+		if (g_Configuration.ShadowType == ShadowMode::Lara && _moveableAssets[item->ObjectNumber].value().ShadowType != ShadowMode::Lara)
 			return;
 
 		// No shadow light found
@@ -287,7 +287,7 @@ namespace TEN::Renderer
 
 		if (gunShellsCount > 0)
 		{
-			auto& moveableObject = *_moveableObjects[objectNumber];
+			auto& moveableObject = *_moveableAssets[objectNumber];
 
 			_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
 			_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
@@ -559,7 +559,7 @@ namespace TEN::Renderer
 				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-				RendererObject& moveableObj = *_moveableObjects[ID_RATS_EMITTER];
+				RendererObject& moveableObj = *_moveableAssets[ID_RATS_EMITTER];
 
 				_stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
 
@@ -682,7 +682,7 @@ namespace TEN::Renderer
 				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-				const auto& moveableObj = *_moveableObjects[ID_FISH_EMITTER];
+				const auto& moveableObj = *_moveableAssets[ID_FISH_EMITTER];
 
 				_stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
 
@@ -989,7 +989,7 @@ namespace TEN::Renderer
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
 			ObjectInfo* obj = &Objects[ID_LOCUSTS];
-			RendererObject& moveableObj = *_moveableObjects[ID_LOCUSTS];
+			RendererObject& moveableObj = *_moveableAssets[ID_LOCUSTS];
 
 			for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
 			{
@@ -1062,7 +1062,7 @@ namespace TEN::Renderer
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 				ObjectInfo* obj = &Objects[ID_LOCUSTS];
-				RendererObject& moveableObj = *_moveableObjects[ID_LOCUSTS];
+				RendererObject& moveableObj = *_moveableAssets[ID_LOCUSTS];
 
 				_stStatic.LightMode = (int)moveableObj.ObjectMeshes[0]->LightMode;
 
@@ -2017,12 +2017,12 @@ namespace TEN::Renderer
 			_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
 			// Draw horizon.
-			if (_moveableObjects[ID_HORIZON].has_value())
+			if (_moveableAssets[ID_HORIZON].has_value())
 			{
 				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-				auto& moveableObj = *_moveableObjects[ID_HORIZON];
+				auto& moveableObj = *_moveableAssets[ID_HORIZON];
 
 				_stStatic.World = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
 				_stStatic.Color = Vector4::One;
@@ -2248,7 +2248,7 @@ namespace TEN::Renderer
 		// Extremely hacky function to get first rendered face of a waterfall object mesh, calculate
 		// its texture height and scroll all the textures according to that height.
 
-		RendererObject& moveableObj = *_moveableObjects[item->ObjectNumber];
+		RendererObject& moveableObj = *_moveableAssets[item->ObjectNumber];
 
 		// No mesh or bucket, abort
 		if (!moveableObj.ObjectMeshes.size() || !moveableObj.ObjectMeshes[0]->Buckets.size())
@@ -2290,7 +2290,7 @@ namespace TEN::Renderer
 	{
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 		RendererRoom* room = &_rooms[item->RoomNumber];
-		RendererObject& moveableObj = *_moveableObjects[item->ObjectNumber];
+		RendererObject& moveableObj = *_moveableAssets[item->ObjectNumber];
 
 		// Bind item main properties
 		_stItem.World = item->World;
@@ -2426,7 +2426,7 @@ namespace TEN::Renderer
 				std::vector<RendererStatic*> statics = it->second;
 
 				RendererStatic* refStatic = statics[0];
-				RendererObject& refStaticObj = *_staticObjects[refStatic->ObjectNumber];
+				RendererObject& refStaticObj = *_staticAssets[refStatic->ObjectNumber];
 				if (refStaticObj.ObjectMeshes.size() == 0)
 					continue;
 
@@ -2504,7 +2504,7 @@ namespace TEN::Renderer
 				std::vector<RendererStatic*> statics = it->second;
 
 				RendererStatic* refStatic = statics[0];
-				RendererObject& refStaticObj = *_staticObjects[refStatic->ObjectNumber];
+				RendererObject& refStaticObj = *_staticAssets[refStatic->ObjectNumber];
 				if (refStaticObj.ObjectMeshes.size() == 0)
 					continue;
 
@@ -2803,12 +2803,12 @@ namespace TEN::Renderer
 		_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
 		// Draw horizon.
-		if (_moveableObjects[ID_HORIZON].has_value())
+		if (_moveableAssets[ID_HORIZON].has_value())
 		{
 			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			auto& moveableObj = *_moveableObjects[ID_HORIZON];
+			auto& moveableObj = *_moveableAssets[ID_HORIZON];
 
 			_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			_stStatic.Color = Vector4::One;
@@ -3312,7 +3312,7 @@ namespace TEN::Renderer
 
 		ItemInfo* nativeItem = &g_Level.Items[objectInfo->Item->ItemNumber];
 		RendererRoom* room = &_rooms[objectInfo->Item->RoomNumber];
-		RendererObject& moveableObj = *_moveableObjects[objectInfo->Item->ObjectNumber];
+		RendererObject& moveableObj = *_moveableAssets[objectInfo->Item->ObjectNumber];
 
 		// Bind item main properties
 		_stItem.World = objectInfo->Item->World;
@@ -3354,7 +3354,7 @@ namespace TEN::Renderer
 		_stStatic.World = objectInfo->Static->World;
 		_stStatic.Color = objectInfo->Static->Color;
 		_stStatic.AmbientLight = objectInfo->Room->AmbientLight;
-		_stStatic.LightMode = (int)_staticObjects[objectInfo->Static->ObjectNumber]->ObjectMeshes[0]->LightMode;
+		_stStatic.LightMode = (int)_staticAssets[objectInfo->Static->ObjectNumber]->ObjectMeshes[0]->LightMode;
 		BindStaticLights(objectInfo->Static->LightsToDraw);
 		_cbStatic.UpdateData(_stStatic, _context.Get());
 

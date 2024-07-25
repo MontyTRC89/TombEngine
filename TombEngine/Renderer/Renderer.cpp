@@ -33,8 +33,8 @@ namespace TEN::Renderer
 
 		ClearSceneItems();
 
-		_moveableObjects.resize(0);
-		_staticObjects.resize(0);
+		_moveableAssets.resize(0);
+		_staticAssets.resize(0);
 		_sprites.resize(0);
 		_rooms.resize(0);
 		_roomTextures.resize(0);

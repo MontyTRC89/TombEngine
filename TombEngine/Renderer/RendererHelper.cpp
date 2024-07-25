@@ -171,7 +171,7 @@ namespace TEN::Renderer
 		itemToDraw->DoneAnimations = true;
 
 		auto* obj = &Objects[nativeItem->ObjectNumber];
-		auto& moveableObj = *_moveableObjects[nativeItem->ObjectNumber];
+		auto& moveableObj = *_moveableAssets[nativeItem->ObjectNumber];
 
 		// Copy meshswaps
 		itemToDraw->MeshIndex = nativeItem->Model.MeshIndex;
@@ -392,14 +392,14 @@ namespace TEN::Renderer
 	{
 		if (id == GAME_OBJECT_ID::ID_LARA || id == GAME_OBJECT_ID::ID_LARA_SKIN)
 		{
-			if (_moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].has_value())
-				return _moveableObjects[GAME_OBJECT_ID::ID_LARA_SKIN].value();
+			if (_moveableAssets[GAME_OBJECT_ID::ID_LARA_SKIN].has_value())
+				return _moveableAssets[GAME_OBJECT_ID::ID_LARA_SKIN].value();
 			else
-				return _moveableObjects[GAME_OBJECT_ID::ID_LARA].value();
+				return _moveableAssets[GAME_OBJECT_ID::ID_LARA].value();
 		}
 		else
 		{
-			return _moveableObjects[id].value();
+			return _moveableAssets[id].value();
 		}
 	}
 
@@ -468,7 +468,7 @@ namespace TEN::Renderer
 	{
 		if (itemNumber == LaraItem->Index)
 		{
-			auto& object = *_moveableObjects[ID_LARA];
+			auto& object = *_moveableAssets[ID_LARA];
 			*outMatrix = object.AnimationTransforms[jointIndex] * _laraWorldMatrix;
 		}
 		else
@@ -478,7 +478,7 @@ namespace TEN::Renderer
 			auto* rendererItem = &_items[itemNumber];
 			auto* nativeItem = &g_Level.Items[itemNumber];
 
-			auto& obj = *_moveableObjects[nativeItem->ObjectNumber];
+			auto& obj = *_moveableAssets[nativeItem->ObjectNumber];
 			*outMatrix = obj.AnimationTransforms[jointIndex] * rendererItem->World;
 		}
 	}

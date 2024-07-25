@@ -759,7 +759,7 @@ namespace TEN::Renderer
 		auto viewMatrix = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, BLOCK(2)), Vector3::Zero, Vector3::Down);
 		auto projMatrix = Matrix::CreateOrthographic(_screenWidth, _screenHeight, -BLOCK(1), BLOCK(1));
 
-		auto& moveableObject = _moveableObjects[objectNumber];
+		auto& moveableObject = _moveableAssets[objectNumber];
 		if (!moveableObject)
 			return;
 

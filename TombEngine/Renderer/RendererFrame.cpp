@@ -343,12 +343,12 @@ namespace TEN::Renderer
 				continue;
 			}
 
-			if (!_moveableObjects[item->ObjectNumber].has_value())
+			if (!_moveableAssets[item->ObjectNumber].has_value())
 			{
 				continue;
 			}
 
-			auto& obj = _moveableObjects[item->ObjectNumber].value();
+			auto& obj = _moveableAssets[item->ObjectNumber].value();
 
 			if (obj.DoNotDraw)
 			{
@@ -423,10 +423,10 @@ namespace TEN::Renderer
 			if (!(nativeStatic.Flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
-			if (!_staticObjects[rStatic.ObjectNumber].has_value())
+			if (!_staticAssets[rStatic.ObjectNumber].has_value())
 				continue;
 
-			auto& rObject = *_staticObjects[rStatic.ObjectNumber];
+			auto& rObject = *_staticAssets[rStatic.ObjectNumber];
 			if (rObject.ObjectMeshes.empty())
 				continue;
 

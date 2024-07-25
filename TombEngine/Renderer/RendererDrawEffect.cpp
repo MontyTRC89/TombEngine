@@ -34,7 +34,6 @@
 #include "Specific/level.h"
 #include "Structures/RendererSpriteBucket.h"
 
-using namespace TEN::Effects;
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
@@ -914,7 +913,7 @@ namespace TEN::Renderer
 				zOffset += 10;
 			}
 
-			const auto& flashMoveable = *_moveableObjects[gunflash];
+			const auto& flashMoveable = *_moveableAssets[gunflash];
 			const auto& flashMesh = *flashMoveable.ObjectMeshes[0];
 
 			for (const auto& flashBucket : flashMesh.Buckets) 
@@ -999,10 +998,10 @@ namespace TEN::Renderer
 				if (creature.MuzzleFlash[0].Delay != 0 && creature.MuzzleFlash[0].Bite.BoneID != -1)
 				{
 					auto flashObjectID = creature.MuzzleFlash[0].SwitchToMuzzle2 ?
-						_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH :
+						_moveableAssets[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH :
 						ID_GUN_FLASH;
 
-					const auto& flashMoveable = *_moveableObjects[flashObjectID]->ObjectMeshes.at(0);
+					const auto& flashMoveable = *_moveableAssets[flashObjectID]->ObjectMeshes.at(0);
 					
 					for (const auto& flashBucket : flashMoveable.Buckets)
 					{
@@ -1039,10 +1038,10 @@ namespace TEN::Renderer
 				if (creature.MuzzleFlash[1].Delay != 0 && creature.MuzzleFlash[1].Bite.BoneID != -1)
 				{
 					auto flashObjectID = creature.MuzzleFlash[1].SwitchToMuzzle2 ?
-						_moveableObjects[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH :
+						_moveableAssets[ID_GUN_FLASH2].has_value() ? ID_GUN_FLASH2 : ID_GUN_FLASH :
 						ID_GUN_FLASH;
 
-					const auto& flashMoveable = *_moveableObjects[flashObjectID]->ObjectMeshes.at(0);
+					const auto& flashMoveable = *_moveableAssets[flashObjectID]->ObjectMeshes.at(0);
 					
 					for (auto& flashBucket : flashMoveable.Buckets)
 					{
@@ -1302,7 +1301,7 @@ namespace TEN::Renderer
 			//	return;
 
 			AddSpriteBillboard(
-				&_sprites[GetSpriteSequenceAsset(ID_SMOKE_SPRITES).StartIndex + smoke.sprite],
+				_spriteSequenceAssets[ID_SMOKE_SPRITES].Sprites[smoke.sprite],
 				smoke.position,
 				smoke.color, smoke.rotation, 1.0f, { smoke.size, smoke.size }, BlendMode::AlphaBlend, true, view);
 		}
@@ -1330,7 +1329,7 @@ namespace TEN::Renderer
 			auto height = Lerp(1.0f, 0.0f, normalizedLife);
 			auto color = Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 
-			AddSpriteBillboardConstrained(&_sprites[GetSpriteSequenceAsset(ID_SPARK_SPRITE).StartIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BlendMode::Additive, -v, false, view);
+			AddSpriteBillboardConstrained(_spriteSequenceAssets[ID_SPARK_SPRITE].Sprites.front(), s.pos, color, 0, 1, {s.width, s.height * height}, BlendMode::Additive, -v, false, view);
 		}
 	}
 
@@ -1354,7 +1353,7 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareSimpleParticles(RenderView& view)
 	{
-		for (const auto& part : simpleParticles)
+		for (const auto& part : TEN::Effects::simpleParticles)
 		{
 			if (!part.active)
 				continue;

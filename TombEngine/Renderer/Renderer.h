@@ -242,10 +242,10 @@ namespace TEN::Renderer
 		std::vector<RendererTriangle3D> _triangles3DToDraw = {};
 
 		// Textures, objects and sprites
-		std::vector<std::optional<RendererObject>> _moveableObjects;
-		std::vector<std::optional<RendererObject>> _staticObjects;
+		std::vector<std::optional<RendererObject>> _moveableAssets;
+		std::vector<std::optional<RendererObject>> _staticAssets;
 		std::vector<RendererSprite> _sprites;
-		std::vector<RendererSpriteSequence> _spriteSequences;
+		std::vector<RendererSpriteSequence> _spriteSequenceAssets;
 		Matrix _laraWorldMatrix;
 		std::vector<RendererAnimatedTextureSet> _animatedTextureSets;
 		std::vector<RendererMesh*> _meshes;
