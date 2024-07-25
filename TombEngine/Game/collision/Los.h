@@ -13,9 +13,9 @@ namespace TEN::Collision::Los
 {
 	struct RoomLosCollisionData
 	{
-		const CollisionTriangle* Triangle	 = nullptr;
-		Vector3					 Position	 = Vector3::Zero;
-		int						 RoomNumber	 = 0;
+		const CollisionTriangle* Triangle	= nullptr;
+		Vector3					 Position	= Vector3::Zero;
+		int						 RoomNumber = 0;
 
 		bool			 IsIntersected = false;
 		std::vector<int> RoomNumbers   = {};

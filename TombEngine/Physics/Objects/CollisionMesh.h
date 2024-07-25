@@ -9,41 +9,45 @@ namespace TEN::Physics
 	class CollisionTriangle
 	{
 	public:
-		// Constants
-
-		static constexpr auto VERTEX_COUNT = 3;
+		static const auto VERTEX_COUNT = 3;
 
 	private:
 		// Members
 
-		std::array<int, VERTEX_COUNT> _vertexIds = {};
-		Vector3						  _normal	 = Vector3::Zero;
-		BoundingBox					  _aabb		 = BoundingBox();
+		std::array<const Vector3*, VERTEX_COUNT> _vertices = {};
+		Vector3		_normal			  = Vector3::Zero;
+		BoundingBox _aabb			  = BoundingBox();
+		int			_portalRoomNumber = NO_VALUE;
 
-		int _portalRoomNumber = NO_VALUE;
+		// TODO: Relative positions?
+		//const Vector3*	  _offset	= nullptr;
+		//const Quaternion* _rotation = nullptr;
 
 	public:
 		// Constructors
 
-		CollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, const Vector3& normal, const BoundingBox& box, int portalRoomNumber);
+		CollisionTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, const BoundingBox& box, int portalRoomNumber);
 
 		// Getters
 
+		const Vector3&	   GetVertex0() const;
+		const Vector3&	   GetVertex1() const;
+		const Vector3&	   GetVertex2() const;
 		const Vector3&	   GetNormal() const;
 		const BoundingBox& GetAabb() const;
 		int				   GetPortalRoomNumber() const;
 
-		Vector3 GetTangent(const std::vector<Vector3>& vertices, const BoundingSphere& sphere) const;
+		Vector3 GetTangent(const BoundingSphere& sphere) const;
 
 		// Inquirers
 
-		bool Intersects(const std::vector<Vector3>& vertices, const Ray& ray, float& dist) const;
-		bool Intersects(const std::vector<Vector3>& vertices, const BoundingSphere& sphere) const;
+		bool Intersects(const Ray& ray, float& dist) const;
+		bool Intersects(const BoundingSphere& sphere) const;
 		bool IsPortal() const;
 
 		// Debug
 
-		void DrawDebug(const std::vector<Vector3>& vertices) const;
+		void DrawDebug() const;
 	};
 
 	struct CollisionMeshRayCollisionData
