@@ -325,7 +325,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								{
 									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 
-									auto spheres = GetSpheres(*item);
+									auto spheres = item->GetSpheres();
 									auto ray = Ray(origin->ToVector3(), dir);
 									float bestDistance = INFINITY;
 									int bestJointIndex = NO_VALUE;
@@ -506,7 +506,7 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 
 		meshIndex = object->meshIndex;
 
-		auto spheres = GetSpheres(*item);
+		auto spheres = item->GetSpheres();
 		for (int i = 0; i < object->nmeshes; i++)
 		{
 			// If mesh is visible.
@@ -619,7 +619,7 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 	{
 		auto* item = &g_Level.Items[closestItemNumber];
 
-		auto spheres = GetSpheres(*item);
+		auto spheres = item->GetSpheres();
 
 		ShatterItem.yRot = item->Pose.Orientation.y;
 		ShatterItem.meshIndex = meshIndex;

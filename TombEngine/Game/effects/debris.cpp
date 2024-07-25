@@ -27,7 +27,7 @@ bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 		if (number == BODY_DO_EXPLOSION)
 			number = -64;
 
-		auto spheres = GetSpheres(*item);
+		auto spheres = item->GetSpheres();
 		ShatterItem.yRot = item->Pose.Orientation.y;
 		ShatterItem.bit = 1 << node;
 		ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex + node;

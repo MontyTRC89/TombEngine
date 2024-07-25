@@ -29,7 +29,7 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		auto spheres = GetSpheres(item);
+		auto spheres = item.GetSpheres();
 		if (item.ItemFlags[0] >= 150)
 		{
 			SoundEffect(SFX_TR4_EXPLOSION1, &item.Pose);

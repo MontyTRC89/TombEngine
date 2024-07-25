@@ -45,7 +45,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 				short prevYOrient = item->Pose.Orientation.y;
 
 				item->Pose.Orientation.y = 0;
-				auto spheres = GetSpheres(*item);
+				auto spheres = item->GetSpheres();
 				item->Pose.Orientation.y = prevYOrient;
 
 				int deadlyBits = *((int*)&item->ItemFlags[0]); // NOTE: Value spread across ItemFlags[0] and ItemFlags[1].

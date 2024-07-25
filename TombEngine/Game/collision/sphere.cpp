@@ -13,15 +13,10 @@ using namespace TEN::Renderer;
 
 namespace TEN::Collision::Sphere
 {
-	std::vector<BoundingSphere> GetSpheres(const ItemInfo& item)
-	{
-		return g_Renderer.GetSpheres(item.Index);
-	}
-
 	bool HandleItemSphereCollision(ItemInfo& item0, ItemInfo& item1)
 	{
-		auto spheres0 = GetSpheres(item0);
-		auto spheres1 = GetSpheres(item1);
+		auto spheres0 = item0.GetSpheres();
+		auto spheres1 = item1.GetSpheres();
 
 		item1.TouchBits.ClearAll();
 

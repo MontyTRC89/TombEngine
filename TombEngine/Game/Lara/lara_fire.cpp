@@ -858,7 +858,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 		return FireWeaponType::Miss;
 	}
 
-	auto spheres = GetSpheres(targetEntity);
+	auto spheres = targetEntity.GetSpheres();
 	int closestJointIndex = NO_VALUE;
 	float closestDist = INFINITY;
 	for (int i = 0; i < spheres.size(); i++)
