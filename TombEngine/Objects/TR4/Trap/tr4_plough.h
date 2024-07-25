@@ -1,6 +1,7 @@
 #pragma once
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-	void PloughControl(short itemNumber);
+	void InitializePlough(short itemNumber);
+	void ControlPlough(short itemNumber);
 }

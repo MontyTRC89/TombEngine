@@ -3,6 +3,7 @@
 
 #include "Game/collision/floordata.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
@@ -26,6 +27,8 @@
 #include "Specific/trutils.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Room;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Generic;
@@ -583,7 +586,7 @@ void InitializeItem(short itemNumber)
 
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
 	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
-	item->BoxNumber = floor->Box;
+	item->BoxNumber = floor->PathfindingBoxID;
 
 	item->ResetModelToDefault();
 
@@ -802,10 +805,9 @@ bool UpdateItemRoom(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	auto roomNumber = GetCollision(item->Pose.Position.x,
-		item->Pose.Position.y - CLICK(2),
-		item->Pose.Position.z,
-		item->RoomNumber).RoomNumber;
+	auto roomNumber = GetPointCollision(
+		Vector3i(item->Pose.Position.x, item->Pose.Position.y - CLICK(2), item->Pose.Position.z),
+		item->RoomNumber).GetRoomNumber();
 
 	if (roomNumber != item->RoomNumber)
 	{

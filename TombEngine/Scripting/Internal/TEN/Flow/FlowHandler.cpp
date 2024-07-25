@@ -30,7 +30,7 @@ ScriptInterfaceStringsHandler* g_GameStringsHandler;
 ScriptInterfaceFlowHandler* g_GameFlow;
 
 FlowHandler::FlowHandler(sol::state* lua, sol::table& parent) :
-	m_handler(lua)
+	_handler(lua)
 {
 /*** gameflow.lua.
 These functions are called in gameflow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
@@ -38,7 +38,7 @@ They handle a game's 'metadata'; i.e., things such as level titles, loading scre
 ambient tracks.
 @section Flowlua
 */
-	sol::table tableFlow{ m_handler.GetState()->lua_state(), sol::create };
+	sol::table tableFlow{ _handler.GetState()->lua_state(), sol::create };
 	parent.set(ScriptReserved_Flow, tableFlow);
 
 /***
@@ -265,12 +265,12 @@ Specify which translations in the strings table correspond to which languages.
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
 	
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameStatus, GAME_STATUSES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameStatus, GAME_STATUSES);
 }
 
 FlowHandler::~FlowHandler()
@@ -281,35 +281,35 @@ FlowHandler::~FlowHandler()
 
 std::string FlowHandler::GetGameDir()
 {
-	return m_gameDir;
+	return _gameDir;
 }
 
 void FlowHandler::SetGameDir(const std::string& assetDir)
 {
-	m_gameDir = assetDir;
+	_gameDir = assetDir;
 }
 
 void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>>&& src)
 {
-	m_languageNames = std::move(src);
+	_languageNames = std::move(src);
 }
 
 void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src)
 {
-	if (m_translationsMap.empty())
+	if (_translationMap.empty())
 	{
-		m_translationsMap = std::move(src);
+		_translationMap = std::move(src);
 	}
 	else
 	{
 		for (auto& stringPair : src.value())
-			m_translationsMap.insert_or_assign(stringPair.first, stringPair.second);
+			_translationMap.insert_or_assign(stringPair.first, stringPair.second);
 	}
 }
 
 void FlowHandler::SetSettings(Settings const & src)
 {
-	m_settings = src;
+	_settings = src;
 }
 
 void FlowHandler::SetAnimations(Animations const& src)
@@ -339,10 +339,10 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 
 void FlowHandler::LoadFlowScript()
 {
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Gameflow.lua");
-	m_handler.ExecuteScript(m_gameDir + "Scripts/SystemStrings.lua", true);
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua", true);
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua", true);
+	_handler.ExecuteScript(_gameDir + "Scripts/Gameflow.lua");
+	_handler.ExecuteScript(_gameDir + "Scripts/SystemStrings.lua", true);
+	_handler.ExecuteScript(_gameDir + "Scripts/Strings.lua", true);
+	_handler.ExecuteScript(_gameDir + "Scripts/Settings.lua", true);
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
 	
@@ -359,19 +359,19 @@ void FlowHandler::LoadFlowScript()
 
 char const * FlowHandler::GetString(const char* id) const
 {
-	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
+	if (!ScriptAssert(_translationMap.find(id) != _translationMap.end(), std::string{ "Couldn't find string " } + id))
 	{
 		return id;
 	}
 	else
 	{
-		return m_translationsMap.at(std::string(id)).at(0).c_str();
+		return _translationMap.at(std::string(id)).at(0).c_str();
 	}
 }
 
 Settings* FlowHandler::GetSettings()
 {
-	return &m_settings;
+	return &_settings;
 }
 
 Level* FlowHandler::GetLevel(int id)

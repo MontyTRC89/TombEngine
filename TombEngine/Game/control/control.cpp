@@ -76,8 +76,10 @@ using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Streamer;
+using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
+using namespace TEN::Entities::Traps;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
@@ -85,8 +87,6 @@ using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using namespace TEN::Traps::TR5;
-using namespace TEN::Entities::Creatures::TR3;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -161,6 +161,9 @@ GameStatus ControlPhase(int numFrames)
 		// Pre-loop script and event handling.
 		g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
 		HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
+
+		// Clear last selected item in inventory (need to be after on loop event handling, so they can detect that).
+		g_Gui.CancelInventorySelection();
 
 		// Control lock is processed after handling scripts, because builder may want to
 		// process input externally, while still locking Lara from input.

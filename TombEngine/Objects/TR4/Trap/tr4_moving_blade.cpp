@@ -1,26 +1,29 @@
 #include "framework.h"
-#include "tr4_moving_blade.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
-#include "Sound/sound.h"
+#include "Objects/TR4/Trap/tr4_moving_blade.h"\
+
 #include "Game/animation.h"
-#include "Game/Lara/lara.h"
+#include "Game/control/control.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-    void MovingBladeControl(short itemNumber)
+    void ControlMovingBlade(short itemNumber)
     {
-        auto* item = &g_Level.Items[itemNumber];
+        auto& item = g_Level.Items[itemNumber];
 
-        if (TriggerActive(item))
+        if (TriggerActive(&item))
         {
-            item->ItemFlags[3] = 50;
-            AnimateItem(item);
+            item.ItemFlags[3] = 50;
+            AnimateItem(&item);
         }
         else
-            item->Animation.FrameNumber = GetAnimData(item).frameBase;
+        {
+            item.Animation.FrameNumber = GetAnimData(item).frameBase;
+        }
     }
 }

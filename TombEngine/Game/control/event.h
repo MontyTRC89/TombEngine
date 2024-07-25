@@ -41,6 +41,7 @@ namespace TEN::Control::Volumes
 		Save,
 		Start,
 		End,
+		UseItem,
 
 		Count
 	};

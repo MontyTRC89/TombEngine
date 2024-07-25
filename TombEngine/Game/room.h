@@ -122,4 +122,8 @@ int IsRoomOutside(int x, int y, int z);
 void InitializeNeighborRoomList();
 
 GameBoundingBox& GetBoundsAccurate(const StaticObject& staticObj, bool getVisibilityBox);
-FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
+
+namespace TEN::Collision::Room
+{
+	FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
+}

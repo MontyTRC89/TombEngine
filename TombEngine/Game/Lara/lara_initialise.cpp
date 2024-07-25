@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Lara/lara_initialise.h"
 
+#include "Game/collision/Point.h"
 #include "Game/Hud/Hud.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -18,6 +19,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Player;
 using namespace TEN::Hud;
 
@@ -131,8 +133,8 @@ void InitializeLaraAnims(ItemInfo* item)
 		player.Control.WaterStatus = WaterStatus::Dry;
 
 		// Allow player to start in crawl idle anim if start position is too low.
-		auto pointColl = GetCollision(item);
-		if (abs(pointColl.Position.Ceiling - pointColl.Position.Floor) < LARA_HEIGHT)
+		auto pointColl = GetPointCollision(*item);
+		if (abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight()) < LARA_HEIGHT)
 		{
 			SetAnimation(item, LA_CRAWL_IDLE);
 			player.Control.IsLow =

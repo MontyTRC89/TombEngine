@@ -35,26 +35,29 @@ namespace TEN::Renderer
 		_numCheckPortalCalls = 0;
 		_numGetVisibleRoomsCalls = 0;
 
-		_currentY;
+		_currentLineHeight;
 	}
 
-	bool Renderer::PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message)
+	void Renderer::PrintDebugMessage(LPCSTR msg, va_list args)
 	{
-		return true;
-	}
+		constexpr auto LINE_X_POS	= DISPLAY_SPACE_RES.x / 100;
+		constexpr auto LINE_SPACING = DISPLAY_SPACE_RES.y / 30;
+		constexpr auto COLOR		= Color(1.0f, 1.0f, 1.0f);
+		constexpr auto SCALE		= 0.8f;
 
-	void Renderer::PrintDebugMessage(LPCSTR message, ...)
-	{
 		char buffer[255];
 		ZeroMemory(buffer, 255);
+		_vsprintf_l(buffer, msg, nullptr, args);
+		AddString(buffer, Vector2(LINE_X_POS, _currentLineHeight), COLOR, SCALE, (int)PrintStringFlags::Outline);
 
-		va_list args;
-		va_start(args, message);
-		_vsprintf_l(buffer, message, NULL, args);
+		_currentLineHeight += LINE_SPACING;
+	}
+
+	void Renderer::PrintDebugMessage(LPCSTR msg, ...)
+	{
+		auto args = va_list{};
+		va_start(args, msg);
+		PrintDebugMessage(msg, args);
 		va_end(args);
-
-		AddString(10, _currentY, buffer, 0xFFFFFFFF, (int)PrintStringFlags::Outline);
-
-		_currentY += 20;
 	}
 }

@@ -23,6 +23,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/itemdata.h"
 
+using namespace TEN::Collision::Room;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 
@@ -80,14 +81,14 @@ namespace TEN::Entities::Doors
 
 		auto roomNumber = doorData->d1.floor->SidePortalRoomNumber;
 		if (roomNumber == NO_VALUE)
-			boxNumber = doorData->d1.floor->Box;
+			boxNumber = doorData->d1.floor->PathfindingBoxID;
 		else
 		{
 			auto* b = &g_Level.Rooms[roomNumber];
-			boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x + xOffset, doorItem->Pose.Position.z - b->z + zOffset)->Box;
+			boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x + xOffset, doorItem->Pose.Position.z - b->z + zOffset)->PathfindingBoxID;
 		}
 
-		doorData->d1.block = (boxNumber != NO_VALUE && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
+		doorData->d1.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
 		doorData->d1.data = *doorData->d1.floor;
 
 		if (r->flippedRoom != -1)
@@ -97,14 +98,14 @@ namespace TEN::Entities::Doors
 				
 			roomNumber = doorData->d1flip.floor->SidePortalRoomNumber;
 			if (roomNumber == NO_VALUE)
-				boxNumber = doorData->d1flip.floor->Box;
+				boxNumber = doorData->d1flip.floor->PathfindingBoxID;
 			else
 			{
 				auto* b = &g_Level.Rooms[roomNumber];
-				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x + xOffset, doorItem->Pose.Position.z - b->z + zOffset)->Box;
+				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x + xOffset, doorItem->Pose.Position.z - b->z + zOffset)->PathfindingBoxID;
 			}
 
-			doorData->d1flip.block = (boxNumber != NO_VALUE && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
+			doorData->d1flip.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
 			doorData->d1flip.data = *doorData->d1flip.floor;
 		}
 		else
@@ -127,14 +128,14 @@ namespace TEN::Entities::Doors
 
 			roomNumber = doorData->d2.floor->SidePortalRoomNumber;
 			if (roomNumber == NO_VALUE)
-				boxNumber = doorData->d2.floor->Box;
+				boxNumber = doorData->d2.floor->PathfindingBoxID;
 			else
 			{
 				auto* b = &g_Level.Rooms[roomNumber];
-				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x, doorItem->Pose.Position.z - b->z)->Box;
+				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x, doorItem->Pose.Position.z - b->z)->PathfindingBoxID;
 			}
 
-			doorData->d2.block = (boxNumber != NO_VALUE && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
+			doorData->d2.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
 			doorData->d2.data = *doorData->d2.floor;
 
 			if (r->flippedRoom != -1)
@@ -144,14 +145,14 @@ namespace TEN::Entities::Doors
 
 				roomNumber = doorData->d2flip.floor->SidePortalRoomNumber;
 				if (roomNumber == NO_VALUE)
-					boxNumber = doorData->d2flip.floor->Box;
+					boxNumber = doorData->d2flip.floor->PathfindingBoxID;
 				else
 				{
 					auto* b = &g_Level.Rooms[roomNumber];
-					boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x, doorItem->Pose.Position.z - b->z)->Box;
+					boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x, doorItem->Pose.Position.z - b->z)->PathfindingBoxID;
 				}
 
-				doorData->d2flip.block = (boxNumber != NO_VALUE && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
+				doorData->d2flip.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
 				doorData->d2flip.data = *doorData->d2flip.floor;
 			}
 			else
@@ -400,7 +401,7 @@ namespace TEN::Entities::Doors
 			short boxIndex = doorPos->block;
 			if (boxIndex != NO_VALUE)
 			{
-				g_Level.Boxes[boxIndex].flags &= ~BLOCKED;
+				g_Level.PathfindingBoxes[boxIndex].flags &= ~BLOCKED;
 				for (auto& currentCreature : ActiveCreatures)
 					currentCreature->LOT.TargetBox = NO_VALUE;
 			}
@@ -415,7 +416,7 @@ namespace TEN::Entities::Doors
 
 		if (floor)
 		{
-			floor->Box = NO_VALUE;
+			floor->PathfindingBoxID = NO_VALUE;
 			floor->TriggerIndex = 0;
 
 			// FIXME: HACK!!!!!!!
@@ -434,7 +435,7 @@ namespace TEN::Entities::Doors
 			short boxIndex = doorPos->block;
 			if (boxIndex != NO_VALUE)
 			{
-				g_Level.Boxes[boxIndex].flags |= BLOCKED;
+				g_Level.PathfindingBoxes[boxIndex].flags |= BLOCKED;
 
 				for (auto& currentCreature : ActiveCreatures)
 					currentCreature->LOT.TargetBox = NO_VALUE;

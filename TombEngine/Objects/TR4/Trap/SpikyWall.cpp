@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"
@@ -14,6 +15,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 // NOTES:
@@ -47,13 +49,13 @@ namespace TEN::Entities::Traps
 		int forwardVel = item.ItemFlags[0];
 		auto bounds = GameBoundingBox(&item);
 
-		auto pointColl0 = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2);
-		auto pointColl1 = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2, (bounds.X2 - bounds.X1) / 2);
+		auto pointColl0 = GetPointCollision(item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2);
+		auto pointColl1 = GetPointCollision(item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2, (bounds.X2 - bounds.X1) / 2);
 
 		auto collObjects = GetCollidedObjects(item, true, true);
 		if (!collObjects.IsEmpty())
 		{
-			for (auto* itemPtr : collObjects.ItemPtrs)
+			for (auto* itemPtr : collObjects.Items)
 			{
 				const auto& object = Objects[itemPtr->ObjectNumber];
 
@@ -76,18 +78,18 @@ namespace TEN::Entities::Traps
 
 		// Stop moving.
 		if (!item.TriggerFlags ||
-			pointColl0.Block->IsWall(item.Pose.Position.x, item.Pose.Position.z) || 
-			pointColl0.Block->Stopper ||
-			pointColl1.Block->IsWall(item.Pose.Position.x, item.Pose.Position.z) ||
-			pointColl1.Block->Stopper)
+			pointColl0.GetSector().IsWall(item.Pose.Position.x, item.Pose.Position.z) || 
+			pointColl0.GetSector().Stopper ||
+			pointColl1.GetSector().IsWall(item.Pose.Position.x, item.Pose.Position.z) ||
+			pointColl1.GetSector().Stopper)
 		{
 			auto& room = g_Level.Rooms[item.RoomNumber];
 			for (auto& staticObj : room.Statics)
 			{
-				if ((abs(pointColl0.Coordinates.x - staticObj.Pose.Position.x) < BLOCK(1) &&
-					abs(pointColl0.Coordinates.z - staticObj.Pose.Position.z) < BLOCK(1)) ||
-					abs(pointColl1.Coordinates.x - staticObj.Pose.Position.x) < BLOCK(1) &&
-					abs(pointColl1.Coordinates.z - staticObj.Pose.Position.z) < BLOCK(1) &&
+				if ((abs(pointColl0.GetPosition().x - mesh.Pose.Position.x) < BLOCK(1) &&
+					abs(pointColl0.GetPosition().z - mesh.Pose.Position.z) < BLOCK(1)) ||
+					abs(pointColl1.GetPosition().x - mesh.Pose.Position.x) < BLOCK(1) &&
+					abs(pointColl1.GetPosition().z - mesh.Pose.Position.z) < BLOCK(1) &&
 					staticObj.AssetPtr->shatterType != ShatterType::None)
 				{					
 					if (staticObj.HitPoints != 0)
@@ -109,8 +111,8 @@ namespace TEN::Entities::Traps
 			item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, item.Pose.Orientation.y, forwardVel);
 			item.Status = ITEM_ACTIVE;
 
-			if (pointColl0.RoomNumber != item.RoomNumber)
-				ItemNewRoom(itemNumber, pointColl0.RoomNumber);
+			if (pointColl0.GetRoomNumber() != item.RoomNumber)
+				ItemNewRoom(itemNumber, pointColl0.GetRoomNumber());
 
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item.Pose);
 		}

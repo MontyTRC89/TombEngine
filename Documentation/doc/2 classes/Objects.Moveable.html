@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.3 Lua API</title>
+    <title>TombEngine 1.4 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -364,7 +364,7 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
  Use this to bring back original unswapped mesh</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:Enable">Moveable:Enable()</a></td>
+	<td class="name" ><a href="#Moveable:Enable">Moveable:Enable(timeout)</a></td>
 	<td class="summary">Enable the item, as if a trigger for it had been stepped on.</td>
 	</tr>
 	<tr>
@@ -1861,13 +1861,20 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
 </dd>
     <dt>
     <a name = "Moveable:Enable"></a>
-    <strong>Moveable:Enable()</strong>
+    <strong>Moveable:Enable(timeout)</strong>
     </dt>
     <dd>
     Enable the item, as if a trigger for it had been stepped on.
 
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">float</span></span>
+         time (in seconds) after which moveable automatically disables (optional).
+        </li>
+    </ul>
 
 
 
