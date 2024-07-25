@@ -232,10 +232,13 @@ const StaticAsset& GetStaticAsset(GAME_OBJECT_ID id)
 
 const SpriteSequenceAsset& GetSpriteSequenceAsset(GAME_OBJECT_ID id)
 {
+	// HACK.
+	//id = GAME_OBJECT_ID(id - ID_HORIZON);
+
 	auto it = g_Level.SpriteSequenceAssets.find(id);
 	if (it != g_Level.SpriteSequenceAssets.end())
 		return it->second;
 
-	TENLog("GetSpriteSeqAssetsAsset(): ID " + std::to_string(id) + " out of range. Returning sprite sequence asset 0.");
+	TENLog("GetSpriteSequenceAssetsAsset(): ID " + std::to_string(id) + " out of range. Returning sprite sequence asset 0.");
 	return g_Level.SpriteSequenceAssets.begin()->second;
 }

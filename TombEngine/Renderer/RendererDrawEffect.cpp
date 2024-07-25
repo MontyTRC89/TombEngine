@@ -1301,7 +1301,7 @@ namespace TEN::Renderer
 			//	return;
 
 			AddSpriteBillboard(
-				_spriteSequenceAssets[ID_SMOKE_SPRITES].Sprites[smoke.sprite],
+				&_spriteSequenceAssets[ID_SMOKE_SPRITES].Sprites[smoke.sprite],
 				smoke.position,
 				smoke.color, smoke.rotation, 1.0f, { smoke.size, smoke.size }, BlendMode::AlphaBlend, true, view);
 		}
@@ -1329,7 +1329,9 @@ namespace TEN::Renderer
 			auto height = Lerp(1.0f, 0.0f, normalizedLife);
 			auto color = Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 
-			AddSpriteBillboardConstrained(_spriteSequenceAssets[ID_SPARK_SPRITE].Sprites.front(), s.pos, color, 0, 1, {s.width, s.height * height}, BlendMode::Additive, -v, false, view);
+			AddSpriteBillboardConstrained(
+				&_spriteSequenceAssets[ID_SPARK_SPRITE].Sprites.front(),
+				s.pos, color, 0, 1, {s.width, s.height * height}, BlendMode::Additive, -v, false, view);
 		}
 	}
 

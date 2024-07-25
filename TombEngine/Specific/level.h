@@ -65,19 +65,6 @@ struct AI_OBJECT
 	std::string Name;
 };
 
-struct SPRITE
-{
-	int tile;
-	float x1;
-	float y1;
-	float x2;
-	float y2;
-	float x3;
-	float y3;
-	float x4;
-	float y4;
-};
-
 struct MESH
 {
 	LightMode lightMode;
@@ -135,7 +122,6 @@ struct LEVEL
 	std::vector<EventSet>		 VolumeEventSets = {};
 	std::vector<int>			 LoopedEventSetIndices = {};
 	std::vector<AI_OBJECT>		 AIObjects = {};
-	std::vector<SPRITE>			 Sprites   = {};
 
 	// Texture data
 

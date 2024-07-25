@@ -960,7 +960,6 @@ void FreeLevel()
 	g_Level.Ranges.resize(0);
 	g_Level.Commands.resize(0);
 	g_Level.Frames.resize(0);
-	g_Level.Sprites.resize(0);
 	g_Level.SoundDetails.resize(0);
 	g_Level.SoundMap.resize(0);
 	g_Level.FloorData.resize(0);
@@ -1423,25 +1422,25 @@ bool LoadLevelFile(int levelIndex)
 
 void LoadSprites()
 {
-	int spriteCount = ReadInt32();
-	g_Level.Sprites.resize(spriteCount);
-
-	TENLog("Sprites: " + std::to_string(spriteCount), LogLevel::Info);
-
-	for (int i = 0; i < spriteCount; i++)
+	// Load sprite assets.
+	int spriteAssetCount = ReadInt32();
+	TENLog("Sprite assets: " + std::to_string(spriteAssetCount), LogLevel::Info);
+	auto spriteAssets = std::vector<SpriteAsset>(spriteAssetCount);
+	for (int i = 0; i < spriteAssetCount; i++)
 	{
-		auto& sprite = g_Level.Sprites[i];
-		sprite.tile = ReadInt32();
-		sprite.x1 = ReadFloat();
-		sprite.y1 = ReadFloat();
-		sprite.x2 = ReadFloat();
-		sprite.y2 = ReadFloat();
-		sprite.x3 = ReadFloat();
-		sprite.y3 = ReadFloat();
-		sprite.x4 = ReadFloat();
-		sprite.y4 = ReadFloat();
+		auto& asset =spriteAssets[i];
+		asset.tile = ReadInt32();
+		asset.x1 = ReadFloat();
+		asset.y1 = ReadFloat();
+		asset.x2 = ReadFloat();
+		asset.y2 = ReadFloat();
+		asset.x3 = ReadFloat();
+		asset.y3 = ReadFloat();
+		asset.x4 = ReadFloat();
+		asset.y4 = ReadFloat();
 	}
 
+	// Load sprite sequence assets.
 	int spriteSeqAssetCount = ReadInt32();
 	TENLog("Sprite sequence assets: " + std::to_string(spriteSeqAssetCount), LogLevel::Info);
 	for (int i = 0; i < spriteSeqAssetCount; i++)
@@ -1457,10 +1456,14 @@ void LoadSprites()
 		SpriteSequenceAssetIds.push_back(id);
 		auto& asset = g_Level.SpriteSequenceAssets[id];
 
-		asset.ID = id;
-		asset.SpriteCount = spriteCount;
 		asset.StartIndex = startIndex;
 		asset.IsLoaded = true;
+		asset.ID = id;
+
+		auto startIt = spriteAssets.begin() + startIndex;
+		auto endIt = spriteAssets.begin() + (startIndex + spriteCount);
+		asset.Sprites.resize(endIt - startIt);
+		std::copy(startIt, endIt, asset.Sprites.begin());
 
 		SpriteSequenceAssetIds.push_back(id);
 	}

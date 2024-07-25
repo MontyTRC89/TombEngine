@@ -5,7 +5,7 @@ namespace TEN::Renderer::Structures
 	struct RendererSpriteSequence
 	{
 		int ID = 0;
-		std::vector<RendererSprite*> Sprites = {};
+		std::vector<RendererSprite> Sprites = {};
 
 		RendererSpriteSequence() = default;
 

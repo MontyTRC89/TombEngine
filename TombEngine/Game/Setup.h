@@ -70,6 +70,8 @@ enum class ShatterType
 // MoveableAsset
 struct ObjectInfo
 {
+	bool loaded = false; // IsLoaded
+
 	int ID = 0;
 
 	int nmeshes; // BoneCount, SpriteCount
@@ -104,8 +106,6 @@ struct ObjectInfo
 	std::function<void(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)> HitRoutine = nullptr;
 	std::function<void(ItemInfo* item)> drawRoutine = nullptr;
 
-	bool loaded = false; // IsLoaded
-
 	void SetBoneRotationFlags(int boneID, int flags);
 	void SetHitEffect(HitEffect hitEffect);
 	void SetHitEffect(bool isSolid = false, bool isAlive = false);
@@ -125,14 +125,27 @@ struct StaticAsset
 	int flags = 0;
 };
 
+struct SpriteAsset
+{
+	int tile;
+	float x1;
+	float y1;
+	float x2;
+	float y2;
+	float x3;
+	float y3;
+	float x4;
+	float y4;
+};
+
 struct SpriteSequenceAsset
 {
-	int ID = 0;
-
-	int SpriteCount = 0;
-	int StartIndex	= 0;
+	int StartIndex = 0; // TODO: Remove.
 
 	bool IsLoaded = false;
+
+	int ID = 0;
+	std::vector<SpriteAsset> Sprites = {};
 };
 
 class ObjectHandler

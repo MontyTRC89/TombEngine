@@ -837,54 +837,68 @@ namespace TEN::Renderer
 		_staticsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_staticsVertices.size(), _staticsVertices.data());
 		_staticsIndexBuffer = IndexBuffer(_device.Get(), (int)_staticsIndices.size(), _staticsIndices.data());
 
-		TENLog("Preparing sprite data...", LogLevel::Info);
-		
 		// Step 5: Prepare sprites.
-		_sprites.resize(g_Level.Sprites.size());
+		TENLog("Preparing sprite data...", LogLevel::Info);
 
-		for (int i = 0; i < g_Level.Sprites.size(); i++)
+		// TODO: Remove.
+		_sprites.reserve(g_Level.SpriteSequenceAssets.size()); // NOTE: Minimum size.
+		int index = 0;
+		for (int spriteSeqAssetID : SpriteSequenceAssetIds)
 		{
-			const auto& legacySprite = g_Level.Sprites[i];
+			const auto& spriteSeqAsset = g_Level.SpriteSequenceAssets.at((GAME_OBJECT_ID)spriteSeqAssetID);
+			for (const auto& spriteAsset : spriteSeqAsset.Sprites)
+			{
+				auto& sprite = _sprites.emplace_back();
+				sprite.UV[0] = Vector2(spriteAsset.x1, spriteAsset.y1);
+				sprite.UV[1] = Vector2(spriteAsset.x2, spriteAsset.y2);
+				sprite.UV[2] = Vector2(spriteAsset.x3, spriteAsset.y3);
+				sprite.UV[3] = Vector2(spriteAsset.x4, spriteAsset.y4);
+				sprite.Texture = &_spritesTextures[spriteAsset.tile];
+				sprite.Width = round(((spriteAsset.x2 - spriteAsset.x1) * sprite.Texture->Width) + 1.0f);
+				sprite.Height = round(((spriteAsset.y3 - spriteAsset.y2) * sprite.Texture->Height) + 1.0f);
+				sprite.X = spriteAsset.x1 * sprite.Texture->Width;
+				sprite.Y = spriteAsset.y1 * sprite.Texture->Height;
 
-			_sprites[i] = RendererSprite();
-
-			auto& sprite = _sprites[i];
-			sprite.UV[0] = Vector2(legacySprite.x1, legacySprite.y1);
-			sprite.UV[1] = Vector2(legacySprite.x2, legacySprite.y2);
-			sprite.UV[2] = Vector2(legacySprite.x3, legacySprite.y3);
-			sprite.UV[3] = Vector2(legacySprite.x4, legacySprite.y4);
-			sprite.Texture = &_spritesTextures[legacySprite.tile];
-			sprite.Width = round(((legacySprite.x2 - legacySprite.x1) * sprite.Texture->Width) + 1.0f);
-			sprite.Height = round(((legacySprite.y3 - legacySprite.y2) * sprite.Texture->Height) + 1.0f);
-			sprite.X = legacySprite.x1 * sprite.Texture->Width;
-			sprite.Y = legacySprite.y1 * sprite.Texture->Height;
+				index++;
+			}
 		}
 
-		for (int i = 0; i < SpriteSequenceAssetIds.size(); i++)
+		// Convert sprite assets to renderer sprites.
+		for (int spriteSeqAssetID : SpriteSequenceAssetIds)
 		{
-			const auto& spriteSeqAsset = GetSpriteSequenceAsset((GAME_OBJECT_ID)SpriteSequenceAssetIds[i]);
+			const auto& spriteSeqAsset = GetSpriteSequenceAsset((GAME_OBJECT_ID)spriteSeqAssetID);
+			auto& rendererSpriteSeq = _spriteSequenceAssets[spriteSeqAssetID];
 
-			auto &rendererSpriteSeq = _spriteSequenceAssets[SpriteSequenceAssetIds[i]];
-			rendererSpriteSeq.Sprites.resize(spriteSeqAsset.SpriteCount);
-			for (int j = 0; j < spriteSeqAsset.SpriteCount; j++)
-				rendererSpriteSeq.Sprites[j] = &_sprites[spriteSeqAsset.StartIndex + j];
+			rendererSpriteSeq.Sprites.resize(spriteSeqAsset.Sprites.size());
+			for (int i = 0; i < rendererSpriteSeq.Sprites.size(); i++)
+			{
+				const auto& spriteAsset = spriteSeqAsset.Sprites[i];
+				auto& rendererSprite = rendererSpriteSeq.Sprites[i];
 
-			_spriteSequenceAssets[SpriteSequenceAssetIds[i]] = rendererSpriteSeq;
+				rendererSprite.UV[0] = Vector2(spriteAsset.x1, spriteAsset.y1);
+				rendererSprite.UV[1] = Vector2(spriteAsset.x2, spriteAsset.y2);
+				rendererSprite.UV[2] = Vector2(spriteAsset.x3, spriteAsset.y3);
+				rendererSprite.UV[3] = Vector2(spriteAsset.x4, spriteAsset.y4);
+				rendererSprite.Texture = &_spritesTextures[spriteAsset.tile];
+				rendererSprite.Width = round(((spriteAsset.x2 - spriteAsset.x1) * rendererSprite.Texture->Width) + 1.0f);
+				rendererSprite.Height = round(((spriteAsset.y3 - spriteAsset.y2) * rendererSprite.Texture->Height) + 1.0f);
+				rendererSprite.X = spriteAsset.x1 * rendererSprite.Texture->Width;
+				rendererSprite.Y = spriteAsset.y1 * rendererSprite.Texture->Height;
+			}
 
-			if (SpriteSequenceAssetIds[i] == ID_CAUSTICS_TEXTURES)
+			_spriteSequenceAssets[spriteSeqAssetID] = rendererSpriteSeq;
+
+			if (spriteSeqAssetID == ID_CAUSTICS_TEXTURES)
 			{
 				_causticTextures.clear();
-				for (int j = 0; j < rendererSpriteSeq.Sprites.size(); j++)
+				for (int i = 0; i < rendererSpriteSeq.Sprites.size(); i++)
 				{
 					_causticTextures.push_back(
 						Texture2D(
-							_device.Get(),
-							_context.Get(),
-							rendererSpriteSeq.Sprites[j]->Texture->Texture.Get(),
-							rendererSpriteSeq.Sprites[j]->X,
-							rendererSpriteSeq.Sprites[j]->Y,
-							rendererSpriteSeq.Sprites[j]->Width,
-							rendererSpriteSeq.Sprites[j]->Height));
+							_device.Get(), _context.Get(),
+							rendererSpriteSeq.Sprites[i].Texture->Texture.Get(),
+							rendererSpriteSeq.Sprites[i].X, rendererSpriteSeq.Sprites[i].Y,
+							rendererSpriteSeq.Sprites[i].Width, rendererSpriteSeq.Sprites[i].Height));
 				}
 			}
 		}
