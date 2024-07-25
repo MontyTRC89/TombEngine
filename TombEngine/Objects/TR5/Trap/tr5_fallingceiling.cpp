@@ -3,47 +3,57 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 
-void FallingCeilingControl(short itemNumber)
+using namespace TEN::Collision::Point;
+
+namespace TEN::Entities::Traps
 {
-	auto* item = &g_Level.Items[itemNumber];
+	constexpr auto FALLING_CEILING_HARM_DAMAGE = 300;
 
-	if (item->Animation.ActiveState)
+	void ControlFallingCeiling(short itemNumber)
 	{
-		if (item->Animation.ActiveState == 1 && item->TouchBits.TestAny())
-			DoDamage(LaraItem, 300);
-	}
-	else
-	{
-		item->Animation.TargetState = 1;
-		item->Animation.IsAirborne = true;
-	}
+		auto& item = g_Level.Items[itemNumber];
 
-	AnimateItem(item);
-
-	if (item->Status == ITEM_DEACTIVATED)
-		RemoveActiveItem(itemNumber);
-	else
-	{
-		auto probe = GetCollision(item);
-
-		item->Floor = probe.Position.Floor;
-
-		if (probe.RoomNumber != item->RoomNumber)
-			ItemNewRoom(itemNumber, probe.RoomNumber);
-
-		if (item->Animation.ActiveState == 1)
+		if (item.Animation.ActiveState)
 		{
-			if (item->Pose.Position.y >= item->Floor)
+			if (item.Animation.ActiveState == 1 && item.TouchBits.TestAny())
+				DoDamage(LaraItem, FALLING_CEILING_HARM_DAMAGE);
+		}
+		else
+		{
+			item.Animation.TargetState = 1;
+			item.Animation.IsAirborne = true;
+		}
+
+		AnimateItem(&item);
+
+		if (item.Status == ITEM_DEACTIVATED)
+		{
+			RemoveActiveItem(itemNumber);
+		}
+		else
+		{
+			auto pointColl = GetPointCollision(item);
+
+			item.Floor = pointColl.GetFloorHeight();
+
+			if (pointColl.GetRoomNumber() != item.RoomNumber)
+				ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
+
+			if (item.Animation.ActiveState == 1)
 			{
-				item->Pose.Position.y = item->Floor;
-				item->Animation.TargetState = 2;
-				item->Animation.IsAirborne = false;
-				item->Animation.Velocity.y = 0.0f;
+				if (item.Pose.Position.y >= item.Floor)
+				{
+					item.Pose.Position.y = item.Floor;
+					item.Animation.TargetState = 2;
+					item.Animation.IsAirborne = false;
+					item.Animation.Velocity.y = 0.0f;
+				}
 			}
 		}
 	}

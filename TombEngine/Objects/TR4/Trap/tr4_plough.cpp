@@ -1,24 +1,34 @@
 #include "framework.h"
-#include "tr4_plough.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Objects/TR4/Trap/tr4_plough.h"
+
 #include "Game/animation.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
+#include "Specific/level.h"
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-	void PloughControl(short itemNumber)
+	void InitializePlough(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
-		item->ItemFlags[3] = 50;
+		item.ItemFlags[4] = 1;
+	}
 
-		if (TriggerActive(item))
+	void ControlPlough(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+
+		item.ItemFlags[3] = 50;
+
+		if (TriggerActive(&item))
 		{
-			*((int*)&item->ItemFlags) = 0x3F000;
-			AnimateItem(item);
+			*((int*)&item.ItemFlags) = 0x3F000;
+			AnimateItem(&item);
 		}
 		else
-			*((int*)&item->ItemFlags) = 0;
+		{
+			*((int*)&item.ItemFlags) = 0;
+		}
 	}
 }

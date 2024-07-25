@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -17,6 +18,7 @@
 #include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::TR4;
@@ -226,9 +228,9 @@ namespace TEN::Entities::Effects
 		fx.Pose.Position.y += -((fx.Animation.Velocity.z * phd_sin(fx.Pose.Orientation.x))) + fx.Animation.Velocity.y;
 		fx.Pose.Position.z += speed * phd_cos(fx.Pose.Orientation.y);
 
-		auto pointColl = GetCollision(fx.Pose.Position.x, fx.Pose.Position.y, fx.Pose.Position.z, fx.RoomNumber);
+		auto pointColl = GetPointCollision(fx.Pose.Position, fx.RoomNumber);
 
-		if (fx.Pose.Position.y >= pointColl.Position.Floor || fx.Pose.Position.y <= pointColl.Position.Ceiling)
+		if (fx.Pose.Position.y >= pointColl.GetFloorHeight() || fx.Pose.Position.y <= pointColl.GetCeilingHeight())
 		{
 			fx.Pose.Position = prevPos;
 
@@ -366,8 +368,8 @@ namespace TEN::Entities::Effects
 		}
 		else
 		{
-			if (pointColl.RoomNumber != fx.RoomNumber)
-				ItemNewRoom(fxNumber, pointColl.RoomNumber);
+			if (pointColl.GetRoomNumber() != fx.RoomNumber)
+				ItemNewRoom(fxNumber, pointColl.GetRoomNumber());
 
 			auto deltaPos = prevPos - fx.Pose.Position;
 

@@ -1,7 +1,7 @@
 #pragma once
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
 	void InitializeJobySpikes(short itemNumber);
-	void JobySpikesControl(short itemNumber);
+	void ControlJobySpikes(short itemNumber);
 }

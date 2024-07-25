@@ -2,6 +2,7 @@
 #include "Objects/TR1/Entity/tr1_bear.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -13,6 +14,7 @@
 #include "Math/Math.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
@@ -146,8 +148,8 @@ namespace TEN::Entities::Creatures::TR1
 
 			bool isPlayerDead = LaraItem->HitPoints <= 0;
 
-			auto pointColl = GetCollision(item);
-			int floorToCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
+			auto pointColl = GetPointCollision(item);
+			int floorToCeilHeight = abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight());
 
 			switch (item.Animation.ActiveState)
 			{

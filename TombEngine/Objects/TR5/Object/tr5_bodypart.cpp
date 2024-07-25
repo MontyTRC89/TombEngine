@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
@@ -12,6 +13,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 constexpr auto BODY_PART_LIFE				  = 64;
@@ -79,18 +81,18 @@ void ControlBodyPart(short fxNumber)
 			TriggerFireFlame(fx.Pose.Position.x, fx.Pose.Position.y, fx.Pose.Position.z, FlameType::Medium);
 	}
 
-	auto pointColl = GetCollision(fx.Pose.Position.x, fx.Pose.Position.y, fx.Pose.Position.z, fx.RoomNumber);
+	auto pointColl = GetPointCollision(fx.Pose.Position, fx.RoomNumber);
 
 	if (!fxInfo.Counter)
 	{
-		if (fx.Pose.Position.y < pointColl.Position.Ceiling)
+		if (fx.Pose.Position.y < pointColl.GetCeilingHeight())
 		{
-			fx.Pose.Position.y = pointColl.Position.Ceiling;
+			fx.Pose.Position.y = pointColl.GetCeilingHeight();
 			fx.Animation.Velocity.y = -fx.Animation.Velocity.y;
 			fx.Animation.Velocity.z -= (fx.Animation.Velocity.z / 8);
 		}
 
-		if (fx.Pose.Position.y >= pointColl.Position.Floor)
+		if (fx.Pose.Position.y >= pointColl.GetFloorHeight())
 		{
 			if (fxInfo.Flag2 & BODY_NO_BOUNCE)
 			{
@@ -122,7 +124,7 @@ void ControlBodyPart(short fxNumber)
 				return;
 			}
 
-			if (y <= pointColl.Position.Floor)
+			if (y <= pointColl.GetFloorHeight())
 			{
 				// Remove if touched floor (no bounce mode).
 				if (fxInfo.Flag2 & BODY_PART_EXPLODE)
@@ -204,19 +206,19 @@ void ControlBodyPart(short fxNumber)
 		}
 	}
 
-	if (pointColl.RoomNumber != fx.RoomNumber)
+	if (pointColl.GetRoomNumber() != fx.RoomNumber)
 	{
-		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointColl.RoomNumber) &&
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointColl.GetRoomNumber()) &&
 			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx.RoomNumber))
 		{
-			int waterHeight = GetWaterHeight(fx.Pose.Position.x, fx.Pose.Position.y, fx.Pose.Position.z, pointColl.RoomNumber);
+			int waterHeight = GetWaterHeight(fx.Pose.Position.x, fx.Pose.Position.y, fx.Pose.Position.z, pointColl.GetRoomNumber());
 
 			SplashSetup.y = waterHeight - 1;
 			SplashSetup.x = fx.Pose.Position.x;
 			SplashSetup.z = fx.Pose.Position.z;
 			SplashSetup.splashPower = fx.Animation.Velocity.y;
 			SplashSetup.innerRadius = 48;
-			SetupSplash(&SplashSetup, pointColl.RoomNumber);
+			SetupSplash(&SplashSetup, pointColl.GetRoomNumber());
 
 			// Remove if touched water.
 			if (fxInfo.Flag2 & BODY_PART_EXPLODE)
@@ -226,6 +228,6 @@ void ControlBodyPart(short fxNumber)
 			}
 		}
 
-		ItemNewRoom(fxNumber, pointColl.RoomNumber);
+		ItemNewRoom(fxNumber, pointColl.GetRoomNumber());
 	}
 }

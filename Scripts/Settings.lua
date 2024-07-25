@@ -11,7 +11,6 @@ local anims = Flow.Animations.new()
 anims.crawlExtended = true
 anims.crouchRoll = true
 anims.crawlspaceSwandive = true
-anims.monkeyAutoJump = false
 anims.overhangClimb = false
 anims.slideExtended = false
 anims.sprintJump = false

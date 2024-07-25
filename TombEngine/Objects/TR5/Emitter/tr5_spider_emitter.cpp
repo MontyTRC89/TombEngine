@@ -47,7 +47,7 @@ void ClearSpiders()
 	{
 		ZeroMemory(Spiders, NUM_SPIDERS * sizeof(SpiderData));
 		NextSpider = 0;
-		FlipEffect = -1;
+		FlipEffect = NO_VALUE;
 	}
 }
 

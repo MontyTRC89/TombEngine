@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
@@ -16,6 +17,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
@@ -170,20 +172,20 @@ namespace TEN::Entities::TR4
 
 		x += dx;
 		z += dz;
-		int height1 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+		int height1 = GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height2 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+		int height2 = GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height3 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+		int height3 = GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
-		int height4 = probe.Position.Floor;
+		auto probe = GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber);
+		int height4 = probe.GetFloorHeight();
 
 		bool canJump1block = true;
 		if (item->BoxNumber == LaraItem->BoxNumber ||
@@ -419,13 +421,17 @@ namespace TEN::Entities::TR4
 
 			if (creature->MonkeySwingAhead)
 			{
-				probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
-				if (probe.Position.Ceiling == (probe.Position.Floor - 1536))
+				probe = GetPointCollision(item->Pose.Position, probe.GetRoomNumber());
+				if (probe.GetCeilingHeight() == (probe.GetFloorHeight() - 1536))
 				{
 					if (item->TestMeshSwapFlags(VonCroyKnifeSwapJoints))
+					{
 						item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
+					}
 					else
+					{
 						item->Animation.TargetState = VON_CROY_STATE_START_MONKEY;
+					}
 
 					break;
 				}
@@ -598,8 +604,8 @@ namespace TEN::Entities::TR4
 				item->Animation.TargetState = VON_CROY_STATE_MONKEY;
 			else
 			{
-				probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
-				if (probe.Position.Ceiling == probe.Position.Floor - 1536)
+				probe = GetPointCollision(item->Pose.Position, probe.GetRoomNumber());
+				if (probe.GetCeilingHeight() == probe.GetFloorHeight() - 1536)
 					item->Animation.TargetState = VON_CROY_STATE_IDLE;
 			}
 
@@ -612,8 +618,8 @@ namespace TEN::Entities::TR4
 
 			if (item->BoxNumber == creature->LOT.TargetBox || !creature->MonkeySwingAhead)
 			{
-				probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
-				if (probe.Position.Ceiling == (probe.Position.Floor - BLOCK(1.5f)))
+				probe = GetPointCollision(item->Pose.Position, probe.GetRoomNumber());
+				if (probe.GetCeilingHeight() == (probe.GetFloorHeight() - BLOCK(1.5f)))
 					item->Animation.TargetState = VON_CROY_STATE_START_MONKEY;
 			}
 

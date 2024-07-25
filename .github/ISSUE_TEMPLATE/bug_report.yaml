@@ -1,0 +1,109 @@
+name: Bug report
+description: Create a report to help us improve
+title: "[ bug Report ]"
+labels: Awaiting Triage
+
+body:
+
+- type: markdown
+  attributes:
+    value: |
+      Please follow this document in order to report a bug 
+
+- type: dropdown
+  attributes:
+    label: TombEngine version
+    description: |
+      Please select the TombEngine Version from the dropdown list.
+    options:
+      - v1.4
+      - v1.3
+      - v1.2
+      - v1.1
+  validations:
+    required: true
+
+- type: dropdown
+  attributes:
+    label: Tomb Editor version
+    description: |
+      Please select the Tomb Editor version used from the dropdown list.
+    options:
+      - v1.7.1
+      - v1.7.0
+      - v1.6.9
+      - v1.6.8
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Describe the bug
+    description: |
+      Please provide A clear and concise description of what the bug is.
+    placeholder: |
+      Your bug report here.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: To Reproduce
+    description: |
+      To reproduce the behaviour, please provide detailed steps for the development team to follow. This can be done through screenshots or a written guide
+
+      **If the bug cannot be reproduced, and if the issue is not adequately explained, it will be closed without further investigation**
+    placeholder: |
+     Provide detailed reproducible steps here. 
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Expected Behaviour
+    description: |
+      A clear and concise description of what you expected to happen.
+    placeholder: |
+      A description of what should happen here.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Screenshots
+    description: |
+      Please check this box if you have provided screenshots or any other media for this issue
+      **note** If you do not provide screenshots or anything else, it may be hard for devs to investigate
+      provide a link to your screenshot here or simply drag and drop your screenshot into this textbox
+    placeholder: |
+      A description of any additional content here.
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Additional Content
+    description: |
+      Add any other context about the problem here. 
+
+      * Are you testing an build of a TombEngine that has not yet been released? If so please give some context.
+      *  Did you get any asset from the TombEngine website that has presented a bug? 
+    placeholder: |
+      A description of any additional content here.
+  validations:
+    required: false
+
+- type: textarea
+  attributes:
+    label: Minimal reproduction project 
+    description: |
+      **Please upload a .zip file containing your level and all assets needed to compile the level and a cut-down version of your level where the bug presents itself**
+      The project can be uploaded as a zip file (10 mb max) or provide a link from google drive, dropbox etc.
+      **Note** if you do not provide this, your issue may be rejected
+    placeholder: |
+      Download link to your project 
+  validations:
+    required: true
+      
+
+

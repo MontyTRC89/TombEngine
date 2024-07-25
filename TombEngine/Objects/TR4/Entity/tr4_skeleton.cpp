@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
@@ -20,6 +21,7 @@
 #include "Math/Math.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
@@ -149,7 +151,7 @@ namespace TEN::Entities::TR4
 		auto& fxInfo = GetFXInfo(fx);
 
 		fx.Pose.Position.x = (byte)GetRandomControl() + item.Pose.Position.x - 128;
-		fx.Pose.Position.y = GetCollision(&item).Position.Floor;
+		fx.Pose.Position.y = GetPointCollision(item).GetFloorHeight();
 		fx.Pose.Position.z = (byte)GetRandomControl() + item.Pose.Position.z - 128;
 		fx.Pose.Orientation.y = 2 * GetRandomControl();
 		fx.RoomNumber = item.RoomNumber;
@@ -228,15 +230,15 @@ namespace TEN::Entities::TR4
 
 		x += dx;
 		z += dz;
-		int height1 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height1 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height2 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height3 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		int height = 0;
 		bool canJump1Block = true;
@@ -343,7 +345,7 @@ namespace TEN::Entities::TR4
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
-				int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+				int height4 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 				dx = 870 * phd_sin(item->Pose.Orientation.y + ANGLE(78.75f));
 				dz = 870 * phd_cos(item->Pose.Orientation.y + ANGLE(78.75f));
@@ -351,7 +353,7 @@ namespace TEN::Entities::TR4
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
-				int height5 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+				int height5 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 				if (abs(height5 - item->Pose.Position.y) > CLICK(1))
 					jumpRight = false;
@@ -369,7 +371,7 @@ namespace TEN::Entities::TR4
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
-				int height6 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+				int height6 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 				dx = 870 * phd_sin(item->Pose.Orientation.y - ANGLE(78.75f));
 				dz = 870 * phd_cos(item->Pose.Orientation.y - ANGLE(78.75f));
@@ -377,7 +379,7 @@ namespace TEN::Entities::TR4
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
-				int height7 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+				int height7 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 				if (abs(height7 - item->Pose.Position.y) > CLICK(1) || height6 + CLICK(2) >= item->Pose.Position.y)
 					jumpLeft = false;
@@ -562,7 +564,7 @@ namespace TEN::Entities::TR4
 
 					creature->LOT.IsJumping = true;
 
-					if (GetCollision(item).Position.Floor > item->Pose.Position.y + BLOCK(1))
+					if (GetPointCollision(*item).GetFloorHeight() > item->Pose.Position.y + BLOCK(1))
 					{
 						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 44;
 						item->Animation.FrameNumber = GetAnimData(item).frameBase;
@@ -646,8 +648,8 @@ namespace TEN::Entities::TR4
 
 					auto pos = GetJointPosition(item, 16);
 
-					auto floor = GetCollision(x, y, z, item->RoomNumber).Block;
-					if (floor->Stopper)
+					auto& sector = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetSector();
+					if (sector.Stopper)
 					{
 						for (int i = 0; i < room->mesh.size(); i++)
 						{
@@ -659,7 +661,7 @@ namespace TEN::Entities::TR4
 							{
 								ShatterObject(0, staticMesh, -128, LaraItem->RoomNumber, 0);
 								SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
-								floor->Stopper = false;
+								sector.Stopper = false;
 								TestTriggers(item, true);
 								break;
 							}
@@ -707,7 +709,7 @@ namespace TEN::Entities::TR4
 			case SKELETON_STATE_JUMP_FORWARD_1_BLOCK:
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 43)
 				{
-					if (GetCollision(item).Position.Floor > (item->Pose.Position.y + CLICK(5)))
+					if (GetPointCollision(*item).GetFloorHeight() > (item->Pose.Position.y + CLICK(5)))
 					{
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 44;
 						item->Animation.FrameNumber = GetAnimData(item).frameBase;
@@ -722,7 +724,7 @@ namespace TEN::Entities::TR4
 
 			case SKELETON_STATE_JUMP_CONTINUE:
 			case SKELETON_STATE_JUMP_START:
-				if (GetCollision(item).Position.Floor <= item->Pose.Position.y)
+				if (GetPointCollision(*item).GetFloorHeight() <= item->Pose.Position.y)
 				{
 					if (item->Active)
 					{
@@ -755,7 +757,7 @@ namespace TEN::Entities::TR4
 
 				creature->LOT.IsJumping = false;
 
-				if (GetCollision(item).Position.Floor <= (item->Pose.Position.y + BLOCK(1)))
+				if (GetPointCollision(*item).GetFloorHeight() <= (item->Pose.Position.y + BLOCK(1)))
 				{
 					if (Random::TestProbability(1 / 32.0f))
 						item->Animation.TargetState = 14;

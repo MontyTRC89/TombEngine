@@ -1,5 +1,8 @@
 #pragma once
+#include "Game/collision/Point.h"
 #include "Math/Math.h"
+
+using namespace TEN::Collision::Point;
 
 class FloorInfo;
 struct CollisionInfo;
@@ -27,10 +30,10 @@ struct ObjectCollisionBounds
 
 struct CollidedObjectData
 {
-	std::vector<ItemInfo*>	ItemPtrs   = {};
-	std::vector<MESH_INFO*> StaticPtrs = {};
+	std::vector<ItemInfo*>	Items	= {};
+	std::vector<MESH_INFO*> Statics = {};
 
-	bool IsEmpty() const { return (ItemPtrs.empty() && StaticPtrs.empty()); };
+	bool IsEmpty() const { return (Items.empty() && Statics.empty()); };
 };
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
@@ -56,7 +59,7 @@ void ItemPushBridge(ItemInfo& item, CollisionInfo& coll);
 
 bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll);
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll);
-void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& collResult);
+void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData& pointColl);
 
 void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void ObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
