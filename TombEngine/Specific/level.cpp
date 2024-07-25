@@ -259,7 +259,7 @@ void LoadItems()
 	}
 }
 
-void LoadObjects()
+void LoadAssets()
 {
 	Objects.Initialize();
 
@@ -413,15 +413,15 @@ void LoadObjects()
 		}
 	}
 
-	int movCount = ReadInt32();
-	TENLog("Moveables: " + std::to_string(movCount), LogLevel::Info);
-
-	for (int i = 0; i < movCount; i++)
+	int movAssetCount = ReadInt32();
+	TENLog("Moveable assets: " + std::to_string(movAssetCount), LogLevel::Info);
+	for (int i = 0; i < movAssetCount; i++)
 	{
-		int id = ReadInt32();
+		int id = (GAME_OBJECT_ID)ReadInt32();
 		MoveablesIds.push_back(id);
 		auto& asset = Objects[id];
 
+		asset.ID = id;
 		asset.loaded = true;
 		asset.nmeshes = ReadInt32();
 		asset.meshIndex = ReadInt32();
@@ -431,13 +431,12 @@ void LoadObjects()
 		asset.loaded = true;
 	}
 
-	TENLog("Initializing object assets...", LogLevel::Info);
-	InitializeObjects();
+	TENLog("Initializing moveable assets...", LogLevel::Info);
+	InitializeAssets();
 
-	int staticCount = ReadInt32();
-	TENLog("Statics: " + std::to_string(staticCount), LogLevel::Info);
-
-	for (int i = 0; i < staticCount; i++)
+	int staticAssetCount = ReadInt32();
+	TENLog("Static asssets: " + std::to_string(staticAssetCount), LogLevel::Info);
+	for (int i = 0; i < staticAssetCount; i++)
 	{
 		auto id = (GAME_OBJECT_ID)ReadInt32();
 		if (id >= STATIC_ASSET_COUNT_MAX)
@@ -868,7 +867,7 @@ void ReadRooms()
 			staticObj.Scale = ReadFloat();
 			staticObj.Flags = ReadUInt16();
 			staticObj.Color = ReadVector4();
-			staticObj.AssetPtr = &GetStaticAsset((GAME_OBJECT_ID)ReadUInt16());
+			staticObj.AssetID = (GAME_OBJECT_ID)ReadUInt16();
 			staticObj.HitPoints = ReadInt16();
 			staticObj.Name = ReadString();
 
@@ -1253,7 +1252,7 @@ bool LoadLevel(int levelIndex)
 		LoadRooms();
 		g_Renderer.UpdateProgress(40);
 
-		LoadObjects();
+		LoadAssets();
 		g_Renderer.UpdateProgress(50);
 
 		LoadSprites();

@@ -348,7 +348,7 @@ namespace TEN::Entities::Creatures::TR5
 							{
 								if (!((pos.x ^ staticObj.Pose.Position.x) & 0xFFFFFC00))
 								{
-									if (staticObj.AssetPtr->shatterType != ShatterType::None)
+									if (staticObj.GetAsset().shatterType != ShatterType::None)
 									{
 										ShatterObject(0, &staticObj, -64, LaraItem->RoomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28);

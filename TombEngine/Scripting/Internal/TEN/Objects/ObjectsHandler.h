@@ -92,7 +92,7 @@ private:
 				continue;
 			
 			const auto& staticObj = std::get<std::reference_wrapper<StaticObject>>(val).get();
-			if (staticObj.AssetPtr->ID == slot)
+			if (staticObj.AssetID == slot)
 				items.push_back(GetByName<Static, ScriptReserved_Static>(key));
 		}
 

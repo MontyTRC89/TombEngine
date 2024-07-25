@@ -70,9 +70,11 @@ enum class ShatterType
 // MoveableAsset
 struct ObjectInfo
 {
+	int ID = 0;
+
 	bool loaded = false; // IsLoaded
 
-	int nmeshes; // BoneCount
+	int nmeshes; // BoneCount, SpriteCount
 	int meshIndex; // Base index in g_Level.Meshes.
 	int boneIndex; // Base index in g_Level.Bones.
 	int animIndex; // Base index in g_Level.Anims.
@@ -111,8 +113,8 @@ struct ObjectInfo
 
 struct StaticAsset
 {
-	int ID = 0;
-	int meshNumber = 0; // g_Level.meshes index. TODO: Contain here.
+	GAME_OBJECT_ID ID = GAME_OBJECT_ID::ID_NO_OBJECT;
+	int meshNumber = 0; // g_Level.meshes index. TODO: Contain meshes here.
 
 	GameBoundingBox visibilityBox = {};
 	GameBoundingBox collisionBox  = {};
@@ -122,6 +124,12 @@ struct StaticAsset
 
 	int flags = 0;
 };
+
+// TODO
+/*struct SpriteAsset
+{
+	int ID = 0;
+};*/
 
 class ObjectHandler
 {
@@ -142,6 +150,7 @@ extern ObjectHandler Objects;
 
 void InitializeGameFlags();
 void InitializeSpecialEffects();
-void InitializeObjects();
+void InitializeAssets();
 
+const ObjectInfo&  GetMoveableAsset(GAME_OBJECT_ID id);
 const StaticAsset& GetStaticAsset(GAME_OBJECT_ID id);

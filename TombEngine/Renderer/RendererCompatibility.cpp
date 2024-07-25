@@ -257,13 +257,13 @@ namespace TEN::Renderer
 
 					nativeStatic.IsDirty = true;
 
-					rStatic.ObjectNumber = nativeStatic.AssetPtr->ID;
+					rStatic.ObjectNumber = nativeStatic.AssetID;
 					rStatic.RoomNumber = nativeStatic.RoomNumber;
 					rStatic.Color = nativeStatic.Color;
 					rStatic.AmbientLight = r->AmbientLight;
 					rStatic.Pose = nativeStatic.Pose;
 					rStatic.Scale = nativeStatic.Scale;
-					rStatic.OriginalVisibilityBox = nativeStatic.AssetPtr->visibilityBox;
+					rStatic.OriginalVisibilityBox = nativeStatic.GetAsset().visibilityBox;
 					rStatic.IndexInRoom = l;
 
 					rStatic.Update();

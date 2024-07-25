@@ -410,9 +410,9 @@ namespace TEN::Renderer
 
 			if (nativeStatic.IsDirty || _invalidateCache)
 			{
-				rStatic.ObjectNumber = nativeStatic.AssetPtr->ID;
+				rStatic.ObjectNumber = nativeStatic.AssetID;
 				rStatic.Color = nativeStatic.Color;
-				rStatic.OriginalVisibilityBox = nativeStatic.AssetPtr->visibilityBox;
+				rStatic.OriginalVisibilityBox = nativeStatic.GetAsset().visibilityBox;
 				rStatic.Pose = nativeStatic.Pose;
 				rStatic.Scale = nativeStatic.Scale;
 				rStatic.Update();

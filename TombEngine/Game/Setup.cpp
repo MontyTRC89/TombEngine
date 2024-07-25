@@ -156,7 +156,7 @@ void InitializeSpecialEffects()
 	TEN::Entities::Creatures::TR3::ClearFishSwarm();
 }
 
-void InitializeObjects()
+void InitializeAssets()
 {
 	AllocTR4Objects();
 	AllocTR5Objects();
@@ -213,6 +213,11 @@ void InitializeObjects()
 	SequenceUsed[3] = 0;
 	SequenceUsed[4] = 0;
 	SequenceUsed[5] = 0;
+}
+
+const ObjectInfo& GetMoveableAsset(GAME_OBJECT_ID id)
+{
+	return Objects[id];
 }
 
 const StaticAsset& GetStaticAsset(GAME_OBJECT_ID id)

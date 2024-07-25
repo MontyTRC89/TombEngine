@@ -1568,7 +1568,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 			hasHit = hasHitNotByEmitter = doShatter = true;
 			doExplosion = isExplosive;
 
-			if (staticPtr->AssetPtr->shatterType == ShatterType::None)
+			if (staticPtr->GetAsset().shatterType == ShatterType::None)
 				continue;
 
 			staticPtr->HitPoints -= damage;

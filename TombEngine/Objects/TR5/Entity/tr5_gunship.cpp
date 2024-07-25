@@ -110,11 +110,11 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (objOnLos < 0 && GetRandomControl() & 1)
 				{
-					if (hitStaticPtr->AssetPtr->shatterType != ShatterType::None)
+					if (hitStaticPtr->GetAsset().shatterType != ShatterType::None)
 					{
 						ShatterObject(0, hitStaticPtr, 64, target.RoomNumber, 0);
 						TestTriggers(hitStaticPtr->Pose.Position.x, hitStaticPtr->Pose.Position.y, hitStaticPtr->Pose.Position.z, target.RoomNumber, true);
-						SoundEffect(GetShatterSound(*hitStaticPtr->AssetPtr), &hitStaticPtr->Pose);
+						SoundEffect(GetShatterSound(hitStaticPtr->GetAsset()), &hitStaticPtr->Pose);
 					}
 
 					TriggerRicochetSpark(GameVector(hitPos), 2 * GetRandomControl(), 3, 0);

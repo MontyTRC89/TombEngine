@@ -205,13 +205,13 @@ GameBoundingBox& GetBoundsAccurate(const StaticObject& staticObj, bool getVisibi
 
 	if (getVisibilityBox)
 	{
-		staticObj.AssetPtr->ID;
+		staticObj.AssetID;
 
-		bounds = staticObj.AssetPtr->visibilityBox * staticObj.Scale;
+		bounds = staticObj.GetAsset().visibilityBox * staticObj.Scale;
 	}
 	else
 	{
-		bounds = staticObj.AssetPtr->collisionBox * staticObj.Scale;
+		bounds = staticObj.GetAsset().collisionBox * staticObj.Scale;
 	}
 
 	return bounds;

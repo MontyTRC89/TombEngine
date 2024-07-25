@@ -93,6 +93,7 @@ struct MESH
 struct LEVEL
 {
 	// Object data
+
 	int					  NumItems = 0;
 	std::vector<ItemInfo> Items	   = {}; // Moveables
 	std::vector<MESH>	  Meshes   = {}; // TODO: Contain in MoveableAsset and StaticAsset.
@@ -100,6 +101,7 @@ struct LEVEL
 	std::unordered_map<GAME_OBJECT_ID, StaticAsset> StaticAssets = {};
 
 	// Animation data
+
 	std::vector<AnimData>				Anims	 = {};
 	std::vector<AnimFrame>				Frames	 = {};
 	std::vector<StateDispatchData>		Changes	 = {};
@@ -107,21 +109,25 @@ struct LEVEL
 	std::vector<short>					Commands = {};
 
 	// Collision data
+
 	std::vector<ROOM_INFO> Rooms	 = {};
 	std::vector<short>	   FloorData = {};
 	std::vector<SinkInfo>  Sinks	 = {};
 
 	// Pathfinding data
+
 	std::vector<BOX_INFO> PathfindingBoxes				   = {};
 	std::vector<OVERLAP>  Overlaps						   = {};
 	std::vector<int>	  Zones[(int)ZoneType::MaxZone][2] = {};
 
 	// Sound data
+
 	std::vector<short>			 SoundMap	  = {};
 	std::vector<SoundSourceInfo> SoundSources = {};
 	std::vector<SampleInfo>		 SoundDetails = {};
 
 	// Misc. data
+
 	std::vector<LevelCameraInfo> Cameras   = {};
 	std::vector<EventSet>		 GlobalEventSets = {};
 	std::vector<EventSet>		 VolumeEventSets = {};
@@ -130,6 +136,7 @@ struct LEVEL
 	std::vector<SPRITE>			 Sprites   = {};
 
 	// Texture data
+
 	TEXTURE				 SkyTexture		   = {};
 	std::vector<TEXTURE> RoomTextures	   = {};
 	std::vector<TEXTURE> MoveablesTextures = {};
@@ -159,7 +166,7 @@ void FreeLevel();
 void LoadTextures();
 void LoadRooms();
 void LoadItems();
-void LoadObjects();
+void LoadAssets();
 void LoadCameras();
 void LoadSprites();
 void LoadBoxes();

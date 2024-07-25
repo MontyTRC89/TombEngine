@@ -71,7 +71,7 @@ void ShatterObject(SHATTER_ITEM* item, StaticObject* staticPtr, int num, short r
 			return;
 
 		isStatic = true;
-		meshIndex = staticPtr->AssetPtr->meshNumber;
+		meshIndex = staticPtr->GetAsset().meshNumber;
 		yRot = staticPtr->Pose.Orientation.y;
 		pos = Vector3(staticPtr->Pose.Position.x, staticPtr->Pose.Position.y, staticPtr->Pose.Position.z);
 		scale = staticPtr->Scale;

@@ -554,10 +554,10 @@ namespace TEN::Entities::Creatures::TR5
 
 							if (!((staticObj.Pose.Position.z ^ pos.z) & 0xFFFFFC00) && !((staticObj.Pose.Position.x ^ pos.x) & 0xFFFFFC00))
 							{
-								if (staticObj.AssetPtr->shatterType != ShatterType::None)
+								if (staticObj.GetAsset().shatterType != ShatterType::None)
 								{
 									ShatterObject(0, &staticObj, -64, LaraItem->RoomNumber, 0);
-									SoundEffect(GetShatterSound(*staticObj.AssetPtr), &staticObj.Pose);
+									SoundEffect(GetShatterSound(staticObj.GetAsset()), &staticObj.Pose);
 
 									floor->Stopper = false;
 

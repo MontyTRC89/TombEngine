@@ -163,14 +163,14 @@ namespace TEN::Entities::Traps
 
 				for (auto* staticObj : collObjects.Statics)
 				{
-					if (staticObj->AssetPtr->shatterType != ShatterType::None)
+					if (staticObj->GetAsset().shatterType != ShatterType::None)
 					{
-						TriggerExplosionSparks(staticObj->Pose.Position.x, staticObj->Pose.Position.y, staticObj->Pose.Position.z, 3, -2, 0, item->RoomNumber);
+						TriggerExplosionSparks(staticObj->Pose.Position.x, staticObj->Pose.Position.y, staticObj->Pose.Position.z, 3, -2, 0, item.RoomNumber);
 						staticObj->Pose.Position.y -= 128;
 						TriggerShockwave(&staticObj->Pose, 40, 176, 64, 128, 96, 0, 16, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 						staticObj->Pose.Position.y += 128;
-						SoundEffect(GetShatterSound(*staticObj->AssetPtr), &staticObj->Pose);
-						ShatterObject(nullptr, staticObj, -128, item->RoomNumber, 0);
+						SoundEffect(GetShatterSound(staticObj->GetAsset()), &staticObj->Pose);
+						ShatterObject(nullptr, staticObj, -128, item.RoomNumber, 0);
 					}
 				}
 

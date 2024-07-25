@@ -86,11 +86,11 @@ namespace TEN::Entities::Traps
 			auto& room = g_Level.Rooms[item.RoomNumber];
 			for (auto& staticObj : room.Statics)
 			{
-				if ((abs(pointColl0.GetPosition().x - mesh.Pose.Position.x) < BLOCK(1) &&
-					abs(pointColl0.GetPosition().z - mesh.Pose.Position.z) < BLOCK(1)) ||
-					abs(pointColl1.GetPosition().x - mesh.Pose.Position.x) < BLOCK(1) &&
-					abs(pointColl1.GetPosition().z - mesh.Pose.Position.z) < BLOCK(1) &&
-					staticObj.AssetPtr->shatterType != ShatterType::None)
+				if ((abs(pointColl0.GetPosition().x - staticObj.Pose.Position.x) < BLOCK(1) &&
+					abs(pointColl0.GetPosition().z - staticObj.Pose.Position.z) < BLOCK(1)) ||
+					abs(pointColl1.GetPosition().x - staticObj.Pose.Position.x) < BLOCK(1) &&
+					abs(pointColl1.GetPosition().z - staticObj.Pose.Position.z) < BLOCK(1) &&
+					staticObj.GetAsset().shatterType != ShatterType::None)
 				{					
 					if (staticObj.HitPoints != 0)
 						continue;

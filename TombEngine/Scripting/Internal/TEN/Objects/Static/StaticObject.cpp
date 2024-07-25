@@ -67,7 +67,7 @@ std::string Static::GetName() const
 // @treturn string Slot ID.
 int Static::GetSlotID() const
 {
-	return _static.AssetPtr->ID;
+	return _static.AssetID;
 }
 
 /// Get this static's position.
@@ -159,7 +159,7 @@ void Static::SetName(const std::string& name)
 // @tparam Objects.ObjID slot New slot ID.
 void Static::SetSlotID(GAME_OBJECT_ID slotID)
 {
-	_static.AssetPtr = &GetStaticAsset(slotID);
+	_static.AssetID = slotID;
 	_static.IsDirty = true;
 }
 

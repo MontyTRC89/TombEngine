@@ -284,14 +284,14 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			{
 				if (itemNumber < 0)
 				{
-					if (staticObjPtr->AssetPtr->shatterType != ShatterType::None)
+					if (staticObjPtr->GetAsset().shatterType != ShatterType::None)
 					{
 						const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 						staticObjPtr->HitPoints -= weapon.Damage;
 						ShatterImpactData.impactDirection = dir;
 						ShatterImpactData.impactLocation = Vector3(staticObjPtr->Pose.Position.x, staticObjPtr->Pose.Position.y, staticObjPtr->Pose.Position.z);
 						ShatterObject(nullptr, staticObjPtr, 128, target2.RoomNumber, 0);
-						SoundEffect(GetShatterSound(*staticObjPtr->AssetPtr), (Pose*)staticObjPtr);
+						SoundEffect(GetShatterSound(staticObjPtr->GetAsset()), (Pose*)staticObjPtr);
 					}
 
 					TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
@@ -659,7 +659,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, StaticOb
 					auto bounds = GetBoundsAccurate(meshp, false);
 					pose = Pose(meshp.Pose.Position, EulerAngles(0, meshp.Pose.Orientation.y, 0));
 
-					if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp.AssetPtr->ID))
+					if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp.AssetID))
 					{
 						*mesh = &meshp;
 						target->RoomNumber = LosRooms[r];

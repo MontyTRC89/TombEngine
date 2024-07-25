@@ -106,8 +106,8 @@ struct EntityModelData
 struct ItemInfo
 {
 	std::string	   Name			= {};
-	int			   Index		= 0;			// ItemNumber // TODO: Make int.
-	GAME_OBJECT_ID ObjectNumber = ID_NO_OBJECT; // ObjectID
+	int			   Index		= 0;			// ID
+	GAME_OBJECT_ID ObjectNumber = ID_NO_OBJECT; // AssetID
 
 	/*ItemStatus*/int Status = ITEM_NOT_ACTIVE;
 	bool	   Active = false;
@@ -172,6 +172,10 @@ struct ItemInfo
 	bool IsLara() const;
 	bool IsCreature() const;
 	bool IsBridge() const;
+
+	// Getters
+
+	const ObjectInfo& GetAsset() const;
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);
