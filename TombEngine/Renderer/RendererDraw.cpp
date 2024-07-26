@@ -3165,10 +3165,10 @@ namespace TEN::Renderer
 						p3t = Vector3(-0.5, -0.5, 0);
 					}
 
-					uv0 = spr->Sprite->UV[0];
-					uv1 = spr->Sprite->UV[1];
-					uv2 = spr->Sprite->UV[2];
-					uv3 = spr->Sprite->UV[3];
+					uv0 = spr->Sprite->Uvs[0];
+					uv1 = spr->Sprite->Uvs[1];
+					uv2 = spr->Sprite->Uvs[2];
+					uv3 = spr->Sprite->Uvs[3];
 
 					Vertex v0;
 					v0.Position = Vector3::Transform(p0t, currentObject->World);

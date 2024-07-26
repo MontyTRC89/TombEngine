@@ -129,15 +129,15 @@ struct SpriteAsset
 {
 	static const auto UV_COUNT = 4;
 
-	int TileID = 0;
-	std::array<Vector2, UV_COUNT> Uvs = {};
+	int							  TileID = 0;
+	std::array<Vector2, UV_COUNT> Uvs	 = {};
 };
 
 struct SpriteSequenceAsset
 {
 	bool IsLoaded = false;
 
-	int ID = 0;
+	int						 ID		 = 0;
 	std::vector<SpriteAsset> Sprites = {};
 };
 

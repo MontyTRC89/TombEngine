@@ -324,14 +324,14 @@ namespace TEN::Renderer
 				_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = rDrawSprite.SoftParticle ? 1 : 0;
 
 				// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].x = rDrawSprite.Sprite->UV[0].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].y = rDrawSprite.Sprite->UV[1].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].z = rDrawSprite.Sprite->UV[2].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].w = rDrawSprite.Sprite->UV[3].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].x = rDrawSprite.Sprite->UV[0].y;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].y = rDrawSprite.Sprite->UV[1].y;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].z = rDrawSprite.Sprite->UV[2].y;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].w = rDrawSprite.Sprite->UV[3].y;
+				_stInstancedSpriteBuffer.Sprites[i].UV[0].x = rDrawSprite.Sprite->Uvs[0].x;
+				_stInstancedSpriteBuffer.Sprites[i].UV[0].y = rDrawSprite.Sprite->Uvs[1].x;
+				_stInstancedSpriteBuffer.Sprites[i].UV[0].z = rDrawSprite.Sprite->Uvs[2].x;
+				_stInstancedSpriteBuffer.Sprites[i].UV[0].w = rDrawSprite.Sprite->Uvs[3].x;
+				_stInstancedSpriteBuffer.Sprites[i].UV[1].x = rDrawSprite.Sprite->Uvs[0].y;
+				_stInstancedSpriteBuffer.Sprites[i].UV[1].y = rDrawSprite.Sprite->Uvs[1].y;
+				_stInstancedSpriteBuffer.Sprites[i].UV[1].z = rDrawSprite.Sprite->Uvs[2].y;
+				_stInstancedSpriteBuffer.Sprites[i].UV[1].w = rDrawSprite.Sprite->Uvs[3].y;
 			}
 
 			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
@@ -386,22 +386,22 @@ namespace TEN::Renderer
 			{
 				auto vertex0 = Vertex{};
 				vertex0.Position = rDrawSprite.vtx1;
-				vertex0.UV = rDrawSprite.Sprite->UV[0];
+				vertex0.UV = rDrawSprite.Sprite->Uvs[0];
 				vertex0.Color = rDrawSprite.c1;
 
 				auto vertex1 = Vertex{};
 				vertex1.Position = rDrawSprite.vtx2;
-				vertex1.UV = rDrawSprite.Sprite->UV[1];
+				vertex1.UV = rDrawSprite.Sprite->Uvs[1];
 				vertex1.Color = rDrawSprite.c2;
 
 				auto vertex2 = Vertex{};
 				vertex2.Position = rDrawSprite.vtx3;
-				vertex2.UV = rDrawSprite.Sprite->UV[2];
+				vertex2.UV = rDrawSprite.Sprite->Uvs[2];
 				vertex2.Color = rDrawSprite.c3;
 
 				auto vertex3 = Vertex{};
 				vertex3.Position = rDrawSprite.vtx4;
-				vertex3.UV = rDrawSprite.Sprite->UV[3];
+				vertex3.UV = rDrawSprite.Sprite->Uvs[3];
 				vertex3.Color = rDrawSprite.c4;
 
 				_primitiveBatch->DrawTriangle(vertex0, vertex1, vertex3);
@@ -446,14 +446,14 @@ namespace TEN::Renderer
 			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = object->Sprite->SoftParticle ? 1 : 0;
 
 			// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
-			_stInstancedSpriteBuffer.Sprites[0].UV[0].x = object->Sprite->Sprite->UV[0].x;
-			_stInstancedSpriteBuffer.Sprites[0].UV[0].y = object->Sprite->Sprite->UV[1].x;
-			_stInstancedSpriteBuffer.Sprites[0].UV[0].z = object->Sprite->Sprite->UV[2].x;
-			_stInstancedSpriteBuffer.Sprites[0].UV[0].w = object->Sprite->Sprite->UV[3].x;
-			_stInstancedSpriteBuffer.Sprites[0].UV[1].x = object->Sprite->Sprite->UV[0].y;
-			_stInstancedSpriteBuffer.Sprites[0].UV[1].y = object->Sprite->Sprite->UV[1].y;
-			_stInstancedSpriteBuffer.Sprites[0].UV[1].z = object->Sprite->Sprite->UV[2].y;
-			_stInstancedSpriteBuffer.Sprites[0].UV[1].w = object->Sprite->Sprite->UV[3].y;
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].x = object->Sprite->Sprite->Uvs[0].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].y = object->Sprite->Sprite->Uvs[1].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].z = object->Sprite->Sprite->Uvs[2].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[0].w = object->Sprite->Sprite->Uvs[3].x;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].x = object->Sprite->Sprite->Uvs[0].y;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].y = object->Sprite->Sprite->Uvs[1].y;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].z = object->Sprite->Sprite->Uvs[2].y;
+			_stInstancedSpriteBuffer.Sprites[0].UV[1].w = object->Sprite->Sprite->Uvs[3].y;
 
 			BindTexture(TextureRegister::ColorMap, object->Sprite->Sprite->Texture, SamplerStateRegister::LinearClamp);
 
@@ -489,22 +489,22 @@ namespace TEN::Renderer
 
 			auto vertex0 = Vertex{};
 			vertex0.Position = object->Sprite->vtx1;
-			vertex0.UV = object->Sprite->Sprite->UV[0];
+			vertex0.UV = object->Sprite->Sprite->Uvs[0];
 			vertex0.Color = object->Sprite->c1;
 
 			auto vertex1 = Vertex{};
 			vertex1.Position = object->Sprite->vtx2;
-			vertex1.UV = object->Sprite->Sprite->UV[1];
+			vertex1.UV = object->Sprite->Sprite->Uvs[1];
 			vertex1.Color = object->Sprite->c2;
 
 			auto vertex2 = Vertex{};
 			vertex2.Position = object->Sprite->vtx3;
-			vertex2.UV = object->Sprite->Sprite->UV[2];
+			vertex2.UV = object->Sprite->Sprite->Uvs[2];
 			vertex2.Color = object->Sprite->c3;
 
 			auto vertex3 = Vertex{};
 			vertex3.Position = object->Sprite->vtx4;
-			vertex3.UV = object->Sprite->Sprite->UV[3];
+			vertex3.UV = object->Sprite->Sprite->Uvs[3];
 			vertex3.Color = object->Sprite->c4;
 
 			_primitiveBatch->Begin();

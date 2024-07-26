@@ -837,7 +837,7 @@ namespace TEN::Renderer
 		_staticsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_staticsVertices.size(), _staticsVertices.data());
 		_staticsIndexBuffer = IndexBuffer(_device.Get(), (int)_staticsIndices.size(), _staticsIndices.data());
 
-		// Step 5: Prepare sprites.
+		// Step 5: Prepare sprites.h
 		TENLog("Preparing sprite data...", LogLevel::Info);
 
 		// Convert sprite assets to renderer sprites.
@@ -852,10 +852,7 @@ namespace TEN::Renderer
 				const auto& spriteAsset = spriteSeqAsset.Sprites[i];
 				auto& rendererSprite = rendererSpriteSeq.Sprites[i];
 
-				rendererSprite.UV[0] = Vector2(spriteAsset.Uvs[0].x, spriteAsset.Uvs[0].y);
-				rendererSprite.UV[1] = Vector2(spriteAsset.Uvs[1].x, spriteAsset.Uvs[1].y);
-				rendererSprite.UV[2] = Vector2(spriteAsset.Uvs[2].x, spriteAsset.Uvs[2].y);
-				rendererSprite.UV[3] = Vector2(spriteAsset.Uvs[3].x, spriteAsset.Uvs[3].y);
+				rendererSprite.Uvs = spriteAsset.Uvs;
 				rendererSprite.Texture = &_spritesTextures[spriteAsset.TileID];
 				rendererSprite.Width = round(((spriteAsset.Uvs[1].x - spriteAsset.Uvs[0].x) * rendererSprite.Texture->Width) + 1.0f);
 				rendererSprite.Height = round(((spriteAsset.Uvs[2].y - spriteAsset.Uvs[1].y) * rendererSprite.Texture->Height) + 1.0f);

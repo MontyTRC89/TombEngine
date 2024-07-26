@@ -1126,9 +1126,9 @@ namespace TEN::Renderer
 
 		case SpriteType::LookAtBillboard:
 		{
-			auto tMatrix = Matrix::CreateTranslation(sprite->pos);
+			auto translationMatrix = Matrix::CreateTranslation(sprite->pos);
 			auto rotMatrix = Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite->LookAtAxis, Vector3::UnitZ);
-			spriteMatrix = scaleMatrix * rotMatrix * tMatrix;
+			spriteMatrix = scaleMatrix * rotMatrix * translationMatrix;
 		}
 		break;
 

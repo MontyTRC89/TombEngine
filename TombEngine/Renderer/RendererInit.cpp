@@ -601,10 +601,10 @@ namespace TEN::Renderer
 
 		_whiteSprite.Height = _whiteTexture.Height;
 		_whiteSprite.Width = _whiteTexture.Width;
-		_whiteSprite.UV[0] = Vector2(0.0f, 0.0f);
-		_whiteSprite.UV[1] = Vector2(1.0f, 0.0f);
-		_whiteSprite.UV[2] = Vector2(1.0f, 1.0f);
-		_whiteSprite.UV[3] = Vector2(0.0f, 1.0f);
+		_whiteSprite.Uvs[0] = Vector2(0.0f, 0.0f);
+		_whiteSprite.Uvs[1] = Vector2(1.0f, 0.0f);
+		_whiteSprite.Uvs[2] = Vector2(1.0f, 1.0f);
+		_whiteSprite.Uvs[3] = Vector2(0.0f, 1.0f);
 		_whiteSprite.Texture = &_whiteTexture;
 	}
 

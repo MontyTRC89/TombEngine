@@ -2,18 +2,20 @@
 
 #include "Renderer/Graphics/Texture2D.h"
 
+using namespace TEN::Renderer::Graphics;
+
 namespace TEN::Renderer::Structures
 {
-	using namespace TEN::Renderer::Graphics;
-
 	struct RendererSprite
 	{
-		int Index;
-		int Width;
-		int Height;
-		Vector2 UV[4];
-		Texture2D* Texture;
-		int X;
-		int Y;
+		static const auto UV_COUNT = 4;
+
+		std::array<Vector2, UV_COUNT> Uvs	  = {};
+		Texture2D*					  Texture = nullptr;
+
+		int Width  = 0;
+		int Height = 0;
+		int X	   = 0;
+		int Y	   = 0;
 	};
 }

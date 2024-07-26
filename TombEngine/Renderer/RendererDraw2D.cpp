@@ -141,7 +141,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(ConstantBufferRegister::Hud, _cbHUD.get());
 
 		RendererSprite* borderSprite = &_spriteSequenceAssets[ID_BAR_BORDER_GRAPHIC].Sprites.front();
-		_stHUDBar.BarStartUV = borderSprite->UV[0];
+		_stHUDBar.BarStartUV = borderSprite->Uvs[0];
 		_stHUDBar.BarScale = Vector2(borderSprite->Width / (float)borderSprite->Texture->Width, borderSprite->Height / (float)borderSprite->Texture->Height);
 		_cbHUDBar.UpdateData(_stHUDBar, _context.Get());
 		BindConstantBufferVS(ConstantBufferRegister::HudBar, _cbHUDBar.get());
@@ -167,7 +167,7 @@ namespace TEN::Renderer
 		_stHUDBar.Poisoned = isPoisoned;
 		_stHUDBar.Frame = frame;	
 		RendererSprite* innerSprite = &_spriteSequenceAssets[textureSlot].Sprites.front();
-		_stHUDBar.BarStartUV = innerSprite->UV[0];
+		_stHUDBar.BarStartUV = innerSprite->Uvs[0];
 		_stHUDBar.BarScale = Vector2(innerSprite->Width / (float)innerSprite->Texture->Width, innerSprite->Height / (float)innerSprite->Texture->Height);
 		_cbHUDBar.UpdateData(_stHUDBar, _context.Get());
 
@@ -393,7 +393,7 @@ namespace TEN::Renderer
 			for (int i = 0; i < rVertices.size(); i++)
 			{
 				rVertices[i].Position = Vector3(vertices[i]);
-				rVertices[i].UV = spriteToDraw.Sprite->UV[i];
+				rVertices[i].UV = spriteToDraw.Sprite->Uvs[i];
 				rVertices[i].Color = Vector4(spriteToDraw.Color.x, spriteToDraw.Color.y, spriteToDraw.Color.z, spriteToDraw.Color.w);
 			}
 			
@@ -504,10 +504,10 @@ namespace TEN::Renderer
 		}
 
 		auto scale = Vector2(sprite->Width / (float)sprite->Texture->Width, sprite->Height / (float)sprite->Texture->Height);
-		uvStart.x = uvStart.x * scale.x + sprite->UV[0].x;
-		uvStart.y = uvStart.y * scale.y + sprite->UV[0].y;
-		uvEnd.x = uvEnd.x * scale.x + sprite->UV[0].x;
-		uvEnd.y = uvEnd.y * scale.y + sprite->UV[0].y;
+		uvStart.x = uvStart.x * scale.x + sprite->Uvs[0].x;
+		uvStart.y = uvStart.y * scale.y + sprite->Uvs[0].y;
+		uvEnd.x = uvEnd.x * scale.x + sprite->Uvs[0].x;
+		uvEnd.y = uvEnd.y * scale.y + sprite->Uvs[0].y;
 
 		Vertex vertices[4];
 
