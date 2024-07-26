@@ -491,6 +491,7 @@ void LoadObjects()
 
 void LoadCameras()
 {
+	// Load cameras.
 	int cameraCount = ReadInt32();
 	TENLog("Cameras: " + std::to_string(cameraCount), LogLevel::Info);
 
@@ -510,11 +511,10 @@ void LoadCameras()
 		g_GameScriptEntities->AddName(camera.Name, camera);
 	}
 
+	// Load spot cameras.
 	int spotCameraCount = ReadInt32();
 	TENLog("Spot cameras: " + std::to_string(cameraCount), LogLevel::Info);
 
-	ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
-	// Load spot cameras.
 	NumberSpotcams = spotCameraCount;
 	for (int i = 0; i < spotCameraCount; i++)
 	{
@@ -534,11 +534,13 @@ void LoadCameras()
 		ReadInt16();
 	}
 
-	int skinkCount = ReadInt32();
-	TENLog("Sinks: " + std::to_string(skinkCount), LogLevel::Info);
+	// TODO: Not in this function.
+	// Load sinks.
+	int sinkCount = ReadInt32();
+	TENLog("Sinks: " + std::to_string(sinkCount), LogLevel::Info);
 
-	g_Level.Sinks.reserve(skinkCount);
-	for (int i = 0; i < skinkCount; i++)
+	g_Level.Sinks.reserve(sinkCount);
+	for (int i = 0; i < sinkCount; i++)
 	{
 		auto& sink = g_Level.Sinks.emplace_back();
 		sink.Position.x = ReadInt32();
