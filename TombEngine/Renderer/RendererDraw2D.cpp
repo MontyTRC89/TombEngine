@@ -351,15 +351,15 @@ namespace TEN::Renderer
 			{
 				_primitiveBatch->Begin();
 
-				BindTexture(TextureRegister::ColorMap, spriteToDraw.SpritePtr->Texture, SamplerStateRegister::AnisotropicClamp);
+				BindTexture(TextureRegister::ColorMap, spriteToDraw.Sprite->Texture, SamplerStateRegister::AnisotropicClamp);
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
-			else if (texture2DPtr != spriteToDraw.SpritePtr->Texture || _lastBlendMode != spriteToDraw.BlendMode)
+			else if (texture2DPtr != spriteToDraw.Sprite->Texture || _lastBlendMode != spriteToDraw.BlendMode)
 			{
 				_primitiveBatch->End();
 				_primitiveBatch->Begin();
 
-				BindTexture(TextureRegister::ColorMap, spriteToDraw.SpritePtr->Texture, SamplerStateRegister::AnisotropicClamp);
+				BindTexture(TextureRegister::ColorMap, spriteToDraw.Sprite->Texture, SamplerStateRegister::AnisotropicClamp);
 				SetBlendMode(spriteToDraw.BlendMode);
 			}
 
@@ -393,13 +393,13 @@ namespace TEN::Renderer
 			for (int i = 0; i < rVertices.size(); i++)
 			{
 				rVertices[i].Position = Vector3(vertices[i]);
-				rVertices[i].UV = spriteToDraw.SpritePtr->UV[i];
+				rVertices[i].UV = spriteToDraw.Sprite->UV[i];
 				rVertices[i].Color = Vector4(spriteToDraw.Color.x, spriteToDraw.Color.y, spriteToDraw.Color.z, spriteToDraw.Color.w);
 			}
 			
 			_primitiveBatch->DrawQuad(rVertices[0], rVertices[1], rVertices[2], rVertices[3]);
 
-			texture2DPtr = spriteToDraw.SpritePtr->Texture;
+			texture2DPtr = spriteToDraw.Sprite->Texture;
 		}
 		
 		_primitiveBatch->End();
@@ -555,11 +555,11 @@ namespace TEN::Renderer
 	}
 
 	void Renderer::AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
-									  int priority, BlendMode blendMode, const Vector2& aspectCorrection, RenderView& renderView)
+									int priority, BlendMode blendMode, const Vector2& aspectCorrection, RenderView& renderView)
 	{
 		auto spriteToDraw = RendererDisplaySpriteToDraw{};
 
-		spriteToDraw.SpritePtr = &sprite;
+		spriteToDraw.Sprite = &sprite;
 		spriteToDraw.Position = pos2D;
 		spriteToDraw.Orientation = orient;
 		spriteToDraw.Size = size;

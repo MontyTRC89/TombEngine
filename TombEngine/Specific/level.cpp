@@ -1449,16 +1449,10 @@ void LoadSprites()
 		if (id < ID_HORIZON || id >= ID_NUMBER_OBJECTS)
 			continue;
 
-		SpriteSequenceAssetIds.push_back(id);
 		auto& asset = g_Level.SpriteSequenceAssets[id];
-
 		asset.IsLoaded = true;
 		asset.ID = id;
-
-		auto startIt = spriteAssets.begin() + startIndex;
-		auto endIt = spriteAssets.begin() + (startIndex + spriteCount);
-		asset.Sprites.resize(endIt - startIt);
-		std::copy(startIt, endIt, asset.Sprites.begin());
+		asset.Sprites.insert(asset.Sprites.begin(), spriteAssets.begin() + startIndex, spriteAssets.begin() + (startIndex + spriteCount-1));
 
 		SpriteSequenceAssetIds.push_back(id);
 	}
