@@ -27,7 +27,7 @@ namespace TEN::Effects::DisplaySprite
 	struct DisplaySprite
 	{
 		GAME_OBJECT_ID SpriteSeqAssetID = ID_DEFAULT_SPRITES;
-		int			   SpriteID			= 0;
+		int			   SpriteAssetID	= 0;
 
 		Vector2 Position	= Vector2::Zero;
 		short	Orientation = 0;

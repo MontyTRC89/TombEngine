@@ -1,5 +1,6 @@
 #pragma once
-#include "Objects\objectslist.h"
+
+#include "Objects\game_object_ids.h"
 
 enum class BlendMode;
 struct ItemInfo;
@@ -8,14 +9,15 @@ namespace TEN::Effects
 {
 	struct SimpleParticle
 	{
-		DirectX::SimpleMath::Vector3 worldPosition;
+		GAME_OBJECT_ID SpriteSeqAssetID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   SpriteAssetID	= 0;
+
+		Vector3 worldPosition;
 		float size;
 		float age;
 		float ageRate;
 		float life;
 		int room;
-		unsigned int SpriteID;
-		GAME_OBJECT_ID SpriteSeqAssetID;
 		bool active;
 		BlendMode blendMode;
 	};

@@ -9,10 +9,10 @@ namespace TEN::Effects::Streamer
 {
 	enum class StreamerFlags
 	{
-		FadeLeft  = (1 << 0),
-		FadeRight = (1 << 1),
+		FadeLeft  = 1 << 0,
+		FadeRight = 1 << 1,
 
-		BlendModeAdditive = (1 << 2)
+		BlendModeAdditive = 1 << 2
 	};
 
 	class Streamer

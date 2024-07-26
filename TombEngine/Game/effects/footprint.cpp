@@ -142,8 +142,8 @@ namespace TEN::Effects::Footprint
 
 		auto& footprint = GetNewEffect(Footprints, Footprint::COUNT_MAX);
 
-		footprint.SpriteIndex = Objects[ID_MISC_SPRITES].meshIndex + (1 + (int)isRight);
-		footprint.IsRight = isRight;
+		footprint.SpriteSeqAssetID = ID_MISC_SPRITES;
+		footprint.SpriteAssetID = isRight ? 0 : 1;
 		footprint.VertexPoints = vertexPoints;
 		footprint.Life = std::round(LIFE_MAX * FPS);
 		footprint.LifeStartFading = std::round(LIFE_START_FADING * FPS);

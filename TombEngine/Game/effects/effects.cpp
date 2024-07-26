@@ -157,27 +157,29 @@ Particle* GetFreeParticle()
 
 	spark->extras = 0;
 	spark->dynamic = -1;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	spark->SpriteSeqAssetID = ID_DEFAULT_SPRITES;
+	spark->SpriteAssetID = 0;
 	spark->blendMode = BlendMode::Additive;
 
 	return spark;
 }
 
-void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
+void SetSpriteSequence(Particle& part, GAME_OBJECT_ID spriteSeqAssetID)
 {
-	if (particle.life <= 0)
+	if (part.life <= 0)
 	{
-		particle.on = false;
-		ParticleDynamics[particle.dynamic].On = false;
+		part.on = false;
+		ParticleDynamics[part.dynamic].On = false;
 	}
 
-	float particleAge = particle.sLife - particle.life;
-	if (particleAge > particle.life )
+	float partAge = part.sLife - part.life;
+	if (partAge > part.life )
 		return;	
 
-	int numSprites = -Objects[objectID].nmeshes - 1;
-	float normalizedAge = particleAge / particle.life;
-	particle.spriteIndex = Objects[objectID].meshIndex + (int)round(Lerp(0.0f, numSprites, normalizedAge));
+	int spriteCount = -Objects[spriteSeqAssetID].nmeshes - 1;
+	float normalizedAge = partAge / part.life;
+	part.SpriteSeqAssetID = spriteSeqAssetID;
+	part.SpriteAssetID = (int)round(Lerp(0.0f, spriteCount, normalizedAge));
 }
 
 void UpdateSparks()
@@ -743,7 +745,8 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->zVel = 0;
 		spark->friction = 0;
 		spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
+		spark->SpriteSeqAssetID = ID_DEFAULT_SPRITES;
+		spark->SpriteAssetID = SPR_BUBBLES;
 		spark->scalar = 3;
 		spark->gravity = 0;
 		spark->maxYvel = 0;
@@ -1216,7 +1219,8 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			spark->sSize = spark->size = Random::GenerateInt(0, 3) * scale + size;
 			spark->dSize = 2 * spark->size;
 
-			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 95 ? 17 : 0);
+			spark->SpriteSeqAssetID = ID_DEFAULT_SPRITES;
+			spark->SpriteAssetID = (Random::GenerateInt(0, 100) > 95) ? 17 : 0;
 			spark->flags = 538;
 
 			if (sign == 1)
@@ -1368,7 +1372,8 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 	sptr->maxYvel = 0;
 
 	// TODO: right sprite
-	sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sptr->SpriteSeqAssetID = ID_DEFAULT_SPRITES;
+	sptr->SpriteAssetID = 0;
 	sptr->scalar = 2;
 
 	int size = (GetRandomControl() & 7) + 32;
@@ -1413,10 +1418,13 @@ void TriggerRocketFire(int x, int y, int z)
 			sptr->rotAdd = (GetRandomControl() & 15) + 16;
 	}
 	else
+	{
 		sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
+	}
 
 	// TODO: right sprite
-	sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sptr->SpriteSeqAssetID = ID_DEFAULT_SPRITES;
+	sptr->SpriteAssetID = 0;
 	sptr->scalar = 1;
 	sptr->gravity = -(GetRandomControl() & 3) - 4;
 	sptr->maxYvel = -(GetRandomControl() & 3) - 4;
@@ -1425,7 +1433,6 @@ void TriggerRocketFire(int x, int y, int z)
 	sptr->size = sptr->sSize = size >> 2;
 	sptr->dSize = size;
 }
-
 
 void TriggerRocketSmoke(int x, int y, int z)
 {

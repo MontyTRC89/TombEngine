@@ -7,7 +7,7 @@ namespace TEN::Effects::Blood
 	struct UnderwaterBlood
 	{
 		GAME_OBJECT_ID SpriteSeqAssetID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
-		int			   SpriteID		 = 0;
+		int			   SpriteAssetID	= 0;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;

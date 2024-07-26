@@ -30,7 +30,7 @@ namespace TEN::Effects::Blood
 		auto sphere = BoundingSphere(pos, SPAWN_RADIUS);
 
 		uwBlood.SpriteSeqAssetID = ID_DEFAULT_SPRITES;
-		uwBlood.SpriteID = 0;
+		uwBlood.SpriteAssetID = 0;
 		uwBlood.Position = Random::GeneratePointInSphere(sphere);
 		uwBlood.RoomNumber = roomNumber;
 		uwBlood.Life = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);

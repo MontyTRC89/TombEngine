@@ -127,12 +127,12 @@ namespace TEN::Scripting::Effects
 		true -- poison
 		)
 	*/
-	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
-							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
-							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
-							TypeOrNil<bool> damage, TypeOrNil<bool> poison)
+	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteAssetID, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
+							 TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
+							 TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
+							 TypeOrNil<bool> isDamage, TypeOrNil<bool> isPoison)
 	{
-		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Particle spawn script function"))
+		if (!IsSpriteSequenceAssetLoaded(ID_DEFAULT_SPRITES, spriteAssetID))
 			return;
 
 		int grav = USE_IF_HAVE(int, gravity, 0);
@@ -143,7 +143,8 @@ namespace TEN::Scripting::Effects
 
 		s->on = true;
 
-		s->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteIndex;
+		s->SpriteSeqAssetID = ID_DEFAULT_SPRITES;
+		s->SpriteAssetID = spriteAssetID;
 
 		ScriptColor colorStart = USE_IF_HAVE(ScriptColor, startColor, ScriptColor( 255, 255, 255 ));
 		ScriptColor colorEnd = USE_IF_HAVE(ScriptColor, endColor, ScriptColor( 255, 255, 255 ));
@@ -188,8 +189,8 @@ namespace TEN::Scripting::Effects
 
 		s->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
 
-		bool applyPoison = USE_IF_HAVE(bool, poison, false);
-		bool applyDamage = USE_IF_HAVE(bool, damage, false);
+		bool applyPoison = USE_IF_HAVE(bool, isPoison, false);
+		bool applyDamage = USE_IF_HAVE(bool, isDamage, false);
 
 		if (applyPoison)
 			s->flags |= SP_POISON;

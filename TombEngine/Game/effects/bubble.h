@@ -13,7 +13,7 @@ namespace TEN::Effects::Bubble
 	struct Bubble
 	{
 		GAME_OBJECT_ID SpriteSeqAssetID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
-		int			   SpriteID		 = 0;
+		int			   SpriteAssetID	= 0;
 
 		Vector3 Position	 = Vector3::Zero;
 		Vector3 PositionBase = Vector3::Zero;

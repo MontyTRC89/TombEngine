@@ -584,7 +584,7 @@ namespace TEN::Renderer
 
 		for (const auto& displaySprite : DisplaySprites)
 		{
-			const auto& sprite = _spriteSequenceAssets[displaySprite.SpriteSeqAssetID].Sprites[displaySprite.SpriteID];
+			const auto& sprite = _spriteSequenceAssets[displaySprite.SpriteSeqAssetID].Sprites[displaySprite.SpriteAssetID];
 
 			// Calculate sprite aspect ratio.
 			float spriteAspect = (float)sprite.Width / (float)sprite.Height;

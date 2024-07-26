@@ -18,7 +18,7 @@ namespace TEN::Effects::DisplaySprite
 	{
 		auto displaySprite = DisplaySprite{};
 		displaySprite.SpriteSeqAssetID = spriteSeqAssetID;
-		displaySprite.SpriteID = spriteID;
+		displaySprite.SpriteAssetID = spriteID;
 		displaySprite.Position = pos;
 		displaySprite.Orientation = orient;
 		displaySprite.Scale = scale;

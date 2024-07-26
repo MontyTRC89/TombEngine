@@ -1,6 +1,5 @@
 #pragma once
-#include <d3d11.h>
-#include <SimpleMath.h>
+
 #include "Math/Math.h"
 
 namespace TEN::Effects::Spark

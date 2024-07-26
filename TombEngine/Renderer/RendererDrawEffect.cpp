@@ -323,73 +323,73 @@ namespace TEN::Renderer
 		for (int i = 0; i < ParticleNodeOffsetIDs::NodeMax; i++)
 			NodeOffsets[i].gotIt = false;
 
-		for (auto& particle : Particles)
+		for (auto& part : Particles)
 		{
-			if (!particle.on)
+			if (!part.on)
 				continue;
 
-			if (particle.flags & SP_DEF)
+			if (part.flags & SP_DEF)
 			{
-				if (!IsSpriteSequenceAssetLoaded((GAME_OBJECT_ID)particle.spriteIndex))
+				if (!IsSpriteSequenceAssetLoaded(part.SpriteSeqAssetID, part.SpriteAssetID))
 					return;
 
-				auto pos = Vector3(particle.x, particle.y, particle.z);
+				auto pos = Vector3(part.x, part.y, part.z);
 
-				if (particle.flags & SP_FX)
+				if (part.flags & SP_FX)
 				{
-					const auto& fx = EffectList[particle.fxObj];
+					const auto& fx = EffectList[part.fxObj];
 
 					pos += fx.pos.Position.ToVector3();
 
-					if ((particle.sLife - particle.life) > Random::GenerateInt(8, 12))
+					if ((part.sLife - part.life) > Random::GenerateInt(8, 12))
 					{
-						particle.flags &= ~SP_FX;
-						particle.x = pos.x;
-						particle.y = pos.y;
-						particle.z = pos.z;
+						part.flags &= ~SP_FX;
+						part.x = pos.x;
+						part.y = pos.y;
+						part.z = pos.z;
 					}
 				}
-				else if (!(particle.flags & SP_ITEM))
+				else if (!(part.flags & SP_ITEM))
 				{
-					pos.x = particle.x;
-					pos.y = particle.y;
-					pos.z = particle.z;
+					pos.x = part.x;
+					pos.y = part.y;
+					pos.z = part.z;
 				}
 				else
 				{
-					auto* item = &g_Level.Items[particle.fxObj];
+					auto* item = &g_Level.Items[part.fxObj];
 
 					auto nodePos = Vector3i::Zero;
-					if (particle.flags & SP_NODEATTACH)
+					if (part.flags & SP_NODEATTACH)
 					{
-						if (NodeOffsets[particle.nodeNumber].gotIt)
+						if (NodeOffsets[part.nodeNumber].gotIt)
 						{
-							nodePos = NodeVectors[particle.nodeNumber];
+							nodePos = NodeVectors[part.nodeNumber];
 						}
 						else
 						{
-							nodePos.x = NodeOffsets[particle.nodeNumber].x;
-							nodePos.y = NodeOffsets[particle.nodeNumber].y;
-							nodePos.z = NodeOffsets[particle.nodeNumber].z;
+							nodePos.x = NodeOffsets[part.nodeNumber].x;
+							nodePos.y = NodeOffsets[part.nodeNumber].y;
+							nodePos.z = NodeOffsets[part.nodeNumber].z;
 
-							int meshIndex = NodeOffsets[particle.nodeNumber].meshNum;
+							int meshIndex = NodeOffsets[part.nodeNumber].meshNum;
 							if (meshIndex >= 0)
 								nodePos = GetJointPosition(item, meshIndex, nodePos);
 							else
 								nodePos = GetJointPosition(LaraItem, -meshIndex, nodePos);
 
-							NodeOffsets[particle.nodeNumber].gotIt = true;
-							NodeVectors[particle.nodeNumber] = nodePos;
+							NodeOffsets[part.nodeNumber].gotIt = true;
+							NodeVectors[part.nodeNumber] = nodePos;
 						}
 
 						pos += nodePos.ToVector3();
 
-						if ((particle.sLife - particle.life) > Random::GenerateInt(4, 8))
+						if ((part.sLife - part.life) > Random::GenerateInt(4, 8))
 						{
-							particle.flags &= ~SP_ITEM;
-							particle.x = pos.x;
-							particle.y = pos.y;
-							particle.z = pos.z;
+							part.flags &= ~SP_ITEM;
+							part.x = pos.x;
+							part.y = pos.y;
+							part.z = pos.z;
 						}
 					}
 					else
@@ -399,29 +399,29 @@ namespace TEN::Renderer
 				}
 
 				AddSpriteBillboard(
-					&_spriteSequenceAssets[particle.spriteIndex].Sprites.front(),
+					&_spriteSequenceAssets[part.SpriteSeqAssetID].Sprites[part.SpriteAssetID],
 					pos,
-					Vector4(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
-					TO_RAD(particle.rotAng << 4), particle.scalar,
-					Vector2(particle.size, particle.size),
-					particle.blendMode, true, view);
+					Vector4(part.r / (float)UCHAR_MAX, part.g / (float)UCHAR_MAX, part.b / (float)UCHAR_MAX, 1.0f),
+					TO_RAD(part.rotAng << 4), part.scalar,
+					Vector2(part.size, part.size),
+					part.blendMode, true, view);
 			}
 			else
 			{
 				if (!IsSpriteSequenceAssetLoaded(ID_SPARK_SPRITE))
 					continue;
 
-				auto pos = Vector3(particle.x, particle.y, particle.z);
-				auto axis = Vector3(particle.xVel, particle.yVel, particle.zVel);
+				auto pos = Vector3(part.x, part.y, part.z);
+				auto axis = Vector3(part.xVel, part.yVel, part.zVel);
 				axis.Normalize();
 
 				AddSpriteBillboardConstrained(
 					&_spriteSequenceAssets[ID_SPARK_SPRITE].Sprites.front(),
 					pos,
-					Vector4(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
-					TO_RAD(particle.rotAng << 4),
-					particle.scalar,
-					Vector2(4, particle.size), particle.blendMode, axis, true, view);
+					Vector4(part.r / (float)UCHAR_MAX, part.g / (float)UCHAR_MAX, part.b / (float)UCHAR_MAX, 1.0f),
+					TO_RAD(part.rotAng << 4),
+					part.scalar,
+					Vector2(4, part.size), part.blendMode, axis, true, view);
 			}
 		}
 	}
@@ -501,14 +501,14 @@ namespace TEN::Renderer
 
 		for (const auto& bubble : Bubbles)
 		{
-			if (!IsSpriteSequenceAssetLoaded(bubble.SpriteSeqAssetID, bubble.SpriteID))
+			if (!IsSpriteSequenceAssetLoaded(bubble.SpriteSeqAssetID, bubble.SpriteAssetID))
 				return;
 
 			if (bubble.Life <= 0.0f)
 				continue;
 
 			AddSpriteBillboard(
-				&_spriteSequenceAssets[bubble.SpriteSeqAssetID].Sprites[bubble.SpriteID],
+				&_spriteSequenceAssets[bubble.SpriteSeqAssetID].Sprites[bubble.SpriteAssetID],
 				bubble.Position,
 				bubble.Color, 0.0f, 1.0f, bubble.Size / 2, BlendMode::Additive, true, view);
 		}
@@ -799,7 +799,6 @@ namespace TEN::Renderer
 			switch (p.Type)
 			{
 			case WeatherType::None:
-
 				if (!IsSpriteSequenceAssetLoaded(ID_DEFAULT_SPRITES, SPR_UNDERWATERDUST))
 					return;
 
@@ -1086,7 +1085,7 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque);
 	}
 
-	Texture2D Renderer::CreateDefaultNormalTexture() 
+	Texture2D Renderer::CreateDefaultNormalTexture()
 	{
 		std::vector<byte> data = { 128, 128, 255, 1 };
 		return Texture2D(_device.Get(), 1, 1, data.data());
@@ -1096,8 +1095,11 @@ namespace TEN::Renderer
 	{
 		for (const auto& footprint : Footprints)
 		{
+			if (!IsSpriteSequenceAssetLoaded(footprint.SpriteSeqAssetID, footprint.SpriteAssetID))
+				return;
+
 			AddQuad(
-				&_spriteSequenceAssets[footprint.SpriteIndex].Sprites.front(),
+				&_spriteSequenceAssets[footprint.SpriteSeqAssetID].Sprites[footprint.SpriteAssetID],
 				footprint.VertexPoints[0], footprint.VertexPoints[1], footprint.VertexPoints[2], footprint.VertexPoints[3],
 				Vector4(footprint.Opacity), 0.0f, 1.0f, Vector2::One, BlendMode::Subtractive, false, view);
 		}
@@ -1303,11 +1305,11 @@ namespace TEN::Renderer
 			if (!smoke.active)
 				continue;
 
-			if (!IsSpriteSequenceAssetLoaded(ID_SMOKE_SPRITES, smoke.SpriteID))
+			if (!IsSpriteSequenceAssetLoaded(ID_SMOKE_SPRITES, smoke.SpriteAssetID))
 				return;
 
 			AddSpriteBillboard(
-				&_spriteSequenceAssets[ID_SMOKE_SPRITES].Sprites[smoke.SpriteID],
+				&_spriteSequenceAssets[ID_SMOKE_SPRITES].Sprites[smoke.SpriteAssetID],
 				smoke.position,
 				smoke.color, smoke.rotation, 1.0f, { smoke.size, smoke.size }, BlendMode::AlphaBlend, true, view);
 		}
@@ -1351,11 +1353,11 @@ namespace TEN::Renderer
 			ExplosionParticle& e = explosionParticles[i];
 			if (!e.active) continue;
 
-			if (!IsSpriteSequenceAssetLoaded(ID_EXPLOSION_SPRITES, e.SpriteID))
+			if (!IsSpriteSequenceAssetLoaded(ID_EXPLOSION_SPRITES, e.SpriteAssetID))
 				return;
 
 			AddSpriteBillboard(
-				&_spriteSequenceAssets[ID_EXPLOSION_SPRITES].Sprites[e.SpriteID], 
+				&_spriteSequenceAssets[ID_EXPLOSION_SPRITES].Sprites[e.SpriteAssetID], 
 				e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BlendMode::Additive, true, view);
 		}
 	}
@@ -1367,11 +1369,11 @@ namespace TEN::Renderer
 			if (!part.active)
 				continue;
 
-			if (!IsSpriteSequenceAssetLoaded(part.SpriteSeqAssetID, part.SpriteID))
+			if (!IsSpriteSequenceAssetLoaded(part.SpriteSeqAssetID, part.SpriteAssetID))
 				continue;
 
 			AddSpriteBillboard(
-				&_spriteSequenceAssets[part.SpriteSeqAssetID].Sprites[part.SpriteID],
+				&_spriteSequenceAssets[part.SpriteSeqAssetID].Sprites[part.SpriteAssetID],
 				part.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { part.size, part.size / 2 }, BlendMode::AlphaBlend, true, view);
 		}
 	}

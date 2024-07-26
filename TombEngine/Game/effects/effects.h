@@ -1,4 +1,6 @@
 #pragma once
+
+#include "Objects/game_object_ids.h"
 #include "Math/Math.h"
 #include "Renderer/RendererEnums.h"
 
@@ -123,10 +125,8 @@ struct RIPPLE_STRUCT
 
 struct Particle
 {
-	// TODO
-	//GAME_OBJECT_ID SpriteSeqAssetID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
-	//int			   SpriteAssetID	= 0;;
-	int spriteIndex;
+	GAME_OBJECT_ID SpriteSeqAssetID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+	int			   SpriteAssetID	= 0;
 
 	int x;
 	int y;

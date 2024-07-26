@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Objects/game_object_ids.h"
+
 struct ItemInfo;
 
 namespace TEN::Effects::Footprint
@@ -9,8 +11,8 @@ namespace TEN::Effects::Footprint
 		static constexpr auto COUNT_MAX	   = 64;
 		static constexpr auto VERTEX_COUNT = 4;
 
-		unsigned int SpriteIndex = 0;
-		bool		 IsRight	 = false;
+		GAME_OBJECT_ID SpriteSeqAssetID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		bool		   SpriteAssetID	= 0;
 
 		float Life			  = 0.0f;
 		float LifeStartFading = 0.0f;

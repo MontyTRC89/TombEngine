@@ -79,7 +79,7 @@ namespace TEN::Effects
 
 			int numSprites = -Objects[p.SpriteSeqAssetID].nmeshes - 1;
 			float normalizedAge = p.age / p.life;
-			p.SpriteID = Lerp(0.0f, numSprites, normalizedAge);
+			p.SpriteAssetID = Lerp(0.0f, numSprites, normalizedAge);
 		}
 	}
 }
