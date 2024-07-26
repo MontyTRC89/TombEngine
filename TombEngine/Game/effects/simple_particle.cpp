@@ -36,7 +36,7 @@ namespace TEN::Effects
 		p.ageRate = Random::GenerateFloat(0.9f, 1.3f);
 		float size = Random::GenerateFloat(96, 128);
 		p.worldPosition = {x, float(snowMobile->Pose.Position.y) - size / 2 , z};
-		p.sequence = ID_SKIDOO_SNOW_TRAIL_SPRITES;
+		p.SpriteSeqAssetID = ID_SKIDOO_SNOW_TRAIL_SPRITES;
 		p.size = Random::GenerateFloat(256, 512);
 		p.blendMode = BlendMode::AlphaBlend;
 	}
@@ -60,7 +60,7 @@ namespace TEN::Effects
 			p.room = boat->RoomNumber;
 			p.ageRate = Random::GenerateFloat(0.9f, 1.3f);
 			p.worldPosition = { x, y, z };
-			p.sequence = ID_MOTORBOAT_FOAM_SPRITES;
+			p.SpriteSeqAssetID = ID_MOTORBOAT_FOAM_SPRITES;
 			p.size = Random::GenerateFloat(256, 512);
 			p.blendMode = BlendMode::Additive;
 		}
@@ -77,9 +77,9 @@ namespace TEN::Effects
 			if (p.life < p.age)
 				p.active = false;
 
-			int numSprites = -Objects[p.sequence].nmeshes - 1;
+			int numSprites = -Objects[p.SpriteSeqAssetID].nmeshes - 1;
 			float normalizedAge = p.age / p.life;
-			p.sprite = Lerp(0.0f, numSprites, normalizedAge);
+			p.SpriteID = Lerp(0.0f, numSprites, normalizedAge);
 		}
 	}
 }

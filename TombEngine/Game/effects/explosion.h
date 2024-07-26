@@ -16,7 +16,7 @@ namespace TEN::Effects::Explosion
 		float age;
 		float life;
 		int room;
-		int sprite;
+		int SpriteID;
 		bool active;
 	};
 	extern std::array<ExplosionParticle, 64> explosionParticles;

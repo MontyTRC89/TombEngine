@@ -215,6 +215,25 @@ void InitializeAssets()
 	SequenceUsed[5] = 0;
 }
 
+bool IsSpriteSequenceAssetLoaded(GAME_OBJECT_ID id, int spriteID)
+{
+	auto it = g_Level.SpriteSequenceAssets.find(id);
+	bool isLoaded = (it != g_Level.SpriteSequenceAssets.end());
+
+	if (!isLoaded)
+	{
+		TENLog("Sprite sequence asset " + GetObjectName(id) + " not loaded.", LogLevel::Warning);
+		return false;
+	}
+	else if (isLoaded && spriteID >= it->second.Sprites.size())
+	{
+		TENLog("Sprite sequence asset " + GetObjectName(id) + " missing sprite " + std::to_string(spriteID) + ".", LogLevel::Warning);
+		return false;
+	}
+
+	return true;
+}
+
 const ObjectInfo& GetMoveableAsset(GAME_OBJECT_ID id)
 {
 	return Objects[id];

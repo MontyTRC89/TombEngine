@@ -837,10 +837,8 @@ namespace TEN::Renderer
 		_staticsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_staticsVertices.size(), _staticsVertices.data());
 		_staticsIndexBuffer = IndexBuffer(_device.Get(), (int)_staticsIndices.size(), _staticsIndices.data());
 
-		// Step 5: Prepare sprites.h
-		TENLog("Preparing sprite data...", LogLevel::Info);
-
 		// Convert sprite assets to renderer sprites.
+		TENLog("Preparing sprite data...", LogLevel::Info);
 		for (int spriteSeqAssetID : SpriteSequenceAssetIds)
 		{
 			const auto& spriteSeqAsset = GetSpriteSequenceAsset((GAME_OBJECT_ID)spriteSeqAssetID);

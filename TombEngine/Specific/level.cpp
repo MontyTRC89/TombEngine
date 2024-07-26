@@ -260,7 +260,7 @@ void LoadItems()
 	}
 }
 
-void LoadAssets()
+void LoadMoveablesAndStatics()
 {
 	Objects.Initialize();
 
@@ -418,18 +418,18 @@ void LoadAssets()
 	TENLog("Moveable assets: " + std::to_string(movAssetCount), LogLevel::Info);
 	for (int i = 0; i < movAssetCount; i++)
 	{
-		int id = (GAME_OBJECT_ID)ReadInt32();
-		MoveableAssetIds.push_back(id);
-		auto& asset = Objects[id];
+		int movAssetID = (GAME_OBJECT_ID)ReadInt32();
+		MoveableAssetIds.push_back(movAssetID);
+		auto& movAsset = Objects[movAssetID];
 
-		asset.ID = id;
-		asset.loaded = true;
-		asset.nmeshes = ReadInt32();
-		asset.meshIndex = ReadInt32();
-		asset.boneIndex = ReadInt32();
-		asset.frameBase = ReadInt32();
-		asset.animIndex = ReadInt32();
-		asset.loaded = true;
+		movAsset.ID = movAssetID;
+		movAsset.loaded = true;
+		movAsset.nmeshes = ReadInt32();
+		movAsset.meshIndex = ReadInt32();
+		movAsset.boneIndex = ReadInt32();
+		movAsset.frameBase = ReadInt32();
+		movAsset.animIndex = ReadInt32();
+		movAsset.loaded = true;
 	}
 
 	TENLog("Initializing moveable assets...", LogLevel::Info);
@@ -439,36 +439,36 @@ void LoadAssets()
 	TENLog("Static assets: " + std::to_string(staticAssetCount), LogLevel::Info);
 	for (int i = 0; i < staticAssetCount; i++)
 	{
-		auto id = (GAME_OBJECT_ID)ReadInt32();
-		if (id >= STATIC_ASSET_COUNT_MAX)
+		auto staticAssetID = (GAME_OBJECT_ID)ReadInt32();
+		if (staticAssetID >= STATIC_ASSET_COUNT_MAX)
 		{
 			TENLog(
-				"Attempted to load static ID " + std::to_string(id) + ". Change static ID in WadTool to value below max (" + std::to_string(STATIC_ASSET_COUNT_MAX) + "). ",
+				"Attempted to load static ID " + std::to_string(staticAssetID) + ". Change static ID in WadTool to value below max (" + std::to_string(STATIC_ASSET_COUNT_MAX) + "). ",
 				LogLevel::Warning);
 			
-			id = (GAME_OBJECT_ID)0;
+			staticAssetID = (GAME_OBJECT_ID)0;
 		}
 
-		StaticAssetIds.push_back(id);
-		auto& asset = g_Level.StaticAssets[id];
+		StaticAssetIds.push_back(staticAssetID);
+		auto& staticAsset = g_Level.StaticAssets[staticAssetID];
 
-		asset.ID = id;
-		asset.meshNumber = ReadInt32();
-		asset.visibilityBox.X1 = ReadInt16();
-		asset.visibilityBox.X2 = ReadInt16();
-		asset.visibilityBox.Y1 = ReadInt16();
-		asset.visibilityBox.Y2 = ReadInt16();
-		asset.visibilityBox.Z1 = ReadInt16();
-		asset.visibilityBox.Z2 = ReadInt16();
-		asset.collisionBox.X1 = ReadInt16();
-		asset.collisionBox.X2 = ReadInt16();
-		asset.collisionBox.Y1 = ReadInt16();
-		asset.collisionBox.Y2 = ReadInt16();
-		asset.collisionBox.Z1 = ReadInt16();
-		asset.collisionBox.Z2 = ReadInt16();
-		asset.flags = ReadInt16();
-		asset.shatterType = (ShatterType)ReadInt16();
-		asset.shatterSound = ReadInt16();
+		staticAsset.ID = staticAssetID;
+		staticAsset.meshNumber = ReadInt32();
+		staticAsset.visibilityBox.X1 = ReadInt16();
+		staticAsset.visibilityBox.X2 = ReadInt16();
+		staticAsset.visibilityBox.Y1 = ReadInt16();
+		staticAsset.visibilityBox.Y2 = ReadInt16();
+		staticAsset.visibilityBox.Z1 = ReadInt16();
+		staticAsset.visibilityBox.Z2 = ReadInt16();
+		staticAsset.collisionBox.X1 = ReadInt16();
+		staticAsset.collisionBox.X2 = ReadInt16();
+		staticAsset.collisionBox.Y1 = ReadInt16();
+		staticAsset.collisionBox.Y2 = ReadInt16();
+		staticAsset.collisionBox.Z1 = ReadInt16();
+		staticAsset.collisionBox.Z2 = ReadInt16();
+		staticAsset.flags = ReadInt16();
+		staticAsset.shatterType = (ShatterType)ReadInt16();
+		staticAsset.shatterSound = ReadInt16();
 	}
 }
 
@@ -1252,7 +1252,7 @@ bool LoadLevel(int levelIndex)
 		LoadRooms();
 		g_Renderer.UpdateProgress(40);
 
-		LoadAssets();
+		LoadMoveablesAndStatics();
 		g_Renderer.UpdateProgress(50);
 
 		LoadSprites();
@@ -1441,20 +1441,19 @@ void LoadSprites()
 	TENLog("Sprite sequence assets: " + std::to_string(spriteSeqAssetCount), LogLevel::Info);
 	for (int i = 0; i < spriteSeqAssetCount; i++)
 	{
-		auto id = (GAME_OBJECT_ID)ReadInt32();
+		auto spriteSeqAssetID = (GAME_OBJECT_ID)ReadInt32();
 		int spriteCount = abs(ReadInt16()); // NOTE: Value is negative.
 		int startIndex = ReadInt16();
 
 		// Check if slot is a sprite sequence asset.
-		if (id < ID_HORIZON || id >= ID_NUMBER_OBJECTS)
+		if (spriteSeqAssetID < ID_HORIZON || spriteSeqAssetID >= ID_NUMBER_OBJECTS)
 			continue;
 
-		auto& asset = g_Level.SpriteSequenceAssets[id];
-		asset.IsLoaded = true;
-		asset.ID = id;
-		asset.Sprites.insert(asset.Sprites.begin(), spriteAssets.begin() + startIndex, spriteAssets.begin() + (startIndex + spriteCount));
+		auto& spriteSeqAsset = g_Level.SpriteSequenceAssets[spriteSeqAssetID];
+		spriteSeqAsset.ID = spriteSeqAssetID;
+		spriteSeqAsset.Sprites.insert(spriteSeqAsset.Sprites.begin(), spriteAssets.begin() + startIndex, spriteAssets.begin() + (startIndex + spriteCount));
 
-		SpriteSequenceAssetIds.push_back(id);
+		SpriteSequenceAssetIds.push_back(spriteSeqAssetID);
 	}
 }
 

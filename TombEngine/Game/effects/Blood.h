@@ -1,10 +1,13 @@
 #pragma once
 
+#include "Objects/game_object_ids.h"
+
 namespace TEN::Effects::Blood
 {
 	struct UnderwaterBlood
 	{
-		unsigned int SpriteIndex = 0;
+		GAME_OBJECT_ID SpriteSeqAssetID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   SpriteID		 = 0;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;

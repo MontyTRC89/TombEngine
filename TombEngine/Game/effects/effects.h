@@ -123,6 +123,11 @@ struct RIPPLE_STRUCT
 
 struct Particle
 {
+	// TODO
+	//GAME_OBJECT_ID SpriteSeqAssetID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+	//int			   SpriteAssetID	= 0;;
+	int spriteIndex;
+
 	int x;
 	int y;
 	int z;
@@ -137,7 +142,6 @@ struct Particle
 	float size;
 	unsigned char friction;
 	unsigned char scalar;
-	unsigned char spriteIndex;
 	signed char rotAdd;
 	signed char maxYvel;
 	bool on;

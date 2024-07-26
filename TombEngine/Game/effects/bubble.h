@@ -1,16 +1,19 @@
 #pragma once
 
+#include "Objects/game_object_ids.h"
+
 namespace TEN::Effects::Bubble
 {
 	enum class BubbleFlags
 	{
-		LargeScale	  = (1 << 0),
-		HighAmplitude = (1 << 1)
+		LargeScale	  = 1 << 0,
+		HighAmplitude = 1 << 1
 	};
 
 	struct Bubble
 	{
-		unsigned int SpriteIndex = 0;
+		GAME_OBJECT_ID SpriteSeqAssetID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   SpriteID		 = 0;
 
 		Vector3 Position	 = Vector3::Zero;
 		Vector3 PositionBase = Vector3::Zero;

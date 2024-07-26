@@ -1,17 +1,20 @@
 #pragma once
 
+#include "Objects/game_object_ids.h"
+
 namespace TEN::Effects::Ripple
 {
 	enum class RippleFlags
 	{
-		SlowFade		  = (1 << 0),
-		LowOpacity		  = (1 << 1),
-		OnGround		  = (1 << 2)
+		SlowFade   = 1 << 0,
+		LowOpacity = 1 << 1,
+		OnGround   = 1 << 2
 	};
 
 	struct Ripple
 	{
-		unsigned int SpriteIndex = 0;
+		GAME_OBJECT_ID SpriteSeqAssetID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   SpriteID	   = 0;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;

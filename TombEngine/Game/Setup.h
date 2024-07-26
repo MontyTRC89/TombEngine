@@ -135,8 +135,6 @@ struct SpriteAsset
 
 struct SpriteSequenceAsset
 {
-	bool IsLoaded = false;
-
 	int						 ID		 = 0;
 	std::vector<SpriteAsset> Sprites = {};
 };
@@ -158,9 +156,17 @@ private:
 
 extern ObjectHandler Objects;
 
+// Initializers
+
 void InitializeGameFlags();
 void InitializeSpecialEffects();
 void InitializeAssets();
+
+// Inquirers
+
+bool IsSpriteSequenceAssetLoaded(GAME_OBJECT_ID id, int spriteID = 0);
+
+// Getters
 
 const ObjectInfo&		   GetMoveableAsset(GAME_OBJECT_ID id);
 const StaticAsset&		   GetStaticAsset(GAME_OBJECT_ID id);

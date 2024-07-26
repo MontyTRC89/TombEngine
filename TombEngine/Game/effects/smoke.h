@@ -13,7 +13,7 @@ namespace TEN::Effects::Smoke
 		Vector3 position;
 		Vector3 velocity;
 		int room;
-		int sprite;
+		int SpriteID;
 		float gravity;
 		float friction;
 		float sourceSize;

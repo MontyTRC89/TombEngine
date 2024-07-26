@@ -43,7 +43,8 @@ namespace TEN::Effects::Bubble
 
 		size = std::min(size, BUBBLE_SIZE_MAX);
 
-		bubble.SpriteIndex = SPR_BUBBLES;
+		bubble.SpriteSeqAssetID = ID_DEFAULT_SPRITES;
+		bubble.SpriteID = SPR_BUBBLES;
 		bubble.Position =
 		bubble.PositionBase = pos;
 		bubble.RoomNumber = roomNumber;
@@ -110,7 +111,8 @@ namespace TEN::Effects::Bubble
 
 		float size = Random::GenerateFloat(CHAFF_BUBBLE_SIZE_MIN, CHAFF_BUBBLE_SIZE_MAX);
 
-		bubble.SpriteIndex = SPR_BUBBLES;
+		bubble.SpriteSeqAssetID = ID_DEFAULT_SPRITES;
+		bubble.SpriteID = SPR_BUBBLES;
 		bubble.Position =
 		bubble.PositionBase = pos;
 		bubble.RoomNumber = roomNumber;

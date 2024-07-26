@@ -33,7 +33,8 @@ namespace TEN::Effects::Ripple
 			Random::GenerateFloat(LIFE_WATER_SURFACE_MIN, LIFE_WATER_SURFACE_MAX);
 		float fadeDurationInSec = lifeInSec * ((ripple.Flags & ((int)RippleFlags::SlowFade)) ? FADE_SLOW_COEFF : FADE_FAST_COEFF);
 
-		ripple.SpriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES;
+		ripple.SpriteSeqAssetID = ID_DEFAULT_SPRITES;
+		ripple.SpriteID = SPR_RIPPLES;
 		ripple.Position = pos;
 		ripple.RoomNumber = roomNumber;
 		ripple.Normal = normal;

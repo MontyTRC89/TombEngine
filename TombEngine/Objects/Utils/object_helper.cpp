@@ -51,15 +51,14 @@ bool AssignObjectAnimations(ObjectInfo& object, int requiredObjectID, const std:
 
 bool CheckIfSlotExists(GAME_OBJECT_ID requiredObj, const std::string& baseName)
 {
-	bool result = Objects[requiredObj].loaded;
-
-	if (!result)
+	bool isLoaded = Objects[requiredObj].loaded;
+	if (!isLoaded)
 	{
 		TENLog("Slot " + GetObjectName(requiredObj) + " (" + std::to_string(requiredObj) + ") not loaded. " + 
 				baseName + " may not work.", LogLevel::Warning);
 	}
 
-	return result;
+	return isLoaded;
 }
 
 void InitSmashObject(ObjectInfo* object, int objectNumber)

@@ -79,7 +79,7 @@ namespace TEN::Effects::Smoke
 			s.rotation += s.angularVelocity;
 			s.color = DirectX::SimpleMath::Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 			int numSprites = -Objects[ID_SMOKE_SPRITES].nmeshes;
-			s.sprite = Lerp(0, numSprites - 1, normalizedLife);
+			s.SpriteID = Lerp(0, numSprites - 1, normalizedLife);
 		}
 	}
 

@@ -118,7 +118,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)
 	{
-		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHIC, "Bar rendering"))
+		if (!IsSpriteSequenceAssetLoaded(ID_BAR_BORDER_GRAPHIC))
 			return;
 
 		unsigned int strides = sizeof(Vertex);

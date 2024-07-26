@@ -14,8 +14,8 @@ namespace TEN::Effects
 		float ageRate;
 		float life;
 		int room;
-		unsigned int sprite;
-		GAME_OBJECT_ID sequence;
+		unsigned int SpriteID;
+		GAME_OBJECT_ID SpriteSeqAssetID;
 		bool active;
 		BlendMode blendMode;
 	};

@@ -154,7 +154,7 @@ void FreeLevel();
 void LoadTextures();
 void LoadRooms();
 void LoadItems();
-void LoadAssets();
+void LoadMoveablesAndStatics();
 void LoadCameras();
 void LoadSprites();
 void LoadBoxes();
