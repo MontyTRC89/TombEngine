@@ -1452,7 +1452,7 @@ void LoadSprites()
 		auto& asset = g_Level.SpriteSequenceAssets[id];
 		asset.IsLoaded = true;
 		asset.ID = id;
-		asset.Sprites.insert(asset.Sprites.begin(), spriteAssets.begin() + startIndex, spriteAssets.begin() + (startIndex + spriteCount-1));
+		asset.Sprites.insert(asset.Sprites.begin(), spriteAssets.begin() + startIndex, spriteAssets.begin() + (startIndex + spriteCount));
 
 		SpriteSequenceAssetIds.push_back(id);
 	}
