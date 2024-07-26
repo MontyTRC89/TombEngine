@@ -1428,16 +1428,12 @@ void LoadSprites()
 	auto spriteAssets = std::vector<SpriteAsset>(spriteAssetCount);
 	for (int i = 0; i < spriteAssetCount; i++)
 	{
-		auto& asset =spriteAssets[i];
-		asset.tile = ReadInt32();
-		asset.x1 = ReadFloat();
-		asset.y1 = ReadFloat();
-		asset.x2 = ReadFloat();
-		asset.y2 = ReadFloat();
-		asset.x3 = ReadFloat();
-		asset.y3 = ReadFloat();
-		asset.x4 = ReadFloat();
-		asset.y4 = ReadFloat();
+		auto& asset = spriteAssets[i];
+		asset.TileID = ReadInt32();
+		asset.Uvs[0] = ReadVector2();
+		asset.Uvs[1] = ReadVector2();
+		asset.Uvs[2] = ReadVector2();
+		asset.Uvs[3] = ReadVector2();
 	}
 
 	// Load sprite sequence assets.
@@ -1449,14 +1445,13 @@ void LoadSprites()
 		int spriteCount = abs(ReadInt16()); // NOTE: Value is negative.
 		int startIndex = ReadInt16();
 
-		// TODO: Handle error.
+		// Check if slot is a sprite sequence asset.
 		if (id < ID_HORIZON || id >= ID_NUMBER_OBJECTS)
 			continue;
 
 		SpriteSequenceAssetIds.push_back(id);
 		auto& asset = g_Level.SpriteSequenceAssets[id];
 
-		asset.StartIndex = startIndex;
 		asset.IsLoaded = true;
 		asset.ID = id;
 

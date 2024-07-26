@@ -140,7 +140,7 @@ namespace TEN::Renderer
 
 		BindConstantBufferVS(ConstantBufferRegister::Hud, _cbHUD.get());
 
-		RendererSprite* borderSprite = &_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex];
+		RendererSprite* borderSprite = &_spriteSequenceAssets[ID_BAR_BORDER_GRAPHIC].Sprites.front();
 		_stHUDBar.BarStartUV = borderSprite->UV[0];
 		_stHUDBar.BarScale = Vector2(borderSprite->Width / (float)borderSprite->Texture->Width, borderSprite->Height / (float)borderSprite->Texture->Height);
 		_cbHUDBar.UpdateData(_stHUDBar, _context.Get());
@@ -151,7 +151,7 @@ namespace TEN::Renderer
 
 		DrawIndexedTriangles(56, 0, 0);
 
-		_context->PSSetShaderResources(0, 1, _sprites[Objects[textureSlot].meshIndex].Texture->ShaderResourceView.GetAddressOf());
+		_context->PSSetShaderResources(0, 1, _spriteSequenceAssets[textureSlot].Sprites.front().Texture->ShaderResourceView.GetAddressOf());
 
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
 		
@@ -166,7 +166,7 @@ namespace TEN::Renderer
 		_stHUDBar.Percent = percent;
 		_stHUDBar.Poisoned = isPoisoned;
 		_stHUDBar.Frame = frame;	
-		RendererSprite* innerSprite = &_sprites[Objects[textureSlot].meshIndex];
+		RendererSprite* innerSprite = &_spriteSequenceAssets[textureSlot].Sprites.front();
 		_stHUDBar.BarStartUV = innerSprite->UV[0];
 		_stHUDBar.BarScale = Vector2(innerSprite->Width / (float)innerSprite->Texture->Width, innerSprite->Height / (float)innerSprite->Texture->Height);
 		_cbHUDBar.UpdateData(_stHUDBar, _context.Get());
@@ -262,11 +262,11 @@ namespace TEN::Renderer
 
 		if (Lara.Control.Look.OpticRange != 0 && !Lara.Control.Look.IsUsingLasersight)
 		{
-			DrawFullScreenSprite(&_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex], Vector3::One, false);
+			DrawFullScreenSprite(&_spriteSequenceAssets[ID_BINOCULAR_GRAPHIC].Sprites.front(), Vector3::One, false);
 		}
 		else if (Lara.Control.Look.OpticRange != 0 && Lara.Control.Look.IsUsingLasersight)
 		{
-			DrawFullScreenSprite(&_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex], Vector3::One);
+			DrawFullScreenSprite(&_spriteSequenceAssets[ID_LASER_SIGHT_GRAPHIC].Sprites.front(), Vector3::One);
 
 			SetBlendMode(BlendMode::Opaque);
 
@@ -584,7 +584,7 @@ namespace TEN::Renderer
 
 		for (const auto& displaySprite : DisplaySprites)
 		{
-			const auto& sprite = _sprites[Objects[displaySprite.SpriteSeqAssetID].meshIndex + displaySprite.SpriteID];
+			const auto& sprite = _spriteSequenceAssets[displaySprite.SpriteSeqAssetID].Sprites[displaySprite.SpriteID];
 
 			// Calculate sprite aspect ratio.
 			float spriteAspect = (float)sprite.Width / (float)sprite.Height;

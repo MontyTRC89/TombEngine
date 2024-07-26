@@ -840,29 +840,6 @@ namespace TEN::Renderer
 		// Step 5: Prepare sprites.
 		TENLog("Preparing sprite data...", LogLevel::Info);
 
-		// TODO: Remove.
-		_sprites.reserve(g_Level.SpriteSequenceAssets.size()); // NOTE: Minimum size.
-		int index = 0;
-		for (int spriteSeqAssetID : SpriteSequenceAssetIds)
-		{
-			const auto& spriteSeqAsset = g_Level.SpriteSequenceAssets.at((GAME_OBJECT_ID)spriteSeqAssetID);
-			for (const auto& spriteAsset : spriteSeqAsset.Sprites)
-			{
-				auto& sprite = _sprites.emplace_back();
-				sprite.UV[0] = Vector2(spriteAsset.x1, spriteAsset.y1);
-				sprite.UV[1] = Vector2(spriteAsset.x2, spriteAsset.y2);
-				sprite.UV[2] = Vector2(spriteAsset.x3, spriteAsset.y3);
-				sprite.UV[3] = Vector2(spriteAsset.x4, spriteAsset.y4);
-				sprite.Texture = &_spritesTextures[spriteAsset.tile];
-				sprite.Width = round(((spriteAsset.x2 - spriteAsset.x1) * sprite.Texture->Width) + 1.0f);
-				sprite.Height = round(((spriteAsset.y3 - spriteAsset.y2) * sprite.Texture->Height) + 1.0f);
-				sprite.X = spriteAsset.x1 * sprite.Texture->Width;
-				sprite.Y = spriteAsset.y1 * sprite.Texture->Height;
-
-				index++;
-			}
-		}
-
 		// Convert sprite assets to renderer sprites.
 		for (int spriteSeqAssetID : SpriteSequenceAssetIds)
 		{
@@ -875,15 +852,15 @@ namespace TEN::Renderer
 				const auto& spriteAsset = spriteSeqAsset.Sprites[i];
 				auto& rendererSprite = rendererSpriteSeq.Sprites[i];
 
-				rendererSprite.UV[0] = Vector2(spriteAsset.x1, spriteAsset.y1);
-				rendererSprite.UV[1] = Vector2(spriteAsset.x2, spriteAsset.y2);
-				rendererSprite.UV[2] = Vector2(spriteAsset.x3, spriteAsset.y3);
-				rendererSprite.UV[3] = Vector2(spriteAsset.x4, spriteAsset.y4);
-				rendererSprite.Texture = &_spritesTextures[spriteAsset.tile];
-				rendererSprite.Width = round(((spriteAsset.x2 - spriteAsset.x1) * rendererSprite.Texture->Width) + 1.0f);
-				rendererSprite.Height = round(((spriteAsset.y3 - spriteAsset.y2) * rendererSprite.Texture->Height) + 1.0f);
-				rendererSprite.X = spriteAsset.x1 * rendererSprite.Texture->Width;
-				rendererSprite.Y = spriteAsset.y1 * rendererSprite.Texture->Height;
+				rendererSprite.UV[0] = Vector2(spriteAsset.Uvs[0].x, spriteAsset.Uvs[0].y);
+				rendererSprite.UV[1] = Vector2(spriteAsset.Uvs[1].x, spriteAsset.Uvs[1].y);
+				rendererSprite.UV[2] = Vector2(spriteAsset.Uvs[2].x, spriteAsset.Uvs[2].y);
+				rendererSprite.UV[3] = Vector2(spriteAsset.Uvs[3].x, spriteAsset.Uvs[3].y);
+				rendererSprite.Texture = &_spritesTextures[spriteAsset.TileID];
+				rendererSprite.Width = round(((spriteAsset.Uvs[1].x - spriteAsset.Uvs[0].x) * rendererSprite.Texture->Width) + 1.0f);
+				rendererSprite.Height = round(((spriteAsset.Uvs[2].y - spriteAsset.Uvs[1].y) * rendererSprite.Texture->Height) + 1.0f);
+				rendererSprite.X = spriteAsset.Uvs[0].x * rendererSprite.Texture->Width;
+				rendererSprite.Y = spriteAsset.Uvs[0].y * rendererSprite.Texture->Height;
 			}
 
 			_spriteSequenceAssets[spriteSeqAssetID] = rendererSpriteSeq;

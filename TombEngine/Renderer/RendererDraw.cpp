@@ -358,7 +358,8 @@ namespace TEN::Renderer
 
 				auto c = (pos1 + pos2) / 2.0f;
 
-				AddSpriteBillboardConstrained(&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY1],
+				AddSpriteBillboardConstrained(
+					&_spriteSequenceAssets[ID_DEFAULT_SPRITES].Sprites[SPR_EMPTY1],
 					c,
 					_rooms[rope.room].AmbientLight,
 					(PI / 2),

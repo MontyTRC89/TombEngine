@@ -88,6 +88,7 @@ namespace TEN::Renderer
 	{
 	private:
 		// Core DX11 objects
+
 		ComPtr<ID3D11Device> _device = nullptr;
 		ComPtr<ID3D11DeviceContext> _context = nullptr;
 		ComPtr<IDXGISwapChain> _swapChain = nullptr;
@@ -107,6 +108,7 @@ namespace TEN::Renderer
 		Viewport _viewportToolkit;
 
 		// Render targets
+
 		RenderTarget2D _normalsRenderTarget;
 		RenderTarget2D _depthRenderTarget;
 		RenderTarget2D _backBuffer;
@@ -121,6 +123,7 @@ namespace TEN::Renderer
 		Texture2DArray _shadowMap;
 
 		// Shaders
+
 		ComPtr<ID3D11VertexShader> _vsRooms;
 		ComPtr<ID3D11VertexShader> _vsRoomsAnimatedTextures;
 		ComPtr<ID3D11PixelShader> _psRooms;
@@ -159,6 +162,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psRoomAmbient;
 
 		// Constant buffers
+
 		RenderView _gameCamera;
 		ConstantBuffer<CCameraMatrixBuffer> _cbCameraMatrices;
 		CItemBuffer _stItem;
@@ -191,17 +195,20 @@ namespace TEN::Renderer
 		ConstantBuffer<CSMAABuffer> _cbSMAABuffer;
 
 		// Primitive batches
+
 		std::unique_ptr<SpriteBatch> _spriteBatch;
 		std::unique_ptr<PrimitiveBatch<Vertex>> _primitiveBatch;
 
 		// Text
-		std::unique_ptr<SpriteFont> _gameFont;
+
+		std::unique_ptr<SpriteFont>		  _gameFont;
 		std::vector<RendererStringToDraw> _stringsToDraw;
 		float _blinkColorValue = 0.0f;
-		float _blinkTime		  = 0.0f;
+		float _blinkTime	   = 0.0f;
 		bool  _isBlinkUpdated  = false;
 
 		// Graphics resources
+
 		Texture2D _logo;
 		Texture2D _skyTexture;
 		Texture2D _whiteTexture;
@@ -228,25 +235,27 @@ namespace TEN::Renderer
 		std::vector<int> _staticsIndices;
 
 		// Rooms and collector
+
 		std::vector<RendererRoom> _rooms;
 		bool _invalidateCache;
 		std::vector<short> _visitedRoomsStack;
 
 		// Lights
+
 		std::vector<RendererLight> _dynamicLights;
 		RendererLight* _shadowLight;
 
 		// Lines
+
 		std::vector<RendererLine2D>		_lines2DToDraw	   = {};
 		std::vector<RendererLine3D>		_lines3DToDraw	   = {};
 		std::vector<RendererTriangle3D> _triangles3DToDraw = {};
 
-		// Textures, objects and sprites
+		// Assets
 
 		std::vector<std::optional<RendererObject>> _moveableAssets		 = {};
 		std::vector<std::optional<RendererObject>> _staticAssets		 = {};
 		std::vector<RendererSpriteSequence>		   _spriteSequenceAssets = {};
-		std::vector<RendererSprite>				   _sprites				 = {};
 
 		Matrix _laraWorldMatrix;
 		std::vector<RendererAnimatedTextureSet> _animatedTextureSets;

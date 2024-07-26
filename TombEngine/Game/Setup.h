@@ -127,21 +127,14 @@ struct StaticAsset
 
 struct SpriteAsset
 {
-	int tile;
-	float x1;
-	float y1;
-	float x2;
-	float y2;
-	float x3;
-	float y3;
-	float x4;
-	float y4;
+	static const auto UV_COUNT = 4;
+
+	int TileID = 0;
+	std::array<Vector2, UV_COUNT> Uvs = {};
 };
 
 struct SpriteSequenceAsset
 {
-	int StartIndex = 0; // TODO: Remove.
-
 	bool IsLoaded = false;
 
 	int ID = 0;
