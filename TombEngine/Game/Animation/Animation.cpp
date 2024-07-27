@@ -32,6 +32,12 @@ namespace TEN::Animation
 		Alpha = alpha;
 	}
 
+	const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
+	{
+		auto frameInterp = GetFrameInterpolation(frameNumber);
+		return ((frameInterp.Alpha <= 0.5f) ? frameInterp.Keyframe0 : frameInterp.Keyframe1);
+	}
+
 	FrameInterpData AnimData::GetFrameInterpolation(int frameNumber) const
 	{
 		// FAILSAFE: Clamp frame number.
@@ -47,12 +53,6 @@ namespace TEN::Animation
 
 		// Return frame interpolation.
 		return FrameInterpData(keyframe0, keyframe1, alpha);
-	}
-
-	const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
-	{
-		auto frameInterp = GetFrameInterpolation(frameNumber);
-		return ((frameInterp.Alpha <= 0.5f) ? frameInterp.Keyframe0 : frameInterp.Keyframe1);
 	}
 
 	FixedMotionData AnimData::GetFixedMotion(int frameNumber) const
@@ -266,8 +266,12 @@ namespace TEN::Animation
 				item.DisableAnimBlend();
 		}
 
-		// Apply fixed motion and gravity.
+		// Get fixed motion and root motion.
 		auto fixedMotion = anim->GetFixedMotion(item.Animation.FrameNumber);
+		auto rootMotion = anim->GetRootMotion(item.Animation.FrameNumber);
+
+		// TODO: Better handling.
+		// Apply motion translation and gravity.
 		if (item.Animation.IsAirborne)
 		{
 			if (item.IsLara())
@@ -291,9 +295,11 @@ namespace TEN::Animation
 				}
 				else
 				{
-					// HACK
-					float accel = (anim->FixedMotionCurveZ.GetY(1.0f) - anim->FixedMotionCurveZ.GetY(0.0f)) * fixedMotion.CurveAlpha;
-					
+					// TODO: Revise strange hack.
+					float fixedAccel = (anim->FixedMotionCurveZ.GetY(1.0f) - anim->FixedMotionCurveZ.GetY(0.0f)) * fixedMotion.CurveAlpha;
+					float rootAccel = rootMotion.Translation.z; // Probably not right.
+					float accel = fixedAccel + rootAccel;
+
 					item.Animation.Velocity.y += GetEffectiveGravity(item.Animation.Velocity.y);
 					item.Animation.Velocity.z += accel;
 
@@ -313,38 +319,34 @@ namespace TEN::Animation
 				const auto& player = GetLaraInfo(item);
 
 				bool isInSwamp = (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, &item));
-				item.Animation.Velocity.z = isInSwamp ? (fixedMotion.Translation.z / 2) : fixedMotion.Translation.z;
+				item.Animation.Velocity = isInSwamp ? ((fixedMotion.Translation + rootMotion.Translation) / 2) : fixedMotion.Translation;
 			}
 			else
 			{
-				item.Animation.Velocity.x = fixedMotion.Translation.x;
-				item.Animation.Velocity.z = fixedMotion.Translation.z;
+				item.Animation.Velocity = fixedMotion.Translation + rootMotion.Translation;
 			}
 		}
-
-		// Apply root motion.
-		auto rootMotion = anim->GetRootMotion(item.Animation.FrameNumber);
-		item.Animation.Velocity += rootMotion.Translation;
-		item.Pose.Orientation += rootMotion.Rotation;
 
 		// Update animation.
 		if (item.IsLara())
 		{
 			const auto& player = GetLaraInfo(item);
 
-			item.Animation.Velocity.x = fixedMotion.Translation.x;
-
 			if (player.Control.Rope.Ptr != NO_VALUE)
 				DelAlignLaraToRope(&item);
 
 			if (!player.Control.IsMoving)
+			{
 				item.Pose.Translate(player.Control.MoveAngle, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
+				item.Pose.Orientation += rootMotion.Rotation;
+			}
 
 			g_Renderer.UpdateLaraAnimations(true);
 		}
 		else
 		{
 			item.Pose.Translate(item.Pose.Orientation.y, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
+			item.Pose.Orientation += rootMotion.Rotation;
 			g_Renderer.UpdateItemAnimations(item.Index, true);
 		}
 

@@ -38,6 +38,15 @@ namespace TEN::Animation
 		GameBoundingBox BoundingBox = GameBoundingBox::Zero;
 	};
 
+	struct FrameInterpData
+	{
+		const KeyframeData& Keyframe0;
+		const KeyframeData& Keyframe1;
+		float Alpha = 0.0f;
+
+		FrameInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
+	};
+
 	struct StateDispatchData
 	{
 		int			  StateID			  = 0;
@@ -48,15 +57,6 @@ namespace TEN::Animation
 		int			  NextFrameNumberHigh = 0;
 		int			  BlendFrameCount	  = 0;
 		BezierCurve2D BlendCurve		  = BezierCurve2D::Zero;
-	};
-
-	struct FrameInterpData
-	{
-		const KeyframeData& Keyframe0;
-		const KeyframeData& Keyframe1;
-		float Alpha = 0.0f;
-
-		FrameInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
 	};
 
 	struct FixedMotionData
@@ -75,16 +75,16 @@ namespace TEN::Animation
 	{
 		using AnimCommandPtr = std::unique_ptr<AnimCommand>;
 
-		int			  StateID			= 0;
-		int			  Interpolation		= 0;
-		int			  EndFrameNumber	= 0;
-		int			  NextAnimNumber	= 0;
-		int			  NextFrameNumber   = 0;
-		int			  BlendFrameCount   = 0;
-		BezierCurve2D BlendCurve		= BezierCurve2D::Zero;
-		BezierCurve2D FixedMotionCurveX = BezierCurve2D::Zero;
-		BezierCurve2D FixedMotionCurveY = BezierCurve2D::Zero;
-		BezierCurve2D FixedMotionCurveZ = BezierCurve2D::Zero;
+		int			  StateID			  = 0;
+		int			  Interpolation		  = 0;
+		int			  EndFrameNumber	  = 0;
+		int			  NextAnimNumber	  = 0;
+		int			  NextFrameNumber     = 0;
+		int			  BlendFrameCount     = 0;
+		BezierCurve2D BlendCurve		  = BezierCurve2D::Zero;
+		BezierCurve2D FixedMotionCurveX	  = BezierCurve2D::Zero;
+		BezierCurve2D FixedMotionCurveY	  = BezierCurve2D::Zero;
+		BezierCurve2D FixedMotionCurveZ	  = BezierCurve2D::Zero;
 
 		std::vector<KeyframeData>	   Keyframes  = {};
 		std::vector<StateDispatchData> Dispatches = {};
@@ -92,8 +92,8 @@ namespace TEN::Animation
 
 		int Flags = (int)AnimFlags::None;
 
-		FrameInterpData		GetFrameInterpolation(int frameNumber) const;
 		const KeyframeData& GetClosestKeyframe(int frameNumber) const;
+		FrameInterpData		GetFrameInterpolation(int frameNumber) const;
 		FixedMotionData		GetFixedMotion(int frameNumber) const;
 		RootMotionData		GetRootMotion(int frameNumber) const;
 		RootMotionData		GetRootMotionCounteraction(int frameNumber) const;
