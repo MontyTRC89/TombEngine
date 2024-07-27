@@ -255,7 +255,6 @@ namespace TEN::Renderer
 			{
 				CollectItems(to, renderView);
 				CollectStatics(to, renderView);
-				CollectEffects(to);
 			}
 		}
 
@@ -790,47 +789,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::CollectEffects(short roomNumber)
-	{
-		if (_rooms.size() < roomNumber)
-			return;
-
-		RendererRoom& room = _rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
-
-		short fxNum = NO_VALUE;
-		for (fxNum = r->fxNumber; fxNum != NO_VALUE; fxNum = EffectList[fxNum].nextFx)
-		{
-			FX_INFO *fx = &EffectList[fxNum];
-			if (fx->objectNumber < 0 || fx->color.w <= 0)
-				continue;
-
-			ObjectInfo *obj = &Objects[fx->objectNumber];
-
-			RendererEffect *newEffect = &_effects[fxNum];
-
-			Matrix translation = Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
-			Matrix rotation = fx->pos.Orientation.ToRotationMatrix();
-
-			newEffect->ObjectNumber = fx->objectNumber;
-			newEffect->RoomNumber = fx->roomNumber;
-			newEffect->Position = fx->pos.Position.ToVector3();
-			newEffect->AmbientLight = room.AmbientLight;
-			newEffect->Color = fx->color;
-			newEffect->World = rotation * translation;
-			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
-
-			CollectLightsForEffect(fx->roomNumber, newEffect);
-
-			room.EffectsToDraw.push_back(newEffect);
-		}
-	}
-
 	void Renderer::ResetAnimations()
 	{
 		for (int i = 0; i < ITEM_COUNT_MAX; i++)
 			_items[i].DoneAnimations = false;
 	}
-
-} // namespace TEN::Renderer
-
+}

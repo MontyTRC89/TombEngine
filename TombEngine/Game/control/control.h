@@ -74,8 +74,6 @@ extern short ItemNewRoomNo;
 extern short ItemNewRooms[MAX_ROOMS];
 extern short NextItemActive;
 extern short NextItemFree;
-extern short NextFxActive;
-extern short NextFxFree;
 
 extern int ControlPhaseTime;
 
@@ -96,7 +94,6 @@ int GetRandomControl();
 int GetRandomDraw();
 
 void KillMoveItems();
-void KillMoveEffects();
 void UpdateShatters();
 
 void CleanUp();

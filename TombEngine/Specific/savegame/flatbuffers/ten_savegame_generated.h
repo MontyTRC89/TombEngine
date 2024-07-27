@@ -21,10 +21,6 @@ struct Item;
 struct ItemBuilder;
 struct ItemT;
 
-struct FXInfo;
-struct FXInfoBuilder;
-struct FXInfoT;
-
 struct AmmoInfo;
 struct AmmoInfoBuilder;
 struct AmmoInfoT;
@@ -878,6 +874,9 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Minecart *data_as_Minecart() const {
     return data_type() == TEN::Save::ItemData::Minecart ? static_cast<const TEN::Save::Minecart *>(data()) : nullptr;
   }
+  const TEN::Save::FXInfo *data_as_FXInfo() const {
+    return data_type() == TEN::Save::ItemData::FXInfo ? static_cast<const TEN::Save::FXInfo *>(data()) : nullptr;
+  }
   int32_t base_mesh() const {
     return GetField<int32_t>(VT_BASE_MESH, 0);
   }
@@ -1062,6 +1061,10 @@ template<> inline const TEN::Save::Pushable *Item::data_as<TEN::Save::Pushable>(
 
 template<> inline const TEN::Save::Minecart *Item::data_as<TEN::Save::Minecart>() const {
   return data_as_Minecart();
+}
+
+template<> inline const TEN::Save::FXInfo *Item::data_as<TEN::Save::FXInfo>() const {
+  return data_as_FXInfo();
 }
 
 struct ItemBuilder {
@@ -1419,185 +1422,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
 }
 
 flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb, const ItemT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-struct FXInfoT : public flatbuffers::NativeTable {
-  typedef FXInfo TableType;
-  std::unique_ptr<TEN::Save::Pose> pose{};
-  int32_t room_number = 0;
-  int32_t object_number = 0;
-  int32_t next_fx = 0;
-  int32_t next_active = 0;
-  int32_t speed = 0;
-  int32_t fall_speed = 0;
-  int32_t frame_number = 0;
-  int32_t counter = 0;
-  std::unique_ptr<TEN::Save::Vector4> color{};
-  int32_t flag1 = 0;
-  int32_t flag2 = 0;
-};
-
-struct FXInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef FXInfoT NativeTableType;
-  typedef FXInfoBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_POSE = 4,
-    VT_ROOM_NUMBER = 6,
-    VT_OBJECT_NUMBER = 8,
-    VT_NEXT_FX = 10,
-    VT_NEXT_ACTIVE = 12,
-    VT_SPEED = 14,
-    VT_FALL_SPEED = 16,
-    VT_FRAME_NUMBER = 18,
-    VT_COUNTER = 20,
-    VT_COLOR = 22,
-    VT_FLAG1 = 24,
-    VT_FLAG2 = 26
-  };
-  const TEN::Save::Pose *pose() const {
-    return GetStruct<const TEN::Save::Pose *>(VT_POSE);
-  }
-  int32_t room_number() const {
-    return GetField<int32_t>(VT_ROOM_NUMBER, 0);
-  }
-  int32_t object_number() const {
-    return GetField<int32_t>(VT_OBJECT_NUMBER, 0);
-  }
-  int32_t next_fx() const {
-    return GetField<int32_t>(VT_NEXT_FX, 0);
-  }
-  int32_t next_active() const {
-    return GetField<int32_t>(VT_NEXT_ACTIVE, 0);
-  }
-  int32_t speed() const {
-    return GetField<int32_t>(VT_SPEED, 0);
-  }
-  int32_t fall_speed() const {
-    return GetField<int32_t>(VT_FALL_SPEED, 0);
-  }
-  int32_t frame_number() const {
-    return GetField<int32_t>(VT_FRAME_NUMBER, 0);
-  }
-  int32_t counter() const {
-    return GetField<int32_t>(VT_COUNTER, 0);
-  }
-  const TEN::Save::Vector4 *color() const {
-    return GetStruct<const TEN::Save::Vector4 *>(VT_COLOR);
-  }
-  int32_t flag1() const {
-    return GetField<int32_t>(VT_FLAG1, 0);
-  }
-  int32_t flag2() const {
-    return GetField<int32_t>(VT_FLAG2, 0);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<TEN::Save::Pose>(verifier, VT_POSE) &&
-           VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_OBJECT_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_NEXT_FX) &&
-           VerifyField<int32_t>(verifier, VT_NEXT_ACTIVE) &&
-           VerifyField<int32_t>(verifier, VT_SPEED) &&
-           VerifyField<int32_t>(verifier, VT_FALL_SPEED) &&
-           VerifyField<int32_t>(verifier, VT_FRAME_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_COUNTER) &&
-           VerifyField<TEN::Save::Vector4>(verifier, VT_COLOR) &&
-           VerifyField<int32_t>(verifier, VT_FLAG1) &&
-           VerifyField<int32_t>(verifier, VT_FLAG2) &&
-           verifier.EndTable();
-  }
-  FXInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(FXInfoT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<FXInfo> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct FXInfoBuilder {
-  typedef FXInfo Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_pose(const TEN::Save::Pose *pose) {
-    fbb_.AddStruct(FXInfo::VT_POSE, pose);
-  }
-  void add_room_number(int32_t room_number) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_ROOM_NUMBER, room_number, 0);
-  }
-  void add_object_number(int32_t object_number) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_OBJECT_NUMBER, object_number, 0);
-  }
-  void add_next_fx(int32_t next_fx) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_NEXT_FX, next_fx, 0);
-  }
-  void add_next_active(int32_t next_active) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_NEXT_ACTIVE, next_active, 0);
-  }
-  void add_speed(int32_t speed) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_SPEED, speed, 0);
-  }
-  void add_fall_speed(int32_t fall_speed) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_FALL_SPEED, fall_speed, 0);
-  }
-  void add_frame_number(int32_t frame_number) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_FRAME_NUMBER, frame_number, 0);
-  }
-  void add_counter(int32_t counter) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_COUNTER, counter, 0);
-  }
-  void add_color(const TEN::Save::Vector4 *color) {
-    fbb_.AddStruct(FXInfo::VT_COLOR, color);
-  }
-  void add_flag1(int32_t flag1) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_FLAG1, flag1, 0);
-  }
-  void add_flag2(int32_t flag2) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_FLAG2, flag2, 0);
-  }
-  explicit FXInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<FXInfo> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<FXInfo>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<FXInfo> CreateFXInfo(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    const TEN::Save::Pose *pose = 0,
-    int32_t room_number = 0,
-    int32_t object_number = 0,
-    int32_t next_fx = 0,
-    int32_t next_active = 0,
-    int32_t speed = 0,
-    int32_t fall_speed = 0,
-    int32_t frame_number = 0,
-    int32_t counter = 0,
-    const TEN::Save::Vector4 *color = 0,
-    int32_t flag1 = 0,
-    int32_t flag2 = 0) {
-  FXInfoBuilder builder_(_fbb);
-  builder_.add_flag2(flag2);
-  builder_.add_flag1(flag1);
-  builder_.add_color(color);
-  builder_.add_counter(counter);
-  builder_.add_frame_number(frame_number);
-  builder_.add_fall_speed(fall_speed);
-  builder_.add_speed(speed);
-  builder_.add_next_active(next_active);
-  builder_.add_next_fx(next_fx);
-  builder_.add_object_number(object_number);
-  builder_.add_room_number(room_number);
-  builder_.add_pose(pose);
-  return builder_.Finish();
-}
-
-struct FXInfo::Traits {
-  using type = FXInfo;
-  static auto constexpr Create = CreateFXInfo;
-};
-
-flatbuffers::Offset<FXInfo> CreateFXInfo(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct AmmoInfoT : public flatbuffers::NativeTable {
   typedef AmmoInfo TableType;
@@ -7109,9 +6933,6 @@ struct SaveGameT : public flatbuffers::NativeTable {
   int32_t next_item_active = 0;
   std::vector<int32_t> room_items{};
   std::vector<std::unique_ptr<TEN::Save::FishDataT>> fish_swarm{};
-  std::vector<std::unique_ptr<TEN::Save::FXInfoT>> fxinfos{};
-  int32_t next_fx_free = 0;
-  int32_t next_fx_active = 0;
   std::vector<std::unique_ptr<TEN::Save::FixedCameraT>> fixed_cameras{};
   std::vector<std::unique_ptr<TEN::Save::SinkT>> sinks{};
   std::vector<std::unique_ptr<TEN::Save::StaticMeshInfoT>> static_meshes{};
@@ -7168,48 +6989,45 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_NEXT_ITEM_ACTIVE = 18,
     VT_ROOM_ITEMS = 20,
     VT_FISH_SWARM = 22,
-    VT_FXINFOS = 24,
-    VT_NEXT_FX_FREE = 26,
-    VT_NEXT_FX_ACTIVE = 28,
-    VT_FIXED_CAMERAS = 30,
-    VT_SINKS = 32,
-    VT_STATIC_MESHES = 34,
-    VT_FLYBY_CAMERAS = 36,
-    VT_PARTICLES = 38,
-    VT_RATS = 40,
-    VT_SPIDERS = 42,
-    VT_SCARABS = 44,
-    VT_BATS = 46,
-    VT_FLIP_MAPS = 48,
-    VT_FLIP_STATS = 50,
-    VT_FLIP_EFFECT = 52,
-    VT_FLIP_TIMER = 54,
-    VT_FLIP_STATUS = 56,
-    VT_CURRENT_FOV = 58,
-    VT_LAST_INV_ITEM = 60,
-    VT_ACTION_QUEUE = 62,
-    VT_SOUNDTRACKS = 64,
-    VT_CD_FLAGS = 66,
-    VT_POSTPROCESS_MODE = 68,
-    VT_POSTPROCESS_STRENGTH = 70,
-    VT_POSTPROCESS_TINT = 72,
-    VT_ROPE = 74,
-    VT_PENDULUM = 76,
-    VT_ALTERNATE_PENDULUM = 78,
-    VT_VOLUMES = 80,
-    VT_GLOBAL_EVENT_SETS = 82,
-    VT_VOLUME_EVENT_SETS = 84,
-    VT_SCRIPT_VARS = 86,
-    VT_CALLBACKS_PRE_START = 88,
-    VT_CALLBACKS_POST_START = 90,
-    VT_CALLBACKS_PRE_END = 92,
-    VT_CALLBACKS_POST_END = 94,
-    VT_CALLBACKS_PRE_SAVE = 96,
-    VT_CALLBACKS_POST_SAVE = 98,
-    VT_CALLBACKS_PRE_LOAD = 100,
-    VT_CALLBACKS_POST_LOAD = 102,
-    VT_CALLBACKS_PRE_LOOP = 104,
-    VT_CALLBACKS_POST_LOOP = 106
+    VT_FIXED_CAMERAS = 24,
+    VT_SINKS = 26,
+    VT_STATIC_MESHES = 28,
+    VT_FLYBY_CAMERAS = 30,
+    VT_PARTICLES = 32,
+    VT_RATS = 34,
+    VT_SPIDERS = 36,
+    VT_SCARABS = 38,
+    VT_BATS = 40,
+    VT_FLIP_MAPS = 42,
+    VT_FLIP_STATS = 44,
+    VT_FLIP_EFFECT = 46,
+    VT_FLIP_TIMER = 48,
+    VT_FLIP_STATUS = 50,
+    VT_CURRENT_FOV = 52,
+    VT_LAST_INV_ITEM = 54,
+    VT_ACTION_QUEUE = 56,
+    VT_SOUNDTRACKS = 58,
+    VT_CD_FLAGS = 60,
+    VT_POSTPROCESS_MODE = 62,
+    VT_POSTPROCESS_STRENGTH = 64,
+    VT_POSTPROCESS_TINT = 66,
+    VT_ROPE = 68,
+    VT_PENDULUM = 70,
+    VT_ALTERNATE_PENDULUM = 72,
+    VT_VOLUMES = 74,
+    VT_GLOBAL_EVENT_SETS = 76,
+    VT_VOLUME_EVENT_SETS = 78,
+    VT_SCRIPT_VARS = 80,
+    VT_CALLBACKS_PRE_START = 82,
+    VT_CALLBACKS_POST_START = 84,
+    VT_CALLBACKS_PRE_END = 86,
+    VT_CALLBACKS_POST_END = 88,
+    VT_CALLBACKS_PRE_SAVE = 90,
+    VT_CALLBACKS_POST_SAVE = 92,
+    VT_CALLBACKS_PRE_LOAD = 94,
+    VT_CALLBACKS_POST_LOAD = 96,
+    VT_CALLBACKS_PRE_LOOP = 98,
+    VT_CALLBACKS_POST_LOOP = 100
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -7240,15 +7058,6 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>> *fish_swarm() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>> *>(VT_FISH_SWARM);
-  }
-  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *>(VT_FXINFOS);
-  }
-  int32_t next_fx_free() const {
-    return GetField<int32_t>(VT_NEXT_FX_FREE, 0);
-  }
-  int32_t next_fx_active() const {
-    return GetField<int32_t>(VT_NEXT_FX_ACTIVE, 0);
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *fixed_cameras() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *>(VT_FIXED_CAMERAS);
@@ -7390,11 +7199,6 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_FISH_SWARM) &&
            verifier.VerifyVector(fish_swarm()) &&
            verifier.VerifyVectorOfTables(fish_swarm()) &&
-           VerifyOffset(verifier, VT_FXINFOS) &&
-           verifier.VerifyVector(fxinfos()) &&
-           verifier.VerifyVectorOfTables(fxinfos()) &&
-           VerifyField<int32_t>(verifier, VT_NEXT_FX_FREE) &&
-           VerifyField<int32_t>(verifier, VT_NEXT_FX_ACTIVE) &&
            VerifyOffset(verifier, VT_FIXED_CAMERAS) &&
            verifier.VerifyVector(fixed_cameras()) &&
            verifier.VerifyVectorOfTables(fixed_cameras()) &&
@@ -7528,15 +7332,6 @@ struct SaveGameBuilder {
   }
   void add_fish_swarm(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>>> fish_swarm) {
     fbb_.AddOffset(SaveGame::VT_FISH_SWARM, fish_swarm);
-  }
-  void add_fxinfos(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos) {
-    fbb_.AddOffset(SaveGame::VT_FXINFOS, fxinfos);
-  }
-  void add_next_fx_free(int32_t next_fx_free) {
-    fbb_.AddElement<int32_t>(SaveGame::VT_NEXT_FX_FREE, next_fx_free, 0);
-  }
-  void add_next_fx_active(int32_t next_fx_active) {
-    fbb_.AddElement<int32_t>(SaveGame::VT_NEXT_FX_ACTIVE, next_fx_active, 0);
   }
   void add_fixed_cameras(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>>> fixed_cameras) {
     fbb_.AddOffset(SaveGame::VT_FIXED_CAMERAS, fixed_cameras);
@@ -7678,9 +7473,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     int32_t next_item_active = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>>> fish_swarm = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos = 0,
-    int32_t next_fx_free = 0,
-    int32_t next_fx_active = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>>> fixed_cameras = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Sink>>> sinks = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>> static_meshes = 0,
@@ -7759,9 +7551,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_static_meshes(static_meshes);
   builder_.add_sinks(sinks);
   builder_.add_fixed_cameras(fixed_cameras);
-  builder_.add_next_fx_active(next_fx_active);
-  builder_.add_next_fx_free(next_fx_free);
-  builder_.add_fxinfos(fxinfos);
   builder_.add_fish_swarm(fish_swarm);
   builder_.add_room_items(room_items);
   builder_.add_next_item_active(next_item_active);
@@ -7793,9 +7582,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     int32_t next_item_active = 0,
     const std::vector<int32_t> *room_items = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::FishData>> *fish_swarm = nullptr,
-    const std::vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos = nullptr,
-    int32_t next_fx_free = 0,
-    int32_t next_fx_active = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *fixed_cameras = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::Sink>> *sinks = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> *static_meshes = nullptr,
@@ -7839,7 +7625,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto room_items__ = room_items ? _fbb.CreateVector<int32_t>(*room_items) : 0;
   auto fish_swarm__ = fish_swarm ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FishData>>(*fish_swarm) : 0;
-  auto fxinfos__ = fxinfos ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>>(*fxinfos) : 0;
   auto fixed_cameras__ = fixed_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>>(*fixed_cameras) : 0;
   auto sinks__ = sinks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>>(*sinks) : 0;
   auto static_meshes__ = static_meshes ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>(*static_meshes) : 0;
@@ -7879,9 +7664,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       next_item_active,
       room_items__,
       fish_swarm__,
-      fxinfos__,
-      next_fx_free,
-      next_fx_active,
       fixed_cameras__,
       sinks__,
       static_meshes__,
@@ -8116,65 +7898,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _lua_on_hit_name,
       _lua_on_collided_with_object_name,
       _lua_on_collided_with_room_name);
-}
-
-inline FXInfoT *FXInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<FXInfoT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void FXInfo::UnPackTo(FXInfoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = pose(); if (_e) _o->pose = std::unique_ptr<TEN::Save::Pose>(new TEN::Save::Pose(*_e)); }
-  { auto _e = room_number(); _o->room_number = _e; }
-  { auto _e = object_number(); _o->object_number = _e; }
-  { auto _e = next_fx(); _o->next_fx = _e; }
-  { auto _e = next_active(); _o->next_active = _e; }
-  { auto _e = speed(); _o->speed = _e; }
-  { auto _e = fall_speed(); _o->fall_speed = _e; }
-  { auto _e = frame_number(); _o->frame_number = _e; }
-  { auto _e = counter(); _o->counter = _e; }
-  { auto _e = color(); if (_e) _o->color = std::unique_ptr<TEN::Save::Vector4>(new TEN::Save::Vector4(*_e)); }
-  { auto _e = flag1(); _o->flag1 = _e; }
-  { auto _e = flag2(); _o->flag2 = _e; }
-}
-
-inline flatbuffers::Offset<FXInfo> FXInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateFXInfo(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<FXInfo> CreateFXInfo(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FXInfoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _pose = _o->pose ? _o->pose.get() : 0;
-  auto _room_number = _o->room_number;
-  auto _object_number = _o->object_number;
-  auto _next_fx = _o->next_fx;
-  auto _next_active = _o->next_active;
-  auto _speed = _o->speed;
-  auto _fall_speed = _o->fall_speed;
-  auto _frame_number = _o->frame_number;
-  auto _counter = _o->counter;
-  auto _color = _o->color ? _o->color.get() : 0;
-  auto _flag1 = _o->flag1;
-  auto _flag2 = _o->flag2;
-  return TEN::Save::CreateFXInfo(
-      _fbb,
-      _pose,
-      _room_number,
-      _object_number,
-      _next_fx,
-      _next_active,
-      _speed,
-      _fall_speed,
-      _frame_number,
-      _counter,
-      _color,
-      _flag1,
-      _flag2);
 }
 
 inline AmmoInfoT *AmmoInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -10044,9 +9767,6 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = next_item_active(); _o->next_item_active = _e; }
   { auto _e = room_items(); if (_e) { _o->room_items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->room_items[_i] = _e->Get(_i); } } }
   { auto _e = fish_swarm(); if (_e) { _o->fish_swarm.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fish_swarm[_i] = std::unique_ptr<TEN::Save::FishDataT>(_e->Get(_i)->UnPack(_resolver)); } } }
-  { auto _e = fxinfos(); if (_e) { _o->fxinfos.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fxinfos[_i] = std::unique_ptr<TEN::Save::FXInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
-  { auto _e = next_fx_free(); _o->next_fx_free = _e; }
-  { auto _e = next_fx_active(); _o->next_fx_active = _e; }
   { auto _e = fixed_cameras(); if (_e) { _o->fixed_cameras.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fixed_cameras[_i] = std::unique_ptr<TEN::Save::FixedCameraT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = sinks(); if (_e) { _o->sinks.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->sinks[_i] = std::unique_ptr<TEN::Save::SinkT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = static_meshes(); if (_e) { _o->static_meshes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->static_meshes[_i] = std::unique_ptr<TEN::Save::StaticMeshInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
@@ -10106,9 +9826,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _next_item_active = _o->next_item_active;
   auto _room_items = _fbb.CreateVector(_o->room_items);
   auto _fish_swarm = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FishData>> (_o->fish_swarm.size(), [](size_t i, _VectorArgs *__va) { return CreateFishData(*__va->__fbb, __va->__o->fish_swarm[i].get(), __va->__rehasher); }, &_va );
-  auto _fxinfos = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>> (_o->fxinfos.size(), [](size_t i, _VectorArgs *__va) { return CreateFXInfo(*__va->__fbb, __va->__o->fxinfos[i].get(), __va->__rehasher); }, &_va );
-  auto _next_fx_free = _o->next_fx_free;
-  auto _next_fx_active = _o->next_fx_active;
   auto _fixed_cameras = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>> (_o->fixed_cameras.size(), [](size_t i, _VectorArgs *__va) { return CreateFixedCamera(*__va->__fbb, __va->__o->fixed_cameras[i].get(), __va->__rehasher); }, &_va );
   auto _sinks = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>> (_o->sinks.size(), [](size_t i, _VectorArgs *__va) { return CreateSink(*__va->__fbb, __va->__o->sinks[i].get(), __va->__rehasher); }, &_va );
   auto _static_meshes = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> (_o->static_meshes.size(), [](size_t i, _VectorArgs *__va) { return CreateStaticMeshInfo(*__va->__fbb, __va->__o->static_meshes[i].get(), __va->__rehasher); }, &_va );
@@ -10160,9 +9877,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _next_item_active,
       _room_items,
       _fish_swarm,
-      _fxinfos,
-      _next_fx_free,
-      _next_fx_active,
       _fixed_cameras,
       _sinks,
       _static_meshes,

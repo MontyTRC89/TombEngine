@@ -361,124 +361,24 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 	}
 }
 
-void EffectNewRoom(short fxNumber, short roomNumber)
+int CreateNewEffect(int roomNumber, GAME_OBJECT_ID objectID, const Pose& pose) 
 {
-	if (InItemControlLoop)
+	int fxNumber = CreateItem();
+
+	if (fxNumber != NO_VALUE)
 	{
-		ItemNewRooms[2 * ItemNewRoomNo] = fxNumber;
-		ItemNewRooms[2 * ItemNewRoomNo + 1] = roomNumber;
-		ItemNewRoomNo++;
-	}
-	else
-	{
-		auto* fx = &EffectList[fxNumber];
-		auto* room = &g_Level.Rooms[fx->roomNumber];
+		auto& fx = g_Level.Items[fxNumber];
 
-		if (room->fxNumber == fxNumber)
-			room->fxNumber = fx->nextFx;
-		else
-		{
-			for (short linkNumber = room->fxNumber; linkNumber != -1; linkNumber = EffectList[linkNumber].nextFx)
-			{
-				if (EffectList[linkNumber].nextFx == fxNumber)
-				{
-					EffectList[linkNumber].nextFx = fx->nextFx;
-					break;
-				}
-			}
-		}
+		fx.Data = FXInfo();
+		fx.RoomNumber = roomNumber;
+		fx.Pose = pose;
+		fx.ObjectNumber = objectID;
 
-		fx->roomNumber = roomNumber;
-		fx->nextFx = g_Level.Rooms[roomNumber].fxNumber;
-		g_Level.Rooms[roomNumber].fxNumber = fxNumber;
-	}
-}
-
-void KillEffect(short fxNumber)
-{
-	if (InItemControlLoop)
-	{
-		ItemNewRooms[2 * ItemNewRoomNo] = fxNumber | 0x8000;
-		ItemNewRoomNo++;
-	}
-	else
-	{
-		auto* fx = &EffectList[fxNumber];
-		DetatchSpark(fxNumber, SP_FX);
-
-		if (NextFxActive == fxNumber)
-			NextFxActive = fx->nextActive;
-		else
-		{
-			for (short linkNumber = NextFxActive; linkNumber != NO_VALUE; linkNumber = EffectList[linkNumber].nextActive)
-			{
-				if (EffectList[linkNumber].nextActive == fxNumber)
-				{
-					EffectList[linkNumber].nextActive = fx->nextActive;
-					break;
-				}
-			}
-		}
-
-		if (g_Level.Rooms[fx->roomNumber].fxNumber == fxNumber)
-			g_Level.Rooms[fx->roomNumber].fxNumber = fx->nextFx;
-		else
-		{
-			for (short linkNumber = g_Level.Rooms[fx->roomNumber].fxNumber; linkNumber != NO_VALUE; linkNumber = EffectList[linkNumber].nextFx)
-			{
-				if (EffectList[linkNumber].nextFx == fxNumber)
-				{
-					EffectList[linkNumber].nextFx = fx->nextFx;
-					break;
-				}
-			}
-		}
-
-		fx->nextFx = NextFxFree;
-		NextFxFree = fxNumber;
-	}
-
-	// HACK: Garbage collect nextFx if no active effects were detected.
-	// This fixes random crashes after spawining multiple FXs (like body part).
-
-	if (NextFxActive == NO_VALUE)
-		InitializeFXArray();
-}
-
-short CreateNewEffect(short roomNumber) 
-{
-	short fxNumber = NextFxFree;
-
-	if (NextFxFree != NO_VALUE)
-	{
-		auto* fx = &EffectList[NextFxFree];
-		NextFxFree = fx->nextFx;
-
-		auto* room = &g_Level.Rooms[roomNumber];
-
-		fx->roomNumber = roomNumber;
-		fx->nextFx = room->fxNumber;
-		room->fxNumber = fxNumber;
-		fx->nextActive = NextFxActive;
-		NextFxActive = fxNumber;
-		fx->color = Vector4::One;
+		InitializeItem(fxNumber);
+		AddActiveItem(fxNumber);
 	}
 
 	return fxNumber;
-}
-
-void InitializeFXArray()
-{
-	NextFxActive = NO_VALUE;
-	NextFxFree = 0;
-
-	for (int i = 0; i < NUM_EFFECTS; i++)
-	{
-		auto* fx = &EffectList[i];
-		fx->nextFx = i + 1;
-	}
-
-	EffectList[NUM_EFFECTS - 1].nextFx = NO_VALUE;
 }
 
 void RemoveDrawnItem(short itemNumber) 
@@ -486,7 +386,9 @@ void RemoveDrawnItem(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	if (g_Level.Rooms[item->RoomNumber].itemNumber == itemNumber)
+	{
 		g_Level.Rooms[item->RoomNumber].itemNumber = item->NextItem;
+	}
 	else
 	{
 		for (short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
@@ -614,19 +516,19 @@ void InitializeItemArray(int totalItem)
 	for (int i = 0; i < totalItem; i++)
 		g_Level.Items[i].Index = i;
 
-	auto* item = &g_Level.Items[g_Level.NumItems];
+	auto* itemPtr = &g_Level.Items[g_Level.NumItems];
 
 	if (g_Level.NumItems + 1 < totalItem)
 	{
-		for (int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
+		for (int i = g_Level.NumItems + 1; i < totalItem; i++, itemPtr++)
 		{
-			item->NextItem = i;
-			item->Active = false;
-			item->Data = nullptr;
+			itemPtr->NextItem = i;
+			itemPtr->Active = false;
+			itemPtr->Data = nullptr;
 		}
 	}
 
-	item->NextItem = NO_VALUE;
+	itemPtr->NextItem = NO_VALUE;
 	NextItemActive = NO_VALUE;
 	NextItemFree = g_Level.NumItems;
 }
@@ -750,7 +652,7 @@ void UpdateAllItems()
 {
 	InItemControlLoop = true;
 
-	short itemNumber = NextItemActive;
+	int itemNumber = NextItemActive;
 	while (itemNumber != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[itemNumber];
@@ -769,36 +671,20 @@ void UpdateAllItems()
 
 			if (item->AfterDeath > 0 && item->AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
 				item->AfterDeath++;
+
 			if (item->AfterDeath == ITEM_DEATH_TIMEOUT)
 				KillItem(itemNumber);
 		}
 		else
+		{
 			KillItem(itemNumber);
+		}
 
 		itemNumber = nextItem;
 	}
 
 	InItemControlLoop = false;
 	KillMoveItems();
-}
-
-void UpdateAllEffects()
-{
-	InItemControlLoop = true;
-
-	short fxNumber = NextFxActive;
-	while (fxNumber != NO_VALUE)
-	{
-		short nextFx = EffectList[fxNumber].nextActive;
-		auto* fx = &EffectList[fxNumber];
-		if (Objects[fx->objectNumber].control)
-			Objects[fx->objectNumber].control(fxNumber);
-
-		fxNumber = nextFx;
-	}
-
-	InItemControlLoop = false;
-	KillMoveEffects();
 }
 
 bool UpdateItemRoom(short itemNumber)

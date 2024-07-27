@@ -108,8 +108,6 @@ short ItemNewRoomNo;
 short ItemNewRooms[MAX_ROOMS];
 short NextItemActive;
 short NextItemFree;
-short NextFxActive;
-short NextFxFree;
 
 int ControlPhaseTime;
 
@@ -187,7 +185,6 @@ GameStatus ControlPhase(int numFrames)
 		ClearActionQueue();
 
 		UpdateAllItems();
-		UpdateAllEffects();
 		UpdateLara(LaraItem, isTitle);
 
 		g_GameScriptEntities->TestCollidingObjects();
@@ -316,7 +313,6 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 
 	// Initialize items, effects, lots, and cameras.
 	HairEffect.Initialize();
-	InitializeFXArray();
 	InitializeCamera();
 	InitializeSpotCamSequences(isTitle);
 	InitializeItemBoxData();
@@ -371,26 +367,13 @@ void KillMoveItems()
 		{
 			short itemNumber = ItemNewRooms[2 * i];
 			if (itemNumber >= 0)
+			{
 				ItemNewRoom(itemNumber, ItemNewRooms[2 * i + 1]);
+			}
 			else
+			{
 				KillItem(itemNumber & 0x7FFF);
-		}
-	}
-
-	ItemNewRoomNo = 0;
-}
-
-void KillMoveEffects()
-{
-	if (ItemNewRoomNo > 0)
-	{
-		for (int i = 0; i < ItemNewRoomNo; i++)
-		{
-			short itemNumber = ItemNewRooms[2 * i];
-			if (itemNumber >= 0)
-				EffectNewRoom(itemNumber, ItemNewRooms[2 * i + 1]);
-			else
-				KillEffect(itemNumber & 0x7FFF);
+			}
 		}
 	}
 

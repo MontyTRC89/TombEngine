@@ -1184,73 +1184,79 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 
 void ExplodingDeath(short itemNumber, short flags)
 {
-	ItemInfo* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
+
+	int objectID = (item.IsLara() && Objects[ID_LARA_SKIN].loaded) ? ID_LARA_SKIN : item.ObjectNumber;
+	const auto& object = Objects[objectID];
 	
-	ObjectInfo* obj;
-	if (item->IsLara() && Objects[ID_LARA_SKIN].loaded)
-		obj = &Objects[ID_LARA_SKIN];
-	else
-		obj = &Objects[item->ObjectNumber];
-	
-	auto world = item->Pose.Orientation.ToRotationMatrix();
+	auto worldMatrix = item.Pose.Orientation.ToRotationMatrix();
 
 	// If only BODY_PART_EXPLODE flag exists but not BODY_EXPLODE, add it.
 	if ((flags & BODY_PART_EXPLODE) && !(flags & BODY_DO_EXPLOSION))
 		flags |= BODY_DO_EXPLOSION;
 
-	for (int i = 0; i < obj->nmeshes; i++)
+	for (int i = 0; i < object.nmeshes; i++)
 	{
-		Matrix boneMatrix;
+		auto boneMatrix = Matrix::Identity;
 		g_Renderer.GetBoneMatrix(itemNumber, i, &boneMatrix);
-		boneMatrix = world * boneMatrix;
+		boneMatrix = worldMatrix * boneMatrix;
 
-		if (!item->MeshBits.Test(i))
+		if (!item.MeshBits.Test(i))
 			continue;
 
-		item->MeshBits.Clear(i);
+		item.MeshBits.Clear(i);
 
 		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_DO_EXPLOSION)))
 		{
-			short fxNumber = CreateNewEffect(item->RoomNumber);
+			int fxNumber = CreateNewEffect(item.RoomNumber, ID_BODY_PART, item.Pose);
 			if (fxNumber != NO_VALUE)
 			{
-				FX_INFO* fx = &EffectList[fxNumber];
+				auto& fx = g_Level.Items[fxNumber];
+				auto& fxInfo = GetFXInfo(fx);
 
-				fx->pos.Position.x = boneMatrix.Translation().x;
-				fx->pos.Position.y = boneMatrix.Translation().y - BODY_PART_SPAWN_VERTICAL_OFFSET;
-				fx->pos.Position.z = boneMatrix.Translation().z;
-
-				fx->roomNumber = item->RoomNumber;
-				fx->pos.Orientation.x = 0;
-				fx->pos.Orientation.y = Random::GenerateAngle();
+				fx.Pose.Position = Vector3i(boneMatrix.Translation());
+				fx.Pose.Position.y -= BODY_PART_SPAWN_VERTICAL_OFFSET;
+				fx.Pose.Orientation.x = 0;
+				fx.Pose.Orientation.y = Random::GenerateAngle();
+				fx.RoomNumber = item.RoomNumber;
 
 				if (!(flags & BODY_NO_RAND_VELOCITY))
 				{
-					if (flags & BODY_MORE_RAND_VELOCITY)
-						fx->speed = GetRandomControl() >> 12;
+					if (flags & 0x20)
+					{
+						fx.Animation.Velocity.z = GetRandomControl() >> 12;
+					}
 					else
-						fx->speed = GetRandomControl() >> 8;
+					{
+						fx.Animation.Velocity.z = GetRandomControl() >> 8;
+					}
 				}
 
 				if (flags & BODY_NO_VERTICAL_VELOCITY)
-					fx->fallspeed = 0;
+				{
+					fx.Animation.Velocity.y = 0;
+				}
 				else
 				{
 					if (flags & BODY_LESS_IMPULSE)
-						fx->fallspeed = -(GetRandomControl() >> 8);
+					{
+						fx.Animation.Velocity.y = -(GetRandomControl() >> 8);
+					}
 					else
-						fx->fallspeed = -(GetRandomControl() >> 12);
+					{
+						fx.Animation.Velocity.y = -(GetRandomControl() >> 12);
+					}
 				}
 
-				fx->objectNumber = ID_BODY_PART;
-				fx->color = item->Model.Color;
-				fx->flag2 = flags;
-				fx->frameNumber = item->Model.MeshIndex[i];
+				fx.ObjectNumber = ID_BODY_PART;
+				fx.Model.Color = item.Model.Color;
+				fx.Animation.FrameNumber = item.Model.MeshIndex[i];
+				fxInfo.Flag2 = flags;
 			}
 		}
 		else
 		{
-			ExplodeItemNode(item, i, 0, 128);
+			ExplodeItemNode(&item, i, 0, 128);
 		}
 	}
 }

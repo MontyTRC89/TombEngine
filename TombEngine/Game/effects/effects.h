@@ -13,7 +13,6 @@ constexpr auto SD_UWEXPLOSION = 2;
 constexpr auto MAX_NODE		= 23;
 constexpr auto MAX_DYNAMICS = 64;
 constexpr auto MAX_SPLASHES = 8;
-constexpr auto NUM_EFFECTS	= 256;
 
 constexpr auto MAX_PARTICLES		 = 1024;
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
@@ -47,7 +46,7 @@ enum ParticleNodeOffsetIDs
 	NodeUnknown2,
 	NodeUnknown3,
 	NodeUnknown4,
-	NodeUnknown5,
+	NodeUnknown5, // Hydra?
 	NodeUnknown6,
 	NodeUnknown7,
 	NodeUnknown8,
@@ -75,29 +74,18 @@ enum class FlameType
 	Trail
 };
 
-struct FX_INFO
+struct FXInfo
 {
-	Pose pos;
-	short roomNumber;
-	short objectNumber;
-	short nextFx;
-	short nextActive;
-	short speed;
-	short fallspeed;
-	int frameNumber;
-	short counter;
-	Vector4 color;
-	short flag1;
-	short flag2;
+	int Counter;
+	int Flag1;
+	int Flag2;
 };
 
-struct NODEOFFSET_INFO
+struct NodeOffsetData
 {
-	short x;
-	short y;
-	short z;
-	char meshNum;
-	unsigned char gotIt;
+	Vector3 RelOffset = Vector3::Zero;
+	int		BoneID	  = 0;
+	bool	IsActive  = false;
 };
 
 struct SPLASH_SETUP
@@ -197,16 +185,14 @@ struct ParticleDynamic
 extern GameBoundingBox DeadlyBounds;
 
 // New particle class
-extern Particle Particles[MAX_PARTICLES];
+extern Particle		   Particles[MAX_PARTICLES];
 extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
-extern SPLASH_SETUP SplashSetup;
+extern SPLASH_SETUP	 SplashSetup;
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 
-extern Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
-extern NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax];
-
-extern FX_INFO EffectList[NUM_EFFECTS];
+extern Vector3i		  NodeVectors[ParticleNodeOffsetIDs::NodeMax];
+extern NodeOffsetData NodeOffsets[ParticleNodeOffsetIDs::NodeMax];
 
 template <typename TEffect>
 TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
@@ -245,6 +231,8 @@ void ClearInactiveEffects(std::vector<TEffect>& effects)
 		effects.end());
 }
 
+FXInfo&		  GetFXInfo(ItemInfo& fx);
+const FXInfo& GetFXInfo(const ItemInfo& fx);
 Particle* GetFreeParticle();
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);

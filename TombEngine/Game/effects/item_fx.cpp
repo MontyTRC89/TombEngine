@@ -86,9 +86,9 @@ namespace TEN::Effects::Items
 		if (!item->IsLara())
 			return;
 
-		auto* lara = GetLaraInfo(item);
+		const auto& player = GetLaraInfo(*item);
 
-		if (lara->Control.WaterStatus == WaterStatus::Underwater || item->HitPoints <= 0)
+		if (player.Control.WaterStatus == WaterStatus::Underwater || item->HitPoints <= 0)
 			return;
 
 		if (!TestEnvironment(ENV_FLAG_COLD, item))
@@ -116,17 +116,7 @@ namespace TEN::Effects::Items
 				return;
 		}
 
-		float z = std::sin(TO_RAD(item->Pose.Orientation.y)) * -64.0f;
-		float x = std::cos(TO_RAD(item->Pose.Orientation.y)) * -64.0f;
 		auto offset = GetJointPosition(item, LM_HEAD, Vector3i(0, -4, 64));
-
-		auto seed = GetJointPosition(
-			item, LM_HEAD,
-			Vector3i(
-				Random::GenerateInt(-4, 4),
-				Random::GenerateInt(-8, 0),
-				Random::GenerateInt(-4, 4)));
-
 		TriggerBreathSmoke(offset.x, offset.y, offset.z, item->Pose.Orientation.y);
 	}
 }

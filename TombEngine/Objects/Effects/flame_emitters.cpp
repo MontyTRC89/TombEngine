@@ -58,8 +58,7 @@ namespace TEN::Entities::Effects
 		GameBoundingBox::Zero,
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
-			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f))
-		)
+			EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))
 	};
 
 	void BurnNearbyItems(ItemInfo* item, int radius)
