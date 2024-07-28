@@ -291,15 +291,18 @@ namespace TEN::Animation
 
 					if (item.Animation.Velocity.y < 4.0f)
 						item.Animation.Velocity.y = 4.0f;
+					item.Pose.Position.y += item.Animation.Velocity.y;
 				}
 				else
 				{
 					item.Animation.Velocity.y += GetEffectiveGravity(item.Animation.Velocity.y);
+					item.Pose.Position.y += item.Animation.Velocity.y;
 				}
 			}
 			else
 			{
 				item.Animation.Velocity.y += GetEffectiveGravity(item.Animation.Velocity.y);
+				item.Pose.Position.y += item.Animation.Velocity.y;
 			}
 		}
 		else
@@ -330,7 +333,7 @@ namespace TEN::Animation
 
 			if (!player.Control.IsMoving)
 			{
-				item.Pose.Translate(player.Control.MoveAngle, item.Animation.Velocity.z, item.Animation.Velocity.y, item.Animation.Velocity.x);
+				item.Pose.Translate(player.Control.MoveAngle, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
 				item.Pose.Orientation += rootMotion.Rotation;
 			}
 
