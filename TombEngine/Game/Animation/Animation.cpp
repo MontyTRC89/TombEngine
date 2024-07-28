@@ -291,39 +291,32 @@ namespace TEN::Animation
 
 					if (item.Animation.Velocity.y < 4.0f)
 						item.Animation.Velocity.y = 4.0f;
-					item.Pose.Position.y += item.Animation.Velocity.y;
 				}
 				else
 				{
-					// TODO: Revise strange hack.
-					float fixedAccel = (anim->FixedMotionCurveZ.GetY(1.0f) - anim->FixedMotionCurveZ.GetY(0.0f)) * fixedMotion.CurveAlpha;
-					float rootAccel = rootMotion.Translation.z; // Probably not right.
-					float accel = fixedAccel + rootAccel;
-
 					item.Animation.Velocity.y += GetEffectiveGravity(item.Animation.Velocity.y);
-					item.Animation.Velocity.z += accel;
-
-					item.Pose.Position.y += item.Animation.Velocity.y;
 				}
 			}
 			else
 			{
 				item.Animation.Velocity.y += GetEffectiveGravity(item.Animation.Velocity.y);
-				item.Pose.Position.y += item.Animation.Velocity.y;
 			}
 		}
 		else
 		{
+			// TODO: Y velocity.
 			if (item.IsLara())
 			{
 				const auto& player = GetLaraInfo(item);
 
 				bool isInSwamp = (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, &item));
-				item.Animation.Velocity = isInSwamp ? ((fixedMotion.Translation + rootMotion.Translation) / 2) : fixedMotion.Translation;
+				item.Animation.Velocity.x = (fixedMotion.Translation.x + rootMotion.Translation.x) * (isInSwamp ? 0.5f : 1.0f);
+				item.Animation.Velocity.z = (fixedMotion.Translation.z + rootMotion.Translation.z) * (isInSwamp ? 0.5f : 1.0f);
 			}
 			else
 			{
-				item.Animation.Velocity = fixedMotion.Translation + rootMotion.Translation;
+				item.Animation.Velocity.x = fixedMotion.Translation.x + rootMotion.Translation.x;
+				item.Animation.Velocity.z = fixedMotion.Translation.z + rootMotion.Translation.z;
 			}
 		}
 
@@ -337,7 +330,7 @@ namespace TEN::Animation
 
 			if (!player.Control.IsMoving)
 			{
-				item.Pose.Translate(player.Control.MoveAngle, item.Animation.Velocity.z, 0.0f, item.Animation.Velocity.x);
+				item.Pose.Translate(player.Control.MoveAngle, item.Animation.Velocity.z, item.Animation.Velocity.y, item.Animation.Velocity.x);
 				item.Pose.Orientation += rootMotion.Rotation;
 			}
 
