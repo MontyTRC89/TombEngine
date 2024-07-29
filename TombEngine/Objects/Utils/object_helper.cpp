@@ -21,7 +21,7 @@ bool AssignObjectAnimations(ObjectInfo& object, int requiredObjectID, const std:
 {
 	// Check if object has at least 1 animation with more than 1 frame.
 	const auto& anim = GetAnimData(object, 0); // TODO: Check.
-	if (!anim.Keyframes.empty())
+	if (!anim.Frames.empty())
 		return true;
 
 	// Use slot if loaded.
@@ -30,7 +30,7 @@ bool AssignObjectAnimations(ObjectInfo& object, int requiredObjectID, const std:
 	{
 		// Check if the required object has at least 1 animation with more than 1 frame.
 		const auto& anim = GetAnimData(requiredObject, 0); // TODO: Check.
-		if (!anim.Keyframes.empty())
+		if (!anim.Frames.empty())
 		{
 			return true;
 		}

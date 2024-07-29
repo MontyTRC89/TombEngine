@@ -381,7 +381,7 @@ void LoadObjects()
 		for (auto& anim : object.Animations)
 		{
 			anim.StateID = ReadInt32();
-			anim.Interpolation = ReadInt32();
+			int interpolation = ReadInt32();
 			anim.EndFrameNumber = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
@@ -425,22 +425,54 @@ void LoadObjects()
 			anim.FixedMotionCurveY = BezierCurve2D(startY, endY, startY, endY);
 			anim.FixedMotionCurveZ = BezierCurve2D(startZ, endZ, startZ, endZ);
 
-			// Load keyframes.
-			int frameCount = ReadInt32();
-			anim.Keyframes.resize(frameCount);
-			for (auto& keyframe : anim.Keyframes)
+			// Load key frames.
+			int keyFrameCount = ReadInt32();
+			auto keyFrames = std::vector<FrameData>(keyFrameCount);
+			for (auto& keyFrame : keyFrames)
 			{
 				auto center = ReadVector3();
 				auto extents = ReadVector3();
-				keyframe.Aabb = BoundingBox(center, extents);
-				keyframe.BoundingBox = GameBoundingBox(keyframe.Aabb);
+				keyFrame.Aabb = BoundingBox(center, extents);
+				keyFrame.BoundingBox = GameBoundingBox(keyFrame.Aabb);
 
-				keyframe.RootPosition = ReadVector3();
+				keyFrame.RootPosition = ReadVector3();
 
 				int boneCount = ReadInt32();
-				keyframe.BoneOrientations.resize(boneCount);
-				for (auto& orient : keyframe.BoneOrientations)
+				keyFrame.BoneOrientations.resize(boneCount);
+				for (auto& orient : keyFrame.BoneOrientations)
 					orient = ReadVector4();
+			}
+
+			// TODO: Write interpolated data to level.
+			// Interpoate frames.
+			float alphaStep = 1.0f / (float)interpolation;
+			for (int i = 0; i < keyFrames.size(); i++)
+			{
+				anim.Frames.push_back(keyFrames[i]);
+				if (i != (keyFrames.size() - 1))
+				{
+					const auto& currentKeyFrame = keyFrames[i];
+					const auto& nextKeyFrame = keyFrames[i + 1];
+
+					for (int j = 1; j < interpolation; j++)
+					{
+						float alpha = alphaStep * j;
+
+						auto rootPos = Vector3::Lerp(currentKeyFrame.RootPosition, nextKeyFrame.RootPosition, alpha);
+
+						auto boneOrients = std::vector<Quaternion>(currentKeyFrame.BoneOrientations.size());
+						for (int k = 0; k < boneOrients.size(); k++)
+							boneOrients[k] = Quaternion::Slerp(currentKeyFrame.BoneOrientations[k], nextKeyFrame.BoneOrientations[k], alpha);
+						
+						auto aabb = BoundingBox(
+							Vector3::Lerp(currentKeyFrame.Aabb.Center, nextKeyFrame.Aabb.Center, alpha),
+							Vector3::Lerp(currentKeyFrame.Aabb.Extents, nextKeyFrame.Aabb.Extents, alpha));
+						auto legacyAabb = GameBoundingBox(aabb);
+
+						auto frame = FrameData{ rootPos, boneOrients, aabb, legacyAabb };
+						anim.Frames.push_back(frame);
+					}
+				}
 			}
 
 			// Load state dispatches.

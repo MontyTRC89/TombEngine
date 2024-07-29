@@ -42,7 +42,7 @@ extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 namespace TEN::Renderer
 {
-	void Renderer::UpdateAnimation(RendererItem* rendererItem, RendererObject& rendererObject, const FrameInterpData& frameInterp, int mask, bool useObjectWorldRotation,
+	void Renderer::UpdateAnimation(RendererItem* rendererItem, RendererObject& rendererObject, const FrameData& frame, int mask, bool useObjectWorldRotation,
 								   const MoveableAnimBlendData* blendData)
 	{
 		static auto boneIndices = std::vector<int>{};
@@ -75,8 +75,7 @@ namespace TEN::Renderer
 				return;
 			
 			// Bad data; return early.
-			if (frameInterp.Keyframe0.BoneOrientations.size() <= bone->Index ||
-				(frameInterp.Alpha != 0.0f && frameInterp.Keyframe0.BoneOrientations.size() <= bone->Index))
+			if (frame.BoneOrientations.size() <= bone->Index)
 			{
 				TENLog(
 					"Attempted to animate object ID " + GetObjectName((GAME_OBJECT_ID)rendererItem->ObjectNumber) +
@@ -90,38 +89,23 @@ namespace TEN::Renderer
 			bool animateBone = (mask >> bone->Index) & 1;
 			if (animateBone)
 			{
-				auto rootPos0 = frameInterp.Keyframe0.RootPosition;
-				auto rotMatrix0 = Matrix::CreateFromQuaternion(frameInterp.Keyframe0.BoneOrientations[bone->Index]);
-				
-				// Interpolate frames.
-				if (frameInterp.Alpha != 0.0f)
-				{
-					auto rootPos1 = frameInterp.Keyframe1.RootPosition;
-					rootPos0 = Vector3::Lerp(rootPos0, rootPos1, frameInterp.Alpha);
-
-					auto rotMatrix2 = Matrix::CreateFromQuaternion(frameInterp.Keyframe1.BoneOrientations[bone->Index]);
-
-					auto quat0 = Quaternion::CreateFromRotationMatrix(rotMatrix0);
-					auto quat1 = Quaternion::CreateFromRotationMatrix(rotMatrix2);
-					auto quat2 = Quaternion::Slerp(quat0, quat1, frameInterp.Alpha);
-
-					rotMatrix0 = Matrix::CreateFromQuaternion(quat2);
-				}
+				auto rootPos = frame.RootPosition;
+				auto rotMatrix = Matrix::CreateFromQuaternion(frame.BoneOrientations[bone->Index]);
 
 				// Apply blending.
 				if (blendData != nullptr)
 				{
-					rootPos0 = Vector3::Lerp(blendData->RootPos, rootPos0, blendAlpha);
+					rootPos = Vector3::Lerp(blendData->RootPos, rootPos, blendAlpha);
 
-					auto quat = Quaternion::Slerp(blendData->BoneOrientations[bone->Index], Quaternion::CreateFromRotationMatrix(rotMatrix0), blendAlpha);
-					rotMatrix0 = Matrix::CreateFromQuaternion(quat);
+					auto quat = Quaternion::Slerp(blendData->BoneOrientations[bone->Index], Quaternion::CreateFromRotationMatrix(rotMatrix), blendAlpha);
+					rotMatrix = Matrix::CreateFromQuaternion(quat);
 				}
 
 				// Store bone orientation on current frame.
 				if (rendererItem != nullptr)
-					rendererItem->BoneOrientations[bone->Index] = Quaternion::CreateFromRotationMatrix(rotMatrix0);
+					rendererItem->BoneOrientations[bone->Index] = Quaternion::CreateFromRotationMatrix(rotMatrix);
 
-				auto translationMatrix = (bone == rendererObject.Skeleton) ? Matrix::CreateTranslation(rootPos0) : Matrix::Identity;
+				auto translationMatrix = (bone == rendererObject.Skeleton) ? Matrix::CreateTranslation(rootPos) : Matrix::Identity;
 				auto extraRotMatrix = Matrix::CreateFromQuaternion(bone->ExtraRotation);
 
 				if (useObjectWorldRotation)
@@ -131,14 +115,14 @@ namespace TEN::Renderer
 					auto translation = Vector3::Zero;
 					transforms[bone->Parent->Index].Invert().Decompose(scale, invQuat, translation);
 
-					rotMatrix0 = (rotMatrix0 * extraRotMatrix) * Matrix::CreateFromQuaternion(invQuat);
+					rotMatrix = (rotMatrix * extraRotMatrix) * Matrix::CreateFromQuaternion(invQuat);
 				}
 				else
 				{
-					rotMatrix0 = extraRotMatrix * rotMatrix0;
+					rotMatrix = extraRotMatrix * rotMatrix;
 				}
 
-				transforms[bone->Index] = rotMatrix0 * ((bone == rendererObject.Skeleton) ? translationMatrix : bone->Transform);
+				transforms[bone->Index] = rotMatrix * ((bone == rendererObject.Skeleton) ? translationMatrix : bone->Transform);
 				if (bone != rendererObject.Skeleton)
 					transforms[bone->Index] *= transforms[bone->Parent->Index];
 			}
@@ -326,8 +310,8 @@ namespace TEN::Renderer
 				});
 		}
 
-		auto frameData = GetFrameInterpolation(*nativeItem);
-		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX, false, nativeItem->Animation.Blend.IsEnabled() ? &nativeItem->Animation.Blend : nullptr);
+		const auto& frame = GetFrame(*nativeItem);
+		UpdateAnimation(itemToDraw, moveableObj, frame, UINT_MAX, false, nativeItem->Animation.Blend.IsEnabled() ? &nativeItem->Animation.Blend : nullptr);
 
 		for (int m = 0; m < obj->nmeshes; m++)
 			itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];

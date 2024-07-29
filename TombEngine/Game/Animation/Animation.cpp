@@ -25,34 +25,9 @@ namespace TEN::Animation
 
 	// TODO: Arm anim object in savegame.
 
-	FrameInterpData::FrameInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha) :
-		Keyframe0(keyframe0),
-		Keyframe1(keyframe1)
+	const FrameData& AnimData::GetFrame(int frameNumber) const
 	{
-		Alpha = alpha;
-	}
-
-	const KeyframeData& AnimData::GetClosestKeyframe(int frameNumber) const
-	{
-		auto frameInterp = GetFrameInterpolation(frameNumber);
-		return ((frameInterp.Alpha <= 0.5f) ? frameInterp.Keyframe0 : frameInterp.Keyframe1);
-	}
-
-	FrameInterpData AnimData::GetFrameInterpolation(int frameNumber) const
-	{
-		// FAILSAFE: Clamp frame number.
-		frameNumber = std::clamp(frameNumber, 0, EndFrameNumber);
-
-		// Calculate keyframes defining interpolated frame.
-		float keyframeNumber = frameNumber / (float)Interpolation;
-		const auto& keyframe0 = Keyframes[(int)floor(keyframeNumber)];
-		const auto& keyframe1 = Keyframes[(int)ceil(keyframeNumber)];
-
-		// Calculate interpolation alpha between keyframes.
-		float alpha = (1.0f / Interpolation) * (frameNumber % Interpolation);
-
-		// Return frame interpolation.
-		return FrameInterpData(keyframe0, keyframe1, alpha);
+		return Frames[frameNumber];
 	}
 
 	FixedMotionData AnimData::GetFixedMotion(int frameNumber) const
@@ -84,7 +59,7 @@ namespace TEN::Animation
 		{
 			if (Flags & (int)AnimFlags::RootMotionCycle)
 			{
-				if (Keyframes.size() > 1)
+				if (Frames.size() > 1)
 				{
 					frameNumber = 1;
 				}
@@ -100,16 +75,12 @@ namespace TEN::Animation
 			}
 		}
 
-		// Get frame interpolation.
-		auto frameInterp = GetFrameInterpolation(frameNumber);
-		auto prevFrameInterp = GetFrameInterpolation(frameNumber - 1);
-		
 		// Calculate relative translation.
 		auto translation = Vector3::Zero;
 		if (hasTranslation)
 		{
-			auto rootPos = Vector3::Lerp(frameInterp.Keyframe0.RootPosition, frameInterp.Keyframe1.RootPosition, frameInterp.Alpha);
-			auto prevRootPos = Vector3::Lerp(prevFrameInterp.Keyframe0.RootPosition, prevFrameInterp.Keyframe1.RootPosition, prevFrameInterp.Alpha);
+			const auto& rootPos = Frames[frameNumber].RootPosition;
+			const auto& prevRootPos = Frames[frameNumber - 1].RootPosition;
 			auto rootTranslation = rootPos - prevRootPos;
 
 			if (Flags & (int)AnimFlags::RootMotionTranslationX)
@@ -124,8 +95,8 @@ namespace TEN::Animation
 		auto rot = EulerAngles::Identity;
 		if (hasRot)
 		{
-			auto rootOrient = EulerAngles(Quaternion::Slerp(frameInterp.Keyframe0.BoneOrientations.front(), frameInterp.Keyframe1.BoneOrientations.front(), frameInterp.Alpha));
-			auto prevRootOrient = EulerAngles(Quaternion::Slerp(prevFrameInterp.Keyframe0.BoneOrientations.front(), prevFrameInterp.Keyframe1.BoneOrientations.front(), prevFrameInterp.Alpha));
+			const auto& rootOrient = Frames[frameNumber].BoneOrientations.front();
+			const auto& prevRootOrient = Frames[frameNumber - 1].BoneOrientations.front();
 			auto rootRot = rootOrient - prevRootOrient;
 
 			if (Flags & (int)AnimFlags::RootMotionRotationX)
@@ -152,30 +123,27 @@ namespace TEN::Animation
 		if (frameNumber == 0)
 			return {};
 
-		// Get frame interpolation.
-		auto frameInterp = GetFrameInterpolation(frameNumber);
-
 		// Get relative translation counteraction.
 		auto translation = Vector3::Zero;
 		if (hasTranslation)
 		{
-			auto basePos = Keyframes.front().RootPosition;
-			auto rootPos = Vector3::Lerp(frameInterp.Keyframe0.RootPosition, frameInterp.Keyframe1.RootPosition, frameInterp.Alpha);
+			const auto& baseRootPos = Frames.front().RootPosition;
+			const auto& rootPos = Frames[frameNumber].RootPosition;
 
 			if (Flags & (int)AnimFlags::RootMotionTranslationX)
-				translation.x = basePos.x - rootPos.x;
+				translation.x = baseRootPos.x - rootPos.x;
 			if (Flags & (int)AnimFlags::RootMotionTranslationY)
-				translation.y = basePos.y - rootPos.y;
+				translation.y = baseRootPos.y - rootPos.y;
 			if (Flags & (int)AnimFlags::RootMotionTranslationZ)
-				translation.z = basePos.z - rootPos.z;
+				translation.z = baseRootPos.z - rootPos.z;
 		}
 
 		// Get relative rotation counteraction.
 		auto rot = EulerAngles::Identity;
 		if (hasRot)
 		{
-			auto baseOrient = EulerAngles(Keyframes.front().BoneOrientations.front());
-			auto rootOrient = EulerAngles(Quaternion::Slerp(frameInterp.Keyframe0.BoneOrientations.front(), frameInterp.Keyframe1.BoneOrientations.front(), frameInterp.Alpha));
+			auto baseOrient = EulerAngles(Frames.front().BoneOrientations.front());
+			auto rootOrient = EulerAngles(Frames[frameNumber].BoneOrientations.front());
 
 			if (Flags & (int)AnimFlags::RootMotionRotationX)
 				rot.x = baseOrient.x - rootOrient.x;
@@ -402,37 +370,30 @@ namespace TEN::Animation
 		return GetAnimData(item.Animation.AnimObjectID, animNumber);
 	}
 
-	FrameInterpData GetFrameInterpolation(const ItemInfo& item)
-	{
-		const auto& anim = GetAnimData(item);
-		return anim.GetFrameInterpolation(item.Animation.FrameNumber);
-	}
-
-	const KeyframeData& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
+	const FrameData& GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 	{
 		const auto& anim = GetAnimData(objectID, animNumber);
-		return anim.GetClosestKeyframe(frameNumber);
+		return anim.GetFrame(frameNumber);
 	}
 
-	const KeyframeData& GetKeyframe(const ItemInfo& item, int animNumber, int frameNumber)
+	const FrameData& GetFrame(const ItemInfo& item, int animNumber, int frameNumber)
 	{
-		return GetKeyframe(item.ObjectNumber, animNumber, frameNumber);
+		return GetFrame(item.ObjectNumber, animNumber, frameNumber);
 	}
 
-	const KeyframeData& GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber)
+	const FrameData& GetFrame(const ItemInfo& item)
 	{
-		return GetKeyframe(objectID, animNumber, 0);
+		return GetFrame(item.ObjectNumber, item.Animation.AnimNumber, item.Animation.FrameNumber);
 	}
 
-	const KeyframeData& GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber)
+	const FrameData& GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber)
 	{
-		return GetKeyframe(objectID, animNumber, INT_MAX);
+		return GetFrame(objectID, animNumber, 0);
 	}
 
-	const KeyframeData& GetClosestKeyframe(const ItemInfo& item)
+	const FrameData& GetLastFrame(GAME_OBJECT_ID objectID, int animNumber)
 	{
-		const auto& anim = GetAnimData(item);
-		return anim.GetClosestKeyframe(item.Animation.FrameNumber);
+		return GetFrame(objectID, animNumber, INT_MAX);
 	}
 
 	const StateDispatchData* GetStateDispatch(const ItemInfo& item, int targetStateID)

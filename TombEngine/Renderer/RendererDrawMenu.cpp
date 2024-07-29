@@ -737,8 +737,8 @@ namespace TEN::Renderer
 	{
 		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 
 		auto screenRes = GetScreenResolution();
 		auto factor = Vector2(
@@ -749,7 +749,7 @@ namespace TEN::Renderer
 		scale *= (factor.x > factor.y) ? factor.y : factor.x;
 
 		int index = g_Gui.ConvertObjectToInventoryItem(objectNumber);
-		if (index != -1)
+		if (index != NO_VALUE)
 		{
 			const auto& invObject = InventoryObjectTable[index];
 
@@ -767,11 +767,8 @@ namespace TEN::Renderer
 		const auto& object = Objects[objectNumber];
 		if (!object.Animations.empty())
 		{
-			auto frameInterp = FrameInterpData(
-				GetAnimData(object, 0).Keyframes[0],
-				GetAnimData(object, 0).Keyframes[0],
-				0.0f);
-			UpdateAnimation(nullptr, *moveableObject, frameInterp, 0xFFFFFFFF);
+			const auto& frame = GetAnimData(object, 0).Frames.front();
+			UpdateAnimation(nullptr, *moveableObject, frame, 0xFFFFFFFF);
 		}
 
 		auto pos = _viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);

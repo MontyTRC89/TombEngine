@@ -187,10 +187,9 @@ void ItemInfo::SetAnimBlend(int frameCount, const BezierCurve2D& curve)
 	const auto& object = Objects[ObjectNumber];
 
 	const auto& anim = GetAnimData(*this);
-	const auto& frameInterp = anim.GetFrameInterpolation(Animation.FrameNumber);
 	auto rootMotionCounter = anim.GetRootMotionCounteraction(Animation.FrameNumber);
 
-	auto rootPos = Vector3::Lerp(frameInterp.Keyframe0.RootPosition, frameInterp.Keyframe1.RootPosition, frameInterp.Alpha);
+	const auto& rootPos = anim.Frames[Animation.FrameNumber].RootPosition;
 	auto boneRot = rootMotionCounter.Rotation.ToQuaternion();
 
 	Animation.Blend.FrameNumber = 0;
@@ -245,16 +244,15 @@ BoundingOrientedBox ItemInfo::GetObb() const
 {
 	// Get anim data.
 	const auto& anim = GetAnimData(*this);
-	auto keyframeInterp = anim.GetFrameInterpolation(Animation.FrameNumber);
 	auto rootMotionCounter = anim.GetRootMotionCounteraction(Animation.FrameNumber);
 
 	// Calculate offset.
-	auto relOffset = Vector3::Lerp(keyframeInterp.Keyframe0.Aabb.Center, keyframeInterp.Keyframe1.Aabb.Center, keyframeInterp.Alpha);
+	const auto& relOffset = anim.Frames[Animation.FrameNumber].Aabb.Center;
 	auto rotMatrix = (Pose.Orientation + rootMotionCounter.Rotation).ToRotationMatrix();
 	auto offset = Vector3::Transform(relOffset + rootMotionCounter.Translation, rotMatrix);
 
-	// Calculate extents.
-	auto extents = Vector3::Lerp(keyframeInterp.Keyframe0.Aabb.Extents, keyframeInterp.Keyframe1.Aabb.Extents, keyframeInterp.Alpha);
+	// Get extents.
+	const auto& extents = anim.Frames[Animation.FrameNumber].Aabb.Extents;
 
 	// Create and return OBB.
 	return BoundingOrientedBox(Pose.Position.ToVector3() + offset, extents, Pose.Orientation.ToQuaternion());

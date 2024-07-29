@@ -28,7 +28,7 @@ namespace TEN::Animation
 		RootMotionCycle		   = 1 << 6
 	};
 
-	struct KeyframeData
+	struct FrameData
 	{
 		Vector3					RootPosition	 = Vector3::Zero;
 		std::vector<Quaternion> BoneOrientations = {};
@@ -36,15 +36,6 @@ namespace TEN::Animation
 
 		// Deprecated.
 		GameBoundingBox BoundingBox = GameBoundingBox::Zero;
-	};
-
-	struct FrameInterpData
-	{
-		const KeyframeData& Keyframe0;
-		const KeyframeData& Keyframe1;
-		float Alpha = 0.0f;
-
-		FrameInterpData(const KeyframeData& keyframe0, const KeyframeData& keyframe1, float alpha);
 	};
 
 	struct StateDispatchData
@@ -76,7 +67,6 @@ namespace TEN::Animation
 		using AnimCommandPtr = std::unique_ptr<AnimCommand>;
 
 		int			  StateID			  = 0;
-		int			  Interpolation		  = 0;
 		int			  EndFrameNumber	  = 0;
 		int			  NextAnimNumber	  = 0;
 		int			  NextFrameNumber     = 0;
@@ -86,17 +76,16 @@ namespace TEN::Animation
 		BezierCurve2D FixedMotionCurveY	  = BezierCurve2D::Zero;
 		BezierCurve2D FixedMotionCurveZ	  = BezierCurve2D::Zero;
 
-		std::vector<KeyframeData>	   Keyframes  = {};
+		std::vector<FrameData>		   Frames	  = {};
 		std::vector<StateDispatchData> Dispatches = {};
 		std::vector<AnimCommandPtr>	   Commands	  = {};
 
 		int Flags = (int)AnimFlags::None;
 
-		const KeyframeData& GetClosestKeyframe(int frameNumber) const;
-		FrameInterpData		GetFrameInterpolation(int frameNumber) const;
-		FixedMotionData		GetFixedMotion(int frameNumber) const;
-		RootMotionData		GetRootMotion(int frameNumber) const;
-		RootMotionData		GetRootMotionCounteraction(int frameNumber) const;
+		const FrameData& GetFrame(int frameNumber) const;
+		FixedMotionData	 GetFixedMotion(int frameNumber) const;
+		RootMotionData	 GetRootMotion(int frameNumber) const;
+		RootMotionData	 GetRootMotionCounteraction(int frameNumber) const;
 	};
 
 	struct BoneMutator
@@ -124,12 +113,11 @@ namespace TEN::Animation
 	const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 	const AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_VALUE);
 
-	FrameInterpData	GetFrameInterpolation(const ItemInfo& item);
-	const KeyframeData& GetKeyframe(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
-	const KeyframeData& GetKeyframe(const ItemInfo& item, int animNumber, int frameNumber = 0);
-	const KeyframeData& GetFirstKeyframe(GAME_OBJECT_ID objectID, int animNumber);
-	const KeyframeData& GetLastKeyframe(GAME_OBJECT_ID objectID, int animNumber);
-	const KeyframeData& GetClosestKeyframe(const ItemInfo& item);
+	const FrameData& GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
+	const FrameData& GetFrame(const ItemInfo& item, int animNumber, int frameNumber = 0);
+	const FrameData& GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
+	const FrameData& GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
+	const FrameData& GetFrame(const ItemInfo& item);
 
 	const StateDispatchData* GetStateDispatch(const ItemInfo& item, int targetStateID = NO_VALUE);
 

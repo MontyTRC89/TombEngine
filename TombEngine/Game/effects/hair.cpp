@@ -164,11 +164,11 @@ namespace TEN::Effects::Hair
 				break;
 			}
 
-			const auto& frame = GetAnimData(item.ObjectNumber, animNumber).Keyframes[player.HitFrame];
+			const auto& frame = GetAnimData(item.ObjectNumber, animNumber).Frames[player.HitFrame];
 			return frame.BoundingBox.GetCenter();
 		}
 
-		const auto& frame = GetClosestKeyframe(item);
+		const auto& frame = GetFrame(item);
 		return frame.BoundingBox.GetCenter();
 	}
 	

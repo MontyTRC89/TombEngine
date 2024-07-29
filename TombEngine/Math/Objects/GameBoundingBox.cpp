@@ -36,17 +36,16 @@ using namespace TEN::Animation;
 
 	GameBoundingBox::GameBoundingBox(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 	{
-		*this = GetKeyframe(objectID, animNumber, frameNumber).BoundingBox;
+		*this = GetFrame(objectID, animNumber, frameNumber).BoundingBox;
 	}
 
 	// NOTE: Deprecated. Use item.GetObb() instead.
 	GameBoundingBox::GameBoundingBox(const ItemInfo* item)
 	{
 		const auto& anim = GetAnimData(*item);
-		auto frameInterp = anim.GetFrameInterpolation(item->Animation.FrameNumber);
 		auto rootMotionCounter = anim.GetRootMotionCounteraction(item->Animation.FrameNumber);
 
-		*this = frameInterp.Keyframe0.BoundingBox + (((frameInterp.Keyframe1.BoundingBox - frameInterp.Keyframe0.BoundingBox) * frameInterp.Alpha));
+		*this = anim.Frames[item->Animation.FrameNumber].BoundingBox;
 
 		X1 += rootMotionCounter.Translation.x;
 		X2 += rootMotionCounter.Translation.x;

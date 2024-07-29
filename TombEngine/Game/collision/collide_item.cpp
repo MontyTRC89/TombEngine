@@ -113,7 +113,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 	int staticCount = 0;
 
 	// Establish parameters of colliding item.
-	const auto& collidingBounds = GetClosestKeyframe(collidingItem).BoundingBox;
+	const auto& collidingBounds = GetFrame(collidingItem).BoundingBox;
 	auto collidingExtents = collidingBounds.GetExtents();
 	auto collidingSphere = BoundingSphere(collidingBounds.GetCenter() + collidingItem.Pose.Position.ToVector3(), collidingExtents.Length());
 	auto collidingCircle = Vector3(collidingSphere.Center.x, collidingSphere.Center.z, (customRadius > 0.0f) ? customRadius : std::hypot(collidingExtents.x, collidingExtents.z));
@@ -170,7 +170,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					if (dist > COLLISION_CHECK_DISTANCE)
 						continue;
 
-					const auto& bounds = GetClosestKeyframe(item).BoundingBox;
+					const auto& bounds = GetFrame(item).BoundingBox;
 					auto extents = bounds.GetExtents();
 
 					// If item bounding box extents is below tolerance threshold, discard object.
@@ -262,7 +262,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	const auto& bounds = GetClosestKeyframe(*laraItem).BoundingBox;
+	const auto& bounds = GetFrame(*laraItem).BoundingBox;
 
 	if ((item->Pose.Position.y + GlobalCollisionBounds.Y2) <= (laraItem->Pose.Position.y + bounds.Y1))
 		return false;
@@ -572,8 +572,8 @@ bool Move3DPosTo3DPos(ItemInfo* item, Pose& fromPose, const Pose& toPose, int ve
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 {
-	const auto& bounds = GetClosestKeyframe(*item).BoundingBox;
-	const auto& playerBounds = GetClosestKeyframe(*laraItem).BoundingBox;
+	const auto& bounds = GetFrame(*item).BoundingBox;
+	const auto& playerBounds = GetFrame(*laraItem).BoundingBox;
 
 	if ((item->Pose.Position.y + bounds.Y2) <= (laraItem->Pose.Position.y + playerBounds.Y1))
 		return false;
@@ -607,7 +607,7 @@ bool TestBoundsCollideStatic(ItemInfo* item, const MESH_INFO& mesh, int radius)
 	if (!(bounds.Z2 != 0 || bounds.Z1 != 0 || bounds.X1 != 0 || bounds.X2 != 0 || bounds.Y1 != 0 || bounds.Y2 != 0))
 		return false;
 
-	const auto& itemBounds = GetClosestKeyframe(*item).BoundingBox;
+	const auto& itemBounds = GetFrame(*item).BoundingBox;
 	if (mesh.pos.Position.y + bounds.Y2 <= item->Pose.Position.y + itemBounds.Y1)
 		return false;
 
@@ -771,7 +771,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2)
 	int rz = (direction.z * cosY) + (direction.x * sinY);
 
 	const auto& anim = GetAnimData(*item);
-	const auto& keyframe = anim.GetClosestKeyframe(item->Animation.FrameNumber);
+	const auto& keyframe = anim.GetFrame(item->Animation.FrameNumber);
 	const auto& bounds = keyframe.BoundingBox;
 
 	int minX = bounds.X1;
