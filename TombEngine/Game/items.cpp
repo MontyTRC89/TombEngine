@@ -200,7 +200,7 @@ void ItemInfo::SetAnimBlend(int frameCount, const BezierCurve2D& curve)
 	for (int i = 0; i < object.nmeshes; i++)
 	{
 		auto boneOrient = GetBoneOrientation(*this, i);
-		Animation.Blend.BoneOrientations[i] = boneOrient * boneRot; // TODO: Check rotation.
+		Animation.Blend.BoneOrientations[i] = boneOrient * boneRot;
 	}
 }
 
