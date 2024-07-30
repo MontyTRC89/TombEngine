@@ -448,10 +448,11 @@ void LoadObjects()
 			float alphaStep = 1.0f / (float)interpolation;
 			for (int i = 0; i < keyFrames.size(); i++)
 			{
-				anim.Frames.push_back(keyFrames[i]);
+				const auto& currentKeyFrame = keyFrames[i];
+
+				anim.Frames.push_back(currentKeyFrame);
 				if (i != (keyFrames.size() - 1))
 				{
-					const auto& currentKeyFrame = keyFrames[i];
 					const auto& nextKeyFrame = keyFrames[i + 1];
 
 					for (int j = 1; j < interpolation; j++)
