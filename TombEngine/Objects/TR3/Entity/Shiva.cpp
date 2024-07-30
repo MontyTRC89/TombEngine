@@ -341,9 +341,9 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					int x = item->Pose.Position.x + BLOCK(1) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
 					int z = item->Pose.Position.z + BLOCK(1) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
-					auto box = GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetBottomSector().Box;
+					auto box = GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetBottomSector().PathfindingBoxID;
 
-					if (box != NO_VALUE && !(g_Level.Boxes[box].flags & BLOCKABLE) && !creature.Flags)
+					if (box != NO_VALUE && !(g_Level.PathfindingBoxes[box].flags & BLOCKABLE) && !creature.Flags)
 						item->Animation.TargetState = SHIVA_STATE_WALK_BACK;
 					else
 						item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;

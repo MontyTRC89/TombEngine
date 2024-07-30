@@ -131,16 +131,16 @@ bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, boo
 			return false;
 	}
 
+	// Check for inaccessible sector.
+	if (pointColl.GetSector().PathfindingBoxID == NO_VALUE)
+		return false;
+
 	// Check for blocked grey box.
-	if (g_Level.Boxes[pointColl.GetSector().Box].flags & BLOCKABLE)
+	if (g_Level.PathfindingBoxes[pointColl.GetSector().PathfindingBoxID].flags & BLOCKABLE)
 	{
-		if (g_Level.Boxes[pointColl.GetSector().Box].flags & BLOCKED)
+		if (g_Level.PathfindingBoxes[pointColl.GetSector().PathfindingBoxID].flags & BLOCKED)
 			return false;
 	}
-
-	// Check for inaccessible sector.
-	if (pointColl.GetSector().Box == NO_VALUE)
-		return false;
 
 	// Check for stopper flag.
 	if (pointColl.GetSector().Stopper)

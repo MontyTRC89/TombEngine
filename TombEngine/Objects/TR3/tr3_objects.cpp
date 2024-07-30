@@ -484,8 +484,8 @@ static void StartTrap(ObjectInfo* obj)
 	obj = &Objects[ID_TRAIN];
 	if (obj->loaded)
 	{
-		obj->control = TrainControl;
-		obj->collision = TrainCollision;
+		obj->control = ControlTrain;
+		obj->collision = CollideTrain;
 		obj->SetHitEffect(true);
 	}
 
