@@ -77,7 +77,7 @@ using namespace TEN::Effects::EmberEmitter;
 using namespace TEN::Effects::SmokeEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
-using namespace TEN::Traps::TR5;
+using namespace TEN::Entities::Traps;
 
 static void StartEntity(ObjectInfo *obj)
 {
@@ -854,7 +854,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeVentilator;
-		obj->control = VentilatorControl;
+		obj->control = ControlVentilator;
 		obj->SetHitEffect(true);
 	}
 
@@ -862,7 +862,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeVentilator;
-		obj->control = VentilatorControl;
+		obj->control = ControlVentilator;
 		obj->SetHitEffect(true);
 	}
 
@@ -877,7 +877,7 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeRomeHammer;
 		obj->collision = GenericSphereBoxCollision;
-		obj->control = AnimatingControl;
+		obj->control = ControlRomeHammer;
 		obj->SetHitEffect(true);
 	}
 
@@ -885,7 +885,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->collision = TrapCollision;
-		obj->control = FallingCeilingControl;
+		obj->control = ControlFallingCeiling;
 	}
 
 	obj = &Objects[ID_ROLLINGBALL];
@@ -935,7 +935,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeExplosion;
-		obj->control = ExplosionControl;
+		obj->control = ControlExplosion;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -984,8 +984,8 @@ static void StartSwitch(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeWreckingBall;
-		obj->collision = WreckingBallCollision;
-		obj->control = WreckingBallControl;
+		obj->collision = CollideWreckingBall;
+		obj->control = ControlWreckingBall;
 		obj->SetHitEffect(true);
 	}
 }

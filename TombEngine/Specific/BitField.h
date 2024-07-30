@@ -9,23 +9,28 @@ namespace TEN::Utils
 	{
 	private:
 		// Constants
+
 		static constexpr auto SIZE_DEFAULT = 32;
 
 		// Members
+
 		std::vector<bool> _bits = {};
 
 	public:
 		// Presets
+
 		static const BitField Empty;
 		static const BitField Default;
 
 		// Constructors
+
 		BitField();
 		BitField(unsigned int size);
 		BitField(unsigned int size, unsigned int packedBits);
 		BitField(const std::string& bitString);
 		
 		// Getters
+
 		unsigned int GetSize() const;
 		unsigned int GetCount() const;
 
@@ -41,17 +46,20 @@ namespace TEN::Utils
 		void FlipAll();
 
 		// Inquirers
+
 		bool Test(const std::vector<unsigned int>& indices, bool testAny = true) const;
 		bool Test(unsigned int index) const;
 		bool TestAny() const;
 		bool TestAll() const;
 
 		// Converters
+
 		unsigned int ToPackedBits() const;
 		std::string	 ToString() const;
 
 		// Operators
 		// NOTE: packedBits will not be assessed in full if the size of the given BitField object is less than SIZE_DEFAULT.
+
 		bool		 operator ==(unsigned int packedBits) const;
 		bool		 operator !=(unsigned int packedBits) const;
 		BitField&	 operator =(unsigned int packedBits);
@@ -62,6 +70,7 @@ namespace TEN::Utils
 
 	private:
 		// Helpers
+
 		void Fill(bool value);
 	};
 }

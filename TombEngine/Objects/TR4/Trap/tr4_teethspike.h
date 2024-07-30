@@ -1,6 +1,6 @@
 #pragma once
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
 	void InitializeTeethSpikes(short itemNumber);
 	void ControlTeethSpikes(short itemNumber);
