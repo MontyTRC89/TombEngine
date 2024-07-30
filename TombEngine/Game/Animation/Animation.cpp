@@ -25,11 +25,6 @@ namespace TEN::Animation
 
 	// TODO: Arm anim object in savegame.
 
-	const FrameData& AnimData::GetFrame(int frameNumber) const
-	{
-		return Frames[frameNumber];
-	}
-
 	FixedMotionData AnimData::GetFixedMotion(int frameNumber) const
 	{
 		// NOTE: Must use non-zero frame count in this edge case.
@@ -373,7 +368,7 @@ namespace TEN::Animation
 	const FrameData& GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber)
 	{
 		const auto& anim = GetAnimData(objectID, animNumber);
-		return anim.GetFrame(frameNumber);
+		return anim.Frames[frameNumber];
 	}
 
 	const FrameData& GetFrame(const ItemInfo& item, int animNumber, int frameNumber)

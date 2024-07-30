@@ -82,10 +82,9 @@ namespace TEN::Animation
 
 		int Flags = (int)AnimFlags::None;
 
-		const FrameData& GetFrame(int frameNumber) const;
-		FixedMotionData	 GetFixedMotion(int frameNumber) const;
-		RootMotionData	 GetRootMotion(int frameNumber) const;
-		RootMotionData	 GetRootMotionCounteraction(int frameNumber) const;
+		FixedMotionData GetFixedMotion(int frameNumber) const;
+		RootMotionData	GetRootMotion(int frameNumber) const;
+		RootMotionData	GetRootMotionCounteraction(int frameNumber) const;
 	};
 
 	struct BoneMutator
@@ -115,9 +114,9 @@ namespace TEN::Animation
 
 	const FrameData& GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumber = 0);
 	const FrameData& GetFrame(const ItemInfo& item, int animNumber, int frameNumber = 0);
+	const FrameData& GetFrame(const ItemInfo& item);
 	const FrameData& GetFirstFrame(GAME_OBJECT_ID objectID, int animNumber);
 	const FrameData& GetLastFrame(GAME_OBJECT_ID objectID, int animNumber);
-	const FrameData& GetFrame(const ItemInfo& item);
 
 	const StateDispatchData* GetStateDispatch(const ItemInfo& item, int targetStateID = NO_VALUE);
 
