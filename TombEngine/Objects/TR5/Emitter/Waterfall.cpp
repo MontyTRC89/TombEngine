@@ -41,12 +41,10 @@ namespace TEN::Effects::WaterfallEmitter
 		if (!TriggerActive(&item))
 			return;
 
-		float waterfallWidth = BLOCK(2);// std::max(BLOCK(round((float)item.TriggerFlags) / 8.0f), BLOCK(1 / 8.0f));
-		int size = std::max(2, std::clamp(2 + (item.TriggerFlags / 2), 15, 20));
+		float waterfallWidth = std::max(BLOCK(round((float)item.TriggerFlags) / 8.0f), BLOCK(1 / 8.0f));
 
-		short angle = item.Pose.Orientation.y;
-		float cos = phd_cos(angle - ANGLE(90.0f));
-		float sin = phd_sin(angle + ANGLE(90.0f));
+		auto vel = item.Pose.Orientation.ToDirection() * BLOCK(0.2f);
+		vel.y = Random::GenerateFloat(0.0f, 16.0f);
 
 		auto startColor = (item.Model.Color / 4) * SCHAR_MAX;
 		auto endColor = (item.Model.Color / 8) * UCHAR_MAX;
@@ -75,9 +73,9 @@ namespace TEN::Effects::WaterfallEmitter
 			part.roomNumber = item.RoomNumber;
 
 			part.friction = -2;
-			part.xVel = BLOCK(0.2f) * cos;
-			part.yVel = 16 - (GetRandomControl() & 0xF);
-			part.zVel = BLOCK(0.2f) * sin;
+			part.xVel = vel.x;
+			part.yVel = vel.y;
+			part.zVel = vel.z;
 
 			auto pointColl = GetPointCollision(pos, item.RoomNumber, item.Pose.Orientation.y, -BLOCK(0.3f), BLOCK(8));
 			part.targetPos = GameVector(pointColl.GetPosition().x, pointColl.GetFloorHeight(), pointColl.GetPosition().z, pointColl.GetRoomNumber());
