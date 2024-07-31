@@ -123,7 +123,8 @@ namespace TEN::Effects::WaterfallEmitter
 					part.blendMode = BlendMode::Additive;
 
 					part.gravity = (relFloorHeight / 2) / FPS; // Adjust gravity based on relative floor height.
-					part.life = part.sLife = WATERFALL_LIFE_MAX;
+					part.life =
+					part.sLife = WATERFALL_LIFE_MAX;
 					part.fxObj = ID_WATERFALL_EMITTER;
 					part.fadeToBlack = 0;
 
@@ -154,6 +155,10 @@ namespace TEN::Effects::WaterfallEmitter
 
 	void SpawnWaterfallMist(const Vector3& pos, int roomNumber, float scalar, float size, const Color& color)
 	{
+		constexpr auto SPHERE_RADIUS = BLOCK(0.01f);
+
+		auto& part = *GetFreeParticle();
+
 		short angle = pos.y; // TODO: Not an angle, how does it work?
 
 		// TODO: Matrix math.
@@ -170,10 +175,10 @@ namespace TEN::Effects::WaterfallEmitter
 		auto startColor = (color + colorOffset);
 		auto endColor = (color + colorOffset);
 
-		auto& part = *GetFreeParticle();
-
 		// TODO: Generate normal color representation, then convert to legacy.
 		part.on = true;
+		part.SpriteSeqID = ID_WATERFALL;
+		part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_1_SPRITE_ID : WATERFALL_STREAM_2_SPRITE_ID;
 		part.roomNumber = roomNumber;
 		char colorVariation = (Random::GenerateInt(-8, 8)); // TODO: Why char?
 		part.sR = std::clamp((int)startColor.x + colorVariation, 0, SCHAR_MAX);
@@ -198,7 +203,7 @@ namespace TEN::Effects::WaterfallEmitter
 		part.zVel = 0;
 
 		part.friction = 3;
-		part.rotAng = Random::GenerateAngle(ANGLE(-25.0f), ANGLE(25.0f));
+		part.rotAng = Random::GenerateAngle();
 
 		// ??
 		auto scale =
@@ -213,8 +218,6 @@ namespace TEN::Effects::WaterfallEmitter
 		part.size = part.sSize = size1 / 4;
 		part.dSize = size1;
 
-		part.SpriteSeqID = ID_WATERFALL;
-		part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_1_SPRITE_ID : WATERFALL_STREAM_2_SPRITE_ID;
 		part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
 	}
 }

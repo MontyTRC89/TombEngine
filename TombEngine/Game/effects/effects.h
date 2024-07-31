@@ -126,10 +126,10 @@ struct RIPPLE_STRUCT
 // TODO: Refactor. This is *extremely* messy.
 struct Particle
 {
+	bool on;
+
 	GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
 	int			   SpriteID	   = 0;
-
-	bool on;
 
 	int x;
 	int y;
@@ -140,8 +140,10 @@ struct Particle
 	short yVel;
 	short zVel;
 
-	short gravity;
 	short rotAng;
+	signed char rotAdd;
+
+	short gravity;
 	unsigned short flags; // SP_enum
 
 	float sSize;
@@ -150,7 +152,6 @@ struct Particle
 
 	unsigned char friction;
 	unsigned char scalar;
-	signed char rotAdd;
 	signed char maxYvel;
 
 	unsigned char r;

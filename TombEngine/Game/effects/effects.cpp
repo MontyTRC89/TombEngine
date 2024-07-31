@@ -125,47 +125,43 @@ void DetatchSpark(int number, SpriteEnumFlag type)
 
 Particle* GetFreeParticle()
 {
-	int result = -1;
+	int partID = NO_VALUE;
 
-	// Get first free available spark
-
+	// Get first free available particle.
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		auto* particle = &Particles[i];
+		const auto& part = Particles[i];
+		if (part.on)
+			continue;
 
-		if (!particle->on)
-		{
-			result = i;
-			break;
-		}
+		partID = i;
+		break;
 	}
 
-	// No free sparks left, hijack existing one with less possible life
-
-	int life = INT_MAX;
-	if (result == -1)
+	// No free particles left; hijack existing particle with least life.
+	int shortestLife = INT_MAX;
+	if (partID == NO_VALUE)
 	{
 		for (int i = 0; i < MAX_PARTICLES; i++)
 		{
-			auto* particle = &Particles[i];
+			const auto& part = Particles[i];
 
-			if (particle->life < life && particle->dynamic == -1 && !(particle->flags & SP_EXPLOSION))
+			if (part.life < shortestLife && part.dynamic == -1 && !(part.flags & SP_EXPLOSION))
 			{
-				result = i;
-				life = particle->life;
+				partID = i;
+				shortestLife = part.life;
 			}
 		}
 	}
 
-	auto* spark = &Particles[result];
+	auto& part = Particles[partID];
+	part.extras = 0;
+	part.dynamic = -1;
+	part.SpriteSeqID = ID_DEFAULT_SPRITES;
+	part.SpriteID = 0;
+	part.blendMode = BlendMode::Additive;
 
-	spark->extras = 0;
-	spark->dynamic = -1;
-	spark->SpriteSeqID = ID_DEFAULT_SPRITES;
-	spark->SpriteID = 0;
-	spark->blendMode = BlendMode::Additive;
-
-	return spark;
+	return &part;
 }
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
@@ -221,7 +217,7 @@ void UpdateSparks()
 			part.z = part.targetPos.z;
 
 			if (Random::TestProbability(1 / 2.0f))
-				SpawnWaterfallMist(Vector3(part.targetPos.x, part.targetPos.y, part.targetPos.z), part.roomNumber, part.scalar, part.size, Color(part.sR, part.sG, part.sB));
+				SpawnWaterfallMist(part.targetPos.ToVector3(), part.roomNumber, part.scalar, part.size, Color(part.sR, part.sG, part.sB));
 				
 			continue;
 		}
