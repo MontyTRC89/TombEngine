@@ -15,11 +15,13 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
+// NOTES
+// item.TriggetFlags: Waterfall width. 1 unit = BLOCK(1 / 8.0f).
+
 namespace TEN::Effects::WaterfallEmitter
 {
-	constexpr auto WATERFALL_LIFE_MAX				  = 100;
-	constexpr auto WATERFALL_INVERSE_SCALE_FACTOR_MAX = 50.0f;
-	constexpr auto WATERFALL_MIST_COLOR_MODIFIER	  = Color(20.0f, 20.0f, 20.0f);
+	constexpr auto WATERFALL_LIFE_MAX			 = 100;
+	constexpr auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 
 	constexpr auto WATERFALL_SPLASH_SPRITE_ID	= 0;
 	constexpr auto WATERFALL_STREAM_1_SPRITE_ID = 1;
@@ -32,124 +34,100 @@ namespace TEN::Effects::WaterfallEmitter
 
 	void ControlWaterfall(short itemNumber)
 	{
-		constexpr auto SCALE = 3.0f;
+		constexpr auto SCALE		= 3.0f;
+		constexpr auto SPAWN_RADIUS = BLOCK(1 / 16.0f);
 
 		auto& item = g_Level.Items[itemNumber];
-
 		if (!TriggerActive(&item))
 			return;
 
-		int size = 2;
-		int width = 1;
+		float waterfallWidth = std::max(BLOCK(round((float)item.TriggerFlags) / 8.0f), BLOCK(1 / 8.0f));
+		int size = std::max(2, std::clamp(2 + (item.TriggerFlags / 2), 15, 20));
+
 		int waterHeight = 0;
+
 		short angle = item.Pose.Orientation.y;
-
-		if (item.TriggerFlags != 0)
-		{
-			width = std::clamp(int(round(item.TriggerFlags) * 100) / 2, 0, BLOCK(8));
-
-			// Calculate dynamic size based on TriggerFlags.
-			size = std::clamp(2 + (item.TriggerFlags) / 2, 15, 20);
-		}
-
 		float cos = phd_cos(angle - ANGLE(90.0f));
 		float sin = phd_sin(angle + ANGLE(90.0f));
 
 		auto startColor = (item.Model.Color / 4) * SCHAR_MAX; // ??
 		auto endColor = (item.Model.Color / 8) * UCHAR_MAX;
 
-		// Calculate inverse scale factor based on size.
-		float inverseScaleFactor = WATERFALL_INVERSE_SCALE_FACTOR_MAX / size;
-
-		// Adjust step by multiplying with inverse scale factor.
-		float step = (size * SCALE) * inverseScaleFactor;
-
-		int currentStep = 0;
-		int offset = 0;
-		while (offset <= width)
+		unsigned int partCount = (int)round(waterfallWidth / BLOCK(1 / 8.0f));
+		for (int i = 0; i < partCount; i++)
 		{
-			// TODO: Constants.
-			offset = (step * currentStep) + Random::GenerateInt(-32, 32);
+			auto& part = *GetFreeParticle();
 
-			for (int sign = -1; sign <= 1; sign += 2) // ??
+			part.on = true;
+			part.friction = -2;
+			part.xVel = BLOCK(0.2f) * cos;
+			part.yVel = 16 - (GetRandomControl() & 0xF);
+			part.zVel = BLOCK(0.2f) * sin;
+
+			auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+			auto relOffset = Vector3(Random::GenerateFloat(-waterfallWidth / 2, waterfallWidth / 2), 0.0f, 0.0f);
+			auto offset = Vector3::Transform(relOffset, rotMatrix);
+
+			auto sphere = BoundingSphere(offset, SPAWN_RADIUS);
+			offset = Random::GeneratePointInSphere(sphere);
+			auto pos = item.Pose.Position.ToVector3() + offset;
+
+			part.x = pos.x;
+			part.y = pos.y;
+			part.z = pos.z;
+			part.roomNumber = item.RoomNumber;
+
+			auto orient = EulerAngles(item.Pose.Orientation.x - ANGLE(90.0f), item.Pose.Orientation.y, item.Pose.Orientation.z);
+			auto orient2 = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, item.Pose.Orientation.z);
+			auto dir = orient.ToDirection();
+
+			auto origin = GameVector(pos, item.RoomNumber);
+			auto origin2 = Geometry::TranslatePoint(pos, orient2, BLOCK(0.3));
+
+			auto pointColl = GetPointCollision(origin2, origin.RoomNumber, dir, BLOCK(8));
+
+			int relFloorHeight = pointColl.GetFloorHeight() - part.y;
+
+			part.targetPos = GameVector(origin2.x, origin2.y + relFloorHeight, origin2.z, pointColl.GetRoomNumber());
+
+			if (TestEnvironment(ENV_FLAG_WATER, part.targetPos.ToVector3i(), part.roomNumber) ||
+				TestEnvironment(ENV_FLAG_SWAMP, part.targetPos.ToVector3i(), part.roomNumber))
 			{
-				// TODO: Use Random::TestProbability().
-				if (Random::GenerateInt(0, 100) > std::clamp((width / 100) * 3, 30, 80))
-				{
-					auto& part = *GetFreeParticle();
-
-					part.on = true;
-					part.roomNumber = item.RoomNumber;
-					part.friction = -2;
-					part.xVel = BLOCK(0.2f) * cos;
-					part.yVel = 16 - (GetRandomControl() & 0xF);
-					part.zVel = BLOCK(0.2f) * sin;
-
-					// TODO: Constants.
-					part.x = ((offset * sign) * sin) + Random::GenerateInt(-8, 8) + item.Pose.Position.x;
-					part.y = Random::GenerateInt(0, 16) + item.Pose.Position.y - 8;
-					part.z = ((offset * sign) * cos) + Random::GenerateInt(-8, 8) + item.Pose.Position.z;
-
-					auto orient = EulerAngles(item.Pose.Orientation.x - ANGLE(90.0f), item.Pose.Orientation.y, item.Pose.Orientation.z);
-					auto orient2 = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, item.Pose.Orientation.z);
-					auto dir = orient.ToDirection();
-
-					auto origin = GameVector(Vector3(part.x, part.y, part.z), item.RoomNumber);
-					auto origin2 = Geometry::TranslatePoint(Vector3(part.x, part.y, part.z), orient2, BLOCK(0.3));
-
-					auto pointColl = GetPointCollision(origin2, origin.RoomNumber, dir, BLOCK(8));
-
-					int relFloorHeight = pointColl.GetFloorHeight() - part.y;
-
-					part.targetPos = GameVector(origin2.x, origin2.y + relFloorHeight, origin2.z, pointColl.GetRoomNumber());
-
-					if (TestEnvironment(ENV_FLAG_WATER, part.targetPos.ToVector3i(), part.roomNumber) ||
-						TestEnvironment(ENV_FLAG_SWAMP, part.targetPos.ToVector3i(), part.roomNumber))
-					{
-						waterHeight = GetWaterDepth(part.targetPos.x, part.targetPos.y, part.targetPos.z, item.RoomNumber);
-					}
-
-					part.targetPos.y -= waterHeight;
-
-					char colorOffset = Random::GenerateInt(-8, 8);
-					part.sR = std::clamp((int)startColor.x + colorOffset, 0, UCHAR_MAX);
-					part.sG = std::clamp((int)startColor.y + colorOffset, 0, UCHAR_MAX);
-					part.sB = std::clamp((int)startColor.z + colorOffset, 0, UCHAR_MAX);
-					part.dR = std::clamp((int)endColor.x + colorOffset, 0, UCHAR_MAX);
-					part.dG = std::clamp((int)endColor.y + colorOffset, 0, UCHAR_MAX);
-					part.dB = std::clamp((int)endColor.z + colorOffset, 0, UCHAR_MAX);
-					part.roomNumber = pointColl.GetRoomNumber();
-					part.colFadeSpeed = 2;
-					part.blendMode = BlendMode::Additive;
-
-					part.gravity = (relFloorHeight / 2) / FPS; // Adjust gravity based on relative floor height.
-					part.life =
-					part.sLife = WATERFALL_LIFE_MAX;
-					part.fxObj = ID_WATERFALL_EMITTER;
-					part.fadeToBlack = 0;
-
-					// TODO: Magic.
-					part.rotAng = GetRandomControl() & 0xFFF;
-					part.scalar = item.TriggerFlags < 10 ? Random::GenerateInt(2, 4) : Random::GenerateInt(3, 5);
-					part.maxYvel = 0;
-					part.rotAdd = Random::GenerateInt(-16, 16);
-
-					part.sSize =
-					part.size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
-					part.dSize = item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(98.0f, 174.0f);
-
-					part.SpriteSeqID = ID_WATERFALL;
-					part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_SPLASH_SPRITE_ID;
-					part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
-				}
-
-				if (sign == 1)
-				{
-					currentStep++;
-					if (currentStep == 1)
-						break;
-				}
+				waterHeight = GetWaterDepth(part.targetPos.x, part.targetPos.y, part.targetPos.z, item.RoomNumber);
 			}
+
+			part.targetPos.y -= waterHeight;
+
+			char colorOffset = Random::GenerateInt(-8, 8);
+			part.sR = std::clamp((int)startColor.x + colorOffset, 0, UCHAR_MAX);
+			part.sG = std::clamp((int)startColor.y + colorOffset, 0, UCHAR_MAX);
+			part.sB = std::clamp((int)startColor.z + colorOffset, 0, UCHAR_MAX);
+			part.dR = std::clamp((int)endColor.x + colorOffset, 0, UCHAR_MAX);
+			part.dG = std::clamp((int)endColor.y + colorOffset, 0, UCHAR_MAX);
+			part.dB = std::clamp((int)endColor.z + colorOffset, 0, UCHAR_MAX);
+			part.roomNumber = pointColl.GetRoomNumber();
+			part.colFadeSpeed = 2;
+			part.blendMode = BlendMode::Additive;
+
+			part.gravity = (relFloorHeight / 2) / FPS; // Adjust gravity based on relative floor height.
+			part.life =
+			part.sLife = WATERFALL_LIFE_MAX;
+			part.fxObj = ID_WATERFALL_EMITTER;
+			part.fadeToBlack = 0;
+
+			// TODO: Magic.
+			part.rotAng = GetRandomControl() & 0xFFF;
+			part.scalar = item.TriggerFlags < 10 ? Random::GenerateInt(2, 4) : Random::GenerateInt(3, 5);
+			part.maxYvel = 0;
+			part.rotAdd = Random::GenerateInt(-16, 16);
+
+			part.sSize =
+			part.size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
+			part.dSize = item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(98.0f, 174.0f);
+
+			part.SpriteSeqID = ID_WATERFALL;
+			part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_SPLASH_SPRITE_ID;
+			part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
 		}
 	}
 
