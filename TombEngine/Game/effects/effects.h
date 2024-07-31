@@ -202,6 +202,7 @@ struct SPLASH_STRUCT
 	float oldHeight;
 	unsigned short oldLife;
 	float oldHeightSpeed;
+	float oldAnimationPhase;
 
 	void StoreInterpolationData()
 	{
@@ -213,6 +214,7 @@ struct SPLASH_STRUCT
 		oldHeight = height;
 		oldLife = life;
 		oldHeightSpeed = heightSpeed;
+		oldAnimationPhase = animationPhase;
 	}
 };
 

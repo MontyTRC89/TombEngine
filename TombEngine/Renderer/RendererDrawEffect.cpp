@@ -824,7 +824,7 @@ namespace TEN::Renderer
 				b = shockwave->b * shockwave->life / 255.0f;
 			}
 
-			for (int j = 0; j < 16; j++)
+			for (int j = 0; j <= 16; j++)
 			{
 				c = cos(angle);
 				s = sin(angle);
