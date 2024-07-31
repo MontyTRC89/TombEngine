@@ -44,11 +44,11 @@ namespace TEN::Effects::WaterfallEmitter
 		float waterfallWidth = std::max(BLOCK(round((float)item.TriggerFlags) / 8.0f), BLOCK(1 / 8.0f));
 
 		auto vel = item.Pose.Orientation.ToDirection() * BLOCK(0.2f);
-		vel.y = Random::GenerateFloat(0.0f, 16.0f);
 
 		auto startColor = (item.Model.Color / 4) * SCHAR_MAX;
 		auto endColor = (item.Model.Color / 8) * UCHAR_MAX;
 
+		// Spawn particles.
 		unsigned int partCount = (int)round(waterfallWidth / BLOCK(1 / 8.0f));
 		for (int i = 0; i < partCount; i++)
 		{
@@ -72,10 +72,12 @@ namespace TEN::Effects::WaterfallEmitter
 			part.z = pos.z;
 			part.roomNumber = item.RoomNumber;
 
-			part.friction = -2;
+			vel.y = Random::GenerateFloat(0.0f, 16.0f);
 			part.xVel = vel.x;
 			part.yVel = vel.y;
 			part.zVel = vel.z;
+
+			part.friction = -2;
 
 			auto pointColl = GetPointCollision(pos, item.RoomNumber, item.Pose.Orientation.y, -BLOCK(0.3f), BLOCK(8));
 			part.targetPos = GameVector(pointColl.GetPosition().x, pointColl.GetFloorHeight(), pointColl.GetPosition().z, pointColl.GetRoomNumber());
@@ -104,11 +106,11 @@ namespace TEN::Effects::WaterfallEmitter
 			part.fxObj = ID_WATERFALL_EMITTER;
 			part.fadeToBlack = 0;
 
-			// TODO: Magic.
-			part.rotAng = GetRandomControl() & 0xFFF;
+			part.rotAng = Random::GenerateAngle();
+			part.rotAdd = Random::GenerateAngle(ANGLE(-0.1f), ANGLE(0.1f));
+
 			part.scalar = item.TriggerFlags < 10 ? Random::GenerateInt(2, 4) : Random::GenerateInt(3, 5);
 			part.maxYvel = 0;
-			part.rotAdd = Random::GenerateInt(-16, 16);
 
 			part.sSize =
 			part.size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
@@ -140,11 +142,17 @@ namespace TEN::Effects::WaterfallEmitter
 		auto startColor = (color + colorOffset);
 		auto endColor = (color + colorOffset);
 
-		// TODO: Generate normal color representation, then convert to legacy.
-		part.on = true;
 		part.SpriteSeqID = ID_WATERFALL;
 		part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_1_SPRITE_ID : WATERFALL_STREAM_2_SPRITE_ID;
+
+		part.on = true;
+
+		part.x = cos * Random::GenerateInt(-12, 12) + pos.x;
+		part.y = Random::GenerateInt(0, 16) + pos.y - 8;
+		part.z = sin * Random::GenerateInt(-12, 12) + pos.z;
 		part.roomNumber = roomNumber;
+
+		// TODO: Generate normal color representation, then convert to legacy.
 		char colorVariation = (Random::GenerateInt(-8, 8)); // TODO: Why char?
 		part.sR = std::clamp((int)startColor.x + colorVariation, 0, SCHAR_MAX);
 		part.sG = std::clamp((int)startColor.y + colorVariation, 0, SCHAR_MAX);
@@ -159,10 +167,6 @@ namespace TEN::Effects::WaterfallEmitter
 		part.sLife = 8;
 		part.fadeToBlack = part.life;
 
-		part.x = cos * Random::GenerateInt(-12, 12) + pos.x;
-		part.y = Random::GenerateInt(0, 16) + pos.y - 8;
-		part.z = sin * Random::GenerateInt(-12, 12) + pos.z;
-
 		part.xVel = 0;
 		part.yVel = -Random::GenerateInt(63, 64);
 		part.zVel = 0;
@@ -170,17 +174,17 @@ namespace TEN::Effects::WaterfallEmitter
 		part.friction = 3;
 		part.rotAng = Random::GenerateAngle();
 
-		// ??
-		auto scale =
-		scalar = 3.0f ? (scalar - 1.0f) : (scalar + 4.0f);
+		auto scale = (scalar == 3.0f) ? (scalar - 1.0f) : (scalar + 4.0f);
 		scale = std::clamp(int(scale), 2, 9);
 		part.scalar = scale;
 
 		part.rotAdd = Random::GenerateInt(-16, 16);
-		part.gravity = part.maxYvel = -64;
+		part.gravity =
+		part.maxYvel = -64;
 
 		float size1 = (GetRandomControl() & 8) + (size * 4) + scalar;
-		part.size = part.sSize = size1 / 4;
+		part.size =
+		part.sSize = size1 / 4;
 		part.dSize = size1;
 
 		part.flags = SP_SCALE | SP_DEF | SP_ROTATE;

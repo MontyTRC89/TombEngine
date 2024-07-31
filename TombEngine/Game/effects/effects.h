@@ -130,6 +130,7 @@ struct Particle
 
 	GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
 	int			   SpriteID	   = 0;
+	int			   fxObj;
 
 	int x;
 	int y;
@@ -141,7 +142,7 @@ struct Particle
 	short zVel;
 
 	short rotAng;
-	signed char rotAdd;
+	short rotAdd;
 
 	short gravity;
 	unsigned short flags; // SP_enum
@@ -150,9 +151,9 @@ struct Particle
 	float dSize;
 	float size;
 
-	unsigned char friction;
-	unsigned char scalar;
-	signed char maxYvel;
+	unsigned int friction;
+	unsigned int scalar;
+	int maxYvel;
 
 	unsigned char r;
 	unsigned char g;
@@ -173,7 +174,6 @@ struct Particle
 	BlendMode blendMode;
 	unsigned char extras;
 	signed char dynamic;
-	int fxObj;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
 	GameVector targetPos;
 };
