@@ -69,7 +69,7 @@ namespace TEN::Effects::WaterfallEmitter
 		while (offset <= width)
 		{
 			// TODO: Constants.
-			int offset = (step * currentStep) + Random::GenerateInt(-32, 32);
+			offset = (step * currentStep) + Random::GenerateInt(-32, 32);
 
 			for (int sign = -1; sign <= 1; sign += 2) // ??
 			{
@@ -81,14 +81,14 @@ namespace TEN::Effects::WaterfallEmitter
 					part.on = true;
 					part.roomNumber = item.RoomNumber;
 					part.friction = -2;
-					part.xVel = (BLOCK(0.2f) * cos);
+					part.xVel = BLOCK(0.2f) * cos;
 					part.yVel = 16 - (GetRandomControl() & 0xF);
-					part.zVel = (BLOCK(0.2f) * sin);
+					part.zVel = BLOCK(0.2f) * sin;
 
 					// TODO: Constants.
-					part.x = offset * sign * sin + Random::GenerateInt(-8, 8) + item.Pose.Position.x;
+					part.x = ((offset * sign) * sin) + Random::GenerateInt(-8, 8) + item.Pose.Position.x;
 					part.y = Random::GenerateInt(0, 16) + item.Pose.Position.y - 8;
-					part.z = offset * sign * cos + Random::GenerateInt(-8, 8) + item.Pose.Position.z;
+					part.z = ((offset * sign) * cos) + Random::GenerateInt(-8, 8) + item.Pose.Position.z;
 
 					auto orient = EulerAngles(item.Pose.Orientation.x - ANGLE(90.0f), item.Pose.Orientation.y, item.Pose.Orientation.z);
 					auto orient2 = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, item.Pose.Orientation.z);
@@ -111,7 +111,7 @@ namespace TEN::Effects::WaterfallEmitter
 
 					part.targetPos.y -= waterHeight;
 
-					char colorOffset = (Random::GenerateInt(-8, 8));
+					char colorOffset = Random::GenerateInt(-8, 8);
 					part.sR = std::clamp((int)startColor.x + colorOffset, 0, UCHAR_MAX);
 					part.sG = std::clamp((int)startColor.y + colorOffset, 0, UCHAR_MAX);
 					part.sB = std::clamp((int)startColor.z + colorOffset, 0, UCHAR_MAX);
@@ -122,7 +122,7 @@ namespace TEN::Effects::WaterfallEmitter
 					part.colFadeSpeed = 2;
 					part.blendMode = BlendMode::Additive;
 
-					part.gravity = (relFloorHeight / 2) / FPS; // Adjust gravity based on relative floor height
+					part.gravity = (relFloorHeight / 2) / FPS; // Adjust gravity based on relative floor height.
 					part.life = part.sLife = WATERFALL_LIFE_MAX;
 					part.fxObj = ID_WATERFALL_EMITTER;
 					part.fadeToBlack = 0;
@@ -133,10 +133,12 @@ namespace TEN::Effects::WaterfallEmitter
 					part.maxYvel = 0;
 					part.rotAdd = Random::GenerateInt(-16, 16);
 
-					part.sSize = part.size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
+					part.sSize =
+					part.size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
 					part.dSize = item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(98.0f, 174.0f);
 
-					part.spriteIndex = Objects[ID_WATERFALL].meshIndex + (Random::GenerateInt(0, 100) > 40 ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_SPLASH_SPRITE_ID);
+					part.SpriteSeqID = ID_WATERFALL;
+					part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_SPLASH_SPRITE_ID;
 					part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
 				}
 
@@ -200,7 +202,7 @@ namespace TEN::Effects::WaterfallEmitter
 
 		// ??
 		auto scale =
-		scalar = 3 ? scalar - 1 : scalar + 4;
+		scalar = 3.0f ? (scalar - 1.0f) : (scalar + 4.0f);
 		scale = std::clamp(int(scale), 2, 9);
 		part.scalar = scale;
 
@@ -211,7 +213,8 @@ namespace TEN::Effects::WaterfallEmitter
 		part.size = part.sSize = size1 / 4;
 		part.dSize = size1;
 
-		part.spriteIndex = Objects[ID_WATERFALL].meshIndex + (Random::GenerateInt(0, 100) > 40 ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_STREAM_1_SPRITE_ID);
+		part.SpriteSeqID = ID_WATERFALL;
+		part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_1_SPRITE_ID : WATERFALL_STREAM_2_SPRITE_ID;
 		part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
 	}
 }

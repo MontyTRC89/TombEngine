@@ -1090,7 +1090,7 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_b(particle->b);
 		particleInfo.add_col_fade_speed(particle->colFadeSpeed);
 		particleInfo.add_d_b(particle->dB);
-		particleInfo.add_sprite_index(particle->spriteIndex);
+		particleInfo.add_sprite_index(particle->SpriteSeqID); // TODO: Save SpriteID.
 		particleInfo.add_d_g(particle->dG);
 		particleInfo.add_d_r(particle->dR);
 		particleInfo.add_d_size(particle->dSize);
@@ -2058,7 +2058,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		particle->size = particleInfo->size();
 		particle->friction = particleInfo->friction();
 		particle->scalar = particleInfo->scalar();
-		particle->spriteIndex = particleInfo->sprite_index();
+		particle->SpriteSeqID = (GAME_OBJECT_ID)particleInfo->sprite_index(); // TODO: Save SpriteID.
 		particle->rotAdd = particleInfo->rot_add();
 		particle->maxYvel = particleInfo->max_y_vel();
 		particle->on = particleInfo->on();

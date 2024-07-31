@@ -161,7 +161,8 @@ Particle* GetFreeParticle()
 
 	spark->extras = 0;
 	spark->dynamic = -1;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+	spark->SpriteID = 0;
 	spark->blendMode = BlendMode::Additive;
 
 	return spark;
@@ -179,9 +180,10 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 	if (particleAge > particle.life )
 		return;	
 
-	int numSprites = -Objects[objectID].nmeshes - 1;
+	int spriteCount = -Objects[objectID].nmeshes - 1;
 	float normalizedAge = particleAge / particle.life;
-	particle.spriteIndex = Objects[objectID].meshIndex + (int)round(Lerp(0.0f, numSprites, normalizedAge));
+	particle.SpriteSeqID = objectID;
+	particle.SpriteID = (int)round(Lerp(0.0f, spriteCount, normalizedAge));
 }
 
 void UpdateSparks()
@@ -758,7 +760,8 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->zVel = 0;
 		spark->friction = 0;
 		spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
+		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+		spark->SpriteID = SPR_BUBBLES;
 		spark->scalar = 3;
 		spark->gravity = 0;
 		spark->maxYvel = 0;
@@ -1231,7 +1234,8 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			spark->sSize = spark->size = Random::GenerateInt(0, 3) * scale + size;
 			spark->dSize = 2 * spark->size;
 
-			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 95 ? 17 : 0);
+			spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+			spark->SpriteID = Random::GenerateInt(0, 100) > 95 ? 17 : 0;
 			spark->flags = 538;
 
 			if (sign == 1)
@@ -1383,7 +1387,8 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 	sptr->maxYvel = 0;
 
 	// TODO: right sprite
-	sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sptr->SpriteSeqID = ID_DEFAULT_SPRITES;
+	sptr->SpriteID = 0;
 	sptr->scalar = 2;
 
 	int size = (GetRandomControl() & 7) + 32;
@@ -1431,7 +1436,8 @@ void TriggerRocketFire(int x, int y, int z)
 		sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
 
 	// TODO: right sprite
-	sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sptr->SpriteSeqID = ID_DEFAULT_SPRITES;
+	sptr->SpriteID = 0;
 	sptr->scalar = 1;
 	sptr->gravity = -(GetRandomControl() & 3) - 4;
 	sptr->maxYvel = -(GetRandomControl() & 3) - 4;

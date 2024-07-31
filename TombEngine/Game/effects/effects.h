@@ -1,4 +1,6 @@
 #pragma once
+
+#include "Objects/game_object_ids.h"
 #include "Math/Math.h"
 #include "Renderer/RendererEnums.h"
 
@@ -121,44 +123,56 @@ struct RIPPLE_STRUCT
 	unsigned char init;
 };
 
+// TODO: Refactor. This is *extremely* messy.
 struct Particle
 {
+	GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+	int			   SpriteID	   = 0;
+
+	bool on;
+
 	int x;
 	int y;
 	int z;
+	int roomNumber;
+
 	short xVel;
 	short yVel;
 	short zVel;
+
 	short gravity;
 	short rotAng;
 	unsigned short flags; // SP_enum
+
 	float sSize;
 	float dSize;
 	float size;
+
 	unsigned char friction;
 	unsigned char scalar;
-	unsigned char spriteIndex;
 	signed char rotAdd;
 	signed char maxYvel;
-	bool on;
+
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
 	unsigned char sR;
 	unsigned char sG;
 	unsigned char sB;
 	unsigned char dR;
 	unsigned char dG;
 	unsigned char dB;
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
+
 	unsigned char colFadeSpeed;
 	unsigned char fadeToBlack;
+
 	int sLife;
 	int life;
+
 	BlendMode blendMode;
 	unsigned char extras;
 	signed char dynamic;
 	int fxObj;
-	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
 	GameVector targetPos;
 };
