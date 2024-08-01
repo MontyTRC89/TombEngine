@@ -274,7 +274,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			continue;
 
 		auto& bridge = GetBridgeObject(item2);
-		bridge.Initialize(item2);
+		//bridge.Initialize(item2);
 
 		auto labelPos = g_Renderer.Get2DPosition(item2.Pose.Position.ToVector3());
 		//if (labelPos.has_value())

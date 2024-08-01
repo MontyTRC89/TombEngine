@@ -9,6 +9,7 @@ namespace TEN::Math
 		struct Node
 		{
 			int			ObjectID = -1; // NOTE: Only leaf node stores object ID directly.
+			int			Depth	 = -1;
 			BoundingBox Aabb	 = BoundingBox();
 
 			int ParentID = -1;
@@ -64,7 +65,7 @@ namespace TEN::Math
 		void InsertLeaf(int leafID);
 		void RemoveLeaf(int leafID);
 
-		void BalanceNode(int nodeID);
+		int	 BalanceNode(int nodeID);
 		void RefitNode(int nodeID);
 		void RemoveNode(int nodeID);
 

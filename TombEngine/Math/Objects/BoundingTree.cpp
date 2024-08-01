@@ -221,7 +221,8 @@ namespace TEN::Math
 			// Collect object ID.
 			if (node.IsLeaf())
 			{
-				//DrawDebugBox(node.Aabb, Color(1, 1, 1)); //debug
+				DrawDebugBox(node.Aabb, Color(1, 1, 1)); //debug
+				PrintDebugMessage("depth: %d", node.Depth);
 				objectIds.push_back(node.ObjectID);
 			}
 			// Traverse nodes.
@@ -345,6 +346,7 @@ namespace TEN::Math
 		if (_rootID == NO_VALUE)
 		{
 			_rootID = leafID;
+			leaf.Depth = 0;
 			return;
 		}
 
@@ -352,32 +354,33 @@ namespace TEN::Math
 		int siblingID = GetBestSiblingLeafID(leafID);
 		auto& sibling = _nodes[siblingID];
 
-		// Box is wrong?
 		//auto aabb = BoundingBox();
 		//BoundingBox::CreateMerged(aabb, sibling.Aabb, leaf.Aabb);
 
-		// TODO: Data corruption?
 		// Create new parent.
 		int prevParentID = sibling.ParentID;
 		int newParentID = GetNewNodeID();
 		auto& newParent = _nodes[newParentID];
 
 		//newParent.Aabb = aabb;
-		//BoundingBox::CreateMerged(newParent.Aabb, sibling.Aabb, leaf.Aabb);
 		newParent.ParentID = prevParentID;
 		newParent.Child0ID = siblingID;
 		newParent.Child1ID = leafID;
 		sibling.ParentID = newParentID;
 		leaf.ParentID = newParentID;
 
-		// Set new root or update previous parent.
-		if (newParent.ParentID == NO_VALUE)
+		// Update depths.
+		if (prevParentID == NO_VALUE)
 		{
 			_rootID = newParentID;
+			newParent.Depth = 0;
 		}
 		else
 		{
 			auto& prevParent = _nodes[prevParentID];
+			newParent.Depth = prevParent.Depth + 1;
+
+			// Update the previous parent's child reference.
 			if (prevParent.Child0ID == siblingID)
 			{
 				prevParent.Child0ID = newParentID;
@@ -386,7 +389,19 @@ namespace TEN::Math
 			{
 				prevParent.Child1ID = newParentID;
 			}
+
+			// Update depths of all ancestors.
+			int parentID = prevParentID;
+			while (parentID != NO_VALUE)
+			{
+				auto& parent = _nodes[parentID];
+				parent.Depth += 1;
+				parentID = parent.ParentID;
+			}
 		}
+
+		sibling.Depth = newParent.Depth + 1;
+		leaf.Depth = newParent.Depth + 1;
 
 		// Refit.
 		RefitNode(leafID);
@@ -430,64 +445,149 @@ namespace TEN::Math
 		}
 	}
 
-	// TODO: Blizzard guy's version is better.
-	void BoundingTree::BalanceNode(int nodeID)
+	int BoundingTree::BalanceNode(int iA)
 	{
-		int parentID = _nodes[nodeID].ParentID;
-		int grandparentID = _nodes[parentID].ParentID;
+		// Perform a left or right rotation if node A is imbalanced.
+		// Returns the new root index.
 
-		if (grandparentID == NO_VALUE)
-			return;
+		if (iA == NO_VALUE)
+			return iA;
 
-		auto& leaf = _nodes[nodeID];
-		auto& parent = _nodes[parentID];
-		auto& grandParent = _nodes[grandparentID];
+		auto& nodeA = _nodes[iA];
+		if (nodeA.IsLeaf() || nodeA.Depth < 2)
+			return iA;
 
-		int rotatedSiblingID = NO_VALUE;
-		if (grandParent.Child0ID != parentID && grandParent.Child1ID == NO_VALUE)
+		int iB = nodeA.Child0ID;
+		int iC = nodeA.Child1ID;
+		if (iB == NO_VALUE || iC == NO_VALUE)
+			return iA;
+
+		auto& nodeB = _nodes[iB];
+		auto& nodeC = _nodes[iC];
+
+		int balance = nodeC.Depth - nodeB.Depth;
+
+		// Rotate C up
+		if (balance > 1)
 		{
-			rotatedSiblingID = grandParent.Child0ID;
+			int iF = nodeC.Child0ID;
+			int iG = nodeC.Child1ID;
+			if (iF == NO_VALUE || iG == NO_VALUE)
+				return iA;
+
+			auto& nodeF = _nodes[iF];
+			auto& nodeG = _nodes[iG];
+
+			// Swap A and C
+			nodeC.Child0ID = iA;
+			nodeC.ParentID = nodeA.ParentID;
+			nodeA.ParentID = iC;
+
+			// A's old parent should point to C
+			if (nodeC.ParentID != NO_VALUE)
+			{
+				if (_nodes[nodeC.ParentID].Child0ID == iA)
+				{
+					_nodes[nodeC.ParentID].Child0ID = iC;
+				}
+				else
+				{
+					_nodes[nodeC.ParentID].Child1ID = iC;
+				}
+			}
+			else
+			{
+				_rootID = iC;
+			}
+
+			// Rotate
+			if (nodeF.Depth > nodeG.Depth)
+			{
+				nodeC.Child1ID = iF;
+				nodeA.Child1ID = iG;
+				nodeG.ParentID = iA;
+				BoundingBox::CreateMerged(nodeA.Aabb, nodeB.Aabb, nodeG.Aabb);
+				BoundingBox::CreateMerged(nodeC.Aabb, nodeA.Aabb, nodeF.Aabb);
+
+				nodeA.Depth = std::max(nodeB.Depth, nodeG.Depth) + 1;
+				nodeC.Depth = std::max(nodeA.Depth, nodeF.Depth) + 1;
+			}
+			else
+			{
+				nodeC.Child1ID = iG;
+				nodeA.Child1ID = iF;
+				nodeF.ParentID = iA;
+				BoundingBox::CreateMerged(nodeA.Aabb, nodeB.Aabb, nodeF.Aabb);
+				BoundingBox::CreateMerged(nodeC.Aabb, nodeA.Aabb, nodeG.Aabb);
+
+				nodeA.Depth = std::max(nodeB.Depth, nodeF.Depth) + 1;
+				nodeC.Depth = std::max(nodeA.Depth, nodeG.Depth) + 1;
+			}
+
+			return iC;
 		}
-		else if (grandParent.Child1ID != parentID && grandParent.Child0ID == NO_VALUE)
+
+		// Rotate B up
+		if (balance < -1)
 		{
-			rotatedSiblingID = grandParent.Child0ID;
+			int iD = nodeB.Child0ID;
+			int iE = nodeB.Child1ID;
+			if (iD == NO_VALUE || iE == NO_VALUE)
+				return iA;
+
+			auto& nodeD = _nodes[iD];
+			auto& nodeE = _nodes[iE];
+
+			// Swap A and B
+			nodeB.Child0ID = iA;
+			nodeB.ParentID = nodeA.ParentID;
+			nodeA.ParentID = iB;
+
+			// A's old parent should point to B
+			if (nodeB.ParentID != NO_VALUE)
+			{
+				if (_nodes[nodeB.ParentID].Child0ID == iA)
+				{
+					_nodes[nodeB.ParentID].Child0ID = iB;
+				}
+				else
+				{
+					_nodes[nodeB.ParentID].Child1ID = iB;
+				}
+			}
+			else
+			{
+				_rootID = iB;
+			}
+
+			// Rotate
+			if (nodeD.Depth > nodeE.Depth)
+			{
+				nodeB.Child1ID = iD;
+				nodeA.Child0ID = iE;
+				nodeE.ParentID = iA;
+				BoundingBox::CreateMerged(nodeA.Aabb, nodeC.Aabb, nodeE.Aabb);
+				BoundingBox::CreateMerged(nodeB.Aabb, nodeA.Aabb, nodeD.Aabb);
+
+				nodeA.Depth = std::max(nodeC.Depth, nodeE.Depth) + 1;
+				nodeB.Depth = std::max(nodeA.Depth, nodeD.Depth) + 1;
+			}
+			else
+			{
+				nodeB.Child1ID = iE;
+				nodeA.Child0ID = iD;
+				nodeD.ParentID = iA;
+				BoundingBox::CreateMerged(nodeA.Aabb, nodeC.Aabb, nodeD.Aabb);
+				BoundingBox::CreateMerged(nodeB.Aabb, nodeA.Aabb, nodeE.Aabb);
+
+				nodeA.Depth = std::max(nodeC.Depth, nodeD.Depth) + 1;
+				nodeB.Depth = std::max(nodeA.Depth, nodeE.Depth) + 1;
+			}
+
+			return iB;
 		}
 
-		if (rotatedSiblingID == NO_VALUE)
-			return;
-
-		auto& rotatedSibling = _nodes[rotatedSiblingID];
-
-		auto mergedAabb = BoundingBox();
-		BoundingBox::CreateMerged(mergedAabb, rotatedSibling.Aabb, leaf.Aabb);
-
-		// Rotation more less optimal; return early.
-		if (Geometry::GetBoundingBoxArea(mergedAabb) > Geometry::GetBoundingBoxArea(parent.Aabb))
-			return;
-
-		if (parent.Child0ID == nodeID)
-		{
-			parent.Child0ID = NO_VALUE;
-			if (parent.Child1ID != NO_VALUE)
-				parent.Aabb = _nodes[parent.Child1ID].Aabb;
-		}
-		else
-		{
-			parent.Child1ID = NO_VALUE;
-			if (parent.Child0ID != NO_VALUE)
-				parent.Aabb = _nodes[parent.Child0ID].Aabb;
-		}
-		parent.Aabb = {};
-
-		if (grandParent.Child0ID == NO_VALUE)
-		{
-			grandParent.Child0ID = nodeID;
-		}
-		else
-		{
-			grandParent.Child1ID = nodeID;
-		}
-		grandParent.Aabb = mergedAabb;
+		return iA;
 	}
 
 	void BoundingTree::RefitNode(int nodeID)
@@ -498,25 +598,30 @@ namespace TEN::Math
 		int parentID = node.ParentID;
 		while (parentID != NO_VALUE)
 		{
-			// TODO
-			//BalanceNode(parentID);
-
-			auto& parent = _nodes[parentID];
+			// Balance the node and get the new root of the subtree.
+			int newParentID = BalanceNode(parentID);
+			auto& parent = _nodes[newParentID];
 
 			if (parent.Child0ID != NO_VALUE && parent.Child1ID != NO_VALUE)
 			{
 				const auto& child0 = _nodes[parent.Child0ID];
 				const auto& child1 = _nodes[parent.Child1ID];
+
+				parent.Depth = std::max(child0.Depth, child1.Depth) + 1;
 				BoundingBox::CreateMerged(parent.Aabb, child0.Aabb, child1.Aabb);
 			}
 			else if (parent.Child0ID != NO_VALUE)
 			{
 				const auto& child0 = _nodes[parent.Child0ID];
+
+				parent.Depth = child0.Depth + 1;
 				parent.Aabb = child0.Aabb;
 			}
 			else if (parent.Child1ID != NO_VALUE)
 			{
 				const auto& child1 = _nodes[parent.Child1ID];
+
+				parent.Depth = child1.Depth + 1;
 				parent.Aabb = child1.Aabb;
 			}
 
