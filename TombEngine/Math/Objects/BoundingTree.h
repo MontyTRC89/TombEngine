@@ -62,10 +62,10 @@ namespace TEN::Math
 		// Helper utilities
 
 		void InsertLeaf(int leafID);
-		void RefitLeaf(int leafID);
-		void PruneLeaf(int leafID);
+		void RemoveLeaf(int leafID);
 
 		void BalanceNode(int nodeID);
+		void RefitNode(int nodeID);
 		void RemoveNode(int nodeID);
 
 		int Rebuild(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary = 0.0f);

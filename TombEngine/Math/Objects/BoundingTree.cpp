@@ -121,29 +121,9 @@ namespace TEN::Math
 				return;
 			}
 		}
-		
-		// Remove node and prune branch if necessary.
-		if (leaf.ParentID == NO_VALUE)
-		{
-			RemoveNode(leafID);
-		}
-		else
-		{
-			auto& parent = _nodes[leaf.ParentID];
-			if (parent.Child0ID == leafID)
-			{
-				parent.Child0ID = NO_VALUE;
-			}
-			else
-			{
-				parent.Child1ID = NO_VALUE;
-			}
 
-			// TODO: This is an obtuse way of pruning a branch. Make a prune method?
-			RefitLeaf(leafID);
-		}
-
-		// Reinsert node.
+		// Reinsert leaf.
+		RemoveLeaf(leafID);
 		Insert(objectID, aabb, boundary);
 	}
 
@@ -154,29 +134,9 @@ namespace TEN::Math
 		if (it == _leafIDMap.end())
 			return;
 
+		// Prune leaf.
 		int leafID = it->second;
-		const auto& leaf = _nodes[leafID];
-
-		// Remove node and prune branch if necessary.
-		if (leaf.ParentID == NO_VALUE)
-		{
-			RemoveNode(leafID);
-		}
-		else
-		{
-			auto& parent = _nodes[leaf.ParentID];
-			if (parent.Child0ID == leafID)
-			{
-				parent.Child0ID = NO_VALUE;
-			}
-			else
-			{
-				parent.Child1ID = NO_VALUE;
-			}
-
-			// TODO: This is an obtuse way of pruning a branch. Make a prune method?
-			RefitLeaf(leafID);
-		}
+		RemoveLeaf(leafID);
 	}
 
 	void BoundingTree::DrawDebug() const
@@ -428,73 +388,51 @@ namespace TEN::Math
 			}
 		}
 
-		// 4) Refit.
-		RefitLeaf(leafID);
+		// Refit.
+		RefitNode(leafID);
 
 		//Validate(prevParentID);
 	}
 
-	void BoundingTree::RefitLeaf(int nodeID)
+	void BoundingTree::RemoveLeaf(int leafID)
 	{
-		const auto& leaf = _nodes[nodeID];
-
-		bool removeLeaf = false;
-
-		// Retread tree branch to refit AABBs.
-		int parentID = leaf.ParentID;
-		while (parentID != NO_VALUE)
+		int nodeID = leafID;
+		while (nodeID != NO_VALUE)
 		{
-			// TODO
-			//BalanceNode(parentID);
+			const auto& node = _nodes[nodeID];
 
-			auto& parent = _nodes[parentID];
-
-			if (parent.Child0ID != NO_VALUE && parent.Child1ID != NO_VALUE)
+			// Remove node if both children are empty.
+			if (node.Child0ID == NO_VALUE && node.Child1ID == NO_VALUE)
 			{
-				const auto& child0 = _nodes[parent.Child0ID];
-				const auto& child1 = _nodes[parent.Child1ID];
-				BoundingBox::CreateMerged(parent.Aabb, child0.Aabb, child1.Aabb);
+				int parentID = node.ParentID;
+				if (parentID != NO_VALUE)
+				{
+					auto& parentNode = _nodes[parentID];
+					if (parentNode.Child0ID == nodeID)
+					{
+						parentNode.Child0ID = NO_VALUE;
+					}
+					else if (parentNode.Child1ID == nodeID)
+					{
+						parentNode.Child1ID = NO_VALUE;
+					}
+				}
+
+				RemoveNode(nodeID);
+				nodeID = parentID;
 			}
-			else if (parent.Child0ID != NO_VALUE)
+			// Refit last node.
+			else
 			{
-				const auto& child0 = _nodes[parent.Child0ID];
-				parent.Aabb = child0.Aabb;
-			}
-			else if (parent.Child1ID != NO_VALUE)
-			{
-				const auto& child1 = _nodes[parent.Child1ID];
-				parent.Aabb = child1.Aabb;
-			}
-
-			int prevParentID = parentID;
-			parentID = parent.ParentID;
-
-			// TODO: Prune method.
-			// Prune branch.
-			if (parent.IsLeaf() && parent.ObjectID == NO_VALUE)
-			{
-				removeLeaf = true;
-				RemoveNode(prevParentID);
+				RefitNode(nodeID);
+				break;
 			}
 		}
-
-		// TODO: Prune method.
-		// Remove leaf remaining on pruned branch.
-		if (removeLeaf)
-			RemoveNode(nodeID);
-	}
-
-	void BoundingTree::PruneLeaf(int leafID)
-	{
-		// TODO
 	}
 
 	// TODO: Blizzard guy's version is better.
 	void BoundingTree::BalanceNode(int nodeID)
 	{
-		// TODO: Don't balance for now.
-		return;
-
 		int parentID = _nodes[nodeID].ParentID;
 		int grandparentID = _nodes[parentID].ParentID;
 
@@ -552,12 +490,50 @@ namespace TEN::Math
 		grandParent.Aabb = mergedAabb;
 	}
 
+	void BoundingTree::RefitNode(int nodeID)
+	{
+		const auto& node = _nodes[nodeID];
+
+		// Retread tree branch to refit AABBs.
+		int parentID = node.ParentID;
+		while (parentID != NO_VALUE)
+		{
+			// TODO
+			//BalanceNode(parentID);
+
+			auto& parent = _nodes[parentID];
+
+			if (parent.Child0ID != NO_VALUE && parent.Child1ID != NO_VALUE)
+			{
+				const auto& child0 = _nodes[parent.Child0ID];
+				const auto& child1 = _nodes[parent.Child1ID];
+				BoundingBox::CreateMerged(parent.Aabb, child0.Aabb, child1.Aabb);
+			}
+			else if (parent.Child0ID != NO_VALUE)
+			{
+				const auto& child0 = _nodes[parent.Child0ID];
+				parent.Aabb = child0.Aabb;
+			}
+			else if (parent.Child1ID != NO_VALUE)
+			{
+				const auto& child1 = _nodes[parent.Child1ID];
+				parent.Aabb = child1.Aabb;
+			}
+
+			int prevParentID = parentID;
+			parentID = parent.ParentID;
+		}
+	}
+
 	void BoundingTree::RemoveNode(int nodeID)
 	{
 		auto& node = _nodes[nodeID];
 
+		// Remove leaf from map.//
+		if (node.IsLeaf())
+			_leafIDMap.erase(node.ObjectID);
+
 		// Clear node and mark free.
-		_leafIDMap.erase(node.ObjectID);
 		node = {};
 		_freeNodeIds.push_back(nodeID);
 
