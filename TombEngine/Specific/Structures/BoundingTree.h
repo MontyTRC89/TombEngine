@@ -61,6 +61,8 @@ namespace TEN::Structures
 
 		void InsertLeaf(int leafID);
 		void RefitLeaf(int leafID);
+		void PruneLeaf(int leafID);
+
 		void BalanceNode(int nodeID);
 		void RemoveNode(int nodeID);
 

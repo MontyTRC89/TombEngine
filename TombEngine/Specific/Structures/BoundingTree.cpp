@@ -17,9 +17,27 @@ namespace TEN::Structures
 		return (Child0ID == NO_VALUE && Child1ID == NO_VALUE);
 	}
 
+	std::vector<int> BoundingTree::GetBoundedObjectIds() const
+	{
+		auto objectIds = std::vector<int>{};
+		if (_nodes.empty())
+			return objectIds;
+
+		// Collect all object IDs.
+		for (const auto& node : _nodes)
+		{
+			if (!node.IsLeaf())
+				continue;
+
+			objectIds.push_back(node.ObjectID);
+		}
+
+		return objectIds;
+	}
+
 	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary)
 	{
-		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree ctor: object ID and AABB counts must be equal.");
+		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree ctor: object ID and AABB counts not equal.");
 
 		// Debug
 		_nodes.clear();
@@ -112,7 +130,6 @@ namespace TEN::Structures
 		else
 		{
 			auto& parent = _nodes[leaf.ParentID];
-
 			if (parent.Child0ID == leafID)
 			{
 				parent.Child0ID = NO_VALUE;
@@ -148,7 +165,6 @@ namespace TEN::Structures
 		else
 		{
 			auto& parent = _nodes[leaf.ParentID];
-
 			if (parent.Child0ID == leafID)
 			{
 				parent.Child0ID = NO_VALUE;
@@ -224,24 +240,6 @@ namespace TEN::Structures
 		Validate(node.Child1ID);
 	}
 
-	std::vector<int> BoundingTree::GetBoundedObjectIds() const
-	{
-		auto objectIds = std::vector<int>{};
-		if (_nodes.empty())
-			return objectIds;
-
-		// Collect all object IDs.
-		for (const auto& node : _nodes)
-		{
-			if (!node.IsLeaf())
-				continue;
-
-			objectIds.push_back(node.ObjectID);
-		}
-
-		return objectIds;
-	}
-
 	std::vector<int> BoundingTree::GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const
 	{
 		auto objectIds = std::vector<int>{};
@@ -280,10 +278,107 @@ namespace TEN::Structures
 		return objectIds;
 	}
 
+	int BoundingTree::GetNewNodeID()
+	{
+		int nodeID = 0;
+
+		// Get existing empty node ID.
+		if (!_freeNodeIds.empty())
+		{
+			nodeID = _freeNodeIds.back();
+			_freeNodeIds.pop_back();
+		}
+		// Allocate and get new empty node ID.
+		else
+		{
+			_nodes.emplace_back();
+			nodeID = int(_nodes.size() - 1);
+		}
+
+		return nodeID;
+	}
+
+	int BoundingTree::GetBestSiblingLeafID(int leafID)
+	{
+		const auto& leaf = _nodes[leafID];
+
+		// Branch and bound for best sibling.
+		int siblingID = _rootID;
+		while (!_nodes[siblingID].IsLeaf())
+		{
+			int child0ID = _nodes[siblingID].Child0ID;
+			int child1ID = _nodes[siblingID].Child1ID;
+
+			auto mergedAabb = BoundingBox();
+			BoundingBox::CreateMerged(mergedAabb, _nodes[siblingID].Aabb, leaf.Aabb);
+
+			float area = Geometry::GetBoundingBoxArea(_nodes[siblingID].Aabb);
+			float mergedArea = Geometry::GetBoundingBoxArea(mergedAabb);
+
+			// Calculate cost of creating new parent for prospective sibling and new leaf.
+			float cost = mergedArea * 2;
+
+			// Calculate minimum cost of pushing leaf further down tree.
+			float inheritCost = (mergedArea - area) * 2;
+
+			// Calculate cost of descending into child 0.
+			float cost0 = INFINITY;
+			if (child0ID != NO_VALUE)
+			{
+				const auto& child0 = _nodes[child0ID];
+
+				auto aabb = BoundingBox();
+				BoundingBox::CreateMerged(aabb, child0.Aabb, leaf.Aabb);
+
+				if (child0.IsLeaf())
+				{
+					cost0 = Geometry::GetBoundingBoxArea(aabb) + inheritCost;
+				}
+				else
+				{
+					float prevArea = Geometry::GetBoundingBoxArea(child0.Aabb);
+					float newArea = Geometry::GetBoundingBoxArea(aabb);
+					cost0 = (newArea - prevArea) + inheritCost;
+				}
+			}
+
+			// Calculate cost of descending into child 1.
+			float cost1 = INFINITY;
+			if (child1ID != NO_VALUE)
+			{
+				const auto& child1 = _nodes[child1ID];
+
+				auto aabb = BoundingBox();
+				BoundingBox::CreateMerged(aabb, child1.Aabb, leaf.Aabb);
+
+				if (child1.IsLeaf())
+				{
+					cost1 = Geometry::GetBoundingBoxArea(aabb) + inheritCost;
+				}
+				else
+				{
+					float prevArea = Geometry::GetBoundingBoxArea(child1.Aabb);
+					float newArea = Geometry::GetBoundingBoxArea(aabb);
+					cost1 = newArea - prevArea + inheritCost;
+				}
+			}
+
+			// Test if descent is worthwhile according to minimum cost.
+			if (cost < cost0 && cost < cost1)
+				break;
+
+			// Descend.
+			siblingID = (cost0 < cost1) ? child0ID : child1ID;
+			if (siblingID == NO_VALUE)
+				break;
+		}
+
+		return siblingID;
+	}
+
 	void BoundingTree::InsertLeaf(int leafID)
 	{
 		auto& leaf = _nodes[leafID];
-
 		_leafIDMap.insert({ leaf.ObjectID, leafID });
 
 		// Create root if empty.
@@ -316,7 +411,7 @@ namespace TEN::Structures
 		leaf.ParentID = newParentID;
 
 		// Set new root or update previous parent.
-		if (prevParentID == NO_VALUE)
+		if (newParent.ParentID == NO_VALUE)
 		{
 			_rootID = newParentID;
 		}
@@ -337,119 +432,6 @@ namespace TEN::Structures
 		RefitLeaf(leafID);
 
 		//Validate(prevParentID);
-	}
-
-	int BoundingTree::GetNewNodeID()
-	{
-		int nodeID = 0;
-
-		// Get existing empty node ID.
-		if (!_freeNodeIds.empty())
-		{
-			nodeID = _freeNodeIds.back();
-			_freeNodeIds.pop_back();
-		}
-		// Allocate and get new empty node ID.
-		else
-		{
-			_nodes.emplace_back();
-			nodeID = int(_nodes.size() - 1);
-		}
-
-		return nodeID;
-	}
-
-	int BoundingTree::GetBestSiblingLeafID(int leafID)
-	{
-		const auto& leaf = _nodes[leafID];
-
-		// Branch and bound for best sibling.
-		int bestSiblingID = _rootID;
-		while (!_nodes[bestSiblingID].IsLeaf())
-		{
-			int child0ID = _nodes[bestSiblingID].Child0ID;
-			int child1ID = _nodes[bestSiblingID].Child1ID;
-
-			auto mergedAabb = BoundingBox();
-			BoundingBox::CreateMerged(mergedAabb, _nodes[bestSiblingID].Aabb, leaf.Aabb);
-
-			float area = Geometry::GetBoundingBoxArea(_nodes[bestSiblingID].Aabb);
-			float mergedArea = Geometry::GetBoundingBoxArea(mergedAabb);
-
-			// Cost of creating new parent for prospective sibling and new leaf.
-			float cost = mergedArea * 2;
-
-			// Minimum cost of pushing leaf further down tree.
-			float inheritCost = (mergedArea - area) * 2;
-
-			// Cost of descending into child 0.
-			float cost0 = INFINITY;
-			if (child0ID != NO_VALUE)
-			{
-				const auto& child0 = _nodes[child0ID];
-
-				auto aabb = BoundingBox();
-				BoundingBox::CreateMerged(aabb, child0.Aabb, leaf.Aabb);
-
-				if (child0.IsLeaf())
-				{
-					cost0 = Geometry::GetBoundingBoxArea(aabb) + inheritCost;
-				}
-				else
-				{
-					float prevArea = Geometry::GetBoundingBoxArea(child0.Aabb);
-					float newArea = Geometry::GetBoundingBoxArea(aabb);
-					cost0 = (newArea - prevArea) + inheritCost;
-				}
-			}
-
-			// Cost of descending into child 1.
-			float cost1 = INFINITY;
-			if (child1ID != NO_VALUE)
-			{
-				const auto& child1 = _nodes[child1ID];
-
-				auto aabb = BoundingBox();
-				BoundingBox::CreateMerged(aabb, child1.Aabb, leaf.Aabb);
-
-				if (child1.IsLeaf())
-				{
-					cost1 = Geometry::GetBoundingBoxArea(aabb) + inheritCost;
-				}
-				else
-				{
-					float prevArea = Geometry::GetBoundingBoxArea(child1.Aabb);
-					float newArea = Geometry::GetBoundingBoxArea(aabb);
-					cost1 = newArea - prevArea + inheritCost;
-				}
-			}
-
-			// Descend according to minimum cost.
-			if (cost < cost0 && cost < cost1)
-				break;
-
-			// Descend.
-			bestSiblingID = (cost0 < cost1) ? child0ID : child1ID;
-
-			if (bestSiblingID == NO_VALUE)
-				break;
-		}
-
-		return bestSiblingID;
-	}
-
-	void BoundingTree::RemoveNode(int nodeID)
-	{
-		auto& node = _nodes[nodeID];
-
-		// Clear node and mark free.
-		_leafIDMap.erase(node.ObjectID);
-		node = {};
-		_freeNodeIds.push_back(nodeID);
-
-		// Shrink capacity if empty. NOTE: Prevents memory bloat, but may be slower.
-		if (_nodes.size() == _freeNodeIds.size())
-			*this = {};
 	}
 
 	void BoundingTree::RefitLeaf(int nodeID)
@@ -502,9 +484,17 @@ namespace TEN::Structures
 			RemoveNode(nodeID);
 	}
 
+	void BoundingTree::PruneLeaf(int leafID)
+	{
+		// TODO
+	}
+
 	// TODO: Blizzard guy's version is better.
 	void BoundingTree::BalanceNode(int nodeID)
 	{
+		// TODO: Don't balance for now.
+		return;
+
 		int parentID = _nodes[nodeID].ParentID;
 		int grandparentID = _nodes[parentID].ParentID;
 
@@ -560,6 +550,20 @@ namespace TEN::Structures
 			grandParent.Child1ID = nodeID;
 		}
 		grandParent.Aabb = mergedAabb;
+	}
+
+	void BoundingTree::RemoveNode(int nodeID)
+	{
+		auto& node = _nodes[nodeID];
+
+		// Clear node and mark free.
+		_leafIDMap.erase(node.ObjectID);
+		node = {};
+		_freeNodeIds.push_back(nodeID);
+
+		// Shrink capacity if empty to prevent memory bloat.
+		if (_nodes.size() == _freeNodeIds.size())
+			*this = {};
 	}
 
 	int BoundingTree::Rebuild(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
