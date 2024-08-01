@@ -529,7 +529,7 @@ namespace TEN::Math
 	{
 		auto& node = _nodes[nodeID];
 
-		// Remove leaf from map.//
+		// Remove leaf from map.
 		if (node.IsLeaf())
 			_leafIDMap.erase(node.ObjectID);
 
