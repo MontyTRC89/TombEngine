@@ -1,6 +1,6 @@
 #pragma once
 
-namespace TEN::Structures
+namespace TEN::Math
 {
 	// Bounding volume hierarchy using AABBs.
 	class BoundingTree
@@ -8,12 +8,12 @@ namespace TEN::Structures
 	private:
 		struct Node
 		{
-			int			ObjectID = NO_VALUE; // NOTE: Only leaf node stores object ID directly.
+			int			ObjectID = -1; // NOTE: Only leaf node stores object ID directly.
 			BoundingBox Aabb	 = BoundingBox();
 
-			int ParentID = NO_VALUE;
-			int Child0ID = NO_VALUE;
-			int Child1ID = NO_VALUE;
+			int ParentID = -1;
+			int Child0ID = -1;
+			int Child1ID = -1;
 
 			bool IsLeaf() const;
 		};
@@ -22,7 +22,7 @@ namespace TEN::Structures
 
 		std::vector<Node> _nodes	   = {};
 		std::vector<int>  _freeNodeIds = {};
-		int				  _rootID	   = NO_VALUE;
+		int				  _rootID	   = -1;
 
 		std::unordered_map<int, int> _leafIDMap = {}; // Key = object ID.
 
@@ -53,11 +53,13 @@ namespace TEN::Structures
 		void Validate(int nodeID) const;
 
 	private:
-		// Helpers
+		// Helper getters
 
 		std::vector<int> GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const;
 		int				 GetNewNodeID();
-		int				 GetBestSiblingLeafID(int leafID);
+		int				 GetBestSiblingLeafID(int leafID) const;
+
+		// Helper utilities
 
 		void InsertLeaf(int leafID);
 		void RefitLeaf(int leafID);

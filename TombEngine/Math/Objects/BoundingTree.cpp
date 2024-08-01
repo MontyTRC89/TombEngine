@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Specific/Structures/BoundingTree.h"
+#include "Math/Objects/BoundingTree.h"
 
 #include "Math/Math.h"
 #include "Renderer/Renderer.h"
@@ -10,7 +10,7 @@ using TEN::Renderer::g_Renderer;
 // TODO: Add licence? Heavily referenced this implementation, which has an MIT licence and requests attribution:
 // https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
 
-namespace TEN::Structures
+namespace TEN::Math
 {
 	bool BoundingTree::Node::IsLeaf() const
 	{
@@ -298,7 +298,7 @@ namespace TEN::Structures
 		return nodeID;
 	}
 
-	int BoundingTree::GetBestSiblingLeafID(int leafID)
+	int BoundingTree::GetBestSiblingLeafID(int leafID) const
 	{
 		const auto& leaf = _nodes[leafID];
 

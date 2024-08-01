@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Specific/Structures/BoundingTree.h"
+#include "Math/Math.h"
 
-using namespace TEN::Structures;
+using namespace TEN::Math;
 
 namespace TEN::Physics
 {

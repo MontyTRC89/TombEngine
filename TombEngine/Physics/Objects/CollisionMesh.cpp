@@ -2,11 +2,9 @@
 #include "Physics/Objects/CollisionMesh.h"
 
 #include "Math/Math.h"
-#include "Specific/Structures/BoundingTree.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Math;
-using namespace TEN::Structures;
 using namespace TEN::Utils;
 
 namespace TEN::Physics
