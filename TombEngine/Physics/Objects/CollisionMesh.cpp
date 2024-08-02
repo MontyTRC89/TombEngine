@@ -291,7 +291,7 @@ namespace TEN::Physics
 		_triangles.push_back(CollisionTriangle(vertex0ID, vertex1ID, vertex2ID, _vertices, normal, aabb, portalRoomNumber));
 	}
 	
-	void CollisionMesh::BuildTree()
+	void CollisionMesh::Initialize()
 	{
 		auto ids = std::vector<int>{};
 		auto aabbs = std::vector<BoundingBox>{};

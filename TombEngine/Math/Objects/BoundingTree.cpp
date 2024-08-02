@@ -10,6 +10,10 @@ using TEN::Renderer::g_Renderer;
 // TODO: Add licence? Heavily referenced this implementation, which has an MIT licence and requests attribution:
 // https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
 
+// TODO:
+// - Set correct node depths.
+// - Why is traversal so expensive? Is the tree unbalanced?
+
 namespace TEN::Math
 {
 	bool BoundingTree::Node::IsLeaf() const
@@ -52,6 +56,8 @@ namespace TEN::Math
 			float intersectDist = 0.0f;
 			return (node.Aabb.Intersects(ray.position, ray.direction, intersectDist) && intersectDist <= dist);
 		};
+
+		DrawDebugLine(ray.position, Geometry::TranslatePoint(ray.position, ray.direction, dist), Color(1,1,1));
 
 		return GetBoundedObjectIds(testColl);
 	}
@@ -151,7 +157,7 @@ namespace TEN::Math
 		int farthestDepth = 0;
 		for (const auto& node : _nodes)
 		{
-			DrawDebugBox(node.Aabb, BOX_COLOR);
+			//DrawDebugBox(node.Aabb, BOX_COLOR);
 			farthestDepth = std::max(farthestDepth, node.Depth);
 		}
 
@@ -184,8 +190,6 @@ namespace TEN::Math
 			// Collect object ID.
 			if (node.IsLeaf())
 			{
-				//DrawDebugBox(node.Aabb, Color(1, 1, 1)); //debug
-				//PrintDebugMessage("depth: %d", node.Depth);
 				objectIds.push_back(node.ObjectID);
 			}
 			// Traverse nodes.
@@ -653,7 +657,7 @@ namespace TEN::Math
 		unsigned int leafNodeCount = 0;
 		for (const auto& node : _nodes)
 			node.IsLeaf() ? leafNodeCount++ : innerNodeCount++;
-		TENAssert(innerNodeCount == (leafNodeCount - 1), "BoundingTree: Inconsistent relation between inner node and leaf node counts.");
+		TENAssert(innerNodeCount == (leafNodeCount - 1), "BoundingTree: Unexpected relation between inner node and leaf node counts.");
 
 		// Validate unique object ID.
 		auto objectIds = GetBoundedObjectIds();
