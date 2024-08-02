@@ -250,7 +250,7 @@ namespace TEN::Math
 		else
 		{
 			_nodes.emplace_back();
-			nodeID = int(_nodes.size() - 1);
+			nodeID = (int)_nodes.size() - 1;
 		}
 
 		return nodeID;

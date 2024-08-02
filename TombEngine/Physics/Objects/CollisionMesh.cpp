@@ -256,37 +256,34 @@ namespace TEN::Physics
 		int vertex1ID = NO_VALUE;
 		int vertex2ID = NO_VALUE;
 
+		// Get IDs of existing vertices.
+		for (int i = 0; i < _vertices.size(); i++)
+		{
+			const auto& vertex = _vertices[i];
+
+			if (vertex0ID == NO_VALUE && vertex == vertex0)
+				vertex0ID = i;
+			if (vertex1ID == NO_VALUE && vertex == vertex1)
+				vertex1ID = i;
+			if (vertex2ID == NO_VALUE && vertex == vertex2)
+				vertex2ID = i;
+		}
+
 		// Add new vertices and get IDs.
-		if (!Contains(_vertices, vertex0))
+		if (vertex0ID == NO_VALUE)
 		{
 			_vertices.push_back(vertex0);
 			vertex0ID = (int)_vertices.size() - 1;
 		}
-		if (!Contains(_vertices, vertex1))
+		if (vertex1ID == NO_VALUE)
 		{
 			_vertices.push_back(vertex1);
 			vertex1ID = (int)_vertices.size() - 1;
 		}
-		if (!Contains(_vertices, vertex2))
+		if (vertex2ID == NO_VALUE)
 		{
 			_vertices.push_back(vertex2);
 			vertex2ID = (int)_vertices.size() - 1;
-		}
-
-		// Get IDs of existing vertices.
-		if (vertex0ID == NO_VALUE || vertex1ID == NO_VALUE || vertex2ID == NO_VALUE)
-		{
-			for (int i = 0; i < _vertices.size(); i++)
-			{
-				const auto& vertex = _vertices[i];
-
-				if (vertex0ID == NO_VALUE && vertex == vertex0)
-					vertex0ID = i;
-				if (vertex1ID == NO_VALUE && vertex == vertex1)
-					vertex1ID = i;
-				if (vertex2ID == NO_VALUE && vertex == vertex2)
-					vertex2ID = i;
-			}
 		}
 		
 		// Add new triangle.

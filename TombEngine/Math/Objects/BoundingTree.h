@@ -2,7 +2,9 @@
 
 namespace TEN::Math
 {
-	// Bounding volume hierarchy using AABBs.
+	// TODO: Can't use NO_VALUE for some reason.
+	
+	// Dynamic bounding volume hierarchy using AABBs.
 	class BoundingTree
 	{
 	private:
