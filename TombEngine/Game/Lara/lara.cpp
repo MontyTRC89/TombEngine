@@ -188,18 +188,20 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	movIds.push_back(0);
 	aabbs.push_back(GetAabb(item->GetObb()));
 
-	static auto tree = BoundingTree(movIds, aabbs, BLOCK(1 / 32.0f));
-	tree.Move(0, GetAabb(item->GetObb()), BLOCK(1 / 32.0f));
-	tree.DrawDebug();
+	// Player tree box.
+	//static auto tree = BoundingTree(movIds, aabbs, BLOCK(1 / 32.0f));
+	//tree.Move(0, GetAabb(item->GetObb()), BLOCK(1 / 32.0f));
+	//tree.DrawDebug();
 	//tree.Validate();
 
-	auto movIds2 = tree.GetBoundedObjectIds();
+	//auto movIds2 = tree.GetBoundedObjectIds();
 	//for (int movID : movIds2)
 	//	PrintDebugMessage("%d", movID);
 
-	DrawDebugBox(GetAabb(item->GetObb()), Color(1, 0, 0));
+	//DrawDebugBox(GetAabb(item->GetObb()), Color(1, 0, 0));
 
-	/*const auto& room2 = g_Level.Rooms[item->RoomNumber];
+	// Tree of moveables in room
+	const auto& room2 = g_Level.Rooms[item->RoomNumber];
 	int movID = room2.itemNumber;
 	while (movID != NO_VALUE)
 	{
@@ -208,7 +210,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			break;
 		movID = mov.NextItem;
 
-		if (movID != -1)
+		if (movID != NO_VALUE)
 		{
 			movIds.push_back(movID);
 			aabbs.push_back(GetAabb(mov.GetObb()));
@@ -219,7 +221,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	auto tree = BoundingTree(movIds, aabbs);
 	tree.DrawDebug();
-	//tree.Validate();*/
+	PrintDebugMessage(":");
+	auto movIds2 = tree.GetBoundedObjectIds(Ray(item->Pose.Position.ToVector3(), item->Pose.Orientation.ToDirection()), BLOCK(5));
+	//tree.Validate();
 
 	//--------
 

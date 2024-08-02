@@ -11,8 +11,8 @@ namespace TEN::Math
 		struct Node
 		{
 			int			ObjectID = -1; // NOTE: Only leaf node stores object ID directly.
-			int			Depth	 = -1;
 			BoundingBox Aabb	 = BoundingBox();
+			int			Depth	 = -1;
 
 			int ParentID = -1;
 			int Child0ID = -1;

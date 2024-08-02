@@ -203,8 +203,12 @@ namespace TEN::Math
 		if (_nodes.empty())
 			return objectIds;
 
+		int traversalCount = 0;
+
 		std::function<void(int)> traverse = [&](int nodeID)
 		{
+			traversalCount++;
+
 			// Invalid node; return early.
 			if (nodeID == NO_VALUE)
 				return;
@@ -219,7 +223,7 @@ namespace TEN::Math
 			if (node.IsLeaf())
 			{
 				DrawDebugBox(node.Aabb, Color(1, 1, 1)); //debug
-				PrintDebugMessage("depth: %d", node.Depth);
+				//PrintDebugMessage("depth: %d", node.Depth);
 				objectIds.push_back(node.ObjectID);
 			}
 			// Traverse nodes.
@@ -233,6 +237,7 @@ namespace TEN::Math
 		// Traverse tree from root node.
 		traverse(_rootID);
 
+		PrintDebugMessage("traversal count: %d", traversalCount);
 		return objectIds;
 	}
 
@@ -405,6 +410,7 @@ namespace TEN::Math
 
 	void BoundingTree::RemoveLeaf(int leafID)
 	{
+		// Prune branch.
 		int nodeID = leafID;
 		while (nodeID != NO_VALUE)
 		{
