@@ -223,7 +223,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto tree = BoundingTree(movIds, aabbs);
 	tree.DrawDebug();
 	auto movIds2 = tree.GetBoundedObjectIds(Ray(item->Pose.Position.ToVector3(), item->Pose.Orientation.ToDirection()), BLOCK(5));
-	//tree.Validate();
 
 	//--------
 

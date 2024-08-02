@@ -52,8 +52,6 @@ namespace TEN::Math
 		// Debug
 
 		void DrawDebug() const;
-		void Validate() const;
-		void Validate(int nodeID) const;
 
 	private:
 		// Helper getters
@@ -72,5 +70,10 @@ namespace TEN::Math
 		void RemoveNode(int nodeID);
 
 		int Rebuild(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary = 0.0f);
+
+		// Debug
+
+		void Validate() const;
+		void Validate(int nodeID) const;
 	};
 }

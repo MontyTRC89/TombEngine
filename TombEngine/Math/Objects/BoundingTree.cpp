@@ -146,89 +146,17 @@ namespace TEN::Math
 	{
 		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
 
+		PrintDebugMessage("BOUNDING TREE DEBUG");
+
 		int farthestDepth = 0;
 		for (const auto& node : _nodes)
 		{
-			//if (node.Depth == 3)
-				//DrawDebugBox(_nodes[_rootID].Aabb, BOX_COLOR);
-				DrawDebugBox(node.Aabb, BOX_COLOR);
-
-			//farthestDepth = std::max(farthestDepth, node.Depth);
-			//PrintDebugMessage("object ID: %d", _rootID);
+			DrawDebugBox(node.Aabb, BOX_COLOR);
+			farthestDepth = std::max(farthestDepth, node.Depth);
 		}
 
-		PrintDebugMessage("nodes: %d", (int)_nodes.size());
-		//PrintDebugMessage("farthest depth: %d", farthestDepth);
-	}
-
-	void BoundingTree::Validate() const
-	{
-		Validate(_rootID);
-	}
-
-	void BoundingTree::Validate(int nodeID) const
-	{
-		if (nodeID == NO_VALUE)
-			return;
-
-		// Validate root.
-		if (nodeID == _rootID)
-			TENAssert(_nodes[nodeID].ParentID == NO_VALUE, "BoundingTree root node cannot have parent.");
-
-		// Get node.
-		const auto& node = _nodes[nodeID];
-
-		// Validate leaf.
-		if (node.IsLeaf())
-		{
-			TENAssert(node.ObjectID != NO_VALUE, "BoundingTree leaf node must have object ID.");
-			TENAssert(node.Child0ID == NO_VALUE, "BoundingTree leaf node 0 cannot have children.");
-			TENAssert(node.Child1ID == NO_VALUE, "BoundingTree leaf node 1 cannot have children.");
-			return;
-		}
-		else
-		{
-			TENAssert(node.ObjectID == NO_VALUE, "BoundingTree non-leaf node cannot have object ID.");
-		}
-
-		// Validate parent.
-		if (node.Child0ID != NO_VALUE)
-			TENAssert(_nodes[node.Child0ID].ParentID == nodeID, "BoundingTree child node 0 has wrong parent " + std::to_string(_nodes[node.Child0ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
-		if (node.Child1ID != NO_VALUE)
-			TENAssert(_nodes[node.Child1ID].ParentID == nodeID, "BoundingTree child node 1 has wrong parent " + std::to_string(_nodes[node.Child1ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
-
-		// Validate unique object ID.
-		/*auto objectIds = GetBoundedObjectIds();
-		for (int refObjectID : objectIds)
-		{
-			unsigned int count = 0;
-			for (int objectID : objectIds)
-			{
-				if (refObjectID == refObjectID)
-					count++;
-			}
-
-			TENAssert(count != 1, "BoundingTree contains duplicate object IDs.");
-		}*/
-
-		// Validate inner nodes.
-		for (const auto& node : _nodes)
-		{
-			if (!node.IsLeaf())
-				TENAssert(node.ObjectID == NO_VALUE, "BoundingTree inner node cannot contain objectID.");
-		}
-		
-		// Validate AABB.
-		if (node.Child0ID != NO_VALUE && node.Child1ID != NO_VALUE)
-		{
-			auto aabb = BoundingBox();
-			BoundingBox::CreateMerged(aabb, _nodes[node.Child0ID].Aabb, _nodes[node.Child1ID].Aabb);
-			TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree node AABB does not contain children.");
-		}
-
-		// Validate recursively.
-		Validate(node.Child0ID);
-		Validate(node.Child1ID);
+		PrintDebugMessage("Nodes: %d", (int)_nodes.size());
+		PrintDebugMessage("Farthest depth: %d", farthestDepth);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const
@@ -426,6 +354,8 @@ namespace TEN::Math
 
 		// Store object-leaf association.
 		_leafIDMap.insert({ leaf.ObjectID, leafID });
+
+		//Validate(leafID);
 	}
 
 	void BoundingTree::RemoveLeaf(int leafID)
@@ -712,5 +642,96 @@ namespace TEN::Math
 			_nodes.push_back(node);
 			return newNodeID;
 		}
+	}
+
+	void BoundingTree::Validate() const
+	{
+		Validate(_rootID);
+
+		// Validate inner node and leaf node count relation.
+		unsigned int innerNodeCount = 0;
+		unsigned int leafNodeCount = 0;
+		for (const auto& node : _nodes)
+			node.IsLeaf() ? leafNodeCount++ : innerNodeCount++;
+		TENAssert(innerNodeCount == (leafNodeCount - 1), "BoundingTree: Inconsistent relation between inner node and leaf node counts.");
+
+		// Validate unique object ID.
+		auto objectIds = GetBoundedObjectIds();
+		for (int refObjectID : objectIds)
+		{
+			unsigned int count = 0;
+			for (int objectID : objectIds)
+			{
+				if (refObjectID == refObjectID)
+				count++;
+			}
+
+			TENAssert(count == 1, "BoundingTree contains duplicate object IDs.");
+		}
+	}
+
+	void BoundingTree::Validate(int nodeID) const
+	{
+		if (nodeID == NO_VALUE)
+			return;
+
+		// Get node.
+		const auto& node = _nodes[nodeID];
+
+		// Validate root.
+		if (nodeID == _rootID)
+			TENAssert(node.ParentID == NO_VALUE, "BoundingTree: Root node cannot have parent.");
+
+		// Validate leaf node.
+		if (node.IsLeaf())
+		{
+			TENAssert(node.ObjectID != NO_VALUE, "BoundingTree: Leaf node must contain object ID.");
+		}
+		// Validate inner node.
+		else
+		{
+			TENAssert(node.ObjectID == NO_VALUE, "BoundingTree: Inner node cannot contain object ID.");
+		}
+
+		// Validate parent.
+		if (nodeID != _rootID)
+			TENAssert(node.ParentID != NO_VALUE, "BoundingTree: Non-root node must have parent.");
+
+		// Validate parent of children.
+		if (node.Child0ID != NO_VALUE)
+		{
+			const auto& child0 = _nodes[node.Child0ID];
+			TENAssert(child0.ParentID == nodeID, "BoundingTree: Child node 0 has wrong parent.");
+		}
+		if (node.Child1ID != NO_VALUE)
+		{
+			const auto& child1 = _nodes[node.Child1ID];
+			TENAssert(child1.ParentID == nodeID, "BoundingTree: Child node 1 has wrong parent.");
+		}
+
+		// Validate AABB.
+		if (node.Child0ID != NO_VALUE && node.Child1ID != NO_VALUE)
+		{
+			const auto& child0 = _nodes[node.Child0ID];
+			const auto& child1 = _nodes[node.Child1ID];
+
+			auto aabb = BoundingBox();
+			BoundingBox::CreateMerged(aabb, _nodes[node.Child0ID].Aabb, _nodes[node.Child1ID].Aabb);
+			TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree: Node AABB does not contain children.");
+		}
+
+		// TODO: Invalid.
+		// Validate depth.
+		if (nodeID != _rootID)
+		{
+			const auto& parent = _nodes[node.ParentID];
+			//TENAssert(node.Depth == (parent.Depth + 1), "BoundingTree: Node depth inconsistent with parent.");
+
+			//PrintDebugMessage("%d, %d", node.Depth, parent.Depth);
+		}
+
+		// Validate recursively.
+		Validate(node.Child0ID);
+		Validate(node.Child1ID);
 	}
 }
