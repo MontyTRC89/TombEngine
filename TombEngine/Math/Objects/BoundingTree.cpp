@@ -105,7 +105,7 @@ namespace TEN::Math
 		int leafID = it->second;
 		auto& leaf = _nodes[leafID];
 
-		// Check if the current AABB is within expanded AABB and not significantly smaller.
+		// Test if current AABB is inside expanded AABB within extents threshold.
 		if (leaf.Aabb.Contains(aabb) == ContainmentType::CONTAINS)
 		{
 			auto deltaExtents = leaf.Aabb.Extents - aabb.Extents;
@@ -140,8 +140,19 @@ namespace TEN::Math
 	{
 		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
 
-		for (const auto& node : _nodes)
-			DrawDebugBox(node.Aabb, BOX_COLOR);
+		int farthestDepth = 0;
+		//for (const auto& node : _nodes)
+		{
+			//if (node.Depth == 3)
+				DrawDebugBox(_nodes[_rootID].Aabb, BOX_COLOR);
+				//DrawDebugBox(node.Aabb, BOX_COLOR);
+
+			//farthestDepth = std::max(farthestDepth, node.Depth);
+			//PrintDebugMessage("object ID: %d", _rootID);
+		}
+
+		PrintDebugMessage("nodes: %d", (int)_nodes.size());
+		//PrintDebugMessage("farthest depth: %d", farthestDepth);
 	}
 
 	void BoundingTree::Validate() const
@@ -222,7 +233,7 @@ namespace TEN::Math
 			// Collect object ID.
 			if (node.IsLeaf())
 			{
-				DrawDebugBox(node.Aabb, Color(1, 1, 1)); //debug
+				//DrawDebugBox(node.Aabb, Color(1, 1, 1)); //debug
 				//PrintDebugMessage("depth: %d", node.Depth);
 				objectIds.push_back(node.ObjectID);
 			}
@@ -237,7 +248,7 @@ namespace TEN::Math
 		// Traverse tree from root node.
 		traverse(_rootID);
 
-		PrintDebugMessage("traversal count: %d", traversalCount);
+		//PrintDebugMessage("traversal count: %d", traversalCount);
 		return objectIds;
 	}
 
@@ -265,44 +276,35 @@ namespace TEN::Math
 	{
 		const auto& leaf = _nodes[leafID];
 
-		// Branch and bound for best sibling.
+		// Branch and bound for best sibling leaf.
 		int siblingID = _rootID;
 		while (!_nodes[siblingID].IsLeaf())
 		{
-			int child0ID = _nodes[siblingID].Child0ID;
-			int child1ID = _nodes[siblingID].Child1ID;
+			const auto& sibling = _nodes[siblingID];
+			int child0ID = sibling.Child0ID;
+			int child1ID = sibling.Child1ID;
 
+			float area = Geometry::GetBoundingBoxArea(sibling.Aabb);
+			float inheritCost = Geometry::GetBoundingBoxArea(leaf.Aabb) * 2;
+
+			// Calculate cost of creating new parent for sibling and new leaf.
 			auto mergedAabb = BoundingBox();
-			BoundingBox::CreateMerged(mergedAabb, _nodes[siblingID].Aabb, leaf.Aabb);
-
-			float area = Geometry::GetBoundingBoxArea(_nodes[siblingID].Aabb);
+			BoundingBox::CreateMerged(mergedAabb, sibling.Aabb, leaf.Aabb);
 			float mergedArea = Geometry::GetBoundingBoxArea(mergedAabb);
-
-			// Calculate cost of creating new parent for prospective sibling and new leaf.
 			float cost = mergedArea * 2;
-
-			// Calculate minimum cost of pushing leaf further down tree.
-			float inheritCost = (mergedArea - area) * 2;
 
 			// Calculate cost of descending into child 0.
 			float cost0 = INFINITY;
 			if (child0ID != NO_VALUE)
 			{
 				const auto& child0 = _nodes[child0ID];
-
 				auto aabb = BoundingBox();
 				BoundingBox::CreateMerged(aabb, child0.Aabb, leaf.Aabb);
+				float newArea = Geometry::GetBoundingBoxArea(aabb);
 
-				if (child0.IsLeaf())
-				{
-					cost0 = Geometry::GetBoundingBoxArea(aabb) + inheritCost;
-				}
-				else
-				{
-					float prevArea = Geometry::GetBoundingBoxArea(child0.Aabb);
-					float newArea = Geometry::GetBoundingBoxArea(aabb);
-					cost0 = (newArea - prevArea) + inheritCost;
-				}
+				cost0 = child0.IsLeaf() ?
+					newArea + inheritCost :
+					(newArea - Geometry::GetBoundingBoxArea(child0.Aabb)) + inheritCost;
 			}
 
 			// Calculate cost of descending into child 1.
@@ -310,20 +312,13 @@ namespace TEN::Math
 			if (child1ID != NO_VALUE)
 			{
 				const auto& child1 = _nodes[child1ID];
-
 				auto aabb = BoundingBox();
 				BoundingBox::CreateMerged(aabb, child1.Aabb, leaf.Aabb);
+				float newArea = Geometry::GetBoundingBoxArea(aabb);
 
-				if (child1.IsLeaf())
-				{
-					cost1 = Geometry::GetBoundingBoxArea(aabb) + inheritCost;
-				}
-				else
-				{
-					float prevArea = Geometry::GetBoundingBoxArea(child1.Aabb);
-					float newArea = Geometry::GetBoundingBoxArea(aabb);
-					cost1 = newArea - prevArea + inheritCost;
-				}
+				cost1 = child1.IsLeaf() ?
+					newArea + inheritCost :
+					(newArea - Geometry::GetBoundingBoxArea(child1.Aabb)) + inheritCost;
 			}
 
 			// Test if descent is worthwhile according to minimum cost.
@@ -386,7 +381,7 @@ namespace TEN::Math
 		{
 			auto& prevParent = _nodes[prevParentID];
 
-			// Update the previous parent's child reference.
+			// Update previous parent's child reference.
 			if (prevParent.Child0ID == siblingID)
 			{
 				prevParent.Child0ID = newParentID;
@@ -445,149 +440,149 @@ namespace TEN::Math
 		}
 	}
 
-	int BoundingTree::BalanceNode(int iA)
+	int BoundingTree::BalanceNode(int nodeID)
 	{
 		// Perform a left or right rotation if node A is imbalanced.
 		// Returns the new root index.
 
-		if (iA == NO_VALUE)
-			return iA;
+		if (nodeID == NO_VALUE)
+			return nodeID;
 
-		auto& nodeA = _nodes[iA];
+		auto& nodeA = _nodes[nodeID];
 		if (nodeA.IsLeaf() || nodeA.Depth < 2)
-			return iA;
+			return nodeID;
 
-		int iB = nodeA.Child0ID;
-		int iC = nodeA.Child1ID;
-		if (iB == NO_VALUE || iC == NO_VALUE)
-			return iA;
+		int nodeIDB = nodeA.Child0ID;
+		int nodeIDC = nodeA.Child1ID;
+		if (nodeIDB == NO_VALUE || nodeIDC == NO_VALUE)
+			return nodeID;
 
-		auto& nodeB = _nodes[iB];
-		auto& nodeC = _nodes[iC];
+		auto& nodeB = _nodes[nodeIDB];
+		auto& nodeC = _nodes[nodeIDC];
 
 		int balance = nodeC.Depth - nodeB.Depth;
 
-		// Rotate C up
+		// Rotate C up.
 		if (balance > 1)
 		{
-			int iF = nodeC.Child0ID;
-			int iG = nodeC.Child1ID;
-			if (iF == NO_VALUE || iG == NO_VALUE)
-				return iA;
+			int nodeIDF = nodeC.Child0ID;
+			int nodeIDG = nodeC.Child1ID;
+			if (nodeIDF == NO_VALUE || nodeIDG == NO_VALUE)
+				return nodeID;
 
-			auto& nodeF = _nodes[iF];
-			auto& nodeG = _nodes[iG];
+			auto& nodeF = _nodes[nodeIDF];
+			auto& nodeG = _nodes[nodeIDG];
 
-			// Swap A and C
-			nodeC.Child0ID = iA;
+			// Swap A and C.
 			nodeC.ParentID = nodeA.ParentID;
-			nodeA.ParentID = iC;
+			nodeC.Child0ID = nodeID;
+			nodeA.ParentID = nodeIDC;
 
-			// A's old parent should point to C
+			// Make A's previous parent point to C.
 			if (nodeC.ParentID != NO_VALUE)
 			{
-				if (_nodes[nodeC.ParentID].Child0ID == iA)
+				if (_nodes[nodeC.ParentID].Child0ID == nodeID)
 				{
-					_nodes[nodeC.ParentID].Child0ID = iC;
+					_nodes[nodeC.ParentID].Child0ID = nodeIDC;
 				}
 				else
 				{
-					_nodes[nodeC.ParentID].Child1ID = iC;
+					_nodes[nodeC.ParentID].Child1ID = nodeIDC;
 				}
 			}
 			else
 			{
-				_rootID = iC;
+				_rootID = nodeIDC;
 			}
 
-			// Rotate
+			// Rotate.
 			if (nodeF.Depth > nodeG.Depth)
 			{
-				nodeC.Child1ID = iF;
-				nodeA.Child1ID = iG;
-				nodeG.ParentID = iA;
 				BoundingBox::CreateMerged(nodeA.Aabb, nodeB.Aabb, nodeG.Aabb);
 				BoundingBox::CreateMerged(nodeC.Aabb, nodeA.Aabb, nodeF.Aabb);
-
 				nodeA.Depth = std::max(nodeB.Depth, nodeG.Depth) + 1;
 				nodeC.Depth = std::max(nodeA.Depth, nodeF.Depth) + 1;
+
+				nodeG.ParentID = nodeID;
+				nodeC.Child1ID = nodeIDF;
+				nodeA.Child1ID = nodeIDG;
 			}
 			else
 			{
-				nodeC.Child1ID = iG;
-				nodeA.Child1ID = iF;
-				nodeF.ParentID = iA;
 				BoundingBox::CreateMerged(nodeA.Aabb, nodeB.Aabb, nodeF.Aabb);
 				BoundingBox::CreateMerged(nodeC.Aabb, nodeA.Aabb, nodeG.Aabb);
-
 				nodeA.Depth = std::max(nodeB.Depth, nodeF.Depth) + 1;
 				nodeC.Depth = std::max(nodeA.Depth, nodeG.Depth) + 1;
+
+				nodeF.ParentID = nodeID;
+				nodeC.Child1ID = nodeIDG;
+				nodeA.Child1ID = nodeIDF;
 			}
 
-			return iC;
+			return nodeIDC;
 		}
 
-		// Rotate B up
+		// Rotate B up.
 		if (balance < -1)
 		{
-			int iD = nodeB.Child0ID;
-			int iE = nodeB.Child1ID;
-			if (iD == NO_VALUE || iE == NO_VALUE)
-				return iA;
+			int nodeIDD = nodeB.Child0ID;
+			int nodeIDE = nodeB.Child1ID;
+			if (nodeIDD == NO_VALUE || nodeIDE == NO_VALUE)
+				return nodeID;
 
-			auto& nodeD = _nodes[iD];
-			auto& nodeE = _nodes[iE];
+			auto& nodeD = _nodes[nodeIDD];
+			auto& nodeE = _nodes[nodeIDE];
 
-			// Swap A and B
-			nodeB.Child0ID = iA;
+			// Swap A and B.
 			nodeB.ParentID = nodeA.ParentID;
-			nodeA.ParentID = iB;
+			nodeB.Child0ID = nodeID;
+			nodeA.ParentID = nodeIDB;
 
-			// A's old parent should point to B
+			// Make A's previous parent point to B.
 			if (nodeB.ParentID != NO_VALUE)
 			{
-				if (_nodes[nodeB.ParentID].Child0ID == iA)
+				if (_nodes[nodeB.ParentID].Child0ID == nodeID)
 				{
-					_nodes[nodeB.ParentID].Child0ID = iB;
+					_nodes[nodeB.ParentID].Child0ID = nodeIDB;
 				}
 				else
 				{
-					_nodes[nodeB.ParentID].Child1ID = iB;
+					_nodes[nodeB.ParentID].Child1ID = nodeIDB;
 				}
 			}
 			else
 			{
-				_rootID = iB;
+				_rootID = nodeIDB;
 			}
 
-			// Rotate
+			// Rotate.
 			if (nodeD.Depth > nodeE.Depth)
 			{
-				nodeB.Child1ID = iD;
-				nodeA.Child0ID = iE;
-				nodeE.ParentID = iA;
 				BoundingBox::CreateMerged(nodeA.Aabb, nodeC.Aabb, nodeE.Aabb);
 				BoundingBox::CreateMerged(nodeB.Aabb, nodeA.Aabb, nodeD.Aabb);
-
 				nodeA.Depth = std::max(nodeC.Depth, nodeE.Depth) + 1;
 				nodeB.Depth = std::max(nodeA.Depth, nodeD.Depth) + 1;
+
+				nodeB.Child1ID = nodeIDD;
+				nodeA.Child0ID = nodeIDE;
+				nodeE.ParentID = nodeID;
 			}
 			else
 			{
-				nodeB.Child1ID = iE;
-				nodeA.Child0ID = iD;
-				nodeD.ParentID = iA;
 				BoundingBox::CreateMerged(nodeA.Aabb, nodeC.Aabb, nodeD.Aabb);
 				BoundingBox::CreateMerged(nodeB.Aabb, nodeA.Aabb, nodeE.Aabb);
-
 				nodeA.Depth = std::max(nodeC.Depth, nodeD.Depth) + 1;
 				nodeB.Depth = std::max(nodeA.Depth, nodeE.Depth) + 1;
+
+				nodeB.Child1ID = nodeIDE;
+				nodeA.Child0ID = nodeIDD;
+				nodeD.ParentID = nodeID;
 			}
 
-			return iB;
+			return nodeIDB;
 		}
 
-		return iA;
+		return nodeID;
 	}
 
 	void BoundingTree::RefitNode(int nodeID)
@@ -647,6 +642,7 @@ namespace TEN::Math
 			*this = {};
 	}
 
+	// TODO: Refactor into a fast bottom-up algorithm that produces a balanced tree.
 	int BoundingTree::Rebuild(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
 	{
 		// FAILSAFE.

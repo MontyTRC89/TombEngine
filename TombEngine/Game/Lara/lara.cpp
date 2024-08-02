@@ -212,16 +212,16 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 		if (movID != NO_VALUE)
 		{
-			movIds.push_back(movID);
-			aabbs.push_back(GetAabb(mov.GetObb()));
+			if (!g_Level.Items[movID].IsBridge())
+			{
+				movIds.push_back(movID);
+				aabbs.push_back(GetAabb(mov.GetObb()));
+			}
 		}
 	}
-	movIds.push_back(item->Index);
-	aabbs.push_back(GetAabb(item->GetObb()));
 
 	auto tree = BoundingTree(movIds, aabbs);
 	tree.DrawDebug();
-	PrintDebugMessage(":");
 	auto movIds2 = tree.GetBoundedObjectIds(Ray(item->Pose.Position.ToVector3(), item->Pose.Orientation.ToDirection()), BLOCK(5));
 	//tree.Validate();
 
@@ -269,20 +269,26 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	//GenerateRoomCollisionMesh(room);
 	room.CollisionMesh.DrawDebug();
 
-	for (auto& item2 : g_Level.Items)
+	static bool hasRun = false;
+	if (!hasRun)
 	{
-		//if (!item2.Active)
-			//continue;
+		for (auto& item2 : g_Level.Items)
+		{
+			//if (!item2.Active)
+				//continue;
 
-		if (!item2.IsBridge())
-			continue;
+			if (!item2.IsBridge())
+				continue;
 
-		auto& bridge = GetBridgeObject(item2);
-		//bridge.Initialize(item2);
+			auto& bridge = GetBridgeObject(item2);
+			bridge.Initialize(item2);
 
-		auto labelPos = g_Renderer.Get2DPosition(item2.Pose.Position.ToVector3());
-		//if (labelPos.has_value())
-		//	PrintDebugString(std::to_string(item2.Index), *labelPos, Color(1,1,1), 1, 0, RendererDebugPage::None);
+			auto labelPos = g_Renderer.Get2DPosition(item2.Pose.Position.ToVector3());
+			//if (labelPos.has_value())
+			//	PrintDebugString(std::to_string(item2.Index), *labelPos, Color(1,1,1), 1, 0, RendererDebugPage::None);
+		}
+
+		hasRun = true;
 	}
 
 	//UpdateBridgeItem(g_Level.Items[43]);
