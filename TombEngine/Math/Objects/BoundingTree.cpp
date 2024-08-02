@@ -141,11 +141,11 @@ namespace TEN::Math
 		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
 
 		int farthestDepth = 0;
-		//for (const auto& node : _nodes)
+		for (const auto& node : _nodes)
 		{
 			//if (node.Depth == 3)
-				DrawDebugBox(_nodes[_rootID].Aabb, BOX_COLOR);
-				//DrawDebugBox(node.Aabb, BOX_COLOR);
+				//DrawDebugBox(_nodes[_rootID].Aabb, BOX_COLOR);
+				DrawDebugBox(node.Aabb, BOX_COLOR);
 
 			//farthestDepth = std::max(farthestDepth, node.Depth);
 			//PrintDebugMessage("object ID: %d", _rootID);
@@ -248,7 +248,7 @@ namespace TEN::Math
 		// Traverse tree from root node.
 		traverse(_rootID);
 
-		//PrintDebugMessage("traversal count: %d", traversalCount);
+		PrintDebugMessage("traversal count: %d", traversalCount);
 		return objectIds;
 	}
 
@@ -338,12 +338,12 @@ namespace TEN::Math
 
 	void BoundingTree::InsertLeaf(int leafID)
 	{
-		auto& leaf = _nodes[leafID];
-		_leafIDMap.insert({ leaf.ObjectID, leafID });
-
 		// Create root if empty.
 		if (_rootID == NO_VALUE)
 		{
+			auto& leaf = _nodes[leafID];
+			_leafIDMap.insert({ leaf.ObjectID, leafID });
+
 			_rootID = leafID;
 			leaf.Depth = 0;
 			return;
@@ -351,6 +351,9 @@ namespace TEN::Math
 
 		// TODO: Watch out: data corruption occurs with references when vector resizes.
 		int newParentID = GetNewNodeID();
+
+		auto& leaf = _nodes[leafID];
+		_leafIDMap.insert({ leaf.ObjectID, leafID });
 
 		// Get sibling for new leaf.
 		int siblingID = GetBestSiblingLeafID(leafID);
