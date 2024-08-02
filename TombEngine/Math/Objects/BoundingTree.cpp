@@ -94,6 +94,7 @@ namespace TEN::Math
 
 		InsertLeaf(leafID);
 	}
+
 	void BoundingTree::Move(int objectID, const BoundingBox& aabb, float boundary)
 	{
 		// Find leaf containing object ID.
@@ -104,13 +105,15 @@ namespace TEN::Math
 		int leafID = it->second;
 		auto& leaf = _nodes[leafID];
 
-		// Check if the current AABB is within the expanded AABB and not significantly smaller.
+		// Check if the current AABB is within expanded AABB and not significantly smaller.
 		if (leaf.Aabb.Contains(aabb) == ContainmentType::CONTAINS)
 		{
+			auto deltaExtents = leaf.Aabb.Extents - aabb.Extents;
 			float threshold = boundary * 2;
-			if ((leaf.Aabb.Extents.x - aabb.Extents.x) < threshold &&
-				(leaf.Aabb.Extents.y - aabb.Extents.y) < threshold &&
-				(leaf.Aabb.Extents.z - aabb.Extents.z) < threshold)
+
+			if (deltaExtents.x < threshold &&
+				deltaExtents.y < threshold &&
+				deltaExtents.z < threshold)
 			{
 				return;
 			}
