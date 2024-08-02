@@ -39,6 +39,8 @@ namespace TEN::Math
 		for (int i = 0; i < objectIds.size(); i++)
 			Insert(objectIds[i], aabbs[i], boundary);
 
+		Validate(_rootID);
+
 		//Rebuild(objectIds, aabbs, 0, (int)objectIds.size());
 		//_rootID = int(_nodes.size() - 1);
 	}
@@ -86,12 +88,15 @@ namespace TEN::Math
 
 	void BoundingTree::Insert(int objectID, const BoundingBox& aabb, float boundary)
 	{
+		// Allocate new leaf.
 		int leafID = GetNewNodeID();
 		auto& leaf = _nodes[leafID];
 
+		// Set object ID and AABB.
 		leaf.ObjectID = objectID;
 		leaf.Aabb = BoundingBox(aabb.Center, aabb.Extents + Vector3(boundary));
 
+		// Insert new leaf.
 		InsertLeaf(leafID);
 	}
 
@@ -102,6 +107,7 @@ namespace TEN::Math
 		if (it == _leafIDMap.end())
 			return;
 
+		// Get leaf.
 		int leafID = it->second;
 		auto& leaf = _nodes[leafID];
 
@@ -187,20 +193,37 @@ namespace TEN::Math
 
 		// Validate parent.
 		if (node.Child0ID != NO_VALUE)
-			if (_nodes[node.Child0ID].ParentID != nodeID) TENLog("BoundingTree child node 0 has wrong parent " + std::to_string(_nodes[node.Child0ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
-		//TENAssert(_nodes[node.Child0ID].ParentID == nodeID, "BoundingTree child node 0 has wrong parent " + std::to_string(_nodes[node.Child0ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
+			TENAssert(_nodes[node.Child0ID].ParentID == nodeID, "BoundingTree child node 0 has wrong parent " + std::to_string(_nodes[node.Child0ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
 		if (node.Child1ID != NO_VALUE)
-			if (_nodes[node.Child1ID].ParentID != nodeID) TENLog("BoundingTree child node 1 has wrong parent " + std::to_string(_nodes[node.Child1ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
-		//TENAssert(_nodes[node.Child1ID].ParentID == nodeID, "BoundingTree child node 1 has wrong parent " + std::to_string(_nodes[node.Child1ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
+			TENAssert(_nodes[node.Child1ID].ParentID == nodeID, "BoundingTree child node 1 has wrong parent " + std::to_string(_nodes[node.Child1ID].ParentID) + " instead of " + std::to_string(nodeID) + ".");
 
 		// Validate unique object ID.
+		/*auto objectIds = GetBoundedObjectIds();
+		for (int refObjectID : objectIds)
+		{
+			unsigned int count = 0;
+			for (int objectID : objectIds)
+			{
+				if (refObjectID == refObjectID)
+					count++;
+			}
+
+			TENAssert(count != 1, "BoundingTree contains duplicate object IDs.");
+		}*/
+
+		// Validate inner nodes.
+		for (const auto& node : _nodes)
+		{
+			if (!node.IsLeaf())
+				TENAssert(node.ObjectID == NO_VALUE, "BoundingTree inner node cannot contain objectID.");
+		}
 		
 		// Validate AABB.
 		if (node.Child0ID != NO_VALUE && node.Child1ID != NO_VALUE)
 		{
 			auto aabb = BoundingBox();
 			BoundingBox::CreateMerged(aabb, _nodes[node.Child0ID].Aabb, _nodes[node.Child1ID].Aabb);
-			//TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree node AABB does not contain children.");
+			TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree node AABB does not contain children.");
 		}
 
 		// Validate recursively.
@@ -342,43 +365,41 @@ namespace TEN::Math
 		if (_rootID == NO_VALUE)
 		{
 			auto& leaf = _nodes[leafID];
-			_leafIDMap.insert({ leaf.ObjectID, leafID });
+			leaf.Depth = 0;
 
 			_rootID = leafID;
-			leaf.Depth = 0;
+			_leafIDMap.insert({ leaf.ObjectID, leafID });
 			return;
 		}
 
-		// TODO: Watch out: data corruption occurs with references when vector resizes.
-		int newParentID = GetNewNodeID();
+		// Allocate new parent.
+		int parentID = GetNewNodeID();
+		auto& parent = _nodes[parentID];
 
-		auto& leaf = _nodes[leafID];
-		_leafIDMap.insert({ leaf.ObjectID, leafID });
-
-		// Get sibling for new leaf.
+		// Get sibling leaf and new leaf.
 		int siblingID = GetBestSiblingLeafID(leafID);
 		auto& sibling = _nodes[siblingID];
+		auto& leaf = _nodes[leafID];
 
-		// Calculate merged AABB of sibling and new leaf.
+		// Calculate merged AABB of sibling leaf and new leaf.
 		auto aabb = BoundingBox();
 		BoundingBox::CreateMerged(aabb, sibling.Aabb, leaf.Aabb);
 
-		// Create new parent.
+		// Get previous parent.
 		int prevParentID = sibling.ParentID;
-		auto& newParent = _nodes[newParentID];
 
 		// Update nodes.
-		newParent.Aabb = aabb;
-		newParent.ParentID = prevParentID;
-		newParent.Child0ID = siblingID;
-		newParent.Child1ID = leafID;
-		sibling.ParentID = newParentID;
-		leaf.ParentID = newParentID;
+		parent.Aabb = aabb;
+		parent.ParentID = prevParentID;
+		parent.Child0ID = siblingID;
+		parent.Child1ID = leafID;
+		sibling.ParentID = parentID;
+		leaf.ParentID = parentID;
 
 		if (prevParentID == NO_VALUE)
 		{
-			_rootID = newParentID;
-			newParent.Depth = 0;
+			_rootID = parentID;
+			parent.Depth = 0;
 		}
 		else
 		{
@@ -387,23 +408,24 @@ namespace TEN::Math
 			// Update previous parent's child reference.
 			if (prevParent.Child0ID == siblingID)
 			{
-				prevParent.Child0ID = newParentID;
+				prevParent.Child0ID = parentID;
 			}
 			else
 			{
-				prevParent.Child1ID = newParentID;
+				prevParent.Child1ID = parentID;
 			}
 
-			newParent.Depth = prevParent.Depth + 1;
+			parent.Depth = prevParent.Depth + 1;
 		}
 
-		sibling.Depth = newParent.Depth + 1;
-		leaf.Depth = newParent.Depth + 1;
+		sibling.Depth = parent.Depth + 1;
+		leaf.Depth = parent.Depth + 1;
 
 		// Refit.
 		RefitNode(leafID);
 
-		//Validate(prevParentID);
+		// Store object-leaf association.
+		_leafIDMap.insert({ leaf.ObjectID, leafID });
 	}
 
 	void BoundingTree::RemoveLeaf(int leafID)
