@@ -18,7 +18,7 @@ namespace TEN::Math
 {
 	bool BoundingTree::Node::IsLeaf() const
 	{
-		return (Child0ID == NO_VALUE && Child1ID == NO_VALUE);
+		return (LeftChildID == NO_VALUE && RightChildID == NO_VALUE);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds() const
@@ -195,8 +195,8 @@ namespace TEN::Math
 			// Traverse nodes.
 			else
 			{
-				traverse(node.Child0ID);
-				traverse(node.Child1ID);
+				traverse(node.LeftChildID);
+				traverse(node.RightChildID);
 			}
 		};
 
@@ -236,8 +236,8 @@ namespace TEN::Math
 		while (!_nodes[siblingID].IsLeaf())
 		{
 			const auto& sibling = _nodes[siblingID];
-			int child0ID = sibling.Child0ID;
-			int child1ID = sibling.Child1ID;
+			int child0ID = sibling.LeftChildID;
+			int child1ID = sibling.RightChildID;
 
 			float area = Geometry::GetBoundingBoxArea(sibling.Aabb);
 			float inheritCost = Geometry::GetBoundingBoxArea(leaf.Aabb) * 2;
@@ -323,8 +323,8 @@ namespace TEN::Math
 		// Update nodes.
 		parent.Aabb = aabb;
 		parent.ParentID = prevParentID;
-		parent.Child0ID = siblingID;
-		parent.Child1ID = leafID;
+		parent.LeftChildID = siblingID;
+		parent.RightChildID = leafID;
 		sibling.ParentID = parentID;
 		leaf.ParentID = parentID;
 
@@ -338,13 +338,13 @@ namespace TEN::Math
 			auto& prevParent = _nodes[prevParentID];
 
 			// Update previous parent's child reference.
-			if (prevParent.Child0ID == siblingID)
+			if (prevParent.LeftChildID == siblingID)
 			{
-				prevParent.Child0ID = parentID;
+				prevParent.LeftChildID = parentID;
 			}
 			else
 			{
-				prevParent.Child1ID = parentID;
+				prevParent.RightChildID = parentID;
 			}
 
 			parent.Depth = prevParent.Depth + 1;
@@ -371,19 +371,19 @@ namespace TEN::Math
 			const auto& node = _nodes[nodeID];
 
 			// Remove node if both children are empty.
-			if (node.Child0ID == NO_VALUE && node.Child1ID == NO_VALUE)
+			if (node.LeftChildID == NO_VALUE && node.RightChildID == NO_VALUE)
 			{
 				int parentID = node.ParentID;
 				if (parentID != NO_VALUE)
 				{
 					auto& parentNode = _nodes[parentID];
-					if (parentNode.Child0ID == nodeID)
+					if (parentNode.LeftChildID == nodeID)
 					{
-						parentNode.Child0ID = NO_VALUE;
+						parentNode.LeftChildID = NO_VALUE;
 					}
-					else if (parentNode.Child1ID == nodeID)
+					else if (parentNode.RightChildID == nodeID)
 					{
-						parentNode.Child1ID = NO_VALUE;
+						parentNode.RightChildID = NO_VALUE;
 					}
 				}
 
@@ -411,8 +411,8 @@ namespace TEN::Math
 		if (nodeA.IsLeaf() || nodeA.Depth < 2)
 			return nodeID;
 
-		int nodeIDB = nodeA.Child0ID;
-		int nodeIDC = nodeA.Child1ID;
+		int nodeIDB = nodeA.LeftChildID;
+		int nodeIDC = nodeA.RightChildID;
 		if (nodeIDB == NO_VALUE || nodeIDC == NO_VALUE)
 			return nodeID;
 
@@ -424,8 +424,8 @@ namespace TEN::Math
 		// Rotate C up.
 		if (balance > 1)
 		{
-			int nodeIDF = nodeC.Child0ID;
-			int nodeIDG = nodeC.Child1ID;
+			int nodeIDF = nodeC.LeftChildID;
+			int nodeIDG = nodeC.RightChildID;
 			if (nodeIDF == NO_VALUE || nodeIDG == NO_VALUE)
 				return nodeID;
 
@@ -434,19 +434,19 @@ namespace TEN::Math
 
 			// Swap A and C.
 			nodeC.ParentID = nodeA.ParentID;
-			nodeC.Child0ID = nodeID;
+			nodeC.LeftChildID = nodeID;
 			nodeA.ParentID = nodeIDC;
 
 			// Make A's previous parent point to C.
 			if (nodeC.ParentID != NO_VALUE)
 			{
-				if (_nodes[nodeC.ParentID].Child0ID == nodeID)
+				if (_nodes[nodeC.ParentID].LeftChildID == nodeID)
 				{
-					_nodes[nodeC.ParentID].Child0ID = nodeIDC;
+					_nodes[nodeC.ParentID].LeftChildID = nodeIDC;
 				}
 				else
 				{
-					_nodes[nodeC.ParentID].Child1ID = nodeIDC;
+					_nodes[nodeC.ParentID].RightChildID = nodeIDC;
 				}
 			}
 			else
@@ -463,8 +463,8 @@ namespace TEN::Math
 				nodeC.Depth = std::max(nodeA.Depth, nodeF.Depth) + 1;
 
 				nodeG.ParentID = nodeID;
-				nodeC.Child1ID = nodeIDF;
-				nodeA.Child1ID = nodeIDG;
+				nodeC.RightChildID = nodeIDF;
+				nodeA.RightChildID = nodeIDG;
 			}
 			else
 			{
@@ -474,8 +474,8 @@ namespace TEN::Math
 				nodeC.Depth = std::max(nodeA.Depth, nodeG.Depth) + 1;
 
 				nodeF.ParentID = nodeID;
-				nodeC.Child1ID = nodeIDG;
-				nodeA.Child1ID = nodeIDF;
+				nodeC.RightChildID = nodeIDG;
+				nodeA.RightChildID = nodeIDF;
 			}
 
 			return nodeIDC;
@@ -484,8 +484,8 @@ namespace TEN::Math
 		// Rotate B up.
 		if (balance < -1)
 		{
-			int nodeIDD = nodeB.Child0ID;
-			int nodeIDE = nodeB.Child1ID;
+			int nodeIDD = nodeB.LeftChildID;
+			int nodeIDE = nodeB.RightChildID;
 			if (nodeIDD == NO_VALUE || nodeIDE == NO_VALUE)
 				return nodeID;
 
@@ -494,19 +494,19 @@ namespace TEN::Math
 
 			// Swap A and B.
 			nodeB.ParentID = nodeA.ParentID;
-			nodeB.Child0ID = nodeID;
+			nodeB.LeftChildID = nodeID;
 			nodeA.ParentID = nodeIDB;
 
 			// Make A's previous parent point to B.
 			if (nodeB.ParentID != NO_VALUE)
 			{
-				if (_nodes[nodeB.ParentID].Child0ID == nodeID)
+				if (_nodes[nodeB.ParentID].LeftChildID == nodeID)
 				{
-					_nodes[nodeB.ParentID].Child0ID = nodeIDB;
+					_nodes[nodeB.ParentID].LeftChildID = nodeIDB;
 				}
 				else
 				{
-					_nodes[nodeB.ParentID].Child1ID = nodeIDB;
+					_nodes[nodeB.ParentID].RightChildID = nodeIDB;
 				}
 			}
 			else
@@ -522,8 +522,8 @@ namespace TEN::Math
 				nodeA.Depth = std::max(nodeC.Depth, nodeE.Depth) + 1;
 				nodeB.Depth = std::max(nodeA.Depth, nodeD.Depth) + 1;
 
-				nodeB.Child1ID = nodeIDD;
-				nodeA.Child0ID = nodeIDE;
+				nodeB.RightChildID = nodeIDD;
+				nodeA.LeftChildID = nodeIDE;
 				nodeE.ParentID = nodeID;
 			}
 			else
@@ -533,8 +533,8 @@ namespace TEN::Math
 				nodeA.Depth = std::max(nodeC.Depth, nodeD.Depth) + 1;
 				nodeB.Depth = std::max(nodeA.Depth, nodeE.Depth) + 1;
 
-				nodeB.Child1ID = nodeIDE;
-				nodeA.Child0ID = nodeIDD;
+				nodeB.RightChildID = nodeIDE;
+				nodeA.LeftChildID = nodeIDD;
 				nodeD.ParentID = nodeID;
 			}
 
@@ -556,24 +556,24 @@ namespace TEN::Math
 			int newParentID = BalanceNode(parentID);
 			auto& parent = _nodes[newParentID];
 
-			if (parent.Child0ID != NO_VALUE && parent.Child1ID != NO_VALUE)
+			if (parent.LeftChildID != NO_VALUE && parent.RightChildID != NO_VALUE)
 			{
-				const auto& child0 = _nodes[parent.Child0ID];
-				const auto& child1 = _nodes[parent.Child1ID];
+				const auto& child0 = _nodes[parent.LeftChildID];
+				const auto& child1 = _nodes[parent.RightChildID];
 
 				BoundingBox::CreateMerged(parent.Aabb, child0.Aabb, child1.Aabb);
 				parent.Depth = std::max(child0.Depth, child1.Depth) + 1;
 			}
-			else if (parent.Child0ID != NO_VALUE)
+			else if (parent.LeftChildID != NO_VALUE)
 			{
-				const auto& child0 = _nodes[parent.Child0ID];
+				const auto& child0 = _nodes[parent.LeftChildID];
 
 				parent.Aabb = child0.Aabb;
 				parent.Depth = child0.Depth + 1;
 			}
-			else if (parent.Child1ID != NO_VALUE)
+			else if (parent.RightChildID != NO_VALUE)
 			{
-				const auto& child1 = _nodes[parent.Child1ID];
+				const auto& child1 = _nodes[parent.RightChildID];
 
 				parent.Aabb = child1.Aabb;
 				parent.Depth = child1.Depth + 1;
@@ -629,18 +629,18 @@ namespace TEN::Math
 		else
 		{
 			int mid = (start + end) / 2;
-			node.Child0ID = Rebuild(objectIds, aabbs, start, mid);
-			node.Child1ID = Rebuild(objectIds, aabbs, mid, end);
+			node.LeftChildID = Rebuild(objectIds, aabbs, start, mid);
+			node.RightChildID = Rebuild(objectIds, aabbs, mid, end);
 
 			// Set parent ID for child nodes.
 			int newNodeID = (int)_nodes.size();
-			if (node.Child0ID != NO_VALUE)
+			if (node.LeftChildID != NO_VALUE)
 			{
-				_nodes[node.Child0ID].ParentID = newNodeID;
+				_nodes[node.LeftChildID].ParentID = newNodeID;
 			}
-			if (node.Child1ID != NO_VALUE)
+			if (node.RightChildID != NO_VALUE)
 			{
-				_nodes[node.Child1ID].ParentID = newNodeID;
+				_nodes[node.RightChildID].ParentID = newNodeID;
 			}
 
 			_nodes.push_back(node);
@@ -702,25 +702,25 @@ namespace TEN::Math
 			TENAssert(node.ParentID != NO_VALUE, "BoundingTree: Non-root node must have parent.");
 
 		// Validate parent of children.
-		if (node.Child0ID != NO_VALUE)
+		if (node.LeftChildID != NO_VALUE)
 		{
-			const auto& child0 = _nodes[node.Child0ID];
+			const auto& child0 = _nodes[node.LeftChildID];
 			TENAssert(child0.ParentID == nodeID, "BoundingTree: Child node 0 has wrong parent.");
 		}
-		if (node.Child1ID != NO_VALUE)
+		if (node.RightChildID != NO_VALUE)
 		{
-			const auto& child1 = _nodes[node.Child1ID];
+			const auto& child1 = _nodes[node.RightChildID];
 			TENAssert(child1.ParentID == nodeID, "BoundingTree: Child node 1 has wrong parent.");
 		}
 
 		// Validate AABB.
-		if (node.Child0ID != NO_VALUE && node.Child1ID != NO_VALUE)
+		if (node.LeftChildID != NO_VALUE && node.RightChildID != NO_VALUE)
 		{
-			const auto& child0 = _nodes[node.Child0ID];
-			const auto& child1 = _nodes[node.Child1ID];
+			const auto& child0 = _nodes[node.LeftChildID];
+			const auto& child1 = _nodes[node.RightChildID];
 
 			auto aabb = BoundingBox();
-			BoundingBox::CreateMerged(aabb, _nodes[node.Child0ID].Aabb, _nodes[node.Child1ID].Aabb);
+			BoundingBox::CreateMerged(aabb, _nodes[node.LeftChildID].Aabb, _nodes[node.RightChildID].Aabb);
 			TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree: Node AABB does not contain children.");
 		}
 
@@ -735,7 +735,7 @@ namespace TEN::Math
 		}
 
 		// Validate recursively.
-		Validate(node.Child0ID);
-		Validate(node.Child1ID);
+		Validate(node.LeftChildID);
+		Validate(node.RightChildID);
 	}
 }

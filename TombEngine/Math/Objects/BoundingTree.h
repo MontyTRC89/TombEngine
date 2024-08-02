@@ -14,9 +14,9 @@ namespace TEN::Math
 			BoundingBox Aabb	 = BoundingBox();
 			int			Depth	 = -1;
 
-			int ParentID = -1;
-			int Child0ID = -1;
-			int Child1ID = -1;
+			int ParentID	 = -1;
+			int LeftChildID	 = -1;
+			int RightChildID = -1;
 
 			bool IsLeaf() const;
 		};
