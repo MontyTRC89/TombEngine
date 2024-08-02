@@ -236,8 +236,8 @@ namespace TEN::Math
 		while (!_nodes[siblingID].IsLeaf())
 		{
 			const auto& sibling = _nodes[siblingID];
-			int child0ID = sibling.LeftChildID;
-			int child1ID = sibling.RightChildID;
+			int leftChildID = sibling.LeftChildID;
+			int rightChildID = sibling.RightChildID;
 
 			float area = Geometry::GetBoundingBoxArea(sibling.Aabb);
 			float inheritCost = Geometry::GetBoundingBoxArea(leaf.Aabb) * 2;
@@ -248,40 +248,40 @@ namespace TEN::Math
 			float mergedArea = Geometry::GetBoundingBoxArea(mergedAabb);
 			float cost = mergedArea * 2;
 
-			// Calculate cost of descending into child 0.
-			float cost0 = INFINITY;
-			if (child0ID != NO_VALUE)
+			// Calculate cost of descending into left child.
+			float leftCost = INFINITY;
+			if (leftChildID != NO_VALUE)
 			{
-				const auto& child0 = _nodes[child0ID];
+				const auto& leftChild = _nodes[leftChildID];
 				auto aabb = BoundingBox();
-				BoundingBox::CreateMerged(aabb, child0.Aabb, leaf.Aabb);
+				BoundingBox::CreateMerged(aabb, leftChild.Aabb, leaf.Aabb);
 				float newArea = Geometry::GetBoundingBoxArea(aabb);
 
-				cost0 = child0.IsLeaf() ?
+				leftCost = leftChild.IsLeaf() ?
 					newArea + inheritCost :
-					(newArea - Geometry::GetBoundingBoxArea(child0.Aabb)) + inheritCost;
+					(newArea - Geometry::GetBoundingBoxArea(leftChild.Aabb)) + inheritCost;
 			}
 
-			// Calculate cost of descending into child 1.
-			float cost1 = INFINITY;
-			if (child1ID != NO_VALUE)
+			// Calculate cost of descending into right child.
+			float rightCost = INFINITY;
+			if (rightChildID != NO_VALUE)
 			{
-				const auto& child1 = _nodes[child1ID];
+				const auto& rightChild = _nodes[rightChildID];
 				auto aabb = BoundingBox();
-				BoundingBox::CreateMerged(aabb, child1.Aabb, leaf.Aabb);
+				BoundingBox::CreateMerged(aabb, rightChild.Aabb, leaf.Aabb);
 				float newArea = Geometry::GetBoundingBoxArea(aabb);
 
-				cost1 = child1.IsLeaf() ?
+				rightCost = rightChild.IsLeaf() ?
 					newArea + inheritCost :
-					(newArea - Geometry::GetBoundingBoxArea(child1.Aabb)) + inheritCost;
+					(newArea - Geometry::GetBoundingBoxArea(rightChild.Aabb)) + inheritCost;
 			}
 
 			// Test if descent is worthwhile according to minimum cost.
-			if (cost < cost0 && cost < cost1)
+			if (cost < leftCost && cost < rightCost)
 				break;
 
 			// Descend.
-			siblingID = (cost0 < cost1) ? child0ID : child1ID;
+			siblingID = (leftCost < rightCost) ? leftChildID : rightChildID;
 
 			// FAILSAFE.
 			if (siblingID == NO_VALUE)
@@ -399,6 +399,7 @@ namespace TEN::Math
 		}
 	}
 
+	// TODO: Depths are reversed.
 	int BoundingTree::BalanceNode(int nodeID)
 	{
 		// Perform a left or right rotation if node A is imbalanced.
@@ -558,25 +559,25 @@ namespace TEN::Math
 
 			if (parent.LeftChildID != NO_VALUE && parent.RightChildID != NO_VALUE)
 			{
-				const auto& child0 = _nodes[parent.LeftChildID];
-				const auto& child1 = _nodes[parent.RightChildID];
+				const auto& leftChild = _nodes[parent.LeftChildID];
+				const auto& rightChild = _nodes[parent.RightChildID];
 
-				BoundingBox::CreateMerged(parent.Aabb, child0.Aabb, child1.Aabb);
-				parent.Depth = std::max(child0.Depth, child1.Depth) + 1;
+				BoundingBox::CreateMerged(parent.Aabb, leftChild.Aabb, rightChild.Aabb);
+				parent.Depth = std::max(leftChild.Depth, rightChild.Depth) - 1;
 			}
 			else if (parent.LeftChildID != NO_VALUE)
 			{
-				const auto& child0 = _nodes[parent.LeftChildID];
+				const auto& leftChild = _nodes[parent.LeftChildID];
 
-				parent.Aabb = child0.Aabb;
-				parent.Depth = child0.Depth + 1;
+				parent.Aabb = leftChild.Aabb;
+				parent.Depth = leftChild.Depth - 1;
 			}
 			else if (parent.RightChildID != NO_VALUE)
 			{
-				const auto& child1 = _nodes[parent.RightChildID];
+				const auto& rightChild = _nodes[parent.RightChildID];
 
-				parent.Aabb = child1.Aabb;
-				parent.Depth = child1.Depth + 1;
+				parent.Aabb = rightChild.Aabb;
+				parent.Depth = rightChild.Depth - 1;
 			}
 
 			int prevParentID = parentID;
@@ -704,20 +705,20 @@ namespace TEN::Math
 		// Validate parent of children.
 		if (node.LeftChildID != NO_VALUE)
 		{
-			const auto& child0 = _nodes[node.LeftChildID];
-			TENAssert(child0.ParentID == nodeID, "BoundingTree: Child node 0 has wrong parent.");
+			const auto& leftChild = _nodes[node.LeftChildID];
+			TENAssert(leftChild.ParentID == nodeID, "BoundingTree: Left child has wrong parent.");
 		}
 		if (node.RightChildID != NO_VALUE)
 		{
-			const auto& child1 = _nodes[node.RightChildID];
-			TENAssert(child1.ParentID == nodeID, "BoundingTree: Child node 1 has wrong parent.");
+			const auto& rightChild = _nodes[node.RightChildID];
+			TENAssert(rightChild.ParentID == nodeID, "BoundingTree: Right child has wrong parent.");
 		}
 
 		// Validate AABB.
 		if (node.LeftChildID != NO_VALUE && node.RightChildID != NO_VALUE)
 		{
-			const auto& child0 = _nodes[node.LeftChildID];
-			const auto& child1 = _nodes[node.RightChildID];
+			const auto& leftChild = _nodes[node.LeftChildID];
+			const auto& rightChild = _nodes[node.RightChildID];
 
 			auto aabb = BoundingBox();
 			BoundingBox::CreateMerged(aabb, _nodes[node.LeftChildID].Aabb, _nodes[node.RightChildID].Aabb);
