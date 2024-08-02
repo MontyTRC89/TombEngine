@@ -14,7 +14,10 @@ namespace TEN::Physics
 	private:
 		// Members
 
-		std::array<const Vector3*, VERTEX_COUNT> _vertices = {};
+		std::array<int, VERTEX_COUNT> _vertexIds = {};
+		const std::vector<Vector3>*	  _vertices	 = {};
+
+
 		Vector3		_normal			  = Vector3::Zero;
 		BoundingBox _aabb			  = BoundingBox();
 		int			_portalRoomNumber = NO_VALUE;
@@ -26,7 +29,7 @@ namespace TEN::Physics
 	public:
 		// Constructors
 
-		CollisionTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, const BoundingBox& box, int portalRoomNumber);
+		CollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, const std::vector<Vector3>& vertices, const Vector3& normal, const BoundingBox& box, int portalRoomNumber);
 
 		// Getters
 

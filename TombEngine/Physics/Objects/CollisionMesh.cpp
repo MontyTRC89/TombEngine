@@ -9,9 +9,10 @@ using namespace TEN::Utils;
 
 namespace TEN::Physics
 {
-	CollisionTriangle::CollisionTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, const BoundingBox& box, int portalRoomNumber) :
-		_vertices(std::array<const Vector3*, VERTEX_COUNT>{ &vertex0, &vertex1, &vertex2 })
+	CollisionTriangle::CollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, const std::vector<Vector3>& vertices, const Vector3& normal, const BoundingBox& box, int portalRoomNumber)
 	{
+		_vertexIds = std::array<int, VERTEX_COUNT>{ vertex0ID, vertex1ID, vertex2ID };
+		_vertices = &vertices;
 		_normal = normal;
 		_aabb = box;
 		_portalRoomNumber = portalRoomNumber;
@@ -19,17 +20,17 @@ namespace TEN::Physics
 
 	const Vector3& CollisionTriangle::GetVertex0() const
 	{
-		return *_vertices[0];
+		return (*_vertices)[_vertexIds[0]];
 	}
 
 	const Vector3& CollisionTriangle::GetVertex1() const
 	{
-		return *_vertices[1];
+		return (*_vertices)[_vertexIds[1]];
 	}
 
 	const Vector3& CollisionTriangle::GetVertex2() const
 	{
-		return *_vertices[2];
+		return (*_vertices)[_vertexIds[2]];
 	}
 
 	const Vector3& CollisionTriangle::GetNormal() const
@@ -289,8 +290,8 @@ namespace TEN::Physics
 		}
 		
 		// Add new triangle.
-		auto box = Geometry::GetBoundingBox(std::vector<Vector3>{ vertex0, vertex1, vertex2 });
-		_triangles.push_back(CollisionTriangle(_vertices[vertex0ID], _vertices[vertex1ID], _vertices[vertex2ID], normal, box, portalRoomNumber));
+		auto aabb = Geometry::GetBoundingBox(std::vector<Vector3>{ vertex0, vertex1, vertex2 });
+		_triangles.push_back(CollisionTriangle(vertex0ID, vertex1ID, vertex2ID, _vertices, normal, aabb, portalRoomNumber));
 	}
 	
 	void CollisionMesh::BuildTree()

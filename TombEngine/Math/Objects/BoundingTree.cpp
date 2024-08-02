@@ -20,7 +20,7 @@ namespace TEN::Math
 	std::vector<int> BoundingTree::GetBoundedObjectIds() const
 	{
 		auto objectIds = std::vector<int>{};
-		if (_nodes.empty())
+		if (_leafIDMap.empty())
 			return objectIds;
 
 		// Collect all object IDs.
@@ -94,7 +94,6 @@ namespace TEN::Math
 
 		InsertLeaf(leafID);
 	}
-
 	void BoundingTree::Move(int objectID, const BoundingBox& aabb, float boundary)
 	{
 		// Find leaf containing object ID.
@@ -103,15 +102,15 @@ namespace TEN::Math
 			return;
 
 		int leafID = it->second;
-		const auto& leaf = _nodes[leafID];
+		auto& leaf = _nodes[leafID];
 
-		// Previous expanded AABB contains current AABB within scale threshold; return early.
+		// Check if the current AABB is within the expanded AABB and not significantly smaller.
 		if (leaf.Aabb.Contains(aabb) == ContainmentType::CONTAINS)
 		{
-			/*auto extentsThreshold = (leaf.Aabb.Extents + Vector3(boundary * 2)) / 2;
-			if (!(aabb.Extents.x < extentsThreshold.x ||
-				aabb.Extents.y < extentsThreshold.y ||
-				aabb.Extents.z < extentsThreshold.z))*/
+			float threshold = boundary * 2;
+			if ((leaf.Aabb.Extents.x - aabb.Extents.x) < threshold &&
+				(leaf.Aabb.Extents.y - aabb.Extents.y) < threshold &&
+				(leaf.Aabb.Extents.z - aabb.Extents.z) < threshold)
 			{
 				return;
 			}
@@ -347,8 +346,7 @@ namespace TEN::Math
 			return;
 		}
 
-		// OHHHHHHHHHH. The vector RESIZES itself when you insert a new node!
-		// THAT'S where the data corruption is from!!!!!!!!!!!!!
+		// TODO: Watch out: data corruption occurs with references when vector resizes.
 		int newParentID = GetNewNodeID();
 
 		// Get sibling for new leaf.
