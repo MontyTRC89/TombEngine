@@ -24,13 +24,8 @@ namespace TEN::Math
 			return objectIds;
 
 		// Collect all object IDs.
-		for (const auto& node : _nodes)
-		{
-			if (!node.IsLeaf())
-				continue;
-
-			objectIds.push_back(node.ObjectID);
-		}
+		for (const auto& [objectID, nodeID] : _leafIDMap)
+			objectIds.push_back(objectID);
 
 		return objectIds;
 	}
@@ -330,6 +325,8 @@ namespace TEN::Math
 
 			// Descend.
 			siblingID = (cost0 < cost1) ? child0ID : child1ID;
+
+			// FAILSAFE.
 			if (siblingID == NO_VALUE)
 				break;
 		}
@@ -350,26 +347,30 @@ namespace TEN::Math
 			return;
 		}
 
+		// OHHHHHHHHHH. The vector RESIZES itself when you insert a new node!
+		// THAT'S where the data corruption is from!!!!!!!!!!!!!
+		int newParentID = GetNewNodeID();
+
 		// Get sibling for new leaf.
 		int siblingID = GetBestSiblingLeafID(leafID);
 		auto& sibling = _nodes[siblingID];
 
-		//auto aabb = BoundingBox();
-		//BoundingBox::CreateMerged(aabb, sibling.Aabb, leaf.Aabb);
+		// Calculate merged AABB of sibling and new leaf.
+		auto aabb = BoundingBox();
+		BoundingBox::CreateMerged(aabb, sibling.Aabb, leaf.Aabb);
 
 		// Create new parent.
 		int prevParentID = sibling.ParentID;
-		int newParentID = GetNewNodeID();
 		auto& newParent = _nodes[newParentID];
 
-		//newParent.Aabb = aabb;
+		// Update nodes.
+		newParent.Aabb = aabb;
 		newParent.ParentID = prevParentID;
 		newParent.Child0ID = siblingID;
 		newParent.Child1ID = leafID;
 		sibling.ParentID = newParentID;
 		leaf.ParentID = newParentID;
 
-		// Update depths.
 		if (prevParentID == NO_VALUE)
 		{
 			_rootID = newParentID;
@@ -378,7 +379,6 @@ namespace TEN::Math
 		else
 		{
 			auto& prevParent = _nodes[prevParentID];
-			newParent.Depth = prevParent.Depth + 1;
 
 			// Update the previous parent's child reference.
 			if (prevParent.Child0ID == siblingID)
@@ -390,14 +390,7 @@ namespace TEN::Math
 				prevParent.Child1ID = newParentID;
 			}
 
-			// Update depths of all ancestors.
-			int parentID = prevParentID;
-			while (parentID != NO_VALUE)
-			{
-				auto& parent = _nodes[parentID];
-				parent.Depth += 1;
-				parentID = parent.ParentID;
-			}
+			newParent.Depth = prevParent.Depth + 1;
 		}
 
 		sibling.Depth = newParent.Depth + 1;
