@@ -607,22 +607,22 @@ namespace TEN::Math
 				const auto& child0 = _nodes[parent.Child0ID];
 				const auto& child1 = _nodes[parent.Child1ID];
 
-				parent.Depth = std::max(child0.Depth, child1.Depth) + 1;
 				BoundingBox::CreateMerged(parent.Aabb, child0.Aabb, child1.Aabb);
+				parent.Depth = std::max(child0.Depth, child1.Depth) + 1;
 			}
 			else if (parent.Child0ID != NO_VALUE)
 			{
 				const auto& child0 = _nodes[parent.Child0ID];
 
-				parent.Depth = child0.Depth + 1;
 				parent.Aabb = child0.Aabb;
+				parent.Depth = child0.Depth + 1;
 			}
 			else if (parent.Child1ID != NO_VALUE)
 			{
 				const auto& child1 = _nodes[parent.Child1ID];
 
-				parent.Depth = child1.Depth + 1;
 				parent.Aabb = child1.Aabb;
+				parent.Depth = child1.Depth + 1;
 			}
 
 			int prevParentID = parentID;
