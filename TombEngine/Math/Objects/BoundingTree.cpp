@@ -9,8 +9,9 @@ using namespace TEN::Math;
 // https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
 
 // TODO:
-// - Can't use NO_VALUE for some reason.
-// - Better static build method. Refactor into a fast bottom-up algorithm that produces a balanced tree.
+// - Can't use NO_VALUE in .h file for some reason.
+// - Finish static build method.
+// - Faster static build method.
 
 namespace TEN::Math
 {
@@ -24,12 +25,10 @@ namespace TEN::Math
 		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree ctor: Object ID and AABB counts unequal.");
 
 		// Debug
-		for (int i = 0; i < objectIds.size(); i++)
-			Insert(objectIds[i], aabbs[i], boundary);
+		//for (int i = 0; i < objectIds.size(); i++)
+		//	Insert(objectIds[i], aabbs[i], boundary);
 
-		//Build(objectIds, aabbs, boundary);
-
-		//Validate(_rootID);
+		Build(objectIds, aabbs, boundary);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds() const
@@ -172,12 +171,13 @@ namespace TEN::Math
 		if (_nodes.empty())
 			return objectIds;
 
+		int i = 0;
 		std::function<void(int)> traverse = [&](int nodeID)
 		{
 			// Invalid node; return early.
 			if (nodeID == NO_VALUE)
 				return;
-
+			i++;
 			const auto& node = _nodes[nodeID];
 
 			// Test node collision.
@@ -199,7 +199,7 @@ namespace TEN::Math
 
 		// Traverse tree from root node.
 		traverse(_rootID);
-
+		PrintDebugMessage("travs: %d", i);
 		return objectIds;
 	}
 
@@ -447,8 +447,8 @@ namespace TEN::Math
 			*this = {};
 	}
 
-	// Perform a left or right rotation if input node is imbalanced.
-	// Return new subtree root ID.
+	// Performs left or right tree rotation if input node is imbalanced.
+	// Returns new subtree root ID.
 	int BoundingTree::BalanceNode(int nodeID)
 	{
 		if (nodeID == NO_VALUE)
@@ -595,10 +595,11 @@ namespace TEN::Math
 
 	void BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary)
 	{
+		_nodes.reserve(objectIds.size());
 		Build(objectIds, aabbs, 0, (int)objectIds.size(), boundary);
-		_rootID = (int)_nodes.size() - 1;
 	}
 
+	// Constructs tree recursively using top-down approach with surface area heuristic (SAH).
 	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
 	{
 		// FAILSAFE.
@@ -622,12 +623,43 @@ namespace TEN::Math
 			_nodes.push_back(node);
 			return newNodeID;
 		}
-		// Split node.
+		// Inner node.
 		else
 		{
-			int mid = (start + end) / 2;
-			node.LeftChildID = Build(objectIds, aabbs, start, mid);
-			node.RightChildID = Build(objectIds, aabbs, mid, end);
+			int bestSplit = (start + end) / 2;
+			float bestCost = INFINITY;
+
+			// Find best split.
+			for (int split = (start + 1); split < end; split++)
+			{
+				// Calculate AABB 0.
+				auto aabb0 = aabbs[start];
+				*(Vector3*)&aabb0.Extents += Vector3(boundary);
+				for (int i = (start + 1); i < split; i++)
+					BoundingBox::CreateMerged(aabb0, aabb0, aabbs[i]);
+
+				// Calculate AABB 1.
+				auto aabb1 = aabbs[split];
+				*(Vector3*)&aabb1.Extents += Vector3(boundary);
+				for (int i = split; i < end; i++)
+					BoundingBox::CreateMerged(aabb1, aabb1, aabbs[i]);
+
+				// Calculate cost.
+				float surfaceArea0 = Geometry::GetBoundingBoxArea(aabb0);
+				float surfaceArea1 = Geometry::GetBoundingBoxArea(aabb1);
+				float cost = (surfaceArea0 * (split - start)) + (surfaceArea1 * (end - split));
+
+				// Track best split.
+				if (cost < bestCost)
+				{
+					bestSplit = split;
+					bestCost = cost;
+				}
+			}
+
+			// Create children recursively.
+			node.LeftChildID = Build(objectIds, aabbs, start, bestSplit);
+			node.RightChildID = Build(objectIds, aabbs, bestSplit, end);
 
 			// Set parent ID for children.
 			int newNodeID = (int)_nodes.size();
@@ -643,6 +675,10 @@ namespace TEN::Math
 			_nodes.push_back(node);
 			return newNodeID;
 		}
+
+		_rootID = (int)_nodes.size() - 1;
+
+		//Validate(_rootID);
 	}
 
 	void BoundingTree::Validate() const
