@@ -11,14 +11,28 @@ using TEN::Renderer::g_Renderer;
 // https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
 
 // TODO:
-// - Set correct node depths.
-// - Why is traversal so expensive? Is the tree unbalanced?
+// - Tree is slightly unbalanced. Node heights are still wrong?
 
 namespace TEN::Math
 {
 	bool BoundingTree::Node::IsLeaf() const
 	{
 		return (LeftChildID == NO_VALUE && RightChildID == NO_VALUE);
+	}
+
+	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary)
+	{
+		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree ctor: Object ID and AABB counts unequal.");
+
+		// Debug
+		_nodes.clear();
+		for (int i = 0; i < objectIds.size(); i++)
+			Insert(objectIds[i], aabbs[i], boundary);
+
+		Validate(_rootID);
+
+		//Rebuild(objectIds, aabbs, 0, (int)objectIds.size());
+		//_rootID = int(_nodes.size() - 1);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds() const
@@ -32,21 +46,6 @@ namespace TEN::Math
 			objectIds.push_back(objectID);
 
 		return objectIds;
-	}
-
-	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary)
-	{
-		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree ctor: object ID and AABB counts not equal.");
-
-		// Debug
-		_nodes.clear();
-		for (int i = 0; i < objectIds.size(); i++)
-			Insert(objectIds[i], aabbs[i], boundary);
-
-		Validate(_rootID);
-
-		//Rebuild(objectIds, aabbs, 0, (int)objectIds.size());
-		//_rootID = int(_nodes.size() - 1);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds(const Ray& ray, float dist) const
@@ -98,9 +97,10 @@ namespace TEN::Math
 		int leafID = GetNewNodeID();
 		auto& leaf = _nodes[leafID];
 
-		// Set object ID and AABB.
+		// Set initial parameters.
 		leaf.ObjectID = objectID;
 		leaf.Aabb = BoundingBox(aabb.Center, aabb.Extents + Vector3(boundary));
+		leaf.Height = 0;
 
 		// Insert new leaf.
 		InsertLeaf(leafID);
@@ -111,18 +111,22 @@ namespace TEN::Math
 		// Find leaf containing object ID.
 		auto it = _leafIDMap.find(objectID);
 		if (it == _leafIDMap.end())
+		{
+			TENLog("BoundingTree: attempted to move missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
 			return;
+		}
 
 		// Get leaf.
 		int leafID = it->second;
 		auto& leaf = _nodes[leafID];
 
-		// Test if current AABB is inside expanded AABB within extents threshold.
+		// Test if object AABB is inside node AABB.
 		if (leaf.Aabb.Contains(aabb) == ContainmentType::CONTAINS)
 		{
 			auto deltaExtents = leaf.Aabb.Extents - aabb.Extents;
 			float threshold = boundary * 2;
 
+			// Test if object AABB is significantly smaller than node AABB.
 			if (deltaExtents.x < threshold &&
 				deltaExtents.y < threshold &&
 				deltaExtents.z < threshold)
@@ -141,7 +145,10 @@ namespace TEN::Math
 		// Find leaf containing object ID.
 		auto it = _leafIDMap.find(objectID);
 		if (it == _leafIDMap.end())
+		{
+			TENLog("BoundingTree: attempted to remove missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
 			return;
+		}
 
 		// Prune leaf.
 		int leafID = it->second;
@@ -154,15 +161,14 @@ namespace TEN::Math
 
 		PrintDebugMessage("BOUNDING TREE DEBUG");
 
-		int farthestDepth = 0;
-		for (const auto& node : _nodes)
+		if (!_nodes.empty())
 		{
-			//DrawDebugBox(node.Aabb, BOX_COLOR);
-			farthestDepth = std::max(farthestDepth, node.Depth);
+			PrintDebugMessage("Nodes: %d", (int)_nodes.size());
+			PrintDebugMessage("Root height: %d", _nodes[_rootID].Height);
 		}
 
-		PrintDebugMessage("Nodes: %d", (int)_nodes.size());
-		PrintDebugMessage("Farthest depth: %d", farthestDepth);
+		for (const auto& node : _nodes)
+			DrawDebugBox(node.Aabb, BOX_COLOR);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const
@@ -172,7 +178,6 @@ namespace TEN::Math
 			return objectIds;
 
 		int traversalCount = 0;
-
 		std::function<void(int)> traverse = [&](int nodeID)
 		{
 			traversalCount++;
@@ -192,7 +197,7 @@ namespace TEN::Math
 			{
 				objectIds.push_back(node.ObjectID);
 			}
-			// Traverse nodes.
+			// Traverse children recursively.
 			else
 			{
 				traverse(node.LeftChildID);
@@ -202,8 +207,8 @@ namespace TEN::Math
 
 		// Traverse tree from root node.
 		traverse(_rootID);
+		PrintDebugMessage("Traversal count: %d", traversalCount);
 
-		PrintDebugMessage("traversal count: %d", traversalCount);
 		return objectIds;
 	}
 
@@ -297,7 +302,7 @@ namespace TEN::Math
 		if (_rootID == NO_VALUE)
 		{
 			auto& leaf = _nodes[leafID];
-			leaf.Depth = 0;
+			leaf.Height = 0;
 
 			_rootID = leafID;
 			_leafIDMap.insert({ leaf.ObjectID, leafID });
@@ -322,6 +327,7 @@ namespace TEN::Math
 
 		// Update nodes.
 		parent.Aabb = aabb;
+		parent.Height = sibling.Height + 1;
 		parent.ParentID = prevParentID;
 		parent.LeftChildID = siblingID;
 		parent.RightChildID = leafID;
@@ -331,7 +337,6 @@ namespace TEN::Math
 		if (prevParentID == NO_VALUE)
 		{
 			_rootID = parentID;
-			parent.Depth = 0;
 		}
 		else
 		{
@@ -346,12 +351,7 @@ namespace TEN::Math
 			{
 				prevParent.RightChildID = parentID;
 			}
-
-			parent.Depth = prevParent.Depth + 1;
 		}
-
-		sibling.Depth = parent.Depth + 1;
-		leaf.Depth = parent.Depth + 1;
 
 		// Refit.
 		RefitNode(leafID);
@@ -362,6 +362,7 @@ namespace TEN::Math
 		//Validate(leafID);
 	}
 
+	// TODO: Check.
 	void BoundingTree::RemoveLeaf(int leafID)
 	{
 		// Prune branch.
@@ -399,17 +400,72 @@ namespace TEN::Math
 		}
 	}
 
-	// TODO: Depths are reversed.
+	void BoundingTree::RefitNode(int nodeID)
+	{
+		const auto& node = _nodes[nodeID];
+
+		// Retread tree branch to refit AABBs.
+		int parentID = node.ParentID;
+		while (parentID != NO_VALUE)
+		{
+			// Balance node and get new subtree root.
+			int newParentID = BalanceNode(parentID);
+			auto& parent = _nodes[newParentID];
+
+			if (parent.LeftChildID != NO_VALUE && parent.RightChildID != NO_VALUE)
+			{
+				const auto& leftChild = _nodes[parent.LeftChildID];
+				const auto& rightChild = _nodes[parent.RightChildID];
+
+				BoundingBox::CreateMerged(parent.Aabb, leftChild.Aabb, rightChild.Aabb);
+				parent.Height = std::max(leftChild.Height, rightChild.Height) + 1;
+			}
+			else if (parent.LeftChildID != NO_VALUE)
+			{
+				const auto& leftChild = _nodes[parent.LeftChildID];
+
+				parent.Aabb = leftChild.Aabb;
+				parent.Height = leftChild.Height + 1;
+			}
+			else if (parent.RightChildID != NO_VALUE)
+			{
+				const auto& rightChild = _nodes[parent.RightChildID];
+
+				parent.Aabb = rightChild.Aabb;
+				parent.Height = rightChild.Height + 1;
+			}
+
+			int prevParentID = parentID;
+			parentID = parent.ParentID;
+		}
+	}
+
+	void BoundingTree::RemoveNode(int nodeID)
+	{
+		auto& node = _nodes[nodeID];
+
+		// Remove leaf from map.
+		if (node.IsLeaf())
+			_leafIDMap.erase(node.ObjectID);
+
+		// Clear node and mark free.
+		node = {};
+		_freeNodeIds.push_back(nodeID);
+
+		// Shrink capacity if empty to prevent memory bloat.
+		if (_nodes.size() == _freeNodeIds.size())
+			*this = {};
+	}
+
+	// Perform a left or right rotation if input node is imbalanced.
+	// Return new subtree root ID.
 	int BoundingTree::BalanceNode(int nodeID)
 	{
-		// Perform a left or right rotation if node A is imbalanced.
-		// Returns the new root index.
-
 		if (nodeID == NO_VALUE)
 			return nodeID;
 
 		auto& nodeA = _nodes[nodeID];
-		if (nodeA.IsLeaf() || nodeA.Depth < 2)
+		if (nodeA.IsLeaf() || nodeA.Height < 2)
 			return nodeID;
 
 		int nodeIDB = nodeA.LeftChildID;
@@ -420,7 +476,7 @@ namespace TEN::Math
 		auto& nodeB = _nodes[nodeIDB];
 		auto& nodeC = _nodes[nodeIDC];
 
-		int balance = nodeC.Depth - nodeB.Depth;
+		int balance = nodeC.Height - nodeB.Height;
 
 		// Rotate C up.
 		if (balance > 1)
@@ -456,12 +512,12 @@ namespace TEN::Math
 			}
 
 			// Rotate.
-			if (nodeF.Depth > nodeG.Depth)
+			if (nodeF.Height > nodeG.Height)
 			{
 				BoundingBox::CreateMerged(nodeA.Aabb, nodeB.Aabb, nodeG.Aabb);
 				BoundingBox::CreateMerged(nodeC.Aabb, nodeA.Aabb, nodeF.Aabb);
-				nodeA.Depth = std::max(nodeB.Depth, nodeG.Depth) + 1;
-				nodeC.Depth = std::max(nodeA.Depth, nodeF.Depth) + 1;
+				nodeA.Height = std::max(nodeB.Height, nodeG.Height) + 1;
+				nodeC.Height = std::max(nodeA.Height, nodeF.Height) + 1;
 
 				nodeG.ParentID = nodeID;
 				nodeC.RightChildID = nodeIDF;
@@ -471,8 +527,8 @@ namespace TEN::Math
 			{
 				BoundingBox::CreateMerged(nodeA.Aabb, nodeB.Aabb, nodeF.Aabb);
 				BoundingBox::CreateMerged(nodeC.Aabb, nodeA.Aabb, nodeG.Aabb);
-				nodeA.Depth = std::max(nodeB.Depth, nodeF.Depth) + 1;
-				nodeC.Depth = std::max(nodeA.Depth, nodeG.Depth) + 1;
+				nodeA.Height = std::max(nodeB.Height, nodeF.Height) + 1;
+				nodeC.Height = std::max(nodeA.Height, nodeG.Height) + 1;
 
 				nodeF.ParentID = nodeID;
 				nodeC.RightChildID = nodeIDG;
@@ -516,12 +572,12 @@ namespace TEN::Math
 			}
 
 			// Rotate.
-			if (nodeD.Depth > nodeE.Depth)
+			if (nodeD.Height > nodeE.Height)
 			{
 				BoundingBox::CreateMerged(nodeA.Aabb, nodeC.Aabb, nodeE.Aabb);
 				BoundingBox::CreateMerged(nodeB.Aabb, nodeA.Aabb, nodeD.Aabb);
-				nodeA.Depth = std::max(nodeC.Depth, nodeE.Depth) + 1;
-				nodeB.Depth = std::max(nodeA.Depth, nodeD.Depth) + 1;
+				nodeA.Height = std::max(nodeC.Height, nodeE.Height) + 1;
+				nodeB.Height = std::max(nodeA.Height, nodeD.Height) + 1;
 
 				nodeB.RightChildID = nodeIDD;
 				nodeA.LeftChildID = nodeIDE;
@@ -531,8 +587,8 @@ namespace TEN::Math
 			{
 				BoundingBox::CreateMerged(nodeA.Aabb, nodeC.Aabb, nodeD.Aabb);
 				BoundingBox::CreateMerged(nodeB.Aabb, nodeA.Aabb, nodeE.Aabb);
-				nodeA.Depth = std::max(nodeC.Depth, nodeD.Depth) + 1;
-				nodeB.Depth = std::max(nodeA.Depth, nodeE.Depth) + 1;
+				nodeA.Height = std::max(nodeC.Height, nodeD.Height) + 1;
+				nodeB.Height = std::max(nodeA.Height, nodeE.Height) + 1;
 
 				nodeB.RightChildID = nodeIDE;
 				nodeA.LeftChildID = nodeIDD;
@@ -545,65 +601,8 @@ namespace TEN::Math
 		return nodeID;
 	}
 
-	void BoundingTree::RefitNode(int nodeID)
-	{
-		const auto& node = _nodes[nodeID];
-
-		// Retread tree branch to refit AABBs.
-		int parentID = node.ParentID;
-		while (parentID != NO_VALUE)
-		{
-			// Balance the node and get the new root of the subtree.
-			int newParentID = BalanceNode(parentID);
-			auto& parent = _nodes[newParentID];
-
-			if (parent.LeftChildID != NO_VALUE && parent.RightChildID != NO_VALUE)
-			{
-				const auto& leftChild = _nodes[parent.LeftChildID];
-				const auto& rightChild = _nodes[parent.RightChildID];
-
-				BoundingBox::CreateMerged(parent.Aabb, leftChild.Aabb, rightChild.Aabb);
-				parent.Depth = std::max(leftChild.Depth, rightChild.Depth) - 1;
-			}
-			else if (parent.LeftChildID != NO_VALUE)
-			{
-				const auto& leftChild = _nodes[parent.LeftChildID];
-
-				parent.Aabb = leftChild.Aabb;
-				parent.Depth = leftChild.Depth - 1;
-			}
-			else if (parent.RightChildID != NO_VALUE)
-			{
-				const auto& rightChild = _nodes[parent.RightChildID];
-
-				parent.Aabb = rightChild.Aabb;
-				parent.Depth = rightChild.Depth - 1;
-			}
-
-			int prevParentID = parentID;
-			parentID = parent.ParentID;
-		}
-	}
-
-	void BoundingTree::RemoveNode(int nodeID)
-	{
-		auto& node = _nodes[nodeID];
-
-		// Remove leaf from map.
-		if (node.IsLeaf())
-			_leafIDMap.erase(node.ObjectID);
-
-		// Clear node and mark free.
-		node = {};
-		_freeNodeIds.push_back(nodeID);
-
-		// Shrink capacity if empty to prevent memory bloat.
-		if (_nodes.size() == _freeNodeIds.size())
-			*this = {};
-	}
-
 	// TODO: Refactor into a fast bottom-up algorithm that produces a balanced tree.
-	int BoundingTree::Rebuild(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
+	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
 	{
 		// FAILSAFE.
 		if (start >= end)
@@ -630,10 +629,10 @@ namespace TEN::Math
 		else
 		{
 			int mid = (start + end) / 2;
-			node.LeftChildID = Rebuild(objectIds, aabbs, start, mid);
-			node.RightChildID = Rebuild(objectIds, aabbs, mid, end);
+			node.LeftChildID = Build(objectIds, aabbs, start, mid);
+			node.RightChildID = Build(objectIds, aabbs, mid, end);
 
-			// Set parent ID for child nodes.
+			// Set parent ID for children.
 			int newNodeID = (int)_nodes.size();
 			if (node.LeftChildID != NO_VALUE)
 			{
@@ -726,13 +725,13 @@ namespace TEN::Math
 		}
 
 		// TODO: Invalid.
-		// Validate depth.
+		// Validate height.
 		if (nodeID != _rootID)
 		{
 			const auto& parent = _nodes[node.ParentID];
-			//TENAssert(node.Depth == (parent.Depth + 1), "BoundingTree: Node depth inconsistent with parent.");
+			//TENAssert(node.Height == (parent.Height - 1), "BoundingTree: Node height inconsistent with parent.");
 
-			//PrintDebugMessage("%d, %d", node.Depth, parent.Depth);
+			//PrintDebugMessage("%d, %d", node.Height, parent.Height);
 		}
 
 		// Validate recursively.

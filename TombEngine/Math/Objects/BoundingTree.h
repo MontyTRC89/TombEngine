@@ -12,7 +12,7 @@ namespace TEN::Math
 		{
 			int			ObjectID = -1; // NOTE: Only leaf node stores object ID directly.
 			BoundingBox Aabb	 = BoundingBox();
-			int			Depth	 = -1;
+			int			Height	 = -1;
 
 			int ParentID	 = -1;
 			int LeftChildID	 = -1;
@@ -54,24 +54,27 @@ namespace TEN::Math
 		void DrawDebug() const;
 
 	private:
-		// Helper getters
+		// Collision helpers
 
 		std::vector<int> GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const;
-		int				 GetNewNodeID();
-		int				 GetBestSiblingLeafID(int leafID) const;
 
-		// Helper utilities
+		// Dynamic helpers
+
+		int GetNewNodeID();
+		int GetBestSiblingLeafID(int leafID) const;
 
 		void InsertLeaf(int leafID);
 		void RemoveLeaf(int leafID);
 
-		int	 BalanceNode(int nodeID);
 		void RefitNode(int nodeID);
 		void RemoveNode(int nodeID);
+		int	 BalanceNode(int nodeID);
 
-		int Rebuild(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary = 0.0f);
+		// Static helpers
 
-		// Debug
+		int Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary = 0.0f);
+
+		// Debug helpers
 
 		void Validate() const;
 		void Validate(int nodeID) const;
