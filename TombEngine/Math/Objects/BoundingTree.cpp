@@ -597,6 +597,7 @@ namespace TEN::Math
 	{
 		_nodes.reserve(objectIds.size());
 		Build(objectIds, aabbs, 0, (int)objectIds.size(), boundary);
+		_rootID = (int)_nodes.size() - 1;
 	}
 
 	// Constructs tree recursively using top-down approach with surface area heuristic (SAH).
@@ -675,8 +676,6 @@ namespace TEN::Math
 			_nodes.push_back(node);
 			return newNodeID;
 		}
-
-		_rootID = (int)_nodes.size() - 1;
 
 		//Validate(_rootID);
 	}
