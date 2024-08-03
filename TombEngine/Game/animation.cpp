@@ -120,6 +120,14 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				int soundID = commandDataPtr[1] & 0xFFF;	   // Exclude last 4 bits for sound ID.
 				int soundEnvFlag = commandDataPtr[1] & 0xF000; // Keep only last 4 bits for sound environment flag.
 
+				// FAILSAFE.
+				if (item.RoomNumber == NO_VALUE)
+				{
+					SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
+					commandDataPtr += 2;
+					break;
+				}
+
 				// Get required sound environment from flag.
 				auto requiredSoundEnv = SoundEnvironment::Always;
 				switch (soundEnvFlag)
