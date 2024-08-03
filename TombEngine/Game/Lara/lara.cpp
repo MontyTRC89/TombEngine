@@ -212,7 +212,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 		if (movID != NO_VALUE)
 		{
-			if (g_Level.Items[movID].IsBridge() || movID == 0)
+			if (g_Level.Items[movID].IsBridge())
 				continue;
 
 			movIds.push_back(movID);
@@ -222,9 +222,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	auto tree = BoundingTree(movIds, aabbs);
 	tree.DrawDebug();
-	PrintDebugMessage(":");
-	auto movIds2 = tree.GetBoundedObjectIds(Ray(item->Pose.Position.ToVector3() + Vector3(0, -LARA_HEIGHT, 0), item->Pose.Orientation.ToDirection()), BLOCK(1));
-	PrintDebugMessage(":");
+	//auto movIds2 = tree.GetBoundedObjectIds(Ray(item->Pose.Position.ToVector3() + Vector3(0, -LARA_HEIGHT, 0), item->Pose.Orientation.ToDirection()), BLOCK(1));
+	auto movIds2 = tree.GetBoundedObjectIds(item->GetObb());
 
 	//--------
 

@@ -26,7 +26,7 @@ namespace TEN::Entities::Generic
 		return _collisionMesh;
 	}
 
-	/*const Attractor& BridgeObject::GetAttractor() const
+	/*const AttractorObject& BridgeObject::GetAttractor() const
 	{
 		reutrn _attractor;
 	}*/

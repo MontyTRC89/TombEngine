@@ -2,10 +2,8 @@
 #include "Math/Objects/BoundingTree.h"
 
 #include "Math/Math.h"
-#include "Renderer/Renderer.h"
 
 using namespace TEN::Math;
-using TEN::Renderer::g_Renderer;
 
 // TODO: Add licence? Heavily referenced this implementation, which has an MIT licence and requests attribution:
 // https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
@@ -25,14 +23,12 @@ namespace TEN::Math
 		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree ctor: Object ID and AABB counts unequal.");
 
 		// Debug
-		_nodes.clear();
 		for (int i = 0; i < objectIds.size(); i++)
 			Insert(objectIds[i], aabbs[i], boundary);
 
-		Validate(_rootID);
+		//Build(objectIds, aabbs, boundary);
 
-		//Rebuild(objectIds, aabbs, 0, (int)objectIds.size());
-		//_rootID = int(_nodes.size() - 1);
+		//Validate(_rootID);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds() const
@@ -55,8 +51,6 @@ namespace TEN::Math
 			float intersectDist = 0.0f;
 			return (node.Aabb.Intersects(ray.position, ray.direction, intersectDist) && intersectDist <= dist);
 		};
-
-		DrawDebugLine(ray.position, Geometry::TranslatePoint(ray.position, ray.direction, dist), Color(1,1,1));
 
 		return GetBoundedObjectIds(testColl);
 	}
@@ -112,7 +106,7 @@ namespace TEN::Math
 		auto it = _leafIDMap.find(objectID);
 		if (it == _leafIDMap.end())
 		{
-			TENLog("BoundingTree: attempted to move missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
+			TENLog("BoundingTree: Attempted to move missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
 			return;
 		}
 
@@ -146,7 +140,7 @@ namespace TEN::Math
 		auto it = _leafIDMap.find(objectID);
 		if (it == _leafIDMap.end())
 		{
-			TENLog("BoundingTree: attempted to remove missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
+			TENLog("BoundingTree: Attempted to remove missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
 			return;
 		}
 
@@ -157,7 +151,7 @@ namespace TEN::Math
 
 	void BoundingTree::DrawDebug() const
 	{
-		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f);
+		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f, 0.3f);
 
 		PrintDebugMessage("BOUNDING TREE DEBUG");
 
@@ -177,11 +171,8 @@ namespace TEN::Math
 		if (_nodes.empty())
 			return objectIds;
 
-		int traversalCount = 0;
 		std::function<void(int)> traverse = [&](int nodeID)
 		{
-			traversalCount++;
-
 			// Invalid node; return early.
 			if (nodeID == NO_VALUE)
 				return;
@@ -207,7 +198,6 @@ namespace TEN::Math
 
 		// Traverse tree from root node.
 		traverse(_rootID);
-		PrintDebugMessage("Traversal count: %d", traversalCount);
 
 		return objectIds;
 	}
@@ -362,7 +352,6 @@ namespace TEN::Math
 		//Validate(leafID);
 	}
 
-	// TODO: Check.
 	void BoundingTree::RemoveLeaf(int leafID)
 	{
 		// Prune branch.
@@ -601,6 +590,12 @@ namespace TEN::Math
 		return nodeID;
 	}
 
+	void BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary)
+	{
+		Build(objectIds, aabbs, 0, (int)objectIds.size(), boundary);
+		_rootID = (int)_nodes.size() - 1;
+	}
+
 	// TODO: Refactor into a fast bottom-up algorithm that produces a balanced tree.
 	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
 	{
@@ -670,7 +665,7 @@ namespace TEN::Math
 				count++;
 			}
 
-			TENAssert(count == 1, "BoundingTree contains duplicate object IDs.");
+			TENAssert(count == 1, "BoundingTree: Duplicate object IDs contained.");
 		}
 	}
 
@@ -690,11 +685,13 @@ namespace TEN::Math
 		if (node.IsLeaf())
 		{
 			TENAssert(node.ObjectID != NO_VALUE, "BoundingTree: Leaf node must contain object ID.");
+			TENAssert(node.Height == 0, "BoundingTree: Leaf node must have height of 0.");
 		}
 		// Validate inner node.
 		else
 		{
 			TENAssert(node.ObjectID == NO_VALUE, "BoundingTree: Inner node cannot contain object ID.");
+			TENAssert(node.Height != 0, "BoundingTree: Inner node cannot have height of 0.");
 		}
 
 		// Validate parent.
@@ -724,14 +721,11 @@ namespace TEN::Math
 			TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree: Node AABB does not contain children.");
 		}
 
-		// TODO: Invalid.
 		// Validate height.
 		if (nodeID != _rootID)
 		{
 			const auto& parent = _nodes[node.ParentID];
-			//TENAssert(node.Height == (parent.Height - 1), "BoundingTree: Node height inconsistent with parent.");
-
-			//PrintDebugMessage("%d, %d", node.Height, parent.Height);
+			TENAssert(node.Height < parent.Height, "BoundingTree: Child height must be less than parent height.");
 		}
 
 		// Validate recursively.

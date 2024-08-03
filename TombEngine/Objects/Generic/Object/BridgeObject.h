@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Math/Math.h"
 #include "Physics/Physics.h"
 
@@ -13,9 +14,9 @@ namespace TEN::Entities::Generic
 	{
 	private:
 		// Members
-		BoundingBox	  _aabb			 = BoundingBox();
-		CollisionMesh _collisionMesh = CollisionMesh();
-		//Attractor	  _attractor	 = Attractor();
+		BoundingBox		_aabb		   = BoundingBox();
+		CollisionMesh	_collisionMesh = CollisionMesh();
+		//AttractorObject _attractor	   = AttractorObject();
 
 		Pose				_prevPose		= Pose::Zero;
 		int					_prevRoomNumber = 0;
@@ -30,9 +31,9 @@ namespace TEN::Entities::Generic
 		std::function<int(const ItemInfo& item)> GetCeilingBorder = nullptr;
 
 		// Getters
-		const BoundingBox&	 GetAabb() const;
-		const CollisionMesh& GetCollisionMesh() const;
-		//const Attractor&	 GetAttractor() const;
+		const BoundingBox&	   GetAabb() const;
+		const CollisionMesh&   GetCollisionMesh() const;
+		//const AttractorObject& GetAttractor() const;
 
 		// Utilities
 		void Initialize(const ItemInfo& item);
