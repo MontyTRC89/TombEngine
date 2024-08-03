@@ -24,10 +24,6 @@ namespace TEN::Math
 	{
 		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree ctor: Object ID and AABB counts unequal.");
 
-		// Debug
-		//for (int i = 0; i < objectIds.size(); i++)
-		//	Insert(objectIds[i], aabbs[i], boundary);
-
 		Build(objectIds, aabbs, boundary);
 	}
 

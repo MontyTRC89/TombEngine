@@ -62,7 +62,7 @@ namespace TEN::Entities::Generic
 	void BridgeObject::DeassignSectors(const ItemInfo& item) const
 	{
 		// Deassign sectors.
-		int sectorSearchDepth = (int)ceil(std::max(std::max(_prevObb.Extents.x, _prevObb.Extents.y), _prevObb.Extents.z) / BLOCK(1));
+		unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_prevObb.Extents.x, _prevObb.Extents.y), _prevObb.Extents.z) / BLOCK(1));
 		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);
 		for (auto* sector : sectors)
 		{
