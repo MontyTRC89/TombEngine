@@ -9,7 +9,8 @@ using namespace TEN::Math;
 // https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
 
 // TODO:
-// - Tree is slightly unbalanced. Node heights are still wrong?
+// - Can't use NO_VALUE for some reason.
+// - Better static build method. Refactor into a fast bottom-up algorithm that produces a balanced tree.
 
 namespace TEN::Math
 {
@@ -151,7 +152,7 @@ namespace TEN::Math
 
 	void BoundingTree::DrawDebug() const
 	{
-		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f, 0.3f);
+		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f, 0.5f);
 
 		PrintDebugMessage("BOUNDING TREE DEBUG");
 
@@ -486,13 +487,14 @@ namespace TEN::Math
 			// Make A's previous parent point to C.
 			if (nodeC.ParentID != NO_VALUE)
 			{
-				if (_nodes[nodeC.ParentID].LeftChildID == nodeID)
+				auto& parent = _nodes[nodeC.ParentID];
+				if (parent.LeftChildID == nodeID)
 				{
-					_nodes[nodeC.ParentID].LeftChildID = nodeIDC;
+					parent.LeftChildID = nodeIDC;
 				}
 				else
 				{
-					_nodes[nodeC.ParentID].RightChildID = nodeIDC;
+					parent.RightChildID = nodeIDC;
 				}
 			}
 			else
@@ -546,13 +548,14 @@ namespace TEN::Math
 			// Make A's previous parent point to B.
 			if (nodeB.ParentID != NO_VALUE)
 			{
-				if (_nodes[nodeB.ParentID].LeftChildID == nodeID)
+				auto& parent = _nodes[nodeB.ParentID];
+				if (parent.LeftChildID == nodeID)
 				{
-					_nodes[nodeB.ParentID].LeftChildID = nodeIDB;
+					parent.LeftChildID = nodeIDB;
 				}
 				else
 				{
-					_nodes[nodeB.ParentID].RightChildID = nodeIDB;
+					parent.RightChildID = nodeIDB;
 				}
 			}
 			else
@@ -596,7 +599,6 @@ namespace TEN::Math
 		_rootID = (int)_nodes.size() - 1;
 	}
 
-	// TODO: Refactor into a fast bottom-up algorithm that produces a balanced tree.
 	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
 	{
 		// FAILSAFE.

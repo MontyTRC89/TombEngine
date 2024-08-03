@@ -216,7 +216,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				continue;
 
 			movIds.push_back(movID);
-			aabbs.push_back(GetAabb(mov.GetObb()));
+			aabbs.push_back(GetAabb(g_Level.Items[movID].GetObb()));
 		}
 	}
 
