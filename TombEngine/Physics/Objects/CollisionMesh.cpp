@@ -199,7 +199,6 @@ namespace TEN::Physics
 
 		const CollisionTriangle* closestTri = nullptr;
 		float closestDist = INFINITY;
-		bool isIntersected = false;
 
 		// Find closest triangle.
 		for (int triID : triIds)
@@ -212,11 +211,10 @@ namespace TEN::Physics
 			{
 				closestTri = &tri;
 				closestDist = intersectDist;
-				isIntersected = true;
 			}
 		}
 
-		if (isIntersected)
+		if (closestTri != nullptr)
 			return CollisionMeshRayCollisionData{ *closestTri, closestDist };
 
 		return std::nullopt;

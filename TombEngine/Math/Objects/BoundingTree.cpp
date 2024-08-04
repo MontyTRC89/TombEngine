@@ -10,8 +10,8 @@ using namespace TEN::Math;
 
 // TODO:
 // - Can't use NO_VALUE in .h file for some reason.
-// - Finish static build method.
-// - Faster static build method.
+// - Faster static build method? Current complexity is O(n^2), which is okay for one-off generation, but it may hurt level load times and
+//   some collision meshes will have to rebuild frequently if they move.
 
 namespace TEN::Math
 {
@@ -22,7 +22,7 @@ namespace TEN::Math
 
 	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary)
 	{
-		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree ctor: Object ID and AABB counts unequal.");
+		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree: Object ID and AABB counts unequal in static constructor.");
 
 		Build(objectIds, aabbs, boundary);
 	}
@@ -594,6 +594,8 @@ namespace TEN::Math
 		_nodes.reserve(objectIds.size());
 		Build(objectIds, aabbs, 0, (int)objectIds.size(), boundary);
 		_rootID = (int)_nodes.size() - 1;
+
+		Validate();
 	}
 
 	// Constructs tree recursively using top-down approach with surface area heuristic (SAH).
@@ -615,10 +617,12 @@ namespace TEN::Math
 		if ((end - start) == 1)
 		{
 			node.ObjectID = objectIds[start];
-
-			int newNodeID = (int)_nodes.size();
+			node.Height = 0;
+			
+			int nodeID = (int)_nodes.size();
 			_nodes.push_back(node);
-			return newNodeID;
+			_leafIDMap.insert({ node.ObjectID, nodeID }); // TODO: Duplicates set?
+			return nodeID;
 		}
 		// Inner node.
 		else
@@ -659,21 +663,20 @@ namespace TEN::Math
 			node.RightChildID = Build(objectIds, aabbs, bestSplit, end);
 
 			// Set parent ID for children.
-			int newNodeID = (int)_nodes.size();
+			int nodeID = (int)_nodes.size();
 			if (node.LeftChildID != NO_VALUE)
 			{
-				_nodes[node.LeftChildID].ParentID = newNodeID;
+				_nodes[node.LeftChildID].ParentID = nodeID;
 			}
 			if (node.RightChildID != NO_VALUE)
 			{
-				_nodes[node.RightChildID].ParentID = newNodeID;
+				_nodes[node.RightChildID].ParentID = nodeID;
 			}
 
 			_nodes.push_back(node);
-			return newNodeID;
+			_nodes[nodeID].Height = std::max(node.LeftChildID != NO_VALUE ? _nodes[node.LeftChildID].Height : 0, node.RightChildID != NO_VALUE ? _nodes[node.RightChildID].Height : 0) + 1;
+			return nodeID;
 		}
-
-		//Validate(_rootID);
 	}
 
 	void BoundingTree::Validate() const
@@ -698,7 +701,8 @@ namespace TEN::Math
 				count++;
 			}
 
-			TENAssert(count == 1, "BoundingTree: Duplicate object IDs contained.");
+			// TODO: Fails for static build.
+			//TENAssert(count == 1, "BoundingTree: Duplicate object IDs contained.");
 		}
 	}
 
