@@ -280,6 +280,9 @@ void KillItem(short const itemNumber)
 		{
 			auto& bridge = GetBridgeObject(*item);
 			bridge.DeassignSectors(*item);
+
+			auto& room = g_Level.Rooms[item->RoomNumber];
+			room.Bridges.Remove(item->Index);
 		}
 
 		GameScriptHandleKilled(itemNumber, true);
@@ -544,69 +547,70 @@ void RemoveActiveItem(short itemNumber, bool killed)
 
 void InitializeItem(short itemNumber) 
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
+	const auto& object = Objects[item.ObjectNumber];
 
 	SetAnimation(item, 0);
-	item->Animation.RequiredState = NO_VALUE;
-	item->Animation.Velocity = Vector3::Zero;
+	item.Animation.RequiredState = NO_VALUE;
+	item.Animation.Velocity = Vector3::Zero;
 
 	for (int i = 0; i < ITEM_FLAG_COUNT; i++)
-		item->ItemFlags[i] = 0;
+		item.ItemFlags[i] = 0;
 
-	item->Active = false;
-	item->Status = ITEM_NOT_ACTIVE;
-	item->Animation.IsAirborne = false;
-	item->HitStatus = false;
-	item->Collidable = true;
-	item->LookedAt = false;
-	item->Timer = 0;
-	item->HitPoints = Objects[item->ObjectNumber].HitPoints;
+	item.Active = false;
+	item.Status = ITEM_NOT_ACTIVE;
+	item.Animation.IsAirborne = false;
+	item.HitStatus = false;
+	item.Collidable = true;
+	item.LookedAt = false;
+	item.Timer = 0;
+	item.HitPoints = object.HitPoints;
 
-	if (item->ObjectNumber == ID_HK_ITEM ||
-		item->ObjectNumber == ID_HK_AMMO_ITEM ||
-		item->ObjectNumber == ID_CROSSBOW_ITEM ||
-		item->ObjectNumber == ID_REVOLVER_ITEM)
+	if (item.ObjectNumber == ID_HK_ITEM ||
+		item.ObjectNumber == ID_HK_AMMO_ITEM ||
+		item.ObjectNumber == ID_CROSSBOW_ITEM ||
+		item.ObjectNumber == ID_REVOLVER_ITEM)
 	{
-		item->MeshBits = 1;
+		item.MeshBits = 1;
 	}
 	else
 	{
-		item->MeshBits = ALL_JOINT_BITS;
+		item.MeshBits = ALL_JOINT_BITS;
 	}
 
-	item->TouchBits = NO_JOINT_BITS;
-	item->AfterDeath = 0;
+	item.TouchBits = NO_JOINT_BITS;
+	item.AfterDeath = 0;
 
-	if (item->Flags & IFLAG_INVISIBLE)
+	if (item.Flags & IFLAG_INVISIBLE)
 	{
-		item->Flags &= ~IFLAG_INVISIBLE;
-		item->Status = ITEM_INVISIBLE;
+		item.Flags &= ~IFLAG_INVISIBLE;
+		item.Status = ITEM_INVISIBLE;
 	}
-	else if (Objects[item->ObjectNumber].intelligent)
+	else if (object.intelligent)
 	{
-		item->Status = ITEM_INVISIBLE;
+		item.Status = ITEM_INVISIBLE;
 	}
 
-	if ((item->Flags & IFLAG_ACTIVATION_MASK) == IFLAG_ACTIVATION_MASK)
+	if ((item.Flags & IFLAG_ACTIVATION_MASK) == IFLAG_ACTIVATION_MASK)
 	{
-		item->Flags &= ~IFLAG_ACTIVATION_MASK;
-		item->Flags |= IFLAG_REVERSE;
+		item.Flags &= ~IFLAG_ACTIVATION_MASK;
+		item.Flags |= IFLAG_REVERSE;
 		AddActiveItem(itemNumber);
-		item->Status = ITEM_ACTIVE;
+		item.Status = ITEM_ACTIVE;
 	}
 
-	auto* room = &g_Level.Rooms[item->RoomNumber];
-	item->NextItem = room->itemNumber;
-	room->itemNumber = itemNumber;
+	auto& room = g_Level.Rooms[item.RoomNumber];
+	item.NextItem = room.itemNumber;
+	room.itemNumber = itemNumber;
 
-	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
-	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
-	item->BoxNumber = floor->PathfindingBoxID;
+	const auto& sector = *GetSector(&room, item.Pose.Position.x - room.x, item.Pose.Position.z - room.z);
+	item.Floor = sector.GetSurfaceHeight(item.Pose.Position.x, item.Pose.Position.z, true);
+	item.BoxNumber = sector.PathfindingBoxID;
 
-	item->ResetModelToDefault();
+	item.ResetModelToDefault();
 
-	if (Objects[item->ObjectNumber].Initialize != nullptr)
-		Objects[item->ObjectNumber].Initialize(itemNumber);
+	if (object.Initialize != nullptr)
+		object.Initialize(itemNumber);
 }
 
 short CreateItem()
@@ -778,6 +782,9 @@ void UpdateAllItems()
 
 		if (item.AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
+			if (item.IsBridge())
+				int i = 0;
+
 			const auto& object = Objects[item.ObjectNumber];
 			if (object.control != nullptr)
 				object.control(itemNumber);

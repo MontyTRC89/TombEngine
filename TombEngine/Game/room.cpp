@@ -124,7 +124,10 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 		if (item.IsBridge())
 		{
 			auto& bridge = GetBridgeObject(item);
-			//bridge.DeassignSectors(item);
+			bridge.DeassignSectors(item);
+
+			auto& room = g_Level.Rooms[item.RoomNumber];
+			room.Bridges.Remove(item.Index);
 		}
 	}
 }

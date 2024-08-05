@@ -130,6 +130,18 @@ static void HandleLosDebug(const ItemInfo& item)
 	DrawDebugTarget(target, Quaternion::Identity, 100, Color(1, 1, 1));
 }
 
+static void HandleBridgeDebug(const ItemInfo& item)
+{
+	auto pointColl = GetPointCollision(item);
+	if (pointColl.GetFloorBridgeItemNumber() != NO_VALUE)
+	{
+		auto& bridgeItem = g_Level.Items[pointColl.GetFloorBridgeItemNumber()];
+
+		bridgeItem.Pose.Position += Vector3i(GetMouseAxis().x * BLOCK(0.5f), 0, GetMouseAxis().y * BLOCK(0.5f));
+		UpdateItemRoom(bridgeItem.Index);
+	}
+}
+
 // temp
 bool IsPointInFront2(const Vector3& origin, const Vector3& target, const Vector3& normal)
 {
@@ -264,6 +276,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	HandleLosDebug(*item);
+	HandleBridgeDebug(*item);
 
 	auto& room = g_Level.Rooms[item->RoomNumber];
 	//GenerateRoomCollisionMesh(room);
@@ -274,18 +287,14 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	{
 		for (auto& item2 : g_Level.Items)
 		{
-			//if (!item2.Active)
-				//continue;
+			if (!item2.Active)
+				continue;
 
 			if (!item2.IsBridge())
 				continue;
 
 			auto& bridge = GetBridgeObject(item2);
 			bridge.Initialize(item2);
-
-			auto labelPos = g_Renderer.Get2DPosition(item2.Pose.Position.ToVector3());
-			//if (labelPos.has_value())
-			//	PrintDebugString(std::to_string(item2.Index), *labelPos, Color(1,1,1), 1, 0, RendererDebugPage::None);
 		}
 
 		hasRun = true;

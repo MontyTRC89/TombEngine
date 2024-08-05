@@ -242,8 +242,8 @@ namespace TEN::Collision::Los
 
 		// 1) Initialize ray.
 		auto ray = Ray(origin, dir);
-		int rayRoomNumber = roomNumber;
 		float rayDist = dist;
+		int rayRoomNumber = roomNumber;
 
 		// 2) Trace rooms through portals.
 		while (true)
@@ -303,8 +303,8 @@ namespace TEN::Collision::Los
 					rayRoomNumber != closestTri->GetPortalRoomNumber()) // FAILSAFE: Prevent infinite loop.
 				{
 					ray.position = intersectPos;
-					rayRoomNumber = closestTri->GetPortalRoomNumber();
 					rayDist -= closestDist;
+					rayRoomNumber = closestTri->GetPortalRoomNumber();
 				}
 				// Tangible triangle; collect remaining room LOS collision data.
 				else
