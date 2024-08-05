@@ -38,6 +38,9 @@ namespace TEN::Entities::Generic
 		InitializeAttractor(item);
 		AssignSectors(item);
 
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		room.Bridges.Insert(item.Index);
+
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
 	}
@@ -53,6 +56,22 @@ namespace TEN::Entities::Generic
 		UpdateAttractor(item);
 		AssignSectors(item);
 
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
+
+		if (item.RoomNumber == _prevRoomNumber)
+		{
+			if (item.Pose != _prevPose)
+				room.Bridges.Move(item.Index);
+		}
+		else
+		{
+			room.Bridges.Insert(item.Index);
+			prevRoom.Bridges.Remove(item.Index);
+		}
+
+		_prevPose = item.Pose;
+		_prevRoomNumber = item.RoomNumber;
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = _aabb;

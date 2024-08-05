@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Math/Math.h"
 #include "Physics/Physics.h"
 
@@ -90,6 +91,34 @@ struct MESH_INFO
 	BoundingOrientedBox GetVisibilityObb() const;
 };
 
+class BridgeHandler
+{
+private:
+	// Constants
+
+	static constexpr auto AABB_BOUNDARY = BLOCK(0.05f);
+
+	// Members
+
+	BoundingTree _tree = BoundingTree();
+
+public:
+	// Constructors
+
+	BridgeHandler() = default;
+
+	// Getters
+
+	std::vector<int> GetBridgeItemNumbers() const;
+	std::vector<int> GetBoundedBridgeItemNumbers(const Ray& ray, float dist) const;
+
+	// Utilities
+
+	void Insert(int bridgeItemNumber);
+	void Move(int bridgeItemNumber);
+	void Remove(int bridgeItemNumber);
+};
+
 struct ROOM_INFO
 {
 	int index;
@@ -113,7 +142,9 @@ struct ROOM_INFO
 	std::string name = {};
 	std::vector<std::string> tags = {};
 
-	CollisionMesh			   CollisionMesh  = TEN::Physics::CollisionMesh();
+	CollisionMesh CollisionMesh = TEN::Physics::CollisionMesh();
+	BridgeHandler Bridges		= BridgeHandler();
+
 	std::vector<FloorInfo>	   floor		  = {};
 	std::vector<ROOM_LIGHT>	   lights		  = {};
 	std::vector<MESH_INFO>	   mesh			  = {};

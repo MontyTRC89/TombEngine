@@ -149,14 +149,19 @@ struct ItemInfo
 	short		  AfterDeath  = 0;
 	short		  CarriedItem = 0;
 
+	// Getters
+
+	BoundingBox			GetAabb() const;
 	BoundingOrientedBox GetObb() const;
 
 	// OCB utilities
+
 	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);
 	void ClearAllOcb();
 
 	// ItemFlags utilities
+
 	bool  TestFlags(int id, short flags) const;		// ItemFlags[id] & flags
 	bool  TestFlagField(int id, short flags) const; // ItemFlags[id] == flags
 	short GetFlagField(int id) const;				// ItemFlags[id]
@@ -164,6 +169,7 @@ struct ItemInfo
 	void  ClearFlags(int id, short flags);			// ItemFlags[id] &= ~flags
 
 	// Model utilities
+
 	bool TestMeshSwapFlags(unsigned int flags);
 	bool TestMeshSwapFlags(const std::vector<unsigned int>& flags);
 	void SetMeshSwapFlags(unsigned int flags, bool clear = false);
@@ -171,6 +177,7 @@ struct ItemInfo
 	void ResetModelToDefault();
 
 	// Inquirers
+
 	bool IsLara() const;
 	bool IsCreature() const;
 	bool IsBridge() const;

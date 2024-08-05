@@ -263,7 +263,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		DrawDebugSphere(sphere, Color(1, 1, 1, 0.1f), RendererDebugPage::None, false);
 	}
 
-	//HandleLosDebug(*item);
+	HandleLosDebug(*item);
 
 	auto& room = g_Level.Rooms[item->RoomNumber];
 	//GenerateRoomCollisionMesh(room);

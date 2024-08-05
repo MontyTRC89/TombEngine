@@ -51,7 +51,7 @@ namespace TEN::Collision::Los
 					break;
 				movID = mov.NextItem;
 
-				// 1) Ignore bridges (handled as part of room).
+				// 1) Ignore bridges (handled as part of room collision).
 				if (mov.IsBridge())
 					continue;
 
@@ -229,61 +229,6 @@ namespace TEN::Collision::Los
 		return losColl;
 	}
 
-	static std::vector<const FloorInfo*> GetTracedSectors(const Ray& ray, int roomNumber, float dist)
-	{
-		// Reserve minimum sector vector size.
-		auto sectors = std::vector<const FloorInfo*>{};
-		sectors.reserve(int(dist / BLOCK(1)) + 1); // Minimum size.
-
-		// Calculate sector position.
-		auto pos = Vector3(
-			FloorToStep(ray.position.x, BLOCK(1)),
-			0.0f,
-			FloorToStep(ray.position.z, BLOCK(1)));
-
-		// Calculate sector position step.
-		auto posStep = Vector3(
-			(ray.direction.x > 0) ? BLOCK(1) : -BLOCK(1),
-			0.0f,
-			(ray.direction.z > 0) ? BLOCK(1) : -BLOCK(1));
-
-		// Calculate next intersection.
-		auto nextIntersect = Vector3(
-			((pos.x + ((posStep.x > 0) ? BLOCK(1) : 0)) - ray.position.x) / ray.direction.x,
-			0.0f,
-			((pos.z + ((posStep.z > 0) ? BLOCK(1) : 0)) - ray.position.z) / ray.direction.z);
-
-		// Calculate ray step.
-		auto rayStep = Vector3(
-			BLOCK(1) / abs(ray.direction.x),
-			0.0f,
-			BLOCK(1) / abs(ray.direction.z));
-
-		// Traverse and collect sectors.
-		float currentDist = 0.0f;
-		while (currentDist <= dist)
-		{
-			const auto& sector = GetFloor(roomNumber, GetRoomGridCoord(roomNumber, pos.x, pos.z));
-			sectors.push_back(&sector);
-
-			// Determine axis to step along.
-			if (nextIntersect.x < nextIntersect.z)
-			{
-				pos.x += posStep.x;
-				currentDist = nextIntersect.x;
-				nextIntersect.x += rayStep.x;
-			}
-			else
-			{
-				pos.z += posStep.z;
-				currentDist = nextIntersect.z;
-				nextIntersect.z += rayStep.z;
-			}
-		}
-
-		return sectors;
-	}
-
 	RoomLosCollisionData GetRoomLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
 		// FAILSAFE.
@@ -318,21 +263,15 @@ namespace TEN::Collision::Los
 			// 2.2) Clip bridge (if applicable).
 			if (collideBridges)
 			{
-				auto visitedBridgeMovIds = std::set<int>{};
-				bool hasBridge = false;
-
-				// Run through traced sectors.
-				auto sectors = GetTracedSectors(ray, rayRoomNumber, closestDist);
-				for (const auto* sector : sectors)
+				// Run through neighbor rooms.
+				for (int neighborRoomNumber : room.neighbors)
 				{
-					// Run through bridges in sector.
-					for (int bridgeMovID : sector->BridgeItemNumbers)
-					{
-						// Check if bridge was already visited.
-						if (Contains(visitedBridgeMovIds, bridgeMovID))
-							continue;
-						visitedBridgeMovIds.insert(bridgeMovID);
+					const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 
+					// Run through bounded bridges.
+					auto bridgeMovIds = neighborRoom.Bridges.GetBoundedBridgeItemNumbers(ray, closestDist);
+					for (int bridgeMovID : bridgeMovIds)
+					{
 						const auto& bridgeMov = g_Level.Items[bridgeMovID];
 						const auto& bridge = GetBridgeObject(bridgeMov);
 
@@ -341,17 +280,13 @@ namespace TEN::Collision::Los
 							continue;
 
 						// Clip bridge.
-						auto meshColl = bridge.GetCollisionMesh().GetCollision(ray, dist);
+						auto meshColl = bridge.GetCollisionMesh().GetCollision(ray, closestDist);
 						if (meshColl.has_value() && meshColl->Distance < closestDist)
 						{
 							closestTri = &meshColl->Triangle;
 							closestDist = meshColl->Distance;
-							hasBridge = true;
 						}
 					}
-
-					if (hasBridge)
-						break;
 				}
 			}
 
