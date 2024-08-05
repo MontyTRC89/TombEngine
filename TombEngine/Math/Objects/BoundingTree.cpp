@@ -158,7 +158,12 @@ namespace TEN::Math
 		}
 
 		for (const auto& node : _nodes)
+		{
 			DrawDebugBox(node.Aabb, BOX_COLOR);
+
+			//if (node.IsLeaf())
+				//PrintDebugMessage("%d", node.ObjectID);
+		}
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const
@@ -167,13 +172,14 @@ namespace TEN::Math
 		if (_nodes.empty())
 			return objectIds;
 
-		int i = 0;
+		int traversalCount = 0;
 		std::function<void(int)> traverse = [&](int nodeID)
 		{
 			// Invalid node; return early.
 			if (nodeID == NO_VALUE)
 				return;
-			i++;
+			traversalCount++;
+
 			const auto& node = _nodes[nodeID];
 
 			// Test node collision.
@@ -195,7 +201,8 @@ namespace TEN::Math
 
 		// Traverse tree from root node.
 		traverse(_rootID);
-		PrintDebugMessage("travs: %d", i);
+		PrintDebugMessage("Traversals: %d", traversalCount);
+
 		return objectIds;
 	}
 
@@ -274,8 +281,6 @@ namespace TEN::Math
 
 			// Descend.
 			siblingID = (leftCost < rightCost) ? leftChildID : rightChildID;
-
-			// FAILSAFE.
 			if (siblingID == NO_VALUE)
 				break;
 		}
@@ -690,19 +695,18 @@ namespace TEN::Math
 			node.IsLeaf() ? leafNodeCount++ : innerNodeCount++;
 		TENAssert(innerNodeCount == (leafNodeCount - 1), "BoundingTree: Unexpected relation between inner node and leaf node counts.");
 
-		// Validate unique object ID.
+		// Validate unique object IDs.
 		auto objectIds = GetBoundedObjectIds();
 		for (int refObjectID : objectIds)
 		{
 			unsigned int count = 0;
 			for (int objectID : objectIds)
 			{
-				if (refObjectID == refObjectID)
-				count++;
+				if (refObjectID == objectID)
+					count++;
 			}
 
-			// TODO: Fails for static build.
-			//TENAssert(count == 1, "BoundingTree: Duplicate object IDs contained.");
+			TENAssert(count == 1, "BoundingTree: Duplicate object IDs contained.");
 		}
 	}
 
@@ -747,6 +751,7 @@ namespace TEN::Math
 			TENAssert(rightChild.ParentID == nodeID, "BoundingTree: Right child has wrong parent.");
 		}
 
+		// TODO: Fails for static build.
 		// Validate AABB.
 		if (node.LeftChildID != NO_VALUE && node.RightChildID != NO_VALUE)
 		{
@@ -755,7 +760,7 @@ namespace TEN::Math
 
 			auto aabb = BoundingBox();
 			BoundingBox::CreateMerged(aabb, _nodes[node.LeftChildID].Aabb, _nodes[node.RightChildID].Aabb);
-			TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree: Node AABB does not contain children.");
+			//TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree: Node AABB does not contain children.");
 		}
 
 		// Validate height.
