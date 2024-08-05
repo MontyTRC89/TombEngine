@@ -610,6 +610,7 @@ namespace TEN::Math
 		if (start >= end)
 			return NO_VALUE;
 
+		// Create new node.
 		auto node = Node{};
 
 		// Combine AABBs.
@@ -624,10 +625,14 @@ namespace TEN::Math
 			node.ObjectID = objectIds[start];
 			node.Height = 0;
 			
-			int nodeID = (int)_nodes.size();
+			// Add new leaf.
+			int leafID = (int)_nodes.size();
 			_nodes.push_back(node);
-			_leafIDMap.insert({ node.ObjectID, nodeID }); // TODO: Duplicates set?
-			return nodeID;
+
+			// Store object-leaf association.
+			_leafIDMap.insert({ node.ObjectID, leafID });
+
+			return leafID;
 		}
 		// Inner node.
 		else
@@ -678,6 +683,7 @@ namespace TEN::Math
 				_nodes[node.RightChildID].ParentID = nodeID;
 			}
 
+			// Add new inner node and set height.
 			_nodes.push_back(node);
 			_nodes[nodeID].Height = std::max(node.LeftChildID != NO_VALUE ? _nodes[node.LeftChildID].Height : 0, node.RightChildID != NO_VALUE ? _nodes[node.RightChildID].Height : 0) + 1;
 			return nodeID;
