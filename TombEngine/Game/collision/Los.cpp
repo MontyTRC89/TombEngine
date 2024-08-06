@@ -107,7 +107,7 @@ namespace TEN::Collision::Los
 		if (dir == Vector3::Zero)
 		{
 			TENLog("GetLosCollision(): dir is not a unit vector.", LogLevel::Warning);
-			return LosCollisionData{ RoomLosCollisionData{ nullptr, origin, roomNumber, false, {}, 0.0f }, {}, {}, {} };
+			return LosCollisionData{ RoomLosCollisionData{ nullptr, origin, roomNumber, {}, 0.0f, false }, {}, {}, {} };
 		}
 
 		auto los = LosCollisionData{};
@@ -139,8 +139,8 @@ namespace TEN::Collision::Los
 						movLos.Moveable = mov;
 						movLos.Position = pos;
 						movLos.RoomNumber = roomNumber;
-						movLos.IsOriginContained = (bool)obb.Contains(origin);
 						movLos.Distance = intersectDist;
+						movLos.IsOriginContained = (bool)obb.Contains(origin);
 						los.Moveables.push_back(movLos);
 					}
 				}
@@ -165,8 +165,8 @@ namespace TEN::Collision::Los
 							sphereLos.SphereID = i;
 							sphereLos.Position = pos;
 							sphereLos.RoomNumber = roomNumber;
-							sphereLos.IsOriginContained = (bool)sphere.Contains(origin);
 							sphereLos.Distance = intersectDist;
+							sphereLos.IsOriginContained = (bool)sphere.Contains(origin);
 							los.Spheres.push_back(sphereLos);
 						}
 					}
@@ -210,8 +210,8 @@ namespace TEN::Collision::Los
 					staticLos.Static = staticObj;
 					staticLos.Position = pos;
 					staticLos.RoomNumber = roomNumber;
-					staticLos.IsOriginContained = (bool)obb.Contains(origin);
 					staticLos.Distance = intersectDist;
+					staticLos.IsOriginContained = (bool)obb.Contains(origin);
 					los.Statics.push_back(staticLos);
 				}
 			}
@@ -235,7 +235,7 @@ namespace TEN::Collision::Los
 		if (dir == Vector3::Zero)
 		{
 			TENLog("GetRoomLosCollision(): Direction is not a unit vector.", LogLevel::Warning);
-			return RoomLosCollisionData{ {}, origin, roomNumber, false, {}, 0.0f };
+			return RoomLosCollisionData{ {}, origin, roomNumber, {}, 0.0f, false };
 		}
 
 		auto roomLos = RoomLosCollisionData{};
@@ -245,8 +245,9 @@ namespace TEN::Collision::Los
 		float rayDist = dist;
 		int rayRoomNumber = roomNumber;
 
-		// 2) Trace rooms through portals.
-		while (true)
+		// 2) Traverse rooms through portals.
+		bool traversePortal = true;
+		while (traversePortal)
 		{
 			const CollisionTriangle* closestTri = nullptr;
 			float closestDist = rayDist;
@@ -293,12 +294,12 @@ namespace TEN::Collision::Los
 			// 2.4) Collect room number.
 			roomLos.RoomNumbers.push_back(rayRoomNumber);
 
-			// 2.3) Return room LOS collision or retrace from new room at portal.
+			// 2.3) Return room LOS collision or traverse new room.
 			if (closestTri != nullptr)
 			{
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
 
-				// Room portal triangle; update ray to retrace from new room.
+				// Hit portal triangle; update ray to traverse new room.
 				if (closestTri->IsPortal() &&
 					rayRoomNumber != closestTri->GetPortalRoomNumber()) // FAILSAFE: Prevent infinite loop.
 				{
@@ -306,7 +307,7 @@ namespace TEN::Collision::Los
 					rayDist -= closestDist;
 					rayRoomNumber = closestTri->GetPortalRoomNumber();
 				}
-				// Tangible triangle; collect remaining room LOS collision data.
+				// Hit tangible triangle; collect remaining room LOS collision data.
 				else
 				{
 					if (closestTri->IsPortal())
@@ -317,7 +318,8 @@ namespace TEN::Collision::Los
 					roomLos.RoomNumber = rayRoomNumber;
 					roomLos.IsIntersected = true;
 					roomLos.Distance = Vector3::Distance(origin, intersectPos);
-					break;
+
+					traversePortal = false;
 				}
 			}
 			else
@@ -327,7 +329,8 @@ namespace TEN::Collision::Los
 				roomLos.RoomNumber = rayRoomNumber;
 				roomLos.IsIntersected = false;
 				roomLos.Distance = dist;
-				break;
+
+				traversePortal = false;
 			}
 		}
 

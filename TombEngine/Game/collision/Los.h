@@ -17,9 +17,9 @@ namespace TEN::Collision::Los
 		Vector3					 Position	= Vector3::Zero;
 		int						 RoomNumber = 0;
 
-		bool			 IsIntersected = false;
 		std::vector<int> RoomNumbers   = {};
 		float			 Distance	   = 0.0f;
+		bool			 IsIntersected = false;
 	};
 
 	struct MoveableLosCollisionData
@@ -28,8 +28,8 @@ namespace TEN::Collision::Los
 		Vector3	  Position	 = Vector3::Zero;
 		int		  RoomNumber = 0;
 
-		bool  IsOriginContained = false;
 		float Distance			= 0.0f;
+		bool  IsOriginContained = false;
 	};
 	
 	struct SphereLosCollisionData
@@ -39,8 +39,8 @@ namespace TEN::Collision::Los
 		Vector3	  Position	 = Vector3::Zero;
 		int		  RoomNumber = 0;
 
-		bool  IsOriginContained = false;
 		float Distance			= 0.0f;
+		bool  IsOriginContained = false;
 	};
 	
 	struct StaticLosCollisionData
@@ -49,8 +49,8 @@ namespace TEN::Collision::Los
 		Vector3	   Position	  = Vector3::Zero;
 		int		   RoomNumber = 0;
 
-		bool  IsOriginContained = false;
 		float Distance			= 0.0f;
+		bool  IsOriginContained = false;
 	};
 
 	struct LosCollisionData

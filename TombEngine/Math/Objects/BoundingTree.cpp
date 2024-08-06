@@ -665,7 +665,7 @@ namespace TEN::Math
 
 			// Add new inner node and set height.
 			_nodes.push_back(node);
-			_nodes[nodeID].Height = std::max(node.LeftChildID != NO_VALUE ? _nodes[node.LeftChildID].Height : 0, node.RightChildID != NO_VALUE ? _nodes[node.RightChildID].Height : 0) + 1;
+			_nodes[nodeID].Height = std::max((node.LeftChildID != NO_VALUE) ? _nodes[node.LeftChildID].Height : 0, (node.RightChildID != NO_VALUE) ? _nodes[node.RightChildID].Height : 0) + 1;
 			return nodeID;
 		}
 	}
