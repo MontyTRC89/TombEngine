@@ -48,42 +48,30 @@ bool ROOM_INFO::Active() const
 		   ( FlipStats[flipNumber] && flippedRoom == index);
 }
 
-std::vector<int> BridgeHandler::GetBridgeItemNumbers() const
+std::vector<int> RoomObjectHandler::GetIds() const
 {
 	return _tree.GetBoundedObjectIds();
 }
 
-std::vector<int> BridgeHandler::GetBoundedBridgeItemNumbers(const Ray& ray, float dist) const
+std::vector<int> RoomObjectHandler::GetBoundedIds(const Ray& ray, float dist) const
 {
 	_tree.DrawDebug();
 	return _tree.GetBoundedObjectIds(ray, dist);
 }
 
-void BridgeHandler::Insert(int bridgeItemNumber)
+void RoomObjectHandler::Insert(int id, const BoundingBox& aabb)
 {
-	const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
-	if (!bridgeItem.IsBridge())
-		return;
-
-	_tree.Insert(bridgeItemNumber, bridgeItem.GetAabb(), AABB_BOUNDARY);
+	_tree.Insert(id, aabb, AABB_BOUNDARY);
 }
 
-void BridgeHandler::Move(int bridgeItemNumber)
+void RoomObjectHandler::Move(int id, const BoundingBox& aabb)
 {
-	const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
-	if (!bridgeItem.IsBridge())
-		return;
-
-	_tree.Move(bridgeItemNumber, bridgeItem.GetAabb(), AABB_BOUNDARY);
+	_tree.Move(id, aabb, AABB_BOUNDARY);
 }
 
-void BridgeHandler::Remove(int bridgeItemNumber)
+void RoomObjectHandler::Remove(int id)
 {
-	const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
-	if (!bridgeItem.IsBridge())
-		return;
-
-	_tree.Remove(bridgeItemNumber);
+	_tree.Remove(id);
 }
 
 static void AddRoomFlipItems(const ROOM_INFO& room)

@@ -269,7 +269,7 @@ namespace TEN::Collision::Los
 					const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 
 					// Run through bounded bridges.
-					auto bridgeMovIds = neighborRoom.Bridges.GetBoundedBridgeItemNumbers(ray, closestDist);
+					auto bridgeMovIds = neighborRoom.Bridges.GetBoundedIds(ray, closestDist);
 					for (int bridgeMovID : bridgeMovIds)
 					{
 						const auto& bridgeMov = g_Level.Items[bridgeMovID];

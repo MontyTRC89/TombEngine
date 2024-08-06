@@ -91,12 +91,12 @@ struct MESH_INFO
 	BoundingOrientedBox GetVisibilityObb() const;
 };
 
-class BridgeHandler
+class RoomObjectHandler
 {
 private:
 	// Constants
 
-	static constexpr auto AABB_BOUNDARY = BLOCK(0.05f);
+	static constexpr auto AABB_BOUNDARY = BLOCK(0.1f);
 
 	// Members
 
@@ -105,22 +105,25 @@ private:
 public:
 	// Constructors
 
-	BridgeHandler() = default;
+	RoomObjectHandler() = default;
 
 	// Getters
 
-	std::vector<int> GetBridgeItemNumbers() const;
-	std::vector<int> GetBoundedBridgeItemNumbers(const Ray& ray, float dist) const;
+	std::vector<int> GetIds() const;
+	std::vector<int> GetBoundedIds(const Ray& ray, float dist) const;
 
 	// Utilities
 
-	void Insert(int bridgeItemNumber);
-	void Move(int bridgeItemNumber);
-	void Remove(int bridgeItemNumber);
+	void Insert(int id, const BoundingBox& aabb);
+	void Move(int id, const BoundingBox& aabb);
+	void Remove(int id);
 };
 
 struct ROOM_INFO
 {
+	std::string				 name = {};
+	std::vector<std::string> tags = {};
+
 	int index;
 	int x;
 	int y;
@@ -139,11 +142,10 @@ struct ROOM_INFO
 	short fxNumber;
 	bool boundActive;
 
-	std::string name = {};
-	std::vector<std::string> tags = {};
-
-	CollisionMesh CollisionMesh = TEN::Physics::CollisionMesh();
-	BridgeHandler Bridges		= BridgeHandler();
+	//RoomObjectHandler Moveables		= RoomObjectHandler(); // TODO: Refactor linked list of items in room to use a tree instead.
+	//RoomObjectHandler Statics		= RoomObjectHandler(); // TODO: Refactor to use tree.
+	RoomObjectHandler Bridges		= RoomObjectHandler();
+	CollisionMesh	  CollisionMesh = TEN::Physics::CollisionMesh();
 
 	std::vector<FloorInfo>	   floor		  = {};
 	std::vector<ROOM_LIGHT>	   lights		  = {};

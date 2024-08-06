@@ -39,7 +39,7 @@ namespace TEN::Entities::Generic
 		AssignSectors(item);
 
 		auto& room = g_Level.Rooms[item.RoomNumber];
-		room.Bridges.Insert(item.Index);
+		room.Bridges.Insert(item.Index, item.GetAabb());
 
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
@@ -62,11 +62,11 @@ namespace TEN::Entities::Generic
 		if (item.RoomNumber == _prevRoomNumber)
 		{
 			if (item.Pose != _prevPose)
-				room.Bridges.Move(item.Index);
+				room.Bridges.Move(item.Index, item.GetAabb());
 		}
 		else
 		{
-			room.Bridges.Insert(item.Index);
+			room.Bridges.Insert(item.Index, item.GetAabb());
 			prevRoom.Bridges.Remove(item.Index);
 		}
 

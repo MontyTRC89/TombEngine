@@ -291,21 +291,21 @@ namespace TEN::Physics
 	
 	void CollisionMesh::Initialize()
 	{
-		auto ids = std::vector<int>{};
-		auto aabbs = std::vector<BoundingBox>{};
+		auto triIds = std::vector<int>{};
+		auto triAabbs = std::vector<BoundingBox>{};
 
-		ids.reserve(_triangles.size());
-		aabbs.reserve(_triangles.size());
+		triIds.reserve(_triangles.size());
+		triAabbs.reserve(_triangles.size());
 
 		for (int i = 0; i < _triangles.size(); i++)
 		{
 			const auto& tri = _triangles[i];
 
-			ids.push_back(i);
-			aabbs.push_back(tri.GetAabb());
+			triIds.push_back(i);
+			triAabbs.push_back(tri.GetAabb());
 		}
 
-		_tree = BoundingTree(ids, aabbs);
+		_tree = BoundingTree(triIds, triAabbs);
 	}
 
 	void CollisionMesh::DrawDebug() const
