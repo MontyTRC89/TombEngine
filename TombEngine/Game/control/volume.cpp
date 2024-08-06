@@ -139,14 +139,14 @@ namespace TEN::Control::Volumes
 		if (roomNumber == NO_VALUE)
 			return;
 
-		for (int currentRoomIndex : g_Level.Rooms[roomNumber].neighbors)
+		for (int currentRoomIndex : g_Level.Rooms[roomNumber].NeighborRoomNumbers)
 		{
 			auto& room = g_Level.Rooms[currentRoomIndex];
 
 			if (!room.Active())
 				continue;
 
-			for (auto& volume : room.triggerVolumes)
+			for (auto& volume : room.TriggerVolumes)
 			{
 				if (!volume.Enabled)
 					continue;

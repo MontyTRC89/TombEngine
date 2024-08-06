@@ -10,18 +10,18 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR1/Entity/Cowboy.h" // OK
-#include "Objects/TR1/Entity/Kold.h" // OK
-#include "Objects/TR1/Entity/tr1_ape.h" // OK
-#include "Objects/TR1/Entity/tr1_bear.h" // OK
-#include "Objects/TR1/Entity/tr1_doppelganger.h" // OK
-#include "Objects/TR1/Entity/tr1_natla.h" // OK
-#include "Objects/TR1/Entity/tr1_giant_mutant.h" // OK
-#include "Objects/TR1/Entity/tr1_wolf.h" // OK
-#include "Objects/TR1/Entity/tr1_big_rat.h" // OK
-#include "Objects/TR1/Entity/tr1_centaur.h" // OK
-#include "Objects/TR1/Entity/tr1_winged_mutant.h" // OK
-#include "Objects/TR1/Entity/SkateboardKid.h" // OK
+#include "Objects/TR1/Entity/Centaur.h"
+#include "Objects/TR1/Entity/Cowboy.h"
+#include "Objects/TR1/Entity/Kold.h"
+#include "Objects/TR1/Entity/SkateboardKid.h"
+#include "Objects/TR1/Entity/WingedMutant.h"
+#include "Objects/TR1/Entity/tr1_ape.h"
+#include "Objects/TR1/Entity/tr1_bear.h"
+#include "Objects/TR1/Entity/tr1_doppelganger.h"
+#include "Objects/TR1/Entity/tr1_natla.h"
+#include "Objects/TR1/Entity/tr1_giant_mutant.h"
+#include "Objects/TR1/Entity/tr1_wolf.h"
+#include "Objects/TR1/Entity/tr1_big_rat.h"
 #include "Objects/Utils/object_helper.h"
 
 // Traps
@@ -149,7 +149,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeCreature;
-		obj->control = CentaurControl;
+		obj->control = ControlCentaur;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 120;
@@ -165,7 +165,7 @@ static void StartEntity(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeWingedMutant;
-		obj->control = WingedMutantControl;
+		obj->control = ControlWingedMutant;
 		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->pivotLength = 150;
