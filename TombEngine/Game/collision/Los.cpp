@@ -29,7 +29,7 @@ namespace TEN::Collision::Los
 		for (int roomNumber : roomNumbers)
 		{
 			const auto& room = g_Level.Rooms[roomNumber];
-			neighborRoomNumbers.insert(room.neighbors.begin(), room.neighbors.end());
+			neighborRoomNumbers.insert(room.NeighborRoomNumbers.begin(), room.NeighborRoomNumbers.end());
 		}
 
 		// Run through neighbor rooms.
@@ -78,7 +78,7 @@ namespace TEN::Collision::Los
 		{
 			// Run through neighbor rooms.
 			const auto& room = g_Level.Rooms[roomNumber];
-			for (auto& neighborRoomNumber : room.neighbors)
+			for (auto& neighborRoomNumber : room.NeighborRoomNumbers)
 			{
 				auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 				if (!neighborRoom.Active())
@@ -264,7 +264,7 @@ namespace TEN::Collision::Los
 			if (collideBridges)
 			{
 				// Run through neighbor rooms.
-				for (int neighborRoomNumber : room.neighbors)
+				for (int neighborRoomNumber : room.NeighborRoomNumbers)
 				{
 					const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 

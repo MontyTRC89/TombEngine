@@ -140,7 +140,7 @@ namespace TEN::Math
 			return;
 		}
 
-		// Prune leaf.
+		// Remove leaf.
 		int leafID = it->second;
 		RemoveLeaf(leafID);
 	}
@@ -158,12 +158,7 @@ namespace TEN::Math
 		}
 
 		for (const auto& node : _nodes)
-		{
 			DrawDebugBox(node.Aabb, BOX_COLOR);
-
-			//if (node.IsLeaf())
-				//PrintDebugMessage("%d", node.ObjectID);
-		}
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const
@@ -172,13 +167,11 @@ namespace TEN::Math
 		if (_nodes.empty())
 			return objectIds;
 
-		int traversalCount = 0;
 		std::function<void(int)> traverse = [&](int nodeID)
 		{
 			// Invalid node; return early.
 			if (nodeID == NO_VALUE)
 				return;
-			traversalCount++;
 
 			const auto& node = _nodes[nodeID];
 
@@ -199,10 +192,8 @@ namespace TEN::Math
 			}
 		};
 
-		// Traverse tree from root node.
+		// Traverse tree.
 		traverse(_rootID);
-		PrintDebugMessage("Traversals: %d", traversalCount);
-
 		return objectIds;
 	}
 
@@ -282,7 +273,10 @@ namespace TEN::Math
 			// Descend.
 			siblingID = (leftCost < rightCost) ? leftChildID : rightChildID;
 			if (siblingID == NO_VALUE)
+			{
+				TENLog("BoundingTree: Sibling leaf search failed.", LogLevel::Warning);
 				break;
+			}
 		}
 
 		return siblingID;
@@ -467,6 +461,7 @@ namespace TEN::Math
 		auto& nodeB = _nodes[nodeIDB];
 		auto& nodeC = _nodes[nodeIDC];
 
+		// Calculate balance.
 		int balance = nodeC.Height - nodeB.Height;
 
 		// Rotate C up.
@@ -529,9 +524,8 @@ namespace TEN::Math
 
 			return nodeIDC;
 		}
-
 		// Rotate B up.
-		if (balance < -1)
+		else if (balance < -1)
 		{
 			int nodeIDD = nodeB.LeftChildID;
 			int nodeIDE = nodeB.RightChildID;
@@ -675,13 +669,9 @@ namespace TEN::Math
 			// Set parent ID for children.
 			int nodeID = (int)_nodes.size();
 			if (node.LeftChildID != NO_VALUE)
-			{
 				_nodes[node.LeftChildID].ParentID = nodeID;
-			}
 			if (node.RightChildID != NO_VALUE)
-			{
 				_nodes[node.RightChildID].ParentID = nodeID;
-			}
 
 			// Add new inner node and set height.
 			_nodes.push_back(node);
@@ -766,6 +756,7 @@ namespace TEN::Math
 
 			auto aabb = BoundingBox();
 			BoundingBox::CreateMerged(aabb, _nodes[node.LeftChildID].Aabb, _nodes[node.RightChildID].Aabb);
+			DrawDebugBox(aabb, Color(1, 1, 0));
 			//TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree: Node AABB does not contain children.");
 		}
 
