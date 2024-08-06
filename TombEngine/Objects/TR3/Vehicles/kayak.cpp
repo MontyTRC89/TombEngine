@@ -998,7 +998,7 @@ namespace TEN::Entities::Vehicles
 
 	void KayakToItemCollision(ItemInfo* kayakItem, ItemInfo* laraItem)
 	{
-		for (auto i : g_Level.Rooms[kayakItem->RoomNumber].neighbors)
+		for (auto i : g_Level.Rooms[kayakItem->RoomNumber].NeighborRoomNumbers)
 		{
 			if (!g_Level.Rooms[i].Active())
 				continue;
