@@ -83,7 +83,7 @@ char* LevelDataPtr;
 std::vector<int> MoveableAssetIds;
 std::vector<int> StaticAssetIds;
 std::vector<int> SpriteSequenceAssetIds;
-LEVEL g_Level;
+LevelData g_Level;
 
 unsigned char ReadUInt8()
 {
