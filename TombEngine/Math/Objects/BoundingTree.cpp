@@ -20,11 +20,11 @@ namespace TEN::Math
 		return (LeftChildID == NO_VALUE && RightChildID == NO_VALUE);
 	}
 
-	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary)
+	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs)
 	{
 		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree: Object ID and AABB counts unequal in static constructor.");
 
-		Build(objectIds, aabbs, boundary);
+		Build(objectIds, aabbs);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds() const
@@ -588,17 +588,17 @@ namespace TEN::Math
 		return nodeID;
 	}
 
-	void BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary)
+	void BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs)
 	{
 		_nodes.reserve(objectIds.size());
-		Build(objectIds, aabbs, 0, (int)objectIds.size(), boundary);
+		Build(objectIds, aabbs, 0, (int)objectIds.size());
 		_rootID = (int)_nodes.size() - 1;
 
 		Validate();
 	}
 
 	// Constructs tree recursively using top-down approach with surface area heuristic (SAH).
-	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary)
+	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end)
 	{
 		// FAILSAFE.
 		if (start >= end)
@@ -609,7 +609,6 @@ namespace TEN::Math
 
 		// Combine AABBs.
 		node.Aabb = aabbs[start];
-		*(Vector3*)&node.Aabb.Extents += Vector3(boundary);
 		for (int i = (start + 1); i < end; i++)
 			BoundingBox::CreateMerged(node.Aabb, node.Aabb, aabbs[i]);
 
@@ -639,13 +638,11 @@ namespace TEN::Math
 			{
 				// Calculate AABB 0.
 				auto aabb0 = aabbs[start];
-				*(Vector3*)&aabb0.Extents += Vector3(boundary);
 				for (int i = (start + 1); i < split; i++)
 					BoundingBox::CreateMerged(aabb0, aabb0, aabbs[i]);
 
 				// Calculate AABB 1.
 				auto aabb1 = aabbs[split];
-				*(Vector3*)&aabb1.Extents += Vector3(boundary);
 				for (int i = split; i < end; i++)
 					BoundingBox::CreateMerged(aabb1, aabb1, aabbs[i]);
 
@@ -745,19 +742,6 @@ namespace TEN::Math
 		{
 			const auto& rightChild = _nodes[node.RightChildID];
 			TENAssert(rightChild.ParentID == nodeID, "BoundingTree: Right child has wrong parent.");
-		}
-
-		// TODO: Fails for static build.
-		// Validate AABB.
-		if (node.LeftChildID != NO_VALUE && node.RightChildID != NO_VALUE)
-		{
-			const auto& leftChild = _nodes[node.LeftChildID];
-			const auto& rightChild = _nodes[node.RightChildID];
-
-			auto aabb = BoundingBox();
-			BoundingBox::CreateMerged(aabb, _nodes[node.LeftChildID].Aabb, _nodes[node.RightChildID].Aabb);
-			DrawDebugBox(aabb, Color(1, 1, 0));
-			//TENAssert((Vector3)aabb.Center == node.Aabb.Center && (Vector3)aabb.Extents == node.Aabb.Extents, "BoundingTree: Node AABB does not contain children.");
 		}
 
 		// Validate height.

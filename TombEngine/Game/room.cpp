@@ -55,7 +55,6 @@ std::vector<int> RoomObjectHandler::GetIds() const
 
 std::vector<int> RoomObjectHandler::GetBoundedIds(const Ray& ray, float dist) const
 {
-	_tree.DrawDebug();
 	return _tree.GetBoundedObjectIds(ray, dist);
 }
 

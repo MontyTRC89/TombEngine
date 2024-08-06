@@ -31,7 +31,7 @@ namespace TEN::Math
 		// Constructors
 
 		BoundingTree() = default;
-		BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary = 0.0f);
+		BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs);
 
 		// Getters
 
@@ -70,8 +70,8 @@ namespace TEN::Math
 
 		// Static helpers
 
-		void Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, float boundary = 0.0f);
-		int	 Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, float boundary = 0.0f);
+		void Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs);
+		int	 Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end);
 
 		// Debug helpers
 
