@@ -603,7 +603,7 @@ void InitializeItem(short itemNumber)
 	item.NextItem = room.itemNumber;
 	room.itemNumber = itemNumber;
 
-	const auto& sector = *GetSector(&room, item.Pose.Position.x - room.x, item.Pose.Position.z - room.z);
+	const auto& sector = *GetSector(&room, item.Pose.Position.x - room.Position.x, item.Pose.Position.z - room.Position.z);
 	item.Floor = sector.GetSurfaceHeight(item.Pose.Position.x, item.Pose.Position.z, true);
 	item.BoxNumber = sector.PathfindingBoxID;
 

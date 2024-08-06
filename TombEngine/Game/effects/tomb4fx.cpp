@@ -993,10 +993,10 @@ void UpdateGunShells()
 				!TestEnvironment(ENV_FLAG_WATER, prevRoomNumber))
 			{
 
-				SpawnSplashDrips(Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z), gunshell->roomNumber, 3, true);
+				SpawnSplashDrips(Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].TopHeight, gunshell->pos.Position.z), gunshell->roomNumber, 3, true);
 				//AddWaterSparks(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z, 8);
 				SpawnRipple(
-					Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z),
+					Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].TopHeight, gunshell->pos.Position.z),
 					gunshell->roomNumber,
 					Random::GenerateFloat(8.0f, 12.0f),
 					(int)RippleFlags::SlowFade);

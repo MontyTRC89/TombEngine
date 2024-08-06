@@ -212,14 +212,14 @@ namespace TEN::Renderer
 			r->ItemsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
 
-			Vector3 boxMin = Vector3(room.x + BLOCK(1), room.maxceiling - CLICK(1), room.z + BLOCK(1));
-			Vector3 boxMax = Vector3(room.x + (room.xSize - 1) * BLOCK(1), room.minfloor + CLICK(1), room.z + (room.zSize - 1) * BLOCK(1));
+			Vector3 boxMin = Vector3(room.Position.x + BLOCK(1), room.TopHeight - CLICK(1), room.Position.z + BLOCK(1));
+			Vector3 boxMax = Vector3(room.Position.x + (room.XSize - 1) * BLOCK(1), room.BottomHeight + CLICK(1), room.Position.z + (room.ZSize - 1) * BLOCK(1));
 			Vector3 center = (boxMin + boxMax) / 2.0f;
 			Vector3 extents = boxMax - center;
 			r->BoundingBox = BoundingBox(center, extents);
 
 			r->Neighbors.clear();
-			for (int j : room.neighbors)
+			for (int j : room.NeighborRoomNumbers)
 				if (g_Level.Rooms[j].Active())
 					r->Neighbors.push_back(j);
 
@@ -238,9 +238,9 @@ namespace TEN::Renderer
 					for (int k = 0; k < 4; k++)
 					{
 						door->AbsoluteVertices[k] = Vector4(
-							room.x + oldDoor->vertices[k].x,
-							room.y + oldDoor->vertices[k].y,
-							room.z + oldDoor->vertices[k].z,
+							room.Position.x + oldDoor->vertices[k].x,
+							room.Position.y + oldDoor->vertices[k].y,
+							room.Position.z + oldDoor->vertices[k].z,
 							1.0f);
 					}
 				}
@@ -312,9 +312,9 @@ namespace TEN::Renderer
 						Vertex* vertex = &_roomsVertices[lastVertex];
 						int index = poly.indices[k];
 
-						vertex->Position.x = room.x + room.positions[index].x;
-						vertex->Position.y = room.y + room.positions[index].y;
-						vertex->Position.z = room.z + room.positions[index].z;
+						vertex->Position.x = room.Position.x + room.positions[index].x;
+						vertex->Position.y = room.Position.y + room.positions[index].y;
+						vertex->Position.z = room.Position.z + room.positions[index].z;
 
 						bucket.Centre += vertex->Position;
 

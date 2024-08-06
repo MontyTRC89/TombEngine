@@ -1382,12 +1382,12 @@ namespace TEN::Renderer
 			PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
 			PrintDebugMessage("PathfindingBoxID: %d", LaraItem->BoxNumber);
 			PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
-			PrintDebugMessage("Room Position: %d, %d, %d, %d", room.x, room.z, room.x + BLOCK(room.xSize), room.z + BLOCK(room.zSize));
-			PrintDebugMessage("Room.y, minFloor, maxCeiling: %d, %d, %d ", room.y, room.minfloor, room.maxceiling);
+			PrintDebugMessage("Room Position: %d, %d, %d, %d", room.Position.x, room.Position.z, room.Position.x + BLOCK(room.xSize), room.Position.z + BLOCK(room.zSize));
+			PrintDebugMessage("Room.y, minFloor, maxCeiling: %d, %d, %d ", room.Position.y, room.BottomHeiht, room.TopHeight);
 			PrintDebugMessage("Camera Position: %.3f, %.3f, %.3f", g_Camera.Position.x, g_Camera.Position.y, g_Camera.Position.z);
 			PrintDebugMessage("Camera LookAt: %.3f, %.3f, %.3f", g_Camera.LookAt.x, g_Camera.LookAt.y, g_Camera.LookAt.z);
 			PrintDebugMessage("Camera RoomNumber: %d", g_Camera.RoomNumber);
-			break;\
+			break;
 
 		case RendererDebugPage::PlayerStats:
 			PrintDebugMessage("PLAYER STATS");

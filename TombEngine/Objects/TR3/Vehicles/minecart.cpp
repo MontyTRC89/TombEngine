@@ -281,7 +281,7 @@ namespace TEN::Entities::Vehicles
 
 	static void MinecartToEntityCollision(ItemInfo* minecartItem, ItemInfo* laraItem)
 	{
-		for (auto i : g_Level.Rooms[minecartItem->RoomNumber].neighbors)
+		for (auto i : g_Level.Rooms[minecartItem->RoomNumber].NeighborRoomNumbers)
 		{
 			if (!g_Level.Rooms[i].Active())
 				continue;

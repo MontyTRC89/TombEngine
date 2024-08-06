@@ -323,7 +323,7 @@ void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, playerItem.RoomNumber);
 	auto basePos = Vector3(
 		playerItem.Pose.Position.x,
-		isInSwamp ? g_Level.Rooms[playerItem.RoomNumber].maxceiling : playerItem.Pose.Position.y,
+		isInSwamp ? g_Level.Rooms[playerItem.RoomNumber].TopHeight : playerItem.Pose.Position.y,
 		playerItem.Pose.Position.z);
 
 	// Calculate direction.
@@ -507,7 +507,7 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 
 	// Avoid entering swamp rooms.
 	if (TestEnvironment(ENV_FLAG_SWAMP, g_Camera.RoomNumber))
-		g_Camera.Position.y = g_Level.Rooms[g_Camera.RoomNumber].y - BUFFER;
+		g_Camera.Position.y = g_Level.Rooms[g_Camera.RoomNumber].Position.y - BUFFER;
 
 	g_Camera.RoomNumber = GetPointCollision(g_Camera.Position, g_Camera.RoomNumber).GetRoomNumber();
 	LookAt(g_Camera, 0);
@@ -774,7 +774,7 @@ void ChaseCamera(const ItemInfo& playerItem)
 	auto pointColl = GetPointCollision(g_Camera.LookAt, g_Camera.LookAtRoomNumber, 0, 0, CLICK(1));
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.GetRoomNumber()))
-		g_Camera.LookAt.y = g_Level.Rooms[pointColl.GetRoomNumber()].maxceiling - CLICK(1);
+		g_Camera.LookAt.y = g_Level.Rooms[pointColl.GetRoomNumber()].TopHeight - CLICK(1);
 
 	int vPos = g_Camera.LookAt.y;
 	pointColl = GetPointCollision(Vector3i(g_Camera.LookAt.x, vPos, g_Camera.LookAt.z), g_Camera.LookAtRoomNumber);
@@ -815,7 +815,7 @@ void CombatCamera(const ItemInfo& playerItem)
 
 	auto pointColl = GetPointCollision(g_Camera.LookAt, g_Camera.LookAtRoomNumber, 0, 0, CLICK(1));
 	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.GetRoomNumber()))
-		g_Camera.LookAt.y = g_Level.Rooms[pointColl.GetRoomNumber()].y - CLICK(1);
+		g_Camera.LookAt.y = g_Level.Rooms[pointColl.GetRoomNumber()].Position.y - CLICK(1);
 
 	pointColl = GetPointCollision(g_Camera.LookAt, g_Camera.LookAtRoomNumber);
 	g_Camera.LookAtRoomNumber = pointColl.GetRoomNumber();
