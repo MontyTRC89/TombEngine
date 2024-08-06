@@ -5,14 +5,6 @@
 
 using namespace TEN::Math;
 
-// TODO: Add licence? Heavily referenced this implementation, which has an MIT licence and requests attribution:
-// https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
-
-// TODO:
-// - Can't use NO_VALUE in .h file for some reason.
-// - Faster static build method? Current complexity is O(n^2), which is okay for one-off generation, but it may hurt level load times and
-//   some collision meshes will have to rebuild frequently if they move.
-
 namespace TEN::Math
 {
 	bool BoundingTree::Node::IsLeaf() const
@@ -598,6 +590,7 @@ namespace TEN::Math
 	}
 
 	// Constructs tree recursively using top-down approach with surface area heuristic (SAH).
+	// Complexity: O(n^2).
 	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end)
 	{
 		// FAILSAFE.

@@ -1,5 +1,9 @@
 #pragma once
 
+// References:
+// https://www.gdcvault.com/play/1025909/Math-for-Game-Developers-Dynamic
+// https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
+
 namespace TEN::Math
 {
 	// Dynamic bounding volume hierarchy using AABBs.
