@@ -114,58 +114,58 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 	auto dir = target - origin;
 	dir.Normalize();
 	float dist = Vector3::Distance(origin, target);
-	auto losColl = GetLosCollision(origin, originRoomNumber, dir, dist, true, false, true);
+	auto los = GetLosCollision(origin, originRoomNumber, dir, dist, true, false, true);
 
 	// 2) Clip room LOS collision.
-	auto cameraLosColl = CameraLosCollisionData{};
-	cameraLosColl.Normal = (losColl.Room.Triangle != nullptr) ? losColl.Room.Triangle->GetNormal() : -dir;
-	cameraLosColl.Position = losColl.Room.Position;
-	cameraLosColl.RoomNumber = losColl.Room.RoomNumber;
-	cameraLosColl.IsIntersected = losColl.Room.IsIntersected;
-	cameraLosColl.Distance = losColl.Room.Distance;
+	auto cameraLos = CameraLosCollisionData{};
+	cameraLos.Normal = (los.Room.Triangle != nullptr) ? los.Room.Triangle->GetNormal() : -dir;
+	cameraLos.Position = los.Room.Position;
+	cameraLos.RoomNumber = los.Room.RoomNumber;
+	cameraLos.IsIntersected = los.Room.IsIntersected;
+	cameraLos.Distance = los.Room.Distance;
 
 	// 3) Clip moveable LOS collision.
-	for (const auto& movLosColl : losColl.Moveables)
+	for (const auto& movLos : los.Moveables)
 	{
-		if (!TestCameraCollidableItem(*movLosColl.Moveable))
+		if (!TestCameraCollidableItem(*movLos.Moveable))
 			continue;
 
-		if (movLosColl.Distance < cameraLosColl.Distance)
+		if (movLos.Distance < cameraLos.Distance)
 		{
-			auto normal = movLosColl.Moveable->GetObb().Center - origin;
+			auto normal = movLos.Moveable->GetObb().Center - origin;
 			normal.Normalize();
 
-			cameraLosColl.Normal = normal;
-			cameraLosColl.Position = movLosColl.Position;
-			cameraLosColl.RoomNumber = movLosColl.RoomNumber;
-			cameraLosColl.IsIntersected = true;
-			cameraLosColl.Distance = movLosColl.Distance;
+			cameraLos.Normal = normal;
+			cameraLos.Position = movLos.Position;
+			cameraLos.RoomNumber = movLos.RoomNumber;
+			cameraLos.IsIntersected = true;
+			cameraLos.Distance = movLos.Distance;
 			break;
 		}
 	}
 
 	// 4) Clip static LOS collision.
-	for (const auto& staticLosColl : losColl.Statics)
+	for (const auto& staticLos : los.Statics)
 	{
-		if (!TestCameraCollidableStatic(*staticLosColl.Static))
+		if (!TestCameraCollidableStatic(*staticLos.Static))
 			continue;
 
-		if (staticLosColl.Distance < cameraLosColl.Distance)
+		if (staticLos.Distance < cameraLos.Distance)
 		{
-			auto normal = staticLosColl.Static->GetObb().Center - origin;
+			auto normal = staticLos.Static->GetObb().Center - origin;
 			normal.Normalize();
 
-			cameraLosColl.Normal = normal;
-			cameraLosColl.Position = staticLosColl.Position;
-			cameraLosColl.RoomNumber = staticLosColl.RoomNumber;
-			cameraLosColl.IsIntersected = true;
-			cameraLosColl.Distance = staticLosColl.Distance;
+			cameraLos.Normal = normal;
+			cameraLos.Position = staticLos.Position;
+			cameraLos.RoomNumber = staticLos.RoomNumber;
+			cameraLos.IsIntersected = true;
+			cameraLos.Distance = staticLos.Distance;
 			break;
 		}
 	}
 
 	// 5) Return camera LOS collision.
-	return cameraLosColl;
+	return cameraLos;
 }
 
 // TODO: Move to math.
