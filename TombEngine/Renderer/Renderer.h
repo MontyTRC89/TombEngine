@@ -588,7 +588,7 @@ namespace TEN::Renderer
 		Renderer();
 		~Renderer();
 
-		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
+		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, const MeshData* mesh, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
 		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
 		void Initialize(int w, int h, bool windowed, HWND handle);

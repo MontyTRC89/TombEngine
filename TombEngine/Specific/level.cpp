@@ -271,7 +271,7 @@ void LoadMoveablesAndStatics()
 	g_Level.Meshes.reserve(meshCount);
 	for (int i = 0; i < meshCount; i++)
 	{
-		auto mesh = MESH{};
+		auto mesh = MeshData{};
 
 		mesh.lightMode = (LightMode)ReadUInt8();
 		mesh.sphere.Center.x = ReadFloat();
@@ -453,7 +453,7 @@ void LoadMoveablesAndStatics()
 		auto& staticAsset = g_Level.StaticAssets[staticAssetID];
 
 		staticAsset.ID = staticAssetID;
-		staticAsset.meshNumber = ReadInt32();
+		staticAsset.Mesh = g_Level.Meshes[ReadInt32()];
 		staticAsset.visibilityBox.X1 = ReadInt16();
 		staticAsset.visibilityBox.X2 = ReadInt16();
 		staticAsset.visibilityBox.Y1 = ReadInt16();

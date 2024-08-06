@@ -65,30 +65,31 @@ struct AI_OBJECT
 	std::string Name;
 };
 
-struct MESH
+struct MeshData
 {
-	LightMode lightMode;
-	BoundingSphere sphere;
-	std::vector<Vector3> positions;
-	std::vector<Vector3> normals;
-	std::vector<Vector3> colors;
-	std::vector<Vector3> effects; // X = glow, Y = move, Z = refract
-	std::vector<int> bones;
-	std::vector<BUCKET> buckets;
+	std::vector<Vector3> positions = {};
+	std::vector<Vector3> normals   = {};
+	std::vector<Vector3> colors	   = {};
+	std::vector<Vector3> effects   = {}; // X = Glow, Y = Move, Z = Refract.
+
+	LightMode			lightMode = LightMode::Dynamic;
+	BoundingSphere		sphere	  = BoundingSphere();
+	std::vector<int>	bones	  = {};
+	std::vector<BUCKET> buckets	  = {};
 };
 
 struct LevelData
 {
-	// Object data
+	// Object
 
 	int					  NumItems = 0;
 	std::vector<ItemInfo> Items	   = {}; // Moveables
-	std::vector<MESH>	  Meshes   = {}; // TODO: Contain in MoveableAsset and StaticAsset.
+	std::vector<MeshData> Meshes   = {}; // TODO: Contain in MoveableAsset and StaticAsset.
 	std::vector<int>	  Bones	   = {}; // TODO: Contain in MoveableAsset.
-	std::unordered_map<GAME_OBJECT_ID, StaticAsset>			StaticAssets		 = {};
-	std::unordered_map<GAME_OBJECT_ID, SpriteSequenceAsset> SpriteSequenceAssets = {};
+	std::unordered_map<GAME_OBJECT_ID, StaticAsset>			StaticAssets		 = {}; // TODO: Don't use hash map.
+	std::unordered_map<GAME_OBJECT_ID, SpriteSequenceAsset> SpriteSequenceAssets = {}; // TODO: Don't use hash map.
 
-	// Animation data
+	// Animation
 
 	std::vector<AnimData>				Anims	 = {};
 	std::vector<AnimFrame>				Frames	 = {};
@@ -96,25 +97,25 @@ struct LevelData
 	std::vector<StateDispatchRangeData> Ranges	 = {};
 	std::vector<short>					Commands = {};
 
-	// Collision data
+	// Collision
 
 	std::vector<ROOM_INFO> Rooms	 = {};
 	std::vector<short>	   FloorData = {};
 	std::vector<SinkInfo>  Sinks	 = {};
 
-	// Pathfinding data
+	// Pathfinding
 
 	std::vector<BOX_INFO> PathfindingBoxes				   = {};
 	std::vector<OVERLAP>  Overlaps						   = {};
 	std::vector<int>	  Zones[(int)ZoneType::MaxZone][2] = {};
 
-	// Sound data
+	// Sound
 
 	std::vector<short>			 SoundMap	  = {};
 	std::vector<SoundSourceInfo> SoundSources = {};
 	std::vector<SampleInfo>		 SoundDetails = {};
 
-	// Misc. data
+	// Misc.
 
 	std::vector<LevelCameraInfo> Cameras   = {};
 	std::vector<EventSet>		 GlobalEventSets = {};

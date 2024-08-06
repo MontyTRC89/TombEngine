@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/control/box.h"
 #include "Objects/objectslist.h"
 #include "Renderer/RendererEnums.h"
@@ -14,16 +15,9 @@ constexpr auto SWAMP_GRAVITY  = GRAVITY / 3.0f;
 
 enum JointRotationFlags
 {
-	ROT_X = (1 << 2),
-	ROT_Y = (1 << 3),
-	ROT_Z = (1 << 4)
-};
-
-// Unused.
-enum ShatterFlags
-{
-	NoCollision = (1 << 0),
-	Shatterable = (1 << 1)
+	ROT_X = 1 << 2,
+	ROT_Y = 1 << 3,
+	ROT_Z = 1 << 4
 };
 
 // Custom LOT definition for Creature. Used in InitializeSlot() in lot.cpp.
@@ -114,13 +108,12 @@ struct ObjectInfo
 struct StaticAsset
 {
 	GAME_OBJECT_ID ID = GAME_OBJECT_ID::ID_NO_OBJECT;
-	int meshNumber = 0; // g_Level.meshes index. TODO: Contain meshes here.
 
+	MeshData		Mesh		  = {};
 	GameBoundingBox visibilityBox = {};
 	GameBoundingBox collisionBox  = {};
-
-	ShatterType shatterType	 = ShatterType::None;
-	int			shatterSound = 0;
+	ShatterType		shatterType	  = ShatterType::None;
+	int				shatterSound  = 0;
 
 	int flags = 0;
 };
@@ -129,13 +122,13 @@ struct SpriteAsset
 {
 	static const auto UV_COUNT = 4;
 
-	int							  TileID = 0;
+	int TileID = 0;
 	std::array<Vector2, UV_COUNT> Uvs	 = {};
 };
 
 struct SpriteSequenceAsset
 {
-	int						 ID		 = 0;
+	int ID = 0;
 	std::vector<SpriteAsset> Sprites = {};
 };
 

@@ -59,6 +59,7 @@ DebrisFragment* GetFreeDebrisFragment()
 
 void ShatterObject(SHATTER_ITEM* item, StaticObject* staticPtr, int num, short roomNumber, int noZXVel)
 {
+	const MeshData* mesh = nullptr;
 	int meshIndex = 0;
 	short yRot = 0;
 	float scale;
@@ -71,9 +72,9 @@ void ShatterObject(SHATTER_ITEM* item, StaticObject* staticPtr, int num, short r
 			return;
 
 		isStatic = true;
-		meshIndex = staticPtr->GetAsset().meshNumber;
+		mesh = &staticPtr->GetAsset().Mesh;
 		yRot = staticPtr->Pose.Orientation.y;
-		pos = Vector3(staticPtr->Pose.Position.x, staticPtr->Pose.Position.y, staticPtr->Pose.Position.z);
+		pos = staticPtr->Pose.Position.ToVector3();
 		scale = staticPtr->Scale;
 
 		if (staticPtr->HitPoints <= 0)
@@ -92,13 +93,13 @@ void ShatterObject(SHATTER_ITEM* item, StaticObject* staticPtr, int num, short r
 		scale = 1.0f;
 	}
 
-	auto fragmentsMesh = &g_Level.Meshes[meshIndex];
+	auto* fragmentsMesh = isStatic ? mesh : &g_Level.Meshes[meshIndex];
 
 	for (auto& renderBucket : fragmentsMesh->buckets)
 	{
 		for (int i = 0; i < renderBucket.polygons.size(); i++)
 		{
-			POLYGON* poly = &renderBucket.polygons[i];
+			const auto* poly = &renderBucket.polygons[i];
 			int indices[6];
 
 			if (poly->shape == SHAPE_RECTANGLE)

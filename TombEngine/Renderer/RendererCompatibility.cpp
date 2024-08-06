@@ -481,7 +481,7 @@ namespace TEN::Renderer
 
 			for (int j = 0; j < obj->nmeshes; j++)
 			{
-				MESH* mesh = &g_Level.Meshes[obj->meshIndex + j];
+				MeshData* mesh = &g_Level.Meshes[obj->meshIndex + j];
 
 				for (auto& bucket : mesh->buckets)
 				{
@@ -801,7 +801,7 @@ namespace TEN::Renderer
 		{
 			auto staticID = (GAME_OBJECT_ID)StaticAssetIds[i];
 			const auto& staticObj = GetStaticAsset(staticID);
-			const auto& mesh = g_Level.Meshes[staticObj.meshNumber];
+			const auto& mesh = staticObj.Mesh;
 
 			for (auto& bucket : mesh.buckets)
 			{
@@ -826,7 +826,7 @@ namespace TEN::Renderer
 			staticObj.Type = 1;
 			staticObj.Id = staticAssetID;
 
-			auto& mesh = *GetRendererMeshFromTrMesh(&staticObj, &g_Level.Meshes[staticAsset.meshNumber], 0, false, false, &lastVertex, &lastIndex);
+			auto& mesh = *GetRendererMeshFromTrMesh(&staticObj, &staticAsset.Mesh, 0, false, false, &lastVertex, &lastIndex);
 
 			staticObj.ObjectMeshes.push_back(&mesh);
 			_meshes.push_back(&mesh);
@@ -878,23 +878,23 @@ namespace TEN::Renderer
 		return true;
 	}
 
-	RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex)
+	RendererMesh* Renderer::GetRendererMeshFromTrMesh(RendererObject* obj, const MeshData* mesh, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex)
 	{
-		RendererMesh* mesh = new RendererMesh();
+		RendererMesh* rendererMesh = new RendererMesh();
 
-		mesh->Sphere = meshPtr->sphere;
-		mesh->LightMode = meshPtr->lightMode;
+		rendererMesh->Sphere = mesh->sphere;
+		rendererMesh->LightMode = mesh->lightMode;
 
-		if (meshPtr->positions.empty())
-			return mesh;
+		if (mesh->positions.empty())
+			return rendererMesh;
 
-		mesh->Positions.resize(meshPtr->positions.size());
-		for (int i = 0; i < meshPtr->positions.size(); i++)
-			mesh->Positions[i] = meshPtr->positions[i];
+		rendererMesh->Positions.resize(mesh->positions.size());
+		for (int i = 0; i < mesh->positions.size(); i++)
+			rendererMesh->Positions[i] = mesh->positions[i];
 
-		for (int n = 0; n < meshPtr->buckets.size(); n++)
+		for (int n = 0; n < mesh->buckets.size(); n++)
 		{
-			BUCKET* levelBucket = &meshPtr->buckets[n];
+			const auto* levelBucket = &mesh->buckets[n];
 			RendererBucket bucket{};
 			bucket.Animated = levelBucket->animated;
 			bucket.Texture = levelBucket->texture;
@@ -906,14 +906,14 @@ namespace TEN::Renderer
 
 			for (int p = 0; p < (int)levelBucket->polygons.size(); p++)
 			{
-				POLYGON* poly = &levelBucket->polygons[p];
+				const auto* poly = &levelBucket->polygons[p];
 				RendererPolygon newPoly;
 
 				newPoly.Shape = poly->shape;
 				newPoly.Centre = (
-					meshPtr->positions[poly->indices[0]] +
-					meshPtr->positions[poly->indices[1]] +
-					meshPtr->positions[poly->indices[2]]) / 3.0f;
+					mesh->positions[poly->indices[0]] +
+					mesh->positions[poly->indices[1]] +
+					mesh->positions[poly->indices[2]]) / 3.0f;
 
 				int baseVertices = *lastVertex;
 
@@ -922,43 +922,30 @@ namespace TEN::Renderer
 					Vertex vertex;
 					int v = poly->indices[k];
 
-					vertex.Position.x = meshPtr->positions[v].x;
-					vertex.Position.y = meshPtr->positions[v].y;
-					vertex.Position.z = meshPtr->positions[v].z;
-					 
-					vertex.Normal.x = poly->normals[k].x;
-					vertex.Normal.y = poly->normals[k].y;
-					vertex.Normal.z = poly->normals[k].z;
+					vertex.Position = mesh->positions[v];
+					vertex.Normal = poly->normals[k];
+					vertex.Tangent = poly->tangents[k];
+					vertex.Binormal = poly->binormals[k];
+					vertex.UV = poly->textureCoordinates[k];
+					vertex.Color = Color(mesh->colors[v].x, mesh->colors[v].y, mesh->colors[v].z, 1.0f);
 
-					vertex.Tangent.x = poly->tangents[k].x;
-					vertex.Tangent.y = poly->tangents[k].y;
-					vertex.Tangent.z = poly->tangents[k].z;
-
-					vertex.Binormal.x = poly->binormals[k].x;
-					vertex.Binormal.y = poly->binormals[k].y;
-					vertex.Binormal.z = poly->binormals[k].z;
-
-					vertex.UV.x = poly->textureCoordinates[k].x;
-					vertex.UV.y = poly->textureCoordinates[k].y;
-
-					vertex.Color.x = meshPtr->colors[v].x;
-					vertex.Color.y = meshPtr->colors[v].y;
-					vertex.Color.z = meshPtr->colors[v].z;
-					vertex.Color.w = 1.0f;
-
-					vertex.Bone = meshPtr->bones[v];
+					vertex.Bone = mesh->bones[v];
 					vertex.OriginalIndex = v;
 
-					vertex.Effects = Vector4(meshPtr->effects[v].x, meshPtr->effects[v].y, meshPtr->effects[v].z, poly->shineStrength);
+					vertex.Effects = Vector4(mesh->effects[v].x, mesh->effects[v].y, mesh->effects[v].z, poly->shineStrength);
 					vertex.Hash = (unsigned int)std::hash<float>{}
 						(vertex.Position.x) ^
 							(unsigned int)std::hash<float>{}(vertex.Position.y) ^
 							(unsigned int)std::hash<float>{}(vertex.Position.z);
 
 					if (obj->Type == 0)
+					{
 						_moveablesVertices[*lastVertex] = vertex;
+					}
 					else
+					{
 						_staticsVertices[*lastVertex] = vertex;
+					}
 
 					*lastVertex = *lastVertex + 1;
 				}
@@ -1011,9 +998,9 @@ namespace TEN::Renderer
 				bucket.Polygons.push_back(newPoly);
 			}
 
-			mesh->Buckets.push_back(bucket);
+			rendererMesh->Buckets.push_back(bucket);
 		}
 
-		return mesh;
+		return rendererMesh;
 	}
 }
