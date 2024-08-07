@@ -142,30 +142,33 @@ public:
 
 struct ROOM_INFO
 {
-	int index;
-	int x;
-	int y;
-	int z;
-	int minfloor;
-	int maxceiling;
-	int xSize;
-	int zSize;
+	int						 RoomNumber = 0;
+	std::string				 Name		= {};
+	std::vector<std::string> Tags		= {};
+
+	Vector3i Position	  = Vector3i::Zero;
+	int		 BottomHeight = 0;
+	int		 TopHeight	  = 0;
+	int		 XSize		  = 0;
+	int		 ZSize		  = 0;
+
 	Vector3 ambient;
-	int flippedRoom;
 	int flags;
 	int meshEffect;
 	ReverbType reverbType;
+	int flippedRoom;
 	int flipNumber;
 	short itemNumber;
 	short fxNumber;
 	bool boundActive;
 
-	std::string name = {};
-	std::vector<std::string> tags = {};
+	std::vector<int> NeighborRoomNumbers = {};
 
 	AttractorHandler		   Attractors	  = {};
-	std::vector<FloorInfo>	   floor		  = {};
-	std::vector<TriggerVolume> triggerVolumes = {};
+	std::vector<FloorInfo>	   Sectors		  = {};
+	std::vector<ROOM_LIGHT>	   lights		  = {};
+	std::vector<MESH_INFO>	   mesh			  = {}; // Statics
+	std::vector<TriggerVolume> TriggerVolumes = {};
 
 	std::vector<MESH_INFO>	mesh	  = {};
 	std::vector<ROOM_LIGHT> lights	  = {};
@@ -175,8 +178,6 @@ struct ROOM_INFO
 	std::vector<Vector3>	effects	  = {};
 	std::vector<BUCKET>		buckets	  = {};
 	std::vector<ROOM_DOOR>	doors	  = {};
-
-	std::vector<int> neighbors = {};
 
 	bool Active() const;
 };

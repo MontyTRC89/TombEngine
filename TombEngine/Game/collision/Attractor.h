@@ -25,6 +25,7 @@ namespace TEN::Collision::Attractor
 	{
 	private:
 		// Members
+
 		AttractorType		 _type			 = AttractorType::Edge;
 		std::vector<Vector3> _points		 = {};
 		int					 _roomNumber	 = 0;
@@ -36,13 +37,16 @@ namespace TEN::Collision::Attractor
 
 	public:
 		// Constructors
+
 		AttractorObject();
 		AttractorObject(AttractorType type, const std::vector<Vector3>& points, int roomNumber);
 
 		// Destructors
+
 		~AttractorObject();
 
 		// Getters
+
 		AttractorType				GetType() const;
 		const std::vector<Vector3>& GetPoints() const;
 		int							GetRoomNumber() const;
@@ -51,9 +55,11 @@ namespace TEN::Collision::Attractor
 		const BoundingBox&			GetAabb() const;
 
 		// Inquirers
+
 		bool IsLooped() const;
 
 		// Utilities
+
 		unsigned int GetSegmentCount() const;
 		unsigned int GetSegmentIDAtChainDistance(float chainDist) const;
 		Vector3		 GetIntersectionAtChainDistance(float chainDist) const;
@@ -68,6 +74,7 @@ namespace TEN::Collision::Attractor
 
 	private:
 		// Helpers
+
 		float NormalizeChainDistance(float chainDist) const;
 		void  Cache();
 	};
@@ -76,6 +83,7 @@ namespace TEN::Collision::Attractor
 	{
 	public:
 		// Members
+
 		AttractorObject* Attractor = nullptr;
 
 		unsigned int SegmentID	   = 0;
@@ -89,11 +97,13 @@ namespace TEN::Collision::Attractor
 		bool  IsInFront	   = false;
 
 		// Constructors
+
 		AttractorCollisionData() = default;
 		AttractorCollisionData(AttractorObject& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis);
 	};
 
 	// Getters
+
 	AttractorCollisionData GetAttractorCollision(AttractorObject& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle,
 												 const Vector3& axis = Vector3::UnitY);
 	AttractorCollisionData GetAttractorCollision(AttractorObject& attrac, float chainDist, short headingAngle,
@@ -106,5 +116,6 @@ namespace TEN::Collision::Attractor
 															   const Vector3& axis = Vector3::UnitY);
 
 	// Debug
+
 	void DrawNearbyAttractors(const Vector3& pos, int roomNumber, short headingAngle);
 }
