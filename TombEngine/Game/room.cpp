@@ -141,6 +141,40 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 	constexpr auto REL_CORNER_2 = Vector2i(BLOCK(1), BLOCK(1));
 	constexpr auto REL_CORNER_3 = Vector2i(BLOCK(1), 0);
 
+	struct VertexData
+	{
+		struct SurfaceVertexData
+		{
+			struct TriangleVertexData
+			{
+				Vector3 Vertex0 = Vector3::Zero;
+				Vector3 Vertex1 = Vector3::Zero;
+				Vector3 Vertex2 = Vector3::Zero;
+			};
+
+			TriangleVertexData Tri0 = {};
+			TriangleVertexData Tri2 = {};
+
+			Vector3 PrevVertex0 = Vector3::Zero;
+			Vector3 PrevVertex1 = Vector3::Zero;
+			Vector3 NextVertex0 = Vector3::Zero;
+			Vector3 NextVertex1 = Vector3::Zero;
+		};
+
+		SurfaceVertexData Floor = {};
+		SurfaceVertexData Ceil	= {};
+	};
+
+	auto getVertices = []()
+	{
+		return VertexData{};
+	};
+
+	// TODO: Use this to reduce the amount of repeated calculations.
+	auto vertices = getVertices();
+
+	vertices.Floor.Tri0.Vertex0;
+
 	// Calculate 2D corner positions.
 	auto corner0 = sector.Position + REL_CORNER_0;
 	auto corner1 = sector.Position + REL_CORNER_1;
