@@ -32,10 +32,15 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Enhaced Rolling Spindle detection to avoid them going down through pits.
 * Enhaced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
 * Enhaced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
+* Enhanced Raptor behaviour and handling. 
+  - OCB 0: Classic Behaviour
+  - OCB 1: Can jump up to 4 clicks and across a gap up to 2 blocks wide
+  - You must use the download version found on the TombEngine website.
 * Add new sound conditions: quicksand and Underwater.
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.
 * Changed Water sound condition to ShallowWater.
+
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
