@@ -62,9 +62,7 @@ namespace TEN::Entities::Creatures::TR5
 		{
 			if (item->Animation.ActiveState != WITCH_STATE_DEATH)
 			{
-				item->Animation.ActiveState = WITCH_STATE_DEATH;
-				item->Animation.AnimNumber = WITCH_ANIM_DEATH;
-				item->Animation.FrameNumber = 0;
+				SetAnimation(*item, WITCH_ANIM_DEATH);
 				item->HitPoints = 0;
 			}
 		}

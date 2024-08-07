@@ -104,7 +104,7 @@ void Room::SetReverbType(ReverbType reverb)
 
 std::string Room::GetName() const
 {
-	return m_room.name;
+	return m_room.Name;
 }
 
 void Room::SetName(const std::string& name)
@@ -115,8 +115,8 @@ void Room::SetName(const std::string& name)
 	// Remove old name if it already exists.
 	if (s_callbackSetName(name, m_room))
 	{
-		s_callbackRemoveName(m_room.name);
-		m_room.name = name;
+		s_callbackRemoveName(m_room.Name);
+		m_room.Name = name;
 	}
 	else
 	{
@@ -144,10 +144,10 @@ void Room::SetFlag(RoomEnvFlags flag, bool value)
 
 bool Room::IsTagPresent(const std::string& tag) const
 {
-	if (m_room.tags.empty())
+	if (m_room.Tags.empty())
 		return false;
 
 	return std::any_of(
-		m_room.tags.begin(), m_room.tags.end(),
+		m_room.Tags.begin(), m_room.Tags.end(),
 		[&tag](const std::string& value) { return (value == tag); });
 }

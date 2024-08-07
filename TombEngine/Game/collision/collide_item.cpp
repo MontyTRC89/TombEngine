@@ -124,7 +124,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 	// Run through neighboring rooms.
 	const auto& room = g_Level.Rooms[collidingItem.RoomNumber];
-	for (int roomNumber : room.neighbors)
+	for (int roomNumber : room.NeighborRoomNumbers)
 	{
 		auto& neighborRoom = g_Level.Rooms[roomNumber];
 		if (!neighborRoom.Active())
@@ -308,7 +308,7 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 		// DrawDebugSphere(origin, 16, Vector4::One, RendererDebugPage::CollisionStats);
 
-		for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
+		for (auto i : g_Level.Rooms[item->RoomNumber].NeighborRoomNumbers)
 		{
 			if (!g_Level.Rooms[i].Active())
 				continue;
@@ -941,7 +941,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->HitTallObject = false;
 
-	for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
+	for (auto i : g_Level.Rooms[item->RoomNumber].NeighborRoomNumbers)
 	{
 		if (!g_Level.Rooms[i].Active())
 			continue;
@@ -1810,7 +1810,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	const auto& room = g_Level.Rooms[item->RoomNumber];
-	for (int neighborRoomNumber : room.neighbors)
+	for (int neighborRoomNumber : room.NeighborRoomNumbers)
 	{
 		auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 		if (!neighborRoom.Active())
