@@ -23,7 +23,7 @@ using namespace TEN::Math;
 namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto CENTAUR_REAR_DAMAGE = 200;
-	constexpr auto CENTAUR_REAR_RANGE = BLOCK(3 / 2.0f);
+	constexpr auto CENTAUR_REAR_RANGE = SQUARE(BLOCK(3 / 2.0f));
 	constexpr auto CENTAUR_REAR_CHANCE = 1 / 340.0f;
 	constexpr auto CENTAUR_BOMB_VELOCITY = CLICK(1);
 
@@ -60,6 +60,9 @@ namespace TEN::Entities::Creatures::TR1
 
 		short headingAngle = 0;
 		short headYOrient = 0;
+		short headXOrient = 0;
+		short torsoYOrient = 0;
+		short torsoXOrient = 0;
 
 		if (item.HitPoints <= 0)
 		{
@@ -72,22 +75,25 @@ namespace TEN::Entities::Creatures::TR1
 			CreatureAIInfo(&item, &ai);
 
 			if (ai.ahead)
+			{
 				headYOrient = ai.angle;
+				headXOrient = ai.xAngle;
+				torsoYOrient = ai.angle / 2;
+				torsoXOrient = ai.xAngle / 2;
+			}
 
+			GetCreatureMood(&item, &ai, true);
 			CreatureMood(&item, &ai, true);
-
 			headingAngle = CreatureTurn(&item, CENTAUR_TURN_RATE_MAX);
 
 			switch (item.Animation.ActiveState)
 			{
 			case CENTAUR_STATE_IDLE:
-				CreatureJoint(&item, 17, 0);
-
 				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
-				else if (ai.bite && ai.distance < pow(CENTAUR_REAR_RANGE, 2))
+				else if (ai.bite && ai.distance < CENTAUR_REAR_RANGE)
 				{
 					item.Animation.TargetState = CENTAUR_STATE_RUN_FORWARD;
 				}
@@ -103,7 +109,9 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case CENTAUR_STATE_RUN_FORWARD:
-				if (ai.bite && ai.distance < pow(CENTAUR_REAR_RANGE, 2))
+				torsoYOrient = 0;
+				torsoXOrient = 0;
+				if (ai.bite && ai.distance < CENTAUR_REAR_RANGE)
 				{
 					item.Animation.TargetState = CENTAUR_STATE_IDLE;
 					item.Animation.RequiredState = CENTAUR_STATE_WARNING;
@@ -160,8 +168,10 @@ namespace TEN::Entities::Creatures::TR1
 		}
 
 		CreatureJoint(&item, 0, headYOrient);
+		CreatureJoint(&item, 1, -headXOrient);
+		CreatureJoint(&item, 2, torsoYOrient);
+		CreatureJoint(&item, 3, -torsoXOrient);
 		CreatureAnimation(itemNumber, headingAngle, 0);
-
 		if (item.Status == ITEM_DEACTIVATED)
 		{
 			SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item.Pose);

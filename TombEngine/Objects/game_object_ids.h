@@ -165,7 +165,7 @@ enum GAME_OBJECT_ID : short
 	ID_GIANT_MUTANT = 225,
 	// 226
 	ID_PROJ_SHARD = 227,
-	ID_PROJ_BOMB,                                                                                 
+	ID_PROJ_BOMB,
 	ID_YETI,
 	ID_BIRDMONSTER,
 	ID_MARCO_BARTOLI,
