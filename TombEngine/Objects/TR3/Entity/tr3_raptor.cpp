@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR3/Entity/tr3_raptor.h"
 
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
@@ -14,6 +15,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Math;
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -78,13 +80,14 @@ namespace TEN::Entities::Creatures::TR3
 		RAPTOR_ANIM_VAULT_DROP_4CLICK = 23
 	};
 
-	// TODO
 	enum RaptorFlags
 	{
-
+		OCB_NORMAL_BEHAVIOUR = 0,
+		OCB_ABLE_TO_JUMP = 1
 	};
 
 	const std::array RaptorDeathAnims = { RAPTOR_ANIM_DEATH_1, RAPTOR_ANIM_DEATH_2, };
+	const std::vector<GAME_OBJECT_ID> RaptorIgnoreObjects = { ID_RAPTOR, ID_COMPSOGNATHUS };
 
 	void RaptorControl(short itemNumber)
 	{
@@ -98,33 +101,46 @@ namespace TEN::Entities::Creatures::TR3
 		short head = 0;
 		short neck = 0;
 
-		bool canJump1block = CanCreatureJump(*item, JumpDistance::Block1);
-		bool canJump2blocks = !canJump1block && CanCreatureJump(*item, JumpDistance::Block2);
+		bool canJump = item->TestOcb(OCB_ABLE_TO_JUMP);
+		if (!canJump)
+		{
+			creature->LOT.Step = CLICK(1);
+			creature->LOT.Drop = -CLICK(2);
+			creature->LOT.Zone = ZoneType::Basic;
+			creature->LOT.CanJump = false;
+		}
 
-		if (item->HitPoints <= 0)
+		bool canJump1block = canJump && CanCreatureJump(*item, JumpDistance::Block1);
+		bool canJump2blocks = canJump && !canJump1block && CanCreatureJump(*item, JumpDistance::Block2);
+
+		if (item->HitPoints <= 0 && item->Animation.ActiveState == RAPTOR_STATE_IDLE) // Require IDLE state.
 		{
 			if (item->Animation.ActiveState != RAPTOR_STATE_DEATH)
 			{
 				SetAnimation(item, RaptorDeathAnims[Random::GenerateInt(0, (int)RaptorDeathAnims.size() - 1)]);
-				item->Pose.Position.y = GetCollision(item).Position.Floor; // NOTE: Do that so when the raptor die during pit jump, he go down to the bottom floor instead of staying midair !
 			}
 		}
 		else
 		{
 			// Raptor ignore other raptor and mini-raptor but target anything else (TRex is not ignored) !
-			TargetNearestEntity(item, creature, { ID_RAPTOR, ID_COMPSOGNATHUS });
+			TargetNearestEntity(item, creature, RaptorIgnoreObjects);
 
-			AI_INFO AI;
+			AI_INFO ai;
 			if (item->AIBits)
 				GetAITarget(creature);
-			CreatureAIInfo(item, &AI);
-			GetCreatureMood(item, &AI, true);
-			CreatureMood(item, &AI, true);
+			CreatureAIInfo(item, &ai);
+
+			GetCreatureMood(item, &ai, true);
+			CreatureMood(item, &ai, true);
 			if (creature->Mood == MoodType::Bored)
 				creature->MaxTurn /= 2;
+
 			angle = CreatureTurn(item, creature->MaxTurn);
-			if (AI.ahead) head = AI.angle;
-			neck = -angle * 6;
+			if (ai.ahead)
+			{
+				head = ai.angle;
+				neck = -angle * 6;
+			}
 
 			switch (item->Animation.ActiveState)
 			{
@@ -151,14 +167,14 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = RAPTOR_STATE_ROAR;
 				}
 				else if (item->TouchBits.Test(RaptorAttackJoints) ||
-					(AI.distance < RAPTOR_BITE_ATTACK_RANGE && AI.bite))
+					(ai.distance < RAPTOR_BITE_ATTACK_RANGE && ai.bite))
 				{
 					item->Animation.TargetState = RAPTOR_STATE_BITE_ATTACK;
 				}
-				else if (AI.bite && AI.distance < RAPTOR_JUMP_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < RAPTOR_JUMP_ATTACK_RANGE)
 					item->Animation.TargetState = RAPTOR_STATE_JUMP_ATTACK;
 				else if (creature->Mood == MoodType::Escape &&
-					Lara.TargetEntity != item && AI.ahead && !item->HitStatus)
+					Lara.TargetEntity != item && ai.ahead && !item->HitStatus)
 				{
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 				}
@@ -174,7 +190,11 @@ namespace TEN::Entities::Creatures::TR3
 				creature->LOT.IsJumping = false;
 				creature->Flags &= ~1;
 
-				if (canJump1block || canJump2blocks)
+				if (item->HitPoints <= 0)
+				{
+					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+				}
+				else if (canJump1block || canJump2blocks)
 				{
 					creature->MaxTurn = 0;
 					SetAnimation(item, RAPTOR_ANIM_JUMP_START);
@@ -186,7 +206,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (creature->Mood != MoodType::Bored)
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
-				else if (AI.ahead && Random::TestProbability(RAPTOR_ROAR_CHANCE))
+				else if (ai.ahead && Random::TestProbability(RAPTOR_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 					item->Animation.RequiredState = RAPTOR_STATE_ROAR;
@@ -201,7 +221,11 @@ namespace TEN::Entities::Creatures::TR3
 				creature->Flags &= ~1;
 				tilt = angle;
 
-				if (canJump1block || canJump2blocks)
+				if (item->HitPoints <= 0)
+				{
+					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+				}
+				else if (canJump1block || canJump2blocks)
 				{
 					creature->MaxTurn = 0;
 					SetAnimation(item, RAPTOR_ANIM_JUMP_START);
@@ -219,21 +243,21 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.RequiredState = RAPTOR_STATE_ROAR;
 					creature->Flags &= ~2;
 				}
-				else if (AI.bite && AI.distance < RAPTOR_RUN_ATTACK_RANGE)
+				else if (ai.bite && ai.distance < RAPTOR_RUN_ATTACK_RANGE)
 				{
 					if (Random::TestProbability(0.25f))
 						item->Animation.TargetState = RAPTOR_STATE_IDLE;
 					else
 						item->Animation.TargetState = RAPTOR_STATE_RUN_BITE_ATTACK;
 				}
-				else if (AI.ahead && creature->Mood != MoodType::Escape &&
+				else if (ai.ahead && creature->Mood != MoodType::Escape &&
 					Random::TestProbability(RAPTOR_ROAR_CHANCE))
 				{
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 					item->Animation.RequiredState = RAPTOR_STATE_ROAR;
 				}
 				else if (creature->Mood == MoodType::Bored ||
-					(creature->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead))
+					(creature->Mood == MoodType::Escape && Lara.TargetEntity != item && ai.ahead))
 				{
 					item->Animation.TargetState = RAPTOR_STATE_IDLE;
 				}
