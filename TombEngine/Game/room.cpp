@@ -162,7 +162,8 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 			Vector3 NextVertex0 = Vector3::Zero;
 			Vector3 NextVertex1 = Vector3::Zero;
 
-			bool IsSplit = false;
+			bool IsSplit	   = false;
+			bool IsSplitAngle0 = false;
 		};
 
 		SurfaceVertexData Floor = {};
@@ -187,15 +188,12 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 			auto& surfVertices = isFloor ? vertices.Floor : vertices.Ceil;
 			int sign = isFloor ? -1 : 1;
 
-			// Determine split status.
-			bool isSurfSplit = sector.IsSurfaceSplit(isFloor);
-			bool isSurfSplitAngle0 = (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-
 			// Set split status.
-			surfVertices.IsSplit = isSurfSplit;
+			surfVertices.IsSplit = sector.IsSurfaceSplit(isFloor);
+			surfVertices.IsSplitAngle0 = (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 
 			// Set surface triangle vertices.
-			if (!isSurfSplit || isSurfSplitAngle0)
+			if (!surfVertices.IsSplit || surfVertices.IsSplitAngle0)
 			{
 				surfVertices.Tri0.Vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
 				surfVertices.Tri0.Vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
@@ -220,11 +218,13 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				surfVertices.Tri1.Normal = GetRawSurfaceTriangleNormal(surfVertices.Tri1.Vertex0, surfVertices.Tri1.Vertex1, surfVertices.Tri1.Vertex2) * sign;
 			}
 
-			isFloor = false;
+			isFloor = !isFloor;
 		}
 
 		return vertices;
 	};
+
+	goto skip;
 
 	// 1) Generate surface triangle vertices.
 	auto vertices = getVertices();
@@ -234,23 +234,105 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 	for (int i = 0; i < 2; i++)
 	{
 		const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
-		const auto& surfVertices = isFloor ? vertices.Floor : vertices.Ceil;
+		const auto& surfVerts = isFloor ? vertices.Floor : vertices.Ceil;
+		int sign = isFloor ? 1 : -1;
 
-		// Determine wall status.
+		// Determine surface wall status.
 		bool isSurf0Wall = sector.IsWall(0);
 		bool isSurf1Wall = sector.IsWall(1);
 
+		// Determine surface portal status.
+		bool isSurfTri0Portal = (surface.Triangles[0].PortalRoomNumber != NO_VALUE);
+		bool isSurfTri1Portal = (surface.Triangles[1].PortalRoomNumber != NO_VALUE);
+
 		// 2.1) Collect surface triangles.
 		if (!isSurf0Wall)
-			CollisionMesh.InsertTriangle(surfVertices.Tri0.Vertex0, surfVertices.Tri0.Vertex1, surfVertices.Tri0.Vertex2, surfVertices.Tri0.Normal, surface.Triangles[0].PortalRoomNumber);
+			CollisionMesh.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri0.Vertex1, surfVerts.Tri0.Vertex2, surfVerts.Tri0.Normal, surface.Triangles[0].PortalRoomNumber);
 		if (!isSurf1Wall)
-			CollisionMesh.InsertTriangle(surfVertices.Tri1.Vertex0, surfVertices.Tri1.Vertex1, surfVertices.Tri1.Vertex2, surfVertices.Tri1.Normal, surface.Triangles[1].PortalRoomNumber);
+			CollisionMesh.InsertTriangle(surfVerts.Tri1.Vertex0, surfVerts.Tri1.Vertex1, surfVerts.Tri1.Vertex2, surfVerts.Tri1.Normal, surface.Triangles[1].PortalRoomNumber);
+
+		// 2.2) Collect diagonal wall triangles.
+		if (surfVerts.IsSplit && !(isSurf0Wall && isSurf1Wall))
+		{
+			// Full wall.
+			if ((isSurf0Wall || isSurf1Wall) && isFloor)
+			{
+				const auto& vertex0 = surfVerts.IsSplitAngle0 ?
+					(isSurf0Wall ? vertices.Floor.Tri1.Vertex0 : vertices.Floor.Tri0.Vertex0) :
+					(isSurf0Wall ? vertices.Floor.Tri1.Vertex1 : vertices.Floor.Tri0.Vertex0);
+				const auto& vertex1 = surfVerts.IsSplitAngle0 ?
+					(isSurf0Wall ? vertices.Floor.Tri1.Vertex1 : vertices.Floor.Tri0.Vertex2) :
+					(isSurf0Wall ? vertices.Floor.Tri1.Vertex2 : vertices.Floor.Tri0.Vertex2);
+				const auto& vertex2 = surfVerts.IsSplitAngle0 ?
+					(isSurf0Wall ? vertices.Ceil.Tri1.Vertex0 : vertices.Ceil.Tri0.Vertex0) :
+					(isSurf0Wall ? vertices.Ceil.Tri1.Vertex1 : vertices.Ceil.Tri0.Vertex0);
+				const auto& vertex3 = surfVerts.IsSplitAngle0 ?
+					(isSurf0Wall ? vertices.Ceil.Tri1.Vertex1 : vertices.Ceil.Tri0.Vertex2) :
+					(isSurf0Wall ? vertices.Ceil.Tri1.Vertex2 : vertices.Ceil.Tri0.Vertex2);
+
+				if (vertex0 != vertex2)
+				{
+					const auto& normal = surfVerts.IsSplitAngle0 ?
+						(isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL) :
+						(isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
+					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, normal);
+				}
+				if (vertex1 != vertex3)
+				{
+					const auto& normal = surfVerts.IsSplitAngle0 ?
+						(isSurf0Wall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL) :
+						(isSurf0Wall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
+					CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, normal);
+				}
+			}
+			// Step wall.
+			else if (!(isSurf0Wall || isSurf1Wall) && !(isSurfTri0Portal && isSurfTri1Portal))
+			{
+				// TODO: Check when diagonal criss-cross becomes possible.
+				if (surfVerts.IsSplitAngle0)
+				{
+					bool isSecondCrissCrossCase = (isFloor ? (surfVerts.Tri0.Vertex2.y < surfVerts.Tri0.Vertex1.y) : !(surfVerts.Tri0.Vertex2.y < surfVerts.Tri0.Vertex1.y));
+					if (surfVerts.Tri0.Vertex0 != surfVerts.Tri1.Vertex0)
+					{
+						const auto& normal0 = ((surfVerts.Tri0.Vertex0.y > surfVerts.Tri1.Vertex0.y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * sign;
+						isSecondCrissCrossCase ?
+							CollisionMesh.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri0.Vertex2, surfVerts.Tri1.Vertex1, normal0) :
+							CollisionMesh.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri1.Vertex0, surfVerts.Tri0.Vertex2, normal0);
+					}
+					if (surfVerts.Tri0.Vertex2 != surfVerts.Tri0.Vertex1)
+					{
+						const auto& normal1 = ((surfVerts.Tri0.Vertex2.y > surfVerts.Tri1.Vertex1.y) ? NORTH_WEST_WALL_NORMAL : SOUTH_EAST_WALL_NORMAL) * sign;
+						isSecondCrissCrossCase ?
+							CollisionMesh.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri1.Vertex0, surfVerts.Tri1.Vertex1, normal1) :
+							CollisionMesh.InsertTriangle(surfVerts.Tri1.Vertex0, surfVerts.Tri0.Vertex2, surfVerts.Tri1.Vertex1, normal1);
+					}
+				}
+				else
+				{
+					bool isSecondCrissCrossCase = (isFloor ? (surfVerts.Tri1.Vertex2.y < surfVerts.Tri0.Vertex2.y) : !(surfVerts.Tri1.Vertex2.y <surfVerts.Tri0.Vertex2.y));
+					if (surfVerts.Tri0.Vertex0 != surfVerts.Tri1.Vertex1)
+					{
+						const auto& normal0 = ((surfVerts.Tri0.Vertex0.y > surfVerts.Tri1.Vertex1.y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * sign;
+						isSecondCrissCrossCase ?
+							CollisionMesh.InsertTriangle(surfVerts.Tri1.Vertex1, surfVerts.Tri1.Vertex2, surfVerts.Tri0.Vertex2, normal0) :
+							CollisionMesh.InsertTriangle(surfVerts.Tri1.Vertex1, surfVerts.Tri0.Vertex0, surfVerts.Tri1.Vertex2, normal0);
+					}
+					if (surfVerts.Tri0.Vertex2 != surfVerts.Tri1.Vertex2)
+					{
+						const auto& normal1 = ((surfVerts.Tri0.Vertex2.y > surfVerts.Tri1.Vertex2.y) ? NORTH_EAST_WALL_NORMAL : SOUTH_WEST_WALL_NORMAL) * sign;
+						isSecondCrissCrossCase ?
+							CollisionMesh.InsertTriangle(surfVerts.Tri1.Vertex1, surfVerts.Tri0.Vertex0, surfVerts.Tri0.Vertex2, normal1) :
+							CollisionMesh.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri1.Vertex2, surfVerts.Tri0.Vertex2, normal1);
+					}
+				}
+			}
+		}
 
 		isFloor = !isFloor;
 	}
 
 	return;
-	//-----AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+	skip:
 
 	// Collect triangles.
 	isFloor = true;
