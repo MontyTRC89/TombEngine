@@ -6,10 +6,10 @@
 using namespace TEN::Math;
 using namespace TEN::Physics;
 
-enum GAME_OBJECT_ID : short;
-enum class ReverbType;
 class FloorInfo;
 class GameBoundingBox;
+enum GAME_OBJECT_ID : short;
+enum class ReverbType;
 struct BUCKET;
 struct TriggerVolume;
 
@@ -44,7 +44,7 @@ enum StaticMeshFlags : short
 	SM_SOLID = 2
 };
 
-struct ROOM_VERTEX
+struct RoomVertexData
 {
 	Vector3 position;
 	Vector3 normal;
@@ -54,14 +54,14 @@ struct ROOM_VERTEX
 	int		index;
 };
 
-struct ROOM_DOOR
+struct RoomDoorData
 {
 	short room;
 	Vector3 normal;
 	Vector3 vertices[4];
 };
 
-struct ROOM_LIGHT
+struct RoomLightData
 {
 	int x, y, z;       // Position of light, in world coordinates
 	float r, g, b;       // Colour of the light
@@ -119,7 +119,7 @@ public:
 	void Remove(int id);
 };
 
-struct ROOM_INFO
+struct RoomData
 {
 	int						 RoomNumber = 0;
 	std::string				 Name		= {};
@@ -149,7 +149,7 @@ struct ROOM_INFO
 	std::vector<int> NeighborRoomNumbers = {};
 
 	std::vector<FloorInfo>	   Sectors		  = {};
-	std::vector<ROOM_LIGHT>	   lights		  = {};
+	std::vector<RoomLightData> lights		  = {};
 	std::vector<MESH_INFO>	   mesh			  = {}; // Statics
 	std::vector<TriggerVolume> TriggerVolumes = {};
 
@@ -158,9 +158,18 @@ struct ROOM_INFO
 	std::vector<Vector3>   colors	 = {};
 	std::vector<Vector3>   effects	 = {};
 	std::vector<BUCKET>	   buckets	 = {};
-	std::vector<ROOM_DOOR> doors	 = {};
+	std::vector<RoomDoorData> doors	 = {};
 
 	bool Active() const;
+	void GenerateCollisionMesh();
+
+private:
+	void	CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
+												const FloorInfo& prevSectorX, const FloorInfo& nextSectorX,
+												const FloorInfo& prevSectorZ, const FloorInfo& nextSectorZ,
+												bool isXEnd, bool isZEnd);
+	int		GetSurfaceTriangleVertexY(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor);
+	Vector3 GetRawSurfaceTriangleNormal(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2);
 };
 
 void DoFlipMap(int group);
@@ -175,7 +184,5 @@ GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox)
 
 namespace TEN::Collision::Room
 {
-	FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
-
-	void GenerateRoomCollisionMesh(ROOM_INFO& room);
+	FloorInfo* GetSector(RoomData* room, int x, int z);
 }

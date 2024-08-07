@@ -7,11 +7,11 @@ enum class ReverbType;
 class ScriptColor;
 class Vec3; 
 
-class Room : public NamedBase<Room, ROOM_INFO&>
+class Room : public NamedBase<Room, RoomData&>
 {
 public:
-	using IdentifierType = std::reference_wrapper<ROOM_INFO>;
-	Room(ROOM_INFO& room);
+	using IdentifierType = std::reference_wrapper<RoomData>;
+	Room(RoomData& room);
 	~Room() = default;
 
 	Room& operator =(const Room& other) = delete;
@@ -34,5 +34,5 @@ public:
 	[[nodiscard]] bool IsTagPresent(const std::string& tag) const;
 
 private:
-	ROOM_INFO& m_room;
+	RoomData& m_room;
 };

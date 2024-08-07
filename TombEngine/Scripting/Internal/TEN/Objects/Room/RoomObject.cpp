@@ -23,7 +23,7 @@ Rooms
 static auto IndexError = index_error_maker(Room, ScriptReserved_Volume);
 static auto NewIndexError = newindex_error_maker(Room, ScriptReserved_Volume);
 
-Room::Room(ROOM_INFO& room) : m_room{ room }
+Room::Room(RoomData& room) : m_room{ room }
 {};
 
 void Room::Register(sol::table& parent)

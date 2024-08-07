@@ -316,7 +316,7 @@ namespace TEN::Renderer
 		}
 
 		RendererRoom& room = _rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
+		RoomData* r = &g_Level.Rooms[room.RoomNumber];
 
 		short itemNum = NO_VALUE;
 		for (itemNum = r->itemNumber; itemNum != NO_VALUE; itemNum = g_Level.Items[itemNum].NextItem)
@@ -400,7 +400,7 @@ namespace TEN::Renderer
 		}
 
 		RendererRoom& room = _rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
+		RoomData* r = &g_Level.Rooms[room.RoomNumber];
 
 		if (r->mesh.empty())
 		{
@@ -754,7 +754,7 @@ namespace TEN::Renderer
 		}
 
 		RendererRoom& room = _rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
+		RoomData* r = &g_Level.Rooms[roomNumber];
 		
 		// Collect dynamic lights for rooms
 		for (int i = 0; i < _dynamicLights.size(); i++)
@@ -796,7 +796,7 @@ namespace TEN::Renderer
 			return;
 
 		RendererRoom& room = _rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
+		RoomData* r = &g_Level.Rooms[room.RoomNumber];
 
 		short fxNum = NO_VALUE;
 		for (fxNum = r->fxNumber; fxNum != NO_VALUE; fxNum = EffectList[fxNum].nextFx)

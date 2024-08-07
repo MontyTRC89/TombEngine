@@ -203,7 +203,7 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
 		{
-			ROOM_INFO& room = g_Level.Rooms[i];
+			RoomData& room = g_Level.Rooms[i];
 
 			RendererRoom* r = &_rooms[i];
 
@@ -230,7 +230,7 @@ namespace TEN::Renderer
 				for (int l = 0; l < room.doors.size(); l++)
 				{
 					RendererDoor* door = &r->Doors[l];
-					ROOM_DOOR* oldDoor = &room.doors[l];
+					RoomDoorData* oldDoor = &room.doors[l];
 
 					door->RoomNumber = oldDoor->room;
 					door->Normal = oldDoor->normal;
@@ -377,7 +377,7 @@ namespace TEN::Renderer
 				for (int l = 0; l < room.lights.size(); l++)
 				{
 					RendererLight* light = &r->Lights[l];
-					ROOM_LIGHT* oldLight = &room.lights[l];
+					RoomLightData* oldLight = &room.lights[l];
 
 					if (oldLight->type == 0)
 					{

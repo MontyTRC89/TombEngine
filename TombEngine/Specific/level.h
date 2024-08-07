@@ -102,7 +102,7 @@ struct LEVEL
 	std::vector<short>					Commands = {};
 
 	// Collision data
-	std::vector<ROOM_INFO> Rooms	 = {};
+	std::vector<RoomData> Rooms	 = {};
 	std::vector<short>	   FloorData = {};
 	std::vector<SinkInfo>  Sinks	 = {};
 
@@ -164,7 +164,7 @@ void LoadAnimatedTextures();
 void LoadEventSets();
 void LoadAIObjects();
 
-void LoadPortal(ROOM_INFO& room);
+void LoadPortal(RoomData& room);
 
 void GetCarriedItems();
 void GetAIPickups();

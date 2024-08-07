@@ -834,7 +834,7 @@ void ReadRooms()
 		room.lights.reserve(lightCount);
 		for (int j = 0; j < lightCount; j++)
 		{
-			auto light = ROOM_LIGHT{};
+			auto light = RoomLightData{};
 
 			light.x = ReadInt32();
 			light.y = ReadInt32();
@@ -920,7 +920,7 @@ void ReadRooms()
 
 	// Generate room collision meshes.
 	for (auto& room : g_Level.Rooms)
-		GenerateRoomCollisionMesh(room);
+		room.GenerateCollisionMesh();
 }
 
 void LoadRooms()
@@ -1566,9 +1566,9 @@ void BuildOutsideRoomsTable()
 	}
 }
 
-void LoadPortal(ROOM_INFO& room) 
+void LoadPortal(RoomData& room) 
 {
-	ROOM_DOOR door;
+	RoomDoorData door;
 
 	door.room = ReadInt16();
 	door.normal.x = ReadInt32();
