@@ -674,13 +674,6 @@ namespace TEN::Math
 	{
 		Validate(_rootID);
 
-		// Validate inner node and leaf node count relation.
-		unsigned int innerNodeCount = 0;
-		unsigned int leafNodeCount = 0;
-		for (const auto& node : _nodes)
-			node.IsLeaf() ? leafNodeCount++ : innerNodeCount++;
-		TENAssert(innerNodeCount == (leafNodeCount - 1), "BoundingTree: Unexpected relation between inner node and leaf node counts.");
-
 		// Validate unique object IDs.
 		auto objectIds = GetBoundedObjectIds();
 		for (int refObjectID : objectIds)

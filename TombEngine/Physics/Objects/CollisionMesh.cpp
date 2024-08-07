@@ -312,7 +312,7 @@ namespace TEN::Physics
 	{
 		for (const auto& tri : _triangles)
 		{
-			if (tri.IsPortal())
+			//if (tri.IsPortal())
 				tri.DrawDebug();
 		}
 

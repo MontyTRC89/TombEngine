@@ -150,30 +150,24 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				Vector3 Vertex0 = Vector3::Zero;
 				Vector3 Vertex1 = Vector3::Zero;
 				Vector3 Vertex2 = Vector3::Zero;
+
+				Vector3 Normal = Vector3::Zero;
 			};
 
 			TriangleVertexData Tri0 = {};
-			TriangleVertexData Tri2 = {};
+			TriangleVertexData Tri1 = {};
 
 			Vector3 PrevVertex0 = Vector3::Zero;
 			Vector3 PrevVertex1 = Vector3::Zero;
 			Vector3 NextVertex0 = Vector3::Zero;
 			Vector3 NextVertex1 = Vector3::Zero;
+
+			bool IsSplit = false;
 		};
 
 		SurfaceVertexData Floor = {};
 		SurfaceVertexData Ceil	= {};
 	};
-
-	auto getVertices = []()
-	{
-		return VertexData{};
-	};
-
-	// TODO: Use this to reduce the amount of repeated calculations.
-	auto vertices = getVertices();
-
-	vertices.Floor.Tri0.Vertex0;
 
 	// Calculate 2D corner positions.
 	auto corner0 = sector.Position + REL_CORNER_0;
@@ -181,8 +175,85 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 	auto corner2 = sector.Position + REL_CORNER_2;
 	auto corner3 = sector.Position + REL_CORNER_3;
 
-	// Collect triangles.
+	auto getVertices = [&]()
+	{
+		auto vertices = VertexData{};
+
+		// Set vertex data for floor and ceiling.
+		bool isFloor = true;
+		for (int i = 0; i < 2; i++)
+		{
+			const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
+			auto& surfVertices = isFloor ? vertices.Floor : vertices.Ceil;
+			int sign = isFloor ? -1 : 1;
+
+			// Determine split status.
+			bool isSurfSplit = sector.IsSurfaceSplit(isFloor);
+			bool isSurfSplitAngle0 = (surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+
+			// Set split status.
+			surfVertices.IsSplit = isSurfSplit;
+
+			// Set surface triangle vertices.
+			if (!isSurfSplit || isSurfSplitAngle0)
+			{
+				surfVertices.Tri0.Vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
+				surfVertices.Tri0.Vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
+				surfVertices.Tri0.Vertex2 = Vector3(corner2.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
+				surfVertices.Tri0.Normal = GetRawSurfaceTriangleNormal(surfVertices.Tri0.Vertex0, surfVertices.Tri0.Vertex1, surfVertices.Tri0.Vertex2) * sign;
+			
+				surfVertices.Tri1.Vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
+				surfVertices.Tri1.Vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, 1, isFloor), corner2.y);
+				surfVertices.Tri1.Vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
+				surfVertices.Tri1.Normal = GetRawSurfaceTriangleNormal(surfVertices.Tri1.Vertex0, surfVertices.Tri1.Vertex1, surfVertices.Tri1.Vertex2) * sign;
+			}
+			else
+			{
+				surfVertices.Tri0.Vertex0 = Vector3(corner1.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
+				surfVertices.Tri0.Vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner2.y);
+				surfVertices.Tri0.Vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, 0, isFloor), corner3.y);
+				surfVertices.Tri0.Normal = GetRawSurfaceTriangleNormal(surfVertices.Tri0.Vertex0, surfVertices.Tri0.Vertex1, surfVertices.Tri0.Vertex2) * sign;
+			
+				surfVertices.Tri1.Vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner0.y);
+				surfVertices.Tri1.Vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, 1, isFloor), corner1.y);
+				surfVertices.Tri1.Vertex2 = Vector3(corner3.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner3.y);
+				surfVertices.Tri1.Normal = GetRawSurfaceTriangleNormal(surfVertices.Tri1.Vertex0, surfVertices.Tri1.Vertex1, surfVertices.Tri1.Vertex2) * sign;
+			}
+
+			isFloor = false;
+		}
+
+		return vertices;
+	};
+
+	// 1) Generate surface triangle vertices.
+	auto vertices = getVertices();
+
+	// 2) Collect collision mesh triangles.
 	bool isFloor = true;
+	for (int i = 0; i < 2; i++)
+	{
+		const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
+		const auto& surfVertices = isFloor ? vertices.Floor : vertices.Ceil;
+
+		// Determine wall status.
+		bool isSurf0Wall = sector.IsWall(0);
+		bool isSurf1Wall = sector.IsWall(1);
+
+		// 2.1) Collect surface triangles.
+		if (!isSurf0Wall)
+			CollisionMesh.InsertTriangle(surfVertices.Tri0.Vertex0, surfVertices.Tri0.Vertex1, surfVertices.Tri0.Vertex2, surfVertices.Tri0.Normal, surface.Triangles[0].PortalRoomNumber);
+		if (!isSurf1Wall)
+			CollisionMesh.InsertTriangle(surfVertices.Tri1.Vertex0, surfVertices.Tri1.Vertex1, surfVertices.Tri1.Vertex2, surfVertices.Tri1.Normal, surface.Triangles[1].PortalRoomNumber);
+
+		isFloor = !isFloor;
+	}
+
+	return;
+	//-----AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+	// Collect triangles.
+	isFloor = true;
 	for (int i = 0; i < 2; i++)
 	{
 		const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
