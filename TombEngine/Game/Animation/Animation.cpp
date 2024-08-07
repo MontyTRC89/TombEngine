@@ -122,30 +122,32 @@ namespace TEN::Animation
 		auto translation = Vector3::Zero;
 		if (hasTranslation)
 		{
-			const auto& baseRootPos = Frames.front().RootPosition;
 			const auto& rootPos = Frames[frameNumber].RootPosition;
+			const auto& baseRootPos = Frames.front().RootPosition;
+			auto rootTranslation = baseRootPos - rootPos;
 
 			if (Flags & (int)AnimFlags::RootMotionTranslationX)
-				translation.x = baseRootPos.x - rootPos.x;
+				translation.x = rootTranslation.x;
 			if (Flags & (int)AnimFlags::RootMotionTranslationY)
-				translation.y = baseRootPos.y - rootPos.y;
+				translation.y = rootTranslation.y;
 			if (Flags & (int)AnimFlags::RootMotionTranslationZ)
-				translation.z = baseRootPos.z - rootPos.z;
+				translation.z = rootTranslation.z;
 		}
 
 		// Get relative rotation counteraction.
 		auto rot = EulerAngles::Identity;
 		if (hasRot)
 		{
-			auto baseOrient = EulerAngles(Frames.front().BoneOrientations.front());
 			auto rootOrient = EulerAngles(Frames[frameNumber].BoneOrientations.front());
+			auto baseRootOrient = EulerAngles(Frames.front().BoneOrientations.front());
+			auto rootRot = baseRootOrient - rootOrient;
 
 			if (Flags & (int)AnimFlags::RootMotionRotationX)
-				rot.x = baseOrient.x - rootOrient.x;
+				rot.x = rootRot.x;
 			if (Flags & (int)AnimFlags::RootMotionRotationY)
-				rot.y = baseOrient.y - rootOrient.y;
+				rot.y = rootRot.y;
 			if (Flags & (int)AnimFlags::RootMotionRotationZ)
-				rot.z = baseOrient.z - rootOrient.z;
+				rot.z = rootRot.z;
 		}
 
 		// Return root motion counteraction.
