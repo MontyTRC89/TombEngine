@@ -25,6 +25,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed sentry gun joint rotation.
 * Fixed teeth spikes not triggering the player impale animation.
 * Fixed TR4 mine crash with OCB 1 when triggered.
+* Fixed cases where Atlantean mutant's bombs cause the game to crash.
 
 ### Features/Amendments
 * Changed Rome Hammer to not hurt player whilst deactivated.
