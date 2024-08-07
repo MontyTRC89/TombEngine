@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -11,8 +12,8 @@
 #include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 
-using namespace TEN::Renderer;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
@@ -81,18 +82,18 @@ namespace TEN::Entities::Generic
 					return;
 				}
 
-				int distToPortal = *&g_Level.Rooms[item->RoomNumber].maxceiling - item->Pose.Position.y;
+				int distToPortal = *&g_Level.Rooms[item->RoomNumber].TopHeight - item->Pose.Position.y;
 				if (distToPortal <= speed)
 					UpdateBridgeItem(*item);
 
-				auto probe = GetCollision(item);
+				auto probe = GetPointCollision(*item);
 
-				item->Floor = probe.Position.Floor;
+				item->Floor = probe.GetFloorHeight();
 
-				if (probe.RoomNumber != item->RoomNumber)
+				if (probe.GetRoomNumber() != item->RoomNumber)
 				{
 					UpdateBridgeItem(*item, true);
-					ItemNewRoom(itemNumber, probe.RoomNumber);
+					ItemNewRoom(itemNumber, probe.GetRoomNumber());
 					UpdateBridgeItem(*item);
 				}
 			}

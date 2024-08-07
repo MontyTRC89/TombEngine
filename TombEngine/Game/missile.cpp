@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/explosion.h"
@@ -15,6 +16,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Math;
@@ -48,7 +50,7 @@ void ControlMissile(short fxNumber)
 	auto& fx = EffectList[fxNumber];
 
 	auto isUnderwater = TestEnvironment(ENV_FLAG_WATER, fx.roomNumber);
-	auto soundFXType = isUnderwater ? SoundEnvironment::Water : SoundEnvironment::Land;
+	auto soundFXType = isUnderwater ? SoundEnvironment::ShallowWater : SoundEnvironment::Land;
 
 	if (fx.objectNumber == ID_SCUBA_HARPOON && isUnderwater &&
 		fx.pos.Orientation.x > ANGLE(-67.5f))
@@ -58,12 +60,13 @@ void ControlMissile(short fxNumber)
 
 	fx.pos.Translate(fx.pos.Orientation, fx.speed);
 
-	auto pointColl = GetCollision(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, fx.roomNumber);
+	auto pointColl = GetPointCollision(fx.pos.Position, fx.roomNumber);
 	auto hasHitPlayer = ItemNearLara(fx.pos.Position, hitRadius);
 
 	// Check whether something was hit.
-	if (fx.pos.Position.y >= pointColl.Position.Floor ||
-		fx.pos.Position.y <= pointColl.Position.Ceiling ||
+	if (fx.pos.Position.y >= pointColl.GetFloorHeight() ||
+		fx.pos.Position.y <= pointColl.GetCeilingHeight() ||
+		pointColl.IsWall() ||
 		hasHitPlayer)
 	{
 		if (fx.objectNumber == ID_KNIFETHROWER_KNIFE ||
@@ -109,10 +112,11 @@ void ControlMissile(short fxNumber)
 		}
 
 		KillEffect(fxNumber);
+		return;
 	}
 
-	if (pointColl.RoomNumber != fx.roomNumber)
-		EffectNewRoom(fxNumber, pointColl.RoomNumber);
+	if (pointColl.GetRoomNumber() != fx.roomNumber)
+		EffectNewRoom(fxNumber, pointColl.GetRoomNumber());
 
 	if (fx.objectNumber == ID_KNIFETHROWER_KNIFE)
 		fx.pos.Orientation.z += ANGLE(30.0f); // Update knife rotation over time.
@@ -142,23 +146,23 @@ void ControlNatlaGun(short fxNumber)
 	// If first frame, start another explosion at next position.
 	if (fx.frameNumber == -1)
 	{
-		auto pointColl = GetCollision(fx.pos.Position, fx.roomNumber, fx.pos.Orientation.y, fx.speed);
+		auto pointColl = GetPointCollision(fx.pos.Position, fx.roomNumber, fx.pos.Orientation.y, fx.speed);
 
 		// Don't create one if hit a wall.
-		if (pointColl.Coordinates.y >= pointColl.Position.Floor ||
-			pointColl.Coordinates.y <= pointColl.Position.Ceiling)
+		if (pointColl.GetPosition().y >= pointColl.GetFloorHeight() ||
+			pointColl.GetPosition().y <= pointColl.GetCeilingHeight())
 		{
 			return;
 		}
 
-		fxNumber = CreateNewEffect(pointColl.RoomNumber);
+		fxNumber = CreateNewEffect(pointColl.GetRoomNumber());
 		if (fxNumber != NO_VALUE)
 		{
 			auto& fxNew = EffectList[fxNumber];
 
-			fxNew.pos.Position = pointColl.Coordinates;
+			fxNew.pos.Position = pointColl.GetPosition();
 			fxNew.pos.Orientation.y = fx.pos.Orientation.y;
-			fxNew.roomNumber = pointColl.RoomNumber;
+			fxNew.roomNumber = pointColl.GetRoomNumber();
 			fxNew.speed = fx.speed;
 			fxNew.frameNumber = 0;
 			fxNew.objectNumber = ID_PROJ_BOMB;

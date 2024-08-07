@@ -2,6 +2,7 @@
 #include "Objects/TR4/Entity/Wraith.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/flipeffect.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -18,6 +19,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Streamer;
@@ -227,13 +229,13 @@ namespace TEN::Entities::TR4
 		{
 			const auto& room = g_Level.Rooms[LaraItem->RoomNumber];
 
-			x = room.x + room.xSize * BLOCK(1) / 2 - item.Pose.Position.x;
-			z = room.z + room.zSize * BLOCK(1) / 2 - item.Pose.Position.z;
+			x = room.Position.x + room.XSize * BLOCK(1) / 2 - item.Pose.Position.x;
+			z = room.Position.z + room.ZSize * BLOCK(1) / 2 - item.Pose.Position.z;
 
 			distance = SQUARE(x) + SQUARE(z);
 			dy = abs((distance / MAX_VISIBILITY_DISTANCE) - CLICK(1));
 			//Prevent Wraiths to go below floor level
-			y = room.y + ((room.maxceiling - room.minfloor) / 4);
+			y = room.Position.y + ((room.TopHeight - room.BottomHeight) / 4);
 		}
 
 		dy = y - item.Pose.Position.y - dy - CLICK(0.5f);
@@ -303,11 +305,11 @@ namespace TEN::Entities::TR4
 			item.Pose.Orientation.x += angleV;
 		}
 
-		auto pointColl = GetCollision(&item);
+		auto pointColl = GetPointCollision(item);
 
 		bool hasHitWall = false;
-		if (pointColl.Position.Floor < item.Pose.Position.y ||
-			pointColl.Position.Ceiling > item.Pose.Position.y)
+		if (pointColl.GetFloorHeight() < item.Pose.Position.y ||
+			pointColl.GetCeilingHeight() > item.Pose.Position.y)
 		{
 			hasHitWall = true;
 		}
@@ -317,8 +319,8 @@ namespace TEN::Entities::TR4
 		item.Pose.Position.y += item.Animation.Velocity.z * phd_sin(item.Pose.Orientation.x);
 		item.Pose.Position.z += item.Animation.Velocity.z * phd_cos(item.Pose.Orientation.y);
 
-		if (pointColl.RoomNumber != item.RoomNumber)
-			ItemNewRoom(itemNumber, pointColl.RoomNumber);
+		if (pointColl.GetRoomNumber() != item.RoomNumber)
+			ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
 		for (int linkItemNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkItemNumber != NO_VALUE; linkItemNumber = g_Level.Items[linkItemNumber].NextItem)
 		{
@@ -550,10 +552,10 @@ namespace TEN::Entities::TR4
 		}
 
 		// Check if WRAITH is below floor or above ceiling and spawn wall effect
-		pointColl = GetCollision(&item);
+		pointColl = GetPointCollision(item);
 
-		if (pointColl.Position.Floor < item.Pose.Position.y ||
-			pointColl.Position.Ceiling > item.Pose.Position.y)
+		if (pointColl.GetFloorHeight() < item.Pose.Position.y ||
+			pointColl.GetCeilingHeight() > item.Pose.Position.y)
 		{
 			if (!hasHitWall)
 				WraithWallEffect(prevPos, item.Pose.Orientation.y - ANGLE(180.0f), item.ObjectNumber);
@@ -710,7 +712,7 @@ namespace TEN::Entities::TR4
 
 				if (item2->NextActive == NO_VALUE)
 				{
-					FlipEffect = -1;
+					FlipEffect = NO_VALUE;
 					return;
 				}
 			}
@@ -718,6 +720,6 @@ namespace TEN::Entities::TR4
 			item2->HitPoints = item->Index;
 		}
 
-		FlipEffect = -1;
+		FlipEffect = NO_VALUE;
 	}
 }

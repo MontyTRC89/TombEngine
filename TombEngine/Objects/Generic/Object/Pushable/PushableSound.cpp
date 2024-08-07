@@ -1,9 +1,12 @@
 #include "framework.h"
 #include "Objects/Generic/Object/Pushable/PushableSound.h"
 
+#include "Game/collision/Point.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::Generic
 {
@@ -64,8 +67,8 @@ namespace TEN::Entities::Generic
 	static std::optional<int> GetPushableSoundID(const ItemInfo& pushableItem, PushableSoundType soundType)
 	{
 		// Get floor material.
-		auto pointColl = GetCollision(pushableItem);
-		auto material = pointColl.BottomBlock->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true);
+		auto pointColl = GetPointCollision(pushableItem);
+		auto material = pointColl.GetBottomSector().GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true);
 
 		switch (soundType)
 		{

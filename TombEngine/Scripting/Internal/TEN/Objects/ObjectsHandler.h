@@ -111,7 +111,7 @@ private:
 
 			auto room = std::get<std::reference_wrapper<ROOM_INFO>>(val).get();
 			
-			if (std::any_of(room.tags.begin(), room.tags.end(),
+			if (std::any_of(room.Tags.begin(), room.Tags.end(),
 				[&tag](const std::string& value) { return value == tag; }))
 			{
 				rooms.push_back(GetByName<Room, ScriptReserved_Room>(key));

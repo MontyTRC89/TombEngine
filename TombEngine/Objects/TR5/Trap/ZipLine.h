@@ -3,7 +3,7 @@
 struct CollisionInfo;
 struct ItemInfo;
 
-namespace TEN::Traps::TR5
+namespace TEN::Entities::Traps
 {
 	void InitializeZipLine(short itemNumber);
 	void CollideZipLine(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

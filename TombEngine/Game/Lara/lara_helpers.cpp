@@ -7,6 +7,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
@@ -21,7 +22,6 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
@@ -37,6 +37,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
@@ -44,7 +45,6 @@ using namespace TEN::Entities::Player;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 using namespace TEN::Math;
-using namespace TEN::Renderer;
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -160,9 +160,9 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 					const auto& vehicleItem = g_Level.Items[player.Context.Vehicle];
 					if (vehicleItem.ObjectNumber == ID_UPV)
 					{
-						auto pointColl = GetCollision(&item, 0, 0, CLICK(1));
+						auto pointColl = GetPointCollision(item, 0, 0, CLICK(1));
 
-						water.IsCold = (water.IsCold || TestEnvironment(ENV_FLAG_COLD, pointColl.RoomNumber));
+						water.IsCold = (water.IsCold || TestEnvironment(ENV_FLAG_COLD, pointColl.GetRoomNumber()));
 						if (water.IsCold)
 						{
 							player.Status.Exposure--;
@@ -276,50 +276,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 	}
 }
 
-static void UsePlayerMedipack(ItemInfo& item)
-{
-	auto& player = GetLaraInfo(item);
-
-	// Can't use medipack; return early.
-	if (item.HitPoints <= 0 ||
-		(item.HitPoints >= LARA_HEALTH_MAX && player.Status.Poison == 0))
-	{
-		return;
-	}
-
-	bool hasUsedMedipack = false;
-
-	if (IsClicked(In::SmallMedipack) &&
-		player.Inventory.TotalSmallMedipacks != 0)
-	{
-		hasUsedMedipack = true;
-
-		item.HitPoints += LARA_HEALTH_MAX / 2;
-		if (item.HitPoints > LARA_HEALTH_MAX)
-			item.HitPoints = LARA_HEALTH_MAX;
-
-		if (player.Inventory.TotalSmallMedipacks != -1)
-			player.Inventory.TotalSmallMedipacks--;
-	}
-	else if (IsClicked(In::LargeMedipack) &&
-		player.Inventory.TotalLargeMedipacks != 0)
-	{
-		hasUsedMedipack = true;
-		item.HitPoints = LARA_HEALTH_MAX;
-
-		if (player.Inventory.TotalLargeMedipacks != -1)
-			player.Inventory.TotalLargeMedipacks--;
-	}
-
-	if (hasUsedMedipack)
-	{
-		player.Status.Poison = 0;
-		SaveGame::Statistics.Game.HealthUsed++;
-		SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-	}
-}
-
-static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
+static LaraWeaponType GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
 {
 	static const auto SCROLL_WEAPON_TYPES = std::vector<LaraWeaponType>
 	{
@@ -334,15 +291,15 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 		LaraWeaponType::RocketLauncher
 	};
 
-	auto getNextIndex = [getPrev](unsigned int index)
+	auto getNextIndex = [getPrev](int index)
 	{
-		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
+		return (index + (getPrev ? ((int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (int)SCROLL_WEAPON_TYPES.size();
 	};
 
 	auto& player = GetLaraInfo(item);
 
 	// Get vector index for current weapon type.
-	auto currentIndex = std::optional<unsigned int>(std::nullopt);
+	auto currentIndex = NO_VALUE;
 	for (int i = 0; i < SCROLL_WEAPON_TYPES.size(); i++)
 	{
 		if (SCROLL_WEAPON_TYPES[i] == currentWeaponType)
@@ -352,13 +309,13 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 		}
 	}
 
-	// Invalid current weapon type; return nullopt.
-	if (!currentIndex.has_value())
-		return std::nullopt;
+	// Invalid current weapon type; return None type.
+	if (currentIndex == NO_VALUE)
+		return LaraWeaponType::None;
 
 	// Get next valid weapon type in sequence.
-	unsigned int nextIndex = getNextIndex(*currentIndex);
-	while (nextIndex != *currentIndex)
+	int nextIndex = getNextIndex(currentIndex);
+	while (nextIndex != currentIndex)
 	{
 		auto nextWeaponType = SCROLL_WEAPON_TYPES[nextIndex];
 		if (player.Weapons[(int)nextWeaponType].Present)
@@ -367,8 +324,8 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 		nextIndex = getNextIndex(nextIndex);
 	}
 
-	// No valid weapon type; return nullopt.
-	return std::nullopt;
+	// No valid weapon type; return None type.
+	return LaraWeaponType::None;
 }
 
 void HandlePlayerQuickActions(ItemInfo& item)
@@ -376,17 +333,21 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	auto& player = GetLaraInfo(item);
 
 	// Handle medipacks.
-	if (IsClicked(In::SmallMedipack) || IsClicked(In::LargeMedipack))
-		UsePlayerMedipack(item);
+	if (IsClicked(In::SmallMedipack))
+	{
+		g_Gui.UseItem(item, GAME_OBJECT_ID::ID_SMALLMEDI_ITEM);
+	}
+	else if (IsClicked(In::LargeMedipack))
+	{
+		g_Gui.UseItem(item, GAME_OBJECT_ID::ID_BIGMEDI_ITEM);
+	}
 
 	// Handle weapon scroll request.
 	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
 	{
-		bool getPrev = IsClicked(In::PreviousWeapon);
-		auto weaponType = GetPlayerScrolledWeaponType(item, player.Control.Weapon.GunType, getPrev);
-
-		if (weaponType.has_value())
-			player.Control.Weapon.RequestGunType = *weaponType;
+		auto weaponType = GetPlayerScrolledWeaponType(item, player.Control.Weapon.GunType, IsClicked(In::PreviousWeapon));
+		if (weaponType != LaraWeaponType::None)
+			player.Control.Weapon.RequestGunType = weaponType;
 	}
 
 	// Handle weapon requests.
@@ -419,7 +380,7 @@ void HandlePlayerQuickActions(ItemInfo& item)
 
 	// TODO: 10th possible weapon, probably grapple gun.
 	/*if (IsClicked(In::Weapon10) && player.Weapons[(int)LaraWeaponType::].Present)
-	player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
+		player.Control.Weapon.RequestGunType = LaraWeaponType::;*/
 }
 
 bool CanPlayerLookAround(const ItemInfo& item)
@@ -1029,7 +990,7 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 {
 	constexpr auto BUBBLE_COUNT_MAX = 3;
 
-	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::ShallowWater);
 
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
@@ -1250,20 +1211,14 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 
 PlayerWaterData GetPlayerWaterData(ItemInfo& item)
 {
-	bool isWater = TestEnvironment(ENV_FLAG_WATER, &item);
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, &item);
-	bool isCold = TestEnvironment(ENV_FLAG_COLD, &item);
-
-	int waterDepth = GetWaterDepth(&item);
-	int waterHeight = GetWaterHeight(&item);
-
-	auto pointColl = GetCollision(item);
-	int heightFromWater = (waterHeight == NO_HEIGHT) ? NO_HEIGHT : (std::min(item.Pose.Position.y, pointColl.Position.Floor) - waterHeight);
+	auto pointColl = GetPointCollision(item);
+	int heightFromWater = (pointColl.GetWaterTopHeight() == NO_HEIGHT) ?
+		NO_HEIGHT : (std::min(item.Pose.Position.y, pointColl.GetFloorHeight()) - pointColl.GetWaterTopHeight());
 
 	return PlayerWaterData
 	{
-		isWater, isSwamp, isCold,
-		waterDepth, waterHeight, heightFromWater
+		TestEnvironment(ENV_FLAG_WATER, &item), TestEnvironment(ENV_FLAG_SWAMP, &item), TestEnvironment(ENV_FLAG_COLD, &item),
+		pointColl.GetWaterBottomHeight(), pointColl.GetWaterTopHeight(), heightFromWater
 	};
 }
 
@@ -1322,20 +1277,20 @@ static short GetLegacySlideHeadingAngle(const Vector3& floorNormal)
 short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 {
 	short headingAngle = coll->Setup.ForwardAngle;
-	auto pointColl = GetCollision(item);
+	auto pointColl = GetPointCollision(*item);
 
 	// Ground is flat.
-	if (pointColl.FloorTilt == Vector2::Zero)
+	if (pointColl.GetFloorNormal() == -Vector3::UnitY)
 		return coll->Setup.ForwardAngle;
 
 	// Return slide heading angle.
 	if (g_GameFlow->HasSlideExtended())
 	{
-		return Geometry::GetSurfaceAspectAngle(pointColl.FloorNormal);
+		return Geometry::GetSurfaceAspectAngle(pointColl.GetFloorNormal());
 	}
 	else
 	{
-		return GetLegacySlideHeadingAngle(pointColl.FloorNormal);
+		return GetLegacySlideHeadingAngle(pointColl.GetFloorNormal());
 	}
 }
 
@@ -1510,7 +1465,7 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 		auto mul1 = (float)abs(lara->Control.Subsuit.Velocity[0]) / BLOCK(8);
 		auto mul2 = (float)abs(lara->Control.Subsuit.Velocity[1]) / BLOCK(8);
 		auto vol = ((mul1 + mul2) * 5.0f) + 0.5f;
-		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::Water, 1.0f + (mul1 + mul2), vol);
+		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::ShallowWater, 1.0f + (mul1 + mul2), vol);
 	}
 }
 
@@ -1524,7 +1479,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 	if (g_GameFlow->HasSlideExtended())
 	{
-		auto probe = GetCollision(item);
+		auto probe = GetPointCollision(*item);
 		short minSlideAngle = ANGLE(33.75f);
 		//short steepness = Geometry::GetSurfaceSlopeAngle(probe.FloorTilt);
 		//short direction = Geometry::GetSurfaceAspectAngle(probe.FloorTilt);
@@ -1533,7 +1488,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 		//int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
 		//short deltaAngle = abs((short)(direction - item->Pose.Orientation.y));
 
-		//g_Renderer.PrintDebugMessage("%d", slideVelocity);
+		//PrintDebugMessage("%d", slideVelocity);
 
 		//lara->ExtraVelocity.x += slideVelocity;
 		//lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);
@@ -1545,7 +1500,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 void AlignLaraToSurface(ItemInfo* item, float alpha)
 {
 	// Determine relative orientation adhering to floor normal.
-	auto floorNormal = GetCollision(item).FloorNormal;
+	auto floorNormal = GetPointCollision(*item).GetFloorNormal();
 	auto orient = Geometry::GetRelOrientToNormal(item->Pose.Orientation.y, floorNormal);
 
 	// Apply extra rotation according to alpha.

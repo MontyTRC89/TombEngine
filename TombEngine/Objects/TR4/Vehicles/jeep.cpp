@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/tomb4fx.h"
@@ -22,6 +23,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
@@ -372,16 +374,16 @@ namespace TEN::Entities::Vehicles
 		int y = jeepItem->Pose.Position.y;
 		int z = jeepItem->Pose.Position.z - JEEP_DISMOUNT_DISTANCE * phd_cos(angle);
 
-		auto probe = GetCollision(x, y, z, jeepItem->RoomNumber);
+		auto probe = GetPointCollision(Vector3i(x, y, z), jeepItem->RoomNumber);
 
-		if (probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT)
+		if (probe.IsSteepFloor() || probe.GetFloorHeight() == NO_HEIGHT)
 			return false;
 
-		if (abs(probe.Position.Floor - jeepItem->Pose.Position.y) > BLOCK(1 / 2.0f))
+		if (abs(probe.GetFloorHeight() - jeepItem->Pose.Position.y) > BLOCK(1 / 2.0f))
 			return false;
 
-		if ((probe.Position.Ceiling - jeepItem->Pose.Position.y) > -LARA_HEIGHT ||
-			(probe.Position.Floor - probe.Position.Ceiling) < LARA_HEIGHT)
+		if ((probe.GetCeilingHeight() - jeepItem->Pose.Position.y) > -LARA_HEIGHT ||
+			(probe.GetFloorHeight() - probe.GetCeilingHeight()) < LARA_HEIGHT)
 		{
 			return false;
 		}

@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.3 Lua API</title>
+    <title>TombEngine 1.4 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -109,7 +109,7 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#ShowString">ShowString(str, time)</a></td>
+	<td class="name" ><a href="#ShowString">ShowString(str, time, autoDelete)</a></td>
 	<td class="summary">Show some text on-screen.</td>
 	</tr>
 	<tr>
@@ -131,7 +131,7 @@
     <dl class="function">
     <dt>
     <a name = "ShowString"></a>
-    <strong>ShowString(str, time)</strong>
+    <strong>ShowString(str, time, autoDelete)</strong>
     </dt>
     <dd>
     Show some text on-screen.
@@ -150,6 +150,13 @@
 If not given, the string will have an "infinite" life, and will show
 until <a href="../1 modules/Strings.html#HideString">HideString</a> is called or until the level is finished.
 Default: nil (i.e. infinite)
+        </li>
+        <li><span class="parameter">autoDelete</span>
+            <span class="types"><span class="type">bool</span></span>
+         should be string automatically deleted after timeout is reached.
+If not given, the string will remain allocated even after timeout is reached, and can be
+shown again without re-initialization.
+Default: false
         </li>
     </ul>
 
