@@ -493,19 +493,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 		{
 			const auto& prevSurface = isFloor ? prevSectorX.FloorSurface : prevSectorX.CeilingSurface;
 
-			bool isPrevSurfSplit = prevSectorX.IsSurfaceSplit(isFloor);
-			bool isPrevSurfSplitAngle0 = (prevSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-
-			bool isPrevSurf0Wall = prevSectorX.IsWall(0);
-			bool isPrevSurf1Wall = prevSectorX.IsWall(1);
-			bool isPrevSurfTri0Portal = (prevSurface.Triangles[0].PortalRoomNumber != NO_VALUE);
-			bool isPrevSurfTri1Portal = (prevSurface.Triangles[1].PortalRoomNumber != NO_VALUE);
-
 			bool useTri0 = (!isSurfSplit || isSurfSplitAngle0);
-			bool usePrevTri1 = (!isPrevSurfSplit || isPrevSurfSplitAngle0);
-
-			bool isSurfWall = (useTri0 ? isSurf0Wall : isSurf1Wall);
-			bool isPrevSurfWall = (usePrevTri1 ? isPrevSurf1Wall : isPrevSurf0Wall);
 
 			// TODO: Inaccurate heights.
 			// Collect wall portal to previous room's sector.
@@ -577,143 +565,13 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, WEST_WALL_NORMAL, nextSectorX.RoomNumber);
 				CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL, nextSectorX.RoomNumber);
 			}
-
-			// Collect end wall.
-			//if (isXEnd && isFloor)
-			{
-				bool isCeilSurfSplit = sector.IsSurfaceSplit(false);
-				bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-				bool useCeilTri0 = (!isCeilSurfSplit || isCeilSurfSplitAngle0);
-
-				int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useTri0 ? 0 : 1, true);
-				int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, !useTri0 ? 0 : 1, true);
-				int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useCeilTri0 ? 0 : 1, false);
-				int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, !useCeilTri0 ? 0 : 1, false);
-
-				auto endVertex0 = Vector3(corner2.x, floorHeight0, corner2.y);
-				auto endVertex1 = Vector3(corner3.x, floorHeight1, corner3.y);
-				auto endVertex2 = Vector3(corner2.x, ceilHeight0, corner2.y);
-				auto endVertex3 = Vector3(corner3.x, ceilHeight1, corner3.y);
-
-				CollisionMesh.InsertTriangle(endVertex0, endVertex1, endVertex2, WEST_WALL_NORMAL);
-				CollisionMesh.InsertTriangle(endVertex1, endVertex2, endVertex3, WEST_WALL_NORMAL);
-			}
 		}
 
 		// 6) Collect cardinal wall triangles on Z axis.
 		{
 			const auto& prevSurface = isFloor ? prevSectorZ.FloorSurface : prevSectorZ.CeilingSurface;
 
-			bool isPrevSurfSplit = prevSectorZ.IsSurfaceSplit(isFloor);
-			bool isPrevSurfSplitAngle0 = (prevSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-
-			bool isPrevSurf0Wall = prevSectorZ.IsWall(0);
-			bool isPrevSurf1Wall = prevSectorZ.IsWall(1);
-			bool isPrevSurfTri0Portal = (prevSurface.Triangles[0].PortalRoomNumber != NO_VALUE);
-			bool isPrevSurfTri1Portal = (prevSurface.Triangles[1].PortalRoomNumber != NO_VALUE);
-
 			bool useTri0 = !(isSurfSplit || !isSurfSplitAngle0);
-			bool usePrevTri1 = !(isPrevSurfSplit || !isPrevSurfSplitAngle0);
-
-			bool isSurfWall = (useTri0 ? isSurf0Wall : isSurf1Wall);
-			bool isPrevSurfWall = (usePrevTri1 ? isPrevSurf1Wall : isPrevSurf0Wall);
-
-			// Wall behind.
-			if (!isSurfWall || !isPrevSurfWall) // Can set wall.
-			{
-				// Full wall referencing current sector.
-				if ((!isSurfWall && isPrevSurfWall) && isFloor)
-				{
-					bool isCeilSurfSplit = sector.IsSurfaceSplit(false);
-					bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-					bool useCeilTri0 = !(isCeilSurfSplit || !isCeilSurfSplitAngle0);
-
-					// TODO: Check.
-					int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, true);
-					int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, true);
-					int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, useCeilTri0 ? 0 : 1, false);
-					int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useCeilTri0 ? 0 : 1, false);
-
-					auto vertex0 = Vector3(corner3.x, floorHeight0, corner3.y);
-					auto vertex1 = Vector3(corner0.x, floorHeight1, corner0.y);
-					auto vertex2 = Vector3(corner3.x, ceilHeight0, corner3.y);
-					auto vertex3 = Vector3(corner0.x, ceilHeight1, corner0.y);
-
-					if (vertex0 != vertex2)
-						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL);
-					if (vertex1 != vertex3)
-						CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
-				}
-				// Full wall referencing previous sector.
-				else if ((isSurfWall && !isPrevSurfWall) && isFloor)
-				{
-					bool isPrevCeilSurfSplit = prevSectorZ.IsSurfaceSplit(false);
-					bool isPrevCeilSurfSplitAngle0 = (prevSectorZ.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-					bool usePrevCeilTri1 = !(isPrevCeilSurfSplit || !isPrevCeilSurfSplitAngle0);
-
-					int floorHeight0 = GetSurfaceTriangleVertexY(prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, true);
-					int floorHeight1 = GetSurfaceTriangleVertexY(prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevTri1 ? 1 : 0, true);
-					int ceilHeight0 = GetSurfaceTriangleVertexY(prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevCeilTri1 ? 1 : 0, false);
-					int ceilHeight1 = GetSurfaceTriangleVertexY(prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevCeilTri1 ? 1 : 0, false);
-
-					auto vertex0 = Vector3(corner3.x, floorHeight0, corner3.y);
-					auto vertex1 = Vector3(corner0.x, floorHeight1, corner0.y);
-					auto vertex2 = Vector3(corner3.x, ceilHeight0, corner3.y);
-					auto vertex3 = Vector3(corner0.x, ceilHeight1, corner0.y);
-
-					if (vertex0 != vertex2)
-						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, SOUTH_WALL_NORMAL);
-					if (vertex1 != vertex3)
-						CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, SOUTH_WALL_NORMAL);
-				}
-				// Step wall.
-				else if (!isSurfWall && !isPrevSurfWall)
-				{
-					int height0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_3.x, REL_CORNER_3.y, useTri0 ? 0 : 1, isFloor);
-					int height1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, useTri0 ? 0 : 1, isFloor);
-					int prevHeight0 = GetSurfaceTriangleVertexY(prevSectorZ, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, isFloor);
-					int prevHeight1 = GetSurfaceTriangleVertexY(prevSectorZ, REL_CORNER_1.x, REL_CORNER_1.y, usePrevTri1 ? 1 : 0, isFloor);
-
-					auto vertex0 = Vector3(corner3.x, height0, corner3.y);
-					auto vertex1 = Vector3(corner0.x, height1, corner0.y);
-					auto vertex2 = Vector3(corner3.x, prevHeight0, corner3.y);
-					auto vertex3 = Vector3(corner0.x, prevHeight1, corner0.y);
-
-					bool isSecondCrissCrossCase = isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y);
-					if (sector.RoomNumber == prevSectorZ.RoomNumber)
-					{
-						if (vertex0 != vertex2)
-						{
-							const auto& normal0 = ((vertex0.y > vertex2.y) ? NORTH_WALL_NORMAL : SOUTH_WALL_NORMAL) * (isFloor ? 1 : -1);
-							isSecondCrissCrossCase ?
-								CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, normal0) :
-								CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, normal0);
-						}
-						if (vertex1 != vertex3)
-						{
-							const auto& normal1 = ((vertex1.y > vertex3.y) ? NORTH_WALL_NORMAL : SOUTH_WALL_NORMAL) * (isFloor ? 1 : -1);
-							isSecondCrissCrossCase ?
-								CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, normal1) :
-								CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, normal1);
-						}
-					}
-					else // Avoid forming wall beloning to previous sector's room.
-					{
-						if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
-						{
-							isSecondCrissCrossCase ?
-								CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, NORTH_WALL_NORMAL) :
-								CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL);
-						}
-						if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
-						{
-							isSecondCrissCrossCase ?
-								CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, NORTH_WALL_NORMAL) :
-								CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
-						}
-					}
-				}
-			}
 
 			// Collect wall portal to previous sector.
 			if (sector.RoomNumber != prevSectorZ.RoomNumber && isFloor)
@@ -737,27 +595,6 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 
 				CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL, prevSectorZ.RoomNumber);
 				CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL, prevSectorZ.RoomNumber);
-			}
-
-			// Collect end wall.
-			//if (isZEnd && isFloor)
-			{
-				bool isCeilSurfSplit = sector.IsSurfaceSplit(false);
-				bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-				bool useCeilTri0 = !(isCeilSurfSplit || !isCeilSurfSplitAngle0);
-
-				int floorHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, !useTri0 ? 0 : 1, true);
-				int floorHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useTri0 ? 0 : 1, true);
-				int ceilHeight0 = GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, !useCeilTri0 ? 0 : 1, false);
-				int ceilHeight1 = GetSurfaceTriangleVertexY(sector, REL_CORNER_2.x, REL_CORNER_2.y, !useCeilTri0 ? 0 : 1, false);
-
-				auto endVertex0 = Vector3(corner1.x, floorHeight0, corner1.y);
-				auto endVertex1 = Vector3(corner2.x, floorHeight1, corner2.y);
-				auto endVertex2 = Vector3(corner1.x, ceilHeight0, corner1.y);
-				auto endVertex3 = Vector3(corner2.x, ceilHeight1, corner2.y);
-
-				CollisionMesh.InsertTriangle(endVertex0, endVertex1, endVertex2, SOUTH_WALL_NORMAL, nextSectorZ.SidePortalRoomNumber);
-				CollisionMesh.InsertTriangle(endVertex1, endVertex2, endVertex3, SOUTH_WALL_NORMAL, nextSectorZ.SidePortalRoomNumber);
 			}
 		}
 
