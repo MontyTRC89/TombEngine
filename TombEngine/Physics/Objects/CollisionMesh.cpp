@@ -283,6 +283,8 @@ namespace TEN::Physics
 			_vertices.push_back(vertex2);
 			vertex2ID = (int)_vertices.size() - 1;
 		}
+
+		// TODO: Keep normals in vector too?
 		
 		// Add new triangle.
 		auto aabb = Geometry::GetBoundingBox(std::vector<Vector3>{ vertex0, vertex1, vertex2 });

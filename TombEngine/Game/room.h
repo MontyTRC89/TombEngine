@@ -164,11 +164,9 @@ struct RoomData
 	void GenerateCollisionMesh();
 
 private:
-	void	CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
-												const FloorInfo& prevSectorX, const FloorInfo& nextSectorX,
-												const FloorInfo& prevSectorZ, const FloorInfo& nextSectorZ);
-	int		GetSurfaceTriangleVertexY(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor) const;
-	Vector3 GetRawSurfaceTriangleNormal(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2) const;
+	void CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
+											 const FloorInfo& prevSectorX, const FloorInfo& nextSectorX,
+											 const FloorInfo& prevSectorZ, const FloorInfo& nextSectorZ);
 };
 
 void DoFlipMap(int group);
