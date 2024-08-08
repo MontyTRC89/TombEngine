@@ -8,28 +8,28 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR3/Entity/Compsognathus.h" // OK
-#include "Objects/TR3/Entity/Lizard.h" // OK
-#include "Objects/TR3/Entity/PunaBoss.h" // OK
-#include "Objects/TR3/Entity/Shiva.h" // OK
-#include "Objects/TR3/Entity/SophiaLeigh.h" // OK
+#include "Objects/TR3/Entity/Compsognathus.h"
+#include "Objects/TR3/Entity/Lizard.h"
+#include "Objects/TR3/Entity/PunaBoss.h"
+#include "Objects/TR3/Entity/Raptor.h"
+#include "Objects/TR3/Entity/Shiva.h"
+#include "Objects/TR3/Entity/SophiaLeigh.h"
 #include "Objects/TR3/Entity/TwinAutoGun.h"
-#include "Objects/TR3/Entity/WaspMutant.h" // OK
-#include "Objects/TR3/Entity/Winston.h" // OK
-#include "Objects/TR3/Entity/tr3_tony.h" // OK
-#include "Objects/TR3/Entity/tr3_civvy.h" // OK
-#include "Objects/TR3/Entity/tr3_claw_mutant.h" // OK
-#include "Objects/TR3/Entity/tr3_cobra.h" // OK
-#include "Objects/TR3/Entity/FishSwarm.h" // OK
-#include "Objects/TR3/Entity/tr3_flamethrower.h" // OK
-#include "Objects/TR3/Entity/tr3_monkey.h" // OK
-#include "Objects/TR3/Entity/tr3_mp_gun.h" // OK
-#include "Objects/TR3/Entity/tr3_mp_stick.h" // OK
-#include "Objects/TR3/Entity/tr3_raptor.h" // OK
-#include "Objects/TR3/Entity/tr3_scuba_diver.h" // OK
-#include "Objects/TR3/Entity/tr3_tiger.h" // OK
-#include "Objects/TR3/Entity/tr3_trex.h" // OK
-#include "Objects/TR3/Entity/tr3_tribesman.h" // OK
+#include "Objects/TR3/Entity/WaspMutant.h"
+#include "Objects/TR3/Entity/Winston.h"
+#include "Objects/TR3/Entity/tr3_tony.h"
+#include "Objects/TR3/Entity/tr3_civvy.h"
+#include "Objects/TR3/Entity/tr3_claw_mutant.h"
+#include "Objects/TR3/Entity/tr3_cobra.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
+#include "Objects/TR3/Entity/tr3_flamethrower.h"
+#include "Objects/TR3/Entity/tr3_monkey.h"
+#include "Objects/TR3/Entity/tr3_mp_gun.h"
+#include "Objects/TR3/Entity/tr3_mp_stick.h"
+#include "Objects/TR3/Entity/tr3_scuba_diver.h"
+#include "Objects/TR3/Entity/tr3_tiger.h"
+#include "Objects/TR3/Entity/tr3_trex.h"
+#include "Objects/TR3/Entity/tr3_tribesman.h"
 
 // Effects
 #include "Objects/Effects/Boss.h"

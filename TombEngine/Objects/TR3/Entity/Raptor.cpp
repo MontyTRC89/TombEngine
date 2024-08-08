@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/tr3_raptor.h"
+#include "Objects/TR3/Entity/Raptor.h"
 
 #include "Game/collision/Point.h"
 #include "Game/control/box.h"
