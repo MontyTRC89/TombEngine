@@ -53,10 +53,13 @@ namespace TEN::Entities::Creatures::TR3
 	static void ThrowSealMutantGas(short itemNumber, ItemInfo* enemy, int speed)
 	{
 		constexpr auto THROW_COUNT = 2;
-		int gravity = (enemy != nullptr && enemy->IsLaraCrouching()) ? SealMutantGasCrouchGravity : 0;
+		auto gravity = (enemy != nullptr && enemy->IsLaraCrouching()) ? SealMutantGasCrouchGravity : 0;
+		auto velocity = Vector3i(0, gravity, speed * SealMutantGasSpeedMultiplier);
+		auto startColor = Vector3i((GetRandomControl() & 0x3F) + 128, (GetRandomControl() & 0x3F) + 128, 32);
+		auto endColor = Vector3i((GetRandomControl() & 0xF) + 32, (GetRandomControl() & 0xF) + 32, 0);
 		for (int i = 0; i < THROW_COUNT; i++)
-			ThrowPoison(itemNumber, SealMutantGasBite, Vector3i(0, gravity, speed * SealMutantGasSpeedMultiplier), Vector3i((GetRandomControl() & 0x3F) + 128, (GetRandomControl() & 0x3F) + 128, 32), Vector3i((GetRandomControl() & 0xF) + 32, (GetRandomControl() & 0xF) + 32, 0));
-		ThrowPoison(itemNumber, SealMutantGasBite, Vector3i(0, gravity, speed * SealMutantGasSpeedMultiplier), Vector3i((GetRandomControl() & 0x3F) + 128, (GetRandomControl() & 0x3F) + 128, 32), Vector3i((GetRandomControl() & 0xF) + 32, (GetRandomControl() & 0xF) + 32, 0));
+			ThrowPoison(itemNumber, SealMutantGasBite, velocity, startColor, endColor);
+		ThrowPoison(itemNumber, SealMutantGasBite, velocity, startColor, endColor);
 	}
 
 	void SealMutantControl(short itemNumber)
