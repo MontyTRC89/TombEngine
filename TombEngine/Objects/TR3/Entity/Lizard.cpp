@@ -75,11 +75,9 @@ namespace TEN::Entities::Creatures::TR3
 	static void SpawnLizardGas(int itemNumber, const CreatureBiteInfo& bite, int speed)
 	{
 		constexpr auto THROW_COUNT = 2;
-
 		for (int i = 0; i < THROW_COUNT; i++)
-			ThrowPoison(itemNumber, bite, Vector3i(0.0f, -100.0f, speed << 2), Vector3(0.0f, 1.0f, 0.0f));
-
-		ThrowPoison(itemNumber, bite, Vector3i(0.0f, -100.0f, speed << 1), Vector3(0.0f, 1.0f, 0.0f));
+			ThrowPoison(itemNumber, bite, Vector3i(0.0f, -100.0f, speed << 2), Vector3i(0, (GetRandomControl() & 0x3F) + 128, 32), Vector3i(0, (GetRandomControl() & 0xF) + 32, 0));
+		ThrowPoison(itemNumber, bite, Vector3i(0.0f, -100.0f, speed << 1), Vector3i(0, (GetRandomControl() & 0x3F) + 128, 32), Vector3i(0, (GetRandomControl() & 0xF) + 32, 0));
 	}
 
 	void LizardControl(short itemNumber)

@@ -172,6 +172,7 @@ struct ItemInfo
 	bool IsLara() const;
 	bool IsCreature() const;
 	bool IsBridge() const;
+	bool IsLaraCrouching() const;
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);
