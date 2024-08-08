@@ -21,7 +21,7 @@ namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto RAPTOR_ATTACK_DAMAGE = 100;
 
-	constexpr auto RAPTOR_BITE_ATTACK_RANGE = SQUARE(585);
+	constexpr auto RAPTOR_BITE_ATTACK_RANGE = SQUARE(BLOCK(0.6f));
 	constexpr auto RAPTOR_JUMP_ATTACK_RANGE = SQUARE(BLOCK(1.5f));
 	constexpr auto RAPTOR_RUN_ATTACK_RANGE	= SQUARE(BLOCK(1.5f));
 
