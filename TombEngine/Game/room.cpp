@@ -383,40 +383,36 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				const auto& vertex3 = useTri0 ? surfVerts.PrevNeighborX.Vertex1 : surfVerts.PrevNeighborX.Vertex1;
 
 				bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
-				if (sector.RoomNumber == prevSectorX.RoomNumber)
+				if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
 				{
-					if (vertex0 != vertex2)
-					{
-						const auto& normal0 = ((vertex0.y > vertex2.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-						isSecondCrissCrossCase ?
-							CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, normal0) :
-							CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, normal0);
-					}
-					if (vertex1 != vertex3)
-					{
-						const auto& normal1 = ((vertex1.y > vertex3.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
-						isSecondCrissCrossCase ?
-							CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, normal1) :
-							CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, normal1);
-					}
+					isSecondCrissCrossCase ?
+						CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, EAST_WALL_NORMAL) :
+						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL);
 				}
-				else // Avoid forming step wall belonging to previous room.
+				if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
 				{
-					if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
-					{
-						isSecondCrissCrossCase ?
-							CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, EAST_WALL_NORMAL) :
-							CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL);
-					}
-					if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
-					{
-						isSecondCrissCrossCase ?
-							CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, EAST_WALL_NORMAL) :
-							CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
-					}
+					isSecondCrissCrossCase ?
+						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, EAST_WALL_NORMAL) :
+						CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
 				}
 			}
 		}
+
+		// 2.4) Collect next cardinal wall triangles on X axis.
+		/*if (vertex0 != vertex2)
+			{
+				const auto& normal0 = ((vertex0.y > vertex2.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
+				isSecondCrissCrossCase ?
+					CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, normal0) :
+					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, normal0);
+			}
+			if (vertex1 != vertex3)
+			{
+				const auto& normal1 = ((vertex1.y > vertex3.y) ? EAST_WALL_NORMAL : WEST_WALL_NORMAL) * (isFloor ? 1 : -1);
+				isSecondCrissCrossCase ?
+					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, normal1) :
+					CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, normal1);
+			}*/
 
 		isFloor = !isFloor;
 	}
