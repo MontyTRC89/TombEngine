@@ -168,8 +168,8 @@ private:
 												const FloorInfo& prevSectorX, const FloorInfo& nextSectorX,
 												const FloorInfo& prevSectorZ, const FloorInfo& nextSectorZ,
 												bool isXEnd, bool isZEnd);
-	int		GetSurfaceTriangleVertexY(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor);
-	Vector3 GetRawSurfaceTriangleNormal(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2);
+	int		GetSurfaceTriangleVertexY(const FloorInfo& sector, int relX, int relZ, int triID, bool isFloor) const;
+	Vector3 GetRawSurfaceTriangleNormal(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2) const;
 };
 
 void DoFlipMap(int group);

@@ -279,7 +279,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	HandleBridgeDebug(*item);
 
 	auto& room = g_Level.Rooms[item->RoomNumber];
-	//GenerateRoomCollisionMesh(room);
+	//room.GenerateCollisionMesh();
 	room.CollisionMesh.DrawDebug();
 
 	static bool hasRun = false;
