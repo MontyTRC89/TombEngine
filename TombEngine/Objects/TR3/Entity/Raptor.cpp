@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Entity/tr3_raptor.h"
+#include "Objects/TR3/Entity/Raptor.h"
 
 #include "Game/collision/Point.h"
 #include "Game/control/box.h"
@@ -21,7 +21,7 @@ namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto RAPTOR_ATTACK_DAMAGE = 100;
 
-	constexpr auto RAPTOR_BITE_ATTACK_RANGE = SQUARE(585);
+	constexpr auto RAPTOR_BITE_ATTACK_RANGE = SQUARE(BLOCK(0.6f));
 	constexpr auto RAPTOR_JUMP_ATTACK_RANGE = SQUARE(BLOCK(1.5f));
 	constexpr auto RAPTOR_RUN_ATTACK_RANGE	= SQUARE(BLOCK(1.5f));
 
@@ -73,7 +73,7 @@ namespace TEN::Entities::Creatures::TR3
 		RAPTOR_ANIM_JUMP_END = 16,
 		RAPTOR_ANIM_JUMP_1_BLOCK = 17,
 		RAPTOR_ANIM_VAULT_2_STEPS = 18,
-		RAPTOR_ANIM_VAULT_4_STEPS = 19,
+		RAPTOR_ANIM_VAULT_3_STEPS = 19,
 		RAPTOR_ANIM_VAULT_4_STEPS = 20,
 		RAPTOR_ANIM_VAULT_DROP_2_STEPS = 21,
 		RAPTOR_ANIM_VAULT_DROP_3_STEPS = 22,
@@ -417,7 +417,7 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case 3:
-				SetAnimation(item, RAPTOR_ANIM_VAULT_4_STEPS);
+				SetAnimation(item, RAPTOR_ANIM_VAULT_3_STEPS);
 				creature.MaxTurn = 0;
 				break;
 
