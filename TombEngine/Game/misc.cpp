@@ -8,45 +8,35 @@
 #include "Game/items.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Utils;
 
 CreatureInfo* GetCreatureInfo(ItemInfo* item)
 {
 	return (CreatureInfo*)item->Data;
 }
 
-void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature, std::vector<GAME_OBJECT_ID> ignoredItemIds)
+void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature, const std::vector<GAME_OBJECT_ID>& ignoredObjectIds)
 {
-	float nearestDistance = INFINITY;
-
+	float closestDist = INFINITY;
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		auto* targetEntity = &g_Level.Items[i];
-		if (targetEntity == nullptr || (targetEntity->Index == item->Index)) // Ignore itself !
+		auto* targetItem = &g_Level.Items[i];
+		if (targetItem == nullptr || targetItem->Index == item->Index)
 			continue;
 
-		bool checkPassed = true;
-		for (auto& itemId : ignoredItemIds)
-		{
-			if (itemId == ID_NO_OBJECT) // NOTE: if there is any ID_NO_OBJECT then ignore the other itemids and attack the target !
-			{
-				checkPassed = true; // just-in-case checkPassed was false !
-				break;
-			}
-			else if (targetEntity->ObjectNumber == itemId)
-				checkPassed = false;
-		}
+		if (Contains(ignoredObjectIds, targetItem->ObjectNumber))
+			continue;
 
-		if ((targetEntity != item &&
-			 targetEntity->HitPoints > 0 &&
-			 targetEntity->Status != ITEM_INVISIBLE) && checkPassed)
+		if (targetItem != item && targetItem->HitPoints > 0 && targetItem->Status != ITEM_INVISIBLE)
 		{
-			float distance = Vector3i::Distance(item->Pose.Position, targetEntity->Pose.Position);
-			if (distance < nearestDistance)
+			float dist = Vector3i::Distance(item->Pose.Position, targetItem->Pose.Position);
+			if (dist < closestDist)
 			{
-				creature->Enemy = targetEntity;
-				nearestDistance = distance;
+				creature->Enemy = targetItem;
+				closestDist = dist;
 			}
 		}
 	}

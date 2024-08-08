@@ -14,8 +14,8 @@
 #include "Math/Math.h"
 #include "Specific/level.h"
 
-using namespace TEN::Math;
 using namespace TEN::Collision::Point;
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -47,8 +47,8 @@ namespace TEN::Entities::Creatures::TR3
 		RAPTOR_STATE_RUN_BITE_ATTACK = 7,
 		RAPTOR_STATE_BITE_ATTACK = 8,
 		RAPTOR_STATE_JUMP_START = 9,
-		RAPTOR_STATE_JUMP_2BLOCK = 10,
-		RAPTOR_STATE_JUMP_1BLOCK = 11,
+		RAPTOR_STATE_JUMP_2_BLOCKS = 10,
+		RAPTOR_STATE_JUMP_1_BLOCK = 11,
 		RAPTOR_STATE_CLIMB = 12
 	};
 
@@ -69,229 +69,260 @@ namespace TEN::Entities::Creatures::TR3
 		RAPTOR_ANIM_JUMP_ATTACK_END = 12,
 		RAPTOR_ANIM_BITE_ATTACK = 13,
 		RAPTOR_ANIM_JUMP_START = 14,
-		RAPTOR_ANIM_JUMP_2BLOCK = 15,
+		RAPTOR_ANIM_JUMP_2_BLOCKS = 15,
 		RAPTOR_ANIM_JUMP_END = 16,
-		RAPTOR_ANIM_JUMP_1BLOCK = 17,
-		RAPTOR_ANIM_VAULT_2CLICK = 18,
-		RAPTOR_ANIM_VAULT_3CLICK = 19,
-		RAPTOR_ANIM_VAULT_4CLICK = 20,
-		RAPTOR_ANIM_VAULT_DROP_2CLICK = 21,
-		RAPTOR_ANIM_VAULT_DROP_3CLICK = 22,
-		RAPTOR_ANIM_VAULT_DROP_4CLICK = 23
+		RAPTOR_ANIM_JUMP_1_BLOCK = 17,
+		RAPTOR_ANIM_VAULT_2_STEPS = 18,
+		RAPTOR_ANIM_VAULT_4_STEPS = 19,
+		RAPTOR_ANIM_VAULT_4_STEPS = 20,
+		RAPTOR_ANIM_VAULT_DROP_2_STEPS = 21,
+		RAPTOR_ANIM_VAULT_DROP_3_STEPS = 22,
+		RAPTOR_ANIM_VAULT_DROP_4_STEPS = 23
 	};
 
 	enum RaptorFlags
 	{
 		OCB_NORMAL_BEHAVIOUR = 0,
-		OCB_ABLE_TO_JUMP = 1
+		OCB_ENABLE_JUMP = 1
 	};
 
 	const std::array RaptorDeathAnims = { RAPTOR_ANIM_DEATH_1, RAPTOR_ANIM_DEATH_2, };
-	const std::vector<GAME_OBJECT_ID> RaptorIgnoreObjects = { ID_RAPTOR, ID_COMPSOGNATHUS };
+	const std::vector<GAME_OBJECT_ID> RaptorIgnoredObjectIds = { ID_RAPTOR, ID_COMPSOGNATHUS };
 
 	void RaptorControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
 			return;
 
-		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
-		short angle = 0;
-		short tilt = 0;
-		short head = 0;
-		short neck = 0;
+		auto& item = g_Level.Items[itemNumber];
+		auto& creature = *GetCreatureInfo(&item);
 
-		bool canJump = item->TestOcb(OCB_ABLE_TO_JUMP);
+		short headingAngle = 0;
+		short tiltAngle = 0;
+		short headYOrient = 0;
+		short neckYOrient = 0;
+
+		bool canJump = item.TestOcb(OCB_ENABLE_JUMP);
 		if (!canJump)
 		{
-			creature->LOT.Step = CLICK(1);
-			creature->LOT.Drop = -CLICK(2);
-			creature->LOT.Zone = ZoneType::Basic;
-			creature->LOT.CanJump = false;
+			creature.LOT.Step = CLICK(1);
+			creature.LOT.Drop = -CLICK(2);
+			creature.LOT.Zone = ZoneType::Basic;
+			creature.LOT.CanJump = false;
 		}
 
-		bool canJump1block = canJump && CanCreatureJump(*item, JumpDistance::Block1);
-		bool canJump2blocks = canJump && !canJump1block && CanCreatureJump(*item, JumpDistance::Block2);
+		bool canJump1block = (canJump && CanCreatureJump(item, JumpDistance::Block1));
+		bool canJump2blocks = (canJump && !canJump1block && CanCreatureJump(item, JumpDistance::Block2));
 
-		if (item->HitPoints <= 0 && item->Animation.ActiveState == RAPTOR_STATE_IDLE) // Require IDLE state.
+		// Require Idle state.
+		if (item.HitPoints <= 0 && item.Animation.ActiveState == RAPTOR_STATE_IDLE)
 		{
-			if (item->Animation.ActiveState != RAPTOR_STATE_DEATH)
-			{
+			if (item.Animation.ActiveState != RAPTOR_STATE_DEATH)
 				SetAnimation(item, RaptorDeathAnims[Random::GenerateInt(0, (int)RaptorDeathAnims.size() - 1)]);
-			}
 		}
 		else
 		{
-			// Raptor ignore other raptor and mini-raptor but target anything else (TRex is not ignored) !
-			TargetNearestEntity(item, creature, RaptorIgnoreObjects);
+			// NOTE: Ignores other small dinosaurs.
+			TargetNearestEntity(&item, &creature, RaptorIgnoredObjectIds);
 
 			AI_INFO ai;
-			if (item->AIBits)
-				GetAITarget(creature);
-			CreatureAIInfo(item, &ai);
+			if (item.AIBits)
+				GetAITarget(&creature);
+			CreatureAIInfo(&item, &ai);
 
-			GetCreatureMood(item, &ai, true);
-			CreatureMood(item, &ai, true);
-			if (creature->Mood == MoodType::Bored)
-				creature->MaxTurn /= 2;
+			GetCreatureMood(&item, &ai, true);
+			CreatureMood(&item, &ai, true);
+			if (creature.Mood == MoodType::Bored)
+				creature.MaxTurn /= 2;
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			headingAngle = CreatureTurn(&item, creature.MaxTurn);
 			if (ai.ahead)
 			{
-				head = ai.angle;
-				neck = -angle * 6;
+				headYOrient = ai.angle;
+				neckYOrient = -headingAngle * 6;
 			}
 
-			switch (item->Animation.ActiveState)
+			switch (item.Animation.ActiveState)
 			{
 			case RAPTOR_STATE_IDLE:
-				creature->MaxTurn = 0;
-				creature->LOT.IsJumping = false;
-				creature->Flags &= ~1;
+				creature.MaxTurn = 0;
+				creature.LOT.IsJumping = false;
+				creature.Flags &= ~1;
 
 				if (canJump1block || canJump2blocks)
 				{
-					creature->MaxTurn = 0;
+					creature.MaxTurn = 0;
+					creature.LOT.IsJumping = true;
 					SetAnimation(item, RAPTOR_ANIM_JUMP_START);
+
 					if (canJump1block)
-						item->Animation.TargetState = RAPTOR_STATE_JUMP_1BLOCK;
+					{
+						item.Animation.TargetState = RAPTOR_STATE_JUMP_1_BLOCK;
+					}
 					else
-						item->Animation.TargetState = RAPTOR_STATE_JUMP_2BLOCK;
-					creature->LOT.IsJumping = true;
+					{
+						item.Animation.TargetState = RAPTOR_STATE_JUMP_2_BLOCKS;
+					}
 				}
-				else if (item->Animation.RequiredState != NO_VALUE)
-					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (creature->Flags & 2)
+				else if (item.Animation.RequiredState != NO_VALUE)
 				{
-					creature->Flags &= ~2;
-					item->Animation.TargetState = RAPTOR_STATE_ROAR;
+					item.Animation.TargetState = item.Animation.RequiredState;
 				}
-				else if (item->TouchBits.Test(RaptorAttackJoints) ||
+				else if (creature.Flags & 2)
+				{
+					creature.Flags &= ~2;
+					item.Animation.TargetState = RAPTOR_STATE_ROAR;
+				}
+				else if (item.TouchBits.Test(RaptorAttackJoints) ||
 					(ai.distance < RAPTOR_BITE_ATTACK_RANGE && ai.bite))
 				{
-					item->Animation.TargetState = RAPTOR_STATE_BITE_ATTACK;
+					item.Animation.TargetState = RAPTOR_STATE_BITE_ATTACK;
 				}
 				else if (ai.bite && ai.distance < RAPTOR_JUMP_ATTACK_RANGE)
-					item->Animation.TargetState = RAPTOR_STATE_JUMP_ATTACK;
-				else if (creature->Mood == MoodType::Escape &&
-					Lara.TargetEntity != item && ai.ahead && !item->HitStatus)
 				{
-					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+					item.Animation.TargetState = RAPTOR_STATE_JUMP_ATTACK;
 				}
-				else if (creature->Mood == MoodType::Bored)
-					item->Animation.TargetState = RAPTOR_STATE_WALK_FORWARD;
+				else if (creature.Mood == MoodType::Escape &&
+					Lara.TargetEntity != &item && ai.ahead && !item.HitStatus)
+				{
+					item.Animation.TargetState = RAPTOR_STATE_IDLE;
+				}
+				else if (creature.Mood == MoodType::Bored)
+				{
+					item.Animation.TargetState = RAPTOR_STATE_WALK_FORWARD;
+				}
 				else
-					item->Animation.TargetState = RAPTOR_STATE_RUN_FORWARD;
+				{
+					item.Animation.TargetState = RAPTOR_STATE_RUN_FORWARD;
+				}
 
 				break;
 
 			case RAPTOR_STATE_WALK_FORWARD:
-				creature->MaxTurn = RAPTOR_WALK_TURN_RATE_MAX;
-				creature->LOT.IsJumping = false;
-				creature->Flags &= ~1;
+				creature.MaxTurn = RAPTOR_WALK_TURN_RATE_MAX;
+				creature.LOT.IsJumping = false;
+				creature.Flags &= ~1;
 
-				if (item->HitPoints <= 0)
+				if (item.HitPoints <= 0)
 				{
-					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+					item.Animation.TargetState = RAPTOR_STATE_IDLE;
 				}
 				else if (canJump1block || canJump2blocks)
 				{
-					creature->MaxTurn = 0;
+					creature.MaxTurn = 0;
+					creature.LOT.IsJumping = true;
 					SetAnimation(item, RAPTOR_ANIM_JUMP_START);
+
 					if (canJump1block)
-						item->Animation.TargetState = RAPTOR_STATE_JUMP_1BLOCK;
+					{
+						item.Animation.TargetState = RAPTOR_STATE_JUMP_1_BLOCK;
+					}
 					else
-						item->Animation.TargetState = RAPTOR_STATE_JUMP_2BLOCK;
-					creature->LOT.IsJumping = true;
+					{
+						item.Animation.TargetState = RAPTOR_STATE_JUMP_2_BLOCKS;
+					}
 				}
-				else if (creature->Mood != MoodType::Bored)
-					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+				else if (creature.Mood != MoodType::Bored)
+				{
+					item.Animation.TargetState = RAPTOR_STATE_IDLE;
+				}
 				else if (ai.ahead && Random::TestProbability(RAPTOR_ROAR_CHANCE))
 				{
-					item->Animation.TargetState = RAPTOR_STATE_IDLE;
-					item->Animation.RequiredState = RAPTOR_STATE_ROAR;
-					creature->Flags &= ~2;
+					item.Animation.TargetState = RAPTOR_STATE_IDLE;
+					item.Animation.RequiredState = RAPTOR_STATE_ROAR;
+					creature.Flags &= ~2;
 				}
 
 				break;
 
 			case RAPTOR_STATE_RUN_FORWARD:
-				creature->MaxTurn = RAPTOR_RUN_TURN_RATE_MAX;
-				creature->LOT.IsJumping = false;
-				creature->Flags &= ~1;
-				tilt = angle;
+				creature.MaxTurn = RAPTOR_RUN_TURN_RATE_MAX;
+				creature.LOT.IsJumping = false;
+				creature.Flags &= ~1;
+				tiltAngle = headingAngle;
 
-				if (item->HitPoints <= 0)
+				if (item.HitPoints <= 0)
 				{
-					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+					item.Animation.TargetState = RAPTOR_STATE_IDLE;
 				}
 				else if (canJump1block || canJump2blocks)
 				{
-					creature->MaxTurn = 0;
+					creature.MaxTurn = 0;
+					creature.LOT.IsJumping = true;
 					SetAnimation(item, RAPTOR_ANIM_JUMP_START);
+
 					if (canJump1block)
-						item->Animation.TargetState = RAPTOR_STATE_JUMP_1BLOCK;
+					{
+						item.Animation.TargetState = RAPTOR_STATE_JUMP_1_BLOCK;
+					}
 					else
-						item->Animation.TargetState = RAPTOR_STATE_JUMP_2BLOCK;
-					creature->LOT.IsJumping = true;
+					{
+						item.Animation.TargetState = RAPTOR_STATE_JUMP_2_BLOCKS;
+					}
 				}
-				else if (item->TouchBits.Test(RaptorAttackJoints))
-					item->Animation.TargetState = RAPTOR_STATE_IDLE;
-				else if (creature->Flags & 2)
+				else if (item.TouchBits.Test(RaptorAttackJoints))
 				{
-					item->Animation.TargetState = RAPTOR_STATE_IDLE;
-					item->Animation.RequiredState = RAPTOR_STATE_ROAR;
-					creature->Flags &= ~2;
+					item.Animation.TargetState = RAPTOR_STATE_IDLE;
+				}
+				else if (creature.Flags & 2)
+				{
+					item.Animation.TargetState = RAPTOR_STATE_IDLE;
+					item.Animation.RequiredState = RAPTOR_STATE_ROAR;
+					creature.Flags &= ~2;
 				}
 				else if (ai.bite && ai.distance < RAPTOR_RUN_ATTACK_RANGE)
 				{
-					if (Random::TestProbability(0.25f))
-						item->Animation.TargetState = RAPTOR_STATE_IDLE;
+					if (Random::TestProbability(1 / 4.0f))
+					{
+						item.Animation.TargetState = RAPTOR_STATE_IDLE;
+					}
 					else
-						item->Animation.TargetState = RAPTOR_STATE_RUN_BITE_ATTACK;
+					{
+						item.Animation.TargetState = RAPTOR_STATE_RUN_BITE_ATTACK;
+					}
 				}
-				else if (ai.ahead && creature->Mood != MoodType::Escape &&
+				else if (ai.ahead && creature.Mood != MoodType::Escape &&
 					Random::TestProbability(RAPTOR_ROAR_CHANCE))
 				{
-					item->Animation.TargetState = RAPTOR_STATE_IDLE;
-					item->Animation.RequiredState = RAPTOR_STATE_ROAR;
+					item.Animation.TargetState = RAPTOR_STATE_IDLE;
+					item.Animation.RequiredState = RAPTOR_STATE_ROAR;
 				}
-				else if (creature->Mood == MoodType::Bored ||
-					(creature->Mood == MoodType::Escape && Lara.TargetEntity != item && ai.ahead))
+				else if (creature.Mood == MoodType::Bored ||
+					(creature.Mood == MoodType::Escape && Lara.TargetEntity != &item && ai.ahead))
 				{
-					item->Animation.TargetState = RAPTOR_STATE_IDLE;
+					item.Animation.TargetState = RAPTOR_STATE_IDLE;
 				}
 
 				break;
 
 			case RAPTOR_STATE_JUMP_ATTACK:
-				creature->MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
-				tilt = angle;
+				creature.MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
+				tiltAngle = headingAngle;
 
-				if (creature->Enemy != nullptr)
+				if (creature.Enemy != nullptr)
 				{
-					if (creature->Enemy->IsLara() && !(creature->Flags & 1) &&
-						item->TouchBits.Test(RaptorAttackJoints))
+					if (creature.Enemy->IsLara() && !(creature.Flags & 1) &&
+						item.TouchBits.Test(RaptorAttackJoints))
 					{
-						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
-						CreatureEffect(item, RaptorBite, DoBloodSplat);
-						creature->Flags |= 1;
+						DoDamage(creature.Enemy, RAPTOR_ATTACK_DAMAGE);
+						CreatureEffect(&item, RaptorBite, DoBloodSplat);
+						creature.Flags |= 1;
 
 						if (LaraItem->HitPoints <= 0)
-							creature->Flags |= 2;
+							creature.Flags |= 2;
 
-						item->Animation.RequiredState = RAPTOR_STATE_IDLE;
+						item.Animation.RequiredState = RAPTOR_STATE_IDLE;
 					}
-					else if (!(creature->Flags & 1))
+					else if (!(creature.Flags & 1))
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
+						if (Vector3i::Distance(item.Pose.Position, creature.Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
-							if (creature->Enemy->HitPoints <= 0)
-								creature->Flags |= 2;
+							if (creature.Enemy->HitPoints <= 0)
+								creature.Flags |= 2;
 
-							DoDamage(creature->Enemy, 25);
-							CreatureEffect(item, RaptorBite, DoBloodSplat);
-							creature->Flags |= 1;
+							DoDamage(creature.Enemy, 25);
+							CreatureEffect(&item, RaptorBite, DoBloodSplat);
+							creature.Flags |= 1;
 						}
 					}
 				}
@@ -299,33 +330,33 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case RAPTOR_STATE_BITE_ATTACK:
-				creature->MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
-				tilt = angle;
+				creature.MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
+				tiltAngle = headingAngle;
 
-				if (creature->Enemy != nullptr)
+				if (creature.Enemy != nullptr)
 				{
-					if (creature->Enemy->IsLara() && !(creature->Flags & 1) &&
-						item->TouchBits.Test(RaptorAttackJoints))
+					if (creature.Enemy->IsLara() && !(creature.Flags & 1) &&
+						item.TouchBits.Test(RaptorAttackJoints))
 					{
-						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
-						CreatureEffect(item, RaptorBite, DoBloodSplat);
-						creature->Flags |= 1;
+						DoDamage(creature.Enemy, RAPTOR_ATTACK_DAMAGE);
+						CreatureEffect(&item, RaptorBite, DoBloodSplat);
+						creature.Flags |= 1;
 
 						if (LaraItem->HitPoints <= 0)
-							creature->Flags |= 2;
+							creature.Flags |= 2;
 
-						item->Animation.RequiredState = RAPTOR_STATE_IDLE;
+						item.Animation.RequiredState = RAPTOR_STATE_IDLE;
 					}
-					else if (!(creature->Flags & 1))
+					else if (!(creature.Flags & 1))
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
+						if (Vector3i::Distance(item.Pose.Position, creature.Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
-							if (creature->Enemy->HitPoints <= 0)
-								creature->Flags |= 2;
+							if (creature.Enemy->HitPoints <= 0)
+								creature.Flags |= 2;
 
-							DoDamage(creature->Enemy, 25);
-							CreatureEffect(item, RaptorBite, DoBloodSplat);
-							creature->Flags |= 1;
+							DoDamage(creature.Enemy, 25);
+							CreatureEffect(&item, RaptorBite, DoBloodSplat);
+							creature.Flags |= 1;
 						}
 					}
 				}
@@ -333,32 +364,32 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case RAPTOR_STATE_RUN_BITE_ATTACK:
-				creature->MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
-				tilt = angle;
+				creature.MaxTurn = RAPTOR_ATTACK_TURN_RATE_MAX;
+				tiltAngle = headingAngle;
 
-				if (creature->Enemy != nullptr)
+				if (creature.Enemy != nullptr)
 				{
-					if (creature->Enemy->IsLara() && !(creature->Flags & 1) &&
-						item->TouchBits.Test(RaptorAttackJoints))
+					if (creature.Enemy->IsLara() && !(creature.Flags & 1) &&
+						item.TouchBits.Test(RaptorAttackJoints))
 					{
-						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
-						CreatureEffect(item, RaptorBite, DoBloodSplat);
-						item->Animation.RequiredState = RAPTOR_STATE_RUN_FORWARD;
-						creature->Flags |= 1;
+						DoDamage(creature.Enemy, RAPTOR_ATTACK_DAMAGE);
+						CreatureEffect(&item, RaptorBite, DoBloodSplat);
+						item.Animation.RequiredState = RAPTOR_STATE_RUN_FORWARD;
+						creature.Flags |= 1;
 
 						if (LaraItem->HitPoints <= 0)
-							creature->Flags |= 2;
+							creature.Flags |= 2;
 					}
-					else if (!(creature->Flags & 1))
+					else if (!(creature.Flags & 1))
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
+						if (Vector3i::Distance(item.Pose.Position, creature.Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
-							if (creature->Enemy->HitPoints <= 0)
-								creature->Flags |= 2;
+							if (creature.Enemy->HitPoints <= 0)
+								creature.Flags |= 2;
 
-							DoDamage(creature->Enemy, 25);
-							CreatureEffect(item, RaptorBite, DoBloodSplat);
-							creature->Flags |= 1;
+							DoDamage(creature.Enemy, 25);
+							CreatureEffect(&item, RaptorBite, DoBloodSplat);
+							creature.Flags |= 1;
 						}
 					}
 				}
@@ -367,53 +398,53 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		CreatureTilt(item, tilt);
-		CreatureJoint(item, 0, head / 2);
-		CreatureJoint(item, 1, head / 2);
-		CreatureJoint(item, 2, neck);
-		CreatureJoint(item, 3, neck);
+		CreatureTilt(&item, tiltAngle);
+		CreatureJoint(&item, 0, headYOrient / 2);
+		CreatureJoint(&item, 1, headYOrient / 2);
+		CreatureJoint(&item, 2, neckYOrient);
+		CreatureJoint(&item, 3, neckYOrient);
 
-		if (item->Animation.ActiveState != RAPTOR_STATE_JUMP_2BLOCK &&
-			item->Animation.ActiveState != RAPTOR_STATE_JUMP_1BLOCK &&
-			item->Animation.ActiveState != RAPTOR_STATE_CLIMB &&
-			item->Animation.ActiveState != RAPTOR_STATE_JUMP_START)
+		if (item.Animation.ActiveState != RAPTOR_STATE_JUMP_2_BLOCKS &&
+			item.Animation.ActiveState != RAPTOR_STATE_JUMP_1_BLOCK &&
+			item.Animation.ActiveState != RAPTOR_STATE_CLIMB &&
+			item.Animation.ActiveState != RAPTOR_STATE_JUMP_START)
 		{
-			switch (CreatureVault(itemNumber, angle, 2, CLICK(2.5f)))
+			switch (CreatureVault(itemNumber, headingAngle, 2, CLICK(2.5f)))
 			{
 			case 2:
-				SetAnimation(item, RAPTOR_ANIM_VAULT_2CLICK);
-				creature->MaxTurn = 0;
+				SetAnimation(item, RAPTOR_ANIM_VAULT_2_STEPS);
+				creature.MaxTurn = 0;
 				break;
 
 			case 3:
-				SetAnimation(item, RAPTOR_ANIM_VAULT_3CLICK);
-				creature->MaxTurn = 0;
+				SetAnimation(item, RAPTOR_ANIM_VAULT_4_STEPS);
+				creature.MaxTurn = 0;
 				break;
 
 			case 4:
-				SetAnimation(item, RAPTOR_ANIM_VAULT_4CLICK);
-				creature->MaxTurn = 0;
+				SetAnimation(item, RAPTOR_ANIM_VAULT_4_STEPS);
+				creature.MaxTurn = 0;
 				break;
 
 			case -2:
-				SetAnimation(item, RAPTOR_ANIM_VAULT_DROP_2CLICK);
-				creature->MaxTurn = 0;
+				SetAnimation(item, RAPTOR_ANIM_VAULT_DROP_2_STEPS);
+				creature.MaxTurn = 0;
 				break;
 
 			case -3:
-				SetAnimation(item, RAPTOR_ANIM_VAULT_DROP_3CLICK);
-				creature->MaxTurn = 0;
+				SetAnimation(item, RAPTOR_ANIM_VAULT_DROP_3_STEPS);
+				creature.MaxTurn = 0;
 				break;
 
 			case -4:
-				SetAnimation(item, RAPTOR_ANIM_VAULT_DROP_4CLICK);
-				creature->MaxTurn = 0;
+				SetAnimation(item, RAPTOR_ANIM_VAULT_DROP_4_STEPS);
+				creature.MaxTurn = 0;
 				break;
 			}
 		}
 		else
 		{
-			CreatureAnimation(itemNumber, angle, tilt);
+			CreatureAnimation(itemNumber, headingAngle, tiltAngle);
 		}
 	}
 }

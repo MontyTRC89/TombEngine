@@ -18,5 +18,5 @@ enum LaraMeshMask
 };
 
 CreatureInfo* GetCreatureInfo(ItemInfo* item);
-void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature, std::vector<GAME_OBJECT_ID> ignoredItemIds = {ID_NO_OBJECT});
+void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature, const std::vector<GAME_OBJECT_ID>& ignoredObjectIds = {});
 bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir, float dist, bool canFloat);

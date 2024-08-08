@@ -59,10 +59,8 @@ namespace TEN::Entities::Creatures::TR1
 		auto& creature = *GetCreatureInfo(&item);
 
 		short headingAngle = 0;
-		short headYOrient = 0;
-		short headXOrient = 0;
-		short torsoYOrient = 0;
-		short torsoXOrient = 0;
+		auto headOrient = EulerAngles::Identity;
+		auto torsoOrient = EulerAngles::Identity;
 
 		if (item.HitPoints <= 0)
 		{
@@ -76,10 +74,10 @@ namespace TEN::Entities::Creatures::TR1
 
 			if (ai.ahead)
 			{
-				headYOrient = ai.angle;
-				headXOrient = ai.xAngle;
-				torsoYOrient = ai.angle / 2;
-				torsoXOrient = ai.xAngle / 2;
+				headOrient.x = ai.xAngle;
+				headOrient.y = ai.angle;
+				torsoOrient.x = ai.xAngle / 2;
+				torsoOrient.y = ai.angle / 2;
 			}
 
 			GetCreatureMood(&item, &ai, true);
@@ -109,8 +107,8 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case CENTAUR_STATE_RUN_FORWARD:
-				torsoYOrient = 0;
-				torsoXOrient = 0;
+				torsoOrient = EulerAngles::Identity;
+
 				if (ai.bite && ai.distance < CENTAUR_REAR_RANGE)
 				{
 					item.Animation.TargetState = CENTAUR_STATE_IDLE;
@@ -149,7 +147,7 @@ namespace TEN::Entities::Creatures::TR1
 				if (item.Animation.RequiredState == NO_VALUE)
 				{
 					item.Animation.RequiredState = CENTAUR_STATE_AIM;
-					CreatureEffect2(&item, CentaurRocketBite, CENTAUR_BOMB_VELOCITY, headYOrient, BombGun);
+					CreatureEffect2(&item, CentaurRocketBite, CENTAUR_BOMB_VELOCITY, headOrient.y, BombGun);
 				}
 
 				break;
@@ -167,11 +165,12 @@ namespace TEN::Entities::Creatures::TR1
 			}
 		}
 
-		CreatureJoint(&item, 0, headYOrient);
-		CreatureJoint(&item, 1, -headXOrient);
-		CreatureJoint(&item, 2, torsoYOrient);
-		CreatureJoint(&item, 3, -torsoXOrient);
+		CreatureJoint(&item, 0, headOrient.y);
+		CreatureJoint(&item, 1, -headOrient.x);
+		CreatureJoint(&item, 2, torsoOrient.y);
+		CreatureJoint(&item, 3, -torsoOrient.x);
 		CreatureAnimation(itemNumber, headingAngle, 0);
+
 		if (item.Status == ITEM_DEACTIVATED)
 		{
 			SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item.Pose);
