@@ -18,25 +18,26 @@ CreatureInfo* GetCreatureInfo(ItemInfo* item)
 	return (CreatureInfo*)item->Data;
 }
 
-void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature, const std::vector<GAME_OBJECT_ID>& ignoredObjectIds)
+void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature, const std::vector<GAME_OBJECT_ID>& keyObjectIds, bool ignoreKeyObjectIds)
 {
-	float closestDist = INFINITY;
-	for (int i = 0; i < g_Level.NumItems; i++)
+	float closestDistSqr = INFINITY;
+	for (int itemNumber = 0; itemNumber < g_Level.NumItems; itemNumber++)
 	{
-		auto* targetItem = &g_Level.Items[i];
+		auto* targetItem = &g_Level.Items[itemNumber];
 		if (targetItem == nullptr || targetItem->Index == item->Index)
 			continue;
 
-		if (Contains(ignoredObjectIds, targetItem->ObjectNumber))
+		// Ignore or specifically target key object IDs.
+		if (ignoreKeyObjectIds ? Contains(keyObjectIds, targetItem->ObjectNumber) : !Contains(keyObjectIds, targetItem->ObjectNumber))
 			continue;
 
 		if (targetItem != item && targetItem->HitPoints > 0 && targetItem->Status != ITEM_INVISIBLE)
 		{
-			float dist = Vector3i::Distance(item->Pose.Position, targetItem->Pose.Position);
-			if (dist < closestDist)
+			float distSqr = Vector3i::DistanceSquared(item->Pose.Position, targetItem->Pose.Position);
+			if (distSqr < closestDistSqr)
 			{
 				creature->Enemy = targetItem;
-				closestDist = dist;
+				closestDistSqr = distSqr;
 			}
 		}
 	}
