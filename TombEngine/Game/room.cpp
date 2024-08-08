@@ -99,22 +99,8 @@ void RoomData::GenerateCollisionMesh()
 				nextSectorZ = &nextRoomZ.Sectors[(nextRoomGridCoordZ.x * nextRoomZ.ZSize) + nextRoomGridCoordZ.y];
 			}
 
-			// Get end status.
-			bool isXEnd = (x == (XSize - 2));
-			if (isXEnd)
-			{
-				const auto& nextSectorX = Sectors[((x + 1) * ZSize) + z];
-				isXEnd = (nextSectorX.SidePortalRoomNumber == NO_VALUE);
-			}
-			bool isZEnd = (z == (ZSize - 2));
-			if (isZEnd)
-			{
-				const auto& nextSectorZ = Sectors[(x * ZSize) + (z + 1)];
-				isZEnd = (nextSectorZ.SidePortalRoomNumber == NO_VALUE);
-			}
-
 			// Collect collision mesh triangles for sector.
-			CollectSectorCollisionMeshTriangles(sector, *prevSectorX, *nextSectorX , *prevSectorZ, *nextSectorZ, isXEnd, isZEnd);
+			CollectSectorCollisionMeshTriangles(sector, *prevSectorX, *nextSectorX , *prevSectorZ, *nextSectorZ);
 		}
 	}
 
@@ -124,8 +110,7 @@ void RoomData::GenerateCollisionMesh()
 
 void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 												   const FloorInfo& prevSectorX, const FloorInfo& nextSectorX,
-												   const FloorInfo& prevSectorZ, const FloorInfo& nextSectorZ,
-												   bool isXEnd, bool isZEnd)
+												   const FloorInfo& prevSectorZ, const FloorInfo& nextSectorZ)
 {
 	constexpr auto NORTH_WALL_NORMAL	  = Vector3(0.0f, 0.0f, 1.0f);
 	constexpr auto SOUTH_WALL_NORMAL	  = Vector3(0.0f, 0.0f, -1.0f);
@@ -164,8 +149,8 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				Vector3 Vertex1 = Vector3::Zero;
 			};
 
-			bool IsSplit = false;
-			bool UseTri0 = false;
+			bool IsSplit	   = false;
+			bool IsSplitAngle0 = false;
 			TriangleVertexData Tri0 = {};
 			TriangleVertexData Tri1 = {};
 
@@ -199,12 +184,12 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 
 			// 2.1) Set surface status data.
 			surfVertices.IsSplit = sector.IsSurfaceSplit(isFloor);
-			surfVertices.UseTri0 = (!surfVertices.IsSplit || surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+			surfVertices.IsSplitAngle0 = (!surfVertices.IsSplit || surface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 			surfVertices.Tri0.IsWall = sector.IsWall(0);
 			surfVertices.Tri1.IsWall = sector.IsWall(1);
 
 			// 2.2) Set surface triangle vertex data.
-			if (surfVertices.UseTri0)
+			if (surfVertices.IsSplitAngle0)
 			{
 				surfVertices.Tri0.Vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_0.x, REL_CORNER_0.y, 0, isFloor), corner0.y);
 				surfVertices.Tri0.Vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexY(sector, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner1.y);
@@ -233,15 +218,15 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 			const auto& prevSurfaceX = isFloor ? prevSectorX.FloorSurface : prevSectorX.CeilingSurface;
 			surfVertices.PrevNeighborX.UseTri0 = !(!prevSectorX.IsSurfaceSplit(isFloor) || prevSurfaceX.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 			surfVertices.PrevNeighborX.IsWall = prevSectorX.IsWall(surfVertices.PrevNeighborX.UseTri0 ? 0 : 1);
-			surfVertices.PrevNeighborX.Vertex0 = Vector3(corner3.x, GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, surfVertices.PrevNeighborX.UseTri0 ? 0 : 1, isFloor), corner3.y);
-			surfVertices.PrevNeighborX.Vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, surfVertices.PrevNeighborX.UseTri0 ? 0 : 1, isFloor), corner2.y);
+			surfVertices.PrevNeighborX.Vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, surfVertices.PrevNeighborX.UseTri0 ? 0 : 1, isFloor), corner0.y);
+			surfVertices.PrevNeighborX.Vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, surfVertices.PrevNeighborX.UseTri0 ? 0 : 1, isFloor), corner1.y);
 
 			// 2.4) Set next neighbor data on X axis.
 			const auto& nextSurfaceX = isFloor ? nextSectorX.FloorSurface : nextSectorX.CeilingSurface;
 			surfVertices.NextNeighborX.UseTri0 = (!nextSectorX.IsSurfaceSplit(isFloor) || nextSurfaceX.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
 			surfVertices.NextNeighborX.IsWall = nextSectorX.IsWall(surfVertices.NextNeighborX.UseTri0 ? 0 : 1);
-			surfVertices.NextNeighborX.Vertex0 = Vector3(corner0.x, GetSurfaceTriangleVertexY(nextSectorX, REL_CORNER_0.x, REL_CORNER_0.y, surfVertices.NextNeighborX.UseTri0 ? 0 : 1, isFloor), corner0.y);
-			surfVertices.NextNeighborX.Vertex1 = Vector3(corner1.x, GetSurfaceTriangleVertexY(nextSectorX, REL_CORNER_1.x, REL_CORNER_1.y, surfVertices.NextNeighborX.UseTri0 ? 0 : 1, isFloor), corner1.y);
+			surfVertices.NextNeighborX.Vertex0 = Vector3(corner3.x, GetSurfaceTriangleVertexY(nextSectorX, REL_CORNER_0.x, REL_CORNER_0.y, surfVertices.NextNeighborX.UseTri0 ? 0 : 1, isFloor), corner2.y);
+			surfVertices.NextNeighborX.Vertex1 = Vector3(corner2.x, GetSurfaceTriangleVertexY(nextSectorX, REL_CORNER_1.x, REL_CORNER_1.y, surfVertices.NextNeighborX.UseTri0 ? 0 : 1, isFloor), corner3.y);
 
 			// 2.5) Set previous neighbor data on Z axis.
 			const auto& prevSurfaceZ = isFloor ? prevSectorZ.FloorSurface : prevSectorZ.CeilingSurface;
@@ -262,8 +247,6 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 
 		return vertices;
 	};
-
-	//goto skip;
 
 	// 1) Generate surface triangle vertices.
 	auto vertices = getVertices();
@@ -292,29 +275,29 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 			// Full wall.
 			if ((surfVerts.Tri0.IsWall || surfVerts.Tri1.IsWall) && isFloor)
 			{
-				const auto& vertex0 = surfVerts.UseTri0 ?
+				const auto& vertex0 = surfVerts.IsSplitAngle0 ?
 					(surfVerts.Tri0.IsWall ? vertices.Floor.Tri1.Vertex0 : vertices.Floor.Tri0.Vertex0) :
 					(surfVerts.Tri0.IsWall ? vertices.Floor.Tri1.Vertex1 : vertices.Floor.Tri0.Vertex0);
-				const auto& vertex1 = surfVerts.UseTri0 ?
+				const auto& vertex1 = surfVerts.IsSplitAngle0 ?
 					(surfVerts.Tri0.IsWall ? vertices.Floor.Tri1.Vertex1 : vertices.Floor.Tri0.Vertex2) :
 					(surfVerts.Tri0.IsWall ? vertices.Floor.Tri1.Vertex2 : vertices.Floor.Tri0.Vertex2);
-				const auto& vertex2 = surfVerts.UseTri0 ?
+				const auto& vertex2 = surfVerts.IsSplitAngle0 ?
 					(surfVerts.Tri0.IsWall ? vertices.Ceil.Tri1.Vertex0 : vertices.Ceil.Tri0.Vertex0) :
 					(surfVerts.Tri0.IsWall ? vertices.Ceil.Tri1.Vertex1 : vertices.Ceil.Tri0.Vertex0);
-				const auto& vertex3 = surfVerts.UseTri0 ?
+				const auto& vertex3 = surfVerts.IsSplitAngle0 ?
 					(surfVerts.Tri0.IsWall ? vertices.Ceil.Tri1.Vertex1 : vertices.Ceil.Tri0.Vertex2) :
 					(surfVerts.Tri0.IsWall ? vertices.Ceil.Tri1.Vertex2 : vertices.Ceil.Tri0.Vertex2);
 
 				if (vertex0 != vertex2)
 				{
-					const auto& normal = surfVerts.UseTri0 ?
+					const auto& normal = surfVerts.IsSplitAngle0 ?
 						(surfVerts.Tri0.IsWall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL) :
 						(surfVerts.Tri0.IsWall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
 					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, normal);
 				}
 				if (vertex1 != vertex3)
 				{
-					const auto& normal = surfVerts.UseTri0 ?
+					const auto& normal = surfVerts.IsSplitAngle0 ?
 						(surfVerts.Tri0.IsWall ? SOUTH_EAST_WALL_NORMAL : NORTH_WEST_WALL_NORMAL) :
 						(surfVerts.Tri0.IsWall ? SOUTH_WEST_WALL_NORMAL : NORTH_EAST_WALL_NORMAL);
 					CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, normal);
@@ -324,7 +307,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 			else if (!(surfVerts.Tri0.IsWall || surfVerts.Tri1.IsWall) && !(isSurfTri0Portal && isSurfTri1Portal))
 			{
 				// TODO: Check when diagonal criss-cross becomes possible.
-				if (surfVerts.UseTri0)
+				if (surfVerts.IsSplitAngle0)
 				{
 					bool isSecondCrissCrossCase = (isFloor ? (surfVerts.Tri0.Vertex2.y < surfVerts.Tri0.Vertex1.y) : !(surfVerts.Tri0.Vertex2.y < surfVerts.Tri0.Vertex1.y));
 					if (surfVerts.Tri0.Vertex0 != surfVerts.Tri1.Vertex0)
@@ -363,19 +346,18 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 			}
 		}
 
-		bool useTri0 = surfVerts.UseTri0;
+		bool useTri0 = surfVerts.IsSplitAngle0;
 		bool usePrevTri1 = !surfVerts.PrevNeighborX.UseTri0;
 		bool isSurfWall = (useTri0 ? surfVerts.Tri0.IsWall : surfVerts.Tri1.IsWall);
 
 		// 2.3) Collect previous cardinal wall triangles on X axis.
 		if (!isSurfWall || !surfVerts.PrevNeighborX.IsWall)
 		{
-			// TODO: Must keep full wall facing current room. The other one should be generated in the previous room.
-			// Full wall referencing current sector.
+			// Full wall.
 			if ((!isSurfWall && surfVerts.PrevNeighborX.IsWall) && isFloor)
 			{
 				bool useFloorTri0 = useTri0;
-				bool useCeilTri0 = (!vertices.Ceil.IsSplit || vertices.Ceil.UseTri0);
+				bool useCeilTri0 = vertices.Ceil.IsSplitAngle0;
 
 				const auto& vertex0 = useFloorTri0 ? vertices.Floor.Tri0.Vertex0 : vertices.Floor.Tri1.Vertex0;
 				const auto& vertex1 = useFloorTri0 ? vertices.Floor.Tri0.Vertex1 : vertices.Floor.Tri1.Vertex1;
@@ -387,28 +369,6 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				if (vertex1 != vertex3)
 					CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
 			}
-			// Full wall referencing previous sector.
-			/*else if ((isSurfWall && !surfVerts.PrevNeighborX.IsWall) && isFloor)
-			{
-				bool isPrevCeilSurfSplit = prevSectorX.IsSurfaceSplit(false);
-				bool isPrevCeilSurfSplitAngle0 = (prevSectorX.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-				bool usePrevCeilTri1 = (!isPrevCeilSurfSplit || isPrevCeilSurfSplitAngle0);
-
-				int floorHeight0 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, true);
-				int floorHeight1 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, true);
-				int ceilHeight0 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevCeilTri1 ? 1 : 0, false);
-				int ceilHeight1 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevCeilTri1 ? 1 : 0, false);
-
-				auto vertex0 = Vector3(corner0.x, floorHeight0, corner0.y);
-				auto vertex1 = Vector3(corner1.x, floorHeight1, corner1.y);
-				auto vertex2 = Vector3(corner0.x, ceilHeight0, corner0.y);
-				auto vertex3 = Vector3(corner1.x, ceilHeight1, corner1.y);
-
-				if (vertex0 != vertex2)
-					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, WEST_WALL_NORMAL);
-				if (vertex1 != vertex3)
-					CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL);
-			}
 			// Step wall.
 			else if (!isSurfWall && !surfVerts.PrevNeighborX.IsWall)
 			{
@@ -417,10 +377,10 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				int prevHeight0 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_3.x, REL_CORNER_3.y, usePrevTri1 ? 1 : 0, isFloor);
 				int prevHeight1 = GetSurfaceTriangleVertexY(prevSectorX, REL_CORNER_2.x, REL_CORNER_2.y, usePrevTri1 ? 1 : 0, isFloor);
 
-				auto vertex0 = Vector3(corner0.x, height0, corner0.y);
-				auto vertex1 = Vector3(corner1.x, height1, corner1.y);
-				auto vertex2 = Vector3(corner0.x, prevHeight0, corner0.y);
-				auto vertex3 = Vector3(corner1.x, prevHeight1, corner1.y);
+				const auto& vertex0 = useTri0 ? surfVerts.Tri0.Vertex0 : surfVerts.Tri1.Vertex0;
+				const auto& vertex1 = useTri0 ? surfVerts.Tri0.Vertex1 : surfVerts.Tri1.Vertex1;
+				const auto& vertex2 = useTri0 ? surfVerts.PrevNeighborX.Vertex0 : surfVerts.PrevNeighborX.Vertex0;
+				const auto& vertex3 = useTri0 ? surfVerts.PrevNeighborX.Vertex1 : surfVerts.PrevNeighborX.Vertex1;
 
 				bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
 				if (sector.RoomNumber == prevSectorX.RoomNumber)
@@ -440,7 +400,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 							CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, normal1);
 					}
 				}
-				else // Avoid forming wall beloning to previous sector's room.
+				else // Avoid forming step wall belonging to previous room.
 				{
 					if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
 					{
@@ -455,15 +415,13 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 							CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
 					}
 				}
-			}*/
+			}
 		}
 
 		isFloor = !isFloor;
 	}
 
 	return;
-	//skip:
-
 	//-------------------------------------
 
 	// Calculate 2D corner positions.
@@ -575,7 +533,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 			}
 
 			// Collect end wall.
-			if (isXEnd && isFloor)
+			//if (isXEnd && isFloor)
 			{
 				bool isCeilSurfSplit = sector.IsSurfaceSplit(false);
 				bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
@@ -736,7 +694,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 			}
 
 			// Collect end wall.
-			if (isZEnd && isFloor)
+			//if (isZEnd && isFloor)
 			{
 				bool isCeilSurfSplit = sector.IsSurfaceSplit(false);
 				bool isCeilSurfSplitAngle0 = (sector.CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
