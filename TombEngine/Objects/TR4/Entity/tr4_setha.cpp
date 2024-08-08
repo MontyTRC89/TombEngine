@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
@@ -20,6 +21,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
@@ -44,10 +46,10 @@ namespace TEN::Entities::TR4
 	constexpr auto SETH_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 	constexpr auto SETH_RUN_TURN_RATE_MAX  = ANGLE(11.0f);
 
-	const auto SethBite1   = CreatureBiteInfo(Vector3i(0, 220, 50), 17);
-	const auto SethBite2   = CreatureBiteInfo(Vector3i(0, 220, 50), 13);
-	const auto SethAttack1 = CreatureBiteInfo(Vector3i(-16, 200, 32), 13);
-	const auto SethAttack2 = CreatureBiteInfo(Vector3i(16, 200, 32), 17);
+	const auto SethBite1   = CreatureBiteInfo(Vector3(0, 220, 50), 17);
+	const auto SethBite2   = CreatureBiteInfo(Vector3(0, 220, 50), 13);
+	const auto SethAttack1 = CreatureBiteInfo(Vector3(-16, 200, 32), 13);
+	const auto SethAttack2 = CreatureBiteInfo(Vector3(16, 200, 32), 17);
 
 	const auto SethPounceAttackJoints1 = std::vector<unsigned int>{ 13, 14, 15 };
 	const auto SethPounceAttackJoints2 = std::vector<unsigned int>{ 16, 17, 18 };
@@ -129,19 +131,19 @@ namespace TEN::Entities::TR4
 		int dx = 870 * phd_sin(item->Pose.Orientation.y);
 		int dz = 870 * phd_cos(item->Pose.Orientation.y);
 
-		int ceiling = GetCollision(x, y, z, item->RoomNumber).Position.Ceiling;
+		int ceiling = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetCeilingHeight();
 
 		x += dx;
 		z += dz;
-		int height1 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height1 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height2 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height3 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		bool canJump = false;
 		if ((y < (height1 - CLICK(1.5f)) || y < (height2 - CLICK(1.5f))) &&
@@ -152,7 +154,7 @@ namespace TEN::Entities::TR4
 
 		x = item->Pose.Position.x - dx;
 		z = item->Pose.Position.z - dz;
-		int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height4 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		AI_INFO AI;
 		short angle = 0;
@@ -181,7 +183,7 @@ namespace TEN::Entities::TR4
 				creature.Flags = 0;
 				creature.LOT.IsJumping = false;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;
@@ -379,7 +381,7 @@ namespace TEN::Entities::TR4
 
 				if (LaraItem->HitPoints < 0)
 				{
-					SethKillAttack(item, LaraItem);
+					CreatureKill(item, SETH_ANIM_KILL_ATTACK_END, LEA_SETH_DEATH, SETH_STATE_KILL_ATTACK_END, LS_DEATH);
 					ItemCustomBurn(LaraItem, Vector3(0.0f, 0.8f, 0.1f), Vector3(0.0f, 0.9f, 0.8f), 6 * FPS);
 					creature.MaxTurn = 0;
 					return;
@@ -654,36 +656,5 @@ namespace TEN::Entities::TR4
 		fx.objectNumber = ID_ENERGY_BUBBLES;
 		fx.speed = Random::GenerateInt(0, 32) - ((flags == 1) ? 64 : 0) + 96;
 		fx.frameNumber = Objects[ID_ENERGY_BUBBLES].meshIndex + flags;
-	}
-
-	void SethKillAttack(ItemInfo* item, ItemInfo* laraItem)
-	{
-		auto& lara = *GetLaraInfo(laraItem);
-
-		SetAnimation(item, SETH_ANIM_KILL_ATTACK_END);
-
-		SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_SETH_DEATH );
-		laraItem->Animation.IsAirborne = false;
-		laraItem->Pose = Pose(item->Pose.Position, item->Pose.Orientation);
-
-		if (item->RoomNumber != laraItem->RoomNumber)
-			ItemNewRoom(lara.ItemNumber, item->RoomNumber);
-
-		AnimateItem(laraItem);
-		laraItem->HitPoints = -1;
-		lara.ExtraAnim = 1;
-		lara.HitDirection = -1;
-		lara.Status.Air = -1;
-		lara.Control.HandStatus = HandStatus::Busy;
-		lara.Control.Weapon.GunType = LaraWeaponType::None;
-
-		Camera.pos.RoomNumber = laraItem->RoomNumber;
-		Camera.type = CameraType::Fixed;
-		ForcedFixedCamera.x = item->Pose.Position.x + ((BLOCK(2) * phd_sin(item->Pose.Orientation.y)));
-		ForcedFixedCamera.y = item->Pose.Position.y - BLOCK(1);
-		ForcedFixedCamera.z = item->Pose.Position.z + ((BLOCK(2) * phd_cos(item->Pose.Orientation.y)));
-		ForcedFixedCamera.RoomNumber = item->RoomNumber;
-		UseForcedFixedCamera = true;
-
 	}
 }

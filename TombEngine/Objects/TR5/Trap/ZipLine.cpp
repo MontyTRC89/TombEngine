@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -12,10 +13,11 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
-namespace TEN::Traps::TR5
+namespace TEN::Entities::Traps
 {
 	const auto ZipLineInteractOffset = Vector3i(0, 0, 371);
 	const auto ZipLineInteractBasis = ObjectCollisionBounds
@@ -87,7 +89,6 @@ namespace TEN::Traps::TR5
 	{
 		constexpr auto VEL_ACCEL   = 5.0f;
 		constexpr auto VEL_MAX	   = 100.0f;
-		constexpr auto SLOPE_ANGLE = -ANGLE(11.25f);
 
 		auto& zipLineItem = g_Level.Items[itemNumber];
 		auto& laraItem = *LaraItem;
@@ -124,17 +125,19 @@ namespace TEN::Traps::TR5
 			zipLineItem.Animation.Velocity.y += VEL_ACCEL;
 
 		// Translate.
-		auto headingOrient = EulerAngles(SLOPE_ANGLE, zipLineItem.Pose.Orientation.y, 0);
+		// TODO: Use proper calculation of the trajectory instead of bitwise operation.
+		auto headingOrient = EulerAngles(0, zipLineItem.Pose.Orientation.y, 0);
 		TranslateItem(&zipLineItem, headingOrient, zipLineItem.Animation.Velocity.y);
+		zipLineItem.Pose.Position.y += ((int)zipLineItem.Animation.Velocity.y >> 2);
 
 		int vPos = zipLineItem.Pose.Position.y + CLICK(0.25f);
-		auto pointColl = GetCollision(&zipLineItem, zipLineItem.Pose.Orientation.y, zipLineItem.Animation.Velocity.y);
+		auto pointColl = GetPointCollision(zipLineItem, zipLineItem.Pose.Orientation.y, zipLineItem.Animation.Velocity.y);
 
 		// Update zip line room number.
-		if (pointColl.RoomNumber != zipLineItem.RoomNumber)
-			ItemNewRoom(itemNumber, pointColl.RoomNumber);
+		if (pointColl.GetRoomNumber() != zipLineItem.RoomNumber)
+			ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
-		if (pointColl.Position.Floor <= (vPos + CLICK(1)) || pointColl.Position.Ceiling >= (vPos - CLICK(1)))
+		if (pointColl.GetFloorHeight() <= (vPos + CLICK(1)) || pointColl.GetCeilingHeight() >= (vPos - CLICK(1)))
 		{
 			// Dismount.
 			if (laraItem.Animation.ActiveState == LS_ZIP_LINE)

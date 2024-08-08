@@ -8,7 +8,6 @@
 #include "Math/Random.h"
 #include "Math/Math.h"
 
-using std::vector;
 using namespace TEN::Renderer;
 using namespace TEN::Math::Random;
 
@@ -17,14 +16,14 @@ SHATTER_ITEM ShatterItem;
 short SmashedMeshCount;
 MESH_INFO* SmashedMesh[32];
 short SmashedMeshRoom[32];
-vector<DebrisFragment> DebrisFragments = vector<DebrisFragment>(MAX_DEBRIS);
+std::array<DebrisFragment, MAX_DEBRIS> DebrisFragments;
 
 bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 {
 	if (1 << node & item->MeshBits.ToPackedBits())
 	{
 		int number = bits;
-		if (number == BODY_EXPLODE)
+		if (number == BODY_DO_EXPLOSION)
 			number = -64;
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
@@ -77,7 +76,9 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 		pos = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 		scale = mesh->scale;
 
-		mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
+		if (mesh->HitPoints <= 0)
+			mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
+
 		SmashedMeshRoom[SmashedMeshCount] = roomNumber;
 		SmashedMesh[SmashedMeshCount] = mesh;
 		SmashedMeshCount++;
@@ -231,17 +232,17 @@ void UpdateDebris()
 
 			if (deb.worldPosition.y < floor->GetSurfaceHeight(deb.worldPosition.x, deb.worldPosition.z, false))
 			{
-				auto roomNumber = floor->GetRoomNumberAbove(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z).value_or(NO_ROOM);
-				if (roomNumber != NO_ROOM)
-					deb.roomNumber = roomNumber;
+				auto roomNumber = floor->GetNextRoomNumber(deb.worldPosition, false);
+				if (roomNumber.has_value())
+					deb.roomNumber = *roomNumber;
 			}
 
 			if (deb.worldPosition.y > floor->GetSurfaceHeight(deb.worldPosition.x, deb.worldPosition.z, true))
 			{
-				auto roomNumber = floor->GetRoomNumberBelow(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z).value_or(NO_ROOM);
-				if (roomNumber != NO_ROOM)
+				auto roomNumber = floor->GetNextRoomNumber(deb.worldPosition, true);
+				if (roomNumber.has_value())
 				{
-					deb.roomNumber = roomNumber;
+					deb.roomNumber = *roomNumber;
 					continue;
 				}
 
@@ -256,6 +257,10 @@ void UpdateDebris()
 				deb.velocity.z *= deb.friction;
 				deb.numBounces++;
 			}
+
+			auto translation = Matrix::CreateTranslation(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z);
+			auto rotation = Matrix::CreateFromQuaternion(deb.rotation);
+			deb.Transform = rotation * translation;
 		}
 	}
 }

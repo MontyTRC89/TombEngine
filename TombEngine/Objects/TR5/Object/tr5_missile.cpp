@@ -2,6 +2,7 @@
 #include "tr5_missile.h"
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
@@ -9,12 +10,13 @@
 #include "Game/effects/debris.h"
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "tr5_roman_statue.h"
-#include "tr5_hydra.h"
+#include "Objects/TR5/Entity/tr5_roman_statue.h"
+#include "Objects/TR5/Entity/tr5_hydra.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/item_fx.h"
 #include "Math/Math.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Math;
 
@@ -106,9 +108,9 @@ void MissileControl(short itemNumber)
 	fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
 	fx->pos.Position.z += c * phd_cos(fx->pos.Orientation.y);
 
-	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+	auto probe = GetPointCollision(fx->pos.Position, fx->roomNumber);
 	
-	if (fx->pos.Position.y >= probe.Position.Floor || fx->pos.Position.y <= probe.Position.Ceiling)
+	if (fx->pos.Position.y >= probe.GetFloorHeight() || fx->pos.Position.y <= probe.GetCeilingHeight())
 	{
 		fx->pos.Position.x = x;
 		fx->pos.Position.y = y;
@@ -120,9 +122,9 @@ void MissileControl(short itemNumber)
 			{
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.Position.y -= 64;
-				TriggerShockwave(&fx->pos, 48, 256, 64, 64, 128, 0, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx->pos, 48, 256, 64, 64, 128, 0, 24, EulerAngles::Identity, 1, true, false, false, (int)ShockwaveStyle::Normal);
 				fx->pos.Position.y -= 128;
-				TriggerShockwave(&fx->pos, 48, 256, 48, 64, 128, 0, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx->pos, 48, 256, 48, 64, 128, 0, 24, EulerAngles::Identity, 1, true, false, false, (int)ShockwaveStyle::Normal);
 			}
 			else if (fx->flag1 == 2)
 			{
@@ -133,7 +135,7 @@ void MissileControl(short itemNumber)
 		else
 		{
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			TriggerShockwave(&fx->pos, 48, 240, 48, 0, 96, 128, 24, EulerAngles::Zero, 2, true, false, (int)ShockwaveStyle::Normal);
+			TriggerShockwave(&fx->pos, 48, 240, 48, 128, 64, 0, 24, EulerAngles::Identity, 2, true, false, false, (int)ShockwaveStyle::Normal);
 		}
 		
 		KillEffect(itemNumber);
@@ -147,9 +149,9 @@ void MissileControl(short itemNumber)
 				// ROMAN_GOD hit effect
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
 				fx->pos.Position.y -= 64;
-				TriggerShockwave(&fx->pos, 48, 256, 64, 0, 128, 64, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx->pos, 48, 256, 64, 0, 128, 64, 24, EulerAngles::Identity, 1, true, false, false, (int)ShockwaveStyle::Normal);
 				fx->pos.Position.y -= 128;
-				TriggerShockwave(&fx->pos, 48, 256, 48, 0, 128, 64, 24, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+				TriggerShockwave(&fx->pos, 48, 256, 48, 0, 128, 64, 24, EulerAngles::Identity, 1, true, false, false, (int)ShockwaveStyle::Normal);
 				KillEffect(itemNumber);
 				DoDamage(LaraItem, 200);
 			}
@@ -172,7 +174,7 @@ void MissileControl(short itemNumber)
 		{
 			// HYDRA hit effect
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
-			TriggerShockwave(&fx->pos, 48, 240, 48, 0, 96, 128, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+			TriggerShockwave(&fx->pos, 48, 240, 48, 128, 96, 0, 24, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 			if (LaraItem->HitPoints >= 500)
 				DoDamage(LaraItem, 300);
 			else
@@ -182,8 +184,8 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
-		if (probe.RoomNumber != fx->roomNumber)
-			EffectNewRoom(itemNumber, probe.RoomNumber);
+		if (probe.GetRoomNumber() != fx->roomNumber)
+			EffectNewRoom(itemNumber, probe.GetRoomNumber());
 
 		if (GlobalCounter & 1)
 		{

@@ -13,7 +13,7 @@
 #include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/objectslist.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 
 using namespace TEN::Math;
 
@@ -64,10 +64,10 @@ namespace TEN::Entities::TR4
 
 	void TriggerCrocgodMissile(Pose* src, short roomNumber, short counter)
 	{
-		short fxNumber = NO_ITEM;
+		short fxNumber = NO_VALUE;
 
 		fxNumber = CreateNewEffect(roomNumber);
-		if (fxNumber != NO_ITEM)
+		if (fxNumber != NO_VALUE)
 		{
 			auto* fx = &EffectList[fxNumber];
 			fx->pos.Position.x = src->Position.x;
@@ -105,7 +105,7 @@ namespace TEN::Entities::TR4
 		sptr->dG = color / 2;
 		sptr->fadeToBlack = 8;
 		sptr->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BlendMode::Additive;
 		sptr->dynamic = -1;
 		BYTE life = (GetRandomControl() & 7) + 32;
 		sptr->life = life;
@@ -245,11 +245,11 @@ namespace TEN::Entities::TR4
 
 	void MutantAIFix(ItemInfo* item, AI_INFO* AI)
 	{
-		MoveItemFront(item, SECTOR(2));
+		MoveItemFront(item, BLOCK(2));
 		item->Pose.Position.y -= CLICK(3);
 		CreatureAIInfo(item, AI);
 		item->Pose.Position.y += CLICK(3);
-		MoveItemBack(item, SECTOR(2));
+		MoveItemBack(item, BLOCK(2));
 	}
 
 	void InitializeCrocgod(short itemNumber)
@@ -272,8 +272,8 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		short headingAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		int frameNumber;
 

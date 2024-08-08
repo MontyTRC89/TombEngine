@@ -18,8 +18,8 @@ namespace TEN::Entities::TR4
 {
 	constexpr auto GUIDE_ATTACK_DAMAGE = 20;
 
-	const auto GuideBite1 = CreatureBiteInfo(Vector3i(0, 20, 180), 18);
-	const auto GuideBite2 = CreatureBiteInfo(Vector3i(30, 80, 50), 15);
+	const auto GuideBite1 = CreatureBiteInfo(Vector3(0, 20, 180), 18);
+	const auto GuideBite2 = CreatureBiteInfo(Vector3(30, 80, 50), 15);
 	const auto GuideLeftFingerSwapJoints = std::vector<unsigned int>{ 15 };
 	const auto GuideRightHandSwapJoints	 = std::vector<unsigned int>{ 18 };
 	const auto GuideHeadSwapJoints		 = std::vector<unsigned int>{ 21 };
@@ -191,7 +191,7 @@ namespace TEN::Entities::TR4
 
 			for (auto& currentCreature : ActiveCreatures)
 			{
-				if (currentCreature->ItemNumber == NO_ITEM ||
+				if (currentCreature->ItemNumber == NO_VALUE ||
 					currentCreature->ItemNumber == itemNumber)
 				{
 					continue;
@@ -280,7 +280,7 @@ namespace TEN::Entities::TR4
 				joint2 = AI.angle / 2;
 			}
 
-			if (item->Animation.RequiredState != NO_STATE)
+			if (item->Animation.RequiredState != NO_VALUE)
 				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (goalNode >= item->ItemFlags[3] ||
 				item->ItemFlags[1] != 2)
@@ -660,7 +660,7 @@ namespace TEN::Entities::TR4
 
 				ItemInfo* currentItem = nullptr;
 				short currentitemNumber = room->itemNumber;
-				while (currentitemNumber != NO_ITEM)
+				while (currentitemNumber != NO_VALUE)
 				{
 					currentItem = &g_Level.Items[currentitemNumber];
 

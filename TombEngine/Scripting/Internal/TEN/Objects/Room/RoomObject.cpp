@@ -1,7 +1,7 @@
 #pragma once
 #include "framework.h"
 
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
@@ -20,8 +20,8 @@ Rooms
 @pragma nostrip
 */
 
-static auto index_error = index_error_maker(Room, ScriptReserved_Volume);
-static auto newindex_error = newindex_error_maker(Room, ScriptReserved_Volume);
+static auto IndexError = index_error_maker(Room, ScriptReserved_Volume);
+static auto NewIndexError = newindex_error_maker(Room, ScriptReserved_Volume);
 
 Room::Room(ROOM_INFO& room) : m_room{ room }
 {};
@@ -30,13 +30,18 @@ void Room::Register(sol::table& parent)
 {
 	parent.new_usertype<Room>(ScriptReserved_Room,
 		sol::no_constructor,
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 
 		/// Determine whether the room is active or not 
 		// @function Room:GetActive
 		// @treturn bool true if the room is active
 		ScriptReserved_GetActive, &Room::GetActive,
+
+		/// Get the room's ambient light color.
+		// @function Room:GetColor
+		// @treturn Color ambient light color of the room
+		ScriptReserved_GetColor, & Room::GetColor,
 
 		/// Get the room's reverb type.
 		// @function Room:GetReverbType
@@ -82,6 +87,11 @@ bool Room::GetActive() const
 	return m_room.Active();
 }
 
+ScriptColor Room::GetColor() const
+{
+	return ScriptColor{ m_room.ambient };
+}
+
 ReverbType Room::GetReverbType() const
 {
 	return m_room.reverbType;
@@ -94,7 +104,7 @@ void Room::SetReverbType(ReverbType reverb)
 
 std::string Room::GetName() const
 {
-	return m_room.name;
+	return m_room.Name;
 }
 
 void Room::SetName(const std::string& name)
@@ -102,11 +112,11 @@ void Room::SetName(const std::string& name)
 	if (!ScriptAssert(!name.empty(), "Unable to set name. Name cannot be blank."))
 		return;
 
-	// Remove the old name if we have one.
+	// Remove old name if it already exists.
 	if (s_callbackSetName(name, m_room))
 	{
-		s_callbackRemoveName(m_room.name);
-		m_room.name = name;
+		s_callbackRemoveName(m_room.Name);
+		m_room.Name = name;
 	}
 	else
 	{
@@ -123,16 +133,21 @@ bool Room::GetFlag(RoomEnvFlags flag) const
 void Room::SetFlag(RoomEnvFlags flag, bool value)
 {
 	if (value)
+	{
 		m_room.flags |= flag;
+	}
 	else
+	{
 		m_room.flags &= ~flag;
+	}
 }
 
 bool Room::IsTagPresent(const std::string& tag) const
 {
-	if (m_room.tags.empty())
+	if (m_room.Tags.empty())
 		return false;
 
-	return std::any_of(m_room.tags.begin(), m_room.tags.end(),
+	return std::any_of(
+		m_room.Tags.begin(), m_room.Tags.end(),
 		[&tag](const std::string& value) { return (value == tag); });
 }

@@ -20,6 +20,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Room;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
@@ -29,7 +30,7 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto ROMAN_STATUE_GRENADE_SUPER_AMMO_LIMITER = 2.0f;
 	constexpr auto ROMAN_STATUE_EXPLOSIVE_DAMAGE_COEFF	   = 2.0f;
 
-	const auto RomanStatueBite = CreatureBiteInfo(Vector3i::Zero, 15);
+	const auto RomanStatueBite = CreatureBiteInfo(Vector3::Zero, 15);
 
 	struct RomanStatueInfo
 	{
@@ -81,7 +82,7 @@ namespace TEN::Entities::Creatures::TR5
 		if (!(GetRandomControl() & 0x1F))
 		{
 			int fxNumber = CreateNewEffect(item->RoomNumber);
-			if (fxNumber != NO_ITEM)
+			if (fxNumber != NO_VALUE)
 			{
 				auto* fx = &EffectList[fxNumber];
 
@@ -110,7 +111,7 @@ namespace TEN::Entities::Creatures::TR5
 			spark->colFadeSpeed = 4;
 			spark->fadeToBlack = 32;
 			spark->dShade = (GetRandomControl() & 0xF) + 64;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 64;
 			spark->x = (GetRandomControl() & 0x1F) + pos->x - 16;
 			spark->y = (GetRandomControl() & 0x1F) + pos->y - 16;
@@ -139,7 +140,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->colFadeSpeed = 2;
 		spark->dR = r;
 		spark->sR = r;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->life = 16;
 		spark->sLife = 16;
 		spark->x = x;
@@ -180,7 +181,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dG = spark->dB / 2;
 		spark->fadeToBlack = 4;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->dynamic = -1;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 		spark->y = 0;
@@ -205,7 +206,7 @@ namespace TEN::Entities::Creatures::TR5
 	static void RomanStatueAttack(Pose* pos, short roomNumber, short count)
 	{
 		int fxNumber = CreateNewEffect(roomNumber);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto* fx = &EffectList[fxNumber];
@@ -237,7 +238,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->dB = spark->dG / 2;
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->dynamic = -1;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 		spark->x = (GetRandomControl() & 0xF) - 8;
@@ -254,7 +255,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
 		spark->fxObj = fxObject;
 		spark->scalar = 2;
-		spark->sSize = spark->size = (GetRandomControl() & 0xF) + 96;
+		spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 96;
 		spark->dSize = spark->size / 4;
 	}
 
@@ -362,7 +363,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->AIBits ||
 					!(GetRandomControl() & 0x1F) &&
-					(ai.distance > pow(SECTOR(1), 2) ||
+					(ai.distance > pow(BLOCK(1), 2) ||
 						creature->Mood != MoodType::Attack))
 				{
 					joint2 = AIGuard((CreatureInfo*)creature);
@@ -371,7 +372,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					item->Animation.TargetState = STATUE_STATE_TURN_180;
 				}
-				else if (ai.ahead && ai.distance < pow(SECTOR(1), 2))
+				else if (ai.ahead && ai.distance < pow(BLOCK(1), 2))
 				{
 					if (ai.bite & ((GetRandomControl() & 3) == 0))
 						item->Animation.TargetState = STATUE_STATE_ATTACK_1;
@@ -398,7 +399,7 @@ namespace TEN::Entities::Creatures::TR5
 						}
 					}
 
-					if (item->TriggerFlags || ai.distance >= pow(SECTOR(2.5f), 2) || !ai.bite)
+					if (item->TriggerFlags || ai.distance >= pow(BLOCK(2.5f), 2) || !ai.bite)
 					{
 						item->Animation.TargetState = STATUE_STATE_WALK;
 						break;
@@ -459,9 +460,9 @@ namespace TEN::Entities::Creatures::TR5
 
 				pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 450));
 
-				pos1.x = (GetRandomControl() & 0xFFF) + item->Pose.Position.x - SECTOR(2);
-				pos1.y = item->Pose.Position.y - (GetRandomControl() & 0x3FF) - SECTOR(4);
-				pos1.z = (GetRandomControl() & 0xFFF) + item->Pose.Position.z - SECTOR(2);
+				pos1.x = (GetRandomControl() & 0xFFF) + item->Pose.Position.x - BLOCK(2);
+				pos1.y = item->Pose.Position.y - (GetRandomControl() & 0x3FF) - BLOCK(4);
+				pos1.z = (GetRandomControl() & 0xFFF) + item->Pose.Position.z - BLOCK(2);
 
 				for (int i = 0; i < 8; i++)
 				{
@@ -542,7 +543,7 @@ namespace TEN::Entities::Creatures::TR5
 					pos = GetJointPosition(item, 16);
 
 					auto* room = &g_Level.Rooms[item->RoomNumber];
-					FloorInfo* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
+					FloorInfo* floor = GetSector(room, pos.x - room->Position.x, pos.z - room->Position.z);
 
 					// If floor is stopped, then try to find static meshes and shatter them, activating heavy triggers below
 					if (floor->Stopper)
@@ -553,7 +554,7 @@ namespace TEN::Entities::Creatures::TR5
 
 							if (!((mesh->pos.Position.z ^ pos.z) & 0xFFFFFC00) && !((mesh->pos.Position.x ^ pos.x) & 0xFFFFFC00))
 							{
-								if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+								if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
 								{
 									ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
 									SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
@@ -587,10 +588,15 @@ namespace TEN::Entities::Creatures::TR5
 							if (item->ItemFlags[0])
 								item->ItemFlags[0]--;
 
-							TriggerShockwave((Pose*)&pos1, 16, 160, 96, 0, 64, 128, 48, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+							TriggerShockwave(&Pose(pos1), 16, 160, 96, 0, color / 2, color, 48, EulerAngles::Identity, 1, true, false, true, (int)ShockwaveStyle::Normal);
 							TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
+
 							pos1.y -= 64;
-							TriggerShockwave((Pose*)&pos1, 16, 160, 64, 0, 64, 128, 48, EulerAngles::Zero, 1, true, false, (int)ShockwaveStyle::Normal);
+
+							TriggerShockwave(&Pose(pos1), 16, 160, 64, 0, color / 2, color, 48, EulerAngles::Identity, 1, true, false, true, (int)ShockwaveStyle::Normal);
+							
+							auto lightColor = Color(0.4f, 0.3f, 0.0f);
+							TriggerDynamicLight(pos.ToVector3(), lightColor, 0.04f);
 						}
 
 						deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
@@ -600,11 +606,27 @@ namespace TEN::Entities::Creatures::TR5
 						{
 							if (deltaFrame > 16)
 								deltaFrame = 16;
+
 							TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame);
+
+							if (item->ItemFlags[3])
+							{
+								TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 8, 0, color / 4, color / 2);
+							}
+							else
+							{
+								TriggerDynamicLight(pos1.x, pos1.y - 64, pos1.z, 18, 0, color / 4, color / 2);
+							}
 						}
 						else
 						{
 							TriggerRomanStatueAttackEffect1(itemNumber, deltaFrame2);
+
+							if (item->ItemFlags[3])
+							{
+								auto lightColor = Color(0.0f, 0.4f, 1.0f);
+								TriggerDynamicLight(pos.ToVector3(), lightColor, 0.06f);
+							}
 						}
 					}
 				}
@@ -635,13 +657,13 @@ namespace TEN::Entities::Creatures::TR5
 					}
 				}
 
-				if (ai.distance < pow(SECTOR(1), 2))
+				if (ai.distance < pow(BLOCK(1), 2))
 				{
 					item->Animation.TargetState = STATUE_STATE_IDLE;
 					break;
 				}
 
-				if (ai.bite && ai.distance < pow(SECTOR(1.75f), 2))
+				if (ai.bite && ai.distance < pow(BLOCK(1.75f), 2))
 				{
 					item->Animation.TargetState = 9;
 					break;
@@ -656,7 +678,7 @@ namespace TEN::Entities::Creatures::TR5
 					}
 				}
 
-				if (item->TriggerFlags || ai.distance >= pow(SECTOR(2.5f), 2))
+				if (item->TriggerFlags || ai.distance >= pow(BLOCK(2.5f), 2))
 					item->Animation.TargetState = STATUE_STATE_WALK;
 				else
 					item->Animation.TargetState = STATUE_STATE_IDLE;
@@ -692,7 +714,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (deltaFrame == 34)
 				{
-					pos1 = GetJointPosition(item, 14, Vector3i(-48, 48, SECTOR(1)));
+					pos1 = GetJointPosition(item, 14, Vector3i(-48, 48, BLOCK(1)));
 					pos2 = GetJointPosition(item, 14, Vector3i(-48, 48, 450));
 
 				auto orient = Geometry::GetOrientToPoint(pos2.ToVector3(), pos1.ToVector3());
@@ -801,9 +823,9 @@ namespace TEN::Entities::Creatures::TR5
 					short floorHeight = item->ItemFlags[2] & 0xFF00;
 					auto* room = &g_Level.Rooms[roomNumber];
 
-					int x = room->x + (creature->Tosspad / 256 & 0xFF) * SECTOR(1) + 512;
-					int y = room->minfloor + floorHeight;
-					int z = room->z + (creature->Tosspad & 0xFF) * SECTOR(1) + 512;
+					int x = room->Position.x + (creature->Tosspad / 256 & 0xFF) * BLOCK(1) + 512;
+					int y = room->BottomHeight + floorHeight;
+					int z = room->Position.z + (creature->Tosspad & 0xFF) * BLOCK(1) + 512;
 
 					TestTriggers(x, y, z, roomNumber, true);
 				}

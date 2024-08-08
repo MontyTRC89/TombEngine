@@ -1,68 +1,69 @@
 #pragma once
 #include "framework.h"
-#include "ScriptAssert.h"
 
-class LuaHandler {
+#include "Scripting/Internal/ScriptAssert.h"
+
+class LuaHandler
+{
 protected:
-	sol::state*	m_lua;
-	sol::table m_globals;
+	sol::state*	_lua;
+	sol::table _globals;
 
 public:
 	LuaHandler(sol::state* lua);
-	LuaHandler(LuaHandler const &) = delete;
-	LuaHandler& operator=(LuaHandler const &) = delete;
+	LuaHandler(const LuaHandler&) = delete;
+	LuaHandler& operator=(const LuaHandler&) = delete;
 	~LuaHandler() = default;
 
-	void ExecuteScript(const std::string & luaFilename);
-	void ExecuteString(const std::string & command);
+	void ExecuteScript(const std::string& luaFilename, bool isOptional = false);
+	void ExecuteString(const std::string& command);
 
 	void ResetGlobals();
 
-	sol::state* GetState() {
-		return m_lua;
+	sol::state* GetState()
+	{
+		return _lua;
 	};
 
-	template <typename T>void MakeReadOnlyTable(sol::table & parent, std::string const& tableName, T const& container)
+	template <typename T>void MakeReadOnlyTable(sol::table parent, const std::string& tableName, const T& container)
 	{
-		auto mt = tableName + "Meta";
-		// Put all the data in the metatable	
-		m_lua->set(mt, sol::as_table(container));
+		// Put all data into metatable.
+		auto metatable = tableName + "Meta";
+		_lua->set(metatable, sol::as_table(container));
 
 		auto mtmt = tableName + "MetaMeta";
-		auto mtmtTable = m_lua->create_named_table(mtmt);
+		auto mtmtTable = _lua->create_named_table(mtmt);
 
-		// Make the metatable's metatable's __index fail an assert so that trying to use a variable
-		// that doesn't exist will generate a warning or error.
+		// Make metatable's metatable's __index fail an assert to generate warning/error when trying to use missing variable.
 		auto lam = [tableName](sol::table tab, std::string const& key)
 		{
 			ScriptAssertF(false, tableName + " has no member \"" + key +"\"");
 		};
 
 		mtmtTable[sol::meta_method::index] = lam;
-		m_lua->safe_script("setmetatable(" + mt + ", " + mtmt + ")");
+		_lua->safe_script("setmetatable(" + metatable + ", " + mtmt + ")");
 
-		// Make the metatable's __index refer to itself so that requests
-		// to the main table will go through to the metatable (and thus the
-		// container's members)
-		m_lua->safe_script(mt + ".__index = " + mt);
+		// Make metatable's __index refer to itself so that requests to main table will go through to metatable
+		// (and thus container's members).
+		_lua->safe_script(metatable + ".__index = " + metatable);
 		
-		m_lua->safe_script(mt + ".__type = \"readonly\"");
+		_lua->safe_script(metatable + ".__type = \"readonly\"");
 
-		// Don't allow the table to have new elements put into it
-		m_lua->safe_script(mt + ".__newindex = function() error('" + tableName + " is read-only') end");
+		// Don't allow table to have new elements put into it.
+		_lua->safe_script(metatable + ".__newindex = function() error('" + tableName + " is read-only') end");
 
-		// Protect the metatable
-		m_lua->safe_script(mt + ".__metatable = 'metatable is protected'");
+		// Protect metatable.
+		_lua->safe_script(metatable + ".__metatable = 'metatable is protected'");
 
-		auto tab = m_lua->create_named_table(tableName);
+		auto tab = _lua->create_named_table(tableName);
 
-		m_lua->safe_script("setmetatable(" + tableName + ", " + mt + ")");
+		_lua->safe_script("setmetatable(" + tableName + ", " + metatable + ")");
 
-		// point the initial metatable variable away from its contents. this is just for cleanliness
+		// Point initial metatable variable away from its contents. This is just for cleanliness.
 		parent.set(tableName, tab);
 
-		m_lua->safe_script(tableName + " = nil");
-		m_lua->safe_script(mt + " = nil");
-		m_lua->safe_script(mtmt + " = nil");
+		_lua->safe_script(tableName + " = nil");
+		_lua->safe_script(metatable + " = nil");
+		_lua->safe_script(mtmt + " = nil");
 	}
 };

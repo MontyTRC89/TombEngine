@@ -25,7 +25,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto RAT_TURN_RATE_MAX = ANGLE(6.0f);
 
-	const auto RatBite = CreatureBiteInfo(Vector3i(0, 0, 57), 2);
+	const auto RatBite = CreatureBiteInfo(Vector3(0, 0, 57), 2);
 
 	enum RatState
 	{
@@ -97,7 +97,7 @@ namespace TEN::Entities::Creatures::TR2
 				else
 					item->Animation.RequiredState = RAT_STATE_WALK_FORWARD;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = RAT_STATE_IDLE;
 
 				break;
@@ -105,7 +105,7 @@ namespace TEN::Entities::Creatures::TR2
 			case RAT_STATE_IDLE:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 
 				break;
@@ -130,7 +130,7 @@ namespace TEN::Entities::Creatures::TR2
 				break;
 
 			case RAT_STATE_POUNCE_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE &&
+				if (item->Animation.RequiredState == NO_VALUE &&
 					item->TouchBits.Test(RatBite.BoneID))
 				{
 					item->Animation.RequiredState = RAT_STATE_IDLE;

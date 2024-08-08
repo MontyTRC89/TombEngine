@@ -4,18 +4,20 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
-namespace TEN::Entities::Traps::TR1
+namespace TEN::Entities::Traps
 {
 	// NOTES:
-	// ItemFlags[0] = random turn rate.
+	// ItemFlags[0] = random turn rate when active.
 	// ItemFlags[1] = calculated forward velocity.
 
 	constexpr auto DAMOCLES_SWORD_DAMAGE = 100;
@@ -28,14 +30,17 @@ namespace TEN::Entities::Traps::TR1
 	constexpr auto DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL = BLOCK(3);
 
 	constexpr auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.0f);
+	constexpr auto DAMOCLES_SWORD_TURN_RATE_MIN = ANGLE(1.0f);
 
 	void InitializeDamoclesSword(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
+		int sign = Random::TestProbability(0.5f) ? 1 : -1;
+
 		item.Pose.Orientation.y = Random::GenerateAngle();
 		item.Animation.Velocity.y = DAMOCLES_SWORD_VELOCITY_MIN;
-		item.ItemFlags[0] = Random::GenerateAngle(-DAMOCLES_SWORD_TURN_RATE_MAX, DAMOCLES_SWORD_TURN_RATE_MAX);
+		item.ItemFlags[0] = Random::GenerateAngle(DAMOCLES_SWORD_TURN_RATE_MIN, DAMOCLES_SWORD_TURN_RATE_MAX) * sign;
 	}
 
 	void ControlDamoclesSword(short itemNumber)
@@ -56,10 +61,10 @@ namespace TEN::Entities::Traps::TR1
 			TranslateItem(&item, headingAngle, item.ItemFlags[1], item.Animation.Velocity.y);
 
 			int vPos = item.Pose.Position.y;
-			auto pointColl = GetCollision(&item);
+			auto pointColl = GetPointCollision(item);
 
 			// Impale floor.
-			if ((pointColl.Position.Floor - vPos) <= DAMOCLES_SWORD_IMPALE_DEPTH)
+			if ((pointColl.GetFloorHeight() - vPos) <= DAMOCLES_SWORD_IMPALE_DEPTH)
 			{
 				SoundEffect(SFX_TR1_DAMOCLES_ROOM_SWORD, &item.Pose);
 				float distance = Vector3::Distance(item.Pose.Position.ToVector3(), Camera.pos.ToVector3());
@@ -76,7 +81,7 @@ namespace TEN::Entities::Traps::TR1
 		}
 		
 		// Scan for player.
-		if (item.Pose.Position.y < GetCollision(&item).Position.Floor)
+		if (item.Pose.Position.y < GetPointCollision(item).GetFloorHeight())
 		{
 			item.Pose.Orientation.y += item.ItemFlags[0];
 
@@ -112,7 +117,7 @@ namespace TEN::Entities::Traps::TR1
 			return;
 
 		if (coll->Setup.EnableObjectPush)
-			ItemPushItem(&item, laraItem, coll, false, true);
+			ItemPushItem(&item, laraItem, coll, false, 1);
 
 		if (item.Animation.IsAirborne)
 		{

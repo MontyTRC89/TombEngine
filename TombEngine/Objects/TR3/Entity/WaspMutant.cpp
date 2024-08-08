@@ -28,8 +28,8 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto WaspVenomSackLightColor = Vector4(0.0f, 0.35f, 0.0f, 1.0f);
 
-	const auto WaspBite			 = CreatureBiteInfo(Vector3i(0, 0, -260), 12);
-	const auto WaspVenomSackBite = CreatureBiteInfo(Vector3i::Zero, 10);
+	const auto WaspBite			 = CreatureBiteInfo(Vector3(0, 0, -260), 12);
+	const auto WaspVenomSackBite = CreatureBiteInfo(Vector3::Zero, 10);
 
 	enum WaspMutantState
 	{
@@ -67,7 +67,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		particle.on = true;
 		particle.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-		particle.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		particle.blendMode = BlendMode::Additive;
 		particle.fxObj = itemNumber;
 		particle.nodeNumber = ParticleNodeOffsetIDs::NodeWasp;
 
@@ -219,7 +219,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = WASP_AIR_TURN_RATE_MAX;
 				creature.Flags = 0;
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
@@ -243,7 +243,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = WASP_AIR_TURN_RATE_MAX;
 				creature.Flags = 0;
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}

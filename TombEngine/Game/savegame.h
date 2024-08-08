@@ -1,5 +1,6 @@
 #pragma once
-#include "Flow/ScriptInterfaceFlowHandler.h"
+
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
 #include "Specific/IO/ChunkWriter.h"
@@ -38,21 +39,34 @@ struct SaveGameHeader
 	bool Present;
 };
 
-extern GameStats Statistics;
-extern SaveGameHeader SavegameInfos[SAVEGAME_MAX];
-
 class SaveGame 
 {
 private:
-	static FileStream* StreamPtr;
 	static std::string FullSaveDirectory;
-	
-public:
 	static int LastSaveGame;
+	static std::map<int, std::vector<byte>> Hub;
+
+	static std::string SaveGame::GetSavegameFilename(int slot);
+	static bool IsSaveGameSlotValid(int slot);
+
+	static const std::vector<byte> Build();
+	static void Parse(const std::vector<byte>& buffer, bool hubMode);
+
+public:
+	static GameStats Statistics;
+	static SaveGameHeader Infos[SAVEGAME_MAX];
 
 	static void Init(const std::string& dir);
 	static bool Load(int slot);
 	static bool LoadHeader(int slot, SaveGameHeader* header);
+	static void LoadHeaders();
 	static bool Save(int slot);
-	static void LoadSavegameInfos();
+	static void Delete(int slot);
+
+	static bool DoesSaveGameExist(int slot, bool silent = false);
+
+	static void SaveHub(int index);
+	static void LoadHub(int index);
+	static bool IsOnHub(int index);
+	static void ResetHub();
 };

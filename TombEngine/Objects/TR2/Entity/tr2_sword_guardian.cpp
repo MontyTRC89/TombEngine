@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR2/Entity/tr2_sword_guardian.h"
 
-#include "collision/collide_room.h"
+#include "Game/collision/collide_room.h"
 #include "Game/animation.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
@@ -29,7 +29,7 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto SWORD_GUARDIAN_MESH_SWAP_TIME = 3;
 
-	const auto SwordBite = CreatureBiteInfo(Vector3i(0, 37, 550), 15);
+	const auto SwordBite = CreatureBiteInfo(Vector3(0, 37, 550), 15);
 
 	enum SwordGuardianState
 	{
@@ -62,7 +62,7 @@ namespace TEN::Entities::Creatures::TR2
 		auto effectPos = Random::GeneratePointInSphere(sphere);
 
 		particle.on = true;
-		particle.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		particle.blendMode = BlendMode::Additive;
 
 		particle.x = effectPos.x;
 		particle.y = effectPos.y;
@@ -195,8 +195,8 @@ namespace TEN::Entities::Creatures::TR2
 		auto* creature = GetCreatureInfo(item);
 
 		short headingAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		bool isPlayerAlive = ((creature->Enemy != nullptr) && creature->Enemy->IsLara() && (creature->Enemy->HitPoints > 0));
 

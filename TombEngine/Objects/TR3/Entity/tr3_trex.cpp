@@ -7,6 +7,7 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
@@ -35,7 +36,15 @@ namespace TEN::Entities::Creatures::TR3
 		TREX_STATE_DEATH = 5,
 		TREX_STATE_ROAR = 6,
 		TREX_STATE_ATTACK = 7,
-		TREX_STATE_KILL = 8
+		TREX_STATE_KILL = 8,
+		
+		// TODO: TR3 states.
+		/*TREX_STATE_ROAR_START = 9,
+		TREX_STATE_ROAR_CONT = 10,
+		TREX_STATE_ROAR_END = 11,
+		TREX_STATE_HUNCH_START = 12,
+		TREX_STATE_HUNCH_LOOP = 13,
+		TREX_STATE_HUNCH_END = 14*/
 	};
 
 	enum TRexAnim
@@ -49,33 +58,21 @@ namespace TEN::Entities::Creatures::TR3
 		TREX_ANIM_ATTACK = 6,
 		TREX_ANIM_IDLE_TO_RUN_START = 7,
 		TREX_ANIM_IDLE_TO_RUN_END = 8,
-		TREX_ANIM_RUN_FORWARD_TO_IDLE = 9,
+		TREX_ANIM_RUN_FORWARD_TO_IDLE_RIGHT = 9,
 		TREX_ANIM_DEATH = 10,
-		TREX_ANIM_KILL = 11
+		TREX_ANIM_KILL = 11,
+		
+		// TODO: TR3 anims.
+		/*TREX_ANIM_ROARING_START = 12,
+		TREX_ANIM_ROARING_LOOP = 13,
+		TREX_ANIM_ROARING_END = 14,
+		TREX_ANIM_HUNCH_START = 15,
+		TREX_ANIM_HUNCH_LOOP = 16,
+		TREX_ANIM_HUNCH_END = 17,
+
+		// TODO: Missing in TR1 object.
+		TREX_ANIM_RUN_FORWARD_TO_IDLE_LEFT = 18*/
 	};
-
-	void LaraTRexDeath(ItemInfo* tRexItem, ItemInfo* laraItem)
-	{
-		tRexItem->Animation.TargetState = TREX_STATE_KILL;
-
-		if (laraItem->RoomNumber != tRexItem->RoomNumber)
-			ItemNewRoom(Lara.ItemNumber, tRexItem->RoomNumber);
-
-		laraItem->Pose = Pose(
-			tRexItem->Pose.Position,
-			EulerAngles(0, tRexItem->Pose.Orientation.y, 0));
-		laraItem->Animation.IsAirborne = false;
-
-		SetAnimation(*laraItem, ID_LARA_EXTRA_ANIMS, LEA_TREX_DEATH);
-		laraItem->HitPoints = NOT_TARGETABLE;
-		Lara.Status.Air = -1;
-		Lara.Control.HandStatus = HandStatus::Busy;
-		Lara.Control.Weapon.GunType = LaraWeaponType::None;
-
-		Camera.flags = CF_FOLLOW_CENTER;
-		Camera.targetAngle = ANGLE(170.0f);
-		Camera.targetElevation = -ANGLE(25.0f);
-	}
 
 	void TRexControl(short itemNumber)
 	{
@@ -91,9 +88,13 @@ namespace TEN::Entities::Creatures::TR3
 		if (item->HitPoints <= 0)
 		{
 			if (item->Animation.ActiveState == TREX_STATE_IDLE)
+			{
 				item->Animation.TargetState = TREX_STATE_DEATH;
+			}
 			else
+			{
 				item->Animation.TargetState = TREX_STATE_IDLE;
+			}
 		}
 		else
 		{
@@ -114,7 +115,7 @@ namespace TEN::Entities::Creatures::TR3
 			creature->Flags = (creature->Mood != MoodType::Escape && !ai.ahead && ai.enemyFacing > -FRONT_ARC && ai.enemyFacing < FRONT_ARC);
 
 			if (ai.distance > pow(1500, 2) &&
-				ai.distance < pow(SECTOR(4), 2) &&
+				ai.distance < pow(BLOCK(4), 2) &&
 				ai.bite && !creature->Flags)
 			{
 				creature->Flags = 1;
@@ -123,7 +124,7 @@ namespace TEN::Entities::Creatures::TR3
 			switch (item->Animation.ActiveState)
 			{
 			case TREX_STATE_IDLE:
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (ai.distance < pow(1500, 2) && ai.bite)
 					item->Animation.TargetState = TREX_STATE_ATTACK;
@@ -150,7 +151,7 @@ namespace TEN::Entities::Creatures::TR3
 			case TREX_STATE_RUN_FORWARD:
 				creature->MaxTurn = TREX_RUN_TURN_RATE_MAX;
 
-				if (ai.distance < pow(SECTOR(5), 2) && ai.bite)
+				if (ai.distance < pow(BLOCK(5), 2) && ai.bite)
 					item->Animation.TargetState = TREX_STATE_IDLE;
 				else if (creature->Flags)
 					item->Animation.TargetState = TREX_STATE_IDLE;
@@ -168,19 +169,21 @@ namespace TEN::Entities::Creatures::TR3
 			case TREX_STATE_ATTACK:
 				if (item->TouchBits.Test(TRexAttackJoints))
 				{
-					item->Animation.TargetState = TREX_STATE_KILL;
-
-					DoDamage(LaraItem, 1500);
-					LaraTRexDeath(item, LaraItem);
+					CreatureKill(item, TREX_ANIM_KILL, LEA_TREX_DEATH, TREX_STATE_KILL, LS_DEATH);
+					Camera.targetDistance = BLOCK(3);
 				}
 
-				item->Animation.RequiredState = TREX_STATE_WALK_FORWARD;
+				break;
+
+			case TREX_STATE_KILL:
+				headYRot = 0;
+				creature->MaxTurn = 0;
 				break;
 			}
 		}
 
-		CreatureJoint(item, 0, headYRot * 2);
-		creature->JointRotation[1] = creature->JointRotation[0];
+		CreatureJoint(item, 0, headYRot / 2);
+		CreatureJoint(item, 1, headYRot / 2);
 
 		CreatureAnimation(itemNumber, headingAngle, 0);
 

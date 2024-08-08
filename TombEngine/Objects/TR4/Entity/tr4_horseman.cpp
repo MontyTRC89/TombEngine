@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/sphere.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
@@ -16,21 +17,22 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	const auto HorsemanBite1 = CreatureBiteInfo(Vector3i::Zero, 6);
-	const auto HorsemanBite2 = CreatureBiteInfo(Vector3i::Zero, 14);
-	const auto HorsemanBite3 = CreatureBiteInfo(Vector3i::Zero, 10);
+	const auto HorsemanBite1 = CreatureBiteInfo(Vector3::Zero, 6);
+	const auto HorsemanBite2 = CreatureBiteInfo(Vector3::Zero, 14);
+	const auto HorsemanBite3 = CreatureBiteInfo(Vector3::Zero, 10);
 	const auto HorsemanAxeAttackJoints	   = std::vector<unsigned int>{ 5, 6 };
 	const auto HorsemanKickAttackJoints	   = std::vector<unsigned int>{ 14 };
 	const auto HorsemanMountedAttackJoints = std::vector<unsigned int>{ 5, 6, 10 };
 	const auto HorsemanShieldAttackJoints  = std::vector<unsigned int>{ 10 };
 
-	const auto HorseBite1 = CreatureBiteInfo(Vector3i::Zero, 13);
-	const auto HorseBite2 = CreatureBiteInfo(Vector3i::Zero, 17);
-	const auto HorseBite3 = CreatureBiteInfo(Vector3i::Zero, 19);
+	const auto HorseBite1 = CreatureBiteInfo(Vector3::Zero, 13);
+	const auto HorseBite2 = CreatureBiteInfo(Vector3::Zero, 17);
+	const auto HorseBite3 = CreatureBiteInfo(Vector3::Zero, 19);
 
 	enum HorsemanState
 	{
@@ -134,7 +136,7 @@ namespace TEN::Entities::TR4
 
 		InitializeCreature(itemNumber);
 		SetAnimation(item, HORSEMAN_ANIM_IDLE);
-		item->ItemFlags[0] = NO_ITEM; // No horse yet.
+		item->ItemFlags[0] = NO_VALUE; // No horse yet.
 	}
 
 	void HorsemanSparks(Vector3i* pos, int param1, int maxSparks)
@@ -156,7 +158,7 @@ namespace TEN::Entities::TR4
 			spark->fadeToBlack = 4;
 			spark->life = 9;
 			spark->sLife = 9;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
@@ -186,7 +188,7 @@ namespace TEN::Entities::TR4
 			spark->dB = ((random / 16) & 0x1F) + 48;
 			spark->life = 9;
 			spark->sLife = 9;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
@@ -219,7 +221,7 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 
 		// Try to find a horse.
-		if (item->ItemFlags[0] == NO_ITEM)
+		if (item->ItemFlags[0] == NO_VALUE)
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
@@ -235,7 +237,7 @@ namespace TEN::Entities::TR4
 		}
 
 		// If no horse was found, set ItemFlags[0] to 0 so it isn't searched for again.
-		if (item->ItemFlags[0] == NO_ITEM)
+		if (item->ItemFlags[0] == NO_VALUE)
 			item->ItemFlags[0] = 0;
 
 		// Get horse.
@@ -251,14 +253,14 @@ namespace TEN::Entities::TR4
 			int y = horseItem->Pose.Position.y;
 			int z = horseItem->Pose.Position.z + 341 * phd_cos(horseItem->Pose.Orientation.y);
 
-			auto probe = GetCollision(x, y, z, item->RoomNumber);
-			int height1 = probe.Position.Floor;
+			auto probe = GetPointCollision(Vector3i(x, y, z), item->RoomNumber);
+			int height1 = probe.GetFloorHeight();
 
 			x = horseItem->Pose.Position.x - 341 * phd_sin(horseItem->Pose.Orientation.y);
 			y = horseItem->Pose.Position.y;
 			z = horseItem->Pose.Position.z - 341 * phd_cos(horseItem->Pose.Orientation.y);
 
-			int height2 = GetCollision(x, y, z, probe.RoomNumber).Position.Floor;
+			int height2 = GetPointCollision(Vector3i(x, y, z), probe.GetRoomNumber()).GetFloorHeight();
 
 			xRot = phd_atan(682, height2 - height1);
 		}
@@ -321,12 +323,10 @@ namespace TEN::Entities::TR4
 				laraAI.distance = pow(deltaX, 2) + pow(deltaZ, 2);
 			}
 
-			short tilt = 0;
-
 			if (item->HitStatus &&
 				laraAI.angle < ANGLE(67.5f) &&
 				laraAI.angle > -ANGLE(67.5f) &&
-				laraAI.distance < pow(SECTOR(2), 2))
+				laraAI.distance < pow(BLOCK(2), 2))
 			{
 				if (item->Animation.ActiveState != HORSEMAN_STATE_SHIELD)
 				{
@@ -381,7 +381,7 @@ namespace TEN::Entities::TR4
 			case HORSEMAN_STATE_MOUNTED_RUN_FORWARD:
 				creature->MaxTurn = ANGLE(3.0f);
 				horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNTED_WALK_FORWARD;
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_SPRINT;
 					horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNT_HORSE;
@@ -390,7 +390,7 @@ namespace TEN::Entities::TR4
 					creature->Flags ||
 					creature->ReachedGoal)
 				{
-					if (laraAI.distance > pow(SECTOR(4), 2) ||
+					if (laraAI.distance > pow(BLOCK(4), 2) ||
 						creature->ReachedGoal)
 					{
 						creature->Enemy = LaraItem;
@@ -410,16 +410,16 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (AI.distance >= pow(SECTOR(1), 2))
+				if (AI.distance >= pow(BLOCK(1), 2))
 				{
 					if (AI.bite)
 					{
 						if (AI.angle >= -ANGLE(10.0f) ||
-							(AI.distance >= pow(SECTOR(1), 2) &&
+							(AI.distance >= pow(BLOCK(1), 2) &&
 							(AI.distance >= pow(1365, 2) || AI.angle <= -ANGLE(20.0f))))
 						{
 							if (AI.angle > ANGLE(10.0f) &&
-								(AI.distance < pow(SECTOR(1), 2) ||
+								(AI.distance < pow(BLOCK(1), 2) ||
 									(AI.distance < pow(1365, 2) && AI.angle < ANGLE(20.0f))))
 							{
 								item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_ATTACK_RIGHT;
@@ -441,11 +441,11 @@ namespace TEN::Entities::TR4
 						if (AI.bite)
 						{
 							if (AI.angle >= -ANGLE(10.0f) ||
-								(AI.distance >= pow(SECTOR(1), 2) &&
+								(AI.distance >= pow(BLOCK(1), 2) &&
 								(AI.distance >= pow(1365, 2) || AI.angle <= -ANGLE(20.0f))))
 							{
 								if (AI.angle > ANGLE(10.0f) &&
-									(AI.distance < pow(SECTOR(1), 2) ||
+									(AI.distance < pow(BLOCK(1), 2) ||
 										AI.distance < pow(1365, 2) &&
 										AI.angle < ANGLE(20.0f)))
 								{
@@ -467,7 +467,7 @@ namespace TEN::Entities::TR4
 			case HORSEMAN_STATE_MOUNTED_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(1.5f);
 
-				if (laraAI.distance > pow(SECTOR(4), 2) || creature->ReachedGoal || creature->Enemy->IsLara())
+				if (laraAI.distance > pow(BLOCK(4), 2) || creature->ReachedGoal || creature->Enemy->IsLara())
 				{
 					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
 					creature->ReachedGoal = false;
@@ -491,7 +491,7 @@ namespace TEN::Entities::TR4
 				else
 					creature->Flags = 0;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_RUN_FORWARD;
 					horseItem->Animation.TargetState = HORSEMAN_STATE_MOUNTED_WALK_FORWARD;
@@ -499,7 +499,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->ReachedGoal ||
 					!horseItem->Flags &&
-					AI.distance < pow(SECTOR(1), 2) &&
+					AI.distance < pow(BLOCK(1), 2) &&
 					AI.bite &&
 					AI.angle < ANGLE(10.0f) &&
 					AI.angle > -ANGLE(10.0f))
@@ -582,11 +582,11 @@ namespace TEN::Entities::TR4
 
 				if (!item->AIBits || item->ItemFlags[3])
 				{
-					if (item->Animation.RequiredState != NO_STATE)
+					if (item->Animation.RequiredState != NO_VALUE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.bite && AI.distance < pow(682,2))
 						item->Animation.TargetState = HORSEMAN_STATE_IDLE_ATTACK;
-					else if (AI.distance < pow(SECTOR(6), 2) && AI.distance > pow(682, 2))
+					else if (AI.distance < pow(BLOCK(6), 2) && AI.distance > pow(682, 2))
 						item->Animation.TargetState = HORSEMAN_STATE_WALK_FORWARD;
 				}
 				else
@@ -627,7 +627,7 @@ namespace TEN::Entities::TR4
 					else
 						item->Animation.TargetState = HORSEMAN_STATE_IDLE;
 				}
-				else if (AI.distance < pow(SECTOR(5), 2) && AI.distance > pow(1365, 2))
+				else if (AI.distance < pow(BLOCK(5), 2) && AI.distance > pow(1365, 2))
 					item->Animation.TargetState = HORSEMAN_STATE_RUN_FORWARD;
 
 				break;
@@ -722,7 +722,7 @@ namespace TEN::Entities::TR4
 					horseItem->Animation.FrameNumber = GetAnimData(horseItem).frameBase;
 				}
 
-				if (laraAI.distance > pow(SECTOR(4), 2) || creature->ReachedGoal)
+				if (laraAI.distance > pow(BLOCK(4), 2) || creature->ReachedGoal)
 				{
 					creature->ReachedGoal = false;
 					creature->Enemy = LaraItem;

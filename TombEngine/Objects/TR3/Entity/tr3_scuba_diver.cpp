@@ -2,6 +2,7 @@
 #include "Objects/TR3/Entity/tr3_scuba_diver.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
@@ -13,12 +14,14 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
+
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto SCUBA_DIVER_ATTACK_DAMAGE = 50;
 	constexpr auto SCUBA_DIVER_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
-	const auto ScubaGunBite = CreatureBiteInfo(Vector3i(17, 164, 44), 18);
+	const auto ScubaGunBite = CreatureBiteInfo(Vector3(17, 164, 44), 18);
 
 	enum ScubaDiverState
 	{
@@ -59,7 +62,7 @@ namespace TEN::Entities::Creatures::TR3
 	static void ShootHarpoon(ItemInfo* item, Vector3i pos, short velocity, short yRot, short roomNumber)
 	{
 		short harpoonItemNumber = CreateItem();
-		if (harpoonItemNumber == NO_ITEM)
+		if (harpoonItemNumber == NO_VALUE)
 			return;
 
 		auto* harpoonItem = &g_Level.Items[harpoonItemNumber];
@@ -92,12 +95,12 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
 
-			auto probe = GetCollision(item);
+			auto probe = GetPointCollision(*item);
 
-			if (item->RoomNumber != probe.RoomNumber)
-				ItemNewRoom(itemNumber, probe.RoomNumber);
+			if (item->RoomNumber != probe.GetRoomNumber())
+				ItemNewRoom(itemNumber, probe.GetRoomNumber());
 
-			item->Floor = GetCollision(item).Position.Floor;
+			item->Floor = GetPointCollision(*item).GetFloorHeight();
 			if (item->Pose.Position.y >= item->Floor)
 				KillItem(itemNumber);
 		}
@@ -165,7 +168,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			angle = CreatureTurn(item, creature->MaxTurn);
-			waterHeight = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) + SECTOR(0.5f);
+			waterHeight = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) + BLOCK(0.5f);
 
 			switch (item->Animation.ActiveState)
 			{

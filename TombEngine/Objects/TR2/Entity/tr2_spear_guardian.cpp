@@ -2,6 +2,7 @@
 #include "Objects/TR2/Entity/tr2_spear_guardian.h"
 
 #include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
@@ -34,8 +35,8 @@ namespace TEN::Entities::Creatures::TR2
 
 	constexpr auto SPEAR_GUARDIAN_SWAPMESH_TIME = 3;
 
-	const auto SpearGuardianBiteLeft  = CreatureBiteInfo(Vector3i(0, 0, 920), 11);
-	const auto SpearGuardianBiteRight = CreatureBiteInfo(Vector3i(0, 0, 920), 18);
+	const auto SpearGuardianBiteLeft  = CreatureBiteInfo(Vector3(0, 0, 920), 11);
+	const auto SpearGuardianBiteRight = CreatureBiteInfo(Vector3(0, 0, 920), 18);
 
 	enum SpearGuardianState
 	{
@@ -216,8 +217,8 @@ namespace TEN::Entities::Creatures::TR2
 		auto* creature = GetCreatureInfo(item);
 
 		short headingAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		bool isPlayerAlive = ((creature->Enemy != nullptr) && creature->Enemy->IsLara() && (creature->Enemy->HitPoints > 0));
 
@@ -504,10 +505,18 @@ namespace TEN::Entities::Creatures::TR2
 						item->Animation.TargetState = SPEAR_GUARDIAN_STATE_SLASH_IDLE;
 				}
 				else if (ai.ahead && ai.distance < SPEAR_GUARDIAN_RUN_RANGE)
+				{
 					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_WALK;
+				}
 				else
+				{
 					item->Animation.TargetState = SPEAR_GUARDIAN_STATE_RUN;
+				}
 
+				break;
+
+			case SPEAR_GUARDIAN_STATE_KILL:
+				creature->MaxTurn = 0;
 				break;
 			}
 		}
@@ -548,7 +557,7 @@ namespace TEN::Entities::Creatures::TR2
 		auto effectPos = Random::GeneratePointInSphere(sphere);
 
 		particle.on = true;
-		particle.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		particle.blendMode = BlendMode::Additive;
 
 		particle.x = effectPos.x;
 		particle.y = effectPos.y;

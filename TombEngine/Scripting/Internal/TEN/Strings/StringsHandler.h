@@ -1,30 +1,34 @@
 #pragma once
-#include <unordered_map>
 #include <optional>
-#include "LuaHandler.h"
-#include "DisplayString/DisplayString.h"
-#include "Strings/ScriptInterfaceStringsHandler.h"
+#include <unordered_map>
 
-using DisplayStringMap = std::unordered_map<DisplayStringIDType, UserDisplayString>;
+#include "Scripting/Internal/LuaHandler.h"
+#include "Scripting/Internal/TEN/Strings/DisplayString/DisplayString.h"
+#include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 
-class StringsHandler : public LuaHandler, public ScriptInterfaceStringsHandler {
+using DisplayStringMap = std::unordered_map<DisplayStringID, UserDisplayString>;
+
+class StringsHandler :
+	public LuaHandler,
+	public ScriptInterfaceStringsHandler
+{
 private:
-	DisplayStringMap					m_userDisplayStrings{};
-	CallbackDrawString					m_callbackDrawSring;
+	DisplayStringMap   m_userDisplayStrings{};
+	CallbackDrawString m_callbackDrawSring;
 
 public:
-	StringsHandler(sol::state* lua, sol::table & parent);
-	void								SetCallbackDrawString(CallbackDrawString cb) override;
-	void								ProcessDisplayStrings(float dt) override;
-	void								ClearDisplayStrings() override;
-	bool								SetDisplayString(DisplayStringIDType id, UserDisplayString const& ds);
+	StringsHandler(sol::state* lua, sol::table& parent);
+	void SetCallbackDrawString(CallbackDrawString cb) override;
+	void ProcessDisplayStrings(float deltaTime) override;
+	void ClearDisplayStrings() override;
+	bool SetDisplayString(DisplayStringID id, UserDisplayString const& ds);
 
-	std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(DisplayStringIDType id);
-	bool								ScheduleRemoveDisplayString(DisplayStringIDType id);
+	std::optional<std::reference_wrapper<UserDisplayString>> GetDisplayString(DisplayStringID id);
+	bool ScheduleRemoveDisplayString(DisplayStringID id);
 
-	void								ShowString(DisplayString const&, sol::optional<float> nSeconds);
+	void ShowString(DisplayString const&, sol::optional<float> nSeconds, sol::optional<bool> autoDelete);
 
-	bool								IsStringDisplaying(DisplayString const& str);
+	bool IsStringDisplaying(DisplayString const& str);
 
-	void								Register(sol::state* state);
+	void Register(sol::state* state);
 };

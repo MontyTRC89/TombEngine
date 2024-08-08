@@ -11,16 +11,16 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
+#include "Game/misc.h"
+#include "Game/setup.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/people.h"
+#include "Game/effects/spark.h"
 #include "Objects/Effects/Boss.h"
 #include "Objects/Effects/enemy_missile.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "misc.h"
-#include "setup.h"
-#include "lara_helpers.h"
-#include "tomb4fx.h"
-#include "people.h"
-#include "Game/effects/spark.h"
 
 using namespace TEN::Effects::Boss;
 using namespace TEN::Entities::Effects;
@@ -63,9 +63,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto SOPHIALEIGH_VAULT_SHIFT = 96;
 
-	const auto SophiaLeighStaffBite = CreatureBiteInfo(Vector3i(-28, 56, 356), 10);
-	const auto SophiaLeighLeftBite	= CreatureBiteInfo(Vector3i(-72, 48, 356), 10);
-	const auto SophiaLeighRightBite = CreatureBiteInfo(Vector3i(16, 48, 304), 10);
+	const auto SophiaLeighStaffBite = CreatureBiteInfo(Vector3(-28, 56, 356), 10);
+	const auto SophiaLeighLeftBite	= CreatureBiteInfo(Vector3(-72, 48, 356), 10);
+	const auto SophiaLeighRightBite = CreatureBiteInfo(Vector3(16, 48, 304), 10);
 
 	struct SophiaData
 	{
@@ -195,19 +195,19 @@ namespace TEN::Entities::Creatures::TR3
 			TriggerShockwave(
 				&upperPos, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
 				red, green, blue,
-				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
+				36, EulerAngles(0, 30, 0), 0, false, true, false, (int)ShockwaveStyle::Knockback);
 
 			// Center position.
 			TriggerShockwave(
 				&centerPos, SOPHIALEIGH_KNOCKBACK_LARGE_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_LARGE_OUTER_SIZE, 184,
 				red, green, blue,
-				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
+				36, EulerAngles(0, 30, 0), 0, false, true, false, (int)ShockwaveStyle::Knockback);
 
 			// Lower position.
 			TriggerShockwave(
 				&lowerPos, SOPHIALEIGH_KNOCKBACK_SMALL_INNER_SIZE, SOPHIALEIGH_KNOCKBACK_SMALL_OUTER_SIZE, 184,
 				red, green, blue,
-				36, EulerAngles(0, 30, 0), 0, false, true, (int)ShockwaveStyle::Knockback);
+				36, EulerAngles(0, 30, 0), 0, false, true, false, (int)ShockwaveStyle::Knockback);
 
 			TriggerExplosionSparks(enemy.Pose.Position.x, enemy.Pose.Position.y, enemy.Pose.Position.z, 3, -2, 2, enemy.RoomNumber);
 			// NOTE: TriggerPlasmaBall exists but isn't coded (uses EXTRAFX5 in OG).
@@ -246,7 +246,7 @@ namespace TEN::Entities::Creatures::TR3
 	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const CreatureBiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
 	{
 		int fxNumber = CreateNewEffect(item.RoomNumber);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto& fx = EffectList[fxNumber];
@@ -441,7 +441,7 @@ namespace TEN::Entities::Creatures::TR3
 				TriggerShockwave(
 					&shockwavePos, SOPHIALEIGH_SHOCKWAVE_OUTER_SIZE, SOPHIALEIGH_SHOCKWAVE_INNER_SIZE, SOPHIALEIGH_SHOCKWAVE_SPEED,
 					SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
-					36, EulerAngles(Random::GenerateInt(0, 180), 30, Random::GenerateInt(0, 180)), 0, false, true, (int)ShockwaveStyle::Sophia);
+					36, EulerAngles(Random::GenerateInt(0, 180), 30, Random::GenerateInt(0, 180)), 0, false, true, false, (int)ShockwaveStyle::Sophia);
 
 				data->shockwaveTimer = 2;
 				data->shockwaveCount++;
@@ -636,7 +636,7 @@ namespace TEN::Entities::Creatures::TR3
 				SpawnSophiaSparks(shockwavePos.Position.ToVector3(), Vector3(SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX), 5, 2);
 				TriggerShockwave(&shockwavePos, SOPHIALEIGH_SHOCKWAVE_INNER_SIZE, SOPHIALEIGH_SHOCKWAVE_OUTER_SIZE, SOPHIALEIGH_SHOCKWAVE_SPEED,
 					SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX,
-					36, EulerAngles(Random::GenerateInt(0, 180), 30, Random::GenerateInt(0, 180)), 0, false, true, (int)ShockwaveStyle::Sophia);
+					36, EulerAngles(Random::GenerateInt(0, 180), 30, Random::GenerateInt(0, 180)), 0, false, true, false, (int)ShockwaveStyle::Sophia);
 
 				data->shockwaveTimer = 2;
 				data->shockwaveCount++;
@@ -806,7 +806,7 @@ namespace TEN::Entities::Creatures::TR3
 			spark->fadeToBlack = 0;
 			spark->life =
 			spark->sLife = mulSqr * 9;
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->x = pos.x;
 			spark->y = pos.y;
 			spark->z = pos.z;

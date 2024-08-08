@@ -1,7 +1,7 @@
 #pragma once
-
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
+
 #include "Game/items.h"
 
 /***
@@ -30,13 +30,13 @@ The following constants are inside EffectID.
 @table CONSTANT_STRING_HERE
 */
 
-static const std::unordered_map<std::string, EffectType> kEffectIDs
+static const std::unordered_map<std::string, EffectType> EFFECT_IDS
 {
-	{"NONE", EffectType::None},
-	{"FIRE", EffectType::Fire},
-	{"SPARKS", EffectType::Sparks},
-	{"SMOKE", EffectType::Smoke},
-	{"ELECTRICIGNITE", EffectType::ElectricIgnite},
-	{"REDIGNITE", EffectType::RedIgnite},
-	{"CUSTOM", EffectType::Custom}
+	{ "NONE", EffectType::None },
+	{ "FIRE", EffectType::Fire },
+	{ "SPARKS", EffectType::Sparks },
+	{ "SMOKE", EffectType::Smoke},
+	{ "ELECTRICIGNITE", EffectType::ElectricIgnite },
+	{ "REDIGNITE", EffectType::RedIgnite },
+	{ "CUSTOM", EffectType::Custom }
 };

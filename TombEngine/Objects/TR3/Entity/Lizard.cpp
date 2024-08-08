@@ -27,9 +27,9 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto LIZARD_VAULT_SHIFT = 260;
 
-	const auto LizardBiteAttackBite	 = CreatureBiteInfo(Vector3i(0, -120, 120), 10);
-	const auto LizardSwipeAttackBite = CreatureBiteInfo(Vector3i::Zero, 5);
-	const auto LizardGasBite		 = CreatureBiteInfo(Vector3i(0, -64, 56), 9);
+	const auto LizardBiteAttackBite	 = CreatureBiteInfo(Vector3(0, -120, 120), 10);
+	const auto LizardSwipeAttackBite = CreatureBiteInfo(Vector3::Zero, 5);
+	const auto LizardGasBite		 = CreatureBiteInfo(Vector3(0, -64, 56), 9);
 	const auto LizardSwipeAttackJoints = std::vector<unsigned int>{ 5 };
 	const auto LizardBiteAttackJoints  = std::vector<unsigned int>{ 10 };
 
@@ -68,8 +68,8 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		auto& creature = *GetCreatureInfo(&item);
 
-		return (creature.Enemy && creature.Enemy->BoxNumber != NO_BOX &&
-			(g_Level.Boxes[creature.Enemy->BoxNumber].flags & BLOCKABLE));
+		return (creature.Enemy && creature.Enemy->BoxNumber != NO_VALUE &&
+			(g_Level.PathfindingBoxes[creature.Enemy->BoxNumber].flags & BLOCKABLE));
 	}
 
 	static void SpawnLizardGas(int itemNumber, const CreatureBiteInfo& bite, int speed)
@@ -92,7 +92,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto headOrient = EulerAngles::Zero;
+		auto headOrient = EulerAngles::Identity;
 
 		if (item.HitPoints <= 0)
 		{
@@ -140,7 +140,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (creature.Mood == MoodType::Bored)
 				{
-					if (item.Animation.RequiredState != NO_STATE)
+					if (item.Animation.RequiredState != NO_VALUE)
 					{
 						item.Animation.TargetState = item.Animation.RequiredState;
 					}

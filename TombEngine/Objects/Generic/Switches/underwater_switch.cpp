@@ -57,22 +57,12 @@ namespace TEN::Entities::Switches
 		)
 	};
 
-	void UnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* switchItem = &g_Level.Items[itemNumber];
-
-		if (switchItem->TriggerFlags == 0)
-			WallUnderwaterSwitchCollision(itemNumber, laraItem, coll);
-		else
-			CeilingUnderwaterSwitchCollision(itemNumber, laraItem, coll);
-	}
-
-	void WallUnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void CollideUnderwaterWallSwitch(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		if (TrInput & IN_ACTION &&
+		if (IsHeld(In::Action) &&
 			switchItem->Status == ITEM_NOT_ACTIVE &&
 			lara->Control.WaterStatus == WaterStatus::Underwater &&
 			lara->Control.HandStatus == HandStatus::Free &&
@@ -106,14 +96,14 @@ namespace TEN::Entities::Switches
 		}
 	}
 
-	void CeilingUnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void CollideUnderwaterCeilingSwitch(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		bool doInteraction = false;
 
-		if ((TrInput & IN_ACTION &&
+		if ((IsHeld(In::Action) &&
 			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
 			laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE &&
 			lara->Control.WaterStatus == WaterStatus::Underwater &&
@@ -155,9 +145,9 @@ namespace TEN::Entities::Switches
 
 				AddActiveItem(itemNumber);
 
-				ForcedFixedCamera.x = switchItem->Pose.Position.x - SECTOR(1) * phd_sin(switchItem->Pose.Orientation.y + ANGLE(90.0f));
-				ForcedFixedCamera.y = switchItem->Pose.Position.y - SECTOR(1);
-				ForcedFixedCamera.z = switchItem->Pose.Position.z - SECTOR(1) * phd_cos(switchItem->Pose.Orientation.y + ANGLE(90.0f));
+				ForcedFixedCamera.x = switchItem->Pose.Position.x - BLOCK(1) * phd_sin(switchItem->Pose.Orientation.y + ANGLE(90.0f));
+				ForcedFixedCamera.y = switchItem->Pose.Position.y - BLOCK(1);
+				ForcedFixedCamera.z = switchItem->Pose.Position.z - BLOCK(1) * phd_cos(switchItem->Pose.Orientation.y + ANGLE(90.0f));
 				ForcedFixedCamera.RoomNumber = switchItem->RoomNumber;
 			}
 		}

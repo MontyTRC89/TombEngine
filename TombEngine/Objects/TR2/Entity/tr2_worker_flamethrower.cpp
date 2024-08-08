@@ -17,10 +17,10 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	constexpr auto WORKER_FLAME_ATTACK_RANGE = SQUARE(SECTOR(2));
-	constexpr auto WORKER_FLAME_IDLE_RANGE	 = SQUARE(SECTOR(2));
-	constexpr auto WORKER_FLAME_WALK_RANGE	 = SQUARE(SECTOR(2));
-	constexpr auto WORKER_FLAME_RUN_RANGE	 = SQUARE(SECTOR(4));
+	constexpr auto WORKER_FLAME_ATTACK_RANGE = SQUARE(BLOCK(2));
+	constexpr auto WORKER_FLAME_IDLE_RANGE	 = SQUARE(BLOCK(2));
+	constexpr auto WORKER_FLAME_WALK_RANGE	 = SQUARE(BLOCK(2));
+	constexpr auto WORKER_FLAME_RUN_RANGE	 = SQUARE(BLOCK(4));
 
 	constexpr auto WORKER_FLAME_WALK_TURN_RATE_MAX = ANGLE(5.0f);
 	constexpr auto WORKER_FLAME_RUN_TURN_RATE_MAX  = ANGLE(10.0f);
@@ -67,8 +67,8 @@ namespace TEN::Entities::Creatures::TR2
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		auto pos = GetJointPosition(item, WorkerFlamethrowerBite.BoneID, WorkerFlamethrowerBite.Position);
 

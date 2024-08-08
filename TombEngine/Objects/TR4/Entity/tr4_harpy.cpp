@@ -16,7 +16,7 @@
 #include "Game/people.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math;
@@ -30,11 +30,11 @@ namespace TEN::Entities::TR4
 	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE	= 10;
 	constexpr auto HARPY_STINGER_POISON_POTENCY = 8;
 
-	const auto HarpyBite1	= CreatureBiteInfo(Vector3i::Zero, 4);
-	const auto HarpyBite2	= CreatureBiteInfo(Vector3i::Zero, 2);
-	const auto HarpyBite3	= CreatureBiteInfo(Vector3i::Zero, 15);
-	const auto HarpyAttack1 = CreatureBiteInfo(Vector3i(0, 128, 0), 2);
-	const auto HarpyAttack2 = CreatureBiteInfo(Vector3i(0, 128, 0), 4);
+	const auto HarpyBite1	= CreatureBiteInfo(Vector3::Zero, 4);
+	const auto HarpyBite2	= CreatureBiteInfo(Vector3::Zero, 2);
+	const auto HarpyBite3	= CreatureBiteInfo(Vector3::Zero, 15);
+	const auto HarpyAttack1 = CreatureBiteInfo(Vector3(0, 128, 0), 2);
+	const auto HarpyAttack2 = CreatureBiteInfo(Vector3(0, 128, 0), 4);
 	const auto HarpySwoopAttackJoints   = std::vector<unsigned int>{ 2, 4, 15 };
 	const auto HarpyStingerAttackJoints = std::vector<unsigned int>{ 2, 4 };
 
@@ -178,7 +178,6 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* object = &Objects[item->ObjectNumber];
 		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
@@ -244,7 +243,7 @@ namespace TEN::Entities::TR4
 
 			for (auto& currentCreature : ActiveCreatures)
 			{
-				if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+				if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
 					continue;
 
 				auto* target = &g_Level.Items[currentCreature->ItemNumber];
@@ -336,7 +335,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(7.0f);
 				creature->Flags = 0;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					if (item->Animation.RequiredState == HARPY_STATE_FLAME_ATTACK)

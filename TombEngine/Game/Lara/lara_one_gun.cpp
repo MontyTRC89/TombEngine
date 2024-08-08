@@ -4,11 +4,13 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
+#include "Game/effects/Drip.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/Ripple.h"
@@ -30,7 +32,9 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Bubble;
+using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
@@ -44,6 +48,9 @@ constexpr auto GRENADE_FLASH_TIMEOUT = 4;
 
 constexpr auto HARPOON_VELOCITY = BLOCK(0.25f);
 constexpr auto HARPOON_TIME		= 10 * FPS;
+constexpr auto BOLT_VELOCITY	= BLOCK(0.25f);
+constexpr auto BOLT_TIME		= 10 * FPS;
+constexpr auto BOLT_STUCK_LIFE	= 5 * FPS;
 constexpr auto ROCKET_VELOCITY	= CLICK(2);
 constexpr auto ROCKET_TIME		= 4.5f * FPS;
 constexpr auto GRENADE_VELOCITY = BLOCK(1 / 8.0f);
@@ -204,7 +211,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 						break;
 
 					case LaraWeaponType::Crossbow:
-						FireCrossbow(laraItem, nullptr);
+						FireCrossbow(laraItem);
 						break;
 
 					case LaraWeaponType::HK:
@@ -354,7 +361,7 @@ void ReadyShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	player.Control.HandStatus = HandStatus::WeaponReady;
 	player.TargetEntity = nullptr;
 	player.LeftArm.Orientation =
-	player.RightArm.Orientation = EulerAngles::Zero;
+	player.RightArm.Orientation = EulerAngles::Identity;
 	player.LeftArm.FrameNumber =
 	player.RightArm.FrameNumber = 0;
 	player.LeftArm.Locked =
@@ -421,12 +428,12 @@ void FireShotgun(ItemInfo& laraItem)
 
 		player.RightArm.GunFlash = Weapons[(int)LaraWeaponType::Shotgun].FlashTime;
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
+		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::ShallowWater : SoundEnvironment::Land);
 		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem.Pose);
 
 		Rumble(0.5f, 0.2f);
 
-		Statistics.Game.AmmoUsed++;
+		SaveGame::Statistics.Game.AmmoUsed++;
 	}
 }
 
@@ -436,7 +443,7 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	ItemInfo* weaponItemPtr = nullptr;
 
-	if (player.Control.Weapon.WeaponItem == NO_ITEM)
+	if (player.Control.Weapon.WeaponItem == NO_VALUE)
 	{
 		player.Control.Weapon.WeaponItem = CreateItem();
 		weaponItemPtr = &g_Level.Items[player.Control.Weapon.WeaponItem];
@@ -459,7 +466,7 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		weaponItemPtr->Animation.ActiveState =
 		weaponItemPtr->Animation.TargetState = WEAPON_STATE_DRAW;
 		weaponItemPtr->Status = ITEM_ACTIVE;
-		weaponItemPtr->RoomNumber = NO_ROOM;
+		weaponItemPtr->RoomNumber = NO_VALUE;
 		weaponItemPtr->Pose = laraItem.Pose;
 
 		player.LeftArm.FrameBase =
@@ -507,7 +514,7 @@ void UndrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 	if (item.Status == ITEM_DEACTIVATED)
 	{
 		KillItem(player.Control.Weapon.WeaponItem);
-		player.Control.Weapon.WeaponItem = NO_ITEM;
+		player.Control.Weapon.WeaponItem = NO_VALUE;
 		player.Control.HandStatus = HandStatus::Free;
 		player.TargetEntity = nullptr;
 		player.LeftArm.Locked =
@@ -556,109 +563,112 @@ void UndrawShotgunMeshes(ItemInfo& laraItem, LaraWeaponType weaponType)
 	}
 }
 
-ItemInfo* FireHarpoon(ItemInfo& laraItem)
+bool FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose)
 {
 	auto& player = *GetLaraInfo(&laraItem);
 	auto& ammo = GetAmmo(player, LaraWeaponType::HarpoonGun);
 
 	if (!ammo)
-		return nullptr;
+		return false;
 
 	player.Control.Weapon.HasFired = true;
 
-	// Create a new item for harpoon.
-	short itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
-		return nullptr;
+	int itemNumber = CreateItem();
+	if (itemNumber == NO_VALUE)
+		return false;
+
+	auto& harpoonItem = g_Level.Items[itemNumber];
+
+	harpoonItem.ObjectNumber = ID_HARPOON;
+	harpoonItem.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	if (!ammo.HasInfinite())
 		ammo--;
 
-	auto& item = g_Level.Items[itemNumber];
-
-	item.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-	item.ObjectNumber = ID_HARPOON;
-	item.RoomNumber = laraItem.RoomNumber;
-
-	auto jointPos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(-2, 373, 77));
-	int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item.RoomNumber).Position.Floor;
-
-	if (floorHeight >= jointPos.y)
+	if (pose.has_value())
 	{
-		item.Pose.Position = jointPos;
+		harpoonItem.Pose.Position = pose->Position;
+		harpoonItem.RoomNumber = laraItem.RoomNumber;
+
+		InitializeItem(itemNumber);
+
+		harpoonItem.Pose.Orientation = EulerAngles(
+			player.LeftArm.Orientation.x + laraItem.Pose.Orientation.x,
+			player.LeftArm.Orientation.y + laraItem.Pose.Orientation.y,
+			0);
 	}
 	else
 	{
-		item.Pose.Position = Vector3i(laraItem.Pose.Position.x, jointPos.y, laraItem.Pose.Position.z);
-		item.RoomNumber = laraItem.RoomNumber;
+		auto jointPos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(-2, 373, 77));
+		harpoonItem.RoomNumber = laraItem.RoomNumber;
+
+		int floorHeight = GetPointCollision(jointPos, harpoonItem.RoomNumber).GetFloorHeight();
+		if (floorHeight >= jointPos.y)
+		{
+			harpoonItem.Pose.Position = jointPos;
+		}
+		else
+		{
+			harpoonItem.Pose.Position = Vector3i(laraItem.Pose.Position.x, jointPos.y, laraItem.Pose.Position.z);
+			harpoonItem.RoomNumber = laraItem.RoomNumber;
+		}
+
+		InitializeItem(itemNumber);
+
+		harpoonItem.Pose.Orientation.x = player.LeftArm.Orientation.x + laraItem.Pose.Orientation.x;
+		harpoonItem.Pose.Orientation.z = 0;
+		harpoonItem.Pose.Orientation.y = player.LeftArm.Orientation.y + laraItem.Pose.Orientation.y;
+
+		if (!player.LeftArm.Locked)
+			harpoonItem.Pose.Orientation += player.ExtraTorsoRot;
 	}
 
-	InitializeItem(itemNumber);
+	harpoonItem.Animation.Velocity.z = HARPOON_VELOCITY;
+	harpoonItem.HitPoints = HARPOON_TIME;
 
-	item.Pose.Orientation = EulerAngles(
-		player.LeftArm.Orientation.x + laraItem.Pose.Orientation.x,
-		player.LeftArm.Orientation.y + laraItem.Pose.Orientation.y,
-		0);
-
-	if (!player.LeftArm.Locked)
-		item.Pose.Orientation += player.ExtraTorsoRot;
-
-	item.Pose.Orientation.z = 0;
-	item.Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(item.Pose.Orientation.x);
-	item.Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(item.Pose.Orientation.x);
-	item.HitPoints = HARPOON_TIME;
-
-	Rumble(0.2f, 0.1f);
 	AddActiveItem(itemNumber);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	harpoonItem.ItemFlags[0] = (int)ProjectileType::Harpoon;
 
-	return &item;
+	Rumble(0.2f, 0.1f);
+
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
+
+	return true;
 }
-
+	
 void HarpoonBoltControl(short itemNumber)
 {
 	auto& harpoonItem = g_Level.Items[itemNumber];
 
 	if (harpoonItem.HitPoints < HARPOON_TIME)
 	{
-		if (harpoonItem.HitPoints > 0)
+		harpoonItem.HitPoints--;
+
+		if (harpoonItem.HitPoints == 0)
 		{
-			harpoonItem.HitPoints--;
-		}
-		else
-		{
-			ExplodeItemNode(&harpoonItem, 0, 0, BODY_EXPLODE);
+			ExplodeItemNode(&harpoonItem, 0, 0, BODY_DO_EXPLOSION);
 			KillItem(itemNumber);
 		}
 
 		return;
 	}
 
-	harpoonItem.Pose.Orientation.z += ANGLE(35.0f);
-
-	if (!TestEnvironment(ENV_FLAG_WATER, harpoonItem.RoomNumber))
+	if (TestEnvironment(ENV_FLAG_WATER, &harpoonItem))
 	{
-		harpoonItem.Pose.Orientation.x -= ANGLE(1.0f);
+		if (harpoonItem.Animation.Velocity.z > 64.0f)
+			harpoonItem.Animation.Velocity.z -= harpoonItem.Animation.Velocity.z / 16;
 
-		if (harpoonItem.Pose.Orientation.x < ANGLE(-90.0f))
-			harpoonItem.Pose.Orientation.x = ANGLE(-90.0f);
-
-		harpoonItem.Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(harpoonItem.Pose.Orientation.x);
-		harpoonItem.Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(harpoonItem.Pose.Orientation.x);
-	}
-	else
-	{
-		if (Wibble & 4)
-			SpawnBubble(harpoonItem.Pose.Position.ToVector3(), harpoonItem.RoomNumber, (int)BubbleFlags::HighAmplitude);
-			
-		harpoonItem.Animation.Velocity.y = -HARPOON_VELOCITY * phd_sin(harpoonItem.Pose.Orientation.x) / 2;
-		harpoonItem.Animation.Velocity.z = HARPOON_VELOCITY * phd_cos(harpoonItem.Pose.Orientation.x) / 2;
+		if (GlobalCounter & 1)
+			SpawnBubble(harpoonItem.Pose.Position.ToVector3(), harpoonItem.RoomNumber);
 	}
 
+	auto prevPos = harpoonItem.Pose.Position;
 	TranslateItem(&harpoonItem, harpoonItem.Pose.Orientation, harpoonItem.Animation.Velocity.z);
-	HandleProjectile(harpoonItem, *LaraItem, harpoonItem.Pose.Position, ProjectileType::Harpoon, Weapons[(int)LaraWeaponType::HarpoonGun].Damage);
+
+	int damage = Weapons[(int)LaraWeaponType::HarpoonGun].Damage;
+	HandleProjectile(harpoonItem, *LaraItem, prevPos, (ProjectileType)harpoonItem.ItemFlags[0], damage);
 }
 
 void FireGrenade(ItemInfo& laraItem)
@@ -672,7 +682,7 @@ void FireGrenade(ItemInfo& laraItem)
 	player.Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return;
 
 	auto& grenadeItem = g_Level.Items[itemNumber];
@@ -685,7 +695,7 @@ void FireGrenade(ItemInfo& laraItem)
 	grenadeItem.Pose.Position = jointPos;
 	auto smokePos = jointPos;
 
-	int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, grenadeItem.RoomNumber).Position.Floor;
+	int floorHeight = GetPointCollision(jointPos, grenadeItem.RoomNumber).GetFloorHeight();
 	if (floorHeight < jointPos.y)
 	{
 		grenadeItem.Pose.Position.x = laraItem.Pose.Position.x;
@@ -723,7 +733,7 @@ void FireGrenade(ItemInfo& laraItem)
 	grenadeItem.Animation.Velocity.z = GRENADE_VELOCITY;
 	grenadeItem.Animation.ActiveState = grenadeItem.Pose.Orientation.x;
 	grenadeItem.Animation.TargetState = grenadeItem.Pose.Orientation.y;
-	grenadeItem.Animation.RequiredState = NO_STATE;
+	grenadeItem.Animation.RequiredState = NO_VALUE;
 	grenadeItem.HitPoints = GRENADE_TIME;
 	grenadeItem.ItemFlags[0] = (int)WeaponAmmoType::Ammo2;
 
@@ -752,8 +762,8 @@ void FireGrenade(ItemInfo& laraItem)
 		break;
 	}
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void GrenadeControl(short itemNumber)
@@ -773,7 +783,7 @@ void GrenadeControl(short itemNumber)
 		if (grenadeItem.Animation.Velocity.z)
 		{
 			grenadeItem.Pose.Orientation.z += (short((grenadeItem.Animation.Velocity.z / 16) + 3.0f) * ANGLE(1.0f));
-			if (grenadeItem.Animation.RequiredState != NO_STATE)
+			if (grenadeItem.Animation.RequiredState != NO_VALUE)
 			{
 				grenadeItem.Pose.Orientation.y += (short((grenadeItem.Animation.Velocity.z / 4) + 3.0f) * ANGLE(1.0f));
 			}
@@ -791,7 +801,7 @@ void GrenadeControl(short itemNumber)
 		if (grenadeItem.Animation.Velocity.z)
 		{
 			grenadeItem.Pose.Orientation.z += (short((grenadeItem.Animation.Velocity.z / 4) + 7.0f) * ANGLE(1.0f));
-			if (grenadeItem.Animation.RequiredState != NO_STATE)
+			if (grenadeItem.Animation.RequiredState != NO_VALUE)
 			{
 				grenadeItem.Pose.Orientation.y += (short((grenadeItem.Animation.Velocity.z / 2) + 7.0f) * ANGLE(1.0f));
 			}
@@ -805,11 +815,11 @@ void GrenadeControl(short itemNumber)
 	// Trigger fire and smoke sparks in direction of motion.
 	if (grenadeItem.Animation.Velocity.z && aboveWater)
 	{
-		auto world = Matrix::CreateFromYawPitchRoll(
-			TO_RAD(grenadeItem.Pose.Orientation.y - ANGLE(180.0f)),
-			TO_RAD(grenadeItem.Pose.Orientation.x),
-			TO_RAD(grenadeItem.Pose.Orientation.z)) *
-			Matrix::CreateTranslation(0, 0, -64);
+		auto world = Matrix::CreateTranslation(0, 0, -64) * 
+					 Matrix::CreateFromYawPitchRoll(
+						TO_RAD(grenadeItem.Pose.Orientation.y - ANGLE(180.0f)),
+						TO_RAD(grenadeItem.Pose.Orientation.x),
+						TO_RAD(grenadeItem.Pose.Orientation.z));
 
 		int wx = world.Translation().x;
 		int wy = world.Translation().y;
@@ -855,7 +865,7 @@ void FireRocket(ItemInfo& laraItem)
 	player.Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return;
 
 	auto& rocketItem = g_Level.Items[itemNumber];
@@ -914,8 +924,8 @@ void FireRocket(ItemInfo& laraItem)
 	Rumble(0.4f, 0.3f);
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void RocketControl(short itemNumber)
@@ -950,11 +960,11 @@ void RocketControl(short itemNumber)
 	rocketItem.Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	// Calculate offset in rocket direction for fire and smoke sparks.
-	auto world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(rocketItem.Pose.Orientation.y - ANGLE(180.0f)),
-		TO_RAD(rocketItem.Pose.Orientation.x),
-		TO_RAD(rocketItem.Pose.Orientation.z)) *
-		Matrix::CreateTranslation(0, 0, -64);
+	auto world = Matrix::CreateTranslation(0, 0, -64) *
+				 Matrix::CreateFromYawPitchRoll(
+					TO_RAD(rocketItem.Pose.Orientation.y - ANGLE(180.0f)),
+					TO_RAD(rocketItem.Pose.Orientation.x),
+					TO_RAD(rocketItem.Pose.Orientation.z));
 
 	int wx = world.Translation().x;
 	int wy = world.Translation().y;
@@ -983,7 +993,7 @@ void RocketControl(short itemNumber)
 	HandleProjectile(rocketItem, *LaraItem, prevPos, ProjectileType::Explosive, Weapons[(int)LaraWeaponType::RocketLauncher].ExplosiveDamage);
 }
 
-void FireCrossbow(ItemInfo& laraItem, Pose* pos)
+void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose)
 {
 	auto& player = *GetLaraInfo(&laraItem);
 	auto& ammo = GetAmmo(player, LaraWeaponType::Crossbow);
@@ -994,7 +1004,7 @@ void FireCrossbow(ItemInfo& laraItem, Pose* pos)
 	player.Control.Weapon.HasFired = true;
 
 	short itemNumber = CreateItem();
-	if (itemNumber == NO_ITEM)
+	if (itemNumber == NO_VALUE)
 		return;
 
 	auto& boltItem = g_Level.Items[itemNumber];
@@ -1004,14 +1014,14 @@ void FireCrossbow(ItemInfo& laraItem, Pose* pos)
 	if (!ammo.HasInfinite())
 		ammo--;
 
-	if (pos)
+	if (pose.has_value())
 	{
-		boltItem.Pose.Position = pos->Position;
+		boltItem.Pose.Position = pose->Position;
 		boltItem.RoomNumber = laraItem.RoomNumber;
 
 		InitializeItem(itemNumber);
 
-		boltItem.Pose.Orientation = pos->Orientation;
+		boltItem.Pose.Orientation = pose->Orientation;
 	}
 	else
 	{
@@ -1019,9 +1029,11 @@ void FireCrossbow(ItemInfo& laraItem, Pose* pos)
 
 		boltItem.RoomNumber = laraItem.RoomNumber;
 
-		int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, boltItem.RoomNumber).Position.Floor;
+		int floorHeight = GetPointCollision(jointPos, boltItem.RoomNumber).GetFloorHeight();
 		if (floorHeight >= jointPos.y)
+		{
 			boltItem.Pose.Position = jointPos;
+		}
 		else
 		{
 			boltItem.Pose.Position = Vector3i(laraItem.Pose.Position.x, jointPos.y, laraItem.Pose.Position.z);
@@ -1040,8 +1052,8 @@ void FireCrossbow(ItemInfo& laraItem, Pose* pos)
 		}
 	}
 
-	boltItem.Animation.Velocity.z = 512.0f;
-	boltItem.HitPoints = HARPOON_TIME;
+	boltItem.Animation.Velocity.z = BOLT_VELOCITY;
+	boltItem.HitPoints = BOLT_TIME;
 
 	AddActiveItem(itemNumber);
 
@@ -1066,15 +1078,15 @@ void FireCrossbow(ItemInfo& laraItem, Pose* pos)
 	Rumble(0.2f, 0.1f);
 	SoundEffect(SFX_TR4_CROSSBOW_FIRE, &laraItem.Pose);
 
-	Statistics.Level.AmmoUsed++;
-	Statistics.Game.AmmoUsed++;
+	SaveGame::Statistics.Level.AmmoUsed++;
+	SaveGame::Statistics.Game.AmmoUsed++;
 }
 
 void FireCrossBowFromLaserSight(ItemInfo& laraItem, GameVector* origin, GameVector* target)
 {
 	auto orient = Geometry::GetOrientToPoint(origin->ToVector3(), target->ToVector3());
 	auto boltPose = Pose(origin->x, origin->y, origin->z, orient);
-	FireCrossbow(laraItem, &boltPose);
+	FireCrossbow(laraItem, boltPose);
 }
 
 void CrossbowBoltControl(short itemNumber)
@@ -1159,7 +1171,7 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 	auto& ammo = GetAmmo(player, player.Control.Weapon.GunType);
 	const auto& weapon = player.Weapons[(int)weaponType];
 
-	if (!LaserSight || (!weapon.HasLasersight))
+	if (!player.Control.Look.IsUsingLasersight || !weapon.HasLasersight)
 		return;
 
 	bool isFiring = false;
@@ -1183,7 +1195,7 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 		if (player.Control.Weapon.GunType == LaraWeaponType::Revolver)
 		{
 			player.Control.Weapon.Interval = 16.0f;
-			Statistics.Game.AmmoUsed++;
+			SaveGame::Statistics.Game.AmmoUsed++;
 			isFiring = true;
 
 			if (!ammo.HasInfinite())
@@ -1253,7 +1265,7 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 	const auto& weapon = Weapons[(int)weaponType];
 
 	// Never handle weapons in binocular mode.
-	if (BinocularRange || LaserSight)
+	if (player.Control.Look.OpticRange || player.Control.Look.IsUsingLasersight)
 		return;
 
 	FindNewTarget(laraItem, weapon);
@@ -1267,8 +1279,8 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 	{
 		player.ExtraTorsoRot = player.LeftArm.Orientation;
 
-		if (Camera.oldType != CameraType::Look && !BinocularRange)
-			player.ExtraHeadRot = EulerAngles::Zero;
+		if (Camera.oldType != CameraType::Look && player.Control.Look.OpticRange == 0)
+			player.ExtraHeadRot = EulerAngles::Identity;
 	}
 
 	if (weaponType == LaraWeaponType::Revolver)
@@ -1318,10 +1330,10 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 
 		if (&target != &emitter)
 		{
-			Statistics.Game.AmmoHits++;
+			SaveGame::Statistics.Game.AmmoHits++;
 			if (target.HitPoints <= 0)
 			{
-				Statistics.Level.Kills++;
+				SaveGame::Statistics.Level.Kills++;
 				CreatureDie(target.Index, true);
 			}
 		}
@@ -1371,7 +1383,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 	{
 		// Trigger a new fragment in the case of GRENADE_SUPER until itemFlags[1] is > 0.
 		int grenadeItemNumber = CreateItem();
-		if (grenadeItemNumber == NO_ITEM)
+		if (grenadeItemNumber == NO_VALUE)
 			return true;
 
 		auto& grenadeItem = g_Level.Items[grenadeItemNumber];
@@ -1394,7 +1406,7 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 		grenadeItem.Animation.Velocity.z = 64.0f;
 		grenadeItem.Animation.ActiveState = grenadeItem.Pose.Orientation.x;
 		grenadeItem.Animation.TargetState = grenadeItem.Pose.Orientation.y;
-		grenadeItem.Animation.RequiredState = NO_STATE;
+		grenadeItem.Animation.RequiredState = NO_VALUE;
 
 		AddActiveItem(grenadeItemNumber);
 
@@ -1410,23 +1422,36 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 	return true;
 }
 
-bool TestProjectileNewRoom(ItemInfo& item, const CollisionResult& coll)
+bool TestProjectileNewRoom(ItemInfo& item, PointCollisionData& pointColl)
 {
-	// Has projectile changed room?
-	if (item.RoomNumber == coll.RoomNumber)
+	// Check if projectile changed room.
+	if (item.RoomNumber == pointColl.GetRoomNumber())
 		return false;
 
-	// If currently in water and previously on land, add a ripple.
-	if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) != TestEnvironment(ENV_FLAG_WATER, coll.RoomNumber))
+	// If currently in water and previously on land, spawn ripple.
+	if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) != TestEnvironment(ENV_FLAG_WATER, pointColl.GetRoomNumber()))
 	{
-		int floorDiff = abs(coll.Position.Floor - item.Pose.Position.y);
-		int ceilingDiff = abs(coll.Position.Ceiling - item.Pose.Position.y);
-		int yPoint = (floorDiff > ceilingDiff) ? coll.Position.Ceiling : coll.Position.Floor;
+		const auto& player = GetLaraInfo(item);
 
-		SpawnRipple(Vector3(item.Pose.Position.x, yPoint, item.Pose.Position.z), item.RoomNumber, Random::GenerateInt(8, 16));
+		int floorDiff = abs(pointColl.GetFloorHeight() - item.Pose.Position.y);
+		int ceilingDiff = abs(pointColl.GetCeilingHeight() - item.Pose.Position.y);
+		int yPoint = (floorDiff > ceilingDiff) ? pointColl.GetCeilingHeight() : pointColl.GetFloorHeight();
+
+		if (player.Control.Weapon.GunType != LaraWeaponType::GrenadeLauncher && player.Control.Weapon.GunType != LaraWeaponType::RocketLauncher)
+		{
+			SpawnSplashDrips(
+				Vector3(item.Pose.Position.x, yPoint, item.Pose.Position.z),
+				item.RoomNumber, 3, false);
+
+			SpawnRipple(Vector3(item.Pose.Position.x, yPoint, item.Pose.Position.z), item.RoomNumber, Random::GenerateInt(8, 16));
+		}
+		else		
+		{
+			Splash(&item);
+		}
 	}
 
-	ItemNewRoom(item.Index, coll.RoomNumber);
+	ItemNewRoom(item.Index, pointColl.GetRoomNumber());
 	return true;
 }
 
@@ -1438,7 +1463,7 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 	}
 	else
 	{
-		TriggerShockwave(&item.Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, 48, 304, 96, 128, 96, 0, 24, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		item.Pose.Position.y += CLICK(1.0f / 2);
 		TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -2, 0, item.RoomNumber);
 
@@ -1454,22 +1479,20 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 
 void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& prevPos, ProjectileType type, int damage)
 {
-	auto pointColl = GetCollision(&projectile);
+	auto pointColl = GetPointCollision(projectile);
 
 	bool hasHit = false;
 	bool hasHitNotByEmitter = false;
-	bool isExplosive = type >= ProjectileType::Explosive;
-	bool isShatterable = type != ProjectileType::Harpoon;
+	bool isExplosive = (type >= ProjectileType::Explosive);
+	bool isShatterable = (type != ProjectileType::Harpoon);
 
 	// For non-grenade projectiles, check for room collision.
 	if (type < ProjectileType::Grenade)
 	{
-		if (pointColl.Position.Floor < projectile.Pose.Position.y ||
-			pointColl.Position.Ceiling > projectile.Pose.Position.y)
+		if (pointColl.GetFloorHeight() < projectile.Pose.Position.y ||
+			pointColl.GetCeilingHeight() > projectile.Pose.Position.y)
 		{
-			projectile.Pose.Position = prevPos;
-			hasHit =
-			hasHitNotByEmitter = true;
+			hasHit = hasHitNotByEmitter = true;
 		}
 	}
 	// If projectile is timed grenade, try to emit from it according to flags.
@@ -1535,42 +1558,34 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		}
 
 		// Found possible collided items and statics.
-		GetCollidedObjects(&projectile, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
-
-		// If no collided items and meshes are found, exit the loop.
-		if (!CollidedItems[0] && !CollidedMeshes[0])
+		auto collObjects = GetCollidedObjects(projectile, true, false, radius);
+		if (collObjects.IsEmpty())
 			break;
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		// Run through statics.
+		for (auto* staticPtr : collObjects.Statics)
 		{
-			auto* meshPtr = CollidedMeshes[i];
-			if (!meshPtr)
-				break;
-
 			hasHit = hasHitNotByEmitter = doShatter = true;
 			doExplosion = isExplosive;
 
-			if (StaticObjects[meshPtr->staticNumber].shatterType == SHT_NONE)
+			if (StaticObjects[staticPtr->staticNumber].shatterType == ShatterType::None)
 				continue;
 
-			meshPtr->HitPoints -= damage;
-			if (meshPtr->HitPoints <= 0)
-				ShatterObject(nullptr, meshPtr, -128, projectile.RoomNumber, 0);
+			staticPtr->HitPoints -= damage;
+			if (staticPtr->HitPoints <= 0)
+				ShatterObject(nullptr, staticPtr, -128, projectile.RoomNumber, 0);
 
 			if (!isExplosive)
 				continue;
 
-			TriggerExplosionSparks(meshPtr->pos.Position.x, meshPtr->pos.Position.y, meshPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
-			auto pose = Pose(meshPtr->pos.Position.x, meshPtr->pos.Position.y - 128, meshPtr->pos.Position.z, 0, meshPtr->pos.Orientation.y, 0);
-			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
+			TriggerExplosionSparks(staticPtr->pos.Position.x, staticPtr->pos.Position.y, staticPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
+			auto pose = Pose(staticPtr->pos.Position.x, staticPtr->pos.Position.y - 128, staticPtr->pos.Position.z, 0, staticPtr->pos.Orientation.y, 0);
+			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		}
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		// Run through items.
+		for (auto* itemPtr : collObjects.Items)
 		{
-			auto* itemPtr = CollidedItems[i];
-			if (itemPtr == nullptr)
-				break;
-#
 			// Object was already affected by collision, skip it.
 			if (std::find(affectedObjects.begin(), affectedObjects.end(), itemPtr->Index) != affectedObjects.end())
 				continue;
@@ -1581,8 +1596,9 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				itemPtr->IsLara() ||
 				(itemPtr->Flags & 0x40 && Objects[itemPtr->ObjectNumber].explodableMeshbits))
 			{
-				// If we collide with emitter, don't process further in early launch stages.
-				if (!hasHitNotByEmitter && itemPtr == &emitter)
+				// If we collide with emitter, and there are no other objects around, 
+				// don't process further in early launch stages.
+				if (!hasHitNotByEmitter && itemPtr == &emitter && affectedObjects.empty())
 				{
 					// Non-grenade projectiles require larger timeout
 					int timeout = type >= ProjectileType::Grenade ? TRIGGER_TIMEOUT : TRIGGER_TIMEOUT * 2;
@@ -1602,33 +1618,42 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				if (isExplosive)
 				{
 					doExplosion = isExplosive;
-					if (type != ProjectileType::FlashGrenade && !currentObject.undead)
+					if (type != ProjectileType::FlashGrenade && currentObject.damageType != DamageMode::None)
 						DoExplosiveDamage(emitter, *itemPtr, projectile, damage);
 				}
-				else if (type == ProjectileType::Poison)
+				else if (currentObject.damageType == DamageMode::Any)
 				{
-					if (itemPtr->IsCreature())
-						GetCreatureInfo(itemPtr)->Poisoned = true;
+					if (type == ProjectileType::Poison)
+					{
+						if (itemPtr->IsCreature())
+							GetCreatureInfo(itemPtr)->Poisoned = true;
 
-					if (itemPtr->IsLara())
-						GetLaraInfo(itemPtr)->Status.Poison += 5;
+						if (itemPtr->IsLara())
+							GetLaraInfo(itemPtr)->Status.Poison += 5;
+					}
+					else
+					{
+						DoDamage(itemPtr, damage);
+					}
 				}
-				else if (!currentObject.undead)
-				{
-					DoDamage(itemPtr, damage);
-				}
-
 			}
 			else if (itemPtr->ObjectNumber >= ID_SMASH_OBJECT1 &&
 					 itemPtr->ObjectNumber <= ID_SMASH_OBJECT8)
 			{
 				doShatter = hasHit = true;
+				doExplosion = isExplosive;
 
-				// Smash objects are legacy objects from TRC. Let's make them explode in the legacy way.
+				// Smash objects are legacy objects from TRC. Make them explode in legacy way.
 				ExplodeItemNode(itemPtr, 0, 0, 128);
-				short currentItemNumber = (itemPtr - CollidedItems[0]);
-				SmashObject(currentItemNumber);
-				KillItem(currentItemNumber);
+				SmashObject(itemPtr->Index);
+				KillItem(itemPtr->Index);
+			}
+			else if (currentObject.collision && itemPtr->Status != ITEM_INVISIBLE)
+			{
+				doShatter = hasHit = true;
+				doExplosion = isExplosive;
+
+				affectedObjects.push_back(itemPtr->Index);
 			}
 		}
 
@@ -1648,7 +1673,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 	}
 	else if (doShatter)
 	{
-		ExplodeItemNode(&projectile, 0, 0, BODY_EXPLODE);
+		ExplodeItemNode(&projectile, 0, 0, BODY_DO_EXPLOSION);
 	}
 
 	switch (type)
@@ -1663,12 +1688,14 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		projectile.ItemFlags[1] = GRENADE_FRAG_TIMEOUT;
 		return;
 
+	case ProjectileType::Harpoon:
+		if (affectedObjects.empty())
+			return;
+		break;
+
 	default:
 		break;
 	}
-
-	if (type == ProjectileType::Harpoon)
-		return;
 
 	if (hasHit)
 		KillItem(projectile.Index);

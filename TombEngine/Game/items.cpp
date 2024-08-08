@@ -3,30 +3,40 @@
 
 #include "Game/collision/floordata.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Objects/Generic/Object/BridgeObject.h"
+#include "Objects/Generic/Object/Pushable/PushableInfo.h"
+#include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
+#include "Specific/trutils.h"
 
+using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Room;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
-using namespace TEN::Collision::Floordata;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Utils;
 
-constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
+constexpr auto ITEM_DEATH_TIMEOUT = 4 * FPS;
 
 bool ItemInfo::TestOcb(short ocbFlags) const
 {
@@ -72,7 +82,7 @@ void ItemInfo::SetFlagField(int id, short flags)
 	if (id < 0 || id > 7)
 		return;
 
-	this->ItemFlags[id] = flags;
+	ItemFlags[id] = flags;
 }
 
 void ItemInfo::ClearFlags(int id, short flags)
@@ -80,7 +90,7 @@ void ItemInfo::ClearFlags(int id, short flags)
 	if (id < 0 || id > 7)
 		return;
 
-	this->ItemFlags[id] &= ~flags;
+	ItemFlags[id] &= ~flags;
 }
 
 bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
@@ -99,7 +109,7 @@ bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
 
 bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int>& flags)
 {
-	auto bits = BitField();
+	auto bits = BitField::Default;
 	bits.Set(flags);
 	return TestMeshSwapFlags(bits.ToPackedBits());
 }
@@ -136,25 +146,43 @@ void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool cle
 	SetMeshSwapFlags(bits.ToPackedBits(), clear);
 }
 
+void ItemInfo::ResetModelToDefault()
+{
+	if (Objects[ObjectNumber].nmeshes > 0)
+	{
+		Model.MeshIndex.resize(Objects[ObjectNumber].nmeshes);
+		Model.BaseMesh = Objects[ObjectNumber].meshIndex;
+
+		for (int i = 0; i < Model.MeshIndex.size(); i++)
+			Model.MeshIndex[i] = Model.BaseMesh + i;
+
+		Model.Mutators.resize(Objects[ObjectNumber].nmeshes);
+		for (auto& mutator : Model.Mutators)
+			mutator = {};
+	}
+	else
+	{
+		Model.Mutators.clear();
+		Model.MeshIndex.clear();
+	}
+}
+
 bool ItemInfo::IsLara() const
 {
-	return this->Data.is<LaraInfo*>();
+	return Data.is<LaraInfo*>();
 }
 
 bool ItemInfo::IsCreature() const
 {
-	return this->Data.is<CreatureInfo>();
+	return Data.is<CreatureInfo>();
 }
 
-void ItemInfo::ResetModelToDefault()
+bool ItemInfo::IsBridge() const
 {
-	Model.BaseMesh = Objects[ObjectNumber].meshIndex;
-
-	for (int i = 0; i < Model.MeshIndex.size(); i++)
-		Model.MeshIndex[i] = Model.BaseMesh + i;
+	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
 }
 
-bool TestState(int refState, const vector<int>& stateList)
+bool TestState(int refState, const std::vector<int>& stateList)
 {
 	for (const auto& state : stateList)
 	{
@@ -191,12 +219,11 @@ void KillItem(short const itemNumber)
 		ItemNewRooms[2 * ItemNewRoomNo] = itemNumber | 0x8000;
 		ItemNewRoomNo++;
 	}
-	else// if (NextItemActive != NO_ITEM)
+	else// if (NextItemActive != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
 		DetatchSpark(itemNumber, SP_ITEM);
-
 		item->Active = false;
 
 		if (NextItemActive == itemNumber)
@@ -206,7 +233,7 @@ void KillItem(short const itemNumber)
 		else
 		{
 			short linkNumber;
-			for (linkNumber = NextItemActive; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextActive)
+			for (linkNumber = NextItemActive; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextActive)
 			{
 				if (g_Level.Items[linkNumber].NextActive == itemNumber)
 				{
@@ -216,7 +243,7 @@ void KillItem(short const itemNumber)
 			}
 		}
 
-		if (item->RoomNumber != NO_ROOM)
+		if (item->RoomNumber != NO_VALUE)
 		{
 			if (g_Level.Rooms[item->RoomNumber].itemNumber == itemNumber)
 			{
@@ -225,7 +252,7 @@ void KillItem(short const itemNumber)
 			else
 			{
 				short linkNumber;
-				for (linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+				for (linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 				{
 					if (g_Level.Items[linkNumber].NextItem == itemNumber)
 					{
@@ -239,8 +266,10 @@ void KillItem(short const itemNumber)
 		if (item == Lara.TargetEntity)
 			Lara.TargetEntity = nullptr;
 
-		if (Objects[item->ObjectNumber].floor != nullptr)
-			UpdateBridgeItem(itemNumber, true);
+		// AI target generation uses a hack with making a dummy item without ObjectNumber.
+		// Therefore, a check should be done here to prevent access violation.
+		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && item->IsBridge())
+			UpdateBridgeItem(*item, true);
 
 		GameScriptHandleKilled(itemNumber, true);
 
@@ -261,7 +290,7 @@ void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 	auto* room = &g_Level.Rooms[roomNumber];
 
 	short currentItemNumber = room->itemNumber;
-	while (currentItemNumber != NO_ITEM)
+	while (currentItemNumber != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[currentItemNumber];
 
@@ -307,7 +336,7 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->RoomNumber != NO_ROOM)
+		if (item->RoomNumber != NO_VALUE)
 		{
 			auto* room = &g_Level.Rooms[item->RoomNumber];
 
@@ -381,7 +410,7 @@ void KillEffect(short fxNumber)
 			NextFxActive = fx->nextActive;
 		else
 		{
-			for (short linkNumber = NextFxActive; linkNumber != NO_ITEM; linkNumber = EffectList[linkNumber].nextActive)
+			for (short linkNumber = NextFxActive; linkNumber != NO_VALUE; linkNumber = EffectList[linkNumber].nextActive)
 			{
 				if (EffectList[linkNumber].nextActive == fxNumber)
 				{
@@ -395,7 +424,7 @@ void KillEffect(short fxNumber)
 			g_Level.Rooms[fx->roomNumber].fxNumber = fx->nextFx;
 		else
 		{
-			for (short linkNumber = g_Level.Rooms[fx->roomNumber].fxNumber; linkNumber != NO_ITEM; linkNumber = EffectList[linkNumber].nextFx)
+			for (short linkNumber = g_Level.Rooms[fx->roomNumber].fxNumber; linkNumber != NO_VALUE; linkNumber = EffectList[linkNumber].nextFx)
 			{
 				if (EffectList[linkNumber].nextFx == fxNumber)
 				{
@@ -408,13 +437,19 @@ void KillEffect(short fxNumber)
 		fx->nextFx = NextFxFree;
 		NextFxFree = fxNumber;
 	}
+
+	// HACK: Garbage collect nextFx if no active effects were detected.
+	// This fixes random crashes after spawining multiple FXs (like body part).
+
+	if (NextFxActive == NO_VALUE)
+		InitializeFXArray();
 }
 
 short CreateNewEffect(short roomNumber) 
 {
 	short fxNumber = NextFxFree;
 
-	if (NextFxFree != NO_ITEM)
+	if (NextFxFree != NO_VALUE)
 	{
 		auto* fx = &EffectList[NextFxFree];
 		NextFxFree = fx->nextFx;
@@ -432,9 +467,9 @@ short CreateNewEffect(short roomNumber)
 	return fxNumber;
 }
 
-void InitializeFXArray(int allocateMemory)
+void InitializeFXArray()
 {
-	NextFxActive = NO_ITEM;
+	NextFxActive = NO_VALUE;
 	NextFxFree = 0;
 
 	for (int i = 0; i < NUM_EFFECTS; i++)
@@ -443,7 +478,7 @@ void InitializeFXArray(int allocateMemory)
 		fx->nextFx = i + 1;
 	}
 
-	EffectList[NUM_EFFECTS - 1].nextFx = NO_ITEM;
+	EffectList[NUM_EFFECTS - 1].nextFx = NO_VALUE;
 }
 
 void RemoveDrawnItem(short itemNumber) 
@@ -454,7 +489,7 @@ void RemoveDrawnItem(short itemNumber)
 		g_Level.Rooms[item->RoomNumber].itemNumber = item->NextItem;
 	else
 	{
-		for (short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+		for (short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 		{
 			if (g_Level.Items[linkNumber].NextItem == itemNumber)
 			{
@@ -477,7 +512,7 @@ void RemoveActiveItem(short itemNumber, bool killed)
 		}
 		else
 		{
-			for (short linkNumber = NextItemActive; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextActive)
+			for (short linkNumber = NextItemActive; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextActive)
 			{
 				if (g_Level.Items[linkNumber].NextActive == itemNumber)
 				{
@@ -497,10 +532,10 @@ void InitializeItem(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	SetAnimation(item, 0);
-	item->Animation.RequiredState = NO_STATE;
+	item->Animation.RequiredState = NO_VALUE;
 	item->Animation.Velocity = Vector3::Zero;
 
-	for (int i = 0; i < NUM_ITEM_FLAGS; i++)
+	for (int i = 0; i < ITEM_FLAG_COUNT; i++)
 		item->ItemFlags[i] = 0;
 
 	item->Active = false;
@@ -549,24 +584,11 @@ void InitializeItem(short itemNumber)
 	item->NextItem = room->itemNumber;
 	room->itemNumber = itemNumber;
 
-	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
+	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->Position.x, item->Pose.Position.z - room->Position.z);
 	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
-	item->BoxNumber = floor->Box;
+	item->BoxNumber = floor->PathfindingBoxID;
 
-	if (Objects[item->ObjectNumber].nmeshes > 0)
-	{
-		item->Model.MeshIndex.resize(Objects[item->ObjectNumber].nmeshes);
-		item->ResetModelToDefault();
-
-		item->Model.Mutators.resize(Objects[item->ObjectNumber].nmeshes);
-		for (auto& mutator : item->Model.Mutators)
-			mutator = {};
-	}
-	else
-	{
-		item->Model.Mutators.clear();
-		item->Model.MeshIndex.clear();
-	}
+	item->ResetModelToDefault();
 
 	if (Objects[item->ObjectNumber].Initialize != nullptr)
 		Objects[item->ObjectNumber].Initialize(itemNumber);
@@ -574,8 +596,8 @@ void InitializeItem(short itemNumber)
 
 short CreateItem()
 {
-	if (NextItemFree == NO_ITEM)
-		return NO_ITEM;
+	if (NextItemFree == NO_VALUE)
+		return NO_VALUE;
 
 	short itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
@@ -604,26 +626,31 @@ void InitializeItemArray(int totalItem)
 		}
 	}
 
-	item->NextItem = NO_ITEM;
-	NextItemActive = NO_ITEM;
+	item->NextItem = NO_VALUE;
+	NextItemActive = NO_VALUE;
 	NextItemFree = g_Level.NumItems;
 }
 
-short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
+short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectID)
 {
-	short itemNumber = CreateItem();
-	if (itemNumber != NO_ITEM)
+	int itemNumber = CreateItem();
+	if (itemNumber != NO_VALUE)
 	{
-		auto* spawn = &g_Level.Items[itemNumber];
+		auto& newItem = g_Level.Items[itemNumber];
 
-		spawn->ObjectNumber = objectNumber;
-		spawn->RoomNumber = item->RoomNumber;
-		memcpy(&spawn->Pose, &item->Pose, sizeof(Pose));
+		newItem.ObjectNumber = objectID;
+		newItem.RoomNumber = item.RoomNumber;
+		newItem.Pose = item.Pose;
+		newItem.Model.Color = Vector4::One;
 
 		InitializeItem(itemNumber);
 
-		spawn->Status = ITEM_NOT_ACTIVE;
-		spawn->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		newItem.Status = ITEM_NOT_ACTIVE;
+	}
+	else
+	{
+		TENLog("Failed to create new item.", LogLevel::Warning);
+		itemNumber = NO_VALUE;
 	}
 
 	return itemNumber;
@@ -636,7 +663,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		for (short itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+		for (short itemNumber = room->itemNumber; itemNumber != NO_VALUE; itemNumber = g_Level.Items[itemNumber].NextItem)
 		{
 			if (g_Level.Items[itemNumber].ObjectNumber == search)
 			{
@@ -678,12 +705,12 @@ std::vector<int> FindCreatedItems(GAME_OBJECT_ID objectID)
 {
 	auto itemNumbers = std::vector<int>{};
 
-	if (NextItemActive == NO_ITEM)
+	if (NextItemActive == NO_VALUE)
 		return itemNumbers;
 
 	const auto* itemPtr = &g_Level.Items[NextItemActive];
 
-	for (int nextActive = NextItemActive; nextActive != NO_ITEM; nextActive = itemPtr->NextActive)
+	for (int nextActive = NextItemActive; nextActive != NO_VALUE; nextActive = itemPtr->NextActive)
 	{
 		itemPtr = &g_Level.Items[nextActive];
 
@@ -710,7 +737,7 @@ ItemInfo* FindItem(GAME_OBJECT_ID objectID)
 int FindItem(ItemInfo* item)
 {
 	if (item == LaraItem)
-		return Lara.ItemNumber;
+		return item->Index;
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 		if (item == &g_Level.Items[i])
@@ -724,10 +751,13 @@ void UpdateAllItems()
 	InItemControlLoop = true;
 
 	short itemNumber = NextItemActive;
-	while (itemNumber != NO_ITEM)
+	while (itemNumber != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		short nextItem = item->NextActive;
+
+		if (!Objects.CheckID(item->ObjectNumber))
+			continue;
 
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
@@ -757,7 +787,7 @@ void UpdateAllEffects()
 	InItemControlLoop = true;
 
 	short fxNumber = NextFxActive;
-	while (fxNumber != NO_ITEM)
+	while (fxNumber != NO_VALUE)
 	{
 		short nextFx = EffectList[fxNumber].nextActive;
 		auto* fx = &EffectList[fxNumber];
@@ -775,10 +805,9 @@ bool UpdateItemRoom(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	auto roomNumber = GetCollision(item->Pose.Position.x,
-		item->Pose.Position.y - CLICK(2),
-		item->Pose.Position.z,
-		item->RoomNumber).RoomNumber;
+	auto roomNumber = GetPointCollision(
+		Vector3i(item->Pose.Position.x, item->Pose.Position.y - CLICK(2), item->Pose.Position.z),
+		item->RoomNumber).GetRoomNumber();
 
 	if (roomNumber != item->RoomNumber)
 	{
@@ -822,11 +851,12 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 {
 	const auto& object = Objects[target->ObjectNumber];
 
-	if (!object.undead || isExplosive)
+	if ((object.damageType == DamageMode::Any) ||
+		(object.damageType == DamageMode::Explosion && isExplosive))
 	{
 		if (target->HitPoints > 0)
 		{
-			Statistics.Level.AmmoHits++;
+			SaveGame::Statistics.Level.AmmoHits++;
 			DoDamage(target, damage);
 		}
 	}
@@ -858,10 +888,28 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 			break;
 
 		case HitEffect::Smoke:
-			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, -5);
+			TriggerShatterSmoke(pos.value().x, pos.value().y, pos.value().z);
+			break;
+
+		case HitEffect::NonExplosive:
+			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), target.Pose.Orientation.y, target.RoomNumber);
 			break;
 		}
 	}
 
 	DoItemHit(&target, damage, isExplosive);
+}
+
+Vector3i GetNearestSectorCenter(const Vector3i& pos)
+{
+	constexpr int SECTOR_SIZE = 1024;
+
+	// Calculate the sector-aligned coordinates.
+	int x = (pos.x / SECTOR_SIZE) * SECTOR_SIZE + SECTOR_SIZE / 2;
+	int z = (pos.z / SECTOR_SIZE) * SECTOR_SIZE + SECTOR_SIZE / 2;
+
+	// Keep the y-coordinate unchanged.
+	int y = pos.y;
+
+	return Vector3i(x, y, z);
 }

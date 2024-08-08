@@ -3,8 +3,8 @@
 struct ItemInfo;
 struct CollisionInfo;
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-	void CogControl(short itemNumber);
-	void CogCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void ControlCog(short itemNumber);
+	void CollideCog(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
 }

@@ -18,15 +18,17 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Objects/Generic/puzzles_keys.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
-#include "Objects/TR5/Object/tr5_pushableblock.h"
 #include "Objects/Effects/tr4_locusts.h"
+
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Hair;
+using namespace TEN::Entities::Creatures::TR3;
 
 int FlipEffect;
 
@@ -87,25 +89,22 @@ void ClearSwarmEnemies(ItemInfo* item)
 	ClearRats();
 	ClearBeetleSwarm();
 	ClearLocusts();
+	ClearFishSwarm();
 }
 
 void FlashOrange(ItemInfo* item) 
 {
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 	Weather.Flash(255, 128, 0, 0.03f);
 }
 
 void MeshSwapToPour(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
-
 	item->Model.MeshIndex[LM_LHAND] = Objects[item->ItemFlags[2]].meshIndex + LM_LHAND;
 }
 
 void MeshSwapFromPour(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
-
 	item->Model.MeshIndex[LM_LHAND] = item->Model.BaseMesh + LM_LHAND;
 }
 
@@ -146,65 +145,65 @@ void InvisibilityOn(ItemInfo* item)
 
 void SetFog(ItemInfo* item)
 {
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void DrawLeftPistol(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	if (item->Model.MeshIndex[LM_LHAND] == item->Model.BaseMesh + LM_LHAND)
 	{
 		item->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
-		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
+		player.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 	}
 	else
 	{
 		item->Model.MeshIndex[LM_LHAND] = item->Model.BaseMesh + LM_LHAND;
-		lara->Control.Weapon.HolsterInfo.LeftHolster = GetWeaponHolsterSlot(LaraWeaponType::Pistol);
+		player.Control.Weapon.HolsterInfo.LeftHolster = GetWeaponHolsterSlot(LaraWeaponType::Pistol);
 	}
 }
 
 void DrawRightPistol(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	if (item->Model.MeshIndex[LM_RHAND] == item->Model.BaseMesh + LM_RHAND)
 	{
 		item->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
-		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
+		player.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
 	else
 	{
 		item->Model.MeshIndex[LM_RHAND] = item->Model.BaseMesh + LM_RHAND;
-		lara->Control.Weapon.HolsterInfo.RightHolster = GetWeaponHolsterSlot(LaraWeaponType::Pistol);
+		player.Control.Weapon.HolsterInfo.RightHolster = GetWeaponHolsterSlot(LaraWeaponType::Pistol);
 	}
 }
 
 void ShootLeftGun(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->LeftArm.GunFlash = 3;
+	player.LeftArm.GunFlash = 3;
 }
 
 void ShootRightGun(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->RightArm.GunFlash = 3;
+	player.RightArm.GunFlash = 3;
 }
 
 void LaraHandsFree(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.HandStatus = HandStatus::Free;
+	player.Control.HandStatus = HandStatus::Free;
 }
 
 void KillActiveBaddys(ItemInfo* item)
 {
-	if (NextItemActive != NO_ITEM)
+	if (NextItemActive != NO_VALUE)
 	{
 		short itemNumber = NextItemActive;
 
@@ -225,17 +224,17 @@ void KillActiveBaddys(ItemInfo* item)
 			}
 
 			itemNumber = targetItem->NextActive;
-		} while (itemNumber != NO_ITEM);
+		} while (itemNumber != NO_VALUE);
 	}
 
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void LaraLocationPad(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 
 	lara->Location = TriggerTimer;
 	lara->LocationPad = TriggerTimer;
@@ -245,7 +244,7 @@ void LaraLocation(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 
 	lara->Location = TriggerTimer;
 	if (lara->HighestLocation < TriggerTimer)
@@ -256,17 +255,19 @@ void ExplosionFX(ItemInfo* item)
 {
 	SoundEffect(SFX_TR4_EXPLOSION1, nullptr);
 	Camera.bounce = -75;
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void SwapCrowbar(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
-
 	if (item->Model.MeshIndex[LM_RHAND] == item->Model.BaseMesh + LM_RHAND)
+	{
 		item->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;
+	}
 	else 
+	{
 		item->Model.MeshIndex[LM_RHAND] = item->Model.BaseMesh + LM_RHAND;
+	}
 }
 
 void ActivateKey(ItemInfo* item)
@@ -282,7 +283,7 @@ void ActivateCamera(ItemInfo* item)
 void PoseidonSFX(ItemInfo* item)
 {
 	SoundEffect(SFX_TR4_WATER_FLUSHES, nullptr);
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void RubbleFX(ItemInfo* item)
@@ -300,13 +301,13 @@ void RubbleFX(ItemInfo* item)
 	else
 		Camera.bounce = -150;
 
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void PlaySoundEffect(ItemInfo* item)
 {
 	SoundEffect(TriggerTimer, nullptr);
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void FloorShake(ItemInfo* item)
@@ -315,11 +316,11 @@ void FloorShake(ItemInfo* item)
 	int y = abs(item->Pose.Position.y - Camera.pos.y);
 	int z = abs(item->Pose.Position.z - Camera.pos.z);
 
-	if (x < SECTOR(16) &&
-		y < SECTOR(16) &&
-		z < SECTOR(16))
+	if (x < BLOCK(16) &&
+		y < BLOCK(16) &&
+		z < BLOCK(16))
 	{
-		Camera.bounce = 66 * ((pow(x, 2) + pow(y, 2) + pow(z, 2)) / CLICK(1) - pow(SECTOR(1), 2)) / pow(SECTOR(1), 2);
+		Camera.bounce = 66 * ((pow(x, 2) + pow(y, 2) + pow(z, 2)) / CLICK(1) - pow(BLOCK(1), 2)) / pow(BLOCK(1), 2);
 	}
 }
 
@@ -332,7 +333,8 @@ void Turn180(ItemInfo* item)
 
 void FinishLevel(ItemInfo* item)
 {
-	LevelComplete = CurrentLevel + 1;
+	NextLevel = CurrentLevel + 1;
+	RequiredStartPos = TriggerTimer;
 }
 
 void VoidEffect(ItemInfo* item)

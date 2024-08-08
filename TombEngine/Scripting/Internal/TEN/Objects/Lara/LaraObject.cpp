@@ -9,7 +9,8 @@
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Game/effects/item_fx.h"
 #include "Specific/level.h"
-#include "ReservedScriptNames.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
 
 /***
 Class for extra Lara-only functions.
@@ -241,6 +242,99 @@ void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 	}
 }
 
+/// Get player weapon ammo type.
+// @function LaraObject:GetAmmoType
+// @treturn int player weapon ammo type
+// @usage
+// local CurrentAmmoType = Lara:GetAmmoType()
+int LaraObject::GetAmmoType() const
+{
+	const auto& player = GetLaraInfo(*m_item);
+
+	auto ammoType = std::optional<PlayerAmmoType>(std::nullopt);
+	switch (player.Control.Weapon.GunType)
+	{
+		case::LaraWeaponType::Pistol:
+			ammoType = PlayerAmmoType::Pistol;
+			break;
+
+		case::LaraWeaponType::Revolver:
+			ammoType = PlayerAmmoType::Revolver;
+			break;
+
+		case::LaraWeaponType::Uzi:
+			ammoType = PlayerAmmoType::Uzi;
+			break;
+
+		case::LaraWeaponType::Shotgun:
+			if (player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				ammoType = PlayerAmmoType::ShotgunNormal;
+			}
+			else
+			{
+				ammoType = PlayerAmmoType::ShotgunWide;
+			}
+
+			break;
+
+		case::LaraWeaponType::HK:
+			ammoType = PlayerAmmoType::HK;
+			break;
+
+		case::LaraWeaponType::Crossbow:
+			if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				ammoType = PlayerAmmoType::CrossbowBoltNormal;
+			}
+			else if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
+			{
+				ammoType = PlayerAmmoType::CrossbowBoltPoison;
+			}
+			else
+			{
+				ammoType = PlayerAmmoType::CrossbowBoltExplosive;
+			}
+
+			break;
+
+		case::LaraWeaponType::GrenadeLauncher:
+			if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				ammoType = PlayerAmmoType::GrenadeNormal;
+			}
+			else if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
+			{
+				ammoType = PlayerAmmoType::GrenadeFrag;
+			}
+			else
+			{
+				ammoType = PlayerAmmoType::GrenadeFlash;
+			}
+
+			break;
+
+		case::LaraWeaponType::HarpoonGun:
+			ammoType = PlayerAmmoType::Harpoon;
+			break;
+
+		case::LaraWeaponType::RocketLauncher:
+			ammoType = PlayerAmmoType::Rocket;
+			break;
+
+		default:
+			break;
+	}
+
+	if (!ammoType.has_value())
+	{
+		TENLog("GetAmmoType() error; no ammo type.", LogLevel::Warning, LogConfig::All);
+		ammoType = PlayerAmmoType::None;
+	}
+
+	return (int)*ammoType;
+}
+
 /// Get current weapon's ammo count
 // @function LaraObject:GetAmmoCount
 // @treturn int current ammo count (-1 if infinite)
@@ -262,25 +356,40 @@ std::unique_ptr<Moveable> LaraObject::GetVehicle() const
 {
 	auto* lara = GetLaraInfo(m_item);
 
-	if (lara->Context.Vehicle == NO_ITEM)
+	if (lara->Context.Vehicle == NO_VALUE)
 		return nullptr;
 
 	return std::make_unique<Moveable>(lara->Context.Vehicle);
 }
 
-/// Get current target enemy, if it exists
+/// Get the player's current targeted moveable (if it exists).
 // @function LaraObject:GetTarget
-// @treturn Objects.Moveable current target enemy (nil if no target present)
+// @treturn Objects.Moveable Target moveable (nil if the player is not currently targeting a moveable).
 // @usage
 // local target = Lara:GetTarget()
 std::unique_ptr<Moveable> LaraObject::GetTarget() const
 {
-	auto* lara = GetLaraInfo(m_item);
+	const auto& player = GetLaraInfo(*m_item);
 
-	if (lara->TargetEntity == nullptr)
+	if (player.TargetEntity == nullptr)
 		return nullptr;
 
-	return std::make_unique<Moveable>(lara->TargetEntity->Index);
+	return std::make_unique<Moveable>(player.TargetEntity->Index);
+}
+
+/// Get the player's current interacted moveable (if it exists).
+// @function LaraObject:GetInteractedMoveable
+// @treturn Objects.Moveable Interacted moveable (nil if the player is not interacting with a moveable).
+// @usage
+// local interactedMoveable = Lara:GetInteractedMoveable()
+std::unique_ptr<Moveable> LaraObject::GetPlayerInteractedMoveable() const
+{
+	const auto& player = GetLaraInfo(*m_item);
+
+	if (player.Context.InteractedItem == NO_VALUE)
+		return nullptr;
+
+	return std::make_unique<Moveable>(player.Context.InteractedItem);
 }
 
 /// Get current light state of the torch, if it exists
@@ -312,11 +421,12 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,
 			ScriptReserved_GetWeaponType, &LaraObject::GetWeaponType,
 			ScriptReserved_SetWeaponType, &LaraObject::SetWeaponType,
+			ScriptReserved_GetAmmoType, &LaraObject::GetAmmoType,
 			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
 			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
 			ScriptReserved_GetTarget, &LaraObject::GetTarget,
+			ScriptReserved_GetPlayerInteractedMoveable, &LaraObject::GetPlayerInteractedMoveable,
 			ScriptReserved_TorchIsLit, &LaraObject::TorchIsLit,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }
-

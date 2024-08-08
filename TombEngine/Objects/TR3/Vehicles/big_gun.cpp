@@ -4,8 +4,9 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/control/box.h"
-#include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
@@ -20,6 +21,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
@@ -47,7 +49,7 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Back
 	};
 
-	const auto BigGunBite = CreatureBiteInfo(Vector3i(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
+	const auto BigGunBite = CreatureBiteInfo(Vector3(0, 0, BGUN_ROCKET_SPAWN_DISTANCE), 2);
 
 	enum BigGunState
 	{
@@ -93,7 +95,7 @@ namespace TEN::Entities::Vehicles
 		// TODO: If Lara global is not used, the game crashes upon level load. Not sure why. @Sezz 2022.01.09
 		auto* lara = &Lara/* GetLaraInfo(laraItem)*/;
 
-		if (!(TrInput & IN_ACTION) ||
+		if (!IsHeld(In::Action) ||
 			lara->Control.HandStatus != HandStatus::Free ||
 			laraItem->Animation.IsAirborne)
 		{
@@ -105,7 +107,7 @@ namespace TEN::Entities::Vehicles
 		int z = laraItem->Pose.Position.z - bigGunItem->Pose.Position.z;
 
 		int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
-		if (distance > SECTOR(30))
+		if (distance > BLOCK(30))
 			return false;
 
 		short deltaAngle = abs(laraItem->Pose.Orientation.y - bigGunItem->Pose.Orientation.y);
@@ -118,7 +120,7 @@ namespace TEN::Entities::Vehicles
 	void BigGunFire(ItemInfo* bigGunItem, ItemInfo* laraItem)
 	{
 		short itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 		auto* lara = GetLaraInfo(laraItem);
 		auto* bigGun = GetBigGunInfo(bigGunItem);
@@ -126,8 +128,8 @@ namespace TEN::Entities::Vehicles
 		auto* projectileItem = &g_Level.Items[itemNumber];
 		projectileItem->ObjectNumber = ID_ROCKET;
 		auto pos = GetJointPosition(bigGunItem, BigGunBite);
-		auto probe = GetCollision(pos.x, pos.y, pos.z, bigGunItem->RoomNumber);
-		projectileItem->RoomNumber = probe.RoomNumber;
+		auto pointColl = GetPointCollision(pos, bigGunItem->RoomNumber);
+		projectileItem->RoomNumber = pointColl.GetRoomNumber();
 		projectileItem->Pose.Position = pos;
 		projectileItem->Pose.Orientation = EulerAngles(
 			-((bigGun->XOrientFrame - 32) * ANGLE(1.0f)),
@@ -154,7 +156,7 @@ namespace TEN::Entities::Vehicles
 		auto* bigGun = GetBigGunInfo(bigGunItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		if (BigGunTestMount(laraItem, bigGunItem))
@@ -188,11 +190,11 @@ namespace TEN::Entities::Vehicles
 			if (!bigGun->BarrelRotation)
 				bigGun->IsBarrelRotating = false;
 
-			if (TrInput & VEHICLE_IN_DISMOUNT || laraItem->HitPoints <= 0)
+			if (IsHeld(In::Brake) || laraItem->HitPoints <= 0)
 				bigGun->Flags = BGUN_FLAG_AUTO_ROT;
 			else
 			{
-				if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_FIRE) && !bigGun->FireCount)
+				if ((IsHeld(In::Accelerate) || IsHeld(In::Fire)) && !bigGun->FireCount)
 				{
 					BigGunFire(bigGunItem, laraItem);
 					bigGun->FireCount = BGUN_RECOIL_TIME;
@@ -200,7 +202,7 @@ namespace TEN::Entities::Vehicles
 					bigGun->IsBarrelRotating = true;
 				}
 
-				if (TrInput & VEHICLE_IN_UP)
+				if (IsHeld(In::Forward))
 				{
 					if (bigGun->TurnRate.x < 0)
 						bigGun->TurnRate.x /= 2;
@@ -209,7 +211,7 @@ namespace TEN::Entities::Vehicles
 					if (bigGun->TurnRate.x > (BGUN_TURN_RATE_MAX / 2))
 						bigGun->TurnRate.x = (BGUN_TURN_RATE_MAX / 2);
 				}
-				else if (TrInput & VEHICLE_IN_DOWN)
+				else if (IsHeld(In::Back))
 				{
 					if (bigGun->TurnRate.x > 0)
 						bigGun->TurnRate.x /= 2;
@@ -225,7 +227,7 @@ namespace TEN::Entities::Vehicles
 						bigGun->TurnRate.x = 0;
 				}
 
-				if (TrInput & VEHICLE_IN_LEFT)
+				if (IsHeld(In::Left))
 				{
 					if (bigGun->TurnRate.y > 0)
 						bigGun->TurnRate.y /= 2;
@@ -234,7 +236,7 @@ namespace TEN::Entities::Vehicles
 					if (bigGun->TurnRate.y < -BGUN_TURN_RATE_MAX)
 						bigGun->TurnRate.y = -BGUN_TURN_RATE_MAX;
 				}
-				else if (TrInput & VEHICLE_IN_RIGHT)
+				else if (IsHeld(In::Right))
 				{
 					if (bigGun->TurnRate.y < 0)
 						bigGun->TurnRate.y /= 2;

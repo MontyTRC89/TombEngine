@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
@@ -17,6 +18,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
@@ -32,11 +34,11 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto GUARD_NO_WEAPON_ON_HAND_SWAPFLAG = 0x2000;
 	constexpr auto GUARD_HEAD_MESH = 14;
 
-	const auto SwatGunBite				= CreatureBiteInfo(Vector3i(16, 240, 90), 13);
-	const auto MafiaGunBite				= CreatureBiteInfo(Vector3i(16, 270, 90), 13);
-	const auto SniperGunBite			= CreatureBiteInfo(Vector3i(0, 480, 110), 13);
-	const auto ArmedMafia2GunLeftBite	= CreatureBiteInfo(Vector3i(-16, 200, 60), 10);
-	const auto ArmedMafia2GunRightBite	= CreatureBiteInfo(Vector3i(16, 200, 60), 13);
+	const auto SwatGunBite				= CreatureBiteInfo(Vector3(16, 240, 90), 13);
+	const auto MafiaGunBite				= CreatureBiteInfo(Vector3(16, 270, 90), 13);
+	const auto SniperGunBite			= CreatureBiteInfo(Vector3(0, 480, 110), 13);
+	const auto ArmedMafia2GunLeftBite	= CreatureBiteInfo(Vector3(-16, 200, 60), 10);
+	const auto ArmedMafia2GunRightBite	= CreatureBiteInfo(Vector3(16, 200, 60), 13);
 
 	// TODO: Revise names of enum elements.
 
@@ -227,7 +229,7 @@ namespace TEN::Entities::Creatures::TR5
 			item->SetMeshSwapFlags(9216);
 
 			roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-			if (roomItemNumber != NO_ITEM)
+			if (roomItemNumber != NO_VALUE)
 			{
 				ItemInfo* item2 = nullptr;
 				while (true)
@@ -242,7 +244,7 @@ namespace TEN::Entities::Creatures::TR5
 					}
 
 					roomItemNumber = item2->NextItem;
-					if (roomItemNumber == NO_ITEM)
+					if (roomItemNumber == NO_VALUE)
 					{
 						item->Animation.FrameNumber = GetAnimData(item).frameBase;
 						item->Animation.ActiveState = item->Animation.TargetState;
@@ -262,7 +264,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		case GuardOcb::RopeDownFast:
 			SetAnimation(item, GUARD_ANIM_ROPE_DOWN_FAST);
-			item->Pose.Position.y = GetCollision(item).Position.Ceiling - BLOCK(2);
+			item->Pose.Position.y = GetPointCollision(*item).GetCeilingHeight() - BLOCK(2);
 			break;
 
 		case GuardOcb::WaitOnWall:
@@ -292,9 +294,9 @@ namespace TEN::Entities::Creatures::TR5
 
 		InitializeCreature(itemNumber);
 		SetAnimation(item, 0);
-		item->Pose.Position.x += SECTOR(1) * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
+		item->Pose.Position.x += BLOCK(1) * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
 		item->Pose.Position.y += CLICK(2);
-		item->Pose.Position.z += SECTOR(1) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
+		item->Pose.Position.z += BLOCK(1) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
 	}
 
 	void InitializeGuardLaser(short itemNumber)
@@ -420,7 +422,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				if (!(item->AIBits & FOLLOW) &&
 					item->ObjectNumber != ID_SCIENTIST &&
-					abs(item->Pose.Position.y - LaraItem->Pose.Position.y) < SECTOR(1.25f))
+					abs(item->Pose.Position.y - LaraItem->Pose.Position.y) < BLOCK(1.25f))
 				{
 					creature->Enemy = LaraItem; // TODO: deal with LaraItem global !
 					AlertAllGuards(itemNumber);
@@ -465,7 +467,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->ObjectNumber == ID_SCIENTIST && item == Lara.TargetEntity)
 					item->Animation.TargetState = GUARD_STATE_SURRENDER;
-				else if (item->Animation.RequiredState != NO_STATE)
+				else if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (item->AIBits & GUARD)
 				{
@@ -661,7 +663,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						creature->LOT.IsJumping = true;
 					}
-					else if (AI.distance >= SQUARE(SECTOR(1)))
+					else if (AI.distance >= SQUARE(BLOCK(1)))
 					{
 						if (!los || item->AIBits)
 						{
@@ -719,7 +721,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = 0;
 				headY = laraAI.angle;
 
-				if (item->Pose.Position.y <= (item->Floor - SECTOR(2)) || item->TriggerFlags != (int)GuardOcb::RopeDownFast)
+				if (item->Pose.Position.y <= (item->Floor - BLOCK(2)) || item->TriggerFlags != (int)GuardOcb::RopeDownFast)
 				{
 					if (item->Pose.Position.y >= (item->Floor - CLICK(2)))
 						item->Animation.TargetState = GUARD_STATE_AIM;
@@ -765,7 +767,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->SetMeshSwapFlags(NO_JOINT_BITS);
 
 					short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-					if (currentItemNumber == NO_ITEM)
+					if (currentItemNumber == NO_VALUE)
 						break;
 
 					while (true)
@@ -781,11 +783,11 @@ namespace TEN::Entities::Creatures::TR5
 						}
 
 						currentItemNumber = currentItem->NextItem;
-						if (currentItemNumber == NO_ITEM)
+						if (currentItemNumber == NO_VALUE)
 							break;
 					}
 
-					if (currentItemNumber == NO_ITEM)
+					if (currentItemNumber == NO_VALUE)
 						break;
 
 					currentItem->MeshBits = -3;
@@ -847,7 +849,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = 0;
 				currentItem = nullptr;
 
-				for (currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber; currentItemNumber != NO_ITEM; currentItemNumber = currentItem->NextItem)
+				for (currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber; currentItemNumber != NO_VALUE; currentItemNumber = currentItem->NextItem)
 				{
 					currentItem = &g_Level.Items[currentItemNumber];
 					if (item->ObjectNumber == ID_PUZZLE_HOLE8) // TODO: Avoid hardcoded object number. -- TokyoSU 24/12/2022
@@ -1147,15 +1149,15 @@ namespace TEN::Entities::Creatures::TR5
 
 		x += dx;
 		z += dz;
-		int height1 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height1 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height2 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 	
 		x += dx;
 		z += dz;
-		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height3 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 	
 		int height = 0;
 		bool canJump1Sector = true;
@@ -1213,7 +1215,7 @@ namespace TEN::Entities::Creatures::TR5
 			creature->Enemy = LaraItem;
 			angle = CreatureTurn(item, creature->MaxTurn);
 
-			if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity.z > 20) ||
+			if ((laraAI.distance < pow(BLOCK(2), 2) && LaraItem->Animation.Velocity.z > 20) ||
 				item->HitStatus ||
 				TargetVisible(item, &laraAI))
 			{
@@ -1256,7 +1258,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				if (Targetable(item, &ai))
 				{
-					if (ai.distance < pow(SECTOR(1), 2) || ai.zoneNumber != ai.enemyZone)
+					if (ai.distance < pow(BLOCK(1), 2) || ai.zoneNumber != ai.enemyZone)
 						item->Animation.TargetState = MAFIA2_STATE_AIM;
 					else if (!(item->AIBits & MODIFY))
 						item->Animation.TargetState = MAFIA2_STATE_WALK;
@@ -1285,7 +1287,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						if (creature->Mood != MoodType::Bored)
 						{
-							if (ai.distance >= pow(SECTOR(3), 2))
+							if (ai.distance >= pow(BLOCK(3), 2))
 								item->Animation.TargetState = MAFIA2_STATE_WALK;
 						}
 						else
@@ -1386,7 +1388,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->LOT.IsJumping = false;
 
 				if (Targetable(item, &ai) &&
-					(ai.distance < pow(SECTOR(1), 2) || ai.zoneNumber != ai.enemyZone))
+					(ai.distance < pow(BLOCK(1), 2) || ai.zoneNumber != ai.enemyZone))
 				{
 					item->Animation.TargetState = MAFIA2_STATE_AIM;
 				}
@@ -1408,9 +1410,9 @@ namespace TEN::Entities::Creatures::TR5
 						break;
 					}
 
-					if (ai.distance >= pow(SECTOR(1), 2))
+					if (ai.distance >= pow(BLOCK(1), 2))
 					{
-						if (ai.distance > pow(SECTOR(3), 2))
+						if (ai.distance > pow(BLOCK(3), 2))
 							item->Animation.TargetState = MAFIA2_STATE_RUN;
 					}
 					else
@@ -1424,7 +1426,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->LOT.IsJumping = false;
 
 				if (Targetable(item, &ai) &&
-					(ai.distance < pow(SECTOR(1), 2) || ai.zoneNumber != ai.enemyZone))
+					(ai.distance < pow(BLOCK(1), 2) || ai.zoneNumber != ai.enemyZone))
 				{
 					item->Animation.TargetState = MAFIA2_STATE_AIM;
 				}
@@ -1442,7 +1444,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					creature->LOT.IsJumping = true;
 				}
-				else if (ai.distance < pow(SECTOR(3), 2))
+				else if (ai.distance < pow(BLOCK(3), 2))
 					item->Animation.TargetState = MAFIA2_STATE_WALK;
 			
 				break;

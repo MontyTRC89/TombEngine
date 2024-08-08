@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/control/trigger.h"
@@ -17,6 +18,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
@@ -25,7 +27,7 @@ namespace TEN::Entities::TR4
 	{
 		short grenadeItemNumber = CreateItem();
 
-		if (grenadeItemNumber != NO_ITEM)
+		if (grenadeItemNumber != NO_VALUE)
 		{
 			auto* grenadeItem = &g_Level.Items[grenadeItemNumber];
 
@@ -39,9 +41,9 @@ namespace TEN::Entities::TR4
 			grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y - ANGLE(180.0f);
 			grenadeItem->Pose.Orientation.z = 0;
 
-			grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1) * phd_sin(grenadeItem->Pose.Orientation.y);
+			grenadeItem->Pose.Position.x = item->Pose.Position.x + BLOCK(1) * phd_sin(grenadeItem->Pose.Orientation.y);
 			grenadeItem->Pose.Position.y = item->Pose.Position.y - CLICK(3);
-			grenadeItem->Pose.Position.z = item->Pose.Position.x + SECTOR(1) * phd_cos(grenadeItem->Pose.Orientation.y);
+			grenadeItem->Pose.Position.z = item->Pose.Position.x + BLOCK(1) * phd_cos(grenadeItem->Pose.Orientation.y);
 
 			for (int i = 0; i < 5; i++)
 				TriggerGunSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 0, 0, 0, 1, LaraWeaponType::GrenadeLauncher, 32);
@@ -53,7 +55,7 @@ namespace TEN::Entities::TR4
 
 			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
-			grenadeItem->Animation.RequiredState = NO_STATE;
+			grenadeItem->Animation.RequiredState = NO_VALUE;
 			grenadeItem->Animation.Velocity.z = 32;
 			grenadeItem->Animation.Velocity.y = -32 * phd_sin(grenadeItem->Pose.Orientation.x);
 			grenadeItem->HitPoints = 120;
@@ -79,7 +81,7 @@ namespace TEN::Entities::TR4
 
 				item->ItemFlags[1] = i;
 				other->ItemFlags[0] = -80;
-				other->Pose.Position.y = item->Pose.Position.y - SECTOR(1);
+				other->Pose.Position.y = item->Pose.Position.y - BLOCK(1);
 			}
 		}
 	}
@@ -98,7 +100,7 @@ namespace TEN::Entities::TR4
 			int dx = 682 * phd_sin(item->Pose.Orientation.y);
 			int dz = 682 * phd_cos(item->Pose.Orientation.y);
 
-			int height1 = GetCollision(x - dz, y, z - dx, item->RoomNumber).Position.Floor;
+			int height1 = GetPointCollision(Vector3i(x - dz, y, z - dx), item->RoomNumber).GetFloorHeight();
 			if (abs(item->Pose.Position.y - height1) > CLICK(3))
 			{
 				item->Pose.Position.x += dz / 64;
@@ -107,7 +109,7 @@ namespace TEN::Entities::TR4
 				height1 = y;
 			}
 
-			int height2 = GetCollision(x + dz, y, z - dx, item->RoomNumber).Position.Floor;
+			int height2 = GetPointCollision(Vector3i(x + dz, y, z - dx), item->RoomNumber).GetFloorHeight();
 			if (abs(item->Pose.Position.y - height2) > CLICK(3))
 			{
 				item->Pose.Orientation.y -= ANGLE(2.0f);
@@ -118,11 +120,11 @@ namespace TEN::Entities::TR4
 
 			short zRot = phd_atan(1364, height2 - height1);
 
-			int height3 = GetCollision(x + dx, y, z + dz, item->RoomNumber).Position.Floor;
+			int height3 = GetPointCollision(Vector3i(x + dx, y, z + dz), item->RoomNumber).GetFloorHeight();
 			if (abs(y - height3) > CLICK(3))
 				height3 = y;
 
-			int height4 = GetCollision(x - dx, y, z - dz, item->RoomNumber).Position.Floor;
+			int height4 = GetPointCollision(Vector3i(x - dx, y, z - dz), item->RoomNumber).GetFloorHeight();
 			if (abs(y - height4) > CLICK(3))
 				height4 = y;
 
@@ -140,8 +142,8 @@ namespace TEN::Entities::TR4
 			short angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
 
 			int distance;
-			if (dx > SECTOR(31.25f) || dx < -SECTOR(31.25f) ||
-				dz > SECTOR(31.25f) || dz < -SECTOR(31.25f))
+			if (dx > BLOCK(31.25f) || dx < -BLOCK(31.25f) ||
+				dz > BLOCK(31.25f) || dz < -BLOCK(31.25f))
 			{
 				distance = INT_MAX;
 			}
@@ -162,9 +164,9 @@ namespace TEN::Entities::TR4
 				if (item->ItemFlags[0] < 0)
 					item->ItemFlags[0] = 0;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.distance > pow(SECTOR(1), 2) || Lara.Location >= item->ItemFlags[3])
+				else if (AI.distance > pow(BLOCK(1), 2) || Lara.Location >= item->ItemFlags[3])
 					item->Animation.TargetState = 1;
 
 				break;
@@ -243,7 +245,7 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			if (AI.distance < pow(SECTOR(1.5f), 2) || item->ItemFlags[3] == -2)
+			if (AI.distance < pow(BLOCK(1.5f), 2) || item->ItemFlags[3] == -2)
 				creature->ReachedGoal = true;
 
 			if (creature->ReachedGoal)
@@ -266,8 +268,8 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (distance > pow(SECTOR(2), 2) &&
-					distance < pow(SECTOR(10), 2) &&
+				if (distance > pow(BLOCK(2), 2) &&
+					distance < pow(BLOCK(10), 2) &&
 					!item->ItemFlags[2] &&
 					(angle < -ANGLE(112.5f) || angle > ANGLE(112.5f)))
 				{
@@ -294,7 +296,7 @@ namespace TEN::Entities::TR4
 					{
 						aiObject = &g_Level.AIObjects[i];
 
-						if (g_Level.AIObjects[i].triggerFlags == item->ItemFlags[3] && g_Level.AIObjects[i].roomNumber != NO_ROOM)
+						if (g_Level.AIObjects[i].triggerFlags == item->ItemFlags[3] && g_Level.AIObjects[i].roomNumber != NO_VALUE)
 						{
 							aiObject = &g_Level.AIObjects[i];
 							break;
@@ -358,13 +360,15 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 			AnimateItem(item);
 
-			auto probe = GetCollision(item);
-			item->Floor = probe.Position.Floor;
-			if (item->RoomNumber != probe.RoomNumber)
-				ItemNewRoom(itemNumber, probe.RoomNumber);
+			auto probe = GetPointCollision(*item);
+			item->Floor = probe.GetFloorHeight();
+			if (item->RoomNumber != probe.GetRoomNumber())
+				ItemNewRoom(itemNumber, probe.GetRoomNumber());
 
 			if (item->Pose.Position.y < item->Floor)
+			{
 				item->Animation.IsAirborne = true;
+			}
 			else
 			{
 				item->Pose.Position.y = item->Floor;
@@ -372,7 +376,7 @@ namespace TEN::Entities::TR4
 				item->Animation.Velocity.y = 0;
 			}
 
-			SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &item->Pose, SoundEnvironment::Land, 1.0f + (float)item->ItemFlags[0] / SECTOR(8)); // TODO: Check actual sound!
+			SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &item->Pose, SoundEnvironment::Land, 1.0f + (float)item->ItemFlags[0] / BLOCK(8)); // TODO: Check actual sound!
 		}
 	}
 }

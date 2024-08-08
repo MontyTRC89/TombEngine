@@ -12,8 +12,8 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto WorkerDualGunBiteLeft  = CreatureBiteInfo(Vector3i(-2, 340, 23), 6);
-	const auto WorkerDualGunBiteRight = CreatureBiteInfo(Vector3i(2, 340, 23), 10);
+	const auto WorkerDualGunBiteLeft  = CreatureBiteInfo(Vector3(-2, 340, 23), 6);
+	const auto WorkerDualGunBiteRight = CreatureBiteInfo(Vector3(2, 340, 23), 10);
 
 	// TODO
 	enum WorkerDualGunState
@@ -37,8 +37,8 @@ namespace TEN::Entities::Creatures::TR2
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;
@@ -81,7 +81,7 @@ namespace TEN::Entities::Creatures::TR2
 				{
 					if (Targetable(item, &ai))
 					{
-						if (ai.distance <= pow(SECTOR(3), 2))
+						if (ai.distance <= pow(BLOCK(3), 2))
 						{
 							item->Animation.TargetState = 9;
 						}
@@ -95,7 +95,7 @@ namespace TEN::Entities::Creatures::TR2
 						switch (creature->Mood)
 						{
 						case MoodType::Attack:
-							if (ai.distance > pow(SECTOR(20), 2) || !ai.ahead)
+							if (ai.distance > pow(BLOCK(20), 2) || !ai.ahead)
 							{
 								item->Animation.TargetState = 4;
 							}
@@ -140,7 +140,7 @@ namespace TEN::Entities::Creatures::TR2
 
 				if (Targetable(item, &ai))
 				{
-					if (ai.distance < pow(SECTOR(3), 2) || ai.zoneNumber != ai.enemyZone)
+					if (ai.distance < pow(BLOCK(3), 2) || ai.zoneNumber != ai.enemyZone)
 					{
 						item->Animation.TargetState = 1;
 					}
@@ -163,7 +163,7 @@ namespace TEN::Entities::Creatures::TR2
 				}
 				else if (creature->Mood == MoodType::Attack || creature->Mood == MoodType::Stalk)
 				{
-					if (ai.distance > pow(SECTOR(20), 2) || !ai.ahead)
+					if (ai.distance > pow(BLOCK(20), 2) || !ai.ahead)
 						item->Animation.TargetState = 4;
 				}
 				else if (LaraItem->HitPoints > 0)
@@ -208,7 +208,7 @@ namespace TEN::Entities::Creatures::TR2
 				}
 				else if (creature->Mood == MoodType::Attack)
 				{
-					if (ai.ahead && ai.distance < pow(SECTOR(20), 2))
+					if (ai.ahead && ai.distance < pow(BLOCK(20), 2))
 						item->Animation.TargetState = 3;
 				}
 				else if (LaraItem->HitPoints > 0)

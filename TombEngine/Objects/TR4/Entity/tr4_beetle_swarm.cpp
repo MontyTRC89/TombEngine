@@ -70,7 +70,7 @@ namespace TEN::Entities::TR4
 				}
 
 				short beetleNumber = GetFreeBeetle();
-				if (beetleNumber != NO_ITEM)
+				if (beetleNumber != NO_VALUE)
 				{
 					auto* beetle = &BeetleSwarm[beetleNumber];
 
@@ -104,7 +104,7 @@ namespace TEN::Entities::TR4
 		{
 			ZeroMemory(BeetleSwarm, NUM_BEETLES * sizeof(BeetleData));
 			NextBeetle = 0;
-			FlipEffect = -1;
+			FlipEffect = NO_VALUE;
 		}
 	}
 
@@ -128,7 +128,7 @@ namespace TEN::Entities::TR4
 			}
 
 			if (++i >= NUM_BEETLES)
-				return NO_ITEM;
+				return NO_VALUE;
 		}
 
 		NextBeetle = (result + 1) & (NUM_BEETLES - 1);
@@ -167,7 +167,7 @@ namespace TEN::Entities::TR4
 
 				if (beetle->Flags)
 				{
-					if (abs(dx) + abs(dz) <= SECTOR(1))
+					if (abs(dx) + abs(dz) <= BLOCK(1))
 					{
 						if (beetle->Velocity & 1)
 							beetle->Pose.Orientation.y += ANGLE(2.8f);
@@ -197,7 +197,7 @@ namespace TEN::Entities::TR4
 
 				FloorInfo* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, &beetle->RoomNumber);
 				int height = GetFloorHeight(floor, beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
-				if (height < (beetle->Pose.Position.y - SECTOR(1.25f)) || height == NO_HEIGHT)
+				if (height < (beetle->Pose.Position.y - BLOCK(1.25f)) || height == NO_HEIGHT)
 				{
 					// Beetle has hit a wall a high step.
 					if (angle <= 0)
@@ -230,6 +230,10 @@ namespace TEN::Entities::TR4
 				}
 				else
 					beetle->Pose.Orientation.x = beetle->VerticalVelocity * -64;
+
+				Matrix translation = Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
+				Matrix rotation = beetle->Pose.Orientation.ToRotationMatrix();
+				beetle->Transform = rotation * translation;
 			}
 		}
 	}

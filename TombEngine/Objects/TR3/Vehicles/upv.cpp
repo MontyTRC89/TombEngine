@@ -6,6 +6,7 @@
 #include "Game/collision/sphere.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/Bubble.h"
@@ -26,6 +27,7 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
@@ -40,10 +42,10 @@ namespace TEN::Entities::Vehicles
 {
 	constexpr auto UPV_RADIUS = 300;
 	constexpr auto UPV_HEIGHT = 400;
-	constexpr auto UPV_LENGTH = SECTOR(1);
+	constexpr auto UPV_LENGTH = BLOCK(1);
 	constexpr auto UPV_WATER_SURFACE_DISTANCE = 210;
 	constexpr auto UPV_MOUNT_DISTANCE = CLICK(2);
-	constexpr auto UPV_DISMOUNT_DISTANCE = SECTOR(1);
+	constexpr auto UPV_DISMOUNT_DISTANCE = BLOCK(1);
 
 	constexpr int UPV_VELOCITY_ACCEL = 4 * VEHICLE_VELOCITY_SCALE;
 	constexpr int UPV_VELOCITY_FRICTION_DECEL = 1.5f * VEHICLE_VELOCITY_SCALE;
@@ -86,12 +88,12 @@ namespace TEN::Entities::Vehicles
 
 	const CreatureBiteInfo UPVBites[6] =
 	{
-		CreatureBiteInfo(Vector3i(0, 0, 0), 3),
-		CreatureBiteInfo(Vector3i(0, 96, 256), 0),
-		CreatureBiteInfo(Vector3i(-128, 0, 64), 1),
-		CreatureBiteInfo(Vector3i(0, 0, -64), 1),
-		CreatureBiteInfo(Vector3i(128, 0, 64), 2),
-		CreatureBiteInfo(Vector3i(0, 0, -64), 2)
+		CreatureBiteInfo(Vector3(0, 0, 0), 3),
+		CreatureBiteInfo(Vector3(0, 96, 256), 0),
+		CreatureBiteInfo(Vector3(-128, 0, 64), 1),
+		CreatureBiteInfo(Vector3(0, 0, -64), 1),
+		CreatureBiteInfo(Vector3(128, 0, 64), 2),
+		CreatureBiteInfo(Vector3(0, 0, -64), 2)
 	};
 
 	const std::vector<VehicleMountType> UPVMountTypes =
@@ -176,7 +178,7 @@ namespace TEN::Entities::Vehicles
 		auto* UPVItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(UPVItem, laraItem, coll, UPVMountTypes, UPV_MOUNT_DISTANCE);
@@ -184,7 +186,7 @@ namespace TEN::Entities::Vehicles
 		{
 			// HACK: Collision in water behaves differently? @Sezz 2022.06.28
 			if (TestBoundsCollide(UPVItem, laraItem, coll->Setup.Radius) && TestCollision(UPVItem, laraItem))
-				ItemPushItem(UPVItem, laraItem, coll, false, false);
+				ItemPushItem(UPVItem, laraItem, coll, false, 0);
 		}
 		else
 		{
@@ -224,17 +226,16 @@ namespace TEN::Entities::Vehicles
 
 	static void FireUPVHarpoon(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
-		auto* harpoon = FireHarpoon(*laraItem);
+		auto& upv = *GetUPVInfo(UPVItem);
 
-		if (harpoon == nullptr)
+		auto harpoonPose = Pose(GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((upv.HarpoonLeft ? 22 : -22), 24, 230)));
+		if (!FireHarpoon(*laraItem, harpoonPose))
 			return;
 
-		auto UPV = GetUPVInfo(UPVItem);
-		harpoon->Pose.Position = GetJointPosition(UPVItem, UPV_JOINT_TURBINE, Vector3i((UPV->HarpoonLeft ? 22 : -22), 24, 230));
-		harpoon->Pose.Orientation = EulerAngles(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
+		auto soundID = (upv.Flags & UPV_FLAG_SURFACE) ? SFX_TR4_HARPOON_FIRE_DRY : SFX_TR4_HARPOON_FIRE_UNDERWATER;
+		SoundEffect(soundID, &harpoonPose, SoundEnvironment::Always);
 
-		harpoon->ItemFlags[0] = 1;
-		UPV->HarpoonLeft = !UPV->HarpoonLeft;	
+		upv.HarpoonLeft = !upv.HarpoonLeft;
 	}
 
 	static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)
@@ -253,7 +254,7 @@ namespace TEN::Entities::Vehicles
 		sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 		sptr->fadeToBlack = 12;
 		sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BlendMode::Additive;
 		sptr->extras = 0;
 		sptr->dynamic = -1;
 
@@ -289,7 +290,7 @@ namespace TEN::Entities::Vehicles
 
 	void UPVEffects(short itemNumber)
 	{
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 
 		auto* UPVItem = &g_Level.Items[itemNumber];
@@ -312,7 +313,7 @@ namespace TEN::Entities::Vehicles
 				if (Random::TestProbability(1 / 2.0f))
 				{
 					auto bubblePos = Random::GeneratePointInSphere(sphere);
-					int probedRoomNumber = GetCollision(bubblePos.x, bubblePos.y, bubblePos.z, UPVItem->RoomNumber).RoomNumber;
+					int probedRoomNumber = GetPointCollision(bubblePos, UPVItem->RoomNumber).GetRoomNumber();
 				
 					for (int i = 0; i < 3; i++)
 						SpawnBubble(bubblePos, probedRoomNumber, (int)BubbleFlags::HighAmplitude);
@@ -359,12 +360,12 @@ namespace TEN::Entities::Vehicles
 		int z = UPVItem->Pose.Position.z + velocity * phd_cos(moveAngle);
 		int y = UPVItem->Pose.Position.y - UPV_DISMOUNT_DISTANCE * phd_sin(-UPVItem->Pose.Orientation.x);
 
-		auto probe = GetCollision(x, y, z, UPVItem->RoomNumber);
-		if ((probe.Position.Floor - probe.Position.Ceiling) < CLICK(1) ||
-			probe.Position.Floor < y ||
-			probe.Position.Ceiling > y ||
-			probe.Position.Floor == NO_HEIGHT ||
-			probe.Position.Ceiling == NO_HEIGHT)
+		auto probe = GetPointCollision(Vector3i(x, y, z), UPVItem->RoomNumber);
+		if ((probe.GetFloorHeight() - probe.GetCeilingHeight()) < CLICK(1) ||
+			probe.GetFloorHeight() < y ||
+			probe.GetCeilingHeight() > y ||
+			probe.GetFloorHeight() == NO_HEIGHT ||
+			probe.GetCeilingHeight() == NO_HEIGHT)
 		{
 			return false;
 		}
@@ -420,8 +421,8 @@ namespace TEN::Entities::Vehicles
 			int dz = target.z - laraItem->Pose.Position.z;
 
 			int velocity = g_Level.Sinks[sinkVal].Strength;
-			dx = phd_sin(angle * 16) * velocity * SECTOR(1);
-			dz = phd_cos(angle * 16) * velocity * SECTOR(1);
+			dx = phd_sin(angle * 16) * velocity * BLOCK(1);
+			dz = phd_cos(angle * 16) * velocity * BLOCK(1);
 
 			lara->Context.WaterCurrentPull.x += ((dx - lara->Context.WaterCurrentPull.x) / 16);
 			lara->Context.WaterCurrentPull.z += ((dz - lara->Context.WaterCurrentPull.z) / 16);
@@ -453,7 +454,7 @@ namespace TEN::Entities::Vehicles
 		coll->Setup.EnableObjectPush = true;
 		coll->Setup.EnableSpasm = false;
 
-		coll->Setup.OldPosition = UPVItem->Pose.Position;
+		coll->Setup.PrevPosition = UPVItem->Pose.Position;
 
 		if ((UPVItem->Pose.Orientation.x >= -(SHRT_MAX / 2 + 1)) && (UPVItem->Pose.Orientation.x <= (SHRT_MAX / 2 + 1)))
 		{
@@ -478,7 +479,7 @@ namespace TEN::Entities::Vehicles
 		GetCollisionInfo(coll, UPVItem, Vector3i(0, height / 2, 0));
 		ShiftItem(UPVItem, coll);
 
-		if (coll->CollisionType == CT_FRONT)
+		if (coll->CollisionType == CollisionType::Front)
 		{
 			if (UPV->TurnRate.x > UPV_DEFLECT_ANGLE)
 				UPV->TurnRate.x += UPV_DEFLCT_TURN_RATE_MAX;
@@ -495,20 +496,20 @@ namespace TEN::Entities::Vehicles
 					UPV->Velocity = 0;
 			}
 		}
-		else if (coll->CollisionType == CT_TOP)
+		else if (coll->CollisionType == CollisionType::Top)
 		{
 			if (UPV->TurnRate.x >= -UPV_DEFLECT_ANGLE)
 				UPV->TurnRate.x -= UPV_DEFLCT_TURN_RATE_MAX;
 		}
-		else if (coll->CollisionType == CT_TOP_FRONT)
+		else if (coll->CollisionType == CollisionType::TopFront)
 			UPV->Velocity = 0;
-		else if (coll->CollisionType == CT_LEFT)
+		else if (coll->CollisionType == CollisionType::Left)
 			UPVItem->Pose.Orientation.y += ANGLE(5.0f);
-		else if (coll->CollisionType == CT_RIGHT)
+		else if (coll->CollisionType == CollisionType::Right)
 			UPVItem->Pose.Orientation.y -= ANGLE(5.0f);
-		else if (coll->CollisionType == CT_CLAMP)
+		else if (coll->CollisionType == CollisionType::Clamp)
 		{
-			UPVItem->Pose.Position = coll->Setup.OldPosition;
+			UPVItem->Pose.Position = coll->Setup.PrevPosition;
 			UPV->Velocity = 0;
 			return;
 		}
@@ -538,7 +539,7 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 
-			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+			if (IsHeld(In::Left) || IsHeld(In::Right))
 			{
 				ModulateVehicleTurnRateY(&UPV->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
 				ModulateVehicleLean(UPVItem, UPV_LEAN_RATE, UPV_LEAN_MAX);
@@ -567,13 +568,13 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				if (TrInput & (VEHICLE_IN_UP | VEHICLE_IN_DOWN))
+				if (IsHeld(In::Forward) || IsHeld(In::Back))
 					ModulateVehicleTurnRateX(&UPV->TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
-			if (TrInput & VEHICLE_IN_ACCELERATE)
+			if (IsHeld(In::Accelerate))
 			{
-				if (TrInput & VEHICLE_IN_UP &&
+				if (IsHeld(In::Forward) &&
 					UPV->Flags & UPV_FLAG_SURFACE &&
 					UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE_MAX)
 				{
@@ -594,7 +595,7 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 			
-			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+			if (IsHeld(In::Left) || IsHeld(In::Right))
 			{
 				ModulateVehicleTurnRateY(&UPV->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
 				ModulateVehicleLean(UPVItem, UPV_LEAN_RATE, UPV_LEAN_MAX);
@@ -623,11 +624,11 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				if (TrInput & (VEHICLE_IN_UP | VEHICLE_IN_DOWN))
+				if (IsHeld(In::Forward) || IsHeld(In::Back))
 					ModulateVehicleTurnRateX(&UPV->TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
-			if (TrInput & VEHICLE_IN_DISMOUNT && TestUPVDismount(UPVItem, laraItem))
+			if (IsHeld(In::Brake) && TestUPVDismount(UPVItem, laraItem))
 			{
 				if (UPV->Velocity > 0)
 					UPV->Velocity -= UPV_VELOCITY_ACCEL;
@@ -644,9 +645,9 @@ namespace TEN::Entities::Vehicles
 					SoundEffect(SFX_TR3_VEHICLE_UPV_STOP, (Pose*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 				}
 			}
-			else if (TrInput & VEHICLE_IN_ACCELERATE)
+			else if (IsHeld(In::Accelerate))
 			{
-				if (TrInput & VEHICLE_IN_UP &&
+				if (IsHeld(In::Forward) &&
 					UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE_MAX &&
 					UPV->Flags & UPV_FLAG_SURFACE)
 				{
@@ -850,7 +851,7 @@ namespace TEN::Entities::Vehicles
 		auto* UPV = GetUPVInfo(UPVItem);
 	
 		auto oldPos = UPVItem->Pose;
-		auto probe = GetCollision(UPVItem);
+		auto probe = GetPointCollision(*UPVItem);
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD))
 		{
@@ -864,13 +865,13 @@ namespace TEN::Entities::Vehicles
 			else if (UPVItem->Pose.Orientation.x < -UPV_X_ORIENT_MAX)
 				UPVItem->Pose.Orientation.x = -UPV_X_ORIENT_MAX;
 
-			if (!(TrInput & IN_LEFT ) && !(TrInput & IN_RIGHT))
+			if (!(IsHeld(In::Left) ) && !(IsHeld(In::Right)))
 				ResetVehicleLean(UPVItem, 12.0f);
 
 			TranslateItem(UPVItem, UPVItem->Pose.Orientation, UPVItem->Animation.Velocity.z);
 		}
 
-		int newHeight = GetCollision(UPVItem).Position.Floor;
+		int newHeight = GetPointCollision(*UPVItem).GetFloorHeight();
 		int waterHeight = GetWaterHeight(UPVItem);
 
 		if ((newHeight - waterHeight) < UPV_HEIGHT || (newHeight < UPVItem->Pose.Position.y - UPV_HEIGHT / 2) || 
@@ -880,7 +881,7 @@ namespace TEN::Entities::Vehicles
 			UPVItem->Animation.Velocity.z = 0;
 		}
 
-		UPVItem->Floor = probe.Position.Floor;
+		UPVItem->Floor = probe.GetFloorHeight();
 
 		if (UPV->Flags & UPV_FLAG_CONTROL && !(UPV->Flags & UPV_FLAG_DEAD))
 		{
@@ -899,7 +900,7 @@ namespace TEN::Entities::Vehicles
 				UPV->Flags |= UPV_FLAG_SURFACE;
 			}
 			else if ((waterHeight - UPVItem->Pose.Position.y) >= -UPV_WATER_SURFACE_DISTANCE && waterHeight != NO_HEIGHT &&
-					 (laraItem->Pose.Position.y - probe.Position.Ceiling) >= CLICK(1))
+					 (laraItem->Pose.Position.y - probe.GetCeilingHeight()) >= CLICK(1))
 			{
 				UPVItem->Pose.Position.y = waterHeight + UPV_WATER_SURFACE_DISTANCE;
 
@@ -940,18 +941,18 @@ namespace TEN::Entities::Vehicles
 		TestTriggers(UPVItem, false);
 		UPVEffects(lara->Context.Vehicle);
 
-		if (UPV->Velocity || TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT | VEHICLE_IN_UP | VEHICLE_IN_DOWN))
+		if (UPV->Velocity || IsDirectionalActionHeld())
 		{
-			int waterHeight = GetWaterHeight(UPVItem);
+			waterHeight = GetWaterHeight(UPVItem);
 			SpawnVehicleWake(*UPVItem, UPV_WAKE_OFFSET, waterHeight, true);
 		}
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD) &&
-			lara->Context.Vehicle != NO_ITEM)
+			lara->Context.Vehicle != NO_VALUE)
 		{
 			DoCurrent(UPVItem, laraItem);
 
-			if (TrInput & VEHICLE_IN_FIRE &&
+			if (IsHeld(In::Fire) &&
 				UPV->Flags & UPV_FLAG_CONTROL &&
 				!UPV->HarpoonTimer)
 			{
@@ -964,10 +965,10 @@ namespace TEN::Entities::Vehicles
 				}
 			}
 
-			if (probe.RoomNumber != UPVItem->RoomNumber)
+			if (probe.GetRoomNumber() != UPVItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
+				ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 			}
 
 			laraItem->Pose = UPVItem->Pose;
@@ -992,8 +993,8 @@ namespace TEN::Entities::Vehicles
 		{
 			AnimateItem(laraItem);
 
-			if (probe.RoomNumber != UPVItem->RoomNumber)
-				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
+			if (probe.GetRoomNumber() != UPVItem->RoomNumber)
+				ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
 
 			BackgroundCollision(UPVItem, laraItem);
 

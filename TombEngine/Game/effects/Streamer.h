@@ -51,8 +51,8 @@ namespace TEN::Effects::Streamer
 		std::vector<StreamerSegment> Segments = {};
 
 		// Utilities
-		void AddSegment(const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-						float width, float life, float vel, float scaleRate, short rot2D, int flags, unsigned int segmentCount);
+		void AddSegment(const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
+						float width, float life, float vel, float scaleRate, short rot, int flags, unsigned int segmentCount);
 		void Update();
 
 	private:
@@ -72,8 +72,8 @@ namespace TEN::Effects::Streamer
 		std::unordered_map<int, std::vector<Streamer>> Pools = {}; // Key = tag.
 
 		// Utilities
-		void AddStreamer(int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-						 float width, float life, float vel, float scaleRate, short rot2D, int flags);
+		void AddStreamer(int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
+						 float width, float life, float vel, float scaleRate, short rot, int flags);
 		void Update();
 
 	private:
@@ -92,17 +92,17 @@ namespace TEN::Effects::Streamer
 
 	public:
 		// Members
-		std::unordered_map<int, StreamerModule> Modules = {}; // Key = entity number.
+		std::unordered_map<int, StreamerModule> Modules = {}; // Key = item number.
 
 		// Utilities
-		void Spawn(int entityID, int tag, const Vector3& pos, const Vector3& direction, short orient2D, const Vector4& color,
-				   float width, float life, float vel, float scaleRate, short rot2D, int flags = 0);
+		void Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
+				   float width, float life, float vel, float scaleRate, short rot, int flags = 0);
 		void Update();
 		void Clear();
 
 	private:
 		// Helpers
-		StreamerModule& GetModule(int entityNumber);
+		StreamerModule& GetModule(int itemNumber);
 		void			ClearInactiveModules();
 	};
 

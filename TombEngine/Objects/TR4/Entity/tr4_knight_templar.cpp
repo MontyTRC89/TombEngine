@@ -24,7 +24,7 @@ namespace TEN::Entities::TR4
 	constexpr auto KTEMPLAR_IDLE_TURN_RATE_MAX = ANGLE(2.0f);
 	constexpr auto KTEMPLAR_WALK_TURN_RATE_MAX = ANGLE(7.0f);
 
-	const auto KnightTemplarBite = CreatureBiteInfo(Vector3i::Zero, 11);
+	const auto KnightTemplarBite = CreatureBiteInfo(Vector3::Zero, 11);
 	const auto KnightTemplarSwordAttackJoints = std::vector<unsigned int>{ 10, 11 };
 
 	enum KnightTemplarState
@@ -186,15 +186,15 @@ namespace TEN::Entities::TR4
 				auto pos = GetJointPosition(item, LM_LINARM);
 				
 				auto& room = g_Level.Rooms[item->RoomNumber];
-				auto& currentFloor = room.floor[(pos.z - room.z) / BLOCK(1) + (pos.x - room.x) / BLOCK(1) * room.zSize];
+				auto& currentFloor = room.Sectors[(pos.z - room.Position.z) / BLOCK(1) + (pos.x - room.Position.x) / BLOCK(1) * room.ZSize];
 
 				if (currentFloor.Stopper)
 				{
 					for (auto& mesh : room.mesh)
 					{
-						if (abs(pos.x - mesh.pos.Position.x) < SECTOR(1) &&
-							abs(pos.z - mesh.pos.Position.z) < SECTOR(1) &&
-							StaticObjects[mesh.staticNumber].shatterType == SHT_NONE)
+						if (abs(pos.x - mesh.pos.Position.x) < BLOCK(1) &&
+							abs(pos.z - mesh.pos.Position.z) < BLOCK(1) &&
+							StaticObjects[mesh.staticNumber].shatterType == ShatterType::None)
 						{
 							ShatterObject(nullptr, &mesh, -64, LaraItem->RoomNumber, 0);
 							SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);

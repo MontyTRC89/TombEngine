@@ -2,11 +2,11 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "LuaHandler.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "Objects/Moveable/MoveableObject.h"
-#include "Objects/Static/StaticObject.h"
-#include "Objects/AIObject/AIObject.h"
+#include "Scripting/Internal/LuaHandler.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/Static/StaticObject.h"
+#include "Scripting/Internal/TEN/Objects/AIObject/AIObject.h"
 
 class ObjectsHandler : public ScriptInterfaceObjectsHandler
 {
@@ -44,7 +44,7 @@ private:
 	// A map between moveables and the engine entities they represent. This is needed
 	// so that something that is killed by the engine can notify all corresponding
 	// Lua variables which can then become invalid.
-	std::unordered_map<ItemInfo *, std::unordered_set<Moveable*>>	m_moveables{};
+	std::unordered_map<ItemInfo *, std::unordered_set<Moveable*>>	moveables{};
 	std::unordered_map<std::string, VarMapVal>						m_nameMap{};
 	std::unordered_map<std::string, short>	 						m_itemsMapName{};
 	// A set of items that are visible, collidable, and have Lua OnCollide callbacks.
@@ -111,7 +111,7 @@ private:
 
 			auto room = std::get<std::reference_wrapper<ROOM_INFO>>(val).get();
 			
-			if (std::any_of(room.tags.begin(), room.tags.end(),
+			if (std::any_of(room.Tags.begin(), room.Tags.end(),
 				[&tag](const std::string& value) { return value == tag; }))
 			{
 				rooms.push_back(GetByName<Room, ScriptReserved_Room>(key));

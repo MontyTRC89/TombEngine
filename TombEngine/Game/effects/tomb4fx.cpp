@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/effects/tomb4fx.h"
 
-#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
@@ -17,7 +17,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
@@ -29,6 +29,9 @@ using namespace TEN::Effects::Smoke;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
+
+// NOTE: This fixes body part exploding instantly if entity is on ground.
+constexpr auto BODY_PART_SPAWN_VERTICAL_OFFSET = CLICK(1);
 
 char LaserSightActive = 0;
 char LaserSightCol = 0;
@@ -43,12 +46,11 @@ int NextSmokeSpark = 0;
 int NextBlood = 0;
 int NextGunShell = 0;
 
-GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; 
-FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE]; 
-SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE]; 
-GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL]; 
-BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD]; 
-SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE]; 
+FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
+SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
+GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
+BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
+SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 FIRE_LIST Fires[MAX_FIRE_LIST];
 
 int GetFreeFireSpark()
@@ -229,7 +231,7 @@ void TriggerPilotFlame(int itemNumber, int nodeIndex)
 	spark->colFadeSpeed = 12 + (GetRandomControl() & 3);
 	spark->fadeToBlack = 4;
 	spark->sLife = spark->life = (GetRandomControl() & 3) + 20;
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BlendMode::Additive;
 	spark->extras = 0;
 	spark->dynamic = -1;
 	spark->fxObj = itemNumber;
@@ -272,7 +274,7 @@ Particle* SetupPoisonSpark(Vector3 color)
 	spark->dB = 255 * color.z;
 	spark->colFadeSpeed = 14;
 	spark->fadeToBlack = 8;
-	spark->blendMode = BLEND_MODES::BLENDMODE_SCREEN;
+	spark->blendMode = BlendMode::Screen;
 
 	return spark;
 }
@@ -289,7 +291,7 @@ Particle* SetupFireSpark()
 	spark->dB = 32;
 	spark->colFadeSpeed = 12;
 	spark->fadeToBlack = 8;
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BlendMode::Additive;
 
 	return spark;
 }
@@ -645,7 +647,7 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->colFadeSpeed = 4;
 	spark->dShade = (GetRandomControl() & 0x1F) + 64;
 	spark->fadeToBlack = 24 - (GetRandomControl() & 7);
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BlendMode::Additive;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -991,10 +993,10 @@ void UpdateGunShells()
 				!TestEnvironment(ENV_FLAG_WATER, prevRoomNumber))
 			{
 
-				SpawnSplashDrips(Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z), gunshell->roomNumber, 3, true);
+				SpawnSplashDrips(Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].TopHeight, gunshell->pos.Position.z), gunshell->roomNumber, 3, true);
 				//AddWaterSparks(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z, 8);
 				SpawnRipple(
-					Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].maxceiling, gunshell->pos.Position.z),
+					Vector3(gunshell->pos.Position.x, g_Level.Rooms[gunshell->roomNumber].TopHeight, gunshell->pos.Position.z),
 					gunshell->roomNumber,
 					Random::GenerateFloat(8.0f, 12.0f),
 					(int)RippleFlags::SlowFade);
@@ -1063,7 +1065,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->sSize = 8;
 		spark->dSize = 32;
 		spark->scalar = 1;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;	
+		spark->blendMode = BlendMode::Additive;	
 		int random = GetRandomControl() & 0xFFF;
 		spark->xVel = -phd_sin(random << 4) * 128;
 		spark->yVel = -Random::GenerateInt(128, 256);
@@ -1095,7 +1097,7 @@ void SomeSparkEffect(int x, int y, int z, int count)
 		spark->dG = spark->sG >> 1;
 		spark->dB = spark->sB >> 1;
 		spark->sLife = 24;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->friction = 5;
 		int random = GetRandomControl() & 0xFFF;
 		spark->xVel = -128 * phd_sin(random << 4);
@@ -1168,7 +1170,7 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 
 	auto* lara = GetLaraInfo(laraItem);
 
-	ExplodingDeath(lara->Context.Vehicle, BODY_EXPLODE | BODY_STONE_SOUND);
+	ExplodingDeath(lara->Context.Vehicle, BODY_DO_EXPLOSION | BODY_STONE_SOUND);
 	KillItem(lara->Context.Vehicle);
 	vehicle->Status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
@@ -1192,6 +1194,10 @@ void ExplodingDeath(short itemNumber, short flags)
 	
 	auto world = item->Pose.Orientation.ToRotationMatrix();
 
+	// If only BODY_PART_EXPLODE flag exists but not BODY_EXPLODE, add it.
+	if ((flags & BODY_PART_EXPLODE) && !(flags & BODY_DO_EXPLOSION))
+		flags |= BODY_DO_EXPLOSION;
+
 	for (int i = 0; i < obj->nmeshes; i++)
 	{
 		Matrix boneMatrix;
@@ -1203,34 +1209,34 @@ void ExplodingDeath(short itemNumber, short flags)
 
 		item->MeshBits.Clear(i);
 
-		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_EXPLODE)))
+		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_DO_EXPLOSION)))
 		{
 			short fxNumber = CreateNewEffect(item->RoomNumber);
-			if (fxNumber != NO_ITEM)
+			if (fxNumber != NO_VALUE)
 			{
 				FX_INFO* fx = &EffectList[fxNumber];
 
 				fx->pos.Position.x = boneMatrix.Translation().x;
-				fx->pos.Position.y = boneMatrix.Translation().y;
+				fx->pos.Position.y = boneMatrix.Translation().y - BODY_PART_SPAWN_VERTICAL_OFFSET;
 				fx->pos.Position.z = boneMatrix.Translation().z;
 
 				fx->roomNumber = item->RoomNumber;
 				fx->pos.Orientation.x = 0;
-				fx->pos.Orientation.y = GetRandomControl() * 2;
+				fx->pos.Orientation.y = Random::GenerateAngle();
 
-				if (!(flags & 0x10))
+				if (!(flags & BODY_NO_RAND_VELOCITY))
 				{
-					if (flags & 0x20)
+					if (flags & BODY_MORE_RAND_VELOCITY)
 						fx->speed = GetRandomControl() >> 12;
 					else
 						fx->speed = GetRandomControl() >> 8;
 				}
 
-				if (flags & 0x40)
+				if (flags & BODY_NO_VERTICAL_VELOCITY)
 					fx->fallspeed = 0;
 				else
 				{
-					if ((flags & 0x80) == 0)
+					if (flags & BODY_LESS_IMPULSE)
 						fx->fallspeed = -(GetRandomControl() >> 8);
 					else
 						fx->fallspeed = -(GetRandomControl() >> 12);
@@ -1260,7 +1266,7 @@ int GetFreeShockwave()
 	return -1;
 }
 
-void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool sound, bool fadein, int style)
+void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, EulerAngles rotation, short damage, bool hasSound, bool fadein, bool hasLight, int style)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;
@@ -1285,15 +1291,16 @@ void TriggerShockwave(Pose* pos, short innerRad, short outerRad, int speed, unsi
 		sptr->life = life;
 		sptr->sLife = life;
 		sptr->fadeIn = fadein;
+		sptr->HasLight = hasLight;
 		
 		sptr->sr = 0;
 		sptr->sg = 0;
 		sptr->sb = 0;
 		sptr->style = style;
 
-		if (sound)
+		if (hasSound)
 			SoundEffect(SFX_TR4_DEMIGOD_SIREN_SWAVE, pos);
-	}	
+	}
 }
 
 void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel)
@@ -1313,7 +1320,7 @@ void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned ch
 		spark->dR = r;
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 8;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 
 		int speed = (GetRandomControl() & 0xF) + vel;
@@ -1361,6 +1368,14 @@ void UpdateShockwaves()
 
 		shockwave.life--;
 
+		// Spawn light.
+		if (shockwave.HasLight)
+		{
+			auto lightColor = Color(shockwave.r / (float)UCHAR_MAX, shockwave.g / (float)UCHAR_MAX, shockwave.b / (float)UCHAR_MAX);
+			auto pos = Vector3(shockwave.x, shockwave.y, shockwave.z);
+			TriggerDynamicLight(pos, lightColor, shockwave.life / (float)UCHAR_MAX);
+		}
+
 		if (shockwave.style != (int)ShockwaveStyle::Knockback)
 		{
 			shockwave.outerRad += shockwave.speed;
@@ -1386,23 +1401,21 @@ void UpdateShockwaves()
 		if (LaraItem->HitPoints > 0 && shockwave.damage)
 		{
 			const auto& bounds = GetBestFrame(*LaraItem).BoundingBox;
-			auto dx = LaraItem->Pose.Position.x - shockwave.x;
-			auto dz = LaraItem->Pose.Position.z - shockwave.z;
-			auto distance = sqrt(SQUARE(dx) + SQUARE(dz));
-			auto angle = phd_atan(dz, dx);
+			int dx = LaraItem->Pose.Position.x - shockwave.x;
+			int dz = LaraItem->Pose.Position.z - shockwave.z;
+			float dist = sqrt(SQUARE(dx) + SQUARE(dz));
+			int angle = phd_atan(dz, dx);
 
 			// Damage player if inside shockwave.
 			if (shockwave.y > (LaraItem->Pose.Position.y + bounds.Y1) &&
 				shockwave.y < (LaraItem->Pose.Position.y + (bounds.Y2 + CLICK(1))) &&
-				distance > shockwave.innerRad &&
-				distance < shockwave.outerRad)
+				dist > shockwave.innerRad &&
+				dist < shockwave.outerRad)
 			{
-				TriggerShockwaveHitEffect(LaraItem->Pose.Position.x,
-					shockwave.y,
-					LaraItem->Pose.Position.z,
+				TriggerShockwaveHitEffect(
+					LaraItem->Pose.Position.x, shockwave.y, LaraItem->Pose.Position.z,
 					shockwave.r, shockwave.g, shockwave.b,
-					angle,
-					shockwave.speed);
+					angle, shockwave.speed);
 				DoDamage(LaraItem, shockwave.damage);
 			}
 		}
@@ -1425,7 +1438,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	spark->sB = 0;
 	spark->colFadeSpeed = 8;
 	spark->fadeToBlack = 12;
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BlendMode::Additive;
 	spark->x = x;
 	spark->y = y;
 	spark->z = z;
@@ -1480,7 +1493,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	spark->life = spark->sLife = (GetRandomControl() & 0x1F) + 96;
 
 	if (unk)
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BlendMode::Additive;
 	else
 		spark->blendMode = 3;
 
@@ -1555,7 +1568,7 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 
 	spark->life = (GetRandomControl() & 7) + 24;
 	spark->sLife = (GetRandomControl() & 7) + 24;
-	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BlendMode::Additive;
 	spark->dynamic = -1;
 
 	spark->x = x;
@@ -1598,7 +1611,7 @@ void TriggerSmallSplash(int x, int y, int z, int number)
 		sptr->life = 24;
 		sptr->sLife = 24;
 
-		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BlendMode::Additive;
 
 		int angle = GetRandomControl() << 3;
 

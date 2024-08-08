@@ -25,10 +25,10 @@ namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto SMAN_WAIT_RANGE = SQUARE(BLOCK(4));
 
-	const auto SkidooBiteLeft  = CreatureBiteInfo(Vector3i(240, -80, 540), 0);
-	const auto SkidooBiteRight = CreatureBiteInfo(Vector3i(-240, -80, 540), 0);
-	const auto SkidooBiteSmokeLeft	= CreatureBiteInfo(Vector3i(240, -80, 450), 0);
-	const auto SkidooBiteSmokeRight = CreatureBiteInfo(Vector3i(-240, -80, 450), 0);
+	const auto SkidooBiteLeft  = CreatureBiteInfo(Vector3(240, -80, 540), 0);
+	const auto SkidooBiteRight = CreatureBiteInfo(Vector3(-240, -80, 540), 0);
+	const auto SkidooBiteSmokeLeft	= CreatureBiteInfo(Vector3(240, -80, 450), 0);
+	const auto SkidooBiteSmokeRight = CreatureBiteInfo(Vector3(-240, -80, 450), 0);
 
 	constexpr auto SKIDOO_MAN_TURN_RATE_MIN = ANGLE(2.0f);
 	constexpr auto SKIDOO_MAN_TARGET_ANGLE	= ANGLE(30.0f);
@@ -54,7 +54,7 @@ namespace TEN::Entities::Creatures::TR2
 	static void CreateSkidooGun(ItemInfo& riderItem)
 	{
 		int skidooItemNumber = CreateItem();
-		if (skidooItemNumber == NO_ITEM)
+		if (skidooItemNumber == NO_VALUE)
 		{
 			TENLog("Failed to create ID_SNOWMOBILE_GUN from ID_SNOWMOBILE_DRIVER.", LogLevel::Warning);
 			return;
@@ -72,7 +72,7 @@ namespace TEN::Entities::Creatures::TR2
 		InitializeItem(skidooItemNumber); g_Level.NumItems++;
 
 		// Register snowmobile gun for driver to control.
-		riderItem.Data = skidooItemNumber;
+		riderItem.ItemFlags[0] = skidooItemNumber;
 	}
 
 	void InitializeSkidooMan(short itemNumber)
@@ -111,25 +111,28 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		if (Lara.Context.Vehicle == NO_ITEM && item.Animation.Velocity.z > 0.0f)
+		if (Lara.Context.Vehicle == NO_VALUE && item.Animation.Velocity.z > 0.0f)
 			DoDamage(laraItem, 100);
 	}
 
 	void SkidooManControl(short riderItemNumber)
 	{
 		auto& riderItem = g_Level.Items[riderItemNumber];
-		if (!riderItem.Data)
+		if (!riderItem.ItemFlags[0])
 		{
 			// Create snowmobile.
 			CreateSkidooGun(riderItem);
-			if (!riderItem.Data)
+			if (!riderItem.ItemFlags[0])
 				TENLog("Skidoo rider data does not contain skidoo item ID.", LogLevel::Error);
 
 			return;
 		}
 
-		int skidooItemNumber = (short)riderItem.Data;
+		int skidooItemNumber = (short)riderItem.ItemFlags[0];
 		auto* skidooItem = &g_Level.Items[skidooItemNumber];
+
+		if (!CreatureActive(skidooItemNumber))
+			return;
 
 		if (!skidooItem->Data)
 		{
@@ -250,7 +253,7 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			if (creature->Flags == 0 && abs(ai.angle) < SKIDOO_MAN_TARGET_ANGLE && creature->Enemy->HitPoints > 0)
 			{
-				int damage = (creature->Enemy->IsLara() && GetLaraInfo(creature->Enemy)->Context.Vehicle != NO_ITEM) ? 10 : 50;
+				int damage = (creature->Enemy->IsLara() && GetLaraInfo(creature->Enemy)->Context.Vehicle != NO_VALUE) ? 10 : 50;
 				
 				ShotLara(skidooItem, &ai, SkidooBiteLeft, 0, damage);
 

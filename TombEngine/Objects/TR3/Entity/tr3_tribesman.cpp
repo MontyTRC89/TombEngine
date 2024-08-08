@@ -24,9 +24,9 @@ namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto TRIBESMAN_DART_DAMAGE = -25; // NOTE: Negative value gives poison.
 
-	const auto TribesmanAxeBite	  = CreatureBiteInfo(Vector3i(0, 56, 265), 13);
-	const auto TribesmanDartBite1 = CreatureBiteInfo(Vector3i(0, 0, -200), 13);
-	const auto TribesmanDartBite2 = CreatureBiteInfo(Vector3i(8, 40, -248), 13);
+	const auto TribesmanAxeBite	  = CreatureBiteInfo(Vector3(0, 56, 265), 13);
+	const auto TribesmanDartBite1 = CreatureBiteInfo(Vector3(0, 0, -200), 13);
+	const auto TribesmanDartBite2 = CreatureBiteInfo(Vector3(8, 40, -248), 13);
 	const auto TribesmanAxeAttackJoints	 = std::vector<unsigned int>{ 13 };
 	const auto TribesmanDartAttackJoints = std::vector<unsigned int>{ 10, 13 }; // TODO: Check.
 
@@ -132,7 +132,7 @@ namespace TEN::Entities::Creatures::TR3
 			GetCreatureMood(item, &AI, true);
 
 			if (creature->Enemy == LaraItem &&
-				creature->HurtByLara && AI.distance > pow(SECTOR(3), 2) &&
+				creature->HurtByLara && AI.distance > pow(BLOCK(3), 2) &&
 				AI.enemyFacing < ANGLE(67.0f) && AI.enemyFacing > -ANGLE(67.0f))
 			{
 				creature->Mood = MoodType::Escape;
@@ -174,14 +174,14 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_AXE_ATTACK;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(1), 2))
 				{
 					if (Random::TestProbability(1 / 2.0f))
 						item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 					else
 						item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_AXE_ATTACK;
 				}
-				else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+				else if (AI.ahead && AI.distance < pow(BLOCK(2), 2))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}
@@ -217,7 +217,7 @@ namespace TEN::Entities::Creatures::TR3
 					else
 						item->Animation.TargetState = TRIBESMAN_STATE_AXE_ATTACK_HIGH_START;
 				}
-				else if (AI.distance < pow(SECTOR(2), 2))
+				else if (AI.distance < pow(BLOCK(2), 2))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}
@@ -256,7 +256,7 @@ namespace TEN::Entities::Creatures::TR3
 					else
 						item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 				}
-				else if (AI.distance > pow(SECTOR(2), 2))
+				else if (AI.distance > pow(BLOCK(2), 2))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
 				}
@@ -284,7 +284,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 				}
-				else if (AI.bite || AI.distance < pow(SECTOR(2), 2))
+				else if (AI.bite || AI.distance < pow(BLOCK(2), 2))
 				{
 					if (Random::TestProbability(1 / 2.0f))
 					{
@@ -338,7 +338,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (creature->Enemy != nullptr)
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f) &&
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f) &&
 							creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
 							creature->Flags <= TribesmanAxeHit[item->Animation.ActiveState][1])
 						{
@@ -363,7 +363,7 @@ namespace TEN::Entities::Creatures::TR3
 	void TribesmanShotDart(ItemInfo* item)
 	{
 		int dartItemNumber = CreateItem();
-		if (dartItemNumber == NO_ITEM)
+		if (dartItemNumber == NO_VALUE)
 			return;
 		
 		auto* dartItem = &g_Level.Items[dartItemNumber];
@@ -391,8 +391,7 @@ namespace TEN::Entities::Creatures::TR3
 		pos1.z += 96;
 		pos1 = GetJointPosition(item, TribesmanDartBite2.BoneID, pos1);
 
-		TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, true);
-		TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, true);
+		SpawnDartSmoke(pos1.ToVector3(), Vector3::Zero, true);
 	}
 
 	void TribemanDartsControl(short itemNumber)
@@ -405,8 +404,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		short angle = 0;
 		short tilt = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (item->HitPoints <= 0)
 		{
@@ -446,8 +445,8 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			if (item->HitStatus ||
-				(creature->Enemy == LaraItem && (AI.distance < pow(SECTOR(1), 2) ||
-					TargetVisible(item, &AI)) && (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(2))))
+				(creature->Enemy == LaraItem && (AI.distance < pow(BLOCK(1), 2) ||
+					TargetVisible(item, &AI)) && (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < BLOCK(2))))
 			{
 				AlertAllGuards(itemNumber);
 			}
@@ -483,11 +482,11 @@ namespace TEN::Entities::Creatures::TR3
 					else
 						item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(0.5f), 2))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(2), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(2), 2))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}
@@ -532,11 +531,11 @@ namespace TEN::Entities::Creatures::TR3
 					else
 						item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(0.5f), 2))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_AXE_ATTACK_HIGH_CONTINUE;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(2), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(2), 2))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}
@@ -558,11 +557,11 @@ namespace TEN::Entities::Creatures::TR3
 			case TRIBESMAN_STATE_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(9.0f);
 
-				if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
+				if (AI.bite && AI.distance < pow(BLOCK(0.5f), 2))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 				}
-				else if (AI.bite && AI.distance < pow(SECTOR(2), 2))
+				else if (AI.bite && AI.distance < pow(BLOCK(2), 2))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_WALK_FORWARD;
 				}
@@ -589,7 +588,7 @@ namespace TEN::Entities::Creatures::TR3
 						item->Animation.TargetState = TRIBESMAN_STATE_CROUCH_IDLE;
 					}
 				}
-				else if (AI.distance > pow(SECTOR(2), 2))
+				else if (AI.distance > pow(BLOCK(2), 2))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_RUN_FORWARD;
 				}
@@ -601,7 +600,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->Flags &= 0x0FFF;
 				tilt = angle / 4;
 
-				if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
+				if (AI.bite && AI.distance < pow(BLOCK(0.5f), 2))
 				{
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 				}
@@ -626,7 +625,7 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case TRIBESMAN_STATE_AXE_ATTACK_HIGH_START:
-				if (!AI.bite || AI.distance > pow(SECTOR(0.5f), 2))
+				if (!AI.bite || AI.distance > pow(BLOCK(0.5f), 2))
 					item->Animation.TargetState = TRIBESMAN_STATE_IDLE;
 				else
 					item->Animation.TargetState = TRIBESMAN_STATE_AXE_ATTACK_HIGH_CONTINUE;
@@ -679,7 +678,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (creature->Enemy != nullptr && !(creature->Flags & 0xf000))
 					{
-						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= SECTOR(0.5f))
+						if (Vector3i::Distance(item->Pose.Position, creature->Enemy->Pose.Position) <= BLOCK(0.5f))
 						{
 							DoDamage(creature->Enemy, 5);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);

@@ -6,7 +6,10 @@
 #include "Game/animation.h"
 #include "Sound/sound.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/debris.h"
+
+using namespace TEN::Collision::Point;
 
 void ClockworkBeetleControl(short itemNumber)
 {
@@ -31,7 +34,7 @@ void ClockworkBeetleControl(short itemNumber)
 			beetle->Pose.Position = pos;
 			beetle->Status = ITEM_ACTIVE;
 			beetle->Pose.Orientation.y = LaraItem->Pose.Orientation.y;
-			beetle->Pose.Orientation.z = -0x31C4;
+			beetle->Pose.Orientation.z = ANGLE(-70.0f);
 			return;
 		}
 
@@ -88,10 +91,8 @@ void ClockworkBeetleControl(short itemNumber)
 		{
 			int x, z;
 
-			x = (beetle->Pose.Position.x & -CLICK(2)) | 0x200;
-			z = (beetle->Pose.Position.z & -CLICK(2)) | 0x200;
-			x -= beetle->Pose.Position.x;
-			z -= beetle->Pose.Position.z;
+			x = ((beetle->Pose.Position.x & -CLICK(2)) | CLICK(2)) - beetle->Pose.Position.x;
+			z = ((beetle->Pose.Position.z & -CLICK(2)) | CLICK(2)) - beetle->Pose.Position.z;
 
 			if (x <= -8 || z <= -8 || x >= 8 || z >= 8)
 			{
@@ -168,7 +169,7 @@ void ClockworkBeetleControl(short itemNumber)
 					beetle->ItemFlags[2] = 5;
 					short itemRoom = g_Level.Rooms[beetle->RoomNumber].itemNumber;
 
-					if (itemRoom != NO_ITEM)
+					if (itemRoom != NO_VALUE)
 					{
 						ItemInfo* item;
 						short nextItem;
@@ -184,9 +185,9 @@ void ClockworkBeetleControl(short itemNumber)
 								int dy = beetle->Pose.Position.y - item->Pose.Position.y;
 								int dz = beetle->Pose.Position.z - item->Pose.Position.z;
 
-								if (dx > -SECTOR(1) && dx < SECTOR(1) &&
-									dz > -SECTOR(1) && dz < SECTOR(1) &&
-									dy > -SECTOR(1) && dy < SECTOR(1))
+								if (dx > -BLOCK(1) && dx < BLOCK(1) &&
+									dz > -BLOCK(1) && dz < BLOCK(1) &&
+									dy > -BLOCK(1) && dy < BLOCK(1))
 								{
 									break;
 								}
@@ -194,7 +195,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 							itemRoom = nextItem;
 
-							if (itemRoom == NO_ITEM)
+							if (itemRoom == NO_VALUE)
 								return;
 						}
 
@@ -309,7 +310,7 @@ void UseClockworkBeetle(short flag)
 	{
 		short itemNumber = CreateItem();
 
-		if (itemNumber != NO_ITEM)
+		if (itemNumber != NO_VALUE)
 		{
 			auto* item = &g_Level.Items[itemNumber];
 
@@ -325,7 +326,7 @@ void UseClockworkBeetle(short flag)
 			item->Pose.Orientation.z = 0;
 
 			if (Lara.Inventory.BeetleLife)
-				item->ItemFlags[0] = GetCollision(item).Block->Flags.MarkBeetle;
+				item->ItemFlags[0] = GetPointCollision(*item).GetSector().Flags.MarkBeetle;
 			else
 				item->ItemFlags[0] = 0;
 
@@ -337,7 +338,7 @@ void UseClockworkBeetle(short flag)
 				ItemInfo* item2;
 				short itemRoom = g_Level.Rooms[item->RoomNumber].itemNumber;
 
-				if (itemRoom != NO_ITEM)
+				if (itemRoom != NO_VALUE)
 				{
 					while (true)
 					{
@@ -350,9 +351,9 @@ void UseClockworkBeetle(short flag)
 							int dy = item->Pose.Position.y - item2->Pose.Position.y;
 							int dz = item->Pose.Position.z - item2->Pose.Position.z;
 
-							if (dx > -SECTOR(1) && dx < SECTOR(1) &&
-								dz > -SECTOR(1) && dz < SECTOR(1) &&
-								dy > -SECTOR(1) && dy < SECTOR(1))
+							if (dx > -BLOCK(1) && dx < BLOCK(1) &&
+								dz > -BLOCK(1) && dz < BLOCK(1) &&
+								dy > -BLOCK(1) && dy < BLOCK(1))
 							{
 								break;
 							}
@@ -360,7 +361,7 @@ void UseClockworkBeetle(short flag)
 
 						itemRoom = nextItem;
 
-						if (itemRoom == NO_ITEM)
+						if (itemRoom == NO_VALUE)
 						{
 							if (!item->ItemFlags[0])
 								item->ItemFlags[3] = 150;
@@ -369,7 +370,7 @@ void UseClockworkBeetle(short flag)
 						}
 					}
 
-					item->ItemFlags[1] = item2->Pose.Orientation.y + 0x8000;
+					item->ItemFlags[1] = item2->Pose.Orientation.y + ANGLE(180.0f);
 
 					if (item2->ItemFlags[0])
 						item->ItemFlags[0] = 0;

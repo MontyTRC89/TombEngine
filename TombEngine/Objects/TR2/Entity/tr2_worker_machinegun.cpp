@@ -13,7 +13,7 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto WorkerMachineGunBite = CreatureBiteInfo(Vector3i(0, 380, 37), 9);
+	const auto WorkerMachineGunBite = CreatureBiteInfo(Vector3(0, 380, 37), 9);
 
 	// TODO
 	enum WorkerMachineGunState
@@ -54,8 +54,8 @@ namespace TEN::Entities::Creatures::TR2
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;

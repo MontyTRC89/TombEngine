@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Objects/NamedBase.h"
-#include "Objects/Room/RoomObject.h"
+#include "Scripting/Internal/TEN/Objects/NamedBase.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 #include "Specific/level.h"
 
 namespace sol {
@@ -20,7 +20,7 @@ public:
 	AIObject& operator=(AIObject const& other) = delete;
 	AIObject(AIObject const& other) = delete;
 
-	static void Register(sol::table & parent);
+	static void Register(sol::table& parent);
 
 	Vec3 GetPos() const;
 	void SetPos(Vec3 const& pos);

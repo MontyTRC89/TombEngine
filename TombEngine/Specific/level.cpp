@@ -20,7 +20,7 @@
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
 #include "Objects/Sink.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
@@ -33,10 +33,54 @@ using TEN::Renderer::g_Renderer;
 
 using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
+using namespace TEN::Utils;
+
+const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
+{
+	ID_EXPANDING_PLATFORM,
+
+	ID_FALLING_BLOCK,
+	ID_FALLING_BLOCK2,
+	ID_CRUMBLING_FLOOR,
+	ID_TRAPDOOR1,
+	ID_TRAPDOOR2,
+	ID_TRAPDOOR3,
+	ID_FLOOR_TRAPDOOR1,
+	ID_FLOOR_TRAPDOOR2,
+	ID_CEILING_TRAPDOOR1,
+	ID_CEILING_TRAPDOOR2,
+	ID_SCALING_TRAPDOOR,
+
+	ID_ONEBLOCK_PLATFORM,
+	ID_TWOBLOCK_PLATFORM,
+	ID_RAISING_BLOCK1,
+	ID_RAISING_BLOCK2,
+	ID_RAISING_BLOCK3,
+	ID_RAISING_BLOCK4,
+
+	ID_PUSHABLE_OBJECT_CLIMBABLE1,
+	ID_PUSHABLE_OBJECT_CLIMBABLE2,
+	ID_PUSHABLE_OBJECT_CLIMBABLE3,
+	ID_PUSHABLE_OBJECT_CLIMBABLE4,
+	ID_PUSHABLE_OBJECT_CLIMBABLE5,
+	ID_PUSHABLE_OBJECT_CLIMBABLE6,
+	ID_PUSHABLE_OBJECT_CLIMBABLE7,
+	ID_PUSHABLE_OBJECT_CLIMBABLE8,
+	ID_PUSHABLE_OBJECT_CLIMBABLE9,
+	ID_PUSHABLE_OBJECT_CLIMBABLE10,
+
+	ID_BRIDGE_FLAT,
+	ID_BRIDGE_TILT1,
+	ID_BRIDGE_TILT2,
+	ID_BRIDGE_TILT3,
+	ID_BRIDGE_TILT4,
+	ID_BRIDGE_CUSTOM
+};
 
 char* LevelDataPtr;
 std::vector<int> MoveablesIds;
 std::vector<int> StaticObjectsIds;
+std::vector<int> SpriteSequencesIds;
 LEVEL g_Level;
 
 unsigned char ReadUInt8()
@@ -140,7 +184,7 @@ std::string ReadString()
 {
 	auto numBytes = ReadLEB128(false);
 
-	if (!numBytes)
+	if (numBytes <= 0)
 		return std::string();
 	else
 	{
@@ -159,7 +203,7 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	InitializeItemArray(NUM_ITEMS);
+	InitializeItemArray(ITEM_COUNT_MAX);
 
 	if (g_Level.NumItems > 0)
 	{
@@ -187,15 +231,37 @@ void LoadItems()
 			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
 		}
 
-		for (int i = 0; i < g_Level.NumItems; i++)
-			InitializeItem(i);
+		// Initialize items.
+		for (int i = 0; i <= 1; i++)
+		{
+			// HACK: Initialize bridges first. Required because other items need final floordata to init properly.
+			if (i == 0)
+			{
+				for (int j = 0; j < g_Level.NumItems; j++)
+				{
+					const auto& item = g_Level.Items[j];
+					if (Contains(BRIDGE_OBJECT_IDS, item.ObjectNumber))
+						InitializeItem(j);
+				}
+			}
+			// Initialize non-bridge items second.
+			else if (i == 1)
+			{
+				for (int j = 0; j < g_Level.NumItems; j++)
+				{
+					const auto& item = g_Level.Items[j];
+					if (!item.IsBridge())
+						InitializeItem(j);
+				}
+			}
+		}
 	}
 }
 
 void LoadObjects()
 {
-	std::memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
-	std::memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
+	Objects.Initialize();
+	std::memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
 	TENLog("Num meshes: " + std::to_string(numMeshes), LogLevel::Info);
@@ -205,7 +271,7 @@ void LoadObjects()
 	{
 		MESH mesh;
 
-		mesh.lightMode = (LIGHT_MODES)ReadUInt8();
+		mesh.lightMode = (LightMode)ReadUInt8();
 
 		mesh.sphere.Center.x = ReadFloat();
 		mesh.sphere.Center.y = ReadFloat();
@@ -233,7 +299,7 @@ void LoadObjects()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = (BLEND_MODES)ReadUInt8();
+			bucket.blendMode = (BlendMode)ReadUInt8();
 			bucket.animated = ReadBool();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
@@ -253,7 +319,7 @@ void LoadObjects()
 				poly.textureCoordinates.resize(count);
 				poly.normals.resize(count);
 				poly.tangents.resize(count);
-				poly.bitangents.resize(count);
+				poly.binormals.resize(count);
 				
 				for (int n = 0; n < count; n++)
 					poly.indices[n] = ReadInt32();
@@ -264,7 +330,7 @@ void LoadObjects()
 				for (int n = 0; n < count; n++)
 					poly.tangents[n] = ReadVector3();
 				for (int n = 0; n < count; n++)
-					poly.bitangents[n] = ReadVector3();
+					poly.binormals[n] = ReadVector3();
 
 				bucket.polygons.push_back(poly);
 
@@ -374,6 +440,15 @@ void LoadObjects()
 	for (int i = 0; i < numStatics; i++)
 	{
 		int meshID = ReadInt32();
+
+		if (meshID >= MAX_STATICS)
+		{
+			TENLog("Static with ID " + std::to_string(meshID) + " detected, while maximum is " + std::to_string(MAX_STATICS) + ". " +
+				   "Change static mesh ID in WadTool to a value below maximum.", LogLevel::Warning);
+			
+			meshID = 0;
+		}
+
 		StaticObjectsIds.push_back(meshID);
 
 		StaticObjects[meshID].meshNumber = (short)ReadInt32();
@@ -394,12 +469,9 @@ void LoadObjects()
 
 		StaticObjects[meshID].flags = (short)ReadInt16();
 
-		StaticObjects[meshID].shatterType = (short)ReadInt16();
+		StaticObjects[meshID].shatterType = (ShatterType)ReadInt16();
 		StaticObjects[meshID].shatterSound = (short)ReadInt16();
 	}
-
-	// HACK: to remove after decompiling LoadSprites
-	MoveablesIds.push_back(ID_DEFAULT_SPRITES);
 }
 
 void LoadCameras()
@@ -425,6 +497,7 @@ void LoadCameras()
 
 	NumberSpotcams = ReadInt32();
 
+	// TODO: Read properly!
 	if (NumberSpotcams != 0)
 		ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
 
@@ -581,153 +654,183 @@ void LoadTextures()
 	ReadBytes(g_Level.SkyTexture.colorMapData.data(), size);
 }
 
+// The way floordata "planes" were previously stored was non-standard.
+// Instead of a Plane object with a normal + distance,
+// they used a Vector3 object with data laid out as follows:
+// x: X tilt grade (0.25f = 1/4 block).
+// y: Z tilt grade (0.25f = 1/4 block).
+// z: Plane's absolute height at the sector's center (i.e. distance in regular plane terms).
+static Plane ConvertFakePlaneToPlane(const Vector3& fakePlane, bool isFloor)
+{
+	// Calculate normal from tilt grades.
+	int sign = isFloor ? -1 : 1;
+	auto normal = Vector3(-fakePlane.x, 1.0f, -fakePlane.y) * sign;
+	normal.Normalize();
+
+	// Determine distance.
+	float dist = fakePlane.z;
+
+	// Return plane.
+	return Plane(normal, dist);
+}
+
 void ReadRooms()
 {
-	int numRooms = ReadInt32();
-	TENLog("Num rooms: " + std::to_string(numRooms), LogLevel::Info);
+	constexpr auto ILLEGAL_FLOOR_SLOPE_ANGLE   = ANGLE(36.0f);
+	constexpr auto ILLEGAL_CEILING_SLOPE_ANGLE = ANGLE(45.0f);
 
-	g_Level.Rooms.reserve(numRooms);
-	for (int i = 0; i < numRooms; i++)
+	int roomCount = ReadInt32();
+	TENLog("Rooms: " + std::to_string(roomCount), LogLevel::Info);
+
+	g_Level.Rooms.reserve(roomCount);
+	for (int i = 0; i < roomCount; i++)
 	{
 		auto& room = g_Level.Rooms.emplace_back();
 		
-		room.name = ReadString();
-		int numTags = ReadInt32();
-		for (int j = 0; j < numTags; j++)
-			room.tags.push_back(ReadString());
+		room.Name = ReadString();
+
+		int tagCount = ReadInt32();
+		for (int j = 0; j < tagCount; j++)
+			room.Tags.push_back(ReadString());
 		
-		room.x = ReadInt32();
-		room.y = 0;
-		room.z = ReadInt32();
-		room.minfloor = ReadInt32();
-		room.maxceiling = ReadInt32();
+		room.Position.x = ReadInt32();
+		room.Position.y = 0;
+		room.Position.z = ReadInt32();
+		room.BottomHeight = ReadInt32();
+		room.TopHeight = ReadInt32();
 
-		int numVertices = ReadInt32();
+		int vertexCount = ReadInt32();
 
-		room.positions.reserve(numVertices);
-		for (int j = 0; j < numVertices; j++)
+		room.positions.reserve(vertexCount);
+		for (int j = 0; j < vertexCount; j++)
 			room.positions.push_back(ReadVector3());
 
-		room.colors.reserve(numVertices);
-		for (int j = 0; j < numVertices; j++)
+		room.colors.reserve(vertexCount);
+		for (int j = 0; j < vertexCount; j++)
 			room.colors.push_back(ReadVector3());
 
-		room.effects.reserve(numVertices);
-		for (int j = 0; j < numVertices; j++)
+		room.effects.reserve(vertexCount);
+		for (int j = 0; j < vertexCount; j++)
 			room.effects.push_back(ReadVector3());
 
-		int numBuckets = ReadInt32();
-		room.buckets.reserve(numBuckets);
-		for (int j = 0; j < numBuckets; j++)
+		int bucketCount = ReadInt32();
+		room.buckets.reserve(bucketCount);
+		for (int j = 0; j < bucketCount; j++)
 		{
-			BUCKET bucket;
+			auto bucket = BUCKET{};
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = (BLEND_MODES)ReadUInt8();
+			bucket.blendMode = (BlendMode)ReadUInt8();
 			bucket.animated = ReadBool();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
 
-			int numPolygons = ReadInt32();
-			bucket.polygons.reserve(numPolygons);
-			for (int k = 0; k < numPolygons; k++)
+			int polyCount = ReadInt32();
+			bucket.polygons.reserve(polyCount);
+			for (int k = 0; k < polyCount; k++)
 			{
-				POLYGON poly;
+				auto poly = POLYGON{};
 				
 				poly.shape = ReadInt32();
 				poly.animatedSequence = ReadInt32();
 				poly.animatedFrame = ReadInt32();
+
 				int count = (poly.shape == 0 ? 4 : 3);
 				poly.indices.resize(count);
 				poly.textureCoordinates.resize(count);
 				poly.normals.resize(count);
 				poly.tangents.resize(count);
-				poly.bitangents.resize(count);
+				poly.binormals.resize(count);
+
+				for (int l = 0; l < count; l++)
+					poly.indices[l] = ReadInt32();
 
 				for (int n = 0; n < count; n++)
-					poly.indices[n] = ReadInt32();
-				for (int n = 0; n < count; n++)
 					poly.textureCoordinates[n] = ReadVector2();
+
 				for (int n = 0; n < count; n++)
 					poly.normals[n] = ReadVector3();
+
 				for (int n = 0; n < count; n++)
 					poly.tangents[n] = ReadVector3();
+
 				for (int n = 0; n < count; n++)
-					poly.bitangents[n] = ReadVector3();
+					poly.binormals[n] = ReadVector3();
 
 				bucket.polygons.push_back(poly);
 
-				if (poly.shape == 0)
-					bucket.numQuads++;
-				else
-					bucket.numTriangles++;
+				(poly.shape == 0) ? bucket.numQuads++ : bucket.numTriangles++;
 			}
 
 			room.buckets.push_back(bucket);
 		}
 
-		int numPortals = ReadInt32();
-		for (int j = 0; j < numPortals; j++)
+		int portalCount = ReadInt32();
+		for (int j = 0; j < portalCount; j++)
 			LoadPortal(room);
 
-		room.zSize = ReadInt32();
-		room.xSize = ReadInt32();
+		room.ZSize = ReadInt32();
+		room.XSize = ReadInt32();
+		auto roomPos = Vector2i(room.Position.x, room.Position.z);
 
-		room.floor.reserve(room.zSize * room.xSize);
-
-		for (int j = 0; j < room.zSize * room.xSize; j++)
+		room.Sectors.reserve(room.XSize * room.ZSize);
+		for (int x = 0; x < room.XSize; x++)
 		{
-			FloorInfo floor;
+			for (int z = 0; z < room.ZSize; z++)
+			{
+				auto sector = FloorInfo{};
 
-			floor.TriggerIndex = ReadInt32();
-			floor.Box = ReadInt32();
-			floor.Material = (MaterialType)ReadInt32();
-			floor.Stopper = (bool)ReadInt32();
+				sector.Position = roomPos + Vector2i(BLOCK(x), BLOCK(z));
+				sector.RoomNumber = i;
 
-			floor.FloorCollision.SplitAngle = ReadFloat();
-			floor.FloorCollision.Portals[0] = ReadInt32();
-			floor.FloorCollision.Portals[1] = ReadInt32();
-			floor.FloorCollision.Planes[0].x = ReadFloat();
-			floor.FloorCollision.Planes[0].y = ReadFloat();
-			floor.FloorCollision.Planes[0].z = ReadFloat();
-			floor.FloorCollision.Planes[1].x = ReadFloat();
-			floor.FloorCollision.Planes[1].y = ReadFloat();
-			floor.FloorCollision.Planes[1].z = ReadFloat();
-			floor.CeilingCollision.SplitAngle = ReadFloat();
-			floor.CeilingCollision.Portals[0] = ReadInt32();
-			floor.CeilingCollision.Portals[1] = ReadInt32();
-			floor.CeilingCollision.Planes[0].x = ReadFloat();
-			floor.CeilingCollision.Planes[0].y = ReadFloat();
-			floor.CeilingCollision.Planes[0].z = ReadFloat();
-			floor.CeilingCollision.Planes[1].x = ReadFloat();
-			floor.CeilingCollision.Planes[1].y = ReadFloat();
-			floor.CeilingCollision.Planes[1].z = ReadFloat();
-			floor.WallPortal = ReadInt32();
+				sector.TriggerIndex = ReadInt32();
+				sector.PathfindingBoxID = ReadInt32();
 
-			floor.Flags.Death = ReadBool();
-			floor.Flags.Monkeyswing = ReadBool();
-			floor.Flags.ClimbNorth = ReadBool();
-			floor.Flags.ClimbSouth = ReadBool();
-			floor.Flags.ClimbEast = ReadBool();
-			floor.Flags.ClimbWest = ReadBool();
-			floor.Flags.MarkTriggerer = ReadBool();
-			floor.Flags.MarkTriggererActive = 0; // TODO: IT NEEDS TO BE WRITTEN/READ FROM SAVEGAMES!
-			floor.Flags.MarkBeetle = ReadBool();
+				sector.FloorSurface.Triangles[0].Material =
+				sector.FloorSurface.Triangles[1].Material =
+				sector.CeilingSurface.Triangles[0].Material =
+				sector.CeilingSurface.Triangles[1].Material = (MaterialType)ReadInt32();
 
-			floor.Room = i;
+				sector.Stopper = (bool)ReadInt32();
 
-			room.floor.push_back(floor);
+				sector.FloorSurface.SplitAngle = FROM_RAD(ReadFloat());
+				sector.FloorSurface.Triangles[0].SteepSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+				sector.FloorSurface.Triangles[1].SteepSlopeAngle = ILLEGAL_FLOOR_SLOPE_ANGLE;
+				sector.FloorSurface.Triangles[0].PortalRoomNumber = ReadInt32();
+				sector.FloorSurface.Triangles[1].PortalRoomNumber = ReadInt32();
+				sector.FloorSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
+				sector.FloorSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), true);
+
+				sector.CeilingSurface.SplitAngle = FROM_RAD(ReadFloat());
+				sector.CeilingSurface.Triangles[0].SteepSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+				sector.CeilingSurface.Triangles[1].SteepSlopeAngle = ILLEGAL_CEILING_SLOPE_ANGLE;
+				sector.CeilingSurface.Triangles[0].PortalRoomNumber = ReadInt32();
+				sector.CeilingSurface.Triangles[1].PortalRoomNumber = ReadInt32();
+				sector.CeilingSurface.Triangles[0].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
+				sector.CeilingSurface.Triangles[1].Plane = ConvertFakePlaneToPlane(ReadVector3(), false);
+
+				sector.SidePortalRoomNumber = ReadInt32();
+				sector.Flags.Death = ReadBool();
+				sector.Flags.Monkeyswing = ReadBool();
+				sector.Flags.ClimbNorth = ReadBool();
+				sector.Flags.ClimbSouth = ReadBool();
+				sector.Flags.ClimbEast = ReadBool();
+				sector.Flags.ClimbWest = ReadBool();
+				sector.Flags.MarkTriggerer = ReadBool();
+				sector.Flags.MarkTriggererActive = 0; // TODO: Needs to be written to and read from savegames.
+				sector.Flags.MarkBeetle = ReadBool();
+
+				room.Sectors.push_back(sector);
+			}
 		}
 
-		room.ambient.x = ReadFloat();
-		room.ambient.y = ReadFloat();
-		room.ambient.z = ReadFloat();
+		room.ambient = ReadVector3();
 
-		int numLights = ReadInt32();
-		room.lights.reserve(numLights);
-		for (int j = 0; j < numLights; j++)
+		int lightCount = ReadInt32();
+		room.lights.reserve(lightCount);
+		for (int j = 0; j < lightCount; j++)
 		{
-			ROOM_LIGHT light;
+			auto light = ROOM_LIGHT{};
 
 			light.x = ReadInt32();
 			light.y = ReadInt32();
@@ -749,9 +852,9 @@ void ReadRooms()
 			room.lights.push_back(light);
 		}
 		
-		int numStatics = ReadInt32();
-		room.mesh.reserve(numStatics);
-		for (int j = 0; j < numStatics; j++)
+		int staticCount = ReadInt32();
+		room.mesh.reserve(staticCount);
+		for (int j = 0; j < staticCount; j++)
 		{
 			auto& mesh = room.mesh.emplace_back();
 
@@ -772,26 +875,25 @@ void ReadRooms()
 			g_GameScriptEntities->AddName(mesh.Name, mesh);
 		}
 
-		int numTriggerVolumes = ReadInt32();
-
-		// Reserve in advance so the vector doesn't resize itself and leave anything
-		// in the script name-to-reference map obsolete.
-		room.triggerVolumes.reserve(numTriggerVolumes);
-		for (int j = 0; j < numTriggerVolumes; j++)
+		int triggerVolumeCount = ReadInt32();
+		room.TriggerVolumes.reserve(triggerVolumeCount);
+		for (int j = 0; j < triggerVolumeCount; j++)
 		{
-			auto& volume = room.triggerVolumes.emplace_back();
+			auto& volume = room.TriggerVolumes.emplace_back();
 
 			volume.Type = (VolumeType)ReadInt32();
 
-			// NOTE: Braces are necessary to ensure correct value init order.
-			auto pos = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
-			auto orient = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
-			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
+			auto pos = ReadVector3();
+			auto orient = ReadVector4();
+			auto scale = ReadVector3();
+
+			volume.Enabled = ReadBool();
+			volume.DetectInAdjacentRooms = ReadBool();
 
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
-			volume.Box    = BoundingOrientedBox(pos, scale, orient);
+			volume.Box = BoundingOrientedBox(pos, scale, orient);
 			volume.Sphere = BoundingSphere(pos, scale.x);
 
 			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
@@ -805,11 +907,11 @@ void ReadRooms()
 		room.reverbType = (ReverbType)ReadInt32();
 		room.flipNumber = ReadInt32();
 
-		room.itemNumber = NO_ITEM;
-		room.fxNumber = NO_ITEM;
-		room.index = i;
+		room.itemNumber = NO_VALUE;
+		room.fxNumber = NO_VALUE;
+		room.RoomNumber = i;
 
-		g_GameScriptEntities->AddName(room.name, room);
+		g_GameScriptEntities->AddName(room.Name, room);
 	}
 }
 
@@ -846,7 +948,8 @@ void FreeLevel()
 	g_Level.Bones.resize(0);
 	g_Level.Meshes.resize(0);
 	MoveablesIds.resize(0);
-	g_Level.Boxes.resize(0);
+	SpriteSequencesIds.resize(0);
+	g_Level.PathfindingBoxes.resize(0);
 	g_Level.Overlaps.resize(0);
 	g_Level.Anims.resize(0);
 	g_Level.Changes.resize(0);
@@ -861,7 +964,9 @@ void FreeLevel()
 	g_Level.Sinks.resize(0);
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
-	g_Level.EventSets.resize(0);
+	g_Level.VolumeEventSets.resize(0);
+	g_Level.GlobalEventSets.resize(0);
+	g_Level.LoopedEventSetIndices.resize(0);
 	g_Level.Items.resize(0);
 
 	for (int i = 0; i < 2; i++)
@@ -963,31 +1068,64 @@ void LoadAIObjects()
 	}
 }
 
-void LoadEvent(VolumeEvent& event)
+void LoadEvent(EventSet& eventSet)
 {
-	event.Mode = (VolumeEventMode)ReadInt32();
-	event.Function = ReadString();
-	event.Data = ReadString();
-	event.CallCounter = ReadInt32();
+	int eventType = ReadInt32();
+
+	if (eventType >= (int)EventType::Count)
+	{
+		TENLog("Unknown event type detected for event set " + eventSet.Name + ". Fall back to default.", LogLevel::Warning);
+		eventType = (int)EventType::Enter;
+	}
+
+	auto& evt = eventSet.Events[eventType];
+
+	evt.Mode = (EventMode)ReadInt32();
+	evt.Function = ReadString();
+	evt.Data = ReadString();
+	evt.CallCounter = ReadInt32();
 }
 
 void LoadEventSets()
 {
 	int eventSetCount = ReadInt32();
-	TENLog("Num event sets: " + std::to_string(eventSetCount), LogLevel::Info);
+	if (eventSetCount == 0)
+		return;
 
-	for (int i = 0; i < eventSetCount; i++)
+	int globalEventSetCount = ReadInt32();
+	TENLog("Num global event sets: " + std::to_string(globalEventSetCount), LogLevel::Info);
+
+	for (int i = 0; i < globalEventSetCount; i++)
 	{
-		auto eventSet = VolumeEventSet();
+		auto eventSet = EventSet();
 
 		eventSet.Name = ReadString();
-		eventSet.Activators = (VolumeActivatorFlags)ReadInt32();
 
-		LoadEvent(eventSet.OnEnter);
-		LoadEvent(eventSet.OnInside);
-		LoadEvent(eventSet.OnLeave);
+		int eventCount = ReadInt32();
+		for (int j = 0; j < eventCount; j++)
+			LoadEvent(eventSet);
 
-		g_Level.EventSets.push_back(eventSet);
+		g_Level.GlobalEventSets.push_back(eventSet);
+
+		if (!eventSet.Events[(int)EventType::Loop].Function.empty())
+			g_Level.LoopedEventSetIndices.push_back(i);
+	}
+
+	int volumeEventSetCount = ReadInt32();
+	TENLog("Num volume event sets: " + std::to_string(volumeEventSetCount), LogLevel::Info);
+
+	for (int i = 0; i < volumeEventSetCount; i++)
+	{
+		auto eventSet = EventSet();
+
+		eventSet.Name = ReadString();
+		eventSet.Activators = (ActivatorFlags)ReadInt32();
+
+		int eventCount = ReadInt32();
+		for (int j = 0; j < eventCount; j++)
+			LoadEvent(eventSet);
+
+		g_Level.VolumeEventSets.push_back(eventSet);
 	}
 }
 
@@ -1039,7 +1177,7 @@ bool LoadLevel(int levelIndex)
 	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
 	g_Renderer.SetLoadingScreen(loadingScreenPath);
 
-	SetScreenFadeIn(FADE_SCREEN_SPEED);
+	SetScreenFadeIn(FADE_SCREEN_SPEED, true);
 	g_Renderer.UpdateProgress(0);
 
 	try
@@ -1138,7 +1276,7 @@ bool LoadLevel(int levelIndex)
 
 		// Initialize the game
 		InitializeGameFlags();
-		InitializeLara(!(InitializeGame || CurrentLevel <= 1));
+		InitializeLara(!InitializeGame && CurrentLevel > 0);
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
@@ -1151,7 +1289,7 @@ bool LoadLevel(int levelIndex)
 
 		TENLog("Level loading complete.", LogLevel::Info);
 
-		SetScreenFadeOut(FADE_SCREEN_SPEED);
+		SetScreenFadeOut(FADE_SCREEN_SPEED, true);
 		g_Renderer.UpdateProgress(100);
 
 		LoadedSuccessfully = true;
@@ -1226,8 +1364,8 @@ void LoadBoxes()
 	// Read boxes
 	int numBoxes = ReadInt32();
 	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
-	g_Level.Boxes.resize(numBoxes);
-	ReadBytes(g_Level.Boxes.data(), numBoxes * sizeof(BOX_INFO));
+	g_Level.PathfindingBoxes.resize(numBoxes);
+	ReadBytes(g_Level.PathfindingBoxes.data(), numBoxes * sizeof(BOX_INFO));
 
 	// Read overlaps
 	int numOverlaps = ReadInt32();
@@ -1261,8 +1399,8 @@ void LoadBoxes()
 	// By default all blockable boxes are blocked
 	for (int i = 0; i < numBoxes; i++)
 	{
-		if (g_Level.Boxes[i].flags & BLOCKABLE)
-			g_Level.Boxes[i].flags |= BLOCKED;
+		if (g_Level.PathfindingBoxes[i].flags & BLOCKABLE)
+			g_Level.PathfindingBoxes[i].flags |= BLOCKED;
 	}
 }
 
@@ -1270,6 +1408,7 @@ bool LoadLevelFile(int levelIndex)
 {
 	TENLog("Loading level file...", LogLevel::Info);
 
+	BackupLara();
 	CleanUp();
 	FreeLevel();
 	
@@ -1315,6 +1454,8 @@ void LoadSprites()
 			Objects[spriteID].nmeshes = negLength;
 			Objects[spriteID].meshIndex = offset;
 			Objects[spriteID].loaded = true;
+
+			SpriteSequencesIds.push_back(spriteID);
 		}
 	}
 }
@@ -1322,26 +1463,29 @@ void LoadSprites()
 void GetCarriedItems()
 {
 	for (int i = 0; i < g_Level.NumItems; ++i)
-		g_Level.Items[i].CarriedItem = NO_ITEM;
+		g_Level.Items[i].CarriedItem = NO_VALUE;
 
 	for (int i = 0; i < g_Level.NumItems; ++i)
 	{
-		auto* item = &g_Level.Items[i];
-		if (Objects[item->ObjectNumber].intelligent || item->ObjectNumber >= ID_SEARCH_OBJECT1 && item->ObjectNumber <= ID_SEARCH_OBJECT3)
-		{
-			for (short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
-			{
-				auto* item2 = &g_Level.Items[linkNumber];
+		auto& item = g_Level.Items[i];
+		const auto& object = Objects[item.ObjectNumber];
 
-				if (abs(item2->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
-					abs(item2->Pose.Position.z - item->Pose.Position.z) < CLICK(2) &&
-					abs(item2->Pose.Position.y - item->Pose.Position.y) < CLICK(1) &&
-					Objects[item2->ObjectNumber].isPickup)
+		if (object.intelligent ||
+			(item.ObjectNumber >= ID_SEARCH_OBJECT1 && item.ObjectNumber <= ID_SEARCH_OBJECT3))
+		{
+			for (short linkNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
+			{
+				auto& item2 = g_Level.Items[linkNumber];
+
+				if (abs(item2.Pose.Position.x - item.Pose.Position.x) < CLICK(2) &&
+					abs(item2.Pose.Position.z - item.Pose.Position.z) < CLICK(2) &&
+					abs(item2.Pose.Position.y - item.Pose.Position.y) < CLICK(1) &&
+					Objects[item2.ObjectNumber].isPickup)
 				{
-					item2->CarriedItem = item->CarriedItem;
-					item->CarriedItem = linkNumber;
+					item2.CarriedItem = item.CarriedItem;
+					item.CarriedItem = linkNumber;
 					RemoveDrawnItem(linkNumber);
-					item2->RoomNumber = NO_ROOM;
+					item2.RoomNumber = NO_VALUE;
 				}
 			}
 		}
@@ -1370,7 +1514,7 @@ void GetAIPickups()
 					item->ItemFlags[3] = object->triggerFlags;
 
 					if (object->objectNumber != ID_AI_GUARD)
-						object->roomNumber = NO_ROOM;
+						object->roomNumber = NO_VALUE;
 				}
 			}
 
@@ -1395,17 +1539,17 @@ void BuildOutsideRoomsTable()
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		int rx = (room->x / SECTOR(1));
-		int rz = (room->z / SECTOR(1));
+		int rx = (room->Position.x / BLOCK(1));
+		int rz = (room->Position.z / BLOCK(1));
 
 		for (int x = 0; x < OUTSIDE_SIZE; x++)
 		{
-			if (x < (rx + 1) || x > (rx + room->xSize - 2))
+			if (x < (rx + 1) || x > (rx + room->XSize - 2))
 				continue;
 
 			for (int z = 0; z < OUTSIDE_SIZE; z++)
 			{
-				if (z < (rz + 1) || z > (rz + room->zSize - 2))
+				if (z < (rz + 1) || z > (rz + room->ZSize - 2))
 					continue;
 
 				OutsideRoomTable[x][z].push_back(i);

@@ -20,6 +20,7 @@
 #include "Objects/Generic/Traps/falling_block.h"
 #include "Objects/TR1/tr1_objects.h"
 #include "Objects/TR2/tr2_objects.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR3/tr3_objects.h"
 #include "Objects/TR4/tr4_objects.h"
 #include "Objects/TR5/tr5_objects.h"
@@ -31,16 +32,103 @@ using namespace TEN::Effects::Hair;
 using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
-ObjectInfo Objects[ID_NUMBER_OBJECTS];
-STATIC_INFO StaticObjects[MAX_STATICS];
+ObjectHandler Objects;
+StaticInfo StaticObjects[MAX_STATICS];
+
+void ObjectHandler::Initialize() 
+{ 
+	std::memset(_objects, 0, sizeof(ObjectInfo) * GAME_OBJECT_ID::ID_NUMBER_OBJECTS);
+}
+
+bool ObjectHandler::CheckID(GAME_OBJECT_ID objectID, bool isSilent)
+{
+	if (objectID == GAME_OBJECT_ID::ID_NO_OBJECT || objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+	{
+		if (!isSilent)
+		{
+			TENLog(
+				"Attempted to access unavailable slot ID (" + std::to_string(objectID) + "). " +
+				"Check if last accessed item exists in level.", LogLevel::Warning, LogConfig::Debug);
+		}
+
+		return false;
+	}
+
+	return true;
+}
+
+ObjectInfo& ObjectHandler::operator [](int objectID) 
+{
+	if (CheckID((GAME_OBJECT_ID)objectID))
+		return _objects[objectID];
+
+	return GetFirstAvailableObject();
+}
+
+ObjectInfo& ObjectHandler::GetFirstAvailableObject()
+{
+	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
+	{
+		if (_objects[i].loaded)
+			return _objects[i];
+	}
+
+	return _objects[0];
+}
+
+// NOTE: JointRotationFlags allows bones to be rotated with CreatureJoint().
+void ObjectInfo::SetBoneRotationFlags(int boneID, int flags)
+{
+	g_Level.Bones[boneIndex + (boneID * 4)] |= flags;
+}
+
+void ObjectInfo::SetHitEffect(HitEffect hitEffect)
+{
+	this->hitEffect = hitEffect;
+}
+
+// NOTE: Use if object is alive, but not intelligent, to set up blood effects.
+void ObjectInfo::SetHitEffect(bool isSolid, bool isAlive)
+{
+	// Avoid some objects such as ID_SAS_DYING having None.
+	if (isAlive)
+	{
+		hitEffect = HitEffect::Blood;
+		return;
+	}
+
+	if (intelligent)
+	{
+		if (isSolid && HitPoints > 0)
+		{
+			hitEffect = HitEffect::Richochet;
+		}
+		else if ((damageType != DamageMode::Any && HitPoints > 0) || HitPoints == NOT_TARGETABLE)
+		{
+			hitEffect = HitEffect::Smoke;
+		}
+		else if (damageType == DamageMode::Any && HitPoints > 0)
+		{
+			hitEffect = HitEffect::Blood;
+		}
+	}
+	else if (isSolid && HitPoints <= 0)
+	{
+		hitEffect = HitEffect::Richochet;
+	}
+	else
+	{
+		hitEffect = HitEffect::None;
+	}
+}
 
 void InitializeGameFlags()
 {
 	ZeroMemory(FlipMap, MAX_FLIPMAP * sizeof(int));
-	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(int));
+	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(bool));
 
-	FlipEffect = -1;
-	FlipStatus = 0;
+	FlipEffect = NO_VALUE;
+	FlipStatus = false;
 	Camera.underwater = false;
 }
 
@@ -49,7 +137,6 @@ void InitializeSpecialEffects()
 	memset(&FireSparks, 0, MAX_SPARKS_FIRE * sizeof(FIRE_SPARKS));
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
-	memset(&Gunflashes, 0, (MAX_GUNFLASH * sizeof(GUNFLASH_STRUCT)));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
 	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
@@ -67,6 +154,7 @@ void InitializeSpecialEffects()
 	NextBlood = 0;
 
 	TEN::Entities::TR4::ClearBeetleSwarm();
+	TEN::Entities::Creatures::TR3::ClearFishSwarm();
 }
 
 void CustomObjects()
@@ -87,8 +175,6 @@ void InitializeObjects()
 		obj->Initialize = nullptr;
 		obj->collision = nullptr;
 		obj->control = nullptr;
-		obj->floor = nullptr;
-		obj->ceiling = nullptr;
 		obj->drawRoutine = DrawAnimatingItem;
 		obj->HitRoutine = DefaultItemHit;
 		obj->pivotLength = 0;
@@ -101,20 +187,20 @@ void InitializeObjects()
 		obj->waterCreature = false;
 		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;
-		obj->undead = false;
+		obj->damageType = DamageMode::Any;
 		obj->LotType = LotType::Basic;
-		obj->meshSwapSlot = NO_ITEM;
+		obj->meshSwapSlot = NO_VALUE;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
 	}
 
 	InitializeEffectsObjects();
 	InitializeGenericObjects(); // Generic objects
+	InitializeTR5Objects(); // Standard TR5 objects (NOTE: lara need to be loaded first, so entity like doppelganger can use this animIndex !)
 	InitializeTR1Objects(); // Standard TR1 objects
 	InitializeTR2Objects(); // Standard TR2 objects
 	InitializeTR3Objects(); // Standard TR3 objects
 	InitializeTR4Objects(); // Standard TR4 objects
-	InitializeTR5Objects(); // Standard TR5 objects
 
 	// User defined objects
 	CustomObjects();

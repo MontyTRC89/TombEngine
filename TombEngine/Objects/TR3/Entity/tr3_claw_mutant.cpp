@@ -35,9 +35,9 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto CLAW_MUTANT_WALK_TURN_RATE_MAX = ANGLE(3.0f);
 	constexpr auto CLAW_MUTANT_RUN_TURN_RATE_MAX  = ANGLE(4.0f);
 
-	const auto ClawMutantLeftBite  = CreatureBiteInfo(Vector3i(19, -13, 3), 7);
-	const auto ClawMutantRightBite = CreatureBiteInfo(Vector3i(19, -13, 3), 4);
-	const auto ClawMutantTailBite  = CreatureBiteInfo(Vector3i(-32, -16, -119), 13);
+	const auto ClawMutantLeftBite  = CreatureBiteInfo(Vector3(19, -13, 3), 7);
+	const auto ClawMutantRightBite = CreatureBiteInfo(Vector3(19, -13, 3), 4);
+	const auto ClawMutantTailBite  = CreatureBiteInfo(Vector3(-32, -16, -119), 13);
 
 	enum ClawMutantState
 	{
@@ -97,7 +97,7 @@ namespace TEN::Entities::Creatures::TR3
 		plasma.sLife =
 		plasma.life = (GetRandomControl() & 7) + 24;
 
-		plasma.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		plasma.blendMode = BlendMode::Additive;
 
 		plasma.extras = 0;
 		plasma.dynamic = -1;
@@ -149,7 +149,7 @@ namespace TEN::Entities::Creatures::TR3
 		const auto& creature = *GetCreatureInfo(&item);
 
 		int plasmaBall = CreateNewEffect(item.RoomNumber);
-		if (plasmaBall == NO_ITEM)
+		if (plasmaBall == NO_VALUE)
 			return;
 
 		auto enemyPos = creature.Enemy->Pose.Position;
@@ -240,7 +240,7 @@ namespace TEN::Entities::Creatures::TR3
 		plasma.sLife =
 		plasma.life = (GetRandomControl() & 7) + life;
 
-		plasma.blendMode = BLENDMODE_ADDITIVE;
+		plasma.blendMode = BlendMode::Additive;
 
 		plasma.extras = 0;
 		plasma.dynamic = -1;
@@ -298,12 +298,11 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 
 		auto& item = g_Level.Items[itemNumber];
-		auto& object = Objects[item.ObjectNumber];
 		auto& creature = *GetCreatureInfo(&item);
 
 		short headingAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (item.HitPoints <= 0)
 		{
@@ -379,7 +378,7 @@ namespace TEN::Entities::Creatures::TR3
 					if (Random::TestProbability(CLAW_MUTANT_WALK_CHANCE))
 						item.Animation.TargetState = CLAW_MUTANT_STATE_WALK;
 				}
-				else if (item.Animation.RequiredState != NO_STATE)
+				else if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}

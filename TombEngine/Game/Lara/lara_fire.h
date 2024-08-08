@@ -48,11 +48,12 @@ extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 
 void InitializeNewWeapon(ItemInfo& laraItem);
 
-Ammo&		   GetAmmo(LaraInfo& lara, LaraWeaponType weaponType);
-GameVector	   GetTargetPoint(ItemInfo& targetEntity);
-HolsterSlot	   GetWeaponHolsterSlot(LaraWeaponType weaponType);
-GAME_OBJECT_ID GetWeaponObjectID(LaraWeaponType weaponType);
-GAME_OBJECT_ID GetWeaponObjectMeshID(ItemInfo& laraItem, LaraWeaponType weaponType);
+const WeaponInfo& GetWeaponInfo(LaraWeaponType weaponType);
+Ammo&			  GetAmmo(LaraInfo& lara, LaraWeaponType weaponType);
+GameVector		  GetTargetPoint(ItemInfo& targetEntity);
+HolsterSlot		  GetWeaponHolsterSlot(LaraWeaponType weaponType);
+GAME_OBJECT_ID	  GetWeaponObjectID(LaraWeaponType weaponType);
+GAME_OBJECT_ID	  GetWeaponObjectMeshID(ItemInfo& laraItem, LaraWeaponType weaponType);
 
 void HandleWeapon(ItemInfo& laraItem);
 void AimWeapon(ItemInfo& laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo);
@@ -60,6 +61,6 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 
 void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo);
 void LaraTargetInfo(ItemInfo& laraItem, const WeaponInfo& weaponInfo);
-void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, bool isExplosive, int bestJointIndex = NO_JOINT);
+void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, bool isExplosive, int bestJointIndex = NO_VALUE);
 
 void SmashItem(short itemNumber);

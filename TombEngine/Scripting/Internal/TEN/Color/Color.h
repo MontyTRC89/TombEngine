@@ -3,36 +3,47 @@
 
 typedef DWORD D3DCOLOR;
 
-namespace sol {
+namespace sol
+{
 	class state;
 	template <typename T> struct as_table_t;
 }
 
-class ScriptColor {
+class ScriptColor
+{
+private:
+	// Members
+	RGBAColor8Byte _color;
+
 public:
+	static void Register(sol::table& parent);
+
+	// Constructors
 	ScriptColor(byte r, byte g, byte b);
 	ScriptColor(byte r, byte g, byte b, byte a);
-	ScriptColor(Vector3 const &);
-	ScriptColor(Vector4 const &);
+	ScriptColor(const Vector3& color);
+	ScriptColor(const Vector4& color);
 	ScriptColor(D3DCOLOR);
 
+	// Getters
+	byte GetR() const;
+	byte GetG() const;
+	byte GetB() const;
+	byte GetA() const;
+
+	// Setters
+	void SetR(byte value);
+	void SetG(byte value);
+	void SetB(byte value);
+	void SetA(byte value);
+
+	// Converters
+	std::string ToString() const;
+
+	// Operators
+	operator Color() const;
 	operator Vector3() const;
 	operator Vector4() const;
 	operator D3DCOLOR() const;
 	operator RGBAColor8Byte() const;
-
-	byte GetR() const;
-	void SetR(byte v);
-	byte GetG() const;
-	void SetG(byte v);
-	byte GetB() const;
-	void SetB(byte v);
-	byte GetA() const;
-	void SetA(byte v);
-
-	std::string ToString() const;
-
-	static void Register(sol::table & parent);
-private:
-	RGBAColor8Byte m_color;
 };

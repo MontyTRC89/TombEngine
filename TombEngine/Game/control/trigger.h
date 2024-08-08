@@ -54,7 +54,8 @@ enum TRIGOBJECTS_TYPES
 	TO_CUTSCENE,
 	TO_UNUSED1, // TRNG FmvNg
 	TO_UNUSED2, // TRNG TimerfieldNg
-	TO_LUAEVENT
+	TO_VOLUMEEVENT,
+	TO_GLOBALEVENT
 };
 
 extern int TriggerTimer;
@@ -62,7 +63,7 @@ extern int KeyTriggerActive;
 
 bool GetKeyTrigger(ItemInfo* item);
 int GetSwitchTrigger(ItemInfo* item, short* itemNumbersPtr, int attatchedToSwitch);
-int SwitchTrigger(short itemNumber, short timer);
+bool SwitchTrigger(short itemNumber, short timer);
 int KeyTrigger(short itemNumber);
 bool PickupTrigger(short itemNumber);
 void RefreshCamera(short type, short* data);

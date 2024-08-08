@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
 #include "Game/items.h"
@@ -11,13 +12,16 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/rope.h"
-#include "Renderer/Renderer11.h"
+#include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
+
+constexpr auto VERTICAL_VELOCITY_GRAVITY_THRESHOLD = CLICK(0.5f);
 
 // NOTE: 0 frames counts as 1.
 static unsigned int GetNonZeroFrameCount(const AnimData& anim)
@@ -108,49 +112,95 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 			break;
 
 		case AnimCommandType::SoundEffect:
-			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+		{
+			int frameNumber = commandDataPtr[0];
+			if (isFrameBased && item.Animation.FrameNumber == frameNumber)
 			{
-				if (!Objects[item.ObjectNumber].waterCreature)
-				{
-					bool playInWater = (commandDataPtr[1] & 0x8000) != 0;
-					bool playOnLand	 = (commandDataPtr[1] & 0x4000) != 0;
-					bool playAlways	 = (playInWater && playOnLand) || (!playInWater && !playOnLand);
+				// Get sound ID and sound environment flag from packed data.
+				int soundID = commandDataPtr[1] & 0xFFF;	   // Exclude last 4 bits for sound ID.
+				int soundEnvFlag = commandDataPtr[1] & 0xF000; // Keep only last 4 bits for sound environment flag.
 
-					if (item.IsLara())
-					{
-						auto& player = GetLaraInfo(item);
-
-						if (playAlways ||
-							(playOnLand && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
-							(playInWater && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-					}
-					else
-					{
-						if (item.RoomNumber == NO_ROOM)
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-						else if (TestEnvironment(ENV_FLAG_WATER, &item))
-						{
-							if (playAlways || (playInWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
-								SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-						else if (playAlways || (playOnLand && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-					}
-				}
-				else
+				// FAILSAFE.
+				if (item.RoomNumber == NO_VALUE)
 				{
-					SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, TestEnvironment(ENV_FLAG_WATER, &item) ? SoundEnvironment::Water : SoundEnvironment::Land);
+					SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
+					commandDataPtr += 2;
+					break;
 				}
+
+				// Get required sound environment from flag.
+				auto requiredSoundEnv = SoundEnvironment::Always;
+				switch (soundEnvFlag)
+				{
+				default:
+				case 0:
+					requiredSoundEnv = SoundEnvironment::Always;
+					break;
+
+				case (1 << 14):
+					requiredSoundEnv = SoundEnvironment::Land;
+					break;
+
+				case (1 << 15):
+					requiredSoundEnv = SoundEnvironment::ShallowWater;
+					break;
+
+				case (1 << 12):
+					requiredSoundEnv = SoundEnvironment::Swamp;
+					break;
+
+				case (1 << 13):
+					requiredSoundEnv = SoundEnvironment::Underwater;
+					break;
+				}
+
+				int roomNumberAtPos = GetPointCollision(item).GetRoomNumber();
+				bool isWater = TestEnvironment(ENV_FLAG_WATER, roomNumberAtPos);
+				bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, roomNumberAtPos);
+
+				// Get sound environment for sound effect.
+				auto soundEnv = std::optional<SoundEnvironment>();
+				switch (requiredSoundEnv)
+				{
+				case SoundEnvironment::Always:
+					soundEnv = SoundEnvironment::Always;
+					break;
+
+				case SoundEnvironment::Land:
+					if (!isWater && !isSwamp)
+						soundEnv = SoundEnvironment::Land;
+
+					break;
+
+				case SoundEnvironment::ShallowWater:
+					if (isWater)
+					{
+						// HACK: Must update assets before removing this exception for water creatures.
+						const auto& object = Objects[item.ObjectNumber];
+						soundEnv = object.waterCreature ? SoundEnvironment::Underwater : SoundEnvironment::ShallowWater;
+					}
+
+					break;
+
+				case SoundEnvironment::Swamp:
+					if (isSwamp)
+						soundEnv = SoundEnvironment::Swamp;
+
+					break;
+
+				case SoundEnvironment::Underwater:
+					if (isWater || isSwamp)
+						soundEnv = SoundEnvironment::Underwater;
+
+					break;
+				}
+
+				if (soundEnv.has_value())
+					SoundEffect(soundID, &item.Pose, *soundEnv);
 			}
 
 			commandDataPtr += 2;
+		}
 			break;
 
 		case AnimCommandType::Flipeffect:
@@ -188,7 +238,7 @@ void AnimateItem(ItemInfo* item)
 		if (!item->IsLara())
 		{
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 	}
 
@@ -210,7 +260,7 @@ void AnimateItem(ItemInfo* item)
 			}
 
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 		else
 		{
@@ -227,12 +277,15 @@ void AnimateItem(ItemInfo* item)
 		if (!item->IsLara())
 		{
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}*/
 	}
 
 	unsigned int frameCount = GetNonZeroFrameCount(*animPtr);
 	int currentFrame = item->Animation.FrameNumber - animPtr->frameBase;
+
+	auto animAccel = (animPtr->VelocityEnd - animPtr->VelocityStart) / frameCount;
+	auto animVel = animPtr->VelocityStart + (animAccel * currentFrame);
 
 	if (item->Animation.IsAirborne)
 	{
@@ -247,7 +300,7 @@ void AnimateItem(ItemInfo* item)
 					item->Animation.Velocity.z = 0.0f;
 				}
 
-				if (item->Animation.Velocity.y > 128.0f)
+				if (item->Animation.Velocity.y > VERTICAL_VELOCITY_GRAVITY_THRESHOLD)
 					item->Animation.Velocity.y /= 2;
 				item->Animation.Velocity.y -= item->Animation.Velocity.y / 4;
 
@@ -257,15 +310,15 @@ void AnimateItem(ItemInfo* item)
 			}
 			else
 			{
-				item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
-				item->Animation.Velocity.z += (animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount;
+				item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
+				item->Animation.Velocity.z += animAccel.z;
 
 				item->Pose.Position.y += item->Animation.Velocity.y;
 			}
 		}
 		else
 		{
-			item->Animation.Velocity.y += (item->Animation.Velocity.y >= 128.0f) ? 1.0f : GRAVITY;
+			item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
 			item->Pose.Position.y += item->Animation.Velocity.y;
 		}
 	}
@@ -273,25 +326,23 @@ void AnimateItem(ItemInfo* item)
 	{
 		if (item->IsLara())
 		{
-			const auto& player = *GetLaraInfo(item);
+			const auto& player = GetLaraInfo(*item);
 
-			if (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
-				item->Animation.Velocity.z = (animPtr->VelocityStart.z / 2) + ((((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame) / 4);
-			else
-				item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
+			bool isInSwamp = (player.Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item));
+			item->Animation.Velocity.z = isInSwamp ? (animVel.z / 2) : animVel.z;
 		}
 		else
 		{
-			item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
-			item->Animation.Velocity.z = animPtr->VelocityStart.z + (((animPtr->VelocityEnd.z - animPtr->VelocityStart.z) / frameCount) * currentFrame);
+			item->Animation.Velocity.x = animVel.x;
+			item->Animation.Velocity.z = animVel.z;
 		}
 	}
 	
 	if (item->IsLara())
 	{
-		const auto& player = *GetLaraInfo(item);
+		const auto& player = GetLaraInfo(*item);
 
-		item->Animation.Velocity.x = animPtr->VelocityStart.x + (((animPtr->VelocityEnd.x - animPtr->VelocityStart.x) / frameCount) * currentFrame);
+		item->Animation.Velocity.x = animVel.x;
 
 		if (player.Control.Rope.Ptr != -1)
 			DelAlignLaraToRope(item);
@@ -311,7 +362,7 @@ void AnimateItem(ItemInfo* item)
 	}
 }
 
-bool HasStateDispatch(ItemInfo* item, int targetState)
+bool HasStateDispatch(const ItemInfo* item, int targetState)
 {
 	const auto& anim = GetAnimData(*item);
 
@@ -319,7 +370,7 @@ bool HasStateDispatch(ItemInfo* item, int targetState)
 	if (anim.NumStateDispatches <= 0)
 		return false;
 
-	if (targetState == NO_STATE)
+	if (targetState == NO_VALUE)
 		targetState = item->Animation.TargetState;
 
 	// Iterate over animation's state dispatches.
@@ -357,7 +408,7 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 {
 	const auto& object = Objects[item->Animation.AnimObjectID];
 
-	if (animNumber == NO_ANIM)
+	if (animNumber == NO_VALUE)
 		animNumber = item->Animation.AnimNumber - object.animIndex;
 
 	// Animation to test doesn't match; return early.
@@ -460,7 +511,7 @@ const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 
 const AnimData& GetAnimData(const ItemInfo& item, int animNumber)
 {
-	if (animNumber == NO_ANIM)
+	if (animNumber == NO_VALUE)
 		return GetAnimData(item.Animation.AnimNumber);
 
 	const auto& object = Objects[item.Animation.AnimObjectID];
@@ -503,7 +554,7 @@ const AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumb
 	const auto& object = Objects[objectID];
 
 	int animIndex = object.animIndex + animNumber;
-	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
+	TENAssert(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
 
 	const auto& anim = GetAnimData(object, animNumber);
 
@@ -532,6 +583,11 @@ const AnimFrame& GetBestFrame(const ItemInfo& item)
 {
 	auto frameData = GetFrameInterpData(item);
 	return ((frameData.Alpha <= 0.5f) ? *frameData.FramePtr0 : *frameData.FramePtr1);
+}
+
+float GetEffectiveGravity(float verticalVel)
+{
+	return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
 }
 
 int GetAnimNumber(const ItemInfo& item)

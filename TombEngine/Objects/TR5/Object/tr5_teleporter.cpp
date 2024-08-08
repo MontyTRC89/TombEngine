@@ -144,7 +144,7 @@ void ControlTeleporter(short itemNumber)
 					v35->FadeToBlack = 4;
 					v35->Life = 24;
 					v35->sLife = 24;
-					v35->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+					v35->blendMode = BlendMode::Additive;
 					v35->x = src.Position.x;
 					v35->y = src.Position.y;
 					v35->z = src.zPos;
@@ -173,7 +173,7 @@ void ControlTeleporter(short itemNumber)
 		}
 	}*/
 
-	Lara.Control.Locked = false;
+	Lara.Control.IsLocked = false;
 
 	if (item->TriggerFlags == 666)
 	{
@@ -201,7 +201,7 @@ void ControlTeleporter(short itemNumber)
 		LaraItem->Pose.Position.y = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
 		if (LaraItem->RoomNumber != roomNumber)
-			ItemNewRoom(Lara.ItemNumber, roomNumber);
+			ItemNewRoom(LaraItem->Index, roomNumber);
 
 		if (item->Flags & IFLAG_INVISIBLE)
 		{

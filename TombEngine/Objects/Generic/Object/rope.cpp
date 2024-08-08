@@ -167,7 +167,7 @@ namespace TEN::Entities::Generic
 		auto* ropeItem = &g_Level.Items[itemNumber];
 		auto* rope = &Ropes[ropeItem->TriggerFlags];
 		
-		if (TrInput & IN_ACTION &&
+		if (IsHeld(In::Action) &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			(laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP) &&
 			laraItem->Animation.IsAirborne &&
@@ -604,9 +604,9 @@ namespace TEN::Entities::Generic
 		GetCollisionInfo(coll, item);
 
 		bool stumble = testForStumble &&
-			((coll->CollisionType != CollisionType::CT_NONE && 
-			  coll->CollisionType != CollisionType::CT_TOP  &&
-			  coll->CollisionType != CollisionType::CT_TOP_FRONT) || 
+			((coll->CollisionType != CollisionType::None && 
+			  coll->CollisionType != CollisionType::Top &&
+			  coll->CollisionType != CollisionType::TopFront) || 
 			  coll->HitStatic);
 
 		if (stumble || 
@@ -679,7 +679,7 @@ namespace TEN::Entities::Generic
 
 	void LaraClimbRope(ItemInfo* item, CollisionInfo* coll)
 	{
-		if (!(TrInput & IN_ACTION))
+		if (!IsHeld(In::Action))
 			FallFromRope(item);
 		else
 		{
@@ -721,7 +721,7 @@ namespace TEN::Entities::Generic
 				Lara.Control.Rope.Offset = 0;
 			}
 
-			if (!(TrInput & IN_BACK) || Lara.Control.Rope.Segment >= 21)
+			if (!IsHeld(In::Back) || Lara.Control.Rope.Segment >= 21)
 				item->Animation.TargetState = LS_ROPE_IDLE;
 		}
 	}

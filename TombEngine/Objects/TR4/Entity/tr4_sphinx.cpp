@@ -2,6 +2,7 @@
 #include "Objects/TR4/Entity/tr4_sphinx.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -13,6 +14,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
+
 namespace TEN::Entities::TR4
 {
 	constexpr auto SPHINX_ATTACK_DAMAGE = 200;
@@ -20,7 +23,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SPHINX_WALK_TURN_ANGLE = ANGLE(3.0f);
 	constexpr auto SPHINX_RUN_TURN_ANGLE  = ANGLE(0.33f);
 
-	const auto SphinxBite = CreatureBiteInfo(Vector3i::Zero, 6);
+	const auto SphinxBite = CreatureBiteInfo(Vector3::Zero, 6);
 	const auto SphinxAttackJoints = std::vector<unsigned int>{ 6 };
 
 	enum SphinxState
@@ -73,17 +76,16 @@ namespace TEN::Entities::TR4
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
-		auto* object = &Objects[item->ObjectNumber];
 
 		int x = item->Pose.Position.x + 614 * phd_sin(item->Pose.Orientation.y);
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z + 614 * phd_cos(item->Pose.Orientation.y);
 
-		auto probe = GetCollision(x, y, z, item->RoomNumber);
+		auto pointColl = GetPointCollision(Vector3i(x, y, z), item->RoomNumber);
 
-		int height1 = probe.Position.Floor;
+		int height1 = pointColl.GetFloorHeight();
 
-		if (item->Animation.ActiveState == SPHINX_STATE_RUN_FORWARD && probe.Block->Stopper)
+		if (item->Animation.ActiveState == SPHINX_STATE_RUN_FORWARD && pointColl.GetSector().Stopper)
 		{
 			auto* room = &g_Level.Rooms[item->RoomNumber];
 
@@ -91,14 +93,12 @@ namespace TEN::Entities::TR4
 			{
 				auto* mesh = &room->mesh[i];
 
-				if (((mesh->pos.Position.z / SECTOR(1)) == (z / SECTOR(1))) &&
-					((mesh->pos.Position.x / SECTOR(1)) == (x / SECTOR(1))) &&
-					StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+				if (((mesh->pos.Position.z / BLOCK(1)) == (z / BLOCK(1))) &&
+					((mesh->pos.Position.x / BLOCK(1)) == (x / BLOCK(1))) &&
+					StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
 				{
 					ShatterObject(nullptr, mesh, -64, item->RoomNumber, 0);
 					SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
-
-					probe.Block = false;
 
 					TestTriggers(x, y, z, item->RoomNumber, true);
 				}
@@ -109,7 +109,7 @@ namespace TEN::Entities::TR4
 		y = item->Pose.Position.y;
 		z = item->Pose.Position.z - 614 * phd_cos(item->Pose.Orientation.y);
 
-		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height2 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		phd_atan(1228, height2 - height1);
 
@@ -137,7 +137,7 @@ namespace TEN::Entities::TR4
 		case SPHINX_STATE_REST:
 			creature->MaxTurn = 0;
 
-			if (AI.distance < pow(SECTOR(1), 2) || item->TriggerFlags)
+			if (AI.distance < pow(BLOCK(1), 2) || item->TriggerFlags)
 				item->Animation.TargetState = SPHINX_STATE_SLEEP_TO_IDLE;
 
 			// TODO: Use TestProbability().
@@ -149,7 +149,7 @@ namespace TEN::Entities::TR4
 		case SPHINX_STATE_REST_ALERTED:
 			creature->MaxTurn = 0;
 
-			if (AI.distance < pow(SECTOR(1), 2) || item->TriggerFlags)
+			if (AI.distance < pow(BLOCK(1), 2) || item->TriggerFlags)
 				item->Animation.TargetState = SPHINX_STATE_SLEEP_TO_IDLE;
 
 			// TODO: Use TestProbability().
@@ -161,12 +161,12 @@ namespace TEN::Entities::TR4
 		case SPHINX_STATE_WALK_FORWARD:
 			creature->MaxTurn = SPHINX_WALK_TURN_ANGLE;
 
-			if (AI.distance > pow(SECTOR(1), 2) && abs(AI.angle) <= ANGLE(2.8f) ||
+			if (AI.distance > pow(BLOCK(1), 2) && abs(AI.angle) <= ANGLE(2.8f) ||
 				item->Animation.RequiredState == SPHINX_STATE_RUN_FORWARD)
 			{
 				item->Animation.TargetState = SPHINX_STATE_RUN_FORWARD;
 			}
-			else if (AI.distance < pow(SECTOR(2), 2) && item->Animation.TargetState != SPHINX_STATE_RUN_FORWARD)
+			else if (AI.distance < pow(BLOCK(2), 2) && item->Animation.TargetState != SPHINX_STATE_RUN_FORWARD)
 			{
 				if (height2 <= (item->Pose.Position.y + CLICK(1)) &&
 					height2 >= (item->Pose.Position.y - CLICK(1)))
@@ -194,7 +194,7 @@ namespace TEN::Entities::TR4
 			if (dx >= 50 || dz >= 50 ||
 				item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex)
 			{
-				if (AI.distance > pow(SECTOR(2), 2) && abs(AI.angle) > ANGLE(2.8f))
+				if (AI.distance > pow(BLOCK(2), 2) && abs(AI.angle) > ANGLE(2.8f))
 					item->Animation.TargetState = SPHINX_STATE_IDLE;
 			}
 			else
@@ -209,7 +209,7 @@ namespace TEN::Entities::TR4
 		case SPHINX_STATE_WALK_BACK:
 			creature->MaxTurn = SPHINX_WALK_TURN_ANGLE;
 
-			if (AI.distance > pow(SECTOR(2), 2) ||
+			if (AI.distance > pow(BLOCK(2), 2) ||
 				height2 > (item->Pose.Position.y + CLICK(1)) ||
 				height2 < (item->Pose.Position.y - CLICK(1)))
 			{

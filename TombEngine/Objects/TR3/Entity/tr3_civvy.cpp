@@ -36,8 +36,8 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto CIVVY_TARGET_ALERT_VELOCITY = 10.0f;
 	constexpr auto CIVVY_VAULT_SHIFT = 260;
 
-	const auto CivvyBiteLeft  = CreatureBiteInfo(Vector3i::Zero, 10);
-	const auto CivvyBiteRight = CreatureBiteInfo(Vector3i::Zero, 13);
+	const auto CivvyBiteLeft  = CreatureBiteInfo(Vector3::Zero, 10);
+	const auto CivvyBiteRight = CreatureBiteInfo(Vector3::Zero, 13);
 	const auto CivvyAttackJoints = std::vector<unsigned int>{ 10, 13 };
   
 	const auto CivvyExcludedTargets = std::vector<GAME_OBJECT_ID>
@@ -124,7 +124,7 @@ namespace TEN::Entities::Creatures::TR3
 		for (auto& targetCreature : ActiveCreatures)
 		{
 			// Ignore itself and invalid entities.
-			if (targetCreature->ItemNumber == NO_ITEM || targetCreature->ItemNumber == item.Index)
+			if (targetCreature->ItemNumber == NO_VALUE || targetCreature->ItemNumber == item.Index)
 				continue;
 
 			auto& currentItem = g_Level.Items[targetCreature->ItemNumber];
@@ -172,7 +172,6 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 
 		auto& item = g_Level.Items[itemNumber];
-		auto& object = Objects[item.ObjectNumber];
 		auto& creature = *GetCreatureInfo(&item);
 
 		short angle = 0;
@@ -180,10 +179,10 @@ namespace TEN::Entities::Creatures::TR3
 
 		int targetAngle = 0;
 		int targetDistance = 0;
-		auto jointHeadRot = EulerAngles::Zero;
-		auto jointTorsoRot = EulerAngles::Zero;
+		auto jointHeadRot = EulerAngles::Identity;
+		auto jointTorsoRot = EulerAngles::Identity;
 
-		if (item.BoxNumber != NO_BOX && (g_Level.Boxes[item.BoxNumber].flags & BLOCKED) && item.HitPoints > 0)
+		if (item.BoxNumber != NO_VALUE && (g_Level.PathfindingBoxes[item.BoxNumber].flags & BLOCKED) && item.HitPoints > 0)
 		{
 			DoDamage(&item, INT_MAX);
 			DoLotsOfBlood(item.Pose.Position.x, item.Pose.Position.y - (GetRandomControl() & 255) - 32, item.Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item.RoomNumber, 3);

@@ -34,7 +34,7 @@ short GetNextSpider()
 		}
 
 		if (++i >= NUM_SPIDERS)
-			return NO_ITEM;
+			return NO_VALUE;
 	}
 
 	NextSpider = (spiderNumber + 1) & (NUM_SPIDERS - 1);
@@ -47,7 +47,7 @@ void ClearSpiders()
 	{
 		ZeroMemory(Spiders, NUM_SPIDERS * sizeof(SpiderData));
 		NextSpider = 0;
-		FlipEffect = -1;
+		FlipEffect = NO_VALUE;
 	}
 }
 
@@ -96,7 +96,7 @@ void SpidersEmitterControl(short itemNumber)
 				item->ItemFlags[2]--;
 
 			short spiderNumber = GetNextSpider();
-			if (spiderNumber != NO_ITEM)
+			if (spiderNumber != NO_VALUE)
 			{
 				auto* spider = &Spiders[spiderNumber];
 
@@ -186,7 +186,7 @@ void UpdateSpiders()
 				FloorInfo* floor = GetFloor(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z,&spider->RoomNumber);
 				int height = GetFloorHeight(floor, spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z);
 
-				if (height >= spider->Pose.Position.y - CLICK(5) || height == -SECTOR(31.75f))
+				if (height >= spider->Pose.Position.y - CLICK(5) || height == -BLOCK(31.75f))
 				{
 					if (height >= spider->Pose.Position.y - 64)
 					{
@@ -232,9 +232,9 @@ void UpdateSpiders()
 					spider->VerticalVelocity = 0;
 				}
 
-				if (spider->Pose.Position.y < g_Level.Rooms[spider->RoomNumber].maxceiling + 50)
+				if (spider->Pose.Position.y < g_Level.Rooms[spider->RoomNumber].TopHeight + 50)
 				{
-					spider->Pose.Position.y = g_Level.Rooms[spider->RoomNumber].maxceiling + 50;
+					spider->Pose.Position.y = g_Level.Rooms[spider->RoomNumber].TopHeight + 50;
 					spider->Pose.Orientation.y += -ANGLE(180.0f);
 					spider->VerticalVelocity = 1;
 				}

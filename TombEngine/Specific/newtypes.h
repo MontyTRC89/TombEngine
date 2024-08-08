@@ -1,12 +1,6 @@
 #pragma once
 #include "framework.h"
-#include "Renderer/Renderer11Enums.h"
-
-struct ROOM_VECTOR 
-{
-	int roomNumber;
-	int yNumber;
-};
+#include "Renderer/RendererEnums.h"
 
 struct POLYGON
 {
@@ -18,13 +12,13 @@ struct POLYGON
 	std::vector<Vector2> textureCoordinates;
 	std::vector<Vector3> normals;
 	std::vector<Vector3> tangents;
-	std::vector<Vector3> bitangents;
+	std::vector<Vector3> binormals;
 };
 
 struct BUCKET
 {
 	int texture;
-	BLEND_MODES blendMode;
+	BlendMode blendMode;
 	bool animated;
 	int numQuads;
 	int numTriangles;

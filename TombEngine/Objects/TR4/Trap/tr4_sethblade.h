@@ -1,7 +1,7 @@
 #pragma once
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
 	void InitializeSethBlade(short itemNumber);
-	void SethBladeControl(short itemNumber);
+	void ControlSethBlade(short itemNumber);
 }

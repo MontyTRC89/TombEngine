@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Color/Color.h"
+#include "Scripting/Internal/TEN/Color/Color.h"
 
-namespace sol {
-	class state;
-}
+namespace sol { class state; }
 
 struct Fog
 {
@@ -16,9 +14,9 @@ struct Fog
 	short MaxDistance{ 0 };
 
 	Fog() = default;
-	Fog(ScriptColor const& col, short minDistance, short maxDistance);
-	void SetColor(ScriptColor const& col);
+	Fog(ScriptColor const& color, short minDistance, short maxDistance);
+	void SetColor(ScriptColor const& color);
 	ScriptColor GetColor() const;
 
-	static void Register(sol::table &);
+	static void Register(sol::table&);
 };

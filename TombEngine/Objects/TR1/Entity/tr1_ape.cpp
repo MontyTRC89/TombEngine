@@ -35,7 +35,7 @@ namespace TEN::Entities::Creatures::TR1
 	constexpr auto APE_RUN_TURN_RATE_MAX = ANGLE(5.0f);
 	constexpr auto APE_DISPLAY_ANGLE	 = ANGLE(45.0f);
 
-	const auto ApeBite = CreatureBiteInfo(Vector3i(0, -19, 75), 15);
+	const auto ApeBite = CreatureBiteInfo(Vector3(0, -19, 75), 15);
 	const auto ApeAttackJoints = std::vector<unsigned int>{ 8, 9, 10, 11, 12, 13, 14, 15 };
 
 	enum ApeState
@@ -103,8 +103,8 @@ namespace TEN::Entities::Creatures::TR1
 			creature->Flags &= ~APE_FLAG_TURN_RIGHT;
 		}
 
-		int xx = item->Pose.Position.z / SECTOR(1);
-		int yy = item->Pose.Position.x / SECTOR(1);
+		int xx = item->Pose.Position.z / BLOCK(1);
+		int yy = item->Pose.Position.x / BLOCK(1);
 		int y = item->Pose.Position.y;
 
 		CreatureAnimation(itemNumber, angle, 0);
@@ -112,8 +112,8 @@ namespace TEN::Entities::Creatures::TR1
 		if (item->Pose.Position.y > (y - CLICK(1.5f)))
 			return;
 
-		int xFloor = item->Pose.Position.z / SECTOR(1);
-		int yFloor = item->Pose.Position.x / SECTOR(1);
+		int xFloor = item->Pose.Position.z / BLOCK(1);
+		int yFloor = item->Pose.Position.x / BLOCK(1);
 		if (xx == xFloor)
 		{
 			if (yy == yFloor)
@@ -121,12 +121,12 @@ namespace TEN::Entities::Creatures::TR1
 
 			if (yy < yFloor)
 			{
-				item->Pose.Position.x = (yFloor * SECTOR(1)) - APE_SHIFT;
+				item->Pose.Position.x = (yFloor * BLOCK(1)) - APE_SHIFT;
 				item->Pose.Orientation.y = ANGLE(90.0f);
 			}
 			else
 			{
-				item->Pose.Position.x = (yy * SECTOR(1)) + APE_SHIFT;
+				item->Pose.Position.x = (yy * BLOCK(1)) + APE_SHIFT;
 				item->Pose.Orientation.y = -ANGLE(90.0f);
 			}
 		}
@@ -134,12 +134,12 @@ namespace TEN::Entities::Creatures::TR1
 		{
 			if (xx < xFloor)
 			{
-				item->Pose.Position.z = (xFloor * SECTOR(1)) - APE_SHIFT;
+				item->Pose.Position.z = (xFloor * BLOCK(1)) - APE_SHIFT;
 				item->Pose.Orientation.y = 0;
 			}
 			else
 			{
-				item->Pose.Position.z = (xx * SECTOR(1)) + APE_SHIFT;
+				item->Pose.Position.z = (xx * BLOCK(1)) + APE_SHIFT;
 				item->Pose.Orientation.y = -ANGLE(180.0f);
 			}
 		}
@@ -201,7 +201,7 @@ namespace TEN::Entities::Creatures::TR1
 					creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 				}
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.bite && AI.distance < APE_ATTACK_RANGE)
 					item->Animation.TargetState = APE_STATE_ATTACK;
@@ -286,7 +286,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case APE_STATE_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE &&
+				if (item->Animation.RequiredState == NO_VALUE &&
 					item->TouchBits.Test(ApeAttackJoints))
 				{
 					item->Animation.RequiredState = APE_STATE_IDLE;

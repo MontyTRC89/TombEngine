@@ -20,7 +20,7 @@ namespace TEN::Entities::Switches
 		GameBoundingBox(
 			-384, 384,
 			0, CLICK(1),
-			0, SECTOR(0.5f)
+			0, BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -39,7 +39,7 @@ namespace TEN::Entities::Switches
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		if ((!(TrInput & IN_ACTION) ||
+		if ((!IsHeld(In::Action) ||
 			laraItem->Animation.ActiveState != LS_IDLE ||
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 			laraInfo->Control.HandStatus != HandStatus::Free ||

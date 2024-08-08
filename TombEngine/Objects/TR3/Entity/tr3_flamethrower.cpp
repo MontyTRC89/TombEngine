@@ -21,13 +21,13 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto FLAMETHROWER_ATTACK_RANGE = SQUARE(SECTOR(1.5f));
-	constexpr auto FLAMETHROWER_IDLE_RANGE	 = SQUARE(SECTOR(2));
-	constexpr auto FLAMETHROWER_AWARE_RANGE	 = SQUARE(SECTOR(8));
+	constexpr auto FLAMETHROWER_ATTACK_RANGE = SQUARE(BLOCK(1.5f));
+	constexpr auto FLAMETHROWER_IDLE_RANGE	 = SQUARE(BLOCK(2));
+	constexpr auto FLAMETHROWER_AWARE_RANGE	 = SQUARE(BLOCK(8));
 
 	constexpr auto FLAMETHROWER_WALK_TURN_RATE_MAX = ANGLE(5.0f);
 
-	const auto FlamethrowerBite = CreatureBiteInfo(Vector3i(0, 340, 64), 7);
+	const auto FlamethrowerBite = CreatureBiteInfo(Vector3(0, 340, 64), 7);
 
 	// TODO
 	enum FlamethrowerState
@@ -61,8 +61,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		short angle = 0;
 		short tilt = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		auto pos = GetJointPosition(item, FlamethrowerBite);
 		int randomInt = GetRandomControl();
@@ -101,7 +101,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+					if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
 						continue;
 
 					target = &g_Level.Items[currentCreature->ItemNumber];

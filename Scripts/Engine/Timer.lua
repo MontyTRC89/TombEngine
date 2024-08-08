@@ -1,7 +1,7 @@
 -----
 --- Basic timer - after a specified number of seconds, the specified thing happens.
 --
--- Timers are updated automatically every frame before OnControlPhase.
+-- Timers are updated automatically every frame before OnLoop.
 --
 -- Example usage:
 --	local Timer = require("Engine.Timer")
@@ -34,7 +34,7 @@ local Timer
 
 local unpausedColor = TEN.Color(255, 255, 255)
 local pausedColor = TEN.Color(255, 255, 0)
-local str = TEN.Strings.DisplayString("TIMER", 0, 0, unpausedColor, false, {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW} )
+local str = TEN.Strings.DisplayString("TIMER", Vec2 (0, 0), 1, unpausedColor, false, {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW} )
 
 
 Timer = {
@@ -81,7 +81,7 @@ Timer = {
 			print("Warning: a timer with name " .. name .. " already exists; overwriting it with a new one...")
 		end
 
-		LevelVars.Engine.Timer.timers[name] ={} 
+		LevelVars.Engine.Timer.timers[name] = {} 
 		local thisTimer = LevelVars.Engine.Timer.timers[name]
 		thisTimer.name = name
 		thisTimer.totalTime = totalTime
@@ -97,6 +97,14 @@ Timer = {
 			thisTimer.timerFormat = {seconds = true}
 		end
 		return obj
+	end;
+	
+	Delete = function(name)
+		if LevelVars.Engine.Timer.timers[name] then
+			LevelVars.Engine.Timer.timers[name] = nil
+		else
+			print("Warning: a timer with name " .. name .. " does not exist and can't be deleted.")
+		end
 	end;
 
 	--- Get a timer by its name.
@@ -125,7 +133,10 @@ Timer = {
 					else
 						t.remainingTime = t.remainingTime + t.totalTime
 					end
-					t.func(table.unpack(t.funcArgs))
+					
+					if (t.func ~= nil) then
+						t.func(table.unpack(t.funcArgs))
+					end
 				end
 			end
 
@@ -304,7 +315,7 @@ LevelFuncs.Engine.Timer.UpdateAll = function(dt)
 	end
 end
 
-TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRECONTROLPHASE, LevelFuncs.Engine.Timer.UpdateAll)
+TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.Engine.Timer.UpdateAll)
 
 return Timer
 

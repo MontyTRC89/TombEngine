@@ -23,6 +23,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/itemdata.h"
 
+using namespace TEN::Collision::Room;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 
@@ -32,9 +33,9 @@ namespace TEN::Entities::Doors
 	const ObjectCollisionBounds CrowbarDoorBounds =
 	{
 		GameBoundingBox(
-			-SECTOR(0.5f), SECTOR(0.5f),
-			-SECTOR(1), 0,
-			0, SECTOR(0.5f)
+			-BLOCK(0.5f), BLOCK(0.5f),
+			-BLOCK(1), 0,
+			0, BLOCK(0.5f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -67,55 +68,55 @@ namespace TEN::Entities::Doors
 		int zOffset = 0;
 
 		if (doorItem->Pose.Orientation.y == 0)
-			zOffset = -SECTOR(1);
+			zOffset = -BLOCK(1);
 		else if (doorItem->Pose.Orientation.y == ANGLE(180.0f))
-			zOffset = SECTOR(1);
+			zOffset = BLOCK(1);
 		else if (doorItem->Pose.Orientation.y == ANGLE(90.0f))
-			xOffset = -SECTOR(1);
+			xOffset = -BLOCK(1);
 		else
-			xOffset = SECTOR(1);
+			xOffset = BLOCK(1);
 
 		auto* r = &g_Level.Rooms[doorItem->RoomNumber];
-		doorData->d1.floor = GetSector(r, doorItem->Pose.Position.x - r->x + xOffset, doorItem->Pose.Position.z - r->z + zOffset);
+		doorData->d1.floor = GetSector(r, doorItem->Pose.Position.x - r->Position.x + xOffset, doorItem->Pose.Position.z - r->Position.z + zOffset);
 
-		auto roomNumber = doorData->d1.floor->WallPortal;
-		if (roomNumber == NO_ROOM)
-			boxNumber = doorData->d1.floor->Box;
+		auto roomNumber = doorData->d1.floor->SidePortalRoomNumber;
+		if (roomNumber == NO_VALUE)
+			boxNumber = doorData->d1.floor->PathfindingBoxID;
 		else
 		{
 			auto* b = &g_Level.Rooms[roomNumber];
-			boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x + xOffset, doorItem->Pose.Position.z - b->z + zOffset)->Box;
+			boxNumber = GetSector(b, doorItem->Pose.Position.x - b->Position.x + xOffset, doorItem->Pose.Position.z - b->Position.z + zOffset)->PathfindingBoxID;
 		}
 
-		doorData->d1.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX; 
+		doorData->d1.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
 		doorData->d1.data = *doorData->d1.floor;
 
 		if (r->flippedRoom != -1)
 		{
 			r = &g_Level.Rooms[r->flippedRoom];
-			doorData->d1flip.floor = GetSector(r, doorItem->Pose.Position.x - r->x + xOffset, doorItem->Pose.Position.z - r->z + zOffset);
+			doorData->d1flip.floor = GetSector(r, doorItem->Pose.Position.x - r->Position.x + xOffset, doorItem->Pose.Position.z - r->Position.z + zOffset);
 				
-			roomNumber = doorData->d1flip.floor->WallPortal;
-			if (roomNumber == NO_ROOM)
-				boxNumber = doorData->d1flip.floor->Box;
+			roomNumber = doorData->d1flip.floor->SidePortalRoomNumber;
+			if (roomNumber == NO_VALUE)
+				boxNumber = doorData->d1flip.floor->PathfindingBoxID;
 			else
 			{
 				auto* b = &g_Level.Rooms[roomNumber];
-				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x + xOffset, doorItem->Pose.Position.z - b->z + zOffset)->Box;
+				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->Position.x + xOffset, doorItem->Pose.Position.z - b->Position.z + zOffset)->PathfindingBoxID;
 			}
 
-			doorData->d1flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
+			doorData->d1flip.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
 			doorData->d1flip.data = *doorData->d1flip.floor;
 		}
 		else
 			doorData->d1flip.floor = NULL;
 
-		twoRoom = doorData->d1.floor->WallPortal;
+		twoRoom = doorData->d1.floor->SidePortalRoomNumber;
 
 		ShutThatDoor(&doorData->d1, doorData);
 		ShutThatDoor(&doorData->d1flip, doorData);
 
-		if (twoRoom == NO_ROOM)
+		if (twoRoom == NO_VALUE)
 		{
 			doorData->d2.floor = NULL;
 			doorData->d2flip.floor = NULL;
@@ -123,35 +124,35 @@ namespace TEN::Entities::Doors
 		else
 		{
 			r = &g_Level.Rooms[twoRoom];
-			doorData->d2.floor = GetSector(r, doorItem->Pose.Position.x - r->x, doorItem->Pose.Position.z - r->z);
+			doorData->d2.floor = GetSector(r, doorItem->Pose.Position.x - r->Position.x, doorItem->Pose.Position.z - r->Position.z);
 
-			roomNumber = doorData->d2.floor->WallPortal;
-			if (roomNumber == NO_ROOM)
-				boxNumber = doorData->d2.floor->Box;
+			roomNumber = doorData->d2.floor->SidePortalRoomNumber;
+			if (roomNumber == NO_VALUE)
+				boxNumber = doorData->d2.floor->PathfindingBoxID;
 			else
 			{
 				auto* b = &g_Level.Rooms[roomNumber];
-				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x, doorItem->Pose.Position.z - b->z)->Box;
+				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->Position.x, doorItem->Pose.Position.z - b->Position.z)->PathfindingBoxID;
 			}
 
-			doorData->d2.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX;
+			doorData->d2.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
 			doorData->d2.data = *doorData->d2.floor;
 
 			if (r->flippedRoom != -1)
 			{
 				r = &g_Level.Rooms[r->flippedRoom];
-				doorData->d2flip.floor = GetSector(r, doorItem->Pose.Position.x - r->x, doorItem->Pose.Position.z - r->z);
+				doorData->d2flip.floor = GetSector(r, doorItem->Pose.Position.x - r->Position.x, doorItem->Pose.Position.z - r->Position.z);
 
-				roomNumber = doorData->d2flip.floor->WallPortal;
-				if (roomNumber == NO_ROOM)
-					boxNumber = doorData->d2flip.floor->Box;
+				roomNumber = doorData->d2flip.floor->SidePortalRoomNumber;
+				if (roomNumber == NO_VALUE)
+					boxNumber = doorData->d2flip.floor->PathfindingBoxID;
 				else
 				{
 					auto* b = &g_Level.Rooms[roomNumber];
-					boxNumber = GetSector(b, doorItem->Pose.Position.x - b->x, doorItem->Pose.Position.z - b->z)->Box;
+					boxNumber = GetSector(b, doorItem->Pose.Position.x - b->Position.x, doorItem->Pose.Position.z - b->Position.z)->PathfindingBoxID;
 				}
 
-				doorData->d2flip.block = (boxNumber != NO_BOX && g_Level.Boxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_BOX; 
+				doorData->d2flip.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
 				doorData->d2flip.data = *doorData->d2flip.floor;
 			}
 			else
@@ -174,7 +175,7 @@ namespace TEN::Entities::Doors
 
 		if (doorItem->TriggerFlags == 2 &&
 			doorItem->Status == ITEM_NOT_ACTIVE && !doorItem->Animation.IsAirborne && // CHECK
-			((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
+			((IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
 				laraItem->Animation.ActiveState == LS_IDLE &&
 				laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 				!laraItem->HitStatus &&
@@ -186,7 +187,7 @@ namespace TEN::Entities::Doors
 			{
 				if (!laraInfo->Control.IsMoving)
 				{
-					if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
+					if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
 					{
 						if (g_Gui.IsObjectInInventory(ID_CROWBAR_ITEM))
 						{
@@ -216,7 +217,7 @@ namespace TEN::Entities::Doors
 					}
 				}
 
-				g_Gui.SetInventoryItemChosen(NO_ITEM);
+				g_Gui.SetInventoryItemChosen(NO_VALUE);
 
 				if (MoveLaraPosition(CrowbarDoorPos, doorItem, laraItem))
 				{
@@ -253,7 +254,7 @@ namespace TEN::Entities::Doors
 					if (!(doorItem->ObjectNumber >= ID_LIFT_DOORS1 &&
 						doorItem->ObjectNumber <= ID_LIFT_DOORS2) || doorItem->ItemFlags[0])
 					{
-						ItemPushItem(doorItem, laraItem, coll, FALSE, TRUE);
+						ItemPushItem(doorItem, laraItem, coll, false, 1);
 					}
 				}
 			}
@@ -275,7 +276,7 @@ namespace TEN::Entities::Doors
 				doorItem->ItemFlags[0]--;
 				doorItem->Pose.Position.y -= TEN::Entities::Switches::COG_DOOR_SPEED;
 				
-				int y = bounds.Y1 + doorItem->ItemFlags[2] - STEP_SIZE;
+				int y = bounds.Y1 + doorItem->ItemFlags[2] - CLICK(1);
 				if (doorItem->Pose.Position.y < y)
 				{
 					doorItem->Pose.Position.y = y;
@@ -347,7 +348,7 @@ namespace TEN::Entities::Doors
 			// TR5 lift doors
 			/*if (!TriggerActive(item))
 			{
-				if (item->itemFlags[0] >= SECTOR(4))
+				if (item->itemFlags[0] >= BLOCK(4))
 				{
 					if (door->opened)
 					{
@@ -362,16 +363,16 @@ namespace TEN::Entities::Doors
 				{
 					if (!item->itemFlags[0])
 						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos);
-					item->itemFlags[0] += STEP_SIZE;
+					item->itemFlags[0] += CLICK(1);
 				}
 			}
 			else
 			{
 				if (item->itemFlags[0] > 0)
 				{
-					if (item->itemFlags[0] == SECTOR(4))
+					if (item->itemFlags[0] == BLOCK(4))
 						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos);
-					item->itemFlags[0] -= STEP_SIZE;
+					item->itemFlags[0] -= CLICK(1);
 				}
 				if (!door->opened)
 				{
@@ -398,44 +399,46 @@ namespace TEN::Entities::Doors
 			*doorPos->floor = doorPos->data;
 
 			short boxIndex = doorPos->block;
-			if (boxIndex != NO_BOX)
+			if (boxIndex != NO_VALUE)
 			{
-				g_Level.Boxes[boxIndex].flags &= ~BLOCKED;
+				g_Level.PathfindingBoxes[boxIndex].flags &= ~BLOCKED;
 				for (auto& currentCreature : ActiveCreatures)
-					currentCreature->LOT.TargetBox = NO_BOX;
+					currentCreature->LOT.TargetBox = NO_VALUE;
 			}
 		}
 	}
 
 	void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	{
+		static const auto WALL_PLANE = Plane(-Vector3::UnitY, -CLICK(127));
+
 		FloorInfo* floor = doorPos->floor;
 
 		if (floor)
 		{
-			floor->Box = NO_BOX;
+			floor->PathfindingBoxID = NO_VALUE;
 			floor->TriggerIndex = 0;
 
 			// FIXME: HACK!!!!!!!
 			// We should find a better way of dealing with doors using new floordata.
 
-			floor->WallPortal = -1;
-			floor->FloorCollision.Portals[0]   = NO_ROOM;
-			floor->FloorCollision.Portals[1]   = NO_ROOM;
-			floor->CeilingCollision.Portals[0] = NO_ROOM;
-			floor->CeilingCollision.Portals[1] = NO_ROOM;
-			floor->FloorCollision.Planes[0]    = WALL_PLANE;
-			floor->FloorCollision.Planes[1]    = WALL_PLANE;
-			floor->CeilingCollision.Planes[0]  = WALL_PLANE;
-			floor->CeilingCollision.Planes[1]  = WALL_PLANE;
+			floor->SidePortalRoomNumber = -1;
+			floor->FloorSurface.Triangles[0].PortalRoomNumber =
+			floor->FloorSurface.Triangles[1].PortalRoomNumber =
+			floor->CeilingSurface.Triangles[0].PortalRoomNumber =
+			floor->CeilingSurface.Triangles[1].PortalRoomNumber = NO_VALUE;
+			floor->FloorSurface.Triangles[0].Plane =
+			floor->FloorSurface.Triangles[1].Plane =
+			floor->CeilingSurface.Triangles[0].Plane =
+			floor->CeilingSurface.Triangles[1].Plane = WALL_PLANE;
 
 			short boxIndex = doorPos->block;
-			if (boxIndex != NO_BOX)
+			if (boxIndex != NO_VALUE)
 			{
-				g_Level.Boxes[boxIndex].flags |= BLOCKED;
+				g_Level.PathfindingBoxes[boxIndex].flags |= BLOCKED;
 
 				for (auto& currentCreature : ActiveCreatures)
-					currentCreature->LOT.TargetBox = NO_BOX;
+					currentCreature->LOT.TargetBox = NO_VALUE;
 			}
 		}
 	}

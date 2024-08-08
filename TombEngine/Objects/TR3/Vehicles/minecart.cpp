@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
@@ -20,6 +21,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -57,9 +59,6 @@ namespace TEN::Entities::Vehicles
 	const auto MINECART_TERMINAL_ANGLE = ANGLE(22.0f);
 
 	constexpr auto MINECART_WAKE_OFFSET = Vector3(BLOCK(1 / 6.0f), 0.0f, BLOCK(0.5f));
-
-	constexpr auto MINECART_IN_DUCK	 = IN_CROUCH;
-	constexpr auto MINECART_IN_SWIPE = IN_ACTION | IN_DRAW;
 
 	int Wheels[4] = { 2, 3, 1, 4 };
 	const auto MinecartMountTypes = std::vector<VehicleMountType>
@@ -156,7 +155,7 @@ namespace TEN::Entities::Vehicles
 		MINECART_FLAG_DISMOUNT_RIGHT = (1 << 3),
 		MINECART_FLAG_CONTROL		 = (1 << 4),
 		MINECART_FLAG_STOPPED		 = (1 << 5),
-		MINECART_FLAG_NO_ANIM		 = (1 << 6),
+		MINECART_FLAG_NO_VALUE		 = (1 << 6),
 		MINECART_FLAG_DEAD			 = (1 << 7)
 	};
 
@@ -169,7 +168,6 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* minecartItem = &g_Level.Items[itemNumber];
 		minecartItem->Data = MinecartInfo();
-		auto* minecart = GetMinecartInfo(minecartItem);
 	}
 
 	void MinecartPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -177,14 +175,14 @@ namespace TEN::Entities::Vehicles
 		auto* minecartItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		// Don't get into minecart if there are two stop blocks in front.
 		// This allows creation of minecarts which will get to a point and stop forever.
 		auto mountType = GetVehicleMountType(minecartItem, laraItem, coll, MinecartMountTypes, MINECART_MOUNT_DISTANCE);
 		if (mountType == VehicleMountType::None ||
-			GetCollision(minecartItem, minecartItem->Pose.Orientation.y, BLOCK(1)).BottomBlock->Flags.MinecartStop())
+			GetPointCollision(*minecartItem, minecartItem->Pose.Orientation.y, BLOCK(1)).GetBottomSector().Flags.MinecartStop())
 		{
 			ObjectCollision(itemNumber, laraItem, coll);
 		}
@@ -244,12 +242,13 @@ namespace TEN::Entities::Vehicles
 
 	static int GetMinecartCollision(ItemInfo* minecartItem, short angle, int distance)
 	{
-		auto probe = GetCollision(minecartItem, angle, distance, -LARA_HEIGHT);
+		auto probe = GetPointCollision(*minecartItem, angle, distance, -LARA_HEIGHT);
 
-		if (probe.Position.Floor != NO_HEIGHT)
-			probe.Position.Floor -= minecartItem->Pose.Position.y;
+		if (probe.GetFloorHeight() == NO_HEIGHT)
+			return probe.GetFloorHeight();
+			
+		return (probe.GetFloorHeight() - minecartItem->Pose.Position.y);
 
-		return probe.Position.Floor;
 	}
 
 	static bool TestMinecartDismount(ItemInfo* laraItem, int direction)
@@ -263,16 +262,16 @@ namespace TEN::Entities::Vehicles
 		else
 			angle = minecartItem->Pose.Orientation.y - ANGLE(90.0f);
 
-		auto probe = GetCollision(minecartItem, angle, -MINECART_DISMOUNT_DISTANCE);
+		auto probe = GetPointCollision(*minecartItem, angle, -MINECART_DISMOUNT_DISTANCE);
 
-		if (probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT)
+		if (probe.IsSteepFloor() || probe.GetFloorHeight() == NO_HEIGHT)
 			return false;
 
-		if (abs(probe.Position.Floor - minecartItem->Pose.Position.y) > CLICK(2))
+		if (abs(probe.GetFloorHeight() - minecartItem->Pose.Position.y) > CLICK(2))
 			return false;
 
-		if ((probe.Position.Ceiling - minecartItem->Pose.Position.y) > -LARA_HEIGHT ||
-			(probe.Position.Floor - probe.Position.Ceiling) < LARA_HEIGHT)
+		if ((probe.GetCeilingHeight() - minecartItem->Pose.Position.y) > -LARA_HEIGHT ||
+			(probe.GetFloorHeight() - probe.GetCeilingHeight()) < LARA_HEIGHT)
 		{
 			return false;
 		}
@@ -282,14 +281,14 @@ namespace TEN::Entities::Vehicles
 
 	static void MinecartToEntityCollision(ItemInfo* minecartItem, ItemInfo* laraItem)
 	{
-		for (auto i : g_Level.Rooms[minecartItem->RoomNumber].neighbors)
+		for (auto i : g_Level.Rooms[minecartItem->RoomNumber].NeighborRoomNumbers)
 		{
 			if (!g_Level.Rooms[i].Active())
 				continue;
 
 			short itemNumber = g_Level.Rooms[i].itemNumber;
 
-			while (itemNumber != NO_ITEM)
+			while (itemNumber != NO_VALUE)
 			{
 				auto* item = &g_Level.Items[itemNumber];
 
@@ -355,7 +354,7 @@ namespace TEN::Entities::Vehicles
 		auto* minecart = GetMinecartInfo(minecartItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		auto flags = GetCollision(minecartItem).BottomBlock->Flags;
+		auto flags = GetPointCollision(*minecartItem).GetBottomSector().Flags;
 
 		if (minecart->StopDelayTime)
 			minecart->StopDelayTime--;
@@ -605,11 +604,11 @@ namespace TEN::Entities::Vehicles
 		switch (laraItem->Animation.ActiveState)
 		{
 		case MINECART_STATE_MOVE:
-			if (TrInput & MINECART_IN_SWIPE)
+			if (IsHeld(In::Action) || IsHeld(In::Draw))
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
-			else if (TrInput & MINECART_IN_DUCK)
+			else if (IsHeld(In::Crouch))
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
-			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
+			else if (IsHeld(In::Brake) || IsHeld(In::Slower))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
 			else if (minecart->Velocity <= MINECART_STOP_VELOCITY_MIN || minecart->Flags & MINECART_FLAG_STOPPED)
 				laraItem->Animation.TargetState = MINECART_STATE_IDLE;
@@ -617,19 +616,19 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = MINECART_STATE_FORWARD;
 			else if (minecart->Gradient > MINECART_BACK_GRADIENT)
 				laraItem->Animation.TargetState = MINECART_STATE_BACK;
-			else if (TrInput & VEHICLE_IN_LEFT)
+			else if (IsHeld(In::Left))
 				laraItem->Animation.TargetState = MINECART_STATE_LEFT;
-			else if (TrInput & VEHICLE_IN_RIGHT)
+			else if (IsHeld(In::Right))
 				laraItem->Animation.TargetState = MINECART_STATE_RIGHT;
 
 			break;
 
 		case MINECART_STATE_FORWARD:
-			if (TrInput & MINECART_IN_SWIPE)
+			if (IsHeld(In::Action) || IsHeld(In::Draw))
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
-			else if (TrInput & MINECART_IN_DUCK)
+			else if (IsHeld(In::Crouch))
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
-			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
+			else if (IsHeld(In::Brake) || IsHeld(In::Slower))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
 			else if (minecart->Gradient > MINECART_FORWARD_GRADIENT)
 				laraItem->Animation.TargetState = MINECART_STATE_MOVE;
@@ -637,11 +636,11 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case MINECART_STATE_BACK:
-			if (TrInput & MINECART_IN_SWIPE)
+			if (IsHeld(In::Action) || IsHeld(In::Draw))
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
-			else if (TrInput & MINECART_IN_DUCK)
+			else if (IsHeld(In::Crouch))
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
-			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
+			else if (IsHeld(In::Brake) || IsHeld(In::Slower))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
 			else if (minecart->Gradient < MINECART_BACK_GRADIENT)
 				laraItem->Animation.TargetState = MINECART_STATE_MOVE;
@@ -649,27 +648,27 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case MINECART_STATE_LEFT:
-			if (TrInput & MINECART_IN_SWIPE)
+			if (IsHeld(In::Action) || IsHeld(In::Draw))
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
-			else if (TrInput & MINECART_IN_DUCK)
+			else if (IsHeld(In::Crouch))
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
-			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
+			else if (IsHeld(In::Brake) || IsHeld(In::Slower))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
 
-			if (!(TrInput & VEHICLE_IN_LEFT))
+			if (!IsHeld(In::Left))
 				laraItem->Animation.TargetState = MINECART_STATE_MOVE;
 
 			break;
 
 		case MINECART_STATE_RIGHT:
-			if (TrInput & MINECART_IN_SWIPE)
+			if (IsHeld(In::Action) || IsHeld(In::Draw))
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
-			else if (TrInput & MINECART_IN_DUCK)
+			else if (IsHeld(In::Crouch))
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
-			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
+			else if (IsHeld(In::Brake) || IsHeld(In::Slower))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
 
-			if (!(TrInput & VEHICLE_IN_RIGHT))
+			if (!IsHeld(In::Right))
 				laraItem->Animation.TargetState = MINECART_STATE_MOVE;
 
 			break;
@@ -682,14 +681,14 @@ namespace TEN::Entities::Vehicles
 				minecart->StopDelayTime = 64;
 			}
 
-			if (TrInput & VEHICLE_IN_DISMOUNT && minecart->Flags & MINECART_FLAG_STOPPED)
+			if (IsHeld(In::Brake) && minecart->Flags & MINECART_FLAG_STOPPED)
 			{
-				if (TrInput & VEHICLE_IN_LEFT && TestMinecartDismount(laraItem, -1))
+				if (IsHeld(In::Left) && TestMinecartDismount(laraItem, -1))
 				{
 					laraItem->Animation.TargetState = MINECART_STATE_DISMOUNT;
 					minecart->Flags &= ~MINECART_FLAG_DISMOUNT_RIGHT;
 				}
-				else if (TrInput & VEHICLE_IN_RIGHT && TestMinecartDismount(laraItem, 1))
+				else if (IsHeld(In::Right) && TestMinecartDismount(laraItem, 1))
 				{
 					laraItem->Animation.TargetState = MINECART_STATE_DISMOUNT;
 					minecart->Flags |= MINECART_FLAG_DISMOUNT_RIGHT;
@@ -698,7 +697,7 @@ namespace TEN::Entities::Vehicles
 
 			if (minecart->Velocity > 0)
 			{
-				if (TrInput & MINECART_IN_DUCK)
+				if (IsHeld(In::Crouch))
 					laraItem->Animation.TargetState = MINECART_STATE_DUCK;
 				else
 					laraItem->Animation.TargetState = MINECART_STATE_MOVE;
@@ -707,11 +706,11 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case MINECART_STATE_DUCK:
-			if (TrInput & MINECART_IN_SWIPE)
+			if (IsHeld(In::Action) || IsHeld(In::Draw))
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
-			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
+			else if (IsHeld(In::Brake) || IsHeld(In::Slower))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
-			else if (!(TrInput & MINECART_IN_DUCK))
+			else if (!(IsHeld(In::Crouch)))
 				laraItem->Animation.TargetState = MINECART_STATE_IDLE;
 
 			break;
@@ -721,12 +720,12 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case MINECART_STATE_BRAKING:
-			if (TrInput & MINECART_IN_DUCK)
+			if (IsHeld(In::Crouch))
 			{
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
 				StopSoundEffect(SFX_TR3_VEHICLE_MINECART_BRAKE);
 			}
-			else if (!(TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW)) || minecart->Flags & MINECART_FLAG_STOPPED)
+			else if (!(IsHeld(In::Brake) || IsHeld(In::Slower)) || minecart->Flags & MINECART_FLAG_STOPPED)
 			{
 				laraItem->Animation.TargetState = MINECART_STATE_MOVE;
 				StopSoundEffect(SFX_TR3_VEHICLE_MINECART_BRAKE);
@@ -833,7 +832,7 @@ namespace TEN::Entities::Vehicles
 			{
 				if (TestAnimNumber(*laraItem, MINECART_ANIM_FALL_DEATH))
 				{
-					minecart->Flags |= MINECART_FLAG_NO_ANIM;
+					minecart->Flags |= MINECART_FLAG_NO_VALUE;
 					laraItem->HitPoints = -1;
 				}
 			}
@@ -847,7 +846,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.FrameNumber = GetFrameIndex(minecartItem, 34) + 28;
 				minecartItem->Animation.Velocity.z = 0.0f;
 				minecart->Velocity = 0;
-				minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | MINECART_FLAG_NO_ANIM;
+				minecart->Flags = (minecart->Flags & ~MINECART_FLAG_CONTROL) | MINECART_FLAG_NO_VALUE;
 			}
 
 			break;
@@ -865,8 +864,8 @@ namespace TEN::Entities::Vehicles
 			break;
 		}
 
-		if (lara->Context.Vehicle != NO_ITEM &&
-			!(minecart->Flags & MINECART_FLAG_NO_ANIM))
+		if (lara->Context.Vehicle != NO_VALUE &&
+			!(minecart->Flags & MINECART_FLAG_NO_VALUE))
 		{
 			AnimateItem(laraItem);
 			SyncVehicleAnimation(*minecartItem, *laraItem);
@@ -969,14 +968,14 @@ namespace TEN::Entities::Vehicles
 		if (minecart->Flags & MINECART_FLAG_CONTROL)
 			MoveCart(minecartItem, laraItem);
 
-		if (lara->Context.Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_VALUE)
 			laraItem->Pose = minecartItem->Pose;
 
-		short probedRoomNumber = GetCollision(minecartItem).RoomNumber;
+		short probedRoomNumber = GetPointCollision(*minecartItem).GetRoomNumber();
 		if (probedRoomNumber != minecartItem->RoomNumber)
 		{
 			ItemNewRoom(lara->Context.Vehicle, probedRoomNumber);
-			ItemNewRoom(lara->ItemNumber, probedRoomNumber);
+			ItemNewRoom(laraItem->Index, probedRoomNumber);
 		}
 
 		TestTriggers(minecartItem, false);
@@ -987,6 +986,6 @@ namespace TEN::Entities::Vehicles
 			Camera.targetDistance = BLOCK(2);
 		}
 
-		return (lara->Context.Vehicle == NO_ITEM) ? false : true;
+		return (lara->Context.Vehicle == NO_VALUE) ? false : true;
 	}
 }

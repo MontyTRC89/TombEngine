@@ -15,6 +15,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Room;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
@@ -23,7 +24,7 @@ namespace TEN::Entities::Creatures::TR5
 
 	// TODO: Ranges.
 
-	const auto GladiatorBite = CreatureBiteInfo(Vector3i::Zero, 16);
+	const auto GladiatorBite = CreatureBiteInfo(Vector3::Zero, 16);
 	const auto GladiatorAttackJoints = std::vector<unsigned int>{ 13, 14 };
 
 	enum GladiatorState
@@ -152,7 +153,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->AIBits & GUARD ||
 					Random::TestProbability(1.0f / 32) &&
-					(AI.distance > pow(SECTOR(1), 2) || creature->Mood != MoodType::Attack))
+					(AI.distance > pow(BLOCK(1), 2) || creature->Mood != MoodType::Attack))
 				{
 					joint2 = AIGuard(creature);
 					break;
@@ -173,9 +174,9 @@ namespace TEN::Entities::Creatures::TR5
 					else
 					{
 						if (creature->Mood == MoodType::Bored ||
-							(item->AIBits & FOLLOW && (creature->ReachedGoal || distance > pow(SECTOR(2), 2))))
+							(item->AIBits & FOLLOW && (creature->ReachedGoal || distance > pow(BLOCK(2), 2))))
 						{
-							if (item->Animation.RequiredState != NO_STATE)
+							if (item->Animation.RequiredState != NO_VALUE)
 								item->Animation.TargetState = item->Animation.RequiredState;
 							else if (Random::TestProbability(1 / 64.0f))
 								item->Animation.TargetState = GLADIATOR_STATE_IDLE;
@@ -184,7 +185,7 @@ namespace TEN::Entities::Creatures::TR5
 						}
 
 						if (Lara.TargetEntity == item &&
-							unknown && distance < pow(SECTOR(1.5f), 2) &&
+							unknown && distance < pow(BLOCK(1.5f), 2) &&
 							Random::TestProbability(1 / 2.0f) &&
 							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Random::TestProbability(0.06f)) &&
 							item->MeshBits == -1)
@@ -223,15 +224,15 @@ namespace TEN::Entities::Creatures::TR5
 					item->Animation.TargetState = GLADIATOR_STATE_RUN_FORWARD;
 				else if (creature->Mood != MoodType::Bored)
 				{
-					if (AI.distance < pow(SECTOR(1), 2))
+					if (AI.distance < pow(BLOCK(1), 2))
 					{
 						item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 						break;
 					}
 
-					if (AI.bite && AI.distance < pow(SECTOR(2), 2))
+					if (AI.bite && AI.distance < pow(BLOCK(2), 2))
 						item->Animation.TargetState = GLADIATOR_STATE_WALK_SWORD_ATTACK;
-					else if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2))
+					else if (!AI.ahead || AI.distance > pow(BLOCK(1.5f), 2))
 						item->Animation.TargetState = GLADIATOR_STATE_RUN_FORWARD;
 				}
 				else if (Random::TestProbability(1 / 64.0f))
@@ -269,7 +270,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 
 				if (item->AIBits & FOLLOW &&
-					(creature->ReachedGoal || distance > pow(SECTOR(2), 2)))
+					(creature->ReachedGoal || distance > pow(BLOCK(2), 2)))
 				{
 					item->Animation.TargetState = GLADIATOR_STATE_IDLE;
 					break;
@@ -281,7 +282,7 @@ namespace TEN::Entities::Creatures::TR5
 					break;
 				}
 
-				if (AI.distance < pow(SECTOR(1.5f), 2))
+				if (AI.distance < pow(BLOCK(1.5f), 2))
 				{
 					if (AI.bite)
 						item->Animation.TargetState = GLADIATOR_STATE_RUN_SWORD_ATTACK;
@@ -336,7 +337,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					auto pos = GetJointPosition(item, 16);
 
-					auto* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
+					auto* floor = GetSector(room, pos.x - room->Position.x, pos.z - room->Position.z);
 					if (floor->Stopper)
 					{
 						for (int i = 0; i < room->mesh.size(); i++)
@@ -347,7 +348,7 @@ namespace TEN::Entities::Creatures::TR5
 							{
 								if (!((pos.x ^ mesh->pos.Position.x) & 0xFFFFFC00))
 								{
-									if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+									if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
 									{
 										ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
 										//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28);

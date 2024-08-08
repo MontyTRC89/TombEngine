@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "FlowLevel.h"
-#include "ScriptAssert.h"
+#include "Scripting/Internal/ScriptAssert.h"
 
 /***
 Stores level metadata.
@@ -14,7 +14,7 @@ These are things things which aren't present in the compiled level file itself.
 	@function Level
 	@treturn Level a Level object
 	*/
-void Level::Register(sol::table & parent)
+void Level::Register(sol::table& parent)
 {	
 	parent.new_usertype<Level>("Level",
 		sol::constructors<Level()>(),
@@ -109,12 +109,10 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 
 		"farView", sol::property(&Level::SetLevelFarView),
 
-/*** (bool) Enable unlimited oxygen supply when in water.
-
- __(not yet implemented)__
-@mem unlimitedAir
-*/
-		"unlimitedAir", &Level::UnlimitedAir,
+/// (bool) Reset hub data.
+// Resets the state for all previous levels, including items, flipmaps and statistics.
+//@mem resetHub
+		"resetHub", &Level::ResetHub,
 
 /// (table of @{Flow.InventoryItem}s) table of inventory object overrides
 //@mem objects
@@ -152,7 +150,7 @@ This is equivalent to TRNG's LevelFarView variable.
 void Level::SetLevelFarView(short val)
 {
 	static_assert(MIN_FAR_VIEW == 3200.0f, "Please update the comment, docs, and warning message if this number changes.");
-	const short min = std::ceil(MIN_FAR_VIEW / SECTOR(1));
+	const short min = std::ceil(MIN_FAR_VIEW / BLOCK(1));
 	bool cond = val >= min;
 
 	std::string msg{ "farView value must be 4 or greater." };
@@ -169,7 +167,7 @@ void Level::SetLevelFarView(short val)
 
 RGBAColor8Byte Level::GetSkyLayerColor(int index) const
 {
-	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
 	if (index == 0)
 	{
@@ -183,7 +181,7 @@ RGBAColor8Byte Level::GetSkyLayerColor(int index) const
 
 bool Level::GetSkyLayerEnabled(int index) const
 {
-	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
 	if (index == 0)
 	{
@@ -197,7 +195,7 @@ bool Level::GetSkyLayerEnabled(int index) const
 
 short Level::GetSkyLayerSpeed(int index) const
 {
-	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
 	if (index == 0)
 	{
@@ -214,7 +212,12 @@ LaraType Level::GetLaraType() const
 	return Type;
 }
 
-bool Level::HasStorm() const
+bool Level::GetResetHubEnabled() const
+{
+	return ResetHub;
+}
+
+bool Level::GetStormEnabled() const
 {
 	return Storm;
 }

@@ -400,13 +400,12 @@ namespace TEN::Entities::Creatures::TR5
 											farAway = 2;
 
 										auto hitPos = Vector3i::Zero;
-										MESH_INFO* hitMesh = nullptr;
 
 										auto start = GameVector(guardian->fireArcs[i]->pos1.x, guardian->fireArcs[i]->pos1.y, guardian->fireArcs[i]->pos1.z);
 										start.RoomNumber = item->RoomNumber;
 										auto end = GameVector(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, 0);
 
-										if (ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, ID_LARA) == GetLaraInfo(LaraItem)->ItemNumber)
+										if (ObjectOnLOS2(&start, &end, &hitPos, nullptr, ID_LARA) == LaraItem->Index)
 										{
 											if (LaraItem->Effect.Type != EffectType::Smoke)
 											{
@@ -602,9 +601,9 @@ namespace TEN::Entities::Creatures::TR5
 		TriggerExplosionSparks(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, 3, -2, 2, item.RoomNumber);
 		TriggerExplosionSparks(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, 2, 0, 2, item.RoomNumber);
 
-		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, EulerAngles::Zero, 0, true, false, (int)ShockwaveStyle::Normal);
-		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, EulerAngles(0x3000, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
-		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, EulerAngles(0x6000, 0.0f, 0.0f), 0, true, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, EulerAngles(0x3000, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
+		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, EulerAngles(0x6000, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 
 		g_Level.Items[guardian.PuzzleItem].Pose.Position.y = item.Pose.Position.y;
 		TestTriggers(&item, true);
@@ -637,7 +636,7 @@ namespace TEN::Entities::Creatures::TR5
 			spark->fadeToBlack = 0;
 			spark->life = 9 * pow(2, unk);
 			spark->sLife = 9 * pow(2, unk);
-			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BlendMode::Additive;
 			spark->x = pos.x;
 			spark->y = pos.y;
 			spark->z = pos.z;

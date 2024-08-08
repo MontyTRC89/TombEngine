@@ -1,27 +1,29 @@
 #include "framework.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
-#include "Game/items.h"
+#include "Game/collision/floordata.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/item_fx.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
-#include "Objects/objectslist.h"
-#include "Specific/level.h"
 #include "Math/Math.h"
-
+#include "Objects/objectslist.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
-#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Specific/level.h"
 
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
+using namespace TEN::Math;
 
 /***
 Represents any object inside the game world.
@@ -34,21 +36,19 @@ pickups, and Lara herself (see also @{Objects.LaraObject} for Lara-specific feat
 
 constexpr auto LUA_CLASS_NAME{ ScriptReserved_Moveable };
 
-static auto index_error = index_error_maker(Moveable, LUA_CLASS_NAME);
-static auto newindex_error = newindex_error_maker(Moveable, LUA_CLASS_NAME);
+static auto IndexError = index_error_maker(Moveable, LUA_CLASS_NAME);
+static auto NewIndexError = newindex_error_maker(Moveable, LUA_CLASS_NAME);
 
 
 Moveable::Moveable(short num, bool alreadyInitialized) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialized{ alreadyInitialized }
 {
 	if (alreadyInitialized)
-	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(m_item, this);
-	}
 };
 
 Moveable::Moveable(Moveable&& other) noexcept : 
 	m_item{ std::exchange(other.m_item, nullptr) },
-	m_num{ std::exchange(other.m_num, NO_ITEM) },
+	m_num{ std::exchange(other.m_num, NO_VALUE) },
 	m_initialized{ std::exchange(other.m_initialized, false) }
 {
 	if (GetValid())
@@ -58,51 +58,52 @@ Moveable::Moveable(Moveable&& other) noexcept :
 	}
 }
 
-
 Moveable::~Moveable()
 {
 	if (m_item && g_GameScriptEntities) 
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 }
 
-bool operator==(Moveable const& first, Moveable const& second)
+bool operator ==(const Moveable& first, const Moveable& second)
 {
 	return first.m_item == second.m_item;
 }
 
-/*** For more information on each parameter, see the
+/*** Used to generate a new moveable dynamically at runtime. 
+For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
 most can just be ignored (see usage).
+
 	@function Moveable
 	@tparam Objects.ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
-	@tparam[opt] Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
-	@int[opt] room room ID item is in (default: calculated automatically)
-	@int[opt=0] animNumber anim number
-	@int[opt=0] frameNumber frame number
-	@int[opt=10] hp HP of item
-	@int[opt=0] OCB ocb of item (default 0)
-	@tparam[opt] table AIBits table with AI bits (default {0,0,0,0,0,0})
+	@tparam Rotation rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
+	@tparam int roomID room ID item is in (default: calculated automatically)
+	@tparam int animNumber animation number
+	@tparam int frameNumber frame number
+	@tparam int hp HP of item
+	@tparam int OCB ocb of item
+	@tparam table AIBits table with AI bits (default { 0, 0, 0, 0, 0, 0 })
 	@treturn Moveable A new Moveable object (a wrapper around the new object)
+
 	@usage 
 	local item = Moveable(
 		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
-		Vec3(18907, 0, 21201)
-		)
+		Vec3(18907, 0, 21201)) -- position
 	*/
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
-	std::string const & name,
-	Vec3 const & pos,
-	TypeOrNil<Rotation> const & rot,
+	const std::string& name,
+	const Vec3& pos,
+	const TypeOrNil<Rotation>& rot,
 	TypeOrNil<short> room,
 	TypeOrNil<int> animNumber,
 	TypeOrNil<int> frameNumber,
 	TypeOrNil<short> hp,
 	TypeOrNil<short> ocb,
-	TypeOrNil<aiBitsType> const & aiBits
+	const TypeOrNil<aiBitsType>& aiBits
 )
 {
 	short num = CreateItem();
@@ -110,40 +111,53 @@ static std::unique_ptr<Moveable> Create(
 
 	if (ScriptAssert(ptr->SetName(name), "Could not set name for Moveable; returning an invalid object."))
 	{
-		ItemInfo* item = &g_Level.Items[num];
+		auto* item = &g_Level.Items[num];
+
+		ptr->SetObjectID(objID);
+
 		if (std::holds_alternative<short>(room))
 		{
 			ptr->SetPos(pos, false);
 			ptr->SetRoomNumber(std::get<short>(room));
 		}
 		else
+		{
 			ptr->SetPos(pos, true);
+		}
 
 		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
-		ptr->SetObjectID(objID);
 		ptr->Init();
 
-		ptr->SetAnimNumber(USE_IF_HAVE(int, animNumber, 0));
-		ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
-		ptr->SetHP(USE_IF_HAVE(short, hp, 10));
+		if (std::holds_alternative<int>(animNumber))
+		{
+			ptr->SetAnimNumber(std::get<int>(animNumber));
+			ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
+		}
+
+		if (std::holds_alternative<short>(hp))
+		{
+			ptr->SetHP(std::get<short>(hp));
+		}
+
 		ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
 		ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
 		ptr->SetColor(ScriptColor(Vector4::One));
-		item->CarriedItem = NO_ITEM;
+		item->CarriedItem = NO_VALUE;
 
 		// call this when resetting name too?
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(item, ptr.get());
 		// add to name map too?
 	}
+
 	return ptr;
 }
 
-void Moveable::Register(sol::table & parent)
+void Moveable::Register(sol::state& state, sol::table& parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
 		sol::call_constructor, Create,
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
 	ScriptReserved_Enable, &Moveable::EnableItem,
@@ -178,37 +192,17 @@ void Moveable::Register(sol::table & parent)
 /// Get current moveable effect
 // @function Moveable:GetEffect
 // @treturn Effects.EffectID effect type currently assigned to moveable.
-	ScriptReserved_GetEffect, & Moveable::GetEffect,
+	ScriptReserved_GetEffect, &Moveable::GetEffect,
 
-/// Get the status of object.
-// possible values:
-// <br />0 - not active 
-// <br />1 - active 
-// <br />2 - deactivated 
-// <br />3 - invisible
-// @function Moveable:GetStatus
-// @treturn int a number representing the status of the object
+/// Get the moveable's status.
+// @function Moveable:GetStatus()
+// @treturn Objects.MoveableStatus The moveable's status.
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 
-/// Set the name of the function to be called when the moveable is shot by Lara.
-// Note that this will be triggered twice when shot with both pistols at once. 
-// @function Moveable:SetOnHit
-// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
-	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
-
-	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
-
-	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
-
-/// Set the name of the function to be called when the moveable is destroyed/killed
-// Note that enemy death often occurs at the end of an animation, and not at the exact moment
-// the enemy's HP becomes zero.
-// @function Moveable:SetOnKilled
-// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
-// @usage
-// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
-// baddy:SetOnKilled(LevelFuncs.baddyKilled)
-	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
+/// Set the moveable's status.
+// @function Moveable:SetStatus()
+// @tparam Objects.MoveableStatus status The new status of the moveable.
+	ScriptReserved_SetStatus, &Moveable::SetStatus,
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
@@ -255,6 +249,8 @@ void Moveable::Register(sol::table & parent)
 // @treturn int the current frame of the active animation
 	ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
 
+	ScriptReserved_GetEndFrame, &Moveable::GetEndFrame,
+
 /// Set the object's velocity to specified value.
 // In most cases, only Z and Y components are used as forward and vertical velocity.
 // In some cases, primarily NPCs, X component is used as side velocity.
@@ -277,14 +273,21 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:SetFrame
 // @tparam int frame the new frame number
 	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
-		
+
+/// Get current HP (hit points/health points)
+// @function Moveable:GetHP
+// @treturn int the amount of HP the moveable currently has
 	ScriptReserved_GetHP, &Moveable::GetHP,
 
+/// Set current HP (hit points/health points)
+// Clamped to [0, 32767] for "intelligent" entities (i.e. anything with AI); clamped to [-32767, 32767] otherwise.
+// @function Moveable:SetHP
+// @tparam int HP the amount of HP to give the moveable
 	ScriptReserved_SetHP, &Moveable::SetHP,
 
 /// Get HP definded for that object type (hit points/health points) (Read Only).
 // @function Moveable:GetSlotHP
-// @tparam int ID of the moveable slot type.
+// @treturn int the moveable's slot default hit points
 ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 /// Get OCB (object code bit) of the moveable
@@ -327,7 +330,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 			
 	ScriptReserved_SetAIBits, &Moveable::SetAIBits,
 
-	ScriptReserved_GetMeshVisable, &Moveable::GetMeshVisible,
+	ScriptReserved_GetMeshCount, & Moveable::GetMeshCount,
+
+	ScriptReserved_GetMeshVisible, &Moveable::GetMeshVisible,
 			
 	ScriptReserved_SetMeshVisible, &Moveable::SetMeshVisible,
 			
@@ -411,20 +416,59 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam Objects.ObjID ObjectID to take animation and stateID from,
 // @tparam int animNumber animation from object
 // @tparam int stateID state from object
-	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
+	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject,
+
+/// Set the name of the function to be called when the moveable is shot by Lara.
+// Note that this will be triggered twice when shot with both pistols at once. 
+// @function Moveable:SetOnHit
+// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
+	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
+
+/// Set the function to be called when this moveable collides with another moveable
+// @function Moveable:SetOnCollidedWithObject
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.
+// @usage
+// LevelFuncs.objCollided = function(obj1, obj2)
+//     print(obj1:GetName() .. " collided with " .. obj2:GetName())
+// end
+// baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)
+	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
+
+/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.
+// @function Moveable:SetOnCollidedWithRoom
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
+// @usage
+// LevelFuncs.roomCollided = function(obj)
+//     print(obj:GetName() .. " collided with room geometry")
+// end
+// baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)
+	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
+
+/// Set the name of the function to be called when the moveable is destroyed/killed
+// Note that enemy death often occurs at the end of an animation, and not at the exact moment
+// the enemy's HP becomes zero.
+// @function Moveable:SetOnKilled
+// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
+// @usage
+// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
+// baddy:SetOnKilled(LevelFuncs.baddyKilled)
+	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled);
 }
 
 void Moveable::Init()
 {
 	bool cond = IsPointInRoom(m_item->Pose.Position, m_item->RoomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
+
 	if (!ScriptAssertF(cond, err, m_item->Name))
 	{
-		ScriptWarn("Resetting to the center of the room.");
+		ScriptWarn("Resetting to room center.");
 		auto center = GetRoomCenter(m_item->RoomNumber);
-		// reset position but not rotation
+
+		// Reset position, but not orientation.
 		m_item->Pose.Position = center;
 	}
+
 	InitializeItem(m_num);
 	m_initialized = true;
 }
@@ -440,7 +484,7 @@ void Moveable::SetObjectID(GAME_OBJECT_ID id)
 	m_item->ResetModelToDefault();
 }
 
-void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & callerName, Moveable & mov, std::string & toModify)
+void SetLevelFuncCallback(const TypeOrNil<LevelFunc>& cb, const std::string& callerName, Moveable& mov, std::string& toModify)
 {
 	if (std::holds_alternative<LevelFunc>(cb))
 	{
@@ -454,7 +498,8 @@ void SetLevelFuncCallback(TypeOrNil<LevelFunc> const & cb, std::string const & c
 	}
 	else
 	{
-		ScriptAssert(false, "Tried giving " + mov.m_item->Name
+		ScriptAssert(
+			false, "Tried giving " + mov.m_item->Name
 			+ " a non-LevelFunc object as an arg to "
 			+ callerName);
 	}
@@ -466,38 +511,22 @@ short Moveable::GetIndex() const
 	return m_num;
 }
 
-void Moveable::SetOnHit(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnHit(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnHit, *this, m_item->Callbacks.OnHit);
 }
 
-void Moveable::SetOnKilled(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnKilled(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
 }
 
-/// Set the function to be called when this moveable collides with another moveable
-// @function Moveable:SetOnCollidedWithObject
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.
-// @usage
-// LevelFuncs.objCollided = function(obj1, obj2)
-//     print(obj1:GetName() .. " collided with " .. obj2:GetName())
-// end
-// baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)
-void Moveable::SetOnCollidedWithObject(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnCollidedWithObject(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
 }
 
-/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.
-// @function Moveable:SetOnCollidedWithRoom
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
-// @usage
-// LevelFuncs.roomCollided = function(obj)
-//     print(obj:GetName() .. " collided with room geometry")
-// end
-// baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)
-void Moveable::SetOnCollidedWithRoom(TypeOrNil<LevelFunc> const & cb)
+void Moveable::SetOnCollidedWithRoom(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
 }
@@ -507,20 +536,19 @@ std::string Moveable::GetName() const
 	return m_item->Name;
 }
 
-bool Moveable::SetName(std::string const & id) 
+bool Moveable::SetName(const std::string& id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
-	{
 		return false;
-	}
 
 	if (s_callbackSetName(id, m_num))
 	{
-		// remove the old name if we have one
+		// Remove old name if it exists.
 		if (id != m_item->Name)
 		{
-			if(!m_item->Name.empty())
+			if (!m_item->Name.empty())
 				s_callbackRemoveName(m_item->Name);
+
 			m_item->Name = id;
 		}
 	}
@@ -531,6 +559,7 @@ bool Moveable::SetName(std::string const & id)
 
 		return false;
 	}
+
 	return true;
 }
 
@@ -539,7 +568,7 @@ bool Moveable::SetName(std::string const & id)
 // @treturn Vec3 a copy of the moveable's position
 Vec3 Moveable::GetPos() const
 {
-	return Vec3(m_item->Pose);
+	return Vec3(m_item->Pose.Position);
 }
 
 /// Set the moveable's position
@@ -549,26 +578,19 @@ Vec3 Moveable::GetPos() const
 // @function Moveable:SetPosition
 // @tparam Vec3 position the new position of the moveable 
 // @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
-void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
+void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 {
 	auto prevPos = m_item->Pose.Position.ToVector3();
-	pos.StoreInPose(m_item->Pose);
+	m_item->Pose.Position = pos.ToVector3i();
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 
 	if (m_initialized && willUpdate)
 	{
-		bool roomUpdated = false;
+		bool isRoomUpdated = m_item->IsLara() ? UpdateLaraRoom(m_item, pos.y) : UpdateItemRoom(m_item->Index);
 
-		if (m_item->IsLara())
-			roomUpdated = UpdateLaraRoom(m_item, pos.y);
-		else
-			roomUpdated = UpdateItemRoom(m_item->Index);
-
-		// In case direct portal room update didn't happen, and distance between old and new
-		// points is significant, do a predictive room update.
-
-		if (!roomUpdated && 
+		// In case direct portal room update didn't happen and distance between old and new points is significant, do predictive room update.
+		if (!isRoomUpdated && 
 			(willUpdate || Vector3::Distance(prevPos, m_item->Pose.Position.ToVector3()) > BLOCK(1)))
 		{
 			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
@@ -576,6 +598,9 @@ void Moveable::SetPos(Vec3 const& pos, sol::optional<bool> updateRoom)
 				SetRoomNumber(potentialNewRoom);
 		}
 	}
+
+	if (m_item->IsBridge())
+		UpdateBridgeItem(*m_item);
 }
 
 Vec3 Moveable::GetJointPos(int jointIndex) const
@@ -598,28 +623,24 @@ Rotation Moveable::GetRot() const
 	};
 }
 
-void Moveable::SetRot(Rotation const& rot)
+void Moveable::SetRot(const Rotation& rot)
 {
 	m_item->Pose.Orientation.x = ANGLE(rot.x);
 	m_item->Pose.Orientation.y = ANGLE(rot.y);
 	m_item->Pose.Orientation.z = ANGLE(rot.z);
+
+	if (m_item->IsBridge())
+		UpdateBridgeItem(*m_item);
 }
 
-/// Get current HP (hit points/health points)
-// @function Moveable:GetHP
-// @treturn int the amount of HP the moveable currently has
 short Moveable::GetHP() const
 {
 	return m_item->HitPoints;
 }
 
-/// Set current HP (hit points/health points)
-// Clamped to [0, 32767] for "intelligent" entities (i.e. anything with AI); clamped to [-32767, 32767] otherwise.
-// @function Moveable:SetHP
-// @tparam int HP the amount of HP to give the moveable
 void Moveable::SetHP(short hp)
 {
-	if(Objects[m_item->ObjectNumber].intelligent && hp < 0)
+	if (Objects[m_item->ObjectNumber].intelligent && hp < 0)
 	{
 		if (hp != NOT_TARGETABLE)
 		{
@@ -716,7 +737,7 @@ short Moveable::GetLocationAI() const
 		return creature->LocationAI;
 	}
 
-	TENLog("Trying to get LocationAI value from a non creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
+	TENLog("Trying to get LocationAI value from non-creature moveable. Value does not exist so it's returning 0.", LogLevel::Error);
 	return 0;
 }
 
@@ -767,7 +788,7 @@ aiBitsType Moveable::GetAIBits() const
 	aiBitsArray ret{};
 	for (size_t i = 0; i < ret.size(); ++i)
 	{
-		uint8_t isSet = m_item->AIBits & (1 << i);
+		unsigned char isSet = m_item->AIBits & (1 << i);
 		ret[i] = static_cast<int>( isSet > 0);
 	}
 
@@ -787,7 +808,7 @@ void Moveable::SetAIBits(aiBitsType const & bits)
 	for (size_t i = 0; i < bits.value().size(); ++i)
 	{
 		m_item->AIBits &= ~(1 << i);
-		uint8_t isSet = bits.value()[i] > 0;
+		unsigned char isSet = bits.value()[i] > 0;
 		m_item->AIBits |= isSet << i;
 	}
 }
@@ -851,6 +872,16 @@ void Moveable::SetFrameNumber(int frameNumber)
 	}
 }
 
+/// Get the end frame number of the moveable's active animation.
+// This is the "End Frame" set in WADTool for the animation.
+// @function Moveable:GetEndFrame()
+// @treturn int End frame number of the active animation.	
+int Moveable::GetEndFrame() const
+{
+	const auto& anim = GetAnimData(*m_item);
+	return (anim.frameEnd - anim.frameBase);
+}
+
 bool Moveable::GetActive() const
 {
 	return m_item->Active;
@@ -882,21 +913,21 @@ int Moveable::GetRoomNumber() const
 	return m_item->RoomNumber;
 }
 
-/// Set room number of object 
-// Use this if you are not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
+/// Set the room ID of a moveable.
+// Use this if not using SetPosition's automatic room update - for example, when dealing with overlapping rooms.
 // @function Moveable:SetRoomNumber
-// @tparam int ID the ID of the new room 
+// @tparam int roomID New room's ID.
 // @usage 
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetRoomNumber(destinationRoom)
-// sas:SetPosition(destinationPosition, false)
+// sas:SetRoomNumber(newRoomID)
+// sas:SetPosition(newPos, false)
 void Moveable::SetRoomNumber(int roomNumber)
 {	
-	const size_t nRooms = g_Level.Rooms.size();
-	if (roomNumber < 0 || (size_t)roomNumber >= nRooms)
+	int roomCount = (int)g_Level.Rooms.size();
+	if (roomNumber < 0 || roomNumber >= roomCount)
 	{
-		ScriptAssertF(false, "Invalid room number: {}. Value must be in range [0, {})", roomNumber, nRooms);
-		TENLog("Room number will not be set", LogLevel::Warning, LogConfig::All);
+		ScriptAssertF(false, "Invalid room ID {}. Value must be in range [0, {})", roomNumber, roomCount);
+		TENLog("Room ID will not be set.", LogLevel::Warning, LogConfig::All);
 		return;
 	}
 
@@ -908,17 +939,29 @@ void Moveable::SetRoomNumber(int roomNumber)
 	{
 		ItemNewRoom(m_num, roomNumber);
 
-		// HACK: For Lara, we need to manually force Location.roomNumber to new one,
-		// or else camera won't be updated properly.
-
+		// HACK: Must manually force new Location.RoomNumber for player, otherwise camera doesn't update properly.
 		if (m_item->IsLara())
-			m_item->Location.roomNumber = roomNumber;
+			m_item->Location.RoomNumber = roomNumber;
 	}
 }
 
 short Moveable::GetStatus() const
 {
 	return m_item->Status;
+}
+
+void Moveable::SetStatus(ItemStatus status)
+{
+	m_item->Status = status;
+}
+
+/// Get number of meshes for a particular object
+// Returns number of meshes in an object
+// @function Moveable:GetMeshCount
+// @treturn int number of meshes
+short Moveable::GetMeshCount() const
+{
+	return Objects[m_item->ObjectNumber].nmeshes;
 }
 
 /// Get state of specified mesh visibility of object
@@ -1030,9 +1073,10 @@ void Moveable::UnswapMesh(int meshId)
 
 /// Enable the item, as if a trigger for it had been stepped on.
 // @function Moveable:Enable
-void Moveable::EnableItem()
+// @tparam float timeout time (in seconds) after which moveable automatically disables (optional).
+void Moveable::EnableItem(sol::optional<float> timer)
 {
-	if (m_num == NO_ITEM)
+	if (m_num == NO_VALUE)
 		return;
 
 	bool wasInvisible = false;
@@ -1040,6 +1084,7 @@ void Moveable::EnableItem()
 		wasInvisible = true;
 
 	m_item->Flags |= CODE_BITS;
+	m_item->Timer = timer.has_value() ? (timer.value() * FPS) : 0;
 	Trigger(m_num);
 
 	// Try add colliding in case the item went from invisible -> activated
@@ -1052,12 +1097,12 @@ void Moveable::EnableItem()
 // @function Moveable:Disable
 void Moveable::DisableItem()
 {
-	if (m_num == NO_ITEM)
+	if (m_num == NO_VALUE)
 		return;
 
 	Antitrigger(m_num);
 
-	if (m_num > NO_ITEM && (m_item->Status == ITEM_INVISIBLE))
+	if (m_num > NO_VALUE && (m_item->Status == ITEM_INVISIBLE))
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 }
 
@@ -1079,6 +1124,7 @@ void Moveable::Shatter()
 		ExplodeItemNode(m_item, i, 0, 128);
 
 	CreatureDie(m_num, false);
+	KillItem(m_num);
 }
 
 /// Make the item invisible. Alias for `Moveable:SetVisible(false)`.
@@ -1105,7 +1151,7 @@ void Moveable::SetVisible(bool isVisible)
 
 		m_item->Status = ITEM_INVISIBLE;
 
-		if (m_num > NO_ITEM)
+		if (m_num > NO_VALUE)
 			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 	}
 	else
@@ -1114,7 +1160,7 @@ void Moveable::SetVisible(bool isVisible)
 		{
 			if(!(m_item->Flags & IFLAG_KILLED))
 			{
-				EnableItem();
+				EnableItem(sol::nullopt);
 			}
 			else
 			{
@@ -1127,27 +1173,26 @@ void Moveable::SetVisible(bool isVisible)
 			m_item->Status = ITEM_ACTIVE;
 		}
 
-		if (m_num > NO_ITEM)
+		if (m_num > NO_VALUE)
 			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 	}
 }
 
 void Moveable::Invalidate()
 {
-	// keep m_item as it is so that we can properly remove it from the moveables set when
-	// its destructor is called
-	m_num = NO_ITEM;
+	// Keep m_item as-is so it can be properly removed from moveables set when destructor is called.
+	m_num = NO_VALUE;
 	m_initialized = false;
 }
 
 bool Moveable::GetValid() const
 {
-	return m_num > NO_ITEM;
+	return m_num > NO_VALUE;
 }
 
 void Moveable::Destroy()
 {
-	if (m_num > NO_ITEM) 
+	if (m_num > NO_VALUE) 
 	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 		s_callbackRemoveName(m_item->Name);

@@ -2,6 +2,7 @@
 #include "Objects/TR4/Object/tr4_mapper.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
@@ -9,7 +10,9 @@
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
+
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::TR4
 {
@@ -35,7 +38,7 @@ namespace TEN::Entities::TR4
             byte color = (GetRandomControl() & 0x1F) + 192;
             TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, color, color, 0);
 
-            int height = GetCollision(item).Position.Floor;
+            int height = GetPointCollision(*item).GetFloorHeight();
 
             for (int i = 0; i < 2; i++)
             {
@@ -50,7 +53,7 @@ namespace TEN::Entities::TR4
                 spark->dB = 0;
                 spark->colFadeSpeed = 4;
                 spark->fadeToBlack = 4;
-                spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+                spark->blendMode = BlendMode::Additive;
                 spark->life = 12;
                 spark->sLife = 12;
                 spark->x = pos.x;
@@ -61,7 +64,7 @@ namespace TEN::Entities::TR4
                 spark->zVel = (GetRandomControl() & 0x3FF) - 512;
                 spark->friction = 4;
                 spark->scalar = 2;
-                spark->sSize = spark->size = (GetRandomControl() & 0xF) + 16;
+                spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 16;
                 spark->dSize = (GetRandomControl() & 1) + 3;
                 spark->maxYvel = 0;
                 spark->gravity = (GetRandomControl() & 0x1F) + 32;

@@ -2,16 +2,14 @@
 #include <functional>
 #include <string>
 
-#include "Game/control/volumeactivator.h"
+#include "Game/control/event.h"
 #include "Game/room.h"
-#include "Scripting/Include/VarMapVal.h"
 #include "Specific/level.h"
 
 typedef DWORD D3DCOLOR;
 
-using CallbackDrawString = std::function<void(const std::string&, D3DCOLOR, int, int, int)>;
 using VarSaveType = std::variant<bool, double, std::string>;
-using IndexTable = std::vector<std::pair<uint32_t, uint32_t>>;
+using IndexTable = std::vector<std::pair<unsigned int, unsigned int>>;
 
 struct FuncName
 {
@@ -38,8 +36,8 @@ using SavedVar = std::variant<
 	std::string,
 	double,
 	IndexTable,
-	Vector2i, // Vec2
-	Vector3i, // Vec3
+	Vector2,  // Vec2
+	Vector3,  // Vec3
 	Vector3,  // Rotation
 	D3DCOLOR, // Color
 	FuncName>;
@@ -56,16 +54,17 @@ public:
 
 	virtual void OnStart() = 0;
 	virtual void OnLoad() = 0;
-	virtual void OnControlPhase(float deltaTime) = 0;
+	virtual void OnLoop(float deltaTime, bool postLoop) = 0;
 	virtual void OnSave() = 0;
 	virtual void OnEnd(GameStatus reason) = 0;
-	virtual void ShortenTENCalls() = 0;
+	virtual void OnUseItem(GAME_OBJECT_ID objectNumber) = 0;
 
+	virtual void ShortenTENCalls() = 0;
 	virtual void FreeLevelScripts() = 0;
 	virtual void ResetScripts(bool clearGameVars) = 0;
 	virtual void ExecuteScriptFile(const std::string& luaFileName) = 0;
 	virtual void ExecuteString(const std::string& command) = 0;
-	virtual void ExecuteFunction(const std::string& luaFuncName, TEN::Control::Volumes::VolumeActivator, const std::string& arguments) = 0;
+	virtual void ExecuteFunction(const std::string& luaFuncName, TEN::Control::Volumes::Activator, const std::string& arguments) = 0;
 	virtual void ExecuteFunction(const std::string& luaFuncName, short idOne, short idTwo = 0) = 0;
 
 	virtual void GetVariables(std::vector<SavedVar>& vars) = 0;
@@ -80,8 +79,8 @@ public:
 		std::vector<std::string>& postSave,
 		std::vector<std::string>& preLoad,
 		std::vector<std::string>& postLoad,
-		std::vector<std::string>& preControl,
-		std::vector<std::string>& postControl) const = 0;
+		std::vector<std::string>& preLoop,
+		std::vector<std::string>& postLoop) const = 0;
 
 	virtual void SetCallbackStrings(
 		const std::vector<std::string>& preStart,
@@ -92,8 +91,8 @@ public:
 		const std::vector<std::string>& postSave,
 		const std::vector<std::string>& preLoad,
 		const std::vector<std::string>& postLoad,
-		const std::vector<std::string>& preControl,
-		const std::vector<std::string>& postControl) = 0;
+		const std::vector<std::string>& preLoop,
+		const std::vector<std::string>& postLoop) = 0;
 };
 
 extern ScriptInterfaceGame* g_GameScript;

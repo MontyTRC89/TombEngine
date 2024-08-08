@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
@@ -14,10 +15,11 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Objects/Effects/Boss.h"
-#include "Renderer/Renderer11Enums.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Boss;
 
@@ -29,8 +31,8 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TONY_EXPLOSION_COUNT_MAX = 60;
 	constexpr auto TONY_EFFECT_COLOR = Vector4(0.8f, 0.4f, 0.0f, 0.5f);
 
-	const auto TonyLeftHandBite	 = CreatureBiteInfo(Vector3i::Zero, 10);
-	const auto TonyRightHandBite = CreatureBiteInfo(Vector3i::Zero, 13);
+	const auto TonyLeftHandBite	 = CreatureBiteInfo(Vector3::Zero, 10);
+	const auto TonyRightHandBite = CreatureBiteInfo(Vector3::Zero, 13);
 
 	// I can't set it to the TonyFlame struct since the control of the
 	// flame use fxNumber as argument or that FX_INFO have no void* to hold custom data.
@@ -85,7 +87,7 @@ namespace TEN::Entities::Creatures::TR3
 	static void TriggerTonyEffect(const TonyFlame& flame)
 	{
 		int fxNumber = CreateNewEffect(flame.RoomNumber);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto& fx = EffectList[fxNumber];
@@ -129,7 +131,7 @@ namespace TEN::Entities::Creatures::TR3
 		flame.fadeToBlack = 8;
 		flame.sLife =
 		flame.life = Random::GenerateInt(24, 32);
-		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		flame.blendMode = BlendMode::Additive;
 		flame.extras = 0;
 		flame.dynamic = -1;
 		flame.x = Random::GenerateInt(-8, 8);
@@ -177,7 +179,7 @@ namespace TEN::Entities::Creatures::TR3
 		flame.fadeToBlack = 8;
 		flame.sLife =
 		flame.life = Random::GenerateInt(24, 32);
-		flame.blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		flame.blendMode = BlendMode::Additive;
 		flame.extras = 0;
 		flame.dynamic = -1;
 		flame.x = Random::GenerateInt(-8, 8);
@@ -412,10 +414,10 @@ namespace TEN::Entities::Creatures::TR3
 			break;
 		}
 
-		auto probe = GetCollision(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, fx.roomNumber);
+		auto pointColl = GetPointCollision(fx.pos.Position, fx.roomNumber);
 
-		if (fx.pos.Position.y >= probe.Position.Floor ||
-			fx.pos.Position.y < probe.Position.Ceiling)
+		if (fx.pos.Position.y >= pointColl.GetFloorHeight() ||
+			fx.pos.Position.y < pointColl.GetCeilingHeight())
 		{
 			Vector3i pos;
 			int debrisCount = type == TonyFlameType::InFront ? 7 : 3;
@@ -427,13 +429,13 @@ namespace TEN::Entities::Creatures::TR3
 				for (int x = 0; x < 2; x++)
 					TriggerExplosionSparks(prevPos.x, prevPos.y, prevPos.z, 3, -1, 0, fx.roomNumber);
 
-				probe = GetCollision(LaraItem); // TODO: Deal with LaraItem global.
-				pos.y = probe.Position.Ceiling + CLICK(1);
+				pointColl = GetPointCollision(*LaraItem); // TODO: Deal with LaraItem global.
+				pos.y = pointColl.GetCeilingHeight() + CLICK(1);
 				pos.x = LaraItem->Pose.Position.x + (GetRandomControl() & 1023) - CLICK(2);
 				pos.z = LaraItem->Pose.Position.z + (GetRandomControl() & 1023) - CLICK(2);
 
-				TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, probe.RoomNumber);
-				TriggerFireBall(nullptr, TonyFlameType::ShowerFromCeiling, &pos, probe.RoomNumber, 0, 0); // Fallthrough is intended.
+				TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, pointColl.GetRoomNumber());
+				TriggerFireBall(nullptr, TonyFlameType::ShowerFromCeiling, &pos, pointColl.GetRoomNumber(), 0, 0); // Fallthrough is intended.
 
 			case TonyFlameType::InFront:
 			case TonyFlameType::ShowerFromCeiling:
@@ -450,7 +452,7 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 		}
 
-		if (TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber))
+		if (TestEnvironment(ENV_FLAG_WATER, pointColl.GetRoomNumber()))
 		{
 			KillEffect(fxNumber);
 			return;
@@ -468,7 +470,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		if (probe.RoomNumber != fx.roomNumber)
+		if (pointColl.GetRoomNumber() != fx.roomNumber)
 			EffectNewRoom(fxNumber, LaraItem->RoomNumber);
 
 		if (LightIntensityTable[fx.flag1])
@@ -492,7 +494,6 @@ namespace TEN::Entities::Creatures::TR3
 		auto* creature = GetCreatureInfo(item);
 
 		short headingAngle = 0;
-		short tiltAngle = 0;
 		short headAngle = 0;
 		short torsoX = 0;
 		short torsoY = 0;

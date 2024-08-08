@@ -33,7 +33,7 @@ namespace TEN::Entities::TR4
 	constexpr auto CROC_STATE_RUN_TURN_RATE_MAX	 = ANGLE(5.0f);
 	constexpr auto CROC_STATE_SWIM_TURN_RATE_MAX = ANGLE(3.0f);
 
-	const auto CrocodileBite = CreatureBiteInfo(Vector3i(0, -100, 500), 9);
+	const auto CrocodileBite = CreatureBiteInfo(Vector3(0, -100, 500), 9);
 	const auto CrocodileBiteAttackJoints = std::vector<unsigned int>{ 8, 9 };
 
 	enum CrocodileState
@@ -93,8 +93,8 @@ namespace TEN::Entities::TR4
 		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 		if (waterDepth != NO_HEIGHT)
 		{
-			creature->LOT.Step = SECTOR(20);
-			creature->LOT.Drop = -SECTOR(20);
+			creature->LOT.Step = BLOCK(20);
+			creature->LOT.Drop = -BLOCK(20);
 			creature->LOT.Fly = CROC_SWIM_SPEED;
 		}
 		else
@@ -118,8 +118,8 @@ namespace TEN::Entities::TR4
 
 		short headingAngle = 0;
 		short boneAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		AI_INFO ai;
 
@@ -219,7 +219,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (ai.bite && ai.distance < CROC_ATTACK_RANGE)
 					item->Animation.TargetState = CROC_STATE_IDLE;
@@ -239,7 +239,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (ai.bite && ai.distance < CROC_ATTACK_RANGE)
 					item->Animation.TargetState = CROC_STATE_IDLE;
@@ -250,12 +250,12 @@ namespace TEN::Entities::TR4
 
 			case CROC_STATE_BITE_ATTACK:
 				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
-					item->Animation.RequiredState = NO_STATE;
+					item->Animation.RequiredState = NO_VALUE;
 
 				if (ai.bite &&
 					item->TouchBits.Test(CrocodileBiteAttackJoints))
 				{
-					if (item->Animation.RequiredState == NO_STATE)
+					if (item->Animation.RequiredState == NO_VALUE)
 					{
 						CreatureEffect2(item, CrocodileBite, 10, -1, DoBloodSplat);
 						DoDamage(creature->Enemy, CROC_ATTACK_DAMAGE);
@@ -277,7 +277,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (ai.bite)
 				{
@@ -289,11 +289,11 @@ namespace TEN::Entities::TR4
 
 			case CROC_STATE_WATER_BITE_ATTACK:
 				if (item->Animation.FrameNumber == GetAnimData(item).frameBase)
-					item->Animation.RequiredState = NO_STATE;
+					item->Animation.RequiredState = NO_VALUE;
 
 				if (ai.bite && item->TouchBits.Test(CrocodileBiteAttackJoints))
 				{
-					if (item->Animation.RequiredState == NO_STATE)
+					if (item->Animation.RequiredState == NO_VALUE)
 					{
 						CreatureEffect2(item, CrocodileBite, 10, -1, DoBloodSplat);
 						DoDamage(creature->Enemy, CROC_ATTACK_DAMAGE);

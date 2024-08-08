@@ -13,8 +13,8 @@
 
 namespace TEN::Entities::Creatures::TR2
 {
-	const auto MercenaryUziBite		   = CreatureBiteInfo(Vector3i(0, 200, 19), 17);
-	const auto MercenaryAutoPistolBite = CreatureBiteInfo(Vector3i(0, 230, 9), 17);
+	const auto MercenaryUziBite		   = CreatureBiteInfo(Vector3(0, 200, 19), 17);
+	const auto MercenaryAutoPistolBite = CreatureBiteInfo(Vector3(0, 230, 9), 17);
 
 	// TODO
 	enum MercenaryState
@@ -38,8 +38,8 @@ namespace TEN::Entities::Creatures::TR2
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;
@@ -252,8 +252,8 @@ namespace TEN::Entities::Creatures::TR2
 
 		short headingAngle = 0;
 		short tiltAngle = 0;
-		auto extraHeadRot = EulerAngles::Zero;
-		auto extraTorsoRot = EulerAngles::Zero;
+		auto extraHeadRot = EulerAngles::Identity;
+		auto extraTorsoRot = EulerAngles::Identity;
 
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;

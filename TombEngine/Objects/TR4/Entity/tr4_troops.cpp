@@ -20,7 +20,7 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {
-	const auto TroopsBite1 = CreatureBiteInfo(Vector3i(0, 270, 40), 7);
+	const auto TroopsBite1 = CreatureBiteInfo(Vector3(0, 270, 40), 7);
 
 	enum TroopState
 	{
@@ -145,7 +145,7 @@ namespace TEN::Entities::TR4
 
 				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber != NO_ITEM && currentCreature->ItemNumber != itemNumber)
+					if (currentCreature->ItemNumber != NO_VALUE && currentCreature->ItemNumber != itemNumber)
 					{
 						auto* currentItem = &g_Level.Items[currentCreature->ItemNumber];
 						if (currentItem->ObjectNumber != ID_LARA)
@@ -192,7 +192,7 @@ namespace TEN::Entities::TR4
 			CreatureMood(item, &AI, false);
 
 			// Vehicle handling
-			if (Lara.Context.Vehicle != NO_ITEM && AI.bite)
+			if (Lara.Context.Vehicle != NO_VALUE && AI.bite)
 				creature->Mood = MoodType::Escape;
 
 			angle = CreatureTurn(item, creature->MaxTurn);
@@ -242,7 +242,7 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = TROOP_STATE_RUN;
 				else if (Targetable(item, &AI))
 				{
-					if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
+					if (AI.distance < pow(BLOCK(3), 2) || AI.zoneNumber != AI.enemyZone)
 					{
 						if (Random::TestProbability(1 / 2.0f))
 							item->Animation.TargetState = TROOP_STATE_AIM_3;
@@ -255,9 +255,9 @@ namespace TEN::Entities::TR4
 				else
 				{
 					if ((creature->Alerted || creature->Mood != MoodType::Bored) &&
-						(!(item->AIBits & FOLLOW) || !(item->AIBits & MODIFY) && distance <= pow(SECTOR(2), 2)))
+						(!(item->AIBits & FOLLOW) || !(item->AIBits & MODIFY) && distance <= pow(BLOCK(2), 2)))
 					{
-						if (creature->Mood == MoodType::Bored || AI.distance <= pow(SECTOR(2), 2))
+						if (creature->Mood == MoodType::Bored || AI.distance <= pow(BLOCK(2), 2))
 						{
 							item->Animation.TargetState = TROOP_STATE_WALK;
 							break;
@@ -285,20 +285,20 @@ namespace TEN::Entities::TR4
 					if (item->AIBits & GUARD ||
 						item->AIBits & FOLLOW &&
 						(creature->ReachedGoal ||
-							distance > pow(SECTOR(2), 2)))
+							distance > pow(BLOCK(2), 2)))
 					{
 						item->Animation.TargetState = TROOP_STATE_IDLE;
 					}
 					else if (Targetable(item, &AI))
 					{
-						if (AI.distance < pow(SECTOR(3), 2) || AI.enemyZone != AI.zoneNumber)
+						if (AI.distance < pow(BLOCK(3), 2) || AI.enemyZone != AI.zoneNumber)
 							item->Animation.TargetState = TROOP_STATE_IDLE;
 						else
 							item->Animation.TargetState = TROOP_STATE_AIM_2;
 					}
 					else if (creature->Mood != MoodType::Bored)
 					{
-						if (AI.distance > pow(SECTOR(2), 2))
+						if (AI.distance > pow(BLOCK(2), 2))
 							item->Animation.TargetState = TROOP_STATE_RUN;
 					}
 					else if (AI.ahead)
@@ -317,7 +317,7 @@ namespace TEN::Entities::TR4
 				if (item->AIBits & GUARD ||
 					item->AIBits & FOLLOW &&
 					(creature->ReachedGoal ||
-						distance > pow(SECTOR(2), 2)))
+						distance > pow(BLOCK(2), 2)))
 				{
 					item->Animation.TargetState = TROOP_STATE_WALK;
 				}
@@ -328,7 +328,7 @@ namespace TEN::Entities::TR4
 					else if (creature->Mood == MoodType::Bored ||
 						creature->Mood == MoodType::Stalk &&
 						!(item->AIBits & FOLLOW) &&
-						AI.distance < pow(SECTOR(2), 2))
+						AI.distance < pow(BLOCK(2), 2))
 					{
 						item->Animation.TargetState = TROOP_STATE_WALK;
 					}
@@ -413,7 +413,7 @@ namespace TEN::Entities::TR4
 			case TROOP_STATE_ATTACK_3:
 				if (item->Animation.TargetState != TROOP_STATE_IDLE &&
 					(creature->Mood == MoodType::Escape ||
-						AI.distance > pow(SECTOR(3), 2) ||
+						AI.distance > pow(BLOCK(3), 2) ||
 						!Targetable(item, &AI)))
 				{
 					item->Animation.TargetState = TROOP_STATE_IDLE;
