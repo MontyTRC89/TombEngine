@@ -73,7 +73,7 @@ namespace TEN::Entities::Creatures::TR3
 		RAPTOR_ANIM_JUMP_END = 16,
 		RAPTOR_ANIM_JUMP_1_BLOCK = 17,
 		RAPTOR_ANIM_VAULT_2_STEPS = 18,
-		RAPTOR_ANIM_VAULT_4_STEPS = 19,
+		RAPTOR_ANIM_VAULT_3_STEPS = 19,
 		RAPTOR_ANIM_VAULT_4_STEPS = 20,
 		RAPTOR_ANIM_VAULT_DROP_2_STEPS = 21,
 		RAPTOR_ANIM_VAULT_DROP_3_STEPS = 22,
@@ -417,7 +417,7 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case 3:
-				SetAnimation(item, RAPTOR_ANIM_VAULT_4_STEPS);
+				SetAnimation(item, RAPTOR_ANIM_VAULT_3_STEPS);
 				creature.MaxTurn = 0;
 				break;
 
