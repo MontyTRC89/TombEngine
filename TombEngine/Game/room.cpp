@@ -99,9 +99,17 @@ void RoomData::GenerateCollisionMesh()
 				nextSectorZ = &nextRoomZ.Sectors[(nextRoomGridCoordZ.x * nextRoomZ.ZSize) + nextRoomGridCoordZ.y];
 			}
 
-			// Collect collision mesh triangles for sector.
+			// Collect collision mesh tangible triangles for sector.
 			CollectSectorCollisionMeshTriangles(sector, *prevSectorX, *nextSectorX , *prevSectorZ, *nextSectorZ);
 		}
+	}
+
+	// Collect collision mesh portal triangles for room.
+	PrintDebugMessage("%d", doors.size());
+	for (const auto& door : doors)
+	{
+		CollisionMesh.InsertTriangle(Position.ToVector3() + door.vertices[0], Position.ToVector3() + door.vertices[1], Position.ToVector3() + door.vertices[2], door.normal, door.room);
+		CollisionMesh.InsertTriangle(Position.ToVector3() + door.vertices[0], Position.ToVector3() + door.vertices[2], Position.ToVector3() + door.vertices[3], door.normal, door.room);
 	}
 
 	// Initialize collision mesh.
@@ -284,15 +292,14 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 		const auto& surfVerts = isFloor ? vertices.Floor : vertices.Ceil;
 		int sign = isFloor ? 1 : -1;
 
-		// Determine surface portal status.
 		bool isSurfTri0Portal = (surface.Triangles[0].PortalRoomNumber != NO_VALUE);
 		bool isSurfTri1Portal = (surface.Triangles[1].PortalRoomNumber != NO_VALUE);
 
 		// 2.1) Collect surface triangles.
-		if (!surfVerts.Tri0.IsWall)
-			CollisionMesh.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri0.Vertex1, surfVerts.Tri0.Vertex2, surfVerts.Tri0.Normal, surface.Triangles[0].PortalRoomNumber);
-		if (!surfVerts.Tri1.IsWall)
-			CollisionMesh.InsertTriangle(surfVerts.Tri1.Vertex0, surfVerts.Tri1.Vertex1, surfVerts.Tri1.Vertex2, surfVerts.Tri1.Normal, surface.Triangles[1].PortalRoomNumber);
+		if (!surfVerts.Tri0.IsWall && !isSurfTri0Portal)
+			CollisionMesh.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri0.Vertex1, surfVerts.Tri0.Vertex2, surfVerts.Tri0.Normal);
+		if (!surfVerts.Tri1.IsWall && !isSurfTri1Portal)
+			CollisionMesh.InsertTriangle(surfVerts.Tri1.Vertex0, surfVerts.Tri1.Vertex1, surfVerts.Tri1.Vertex2, surfVerts.Tri1.Normal);
 
 		// 2.2) Collect diagonal wall triangles.
 		if (surfVerts.IsSplit && !(surfVerts.Tri0.IsWall && surfVerts.Tri1.IsWall))
@@ -506,12 +513,6 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 		}
 
 		isFloor = !isFloor;
-	}
-
-	// 3) Collect collision mesh portal triangles.
-	for (const auto& door : doors)
-	{
-		// TODO
 	}
 
 	return;

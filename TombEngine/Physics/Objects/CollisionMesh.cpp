@@ -182,7 +182,7 @@ namespace TEN::Physics
 		DrawDebugTriangle(GetVertex0(), GetVertex1(), GetVertex2(), Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f, 0.2f), RendererDebugPage::RoomMeshStats);
 
 		auto center = (GetVertex0() + GetVertex1() + GetVertex2()) / 3;
-		DrawDebugLine(center, Geometry::TranslatePoint(center, _normal, BLOCK(0.2f)), Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f), RendererDebugPage::RoomMeshStats);
+		DrawDebugLine(center, Geometry::TranslatePoint(center, _normal, BLOCK(0.2f)), Color(1.0f, 1, 1), RendererDebugPage::RoomMeshStats);
 	}
 
 	CollisionMesh::CollisionMesh(const std::vector<CollisionTriangle>& tris)
@@ -199,7 +199,9 @@ namespace TEN::Physics
 
 		const CollisionTriangle* closestTri = nullptr;
 		float closestDist = INFINITY;
+		bool isClosestTriTangible = false;
 
+		// TODO: If portal and tangible triangles are double-planing, prioritise tangible triangle.
 		// Find closest triangle.
 		for (int triID : triIds)
 		{
@@ -211,6 +213,7 @@ namespace TEN::Physics
 			{
 				closestTri = &tri;
 				closestDist = intersectDist;
+				isClosestTriTangible = tri.GetPortalRoomNumber() == NO_VALUE;
 			}
 		}
 
