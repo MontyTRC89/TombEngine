@@ -1,11 +1,4 @@
 #include "framework.h"
-
-#include <algorithm>
-#include <ctime>
-#include <filesystem>
-#include <ScreenGrab.h>
-#include <wincodec.h>
-
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"

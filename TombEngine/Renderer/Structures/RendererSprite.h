@@ -1,11 +1,9 @@
 #pragma once
-#include <SimpleMath.h>
 #include "Renderer/Graphics/Texture2D.h"
 
 namespace TEN::Renderer::Structures
 {
 	using namespace TEN::Renderer::Graphics;
-	using namespace DirectX::SimpleMath;
 
 	struct RendererSprite
 	{

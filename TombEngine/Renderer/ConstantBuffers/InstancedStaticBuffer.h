@@ -1,12 +1,9 @@
 #pragma once
-#include <SimpleMath.h>
 #include "Renderer/ConstantBuffers/ShaderLight.h"
 #include "Renderer/Renderer.h"
 
 namespace TEN::Renderer::ConstantBuffers
 {
-	using namespace DirectX::SimpleMath;
-
 	constexpr int INSTANCED_STATIC_MESH_BUCKET_SIZE = 100;
 	
 	struct alignas(16) InstancedStaticMesh

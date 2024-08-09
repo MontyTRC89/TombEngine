@@ -71,11 +71,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x86\</OutDir>
+    <OutDir>$(SolutionDir)Build\bin\$(Platform)\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
     <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
     <TargetExt>.exe</TargetExt>
+    <IntDir>$(SolutionDir)Build\obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x64</ExecutablePath>
@@ -84,16 +85,17 @@
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)</TargetName>
-    <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x64\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)Build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Build\obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x86\</OutDir>
+    <OutDir>$(SolutionDir)Build\bin\$(Platform)\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
     <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
     <TargetExt>.exe</TargetExt>
+    <IntDir>$(SolutionDir)Build\obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x64</ExecutablePath>
@@ -101,8 +103,8 @@
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x64\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)Build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)Build\obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -111,7 +113,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libs\bass\;$(SolutionDir)Libs\fixedpoint\;$(SolutionDir)Libs\srtparser\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -129,14 +131,16 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;version.lib;zlib.lib;spdlogd.lib;OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
+xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
+xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD $(ProjectDir)..\Documentation\
@@ -146,13 +150,9 @@ CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
 
 md "$(SolutionDir)Build\$(Configuration)\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Build\$(Configuration)\Shaders\"
-xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Build\$(Configuration)\Shaders\HUD\"
-
-xcopy /Y "$(SolutionDir)Libs\bass\x86\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders\"
+xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Game\Shaders\HUD\"
+</Command>
       <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -162,7 +162,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libs\bass\;$(SolutionDir)Libs\fixedpoint\;$(SolutionDir)Libs\srtparser\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -180,30 +180,27 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;version.lib;zlib.lib;spdlogd.lib;OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
+xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
+xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)..\Documentation\
+      <Command>CD "$(SolutionDir)Documentation"
 CALL compile.bat .
 
-CD $(ProjectDir)Specific\savegame\schema\
+CD "$(ProjectDir)Specific\savegame\schema\"
 CALL gen.bat
 
-md "$(SolutionDir)Build\$(Configuration)\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Build\$(Configuration)\Shaders\"
-xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Build\$(Configuration)\Shaders\HUD\"
-
-xcopy /Y "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
+md "$(SolutionDir)Game\Shaders"
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
+</Command>
       <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -213,7 +210,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;SOL_SAFE_FUNCTION_CALLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libs\bass\;$(SolutionDir)Libs\fixedpoint\;$(SolutionDir)Libs\srtparser\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -241,17 +238,16 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;version.lib;zlib.lib;spdlog.lib;OIS.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <TargetMachine>MachineX86</TargetMachine>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>del "$(TargetDir)*.pdb" /q
-del "$(TargetDir)*.lib" /q
-del "$(TargetDir)*.exp" /q
-del "$(TargetDir)OIS_d.dll" /q</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD $(ProjectDir)..\Documentation\
@@ -261,13 +257,9 @@ CD $(ProjectDir)Specific\savegame\schema\
 CALL gen.bat
 
 md "$(SolutionDir)Build\$(Configuration)\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Build\$(Configuration)\Shaders\"
-xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Build\$(Configuration)\Shaders\HUD\"
-
-xcopy /Y "$(SolutionDir)Libs\bass\x86\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders\"
+xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Game\Shaders\HUD\"
+</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
@@ -279,7 +271,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;SOL_SAFE_FUNCTION_CALLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libs\bass\;$(SolutionDir)Libs\fixedpoint\;$(SolutionDir)Libs\srtparser\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -307,32 +299,26 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;version.lib;zlib.lib;spdlog.lib;OIS.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>del "$(TargetDir)*.pdb" /q
-del "$(TargetDir)*.lib" /q
-del "$(TargetDir)*.exp" /q
-del "$(TargetDir)OIS_d.dll" /q</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)..\Documentation\
+      <Command>CD "$(SolutionDir)Documentation"
 CALL compile.bat .
 
-CD $(ProjectDir)Specific\savegame\schema\
+CD "$(ProjectDir)Specific\savegame\schema\"
 CALL gen.bat
 
-md "$(SolutionDir)Build\$(Configuration)\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Build\$(Configuration)\Shaders\"
-xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Build\$(Configuration)\Shaders\HUD\"
-
-xcopy /Y "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
+md "$(SolutionDir)Game\Shaders"
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
+</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
@@ -1247,8 +1233,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Specific\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.editorconfig" />
     <None Include="Objects\Generic\Switches\rail_switch.h" />
-    <None Include="packages.config" />
     <None Include="Resources.aps" />
     <None Include="RuleSet.ruleset" />
     <None Include="Shaders\AnimatedTextures.hlsli" />
@@ -1521,15 +1507,5 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets')" />
-    <Import Project="..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets" Condition="Exists('..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets')" />
-  </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets'))" />
-    <Error Condition="!Exists('..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets'))" />
-  </Target>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

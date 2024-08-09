@@ -2,7 +2,7 @@
 #include "Game/Debug/Debug.h"
 
 #include <chrono>
-#include <spdlog.h>
+#include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <stdarg.h>

@@ -1,9 +1,7 @@
-#include <SimpleMath.h>
+#pragma once
 
 namespace TEN::Renderer::ConstantBuffers
 {
-	using namespace DirectX::SimpleMath;
-
 	struct alignas(16) CPostProcessBuffer
 	{
 		float CinematicBarsHeight;

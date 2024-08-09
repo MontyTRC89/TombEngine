@@ -1,15 +1,10 @@
 #pragma once
-#include <vector>
-#include <SimpleMath.h>
 #include "Math/Objects/GameBoundingBox.h"
 #include "Math/Objects/Pose.h"
 #include "Renderer/Structures/RendererLight.h"
 
 namespace TEN::Renderer::Structures
 {
-	using namespace DirectX;
-	using namespace DirectX::SimpleMath;
-
 	struct RendererStatic
 	{
 		int ObjectNumber;

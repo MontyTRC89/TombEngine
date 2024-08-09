@@ -1,12 +1,9 @@
 #pragma once
-#include <SimpleMath.h>
 #include "Renderer/RendererEnums.h"
 #include "Renderer/ConstantBuffers/ShaderLight.h"
 
 namespace TEN::Renderer::ConstantBuffers
 {
-	using namespace DirectX::SimpleMath;
-
 	struct alignas(16) CItemBuffer
 	{
 		Matrix World;

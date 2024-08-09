@@ -1,12 +1,10 @@
 #pragma once
-#include <SimpleMath.h>
 #include "Renderer/RendererEnums.h"
 #include "Renderer/Graphics/IndexBuffer.h"
 #include "Renderer/Graphics/VertexBuffer.h"
 
 namespace TEN::Renderer::Structures
 {
-	using namespace DirectX::SimpleMath;
 	using namespace TEN::Renderer;
 	using namespace TEN::Renderer::Graphics;
 

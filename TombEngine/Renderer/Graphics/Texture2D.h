@@ -1,9 +1,4 @@
 #pragma once
-#include <d3d11.h>
-#include <string>
-#include <wrl/client.h>
-#include <WICTextureLoader.h>
-#include <DDSTextureLoader.h>
 #include "Renderer/Graphics/TextureBase.h"
 #include "Renderer/RendererUtils.h"
 
