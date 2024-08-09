@@ -24,7 +24,7 @@ Steps:
 1) Clone this repository: https://github.com/microsoft/vcpkg with your GitHub Desktop.
 2) Use bootstrap-vcpkg.bat and wait until vcpkg.exe is done.
 3) Register vcpkg folder in your PATH, use this if you don't know how to: https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/
-4) Clone the repository to your GitHub Desktop.
+4) Clone TombEngine repository to your GitHub Desktop.
 5) Use vcpkg_install_libraries.bat and wait until it finish.
 6) Launch TombEngine.sln and compile.
 7) Once compiled, create a separate folder to serve as your main TEN directory.
