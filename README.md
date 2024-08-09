@@ -28,7 +28,7 @@ Steps:
 5) Use vcpkg_install_libraries.bat and wait until it finish.
 6) Launch TombEngine.sln and compile.
 7) Once compiled, you need to use the Game folder as assets folder.
-8) Copy everything inside the Build/bin/Win32 or x64/ folder to the Game directory.
+8) Copy everything inside the Build/bin/Win32 or x64/Debug or Release/ folder to the Game directory.
 9) Copy the Scripts folder to the Game directory.
 10) Ensure you have the necessary level data and textures files as well.
 11) In the case Windows warns about missing DLLs, (bass.dll, etc.) copy the missing DLL files found inside the Libs folder to your main TEN directory (vcpkg copy them auto).
