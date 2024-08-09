@@ -72,5 +72,6 @@ echo "  Updating libraries to latest version  "
 echo "========================================"
 timeout /t 1 /nobreak > NUL
 vcpkg upgrade --no-dry-run
+vcpkg integrate install
 
 pause
