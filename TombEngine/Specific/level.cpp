@@ -1570,17 +1570,17 @@ void LoadPortal(RoomData& room)
 {
 	RoomDoorData door;
 
-	door.room = ReadInt16();
-	door.normal.x = ReadInt32();
-	door.normal.y = ReadInt32();
-	door.normal.z = ReadInt32();
+	door.RoomNumber = ReadInt16();
+	door.Nomal.x = ReadInt32();
+	door.Nomal.y = ReadInt32();
+	door.Nomal.z = ReadInt32();
 
 	for (int k = 0; k < 4; k++)
 	{
-		door.vertices[k].x = ReadInt32();
-		door.vertices[k].y = ReadInt32();
-		door.vertices[k].z = ReadInt32();
+		door.Vertices[k].x = ReadInt32();
+		door.Vertices[k].y = ReadInt32();
+		door.Vertices[k].z = ReadInt32();
 	}
 
-	room.doors.push_back(door);
+	room.Doors.push_back(door);
 }

@@ -56,9 +56,14 @@ struct RoomVertexData
 
 struct RoomDoorData
 {
-	short room;
-	Vector3 normal;
-	Vector3 vertices[4];
+private:
+	static constexpr auto VERTEX_COUNT = 4;
+
+public:
+	int RoomNumber = 0;
+
+	std::array<Vector3, VERTEX_COUNT> Vertices = {};
+	Vector3							  Nomal	   = Vector3::Zero;
 };
 
 struct RoomLightData
@@ -153,12 +158,12 @@ struct RoomData
 	std::vector<MESH_INFO>	   mesh			  = {}; // Statics
 	std::vector<TriggerVolume> TriggerVolumes = {};
 
-	std::vector<Vector3>   positions = {};
-	std::vector<Vector3>   normals	 = {};
-	std::vector<Vector3>   colors	 = {};
-	std::vector<Vector3>   effects	 = {};
-	std::vector<BUCKET>	   buckets	 = {};
-	std::vector<RoomDoorData> doors	 = {};
+	std::vector<Vector3>	  positions = {};
+	std::vector<Vector3>	  normals	= {};
+	std::vector<RoomDoorData> Doors		= {};
+	std::vector<Vector3>	  colors	= {};
+	std::vector<Vector3>	  effects	= {};
+	std::vector<BUCKET>		  buckets	= {};
 
 	bool Active() const;
 	void GenerateCollisionMesh();

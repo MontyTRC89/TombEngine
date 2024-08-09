@@ -105,11 +105,11 @@ void RoomData::GenerateCollisionMesh()
 	}
 
 	// Collect collision mesh portal triangles for room.
-	PrintDebugMessage("%d", doors.size());
-	for (const auto& door : doors)
+	PrintDebugMessage("%d", Doors.size());
+	for (const auto& door : Doors)
 	{
-		CollisionMesh.InsertTriangle(Position.ToVector3() + door.vertices[0], Position.ToVector3() + door.vertices[1], Position.ToVector3() + door.vertices[2], door.normal, door.room);
-		CollisionMesh.InsertTriangle(Position.ToVector3() + door.vertices[0], Position.ToVector3() + door.vertices[2], Position.ToVector3() + door.vertices[3], door.normal, door.room);
+		CollisionMesh.InsertTriangle(Position.ToVector3() + door.Vertices[0], Position.ToVector3() + door.Vertices[1], Position.ToVector3() + door.Vertices[2], door.Nomal, door.RoomNumber);
+		CollisionMesh.InsertTriangle(Position.ToVector3() + door.Vertices[0], Position.ToVector3() + door.Vertices[2], Position.ToVector3() + door.Vertices[3], door.Nomal, door.RoomNumber);
 	}
 
 	// Initialize collision mesh.
@@ -930,15 +930,15 @@ static std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int sear
 
 	// Recursively collect neighbors of current neighbor.
 	const auto& room = g_Level.Rooms[roomNumber];
-	if (room.doors.empty())
+	if (room.Doors.empty())
 	{
 		neighborRoomNumbers.push_back(roomNumber);
 	}
 	else
 	{
-		for (int doorID = 0; doorID < room.doors.size(); doorID++)
+		for (int doorID = 0; doorID < room.Doors.size(); doorID++)
 		{
-			int neighborRoomNumber = room.doors[doorID].room;
+			int neighborRoomNumber = room.Doors[doorID].RoomNumber;
 			neighborRoomNumbers.push_back(neighborRoomNumber);
 
 			auto recNeighborRoomNumbers = GetNeighborRoomNumbers(neighborRoomNumber, searchDepth - 1, visitedRoomNumbers);

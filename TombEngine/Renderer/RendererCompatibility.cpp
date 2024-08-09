@@ -223,24 +223,24 @@ namespace TEN::Renderer
 				if (g_Level.Rooms[j].Active())
 					r->Neighbors.push_back(j);
 
-			if (room.doors.size() != 0)
+			if (room.Doors.size() != 0)
 			{
-				r->Doors.resize((int)room.doors.size());
+				r->Doors.resize((int)room.Doors.size());
 
-				for (int l = 0; l < room.doors.size(); l++)
+				for (int l = 0; l < room.Doors.size(); l++)
 				{
 					RendererDoor* door = &r->Doors[l];
-					RoomDoorData* oldDoor = &room.doors[l];
+					RoomDoorData* oldDoor = &room.Doors[l];
 
-					door->RoomNumber = oldDoor->room;
-					door->Normal = oldDoor->normal;
+					door->RoomNumber = oldDoor->RoomNumber;
+					door->Normal = oldDoor->Nomal;
 
 					for (int k = 0; k < 4; k++)
 					{
 						door->AbsoluteVertices[k] = Vector4(
-							room.Position.x + oldDoor->vertices[k].x,
-							room.Position.y + oldDoor->vertices[k].y,
-							room.Position.z + oldDoor->vertices[k].z,
+							room.Position.x + oldDoor->Vertices[k].x,
+							room.Position.y + oldDoor->Vertices[k].y,
+							room.Position.z + oldDoor->Vertices[k].z,
 							1.0f);
 					}
 				}
