@@ -74,4 +74,12 @@ timeout /t 1 /nobreak > NUL
 vcpkg upgrade --no-dry-run
 vcpkg integrate install
 
+echo Creating the game directory.
+mkdir Game
+mkdir Game\Audio
+mkdir Game\Data
+mkdir Game\Scripts
+mkdir Game\Shaders
+mkdir Game\Textures
+
 pause
