@@ -196,7 +196,6 @@ namespace TEN::Physics
 
 		const CollisionTriangle* closestTri = nullptr;
 		float closestDist = dist;
-		bool isClosestTriTangible = false;
 
 		// Find closest triangle.
 		for (int triID : triIds)
@@ -206,13 +205,12 @@ namespace TEN::Physics
 			float intersectDist = 0.0f;
 			if (tri.Intersects(ray, intersectDist) && intersectDist < closestDist)
 			{
-				// Prioritize tangible triangle in case of coincident triangles.
+				// Prioritize tangible triangle in case portal triangle coincides.
 				bool isTangible = (tri.GetPortalRoomNumber() == NO_VALUE);
-				if (isTangible || (!isClosestTriTangible && abs(intersectDist - closestDist) > THRESHOLD))
+				if (isTangible || (abs(intersectDist - closestDist) > THRESHOLD))
 				{
 					closestTri = &tri;
 					closestDist = intersectDist;
-					isClosestTriTangible = isTangible;
 				}
 			}
 		}
