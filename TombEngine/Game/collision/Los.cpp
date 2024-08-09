@@ -107,7 +107,7 @@ namespace TEN::Collision::Los
 		if (dir == Vector3::Zero)
 		{
 			TENLog("GetLosCollision(): dir is not a unit vector.", LogLevel::Warning);
-			return LosCollisionData{ RoomLosCollisionData{ nullptr, origin, roomNumber, {}, 0.0f, false }, {}, {}, {} };
+			return LosCollisionData{ RoomLosCollisionData{ {}, origin, roomNumber, {}, 0.0f, false}, {}, {}, {} };
 		}
 
 		auto los = LosCollisionData{};
@@ -249,7 +249,7 @@ namespace TEN::Collision::Los
 		bool traversePortal = true;
 		while (traversePortal)
 		{
-			const CollisionTriangle* closestTri = nullptr;
+			const CollisionTriangleData* closestTri = nullptr;
 			float closestDist = rayDist;
 
 			// 2.1) Clip room.
@@ -297,23 +297,24 @@ namespace TEN::Collision::Los
 			// 2.3) Return room LOS collision or traverse new room.
 			if (closestTri != nullptr)
 			{
+				bool isPortal = (closestTri->PortalRoomNumber != NO_VALUE);
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
 
 				// Hit portal triangle; update ray to traverse new room.
-				if (closestTri->IsPortal() &&
-					rayRoomNumber != closestTri->GetPortalRoomNumber()) // FAILSAFE: Prevent infinite loop.
+				if (isPortal &&
+					rayRoomNumber != closestTri->PortalRoomNumber) // FAILSAFE: Prevent infinite loop.
 				{
 					ray.position = intersectPos;
 					rayDist -= closestDist;
-					rayRoomNumber = closestTri->GetPortalRoomNumber();
+					rayRoomNumber = closestTri->PortalRoomNumber;
 				}
 				// Hit tangible triangle; collect remaining room LOS collision data.
 				else
 				{
-					if (closestTri->IsPortal())
+					if (isPortal)
 						TENLog("GetRoomLosCollision(): Room portal cannot link back to itself.", LogLevel::Warning);
 
-					roomLos.Triangle = closestTri;
+					roomLos.Triangle = *closestTri;
 					roomLos.Position = intersectPos;
 					roomLos.RoomNumber = rayRoomNumber;
 					roomLos.IsIntersected = true;
@@ -324,7 +325,7 @@ namespace TEN::Collision::Los
 			}
 			else
 			{
-				roomLos.Triangle = nullptr;
+				roomLos.Triangle = std::nullopt;
 				roomLos.Position = Geometry::TranslatePoint(ray.position, ray.direction, rayDist);
 				roomLos.RoomNumber = rayRoomNumber;
 				roomLos.IsIntersected = false;

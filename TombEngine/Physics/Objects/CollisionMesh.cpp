@@ -9,33 +9,32 @@ using namespace TEN::Utils;
 
 namespace TEN::Physics
 {
-	CollisionTriangle::CollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, const std::vector<Vector3>& vertices, const Vector3& normal, const BoundingBox& box, int portalRoomNumber)
+	CollisionTriangle::CollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, int normalID, const BoundingBox& aabb, int portalRoomNumber)
 	{
 		_vertexIds = std::array<int, VERTEX_COUNT>{ vertex0ID, vertex1ID, vertex2ID };
-		_vertices = &vertices;
-		_normal = normal;
-		_aabb = box;
+		_normalID = normalID;
+		_aabb = aabb;
 		_portalRoomNumber = portalRoomNumber;
 	}
 
-	const Vector3& CollisionTriangle::GetVertex0() const
+	const Vector3& CollisionTriangle::GetVertex0(const std::vector<Vector3>& vertices) const
 	{
-		return (*_vertices)[_vertexIds[0]];
+		return vertices[_vertexIds[0]];
 	}
 
-	const Vector3& CollisionTriangle::GetVertex1() const
+	const Vector3& CollisionTriangle::GetVertex1(const std::vector<Vector3>& vertices) const
 	{
-		return (*_vertices)[_vertexIds[1]];
+		return vertices[_vertexIds[1]];
 	}
 
-	const Vector3& CollisionTriangle::GetVertex2() const
+	const Vector3& CollisionTriangle::GetVertex2(const std::vector<Vector3>& vertices) const
 	{
-		return (*_vertices)[_vertexIds[2]];
+		return vertices[_vertexIds[2]];
 	}
 
-	const Vector3& CollisionTriangle::GetNormal() const
+	const Vector3& CollisionTriangle::GetNormal(const std::vector<Vector3>& normals) const
 	{
-		return _normal;
+		return normals[_normalID];
 	}
 
 	const BoundingBox& CollisionTriangle::GetAabb() const
@@ -49,29 +48,37 @@ namespace TEN::Physics
 	}
 
 	// TODO: Triangle treated as infinite.
-	Vector3 CollisionTriangle::GetTangent(const BoundingSphere& sphere) const
+	Vector3 CollisionTriangle::GetTangent(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
+		// Get vertices.
+		const auto& vertex0 = GetVertex0(vertices);
+		const auto& vertex1 = GetVertex1(vertices);
+		const auto& vertex2 = GetVertex2(vertices);
+
 		// Calculate edges.
-		auto edge0 = GetVertex1() - GetVertex0();
-		auto edge1 = GetVertex2() - GetVertex0();
+		auto edge0 = vertex1 - vertex0;
+		auto edge1 = vertex2 - vertex0;
 
 		// Calculate edge normal.
 		auto normal = edge0.Cross(edge1);
 		normal.Normalize();
 
 		// Calculate tangent.
-		float dist = normal.Dot(sphere.Center - GetVertex0());
+		float dist = normal.Dot(sphere.Center - vertex0);
 		return (sphere.Center - (normal * dist));
 	}
 
 	// "More accurate" version but it doesn't work.
-	/*Vector3 CollisionTriangle::GetTangent(const std::vector<Vector3>& vertices, const BoundingSphere& sphere) const
+	/*Vector3 CollisionTriangle::GetTangent(const std::vector<Vector3>& vertices, const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
 		// Get vertices.
+		const auto& vertex0 = GetVertex0(vertices);
+		const auto& vertex1 = GetVertex1(vertices);
+		const auto& vertex2 = GetVertex2(vertices);
 
 		// Calculate edges.
-		auto edge0 = GetVertex1() - GetVertex0();
-		auto edge1 = GetVertex2() - GetVertex0();
+		auto edge0 = vertex1 - vertex0;
+		auto edge1 = vertex2 - vertex0;
 
 		// Calculate vectors.
 		auto v2 = sphere.Center - vertex0;
@@ -113,20 +120,28 @@ namespace TEN::Physics
 		return c3;
 	}*/
 
-	bool CollisionTriangle::Intersects(const Ray& ray, float& dist) const
+	bool CollisionTriangle::Intersects(const Ray& ray, float& dist, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
 		// Test if ray intersects triangle AABB.
 		float boxDist = 0.0f;
 		if (!ray.Intersects(_aabb, boxDist))
 			return false;
 
+		// Get normal.
+		const auto& normal = GetNormal(normals);
+
 		// Test if ray is facing triangle.
-		if (ray.direction.Dot(_normal) > EPSILON)
+		if (ray.direction.Dot(normal) > EPSILON)
 			return false;
 
+		// Get vertices.
+		const auto& vertex0 = GetVertex0(vertices);
+		const auto& vertex1 = GetVertex1(vertices);
+		const auto& vertex2 = GetVertex2(vertices);
+
 		// Calculate edges.
-		auto edge0 = GetVertex1() - GetVertex0();
-		auto edge1 = GetVertex2() - GetVertex0();
+		auto edge0 = vertex1 - vertex0;
+		auto edge1 = vertex2 - vertex0;
 
 		// Calculate determinant.
 		auto dirCrossEdge1 = ray.direction.Cross(edge1);
@@ -139,11 +154,11 @@ namespace TEN::Physics
 		float invDet = 1.0f / det;
 
 		// Calculate barycentric coordinates.
-		float baryCoordVert0 = (ray.position - GetVertex0()).Dot(dirCrossEdge1) * invDet;
+		float baryCoordVert0 = (ray.position - vertex0).Dot(dirCrossEdge1) * invDet;
 		if (baryCoordVert0 < 0.0f || baryCoordVert0 > 1.0f)
 			return false;
 
-		auto rayToVert0CrossEdge0 = (ray.position - GetVertex0()).Cross(edge0);
+		auto rayToVert0CrossEdge0 = (ray.position - vertex0).Cross(edge0);
 		float baryCoordVert1 = ray.direction.Dot(rayToVert0CrossEdge0) * invDet;
 		if (baryCoordVert1 < 0.0f || (baryCoordVert0 + baryCoordVert1) > 1.0f)
 			return false;
@@ -157,18 +172,23 @@ namespace TEN::Physics
 		return true;
 	}
 
-	bool CollisionTriangle::Intersects(const BoundingSphere& sphere) const
+	bool CollisionTriangle::Intersects(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
+		// Get vertices.
+		const auto& vertex0 = GetVertex0(vertices);
+		const auto& vertex1 = GetVertex1(vertices);
+		const auto& vertex2 = GetVertex2(vertices);
+
 		// Calculate edges.
-		auto edge0 = GetVertex1() - GetVertex0();
-		auto edge1 = GetVertex2() - GetVertex0();
+		auto edge0 = vertex1 - vertex0;
+		auto edge1 = vertex2 - vertex0;
 
 		// Calculate edge normal.
 		auto normal = edge0.Cross(edge1);
 		normal.Normalize();
 
 		// Test intersection.
-		float dist = abs(normal.Dot(sphere.Center - GetVertex0()));
+		float dist = abs(normal.Dot(sphere.Center - vertex0));
 		return (dist <= sphere.Radius);
 	}
 
@@ -177,12 +197,20 @@ namespace TEN::Physics
 		return (_portalRoomNumber != NO_VALUE);
 	}
 
-	void CollisionTriangle::DrawDebug() const
+	void CollisionTriangle::DrawDebug(const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
-		DrawDebugTriangle(GetVertex0(), GetVertex1(), GetVertex2(), Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f, 0.2f));
+		// Get vertices and normal.
+		const auto& vertex0 = GetVertex0(vertices);
+		const auto& vertex1 = GetVertex1(vertices);
+		const auto& vertex2 = GetVertex2(vertices);
+		const auto& normal = GetNormal(normals);
 
-		auto center = (GetVertex0() + GetVertex1() + GetVertex2()) / 3;
-		DrawDebugLine(center, Geometry::TranslatePoint(center, _normal, BLOCK(0.2f)), Color(1.0f, 1.0f, 1.0f));
+		// Draw triangle.
+		DrawDebugTriangle(vertex0, vertex1, vertex2, Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f, 0.2f));
+
+		// Draw normal line.
+		auto center = (vertex0 + vertex1 + vertex2) / 3;
+		DrawDebugLine(center, Geometry::TranslatePoint(center, normal, BLOCK(0.2f)), Color(1.0f, 1.0f, 1.0f));
 	}
 
 	std::optional<CollisionMeshRayCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
@@ -190,7 +218,7 @@ namespace TEN::Physics
 		constexpr auto THRESHOLD = 0.001f;
 
 		// Get bounded triangle IDs.
-		auto triIds = _tree.GetBoundedObjectIds(ray, dist);
+		auto triIds = _triangleTree.GetBoundedObjectIds(ray, dist);
 		if (triIds.empty())
 			return std::nullopt;
 
@@ -203,7 +231,7 @@ namespace TEN::Physics
 			const auto& tri = _triangles[triID];
 
 			float intersectDist = 0.0f;
-			if (tri.Intersects(ray, intersectDist) && intersectDist < closestDist)
+			if (tri.Intersects(ray, intersectDist, _vertices, _normals) && intersectDist < closestDist)
 			{
 				// Prioritize tangible triangle in case portal triangle coincides.
 				if (tri.GetPortalRoomNumber() == NO_VALUE || (abs(intersectDist - closestDist) > THRESHOLD))
@@ -215,7 +243,16 @@ namespace TEN::Physics
 		}
 
 		if (closestTri != nullptr)
-			return CollisionMeshRayCollisionData{ *closestTri, closestDist };
+		{
+			auto meshColl = CollisionMeshRayCollisionData{};
+			meshColl.Triangle.Vertices = { closestTri->GetVertex0(_vertices), closestTri->GetVertex1(_vertices), closestTri->GetVertex2(_vertices) };
+			meshColl.Triangle.Normal = closestTri->GetNormal(_normals);
+			meshColl.Triangle.Aabb = closestTri->GetAabb();
+			meshColl.Triangle.PortalRoomNumber = closestTri->GetPortalRoomNumber();
+			meshColl.Distance = closestDist;
+
+			return meshColl;
+		}
 
 		return std::nullopt;
 	}
@@ -223,7 +260,7 @@ namespace TEN::Physics
 	std::optional<CollisionMeshSphereCollisionData> CollisionMesh::GetCollision(const BoundingSphere& sphere) const
 	{
 		// Get bounded triangle IDs.
-		auto triIds = _tree.GetBoundedObjectIds(sphere);
+		auto triIds = _triangleTree.GetBoundedObjectIds(sphere);
 		if (triIds.empty())
 			return std::nullopt;
 
@@ -234,10 +271,16 @@ namespace TEN::Physics
 		{
 			const auto& tri = _triangles[triID];
 
-			if (!tri.IsPortal() && tri.Intersects(sphere))
+			if (!tri.IsPortal() && tri.Intersects(sphere, _vertices, _normals))
 			{
-				meshColl.Triangles.push_back(&tri);
-				meshColl.Tangents.push_back(tri.GetTangent(sphere));
+				auto triData = CollisionTriangleData{};
+				triData.Vertices = { tri.GetVertex0(_vertices), tri.GetVertex1(_vertices), tri.GetVertex2(_vertices) };
+				triData.Normal = tri.GetNormal(_normals);
+				triData.Aabb = tri.GetAabb();
+				triData.PortalRoomNumber = tri.GetPortalRoomNumber();
+
+				meshColl.Triangles.push_back(triData);
+				meshColl.Tangents.push_back(tri.GetTangent(sphere, _vertices, _normals));
 				meshColl.Count++;
 			}
 		}
@@ -250,45 +293,49 @@ namespace TEN::Physics
 
 	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, int portalRoomNumber)
 	{
-		int vertex0ID = NO_VALUE;
-		int vertex1ID = NO_VALUE;
-		int vertex2ID = NO_VALUE;
-
-		// Get IDs of existing vertices.
-		for (int i = 0; i < _vertices.size(); i++)
+		auto getVertexID = [&](const Vector3& vertex)
 		{
-			const auto& vertex = _vertices[i];
+			auto it = _vertexMap.find(vertex);
+			if (it != _vertexMap.end())
+			{
+				int vertexID = it->second;
+				return vertexID;
+			}
+			
+			int vertexID = _vertices.size();
+			_vertices.push_back(vertex);
+			_vertexMap[vertex] = vertexID;
+			return vertexID;
+		};
 
-			if (vertex0ID == NO_VALUE && vertex == vertex0)
-				vertex0ID = i;
-			if (vertex1ID == NO_VALUE && vertex == vertex1)
-				vertex1ID = i;
-			if (vertex2ID == NO_VALUE && vertex == vertex2)
-				vertex2ID = i;
-		}
+		auto getNormalID = [&](const Vector3& normal)
+		{
+			auto it = _normalMap.find(normal);
+			if (it != _normalMap.end())
+			{
+				int normalID = it->second;
+				return normalID;
+			}
 
-		// Add new vertices and get IDs.
-		if (vertex0ID == NO_VALUE)
-		{
-			_vertices.push_back(vertex0);
-			vertex0ID = (int)_vertices.size() - 1;
-		}
-		if (vertex1ID == NO_VALUE)
-		{
-			_vertices.push_back(vertex1);
-			vertex1ID = (int)_vertices.size() - 1;
-		}
-		if (vertex2ID == NO_VALUE)
-		{
-			_vertices.push_back(vertex2);
-			vertex2ID = (int)_vertices.size() - 1;
-		}
+			int normalID = _normals.size();
+			_normals.push_back(normal);
+			_normalMap[normal] = normalID;
+			return normalID;
+		};
 
-		// TODO: Keep normals in vector too?
-		
-		// Add new triangle.
-		auto aabb = Geometry::GetBoundingBox(std::vector<Vector3>{ vertex0, vertex1, vertex2 });
-		_triangles.push_back(CollisionTriangle(vertex0ID, vertex1ID, vertex2ID, _vertices, normal, aabb, portalRoomNumber));
+		// Add vertices and get IDs.
+		int vertex0ID = getVertexID(vertex0);
+		int vertex1ID = getVertexID(vertex1);
+		int vertex2ID = getVertexID(vertex2);
+
+		// Add normal and get ID.
+		int normalID = getNormalID(normal);
+
+		// Set AABB.
+		auto aabb = Geometry::GetBoundingBox({ vertex0, vertex1, vertex2 });
+
+		// Add triangle.
+		_triangles.push_back(CollisionTriangle(vertex0ID, vertex1ID, vertex2ID, normalID, aabb, portalRoomNumber));
 	}
 	
 	void CollisionMesh::Initialize()
@@ -307,14 +354,14 @@ namespace TEN::Physics
 			triAabbs.push_back(tri.GetAabb());
 		}
 
-		_tree = BoundingTree(triIds, triAabbs);
+		_triangleTree = BoundingTree(triIds, triAabbs);
 	}
 
 	void CollisionMesh::DrawDebug() const
 	{
 		for (const auto& tri : _triangles)
-			tri.DrawDebug();
+			tri.DrawDebug(_vertices, _normals);
 
-		_tree.DrawDebug();
+		_triangleTree.DrawDebug();
 	}
 }

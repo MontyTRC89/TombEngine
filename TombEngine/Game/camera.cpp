@@ -118,7 +118,7 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 
 	// 2) Clip room LOS collision.
 	auto cameraLos = CameraLosCollisionData{};
-	cameraLos.Normal = (los.Room.Triangle != nullptr) ? los.Room.Triangle->GetNormal() : -dir;
+	cameraLos.Normal = los.Room.Triangle.has_value() ? los.Room.Triangle->Normal : -dir;
 	cameraLos.Position = los.Room.Position;
 	cameraLos.RoomNumber = los.Room.RoomNumber;
 	cameraLos.IsIntersected = los.Room.IsIntersected;
@@ -193,7 +193,7 @@ static Vector3 GetCameraGeometryOffset()
 		for (int i = 0; i < meshColl->Count; i++)
 		{
 			const auto& tangent = meshColl->Tangents[i];
-			const auto& normal = meshColl->Triangles[i]->GetNormal();
+			const auto& normal = meshColl->Triangles[i].Normal;
 
 			// Calculate and collect tanget offset.
 			int sign = IsPointInFront(sphere.Center, tangent, normal) ? 1 : -1;

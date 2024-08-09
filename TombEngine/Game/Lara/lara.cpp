@@ -242,7 +242,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		for (int i = 0; i < meshColl->Count; i++)
 		{
 			const auto& tangent = meshColl->Tangents[i];
-			const auto& normal = meshColl->Triangles[i]->GetNormal();
+			const auto& normal = meshColl->Triangles[i].Normal;
 
 			DrawDebugTarget(tangent, Quaternion::Identity, BLOCK(0.2f), Color(1, 0, 0));
 
