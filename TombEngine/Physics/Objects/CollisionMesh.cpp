@@ -201,19 +201,23 @@ namespace TEN::Physics
 		float closestDist = INFINITY;
 		bool isClosestTriTangible = false;
 
-		// TODO: If portal and tangible triangles are double-planing, prioritise tangible triangle.
 		// Find closest triangle.
 		for (int triID : triIds)
 		{
 			const auto& tri = _triangles[triID];
 
 			float intersectDist = 0.0f;
-			if (tri.Intersects(ray, intersectDist) &&
-				intersectDist <= dist && intersectDist < closestDist)
+			if (tri.Intersects(ray, intersectDist) && intersectDist <= dist)
 			{
-				closestTri = &tri;
-				closestDist = intersectDist;
-				isClosestTriTangible = tri.GetPortalRoomNumber() == NO_VALUE;
+				// TODO: Priority not working.
+				bool isTriTangible = (tri.GetPortalRoomNumber() == NO_VALUE);
+				if (intersectDist < closestDist || 
+					(abs(intersectDist - closestDist) <= EPSILON && isTriTangible && !isClosestTriTangible)) // FAILSAFE: Prioritise tangible triangle.
+				{
+					closestTri = &tri;
+					closestDist = intersectDist;
+					isClosestTriTangible = isTriTangible;
+				}
 			}
 		}
 
