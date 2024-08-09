@@ -80,7 +80,6 @@ namespace TEN::Physics
 		// Constructors
 
 		CollisionMesh() = default;
-		CollisionMesh(const std::vector<CollisionTriangle>& tris);
 
 		// Getters
 

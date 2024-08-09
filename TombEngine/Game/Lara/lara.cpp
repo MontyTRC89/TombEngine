@@ -278,12 +278,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	HandleLosDebug(*item);
 	HandleBridgeDebug(*item);
 
-	// Regenerate room collision mesh.
-	auto& room = g_Level.Rooms[item->RoomNumber];
-	if (IsClicked(In::Action))
-		room.GenerateCollisionMesh();
-	room.CollisionMesh.DrawDebug();
-
 	static bool hasRun = false;
 	if (!hasRun)
 	{

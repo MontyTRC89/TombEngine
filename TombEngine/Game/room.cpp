@@ -384,13 +384,10 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 			// Full wall.
 			if (isFloor && (!isPrevXTriWall && surfVerts.PrevNeighborX.IsWall))
 			{
-				bool useFloorTri0 = surfVerts.IsSplitAngle0;
-				bool useCeilTri0 = vertices.Ceil.IsSplitAngle0;
-
-				const auto& vertex0 = useFloorTri0 ? vertices.Floor.Tri0.Vertex0 : vertices.Floor.Tri1.Vertex0;
-				const auto& vertex1 = useFloorTri0 ? vertices.Floor.Tri0.Vertex1 : vertices.Floor.Tri1.Vertex1;
-				const auto& vertex2 = useCeilTri0 ? vertices.Ceil.Tri0.Vertex0 : vertices.Ceil.Tri1.Vertex0;
-				const auto& vertex3 = useCeilTri0 ? vertices.Ceil.Tri0.Vertex1 : vertices.Ceil.Tri1.Vertex1;
+				const auto& vertex0 = vertices.Floor.IsSplitAngle0 ? vertices.Floor.Tri0.Vertex0 : vertices.Floor.Tri1.Vertex0;
+				const auto& vertex1 = vertices.Floor.IsSplitAngle0 ? vertices.Floor.Tri0.Vertex1 : vertices.Floor.Tri1.Vertex1;
+				const auto& vertex2 = vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex0 : vertices.Ceil.Tri1.Vertex0;
+				const auto& vertex3 = vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex1 : vertices.Ceil.Tri1.Vertex1;
 
 				if (vertex0 != vertex2)
 					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL);
@@ -428,13 +425,10 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 			// Full wall.
 			if (isFloor && (!isNextXTriWall && surfVerts.NextNeighborX.IsWall))
 			{
-				bool useFloorTri0 = !surfVerts.IsSplitAngle0;
-				bool useCeilTri0 = !vertices.Ceil.IsSplitAngle0;
-
-				const auto& vertex0 = useFloorTri0 ? vertices.Floor.Tri0.Vertex1 : vertices.Floor.Tri1.Vertex1;
-				const auto& vertex1 = useFloorTri0 ? vertices.Floor.Tri0.Vertex2 : vertices.Floor.Tri1.Vertex2;
-				const auto& vertex2 = useCeilTri0 ? vertices.Ceil.Tri0.Vertex1 : vertices.Ceil.Tri1.Vertex1;
-				const auto& vertex3 = useCeilTri0 ? vertices.Ceil.Tri0.Vertex2 : vertices.Ceil.Tri1.Vertex2;
+				const auto& vertex0 = !vertices.Floor.IsSplitAngle0 ? vertices.Floor.Tri0.Vertex1 : vertices.Floor.Tri1.Vertex1;
+				const auto& vertex1 = !vertices.Floor.IsSplitAngle0 ? vertices.Floor.Tri0.Vertex2 : vertices.Floor.Tri1.Vertex2;
+				const auto& vertex2 = !vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex1 : vertices.Ceil.Tri1.Vertex1;
+				const auto& vertex3 = !vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex2 : vertices.Ceil.Tri1.Vertex2;
 
 				if (vertex0 != vertex2)
 					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, WEST_WALL_NORMAL);

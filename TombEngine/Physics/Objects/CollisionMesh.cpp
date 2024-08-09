@@ -182,23 +182,20 @@ namespace TEN::Physics
 		DrawDebugTriangle(GetVertex0(), GetVertex1(), GetVertex2(), Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f, 0.2f), RendererDebugPage::RoomMeshStats);
 
 		auto center = (GetVertex0() + GetVertex1() + GetVertex2()) / 3;
-		DrawDebugLine(center, Geometry::TranslatePoint(center, _normal, BLOCK(0.2f)), Color(1.0f, 1, 1), RendererDebugPage::RoomMeshStats);
-	}
-
-	CollisionMesh::CollisionMesh(const std::vector<CollisionTriangle>& tris)
-	{
-		_triangles = tris;
+		DrawDebugLine(center, Geometry::TranslatePoint(center, _normal, BLOCK(0.2f)), Color(1.0f, 1.0f, 1.0f), RendererDebugPage::RoomMeshStats);
 	}
 
 	std::optional<CollisionMeshRayCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
 	{
+		constexpr auto THRESHOLD = 0.001f;
+
 		// Get bounded triangle IDs.
 		auto triIds = _tree.GetBoundedObjectIds(ray, dist);
 		if (triIds.empty())
 			return std::nullopt;
 
 		const CollisionTriangle* closestTri = nullptr;
-		float closestDist = INFINITY;
+		float closestDist = dist;
 		bool isClosestTriTangible = false;
 
 		// Find closest triangle.
@@ -207,16 +204,15 @@ namespace TEN::Physics
 			const auto& tri = _triangles[triID];
 
 			float intersectDist = 0.0f;
-			if (tri.Intersects(ray, intersectDist) && intersectDist <= dist)
+			if (tri.Intersects(ray, intersectDist) && intersectDist < closestDist)
 			{
-				// TODO: Priority not working.
-				bool isTriTangible = (tri.GetPortalRoomNumber() == NO_VALUE);
-				if (intersectDist < closestDist || 
-					(abs(intersectDist - closestDist) <= EPSILON && isTriTangible && !isClosestTriTangible)) // FAILSAFE: Prioritise tangible triangle.
+				// Prioritize tangible triangle in case of coincident triangles.
+				bool isTangible = (tri.GetPortalRoomNumber() == NO_VALUE);
+				if (isTangible || abs(intersectDist - closestDist) > THRESHOLD)
 				{
 					closestTri = &tri;
 					closestDist = intersectDist;
-					isClosestTriTangible = isTriTangible;
+					isClosestTriTangible = isTangible;
 				}
 			}
 		}
@@ -320,10 +316,7 @@ namespace TEN::Physics
 	void CollisionMesh::DrawDebug() const
 	{
 		for (const auto& tri : _triangles)
-		{
-			//if (tri.IsPortal())
-				tri.DrawDebug();
-		}
+			tri.DrawDebug();
 
 		if (GetDebugPage() == RendererDebugPage::RoomMeshStats)
 			_tree.DrawDebug();
