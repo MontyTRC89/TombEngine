@@ -62,6 +62,9 @@ LaraInfo Lara = {};
 ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 
+#include "Specific/Structures/SpatialHash.h"
+using namespace TEN::Structures;
+
 //debug
 #include <Game/control/los.h>
 #include "Specific/Input/Input.h"
@@ -180,6 +183,53 @@ static BoundingBox GetAabb(const BoundingOrientedBox& obb)
 	return GetAabb(cornerVector);
 }
 
+void HandleSpatialHasDebug(const ItemInfo& item)
+{
+	struct TestObject
+	{
+		BoundingOrientedBox Obb		= BoundingOrientedBox();
+		BoundingOrientedBox PrevObb = BoundingOrientedBox();
+	};
+
+	static auto testObj = TestObject{};
+
+	// Modify OBB extents.
+	float exp = BLOCK(0.01f);
+	if (KeyMap[OIS::KC_1])
+		testObj.Obb.Extents.x += exp;
+	else if (KeyMap[OIS::KC_Q])
+		testObj.Obb.Extents.x -= exp;
+	if (KeyMap[OIS::KC_2])
+		testObj.Obb.Extents.y += exp;
+	else if (KeyMap[OIS::KC_W])
+		testObj.Obb.Extents.y -= exp;
+	if (KeyMap[OIS::KC_3])
+		testObj.Obb.Extents.z += exp;
+	else if (KeyMap[OIS::KC_E])
+		testObj.Obb.Extents.z -= exp;
+
+	// Rotate OBB.
+	if (KeyMap[OIS::KC_6])
+		testObj.Obb.Orientation = Quaternion(testObj.Obb.Orientation) * EulerAngles(ANGLE(2), 0, 0).ToQuaternion();
+	else if (KeyMap[OIS::KC_Y])
+		testObj.Obb.Orientation = Quaternion(testObj.Obb.Orientation) * EulerAngles(ANGLE(-2), 0, 0).ToQuaternion();
+	if (KeyMap[OIS::KC_7])
+		testObj.Obb.Orientation = Quaternion(testObj.Obb.Orientation) * EulerAngles(0, ANGLE(2), 0).ToQuaternion();
+	else if (KeyMap[OIS::KC_U])
+		testObj.Obb.Orientation = Quaternion(testObj.Obb.Orientation) * EulerAngles(0, ANGLE(-2), 0).ToQuaternion();
+
+	// Set boxes.
+	testObj.Obb.Center = item.Pose.Position.ToVector3() + Vector3(0, -BLOCK(1), 0);
+	g_Renderer.AddDebugBox(testObj.Obb, Color(1, 1, 0));
+
+	// Insert to DSC.
+	DebugSpatialHash.Update(item.Index, testObj.Obb, testObj.PrevObb);
+	DebugSpatialHash.DrawDebug();
+
+	// Update prev AABB.
+	testObj.PrevObb = testObj.Obb;
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
@@ -269,6 +319,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	HandleLosDebug(*item);
 	HandleBridgeDebug(*item);
+	HandleSpatialHasDebug(*item);
+	HandleLosDebug(*item);
 
 	static bool hasRun = false;
 	if (!hasRun)
