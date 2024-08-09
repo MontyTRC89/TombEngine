@@ -304,7 +304,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 		if (surfVerts.IsSplit && !(surfVerts.Tri0.IsWall && surfVerts.Tri1.IsWall))
 		{
 			// Full wall.
-			if ((surfVerts.Tri0.IsWall || surfVerts.Tri1.IsWall) && isFloor)
+			if (isFloor && (surfVerts.Tri0.IsWall || surfVerts.Tri1.IsWall))
 			{
 				const auto& vertex0 = surfVerts.IsSplitAngle0 ?
 					(surfVerts.Tri0.IsWall ? vertices.Floor.Tri1.Vertex0 : vertices.Floor.Tri0.Vertex0) :

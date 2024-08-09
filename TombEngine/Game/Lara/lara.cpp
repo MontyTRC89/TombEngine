@@ -91,15 +91,7 @@ static void HandleLosDebug(const ItemInfo& item)
 
 	auto origin = (item.Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
 	auto target = Geometry::TranslatePoint(origin, dir, dist);
-	
-	auto start = std::chrono::high_resolution_clock::now();
-
 	auto los = GetLosCollision(origin, roomNumber, dir, dist, true, true, true);
-	
-	auto end = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-	//PrintDebugMessage("%d", duration.count());
-
 	float closestDist = los.Room.Distance;
 	target = los.Room.Position;
 
@@ -580,6 +572,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	if (DebugMode)
 	{
+		if (GetDebugPage() == RendererDebugPage::RoomMeshStats)
+			g_Level.Rooms[item->RoomNumber].CollisionMesh.DrawDebug();
+
 		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().PathfindingBoxID);
 		DrawNearbySectorFlags(*item);
 	}
