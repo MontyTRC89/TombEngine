@@ -66,5 +66,6 @@ vcpkg remove sol2[core]:x64-windows
 echo Removing Lua.
 timeout /t 1 /nobreak > NUL
 vcpkg remove lua[core,cpp,tools]:x64-windows
+vcpkg integrate remove
 
 pause
