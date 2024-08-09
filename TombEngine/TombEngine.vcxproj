@@ -89,7 +89,8 @@
     <IntDir>$(SolutionDir)Build\obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>
+    </LinkIncremental>
     <OutDir>$(SolutionDir)Build\bin\$(Platform)\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
     <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
@@ -102,7 +103,8 @@
     <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>
+    </LinkIncremental>
     <OutDir>$(SolutionDir)Build\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)Build\obj\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
@@ -126,6 +128,7 @@
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,22 +141,21 @@
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
+      <Command>xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
+      <Message>Copy bass dll to compiled bin directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)..\Documentation\
+      <Command>CD "$(SolutionDir)Documentation"
 CALL compile.bat .
 
-CD $(ProjectDir)Specific\savegame\schema\
+CD "$(ProjectDir)Specific\savegame\schema\"
 CALL gen.bat
 
-md "$(SolutionDir)Build\$(Configuration)\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders\"
-xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Game\Shaders\HUD\"
-</Command>
-      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
+md "$(SolutionDir)Game\Shaders"
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"</Command>
+      <Message>Generating documentation, savegame flatbuffer and copying shaders files.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -187,9 +189,10 @@ xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Game\Shaders\HUD\"
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)\Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
+      <Command>xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
+      <Message>Copy bass dll to compiled bin directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD "$(SolutionDir)Documentation"
@@ -201,7 +204,7 @@ CALL gen.bat
 md "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
 </Command>
-      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying shaders files.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -242,27 +245,27 @@ xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <TargetMachine>MachineX86</TargetMachine>
-      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
+      <Message>Copy bass dll to compiled bin directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)..\Documentation\
+      <Command>CD "$(SolutionDir)Documentation"
 CALL compile.bat .
 
-CD $(ProjectDir)Specific\savegame\schema\
+CD "$(ProjectDir)Specific\savegame\schema\"
 CALL gen.bat
 
-md "$(SolutionDir)Build\$(Configuration)\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders\"
-xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Game\Shaders\HUD\"
-</Command>
+md "$(SolutionDir)Game\Shaders"
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying shaders files.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -302,12 +305,14 @@ xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Game\Shaders\HUD\"
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
-      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
+      <Message>Copy bass dll to compiled bin directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD "$(SolutionDir)Documentation"
@@ -321,7 +326,7 @@ xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
 </Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying shaders files.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
