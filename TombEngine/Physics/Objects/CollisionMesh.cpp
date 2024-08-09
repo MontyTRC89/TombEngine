@@ -206,8 +206,7 @@ namespace TEN::Physics
 			if (tri.Intersects(ray, intersectDist) && intersectDist < closestDist)
 			{
 				// Prioritize tangible triangle in case portal triangle coincides.
-				bool isTangible = (tri.GetPortalRoomNumber() == NO_VALUE);
-				if (isTangible || (abs(intersectDist - closestDist) > THRESHOLD))
+				if (tri.GetPortalRoomNumber() == NO_VALUE || (abs(intersectDist - closestDist) > THRESHOLD))
 				{
 					closestTri = &tri;
 					closestDist = intersectDist;
