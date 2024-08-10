@@ -845,7 +845,7 @@ namespace TEN::Gui
 			ThumbstickCameraControl,
 
 			MouseSensitivity,
-			MenuLoop,
+			MenuOptionLooping,
 
 			Apply,
 			Cancel,
@@ -951,7 +951,7 @@ namespace TEN::Gui
 
 				break;
 
-			case OtherSettingsOption::MenuLoop:
+			case OtherSettingsOption::MenuOptionLooping:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 				switch (CurrentSettings.Configuration.MenuOptionLooping)
@@ -1022,7 +1022,7 @@ namespace TEN::Gui
 
 				break;
 
-			case OtherSettingsOption::MenuLoop:
+			case OtherSettingsOption::MenuOptionLooping:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				switch (CurrentSettings.Configuration.MenuOptionLooping)
 				{
