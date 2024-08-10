@@ -14,6 +14,8 @@
 
 using namespace TEN::Math;
 
+// TODO: Magic numbers to constants.
+
 namespace TEN::Entities::Creatures::TR3
 {
 	const auto SealMutantGasBite			   = CreatureBiteInfo(Vector3(0.0f, 48.0f, 140.0f), 10);
@@ -64,11 +66,11 @@ namespace TEN::Entities::Creatures::TR3
 		}
 		
 		auto velVector = Vector3(0.0f, gravity, vel * VEL_MULT);
-		auto startColor = Color(Random::GenerateFloat(0.25f, 0.5f), Random::GenerateFloat(0.25f, 0.5f), 0.1f);
-		auto endColor = Color(Random::GenerateFloat(0.05f, 0.1f), Random::GenerateFloat(0.05f, 0.1f), 0.0f);
+		auto colorStart  = Color(Random::GenerateFloat(0.25f, 0.5f), Random::GenerateFloat(0.25f, 0.5f), 0.1f);
+		auto colorEnd = Color(Random::GenerateFloat(0.05f, 0.1f), Random::GenerateFloat(0.05f, 0.1f), 0.0f);
 
 		for (int i = 0; i < GAS_COUNT; i++)
-			ThrowPoison(item, SealMutantGasBite, velVector, startColor, endColor);
+			ThrowPoison(item, SealMutantGasBite, velVector, colorStart, colorEnd);
 	}
 
 	void ControlSealMutant(short itemNumber)
@@ -117,8 +119,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		ItemInfo* target = nullptr;
 
-		CreatureBiteInfo bite = {};
-		Vector3i boneEffectPos = Vector3i::Zero;
+		auto bite = CreatureBiteInfo{};
+		auto boneEffectPos = Vector3i::Zero;
 
 		if (item.GetFlagField(IF_SEAL_MUTANT_FLAME_TIMER) > 80)
 			item.HitPoints = 0;
