@@ -41,7 +41,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.
 * Changed Water sound condition to ShallowWater.
-* All menus except Load and Save will now no longer loop once going past the first and last items.
+* Added option to enable or disable menu loop.
+* Menu scrolling using held inputs will stop at the last option until a new input is made.
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
