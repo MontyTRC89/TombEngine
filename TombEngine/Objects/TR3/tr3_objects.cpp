@@ -419,7 +419,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->Initialize = InitializeCreature;
 		obj->collision = CreatureCollision;
-		obj->control = SealMutantControl;
+		obj->control = ControlSealMutant;
 		obj->shadowType = ShadowMode::All;
 		obj->HitPoints = 50;
 		obj->radius = 204;

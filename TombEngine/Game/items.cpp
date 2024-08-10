@@ -182,13 +182,6 @@ bool ItemInfo::IsBridge() const
 	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
 }
 
-bool ItemInfo::IsLaraCrouching() const
-{
-	if (!IsLara()) return false;
-	const LaraInfo& laraInfo = GetLaraInfo(*this);
-	return laraInfo.Control.IsLow;
-}
-
 bool TestState(int refState, const std::vector<int>& stateList)
 {
 	for (const auto& state : stateList)

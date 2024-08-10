@@ -50,25 +50,30 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SealMutantGasSpeedMultiplier = 5; // Speed increase for the gas to touch lara at more than 1.5 blocks.
 	constexpr auto SealMutantGasCrouchGravity = 32; // Avoid the seal mutant to not hit lara if she is crouching !
 
-	static void ThrowSealMutantGas(short itemNumber, ItemInfo* enemy, int speed)
+	static void ThrowSealMutantGas(int itemNumber, ItemInfo* enemy, int speed)
 	{
-		constexpr auto THROW_COUNT = 2;
-		auto gravity = (enemy != nullptr && enemy->IsLaraCrouching()) ? SealMutantGasCrouchGravity : 0;
-		auto velocity = Vector3i(0, gravity, speed * SealMutantGasSpeedMultiplier);
+		constexpr auto PART_COUNT = 2;
+
+		auto gravity = (enemy != nullptr && (!enemy->IsLara() || (enemy->IsLara() && GetLaraInfo(*enemy).Control.IsLow))) ? SealMutantGasCrouchGravity : 0;
+		auto vel = Vector3i(0, gravity, speed * SealMutantGasSpeedMultiplier);
 		auto startColor = Vector3i((GetRandomControl() & 0x3F) + 128, (GetRandomControl() & 0x3F) + 128, 32);
 		auto endColor = Vector3i((GetRandomControl() & 0xF) + 32, (GetRandomControl() & 0xF) + 32, 0);
-		for (int i = 0; i < THROW_COUNT; i++)
-			ThrowPoison(itemNumber, SealMutantGasBite, velocity, startColor, endColor);
-		ThrowPoison(itemNumber, SealMutantGasBite, velocity, startColor, endColor);
+
+		for (int i = 0; i < PART_COUNT; i++)
+			ThrowPoison(itemNumber, SealMutantGasBite, vel, startColor, endColor);
+
+		ThrowPoison(itemNumber, SealMutantGasBite, vel, startColor, endColor);
 	}
 
-	void SealMutantControl(short itemNumber)
+	void ControlSealMutant(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
 			return;
 
-		int speed = 0;
 		auto* item = &g_Level.Items[itemNumber];
+
+		int speed = 0;
+
 		if (item->TestOcb(OCB_TRAP_MODE))
 		{
 			if (item->Animation.ActiveState != SEAL_MUTANT_STATE_TRAP)
