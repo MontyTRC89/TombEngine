@@ -271,7 +271,7 @@ namespace TEN::Renderer
 			GetNextLinePosition(&y);
 
 			// Menu loop
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MENU_LOOP), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 10));
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MENU_OPTION_LOOPING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 10));
 			AddString(MenuRightSideEntry, y, Str_MenuOptionLooping(g_Gui.GetCurrentSettings().Configuration.MenuOptionLooping), PRINTSTRING_COLOR_WHITE, SF(titleOption == 10));
 			GetNextBlockPosition(&y);
 
