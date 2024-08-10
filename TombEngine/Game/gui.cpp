@@ -173,7 +173,7 @@ namespace TEN::Gui
 			return ((IsReleased(In::Select) || IsReleased(In::Action)) && CanSelect());
 		}
 	}
-	
+
 	bool GuiController::GuiIsDeselected() const
 	{
 		return ((IsClicked(In::Deselect) || IsClicked(In::Draw)) && CanDeselect());
@@ -356,18 +356,19 @@ namespace TEN::Gui
 		{
 			if (GuiIsPulsed(In::Forward))
 			{
-				SelectedOption = (SelectedOption <= 0) ? OptionCount : (SelectedOption - 1);
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				if (SelectedOption > 0)
+				{
+					SelectedOption--;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
 			}
-
-			if (GuiIsPulsed(In::Back))
+			else if (GuiIsPulsed(In::Back))
 			{
 				if (SelectedOption < OptionCount)
+				{
 					SelectedOption++;
-				else
-					SelectedOption -= OptionCount;
-
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
 			}
 
 			if (GuiIsDeselected() && MenuToDisplay != Menu::Title)
@@ -579,22 +580,19 @@ namespace TEN::Gui
 
 		if (GuiIsPulsed(In::Forward))
 		{
-			if (SelectedOption <= 0)
-				SelectedOption += OptionCount;
-			else
+			if (SelectedOption > 0)
+			{
 				SelectedOption--;
-
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			}
 		}
-
-		if (GuiIsPulsed(In::Back))
+		else if (GuiIsPulsed(In::Back))
 		{
 			if (SelectedOption < OptionCount)
+			{
 				SelectedOption++;
-			else
-				SelectedOption -= OptionCount;
-
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			}
 		}
 
 		if (GuiIsSelected())
@@ -612,7 +610,7 @@ namespace TEN::Gui
 				SaveConfiguration();
 
 				// Reset screen and go back.
-				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.ScreenWidth, CurrentSettings.Configuration.ScreenHeight, 
+				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.ScreenWidth, CurrentSettings.Configuration.ScreenHeight,
 					CurrentSettings.Configuration.EnableWindowedMode);
 
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
@@ -745,22 +743,19 @@ namespace TEN::Gui
 		{
 			if (GuiIsPulsed(In::Forward))
 			{
-				if (SelectedOption <= 0)
-					SelectedOption += OptionCount;
-				else
+				if (SelectedOption > 0)
+				{
 					SelectedOption--;
-
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
 			}
-
-			if (GuiIsPulsed(In::Back))
+			else if (GuiIsPulsed(In::Back))
 			{
 				if (SelectedOption < OptionCount)
+				{
 					SelectedOption++;
-				else
-					SelectedOption -= OptionCount;
-
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
 			}
 
 			// HACK: Menu screen scroll.
@@ -929,7 +924,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAutoMonkeySwingJump = !CurrentSettings.Configuration.EnableAutoMonkeySwingJump;
 				break;
-				
+
 			case OtherSettingsOption::Subtitles:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableSubtitles = !CurrentSettings.Configuration.EnableSubtitles;
@@ -944,7 +939,7 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableTargetHighlighter = !CurrentSettings.Configuration.EnableTargetHighlighter;
 				break;
-				
+
 			case OtherSettingsOption::ToggleRumble:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableRumble = !CurrentSettings.Configuration.EnableRumble;
@@ -1085,30 +1080,19 @@ namespace TEN::Gui
 
 		if (GuiIsPulsed(In::Forward))
 		{
-			if (SelectedOption <= 0)
-			{
-				SelectedOption += OptionCount;
-			}
-			else
+			if (SelectedOption > 0)
 			{
 				SelectedOption--;
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
-
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
-
-		if (GuiIsPulsed(In::Back))
+		else if (GuiIsPulsed(In::Back))
 		{
 			if (SelectedOption < OptionCount)
 			{
 				SelectedOption++;
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
-			else
-			{
-				SelectedOption -= OptionCount;
-			}
-
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
 		if (GuiIsSelected())
@@ -1193,22 +1177,19 @@ namespace TEN::Gui
 		{
 			if (GuiIsPulsed(In::Forward))
 			{
-				if (SelectedOption <= 0)
-					SelectedOption += OptionCount;
-				else
+				if (SelectedOption > 0)
+				{
 					SelectedOption--;
-
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
 			}
-
-			if (GuiIsPulsed(In::Back))
+			else if (GuiIsPulsed(In::Back))
 			{
 				if (SelectedOption < OptionCount)
+				{
 					SelectedOption++;
-				else
-					SelectedOption -= OptionCount;
-
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				}
 			}
 		}
 
@@ -1409,7 +1390,7 @@ namespace TEN::Gui
 
 		if (Rings[(int)RingTypes::Ammo].RingActive)
 			return;
-	
+
 		AmmoObjectList[0].Orientation = EulerAngles::Identity;
 		AmmoObjectList[1].Orientation = EulerAngles::Identity;
 		AmmoObjectList[2].Orientation = EulerAngles::Identity;
@@ -1903,7 +1884,7 @@ namespace TEN::Gui
 		{
 			Ammo.AmountShotGunAmmo2 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].GetCount() / 6;
 		}
-		
+
 		Ammo.AmountShotGunAmmo1 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 		Ammo.AmountShotGunAmmo2 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
 		Ammo.AmountHKAmmo1 = lara->Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
@@ -2108,7 +2089,7 @@ namespace TEN::Gui
 			{
 				player.Control.HandStatus = HandStatus::WeaponDraw;
 			}
-			
+
 			InventoryItemChosen = NO_VALUE;
 			return;
 		}
@@ -2515,51 +2496,25 @@ namespace TEN::Gui
 				!invRing.ObjectListMovement &&
 				!ammoRing.ObjectListMovement)
 			{
+				if (GuiIsPulsed(In::Forward))
+				{
+					if (CurrentSelectedOption > 0)
+					{
+						CurrentSelectedOption--;
+						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					}
+				}
+				else if (GuiIsPulsed(In::Back))
+				{
+					if (CurrentSelectedOption < n - 1)
+					{
+						CurrentSelectedOption++;
+						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					}
+				}
+
 				if (AmmoActive)
-				{
-					if (GuiIsPulsed(In::Forward))
-					{
-						if (CurrentSelectedOption <= 0)
-							CurrentSelectedOption = n - 1;
-						else
-							CurrentSelectedOption--;
-
-						SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					}
-
-					if (GuiIsPulsed(In::Back))
-					{
-						if (CurrentSelectedOption >= (n - 1))
-							CurrentSelectedOption = 0;
-						else
-							CurrentSelectedOption++;
-
-						SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					}
-
 					*CurrentAmmoType = CurrentSelectedOption;
-				}
-				else
-				{
-					if (GuiIsPulsed(In::Forward))
-					{
-						if (CurrentSelectedOption <= 0)
-							CurrentSelectedOption = n - 1;
-						else
-							CurrentSelectedOption--;
-
-						SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					}
-					else if (GuiIsPulsed(In::Back))
-					{
-						if (CurrentSelectedOption >= (n - 1))
-							CurrentSelectedOption = 0;
-						else
-							CurrentSelectedOption++;
-
-						SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					}
-				}
 
 				if (GuiIsSelected(false))
 				{
@@ -2719,7 +2674,7 @@ namespace TEN::Gui
 	{
 		if (!AmmoSelectorFlag)
 			return;
-	
+
 		int xPos = (2 * PHD_CENTER_X - OBJLIST_SPACING) / 2;
 		if (NumAmmoSlots == 2)
 			xPos -= OBJLIST_SPACING / 2;
@@ -2767,7 +2722,7 @@ namespace TEN::Gui
 					// CHECK: AmmoSelectorFadeVal is never true and therefore the string is never printed.
 					//if (AmmoSelectorFadeVal)
 						g_Renderer.AddString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, (int)PrintStringFlags::Center | (int)PrintStringFlags::Outline);
-				
+
 					if (n == *CurrentAmmoType)
 						g_Renderer.DrawObjectIn2DSpace(objectNumber, Vector2(x, y), AmmoObjectList[n].Orientation, scaler);
 					else
@@ -3470,8 +3425,7 @@ namespace TEN::Gui
 			else
 				SelectedSaveSlot++;
 		}
-
-		if (GuiIsPulsed(In::Forward))
+		else if (GuiIsPulsed(In::Forward))
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
@@ -3569,7 +3523,7 @@ namespace TEN::Gui
 				return true;
 			}
 		}
-		else 
+		else
 		{
 			// Small one isn't empty and the big one isn't full.
 			if (lara->Inventory.SmallWaterskin != 1 && bigCapacity)
