@@ -127,6 +127,26 @@ static void HandleLosDebug(const ItemInfo& item)
 
 static void HandleBridgeDebug(const ItemInfo& item)
 {
+	// Force init bridges. For some reason they don't init properly right now.
+	static bool hasRun = false;
+	if (!hasRun)
+	{
+		for (auto& item2 : g_Level.Items)
+		{
+			if (!item2.Active)
+				continue;
+
+			if (!item2.IsBridge())
+				continue;
+
+			auto& bridge = GetBridgeObject(item2);
+			bridge.Initialize(item2);
+		}
+
+		hasRun = true;
+	}
+
+	// Move bridge with mouse.
 	auto pointColl = GetPointCollision(item);
 	if (pointColl.GetFloorBridgeItemNumber() != NO_VALUE)
 	{
@@ -234,27 +254,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	// ----BoundingTree debug
+	// ----DEBUG
+	
+	// Tree of moveables in room.
 
 	auto movIds = std::vector<int>{};
 	auto aabbs = std::vector<BoundingBox>{};
 
-	movIds.push_back(0);
-	aabbs.push_back(GetAabb(item->GetObb()));
-
-	// Player tree box.
-	//static auto tree = BoundingTree(movIds, aabbs, BLOCK(1 / 32.0f));
-	//tree.Move(0, GetAabb(item->GetObb()), BLOCK(1 / 32.0f));
-	//tree.DrawDebug();
-	//tree.Validate();
-
-	//auto movIds2 = tree.GetBoundedObjectIds();
-	//for (int movID : movIds2)
-	//	PrintDebugMessage("%d", movID);
-
-	//DrawDebugBox(GetAabb(item->GetObb()), Color(1, 0, 0));
-
-	// Tree of moveables in room
 	const auto& room2 = g_Level.Rooms[item->RoomNumber];
 	int movID = room2.itemNumber;
 	while (movID != NO_VALUE)
@@ -273,17 +279,12 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			aabbs.push_back(GetAabb(g_Level.Items[movID].GetObb()));
 		}
 	}
-
 	auto tree = BoundingTree(movIds, aabbs);
 	tree.DrawDebug();
-	//auto movIds2 = tree.GetBoundedObjectIds(Ray(item->Pose.Position.ToVector3() + Vector3(0, -LARA_HEIGHT, 0), item->Pose.Orientation.ToDirection()), BLOCK(1));
-	auto movIds2 = tree.GetBoundedObjectIds(item->GetObb());
-
-	//--------
 
 	// Sphere-triangle collision debug.
+
 	auto sphere = BoundingSphere(Geometry::TranslatePoint(item->Pose.Position.ToVector3(), g_Camera.actualAngle, BLOCK(0.6f)) + Vector3(0, -BLOCK(1), 0), BLOCK(0.5f));
-	
 	auto meshColl = g_Level.Rooms[item->RoomNumber].CollisionMesh.GetCollision(sphere);
 
 	auto offsets = std::vector<Vector3>{};
@@ -317,38 +318,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		DrawDebugSphere(sphere, Color(1, 1, 1, 0.1f), RendererDebugPage::None, false);
 	}
 
-	HandleLosDebug(*item);
-	HandleBridgeDebug(*item);
-	HandleSpatialHasDebug(*item);
-	HandleLosDebug(*item);
-
-	static bool hasRun = false;
-	if (!hasRun)
-	{
-		for (auto& item2 : g_Level.Items)
-		{
-			if (!item2.Active)
-				continue;
-
-			if (!item2.IsBridge())
-				continue;
-
-			auto& bridge = GetBridgeObject(item2);
-			bridge.Initialize(item2);
-		}
-
-		hasRun = true;
-	}
-
-	//UpdateBridgeItem(g_Level.Items[43]);
-
-	//for (auto& sector : room.floor)
-	//	DrawDebugBox(sector.Aabb, Color(1, 1, 1));
-	
-	//room.CollisionMesh.DrawDebug();
-
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), g_Camera.actualAngle);
 	//PrintDebugMessage("%d", abs(deltaAngle));
+
+	HandleLosDebug(*item);
+	HandleBridgeDebug(*item);
+	//HandleSpatialHasDebug(*item);
+	HandleLosDebug(*item);
 
 	//--------
 

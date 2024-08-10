@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Math/Math.h"
+#include "Specific/Structures/BoundingTree.h"
 
 using namespace TEN::Math;
+using namespace TEN::Structures;
 
 namespace std
 {
@@ -11,9 +13,9 @@ namespace std
 	{
 		std::size_t operator()(const Vector3& v) const noexcept
 		{
-			auto x = std::hash<float>{}(v.x);
-			auto y = std::hash<float>{}(v.y);
-			auto z = std::hash<float>{}(v.z);
+			auto x = std::hash<float>()(v.x);
+			auto y = std::hash<float>()(v.y);
+			auto z = std::hash<float>()(v.z);
 			return ((x ^ (y << 1)) ^ (z << 2));
 		}
 	};
@@ -93,7 +95,7 @@ namespace TEN::Physics
 		std::vector<Vector3>		   _vertices  = {};
 		std::vector<Vector3>		   _normals	  = {};
 
-		BoundingTree					 _triangleTree = {};
+		BoundingTree					 _triangleTree = BoundingTree();
 		std::unordered_map<Vector3, int> _vertexMap	   = {}; // Key = vertex, value = vertex ID.
 		std::unordered_map<Vector3, int> _normalMap	   = {}; // Key = normal, value = normal ID.
 

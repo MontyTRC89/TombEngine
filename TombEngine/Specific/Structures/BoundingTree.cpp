@@ -1,11 +1,11 @@
 #include "framework.h"
-#include "Math/Objects/BoundingTree.h"
+#include "Specific/Structures/BoundingTree.h"
 
 #include "Math/Math.h"
 
 using namespace TEN::Math;
 
-namespace TEN::Math
+namespace TEN::Structures
 {
 	bool BoundingTree::Node::IsLeaf() const
 	{

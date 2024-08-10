@@ -1,10 +1,11 @@
 #pragma once
 
 // References:
-// https://www.gdcvault.com/play/1025909/Math-for-Game-Developers-Dynamic
 // https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
+// https://github.com/erincatto/box2d/blob/main/include/box2d/b2_dynamic_tree.h
+// https://www.gdcvault.com/play/1025909/Math-for-Game-Developers-Dynamic
 
-namespace TEN::Math
+namespace TEN::Structures
 {
 	// Dynamic bounding volume hierarchy using AABBs.
 	class BoundingTree
@@ -12,13 +13,13 @@ namespace TEN::Math
 	private:
 		struct Node
 		{
-			int			ObjectID = -1; // NOTE: Only leaf node stores object ID directly.
+			int			ObjectID = NO_VALUE; // NOTE: Only leaf node stores object ID directly.
 			BoundingBox Aabb	 = BoundingBox();
-			int			Height	 = -1;
+			int			Height	 = NO_VALUE;
 
-			int ParentID	 = -1;
-			int LeftChildID	 = -1;
-			int RightChildID = -1;
+			int ParentID	 = NO_VALUE;
+			int LeftChildID	 = NO_VALUE;
+			int RightChildID = NO_VALUE;
 
 			bool IsLeaf() const;
 		};
@@ -27,9 +28,9 @@ namespace TEN::Math
 
 		std::vector<Node> _nodes	   = {};
 		std::vector<int>  _freeNodeIds = {};
-		int				  _rootID	   = -1;
+		int				  _rootID	   = NO_VALUE;
 
-		std::unordered_map<int, int> _leafIDMap = {}; // Key = object ID.
+		std::unordered_map<int, int> _leafIDMap = {}; // Key = object ID, value = leaf ID.
 
 	public:
 		// Constructors
