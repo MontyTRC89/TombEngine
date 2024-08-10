@@ -11,10 +11,10 @@
 #include "Objects/TR3/Entity/Compsognathus.h"
 #include "Objects/TR3/Entity/Lizard.h"
 #include "Objects/TR3/Entity/PunaBoss.h"
-#include "Objects/TR3/Entity/Raptor.h"
-#include "Objects/TR3/Entity/Shiva.h"
 #include "Objects/TR3/Entity/SealMutant.h"
+#include "Objects/TR3/Entity/Shiva.h"
 #include "Objects/TR3/Entity/SophiaLeigh.h"
+#include "Objects/TR3/Entity/Raptor.h"
 #include "Objects/TR3/Entity/TwinAutoGun.h"
 #include "Objects/TR3/Entity/WaspMutant.h"
 #include "Objects/TR3/Entity/Winston.h"
@@ -426,7 +426,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 0;
 		obj->intelligent = true;
 		obj->SetBoneRotationFlags(8, ROT_X | ROT_Z); // Torso X/Z
-		obj->SetBoneRotationFlags(9, ROT_Y);         // Head
+		obj->SetBoneRotationFlags(9, ROT_Y);		 // Head
 		obj->SetHitEffect();
 	}
 

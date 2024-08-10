@@ -83,7 +83,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto headOrient = EulerAngles::Identity;
 		auto torsoOrient = EulerAngles::Identity;
 
-		int speed = 0;
+		int vel = 0;
 
 		if (item.TestOcb(OCB_TRAP))
 		{
@@ -96,17 +96,17 @@ namespace TEN::Entities::Creatures::TR3
 				const auto& deathAnim = GetAnimData(item.Animation.AnimNumber);
 				if ((item.Animation.FrameNumber >= (deathAnim.frameBase + 1)) && (item.Animation.FrameNumber <= (deathAnim.frameEnd - 8)))
 				{
-					speed = item.Animation.FrameNumber - (deathAnim.frameBase + 1);
-					if (speed > 24)
+					vel = item.Animation.FrameNumber - (deathAnim.frameBase + 1);
+					if (vel > 24)
 					{
-						speed = (deathAnim.frameEnd - item.Animation.FrameNumber) - 8;
-						if (speed <= 0)
-							speed = 1;
+						vel = (deathAnim.frameEnd - item.Animation.FrameNumber) - 8;
+						if (vel <= 0)
+							vel = 1;
 
-						if (speed > 24)
-							speed = (GetRandomControl() & 0xF) + 8;
+						if (vel > 24)
+							vel = (GetRandomControl() & 0xF) + 8;
 
-						ThrowSealMutantGas(item, nullptr, speed);
+						ThrowSealMutantGas(item, nullptr, vel);
 					}
 				}
 			}
@@ -115,11 +115,10 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 		}
 
-
-		AI_INFO ai;
 		ItemInfo* target = nullptr;
-		CreatureBiteInfo bonePos;
-		Vector3i boneEffectPos;
+
+		CreatureBiteInfo bite = {};
+		Vector3i boneEffectPos = Vector3i::Zero;
 
 		if (item.GetFlagField(IF_SEAL_MUTANT_FLAME_TIMER) > 80)
 			item.HitPoints = 0;
@@ -135,9 +134,9 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				for (int boneID = 9; boneID < 17; boneID++)
 				{
-					bonePos.Position = Vector3::Zero;
-					bonePos.BoneID = boneID;
-					boneEffectPos = GetJointPosition(item, bonePos);
+					bite.Position = Vector3::Zero;
+					bite.BoneID = boneID;
+					boneEffectPos = GetJointPosition(item, bite);
 					TriggerFireFlame(boneEffectPos.x, boneEffectPos.y, boneEffectPos.z, FlameType::Medium);
 				}
 
@@ -150,26 +149,27 @@ namespace TEN::Entities::Creatures::TR3
 						c = 16;
 				}
 
-				Color color;
+				auto color = Color();
 				color.z = GetRandomControl();
 				color.x = (c * (255 - (((byte)color.z >> 4) & 0x1F))) >> 4;
 				color.y = (c * (192 - (((byte)color.z >> 6) & 0x3F))) >> 4;
 				color.z = (c * ((byte)color.z & 0x3F)) >> 4;
 				TriggerDynamicLight(item.Pose.Position.ToVector3(), color, 12.0f);
 			}
-			else if ((item.Animation.FrameNumber >= (prevAnim.frameBase + 1)) && (item.Animation.FrameNumber <= (prevAnim.frameEnd - 8)))
+			else if (item.Animation.FrameNumber >= (prevAnim.frameBase + 1) &&
+				item.Animation.FrameNumber <= (prevAnim.frameEnd - 8))
 			{
-				speed = item.Animation.FrameNumber - (prevAnim.frameBase + 1);
-				if (speed > 24)
+				vel = item.Animation.FrameNumber - (prevAnim.frameBase + 1);
+				if (vel > 24)
 				{
-					speed = (prevAnim.frameEnd - item.Animation.FrameNumber) - 8;
-					if (speed <= 0)
-						speed = 1;
+					vel = (prevAnim.frameEnd - item.Animation.FrameNumber) - 8;
+					if (vel <= 0)
+						vel = 1;
 
-					if (speed > 24)
-						speed = (GetRandomControl() & 0xF) + 8;
+					if (vel > 24)
+						vel = (GetRandomControl() & 0xF) + 8;
 
-					ThrowSealMutantGas(item, creature.Enemy, speed);
+					ThrowSealMutantGas(item, creature.Enemy, vel);
 				}
 			}
 		}
@@ -183,10 +183,12 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				TargetNearestEntity(&item, &creature, SealMutantAttackTargetObjectIds, false);
 			}
-			
+
+			AI_INFO ai;
 			CreatureAIInfo(&item, &ai);
+
 			GetCreatureMood(&item, &ai, ai.zoneNumber == ai.enemyZone);
-			if (creature.Enemy != nullptr && creature.Enemy->ObjectNumber == ID_LARA)
+			if (creature.Enemy != nullptr && creature.Enemy->IsLara())
 			{
 				const auto& player = GetLaraInfo(*creature.Enemy);
 				if (player.Status.Poison >= (LARA_POISON_MAX * 2))
@@ -229,7 +231,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item.Animation.TargetState = SEAL_MUTANT_STATE_WALK;
 				}
-				else if (Targetable(&item, &ai) && ai.distance < 0x400000)
+				else if (Targetable(&item, &ai) && ai.distance < SQUARE(BLOCK(4)))
 				{
 					item.Animation.TargetState = SEAL_MUTANT_STATE_ATTACK;
 				}
@@ -275,23 +277,23 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				const auto& anim = GetAnimData(item.Animation.AnimNumber);
-				if ((item.Animation.FrameNumber >= (anim.frameBase + 35)) && (item.Animation.FrameNumber <= (anim.frameBase + 58)))
+				if (item.Animation.FrameNumber >= (anim.frameBase + 35) && item.Animation.FrameNumber <= (anim.frameBase + 58))
 				{
 					if (creature.Flags < 24)
 						creature.Flags += 3;
 
-					speed = 0;
+					vel = 0;
 					if (creature.Flags < 24)
 					{
-						speed = creature.Flags;
+						vel = creature.Flags;
 					}
 					else
 					{
-						speed = (GetRandomControl() & 0xF) + 8;
+						vel = (GetRandomControl() & 0xF) + 8;
 					}
 
-					ThrowSealMutantGas(item, creature.Enemy, speed);
-					if (creature.Enemy && creature.Enemy->ObjectNumber != ID_LARA)
+					ThrowSealMutantGas(item, creature.Enemy, vel);
+					if (creature.Enemy != nullptr && !creature.Enemy->IsLara())
 						creature.Enemy->HitStatus = true;
 				}
 
