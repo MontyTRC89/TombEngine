@@ -397,6 +397,7 @@ void KillMoveEffects()
 	ItemNewRoomNo = 0;
 }
 
+// NOTE: No one should use this ever again.
 int GetRandomControl()
 {
 	return Random::GenerateInt();
