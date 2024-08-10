@@ -70,6 +70,4 @@ namespace TEN::Structures
 		void Insert(int objectID, const std::vector<Vector3i>& keys);
 		void Remove(int objectID, const std::vector<Vector3i>& keys);
 	};
-
-	extern SpatialHash DebugSpatialHash;
 }

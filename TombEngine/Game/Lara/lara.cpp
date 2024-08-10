@@ -203,7 +203,7 @@ static BoundingBox GetAabb(const BoundingOrientedBox& obb)
 	return GetAabb(cornerVector);
 }
 
-void HandleSpatialHasDebug(const ItemInfo& item)
+void HandleSpatialHashDebug(const ItemInfo& item)
 {
 	struct TestObject
 	{
@@ -211,6 +211,7 @@ void HandleSpatialHasDebug(const ItemInfo& item)
 		BoundingOrientedBox PrevObb = BoundingOrientedBox();
 	};
 
+	static auto debugSpatialHash = SpatialHash(BLOCK(0.5f));
 	static auto testObj = TestObject{};
 
 	// Modify OBB extents.
@@ -243,8 +244,8 @@ void HandleSpatialHasDebug(const ItemInfo& item)
 	g_Renderer.AddDebugBox(testObj.Obb, Color(1, 1, 0));
 
 	// Insert to DSC.
-	DebugSpatialHash.Update(item.Index, testObj.Obb, testObj.PrevObb);
-	DebugSpatialHash.DrawDebug();
+	debugSpatialHash.Update(item.Index, testObj.Obb, testObj.PrevObb);
+	debugSpatialHash.DrawDebug();
 
 	// Update prev AABB.
 	testObj.PrevObb = testObj.Obb;
@@ -323,7 +324,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	HandleLosDebug(*item);
 	HandleBridgeDebug(*item);
-	//HandleSpatialHasDebug(*item);
+	//HandleSpatialHashDebug(*item);
 	HandleLosDebug(*item);
 
 	//--------

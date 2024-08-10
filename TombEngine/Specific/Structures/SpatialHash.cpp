@@ -8,8 +8,6 @@ using namespace TEN::Math;
 
 namespace TEN::Structures
 {
-	SpatialHash DebugSpatialHash = SpatialHash(BLOCK(0.5f));
-
 	SpatialHash::Cell::Cell(const BoundingBox& aabb)
 	{
 		Aabb = aabb;

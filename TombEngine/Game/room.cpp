@@ -279,6 +279,32 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 
 		return vertices;
 	};
+	
+	// TODO: Fix strange compile error.
+	/*auto insertFullCardinalWallTriangles = [&](const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3, const Vector3& normal)
+	{
+		if (vertex0 != vertex2)
+			CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, normal);
+		if (vertex1 != vertex3)
+			CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, normal);
+	};*/
+
+	auto insertStepCardinalWallTriangles = [&](bool isFloor, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3, const Vector3& normal)
+	{
+		bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
+		if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
+		{
+			isSecondCrissCrossCase ?
+				CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, normal) :
+				CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, normal);
+		}
+		if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
+		{
+			isSecondCrissCrossCase ?
+				CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, normal) :
+				CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, normal);
+		}
+	};
 
 	// 1) Generate surface triangle vertices.
 	auto vertices = getVertices();
@@ -389,6 +415,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				const auto& vertex2 = vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex0 : vertices.Ceil.Tri1.Vertex0;
 				const auto& vertex3 = vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex1 : vertices.Ceil.Tri1.Vertex1;
 
+				//insertFullCardinalWallTriangles(vertex0, vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
 				if (vertex0 != vertex2)
 					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL);
 				if (vertex1 != vertex3)
@@ -402,19 +429,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				const auto& vertex2 = surfVerts.IsSplitAngle0 ? surfVerts.PrevNeighborX.Vertex0 : surfVerts.PrevNeighborX.Vertex0;
 				const auto& vertex3 = surfVerts.IsSplitAngle0 ? surfVerts.PrevNeighborX.Vertex1 : surfVerts.PrevNeighborX.Vertex1;
 
-				bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
-				if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
-				{
-					isSecondCrissCrossCase ?
-						CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, EAST_WALL_NORMAL) :
-						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, EAST_WALL_NORMAL);
-				}
-				if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
-				{
-					isSecondCrissCrossCase ?
-						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, EAST_WALL_NORMAL) :
-						CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
-				}
+				insertStepCardinalWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3, EAST_WALL_NORMAL);
 			}
 		}
 
@@ -430,6 +445,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				const auto& vertex2 = !vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex1 : vertices.Ceil.Tri1.Vertex1;
 				const auto& vertex3 = !vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex2 : vertices.Ceil.Tri1.Vertex2;
 
+				//insertFullCardinalWallTriangles(vertex0, vertex1, vertex2, vertex3, WEST_WALL_NORMAL);
 				if (vertex0 != vertex2)
 					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, WEST_WALL_NORMAL);
 				if (vertex1 != vertex3)
@@ -443,19 +459,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				const auto& vertex2 = !surfVerts.IsSplitAngle0 ? surfVerts.NextNeighborX.Vertex0 : surfVerts.NextNeighborX.Vertex0;
 				const auto& vertex3 = !surfVerts.IsSplitAngle0 ? surfVerts.NextNeighborX.Vertex1 : surfVerts.NextNeighborX.Vertex1;
 
-				bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
-				if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
-				{
-					isSecondCrissCrossCase ?
-						CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, WEST_WALL_NORMAL) :
-						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, WEST_WALL_NORMAL);
-				}
-				if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
-				{
-					isSecondCrissCrossCase ?
-						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, WEST_WALL_NORMAL) :
-						CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL);
-				}
+				insertStepCardinalWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3, WEST_WALL_NORMAL);
 			}
 		}
 
@@ -471,6 +475,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				const auto& vertex2 = vertices.Ceil.Tri1.Vertex0;
 				const auto& vertex3 = vertices.Ceil.Tri1.Vertex2;
 
+				//insertFullCardinalWallTriangles(vertex0, vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
 				if (vertex0 != vertex2)
 					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL);
 				if (vertex1 != vertex3)
@@ -484,19 +489,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				const auto& vertex2 = surfVerts.PrevNeighborZ.Vertex0;
 				const auto& vertex3 = surfVerts.PrevNeighborZ.Vertex1;
 
-				bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
-				if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
-				{
-					isSecondCrissCrossCase ?
-						CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, NORTH_WALL_NORMAL) :
-						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL);
-				}
-				if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
-				{
-					isSecondCrissCrossCase ?
-						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, NORTH_WALL_NORMAL) :
-						CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
-				}
+				insertStepCardinalWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
 			}
 		}
 
@@ -512,6 +505,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				const auto& vertex2 = vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex1 : vertices.Ceil.Tri0.Vertex0;
 				const auto& vertex3 = vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex2 : vertices.Ceil.Tri0.Vertex1;
 
+				//insertFullCardinalWallTriangles(vertex0, vertex1, vertex2, vertex3, SOUTH_WALL_NORMAL);
 				if (vertex0 != vertex2)
 					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, SOUTH_WALL_NORMAL);
 				if (vertex1 != vertex3)
@@ -525,19 +519,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				const auto& vertex2 = surfVerts.NextNeighborZ.Vertex0;
 				const auto& vertex3 = surfVerts.NextNeighborZ.Vertex1;
 
-				bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
-				if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
-				{
-					isSecondCrissCrossCase ?
-						CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, SOUTH_WALL_NORMAL) :
-						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, SOUTH_WALL_NORMAL);
-				}
-				if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
-				{
-					isSecondCrissCrossCase ?
-						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, SOUTH_WALL_NORMAL) :
-						CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, SOUTH_WALL_NORMAL);
-				}
+				insertStepCardinalWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3, SOUTH_WALL_NORMAL);
 			}
 		}
 
