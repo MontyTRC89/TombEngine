@@ -888,8 +888,10 @@ namespace TEN::Gui
 			TargetHighlighter,
 			ToggleRumble,
 			ThumbstickCameraControl,
+			
 			MouseSensitivity,
 			MouseSmoothing,
+			MenuLoop,
 
 			Apply,
 			Cancel,
@@ -1006,6 +1008,11 @@ namespace TEN::Gui
 				}
 
 				break;
+
+			case OtherSettingsOption::MenuLoop:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableMenuLoop = !CurrentSettings.Configuration.EnableMenuLoop;
+				break;
 			}
 
 			if (isVolumeAdjusted)
@@ -1068,6 +1075,11 @@ namespace TEN::Gui
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				}
 
+				break;
+
+			case OtherSettingsOption::MenuLoop:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableMenuLoop = !CurrentSettings.Configuration.EnableMenuLoop;
 				break;
 			}
 

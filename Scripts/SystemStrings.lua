@@ -80,6 +80,7 @@ local strings =
 	low = { "Low" },
 	medium = { "Medium" },
 	menu_actions = { "Menu Actions" },
+	menu_loop = { "Menu Loop" },
 	mouse_sensitivity = { "Mouse Sensitivity" },
 	mouse_smoothing = { "Mouse Smoothing" },
 	music_volume = { "Music Volume" },
