@@ -589,10 +589,12 @@ namespace TEN::Structures
 		Validate();
 	}
 
-	// Constructs tree recursively using top-down approach with surface area heuristic (SAH).
-	// Complexity: O(n^2).
+	// Recursively constructs tree using top-down approach with limited surface area heuristic.
+	// Complexity: O(n)-ish.
 	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end)
 	{
+		constexpr auto SPLIT_RANGE_MAX = 10;
+
 		// FAILSAFE.
 		if (start >= end)
 			return NO_VALUE;
@@ -610,7 +612,7 @@ namespace TEN::Structures
 		{
 			node.ObjectID = objectIds[start];
 			node.Height = 0;
-			
+
 			// Add new leaf.
 			int leafID = (int)_nodes.size();
 			_nodes.push_back(node);
@@ -626,8 +628,8 @@ namespace TEN::Structures
 			int bestSplit = (start + end) / 2;
 			float bestCost = INFINITY;
 
-			// Find best split.
-			for (int split = (start + 1); split < end; split++)
+			// Find best split within limited range.
+			for (int split = std::max(start + 1, bestSplit - SPLIT_RANGE_MAX); split < std::min(end, bestSplit + SPLIT_RANGE_MAX); split++)
 			{
 				// Calculate AABB 0.
 				auto aabb0 = aabbs[start];
