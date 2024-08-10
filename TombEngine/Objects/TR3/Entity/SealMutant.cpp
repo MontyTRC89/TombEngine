@@ -16,6 +16,9 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
+	const auto SealMutantGasBite			   = CreatureBiteInfo(Vector3(0.0f, 48.0f, 140.0f), 10);
+	const auto SealMutantAttackTargetObjectIds = { ID_LARA, ID_FLAMETHROWER_BADDY, ID_WORKER_FLAMETHROWER };
+
 	enum SealMutantState
 	{
 		SEAL_MUTANT_STATE_IDLE = 0,
@@ -31,7 +34,7 @@ namespace TEN::Entities::Creatures::TR3
 		SEAL_MUTANT_ANIM_IDLE_TO_WALK = 1,
 		SEAL_MUTANT_ANIM_WALK = 2,
 		SEAL_MUTANT_ANIM_WALK_TO_IDLE = 3,
-		SEAL_MUTANT_ANIM_ATTACKING = 4,
+		SEAL_MUTANT_ANIM_ATTACK = 4,
 		SEAL_MUTANT_ANIM_DEATH = 5,
 		SEAL_MUTANT_ANIM_TRAP = 6
 	};
@@ -47,24 +50,25 @@ namespace TEN::Entities::Creatures::TR3
 		OCB_TRAP = 1
 	};
 
-	const auto SealMutantGasBite = CreatureBiteInfo(0.0f, 48.0f, 140.0f, 10);
-	const auto SealMutantTargetList = { ID_FLAMETHROWER_BADDY, ID_WORKER_FLAMETHROWER, ID_LARA };
-	constexpr auto SealMutantGasSpeedMultiplier = 5; // Speed increase for gas to touch player at more than 1.5 blocks.
-	constexpr auto SealMutantGasCrouchGravity = 32; // Addresses seal mutant gas not hitting player when crouching.
-
-	static void ThrowSealMutantGas(const ItemInfo& item, const ItemInfo* enemy, int speed)
+	static void ThrowSealMutantGas(const ItemInfo& item, const ItemInfo* enemy, float vel)
 	{
-		constexpr auto PART_COUNT = 2;
+		constexpr auto GAS_COUNT			 = 3;
+		constexpr auto VEL_MULT				 = 5.0f;
+		constexpr auto PLAYER_CROUCH_GRAVITY = 32.0f;
 
-		float gravity = (enemy != nullptr && (!enemy->IsLara() || (enemy->IsLara() && GetLaraInfo(*enemy).Control.IsLow))) ? SealMutantGasCrouchGravity : 0.0f;
-		auto vel = Vector3(0.0f, gravity, speed * SealMutantGasSpeedMultiplier);
+		float gravity = 0.0f;
+		if (enemy != nullptr && enemy->IsLara())
+		{
+			const auto& player = GetLaraInfo(*enemy);
+			player.Control.IsLow;
+		}
+		
+		auto velVector = Vector3(0.0f, gravity, vel * VEL_MULT);
 		auto startColor = Color(Random::GenerateFloat(0.25f, 0.5f), Random::GenerateFloat(0.25f, 0.5f), 0.1f);
 		auto endColor = Color(Random::GenerateFloat(0.05f, 0.1f), Random::GenerateFloat(0.05f, 0.1f), 0.0f);
 
-		for (int i = 0; i < PART_COUNT; i++)
-			ThrowPoison(item, SealMutantGasBite, vel, startColor, endColor);
-
-		ThrowPoison(item, SealMutantGasBite, vel, startColor, endColor);
+		for (int i = 0; i < GAS_COUNT; i++)
+			ThrowPoison(item, SealMutantGasBite, velVector, startColor, endColor);
 	}
 
 	void ControlSealMutant(short itemNumber)
@@ -177,13 +181,17 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else
 			{
-				TargetNearestEntity(&item, &creature, SealMutantTargetList, false);
+				TargetNearestEntity(&item, &creature, SealMutantAttackTargetObjectIds, false);
 			}
 			
 			CreatureAIInfo(&item, &ai);
 			GetCreatureMood(&item, &ai, ai.zoneNumber == ai.enemyZone);
-			if (creature.Enemy && creature.Enemy->ObjectNumber == ID_LARA && GetLaraInfo(creature.Enemy)->Status.Poison >= 256)
-				creature.Mood = MoodType::Escape;
+			if (creature.Enemy != nullptr && creature.Enemy->ObjectNumber == ID_LARA)
+			{
+				const auto& player = GetLaraInfo(*creature.Enemy);
+				if (player.Status.Poison >= (LARA_POISON_MAX * 2))
+					creature.Mood = MoodType::Escape;
+			}
 
 			CreatureMood(&item, &ai, ai.zoneNumber == ai.enemyZone);
 			headingAngle = CreatureTurn(&item, creature.MaxTurn);
