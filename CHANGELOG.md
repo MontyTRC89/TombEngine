@@ -41,7 +41,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.
 * Changed Water sound condition to ShallowWater.
-* Added TR3 seal mutant and enable with OCB 1 this trap version.
+* Added TR3 seal mutant (trap version enabled with OCB 1).
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.

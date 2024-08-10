@@ -256,19 +256,20 @@ void TriggerPilotFlame(int itemNumber, int nodeIndex)
 	spark->dSize = size;
 }
 
-static Particle* SetupPoisonSpark(Vector3i startColor, Vector3i endColor)
+static Particle& SetupPoisonParticle(const Color& colorStart, const Color& colorEnd)
 {
-	auto* spark = GetFreeParticle();
-	spark->sR = std::clamp<unsigned char>(startColor.x, 0, 255);
-	spark->sG = std::clamp<unsigned char>(startColor.y, 0, 255);
-	spark->sB = std::clamp<unsigned char>(startColor.z, 0, 255);
-	spark->dR = std::clamp<unsigned char>(endColor.x, 0, 255);
-	spark->dG = std::clamp<unsigned char>(endColor.y, 0, 255);
-	spark->dB = std::clamp<unsigned char>(endColor.z, 0, 255);
-	spark->colFadeSpeed = 14;
-	spark->fadeToBlack = 8;
-	spark->blendMode = BlendMode::Screen;
-	return spark;
+	auto& part = *GetFreeParticle();
+	part.sR = std::clamp<unsigned char>(colorStart.x * UCHAR_MAX, 0, UCHAR_MAX);
+	part.sG = std::clamp<unsigned char>(colorStart.y * UCHAR_MAX, 0, UCHAR_MAX);
+	part.sB = std::clamp<unsigned char>(colorStart.z * UCHAR_MAX, 0, UCHAR_MAX);
+	part.dR = std::clamp<unsigned char>(colorEnd.x * UCHAR_MAX, 0, UCHAR_MAX);
+	part.dG = std::clamp<unsigned char>(colorEnd.y * UCHAR_MAX, 0, UCHAR_MAX);
+	part.dB = std::clamp<unsigned char>(colorEnd.z * UCHAR_MAX, 0, UCHAR_MAX);
+	part.colFadeSpeed = 14;
+	part.fadeToBlack = 8;
+	part.blendMode = BlendMode::Screen;
+
+	return part;
 }
 
 static Particle* SetupFireSpark()
@@ -288,15 +289,15 @@ static Particle* SetupFireSpark()
 	return spark;
 }
 
-static void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector3i offset, Vector3i vel)
+static void AttachAndCreateSpark(Particle* spark, const ItemInfo* item, int meshIndex, Vector3i offset, Vector3i vel)
 {
-	auto pos1 = GetJointPosition(item, meshIndex, Vector3i(-4, -30, -4) + offset);
+	auto pos1 = GetJointPosition(*item, meshIndex, Vector3i(-4, -30, -4) + offset);
 
 	spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
 	spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
 
-	auto pos2 = GetJointPosition(item, meshIndex, Vector3i(-4, -30, -4) + offset + vel);
+	auto pos2 = GetJointPosition(*item, meshIndex, Vector3i(-4, -30, -4) + offset + vel);
 
 	int v = (GetRandomControl() & 0x3F) + 192;
 
@@ -337,20 +338,21 @@ void ThrowFire(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel
 	ThrowFire(itemNumber, bite.BoneID, bite.Position, vel);
 }
 
-void ThrowPoison(int itemNumber, int meshIndex, const Vector3i& offset, const Vector3i& vel, const Vector3i& startColor, const Vector3i& endColor)
+void ThrowPoison(const ItemInfo& item, int boneID, const Vector3& offset, const Vector3& vel, const Color& colorStart, const Color& colorEnd)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	for (int i = 0; i < 2; i++)
+	constexpr auto COUNT = 2;
+
+	for (int i = 0; i < COUNT; i++)
 	{
-		auto* spark = SetupPoisonSpark(startColor, endColor);
-		AttachAndCreateSpark(spark, item, meshIndex, offset, vel);
-		spark->flags = SP_POISON | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		auto& part = SetupPoisonParticle(colorStart, colorEnd);
+		AttachAndCreateSpark(&part, &item, boneID, offset, vel);
+		part.flags = SP_POISON | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 }
 
-void ThrowPoison(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel, const Vector3i& startColor, const Vector3i& endColor)
+void ThrowPoison(const ItemInfo& item, const CreatureBiteInfo& bite, const Vector3& vel, const Color& colorStart, const Color& colorEnd)
 {
-	ThrowPoison(itemNumber, bite.BoneID, bite.Position, vel, startColor, endColor);
+	ThrowPoison(item, bite.BoneID, bite.Position, vel, colorStart, colorEnd);
 }
 
 void UpdateFireProgress()

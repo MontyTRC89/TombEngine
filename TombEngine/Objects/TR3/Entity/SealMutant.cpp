@@ -2,8 +2,8 @@
 
 #include "Game/animation.h"
 #include "Game/control/box.h"
-#include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
@@ -11,6 +11,8 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Effects/enemy_missile.h"
+
+using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
@@ -27,7 +29,7 @@ namespace TEN::Entities::Creatures::TR3
 	{
 		SEAL_MUTANT_ANIM_IDLE = 0,
 		SEAL_MUTANT_ANIM_IDLE_TO_WALK = 1,
-		SEAL_MUTANT_ANIM_WALKING = 2,
+		SEAL_MUTANT_ANIM_WALK = 2,
 		SEAL_MUTANT_ANIM_WALK_TO_IDLE = 3,
 		SEAL_MUTANT_ANIM_ATTACKING = 4,
 		SEAL_MUTANT_ANIM_DEATH = 5,
@@ -36,33 +38,33 @@ namespace TEN::Entities::Creatures::TR3
 
 	enum SealMutantItemFlags
 	{
-		IF_SEAL_MUTANT_FLAMER_TIMER = 0
+		IF_SEAL_MUTANT_FLAME_TIMER = 0
 	};
 
 	enum SealMutantOcb
 	{
 		OCB_NORMAL_BEHAVIOUR = 0,
-		OCB_TRAP_MODE = 1 // Enable the seal mutant that wakes up, spits poison then dies.
+		OCB_TRAP = 1
 	};
 
 	const auto SealMutantGasBite = CreatureBiteInfo(0.0f, 48.0f, 140.0f, 10);
 	const auto SealMutantTargetList = { ID_FLAMETHROWER_BADDY, ID_WORKER_FLAMETHROWER, ID_LARA };
-	constexpr auto SealMutantGasSpeedMultiplier = 5; // Speed increase for the gas to touch lara at more than 1.5 blocks.
-	constexpr auto SealMutantGasCrouchGravity = 32; // Avoid the seal mutant to not hit lara if she is crouching !
+	constexpr auto SealMutantGasSpeedMultiplier = 5; // Speed increase for gas to touch player at more than 1.5 blocks.
+	constexpr auto SealMutantGasCrouchGravity = 32; // Addresses seal mutant gas not hitting player when crouching.
 
-	static void ThrowSealMutantGas(int itemNumber, ItemInfo* enemy, int speed)
+	static void ThrowSealMutantGas(const ItemInfo& item, const ItemInfo* enemy, int speed)
 	{
 		constexpr auto PART_COUNT = 2;
 
-		auto gravity = (enemy != nullptr && (!enemy->IsLara() || (enemy->IsLara() && GetLaraInfo(*enemy).Control.IsLow))) ? SealMutantGasCrouchGravity : 0;
-		auto vel = Vector3i(0, gravity, speed * SealMutantGasSpeedMultiplier);
-		auto startColor = Vector3i((GetRandomControl() & 0x3F) + 128, (GetRandomControl() & 0x3F) + 128, 32);
-		auto endColor = Vector3i((GetRandomControl() & 0xF) + 32, (GetRandomControl() & 0xF) + 32, 0);
+		float gravity = (enemy != nullptr && (!enemy->IsLara() || (enemy->IsLara() && GetLaraInfo(*enemy).Control.IsLow))) ? SealMutantGasCrouchGravity : 0.0f;
+		auto vel = Vector3(0.0f, gravity, speed * SealMutantGasSpeedMultiplier);
+		auto startColor = Color(Random::GenerateFloat(0.25f, 0.5f), Random::GenerateFloat(0.25f, 0.5f), 0.1f);
+		auto endColor = Color(Random::GenerateFloat(0.05f, 0.1f), Random::GenerateFloat(0.05f, 0.1f), 0.0f);
 
 		for (int i = 0; i < PART_COUNT; i++)
-			ThrowPoison(itemNumber, SealMutantGasBite, vel, startColor, endColor);
+			ThrowPoison(item, SealMutantGasBite, vel, startColor, endColor);
 
-		ThrowPoison(itemNumber, SealMutantGasBite, vel, startColor, endColor);
+		ThrowPoison(item, SealMutantGasBite, vel, startColor, endColor);
 	}
 
 	void ControlSealMutant(short itemNumber)
@@ -74,7 +76,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		int speed = 0;
 
-		if (item->TestOcb(OCB_TRAP_MODE))
+		if (item->TestOcb(OCB_TRAP))
 		{
 			if (item->Animation.ActiveState != SEAL_MUTANT_STATE_TRAP)
 			{
@@ -93,7 +95,7 @@ namespace TEN::Entities::Creatures::TR3
 							speed = 1;
 						if (speed > 24)
 							speed = (GetRandomControl() & 0xF) + 8;
-						ThrowSealMutantGas(itemNumber, nullptr, speed);
+						ThrowSealMutantGas(*itemNumber, nullptr, speed);
 					}
 				}
 			}
@@ -111,7 +113,7 @@ namespace TEN::Entities::Creatures::TR3
 		short torsoZ = 0;
 		short torsoX = 0;
 
-		if (item->GetFlagField(IF_SEAL_MUTANT_FLAMER_TIMER) > 80)
+		if (item->GetFlagField(IF_SEAL_MUTANT_FLAME_TIMER) > 80)
 			item->HitPoints = 0;
 
 		if (item->HitPoints <= 0)
@@ -121,7 +123,7 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				SetAnimation(item, SEAL_MUTANT_ANIM_DEATH);
 			}
-			else if (item->GetFlagField(IF_SEAL_MUTANT_FLAMER_TIMER) > 80)
+			else if (item->GetFlagField(IF_SEAL_MUTANT_FLAME_TIMER) > 80)
 			{
 				for (int boneIndex = 9; boneIndex < 17; boneIndex++)
 				{
@@ -157,7 +159,7 @@ namespace TEN::Entities::Creatures::TR3
 						speed = 1;
 					if (speed > 24)
 						speed = (GetRandomControl() & 0xF) + 8;
-					ThrowSealMutantGas(itemNumber, creature.Enemy, speed);
+					ThrowSealMutantGas(*itemNumber, creature.Enemy, speed);
 				}
 			}
 		}
@@ -249,7 +251,7 @@ namespace TEN::Entities::Creatures::TR3
 						speed = creature.Flags;
 					else
 						speed = (GetRandomControl() & 0xF) + 8;
-					ThrowSealMutantGas(itemNumber, creature.Enemy, speed);
+					ThrowSealMutantGas(*itemNumber, creature.Enemy, speed);
 					if (creature.Enemy && creature.Enemy->ObjectNumber != ID_LARA)
 						creature.Enemy->HitStatus = true;
 				}
