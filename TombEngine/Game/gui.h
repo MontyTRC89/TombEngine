@@ -231,6 +231,7 @@ namespace TEN::Gui
 		bool DoSave();
 		void DoInventory(ItemInfo* item);
 		void ConstructCombineObjectList(ItemInfo* item);
+		bool TryShiftSelectedMenuOption(int& selectedOption, int optionCount, int loopingCondition);
 	};
 
 	extern GuiController g_Gui;

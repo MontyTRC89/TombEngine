@@ -354,38 +354,7 @@ namespace TEN::Gui
 				 MenuToDisplay == Menu::SelectLevel ||
 				 MenuToDisplay == Menu::Options)
 		{
-			if (GuiIsPulsed(In::Forward))
-			{
-				if (SelectedOption <= 0)
-				{
-					if (IsClicked(In::Forward) && g_Configuration.EnableMenuLoop)
-					{
-						SelectedOption = OptionCount;
-						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-					}
-				}
-				else
-				{
-					SelectedOption--;
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-			}
-			else if (GuiIsPulsed(In::Back))
-			{
-				if (SelectedOption >= OptionCount)
-				{
-					if (IsClicked(In::Back) && g_Configuration.EnableMenuLoop)
-					{
-						SelectedOption = 0;
-						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-					}
-				}
-				else
-				{
-					SelectedOption++;
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-			}
+			TryShiftSelectedMenuOption(SelectedOption, OptionCount, MenuOptionLooping::AllMenus);
 
 			if (GuiIsDeselected() && MenuToDisplay != Menu::Title)
 			{
@@ -594,38 +563,7 @@ namespace TEN::Gui
 			}
 		}
 
-		if (GuiIsPulsed(In::Forward))
-		{
-			if (SelectedOption <= 0)
-			{
-				if (IsClicked(In::Forward) && g_Configuration.EnableMenuLoop)
-				{
-					SelectedOption = OptionCount;
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-			}
-			else
-			{
-				SelectedOption--;
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			}
-		}
-		else if (GuiIsPulsed(In::Back))
-		{
-			if (SelectedOption >= OptionCount)
-			{
-				if (IsClicked(In::Back) && g_Configuration.EnableMenuLoop)
-				{
-					SelectedOption = 0;
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-			}
-			else
-			{
-				SelectedOption++;
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			}
-		}
+		TryShiftSelectedMenuOption(SelectedOption, OptionCount, MenuOptionLooping::AllMenus);
 
 		if (GuiIsSelected())
 		{
@@ -773,38 +711,7 @@ namespace TEN::Gui
 		}
 		else
 		{
-			if (GuiIsPulsed(In::Forward))
-			{
-				if (SelectedOption <= 0)
-				{
-					if (IsClicked(In::Forward) && g_Configuration.EnableMenuLoop)
-					{
-						SelectedOption = OptionCount;
-						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-					}
-				}
-				else
-				{
-					SelectedOption--;
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-			}
-			else if (GuiIsPulsed(In::Back))
-			{
-				if (SelectedOption >= OptionCount)
-				{
-					if (IsClicked(In::Back) && g_Configuration.EnableMenuLoop)
-					{
-						SelectedOption = 0;
-						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-					}
-				}
-				else
-				{
-					SelectedOption++;
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-			}
+			TryShiftSelectedMenuOption(SelectedOption, OptionCount, MenuOptionLooping::AllMenus);
 
 			// HACK: Menu screen scroll.
 			if (GuiIsPulsed(In::Left) || GuiIsPulsed(In::Right))
@@ -936,7 +843,7 @@ namespace TEN::Gui
 			TargetHighlighter,
 			ToggleRumble,
 			ThumbstickCameraControl,
-			
+
 			MouseSensitivity,
 			MenuLoop,
 
@@ -1046,7 +953,22 @@ namespace TEN::Gui
 
 			case OtherSettingsOption::MenuLoop:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableMenuLoop = !CurrentSettings.Configuration.EnableMenuLoop;
+
+				switch (CurrentSettings.Configuration.MenuOptionLooping)
+				{
+					case MenuOptionLooping::Disabled:
+						CurrentSettings.Configuration.MenuOptionLooping = MenuOptionLooping::AllMenus;
+						break;
+
+					case MenuOptionLooping::AllMenus:
+						CurrentSettings.Configuration.MenuOptionLooping = MenuOptionLooping::SaveLoadOnly;
+						break;
+
+					default:
+						CurrentSettings.Configuration.MenuOptionLooping = MenuOptionLooping::Disabled;
+						break;
+				}
+
 				break;
 			}
 
@@ -1102,7 +1024,20 @@ namespace TEN::Gui
 
 			case OtherSettingsOption::MenuLoop:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				CurrentSettings.Configuration.EnableMenuLoop = !CurrentSettings.Configuration.EnableMenuLoop;
+				switch (CurrentSettings.Configuration.MenuOptionLooping)
+				{
+				case MenuOptionLooping::Disabled:
+					CurrentSettings.Configuration.MenuOptionLooping = MenuOptionLooping::SaveLoadOnly;
+					break;
+
+				case MenuOptionLooping::SaveLoadOnly:
+					CurrentSettings.Configuration.MenuOptionLooping = MenuOptionLooping::AllMenus;
+					break;
+
+				default:
+					CurrentSettings.Configuration.MenuOptionLooping = MenuOptionLooping::Disabled;
+					break;
+				}
 				break;
 			}
 
@@ -1113,38 +1048,7 @@ namespace TEN::Gui
 			}
 		}
 
-		if (GuiIsPulsed(In::Forward))
-		{
-			if (SelectedOption <= 0)
-			{
-				if (IsClicked(In::Forward) && g_Configuration.EnableMenuLoop)
-				{
-					SelectedOption = OptionCount;
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-			}
-			else
-			{
-				SelectedOption--;
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			}
-		}
-		else if (GuiIsPulsed(In::Back))
-		{
-			if (SelectedOption >= OptionCount)
-			{
-				if (IsClicked(In::Back) && g_Configuration.EnableMenuLoop)
-				{
-					SelectedOption = 0;
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-			}
-			else
-			{
-				SelectedOption++;
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			}
-		}
+		TryShiftSelectedMenuOption(SelectedOption, OptionCount, MenuOptionLooping::AllMenus);
 
 		if (GuiIsSelected())
 		{
@@ -1226,38 +1130,7 @@ namespace TEN::Gui
 		if (MenuToDisplay == Menu::Pause ||
 			MenuToDisplay == Menu::Options)
 		{
-			if (GuiIsPulsed(In::Forward))
-			{
-				if (SelectedOption <= 0)
-				{
-					if (IsClicked(In::Forward) && g_Configuration.EnableMenuLoop)
-					{
-						SelectedOption = OptionCount;
-						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-					}
-				}
-				else
-				{
-					SelectedOption--;
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-			}
-			else if (GuiIsPulsed(In::Back))
-			{
-				if (SelectedOption >= OptionCount)
-				{
-					if (IsClicked(In::Back) && g_Configuration.EnableMenuLoop)
-					{
-						SelectedOption = 0;
-						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-					}
-				}
-				else
-				{
-					SelectedOption++;
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-			}
+			TryShiftSelectedMenuOption(SelectedOption, OptionCount, MenuOptionLooping::AllMenus);
 		}
 
 		if (GuiIsDeselected() || IsClicked(In::Pause))
@@ -2563,38 +2436,7 @@ namespace TEN::Gui
 				!invRing.ObjectListMovement &&
 				!ammoRing.ObjectListMovement)
 			{
-				if (GuiIsPulsed(In::Forward))
-				{
-					if (CurrentSelectedOption <= 0)
-					{
-						if (IsClicked(In::Forward) && g_Configuration.EnableMenuLoop)
-						{
-							CurrentSelectedOption = n - 1;
-							SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-						}
-					}
-					else
-					{
-						CurrentSelectedOption--;
-						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-					}
-				}
-				else if (GuiIsPulsed(In::Back))
-				{
-					if (CurrentSelectedOption >= (n - 1))
-					{
-						if (IsClicked(In::Back) && g_Configuration.EnableMenuLoop)
-						{
-							CurrentSelectedOption = 0;
-							SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-						}
-					}
-					else
-					{
-						CurrentSelectedOption++;
-						SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-					}
-				}
+				TryShiftSelectedMenuOption(CurrentSelectedOption, n - 1, MenuOptionLooping::AllMenus);
 
 				if (AmmoActive)
 					*CurrentAmmoType = CurrentSelectedOption;
@@ -3499,24 +3341,7 @@ namespace TEN::Gui
 
 	LoadResult GuiController::DoLoad()
 	{
-		if (GuiIsPulsed(In::Back))
-		{
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-
-			if (SelectedSaveSlot == (SAVEGAME_MAX - 1))
-				SelectedSaveSlot -= SAVEGAME_MAX - 1;
-			else
-				SelectedSaveSlot++;
-		}
-		else if (GuiIsPulsed(In::Forward))
-		{
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-
-			if (SelectedSaveSlot == 0)
-				SelectedSaveSlot += SAVEGAME_MAX - 1;
-			else
-				SelectedSaveSlot--;
-		}
+		TryShiftSelectedMenuOption(SelectedSaveSlot, SAVEGAME_MAX - 1, MenuOptionLooping::SaveLoadOnly | MenuOptionLooping::AllMenus);
 
 		if (GuiIsSelected())
 		{
@@ -3538,25 +3363,7 @@ namespace TEN::Gui
 
 	bool GuiController::DoSave()
 	{
-		if (GuiIsPulsed(In::Back))
-		{
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-
-			if (SelectedSaveSlot == (SAVEGAME_MAX - 1))
-				SelectedSaveSlot -= SAVEGAME_MAX - 1;
-			else
-				SelectedSaveSlot++;
-		}
-
-		if (GuiIsPulsed(In::Forward))
-		{
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-
-			if (SelectedSaveSlot == 0)
-				SelectedSaveSlot += SAVEGAME_MAX - 1;
-			else
-				SelectedSaveSlot--;
-		}
+		TryShiftSelectedMenuOption(SelectedSaveSlot, SAVEGAME_MAX - 1, MenuOptionLooping::SaveLoadOnly | MenuOptionLooping::AllMenus);
 
 		if (GuiIsSelected())
 		{
@@ -3628,6 +3435,48 @@ namespace TEN::Gui
 				lara->Inventory.SmallWaterskin = smallLiters + 1;
 				lara->Inventory.BigWaterskin = bigLiters + 1;
 				CombineObject1 = (bigLiters + 1) + (INV_OBJECT_BIG_WATERSKIN_EMPTY - 1);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool GuiController::TryShiftSelectedMenuOption(int& selectedOption, int optionCount, int loopingCondition)
+	{
+		if (GuiIsPulsed(In::Forward))
+		{
+			if (selectedOption <= 0)
+			{
+				if (IsClicked(In::Forward) && g_Configuration.MenuOptionLooping & loopingCondition)
+				{
+					selectedOption = optionCount;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					return true;
+				}
+			}
+			else
+			{
+				selectedOption--;
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				return true;
+			}
+		}
+		else if (GuiIsPulsed(In::Back))
+		{
+			if (selectedOption >= optionCount)
+			{
+				if (IsClicked(In::Back) && g_Configuration.MenuOptionLooping & loopingCondition)
+				{
+					selectedOption = 0;
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+					return true;
+				}
+			}
+			else
+			{
+				selectedOption++;
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				return true;
 			}
 		}

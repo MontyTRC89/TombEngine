@@ -48,7 +48,16 @@ constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	= "EnableThumbstickCamera";
 constexpr auto REGKEY_MOUSE_SENSITIVITY = "MouseSensitivity";
 constexpr auto REGKEY_ENABLE_MENU_LOOP	= "EnableMenuLoop";
 
-struct GameConfiguration 
+// Enums
+
+enum MenuOptionLooping
+{
+	Disabled,
+	SaveLoadOnly,
+	AllMenus
+};
+
+struct GameConfiguration
 {
 	static constexpr auto DEFAULT_SHADOW_MAP_SIZE	= 1024;
 	static constexpr auto DEFAULT_SHADOW_BLOBS_MAX	= 16;
@@ -87,7 +96,7 @@ struct GameConfiguration
 	// Input
 
 	int	 MouseSensitivity = DEFAULT_MOUSE_SENSITIVITY;
-	bool EnableMenuLoop	  = false;
+	MenuOptionLooping MenuOptionLooping = MenuOptionLooping::SaveLoadOnly;
 	std::vector<int> Bindings = {};
 
 	std::vector<Vector2i> SupportedScreenResolutions = {};
