@@ -75,6 +75,12 @@ namespace TEN::Entities::Creatures::TR3
 		auto& item = g_Level.Items[itemNumber];
 		auto& creature = *GetCreatureInfo(&item);
 
+		short headingAngle = 0;
+		short headY = 0;
+		short headX = 0;
+		short torsoZ = 0;
+		short torsoX = 0;
+
 		int speed = 0;
 
 		if (item.TestOcb(OCB_TRAP))
@@ -94,8 +100,10 @@ namespace TEN::Entities::Creatures::TR3
 						speed = (deathAnim.frameEnd - item.Animation.FrameNumber) - 8;
 						if (speed <= 0)
 							speed = 1;
+
 						if (speed > 24)
 							speed = (GetRandomControl() & 0xF) + 8;
+
 						ThrowSealMutantGas(item, nullptr, speed);
 					}
 				}
@@ -106,14 +114,9 @@ namespace TEN::Entities::Creatures::TR3
 
 
 		AI_INFO ai;
-		ItemInfo* target = NULL;
+		ItemInfo* target = nullptr;
 		CreatureBiteInfo bonePosition;
 		Vector3i boneEffectPosition;
-		short headingAngle = 0;
-		short headY = 0;
-		short headX = 0;
-		short torsoZ = 0;
-		short torsoX = 0;
 
 		if (item.GetFlagField(IF_SEAL_MUTANT_FLAME_TIMER) > 80)
 			item.HitPoints = 0;
@@ -144,6 +147,7 @@ namespace TEN::Entities::Creatures::TR3
 					if (c > 16)
 						c = 16;
 				}
+
 				Color color;
 				color.z = GetRandomControl();
 				color.x = (c * (255 - (((byte)color.z >> 4) & 0x1F))) >> 4;
@@ -159,8 +163,10 @@ namespace TEN::Entities::Creatures::TR3
 					speed = (beforeSetAnim.frameEnd - item.Animation.FrameNumber) - 8;
 					if (speed <= 0)
 						speed = 1;
+
 					if (speed > 24)
 						speed = (GetRandomControl() & 0xF) + 8;
+
 					ThrowSealMutantGas(item, creature.Enemy, speed);
 				}
 			}
@@ -168,21 +174,27 @@ namespace TEN::Entities::Creatures::TR3
 		else
 		{
 			if (item.AIBits)
+			{
 				GetAITarget(&creature);
+			}
 			else
+			{
 				TargetNearestEntity(&item, &creature, SealMutantTargetList, false);
+			}
 			
 			CreatureAIInfo(&item, &ai);
 			GetCreatureMood(&item, &ai, ai.zoneNumber == ai.enemyZone);
 			if (creature.Enemy && creature.Enemy->ObjectNumber == ID_LARA && GetLaraInfo(creature.Enemy)->Status.Poison >= 256)
 				creature.Mood = MoodType::Escape;
+
 			CreatureMood(&item, &ai, ai.zoneNumber == ai.enemyZone);
 			headingAngle = CreatureTurn(&item, creature.MaxTurn);
 			
 			target = creature.Enemy;
-			creature.Enemy = LaraItem; // TODO: replace global LaraItem reference !
+			creature.Enemy = LaraItem;
 			if (ai.distance < 0x100000 || item.HitStatus || TargetVisible(&item, &ai))
 				AlertAllGuards(itemNumber);
+
 			creature.Enemy = target;
 
 			switch (item.Animation.ActiveState)
@@ -208,15 +220,24 @@ namespace TEN::Entities::Creatures::TR3
 					item.Animation.TargetState = SEAL_MUTANT_STATE_WALK;
 				}
 				else if (creature.Mood == MoodType::Escape)
+				{
 					item.Animation.TargetState = SEAL_MUTANT_STATE_WALK;
+				}
 				else if (Targetable(&item, &ai) && ai.distance < 0x400000)
+				{
 					item.Animation.TargetState = SEAL_MUTANT_STATE_ATTACK;
+				}
 				else if (item.Animation.RequiredState != NO_VALUE)
+				{
 					item.Animation.TargetState = item.Animation.RequiredState;
+				}
 				else
+				{
 					item.Animation.TargetState = SEAL_MUTANT_STATE_WALK;
+				}
 
 				break;
+
 			case SEAL_MUTANT_STATE_WALK:
 				creature.MaxTurn = 546;
 				if (ai.ahead)
@@ -231,9 +252,12 @@ namespace TEN::Entities::Creatures::TR3
 					item.Animation.TargetState = SEAL_MUTANT_STATE_WALK;
 				}
 				else if (Targetable(&item, &ai) && ai.distance < 0x400000)
+				{
 					item.Animation.TargetState = SEAL_MUTANT_STATE_IDLE;
+				}
 
 				break;
+
 			case SEAL_MUTANT_STATE_ATTACK:
 				if (ai.ahead)
 				{
@@ -248,11 +272,17 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					if (creature.Flags < 24)
 						creature.Flags += 3;
+
 					speed = 0;
 					if (creature.Flags < 24)
+					{
 						speed = creature.Flags;
+					}
 					else
+					{
 						speed = (GetRandomControl() & 0xF) + 8;
+					}
+
 					ThrowSealMutantGas(item, creature.Enemy, speed);
 					if (creature.Enemy && creature.Enemy->ObjectNumber != ID_LARA)
 						creature.Enemy->HitStatus = true;
