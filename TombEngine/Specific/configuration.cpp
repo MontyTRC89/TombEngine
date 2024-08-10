@@ -257,7 +257,7 @@ bool SaveConfiguration()
 
 	// Set Input keys.
 	if (SetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS ||
-		SetDWORDRegKey(inputKey, REGKEY_ENABLE_MENU_LOOP, g_Configuration.MenuOptionLooping) != ERROR_SUCCESS)
+		SetDWORDRegKey(inputKey, REGKEY_MENU_OPTION_LOOPING, g_Configuration.MenuOptionLooping) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
@@ -451,7 +451,7 @@ bool LoadConfiguration()
 	if (RegOpenKeyExA(rootKey, REGKEY_INPUT, 0, KEY_READ, &inputKey) == ERROR_SUCCESS)
 	{
 		if (GetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS ||
-			GetDWORDRegKey(inputKey, REGKEY_ENABLE_MENU_LOOP, &menuOptionLooping, MenuOptionLooping::SaveLoadOnly) != ERROR_SUCCESS)
+			GetDWORDRegKey(inputKey, REGKEY_MENU_OPTION_LOOPING, &menuOptionLooping, MenuOptionLooping::SaveLoadOnly) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
