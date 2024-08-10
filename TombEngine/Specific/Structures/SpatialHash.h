@@ -22,7 +22,7 @@ namespace TEN::Structures
 		std::unordered_map<Vector3i, Cell> _cellMap = {};
 
 		float	_cellSize		 = 0.0f;
-		Vector3 _CellAabbExtents = Vector3::Zero;
+		Vector3 _cellAabbExtents = Vector3::Zero;
 
 	public:
 		// Constructors

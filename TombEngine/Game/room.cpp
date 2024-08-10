@@ -457,86 +457,86 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 						CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, WEST_WALL_NORMAL);
 				}
 			}
+		}
 
-			// 2.5) Collect previous Z axis cardinal wall triangles.
-			bool isPrevZTriWall = surfVerts.IsSplitAngle0 ? surfVerts.Tri1.IsWall : surfVerts.Tri0.IsWall;
-			if (!isPrevZTriWall || !surfVerts.PrevNeighborZ.IsWall)
+		// 2.5) Collect previous Z axis cardinal wall triangles.
+		bool isPrevZTriWall = surfVerts.IsSplitAngle0 ? surfVerts.Tri1.IsWall : surfVerts.Tri0.IsWall;
+		if (!isPrevZTriWall || !surfVerts.PrevNeighborZ.IsWall)
+		{
+			// Full wall.
+			if (isFloor && (!isPrevZTriWall && surfVerts.PrevNeighborZ.IsWall))
 			{
-				// Full wall.
-				if (isFloor && (!isPrevZTriWall && surfVerts.PrevNeighborZ.IsWall))
-				{
-					const auto& vertex0 = vertices.Floor.Tri1.Vertex0;
-					const auto& vertex1 = vertices.Floor.Tri1.Vertex2;
-					const auto& vertex2 = vertices.Ceil.Tri1.Vertex0;
-					const auto& vertex3 = vertices.Ceil.Tri1.Vertex2;
+				const auto& vertex0 = vertices.Floor.Tri1.Vertex0;
+				const auto& vertex1 = vertices.Floor.Tri1.Vertex2;
+				const auto& vertex2 = vertices.Ceil.Tri1.Vertex0;
+				const auto& vertex3 = vertices.Ceil.Tri1.Vertex2;
 
-					if (vertex0 != vertex2)
+				if (vertex0 != vertex2)
+					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL);
+				if (vertex1 != vertex3)
+					CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
+			}
+			// Step wall.
+			else if (!isPrevZTriWall && !surfVerts.PrevNeighborZ.IsWall)
+			{
+				const auto& vertex0 = surfVerts.Tri1.Vertex0;
+				const auto& vertex1 = surfVerts.Tri1.Vertex2;
+				const auto& vertex2 = surfVerts.PrevNeighborZ.Vertex0;
+				const auto& vertex3 = surfVerts.PrevNeighborZ.Vertex1;
+
+				bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
+				if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
+				{
+					isSecondCrissCrossCase ?
+						CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, NORTH_WALL_NORMAL) :
 						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL);
-					if (vertex1 != vertex3)
+				}
+				if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
+				{
+					isSecondCrissCrossCase ?
+						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, NORTH_WALL_NORMAL) :
 						CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
 				}
-				// Step wall.
-				else if (!isPrevZTriWall && !surfVerts.PrevNeighborZ.IsWall)
-				{
-					const auto& vertex0 = surfVerts.Tri1.Vertex0;
-					const auto& vertex1 = surfVerts.Tri1.Vertex2;
-					const auto& vertex2 = surfVerts.PrevNeighborZ.Vertex0;
-					const auto& vertex3 = surfVerts.PrevNeighborZ.Vertex1;
-
-					bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
-					if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
-					{
-						isSecondCrissCrossCase ?
-							CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, NORTH_WALL_NORMAL) :
-							CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL);
-					}
-					if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
-					{
-						isSecondCrissCrossCase ?
-							CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, NORTH_WALL_NORMAL) :
-							CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
-					}
-				}
 			}
-			
-			// 2.6) Collect previous Z axis cardinal wall triangles.
-			bool isNextZTriWall = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.IsWall : surfVerts.Tri1.IsWall;
-			if (!isNextZTriWall || !surfVerts.NextNeighborZ.IsWall)
+		}
+
+		// 2.6) Collect next Z axis cardinal wall triangles.
+		bool isNextZTriWall = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.IsWall : surfVerts.Tri1.IsWall;
+		if (!isNextZTriWall || !surfVerts.NextNeighborZ.IsWall)
+		{
+			// Full wall.
+			if (isFloor && (!isNextZTriWall && surfVerts.NextNeighborZ.IsWall))
 			{
-				// Full wall.
-				if (isFloor && (!isNextZTriWall && surfVerts.NextNeighborZ.IsWall))
-				{
-					const auto& vertex0 = vertices.Floor.IsSplitAngle0 ? vertices.Floor.Tri0.Vertex1 : vertices.Floor.Tri0.Vertex0;
-					const auto& vertex1 = vertices.Floor.IsSplitAngle0 ? vertices.Floor.Tri0.Vertex2 : vertices.Floor.Tri0.Vertex1;
-					const auto& vertex2 = vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex1 : vertices.Ceil.Tri0.Vertex0;
-					const auto& vertex3 = vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex2 : vertices.Ceil.Tri0.Vertex1;
+				const auto& vertex0 = vertices.Floor.IsSplitAngle0 ? vertices.Floor.Tri0.Vertex1 : vertices.Floor.Tri0.Vertex0;
+				const auto& vertex1 = vertices.Floor.IsSplitAngle0 ? vertices.Floor.Tri0.Vertex2 : vertices.Floor.Tri0.Vertex1;
+				const auto& vertex2 = vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex1 : vertices.Ceil.Tri0.Vertex0;
+				const auto& vertex3 = vertices.Ceil.IsSplitAngle0 ? vertices.Ceil.Tri0.Vertex2 : vertices.Ceil.Tri0.Vertex1;
 
-					if (vertex0 != vertex2)
+				if (vertex0 != vertex2)
+					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, SOUTH_WALL_NORMAL);
+				if (vertex1 != vertex3)
+					CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, SOUTH_WALL_NORMAL);
+			}
+			// Step wall.
+			else if (!isNextZTriWall && !surfVerts.NextNeighborZ.IsWall)
+			{
+				const auto& vertex0 = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.Vertex1 : surfVerts.Tri0.Vertex0;
+				const auto& vertex1 = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.Vertex2 : surfVerts.Tri0.Vertex1;
+				const auto& vertex2 = surfVerts.NextNeighborZ.Vertex0;
+				const auto& vertex3 = surfVerts.NextNeighborZ.Vertex1;
+
+				bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
+				if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
+				{
+					isSecondCrissCrossCase ?
+						CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, SOUTH_WALL_NORMAL) :
 						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, SOUTH_WALL_NORMAL);
-					if (vertex1 != vertex3)
-						CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, SOUTH_WALL_NORMAL);
 				}
-				// Step wall.
-				else if (!isNextZTriWall && !surfVerts.NextNeighborZ.IsWall)
+				if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
 				{
-					const auto& vertex0 = vertices.Floor.IsSplitAngle0 ? surfVerts.Tri0.Vertex1 : surfVerts.Tri0.Vertex0;
-					const auto& vertex1 = vertices.Floor.IsSplitAngle0 ? surfVerts.Tri0.Vertex2 : surfVerts.Tri0.Vertex1;
-					const auto& vertex2 = surfVerts.NextNeighborZ.Vertex0;
-					const auto& vertex3 = surfVerts.NextNeighborZ.Vertex1;
-
-					bool isSecondCrissCrossCase = (isFloor ? (vertex1.y < vertex3.y) : !(vertex1.y < vertex3.y));
-					if (isFloor ? (vertex0.y > vertex2.y) : (vertex0.y < vertex2.y))
-					{
-						isSecondCrissCrossCase ?
-							CollisionMesh.InsertTriangle(vertex0, vertex2, vertex3, SOUTH_WALL_NORMAL) :
-							CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, SOUTH_WALL_NORMAL);
-					}
-					if (isFloor ? (vertex1.y > vertex3.y) : (vertex1.y < vertex3.y))
-					{
-						isSecondCrissCrossCase ?
-							CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, SOUTH_WALL_NORMAL) :
-							CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, SOUTH_WALL_NORMAL);
-					}
+					isSecondCrissCrossCase ?
+						CollisionMesh.InsertTriangle(vertex0, vertex1, vertex3, SOUTH_WALL_NORMAL) :
+						CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, SOUTH_WALL_NORMAL);
 				}
 			}
 		}

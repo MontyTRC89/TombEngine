@@ -18,7 +18,7 @@ namespace TEN::Structures
 	SpatialHash::SpatialHash(float cellSize)
 	{
 		_cellSize = cellSize;
-		_CellAabbExtents = Vector3(cellSize / 2);
+		_cellAabbExtents = Vector3(cellSize / 2);
 	}
 
 	std::set<int> SpatialHash::GetBoundedObjectIds() const
@@ -350,7 +350,7 @@ namespace TEN::Structures
 			const auto& key = *it;
 
 			// Remove keys of cells not intersecting OBB.
-			auto cellAabb = BoundingBox(key.ToVector3(), _CellAabbExtents);
+			auto cellAabb = BoundingBox(key.ToVector3(), _cellAabbExtents);
 			if (!obb.Intersects(cellAabb))
 			{
 				it = keys.erase(it);
@@ -374,7 +374,7 @@ namespace TEN::Structures
 			const auto& key = *it;
 
 			// Remove keys of cells not intersecting OBB.
-			auto cellAabb = BoundingBox(key.ToVector3(), _CellAabbExtents);
+			auto cellAabb = BoundingBox(key.ToVector3(), _cellAabbExtents);
 			if (!sphere.Intersects(cellAabb))
 			{
 				it = keys.erase(it);
@@ -393,7 +393,7 @@ namespace TEN::Structures
 		for (auto& key : keys)
 		{
 			// Get existing cell or insert new cell.
-			auto [it, isInserted] = _cellMap.try_emplace(key, Cell(BoundingBox(key.ToVector3(), _CellAabbExtents)));
+			auto [it, isInserted] = _cellMap.try_emplace(key, Cell(BoundingBox(key.ToVector3(), _cellAabbExtents)));
 
 			// Insert object ID into cell.
 			auto& cell = it->second;
