@@ -463,7 +463,7 @@ namespace TEN::Input
 				(((rawAxes.x - -DISPLAY_SPACE_RES.x) * 2) / (DISPLAY_SPACE_RES.x - -DISPLAY_SPACE_RES.x)) - 1.0f,
 				(((rawAxes.y - -DISPLAY_SPACE_RES.y) * 2) / (DISPLAY_SPACE_RES.y - -DISPLAY_SPACE_RES.y)) - 1.0f);
 
-			// Apply sensitivity and smoothing.
+			// Apply sensitivity.
 			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
 			normAxes *= sensitivity;
 
