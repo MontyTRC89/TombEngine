@@ -76,10 +76,8 @@ namespace TEN::Entities::Creatures::TR3
 		auto& creature = *GetCreatureInfo(&item);
 
 		short headingAngle = 0;
-		short headY = 0;
-		short headX = 0;
-		short torsoZ = 0;
-		short torsoX = 0;
+		auto headOrient = EulerAngles::Identity;
+		auto torsoOrient = EulerAngles::Identity;
 
 		int speed = 0;
 
@@ -91,7 +89,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else
 			{
-				auto& deathAnim = GetAnimData(item.Animation.AnimNumber);
+				const auto& deathAnim = GetAnimData(item.Animation.AnimNumber);
 				if ((item.Animation.FrameNumber >= (deathAnim.frameBase + 1)) && (item.Animation.FrameNumber <= (deathAnim.frameEnd - 8)))
 				{
 					speed = item.Animation.FrameNumber - (deathAnim.frameBase + 1);
@@ -108,6 +106,7 @@ namespace TEN::Entities::Creatures::TR3
 					}
 				}
 			}
+
 			CreatureAnimation(itemNumber, 0, 0);
 			return;
 		}
@@ -132,9 +131,7 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				for (int boneID = 9; boneID < 17; boneID++)
 				{
-					bonePos.Position.x = 0;
-					bonePos.Position.y = 0;
-					bonePos.Position.z = 0;
+					bonePos.Position = Vector3::Zero;
 					bonePos.BoneID = boneID;
 					boneEffectPos = GetJointPosition(item, bonePos);
 					TriggerFireFlame(boneEffectPos.x, boneEffectPos.y, boneEffectPos.z, FlameType::Medium);
@@ -193,7 +190,7 @@ namespace TEN::Entities::Creatures::TR3
 			
 			target = creature.Enemy;
 			creature.Enemy = LaraItem;
-			if (ai.distance < 0x100000 || item.HitStatus || TargetVisible(&item, &ai))
+			if (ai.distance < SQUARE(BLOCK(1)) || item.HitStatus || TargetVisible(&item, &ai))
 				AlertAllGuards(itemNumber);
 
 			creature.Enemy = target;
@@ -203,22 +200,22 @@ namespace TEN::Entities::Creatures::TR3
 			case SEAL_MUTANT_STATE_IDLE:
 				creature.MaxTurn = 0;
 				creature.Flags = 0;
-				headY = ai.angle;
-				headX = -ai.xAngle;
-				torsoX = 0;
-				torsoZ = 0;
+				headOrient.x = -ai.xAngle;
+				headOrient.y = ai.angle;
+				torsoOrient.x = 0;
+				torsoOrient.z = 0;
 
 				if (item.AIBits & GUARD)
 				{
-					headY = AIGuard(&creature);
-					headX = 0;
 					item.Animation.TargetState = SEAL_MUTANT_STATE_IDLE;
+					headOrient.x = 0;
+					headOrient.y = AIGuard(&creature);
 				}
 				else if (item.AIBits & PATROL1)
 				{
-					headY = 0;
-					headX = 0;
 					item.Animation.TargetState = SEAL_MUTANT_STATE_WALK;
+					headOrient.x = 0;
+					headOrient.y = 0;
 				}
 				else if (creature.Mood == MoodType::Escape)
 				{
@@ -240,19 +237,20 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case SEAL_MUTANT_STATE_WALK:
-				creature.MaxTurn = 546;
+				creature.MaxTurn = ANGLE(3.0f);
+
 				if (ai.ahead)
 				{
-					headY = ai.angle;
-					headX = -ai.xAngle;
+					headOrient.x = -ai.xAngle;
+					headOrient.y = ai.angle;
 				}
 
 				if (item.AIBits & PATROL1)
 				{
-					headY = 0;
 					item.Animation.TargetState = SEAL_MUTANT_STATE_WALK;
+					headOrient.y = 0;
 				}
-				else if (Targetable(&item, &ai) && ai.distance < 0x400000)
+				else if (Targetable(&item, &ai) && ai.distance < SQUARE(BLOCK(4)))
 				{
 					item.Animation.TargetState = SEAL_MUTANT_STATE_IDLE;
 				}
@@ -262,10 +260,10 @@ namespace TEN::Entities::Creatures::TR3
 			case SEAL_MUTANT_STATE_ATTACK:
 				if (ai.ahead)
 				{
-					headY = ai.angle;
-					headX = -ai.xAngle;
-					torsoZ = ai.angle / 2;
-					torsoX = -ai.xAngle / 2;
+					headOrient.x = -ai.xAngle;
+					headOrient.y = ai.angle;
+					torsoOrient.x = -ai.xAngle / 2;
+					torsoOrient.z = ai.angle / 2;
 				}
 
 				const auto& anim = GetAnimData(item.Animation.AnimNumber);
@@ -293,9 +291,9 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		CreatureJoint(&item, 0, torsoZ);
-		CreatureJoint(&item, 1, torsoX);
-		CreatureJoint(&item, 2, headY);
+		CreatureJoint(&item, 0, torsoOrient.z);
+		CreatureJoint(&item, 1, torsoOrient.x);
+		CreatureJoint(&item, 2, headOrient.y);
 		CreatureAnimation(itemNumber, headingAngle, 0);
 	}
 }
