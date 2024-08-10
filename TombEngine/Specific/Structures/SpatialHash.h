@@ -11,20 +11,24 @@ namespace TEN::Structures
 	private:
 		struct Cell
 		{
-			static constexpr auto SIZE		   = BLOCK(0.5f);
-			static constexpr auto AABB_EXTENTS = Vector3(SIZE / 2);
-
 			std::set<int> ObjectIds = {};
 			BoundingBox	  Aabb		= BoundingBox();
 
-			Cell(const Vector3& center);
+			Cell(const BoundingBox& aabb);
 		};
 
 		// Members
 
 		std::unordered_map<Vector3i, Cell> _cellMap = {};
 
+		float	_cellSize		 = 0.0f;
+		Vector3 _CellAabbExtents = Vector3::Zero;
+
 	public:
+		// Constructors
+		
+		SpatialHash(float cellSize);
+
 		// Getters
 
 		std::set<int> GetBoundedObjectIds() const;

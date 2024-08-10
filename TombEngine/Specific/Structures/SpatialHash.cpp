@@ -8,11 +8,17 @@ using namespace TEN::Math;
 
 namespace TEN::Structures
 {
-	SpatialHash DebugSpatialHash;
+	SpatialHash DebugSpatialHash = SpatialHash(BLOCK(0.5f));
 
-	SpatialHash::Cell::Cell(const Vector3& center)
+	SpatialHash::Cell::Cell(const BoundingBox& aabb)
 	{
-		Aabb = BoundingBox(center, AABB_EXTENTS);
+		Aabb = aabb;
+	}
+
+	SpatialHash::SpatialHash(float cellSize)
+	{
+		_cellSize = cellSize;
+		_CellAabbExtents = Vector3(cellSize / 2);
 	}
 
 	std::set<int> SpatialHash::GetBoundedObjectIds() const
@@ -218,44 +224,42 @@ namespace TEN::Structures
 
 	Vector3i SpatialHash::GetCellKey(const Vector3& pos) const
 	{
-		constexpr auto OFFSET = Cell::SIZE / 2;
-
 		// Calculate and return key.
 		return Vector3i(
-			RoundToStep(pos.x, Cell::SIZE) + OFFSET,
-			RoundToStep(pos.y, Cell::SIZE) + OFFSET,
-			RoundToStep(pos.z, Cell::SIZE) + OFFSET);
+			RoundToStep(pos.x, _cellSize) + (_cellSize / 2),
+			RoundToStep(pos.y, _cellSize) + (_cellSize / 2),
+			RoundToStep(pos.z, _cellSize) + (_cellSize / 2));
 	}
 
 	std::vector<Vector3i> SpatialHash::GetCellKeys(const Ray& ray, float dist) const
 	{
 		// Reserve minimum key vector.
 		auto keys = std::vector<Vector3i>{};
-		keys.reserve(int(dist / Cell::SIZE) + 1);
+		keys.reserve(int(dist / _cellSize) + 1);
 
 		// Calculate cell position.
 		auto pos = Vector3(
-			floor(ray.position.x / Cell::SIZE) * Cell::SIZE,
-			floor(ray.position.y / Cell::SIZE) * Cell::SIZE,
-			floor(ray.position.z / Cell::SIZE) * Cell::SIZE);
+			floor(ray.position.x / _cellSize) * _cellSize,
+			floor(ray.position.y / _cellSize) * _cellSize,
+			floor(ray.position.z / _cellSize) * _cellSize);
 
 		// Calculate cell position step.
 		auto posStep = Vector3(
-			(ray.direction.x > 0) ? Cell::SIZE : -Cell::SIZE,
-			(ray.direction.y > 0) ? Cell::SIZE : -Cell::SIZE,
-			(ray.direction.z > 0) ? Cell::SIZE : -Cell::SIZE);
+			(ray.direction.x > 0) ? _cellSize : -_cellSize,
+			(ray.direction.y > 0) ? _cellSize : -_cellSize,
+			(ray.direction.z > 0) ? _cellSize : -_cellSize);
 
 		// Calculate next intersection.
 		auto nextIntersect = Vector3(
-			((pos.x + ((posStep.x > 0) ? Cell::SIZE : 0)) - ray.position.x) / ray.direction.x,
-			((pos.y + ((posStep.y > 0) ? Cell::SIZE : 0)) - ray.position.y) / ray.direction.y,
-			((pos.z + ((posStep.z > 0) ? Cell::SIZE : 0)) - ray.position.z) / ray.direction.z);
+			((pos.x + ((posStep.x > 0) ? _cellSize : 0)) - ray.position.x) / ray.direction.x,
+			((pos.y + ((posStep.y > 0) ? _cellSize : 0)) - ray.position.y) / ray.direction.y,
+			((pos.z + ((posStep.z > 0) ? _cellSize : 0)) - ray.position.z) / ray.direction.z);
 
 		// Calculate ray step.
 		auto rayStep = Vector3(
-			Cell::SIZE / abs(ray.direction.x),
-			Cell::SIZE / abs(ray.direction.y),
-			Cell::SIZE / abs(ray.direction.z));
+			_cellSize / abs(ray.direction.x),
+			_cellSize / abs(ray.direction.y),
+			_cellSize / abs(ray.direction.z));
 
 		// Traverse cells and collect keys.
 		float currentDist = 0.0f;
@@ -304,27 +308,27 @@ namespace TEN::Structures
 	{
 		// Calculate cell bounds.
 		auto minCell = Vector3(
-			FloorToStep(aabb.Center.x - aabb.Extents.x, Cell::SIZE),
-			FloorToStep(aabb.Center.y - aabb.Extents.y, Cell::SIZE),
-			FloorToStep(aabb.Center.z - aabb.Extents.z, Cell::SIZE));
+			FloorToStep(aabb.Center.x - aabb.Extents.x, _cellSize),
+			FloorToStep(aabb.Center.y - aabb.Extents.y, _cellSize),
+			FloorToStep(aabb.Center.z - aabb.Extents.z, _cellSize));
 		auto maxCell = Vector3(
-			FloorToStep(aabb.Center.x + aabb.Extents.x, Cell::SIZE),
-			FloorToStep(aabb.Center.y + aabb.Extents.y, Cell::SIZE),
-			FloorToStep(aabb.Center.z + aabb.Extents.z, Cell::SIZE));
+			FloorToStep(aabb.Center.x + aabb.Extents.x, _cellSize),
+			FloorToStep(aabb.Center.y + aabb.Extents.y, _cellSize),
+			FloorToStep(aabb.Center.z + aabb.Extents.z, _cellSize));
 
 		// Reserve key vector.
 		auto keys = std::vector<Vector3i>{};
 		keys.reserve(
-			(((maxCell.x - minCell.x) / Cell::SIZE) + 1) *
-			(((maxCell.y - minCell.y) / Cell::SIZE) + 1) *
-			(((maxCell.z - minCell.z) / Cell::SIZE) + 1));
+			(((maxCell.x - minCell.x) / _cellSize) + 1) *
+			(((maxCell.y - minCell.y) / _cellSize) + 1) *
+			(((maxCell.z - minCell.z) / _cellSize) + 1));
 
 		// Collect keys of cells intersecting AABB.
-		for (float x = minCell.x; x <= maxCell.x; x += Cell::SIZE)
+		for (float x = minCell.x; x <= maxCell.x; x += _cellSize)
 		{
-			for (float y = minCell.y; y <= maxCell.y; y += Cell::SIZE)
+			for (float y = minCell.y; y <= maxCell.y; y += _cellSize)
 			{
-				for (float z = minCell.z; z <= maxCell.z; z += Cell::SIZE)
+				for (float z = minCell.z; z <= maxCell.z; z += _cellSize)
 				{
 					auto pos = Vector3(x, y, z);
 					keys.push_back(GetCellKey(pos));
@@ -346,7 +350,7 @@ namespace TEN::Structures
 			const auto& key = *it;
 
 			// Remove keys of cells not intersecting OBB.
-			auto cellAabb = BoundingBox(key.ToVector3(), Cell::AABB_EXTENTS);
+			auto cellAabb = BoundingBox(key.ToVector3(), _CellAabbExtents);
 			if (!obb.Intersects(cellAabb))
 			{
 				it = keys.erase(it);
@@ -370,7 +374,7 @@ namespace TEN::Structures
 			const auto& key = *it;
 
 			// Remove keys of cells not intersecting OBB.
-			auto cellAabb = BoundingBox(key.ToVector3(), Cell::AABB_EXTENTS);
+			auto cellAabb = BoundingBox(key.ToVector3(), _CellAabbExtents);
 			if (!sphere.Intersects(cellAabb))
 			{
 				it = keys.erase(it);
@@ -389,7 +393,7 @@ namespace TEN::Structures
 		for (auto& key : keys)
 		{
 			// Get existing cell or insert new cell.
-			auto [it, isInserted] = _cellMap.try_emplace(key, Cell(key.ToVector3()));
+			auto [it, isInserted] = _cellMap.try_emplace(key, Cell(BoundingBox(key.ToVector3(), _CellAabbExtents)));
 
 			// Insert object ID into cell.
 			auto& cell = it->second;
