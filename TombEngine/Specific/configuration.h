@@ -46,7 +46,6 @@ constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	= "EnableThumbstickCamera";
 // Input keys
 
 constexpr auto REGKEY_MOUSE_SENSITIVITY = "MouseSensitivity";
-constexpr auto REGKEY_MOUSE_SMOOTHING	= "MouseSmoothing";
 constexpr auto REGKEY_ENABLE_MENU_LOOP	= "EnableMenuLoop";
 
 struct GameConfiguration 
@@ -88,7 +87,6 @@ struct GameConfiguration
 	// Input
 
 	int	 MouseSensitivity = DEFAULT_MOUSE_SENSITIVITY;
-	int	 MouseSmoothing	  = DEFAULT_MOUSE_SMOOTHING;
 	bool EnableMenuLoop	  = false;
 	std::vector<int> Bindings = {};
 

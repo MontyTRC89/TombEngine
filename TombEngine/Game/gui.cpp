@@ -938,7 +938,6 @@ namespace TEN::Gui
 			ThumbstickCameraControl,
 			
 			MouseSensitivity,
-			MouseSmoothing,
 			MenuLoop,
 
 			Apply,
@@ -1045,18 +1044,6 @@ namespace TEN::Gui
 
 				break;
 
-			case OtherSettingsOption::MouseSmoothing:
-				if (CurrentSettings.Configuration.MouseSmoothing > MOUSE_SMOOTHING_MIN)
-				{
-					CurrentSettings.Configuration.MouseSmoothing -= 1;
-					if (CurrentSettings.Configuration.MouseSmoothing < MOUSE_SMOOTHING_MIN)
-						CurrentSettings.Configuration.MouseSmoothing = MOUSE_SMOOTHING_MIN;
-
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-
-				break;
-
 			case OtherSettingsOption::MenuLoop:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableMenuLoop = !CurrentSettings.Configuration.EnableMenuLoop;
@@ -1107,18 +1094,6 @@ namespace TEN::Gui
 					CurrentSettings.Configuration.MouseSensitivity += 1;
 					if (CurrentSettings.Configuration.MouseSensitivity > MOUSE_SENSITIVITY_MAX)
 						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MAX;
-
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-
-				break;
-
-			case OtherSettingsOption::MouseSmoothing:
-				if (CurrentSettings.Configuration.MouseSmoothing < MOUSE_SMOOTHING_MAX)
-				{
-					CurrentSettings.Configuration.MouseSmoothing += 1;
-					if (CurrentSettings.Configuration.MouseSmoothing > MOUSE_SMOOTHING_MAX)
-						CurrentSettings.Configuration.MouseSmoothing = MOUSE_SMOOTHING_MAX;
 
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				}

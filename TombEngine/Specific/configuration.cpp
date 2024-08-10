@@ -257,7 +257,6 @@ bool SaveConfiguration()
 
 	// Set Input keys.
 	if (SetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS ||
-		SetDWORDRegKey(inputKey, REGKEY_MOUSE_SMOOTHING, g_Configuration.MouseSmoothing) != ERROR_SUCCESS ||
 		SetBoolRegKey(inputKey, REGKEY_ENABLE_MENU_LOOP, g_Configuration.EnableMenuLoop) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
@@ -331,7 +330,6 @@ void InitDefaultConfiguration()
 	g_Configuration.EnableThumbstickCamera = false;
 
 	g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-	g_Configuration.MouseSmoothing = GameConfiguration::DEFAULT_MOUSE_SMOOTHING;
 	g_Configuration.EnableMenuLoop = true;
 
 	g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
@@ -446,7 +444,6 @@ bool LoadConfiguration()
 	}
 
 	DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-	DWORD mouseSmoothing = GameConfiguration::DEFAULT_MOUSE_SMOOTHING;
 	bool enableMenuLoop = true;
 
 	// Load Input keys.
@@ -454,7 +451,6 @@ bool LoadConfiguration()
 	if (RegOpenKeyExA(rootKey, REGKEY_INPUT, 0, KEY_READ, &inputKey) == ERROR_SUCCESS)
 	{
 		if (GetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS ||
-			GetDWORDRegKey(inputKey, REGKEY_MOUSE_SMOOTHING, &mouseSmoothing, GameConfiguration::DEFAULT_MOUSE_SMOOTHING) != ERROR_SUCCESS ||
 			GetBoolRegKey(inputKey, REGKEY_ENABLE_MENU_LOOP, &enableMenuLoop, true) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
@@ -523,7 +519,6 @@ bool LoadConfiguration()
 	g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
 
 	g_Configuration.MouseSensitivity = mouseSensitivity;
-	g_Configuration.MouseSmoothing = mouseSmoothing;
 	g_Configuration.EnableMenuLoop = enableMenuLoop;
 
 	// Set legacy variables.
