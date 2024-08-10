@@ -115,31 +115,32 @@ namespace TEN::Entities::Creatures::TR3
 
 		AI_INFO ai;
 		ItemInfo* target = nullptr;
-		CreatureBiteInfo bonePosition;
-		Vector3i boneEffectPosition;
+		CreatureBiteInfo bonePos;
+		Vector3i boneEffectPos;
 
 		if (item.GetFlagField(IF_SEAL_MUTANT_FLAME_TIMER) > 80)
 			item.HitPoints = 0;
 
 		if (item.HitPoints <= 0)
 		{
-			auto& beforeSetAnim = GetAnimData(item.Animation.AnimNumber);
+			const auto& prevAnim = GetAnimData(item.Animation.AnimNumber);
 			if (item.Animation.ActiveState != SEAL_MUTANT_STATE_DEATH)
 			{
 				SetAnimation(item, SEAL_MUTANT_ANIM_DEATH);
 			}
 			else if (item.GetFlagField(IF_SEAL_MUTANT_FLAME_TIMER) > 80)
 			{
-				for (int boneIndex = 9; boneIndex < 17; boneIndex++)
+				for (int boneID = 9; boneID < 17; boneID++)
 				{
-					bonePosition.Position.x = 0;
-					bonePosition.Position.y = 0;
-					bonePosition.Position.z = 0;
-					bonePosition.BoneID = boneIndex;
-					boneEffectPosition = GetJointPosition(item, bonePosition);
-					TriggerFireFlame(boneEffectPosition.x, boneEffectPosition.y, boneEffectPosition.z, FlameType::Medium);
+					bonePos.Position.x = 0;
+					bonePos.Position.y = 0;
+					bonePos.Position.z = 0;
+					bonePos.BoneID = boneID;
+					boneEffectPos = GetJointPosition(item, bonePos);
+					TriggerFireFlame(boneEffectPos.x, boneEffectPos.y, boneEffectPos.z, FlameType::Medium);
 				}
-				auto& animData = GetAnimData(item.Animation.AnimNumber);
+
+				const auto& animData = GetAnimData(item.Animation.AnimNumber);
 				int c = item.Animation.FrameNumber - animData.frameBase;
 				if (c > 16)
 				{
@@ -155,12 +156,12 @@ namespace TEN::Entities::Creatures::TR3
 				color.z = (c * ((byte)color.z & 0x3F)) >> 4;
 				TriggerDynamicLight(item.Pose.Position.ToVector3(), color, 12.0f);
 			}
-			else if ((item.Animation.FrameNumber >= (beforeSetAnim.frameBase + 1)) && (item.Animation.FrameNumber <= (beforeSetAnim.frameEnd - 8)))
+			else if ((item.Animation.FrameNumber >= (prevAnim.frameBase + 1)) && (item.Animation.FrameNumber <= (prevAnim.frameEnd - 8)))
 			{
-				speed = item.Animation.FrameNumber - (beforeSetAnim.frameBase + 1);
+				speed = item.Animation.FrameNumber - (prevAnim.frameBase + 1);
 				if (speed > 24)
 				{
-					speed = (beforeSetAnim.frameEnd - item.Animation.FrameNumber) - 8;
+					speed = (prevAnim.frameEnd - item.Animation.FrameNumber) - 8;
 					if (speed <= 0)
 						speed = 1;
 
@@ -267,8 +268,8 @@ namespace TEN::Entities::Creatures::TR3
 					torsoX = -ai.xAngle / 2;
 				}
 
-				auto& animData = GetAnimData(item.Animation.AnimNumber);
-				if ((item.Animation.FrameNumber >= (animData.frameBase + 35)) && (item.Animation.FrameNumber <= (animData.frameBase + 58)))
+				const auto& anim = GetAnimData(item.Animation.AnimNumber);
+				if ((item.Animation.FrameNumber >= (anim.frameBase + 35)) && (item.Animation.FrameNumber <= (anim.frameBase + 58)))
 				{
 					if (creature.Flags < 24)
 						creature.Flags += 3;
