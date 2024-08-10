@@ -6,21 +6,6 @@
 using namespace TEN::Math;
 using namespace TEN::Structures;
 
-namespace std
-{
-	template <>
-	struct hash<Vector3>
-	{
-		std::size_t operator()(const Vector3& v) const noexcept
-		{
-			auto x = std::hash<float>()(v.x);
-			auto y = std::hash<float>()(v.y);
-			auto z = std::hash<float>()(v.z);
-			return ((x ^ (y << 1)) ^ (z << 2));
-		}
-	};
-}
-
 namespace TEN::Physics
 {
 	class CollisionTriangle

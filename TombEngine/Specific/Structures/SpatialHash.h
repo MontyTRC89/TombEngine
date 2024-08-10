@@ -4,19 +4,6 @@
 
 using namespace TEN::Math;
 
-template <>
-struct std::hash<Vector3i>
-{
-	size_t operator() (const Vector3i& vector) const
-	{
-		size_t value = 0;
-		value ^= std::hash<int>()(vector.x) + 0x9e3779b9 + (value << 6) + (value >> 2);
-		value ^= std::hash<int>()(vector.y) + 0x9e3779b9 + (value << 6) + (value >> 2);
-		value ^= std::hash<int>()(vector.z) + 0x9e3779b9 + (value << 6) + (value >> 2);
-		return value;
-	}
-};
-
 namespace TEN::Structures
 {
 	class SpatialHash

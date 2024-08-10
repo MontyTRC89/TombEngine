@@ -15,8 +15,8 @@ namespace TEN::Structures
 		{
 			int			ObjectID = NO_VALUE; // NOTE: Only leaf node stores object ID directly.
 			BoundingBox Aabb	 = BoundingBox();
-			int			Height	 = NO_VALUE;
 
+			int Height		 = NO_VALUE;
 			int ParentID	 = NO_VALUE;
 			int LeftChildID	 = NO_VALUE;
 			int RightChildID = NO_VALUE;
@@ -68,7 +68,6 @@ namespace TEN::Structures
 
 		void InsertLeaf(int leafID);
 		void RemoveLeaf(int leafID);
-
 		void RefitNode(int nodeID);
 		void RemoveNode(int nodeID);
 		int	 BalanceNode(int nodeID);
