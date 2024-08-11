@@ -167,13 +167,11 @@ namespace TEN::Entities::Creatures::TR3
 						burnTimer = SEAL_MUTANT_BURN_END_TIME;
 				}
 
-				// TODO: Proper color values.
-				auto color = Color();
-				int rand = GetRandomControl();
-				color.x = (float)((burnTimer * (255 - (((byte)rand / 16) & 0x1F))) / 16) / 255.0f;
-				color.y = (float)((burnTimer * (192 - (((byte)rand / 64) & 0x3F))) / 16) / 255.0f;
-				color.z = (float)((burnTimer * ((byte)rand & 0x3F)) / 16) / 255.0f;
-				TriggerDynamicLight(item.Pose.Position.ToVector3(), color, 12.0f);
+				if (burnTimer != SEAL_MUTANT_BURN_END_TIME)
+				{
+					int randomInt = GetRandomControl();
+					TriggerDynamicLight(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, (randomInt & 3) + 13, 31 - ((randomInt / 16) & 3), 24 - ((randomInt / 64) & 3), randomInt & 7);
+				}
 			}
 			else if (TestAnimFrameRange(item, 1, 124))
 			{
