@@ -165,12 +165,11 @@ namespace TEN::Entities::Creatures::TR3
 						burnTimer = SEAL_MUTANT_BURN_END_TIME;
 				}
 
-				// TODO: Proper color values.
-				int rand = GetRandomControl();
-				byte r = ((burnTimer * (255 - (((byte)rand / 16) & 0x1F))) / 16);
-				byte g = (burnTimer * (192 - (((byte)rand / 64) & 0x3F))) / 16;
-				byte b = (burnTimer * ((byte)rand & 0x3F)) / 16;
-				TriggerDynamicLight(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, 12.0f, r, g, b);
+				if (burnTimer != SEAL_MUTANT_BURN_END_TIME)
+				{
+					int randomInt = GetRandomControl();
+					TriggerDynamicLight(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, (randomInt & 3) + 13, 31 - ((randomInt / 16) & 3), 24 - ((randomInt / 64) & 3), randomInt & 7);
+				}
 			}
 			// TODO: Check. Third argument is supposed to be end frame - 8.
 			else if (TestAnimFrameRange(item, 1, 124))
