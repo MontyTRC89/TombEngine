@@ -76,6 +76,7 @@ local strings =
 	general_actions = { "General Actions" },
 	high = { "High" },
 	level_secrets_found = { "Secrets Found in Level" },
+	home_level = { "Lara's Home" },
 	load_game = { "Load Game" },
 	low = { "Low" },
 	medium = { "Medium" },

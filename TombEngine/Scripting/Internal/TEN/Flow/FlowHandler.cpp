@@ -77,10 +77,16 @@ Must be true or false
 */
 	tableFlow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
 
-	/*** Enable or disable saving and loading of savegames.
-	@function EnableLoadSave
-	@tparam bool enabled true or false.
-	*/
+/*** Enable or disable Home Level entry in the main menu.
+@function EnableHomeLevel
+@tparam bool enabled true or false.
+*/
+	tableFlow.set_function(ScriptReserved_EnableHomeLevel, &FlowHandler::EnableHomeLevel, this);
+
+/*** Enable or disable saving and loading of savegames.
+@function EnableLoadSave
+@tparam bool enabled true or false.
+*/
 	tableFlow.set_function(ScriptReserved_EnableLoadSave, &FlowHandler::EnableLoadSave, this);
 
 /*** gameflow.lua or level scripts.
@@ -577,6 +583,16 @@ void FlowHandler::EnableLevelSelect(bool levelSelect)
 	LevelSelect = levelSelect;
 }
 
+bool FlowHandler::IsHomeLevelEnabled() const
+{
+	return HomeLevel;
+}
+
+void FlowHandler::EnableHomeLevel(bool homeLevel)
+{
+	HomeLevel = homeLevel;
+}
+
 bool FlowHandler::IsLoadSaveEnabled() const
 {
 	return LoadSave;
@@ -674,9 +690,18 @@ bool FlowHandler::DoFlow()
 			break;
 
 		case GameStatus::NewGame:
-			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
+			CurrentLevel = SelectedLevelForNewGame != 0
+				? SelectedLevelForNewGame
+				: IsHomeLevelEnabled() ? 2 : 1; // 0 is title level and 1 is reserved for home level
+
 			RequiredStartPos = 0;
 			SelectedLevelForNewGame = 0;
+			InitializeGame = true;
+			break;
+
+		case GameStatus::HomeLevel:
+			CurrentLevel = 1;
+			RequiredStartPos = 0;
 			InitializeGame = true;
 			break;
 

@@ -30,10 +30,11 @@ public:
 	int FogOutDistance = 0;
 
 	bool LevelSelect = true;
+	bool HomeLevel	 = false;
 	bool LoadSave	 = true;
 	bool FlyCheat	 = true;
 	bool PointFilter = false;
-	bool MassPickup	 = true; 
+	bool MassPickup	 = true;
 	bool LaraInTitle = false;
 	bool DebugMode	 = false;
 
@@ -77,12 +78,14 @@ public:
 	void		EnableFlyCheat(bool flyCheat);
 	bool		IsPointFilterEnabled() const;
 	void		EnablePointFilter(bool pointFilter);
-	bool		IsMassPickupEnabled() const; 
+	bool		IsMassPickupEnabled() const;
 	void		EnableMassPickup(bool massPickup);
 	bool		IsLaraInTitleEnabled() const;
 	void		EnableLaraInTitle(bool laraInTitle);
 	bool		IsLevelSelectEnabled() const;
 	void		EnableLevelSelect(bool laraInTitle);
+	bool		IsHomeLevelEnabled() const;
+	void		EnableHomeLevel(bool laraHome);
 	bool		IsLoadSaveEnabled() const;
 	void		EnableLoadSave(bool loadSave);
 

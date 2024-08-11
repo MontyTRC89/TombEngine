@@ -578,6 +578,10 @@ GameStatus DoGameLoop(int levelIndex)
 				status = GameStatus::NewGame;
 				break;
 
+			case InventoryResult::HomeLevel:
+				status = GameStatus::HomeLevel;
+				break;
+
 			case InventoryResult::LoadGame:
 				status = GameStatus::LoadGame;
 				break;

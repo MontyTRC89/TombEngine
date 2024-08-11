@@ -281,12 +281,13 @@ namespace TEN::Gui
 		enum TitleOption
 		{
 			NewGame,
+			HomeLevel,
 			LoadGame,
 			Options,
 			ExitGame
 		};
 
-		static const int numTitleOptions	= 3;
+		static const int numTitleOptions	= 4;
 		static const int numLoadGameOptions = SAVEGAME_MAX - 1;
 		static const int numOptionsOptions	= 2;
 
@@ -300,12 +301,23 @@ namespace TEN::Gui
 		switch (MenuToDisplay)
 		{
 		case Menu::Title:
-			OptionCount = g_GameFlow->IsLoadSaveEnabled() ? numTitleOptions : (numTitleOptions - 1);
+			OptionCount = numTitleOptions;
+
+			if (!g_GameFlow->IsHomeLevelEnabled())
+				OptionCount--;
+
+			if (!g_GameFlow->IsLoadSaveEnabled())
+				OptionCount--;
+
 			break;
 
 		case Menu::SelectLevel:
 			inventoryResult = InventoryResult::None;
 			OptionCount = g_GameFlow->GetNumLevels() - 2;
+
+			if (g_GameFlow->IsHomeLevelEnabled())
+				OptionCount--;
+
 			break;
 
 		case Menu::LoadGame:
@@ -369,9 +381,14 @@ namespace TEN::Gui
 
 				if (MenuToDisplay == Menu::Title)
 				{
-					// Skip load game entry if loading and saving is disabled.
 					int realSelectedOption = SelectedOption;
-					if (!g_GameFlow->IsLoadSaveEnabled() && SelectedOption > TitleOption::NewGame)
+
+					// Skip Home Level entry if the home level is disabled.
+					if (!g_GameFlow->IsHomeLevelEnabled() && realSelectedOption > TitleOption::NewGame)
+						realSelectedOption++;
+
+					// Skip Load Game entry if loading and saving is disabled.
+					if (!g_GameFlow->IsLoadSaveEnabled() && realSelectedOption > TitleOption::HomeLevel)
 						realSelectedOption++;
 
 					switch (realSelectedOption)
@@ -388,6 +405,10 @@ namespace TEN::Gui
 							inventoryResult = InventoryResult::NewGame;
 						}
 
+						break;
+
+					case TitleOption::HomeLevel:
+						inventoryResult = InventoryResult::HomeLevel;
 						break;
 
 					case TitleOption::LoadGame:
@@ -412,6 +433,12 @@ namespace TEN::Gui
 				{
 					// Level 0 is the title level, so increment the option by 1 to offset it.
 					g_GameFlow->SelectedLevelForNewGame = SelectedOption + 1;
+
+					// Level 1 is reserved for the home level,
+					// so increment the option by 1 if the home level is enabled.
+					if (g_GameFlow->IsHomeLevelEnabled())
+						g_GameFlow->SelectedLevelForNewGame++;
+
 					MenuToDisplay = Menu::Title;
 					SelectedOption = 0;
 					inventoryResult = InventoryResult::NewGameSelectedLevel;

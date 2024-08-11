@@ -3,7 +3,7 @@
 // std::string ID macros
 #define STRING_WINDOW_TITLE				"window_title"
 #define STRING_PASSPORT					"passport"
-#define STRING_LARA_HOME				"lara_home"
+#define STRING_HOME_LEVEL				"home_level"
 #define STRING_CONTROLS					"controls"
 #define STRING_DISPLAY					"display"
 #define STRING_OTHER_SETTINGS			"other_settings"
