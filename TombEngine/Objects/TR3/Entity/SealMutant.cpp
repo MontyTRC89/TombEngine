@@ -63,11 +63,13 @@ namespace TEN::Entities::Creatures::TR3
 		constexpr auto VEL_MULT				 = 5.0f;
 		constexpr auto PLAYER_CROUCH_GRAVITY = 32.0f;
 
+		// HACK.
 		float gravity = 0.0f;
 		if (enemy != nullptr && enemy->IsLara())
 		{
 			const auto& player = GetLaraInfo(*enemy);
-			player.Control.IsLow;
+			if (player.Control.IsLow)
+				gravity = PLAYER_CROUCH_GRAVITY;
 		}
 		
 		auto velVector = Vector3(0.0f, gravity, vel * VEL_MULT);
@@ -100,13 +102,15 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else
 			{
-				const auto& deathAnim = GetAnimData(item.Animation.AnimNumber);
-				if ((item.Animation.FrameNumber >= (deathAnim.frameBase + 1)) && (item.Animation.FrameNumber <= (deathAnim.frameEnd - 8)))
+				// TODO: Check. Third argument is supposed to be end frame - 8.
+				if (TestAnimFrameRange(item, 1, 8))
 				{
-					gasVel = item.Animation.FrameNumber - (deathAnim.frameBase + 1);
+					const auto& anim = GetAnimData(item.Animation.AnimNumber);
+
+					gasVel = item.Animation.FrameNumber - (anim.frameBase + 1);
 					if (gasVel > 24.0f)
 					{
-						gasVel = (deathAnim.frameEnd - item.Animation.FrameNumber) - 8;
+						gasVel = (anim.frameEnd - item.Animation.FrameNumber) - 8.0f;
 						if (gasVel <= 0.0f)
 							gasVel = 1.0f;
 
@@ -132,7 +136,8 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (item.HitPoints <= 0)
 		{
-			const auto& prevAnim = GetAnimData(item.Animation.AnimNumber);
+			const auto& anim = GetAnimData(item.Animation.AnimNumber);
+
 			if (item.Animation.ActiveState != SEAL_MUTANT_STATE_DEATH)
 			{
 				SetAnimation(item, SEAL_MUTANT_ANIM_DEATH);
@@ -147,11 +152,10 @@ namespace TEN::Entities::Creatures::TR3
 					TriggerFireFlame(boneEffectPos.x, boneEffectPos.y, boneEffectPos.z, FlameType::Medium);
 				}
 
-				const auto& animData = GetAnimData(item.Animation.AnimNumber);
-				int burnTimer = item.Animation.FrameNumber - animData.frameBase;
+				int burnTimer = item.Animation.FrameNumber - anim.frameBase;
 				if (burnTimer > SEAL_MUTANT_BURN_END_TIME)
 				{
-					burnTimer = item.Animation.FrameNumber - animData.frameEnd;
+					burnTimer = item.Animation.FrameNumber - anim.frameEnd;
 					if (burnTimer > SEAL_MUTANT_BURN_END_TIME)
 						burnTimer = SEAL_MUTANT_BURN_END_TIME;
 				}
@@ -164,13 +168,13 @@ namespace TEN::Entities::Creatures::TR3
 				color.z = (burnTimer * ((byte)color.z & 0x3F)) / 16;
 				TriggerDynamicLight(item.Pose.Position.ToVector3(), color, 12.0f);
 			}
-			else if (item.Animation.FrameNumber >= (prevAnim.frameBase + 1) &&
-				item.Animation.FrameNumber <= (prevAnim.frameEnd - 8))
+			// TODO: Check. Third argument is supposed to be end frame - 8.
+			else if (TestAnimFrameRange(item, 1, 8))
 			{
-				gasVel = item.Animation.FrameNumber - (prevAnim.frameBase + 1);
+				gasVel = item.Animation.FrameNumber - (anim.frameBase + 1);
 				if (gasVel > 24.0f)
 				{
-					gasVel = (prevAnim.frameEnd - item.Animation.FrameNumber) - 8.0f;
+					gasVel = (anim.frameEnd - item.Animation.FrameNumber) - 8.0f;
 					if (gasVel <= 0.0f)
 						gasVel = 1.0f;
 
@@ -284,7 +288,6 @@ namespace TEN::Entities::Creatures::TR3
 					torsoOrient.z = ai.angle / 2;
 				}
 
-				const auto& anim = GetAnimData(item.Animation.AnimNumber);
 				if (TestAnimFrameRange(item, 35, 58))
 				{
 					if (creature.Flags < 24)
