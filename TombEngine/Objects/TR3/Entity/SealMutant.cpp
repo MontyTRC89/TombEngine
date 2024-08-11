@@ -14,6 +14,9 @@
 
 using namespace TEN::Math;
 
+// NOTES:
+// ItemFlags[0]: Sprite ID for poison effect.
+
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto SEAL_MUTANT_ATTACK_DAMAGE = 1;
@@ -24,7 +27,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SEAL_MUTANT_WALK_TURN_RATE = ANGLE(3.0f);
 
 	constexpr auto SEAL_MUTANT_FLAME_LIGHT_Y_OFFSET = CLICK(2);
-	constexpr auto SEAL_MUTANT_BURN_END_TIME = 16;
+	constexpr auto SEAL_MUTANT_BURN_END_TIME		= 16;
 
 	const auto SealMutantGasBite			   = CreatureBiteInfo(Vector3(0.0f, 48.0f, 140.0f), 10);
 	const auto SealMutantAttackTargetObjectIds = { ID_LARA, ID_FLAMETHROWER_BADDY, ID_WORKER_FLAMETHROWER };
@@ -95,7 +98,8 @@ namespace TEN::Entities::Creatures::TR3
 	void InitializeSealMutant(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		item.ItemFlags[0] = 0; // SpriteIndex for ThrowPoison()
+
+		item.ItemFlags[0] = 0;
 		InitializeCreature(itemNumber);
 	}
 
@@ -141,11 +145,6 @@ namespace TEN::Entities::Creatures::TR3
 			return;
 		}
 
-		ItemInfo* target = nullptr;
-
-		auto bite = CreatureBiteInfo{};
-		auto boneEffectPos = Vector3i::Zero;
-
 		if (item.GetFlagField(IF_SEAL_MUTANT_FLAME_TIMER) > 80)
 			item.HitPoints = 0;
 
@@ -161,10 +160,8 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				for (int boneID = 9; boneID < 17; boneID++)
 				{
-					bite.Position = Vector3::Zero;
-					bite.BoneID = boneID;
-					boneEffectPos = GetJointPosition(item, bite);
-					TriggerFireFlame(boneEffectPos.x, boneEffectPos.y, boneEffectPos.z, FlameType::Medium);
+					auto pos = GetJointPosition(item, boneID);
+					TriggerFireFlame(pos.x, pos.y, pos.z, FlameType::Medium);
 				}
 
 				int burnTimer = item.Animation.FrameNumber - anim.frameBase;
@@ -177,17 +174,10 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (burnTimer != SEAL_MUTANT_BURN_END_TIME)
 				{
-					bite.Position = Vector3::Zero;
-					bite.Position.y -= SEAL_MUTANT_FLAME_LIGHT_Y_OFFSET;
-					bite.BoneID = SealMutantGasBite.BoneID;
-					boneEffectPos = GetJointPosition(item, bite);
-
-					float rand = Random::GenerateFloat(0.25f, 0.75f);
-					Color color;
-					color.x = 0.50f + Random::GenerateFloat(0.25f, 0.50f);
-					color.y = 0.25f + Random::GenerateFloat(0.15f, 0.25f);
-					color.z = Random::GenerateFloat(0.0f, 0.25f);
-					TriggerDynamicLight(boneEffectPos.ToVector3(), color, Random::GenerateFloat(0.03f, 0.04f));
+					auto pos = GetJointPosition(item, SealMutantGasBite.BoneID, Vector3(0.0f, -SEAL_MUTANT_FLAME_LIGHT_Y_OFFSET, 0.0f));
+					auto color = Color(Random::GenerateFloat(0.75f, 1.0f), Random::GenerateFloat(0.4f, 0.5f), Random::GenerateFloat(0.0f, 0.25f));
+					float falloff = Random::GenerateFloat(0.03f, 0.04f);
+					TriggerDynamicLight(pos.ToVector3(), color, falloff);
 				}
 			}
 			else if (TestAnimFrameRange(item, 1, 124))
@@ -231,7 +221,7 @@ namespace TEN::Entities::Creatures::TR3
 			CreatureMood(&item, &ai, ai.zoneNumber == ai.enemyZone);
 			headingAngle = CreatureTurn(&item, creature.MaxTurn);
 			
-			target = creature.Enemy;
+			auto* target = creature.Enemy;
 			creature.Enemy = LaraItem;
 			if (ai.distance < SEAL_MUTANT_ALERT_RANGE || item.HitStatus || TargetVisible(&item, &ai))
 				AlertAllGuards(itemNumber);
