@@ -21,6 +21,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto SEAL_MUTANT_WALK_TURN_RATE = ANGLE(3.0f);
 
+	constexpr auto SEAL_MUTANT_DAMAGE_TO_OTHER = 1;
 	constexpr auto SEAL_MUTANT_BURN_END_TIME = 16;
 
 	const auto SealMutantGasBite			   = CreatureBiteInfo(Vector3(0.0f, 48.0f, 140.0f), 10);
@@ -67,11 +68,18 @@ namespace TEN::Entities::Creatures::TR3
 
 		// HACK.
 		float gravity = 0.0f;
-		if (creature.Enemy != nullptr && creature.Enemy->IsLara())
+		if (creature.Enemy != nullptr)
 		{
-			const auto& player = GetLaraInfo(*creature.Enemy);
-			if (player.Control.IsLow)
-				gravity = PLAYER_CROUCH_GRAVITY;
+			if (creature.Enemy->IsLara())
+			{
+				const auto& player = GetLaraInfo(*creature.Enemy);
+				if (player.Control.IsLow)
+					gravity = PLAYER_CROUCH_GRAVITY;
+			}
+			else
+			{
+				DoDamage(creature.Enemy, SEAL_MUTANT_DAMAGE_TO_OTHER);
+			}
 		}
 		
 		auto velVector = Vector3(0.0f, gravity, vel * VEL_MULT);
@@ -102,25 +110,20 @@ namespace TEN::Entities::Creatures::TR3
 			{
 				SetAnimation(item, SEAL_MUTANT_ANIM_TRAP);
 			}
-			else
+			else if (TestAnimFrameRange(item, 1, 124))
 			{
-				// TODO: Check. Third argument is supposed to be end frame - 8.
-				if (TestAnimFrameRange(item, 1, 8))
+				const auto& anim = GetAnimData(item.Animation.AnimNumber);
+				gasVel = (float)(item.Animation.FrameNumber - (anim.frameBase + 1));
+				if (gasVel > 24.0f)
 				{
-					const auto& anim = GetAnimData(item.Animation.AnimNumber);
+					gasVel = (float)((anim.frameEnd - 8) - item.Animation.FrameNumber);
+					if (gasVel <= 0.0f)
+						gasVel = 1.0f;
 
-					gasVel = item.Animation.FrameNumber - (anim.frameBase + 1);
 					if (gasVel > 24.0f)
-					{
-						gasVel = (anim.frameEnd - item.Animation.FrameNumber) - 8.0f;
-						if (gasVel <= 0.0f)
-							gasVel = 1.0f;
+						gasVel = Random::GenerateFloat(8.0f, 24.0f);
 
-						if (gasVel > 24.0f)
-							gasVel = Random::GenerateFloat(8.0f, 24.0f);
-
-						SpawnSealMutantPoisonGas(item, gasVel);
-					}
+					SpawnSealMutantPoisonGas(item, gasVel);
 				}
 			}
 
