@@ -143,19 +143,19 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				const auto& animData = GetAnimData(item.Animation.AnimNumber);
-				int c = item.Animation.FrameNumber - animData.frameBase;
-				if (c > 16)
+				int burnTimer = item.Animation.FrameNumber - animData.frameBase;
+				if (burnTimer > 16)
 				{
-					c = item.Animation.FrameNumber - animData.frameEnd;
-					if (c > 16)
-						c = 16;
+					burnTimer = item.Animation.FrameNumber - animData.frameEnd;
+					if (burnTimer > 16)
+						burnTimer = 16;
 				}
 
 				auto color = Color();
 				color.z = GetRandomControl();
-				color.x = (c * (255 - (((byte)color.z >> 4) & 0x1F))) >> 4;
-				color.y = (c * (192 - (((byte)color.z >> 6) & 0x3F))) >> 4;
-				color.z = (c * ((byte)color.z & 0x3F)) >> 4;
+				color.x = (burnTimer * (255 - (((byte)color.z >> 4) & 0x1F))) >> 4;
+				color.y = (burnTimer * (192 - (((byte)color.z >> 6) & 0x3F))) >> 4;
+				color.z = (burnTimer * ((byte)color.z & 0x3F)) >> 4;
 				TriggerDynamicLight(item.Pose.Position.ToVector3(), color, 12.0f);
 			}
 			else if (item.Animation.FrameNumber >= (prevAnim.frameBase + 1) &&
