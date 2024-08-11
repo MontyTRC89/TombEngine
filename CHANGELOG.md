@@ -37,11 +37,13 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - OCB 0: Classic behaviour
   - OCB 1: Can jump up/down up to 4 steps and jump across gaps up to 2 blocks wide.
   - You must use the download version found on the TombEngine website.
+* Added TR3 seal mutant (trap version enabled with OCB 1).
 * Add new sound conditions: Quicksand and Underwater.
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.
 * Changed Water sound condition to ShallowWater.
-* Added TR3 seal mutant (trap version enabled with OCB 1).
+* Added option to enable or disable menu option looping.
+* Menu scrolling using held inputs will stop at the last option until a new input is made.
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
