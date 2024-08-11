@@ -60,7 +60,6 @@ struct GameConfiguration
 	static constexpr auto DEFAULT_SHADOW_MAP_SIZE	= 1024;
 	static constexpr auto DEFAULT_SHADOW_BLOBS_MAX	= 16;
 	static constexpr auto DEFAULT_MOUSE_SENSITIVITY = 6;
-	static constexpr auto DEFAULT_MOUSE_SMOOTHING	= 1;
 
 	// Graphics
 
