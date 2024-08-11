@@ -508,6 +508,14 @@ namespace TEN::Renderer
 			GetNextLinePosition(&y);
 			selectedOption++;
 
+			// Home Level
+			if (g_GameFlow->IsHomeLevelEnabled())
+			{
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_HOME_LEVEL), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
+				GetNextLinePosition(&y);
+				selectedOption++;
+			}
+
 			// Load game
 			if (g_GameFlow->IsLoadSaveEnabled())
 			{
@@ -538,13 +546,15 @@ namespace TEN::Renderer
 			AddString(MenuCenterEntry, 26, g_GameFlow->GetString(STRING_SELECT_LEVEL), PRINTSTRING_COLOR_ORANGE, SF_Center());
 			GetNextBlockPosition(&y);
 
-			// Level listing (starts with 1 because 0 is always title)
-			for (int i = 1; i < g_GameFlow->GetNumLevels(); i++, selectedOption++)
+			// Level 0 is always Title Level and level 1 might be Home Level.
+			for (int i = (g_GameFlow->IsHomeLevelEnabled() ? 2 : 1); i < g_GameFlow->GetNumLevels(); i++, selectedOption++)
 			{
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(g_GameFlow->GetLevel(i)->NameStringKey.c_str()),
+				AddString(
+					MenuCenterEntry, y, g_GameFlow->GetString(g_GameFlow->GetLevel(i)->NameStringKey.c_str()),
 					PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 				GetNextNarrowLinePosition(&y);
 			}
+
 			break;
 
 		case Menu::Options:

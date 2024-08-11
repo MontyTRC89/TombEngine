@@ -30,6 +30,7 @@ namespace TEN::Gui
 		None,
 		UseItem,
 		NewGame,
+		HomeLevel,
 		LoadGame,
 		SaveGame,
 		ExitGame,
