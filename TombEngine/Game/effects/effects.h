@@ -137,7 +137,7 @@ struct Particle
 	float size;
 	unsigned char friction;
 	unsigned char scalar;
-	int spriteIndex;
+	unsigned char spriteIndex;
 	signed char rotAdd;
 	signed char maxYvel;
 	bool on;

@@ -396,7 +396,7 @@ namespace TEN::Renderer
 				}
 
 				// Don't allow sprites out of bounds.
-				int spriteIndex = std::clamp(particle.spriteIndex, 0, (int)_sprites.size());
+				int spriteIndex = std::clamp((int)particle.spriteIndex, 0, (int)_sprites.size());
 
 				AddSpriteBillboard(
 					&_sprites[spriteIndex],
