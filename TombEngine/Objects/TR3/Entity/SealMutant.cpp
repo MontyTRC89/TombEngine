@@ -18,6 +18,8 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
+	constexpr auto SEAL_MUTANT_BURN_TIMER_END  = 16;
+
 	const auto SealMutantGasBite			   = CreatureBiteInfo(Vector3(0.0f, 48.0f, 140.0f), 10);
 	const auto SealMutantAttackTargetObjectIds = { ID_LARA, ID_FLAMETHROWER_BADDY, ID_WORKER_FLAMETHROWER };
 
@@ -144,11 +146,11 @@ namespace TEN::Entities::Creatures::TR3
 
 				const auto& animData = GetAnimData(item.Animation.AnimNumber);
 				int burnTimer = item.Animation.FrameNumber - animData.frameBase;
-				if (burnTimer > 16)
+				if (burnTimer > SEAL_MUTANT_BURN_TIMER_END)
 				{
 					burnTimer = item.Animation.FrameNumber - animData.frameEnd;
-					if (burnTimer > 16)
-						burnTimer = 16;
+					if (burnTimer > SEAL_MUTANT_BURN_TIMER_END)
+						burnTimer = SEAL_MUTANT_BURN_TIMER_END;
 				}
 
 				auto color = Color();
