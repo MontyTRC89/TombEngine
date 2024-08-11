@@ -417,7 +417,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SEAL_MUTANT];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeCreature;
+		obj->Initialize = InitializeSealMutant;
 		obj->collision = CreatureCollision;
 		obj->control = ControlSealMutant;
 		obj->shadowType = ShadowMode::All;

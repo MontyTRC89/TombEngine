@@ -23,6 +23,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	constexpr auto SEAL_MUTANT_WALK_TURN_RATE = ANGLE(3.0f);
 
+	constexpr auto SEAL_MUTANT_FLAME_LIGHT_Y_OFFSET = CLICK(2);
 	constexpr auto SEAL_MUTANT_BURN_END_TIME = 16;
 
 	const auto SealMutantGasBite			   = CreatureBiteInfo(Vector3(0.0f, 48.0f, 140.0f), 10);
@@ -89,6 +90,13 @@ namespace TEN::Entities::Creatures::TR3
 
 		for (int i = 0; i < GAS_COUNT; i++)
 			ThrowPoison(item, SealMutantGasBite, velVector, colorStart, colorEnd, item.ItemFlags[0]);
+	}
+
+	void InitializeSealMutant(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
+		item.ItemFlags[0] = 0; // SpriteIndex for ThrowPoison()
+		InitializeCreature(itemNumber);
 	}
 
 	void ControlSealMutant(short itemNumber)
@@ -169,8 +177,17 @@ namespace TEN::Entities::Creatures::TR3
 
 				if (burnTimer != SEAL_MUTANT_BURN_END_TIME)
 				{
-					int randomInt = GetRandomControl();
-					TriggerDynamicLight(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, (randomInt & 3) + 13, 31 - ((randomInt / 16) & 3), 24 - ((randomInt / 64) & 3), randomInt & 7);
+					bite.Position = Vector3::Zero;
+					bite.Position.y -= SEAL_MUTANT_FLAME_LIGHT_Y_OFFSET;
+					bite.BoneID = SealMutantGasBite.BoneID;
+					boneEffectPos = GetJointPosition(item, bite);
+
+					float rand = Random::GenerateFloat(0.25f, 0.75f);
+					Color color;
+					color.x = 0.50f + Random::GenerateFloat(0.25f, 0.50f);
+					color.y = 0.25f + Random::GenerateFloat(0.15f, 0.25f);
+					color.z = Random::GenerateFloat(0.0f, 0.25f);
+					TriggerDynamicLight(boneEffectPos.ToVector3(), color, Random::GenerateFloat(0.03f, 0.04f));
 				}
 			}
 			else if (TestAnimFrameRange(item, 1, 124))
