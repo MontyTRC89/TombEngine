@@ -14,11 +14,14 @@
 
 using namespace TEN::Math;
 
-// TODO: Magic numbers to constants.
-
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto SEAL_MUTANT_BURN_TIMER_END  = 16;
+	constexpr auto SEAL_MUTANT_ALERT_RANGE	= SQUARE(BLOCK(1));
+	constexpr auto SEAL_MUTANT_ATTACK_RANGE = SQUARE(BLOCK(4));
+
+	constexpr auto SEAL_MUTANT_WALK_TURN_RATE = ANGLE(3.0f);
+
+	constexpr auto SEAL_MUTANT_BURN_END_TIME = 16;
 
 	const auto SealMutantGasBite			   = CreatureBiteInfo(Vector3(0.0f, 48.0f, 140.0f), 10);
 	const auto SealMutantAttackTargetObjectIds = { ID_LARA, ID_FLAMETHROWER_BADDY, ID_WORKER_FLAMETHROWER };
@@ -87,7 +90,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto headOrient = EulerAngles::Identity;
 		auto torsoOrient = EulerAngles::Identity;
 
-		int vel = 0;
+		float gasVel = 0.0f;
 
 		if (item.TestOcb(OCB_TRAP))
 		{
@@ -100,17 +103,17 @@ namespace TEN::Entities::Creatures::TR3
 				const auto& deathAnim = GetAnimData(item.Animation.AnimNumber);
 				if ((item.Animation.FrameNumber >= (deathAnim.frameBase + 1)) && (item.Animation.FrameNumber <= (deathAnim.frameEnd - 8)))
 				{
-					vel = item.Animation.FrameNumber - (deathAnim.frameBase + 1);
-					if (vel > 24)
+					gasVel = item.Animation.FrameNumber - (deathAnim.frameBase + 1);
+					if (gasVel > 24.0f)
 					{
-						vel = (deathAnim.frameEnd - item.Animation.FrameNumber) - 8;
-						if (vel <= 0)
-							vel = 1;
+						gasVel = (deathAnim.frameEnd - item.Animation.FrameNumber) - 8;
+						if (gasVel <= 0.0f)
+							gasVel = 1.0f;
 
-						if (vel > 24)
-							vel = (GetRandomControl() & 0xF) + 8;
+						if (gasVel > 24.0f)
+							gasVel = Random::GenerateFloat(8.0f, 24.0f);
 
-						ThrowSealMutantGas(item, nullptr, vel);
+						ThrowSealMutantGas(item, nullptr, gasVel);
 					}
 				}
 			}
@@ -146,34 +149,35 @@ namespace TEN::Entities::Creatures::TR3
 
 				const auto& animData = GetAnimData(item.Animation.AnimNumber);
 				int burnTimer = item.Animation.FrameNumber - animData.frameBase;
-				if (burnTimer > SEAL_MUTANT_BURN_TIMER_END)
+				if (burnTimer > SEAL_MUTANT_BURN_END_TIME)
 				{
 					burnTimer = item.Animation.FrameNumber - animData.frameEnd;
-					if (burnTimer > SEAL_MUTANT_BURN_TIMER_END)
-						burnTimer = SEAL_MUTANT_BURN_TIMER_END;
+					if (burnTimer > SEAL_MUTANT_BURN_END_TIME)
+						burnTimer = SEAL_MUTANT_BURN_END_TIME;
 				}
 
+				// TODO: Proper color values.
 				auto color = Color();
 				color.z = GetRandomControl();
-				color.x = (burnTimer * (255 - (((byte)color.z >> 4) & 0x1F))) >> 4;
-				color.y = (burnTimer * (192 - (((byte)color.z >> 6) & 0x3F))) >> 4;
-				color.z = (burnTimer * ((byte)color.z & 0x3F)) >> 4;
+				color.x = (burnTimer * (255 - (((byte)color.z / 16) & 0x1F))) / 16;
+				color.y = (burnTimer * (192 - (((byte)color.z / 64) & 0x3F))) / 16;
+				color.z = (burnTimer * ((byte)color.z & 0x3F)) / 16;
 				TriggerDynamicLight(item.Pose.Position.ToVector3(), color, 12.0f);
 			}
 			else if (item.Animation.FrameNumber >= (prevAnim.frameBase + 1) &&
 				item.Animation.FrameNumber <= (prevAnim.frameEnd - 8))
 			{
-				vel = item.Animation.FrameNumber - (prevAnim.frameBase + 1);
-				if (vel > 24)
+				gasVel = item.Animation.FrameNumber - (prevAnim.frameBase + 1);
+				if (gasVel > 24.0f)
 				{
-					vel = (prevAnim.frameEnd - item.Animation.FrameNumber) - 8;
-					if (vel <= 0)
-						vel = 1;
+					gasVel = (prevAnim.frameEnd - item.Animation.FrameNumber) - 8.0f;
+					if (gasVel <= 0.0f)
+						gasVel = 1.0f;
 
-					if (vel > 24)
-						vel = (GetRandomControl() & 0xF) + 8;
+					if (gasVel > 24.0f)
+						gasVel = Random::GenerateFloat(16.0f, 24.0f);
 
-					ThrowSealMutantGas(item, creature.Enemy, vel);
+					ThrowSealMutantGas(item, creature.Enemy, gasVel);
 				}
 			}
 		}
@@ -195,7 +199,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (creature.Enemy != nullptr && creature.Enemy->IsLara())
 			{
 				const auto& player = GetLaraInfo(*creature.Enemy);
-				if (player.Status.Poison >= (LARA_POISON_MAX * 2))
+				if (player.Status.Poison >= LARA_POISON_MAX)
 					creature.Mood = MoodType::Escape;
 			}
 
@@ -204,7 +208,7 @@ namespace TEN::Entities::Creatures::TR3
 			
 			target = creature.Enemy;
 			creature.Enemy = LaraItem;
-			if (ai.distance < SQUARE(BLOCK(1)) || item.HitStatus || TargetVisible(&item, &ai))
+			if (ai.distance < SEAL_MUTANT_ALERT_RANGE || item.HitStatus || TargetVisible(&item, &ai))
 				AlertAllGuards(itemNumber);
 
 			creature.Enemy = target;
@@ -235,7 +239,7 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					item.Animation.TargetState = SEAL_MUTANT_STATE_WALK;
 				}
-				else if (Targetable(&item, &ai) && ai.distance < SQUARE(BLOCK(4)))
+				else if (Targetable(&item, &ai) && ai.distance < SEAL_MUTANT_ATTACK_RANGE)
 				{
 					item.Animation.TargetState = SEAL_MUTANT_STATE_ATTACK;
 				}
@@ -251,7 +255,7 @@ namespace TEN::Entities::Creatures::TR3
 				break;
 
 			case SEAL_MUTANT_STATE_WALK:
-				creature.MaxTurn = ANGLE(3.0f);
+				creature.MaxTurn = SEAL_MUTANT_WALK_TURN_RATE;
 
 				if (ai.ahead)
 				{
@@ -264,7 +268,7 @@ namespace TEN::Entities::Creatures::TR3
 					item.Animation.TargetState = SEAL_MUTANT_STATE_WALK;
 					headOrient.y = 0;
 				}
-				else if (Targetable(&item, &ai) && ai.distance < SQUARE(BLOCK(4)))
+				else if (Targetable(&item, &ai) && ai.distance < SEAL_MUTANT_ATTACK_RANGE)
 				{
 					item.Animation.TargetState = SEAL_MUTANT_STATE_IDLE;
 				}
@@ -281,22 +285,22 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				const auto& anim = GetAnimData(item.Animation.AnimNumber);
-				if (item.Animation.FrameNumber >= (anim.frameBase + 35) && item.Animation.FrameNumber <= (anim.frameBase + 58))
+				if (TestAnimFrameRange(item, 35, 58))
 				{
 					if (creature.Flags < 24)
 						creature.Flags += 3;
 
-					vel = 0;
-					if (creature.Flags < 24)
+					gasVel = 0.0f;
+					if (creature.Flags < 24.0f)
 					{
-						vel = creature.Flags;
+						gasVel = creature.Flags;
 					}
 					else
 					{
-						vel = (GetRandomControl() & 0xF) + 8;
+						gasVel = Random::GenerateFloat(16.0f, 24.0f);
 					}
 
-					ThrowSealMutantGas(item, creature.Enemy, vel);
+					ThrowSealMutantGas(item, creature.Enemy, gasVel);
 					if (creature.Enemy != nullptr && !creature.Enemy->IsLara())
 						creature.Enemy->HitStatus = true;
 				}
