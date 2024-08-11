@@ -94,7 +94,7 @@ struct GameConfiguration
 	// Input
 
 	int					  MouseSensitivity		= DEFAULT_MOUSE_SENSITIVITY;
-	MenuOptionLoopingMode MenuOptionLoopingMode = MenuOptionLoopingMode::AllMenus;
+	MenuOptionLoopingMode MenuOptionLoopingMode = MenuOptionLoopingMode::SaveLoadOnly;
 	std::vector<int>	  Bindings				= {};
 
 	std::vector<Vector2i> SupportedScreenResolutions = {};

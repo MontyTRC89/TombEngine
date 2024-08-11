@@ -330,7 +330,7 @@ void InitDefaultConfiguration()
 	g_Configuration.EnableThumbstickCamera = false;
 
 	g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-	g_Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::AllMenus;
+	g_Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::SaveLoadOnly;
 
 	g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
 	g_Configuration.AdapterName = g_Renderer.GetDefaultAdapterName();
@@ -444,14 +444,14 @@ bool LoadConfiguration()
 	}
 
 	DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-	DWORD menuOptionLoopingMode = (DWORD)MenuOptionLoopingMode::AllMenus;
+	DWORD menuOptionLoopingMode = (DWORD)MenuOptionLoopingMode::SaveLoadOnly;
 
 	// Load Input keys.
 	HKEY inputKey = NULL;
 	if (RegOpenKeyExA(rootKey, REGKEY_INPUT, 0, KEY_READ, &inputKey) == ERROR_SUCCESS)
 	{
 		if (GetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS ||
-			GetDWORDRegKey(inputKey, REGKEY_ENABLE_MENU_OPTION_LOOPING, &menuOptionLoopingMode, (DWORD)MenuOptionLoopingMode::AllMenus) != ERROR_SUCCESS)
+			GetDWORDRegKey(inputKey, REGKEY_ENABLE_MENU_OPTION_LOOPING, &menuOptionLoopingMode, (DWORD)MenuOptionLoopingMode::SaveLoadOnly) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
