@@ -28,7 +28,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto FLAMETHROWER_WALK_TURN_RATE_MAX = ANGLE(5.0f);
 
 	const auto FlamethrowerBite = CreatureBiteInfo(Vector3(0, 340, 64), 7);
-	const auto FlamethrowerTargetIds = { ID_SEAL_MUTANT };
+	const auto FlamethrowerTargetIds = { ID_LARA, ID_SEAL_MUTANT };
 
 	// TODO
 	enum FlamethrowerState

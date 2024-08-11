@@ -19,7 +19,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto SEAL_MUTANT_ATTACK_DAMAGE = 1;
 
 	constexpr auto SEAL_MUTANT_ALERT_RANGE	= SQUARE(BLOCK(1));
-	constexpr auto SEAL_MUTANT_ATTACK_RANGE = SQUARE(BLOCK(1.25f));
+	constexpr auto SEAL_MUTANT_ATTACK_RANGE = SQUARE(BLOCK(1.5f));
 
 	constexpr auto SEAL_MUTANT_WALK_TURN_RATE = ANGLE(3.0f);
 
@@ -62,7 +62,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void SpawnSealMutantPoisonGas(ItemInfo& item, float vel)
 	{
-		constexpr auto GAS_COUNT			 = 3;
+		constexpr auto GAS_COUNT			 = 2;
 		constexpr auto VEL_MULT				 = 5.0f;
 		constexpr auto PLAYER_CROUCH_GRAVITY = 32.0f;
 
