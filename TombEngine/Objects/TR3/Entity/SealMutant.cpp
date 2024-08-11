@@ -16,12 +16,13 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto SEAL_MUTANT_ALERT_RANGE	= SQUARE(BLOCK(1.0f));
+	constexpr auto SEAL_MUTANT_ATTACK_DAMAGE = 1;
+
+	constexpr auto SEAL_MUTANT_ALERT_RANGE	= SQUARE(BLOCK(1));
 	constexpr auto SEAL_MUTANT_ATTACK_RANGE = SQUARE(BLOCK(1.25f));
 
 	constexpr auto SEAL_MUTANT_WALK_TURN_RATE = ANGLE(3.0f);
 
-	constexpr auto SEAL_MUTANT_DAMAGE_TO_OTHER = 1;
 	constexpr auto SEAL_MUTANT_BURN_END_TIME = 16;
 
 	const auto SealMutantGasBite			   = CreatureBiteInfo(Vector3(0.0f, 48.0f, 140.0f), 10);
@@ -78,7 +79,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else
 			{
-				DoDamage(creature.Enemy, SEAL_MUTANT_DAMAGE_TO_OTHER);
+				DoDamage(creature.Enemy, SEAL_MUTANT_ATTACK_DAMAGE);
 			}
 		}
 		
@@ -113,10 +114,11 @@ namespace TEN::Entities::Creatures::TR3
 			else if (TestAnimFrameRange(item, 1, 124))
 			{
 				const auto& anim = GetAnimData(item.Animation.AnimNumber);
-				gasVel = (float)(item.Animation.FrameNumber - (anim.frameBase + 1));
+
+				gasVel = item.Animation.FrameNumber - (anim.frameBase + 1);
 				if (gasVel > 24.0f)
 				{
-					gasVel = (float)(item.Animation.FrameNumber - (anim.frameEnd - 8));
+					gasVel = item.Animation.FrameNumber - (anim.frameEnd - 8);
 					if (gasVel <= 0.0f)
 						gasVel = 1.0f;
 
@@ -173,13 +175,12 @@ namespace TEN::Entities::Creatures::TR3
 				color.z = (float)((burnTimer * ((byte)rand & 0x3F)) / 16) / 255.0f;
 				TriggerDynamicLight(item.Pose.Position.ToVector3(), color, 12.0f);
 			}
-			// TODO: Check. Third argument is supposed to be end frame - 8.
 			else if (TestAnimFrameRange(item, 1, 124))
 			{
-				gasVel = (float)(item.Animation.FrameNumber - (anim.frameBase + 1));
+				gasVel = item.Animation.FrameNumber - (anim.frameBase + 1);
 				if (gasVel > 24.0f)
 				{
-					gasVel = (float)(item.Animation.FrameNumber - (anim.frameEnd - 8));
+					gasVel = item.Animation.FrameNumber - (anim.frameEnd - 8);
 					if (gasVel <= 0.0f)
 						gasVel = 1.0f;
 

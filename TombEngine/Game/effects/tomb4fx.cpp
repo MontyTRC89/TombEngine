@@ -289,20 +289,20 @@ static Particle* SetupFireSpark()
 	return spark;
 }
 
-static void AttachAndCreateSpark(Particle* spark, const ItemInfo* item, int meshIndex, Vector3i offset, Vector3i vel, int spriteIndex = 0)
+static void AttachAndCreateSpark(Particle* spark, const ItemInfo* item, int meshID, Vector3i offset, Vector3i vel, int spriteID = 0)
 {
-	auto pos1 = GetJointPosition(*item, meshIndex, Vector3i(-4, -30, -4) + offset);
+	auto pos1 = GetJointPosition(*item, meshID, Vector3i(-4, -30, -4) + offset);
 
 	spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
 	spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
 
-	auto pos2 = GetJointPosition(*item, meshIndex, Vector3i(-4, -30, -4) + offset + vel);
+	auto pos2 = GetJointPosition(*item, meshID, Vector3i(-4, -30, -4) + offset + vel);
 
 	int v = (GetRandomControl() & 0x3F) + 192;
 
 	spark->life = spark->sLife = v / 6;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteIndex;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteID;
 
 	spark->xVel = v * (pos2.x - pos1.x) / 10;
 	spark->yVel = v * (pos2.y - pos1.y) / 10;
@@ -321,39 +321,39 @@ static void AttachAndCreateSpark(Particle* spark, const ItemInfo* item, int mesh
 	spark->on = 1;
 }
 
-void ThrowFire(int itemNumber, int meshIndex, const Vector3i& offset, const Vector3i& vel, int spriteIndex)
+void ThrowFire(int itemNumber, int meshID, const Vector3i& offset, const Vector3i& vel, int spriteID)
 {
 	auto& item = g_Level.Items[itemNumber];
 
 	for (int i = 0; i < 3; i++)
 	{
-		auto& spark = *SetupFireSpark();
-		AttachAndCreateSpark(&spark, &item, meshIndex, offset, vel, spriteIndex);
+		auto& part = *SetupFireSpark();
+		AttachAndCreateSpark(&part, &item, meshID, offset, vel, spriteID);
 
-		spark.flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		part.flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 }
 
-void ThrowFire(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel, int spriteIndex)
+void ThrowFire(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel, int spriteID)
 {
-	ThrowFire(itemNumber, bite.BoneID, bite.Position, vel, spriteIndex);
+	ThrowFire(itemNumber, bite.BoneID, bite.Position, vel, spriteID);
 }
 
-void ThrowPoison(const ItemInfo& item, int boneID, const Vector3& offset, const Vector3& vel, const Color& colorStart, const Color& colorEnd, int spriteIndex)
+void ThrowPoison(const ItemInfo& item, int boneID, const Vector3& offset, const Vector3& vel, const Color& colorStart, const Color& colorEnd, int spriteID)
 {
 	constexpr auto COUNT = 2;
 
 	for (int i = 0; i < COUNT; i++)
 	{
 		auto& part = SetupPoisonParticle(colorStart, colorEnd);
-		AttachAndCreateSpark(&part, &item, boneID, offset, vel, spriteIndex);
+		AttachAndCreateSpark(&part, &item, boneID, offset, vel, spriteID);
 		part.flags = SP_POISON | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 }
 
-void ThrowPoison(const ItemInfo& item, const CreatureBiteInfo& bite, const Vector3& vel, const Color& colorStart, const Color& colorEnd, int spriteIndex)
+void ThrowPoison(const ItemInfo& item, const CreatureBiteInfo& bite, const Vector3& vel, const Color& colorStart, const Color& colorEnd, int spriteID)
 {
-	ThrowPoison(item, bite.BoneID, bite.Position, vel, colorStart, colorEnd, spriteIndex);
+	ThrowPoison(item, bite.BoneID, bite.Position, vel, colorStart, colorEnd, spriteID);
 }
 
 void UpdateFireProgress()
