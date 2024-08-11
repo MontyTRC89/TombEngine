@@ -465,11 +465,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 				const auto& vertex2 = vertices.Ceil.Tri1.Vertex0;
 				const auto& vertex3 = vertices.Ceil.Tri1.Vertex2;
 
-				//insertFullCardinalWallTriangles(vertex0, vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
-				if (vertex0 != vertex2)
-					CollisionMesh.InsertTriangle(vertex0, vertex1, vertex2, NORTH_WALL_NORMAL);
-				if (vertex1 != vertex3)
-					CollisionMesh.InsertTriangle(vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
+				insertFullCardinalWallTriangles(CollisionMesh, vertex0, vertex1, vertex2, vertex3, NORTH_WALL_NORMAL);
 			}
 			// Step wall.
 			else if (!isPrevZTriWall && !surfVerts.PrevNeighborZ.IsWall)
