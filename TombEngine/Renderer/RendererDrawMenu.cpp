@@ -67,15 +67,21 @@ namespace TEN::Renderer
 	inline int SF_Center(bool selected = false) { return (int)PrintStringFlags::Outline | (int)PrintStringFlags::Center | (selected ? (int)PrintStringFlags::Blink : 0); }
 
 	// Helper functions to get specific generic strings
-	inline const char* Str_Enabled(bool enabled = false) { return g_GameFlow->GetString(enabled ? STRING_ENABLED : STRING_DISABLED); }
-	inline const char* Str_LoadSave(bool save = false) { return g_GameFlow->GetString(save ? STRING_SAVE_GAME : STRING_LOAD_GAME); }
-	inline const char* Str_MenuOptionLooping(MenuOptionLooping looping)
+	inline const std::string Str_Enabled(bool enabled = false) { return g_GameFlow->GetString(enabled ? STRING_ENABLED : STRING_DISABLED); }
+	inline const std::string Str_LoadSave(bool save = false) { return g_GameFlow->GetString(save ? STRING_SAVE_GAME : STRING_LOAD_GAME); }
+	inline const std::string Str_MenuOptionLoopingMode(MenuOptionLoopingMode loopingMode)
 	{
-		switch (looping)
+		switch (loopingMode)
 		{
-			case MenuOptionLooping::SaveLoadOnly: return g_GameFlow->GetString(STRING_SAVE_LOAD_ONLY);
-			case MenuOptionLooping::AllMenus: return g_GameFlow->GetString(STRING_ALL_MENUS);
-			default: return g_GameFlow->GetString(STRING_DISABLED);
+		default:
+			case MenuOptionLoopingMode::AllMenus:
+				return g_GameFlow->GetString(STRING_MENU_OPT_LOOP_ALL_MENUS);
+
+			case MenuOptionLoopingMode::SaveLoadOnly:
+				return g_GameFlow->GetString(STRING_MENU_OPT_LOOP_SAVE_LOAD_ONLY);
+
+			case MenuOptionLoopingMode::Disabled:
+				return g_GameFlow->GetString(STRING_MENU_OPT_LOOP_DISABLED);
 		}
 	}
 
@@ -270,9 +276,9 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 9));
 			GetNextLinePosition(&y);
 
-			// Menu loop
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MENU_OPTION_LOOPING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 10));
-			AddString(MenuRightSideEntry, y, Str_MenuOptionLooping(g_Gui.GetCurrentSettings().Configuration.MenuOptionLooping), PRINTSTRING_COLOR_WHITE, SF(titleOption == 10));
+			// Menu option looping
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MENU_OPT_LOOP), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 10));
+			AddString(MenuRightSideEntry, y, Str_MenuOptionLoopingMode(g_Gui.GetCurrentSettings().Configuration.MenuOptionLoopingMode), PRINTSTRING_COLOR_WHITE, SF(titleOption == 10));
 			GetNextBlockPosition(&y);
 
 			// Apply

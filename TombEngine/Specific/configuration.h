@@ -45,16 +45,14 @@ constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	= "EnableThumbstickCamera";
 
 // Input keys
 
-constexpr auto REGKEY_MOUSE_SENSITIVITY = "MouseSensitivity";
-constexpr auto REGKEY_MENU_OPTION_LOOPING = "MenuOptionLooping";
+constexpr auto REGKEY_MOUSE_SENSITIVITY			 = "MouseSensitivity";
+constexpr auto REGKEY_ENABLE_MENU_OPTION_LOOPING = "EnableMenuOptionLooping";
 
-// Enums
-
-enum MenuOptionLooping
+enum class MenuOptionLoopingMode
 {
-	Disabled,
+	AllMenus,
 	SaveLoadOnly,
-	AllMenus
+	Disabled
 };
 
 struct GameConfiguration
@@ -95,9 +93,9 @@ struct GameConfiguration
 
 	// Input
 
-	int	 MouseSensitivity = DEFAULT_MOUSE_SENSITIVITY;
-	MenuOptionLooping MenuOptionLooping = MenuOptionLooping::SaveLoadOnly;
-	std::vector<int> Bindings = {};
+	int					  MouseSensitivity		= DEFAULT_MOUSE_SENSITIVITY;
+	MenuOptionLoopingMode MenuOptionLoopingMode = MenuOptionLoopingMode::AllMenus;
+	std::vector<int>	  Bindings				= {};
 
 	std::vector<Vector2i> SupportedScreenResolutions = {};
 	std::string			  AdapterName				 = {};
