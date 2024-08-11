@@ -57,17 +57,19 @@ namespace TEN::Entities::Creatures::TR3
 		OCB_TRAP = 1
 	};
 
-	static void ThrowSealMutantGas(const ItemInfo& item, const ItemInfo* enemy, float vel)
+	static void SpawnSealMutantPoisonGas(ItemInfo& item, float vel)
 	{
 		constexpr auto GAS_COUNT			 = 3;
 		constexpr auto VEL_MULT				 = 5.0f;
 		constexpr auto PLAYER_CROUCH_GRAVITY = 32.0f;
 
+		auto& creature = *GetCreatureInfo(&item);
+
 		// HACK.
 		float gravity = 0.0f;
-		if (enemy != nullptr && enemy->IsLara())
+		if (creature.Enemy != nullptr && creature.Enemy->IsLara())
 		{
-			const auto& player = GetLaraInfo(*enemy);
+			const auto& player = GetLaraInfo(*creature.Enemy);
 			if (player.Control.IsLow)
 				gravity = PLAYER_CROUCH_GRAVITY;
 		}
@@ -117,7 +119,7 @@ namespace TEN::Entities::Creatures::TR3
 						if (gasVel > 24.0f)
 							gasVel = Random::GenerateFloat(8.0f, 24.0f);
 
-						ThrowSealMutantGas(item, nullptr, gasVel);
+						SpawnSealMutantPoisonGas(item, gasVel);
 					}
 				}
 			}
@@ -181,7 +183,7 @@ namespace TEN::Entities::Creatures::TR3
 					if (gasVel > 24.0f)
 						gasVel = Random::GenerateFloat(16.0f, 24.0f);
 
-					ThrowSealMutantGas(item, creature.Enemy, gasVel);
+					SpawnSealMutantPoisonGas(item, gasVel);
 				}
 			}
 		}
@@ -303,7 +305,7 @@ namespace TEN::Entities::Creatures::TR3
 						gasVel = Random::GenerateFloat(16.0f, 24.0f);
 					}
 
-					ThrowSealMutantGas(item, creature.Enemy, gasVel);
+					SpawnSealMutantPoisonGas(item, gasVel);
 					if (creature.Enemy != nullptr && !creature.Enemy->IsLara())
 						creature.Enemy->HitStatus = true;
 				}
