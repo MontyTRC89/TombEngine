@@ -257,32 +257,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	// ----DEBUG
 	
-	// Tree of moveables in room.
-
-	auto movIds = std::vector<int>{};
-	auto aabbs = std::vector<BoundingBox>{};
-
-	const auto& room2 = g_Level.Rooms[item->RoomNumber];
-	int movID = room2.itemNumber;
-	while (movID != NO_VALUE)
-	{
-		const auto& mov = g_Level.Items[movID];
-		if (movID == mov.NextItem)
-			break;
-		movID = mov.NextItem;
-
-		if (movID != NO_VALUE)
-		{
-			if (g_Level.Items[movID].IsBridge())
-				continue;
-
-			movIds.push_back(movID);
-			aabbs.push_back(GetAabb(g_Level.Items[movID].GetObb()));
-		}
-	}
-	auto tree = BoundingTree(movIds, aabbs);
-	tree.DrawDebug();
-
 	// Sphere-triangle collision debug.
 
 	auto sphere = BoundingSphere(Geometry::TranslatePoint(item->Pose.Position.ToVector3(), g_Camera.actualAngle, BLOCK(0.6f)) + Vector3(0, -BLOCK(1), 0), BLOCK(0.5f));
