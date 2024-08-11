@@ -284,12 +284,14 @@ namespace TEN::Gui
 			HomeLevel,
 			LoadGame,
 			Options,
-			ExitGame
+			ExitGame,
+
+			Count
 		};
 
-		static const int numTitleOptions	= 4;
-		static const int numLoadGameOptions = SAVEGAME_MAX - 1;
-		static const int numOptionsOptions	= 2;
+		constexpr auto TITLE_OPTION_COUNT	  = TitleOption::Count - 1;
+		constexpr auto LOAD_GAME_OPTION_COUNT = SAVEGAME_MAX - 1;
+		constexpr auto OPTION_OPTION_COUNT	  = 2;
 
 		static int selectedOptionBackup;
 		auto inventoryResult = InventoryResult::None;
@@ -301,7 +303,7 @@ namespace TEN::Gui
 		switch (MenuToDisplay)
 		{
 		case Menu::Title:
-			OptionCount = numTitleOptions;
+			OptionCount = TITLE_OPTION_COUNT;
 
 			if (!g_GameFlow->IsHomeLevelEnabled())
 				OptionCount--;
@@ -321,11 +323,11 @@ namespace TEN::Gui
 			break;
 
 		case Menu::LoadGame:
-			OptionCount = numLoadGameOptions;
+			OptionCount = LOAD_GAME_OPTION_COUNT;
 			break;
 
 		case Menu::Options:
-			OptionCount = numOptionsOptions;
+			OptionCount = OPTION_OPTION_COUNT;
 			break;
 
 		case Menu::Display:
@@ -383,7 +385,7 @@ namespace TEN::Gui
 				{
 					int realSelectedOption = SelectedOption;
 
-					// Skip Home Level entry if the home level is disabled.
+					// Skip Home Level entry if home level is disabled.
 					if (!g_GameFlow->IsHomeLevelEnabled() && realSelectedOption > TitleOption::NewGame)
 						realSelectedOption++;
 
@@ -431,11 +433,10 @@ namespace TEN::Gui
 				}
 				else if (MenuToDisplay == Menu::SelectLevel)
 				{
-					// Level 0 is the title level, so increment the option by 1 to offset it.
+					// Level 0 is Title Level; increment option to offset it.
 					g_GameFlow->SelectedLevelForNewGame = SelectedOption + 1;
 
-					// Level 1 is reserved for the home level,
-					// so increment the option by 1 if the home level is enabled.
+					// Level 1 reserved for Home Level; increment option if enabled to offset it.
 					if (g_GameFlow->IsHomeLevelEnabled())
 						g_GameFlow->SelectedLevelForNewGame++;
 

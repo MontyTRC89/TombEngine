@@ -75,19 +75,19 @@ public:
 	void		SetTitleScreenImagePath(const std::string& path);
 	void		SetTotalSecretCount(int secretsNumber);
 	bool		IsFlyCheatEnabled() const;
-	void		EnableFlyCheat(bool flyCheat);
+	void		EnableFlyCheat(bool enable);
 	bool		IsPointFilterEnabled() const;
-	void		EnablePointFilter(bool pointFilter);
+	void		EnablePointFilter(bool enable);
 	bool		IsMassPickupEnabled() const;
-	void		EnableMassPickup(bool massPickup);
+	void		EnableMassPickup(bool enable);
 	bool		IsLaraInTitleEnabled() const;
-	void		EnableLaraInTitle(bool laraInTitle);
+	void		EnableLaraInTitle(bool enable);
 	bool		IsLevelSelectEnabled() const;
-	void		EnableLevelSelect(bool laraInTitle);
+	void		EnableLevelSelect(bool enable);
 	bool		IsHomeLevelEnabled() const;
-	void		EnableHomeLevel(bool laraHome);
+	void		EnableHomeLevel(bool enable);
 	bool		IsLoadSaveEnabled() const;
-	void		EnableLoadSave(bool loadSave);
+	void		EnableLoadSave(bool enable);
 
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
 	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }
