@@ -71,7 +71,7 @@ namespace TEN::Entities::Generic
 		spark->dSize = spark->size / 8;
 
 		spark->SpriteSeqAssetID = ID_FIRE_SPRITES;
-		spark->SpriteAssetID = GameTimer % GetSpriteSequenceAsset(ID_FIRE_SPRITES).Sprites.size();
+		spark->SpriteAssetID = GameTimer % (int)GetSpriteSequenceAsset(ID_FIRE_SPRITES).Sprites.size();
 	}
 
 	void DoFlameTorch()

@@ -237,7 +237,7 @@ namespace TEN::Entities::Creatures::TR2
 			dir *= VEL;
 
 			fire.SpriteSeqAssetID = ID_FIRE_SPRITES;
-			fire.SpriteAssetID = Random::GenerateInt(0, GetSpriteSequenceAsset(ID_FIRE_SPRITES).Sprites.size() - 1);
+			fire.SpriteAssetID = Random::GenerateInt(0, (int)GetSpriteSequenceAsset(ID_FIRE_SPRITES).Sprites.size() - 1);
 
 			fire.x = pos.x;
 			fire.y = pos.y;
@@ -296,7 +296,7 @@ namespace TEN::Entities::Creatures::TR2
 			auto& smoke = *GetFreeParticle();
 
 			smoke.SpriteSeqAssetID = ID_SMOKE_SPRITES;
-			smoke.SpriteAssetID = Random::GenerateInt(0, GetSpriteSequenceAsset(ID_SMOKE_SPRITES).Sprites.size() - 1);
+			smoke.SpriteAssetID = Random::GenerateInt(0, (int)GetSpriteSequenceAsset(ID_SMOKE_SPRITES).Sprites.size() - 1);
 			smoke.on = true;
 			smoke.x = pos.x;
 			smoke.y = pos.y;
