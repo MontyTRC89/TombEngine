@@ -16,8 +16,8 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {
-	constexpr auto SEAL_MUTANT_ALERT_RANGE	= SQUARE(BLOCK(1));
-	constexpr auto SEAL_MUTANT_ATTACK_RANGE = SQUARE(BLOCK(4));
+	constexpr auto SEAL_MUTANT_ALERT_RANGE	= SQUARE(BLOCK(1.0f));
+	constexpr auto SEAL_MUTANT_ATTACK_RANGE = SQUARE(BLOCK(1.25f));
 
 	constexpr auto SEAL_MUTANT_WALK_TURN_RATE = ANGLE(3.0f);
 
@@ -87,7 +87,7 @@ namespace TEN::Entities::Creatures::TR3
 		auto colorEnd = Color(Random::GenerateFloat(0.05f, 0.1f), Random::GenerateFloat(0.05f, 0.1f), 0.0f);
 
 		for (int i = 0; i < GAS_COUNT; i++)
-			ThrowPoison(item, SealMutantGasBite, velVector, colorStart, colorEnd);
+			ThrowPoison(item, SealMutantGasBite, velVector, colorStart, colorEnd, item.ItemFlags[0]);
 	}
 
 	void ControlSealMutant(short itemNumber)
@@ -116,7 +116,7 @@ namespace TEN::Entities::Creatures::TR3
 				gasVel = (float)(item.Animation.FrameNumber - (anim.frameBase + 1));
 				if (gasVel > 24.0f)
 				{
-					gasVel = (float)((anim.frameEnd - 8) - item.Animation.FrameNumber);
+					gasVel = (float)(item.Animation.FrameNumber - (anim.frameEnd - 8));
 					if (gasVel <= 0.0f)
 						gasVel = 1.0f;
 
@@ -167,19 +167,19 @@ namespace TEN::Entities::Creatures::TR3
 
 				// TODO: Proper color values.
 				auto color = Color();
-				color.z = GetRandomControl();
-				color.x = (burnTimer * (255 - (((byte)color.z / 16) & 0x1F))) / 16;
-				color.y = (burnTimer * (192 - (((byte)color.z / 64) & 0x3F))) / 16;
-				color.z = (burnTimer * ((byte)color.z & 0x3F)) / 16;
+				int rand = GetRandomControl();
+				color.x = (float)((burnTimer * (255 - (((byte)rand / 16) & 0x1F))) / 16) / 255.0f;
+				color.y = (float)((burnTimer * (192 - (((byte)rand / 64) & 0x3F))) / 16) / 255.0f;
+				color.z = (float)((burnTimer * ((byte)rand & 0x3F)) / 16) / 255.0f;
 				TriggerDynamicLight(item.Pose.Position.ToVector3(), color, 12.0f);
 			}
 			// TODO: Check. Third argument is supposed to be end frame - 8.
-			else if (TestAnimFrameRange(item, 1, 8))
+			else if (TestAnimFrameRange(item, 1, 124))
 			{
-				gasVel = item.Animation.FrameNumber - (anim.frameBase + 1);
+				gasVel = (float)(item.Animation.FrameNumber - (anim.frameBase + 1));
 				if (gasVel > 24.0f)
 				{
-					gasVel = (anim.frameEnd - item.Animation.FrameNumber) - 8.0f;
+					gasVel = (float)(item.Animation.FrameNumber - (anim.frameEnd - 8));
 					if (gasVel <= 0.0f)
 						gasVel = 1.0f;
 
