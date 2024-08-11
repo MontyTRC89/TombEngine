@@ -60,7 +60,7 @@ namespace TEN::Effects::Explosion
 			e.pos += e.vel;
 			e.angularVel *= 0.98f;
 			e.rotation += e.angularVel;
-			int spriteCount = GetSpriteSequenceAsset(ID_EXPLOSION_SPRITES).Sprites.size() - 1; // TODO: Not calculated correctly.
+			int spriteCount = (int)GetSpriteSequenceAsset(ID_EXPLOSION_SPRITES).Sprites.size() - 1; // TODO: Not calculated correctly.
 			float normalizedAge = e.age / e.life;
 			e.SpriteAssetID = Lerp(0.0f, spriteCount, normalizedAge);
 			e.tint = Vector4::Lerp(Vector4(2, 2, 2, 1), Vector4::Zero, normalizedAge);
