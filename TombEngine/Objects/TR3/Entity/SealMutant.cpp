@@ -166,12 +166,11 @@ namespace TEN::Entities::Creatures::TR3
 				}
 
 				// TODO: Proper color values.
-				auto color = Color();
 				int rand = GetRandomControl();
-				color.x = (float)((burnTimer * (255 - (((byte)rand / 16) & 0x1F))) / 16) / 255.0f;
-				color.y = (float)((burnTimer * (192 - (((byte)rand / 64) & 0x3F))) / 16) / 255.0f;
-				color.z = (float)((burnTimer * ((byte)rand & 0x3F)) / 16) / 255.0f;
-				TriggerDynamicLight(item.Pose.Position.ToVector3(), color, 12.0f);
+				byte r = ((burnTimer * (255 - (((byte)rand / 16) & 0x1F))) / 16);
+				byte g = (burnTimer * (192 - (((byte)rand / 64) & 0x3F))) / 16;
+				byte b = (burnTimer * ((byte)rand & 0x3F)) / 16;
+				TriggerDynamicLight(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, 12.0f, r, g, b);
 			}
 			// TODO: Check. Third argument is supposed to be end frame - 8.
 			else if (TestAnimFrameRange(item, 1, 124))
