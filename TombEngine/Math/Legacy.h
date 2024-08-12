@@ -11,15 +11,20 @@ namespace TEN::Math
 	constexpr auto SHORTS_TO_1_DEGREE = 65536.0f / 360.0f;
 	constexpr auto DEGREES_TO_1_SHORT = 360.0f / 65536.0f;
 
-	constexpr short ANGLE(float degrees)
-	{
-		return short(degrees * SHORTS_TO_1_DEGREE);
-	}
+constexpr float ROUND(float value)
+{
+	return ((value > 0.0f) ? int(value + 0.5f) : int(value - 0.5f));
+}
 
-	constexpr short FROM_RAD(float radians)
-	{
-		return short((radians / RADIAN) * SHORTS_TO_1_DEGREE);
-	}
+constexpr short ANGLE(float degrees)
+{
+	return (short)ROUND(degrees * SHORTS_TO_1_DEGREE);
+}
+
+constexpr short FROM_RAD(float radians)
+{
+	return (short)ROUND((radians / RADIAN) * SHORTS_TO_1_DEGREE);
+}
 
 	constexpr float TO_DEGREES(short shortAngle)
 	{

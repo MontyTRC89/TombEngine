@@ -163,7 +163,7 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
 	auto basePos = Vector3i(
 		item.Pose.Position.x,
-		isInSwamp ? g_Level.Rooms[item.RoomNumber].maxceiling : item.Pose.Position.y,
+		isInSwamp ? g_Level.Rooms[item.RoomNumber].TopHeight : item.Pose.Position.y,
 		item.Pose.Position.z);
 
 	// Define landmarks.
@@ -340,7 +340,7 @@ void MoveCamera(GameVector* ideal, int speed)
 
 	int y = Camera.pos.y;
 	if (TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber))
-		y = g_Level.Rooms[Camera.pos.RoomNumber].y - CLICK(1);
+		y = g_Level.Rooms[Camera.pos.RoomNumber].Position.y - CLICK(1);
 
 	auto pointColl = GetPointCollision(Vector3i(Camera.pos.x, y, Camera.pos.z), Camera.pos.RoomNumber);
 	if (y < pointColl.GetCeilingHeight() ||
@@ -531,7 +531,7 @@ void ChaseCamera(ItemInfo* item)
 	auto pointColl = GetPointCollision(Vector3i(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z), Camera.target.RoomNumber);
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.GetRoomNumber()))
-		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].maxceiling - CLICK(1);
+		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].TopHeight - CLICK(1);
 
 	int y = Camera.target.y;
 	pointColl = GetPointCollision(Vector3i(Camera.target.x, y, Camera.target.z), Camera.target.RoomNumber);
@@ -649,7 +649,7 @@ void CombatCamera(ItemInfo* item)
 
 	auto pointColl = GetPointCollision(Vector3i(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z), Camera.target.RoomNumber);
 	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.GetRoomNumber()))
-		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].y - CLICK(1);
+		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].Position.y - CLICK(1);
 
 	pointColl = GetPointCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber);
 	Camera.target.RoomNumber = pointColl.GetRoomNumber();
@@ -1390,7 +1390,7 @@ bool CheckItemCollideCamera(ItemInfo* item)
 static std::vector<int> FillCollideableItemList()
 {
 	auto itemList = std::vector<int>{};
-	auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
+	auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].NeighborRoomNumbers;
 
 	for (short i = 0; i < g_Level.NumItems; i++)
 	{
@@ -1440,7 +1440,7 @@ bool CheckStaticCollideCamera(MESH_INFO* mesh)
 std::vector<MESH_INFO*> FillCollideableStaticsList()
 {
 	std::vector<MESH_INFO*> staticList;
-	auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
+	auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].NeighborRoomNumbers;
 
 	for (int i : roomList)
 	{

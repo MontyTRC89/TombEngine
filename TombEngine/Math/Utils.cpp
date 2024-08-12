@@ -3,29 +3,42 @@
 
 namespace TEN::Math
 {
+	float FloorToStep(float value, float step)
+	{
+		return (floor(value / step) * step);
+	}
+
+	float CeilToStep(float value, float step)
+	{
+		return (ceil(value / step) * step);
+	}
+
+	float RoundToStep(float value, float step)
+	{
+		return (round(value / step) * step);
+	}
+
+	float Remap(float value, float min0, float max0, float min1, float max1)
+	{
+		float alpha = (value - min0) / (max0 - min0);
+		return Lerp(min1, max1, alpha);
+	}
+
 	float Lerp(float value0, float value1, float alpha)
 	{
 		alpha = std::clamp(alpha, 0.0f, 1.0f);
 		return (((1.0f - alpha) * value0) + (alpha * value1));
 	}
 
-	float InterpolateCos(float value0, float value1, float alpha)
+	float Smoothstep(float value0, float value1, float alpha)
 	{
-		alpha = std::clamp(alpha, 0.0f, 1.0f);
-		return Lerp(value0, value1, (1 - cos(alpha * PI)) * 0.5f);
-	}
+		alpha = std::clamp(alpha, value0, value1);
 
-	float InterpolateCubic(float value0, float value1, float value2, float value3, float alpha)
-	{
-		alpha = std::clamp(alpha, 0.0f, 1.0f);
+		// Scale, bias, and saturate alpha to [0, 1] range.
+		alpha = std::clamp((alpha - value0) / (value1 - value0), 0.0f, 1.0f);
 
-		float p = (value3 - value2) - (value0 - value1);
-		float q = (value0 - value1) - p;
-		float r = value2 - value0;
-		float s = value1;
-		float x = alpha;
-		float xSquared = SQUARE(x);
-		return ((p * xSquared * x) + (q * xSquared) + (r * x) + s);
+		// Evaluate polynomial.
+		return (CUBE(alpha) * (alpha * ((alpha * 6) - 15.0f) + 10.0f));
 	}
 
 	float Smoothstep(float alpha)
@@ -33,32 +46,44 @@ namespace TEN::Math
 		return Smoothstep(0.0f, 1.0f, alpha);
 	}
 
-	float Smoothstep(float value0, float value1, float alpha)
+	float EaseInSine(float value0, float value1, float alpha)
 	{
-		alpha = std::clamp(alpha, value0, value1);
+		alpha = std::clamp(alpha, 0.0f, 1.0f);
+		return Lerp(value0, value1, 1.0f - cos((alpha * PI) / 2));
+	}
 
-		// Don't process if input value is same as one of the values.
-		if (alpha == value0)
-		{
-			return value0;
-		}
-		else if (alpha == value1)
-		{
-			return value1;
-		}
+	float EaseInSine(float alpha)
+	{
+		return EaseInSine(0.0f, 1.0f, alpha);
+	}
 
-		// Scale, bias, and saturate alpha to [0, 1] range.
-		alpha = std::clamp((alpha - value0) / (value1 - value0), 0.0f, 1.0f);
+	float EaseOutSine(float value0, float value1, float alpha)
+	{
+		alpha = std::clamp(alpha, 0.0f, 1.0f);
+		return Lerp(value0, value1, sin((alpha * PI) / 2));
+	}
+	
+	float EaseOutSine(float alpha)
+	{
+		return EaseOutSine(0.0f, 1.0f, alpha);
+	}
 
-		// Evaluate polynomial.
-		return (CUBE(alpha) * (alpha * (alpha * 6 - 15) + 10));
+	float EaseInOutSine(float value0, float value1, float alpha)
+	{
+		alpha = std::clamp(alpha, 0.0f, 1.0f);
+		return Lerp(value0, value1, (1.0f - cos(alpha * PI)) / 2);
+	}
+	
+	float EaseInOutSine(float alpha)
+	{
+		return EaseInOutSine(0.0f, 1.0f, alpha);
 	}
 
 	float Luma(const Vector3& color)
 	{
-		constexpr auto RED_COEFF = 0.2126f;
+		constexpr auto RED_COEFF   = 0.2126f;
 		constexpr auto GREEN_COEFF = 0.7152f;
-		constexpr auto BLUE_COEFF = 0.0722f;
+		constexpr auto BLUE_COEFF  = 0.0722f;
 
 		// Use Rec.709 trichromat formula to get perceptive luma value.
 		return float((color.x * RED_COEFF) + (color.y * GREEN_COEFF) + (color.z * BLUE_COEFF));
@@ -80,20 +105,5 @@ namespace TEN::Math
 	{
 		auto result = Screen(Vector3(ambient), Vector3(tint));
 		return Vector4(result.x, result.y, result.z, ambient.w * tint.w);
-	}
-
-	float FloorToStep(float value, float step)
-	{
-		return (floor(value / step) * step);
-	}
-
-	float CeilToStep(float value, float step)
-	{
-		return (ceil(value / step) * step);
-	}
-
-	float RoundToStep(float value, float step)
-	{
-		return (round(value / step) * step);
 	}
 }

@@ -1081,7 +1081,7 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 int GetWaterSurface(int x, int y, int z, short roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
-	auto* sector = GetSector(room, x - room->x, z - room->z);
+	auto* sector = GetSector(room, x - room->Position.x, z - room->Position.z);
 
 	if (TestEnvironment(ENV_FLAG_WATER, room))
 	{
@@ -1091,7 +1091,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 			if (!TestEnvironment(ENV_FLAG_WATER, room))
 				return (sector->GetSurfaceHeight(x, z, false));
 
-			sector = GetSector(room, x - room->x, z - room->z);
+			sector = GetSector(room, x - room->Position.x, z - room->Position.z);
 		}
 
 		return NO_HEIGHT;
@@ -1104,7 +1104,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 			if (TestEnvironment(ENV_FLAG_WATER, room))
 				return (sector->GetSurfaceHeight(x, z, true));
 
-			sector = GetSector(room, x - room->x, z - room->z);
+			sector = GetSector(room, x - room->Position.x, z - room->Position.z);
 		}
 	}
 
@@ -1124,8 +1124,8 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 	int adjoiningRoomNumber = NO_VALUE;
 	do
 	{
-		int xFloor = (x - room->x) / BLOCK(1);
-		int zFloor = (z - room->z) / BLOCK(1);
+		int xFloor = (x - room->Position.x) / BLOCK(1);
+		int zFloor = (z - room->Position.z) / BLOCK(1);
 
 		if (zFloor <= 0)
 		{
@@ -1134,33 +1134,33 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			{
 				xFloor = 1;
 			}
-			else if (xFloor > (room->xSize - 2))
+			else if (xFloor > (room->XSize - 2))
 			{
-				xFloor = room->xSize - 2;
+				xFloor = room->XSize - 2;
 			}
 		}
-		else if (zFloor >= (room->zSize - 1))
+		else if (zFloor >= (room->ZSize - 1))
 		{
-			zFloor = room->zSize - 1;
+			zFloor = room->ZSize - 1;
 			if (xFloor < 1)
 			{
 				xFloor = 1;
 			}
-			else if (xFloor > (room->xSize - 2))
+			else if (xFloor > (room->XSize - 2))
 			{
-				xFloor = room->xSize - 2;
+				xFloor = room->XSize - 2;
 			}
 		}
 		else if (xFloor < 0)
 		{
 			xFloor = 0;
 		}
-		else if (xFloor >= room->xSize)
+		else if (xFloor >= room->XSize)
 		{
-			xFloor = room->xSize - 1;
+			xFloor = room->XSize - 1;
 		}
 
-		sector = &room->floor[zFloor + (xFloor * room->zSize)];
+		sector = &room->Sectors[zFloor + (xFloor * room->ZSize)];
 		adjoiningRoomNumber = sector->SidePortalRoomNumber;
 		if (adjoiningRoomNumber != NO_VALUE)
 		{
@@ -1185,7 +1185,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 				return (floorHeight - waterHeight);
 			}
 
-			sector = GetSector(room, x - room->x, z - room->z);
+			sector = GetSector(room, x - room->Position.x, z - room->Position.z);
 		}
 
 		return DEEP_WATER;
@@ -1204,7 +1204,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 				return (GetFloorHeight(sector, x, y, z) - waterHeight);
 			}
 
-			sector = GetSector(room, x - room->x, z - room->z);
+			sector = GetSector(room, x - room->Position.x, z - room->Position.z);
 		}
 
 		return NO_HEIGHT;
@@ -1224,8 +1224,8 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	int adjoiningRoomNumber = NO_VALUE;
 	do
 	{
-		int xBlock = (x - room->x) / BLOCK(1);
-		int zBlock = (z - room->z) / BLOCK(1);
+		int xBlock = (x - room->Position.x) / BLOCK(1);
+		int zBlock = (z - room->Position.z) / BLOCK(1);
 
 		if (zBlock <= 0)
 		{
@@ -1234,33 +1234,33 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 			{
 				xBlock = 1;
 			}
-			else if (xBlock > (room->xSize - 2))
+			else if (xBlock > (room->XSize - 2))
 			{
-				xBlock = room->xSize - 2;
+				xBlock = room->XSize - 2;
 			}
 		}
-		else if (zBlock >= (room->zSize - 1))
+		else if (zBlock >= (room->ZSize - 1))
 		{
-			zBlock = room->zSize - 1;
+			zBlock = room->ZSize - 1;
 			if (xBlock < 1)
 			{
 				xBlock = 1;
 			}
-			else if (xBlock > (room->xSize - 2))
+			else if (xBlock > (room->XSize - 2))
 			{
-				xBlock = room->xSize - 2;
+				xBlock = room->XSize - 2;
 			}
 		}
 		else if (xBlock < 0)
 		{
 			xBlock = 0;
 		}
-		else if (xBlock >= room->xSize)
+		else if (xBlock >= room->XSize)
 		{
-			xBlock = room->xSize - 1;
+			xBlock = room->XSize - 1;
 		}
 
-		sector = &room->floor[zBlock + (xBlock * room->zSize)];
+		sector = &room->Sectors[zBlock + (xBlock * room->ZSize)];
 		adjoiningRoomNumber = sector->SidePortalRoomNumber;
 
 		if (adjoiningRoomNumber != NO_VALUE)
@@ -1287,7 +1287,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 				break;
 			}
 
-			sector = GetSector(room, x - room->x, z - room->z);
+			sector = GetSector(room, x - room->Position.x, z - room->Position.z);
 		}
 
 		return sector->GetSurfaceHeight(Vector3i(x, y, z), false);
@@ -1304,7 +1304,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 				break;
 			}
 
-			sector = GetSector(room2, x - room2->x, z - room2->z);
+			sector = GetSector(room2, x - room2->Position.x, z - room2->Position.z);
 		}
 
 		return sector->GetSurfaceHeight(Vector3i(x, y, z), true);

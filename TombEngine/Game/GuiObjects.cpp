@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/GuiObjects.h"
 
 #include "Game/Lara/lara.h"
