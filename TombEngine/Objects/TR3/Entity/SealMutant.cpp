@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "Objects/TR3/Entity/SealMutant.h"
 
 #include "Game/animation.h"
 #include "Game/control/box.h"
