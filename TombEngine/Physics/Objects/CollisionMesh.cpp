@@ -305,7 +305,7 @@ namespace TEN::Physics
 				return vertexID;
 			}
 			
-			// Add and cache new vertex.
+			// Add, cache, and get new vertex ID.
 			int vertexID = _vertices.size();
 			_vertices.push_back(vertex);
 			_cache.VertexMap[vertex] = vertexID;
@@ -322,7 +322,7 @@ namespace TEN::Physics
 				return normalID;
 			}
 
-			// Add and cache new normal.
+			// Add, cache, and get new normal ID.
 			int normalID = _normals.size();
 			_normals.push_back(normal);
 			_cache.NormalMap[normal] = normalID;

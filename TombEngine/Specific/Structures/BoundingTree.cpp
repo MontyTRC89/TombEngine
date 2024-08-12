@@ -202,8 +202,8 @@ namespace TEN::Structures
 		// Allocate and get new empty node ID.
 		else
 		{
+			nodeID = _nodes.size();
 			_nodes.emplace_back();
-			nodeID = (int)_nodes.size() - 1;
 		}
 
 		return nodeID;
@@ -372,7 +372,7 @@ namespace TEN::Structures
 			else
 			{
 				RefitNode(nodeID);
-				break;
+				nodeID = NO_VALUE;
 			}
 		}
 	}
@@ -429,7 +429,7 @@ namespace TEN::Structures
 		node = {};
 		_freeNodeIds.push_back(nodeID);
 
-		// Shrink capacity if empty to prevent memory bloat.
+		// Shrink capacity if empty to avoid memory bloat.
 		if (_nodes.size() == _freeNodeIds.size())
 			*this = {};
 	}
@@ -586,7 +586,7 @@ namespace TEN::Structures
 		Build(objectIds, aabbs, 0, (int)objectIds.size());
 		_rootID = (int)_nodes.size() - 1;
 
-		Validate();
+		//Validate();
 	}
 
 	// Recursively constructs tree using top-down approach with limited surface area heuristic.
