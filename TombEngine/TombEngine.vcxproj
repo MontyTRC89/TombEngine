@@ -760,6 +760,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Structures\RendererStatic.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererTriangle3D.h" />
+    <ClInclude Include="Resource.h" />
     <ClInclude Include="Scripting\Include\Flow\ScriptInterfaceFlowHandler.h" />
     <ClInclude Include="Scripting\Include\Objects\ScriptInterfaceObjectsHandler.h" />
     <ClInclude Include="Scripting\Include\ScriptInterfaceGame.h" />
@@ -850,7 +851,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Specific\savegame\flatbuffers\ten_savegame_generated.h" />
     <ClInclude Include="Specific\trutils.h" />
     <ClInclude Include="Specific\winmain.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>

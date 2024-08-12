@@ -34,6 +34,10 @@
 // TODO: Remove this and everything that relies on it.
 #include <codecvt>
 
+// BASS
+#include <bass.h>
+#include <bass_fx.h>
+
 // DirectX
 #include <CommonStates.h>
 #include <d3d11.h>
@@ -44,28 +48,24 @@
 #include <SpriteFont.h>
 #include <WICTextureLoader.h>
 
-// WRL
-#include <wrl/client.h>
-
-// BASS
-#include <bass.h>
-#include <bass_fx.h>
-
-// OIS
-#include <OISKeyboard.h>
-
-// zlib
-#include <zlib.h>
-
-// DXTK
+// DirectX Tool Kit
 #include <SimpleMath.h>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+// OIS
+#include <OISKeyboard.h>
+
+// WRL
+#include <wrl/client.h>
+
+// zlib
+#include <zlib.h>
+
 // Resources
 #include "Math/Math.h"
-#include "resource.h"
+#include "Resource.h"
 
 using namespace TEN::Math;
 
