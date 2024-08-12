@@ -1,4 +1,3 @@
-#pragma once
 #include "Scripting/Internal/TEN/Objects/Volume/VolumeObject.h"
 
 #include "Scripting/Internal/ReservedScriptNames.h"

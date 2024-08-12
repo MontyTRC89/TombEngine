@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Objects\objectslist.h"
 
 enum class BlendMode;

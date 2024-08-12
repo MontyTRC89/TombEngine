@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Objects/game_object_ids.h"
 
 enum GAME_OBJECT_ID : short;

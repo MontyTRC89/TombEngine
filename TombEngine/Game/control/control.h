@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/animation.h"
 #include "Game/control/trigger.h"
 #include "Game/items.h"

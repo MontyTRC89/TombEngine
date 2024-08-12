@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Logic/LogicHandler.h"
 

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/collision/sphere.h"
 #include "Specific/newtypes.h"
 #include "Specific/level.h"

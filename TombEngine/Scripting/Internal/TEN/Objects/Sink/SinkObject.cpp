@@ -1,4 +1,3 @@
-#pragma once
 #include "SinkObject.h"
 
 #include "Scripting/Internal/ReservedScriptNames.h"

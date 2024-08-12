@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/Lara/PlayerContextData.h"
 
 struct CollisionInfo;

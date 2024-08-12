@@ -1,4 +1,3 @@
-#pragma once
 #include "Game/effects/spark.h"
 
 #include "Game/control/control.h"

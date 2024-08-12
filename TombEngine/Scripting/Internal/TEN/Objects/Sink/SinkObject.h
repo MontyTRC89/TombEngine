@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Scripting/Internal/TEN/Objects/NamedBase.h"
 #include "Objects/Sink.h"
 

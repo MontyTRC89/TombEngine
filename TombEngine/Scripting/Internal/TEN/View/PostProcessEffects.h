@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Renderer/RendererEnums.h"
 /***
 Constants for the post-process effects to apply.

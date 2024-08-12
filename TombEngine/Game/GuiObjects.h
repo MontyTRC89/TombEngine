@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Scripting/Internal/LanguageScript.h"
 
 struct ItemInfo;

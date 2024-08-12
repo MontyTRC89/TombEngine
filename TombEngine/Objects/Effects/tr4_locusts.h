@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/items.h"
 
 struct LOCUST_INFO
