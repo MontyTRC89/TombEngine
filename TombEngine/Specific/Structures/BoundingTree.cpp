@@ -590,7 +590,7 @@ namespace TEN::Structures
 	}
 
 	// Recursively constructs tree using top-down approach with limited surface area heuristic.
-	// Complexity: O(n)-ish.
+	// Complexity: O(n)
 	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end)
 	{
 		constexpr auto SPLIT_RANGE_MAX = 10;
