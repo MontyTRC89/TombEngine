@@ -1438,50 +1438,94 @@ void FindAITarget(CreatureInfo* creature, short objectNumber)
 void FindAITargetObject(CreatureInfo* creature, int objectNumber)
 {
 	const auto& item = g_Level.Items[creature->ItemNumber];
-
-	FindAITargetObject(creature, objectNumber, item.ItemFlags[3], true);
+	AITargetFlags data = {};
+	data.checkDistance = false;
+	data.checkOcb = item.ItemFlags[3] != 0;
+	data.objectNumber = objectNumber;
+	data.ocb = item.ItemFlags[3];
+	data.checkSameZone = true;
+	if (FindAITargetObject(creature, &data))
+	{
+		*creature->AITarget = data.foundItem;
+		creature->Enemy = creature->AITarget;
+	}
 }
 
 void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool checkSameZone)
 {
-	auto& item = g_Level.Items[creature->ItemNumber];
+	AITargetFlags data = {};
+	data.checkDistance = false;
+	data.checkOcb = ocb != NO_VALUE;
+	data.objectNumber = objectNumber;
+	data.ocb = ocb;
+	data.checkSameZone = checkSameZone;
+	if (FindAITargetObject(creature, &data))
+	{
+		*creature->AITarget = data.foundItem;
+		creature->Enemy = creature->AITarget;
+	}
+}
 
+bool FindAITargetObject(CreatureInfo* creature, AITargetFlags* data)
+{
 	if (g_Level.AIObjects.empty())
-		return;
+		return false;
 
+	auto& item = g_Level.Items[creature->ItemNumber];
 	AI_OBJECT* foundObject = nullptr;
 
 	for (auto& aiObject : g_Level.AIObjects)
 	{
-		if (aiObject.objectNumber == objectNumber &&
-			aiObject.triggerFlags == ocb &&
-			aiObject.roomNumber != NO_VALUE)
+		// Check if the objectNumber match.
+		if (aiObject.objectNumber != data->objectNumber)
+			continue;
+
+		// Check if the room is valid.
+		if (aiObject.roomNumber == NO_VALUE)
+			continue;
+
+		// Check if distance is valid.
+		if (data->checkDistance)
+		{
+			if (Vector3i::Distance(item.Pose.Position, aiObject.pos.Position) > data->maxDistance)
+				continue;
+		}
+
+		// Check if the ocb is the same, useful for paths.
+		if (data->checkOcb)
+		{
+			if (aiObject.triggerFlags != data->ocb)
+				continue;
+		}
+
+		// Check if the zone number is the same.
+		if (data->checkSameZone)
 		{
 			int* zone = g_Level.Zones[(int)creature->LOT.Zone][(int)FlipStatus].data();
 			auto* room = &g_Level.Rooms[item.RoomNumber];
 
-			item.BoxNumber = GetSector(room, item.Pose.Position.x - room->Position.x, item.Pose.Position.z - room->Position.z)->PathfindingBoxID;
+			// NOTE: Avoid changing the boxNumber of the item/ai_item, so a local variable is required !
+			// Where just searching for AIobject near him.
+			int boxNum = GetSector(room, item.Pose.Position.x - room->Position.x, item.Pose.Position.z - room->Position.z)->PathfindingBoxID;
 			room = &g_Level.Rooms[aiObject.roomNumber];
-			aiObject.boxNumber = GetSector(room, aiObject.pos.Position.x - room->Position.x, aiObject.pos.Position.z - room->Position.z)->PathfindingBoxID;
+			int aiBoxNum = GetSector(room, aiObject.pos.Position.x - room->Position.x, aiObject.pos.Position.z - room->Position.z)->PathfindingBoxID;
 
-			if (item.BoxNumber == NO_VALUE || aiObject.boxNumber == NO_VALUE)
-				return;
-
-			if (checkSameZone && (zone[item.BoxNumber] != zone[aiObject.boxNumber]))
-				return;
-
-			// Don't check for same zone. Needed for Sophia Leigh.
-			foundObject = &aiObject;
+			// If box is invalid or zone is not the same, go next.
+			if (boxNum == NO_VALUE || aiBoxNum == NO_VALUE)
+				continue;
+			// If the zone is invalid, go next.
+			if (zone[boxNum] != zone[aiBoxNum])
+				continue;
 		}
+
+		// Don't check for same zone.
+		// Needed for Sophia Leigh.
+		foundObject = &aiObject;
 	}
-
 	if (foundObject == nullptr)
-		return;
+		return false;
 
-	auto& aiItem = *creature->AITarget;
-
-	creature->Enemy = &aiItem;
-
+	ItemInfo aiItem = {};
 	aiItem.ObjectNumber = foundObject->objectNumber;
 	aiItem.RoomNumber = foundObject->roomNumber;
 	aiItem.Pose.Position = foundObject->pos.Position;
@@ -1490,14 +1534,14 @@ void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool 
 	aiItem.TriggerFlags = foundObject->triggerFlags;
 	aiItem.BoxNumber = foundObject->boxNumber;
 
-	if (!(creature->AITarget->Flags & ItemFlags::IFLAG_TRIGGERED))
+	if (!(aiItem.Flags & IFLAG_TRIGGERED))
 	{
-		float sinY = phd_sin(creature->AITarget->Pose.Orientation.y);
-		float cosY = phd_cos(creature->AITarget->Pose.Orientation.y);
-
-		creature->AITarget->Pose.Position.x += CLICK(1) * sinY;
-		creature->AITarget->Pose.Position.z += CLICK(1) * cosY;
+		aiItem.Pose.Position.x += CLICK(1) * phd_sin(aiItem.Pose.Orientation.y);
+		aiItem.Pose.Position.z += CLICK(1) * phd_cos(aiItem.Pose.Orientation.y);
 	}
+
+	data->foundItem = aiItem;
+	return true;
 }
 
 int TargetReachable(ItemInfo* item, ItemInfo* enemy)

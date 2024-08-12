@@ -1830,6 +1830,10 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			if (&linkItem == item)
 				continue;
 
+			// NOTE: Avoid killing enemy jeep else he won't work correctly anymore.
+			if (linkItem.ObjectNumber == ID_ENEMY_JEEP)
+				continue;
+
 			if (!(linkItem.Collidable && linkItem.Status != ITEM_INVISIBLE))
 				continue;
 

@@ -79,7 +79,13 @@ ObjectInfo& ObjectHandler::GetFirstAvailableObject()
 // NOTE: JointRotationFlags allows bones to be rotated with CreatureJoint().
 void ObjectInfo::SetBoneRotationFlags(int boneID, int flags)
 {
-	g_Level.Bones[boneIndex + (boneID * 4)] |= flags;
+	int boneResult = boneIndex + (boneID * 4);
+	if (boneResult < 0 || boneResult >= g_Level.Bones.size())
+	{
+		TENLog(std::string("Failed to setup bone rotation with id: " + std::to_string(boneID) + ", name: " + ), LogLevel::Warning);
+		return;
+	}
+	g_Level.Bones[boneResult] |= flags;
 }
 
 void ObjectInfo::SetHitEffect(HitEffect hitEffect)

@@ -12,7 +12,7 @@
 
 // Creatures
 #include "Objects/TR4/Entity/Wraith.h" // OFF
-#include "Objects/TR4/Entity/tr4_enemy_jeep.h"
+#include "Objects/TR4/Entity/EnemyJeep.h" // WIP
 #include "Objects/TR4/Entity/tr4_ahmet.h" // OK
 #include "Objects/TR4/Entity/tr4_baddy.h" // OK
 #include "Objects/TR4/Entity/tr4_bat.h" // OK
@@ -634,8 +634,8 @@ namespace TEN::Entities
 			obj->radius = 512;
 			obj->intelligent = true;
 			obj->damageType = DamageMode::None; // NOTE: Prevents enemy jeep from being killed with skidoo gun or something like that.
-			obj->LotType = LotType::HumanPlusJumpAndMonkey;
-			obj->SetBoneRotationFlags(8, ROT_X);
+			obj->LotType = LotType::EnemyJeep;
+			obj->SetBoneRotationFlags(8, ROT_X); // Wheel rotation.
 			obj->SetBoneRotationFlags(9, ROT_X);
 			obj->SetBoneRotationFlags(11, ROT_X);
 			obj->SetBoneRotationFlags(12, ROT_X);
