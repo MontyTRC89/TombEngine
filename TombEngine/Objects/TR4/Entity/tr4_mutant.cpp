@@ -13,7 +13,6 @@
 #include "Objects/objectslist.h"
 #include "Renderer/RendererEnums.h"
 
-
 namespace TEN::Entities::TR4
 {
 	constexpr auto MUTANT_PROJECTILE_ATTACK_RANGE = SQUARE(BLOCK(10));

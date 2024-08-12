@@ -5,7 +5,6 @@
 #include "Objects/objectslist.h"
 #include "Specific/clock.h"
 
-
 namespace TEN::Effects::Ripple
 {
 	constexpr auto RIPPLE_COUNT_MAX	  = 1024;

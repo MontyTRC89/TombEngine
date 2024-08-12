@@ -11,7 +11,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto TIGER_BITE_ATTACK_DAMAGE	 = 90;

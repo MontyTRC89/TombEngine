@@ -7,7 +7,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::TR4
 {
 	BeetleData BeetleSwarm[NUM_BEETLES];

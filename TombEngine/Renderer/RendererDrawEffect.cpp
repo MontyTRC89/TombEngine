@@ -287,7 +287,6 @@ namespace TEN::Renderer
 		}
 	}
 
-
 	void Renderer::PrepareFires(RenderView& view) 
 	{
 		for (int k = 0; k < MAX_FIRE_LIST; k++) 
@@ -652,7 +651,6 @@ namespace TEN::Renderer
 					r = shockwave->r * shockwave->life / 255.0f;
 				}
 
-
 				if (shockwave->sg < shockwave->g)
 				{
 					shockwave->sg += shockwave->g / 18;
@@ -662,7 +660,6 @@ namespace TEN::Renderer
 				{
 					g = shockwave->g * shockwave->life / 255.0f;
 				}
-
 
 				if (shockwave->sb < shockwave->b)
 				{

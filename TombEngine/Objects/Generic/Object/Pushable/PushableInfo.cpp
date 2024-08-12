@@ -4,7 +4,6 @@
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/Generic/Object/Pushable/PushableBridge.h"
 
-
 namespace TEN::Entities::Generic
 {
 	const auto PUSHABLE_EDGE_ATTRIBS_DEFAULT = PushableEdgeAttribs(true, true, false);

@@ -3,7 +3,6 @@
 #include "Game/effects/effects.h"
 #include "Game/Setup.h"
 
-
 namespace TEN::Effects::EmberEmitter
 {
 	void ControlEmberEmitter(short itemNumber)

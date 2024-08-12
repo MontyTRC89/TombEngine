@@ -5,7 +5,6 @@
 #include "Game/items.h"
 #include "Specific/clock.h"
 
-
 namespace TEN::Effects::Streamer
 {
 	StreamerEffectController StreamerEffect = {};

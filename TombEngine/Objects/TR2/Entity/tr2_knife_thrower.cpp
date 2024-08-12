@@ -15,7 +15,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto KNIFE_PROJECTILE_DAMAGE = 50;

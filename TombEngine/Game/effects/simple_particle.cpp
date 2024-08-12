@@ -3,7 +3,6 @@
 #include "Game/items.h"
 #include "Game/Setup.h"
 
-
 namespace TEN::Effects
 {
 	std::array<SimpleParticle, 15> simpleParticles;

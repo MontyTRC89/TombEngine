@@ -10,7 +10,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::TR4
 {
 	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;

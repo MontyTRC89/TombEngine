@@ -9,7 +9,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-
 static ElectricalLightInfo& GetElectricalLightInfo(ItemInfo& item)
 {
 	return *(ElectricalLightInfo*)item.Data;

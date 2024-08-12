@@ -16,7 +16,6 @@
 #include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::TR4
 {
 	constexpr auto DEMIGOD_IDLE_RANGE					   = SQUARE(BLOCK(2));

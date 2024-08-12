@@ -15,7 +15,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto FLAMETHROWER_ATTACK_RANGE = SQUARE(BLOCK(1.5f));

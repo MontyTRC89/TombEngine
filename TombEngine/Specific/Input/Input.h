@@ -1,7 +1,6 @@
 #pragma once
 #include "Specific/Input/InputAction.h"
 
-
 struct ItemInfo;
 
 namespace TEN::Input

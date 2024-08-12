@@ -12,7 +12,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR5
 {
 	#define STATE_TR5_LARSON_STOP	1

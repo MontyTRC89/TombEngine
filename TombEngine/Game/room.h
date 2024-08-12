@@ -1,6 +1,5 @@
 #pragma once
 
-
 enum GAME_OBJECT_ID : short;
 enum class ReverbType;
 class FloorInfo;

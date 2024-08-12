@@ -50,7 +50,6 @@ private:
 	std::unordered_set<short>		 								m_collidingItemsToRemove{};
 	sol::table m_table_objects;
 
-
 	void AssignLara() override;
 
 	template <typename R, char const* S>

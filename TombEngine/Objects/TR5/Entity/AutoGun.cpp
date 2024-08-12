@@ -12,7 +12,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-
 // NOTES:
 // ItemFlags[0]: X axis orientation.
 // ItemFlags[1]: Y axis orientation.

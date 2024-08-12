@@ -5,7 +5,6 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_two_guns.h"
 
-
 namespace TEN::Gui
 {
 	// To add an object to the inventory, introduce entries to the

@@ -10,7 +10,6 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 
-
 namespace TEN::Entities::TR4
 {
 	constexpr auto BAT_ATTACK_DAMAGE = 2;

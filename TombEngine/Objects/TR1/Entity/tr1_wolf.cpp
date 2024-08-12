@@ -10,7 +10,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto WOLF_BITE_ATTACK_DAMAGE = 100;

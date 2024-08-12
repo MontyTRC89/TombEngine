@@ -14,7 +14,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::TR4
 {
 	const auto TroopsBite1 = CreatureBiteInfo(Vector3(0, 270, 40), 7);

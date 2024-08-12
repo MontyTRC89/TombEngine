@@ -13,7 +13,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::TR4
 {
 	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;

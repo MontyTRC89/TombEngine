@@ -5,7 +5,6 @@
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer.h"
 
-
 namespace TEN::Effects::DisplaySprite
 {
 	std::vector<DisplaySprite> DisplaySprites = {};

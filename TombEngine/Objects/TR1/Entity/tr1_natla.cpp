@@ -12,7 +12,6 @@
 #include "Specific/level.h"
 #include "Sound/sound.h"
 
-
 namespace TEN::Entities::Creatures::TR1
 {
 	// TODO: Organise.

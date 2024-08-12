@@ -10,7 +10,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto APE_ATTACK_DAMAGE = 200;

@@ -157,7 +157,6 @@ namespace TEN::Entities::Vehicles
 		UPV_FLAG_DEAD	 = (1 << 3)
 	};
 
-
 	UPVInfo* GetUPVInfo(ItemInfo* UPVItem)
 	{
 		return (UPVInfo*)UPVItem->Data;

@@ -271,4 +271,3 @@ void AnimatingControl(short itemNumber)
 	}*/
 }
 
-

@@ -14,7 +14,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::TR4
 {
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE		   = 120;

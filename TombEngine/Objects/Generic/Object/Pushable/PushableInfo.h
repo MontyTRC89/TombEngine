@@ -3,7 +3,6 @@
 
 #include "Objects/Generic/Object/BridgeObject.h"
 
-
 namespace TEN::Entities::Generic
 {
 	enum class PushableSoundState

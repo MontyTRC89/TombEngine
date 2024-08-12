@@ -12,7 +12,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto CIVVY_ATTACK_DAMAGE = 50;

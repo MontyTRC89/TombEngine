@@ -2,7 +2,6 @@
 
 #include "Specific/clock.h"
 
-
 namespace TEN::Input
 {
 	InputAction::InputAction(ActionID actionID)

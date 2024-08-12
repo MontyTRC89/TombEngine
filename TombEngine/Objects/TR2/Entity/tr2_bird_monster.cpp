@@ -9,7 +9,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto BIRD_MONSTER_ATTACK_DAMAGE = 200;

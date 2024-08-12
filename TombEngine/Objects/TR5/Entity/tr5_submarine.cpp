@@ -20,7 +20,6 @@
 
 using namespace TEN::Collision::Point;
 
-
 namespace TEN::Entities::Creatures::TR5
 {
 	void InitializeSubmarine(short itemNumber)

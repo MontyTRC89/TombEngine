@@ -36,7 +36,6 @@ constexpr auto LUA_CLASS_NAME{ ScriptReserved_Moveable };
 static auto IndexError = index_error_maker(Moveable, LUA_CLASS_NAME);
 static auto NewIndexError = newindex_error_maker(Moveable, LUA_CLASS_NAME);
 
-
 Moveable::Moveable(short num, bool alreadyInitialized) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialized{ alreadyInitialized }
 {
 	if (alreadyInitialized)

@@ -2,7 +2,6 @@
 #include "Game/Lara/PlayerContext.h"
 #include "Objects/objectslist.h"
 
-
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;

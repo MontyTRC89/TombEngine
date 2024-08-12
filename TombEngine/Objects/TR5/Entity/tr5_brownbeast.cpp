@@ -11,7 +11,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR5
 {
 	constexpr auto BROWN_BEAST_ATTACK_DAMAGE = 150;

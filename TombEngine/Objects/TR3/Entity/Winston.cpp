@@ -14,7 +14,6 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
-
 // NOTES:
 // ItemFlags[0]: defeat timer.
 // ItemFlags[1]: type.

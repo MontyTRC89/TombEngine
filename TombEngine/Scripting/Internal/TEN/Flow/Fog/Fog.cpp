@@ -56,7 +56,6 @@ void Fog::SetColor(ScriptColor const& col)
 	B = col.GetB();
 }
 
-
 ScriptColor Fog::GetColor() const
 {
 	return ScriptColor{ R, G, B };

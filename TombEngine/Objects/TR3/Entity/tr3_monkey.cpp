@@ -11,7 +11,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR3
 {
 	// TODO: Work out damage constants.

@@ -11,7 +11,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto WORKER_SHOTGUN_NUM_SHOTS = 6;

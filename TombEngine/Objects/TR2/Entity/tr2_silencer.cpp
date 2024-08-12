@@ -9,7 +9,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto SILENCER_SHOOT_ATTACK_DAMAGE = 50;

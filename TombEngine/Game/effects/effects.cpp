@@ -1422,7 +1422,6 @@ void TriggerRocketFire(int x, int y, int z)
 	sptr->dSize = size;
 }
 
-
 void TriggerRocketSmoke(int x, int y, int z)
 {
 	TEN::Effects::Smoke::TriggerRocketSmoke(x, y, z);

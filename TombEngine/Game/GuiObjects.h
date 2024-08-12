@@ -1,7 +1,6 @@
 #pragma once
 #include "Scripting/Internal/LanguageScript.h"
 
-
 struct ItemInfo;
 
 namespace TEN::Gui

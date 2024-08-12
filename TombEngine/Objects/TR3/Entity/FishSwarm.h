@@ -1,7 +1,6 @@
 #pragma once
 #include "Game/items.h"
 
-
 namespace TEN::Entities::Creatures::TR3
 {
 	constexpr auto FISH_COUNT_MAX = 512;

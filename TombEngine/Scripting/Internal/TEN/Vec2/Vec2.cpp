@@ -2,7 +2,6 @@
 
 #include "Scripting/Internal/ReservedScriptNames.h"
 
-
 /// Represents a float-based 2D vector.
 // @tenprimitive Vec2
 // @pragma nostrip

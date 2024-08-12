@@ -11,7 +11,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::TR4
 {
 	constexpr auto WILD_BOAR_ATTACK_DAMAGE = 30;

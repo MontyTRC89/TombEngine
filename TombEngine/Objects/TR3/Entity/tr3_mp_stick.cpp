@@ -12,7 +12,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR3
 {
 	const auto MPStickBite1 = CreatureBiteInfo(Vector3(247, 10, 11), 13);

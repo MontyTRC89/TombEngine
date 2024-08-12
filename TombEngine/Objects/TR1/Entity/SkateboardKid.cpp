@@ -7,7 +7,6 @@
 #include "Game/people.h"
 #include "Game/Setup.h"
 
-
 namespace TEN::Entities::Creatures::TR1
 {
 	// NOTES:

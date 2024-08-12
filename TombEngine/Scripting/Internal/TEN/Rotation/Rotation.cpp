@@ -2,7 +2,6 @@
 
 #include "Scripting/Internal/ReservedScriptNames.h"
 
-
 /*** Represents a degree-based 3D rotation.
 All values are clamped to the range [0.0, 360.0].
 @tenprimitive Rotation

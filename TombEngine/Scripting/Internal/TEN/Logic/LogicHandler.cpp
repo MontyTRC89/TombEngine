@@ -911,7 +911,6 @@ void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volume
 	}
 }
 
-
 void LogicHandler::OnStart()
 {
 	for (auto& name : m_callbacksPreStart)

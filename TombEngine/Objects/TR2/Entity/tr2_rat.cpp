@@ -10,7 +10,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto RAT_ATTACK_DAMAGE = 20;

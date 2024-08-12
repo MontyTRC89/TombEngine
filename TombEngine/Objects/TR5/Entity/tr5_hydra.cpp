@@ -13,7 +13,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR5
 {
 	const auto HydraBite = CreatureBiteInfo(Vector3::Zero, 11);

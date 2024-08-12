@@ -1,6 +1,5 @@
 #pragma once
 
-
 struct ItemInfo;
 
 namespace TEN::Effects::Streamer

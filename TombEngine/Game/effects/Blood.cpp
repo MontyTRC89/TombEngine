@@ -6,7 +6,6 @@
 #include "Objects/Utils/object_helper.h"
 #include "Specific/clock.h"
 
-
 namespace TEN::Effects::Blood
 {
 	constexpr auto UW_BLOOD_COUNT_MAX = 512;

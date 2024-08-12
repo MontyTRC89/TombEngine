@@ -5,7 +5,6 @@ struct CollisionInfo;
 struct ItemInfo;
 struct LaraInfo;
 
-
 namespace TEN::Entities::Player
 {
 	class PlayerContext

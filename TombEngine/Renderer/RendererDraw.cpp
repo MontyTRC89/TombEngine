@@ -3149,7 +3149,6 @@ namespace TEN::Renderer
 						p2t = spr->vtx3;
 						p3t = spr->vtx4;
 
-
 					}
 					else
 					{

@@ -4,7 +4,6 @@
 #include "Game/people.h"
 #include "Game/Setup.h"
 
-
 namespace TEN::Effects::Electricity
 {
 	constexpr auto HELICAL_LASER_LIFE_MAX = 18.0f;

@@ -11,7 +11,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR2
 {
 	const auto YetiBiteLeft	 = CreatureBiteInfo(Vector3(12, 101, 19), 13);

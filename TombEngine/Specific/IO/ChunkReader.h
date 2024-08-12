@@ -3,7 +3,6 @@
 #include "Specific/IO/LEB128.h"
 #include "Specific/IO/Streams.h"
 
-
 class ChunkReader
 {
 private:

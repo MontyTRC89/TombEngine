@@ -10,7 +10,6 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::Creatures::TR5
 {
 	const auto DobermanBite = CreatureBiteInfo(Vector3(0, 30, 141), 20);

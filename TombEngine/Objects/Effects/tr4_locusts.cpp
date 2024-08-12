@@ -9,7 +9,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-
 namespace TEN::Entities::TR4 
 {
 	LOCUST_INFO Locusts[MAX_LOCUSTS];

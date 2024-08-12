@@ -5,7 +5,6 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 
-
 namespace TEN::Entities::Traps
 {
 	constexpr auto SLAMMING_DOORS_HARM_DAMAGE = 400;

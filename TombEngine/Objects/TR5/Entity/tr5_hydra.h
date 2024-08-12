@@ -1,6 +1,5 @@
 #pragma once
 
-
 namespace TEN::Entities::Creatures::TR5
 {
 	void InitializeHydra(short itemNumber);

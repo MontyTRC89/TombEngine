@@ -4,7 +4,6 @@
 #include "Game/Hud/StatusBars.h"
 #include "Game/items.h"
 
-
 namespace TEN::Hud
 {
 	HudController g_Hud = {};
