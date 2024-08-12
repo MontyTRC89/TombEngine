@@ -74,15 +74,20 @@ namespace TEN::Physics
 	class CollisionMesh
 	{
 	private:
+		struct Cache
+		{
+			std::unordered_map<Vector3, int> VertexMap = {}; // Key = vertex, value = vertex ID.
+			std::unordered_map<Vector3, int> NormalMap = {}; // Key = normal, value = normal ID.
+		};
+
 		// Members
 
 		std::vector<CollisionTriangle> _triangles = {};
 		std::vector<Vector3>		   _vertices  = {};
 		std::vector<Vector3>		   _normals	  = {};
 
-		BoundingTree					 _triangleTree = BoundingTree();
-		std::unordered_map<Vector3, int> _vertexMap	   = {}; // Key = vertex, value = vertex ID.
-		std::unordered_map<Vector3, int> _normalMap	   = {}; // Key = normal, value = normal ID.
+		BoundingTree _triangleTree = BoundingTree();
+		Cache		 _cache		   = {};
 
 	public:
 		// Constructors

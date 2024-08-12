@@ -236,7 +236,7 @@ namespace TEN::Physics
 			if (tri.Intersects(ray, intersectDist, _vertices, _normals) && intersectDist < closestDist)
 			{
 				// Prioritize tangible triangle in case portal triangle coincides.
-				if (tri.GetPortalRoomNumber() == NO_VALUE || (abs(intersectDist - closestDist) > THRESHOLD))
+				if (tri.GetPortalRoomNumber() == NO_VALUE || abs(intersectDist - closestDist) > THRESHOLD)
 				{
 					closestTri = &tri;
 					closestDist = intersectDist;
@@ -297,31 +297,35 @@ namespace TEN::Physics
 	{
 		auto getVertexID = [&](const Vector3& vertex)
 		{
-			auto it = _vertexMap.find(vertex);
-			if (it != _vertexMap.end())
+			// Get existing vertex ID.
+			auto it = _cache.VertexMap.find(vertex);
+			if (it != _cache.VertexMap.end())
 			{
 				int vertexID = it->second;
 				return vertexID;
 			}
 			
+			// Add and cache new vertex.
 			int vertexID = _vertices.size();
 			_vertices.push_back(vertex);
-			_vertexMap[vertex] = vertexID;
+			_cache.VertexMap[vertex] = vertexID;
 			return vertexID;
 		};
 
 		auto getNormalID = [&](const Vector3& normal)
 		{
-			auto it = _normalMap.find(normal);
-			if (it != _normalMap.end())
+			// Get existing normal ID.
+			auto it = _cache.NormalMap.find(normal);
+			if (it != _cache.NormalMap.end())
 			{
 				int normalID = it->second;
 				return normalID;
 			}
 
+			// Add and cache new normal.
 			int normalID = _normals.size();
 			_normals.push_back(normal);
-			_normalMap[normal] = normalID;
+			_cache.NormalMap[normal] = normalID;
 			return normalID;
 		};
 
@@ -356,7 +360,11 @@ namespace TEN::Physics
 			triAabbs.push_back(tri.GetAabb());
 		}
 
+		// Create bounding tree of triangles.
 		_triangleTree = BoundingTree(triIds, triAabbs);
+
+		// Clear cache.
+		_cache = {};
 	}
 
 	void CollisionMesh::DrawDebug() const

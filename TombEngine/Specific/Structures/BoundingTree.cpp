@@ -26,7 +26,7 @@ namespace TEN::Structures
 			return objectIds;
 
 		// Collect all object IDs.
-		for (const auto& [objectID, nodeID] : _leafIDMap)
+		for (const auto& [objectID, leafID] : _leafIDMap)
 			objectIds.push_back(objectID);
 
 		return objectIds;

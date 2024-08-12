@@ -16,7 +16,7 @@ namespace TEN::Structures
 			int			ObjectID = NO_VALUE; // NOTE: Only leaf node stores object ID directly.
 			BoundingBox Aabb	 = BoundingBox();
 
-			int Height		 = NO_VALUE;
+			int Height		 = 0;
 			int ParentID	 = NO_VALUE;
 			int LeftChildID	 = NO_VALUE;
 			int RightChildID = NO_VALUE;
@@ -26,11 +26,11 @@ namespace TEN::Structures
 
 		// Members
 
-		std::vector<Node> _nodes	   = {};
-		std::vector<int>  _freeNodeIds = {};
-		int				  _rootID	   = NO_VALUE;
+		std::vector<Node> _nodes = {};
 
-		std::unordered_map<int, int> _leafIDMap = {}; // Key = object ID, value = leaf ID.
+		int							 _rootID	  = NO_VALUE;
+		std::unordered_map<int, int> _leafIDMap	  = {}; // Key = object ID, value = leaf ID.
+		std::vector<int>			 _freeNodeIds = {};
 
 	public:
 		// Constructors
