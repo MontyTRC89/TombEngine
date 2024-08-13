@@ -82,7 +82,7 @@ void ObjectInfo::SetBoneRotationFlags(int boneID, int flags)
 	int boneResult = boneIndex + (boneID * 4);
 	if (boneResult < 0 || boneResult >= g_Level.Bones.size())
 	{
-		TENLog(std::string("Failed to setup bone rotation with id: " + std::to_string(boneID) + ", name: " + ), LogLevel::Warning);
+		TENLog(std::string("Failed to setup bone rotation with id: " + std::to_string(boneID)), LogLevel::Warning);
 		return;
 	}
 	g_Level.Bones[boneResult] |= flags;
