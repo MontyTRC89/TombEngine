@@ -31,9 +31,9 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Changed Rome Hammer to not hurt player whilst deactivated.
 * Changed Statue with blade damage, from 20 to 200.
 * Changed TR4 enemy jeep:
-1) New ocb:
+   1) New ocb:
   - 1: Start without the player having vehicle driven.
-2) Now it's driven by AI_X1 and add behaviour with AI_X2.
+   2) Now it's driven by AI_X1 and add behaviour with AI_X2.
   - AI_X1 need to start at 0 and end at whatever your path need to end.
   - AI_X2 have different ocb:
    1) Drop a grenade. (Cooldown is 15 frame)
