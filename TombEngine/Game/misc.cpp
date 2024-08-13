@@ -8,34 +8,36 @@
 #include "Game/items.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Utils;
 
 CreatureInfo* GetCreatureInfo(ItemInfo* item)
 {
 	return (CreatureInfo*)item->Data;
 }
 
-void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
+void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature, const std::vector<GAME_OBJECT_ID>& keyObjectIds, bool ignoreKeyObjectIds)
 {
-	float nearestDistance = INFINITY;
-
-	for (int i = 0; i < g_Level.NumItems; i++)
+	float closestDistSqr = INFINITY;
+	for (int itemNumber = 0; itemNumber < g_Level.NumItems; itemNumber++)
 	{
-		auto* targetEntity = &g_Level.Items[i];
-
-		if (targetEntity == nullptr)
+		auto* targetItem = &g_Level.Items[itemNumber];
+		if (targetItem == nullptr || targetItem->Index == item->Index)
 			continue;
 
-		if (targetEntity != item &&
-			targetEntity->HitPoints > 0 &&
-			targetEntity->Status != ITEM_INVISIBLE)
+		// Ignore or specifically target key object IDs.
+		if (ignoreKeyObjectIds ? Contains(keyObjectIds, targetItem->ObjectNumber) : !Contains(keyObjectIds, targetItem->ObjectNumber))
+			continue;
+
+		if (targetItem != item && targetItem->HitPoints > 0 && targetItem->Status != ITEM_INVISIBLE)
 		{
-			float distance = Vector3i::Distance(item->Pose.Position, targetEntity->Pose.Position);
-			if (distance < nearestDistance)
+			float distSqr = Vector3i::DistanceSquared(item->Pose.Position, targetItem->Pose.Position);
+			if (distSqr < closestDistSqr)
 			{
-				creature->Enemy = targetEntity;
-				nearestDistance = distance;
+				creature->Enemy = targetItem;
+				closestDistSqr = distSqr;
 			}
 		}
 	}
