@@ -1830,10 +1830,6 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			if (&linkItem == item)
 				continue;
 
-			// NOTE: Avoid killing enemy jeep else he won't work correctly anymore.
-			if (linkItem.ObjectNumber == ID_ENEMY_JEEP)
-				continue;
-
 			if (!(linkItem.Collidable && linkItem.Status != ITEM_INVISIBLE))
 				continue;
 
@@ -1872,7 +1868,8 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 					if (linkItem.HitPoints <= 0 || linkItem.HitPoints == NOT_TARGETABLE)
 						continue;
 
-					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
+					// NOTE: Avoid killing enemy jeep else he won't work correctly anymore.
+					if (isHarmless || linkItem.ObjectNumber == ID_ENEMY_JEEP || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
 					{
 						// If vehicle is harmless or speed is too low, just push enemy.
 						ItemPushItem(&linkItem, item, coll, false, 0);
