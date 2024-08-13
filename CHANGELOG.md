@@ -30,9 +30,9 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Features/Amendments
 * Changed Rome Hammer to not hurt player whilst deactivated.
 * Changed Statue with blade damage, from 20 to 200.
-* Enhaced Rolling Spindle detection to avoid them going down through pits.
-* Enhaced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
-* Enhaced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
+* Enhanced Rolling Spindle detection to avoid them going down through pits.
+* Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
+* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
 * Enhanced raptor behaviour and handling. 
   - OCB 0: Classic behaviour
   - OCB 1: Can jump up/down up to 4 steps and jump across gaps up to 2 blocks wide.
