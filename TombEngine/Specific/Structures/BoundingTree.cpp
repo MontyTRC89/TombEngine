@@ -202,7 +202,7 @@ namespace TEN::Structures
 		// Allocate and get new empty node ID.
 		else
 		{
-			nodeID = _nodes.size();
+			nodeID = (int)_nodes.size();
 			_nodes.emplace_back();
 		}
 
