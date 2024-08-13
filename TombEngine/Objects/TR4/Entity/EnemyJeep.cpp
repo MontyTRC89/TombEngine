@@ -103,9 +103,9 @@ namespace TEN::Entities::TR4
 	constexpr auto ENEMY_JEEP_PITCH_WHEEL_SPEED_MULTIPLIER = 12.0f;
 	constexpr auto ENEMY_JEEP_WHEEL_LEFTRIGHT_TURN_MINIMUM = ANGLE(12.0f);
 
-	const auto EnemyJeepGrenadeBite = CreatureBiteInfo(0.0f, -640.0f, -768.0f, ENEMY_JEEP_CENTER_MESH);
-	const auto EnemyJeepRightLightBite = CreatureBiteInfo(200.0f, -144.0f, -768.0f, ENEMY_JEEP_CENTER_MESH);
-	const auto EnemyJeepLeftLightBite = CreatureBiteInfo(-200.0f, -144.0f, -768.0f, ENEMY_JEEP_CENTER_MESH);
+	const auto EnemyJeepGrenadeBite = CreatureBiteInfo(Vector3(0.0f, -640.0f, -768.0f), ENEMY_JEEP_CENTER_MESH);
+	const auto EnemyJeepRightLightBite = CreatureBiteInfo(Vector3(200.0f, -144.0f, -768.0f), ENEMY_JEEP_CENTER_MESH);
+	const auto EnemyJeepLeftLightBite = CreatureBiteInfo(Vector3(-200.0f, -144.0f, -768.0f), ENEMY_JEEP_CENTER_MESH);
 
 	/// <summary>
 	/// Enable/Disable the light mesh that are on the back of the jeep.
