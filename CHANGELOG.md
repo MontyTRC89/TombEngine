@@ -44,8 +44,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
       - 5: Make the jeep disappear/killed.
       - 6: Make the jeep trigger heavy trigger below him (just 1 time per AI_X2 having this ocb).
     If you need more than 1 animation for both vault/jump pit then you can use these:
-      7: Same as 2 (Need new animation + state id setup) and state id is 8.
-      8: Same as 3 (Need new animation + state id setup) and state id is 9.
+      - 7: Same as 2 (Need new animation + state id setup) and state id is 8.
+      - 8: Same as 3 (Need new animation + state id setup) and state id is 9.
 * Enhanced Rolling Spindle detection to avoid them going down through pits.
 * Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
 * Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
