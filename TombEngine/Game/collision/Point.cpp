@@ -57,7 +57,7 @@ namespace TEN::Collision::Point
 			int roomNumber = roomNumberBelow.value_or(bottomSector->RoomNumber);
 			auto& room = g_Level.Rooms[roomNumber];
 
-			bottomSector = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
+			bottomSector = Room::GetSector(&room, _position.x - room.Position.x, _position.z - room.Position.z);
 			roomNumberBelow = bottomSector->GetNextRoomNumber(_position, true);
 		}
 		_bottomSector = bottomSector;
@@ -78,7 +78,7 @@ namespace TEN::Collision::Point
 			int roomNumber = roomNumberAbove.value_or(topSector->RoomNumber);
 			auto& room = g_Level.Rooms[roomNumber];
 
-			topSector = Room::GetSector(&room, _position.x - room.x, _position.z - room.z);
+			topSector = Room::GetSector(&room, _position.x - room.Position.x, _position.z - room.Position.z);
 			roomNumberAbove = topSector->GetNextRoomNumber(_position, false);
 		}
 		_topSector = topSector;

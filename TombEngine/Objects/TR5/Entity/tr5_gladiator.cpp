@@ -337,7 +337,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					auto pos = GetJointPosition(item, 16);
 
-					auto* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
+					auto* floor = GetSector(room, pos.x - room->Position.x, pos.z - room->Position.z);
 					if (floor->Stopper)
 					{
 						for (int i = 0; i < room->mesh.size(); i++)
