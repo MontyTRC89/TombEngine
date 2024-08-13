@@ -147,7 +147,7 @@ namespace TEN::Effects::SmokeEmitter
 
 		part.scalar = 2;
 		part.gravity = Random::GenerateFloat(-24.0f, -15.0f);
-		part.maxYvel = Random::GenerateFloat(-15.0f, -8.0f);
+		part.maxYvel = 0;
 		
 		float size = Random::GenerateFloat(PART_SIZE_MIN, PART_SIZE_MAX);
 		part.dSize = size;
