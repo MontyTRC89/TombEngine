@@ -36,16 +36,16 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
    2) Now it's driven by AI_X1 and add behaviour with AI_X2.
   - AI_X1 need to start at 0 and end at whatever your path need to end.
   - AI_X2 have different ocb:
-   1) Drop a grenade. (Cooldown is 15 frame)
-   2) Make the jeep vault block (it's entirly driven by animation).
-   3) Same as 2 but for jumping pit.
-   4) Wait until lara is near, need to add distance in block (1024 = 1 block)
+      1) Drop a grenade. (Cooldown is 15 frame)
+      2) Make the jeep vault block (it's entirly driven by animation).
+      3) Same as 2 but for jumping pit.
+      4) Wait until lara is near, need to add distance in block (1024 = 1 block)
        Example: You want to have 4 block distance then it's: 4096+4 = 4100 as ocb.
-   5) Make the jeep disappear/killed.
-   6) Make the jeep trigger heavy trigger below him (just 1 time per AI_X2 having this ocb).
-   If you need more than 1 animation for both vault/jump pit then you can use these:
-   7) Same as 2 (Need new animation + state id setup) and state id is 8.
-   8) Same as 3 (Need new animation + state id setup) and state id is 9.
+      5) Make the jeep disappear/killed.
+      6) Make the jeep trigger heavy trigger below him (just 1 time per AI_X2 having this ocb).
+    If you need more than 1 animation for both vault/jump pit then you can use these:
+      7) Same as 2 (Need new animation + state id setup) and state id is 8.
+      8) Same as 3 (Need new animation + state id setup) and state id is 9.
 * Enhanced Rolling Spindle detection to avoid them going down through pits.
 * Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
 * Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
