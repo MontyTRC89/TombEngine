@@ -116,6 +116,7 @@ public:
 
 	std::vector<int> GetIds() const;
 	std::vector<int> GetBoundedIds(const Ray& ray, float dist) const;
+	std::vector<int> GetBoundedIds(const BoundingSphere& sphere) const;
 
 	// Utilities
 

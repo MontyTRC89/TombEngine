@@ -110,6 +110,8 @@ static bool TestCameraCollidableStatic(const MESH_INFO& staticObj)
 
 static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoomNumber, const Vector3& target)
 {
+	auto cameraLos = CameraLosCollisionData{};
+
 	// 1) Get raw LOS collision.
 	auto dir = target - origin;
 	dir.Normalize();
@@ -117,7 +119,6 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 	auto los = GetLosCollision(origin, originRoomNumber, dir, dist, true, false, true);
 
 	// 2) Clip room LOS collision.
-	auto cameraLos = CameraLosCollisionData{};
 	cameraLos.Normal = los.Room.Triangle.has_value() ? los.Room.Triangle->Normal : -dir;
 	cameraLos.Position = los.Room.Position;
 	cameraLos.RoomNumber = los.Room.RoomNumber;
@@ -177,43 +178,60 @@ bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3&
 	return (dotProduct >= 0.0f);
 }
 
-// TODO: More precise math. This will fail in critical cases.
+// TODO: Not the right math.
 static Vector3 GetCameraGeometryOffset()
 {
-	// 1) Define camera sphere.
-	auto sphere = BoundingSphere(g_Camera.Position, g_Camera.Radius);
-
-	const auto& room = g_Level.Rooms[g_Camera.RoomNumber];
-	auto meshColl = room.CollisionMesh.GetCollision(sphere);
-
-	// 2) Collect room mesh triangle tangent offsets.
-	auto offsets = std::vector<Vector3>{};
-	if (meshColl.has_value())
+	auto collectOffsets = [](std::vector<Vector3>& offsets, const std::optional<CollisionMeshSphereCollisionData>& meshColl, const BoundingSphere& sphere)
 	{
+		if (!meshColl.has_value())
+			return;
+
 		for (int i = 0; i < meshColl->Count; i++)
 		{
 			const auto& tangent = meshColl->Tangents[i];
 			const auto& normal = meshColl->Triangles[i].Normal;
 
-			// Calculate and collect tanget offset.
+			// Calculate tangent offset.
 			int sign = IsPointInFront(sphere.Center, tangent, normal) ? 1 : -1;
 			float dist = sphere.Radius + (Vector3::Distance(sphere.Center, tangent) * sign);
 			auto offset = Geometry::TranslatePoint(Vector3::Zero, normal, dist);
 
 			offsets.push_back(offset);
 		}
+	};
+
+	//return Vector3::Zero;
+
+	auto offsets = std::vector<Vector3>{};
+	auto sphere = BoundingSphere(g_Camera.Position, g_Camera.Radius);
+
+	const auto& room = g_Level.Rooms[g_Camera.RoomNumber];
+
+	// 1) Collect room mesh triangle tangent offsets.
+	auto meshColl = room.CollisionMesh.GetCollision(sphere);
+	collectOffsets(offsets, meshColl, sphere);
+
+	// 2) Collect bridge mesh triangle tangent offsets.
+	for (int neighborRoomNumber : room.NeighborRoomNumbers)
+	{
+		const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+
+		auto bridgeMovIds = neighborRoom.Bridges.GetBoundedIds(sphere);
+		for (int bridgeMovID : bridgeMovIds)
+		{
+			const auto& bridgeMov = g_Level.Items[bridgeMovID];
+			const auto& bridge = GetBridgeObject(bridgeMov);
+
+			auto meshColl = bridge.GetCollisionMesh().GetCollision(sphere);
+			collectOffsets(offsets, meshColl, sphere);
+		}
 	}
 
-	// 3) Collect bridge mesh triangle tangent offsets.
-	unsigned int searchDepth = (unsigned int)ceil(sphere.Radius / BLOCK(1));
-	auto sectors = GetNeighborSectors(Vector3i(sphere.Center), g_Camera.RoomNumber, searchDepth);
-	// TODO
-
-	// 4) No offsets; return early.
+	// 3) No offsets; return early.
 	if (offsets.empty())
 		return Vector3::Zero;
 
-	// 5) Calculate median offset.
+	// 4) Calculate median offset.
 	auto median = Vector3::Zero;
 	for (const auto& offset : offsets)
 		median += offset;
@@ -468,7 +486,6 @@ void MoveCamera(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumbe
 	g_Camera.Position = Vector3::Lerp(g_Camera.Position, idealPos, 1.0f / speed);
 	g_Camera.RoomNumber = idealRoomNumber;
 
-	// TODO
 	// Apply geometry offset.
 	g_Camera.Position += GetCameraGeometryOffset();
 	g_Camera.Offset = Vector3::Zero;

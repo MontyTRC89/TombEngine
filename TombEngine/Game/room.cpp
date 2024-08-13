@@ -509,6 +509,11 @@ std::vector<int> RoomObjectHandler::GetBoundedIds(const Ray& ray, float dist) co
 	return _tree.GetBoundedObjectIds(ray, dist);
 }
 
+std::vector<int> RoomObjectHandler::GetBoundedIds(const BoundingSphere& sphere) const
+{
+	return _tree.GetBoundedObjectIds(sphere);
+}
+
 void RoomObjectHandler::Insert(int id, const BoundingBox& aabb)
 {
 	_tree.Insert(id, aabb, AABB_BOUNDARY);

@@ -285,7 +285,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			median += offset;
 		median /= (int)offsets.size();
 
-		PrintDebugMessage("%d", meshColl->Count);
+		//PrintDebugMessage("%d", meshColl->Count);
 		DrawDebugSphere(BoundingSphere(sphere.Center + median, sphere.Radius), Color(1, 1, 1, 0.1f), RendererDebugPage::None, false);
 	}
 	else
