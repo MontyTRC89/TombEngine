@@ -1,7 +1,8 @@
 #pragma once
-#include "Renderer/RendererEnums.h"
+
 #include "Renderer/Graphics/IndexBuffer.h"
 #include "Renderer/Graphics/VertexBuffer.h"
+#include "Renderer/RendererEnums.h"
 
 namespace TEN::Renderer::Structures
 {

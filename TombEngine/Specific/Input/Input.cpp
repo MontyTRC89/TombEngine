@@ -1,10 +1,8 @@
-#include "framework.h"
 #include "Specific/Input/Input.h"
 #include "Game/camera.h"
 #include "Game/Gui.h"
 #include "Game/items.h"
 #include "Game/savegame.h"
-#include "Math/Math.h"
 #include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
@@ -13,7 +11,6 @@
 
 using namespace OIS;
 using namespace TEN::Gui;
-using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
 // Big TODO: Entire input system shouldn't be left exposed like this.
@@ -455,10 +452,9 @@ namespace TEN::Input
 				(((rawAxes.x - -DISPLAY_SPACE_RES.x) * 2) / (DISPLAY_SPACE_RES.x - -DISPLAY_SPACE_RES.x)) - 1.0f,
 				(((rawAxes.y - -DISPLAY_SPACE_RES.y) * 2) / (DISPLAY_SPACE_RES.y - -DISPLAY_SPACE_RES.y)) - 1.0f);
 
-			// Apply sensitivity and smoothing.
+			// Apply sensitivity.
 			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
-			float smoothing = 1.0f - (g_Configuration.MouseSmoothing * 0.1f);
-			normAxes *= sensitivity * smoothing;
+			normAxes *= sensitivity;
 
 			// Set mouse axis values.
 			AxisMap[(int)InputAxis::Mouse] = normAxes;

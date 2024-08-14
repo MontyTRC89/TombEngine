@@ -1,5 +1,4 @@
 #pragma once
-#include "Math/Math.h"
 
 #define SHAPE_RECTANGLE 0
 #define SHAPE_TRIANGLE	1

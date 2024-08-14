@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Math/Objects/EulerAngles.h"
 
 #include "Math/Constants.h"
@@ -6,10 +5,8 @@
 #include "Math/Legacy.h"
 #include "Math/Objects/AxisAngle.h"
 
-using namespace TEN::Math;
-
-//namespace TEN::Math
-//{
+namespace TEN::Math
+{
 	const EulerAngles EulerAngles::Identity = EulerAngles(0, 0, 0);
 
 	EulerAngles::EulerAngles(const Vector3& dir)
@@ -265,4 +262,4 @@ using namespace TEN::Math;
 		int sign = copysign(1, Geometry::GetShortestAngle(angleFrom, angleTo));
 		return (angleFrom + (angularVel * sign));
 	}
-//}
+}

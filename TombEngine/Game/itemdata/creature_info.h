@@ -1,5 +1,4 @@
 #pragma once
-#include "Math/Math.h"
 
 struct ItemInfo;
 
@@ -81,12 +80,6 @@ struct CreatureBiteInfo
 	CreatureBiteInfo(const Vector3& pos, int boneID)
 	{
 		Position = pos;
-		BoneID = boneID;
-	}
-
-	CreatureBiteInfo(float x, float y, float z, int boneID)
-	{
-		Position = Vector3(x, y, z);
 		BoneID = boneID;
 	}
 };

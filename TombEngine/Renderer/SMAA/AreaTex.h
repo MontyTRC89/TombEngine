@@ -26,7 +26,6 @@
  * SOFTWARE.
  */
 
-
 #ifndef AREATEX_H
 #define AREATEX_H
 

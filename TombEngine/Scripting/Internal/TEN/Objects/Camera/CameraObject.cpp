@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "CameraObject.h"
 #include "Game/camera.h"
 

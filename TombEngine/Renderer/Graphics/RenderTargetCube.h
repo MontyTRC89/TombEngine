@@ -1,6 +1,5 @@
 #pragma once
-#include <d3d11.h>
-#include <wrl/client.h>
+
 #include "Renderer/Graphics/TextureBase.h"
 #include "Renderer/RendererUtils.h"
 

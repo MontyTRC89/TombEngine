@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Game/control/box.h"
@@ -8,7 +7,6 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
-#include "Math/Math.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
 #include "Objects/Generic/Object/rope.h"

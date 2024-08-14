@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Math/Geometry.h"
 
 #include "Math/Constants.h"

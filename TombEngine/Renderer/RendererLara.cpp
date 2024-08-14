@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Renderer/Renderer.h"
 
 #include "Game/animation.h"
@@ -11,13 +10,11 @@
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Hair;
-using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 extern ScriptInterfaceFlowHandler *g_GameFlow;

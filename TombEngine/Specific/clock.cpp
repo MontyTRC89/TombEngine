@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Specific/clock.h"
 
 // Globals

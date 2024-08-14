@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Entity/tr4_baboon.h"
 
 #include "Game/collision/collide_room.h"
@@ -14,11 +13,9 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
-using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {

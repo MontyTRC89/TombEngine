@@ -1,5 +1,4 @@
 #pragma once
-#include "Math/Math.h"
 
 namespace TEN::Effects::Spark
 {

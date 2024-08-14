@@ -1,5 +1,4 @@
 #pragma once
-#include "framework.h"
 
 #include "Renderer/Renderer.h"
 #include "Scripting/Internal/ReservedScriptNames.h"

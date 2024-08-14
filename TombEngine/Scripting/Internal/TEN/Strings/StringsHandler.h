@@ -1,10 +1,8 @@
 #pragma once
-#include <optional>
-#include <unordered_map>
 
+#include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/TEN/Strings/DisplayString/DisplayString.h"
-#include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 
 using DisplayStringMap = std::unordered_map<DisplayStringID, UserDisplayString>;
 

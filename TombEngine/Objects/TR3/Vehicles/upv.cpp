@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Vehicles/upv.h"
 
 #include "Game/animation.h"
@@ -157,7 +156,6 @@ namespace TEN::Entities::Vehicles
 		UPV_FLAG_DIVE	 = (1 << 2),
 		UPV_FLAG_DEAD	 = (1 << 3)
 	};
-
 
 	UPVInfo* GetUPVInfo(ItemInfo* UPVItem)
 	{

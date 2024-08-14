@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/control/control.h"
 #include "Game/Lara/lara_struct.h"
 #include "Specific/clock.h"

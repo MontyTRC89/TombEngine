@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Object/WraithTrap.h"
 
 #include "Game/animation.h"

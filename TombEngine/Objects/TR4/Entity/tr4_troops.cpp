@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Entity/tr4_troops.h"
 
 #include "Game/control/box.h"
@@ -13,10 +12,7 @@
 #include "Game/animation.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/level.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {

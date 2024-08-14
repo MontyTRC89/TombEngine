@@ -1,7 +1,7 @@
 #pragma once
+
 #include "Game/Lara/lara.h"
 
-class EulerAngles;
 struct CollisionInfo;
 struct ItemInfo;
 

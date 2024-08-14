@@ -1,12 +1,9 @@
-#include "framework.h"
 #include "Game/Hud/Speedometer.h"
 
 #include "Game/effects/DisplaySprite.h"
-#include "Math/Math.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Effects::DisplaySprite;
-using namespace TEN::Math;
 
 namespace TEN::Hud
 {

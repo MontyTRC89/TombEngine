@@ -1,11 +1,11 @@
 #pragma once
+
 #include "Renderer/Graphics/TextureBase.h"
 #include "Renderer/RendererUtils.h"
 
 namespace TEN::Renderer::Graphics
 {
 	using namespace TEN::Renderer::Utils;
-	using namespace DirectX;
 
 	using Microsoft::WRL::ComPtr;
 

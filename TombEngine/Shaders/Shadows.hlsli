@@ -132,7 +132,6 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
     lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * INV_SHADOW_INTENSITY));
 }
 
-
 void DoBlobShadows(float3 worldPos, inout float3 lighting)
 {
     float shadowFactor = 1.0f;

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/control/control.h"
 
 class ScriptInterfaceLevel;
@@ -35,6 +36,7 @@ public:
 	virtual bool IsMassPickupEnabled() const = 0;
 	virtual bool IsPointFilterEnabled() const = 0;
 	virtual bool IsLaraInTitleEnabled() const = 0;
+	virtual bool IsHomeLevelEnabled() const = 0;
 	virtual bool IsLoadSaveEnabled() const = 0;
 	virtual bool HasCrawlExtended() const = 0;
 	virtual bool HasCrouchRoll() const = 0;

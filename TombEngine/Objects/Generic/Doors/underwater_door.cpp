@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Generic/Doors/underwater_door.h"
 
 #include "Game/animation.h"
@@ -14,7 +13,6 @@
 #include "Game/Lara/lara_struct.h"
 #include "Game/misc.h"
 #include "Game/pickup/pickup.h"
-#include "Math/Math.h"
 #include "Objects/Generic/Doors/generic_doors.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"

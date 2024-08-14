@@ -1,7 +1,8 @@
 #pragma once
+
+#include "Game/room.h"
 #include "Renderer/RendererEnums.h"
 #include "Renderer/Structures/RendererLight.h"
-#include "Game/room.h"
 
 namespace TEN::Renderer::Structures
 {

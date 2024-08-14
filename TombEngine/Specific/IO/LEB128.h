@@ -1,8 +1,5 @@
 #pragma once
 
-#include <stdlib.h>
-#include <stdint.h>
-
 #include "Specific/IO/Streams.h"
 
 struct LEB128

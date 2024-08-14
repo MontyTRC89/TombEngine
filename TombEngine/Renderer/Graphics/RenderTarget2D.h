@@ -1,13 +1,10 @@
 #pragma once
-#include <d3d11.h>
-#include <wrl/client.h>
+
 #include "Renderer/Graphics/TextureBase.h"
 #include "Renderer/RendererUtils.h"
 
 namespace TEN::Renderer::Graphics
 {
-	using namespace TEN::Renderer::Utils;
-
 	using Microsoft::WRL::ComPtr;
 
 	class RenderTarget2D : public TextureBase

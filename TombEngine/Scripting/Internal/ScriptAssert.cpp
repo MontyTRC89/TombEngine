@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Scripting/Internal/ScriptAssert.h"
 
 static ErrorMode ScriptErrorMode = ErrorMode::Warn;

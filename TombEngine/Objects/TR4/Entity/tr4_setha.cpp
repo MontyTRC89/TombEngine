@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Entity/tr4_setha.h"
 
 #include "Game/animation.h"
@@ -17,14 +16,12 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
-using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {

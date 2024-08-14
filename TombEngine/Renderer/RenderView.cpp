@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Renderer/RenderView.h"
 
 namespace TEN::Renderer

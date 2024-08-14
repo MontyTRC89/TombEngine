@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR5/Entity/tr5_guard.h"
 
 #include "Game/animation.h"
@@ -14,12 +13,10 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {

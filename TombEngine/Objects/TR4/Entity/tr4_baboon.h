@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/Math.h"
+
 #include "Game/items.h"
 
 namespace TEN::Entities::TR4

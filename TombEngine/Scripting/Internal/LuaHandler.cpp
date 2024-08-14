@@ -1,10 +1,7 @@
-#pragma once
-#include "framework.h"
-
-#include <filesystem>
 #include "Scripting/Internal/LuaHandler.h"
 
-LuaHandler::LuaHandler(sol::state* lua) : _lua{ lua }
+LuaHandler::LuaHandler(sol::state* lua) :
+	_lua{ lua }
 {
 }
 

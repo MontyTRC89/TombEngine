@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR2/Vehicles/speedboat.h"
 
 #include "Game/animation.h"

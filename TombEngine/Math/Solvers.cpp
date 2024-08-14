@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Math/Solvers.h"
 
 #include "Math/Constants.h"

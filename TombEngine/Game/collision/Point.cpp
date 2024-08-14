@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/collision/Point.h"
 
 #include "Game/collision/collide_room.h"
@@ -6,13 +5,11 @@
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Room;
-using namespace TEN::Math;
 
 namespace TEN::Collision::Point
 {

@@ -1,12 +1,6 @@
-#include "framework.h"
 #include "Specific/winmain.h"
 
 #include <CommCtrl.h>
-#include <process.h>
-#include <resource.h>
-#include <iostream>
-#include <codecvt>
-#include <filesystem>
 
 #include "Game/control/control.h"
 #include "Game/savegame.h"
@@ -22,11 +16,6 @@
 using namespace TEN::Renderer;
 using namespace TEN::Input;
 using namespace TEN::Utils;
-
-using std::exception;
-using std::string;
-using std::cout;
-using std::endl;
 
 WINAPP App;
 unsigned int ThreadID;

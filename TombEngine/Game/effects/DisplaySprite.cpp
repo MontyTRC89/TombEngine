@@ -1,13 +1,9 @@
-#include "framework.h"
 #include "Game/effects/DisplaySprite.h"
 
 #include "Game/effects/effects.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/objectslist.h"
 #include "Renderer/Renderer.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Effects::DisplaySprite
 {

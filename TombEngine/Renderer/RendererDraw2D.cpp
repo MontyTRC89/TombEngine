@@ -1,4 +1,4 @@
-#include "framework.h"
+
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
@@ -6,7 +6,6 @@
 #include "Game/effects/weather.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 #include "Objects/Utils/object_helper.h"
 #include "Renderer/Renderer.h"
@@ -26,7 +25,6 @@ namespace TEN::Renderer
 	using namespace TEN::Renderer::Structures;
 	using namespace TEN::Effects::DisplaySprite;
 	using namespace TEN::Effects::Environment;
-	using namespace TEN::Math;
 
 	void Renderer::InitializeGameBars()
 	{

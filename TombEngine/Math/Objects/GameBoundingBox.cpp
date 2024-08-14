@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Math/Objects/GameBoundingBox.h"
 
 #include "Game/animation.h"
@@ -8,8 +7,8 @@
 #include "Math/Objects/Pose.h"
 #include "Objects/game_object_ids.h"
 
-//namespace TEN::Math
-//{
+namespace TEN::Math
+{
 	const GameBoundingBox GameBoundingBox::Zero = GameBoundingBox(0, 0, 0, 0, 0, 0);
 
 	GameBoundingBox::GameBoundingBox(float x1, float x2, float y1, float y2, float z1, float z2)
@@ -144,4 +143,4 @@
 			Y1 / scalar, Y2 / scalar,
 			Z1 / scalar, Z2 / scalar);
 	}
-//}
+}

@@ -1,7 +1,4 @@
-#include "framework.h"
 #include "Game/control/volume.h"
-
-#include <filesystem>
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"

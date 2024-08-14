@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Effects/Boss.h"
 
 #include "Game/collision/collide_room.h"

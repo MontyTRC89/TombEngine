@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/control/box.h"
 
 struct CreatureBiteInfo;

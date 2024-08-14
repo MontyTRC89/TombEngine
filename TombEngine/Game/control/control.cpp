@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/control/control.h"
 
 #include <chrono>
@@ -39,7 +38,6 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Game/spotcam.h"
-#include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"
@@ -85,7 +83,6 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Hud;
 using namespace TEN::Input;
-using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 int GameTimer       = 0;
@@ -397,6 +394,7 @@ void KillMoveEffects()
 	ItemNewRoomNo = 0;
 }
 
+// NOTE: No one should use this ever again.
 int GetRandomControl()
 {
 	return Random::GenerateInt();
@@ -576,6 +574,10 @@ GameStatus DoGameLoop(int levelIndex)
 			case InventoryResult::NewGame:
 			case InventoryResult::NewGameSelectedLevel:
 				status = GameStatus::NewGame;
+				break;
+
+			case InventoryResult::HomeLevel:
+				status = GameStatus::HomeLevel;
 				break;
 
 			case InventoryResult::LoadGame:

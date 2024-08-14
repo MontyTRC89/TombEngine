@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/control/flipeffect.h"
 
 #include "Game/camera.h"
@@ -23,7 +22,6 @@
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/Effects/tr4_locusts.h"
-
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprint;

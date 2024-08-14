@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Renderer/Graphics/Texture2D.h"
 
 namespace TEN::Renderer::Structures

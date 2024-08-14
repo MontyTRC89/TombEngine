@@ -1,6 +1,5 @@
 #pragma once
 
-class Pose;
 struct ItemInfo;
 struct ObjectInfo;
 

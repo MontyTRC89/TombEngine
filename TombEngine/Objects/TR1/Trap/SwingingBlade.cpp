@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR1/Trap/SwingingBlade.h"
 
 #include "Game/Setup.h"

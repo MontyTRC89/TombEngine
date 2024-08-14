@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR1/Entity/tr1_doppelganger.h"
 
 #include "Game/animation.h"

@@ -7,13 +7,6 @@
     "publicKeyToken='6595b64144ccf1df' " \
     "language='*'\"")
 
-#include <process.h>
-#include <vector>
-
-#include "Math/Math.h"
-
-using namespace TEN::Math;
-
 struct WINAPP
 {
     HINSTANCE hInstance;

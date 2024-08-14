@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/effects/Electricity.h"
 
 using namespace TEN::Effects::Electricity;

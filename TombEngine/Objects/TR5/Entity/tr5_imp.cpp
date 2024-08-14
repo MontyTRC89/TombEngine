@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR5/Entity/tr5_imp.h"
 
 #include "Game/animation.h"
@@ -11,12 +10,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Specific/level.h"
 
 using namespace TEN::Entities::Generic;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
 {

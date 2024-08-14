@@ -1,6 +1,5 @@
 #pragma once
-#include "Math/Objects/GameBoundingBox.h"
-#include "Math/Objects/Pose.h"
+
 #include "Renderer/Structures/RendererLight.h"
 
 namespace TEN::Renderer::Structures

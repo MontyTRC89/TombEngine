@@ -1,8 +1,6 @@
 #pragma once
-#include <wrl/client.h>
-#include <d3d11.h>
+
 #include "Renderer/Graphics/TextureBase.h"
-#include <vector>
 
 namespace TEN::Renderer::Graphics
 {

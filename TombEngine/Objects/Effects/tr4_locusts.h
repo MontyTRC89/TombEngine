@@ -1,6 +1,6 @@
 #pragma once
+
 #include "Game/items.h"
-#include "Math/Math.h"
 
 struct LOCUST_INFO
 {

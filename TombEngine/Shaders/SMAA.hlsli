@@ -26,7 +26,6 @@
  * SOFTWARE.
  */
 
-
  /**
   *                  _______  ___  ___       ___           ___
   *                 /       ||   \/   |     /   \         /   \
@@ -633,7 +632,6 @@ void SMAAMovc(bool4 cond, inout float4 variable, float4 value) {
     SMAAMovc(cond.xy, variable.xy, value.xy);
     SMAAMovc(cond.zw, variable.zw, value.zw);
 }
-
 
 #if SMAA_INCLUDE_VS
 //-----------------------------------------------------------------------------

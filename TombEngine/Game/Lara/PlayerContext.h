@@ -1,12 +1,10 @@
 #pragma once
+
 #include "Game/Lara/PlayerContextData.h"
-#include "Math/Math.h"
 
 struct CollisionInfo;
 struct ItemInfo;
 struct LaraInfo;
-
-using namespace TEN::Math;
 
 namespace TEN::Entities::Player
 {

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Renderer/RendererEnums.h"
 #include "Renderer/Structures/RendererPolygon.h"
 

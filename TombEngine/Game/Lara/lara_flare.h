@@ -1,7 +1,6 @@
 #pragma once
 
 enum GAME_OBJECT_ID : short;
-class Vector3i;
 struct CollisionInfo;
 struct ItemInfo;
 

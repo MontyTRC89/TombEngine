@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/Lara/lara_flare.h"
 
 #include "Game/animation.h"
@@ -14,13 +13,11 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
-using namespace TEN::Math;
 
 constexpr auto FLARE_LIFE_MAX	 = 60.0f * FPS;
 constexpr auto FLARE_DEATH_DELAY = 1.0f  * FPS;

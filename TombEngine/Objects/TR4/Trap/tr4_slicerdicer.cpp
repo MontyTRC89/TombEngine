@@ -1,16 +1,13 @@
-#include "framework.h"
 #include "Objects/TR4/Trap/tr4_slicerdicer.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/items.h"
-#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Traps
 {

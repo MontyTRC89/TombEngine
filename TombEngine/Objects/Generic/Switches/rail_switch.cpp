@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Generic/Switches/rail_switch.h"
 #include "Specific/Input/Input.h"
 #include "Game/Lara/lara.h"

@@ -1,14 +1,10 @@
-#include "framework.h"
 #include "Game/effects/Blood.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/clock.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Effects::Blood
 {

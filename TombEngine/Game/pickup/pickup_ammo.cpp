@@ -1,7 +1,4 @@
-#include "framework.h"
 #include "Game/pickup/pickup_ammo.h"
-
-#include <array>
 
 #include "Game/Lara/lara_struct.h"
 #include "Game/pickup/pickuputil.h"

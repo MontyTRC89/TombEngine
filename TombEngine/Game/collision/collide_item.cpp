@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/collision/collide_item.h"
 
 #include "Game/animation.h"
@@ -17,13 +16,11 @@
 #include "Game/pickup/pickup.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
-using namespace TEN::Math;
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
 

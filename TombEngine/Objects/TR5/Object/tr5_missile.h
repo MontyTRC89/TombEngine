@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/effects/effects.h"
 
 void MissileControl(short itemNumber);

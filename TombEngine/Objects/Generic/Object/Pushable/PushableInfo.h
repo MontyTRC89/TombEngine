@@ -1,10 +1,8 @@
 #pragma once
-#include "Math/Math.h"
+
 #include "Objects/Generic/Object/Pushable/PushableStates.h"
 
 #include "Objects/Generic/Object/BridgeObject.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Entities::Generic
 {

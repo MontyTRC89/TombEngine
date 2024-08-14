@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Entity/tr4_mutant.h"
 
 #include "Game/animation.h"
@@ -10,12 +9,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/objectslist.h"
 #include "Renderer/RendererEnums.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {

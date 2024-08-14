@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/effects/chaffFX.h"
 
 #include "Game/animation.h"
@@ -11,13 +10,11 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/level.h"
 #include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Effects::Bubble;
-using namespace TEN::Math;
 
 constexpr auto MAX_TRIGGER_RANGE = BLOCK(16);
 

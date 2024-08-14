@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR1/Entity/WingedMutant.h"
 
 #include "Game/collision/collide_room.h"

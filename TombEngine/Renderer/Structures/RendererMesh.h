@@ -1,6 +1,9 @@
 #pragma once
-#include "Renderer/Structures/RendererBucket.h"
+
+#include <DirectXCollision.h>
+
 #include "Renderer/RendererEnums.h"
+#include "Renderer/Structures/RendererBucket.h"
 
 namespace TEN::Renderer::Structures
 {
