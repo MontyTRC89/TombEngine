@@ -129,54 +129,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
-      <LargeAddressAware>true</LargeAddressAware>
-      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Link>
-    <PostBuildEvent>
-      <Command>xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
-      <Message>Copy bass dll to compiled bin directory.</Message>
-    </PostBuildEvent>
-    <PreBuildEvent>
-      <Command>CD "$(SolutionDir)Documentation"
-CALL compile.bat .
-
-CD "$(ProjectDir)Specific\savegame\schema\"
-CALL gen.bat
-
-md "$(SolutionDir)Game\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"</Command>
-      <Message>Generating documentation, savegame flatbuffer and copying shaders files.</Message>
-    </PreBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libs\bass\;$(SolutionDir)Libs\fixedpoint\;$(SolutionDir)Libs\srtparser\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <MinimalRebuild>false</MinimalRebuild>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <PrecompiledHeaderFile>framework.h</PrecompiledHeaderFile>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
-      <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ForcedIncludeFiles>Framework.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -203,8 +156,63 @@ CALL gen.bat
 
 md "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
+xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
+xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
+xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"</Command>
+      <Message>Generating documentation, savegame flatbuffer and copying scripts and shaders files.</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libs\bass\;$(SolutionDir)Libs\fixedpoint\;$(SolutionDir)Libs\srtparser\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <PrecompiledHeaderFile>framework.h</PrecompiledHeaderFile>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
+      <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ForcedIncludeFiles>Framework.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <LargeAddressAware>true</LargeAddressAware>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
+      <Message>Copy bass dll to compiled bin directory.</Message>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>CD "$(SolutionDir)Documentation"
+CALL compile.bat .
+
+CD "$(ProjectDir)Specific\savegame\schema\"
+CALL gen.bat
+
+md "$(SolutionDir)Game\Shaders"
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
+xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
+xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
+xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"
 </Command>
-      <Message>Generating documentation, savegame flatbuffer and copying shaders files.</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying scripts and shaders files.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -236,6 +244,7 @@ xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ForcedIncludeFiles>Framework.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -262,10 +271,13 @@ CD "$(ProjectDir)Specific\savegame\schema\"
 CALL gen.bat
 
 md "$(SolutionDir)Game\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"</Command>
+xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
+xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
+xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
+xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating documentation, savegame flatbuffer and copying shaders files.</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying scripts and shaders files.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -297,6 +309,7 @@ xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"</Command>
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ForcedIncludeFiles>Framework.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -323,10 +336,13 @@ CALL gen.bat
 
 md "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
+xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
+xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
+xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"
 </Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating documentation, savegame flatbuffer and copying shaders files.</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying scripts and shaders files.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -523,6 +539,7 @@ xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
     <ClInclude Include="Objects\TR3\Entity\Raptor.h" />
+    <ClInclude Include="Objects\TR3\Entity\SealMutant.h" />
     <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_claw_mutant.h" />
@@ -1029,6 +1046,7 @@ xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Raptor.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\SealMutant.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Shiva.cpp" />
     <ClCompile Include="Objects\TR3\Entity\SophiaLeigh.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_civvy.cpp" />
@@ -1238,7 +1256,6 @@ xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
     <ClCompile Include="Specific\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\.editorconfig" />
     <None Include="Objects\Generic\Switches\rail_switch.h" />
     <None Include="Resources.aps" />
     <None Include="RuleSet.ruleset" />

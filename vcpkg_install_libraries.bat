@@ -79,6 +79,8 @@ mkdir Game
 mkdir Game\Audio
 mkdir Game\Data
 mkdir Game\Scripts
+mkdir Game\Scripts\Engine
+mkdir Game\Scripts\Levels
 mkdir Game\Shaders
 mkdir Game\Textures
 

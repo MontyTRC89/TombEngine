@@ -1,7 +1,3 @@
-#include <ctime>
-#include <ScreenGrab.h>
-#include <wincodec.h>
-
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"

@@ -1,8 +1,4 @@
 #include "Game/control/control.h"
-
-#include <chrono>
-#include <process.h>
-
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
