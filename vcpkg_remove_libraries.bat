@@ -1,69 +1,69 @@
 @echo off
-title VCpkg Library Installer
+title VCpkg Library Uninnstaller
 color 10
 
 echo "========================================"
-echo " This batch remove vcpkg library        "
-echo "                      for TombEngine.   "
+echo "   This batch removes vcpkg libraries   "
+echo "             for TombEngine.            "
 echo "========================================"
 echo.
 timeout /t 1 /nobreak > NUL
 
 echo "========================================"
-echo "      Starting with x86 libraries.      "
+echo "       Uninstalling x86 libraries.      "
 echo "========================================"
 timeout /t 1 /nobreak > NUL
 
-echo Removing DirectXTK.
+echo Uninstalling DirectX Tool Kit.
 timeout /t 1 /nobreak > NUL
 vcpkg remove directxtk[core,tools]:x86-windows
 
-echo Removing OIS.
+echo Uninstalling OIS.
 timeout /t 1 /nobreak > NUL
 vcpkg remove ois[core]:x86-windows
 
-echo Removing FlatBuffers.
+echo Uninstalling FlatBuffers.
 timeout /t 1 /nobreak > NUL
 vcpkg remove flatbuffers[core]:x86-windows
 
-echo Removing Spdlog.
+echo Uninstalling spdlog.
 timeout /t 1 /nobreak > NUL
 vcpkg remove spdlog[core]:x86-windows
 
-echo Removing Sol2 (Lua Module).
+echo Uninstalling Sol2 (Lua module).
 timeout /t 1 /nobreak > NUL
 vcpkg remove sol2[core]:x86-windows
 
-echo Removing Lua.
+echo Uninstalling Lua.
 timeout /t 1 /nobreak > NUL
 vcpkg remove lua[core,cpp,tools]:x86-windows
 
 echo "========================================"
-echo "        Now with x64 libraries.         "
+echo "       Uninstalling x64 libraries.      "
 echo "========================================"
 timeout /t 1 /nobreak > NUL
 
-echo Removing DirectXTK.
+echo Uninstalling DirectX Tool Kit.
 timeout /t 1 /nobreak > NUL
 vcpkg remove directxtk[core,tools]:x64-windows
 
-echo Removing OIS.
+echo Uninstalling OIS.
 timeout /t 1 /nobreak > NUL
 vcpkg remove ois[core]:x64-windows
 
-echo Removing FlatBuffers.
+echo Uninstalling FlatBuffers.
 timeout /t 1 /nobreak > NUL
 vcpkg remove flatbuffers[core]:x64-windows
 
-echo Removing Spdlog.
+echo Uninstalling spdlog.
 timeout /t 1 /nobreak > NUL
 vcpkg remove spdlog[core]:x64-windows
 
-echo Removing Sol2 (Lua Module).
+echo Uninstalling Sol2 (Lua module).
 timeout /t 1 /nobreak > NUL
 vcpkg remove sol2[core]:x64-windows
 
-echo Removing Lua.
+echo Uninstalling Lua.
 timeout /t 1 /nobreak > NUL
 vcpkg remove lua[core,cpp,tools]:x64-windows
 vcpkg integrate remove

@@ -3,18 +3,18 @@ title VCpkg Library Installer
 color 10
 
 echo "========================================"
-echo " This batch install vcpkg library       "
-echo "                      for TombEngine.   "
+echo "   This batch installs VCpkg libraries  "
+echo "             for TombEngine.            "
 echo "========================================"
 echo.
 timeout /t 1 /nobreak > NUL
 
 echo "========================================"
-echo "      Starting with x86 libraries.      "
+echo "        Installing x86 libraries.       "
 echo "========================================"
 timeout /t 1 /nobreak > NUL
 
-echo Installing DirectXTK.
+echo Installing DirectX Tool Kit.
 timeout /t 1 /nobreak > NUL
 vcpkg install directxtk[core,tools]:x86-windows
 
@@ -26,11 +26,11 @@ echo Installing FlatBuffers.
 timeout /t 1 /nobreak > NUL
 vcpkg install flatbuffers[core]:x86-windows
 
-echo Installing Spdlog.
+echo Installing spdlog.
 timeout /t 1 /nobreak > NUL
 vcpkg install spdlog[core]:x86-windows
 
-echo Installing Sol2 (Lua Module).
+echo Installing Sol2 (Lua module).
 timeout /t 1 /nobreak > NUL
 vcpkg install sol2[core]:x86-windows
 
@@ -39,11 +39,11 @@ timeout /t 1 /nobreak > NUL
 vcpkg install lua[core,cpp,tools]:x86-windows
 
 echo "========================================"
-echo "        Now with x64 libraries.         "
+echo "        Installing x64 libraries.       "
 echo "========================================"
 timeout /t 1 /nobreak > NUL
 
-echo Installing DirectXTK.
+echo Installing DirectX Tool Kit.
 timeout /t 1 /nobreak > NUL
 vcpkg install directxtk[core,tools]:x64-windows
 
@@ -55,7 +55,7 @@ echo Installing FlatBuffers.
 timeout /t 1 /nobreak > NUL
 vcpkg install flatbuffers[core]:x64-windows
 
-echo Installing Spdlog.
+echo Installing spdlog.
 timeout /t 1 /nobreak > NUL
 vcpkg install spdlog[core]:x64-windows
 
@@ -68,7 +68,7 @@ timeout /t 1 /nobreak > NUL
 vcpkg install lua[core,cpp,tools]:x64-windows
 
 echo "========================================"
-echo "  Updating libraries to latest version  "
+echo " Updating libraries to latest versions. "
 echo "========================================"
 timeout /t 1 /nobreak > NUL
 vcpkg upgrade --no-dry-run
