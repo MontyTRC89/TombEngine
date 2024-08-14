@@ -40,7 +40,7 @@ namespace TEN::Renderer
 	constexpr auto MenuVerticalLineSpacing = 30;
 	constexpr auto MenuVerticalNarrowLineSpacing = 24;
 	constexpr auto MenuVerticalBlockSpacing = 50;
-	
+
 	// Vertical menu positioning templates
 	constexpr auto MenuVerticalControlsSettings = 100;
 	constexpr auto MenuVerticalKeyBindingsSettings = 30;
@@ -71,10 +71,25 @@ namespace TEN::Renderer
 	// Helper functions to construct string flags
 	inline int SF(bool selected = false) { return (int)PrintStringFlags::Outline | (selected ? (int)PrintStringFlags::Blink : 0); }
 	inline int SF_Center(bool selected = false) { return (int)PrintStringFlags::Outline | (int)PrintStringFlags::Center | (selected ? (int)PrintStringFlags::Blink : 0); }
-	
+
 	// Helper functions to get specific generic strings
 	inline std::string GetStringOnOff(bool on = false) { return g_GameFlow->GetString(on ? STRING_ON: STRING_OFF); }
 	inline std::string GetStringSaveLoad(bool save = false) { return g_GameFlow->GetString(save ? STRING_SAVE_GAME : STRING_LOAD_GAME); }
+	inline std::string GetStringMenuOptionLoopingMode(MenuOptionLoopingMode loopingMode)
+	{
+		switch (loopingMode)
+		{
+		default:
+		case MenuOptionLoopingMode::AllMenus:
+			return g_GameFlow->GetString(STRING_MENU_OPT_LOOP_ALL_MENUS);
+
+		case MenuOptionLoopingMode::SaveLoadOnly:
+			return g_GameFlow->GetString(STRING_MENU_OPT_LOOP_SAVE_LOAD_ONLY);
+
+		case MenuOptionLoopingMode::Off:
+			return g_GameFlow->GetString(STRING_MENU_OPT_LOOP_OFF);
+		}
+	}
 
 	// These bars are only used in menus.
 	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
@@ -256,15 +271,20 @@ namespace TEN::Renderer
 			// Mouse sensitivity
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SENSITIVITY), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
 			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
+			GetNextLinePosition(&y);
+
+			// Menu option looping
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MENU_OPT_LOOP), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
+			AddString(MenuRightSideEntry, y, GetStringMenuOptionLoopingMode(g_Gui.GetCurrentSettings().Configuration.MenuOptionLoopingMode), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
 
 			y = MenuVerticalBottomOptions;
 
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 6));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 7));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 7));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 8));
 			break;
 
 		case Menu::Gameplay:
@@ -643,6 +663,14 @@ namespace TEN::Renderer
 			GetNextLinePosition(&y);
 			selectedOption++;
 
+			// Home Level
+			if (g_GameFlow->IsHomeLevelEnabled())
+			{
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_HOME_LEVEL), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
+				GetNextLinePosition(&y);
+				selectedOption++;
+			}
+
 			// Load game
 			if (g_GameFlow->IsLoadSaveEnabled())
 			{
@@ -672,8 +700,8 @@ namespace TEN::Renderer
 			AddString(MenuCenterEntry, 26, g_GameFlow->GetString(STRING_SELECT_LEVEL), PRINTSTRING_COLOR_ORANGE, SF_Center());
 			GetNextBlockPosition(&y);
 
-			// Level listing (starts with 1 because 0 is always title)
-			for (int i = 1; i < g_GameFlow->GetNumLevels(); i++, selectedOption++)
+			// Level 0 is always Title Level and level 1 might be Home Level.
+			for (int i = (g_GameFlow->IsHomeLevelEnabled() ? 2 : 1); i < g_GameFlow->GetNumLevels(); i++, selectedOption++)
 			{
 				AddString(MenuCenterEntry, y, g_GameFlow->GetString(g_GameFlow->GetLevel(i)->NameStringKey), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 				GetNextNarrowLinePosition(&y);
@@ -957,7 +985,7 @@ namespace TEN::Renderer
 		{
 			if (meshBits && !(meshBits & (1 << n)))
 				continue;
-			
+
 			auto* mesh = (*moveableObject).ObjectMeshes[n];
 
 			// HACK: Rotate compass needle.
@@ -982,7 +1010,7 @@ namespace TEN::Renderer
 			_cbItem.UpdateData(_stItem, _context.Get());
 			BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
 			BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
-			
+
 			for (const auto& bucket : mesh->Buckets)
 			{
 				if (bucket.NumVertices == 0)
@@ -994,10 +1022,10 @@ namespace TEN::Renderer
 
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 				BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-				
+
 				 if (bucket.BlendMode != BlendMode::Opaque)
 					Renderer::SetBlendMode(bucket.BlendMode, true);
-				
+
 				SetAlphaTest(
 					(bucket.BlendMode == BlendMode::AlphaTest) ? AlphaTestMode::GreatherThan : AlphaTestMode::None,
 					ALPHA_TEST_THRESHOLD);
@@ -1261,9 +1289,9 @@ namespace TEN::Renderer
 	{
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
-		
+
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 0.5f);
-		
+
 		_swapChain->Present(0, 0);
 	}
 
@@ -1328,14 +1356,14 @@ namespace TEN::Renderer
 			PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);
 			PrintDebugMessage("    GetVisibleRooms() calls: %d", _numGetVisibleRoomsCalls);
 			PrintDebugMessage("    Dot products: %d", _numDotProducts);
-				 
-			_spriteBatch->Begin(SpriteSortMode_Deferred, _renderStates->Opaque()); 
+
+			_spriteBatch->Begin(SpriteSortMode_Deferred, _renderStates->Opaque());
 
 			rect.left = _screenWidth - thumbWidth;
 			rect.top = thumbY;
 			rect.right = rect.left+ thumbWidth;
 			rect.bottom = rect.top+thumbWidth / aspectRatio;
-				  
+
 			_spriteBatch->Draw(_normalsRenderTarget.ShaderResourceView.Get(), rect);
 			thumbY += thumbWidth / aspectRatio;
 
@@ -1422,7 +1450,7 @@ namespace TEN::Renderer
 				if (action.IsReleased())
 					releasedActions.Set((int)action.GetID());
 			}
-				
+
 			PrintDebugMessage("INPUT STATS");
 			PrintDebugMessage(("Clicked actions: " + clickedActions.ToString()).c_str());
 			PrintDebugMessage(("Held actions: " + heldActions.ToString()).c_str());
@@ -1454,7 +1482,7 @@ namespace TEN::Renderer
 			PrintDebugMessage("PATHFINDING STATS");
 			PrintDebugMessage("BoxNumber: %d", LaraItem->BoxNumber);
 			break;
-				
+
 		case RendererDebugPage::WireframeMode:
 			PrintDebugMessage("WIREFRAME MODE");
 			break;

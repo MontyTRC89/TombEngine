@@ -3,6 +3,7 @@
 // std::string ID macros
 #define STRING_WINDOW_TITLE				"window_title"
 #define STRING_PASSPORT					"passport"
+#define STRING_HOME_LEVEL				"home_level"
 #define STRING_LARA_HOME				"lara_home"
 #define STRING_OPTIONS_CONTROLS			"options_controls"
 #define STRING_OPTIONS_DISPLAY			"options_display"
@@ -105,6 +106,10 @@
 #define STRING_INVERT_CAMERA_X_AXIS		"invert_camera_x_axis"
 #define STRING_INVERT_CAMERA_Y_AXIS		"invert_camera_y_axis"
 #define STRING_SUBTITLES				"subtitles"
+#define STRING_MENU_OPT_LOOP			"menu_option_looping"
+#define STRING_MENU_OPT_LOOP_ALL_MENUS	"menu_option_looping_all_menus"
+#define STRING_MENU_OPT_LOOP_OFF		"menu_option_looping_off"
+#define STRING_MENU_OPT_LOOP_SAVE_LOAD_ONLY "menu_option_looping_save_load_only"
 #define STRING_MOUSE_SENSITIVITY		"mouse_sensitivity"
 #define STRING_ACTIONS_FORWARD			"actions_forward"
 #define STRING_ACTIONS_BACKWARD			"actions_backward"

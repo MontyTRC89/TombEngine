@@ -17,11 +17,12 @@ namespace TEN::Config
 
 	// Controls keys
 
-	constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA = "EnableThumbstickCamera";
-	constexpr auto REGKEY_INVERT_CAMERA_X_AXIS	   = "InvertCameraXAxis";
-	constexpr auto REGKEY_INVERT_CAMERA_Y_AXIS	   = "InvertCameraYAxis";
-	constexpr auto REGKEY_ENABLE_RUMBLE			   = "EnableRumble";
-	constexpr auto REGKEY_MOUSE_SENSITIVITY		   = "MouseSensitivity";
+	constexpr auto REGKEY_ENABLE_TANK_CAMERA_CONTROL = "EnableTankCameraControl";
+	constexpr auto REGKEY_INVERT_CAMERA_X_AXIS		 = "InvertCameraXAxis";
+	constexpr auto REGKEY_INVERT_CAMERA_Y_AXIS		 = "InvertCameraYAxis";
+	constexpr auto REGKEY_ENABLE_RUMBLE				 = "EnableRumble";
+	constexpr auto REGKEY_MOUSE_SENSITIVITY			 = "MouseSensitivity";
+	constexpr auto REGKEY_MENU_OPTION_LOOPING_MODE	 = "MenuOptionLoopingMode";
 
 	// Gameplay keys
 
@@ -56,6 +57,13 @@ namespace TEN::Config
 	constexpr auto REGKEY_MUSIC_VOLUME	= "MusicVolume";
 	constexpr auto REGKEY_SFX_VOLUME	= "SfxVolume";
 
+	enum class MenuOptionLoopingMode
+	{
+		AllMenus,
+		SaveLoadOnly,
+		Off
+	};
+
 	enum class ControlMode
 	{
 		Classic,
@@ -85,7 +93,7 @@ namespace TEN::Config
 	{
 		Thirty,
 		Sixty,
-		//UnlimitedPower,
+		//Unlimited,
 
 		Count
 	};
@@ -101,12 +109,13 @@ namespace TEN::Config
 
 		// Controls
 
-		std::vector<int> KeyBindings			 = {};
-		bool			 EnableTankCameraControl = false;
-		bool			 InvertCameraXAxis		 = false;
-		bool			 InvertCameraYAxis		 = false;
-		bool			 EnableRumble			 = false;
-		int				 MouseSensitivity		 = DEFAULT_MOUSE_SENSITIVITY;
+		std::vector<int>	  KeyBindings			  = {};
+		bool				  EnableTankCameraControl = false;
+		bool				  InvertCameraXAxis		  = false;
+		bool				  InvertCameraYAxis		  = false;
+		bool				  EnableRumble			  = false;
+		int					  MouseSensitivity		  = DEFAULT_MOUSE_SENSITIVITY;
+		MenuOptionLoopingMode MenuOptionLoopingMode	  = MenuOptionLoopingMode::SaveLoadOnly;
 
 		// Gameplay
 

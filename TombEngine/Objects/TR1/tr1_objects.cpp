@@ -157,7 +157,8 @@ static void StartEntity(ObjectInfo* obj)
 		obj->radius = BLOCK(1 / 3.0f);
 		obj->intelligent = true;
 		obj->LotType = LotType::Blockable;
-		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y);
+		obj->SetBoneRotationFlags(10, ROT_X | ROT_Y); // Torso
+		obj->SetBoneRotationFlags(17, ROT_X | ROT_Y); // Head
 		obj->SetHitEffect();
 	}
 
@@ -273,7 +274,6 @@ static void StartTrap(ObjectInfo* obj)
 static void StartProjectiles(ObjectInfo* obj)
 {
 	InitProjectile(obj, ControlMissile, ID_PROJ_SHARD);
-	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
 	InitProjectile(obj, ControlMissile, ID_PROJ_BOMB);
 }
 

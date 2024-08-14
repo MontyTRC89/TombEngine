@@ -21,8 +21,8 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto TWIN_AUTO_GUN_SHOT_DAMAGE	= 5;
 	constexpr auto TWIN_AUTO_GUN_HIT_POINTS_MAX = 28;
 
-	const auto TwinAutoGunLeftBite	= CreatureBiteInfo(110, -30, 530, 2);
-	const auto TwinAutoGunRightBite = CreatureBiteInfo(-110, -30, 530, 2);
+	const auto TwinAutoGunLeftBite	= CreatureBiteInfo(Vector3(110.0f, -30.0f, 530.0f), 2);
+	const auto TwinAutoGunRightBite = CreatureBiteInfo(Vector3(-110.0f, -30.0f, 530.0f), 2);
 
 	enum TwinAutoGunAnim
 	{

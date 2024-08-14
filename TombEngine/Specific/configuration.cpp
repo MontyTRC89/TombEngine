@@ -211,6 +211,7 @@ namespace TEN::Config
 		g_Config.InvertCameraYAxis = false;
 		g_Config.EnableRumble = true;
 		g_Config.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
+		g_Config.MenuOptionLoopingMode = MenuOptionLoopingMode::SaveLoadOnly;
 
 		// Gameplay
 		g_Config.ControlMode = ControlMode::Enhanced;
@@ -268,11 +269,12 @@ namespace TEN::Config
 		}
 
 		// Set Controls keys.
-		if (SetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Config.EnableTankCameraControl) != ERROR_SUCCESS ||
+		if (SetBoolRegKey(controlsKey, REGKEY_ENABLE_TANK_CAMERA_CONTROL, g_Config.EnableTankCameraControl) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_X_AXIS, g_Config.InvertCameraXAxis) != ERROR_SUCCESS ||
 			SetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_Y_AXIS, g_Config.InvertCameraYAxis) != ERROR_SUCCESS ||
+			SetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, g_Config.EnableRumble) != ERROR_SUCCESS ||
 			SetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, g_Config.MouseSensitivity) != ERROR_SUCCESS ||
-			SetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, g_Config.EnableRumble) != ERROR_SUCCESS)
+			SetDWORDRegKey(controlsKey, REGKEY_MENU_OPTION_LOOPING_MODE, (int)g_Config.MenuOptionLoopingMode) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(controlsKey);
@@ -464,18 +466,20 @@ namespace TEN::Config
 			return false;
 		}
 
-		bool enableRumble = true;
+		bool enableThumbstickCamera = true;
 		bool invertCameraXAxis = false;
 		bool invertCameraYAxis = false;
-		bool enableThumbstickCamera = true;
+		bool enableRumble = true;
 		DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
+		DWORD menuOptionLoopingMode = (DWORD)MenuOptionLoopingMode::SaveLoadOnly;
 
 		// Load Controls keys.
-		if (GetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
+		if (GetBoolRegKey(controlsKey, REGKEY_ENABLE_TANK_CAMERA_CONTROL, &enableThumbstickCamera, true) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_X_AXIS, &invertCameraXAxis, false) != ERROR_SUCCESS ||
 			GetBoolRegKey(controlsKey, REGKEY_INVERT_CAMERA_Y_AXIS, &invertCameraYAxis, false) != ERROR_SUCCESS ||
-			GetBoolRegKey(controlsKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS ||
-			GetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS)
+			GetBoolRegKey(controlsKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS ||
+			GetDWORDRegKey(controlsKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS ||
+			GetDWORDRegKey(controlsKey, REGKEY_MENU_OPTION_LOOPING_MODE, &menuOptionLoopingMode, (DWORD)MenuOptionLoopingMode::SaveLoadOnly) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(controlsKey);
@@ -638,14 +642,30 @@ namespace TEN::Config
 		RegCloseKey(soundKey);
 
 		// All configuration values found; apply configuration.
+		g_Config.EnableTankCameraControl = enableThumbstickCamera;
+		g_Config.InvertCameraXAxis = invertCameraXAxis;
+		g_Config.InvertCameraYAxis = invertCameraYAxis;
+		g_Config.EnableRumble = enableRumble;
+		g_Config.MouseSensitivity = mouseSensitivity;
+		g_Config.MenuOptionLoopingMode = (MenuOptionLoopingMode)menuOptionLoopingMode;
+
+		g_Config.ControlMode = (ControlMode)controlMode;
+		g_Config.SwimControlMode = (SwimControlMode)swimControlMode;
+		g_Config.EnableWalkToggle = enableWalkToggle;
+		g_Config.EnableCrouchToggle = enableCrouchToggle;
+		g_Config.EnableClimbToggle = enableClimbToggle;
+		g_Config.EnableAutoMonkeySwingJump = enableAutoMonkeySwingJump;
+		g_Config.EnableAutoTargeting = enableAutoTargeting;
+		g_Config.EnableOppositeActionRoll = enableOppositeActionRoll;
+
 		g_Config.ScreenWidth = screenWidth;
 		g_Config.ScreenHeight = screenHeight;
-		g_Config.WindowMode = WindowMode(windowMode);
-		g_Config.FrameRateMode = FrameRateMode(frameRateMode);
-		g_Config.ShadowType = ShadowMode(shadowMode);
+		g_Config.WindowMode = (WindowMode)windowMode;
+		g_Config.FrameRateMode = (FrameRateMode)frameRateMode;
+		g_Config.ShadowType = (ShadowMode)shadowMode;
 		g_Config.ShadowBlobCountMax = shadowBlobsMax;
 		g_Config.EnableCaustics = enableCaustics;
-		g_Config.AntialiasingMode = AntialiasingMode(antialiasingMode);
+		g_Config.AntialiasingMode = (AntialiasingMode)antialiasingMode;
 		g_Config.ShadowMapSize = shadowMapSize;
 		g_Config.EnableAmbientOcclusion = enableAmbientOcclusion;
 		g_Config.EnableTargetHighlighter = enableTargetHighlighter;
@@ -656,20 +676,6 @@ namespace TEN::Config
 		g_Config.MusicVolume = musicVolume;
 		g_Config.SfxVolume = sfxVolume;
 		g_Config.SoundDevice = soundDevice;
-
-		g_Config.ControlMode = (ControlMode)controlMode;
-		g_Config.SwimControlMode = (SwimControlMode)swimControlMode;
-		g_Config.EnableWalkToggle = enableWalkToggle;
-		g_Config.EnableCrouchToggle = enableCrouchToggle;
-		g_Config.EnableClimbToggle = enableClimbToggle;
-		g_Config.EnableAutoMonkeySwingJump = enableAutoMonkeySwingJump;
-		g_Config.EnableAutoTargeting = enableAutoTargeting;
-		g_Config.EnableOppositeActionRoll = enableOppositeActionRoll;
-		g_Config.EnableRumble = enableRumble;
-		g_Config.InvertCameraXAxis = invertCameraXAxis;
-		g_Config.InvertCameraYAxis = invertCameraYAxis;
-		g_Config.EnableTankCameraControl = enableThumbstickCamera;
-		g_Config.MouseSensitivity = mouseSensitivity;
 
 		// Set legacy variables.
 		SetVolumeTracks(musicVolume);
