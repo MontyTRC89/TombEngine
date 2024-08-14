@@ -52,10 +52,11 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Enhanced raptor behaviour and handling. 
   - OCB 0: Classic behaviour
   - OCB 1: Can jump up/down up to 4 steps and jump across gaps up to 2 blocks wide.
-  - You must use the download version found on the TombEngine website.
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
 * Added TR3 seal mutant.
   - OCB 0: Normal enemy behaviour. (TR3 RX-Tech mines level)
   - OCB 1: Trap like behaviour. (TR3 Antarctica level)
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Seal_Mutant.wad2
 * Add new sound conditions: Quicksand and Underwater.
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.
