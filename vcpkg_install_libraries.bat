@@ -87,6 +87,9 @@ vcpkg integrate install
 echo Creating the game directory.
 mkdir Game
 mkdir Game\Audio
+mkdir Game\Bin
+mkdir Game\Bin\x64
+mkdir Game\Bin\x86
 mkdir Game\Data
 mkdir Game\Scripts
 mkdir Game\Scripts\Engine

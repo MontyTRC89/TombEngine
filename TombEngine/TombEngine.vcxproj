@@ -142,10 +142,11 @@
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
-      <Message>Copy bass dll to compiled bin directory.</Message>
+      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(LocalDebuggerWorkingDirectory)\Bin\x86"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).exp"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).lib"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).pdb"</Command>
+      <Message>Copy dll and exe to game directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD "$(SolutionDir)Documentation"
@@ -158,8 +159,12 @@ md "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
 xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
-xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"</Command>
-      <Message>Generating documentation, savegame flatbuffer and copying scripts and shaders files.</Message>
+xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"
+
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
+      <Message>Generating documentation, savegame flatbuffer, bass dll and copying scripts and shaders files.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -194,10 +199,11 @@ xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Level
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
-      <Message>Copy bass dll to compiled bin directory.</Message>
+      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(LocalDebuggerWorkingDirectory)\Bin\x64"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).exp"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).lib"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).pdb"</Command>
+      <Message>Copy dll and exe to game directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD "$(SolutionDir)Documentation"
@@ -211,8 +217,11 @@ xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
 xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
 xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"
-</Command>
-      <Message>Generating documentation, savegame flatbuffer and copying scripts and shaders files.</Message>
+
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
+      <Message>Generating documentation, savegame flatbuffer, bass dll and copying scripts and shaders files.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -258,10 +267,11 @@ xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Level
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
-      <Message>Copy bass dll to compiled bin directory.</Message>
+      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(LocalDebuggerWorkingDirectory)\Bin\x86"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).exp"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).lib"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).pdb"</Command>
+      <Message>Copy dll and exe to game directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD "$(SolutionDir)Documentation"
@@ -274,10 +284,14 @@ md "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
 xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
-xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"</Command>
+xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"
+
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating documentation, savegame flatbuffer and copying scripts and shaders files.</Message>
+      <Message>Generating documentation, savegame flatbuffer, bass dll and copying scripts and shaders files.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -322,10 +336,11 @@ xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Level
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
-      <Message>Copy bass dll to compiled bin directory.</Message>
+      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(LocalDebuggerWorkingDirectory)\Bin\x64"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).exp"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).lib"
+del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).pdb"</Command>
+      <Message>Copy dll and exe to game directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD "$(SolutionDir)Documentation"
@@ -339,10 +354,13 @@ xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
 xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
 xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"
-</Command>
+
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
+xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating documentation, savegame flatbuffer and copying scripts and shaders files.</Message>
+      <Message>Generating documentation, savegame flatbuffer, bass dll and copying scripts and shaders files.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -857,12 +875,12 @@ xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Level
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-  <ClCompile Include="Framework.cpp">
-    <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-    <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-    <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-    <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-  </ClCompile>
+    <ClCompile Include="Framework.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\camera.cpp" />
     <ClCompile Include="Game\collision\collide_item.cpp" />
