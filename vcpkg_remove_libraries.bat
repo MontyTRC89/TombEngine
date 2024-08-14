@@ -38,6 +38,10 @@ echo Uninstalling Lua.
 timeout /t 1 /nobreak > NUL
 vcpkg remove lua[core,cpp,tools]:x86-windows
 
+echo Uninstalling zlib.
+timeout /t 1 /nobreak > NUL
+vcpkg remove zlib:x86-windows
+
 echo "========================================"
 echo "       Uninstalling x64 libraries.      "
 echo "========================================"
@@ -66,6 +70,12 @@ vcpkg remove sol2[core]:x64-windows
 echo Uninstalling Lua.
 timeout /t 1 /nobreak > NUL
 vcpkg remove lua[core,cpp,tools]:x64-windows
+
+echo Uninstalling zlib.
+timeout /t 1 /nobreak > NUL
+vcpkg remove zlib:x64-windows
+
+echo Removing integration with visual studio.
 vcpkg integrate remove
 
 pause

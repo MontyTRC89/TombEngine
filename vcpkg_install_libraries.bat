@@ -38,6 +38,10 @@ echo Installing Lua.
 timeout /t 1 /nobreak > NUL
 vcpkg install lua[core,cpp,tools]:x86-windows
 
+echo Installing zlib.
+timeout /t 1 /nobreak > NUL
+vcpkg install zlib:x86-windows
+
 echo "========================================"
 echo "        Installing x64 libraries.       "
 echo "========================================"
@@ -67,11 +71,17 @@ echo Installing Lua.
 timeout /t 1 /nobreak > NUL
 vcpkg install lua[core,cpp,tools]:x64-windows
 
+echo Installing zlib.
+timeout /t 1 /nobreak > NUL
+vcpkg install zlib:x64-windows
+
 echo "========================================"
 echo " Updating libraries to latest versions. "
 echo "========================================"
 timeout /t 1 /nobreak > NUL
 vcpkg upgrade --no-dry-run
+
+echo Installing integration with visual studio.
 vcpkg integrate install
 
 echo Creating the game directory.
