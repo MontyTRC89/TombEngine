@@ -549,6 +549,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_trex.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tribesman.h" />
+    <ClInclude Include="Objects\TR3\Entity\Willard.h" />
     <ClInclude Include="Objects\TR3\Entity\Winston.h" />
     <ClInclude Include="Objects\TR3\Object\Corpse.h" />
     <ClInclude Include="Objects\TR3\Trap\ElectricCleaner.h" />
@@ -1056,6 +1057,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_tribesman.cpp" />
     <ClCompile Include="Objects\TR3\Entity\TwinAutoGun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\WaspMutant.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Willard.cpp" />
     <ClCompile Include="Objects\TR3\Object\corpse.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Winston.cpp" />
     <ClCompile Include="Objects\TR3\tr3_objects.cpp" />

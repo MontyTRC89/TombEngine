@@ -18,6 +18,11 @@ CreatureInfo* GetCreatureInfo(ItemInfo* item)
 	return (CreatureInfo*)item->Data;
 }
 
+CreatureInfo& GetCreatureInfoRef(ItemInfo& item)
+{
+	return item.Data;
+}
+
 void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature, const std::vector<GAME_OBJECT_ID>& keyObjectIds, bool ignoreKeyObjectIds)
 {
 	float closestDistSqr = INFINITY;
