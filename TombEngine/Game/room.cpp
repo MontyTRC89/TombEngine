@@ -105,11 +105,11 @@ void RoomData::GenerateCollisionMesh()
 	}
 
 	// Collect collision mesh portal triangles for room.
-	auto roomPos = Position.ToVector3();
+	auto pos = Position.ToVector3();
 	for (const auto& door : Doors)
 	{
-		CollisionMesh.InsertTriangle(roomPos + door.Vertices[0], roomPos + door.Vertices[1], roomPos + door.Vertices[2], door.Nomal, door.RoomNumber);
-		CollisionMesh.InsertTriangle(roomPos + door.Vertices[0], roomPos + door.Vertices[2], roomPos + door.Vertices[3], door.Nomal, door.RoomNumber);
+		CollisionMesh.InsertTriangle(pos + door.Vertices[0], pos + door.Vertices[1], pos + door.Vertices[2], door.Nomal, door.RoomNumber);
+		CollisionMesh.InsertTriangle(pos + door.Vertices[0], pos + door.Vertices[2], pos + door.Vertices[3], door.Nomal, door.RoomNumber);
 	}
 
 	// Initialize collision mesh.

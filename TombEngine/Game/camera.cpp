@@ -118,14 +118,14 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 	float dist = Vector3::Distance(origin, target);
 	auto los = GetLosCollision(origin, originRoomNumber, dir, dist, true, false, true);
 
-	// 2) Clip room LOS collision.
+	// 2) Clip room.
 	cameraLos.Normal = los.Room.Triangle.has_value() ? los.Room.Triangle->Normal : -dir;
 	cameraLos.Position = los.Room.Position;
 	cameraLos.RoomNumber = los.Room.RoomNumber;
 	cameraLos.IsIntersected = los.Room.IsIntersected;
 	cameraLos.Distance = los.Room.Distance;
 
-	// 3) Clip moveable LOS collision.
+	// 3) Clip moveable.
 	for (const auto& movLos : los.Moveables)
 	{
 		if (!TestCameraCollidableItem(*movLos.Moveable))
@@ -145,7 +145,7 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 		}
 	}
 
-	// 4) Clip static LOS collision.
+	// 4) Clip static.
 	for (const auto& staticLos : los.Statics)
 	{
 		if (!TestCameraCollidableStatic(*staticLos.Static))
