@@ -1,6 +1,6 @@
 @echo off
 title VCpkg Library Uninnstaller
-color 10
+color 0
 
 echo "========================================"
 echo "   This batch removes vcpkg libraries   "

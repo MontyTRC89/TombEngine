@@ -1,6 +1,6 @@
 @echo off
 title VCpkg Library Installer
-color 10
+color 0
 
 echo "========================================"
 echo "   This batch installs VCpkg libraries  "
