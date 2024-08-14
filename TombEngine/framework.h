@@ -1,43 +1,46 @@
 #pragma once
-// NOTE: Disable Unicode for FMT and SPDLOG, else cause error when compiling...
+
+// Disable Unicode for FMT and SPDLOG to prevent errors when compiling.
 #define FMT_UNICODE 0
 
 // Windows
 #pragma comment(lib, "comctl32")
 #pragma comment(lib, "version")
 
-// Spdlog, Zlib, OIS library
-#if defined(_DEBUG)
-#pragma comment(lib, "spdlogd")
-#pragma comment(lib, "zlibd")
-#pragma comment(lib, "OIS_d")
-#else
-#pragma comment(lib, "spdlog")
-#pragma comment(lib, "zlib")
-#pragma comment(lib, "OIS")
-#endif
-
-// Lua library
-#pragma comment(lib, "lua-c++")
-
-// DirectXTK library + DirectX11
-#pragma comment(lib, "d3dcompiler")
-#pragma comment(lib, "dxgi")
-#pragma comment(lib, "dxguid")
-#pragma comment(lib, "d3d11")
-#pragma comment(lib, "DirectXTK")
-
 // Bass library
 #pragma comment(lib, "bass")
 #pragma comment(lib, "bass_fx")
 #pragma comment(lib, "bassmix")
 
+// DirectX 11 library
+#pragma comment(lib, "d3d11")
+#pragma comment(lib, "d3dcompiler")
+#pragma comment(lib, "dxgi")
+#pragma comment(lib, "dxguid")
+
+// DirectX Tool Kit library
+#pragma comment(lib, "DirectXTK")
+
+// OIS, spdlog, zlib libraries
+#if defined(_DEBUG)
+#pragma comment(lib, "OIS_d")
+#pragma comment(lib, "spdlogd")
+#pragma comment(lib, "zlibd")
+#else
+#pragma comment(lib, "OIS")
+#pragma comment(lib, "spdlog")
+#pragma comment(lib, "zlib")
+#endif
+
+// Lua library
+#pragma comment(lib, "lua-c++")
+
 #include <algorithm>
-#include <ctime>
 #include <array>
+#include <chrono>
+#include <ctime>
 #include <deque>
 #include <execution>
-#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -47,11 +50,16 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <process.h>
 #include <random>
 #include <regex>
 #include <set>
 #include <stack>
+#include <stdarg.h>
 #include <stdexcept>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -60,40 +68,35 @@
 #include <unordered_set>
 #include <variant>
 #include <vector>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <process.h>
 #include <wincodec.h>
 
 // TODO: Remove this and everything that relies on it.
 #include <codecvt>
 
-// Lua
-#include <sol/sol.hpp>
-
 // BASS
 #include <bass.h>
 #include <bass_fx.h>
 
-// DirectX
-#include <directxtk/CommonStates.h>
+// DirectX 11
 #include <d3d11.h>
 #include <d3d9types.h>
 #include <d3dcompiler.h>
-#include <directxtk/DDSTextureLoader.h>
-#include <directxtk/PrimitiveBatch.h>
-#include <directxtk/PostProcess.h>
-#include <directxtk/SpriteFont.h>
-#include <directxtk/ScreenGrab.h>
-#include <directxtk/WICTextureLoader.h>
 
 // DirectX Tool Kit
+#include <directxtk/CommonStates.h>
+#include <directxtk/DDSTextureLoader.h>
+#include <directxtk/PostProcess.h>
+#include <directxtk/PrimitiveBatch.h>
+#include <directxtk/ScreenGrab.h>
 #include <directxtk/SimpleMath.h>
+#include <directxtk/SpriteFont.h>
+#include <directxtk/WICTextureLoader.h>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
+
+// Lua
+#include <sol/sol.hpp>
 
 // OIS
 #include <ois/OIS.h>
