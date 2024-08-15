@@ -542,7 +542,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\Compsognathus.h" />
     <ClInclude Include="Objects\TR3\Entity\FishSwarm.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
+    <ClInclude Include="Objects\TR3\Entity\SealMutant.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
+    <ClInclude Include="Objects\TR3\Entity\Raptor.h" />
     <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_claw_mutant.h" />
@@ -554,7 +556,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_monkey.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_gun.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_stick.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_scuba_diver.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tiger.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
@@ -1059,7 +1060,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\Compsognathus.cpp" />
     <ClCompile Include="Objects\TR3\Entity\FishSwarm.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\SealMutant.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Raptor.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Shiva.cpp" />
     <ClCompile Include="Objects\TR3\Entity\SophiaLeigh.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_civvy.cpp" />
@@ -1069,7 +1072,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_monkey.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_gun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_stick.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_raptor.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_scuba_diver.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tiger.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />

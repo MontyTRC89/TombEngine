@@ -259,7 +259,7 @@ namespace TEN::Collision::Attractor
 
 			// Draw label.
 			if (labelPos2D.has_value())
-				g_Renderer.AddDebugString(labelString, *labelPos2D, COLOR_YELLOW_OPAQUE, labelScale, (int)PrintStringFlags::Outline, RendererDebugPage::AttractorStats);
+				DrawDebugString(labelString, *labelPos2D, COLOR_YELLOW_OPAQUE, labelScale, RendererDebugPage::AttractorStats);
 		}
 		else
 		{
@@ -284,7 +284,7 @@ namespace TEN::Collision::Attractor
 
 			// Draw label.
 			if (labelPos2D.has_value())
-				g_Renderer.AddDebugString(labelString, *labelPos2D, COLOR_YELLOW_OPAQUE, labelScale, 0, RendererDebugPage::AttractorStats);
+				DrawDebugString(labelString, *labelPos2D, COLOR_YELLOW_OPAQUE, labelScale, RendererDebugPage::AttractorStats);
 
 			// Draw start indicator line.
 			if (segmentID == 0)
@@ -440,7 +440,7 @@ namespace TEN::Collision::Attractor
 
 		// 1) Collect bounded room attractors.
 		auto& room = g_Level.Rooms[roomNumber];
-		for (int neighborRoomNumber : room.neighbors)
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
 		{
 			// Check if room is active.
 			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];

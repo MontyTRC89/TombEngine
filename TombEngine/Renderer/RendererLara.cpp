@@ -333,10 +333,6 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 
 	const auto& hairObject = *_moveableObjects[ID_HAIR];
 
-	// TODO
-	bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
-
-	bool isHead = true;
 	for (const auto& unit : HairEffect.Units)
 	{
 		if (!unit.IsEnabled)
@@ -349,10 +345,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{
-			const auto& segment = unit.Segments[i];
-			auto worldMatrix = Matrix::CreateFromQuaternion(segment.Orientation) * Matrix::CreateTranslation(segment.Position);
-
-			_stItem.BonesMatrices[i + 1] = worldMatrix;
+			_stItem.BonesMatrices[i + 1] = unit.Segments[i].WorldMatrix;
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
 		}
 
@@ -363,8 +356,6 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 			auto& rMesh = *hairObject.ObjectMeshes[i];
 			DrawMoveableMesh(itemToDraw, &rMesh, room, i, view, rendererPass);
 		}
-
-		isHead = false;
 	}
 }
 

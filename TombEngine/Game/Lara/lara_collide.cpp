@@ -497,14 +497,12 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	auto pointColl = GetPointCollision(*item);
-	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-
 	if ((pointColl.GetFloorHeight() - item->Pose.Position.y) < SWIM_WATER_DEPTH)
 	{
 		// TODO: Find fix for this branch.
 		//TestPlayerWaterStepOut(item, coll);
 	}
-	else if ((waterHeight - item->Pose.Position.y) <= -LARA_HEADROOM)
+	else if ((pointColl.GetWaterTopHeight() - item->Pose.Position.y) <= -LARA_HEADROOM)
 	{
 		SetLaraSwimDiveAnimation(item);
 	}

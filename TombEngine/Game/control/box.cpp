@@ -613,7 +613,7 @@ void CreatureUnderwater(ItemInfo* item, int depth)
 	}
 	else
 	{
-		waterHeight = GetWaterHeight(item);
+		waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 	}
 
 	int y = waterHeight + waterLevel;
@@ -647,7 +647,7 @@ void CreatureFloat(short itemNumber)
 	item->Pose.Orientation.x = 0;
 
 	int y = item->Pose.Position.y;
-	int waterLevel = GetWaterHeight(item);
+	int waterLevel = GetPointCollision(*item).GetWaterTopHeight();
 	if (waterLevel == NO_HEIGHT)
 		return;
 
@@ -794,7 +794,7 @@ void CreatureHealth(ItemInfo* item)
 		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[item->RoomNumber]))
 	{
 		auto bounds = GameBoundingBox(item);
-		auto height = item->Pose.Position.y - GetWaterHeight(item);
+		auto height = item->Pose.Position.y - GetPointCollision(*item).GetWaterTopHeight();
 
 		if (abs(bounds.Y1 + bounds.Y2) < height)
 			DoDamage(item, INT_MAX);
@@ -2184,19 +2184,7 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 	if (creature.Enemy == nullptr)
 		return false;
 
-	float stepDist = 0.0f;
-	switch (jumpDistType)
-	{
-	default:
-	case JumpDistance::Block1:
-		stepDist = BLOCK(0.51f);
-		break;
-
-	case JumpDistance::Block2:
-		stepDist = BLOCK(0.76f);
-		break;
-	}
-
+	float stepDist = BLOCK(0.92f);
 	int vPos = item.Pose.Position.y;
 	auto pointCollA = GetPointCollision(item, item.Pose.Orientation.y, stepDist);
 	auto pointCollB = GetPointCollision(item, item.Pose.Orientation.y, stepDist * 2);

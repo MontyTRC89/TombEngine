@@ -41,8 +41,8 @@ namespace TEN::Effects::Hair
 		auto baseOrient = Geometry::ConvertDirectionToQuat(-Geometry::ConvertQuatToDirection(GetBoneOrientation(item, LM_HEAD)));
 
 		// Set position of base segment.
-		auto basePos = worldMatrix.Translation();
-		Segments[0].Position = basePos;
+		Segments[0].Position = worldMatrix.Translation();
+		Segments[0].WorldMatrix = worldMatrix;
 
 		if (!IsInitialized)
 		{
@@ -69,7 +69,7 @@ namespace TEN::Effects::Hair
 			// Get water height.
 			auto pos = item.Pose.Position + Vector3i(GetWaterProbeOffset(item));
 			int roomNumber = item.RoomNumber;
-			int waterHeight = GetWaterHeight(pos.x, pos.y, pos.z, roomNumber);
+			int waterHeight = GetPointCollision(pos, roomNumber).GetWaterTopHeight();
 
 			// Get collision spheres.
 			auto spheres = GetSpheres(item, isYoung);
@@ -83,12 +83,10 @@ namespace TEN::Effects::Hair
 				// TR3 UPV uses a hack which forces player water status to dry. 
 				// Therefore, cannot directly use water status value to determine enrironment.
 				bool isOnLand = (player.Control.WaterStatus == WaterStatus::Dry &&
-								 (player.Context.Vehicle == -1 || g_Level.Items[player.Context.Vehicle].ObjectNumber != ID_UPV));
+								 (player.Context.Vehicle == NO_VALUE || g_Level.Items[player.Context.Vehicle].ObjectNumber != ID_UPV));
 
-				// Handle segment room collision.
+				// Handle segment collision.
 				CollideSegmentWithRoom(segment, waterHeight, roomNumber, isOnLand);
-
-				// Handle segment sphere collision.
 				CollideSegmentWithSpheres(segment, spheres);
 
 				// Calculate orientation.
@@ -97,6 +95,7 @@ namespace TEN::Effects::Hair
 				// Calculate world matrix.
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
 				worldMatrix = Matrix::CreateFromQuaternion(prevSegment.Orientation) * worldMatrix;
+				segment.WorldMatrix = worldMatrix;
 
 				auto jointOffset = (i == (Segments.size() - 1)) ?
 					GetJointOffset(ID_HAIR, (i - 1) - 1) :
@@ -118,12 +117,12 @@ namespace TEN::Effects::Hair
 			{
 			// Left pigtail offset.
 			case 0:
-				relOffset = Vector3(-52.0f, -48.0f, -50.0f);
+				relOffset = Vector3(-48.0f, -48.0f, -50.0f);
 				break;
 
 			// Right pigtail offset.
 			case 1:
-				relOffset = Vector3(44.0f, -48.0f, -50.0f);
+				relOffset = Vector3(48.0f, -48.0f, -50.0f);
 				break;
 			}
 		}
@@ -175,13 +174,13 @@ namespace TEN::Effects::Hair
 	Quaternion HairUnit::GetSegmentOrientation(const Vector3& origin, const Vector3& target, const Quaternion& baseOrient)
 	{
 		// Calculate absolute orientation.
-		auto absDirection = target - origin;
-		absDirection.Normalize();
-		auto absOrient = Geometry::ConvertDirectionToQuat(absDirection);
+		auto absDir = target - origin;
+		absDir.Normalize();
+		auto absOrient = Geometry::ConvertDirectionToQuat(absDir);
 
 		// Calculate relative twist rotation.
 		// TODO: Find accurate twist angle based on relation between absOrient and baseOrient.
-		auto twistAxisAngle = AxisAngle(absDirection, EulerAngles(baseOrient).y);
+		auto twistAxisAngle = AxisAngle(absDir, EulerAngles(baseOrient).y);
 		auto twistRot = twistAxisAngle.ToQuaternion();
 
 		// Return ideal orientation.
@@ -198,21 +197,21 @@ namespace TEN::Effects::Hair
 		spheres.reserve(SPHERE_COUNT);
 
 		// Hips sphere.
-		auto* meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_HIPS]];
-		auto pos = GetJointPosition(item, LM_HIPS, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres.push_back(BoundingSphere(pos, meshPtr->sphere.Radius));
+		const auto* mesh = &g_Level.Meshes[item.Model.MeshIndex[LM_HIPS]];
+		auto pos = GetJointPosition(item, LM_HIPS, Vector3i(mesh->sphere.Center)).ToVector3();
+		spheres.push_back(BoundingSphere(pos, mesh->sphere.Radius));
 
 		// Torso sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_TORSO]];
-		pos = GetJointPosition(item, LM_TORSO, Vector3i(meshPtr->sphere.Center) + TORSO_SPHERE_OFFSET).ToVector3();
-		spheres.push_back(BoundingSphere(pos, meshPtr->sphere.Radius));
+		mesh = &g_Level.Meshes[item.Model.MeshIndex[LM_TORSO]];
+		pos = GetJointPosition(item, LM_TORSO, Vector3i(mesh->sphere.Center) + TORSO_SPHERE_OFFSET).ToVector3();
+		spheres.push_back(BoundingSphere(pos, mesh->sphere.Radius));
 		if (isYoung)
 			spheres.back().Radius = spheres.back().Radius - ((spheres.back().Radius / 4) + (spheres.back().Radius / 8));
 
 		// Head sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_HEAD]];
-		pos = GetJointPosition(item, LM_HEAD, Vector3i(meshPtr->sphere.Center) + HEAD_SPHERE_OFFSET).ToVector3();
-		spheres.push_back(BoundingSphere(pos, meshPtr->sphere.Radius));
+		mesh = &g_Level.Meshes[item.Model.MeshIndex[LM_HEAD]];
+		pos = GetJointPosition(item, LM_HEAD, Vector3i(mesh->sphere.Center) + HEAD_SPHERE_OFFSET).ToVector3();
+		spheres.push_back(BoundingSphere(pos, mesh->sphere.Radius));
 
 		// Neck sphere.
 		spheres.push_back(BoundingSphere(
@@ -220,30 +219,30 @@ namespace TEN::Effects::Hair
 			isYoung ? 0.0f : (spheres[2].Radius * 0.75f)));
 
 		// Left arm sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_LINARM]];
-		pos = GetJointPosition(item, LM_LINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres.push_back(BoundingSphere(pos, (meshPtr->sphere.Radius / 3) * 4));
+		mesh = &g_Level.Meshes[item.Model.MeshIndex[LM_LINARM]];
+		pos = GetJointPosition(item, LM_LINARM, Vector3i(mesh->sphere.Center)).ToVector3();
+		spheres.push_back(BoundingSphere(pos, (mesh->sphere.Radius / 3) * 4));
 		
 		// Right arm sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_RINARM]];
-		pos = GetJointPosition(item, LM_RINARM, Vector3i(meshPtr->sphere.Center)).ToVector3();
-		spheres.push_back(BoundingSphere(pos, (meshPtr->sphere.Radius / 3) * 4));
+		mesh = &g_Level.Meshes[item.Model.MeshIndex[LM_RINARM]];
+		pos = GetJointPosition(item, LM_RINARM, Vector3i(mesh->sphere.Center)).ToVector3();
+		spheres.push_back(BoundingSphere(pos, (mesh->sphere.Radius / 3) * 4));
 
 		// Left holster sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_LTHIGH]];
-		pos = GetJointPosition(item, LM_LTHIGH, Vector3i(meshPtr->sphere.Center)).ToVector3();
+		mesh = &g_Level.Meshes[item.Model.MeshIndex[LM_LTHIGH]];
+		pos = GetJointPosition(item, LM_LTHIGH, Vector3i(mesh->sphere.Center)).ToVector3();
 		spheres.push_back(
 			BoundingSphere(
 				pos + ((spheres[0].Center - pos) / 2),
-				meshPtr->sphere.Radius));
+				mesh->sphere.Radius));
 		
 		// Right holster sphere.
-		meshPtr = &g_Level.Meshes[item.Model.MeshIndex[LM_RTHIGH]];
-		pos = GetJointPosition(item, LM_RTHIGH, Vector3i(meshPtr->sphere.Center)).ToVector3();
+		mesh = &g_Level.Meshes[item.Model.MeshIndex[LM_RTHIGH]];
+		pos = GetJointPosition(item, LM_RTHIGH, Vector3i(mesh->sphere.Center)).ToVector3();
 		spheres.push_back(
 			BoundingSphere(
 				pos + ((spheres[0].Center - pos) / 2),
-				meshPtr->sphere.Radius));
+				mesh->sphere.Radius));
 
 		if (isYoung)
 			spheres[1].Center = (spheres[1].Center + spheres[2].Center) / 2;
@@ -253,13 +252,12 @@ namespace TEN::Effects::Hair
 	
 	void HairUnit::CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand)
 	{
-		constexpr auto VELOCITY_COEFF = 0.75f;
+		constexpr auto VEL_COEFF = 0.75f;
 
 		auto pointColl = GetPointCollision(segment.Position, roomNumber);
-		int floorHeight = pointColl.GetFloorHeight();
 
 		Segments[0].Velocity = segment.Position;
-		segment.Position += segment.Velocity * VELOCITY_COEFF;
+		segment.Position += segment.Velocity * VEL_COEFF;
 
 		// Land collision.
 		if (isOnLand)
@@ -277,7 +275,7 @@ namespace TEN::Effects::Hair
 				segment.Position.y = waterHeight;
 			}
 			// Avoid clipping through floor.
-			else if (floorHeight > Segments[0].Position.y && segment.Position.y > floorHeight)
+			else if (pointColl.GetFloorHeight() > Segments[0].Position.y && segment.Position.y > pointColl.GetFloorHeight())
 			{
 				segment.Position = Segments[0].Velocity;
 			}
@@ -289,9 +287,9 @@ namespace TEN::Effects::Hair
 			{
 				segment.Position.y = waterHeight;
 			}
-			else if (segment.Position.y > floorHeight)
+			else if (segment.Position.y > pointColl.GetFloorHeight())
 			{
-				segment.Position.y = floorHeight;
+				segment.Position.y = pointColl.GetFloorHeight();
 			}
 		}
 	}
@@ -300,24 +298,24 @@ namespace TEN::Effects::Hair
 	{
 		for (const auto& sphere : spheres)
 		{
-			auto direction = segment.Position - sphere.Center;
+			auto dir = segment.Position - sphere.Center;
 
-			float distance = Vector3::Distance(segment.Position, sphere.Center);
-			if (distance < sphere.Radius)
+			float dist = Vector3::Distance(segment.Position, sphere.Center);
+			if (dist < sphere.Radius)
 			{
 				// Avoid division by zero.
-				if (distance == 0.0f)
-					distance = 1.0f;
+				if (dist == 0.0f)
+					dist = 1.0f;
 
 				// Push segment away from sphere.
-				segment.Position = sphere.Center + (direction * (sphere.Radius / distance));
+				segment.Position = sphere.Center + (dir * (sphere.Radius / dist));
 			}
 		}
 	}
 
 	void HairEffectController::Initialize()
 	{
-		constexpr auto ORIENT_DEFAULT = EulerAngles(ANGLE(-90.0f), 0, 0);
+		constexpr auto DEFAULT_ORIENT = EulerAngles(ANGLE(-90.0f), 0, 0);
 
 		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 
@@ -336,21 +334,16 @@ namespace TEN::Effects::Hair
 			{
 				segment.Position = GetJointOffset(ID_HAIR, 0);
 				segment.Velocity = Vector3::Zero;
-				segment.Orientation = ORIENT_DEFAULT.ToQuaternion();
+				segment.Orientation = DEFAULT_ORIENT.ToQuaternion();
 			}
 
 			isHead = false;
 		}
 	}
 
-	void HairEffectController::Update(ItemInfo& item, bool isYoung)
+	void HairEffectController::Update(ItemInfo& item)
 	{
 		for (int i = 0; i < Units.size(); i++)
-		{
 			Units[i].Update(item, i);
-
-			if (isYoung && i == 1)
-				Units[i].Update(item, i);
-		}
 	}
 }

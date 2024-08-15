@@ -397,6 +397,7 @@ void KillMoveEffects()
 	ItemNewRoomNo = 0;
 }
 
+// NOTE: No one should use this ever again.
 int GetRandomControl()
 {
 	return Random::GenerateInt();
@@ -576,6 +577,10 @@ GameStatus DoGameLoop(int levelIndex)
 			case InventoryResult::NewGame:
 			case InventoryResult::NewGameSelectedLevel:
 				status = GameStatus::NewGame;
+				break;
+
+			case InventoryResult::HomeLevel:
+				status = GameStatus::HomeLevel;
 				break;
 
 			case InventoryResult::LoadGame:
