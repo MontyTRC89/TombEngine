@@ -41,14 +41,14 @@ namespace TEN::Renderer::Graphics
 			subresourceData.pSysMem = data;
 			subresourceData.SysMemPitch = width * 4;
 			subresourceData.SysMemSlicePitch = 0;
-			throwIfFailed(device->CreateTexture2D(&desc, &subresourceData, &Texture));
+			ThrowIfFailed(device->CreateTexture2D(&desc, &subresourceData, &Texture));
 
 			auto shaderDesc = D3D11_SHADER_RESOURCE_VIEW_DESC{};
 			shaderDesc.Format = desc.Format;
 			shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			shaderDesc.Texture2D.MostDetailedMip = 0;
 			shaderDesc.Texture2D.MipLevels = 1;
-			throwIfFailed(device->CreateShaderResourceView(Texture.Get(), &shaderDesc, ShaderResourceView.GetAddressOf()));
+			ThrowIfFailed(device->CreateShaderResourceView(Texture.Get(), &shaderDesc, ShaderResourceView.GetAddressOf()));
 		}
 
 		Texture2D(ID3D11Device* device, int width, int height, DXGI_FORMAT format, int pitch, const void* data)
@@ -74,7 +74,7 @@ namespace TEN::Renderer::Graphics
 			subresourceData.SysMemPitch = pitch;
 			subresourceData.SysMemSlicePitch = 0;
 
-			throwIfFailed(device->CreateTexture2D(&desc, &subresourceData, &Texture));
+			ThrowIfFailed(device->CreateTexture2D(&desc, &subresourceData, &Texture));
 
 			auto shaderDesc = D3D11_SHADER_RESOURCE_VIEW_DESC{};
 			shaderDesc.Format = desc.Format;
@@ -82,7 +82,7 @@ namespace TEN::Renderer::Graphics
 			shaderDesc.Texture2D.MostDetailedMip = 0;
 			shaderDesc.Texture2D.MipLevels = 1;
 
-			throwIfFailed(device->CreateShaderResourceView(Texture.Get(), &shaderDesc, ShaderResourceView.GetAddressOf()));
+			ThrowIfFailed(device->CreateShaderResourceView(Texture.Get(), &shaderDesc, ShaderResourceView.GetAddressOf()));
 		}
 
 		Texture2D(ID3D11Device* device, const std::wstring& fileName)
@@ -91,8 +91,8 @@ namespace TEN::Renderer::Graphics
 			ID3D11DeviceContext* context = nullptr;
 			device->GetImmediateContext(&context);
 
-			throwIfFailed(CreateWICTextureFromFile(device, context, fileName.c_str(), resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0), L"Opening Texture file '" + fileName + L"': ");
-			throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
+			ThrowIfFailed(CreateWICTextureFromFile(device, context, fileName.c_str(), resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0), L"Opening Texture file '" + fileName + L"': ");
+			ThrowIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
 
 			D3D11_TEXTURE2D_DESC desc;
 			Texture->GetDesc(&desc);
@@ -109,7 +109,7 @@ namespace TEN::Renderer::Graphics
 			if (data[0] == 0x44 && data[1] == 0x44 && data[2] == 0x53)
 			{
 				// DDS texture
-				throwIfFailed(CreateDDSTextureFromMemory(
+				ThrowIfFailed(CreateDDSTextureFromMemory(
 					device,
 					context,
 					data,
@@ -120,7 +120,7 @@ namespace TEN::Renderer::Graphics
 			else
 			{
 				// PNG legacy texture
-				throwIfFailed(CreateWICTextureFromMemory(
+				ThrowIfFailed(CreateWICTextureFromMemory(
 					device,
 					context,
 					data,
@@ -131,7 +131,7 @@ namespace TEN::Renderer::Graphics
 
 			context->GenerateMips(ShaderResourceView.Get());
 
-			throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
+			ThrowIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
 
 			D3D11_TEXTURE2D_DESC desc;
 			Texture->GetDesc(&desc);
@@ -160,7 +160,7 @@ namespace TEN::Renderer::Graphics
 			desc.SampleDesc.Quality = 0;
 			desc.Usage = D3D11_USAGE_DEFAULT;
 
-			throwIfFailed(device->CreateTexture2D(&desc, nullptr, &Texture));
+			ThrowIfFailed(device->CreateTexture2D(&desc, nullptr, &Texture));
 
 			D3D11_BOX sourceRegion;
 			sourceRegion.left = x;
@@ -178,7 +178,7 @@ namespace TEN::Renderer::Graphics
 			shaderDesc.Texture2D.MostDetailedMip = 0;
 			shaderDesc.Texture2D.MipLevels = 1;
 
-			throwIfFailed(device->CreateShaderResourceView(Texture.Get(), &shaderDesc, ShaderResourceView.GetAddressOf()));
+			ThrowIfFailed(device->CreateShaderResourceView(Texture.Get(), &shaderDesc, ShaderResourceView.GetAddressOf()));
 		}
 
 		~Texture2D() = default;

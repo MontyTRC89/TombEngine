@@ -94,8 +94,15 @@ namespace TEN::Utils
 
 	std::string ToString(const wchar_t* wString)
 	{
-        auto converter = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>();
-		return converter.to_bytes(std::wstring(wString));
+		if (wString == nullptr)
+			return {};
+
+		// Convert std::wstring to std::string (UTF-8).
+		int size = WideCharToMultiByte(CP_UTF8, 0, wString, -1, nullptr, 0, nullptr, nullptr);
+		auto utf8String = std::string (size, 0);
+		WideCharToMultiByte(CP_UTF8, 0, wString, -1, utf8String.data(), size, nullptr, nullptr);
+
+		return utf8String;
 	}
 
     std::wstring ToWString(const std::string& string)

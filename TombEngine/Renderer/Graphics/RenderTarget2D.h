@@ -39,7 +39,7 @@ namespace TEN::Renderer::Graphics
 			desc.MiscFlags = 0;
 
 			auto res = device->CreateTexture2D(&desc, nullptr, &Texture);
-			throwIfFailed(res);
+			ThrowIfFailed(res);
 
 			auto viewDesc = D3D11_RENDER_TARGET_VIEW_DESC{};
 			viewDesc.Format = colorFormat;
@@ -47,7 +47,7 @@ namespace TEN::Renderer::Graphics
 			viewDesc.Texture2D.MipSlice = 0;
 
 			res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, &RenderTargetView);
-			throwIfFailed(res);
+			ThrowIfFailed(res);
 
 			// Set up description of shader resource view.
 			auto shaderDesc = D3D11_SHADER_RESOURCE_VIEW_DESC{};
@@ -57,7 +57,7 @@ namespace TEN::Renderer::Graphics
 			shaderDesc.Texture2D.MipLevels = 1;
 
 			res = device->CreateShaderResourceView(Texture.Get(), &shaderDesc, &ShaderResourceView);
-			throwIfFailed(res);
+			ThrowIfFailed(res);
 
 			if (depthFormat != DXGI_FORMAT_UNKNOWN)
 			{
@@ -75,7 +75,7 @@ namespace TEN::Renderer::Graphics
 				depthTexDesc.MiscFlags = 0;
 
 				res = device->CreateTexture2D(&depthTexDesc, NULL, &DepthStencilTexture);
-				throwIfFailed(res);
+				ThrowIfFailed(res);
 
 				auto dsvDesc = D3D11_DEPTH_STENCIL_VIEW_DESC{};
 				dsvDesc.Format = depthTexDesc.Format;
@@ -84,7 +84,7 @@ namespace TEN::Renderer::Graphics
 				dsvDesc.Texture2D.MipSlice = 0;
 
 				res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, &DepthStencilView);
-				throwIfFailed(res);
+				ThrowIfFailed(res);
 			}
 		}
 
@@ -104,7 +104,7 @@ namespace TEN::Renderer::Graphics
 			viewDesc.Texture2D.MipSlice = 0;
 
 			auto res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, &RenderTargetView);
-			throwIfFailed(res);
+			ThrowIfFailed(res);
 
 			// Set up description of shader resource view.
 			auto shaderDesc = D3D11_SHADER_RESOURCE_VIEW_DESC{};
@@ -114,7 +114,7 @@ namespace TEN::Renderer::Graphics
 			shaderDesc.Texture2D.MipLevels = 1;
 
 			res = device->CreateShaderResourceView(Texture.Get(), &shaderDesc, &ShaderResourceView);
-			throwIfFailed(res);
+			ThrowIfFailed(res);
 		}
 
 		RenderTarget2D(ID3D11Device* device, ID3D11Texture2D* texture, DXGI_FORMAT depthFormat)
@@ -135,7 +135,7 @@ namespace TEN::Renderer::Graphics
 			viewDesc.Texture2D.MipSlice = 0;
 
 			HRESULT res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, &RenderTargetView);
-			throwIfFailed(res);
+			ThrowIfFailed(res);
 
 			// Setup the description of the shader resource view.
 			if (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
@@ -147,7 +147,7 @@ namespace TEN::Renderer::Graphics
 				shaderDesc.Texture2D.MipLevels = 1;
 
 				res = device->CreateShaderResourceView(Texture.Get(), &shaderDesc, &ShaderResourceView);
-				throwIfFailed(res);
+				ThrowIfFailed(res);
 			}
 
 			if (depthFormat != DXGI_FORMAT_UNKNOWN)
@@ -166,7 +166,7 @@ namespace TEN::Renderer::Graphics
 				depthTexDesc.MiscFlags = 0;
 
 				res = device->CreateTexture2D(&depthTexDesc, NULL, &DepthStencilTexture);
-				throwIfFailed(res);
+				ThrowIfFailed(res);
 
 				D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
 				dsvDesc.Format = depthTexDesc.Format;
@@ -175,7 +175,7 @@ namespace TEN::Renderer::Graphics
 				dsvDesc.Texture2D.MipSlice = 0;
 
 				res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, &DepthStencilView);
-				throwIfFailed(res);
+				ThrowIfFailed(res);
 			}
 		}
 

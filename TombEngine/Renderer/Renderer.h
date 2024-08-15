@@ -624,7 +624,7 @@ namespace TEN::Renderer
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
 		void DrawObjectIn2DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale1, float opacity = 1.0f, int meshBits = NO_JOINT_BITS);
 		void SetLoadingScreen(std::wstring& fileName);
-		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
+		void SetTextureOrDefault(Texture2D& texture, const std::wstring& path);
 		std::string GetDefaultAdapterName();
 
 		Vector2i GetScreenResolution() const;

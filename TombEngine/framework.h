@@ -70,9 +70,6 @@
 #include <vector>
 #include <wincodec.h>
 
-// TODO: Remove this and everything that relies on it.
-#include <codecvt>
-
 // BASS
 #include <bass.h>
 #include <bass_fx.h>

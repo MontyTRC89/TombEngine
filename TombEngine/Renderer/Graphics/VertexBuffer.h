@@ -41,11 +41,11 @@ namespace TEN::Renderer::Graphics
 				initData.pSysMem = vertices.data();
 				initData.SysMemPitch = sizeof(CVertex) * numVertices;
 
-				throwIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
+				ThrowIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
 			}
 			else
 			{
-				throwIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
+				ThrowIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
 			}
 
 			_numVertices = numVertices;
@@ -67,11 +67,11 @@ namespace TEN::Renderer::Graphics
 				initData.pSysMem = vertices.data();
 				initData.SysMemPitch = sizeof(CVertex) * numVertices;
 
-				throwIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
+				ThrowIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
 			}
 			else
 			{
-				throwIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
+				ThrowIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
 			}
 
 			_numVertices = numVertices;
@@ -93,11 +93,11 @@ namespace TEN::Renderer::Graphics
 				initData.pSysMem = vertices;
 				initData.SysMemPitch = sizeof(CVertex) * numVertices;
 
-				throwIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
+				ThrowIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
 			}
 			else
 			{
-				throwIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
+				ThrowIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
 			}
 
 			_numVertices = numVertices;

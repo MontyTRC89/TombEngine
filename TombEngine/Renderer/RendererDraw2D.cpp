@@ -1,4 +1,3 @@
-
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
@@ -21,10 +20,9 @@ TEN::Renderer::RendererHudBar* g_LoadingBar;
 
 namespace TEN::Renderer
 {
-	using namespace DirectX::SimpleMath;
-	using namespace TEN::Renderer::Structures;
 	using namespace TEN::Effects::DisplaySprite;
 	using namespace TEN::Effects::Environment;
+	using namespace TEN::Renderer::Structures;
 
 	void Renderer::InitializeGameBars()
 	{

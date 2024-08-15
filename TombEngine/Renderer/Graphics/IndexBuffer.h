@@ -31,11 +31,11 @@ namespace TEN::Renderer::Graphics
 				initData.pSysMem = indices;
 				initData.SysMemPitch = sizeof(int) * numIndices;
 
-				throwIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
+				ThrowIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
 			}
 			else
 			{
-				throwIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
+				ThrowIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
 			}
 
 			_numIndices = numIndices;
@@ -56,11 +56,11 @@ namespace TEN::Renderer::Graphics
 				initData.pSysMem = indices.data();
 				initData.SysMemPitch = sizeof(int) * numIndices;
 
-				throwIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
+				ThrowIfFailed(device->CreateBuffer(&desc, &initData, &Buffer));
 			}
 			else
 			{
-				throwIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
+				ThrowIfFailed(device->CreateBuffer(&desc, nullptr, &Buffer));
 			}
 
 			_numIndices = numIndices;

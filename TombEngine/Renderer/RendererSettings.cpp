@@ -13,14 +13,14 @@ namespace TEN::Renderer
 		_context->ClearState();
 
 		IDXGIOutput* output;
-		Utils::throwIfFailed(_swapChain->GetContainingOutput(&output));
+		Utils::ThrowIfFailed(_swapChain->GetContainingOutput(&output));
 
 		DXGI_SWAP_CHAIN_DESC scd;
-		Utils::throwIfFailed(_swapChain->GetDesc(&scd));
+		Utils::ThrowIfFailed(_swapChain->GetDesc(&scd));
 
 		unsigned int numModes = 1024;
 		DXGI_MODE_DESC modes[1024];
-		Utils::throwIfFailed(output->GetDisplayModeList(scd.BufferDesc.Format, 0, &numModes, modes));
+		Utils::ThrowIfFailed(output->GetDisplayModeList(scd.BufferDesc.Format, 0, &numModes, modes));
 
 		DXGI_MODE_DESC* mode = &modes[0];
 		for (unsigned int i = 0; i < numModes; i++)
@@ -30,7 +30,7 @@ namespace TEN::Renderer
 				break;
 		}
 
-		Utils::throwIfFailed( _swapChain->ResizeTarget(mode));
+		Utils::ThrowIfFailed( _swapChain->ResizeTarget(mode));
 
 		_screenWidth = width;
 		_screenHeight = height;
@@ -42,7 +42,7 @@ namespace TEN::Renderer
 	std::string Renderer::GetDefaultAdapterName()
 	{
 		IDXGIFactory* dxgiFactory = NULL;
-		Utils::throwIfFailed(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
+		Utils::ThrowIfFailed(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
 
 		IDXGIAdapter* dxgiAdapter = NULL;
 
@@ -56,16 +56,22 @@ namespace TEN::Renderer
 		return TEN::Utils::ToString(adapterDesc.Description);
 	}
 
-	void Renderer::SetTextureOrDefault(Texture2D& texture, std::wstring path)
+	void Renderer::SetTextureOrDefault(Texture2D& texture, const std::wstring& path)
 	{
 		texture = Texture2D();
 
 		if (std::filesystem::is_regular_file(path))
+		{
 			texture = Texture2D(_device.Get(), path);
+		}
 		else
 		{
-			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-			TENLog("Texture file not found: " + converter.to_bytes(path), LogLevel::Warning);
+			// Convert std::wstring to std::string (UTF-8).
+			int size = WideCharToMultiByte(CP_UTF8, 0, path.c_str(), -1, nullptr, 0, nullptr, nullptr);
+			auto utf8Path = std::string(size, 0);
+			WideCharToMultiByte(CP_UTF8, 0, path.c_str(), -1, utf8Path.data(), size, nullptr, nullptr);
+
+			TENLog("Texture file not found: " + utf8Path, LogLevel::Warning);
 		}
 	}
 }
