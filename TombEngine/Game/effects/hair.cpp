@@ -85,10 +85,8 @@ namespace TEN::Effects::Hair
 				bool isOnLand = (player.Control.WaterStatus == WaterStatus::Dry &&
 								 (player.Context.Vehicle == NO_VALUE || g_Level.Items[player.Context.Vehicle].ObjectNumber != ID_UPV));
 
-				// Handle segment room collision.
+				// Handle segment collision.
 				CollideSegmentWithRoom(segment, waterHeight, roomNumber, isOnLand);
-
-				// Handle segment sphere collision.
 				CollideSegmentWithSpheres(segment, spheres);
 
 				// Calculate orientation.
@@ -318,7 +316,7 @@ namespace TEN::Effects::Hair
 
 	void HairEffectController::Initialize()
 	{
-		constexpr auto ORIENT_DEFAULT = EulerAngles(ANGLE(-90.0f), 0, 0);
+		constexpr auto DEFAULT_ORIENT = EulerAngles(ANGLE(-90.0f), 0, 0);
 
 		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 
@@ -337,14 +335,14 @@ namespace TEN::Effects::Hair
 			{
 				segment.Position = GetJointOffset(ID_HAIR, 0);
 				segment.Velocity = Vector3::Zero;
-				segment.Orientation = ORIENT_DEFAULT.ToQuaternion();
+				segment.Orientation = DEFAULT_ORIENT.ToQuaternion();
 			}
 
 			isHead = false;
 		}
 	}
 
-	void HairEffectController::Update(ItemInfo& item, bool isYoung)
+	void HairEffectController::Update(ItemInfo& item)
 	{
 		for (int i = 0; i < Units.size(); i++)
 			Units[i].Update(item, i);
