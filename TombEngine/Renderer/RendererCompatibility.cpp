@@ -516,7 +516,7 @@ namespace TEN::Renderer
 						&moveable,
 						&g_Level.Meshes[obj->meshIndex + j],
 						j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
-						MoveablesIds[i] == ID_HAIR, &lastVertex, &lastIndex);
+						MoveablesIds[i] == ID_HAIR || MoveablesIds[i] == ID_HAIR_2, &lastVertex, &lastIndex);
 
 					moveable.ObjectMeshes.push_back(mesh);
 					_meshes.push_back(mesh);
@@ -709,40 +709,114 @@ namespace TEN::Renderer
 										// HACK: Hardcoded hair base parent vertices.
 										int parentVertices0[] = { 37, 39, 40, 38 }; // Single braid.
 										int parentVertices1[] = { 79, 78, 76, 77 }; // Left pigtail.
+
+										auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
+										auto* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
+										auto* parentBone = skinObj.LinearizedBones[LM_HEAD];
+
+										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
+										{
+											auto* parentBucket = &parentMesh->Buckets[b2];
+											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
+											{
+												auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
+												if (isYoung)
+												{
+													if (parentVertex->OriginalIndex == parentVertices1[currentVertex->OriginalIndex])
+													{
+														currentVertex->Bone = 0;
+														currentVertex->Position = parentVertex->Position;
+														currentVertex->Normal = parentVertex->Normal;
+													}
+												}
+												else
+												{
+													if (parentVertex->OriginalIndex == parentVertices0[currentVertex->OriginalIndex])
+													{
+														currentVertex->Bone = 0;
+														currentVertex->Position = parentVertex->Position;
+														currentVertex->Normal = parentVertex->Normal;
+													}
+												}
+											}
+										}
+									}
+									// Link meshes > 0 to parent meshes.
+									else
+									{
+										auto* parentMesh = moveable.ObjectMeshes[j - 1];
+										auto* parentBone = moveable.LinearizedBones[j - 1];
+
+										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
+										{
+											auto* parentBucket = &parentMesh->Buckets[b2];
+											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
+											{
+												auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
+
+												int x1 = _moveablesVertices[currentBucket.StartVertex + v1].Position.x + currentBone->GlobalTranslation.x;
+												int y1 = _moveablesVertices[currentBucket.StartVertex + v1].Position.y + currentBone->GlobalTranslation.y;
+												int z1 = _moveablesVertices[currentBucket.StartVertex + v1].Position.z + currentBone->GlobalTranslation.z;
+
+												int x2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.x + parentBone->GlobalTranslation.x;
+												int y2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.y + parentBone->GlobalTranslation.y;
+												int z2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.z + parentBone->GlobalTranslation.z;
+
+												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
+												{
+													currentVertex->Bone = j;
+													currentVertex->Position = parentVertex->Position;
+													currentVertex->Normal = parentVertex->Normal;
+													currentVertex->AnimationFrameOffset = parentVertex->AnimationFrameOffset;
+													currentVertex->Tangent = parentVertex->Tangent;
+													break;
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					else if (MoveablesIds[i] == ID_HAIR_2 && isSkinPresent)
+					{
+						for (int j = 0; j < obj->nmeshes; j++)
+						{
+							auto* currentMesh = moveable.ObjectMeshes[j];
+							auto* currentBone = moveable.LinearizedBones[j];
+
+							for (const auto& currentBucket : currentMesh->Buckets)
+							{
+								for (int v1 = 0; v1 < currentBucket.NumVertices; v1++)
+								{
+									auto* currentVertex = &_moveablesVertices[currentBucket.StartVertex + v1];
+									currentVertex->Bone = j + 1;
+
+									// Link mesh 0 to head.
+									if (j == 0)
+									{
+										bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+
+										// HACK: Hardcoded hair base parent vertices.
 										int parentVertices2[] = { 68, 69, 70, 71 }; // Right pigtail.
 
 										auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 										auto* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
 										auto* parentBone = skinObj.LinearizedBones[LM_HEAD];
 
-										// Link first 4 vertices.
-										if (currentVertex->OriginalIndex < 4)
+										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 										{
-											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
+											auto* parentBucket = &parentMesh->Buckets[b2];
+											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
-												auto* parentBucket = &parentMesh->Buckets[b2];
-												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
+												auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
+												if (isYoung)
 												{
-													auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
-													
-													// TODO
-													if (isYoung)
+													if (parentVertex->OriginalIndex == parentVertices2[currentVertex->OriginalIndex])
 													{
-														if (parentVertex->OriginalIndex == parentVertices1[currentVertex->OriginalIndex])
-														{
-															currentVertex->Bone = 0;
-															currentVertex->Position = parentVertex->Position;
-															currentVertex->Normal = parentVertex->Normal;
-														}
-													}
-													else
-													{
-														if (parentVertex->OriginalIndex == parentVertices0[currentVertex->OriginalIndex])
-														{
-															currentVertex->Bone = 0;
-															currentVertex->Position = parentVertex->Position;
-															currentVertex->Normal = parentVertex->Normal;
-														}
+														currentVertex->Bone = 0;
+														currentVertex->Position = parentVertex->Position;
+														currentVertex->Normal = parentVertex->Normal;
 													}
 												}
 											}
@@ -789,7 +863,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		_moveablesVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_moveablesVertices.size(), &_moveablesVertices[0]);
+		_moveablesVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_moveablesVertices.size(), _moveablesVertices.data());
 		_moveablesIndexBuffer = IndexBuffer(_device.Get(), (int)_moveablesIndices.size(), _moveablesIndices.data());
 
 		TENLog("Preparing static mesh data...", LogLevel::Info);

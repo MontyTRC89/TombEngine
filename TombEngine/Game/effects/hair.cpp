@@ -23,7 +23,7 @@ namespace TEN::Effects::Hair
 {
 	HairEffectController HairEffect = {};
 
-	void HairUnit::Update(const ItemInfo& item, int hairUnitIndex)
+	void HairUnit::Update(const ItemInfo& item, GAME_OBJECT_ID objectNumber, int hairUnitIndex)
 	{
 		const auto& player = GetLaraInfo(item);
 
@@ -53,7 +53,7 @@ namespace TEN::Effects::Hair
 				auto& nextSegment = Segments[i + 1];
 
 				// NOTE: Joint offset determines segment length.
-				auto jointOffset = GetJointOffset(ID_HAIR, i);
+				auto jointOffset = GetJointOffset(objectNumber, i);
 
 				worldMatrix = Matrix::CreateTranslation(segment.Position);
 				worldMatrix = Matrix::CreateFromQuaternion(segment.Orientation) * worldMatrix;
@@ -100,8 +100,8 @@ namespace TEN::Effects::Hair
 				segment.WorldMatrix = worldMatrix;
 
 				auto jointOffset = (i == (Segments.size() - 1)) ?
-					GetJointOffset(ID_HAIR, (i - 1) - 1) :
-					GetJointOffset(ID_HAIR, (i - 1));
+					GetJointOffset(objectNumber, (i - 1) - 1) :
+					GetJointOffset(objectNumber, (i - 1));
 				worldMatrix = Matrix::CreateTranslation(jointOffset) * worldMatrix;
 
 				segment.Position = worldMatrix.Translation();
@@ -119,7 +119,7 @@ namespace TEN::Effects::Hair
 			{
 			// Left pigtail offset.
 			case 0:
-				relOffset = Vector3(-48.0f, -48.0f, -50.0f);
+				relOffset = Vector3(-52.0f, -48.0f, -50.0f);
 				break;
 
 			// Right pigtail offset.
@@ -323,30 +323,38 @@ namespace TEN::Effects::Hair
 		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 
 		// Initialize hair units.
-		bool isHead = true;
-		for (auto& unit : Units)
+		auto& unit0 = Units[0];
+		unit0.IsEnabled = Objects[ID_HAIR].loaded;
+		unit0.IsInitialized = false;
+		unit0.Segments.resize(Objects[ID_HAIR].nmeshes + 1);
+		// Initialize segments.
+		for (auto& segment : unit0.Segments)
 		{
-			unit.IsEnabled = (!isHead || isYoung);
-			unit.IsInitialized = false;
-			
-			unsigned int segmentCount = Objects[ID_HAIR].nmeshes + 1;
-			unit.Segments.resize(segmentCount);
+			segment.Position = GetJointOffset(ID_HAIR, 0);
+			segment.Velocity = Vector3::Zero;
+			segment.Orientation = ORIENT_DEFAULT.ToQuaternion();
+		}
 
-			// Initialize segments.
-			for (auto& segment : unit.Segments)
-			{
-				segment.Position = GetJointOffset(ID_HAIR, 0);
-				segment.Velocity = Vector3::Zero;
-				segment.Orientation = ORIENT_DEFAULT.ToQuaternion();
-			}
-
-			isHead = false;
+		auto& unit1 = Units[1];
+		unit1.IsEnabled = Objects[ID_HAIR_2].loaded && isYoung;
+		unit1.IsInitialized = false;
+		unit1.Segments.resize(Objects[ID_HAIR_2].nmeshes + 1);
+		// Initialize segments.
+		for (auto& segment : unit1.Segments)
+		{
+			segment.Position = GetJointOffset(ID_HAIR_2, 0);
+			segment.Velocity = Vector3::Zero;
+			segment.Orientation = ORIENT_DEFAULT.ToQuaternion();
 		}
 	}
 
 	void HairEffectController::Update(ItemInfo& item, bool isYoung)
 	{
-		for (int i = 0; i < Units.size(); i++)
-			Units[i].Update(item, i);
+		auto& unit0 = Units[0];
+		if (unit0.IsEnabled)
+			unit0.Update(item, ID_HAIR, 0);
+		auto& unit1 = Units[1];
+		if (unit1.IsEnabled)
+			unit1.Update(item, ID_HAIR_2, 1);
 	}
 }

@@ -332,20 +332,17 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		return;
 
 	const auto& hairObject = *_moveableObjects[ID_HAIR];
-
-	for (const auto& unit : HairEffect.Units)
+	const auto& unit = HairEffect.Units[0];
+	if (unit.IsEnabled)
 	{
-		if (!unit.IsEnabled)
-			continue;
-
 		// First matrix is Lara's head matrix, then all hair unit segment matrices.
 		// Bones are adjusted at load time to account for this.
 		_stItem.World = Matrix::Identity;
 		_stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * _laraWorldMatrix;
 
-		for (int i = 0; i < unit.Segments.size(); i++)
+		for (int i = 1; i < unit.Segments.size(); i++)
 		{
-			_stItem.BonesMatrices[i + 1] = unit.Segments[i].WorldMatrix;
+			_stItem.BonesMatrices[i] = unit.Segments[i].WorldMatrix;
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
 		}
 
@@ -354,6 +351,33 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
 		{
 			auto& rMesh = *hairObject.ObjectMeshes[i];
+			DrawMoveableMesh(itemToDraw, &rMesh, room, i, view, rendererPass);
+		}
+	}
+
+	if (!Objects[ID_HAIR_2].loaded)
+		return;
+
+	const auto& hair2Object = *_moveableObjects[ID_HAIR_2];
+	const auto& unit2 = HairEffect.Units[1];
+	if (unit2.IsEnabled)
+	{
+		// First matrix is Lara's head matrix, then all hair unit segment matrices.
+		// Bones are adjusted at load time to account for this.
+		_stItem.World = Matrix::Identity;
+		_stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * _laraWorldMatrix;
+
+		for (int i = 1; i < unit2.Segments.size(); i++)
+		{
+			_stItem.BonesMatrices[i] = unit2.Segments[i].WorldMatrix;
+			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
+		}
+
+		_cbItem.UpdateData(_stItem, _context.Get());
+
+		for (int i = 0; i < hair2Object.ObjectMeshes.size(); i++)
+		{
+			auto& rMesh = *hair2Object.ObjectMeshes[i];
 			DrawMoveableMesh(itemToDraw, &rMesh, room, i, view, rendererPass);
 		}
 	}

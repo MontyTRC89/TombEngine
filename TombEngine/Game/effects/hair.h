@@ -25,7 +25,7 @@ namespace TEN::Effects::Hair
 		std::vector<HairSegment> Segments = {};
 
 		// Utilities
-		void Update(const ItemInfo& item, int hairUnitIndex);
+		void Update(const ItemInfo& item, GAME_OBJECT_ID objectNumber, int hairUnitIndex);
 
 	private:
 		// Helpers

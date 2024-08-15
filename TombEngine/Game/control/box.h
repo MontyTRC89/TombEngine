@@ -11,7 +11,8 @@ struct LOTInfo;
 enum class JumpDistance
 {
 	Block1,
-	Block2
+	Block2,
+	Block3
 };
 
 enum TARGET_TYPE
@@ -79,10 +80,22 @@ constexpr auto CLIP_BOTTOM = 0x8;
 constexpr auto SECONDARY_CLIP = 0x10;
 constexpr auto ALL_CLIP = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 
+struct AITargetFlags
+{
+	bool checkDistance = false;
+	bool checkSameZone = true;
+	bool checkOcb = false;
+	float maxDistance = 0.0f;
+	int ocb = NO_VALUE;
+	int objectNumber = ID_NO_OBJECT;
+	ItemInfo foundItem = {};
+};
+
 void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
 void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
 void FindAITargetObject(CreatureInfo* creature, int objectNumber);
 void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool checkSameZone = true);
+bool FindAITargetObject(CreatureInfo* creature, AITargetFlags* data);
 void GetAITarget(CreatureInfo* creature);
 int CreatureVault(short itemNumber, short angle, int vault, int shift);
 bool MoveCreature3DPos(Pose* fromPose, Pose* toPose, int velocity, short angleDif, int angleAdd);
@@ -118,7 +131,7 @@ void CreatureHealth(ItemInfo* item);
 void AdjustStopperFlag(ItemInfo* item, int direction);
 void InitializeItemBoxData();
 
-bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType);
+bool CanCreatureJump(ItemInfo& item, float stepDist, JumpDistance jumpDistType);
 
 void DrawBox(int boxIndex, Vector3 color);
 void DrawNearbyPathfinding(int boxIndex);
