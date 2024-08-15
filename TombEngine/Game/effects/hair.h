@@ -15,6 +15,7 @@ namespace TEN::Effects::Hair
 			Vector3	   Position	   = Vector3::Zero;
 			Vector3	   Velocity	   = Vector3::Zero;
 			Quaternion Orientation = Quaternion::Identity;
+			Matrix     WorldMatrix = Matrix::Identity;
 		};
 
 	public:

@@ -41,8 +41,8 @@ namespace TEN::Effects::Hair
 		auto baseOrient = Geometry::ConvertDirectionToQuat(-Geometry::ConvertQuatToDirection(GetBoneOrientation(item, LM_HEAD)));
 
 		// Set position of base segment.
-		auto basePos = worldMatrix.Translation();
-		Segments[0].Position = basePos;
+		Segments[0].Position = worldMatrix.Translation();
+		Segments[0].WorldMatrix = worldMatrix;
 
 		if (!IsInitialized)
 		{
@@ -83,7 +83,7 @@ namespace TEN::Effects::Hair
 				// TR3 UPV uses a hack which forces player water status to dry. 
 				// Therefore, cannot directly use water status value to determine enrironment.
 				bool isOnLand = (player.Control.WaterStatus == WaterStatus::Dry &&
-								 (player.Context.Vehicle == -1 || g_Level.Items[player.Context.Vehicle].ObjectNumber != ID_UPV));
+								 (player.Context.Vehicle == NO_VALUE || g_Level.Items[player.Context.Vehicle].ObjectNumber != ID_UPV));
 
 				// Handle segment room collision.
 				CollideSegmentWithRoom(segment, waterHeight, roomNumber, isOnLand);
@@ -97,6 +97,7 @@ namespace TEN::Effects::Hair
 				// Calculate world matrix.
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
 				worldMatrix = Matrix::CreateFromQuaternion(prevSegment.Orientation) * worldMatrix;
+				segment.WorldMatrix = worldMatrix;
 
 				auto jointOffset = (i == (Segments.size() - 1)) ?
 					GetJointOffset(ID_HAIR, (i - 1) - 1) :
@@ -118,12 +119,12 @@ namespace TEN::Effects::Hair
 			{
 			// Left pigtail offset.
 			case 0:
-				relOffset = Vector3(-52.0f, -48.0f, -50.0f);
+				relOffset = Vector3(-48.0f, -48.0f, -50.0f);
 				break;
 
 			// Right pigtail offset.
 			case 1:
-				relOffset = Vector3(44.0f, -48.0f, -50.0f);
+				relOffset = Vector3(48.0f, -48.0f, -50.0f);
 				break;
 			}
 		}
@@ -346,11 +347,6 @@ namespace TEN::Effects::Hair
 	void HairEffectController::Update(ItemInfo& item, bool isYoung)
 	{
 		for (int i = 0; i < Units.size(); i++)
-		{
 			Units[i].Update(item, i);
-
-			if (isYoung && i == 1)
-				Units[i].Update(item, i);
-		}
 	}
 }
