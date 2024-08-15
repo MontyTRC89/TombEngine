@@ -203,7 +203,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
 del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).exp"
 del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).lib"
 del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).pdb"</Command>
-      <Message>Copy dll and exe to game directory.</Message>
+      <Message>Copying DLLs and EXE to Game directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>CD "$(SolutionDir)Documentation"
@@ -221,7 +221,7 @@ xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Level
 xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
 xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
 xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
-      <Message>Generating documentation, savegame flatbuffer, bass dll and copying scripts and shaders files.</Message>
+      <Message>Generating documentation, savegame flatbuffer, and bass DLL. Copying scripts and shaders to Game directory.</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
