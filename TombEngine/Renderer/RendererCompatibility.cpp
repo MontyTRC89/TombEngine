@@ -714,24 +714,25 @@ namespace TEN::Renderer
 										auto* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
 										auto* parentBone = skinObj.LinearizedBones[LM_HEAD];
 
-										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
+										// Link first 4 vertices.
+										if (currentVertex->OriginalIndex < 4)
 										{
-											auto* parentBucket = &parentMesh->Buckets[b2];
-											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
+											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 											{
-												auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
-												if (isYoung)
+												auto* parentBucket = &parentMesh->Buckets[b2];
+												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
-													if (parentVertex->OriginalIndex == parentVertices1[currentVertex->OriginalIndex])
+													auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
+													if (isYoung)
 													{
-														currentVertex->Bone = 0;
-														currentVertex->Position = parentVertex->Position;
-														currentVertex->Normal = parentVertex->Normal;
+														if (parentVertex->OriginalIndex == parentVertices1[currentVertex->OriginalIndex])
+														{
+															currentVertex->Bone = 0;
+															currentVertex->Position = parentVertex->Position;
+															currentVertex->Normal = parentVertex->Normal;
+														}
 													}
-												}
-												else
-												{
-													if (parentVertex->OriginalIndex == parentVertices0[currentVertex->OriginalIndex])
+													else if (parentVertex->OriginalIndex == parentVertices0[currentVertex->OriginalIndex])
 													{
 														currentVertex->Bone = 0;
 														currentVertex->Position = parentVertex->Position;
@@ -810,14 +811,11 @@ namespace TEN::Renderer
 											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
 												auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
-												if (isYoung)
+												if (isYoung && parentVertex->OriginalIndex == parentVertices2[currentVertex->OriginalIndex])
 												{
-													if (parentVertex->OriginalIndex == parentVertices2[currentVertex->OriginalIndex])
-													{
-														currentVertex->Bone = 0;
-														currentVertex->Position = parentVertex->Position;
-														currentVertex->Normal = parentVertex->Normal;
-													}
+													currentVertex->Bone = 0;
+													currentVertex->Position = parentVertex->Position;
+													currentVertex->Normal = parentVertex->Normal;
 												}
 											}
 										}
@@ -863,7 +861,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		_moveablesVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_moveablesVertices.size(), _moveablesVertices.data());
+		_moveablesVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_moveablesVertices.size(), &_moveablesVertices[0]);
 		_moveablesIndexBuffer = IndexBuffer(_device.Get(), (int)_moveablesIndices.size(), _moveablesIndices.data());
 
 		TENLog("Preparing static mesh data...", LogLevel::Info);

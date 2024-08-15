@@ -94,7 +94,7 @@ namespace TEN::Entities::TR3
 				ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 			}
 
-			auto pointColl = GetPointCollision(item);
+			pointColl = GetPointCollision(item);
 			item.Animation.IsAirborne = true;
 
 			if (pointColl.GetFloorHeight() < item.Pose.Position.y)

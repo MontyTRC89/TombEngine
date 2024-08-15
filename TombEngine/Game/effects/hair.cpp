@@ -117,7 +117,7 @@ namespace TEN::Effects::Hair
 			{
 			// Left pigtail offset.
 			case 0:
-				relOffset = Vector3(-52.0f, -48.0f, -50.0f);
+				relOffset = Vector3(-48.0f, -48.0f, -50.0f);
 				break;
 
 			// Right pigtail offset.
@@ -331,7 +331,7 @@ namespace TEN::Effects::Hair
 			segment.Velocity = Vector3::Zero;
 			segment.Orientation = DEFAULT_ORIENT.ToQuaternion();
 		}
-		
+
 		auto& unit1 = Units[1];
 		unit1.IsEnabled = Objects[ID_HAIR_2].loaded && isYoung;
 		unit1.IsInitialized = false;
