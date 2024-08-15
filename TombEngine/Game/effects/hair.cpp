@@ -174,13 +174,13 @@ namespace TEN::Effects::Hair
 	Quaternion HairUnit::GetSegmentOrientation(const Vector3& origin, const Vector3& target, const Quaternion& baseOrient)
 	{
 		// Calculate absolute orientation.
-		auto absDirection = target - origin;
-		absDirection.Normalize();
-		auto absOrient = Geometry::ConvertDirectionToQuat(absDirection);
+		auto absDir = target - origin;
+		absDir.Normalize();
+		auto absOrient = Geometry::ConvertDirectionToQuat(absDir);
 
 		// Calculate relative twist rotation.
 		// TODO: Find accurate twist angle based on relation between absOrient and baseOrient.
-		auto twistAxisAngle = AxisAngle(absDirection, EulerAngles(baseOrient).y);
+		auto twistAxisAngle = AxisAngle(absDir, EulerAngles(baseOrient).y);
 		auto twistRot = twistAxisAngle.ToQuaternion();
 
 		// Return ideal orientation.
@@ -252,13 +252,12 @@ namespace TEN::Effects::Hair
 	
 	void HairUnit::CollideSegmentWithRoom(HairSegment& segment, int waterHeight, int roomNumber, bool isOnLand)
 	{
-		constexpr auto VELOCITY_COEFF = 0.75f;
+		constexpr auto VEL_COEFF = 0.75f;
 
 		auto pointColl = GetPointCollision(segment.Position, roomNumber);
-		int floorHeight = pointColl.GetFloorHeight();
 
 		Segments[0].Velocity = segment.Position;
-		segment.Position += segment.Velocity * VELOCITY_COEFF;
+		segment.Position += segment.Velocity * VEL_COEFF;
 
 		// Land collision.
 		if (isOnLand)
@@ -276,7 +275,7 @@ namespace TEN::Effects::Hair
 				segment.Position.y = waterHeight;
 			}
 			// Avoid clipping through floor.
-			else if (floorHeight > Segments[0].Position.y && segment.Position.y > floorHeight)
+			else if (pointColl.GetFloorHeight() > Segments[0].Position.y && segment.Position.y > pointColl.GetFloorHeight())
 			{
 				segment.Position = Segments[0].Velocity;
 			}
@@ -288,9 +287,9 @@ namespace TEN::Effects::Hair
 			{
 				segment.Position.y = waterHeight;
 			}
-			else if (segment.Position.y > floorHeight)
+			else if (segment.Position.y > pointColl.GetFloorHeight())
 			{
-				segment.Position.y = floorHeight;
+				segment.Position.y = pointColl.GetFloorHeight();
 			}
 		}
 	}
@@ -299,17 +298,17 @@ namespace TEN::Effects::Hair
 	{
 		for (const auto& sphere : spheres)
 		{
-			auto direction = segment.Position - sphere.Center;
+			auto dir = segment.Position - sphere.Center;
 
-			float distance = Vector3::Distance(segment.Position, sphere.Center);
-			if (distance < sphere.Radius)
+			float dist = Vector3::Distance(segment.Position, sphere.Center);
+			if (dist < sphere.Radius)
 			{
 				// Avoid division by zero.
-				if (distance == 0.0f)
-					distance = 1.0f;
+				if (dist == 0.0f)
+					dist = 1.0f;
 
 				// Push segment away from sphere.
-				segment.Position = sphere.Center + (direction * (sphere.Radius / distance));
+				segment.Position = sphere.Center + (dir * (sphere.Radius / dist));
 			}
 		}
 	}
