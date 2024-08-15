@@ -7,7 +7,7 @@
 #pragma comment(lib, "comctl32")
 #pragma comment(lib, "version")
 
-// Bass library
+// BASS library
 #pragma comment(lib, "bass")
 #pragma comment(lib, "bass_fx")
 #pragma comment(lib, "bassmix")
@@ -21,6 +21,9 @@
 // DirectX Tool Kit library
 #pragma comment(lib, "DirectXTK")
 
+// Lua library
+#pragma comment(lib, "lua-c++")
+
 // OIS, spdlog, zlib libraries
 #if defined(_DEBUG)
 #pragma comment(lib, "OIS_d")
@@ -31,9 +34,6 @@
 #pragma comment(lib, "spdlog")
 #pragma comment(lib, "zlib")
 #endif
-
-// Lua library
-#pragma comment(lib, "lua-c++")
 
 #include <algorithm>
 #include <array>
