@@ -321,25 +321,25 @@ namespace TEN::Effects::Hair
 
 		// Initialize hair units.
 		auto& unit0 = Units[0];
-		unit0.IsEnabled = Objects[ID_HAIR].loaded;
+		unit0.IsEnabled = Objects[ID_SINGLE_BRAID_HAIR].loaded;
 		unit0.IsInitialized = false;
-		unit0.Segments.resize(Objects[ID_HAIR].nmeshes + 1);
+		unit0.Segments.resize(Objects[ID_SINGLE_BRAID_HAIR].nmeshes + 1);
 		// Initialize segments.
 		for (auto& segment : unit0.Segments)
 		{
-			segment.Position = GetJointOffset(ID_HAIR, 0);
+			segment.Position = GetJointOffset(ID_SINGLE_BRAID_HAIR, 0);
 			segment.Velocity = Vector3::Zero;
 			segment.Orientation = DEFAULT_ORIENT.ToQuaternion();
 		}
 
 		auto& unit1 = Units[1];
-		unit1.IsEnabled = Objects[ID_HAIR_2].loaded && isYoung;
+		unit1.IsEnabled = Objects[ID_DUAL_PIGTAIL_HAIR].loaded && isYoung;
 		unit1.IsInitialized = false;
-		unit1.Segments.resize(Objects[ID_HAIR_2].nmeshes + 1);
+		unit1.Segments.resize(Objects[ID_DUAL_PIGTAIL_HAIR].nmeshes + 1);
 		// Initialize segments.
 		for (auto& segment : unit1.Segments)
 		{
-			segment.Position = GetJointOffset(ID_HAIR_2, 0);
+			segment.Position = GetJointOffset(ID_DUAL_PIGTAIL_HAIR, 0);
 			segment.Velocity = Vector3::Zero;
 			segment.Orientation = DEFAULT_ORIENT.ToQuaternion();
 		}
@@ -349,9 +349,9 @@ namespace TEN::Effects::Hair
 	{
 		auto& unit0 = Units[0];
 		if (unit0.IsEnabled)
-			unit0.Update(item, ID_HAIR, 0);
+			unit0.Update(item, ID_SINGLE_BRAID_HAIR, 0);
 		auto& unit1 = Units[1];
 		if (unit1.IsEnabled)
-			unit1.Update(item, ID_HAIR_2, 1);
+			unit1.Update(item, ID_DUAL_PIGTAIL_HAIR, 1);
 	}
 }

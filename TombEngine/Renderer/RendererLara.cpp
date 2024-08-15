@@ -328,10 +328,10 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 
 void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
-	if (!Objects[ID_HAIR].loaded)
+	if (!Objects[ID_SINGLE_BRAID_HAIR].loaded)
 		return;
 
-	const auto& hairObject = *_moveableObjects[ID_HAIR];
+	const auto& hairObject = *_moveableObjects[ID_SINGLE_BRAID_HAIR];
 	const auto& unit = HairEffect.Units[0];
 	if (unit.IsEnabled)
 	{
@@ -355,10 +355,10 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		}
 	}
 
-	if (!Objects[ID_HAIR_2].loaded)
+	if (!Objects[ID_DUAL_PIGTAIL_HAIR].loaded)
 		return;
 
-	const auto& hair2Object = *_moveableObjects[ID_HAIR_2];
+	const auto& hair2Object = *_moveableObjects[ID_DUAL_PIGTAIL_HAIR];
 	const auto& unit2 = HairEffect.Units[1];
 	if (unit2.IsEnabled)
 	{
