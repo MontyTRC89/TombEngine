@@ -1,6 +1,6 @@
 #pragma once
 
-// Disable Unicode for FMT and SPDLOG to prevent errors when compiling.
+// Disable Unicode for FMT and spdlog to prevent errors when compiling.
 #define FMT_UNICODE 0
 
 // Windows
