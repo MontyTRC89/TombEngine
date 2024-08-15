@@ -74,24 +74,24 @@ namespace TEN::Entities::TR3
 			bool isWater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
 			float verticalVelCoeff = isWater ? 81.0f : 1.0f;
 			
-			int roomNumber = GetPointCollision(item).GetRoomNumber();
-			if (item.RoomNumber != roomNumber)
+			auto pointColl = GetPointCollision(item);
+			if (item.RoomNumber != pointColl.GetRoomNumber())
 			{
-				if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber) &&
+				if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointColl.GetRoomNumber()) &&
 					!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber))
 				{
-					int waterHeight = GetWaterHeight(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, roomNumber);
+					int waterHeight = pointColl.GetWaterTopHeight();
 					SplashSetup.y = waterHeight - 1;
 					SplashSetup.x = item.Pose.Position.x;
 					SplashSetup.z = item.Pose.Position.z;
 					SplashSetup.splashPower = item.Animation.Velocity.y * 4;
 					SplashSetup.innerRadius = 160.0f;
 
-					SetupSplash(&SplashSetup, roomNumber);
+					SetupSplash(&SplashSetup, pointColl.GetRoomNumber());
 					item.Animation.Velocity.y = 0.0f;
 				}
 
-				ItemNewRoom(itemNumber, roomNumber);
+				ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 			}
 
 			auto pointColl = GetPointCollision(item);

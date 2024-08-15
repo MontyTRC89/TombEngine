@@ -69,7 +69,7 @@ namespace TEN::Effects::Hair
 			// Get water height.
 			auto pos = item.Pose.Position + Vector3i(GetWaterProbeOffset(item));
 			int roomNumber = item.RoomNumber;
-			int waterHeight = GetWaterHeight(pos.x, pos.y, pos.z, roomNumber);
+			int waterHeight = GetPointCollision(pos, roomNumber).GetWaterTopHeight();
 
 			// Get collision spheres.
 			auto spheres = GetSpheres(item, isYoung);
