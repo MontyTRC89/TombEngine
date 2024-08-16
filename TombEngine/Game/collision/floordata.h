@@ -136,16 +136,18 @@ class FloorInfo
 {
 public:
 	// Members
-	int				  RoomNumber		   = 0;
-	int				  SidePortalRoomNumber = 0;
-	SectorSurfaceData FloorSurface		   = {};
-	SectorSurfaceData CeilingSurface	   = {};
-	std::set<int>	  BridgeItemNumbers	   = {};
-	SectorFlagData	  Flags				   = {};
+	Vector2i		  Position		 = Vector2i::Zero;
+	int				  RoomNumber	 = 0;
+	SectorSurfaceData FloorSurface	 = {};
+	SectorSurfaceData CeilingSurface = {};
+	SectorFlagData	  Flags			 = {};
 
-	int	 Box		  = 0;
-	int	 TriggerIndex = 0;
-	bool Stopper	  = true;
+	std::set<int> BridgeItemNumbers	   = {};
+	int			  SidePortalRoomNumber = 0;
+
+	int	 PathfindingBoxID = 0;
+	int	 TriggerIndex	  = 0;
+	bool Stopper		  = true;
 
 	// Getters
 	int								 GetSurfaceTriangleID(int x, int z, bool isFloor) const;

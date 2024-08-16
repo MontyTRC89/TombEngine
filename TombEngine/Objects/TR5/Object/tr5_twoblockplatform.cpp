@@ -82,7 +82,7 @@ namespace TEN::Entities::Generic
 					return;
 				}
 
-				int distToPortal = *&g_Level.Rooms[item->RoomNumber].maxceiling - item->Pose.Position.y;
+				int distToPortal = *&g_Level.Rooms[item->RoomNumber].TopHeight - item->Pose.Position.y;
 				if (distToPortal <= speed)
 					UpdateBridgeItem(*item);
 

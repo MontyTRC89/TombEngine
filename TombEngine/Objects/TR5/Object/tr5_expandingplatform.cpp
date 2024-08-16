@@ -131,7 +131,7 @@ namespace TEN::Entities::Generic
 
 		short roomNumber = item.RoomNumber;
 		FloorInfo* floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber);
-		g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
+		g_Level.PathfindingBoxes[floor->PathfindingBoxID].flags &= ~BLOCKED;
 
 		// Set mutators to default.
 		UpdateExpandingPlatformMutators(itemNumber);

@@ -180,7 +180,7 @@ void Level::SetLevelFarView(short val)
 
 RGBAColor8Byte Level::GetSkyLayerColor(int index) const
 {
-	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
 	if (index == 0)
 	{
@@ -194,7 +194,7 @@ RGBAColor8Byte Level::GetSkyLayerColor(int index) const
 
 bool Level::GetSkyLayerEnabled(int index) const
 {
-	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
 	if (index == 0)
 	{
@@ -208,7 +208,7 @@ bool Level::GetSkyLayerEnabled(int index) const
 
 short Level::GetSkyLayerSpeed(int index) const
 {
-	assertion(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
 
 	if (index == 0)
 	{

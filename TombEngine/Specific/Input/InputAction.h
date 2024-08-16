@@ -5,6 +5,7 @@ namespace TEN::Input
 	typedef enum class ActionID
 	{
 		// General actions
+
 		Forward,
 		Back,
 		Left,
@@ -21,6 +22,7 @@ namespace TEN::Input
 		Look,
 
 		// Vehicle actions
+
 		Accelerate,
 		Reverse,
 		Faster,
@@ -29,6 +31,7 @@ namespace TEN::Input
 		Fire,
 
 		// Quick actions
+
 		Flare,
 		SmallMedipack,
 		LargeMedipack,
@@ -46,6 +49,7 @@ namespace TEN::Input
 		Weapon10,
 
 		// Menu actions
+
 		Select,
 		Deselect,
 		Pause,
@@ -56,11 +60,11 @@ namespace TEN::Input
 		Count
 	} In;
 
-	// TODO: For analog triggers, use Value range [0.0f, 1.0f] with deadzone up to a quarter press.
 	class InputAction
 	{
 	private:
 		// Members
+
 		ActionID ID				= In::Forward;
 		float	 Value			= 0.0f;
 		float	 PrevValue		= 0.0f;
@@ -70,21 +74,25 @@ namespace TEN::Input
 
 	public:
 		// Constructors
+
 		InputAction(ActionID actionID);
 
 		// Getters
+
 		ActionID GetID() const;
 		float	 GetValue() const;
 		float	 GetTimeActive() const;
 		float	 GetTimeInactive() const;
 		
 		// Inquirers
+
 		bool IsClicked() const;
 		bool IsHeld(float delayInSec = 0.0f) const;
 		bool IsPulsed(float delayInSec, float initialDelayInSec = 0.0f) const;
 		bool IsReleased(float maxDelayInSec = INFINITY) const;
 
 		// Utilities
+
 		void Update(bool value);
 		void Update(float value);
 		void Clear();
@@ -93,6 +101,7 @@ namespace TEN::Input
 
 	private:
 		// Helpers
+
 		void UpdateValue(float value);
 	};
 }

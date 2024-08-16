@@ -246,7 +246,7 @@ extern FX_INFO EffectList[NUM_EFFECTS];
 template <typename TEffect>
 TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
 {
-	assertion(effects.size() <= countMax, "Too many particle effects.");
+	TENAssert(effects.size() <= countMax, "Too many particle effects.");
 
 	// Add and return new effect.
 	if (effects.size() < countMax)

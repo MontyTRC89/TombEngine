@@ -584,9 +584,9 @@ void InitializeItem(short itemNumber)
 	item->NextItem = room->itemNumber;
 	room->itemNumber = itemNumber;
 
-	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
+	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->Position.x, item->Pose.Position.z - room->Position.z);
 	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
-	item->BoxNumber = floor->Box;
+	item->BoxNumber = floor->PathfindingBoxID;
 
 	item->ResetModelToDefault();
 

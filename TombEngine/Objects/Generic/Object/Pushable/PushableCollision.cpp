@@ -120,10 +120,10 @@ namespace TEN::Entities::Generic
 		auto collObjects = GetCollidedObjects(pushableItem, true, true);
 		pushableItem.Pose.Position = prevPos;
 
-		if (!collObjects.StaticPtrs.empty())
+		if (!collObjects.Statics.empty())
 			return false;
 
-		for (const auto* itemPtr : collObjects.ItemPtrs)
+		for (const auto* itemPtr : collObjects.Items)
 		{
 			const auto& object = Objects[itemPtr->ObjectNumber];
 
@@ -191,10 +191,10 @@ namespace TEN::Entities::Generic
 		auto collObjects = GetCollidedObjects(*LaraItem, true, true);
 		LaraItem->Pose.Position = prevPos;
 
-		if (!collObjects.StaticPtrs.empty())
+		if (!collObjects.Statics.empty())
 			return false;
 
-		for (const auto* itemPtr : collObjects.ItemPtrs)
+		for (const auto* itemPtr : collObjects.Items)
 		{
 			const auto& object = Objects[itemPtr->ObjectNumber];
 
@@ -315,7 +315,7 @@ namespace TEN::Entities::Generic
 			waterHeight = pointColl.GetWaterSurfaceHeight();
 
 			if (waterHeight == NO_HEIGHT && TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
-				waterHeight = g_Level.Rooms[item.RoomNumber].maxceiling;
+				waterHeight = g_Level.Rooms[item.RoomNumber].TopHeight;
 
 			AddPushableBridge(item);
 		}
@@ -324,7 +324,7 @@ namespace TEN::Entities::Generic
 			waterHeight = pointColl.GetWaterSurfaceHeight();
 
 			if (waterHeight == NO_HEIGHT && TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
-				waterHeight = g_Level.Rooms[item.RoomNumber].maxceiling;
+				waterHeight = g_Level.Rooms[item.RoomNumber].TopHeight;
 		}
 
 		auto pushableColl = PushableCollisionData{};

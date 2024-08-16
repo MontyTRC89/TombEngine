@@ -30,6 +30,7 @@ namespace TEN::Gui
 		None,
 		UseItem,
 		NewGame,
+		HomeLevel,
 		LoadGame,
 		SaveGame,
 		ExitGame,
@@ -187,6 +188,7 @@ namespace TEN::Gui
 		void UseItem(ItemInfo& item, int objectNumber);
 
 		// Getters
+
 		const InventoryRing& GetRing(RingTypes ringType);
 		int GetSelectedOption();
 		Menu GetMenuToDisplay();
@@ -196,8 +198,10 @@ namespace TEN::Gui
 		int GetLastInventoryItem();
 		SettingsData& GetCurrentSettings();
 		int GetLoadSaveSelection();
+		int GetLoopedSelectedOption(int selectedOption, int optionCount, bool canLoop);
 
 		// Setters
+
 		void SetSelectedOption(int menu);
 		void SetMenuToDisplay(Menu menu);
 		void SetInventoryMode(InventoryMode mode);

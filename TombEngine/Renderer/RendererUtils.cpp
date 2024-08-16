@@ -68,7 +68,7 @@ namespace TEN::Renderer::Utils
 		ComPtr<ID3D11VertexShader> shader;
 		throwIfFailed(device->CreateVertexShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, shader.GetAddressOf()));
 		
-		if constexpr(DebugBuild)
+		if constexpr (DebugBuild)
 		{
 			char buffer[100];
 			unsigned int size = (unsigned int)std::wcstombs(buffer, fileName.c_str(), 100);

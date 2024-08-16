@@ -18,14 +18,12 @@
 #include "Game/room.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
-using namespace TEN::Renderer;
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
 
@@ -125,7 +123,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 	// Run through neighboring rooms.
 	const auto& room = g_Level.Rooms[collidingItem.RoomNumber];
-	for (int roomNumber : room.neighbors)
+	for (int roomNumber : room.NeighborRoomNumbers)
 	{
 		auto& neighborRoom = g_Level.Rooms[roomNumber];
 		if (!neighborRoom.Active())
@@ -204,7 +202,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 					// Test accurate box intersection.
 					if (box0.Intersects(box1))
-						collObjects.ItemPtrs.push_back(&item);
+						collObjects.Items.push_back(&item);
 				}
 				while (itemNumber != NO_VALUE);
 			}
@@ -253,7 +251,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 				// Test accurate box intersection.
 				if (box0.Intersects(box1))
-					collObjects.StaticPtrs.push_back(&staticObj);
+					collObjects.Statics.push_back(&staticObj);
 			}
 		}
 	}
@@ -307,9 +305,9 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0.0f, 0.0f);
 		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
-		// g_Renderer.AddDebugSphere(origin, 16, Vector4::One, RendererDebugPage::CollisionStats);
+		// DrawDebugSphere(origin, 16, Vector4::One, RendererDebugPage::CollisionStats);
 
-		for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
+		for (auto i : g_Level.Rooms[item->RoomNumber].NeighborRoomNumbers)
 		{
 			if (!g_Level.Rooms[i].Active())
 				continue;
@@ -706,7 +704,7 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 		item1->Pose.Position.Lerp(item0->Pose.Position + newDeltaPos, SOFT_PUSH_LERP_ALPHA);
 	}
 	// Snap to new position.
-	else
+	else if (coll->Setup.EnableObjectPush)
 	{
 		item1->Pose.Position = item0->Pose.Position + newDeltaPos;
 	}
@@ -942,7 +940,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->HitTallObject = false;
 
-	for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
+	for (auto i : g_Level.Rooms[item->RoomNumber].NeighborRoomNumbers)
 	{
 		if (!g_Level.Rooms[i].Active())
 			continue;
@@ -989,7 +987,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	itemBounds.Extents = itemBounds.Extents - Vector3(BLOCK(1));
 
 	// Draw static bounds.
-	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RendererDebugPage::CollisionStats);
+	DrawDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RendererDebugPage::CollisionStats);
 
 	// Calculate horizontal item collision bounds according to radius.
 	GameBoundingBox collBox;
@@ -1016,7 +1014,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Draw item coll bounds.
-	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
+	DrawDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 	// Decompose static bounds into top/bottom plane vertices.
 	Vector3 corners[8];
@@ -1811,7 +1809,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	const auto& room = g_Level.Rooms[item->RoomNumber];
-	for (int neighborRoomNumber : room.neighbors)
+	for (int neighborRoomNumber : room.NeighborRoomNumbers)
 	{
 		auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 		if (!neighborRoom.Active())

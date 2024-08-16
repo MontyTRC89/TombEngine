@@ -13,7 +13,7 @@
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 
-namespace TEN::Traps::TR5
+namespace TEN::Entities::Traps
 {
 	// NOTES:
 	// item.ItemFlags[0] = barrier height.
@@ -60,7 +60,7 @@ namespace TEN::Traps::TR5
 		auto beamOffset = Vector3(0.0f, -LaserBarrierBeam::HEIGHT, 0.0f);
 		for (auto& beam : Beams)
 		{
-			assertion(beam.VertexPoints.size() == baseVertices.size(), "Laser barrier beam vertex count out of sync.");
+			TENAssert(beam.VertexPoints.size() == baseVertices.size(), "Laser barrier beam vertex count out of sync.");
 
 			for (int i = 0; i < beam.VertexPoints.size(); i++)
 				beam.VertexPoints[i] = baseVertices[i] + beamOffset;

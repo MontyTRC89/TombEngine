@@ -11,13 +11,11 @@
 #include "Game/room.h"
 #include "Math/Math.h"
 #include "Sound/sound.h"
-#include "Renderer/Renderer.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Room;
 using namespace TEN::Math;
-using namespace TEN::Renderer;
 
 void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 {
@@ -299,8 +297,8 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
 	// Debug angle and distance
-	// g_Renderer.PrintDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
-	// g_Renderer.PrintDebugMessage("Nearest dist:  %f", coll->NearestLedgeDistance);
+	// PrintDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
+	// PrintDebugMessage("Nearest dist:  %f", coll->NearestLedgeDistance);
 	
 	// TEST 2: CENTERPOINT PROBE
 
@@ -339,7 +337,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xFront;
 	probePos.z = entityPos.z + zFront;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
+	DrawDebugSphere(probePos.ToVector3(), 32, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
 
 	pointColl = GetPointCollision(probePos, topRoomNumber);
 
@@ -394,7 +392,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xLeft;
 	probePos.z = entityPos.z + zLeft;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 0, 1, 1), RendererDebugPage::CollisionStats);
+	DrawDebugSphere(probePos.ToVector3(), 32, Vector4(0, 0, 1, 1), RendererDebugPage::CollisionStats);
 
 	pointColl = GetPointCollision(probePos, item->RoomNumber);
 
@@ -460,7 +458,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, const Vector3i& offse
 	probePos.x = entityPos.x + xRight;
 	probePos.z = entityPos.z + zRight;
 
-	g_Renderer.AddDebugSphere(probePos.ToVector3(), 32, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
+	DrawDebugSphere(probePos.ToVector3(), 32, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 	pointColl = GetPointCollision(probePos, item->RoomNumber);
 
@@ -807,7 +805,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			}
 
 			// Debug probe point
-			// g_Renderer.AddDebugSphere(Vector3(eX, y, eZ), 16, Vector4(1, 1, 0, 1), RendererDebugPage::CollisionStats);
+			// DrawDebugSphere(Vector3(eX, y, eZ), 16, Vector4(1, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 			// Determine front floor probe offset.
 			// It is needed to identify if there is bridge or ceiling split in front.
@@ -849,7 +847,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto fpZ = eZ + floorProbeOffset * cosForwardAngle;
 
 			// Debug probe point.
-			// g_Renderer.AddDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
+			// DrawDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 			// Get true room number and block, based on derived height
 			room = GetRoomVector(item->Location, Vector3i(fpX, height, fpZ)).RoomNumber;
@@ -865,7 +863,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 			auto ray = Ray(Vector3(eX, cY, eZ), direction);
 
 			// Debug ray direction.
-			// g_Renderer.AddDebugLine(Vector3(eX, y, eZ), Vector3(eX, y, eZ) + direction * 256, Vector4(1, 0, 0, 1));
+			// DrawDebugLine(Vector3(eX, y, eZ), Vector3(eX, y, eZ) + direction * 256, Vector4(1, 0, 0, 1));
 
 			// Keep origin ray to calculate true centerpoint distance to ledge later.
 			if (p == 0)
@@ -920,7 +918,7 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 				auto cZ = fZ + BLOCK(1) + 1;
 
 				// Debug used block
-				// g_Renderer.AddDebugSphere(Vector3(round(eX / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f), y, round(eZ / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f)), 16, Vector4::One, RendererDebugPage::CollisionStats);
+				// DrawDebugSphere(Vector3(round(eX / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f), y, round(eZ / BLOCK(1)) * BLOCK(1) + BLOCK(0.5f)), 16, Vector4::One, RendererDebugPage::CollisionStats);
 
 				// Get split angle coordinates.
 				auto sX = fX + 1 + BLOCK(0.5f);
@@ -1083,246 +1081,6 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 	return (minHeight + item.Pose.Position.y - height);
 }
 
-int GetWaterSurface(int x, int y, int z, short roomNumber)
-{
-	auto* room = &g_Level.Rooms[roomNumber];
-	auto* sector = GetSector(room, x - room->x, z - room->z);
-
-	if (TestEnvironment(ENV_FLAG_WATER, room))
-	{
-		while (sector->GetNextRoomNumber(Vector3i(x, y, z), false).has_value())
-		{
-			room = &g_Level.Rooms[sector->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(sector->RoomNumber)];
-			if (!TestEnvironment(ENV_FLAG_WATER, room))
-				return (sector->GetSurfaceHeight(x, z, false));
-
-			sector = GetSector(room, x - room->x, z - room->z);
-		}
-
-		return NO_HEIGHT;
-	}
-	else
-	{
-		while (sector->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
-		{
-			room = &g_Level.Rooms[sector->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(sector->RoomNumber)];
-			if (TestEnvironment(ENV_FLAG_WATER, room))
-				return (sector->GetSurfaceHeight(x, z, true));
-
-			sector = GetSector(room, x - room->x, z - room->z);
-		}
-	}
-
-	return NO_HEIGHT;
-}
-
-int GetWaterSurface(ItemInfo* item)
-{
-	return GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-}
-
-int GetWaterDepth(int x, int y, int z, short roomNumber)
-{
-	FloorInfo* sector = nullptr;
-	auto* room = &g_Level.Rooms[roomNumber];
-
-	int adjoiningRoomNumber = NO_VALUE;
-	do
-	{
-		int xFloor = (x - room->x) / BLOCK(1);
-		int zFloor = (z - room->z) / BLOCK(1);
-
-		if (zFloor <= 0)
-		{
-			zFloor = 0;
-			if (xFloor < 1)
-			{
-				xFloor = 1;
-			}
-			else if (xFloor > (room->xSize - 2))
-			{
-				xFloor = room->xSize - 2;
-			}
-		}
-		else if (zFloor >= (room->zSize - 1))
-		{
-			zFloor = room->zSize - 1;
-			if (xFloor < 1)
-			{
-				xFloor = 1;
-			}
-			else if (xFloor > (room->xSize - 2))
-			{
-				xFloor = room->xSize - 2;
-			}
-		}
-		else if (xFloor < 0)
-		{
-			xFloor = 0;
-		}
-		else if (xFloor >= room->xSize)
-		{
-			xFloor = room->xSize - 1;
-		}
-
-		sector = &room->floor[zFloor + (xFloor * room->zSize)];
-		adjoiningRoomNumber = sector->SidePortalRoomNumber;
-		if (adjoiningRoomNumber != NO_VALUE)
-		{
-			roomNumber = adjoiningRoomNumber;
-			room = &g_Level.Rooms[adjoiningRoomNumber];
-		}
-	}
-	while (adjoiningRoomNumber != NO_VALUE);
-
-	if (TestEnvironment(ENV_FLAG_WATER, room) ||
-		TestEnvironment(ENV_FLAG_SWAMP, room))
-	{
-		while (sector->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(NO_VALUE) != NO_VALUE)
-		{
-			room = &g_Level.Rooms[sector->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(sector->RoomNumber)];
-
-			if (!TestEnvironment(ENV_FLAG_WATER, room) &&
-				!TestEnvironment(ENV_FLAG_SWAMP, room))
-			{
-				int waterHeight = sector->GetSurfaceHeight(x, z, false);
-				int floorHeight = GetPointCollision(Vector3i(x, y, z), sector->RoomNumber).GetBottomSector().GetSurfaceHeight(x, z, true);
-				return (floorHeight - waterHeight);
-			}
-
-			sector = GetSector(room, x - room->x, z - room->z);
-		}
-
-		return DEEP_WATER;
-	}
-	else
-	{
-		while (sector->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(NO_VALUE) != NO_VALUE)
-		{
-			room = &g_Level.Rooms[sector->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(sector->RoomNumber)];
-
-			if (TestEnvironment(ENV_FLAG_WATER, room) ||
-				TestEnvironment(ENV_FLAG_SWAMP, room))
-			{
-				int waterHeight = sector->GetSurfaceHeight(x, z, true);
-				sector = GetFloor(x, y, z, &roomNumber);
-				return (GetFloorHeight(sector, x, y, z) - waterHeight);
-			}
-
-			sector = GetSector(room, x - room->x, z - room->z);
-		}
-
-		return NO_HEIGHT;
-	}
-}
-
-int GetWaterDepth(ItemInfo* item)
-{
-	return GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-}
-
-int GetWaterHeight(int x, int y, int z, short roomNumber)
-{
-	FloorInfo* sector = nullptr;
-	auto* room = &g_Level.Rooms[roomNumber];
-
-	int adjoiningRoomNumber = NO_VALUE;
-	do
-	{
-		int xBlock = (x - room->x) / BLOCK(1);
-		int zBlock = (z - room->z) / BLOCK(1);
-
-		if (zBlock <= 0)
-		{
-			zBlock = 0;
-			if (xBlock < 1)
-			{
-				xBlock = 1;
-			}
-			else if (xBlock > (room->xSize - 2))
-			{
-				xBlock = room->xSize - 2;
-			}
-		}
-		else if (zBlock >= (room->zSize - 1))
-		{
-			zBlock = room->zSize - 1;
-			if (xBlock < 1)
-			{
-				xBlock = 1;
-			}
-			else if (xBlock > (room->xSize - 2))
-			{
-				xBlock = room->xSize - 2;
-			}
-		}
-		else if (xBlock < 0)
-		{
-			xBlock = 0;
-		}
-		else if (xBlock >= room->xSize)
-		{
-			xBlock = room->xSize - 1;
-		}
-
-		sector = &room->floor[zBlock + (xBlock * room->zSize)];
-		adjoiningRoomNumber = sector->SidePortalRoomNumber;
-
-		if (adjoiningRoomNumber != NO_VALUE)
-		{
-			roomNumber = adjoiningRoomNumber;
-			room = &g_Level.Rooms[adjoiningRoomNumber];
-		}
-	}
-	while (adjoiningRoomNumber != NO_VALUE);
-
-	if (sector->IsWall(x, z))
-		return NO_HEIGHT;
-
-	if (TestEnvironment(ENV_FLAG_WATER, room) ||
-		TestEnvironment(ENV_FLAG_SWAMP, room))
-	{
-		while (sector->GetNextRoomNumber(Vector3i(x, y, z), false).has_value())
-		{
-			auto* room = &g_Level.Rooms[sector->GetNextRoomNumber(Vector3i(x, y, z), false).value_or(sector->RoomNumber)];
-
-			if (!TestEnvironment(ENV_FLAG_WATER, room) &&
-				!TestEnvironment(ENV_FLAG_SWAMP, room))
-			{
-				break;
-			}
-
-			sector = GetSector(room, x - room->x, z - room->z);
-		}
-
-		return sector->GetSurfaceHeight(Vector3i(x, y, z), false);
-	}
-	else if (sector->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
-	{
-		while (sector->GetNextRoomNumber(Vector3i(x, y, z), true).has_value())
-		{
-			auto* room2 = &g_Level.Rooms[sector->GetNextRoomNumber(Vector3i(x, y, z), true).value_or(sector->RoomNumber)];
-
-			if (TestEnvironment(ENV_FLAG_WATER, room2) ||
-				TestEnvironment(ENV_FLAG_SWAMP, room2))
-			{
-				break;
-			}
-
-			sector = GetSector(room2, x - room2->x, z - room2->z);
-		}
-
-		return sector->GetSurfaceHeight(Vector3i(x, y, z), true);
-	}
-
-	return NO_HEIGHT;
-}
-
-int GetWaterHeight(ItemInfo* item)
-{
-	return GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-}
-
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber)
 {
 	return TestEnvironment(environmentType, GetPointCollision(Vector3i(x, y, z), roomNumber).GetRoomNumber());
@@ -1343,7 +1101,7 @@ bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber)
 	return TestEnvironment(environmentType, &g_Level.Rooms[roomNumber]);
 }
 
-bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room)
+bool TestEnvironment(RoomEnvFlags environmentType, const ROOM_INFO* room)
 {
 	return TestEnvironmentFlags(environmentType, room->flags);
 }

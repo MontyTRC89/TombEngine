@@ -292,7 +292,7 @@ namespace TEN::Renderer
 		int _numCheckPortalCalls = 0;
 		int _numGetVisibleRoomsCalls = 0;
 
-		int _currentY;
+		float _currentLineHeight = 0.0f;;
 
 		RendererDebugPage _debugPage = RendererDebugPage::None;
 
@@ -412,7 +412,6 @@ namespace TEN::Renderer
 		void ClearShadowMap();
 		void CalculateSSAO(RenderView& view);
 		void UpdateItemAnimations(RenderView& view);
-		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 		void InitializeScreen(int w, int h, HWND handle, bool reset);
 		void InitializeCommonTextures();
 		void InitializeGameBars();
@@ -602,14 +601,15 @@ namespace TEN::Renderer
 		void PrepareScene();
 		void ClearScene();
 		void SaveScreenshot();
-		void PrintDebugMessage(LPCSTR message, ...);
+		void PrintDebugMessage(LPCSTR msg, va_list args);
+		void PrintDebugMessage(LPCSTR msg, ...);
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool goBack);
 		void DrawDisplayPickup(const DisplayPickup& pickup);
 		int  Synchronize();
 		void AddString(int x, int y, const std::string& string, D3DCOLOR color, int flags);
 		void AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags);
-		void AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RendererDebugPage page);
+		void AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, RendererDebugPage page = RendererDebugPage::None);
 		void FreeRendererData();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void RenderLoadingScreen(float percentage);
@@ -624,11 +624,11 @@ namespace TEN::Renderer
 		void AddDebugLine(const Vector3& origin, const Vector3& target, const Color& color, RendererDebugPage page = RendererDebugPage::None);
 		void AddDebugTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Color& color, RendererDebugPage page = RendererDebugPage::None);
 		void AddDebugTarget(const Vector3& center, const Quaternion& orient, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None);
-		void AddDebugBox(const std::array<Vector3, 8>& corners, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+		void AddDebugBox(const std::array<Vector3, BOX_VERTEX_COUNT>& corners, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 		void AddDebugBox(const Vector3& min, const Vector3& max, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 		void AddDebugBox(const BoundingOrientedBox& box, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 		void AddDebugBox(const BoundingBox& box, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
-		void AddDebugCone(const Vector3& center, const Quaternion& orient, float radius, float length, const Vector4& color, RendererDebugPage page, bool isWireframe);
+		void AddDebugCone(const Vector3& center, const Quaternion& orient, float radius, float length, const Vector4& color, RendererDebugPage page, bool isWireframe = true);
 		void AddDebugCylinder(const Vector3& center, const Quaternion& orient, float radius, float length, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 		void AddDebugSphere(const Vector3& center, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 		void AddDebugSphere(const BoundingSphere& sphere, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);

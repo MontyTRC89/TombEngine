@@ -198,7 +198,7 @@ namespace TEN::Hud
 
 	DisplayPickup& PickupSummaryController::GetNewDisplayPickup()
 	{
-		assertion(_displayPickups.size() <= DISPLAY_PICKUP_COUNT_MAX, "Display pickup overflow.");
+		TENAssert(_displayPickups.size() <= DISPLAY_PICKUP_COUNT_MAX, "Display pickup overflow.");
 
 		// Add and return new display pickup.
 		if (_displayPickups.size() < DISPLAY_PICKUP_COUNT_MAX)
@@ -224,6 +224,6 @@ namespace TEN::Hud
 
 	void PickupSummaryController::DrawDebug() const
 	{
-		g_Renderer.PrintDebugMessage("Display pickups in summary: %d", _displayPickups.size());
+		PrintDebugMessage("Display pickups in summary: %d", _displayPickups.size());
 	}
 }

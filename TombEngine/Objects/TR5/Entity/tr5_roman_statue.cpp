@@ -547,7 +547,7 @@ namespace TEN::Entities::Creatures::TR5
 					pos = GetJointPosition(item, 16);
 
 					auto* room = &g_Level.Rooms[item->RoomNumber];
-					FloorInfo* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
+					FloorInfo* floor = GetSector(room, pos.x - room->Position.x, pos.z - room->Position.z);
 
 					// If floor is stopped, then try to find static meshes and shatter them, activating heavy triggers below
 					if (floor->Stopper)
@@ -827,9 +827,9 @@ namespace TEN::Entities::Creatures::TR5
 					short floorHeight = item->ItemFlags[2] & 0xFF00;
 					auto* room = &g_Level.Rooms[roomNumber];
 
-					int x = room->x + (creature->Tosspad / 256 & 0xFF) * BLOCK(1) + 512;
-					int y = room->minfloor + floorHeight;
-					int z = room->z + (creature->Tosspad & 0xFF) * BLOCK(1) + 512;
+					int x = room->Position.x + (creature->Tosspad / 256 & 0xFF) * BLOCK(1) + 512;
+					int y = room->BottomHeight + floorHeight;
+					int z = room->Position.z + (creature->Tosspad & 0xFF) * BLOCK(1) + 512;
 
 					TestTriggers(x, y, z, roomNumber, true);
 				}

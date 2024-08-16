@@ -96,7 +96,7 @@ void ClearRats()
 	{
 		ZeroMemory(Rats, NUM_RATS * sizeof(RatData));
 		NextRat = 0;
-		FlipEffect = -1;
+		FlipEffect = NO_VALUE;
 	}
 }
 
@@ -268,7 +268,7 @@ void UpdateRats()
 
 				if (TestEnvironment(ENV_FLAG_WATER, room))
 				{
-					rat->Pose.Position.y = room->maxceiling + 50;
+					rat->Pose.Position.y = room->TopHeight + 50;
 					rat->Velocity = 16;
 					rat->VerticalVelocity = 0;
 
@@ -276,16 +276,16 @@ void UpdateRats()
 					{
 						if (!(GetRandomControl() & 0xF))
 							SpawnRipple(
-								Vector3(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z),
+								Vector3(rat->Pose.Position.x, room->TopHeight, rat->Pose.Position.z),
 								rat->RoomNumber,
 								Random::GenerateFloat(48.0f, 52.0f),
 								(int)RippleFlags::SlowFade);
 					}
 					else
 					{
-						AddWaterSparks(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, 16);
+						AddWaterSparks(rat->Pose.Position.x, room->TopHeight, rat->Pose.Position.z, 16);
 						SpawnRipple(
-							Vector3(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z),
+							Vector3(rat->Pose.Position.x, room->TopHeight, rat->Pose.Position.z),
 							rat->RoomNumber,
 							Random::GenerateFloat(48.0f, 52.0f),
 							(int)RippleFlags::SlowFade);

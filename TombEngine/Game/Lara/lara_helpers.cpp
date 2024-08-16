@@ -22,7 +22,6 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
@@ -46,7 +45,6 @@ using namespace TEN::Entities::Player;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 using namespace TEN::Math;
-using namespace TEN::Renderer;
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -278,7 +276,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 	}
 }
 
-static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
+static LaraWeaponType GetPlayerScrolledWeaponType(const ItemInfo& item, LaraWeaponType currentWeaponType, bool getPrev)
 {
 	static const auto SCROLL_WEAPON_TYPES = std::vector<LaraWeaponType>
 	{
@@ -293,15 +291,15 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 		LaraWeaponType::RocketLauncher
 	};
 
-	auto getNextIndex = [getPrev](unsigned int index)
+	auto getNextIndex = [getPrev](int index)
 	{
-		return (index + (getPrev ? ((unsigned int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (unsigned int)SCROLL_WEAPON_TYPES.size();
+		return (index + (getPrev ? ((int)SCROLL_WEAPON_TYPES.size() - 1) : 1)) % (int)SCROLL_WEAPON_TYPES.size();
 	};
 
 	auto& player = GetLaraInfo(item);
 
 	// Get vector index for current weapon type.
-	auto currentIndex = std::optional<unsigned int>(std::nullopt);
+	auto currentIndex = NO_VALUE;
 	for (int i = 0; i < SCROLL_WEAPON_TYPES.size(); i++)
 	{
 		if (SCROLL_WEAPON_TYPES[i] == currentWeaponType)
@@ -311,13 +309,13 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 		}
 	}
 
-	// Invalid current weapon type; return nullopt.
-	if (!currentIndex.has_value())
-		return std::nullopt;
+	// Invalid current weapon type; return None type.
+	if (currentIndex == NO_VALUE)
+		return LaraWeaponType::None;
 
 	// Get next valid weapon type in sequence.
-	unsigned int nextIndex = getNextIndex(*currentIndex);
-	while (nextIndex != *currentIndex)
+	int nextIndex = getNextIndex(currentIndex);
+	while (nextIndex != currentIndex)
 	{
 		auto nextWeaponType = SCROLL_WEAPON_TYPES[nextIndex];
 		if (player.Weapons[(int)nextWeaponType].Present)
@@ -326,8 +324,8 @@ static std::optional<LaraWeaponType> GetPlayerScrolledWeaponType(const ItemInfo&
 		nextIndex = getNextIndex(nextIndex);
 	}
 
-	// No valid weapon type; return nullopt.
-	return std::nullopt;
+	// No valid weapon type; return None type.
+	return LaraWeaponType::None;
 }
 
 void HandlePlayerQuickActions(ItemInfo& item)
@@ -347,11 +345,9 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	// Handle weapon scroll request.
 	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
 	{
-		bool getPrev = IsClicked(In::PreviousWeapon);
-		auto weaponType = GetPlayerScrolledWeaponType(item, player.Control.Weapon.GunType, getPrev);
-
-		if (weaponType.has_value())
-			player.Control.Weapon.RequestGunType = *weaponType;
+		auto weaponType = GetPlayerScrolledWeaponType(item, player.Control.Weapon.GunType, IsClicked(In::PreviousWeapon));
+		if (weaponType != LaraWeaponType::None)
+			player.Control.Weapon.RequestGunType = weaponType;
 	}
 
 	// Handle weapon requests.
@@ -994,7 +990,7 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 {
 	constexpr auto BUBBLE_COUNT_MAX = 3;
 
-	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::ShallowWater);
 
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
@@ -1471,7 +1467,7 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 		auto mul1 = (float)abs(lara->Control.Subsuit.Velocity[0]) / BLOCK(8);
 		auto mul2 = (float)abs(lara->Control.Subsuit.Velocity[1]) / BLOCK(8);
 		auto vol = ((mul1 + mul2) * 5.0f) + 0.5f;
-		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::Water, 1.0f + (mul1 + mul2), vol);
+		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::ShallowWater, 1.0f + (mul1 + mul2), vol);
 	}
 }
 
@@ -1494,7 +1490,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 		//int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
 		//short deltaAngle = abs((short)(direction - item->Pose.Orientation.y));
 
-		//g_Renderer.PrintDebugMessage("%d", slideVelocity);
+		//PrintDebugMessage("%d", slideVelocity);
 
 		//lara->ExtraVelocity.x += slideVelocity;
 		//lara->ExtraVelocity.y += slideVelocity * phd_sin(steepness);

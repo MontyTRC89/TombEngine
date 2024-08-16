@@ -544,11 +544,11 @@ const std::vector<byte> SaveGame::Build()
 	std::vector<flatbuffers::Offset<Save::Room>> rooms;
 	for (auto& room : g_Level.Rooms)
 	{
-		auto nameOffset = fbb.CreateString(room.name);
+		auto nameOffset = fbb.CreateString(room.Name);
 
 		Save::RoomBuilder serializedInfo{ fbb };
 		serializedInfo.add_name(nameOffset);
-		serializedInfo.add_index(room.index);
+		serializedInfo.add_index(room.RoomNumber);
 		serializedInfo.add_reverb_type((int)room.reverbType);
 		serializedInfo.add_flags(room.flags);
 		auto serializedInfoOffset = serializedInfo.Finish();
@@ -991,14 +991,14 @@ const std::vector<byte> SaveGame::Build()
 
 			staticMesh.add_flags(room->mesh[j].flags);
 			staticMesh.add_hit_points(room->mesh[j].HitPoints);
-			staticMesh.add_room_number(room->index);
+			staticMesh.add_room_number(room->RoomNumber);
 			staticMesh.add_number(j);
 			staticMeshes.push_back(staticMesh.Finish());
 		}
 
-		for (int j = 0; j < room->triggerVolumes.size(); j++)
+		for (int j = 0; j < room->TriggerVolumes.size(); j++)
 		{
-			auto& currVolume = room->triggerVolumes[j];
+			auto& currVolume = room->TriggerVolumes[j];
 
 			std::vector<flatbuffers::Offset<Save::VolumeState>> queue;
 			for (int k = 0; k < currVolume.StateQueue.size(); k++)
@@ -1022,7 +1022,7 @@ const std::vector<byte> SaveGame::Build()
 			auto nameOffset = fbb.CreateString(currVolume.Name);
 
 			Save::VolumeBuilder volume{ fbb };
-			volume.add_room_number(room->index);
+			volume.add_room_number(room->RoomNumber);
 			volume.add_number(j);
 			volume.add_name(nameOffset);
 			volume.add_enabled(currVolume.Enabled);
@@ -2010,7 +2010,7 @@ static void ParseEffects(const Save::SaveGame* s)
 	// Restore soundtracks.
 	for (int i = 0; i < s->soundtracks()->size(); i++)
 	{
-		assertion(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
+		TENAssert(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
 
 		auto track = s->soundtracks()->Get(i);
 		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position());
@@ -2155,7 +2155,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 	for (int i = 0; i < s->rooms()->size(); i++)
 	{
 		auto room = s->rooms()->Get(i);
-		g_Level.Rooms[room->index()].name = room->name()->str();
+		g_Level.Rooms[room->index()].Name = room->name()->str();
 		g_Level.Rooms[room->index()].flags = room->flags();
 		g_Level.Rooms[room->index()].reverbType = (ReverbType)room->reverb_type();
 	}
@@ -2191,18 +2191,18 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 		auto room = &g_Level.Rooms[volume->room_number()];
 		int number = volume->number();
 
-		room->triggerVolumes[number].Enabled = volume->enabled();
-		room->triggerVolumes[number].Name = volume->name()->str();
-		room->triggerVolumes[number].Box.Center =
-		room->triggerVolumes[number].Sphere.Center = ToVector3(volume->position());
-		room->triggerVolumes[number].Box.Orientation = ToVector4(volume->rotation());
-		room->triggerVolumes[number].Box.Extents = ToVector3(volume->scale());
-		room->triggerVolumes[number].Sphere.Radius = room->triggerVolumes[number].Box.Extents.x;
+		room->TriggerVolumes[number].Enabled = volume->enabled();
+		room->TriggerVolumes[number].Name = volume->name()->str();
+		room->TriggerVolumes[number].Box.Center =
+		room->TriggerVolumes[number].Sphere.Center = ToVector3(volume->position());
+		room->TriggerVolumes[number].Box.Orientation = ToVector4(volume->rotation());
+		room->TriggerVolumes[number].Box.Extents = ToVector3(volume->scale());
+		room->TriggerVolumes[number].Sphere.Radius = room->TriggerVolumes[number].Box.Extents.x;
 
 		for (int j = 0; j < volume->queue()->size(); j++)
 		{
 			auto state = volume->queue()->Get(j);
-			room->triggerVolumes[number].StateQueue.push_back(
+			room->TriggerVolumes[number].StateQueue.push_back(
 				VolumeState
 				{
 					(VolumeStateStatus)state->status(),
@@ -2228,7 +2228,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 	// Restore action queue.
 	for (int i = 0; i < s->action_queue()->size(); i++)
 	{
-		assertion(i < ActionQueue.size(), "Action queue size was changed");
+		TENAssert(i < ActionQueue.size(), "Action queue size was changed");
 		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
 	}
 

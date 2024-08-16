@@ -50,7 +50,7 @@ void ControlMissile(short fxNumber)
 	auto& fx = EffectList[fxNumber];
 
 	auto isUnderwater = TestEnvironment(ENV_FLAG_WATER, fx.roomNumber);
-	auto soundFXType = isUnderwater ? SoundEnvironment::Water : SoundEnvironment::Land;
+	auto soundFXType = isUnderwater ? SoundEnvironment::ShallowWater : SoundEnvironment::Land;
 
 	if (fx.objectNumber == ID_SCUBA_HARPOON && isUnderwater &&
 		fx.pos.Orientation.x > ANGLE(-67.5f))
@@ -66,6 +66,7 @@ void ControlMissile(short fxNumber)
 	// Check whether something was hit.
 	if (fx.pos.Position.y >= pointColl.GetFloorHeight() ||
 		fx.pos.Position.y <= pointColl.GetCeilingHeight() ||
+		pointColl.IsWall() ||
 		hasHitPlayer)
 	{
 		if (fx.objectNumber == ID_KNIFETHROWER_KNIFE ||
@@ -111,6 +112,7 @@ void ControlMissile(short fxNumber)
 		}
 
 		KillEffect(fxNumber);
+		return;
 	}
 
 	if (pointColl.GetRoomNumber() != fx.roomNumber)

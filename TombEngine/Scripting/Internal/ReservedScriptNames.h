@@ -223,6 +223,7 @@ static constexpr char ScriptReserved_EnableFlyCheat[]			= "EnableFlyCheat";
 static constexpr char ScriptReserved_EnableMassPickup[]			= "EnableMassPickup";
 static constexpr char ScriptReserved_EnableLaraInTitle[]		= "EnableLaraInTitle";
 static constexpr char ScriptReserved_EnableLevelSelect[]		= "EnableLevelSelect";
+static constexpr char ScriptReserved_EnableHomeLevel[]			= "EnableHomeLevel";
 static constexpr char ScriptReserved_EnableLoadSave[]			= "EnableLoadSave";
 static constexpr char ScriptReserved_EnablePointFilter[]		= "EnablePointFilter";
 
@@ -318,6 +319,7 @@ static constexpr char ScriptReserved_KeyIsHeld[]					= "KeyIsHeld";
 static constexpr char ScriptReserved_KeyIsHit[]						= "KeyIsHit";
 static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
 static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
+static constexpr char ScriptReserved_KeyClearAll[]					= "KeyClearAll";
 
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
 static constexpr char ScriptReserved_GetFlipMapStatus[]				= "GetFlipMapStatus";

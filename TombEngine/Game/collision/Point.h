@@ -14,6 +14,7 @@ namespace TEN::Collision::Point
 	{
 	private:
 		// Members
+
 		Vector3i _position	= Vector3i::Zero;
 		int		 _roomNumber = 0;
 
@@ -34,9 +35,11 @@ namespace TEN::Collision::Point
 
 	public:
 		// Constructors
+
 		PointCollisionData(const Vector3i& pos, int roomNumber);
 
 		// Getters
+
 		Vector3i GetPosition() const;
 		int		 GetRoomNumber() const;
 
@@ -56,6 +59,7 @@ namespace TEN::Collision::Point
 		int GetWaterTopHeight();
 
 		// Inquirers
+
 		bool IsWall();
 		bool IsSteepFloor();
 		bool IsSteepCeiling();
@@ -70,6 +74,7 @@ namespace TEN::Collision::Point
 
 	private:
 		// Helpers
+
 		Vector3 GetBridgeNormal(bool isFloor);
 	};
 

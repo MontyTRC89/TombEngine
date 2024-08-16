@@ -1,6 +1,6 @@
 #pragma once
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-	void HammerControl(short itemNumber);
+	void ControlHammer(short itemNumber);
 }

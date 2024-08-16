@@ -15,11 +15,13 @@ namespace TEN::Hud
 
 	public:
 		// Constants
+
 		static constexpr auto COLOR_RED		= Color(1.0f, 0.2f, 0.2f);
 		static constexpr auto COLOR_GRAY	= Color(0.7f, 0.7f, 0.7f, 0.7f);
 		static constexpr auto SEGMENT_COUNT = 4;
 
 		// Members
+
 		bool IsActive  = false;
 		bool IsPrimary = false;
 
@@ -41,15 +43,18 @@ namespace TEN::Hud
 		std::array<SegmentData, SEGMENT_COUNT> PrevSegments = {};
 
 		// Getters
+
 		float	GetScale(float cameraDist) const;
 		float	GetRadius() const;
 		Vector2 GetPositionOffset(short orientOffset) const;
 
 		// Setters
+
 		void SetPrimary();
 		void SetPeripheral();
 		
 		// Utilities
+
 		void Update(const Vector3& targetPos, bool isActive, bool doPulse);
 		void Draw() const;
 
@@ -67,19 +72,23 @@ namespace TEN::Hud
 	{
 	private:
 		// Members
+
 		std::unordered_map<int, CrosshairData> _crosshairs = {}; // Key = item number.
 
 	public:
 		// Utilities
+
 		void Update(const ItemInfo& playerItem);
 		void Draw() const;
 		void Clear();
 
 	private:
 		// Update helpers
+
 		void Update(const std::vector<int>& itemNumbers);
 
 		// Object helpers
+
 		CrosshairData& GetNewCrosshair(int itemNumber);
 		void		   AddCrosshair(int itemNumber, const Vector3& targetPos);
 		void		   ClearInactiveCrosshairs();

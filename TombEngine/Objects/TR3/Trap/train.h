@@ -1,7 +1,10 @@
 #pragma once
 
-#include "Game/items.h"
-#include "Game/collision/collide_room.h"
+struct CollisionInfo;
+struct ItemInfo;
 
-void TrainControl(short itemNumber);
-void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+namespace TEN::Entities::Traps
+{
+	void ControlTrain(short itemNumber);
+	void CollideTrain(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
+}

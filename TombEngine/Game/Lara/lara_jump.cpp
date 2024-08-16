@@ -64,7 +64,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		DoLaraFallDamage(item);
 
-		if (item->HitPoints <= 0) USE_FEATURE_IF_CPP20([[unlikely]])
+		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
 		else if (IsHeld(In::Forward) && !IsHeld(In::Walk) &&
 			player.Control.WaterStatus != WaterStatus::Wade)
@@ -146,7 +146,7 @@ void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -202,7 +202,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -414,7 +414,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -468,7 +468,7 @@ void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -523,7 +523,7 @@ void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -576,7 +576,7 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -673,7 +673,7 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -749,7 +749,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			TranslateItem(item, coll->Setup.ForwardAngle, CLICK(0.5f)); // HACK: Move forward to avoid standing up or falling out on an edge.
 		}
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -823,7 +823,7 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_DEATH;
 			Rumble(0.5f, 0.2f);
 		}
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);

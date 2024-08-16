@@ -14,7 +14,7 @@
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
-namespace TEN::Entities::Traps::TR1
+namespace TEN::Entities::Traps
 {
 	// NOTES:
 	// ItemFlags[0] = random turn rate when active.

@@ -1,6 +1,7 @@
 #pragma once
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-	void FourBladesControl(short itemNumber);
+	void InitializeFourBlades(short itemNumber);
+	void ControlFourBlades(short itemNumber);
 }

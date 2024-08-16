@@ -235,6 +235,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
       <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -339,6 +340,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Game\collision\Point.h" />
+    <ClInclude Include="Game\Debug\Debug.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\DisplaySprite.h" />
     <ClInclude Include="Game\GuiObjects.h" />
@@ -384,7 +386,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\control\trigger.h" />
     <ClInclude Include="Game\control\volume.h" />
     <ClInclude Include="Game\control\event.h" />
-    <ClInclude Include="Game\debug\debug.h" />
     <ClInclude Include="Game\effects\Blood.h" />
     <ClInclude Include="Game\effects\Drip.h" />
     <ClInclude Include="Game\effects\Electricity.h" />
@@ -426,7 +427,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\spotcam.h" />
     <ClInclude Include="Math\Constants.h" />
     <ClInclude Include="Math\Geometry.h" />
-    <ClInclude Include="Math\Interpolation.h" />
     <ClInclude Include="Math\Legacy.h" />
     <ClInclude Include="Math\Math.h" />
     <ClInclude Include="Math\Objects\AxisAngle.h" />
@@ -438,6 +438,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Math\Objects\Vector3i.h" />
     <ClInclude Include="Math\Random.h" />
     <ClInclude Include="Math\Solvers.h" />
+    <ClInclude Include="Math\Utils.h" />
     <ClInclude Include="Objects\Effects\Boss.h" />
     <ClInclude Include="Objects\Effects\effect_objects.h" />
     <ClInclude Include="Objects\Effects\EmberEmitter.h" />
@@ -483,18 +484,18 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Generic\generic_objects.h" />
     <ClInclude Include="Objects\Generic\puzzles_keys.h" />
     <ClInclude Include="Objects\Sink.h" />
+    <ClInclude Include="Objects\TR1\Entity\Centaur.h" />
     <ClInclude Include="Objects\TR1\Entity\Cowboy.h" />
     <ClInclude Include="Objects\TR1\Entity\Kold.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_ape.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_bear.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_big_rat.h" />
-    <ClInclude Include="Objects\TR1\Entity\tr1_centaur.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_doppelganger.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_giant_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_natla.h" />
     <ClInclude Include="Objects\TR1\Entity\SkateboardKid.h" />
-    <ClInclude Include="Objects\TR1\Entity\tr1_winged_mutant.h" />
     <ClInclude Include="Objects\TR1\Entity\tr1_wolf.h" />
+    <ClInclude Include="Objects\TR1\Entity\WingedMutant.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
     <ClInclude Include="Objects\TR1\Trap\SlammingDoors.h" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
@@ -530,7 +531,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\Compsognathus.h" />
     <ClInclude Include="Objects\TR3\Entity\FishSwarm.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
+    <ClInclude Include="Objects\TR3\Entity\SealMutant.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
+    <ClInclude Include="Objects\TR3\Entity\Raptor.h" />
     <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_claw_mutant.h" />
@@ -542,7 +545,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_monkey.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_gun.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_stick.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_scuba_diver.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tiger.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
@@ -873,7 +875,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\control\lot.cpp" />
     <ClCompile Include="Game\control\trigger.cpp" />
     <ClCompile Include="Game\control\volume.cpp" />
-    <ClCompile Include="Game\debug\debug.cpp" />
+    <ClCompile Include="Game\Debug\Debug.cpp" />
     <ClCompile Include="Game\effects\Blood.cpp" />
     <ClCompile Include="Game\effects\Bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
@@ -940,9 +942,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Setup.cpp" />
     <ClCompile Include="Game\spotcam.cpp" />
     <ClCompile Include="Math\Geometry.cpp" />
-    <ClCompile Include="Math\Interpolation.cpp" />
     <ClCompile Include="Math\Legacy.cpp" />
-    <ClCompile Include="Math\Math.cpp" />
     <ClCompile Include="Math\Objects\AxisAngle.cpp" />
     <ClCompile Include="Math\Objects\EulerAngles.cpp" />
     <ClCompile Include="Math\Objects\GameBoundingBox.cpp" />
@@ -952,6 +952,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Math\Objects\Vector3i.cpp" />
     <ClCompile Include="Math\Random.cpp" />
     <ClCompile Include="Math\Solvers.cpp" />
+    <ClCompile Include="Math\Utils.cpp" />
     <ClCompile Include="Objects\Effects\Boss.cpp" />
     <ClCompile Include="Objects\Effects\effect_objects.cpp" />
     <ClCompile Include="Objects\Effects\EmberEmitter.cpp" />
@@ -997,18 +998,18 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Generic\Traps\CrumblingPlatform.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\Centaur.cpp" />
     <ClCompile Include="Objects\TR1\Entity\Cowboy.cpp" />
     <ClCompile Include="Objects\TR1\Entity\Kold.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_ape.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_big_rat.cpp" />
-    <ClCompile Include="Objects\TR1\Entity\tr1_centaur.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_doppelganger.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_giant_mutant.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_natla.cpp" />
     <ClCompile Include="Objects\TR1\Entity\SkateboardKid.cpp" />
-    <ClCompile Include="Objects\TR1\Entity\tr1_winged_mutant.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_wolf.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\WingedMutant.cpp" />
     <ClCompile Include="Objects\TR1\tr1_objects.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Objects\TR1\Trap\SlammingDoors.cpp" />
@@ -1042,7 +1043,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\Compsognathus.cpp" />
     <ClCompile Include="Objects\TR3\Entity\FishSwarm.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\SealMutant.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Raptor.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Shiva.cpp" />
     <ClCompile Include="Objects\TR3\Entity\SophiaLeigh.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_civvy.cpp" />
@@ -1052,7 +1055,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_monkey.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_gun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_stick.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_raptor.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_scuba_diver.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tiger.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />

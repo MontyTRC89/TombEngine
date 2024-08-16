@@ -17,7 +17,7 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
-namespace TEN::Traps::TR5
+namespace TEN::Entities::Traps
 {
 	const auto ZipLineInteractOffset = Vector3i(0, 0, 371);
 	const auto ZipLineInteractBasis = ObjectCollisionBounds

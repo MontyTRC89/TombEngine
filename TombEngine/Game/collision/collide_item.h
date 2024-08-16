@@ -30,10 +30,10 @@ struct ObjectCollisionBounds
 
 struct CollidedObjectData
 {
-	std::vector<ItemInfo*>	ItemPtrs   = {};
-	std::vector<MESH_INFO*> StaticPtrs = {};
+	std::vector<ItemInfo*>	Items	= {};
+	std::vector<MESH_INFO*> Statics = {};
 
-	bool IsEmpty() const { return (ItemPtrs.empty() && StaticPtrs.empty()); };
+	bool IsEmpty() const { return (Items.empty() && Statics.empty()); };
 };
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

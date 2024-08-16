@@ -784,7 +784,7 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 {
 	// Run through neighbor rooms.
 	const auto& room = g_Level.Rooms[roomNumber];
-	for (int neighborRoomNumber : room.neighbors)
+	for (int neighborRoomNumber : room.NeighborRoomNumbers)
 	{
 		// Get neighbor room.
 		const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];

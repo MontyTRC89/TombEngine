@@ -9,20 +9,53 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## Version 1.5 - xxxx-xx-xx
 
 ### Bug fixes
-* Fixed original issue with classic switch off trigger wrongly activating some trigger actions.
+* Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
 * Fixed incorrect diving animation when swandiving from a high place.
-* Fixed camera rotating with Lara's hips when climbing out of water.
-* Fixed AI for skidoo driver and worker with shotgun TR2 enemies.
-* Fixed Ember emitter crashing when ocb is between -1 and -10 
-* Fixed Electric cleaner and Squishy block not detecting collision with certain block heights.
-* Fixed Squishy blocks crashing the level.
-* Fixed the path finding zones of Larson and Pierre.
-* Fixed the torch flame delay in disappearing when Lara threw or dropped the torch object.
+* Fixed camera rotating with the player's hips when climbing out of water.
+* Fixed AI for TR2 skidoo driver and worker with shotgun.
+* Fixed ember emitter crashing when ocb is between -1 and -10.
+* Fixed electric cleaner and squishy block not detecting collision with certain block heights.
+* Fixed squishy blocks crashing the level.
+* Fixed Larson and Pierre pathfinding.
+* Fixed torch flame delay when the player throws or drops a torch.
+* Fixed dart emitters failing with antitrigger.
+* Fixed homing dart emitter spawning darts continously when player is on its trigger.
+* Fixed four blade trap floor and ceiling collision.
+* Fixed Joby spikes collision and deformation.
+* Fixed sentry gun joint rotation.
+* Fixed teeth spikes not triggering the player impale animation.
+* Fixed TR4 mine crash with OCB 1 when triggered.
+* Fixed cases where Atlantean mutant's bombs cause the game to crash.
+* Fixed young hair drawing.
 
 ### Features/Amendments
+* Changed Rome Hammer to not hurt player whilst deactivated.
+* Changed Statue with blade damage, from 20 to 200.
+* Enhanced Rolling Spindle detection to avoid them going down through pits.
+* Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
+* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
+* Enhanced raptor behaviour and handling. 
+  - OCB 0: Classic behaviour
+  - OCB 1: Can jump up/down up to 4 steps and jump across gaps up to 2 blocks wide.
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
+* Added TR3 seal mutant.
+  - OCB 0: Normal enemy behaviour. (TR3 RX-Tech mines level)
+  - OCB 1: Trap like behaviour. (TR3 Antarctica level)
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Seal_Mutant.wad2
+* Add new sound conditions: Quicksand and Underwater.
+  - Quicksand - sound effect plays when a moveable is in quicksand.
+  - Underwater - sound plays when the camera is submerged.
+* Changed Water sound condition to ShallowWater.
+* Added option to enable or disable menu option looping.
+* Menu scrolling using held inputs will stop at the last option until a new input is made.
+* Added the ability to display "Lara's Home" entry in the main menu.
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
+* Added Input.KeyClearAll()
+* Added Flow.EnableHomeLevel()
+* Removed anims.monkeyAutoJump. It is now a player menu configuration.
+* Fixed Volume:GetActive() method
 
 ## [Version 1.4](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.1) - 2024-04-21
 

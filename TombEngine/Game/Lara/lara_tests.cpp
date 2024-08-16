@@ -17,7 +17,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_monkey.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer.h"
+#include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
@@ -27,7 +27,6 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 using namespace TEN::Math;
-using namespace TEN::Renderer;
 using namespace TEN::Utils;
 
 // -----------------------------
@@ -58,8 +57,8 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom, bo
 	if (frontLeft.GetCeilingHeight() >(item->Pose.Position.y - coll->Setup.Height) || frontRight.GetCeilingHeight() > (item->Pose.Position.y - coll->Setup.Height))
 		return false;
 
-	//g_Renderer.AddDebugSphere(Vector3(item->pos.Position.x + xl, left, item->pos.Position.z + zl), 64, Vector4::One, RendererDebugPage::CollisionStats);
-	//g_Renderer.AddDebugSphere(Vector3(item->pos.Position.x + xr, right, item->pos.Position.z + zr), 64, Vector4::One, RendererDebugPage::CollisionStats);
+	//DrawDebugSphere(Vector3(item->pos.Position.x + xl, left, item->pos.Position.z + zl), 64, Vector4::One, RendererDebugPage::CollisionStats);
+	//DrawDebugSphere(Vector3(item->pos.Position.x + xr, right, item->pos.Position.z + zr), 64, Vector4::One, RendererDebugPage::CollisionStats);
 	
 	// Determine ledge probe embed offset.
 	// We use 0.2f radius extents here for two purposes. First - we can't guarantee that shifts weren't already applied
@@ -1088,15 +1087,13 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	auto pointColl = GetPointCollision(*item);
-	int waterDepth = GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, pointColl.GetRoomNumber());
 
-	if (waterDepth == NO_HEIGHT)
+	if (pointColl.GetWaterBottomHeight() == NO_HEIGHT)
 	{
 		item->Animation.Velocity.y = 0.0f;
 		item->Pose.Position = coll->Setup.PrevPosition;
 	}
-
-	else if (waterDepth <= (LARA_HEIGHT - (LARA_HEADROOM / 2)))
+	else if (pointColl.GetWaterBottomHeight() <= (LARA_HEIGHT - (LARA_HEADROOM / 2)))
 	{
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
 		ResetPlayerLean(item);
@@ -1427,7 +1424,7 @@ std::optional<VaultTestResult> TestLaraLadderMount(ItemInfo* item, CollisionInfo
 	return std::nullopt;
 }
 
-std::optional<VaultTestResult> TestLaraMonkeyAutoJump(ItemInfo* item, CollisionInfo* coll)
+std::optional<VaultTestResult> TestLaraAutoMonkeySwingJump(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1530,8 +1527,8 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 	// In this case, they fail due to a reliance on ShiftItem(). @Sezz 2021.02.05
 
 	// Auto jump to monkey swing.
-	vaultResult = TestLaraMonkeyAutoJump(item, coll);
-	if (vaultResult.has_value() && g_GameFlow->HasMonkeyAutoJump())
+	vaultResult = TestLaraAutoMonkeySwingJump(item, coll);
+	if (vaultResult.has_value() && g_Configuration.EnableAutoMonkeySwingJump)
 	{
 		vaultResult->TargetState = LS_AUTO_JUMP;
 		if (!HasStateDispatch(item, vaultResult->TargetState))
@@ -1710,7 +1707,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Crouch) && TestLaraCrawlDownStep(item, coll).Success)
 			crawlVaultResult.TargetState = LS_CRAWL_STEP_DOWN;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_STEP_DOWN;
 
 		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
@@ -1723,7 +1720,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (IsHeld(In::Walk))
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_FLIP;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_JUMP;
 
 		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
@@ -1793,9 +1790,9 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 		auto sphere = BoundingSphere(spherePos, poleProbeCollRadius);
 		auto offsetSphere = BoundingSphere(spherePos + sphereOffset2D, poleProbeCollRadius);
 
-		//g_Renderer.AddDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
+		//DrawDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RendererDebugPage::CollisionStats);
 
-		for (const auto* itemPtr : collObjects.ItemPtrs)
+		for (const auto* itemPtr : collObjects.Items)
 		{
 			if (itemPtr->ObjectNumber != ID_POLEROPE)
 				continue;
@@ -1803,7 +1800,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 			auto poleBox = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
 			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0.0f, coll->Setup.Radius);
 
-			//g_Renderer.AddDebugBox(poleBox, Vector4(0, 0, 1, 1), RendererDebugPage::CollisionStats);
+			//DrawDebugBox(poleBox, Vector4(0, 0, 1, 1), RendererDebugPage::CollisionStats);
 
 			if (poleBox.Intersects(sphere) || poleBox.Intersects(offsetSphere))
 			{

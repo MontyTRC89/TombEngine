@@ -391,8 +391,7 @@ namespace TEN::Entities::Creatures::TR3
 		pos1.z += 96;
 		pos1 = GetJointPosition(item, TribesmanDartBite2.BoneID, pos1);
 
-		TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, true);
-		TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, true);
+		SpawnDartSmoke(pos1.ToVector3(), Vector3::Zero, true);
 	}
 
 	void TribemanDartsControl(short itemNumber)

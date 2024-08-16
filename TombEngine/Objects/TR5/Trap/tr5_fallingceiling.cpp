@@ -11,42 +11,49 @@
 
 using namespace TEN::Collision::Point;
 
-void FallingCeilingControl(short itemNumber)
+namespace TEN::Entities::Traps
 {
-	auto* item = &g_Level.Items[itemNumber];
+	constexpr auto FALLING_CEILING_HARM_DAMAGE = 300;
 
-	if (item->Animation.ActiveState)
+	void ControlFallingCeiling(short itemNumber)
 	{
-		if (item->Animation.ActiveState == 1 && item->TouchBits.TestAny())
-			DoDamage(LaraItem, 300);
-	}
-	else
-	{
-		item->Animation.TargetState = 1;
-		item->Animation.IsAirborne = true;
-	}
+		auto& item = g_Level.Items[itemNumber];
 
-	AnimateItem(item);
-
-	if (item->Status == ITEM_DEACTIVATED)
-		RemoveActiveItem(itemNumber);
-	else
-	{
-		auto probe = GetPointCollision(*item);
-
-		item->Floor = probe.GetFloorHeight();
-
-		if (probe.GetRoomNumber() != item->RoomNumber)
-			ItemNewRoom(itemNumber, probe.GetRoomNumber());
-
-		if (item->Animation.ActiveState == 1)
+		if (item.Animation.ActiveState)
 		{
-			if (item->Pose.Position.y >= item->Floor)
+			if (item.Animation.ActiveState == 1 && item.TouchBits.TestAny())
+				DoDamage(LaraItem, FALLING_CEILING_HARM_DAMAGE);
+		}
+		else
+		{
+			item.Animation.TargetState = 1;
+			item.Animation.IsAirborne = true;
+		}
+
+		AnimateItem(&item);
+
+		if (item.Status == ITEM_DEACTIVATED)
+		{
+			RemoveActiveItem(itemNumber);
+		}
+		else
+		{
+			auto pointColl = GetPointCollision(item);
+
+			item.Floor = pointColl.GetFloorHeight();
+
+			if (pointColl.GetRoomNumber() != item.RoomNumber)
+				ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
+
+			if (item.Animation.ActiveState == 1)
 			{
-				item->Pose.Position.y = item->Floor;
-				item->Animation.TargetState = 2;
-				item->Animation.IsAirborne = false;
-				item->Animation.Velocity.y = 0.0f;
+				if (item.Pose.Position.y >= item.Floor)
+				{
+					item.Pose.Position.y = item.Floor;
+					item.Animation.TargetState = 2;
+					item.Animation.IsAirborne = false;
+					item.Animation.Velocity.y = 0.0f;
+				}
 			}
 		}
 	}

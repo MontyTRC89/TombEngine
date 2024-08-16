@@ -336,7 +336,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	if (DebugMode)
 	{
-		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().Box);
+		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().PathfindingBoxID);
 		DrawNearbySectorFlags(*item);
 	}
 }
@@ -642,7 +642,7 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	g_Renderer.UpdateLaraAnimations(true);
 
 	// Update player effects.
-	HairEffect.Update(*item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+	HairEffect.Update(*item);
 	HandlePlayerWetnessDrips(*item);
 	HandlePlayerDiveBubbles(*item);
 	ProcessEffects(item);

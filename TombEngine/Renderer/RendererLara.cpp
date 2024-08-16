@@ -328,22 +328,18 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 
 void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
-	if (!Objects[ID_HAIR].loaded)
-		return;
-
-	const auto& hairObject = *_moveableObjects[ID_HAIR];
-
-	// TODO
-	bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
-
-	bool isHead = true;
-	for (const auto& unit : HairEffect.Units)
+	for (int i = 0; i < HairEffect.Units.size(); i++)
 	{
+		const auto& unit = HairEffect.Units[i];
 		if (!unit.IsEnabled)
 			continue;
 
-		// First matrix is Lara's head matrix, then all hair unit segment matrices.
-		// Bones are adjusted at load time to account for this.
+		const auto& object = Objects[unit.ObjectID];
+		if (!object.loaded)
+			continue;
+
+		const auto& rendererObject = *_moveableObjects[unit.ObjectID];
+
 		_stItem.World = Matrix::Identity;
 		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimationTransforms[LM_HEAD] * itemToDraw->InterpolatedWorld;
 
@@ -362,13 +358,11 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 
 		_cbItem.UpdateData(_stItem, _context.Get());
 
-		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
+		for (int i = 0; i < rendererObject.ObjectMeshes.size(); i++)
 		{
-			auto& rMesh = *hairObject.ObjectMeshes[i];
-			DrawMoveableMesh(itemToDraw, &rMesh, room, i, view, rendererPass);
+			auto& rendererMesh = *rendererObject.ObjectMeshes[i];
+			DrawMoveableMesh(itemToDraw, &rendererMesh, room, i, view, rendererPass);
 		}
-
-		isHead = false;
 	}
 }
 

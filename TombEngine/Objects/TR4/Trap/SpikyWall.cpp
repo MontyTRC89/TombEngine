@@ -55,7 +55,7 @@ namespace TEN::Entities::Traps
 		auto collObjects = GetCollidedObjects(item, true, true);
 		if (!collObjects.IsEmpty())
 		{
-			for (auto* itemPtr : collObjects.ItemPtrs)
+			for (auto* itemPtr : collObjects.Items)
 			{
 				const auto& object = Objects[itemPtr->ObjectNumber];
 
