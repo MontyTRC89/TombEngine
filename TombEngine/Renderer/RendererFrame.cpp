@@ -927,6 +927,15 @@ namespace TEN::Renderer
 			for (int j = 0; j < MAX_BONES; j++)
 				_items[i].OldAnimationTransforms[j] = _items[i].AnimationTransforms[j];
 		}
+
+		for (int i = 0; i < ITEM_COUNT_MAX; i++)
+		{
+			_effects[i].OldPosition = _effects[i].Position;
+			_effects[i].OldWorld = _effects[i].World;
+			_effects[i].OldTranslation = _effects[i].Translation;
+			_effects[i].OldRotation = _effects[i].Rotation;
+			_effects[i].OldScale = _effects[i].Scale;
+		}
 	}
 
 } // namespace TEN::Renderer
