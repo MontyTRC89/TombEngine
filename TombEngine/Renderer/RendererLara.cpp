@@ -328,57 +328,36 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 
 void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
-	if (!Objects[ID_HAIR].loaded)
-		return;
-
-	const auto& hairObject = *_moveableObjects[ID_HAIR];
-	const auto& unit = HairEffect.Units[0];
-	if (unit.IsEnabled)
+	for (int i = 0; i < HairEffect.Units.size(); i++)
 	{
-		// First matrix is Lara's head matrix, then all hair unit segment matrices.
-		// Bones are adjusted at load time to account for this.
+		const auto& unit = HairEffect.Units[i];
+		if (!unit.IsEnabled)
+			continue;
+
+		const auto& object = Objects[unit.ObjectID];
+		if (!object.loaded)
+			continue;
+
+		const auto& rendererObject = *_moveableObjects[unit.ObjectID];
+
 		_stItem.World = Matrix::Identity;
 		_stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * _laraWorldMatrix;
 
-		for (int i = 1; i < unit.Segments.size(); i++)
+		for (int i = 0; i < unit.Segments.size(); i++)
 		{
-			_stItem.BonesMatrices[i] = unit.Segments[i].WorldMatrix;
+			const auto& segment = unit.Segments[i];
+			auto worldMatrix = Matrix::CreateFromQuaternion(segment.Orientation) * Matrix::CreateTranslation(segment.Position);
+
+			_stItem.BonesMatrices[i + 1] = worldMatrix;
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
 		}
 
 		_cbItem.UpdateData(_stItem, _context.Get());
 
-		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
+		for (int i = 0; i < rendererObject.ObjectMeshes.size(); i++)
 		{
-			auto& rMesh = *hairObject.ObjectMeshes[i];
-			DrawMoveableMesh(itemToDraw, &rMesh, room, i, view, rendererPass);
-		}
-	}
-
-	if (!Objects[ID_HAIR_2].loaded)
-		return;
-
-	const auto& hair2Object = *_moveableObjects[ID_HAIR_2];
-	const auto& unit2 = HairEffect.Units[1];
-	if (unit2.IsEnabled)
-	{
-		// First matrix is Lara's head matrix, then all hair unit segment matrices.
-		// Bones are adjusted at load time to account for this.
-		_stItem.World = Matrix::Identity;
-		_stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * _laraWorldMatrix;
-
-		for (int i = 1; i < unit2.Segments.size(); i++)
-		{
-			_stItem.BonesMatrices[i] = unit2.Segments[i].WorldMatrix;
-			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
-		}
-
-		_cbItem.UpdateData(_stItem, _context.Get());
-
-		for (int i = 0; i < hair2Object.ObjectMeshes.size(); i++)
-		{
-			auto& rMesh = *hair2Object.ObjectMeshes[i];
-			DrawMoveableMesh(itemToDraw, &rMesh, room, i, view, rendererPass);
+			auto& rendererMesh = *rendererObject.ObjectMeshes[i];
+			DrawMoveableMesh(itemToDraw, &rendererMesh, room, i, view, rendererPass);
 		}
 	}
 }
