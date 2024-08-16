@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Entity/tr3_cobra.h"
 
 #include "Game/control/box.h"

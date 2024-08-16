@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Generic/Traps/falling_block.h"
 
 #include "Game/animation.h"
@@ -8,13 +7,11 @@
 #include "Game/effects/debris.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
-using namespace TEN::Math;
 
 constexpr auto FALLINGBLOCK_INITIAL_SPEED		= 10;
 constexpr auto FALLINGBLOCK_MAX_SPEED			= 100;

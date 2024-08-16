@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/effects/weather.h"
 
 #include "Game/camera.h"
@@ -9,14 +8,13 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
-#include "Math/Random.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
-using namespace TEN::Math::Random;
+using namespace TEN::Math::Random; // TODO: Remove this.
 
 namespace TEN::Effects::Environment 
 {

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/Lara/lara_overhang.h"
 
 #include "Game/camera.h"
@@ -648,7 +647,6 @@ void lara_as_slopeclimbup(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetDistance = CLICK(7);
 	Camera.speed = 15;
 
-
 	if (!IsHeld(In::Action))
 	{
 		int frame = GetFrameNumber(item);
@@ -783,7 +781,6 @@ void lara_as_sclimbstop(ItemInfo* item, CollisionInfo* coll)
 		Camera.targetElevation = -ANGLE(11.25f);
 		Camera.targetspeed = 15;
 	}
-
 
 	if (GlobalCounter % 2)
 		item->Pose.Orientation.x++;

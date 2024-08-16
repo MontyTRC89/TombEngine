@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Generic/Object/generic_trapdoor.h"
 
 #include "Game/animation.h"
@@ -13,7 +12,6 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Math/Math.h"
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Renderer/Renderer.h"
 #include "Specific/Input/Input.h"
@@ -21,7 +19,6 @@
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
-using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 namespace TEN::Entities::Generic

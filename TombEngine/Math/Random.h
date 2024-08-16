@@ -1,7 +1,5 @@
 #pragma once
 
-class EulerAngles;
-
 namespace TEN::Math::Random
 {
 	// Value generation

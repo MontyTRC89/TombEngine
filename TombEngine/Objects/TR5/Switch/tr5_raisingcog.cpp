@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "tr5_raisingcog.h"
 #include "Specific/level.h"
 #include "Game/control/control.h"

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Entity/tr4_ahmet.h"
 
 #include "Game/collision/sphere.h"
@@ -13,12 +12,10 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Environment;
-using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {

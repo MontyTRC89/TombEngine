@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Entity/Wraith.h"
 
 #include "Game/collision/collide_room.h"
@@ -13,7 +12,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/people.h"
 #include "Game/room.h"
-#include "Math/Math.h"
 #include "Objects/TR4/Entity/WraithInfo.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
@@ -23,7 +21,6 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Streamer;
-using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
 {

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Specific/IO/Streams.h"
 
 using std::ios;

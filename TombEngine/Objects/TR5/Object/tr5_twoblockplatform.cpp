@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR5/Object/tr5_twoblockplatform.h"
 
 #include "Game/collision/collide_room.h"
@@ -7,14 +6,12 @@
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Math/Math.h"
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
-using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 namespace TEN::Entities::Generic

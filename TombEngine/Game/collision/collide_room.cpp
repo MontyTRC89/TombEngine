@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/collision/collide_room.h"
 
 #include "Game/control/box.h"
@@ -9,13 +8,11 @@
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Game/room.h"
-#include "Math/Math.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Room;
-using namespace TEN::Math;
 
 void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 {

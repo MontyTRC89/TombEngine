@@ -1,9 +1,5 @@
 #pragma once
 
-#include <d3d11.h>
-#include <wrl/client.h>
-
-#include "Game/Debug/Debug.h"
 #include "Renderer/RendererUtils.h"
 
 namespace TEN::Renderer::ConstantBuffers
@@ -22,7 +18,7 @@ namespace TEN::Renderer::ConstantBuffers
 			desc.Usage = D3D11_USAGE_DYNAMIC;
 			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-			Utils::throwIfFailed(device->CreateBuffer(&desc, nullptr, buffer.GetAddressOf()));
+			Utils::ThrowIfFailed(device->CreateBuffer(&desc, nullptr, buffer.GetAddressOf()));
 			buffer->SetPrivateData(WKPDID_D3DDebugObjectName, 32, typeid(CBuff).name());
 		}
 

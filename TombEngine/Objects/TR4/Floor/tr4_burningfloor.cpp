@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "tr4_burningfloor.h"
 #include "Specific/level.h"
 #include "Game/items.h"

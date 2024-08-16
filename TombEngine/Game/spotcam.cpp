@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/spotcam.h"
 
 #include "Game/animation.h"
@@ -62,7 +61,6 @@ void ClearSpotCamSequences()
 	UseSpotCam = false;
 	SpotcamDontDrawLara = false;
 	SpotcamOverlay = false;
-
 
 	for (int i = 0; i < MAX_SPOTCAMS; i++)
 		SpotCam[i] = {};
@@ -355,7 +353,6 @@ void CalculateSpotCameras()
 	int lz; // stack offset -52
 	int ly; // stack offset -48
 	int cn; // $s0
-
 
 	CAMERA_INFO backup;
 

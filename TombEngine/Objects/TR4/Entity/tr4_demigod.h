@@ -1,8 +1,5 @@
 #pragma once
 
-class Vector3i;
-class Pose;
-
 namespace TEN::Entities::TR4
 {
 	void InitializeDemigod(short itemNumber);

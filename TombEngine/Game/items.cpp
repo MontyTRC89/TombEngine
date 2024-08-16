@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/items.h"
 
 #include "Game/collision/floordata.h"
@@ -13,7 +12,6 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
@@ -33,7 +31,6 @@ using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
-using namespace TEN::Math;
 using namespace TEN::Utils;
 
 constexpr auto ITEM_DEATH_TIMEOUT = 4 * FPS;

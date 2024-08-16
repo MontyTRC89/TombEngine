@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/Setup.h"
 
 #define InitFunction void(short itemNumber)

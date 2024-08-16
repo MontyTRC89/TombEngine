@@ -1,5 +1,4 @@
 #pragma once
-#include "framework.h"
 
 namespace TEN::Scripting::InventoryHandler
 {

@@ -1,9 +1,9 @@
 #pragma once
 
-class Vector3i;
+namespace TEN::Math
+{
+	class Vector3i;
 
-//namespace TEN::Math
-//{
 	class GameVector
 	{
 	public:
@@ -21,7 +21,7 @@ class Vector3i;
 
 		// Constructors
 
-		GameVector();
+		GameVector() = default;
 		GameVector(const Vector3i& pos);
 		GameVector(const Vector3i& pos, short roomNumber);
 		GameVector(int xPos, int yPos, int zPos);
@@ -48,4 +48,4 @@ class Vector3i;
 		GameVector	operator *(float scalar) const;
 		GameVector	operator /(float scalar) const;
 	};
-//}
+}

@@ -1,9 +1,4 @@
-#include "framework.h"
 #include "Renderer/Renderer.h"
-
-#include <execution>
-#include <stack>
-#include <tuple>
 
 #include "Game/control/control.h"
 #include "Game/Lara/lara_struct.h"
@@ -663,7 +658,6 @@ namespace TEN::Renderer
 												int x2 = _moveablesVertices[skinBucket->StartVertex + v2].Position.x + skinBone->GlobalTranslation.x;
 												int y2 = _moveablesVertices[skinBucket->StartVertex + v2].Position.y + skinBone->GlobalTranslation.y;
 												int z2 = _moveablesVertices[skinBucket->StartVertex + v2].Position.z + skinBone->GlobalTranslation.z;
-
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 												{

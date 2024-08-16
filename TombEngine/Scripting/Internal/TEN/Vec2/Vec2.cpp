@@ -1,10 +1,6 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
-#include "Math/Math.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
-
-using namespace TEN::Math;
 
 /// Represents a float-based 2D vector.
 // @tenprimitive Vec2

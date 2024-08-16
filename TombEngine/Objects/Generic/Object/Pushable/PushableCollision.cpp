@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Generic/Object/Pushable/PushableCollision.h"
 
 #include "Game/collision/collide_item.h"

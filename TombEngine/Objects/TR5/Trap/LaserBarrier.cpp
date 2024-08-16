@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 
 #include "Game/collision/collide_room.h"

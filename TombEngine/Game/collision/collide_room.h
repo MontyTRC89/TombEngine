@@ -1,6 +1,6 @@
 #pragma once
+
 #include "Game/collision/floordata.h"
-#include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 
 enum RoomEnvFlags;
@@ -10,7 +10,6 @@ struct MESH_INFO;
 struct ROOM_INFO;
 
 using namespace TEN::Collision::Floordata;
-using namespace TEN::Math;
 
 constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// Used by coll->Setup.LowerFloorBound.
 constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// Used by coll->Setup.UpperFloorBound.

@@ -1,6 +1,5 @@
 #pragma once
 
-class Vector3i;
 struct ItemInfo;
 
 void TriggerChaffEffects(int flareLife);

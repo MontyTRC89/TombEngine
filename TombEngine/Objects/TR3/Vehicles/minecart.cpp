@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Vehicles/minecart.h"
 
 #include "Game/animation.h"
@@ -14,7 +13,6 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/TR3/Vehicles/minecart_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
@@ -24,7 +22,6 @@
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {

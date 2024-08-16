@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Entity/Compsognathus.h"
 
 #include "Game/collision/collide_room.h"
@@ -11,12 +10,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/TR3/Object/Corpse.h"
 #include "Specific/level.h"
 
 using namespace TEN::Entities::TR3;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {

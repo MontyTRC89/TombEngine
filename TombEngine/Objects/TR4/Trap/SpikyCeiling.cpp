@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Trap/SpikyCeiling.h"
 
 #include "Game/animation.h"

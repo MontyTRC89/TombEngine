@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/Lara/lara_one_gun.h"
 
 #include "Game/animation.h"
@@ -24,7 +23,6 @@
 #include "Game/misc.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Sound/sound.h"
@@ -40,7 +38,6 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Input;
-using namespace TEN::Math;
 
 constexpr auto TRIGGER_TIMEOUT		 = 5;
 constexpr auto GRENADE_FRAG_TIMEOUT  = 4;

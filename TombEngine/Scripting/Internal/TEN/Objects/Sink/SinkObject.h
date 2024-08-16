@@ -1,7 +1,7 @@
 #pragma once
+
 #include "Scripting/Internal/TEN/Objects/NamedBase.h"
 #include "Objects/Sink.h"
-#include "Math/Math.h"
 
 namespace sol { class state; }
 class Vec3;

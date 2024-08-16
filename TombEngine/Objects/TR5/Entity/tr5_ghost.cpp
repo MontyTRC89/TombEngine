@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR5/Entity/tr5_ghost.h"
 
 #include "Game/control/box.h"

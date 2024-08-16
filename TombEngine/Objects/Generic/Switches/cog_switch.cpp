@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Generic/Switches/cog_switch.h"
 #include "Game/control/control.h"
 #include "Specific/Input/Input.h"

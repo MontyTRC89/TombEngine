@@ -1,10 +1,7 @@
 #pragma once
-#include <SimpleMath.h>
 
 namespace TEN::Renderer::Structures
 {
-	using namespace DirectX::SimpleMath;
-
 	struct RendererLine3D
 	{
 		Vector3 Origin = Vector3::Zero;

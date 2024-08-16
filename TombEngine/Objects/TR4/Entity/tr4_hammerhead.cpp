@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Entity/tr4_hammerhead.h"
 
 #include "Game/animation.h"

@@ -1,11 +1,7 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 
-#include "Math/Math.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
-
-using namespace TEN::Math;
 
 /// Represents a float-based 3D vector.
 // @tenprimitive Vec3

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/collision/collide_room.h"
 
 enum class JumpDirection;

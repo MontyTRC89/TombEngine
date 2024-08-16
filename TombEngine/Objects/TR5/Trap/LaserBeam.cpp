@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR5/Trap/LaserBeam.h"
 
 #include "Game/collision/collide_room.h"
@@ -11,14 +10,12 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/people.h"
-#include "Math/Math.h"
 #include "Renderer/Renderer.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
-using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 namespace TEN::Entities::Traps

@@ -1,7 +1,7 @@
 #pragma once
 
-//namespace TEN::Math
-//{
+namespace TEN::Math
+{
 	class Vector3i
 	{
 	public:
@@ -17,7 +17,7 @@
 
 		// Constructors
 
-		constexpr Vector3i() {};
+		constexpr Vector3i() = default;
 		constexpr Vector3i(int x, int y, int z) { this->x = x; this->y = y; this->z = z; };
 				  Vector3i(const Vector3& vector);
 
@@ -48,4 +48,4 @@
 		Vector3i  operator *(float scalar) const;
 		Vector3i  operator /(float scalar) const;
 	};
-//}
+}

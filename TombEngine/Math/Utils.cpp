@@ -1,5 +1,3 @@
-#include "framework.h"
-#include "Math/Utils.h"
 
 #include "Math/Constants.h"
 

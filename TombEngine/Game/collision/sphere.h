@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/items.h"
 
 #define SPHERES_SPACE_LOCAL			0

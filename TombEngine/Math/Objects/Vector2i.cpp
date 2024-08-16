@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Math/Objects/Vector2i.h"
 
 namespace TEN::Math

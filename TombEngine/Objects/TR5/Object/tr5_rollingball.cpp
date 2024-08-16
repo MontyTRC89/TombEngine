@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
 
 #include "Game/animation.h"

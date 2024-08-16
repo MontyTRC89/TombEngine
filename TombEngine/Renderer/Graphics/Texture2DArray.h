@@ -1,8 +1,6 @@
 #pragma once
-#include <wrl/client.h>
-#include <d3d11.h>
+
 #include "Renderer/Graphics/TextureBase.h"
-#include <vector>
 
 namespace TEN::Renderer::Graphics
 {
@@ -42,7 +40,7 @@ namespace TEN::Renderer::Graphics
 			desc.MiscFlags = 0x0;
 
 			HRESULT res = device->CreateTexture2D(&desc, NULL, Texture.GetAddressOf());
-			throwIfFailed(res);
+			ThrowIfFailed(res);
 
 			D3D11_RENDER_TARGET_VIEW_DESC viewDesc = {};
 			viewDesc.Format = desc.Format;
@@ -53,7 +51,7 @@ namespace TEN::Renderer::Graphics
 			{
 				viewDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i, 1);
 				res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, RenderTargetView[i].GetAddressOf());
-				throwIfFailed(res);
+				ThrowIfFailed(res);
 			}
 
 			// Setup the description of the shader resource view.
@@ -65,7 +63,7 @@ namespace TEN::Renderer::Graphics
 			shaderDesc.Texture2DArray.ArraySize = count;
 			shaderDesc.Texture2DArray.FirstArraySlice = 0;
 			res = device->CreateShaderResourceView(Texture.Get(), &shaderDesc, ShaderResourceView.GetAddressOf());
-			throwIfFailed(res);
+			ThrowIfFailed(res);
 
 			D3D11_TEXTURE2D_DESC depthTexDesc = {};
 			depthTexDesc.Width = resolution;
@@ -81,7 +79,7 @@ namespace TEN::Renderer::Graphics
 			depthTexDesc.MiscFlags = 0x0;
 
 			res = device->CreateTexture2D(&depthTexDesc, NULL, DepthStencilTexture.GetAddressOf());
-			throwIfFailed(res);
+			ThrowIfFailed(res);
 
 			D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
 			dsvDesc.Format = depthTexDesc.Format;
@@ -93,7 +91,7 @@ namespace TEN::Renderer::Graphics
 			{
 				dsvDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i, 1);
 				res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, DepthStencilView[i].GetAddressOf());
-				throwIfFailed(res);
+				ThrowIfFailed(res);
 			}
 		}
 	};

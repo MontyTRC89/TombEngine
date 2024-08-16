@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR2/Entity/Dragon.h"
 
 #include "Game/camera.h"
@@ -13,13 +12,11 @@
 #include "Game/misc.h"
 #include "Game/pickup/pickup.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
-using namespace TEN::Math;
 
 // NOTES:
 // OCB 0: Dragon dies when hitpoints reach 0.

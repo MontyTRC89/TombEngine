@@ -1,9 +1,4 @@
-#include "framework.h"
 #include "Game/control/control.h"
-
-#include <chrono>
-#include <process.h>
-
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
@@ -39,7 +34,6 @@
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Game/spotcam.h"
-#include "Math/Math.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"
@@ -85,7 +79,6 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Hud;
 using namespace TEN::Input;
-using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 int GameTimer       = 0;

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Generic/Switches/turn_switch.h"
 
 #include "Game/animation.h"

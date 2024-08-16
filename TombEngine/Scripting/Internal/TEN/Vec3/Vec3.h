@@ -1,9 +1,6 @@
 #pragma once
 
-class GameVector;
-class Pose;
 class Rotation;
-class Vector3i;
 namespace sol { class state; }
 
 class Vec3

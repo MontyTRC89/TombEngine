@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Sound/SoundHandler.h"
 
 #include "Scripting/Internal/LuaHandler.h"

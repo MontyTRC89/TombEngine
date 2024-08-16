@@ -1,7 +1,4 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Flow/FlowHandler.h"
-
-#include <filesystem>
 
 #include "Game/Gui.h"
 #include "Game/savegame.h"
@@ -293,14 +290,14 @@ void FlowHandler::SetGameDir(const std::string& assetDir)
 
 void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>>&& src)
 {
-	_languageNames = std::move(src);
+	_languageNames = std::move(src.value());
 }
 
 void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src)
 {
 	if (_translationMap.empty())
 	{
-		_translationMap = std::move(src);
+		_translationMap = std::move(src.value());
 	}
 	else
 	{

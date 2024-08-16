@@ -1,7 +1,4 @@
-#include "framework.h"
 #include "Specific/IO/ChunkId.h"
-
-using std::string;
 
 ChunkId::ChunkId(char* bytes, int length)
 {
@@ -29,7 +26,7 @@ std::unique_ptr<ChunkId> ChunkId::FromString(const char* str)
 	return std::make_unique<ChunkId>((char*)str, (int)strlen(str));
 }
 
-std::unique_ptr<ChunkId> ChunkId::FromString(string* str)
+std::unique_ptr<ChunkId> ChunkId::FromString(std::string* str)
 {
 	return std::make_unique<ChunkId>((char*)str->c_str(), (int)str->length());
 }

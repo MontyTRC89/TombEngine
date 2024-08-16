@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Entity/FishSwarm.h"
 
 #include "Game/collision/collide_item.h"
@@ -13,7 +12,6 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/TR3/Object/Corpse.h"
 #include "Renderer/Renderer.h"
 #include "Specific/clock.h"
@@ -21,7 +19,6 @@
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Entities::TR3;
-using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 // NOTES:

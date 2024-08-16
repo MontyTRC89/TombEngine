@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "SkyLayer.h"
 
 /*** Describes a layer of moving clouds.

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/room.h"
 #include "Scripting/Internal/TEN/Objects/NamedBase.h"
 

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Renderer/Renderer.h"
 
 #include "Game/animation.h"
@@ -25,7 +24,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/TR5/Trap/LaserBeam.h"
 #include "Objects/Utils/object_helper.h"
@@ -44,7 +42,6 @@ using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Traps;
-using namespace TEN::Math;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -289,7 +286,6 @@ namespace TEN::Renderer
 			}
 		}
 	}
-
 
 	void Renderer::PrepareFires(RenderView& view) 
 	{
@@ -655,7 +651,6 @@ namespace TEN::Renderer
 					r = shockwave->r * shockwave->life / 255.0f;
 				}
 
-
 				if (shockwave->sg < shockwave->g)
 				{
 					shockwave->sg += shockwave->g / 18;
@@ -665,7 +660,6 @@ namespace TEN::Renderer
 				{
 					g = shockwave->g * shockwave->life / 255.0f;
 				}
-
 
 				if (shockwave->sb < shockwave->b)
 				{

@@ -1,20 +1,16 @@
-#include "framework.h"
 #include "Renderer/Renderer.h"
 
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Game/spotcam.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
-#include "Specific/level.h"
+#include "Game/spotcam.h"
 #include "Renderer/RenderView.h"
-
-using namespace TEN::Math;
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/level.h"
 
 namespace TEN::Renderer
 {
@@ -833,4 +829,3 @@ namespace TEN::Renderer
 	}
 
 } // namespace TEN::Renderer
-

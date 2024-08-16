@@ -1,13 +1,9 @@
-#include "framework.h"
 #include "Game/effects/Streamer.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
-#include "Math/Math.h"
 #include "Specific/clock.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Effects::Streamer
 {

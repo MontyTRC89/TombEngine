@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Trap/WallMountedBlade.h"
 
 #include "Game/control/box.h"

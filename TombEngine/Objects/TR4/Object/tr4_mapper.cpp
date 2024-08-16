@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Object/tr4_mapper.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_room.h"

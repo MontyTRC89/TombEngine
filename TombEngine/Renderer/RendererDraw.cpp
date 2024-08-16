@@ -1,9 +1,4 @@
-#include "framework.h"
-
-#include <algorithm>
 #include <chrono>
-#include <execution>
-#include <filesystem>
 
 #include "ConstantBuffers/CameraMatrixBuffer.h"
 #include "Game/animation.h"
@@ -3153,7 +3148,6 @@ namespace TEN::Renderer
 						p1t = spr->vtx2;
 						p2t = spr->vtx3;
 						p3t = spr->vtx4;
-
 
 					}
 					else

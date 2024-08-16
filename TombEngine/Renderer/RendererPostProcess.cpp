@@ -1,5 +1,5 @@
-#include "framework.h"
 #include "Renderer/Renderer.h"
+
 #include "Game/spotcam.h"
 
 namespace TEN::Renderer

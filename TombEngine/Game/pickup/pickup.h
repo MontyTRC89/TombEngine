@@ -1,10 +1,8 @@
 #pragma once
 
 enum GAME_OBJECT_ID : short;
-class GameBoundingBox;
 struct CollisionInfo;
 struct ItemInfo;
-class Vector3i;
 
 extern int NumRPickups;
 extern short RPickups[16];

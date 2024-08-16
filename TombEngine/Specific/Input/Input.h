@@ -1,8 +1,6 @@
 #pragma once
-#include "Math/Math.h"
-#include "Specific/Input/InputAction.h"
 
-using namespace TEN::Math;
+#include "Specific/Input/InputAction.h"
 
 struct ItemInfo;
 

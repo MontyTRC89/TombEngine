@@ -1,11 +1,7 @@
-#include "framework.h"
 #include "Game/effects/simple_particle.h"
 
 #include "Game/items.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Effects
 {
