@@ -113,7 +113,7 @@ void RoomData::GenerateCollisionMesh()
 	}
 
 	// Initialize collision mesh.
-	CollisionMesh.Initialize();
+	CollisionMesh.Cook();
 }
 
 void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,

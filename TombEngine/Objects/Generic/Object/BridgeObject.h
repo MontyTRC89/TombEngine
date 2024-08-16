@@ -42,6 +42,7 @@ namespace TEN::Entities::Generic
 
 	private:
 		// Helpers
+		void InitializeCollisionMesh(const ItemInfo& item);
 		void InitializeAttractor(const ItemInfo& item);
 		void UpdateAabb(const ItemInfo& item);
 		void UpdateCollisionMesh(const ItemInfo& item);

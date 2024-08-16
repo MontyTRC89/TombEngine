@@ -45,15 +45,14 @@ namespace TEN::Physics
 
 		// Debug
 
-		void DrawDebug(const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
+		void DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
 	};
 
 	struct CollisionTriangleData
 	{
 		std::array<Vector3, CollisionTriangle::VERTEX_COUNT> Vertices = {};
-		Vector3		Normal			 = Vector3::Zero;
-		BoundingBox Aabb			 = BoundingBox();
-		int			PortalRoomNumber = NO_VALUE;
+		Vector3 Normal			 = Vector3::Zero;
+		int		PortalRoomNumber = NO_VALUE;
 	};
 
 	struct CollisionMeshRayCollisionData
@@ -70,7 +69,6 @@ namespace TEN::Physics
 		unsigned int Count = 0;
 	};
 
-	// TODO: Relative transform.
 	class CollisionMesh
 	{
 	private:
@@ -82,9 +80,11 @@ namespace TEN::Physics
 
 		// Members
 
-		std::vector<CollisionTriangle> _triangles = {};
-		std::vector<Vector3>		   _vertices  = {};
-		std::vector<Vector3>		   _normals	  = {};
+		Vector3						   _position	= Vector3::Zero;
+		Quaternion					   _orientation = Quaternion::Identity;
+		std::vector<CollisionTriangle> _triangles	= {};
+		std::vector<Vector3>		   _vertices	= {};
+		std::vector<Vector3>		   _normals		= {};
 
 		BoundingTree _triangleTree = BoundingTree();
 		Cache		 _cache		   = {};
@@ -99,13 +99,24 @@ namespace TEN::Physics
 		std::optional<CollisionMeshRayCollisionData>	GetCollision(const Ray& ray, float dist) const;
 		std::optional<CollisionMeshSphereCollisionData> GetCollision(const BoundingSphere& sphere) const;
 
+		// Setters
+
+		void SetPosition(const Vector3& pos);
+		void SetOrientation(const Quaternion& orient);
+
 		// Utilities
 
 		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, int portalRoomNumber = NO_VALUE);
-		void Initialize();
+		void Cook();
 
 		// Debug
 
 		void DrawDebug() const;
+
+	private:
+		// Helpers
+
+		Matrix GetTransformMatrix() const;
+		Matrix GetRotationMatrix() const;
 	};
 }

@@ -199,13 +199,13 @@ namespace TEN::Physics
 		return (_portalRoomNumber != NO_VALUE);
 	}
 
-	void CollisionTriangle::DrawDebug(const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
+	void CollisionTriangle::DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
 		// Get vertices and normal.
-		const auto& vertex0 = GetVertex0(vertices);
-		const auto& vertex1 = GetVertex1(vertices);
-		const auto& vertex2 = GetVertex2(vertices);
-		const auto& normal = GetNormal(normals);
+		const auto& vertex0 = Vector3::Transform(GetVertex0(vertices), transformMatrix);
+		const auto& vertex1 = Vector3::Transform(GetVertex1(vertices), transformMatrix);
+		const auto& vertex2 = Vector3::Transform(GetVertex2(vertices), transformMatrix);
+		const auto& normal = Vector3::Transform(GetNormal(normals), rotMatrix);
 
 		// Draw triangle.
 		DrawDebugTriangle(vertex0, vertex1, vertex2, Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f, 0.2f));
@@ -219,8 +219,17 @@ namespace TEN::Physics
 	{
 		constexpr auto THRESHOLD = 0.001f;
 
+		// Calculate key matrices.
+		auto transformMatrix = GetTransformMatrix();
+		auto invTransformMatrix = transformMatrix.Invert();
+		auto rotMatrix = GetRotationMatrix();
+		auto invRotMatrix = rotMatrix.Invert();
+
+		// Calculate local ray.
+		auto localRay = Ray(Vector3::Transform(ray.position, invTransformMatrix), Vector3::Transform(ray.direction, invRotMatrix));
+
 		// Get bounded triangle IDs.
-		auto triIds = _triangleTree.GetBoundedObjectIds(ray, dist);
+		auto triIds = _triangleTree.GetBoundedObjectIds(localRay, dist);
 		if (triIds.empty())
 			return std::nullopt;
 
@@ -233,7 +242,7 @@ namespace TEN::Physics
 			const auto& tri = _triangles[triID];
 
 			float intersectDist = 0.0f;
-			if (tri.Intersects(ray, intersectDist, _vertices, _normals) && intersectDist < closestDist)
+			if (tri.Intersects(localRay, intersectDist, _vertices, _normals) && intersectDist < closestDist)
 			{
 				// Prioritize tangible triangle in case portal triangle coincides.
 				if (tri.GetPortalRoomNumber() == NO_VALUE || abs(intersectDist - closestDist) > THRESHOLD)
@@ -247,9 +256,15 @@ namespace TEN::Physics
 		if (closestTri != nullptr)
 		{
 			auto meshColl = CollisionMeshRayCollisionData{};
-			meshColl.Triangle.Vertices = { closestTri->GetVertex0(_vertices), closestTri->GetVertex1(_vertices), closestTri->GetVertex2(_vertices) };
-			meshColl.Triangle.Normal = closestTri->GetNormal(_normals);
-			meshColl.Triangle.Aabb = closestTri->GetAabb();
+
+			meshColl.Triangle.Vertices =
+			{
+				Vector3::Transform(closestTri->GetVertex0(_vertices), transformMatrix),
+				Vector3::Transform(closestTri->GetVertex1(_vertices), transformMatrix),
+				Vector3::Transform(closestTri->GetVertex2(_vertices), transformMatrix)
+			};
+
+			meshColl.Triangle.Normal = Vector3::Transform(closestTri->GetNormal(_normals), rotMatrix);
 			meshColl.Triangle.PortalRoomNumber = closestTri->GetPortalRoomNumber();
 			meshColl.Distance = closestDist;
 
@@ -261,8 +276,16 @@ namespace TEN::Physics
 
 	std::optional<CollisionMeshSphereCollisionData> CollisionMesh::GetCollision(const BoundingSphere& sphere) const
 	{
+		// Calculate key matrices.
+		auto transformMatrix = GetTransformMatrix();
+		auto invTransformMatrix = transformMatrix.Invert();
+		auto rotMatrix = GetRotationMatrix();
+
+		// Calculate local sphere.
+		auto localSphere = BoundingSphere(Vector3::Transform(sphere.Center, invTransformMatrix), sphere.Radius);
+
 		// Get bounded triangle IDs.
-		auto triIds = _triangleTree.GetBoundedObjectIds(sphere);
+		auto triIds = _triangleTree.GetBoundedObjectIds(localSphere);
 		if (triIds.empty())
 			return std::nullopt;
 
@@ -273,16 +296,22 @@ namespace TEN::Physics
 		{
 			const auto& tri = _triangles[triID];
 
-			if (!tri.IsPortal() && tri.Intersects(sphere, _vertices, _normals))
+			if (!tri.IsPortal() && tri.Intersects(localSphere, _vertices, _normals))
 			{
 				auto triData = CollisionTriangleData{};
-				triData.Vertices = { tri.GetVertex0(_vertices), tri.GetVertex1(_vertices), tri.GetVertex2(_vertices) };
-				triData.Normal = tri.GetNormal(_normals);
-				triData.Aabb = tri.GetAabb();
+
+				triData.Vertices =
+				{
+					Vector3::Transform(tri.GetVertex0(_vertices), transformMatrix),
+					Vector3::Transform(tri.GetVertex1(_vertices), transformMatrix),
+					Vector3::Transform(tri.GetVertex2(_vertices), transformMatrix)
+				};
+
+				triData.Normal = Vector3::Transform(tri.GetNormal(_normals), rotMatrix);
 				triData.PortalRoomNumber = tri.GetPortalRoomNumber();
 
 				meshColl.Triangles.push_back(triData);
-				meshColl.Tangents.push_back(tri.GetTangent(sphere, _vertices, _normals));
+				meshColl.Tangents.push_back(Vector3::Transform(tri.GetTangent(sphere, _vertices, _normals), transformMatrix));
 				meshColl.Count++;
 			}
 		}
@@ -291,6 +320,16 @@ namespace TEN::Physics
 			return meshColl;
 
 		return std::nullopt;
+	}
+
+	void CollisionMesh::SetPosition(const Vector3& pos)
+	{
+		_position = pos;
+	}
+
+	void CollisionMesh::SetOrientation(const Quaternion& orient)
+	{
+		_orientation = orient;
 	}
 
 	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, int portalRoomNumber)
@@ -329,12 +368,12 @@ namespace TEN::Physics
 			return normalID;
 		};
 
-		// Add vertices and get IDs.
+		// Allocate vertices.
 		int vertex0ID = getVertexID(vertex0);
 		int vertex1ID = getVertexID(vertex1);
 		int vertex2ID = getVertexID(vertex2);
 
-		// Add normal and get ID.
+		// Allocate normal.
 		int normalID = getNormalID(normal);
 
 		// Set AABB.
@@ -344,7 +383,7 @@ namespace TEN::Physics
 		_triangles.push_back(CollisionTriangle(vertex0ID, vertex1ID, vertex2ID, normalID, aabb, portalRoomNumber));
 	}
 	
-	void CollisionMesh::Initialize()
+	void CollisionMesh::Cook()
 	{
 		auto triIds = std::vector<int>{};
 		auto triAabbs = std::vector<BoundingBox>{};
@@ -352,6 +391,7 @@ namespace TEN::Physics
 		triIds.reserve(_triangles.size());
 		triAabbs.reserve(_triangles.size());
 
+		// Collect triangle IDs and AABBs.
 		for (int i = 0; i < _triangles.size(); i++)
 		{
 			const auto& tri = _triangles[i];
@@ -370,8 +410,18 @@ namespace TEN::Physics
 	void CollisionMesh::DrawDebug() const
 	{
 		for (const auto& tri : _triangles)
-			tri.DrawDebug(_vertices, _normals);
+			tri.DrawDebug(GetTransformMatrix(), GetRotationMatrix(), _vertices, _normals);
+	}
 
-		_triangleTree.DrawDebug();
+	Matrix CollisionMesh::GetTransformMatrix() const
+	{
+		auto translationMatrix = Matrix::CreateTranslation(_position);
+		auto rotMatrix = Matrix::CreateFromQuaternion(_orientation);
+		return (rotMatrix * translationMatrix);
+	}
+
+	Matrix CollisionMesh::GetRotationMatrix() const
+	{
+		return Matrix::CreateFromQuaternion(_orientation);
 	}
 }

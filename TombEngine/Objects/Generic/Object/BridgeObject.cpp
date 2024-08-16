@@ -34,7 +34,7 @@ namespace TEN::Entities::Generic
 	void BridgeObject::Initialize(const ItemInfo& item)
 	{
 		UpdateAabb(item);
-		UpdateCollisionMesh(item);
+		InitializeCollisionMesh(item);
 		InitializeAttractor(item);
 		AssignSectors(item);
 
@@ -95,17 +95,7 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void BridgeObject::InitializeAttractor(const ItemInfo& item)
-	{
-		// TODO
-	}
-
-	void BridgeObject::UpdateAabb(const ItemInfo& item)
-	{
-		_aabb = Geometry::GetBoundingBox(item.GetObb());
-	}
-
-	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
+	void BridgeObject::InitializeCollisionMesh(const ItemInfo& item)
 	{
 		constexpr auto UP_NORMAL	  = Vector3(0.0f, -1.0f, 0.0f);
 		constexpr auto DOWN_NORMAL	  = Vector3(0.0f, 1.0f, 0.0f);
@@ -143,36 +133,54 @@ namespace TEN::Entities::Generic
 			break;
 		}
 
-		// Calculate absolute tilt offset.
-		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
-		offset = Vector3::Transform(offset, rotMatrix);
-
-		// Get box corners.
-		auto box = item.GetObb();
+		// Get local AABB corners.
+		auto bounds = GetAnimFrame(item, 0, 0).BoundingBox;
+		auto aabb = BoundingBox(bounds.GetCenter(), bounds.GetExtents());
 		auto corners = std::array<Vector3, BoundingOrientedBox::CORNER_COUNT>{};
-		box.GetCorners(corners.data());
+		aabb.GetCorners(corners.data());
+
+		// TODO: Corners aren't right anymore.
 
 		// Offset key corners.
-		corners[1] += offset;
-		corners[3] -= offset;
-		corners[5] += offset;
-		corners[7] -= offset;
-		
-		// Set collision mesh.
-		_collisionMesh = CollisionMesh();
-		_collisionMesh.InsertTriangle(corners[0], corners[1], corners[4], Vector3::Transform(UP_NORMAL, tiltRotMatrix * rotMatrix));
-		_collisionMesh.InsertTriangle(corners[1], corners[4], corners[5], Vector3::Transform(UP_NORMAL, tiltRotMatrix * rotMatrix));
-		_collisionMesh.InsertTriangle(corners[2], corners[3], corners[6], Vector3::Transform(DOWN_NORMAL, tiltRotMatrix * rotMatrix));
-		_collisionMesh.InsertTriangle(corners[3], corners[6], corners[7], Vector3::Transform(DOWN_NORMAL, tiltRotMatrix * rotMatrix));
-		_collisionMesh.InsertTriangle(corners[4], corners[5], corners[6], Vector3::Transform(FORWARD_NORMAL, rotMatrix));
-		_collisionMesh.InsertTriangle(corners[4], corners[6], corners[7], Vector3::Transform(FORWARD_NORMAL, rotMatrix));
-		_collisionMesh.InsertTriangle(corners[0], corners[1], corners[2], Vector3::Transform(BACK_NORMAL, rotMatrix));
-		_collisionMesh.InsertTriangle(corners[0], corners[2], corners[3], Vector3::Transform(BACK_NORMAL, rotMatrix));
-		_collisionMesh.InsertTriangle(corners[1], corners[2], corners[5], Vector3::Transform(LEFT_NORMAL, rotMatrix));
-		_collisionMesh.InsertTriangle(corners[2], corners[5], corners[6], Vector3::Transform(LEFT_NORMAL, rotMatrix));
-		_collisionMesh.InsertTriangle(corners[0], corners[3], corners[4], Vector3::Transform(RIGHT_NORMAL, rotMatrix));
-		_collisionMesh.InsertTriangle(corners[3], corners[4], corners[7], Vector3::Transform(RIGHT_NORMAL, rotMatrix));
-		_collisionMesh.Initialize();
+		corners[1] -= offset;
+		corners[3] += offset;
+		corners[5] -= offset;
+		corners[7] += offset;
+
+		// Build collision mesh.
+		_collisionMesh.InsertTriangle(corners[0], corners[1], corners[4], Vector3::Transform(UP_NORMAL, tiltRotMatrix));
+		_collisionMesh.InsertTriangle(corners[1], corners[4], corners[5], Vector3::Transform(UP_NORMAL, tiltRotMatrix));
+		_collisionMesh.InsertTriangle(corners[2], corners[3], corners[6], Vector3::Transform(DOWN_NORMAL, tiltRotMatrix));
+		_collisionMesh.InsertTriangle(corners[3], corners[6], corners[7], Vector3::Transform(DOWN_NORMAL, tiltRotMatrix));
+		_collisionMesh.InsertTriangle(corners[4], corners[5], corners[6], FORWARD_NORMAL);
+		_collisionMesh.InsertTriangle(corners[4], corners[6], corners[7], FORWARD_NORMAL);
+		_collisionMesh.InsertTriangle(corners[0], corners[1], corners[2], BACK_NORMAL);
+		_collisionMesh.InsertTriangle(corners[0], corners[2], corners[3], BACK_NORMAL);
+		_collisionMesh.InsertTriangle(corners[1], corners[2], corners[5], LEFT_NORMAL);
+		_collisionMesh.InsertTriangle(corners[2], corners[5], corners[6], LEFT_NORMAL);
+		_collisionMesh.InsertTriangle(corners[0], corners[3], corners[4], RIGHT_NORMAL);
+		_collisionMesh.InsertTriangle(corners[3], corners[4], corners[7], RIGHT_NORMAL);
+		_collisionMesh.Cook();
+
+		// Set collision mesh position and orientation.
+		_collisionMesh.SetPosition(item.Pose.Position.ToVector3());
+		_collisionMesh.SetOrientation(item.Pose.Orientation.ToQuaternion());
+	}
+
+	void BridgeObject::InitializeAttractor(const ItemInfo& item)
+	{
+		// TODO
+	}
+
+	void BridgeObject::UpdateAabb(const ItemInfo& item)
+	{
+		_aabb = Geometry::GetBoundingBox(item.GetObb());
+	}
+
+	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
+	{
+		_collisionMesh.SetPosition(item.Pose.Position.ToVector3());
+		_collisionMesh.SetOrientation(item.Pose.Orientation.ToQuaternion());
 	}
 
 	void BridgeObject::UpdateAttractor(const ItemInfo& item)
