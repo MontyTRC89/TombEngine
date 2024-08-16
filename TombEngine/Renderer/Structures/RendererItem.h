@@ -1,49 +1,46 @@
 #pragma once
-#include <SimpleMath.h>
+
+#include "Game/room.h"
 #include "Renderer/RendererEnums.h"
 #include "Renderer/Structures/RendererLight.h"
-#include "Game/room.h"
 
 namespace TEN::Renderer::Structures
 {
-	using namespace DirectX::SimpleMath;
-
 	struct RendererItem
 	{
-		int ItemNumber;
-		int ObjectNumber;
+		int ItemNumber = 0;
+		int ObjectID   = 0;
 
-		Vector3 Position;
-		Matrix World;
-		Matrix Translation;
-		Matrix Rotation;
-		Matrix Scale;
-		Matrix AnimationTransforms[MAX_BONES];
+		Vector3 Position	= Vector3::Zero;
+		int		RoomNumber	= NO_VALUE;
+		Matrix	World		= Matrix::Identity;
+		Matrix	Translation = Matrix::Identity;
+		Matrix	Rotation	= Matrix::Identity;
+		Matrix	Scale		= Matrix::Identity;
+		Matrix	AnimTransforms[MAX_BONES] = {};
 
-		Vector3 OldPosition;
-		Matrix OldWorld;
-		Matrix OldTranslation;
-		Matrix OldRotation;
-		Matrix OldScale;
-		Matrix OldAnimationTransforms[MAX_BONES];
+		Vector4 Color		 = Vector4::Zero;
+		Vector4 AmbientLight = Vector4::Zero;
 
-		Vector3 InterpolatedPosition;
-		Matrix InterpolatedWorld;
-		Matrix InterpolatedTranslation;
-		Matrix InterpolatedRotation;
-		Matrix InterpolatedScale;
-		Matrix InterpolatedAnimationTransforms[MAX_BONES];
+		std::vector<int>			MeshIds		 = {};
+		std::vector<RendererLight*> LightsToDraw = {};
+		float LightFade = 0.0f;
 
-		int RoomNumber = NO_VALUE;
-		int PrevRoomNumber = NO_VALUE;
+		bool DoneAnimations = false;
 
-		Vector4 Color;
-		Vector4 AmbientLight;
-		std::vector<RendererLight*> LightsToDraw;
-		float LightFade;
+		Vector3 InterpolatedPosition	= Vector3::Zero;
+		Matrix	InterpolatedWorld		= Matrix::Identity;
+		Matrix	InterpolatedTranslation = Matrix::Identity;
+		Matrix	InterpolatedRotation	= Matrix::Identity;
+		Matrix	InterpolatedScale		= Matrix::Identity;
+		Matrix	InterpolatedAnimTransforms[MAX_BONES];
 
-		std::vector<int> MeshIndex;
-
-		bool DoneAnimations;
+		Vector3 PrevPosition	= Vector3::Zero;
+		int		PrevRoomNumber	= NO_VALUE;
+		Matrix	PrevWorld		= Matrix::Identity;
+		Matrix	PrevTranslation = Matrix::Identity;
+		Matrix	PrevRotation	= Matrix::Identity;
+		Matrix	PrevScale		= Matrix::Identity;
+		Matrix	PrevAnimTransforms[MAX_BONES];
 	};
 }
