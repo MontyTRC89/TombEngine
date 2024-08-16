@@ -422,7 +422,7 @@ namespace TEN::Entities::Vehicles
 
 		short roomNumber = rBoatItem->RoomNumber;
 		auto floor = GetFloor(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z, &roomNumber);
-		int height = GetWaterHeight(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z, roomNumber);
+		int height = GetPointCollision(rBoatItem->Pose.Position, roomNumber).GetWaterTopHeight();
 
 		if (height == NO_HEIGHT)
 			height = GetFloorHeight(floor, rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z);
@@ -826,7 +826,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		auto probe = GetPointCollision(*rBoatItem);
-		int water = GetWaterHeight(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z, probe.GetRoomNumber());
+		int water = GetPointCollision(rBoatItem->Pose.Position, probe.GetRoomNumber()).GetWaterTopHeight();
 		rBoat->Water = water;
 
 		if (lara->Context.Vehicle == itemNumber && laraItem->HitPoints > 0)
@@ -935,7 +935,7 @@ namespace TEN::Entities::Vehicles
 		DoRubberBoatDismount(rBoatItem, laraItem);
 
 		short probedRoomNumber = GetPointCollision(Vector3i(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y + 128, rBoatItem->Pose.Position.z), rBoatItem->RoomNumber).GetRoomNumber();
-		height = GetWaterHeight(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y + 128, rBoatItem->Pose.Position.z, probedRoomNumber);
+		height = GetPointCollision(Vector3i(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y + 128, rBoatItem->Pose.Position.z), probedRoomNumber).GetWaterTopHeight();
 		if (height > rBoatItem->Pose.Position.y + 32 || height == NO_HEIGHT)
 			height = 0;
 		else
@@ -950,7 +950,7 @@ namespace TEN::Entities::Vehicles
 		{
 			TriggerRubberBoatMist(prop.x, prop.y, prop.z, abs(rBoatItem->Animation.Velocity.z), rBoatItem->Pose.Orientation.y + ANGLE(180.0f), 0);
 			
-			int waterHeight = GetWaterHeight(rBoatItem);
+			int waterHeight = GetPointCollision(*rBoatItem).GetWaterTopHeight();
 			SpawnVehicleWake(*rBoatItem, RBOAT_WAKE_OFFSET, waterHeight);
 
 			if ((GetRandomControl() & 1) == 0)

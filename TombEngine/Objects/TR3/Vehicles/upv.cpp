@@ -729,8 +729,9 @@ namespace TEN::Entities::Vehicles
 				UPV->Flags &= ~UPV_FLAG_CONTROL;
 				int waterDepth, waterHeight, heightFromWater;
 
-				waterDepth = GetWaterSurface(laraItem);
-				waterHeight = GetWaterHeight(laraItem);
+				auto pointColl = GetPointCollision(*laraItem);
+				waterDepth = pointColl.GetWaterSurfaceHeight();
+				waterHeight = pointColl.GetWaterTopHeight();
 
 				if (waterHeight != NO_HEIGHT)
 					heightFromWater = laraItem->Pose.Position.y - waterHeight;
@@ -869,8 +870,9 @@ namespace TEN::Entities::Vehicles
 			TranslateItem(UPVItem, UPVItem->Pose.Orientation, UPVItem->Animation.Velocity.z);
 		}
 
-		int newHeight = GetPointCollision(*UPVItem).GetFloorHeight();
-		int waterHeight = GetWaterHeight(UPVItem);
+		auto pointColl = GetPointCollision(*UPVItem);
+		int newHeight = pointColl.GetFloorHeight();
+		int waterHeight = pointColl.GetWaterTopHeight();
 
 		if ((newHeight - waterHeight) < UPV_HEIGHT || (newHeight < UPVItem->Pose.Position.y - UPV_HEIGHT / 2) || 
 			(newHeight == NO_HEIGHT) || (waterHeight == NO_HEIGHT))
@@ -941,7 +943,7 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->Velocity || IsDirectionalActionHeld())
 		{
-			waterHeight = GetWaterHeight(UPVItem);
+			waterHeight = GetPointCollision(*UPVItem).GetWaterTopHeight();
 			SpawnVehicleWake(*UPVItem, UPV_WAKE_OFFSET, waterHeight, true);
 		}
 

@@ -611,7 +611,7 @@ void CreatureUnderwater(ItemInfo* item, int depth)
 	}
 	else
 	{
-		waterHeight = GetWaterHeight(item);
+		waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 	}
 
 	int y = waterHeight + waterLevel;
@@ -645,7 +645,7 @@ void CreatureFloat(short itemNumber)
 	item->Pose.Orientation.x = 0;
 
 	int y = item->Pose.Position.y;
-	int waterLevel = GetWaterHeight(item);
+	int waterLevel = GetPointCollision(*item).GetWaterTopHeight();
 	if (waterLevel == NO_HEIGHT)
 		return;
 
@@ -792,7 +792,7 @@ void CreatureHealth(ItemInfo* item)
 		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[item->RoomNumber]))
 	{
 		auto bounds = GameBoundingBox(item);
-		auto height = item->Pose.Position.y - GetWaterHeight(item);
+		auto height = item->Pose.Position.y - GetPointCollision(*item).GetWaterTopHeight();
 
 		if (abs(bounds.Y1 + bounds.Y2) < height)
 			DoDamage(item, INT_MAX);

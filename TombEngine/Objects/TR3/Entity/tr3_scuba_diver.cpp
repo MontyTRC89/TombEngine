@@ -129,11 +129,11 @@ namespace TEN::Entities::Creatures::TR3
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO ai;
+			CreatureAIInfo(item, &ai);
 
-			GetCreatureMood(item, &AI, false);
-			CreatureMood(item, &AI, false);
+			GetCreatureMood(item, &ai, false);
+			CreatureMood(item, &ai, false);
 
 			bool shoot = false;
 			if (Lara.Control.WaterStatus == WaterStatus::Dry)
@@ -142,23 +142,21 @@ namespace TEN::Entities::Creatures::TR3
 					item->Pose.Position.x,
 					item->Pose.Position.y - CLICK(1),
 					item->Pose.Position.z,
-					item->RoomNumber
-				);
+					item->RoomNumber);
 				auto target = GameVector(
 					LaraItem->Pose.Position.x,
 					LaraItem->Pose.Position.y - (LARA_HEIGHT - 150),
-					LaraItem->Pose.Position.z
-				);
+					LaraItem->Pose.Position.z);
 
 				shoot = LOS(&origin, &target);
 
 				if (shoot)
 					creature->Target = LaraItem->Pose.Position;
 
-				if (AI.angle < -ANGLE(45.0f) || AI.angle > ANGLE(45.0f))
+				if (ai.angle < -ANGLE(45.0f) || ai.angle > ANGLE(45.0f))
 					shoot = false;
 			}
-			else if (AI.angle > -ANGLE(45.0f) && AI.angle < ANGLE(45.0f))
+			else if (ai.angle > -ANGLE(45.0f) && ai.angle < ANGLE(45.0f))
 			{
 				auto origin = GameVector(item->Pose.Position, item->RoomNumber);
 				auto target = GameVector(LaraItem->Pose.Position);
@@ -167,7 +165,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			angle = CreatureTurn(item, creature->MaxTurn);
-			waterHeight = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber) + BLOCK(0.5f);
+			waterHeight = GetPointCollision(*item).GetWaterSurfaceHeight() + BLOCK(0.5f);
 
 			switch (item->Animation.ActiveState)
 			{
@@ -175,7 +173,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->MaxTurn = SCUBA_DIVER_SWIM_TURN_RATE_MAX;
 
 				if (shoot)
-					neck = -AI.angle;
+					neck = -ai.angle;
 
 				if (creature->Target.y < waterHeight &&
 					item->Pose.Position.y < (waterHeight + creature->LOT.Fly))
@@ -193,7 +191,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->Flags = 0;
 
 				if (shoot)
-					neck = -AI.angle;
+					neck = -ai.angle;
 
 				if (!shoot || creature->Mood == MoodType::Escape ||
 					(creature->Target.y < waterHeight &&
@@ -208,7 +206,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			case SDIVER_STATE_SWIM_SHOOT:
 				if (shoot)
-					neck = -AI.angle;
+					neck = -ai.angle;
 
 				if (!creature->Flags)
 				{
@@ -222,7 +220,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->MaxTurn = SCUBA_DIVER_SWIM_TURN_RATE_MAX;
 
 				if (shoot)
-					head = AI.angle;
+					head = ai.angle;
 
 				if (creature->Target.y > waterHeight)
 					item->Animation.TargetState = SDIVER_STATE_SWIM;
@@ -237,7 +235,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature->Flags = 0;
 
 				if (shoot)
-					head = AI.angle;
+					head = ai.angle;
 
 				if (!shoot || creature->Mood == MoodType::Escape || creature->Target.y > waterHeight)
 					item->Animation.TargetState = SDIVER_STATE_TREAD_WATER_IDLE;
@@ -248,7 +246,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			case SDIVER_STATE_TREAD_WATER_SHOOT:
 				if (shoot)
-					head = AI.angle;
+					head = ai.angle;
 
 				if (!creature->Flags)
 				{

@@ -26,6 +26,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed teeth spikes not triggering the player impale animation.
 * Fixed TR4 mine crash with OCB 1 when triggered.
 * Fixed cases where Atlantean mutant's bombs cause the game to crash.
+* Fixed young hair drawing.
 
 ### Features/Amendments
 * Changed Rome Hammer to not hurt player whilst deactivated.

@@ -176,7 +176,7 @@ namespace TEN::Entities::Vehicles
 		*pos = Vector3i(point);
 
 		auto pointColl = GetPointCollision(*pos, vehicleItem->RoomNumber);
-		int height = GetWaterHeight(pos->x, pos->y, pos->z, pointColl.GetRoomNumber());
+		int height = GetPointCollision(Vector3i(pos->x, pos->y, pos->z), pointColl.GetRoomNumber()).GetWaterTopHeight();
 
 		if (height == NO_HEIGHT)
 		{
@@ -216,7 +216,7 @@ namespace TEN::Entities::Vehicles
 		if (TestEnvironment(ENV_FLAG_WATER, vehicleItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
 		{
-			auto waterDepth = (float)GetWaterDepth(vehicleItem);
+			int waterDepth = GetPointCollision(*vehicleItem).GetWaterBottomHeight();
 
 			// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
 			// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
@@ -237,11 +237,8 @@ namespace TEN::Entities::Vehicles
 
 					if (isWater)
 					{
-						int waterHeight = GetWaterHeight(vehicleItem);
+						int waterHeight = GetPointCollision(*vehicleItem).GetWaterTopHeight();
 						SpawnVehicleWake(*vehicleItem, wakeOffset, waterHeight);
-
-						//SpawnStreamer(vehicleItem, -wakeOffset.x, waterHeight / 2, wakeOffset.z, 1, true, 5.0f, 50, 9.0f);
-						//SpawnStreamer(vehicleItem, wakeOffset.x, waterHeight / 2, wakeOffset.z, 2, true, 5.0f, 50, 9.0f);
 					}
 				}
 
@@ -253,7 +250,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				int waterHeight = vehicleItem->Pose.Position.y - GetWaterHeight(vehicleItem);
+				int waterHeight = vehicleItem->Pose.Position.y - GetPointCollision(*vehicleItem).GetWaterTopHeight();
 
 				if (waterDepth > VEHICLE_WATER_HEIGHT_MAX && waterHeight > VEHICLE_WATER_HEIGHT_MAX)
 				{

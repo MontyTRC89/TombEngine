@@ -218,7 +218,6 @@ namespace TEN::Entities::Creatures::TR3
 
 		// Get point collision.
 		auto pointColl = GetPointCollision(pos, item.RoomNumber);
-		int waterHeight = GetWaterHeight(pointColl.GetPosition().x, pointColl.GetPosition().y, pointColl.GetPosition().z, pointColl.GetRoomNumber());
 
 		// 1) Test for water room.
 		if (!TestEnvironment(ENV_FLAG_WATER, pointColl.GetRoomNumber()))
@@ -226,7 +225,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		// 2) Assess point collision.
 		if (pos.y >= (pointColl.GetFloorHeight() - BUFFER) ||
-			pos.y <= (waterHeight + BUFFER) ||
+			pos.y <= (pointColl.GetWaterTopHeight() + BUFFER) ||
 			pointColl.GetSector().IsWall(item.Pose.Position.x + BUFFER, item.Pose.Position.z + BUFFER) ||
 			pointColl.GetSector().IsWall(item.Pose.Position.x - BUFFER, item.Pose.Position.z - BUFFER))
 		{
@@ -377,7 +376,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			// Clamp position to slightly below water surface.
-			int waterHeight = GetWaterHeight(fish.Position.x, fish.Position.y, fish.Position.z, fish.RoomNumber);
+			int waterHeight = pointColl.GetWaterTopHeight();
 			if (fish.Position.y < (waterHeight + WATER_SURFACE_OFFSET))
 				fish.Position.y = waterHeight + WATER_SURFACE_OFFSET;
 			
