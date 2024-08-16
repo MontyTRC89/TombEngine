@@ -12,6 +12,8 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
+
 namespace TEN::Entities::Creatures::TR1
 {
 	constexpr auto BIG_RAT_BITE_ATTACK_DAMAGE	= 20;

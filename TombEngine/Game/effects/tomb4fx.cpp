@@ -26,6 +26,7 @@ using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 
 using TEN::Renderer::g_Renderer;
 
