@@ -3,28 +3,30 @@
 // Disable Unicode for FMT and spdlog to prevent errors when compiling.
 #define FMT_UNICODE 0
 
+// Libraries
+
 // Windows
 #pragma comment(lib, "comctl32")
 #pragma comment(lib, "version")
 
-// BASS library
+// BASS
 #pragma comment(lib, "bass")
 #pragma comment(lib, "bass_fx")
 #pragma comment(lib, "bassmix")
 
-// DirectX 11 library
+// DirectX 11
 #pragma comment(lib, "d3d11")
 #pragma comment(lib, "d3dcompiler")
 #pragma comment(lib, "dxgi")
 #pragma comment(lib, "dxguid")
 
-// DirectX Tool Kit library
+// DirectX Tool Kit
 #pragma comment(lib, "DirectXTK")
 
-// Lua library
+// Lua
 #pragma comment(lib, "lua-c++")
 
-// OIS, spdlog, zlib libraries
+// OIS, spdlog, zlib
 #if defined(_DEBUG)
 #pragma comment(lib, "OIS_d")
 #pragma comment(lib, "spdlogd")
@@ -35,6 +37,9 @@
 #pragma comment(lib, "zlib")
 #endif
 
+// Includes
+
+// Standard
 #include <algorithm>
 #include <array>
 #include <chrono>
