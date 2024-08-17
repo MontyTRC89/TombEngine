@@ -27,12 +27,17 @@ namespace TEN::Entities::TR4
 	constexpr auto VON_CROY_JUMP_RANGE = BLOCK(0.79f);
 	constexpr auto VON_CROY_WALK_TURN_RATE = ANGLE(7.0f);
 	constexpr auto VON_CROY_RUN_TURN_RATE = ANGLE(11.0f);
+	constexpr auto VON_CROY_ATTACK_RANGE = BLOCK(0.8f);
+	constexpr auto VON_CROY_RUN_RANGE = BLOCK(3.0f);
 	constexpr auto VON_CROY_VAULT_SHIFT = 260;
+	constexpr auto VON_CROY_BOOK_EQUIP_FRAME = 26;
+	constexpr auto VON_CROY_BOOK_UNEQUIP_FRAME = 224;
 	constexpr auto VON_CROY_EQUIP_UNEQUIP_FRAME = 28;
 	constexpr auto VON_CROY_ADJUST_POSITION_TURN_RATE = ANGLE(2.81f);
 	constexpr auto VON_CROY_ADJUST_POSITION_VELOCITY = 15;
 	constexpr auto VON_CROY_AI_PATH_DETECTION_RADIUS = BLOCK(0.65f);
 	constexpr auto VON_CROY_CALL_LARA_RANGE = BLOCK(5.0f);
+	constexpr auto VON_CROY_CALL_TIMER = 40;
 
 	constexpr auto VON_CROY_TORSO_MESHINDEX = 7;
 	constexpr auto VON_CROY_HAND_LEFT_MESHINDEX = 15;
@@ -83,6 +88,8 @@ namespace TEN::Entities::TR4
 		VON_CROY_STATE_POSITION_ADJUST_FRONT = 36,
 		VON_CROY_STATE_POSITION_ADJUST_BACK = 37
 	};
+
+	const auto VonCroyTalkStateList = std::vector<int>{ VON_CROY_STATE_TALK_1, VON_CROY_STATE_TALK_2, VON_CROY_STATE_TALK_3 };
 
 	enum VonCroyAnim
 	{
@@ -148,9 +155,9 @@ namespace TEN::Entities::TR4
 		VON_CROY_ANIM_LAND_TO_RUN = 59
 	};
 
-	static void DoKnifeMeshSwap(ItemInfo& item)
+	static void DoKnifeMeshSwap(ItemInfo& item, bool forceEquip = false)
 	{
-		item.SetMeshSwapFlags(VonCroyKnifeSwapJoints, item.TestMeshSwapFlags(VonCroyKnifeSwapJoints));
+		item.SetMeshSwapFlags(VonCroyKnifeSwapJoints, forceEquip || item.TestMeshSwapFlags(VonCroyKnifeSwapJoints));
 	}
 
 	static void DoBookMeshSwap(ItemInfo& item)
@@ -202,12 +209,22 @@ namespace TEN::Entities::TR4
 		return Vector3i::Distance(item.Pose.Position, target.Pose.Position) <= range;
 	}
 
+	static bool IsVonCroyTalking(ItemInfo& item)
+	{
+		return item.Animation.ActiveState == VON_CROY_STATE_TALK_1 ||
+			   item.Animation.ActiveState == VON_CROY_STATE_TALK_2 ||
+			   item.Animation.ActiveState == VON_CROY_STATE_TALK_3 ||
+			   item.Animation.ActiveState == VON_CROY_STATE_TALK_WITH_BOOK;
+	}
+
 	void InitializeVonCroy(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		InitializeCreature(itemNumber);
 		SetAnimation(item, VON_CROY_ANIM_KNIFE_EQUIP_UNEQUIP);
-		item.ItemFlags[1] = 0; // 0= Use AI_Path or 1= Follow lara.
+		DoKnifeMeshSwap(item);
+		item.ItemFlags[1] = 0; // 0= Use AI_Path or 1= Follow player.
+		item.ItemFlags[2] = 0; // 1= Call for player. 2= During cutscene.
 	}
 
 	void VonCroyControl(short itemNumber)
@@ -219,6 +236,7 @@ namespace TEN::Entities::TR4
 		auto& creature = *GetCreatureInfo(&item);
 		short angle = 0;
 		short tilt = 0;
+		ItemInfo* enemy = nullptr;
 		EulerAngles head = {};
 		EulerAngles torso = {};
 		AI_INFO ai = {};
@@ -230,6 +248,7 @@ namespace TEN::Entities::TR4
 
 		GetAITarget(&creature);
 		CreatureAIInfo(&item, &ai);
+
 		if (item.ItemFlags[1] == 0)
 		{
 			DoNodePath(item, creature);
@@ -237,10 +256,6 @@ namespace TEN::Entities::TR4
 			{
 				switch (item.ItemFlags[2])
 				{
-				case 0: // Adjust position.
-					item.Animation.TargetState = VON_CROY_STATE_IDLE;
-					item.Animation.RequiredState = VON_CROY_STATE_POSITION_ADJUST_FRONT;
-					break;
 				case 1: // Call lara.
 					if (item.Timer == 0)
 					{
@@ -248,7 +263,7 @@ namespace TEN::Entities::TR4
 							item.Animation.TargetState = VON_CROY_STATE_CALL_LARA_2;
 						else
 							item.Animation.TargetState = VON_CROY_STATE_CALL_LARA_1;
-						item.Timer = 20;
+						item.Timer = VON_CROY_CALL_TIMER;
 					}
 					else
 					{
@@ -257,7 +272,30 @@ namespace TEN::Entities::TR4
 							item.Timer = 0;
 					}
 					break;
-				case 2: // Currently in cinematic.
+				case 3: // Currently in cinematic, normal talk.
+					if (IsVonCroyTalking(item))
+						break;
+
+					item.Animation.TargetState = VonCroyTalkStateList[Random::GenerateInt(0, 2)];
+					break;
+				case 4: // Currently in cinematic, look back left/right
+					enemy = creature.Enemy;
+					if (enemy->Pose.Orientation.y - item.Pose.Orientation.y < -1024)
+						item.Animation.TargetState = VON_CROY_STATE_LOOK_BACK_RIGHT;
+					else if (enemy->Pose.Orientation.y - item.Pose.Orientation.y > 1024)
+						item.Animation.TargetState = VON_CROY_STATE_LOOK_BACK_LEFT;
+					break;
+				case 5:
+					// Now talk, equip book then when finished, unequip it !
+					if (TestAnimFrame(item, VON_CROY_BOOK_EQUIP_FRAME))
+					{
+						DoBookMeshSwap(item);
+					}
+					else if (TestAnimFrame(item, VON_CROY_BOOK_UNEQUIP_FRAME))
+					{
+						DoBookMeshSwap(item);
+						item.SetFlagField(2, 3); // Do the normal talk after the book talk is finished.
+					}
 					break;
 				}
 			}
@@ -270,7 +308,7 @@ namespace TEN::Entities::TR4
 			angle = CreatureTurn(&item, creature.MaxTurn);
 		}
 
-		auto& enemy = *creature.Enemy;
+		enemy = creature.Enemy;
 		switch (item.Animation.ActiveState)
 		{
 		case VON_CROY_STATE_IDLE:
@@ -292,6 +330,28 @@ namespace TEN::Entities::TR4
 			{
 				item.Animation.TargetState = item.Animation.RequiredState;
 			}
+			else if (Vector3i::Distance(item.Pose.Position, enemy->Pose.Position) <= VON_CROY_ATTACK_RANGE)
+			{
+				if (creature.ReachedGoal && enemy->ObjectNumber == ID_AI_PATH)
+				{
+					if (ai.ahead)
+						item.Animation.TargetState = VON_CROY_STATE_POSITION_ADJUST_FRONT;
+					else
+						item.Animation.TargetState = VON_CROY_STATE_POSITION_ADJUST_BACK;
+				}
+				else
+				{
+					GameBoundingBox box(enemy);
+					if (box.GetHeight() <= CLICK(2.5f))
+						item.Animation.TargetState = VON_CROY_STATE_KNIFE_ATTACK_LOW;
+					else
+						item.Animation.TargetState = VON_CROY_STATE_KNIFE_ATTACK_HIGH;
+				}
+			}
+			else if (Vector3i::Distance(item.Pose.Position, enemy->Pose.Position) > VON_CROY_RUN_RANGE)
+			{
+				item.Animation.TargetState = VON_CROY_STATE_RUN;
+			}
 			else
 			{
 				item.Animation.TargetState = VON_CROY_STATE_WALK;
@@ -309,12 +369,22 @@ namespace TEN::Entities::TR4
 			if (item.ItemFlags[1] == 0 && !creature.ReachedGoal)
 				RotateTowardTarget(item, ai.angle, creature.MaxTurn);
 
+			if (Vector3i::Distance(item.Pose.Position, enemy->Pose.Position) <= VON_CROY_ATTACK_RANGE)
+			{
+				item.Animation.TargetState = VON_CROY_STATE_IDLE;
+			}
+
 			break;
 
 		case VON_CROY_STATE_RUN:
 			creature.MaxTurn = VON_CROY_RUN_TURN_RATE;
 			if (item.ItemFlags[1] == 0 && !creature.ReachedGoal)
 				RotateTowardTarget(item, ai.angle, creature.MaxTurn);
+
+			if (Vector3i::Distance(item.Pose.Position, enemy->Pose.Position) <= VON_CROY_RUN_RANGE)
+			{
+				item.Animation.TargetState = VON_CROY_STATE_WALK;
+			}
 
 			break;
 
@@ -328,7 +398,7 @@ namespace TEN::Entities::TR4
 		case VON_CROY_STATE_POSITION_ADJUST_FRONT:
 		case VON_CROY_STATE_POSITION_ADJUST_BACK:
 			creature.MaxTurn = 0;
-			if (MoveCreature3DPos(&item.Pose, &enemy.Pose, VON_CROY_ADJUST_POSITION_VELOCITY, enemy.Pose.Orientation.y - item.Pose.Orientation.y, VON_CROY_ADJUST_POSITION_TURN_RATE))
+			if (MoveCreature3DPos(&item.Pose, &enemy->Pose, VON_CROY_ADJUST_POSITION_VELOCITY, enemy->Pose.Orientation.y - item.Pose.Orientation.y, VON_CROY_ADJUST_POSITION_TURN_RATE))
 			{
 				item.Animation.TargetState = VON_CROY_STATE_IDLE;
 				item.ItemFlags[2] = 1; // Next voncroy state.
