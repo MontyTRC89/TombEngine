@@ -201,6 +201,11 @@ namespace TEN::Physics
 
 	void CollisionTriangle::DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
+		constexpr auto NORMAL_LINE_LENGTH = BLOCK(0.1f);
+		constexpr auto NORMAL_LINE_COLOR  = Color(1.0f, 1.0f, 1.0f);
+		constexpr auto TANGIBLE_TRI_COLOR = Color(1.0f, 1.0f, 0.0f, 0.2f);
+		constexpr auto PORTAL_TRI_COLOR	  = Color(1.0f, 0.0f, 0.0f, 0.2f);
+
 		// Get vertices and normal.
 		const auto& vertex0 = Vector3::Transform(GetVertex0(vertices), transformMatrix);
 		const auto& vertex1 = Vector3::Transform(GetVertex1(vertices), transformMatrix);
@@ -208,18 +213,18 @@ namespace TEN::Physics
 		const auto& normal = Vector3::Transform(GetNormal(normals), rotMatrix);
 
 		// Draw triangle.
-		DrawDebugTriangle(vertex0, vertex1, vertex2, Color(1.0f, IsPortal() ? 0.0f : 1.0f, 0.0f, 0.2f));
+		DrawDebugTriangle(vertex0, vertex1, vertex2, IsPortal() ? PORTAL_TRI_COLOR : TANGIBLE_TRI_COLOR);
 
 		// Draw normal line.
 		auto center = (vertex0 + vertex1 + vertex2) / 3;
-		DrawDebugLine(center, Geometry::TranslatePoint(center, normal, BLOCK(0.2f)), Color(1.0f, 1.0f, 1.0f));
+		DrawDebugLine(center, Geometry::TranslatePoint(center, normal, NORMAL_LINE_LENGTH), NORMAL_LINE_COLOR);
 	}
 
 	std::optional<CollisionMeshRayCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
 	{
 		constexpr auto THRESHOLD = 0.001f;
 
-		// Calculate key matrices.
+		// Calculate matrices.
 		auto transformMatrix = GetTransformMatrix();
 		auto invTransformMatrix = transformMatrix.Invert();
 		auto rotMatrix = GetRotationMatrix();
@@ -276,7 +281,7 @@ namespace TEN::Physics
 
 	std::optional<CollisionMeshSphereCollisionData> CollisionMesh::GetCollision(const BoundingSphere& sphere) const
 	{
-		// Calculate key matrices.
+		// Calculate matrices.
 		auto transformMatrix = GetTransformMatrix();
 		auto invTransformMatrix = transformMatrix.Invert();
 		auto rotMatrix = GetRotationMatrix();
@@ -311,7 +316,7 @@ namespace TEN::Physics
 				triData.PortalRoomNumber = tri.GetPortalRoomNumber();
 
 				meshColl.Triangles.push_back(triData);
-				meshColl.Tangents.push_back(Vector3::Transform(tri.GetTangent(sphere, _vertices, _normals), transformMatrix));
+				meshColl.Tangents.push_back(Vector3::Transform(tri.GetTangent(localSphere, _vertices, _normals), transformMatrix));
 				meshColl.Count++;
 			}
 		}

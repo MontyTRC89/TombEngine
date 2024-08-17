@@ -139,27 +139,25 @@ namespace TEN::Entities::Generic
 		auto corners = std::array<Vector3, BoundingOrientedBox::CORNER_COUNT>{};
 		aabb.GetCorners(corners.data());
 
-		// TODO: Corners aren't right anymore.
-
 		// Offset key corners.
-		corners[1] -= offset;
-		corners[3] += offset;
-		corners[5] -= offset;
-		corners[7] += offset;
+		corners[0] += offset;
+		corners[4] += offset;
+		corners[2] -= offset;
+		corners[6] -= offset;
 
 		// Build collision mesh.
 		_collisionMesh.InsertTriangle(corners[0], corners[1], corners[4], Vector3::Transform(UP_NORMAL, tiltRotMatrix));
 		_collisionMesh.InsertTriangle(corners[1], corners[4], corners[5], Vector3::Transform(UP_NORMAL, tiltRotMatrix));
 		_collisionMesh.InsertTriangle(corners[2], corners[3], corners[6], Vector3::Transform(DOWN_NORMAL, tiltRotMatrix));
 		_collisionMesh.InsertTriangle(corners[3], corners[6], corners[7], Vector3::Transform(DOWN_NORMAL, tiltRotMatrix));
-		_collisionMesh.InsertTriangle(corners[4], corners[5], corners[6], FORWARD_NORMAL);
-		_collisionMesh.InsertTriangle(corners[4], corners[6], corners[7], FORWARD_NORMAL);
-		_collisionMesh.InsertTriangle(corners[0], corners[1], corners[2], BACK_NORMAL);
-		_collisionMesh.InsertTriangle(corners[0], corners[2], corners[3], BACK_NORMAL);
-		_collisionMesh.InsertTriangle(corners[1], corners[2], corners[5], LEFT_NORMAL);
-		_collisionMesh.InsertTriangle(corners[2], corners[5], corners[6], LEFT_NORMAL);
-		_collisionMesh.InsertTriangle(corners[0], corners[3], corners[4], RIGHT_NORMAL);
-		_collisionMesh.InsertTriangle(corners[3], corners[4], corners[7], RIGHT_NORMAL);
+		_collisionMesh.InsertTriangle(corners[0], corners[1], corners[2], FORWARD_NORMAL);
+		_collisionMesh.InsertTriangle(corners[0], corners[2], corners[3], FORWARD_NORMAL);
+		_collisionMesh.InsertTriangle(corners[4], corners[5], corners[6], BACK_NORMAL);
+		_collisionMesh.InsertTriangle(corners[4], corners[6], corners[7], BACK_NORMAL);
+		_collisionMesh.InsertTriangle(corners[0], corners[3], corners[4], LEFT_NORMAL);
+		_collisionMesh.InsertTriangle(corners[3], corners[4], corners[7], LEFT_NORMAL);
+		_collisionMesh.InsertTriangle(corners[1], corners[2], corners[5], RIGHT_NORMAL);
+		_collisionMesh.InsertTriangle(corners[2], corners[5], corners[6], RIGHT_NORMAL);
 		_collisionMesh.Cook();
 
 		// Set collision mesh position and orientation.

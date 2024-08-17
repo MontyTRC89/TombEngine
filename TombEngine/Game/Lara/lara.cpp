@@ -567,7 +567,18 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (DebugMode)
 	{
 		if (GetDebugPage() == RendererDebugPage::RoomMeshStats)
-			g_Level.Rooms[item->RoomNumber].CollisionMesh.DrawDebug();
+		{
+			const auto& room = g_Level.Rooms[item->RoomNumber];
+			room.CollisionMesh.DrawDebug();
+
+			for (const auto& bridgeMovID : room.Bridges.GetIds())
+			{
+				const auto& bridgeItem = g_Level.Items[bridgeMovID];
+				const auto& bridge = GetBridgeObject(bridgeItem);
+
+				bridge.GetCollisionMesh().DrawDebug();
+			}
+		}
 
 		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().PathfindingBoxID);
 		DrawNearbySectorFlags(*item);
