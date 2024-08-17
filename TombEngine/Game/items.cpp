@@ -17,6 +17,7 @@
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
@@ -35,6 +36,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Utils;
+using TEN::Renderer::g_Renderer;
 
 constexpr auto ITEM_DEATH_TIMEOUT = 4 * FPS;
 
@@ -194,6 +196,11 @@ bool ItemInfo::IsCreature() const
 bool ItemInfo::IsBridge() const
 {
 	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
+}
+
+std::vector<BoundingSphere> ItemInfo::GetSpheres() const
+{
+	return g_Renderer.GetSpheres(Index);
 }
 
 bool TestState(int refStateID, const std::vector<int>& stateIds)

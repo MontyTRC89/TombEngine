@@ -995,7 +995,7 @@ namespace TEN::Gui
 		{
 			ScreenResolution,
 			WindowModeOption,
-			//FrameRateModeOption,
+			//FrameRateMode,
 			ShadowType,
 			Caustics,
 			Antialiasing,
@@ -1783,7 +1783,7 @@ namespace TEN::Gui
 
 	void GuiController::ConstructObjectList(ItemInfo* item)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 
 		Rings[(int)RingTypes::Inventory].NumObjectsInList = 0;
 
@@ -1799,19 +1799,19 @@ namespace TEN::Gui
 
 		if (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() != LaraType::Young)
 		{
-			if (lara->Weapons[(int)LaraWeaponType::Pistol].Present)
+			if (player.Weapons[(int)LaraWeaponType::Pistol].Present)
 				InsertObjectIntoList(INV_OBJECT_PISTOLS);
 			else if (Ammo.AmountPistolsAmmo)
 				InsertObjectIntoList(INV_OBJECT_PISTOLS_AMMO);
 
-			if (lara->Weapons[(int)LaraWeaponType::Uzi].Present)
+			if (player.Weapons[(int)LaraWeaponType::Uzi].Present)
 				InsertObjectIntoList(INV_OBJECT_UZIS);
 			else if (Ammo.AmountUziAmmo)
 				InsertObjectIntoList(INV_OBJECT_UZI_AMMO);
 
-			if (lara->Weapons[(int)LaraWeaponType::Revolver].Present)
+			if (player.Weapons[(int)LaraWeaponType::Revolver].Present)
 			{
-				if (lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
+				if (player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
 					InsertObjectIntoList(INV_OBJECT_REVOLVER_LASER);
 				else
 					InsertObjectIntoList(INV_OBJECT_REVOLVER);
@@ -1819,11 +1819,11 @@ namespace TEN::Gui
 			else if (Ammo.AmountRevolverAmmo)
 				InsertObjectIntoList(INV_OBJECT_REVOLVER_AMMO);
 
-			if (lara->Weapons[(int)LaraWeaponType::Shotgun].Present)
+			if (player.Weapons[(int)LaraWeaponType::Shotgun].Present)
 			{
 				InsertObjectIntoList(INV_OBJECT_SHOTGUN);
 
-				if (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo2)
+				if (player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo2)
 					Ammo.CurrentShotGunAmmoType = 1;
 			}
 			else
@@ -1835,33 +1835,33 @@ namespace TEN::Gui
 					InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO_2);
 			}
 
-			if (lara->Weapons[(int)LaraWeaponType::HK].Present)
+			if (player.Weapons[(int)LaraWeaponType::HK].Present)
 			{
-				if (lara->Weapons[(int)LaraWeaponType::HK].HasLasersight)
+				if (player.Weapons[(int)LaraWeaponType::HK].HasLasersight)
 					InsertObjectIntoList(INV_OBJECT_HK_LASERSIGHT);
 				else
 					InsertObjectIntoList(INV_OBJECT_HK);
 
-				if (lara->Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
+				if (player.Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
 					Ammo.CurrentHKAmmoType = 1;
 
-				if (lara->Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3)
+				if (player.Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3)
 					Ammo.CurrentHKAmmoType = 2;
 			}
 			else if (Ammo.AmountHKAmmo1)
 				InsertObjectIntoList(INV_OBJECT_HK_AMMO);
 
-			if (lara->Weapons[(int)LaraWeaponType::Crossbow].Present)
+			if (player.Weapons[(int)LaraWeaponType::Crossbow].Present)
 			{
-				if (lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
+				if (player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
 					InsertObjectIntoList(INV_OBJECT_CROSSBOW_LASER);
 				else
 					InsertObjectIntoList(INV_OBJECT_CROSSBOW);
 
-				if (lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
+				if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
 					Ammo.CurrentCrossBowAmmoType = 1;
 
-				if (lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo3)
+				if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo3)
 					Ammo.CurrentCrossBowAmmoType = 2;
 			}
 			else
@@ -1876,14 +1876,14 @@ namespace TEN::Gui
 					InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO_3);
 			}
 
-			if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+			if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
 			{
 				InsertObjectIntoList(INV_OBJECT_GRENADE_LAUNCHER);
 
-				if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
+				if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
 					Ammo.CurrentGrenadeGunAmmoType = 1;
 
-				if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo3)
+				if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo3)
 					Ammo.CurrentGrenadeGunAmmoType = 2;
 			}
 			else
@@ -1898,107 +1898,107 @@ namespace TEN::Gui
 					InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO_3);
 			}
 
-			if (lara->Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+			if (player.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
 				InsertObjectIntoList(INV_OBJECT_ROCKET_LAUNCHER);
 			else if (Ammo.AmountRocketsAmmo)
 				InsertObjectIntoList(INV_OBJECT_ROCKET_AMMO);
 
-			if (lara->Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+			if (player.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
 				InsertObjectIntoList(INV_OBJECT_HARPOON_GUN);
 			else if (Ammo.AmountHarpoonAmmo)
 				InsertObjectIntoList(INV_OBJECT_HARPOON_AMMO);
 
-			if (lara->Inventory.HasLasersight)
+			if (player.Inventory.HasLasersight)
 				InsertObjectIntoList(INV_OBJECT_LASERSIGHT);
 
-			if (lara->Inventory.HasSilencer)
+			if (player.Inventory.HasSilencer)
 				InsertObjectIntoList(INV_OBJECT_SILENCER);
 
-			if (lara->Inventory.HasBinoculars)
+			if (player.Inventory.HasBinoculars)
 				InsertObjectIntoList(INV_OBJECT_BINOCULARS);
 
-			if (lara->Inventory.TotalFlares)
+			if (player.Inventory.TotalFlares)
 				InsertObjectIntoList(INV_OBJECT_FLARES);
 		}
 
 		InsertObjectIntoList(INV_OBJECT_TIMEX);//every level has the timex? what's a good way to check?!
 
-		if (lara->Inventory.TotalSmallMedipacks)
+		if (player.Inventory.TotalSmallMedipacks)
 			InsertObjectIntoList(INV_OBJECT_SMALL_MEDIPACK);
 
-		if (lara->Inventory.TotalLargeMedipacks)
+		if (player.Inventory.TotalLargeMedipacks)
 			InsertObjectIntoList(INV_OBJECT_LARGE_MEDIPACK);
 
-		if (lara->Inventory.HasCrowbar)
+		if (player.Inventory.HasCrowbar)
 			InsertObjectIntoList(INV_OBJECT_CROWBAR);
 
-		if (lara->Inventory.BeetleComponents)
+		if (player.Inventory.BeetleComponents)
 		{
-			if (lara->Inventory.BeetleComponents & BEETLECOMP_FLAG_BEETLE)
+			if (player.Inventory.BeetleComponents & BEETLECOMP_FLAG_BEETLE)
 				InsertObjectIntoList(INV_OBJECT_BEETLE);
 
-			if (lara->Inventory.BeetleComponents & BEETLECOMP_FLAG_COMBO_1)
+			if (player.Inventory.BeetleComponents & BEETLECOMP_FLAG_COMBO_1)
 				InsertObjectIntoList(INV_OBJECT_BEETLE_PART1);
 
-			if (lara->Inventory.BeetleComponents & BEETLECOMP_FLAG_COMBO_2)
+			if (player.Inventory.BeetleComponents & BEETLECOMP_FLAG_COMBO_2)
 				InsertObjectIntoList(INV_OBJECT_BEETLE_PART2);
 		}
 
-		if (lara->Inventory.SmallWaterskin)
-			InsertObjectIntoList((lara->Inventory.SmallWaterskin - 1) + INV_OBJECT_SMALL_WATERSKIN_EMPTY);
+		if (player.Inventory.SmallWaterskin)
+			InsertObjectIntoList((player.Inventory.SmallWaterskin - 1) + INV_OBJECT_SMALL_WATERSKIN_EMPTY);
 
-		if (lara->Inventory.BigWaterskin)
-			InsertObjectIntoList((lara->Inventory.BigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN_EMPTY);
+		if (player.Inventory.BigWaterskin)
+			InsertObjectIntoList((player.Inventory.BigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN_EMPTY);
 
 		for (int i = 0; i < NUM_PUZZLES; i++)
 		{
-			if (lara->Inventory.Puzzles[i])
+			if (player.Inventory.Puzzles[i])
 				InsertObjectIntoList(INV_OBJECT_PUZZLE1 + i);
 		}
 
 		for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
 		{
-			if (lara->Inventory.PuzzlesCombo[i])
+			if (player.Inventory.PuzzlesCombo[i])
 				InsertObjectIntoList(INV_OBJECT_PUZZLE1_COMBO1 + i);
 		}
 
 		for (int i = 0; i < NUM_KEYS; i++)
 		{
-			if (lara->Inventory.Keys[i])
+			if (player.Inventory.Keys[i])
 				InsertObjectIntoList(INV_OBJECT_KEY1 + i);
 		}
 
 		for (int i = 0; i < NUM_KEY_PIECES; i++)
 		{
-			if (lara->Inventory.KeysCombo[i])
+			if (player.Inventory.KeysCombo[i])
 				InsertObjectIntoList(INV_OBJECT_KEY1_COMBO1 + i);
 		}
 
 		for (int i = 0; i < NUM_PICKUPS; i++)
 		{
-			if (lara->Inventory.Pickups[i])
+			if (player.Inventory.Pickups[i])
 				InsertObjectIntoList(INV_OBJECT_PICKUP1 + i);
 		}
 
 		for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
 		{
-			if (lara->Inventory.PickupsCombo[i])
+			if (player.Inventory.PickupsCombo[i])
 				InsertObjectIntoList(INV_OBJECT_PICKUP1_COMBO1 + i);
 		}
 
 		for (int i = 0; i < NUM_EXAMINES; i++)
 		{
-			if (lara->Inventory.Examines[i])
+			if (player.Inventory.Examines[i])
 				InsertObjectIntoList(INV_OBJECT_EXAMINE1 + i);
 		}
 
 		for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
 		{
-			if (lara->Inventory.ExaminesCombo[i])
+			if (player.Inventory.ExaminesCombo[i])
 				InsertObjectIntoList(INV_OBJECT_EXAMINE1_COMBO1 + i);
 		}
 
-		if (lara->Inventory.Diary.Present)
+		if (player.Inventory.Diary.Present)
 			InsertObjectIntoList(INV_OBJECT_DIARY);
 
 		if (g_GameFlow->IsLoadSaveEnabled())
@@ -2019,7 +2019,7 @@ namespace TEN::Gui
 
 	void GuiController::ConstructCombineObjectList(ItemInfo* item)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 
 		Rings[(int)RingTypes::Ammo].NumObjectsInList = 0;
 
@@ -2028,73 +2028,73 @@ namespace TEN::Gui
 
 		if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
 		{
-			if (lara->Weapons[(int)LaraWeaponType::Revolver].Present)
+			if (player.Weapons[(int)LaraWeaponType::Revolver].Present)
 			{
-				if (lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
+				if (player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
 					InsertObjectIntoList_v2(INV_OBJECT_REVOLVER_LASER);
 				else
 					InsertObjectIntoList_v2(INV_OBJECT_REVOLVER);
 			}
 
-			if (lara->Weapons[(int)LaraWeaponType::HK].Present)
+			if (player.Weapons[(int)LaraWeaponType::HK].Present)
 			{
-				if (lara->Weapons[(int)LaraWeaponType::HK].HasLasersight)
+				if (player.Weapons[(int)LaraWeaponType::HK].HasLasersight)
 					InsertObjectIntoList_v2(INV_OBJECT_HK_LASERSIGHT);
 				else
 					InsertObjectIntoList_v2(INV_OBJECT_HK);
 			}
 
-			if (lara->Weapons[(int)LaraWeaponType::Crossbow].Present)
+			if (player.Weapons[(int)LaraWeaponType::Crossbow].Present)
 			{
-				if (lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
+				if (player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
 					InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW_LASER);
 				else
 					InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW);
 			}
 
-			if (lara->Inventory.HasLasersight)
+			if (player.Inventory.HasLasersight)
 				InsertObjectIntoList_v2(INV_OBJECT_LASERSIGHT);
 
-			if (lara->Inventory.HasSilencer)
+			if (player.Inventory.HasSilencer)
 				InsertObjectIntoList_v2(INV_OBJECT_SILENCER);
 		}
 
-		if (lara->Inventory.BeetleComponents)
+		if (player.Inventory.BeetleComponents)
 		{
-			if (lara->Inventory.BeetleComponents & 2)
+			if (player.Inventory.BeetleComponents & 2)
 				InsertObjectIntoList_v2(INV_OBJECT_BEETLE_PART1);
 
-			if (lara->Inventory.BeetleComponents & 4)
+			if (player.Inventory.BeetleComponents & 4)
 				InsertObjectIntoList_v2(INV_OBJECT_BEETLE_PART2);
 		}
 
-		if (lara->Inventory.SmallWaterskin)
-			InsertObjectIntoList_v2(lara->Inventory.SmallWaterskin - 1 + INV_OBJECT_SMALL_WATERSKIN_EMPTY);
+		if (player.Inventory.SmallWaterskin)
+			InsertObjectIntoList_v2(player.Inventory.SmallWaterskin - 1 + INV_OBJECT_SMALL_WATERSKIN_EMPTY);
 
-		if (lara->Inventory.BigWaterskin)
-			InsertObjectIntoList_v2(lara->Inventory.BigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN_EMPTY);
+		if (player.Inventory.BigWaterskin)
+			InsertObjectIntoList_v2(player.Inventory.BigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN_EMPTY);
 
 		for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
 		{
-			if (lara->Inventory.PuzzlesCombo[i])
+			if (player.Inventory.PuzzlesCombo[i])
 				InsertObjectIntoList_v2(INV_OBJECT_PUZZLE1_COMBO1 + i);
 		}
 
 		for (int i = 0; i < NUM_KEY_PIECES; i++)
 		{
-			if (lara->Inventory.KeysCombo[i])
+			if (player.Inventory.KeysCombo[i])
 				InsertObjectIntoList_v2(INV_OBJECT_KEY1_COMBO1 + i);
 		}
 
 		for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
 		{
-			if (lara->Inventory.PickupsCombo[i])
+			if (player.Inventory.PickupsCombo[i])
 				InsertObjectIntoList_v2(INV_OBJECT_PICKUP1_COMBO1 + i);
 		}
 
 		for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
 		{
-			if (lara->Inventory.ExaminesCombo[i])
+			if (player.Inventory.ExaminesCombo[i])
 				InsertObjectIntoList_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
 		}
 
@@ -2112,45 +2112,45 @@ namespace TEN::Gui
 
 	void GuiController::InitializeInventory(ItemInfo* item)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 
 		SetFov(ANGLE(DEFAULT_FOV), false);
-		lara->Inventory.IsBusy = false;
+		player.Inventory.IsBusy = false;
 		InventoryItemChosen = NO_VALUE;
 		ItemUsed = false;
 
-		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].HasInfinite())
+		if (player.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].HasInfinite())
 		{
 			Ammo.AmountShotGunAmmo1 = -1;
 		}
 		else
 		{
-			Ammo.AmountShotGunAmmo1 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].GetCount() / 6;
+			Ammo.AmountShotGunAmmo1 = player.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].GetCount() / 6;
 		}
 
-		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].HasInfinite())
+		if (player.Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].HasInfinite())
 		{
 			Ammo.AmountShotGunAmmo2 = -1;
 		}
 		else
 		{
-			Ammo.AmountShotGunAmmo2 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].GetCount() / 6;
+			Ammo.AmountShotGunAmmo2 = player.Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].GetCount() / 6;
 		}
 
-		Ammo.AmountShotGunAmmo1 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
-		Ammo.AmountShotGunAmmo2 = lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
-		Ammo.AmountHKAmmo1 = lara->Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
-		Ammo.AmountCrossBowAmmo1 = lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
-		Ammo.AmountCrossBowAmmo2 = lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
-		Ammo.AmountCrossBowAmmo3 = lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].GetCount();
-		Ammo.AmountUziAmmo = lara->Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
-		Ammo.AmountRevolverAmmo = lara->Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
-		Ammo.AmountPistolsAmmo = lara->Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
-		Ammo.AmountRocketsAmmo = lara->Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
-		Ammo.AmountHarpoonAmmo = lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite()? -1 : lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
-		Ammo.AmountGrenadeAmmo1 = lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
-		Ammo.AmountGrenadeAmmo2 = lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
-		Ammo.AmountGrenadeAmmo3 = lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].HasInfinite() ? -1 : lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].GetCount();
+		Ammo.AmountShotGunAmmo1 = player.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+		Ammo.AmountShotGunAmmo2 = player.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
+		Ammo.AmountHKAmmo1 = player.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+		Ammo.AmountCrossBowAmmo1 = player.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+		Ammo.AmountCrossBowAmmo2 = player.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
+		Ammo.AmountCrossBowAmmo3 = player.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].GetCount();
+		Ammo.AmountUziAmmo = player.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+		Ammo.AmountRevolverAmmo = player.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+		Ammo.AmountPistolsAmmo = player.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+		Ammo.AmountRocketsAmmo = player.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+		Ammo.AmountHarpoonAmmo = player.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite()? -1 : player.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+		Ammo.AmountGrenadeAmmo1 = player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
+		Ammo.AmountGrenadeAmmo2 = player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].GetCount();
+		Ammo.AmountGrenadeAmmo3 = player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].HasInfinite() ? -1 : player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].GetCount();
 		ConstructObjectList(item);
 
 		if (EnterInventory == NO_VALUE)
@@ -2528,7 +2528,7 @@ namespace TEN::Gui
 
 	void GuiController::DoInventory(ItemInfo* item)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 		auto& invRing = Rings[(int)RingTypes::Inventory];
 		auto& ammoRing = Rings[(int)RingTypes::Ammo];
 
@@ -2831,7 +2831,7 @@ namespace TEN::Gui
 
 					case MenuType::Diary:
 						SetInventoryMode(InventoryMode::Diary);
-						lara->Inventory.Diary.CurrentPage = 1;
+						player.Inventory.Diary.CurrentPage = 1;
 						break;
 					}
 				}
@@ -2859,51 +2859,51 @@ namespace TEN::Gui
 	// Update the selected ammo of weapons that require it, and only these.
 	void GuiController::UpdateWeaponStatus(ItemInfo* item)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 
-		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Present)
+		if (player.Weapons[(int)LaraWeaponType::Shotgun].Present)
 		{
 			if (Ammo.CurrentShotGunAmmoType)
-				lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo = WeaponAmmoType::Ammo2;
+				player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo = WeaponAmmoType::Ammo2;
 			else
-				lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo = WeaponAmmoType::Ammo1;
+				player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo = WeaponAmmoType::Ammo1;
 		}
 
-		if (lara->Weapons[(int)LaraWeaponType::Crossbow].Present)
+		if (player.Weapons[(int)LaraWeaponType::Crossbow].Present)
 		{
-			lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo1;
+			player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo1;
 
 			if (Ammo.CurrentCrossBowAmmoType == 1)
-				lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo2;
+				player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo2;
 			else if (Ammo.CurrentCrossBowAmmoType == 2)
-				lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo3;
+				player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo3;
 		}
 
-		if (lara->Weapons[(int)LaraWeaponType::HK].Present)
+		if (player.Weapons[(int)LaraWeaponType::HK].Present)
 		{
-			lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_1;
-			lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
+			player.Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_1;
+			player.Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
 
 			if (Ammo.CurrentHKAmmoType == 1)
 			{
-				lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_2;
-				lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
+				player.Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_2;
+				player.Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
 			}
 			else if (Ammo.CurrentHKAmmoType == 2)
 			{
-				lara->Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_3;
-				lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
+				player.Weapons[(int)LaraWeaponType::HK].WeaponMode = LaraWeaponTypeCarried::WTYPE_AMMO_3;
+				player.Weapons[(int)LaraWeaponType::HK].SelectedAmmo = WeaponAmmoType::Ammo1;
 			}
 		}
 
-		if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+		if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
 		{
-			lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo1;
+			player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo1;
 
 			if (Ammo.CurrentGrenadeGunAmmoType == 1)
-				lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo2;
+				player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo2;
 			else if (Ammo.CurrentGrenadeGunAmmoType == 2)
-				lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo3;
+				player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo3;
 		}
 	}
 
@@ -3467,11 +3467,11 @@ namespace TEN::Gui
 
 	bool GuiController::CallInventory(ItemInfo* item, bool resetMode)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 
 		bool doLoad = false;
 
-		lara->Inventory.OldBusy = lara->Inventory.IsBusy;
+		player.Inventory.OldBusy = player.Inventory.IsBusy;
 
 		g_Renderer.DumpGameScene();
 		PauseAllSounds(SoundPauseMode::Inventory);
@@ -3571,7 +3571,7 @@ namespace TEN::Gui
 		SetFov(g_Camera.PrevFov);
 		ResumeAllSounds(SoundPauseMode::Inventory);
 
-		lara->Inventory.IsBusy = lara->Inventory.OldBusy;
+		player.Inventory.IsBusy = player.Inventory.OldBusy;
 		SetInventoryMode(InventoryMode::None);
 
 		return doLoad;
@@ -3626,21 +3626,21 @@ namespace TEN::Gui
 
 	void GuiController::DoDiary(ItemInfo* item)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 
 		SetInventoryMode(InventoryMode::Diary);
 
 		if ((GuiIsPulsed(In::Right) && !IsHeld(In::Left)) &&
-			lara->Inventory.Diary.CurrentPage < lara->Inventory.Diary.NumPages)
+			player.Inventory.Diary.CurrentPage < player.Inventory.Diary.NumPages)
 		{
-			lara->Inventory.Diary.CurrentPage++;
+			player.Inventory.Diary.CurrentPage++;
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
 		if ((GuiIsPulsed(In::Left) && !IsHeld(In::Right)) &&
-			lara->Inventory.Diary.CurrentPage > 1)
+			player.Inventory.Diary.CurrentPage > 1)
 		{
-			lara->Inventory.Diary.CurrentPage--;
+			player.Inventory.Diary.CurrentPage--;
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
@@ -3739,10 +3739,10 @@ namespace TEN::Gui
 
 	bool GuiController::PerformWaterskinCombine(ItemInfo* item, bool flag)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 
-		int smallLiters = lara->Inventory.SmallWaterskin - 1; // How many liters in the small one?
-		int bigLiters = lara->Inventory.BigWaterskin - 1;	  // How many liters in the big one?
+		int smallLiters = player.Inventory.SmallWaterskin - 1; // How many liters in the small one?
+		int bigLiters = player.Inventory.BigWaterskin - 1;	  // How many liters in the big one?
 		int smallCapacity = 3 - smallLiters;				  // How many more liters can fit in the small one?
 		int bigCapacity = 5 - bigLiters;					  // How many more liters can fit in the big one?
 
@@ -3750,7 +3750,7 @@ namespace TEN::Gui
 		if (flag)
 		{
 			// Big one isn't empty and the small one isn't full.
-			if (lara->Inventory.BigWaterskin != 1 && smallCapacity)
+			if (player.Inventory.BigWaterskin != 1 && smallCapacity)
 			{
 				i = bigLiters;
 
@@ -3766,8 +3766,8 @@ namespace TEN::Gui
 					i--;
 				} while (i);
 
-				lara->Inventory.SmallWaterskin = smallLiters + 1;
-				lara->Inventory.BigWaterskin = bigLiters + 1;
+				player.Inventory.SmallWaterskin = smallLiters + 1;
+				player.Inventory.BigWaterskin = bigLiters + 1;
 				CombineObject1 = (smallLiters + 1) + (INV_OBJECT_SMALL_WATERSKIN_EMPTY - 1);
 				return true;
 			}
@@ -3775,9 +3775,9 @@ namespace TEN::Gui
 		else
 		{
 			// Small one isn't empty and the big one isn't full.
-			if (lara->Inventory.SmallWaterskin != 1 && bigCapacity)
+			if (player.Inventory.SmallWaterskin != 1 && bigCapacity)
 			{
-				i = lara->Inventory.SmallWaterskin - 1;
+				i = player.Inventory.SmallWaterskin - 1;
 
 				do
 				{
@@ -3791,8 +3791,8 @@ namespace TEN::Gui
 					i--;
 				} while (i);
 
-				lara->Inventory.SmallWaterskin = smallLiters + 1;
-				lara->Inventory.BigWaterskin = bigLiters + 1;
+				player.Inventory.SmallWaterskin = smallLiters + 1;
+				player.Inventory.BigWaterskin = bigLiters + 1;
 				CombineObject1 = (bigLiters + 1) + (INV_OBJECT_BIG_WATERSKIN_EMPTY - 1);
 				return true;
 			}

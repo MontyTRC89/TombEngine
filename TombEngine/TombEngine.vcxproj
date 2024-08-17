@@ -341,6 +341,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   <ItemGroup>
     <ClInclude Include="Game\collision\Los.h" />
     <ClInclude Include="Game\collision\Point.h" />
+    <ClInclude Include="Game\collision\Sphere.h" />
     <ClInclude Include="Game\Debug\Debug.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\DisplaySprite.h" />
@@ -378,7 +379,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\collision\collide_room.h" />
     <ClInclude Include="Game\collision\floordata.h" />
-    <ClInclude Include="Game\collision\sphere.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\control.h" />
     <ClInclude Include="Game\control\flipeffect.h" />
@@ -868,7 +868,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\collision\Los.cpp" />
     <ClCompile Include="Game\collision\Point.cpp" />
-    <ClCompile Include="Game\collision\sphere.cpp" />
+    <ClCompile Include="Game\collision\Sphere.cpp" />
     <ClCompile Include="Game\control\box.cpp" />
     <ClCompile Include="Game\control\control.cpp" />
     <ClCompile Include="Game\control\flipeffect.cpp" />

@@ -137,13 +137,6 @@ int GetFloorHeight(const FloorInfo* floor, int x, int y, int z);
 int GetCeiling(const FloorInfo* floor, int x, int y, int z);
 int GetDistanceToFloor(int itemNumber, bool precise = true);
 
-int GetWaterSurface(int x, int y, int z, short roomNumber);
-int GetWaterSurface(ItemInfo* item);
-int GetWaterDepth(int x, int y, int z, short roomNumber);
-int GetWaterDepth(ItemInfo* item);
-int GetWaterHeight(int x, int y, int z, short roomNumber);
-int GetWaterHeight(ItemInfo* item);
-
 int  FindGridShift(int x, int z);
 void ShiftItem(ItemInfo* item, CollisionInfo* coll);
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapToAngle = true);

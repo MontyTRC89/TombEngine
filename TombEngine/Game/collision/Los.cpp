@@ -148,10 +148,10 @@ namespace TEN::Collision::Los
 				// 2.2) Collect moveable sphere LOS collisions.
 				if (collideSpheres)
 				{
-					int sphereCount = GetSpheres(mov, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-					for (int i = 0; i < sphereCount; i++)
+					auto spheres = mov->GetSpheres();
+					for (int i = 0; i < spheres.size(); i++)
 					{
-						auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
+						const auto& sphere = spheres[i];
 
 						float intersectDist = 0.0f;
 						if (sphere.Intersects(origin, dir, intersectDist) && intersectDist <= dist)

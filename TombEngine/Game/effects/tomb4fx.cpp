@@ -5,6 +5,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
@@ -27,6 +28,7 @@ using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
@@ -1117,7 +1119,7 @@ void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
 		TriggerExplosionBubbles(x, y, z, item->RoomNumber);
 		TriggerExplosionSparks(x, y, z, 2, -1, 1, item->RoomNumber);
 
-		int waterHeight = GetWaterHeight(x, y, z, item->RoomNumber);
+		int waterHeight = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetWaterTopHeight();
 		if (waterHeight != NO_HEIGHT)
 			SomeSparkEffect(x, waterHeight, z, 8);
 	}
@@ -1129,7 +1131,7 @@ void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
 		for (int i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, -1, 1, item->RoomNumber);
 
-		int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+		int waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 		if (waterHeight != NO_HEIGHT)
 		{
 			int dy = item->Pose.Position.y - waterHeight;

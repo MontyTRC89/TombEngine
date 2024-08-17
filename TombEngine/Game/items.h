@@ -181,6 +181,10 @@ struct ItemInfo
 	bool IsLara() const;
 	bool IsCreature() const;
 	bool IsBridge() const;
+
+	// Getters
+
+	std::vector<BoundingSphere> GetSpheres() const;
 };
 
 bool TestState(int refStateID, const std::vector<int>& stateIds);

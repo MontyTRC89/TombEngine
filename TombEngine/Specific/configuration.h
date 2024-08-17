@@ -64,6 +64,13 @@ namespace TEN::Config
 		Off
 	};
 
+	enum class MenuOptionLoopingMode
+	{
+		AllMenus,
+		SaveLoadOnly,
+		Off
+	};
+
 	enum class ControlMode
 	{
 		Classic,
