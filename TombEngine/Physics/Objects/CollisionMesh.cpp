@@ -122,11 +122,11 @@ namespace TEN::Physics
 		return c3;
 	}*/
 
-	bool CollisionTriangle::Intersects(const Ray& ray, float& dist, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
+	bool CollisionTriangle::Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
 		// Test if ray intersects triangle AABB.
-		float boxDist = 0.0f;
-		if (!ray.Intersects(_aabb, boxDist))
+		float aabbDist = 0.0f;
+		if (!ray.Intersects(_aabb, aabbDist) || aabbDist >= distMax)
 			return false;
 
 		// Get normal.
@@ -216,7 +216,7 @@ namespace TEN::Physics
 		DrawDebugTriangle(vertex0, vertex1, vertex2, IsPortal() ? PORTAL_TRI_COLOR : TANGIBLE_TRI_COLOR);
 
 		// Draw normal line.
-		auto center = (vertex0 + vertex1 + vertex2) / 3;
+		auto center = (vertex0 + vertex1 + vertex2) / VERTEX_COUNT;
 		DrawDebugLine(center, Geometry::TranslatePoint(center, normal, NORMAL_LINE_LENGTH), NORMAL_LINE_COLOR);
 	}
 
@@ -224,14 +224,12 @@ namespace TEN::Physics
 	{
 		constexpr auto THRESHOLD = 0.001f;
 
-		// Calculate matrices.
+		// Get matrices.
 		auto transformMatrix = GetTransformMatrix();
-		auto invTransformMatrix = transformMatrix.Invert();
 		auto rotMatrix = GetRotationMatrix();
-		auto invRotMatrix = rotMatrix.Invert();
 
 		// Calculate local ray.
-		auto localRay = Ray(Vector3::Transform(ray.position, invTransformMatrix), Vector3::Transform(ray.direction, invRotMatrix));
+		auto localRay = Ray(Vector3::Transform(ray.position, transformMatrix.Invert()), Vector3::Transform(ray.direction, rotMatrix.Invert()));
 
 		// Get bounded triangle IDs.
 		auto triIds = _triangleTree.GetBoundedObjectIds(localRay, dist);
@@ -247,7 +245,7 @@ namespace TEN::Physics
 			const auto& tri = _triangles[triID];
 
 			float intersectDist = 0.0f;
-			if (tri.Intersects(localRay, intersectDist, _vertices, _normals) && intersectDist < closestDist)
+			if (tri.Intersects(localRay, closestDist, intersectDist, _vertices, _normals))
 			{
 				// Prioritize tangible triangle in case portal triangle coincides.
 				if (tri.GetPortalRoomNumber() == NO_VALUE || abs(intersectDist - closestDist) > THRESHOLD)
@@ -281,13 +279,12 @@ namespace TEN::Physics
 
 	std::optional<CollisionMeshSphereCollisionData> CollisionMesh::GetCollision(const BoundingSphere& sphere) const
 	{
-		// Calculate matrices.
+		// Get matrices.
 		auto transformMatrix = GetTransformMatrix();
-		auto invTransformMatrix = transformMatrix.Invert();
 		auto rotMatrix = GetRotationMatrix();
 
 		// Calculate local sphere.
-		auto localSphere = BoundingSphere(Vector3::Transform(sphere.Center, invTransformMatrix), sphere.Radius);
+		auto localSphere = BoundingSphere(Vector3::Transform(sphere.Center, transformMatrix.Invert()), sphere.Radius);
 
 		// Get bounded triangle IDs.
 		auto triIds = _triangleTree.GetBoundedObjectIds(localSphere);

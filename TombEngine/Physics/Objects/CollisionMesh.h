@@ -39,7 +39,7 @@ namespace TEN::Physics
 
 		// Inquirers
 
-		bool Intersects(const Ray& ray, float& dist, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
+		bool Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
 		bool Intersects(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
 		bool IsPortal() const;
 
