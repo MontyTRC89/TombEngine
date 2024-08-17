@@ -723,14 +723,11 @@ namespace TEN::Renderer
 												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
 													auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
-													if (isYoung)
+													if (isYoung && parentVertex->OriginalIndex == parentVertices1[currentVertex->OriginalIndex])
 													{
-														if (parentVertex->OriginalIndex == parentVertices1[currentVertex->OriginalIndex])
-														{
-															currentVertex->Bone = 0;
-															currentVertex->Position = parentVertex->Position;
-															currentVertex->Normal = parentVertex->Normal;
-														}
+														currentVertex->Bone = 0;
+														currentVertex->Position = parentVertex->Position;
+														currentVertex->Normal = parentVertex->Normal;
 													}
 													else if (parentVertex->OriginalIndex == parentVertices0[currentVertex->OriginalIndex])
 													{
@@ -805,17 +802,20 @@ namespace TEN::Renderer
 										auto* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
 										auto* parentBone = skinObj.LinearizedBones[LM_HEAD];
 
-										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
+										if (currentVertex->OriginalIndex < 4)
 										{
-											auto* parentBucket = &parentMesh->Buckets[b2];
-											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
+											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 											{
-												auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
-												if (isYoung && parentVertex->OriginalIndex == parentVertices2[currentVertex->OriginalIndex])
+												auto* parentBucket = &parentMesh->Buckets[b2];
+												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
-													currentVertex->Bone = 0;
-													currentVertex->Position = parentVertex->Position;
-													currentVertex->Normal = parentVertex->Normal;
+													auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
+													if (isYoung && parentVertex->OriginalIndex == parentVertices2[currentVertex->OriginalIndex])
+													{
+														currentVertex->Bone = 0;
+														currentVertex->Position = parentVertex->Position;
+														currentVertex->Normal = parentVertex->Normal;
+													}
 												}
 											}
 										}
