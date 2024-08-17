@@ -130,9 +130,8 @@ namespace TEN::Effects::Drip
 				// Spawn ripple on surface only.
 				if (!TestEnvironment(ENV_FLAG_WATER, prevRoomNumber))
 				{
-					float waterHeight = GetWaterHeight(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
 					SpawnRipple(
-						Vector3(drip.Position.x, waterHeight - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
+						Vector3(drip.Position.x, pointColl.GetWaterTopHeight() - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
 						pointColl.GetRoomNumber(),
 						Random::GenerateFloat(RIPPLE_SIZE_WATER_MIN, RIPPLE_SIZE_WATER_MAX),
 						(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
