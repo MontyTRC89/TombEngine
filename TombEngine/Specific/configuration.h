@@ -61,14 +61,9 @@ namespace TEN::Config
 	{
 		AllMenus,
 		SaveLoadOnly,
-		Off
-	};
+		Off,
 
-	enum class MenuOptionLoopingMode
-	{
-		AllMenus,
-		SaveLoadOnly,
-		Off
+		Count
 	};
 
 	enum class ControlMode
