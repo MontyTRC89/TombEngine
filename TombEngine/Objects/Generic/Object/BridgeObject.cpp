@@ -134,9 +134,9 @@ namespace TEN::Entities::Generic
 		}
 
 		// Get local AABB corners.
-		auto bounds = GetAnimFrame(item, 0, 0).BoundingBox;
+		const auto& bounds = GetAnimFrame(item, 0, 0).BoundingBox;
 		auto aabb = BoundingBox(bounds.GetCenter(), bounds.GetExtents());
-		auto corners = std::array<Vector3, BoundingOrientedBox::CORNER_COUNT>{};
+		auto corners = std::array<Vector3, BoundingBox::CORNER_COUNT>{};
 		aabb.GetCorners(corners.data());
 
 		// Offset key corners.

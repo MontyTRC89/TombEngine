@@ -8,7 +8,7 @@ using namespace TEN::Structures;
 
 namespace TEN::Physics
 {
-	class CollisionTriangle
+	class LocalCollisionTriangle
 	{
 	public:
 		static constexpr auto VERTEX_COUNT = 3;
@@ -24,7 +24,7 @@ namespace TEN::Physics
 	public:
 		// Constructors
 
-		CollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, int normalID, const BoundingBox& aabb, int portalRoomNumber);
+		LocalCollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, int normalID, const BoundingBox& aabb, int portalRoomNumber);
 
 		// Getters
 
@@ -50,7 +50,7 @@ namespace TEN::Physics
 
 	struct CollisionTriangleData
 	{
-		std::array<Vector3, CollisionTriangle::VERTEX_COUNT> Vertices = {};
+		std::array<Vector3, LocalCollisionTriangle::VERTEX_COUNT> Vertices = {};
 		Vector3 Normal			 = Vector3::Zero;
 		int		PortalRoomNumber = NO_VALUE;
 	};
@@ -80,11 +80,11 @@ namespace TEN::Physics
 
 		// Members
 
-		Vector3						   _position	= Vector3::Zero;
-		Quaternion					   _orientation = Quaternion::Identity;
-		std::vector<CollisionTriangle> _triangles	= {};
-		std::vector<Vector3>		   _vertices	= {};
-		std::vector<Vector3>		   _normals		= {};
+		Vector3								_position	 = Vector3::Zero;
+		Quaternion							_orientation = Quaternion::Identity;
+		std::vector<LocalCollisionTriangle> _triangles	 = {};
+		std::vector<Vector3>				_vertices	 = {};
+		std::vector<Vector3>				_normals	 = {};
 
 		BoundingTree _triangleTree = BoundingTree();
 		Cache		 _cache		   = {};

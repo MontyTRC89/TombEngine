@@ -11,7 +11,7 @@ using namespace TEN::Utils;
 
 namespace TEN::Physics
 {
-	CollisionTriangle::CollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, int normalID, const BoundingBox& aabb, int portalRoomNumber)
+	LocalCollisionTriangle::LocalCollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, int normalID, const BoundingBox& aabb, int portalRoomNumber)
 	{
 		_vertexIds = std::array<int, VERTEX_COUNT>{ vertex0ID, vertex1ID, vertex2ID };
 		_normalID = normalID;
@@ -19,38 +19,38 @@ namespace TEN::Physics
 		_portalRoomNumber = portalRoomNumber;
 	}
 
-	const Vector3& CollisionTriangle::GetVertex0(const std::vector<Vector3>& vertices) const
+	const Vector3& LocalCollisionTriangle::GetVertex0(const std::vector<Vector3>& vertices) const
 	{
 		return vertices[_vertexIds[0]];
 	}
 
-	const Vector3& CollisionTriangle::GetVertex1(const std::vector<Vector3>& vertices) const
+	const Vector3& LocalCollisionTriangle::GetVertex1(const std::vector<Vector3>& vertices) const
 	{
 		return vertices[_vertexIds[1]];
 	}
 
-	const Vector3& CollisionTriangle::GetVertex2(const std::vector<Vector3>& vertices) const
+	const Vector3& LocalCollisionTriangle::GetVertex2(const std::vector<Vector3>& vertices) const
 	{
 		return vertices[_vertexIds[2]];
 	}
 
-	const Vector3& CollisionTriangle::GetNormal(const std::vector<Vector3>& normals) const
+	const Vector3& LocalCollisionTriangle::GetNormal(const std::vector<Vector3>& normals) const
 	{
 		return normals[_normalID];
 	}
 
-	const BoundingBox& CollisionTriangle::GetAabb() const
+	const BoundingBox& LocalCollisionTriangle::GetAabb() const
 	{
 		return _aabb;
 	}
 
-	int CollisionTriangle::GetPortalRoomNumber() const
+	int LocalCollisionTriangle::GetPortalRoomNumber() const
 	{
 		return _portalRoomNumber;
 	}
 
 	// TODO: Triangle treated as infinite.
-	Vector3 CollisionTriangle::GetTangent(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
+	Vector3 LocalCollisionTriangle::GetTangent(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
 		// Get vertices.
 		const auto& vertex0 = GetVertex0(vertices);
@@ -122,7 +122,7 @@ namespace TEN::Physics
 		return c3;
 	}*/
 
-	bool CollisionTriangle::Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
+	bool LocalCollisionTriangle::Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
 		// Test if ray intersects triangle AABB.
 		float aabbDist = 0.0f;
@@ -174,7 +174,7 @@ namespace TEN::Physics
 		return true;
 	}
 
-	bool CollisionTriangle::Intersects(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
+	bool LocalCollisionTriangle::Intersects(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
 		// Get vertices.
 		const auto& vertex0 = GetVertex0(vertices);
@@ -194,12 +194,12 @@ namespace TEN::Physics
 		return (dist <= sphere.Radius);
 	}
 
-	bool CollisionTriangle::IsPortal() const
+	bool LocalCollisionTriangle::IsPortal() const
 	{
 		return (_portalRoomNumber != NO_VALUE);
 	}
 
-	void CollisionTriangle::DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
+	void LocalCollisionTriangle::DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
 	{
 		constexpr auto NORMAL_LINE_LENGTH = BLOCK(0.1f);
 		constexpr auto NORMAL_LINE_COLOR  = Color(1.0f, 1.0f, 1.0f);
@@ -236,7 +236,7 @@ namespace TEN::Physics
 		if (triIds.empty())
 			return std::nullopt;
 
-		const CollisionTriangle* closestTri = nullptr;
+		const LocalCollisionTriangle* closestTri = nullptr;
 		float closestDist = dist;
 
 		// Find closest triangle.
@@ -382,7 +382,7 @@ namespace TEN::Physics
 		auto aabb = Geometry::GetBoundingBox({ vertex0, vertex1, vertex2 });
 
 		// Add triangle.
-		_triangles.push_back(CollisionTriangle(vertex0ID, vertex1ID, vertex2ID, normalID, aabb, portalRoomNumber));
+		_triangles.push_back(LocalCollisionTriangle(vertex0ID, vertex1ID, vertex2ID, normalID, aabb, portalRoomNumber));
 	}
 	
 	void CollisionMesh::Cook()
