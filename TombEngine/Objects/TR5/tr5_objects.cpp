@@ -799,7 +799,6 @@ static void StartObject(ObjectInfo *obj)
 	}
 
 	InitAIObject(obj, ID_AI_GUARD);
-	InitAIObject(obj, ID_AI_GUARD);
 	InitAIObject(obj, ID_AI_AMBUSH);
 	InitAIObject(obj, ID_AI_PATROL1);
 	InitAIObject(obj, ID_AI_MODIFY);
