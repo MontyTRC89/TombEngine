@@ -187,8 +187,8 @@ namespace TEN::Entities::Generic
 					ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - phd_sin(trapDoorItem->Pose.Orientation.y) * 2048;
 					ForcedFixedCamera.y = trapDoorItem->Pose.Position.y - 2048;
 
-					if (ForcedFixedCamera.y < g_Level.Rooms[trapDoorItem->RoomNumber].maxceiling)
-						ForcedFixedCamera.y = g_Level.Rooms[trapDoorItem->RoomNumber].maxceiling;
+					if (ForcedFixedCamera.y < g_Level.Rooms[trapDoorItem->RoomNumber].TopHeight)
+						ForcedFixedCamera.y = g_Level.Rooms[trapDoorItem->RoomNumber].TopHeight;
 
 					ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - phd_cos(trapDoorItem->Pose.Orientation.y) * 2048;
 					ForcedFixedCamera.RoomNumber = trapDoorItem->RoomNumber;

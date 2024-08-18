@@ -147,7 +147,7 @@ namespace TEN::Effects::Bubble
 			if (bubble.Life <= 0.0f)
 				continue;
 
-			// Update room number. TODO: Should use GetCollision(), but calling it for each bubble is very inefficient.
+			// Update room number. TODO: Should use GetPointCollision(), but calling it for each bubble is very inefficient.
 			auto roomVector = RoomVector(bubble.RoomNumber, int(bubble.Position.y - bubble.Gravity));
 			int roomNumber = GetRoomVector(roomVector, Vector3i(bubble.Position.x, bubble.Position.y - bubble.Gravity, bubble.Position.z)).RoomNumber;
 			int prevRoomNumber = bubble.RoomNumber;
@@ -158,7 +158,7 @@ namespace TEN::Effects::Bubble
 			{
 				// Hit water surface; spawn ripple.
 				SpawnRipple(
-					Vector3(bubble.Position.x, g_Level.Rooms[prevRoomNumber].maxceiling, bubble.Position.z),
+					Vector3(bubble.Position.x, g_Level.Rooms[prevRoomNumber].TopHeight, bubble.Position.z),
 					roomNumber,
 					((bubble.SizeMax.x + bubble.SizeMax.y) / 2) * 0.5f,
 					(int)RippleFlags::SlowFade);
@@ -168,7 +168,7 @@ namespace TEN::Effects::Bubble
 			}
 			// Hit ceiling. NOTE: This is a hacky check. New collision fetching should provide fast info on a need-to-know basis.
 			else if (bubble.RoomNumber == prevRoomNumber &&
-				bubble.Position.y <= g_Level.Rooms[prevRoomNumber].maxceiling)
+				bubble.Position.y <= g_Level.Rooms[prevRoomNumber].TopHeight)
 			{
 				bubble.Life = 0.0f;
 				continue;

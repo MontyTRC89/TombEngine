@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/los.h"
@@ -31,6 +32,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
@@ -426,7 +428,7 @@ void FireShotgun(ItemInfo& laraItem)
 
 		player.RightArm.GunFlash = Weapons[(int)LaraWeaponType::Shotgun].FlashTime;
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
+		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::ShallowWater : SoundEnvironment::Land);
 		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem.Pose);
 
 		Rumble(0.5f, 0.2f);
@@ -464,7 +466,7 @@ void DrawShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 		weaponItemPtr->Animation.ActiveState =
 		weaponItemPtr->Animation.TargetState = WEAPON_STATE_DRAW;
 		weaponItemPtr->Status = ITEM_ACTIVE;
-		weaponItemPtr->RoomNumber = NO_ROOM;
+		weaponItemPtr->RoomNumber = NO_VALUE;
 		weaponItemPtr->Pose = laraItem.Pose;
 
 		player.LeftArm.FrameBase =
@@ -600,7 +602,7 @@ bool FireHarpoon(ItemInfo& laraItem, const std::optional<Pose>& pose)
 		auto jointPos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(-2, 373, 77));
 		harpoonItem.RoomNumber = laraItem.RoomNumber;
 
-		int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, harpoonItem.RoomNumber).Position.Floor;
+		int floorHeight = GetPointCollision(jointPos, harpoonItem.RoomNumber).GetFloorHeight();
 		if (floorHeight >= jointPos.y)
 		{
 			harpoonItem.Pose.Position = jointPos;
@@ -693,7 +695,7 @@ void FireGrenade(ItemInfo& laraItem)
 	grenadeItem.Pose.Position = jointPos;
 	auto smokePos = jointPos;
 
-	int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, grenadeItem.RoomNumber).Position.Floor;
+	int floorHeight = GetPointCollision(jointPos, grenadeItem.RoomNumber).GetFloorHeight();
 	if (floorHeight < jointPos.y)
 	{
 		grenadeItem.Pose.Position.x = laraItem.Pose.Position.x;
@@ -1027,9 +1029,11 @@ void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose)
 
 		boltItem.RoomNumber = laraItem.RoomNumber;
 
-		int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, boltItem.RoomNumber).Position.Floor;
+		int floorHeight = GetPointCollision(jointPos, boltItem.RoomNumber).GetFloorHeight();
 		if (floorHeight >= jointPos.y)
+		{
 			boltItem.Pose.Position = jointPos;
+		}
 		else
 		{
 			boltItem.Pose.Position = Vector3i(laraItem.Pose.Position.x, jointPos.y, laraItem.Pose.Position.z);
@@ -1418,20 +1422,20 @@ bool EmitFromProjectile(ItemInfo& projectile, ProjectileType type)
 	return true;
 }
 
-bool TestProjectileNewRoom(ItemInfo& item, const CollisionResult& coll)
+bool TestProjectileNewRoom(ItemInfo& item, PointCollisionData& pointColl)
 {
 	// Check if projectile changed room.
-	if (item.RoomNumber == coll.RoomNumber)
+	if (item.RoomNumber == pointColl.GetRoomNumber())
 		return false;
 
 	// If currently in water and previously on land, spawn ripple.
-	if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) != TestEnvironment(ENV_FLAG_WATER, coll.RoomNumber))
+	if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber) != TestEnvironment(ENV_FLAG_WATER, pointColl.GetRoomNumber()))
 	{
 		const auto& player = GetLaraInfo(item);
 
-		int floorDiff = abs(coll.Position.Floor - item.Pose.Position.y);
-		int ceilingDiff = abs(coll.Position.Ceiling - item.Pose.Position.y);
-		int yPoint = (floorDiff > ceilingDiff) ? coll.Position.Ceiling : coll.Position.Floor;
+		int floorDiff = abs(pointColl.GetFloorHeight() - item.Pose.Position.y);
+		int ceilingDiff = abs(pointColl.GetCeilingHeight() - item.Pose.Position.y);
+		int yPoint = (floorDiff > ceilingDiff) ? pointColl.GetCeilingHeight() : pointColl.GetFloorHeight();
 
 		if (player.Control.Weapon.GunType != LaraWeaponType::GrenadeLauncher && player.Control.Weapon.GunType != LaraWeaponType::RocketLauncher)
 		{
@@ -1447,7 +1451,7 @@ bool TestProjectileNewRoom(ItemInfo& item, const CollisionResult& coll)
 		}
 	}
 
-	ItemNewRoom(item.Index, coll.RoomNumber);
+	ItemNewRoom(item.Index, pointColl.GetRoomNumber());
 	return true;
 }
 
@@ -1475,7 +1479,7 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 
 void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& prevPos, ProjectileType type, int damage)
 {
-	auto pointColl = GetCollision(&projectile);
+	auto pointColl = GetPointCollision(projectile);
 
 	bool hasHit = false;
 	bool hasHitNotByEmitter = false;
@@ -1485,8 +1489,8 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 	// For non-grenade projectiles, check for room collision.
 	if (type < ProjectileType::Grenade)
 	{
-		if (pointColl.Position.Floor < projectile.Pose.Position.y ||
-			pointColl.Position.Ceiling > projectile.Pose.Position.y)
+		if (pointColl.GetFloorHeight() < projectile.Pose.Position.y ||
+			pointColl.GetCeilingHeight() > projectile.Pose.Position.y)
 		{
 			hasHit = hasHitNotByEmitter = true;
 		}
@@ -1554,42 +1558,34 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		}
 
 		// Found possible collided items and statics.
-		GetCollidedObjects(&projectile, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
-
-		// If no collided items and meshes are found, exit the loop.
-		if (!CollidedItems[0] && !CollidedMeshes[0])
+		auto collObjects = GetCollidedObjects(projectile, true, false, radius);
+		if (collObjects.IsEmpty())
 			break;
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		// Run through statics.
+		for (auto* staticPtr : collObjects.Statics)
 		{
-			auto* meshPtr = CollidedMeshes[i];
-			if (!meshPtr)
-				break;
-
 			hasHit = hasHitNotByEmitter = doShatter = true;
 			doExplosion = isExplosive;
 
-			if (StaticObjects[meshPtr->staticNumber].shatterType == ShatterType::None)
+			if (StaticObjects[staticPtr->staticNumber].shatterType == ShatterType::None)
 				continue;
 
-			meshPtr->HitPoints -= damage;
-			if (meshPtr->HitPoints <= 0)
-				ShatterObject(nullptr, meshPtr, -128, projectile.RoomNumber, 0);
+			staticPtr->HitPoints -= damage;
+			if (staticPtr->HitPoints <= 0)
+				ShatterObject(nullptr, staticPtr, -128, projectile.RoomNumber, 0);
 
 			if (!isExplosive)
 				continue;
 
-			TriggerExplosionSparks(meshPtr->pos.Position.x, meshPtr->pos.Position.y, meshPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
-			auto pose = Pose(meshPtr->pos.Position.x, meshPtr->pos.Position.y - 128, meshPtr->pos.Position.z, 0, meshPtr->pos.Orientation.y, 0);
+			TriggerExplosionSparks(staticPtr->pos.Position.x, staticPtr->pos.Position.y, staticPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
+			auto pose = Pose(staticPtr->pos.Position.x, staticPtr->pos.Position.y - 128, staticPtr->pos.Position.z, 0, staticPtr->pos.Orientation.y, 0);
 			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		}
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		// Run through items.
+		for (auto* itemPtr : collObjects.Items)
 		{
-			auto* itemPtr = CollidedItems[i];
-			if (itemPtr == nullptr)
-				break;
-#
 			// Object was already affected by collision, skip it.
 			if (std::find(affectedObjects.begin(), affectedObjects.end(), itemPtr->Index) != affectedObjects.end())
 				continue;
@@ -1652,7 +1648,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				SmashObject(itemPtr->Index);
 				KillItem(itemPtr->Index);
 			}
-			else if (currentObject.collision && !(itemPtr->Status & ITEM_INVISIBLE))
+			else if (currentObject.collision && itemPtr->Status != ITEM_INVISIBLE)
 			{
 				doShatter = hasHit = true;
 				doExplosion = isExplosive;

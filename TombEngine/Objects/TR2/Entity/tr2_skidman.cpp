@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/effects/smoke.h"
@@ -19,6 +19,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Smoke;
 
 namespace TEN::Entities::Creatures::TR2
@@ -96,7 +97,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (!TestBoundsCollide(&item, laraItem, coll->Setup.Radius))
 			return;
 
-		if (!TestCollision(&item, laraItem))
+		if (!HandleItemSphereCollision(item, *laraItem))
 			return;
 
 		if (coll->Setup.EnableObjectPush)
@@ -130,6 +131,9 @@ namespace TEN::Entities::Creatures::TR2
 
 		int skidooItemNumber = (short)riderItem.ItemFlags[0];
 		auto* skidooItem = &g_Level.Items[skidooItemNumber];
+
+		if (!CreatureActive(skidooItemNumber))
+			return;
 
 		if (!skidooItem->Data)
 		{

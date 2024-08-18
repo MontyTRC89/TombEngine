@@ -43,8 +43,8 @@ using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
+using namespace TEN::Entities::Traps;
 using namespace TEN::Math;
-using namespace TEN::Traps::TR5;
 
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
@@ -1298,6 +1298,13 @@ namespace TEN::Renderer
 					_numTriangles++;
 				}
 			}
+
+			// TODO: temporary fix, we need to remove every use of SpriteBatch and PrimitiveBatch because
+			// they mess up render states cache.
+
+			SetBlendMode(BlendMode::Opaque, true);
+			SetDepthState(DepthState::Write, true);
+			SetCullMode(CullMode::CounterClockwise, true);
 		}
 	}
 

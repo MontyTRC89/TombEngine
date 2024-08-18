@@ -1,13 +1,11 @@
 #pragma once
-#include <SimpleMath.h>
+
+#include "Game/room.h"
 #include "Renderer/RendererEnums.h"
 #include "Renderer/Structures/RendererLight.h"
-#include "Game/room.h"
 
 namespace TEN::Renderer::Structures
 {
-	using namespace DirectX::SimpleMath;
-
 	struct RendererItem
 	{
 		int ItemNumber;
@@ -20,8 +18,10 @@ namespace TEN::Renderer::Structures
 		Matrix Scale;
 		Matrix AnimationTransforms[MAX_BONES];
 
-		int RoomNumber = NO_ROOM;
-		int PrevRoomNumber = NO_ROOM;
+		Quaternion BoneOrientations[MAX_BONES];
+
+		int RoomNumber = NO_VALUE;
+		int PrevRoomNumber = NO_VALUE;
 		Vector4 Color;
 		Vector4 AmbientLight;
 		std::vector<RendererLight*> LightsToDraw;

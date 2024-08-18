@@ -4,7 +4,7 @@
 #include "Game/Setup.h"
 #include "Renderer/Renderer.h"
 
-struct CollisionSetup;
+struct CollisionSetupData;
 
 namespace TEN::Control::Volumes
 {
@@ -39,11 +39,11 @@ namespace TEN::Control::Volumes
 	};
 
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, ActivatorFlags activatorFlag, Activator activator);
-	void TestVolumes(short itemNumber, const CollisionSetup* coll = nullptr);
+	void TestVolumes(short itemNumber, const CollisionSetupData* coll = nullptr);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
 	void TestVolumes(CAMERA_INFO* camera);
 
-	void HandleEvent(Event& event, Activator& activator);
+	bool HandleEvent(Event& event, Activator& activator);
 	bool HandleEvent(const std::string& name, EventType eventType, Activator activator);
 	void HandleAllGlobalEvents(EventType type, Activator& activator);
 	bool SetEventState(const std::string& name, EventType eventType, bool enabled);

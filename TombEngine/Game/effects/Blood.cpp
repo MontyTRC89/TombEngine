@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
 #include "Game/Setup.h"
@@ -15,6 +16,7 @@
 #include "Game/Lara/lara.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -49,9 +51,9 @@ namespace TEN::Effects::Blood
 		// Update position.
 		Position += Velocity;
 
-		auto pointColl = GetCollision(Position.x, Position.y, Position.z, RoomNumber);
+		auto pointColl = GetPointCollision(Position, RoomNumber);
 
-		RoomNumber = pointColl.RoomNumber;
+		RoomNumber = pointColl.GetRoomNumber();
 
 		// Hit water; spawn underwater blood.
 		if (TestEnvironment(ENV_FLAG_WATER, RoomNumber))
@@ -65,18 +67,18 @@ namespace TEN::Effects::Blood
 			}
 		}
 		// Hit wall or ceiling; deactivate.
-		if (pointColl.Position.Floor == NO_HEIGHT || Position.y <= pointColl.Position.Ceiling)
+		if (pointColl.GetFloorHeight() == NO_HEIGHT || Position.y <= pointColl.GetCeilingHeight())
 		{
 			Life = 0.0f;
 		}
 		// Hit floor; spawn 
-		else if (Position.y >= pointColl.Position.Floor)
+		else if (Position.y >= pointColl.GetFloorHeight())
 		{
 			Life = 0.0f;
 			BloodStainEffect.Spawn(*this, pointColl, true);
 		}
 		// Hit ceiling; spawn 
-		else if (Position.y <= pointColl.Position.Ceiling)
+		else if (Position.y <= pointColl.GetCeilingHeight())
 		{
 			Life = 0.0f;
 			BloodStainEffect.Spawn(*this, pointColl, false);
@@ -220,16 +222,16 @@ namespace TEN::Effects::Blood
 
 		// Get point collision at every vertex point.
 		int vPos = Position.y - VERTICAL_OFFSET;
-		auto pointColl0 = GetCollision(VertexPoints[0].x, vPos, VertexPoints[0].z, RoomNumber);
-		auto pointColl1 = GetCollision(VertexPoints[1].x, vPos, VertexPoints[1].z, RoomNumber);
-		auto pointColl2 = GetCollision(VertexPoints[2].x, vPos, VertexPoints[2].z, RoomNumber);
-		auto pointColl3 = GetCollision(VertexPoints[3].x, vPos, VertexPoints[3].z, RoomNumber);
+		auto pointColl0 = GetPointCollision(Vector3i(VertexPoints[0].x, vPos, VertexPoints[0].z), RoomNumber);
+		auto pointColl1 = GetPointCollision(Vector3i(VertexPoints[1].x, vPos, VertexPoints[1].z), RoomNumber);
+		auto pointColl2 = GetPointCollision(Vector3i(VertexPoints[2].x, vPos, VertexPoints[2].z), RoomNumber);
+		auto pointColl3 = GetPointCollision(Vector3i(VertexPoints[3].x, vPos, VertexPoints[3].z), RoomNumber);
 
 		// Stop scaling blood stain if floor heights at vertex points are beyond lower/upper floor height bound.
-		if (abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > ABS_FLOOR_BOUND ||
-			abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > ABS_FLOOR_BOUND ||
-			abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > ABS_FLOOR_BOUND ||
-			abs(pointColl3.Position.Floor - pointColl0.Position.Floor) > ABS_FLOOR_BOUND)
+		if (abs(pointColl0.GetFloorHeight() - pointColl1.GetFloorHeight()) > ABS_FLOOR_BOUND ||
+			abs(pointColl1.GetFloorHeight() - pointColl2.GetFloorHeight()) > ABS_FLOOR_BOUND ||
+			abs(pointColl2.GetFloorHeight() - pointColl3.GetFloorHeight()) > ABS_FLOOR_BOUND ||
+			abs(pointColl3.GetFloorHeight() - pointColl0.GetFloorHeight()) > ABS_FLOOR_BOUND)
 		{
 			return false;
 		}
@@ -274,7 +276,7 @@ namespace TEN::Effects::Blood
 		part.DelayTime = std::round(delayInSec * FPS);
 	}
 
-	void BloodStainEffectController::Spawn(const BloodDripEffectParticle& drip, const CollisionResult& pointColl, bool isOnFloor)
+	void BloodStainEffectController::Spawn(const BloodDripEffectParticle& drip, PointCollisionData& pointColl, bool isOnFloor)
 	{
 		constexpr auto SIZE_COEFF = 4.2f;
 
@@ -286,11 +288,11 @@ namespace TEN::Effects::Blood
 		if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
 			return;
 
-		auto normal = GetSurfaceNormal(isOnFloor ? pointColl.FloorTilt : pointColl.CeilingTilt, isOnFloor);
+		auto normal = isOnFloor ? pointColl.GetFloorNormal() : pointColl.GetCeilingNormal();
 
 		auto pos = Vector3(
 			drip.Position.x,
-			(isOnFloor ? pointColl.Position.Floor : pointColl.Position.Ceiling),
+			(isOnFloor ? pointColl.GetFloorHeight() : pointColl.GetCeilingHeight()),
 			drip.Position.z);
 		pos = Geometry::TranslatePoint(pos, normal, BloodStainEffectParticle::SURFACE_OFFSET);
 
@@ -305,14 +307,13 @@ namespace TEN::Effects::Blood
 		constexpr auto SCALAR	  = 0.4f;
 		constexpr auto DELAY_TIME = 5.0f;
 
-		auto pointColl = GetCollision(item);
-		auto pos = Vector3(item.Pose.Position.x, pointColl.Position.Floor - BloodStainEffectParticle::SURFACE_OFFSET, item.Pose.Position.z);
-		auto normal = GetSurfaceNormal(pointColl.FloorTilt, true);
+		auto pointColl = GetPointCollision(item);
+		auto pos = Vector3(item.Pose.Position.x, pointColl.GetFloorHeight() - BloodStainEffectParticle::SURFACE_OFFSET, item.Pose.Position.z);
 
-		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-		float sizeMax = box.Extents.x + box.Extents.z;
+		auto obb = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		float sizeMax = obb.Extents.x + obb.Extents.z;
 
-		Spawn(pos, item.RoomNumber, normal, sizeMax, SCALAR, DELAY_TIME);
+		Spawn(pos, item.RoomNumber, pointColl.GetFloorNormal(), sizeMax, SCALAR, DELAY_TIME);
 	}
 
 	void BloodStainEffectController::Update()
@@ -573,7 +574,7 @@ namespace TEN::Effects::Blood
 
 	short DoBloodSplat(int x, int y, int z, short vel, short headingAngle, short roomNumber)
 	{
-		int probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
+		int probedRoomNumber = GetPointCollision(Vector3i(x, y, z), roomNumber).GetRoomNumber();
 		if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		{
 			UnderwaterBloodEffect.Spawn(Vector3(x, y, z), probedRoomNumber, vel);

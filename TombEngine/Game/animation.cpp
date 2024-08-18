@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
 #include "Game/items.h"
@@ -15,6 +16,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
@@ -110,49 +112,95 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 			break;
 
 		case AnimCommandType::SoundEffect:
-			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+		{
+			int frameNumber = commandDataPtr[0];
+			if (isFrameBased && item.Animation.FrameNumber == frameNumber)
 			{
-				if (!Objects[item.ObjectNumber].waterCreature)
-				{
-					bool playInWater = (commandDataPtr[1] & 0x8000) != 0;
-					bool playOnLand	 = (commandDataPtr[1] & 0x4000) != 0;
-					bool playAlways	 = (playInWater && playOnLand) || (!playInWater && !playOnLand);
+				// Get sound ID and sound environment flag from packed data.
+				int soundID = commandDataPtr[1] & 0xFFF;	   // Exclude last 4 bits for sound ID.
+				int soundEnvFlag = commandDataPtr[1] & 0xF000; // Keep only last 4 bits for sound environment flag.
 
-					if (item.IsLara())
-					{
-						auto& player = GetLaraInfo(item);
-
-						if (playAlways ||
-							(playOnLand && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
-							(playInWater && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-					}
-					else
-					{
-						if (item.RoomNumber == NO_ROOM)
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-						else if (TestEnvironment(ENV_FLAG_WATER, &item))
-						{
-							if (playAlways || (playInWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
-								SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-						else if (playAlways || (playOnLand && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-					}
-				}
-				else
+				// FAILSAFE.
+				if (item.RoomNumber == NO_VALUE)
 				{
-					SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, TestEnvironment(ENV_FLAG_WATER, &item) ? SoundEnvironment::Water : SoundEnvironment::Land);
+					SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
+					commandDataPtr += 2;
+					break;
 				}
+
+				// Get required sound environment from flag.
+				auto requiredSoundEnv = SoundEnvironment::Always;
+				switch (soundEnvFlag)
+				{
+				default:
+				case 0:
+					requiredSoundEnv = SoundEnvironment::Always;
+					break;
+
+				case (1 << 14):
+					requiredSoundEnv = SoundEnvironment::Land;
+					break;
+
+				case (1 << 15):
+					requiredSoundEnv = SoundEnvironment::ShallowWater;
+					break;
+
+				case (1 << 12):
+					requiredSoundEnv = SoundEnvironment::Swamp;
+					break;
+
+				case (1 << 13):
+					requiredSoundEnv = SoundEnvironment::Underwater;
+					break;
+				}
+
+				int roomNumberAtPos = GetPointCollision(item).GetRoomNumber();
+				bool isWater = TestEnvironment(ENV_FLAG_WATER, roomNumberAtPos);
+				bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, roomNumberAtPos);
+
+				// Get sound environment for sound effect.
+				auto soundEnv = std::optional<SoundEnvironment>();
+				switch (requiredSoundEnv)
+				{
+				case SoundEnvironment::Always:
+					soundEnv = SoundEnvironment::Always;
+					break;
+
+				case SoundEnvironment::Land:
+					if (!isWater && !isSwamp)
+						soundEnv = SoundEnvironment::Land;
+
+					break;
+
+				case SoundEnvironment::ShallowWater:
+					if (isWater)
+					{
+						// HACK: Must update assets before removing this exception for water creatures.
+						const auto& object = Objects[item.ObjectNumber];
+						soundEnv = object.waterCreature ? SoundEnvironment::Underwater : SoundEnvironment::ShallowWater;
+					}
+
+					break;
+
+				case SoundEnvironment::Swamp:
+					if (isSwamp)
+						soundEnv = SoundEnvironment::Swamp;
+
+					break;
+
+				case SoundEnvironment::Underwater:
+					if (isWater || isSwamp)
+						soundEnv = SoundEnvironment::Underwater;
+
+					break;
+				}
+
+				if (soundEnv.has_value())
+					SoundEffect(soundID, &item.Pose, *soundEnv);
 			}
 
 			commandDataPtr += 2;
+		}
 			break;
 
 		case AnimCommandType::Flipeffect:
@@ -506,7 +554,7 @@ const AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumb
 	const auto& object = Objects[objectID];
 
 	int animIndex = object.animIndex + animNumber;
-	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
+	TENAssert(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
 
 	const auto& anim = GetAnimData(object, animNumber);
 
@@ -663,7 +711,7 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset)
 {
 	// Use matrices done in renderer to transform relative offset.
-	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
+	return Vector3i(g_Renderer.GetMoveableBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
 }
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
@@ -689,16 +737,9 @@ Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
 }
 
-Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex)
+Quaternion GetBoneOrientation(const ItemInfo& item, int boneID)
 {
-	static const auto REF_DIRECTION = Vector3::UnitZ;
-
-	auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex);
-	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex, REF_DIRECTION);
-
-	auto direction = target - origin;
-	direction.Normalize();
-	return Geometry::ConvertDirectionToQuat(direction);
+	return g_Renderer.GetMoveableBoneOrientation(item.Index, boneID);
 }
 
 // NOTE: Will not work for bones at ends of hierarchies.

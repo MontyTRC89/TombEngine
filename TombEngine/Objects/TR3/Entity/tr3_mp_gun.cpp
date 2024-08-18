@@ -3,9 +3,9 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
@@ -17,6 +17,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
@@ -70,7 +71,7 @@ namespace TEN::Entities::Creatures::TR3
 		if (creature->MuzzleFlash[0].Delay != 0)
 			creature->MuzzleFlash[0].Delay--;
 
-		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
+		if (item->BoxNumber != NO_VALUE && (g_Level.PathfindingBoxes[item->BoxNumber].flags & BLOCKED))
 		{
 			DoDamage(item, 20);
 			DoLotsOfBlood(
@@ -168,7 +169,7 @@ namespace TEN::Entities::Creatures::TR3
 			int y = item->Pose.Position.y;
 			int z = item->Pose.Position.z + BLOCK(1) * phd_cos(item->Pose.Orientation.y + laraAI.angle);
 
-			int height = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+			int height = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 			bool cover = (item->Pose.Position.y > (height + CLICK(3)) && item->Pose.Position.y < (height + CLICK(4.5f)) && laraAI.distance > pow(BLOCK(1), 2));
 
 			auto* enemy = creature->Enemy;

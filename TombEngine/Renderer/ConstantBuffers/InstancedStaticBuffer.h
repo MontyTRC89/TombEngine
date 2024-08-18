@@ -17,7 +17,7 @@ namespace TEN::Renderer::ConstantBuffers
 		//--
 		Vector4 Ambient;
 		//--
-		ShaderLight Lights[8];
+		ShaderLight Lights[MAX_LIGHTS_PER_ITEM];
 		//--
 		int NumLights;
 		int LightMode;

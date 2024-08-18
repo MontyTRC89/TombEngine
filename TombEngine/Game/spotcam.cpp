@@ -484,7 +484,7 @@ void CalculateSpotCameras()
 		}
 
 		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
-		if (outsideRoom == NO_ROOM)
+		if (outsideRoom == NO_VALUE)
 		{
 			Camera.pos.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
 			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);

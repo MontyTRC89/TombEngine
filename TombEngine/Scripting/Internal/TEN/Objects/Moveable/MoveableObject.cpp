@@ -69,26 +69,29 @@ bool operator ==(const Moveable& first, const Moveable& second)
 	return first.m_item == second.m_item;
 }
 
-/*** For more information on each parameter, see the
+/*** Used to generate a new moveable dynamically at runtime. 
+For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
 most can just be ignored (see usage).
+
 	@function Moveable
 	@tparam Objects.ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
-	@tparam[opt] Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
-	@int[opt] roomID room ID item is in (default: calculated automatically)
-	@int[opt=0] animNumber anim number
-	@int[opt=0] frameNumber frame number
-	@int[opt=10] hp HP of item
-	@int[opt=0] OCB ocb of item
-	@tparam[opt] table AIBits table with AI bits (default { 0, 0, 0, 0, 0, 0 })
+	@tparam Rotation rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
+	@tparam int roomID room ID item is in (default: calculated automatically)
+	@tparam int animNumber animation number
+	@tparam int frameNumber frame number
+	@tparam int hp HP of item
+	@tparam int OCB ocb of item
+	@tparam table AIBits table with AI bits (default { 0, 0, 0, 0, 0, 0 })
 	@treturn Moveable A new Moveable object (a wrapper around the new object)
+
 	@usage 
 	local item = Moveable(
 		TEN.Objects.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
-		Vec3(18907, 0, 21201))
+		Vec3(18907, 0, 21201)) -- position
 	*/
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
@@ -165,61 +168,41 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 
 	ScriptReserved_SetVisible, &Moveable::SetVisible,
 
-	/// Explode item. This also kills and disables item.
-	// @function Moveable:Explode
+/// Explode item. This also kills and disables item.
+// @function Moveable:Explode
 	ScriptReserved_Explode, &Moveable::Explode,
 
-	/// Shatter item. This also kills and disables item.
-	// @function Moveable:Shatter
+/// Shatter item. This also kills and disables item.
+// @function Moveable:Shatter
 	ScriptReserved_Shatter, &Moveable::Shatter,
 
-	/// Set effect to moveable
-	// @function Moveable:SetEffect
-	// @tparam Effects.EffectID effect Type of effect to assign.
-	// @tparam float timeout time (in seconds) after which effect turns off (optional).
+/// Set effect to moveable
+// @function Moveable:SetEffect
+// @tparam Effects.EffectID effect Type of effect to assign.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
-	/// Set custom colored burn effect to moveable
-	// @function Moveable:SetCustomEffect
-	// @tparam Color Color1 color the primary color of the effect (also used for lighting).
-	// @tparam Color Color2 color the secondary color of the effect.
-	// @tparam float timeout time (in seconds) after which effect turns off (optional).
+/// Set custom colored burn effect to moveable
+// @function Moveable:SetCustomEffect
+// @tparam Color Color1 color the primary color of the effect (also used for lighting).
+// @tparam Color Color2 color the secondary color of the effect.
+// @tparam float timeout time (in seconds) after which effect turns off (optional).
 	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
 
-	/// Get current moveable effect
-	// @function Moveable:GetEffect
-	// @treturn Effects.EffectID effect type currently assigned to moveable.
+/// Get current moveable effect
+// @function Moveable:GetEffect
+// @treturn Effects.EffectID effect type currently assigned to moveable.
 	ScriptReserved_GetEffect, &Moveable::GetEffect,
 
-	/// Get the moveable's status.
-	// @function Moveable:GetStatus()
-	// @treturn Objects.MoveableStatus The moveable's status.
+/// Get the moveable's status.
+// @function Moveable:GetStatus()
+// @treturn Objects.MoveableStatus The moveable's status.
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 
-	/// Set the moveable's status.
-	// @function Moveable:SetStatus()
-	// @tparam Objects.MoveableStatus status The new status of the moveable.
+/// Set the moveable's status.
+// @function Moveable:SetStatus()
+// @tparam Objects.MoveableStatus status The new status of the moveable.
 	ScriptReserved_SetStatus, &Moveable::SetStatus,
-
-	/// Set the name of the function to be called when the moveable is shot by Lara.
-	// Note that this will be triggered twice when shot with both pistols at once. 
-	// @function Moveable:SetOnHit
-	// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
-	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
-
-	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
-
-	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
-
-/// Set the name of the function to be called when the moveable is destroyed/killed
-// Note that enemy death often occurs at the end of an animation, and not at the exact moment
-// the enemy's HP becomes zero.
-// @function Moveable:SetOnKilled
-// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
-// @usage
-// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
-// baddy:SetOnKilled(LevelFuncs.baddyKilled)
-	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
@@ -433,7 +416,43 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam Objects.ObjID ObjectID to take animation and stateID from,
 // @tparam int animNumber animation from object
 // @tparam int stateID state from object
-	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
+	ScriptReserved_AnimFromObject, &Moveable::AnimFromObject,
+
+/// Set the name of the function to be called when the moveable is shot by Lara.
+// Note that this will be triggered twice when shot with both pistols at once. 
+// @function Moveable:SetOnHit
+// @tparam function callback function in LevelFuncs hierarchy to call when moveable is shot
+	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
+
+/// Set the function to be called when this moveable collides with another moveable
+// @function Moveable:SetOnCollidedWithObject
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.
+// @usage
+// LevelFuncs.objCollided = function(obj1, obj2)
+//     print(obj1:GetName() .. " collided with " .. obj2:GetName())
+// end
+// baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)
+	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
+
+/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.
+// @function Moveable:SetOnCollidedWithRoom
+// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
+// @usage
+// LevelFuncs.roomCollided = function(obj)
+//     print(obj:GetName() .. " collided with room geometry")
+// end
+// baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)
+	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
+
+/// Set the name of the function to be called when the moveable is destroyed/killed
+// Note that enemy death often occurs at the end of an animation, and not at the exact moment
+// the enemy's HP becomes zero.
+// @function Moveable:SetOnKilled
+// @tparam function callback function in LevelFuncs hierarchy to call when enemy is killed
+// @usage
+// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
+// baddy:SetOnKilled(LevelFuncs.baddyKilled)
+	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled);
 }
 
 void Moveable::Init()
@@ -502,27 +521,11 @@ void Moveable::SetOnKilled(const TypeOrNil<LevelFunc>& cb)
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnKilled, *this, m_item->Callbacks.OnKilled);
 }
 
-/// Set the function to be called when this moveable collides with another moveable
-// @function Moveable:SetOnCollidedWithObject
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.
-// @usage
-// LevelFuncs.objCollided = function(obj1, obj2)
-//     print(obj1:GetName() .. " collided with " .. obj2:GetName())
-// end
-// baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)
 void Moveable::SetOnCollidedWithObject(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithObject, *this, m_item->Callbacks.OnObjectCollided);
 }
 
-/// Set the function called when this moveable collides with room geometry (e.g. a wall or floor). This function can take an argument that holds the @{Moveable} that collided with geometry.
-// @function Moveable:SetOnCollidedWithRoom
-// @tparam function func callback function to be called (must be in LevelFuncs hierarchy)
-// @usage
-// LevelFuncs.roomCollided = function(obj)
-//     print(obj:GetName() .. " collided with room geometry")
-// end
-// baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)
 void Moveable::SetOnCollidedWithRoom(const TypeOrNil<LevelFunc>& cb)
 {
 	SetLevelFuncCallback(cb, ScriptReserved_SetOnCollidedWithRoom, *this, m_item->Callbacks.OnRoomCollided);
@@ -1070,7 +1073,8 @@ void Moveable::UnswapMesh(int meshId)
 
 /// Enable the item, as if a trigger for it had been stepped on.
 // @function Moveable:Enable
-void Moveable::EnableItem()
+// @tparam float timeout time (in seconds) after which moveable automatically disables (optional).
+void Moveable::EnableItem(sol::optional<float> timer)
 {
 	if (m_num == NO_VALUE)
 		return;
@@ -1080,6 +1084,7 @@ void Moveable::EnableItem()
 		wasInvisible = true;
 
 	m_item->Flags |= CODE_BITS;
+	m_item->Timer = timer.has_value() ? (timer.value() * FPS) : 0;
 	Trigger(m_num);
 
 	// Try add colliding in case the item went from invisible -> activated
@@ -1155,7 +1160,7 @@ void Moveable::SetVisible(bool isVisible)
 		{
 			if(!(m_item->Flags & IFLAG_KILLED))
 			{
-				EnableItem();
+				EnableItem(sol::nullopt);
 			}
 			else
 			{

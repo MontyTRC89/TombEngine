@@ -1,10 +1,8 @@
 #include "framework.h"
 #include "Specific/Input/InputAction.h"
 
-#include "Renderer/Renderer.h"
 #include "Specific/clock.h"
 
-using TEN::Renderer::g_Renderer;
 
 namespace TEN::Input
 {
@@ -126,17 +124,17 @@ namespace TEN::Input
 
 	void InputAction::DrawDebug() const
 	{
-		g_Renderer.PrintDebugMessage("ID: %d", (int)ID);
-		g_Renderer.PrintDebugMessage("IsClicked: %d", IsClicked());
-		g_Renderer.PrintDebugMessage("IsHeld: %d", IsHeld());
-		g_Renderer.PrintDebugMessage("IsPulsed (.2s, .6s): %d", IsPulsed(0.2f, 0.6f));
-		g_Renderer.PrintDebugMessage("IsReleased: %d", IsReleased());
-		g_Renderer.PrintDebugMessage("");
-		g_Renderer.PrintDebugMessage("Value: %.3f", Value);
-		g_Renderer.PrintDebugMessage("PrevValue: %.3f", PrevValue);
-		g_Renderer.PrintDebugMessage("TimeActive: %.3f", TimeActive);
-		g_Renderer.PrintDebugMessage("PrevTimeActive: %.3f", PrevTimeActive);
-		g_Renderer.PrintDebugMessage("TimeInactive: %.3f", TimeInactive);
+		PrintDebugMessage("ID: %d", (int)ID);
+		PrintDebugMessage("IsClicked: %d", IsClicked());
+		PrintDebugMessage("IsHeld: %d", IsHeld());
+		PrintDebugMessage("IsPulsed (.2s, .6s): %d", IsPulsed(0.2f, 0.6f));
+		PrintDebugMessage("IsReleased: %d", IsReleased());
+		PrintDebugMessage("");
+		PrintDebugMessage("Value: %.3f", Value);
+		PrintDebugMessage("PrevValue: %.3f", PrevValue);
+		PrintDebugMessage("TimeActive: %.3f", TimeActive);
+		PrintDebugMessage("PrevTimeActive: %.3f", PrevTimeActive);
+		PrintDebugMessage("TimeInactive: %.3f", TimeInactive);
 	}
 
 	void InputAction::UpdateValue(float value)

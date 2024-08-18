@@ -90,7 +90,7 @@ namespace TEN::Effects::Blood
 
 		// Spawners
 		void Spawn(const Vector3& pos, int roomNumber, const Vector3& normal, float sizeMax, float scalar, float delayInSec = 0.0f);
-		void Spawn(const BloodDripEffectParticle& drip, const CollisionResult& pointColl, bool isOnFloor);
+		void Spawn(const BloodDripEffectParticle& drip, PointCollisionData& pointColl, bool isOnFloor);
 		void Spawn(const ItemInfo& item);
 
 		// Utilities

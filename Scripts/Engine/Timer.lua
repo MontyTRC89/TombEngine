@@ -81,7 +81,7 @@ Timer = {
 			print("Warning: a timer with name " .. name .. " already exists; overwriting it with a new one...")
 		end
 
-		LevelVars.Engine.Timer.timers[name] ={} 
+		LevelVars.Engine.Timer.timers[name] = {} 
 		local thisTimer = LevelVars.Engine.Timer.timers[name]
 		thisTimer.name = name
 		thisTimer.totalTime = totalTime
@@ -97,6 +97,14 @@ Timer = {
 			thisTimer.timerFormat = {seconds = true}
 		end
 		return obj
+	end;
+	
+	Delete = function(name)
+		if LevelVars.Engine.Timer.timers[name] then
+			LevelVars.Engine.Timer.timers[name] = nil
+		else
+			print("Warning: a timer with name " .. name .. " does not exist and can't be deleted.")
+		end
 	end;
 
 	--- Get a timer by its name.

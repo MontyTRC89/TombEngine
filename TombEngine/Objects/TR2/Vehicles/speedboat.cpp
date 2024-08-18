@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/items.h"
@@ -17,6 +17,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
@@ -237,19 +238,19 @@ namespace TEN::Entities::Vehicles
 		int x = speedboatItem->Pose.Position.x +  SPEEDBOAT_DISMOUNT_DISTANCE * phd_sin(angle);
 		int y = speedboatItem->Pose.Position.y;
 		int z = speedboatItem->Pose.Position.z +  SPEEDBOAT_DISMOUNT_DISTANCE * phd_cos(angle);
-		auto probe = GetCollision(x, y, z, speedboatItem->RoomNumber);
+		auto probe = GetPointCollision(Vector3i(x, y, z), speedboatItem->RoomNumber);
 
-		if ((probe.Position.Floor - speedboatItem->Pose.Position.y) < -CLICK(2))
+		if ((probe.GetFloorHeight() - speedboatItem->Pose.Position.y) < -CLICK(2))
 			return false;
 
-		if (probe.Position.FloorSlope ||
-			probe.Position.Floor == NO_HEIGHT)
+		if (probe.IsSteepFloor() ||
+			probe.GetFloorHeight() == NO_HEIGHT)
 		{
 			return false;
 		}
 
-		if ((probe.Position.Floor - probe.Position.Ceiling) < LARA_HEIGHT ||
-			(probe.Position.Ceiling - speedboatItem->Pose.Position.y) > -LARA_HEIGHT)
+		if ((probe.GetFloorHeight() - probe.GetCeilingHeight()) < LARA_HEIGHT ||
+			(probe.GetCeilingHeight() - speedboatItem->Pose.Position.y) > -LARA_HEIGHT)
 		{
 			return false;
 		}
@@ -281,15 +282,15 @@ namespace TEN::Entities::Vehicles
 			int x = laraItem->Pose.Position.x + 360 * phd_sin(laraItem->Pose.Orientation.y);
 			int y = laraItem->Pose.Position.y - 90;
 			int z = laraItem->Pose.Position.z + 360 * phd_cos(laraItem->Pose.Orientation.y);
-			auto probe = GetCollision(x, y, z, laraItem->RoomNumber);
+			auto probe = GetPointCollision(Vector3i(x, y, z), laraItem->RoomNumber);
 
-			if (probe.Position.Floor >= (y - CLICK(1)))
+			if (probe.GetFloorHeight() >= (y - CLICK(1)))
 			{
 				laraItem->Pose.Position.x = x;
 				laraItem->Pose.Position.z = z;
 
-				if (probe.RoomNumber != laraItem->RoomNumber)
-					ItemNewRoom(laraItem->Index, probe.RoomNumber);
+				if (probe.GetRoomNumber() != laraItem->RoomNumber)
+					ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 			}
 			laraItem->Pose.Position.y = y;
 
@@ -373,8 +374,8 @@ namespace TEN::Entities::Vehicles
 			x = 0;
 			z = 0;
 
-			auto probe = GetCollision(old->x, pos->y, pos->z, speedboatItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			auto probe = GetPointCollision(Vector3i(old->x, pos->y, pos->z), speedboatItem->RoomNumber);
+			if (probe.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
@@ -382,8 +383,8 @@ namespace TEN::Entities::Vehicles
 					z = BLOCK(1) - shiftZ;
 			}
 
-			probe = GetCollision(pos->x, pos->y, old->z, speedboatItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			probe = GetPointCollision(Vector3i(pos->x, pos->y, old->z), speedboatItem->RoomNumber);
+			if (probe.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->x > old->x)
 					x = -shiftX - 1;
@@ -547,11 +548,11 @@ namespace TEN::Entities::Vehicles
 				SpeedboatDoShift(speedboatItem, &f, &frontOld);
 		}
 
-		auto probe = GetCollision(speedboatItem);
-		auto height = GetWaterHeight(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y - 5, speedboatItem->Pose.Position.z, probe.RoomNumber);
+		auto pointColl = GetPointCollision(*speedboatItem);
+		auto height = GetPointCollision(Vector3i(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y - 5, speedboatItem->Pose.Position.z), pointColl.GetRoomNumber()).GetWaterTopHeight();
 
 		if (height == NO_HEIGHT)
-			height = GetFloorHeight(probe.Block, speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y - 5, speedboatItem->Pose.Position.z);
+			height = GetFloorHeight(&pointColl.GetSector(), speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y - 5, speedboatItem->Pose.Position.z);
 
 		if (height < (speedboatItem->Pose.Position.y - CLICK(0.5f)))
 			SpeedboatDoShift(speedboatItem, (Vector3i*)&speedboatItem->Pose, &old);
@@ -815,7 +816,7 @@ namespace TEN::Entities::Vehicles
 		int heightFrontLeft = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, &frontLeft);
 		int heightFrontRight = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, true, &frontRight);
 
-		auto probe = GetCollision(speedboatItem);
+		auto probe = GetPointCollision(*speedboatItem);
 
 		if (lara->Context.Vehicle == itemNumber)
 		{
@@ -823,7 +824,7 @@ namespace TEN::Entities::Vehicles
 			TestTriggers(speedboatItem, false);
 		}
 
-		auto water = GetWaterHeight(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y, speedboatItem->Pose.Position.z, probe.RoomNumber);
+		auto water = GetPointCollision(Vector3i(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y, speedboatItem->Pose.Position.z), probe.GetRoomNumber()).GetWaterTopHeight();
 		speedboat->Water = water;
 
 		bool noTurn = true;
@@ -864,9 +865,9 @@ namespace TEN::Entities::Vehicles
 				speedboat->TurnRate = 0;
 		}
 
-		speedboatItem->Floor = probe.Position.Floor - 5;
+		speedboatItem->Floor = probe.GetFloorHeight() - 5;
 		if (speedboat->Water == NO_HEIGHT)
-			speedboat->Water = probe.Position.Floor;
+			speedboat->Water = probe.GetFloorHeight();
 		else
 			speedboat->Water -= 5;
 
@@ -878,14 +879,18 @@ namespace TEN::Entities::Vehicles
 		if (ofs - speedboatItem->Animation.Velocity.y > 32 && speedboatItem->Animation.Velocity.y == 0 && water != NO_HEIGHT)
 			SpeedboatSplash(speedboatItem, ofs - speedboatItem->Animation.Velocity.y, water);
 
-		probe.Position.Floor = (frontLeft.y + frontRight.y);
-		if (probe.Position.Floor < 0)
-			probe.Position.Floor = -(abs(probe.Position.Floor) / 2);
+		int floorHeight = (frontLeft.y + frontRight.y);
+		if (floorHeight < 0)
+		{
+			floorHeight = -(abs(floorHeight) / 2);
+		}
 		else
-			probe.Position.Floor /= 2;
+		{
+			floorHeight /= 2;
+		}
 
-		short xRot = phd_atan(SPEEDBOAT_FRONT, speedboatItem->Pose.Position.y - probe.Position.Floor);
-		short zRot = phd_atan(SPEEDBOAT_SIDE, probe.Position.Floor - frontLeft.y);
+		short xRot = phd_atan(SPEEDBOAT_FRONT, speedboatItem->Pose.Position.y - floorHeight);
+		short zRot = phd_atan(SPEEDBOAT_SIDE, floorHeight - frontLeft.y);
 
 		speedboatItem->Pose.Orientation.x += ((xRot - speedboatItem->Pose.Orientation.x) / 2);
 		speedboatItem->Pose.Orientation.z += ((zRot - speedboatItem->Pose.Orientation.z) / 2);
@@ -899,10 +904,10 @@ namespace TEN::Entities::Vehicles
 		{
 			SpeedboatAnimation(speedboatItem, laraItem, collide);
 
-			if (probe.RoomNumber != speedboatItem->RoomNumber)
+			if (probe.GetRoomNumber() != speedboatItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(laraItem->Index, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
+				ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 			}
 
 			laraItem->Pose = speedboatItem->Pose;
@@ -930,8 +935,8 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			if (probe.RoomNumber != speedboatItem->RoomNumber)
-				ItemNewRoom(itemNumber, probe.RoomNumber);
+			if (probe.GetRoomNumber() != speedboatItem->RoomNumber)
+				ItemNewRoom(itemNumber, probe.GetRoomNumber());
 
 			speedboatItem->Pose.Orientation.z += speedboat->LeanAngle;
 		}
@@ -941,7 +946,7 @@ namespace TEN::Entities::Vehicles
 
 		if (speedboatItem->Animation.Velocity.z && (water - 5) == speedboatItem->Pose.Position.y)
 		{
-			auto roomNumber = probe.Block->GetNextRoomNumber(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z, true);
+			auto roomNumber = probe.GetSector().GetNextRoomNumber(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z, true);
 			if (roomNumber.has_value() &&
 				(TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, *roomNumber) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, *roomNumber)))
 			{
@@ -962,7 +967,7 @@ namespace TEN::Entities::Vehicles
 					TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
 				}
 				
-				int waterHeight = GetWaterHeight(speedboatItem);
+				int waterHeight = GetPointCollision(*speedboatItem).GetWaterTopHeight();
 				SpawnVehicleWake(*speedboatItem, SPEEDBOAT_WAKE_OFFSET, waterHeight);
 			}
 		}

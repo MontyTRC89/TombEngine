@@ -2,7 +2,8 @@
 #include "Objects/Utils/VehicleHelpers.h"
 
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
@@ -15,6 +16,8 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Hud;
 using namespace TEN::Input;
@@ -54,7 +57,7 @@ namespace TEN::Entities::Vehicles
 			return VehicleMountType::None;
 
 		// Assess object collision.
-		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !TestCollision(vehicleItem, laraItem))
+		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !HandleItemSphereCollision(*vehicleItem, *laraItem))
 			return VehicleMountType::None;
 
 		bool hasInputAction = IsHeld(In::Action);
@@ -154,15 +157,15 @@ namespace TEN::Entities::Vehicles
 		pos->z = vehicleItem->Pose.Position.z + (forward * cosY) - (right * sinY);
 
 		// Get collision a bit higher to be able to detect bridges.
-		auto probe = GetCollision(pos->x, pos->y - CLICK(2), pos->z, vehicleItem->RoomNumber);
+		auto probe = GetPointCollision(Vector3i(pos->x, pos->y - CLICK(2), pos->z), vehicleItem->RoomNumber);
 
-		if (pos->y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
+		if (pos->y < probe.GetCeilingHeight() || probe.GetCeilingHeight() == NO_HEIGHT)
 			return NO_HEIGHT;
 
-		if (pos->y > probe.Position.Floor && clamp)
-			pos->y = probe.Position.Floor;
+		if (pos->y > probe.GetFloorHeight() && clamp)
+			pos->y = probe.GetFloorHeight();
 
-		return probe.Position.Floor;
+		return probe.GetFloorHeight();
 	}
 
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3i* pos)
@@ -175,12 +178,12 @@ namespace TEN::Entities::Vehicles
 		point = Vector3::Transform(point, world);
 		*pos = Vector3i(point);
 
-		auto pointColl = GetCollision(pos->x, pos->y, pos->z, vehicleItem->RoomNumber);
-		int height = GetWaterHeight(pos->x, pos->y, pos->z, pointColl.RoomNumber);
+		auto pointColl = GetPointCollision(*pos, vehicleItem->RoomNumber);
+		int height = GetPointCollision(Vector3i(pos->x, pos->y, pos->z), pointColl.GetRoomNumber()).GetWaterTopHeight();
 
 		if (height == NO_HEIGHT)
 		{
-			height = pointColl.Position.Floor;
+			height = pointColl.GetFloorHeight();
 			if (height == NO_HEIGHT)
 				return height;
 		}
@@ -216,7 +219,7 @@ namespace TEN::Entities::Vehicles
 		if (TestEnvironment(ENV_FLAG_WATER, vehicleItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
 		{
-			auto waterDepth = (float)GetWaterDepth(vehicleItem);
+			int waterDepth = GetPointCollision(*vehicleItem).GetWaterBottomHeight();
 
 			// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
 			// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
@@ -237,11 +240,8 @@ namespace TEN::Entities::Vehicles
 
 					if (isWater)
 					{
-						int waterHeight = GetWaterHeight(vehicleItem);
+						int waterHeight = GetPointCollision(*vehicleItem).GetWaterTopHeight();
 						SpawnVehicleWake(*vehicleItem, wakeOffset, waterHeight);
-
-						//SpawnStreamer(vehicleItem, -wakeOffset.x, waterHeight / 2, wakeOffset.z, 1, true, 5.0f, 50, 9.0f);
-						//SpawnStreamer(vehicleItem, wakeOffset.x, waterHeight / 2, wakeOffset.z, 2, true, 5.0f, 50, 9.0f);
 					}
 				}
 
@@ -253,7 +253,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				int waterHeight = vehicleItem->Pose.Position.y - GetWaterHeight(vehicleItem);
+				int waterHeight = vehicleItem->Pose.Position.y - GetPointCollision(*vehicleItem).GetWaterTopHeight();
 
 				if (waterDepth > VEHICLE_WATER_HEIGHT_MAX && waterHeight > VEHICLE_WATER_HEIGHT_MAX)
 				{

@@ -1,150 +1,147 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 
-#include <cmath>
-
-/***
-An RGBA or RGB color.
-Components are specified in bytes; all values are clamped to [0, 255].
-
-@tenprimitive Color
-@pragma nostrip
-*/
+/// Represents an RGBA or RGB color.
+// Components are specified in bytes. All values are clamped to the range [0, 255].
+//
+// @tenprimitive Color
+// @pragma nostrip
 
 void ScriptColor::Register(sol::table& parent)
 {
 	using ctors = sol::constructors<ScriptColor(byte, byte, byte), ScriptColor(byte, byte, byte, byte)>;
+
+	// Register type.
 	parent.new_usertype<ScriptColor>(
 		"Color",
 		ctors(),
 		sol::call_constructor, ctors(),	
 		sol::meta_function::to_string, &ScriptColor::ToString,
 
-/// (int) red component
-//@mem r
+		/// (int) Red component.
+		// @mem r
 		"r", sol::property(&ScriptColor::GetR, &ScriptColor::SetR),
 
-/// (int) green component
-//@mem g
+		/// (int) Green component.
+		// @mem g
 		"g", sol::property(&ScriptColor::GetG, &ScriptColor::SetG),
 
-/// (int) blue component
-//@mem b
+		/// (int) Blue component.
+		// @mem b
 		"b", sol::property(&ScriptColor::GetB, &ScriptColor::SetB),
 
-/// (int) alpha component (255 = opaque, 0 = invisible)
-//@mem a
-		"a", sol::property(&ScriptColor::GetA, &ScriptColor::SetA)
-	);
+		/// (int) Alpha component (0 = invisible, 255 = opaque).
+		// @mem a
+		"a", sol::property(&ScriptColor::GetA, &ScriptColor::SetA));
 }
 
-/*** 
-@int R red component
-@int G green component
-@int B blue component
-@treturn Color A new Color object.
-@function Color
-*/
+/// @int R red component
+// @int G green component
+// @int B blue component
+// @treturn Color A new Color object.
+// @function Color
 ScriptColor::ScriptColor(byte r, byte g, byte b) :
-m_color(r, g, b)
+_color(r, g, b)
 {
 }
 
-/*** 
-@int R red component
-@int G green component
-@int B blue component
-@int A alpha component (255 is opaque, 0 is invisible)
-@treturn Color A new Color object.
-@function Color
-*/
-ScriptColor::ScriptColor(byte r, byte g, byte b, byte a) : ScriptColor(r, g, b)
+// @function Color()
+// @int R Red component.
+// @int G Green component.
+// @int B Blue component.
+// @int A Alpha component (0 = invisible, 255 = opaque).
+// @treturn Color A new Color object.
+ScriptColor::ScriptColor(byte r, byte g, byte b, byte a) :
+	ScriptColor(r, g, b)
 {
 	SetA(a);
 }
 
 ScriptColor::ScriptColor(const Vector3& color) :
-	m_color(color)
+	_color(color)
 {
 }
 
 ScriptColor::ScriptColor(const Vector4& color) :
-	m_color(color)
+	_color(color)
 {
 }
 
 ScriptColor::ScriptColor(D3DCOLOR color) : 
-	m_color(color)
+	_color(color)
 {
-}
-
-ScriptColor::operator Vector3() const
-{
-	return m_color;
-}
-
-ScriptColor::operator Vector4() const
-{
-	return m_color;
-}
-
-// D3DCOLOR is 32 bits and is laid out as ARGB.
-ScriptColor::operator D3DCOLOR() const
-{	
-	return m_color;
-}
-
-ScriptColor::operator RGBAColor8Byte() const
-{
-	return m_color;
 }
 
 byte ScriptColor::GetR() const
 {
-	return m_color.GetR();
-}
-
-void ScriptColor::SetR(byte value)
-{
-	m_color.SetR(value);
+	return _color.GetR();
 }
 
 byte ScriptColor::GetG() const
 {
-	return m_color.GetG();
-}
-
-void ScriptColor::SetG(byte value)
-{
-	m_color.SetG(value);
+	return _color.GetG();
 }
 
 byte ScriptColor::GetB() const
 {
-	return m_color.GetB();
-}
-
-void ScriptColor::SetB(byte value)
-{
-	m_color.SetB(value);
+	return _color.GetB();
 }
 
 byte ScriptColor::GetA() const
 {
-	return m_color.GetA();
+	return _color.GetA();
+}
+
+void ScriptColor::SetR(byte value)
+{
+	_color.SetR(value);
+}
+
+void ScriptColor::SetG(byte value)
+{
+	_color.SetG(value);
+}
+
+void ScriptColor::SetB(byte value)
+{
+	_color.SetB(value);
 }
 
 void ScriptColor::SetA(byte value)
 {
-	m_color.SetA(value);
+	_color.SetA(value);
 }
 
-/***
-@tparam Color color this color
-@treturn string A string showing the r, g, b, and a values of the color
-@function __tostring
-*/
+/// @tparam Color color This color.
+// @treturn string A string representing the r, g, b, and a values of the color.
+// @function __tostring
 std::string ScriptColor::ToString() const
 {
-	return "{" + std::to_string(GetR()) + ", " + std::to_string(GetG()) + ", " + std::to_string(GetB()) + ", " + std::to_string(GetA()) + "}";
+	return "{ " + std::to_string(GetR()) + ", " + std::to_string(GetG()) + ", " + std::to_string(GetB()) + ", " + std::to_string(GetA()) + " }";
+}
+
+ScriptColor::operator Color() const
+{
+	return _color;
+}
+
+ScriptColor::operator Vector3() const
+{
+	return _color;
+}
+
+ScriptColor::operator Vector4() const
+{
+	return _color;
+}
+
+// NOTE: D3DCOLOR is 32 bits and is laid out as ARGB.
+ScriptColor::operator D3DCOLOR() const
+{	
+	return _color;
+}
+
+ScriptColor::operator RGBAColor8Byte() const
+{
+	return _color;
 }

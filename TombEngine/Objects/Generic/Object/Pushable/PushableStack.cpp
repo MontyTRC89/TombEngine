@@ -2,12 +2,14 @@
 #include "Objects/Generic/Object/Pushable/PushableStack.h"
 
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushable/PushableBridge.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::Generic
 {
@@ -44,8 +46,8 @@ namespace TEN::Entities::Generic
 			int x = pushableItem.Pose.Position.x;
 			int z = pushableItem.Pose.Position.z;
 			
-			auto pointColl = GetCollision(&pushableItem);
-			int y = pointColl.Position.Floor;
+			auto pointColl = GetPointCollision(pushableItem);
+			int y = pointColl.GetFloorHeight();
 			
 			stackGroups.emplace(Vector3i(x, y, z), std::vector<int>()).first->second.push_back(itemNumber);
 		}
@@ -144,7 +146,7 @@ namespace TEN::Entities::Generic
 			return pushabelStackFound;
 
 		// Otherwise, check room below.
-		//auto collisionResult = GetCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);		
+		//auto collisionResult = GetPointCollision(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z, pushableItem.RoomNumber);		
 		//auto roomNumberBelow = collisionResult.Block->GetRoomNumberBelow(pushableItem.Pose.Position.x, pushableItem.Pose.Position.y, pushableItem.Pose.Position.z).value();
 		//pushabelStackFound = FindPushableStackInRoom(itemNumber, roomNumberBelow);
 
@@ -156,7 +158,7 @@ namespace TEN::Entities::Generic
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (roomNumber != NO_ROOM)
+		if (roomNumber != NO_VALUE)
 		{
 			short currentItemNumber = g_Level.Rooms[roomNumber].itemNumber;
 			while (currentItemNumber != NO_VALUE)

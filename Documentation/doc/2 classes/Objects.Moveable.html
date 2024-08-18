@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.3 Lua API</title>
+    <title>TombEngine 1.4 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -108,9 +108,8 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Moveable">Moveable(object, name, position[, rotation][, roomID][, animNumber=0][, frameNumber=0][, hp=10][, OCB=0][, AIBits])</a></td>
-	<td class="summary">For more information on each parameter, see the
-associated getters and setters.</td>
+	<td class="name" ><a href="#Moveable">Moveable(object, name, position, rotation, roomID, animNumber, frameNumber, hp, OCB, AIBits)</a></td>
+	<td class="summary">Used to generate a new moveable dynamically at runtime.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:Explode">Moveable:Explode()</a></td>
@@ -139,16 +138,6 @@ associated getters and setters.</td>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetStatus">Moveable:SetStatus(status)</a></td>
 	<td class="summary">Set the moveable's status.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnHit">Moveable:SetOnHit(callback)</a></td>
-	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
-	<td class="summary">Set the name of the function to be called when the moveable is destroyed/killed
- Note that enemy death often occurs at the end of an animation, and not at the exact moment
- the enemy's HP becomes zero.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetObjectID">Moveable:GetObjectID()</a></td>
@@ -274,12 +263,22 @@ associated getters and setters.</td>
 	<td class="summary">Borrow animation from an object</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Moveable:SetOnHit">Moveable:SetOnHit(callback)</a></td>
+	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(func)</a></td>
 	<td class="summary">Set the function to be called when this moveable collides with another moveable</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(func)</a></td>
 	<td class="summary">Set the function called when this moveable collides with room geometry (e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
+	<td class="summary">Set the name of the function to be called when the moveable is destroyed/killed
+ Note that enemy death often occurs at the end of an animation, and not at the exact moment
+ the enemy's HP becomes zero.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetPosition">Moveable:GetPosition()</a></td>
@@ -365,7 +364,7 @@ associated getters and setters.</td>
  Use this to bring back original unswapped mesh</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:Enable">Moveable:Enable()</a></td>
+	<td class="name" ><a href="#Moveable:Enable">Moveable:Enable(timeout)</a></td>
 	<td class="summary">Enable the item, as if a trigger for it had been stepped on.</td>
 	</tr>
 	<tr>
@@ -391,11 +390,12 @@ associated getters and setters.</td>
     <dl class="function">
     <dt>
     <a name = "Moveable"></a>
-    <strong>Moveable(object, name, position[, rotation][, roomID][, animNumber=0][, frameNumber=0][, hp=10][, OCB=0][, AIBits])</strong>
+    <strong>Moveable(object, name, position, rotation, roomID, animNumber, frameNumber, hp, OCB, AIBits)</strong>
     </dt>
     <dd>
-    For more information on each parameter, see the
-associated getters and setters.  If you do not know what to set for these,
+    Used to generate a new moveable dynamically at runtime. <br/>
+For more information on each parameter, see the
+associated getters and setters. If you do not know what to set for these,
 most can just be ignored (see usage).
 
 
@@ -416,38 +416,31 @@ most can just be ignored (see usage).
         </li>
         <li><span class="parameter">rotation</span>
             <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-         rotation about x, y, and z axes (default Rotation(0, 0, 0))
-         (<em>optional</em>)
+         rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
         </li>
         <li><span class="parameter">roomID</span>
             <span class="types"><span class="type">int</span></span>
          room ID item is in (default: calculated automatically)
-         (<em>optional</em>)
         </li>
         <li><span class="parameter">animNumber</span>
             <span class="types"><span class="type">int</span></span>
-         anim number
-         (<em>default</em> 0)
+         animation number
         </li>
         <li><span class="parameter">frameNumber</span>
             <span class="types"><span class="type">int</span></span>
          frame number
-         (<em>default</em> 0)
         </li>
         <li><span class="parameter">hp</span>
             <span class="types"><span class="type">int</span></span>
          HP of item
-         (<em>default</em> 10)
         </li>
         <li><span class="parameter">OCB</span>
             <span class="types"><span class="type">int</span></span>
          ocb of item
-         (<em>default</em> 0)
         </li>
         <li><span class="parameter">AIBits</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
          table with AI bits (default { 0, 0, 0, 0, 0, 0 })
-         (<em>optional</em>)
         </li>
     </ul>
 
@@ -465,7 +458,7 @@ most can just be ignored (see usage).
         <pre class="example"><span class="keyword">local</span> item = Moveable(
 	TEN.Objects.ObjID.PISTOLS_ITEM, <span class="comment">-- object id
 </span>	<span class="string">"test"</span>, <span class="comment">-- name
-</span>	Vec3(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>))</pre>
+</span>	Vec3(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>)) <span class="comment">-- position</span></pre>
     </ul>
 
 </dd>
@@ -617,58 +610,6 @@ most can just be ignored (see usage).
 
 
 
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnHit"></a>
-    <strong>Moveable:SetOnHit(callback)</strong>
-    </dt>
-    <dd>
-    Set the name of the function to be called when the moveable is shot by Lara.
- Note that this will be triggered twice when shot with both pistols at once.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">callback</span>
-            <span class="types"><span class="type">function</span></span>
-         function in LevelFuncs hierarchy to call when moveable is shot
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnKilled"></a>
-    <strong>Moveable:SetOnKilled(callback)</strong>
-    </dt>
-    <dd>
-    Set the name of the function to be called when the moveable is destroyed/killed
- Note that enemy death often occurs at the end of an animation, and not at the exact moment
- the enemy's HP becomes zero.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">callback</span>
-            <span class="types"><span class="type">function</span></span>
-         function in LevelFuncs hierarchy to call when enemy is killed
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">LevelFuncs.baddyKilled = <span class="keyword">function</span>(theBaddy) <span class="global">print</span>(<span class="string">"You killed a baddy!"</span>) <span class="keyword">end</span>
-baddy:SetOnKilled(LevelFuncs.baddyKilled)</pre>
-    </ul>
 
 </dd>
     <dt>
@@ -1374,6 +1315,29 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
 </dd>
     <dt>
+    <a name = "Moveable:SetOnHit"></a>
+    <strong>Moveable:SetOnHit(callback)</strong>
+    </dt>
+    <dd>
+    Set the name of the function to be called when the moveable is shot by Lara.
+ Note that this will be triggered twice when shot with both pistols at once.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">function</span></span>
+         function in LevelFuncs hierarchy to call when moveable is shot
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "Moveable:SetOnCollidedWithObject"></a>
     <strong>Moveable:SetOnCollidedWithObject(func)</strong>
     </dt>
@@ -1428,6 +1392,35 @@ baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)</pre>
     <span class="global">print</span>(obj:GetName() .. <span class="string">" collided with room geometry"</span>)
 <span class="keyword">end</span>
 baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnKilled"></a>
+    <strong>Moveable:SetOnKilled(callback)</strong>
+    </dt>
+    <dd>
+    Set the name of the function to be called when the moveable is destroyed/killed
+ Note that enemy death often occurs at the end of an animation, and not at the exact moment
+ the enemy's HP becomes zero.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">function</span></span>
+         function in LevelFuncs hierarchy to call when enemy is killed
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">LevelFuncs.baddyKilled = <span class="keyword">function</span>(theBaddy) <span class="global">print</span>(<span class="string">"You killed a baddy!"</span>) <span class="keyword">end</span>
+baddy:SetOnKilled(LevelFuncs.baddyKilled)</pre>
     </ul>
 
 </dd>
@@ -1868,13 +1861,20 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
 </dd>
     <dt>
     <a name = "Moveable:Enable"></a>
-    <strong>Moveable:Enable()</strong>
+    <strong>Moveable:Enable(timeout)</strong>
     </dt>
     <dd>
     Enable the item, as if a trigger for it had been stepped on.
 
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">float</span></span>
+         time (in seconds) after which moveable automatically disables (optional).
+        </li>
+    </ul>
 
 
 

@@ -10,6 +10,8 @@
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Room;
+
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
 
@@ -23,7 +25,7 @@ void InitializeLOTarray(int itemNumber)
 
 	if (!creature->LOT.Initialized)
 	{
-		creature->LOT.Node = std::vector<BoxNode>(g_Level.Boxes.size(), BoxNode{});
+		creature->LOT.Node = std::vector<BoxNode>(g_Level.PathfindingBoxes.size(), BoxNode{});
 		creature->LOT.Initialized = true;
 	}
 }
@@ -218,17 +220,17 @@ void SetEntityTarget(short itemNum, short target)
 
 void ClearLOT(LOTInfo* LOT)
 {
-	LOT->Head = NO_BOX;
-	LOT->Tail = NO_BOX;
+	LOT->Head = NO_VALUE;
+	LOT->Tail = NO_VALUE;
 	LOT->SearchNumber = 0;
-	LOT->TargetBox = NO_BOX;
-	LOT->RequiredBox = NO_BOX;
+	LOT->TargetBox = NO_VALUE;
+	LOT->RequiredBox = NO_VALUE;
 
 	auto* node = LOT->Node.data();
 	for (auto& node : LOT->Node) 
 	{
-		node.exitBox = NO_BOX;
-		node.nextExpansion = NO_BOX;
+		node.exitBox = NO_VALUE;
+		node.nextExpansion = NO_VALUE;
 		node.searchNumber = 0;
 	}
 }
@@ -238,14 +240,14 @@ void CreateZone(ItemInfo* item)
 	auto* creature = GetCreatureInfo(item);
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->Box;
+	item->BoxNumber = GetSector(room, item->Pose.Position.x - room->Position.x, item->Pose.Position.z - room->Position.z)->PathfindingBoxID;
 
 	if (creature->LOT.Fly)
 	{
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (int i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < g_Level.PathfindingBoxes.size(); i++)
 		{
 			node->boxNumber = i;
 			node++;
@@ -263,7 +265,7 @@ void CreateZone(ItemInfo* item)
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (int i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < g_Level.PathfindingBoxes.size(); i++)
 		{
 			if (*zone == zoneNumber || *flippedZone == flippedZoneNumber)
 			{

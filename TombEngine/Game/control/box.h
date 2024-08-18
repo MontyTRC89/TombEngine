@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Specific/level.h"
 #include "Math/Math.h"
 
@@ -33,12 +34,14 @@ struct AI_INFO
 	short enemyFacing;
 };
 
+// TODO: Use DX BoundingBox class to store AABB.
 struct BOX_INFO
 {
 	unsigned int left;
 	unsigned int right;
 	unsigned int top;
 	unsigned int bottom;
+
 	int height;
 	int overlapIndex;
 	int flags;
@@ -60,8 +63,6 @@ constexpr auto BLOCKABLE = 0x8000;
 constexpr auto BLOCKED = 0x4000;
 constexpr auto SEARCH_NUMBER = 0x7FFF;
 constexpr auto BLOCKED_SEARCH = 0x8000;
-constexpr auto NO_BOX = -1;
-constexpr auto NO_ZONE = -1;
 constexpr auto BOX_JUMP = 0x800;
 constexpr auto BOX_MONKEY = 0x2000;
 constexpr auto BOX_END_BIT = 0x8000;

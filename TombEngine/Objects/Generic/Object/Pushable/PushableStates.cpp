@@ -333,6 +333,12 @@ namespace TEN::Entities::Generic
 					auto movementDir = pushableItem.Pose.Position.ToVector3() - playerItem.Pose.Position.ToVector3();
 					movementDir.Normalize();
 					playerItem.Pose.Position = playerItem.Pose.Position + movementDir * BLOCK(1);
+
+					RemovePushableBridge(pushableItem);
+				}
+				else
+				{
+					RemovePushableBridge(pushableItem);
 				}
 				break;
 
@@ -359,6 +365,20 @@ namespace TEN::Entities::Generic
 				break;
 			}
 		}
+	}
+
+	// TODO: Remove.
+	static float InterpolateCubic(float value0, float value1, float value2, float value3, float alpha)
+	{
+		alpha = std::clamp(alpha, 0.0f, 1.0f);
+
+		float p = (value3 - value2) - (value0 - value1);
+		float q = (value0 - value1) - p;
+		float r = value2 - value0;
+		float s = value1;
+		float x = alpha;
+		float xSquared = SQUARE(x);
+		return ((p * xSquared * x) + (q * xSquared) + (r * x) + s);
 	}
 
 	static void HandleEdgeSlipState(ItemInfo& pushableItem)

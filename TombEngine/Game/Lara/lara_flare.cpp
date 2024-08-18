@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/chaffFX.h"
@@ -18,6 +19,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 constexpr auto FLARE_LIFE_MAX	 = 60.0f * FPS;
@@ -258,7 +260,7 @@ void DrawFlare(ItemInfo& laraItem)
 				SoundEffect(
 					SFX_TR4_FLARE_IGNITE_DRY,
 					&laraItem.Pose,
-					TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
+					TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::ShallowWater : SoundEnvironment::Land);
 			}
 
 			DoFlareInHand(laraItem, player.Flare.Life);
@@ -323,11 +325,11 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 
 	flareItem.Pose.Position = pos;
 
-	int floorHeight = GetCollision(pos.x, pos.y, pos.z, laraItem.RoomNumber).Position.Floor;
-	auto hasCollided = GetCollidedObjects(&flareItem, 0, true, CollidedItems, CollidedMeshes, true);
+	int floorHeight = GetPointCollision(pos, laraItem.RoomNumber).GetFloorHeight();
+	auto isCollided = !GetCollidedObjects(flareItem, true, true).IsEmpty();
 	bool hasLanded = false;
 
-	if (floorHeight < pos.y || hasCollided)
+	if (floorHeight < pos.y || isCollided)
 	{
 		hasLanded = true;
 		flareItem.Pose.Position.x = laraItem.Pose.Position.x + 320 * phd_sin(flareItem.Pose.Orientation.y);

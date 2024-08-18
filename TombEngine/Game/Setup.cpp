@@ -127,7 +127,7 @@ void InitializeGameFlags()
 	ZeroMemory(FlipMap, MAX_FLIPMAP * sizeof(int));
 	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(bool));
 
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 	FlipStatus = false;
 	Camera.underwater = false;
 }

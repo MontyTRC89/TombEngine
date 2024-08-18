@@ -3,7 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
@@ -16,6 +16,7 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -333,15 +334,15 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			if (GetFrameNumber(item) == GetFrameCount(item.Animation.AnimNumber))
 			{
-				auto pointColl = GetCollision(pos, item.RoomNumber);
+				auto pointColl = GetPointCollision(pos, item.RoomNumber);
 
-				if (pointColl.Position.Floor == NO_HEIGHT)
+				if (pointColl.GetFloorHeight() == NO_HEIGHT)
 				{
 					pos.y -= CLICK(0.5f);
 				}
 				else
 				{
-					pos.y = pointColl.Position.Floor - CLICK(0.5f);
+					pos.y = pointColl.GetFloorHeight() - CLICK(0.5f);
 				}
 
 				auto pose = Pose(pos, EulerAngles::Identity);

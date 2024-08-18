@@ -5,6 +5,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/debris.h"
 #include "Game/Gui.h"
 #include "Game/Hud/Hud.h"
@@ -30,6 +31,7 @@
 #include "Specific/level.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
 using namespace TEN::Input;
@@ -229,42 +231,35 @@ static void HideOrDisablePickup(ItemInfo& pickupItem)
 
 void CollectMultiplePickups(int itemNumber)
 {
-	auto* firstItem = &g_Level.Items[itemNumber];
-	GetCollidedObjects(firstItem, LARA_RADIUS, true, CollidedItems, CollidedMeshes, true);
-
-	for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+	auto& firstItem = g_Level.Items[itemNumber];
+	
+	auto collObjects = GetCollidedObjects(firstItem, true, true, LARA_RADIUS, ObjectCollectionMode::Items);
+	collObjects.Items.push_back(&firstItem);
+	for (auto* itemPtr : collObjects.Items)
 	{
-		auto* currentItem = CollidedItems[i];
-
-		if (currentItem == nullptr)
-			currentItem = firstItem;
-
-		if (!Objects[currentItem->ObjectNumber].isPickup)
+		if (!Objects[itemPtr->ObjectNumber].isPickup)
 			continue;
 
 		// HACK: Exclude flares and torches from pickup batches.
-		if ((currentItem->ObjectNumber == ID_FLARE_ITEM && currentItem->Active) ||
-			 currentItem->ObjectNumber == ID_BURNING_TORCH_ITEM)
+		if ((itemPtr->ObjectNumber == ID_FLARE_ITEM && itemPtr->Active) ||
+			 itemPtr->ObjectNumber == ID_BURNING_TORCH_ITEM)
 		{
-				continue;
+			continue;
 		}
 
-		PickedUpObject(currentItem->ObjectNumber);
-		g_Hud.PickupSummary.AddDisplayPickup(currentItem->ObjectNumber, currentItem->Pose.Position.ToVector3());
+		PickedUpObject(itemPtr->ObjectNumber);
+		g_Hud.PickupSummary.AddDisplayPickup(itemPtr->ObjectNumber, itemPtr->Pose.Position.ToVector3());
 
-		if (currentItem->TriggerFlags & (1 << 8))
+		if (itemPtr->TriggerFlags & (1 << 8))
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
-				if (g_Level.Items[i].ObjectNumber == currentItem->ObjectNumber)
+				if (g_Level.Items[i].ObjectNumber == itemPtr->ObjectNumber)
 					KillItem(i);
 			}
 		}
 
-		HideOrDisablePickup(*currentItem);
-
-		if (currentItem == firstItem)
-			break;
+		HideOrDisablePickup(*itemPtr);
 	}
 }
 
@@ -842,14 +837,13 @@ void DropPickups(ItemInfo* item)
 	auto bounds = GameBoundingBox(item);
 	auto extents = bounds.GetExtents();
 	auto origin = Geometry::TranslatePoint(item->Pose.Position.ToVector3(), item->Pose.Orientation, bounds.GetCenter());
-	auto yPos = GetCollision(item).Position.Floor;
+	auto yPos = GetPointCollision(*item).GetFloorHeight();
 
 	origin.y = yPos; // Initialize drop origin Y point as floor height at centerpoint, in case all corner tests fail.
 
-	// Also collect objects which are around.
-	bool collidedWithObjects = GetCollidedObjects(item, extents.Length(), true, CollidedItems, CollidedMeshes, true);
+	auto collObjects = GetCollidedObjects(*item, true, true);
 
-	short startAngle = ANGLE(Random::GenerateInt(0, 3) * 90); // Randomize start corner.
+	short startAngle = ANGLE(Random::GenerateInt(0, 3) * 90.0f); // Randomize start corner.
 
 	// Iterate through 4 corners and find best-fitting position, which is not inside a wall, not on a slope
 	// and also does not significantly differ in height to an object centerpoint height.
@@ -858,31 +852,31 @@ void DropPickups(ItemInfo* item)
 	for (int corner = 0; corner < 4; corner++)
 	{
 		auto angle = item->Pose.Orientation;
-		angle.y += startAngle + corner * ANGLE(90);
+		angle.y += startAngle + corner * ANGLE(90.0f);
 
 		// At first, do an inside-wall test at an extended extent point to make sure player can correctly align.
 		auto candidatePos = Geometry::TranslatePoint(origin, angle, extents * 1.2f);
 		candidatePos.y = yPos;
-		auto collPoint = GetCollision(candidatePos.x, candidatePos.y, candidatePos.z, item->RoomNumber);
+		auto collPoint = GetPointCollision(candidatePos, item->RoomNumber);
 
 		// If position is inside a wall or on a slope, don't use it.
-		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
+		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsSteepFloor())
 			continue;
 
 		// Remember floor position for a tested point.
-		int candidateYPos = collPoint.Position.Floor;
+		int candidateYPos = collPoint.GetFloorHeight();
 
 		// Now repeat the same test for original extent point to make sure it's also valid.
 		candidatePos = Geometry::TranslatePoint(origin, angle, extents);
 		candidatePos.y = yPos;
-		collPoint = GetCollision(candidatePos.x, candidatePos.y, candidatePos.z, item->RoomNumber);
+		collPoint = GetPointCollision(candidatePos, item->RoomNumber);
 
 		// If position is inside a wall or on a slope, don't use it.
-		if (collPoint.Position.Floor == NO_HEIGHT || collPoint.Position.FloorSlope)
+		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsSteepFloor())
 			continue;
 
 		// If position is not in the same room, don't use it.
-		if (collPoint.RoomNumber != item->RoomNumber)
+		if (collPoint.GetRoomNumber() != item->RoomNumber)
 			continue;
 
 		// Setup a dummy sphere with 1-click diameter for item and static mesh collision tests.
@@ -892,26 +886,22 @@ void DropPickups(ItemInfo* item)
 		// Iterate through all found items and statics around, and determine if dummy sphere
 		// intersects any of those. If so, try other corner.
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		for (const auto* itemPtr : collObjects.Items)
 		{
-			auto* currentItem = CollidedItems[i];
-			if (!currentItem)
-				break;
-
-			if (GameBoundingBox(currentItem).ToBoundingOrientedBox(currentItem->Pose).Intersects(sphere))
+			auto box = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
+			if (box.Intersects(sphere))
 			{
 				collidedWithObject = true;
 				break;
 			}
 		}
 
-		for (int i = 0; i < MAX_COLLIDED_OBJECTS; i++)
+		for (auto* staticPtr : collObjects.Statics)
 		{
-			auto* currentMesh = CollidedMeshes[i];
-			if (!currentMesh)
-				break;
+			auto& object = StaticObjects[staticPtr->staticNumber];
 
-			if (StaticObjects[currentMesh->staticNumber].collisionBox.ToBoundingOrientedBox(currentMesh->pos).Intersects(sphere))
+			auto box = object.collisionBox.ToBoundingOrientedBox(staticPtr->pos);
+			if (box.Intersects(sphere))
 			{
 				collidedWithObject = true;
 				break;
@@ -923,16 +913,16 @@ void DropPickups(ItemInfo* item)
 
 		// Finally, do height difference tests. If difference is more than one and a half click,
 		// most likely it's hanging in the air or submerged, so bypass the corner.
-		if (abs(collPoint.Position.Floor - yPos) > CLICK(1.5f))
+		if (abs(collPoint.GetFloorHeight() - yPos) > CLICK(1.5f))
 			continue;
 
 		// If height difference between extent points is more than one click, it means it landed
 		// on a step, so let's search for other position.
-		if (abs(collPoint.Position.Floor - candidateYPos) >= CLICK(1.0f))
+		if (abs(collPoint.GetFloorHeight() - candidateYPos) >= CLICK(1.0f))
 			continue;
 
 		origin = candidatePos;
-		origin.y = collPoint.Position.Floor;
+		origin.y = collPoint.GetFloorHeight();
 		break;
 	}
 
@@ -1086,19 +1076,19 @@ void InitializePickup(short itemNumber)
 			if (triggerFlags == 0)
 			{
 				// Automatically align pickups to the floor surface.
-				auto pointColl = GetCollision(item);
-				int bridgeItemNumber = pointColl.Block->GetInsideBridgeItemNumber(item->Pose.Position, true, true);
+				auto pointColl = GetPointCollision(*item);
+				int bridgeItemNumber = pointColl.GetSector().GetInsideBridgeItemNumber(item->Pose.Position, true, true);
 
 				if (bridgeItemNumber != NO_VALUE)
 				{
 					// If pickup is within bridge item, most likely it means it is
 					// below pushable or raising block, so ignore its collision.
-					pointColl.Block->RemoveBridge(bridgeItemNumber);
-					pointColl = GetCollision(item);
-					pointColl.Block->AddBridge(bridgeItemNumber);
+					pointColl.GetSector().RemoveBridge(bridgeItemNumber);
+					pointColl = GetPointCollision(*item);
+					pointColl.GetSector().AddBridge(bridgeItemNumber);
 				}
 
-				item->Pose.Position.y = pointColl.Position.Floor - bounds.Y2;
+				item->Pose.Position.y = pointColl.GetFloorHeight() - bounds.Y2;
 				AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 			}
 		}

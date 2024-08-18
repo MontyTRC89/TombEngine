@@ -77,7 +77,7 @@ namespace TEN::Entities::Creatures::TR3
 		short head = 0;
 		auto extraTorsoRot = EulerAngles::Identity;
 
-		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
+		if (item->BoxNumber != NO_VALUE && (g_Level.PathfindingBoxes[item->BoxNumber].flags & BLOCKED))
 		{
 			DoDamage(item, 20);
 			DoLotsOfBlood(

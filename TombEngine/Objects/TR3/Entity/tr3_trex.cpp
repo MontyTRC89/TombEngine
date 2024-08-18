@@ -182,8 +182,8 @@ namespace TEN::Entities::Creatures::TR3
 			}
 		}
 
-		CreatureJoint(item, 0, headYRot);
-		creature->JointRotation[1] = creature->JointRotation[0];
+		CreatureJoint(item, 0, headYRot / 2);
+		CreatureJoint(item, 1, headYRot / 2);
 
 		CreatureAnimation(itemNumber, headingAngle, 0);
 

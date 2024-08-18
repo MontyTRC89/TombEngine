@@ -9,7 +9,7 @@
 
 using namespace TEN::Math;
 
-namespace TEN::Entities::Traps::TR1
+namespace TEN::Entities::Traps
 {
 	constexpr auto SLAMMING_DOORS_HARM_DAMAGE = 400;
 

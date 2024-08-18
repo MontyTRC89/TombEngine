@@ -794,52 +794,55 @@ namespace TEN::Renderer
 
 					batsCount++;
 				}
-			}
 
-			if (batsCount > 0)
-			{
-				if (rendererPass == RendererPass::GBuffer)
+				if (batsCount == INSTANCED_STATIC_MESH_BUCKET_SIZE ||
+					(i == NUM_BATS - 1 && batsCount > 0))
 				{
-					_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
-					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
-				}
-				else
-				{
-					_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-					_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
-				}
-
-				UINT stride = sizeof(Vertex);
-				UINT offset = 0;
-
-				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-				_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
-
-				for (auto& bucket : mesh->Buckets)
-				{
-					if (bucket.NumVertices == 0)
+					if (rendererPass == RendererPass::GBuffer)
 					{
-						continue;
+						_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
+						_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+					}
+					else
+					{
+						_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
+						_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
 					}
 
-					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+					UINT stride = sizeof(Vertex);
+					UINT offset = 0;
 
-					for (int p = 0; p < passes; p++)
+					_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+					_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+					_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
+
+					for (auto& bucket : mesh->Buckets)
 					{
-						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+						if (bucket.NumVertices == 0)
 						{
 							continue;
 						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
-						DrawIndexedInstancedTriangles(bucket.NumIndices, batsCount, bucket.StartIndex, 0);
+						for (int p = 0; p < passes; p++)
+						{
+							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+							{
+								continue;
+							}
 
-						_numMoveablesDrawCalls++;
+							BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+							BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+							DrawIndexedInstancedTriangles(bucket.NumIndices, batsCount, bucket.StartIndex, 0);
+
+							_numMoveablesDrawCalls++;
+						}
 					}
+
+					batsCount = 0;
 				}
 			}
 		}
@@ -893,7 +896,10 @@ namespace TEN::Renderer
 		}
 		else
 		{	
+			std::vector<std::vector<BeetleData>> beetlesBuckets;
+
 			unsigned int beetleCount = 0;
+
 			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
 				const auto& beetle = TEN::Entities::TR4::BeetleSwarm[i];
@@ -909,57 +915,65 @@ namespace TEN::Renderer
 
 					if (rendererPass != RendererPass::GBuffer)
 					{
-						BindInstancedStaticLights(room.LightsToDraw, beetleCount);
+						std::vector<RendererLight*> lights;
+						for (int i = 0; i < std::min((int)room.LightsToDraw.size(), MAX_LIGHTS_PER_ITEM); i++)
+						{
+							lights.push_back(room.LightsToDraw[i]);
+						}
+						BindInstancedStaticLights(lights, beetleCount);
 					}
 
 					beetleCount++;
 				}
-			}
 
-			if (beetleCount > 0)
-			{
-				if (rendererPass == RendererPass::GBuffer)
+				if (beetleCount == INSTANCED_STATIC_MESH_BUCKET_SIZE || 
+					(i == TEN::Entities::TR4::NUM_BEETLES - 1 && beetleCount > 0))
 				{
-					_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
-					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
-				}
-				else
-				{
-					_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-					_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
-				}
-
-				unsigned int stride = sizeof(Vertex);
-				unsigned int offset = 0;
-
-				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-				_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
-
-				for (const auto& bucket : mesh->Buckets)
-				{
-					if (bucket.NumVertices == 0)
+					if (rendererPass == RendererPass::GBuffer)
 					{
-						continue;
+						_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
+						_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+					}
+					else
+					{
+						_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
+						_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
 					}
 
-					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+					unsigned int stride = sizeof(Vertex);
+					unsigned int offset = 0;
 
-					for (int p = 0; p < passes; p++)
+					_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+					_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+					_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
+
+					for (const auto& bucket : mesh->Buckets)
 					{
-						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+						if (bucket.NumVertices == 0)
 						{
 							continue;
 						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
-						DrawIndexedInstancedTriangles(bucket.NumIndices, beetleCount, bucket.StartIndex, 0);
+						for (int p = 0; p < passes; p++)
+						{
+							if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+							{
+								continue;
+							}
 
-						_numInstancedStaticsDrawCalls++;
+							BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+							BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+							DrawIndexedInstancedTriangles(bucket.NumIndices, beetleCount, bucket.StartIndex, 0);
+
+							_numInstancedStaticsDrawCalls++;
+						}
 					}
+
+					beetleCount = 0;
 				}
 			}
 		}
@@ -1222,11 +1236,8 @@ namespace TEN::Renderer
 		AddDebugLine(origin2, target2, color);
 	}
 
-	void Renderer::AddDebugBox(const std::array<Vector3, 8>& corners, const Color& color, RendererDebugPage page, bool isWireframe)
+	void Renderer::AddDebugBox(const std::array<Vector3, BOX_VERTEX_COUNT>& corners, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
-		constexpr auto LINE_COUNT  = 12;
-		constexpr auto PLANE_COUNT = 6;
-
 		if (_isLocked)
 			return;
 
@@ -1236,7 +1247,7 @@ namespace TEN::Renderer
 		// Construct box.
 		if (isWireframe)
 		{
-			for (int i = 0; i < LINE_COUNT; i++)
+			for (int i = 0; i < BOX_EDGE_COUNT; i++)
 			{
 				switch (i)
 				{
@@ -1283,7 +1294,7 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			for (int i = 0; i < PLANE_COUNT; i++)
+			for (int i = 0; i < BOX_FACE_COUNT; i++)
 			{
 				switch (i)
 				{
@@ -1335,15 +1346,13 @@ namespace TEN::Renderer
 
 	void Renderer::AddDebugBox(const BoundingOrientedBox& box, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
-		constexpr auto CORNER_COUNT = 8;
-
 		if (_isLocked)
 			return;
 
 		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
 			return;
 
-		auto corners = std::array<Vector3, CORNER_COUNT>{};
+		auto corners = std::array<Vector3, BOX_VERTEX_COUNT>{};
 		box.GetCorners(corners.data());
 
 		AddDebugBox(corners, color, page, isWireframe);
@@ -1351,15 +1360,13 @@ namespace TEN::Renderer
 
 	void Renderer::AddDebugBox(const BoundingBox& box, const Color& color, RendererDebugPage page, bool isWireframe)
 	{
-		constexpr auto CORNER_COUNT = 8;
-
 		if (_isLocked)
 			return;
 
 		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
 			return;
 
-		auto corners = std::array<Vector3, CORNER_COUNT>{};
+		auto corners = std::array<Vector3, BOX_VERTEX_COUNT>{};
 		box.GetCorners(corners.data());
 
 		AddDebugBox(corners, color, page, isWireframe);
@@ -1590,7 +1597,7 @@ namespace TEN::Renderer
 			dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
 		}
 
-		dynamicLight.RoomNumber = NO_ROOM;
+		dynamicLight.RoomNumber = NO_VALUE;
 		dynamicLight.Intensity = 1.0f;
 		dynamicLight.Position = Vector3(float(x), float(y), float(z));
 		dynamicLight.Out = falloff * 256.0f;
@@ -1718,7 +1725,7 @@ namespace TEN::Renderer
 		//RenderSimpleSceneToParaboloid(&_roomAmbientMapsCache[ambientMapCacheIndex].Back, LaraItem->Pose.Position.ToVector3(), -1);
 
 		// Bind and clear render target.
-		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), _debugPage == RendererDebugPage::WireframeMode ? Colors::White : Colors::Black);
+		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), _debugPage == RendererDebugPage::WireframeMode ? Colors::DimGray : Colors::Black);
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Reset viewport and scissor
@@ -3237,7 +3244,7 @@ namespace TEN::Renderer
 		}
 
 		SetBlendMode(objectInfo->Bucket->BlendMode);
-		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		// Draw geometry
 		if (objectInfo->Bucket->Animated)
@@ -3298,10 +3305,10 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
 		SetBlendMode(objectInfo->Bucket->BlendMode);
-		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
-			_context->VSSetShader(_vsItems.Get(), nullptr, 0);
-			_context->PSSetShader(_psItems.Get(), nullptr, 0);
+		_context->VSSetShader(_vsItems.Get(), nullptr, 0);
+		_context->PSSetShader(_psItems.Get(), nullptr, 0);
 
 		ItemInfo* nativeItem = &g_Level.Items[objectInfo->Item->ItemNumber];
 		RendererRoom* room = &_rooms[objectInfo->Item->RoomNumber];
@@ -3354,7 +3361,7 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
 		SetBlendMode(objectInfo->Bucket->BlendMode);
-		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[objectInfo->Bucket->Texture]),
 			SamplerStateRegister::AnisotropicClamp);

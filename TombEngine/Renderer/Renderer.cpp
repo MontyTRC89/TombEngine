@@ -50,8 +50,8 @@ namespace TEN::Renderer
 
 		for (auto& item : _items)
 		{
-			item.PrevRoomNumber = NO_ROOM;
-			item.RoomNumber = NO_ROOM;
+			item.PrevRoomNumber = NO_VALUE;
+			item.RoomNumber = NO_VALUE;
 			item.ItemNumber = NO_VALUE;
 			item.LightsToDraw.clear();
 		}
@@ -242,7 +242,7 @@ namespace TEN::Renderer
 			float fadedCoeff = 1.0f;
 
 			// Interpolate lights which don't affect neighbor rooms
-			if (!lights[i]->AffectNeighbourRooms && roomNumber != NO_ROOM && lights[i]->RoomNumber != NO_ROOM)
+			if (!lights[i]->AffectNeighbourRooms && roomNumber != NO_VALUE && lights[i]->RoomNumber != NO_VALUE)
 			{
 				if (lights[i]->RoomNumber == roomNumber)
 					fadedCoeff = fade;

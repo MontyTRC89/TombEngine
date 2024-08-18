@@ -3,8 +3,9 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/Point.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
@@ -20,6 +21,8 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -180,7 +183,7 @@ namespace TEN::Entities::Vehicles
 		// This allows creation of minecarts which will get to a point and stop forever.
 		auto mountType = GetVehicleMountType(minecartItem, laraItem, coll, MinecartMountTypes, MINECART_MOUNT_DISTANCE);
 		if (mountType == VehicleMountType::None ||
-			GetCollision(minecartItem, minecartItem->Pose.Orientation.y, BLOCK(1)).BottomBlock->Flags.MinecartStop())
+			GetPointCollision(*minecartItem, minecartItem->Pose.Orientation.y, BLOCK(1)).GetBottomSector().Flags.MinecartStop())
 		{
 			ObjectCollision(itemNumber, laraItem, coll);
 		}
@@ -240,12 +243,13 @@ namespace TEN::Entities::Vehicles
 
 	static int GetMinecartCollision(ItemInfo* minecartItem, short angle, int distance)
 	{
-		auto probe = GetCollision(minecartItem, angle, distance, -LARA_HEIGHT);
+		auto probe = GetPointCollision(*minecartItem, angle, distance, -LARA_HEIGHT);
 
-		if (probe.Position.Floor != NO_HEIGHT)
-			probe.Position.Floor -= minecartItem->Pose.Position.y;
+		if (probe.GetFloorHeight() == NO_HEIGHT)
+			return probe.GetFloorHeight();
+			
+		return (probe.GetFloorHeight() - minecartItem->Pose.Position.y);
 
-		return probe.Position.Floor;
 	}
 
 	static bool TestMinecartDismount(ItemInfo* laraItem, int direction)
@@ -259,16 +263,16 @@ namespace TEN::Entities::Vehicles
 		else
 			angle = minecartItem->Pose.Orientation.y - ANGLE(90.0f);
 
-		auto probe = GetCollision(minecartItem, angle, -MINECART_DISMOUNT_DISTANCE);
+		auto probe = GetPointCollision(*minecartItem, angle, -MINECART_DISMOUNT_DISTANCE);
 
-		if (probe.Position.FloorSlope || probe.Position.Floor == NO_HEIGHT)
+		if (probe.IsSteepFloor() || probe.GetFloorHeight() == NO_HEIGHT)
 			return false;
 
-		if (abs(probe.Position.Floor - minecartItem->Pose.Position.y) > CLICK(2))
+		if (abs(probe.GetFloorHeight() - minecartItem->Pose.Position.y) > CLICK(2))
 			return false;
 
-		if ((probe.Position.Ceiling - minecartItem->Pose.Position.y) > -LARA_HEIGHT ||
-			(probe.Position.Floor - probe.Position.Ceiling) < LARA_HEIGHT)
+		if ((probe.GetCeilingHeight() - minecartItem->Pose.Position.y) > -LARA_HEIGHT ||
+			(probe.GetFloorHeight() - probe.GetCeilingHeight()) < LARA_HEIGHT)
 		{
 			return false;
 		}
@@ -278,7 +282,7 @@ namespace TEN::Entities::Vehicles
 
 	static void MinecartToEntityCollision(ItemInfo* minecartItem, ItemInfo* laraItem)
 	{
-		for (auto i : g_Level.Rooms[minecartItem->RoomNumber].neighbors)
+		for (auto i : g_Level.Rooms[minecartItem->RoomNumber].NeighborRoomNumbers)
 		{
 			if (!g_Level.Rooms[i].Active())
 				continue;
@@ -348,7 +352,7 @@ namespace TEN::Entities::Vehicles
 		auto* minecart = GetMinecartInfo(minecartItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		auto flags = GetCollision(minecartItem).BottomBlock->Flags;
+		auto flags = GetPointCollision(*minecartItem).GetBottomSector().Flags;
 
 		if (minecart->StopDelayTime)
 			minecart->StopDelayTime--;
@@ -963,7 +967,7 @@ namespace TEN::Entities::Vehicles
 		if (lara->Context.Vehicle != NO_VALUE)
 			laraItem->Pose = minecartItem->Pose;
 
-		short probedRoomNumber = GetCollision(minecartItem).RoomNumber;
+		short probedRoomNumber = GetPointCollision(*minecartItem).GetRoomNumber();
 		if (probedRoomNumber != minecartItem->RoomNumber)
 		{
 			ItemNewRoom(lara->Context.Vehicle, probedRoomNumber);

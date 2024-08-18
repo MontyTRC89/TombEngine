@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/debris.h"
 #include "Game/items.h"
@@ -18,6 +19,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
@@ -308,7 +310,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						{
 								item->MeshBits &= ~ShatterItem.bit;
 								ShatterImpactData.impactDirection = dir;
-								ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
+								ShatterImpactData.impactLocation = ShatterItem.sphere.Center;
 								ShatterObject(&ShatterItem, 0, 128, target2.RoomNumber, 0);
 								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);							
 						}
@@ -323,20 +325,19 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								{
 									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 
-									int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+									auto spheres = item->GetSpheres();
 									auto ray = Ray(origin->ToVector3(), dir);
 									float bestDistance = INFINITY;
 									int bestJointIndex = NO_VALUE;
 
-									for (int i = 0; i < num; i++)
+									for (int i = 0; i < spheres.size(); i++)
 									{
-										auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
-										float distance = 0.0f;
-										if (ray.Intersects(sphere, distance))
+										float dist = 0.0f;
+										if (ray.Intersects(spheres[i], dist))
 										{
-											if (distance < bestDistance)
+											if (dist < bestDistance)
 											{
-												bestDistance = distance;
+												bestDistance = dist;
 												bestJointIndex = i;
 											}
 										}
@@ -500,27 +501,23 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 		auto* item = &g_Level.Items[closestItemNumber];
 		auto* object = &Objects[item->ObjectNumber];
 
-		// Get transformed mesh sphere.
-		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-		SPHERE spheres[34];
-		memcpy(spheres, CreatureSpheres, sizeof(SPHERE) * 34);
-
 		if (object->nmeshes <= 0)
 			return false;
 
 		meshIndex = object->meshIndex;
 
+		auto spheres = item->GetSpheres();
 		for (int i = 0; i < object->nmeshes; i++)
 		{
 			// If mesh is visible.
 			if (item->MeshBits & (1 << i))
 			{
-				auto* sphere = &CreatureSpheres[i];
+				const auto& sphere = spheres[i];
 
+				// NOTE: Not worth doing what's commented below. *Rewrite completely.*
 				// TODO: this approach is the correct one but, again, Core's math is a mystery and this test was meant
 				// to fail deliberately in some way. I've so added again Core's legacy test for allowing the current game logic
 				// but after more testing we should trash it in the future and restore the new way.
-
 #if 0
 				// Create the bounding sphere and test it against the ray
 				BoundingSphere sph = BoundingSphere(Vector3(sphere->x, sphere->y, sphere->z), sphere->r);
@@ -551,9 +548,9 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 				p[2].x = target.x;
 				p[2].y = target.y;
 				p[2].z = target.z;
-				p[3].x = sphere->x;
-				p[3].y = sphere->y;
-				p[3].z = sphere->z;
+				p[3].x = sphere.Center.x;
+				p[3].y = sphere.Center.y;
+				p[3].z = sphere.Center.z;
 
 				int r0 = (p[3].x - p[1].x) * (p[2].x - p[1].x) +
 					(p[3].y - p[1].y) * (p[2].y - p[1].y) +
@@ -583,11 +580,11 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 
 					int distance = dx + dy + dz;
 
-					if (distance < SQUARE(sphere->r))
+					if (distance < SQUARE(sphere.Radius))
 					{
-						dx = SQUARE(sphere->x - origin.x);
-						dy = SQUARE(sphere->y - origin.y);
-						dz = SQUARE(sphere->z - origin.z);
+						dx = SQUARE(sphere.Center.x - origin.x);
+						dy = SQUARE(sphere.Center.y - origin.y);
+						dz = SQUARE(sphere.Center.z - origin.z);
 
 						distance = dx + dy + dz;
 
@@ -622,14 +619,12 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 	{
 		auto* item = &g_Level.Items[closestItemNumber];
 
-		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
+		auto spheres = item->GetSpheres();
 
 		ShatterItem.yRot = item->Pose.Orientation.y;
 		ShatterItem.meshIndex = meshIndex;
 		ShatterItem.color = item->Model.Color;
-		ShatterItem.sphere.x = CreatureSpheres[sp].x;
-		ShatterItem.sphere.y = CreatureSpheres[sp].y;
-		ShatterItem.sphere.z = CreatureSpheres[sp].z;
+		ShatterItem.sphere.Center = spheres[sp].Center;
 		ShatterItem.bit = bit;
 		ShatterItem.flags = 0;
 	}
@@ -784,7 +779,7 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 {
 	// Run through neighbor rooms.
 	const auto& room = g_Level.Rooms[roomNumber];
-	for (int neighborRoomNumber : room.neighbors)
+	for (int neighborRoomNumber : room.NeighborRoomNumbers)
 	{
 		// Get neighbor room.
 		const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
