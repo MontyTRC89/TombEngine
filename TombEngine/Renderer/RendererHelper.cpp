@@ -95,6 +95,10 @@ namespace TEN::Renderer
 					rotMatrix = Matrix::CreateFromQuaternion(quat3);
 				}
 
+				// Store bone orientation on current frame.
+				if (rItem != nullptr)
+					rItem->BoneOrientations[bonePtr->Index] = Quaternion::CreateFromRotationMatrix(rotMatrix);
+
 				auto tMatrix = (bonePtr == rObject.Skeleton) ? Matrix::CreateTranslation(offset0) : Matrix::Identity;
 
 				auto extraRotMatrix = Matrix::CreateFromQuaternion(bonePtr->ExtraRotation);
@@ -549,28 +553,38 @@ namespace TEN::Renderer
 		return std::pair<Vector3, Vector3>(nearPoint, farPoint);
 	}
 
-	Vector3 Renderer::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
+	Vector3 Renderer::GetMoveableBonePosition(int itemNumber, int boneID, const Vector3& relOffset)
 	{
 		auto* rendererItem = &_items[itemNumber];
-
 		rendererItem->ItemNumber = itemNumber;
 
-		if (!rendererItem)
+		if (rendererItem == nullptr)
 			return Vector3::Zero;
 
 		if (!rendererItem->DoneAnimations)
-		{
-			if (itemNumber == LaraItem->Index)
-				UpdateLaraAnimations(false);
-			else
-				UpdateItemAnimations(itemNumber, false);
-		}
+			(itemNumber == LaraItem->Index) ? UpdateLaraAnimations(false) : UpdateItemAnimations(itemNumber, false);
 
-		if (jointIndex >= MAX_BONES)
-			jointIndex = 0;
+		if (boneID >= MAX_BONES)
+			boneID = 0;
 
-		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
+		auto world = rendererItem->AnimationTransforms[boneID] * rendererItem->World;
 		return Vector3::Transform(relOffset, world);
+	}
+
+	Quaternion Renderer::GetMoveableBoneOrientation(int itemNumber, int boneID)
+	{
+		const auto* rendererItem = &_items[itemNumber];
+
+		if (rendererItem == nullptr)
+			return Quaternion::Identity;
+
+		if (!rendererItem->DoneAnimations)
+			(itemNumber == LaraItem->Index) ? UpdateLaraAnimations(false) : UpdateItemAnimations(itemNumber, false);
+
+		if (boneID >= MAX_BONES)
+			boneID = 0;
+
+		return rendererItem->BoneOrientations[boneID];
 	}
 
 	void Renderer::SaveScreenshot()
