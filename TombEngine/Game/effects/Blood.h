@@ -1,6 +1,8 @@
 #pragma once
 
-struct CollisionResult;
+#include "Objects/game_object_ids.h"
+
+namespace TEN::Collision::Point { class PointCollisionData; }
 struct ItemInfo;
 
 namespace TEN::Effects::Blood
@@ -9,8 +11,10 @@ namespace TEN::Effects::Blood
 	{
 		static constexpr auto LIFE_START_FADING = 0.5f;
 
-		unsigned int SpriteID	   = 0;
-		bool		 CanSpawnStain = false;
+		GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   SpriteID	   = 0;
+
+		bool CanSpawnStain = false;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;
@@ -30,16 +34,20 @@ namespace TEN::Effects::Blood
 	{
 	private:
 		// Members
-		std::vector<BloodDripEffectParticle> Particles;
+
+		std::vector<BloodDripEffectParticle> _particles;
 
 	public:
 		// Getters
+
 		const std::vector<BloodDripEffectParticle>& GetParticles();
 
 		// Spawners
+
 		void Spawn(const Vector3& pos, int roomNumber, const Vector3& vel, const Vector2& size, float lifeInSec, bool canSpawnStain);
 
 		// Utilities
+
 		void Update();
 		void Clear();
 	};
@@ -51,17 +59,18 @@ namespace TEN::Effects::Blood
 		static constexpr auto SURFACE_OFFSET	= 4;
 		static constexpr auto VERTEX_COUNT		= 4;
 
-		unsigned int SpriteID = 0;
+		GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   SpriteID	   = 0;
 
-		Vector3	Position	  = Vector3::Zero;
-		int		RoomNumber	  = 0;
-		short	Orientation2D = 0;
-		Vector3 Normal		  = Vector3::Zero;
-		Vector4	Color		  = Vector4::Zero;
-		Vector4	ColorStart	  = Vector4::Zero;
-		Vector4	ColorEnd	  = Vector4::Zero;
+		Vector3	Position	= Vector3::Zero;
+		int		RoomNumber	= 0;
+		short	Orientation = 0;
+		Vector3 Normal		= Vector3::Zero;
+		Vector4	Color		= Vector4::Zero;
+		Vector4	ColorStart	= Vector4::Zero;
+		Vector4	ColorEnd	= Vector4::Zero;
 
-		std::array<Vector3, VERTEX_COUNT> VertexPoints = {};
+		std::array<Vector3, VERTEX_COUNT> Vertices = {};
 
 		float Life			  = 0.0f;
 		float LifeStartFading = 0.0f;
@@ -74,33 +83,71 @@ namespace TEN::Effects::Blood
 
 		void Update();
 
-		std::array<Vector3, VERTEX_COUNT> GetVertexPoints();
-		bool							  TestSurface();
+		std::array<Vector3, VERTEX_COUNT> GetVertices();
+		bool							  TestSurface() const;
 	};
 
 	class BloodStainEffectController
 	{
 	private:
 		// Members
-		std::vector<BloodStainEffectParticle> Particles = {};
+
+		std::vector<BloodStainEffectParticle> _particles = {};
 
 	public:
 		// Getters
+
 		const std::vector<BloodStainEffectParticle>& GetParticles();
 
 		// Spawners
+
 		void Spawn(const Vector3& pos, int roomNumber, const Vector3& normal, float sizeMax, float scalar, float delayInSec = 0.0f);
 		void Spawn(const BloodDripEffectParticle& drip, PointCollisionData& pointColl, bool isOnFloor);
 		void Spawn(const ItemInfo& item);
 
 		// Utilities
+
+		void Update();
+		void Clear();
+	};
+
+	struct BloodBillboardEffectParticle
+	{
+		GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   SpriteID	   = 0;
+
+		Vector3 Position = Vector3::Zero;
+		Vector4	Color	 = Vector4::Zero;
+		float	Size	 = 0.0f;
+
+		void Update();
+	};
+
+	class BloodBillboardEffectController
+	{
+	private:
+		// Members
+
+		std::vector<BloodBillboardEffectParticle> _particles = {};
+
+	public:
+		// Getters
+
+		const std::vector<BloodBillboardEffectParticle>& GetParticles();
+
+		// Spawners
+
+
+		// Utilities
+
 		void Update();
 		void Clear();
 	};
 	
 	struct BloodMistEffectParticle
 	{
-		unsigned int SpriteID = 0;
+		GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   SpriteID	   = 0;
 
 		Vector3 Position	  = Vector3::Zero;
 		int		RoomNumber	  = 0;
@@ -126,16 +173,20 @@ namespace TEN::Effects::Blood
 	{
 	private:
 		// Members
-		std::vector<BloodMistEffectParticle> Particles = {};
+
+		std::vector<BloodMistEffectParticle> _particles = {};
 
 	public:
-		// Spawners
+		// Getters
+
 		const std::vector<BloodMistEffectParticle>& GetParticles();
 
 		// Spawners
+
 		void Spawn(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count = 1);
 
 		// Utilities
+
 		void Update();
 		void Clear();
 	};
@@ -143,7 +194,8 @@ namespace TEN::Effects::Blood
 	// TODO: Copy approach from ripple effect.
 	struct UnderwaterBloodEffectParticle
 	{
-		unsigned int SpriteID = 0;
+		GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+		int			   SpriteID	   = 0;
 
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;
@@ -161,29 +213,35 @@ namespace TEN::Effects::Blood
 	{
 	private:
 		// Members
-		std::vector<UnderwaterBloodEffectParticle> Particles;
+
+		std::vector<UnderwaterBloodEffectParticle> _particles;
 
 	public:
 		// Getters
+
 		const std::vector<UnderwaterBloodEffectParticle>& GetParticles();
 
 		// Spawners
+
 		void Spawn(const Vector3& pos, int roomNumber, float size, unsigned int count = 1);
 
 		// Utilities
+
 		void Update();
 		void Clear();
 	};
 
 	extern BloodDripEffectController	   BloodDripEffect;
 	extern BloodStainEffectController	   BloodStainEffect;
+	extern BloodBillboardEffectController  BloodBillboardEffect;
 	extern BloodMistEffectController	   BloodMistEffect;
 	extern UnderwaterBloodEffectController UnderwaterBloodEffect;
 
 	void SpawnBloodSplatEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount);
 	void SpawnPlayerBloodEffect(const ItemInfo& item);
 
-	// Legacy spawners
+	// TODO: Remove legacy spawners
+
 	void TriggerBlood(const Vector3& pos, short headingAngle, unsigned int count);
 	short DoBloodSplat(int x, int y, int z, short vel, short yRot, short roomNumber);
 	void DoLotsOfBlood(const Vector3& pos, int vel, short headingAngle, int roomNumber, unsigned int count);

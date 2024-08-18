@@ -552,38 +552,6 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::PrepareUnderwaterBloodParticles(RenderView& view)
-	{
-		if (UnderwaterBloodEffect.GetParticles().empty())
-			return;
-
-		for (const auto& part : UnderwaterBloodEffect.GetParticles())
-		{
-			if (part.Life <= 0.0f)
-				continue;
-
-			auto color = Vector4::Zero;
-			if (part.Init)
-			{
-				color = Vector4(part.Init / 2, 0, part.Init / 16, UCHAR_MAX);
-			}
-			else
-			{
-				color = Vector4(part.Life / 2, 0, part.Life / 16, UCHAR_MAX);
-			}
-
-			color.x = (int)std::clamp((int)color.x, 0, UCHAR_MAX);
-			color.y = (int)std::clamp((int)color.y, 0, UCHAR_MAX);
-			color.z = (int)std::clamp((int)color.z, 0, UCHAR_MAX);
-			color /= UCHAR_MAX;
-
-			AddSpriteBillboard(
-				&_sprites[uwBlood.SpriteIndex],
-				uwBlood.Position,
-				color, 0.0f, 1.0f, Vector2(uwBlood.Size, uwBlood.Size) * 2, BlendMode::Additive, true, view);
-		}
-	}
-
 	void Renderer::PrepareShockwaves(RenderView& view)
 	{
 		unsigned char r = 0;
@@ -1062,7 +1030,7 @@ namespace TEN::Renderer
 		return Texture2D(_device.Get(), 1, 1, data.data());
 	}
 
-	void Renderer11::DrawBloodDrips(RenderView& view)
+	void Renderer::PrepareBloodDrips(RenderView& view)
 	{
 		for (const auto& part : BloodDripEffect.GetParticles())
 		{
@@ -1073,27 +1041,13 @@ namespace TEN::Renderer
 			axis.Normalize();
 
 			AddSpriteBillboardConstrained(
-				&m_sprites[part.SpriteID],
+				&_sprites[Objects[part.SpriteSeqID].meshIndex + part.SpriteID],
 				part.Position,
-				part.Color, 0.5f, 1.0f, part.Size, BLENDMODE_ALPHABLEND, axis, true, view);
+				part.Color, 0.5f, 1.0f, part.Size, BlendMode::AlphaBlend, axis, true, view);
 		}
 	}
 
-	void Renderer11::DrawBloodMists(RenderView& view)
-	{
-		for (const auto& part : BloodMistEffect.GetParticles())
-		{
-			if (part.Life <= 0.0f)
-				continue;
-
-			AddSpriteBillboard(
-				&m_sprites[part.SpriteID],
-				part.Position,
-				part.Color, TO_RAD(part.Orientation2D), 1.0f, Vector2(part.Size), BLENDMODE_ALPHABLEND, true, view);
-		}
-	}
-
-	void Renderer11::DrawBloodStains(RenderView& view)
+	void Renderer::PrepareBloodStains(RenderView& view)
 	{
 		for (const auto& part : BloodStainEffect.GetParticles())
 		{
@@ -1101,9 +1055,66 @@ namespace TEN::Renderer
 				continue;
 
 			AddQuad(
-				&m_sprites[part.SpriteID],
-				part.VertexPoints[0], part.VertexPoints[1], part.VertexPoints[2], part.VertexPoints[3],
-				part.Color, 0.0f, 1.0f, Vector2::One, BLENDMODE_ALPHABLEND, false, view);
+				&_sprites[Objects[part.SpriteSeqID].meshIndex + part.SpriteID],
+				part.Vertices[0], part.Vertices[1], part.Vertices[2], part.Vertices[3],
+				part.Color, 0.0f, 1.0f, Vector2::One, BlendMode::AlphaBlend, false, view);
+		}
+	}
+
+	void Renderer::PrepareBloodBillboards(RenderView& view)
+	{
+		for (const auto& part : BloodBillboardEffect.GetParticles())
+		{
+			AddSpriteBillboard(
+				&_sprites[Objects[part.SpriteSeqID].meshIndex + part.SpriteID],
+				part.Position,
+				part.Color, 0.0f, 1.0f, Vector2(part.Size), BlendMode::AlphaBlend, true, view);
+		}
+	}
+
+	void Renderer::PrepareBloodMists(RenderView& view)
+	{
+		for (const auto& part : BloodMistEffect.GetParticles())
+		{
+			if (part.Life <= 0.0f)
+				continue;
+
+			AddSpriteBillboard(
+				&_sprites[Objects[part.SpriteSeqID].meshIndex + part.SpriteID],
+				part.Position,
+				part.Color, TO_RAD(part.Orientation2D), 1.0f, Vector2(part.Size), BlendMode::AlphaBlend, true, view);
+		}
+	}
+
+	void Renderer::PrepareUnderwaterBloodParticles(RenderView& view)
+	{
+		if (UnderwaterBloodEffect.GetParticles().empty())
+			return;
+
+		for (const auto& part : UnderwaterBloodEffect.GetParticles())
+		{
+			if (part.Life <= 0.0f)
+				continue;
+
+			auto color = Vector4::Zero;
+			if (part.Init)
+			{
+				color = Vector4(part.Init / 2, 0, part.Init / 16, UCHAR_MAX);
+			}
+			else
+			{
+				color = Vector4(part.Life / 2, 0, part.Life / 16, UCHAR_MAX);
+			}
+
+			color.x = (int)std::clamp((int)color.x, 0, UCHAR_MAX);
+			color.y = (int)std::clamp((int)color.y, 0, UCHAR_MAX);
+			color.z = (int)std::clamp((int)color.z, 0, UCHAR_MAX);
+			color /= UCHAR_MAX;
+
+			AddSpriteBillboard(
+				&_sprites[Objects[part.SpriteSeqID].meshIndex + part.SpriteID],
+				part.Position,
+				color, 0.0f, 1.0f, Vector2(part.Size * 2), BlendMode::Additive, true, view);
 		}
 	}
 
@@ -1368,8 +1379,8 @@ namespace TEN::Renderer
 				return;
 
 			AddSpriteBillboard(
-				&_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], 
-				e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BlendMode::Additive, true, view);
+				&_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + explosion.sprite], 
+				explosion.pos, explosion.tint, explosion.rotation, 1.0f, { explosion.size, explosion.size }, BlendMode::Additive, true, view);
 		}
 	}
 
@@ -1377,18 +1388,18 @@ namespace TEN::Renderer
 	{
 		using namespace TEN::Effects;
 
-		for (const auto& particle : simpleParticles)
+		for (const auto& part : simpleParticles)
 		{
-			if (!particle.active)
+			if (!part.active)
 				continue;
 
-			if (!CheckIfSlotExists(particle.sequence, "Particle rendering"))
+			if (!CheckIfSlotExists(part.sequence, "Particle rendering"))
 				continue;
 
 			AddSpriteBillboard(
-				&_sprites[Objects[s.sequence].meshIndex + s.sprite],
-				s.worldPosition,
-				Vector4::One, 0, 1.0f, { s.size, s.size / 2 }, BlendMode::AlphaBlend, true, view);
+				&_sprites[Objects[part.sequence].meshIndex + part.sprite],
+				part.worldPosition,
+				Vector4::One, 0, 1.0f, { part.size, part.size / 2 }, BlendMode::AlphaBlend, true, view);
 		}
 	}
 }

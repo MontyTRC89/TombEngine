@@ -233,7 +233,10 @@ void ClearInactiveEffects(std::vector<TEffect>& effects)
 	effects.erase(
 		std::remove_if(
 			effects.begin(), effects.end(),
-			[](const auto& effect) { return (effect.Life <= 0.0f); }),
+			[](const auto& effect)
+			{
+				return (effect.Life <= 0.0f);
+			}),
 		effects.end());
 }
 

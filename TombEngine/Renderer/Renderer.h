@@ -411,8 +411,6 @@ namespace TEN::Renderer
 		void InitializeMenuBars(int y);
 		void InitializeSky();
 		void DrawAllStrings();
-		void PrepareLaserBarriers(RenderView& view);
-		void PrepareSingleLaserBeam(RenderView& view);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, RendererPass rendererPass);
 		void DrawItems(RenderView& view, RendererPass rendererPass);
@@ -421,19 +419,38 @@ namespace TEN::Renderer
 		void DrawBaddyGunflashes(RenderView& view);
 		void DrawStatics(RenderView& view, RendererPass rendererPass);
 		void DrawLara(RenderView& view, RendererPass rendererPass);
+
+		void PrepareLaserBarriers(RenderView& view);
+		void PrepareSingleLaserBeam(RenderView& view);
 		void PrepareFires(RenderView& view);
 		void PrepareParticles(RenderView& view);
 		void PrepareSmokes(RenderView& view);
 		void PrepareElectricity(RenderView& view);
 		void PrepareHelicalLasers(RenderView& view);
-		void PrepareBlood(RenderView& view);
 		void PrepareWeatherParticles(RenderView& view);
 		void PrepareDrips(RenderView& view);
 		void PrepareBubbles(RenderView& view);
+		void PrepareSplashes(RenderView& view);
+		void PrepareRopes(RenderView& view);
+		void PrepareShockwaves(RenderView& view);
+		void PrepareRipples(RenderView& view);
+		void PrepareSmokeParticles(RenderView& view);
+		void PrepareSparkParticles(RenderView& view);
+		void PrepareExplosionParticles(RenderView& view);
+		void PrepareSimpleParticles(RenderView& view);
+		void PrepareStreamers(RenderView& view);
+		void PrepareFootprints(RenderView& view);
+
+		void PrepareBloodDrips(RenderView& view);
+		void PrepareBloodStains(RenderView& view);
+		void PrepareBloodBillboards(RenderView& view);
+		void PrepareBloodMists(RenderView& view);
+		void PrepareUnderwaterBloodParticles(RenderView& view);
+
+		void DrawSprites(RenderView& view, RendererPass rendererPass);
+
 		void DrawEffects(RenderView& view, RendererPass rendererPass);
 		void DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass);
-		void PrepareSplashes(RenderView& view);
-		void DrawSprites(RenderView& view, RendererPass rendererPass);
 		void DrawDisplaySprites(RenderView& view);
 		void DrawSortedFaces(RenderView& view);
 		void DrawSingleSprite(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
@@ -446,7 +463,6 @@ namespace TEN::Renderer
 		void DrawLines3D(RenderView& view);
 		void DrawTriangles3D(RenderView& view);
 		void DrawOverlays(RenderView& view);
-		void PrepareRopes(RenderView& view);
 		void DrawFishSwarm(RenderView& view, RendererPass rendererPass);
 		void DrawBats(RenderView& view, RendererPass rendererPass);
 		void DrawRats(RenderView& view, RendererPass rendererPass);
@@ -461,21 +477,12 @@ namespace TEN::Renderer
 		void DrawDebris(RenderView& view, RendererPass rendererPass);
 		void DrawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target,
 		                         ID3D11DepthStencilView* depthTarget);
-		void PrepareShockwaves(RenderView& view);
-		void PrepareRipples(RenderView& view);
-		void PrepareUnderwaterBloodParticles(RenderView& view);
 		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true);
-		void DrawFullScreenSprite(RendererSprite* sprite, DirectX::SimpleMath::Vector3 color, bool fit = true);
-		void PrepareSmokeParticles(RenderView& view);
-		void PrepareSparkParticles(RenderView& view);
-		void PrepareExplosionParticles(RenderView& view);
+		void DrawFullScreenSprite(RendererSprite* sprite, Vector3 color, bool fit = true);
 		void DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass);
 		void DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass);
 		void DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass);
 		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RenderView& view, RendererPass rendererPass);
-		void PrepareSimpleParticles(RenderView& view);
-		void PrepareStreamers(RenderView& view);
-		void PrepareFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
 		void DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view);
 		void RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background, float backgroundFade);

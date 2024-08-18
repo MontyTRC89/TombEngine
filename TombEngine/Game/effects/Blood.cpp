@@ -28,6 +28,7 @@ namespace TEN::Effects::Blood
 
 	BloodDripEffectController		BloodDripEffect		  = {};
 	BloodStainEffectController		BloodStainEffect	  = {};
+	BloodBillboardEffectController	BloodBillboardEffect  = {};
 	BloodMistEffectController		BloodMistEffect		  = {};
 	UnderwaterBloodEffectController UnderwaterBloodEffect = {};
 
@@ -55,7 +56,7 @@ namespace TEN::Effects::Blood
 
 		RoomNumber = pointColl.GetRoomNumber();
 
-		// Hit water; spawn underwater blood.
+		// Spawn underwater blood.
 		if (TestEnvironment(ENV_FLAG_WATER, RoomNumber))
 		{
 			Life = 0.0f;
@@ -66,18 +67,18 @@ namespace TEN::Effects::Blood
 				UnderwaterBloodEffect.Spawn(Position, RoomNumber, size);
 			}
 		}
-		// Hit wall or ceiling; deactivate.
+		// Deactivate on wall hit.
 		if (pointColl.GetFloorHeight() == NO_HEIGHT || Position.y <= pointColl.GetCeilingHeight())
 		{
 			Life = 0.0f;
 		}
-		// Hit floor; spawn 
+		// Spawn stain on floor.
 		else if (Position.y >= pointColl.GetFloorHeight())
 		{
 			Life = 0.0f;
 			BloodStainEffect.Spawn(*this, pointColl, true);
 		}
-		// Hit ceiling; spawn 
+		// Spawn stain on ceiling.
 		else if (Position.y <= pointColl.GetCeilingHeight())
 		{
 			Life = 0.0f;
@@ -90,7 +91,7 @@ namespace TEN::Effects::Blood
 
 	const std::vector<BloodDripEffectParticle>& BloodDripEffectController::GetParticles()
 	{
-		return Particles;
+		return _particles;
 	}
 
 	void BloodDripEffectController::Spawn(const Vector3& pos, int roomNumber, const Vector3& vel, const Vector2& size, float lifeInSec, bool canSpawnStain)
@@ -99,13 +100,10 @@ namespace TEN::Effects::Blood
 		constexpr auto GRAVITY_MAX = 10.0f;
 		constexpr auto GRAVITY_MIN = 5.0f;
 
-		// Sprite missing; return early.
-		if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Drip sprite missing."))
-			return;
+		auto& part = GetNewEffect(_particles, COUNT_MAX);
 
-		auto& part = GetNewEffect(Particles, COUNT_MAX);
-
-		part.SpriteID = Objects[ID_DRIP_SPRITE].meshIndex;
+		part.SpriteSeqID = ID_DRIP_SPRITE;
+		part.SpriteID = 0;
 		part.CanSpawnStain = canSpawnStain;
 		part.Position = pos;
 		part.RoomNumber = roomNumber;
@@ -120,18 +118,18 @@ namespace TEN::Effects::Blood
 
 	void BloodDripEffectController::Update()
 	{
-		if (Particles.empty())
+		if (_particles.empty())
 			return;
 
-		for (auto& part : Particles)
+		for (auto& part : _particles)
 			part.Update();
 
-		ClearInactiveEffects(Particles);
+		ClearInactiveEffects(_particles);
 	}
 
 	void BloodDripEffectController::Clear()
 	{
-		Particles.clear();
+		_particles.clear();
 	}
 
 	void BloodStainEffectParticle::Update()
@@ -162,11 +160,11 @@ namespace TEN::Effects::Blood
 					Scalar = 0.0f;
 			}
 
-			// Update vertex points.
-			auto vertexPoints = GetVertexPoints();
+			// Update vertices.
+			auto vertices = GetVertices();
 			if (TestSurface())
 			{
-				VertexPoints = vertexPoints;
+				Vertices = vertices;
 			}
 			else
 			{
@@ -190,44 +188,42 @@ namespace TEN::Effects::Blood
 		Life -= 1.0f;
 	}
 
-	std::array<Vector3, BloodStainEffectParticle::VERTEX_COUNT> BloodStainEffectParticle::GetVertexPoints()
+	std::array<Vector3, BloodStainEffectParticle::VERTEX_COUNT> BloodStainEffectParticle::GetVertices()
 	{
-		constexpr auto POINT_0 = Vector3( SQRT_2, 0.0f,  SQRT_2);
-		constexpr auto POINT_1 = Vector3(-SQRT_2, 0.0f,  SQRT_2);
-		constexpr auto POINT_2 = Vector3(-SQRT_2, 0.0f, -SQRT_2);
-		constexpr auto POINT_3 = Vector3( SQRT_2, 0.0f, -SQRT_2);
+		constexpr auto REL_VERTEX_0 = Vector3( SQRT_2, 0.0f,  SQRT_2);
+		constexpr auto REL_VERTEX_1 = Vector3(-SQRT_2, 0.0f,  SQRT_2);
+		constexpr auto REL_VERTEX_2 = Vector3(-SQRT_2, 0.0f, -SQRT_2);
+		constexpr auto REL_VERTEX_3 = Vector3( SQRT_2, 0.0f, -SQRT_2);
 
 		// No size; return vertices at singularity.
 		if (Size == 0.0f)
 			return std::array<Vector3, VERTEX_COUNT>{ Position, Position, Position, Position };
 
-		// Determine rotation matrix.
-		auto rotMatrix = Geometry::GetRelOrientToNormal(Orientation2D, Normal).ToRotationMatrix();
-
-		// Calculate and return vertex points.
+		// Calculate and return vertices.
+		auto rotMatrix = Geometry::GetRelOrientToNormal(Orientation, Normal).ToRotationMatrix();
 		return std::array<Vector3, VERTEX_COUNT>
 		{
-			Position + Vector3::Transform(POINT_0 * (Size / 2), rotMatrix),
-			Position + Vector3::Transform(POINT_1 * (Size / 2), rotMatrix),
-			Position + Vector3::Transform(POINT_2 * (Size / 2), rotMatrix),
-			Position + Vector3::Transform(POINT_3 * (Size / 2), rotMatrix)
+			Position + Vector3::Transform(REL_VERTEX_0 * (Size / 2), rotMatrix),
+			Position + Vector3::Transform(REL_VERTEX_1 * (Size / 2), rotMatrix),
+			Position + Vector3::Transform(REL_VERTEX_2 * (Size / 2), rotMatrix),
+			Position + Vector3::Transform(REL_VERTEX_3 * (Size / 2), rotMatrix)
 		};
 	}
 
 	// TODO: Ceilings.
-	bool BloodStainEffectParticle::TestSurface()
+	bool BloodStainEffectParticle::TestSurface() const
 	{
 		constexpr auto ABS_FLOOR_BOUND = CLICK(0.5f);
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
-		// Get point collision at every vertex point.
+		// Get point collision at every vertex.
 		int vPos = Position.y - VERTICAL_OFFSET;
-		auto pointColl0 = GetPointCollision(Vector3i(VertexPoints[0].x, vPos, VertexPoints[0].z), RoomNumber);
-		auto pointColl1 = GetPointCollision(Vector3i(VertexPoints[1].x, vPos, VertexPoints[1].z), RoomNumber);
-		auto pointColl2 = GetPointCollision(Vector3i(VertexPoints[2].x, vPos, VertexPoints[2].z), RoomNumber);
-		auto pointColl3 = GetPointCollision(Vector3i(VertexPoints[3].x, vPos, VertexPoints[3].z), RoomNumber);
+		auto pointColl0 = GetPointCollision(Vector3i(Vertices[0].x, vPos, Vertices[0].z), RoomNumber);
+		auto pointColl1 = GetPointCollision(Vector3i(Vertices[1].x, vPos, Vertices[1].z), RoomNumber);
+		auto pointColl2 = GetPointCollision(Vector3i(Vertices[2].x, vPos, Vertices[2].z), RoomNumber);
+		auto pointColl3 = GetPointCollision(Vector3i(Vertices[3].x, vPos, Vertices[3].z), RoomNumber);
 
-		// Stop scaling blood stain if floor heights at vertex points are beyond lower/upper floor height bound.
+		// Stop scaling blood stain if floor heights at vertices are beyond floor height bound.
 		if (abs(pointColl0.GetFloorHeight() - pointColl1.GetFloorHeight()) > ABS_FLOOR_BOUND ||
 			abs(pointColl1.GetFloorHeight() - pointColl2.GetFloorHeight()) > ABS_FLOOR_BOUND ||
 			abs(pointColl2.GetFloorHeight() - pointColl3.GetFloorHeight()) > ABS_FLOOR_BOUND ||
@@ -241,7 +237,7 @@ namespace TEN::Effects::Blood
 
 	const std::vector<BloodStainEffectParticle>& BloodStainEffectController::GetParticles()
 	{
-		return Particles;
+		return _particles;
 	}
 
 	void BloodStainEffectController::Spawn(const Vector3& pos, int roomNumber, const Vector3& normal, float size, float scalar, float delayInSec)
@@ -249,23 +245,20 @@ namespace TEN::Effects::Blood
 		constexpr auto COUNT_MAX   = 192;
 		constexpr auto OPACITY_MAX = 0.8f;
 
-		// Sprite missing; return early.
-		if (!CheckIfSlotExists(ID_BLOOD_STAIN_SPRITES, "Blood stain sprite missing."))
-			return;
-
-		auto& part = GetNewEffect(Particles, COUNT_MAX);
 		const auto& object = Objects[ID_BLOOD_STAIN_SPRITES];
 
-		// TODO: Dehardcoding value doesn't work.
-		part.SpriteID = object.meshIndex + Random::GenerateInt(0, 7);
+		auto& part = GetNewEffect(_particles, COUNT_MAX);
+
+		part.SpriteSeqID = ID_BLOOD_STAIN_SPRITES;
+		part.SpriteID = Random::GenerateInt(0, object.nmeshes - 1);
 		part.Position = pos;
 		part.RoomNumber = roomNumber;
-		part.Orientation2D = Random::GenerateAngle();
+		part.Orientation = Random::GenerateAngle();
 		part.Normal = normal;
 		part.Color =
 		part.ColorStart = BLOOD_COLOR_RED;
 		part.ColorEnd = BLOOD_COLOR_BROWN;
-		part.VertexPoints = part.GetVertexPoints();
+		part.Vertices = part.GetVertices();
 		part.Life = std::round(BloodStainEffectParticle::LIFE_MAX * FPS);
 		part.LifeStartFading = std::round(BloodStainEffectParticle::LIFE_START_FADING * FPS);
 		part.Size = 0.0f;
@@ -280,7 +273,7 @@ namespace TEN::Effects::Blood
 	{
 		constexpr auto SIZE_COEFF = 4.2f;
 
-		// Drip can't spawn stain; return early.
+		// Non-staining drip; return early.
 		if (!drip.CanSpawnStain)
 			return;
 
@@ -288,12 +281,9 @@ namespace TEN::Effects::Blood
 		if (TestEnvironment(ENV_FLAG_WATER, drip.RoomNumber))
 			return;
 
+		// Calculate position.
 		auto normal = isOnFloor ? pointColl.GetFloorNormal() : pointColl.GetCeilingNormal();
-
-		auto pos = Vector3(
-			drip.Position.x,
-			(isOnFloor ? pointColl.GetFloorHeight() : pointColl.GetCeilingHeight()),
-			drip.Position.z);
+		auto pos = Vector3(drip.Position.x, isOnFloor ? pointColl.GetFloorHeight() : pointColl.GetCeilingHeight(), drip.Position.z);
 		pos = Geometry::TranslatePoint(pos, normal, BloodStainEffectParticle::SURFACE_OFFSET);
 
 		float size = ((drip.Size.x + drip.Size.y) / 2) * SIZE_COEFF;
@@ -308,28 +298,66 @@ namespace TEN::Effects::Blood
 		constexpr auto DELAY_TIME = 5.0f;
 
 		auto pointColl = GetPointCollision(item);
-		auto pos = Vector3(item.Pose.Position.x, pointColl.GetFloorHeight() - BloodStainEffectParticle::SURFACE_OFFSET, item.Pose.Position.z);
 
+		// Calculate position.
+		auto pos = Vector3(item.Pose.Position.x, pointColl.GetFloorHeight(), item.Pose.Position.z);
+		pos = Geometry::TranslatePoint(pos, pointColl.GetFloorNormal(), BloodStainEffectParticle::SURFACE_OFFSET);
+
+		// Calculate max size.
 		auto obb = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-		float sizeMax = obb.Extents.x + obb.Extents.z;
+		float sizeMax = ((obb.Extents.x + obb.Extents.z) / 2) * 1.5f;
 
 		Spawn(pos, item.RoomNumber, pointColl.GetFloorNormal(), sizeMax, SCALAR, DELAY_TIME);
 	}
 
 	void BloodStainEffectController::Update()
 	{
-		if (Particles.empty())
+		if (_particles.empty())
 			return;
 
-		for (auto& part : Particles)
+		for (auto& part : _particles)
 			part.Update();
 
-		ClearInactiveEffects(Particles);
+		ClearInactiveEffects(_particles);
 	}
 
 	void BloodStainEffectController::Clear()
 	{
-		Particles.clear();
+		_particles.clear();
+	}
+
+	void BloodBillboardEffectParticle::Update()
+	{
+		SpriteID++;
+	}
+
+	void BloodBillboardEffectController::Update()
+	{
+		if (_particles.empty())
+			return;
+
+		for (auto& part : _particles)
+			part.Update();
+
+		_particles.erase(
+			std::remove_if(
+				_particles.begin(), _particles.end(),
+				[](const auto& part)
+				{
+					const auto& object = Objects[part.SpriteSeqID];
+					return (part.SpriteID >= object.nmeshes);
+				}),
+			_particles.end());
+	}
+
+	void BloodBillboardEffectController::Clear()
+	{
+		_particles.clear();
+	}
+
+	const std::vector<BloodBillboardEffectParticle>& BloodBillboardEffectController::GetParticles()
+	{
+		return _particles;
 	}
 
 	void BloodMistEffectParticle::Update()
@@ -358,7 +386,7 @@ namespace TEN::Effects::Blood
 
 	const std::vector<BloodMistEffectParticle>& BloodMistEffectController::GetParticles()
 	{
-		return Particles;
+		return _particles;
 	}
 
 	void BloodMistEffectController::Spawn(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count)
@@ -378,10 +406,6 @@ namespace TEN::Effects::Blood
 		constexpr auto SPHERE_RADIUS	  = BLOCK(1 / 8.0f);
 		constexpr auto CONE_SEMIANGLE	  = 20.0f;
 
-		// Sprite missing; return early.
-		if (!CheckIfSlotExists(ID_BLOOD_MIST_SPRITES, "Blood mist sprite missing."))
-			return;
-
 		// Underwater; return early.
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 			return;
@@ -390,9 +414,10 @@ namespace TEN::Effects::Blood
 
 		for (int i = 0; i < count; i++)
 		{
-			auto& part = GetNewEffect(Particles, COUNT_MAX);
+			auto& part = GetNewEffect(_particles, COUNT_MAX);
 
-			part.SpriteID = Objects[ID_SMOKE_SPRITES].meshIndex;
+			part.SpriteSeqID = ID_SMOKE_SPRITES;
+			part.SpriteID = 0;
 			part.Position = Random::GeneratePointInSphere(sphere);
 			part.RoomNumber = roomNumber;
 			part.Orientation2D = Random::GenerateAngle();
@@ -413,23 +438,23 @@ namespace TEN::Effects::Blood
 
 	void BloodMistEffectController::Update()
 	{
-		if (Particles.empty())
+		if (_particles.empty())
 			return;
 
-		for (auto& part : Particles)
+		for (auto& part : _particles)
 			part.Update();
 
-		ClearInactiveEffects(Particles);
+		ClearInactiveEffects(_particles);
 	}
 
 	void BloodMistEffectController::Clear()
 	{
-		Particles.clear();
+		_particles.clear();
 	}
 
 	const std::vector<UnderwaterBloodEffectParticle>& UnderwaterBloodEffectController::GetParticles()
 	{
-		return Particles;
+		return _particles;
 	}
 
 	void UnderwaterBloodEffectParticle::Update()
@@ -464,17 +489,14 @@ namespace TEN::Effects::Blood
 		constexpr auto LIFE_MIN		= 8.0f;
 		constexpr auto SPAWN_RADIUS = BLOCK(0.25f);
 
-		// Sprite missing; return early.
-		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Underwater blood sprite missing."))
-			return;
-
 		auto sphere = BoundingSphere(pos, SPAWN_RADIUS);
 
 		for (int i = 0; i > count; i++)
 		{
-			auto& part = GetNewEffect(Particles, COUNT_MAX);
+			auto& part = GetNewEffect(_particles, COUNT_MAX);
 
-			part.SpriteID = Objects[ID_DEFAULT_SPRITES].meshIndex;
+			part.SpriteSeqID = ID_DEFAULT_SPRITES;
+			part.SpriteID = 0;
 			part.Position = Random::GeneratePointInSphere(sphere);
 			part.RoomNumber = roomNumber;
 			part.Life = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
@@ -485,18 +507,18 @@ namespace TEN::Effects::Blood
 
 	void UnderwaterBloodEffectController::Update()
 	{
-		if (Particles.empty())
+		if (_particles.empty())
 			return;
 
-		for (auto& part : Particles)
+		for (auto& part : _particles)
 			Update();
 
-		ClearInactiveEffects(Particles);
+		ClearInactiveEffects(_particles);
 	}
 
 	void UnderwaterBloodEffectController::Clear()
 	{
-		Particles.clear();
+		_particles.clear();
 	}
 
 	void SpawnBloodSplatEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount)
@@ -532,6 +554,8 @@ namespace TEN::Effects::Blood
 			bool canSpawnStain = (i < baseCount);
 			BloodDripEffect.Spawn(pos, roomNumber, velVector, size, LIFE, canSpawnStain);
 		}
+
+		// TODO: Spawn billboard.
 
 		// Spawn mists.
 		unsigned int mistCount = baseCount * MIST_COUNT_MULT;
