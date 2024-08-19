@@ -215,6 +215,7 @@ GameStatus ControlPhase(int numFrames)
 		Weather.Update();
 
 		// Update effects.
+		BloodBillboardEffect.Update();
 		BloodDripEffect.Update();
 		BloodMistEffect.Update();
 		BloodStainEffect.Update();
@@ -433,6 +434,7 @@ void CleanUp()
 	ClearCinematicBars();
 
 	// Clear effects.
+	BloodBillboardEffect.Clear();
 	BloodDripEffect.Clear();
 	BloodMistEffect.Clear();
 	BloodStainEffect.Clear();

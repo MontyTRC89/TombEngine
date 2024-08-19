@@ -772,11 +772,12 @@ namespace TEN::Renderer
 				Vector3 v;
 				p.Velocity.Normalize(v);
 
+				// TODO: Restore RAIN_WIDTH.
 				AddSpriteBillboardConstrained(
 					&_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
 					p.Position,
 					Vector4(0.8f, 1.0f, 1.0f, p.Transparency()),
-					0.0f, 1.0f, Vector2(RAIN_WIDTH, p.Size), BlendMode::Additive, -v, true, view);
+					0.0f, 1.0f, Vector2(32/*RAIN_WIDTH*/, p.Size), BlendMode::Additive, -v, true, view);
 
 				break;
 			}
@@ -1061,6 +1062,7 @@ namespace TEN::Renderer
 		}
 	}
 
+	// TODO: / 2 size for all blood effects?
 	void Renderer::PrepareBloodBillboards(RenderView& view)
 	{
 		for (const auto& part : BloodBillboardEffect.GetParticles())
@@ -1068,7 +1070,7 @@ namespace TEN::Renderer
 			AddSpriteBillboard(
 				&_sprites[Objects[part.SpriteSeqID].meshIndex + part.SpriteID],
 				part.Position,
-				part.Color, 0.0f, 1.0f, Vector2(part.Size), BlendMode::AlphaBlend, true, view);
+				part.Color, 0.0f, 1.0f, Vector2(part.Size / 2), BlendMode::AlphaBlend, true, view);
 		}
 	}
 

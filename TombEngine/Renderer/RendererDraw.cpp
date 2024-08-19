@@ -1656,28 +1656,31 @@ namespace TEN::Renderer
 		RenderItemShadows(view);
 
 		// Prepare all sprites for later.
-		PrepareFires(view);
-		PrepareSmokes(view);
-		PrepareSmokeParticles(view);
-		PrepareSimpleParticles(view);
-		PrepareSparkParticles(view);
-		PrepareExplosionParticles(view);
-		PrepareFootprints(view);
-		PrepareBlood(view);
-		PrepareWeatherParticles(view);
-		PrepareParticles(view);
+		PrepareBloodBillboards(view);
+		PrepareBloodDrips(view);
+		PrepareBloodMists(view);
+		PrepareBloodStains(view);
 		PrepareBubbles(view);
 		PrepareDrips(view);
-		PrepareRipples(view);
-		PrepareUnderwaterBloodParticles(view);
-		PrepareSplashes(view);
-		PrepareShockwaves(view);
+		PrepareExplosionParticles(view);
 		PrepareElectricity(view);
+		PrepareFires(view);
+		PrepareFootprints(view);
 		PrepareHelicalLasers(view);
-		PrepareRopes(view);
-		PrepareStreamers(view);
 		PrepareLaserBarriers(view);
+		PrepareParticles(view);
+		PrepareRipples(view);
+		PrepareRopes(view);
+		PrepareShockwaves(view);
+		PrepareSimpleParticles(view);
 		PrepareSingleLaserBeam(view);
+		PrepareSmokeParticles(view);
+		PrepareSmokes(view);
+		PrepareSparkParticles(view);
+		PrepareSplashes(view);
+		PrepareStreamers(view);
+		PrepareUnderwaterBloodParticles(view);
+		PrepareWeatherParticles(view);
 
 		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected for a later stage.
 		SortAndPrepareSprites(view);

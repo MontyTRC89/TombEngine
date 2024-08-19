@@ -250,7 +250,7 @@ namespace TEN::Effects::Blood
 		auto& part = GetNewEffect(_particles, COUNT_MAX);
 
 		part.SpriteSeqID = ID_BLOOD_STAIN_SPRITES;
-		part.SpriteID = Random::GenerateInt(0, object.nmeshes - 1);
+		part.SpriteID = Random::GenerateInt(0, abs(object.nmeshes) - 1);
 		part.Position = pos;
 		part.RoomNumber = roomNumber;
 		part.Orientation = Random::GenerateAngle();
@@ -328,7 +328,34 @@ namespace TEN::Effects::Blood
 
 	void BloodBillboardEffectParticle::Update()
 	{
+		const auto& object = Objects[SpriteSeqID];
+
+		// Update sprite ID.
 		SpriteID++;
+
+		// Update life.
+		if (SpriteID > (abs(object.nmeshes) - 1))
+			Life = 0.0f;
+	}
+
+	void BloodBillboardEffectController::Spawn(const Vector3& pos, int roomNumber, float size)
+	{
+		constexpr auto	  COUNT_MAX				= 128;
+		constexpr auto	  SPHERE_RADIUS			= BLOCK(1 / 16.0f);
+		static const auto SPRITE_SEQ_OBJECT_IDS = std::vector{ ID_BLOOD_SPLASH_1, ID_BLOOD_SPLASH_2, ID_BLOOD_SPLASH_3 };
+
+		auto sphere = BoundingSphere(pos, SPHERE_RADIUS);
+
+		auto& part = GetNewEffect(_particles, COUNT_MAX);
+
+		part.SpriteSeqID = SPRITE_SEQ_OBJECT_IDS[Random::GenerateInt(0, (int)SPRITE_SEQ_OBJECT_IDS.size() - 1)];
+		part.SpriteID = 0;
+		part.Position = Random::GeneratePointInSphere(sphere);
+		part.Position.y -= BLOCK(0.25f);
+		part.RoomNumber = roomNumber;
+		part.Color = BLOOD_COLOR_RED;
+		part.Life = 1.0f;
+		part.Size = size;
 	}
 
 	void BloodBillboardEffectController::Update()
@@ -339,15 +366,7 @@ namespace TEN::Effects::Blood
 		for (auto& part : _particles)
 			part.Update();
 
-		_particles.erase(
-			std::remove_if(
-				_particles.begin(), _particles.end(),
-				[](const auto& part)
-				{
-					const auto& object = Objects[part.SpriteSeqID];
-					return (part.SpriteID >= object.nmeshes);
-				}),
-			_particles.end());
+		ClearInactiveEffects(_particles);
 	}
 
 	void BloodBillboardEffectController::Clear()
@@ -555,7 +574,8 @@ namespace TEN::Effects::Blood
 			BloodDripEffect.Spawn(pos, roomNumber, velVector, size, LIFE, canSpawnStain);
 		}
 
-		// TODO: Spawn billboard.
+		// Spawn billboard.
+		BloodBillboardEffect.Spawn(pos, roomNumber, BLOCK(0.5f));
 
 		// Spawn mists.
 		unsigned int mistCount = baseCount * MIST_COUNT_MULT;
@@ -582,7 +602,7 @@ namespace TEN::Effects::Blood
 				auto pos = GetJointPosition(item, i, relOffset);
 
 				SpawnBloodSplatEffect(pos.ToVector3(), item.RoomNumber, -Vector3::UnitY, baseVel, baseCount);
-				//DoBloodSplat(pos.x, pos.y, pos.z, Random::GenerateInt(8, 16), Random::GenerateAngle(), LaraItem->RoomNumber);
+				DoBloodSplat(pos.x, pos.y, pos.z, Random::GenerateInt(8, 16), Random::GenerateAngle(), LaraItem->RoomNumber);
 			}
 
 			node *= 2;
@@ -627,6 +647,7 @@ namespace TEN::Effects::Blood
 	{
 		g_Renderer.PrintDebugMessage("Blood drips: %d ", BloodDripEffect.GetParticles().size());
 		g_Renderer.PrintDebugMessage("Blood stains: %d ", BloodStainEffect.GetParticles().size());
+		g_Renderer.PrintDebugMessage("Blood billboards: %d ", BloodBillboardEffect.GetParticles().size());
 		g_Renderer.PrintDebugMessage("Blood mists: %d ", BloodMistEffect.GetParticles().size());
 		g_Renderer.PrintDebugMessage("UW. blood particles: %d ", UnderwaterBloodEffect.GetParticles().size());
 	}

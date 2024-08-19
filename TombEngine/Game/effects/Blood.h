@@ -2,7 +2,11 @@
 
 #include "Objects/game_object_ids.h"
 
-namespace TEN::Collision::Point { class PointCollisionData; }
+// TODO: forward decl
+#include "Game/collision/Point.h"
+using namespace TEN::Collision::Point;
+
+//namespace TEN::Collision::Point { class PointCollisionData; }
 struct ItemInfo;
 
 namespace TEN::Effects::Blood
@@ -116,9 +120,12 @@ namespace TEN::Effects::Blood
 		GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
 		int			   SpriteID	   = 0;
 
-		Vector3 Position = Vector3::Zero;
-		Vector4	Color	 = Vector4::Zero;
-		float	Size	 = 0.0f;
+		Vector3 Position   = Vector3::Zero;
+		int		RoomNumber = 0;
+		Vector4	Color	   = Vector4::Zero;
+
+		float Life = 0.0f;
+		float Size = 0.0f;
 
 		void Update();
 	};
@@ -137,6 +144,7 @@ namespace TEN::Effects::Blood
 
 		// Spawners
 
+		void Spawn(const Vector3& pos, int roomNumber, float size);
 
 		// Utilities
 

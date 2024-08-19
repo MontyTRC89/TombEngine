@@ -81,7 +81,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* playerItem, Collision
 				if (deltaPos != Vector3i::Zero)
 				{
 					if (TriggerActive(&item))
-						SpawnPlayerBloodEffect(*laraItem);
+						SpawnPlayerBloodEffect(*playerItem);
 				}
 
 				if (!coll->Setup.EnableObjectPush)

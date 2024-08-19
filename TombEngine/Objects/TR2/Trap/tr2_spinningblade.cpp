@@ -51,8 +51,9 @@ namespace TEN::Entities::Traps
 			}
 
 			isSpinning = true;
+		}
 
-		if (item->TouchBits.TestAny())
+		if (item.TouchBits.TestAny())
 		{
 			DoDamage(LaraItem, SPINNING_BLADE_DAMAGE);
 			DoLotsOfBlood(
@@ -60,9 +61,7 @@ namespace TEN::Entities::Traps
 					LaraItem->Pose.Position.x,
 					LaraItem->Pose.Position.y - CLICK(2),
 					LaraItem->Pose.Position.z),
-				short(item->Animation.Velocity.z * 2), LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 2);
-		}
-
+				short(item.Animation.Velocity.z * 2), LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 2);
 			SoundEffect(SFX_TR2_ROLLING_BLADE, &item.Pose);
 		}
 		else

@@ -86,9 +86,9 @@ namespace TEN::Entities::Traps
 				{
 					TriggerBlood(
 						Vector3(
-							laraItem->Pose.Position.x + (GetRandomControl() & 63) - 32,
-							laraItem->Pose.Position.y - (GetRandomControl() & 511) - 256,
-							laraItem->Pose.Position.z + (GetRandomControl() & 63) - 32),
+							playerItem->Pose.Position.x + (GetRandomControl() & 63) - 32,
+							playerItem->Pose.Position.y - (GetRandomControl() & 511) - 256,
+							playerItem->Pose.Position.z + (GetRandomControl() & 63) - 32),
 						-1, 1);
 				}
 			}

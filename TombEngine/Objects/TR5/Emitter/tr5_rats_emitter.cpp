@@ -290,10 +290,9 @@ void UpdateRats()
 						
 						SoundEffect(SFX_TR5_RATS_SPLASH,&rat->Pose);
 						SpawnRipple(
-							Vector3(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z),
+							Vector3(rat->Pose.Position.x, room->TopHeight, rat->Pose.Position.z),
 							rat->RoomNumber,
 							(GetRandomControl() & 3) + 48);
-						
 					}
 				}
 

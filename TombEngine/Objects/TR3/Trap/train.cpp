@@ -109,8 +109,8 @@ namespace TEN::Entities::Traps
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 
-	if (!HandleItemSphereCollision(item, *playerItem))
-		return;
+		if (!HandleItemSphereCollision(item, *playerItem))
+			return;
 
 		SoundEffect(SFX_TR4_LARA_GENERAL_DEATH, &playerItem->Pose, SoundEnvironment::Always);
 		SoundEffect(SFX_TR4_LARA_HIGH_FALL_DEATH, &playerItem->Pose, SoundEnvironment::Always);
@@ -140,7 +140,8 @@ namespace TEN::Entities::Traps
 		long x = playerItem->Pose.Position.x + CLICK(1) * sinY;
 		long z = playerItem->Pose.Position.z + CLICK(1) * cosY;
 
-	DoLotsOfBlood(
-		Vector3(x, laraItem->Pose.Position.y - CLICK(2), z),
-		BLOCK(1), item->Pose.Orientation.y, laraItem->RoomNumber, 15);
+		DoLotsOfBlood(
+			Vector3(x, item.Pose.Position.y - CLICK(2), z),
+			BLOCK(1), item.Pose.Orientation.y, item.RoomNumber, 15);
+	}
 }
