@@ -1062,7 +1062,6 @@ namespace TEN::Renderer
 		}
 	}
 
-	// TODO: / 2 size for all blood effects?
 	void Renderer::PrepareBloodBillboards(RenderView& view)
 	{
 		for (const auto& part : BloodBillboardEffect.GetParticles())
@@ -1070,7 +1069,7 @@ namespace TEN::Renderer
 			AddSpriteBillboard(
 				&_sprites[Objects[part.SpriteSeqID].meshIndex + part.SpriteID],
 				part.Position,
-				part.Color, 0.0f, 1.0f, Vector2(part.Size / 2), BlendMode::AlphaBlend, true, view);
+				part.Color, 0.0f, 1.0f, Vector2(part.Size), BlendMode::AlphaBlend, true, view);
 		}
 	}
 

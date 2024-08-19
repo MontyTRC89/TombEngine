@@ -18,8 +18,6 @@ namespace TEN::Effects::Blood
 		GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
 		int			   SpriteID	   = 0;
 
-		bool CanSpawnStain = false;
-
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;
 		Vector3 Velocity   = Vector3::Zero;
@@ -48,7 +46,7 @@ namespace TEN::Effects::Blood
 
 		// Spawners
 
-		void Spawn(const Vector3& pos, int roomNumber, const Vector3& vel, const Vector2& size, float lifeInSec, bool canSpawnStain);
+		void Spawn(const Vector3& pos, int roomNumber, const Vector3& vel, const Vector2& size, float lifeInSec);
 
 		// Utilities
 
@@ -58,8 +56,8 @@ namespace TEN::Effects::Blood
 
 	struct BloodStainEffectParticle
 	{
-		static constexpr auto LIFE_MAX			= 5.0f * 60.0f;
-		static constexpr auto LIFE_START_FADING = 30.0f;
+		static constexpr auto LIFE_MAX			= 4.0f * 60.0f;
+		static constexpr auto LIFE_START_FADING = 15.0f;
 		static constexpr auto SURFACE_OFFSET	= 4;
 		static constexpr auto VERTEX_COUNT		= 4;
 
@@ -245,7 +243,7 @@ namespace TEN::Effects::Blood
 	extern BloodMistEffectController	   BloodMistEffect;
 	extern UnderwaterBloodEffectController UnderwaterBloodEffect;
 
-	void SpawnBloodSplatEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int baseCount);
+	void SpawnBloodSplatEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int count);
 	void SpawnPlayerBloodEffect(const ItemInfo& item);
 
 	// TODO: Remove legacy spawners
