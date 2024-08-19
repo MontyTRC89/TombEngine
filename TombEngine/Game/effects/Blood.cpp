@@ -21,6 +21,8 @@ using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
+// TODO: Better position randomisation.
+
 namespace TEN::Effects::Blood
 {
 	constexpr auto BLOOD_COLOR_RED	 = Vector4(0.8f, 0.0f, 0.0f, 1.0f);
@@ -56,27 +58,27 @@ namespace TEN::Effects::Blood
 
 		RoomNumber = pointColl.GetRoomNumber();
 
+		// Deactivate on wall hit.
+		if (pointColl.IsWall())
+		{
+			Life = 0.0f;
+		}
 		// Spawn underwater blood.
-		if (TestEnvironment(ENV_FLAG_WATER, RoomNumber))
+		else if (TestEnvironment(ENV_FLAG_WATER, RoomNumber))
 		{
 			Life = 0.0f;
 
 			float size = ((Size.x + Size.y) / 2) * 5;
 			UnderwaterBloodEffect.Spawn(Position, RoomNumber, size);
 		}
-		// Deactivate on wall hit.
-		if (pointColl.IsWall() || Position.y <= pointColl.GetCeilingHeight())
-		{
-			Life = 0.0f;
-		}
 		// Spawn stain on floor.
-		else if (Position.y >= pointColl.GetFloorHeight())
+		else if (Position.y >= pointColl.GetFloorHeight() && Position.y <= (pointColl.GetFloorHeight() + Velocity.y))
 		{
 			Life = 0.0f;
 			BloodStainEffect.Spawn(*this, pointColl, true);
 		}
 		// Spawn stain on ceiling.
-		else if (Position.y <= pointColl.GetCeilingHeight())
+		else if (Position.y <= pointColl.GetCeilingHeight() && Position.y >= (pointColl.GetCeilingHeight() + Velocity.y))
 		{
 			Life = 0.0f;
 			BloodStainEffect.Spawn(*this, pointColl, false);
@@ -295,11 +297,11 @@ namespace TEN::Effects::Blood
 		auto pos = Vector3(item.Pose.Position.x, pointColl.GetFloorHeight(), item.Pose.Position.z);
 		pos = Geometry::TranslatePoint(pos, pointColl.GetFloorNormal(), BloodStainEffectParticle::SURFACE_OFFSET);
 
-		// Calculate max size.
+		// Calculate size.
 		auto obb = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-		float sizeMax = ((obb.Extents.x + obb.Extents.z) / 2) * 2;
+		float size = ((obb.Extents.x + obb.Extents.z) / 2) * 2;
 
-		Spawn(pos, item.RoomNumber, pointColl.GetFloorNormal(), sizeMax, SCALAR, DELAY_TIME);
+		Spawn(pos, item.RoomNumber, pointColl.GetFloorNormal(), size, SCALAR, DELAY_TIME);
 	}
 
 	void BloodStainEffectController::Update()
@@ -533,63 +535,62 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodSplatEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int count)
 	{
-		constexpr auto LIFE			   = 2.0f;
-		constexpr auto WIDTH_MAX	   = 15.0f;
-		constexpr auto WIDTH_MIN	   = WIDTH_MAX / 4;
-		constexpr auto HEIGHT_MAX	   = WIDTH_MAX * 2;
-		constexpr auto HEIGHT_MIN	   = WIDTH_MAX;
-		constexpr auto VEL_MAX		   = 35.0f;
-		constexpr auto VEL_MIN		   = 15.0f;
-		constexpr auto MIST_COUNT_MULT = 4;
-		constexpr auto CONE_SEMIANGLE  = 50.0f;
+		constexpr auto UW_SIZE			   = BLOCK(0.5f);
+		constexpr auto DRIP_LIFE		   = 2.0f;
+		constexpr auto DRIP_WIDTH_MAX	   = 15.0f;
+		constexpr auto DRIP_WIDTH_MIN	   = DRIP_WIDTH_MAX / 4;
+		constexpr auto DRIP_HEIGHT_MAX	   = DRIP_WIDTH_MAX * 2;
+		constexpr auto DRIP_HEIGHT_MIN	   = DRIP_WIDTH_MAX;
+		constexpr auto DRIP_VEL_MAX		   = 35.0f;
+		constexpr auto DRIP_VEL_MIN		   = 15.0f;
+		constexpr auto BILLBOARD_SIZE	   = BLOCK(1 / 6.0f);
+		constexpr auto MIST_COUNT_MULT	   = 4;
+		constexpr auto DRIP_CONE_SEMIANGLE = 50.0f;
 
 		// Spawn underwater blood.
 		if (TestEnvironment(ENV_FLAG_WATER, roomNumber))
 		{
-			UnderwaterBloodEffect.Spawn(pos, roomNumber, BLOCK(0.5f), count);
+			UnderwaterBloodEffect.Spawn(pos, roomNumber, UW_SIZE, count);
 			return;
 		}
 
-		// Spawn drips.
+		// Spawn blood drips.
 		for (int i = 0; i < count; i++)
 		{
-			float vel = Random::GenerateFloat(VEL_MIN, VEL_MAX);
-			auto velVector = baseVel + (Random::GenerateDirectionInCone(dir, CONE_SEMIANGLE) * vel);
+			float vel = Random::GenerateFloat(DRIP_VEL_MIN, DRIP_VEL_MAX);
+			auto velVector = baseVel + (Random::GenerateDirectionInCone(dir, DRIP_CONE_SEMIANGLE) * vel);
 			auto size = Vector2(
-				Random::GenerateFloat(WIDTH_MIN, WIDTH_MAX),
-				Random::GenerateFloat(HEIGHT_MIN, HEIGHT_MAX));
+				Random::GenerateFloat(DRIP_WIDTH_MIN, DRIP_WIDTH_MAX),
+				Random::GenerateFloat(DRIP_HEIGHT_MIN, DRIP_HEIGHT_MAX));
 
-			BloodDripEffect.Spawn(pos, roomNumber, velVector, size, LIFE);
+			BloodDripEffect.Spawn(pos, roomNumber, velVector, size, DRIP_LIFE);
 		}
 
-		// Spawn billboard.
-		BloodBillboardEffect.Spawn(pos, roomNumber, BLOCK(1 / 5.0f));
+		// Spawn blood billboard.
+		BloodBillboardEffect.Spawn(pos, roomNumber, BILLBOARD_SIZE);
 
-		// Spawn mists.
+		// Spawn blood mists.
 		BloodMistEffect.Spawn(pos, roomNumber, dir, count * MIST_COUNT_MULT);
 	}
 
 	void SpawnPlayerBloodEffect(const ItemInfo& item)
 	{
-		constexpr auto BASE_COUNT_MAX	 = 3;
-		constexpr auto BASE_COUNT_MIN	 = 1;
-		constexpr auto SPHERE_RADIUS_MAX = 16.0f;
+		constexpr auto COUNT		 = 1;
+		constexpr auto SPHERE_RADIUS = 16.0f;
 
 		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
 		auto baseVel = Vector3::Transform(item.Animation.Velocity, rotMatrix);
-		unsigned int baseCount = Random::GenerateInt(BASE_COUNT_MIN, BASE_COUNT_MAX);
+
+		auto sphere = BoundingSphere(Vector3::Zero, SPHERE_RADIUS);
 
 		int node = 1;
 		for (int i = 0; i < LARA_MESHES::LM_HEAD; i++)
 		{
 			if (node & item.TouchBits.ToPackedBits())
 			{
-				auto sphere = BoundingSphere(Vector3::Zero, Random::GenerateFloat(0.0f, SPHERE_RADIUS_MAX));
 				auto relOffset = Random::GeneratePointInSphere(sphere);
-				auto pos = GetJointPosition(item, i, relOffset);
-
-				SpawnBloodSplatEffect(pos.ToVector3(), item.RoomNumber, -Vector3::UnitY, baseVel, baseCount);
-				DoBloodSplat(pos.x, pos.y, pos.z, Random::GenerateInt(8, 16), Random::GenerateAngle(), LaraItem->RoomNumber);
+				auto pos = GetJointPosition(item, i, relOffset).ToVector3();
+				SpawnBloodSplatEffect(pos, item.RoomNumber, -Vector3::UnitY, baseVel, COUNT);
 			}
 
 			node *= 2;
@@ -599,8 +600,7 @@ namespace TEN::Effects::Blood
 	// TODO: Room number.
 	void TriggerBlood(const Vector3& pos, short headingAngle, unsigned int count)
 	{
-		SpawnBloodSplatEffect(pos, LaraItem->RoomNumber, -Vector3::UnitY, Vector3::Zero, count / 4);
-		//BloodMistEffect.Spawn(Vector3(x, y, z), 0, Vector3::Zero, count);
+		SpawnBloodSplatEffect(pos, LaraItem->RoomNumber, -Vector3::UnitY, Vector3::Zero, count / 8);
 	}
 
 	short DoBloodSplat(int x, int y, int z, short vel, short headingAngle, short roomNumber)
