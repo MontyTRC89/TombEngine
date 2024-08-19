@@ -1044,7 +1044,7 @@ namespace TEN::Renderer
 			AddSpriteBillboardConstrained(
 				&_sprites[Objects[part.SpriteSeqID].meshIndex + part.SpriteID],
 				part.Position,
-				part.Color, 0.5f, 1.0f, part.Size, BlendMode::AlphaBlend, axis, true, view);
+				part.Color, 0.0f, 1.0f, Vector2(part.Size), BlendMode::AlphaBlend, axis, true, view);
 		}
 	}
 

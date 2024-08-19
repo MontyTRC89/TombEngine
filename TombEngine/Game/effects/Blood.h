@@ -21,11 +21,11 @@ namespace TEN::Effects::Blood
 		Vector3 Position   = Vector3::Zero;
 		int		RoomNumber = 0;
 		Vector3 Velocity   = Vector3::Zero;
-		Vector2 Size	   = Vector2::Zero;
 		Vector4 Color	   = Vector4::Zero;
 
 		float Life			  = 0.0f;
 		float LifeStartFading = 0.0f;
+		float Size			  = 0.0f;
 		float Opacity		  = 0.0f;
 		float Gravity		  = 0.0f;
 
@@ -46,7 +46,7 @@ namespace TEN::Effects::Blood
 
 		// Spawners
 
-		void Spawn(const Vector3& pos, int roomNumber, const Vector3& vel, const Vector2& size, float lifeInSec);
+		void Spawn(const Vector3& pos, int roomNumber, const Vector3& vel, float size, float lifeInSec);
 
 		// Utilities
 
