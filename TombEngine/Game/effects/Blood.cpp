@@ -36,6 +36,11 @@ namespace TEN::Effects::Blood
 
 	void BloodDripEffectParticle::Update()
 	{
+		constexpr auto SOUND_ID		   = SFX_TR4_LARA_FOOTSTEPS_MUD;
+		constexpr auto SOUND_PITCH_MIN = 2.0f;
+		constexpr auto SOUND_PITCH_MAX = 4.0f;
+		constexpr auto SOUND_VOL	   = 1.0f;
+
 		if (Life <= 0.0f)
 			return;
 
@@ -76,12 +81,14 @@ namespace TEN::Effects::Blood
 		{
 			Life = 0.0f;
 			BloodStainEffect.Spawn(*this, pointColl, true);
+			SoundEffect(SOUND_ID, &Pose(Vector3i(Position)), SoundEnvironment::Always, Random::GenerateFloat(SOUND_PITCH_MIN, SOUND_PITCH_MAX), SOUND_VOL);
 		}
 		// Spawn stain on ceiling.
 		else if (Position.y <= pointColl.GetCeilingHeight() && Position.y >= (pointColl.GetCeilingHeight() + Velocity.y))
 		{
 			Life = 0.0f;
 			BloodStainEffect.Spawn(*this, pointColl, false);
+			SoundEffect(SOUND_ID, &Pose(Vector3i(Position)), SoundEnvironment::Always,	Random::GenerateFloat(SOUND_PITCH_MIN, SOUND_PITCH_MAX), SOUND_VOL);
 		}
 
 		// Update life.
