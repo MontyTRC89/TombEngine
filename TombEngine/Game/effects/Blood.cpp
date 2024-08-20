@@ -627,7 +627,7 @@ namespace TEN::Effects::Blood
 	// TODO: Room number.
 	void TriggerBlood(const Vector3& pos, short headingAngle, unsigned int count)
 	{
-		SpawnBloodSplatEffect(pos, LaraItem->RoomNumber, -Vector3::UnitY, Vector3::Zero, count / 4);
+		SpawnBloodSplatEffect(pos, LaraItem->RoomNumber, -Vector3::UnitY, Vector3::Zero, count / 6);
 	}
 
 	short DoBloodSplat(int x, int y, int z, short vel, short headingAngle, short roomNumber)
