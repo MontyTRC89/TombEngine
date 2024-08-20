@@ -6,7 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
@@ -23,81 +23,73 @@
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
 
 // Globals
+
 GameBoundingBox GlobalCollisionBounds;
 
-void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+void GenericSphereBoxCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
+	if (item.Status == ITEM_INVISIBLE)
+		return;
 
-	if (item->Status != ITEM_INVISIBLE)
+	if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
+		return;
+
+	HandleItemSphereCollision(item, *playerItem);
+	if (!item.TouchBits.TestAny())
+		return;
+
+	short prevYOrient = item.Pose.Orientation.y;
+	item.Pose.Orientation.y = 0;
+	auto spheres = item.GetSpheres();
+	item.Pose.Orientation.y = prevYOrient;
+
+	int harmBits = *(int*)&item.ItemFlags[0]; // NOTE: Value spread across ItemFlags[0] and ItemFlags[1].
+	
+	auto collidedBits = item.TouchBits;
+	if (item.ItemFlags[2] != 0)
+		collidedBits.Clear(0);
+
+	coll->Setup.EnableObjectPush = (item.ItemFlags[4] == 0);
+
+	// Handle push and damage.
+	for (int i = 0; i < spheres.size(); i++)
 	{
-		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+		if (collidedBits.Test(i))
 		{
-			int collidedBits = TestCollision(item, laraItem);
-			if (collidedBits)
+			const auto& sphere = spheres[i];
+
+			GlobalCollisionBounds.X1 = sphere.Center.x - sphere.Radius - item.Pose.Position.x;
+			GlobalCollisionBounds.X2 = sphere.Center.x + sphere.Radius - item.Pose.Position.x;
+			GlobalCollisionBounds.Y1 = sphere.Center.y - sphere.Radius - item.Pose.Position.y;
+			GlobalCollisionBounds.Y2 = sphere.Center.y + sphere.Radius - item.Pose.Position.y;
+			GlobalCollisionBounds.Z1 = sphere.Center.z - sphere.Radius - item.Pose.Position.z;
+			GlobalCollisionBounds.Z2 = sphere.Center.z + sphere.Radius - item.Pose.Position.z;
+
+			auto pos = playerItem->Pose.Position;
+			if (ItemPushItem(&item, playerItem, coll, harmBits & 1, 3) && (harmBits & 1))
 			{
-				short prevYOrient = item->Pose.Orientation.y;
+				DoDamage(playerItem, item.ItemFlags[3]);
 
-				item->Pose.Orientation.y = 0;
-				GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-				item->Pose.Orientation.y = prevYOrient;
-
-				int deadlyBits = *((int*)&item->ItemFlags[0]);
-				auto* sphere = &CreatureSpheres[0];
-
-				if (item->ItemFlags[2] != 0)
-					collidedBits &= ~1;
-				coll->Setup.EnableObjectPush = item->ItemFlags[4] == 0;
-
-				while (collidedBits)
+				auto deltaPos = pos - playerItem->Pose.Position;
+				if (deltaPos != Vector3i::Zero)
 				{
-					if (collidedBits & 1)
-					{
-						GlobalCollisionBounds.X1 = sphere->x - sphere->r - item->Pose.Position.x;
-						GlobalCollisionBounds.X2 = sphere->x + sphere->r - item->Pose.Position.x;
-						GlobalCollisionBounds.Y1 = sphere->y - sphere->r - item->Pose.Position.y;
-						GlobalCollisionBounds.Y2 = sphere->y + sphere->r - item->Pose.Position.y;
-						GlobalCollisionBounds.Z1 = sphere->z - sphere->r - item->Pose.Position.z;
-						GlobalCollisionBounds.Z2 = sphere->z + sphere->r - item->Pose.Position.z;
-
-						int x = laraItem->Pose.Position.x;
-						int y = laraItem->Pose.Position.y;
-						int z = laraItem->Pose.Position.z;
-
-						if (ItemPushItem(item, laraItem, coll, deadlyBits & 1, 3) && (deadlyBits & 1))
-						{
-							DoDamage(laraItem, item->ItemFlags[3]);
-
-							int dx = x - laraItem->Pose.Position.x;
-							int dy = y - laraItem->Pose.Position.y;
-							int dz = z - laraItem->Pose.Position.z;
-
-							if (dx || dy || dz)
-							{
-								if (TriggerActive(item))
-									TriggerLaraBlood();
-							}
-
-							if (!coll->Setup.EnableObjectPush)
-							{
-								laraItem->Pose.Position.x += dx;
-								laraItem->Pose.Position.y += dy;
-								laraItem->Pose.Position.z += dz;
-							}
-						}
-					}
-
-					collidedBits >>= 1;
-					deadlyBits >>= 1;
-					sphere++;
+					if (TriggerActive(&item))
+						TriggerLaraBlood();
 				}
+
+				if (!coll->Setup.EnableObjectPush)
+					playerItem->Pose.Position += deltaPos;
 			}
 		}
+
+		harmBits >>= 1;
 	}
 }
 
@@ -1959,7 +1951,7 @@ void ObjectCollision(const short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 
 	if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 	{
-		if (TestCollision(item, laraItem))
+		if (HandleItemSphereCollision(*item, *laraItem))
 		{
 			if (coll->Setup.EnableObjectPush)
 				ItemPushItem(item, laraItem, coll, false, 1);
@@ -1974,7 +1966,7 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 	if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		return;
 
-	if (!TestCollision(item, laraItem))
+	if (!HandleItemSphereCollision(*item, *laraItem))
 		return;
 
 	bool doPlayerCollision = laraItem->IsLara();
@@ -2009,7 +2001,7 @@ void TrapCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 
-		TestCollision(&item, playerItem);
+		HandleItemSphereCollision(item, *playerItem);
 	}
 	else if (item.Status != ITEM_INVISIBLE)
 	{

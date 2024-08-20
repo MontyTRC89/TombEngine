@@ -2,7 +2,7 @@
 #include "Objects/TR5/Entity/AutoGun.h"
 
 #include "Game/animation.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
@@ -14,6 +14,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
 // NOTES:
