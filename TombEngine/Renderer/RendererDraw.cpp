@@ -1679,7 +1679,7 @@ namespace TEN::Renderer
 		PrepareSparkParticles(view);
 		PrepareSplashes(view);
 		PrepareStreamers(view);
-		PrepareUnderwaterBloodParticles(view);
+		PrepareUnderwaterBloodClouds(view);
 		PrepareWeatherParticles(view);
 
 		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected for a later stage.

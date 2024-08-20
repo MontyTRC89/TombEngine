@@ -220,7 +220,7 @@ GameStatus ControlPhase(int numFrames)
 		BloodMistEffect.Update();
 		BloodStainEffect.Update();
 		StreamerEffect.Update();
-		UnderwaterBloodEffect.Update();
+		UnderwaterBloodCloudEffect.Update();
 		UpdateSparks();
 		UpdateFireSparks();
 		UpdateSmoke();
@@ -439,7 +439,7 @@ void CleanUp()
 	BloodMistEffect.Clear();
 	BloodStainEffect.Clear();
 	StreamerEffect.Clear();
-	UnderwaterBloodEffect.Clear();
+	UnderwaterBloodCloudEffect.Clear();
 	ClearBubbles();
 	ClearBubbles();
 	ClearDisplaySprites();

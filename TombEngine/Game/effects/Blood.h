@@ -56,10 +56,11 @@ namespace TEN::Effects::Blood
 
 	struct BloodStainEffectParticle
 	{
-		static constexpr auto LIFE_MAX			= 4.0f * 60.0f;
-		static constexpr auto LIFE_START_FADING = 15.0f;
-		static constexpr auto SURFACE_OFFSET	= 4;
-		static constexpr auto VERTEX_COUNT		= 4;
+		static constexpr auto LIFE_MAX				   = 5.0f * 60.0f;
+		static constexpr auto LIFE_START_FADING		   = 15.0f;
+		static constexpr auto SURFACE_OFFSET		   = 4;
+		static constexpr auto VERTEX_COUNT			   = 4;
+		static constexpr auto COLL_CHECK_TIME_INTERVAL = 0.5f;
 
 		GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
 		int			   SpriteID	   = 0;
@@ -82,6 +83,9 @@ namespace TEN::Effects::Blood
 		float Opacity		  = 0.0f;
 		float OpacityMax	  = 0.0f;
 		float DelayTime		  = 0.0f;
+
+		bool  IsOnFloor			  = false;
+		float CollCheckTimeOffset = 0.0f;
 
 		void Update();
 
@@ -198,7 +202,7 @@ namespace TEN::Effects::Blood
 	};
 
 	// TODO: Copy approach from ripple effect.
-	struct UnderwaterBloodEffectParticle
+	struct UnderwaterBloodCloudEffectParticle
 	{
 		GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
 		int			   SpriteID	   = 0;
@@ -215,17 +219,17 @@ namespace TEN::Effects::Blood
 		void Update();
 	};
 
-	class UnderwaterBloodEffectController
+	class UnderwaterBloodCloudEffectController
 	{
 	private:
 		// Members
 
-		std::vector<UnderwaterBloodEffectParticle> _particles;
+		std::vector<UnderwaterBloodCloudEffectParticle> _particles;
 
 	public:
 		// Getters
 
-		const std::vector<UnderwaterBloodEffectParticle>& GetParticles();
+		const std::vector<UnderwaterBloodCloudEffectParticle>& GetParticles();
 
 		// Spawners
 
@@ -237,11 +241,11 @@ namespace TEN::Effects::Blood
 		void Clear();
 	};
 
-	extern BloodDripEffectController	   BloodDripEffect;
-	extern BloodStainEffectController	   BloodStainEffect;
-	extern BloodBillboardEffectController  BloodBillboardEffect;
-	extern BloodMistEffectController	   BloodMistEffect;
-	extern UnderwaterBloodEffectController UnderwaterBloodEffect;
+	extern BloodDripEffectController			BloodDripEffect;
+	extern BloodStainEffectController			BloodStainEffect;
+	extern BloodBillboardEffectController		BloodBillboardEffect;
+	extern BloodMistEffectController			BloodMistEffect;
+	extern UnderwaterBloodCloudEffectController UnderwaterBloodCloudEffect;
 
 	void SpawnBloodSplatEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int count);
 	void SpawnPlayerBloodEffect(const ItemInfo& item);

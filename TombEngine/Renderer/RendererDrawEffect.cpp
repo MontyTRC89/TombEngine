@@ -1087,12 +1087,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::PrepareUnderwaterBloodParticles(RenderView& view)
+	void Renderer::PrepareUnderwaterBloodClouds(RenderView& view)
 	{
-		if (UnderwaterBloodEffect.GetParticles().empty())
-			return;
-
-		for (const auto& part : UnderwaterBloodEffect.GetParticles())
+		for (const auto& part : UnderwaterBloodCloudEffect.GetParticles())
 		{
 			if (part.Life <= 0.0f)
 				continue;

@@ -445,7 +445,7 @@ namespace TEN::Renderer
 		void PrepareBloodStains(RenderView& view);
 		void PrepareBloodBillboards(RenderView& view);
 		void PrepareBloodMists(RenderView& view);
-		void PrepareUnderwaterBloodParticles(RenderView& view);
+		void PrepareUnderwaterBloodClouds(RenderView& view);
 
 		void DrawSprites(RenderView& view, RendererPass rendererPass);
 
