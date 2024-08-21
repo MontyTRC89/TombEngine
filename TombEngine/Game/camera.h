@@ -46,7 +46,8 @@ struct CAMERA_INFO
 	ItemInfo* lastItem;
 	int mikeAtLara;
 	Vector3i mikePos;
-	bool disableInterpolation;
+
+	bool DisableInterpolation = false;
 };
 
 struct ObjectCameraInfo
