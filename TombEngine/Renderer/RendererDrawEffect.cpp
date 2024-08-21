@@ -535,13 +535,13 @@ namespace TEN::Renderer
 				}
 			}
 
-			byte prevColor = (splash.oldLife >= 32 ? 128 : (byte)((splash.oldLife / 32.0f) * 128));
+			byte prevColor = (splash.PrevLife >= 32 ? 128 : (byte)((splash.PrevLife / 32.0f) * 128));
 
 			if (!splash.isRipple)
 			{
-				if (splash.oldHeightSpeed < 0 && splash.oldHeight < 1024)
+				if (splash.PrevHeightSpeed < 0 && splash.PrevHeight < 1024)
 				{
-					float multiplier = splash.oldHeight / 1024.0f;
+					float multiplier = splash.PrevHeight / 1024.0f;
 					prevColor = (float)prevColor * multiplier;
 				}
 			}
@@ -559,8 +559,8 @@ namespace TEN::Renderer
 			float yInner = splash.y;
 			float yOuter = splash.y - splash.height;
 
-			float innerRadius = Lerp(splash.oldInnerRad, splash.innerRad, _interpolationFactor);
-			float outerRadius = Lerp(splash.oldOuterRad, splash.outerRad, _interpolationFactor);
+			float innerRadius = Lerp(splash.PrevInnerRad, splash.innerRad, _interpolationFactor);
+			float outerRadius = Lerp(splash.PrevOuterRad, splash.outerRad, _interpolationFactor);
 
 			for (int i = 0; i < NUM_POINTS; i++) 
 			{
@@ -1081,7 +1081,7 @@ namespace TEN::Renderer
 				auto worldMatrix = Matrix::Identity;
 				if (Lara.LeftArm.GunFlash)
 				{
-					worldMatrix = itemPtr->AnimationTransforms[LM_LHAND] * itemPtr->World;
+					worldMatrix = itemPtr->AnimTransforms[LM_LHAND] * itemPtr->World;
 					worldMatrix = tMatrix * worldMatrix;
 					worldMatrix = rotMatrix * worldMatrix;
 
@@ -1095,7 +1095,7 @@ namespace TEN::Renderer
 
 				if (Lara.RightArm.GunFlash)
 				{
-					worldMatrix = itemPtr->AnimationTransforms[LM_RHAND] * itemPtr->World;
+					worldMatrix = itemPtr->AnimTransforms[LM_RHAND] * itemPtr->World;
 					worldMatrix = tMatrix * worldMatrix;
 					worldMatrix = rotMatrix * worldMatrix;
 
@@ -1166,7 +1166,7 @@ namespace TEN::Renderer
 						auto rotMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						auto rotMatrixZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-						auto worldMatrix = rItemPtr->AnimationTransforms[creature.MuzzleFlash[0].Bite.BoneID] * rItemPtr->World;
+						auto worldMatrix = rItemPtr->AnimTransforms[creature.MuzzleFlash[0].Bite.BoneID] * rItemPtr->World;
 						worldMatrix = tMatrix * worldMatrix;
 
 						if (creature.MuzzleFlash[0].ApplyXRotation)
@@ -1206,7 +1206,7 @@ namespace TEN::Renderer
 						auto rotMatrixX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 						auto rotMatrixZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-						auto worldMatrix = rItemPtr->AnimationTransforms[creature.MuzzleFlash[1].Bite.BoneID] * rItemPtr->World;
+						auto worldMatrix = rItemPtr->AnimTransforms[creature.MuzzleFlash[1].Bite.BoneID] * rItemPtr->World;
 						worldMatrix = tMatrix * worldMatrix;
 
 						if (creature.MuzzleFlash[1].ApplyXRotation)
@@ -1339,7 +1339,7 @@ namespace TEN::Renderer
 			for (auto* effectPtr : roomPtr->EffectsToDraw)
 			{
 				const auto& room = _rooms[effectPtr->RoomNumber];
-				const auto& object = Objects[effectPtr->ObjectNumber];
+				const auto& object = Objects[effectPtr->ObjectID];
 
 				if (object.drawRoutine && object.loaded)
 					DrawEffect(view, effectPtr, rendererPass);

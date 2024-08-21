@@ -268,10 +268,10 @@ void Renderer::UpdateLaraAnimations(bool force)
 
 	// Copy matrices in player object.
 	for (int m = 0; m < NUM_LARA_MESHES; m++)
-		playerObject.AnimationTransforms[m] = rItem.AnimationTransforms[m];
+		playerObject.AnimationTransforms[m] = rItem.AnimTransforms[m];
 
 	// Copy meshswap indices.
-	rItem.MeshIndex = LaraItem->Model.MeshIndex;
+	rItem.MeshIds = LaraItem->Model.MeshIndex;
 	rItem.DoneAnimations = true;
 }
 
@@ -305,7 +305,7 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	_stItem.World = item->InterpolatedWorld; // _laraWorldMatrix;
 	_stItem.Color = item->Color;
 	_stItem.AmbientLight = item->AmbientLight;
-	memcpy(_stItem.BonesMatrices, item->InterpolatedAnimationTransforms, laraObj.AnimationTransforms.size() * sizeof(Matrix));
+	memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, laraObj.AnimationTransforms.size() * sizeof(Matrix));
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
@@ -341,7 +341,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		const auto& rendererObject = *_moveableObjects[unit.ObjectID];
 
 		_stItem.World = Matrix::Identity;
-		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimationTransforms[LM_HEAD] * itemToDraw->InterpolatedWorld;
+		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimTransforms[LM_HEAD] * itemToDraw->InterpolatedWorld;
 
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{

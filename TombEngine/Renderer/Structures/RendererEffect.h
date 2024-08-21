@@ -1,36 +1,36 @@
 #pragma once
-#include <SimpleMath.h>
-#include "Renderer/Structures/RendererMesh.h"
+
 #include "Renderer/Structures/RendererLight.h"
+#include "Renderer/Structures/RendererMesh.h"
 
 namespace TEN::Renderer::Structures
 {
-	using namespace DirectX::SimpleMath;
-
 	struct RendererEffect
 	{
-		int ObjectNumber;
-		int RoomNumber;
-		Vector3 Position;
-		Matrix World;
-		Matrix Translation;
-		Matrix Rotation;
-		Matrix Scale;
-		Vector4 Color;
-		Vector4 AmbientLight;
-		RendererMesh* Mesh;
-		std::vector<RendererLight*> LightsToDraw;
+		int ObjectID   = 0;
+		int RoomNumber = 0;
 
-		Vector3 OldPosition;
-		Matrix OldWorld;
-		Matrix OldTranslation;
-		Matrix OldRotation;
-		Matrix OldScale;
+		Vector3 Position	 = Vector3::Zero;
+		Matrix	World		 = Matrix::Identity;
+		Matrix	Translation	 = Matrix::Identity;
+		Matrix	Rotation	 = Matrix::Identity;
+		Matrix	Scale		 = Matrix::Identity;
+		Vector4 Color		 = Vector4::Zero;
+		Vector4 AmbientLight = Vector4::Zero;
 
-		Vector3 InterpolatedPosition;
-		Matrix InterpolatedWorld;
-		Matrix InterpolatedTranslation;
-		Matrix InterpolatedRotation;
-		Matrix InterpolatedScale;
+		RendererMesh*				Mesh		 = nullptr;
+		std::vector<RendererLight*> LightsToDraw = {};
+
+		Vector3 InterpolatedPosition	= Vector3::Zero;
+		Matrix	InterpolatedWorld		= Matrix::Identity;
+		Matrix	InterpolatedTranslation = Matrix::Identity;
+		Matrix	InterpolatedRotation	= Matrix::Identity;
+		Matrix	InterpolatedScale		= Matrix::Identity;
+
+		Vector3 PrevPosition	= Vector3::Zero;
+		Matrix	PrevWorld		= Matrix::Identity;
+		Matrix	PrevTranslation = Matrix::Identity;
+		Matrix	PrevRotation	= Matrix::Identity;
+		Matrix	PrevScale		= Matrix::Identity;
 	};
 }

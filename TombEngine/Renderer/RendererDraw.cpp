@@ -130,11 +130,11 @@ namespace TEN::Renderer
 	void Renderer::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
 		// Doesn't cast shadow
-		if (_moveableObjects[item->ObjectNumber].value().ShadowType == ShadowMode::None)
+		if (_moveableObjects[item->ObjectID].value().ShadowType == ShadowMode::None)
 			return;
 
 		// Only render for Lara if such setting is active
-		if (g_Configuration.ShadowType == ShadowMode::Lara && _moveableObjects[item->ObjectNumber].value().ShadowType != ShadowMode::Lara)
+		if (g_Configuration.ShadowType == ShadowMode::Lara && _moveableObjects[item->ObjectID].value().ShadowType != ShadowMode::Lara)
 			return;
 
 		// No shadow light found
@@ -210,12 +210,12 @@ namespace TEN::Renderer
 
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
-			RendererObject& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectNumber);
+			RendererObject& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectID);
 
 			_stItem.World = item->InterpolatedWorld;
 			_stItem.Color = item->Color;
 			_stItem.AmbientLight = item->AmbientLight;
-			memcpy(_stItem.BonesMatrices, item->InterpolatedAnimationTransforms, sizeof(Matrix) * MAX_BONES);
+			memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, sizeof(Matrix) * MAX_BONES);
 			for (int k = 0; k < MAX_BONES; k++)
 				_stItem.BoneLightModes[k] = (int)LightMode::Static;
 
@@ -225,7 +225,7 @@ namespace TEN::Renderer
 
 			for (int k = 0; k < obj.ObjectMeshes.size(); k++)
 			{
-				auto* mesh = GetMesh(item->MeshIndex[k]);
+				auto* mesh = GetMesh(item->MeshIds[k]);
 
 				for (auto& bucket : mesh->Buckets)
 				{
@@ -242,7 +242,7 @@ namespace TEN::Renderer
 				}
 			}
 
-			if (item->ObjectNumber == ID_LARA)
+			if (item->ObjectID == ID_LARA)
 			{
 				RendererRoom& room = _rooms[item->RoomNumber];
 
@@ -2200,7 +2200,7 @@ namespace TEN::Renderer
 		{
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
-				switch (itemToDraw->ObjectNumber)
+				switch (itemToDraw->ObjectID)
 				{ 
 				case ID_LARA:
 					DrawLara(view, rendererPass);
@@ -2242,7 +2242,7 @@ namespace TEN::Renderer
 		// Extremely hacky function to get first rendered face of a waterfall object mesh, calculate
 		// its texture height and scroll all the textures according to that height.
 
-		RendererObject& moveableObj = *_moveableObjects[item->ObjectNumber];
+		RendererObject& moveableObj = *_moveableObjects[item->ObjectID];
 
 		// No mesh or bucket, abort
 		if (!moveableObj.ObjectMeshes.size() || !moveableObj.ObjectMeshes[0]->Buckets.size())
@@ -2284,13 +2284,13 @@ namespace TEN::Renderer
 	{
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 		RendererRoom* room = &_rooms[item->RoomNumber];
-		RendererObject& moveableObj = *_moveableObjects[item->ObjectNumber];
+		RendererObject& moveableObj = *_moveableObjects[item->ObjectID];
 
 		// Bind item main properties
 		_stItem.World = item->InterpolatedWorld;
 		_stItem.Color = item->Color;
 		_stItem.AmbientLight = item->AmbientLight;
-		memcpy(_stItem.BonesMatrices, item->InterpolatedAnimationTransforms, sizeof(Matrix) * MAX_BONES);
+		memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, sizeof(Matrix) * MAX_BONES);
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
@@ -2303,7 +2303,7 @@ namespace TEN::Renderer
 			if (!(nativeItem->MeshBits & (1 << k)))
 				continue;
 
-			DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, view, rendererPass);
+			DrawMoveableMesh(item, GetMesh(item->MeshIds[k]), room, k, view, rendererPass);
 		}
 	}
 
@@ -3095,7 +3095,7 @@ namespace TEN::Renderer
 						for (int p = 0; p < bucket.Polygons.size(); p++)
 						{
 							auto centre = Vector3::Transform(
-								bucket.Polygons[p].Centre, itemToDraw->InterpolatedAnimationTransforms[boneIndex] * itemToDraw->InterpolatedWorld);
+								bucket.Polygons[p].Centre, itemToDraw->InterpolatedAnimTransforms[boneIndex] * itemToDraw->InterpolatedWorld);
 							int distance = (centre - cameraPos).Length();
 
 							RendererSortableObject object;
@@ -3537,9 +3537,9 @@ namespace TEN::Renderer
 		_stItem.World = objectInfo->Item->InterpolatedWorld;
 		_stItem.Color = objectInfo->Item->Color;
 		_stItem.AmbientLight = objectInfo->Item->AmbientLight;
-		memcpy(_stItem.BonesMatrices, objectInfo->Item->InterpolatedAnimationTransforms, sizeof(Matrix) * MAX_BONES);
+		memcpy(_stItem.BonesMatrices, objectInfo->Item->InterpolatedAnimTransforms, sizeof(Matrix) * MAX_BONES);
 
-		const auto& moveableObj = *_moveableObjects[objectInfo->Item->ObjectNumber];
+		const auto& moveableObj = *_moveableObjects[objectInfo->Item->ObjectID];
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
 

@@ -152,25 +152,25 @@ struct Particle
 	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
 
-	int oldX;
-	int oldY;
-	int oldZ;
-	short oldRotAng;
-	byte oldR;
-	byte oldG; 
-	byte oldB;
-	byte oldScalar;
+	int PrevX;
+	int PrevY;
+	int PrevZ;
+	short PrevRotAng;
+	byte PrevR;
+	byte PrevG; 
+	byte PrevB;
+	byte PrevScalar;
 
 	void StoreInterpolationData()
 	{
-		oldX = x;
-		oldY = y;
-		oldZ = z;
-		oldRotAng = rotAng;
-		oldR = r;
-		oldG = g;
-		oldB = b;
-		oldScalar = scalar;
+		PrevX = x;
+		PrevY = y;
+		PrevZ = z;
+		PrevRotAng = rotAng;
+		PrevR = r;
+		PrevG = g;
+		PrevB = b;
+		PrevScalar = scalar;
 	}
 };
 
@@ -194,27 +194,23 @@ struct SPLASH_STRUCT
 	bool isRipple;
 	bool isActive;
 
-	float oldX;
-	float oldY;
-	float oldZ;
-	float oldInnerRad;
-	float oldOuterRad;
-	float oldHeight;
-	unsigned short oldLife;
-	float oldHeightSpeed;
-	float oldAnimationPhase;
+	Vector3 PrevPosition	= Vector3::Zero;
+	float	PrevInnerRad	= 0.0f;
+	float	PrevOuterRad	= 0.0f;
+	float	PrevHeight		= 0.0f;
+	float	PrevHeightSpeed = 0.0f;
+	float	PrevAnimPhase	= 0.0f;
+	unsigned short PrevLife = 0;
 
 	void StoreInterpolationData()
 	{
-		oldX = x;
-		oldY = y;
-		oldZ = z;
-		oldInnerRad = innerRad;
-		oldOuterRad = outerRad;
-		oldHeight = height;
-		oldLife = life;
-		oldHeightSpeed = heightSpeed;
-		oldAnimationPhase = animationPhase;
+		PrevPosition = Vector3(x, y, z);
+		PrevInnerRad = innerRad;
+		PrevOuterRad = outerRad;
+		PrevHeight = height;
+		PrevHeightSpeed = heightSpeed;
+		PrevAnimPhase = animationPhase;
+		PrevLife = life;
 	}
 };
 

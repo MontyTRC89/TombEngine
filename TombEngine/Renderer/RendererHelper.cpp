@@ -49,7 +49,7 @@ namespace TEN::Renderer
 		RendererBone* bones[MAX_BONES] = {};
 		int nextBone = 0;
 
-		auto* transforms = ((rItem == nullptr) ? rObject.AnimationTransforms.data() : &rItem->AnimationTransforms[0]);
+		auto* transforms = ((rItem == nullptr) ? rObject.AnimationTransforms.data() : &rItem->AnimTransforms[0]);
 
 		// Push.
 		bones[nextBone++] = rObject.Skeleton;
@@ -67,7 +67,7 @@ namespace TEN::Renderer
 				(frameData.Alpha != 0.0f && frameData.FramePtr0->BoneOrientations.size() <= bonePtr->Index))
 			{
 				TENLog(
-					"Attempted to animate object with ID " + GetObjectName((GAME_OBJECT_ID)rItem->ObjectNumber) +
+					"Attempted to animate object with ID " + GetObjectName((GAME_OBJECT_ID)rItem->ObjectID) +
 					" using incorrect animation data. Bad animations set for slot?",
 					LogLevel::Error);
 
@@ -174,7 +174,7 @@ namespace TEN::Renderer
 		auto& moveableObj = *_moveableObjects[nativeItem->ObjectNumber];
 
 		// Copy meshswaps
-		itemToDraw->MeshIndex = nativeItem->Model.MeshIndex;
+		itemToDraw->MeshIds = nativeItem->Model.MeshIndex;
 
 		if (obj->animIndex == -1)
 			return;
@@ -310,7 +310,7 @@ namespace TEN::Renderer
 		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX);
 
 		for (int m = 0; m < obj->nmeshes; m++)
-			itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
+			itemToDraw->AnimTransforms[m] = itemToDraw->AnimTransforms[m];
 	}
 
 	void Renderer::UpdateItemAnimations(RenderView& view)
@@ -452,7 +452,7 @@ namespace TEN::Renderer
 			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
 				pos += moveable.LinearizedBones[i]->Translation;
 
-			spheres[i].Center = Vector3::Transform(pos, (itemToDraw->AnimationTransforms[i] * world));
+			spheres[i].Center = Vector3::Transform(pos, (itemToDraw->AnimTransforms[i] * world));
 			spheres[i].Radius = mesh->Sphere.Radius;
 
 			// Spheres debug
@@ -591,7 +591,7 @@ namespace TEN::Renderer
 		if (jointIndex >= MAX_BONES)
 			jointIndex = 0;
 
-		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
+		auto world = rendererItem->AnimTransforms[jointIndex] * rendererItem->World;
 		return Vector3::Transform(relOffset, world);
 	}
 
