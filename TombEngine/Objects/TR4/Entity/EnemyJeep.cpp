@@ -22,10 +22,10 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-using namespace TEN::Renderer;
-using namespace TEN::Effects::Smoke;
 using namespace TEN::Collision::Point;
+using namespace TEN::Effects::Smoke;
 using namespace TEN::Math;
+using namespace TEN::Renderer;
 
 /// item.ItemFlags[1] = AI_X2 behaviour
 /// item.ItemFlags[2] = Wheel rotation
@@ -39,7 +39,7 @@ namespace TEN::Entities::TR4
 	{
 		ENEMY_JEEP_ANIM_MOVE_START = 0,
 		ENEMY_JEEP_ANIM_MOVE_STOP = 1,
-		ENEMY_JEEP_ANIM_MOVING = 2,
+		ENEMY_JEEP_ANIM_MOVE = 2,
 		ENEMY_JEEP_ANIM_TURN_LEFT_START = 3,
 		ENEMY_JEEP_ANIM_TURN_LEFT = 4,
 		ENEMY_JEEP_ANIM_TURN_LEFT_END = 5,
@@ -61,7 +61,7 @@ namespace TEN::Entities::TR4
 		ENEMY_JEEP_STATE_TURN_RIGHT = 4,
 		ENEMY_JEEP_STATE_DROP_LAND = 5,
 
-		// New state added to allow customization through state.
+		// States to allow customization.
 
 		ENEMY_JEEP_STATE_DROP = 6,
 		ENEMY_JEEP_STATE_JUMP_PIT = 7,
@@ -71,7 +71,7 @@ namespace TEN::Entities::TR4
 
 	enum EnemyJeepOcb
 	{
-		EJ_NO_PLAYER_VEHICLE_REQUIRED = 1 // Makes enemy jeep start directly instead of waiting for player to enter a vehicle.
+		EJ_NO_PLAYER_VEHICLE_REQUIRED = 1 // Starts immediately instead of waiting for player to enter vehicle.
 	};
 
 	enum EnemyJeepX2Ocb
@@ -81,7 +81,7 @@ namespace TEN::Entities::TR4
 		X2_JUMP_PIT = 3,
 		// Need ocb 4 + block distance
 		// Example: 4 + 1024 = 4 block distance + wait behaviour.
-		X2_WAIT_UNTIL_LARA_NEAR = 4,
+		X2_WAIT_UNTIL_PLAYER_NEAR = 4,
 		X2_DISAPPEAR = 5,
 		X2_ACTIVATE_HEAVY_TRIGGER = 6,
 		X2_CUSTOM_DROP = 7, // Another drop step for customization.
@@ -90,88 +90,92 @@ namespace TEN::Entities::TR4
 
 	constexpr auto ENEMY_JEEP_GRENADE_VELOCITY = 32.0f;
 	constexpr auto ENEMY_JEEP_GRENADE_TIMER = 150;
-	constexpr auto ENEMY_JEEP_CENTER_MESH = 11;
+
 	constexpr auto ENEMY_JEEP_RIGHT_LIGHT_MESHBITS = 15;
-	constexpr auto ENEMY_JEEP_LEFT_LIGHT_MESHBITS = 17;
+	constexpr auto ENEMY_JEEP_LEFT_LIGHT_MESHBITS  = 17;
 	constexpr auto ENEMY_JEEP_GRENADE_COOLDOWN_TIME = 15;
 	constexpr auto ENEMY_JEEP_PLAYER_IS_NEAR = BLOCK(6.0f);
-	constexpr auto ENEMY_JEEP_NEAR_X1_NODE_DISTANCE = BLOCK(1.0f);
+	constexpr auto ENEMY_JEEP_NEAR_X1_NODE_DISTANCE = BLOCK(1);
 	constexpr auto ENEMY_JEEP_NEAR_X2_NODE_DISTANCE = BLOCK(0.3f);
 	constexpr auto ENEMY_JEEP_PITCH_MAX = 120.0f;
 	constexpr auto ENEMY_JEEP_PITCH_WHEEL_SPEED_MULTIPLIER = 12.0f;
+
 	constexpr auto ENEMY_JEEP_WHEEL_LEFTRIGHT_TURN_MINIMUM = ANGLE(12.0f);
 
-	const auto EnemyJeepGrenadeBite = CreatureBiteInfo(Vector3(0.0f, -640.0f, -768.0f), ENEMY_JEEP_CENTER_MESH);
-	const auto EnemyJeepRightLightBite = CreatureBiteInfo(Vector3(200.0f, -144.0f, -768.0f), ENEMY_JEEP_CENTER_MESH);
-	const auto EnemyJeepLeftLightBite = CreatureBiteInfo(Vector3(-200.0f, -144.0f, -768.0f), ENEMY_JEEP_CENTER_MESH);
+	constexpr auto ENEMY_JEEP_CENTER_MESH = 11;
 
-	// Enable/Disable the light mesh that are on the back of the jeep.
-	static void DrawEnemyJeepLightMesh(ItemInfo& item, bool enabled)
+	const auto EnemyJeepGrenadeBite	   = CreatureBiteInfo(Vector3(0.0f, -640.0f, -768.0f), ENEMY_JEEP_CENTER_MESH);
+	const auto EnemyJeepRightLightBite = CreatureBiteInfo(Vector3(200.0f, -144.0f, -768.0f), ENEMY_JEEP_CENTER_MESH);
+	const auto EnemyJeepLeftLightBite  = CreatureBiteInfo(Vector3(-200.0f, -144.0f, -768.0f), ENEMY_JEEP_CENTER_MESH);
+
+	static void DrawEnemyJeepLightMesh(ItemInfo& item, bool isBraking)
 	{
-		if (enabled)
+		if (isBraking)
 		{
-			item.MeshBits.Set(ENEMY_JEEP_RIGHT_LIGHT_MESHBITS); // Left blinking light.
-			item.MeshBits.Set(ENEMY_JEEP_LEFT_LIGHT_MESHBITS); // Right blinking light.
+			item.MeshBits.Set(ENEMY_JEEP_RIGHT_LIGHT_MESHBITS);
+			item.MeshBits.Set(ENEMY_JEEP_LEFT_LIGHT_MESHBITS);
 		}
 		else
 		{
-			item.MeshBits.Clear(ENEMY_JEEP_RIGHT_LIGHT_MESHBITS); // Left blinking light.
-			item.MeshBits.Clear(ENEMY_JEEP_LEFT_LIGHT_MESHBITS); // Right blinking light.
+			item.MeshBits.Clear(ENEMY_JEEP_RIGHT_LIGHT_MESHBITS);
+			item.MeshBits.Clear(ENEMY_JEEP_LEFT_LIGHT_MESHBITS);
 		}
 	}
 
-	// Draw 2 dynamic light near the light mesh on the back of the jeep.
-	static void SpawnEnemyJeepLight(ItemInfo* item)
+	static void SpawnEnemyJeepBrakeLights(const ItemInfo& item)
 	{
-		auto jointPos = GetJointPosition(item, EnemyJeepRightLightBite);
-		TriggerDynamicLight(jointPos.x, jointPos.y, jointPos.z, 10, 64, 0, 0);
+		constexpr auto COLOR   = Color(0.25f, 0.0f, 0.0f);
+		constexpr auto FALLOFF = 0.04f;
 
-		jointPos = GetJointPosition(item, EnemyJeepLeftLightBite);
-		TriggerDynamicLight(jointPos.x, jointPos.y, jointPos.z, 10, 64, 0, 0);
+		auto leftPos = GetJointPosition(item, EnemyJeepLeftLightBite).ToVector3();
+		TriggerDynamicLight(leftPos, COLOR, FALLOFF);
+
+		auto rightPos  = GetJointPosition(item, EnemyJeepRightLightBite).ToVector3();
+		TriggerDynamicLight(rightPos, COLOR, FALLOFF);
 	}
 
 	static void SpawnEnemyJeepGrenade(ItemInfo& item)
 	{
-		auto grenadeIndex = CreateItem();
-		if (grenadeIndex == NO_VALUE || item.ItemFlags[3] > 0)
+		int grenadeItemNumber = CreateItem();
+		if (grenadeItemNumber == NO_VALUE || item.ItemFlags[3] > 0)
 			return;
 
-		auto* grenade = &g_Level.Items[grenadeIndex];
-		grenade->ObjectNumber = ID_GRENADE;
-		grenade->RoomNumber = item.RoomNumber;
-		grenade->Model.Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+		auto& grenadeItem = g_Level.Items[grenadeItemNumber];
+
+		grenadeItem.ObjectNumber = ID_GRENADE;
+		grenadeItem.RoomNumber = item.RoomNumber;
+		grenadeItem.Model.Color = Color(0.5f, 0.5f, 0.5f, 1.0f);
+
 		auto grenadePos = GetJointPosition(item, EnemyJeepGrenadeBite);
 		auto grenadeposF = Vector3(grenadePos.x, grenadePos.y, grenadePos.z);
 
-		grenade->Pose.Orientation.x = item.Pose.Orientation.x;
-		grenade->Pose.Orientation.y = item.Pose.Orientation.y + ANGLE(180.0f);
-		grenade->Pose.Orientation.z = 0;
-		grenade->Pose.Position.x = grenadePos.x + (BLOCK(0.10f) * phd_sin(grenade->Pose.Orientation.y));
-		grenade->Pose.Position.y = grenadePos.y;
-		grenade->Pose.Position.z = grenadePos.z + (BLOCK(0.10f) * phd_cos(grenade->Pose.Orientation.y));
-		InitializeItem(grenadeIndex);
+		grenadeItem.Pose.Orientation = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y + ANGLE(180.0f), 0);
+		grenadeItem.Pose.Position = grenadePos + Vector3i(BLOCK(0.1f) * phd_sin(grenadeItem.Pose.Orientation.y), 0, BLOCK(0.1f) * phd_cos(grenadeItem.Pose.Orientation.y));
+		
+		InitializeItem(grenadeItemNumber);
 
 		for (int i = 0; i < 9; i++)
 			SpawnGunSmokeParticles(grenadeposF, Vector3(0, 0, 1), item.RoomNumber, 1, LaraWeaponType::RocketLauncher, 32);
 
 		if (GetRandomControl() & 3)
 		{
-			grenade->ItemFlags[0] = (int)ProjectileType::Grenade;
+			grenadeItem.ItemFlags[0] = (int)ProjectileType::Grenade;
 		}
 		else
 		{
-			grenade->ItemFlags[0] = (int)ProjectileType::FragGrenade;
+			grenadeItem.ItemFlags[0] = (int)ProjectileType::FragGrenade;
 		}
 
-		grenade->Animation.Velocity.z = ENEMY_JEEP_GRENADE_VELOCITY;
-		grenade->Animation.Velocity.y = CLICK(1) * phd_sin(grenade->Pose.Orientation.x);
-		grenade->Animation.ActiveState = grenade->Pose.Orientation.x;
-		grenade->Animation.TargetState = grenade->Pose.Orientation.y;
-		grenade->Animation.RequiredState = NO_VALUE;
-		grenade->HitPoints = ENEMY_JEEP_GRENADE_TIMER; // Timer of the grenade.
+		grenadeItem.Animation.Velocity.z = ENEMY_JEEP_GRENADE_VELOCITY;
+		grenadeItem.Animation.Velocity.y = CLICK(1) * phd_sin(grenadeItem.Pose.Orientation.x);
+		grenadeItem.Animation.ActiveState = grenadeItem.Pose.Orientation.x;
+		grenadeItem.Animation.TargetState = grenadeItem.Pose.Orientation.y;
+		grenadeItem.Animation.RequiredState = NO_VALUE;
+		grenadeItem.HitPoints = ENEMY_JEEP_GRENADE_TIMER;
+
 		item.ItemFlags[3] = ENEMY_JEEP_GRENADE_COOLDOWN_TIME;
 
-		AddActiveItem(grenadeIndex);
+		AddActiveItem(grenadeItemNumber);
 		SoundEffect(SFX_TR4_GRENADEGUN_FIRE, &item.Pose);
 ;	}
 
@@ -259,12 +263,12 @@ namespace TEN::Entities::TR4
 			break;
 
 		default:
-			bool waitBehaviour = (item.ItemFlags[1] & X2_WAIT_UNTIL_LARA_NEAR) != 0;
+			bool waitBehaviour = (item.ItemFlags[1] & X2_WAIT_UNTIL_PLAYER_NEAR) != 0;
 			if (waitBehaviour)
 			{
 				item.Animation.TargetState = ENEMY_JEEP_STATE_STOP;
 				item.ItemFlags[4] = 1;
-				item.ItemFlags[5] = item.ItemFlags[1] - X2_WAIT_UNTIL_LARA_NEAR;
+				item.ItemFlags[5] = item.ItemFlags[1] - X2_WAIT_UNTIL_PLAYER_NEAR;
 			}
 
 			break;
@@ -275,30 +279,30 @@ namespace TEN::Entities::TR4
 
 	static bool IsJeepIdle(int activeState)
 	{
-		return activeState == ENEMY_JEEP_STATE_IDLE ||
-			   activeState == ENEMY_JEEP_STATE_STOP;
+		return (activeState == ENEMY_JEEP_STATE_IDLE ||
+				activeState == ENEMY_JEEP_STATE_STOP);
 	}
 
 	static bool IsJeepMoving(int activeState)
 	{
-		return activeState == ENEMY_JEEP_STATE_MOVE ||
-			   activeState == ENEMY_JEEP_STATE_TURN_LEFT ||
-			   activeState == ENEMY_JEEP_STATE_TURN_RIGHT;
+		return (activeState == ENEMY_JEEP_STATE_MOVE ||
+				activeState == ENEMY_JEEP_STATE_TURN_LEFT ||
+				activeState == ENEMY_JEEP_STATE_TURN_RIGHT);
 	}
 
 	static bool IsJeepJumpingOrDropping(int activeState, bool onlyJump = false)
 	{
 		if (onlyJump)
 		{
-			return activeState == ENEMY_JEEP_STATE_JUMP_PIT ||
-				activeState == ENEMY_JEEP_STATE_CUSTOM_JUMP_PIT;
+			return (activeState == ENEMY_JEEP_STATE_JUMP_PIT ||
+					activeState == ENEMY_JEEP_STATE_CUSTOM_JUMP_PIT);
 		}
 		else
 		{
-			return activeState == ENEMY_JEEP_STATE_JUMP_PIT ||
-				activeState == ENEMY_JEEP_STATE_DROP ||
-				activeState == ENEMY_JEEP_STATE_CUSTOM_DROP ||
-				activeState == ENEMY_JEEP_STATE_CUSTOM_JUMP_PIT;
+			return (activeState == ENEMY_JEEP_STATE_JUMP_PIT ||
+					activeState == ENEMY_JEEP_STATE_DROP ||
+					activeState == ENEMY_JEEP_STATE_CUSTOM_DROP ||
+					activeState == ENEMY_JEEP_STATE_CUSTOM_JUMP_PIT);
 		}
 	}
 
@@ -342,7 +346,7 @@ namespace TEN::Entities::TR4
 			if (IsJeepIdle(item.Animation.ActiveState))
 			{
 				DrawEnemyJeepLightMesh(item, true);
-				SpawnEnemyJeepLight(&item);
+				SpawnEnemyJeepBrakeLights(item);
 			}
 			else
 			{
