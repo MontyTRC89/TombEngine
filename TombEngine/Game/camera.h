@@ -24,6 +24,7 @@ struct CAMERA_INFO
 	GameVector target;
 	CameraType type;
 	CameraType oldType;
+	CameraType lastType;
 	int shift;
 	int flags;
 	bool fixedCamera;
@@ -45,6 +46,7 @@ struct CAMERA_INFO
 	ItemInfo* lastItem;
 	int mikeAtLara;
 	Vector3i mikePos;
+	bool disableInterpolation;
 };
 
 struct ObjectCameraInfo
