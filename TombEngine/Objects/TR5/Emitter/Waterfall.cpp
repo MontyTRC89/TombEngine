@@ -133,7 +133,7 @@ namespace TEN::Effects::WaterfallEmitter
 		auto startColor = (color + colorOffset);
 		auto endColor = (color + colorOffset);
 
-		part.SpriteSeqID = ID_WATERFALL_SPRITES;
+		part.SpriteSeqID = ID_WATERFALL;
 		part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_1_SPRITE_ID : WATERFALL_STREAM_2_SPRITE_ID;
 
 		part.on = true;
