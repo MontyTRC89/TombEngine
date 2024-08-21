@@ -1290,7 +1290,7 @@ void CalculateCamera(const CollisionInfo& coll)
 
 	Camera.fixedCamera = isFixedCamera;
 	Camera.last = Camera.number;
-	Camera.DisableInterpolation = (Camera.lastType != Camera.type);
+	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
 	Camera.lastType = Camera.type;
 
 	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) &&
