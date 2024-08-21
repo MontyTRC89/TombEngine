@@ -81,20 +81,22 @@ constexpr auto ALL_CLIP = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 
 struct AITargetFlags
 {
-	bool checkDistance = false;
-	bool checkSameZone = true;
-	bool checkOcb = false;
-	float maxDistance = 0.0f;
-	int ocb = NO_VALUE;
-	int objectNumber = ID_NO_OBJECT;
-	ItemInfo foundItem = {};
+	ItemInfo	   FoundItem   = {};
+	GAME_OBJECT_ID ObjectID	   = GAME_OBJECT_ID::ID_NO_OBJECT;
+	float		   DistanceMax = 0.0f;
+	int			   Ocb		   = NO_VALUE;
+
+	bool CheckDistance = false;
+	bool CheckSameZone = true;
+	bool CheckOcb	   = false;
 };
 
 void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
 void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
-void FindAITargetObject(CreatureInfo* creature, int objectNumber);
-void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool checkSameZone = true);
-bool FindAITargetObject(CreatureInfo* creature, AITargetFlags* data);
+void FindAITargetObject(ItemInfo& item, GAME_OBJECT_ID objectID);
+void FindAITargetObject(ItemInfo& item, GAME_OBJECT_ID objectID, int ocb, bool checkSameZone = true);
+bool FindAITargetObject(ItemInfo& item, AITargetFlags& flags);
+
 void GetAITarget(CreatureInfo* creature);
 int CreatureVault(short itemNumber, short angle, int vault, int shift);
 bool MoveCreature3DPos(Pose* fromPose, Pose* toPose, int velocity, short angleDif, int angleAdd);

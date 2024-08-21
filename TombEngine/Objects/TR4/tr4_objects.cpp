@@ -11,8 +11,8 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR4/Entity/Wraith.h" // OFF
-#include "Objects/TR4/Entity/EnemyJeep.h" // WIP
+#include "Objects/TR4/Entity/EnemyJeep.h"
+#include "Objects/TR4/Entity/Wraith.h"
 #include "Objects/TR4/Entity/tr4_ahmet.h" // OK
 #include "Objects/TR4/Entity/tr4_baddy.h" // OK
 #include "Objects/TR4/Entity/tr4_bat.h" // OK
@@ -626,7 +626,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->Initialize = InitializeEnemyJeep;
-			obj->control = EnemyJeepControl;
+			obj->control = ControlEnemyJeep;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 40;
