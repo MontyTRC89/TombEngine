@@ -4,7 +4,6 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -41,7 +40,7 @@ namespace TEN::Effects::Hair
 		worldMatrix = Matrix::CreateTranslation(relOffset) * worldMatrix;
 
 		// Use player's head bone orientation as base.
-		auto baseOrient = Geometry::ConvertDirectionToQuat(-Geometry::ConvertQuatToDirection(GetBoneOrientation(item, LM_HEAD)));
+		auto baseOrient = Geometry::ConvertDirectionToQuat(-Geometry::ConvertQuatToDirection(GetBoneOrientation(item, LM_HEAD))) * item.Pose.Orientation.ToQuaternion();
 
 		// Set position of base segment.
 		Segments[0].Position = worldMatrix.Translation();

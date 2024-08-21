@@ -19,8 +19,10 @@ namespace TEN::Renderer::Structures
 		Matrix	Scale		= Matrix::Identity;
 		Matrix	AnimTransforms[MAX_BONES] = {};
 
-		Vector4 Color		 = Vector4::Zero;
-		Vector4 AmbientLight = Vector4::Zero;
+		Quaternion BoneOrientations[MAX_BONES];
+
+		Vector4 Color = Vector4::One;
+		Vector4 AmbientLight = Vector4::One;
 
 		std::vector<int>			MeshIds		 = {};
 		std::vector<RendererLight*> LightsToDraw = {};

@@ -1,9 +1,8 @@
 #pragma once
-#include "Game/collision/sphere.h"
-#include "Specific/newtypes.h"
-#include "Specific/level.h"
-#include "Renderer/Renderer.h"
 #include "Renderer/Graphics/Vertices/Vertex.h"
+#include "Renderer/Renderer.h"
+#include "Specific/level.h"
+#include "Specific/newtypes.h"
 
 constexpr int MAX_DEBRIS = 2048;
 
@@ -26,7 +25,7 @@ struct ITEM_LIGHT
 
 struct SHATTER_ITEM
 {
-	SPHERE sphere;
+	BoundingSphere sphere;
 	ITEM_LIGHT* il;
 	int meshIndex;
 	Vector4 color;
