@@ -300,8 +300,8 @@ namespace TEN::Structures
 		// Create root if empty.
 		if (_rootID == NO_VALUE)
 		{
+			// Get new leaf.
 			auto& leaf = _nodes[leafID];
-			leaf.Height = 0;
 
 			_rootID = leafID;
 			_leafIDMap.insert({ leaf.ObjectID, leafID });
