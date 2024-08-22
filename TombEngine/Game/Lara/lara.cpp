@@ -287,6 +287,12 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), g_Camera.actualAngle);
 	//PrintDebugMessage("%d", abs(deltaAngle));
 
+	// Regenerate room mesh.
+	static bool dbGenerate = true;
+	if (KeyMap[OIS::KC_Q] && dbGenerate)
+		g_Level.Rooms[item->RoomNumber].GenerateCollisionMesh();
+	dbGenerate = !KeyMap[OIS::KC_Q];
+
 	HandleLosDebug(*item);
 	HandleBridgeDebug(*item);
 	//HandleSpatialHashDebug(*item);

@@ -1,8 +1,8 @@
 #pragma once
 
 // References:
-// https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
 // https://github.com/erincatto/box2d/blob/main/include/box2d/b2_dynamic_tree.h
+// https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
 // https://www.gdcvault.com/play/1025909/Math-for-Game-Developers-Dynamic
 
 namespace TEN::Structures
@@ -10,8 +10,8 @@ namespace TEN::Structures
 	enum class BvhBuildStrategy
 	{
 		Fast,	  // O(n): Fast build, okay quality. Top-down approach with median split.
-		Balanced, // O(n): Slower build, good quality. Top-down approach with limited surface area heuristic (SAH).
-		Accurate  // O(n^2): Slow build, optimal quality. Top-down approach with exhaustive surface area heuristic (SAH).
+		Balanced, // O(n * m): Efficient build, good quality. Top-down approach with limited surface area heuristic.
+		Accurate  // O(n²): Slow build, optimal quality. Top-down approach with exhaustive surface area heuristic.
 	};
 
 	// Dynamic bounding volume hierarchy using AABBs.

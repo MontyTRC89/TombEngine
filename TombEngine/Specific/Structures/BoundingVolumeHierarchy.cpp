@@ -603,7 +603,10 @@ namespace TEN::Structures
 
 	void BoundingVolumeHierarchy::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BvhBuildStrategy strategy)
 	{
-		_nodes.reserve(objectIds.size());
+		// Reserve enough memory for optimally balanced tree.
+		_nodes.reserve((objectIds.size() * 2) - 1);
+
+		// Build recursively.
 		Build(objectIds, aabbs, 0, (int)objectIds.size(), strategy);
 		_rootID = (int)_nodes.size() - 1;
 
@@ -612,7 +615,7 @@ namespace TEN::Structures
 
 	int BoundingVolumeHierarchy::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, BvhBuildStrategy strategy)
 	{
-		constexpr auto BALANCED_SPLIT_RANGE_MAX = 10;
+		constexpr auto BALANCED_STRAT_SPLIT_RANGE_MAX = 10;
 
 		// FAILSAFE.
 		if (start >= end)
@@ -652,18 +655,10 @@ namespace TEN::Structures
 				if (strategy == BvhBuildStrategy::Fast)
 					return bestSplit;
 
-				// Surface area heuristic (SAH).
-				int range = 0;
-				if (strategy == BvhBuildStrategy::Balanced)
-				{
-					range = BALANCED_SPLIT_RANGE_MAX;
-				}
-				else if (strategy == BvhBuildStrategy::Accurate)
-				{
-					range = end - start;
-				}
-
+				int range = (strategy == BvhBuildStrategy::Balanced) ? BALANCED_STRAT_SPLIT_RANGE_MAX : (end - start);
 				float bestCost = INFINITY;
+
+				// Surface area heuristic.
 				for (int split = std::max(start + 1, bestSplit - range); split < std::min(end, bestSplit + range); split++)
 				{
 					// Calculate AABB 0.
