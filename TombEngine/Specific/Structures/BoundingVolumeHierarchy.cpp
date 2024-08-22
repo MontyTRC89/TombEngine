@@ -363,37 +363,53 @@ namespace TEN::Structures
 
 	void BoundingVolumeHierarchy::RemoveLeaf(int leafID)
 	{
-		// Prune branch.
 		int nodeID = leafID;
-		while (nodeID != NO_VALUE)
-		{
-			const auto& node = _nodes[nodeID];
+		int parentID = _nodes[nodeID].ParentID;
 
-			// Remove node if both children are empty.
-			if (node.LeftChildID == NO_VALUE && node.RightChildID == NO_VALUE)
+		// Remove node.
+		RemoveNode(nodeID);
+
+		// Prune branch up to root.
+		while (parentID != NO_VALUE)
+		{
+			auto& parentNode = _nodes[parentID];
+
+			// Check if parent becomes new leaf.
+			int siblingID = (parentNode.LeftChildID == nodeID) ? parentNode.RightChildID : parentNode.LeftChildID;
+			auto& siblingNode = _nodes[siblingID];
+
+			if (parentNode.LeftChildID == nodeID || parentNode.RightChildID == nodeID)
 			{
-				int parentID = node.ParentID;
-				if (parentID != NO_VALUE)
+				// Replace parent with sibling.
+				if (parentNode.ParentID != NO_VALUE)
 				{
-					auto& parentNode = _nodes[parentID];
-					if (parentNode.LeftChildID == nodeID)
+					auto& grandparentNode = _nodes[parentNode.ParentID];
+					if (grandparentNode.LeftChildID == parentID)
 					{
-						parentNode.LeftChildID = NO_VALUE;
+						grandparentNode.LeftChildID = siblingID;
 					}
-					else if (parentNode.RightChildID == nodeID)
+					else
 					{
-						parentNode.RightChildID = NO_VALUE;
+						grandparentNode.RightChildID = siblingID;
 					}
+
+					siblingNode.ParentID = parentNode.ParentID;
+				}
+				else
+				{
+					// No grandparent; sibling becomes root.
+					_rootID = siblingID;
+					siblingNode.ParentID = NO_VALUE;
 				}
 
-				RemoveNode(nodeID);
-				nodeID = parentID;
+				RemoveNode(parentID);
+				parentID = siblingNode.ParentID;
 			}
-			// Refit last node.
 			else
 			{
-				RefitNode(nodeID);
-				nodeID = NO_VALUE;
+				// Refit valid node.
+				RefitNode(parentID);
+				parentID = NO_VALUE;
 			}
 		}
 	}
