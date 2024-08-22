@@ -172,14 +172,14 @@ namespace TEN::Structures
 			return objectIds;
 
 		// Initialize stack.
-		auto nodeIDStack = std::stack<int>{};
-		nodeIDStack.push(_rootID);
+		auto stack = std::stack<int>{};
+		stack.push(_rootID);
 
 		// Traverse tree.
-		while (!nodeIDStack.empty())
+		while (!stack.empty())
 		{
-			int nodeID = nodeIDStack.top();
-			nodeIDStack.pop();
+			int nodeID = stack.top();
+			stack.pop();
 
 			// Invalid node; continue.
 			if (nodeID == NO_VALUE)
@@ -200,10 +200,10 @@ namespace TEN::Structures
 			else
 			{
 				if (node.LeftChildID != NO_VALUE)
-					nodeIDStack.push(node.LeftChildID);
+					stack.push(node.LeftChildID);
 
 				if (node.RightChildID != NO_VALUE)
-					nodeIDStack.push(node.RightChildID);
+					stack.push(node.RightChildID);
 			}
 		}
 
