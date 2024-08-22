@@ -1156,7 +1156,7 @@ namespace TEN::Renderer
 		_interpolationFactor = interpFactor;
 
 		// Interpolate camera.
-		if (!Camera.disableInterpolation)
+		if (!Camera.DisableInterpolation)
 		{
 			_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpFactor);
 			_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpFactor);
@@ -1176,7 +1176,7 @@ namespace TEN::Renderer
 			_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
 			_gameCamera.Camera.Frustum = _currentGameCamera.Camera.Frustum;
 
-			Camera.disableInterpolation = false;
+			Camera.DisableInterpolation = false;
 		}
 
 		_gameCamera.Camera.ViewSize = _currentGameCamera.Camera.ViewSize;
