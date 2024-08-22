@@ -149,6 +149,16 @@ namespace TEN::Structures
 		return objectIds;
 	}
 
+	unsigned int SpatialHash::Size() const
+	{
+		return (unsigned int)_cellMap.size();
+	}
+
+	bool SpatialHash::Empty() const
+	{
+		return _cellMap.empty();
+	}
+
 	void SpatialHash::Update(int objectID, const BoundingBox& aabb, const BoundingBox& prevAabb)
 	{
 		Remove(objectID, prevAabb);

@@ -40,14 +40,15 @@ namespace TEN::Structures
 
 		// Utilities
 
+		unsigned int Size() const;
+		bool		 Empty() const;
+
 		void Update(int objectID, const BoundingBox& aabb, const BoundingBox& prevAabb);
 		void Update(int objectID, const BoundingOrientedBox& obb, BoundingOrientedBox& prevObb);
 		void Update(int objectID, const BoundingSphere& sphere, const BoundingSphere& prevSphere);
-
 		void Insert(int objectID, const BoundingBox& aabb);
 		void Insert(int objectID, const BoundingOrientedBox& obb);
 		void Insert(int objectID, const BoundingSphere& sphere);
-
 		void Remove(int objectID, const BoundingBox& prevAabb);
 		void Remove(int objectID, const BoundingOrientedBox& prevObb);
 		void Remove(int objectID, const BoundingSphere& prevSphere);
