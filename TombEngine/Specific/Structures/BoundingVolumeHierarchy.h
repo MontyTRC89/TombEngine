@@ -9,9 +9,9 @@ namespace TEN::Structures
 {
 	enum class BvhBuildStrategy
 	{
-		Fast,	  // O(n): Top-down approach with median split. Fast build, okay quality.
-		Balanced, // O(n): Top-down approach with limited surface area heuristic (SAH). Slower build, good quality.
-		Accurate  // O(n^2): Top-down approach with exhaustive surface area heuristic (SAH). Slow build, optimal quality.
+		Fast,	  // O(n): Fast build, okay quality. Top-down approach with median split.
+		Balanced, // O(n): Slower build, good quality. Top-down approach with limited surface area heuristic (SAH).
+		Accurate  // O(n^2): Slow build, optimal quality. Top-down approach with exhaustive surface area heuristic (SAH).
 	};
 
 	// Dynamic bounding volume hierarchy using AABBs.
