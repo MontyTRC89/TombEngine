@@ -1,6 +1,8 @@
 #include "framework.h"
 #include "Specific/Structures/BoundingTree.h"
 
+#include <stack>
+
 #include "Math/Math.h"
 
 using namespace TEN::Math;
@@ -12,11 +14,11 @@ namespace TEN::Structures
 		return (LeftChildID == NO_VALUE && RightChildID == NO_VALUE);
 	}
 
-	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs)
+	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BoundingTreeBuildStrategy strategy)
 	{
 		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree: Object ID and AABB counts unequal in static constructor.");
 
-		Build(objectIds, aabbs);
+		Build(objectIds, aabbs, strategy);
 	}
 
 	std::vector<int> BoundingTree::GetBoundedObjectIds() const
@@ -71,6 +73,16 @@ namespace TEN::Structures
 		};
 
 		return GetBoundedObjectIds(testColl);
+	}
+
+	unsigned int BoundingTree::Size() const
+	{
+		return (unsigned int)_leafIDMap.size();
+	}
+
+	bool BoundingTree::Empty() const
+	{
+		return _leafIDMap.empty();
 	}
 
 	void BoundingTree::Insert(int objectID, const BoundingBox& aabb, float boundary)
@@ -159,33 +171,45 @@ namespace TEN::Structures
 		if (_nodes.empty())
 			return objectIds;
 
-		std::function<void(int)> traverse = [&](int nodeID)
+		// Initialize stack.
+		auto nodeIDStack = std::stack<int>{};
+		nodeIDStack.push(_rootID);
+
+		// Traverse tree.
+		while (!nodeIDStack.empty())
 		{
-			// Invalid node; return early.
+			int nodeID = nodeIDStack.top();
+			nodeIDStack.pop();
+
+			// Invalid node; continue.
 			if (nodeID == NO_VALUE)
-				return;
+				continue;
 
 			const auto& node = _nodes[nodeID];
 
 			// Test node collision.
 			if (!testCollRoutine(node))
-				return;
+				continue;
 
-			// Collect object ID.
+			// Leaf node; collect object ID.
 			if (node.IsLeaf())
 			{
 				objectIds.push_back(node.ObjectID);
 			}
-			// Traverse children recursively.
+			// Inner node; push children onto stack for traversal.
 			else
 			{
-				traverse(node.LeftChildID);
-				traverse(node.RightChildID);
+				if (node.LeftChildID != NO_VALUE)
+				{
+					nodeIDStack.push(node.LeftChildID);
+				}
+				if (node.RightChildID != NO_VALUE)
+				{
+					nodeIDStack.push(node.RightChildID);
+				}
 			}
-		};
+		}
 
-		// Traverse tree.
-		traverse(_rootID);
 		return objectIds;
 	}
 
@@ -580,20 +604,18 @@ namespace TEN::Structures
 		return nodeID;
 	}
 
-	void BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs)
+	void BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BoundingTreeBuildStrategy strategy)
 	{
 		_nodes.reserve(objectIds.size());
-		Build(objectIds, aabbs, 0, (int)objectIds.size());
+		Build(objectIds, aabbs, 0, (int)objectIds.size(), strategy);
 		_rootID = (int)_nodes.size() - 1;
 
 		//Validate();
 	}
 
-	// Recursively constructs tree using top-down approach with limited surface area heuristic.
-	// Complexity: O(n)
-	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end)
+	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, BoundingTreeBuildStrategy strategy)
 	{
-		constexpr auto SPLIT_RANGE_MAX = 10;
+		constexpr auto BALANCED_SPLIT_RANGE_MAX = 10;
 
 		// FAILSAFE.
 		if (start >= end)
@@ -625,38 +647,59 @@ namespace TEN::Structures
 		// Inner node.
 		else
 		{
-			int bestSplit = (start + end) / 2;
-			float bestCost = INFINITY;
-
-			// Find best split within limited range.
-			for (int split = std::max(start + 1, bestSplit - SPLIT_RANGE_MAX); split < std::min(end, bestSplit + SPLIT_RANGE_MAX); split++)
+			auto getBestSplit = [&]()
 			{
-				// Calculate AABB 0.
-				auto aabb0 = aabbs[start];
-				for (int i = (start + 1); i < split; i++)
-					BoundingBox::CreateMerged(aabb0, aabb0, aabbs[i]);
+				int bestSplit = (start + end) / 2;
 
-				// Calculate AABB 1.
-				auto aabb1 = aabbs[split];
-				for (int i = split; i < end; i++)
-					BoundingBox::CreateMerged(aabb1, aabb1, aabbs[i]);
+				// Median split.
+				if (strategy == BoundingTreeBuildStrategy::Fast)
+					return bestSplit;
 
-				// Calculate cost.
-				float surfaceArea0 = Geometry::GetBoundingBoxArea(aabb0);
-				float surfaceArea1 = Geometry::GetBoundingBoxArea(aabb1);
-				float cost = (surfaceArea0 * (split - start)) + (surfaceArea1 * (end - split));
-
-				// Track best split.
-				if (cost < bestCost)
+				// Surface area heuristic (SAH).
+				int range = 0;
+				if (strategy == BoundingTreeBuildStrategy::Balanced)
 				{
-					bestSplit = split;
-					bestCost = cost;
+					range = BALANCED_SPLIT_RANGE_MAX;
 				}
-			}
+				else if (strategy == BoundingTreeBuildStrategy::Accurate)
+				{
+					range = end - start;
+				}
+
+				float bestCost = INFINITY;
+				for (int split = std::max(start + 1, bestSplit - range); split < std::min(end, bestSplit + range); split++)
+				{
+					// Calculate AABB 0.
+					auto aabb0 = aabbs[start];
+					for (int i = (start + 1); i < split; i++)
+						BoundingBox::CreateMerged(aabb0, aabb0, aabbs[i]);
+
+					// Calculate AABB 1.
+					auto aabb1 = aabbs[split];
+					for (int i = split; i < end; i++)
+						BoundingBox::CreateMerged(aabb1, aabb1, aabbs[i]);
+
+					// Calculate cost.
+					float surfaceArea0 = Geometry::GetBoundingBoxArea(aabb0);
+					float surfaceArea1 = Geometry::GetBoundingBoxArea(aabb1);
+					float cost = (surfaceArea0 * (split - start)) + (surfaceArea1 * (end - split));
+
+					// Track best split.
+					if (cost < bestCost)
+					{
+						bestSplit = split;
+						bestCost = cost;
+					}
+				}
+
+				return bestSplit;
+			};
+
+			int bestSplit = getBestSplit();
 
 			// Create children recursively.
-			node.LeftChildID = Build(objectIds, aabbs, start, bestSplit);
-			node.RightChildID = Build(objectIds, aabbs, bestSplit, end);
+			node.LeftChildID = Build(objectIds, aabbs, start, bestSplit, strategy);
+			node.RightChildID = Build(objectIds, aabbs, bestSplit, end, strategy);
 
 			// Set parent ID for children.
 			int nodeID = (int)_nodes.size();
@@ -667,7 +710,10 @@ namespace TEN::Structures
 
 			// Add new inner node and set height.
 			_nodes.push_back(node);
-			_nodes[nodeID].Height = std::max((node.LeftChildID != NO_VALUE) ? _nodes[node.LeftChildID].Height : 0, (node.RightChildID != NO_VALUE) ? _nodes[node.RightChildID].Height : 0) + 1;
+			_nodes[nodeID].Height = std::max(
+				(node.LeftChildID != NO_VALUE) ? _nodes[node.LeftChildID].Height : 0, 
+				(node.RightChildID != NO_VALUE) ? _nodes[node.RightChildID].Height : 0) + 1;
+
 			return nodeID;
 		}
 	}

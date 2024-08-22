@@ -7,13 +7,20 @@
 
 namespace TEN::Structures
 {
+	enum class BoundingTreeBuildStrategy
+	{
+		Fast,	  // O(n): Top-down approach with median split for quick construction.
+		Balanced, // O(n): Top-down approach with limited surface area heuristic (SAH) for speed-quality balance.
+		Accurate  // O(n^2): Top-down approach with exhaustive surface area heuristic (SAH) for optimal structure.
+	};
+
 	// Dynamic bounding volume hierarchy using AABBs.
 	class BoundingTree
 	{
 	private:
 		struct Node
 		{
-			int			ObjectID = NO_VALUE; // NOTE: Only leaf node stores object ID directly.
+			int			ObjectID = NO_VALUE; // NOTE: Only stored by leaf.
 			BoundingBox Aabb	 = BoundingBox();
 
 			int Height		 = 0;
@@ -36,7 +43,7 @@ namespace TEN::Structures
 		// Constructors
 
 		BoundingTree() = default;
-		BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs);
+		BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BoundingTreeBuildStrategy strategy = BoundingTreeBuildStrategy::Balanced);
 
 		// Getters
 
@@ -48,9 +55,11 @@ namespace TEN::Structures
 
 		// Utilities
 
-		void Insert(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
-		void Move(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
-		void Remove(int objectID);
+		unsigned int Size() const;
+		bool		 Empty() const;
+		void		 Insert(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
+		void		 Move(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
+		void		 Remove(int objectID);
 
 		// Debug
 
@@ -74,8 +83,8 @@ namespace TEN::Structures
 
 		// Static helpers
 
-		void Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs);
-		int	 Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end);
+		void Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BoundingTreeBuildStrategy strategy);
+		int	 Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, BoundingTreeBuildStrategy strategy);
 
 		// Debug helpers
 
