@@ -572,6 +572,8 @@ namespace TEN::Renderer
 			RenderOptionsMenu(menu, MenuVerticalOptionsTitle);
 			break;
 		}
+
+		DrawAllStrings();
 	}
 
 	void Renderer::RenderPauseMenu(Menu menu)
@@ -1151,30 +1153,50 @@ namespace TEN::Renderer
 
 	void Renderer::RenderTitle(float interpFactor)
 	{
-		_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpFactor);
-		_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpFactor);
-		_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpFactor);
-		_gameCamera.Camera.Projection = Matrix::Lerp(_oldGameCamera.Camera.Projection, _currentGameCamera.Camera.Projection, interpFactor);
-		_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
-		_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
-		_gameCamera.Camera.Frustum = _currentGameCamera.Camera.Frustum;
+		_interpolationFactor = interpFactor;
+
+		// Interpolate camera.
+		if (!Camera.disableInterpolation)
+		{
+			_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpFactor);
+			_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpFactor);
+			_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpFactor);
+			_gameCamera.Camera.Projection = Matrix::Lerp(_oldGameCamera.Camera.Projection, _currentGameCamera.Camera.Projection, interpFactor);
+			_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
+			_gameCamera.Camera.FOV = Lerp(_oldGameCamera.Camera.FOV, _currentGameCamera.Camera.FOV, interpFactor);
+			_gameCamera.Camera.Frustum.Update(_gameCamera.Camera.View, _gameCamera.Camera.Projection);
+		}
+		else
+		{
+			_gameCamera.Camera.WorldPosition = _currentGameCamera.Camera.WorldPosition;
+			_gameCamera.Camera.WorldDirection = _currentGameCamera.Camera.WorldDirection;
+			_gameCamera.Camera.View = _currentGameCamera.Camera.View;
+			_gameCamera.Camera.Projection = _currentGameCamera.Camera.Projection;
+			_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
+			_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
+			_gameCamera.Camera.Frustum = _currentGameCamera.Camera.Frustum;
+
+			Camera.disableInterpolation = false;
+		}
+
 		_gameCamera.Camera.ViewSize = _currentGameCamera.Camera.ViewSize;
 		_gameCamera.Camera.InvViewSize = _currentGameCamera.Camera.InvViewSize;
 		_gameCamera.Camera.NearPlane = _currentGameCamera.Camera.NearPlane;
 		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
 
-		_interpolationFactor = interpFactor;
+		_stringsToDraw.clear();
+		_isLocked = false;
 
-		RenderScene(&_dumpScreenRenderTarget, false, _gameCamera);
+		DumpGameScene();
 
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 1.0f);
-		DrawAllStrings();
-
-		_context->ClearState();
+		
 		_swapChain->Present(1, 0);
+
+		_isLocked = true;
 	}
 
 	void Renderer::DrawDebugInfo(RenderView& view)
