@@ -254,7 +254,7 @@ void InitializeCamera()
 	Camera.bounce = 0;
 	Camera.number = -1;
 	Camera.fixedCamera = false;
-	Camera.disableInterpolation = true;
+	Camera.DisableInterpolation = true;
 
 	AlterFOV(ANGLE(DEFAULT_FOV));
 
@@ -1086,9 +1086,7 @@ void CalculateCamera(const CollisionInfo& coll)
 	{
 		Camera.type = CameraType::Fixed;
 		if (Camera.oldType != CameraType::Fixed)
-		{
 			Camera.speed = 1;
-		}
 	}
 
 	// Camera is in a water room, play water sound effect.
@@ -1292,16 +1290,7 @@ void CalculateCamera(const CollisionInfo& coll)
 
 	Camera.fixedCamera = isFixedCamera;
 	Camera.last = Camera.number;
-
-	if (Camera.lastType != Camera.type)
-	{
-		Camera.disableInterpolation = true;
-	}
-	else
-	{
-		Camera.disableInterpolation = false;
-	}
-
+	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
 	Camera.lastType = Camera.type;
 
 	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) &&
