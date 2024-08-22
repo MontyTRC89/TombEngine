@@ -200,13 +200,10 @@ namespace TEN::Structures
 			else
 			{
 				if (node.LeftChildID != NO_VALUE)
-				{
 					nodeIDStack.push(node.LeftChildID);
-				}
+
 				if (node.RightChildID != NO_VALUE)
-				{
 					nodeIDStack.push(node.RightChildID);
-				}
 			}
 		}
 
