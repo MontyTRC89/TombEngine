@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Math/Math.h"
-#include "Specific/Structures/BoundingTree.h"
+#include "Specific/Structures/BoundingVolumeHierarchy.h"
 
 using namespace TEN::Math;
 using namespace TEN::Structures;
@@ -86,8 +86,8 @@ namespace TEN::Physics
 		std::vector<Vector3>				_vertices	 = {};
 		std::vector<Vector3>				_normals	 = {};
 
-		BoundingTree _triangleTree = BoundingTree();
-		Cache		 _cache		   = {};
+		Bvh	  _triangleTree = Bvh();
+		Cache _cache		= {};
 
 	public:
 		// Constructors

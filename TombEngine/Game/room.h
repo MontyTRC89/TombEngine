@@ -105,7 +105,7 @@ private:
 
 	// Members
 
-	BoundingTree _tree = BoundingTree();
+	Bvh _tree = Bvh();
 
 public:
 	// Constructors

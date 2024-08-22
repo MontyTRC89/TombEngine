@@ -7,7 +7,7 @@
 
 namespace TEN::Structures
 {
-	enum class BoundingTreeBuildStrategy
+	enum class BvhBuildStrategy
 	{
 		Fast,	  // O(n): Top-down approach with median split for quick construction.
 		Balanced, // O(n): Top-down approach with limited surface area heuristic (SAH) for speed-quality balance.
@@ -15,7 +15,7 @@ namespace TEN::Structures
 	};
 
 	// Dynamic bounding volume hierarchy using AABBs.
-	class BoundingTree
+	typedef class BoundingVolumeHierarchy
 	{
 	private:
 		struct Node
@@ -42,8 +42,8 @@ namespace TEN::Structures
 	public:
 		// Constructors
 
-		BoundingTree() = default;
-		BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BoundingTreeBuildStrategy strategy = BoundingTreeBuildStrategy::Balanced);
+		BoundingVolumeHierarchy() = default;
+		BoundingVolumeHierarchy(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BvhBuildStrategy strategy = BvhBuildStrategy::Balanced);
 
 		// Getters
 
@@ -83,12 +83,12 @@ namespace TEN::Structures
 
 		// Static helpers
 
-		void Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BoundingTreeBuildStrategy strategy);
-		int	 Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, BoundingTreeBuildStrategy strategy);
+		void Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BvhBuildStrategy strategy);
+		int	 Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, BvhBuildStrategy strategy);
 
 		// Debug helpers
 
 		void Validate() const;
 		void Validate(int nodeID) const;
-	};
+	} Bvh;
 }

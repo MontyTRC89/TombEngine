@@ -2,7 +2,7 @@
 #include "Physics/Objects/CollisionMesh.h"
 
 #include "Math/Math.h"
-#include "Specific/Structures/BoundingTree.h"
+#include "Specific/Structures/BoundingVolumeHierarchy.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Math;
@@ -402,8 +402,8 @@ namespace TEN::Physics
 			triAabbs.push_back(tri.GetAabb());
 		}
 
-		// Create bounding tree of triangles.
-		_triangleTree = BoundingTree(triIds, triAabbs);
+		// Create tree of triangles.
+		_triangleTree = Bvh(triIds, triAabbs);
 
 		// Clear cache.
 		_cache = {};

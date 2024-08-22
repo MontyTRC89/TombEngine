@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Specific/Structures/BoundingTree.h"
+#include "Specific/Structures/BoundingVolumeHierarchy.h"
 
 #include <stack>
 
@@ -9,19 +9,19 @@ using namespace TEN::Math;
 
 namespace TEN::Structures
 {
-	bool BoundingTree::Node::IsLeaf() const
+	bool BoundingVolumeHierarchy::Node::IsLeaf() const
 	{
 		return (LeftChildID == NO_VALUE && RightChildID == NO_VALUE);
 	}
 
-	BoundingTree::BoundingTree(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BoundingTreeBuildStrategy strategy)
+	BoundingVolumeHierarchy::BoundingVolumeHierarchy(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BvhBuildStrategy strategy)
 	{
 		TENAssert(objectIds.size() == aabbs.size(), "BoundingTree: Object ID and AABB counts unequal in static constructor.");
 
 		Build(objectIds, aabbs, strategy);
 	}
 
-	std::vector<int> BoundingTree::GetBoundedObjectIds() const
+	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds() const
 	{
 		auto objectIds = std::vector<int>{};
 		if (_leafIDMap.empty())
@@ -34,7 +34,7 @@ namespace TEN::Structures
 		return objectIds;
 	}
 
-	std::vector<int> BoundingTree::GetBoundedObjectIds(const Ray& ray, float dist) const
+	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const Ray& ray, float dist) const
 	{
 		auto testColl = [&](const Node& node)
 		{
@@ -45,7 +45,7 @@ namespace TEN::Structures
 		return GetBoundedObjectIds(testColl);
 	}
 
-	std::vector<int> BoundingTree::GetBoundedObjectIds(const BoundingBox& aabb) const
+	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const BoundingBox& aabb) const
 	{
 		auto testColl = [&](const Node& node)
 		{
@@ -55,7 +55,7 @@ namespace TEN::Structures
 		return GetBoundedObjectIds(testColl);
 	}
 
-	std::vector<int> BoundingTree::GetBoundedObjectIds(const BoundingOrientedBox& obb) const
+	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const BoundingOrientedBox& obb) const
 	{
 		auto testColl = [&](const Node& node)
 		{
@@ -65,7 +65,7 @@ namespace TEN::Structures
 		return GetBoundedObjectIds(testColl);
 	}
 
-	std::vector<int> BoundingTree::GetBoundedObjectIds(const BoundingSphere& sphere) const
+	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const BoundingSphere& sphere) const
 	{
 		auto testColl = [&](const Node& node)
 		{
@@ -75,17 +75,17 @@ namespace TEN::Structures
 		return GetBoundedObjectIds(testColl);
 	}
 
-	unsigned int BoundingTree::Size() const
+	unsigned int BoundingVolumeHierarchy::Size() const
 	{
 		return (unsigned int)_leafIDMap.size();
 	}
 
-	bool BoundingTree::Empty() const
+	bool BoundingVolumeHierarchy::Empty() const
 	{
 		return _leafIDMap.empty();
 	}
 
-	void BoundingTree::Insert(int objectID, const BoundingBox& aabb, float boundary)
+	void BoundingVolumeHierarchy::Insert(int objectID, const BoundingBox& aabb, float boundary)
 	{
 		// Allocate new leaf.
 		int leafID = GetNewNodeID();
@@ -100,7 +100,7 @@ namespace TEN::Structures
 		InsertLeaf(leafID);
 	}
 
-	void BoundingTree::Move(int objectID, const BoundingBox& aabb, float boundary)
+	void BoundingVolumeHierarchy::Move(int objectID, const BoundingBox& aabb, float boundary)
 	{
 		// Find leaf containing object ID.
 		auto it = _leafIDMap.find(objectID);
@@ -134,7 +134,7 @@ namespace TEN::Structures
 		Insert(objectID, aabb, boundary);
 	}
 
-	void BoundingTree::Remove(int objectID)
+	void BoundingVolumeHierarchy::Remove(int objectID)
 	{
 		// Find leaf containing object ID.
 		auto it = _leafIDMap.find(objectID);
@@ -149,7 +149,7 @@ namespace TEN::Structures
 		RemoveLeaf(leafID);
 	}
 
-	void BoundingTree::DrawDebug() const
+	void BoundingVolumeHierarchy::DrawDebug() const
 	{
 		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f, 0.5f);
 
@@ -165,7 +165,7 @@ namespace TEN::Structures
 			DrawDebugBox(node.Aabb, BOX_COLOR);
 	}
 
-	std::vector<int> BoundingTree::GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const
+	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds(const std::function<bool(const Node& node)>& testCollRoutine) const
 	{
 		auto objectIds = std::vector<int>{};
 		if (_nodes.empty())
@@ -213,7 +213,7 @@ namespace TEN::Structures
 		return objectIds;
 	}
 
-	int BoundingTree::GetNewNodeID()
+	int BoundingVolumeHierarchy::GetNewNodeID()
 	{
 		int nodeID = 0;
 
@@ -233,7 +233,7 @@ namespace TEN::Structures
 		return nodeID;
 	}
 
-	int BoundingTree::GetBestSiblingLeafID(int leafID) const
+	int BoundingVolumeHierarchy::GetBestSiblingLeafID(int leafID) const
 	{
 		const auto& leaf = _nodes[leafID];
 
@@ -298,7 +298,7 @@ namespace TEN::Structures
 		return siblingID;
 	}
 
-	void BoundingTree::InsertLeaf(int leafID)
+	void BoundingVolumeHierarchy::InsertLeaf(int leafID)
 	{
 		// Create root if empty.
 		if (_rootID == NO_VALUE)
@@ -364,7 +364,7 @@ namespace TEN::Structures
 		//Validate(leafID);
 	}
 
-	void BoundingTree::RemoveLeaf(int leafID)
+	void BoundingVolumeHierarchy::RemoveLeaf(int leafID)
 	{
 		// Prune branch.
 		int nodeID = leafID;
@@ -401,7 +401,7 @@ namespace TEN::Structures
 		}
 	}
 
-	void BoundingTree::RefitNode(int nodeID)
+	void BoundingVolumeHierarchy::RefitNode(int nodeID)
 	{
 		const auto& node = _nodes[nodeID];
 
@@ -441,7 +441,7 @@ namespace TEN::Structures
 		}
 	}
 
-	void BoundingTree::RemoveNode(int nodeID)
+	void BoundingVolumeHierarchy::RemoveNode(int nodeID)
 	{
 		auto& node = _nodes[nodeID];
 
@@ -460,7 +460,7 @@ namespace TEN::Structures
 
 	// Performs left or right tree rotation if input node is imbalanced.
 	// Returns new subtree root ID.
-	int BoundingTree::BalanceNode(int nodeID)
+	int BoundingVolumeHierarchy::BalanceNode(int nodeID)
 	{
 		if (nodeID == NO_VALUE)
 			return nodeID;
@@ -604,7 +604,7 @@ namespace TEN::Structures
 		return nodeID;
 	}
 
-	void BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BoundingTreeBuildStrategy strategy)
+	void BoundingVolumeHierarchy::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BvhBuildStrategy strategy)
 	{
 		_nodes.reserve(objectIds.size());
 		Build(objectIds, aabbs, 0, (int)objectIds.size(), strategy);
@@ -613,7 +613,7 @@ namespace TEN::Structures
 		//Validate();
 	}
 
-	int BoundingTree::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, BoundingTreeBuildStrategy strategy)
+	int BoundingVolumeHierarchy::Build(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, int start, int end, BvhBuildStrategy strategy)
 	{
 		constexpr auto BALANCED_SPLIT_RANGE_MAX = 10;
 
@@ -652,16 +652,16 @@ namespace TEN::Structures
 				int bestSplit = (start + end) / 2;
 
 				// Median split.
-				if (strategy == BoundingTreeBuildStrategy::Fast)
+				if (strategy == BvhBuildStrategy::Fast)
 					return bestSplit;
 
 				// Surface area heuristic (SAH).
 				int range = 0;
-				if (strategy == BoundingTreeBuildStrategy::Balanced)
+				if (strategy == BvhBuildStrategy::Balanced)
 				{
 					range = BALANCED_SPLIT_RANGE_MAX;
 				}
-				else if (strategy == BoundingTreeBuildStrategy::Accurate)
+				else if (strategy == BvhBuildStrategy::Accurate)
 				{
 					range = end - start;
 				}
@@ -718,7 +718,7 @@ namespace TEN::Structures
 		}
 	}
 
-	void BoundingTree::Validate() const
+	void BoundingVolumeHierarchy::Validate() const
 	{
 		Validate(_rootID);
 
@@ -737,7 +737,7 @@ namespace TEN::Structures
 		}
 	}
 
-	void BoundingTree::Validate(int nodeID) const
+	void BoundingVolumeHierarchy::Validate(int nodeID) const
 	{
 		if (nodeID == NO_VALUE)
 			return;
