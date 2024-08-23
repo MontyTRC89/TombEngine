@@ -300,11 +300,10 @@ namespace TEN::Structures
 		// Create root if empty.
 		if (_rootID == NO_VALUE)
 		{
-			// Get new leaf.
 			auto& leaf = _nodes[leafID];
 
-			_rootID = leafID;
 			_leafIDMap.insert({ leaf.ObjectID, leafID });
+			_rootID = leafID;
 			return;
 		}
 
@@ -622,7 +621,7 @@ namespace TEN::Structures
 		// Reserve enough memory for optimally balanced tree.
 		_nodes.reserve((objectIds.size() * 2) - 1);
 
-		// Build recursively.
+		// Build tree recursively.
 		Build(objectIds, aabbs, 0, (int)objectIds.size(), strategy);
 		_rootID = (int)_nodes.size() - 1;
 
@@ -648,16 +647,14 @@ namespace TEN::Structures
 		// Leaf node.
 		if ((end - start) == 1)
 		{
+			int leafID = (int)_nodes.size();
+
 			node.ObjectID = objectIds[start];
 			node.Height = 0;
 
 			// Add new leaf.
-			int leafID = (int)_nodes.size();
 			_nodes.push_back(node);
-
-			// Store object-leaf association.
 			_leafIDMap.insert({ node.ObjectID, leafID });
-
 			return leafID;
 		}
 		// Inner node.
@@ -667,14 +664,14 @@ namespace TEN::Structures
 			{
 				int bestSplit = (start + end) / 2;
 
-				// Median split.
+				// Fast strategy: median split.
 				if (strategy == BvhBuildStrategy::Fast)
 					return bestSplit;
 
-				int range = (strategy == BvhBuildStrategy::Balanced) ? BALANCED_STRAT_SPLIT_RANGE_MAX : (end - start);
 				float bestCost = INFINITY;
+				int range = (strategy == BvhBuildStrategy::Balanced) ? BALANCED_STRAT_SPLIT_RANGE_MAX : (end - start);
 
-				// Surface area heuristic.
+				// Balanced or accurate strategy: surface area heuristic.
 				for (int split = std::max(start + 1, bestSplit - range); split < std::min(end, bestSplit + range); split++)
 				{
 					// Calculate AABB 0.
@@ -716,12 +713,13 @@ namespace TEN::Structures
 			if (node.RightChildID != NO_VALUE)
 				_nodes[node.RightChildID].ParentID = nodeID;
 
-			// Add new inner node and set height.
-			_nodes.push_back(node);
-			_nodes[nodeID].Height = std::max(
+			// Set height.
+			node.Height = std::max(
 				(node.LeftChildID != NO_VALUE) ? _nodes[node.LeftChildID].Height : 0, 
 				(node.RightChildID != NO_VALUE) ? _nodes[node.RightChildID].Height : 0) + 1;
 
+			// Add new inner node.
+			_nodes.push_back(node);
 			return nodeID;
 		}
 	}
