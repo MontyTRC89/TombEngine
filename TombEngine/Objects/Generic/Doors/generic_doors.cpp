@@ -11,7 +11,7 @@
 #include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
 #include "Game/Animation/Animation.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Objects/Generic/Switches/cog_switch.h"
 #include "Objects/objectslist.h"
 #include "Game/Lara/lara.h"
@@ -26,6 +26,7 @@
 
 using namespace TEN::Animation;
 using namespace TEN::Collision::Room;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 
@@ -249,7 +250,7 @@ namespace TEN::Entities::Doors
 
 		if (TestBoundsCollide(doorItem, laraItem, coll->Setup.Radius))
 		{
-			if (TestCollision(doorItem, laraItem))
+			if (HandleItemSphereCollision(*doorItem, *laraItem))
 			{
 				if (coll->Setup.EnableObjectPush)
 				{

@@ -5,7 +5,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -15,6 +15,7 @@
 
 using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 
 namespace TEN::Entities::Traps
 {
@@ -81,7 +82,7 @@ namespace TEN::Entities::Traps
 			if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 				return;
 
-			TestCollision(&item, playerItem);
+			HandleItemSphereCollision(item, *playerItem);
 		}
 		else if (item.Status != ITEM_INVISIBLE)
 		{

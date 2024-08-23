@@ -3,6 +3,7 @@
 
 #include "Game/Animation/Animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -16,6 +17,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Animation;
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
@@ -91,7 +93,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* creature = GetCreatureInfo(item);
 
-		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+		int waterDepth = GetPointCollision(*item).GetWaterSurfaceHeight();
 		if (waterDepth != NO_HEIGHT)
 		{
 			creature->LOT.Step = BLOCK(20);

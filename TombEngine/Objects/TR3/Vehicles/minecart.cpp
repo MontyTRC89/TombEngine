@@ -3,9 +3,9 @@
 
 #include "Game/Animation/Animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/Point.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
@@ -23,6 +23,7 @@
 
 using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;
 using namespace TEN::Math;

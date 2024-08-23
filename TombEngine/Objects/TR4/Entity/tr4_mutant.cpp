@@ -2,7 +2,6 @@
 #include "Objects/TR4/Entity/tr4_mutant.h"
 
 #include "Game/Animation/Animation.h"
-#include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"

@@ -70,6 +70,7 @@
 using namespace TEN::Animation;
 
 enum GAME_OBJECT_ID : short;
+enum class SphereSpaceType;
 class EulerAngles;
 struct AnimFrameInterpData;
 struct CAMERA_INFO;
@@ -630,7 +631,7 @@ namespace TEN::Renderer
 		void FlipRooms(short roomNumber1, short roomNumber2);
 		void UpdateLaraAnimations(bool force);
 		void UpdateItemAnimations(int itemNumber, bool force);
-		int  GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
+		std::vector<BoundingSphere> GetSpheres(int itemNumber);
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
 		void DrawObjectIn2DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale1, float opacity = 1.0f, int meshBits = NO_JOINT_BITS);
 		void SetLoadingScreen(std::wstring& fileName);
@@ -639,12 +640,11 @@ namespace TEN::Renderer
 
 		Vector2i GetScreenResolution() const;
 		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;
+		std::pair<Vector3, Vector3> GetRay(const Vector2& pos) const;
 
-		Vector3	   GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset = Vector3::Zero);
+		Vector3	   GetMoveableBonePosition(int itemNumber, int boneID, const Vector3& relOffset = Vector3::Zero);
 		Quaternion GetMoveableBoneOrientation(int itemNumber, int boneID);
 
-		std::pair<Vector3, Vector3> GetRay(const Vector2& pos) const;
-		
 		void AddDisplaySprite(const RendererSprite& sprite, const Vector2& pos2D, short orient, const Vector2& size, const Vector4& color,
 							  int priority, BlendMode blendMode, const Vector2& aspectCorrection, RenderView& renderView);
 		void CollectDisplaySprites(RenderView& renderView);

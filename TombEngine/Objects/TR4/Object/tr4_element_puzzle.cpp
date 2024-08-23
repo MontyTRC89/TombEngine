@@ -2,12 +2,12 @@
 #include "tr4_element_puzzle.h"
 
 #include "Specific/level.h"
+#include "Game/Collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Sound/sound.h"
 #include "Game/Animation/Animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Specific/Input/Input.h"
@@ -17,6 +17,7 @@
 #include "Game/items.h"
 
 using namespace TEN::Animation;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Input;
 using namespace TEN::Entities::Switches;
 
@@ -151,7 +152,7 @@ namespace TEN::Entities::TR4
 
 		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		{
-			if (TestCollision(item, laraItem))
+			if (HandleItemSphereCollision(*item, *laraItem))
 			{
 				if (coll->Setup.EnableObjectPush)
 					ItemPushItem(item, laraItem, coll, false, 0);

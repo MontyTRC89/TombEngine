@@ -444,7 +444,7 @@ namespace TEN::Animation
 	Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset)
 	{
 		// Use matrices done in renderer to transform relative offset.
-		return Vector3i(g_Renderer.GetAbsEntityBonePosition(item.Index, boneID, relOffset.ToVector3()));
+		return Vector3i(g_Renderer.GetMoveableBonePosition(item.Index, boneID, relOffset.ToVector3()));
 	}
 
 	Vector3i GetJointPosition(ItemInfo* item, int boneID, const Vector3i& relOffset)
