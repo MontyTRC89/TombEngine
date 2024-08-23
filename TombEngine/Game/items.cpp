@@ -17,6 +17,7 @@
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
@@ -35,6 +36,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Utils;
+using TEN::Renderer::g_Renderer;
 
 constexpr auto ITEM_DEATH_TIMEOUT = 4 * FPS;
 
@@ -212,6 +214,11 @@ BoundingOrientedBox ItemInfo::GetObb() const
 		Pose.Position.ToVector3() + Vector3::Lerp(frameData.Keyframe0.Aabb.Center, frameData.Keyframe1.Aabb.Center, frameData.Alpha),
 		Vector3::Lerp(frameData.Keyframe0.Aabb.Extents, frameData.Keyframe1.Aabb.Extents, frameData.Alpha),
 		Pose.Orientation.ToQuaternion());
+}
+
+std::vector<BoundingSphere> ItemInfo::GetSpheres() const
+{
+	return g_Renderer.GetSpheres(Index);
 }
 
 static void GameScriptHandleKilled(short itemNumber, bool destroyed)

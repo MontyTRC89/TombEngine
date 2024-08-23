@@ -181,8 +181,9 @@ struct ItemInfo
 
 	// Getters
 
-	BoundingBox			GetAabb() const;
-	BoundingOrientedBox GetObb() const;
+	BoundingBox					GetAabb() const;
+	BoundingOrientedBox			GetObb() const;
+	std::vector<BoundingSphere> GetSpheres() const;
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);

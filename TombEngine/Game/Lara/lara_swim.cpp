@@ -3,6 +3,7 @@
 
 #include "Game/Animation/Animation.h"
 #include "Game/camera.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara_collide.h"
@@ -15,6 +16,7 @@
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Animation;
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 // -----------------------------
@@ -188,7 +190,7 @@ void lara_col_underwater_death(ItemInfo* item, CollisionInfo* coll)
 	item->HitPoints = -1;
 	lara->Control.HandStatus = HandStatus::Busy;
 
-	int waterHeight = GetWaterHeight(item);
+	int waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 	if (waterHeight < (item->Pose.Position.y - (CLICK(0.4f) - 2)) &&
 		waterHeight != NO_HEIGHT)
 	{

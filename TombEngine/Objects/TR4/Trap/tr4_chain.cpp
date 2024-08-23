@@ -21,7 +21,7 @@ namespace TEN::Entities::Traps
 
 			if (TriggerActive(&item))
 			{
-				*((int*)&item.ItemFlags[0]) = 0x787E;
+				*(int*)&item.ItemFlags[0] = 0x787E;
 				AnimateItem(item);
 				return;
 			}
@@ -32,12 +32,12 @@ namespace TEN::Entities::Traps
 
 			if (TriggerActive(&item))
 			{
-				*((int*)&item.ItemFlags[0]) = 0x780;
+				*(int*)&item.ItemFlags[0] = 0x780;
 				AnimateItem(item);
 				return;
 			}
 		}
 
-		*((int*)&item.ItemFlags[0]) = 0;
+		*(int*)&item.ItemFlags[0] = 0;
 	}
 }

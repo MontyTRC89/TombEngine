@@ -3,7 +3,6 @@
 
 #include "Game/Animation/Animation.h"
 #include "Game/control/los.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/debris.h"
 #include "Game/itemdata/creature_info.h"
@@ -171,8 +170,8 @@ bool TargetVisible(ItemInfo* item, AI_INFO* ai, float maxAngleInDegrees)
 		auto target = GameVector(
 			enemy->Pose.Position.x,
 			enemy->Pose.Position.y + ((((bounds.Y1 * 2) + bounds.Y1) + bounds.Y2) / 4),
-			enemy->Pose.Position.z,
-			enemy->RoomNumber); // TODO: Check why this line didn't exist before. -- TokyoSU, 10/8/2022
+			enemy->Pose.Position.z);
+
 		return LOS(&origin, &target);
 	}
 

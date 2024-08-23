@@ -4,7 +4,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/Animation/Animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -15,6 +15,7 @@
 #include "Renderer/RenderView.h"
 
 using namespace TEN::Animation;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
 namespace TEN::Renderer
@@ -362,11 +363,10 @@ namespace TEN::Renderer
 			if (obj.ShadowType == ShadowMode::None)
 			{
 				// Get all spheres and check if frustum intersects any of them.
-				static BoundingSphere spheres[MAX_BONES];
-				int cnt = GetSpheres(itemNum, spheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+				auto spheres = GetSpheres(itemNum);
 
 				bool inFrustum = false;
-				for (int i = 0; !inFrustum, i < cnt; i++)
+				for (int i = 0; !inFrustum, i < spheres.size(); i++)
 					// Blow up sphere radius by half for cases of too small calculated spheres.
 					if (renderView.Camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
 						inFrustum = true;

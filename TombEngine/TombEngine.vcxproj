@@ -343,6 +343,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Animation\Animation.h" />
     <ClInclude Include="Game\Animation\Commands.h" />
     <ClInclude Include="Game\collision\Point.h" />
+    <ClInclude Include="Game\collision\Sphere.h" />
     <ClInclude Include="Game\Debug\Debug.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\DisplaySprite.h" />
@@ -379,7 +380,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\collision\collide_room.h" />
     <ClInclude Include="Game\collision\floordata.h" />
-    <ClInclude Include="Game\collision\sphere.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\control.h" />
     <ClInclude Include="Game\control\flipeffect.h" />
@@ -532,7 +532,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\Compsognathus.h" />
     <ClInclude Include="Objects\TR3\Entity\FishSwarm.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
+    <ClInclude Include="Objects\TR3\Entity\SealMutant.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
+    <ClInclude Include="Objects\TR3\Entity\Raptor.h" />
     <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_claw_mutant.h" />
@@ -544,7 +546,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_monkey.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_gun.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_mp_stick.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_scuba_diver.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tiger.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tony.h" />
@@ -864,7 +865,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\collision\Point.cpp" />
-    <ClCompile Include="Game\collision\sphere.cpp" />
+    <ClCompile Include="Game\collision\Sphere.cpp" />
     <ClCompile Include="Game\control\box.cpp" />
     <ClCompile Include="Game\control\control.cpp" />
     <ClCompile Include="Game\control\flipeffect.cpp" />
@@ -1039,7 +1040,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\Compsognathus.cpp" />
     <ClCompile Include="Objects\TR3\Entity\FishSwarm.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\SealMutant.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\Raptor.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Shiva.cpp" />
     <ClCompile Include="Objects\TR3\Entity\SophiaLeigh.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_civvy.cpp" />
@@ -1049,7 +1052,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_monkey.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_gun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mp_stick.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_raptor.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_scuba_diver.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tiger.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />

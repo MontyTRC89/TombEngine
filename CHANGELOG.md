@@ -25,21 +25,35 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed sentry gun joint rotation.
 * Fixed teeth spikes not triggering the player impale animation.
 * Fixed TR4 mine crash with OCB 1 when triggered.
+* Fixed cases where Atlantean mutant's bombs cause the game to crash.
+* Fixed young hair drawing.
 
 ### Features/Amendments
 * Changed Rome Hammer to not hurt player whilst deactivated.
 * Changed Statue with blade damage, from 20 to 200.
-* Enhaced Rolling Spindle detection to avoid them going down through pits.
-* Enhaced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
-* Enhaced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
-* Add new sound conditions: quicksand and Underwater.
+* Enhanced Rolling Spindle detection to avoid them going down through pits.
+* Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
+* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
+* Enhanced raptor behaviour and handling. 
+  - OCB 0: Classic behaviour
+  - OCB 1: Can jump up/down up to 4 steps and jump across gaps up to 2 blocks wide.
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
+* Added TR3 seal mutant.
+  - OCB 0: Normal enemy behaviour. (TR3 RX-Tech mines level)
+  - OCB 1: Trap like behaviour. (TR3 Antarctica level)
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Seal_Mutant.wad2
+* Add new sound conditions: Quicksand and Underwater.
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.
 * Changed Water sound condition to ShallowWater.
+* Added option to enable or disable menu option looping.
+* Menu scrolling using held inputs will stop at the last option until a new input is made.
+* Added the ability to display "Lara's Home" entry in the main menu.
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Input.KeyClearAll()
+* Added Flow.EnableHomeLevel()
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
 * Fixed Volume:GetActive() method
 

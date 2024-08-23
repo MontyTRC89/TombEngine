@@ -5,6 +5,7 @@
 #include "Game/Animation/Animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/debris.h"
@@ -28,6 +29,7 @@ using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
@@ -257,30 +259,23 @@ void TriggerPilotFlame(int itemNumber, int nodeIndex)
 	spark->dSize = size;
 }
 
-Particle* SetupPoisonSpark(Vector3 color)
+static Particle& SetupPoisonParticle(const Color& colorStart, const Color& colorEnd)
 {
-	auto* spark = GetFreeParticle();
+	auto& part = *GetFreeParticle();
+	part.sR = std::clamp<unsigned char>(colorStart.x * UCHAR_MAX, 0, UCHAR_MAX);
+	part.sG = std::clamp<unsigned char>(colorStart.y * UCHAR_MAX, 0, UCHAR_MAX);
+	part.sB = std::clamp<unsigned char>(colorStart.z * UCHAR_MAX, 0, UCHAR_MAX);
+	part.dR = std::clamp<unsigned char>(colorEnd.x * UCHAR_MAX, 0, UCHAR_MAX);
+	part.dG = std::clamp<unsigned char>(colorEnd.y * UCHAR_MAX, 0, UCHAR_MAX);
+	part.dB = std::clamp<unsigned char>(colorEnd.z * UCHAR_MAX, 0, UCHAR_MAX);
+	part.colFadeSpeed = 14;
+	part.fadeToBlack = 8;
+	part.blendMode = BlendMode::Screen;
 
-	bool rMax = color.x > color.y && color.x > color.z;
-	bool gMax = color.y > color.x && color.y > color.z;
-	bool bMax = color.z > color.x && color.z > color.y;
-
-	char seed = (GetRandomControl() & 0x1F) + 220;
-
-	spark->sR = (rMax ? seed : 255) * (color.x * 0.4);
-	spark->sG = (gMax ? seed : 255) * (color.y * 0.4);
-	spark->sB = (bMax ? seed : 255) * (color.z * 0.4);
-	spark->dR = 255 * color.x;
-	spark->dG = 255 * color.y;
-	spark->dB = 255 * color.z;
-	spark->colFadeSpeed = 14;
-	spark->fadeToBlack = 8;
-	spark->blendMode = BlendMode::Screen;
-
-	return spark;
+	return part;
 }
 
-Particle* SetupFireSpark()
+static Particle* SetupFireSpark()
 {
 	auto* spark = GetFreeParticle();
 
@@ -297,19 +292,20 @@ Particle* SetupFireSpark()
 	return spark;
 }
 
-void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector3i offset, Vector3i vel)
+static void AttachAndCreateSpark(Particle* spark, const ItemInfo* item, int meshID, Vector3i offset, Vector3i vel, int spriteID = 0)
 {
-	auto pos1 = GetJointPosition(item, meshIndex, Vector3i(-4, -30, -4) + offset);
+	auto pos1 = GetJointPosition(*item, meshID, Vector3i(-4, -30, -4) + offset);
 
 	spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
 	spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
 
-	auto pos2 = GetJointPosition(item, meshIndex, Vector3i(-4, -30, -4) + offset + vel);
+	auto pos2 = GetJointPosition(*item, meshID, Vector3i(-4, -30, -4) + offset + vel);
 
 	int v = (GetRandomControl() & 0x3F) + 192;
 
 	spark->life = spark->sLife = v / 6;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteID;
 
 	spark->xVel = v * (pos2.x - pos1.x) / 10;
 	spark->yVel = v * (pos2.y - pos1.y) / 10;
@@ -328,39 +324,39 @@ void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector
 	spark->on = 1;
 }
 
-void ThrowFire(int itemNumber, int meshIndex, const Vector3i& offset, const Vector3i& vel)
+void ThrowFire(int itemNumber, int meshID, const Vector3i& offset, const Vector3i& vel, int spriteID)
 {
 	auto& item = g_Level.Items[itemNumber];
 
 	for (int i = 0; i < 3; i++)
 	{
-		auto& spark = *SetupFireSpark();
-		AttachAndCreateSpark(&spark, &item, meshIndex, offset, vel);
+		auto& part = *SetupFireSpark();
+		AttachAndCreateSpark(&part, &item, meshID, offset, vel, spriteID);
 
-		spark.flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		part.flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 }
 
-void ThrowFire(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel)
+void ThrowFire(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel, int spriteID)
 {
-	ThrowFire(itemNumber, bite.BoneID, bite.Position, vel);
+	ThrowFire(itemNumber, bite.BoneID, bite.Position, vel, spriteID);
 }
 
-void ThrowPoison(int itemNumber, int meshIndex, const Vector3i& offset, const Vector3i& vel, const Vector3& color)
+void ThrowPoison(const ItemInfo& item, int boneID, const Vector3& offset, const Vector3& vel, const Color& colorStart, const Color& colorEnd, int spriteID)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	constexpr auto COUNT = 2;
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < COUNT; i++)
 	{
-		auto* spark = SetupPoisonSpark(color);
-		AttachAndCreateSpark(spark, item, meshIndex, offset, vel);
-		spark->flags = SP_POISON | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		auto& part = SetupPoisonParticle(colorStart, colorEnd);
+		AttachAndCreateSpark(&part, &item, boneID, offset, vel, spriteID);
+		part.flags = SP_POISON | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	}
 }
 
-void ThrowPoison(int itemNumber, const CreatureBiteInfo& bite, const Vector3i& vel, const Vector3& color)
+void ThrowPoison(const ItemInfo& item, const CreatureBiteInfo& bite, const Vector3& vel, const Color& colorStart, const Color& colorEnd, int spriteID)
 {
-	ThrowPoison(itemNumber, bite.BoneID, bite.Position, vel, color);
+	ThrowPoison(item, bite.BoneID, bite.Position, vel, colorStart, colorEnd, spriteID);
 }
 
 void UpdateFireProgress()
@@ -1124,7 +1120,7 @@ void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
 		TriggerExplosionBubbles(x, y, z, item->RoomNumber);
 		TriggerExplosionSparks(x, y, z, 2, -1, 1, item->RoomNumber);
 
-		int waterHeight = GetWaterHeight(x, y, z, item->RoomNumber);
+		int waterHeight = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetWaterTopHeight();
 		if (waterHeight != NO_HEIGHT)
 			SomeSparkEffect(x, waterHeight, z, 8);
 	}
@@ -1136,7 +1132,7 @@ void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
 		for (int i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, -1, 1, item->RoomNumber);
 
-		int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+		int waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 		if (waterHeight != NO_HEIGHT)
 		{
 			int dy = item->Pose.Position.y - waterHeight;

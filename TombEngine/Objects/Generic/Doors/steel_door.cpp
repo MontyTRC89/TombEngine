@@ -10,7 +10,7 @@
 #include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
 #include "Game/Animation/Animation.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
@@ -20,6 +20,7 @@
 #include "Game/collision/collide_item.h"
 
 using namespace TEN::Animation;
+using namespace TEN::Collision::Sphere;
 
 namespace TEN::Entities::Doors
 {
@@ -39,7 +40,7 @@ namespace TEN::Entities::Doors
 		{
 			if (TestBoundsCollide(doorItem, laraItem, coll->Setup.Radius))
 			{
-				if (TestCollision(doorItem, laraItem))
+				if (HandleItemSphereCollision(*doorItem, *laraItem))
 				{
 					if (coll->Setup.EnableObjectPush)
 						ItemPushItem(doorItem, laraItem, coll, 0, 1);

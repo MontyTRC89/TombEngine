@@ -333,7 +333,7 @@ namespace TEN::Animation
 	Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset)
 	{
 		// Use matrices done in renderer to transform relative offset.
-		return Vector3i(g_Renderer.GetAbsEntityBonePosition(item.Index, boneID, relOffset.ToVector3()));
+		return Vector3i(g_Renderer.GetMoveableBonePosition(item.Index, boneID, relOffset.ToVector3()));
 	}
 
 	Vector3i GetJointPosition(ItemInfo* item, int boneID, const Vector3i& relOffset)
@@ -361,14 +361,7 @@ namespace TEN::Animation
 
 	Quaternion GetBoneOrientation(const ItemInfo& item, int boneID)
 	{
-		static const auto REF_DIR = Vector3::UnitZ;
-
-		auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneID);
-		auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneID, REF_DIR);
-
-		auto dir = target - origin;
-		dir.Normalize();
-		return Geometry::ConvertDirectionToQuat(dir);
+		return g_Renderer.GetMoveableBoneOrientation(item.Index, boneID);
 	}
 
 	void SetAnimation(ItemInfo& item, GAME_OBJECT_ID animObjectID, int animNumber, int frameNumber)
