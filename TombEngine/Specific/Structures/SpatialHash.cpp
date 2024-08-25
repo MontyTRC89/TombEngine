@@ -19,6 +19,11 @@ namespace TEN::Structures
 		_cellAabbExtents = Vector3(cellSize / 2);
 	}
 
+	unsigned int SpatialHash::GetSize() const
+	{
+		return (unsigned int)_cellMap.size();
+	}
+
 	std::set<int> SpatialHash::GetBoundedObjectIds() const
 	{
 		auto objectIds = std::set<int>{};
@@ -149,34 +154,6 @@ namespace TEN::Structures
 		return objectIds;
 	}
 
-	unsigned int SpatialHash::Size() const
-	{
-		return (unsigned int)_cellMap.size();
-	}
-
-	bool SpatialHash::Empty() const
-	{
-		return _cellMap.empty();
-	}
-
-	void SpatialHash::Update(int objectID, const BoundingBox& aabb, const BoundingBox& prevAabb)
-	{
-		Remove(objectID, prevAabb);
-		Insert(objectID, aabb);
-	}
-
-	void SpatialHash::Update(int objectID, const BoundingOrientedBox& obb, BoundingOrientedBox& prevObb)
-	{
-		Remove(objectID, prevObb);
-		Insert(objectID, obb);
-	}
-
-	void SpatialHash::Update(int objectID, const BoundingSphere& sphere, const BoundingSphere& prevSphere)
-	{
-		Remove(objectID, prevSphere);
-		Insert(objectID, sphere);
-	}
-
 	void SpatialHash::Insert(int objectID, const BoundingBox& aabb)
 	{
 		// Insert object ID into cells intersecting AABB.
@@ -198,6 +175,24 @@ namespace TEN::Structures
 		Insert(objectID, keys);
 	}
 
+	void SpatialHash::Move(int objectID, const BoundingBox& aabb, const BoundingBox& prevAabb)
+	{
+		Remove(objectID, prevAabb);
+		Insert(objectID, aabb);
+	}
+
+	void SpatialHash::Move(int objectID, const BoundingOrientedBox& obb, BoundingOrientedBox& prevObb)
+	{
+		Remove(objectID, prevObb);
+		Insert(objectID, obb);
+	}
+
+	void SpatialHash::Move(int objectID, const BoundingSphere& sphere, const BoundingSphere& prevSphere)
+	{
+		Remove(objectID, prevSphere);
+		Insert(objectID, sphere);
+	}
+
 	void SpatialHash::Remove(int objectID, const BoundingBox& prevAabb)
 	{
 		// Remove object ID from cells intersecting previous AABB.
@@ -217,6 +212,11 @@ namespace TEN::Structures
 		// Remove object ID from cells intersecting previous sphere.
 		auto keys = GetCellKeys(prevSphere);
 		Remove(objectID, keys);
+	}
+
+	bool SpatialHash::IsEmpty() const
+	{
+		return _cellMap.empty();
 	}
 
 	void SpatialHash::DrawDebug() const

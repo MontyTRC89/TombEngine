@@ -244,7 +244,7 @@ void HandleSpatialHashDebug(const ItemInfo& item)
 	g_Renderer.AddDebugBox(testObj.Obb, Color(1, 1, 0));
 
 	// Insert to DSC.
-	debugSpatialHash.Update(item.Index, testObj.Obb, testObj.PrevObb);
+	debugSpatialHash.Move(item.Index, testObj.Obb, testObj.PrevObb);
 	debugSpatialHash.DrawDebug();
 
 	// Update prev AABB.

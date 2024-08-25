@@ -21,6 +21,11 @@ namespace TEN::Structures
 		Build(objectIds, aabbs, strategy);
 	}
 
+	unsigned int BoundingVolumeHierarchy::GetSize() const
+	{
+		return (unsigned int)_leafIDMap.size();
+	}
+
 	std::vector<int> BoundingVolumeHierarchy::GetBoundedObjectIds() const
 	{
 		auto objectIds = std::vector<int>{};
@@ -75,12 +80,7 @@ namespace TEN::Structures
 		return GetBoundedObjectIds(testColl);
 	}
 
-	unsigned int BoundingVolumeHierarchy::Size() const
-	{
-		return (unsigned int)_leafIDMap.size();
-	}
-
-	bool BoundingVolumeHierarchy::Empty() const
+	bool BoundingVolumeHierarchy::IsEmpty() const
 	{
 		return _leafIDMap.empty();
 	}

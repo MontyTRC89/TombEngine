@@ -46,6 +46,8 @@ namespace TEN::Structures
 
 		// Getters
 
+		unsigned int GetSize() const;
+
 		std::vector<int> GetBoundedObjectIds() const;
 		std::vector<int> GetBoundedObjectIds(const Ray& ray, float dist) const;
 		std::vector<int> GetBoundedObjectIds(const BoundingBox& aabb) const;
@@ -54,12 +56,13 @@ namespace TEN::Structures
 
 		// Utilities
 
-		unsigned int Size() const;
-		bool		 Empty() const;
-
 		void Insert(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
 		void Move(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
 		void Remove(int objectID);
+
+		// Inquirers
+
+		bool IsEmpty() const;
 
 		// Debug
 
