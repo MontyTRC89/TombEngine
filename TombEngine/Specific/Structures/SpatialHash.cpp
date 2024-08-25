@@ -154,6 +154,11 @@ namespace TEN::Structures
 		return objectIds;
 	}
 
+	bool SpatialHash::IsEmpty() const
+	{
+		return _cellMap.empty();
+	}
+
 	void SpatialHash::Insert(int objectID, const BoundingBox& aabb)
 	{
 		// Insert object ID into cells intersecting AABB.
@@ -212,11 +217,6 @@ namespace TEN::Structures
 		// Remove object ID from cells intersecting previous sphere.
 		auto keys = GetCellKeys(prevSphere);
 		Remove(objectID, keys);
-	}
-
-	bool SpatialHash::IsEmpty() const
-	{
-		return _cellMap.empty();
 	}
 
 	void SpatialHash::DrawDebug() const

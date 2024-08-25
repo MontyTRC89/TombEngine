@@ -40,6 +40,10 @@ namespace TEN::Structures
 		std::set<int> GetBoundedObjectIds(const BoundingOrientedBox& obb) const;
 		std::set<int> GetBoundedObjectIds(const BoundingSphere& sphere) const;
 
+		// Inquirers
+
+		bool IsEmpty() const;
+
 		// Utilities
 
 		void Insert(int objectID, const BoundingBox& aabb);
@@ -51,10 +55,6 @@ namespace TEN::Structures
 		void Remove(int objectID, const BoundingBox& prevAabb);
 		void Remove(int objectID, const BoundingOrientedBox& prevObb);
 		void Remove(int objectID, const BoundingSphere& prevSphere);
-
-		// Inquirers
-
-		bool IsEmpty() const;
 
 		// Debug
 

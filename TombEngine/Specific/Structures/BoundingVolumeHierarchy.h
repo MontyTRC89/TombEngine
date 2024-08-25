@@ -54,15 +54,15 @@ namespace TEN::Structures
 		std::vector<int> GetBoundedObjectIds(const BoundingOrientedBox& obb) const;
 		std::vector<int> GetBoundedObjectIds(const BoundingSphere& sphere) const;
 
+		// Inquirers
+
+		bool IsEmpty() const;
+
 		// Utilities
 
 		void Insert(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
 		void Move(int objectID, const BoundingBox& aabb, float boundary = 0.0f);
 		void Remove(int objectID);
-
-		// Inquirers
-
-		bool IsEmpty() const;
 
 		// Debug
 
