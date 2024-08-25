@@ -17,6 +17,8 @@ namespace TEN::Structures
 	BoundingVolumeHierarchy::BoundingVolumeHierarchy(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BvhBuildStrategy strategy)
 	{
 		TENAssert(objectIds.size() == aabbs.size(), "BoundingVolumeHierarchy: Object ID and AABB counts unequal in static constructor.");
+		if (objectIds.empty() && aabbs.empty())
+			return;
 
 		Build(objectIds, aabbs, strategy);
 	}

@@ -298,19 +298,12 @@ namespace TEN::Collision::Los
 			for (const auto& portal : room.Portals)
 			{
 				auto meshColl = portal.CollisionMesh.GetCollision(ray, closestDist);
-				if (meshColl.has_value() && meshColl->Distance < closestDist)
+				if (meshColl.has_value() && meshColl->Distance < closestDist &&
+					abs(meshColl->Distance - closestDist) > PORTAL_THRESHOLD) // FAILSAFE: Prioritize tangible triangle in case portal triangle coincides.
 				{
-					// FAILSAFE: Prioritize tangible triangle in case portal triangle coincides.
-					if (abs(meshColl->Distance - closestDist) > PORTAL_THRESHOLD)
-					{
-						portalRoomNumber = portal.RoomNumber;
-						closestTri = meshColl->Triangle;
-						closestDist = meshColl->Distance;
-					}
-					else
-					{
-						TENLog("GetRoomLosCollision(): Portal rejected in favor of tangible room mesh.", LogLevel::Info);
-					}
+					portalRoomNumber = portal.RoomNumber;
+					closestTri = meshColl->Triangle;
+					closestDist = meshColl->Distance;
 				}
 			}
 
