@@ -768,11 +768,12 @@ void ReadRooms()
 			room.buckets.push_back(bucket);
 		}
 
-		// TODO: Write floats.
+		// TODO: Write proper data to level.
 		int portalCount = ReadInt32();
 		for (int j = 0; j < portalCount; j++)
 		{
-			auto portal = RoomDoorData{};
+			auto portal = RoomPortalData{};
+
 			portal.RoomNumber = ReadInt16();
 			portal.Nomal.x = ReadInt32();
 			portal.Nomal.y = ReadInt32();
@@ -785,7 +786,12 @@ void ReadRooms()
 				vertex.z = ReadInt32();
 			}
 
-			room.Doors.push_back(portal);
+			portal.CollisionMesh.SetPosition(room.Position.ToVector3());
+			portal.CollisionMesh.InsertTriangle(portal.Vertices[0], portal.Vertices[1], portal.Vertices[2], portal.Nomal);
+			portal.CollisionMesh.InsertTriangle(portal.Vertices[0], portal.Vertices[2], portal.Vertices[3], portal.Nomal);
+			portal.CollisionMesh.Cook();
+
+			room.Portals.push_back(portal);
 		}
 
 		room.ZSize = ReadInt32();

@@ -54,18 +54,6 @@ struct RoomVertexData
 	int		index;
 };
 
-struct RoomDoorData
-{
-private:
-	static constexpr auto VERTEX_COUNT = 4;
-
-public:
-	int RoomNumber = 0;
-
-	std::array<Vector3, VERTEX_COUNT> Vertices = {};
-	Vector3							  Nomal	   = Vector3::Zero;
-};
-
 struct RoomLightData
 {
 	int x, y, z;       // Position of light, in world coordinates
@@ -96,6 +84,19 @@ struct MESH_INFO
 	BoundingOrientedBox GetVisibilityObb() const;
 };
 
+struct RoomPortalData
+{
+private:
+	static constexpr auto VERTEX_COUNT = 4;
+
+public:
+	int			  RoomNumber	= 0;
+	CollisionMesh CollisionMesh = TEN::Physics::CollisionMesh();
+	Vector3		  Nomal			= Vector3::Zero;
+
+	std::array<Vector3, VERTEX_COUNT> Vertices = {};
+};
+
 class RoomObjectHandler
 {
 private:
@@ -123,13 +124,6 @@ public:
 	void Insert(int id, const BoundingBox& aabb);
 	void Move(int id, const BoundingBox& aabb);
 	void Remove(int id);
-};
-
-// TODO: Make portal handler?
-struct RoomPortalData
-{
-	int			  RoomNumber	= 0;
-	CollisionMesh CollisionMesh = TEN::Physics::CollisionMesh();
 };
 
 // TODO: Make class?
@@ -173,7 +167,6 @@ struct RoomData
 
 	// Renderer members
 
-	std::vector<RoomDoorData>  Doors	 = {};
 	std::vector<RoomLightData> lights	 = {};
 	std::vector<Vector3>	   positions = {};
 	std::vector<Vector3>	   normals	 = {};
