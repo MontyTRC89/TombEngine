@@ -125,6 +125,14 @@ public:
 	void Remove(int id);
 };
 
+// TODO: Make portal handler?
+struct RoomPortalData
+{
+	int			  RoomNumber	= 0;
+	CollisionMesh CollisionMesh = TEN::Physics::CollisionMesh();
+};
+
+// TODO: Make class?
 struct RoomData
 {
 	int						 RoomNumber = 0;
@@ -147,24 +155,31 @@ struct RoomData
 	short fxNumber;
 	bool boundActive;
 
-	//RoomObjectHandler Moveables		= RoomObjectHandler(); // TODO: Refactor linked list of items in room to use a tree instead.
-	//RoomObjectHandler Statics		= RoomObjectHandler(); // TODO: Refactor to use tree.
-	RoomObjectHandler Bridges		= RoomObjectHandler();
-	CollisionMesh	  CollisionMesh = TEN::Physics::CollisionMesh();
-
 	std::vector<int> NeighborRoomNumbers = {};
 
-	std::vector<FloorInfo>	   Sectors		  = {};
-	std::vector<RoomLightData> lights		  = {};
-	std::vector<MESH_INFO>	   mesh			  = {}; // Statics
-	std::vector<TriggerVolume> TriggerVolumes = {};
+	// Object members
 
-	std::vector<Vector3>	  positions = {};
-	std::vector<Vector3>	  normals	= {};
-	std::vector<RoomDoorData> Doors		= {};
-	std::vector<Vector3>	  colors	= {};
-	std::vector<Vector3>	  effects	= {};
-	std::vector<BUCKET>		  buckets	= {};
+	//RoomObjectHandler Moveables = RoomObjectHandler(); // TODO: Refactor linked list of items in room to use a BVH instead.
+	//RoomObjectHandler Statics	= RoomObjectHandler(); // TODO: Refactor to use BVH.
+	std::vector<MESH_INFO> mesh = {}; // Statics
+
+	// Collision members
+
+	CollisionMesh				CollisionMesh  = TEN::Physics::CollisionMesh();
+	RoomObjectHandler			Bridges		   = RoomObjectHandler();
+	std::vector<RoomPortalData> Portals		   = {};
+	std::vector<TriggerVolume>	TriggerVolumes = {};
+	std::vector<FloorInfo>		Sectors		   = {};
+
+	// Renderer members
+
+	std::vector<RoomDoorData>  Doors	 = {};
+	std::vector<RoomLightData> lights	 = {};
+	std::vector<Vector3>	   positions = {};
+	std::vector<Vector3>	   normals	 = {};
+	std::vector<Vector3>	   colors	 = {};
+	std::vector<Vector3>	   effects	 = {};
+	std::vector<BUCKET>		   buckets	 = {};
 
 	bool Active() const;
 	void GenerateCollisionMesh();

@@ -52,7 +52,7 @@ void RoomData::GenerateCollisionMesh()
 {
 	CollisionMesh = {};
 
-	// Run through room sectors (ignoring border).
+	// Create room collision mesh.
 	for (int x = 1; x < (XSize - 1); x++)
 	{
 		for (int z = 1; z < (ZSize - 1); z++)
@@ -99,21 +99,24 @@ void RoomData::GenerateCollisionMesh()
 				nextSectorZ = &nextRoomZ.Sectors[(nextRoomGridCoordZ.x * nextRoomZ.ZSize) + nextRoomGridCoordZ.y];
 			}
 
-			// Collect collision mesh tangible triangles for sector.
 			CollectSectorCollisionMeshTriangles(sector, *prevSectorX, *nextSectorX , *prevSectorZ, *nextSectorZ);
 		}
 	}
-
-	// Collect collision mesh portal triangles for room.
-	auto pos = Position.ToVector3();
-	for (const auto& door : Doors)
-	{
-		CollisionMesh.InsertTriangle(pos + door.Vertices[0], pos + door.Vertices[1], pos + door.Vertices[2], door.Nomal, door.RoomNumber);
-		CollisionMesh.InsertTriangle(pos + door.Vertices[0], pos + door.Vertices[2], pos + door.Vertices[3], door.Nomal, door.RoomNumber);
-	}
-
-	// Initialize collision mesh.
 	CollisionMesh.Cook();
+
+	// Create portal collision meshes.
+	Portals.reserve(Doors.size());
+	for (int i = 0; i < Doors.size(); i++)
+	{
+		const auto& door = Doors[i];
+		
+		auto& portal = Portals.emplace_back();
+		portal.RoomNumber = door.RoomNumber;
+		portal.CollisionMesh.SetPosition(Position.ToVector3());
+		portal.CollisionMesh.InsertTriangle(door.Vertices[0], door.Vertices[1], door.Vertices[2], door.Nomal);
+		portal.CollisionMesh.InsertTriangle(door.Vertices[0], door.Vertices[2], door.Vertices[3], door.Nomal);
+		portal.CollisionMesh.Cook();
+	}
 }
 
 void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
@@ -308,7 +311,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(const FloorInfo& sector,
 	// 1) Generate surface triangle vertices.
 	auto vertices = getVertices();
 
-	// 2) Collect collision mesh tangible triangles.
+	// 2) Collect collision mesh triangles.
 	bool isFloor = true;
 	for (int i = 0; i < SECTOR_SURFACE_COUNT; i++)
 	{

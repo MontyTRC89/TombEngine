@@ -231,6 +231,8 @@ namespace TEN::Collision::Los
 
 	RoomLosCollisionData GetRoomLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
+		constexpr auto PORTAL_DIST_THRESHOLD = 0.001f;
+
 		// FAILSAFE.
 		if (dir == Vector3::Zero)
 		{
@@ -245,11 +247,12 @@ namespace TEN::Collision::Los
 		float rayDist = dist;
 		int rayRoomNumber = roomNumber;
 
-		// 2) Traverse rooms through portals.
+		// 2) Traverse rooms.
 		bool traversePortal = true;
 		while (traversePortal)
 		{
-			const CollisionTriangleData* closestTri = nullptr;
+			int portalRoomNumber = NO_VALUE;
+			auto closestTri = std::optional<CollisionTriangleData>();
 			float closestDist = rayDist;
 
 			// 2.1) Clip room.
@@ -257,7 +260,7 @@ namespace TEN::Collision::Los
 			auto meshColl = room.CollisionMesh.GetCollision(ray, closestDist);
 			if (meshColl.has_value())
 			{
-				closestTri = &meshColl->Triangle;
+				closestTri = meshColl->Triangle;
 				closestDist = meshColl->Distance;
 			}
 
@@ -284,34 +287,53 @@ namespace TEN::Collision::Los
 						auto meshColl = bridge.GetCollisionMesh().GetCollision(ray, closestDist);
 						if (meshColl.has_value() && meshColl->Distance < closestDist)
 						{
-							closestTri = &meshColl->Triangle;
+							closestTri = meshColl->Triangle;
 							closestDist = meshColl->Distance;
 						}
 					}
 				}
 			}
 
-			// 2.4) Collect room number.
+			// 2.4) Clip portal.
+			for (const auto& portal : room.Portals)
+			{
+				auto meshColl = portal.CollisionMesh.GetCollision(ray, closestDist);
+				if (meshColl.has_value() && meshColl->Distance < closestDist)
+				{
+					// FAILSAFE: Prioritize tangible triangle in case portal triangle coincides.
+					if (abs(meshColl->Distance - closestDist) > PORTAL_DIST_THRESHOLD)
+					{
+						portalRoomNumber = portal.RoomNumber;
+						closestTri = meshColl->Triangle;
+						closestDist = meshColl->Distance;
+					}
+					else
+					{
+						TENLog("GetRoomLosCollision(): Portal rejected in favor of tangible room mesh.", LogLevel::Info);
+					}
+				}
+			}
+
+			// 2.5) Collect room number.
 			roomLos.RoomNumbers.push_back(rayRoomNumber);
 
-			// 2.3) Return room LOS collision or traverse new room.
-			if (closestTri != nullptr)
+			// 2.6) Traverse portal or return room LOS.
+			if (closestTri.has_value())
 			{
-				bool isPortal = (closestTri->PortalRoomNumber != NO_VALUE);
 				auto intersectPos = Geometry::TranslatePoint(ray.position, ray.direction, closestDist);
 
 				// Hit portal triangle; update ray to traverse new room.
-				if (isPortal &&
-					rayRoomNumber != closestTri->PortalRoomNumber) // FAILSAFE: Prevent infinite loop.
+				if (portalRoomNumber != NO_VALUE &&
+					rayRoomNumber != portalRoomNumber) // FAILSAFE: Prevent infinite loop.
 				{
 					ray.position = intersectPos;
 					rayDist -= closestDist;
-					rayRoomNumber = closestTri->PortalRoomNumber;
+					rayRoomNumber = portalRoomNumber;
 				}
 				// Hit tangible triangle; collect remaining room LOS collision data.
 				else
 				{
-					if (isPortal)
+					if (portalRoomNumber != NO_VALUE)
 						TENLog("GetRoomLosCollision(): Room portal cannot link back to itself.", LogLevel::Warning);
 
 					roomLos.Triangle = *closestTri;

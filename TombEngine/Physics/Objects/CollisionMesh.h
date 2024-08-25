@@ -16,15 +16,14 @@ namespace TEN::Physics
 	private:
 		// Members
 
-		std::array<int, VERTEX_COUNT> _vertexIds		= {};
-		int							  _normalID			= 0;
-		BoundingBox					  _aabb				= BoundingBox();
-		int							  _portalRoomNumber = NO_VALUE;
+		std::array<int, VERTEX_COUNT> _vertexIds = {};
+		int							  _normalID	 = 0;
+		BoundingBox					  _aabb		 = BoundingBox();
 
 	public:
 		// Constructors
 
-		LocalCollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, int normalID, const BoundingBox& aabb, int portalRoomNumber);
+		LocalCollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, int normalID, const BoundingBox& aabb);
 
 		// Getters
 
@@ -33,7 +32,6 @@ namespace TEN::Physics
 		const Vector3&	   GetVertex2(const std::vector<Vector3>& vertices) const;
 		const Vector3&	   GetNormal(const std::vector<Vector3>& normals) const;
 		const BoundingBox& GetAabb() const;
-		int				   GetPortalRoomNumber() const;
 
 		Vector3 GetTangent(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
 
@@ -41,7 +39,6 @@ namespace TEN::Physics
 
 		bool Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
 		bool Intersects(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
-		bool IsPortal() const;
 
 		// Debug
 
@@ -51,8 +48,7 @@ namespace TEN::Physics
 	struct CollisionTriangleData
 	{
 		std::array<Vector3, LocalCollisionTriangle::VERTEX_COUNT> Vertices = {};
-		Vector3 Normal			 = Vector3::Zero;
-		int		PortalRoomNumber = NO_VALUE;
+		Vector3 Normal = Vector3::Zero;
 	};
 
 	struct CollisionMeshRayCollisionData
@@ -106,7 +102,7 @@ namespace TEN::Physics
 
 		// Utilities
 
-		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal, int portalRoomNumber = NO_VALUE);
+		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal);
 		void Cook();
 
 		// Debug
