@@ -97,10 +97,9 @@ namespace TEN::Player
 				attracColl.HeadingAngle, -coll.Setup.Radius, PROBE_POINT_OFFSET.y);
 
 			bool isTreadingWater = (player.Control.WaterStatus == WaterStatus::TreadWater);
-			int waterSurfaceHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
 			// 2.6) Test if relative edge height is within edge intersection bounds. NOTE: Special case for water tread.
-			int relEdgeHeight = (attracColl.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.GetFloorHeight())) * sign;
+			int relEdgeHeight = (attracColl.Intersection.y - (isTreadingWater ? pointCollBack.GetWaterSurfaceHeight() : pointCollBack.GetFloorHeight())) * sign;
 			if (relEdgeHeight >= setup.LowerEdgeBound ||
 				relEdgeHeight < setup.UpperEdgeBound)
 			{
@@ -108,7 +107,7 @@ namespace TEN::Player
 			}
 
 			// 2.7) Test if player vertical position is within surface threshold. NOTE: Special case for water tread.
-			int surfaceHeight = isTreadingWater ? waterSurfaceHeight : (setup.TestEdgeFront ? pointCollBack.GetFloorHeight() : attracColl.Intersection.y);
+			int surfaceHeight = isTreadingWater ? pointCollBack.GetWaterSurfaceHeight() : (setup.TestEdgeFront ? pointCollBack.GetFloorHeight() : attracColl.Intersection.y);
 			int relPlayerSurfaceHeight = abs(item.Pose.Position.y - surfaceHeight);
 			if (relPlayerSurfaceHeight > REL_SURFACE_HEIGHT_THRESHOLD)
 				continue;
@@ -489,10 +488,9 @@ namespace TEN::Player
 			// ceiling height max.
 
 			bool isTreadingWater = (player.Control.WaterStatus == WaterStatus::TreadWater);
-			int waterSurfaceHeight = GetWaterSurface(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
 
 			// 6) Test if relative edge height is within edge intersection bounds. NOTE: Special case for water tread.
-			int relEdgeHeight = attracColl.Intersection.y - (isTreadingWater ? waterSurfaceHeight : pointCollBack.GetFloorHeight());
+			int relEdgeHeight = attracColl.Intersection.y - (isTreadingWater ? pointCollBack.GetWaterSurfaceHeight() : pointCollBack.GetFloorHeight());
 			if (relEdgeHeight >= setup.LowerEdgeBound ||
 				relEdgeHeight < setup.UpperEdgeBound)
 			{

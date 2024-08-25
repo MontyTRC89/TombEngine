@@ -125,7 +125,7 @@ namespace TEN::Player
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeHangDescentClimbSetupData
 		{
-			ANGLE(180.0f),					  // Relative heading angle.
+			ANGLE(-180.0f),					  // Relative heading angle.
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			-CLICK(1)						  // Edge-to-ceil height lower bound.
 		};
@@ -197,7 +197,7 @@ namespace TEN::Player
 		constexpr auto ATTRAC_DETECT_RADIUS = BLOCK(0.5f);
 		constexpr auto SETUP = EdgeHangDescentClimbSetupData
 		{
-			ANGLE(180.0f),					  // Relative heading angle.
+			ANGLE(-180.0f),					  // Relative heading angle.
 			-MAX_HEIGHT, LARA_HEIGHT_STRETCH, // Edge height bounds.
 			-(int)CLICK(0.6f)				  // Edge-to-ceil height lower bound.
 		};
