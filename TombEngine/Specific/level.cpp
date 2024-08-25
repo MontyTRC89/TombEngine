@@ -768,9 +768,25 @@ void ReadRooms()
 			room.buckets.push_back(bucket);
 		}
 
+		// TODO: Write floats.
 		int portalCount = ReadInt32();
 		for (int j = 0; j < portalCount; j++)
-			LoadPortal(room);
+		{
+			auto portal = RoomDoorData{};
+			portal.RoomNumber = ReadInt16();
+			portal.Nomal.x = ReadInt32();
+			portal.Nomal.y = ReadInt32();
+			portal.Nomal.z = ReadInt32();
+
+			for (auto& vertex : portal.Vertices)
+			{
+				vertex.x = ReadInt32();
+				vertex.y = ReadInt32();
+				vertex.z = ReadInt32();
+			}
+
+			room.Doors.push_back(portal);
+		}
 
 		room.ZSize = ReadInt32();
 		room.XSize = ReadInt32();
@@ -1564,23 +1580,4 @@ void BuildOutsideRoomsTable()
 			}
 		}
 	}
-}
-
-void LoadPortal(RoomData& room) 
-{
-	RoomDoorData door;
-
-	door.RoomNumber = ReadInt16();
-	door.Nomal.x = ReadInt32();
-	door.Nomal.y = ReadInt32();
-	door.Nomal.z = ReadInt32();
-
-	for (int k = 0; k < 4; k++)
-	{
-		door.Vertices[k].x = ReadInt32();
-		door.Vertices[k].y = ReadInt32();
-		door.Vertices[k].z = ReadInt32();
-	}
-
-	room.Doors.push_back(door);
 }

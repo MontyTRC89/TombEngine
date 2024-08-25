@@ -368,11 +368,8 @@ namespace TEN::Physics
 	
 	void CollisionMesh::Cook()
 	{
-		auto triIds = std::vector<int>{};
-		auto triAabbs = std::vector<BoundingBox>{};
-
-		triIds.reserve(_triangles.size());
-		triAabbs.reserve(_triangles.size());
+		auto triIds = std::vector<int>(_triangles.size());
+		auto triAabbs = std::vector<BoundingBox>(_triangles.size());
 
 		// Collect triangle IDs and AABBs.
 		for (int i = 0; i < _triangles.size(); i++)

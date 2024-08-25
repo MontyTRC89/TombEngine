@@ -51,6 +51,7 @@ bool RoomData::Active() const
 void RoomData::GenerateCollisionMesh()
 {
 	CollisionMesh = {};
+	Portals = {};
 
 	// Create room collision mesh.
 	for (int x = 1; x < (XSize - 1); x++)

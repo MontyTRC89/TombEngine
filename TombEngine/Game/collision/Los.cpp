@@ -231,7 +231,7 @@ namespace TEN::Collision::Los
 
 	RoomLosCollisionData GetRoomLosCollision(const Vector3& origin, int roomNumber, const Vector3& dir, float dist, bool collideBridges)
 	{
-		constexpr auto PORTAL_DIST_THRESHOLD = 0.001f;
+		constexpr auto PORTAL_THRESHOLD = 0.001f;
 
 		// FAILSAFE.
 		if (dir == Vector3::Zero)
@@ -301,7 +301,7 @@ namespace TEN::Collision::Los
 				if (meshColl.has_value() && meshColl->Distance < closestDist)
 				{
 					// FAILSAFE: Prioritize tangible triangle in case portal triangle coincides.
-					if (abs(meshColl->Distance - closestDist) > PORTAL_DIST_THRESHOLD)
+					if (abs(meshColl->Distance - closestDist) > PORTAL_THRESHOLD)
 					{
 						portalRoomNumber = portal.RoomNumber;
 						closestTri = meshColl->Triangle;

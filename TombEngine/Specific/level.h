@@ -164,8 +164,6 @@ void LoadAnimatedTextures();
 void LoadEventSets();
 void LoadAIObjects();
 
-void LoadPortal(RoomData& room);
-
 void GetCarriedItems();
 void GetAIPickups();
 void BuildOutsideRoomsTable();
