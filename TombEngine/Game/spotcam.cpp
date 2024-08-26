@@ -138,6 +138,7 @@ void InitializeSpotCam(short Sequence)
 	SpotcamPaused = false;
 	SpotcamLoopCnt = 0;
 	Lara.Control.IsLocked = false;
+	Camera.DisableInterpolation = true;
 
 	LaraAir = Lara.Status.Air;
 
@@ -573,6 +574,7 @@ void CalculateSpotCameras()
 					{
 						cn = FirstCamera + SpotCam[CurrentSplineCamera].timer;
 
+						Camera.DisableInterpolation = true;
 						CameraXposition[1] = SpotCam[cn].x;
 						CameraYposition[1] = SpotCam[cn].y;
 						CameraZposition[1] = SpotCam[cn].z;
@@ -642,6 +644,8 @@ void CalculateSpotCameras()
 				}
 				else if (s->flags & SCF_CUT_TO_LARA_CAM || SplineToCamera)
 				{
+					Camera.DisableInterpolation = true;
+
 					if (CheckTrigger)
 					{
 						CameraType oldType = Camera.type;
