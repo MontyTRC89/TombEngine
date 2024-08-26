@@ -751,54 +751,50 @@ Vector3i GetRoomCenter(int roomNumber)
 		room.Position.z + halfDepth);
 }
 
-static std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers = std::vector<int>{})
+static std::set<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::set<int>& visitedRoomNumbers = std::set<int>{})
 {
-	// Invalid room; return empty vector.
-	if (g_Level.Rooms.size() <= roomNumber)
-		return {};
+	auto neighborRoomNumbers = std::set<int>{};
 
-	// Search depth limit reached; return empty vector.
+	// Search depth limit reached; return early.
 	if (searchDepth == 0)
-		return {};
+		return neighborRoomNumbers;
+
+	// Invalid room; return early.
+	if (g_Level.Rooms.size() <= roomNumber)
+		return neighborRoomNumbers;
 
 	// Collect current room number as neighbor of itself.
-	visitedRoomNumbers.push_back(roomNumber);
-
-	auto neighborRoomNumbers = std::vector<int>{};
+	visitedRoomNumbers.insert(roomNumber);
 
 	// Recursively collect neighbors of current neighbor.
 	const auto& room = g_Level.Rooms[roomNumber];
 	if (room.Portals.empty())
 	{
-		neighborRoomNumbers.push_back(roomNumber);
+		neighborRoomNumbers.insert(roomNumber);
 	}
 	else
 	{
-		for (int doorID = 0; doorID < room.Portals.size(); doorID++)
+		for (int i = 0; i < room.Portals.size(); i++)
 		{
-			int neighborRoomNumber = room.Portals[doorID].RoomNumber;
-			neighborRoomNumbers.push_back(neighborRoomNumber);
+			int neighborRoomNumber = room.Portals[i].RoomNumber;
+			neighborRoomNumbers.insert(neighborRoomNumber);
 
-			auto recNeighborRoomNumbers = GetNeighborRoomNumbers(neighborRoomNumber, searchDepth - 1, visitedRoomNumbers);
-			neighborRoomNumbers.insert(neighborRoomNumbers.end(), recNeighborRoomNumbers.begin(), recNeighborRoomNumbers.end());
+			auto nextNeighborRoomNumbers = GetNeighborRoomNumbers(neighborRoomNumber, searchDepth - 1, visitedRoomNumbers);
+			neighborRoomNumbers.insert(nextNeighborRoomNumbers.begin(), nextNeighborRoomNumbers.end());
 		}
 	}
-
-	// Sort and clean collection.
-	std::sort(neighborRoomNumbers.begin(), neighborRoomNumbers.end());
-	neighborRoomNumbers.erase(std::unique(neighborRoomNumbers.begin(), neighborRoomNumbers.end()), neighborRoomNumbers.end());
 
 	return neighborRoomNumbers;
 }
 
 void InitializeNeighborRoomList()
 {
-	constexpr auto NEIGHBOR_ROOM_SEARCH_DEPTH = 2;
+	constexpr auto SEARCH_DEPTH = 2;
 
 	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
-		room.NeighborRoomNumbers = GetNeighborRoomNumbers(roomNumber, NEIGHBOR_ROOM_SEARCH_DEPTH);
+		room.NeighborRoomNumbers = GetNeighborRoomNumbers(roomNumber, SEARCH_DEPTH);
 	}
 
 	// Add flipped variations of itself.
@@ -809,11 +805,11 @@ void InitializeNeighborRoomList()
 			continue;
 
 		if (!Contains(room.NeighborRoomNumbers, room.flippedRoom))
-			room.NeighborRoomNumbers.push_back(room.flippedRoom);
+			room.NeighborRoomNumbers.insert(room.flippedRoom);
 
 		auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
 		if (!Contains(flippedRoom.NeighborRoomNumbers, roomNumber))
-			flippedRoom.NeighborRoomNumbers.push_back(roomNumber);
+			flippedRoom.NeighborRoomNumbers.insert(roomNumber);
 	}
 }
 

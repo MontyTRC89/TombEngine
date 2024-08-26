@@ -24,18 +24,18 @@ extern int  FlipMap[MAX_FLIPMAP];
 
 enum RoomEnvFlags
 {
-	ENV_FLAG_WATER			  = (1 << 0),
-	ENV_FLAG_SWAMP			  = (1 << 2),
-	ENV_FLAG_OUTSIDE		  = (1 << 3),
-	ENV_FLAG_DYNAMIC_LIT	  = (1 << 4),
-	ENV_FLAG_WIND			  = (1 << 5),
-	ENV_FLAG_NOT_NEAR_OUTSIDE = (1 << 6),
-	ENV_FLAG_NO_LENSFLARE	  = (1 << 7),
-	ENV_FLAG_MIST			  = (1 << 8),
-	ENV_FLAG_CAUSTICS		  = (1 << 9),
-	ENV_FLAG_UNKNOWN3		  = (1 << 10),
-	ENV_FLAG_DAMAGE			  = (1 << 11),
-	ENV_FLAG_COLD			  = (1 << 12)
+	ENV_FLAG_WATER			  = 1 << 0,
+	ENV_FLAG_SWAMP			  = 1 << 2,
+	ENV_FLAG_OUTSIDE		  = 1 << 3,
+	ENV_FLAG_DYNAMIC_LIT	  = 1 << 4,
+	ENV_FLAG_WIND			  = 1 << 5,
+	ENV_FLAG_NOT_NEAR_OUTSIDE = 1 << 6,
+	ENV_FLAG_NO_LENSFLARE	  = 1 << 7,
+	ENV_FLAG_MIST			  = 1 << 8,
+	ENV_FLAG_CAUSTICS		  = 1 << 9,
+	ENV_FLAG_UNKNOWN3		  = 1 << 10,
+	ENV_FLAG_DAMAGE			  = 1 << 11,
+	ENV_FLAG_COLD			  = 1 << 12
 };
 
 enum StaticMeshFlags : short
@@ -91,7 +91,7 @@ private:
 
 public:
 	int			  RoomNumber	= 0;
-	CollisionMesh CollisionMesh = TEN::Physics::CollisionMesh();
+	CollisionMesh CollisionMesh = {};
 	Vector3		  Nomal			= Vector3::Zero;
 
 	std::array<Vector3, VERTEX_COUNT> Vertices = {};
@@ -149,7 +149,7 @@ struct RoomData
 	short fxNumber;
 	bool boundActive;
 
-	std::vector<int> NeighborRoomNumbers = {};
+	std::set<int> NeighborRoomNumbers = {};
 
 	// Object members
 

@@ -251,9 +251,9 @@ namespace TEN::Collision::Los
 		bool traversePortal = true;
 		while (traversePortal)
 		{
-			int portalRoomNumber = NO_VALUE;
 			auto closestTri = std::optional<CollisionTriangleData>();
 			float closestDist = rayDist;
+			int portalRoomNumber = NO_VALUE;
 
 			// 2.1) Clip room.
 			const auto& room = g_Level.Rooms[rayRoomNumber];
@@ -301,9 +301,9 @@ namespace TEN::Collision::Los
 				if (meshColl.has_value() && meshColl->Distance < closestDist &&
 					abs(meshColl->Distance - closestDist) > PORTAL_THRESHOLD) // FAILSAFE: Prioritize tangible triangle in case portal triangle coincides.
 				{
-					portalRoomNumber = portal.RoomNumber;
 					closestTri = meshColl->Triangle;
 					closestDist = meshColl->Distance;
+					portalRoomNumber = portal.RoomNumber;
 				}
 			}
 
