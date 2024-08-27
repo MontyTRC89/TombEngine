@@ -52,6 +52,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added F12 as alternative to PrtSc for screenshots.
 
 ### Lua API changes
+* Added Moveable.GetJointRotation() and optional 'offset' parameter for Moveable.GetJointRotation().
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Input.KeyClearAll()
 * Added Flow.EnableHomeLevel()
