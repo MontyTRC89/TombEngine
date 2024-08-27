@@ -135,10 +135,10 @@ namespace TEN::Entities::Generic
 
 		// Define collision mesh description.
 		auto desc = CollisionMeshDesc();
-		desc.InsertTriangle(corners[0], corners[1], corners[4]);
-		desc.InsertTriangle(corners[1], corners[4], corners[5]);
-		desc.InsertTriangle(corners[2], corners[3], corners[6]);
-		desc.InsertTriangle(corners[3], corners[6], corners[7]);
+		desc.InsertTriangle(corners[4], corners[1], corners[0]);
+		desc.InsertTriangle(corners[5], corners[4], corners[1]);
+		desc.InsertTriangle(corners[6], corners[3], corners[2]);
+		desc.InsertTriangle(corners[7], corners[6], corners[3]);
 		desc.InsertTriangle(corners[0], corners[1], corners[2]);
 		desc.InsertTriangle(corners[0], corners[2], corners[3]);
 		desc.InsertTriangle(corners[4], corners[5], corners[6]);

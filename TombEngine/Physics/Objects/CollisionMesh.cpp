@@ -16,9 +16,9 @@ namespace TEN::Physics
 		return _vertices;
 	}
 
-	const std::vector<int>& CollisionMeshDesc::GetIndices() const
+	const std::vector<int>& CollisionMeshDesc::GetIds() const
 	{
-		return _indices;
+		return _ids;
 	}
 
 	void CollisionMeshDesc::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
@@ -45,15 +45,15 @@ namespace TEN::Physics
 		int vertex1ID = getVertexID(vertex1);
 		int vertex2ID = getVertexID(vertex2);
 
-		// Add indices.
-		_indices.push_back(vertex0ID);
-		_indices.push_back(vertex1ID);
-		_indices.push_back(vertex2ID);
+		// Add vertex IDs.
+		_ids.push_back(vertex0ID);
+		_ids.push_back(vertex1ID);
+		_ids.push_back(vertex2ID);
 	}
 
 	LocalCollisionTriangle::LocalCollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID)
 	{
-		_vertexIds = /*std::array<int, VERTEX_COUNT>*/{ vertex0ID, vertex1ID, vertex2ID };
+		_vertexIds = { vertex0ID, vertex1ID, vertex2ID };
 	}
 
 	const Vector3& LocalCollisionTriangle::GetVertex0(const std::vector<Vector3>& vertices) const
@@ -262,8 +262,8 @@ namespace TEN::Physics
 		_vertices = desc.GetVertices();
 
 		// Add triangles.
-		for (int i = 0; i < desc.GetIndices().size(); i += LocalCollisionTriangle::VERTEX_COUNT)
-			_triangles.push_back(LocalCollisionTriangle(desc.GetIndices()[i], desc.GetIndices()[i + 1], desc.GetIndices()[i + 2]));
+		for (int i = 0; i < desc.GetIds().size(); i += LocalCollisionTriangle::VERTEX_COUNT)
+			_triangles.push_back(LocalCollisionTriangle(desc.GetIds()[i], desc.GetIds()[i + 1], desc.GetIds()[i + 2]));
 
 		// Collect triangle IDs and AABBs.
 		auto triIds = std::vector<int>(_triangles.size());

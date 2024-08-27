@@ -14,7 +14,7 @@ namespace TEN::Physics
 		// Members
 
 		std::vector<Vector3> _vertices = {};
-		std::vector<int>	 _indices  = {};
+		std::vector<int>	 _ids	   = {};
 
 		std::unordered_map<Vector3, int> _vertexMap = {}; // Key = vertex, value = vertex ID.
 
@@ -26,7 +26,7 @@ namespace TEN::Physics
 		// Getters
 
 		const std::vector<Vector3>& GetVertices() const;
-		const std::vector<int>&		GetIndices() const;
+		const std::vector<int>&		GetIds() const;
 
 		// Utilities
 
