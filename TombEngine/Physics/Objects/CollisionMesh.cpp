@@ -11,11 +11,49 @@ using namespace TEN::Utils;
 
 namespace TEN::Physics
 {
-	LocalCollisionTriangle::LocalCollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, int normalID, const BoundingBox& aabb)
+	const std::vector<Vector3>& CollisionMeshDesc::GetVertices() const
 	{
-		_vertexIds = std::array<int, VERTEX_COUNT>{ vertex0ID, vertex1ID, vertex2ID };
-		_normalID = normalID;
-		_aabb = aabb;
+		return _vertices;
+	}
+
+	const std::vector<int>& CollisionMeshDesc::GetIndices() const
+	{
+		return _indices;
+	}
+
+	void CollisionMeshDesc::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
+	{
+		auto getVertexID = [&](const Vector3& vertex)
+		{
+			// Get existing vertex ID.
+			auto it = _vertexMap.find(vertex);
+			if (it != _vertexMap.end())
+			{
+				int vertexID = it->second;
+				return vertexID;
+			}
+			
+			// Add, cache, and get new vertex ID.
+			int vertexID = (int)_vertices.size();
+			_vertices.push_back(vertex);
+			_vertexMap[vertex] = vertexID;
+			return vertexID;
+		};
+
+		// Allocate vertices.
+		int vertex0ID = getVertexID(vertex0);
+		int vertex1ID = getVertexID(vertex1);
+		int vertex2ID = getVertexID(vertex2);
+
+		// Add indices.
+		_indices.push_back(vertex0ID);
+		_indices.push_back(vertex1ID);
+		_indices.push_back(vertex2ID);
+	}
+
+	LocalCollisionTriangle::LocalCollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID)
+	{
+		_vertexIds = /*std::array<int, VERTEX_COUNT>*/{ vertex0ID, vertex1ID, vertex2ID };
 	}
 
 	const Vector3& LocalCollisionTriangle::GetVertex0(const std::vector<Vector3>& vertices) const
@@ -33,18 +71,7 @@ namespace TEN::Physics
 		return vertices[_vertexIds[2]];
 	}
 
-	const Vector3& LocalCollisionTriangle::GetNormal(const std::vector<Vector3>& normals) const
-	{
-		return normals[_normalID];
-	}
-
-	const BoundingBox& LocalCollisionTriangle::GetAabb() const
-	{
-		return _aabb;
-	}
-
-	// TODO: Triangle treated as infinite.
-	Vector3 LocalCollisionTriangle::GetTangent(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
+	Vector3 LocalCollisionTriangle::GetNormal(const std::vector<Vector3>& vertices) const
 	{
 		// Get vertices.
 		const auto& vertex0 = GetVertex0(vertices);
@@ -58,6 +85,29 @@ namespace TEN::Physics
 		// Calculate edge normal.
 		auto normal = edge0.Cross(edge1);
 		normal.Normalize();
+		return normal;
+	}
+
+	BoundingBox LocalCollisionTriangle::GetAabb(const std::vector<Vector3>& vertices) const
+	{
+		// Get vertices.
+		const auto& vertex0 = GetVertex0(vertices);
+		const auto& vertex1 = GetVertex1(vertices);
+		const auto& vertex2 = GetVertex2(vertices);
+
+		return Geometry::GetBoundingBox({ vertex0, vertex1, vertex2 });
+	}
+
+	// TODO: Triangle treated as infinite.
+	Vector3 LocalCollisionTriangle::GetTangent(const BoundingSphere& sphere, const std::vector<Vector3>& vertices) const
+	{
+		// Get vertices.
+		const auto& vertex0 = GetVertex0(vertices);
+		const auto& vertex1 = GetVertex1(vertices);
+		const auto& vertex2 = GetVertex2(vertices);
+
+		// Get normal.
+		auto normal = GetNormal(vertices);
 
 		// Calculate tangent.
 		float dist = normal.Dot(sphere.Center - vertex0);
@@ -65,7 +115,7 @@ namespace TEN::Physics
 	}
 
 	// "More accurate" version but it doesn't work.
-	/*Vector3 CollisionTriangle::GetTangent(const std::vector<Vector3>& vertices, const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
+	/*Vector3 CollisionTriangle::GetTangent(const std::vector<Vector3>& vertices, const BoundingSphere& sphere, const std::vector<Vector3>& vertices) const
 	{
 		// Get vertices.
 		const auto& vertex0 = GetVertex0(vertices);
@@ -116,15 +166,15 @@ namespace TEN::Physics
 		return c3;
 	}*/
 
-	bool LocalCollisionTriangle::Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
+	bool LocalCollisionTriangle::Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices) const
 	{
 		// Test if ray intersects triangle AABB.
 		float aabbDist = 0.0f;
-		if (!ray.Intersects(_aabb, aabbDist) || aabbDist >= distMax)
+		if (!ray.Intersects(GetAabb(vertices), aabbDist) || aabbDist >= distMax)
 			return false;
 
 		// Get normal.
-		const auto& normal = GetNormal(normals);
+		const auto& normal = GetNormal(vertices);
 
 		// Test if ray is facing triangle.
 		if (ray.direction.Dot(normal) > EPSILON)
@@ -168,37 +218,34 @@ namespace TEN::Physics
 		return true;
 	}
 
-	bool LocalCollisionTriangle::Intersects(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
+	bool LocalCollisionTriangle::Intersects(const BoundingSphere& sphere, const std::vector<Vector3>& vertices) const
 	{
 		// Get vertices.
 		const auto& vertex0 = GetVertex0(vertices);
 		const auto& vertex1 = GetVertex1(vertices);
 		const auto& vertex2 = GetVertex2(vertices);
 
-		// Calculate edges.
-		auto edge0 = vertex1 - vertex0;
-		auto edge1 = vertex2 - vertex0;
-
-		// Calculate edge normal.
-		auto normal = edge0.Cross(edge1);
-		normal.Normalize();
+		// Get normal.
+		auto normal = GetNormal(vertices);
 
 		// Test intersection.
 		float dist = abs(normal.Dot(sphere.Center - vertex0));
 		return (dist <= sphere.Radius);
 	}
 
-	void LocalCollisionTriangle::DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const
+	void LocalCollisionTriangle::DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices) const
 	{
 		constexpr auto TRI_COLOR		  = Color(1.0f, 1.0f, 0.0f, 0.2f);
 		constexpr auto NORMAL_LINE_LENGTH = BLOCK(0.1f);
 		constexpr auto NORMAL_LINE_COLOR  = Color(1.0f, 1.0f, 1.0f);
 
-		// Get vertices and normal.
+		// Get vertices.
 		const auto& vertex0 = Vector3::Transform(GetVertex0(vertices), transformMatrix);
 		const auto& vertex1 = Vector3::Transform(GetVertex1(vertices), transformMatrix);
 		const auto& vertex2 = Vector3::Transform(GetVertex2(vertices), transformMatrix);
-		const auto& normal = Vector3::Transform(GetNormal(normals), rotMatrix);
+
+		// Get normal.
+		auto normal = Vector3::Transform(GetNormal(vertices), rotMatrix);
 
 		// Draw triangle.
 		DrawDebugTriangle(vertex0, vertex1, vertex2, TRI_COLOR);
@@ -206,6 +253,31 @@ namespace TEN::Physics
 		// Draw normal line.
 		auto center = (vertex0 + vertex1 + vertex2) / VERTEX_COUNT;
 		DrawDebugLine(center, Geometry::TranslatePoint(center, normal, NORMAL_LINE_LENGTH), NORMAL_LINE_COLOR);
+	}
+
+	CollisionMesh::CollisionMesh(const Vector3& pos, const Quaternion& orient, const CollisionMeshDesc& desc)
+	{
+		_position = pos;
+		_orientation = orient;
+		_vertices = desc.GetVertices();
+
+		// Add triangles.
+		for (int i = 0; i < desc.GetIndices().size(); i += LocalCollisionTriangle::VERTEX_COUNT)
+			_triangles.push_back(LocalCollisionTriangle(desc.GetIndices()[i], desc.GetIndices()[i + 1], desc.GetIndices()[i + 2]));
+
+		// Collect triangle IDs and AABBs.
+		auto triIds = std::vector<int>(_triangles.size());
+		auto triAabbs = std::vector<BoundingBox>(_triangles.size());
+		for (int i = 0; i < _triangles.size(); i++)
+		{
+			const auto& tri = _triangles[i];
+
+			triIds.push_back(i);
+			triAabbs.push_back(tri.GetAabb(_vertices));
+		}
+
+		// Create triangle tree.
+		_triangleTree = Bvh(triIds, triAabbs);
 	}
 
 	std::optional<CollisionMeshRayCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
@@ -233,7 +305,7 @@ namespace TEN::Physics
 			const auto& tri = _triangles[triID];
 
 			float intersectDist = 0.0f;
-			if (tri.Intersects(localRay, closestDist, intersectDist, _vertices, _normals))
+			if (tri.Intersects(localRay, closestDist, intersectDist, _vertices))
 			{
 				closestTri = &tri;
 				closestDist = intersectDist;
@@ -251,7 +323,7 @@ namespace TEN::Physics
 				Vector3::Transform(closestTri->GetVertex2(_vertices), transformMatrix)
 			};
 
-			meshColl.Triangle.Normal = Vector3::Transform(closestTri->GetNormal(_normals), rotMatrix);
+			meshColl.Triangle.Normal = Vector3::Transform(closestTri->GetNormal(_vertices), rotMatrix);
 			meshColl.Distance = closestDist;
 
 			return meshColl;
@@ -280,7 +352,7 @@ namespace TEN::Physics
 		for (int triID : triIds)
 		{
 			const auto& tri = _triangles[triID];
-			if (tri.Intersects(localSphere, _vertices, _normals))
+			if (tri.Intersects(localSphere, _vertices))
 			{
 				auto triData = CollisionTriangleData{};
 
@@ -291,10 +363,10 @@ namespace TEN::Physics
 					Vector3::Transform(tri.GetVertex2(_vertices), transformMatrix)
 				};
 
-				triData.Normal = Vector3::Transform(tri.GetNormal(_normals), rotMatrix);
+				triData.Normal = Vector3::Transform(tri.GetNormal(_vertices), rotMatrix);
 
 				meshColl.Triangles.push_back(triData);
-				meshColl.Tangents.push_back(Vector3::Transform(tri.GetTangent(localSphere, _vertices, _normals), transformMatrix));
+				meshColl.Tangents.push_back(Vector3::Transform(tri.GetTangent(localSphere, _vertices), transformMatrix));
 				meshColl.Count++;
 			}
 		}
@@ -315,82 +387,10 @@ namespace TEN::Physics
 		_orientation = orient;
 	}
 
-	void CollisionMesh::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal)
-	{
-		auto getVertexID = [&](const Vector3& vertex)
-		{
-			// Get existing vertex ID.
-			auto it = _cache.VertexMap.find(vertex);
-			if (it != _cache.VertexMap.end())
-			{
-				int vertexID = it->second;
-				return vertexID;
-			}
-			
-			// Add, cache, and get new vertex ID.
-			int vertexID = (int)_vertices.size();
-			_vertices.push_back(vertex);
-			_cache.VertexMap[vertex] = vertexID;
-			return vertexID;
-		};
-
-		auto getNormalID = [&](const Vector3& normal)
-		{
-			// Get existing normal ID.
-			auto it = _cache.NormalMap.find(normal);
-			if (it != _cache.NormalMap.end())
-			{
-				int normalID = it->second;
-				return normalID;
-			}
-
-			// Add, cache, and get new normal ID.
-			int normalID = (int)_normals.size();
-			_normals.push_back(normal);
-			_cache.NormalMap[normal] = normalID;
-			return normalID;
-		};
-
-		// Allocate vertices.
-		int vertex0ID = getVertexID(vertex0);
-		int vertex1ID = getVertexID(vertex1);
-		int vertex2ID = getVertexID(vertex2);
-
-		// Allocate normal.
-		int normalID = getNormalID(normal);
-
-		// Set AABB.
-		auto aabb = Geometry::GetBoundingBox({ vertex0, vertex1, vertex2 });
-
-		// Add triangle.
-		_triangles.push_back(LocalCollisionTriangle(vertex0ID, vertex1ID, vertex2ID, normalID, aabb));
-	}
-	
-	void CollisionMesh::Cook()
-	{
-		auto triIds = std::vector<int>(_triangles.size());
-		auto triAabbs = std::vector<BoundingBox>(_triangles.size());
-
-		// Collect triangle IDs and AABBs.
-		for (int i = 0; i < _triangles.size(); i++)
-		{
-			const auto& tri = _triangles[i];
-
-			triIds.push_back(i);
-			triAabbs.push_back(tri.GetAabb());
-		}
-
-		// Create tree of triangles.
-		_triangleTree = Bvh(triIds, triAabbs);
-
-		// Clear cache.
-		_cache = {};
-	}
-
 	void CollisionMesh::DrawDebug() const
 	{
 		for (const auto& tri : _triangles)
-			tri.DrawDebug(GetTransformMatrix(), GetRotationMatrix(), _vertices, _normals);
+			tri.DrawDebug(GetTransformMatrix(), GetRotationMatrix(), _vertices);
 	}
 
 	Matrix CollisionMesh::GetTransformMatrix() const

@@ -786,10 +786,11 @@ void ReadRooms()
 				vertex.z = ReadInt32();
 			}
 
-			portal.CollisionMesh.SetPosition(room.Position.ToVector3());
-			portal.CollisionMesh.InsertTriangle(portal.Vertices[0], portal.Vertices[1], portal.Vertices[2], portal.Nomal);
-			portal.CollisionMesh.InsertTriangle(portal.Vertices[0], portal.Vertices[2], portal.Vertices[3], portal.Nomal);
-			portal.CollisionMesh.Cook();
+			auto desc = CollisionMeshDesc();
+			desc.InsertTriangle(portal.Vertices[2], portal.Vertices[1], portal.Vertices[0]);
+			desc.InsertTriangle(portal.Vertices[3], portal.Vertices[2], portal.Vertices[0]);
+
+			portal.CollisionMesh = CollisionMesh(room.Position.ToVector3(), Quaternion::Identity, desc);
 
 			room.Portals.push_back(portal);
 		}

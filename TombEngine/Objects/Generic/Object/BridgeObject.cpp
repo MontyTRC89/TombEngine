@@ -97,36 +97,24 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::InitializeCollisionMesh(const ItemInfo& item)
 	{
-		constexpr auto UP_NORMAL	  = Vector3(0.0f, -1.0f, 0.0f);
-		constexpr auto DOWN_NORMAL	  = Vector3(0.0f, 1.0f, 0.0f);
-		constexpr auto FORWARD_NORMAL = Vector3(0.0f, 0.0f, 1.0f);
-		constexpr auto BACK_NORMAL	  = Vector3(0.0f, 0.0f, -1.0f);
-		constexpr auto LEFT_NORMAL	  = Vector3(-1.0f, 0.0f, 0.0f);
-		constexpr auto RIGHT_NORMAL	  = Vector3(1.0f, 0.0f, 0.0f);
-
 		// Determine relative tilt offset.
 		auto offset = Vector3::Zero;
-		auto tiltRotMatrix = Matrix::Identity;
 		switch (item.ObjectNumber)
 		{
 		case ID_BRIDGE_TILT1:
 			offset = Vector3(0.0f, CLICK(1), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(-45.0f * 0.25f)).ToRotationMatrix();
 			break;
 
 		case ID_BRIDGE_TILT2:
 			offset = Vector3(0.0f, CLICK(2), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(-45.0f * 0.5f)).ToRotationMatrix();
 			break;
 
 		case ID_BRIDGE_TILT3:
 			offset = Vector3(0.0f, CLICK(3), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(-45.0f * 0.75f)).ToRotationMatrix();
 			break;
 
 		case ID_BRIDGE_TILT4:
 			offset = Vector3(0.0f, CLICK(4), 0.0f);
-			tiltRotMatrix = EulerAngles(0, 0, ANGLE(-45.0f)).ToRotationMatrix();
 			break;
 
 		default:
@@ -145,24 +133,23 @@ namespace TEN::Entities::Generic
 		corners[2] -= offset;
 		corners[6] -= offset;
 
-		// Build collision mesh.
-		_collisionMesh.InsertTriangle(corners[0], corners[1], corners[4], Vector3::Transform(UP_NORMAL, tiltRotMatrix));
-		_collisionMesh.InsertTriangle(corners[1], corners[4], corners[5], Vector3::Transform(UP_NORMAL, tiltRotMatrix));
-		_collisionMesh.InsertTriangle(corners[2], corners[3], corners[6], Vector3::Transform(DOWN_NORMAL, tiltRotMatrix));
-		_collisionMesh.InsertTriangle(corners[3], corners[6], corners[7], Vector3::Transform(DOWN_NORMAL, tiltRotMatrix));
-		_collisionMesh.InsertTriangle(corners[0], corners[1], corners[2], FORWARD_NORMAL);
-		_collisionMesh.InsertTriangle(corners[0], corners[2], corners[3], FORWARD_NORMAL);
-		_collisionMesh.InsertTriangle(corners[4], corners[5], corners[6], BACK_NORMAL);
-		_collisionMesh.InsertTriangle(corners[4], corners[6], corners[7], BACK_NORMAL);
-		_collisionMesh.InsertTriangle(corners[0], corners[3], corners[4], LEFT_NORMAL);
-		_collisionMesh.InsertTriangle(corners[3], corners[4], corners[7], LEFT_NORMAL);
-		_collisionMesh.InsertTriangle(corners[1], corners[2], corners[5], RIGHT_NORMAL);
-		_collisionMesh.InsertTriangle(corners[2], corners[5], corners[6], RIGHT_NORMAL);
-		_collisionMesh.Cook();
+		// Define collision mesh description.
+		auto desc = CollisionMeshDesc();
+		desc.InsertTriangle(corners[0], corners[1], corners[4]);
+		desc.InsertTriangle(corners[1], corners[4], corners[5]);
+		desc.InsertTriangle(corners[2], corners[3], corners[6]);
+		desc.InsertTriangle(corners[3], corners[6], corners[7]);
+		desc.InsertTriangle(corners[0], corners[1], corners[2]);
+		desc.InsertTriangle(corners[0], corners[2], corners[3]);
+		desc.InsertTriangle(corners[4], corners[5], corners[6]);
+		desc.InsertTriangle(corners[4], corners[6], corners[7]);
+		desc.InsertTriangle(corners[0], corners[3], corners[4]);
+		desc.InsertTriangle(corners[3], corners[4], corners[7]);
+		desc.InsertTriangle(corners[1], corners[2], corners[5]);
+		desc.InsertTriangle(corners[2], corners[5], corners[6]);
 
-		// Set collision mesh position and orientation.
-		_collisionMesh.SetPosition(item.Pose.Position.ToVector3());
-		_collisionMesh.SetOrientation(item.Pose.Orientation.ToQuaternion());
+		// Set collision mesh.
+		_collisionMesh = CollisionMesh(item.Pose.Position.ToVector3(), item.Pose.Orientation.ToQuaternion(), desc);
 	}
 
 	void BridgeObject::InitializeAttractor(const ItemInfo& item)

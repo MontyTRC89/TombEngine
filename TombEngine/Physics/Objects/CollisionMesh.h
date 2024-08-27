@@ -8,6 +8,31 @@ using namespace TEN::Structures;
 
 namespace TEN::Physics
 {
+	class CollisionMeshDesc
+	{
+	private:
+		// Members
+
+		std::vector<Vector3> _vertices = {};
+		std::vector<int>	 _indices  = {};
+
+		std::unordered_map<Vector3, int> _vertexMap = {}; // Key = vertex, value = vertex ID.
+
+	public:
+		// Constructors
+		
+		CollisionMeshDesc() = default;
+
+		// Getters
+
+		const std::vector<Vector3>& GetVertices() const;
+		const std::vector<int>&		GetIndices() const;
+
+		// Utilities
+
+		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2);
+	};
+
 	class LocalCollisionTriangle
 	{
 	public:
@@ -17,32 +42,30 @@ namespace TEN::Physics
 		// Members
 
 		std::array<int, VERTEX_COUNT> _vertexIds = {};
-		int							  _normalID	 = 0;
-		BoundingBox					  _aabb		 = BoundingBox();
 
 	public:
 		// Constructors
 
-		LocalCollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID, int normalID, const BoundingBox& aabb);
+		LocalCollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID);
 
 		// Getters
 
-		const Vector3&	   GetVertex0(const std::vector<Vector3>& vertices) const;
-		const Vector3&	   GetVertex1(const std::vector<Vector3>& vertices) const;
-		const Vector3&	   GetVertex2(const std::vector<Vector3>& vertices) const;
-		const Vector3&	   GetNormal(const std::vector<Vector3>& normals) const;
-		const BoundingBox& GetAabb() const;
+		const Vector3& GetVertex0(const std::vector<Vector3>& vertices) const;
+		const Vector3& GetVertex1(const std::vector<Vector3>& vertices) const;
+		const Vector3& GetVertex2(const std::vector<Vector3>& vertices) const;
+		Vector3		   GetNormal(const std::vector<Vector3>& vertices) const;
+		BoundingBox	   GetAabb(const std::vector<Vector3>& vertices) const;
 
-		Vector3 GetTangent(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
+		Vector3 GetTangent(const BoundingSphere& sphere, const std::vector<Vector3>& vertices) const;
 
 		// Inquirers
 
-		bool Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
-		bool Intersects(const BoundingSphere& sphere, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
+		bool Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices) const;
+		bool Intersects(const BoundingSphere& sphere, const std::vector<Vector3>& vertices) const;
 
 		// Debug
 
-		void DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices, const std::vector<Vector3>& normals) const;
+		void DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices) const;
 	};
 
 	struct CollisionTriangleData
@@ -68,27 +91,20 @@ namespace TEN::Physics
 	class CollisionMesh
 	{
 	private:
-		struct Cache
-		{
-			std::unordered_map<Vector3, int> VertexMap = {}; // Key = vertex, value = vertex ID.
-			std::unordered_map<Vector3, int> NormalMap = {}; // Key = normal, value = normal ID.
-		};
-
 		// Members
 
 		Vector3								_position	 = Vector3::Zero;
 		Quaternion							_orientation = Quaternion::Identity;
-		std::vector<LocalCollisionTriangle> _triangles	 = {};
 		std::vector<Vector3>				_vertices	 = {};
-		std::vector<Vector3>				_normals	 = {};
+		std::vector<LocalCollisionTriangle> _triangles	 = {};
 
-		Bvh	  _triangleTree = Bvh();
-		Cache _cache		= {};
+		Bvh _triangleTree = Bvh();
 
 	public:
 		// Constructors
 
 		CollisionMesh() = default;
+		CollisionMesh(const Vector3& pos, const Quaternion& orient, const CollisionMeshDesc& desc);
 
 		// Getters
 
@@ -99,11 +115,6 @@ namespace TEN::Physics
 
 		void SetPosition(const Vector3& pos);
 		void SetOrientation(const Quaternion& orient);
-
-		// Utilities
-
-		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& normal);
-		void Cook();
 
 		// Debug
 
