@@ -56,12 +56,9 @@ namespace TEN::Physics
 		Vector3		   GetNormal(const std::vector<Vector3>& vertices) const;
 		BoundingBox	   GetAabb(const std::vector<Vector3>& vertices) const;
 
-		Vector3 GetTangent(const BoundingSphere& sphere, const std::vector<Vector3>& vertices) const;
-
 		// Inquirers
 
 		bool Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices) const;
-		bool Intersects(const BoundingSphere& sphere, const std::vector<Vector3>& vertices) const;
 
 		// Debug
 
@@ -80,14 +77,6 @@ namespace TEN::Physics
 		float Distance = 0.0f;
 	};
 	
-	struct CollisionMeshSphereCollisionData
-	{
-		std::vector<CollisionTriangleData> Triangles = {};
-		std::vector<Vector3>			   Tangents	 = {};
-
-		unsigned int Count = 0;
-	};
-
 	class CollisionMesh
 	{
 	private:
@@ -108,8 +97,7 @@ namespace TEN::Physics
 
 		// Getters
 
-		std::optional<CollisionMeshRayCollisionData>	GetCollision(const Ray& ray, float dist) const;
-		std::optional<CollisionMeshSphereCollisionData> GetCollision(const BoundingSphere& sphere) const;
+		std::optional<CollisionMeshRayCollisionData> GetCollision(const Ray& ray, float dist) const;
 
 		// Setters
 

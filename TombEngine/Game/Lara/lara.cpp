@@ -257,33 +257,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	// ----DEBUG
 	
-	// Sphere-triangle collision debug.
-
-	auto dir = EulerAngles(g_Camera.actualElevation, g_Camera.actualAngle, 0).ToDirection();
-	auto sphere = BoundingSphere(Geometry::TranslatePoint(item->Pose.Position.ToVector3() + Vector3(0, -coll->Setup.Height, 0), dir, BLOCK(1)), BLOCK(0.4f));
-
-	auto meshColl = g_Level.Rooms[item->RoomNumber].CollisionMesh.GetCollision(sphere);
-	if (meshColl.has_value())
-	{
-		const auto& tangent = meshColl->Tangents[0];
-		const auto& normal = meshColl->Triangles[0].Normal;
-
-		float cosTheta = dir.Dot(normal);
-		float moveBackDist = sphere.Radius / cosTheta;
-		PrintDebugMessage("%.3f", cosTheta);
-
-		DrawDebugSphere(sphere, Color(1, 0, 1, 0.1f), RendererDebugPage::None, false);
-		DrawDebugTarget(tangent, Quaternion::Identity, BLOCK(0.2f), Color(1, 0, 0));
-
-		// Calculate and collect tanget offset.
-		int sign = IsPointInFront2(sphere.Center, tangent, normal) ? 1 : -1;
-		float dist = sphere.Radius + (Vector3::Distance(sphere.Center, tangent) * sign);
-		auto offset = Geometry::TranslatePoint(Vector3::Zero, -dir, moveBackDist - dist);
-
-		*(Vector3*)&sphere.Center += offset;
-	}
-	DrawDebugSphere(sphere, Color(1, 1, 1, 0.1f), RendererDebugPage::None, false);
-
 	short deltaAngle = Geometry::GetShortestAngle(GetPlayerHeadingAngleY(*item), g_Camera.actualAngle);
 	//PrintDebugMessage("%d", abs(deltaAngle));
 

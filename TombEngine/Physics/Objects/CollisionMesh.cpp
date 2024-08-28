@@ -98,74 +98,6 @@ namespace TEN::Physics
 		return Geometry::GetBoundingBox({ vertex0, vertex1, vertex2 });
 	}
 
-	// TODO: Triangle treated as infinite.
-	Vector3 LocalCollisionTriangle::GetTangent(const BoundingSphere& sphere, const std::vector<Vector3>& vertices) const
-	{
-		// Get vertices.
-		const auto& vertex0 = GetVertex0(vertices);
-		const auto& vertex1 = GetVertex1(vertices);
-		const auto& vertex2 = GetVertex2(vertices);
-
-		// Get normal.
-		auto normal = GetNormal(vertices);
-
-		// Calculate tangent.
-		float dist = normal.Dot(sphere.Center - vertex0);
-		return (sphere.Center - (normal * dist));
-	}
-
-	// "More accurate" version but it doesn't work.
-	/*Vector3 CollisionTriangle::GetTangent(const std::vector<Vector3>& vertices, const BoundingSphere& sphere, const std::vector<Vector3>& vertices) const
-	{
-		// Get vertices.
-		const auto& vertex0 = GetVertex0(vertices);
-		const auto& vertex1 = GetVertex1(vertices);
-		const auto& vertex2 = GetVertex2(vertices);
-
-		// Calculate edges.
-		auto edge0 = vertex1 - vertex0;
-		auto edge1 = vertex2 - vertex0;
-
-		// Calculate vectors.
-		auto v2 = sphere.Center - vertex0;
-
-		// Calculate dot products.
-		float dot00 = edge1.Dot(edge1);
-		float dot01 = edge1.Dot(edge0);
-		float dot02 = edge1.Dot(v2);
-		float dot11 = edge0.Dot(edge0);
-		float dot12 = edge0.Dot(v2);
-
-		// Calculate barycentric coordinates.
-		float invDenom = 1 / ((dot00 * dot11) - (dot01 * dot01));
-		float u = ((dot11 * dot02) - (dot01 * dot12)) * invDenom;
-		float v = ((dot00 * dot12) - (dot01 * dot02)) * invDenom;
-
-		// Check if point is in triangle
-		if (u >= 0 && v >= 0 && (u + v) <= 1)
-			return (vertex0 + (edge1 * u) + (edge0 * v));
-
-		// Clamp to nearest edge if point is outside triangle.
-		auto c1 = Geometry::GetClosestPointOnLine(vertex0, vertex1, sphere.Center);
-		auto c2 = Geometry::GetClosestPointOnLine(vertex1, vertex2, sphere.Center);
-		auto c3 = Geometry::GetClosestPointOnLine(vertex2, vertex0, sphere.Center);
-
-		float d1 = (c1 - sphere.Center).Length();
-		float d2 = (c2 - sphere.Center).Length();
-		float d3 = (c3 - sphere.Center).Length();
-
-		if (d1 < d2 && d1 < d3)
-		{
-			return c1;
-		}
-		else if (d2 < d1 && d2 < d3)
-		{
-			return c2;
-		}
-
-		return c3;
-	}*/
-
 	bool LocalCollisionTriangle::Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices) const
 	{
 		// Test if ray intersects triangle AABB.
@@ -216,21 +148,6 @@ namespace TEN::Physics
 
 		dist = intersectDist;
 		return true;
-	}
-
-	bool LocalCollisionTriangle::Intersects(const BoundingSphere& sphere, const std::vector<Vector3>& vertices) const
-	{
-		// Get vertices.
-		const auto& vertex0 = GetVertex0(vertices);
-		const auto& vertex1 = GetVertex1(vertices);
-		const auto& vertex2 = GetVertex2(vertices);
-
-		// Get normal.
-		auto normal = GetNormal(vertices);
-
-		// Test intersection.
-		float dist = abs(normal.Dot(sphere.Center - vertex0));
-		return (dist <= sphere.Radius);
 	}
 
 	void LocalCollisionTriangle::DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices) const
@@ -328,51 +245,6 @@ namespace TEN::Physics
 
 			return meshColl;
 		}
-
-		return std::nullopt;
-	}
-
-	std::optional<CollisionMeshSphereCollisionData> CollisionMesh::GetCollision(const BoundingSphere& sphere) const
-	{
-		// Get matrices.
-		auto transformMatrix = GetTransformMatrix();
-		auto rotMatrix = GetRotationMatrix();
-
-		// Calculate local sphere.
-		auto localSphere = BoundingSphere(Vector3::Transform(sphere.Center, transformMatrix.Invert()), sphere.Radius);
-
-		// Get bounded triangle IDs.
-		auto triIds = _triangleTree.GetBoundedObjectIds(localSphere);
-		if (triIds.empty())
-			return std::nullopt;
-
-		auto meshColl = CollisionMeshSphereCollisionData{};
-
-		// Collect triangles.
-		for (int triID : triIds)
-		{
-			const auto& tri = _triangles[triID];
-			if (tri.Intersects(localSphere, _vertices))
-			{
-				auto triData = CollisionTriangleData{};
-
-				triData.Vertices =
-				{
-					Vector3::Transform(tri.GetVertex0(_vertices), transformMatrix),
-					Vector3::Transform(tri.GetVertex1(_vertices), transformMatrix),
-					Vector3::Transform(tri.GetVertex2(_vertices), transformMatrix)
-				};
-
-				triData.Normal = Vector3::Transform(tri.GetNormal(_vertices), rotMatrix);
-
-				meshColl.Triangles.push_back(triData);
-				meshColl.Tangents.push_back(Vector3::Transform(tri.GetTangent(localSphere, _vertices), transformMatrix));
-				meshColl.Count++;
-			}
-		}
-
-		if (meshColl.Count > 0)
-			return meshColl;
 
 		return std::nullopt;
 	}

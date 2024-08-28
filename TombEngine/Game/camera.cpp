@@ -178,66 +178,9 @@ bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3&
 	return (dotProduct >= 0.0f);
 }
 
-// TODO: Not the right math.
 static Vector3 GetCameraGeometryOffset()
 {
-	auto collectOffsets = [](std::vector<Vector3>& offsets, const std::optional<CollisionMeshSphereCollisionData>& meshColl, const BoundingSphere& sphere)
-	{
-		if (!meshColl.has_value())
-			return;
-
-		for (int i = 0; i < meshColl->Count; i++)
-		{
-			const auto& tangent = meshColl->Tangents[i];
-			const auto& normal = meshColl->Triangles[i].Normal;
-
-			// Calculate tangent offset.
-			int sign = IsPointInFront(sphere.Center, tangent, normal) ? 1 : -1;
-			float dist = sphere.Radius + (Vector3::Distance(sphere.Center, tangent) * sign);
-			auto offset = Geometry::TranslatePoint(Vector3::Zero, normal, dist);
-
-			offsets.push_back(offset);
-		}
-	};
-
-	//return Vector3::Zero;
-
-	auto offsets = std::vector<Vector3>{};
-	auto sphere = BoundingSphere(g_Camera.Position, g_Camera.Radius);
-
-	const auto& room = g_Level.Rooms[g_Camera.RoomNumber];
-
-	// 1) Collect room mesh triangle tangent offsets.
-	auto meshColl = room.CollisionMesh.GetCollision(sphere);
-	collectOffsets(offsets, meshColl, sphere);
-
-	// 2) Collect bridge mesh triangle tangent offsets.
-	for (int neighborRoomNumber : room.NeighborRoomNumbers)
-	{
-		const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-
-		auto bridgeMovIds = neighborRoom.Bridges.GetBoundedIds(sphere);
-		for (int bridgeMovID : bridgeMovIds)
-		{
-			const auto& bridgeMov = g_Level.Items[bridgeMovID];
-			const auto& bridge = GetBridgeObject(bridgeMov);
-
-			auto meshColl = bridge.GetCollisionMesh().GetCollision(sphere);
-			collectOffsets(offsets, meshColl, sphere);
-		}
-	}
-
-	// 3) No offsets; return early.
-	if (offsets.empty())
-		return Vector3::Zero;
-
-	// 4) Calculate median offset.
-	auto median = Vector3::Zero;
-	for (const auto& offset : offsets)
-		median += offset;
-	median /= offsets.size();
-
-	return median;
+	// TODO
 }
 
 EulerAngles GetCameraControlRotation()
