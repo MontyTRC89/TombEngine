@@ -154,6 +154,8 @@ namespace TEN::Entities::Generic
 		if (TriggerActive(item))
 		{
 			rope->active = 1;
+			rope->StoreInterpolationData();
+
 			RopeDynamics(rope);
 		}
 		else

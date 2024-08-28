@@ -26,10 +26,16 @@ namespace TEN::Entities::Generic
 		Vector3i normalisedSegment[ROPE_SEGMENTS];
 		Vector3i meshSegment[ROPE_SEGMENTS];
 		Vector3i coords[ROPE_SEGMENTS];
+		Vector3i oldMeshSegments[ROPE_SEGMENTS];
 
 		int segmentLength;
 		short active;
 		short coiled;
+
+		void StoreInterpolationData()
+		{
+			memcpy(oldMeshSegments, meshSegment, sizeof(Vector3i) * ROPE_SEGMENTS);
+		}
 	};
 
 	struct PENDULUM

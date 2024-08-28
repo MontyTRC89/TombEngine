@@ -348,17 +348,26 @@ namespace TEN::Renderer
 
 			for (int n = 0; n < ROPE_SEGMENTS; n++)
 			{
-				auto* s = &rope.meshSegment[n];
+				auto* s = &rope.oldMeshSegments[n];
 				Vector3 t;
-				Vector3 output;
+				Vector3 oldOutput;
 
 				t.x = s->x >> FP_SHIFT;
 				t.y = s->y >> FP_SHIFT;
 				t.z = s->z >> FP_SHIFT;
 
-				output = Vector3::Transform(t, world);
+				oldOutput = Vector3::Transform(t, world);
 
-				auto absolutePosition = output;
+				s = &rope.meshSegment[n];
+				Vector3 currentOutput;
+
+				t.x = s->x >> FP_SHIFT;
+				t.y = s->y >> FP_SHIFT;
+				t.z = s->z >> FP_SHIFT;
+
+				currentOutput = Vector3::Transform(t, world);
+
+				auto absolutePosition = Vector3::Lerp(oldOutput, currentOutput, _interpolationFactor);
 				absolute[n] = absolutePosition;
 			}
 
