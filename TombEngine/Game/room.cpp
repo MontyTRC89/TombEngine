@@ -12,9 +12,11 @@
 #include "Objects/game_object_ids.h"
 #include "Physics/Physics.h"
 #include "Specific/trutils.h"
+#include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Room;
 using namespace TEN::Math;
 using namespace TEN::Physics;
 using namespace TEN::Renderer;
@@ -62,7 +64,7 @@ void RoomData::GenerateCollisionMesh()
 			const auto* prevSectorX = &Sectors[((x - 1) * ZSize) + z];
 			if (prevSectorX->SidePortalRoomNumber != NO_VALUE)
 			{
-				const auto& prevRoomX = g_Level.Rooms[prevSectorX->SidePortalRoomNumber];
+				const auto& prevRoomX = GetRoom(prevSectorX->SidePortalRoomNumber);
 				auto prevRoomGridCoordX = GetRoomGridCoord(prevSectorX->SidePortalRoomNumber, prevSectorX->Position.x, prevSectorX->Position.y);
 
 				prevSectorX = &prevRoomX.Sectors[(prevRoomGridCoordX.x * prevRoomX.ZSize) + prevRoomGridCoordX.y];
@@ -72,7 +74,7 @@ void RoomData::GenerateCollisionMesh()
 			const auto* nextSectorX = &Sectors[((x + 1) * ZSize) + z];
 			if (nextSectorX->SidePortalRoomNumber != NO_VALUE)
 			{
-				const auto& nextRoomX = g_Level.Rooms[nextSectorX->SidePortalRoomNumber];
+				const auto& nextRoomX = GetRoom(nextSectorX->SidePortalRoomNumber);
 				auto nextRoomGridCoordX = GetRoomGridCoord(nextSectorX->SidePortalRoomNumber, nextSectorX->Position.x, nextSectorX->Position.y);
 
 				nextSectorX = &nextRoomX.Sectors[(nextRoomGridCoordX.x * nextRoomX.ZSize) + nextRoomGridCoordX.y];
@@ -82,7 +84,7 @@ void RoomData::GenerateCollisionMesh()
 			const auto* prevSectorZ = &Sectors[(x * ZSize) + (z - 1)];
 			if (prevSectorZ->SidePortalRoomNumber != NO_VALUE)
 			{
-				const auto& prevRoomZ = g_Level.Rooms[prevSectorZ->SidePortalRoomNumber];
+				const auto& prevRoomZ = GetRoom(prevSectorZ->SidePortalRoomNumber);
 				auto prevRoomGridCoordZ = GetRoomGridCoord(prevSectorZ->SidePortalRoomNumber, prevSectorZ->Position.x, prevSectorZ->Position.y);
 
 				prevSectorZ = &prevRoomZ.Sectors[(prevRoomGridCoordZ.x * prevRoomZ.ZSize) + prevRoomGridCoordZ.y];
@@ -92,7 +94,7 @@ void RoomData::GenerateCollisionMesh()
 			const auto* nextSectorZ = &Sectors[(x * ZSize) + (z + 1)];
 			if (nextSectorZ->SidePortalRoomNumber != NO_VALUE)
 			{
-				const auto& nextRoomZ = g_Level.Rooms[nextSectorZ->SidePortalRoomNumber];
+				const auto& nextRoomZ = GetRoom(nextSectorZ->SidePortalRoomNumber);
 				auto nextRoomGridCoordZ = GetRoomGridCoord(nextSectorZ->SidePortalRoomNumber, nextSectorZ->Position.x, nextSectorZ->Position.y);
 
 				nextSectorZ = &nextRoomZ.Sectors[(nextRoomGridCoordZ.x * nextRoomZ.ZSize) + nextRoomGridCoordZ.y];
@@ -538,7 +540,7 @@ static void RemoveRoomFlipItems(const RoomData& room)
 			auto& bridge = GetBridgeObject(item);
 			bridge.DeassignSectors(item);
 
-			auto& room = g_Level.Rooms[item.RoomNumber];
+			auto& room = GetRoom(item.RoomNumber);
 			room.Bridges.Remove(item.Index);
 		}
 	}
@@ -555,12 +557,12 @@ void DoFlipMap(int group)
 	// Run through rooms.
 	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
 	{
-		auto& room = g_Level.Rooms[roomNumber];
+		auto& room = GetRoom(roomNumber);
 
 		// Handle flipmap.
 		if (room.flippedRoom >= 0 && room.flipNumber == group)
 		{
-			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
+			auto& flippedRoom = GetRoom(room.flippedRoom);
 
 			RemoveRoomFlipItems(room);
 
@@ -586,7 +588,7 @@ void DoFlipMap(int group)
 			// Regenerate neighbor room collision meshes.
 			for (int neightborRoomNumber : room.NeighborRoomNumbers)
 			{
-				auto& neighborRoom = g_Level.Rooms[neightborRoomNumber];
+				auto& neighborRoom = GetRoom(neightborRoomNumber);
 				neighborRoom.GenerateCollisionMesh();
 			}
 		}
@@ -601,7 +603,7 @@ void DoFlipMap(int group)
 
 bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID)
 {
-	int itemNumber = g_Level.Rooms[roomNumber].itemNumber;
+	int itemNumber = GetRoom(roomNumber).itemNumber;
 	if (itemNumber == NO_VALUE)
 		return false;
 
@@ -634,7 +636,7 @@ int IsRoomOutside(int x, int y, int z)
 	for (int i = 0; i < OutsideRoomTable[xTable][zTable].size(); i++)
 	{
 		int roomNumber = OutsideRoomTable[xTable][zTable][i];
-		const auto& room = g_Level.Rooms[roomNumber];
+		const auto& room = GetRoom(roomNumber);
 
 		if ((x > (room.Position.x + BLOCK(1)) && x < (room.Position.x + (room.XSize - 1) * BLOCK(1))) &&
 			(y > room.TopHeight && y < room.BottomHeight) &&
@@ -679,7 +681,7 @@ GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox)
 
 bool IsPointInRoom(const Vector3i& pos, int roomNumber)
 {
-	const auto& room = g_Level.Rooms[roomNumber];
+	const auto& room = GetRoom(roomNumber);
 
 	if (pos.z >= (room.Position.z + BLOCK(1)) && pos.z <= (room.Position.z + BLOCK(room.ZSize - 1)) &&
 		pos.y <= room.BottomHeight && pos.y > room.TopHeight &&
@@ -695,10 +697,10 @@ int FindRoomNumber(const Vector3i& pos, int startRoomNumber)
 {
 	if (startRoomNumber != NO_VALUE && startRoomNumber < g_Level.Rooms.size())
 	{
-		const auto& room = g_Level.Rooms[startRoomNumber];
+		const auto& room = GetRoom(startRoomNumber);
 		for (int neighborRoomNumber : room.NeighborRoomNumbers)
 		{
-			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+			const auto& neighborRoom = GetRoom(neighborRoomNumber);
 			if (neighborRoomNumber != startRoomNumber && neighborRoom.Active() &&
 				IsPointInRoom(pos, neighborRoomNumber))
 			{
@@ -709,7 +711,7 @@ int FindRoomNumber(const Vector3i& pos, int startRoomNumber)
 
 	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
 	{
-		if (IsPointInRoom(pos, roomNumber) && g_Level.Rooms[roomNumber].Active())
+		if (IsPointInRoom(pos, roomNumber) && GetRoom(roomNumber).Active())
 			return roomNumber;
 	}
 
@@ -718,7 +720,7 @@ int FindRoomNumber(const Vector3i& pos, int startRoomNumber)
 
 Vector3i GetRoomCenter(int roomNumber)
 {
-	const auto& room = g_Level.Rooms[roomNumber];
+	const auto& room = GetRoom(roomNumber);
 
 	int halfLength = BLOCK(room.XSize) / 2;
 	int halfDepth = BLOCK(room.ZSize) / 2;
@@ -747,7 +749,7 @@ static std::set<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchD
 	visitedRoomNumbers.insert(roomNumber);
 
 	// Recursively collect neighbors of current neighbor.
-	const auto& room = g_Level.Rooms[roomNumber];
+	const auto& room = GetRoom(roomNumber);
 	if (room.Portals.empty())
 	{
 		neighborRoomNumbers.insert(roomNumber);
@@ -773,21 +775,21 @@ void InitializeNeighborRoomList()
 
 	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
 	{
-		auto& room = g_Level.Rooms[roomNumber];
+		auto& room = GetRoom(roomNumber);
 		room.NeighborRoomNumbers = GetNeighborRoomNumbers(roomNumber, SEARCH_DEPTH);
 	}
 
 	// Add flipped variations of itself.
 	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
 	{
-		auto& room = g_Level.Rooms[roomNumber];
+		auto& room = GetRoom(roomNumber);
 		if (room.flippedRoom == NO_VALUE)
 			continue;
 
 		if (!Contains(room.NeighborRoomNumbers, room.flippedRoom))
 			room.NeighborRoomNumbers.insert(room.flippedRoom);
 
-		auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
+		auto& flippedRoom = GetRoom(room.flippedRoom);
 		if (!Contains(flippedRoom.NeighborRoomNumbers, roomNumber))
 			flippedRoom.NeighborRoomNumbers.insert(roomNumber);
 	}
@@ -795,6 +797,17 @@ void InitializeNeighborRoomList()
 
 namespace TEN::Collision::Room
 {
+	RoomData& GetRoom(int roomNumber)
+	{
+		if (roomNumber < 0 || roomNumber >= g_Level.Rooms.size())
+		{
+			TENLog("Attempted to get invalid room. Returning room 0.", LogLevel::Warning);
+			return g_Level.Rooms.front();
+		}
+
+		return g_Level.Rooms[roomNumber];
+	}
+
 	// TODO: Can use floordata's GetRoomGridCoord()?
 	FloorInfo* GetSector(RoomData* room, int x, int z)
 	{
