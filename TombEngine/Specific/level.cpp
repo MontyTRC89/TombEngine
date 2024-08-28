@@ -768,16 +768,16 @@ void ReadRooms()
 			room.buckets.push_back(bucket);
 		}
 
-		// TODO: Write proper data to level.
+		// TODO: Write proper float data to level.
 		int portalCount = ReadInt32();
 		for (int j = 0; j < portalCount; j++)
 		{
 			auto portal = RoomPortalData{};
 
 			portal.RoomNumber = ReadInt16();
-			portal.Nomal.x = ReadInt32();
-			portal.Nomal.y = ReadInt32();
-			portal.Nomal.z = ReadInt32();
+			portal.Normal.x = ReadInt32();
+			portal.Normal.y = ReadInt32();
+			portal.Normal.z = ReadInt32();
 
 			for (auto& vertex : portal.Vertices)
 			{
@@ -786,10 +786,20 @@ void ReadRooms()
 				vertex.z = ReadInt32();
 			}
 
+			// HACK: To derive correct normal from collision mesh triangle vertices, they must be in correct clockwise or counter-clockwise order.
+			// Hack differentiates between wall and floor/ceiling portals to account for improperly written level data.
 			auto desc = CollisionMeshDesc();
-			desc.InsertTriangle(portal.Vertices[2], portal.Vertices[1], portal.Vertices[0]);
-			desc.InsertTriangle(portal.Vertices[3], portal.Vertices[2], portal.Vertices[0]);
-
+			bool isWallPortal = (portal.Normal.y != 0.0f);
+			if (isWallPortal)
+			{
+				desc.InsertTriangle(portal.Vertices[0], portal.Vertices[1], portal.Vertices[2]);
+				desc.InsertTriangle(portal.Vertices[0], portal.Vertices[2], portal.Vertices[3]);
+			}
+			else
+			{
+				desc.InsertTriangle(portal.Vertices[2], portal.Vertices[1], portal.Vertices[0]);
+				desc.InsertTriangle(portal.Vertices[3], portal.Vertices[2], portal.Vertices[0]);
+			}
 			portal.CollisionMesh = CollisionMesh(room.Position.ToVector3(), Quaternion::Identity, desc);
 
 			room.Portals.push_back(portal);

@@ -92,7 +92,7 @@ private:
 public:
 	int			  RoomNumber	= 0;
 	CollisionMesh CollisionMesh = {};
-	Vector3		  Nomal			= Vector3::Zero;
+	Vector3		  Normal		= Vector3::Zero;
 
 	std::array<Vector3, VERTEX_COUNT> Vertices = {};
 };

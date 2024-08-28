@@ -234,7 +234,7 @@ namespace TEN::Renderer
 					auto& rendererDoor = rendererRoom.Doors[j];
 
 					rendererDoor.RoomNumber = door.RoomNumber;
-					rendererDoor.Normal = door.Nomal;
+					rendererDoor.Normal = door.Normal;
 
 					for (int k = 0; k < 4; k++)
 					{
