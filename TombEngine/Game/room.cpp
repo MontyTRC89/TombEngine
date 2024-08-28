@@ -11,8 +11,8 @@
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 #include "Physics/Physics.h"
-#include "Specific/trutils.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
@@ -801,7 +801,7 @@ namespace TEN::Collision::Room
 	{
 		if (roomNumber < 0 || roomNumber >= g_Level.Rooms.size())
 		{
-			TENLog("Attempted to get invalid room. Returning room 0.", LogLevel::Warning);
+			TENLog("Attempted to get invalid room " + std::to_string(roomNumber) + ". Returning room 0.", LogLevel::Warning);
 			return g_Level.Rooms.front();
 		}
 
