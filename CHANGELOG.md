@@ -49,6 +49,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added option to enable or disable menu option looping.
 * Menu scrolling using held inputs will stop at the last option until a new input is made.
 * Added the ability to display "Lara's Home" entry in the main menu.
+* Added F12 as alternative to PrtSc for screenshots.
 
 ### Lua API changes
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
