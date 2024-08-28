@@ -323,42 +323,15 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 
 				insertFullWallTriangles(vertex0, vertex1, vertex2, vertex3, surfVerts.Tri0.IsWall);
 			}
-			// TODO: Check second criss-cross case.
 			// Step wall.
 			else if (!(surfVerts.Tri0.IsWall || surfVerts.Tri1.IsWall) && !(isSurfTri0Portal && isSurfTri1Portal))
 			{
-				if (surfVerts.IsSplitAngle0)
-				{
-					bool isSecondCrissCrossCase = isFloor ? (surfVerts.Tri0.Vertex2.y < surfVerts.Tri0.Vertex1.y) : !(surfVerts.Tri0.Vertex2.y < surfVerts.Tri0.Vertex1.y);
-					if (surfVerts.Tri0.Vertex0 != surfVerts.Tri1.Vertex0)
-					{
-						isSecondCrissCrossCase ?
-							(isFloor ? desc.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri0.Vertex2, surfVerts.Tri1.Vertex1) : desc.InsertTriangle(surfVerts.Tri1.Vertex1, surfVerts.Tri0.Vertex2, surfVerts.Tri0.Vertex0)) :
-							(isFloor ? desc.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri1.Vertex0, surfVerts.Tri0.Vertex2) : desc.InsertTriangle(surfVerts.Tri0.Vertex2, surfVerts.Tri1.Vertex0, surfVerts.Tri0.Vertex0));
-					}
-					if (surfVerts.Tri0.Vertex2 != surfVerts.Tri0.Vertex1)
-					{
-						isSecondCrissCrossCase ?
-							(isFloor ? desc.InsertTriangle(surfVerts.Tri1.Vertex1, surfVerts.Tri1.Vertex0, surfVerts.Tri0.Vertex0) : desc.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri1.Vertex0, surfVerts.Tri1.Vertex1)) :
-							(isFloor ? desc.InsertTriangle(surfVerts.Tri1.Vertex1, surfVerts.Tri0.Vertex2, surfVerts.Tri1.Vertex0) : desc.InsertTriangle(surfVerts.Tri1.Vertex0, surfVerts.Tri0.Vertex2, surfVerts.Tri1.Vertex1));
-					}
-				}
-				else
-				{
-					bool isSecondCrissCrossCase = isFloor ? (surfVerts.Tri1.Vertex2.y < surfVerts.Tri0.Vertex2.y) : !(surfVerts.Tri1.Vertex2.y < surfVerts.Tri0.Vertex2.y);
-					if (surfVerts.Tri0.Vertex0 != surfVerts.Tri1.Vertex1)
-					{
-						isSecondCrissCrossCase ?
-							(isFloor ? desc.InsertTriangle(surfVerts.Tri1.Vertex1, surfVerts.Tri1.Vertex2, surfVerts.Tri0.Vertex2) : desc.InsertTriangle(surfVerts.Tri0.Vertex2, surfVerts.Tri1.Vertex2, surfVerts.Tri1.Vertex1)) :
-							(isFloor ? desc.InsertTriangle(surfVerts.Tri1.Vertex2, surfVerts.Tri0.Vertex0, surfVerts.Tri1.Vertex1) : desc.InsertTriangle(surfVerts.Tri1.Vertex1, surfVerts.Tri0.Vertex0, surfVerts.Tri1.Vertex2));
-					}
-					if (surfVerts.Tri0.Vertex2 != surfVerts.Tri1.Vertex2)
-					{
-						isSecondCrissCrossCase ?
-							(!isFloor ? desc.InsertTriangle(surfVerts.Tri1.Vertex1, surfVerts.Tri0.Vertex0, surfVerts.Tri0.Vertex2) : desc.InsertTriangle(surfVerts.Tri0.Vertex2, surfVerts.Tri0.Vertex0, surfVerts.Tri1.Vertex1)):
-							(!isFloor ? desc.InsertTriangle(surfVerts.Tri0.Vertex2, surfVerts.Tri1.Vertex2, surfVerts.Tri0.Vertex0) : desc.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri1.Vertex2, surfVerts.Tri0.Vertex2));
-					}
-				}
+				const auto& vertex0 = surfVerts.IsSplitAngle0 ? surfVerts.Tri1.Vertex0 : surfVerts.Tri1.Vertex1;
+				const auto& vertex1 = surfVerts.IsSplitAngle0 ? surfVerts.Tri1.Vertex1 : surfVerts.Tri1.Vertex2;
+				const auto& vertex2 = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.Vertex2 : surfVerts.Tri0.Vertex2;
+				const auto& vertex3 = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.Vertex0 : surfVerts.Tri0.Vertex0;
+
+				insertStepWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3, isFloor);
 			}
 		}
 
