@@ -362,12 +362,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
-    <ClInclude Include="Game\Lara\lara_climb.h" />
     <ClInclude Include="Game\Lara\lara_collide.h" />
     <ClInclude Include="Game\Lara\lara_crawl.h" />
     <ClInclude Include="Game\Lara\lara_fire.h" />
     <ClInclude Include="Game\Lara\lara_flare.h" />
-    <ClInclude Include="Game\Lara\lara_hang.h" />
     <ClInclude Include="Game\Lara\lara_helpers.h" />
     <ClInclude Include="Game\Lara\lara_initialise.h" />
     <ClInclude Include="Game\Lara\lara_jump.h" />
@@ -418,8 +416,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\itemdata\itemdata.h" />
     <ClInclude Include="Game\items.h" />
-    <ClInclude Include="Game\Lara\PlayerContext.h" />
-    <ClInclude Include="Game\Lara\PlayerContextData.h" />
     <ClInclude Include="Game\Lara\PlayerStateMachine.h" />
     <ClInclude Include="Game\Lara\States\EdgeHang.h" />
     <ClInclude Include="Game\Lara\States\WallClimb.h" />
@@ -924,12 +920,10 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\lara.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />
-    <ClCompile Include="Game\Lara\lara_climb.cpp" />
     <ClCompile Include="Game\Lara\lara_collide.cpp" />
     <ClCompile Include="Game\Lara\lara_crawl.cpp" />
     <ClCompile Include="Game\Lara\lara_fire.cpp" />
     <ClCompile Include="Game\Lara\lara_flare.cpp" />
-    <ClCompile Include="Game\Lara\lara_hang.cpp" />
     <ClCompile Include="Game\Lara\lara_helpers.cpp" />
     <ClCompile Include="Game\Lara\lara_initialise.cpp" />
     <ClCompile Include="Game\Lara\lara_jump.cpp" />
@@ -942,7 +936,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\lara_swim.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\Lara\lara_two_guns.cpp" />
-    <ClCompile Include="Game\Lara\PlayerContext.cpp" />
     <ClCompile Include="Game\Lara\PlayerStateMachine.cpp" />
     <ClCompile Include="Game\Lara\States\EdgeHang.cpp" />
     <ClCompile Include="Game\Lara\States\WallClimb.cpp" />

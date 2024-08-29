@@ -4,7 +4,7 @@
 
 using namespace TEN::Collision::Point;
 
-namespace TEN::Collision::Attractor { class AttractorCollisionData; };
+namespace TEN::Collision::Attractor { struct AttractorCollisionData; };
 class FloorInfo;
 struct CollisionInfo;
 struct CollisionResult;

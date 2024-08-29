@@ -1,6 +1,5 @@
 #pragma once
 
-struct CollisionResult;
 struct ItemInfo;
 
 namespace TEN::Collision::Attractor

@@ -38,7 +38,7 @@ namespace TEN::Player
 		Detach(playerItem);
 
 		Attractor = &attrac;
-		ChainDistance = chainDist;
+		PathDistance = chainDist;
 		RelPosOffset = relPosOffset;
 		RelOrientOffset = relOrientOffset;
 		RelDeltaPos = relDeltaPos;

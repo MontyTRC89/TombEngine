@@ -66,7 +66,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (coll->LastBridgeItemNumber != NO_VALUE)
 		bridgeItemNumber = coll->LastBridgeItemNumber;
 
-	if (bridgeItemNumber != NO_VALUE)
+	if (false)
+	//if (bridgeItemNumber != NO_VALUE)
 	{
 		constexpr auto TRANSLATE_STEP = BLOCK(0.1f);
 

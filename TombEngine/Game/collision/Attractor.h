@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/collision/AttractorDebug.h"
 #include "Math/Math.h"
 
@@ -9,6 +10,8 @@ struct ItemInfo;
 
 namespace TEN::Collision::Attractor
 {
+	class AttractorObject;
+
 	enum class AttractorType
 	{
 		Edge,
@@ -21,25 +24,47 @@ namespace TEN::Collision::Attractor
 		Pinnacle*/
 	};
 
+	struct AttractorCollisionData
+	{
+		AttractorObject* Attractor = nullptr;
+
+		Vector3		 Intersection = Vector3::Zero;
+		float		 Distance2D	  = 0.0f;
+		float		 Distance3D	  = 0.0f;
+		float		 PathDistance = 0.0f;
+		unsigned int SegmentID	  = 0;
+
+		short HeadingAngle = 0;
+		short SlopeAngle   = 0;
+		bool  IsInFront	   = false;
+	};
+
 	class AttractorObject
 	{
 	private:
+		struct Path
+		{
+			std::vector<Vector3> Points			= {};
+			std::vector<float>	 SegmentLengths = {};
+			float				 Length			= 0.0f;
+		};
+
 		// Members
 
-		AttractorType		 _type			 = AttractorType::Edge;
-		std::vector<Vector3> _points		 = {};
-		int					 _roomNumber	 = 0;
-		std::vector<float>	 _segmentLengths = {};
-		float				 _length		 = 0.0f;
-		BoundingBox			 _aabb			 = BoundingBox();
+		AttractorType _type		   = AttractorType::Edge;
+		Vector3		  _position	   = Vector3::Zero;
+		Quaternion	  _orientation = Quaternion::Identity;
+		int			  _roomNumber  = 0;
+		Path		  _path		   = {};
+		BoundingBox	  _aabb		   = BoundingBox();
 
-		std::set<int> _attachedPlayerItemNumbers = {};
+		std::set<int> _playerItemNumbers = {};
 
 	public:
 		// Constructors
 
-		AttractorObject();
-		AttractorObject(AttractorType type, const std::vector<Vector3>& points, int roomNumber);
+		AttractorObject() { _path.Points.push_back(Vector3::Zero); }; // TEMP
+		AttractorObject(AttractorType type, const Vector3& pos, const Quaternion& orient, int roomNumber, const std::vector<Vector3>& points);
 
 		// Destructors
 
@@ -47,24 +72,32 @@ namespace TEN::Collision::Attractor
 
 		// Getters
 
-		AttractorType				GetType() const;
-		const std::vector<Vector3>& GetPoints() const;
-		int							GetRoomNumber() const;
-		const std::vector<float>&	GetSegmentLengths() const;
-		float						GetLength() const;
-		const BoundingBox&			GetAabb() const;
+		AttractorType GetType() const;
+		int			  GetRoomNumber() const;
+		float		  GetLength() const;
+
+		// TEMP
+		const BoundingBox&	GetLocalAabb() const;
+		BoundingOrientedBox GetWorldObb() const;
+
+		unsigned int GetSegmentCount() const;
+		unsigned int GetSegmentIDAtPathDistance(float pathDist) const;
+		Vector3		 GetIntersectionAtPathDistance(float pathDist) const;
+
+		std::optional<AttractorCollisionData> GetCollision(const BoundingSphere& sphere, short headingAngle, unsigned int segmentID, const Vector3& axis = Vector3::UnitY);
+		AttractorCollisionData				  GetCollision(float pathDist, short headingAngle, const Vector3& axis = Vector3::UnitY);
+
+		// Setters
+		
+		void SetPosition(const Vector3& pos);
+		void SetOrientation(const Quaternion& orient);
 
 		// Inquirers
 
-		bool IsLooped() const;
+		bool IsLoop() const;
 
 		// Utilities
 
-		unsigned int GetSegmentCount() const;
-		unsigned int GetSegmentIDAtChainDistance(float chainDist) const;
-		Vector3		 GetIntersectionAtChainDistance(float chainDist) const;
-
-		void Update(const std::vector<Vector3>& points, int roomNumber);
 		void AttachPlayer(ItemInfo& playerItem);
 		void DetachPlayer(ItemInfo& playerItem);
 		void DetachAllPlayers();
@@ -75,39 +108,11 @@ namespace TEN::Collision::Attractor
 	private:
 		// Helpers
 
-		float NormalizeChainDistance(float chainDist) const;
-		void  Cache();
-	};
-
-	class AttractorCollisionData
-	{
-	public:
-		// Members
-
-		AttractorObject* Attractor = nullptr;
-
-		unsigned int SegmentID	   = 0;
-		Vector3		 Intersection  = Vector3::Zero;
-		float		 Distance2D	   = 0.0f;
-		float		 Distance3D	   = 0.0f;
-		float		 ChainDistance = 0.0f;
-
-		short HeadingAngle = 0;
-		short SlopeAngle   = 0;
-		bool  IsInFront	   = false;
-
-		// Constructors
-
-		AttractorCollisionData() = default;
-		AttractorCollisionData(AttractorObject& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle, const Vector3& axis);
+		float  NormalizePathDistance(float pathDist) const;
+		Matrix GetTransformMatrix() const;
 	};
 
 	// Getters
-
-	AttractorCollisionData GetAttractorCollision(AttractorObject& attrac, unsigned int segmentID, const Vector3& pos, short headingAngle,
-												 const Vector3& axis = Vector3::UnitY);
-	AttractorCollisionData GetAttractorCollision(AttractorObject& attrac, float chainDist, short headingAngle,
-												 const Vector3& axis = Vector3::UnitY);
 
 	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float radius,
 															   const Vector3& axis = Vector3::UnitY);

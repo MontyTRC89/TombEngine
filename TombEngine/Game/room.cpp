@@ -31,14 +31,14 @@ bool AttractorHandler::BvhNode::IsLeaf() const
 	return (LeftChildID == NO_VALUE && RightChildID == NO_VALUE);
 }
 
-AttractorHandler::Bvh::Bvh(const std::vector<AttractorObject>& attracs)
+AttractorHandler::Bvh::Bvh(const Vector3& pos, const std::vector<AttractorObject>& attracs)
 {
 	auto attracIds = std::vector<int>{};
 	attracIds.reserve(attracs.size());
 	for (int i = 0; i < attracs.size(); ++i)
 		attracIds.push_back(i);
 
-	Generate(attracs, attracIds, 0, (int)attracs.size());
+	Generate(pos, attracs, attracIds, 0, (int)attracs.size());
 }
 
 std::vector<AttractorObject*> AttractorHandler::Bvh::GetBoundedAttractors(const BoundingSphere& sphere, std::vector<AttractorObject>& attracs)
@@ -47,7 +47,7 @@ std::vector<AttractorObject*> AttractorHandler::Bvh::GetBoundedAttractors(const 
 		return {};
 
 	auto boundedAttracs = std::vector<AttractorObject*>{};
-
+	
 	std::function<void(int)> traverseBvh = [&](int nodeID)
 	{
 		// Invalid node; return early.
@@ -65,7 +65,7 @@ std::vector<AttractorObject*> AttractorHandler::Bvh::GetBoundedAttractors(const 
 		{
 			for (int attracID : node.AttractorIds)
 			{
-				if (attracs[attracID].GetAabb().Intersects(sphere))
+				if (attracs[attracID].GetWorldObb().Intersects(sphere))
 					boundedAttracs.push_back(&attracs[attracID]);
 			}
 		}
@@ -81,7 +81,7 @@ std::vector<AttractorObject*> AttractorHandler::Bvh::GetBoundedAttractors(const 
 	return boundedAttracs;
 }
 
-int AttractorHandler::Bvh::Generate(const std::vector<AttractorObject>& attracs, const std::vector<int>& attracIds, int start, int end)
+int AttractorHandler::Bvh::Generate(const Vector3& pos, const std::vector<AttractorObject>& attracs, const std::vector<int>& attracIds, int start, int end)
 {
 	constexpr auto ATTRAC_COUNT_PER_LEAF_MAX = 4;
 
@@ -92,9 +92,12 @@ int AttractorHandler::Bvh::Generate(const std::vector<AttractorObject>& attracs,
 	auto node = BvhNode{};
 
 	// Combine boxes.
-	node.Box = attracs[attracIds[start]].GetAabb();
+	node.Box = attracs[attracIds[start]].GetLocalAabb();
 	for (int i = (start + 1); i < end; i++)
-		node.Box = Geometry::CombineBoundingBoxes(node.Box, attracs[attracIds[i]].GetAabb());
+	{
+		node.Box = Geometry::CombineBoundingBoxes(node.Box, attracs[attracIds[i]].GetLocalAabb());
+		*(Vector3*)&node.Box.Center += pos;
+	}
 
 	// Leaf node.
 	if ((end - start) <= ATTRAC_COUNT_PER_LEAF_MAX)
@@ -107,16 +110,17 @@ int AttractorHandler::Bvh::Generate(const std::vector<AttractorObject>& attracs,
 	else
 	{
 		int mid = (start + end) / 2;
-		node.LeftChildID = Generate(attracs, attracIds, start, mid);
-		node.RightChildID = Generate(attracs, attracIds, mid, end);
+		node.LeftChildID = Generate(pos, attracs, attracIds, start, mid);
+		node.RightChildID = Generate(pos, attracs, attracIds, mid, end);
 		Nodes.push_back(node);
 		return int(Nodes.size() - 1);
 	}
 }
 
-AttractorHandler::AttractorHandler(std::vector<AttractorObject>& attracs)
+AttractorHandler::AttractorHandler(const Vector3& pos, std::vector<AttractorObject>& attracs)
 {
 	_attractors = attracs;
+	GenerateBvh(pos);
 }
 
 std::vector<AttractorObject>& AttractorHandler::GetAttractors()
@@ -134,9 +138,9 @@ void AttractorHandler::InsertAttractor(const AttractorObject& attrac)
 	_attractors.push_back(attrac);
 }
 
-void AttractorHandler::GenerateBvh()
+void AttractorHandler::GenerateBvh(const Vector3& pos)
 {
-	_bvh = Bvh(_attractors);
+	_bvh = Bvh(pos, _attractors);
 }
 
 bool ROOM_INFO::Active() const

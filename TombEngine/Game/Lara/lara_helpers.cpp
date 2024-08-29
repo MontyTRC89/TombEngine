@@ -285,11 +285,11 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 	}
 }
 
-static AttractorParentTargetData GetAttractorParentTarget(AttractorObject& attrac, float chainDist, short headingAngle,
+static AttractorParentTargetData GetAttractorParentTarget(AttractorObject& attrac, float pathDist, short headingAngle,
 														  const Vector3& relPosOffset, const EulerAngles& relOrientOffset)
 {
 	// Get attractor collision.
-	auto attracColl = GetAttractorCollision(attrac, chainDist, headingAngle);
+	auto attracColl = attrac.GetCollision(pathDist, headingAngle);
 
 	// Calculate target.
 	auto orient = EulerAngles(0, attracColl.HeadingAngle, 0) + relOrientOffset;
@@ -312,7 +312,7 @@ void HandlePlayerAttractorParent(ItemInfo& item)
 
 	// Get parent target.
 	auto target = GetAttractorParentTarget(
-		*player.Context.Attractor.Attractor, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y,
+		*player.Context.Attractor.Attractor, player.Context.Attractor.PathDistance, item.Pose.Orientation.y,
 		player.Context.Attractor.RelPosOffset, player.Context.Attractor.RelOrientOffset);
 
 	// Update player position.
@@ -1596,13 +1596,13 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 		// No attractor; break.
 		if (climbContext.Attractor == nullptr)
 		{
-			TENLog("SetPlayerClimb() attempted to reference missing attractor for offset blend.", LogLevel::Warning);
+			TENLog("SetPlayerClimb(): Attempted to reference missing attractor for offset blend.", LogLevel::Warning);
 			break;
 		}
 
 		// Get parent target.
 		auto target = GetAttractorParentTarget(
-			*climbContext.Attractor, climbContext.ChainDistance, item.Pose.Orientation.y,
+			*climbContext.Attractor, climbContext.PathDistance, item.Pose.Orientation.y,
 			climbContext.RelPosOffset, climbContext.RelOrientOffset);
 
 		// Calculate offsets.
@@ -1625,7 +1625,7 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 		// Get parent target.
 		auto target = GetAttractorParentTarget(
-			*climbContext.Attractor, climbContext.ChainDistance, item.Pose.Orientation.y,
+			*climbContext.Attractor, climbContext.PathDistance, item.Pose.Orientation.y,
 			climbContext.RelPosOffset, climbContext.RelOrientOffset);
 
 		// Calculate relative delta position and orientation.
@@ -1634,7 +1634,7 @@ void SetPlayerClimb(ItemInfo& item, const ClimbContextData& climbContext)
 
 		// Attach player to attractor.
 		player.Context.Attractor.Attach(
-			item, *climbContext.Attractor, climbContext.ChainDistance,
+			item, *climbContext.Attractor, climbContext.PathDistance,
 			climbContext.RelPosOffset, climbContext.RelOrientOffset,
 			relDeltaPos, relDeltaOrient);
 	}

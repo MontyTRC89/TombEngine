@@ -19,13 +19,13 @@ namespace TEN::Entities::Generic
 	void BridgeObject::Initialize(const ItemInfo& item)
 	{
 		auto points = GetAttractorPoints(item);
-		_attractor = AttractorObject(AttractorType::Edge, points, item.RoomNumber);
+		_attractor = AttractorObject(AttractorType::Edge, item.Pose.Position.ToVector3(), item.Pose.Orientation.ToQuaternion(), item.RoomNumber, points);
 	}
 
 	void BridgeObject::Update(const ItemInfo& item)
 	{
-		auto points = GetAttractorPoints(item);
-		_attractor.Update(points, item.RoomNumber);
+		_attractor.SetPosition(item.Pose.Position.ToVector3());
+		_attractor.SetOrientation(item.Pose.Orientation.ToQuaternion());
 	}
 
 	std::vector<Vector3> BridgeObject::GetAttractorPoints(const ItemInfo& item) const
@@ -33,7 +33,7 @@ namespace TEN::Entities::Generic
 		constexpr auto TILT_STEP = CLICK(1);
 
 		// Determine tilt offset.
-		int tiltOffset = 0;
+		auto offset = Vector3::Zero;
 		switch (item.ObjectNumber)
 		{
 		default:
@@ -41,30 +41,29 @@ namespace TEN::Entities::Generic
 			break;
 
 		case ID_BRIDGE_TILT1:
-			tiltOffset = TILT_STEP;
+			offset = Vector3(0.0f, TILT_STEP, 0.0f);
 			break;
 
 		case ID_BRIDGE_TILT2:
-			tiltOffset = TILT_STEP * 2;
+			offset = Vector3(0.0f, TILT_STEP * 2, 0.0f);
 			break;
 
 		case ID_BRIDGE_TILT3:
-			tiltOffset = TILT_STEP * 3;
+			offset = Vector3(0.0f, TILT_STEP * 3, 0.0f);
 			break;
 
 		case ID_BRIDGE_TILT4:
-			tiltOffset = TILT_STEP * 4;
+			offset = Vector3(0.0f, TILT_STEP * 4, 0.0f);
 			break;
 		}
 
-		// Get corners.
-		auto corners = std::array<Vector3, BoundingOrientedBox::CORNER_COUNT>{};
-		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-		box.GetCorners(corners.data());
-
-		// NOTE: Traces only top plane.
-		// Collect and return relevant points.
-		auto offset = Vector3(0.0f, tiltOffset, 0.0f);
+		// Get AABB corners.
+		auto bounds = GameBoundingBox(&item);
+		auto aabb = BoundingBox(bounds.GetCenter(), bounds.GetExtents());
+		auto corners = std::array<Vector3, BoundingBox::CORNER_COUNT>{};
+		aabb.GetCorners(corners.data());
+		
+		// Collect and return attractor points. NOTE: Traces only top plane of bridge.
 		return std::vector<Vector3>
 		{
 			corners[0],

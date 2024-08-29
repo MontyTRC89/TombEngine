@@ -107,7 +107,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_STAND_EDGE_HANG_DESCENT_FRONT;
@@ -145,7 +145,7 @@ namespace TEN::Player
 
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = targetStateID;
@@ -179,7 +179,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_CRAWL_EDGE_HANG_DESCENT_FRONT;
@@ -213,7 +213,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_CRAWL_EDGE_HANG_DESCENT_BACK;

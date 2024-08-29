@@ -333,7 +333,7 @@ const std::vector<byte> SaveGame::Build()
 				const auto& attrac = room.Attractors.GetAttractors()[j];
 				if (&attrac == Lara.Context.Attractor.Attractor)
 				{
-					roomNumber = room.index;
+					roomNumber = room.RoomNumber;
 					roomAttracID = j;
 					hasRoomAttrac = true;
 					break;
@@ -361,7 +361,7 @@ const std::vector<byte> SaveGame::Build()
 
 	Save::PlayerAttractorDataBuilder playerAttractorData{ fbb };
 	playerAttractorData.add_bridge_item_number(bridgeItemNumber);
-	playerAttractorData.add_chain_distance(Lara.Context.Attractor.ChainDistance);
+	playerAttractorData.add_chain_distance(Lara.Context.Attractor.PathDistance);
 	playerAttractorData.add_rel_delta_orient(&FromEulerAngles(Lara.Context.Attractor.RelDeltaOrient));
 	playerAttractorData.add_rel_delta_pos(&FromVector3(Lara.Context.Attractor.RelDeltaPos));
 	playerAttractorData.add_rel_orient_offset(&FromEulerAngles(Lara.Context.Attractor.RelOrientOffset));
@@ -1889,7 +1889,7 @@ static void ParsePlayer(const Save::SaveGame* s)
 		}
 	}
 
-	Lara.Context.Attractor.ChainDistance = s->lara()->context()->attractor()->chain_distance();
+	Lara.Context.Attractor.PathDistance = s->lara()->context()->attractor()->chain_distance();
 	Lara.Context.Attractor.Attractor = attrac;
 	Lara.Context.Attractor.RelDeltaOrient = ToEulerAngles(s->lara()->context()->attractor()->rel_delta_orient());
 	Lara.Context.Attractor.RelDeltaPos = ToVector3(s->lara()->context()->attractor()->rel_delta_pos());

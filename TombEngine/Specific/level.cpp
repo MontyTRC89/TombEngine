@@ -682,7 +682,7 @@ void ReadRooms()
 	TENLog("Rooms: " + std::to_string(roomCount), LogLevel::Info);
 
 	g_Level.Rooms.reserve(roomCount);
-	for (int i = 0; i < roomCount; i++)
+	for (int roomNumber = 0; roomNumber < roomCount; roomNumber++)
 	{
 		auto& room = g_Level.Rooms.emplace_back();
 		
@@ -780,7 +780,7 @@ void ReadRooms()
 				auto sector = FloorInfo{};
 
 				sector.Position = roomPos + Vector2i(BLOCK(x), BLOCK(z));
-				sector.RoomNumber = i;
+				sector.RoomNumber = roomNumber;
 
 				sector.TriggerIndex = ReadInt32();
 				sector.PathfindingBoxID = ReadInt32();
@@ -860,7 +860,7 @@ void ReadRooms()
 		{
 			auto& mesh = room.mesh.emplace_back();
 
-			mesh.roomNumber = i;
+			mesh.roomNumber = roomNumber;
 			mesh.pos.Position.x = ReadInt32();
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
@@ -916,13 +916,13 @@ void ReadRooms()
 			points.reserve(pointCount);
 			for (int k = 0; k < pointCount; k++)
 			{
-				auto point = ReadVector3();
+				auto point = ReadVector3() - room.Position.ToVector3(); // TODO: Write local points to level.
 				points.push_back(point);
 			}
 
-			attracs.push_back(AttractorObject(type, points, i));
+			attracs.push_back(AttractorObject(type, room.Position.ToVector3(), Quaternion::Identity, roomNumber, points));
 		}
-		room.Attractors = AttractorHandler(attracs);
+		room.Attractors = AttractorHandler(room.Position.ToVector3(), attracs);
 
 		room.flippedRoom = ReadInt32();
 		room.flags = ReadInt32();
@@ -932,7 +932,7 @@ void ReadRooms()
 
 		room.itemNumber = NO_VALUE;
 		room.fxNumber = NO_VALUE;
-		room.RoomNumber = i;
+		room.RoomNumber = roomNumber;
 
 		g_GameScriptEntities->AddName(room.Name, room);
 	}

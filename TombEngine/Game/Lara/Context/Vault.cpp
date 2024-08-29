@@ -225,7 +225,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP;
@@ -260,7 +260,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP;
@@ -295,7 +295,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_1_STEP_UP_TO_CROUCH;
@@ -330,7 +330,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_2_STEPS_UP_TO_CROUCH;
@@ -365,7 +365,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_STAND_VAULT_3_STEPS_UP_TO_CROUCH;
@@ -406,7 +406,7 @@ namespace TEN::Player
 
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, -relEdgeHeight, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_AUTO_JUMP;
@@ -431,7 +431,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = nullptr;
-			context.ChainDistance = 0.0f;
+			context.PathDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, -relCeilHeight, 0.0f);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_AUTO_JUMP;
@@ -541,7 +541,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_WALL_CLIMB_IDLE;
@@ -649,7 +649,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN;
@@ -689,7 +689,7 @@ namespace TEN::Player
 			context.Attractor = attracColl->Attractor;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_DOWN_TO_STAND;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.IsJump = false;
@@ -723,7 +723,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_CRAWL_VAULT_1_STEP_UP;
@@ -759,7 +759,7 @@ namespace TEN::Player
 			context.Attractor = attracColl->Attractor;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(180.0f), 0);
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.TargetStateID = IsHeld(In::Walk) ? LS_CRAWL_VAULT_JUMP_FLIP : LS_CRAWL_VAULT_JUMP;
 			context.AlignType = ClimbContextAlignType::OffsetBlend;
 			context.IsJump = false;
@@ -787,7 +787,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = nullptr;
-			context.ChainDistance = 0.0f;
+			context.PathDistance = 0.0f;
 			context.RelPosOffset = Vector3::Zero;
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_CRAWL_VAULT_JUMP;
@@ -879,7 +879,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_STAND;
@@ -917,7 +917,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_STAND;
@@ -956,7 +956,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_STAND;
@@ -995,7 +995,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_DOWN_TO_CROUCH;
@@ -1033,7 +1033,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_0_STEPS_TO_CROUCH;
@@ -1072,7 +1072,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_TREAD_WATER_VAULT_1_STEP_UP_TO_CROUCH;
@@ -1100,7 +1100,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = nullptr;
-			context.ChainDistance = 0.0f;
+			context.PathDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, 0.0f, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_WALL_CLIMB_IDLE;

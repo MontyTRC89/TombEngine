@@ -407,7 +407,7 @@ namespace TEN::Player
 
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = targetStateID;
@@ -456,7 +456,7 @@ namespace TEN::Player
 			// Get monkey swing catch climb context.
 			auto context = ClimbContextData{};
 			context.Attractor = nullptr;
-			context.ChainDistance = 0.0f;
+			context.PathDistance = 0.0f;
 			context.RelPosOffset = Vector3(0.0f, item.Pose.Position.y - (pointColl.GetCeilingHeight() + LARA_HEIGHT_MONKEY), 0.0f);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_MONKEY_IDLE;

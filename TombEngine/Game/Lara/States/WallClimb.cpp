@@ -30,7 +30,7 @@ namespace TEN::Player
 		if (item->Animation.AnimNumber != LA_STAND_TO_WALL_CLIMB)
 		{
 			player.Context.Attractor.Update(
-				*item, *player.Context.Attractor.Attractor, player.Context.Attractor.ChainDistance,
+				*item, *player.Context.Attractor.Attractor, player.Context.Attractor.PathDistance,
 				Vector3(0.0f, coll->Setup.Height, -coll->Setup.Radius), EulerAngles::Identity);
 		}
 

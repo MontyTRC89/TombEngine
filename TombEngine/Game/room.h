@@ -108,36 +108,44 @@ private:
 	{
 	public:
 		// Members
+
 		std::vector<BvhNode> Nodes = {};
 
 		// Constructors
+
 		Bvh() = default;
-		Bvh(const std::vector<AttractorObject>& attracs);
+		Bvh(const Vector3& pos, const std::vector<AttractorObject>& attracs);
 
 		// Utilities
+
 		std::vector<AttractorObject*> GetBoundedAttractors(const BoundingSphere& sphere, std::vector<AttractorObject>& attracs);
 
 	private:
 		// Helpers
-		int Generate(const std::vector<AttractorObject>& attracs, const std::vector<int>& attracIds, int start, int end);
+
+		int Generate(const Vector3& pos, const std::vector<AttractorObject>& attracs, const std::vector<int>& attracIds, int start, int end);
 	};
 
 	// Members
+
 	std::vector<AttractorObject> _attractors = {};
 	Bvh							 _bvh		 = Bvh();
 
 public:
 	// Constructors
+
 	AttractorHandler() = default;
-	AttractorHandler(std::vector<AttractorObject>& attracs);
+	AttractorHandler(const Vector3& pos, std::vector<AttractorObject>& attracs);
 
 	// Getters
+
 	std::vector<AttractorObject>& GetAttractors();
 	std::vector<AttractorObject*> GetBoundedAttractors(const BoundingSphere& sphere);
 
 	// Utilities
+
 	void InsertAttractor(const AttractorObject& attrac);
-	void GenerateBvh();
+	void GenerateBvh(const Vector3& pos);
 };
 
 struct ROOM_INFO
@@ -166,8 +174,6 @@ struct ROOM_INFO
 
 	AttractorHandler		   Attractors	  = {};
 	std::vector<FloorInfo>	   Sectors		  = {};
-	std::vector<ROOM_LIGHT>	   lights		  = {};
-	std::vector<MESH_INFO>	   mesh			  = {}; // Statics
 	std::vector<TriggerVolume> TriggerVolumes = {};
 
 	std::vector<MESH_INFO>	mesh	  = {};

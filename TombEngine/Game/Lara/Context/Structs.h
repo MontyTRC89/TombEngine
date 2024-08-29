@@ -95,7 +95,7 @@ namespace TEN::Player
 	struct ClimbContextData
 	{
 		AttractorObject* Attractor		 = nullptr;
-		float			 ChainDistance	 = 0.0f;
+		float			 PathDistance	 = 0.0f;
 		Vector3			 RelPosOffset	 = Vector3::Zero;
 		EulerAngles		 RelOrientOffset = EulerAngles::Identity;
 		int				 TargetStateID	 = 0;

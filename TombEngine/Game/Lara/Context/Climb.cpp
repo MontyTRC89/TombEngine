@@ -70,7 +70,7 @@ namespace TEN::Player
 			return false;
 
 		// Get attractor collision.
-		auto attracColl = GetAttractorCollision(*player.Context.Attractor.Attractor, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
+		auto attracColl = player.Context.Attractor.Attractor->GetCollision(player.Context.Attractor.PathDistance, item.Pose.Orientation.y);
 
 		// TODO: Probe from player.
 		// Get point collision in front of edge. NOTE: Height offset required for correct bridge collision.
@@ -178,12 +178,12 @@ namespace TEN::Player
 		float dist = 8.0f;// GetAnimVelocity(anim, item.Animation.FrameNumber).z;
 
 		// Calculate projected chain distances along attractor.
-		float chainDistCenter = handAttrac.ChainDistance + (dist * sign);
+		float chainDistCenter = handAttrac.PathDistance + (dist * sign);
 		float chainDistLeft = chainDistCenter - coll.Setup.Radius;
 		float chainDistRight = chainDistCenter + coll.Setup.Radius;
 
 		// Get attractor collisions.
-		auto attracCollCenter = GetAttractorCollision(*handAttrac.Attractor, chainDistCenter, item.Pose.Orientation.y);
+		auto attracCollCenter = handAttrac.Attractor->GetCollision(chainDistCenter, item.Pose.Orientation.y);
 		return attracCollCenter;
 		auto attracCollSide = std::optional<AttractorCollisionData>{};
 
@@ -191,11 +191,11 @@ namespace TEN::Player
 
 		// TODO: Check "current" side dist and "next" side dist. Otherwise all segments will be required to be at least 50 units long.
 		// Get current side attractor collision.
-		if (handAttrac.Attractor->IsLooped() ||
+		if (handAttrac.Attractor->IsLoop() ||
 			((!isGoingRight && chainDistLeft > 0.0f && chainDistRight) || (isGoingRight && chainDistRight < handAttrac.Attractor->GetLength())))
 		{
 			float chainDist = isGoingRight ? chainDistRight : chainDistLeft;
-			attracCollsSide.push_back(GetAttractorCollision(*handAttrac.Attractor, chainDist, attracCollCenter.HeadingAngle));
+			attracCollsSide.push_back(handAttrac.Attractor->GetCollision(chainDist, attracCollCenter.HeadingAngle));
 
 			// ???
 			// Test for corner.
@@ -253,11 +253,11 @@ namespace TEN::Player
 		const auto& handAttrac = player.Context.Attractor;
 
 		// Calculate projected chain distances along attractor.
-		float chainDistLeft = handAttrac.ChainDistance - (coll.Setup.Radius * 2);
-		float chainDistRight = handAttrac.ChainDistance + (coll.Setup.Radius * 2);
+		float chainDistLeft = handAttrac.PathDistance - (coll.Setup.Radius * 2);
+		float chainDistRight = handAttrac.PathDistance + (coll.Setup.Radius * 2);
 
 		// Get center attractor collision.
-		auto attracCollCenter = GetAttractorCollision(*handAttrac.Attractor, handAttrac.ChainDistance, item.Pose.Orientation.y);
+		auto attracCollCenter = handAttrac.Attractor->GetCollision(handAttrac.PathDistance, item.Pose.Orientation.y);
 
 		// Get connecting attractor collisions.
 		int sign = isGoingRight ? 1 : -1;
@@ -268,17 +268,17 @@ namespace TEN::Player
 		auto cornerAttracColls = std::vector<AttractorCollisionData>{};
 
 		// 1) Collect corner attractor collision for hands attractor.
-		if (handAttrac.Attractor->IsLooped() ||
+		if (handAttrac.Attractor->IsLoop() ||
 			((!isGoingRight && chainDistLeft > 0.0f && chainDistRight) || (isGoingRight && chainDistRight < handAttrac.Attractor->GetLength())))
 		{
 			float chainDist = isGoingRight ? chainDistRight : chainDistLeft;
-			cornerAttracColls.push_back(GetAttractorCollision(*handAttrac.Attractor, chainDist, attracCollCenter.HeadingAngle));
+			cornerAttracColls.push_back(handAttrac.Attractor->GetCollision(chainDist, attracCollCenter.HeadingAngle));
 		}
 
 		// 2) Collect corner attractor collisions for connecting attractors.
 		for (const auto& attracColl : connectingAttracColls)
 		{
-			auto cornerAttracColl = GetAttractorCollision(*attracColl.Attractor, attracColl.ChainDistance + (coll.Setup.Radius * sign), attracColl.HeadingAngle);
+			auto cornerAttracColl = attracColl.Attractor->GetCollision(attracColl.PathDistance + (coll.Setup.Radius * sign), attracColl.HeadingAngle);
 			cornerAttracColls.push_back(cornerAttracColl);
 		}
 
@@ -320,7 +320,7 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 
 		// Get attractor collisions.
-		auto currentAttracColl = GetAttractorCollision(*player.Context.Attractor.Attractor, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
+		auto currentAttracColl = player.Context.Attractor.Attractor->GetCollision(player.Context.Attractor.PathDistance, item.Pose.Orientation.y);
 		auto attracColls = GetAttractorCollisions(
 			currentAttracColl.Intersection, currentAttracColl.Attractor->GetRoomNumber(), currentAttracColl.HeadingAngle,
 			ATTRAC_DETECT_RADIUS);
@@ -442,7 +442,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_UP;
@@ -473,7 +473,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, SETUP.UpperFloorToEdgeBound + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_DOWN;
@@ -496,7 +496,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_LEFT;
@@ -522,7 +522,7 @@ namespace TEN::Player
 
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = relPosOffset;
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = (deltaHeadingAngle >= ANGLE(0.0f)) ? LS_EDGE_HANG_SHIMMY_90_OUTER_LEFT : LS_EDGE_HANG_SHIMMY_90_INNER_LEFT;
@@ -566,7 +566,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_EDGE_HANG_SHIMMY_RIGHT;
@@ -587,7 +587,7 @@ namespace TEN::Player
 
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.TargetStateID = (deltaHeadingAngle >= ANGLE(0.0f)) ? LS_EDGE_HANG_SHIMMY_90_OUTER_RIGHT : LS_EDGE_HANG_SHIMMY_90_INNER_RIGHT;
 
 			return context;
@@ -654,7 +654,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_WALL_CLIMB_UP;
@@ -689,7 +689,7 @@ namespace TEN::Player
 		{
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height + VERTICAL_OFFSET, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles::Identity;
 			context.TargetStateID = LS_WALL_CLIMB_DOWN;
@@ -710,7 +710,7 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 
 		// Get attractor collision.
-		auto attracColl = GetAttractorCollision(*player.Context.Attractor.Attractor, player.Context.Attractor.ChainDistance, item.Pose.Orientation.y);
+		auto attracColl = player.Context.Attractor.Attractor->GetCollision(player.Context.Attractor.PathDistance, item.Pose.Orientation.y);
 
 		// TODO: Use player room number?
 		// Get point collision.
@@ -732,7 +732,7 @@ namespace TEN::Player
 		// 3) Create and return climb context.
 		auto context = ClimbContextData{};
 		context.Attractor = player.Context.Attractor.Attractor;
-		context.ChainDistance = player.Context.Attractor.ChainDistance;
+		context.PathDistance = player.Context.Attractor.PathDistance;
 		context.RelPosOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
 		context.RelOrientOffset = EulerAngles::Identity;
 		context.AlignType = ClimbContextAlignType::AttractorParent;
@@ -760,7 +760,7 @@ namespace TEN::Player
 			// Create and return climb context.
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(0.0f, coll.Setup.Height, -coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(90.0f), 0);
 			context.AlignType = ClimbContextAlignType::AttractorParent;
@@ -777,7 +777,7 @@ namespace TEN::Player
 			// Create and return climb context.
 			auto context = ClimbContextData{};
 			context.Attractor = attracColl->Attractor;
-			context.ChainDistance = attracColl->ChainDistance;
+			context.PathDistance = attracColl->PathDistance;
 			context.RelPosOffset = Vector3(coll.Setup.Radius, coll.Setup.Height, coll.Setup.Radius);
 			context.RelOrientOffset = EulerAngles(0, ANGLE(-90.0f), 0);
 			context.AlignType = ClimbContextAlignType::AttractorParent;

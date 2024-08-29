@@ -13,19 +13,23 @@ namespace TEN::Entities::Generic
 	{
 	private:
 		// Members
+
 		AttractorObject _attractor = AttractorObject();
 
 	public:
 		// Routines
+
 		std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetFloorHeight	  = nullptr;
 		std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetCeilingHeight = nullptr;
 		std::function<int(const ItemInfo& item)> GetFloorBorder	  = nullptr;
 		std::function<int(const ItemInfo& item)> GetCeilingBorder = nullptr;
 
 		// Getters
+
 		AttractorObject& GetAttractor();
 
 		// Utilities
+
 		void Initialize(const ItemInfo& item);
 		void Update(const ItemInfo& item);
 

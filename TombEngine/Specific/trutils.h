@@ -3,6 +3,7 @@
 namespace TEN::Utils
 {
 	// String utilities
+
 	std::string ConstructAssetDirectory(std::string customDirectory);
 	std::string ReplaceNewLineSymbols(const std::string& string);
 	std::string ToUpper(std::string string);
@@ -14,9 +15,11 @@ namespace TEN::Utils
 	std::vector<std::string> SplitString(const std::string& string);
 
 	// 2D space utilities
-	Vector2 GetAspectCorrect2DPosition(const Vector2& pos);
-	Vector2 Convert2DPositionToNDC(const Vector2& pos);
-	Vector2 ConvertNDCTo2DPosition(const Vector2& ndc);
+
+	std::optional<Vector2> Get2DPosition(const Vector3& pos);
+	Vector2				   GetAspectCorrect2DPosition(const Vector2& pos);
+	Vector2				   Convert2DPositionToNDC(const Vector2& pos);
+	Vector2				   ConvertNDCTo2DPosition(const Vector2& ndc);
 
 	std::vector<unsigned short> GetProductOrFileVersion(bool productVersion);
 

@@ -40,20 +40,17 @@ namespace TEN::Player
 		auto& player = GetLaraInfo(item);
 		auto& handsAttrac = player.Context.Attractor;
 
-		const auto& points = handsAttrac.Attractor->GetPoints();
-		float length = handsAttrac.Attractor->GetLength();
-
 		// Calculate distances along attractor.
-		float chainDistCenter = handsAttrac.ChainDistance;
+		float chainDistCenter = handsAttrac.PathDistance;
 		float chainDistLeft = chainDistCenter - coll.Setup.Radius;
 		float chainDistRight = chainDistCenter + coll.Setup.Radius;
 
 		// TODO: Find connecting attractors.
 
 		// Get attractor collisions.
-		auto attracCollCenter = GetAttractorCollision(*handsAttrac.Attractor, chainDistCenter, item.Pose.Orientation.y);
-		auto attracCollLeft = GetAttractorCollision(*handsAttrac.Attractor, chainDistLeft, item.Pose.Orientation.y);
-		auto attracCollRight = GetAttractorCollision(*handsAttrac.Attractor, chainDistRight, item.Pose.Orientation.y);
+		auto attracCollCenter = handsAttrac.Attractor->GetCollision(chainDistCenter, item.Pose.Orientation.y);
+		auto attracCollLeft = handsAttrac.Attractor->GetCollision(chainDistLeft, item.Pose.Orientation.y);
+		auto attracCollRight = handsAttrac.Attractor->GetCollision(chainDistRight, item.Pose.Orientation.y);
 
 		// DEBUG----
 		g_Renderer.AddDebugLine(attracCollCenter.Intersection, attracCollCenter.Intersection + Vector3(0, -CLICK(0.5f), 0), Color(1, 1, 0));
@@ -105,7 +102,7 @@ namespace TEN::Player
 		// Set edge hang parameters.
 		player.Control.IsHanging = true;
 		player.Context.Attractor.Update(
-			item, *climbContext.Attractor, climbContext.ChainDistance,
+			item, *climbContext.Attractor, climbContext.PathDistance,
 			relPosOffset, relOrientOffset);
 	}
 	

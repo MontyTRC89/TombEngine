@@ -155,6 +155,11 @@ namespace TEN::Utils
 		return strings;
 	}
 
+	std::optional<Vector2> Get2DPosition(const Vector3& pos)
+	{
+		return g_Renderer.Get2DPosition(pos);
+	}
+
     Vector2 GetAspectCorrect2DPosition(const Vector2& pos)
     {
        constexpr auto DISPLAY_SPACE_ASPECT = DISPLAY_SPACE_RES.x / DISPLAY_SPACE_RES.y;
