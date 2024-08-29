@@ -278,9 +278,9 @@ namespace TEN::Entities::Generic
 
 			for (int i = pendulumPointer->node; i >= 0; --i)
 			{
-				rope->segment[i].x = rope->meshSegment[i - 1].x + ((int64_t)rope->segmentLength * vec.x >> FP_SHIFT);
-				rope->segment[i].y = rope->meshSegment[i - 1].y + ((int64_t)rope->segmentLength * vec.y >> FP_SHIFT);
-				rope->segment[i].z = rope->meshSegment[i - 1].z + ((int64_t)rope->segmentLength * vec.z >> FP_SHIFT);
+				rope->segment[i].x = rope->meshSegment[std::clamp(i - 1, 0, ROPE_SEGMENTS)].x + ((int64_t)rope->segmentLength * vec.x >> FP_SHIFT);
+				rope->segment[i].y = rope->meshSegment[std::clamp(i - 1, 0, ROPE_SEGMENTS)].y + ((int64_t)rope->segmentLength * vec.y >> FP_SHIFT);
+				rope->segment[i].z = rope->meshSegment[std::clamp(i - 1, 0, ROPE_SEGMENTS)].z + ((int64_t)rope->segmentLength * vec.z >> FP_SHIFT);
 
 				rope->velocity[i].x = 0;
 				rope->velocity[i].y = 0;

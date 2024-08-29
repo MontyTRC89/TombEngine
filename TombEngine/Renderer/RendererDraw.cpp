@@ -258,56 +258,49 @@ namespace TEN::Renderer
 		auto& room = _rooms[LaraItem->RoomNumber];
 		auto* item = &_items[LaraItem->Index];
 
-		int gunShellsCount = 0;
-		short objectNumber = 0;
+		int gunShellCount = 0;
+		int objectID = 0;
 
 		for (int i = 0; i < MAX_GUNSHELL; i++)
 		{
 			auto* gunshell = &Gunshells[i];
 
 			if (gunshell->counter <= 0)
-			{
 				continue;
-			}
 
-			objectNumber = gunshell->objectNumber;
+			objectID = gunshell->objectNumber;
 
-			Matrix translation = Matrix::CreateTranslation(
-				gunshell->pos.Position.x,
-				gunshell->pos.Position.y,
-				gunshell->pos.Position.z
-			);
-			Matrix rotation = gunshell->pos.Orientation.ToRotationMatrix();
-			Matrix world = rotation * translation;
+			auto translation = Matrix::CreateTranslation(gunshell->pos.Position.ToVector3());
+			auto rotMatrix = gunshell->pos.Orientation.ToRotationMatrix();
+			auto worldMatrix = rotMatrix * translation;
 
-			Matrix oldTranslation = Matrix::CreateTranslation(
+			auto prevTranslation = Matrix::CreateTranslation(
 				gunshell->oldPos.Position.x,
 				gunshell->oldPos.Position.y,
-				gunshell->oldPos.Position.z
-			);
-			Matrix oldRotation = gunshell->oldPos.Orientation.ToRotationMatrix();
-			Matrix oldWorld = oldRotation * oldTranslation;
+				gunshell->oldPos.Position.z);
+			auto prevRotMatrix = gunshell->oldPos.Orientation.ToRotationMatrix();
+			auto prevWorldMatrix = prevRotMatrix * prevTranslation;
 
-			world = Matrix::Lerp(oldWorld, world, _interpolationFactor);
+			worldMatrix = Matrix::Lerp(prevWorldMatrix, worldMatrix, _interpolationFactor);
 
-			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].World = world;
-			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].Ambient = room.AmbientLight;
-			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].Color = room.AmbientLight;
-			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellsCount].LightMode = (int)LightMode::Dynamic;
-			BindInstancedStaticLights(item->LightsToDraw, gunShellsCount);
+			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellCount].World = worldMatrix;
+			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellCount].Ambient = room.AmbientLight;
+			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellCount].Color = room.AmbientLight;
+			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellCount].LightMode = (int)LightMode::Dynamic;
+			BindInstancedStaticLights(item->LightsToDraw, gunShellCount);
 
-			gunShellsCount++;
+			gunShellCount++;
 		}
 
-		if (gunShellsCount > 0)
+		if (gunShellCount > 0)
 		{
-			auto& moveableObject = *_moveableObjects[objectNumber];
+			auto& moveableObject = *_moveableObjects[objectID];
 
 			_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
 			_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
 
-			UINT stride = sizeof(Vertex);
-			UINT offset = 0;
+			unsigned int stride = sizeof(Vertex);
+			unsigned int offset = 0;
 			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
@@ -316,19 +309,16 @@ namespace TEN::Renderer
 
 			_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
 
-			auto* mesh = moveableObject.ObjectMeshes[0];
-
-			for (auto& bucket : mesh->Buckets)
+			const auto& mesh = *moveableObject.ObjectMeshes[0];
+			for (const auto& bucket : mesh.Buckets)
 			{
 				if (bucket.NumVertices == 0)
-				{
 					continue;
-				}
 
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 				BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-				DrawIndexedInstancedTriangles(bucket.NumIndices, gunShellsCount, bucket.StartIndex, 0);
+				DrawIndexedInstancedTriangles(bucket.NumIndices, gunShellCount, bucket.StartIndex, 0);
 
 				_numInstancedStaticsDrawCalls++;
 			}
@@ -337,59 +327,43 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareRopes(RenderView& view)
 	{
-		for (auto& rope : Ropes)
+		for (const auto& rope : Ropes)
 		{
 			if (!rope.active)
 				continue;
 
-			auto world = Matrix::CreateTranslation(rope.position.x, rope.position.y, rope.position.z);
+			auto translationMatrix = Matrix::CreateTranslation(rope.position.ToVector3());
+			auto absolutePoints = std::array<Vector3, 24>{};
 
-			Vector3 absolute[24];
-
-			for (int n = 0; n < ROPE_SEGMENTS; n++)
+			for (int i = 0; i < rope.segment.size(); i++)
 			{
-				auto* s = &rope.oldMeshSegments[n];
-				Vector3 t;
-				Vector3 oldOutput;
+				const auto* segment = &rope.PrevMeshSegments[i];
 
-				t.x = s->x >> FP_SHIFT;
-				t.y = s->y >> FP_SHIFT;
-				t.z = s->z >> FP_SHIFT;
+				auto relPos = Vector3(segment->x >> FP_SHIFT, segment->y >> FP_SHIFT, segment->z >> FP_SHIFT);
+				auto prevOutput = Vector3::Transform(relPos, translationMatrix);
 
-				oldOutput = Vector3::Transform(t, world);
+				segment = &rope.meshSegment[i];
 
-				s = &rope.meshSegment[n];
-				Vector3 currentOutput;
+				relPos = Vector3(segment->x >> FP_SHIFT, segment->y >> FP_SHIFT, segment->z >> FP_SHIFT);
+				auto currentOutput = Vector3::Transform(relPos, translationMatrix);
 
-				t.x = s->x >> FP_SHIFT;
-				t.y = s->y >> FP_SHIFT;
-				t.z = s->z >> FP_SHIFT;
-
-				currentOutput = Vector3::Transform(t, world);
-
-				auto absolutePosition = Vector3::Lerp(oldOutput, currentOutput, _interpolationFactor);
-				absolute[n] = absolutePosition;
+				auto absolutePos = Vector3::Lerp(prevOutput, currentOutput, _interpolationFactor);
+				absolutePoints[i] = absolutePos;
 			}
 
-			for (int n = 0; n < ROPE_SEGMENTS - 1; n++)
+			for (int i = 0; i < (rope.segment.size() - 1); i++)
 			{
-				auto pos1 = absolute[n];
-				auto pos2 = absolute[n + 1];
+				const auto& pos0 = absolutePoints[i];
+				const auto& pos1 = absolutePoints[i + 1];
+				auto pos = (pos0 + pos1) / 2;
 
-				auto d = pos2 - pos1;
-				d.Normalize();
+				auto dir = pos1 - pos0;
+				dir.Normalize();
 
-				auto c = (pos1 + pos2) / 2.0f;
-
-				AddSpriteBillboardConstrained(&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY1],
-					c,
-					_rooms[rope.room].AmbientLight,
-					(PI / 2),
-					1.0f,
-					{ 32,
-					Vector3::Distance(pos1, pos2) },
-					BlendMode::AlphaBlend,
-					d, false, view);
+				AddSpriteBillboardConstrained(
+					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY1],
+					pos, _rooms[rope.room].AmbientLight,
+					PI_DIV_2, 1.0f, Vector2(32.0f, Vector3::Distance(pos0, pos1)), BlendMode::AlphaBlend, dir, false, view);
 			}
 		}
 	}

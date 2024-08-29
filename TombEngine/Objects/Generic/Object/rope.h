@@ -21,20 +21,21 @@ namespace TEN::Entities::Generic
 		int room;
 		Vector3i position;
 
-		Vector3i segment[ROPE_SEGMENTS];
-		Vector3i velocity[ROPE_SEGMENTS];
-		Vector3i normalisedSegment[ROPE_SEGMENTS];
-		Vector3i meshSegment[ROPE_SEGMENTS];
-		Vector3i coords[ROPE_SEGMENTS];
-		Vector3i oldMeshSegments[ROPE_SEGMENTS];
+		std::array<Vector3i, ROPE_SEGMENTS> segment			  = {};
+		std::array<Vector3i, ROPE_SEGMENTS> velocity		  = {};
+		std::array<Vector3i, ROPE_SEGMENTS> normalisedSegment = {};
+		std::array<Vector3i, ROPE_SEGMENTS> meshSegment		  = {};
+		std::array<Vector3i, ROPE_SEGMENTS> coords			  = {};
 
 		int segmentLength;
 		short active;
 		short coiled;
 
+		std::array<Vector3i, ROPE_SEGMENTS> PrevMeshSegments = {};
+
 		void StoreInterpolationData()
 		{
-			memcpy(oldMeshSegments, meshSegment, sizeof(Vector3i) * ROPE_SEGMENTS);
+			PrevMeshSegments = meshSegment;
 		}
 	};
 
