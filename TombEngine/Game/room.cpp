@@ -284,9 +284,9 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 	// 0---1
 	auto insertWallTriangles = [&](bool isFloor, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3)
 	{
-		// 0   2    3   1
-		// | X | or | X |
-		// 3---1    0---2
+		//     2     0       3            1
+		//   / | and | \  or | \  and  / |
+		// 3---1     3---1   0---2    0---2
 		bool isCrissCross = ((vertex0.y < vertex3.y && vertex1.y > vertex2.y) || (vertex0.y > vertex3.y && vertex1.y < vertex2.y));
 		if (isCrissCross)
 		{
@@ -373,7 +373,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 				const auto& vertex2 = surfVerts.Tri0.Vertex2;
 				const auto& vertex3 = surfVerts.Tri0.Vertex0;
 
-				// TODO
+				// TODO: Check various diagonal step arrangements.
 				//if (isFloor ? !(vertex0.y <= vertex3.y && vertex1.y <= vertex2.y) : !(vertex0.y >= vertex3.y && vertex1.y >= vertex2.y))
 				{
 					insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
@@ -440,7 +440,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 		}
 
 		// 2.5) Collect previous Z axis cardinal wall triangles.
-		bool isPrevZTriWall = surfVerts.IsSplitAngle0 ? surfVerts.Tri1.IsWall : surfVerts.Tri0.IsWall;
+		bool isPrevZTriWall = surfVerts.Tri1.IsWall;
 		if (!isPrevZTriWall || !surfVerts.PrevNeighborZ.IsWall)
 		{
 			// Full wall.
@@ -461,14 +461,13 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 				const auto& vertex2 = surfVerts.PrevNeighborZ.Vertex0;
 				const auto& vertex3 = surfVerts.PrevNeighborZ.Vertex1;
 
-				// TODO: Wrongly detected as criss-cross?
 				if (isFloor ? !(vertex0.y <= vertex3.y && vertex1.y <= vertex2.y) : !(vertex0.y >= vertex3.y && vertex1.y >= vertex2.y))
 					insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
 			}
 		}
 
 		// 2.6) Collect next Z axis cardinal wall triangles.
-		bool isNextZTriWall = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.IsWall : surfVerts.Tri1.IsWall;
+		bool isNextZTriWall = surfVerts.Tri0.IsWall;
 		if (!isNextZTriWall || !surfVerts.NextNeighborZ.IsWall)
 		{
 			// Full wall.
