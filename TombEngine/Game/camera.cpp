@@ -181,6 +181,7 @@ bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3&
 static Vector3 GetCameraGeometryOffset()
 {
 	// TODO
+	return {};
 }
 
 EulerAngles GetCameraControlRotation()

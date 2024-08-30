@@ -550,8 +550,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			const auto& room = g_Level.Rooms[item->RoomNumber];
 
 			room.CollisionMesh.DrawDebug();
-			for (const auto& portal : room.Portals)
-				portal.CollisionMesh.DrawDebug();
+			//for (const auto& portal : room.Portals)
+			//	portal.CollisionMesh.DrawDebug();
 
 
 			for (const auto& bridgeMovID : room.Bridges.GetIds())
