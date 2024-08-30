@@ -65,7 +65,7 @@ std::vector<AttractorObject*> AttractorHandler::Bvh::GetBoundedAttractors(const 
 		{
 			for (int attracID : node.AttractorIds)
 			{
-				if (attracs[attracID].GetWorldObb().Intersects(sphere))
+				if (attracs[attracID].GetWorldObb().Intersects(sphere)) // TODO: Will have to do this differently.
 					boundedAttracs.push_back(&attracs[attracID]);
 			}
 		}

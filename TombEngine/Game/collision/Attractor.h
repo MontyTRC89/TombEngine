@@ -42,28 +42,24 @@ namespace TEN::Collision::Attractor
 	class AttractorObject
 	{
 	private:
-		struct Path
-		{
-			std::vector<Vector3> Points			= {};
-			std::vector<float>	 SegmentLengths = {};
-			float				 Length			= 0.0f;
-		};
-
 		// Members
 
-		AttractorType _type		   = AttractorType::Edge;
-		Vector3		  _position	   = Vector3::Zero;
-		Quaternion	  _orientation = Quaternion::Identity;
-		int			  _roomNumber  = 0;
-		Path		  _path		   = {};
-		BoundingBox	  _aabb		   = BoundingBox();
+		AttractorType _type		  = AttractorType::Edge;
+		int			  _roomNumber = 0;
+		float		  _length	  = 0.0f;
+		BoundingBox	  _aabb		  = BoundingBox();
+
+		Vector3				 _position		 = Vector3::Zero;
+		Quaternion			 _orientation	 = Quaternion::Identity;
+		std::vector<Vector3> _points		 = {};
+		std::vector<float>	 _segmentLengths = {};
 
 		std::set<int> _playerItemNumbers = {};
 
 	public:
 		// Constructors
 
-		AttractorObject() { _path.Points.push_back(Vector3::Zero); }; // TEMP
+		AttractorObject() { _points.push_back(Vector3::Zero); }; // TEMP
 		AttractorObject(AttractorType type, const Vector3& pos, const Quaternion& orient, int roomNumber, const std::vector<Vector3>& points);
 
 		// Destructors
@@ -72,13 +68,11 @@ namespace TEN::Collision::Attractor
 
 		// Getters
 
-		AttractorType GetType() const;
-		int			  GetRoomNumber() const;
-		float		  GetLength() const;
-
-		// TEMP
-		const BoundingBox&	GetLocalAabb() const;
-		BoundingOrientedBox GetWorldObb() const;
+		AttractorType	   GetType() const;
+		int				   GetRoomNumber() const;
+		float			   GetLength() const;
+		const BoundingBox& GetLocalAabb() const;
+		BoundingOrientedBox GetWorldObb() const; // TEMP
 
 		unsigned int GetSegmentCount() const;
 		unsigned int GetSegmentIDAtPathDistance(float pathDist) const;
@@ -110,6 +104,7 @@ namespace TEN::Collision::Attractor
 
 		float  NormalizePathDistance(float pathDist) const;
 		Matrix GetTransformMatrix() const;
+		Matrix GetRotationMatrix() const;
 	};
 
 	// Getters
