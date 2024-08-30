@@ -282,51 +282,35 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 	// 3---2
 	// |   |
 	// 0---1
-	auto insertFullWallTriangles = [&](const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3)
+	auto insertWallTriangles = [&](bool isFloor, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3)
 	{
-		//     2
-		//   / |
-		// 0---1
-		if (vertex1.y != vertex2.y)
-			desc.InsertTriangle(vertex0, vertex1, vertex2);
-
-		// 3---2
-		// | /
-		// 0
-		if (vertex0.y != vertex3.y)
-			desc.InsertTriangle(vertex0, vertex2, vertex3);
-	};
-
-	// Vertex input:
-	// 3---2
-	// |   |
-	// 0---1
-	auto insertStepWallTriangles = [&](bool isFloor, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3)
-	{
-		bool isCrissCross = isFloor ? (vertex0.y < vertex3.y || vertex1.y < vertex2.y) : !(vertex0.y < vertex3.y || vertex1.y < vertex2.y);
+		// 0   2    3   1
+		// | X | or | X |
+		// 3---1    0---2
+		bool isCrissCross = ((vertex0.y < vertex3.y && vertex1.y > vertex2.y) || (vertex0.y > vertex3.y && vertex1.y < vertex2.y));
 		if (isCrissCross)
 		{
-			bool isSecondCrissCrossCase = isFloor ? (vertex1.y < vertex2.y) : !(vertex1.y < vertex2.y);
+			bool isFirstCrissCross = isFloor ? (vertex0.y < vertex3.y) : (vertex0.y > vertex3.y);
 			if (isFloor ? (vertex0.y > vertex3.y) : (vertex0.y < vertex3.y))
 			{
-				isSecondCrissCrossCase ? desc.InsertTriangle(vertex0, vertex2, vertex3) : desc.InsertTriangle(vertex0, vertex1, vertex2);
+				isFloor ?
+					isFirstCrissCross ? desc.InsertTriangle(vertex0, vertex1, vertex2) : desc.InsertTriangle(vertex0, vertex2, vertex3) :
+					isFirstCrissCross ? desc.InsertTriangle(vertex2, vertex1, vertex0) : desc.InsertTriangle(vertex3, vertex2, vertex0);
 			}
 			if (isFloor ? (vertex1.y > vertex2.y) : (vertex1.y < vertex2.y))
 			{
-				isSecondCrissCrossCase ? desc.InsertTriangle(vertex0, vertex1, vertex3) : desc.InsertTriangle(vertex1, vertex2, vertex3);
+				isFloor ?
+					isFirstCrissCross ? desc.InsertTriangle(vertex1, vertex2, vertex3) : desc.InsertTriangle(vertex0, vertex1, vertex3) :
+					isFirstCrissCross ? desc.InsertTriangle(vertex3, vertex2, vertex1) : desc.InsertTriangle(vertex3, vertex1, vertex0);
 			}
 		}
+		//     2     3---2
+		//   / | and | /
+		// 0---1     0
 		else
 		{
-			//     2
-			//   / |
-			// 0---1
 			if (vertex1.y != vertex2.y)
 				isFloor ? desc.InsertTriangle(vertex0, vertex1, vertex2) : desc.InsertTriangle(vertex2, vertex1, vertex0);
-
-			// 3---2
-			// | /
-			// 0
 			if (vertex0.y != vertex3.y)
 				isFloor ? desc.InsertTriangle(vertex0, vertex2, vertex3) : desc.InsertTriangle(vertex3, vertex2, vertex0);
 		}
@@ -379,7 +363,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 					(surfVerts.Tri0.IsWall ? sectorVerts.Ceil.Tri1.Vertex0 : sectorVerts.Ceil.Tri0.Vertex0) :
 					(surfVerts.Tri0.IsWall ? sectorVerts.Ceil.Tri1.Vertex1 : sectorVerts.Ceil.Tri0.Vertex0);
 
-				insertFullWallTriangles(vertex0, vertex1, vertex2, vertex3);
+				insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
 			}
 			// Step wall.
 			else if (!(surfVerts.Tri0.IsWall || surfVerts.Tri1.IsWall) && !(isSurfTri0Portal && isSurfTri1Portal))
@@ -392,7 +376,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 				// TODO
 				//if (isFloor ? !(vertex0.y <= vertex3.y && vertex1.y <= vertex2.y) : !(vertex0.y >= vertex3.y && vertex1.y >= vertex2.y))
 				{
-					insertStepWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
+					insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
 				}
 				//else
 				{
@@ -413,7 +397,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 				const auto& vertex2 = sectorVerts.Ceil.IsSplitAngle0 ? sectorVerts.Ceil.Tri0.Vertex1 : sectorVerts.Ceil.Tri1.Vertex1;
 				const auto& vertex3 = sectorVerts.Ceil.IsSplitAngle0 ? sectorVerts.Ceil.Tri0.Vertex0 : sectorVerts.Ceil.Tri1.Vertex0;
 
-				insertFullWallTriangles(vertex0, vertex1, vertex2, vertex3);
+				insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
 			}
 			// Step wall.
 			else if (!isPrevXTriWall && !surfVerts.PrevNeighborX.IsWall)
@@ -424,7 +408,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 				const auto& vertex3 = surfVerts.PrevNeighborX.Vertex0;
 
 				if (isFloor ? !(vertex0.y <= vertex3.y && vertex1.y <= vertex2.y) : !(vertex0.y >= vertex3.y && vertex1.y >= vertex2.y))
-					insertStepWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
+					insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
 			}
 		}
 
@@ -440,7 +424,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 				const auto& vertex2 = sectorVerts.Ceil.IsSplitAngle0 ? sectorVerts.Ceil.Tri1.Vertex2 : sectorVerts.Ceil.Tri0.Vertex2;
 				const auto& vertex3 = sectorVerts.Ceil.IsSplitAngle0 ? sectorVerts.Ceil.Tri1.Vertex1 : sectorVerts.Ceil.Tri0.Vertex1;
 
-				insertFullWallTriangles(vertex0, vertex1, vertex2, vertex3);
+				insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
 			}
 			// Step wall.
 			else if (!isNextXTriWall && !surfVerts.NextNeighborX.IsWall)
@@ -451,7 +435,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 				const auto& vertex3 = surfVerts.NextNeighborX.Vertex0;
 
 				if (isFloor ? !(vertex0.y <= vertex3.y && vertex1.y <= vertex2.y) : !(vertex0.y >= vertex3.y && vertex1.y >= vertex2.y))
-					insertStepWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
+					insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
 			}
 		}
 
@@ -467,7 +451,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 				const auto& vertex2 = sectorVerts.Ceil.Tri1.Vertex0;
 				const auto& vertex3 = sectorVerts.Ceil.Tri1.Vertex2;
 
-				insertFullWallTriangles(vertex0, vertex1, vertex2, vertex3);
+				insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
 			}
 			// Step wall.
 			else if (!isPrevZTriWall && !surfVerts.PrevNeighborZ.IsWall)
@@ -479,7 +463,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 
 				// TODO: Wrongly detected as criss-cross?
 				if (isFloor ? !(vertex0.y <= vertex3.y && vertex1.y <= vertex2.y) : !(vertex0.y >= vertex3.y && vertex1.y >= vertex2.y))
-					insertStepWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
+					insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
 			}
 		}
 
@@ -495,7 +479,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 				const auto& vertex2 = sectorVerts.Ceil.IsSplitAngle0 ? sectorVerts.Ceil.Tri0.Vertex2 : sectorVerts.Ceil.Tri0.Vertex1;
 				const auto& vertex3 = sectorVerts.Ceil.IsSplitAngle0 ? sectorVerts.Ceil.Tri0.Vertex1 : sectorVerts.Ceil.Tri0.Vertex0;
 
-				insertFullWallTriangles(vertex0, vertex1, vertex2, vertex3);
+				insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
 			}
 			// Step wall.
 			else if (!isNextZTriWall && !surfVerts.NextNeighborZ.IsWall)
@@ -506,7 +490,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 				const auto& vertex3 = surfVerts.NextNeighborZ.Vertex0;
 
 				if (isFloor ? !(vertex0.y <= vertex3.y && vertex1.y <= vertex2.y) : !(vertex0.y >= vertex3.y && vertex1.y >= vertex2.y))
-					insertStepWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
+					insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
 			}
 		}
 
