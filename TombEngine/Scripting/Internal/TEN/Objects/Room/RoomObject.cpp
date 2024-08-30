@@ -51,7 +51,7 @@ void Room::Register(sol::table& parent)
 		/// Get the room's reverb type.
 		// @function Room:GetReverbType
 		// @treturn Objects.RoomReverb room's reverb type
-		ScriptReserved_GetPosition, &Room::GetReverbType,
+		ScriptReserved_GetReverbType, &Room::GetReverbType,
 
 		/// Set the room's reverb type.
 		// @function Room:SetReverbType

@@ -199,6 +199,7 @@ static constexpr char ScriptReserved_GetFlag[]				= "GetFlag";
 static constexpr char ScriptReserved_SetFlag[]				= "SetFlag";
 static constexpr char ScriptReserved_IsTagPresent[]			= "IsTagPresent";
 static constexpr char ScriptReserved_SetReverbType[]		= "SetReverbType";
+static constexpr char ScriptReserved_GetReverbType[]		= "GetReverbType";
 
 // Flow Functions
 static constexpr char ScriptReserved_AddLevel[]					= "AddLevel";
