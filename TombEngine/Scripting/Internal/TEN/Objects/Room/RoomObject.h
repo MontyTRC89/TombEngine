@@ -20,6 +20,7 @@ public:
 	static void Register(sol::table& parent);
 
 	[[nodiscard]] bool GetActive() const;
+	[[nodiscard]] int GetRoomNumber() const;
 	[[nodiscard]] ScriptColor GetColor() const;
 
 	[[nodiscard]] std::string GetName() const;
