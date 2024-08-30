@@ -45,8 +45,8 @@ constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	= "EnableThumbstickCamera";
 
 // Input keys
 
-constexpr auto REGKEY_MOUSE_SENSITIVITY			 = "MouseSensitivity";
-constexpr auto REGKEY_ENABLE_MENU_OPTION_LOOPING = "EnableMenuOptionLooping";
+constexpr auto REGKEY_MOUSE_SENSITIVITY		   = "MouseSensitivity";
+constexpr auto REGKEY_MENU_OPTION_LOOPING_MODE = "MenuOptionLoopingMode";
 
 enum class MenuOptionLoopingMode
 {

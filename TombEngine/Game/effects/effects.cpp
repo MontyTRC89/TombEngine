@@ -1308,7 +1308,7 @@ void Splash(ItemInfo* item)
 	if (!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		return;
 
-	int waterHeight = GetWaterHeight(item);
+	int waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 
 	SplashSetup.x = item->Pose.Position.x;
 	SplashSetup.y = waterHeight - 1;
@@ -1940,7 +1940,7 @@ void ProcessEffects(ItemInfo* item)
 	if (item->Effect.Type != EffectType::Sparks && item->Effect.Type != EffectType::Smoke)
 	{
 		const auto& bounds = GameBoundingBox(item);
-		int waterHeight = GetWaterHeight(item);
+		int waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 		int itemLevel = item->Pose.Position.y + bounds.Y2 - (bounds.GetHeight() / 3);
 
 		if (waterHeight != NO_HEIGHT && itemLevel > waterHeight)
