@@ -212,10 +212,11 @@ namespace TEN::Collision::Attractor
 			pathDist += Vector3::Distance(_points[segmentID], intersect);
 		}
 
+		// TODO: Consider axis. Hardcoded to Y+.
 		// Calculate orientations.
-		auto refOrient = EulerAngles(Vector3::Transform(AxisAngle(axis, headingAngle).ToDirection(), rotMatrix.Invert()));
+		auto refOrient = EulerAngles(0, headingAngle - EulerAngles(_orientation).y, 0);
 		auto segmentOrient = isPath ?
-			Vector3::Transform(Geometry::GetOrientToPoint(_points[segmentID], _points[segmentID + 1]).ToDirection(), rotMatrix) : // TODO: Consider axis.
+			Geometry::GetOrientToPoint(_points[segmentID], _points[segmentID + 1]) + EulerAngles(0, EulerAngles(_orientation).y, 0) :
 			refOrient;
 
 		// Create attractor collision.
@@ -226,7 +227,7 @@ namespace TEN::Collision::Attractor
 		attracColl.Distance3D = Vector3::Distance(localSphere.Center, intersect);
 		attracColl.PathDistance = pathDist;
 		attracColl.SegmentID = segmentID;
-		attracColl.HeadingAngle = segmentOrient.y + HEADING_ANGLE_OFFSET; // TODO: Something went wrong here with local positions.
+		attracColl.HeadingAngle = segmentOrient.y + HEADING_ANGLE_OFFSET;
 		attracColl.SlopeAngle = segmentOrient.x;
 		attracColl.IsInFront = Geometry::IsPointInFront(localSphere.Center, intersect, refOrient);
 		return attracColl;
