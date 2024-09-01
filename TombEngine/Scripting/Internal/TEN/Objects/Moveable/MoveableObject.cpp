@@ -79,7 +79,7 @@ most can just be ignored (see usage).
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
 	@tparam Rotation rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
-	@tparam int roomID room ID item is in (default: calculated automatically)
+	@tparam int roomNumber room number item is in (default: calculated automatically)
 	@tparam int animNumber animation number
 	@tparam int frameNumber frame number
 	@tparam int hp HP of item

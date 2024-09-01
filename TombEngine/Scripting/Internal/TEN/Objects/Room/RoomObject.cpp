@@ -38,6 +38,11 @@ void Room::Register(sol::table& parent)
 		// @treturn bool true if the room is active
 		ScriptReserved_GetActive, &Room::GetActive,
 
+		/// Get the room ID
+		// @function Room:GetRoomNumber
+		// @treturn int the room ID
+		ScriptReserved_GetRoomNumber, & Room::GetRoomNumber,
+
 		/// Get the room's ambient light color.
 		// @function Room:GetColor
 		// @treturn Color ambient light color of the room
@@ -46,7 +51,7 @@ void Room::Register(sol::table& parent)
 		/// Get the room's reverb type.
 		// @function Room:GetReverbType
 		// @treturn Objects.RoomReverb room's reverb type
-		ScriptReserved_GetPosition, &Room::GetReverbType,
+		ScriptReserved_GetReverbType, &Room::GetReverbType,
 
 		/// Set the room's reverb type.
 		// @function Room:SetReverbType
@@ -85,6 +90,11 @@ void Room::Register(sol::table& parent)
 bool Room::GetActive() const
 {
 	return m_room.Active();
+}
+
+int Room::GetRoomNumber() const
+{
+	return m_room.RoomNumber;
 }
 
 ScriptColor Room::GetColor() const
