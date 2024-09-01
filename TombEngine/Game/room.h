@@ -178,7 +178,7 @@ struct RoomData
 	void GenerateCollisionMesh();
 
 private:
-	void CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
+	void CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc, const Vector3& offset,
 											 const FloorInfo& sector,
 											 const FloorInfo& sectorNorth, const FloorInfo& sectorSouth,
 											 const FloorInfo& sectorEast, const FloorInfo& sectorWest);

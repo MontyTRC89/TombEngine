@@ -13,7 +13,7 @@ namespace TEN::Physics
 {
 	unsigned int CollisionMeshDesc::GetTriangleCount() const
 	{
-		return (_ids.size() / LocalCollisionTriangle::VERTEX_COUNT);
+		return ((unsigned int)_ids.size() / LocalCollisionTriangle::VERTEX_COUNT);
 	}
 
 	const std::vector<Vector3>& CollisionMeshDesc::GetVertices() const

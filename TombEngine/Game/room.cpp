@@ -100,15 +100,15 @@ void RoomData::GenerateCollisionMesh()
 				sectorWest = &room.Sectors[(gridCoord.x * room.ZSize) + gridCoord.y];
 			}
 
-			CollectSectorCollisionMeshTriangles(desc, sector, *sectorNorth, *sectorSouth, *sectorEast, *sectorWest);
+			CollectSectorCollisionMeshTriangles(desc, -Position.ToVector3(), sector, *sectorNorth, *sectorSouth, *sectorEast, *sectorWest);
 		}
 	}
 
 	// Create collision mesh.
-	CollisionMesh = TEN::Physics::CollisionMesh(Vector3::Zero, Quaternion::Identity, desc);
+	CollisionMesh = TEN::Physics::CollisionMesh(Position.ToVector3(), Quaternion::Identity, desc);
 }
 
-void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
+void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc, const Vector3& offset,
 												   const FloorInfo& sector,
 												   const FloorInfo& sectorNorth, const FloorInfo& sectorSouth,
 												   const FloorInfo& sectorEast, const FloorInfo& sectorWest)
@@ -294,14 +294,14 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 			if (isFloor ? (vertex0.y > vertex3.y) : (vertex0.y < vertex3.y))
 			{
 				isFloor ?
-					isFirstCrissCross ? desc.InsertTriangle(vertex0, vertex1, vertex2) : desc.InsertTriangle(vertex0, vertex2, vertex3) :
-					isFirstCrissCross ? desc.InsertTriangle(vertex2, vertex1, vertex0) : desc.InsertTriangle(vertex3, vertex2, vertex0);
+					isFirstCrissCross ? desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex2 + offset) : desc.InsertTriangle(vertex0 + offset, vertex2 + offset, vertex3 + offset) :
+					isFirstCrissCross ? desc.InsertTriangle(vertex2 + offset, vertex1 + offset, vertex0 + offset) : desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex0 + offset);
 			}
 			if (isFloor ? (vertex1.y > vertex2.y) : (vertex1.y < vertex2.y))
 			{
 				isFloor ?
-					isFirstCrissCross ? desc.InsertTriangle(vertex1, vertex2, vertex3) : desc.InsertTriangle(vertex0, vertex1, vertex3) :
-					isFirstCrissCross ? desc.InsertTriangle(vertex3, vertex2, vertex1) : desc.InsertTriangle(vertex3, vertex1, vertex0);
+					isFirstCrissCross ? desc.InsertTriangle(vertex1 + offset, vertex2 + offset, vertex3 + offset) : desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex3 + offset) :
+					isFirstCrissCross ? desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex1 + offset) : desc.InsertTriangle(vertex3 + offset, vertex1 + offset, vertex0 + offset);
 			}
 		}
 		//     2     3---2
@@ -310,9 +310,9 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 		else
 		{
 			if (vertex1.y != vertex2.y)
-				isFloor ? desc.InsertTriangle(vertex0, vertex1, vertex2) : desc.InsertTriangle(vertex2, vertex1, vertex0);
+				isFloor ? desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex2 + offset) : desc.InsertTriangle(vertex2 + offset, vertex1 + offset, vertex0 + offset);
 			if (vertex0.y != vertex3.y)
-				isFloor ? desc.InsertTriangle(vertex0, vertex2, vertex3) : desc.InsertTriangle(vertex3, vertex2, vertex0);
+				isFloor ? desc.InsertTriangle(vertex0 + offset, vertex2 + offset, vertex3 + offset) : desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex0 + offset);
 		}
 	};
 
@@ -333,14 +333,14 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 		if (!surfVerts.Tri0.IsWall && !isSurfTri0Portal)
 		{
 			isFloor ?
-				desc.InsertTriangle(surfVerts.Tri0.Vertex2, surfVerts.Tri0.Vertex1, surfVerts.Tri0.Vertex0) :
-				desc.InsertTriangle(surfVerts.Tri0.Vertex0, surfVerts.Tri0.Vertex1, surfVerts.Tri0.Vertex2);
+				desc.InsertTriangle(surfVerts.Tri0.Vertex2 + offset, surfVerts.Tri0.Vertex1 + offset, surfVerts.Tri0.Vertex0 + offset) :
+				desc.InsertTriangle(surfVerts.Tri0.Vertex0 + offset, surfVerts.Tri0.Vertex1 + offset, surfVerts.Tri0.Vertex2 + offset);
 		}
 		if (!surfVerts.Tri1.IsWall && !isSurfTri1Portal)
 		{
 			isFloor ?
-				desc.InsertTriangle(surfVerts.Tri1.Vertex2, surfVerts.Tri1.Vertex1, surfVerts.Tri1.Vertex0) :
-				desc.InsertTriangle(surfVerts.Tri1.Vertex0, surfVerts.Tri1.Vertex1, surfVerts.Tri1.Vertex2);
+				desc.InsertTriangle(surfVerts.Tri1.Vertex2 + offset, surfVerts.Tri1.Vertex1 + offset, surfVerts.Tri1.Vertex0 + offset) :
+				desc.InsertTriangle(surfVerts.Tri1.Vertex0 + offset, surfVerts.Tri1.Vertex1 + offset, surfVerts.Tri1.Vertex2 + offset);
 		}
 
 		// 2.2) Collect diagonal wall triangles.
