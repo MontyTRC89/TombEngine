@@ -291,17 +291,37 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc, cons
 		if (isCrissCross)
 		{
 			bool isFirstCrissCross = isFloor ? (vertex0.y < vertex3.y) : (vertex0.y > vertex3.y);
+
 			if (isFloor ? (vertex0.y > vertex3.y) : (vertex0.y < vertex3.y))
 			{
-				isFloor ?
-					isFirstCrissCross ? desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex2 + offset) : desc.InsertTriangle(vertex0 + offset, vertex2 + offset, vertex3 + offset) :
-					isFirstCrissCross ? desc.InsertTriangle(vertex2 + offset, vertex1 + offset, vertex0 + offset) : desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex0 + offset);
+				if (isFloor)
+				{
+					isFirstCrissCross ?
+						desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex2 + offset) :
+						desc.InsertTriangle(vertex0 + offset, vertex2 + offset, vertex3 + offset);
+				}
+				else
+				{
+					isFirstCrissCross ?
+						desc.InsertTriangle(vertex2 + offset, vertex1 + offset, vertex0 + offset) :
+						desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex0 + offset);
+				}
 			}
+
 			if (isFloor ? (vertex1.y > vertex2.y) : (vertex1.y < vertex2.y))
 			{
-				isFloor ?
-					isFirstCrissCross ? desc.InsertTriangle(vertex1 + offset, vertex2 + offset, vertex3 + offset) : desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex3 + offset) :
-					isFirstCrissCross ? desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex1 + offset) : desc.InsertTriangle(vertex3 + offset, vertex1 + offset, vertex0 + offset);
+				if (isFloor)
+				{
+					isFirstCrissCross ?
+						desc.InsertTriangle(vertex1 + offset, vertex2 + offset, vertex3 + offset) :
+						desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex3 + offset);
+				}
+				else
+				{
+					isFirstCrissCross ?
+						desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex1 + offset) :
+						desc.InsertTriangle(vertex3 + offset, vertex1 + offset, vertex0 + offset);
+				}
 			}
 		}
 		//     2     3---2
@@ -310,9 +330,18 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc, cons
 		else
 		{
 			if (vertex1.y != vertex2.y)
-				isFloor ? desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex2 + offset) : desc.InsertTriangle(vertex2 + offset, vertex1 + offset, vertex0 + offset);
+			{
+				isFloor ?
+					desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex2 + offset) :
+					desc.InsertTriangle(vertex2 + offset, vertex1 + offset, vertex0 + offset);
+			}
+			
 			if (vertex0.y != vertex3.y)
-				isFloor ? desc.InsertTriangle(vertex0 + offset, vertex2 + offset, vertex3 + offset) : desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex0 + offset);
+			{
+				isFloor ?
+					desc.InsertTriangle(vertex0 + offset, vertex2 + offset, vertex3 + offset) :
+					desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex0 + offset);
+			}
 		}
 	};
 
