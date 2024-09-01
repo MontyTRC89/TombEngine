@@ -100,7 +100,7 @@ void RoomData::GenerateCollisionMesh()
 				sectorWest = &room.Sectors[(gridCoord.x * room.ZSize) + gridCoord.y];
 			}
 
-			CollectSectorCollisionMeshTriangles(desc, -Position.ToVector3(), sector, *sectorNorth, *sectorSouth, *sectorEast, *sectorWest);
+			CollectSectorCollisionMeshTriangles(desc, sector, *sectorNorth, *sectorSouth, *sectorEast, *sectorWest);
 		}
 	}
 
@@ -108,7 +108,7 @@ void RoomData::GenerateCollisionMesh()
 	CollisionMesh = TEN::Physics::CollisionMesh(Position.ToVector3(), Quaternion::Identity, desc);
 }
 
-void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc, const Vector3& offset,
+void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 												   const FloorInfo& sector,
 												   const FloorInfo& sectorNorth, const FloorInfo& sectorSouth,
 												   const FloorInfo& sectorEast, const FloorInfo& sectorWest)
@@ -173,7 +173,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc, cons
 		constexpr auto REL_CORNER_1 = Vector2i(0, BLOCK(1));
 		constexpr auto REL_CORNER_2 = Vector2i(BLOCK(1), BLOCK(1));
 		constexpr auto REL_CORNER_3 = Vector2i(BLOCK(1), 0);
-
+		
 		auto sectorVerts = SectorVertexData{};
 
 		// 1) Calculate 2D corner positions.
@@ -282,10 +282,11 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc, cons
 	// 3---2
 	// |   |
 	// 0---1
+	auto offset = -Position.ToVector3();
 	auto insertWallTriangles = [&](bool isFloor, const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2, const Vector3& vertex3)
 	{
-		//     2     0       3          1
-		//   / | and | \  or | \  and / |
+		//     2     0       3           1
+		//   / | and | \  or | \  and  / |
 		// 3---1     3---1   0---2   0---2
 		bool isCrissCross = ((vertex0.y < vertex3.y && vertex1.y > vertex2.y) || (vertex0.y > vertex3.y && vertex1.y < vertex2.y));
 		if (isCrissCross)
@@ -318,7 +319,6 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc, cons
 					desc.InsertTriangle(vertex3 + offset, vertex1 + offset, vertex0 + offset);
 			}
 		}
-
 		//     2     3---2
 		//   / | and | /
 		// 0---1     0

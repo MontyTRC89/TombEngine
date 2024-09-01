@@ -169,15 +169,6 @@ static CameraLosCollisionData GetCameraLos(const Vector3& origin, int originRoom
 	return cameraLos;
 }
 
-// TODO: Move to math.
-bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& normal)
-{
-	auto deltaPos = target - origin;
-	float dotProduct = deltaPos.Dot(normal);
-
-	return (dotProduct >= 0.0f);
-}
-
 static Vector3 GetCameraGeometryOffset()
 {
 	// TODO

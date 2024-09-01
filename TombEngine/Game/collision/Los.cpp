@@ -107,7 +107,7 @@ namespace TEN::Collision::Los
 		if (dir == Vector3::Zero)
 		{
 			TENLog("GetLosCollision(): dir is not a unit vector.", LogLevel::Warning);
-			return LosCollisionData{ RoomLosCollisionData{ {}, origin, roomNumber, {}, 0.0f, false}, {}, {}, {} };
+			return LosCollisionData{ RoomLosCollisionData{ {}, origin, roomNumber, {}, 0.0f, false }, {}, {}, {} };
 		}
 
 		auto los = LosCollisionData{};

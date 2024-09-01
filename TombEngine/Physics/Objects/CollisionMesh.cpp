@@ -105,13 +105,8 @@ namespace TEN::Physics
 		return Geometry::GetBoundingBox({ vertex0, vertex1, vertex2 });
 	}
 
-	bool LocalCollisionTriangle::Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices) const
+	bool LocalCollisionTriangle::Intersects(const Ray& ray, float& dist, const std::vector<Vector3>& vertices) const
 	{
-		// Test if ray intersects triangle AABB.
-		float aabbDist = 0.0f;
-		if (!ray.Intersects(GetAabb(vertices), aabbDist) || aabbDist >= distMax)
-			return false;
-
 		// Get normal.
 		const auto& normal = GetNormal(vertices);
 
@@ -229,7 +224,7 @@ namespace TEN::Physics
 			const auto& tri = _triangles[triID];
 
 			float intersectDist = 0.0f;
-			if (tri.Intersects(localRay, closestDist, intersectDist, _vertices))
+			if (tri.Intersects(localRay, intersectDist, _vertices) && intersectDist <= closestDist)
 			{
 				closestTri = &tri;
 				closestDist = intersectDist;

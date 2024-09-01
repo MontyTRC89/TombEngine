@@ -59,7 +59,7 @@ namespace TEN::Physics
 
 		// Inquirers
 
-		bool Intersects(const Ray& ray, float distMax, float& dist, const std::vector<Vector3>& vertices) const;
+		bool Intersects(const Ray& ray, float& dist, const std::vector<Vector3>& vertices) const;
 
 		// Debug
 
