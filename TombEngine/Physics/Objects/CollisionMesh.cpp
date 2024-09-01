@@ -11,6 +11,11 @@ using namespace TEN::Utils;
 
 namespace TEN::Physics
 {
+	unsigned int CollisionMeshDesc::GetTriangleCount() const
+	{
+		return (_ids.size() / LocalCollisionTriangle::VERTEX_COUNT);
+	}
+
 	const std::vector<Vector3>& CollisionMeshDesc::GetVertices() const
 	{
 		return _vertices;
@@ -33,10 +38,12 @@ namespace TEN::Physics
 				return vertexID;
 			}
 			
-			// Add, cache, and get new vertex ID.
+			// Add and cache new vertex.
 			int vertexID = (int)_vertices.size();
 			_vertices.push_back(vertex);
 			_vertexMap[vertex] = vertexID;
+
+			// Get new vertex ID.
 			return vertexID;
 		};
 

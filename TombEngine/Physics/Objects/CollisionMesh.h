@@ -25,6 +25,7 @@ namespace TEN::Physics
 
 		// Getters
 
+		unsigned int				GetTriangleCount() const;
 		const std::vector<Vector3>& GetVertices() const;
 		const std::vector<int>&		GetIds() const;
 
