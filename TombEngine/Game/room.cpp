@@ -292,38 +292,33 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc, cons
 		{
 			bool isFirstCrissCross = isFloor ? (vertex0.y < vertex3.y) : (vertex0.y > vertex3.y);
 
-			if (isFloor ? (vertex0.y > vertex3.y) : (vertex0.y < vertex3.y))
+			if (isFloor && (vertex0.y > vertex3.y))
 			{
-				if (isFloor)
-				{
-					isFirstCrissCross ?
-						desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex2 + offset) :
-						desc.InsertTriangle(vertex0 + offset, vertex2 + offset, vertex3 + offset);
-				}
-				else
-				{
-					isFirstCrissCross ?
-						desc.InsertTriangle(vertex2 + offset, vertex1 + offset, vertex0 + offset) :
-						desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex0 + offset);
-				}
+				isFirstCrissCross ?
+					desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex2 + offset) :
+					desc.InsertTriangle(vertex0 + offset, vertex2 + offset, vertex3 + offset);
+			}
+			else if (!isFloor && (vertex0.y < vertex3.y))
+			{
+				isFirstCrissCross ?
+					desc.InsertTriangle(vertex2 + offset, vertex1 + offset, vertex0 + offset) :
+					desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex0 + offset);
 			}
 
-			if (isFloor ? (vertex1.y > vertex2.y) : (vertex1.y < vertex2.y))
+			if (isFloor && (vertex1.y > vertex2.y))
 			{
-				if (isFloor)
-				{
-					isFirstCrissCross ?
-						desc.InsertTriangle(vertex1 + offset, vertex2 + offset, vertex3 + offset) :
-						desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex3 + offset);
-				}
-				else
-				{
-					isFirstCrissCross ?
-						desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex1 + offset) :
-						desc.InsertTriangle(vertex3 + offset, vertex1 + offset, vertex0 + offset);
-				}
+				isFirstCrissCross ?
+					desc.InsertTriangle(vertex1 + offset, vertex2 + offset, vertex3 + offset) :
+					desc.InsertTriangle(vertex0 + offset, vertex1 + offset, vertex3 + offset);
+			}
+			else if (!isFloor && (vertex1.y < vertex2.y))
+			{
+				isFirstCrissCross ?
+					desc.InsertTriangle(vertex3 + offset, vertex2 + offset, vertex1 + offset) :
+					desc.InsertTriangle(vertex3 + offset, vertex1 + offset, vertex0 + offset);
 			}
 		}
+
 		//     2     3---2
 		//   / | and | /
 		// 0---1     0
