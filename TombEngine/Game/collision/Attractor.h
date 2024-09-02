@@ -78,8 +78,8 @@ namespace TEN::Collision::Attractor
 		unsigned int GetSegmentIDAtPathDistance(float pathDist) const;
 		Vector3		 GetIntersectionAtPathDistance(float pathDist) const;
 
-		std::optional<AttractorCollisionData> GetCollision(const BoundingSphere& sphere, short headingAngle, unsigned int segmentID, const Vector3& axis = Vector3::UnitY);
 		AttractorCollisionData				  GetCollision(float pathDist, short headingAngle, const Vector3& axis = Vector3::UnitY);
+		std::optional<AttractorCollisionData> GetCollision(const BoundingSphere& sphere, short headingAngle, unsigned int segmentID, const Vector3& axis = Vector3::UnitY);
 
 		// Setters
 		

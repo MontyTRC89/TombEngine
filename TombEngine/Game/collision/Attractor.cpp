@@ -179,13 +179,10 @@ namespace TEN::Collision::Attractor
 			segmentID = 0;
 		}
 
-		// Get matrices.
 		auto transformMatrix = GetTransformMatrix();
 		auto rotMatrix = GetRotationMatrix();
 
 		auto localSphere = BoundingSphere(Vector3::Transform(sphere.Center, transformMatrix.Invert()), sphere.Radius);
-
-		// Determine if attractor is path or single point.
 		bool isPath = (_points.size() > 1);
 
 		// Test sphere-segment intersection.
@@ -195,7 +192,6 @@ namespace TEN::Collision::Attractor
 		if (dist > localSphere.Radius)
 			return std::nullopt;
 
-		// Calculate intersection.
 		auto intersect = isPath ?
 			Geometry::GetClosestPointOnLinePerp(localSphere.Center, _points[segmentID], _points[segmentID + 1], axis) :
 			_points[segmentID];
@@ -213,7 +209,6 @@ namespace TEN::Collision::Attractor
 		}
 
 		// TODO: Consider axis. Hardcoded to Y+.
-		// Calculate orientations.
 		auto refOrient = EulerAngles(0, headingAngle - EulerAngles(_orientation).y, 0);
 		auto segmentOrient = isPath ?
 			Geometry::GetOrientToPoint(_points[segmentID], _points[segmentID + 1]) + EulerAngles(0, EulerAngles(_orientation).y, 0) :
