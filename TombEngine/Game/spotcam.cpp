@@ -498,7 +498,7 @@ void CalculateSpotCameras()
 
 		SetFov(cfov, false);
 
-		LookAt(g_Camera, croll);
+		HandleLookAt(g_Camera, croll);
 		UpdateListenerPosition(*LaraItem);
 
 		if (SpotCam[CurrentSplineCamera].flags & SCF_OVERLAY)
@@ -757,7 +757,7 @@ void CalculateSpotCameras()
 
 					g_Camera.targetElevation = elevation;
 
-					LookAt(g_Camera, croll);
+					HandleLookAt(g_Camera, croll);
 					UpdateListenerPosition(*LaraItem);
 
 					SplineToCamera = 1;

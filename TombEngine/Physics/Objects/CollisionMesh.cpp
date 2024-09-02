@@ -201,8 +201,6 @@ namespace TEN::Physics
 
 	std::optional<CollisionMeshRayCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
 	{
-		constexpr auto THRESHOLD = 0.001f;
-
 		// Get matrices.
 		auto transformMatrix = GetTransformMatrix();
 		auto rotMatrix = GetRotationMatrix();

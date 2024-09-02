@@ -101,6 +101,17 @@ struct PrevCameraData
 	int TargetState = 0;
 };
 
+struct CameraLosCollisionData
+{
+	Vector3 Position   = Vector3::Zero;
+	int		RoomNumber = 0;
+	Vector3 Normal	   = Vector3::Zero;
+
+	bool  IsIntersected = false;
+	float Distance		= 0.0f;
+};
+
+// class CameraObject
 struct CameraInfo
 {
 	// Camera sphere
@@ -161,6 +172,33 @@ struct CameraInfo
 	Vector3		   PrevIdeal			   = Vector3::Zero;
 	int			   PrevIdealRoomNumber	   = 0;
 	CameraType	   PrevBinocularCameraType = CameraType::Chase;
+
+	// Getters
+
+	CameraLosCollisionData GetLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist);
+	Vector3				   GetGeometryOffset(); // TODO
+
+	// Utilities
+
+	void Update(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumber, float speed);
+	void UpdateSphere(const ItemInfo& playerItem);
+	void HandleFollow(const ItemInfo& playerItem, bool isCombatCamera);
+	void RumbleFromBounce();
+
+private:
+
+	// Helper inquirers
+
+	bool CanControlTankCamera(const ItemInfo& playerItem);
+	bool TestStrafeZoom(const ItemInfo& playerItem);
+	bool TestCollidableMoveable(const ItemInfo& mov);
+	bool TestCollidableStatic(const MESH_INFO& staticObj);
+	bool TestCollidableObb(const BoundingOrientedBox& obb);
+
+	// Helper utilities
+
+	void UpdateAzimuthAngle(const ItemInfo& item);
+	void ClampAltitudeAngle(bool isUnderwater);
 };
 
 struct ScreenEffectData
@@ -185,17 +223,16 @@ EulerAngles GetCameraControlRotation();
 void UpdatePlayerRefCameraOrient(ItemInfo& item);
 void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
 
-void LookAt(CameraInfo& camera, short roll);
+void HandleLookAt(CameraInfo& camera, short roll);
 void SetFov(short fov, bool store = true);
 short GetCurrentFov();
 void InitializeCamera();
-void MoveCamera(const ItemInfo& playerItem, Vector3 ideal, int idealRoomNumber, float speed);
 void ChaseCamera(const ItemInfo& playerItem);
 void CombatCamera(const ItemInfo& playerItem);
-void UpdateCameraSphere(const ItemInfo& playerItem);
 void FixedCamera();
-void BounceCamera(ItemInfo* item, int bounce, float distMax);
 void BinocularCamera(ItemInfo* item);
+
+void BounceCamera(ItemInfo* item, int bounce, float distMax);
 void ConfirmCameraTargetPos();
 void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll);
 void RumbleScreen();
@@ -204,11 +241,14 @@ void ObjCamera(ItemInfo* item, int boneID, ItemInfo* targetItem, int targetBoneI
 void MoveObjCamera(GameVector* ideal, ItemInfo* item, int boneID, ItemInfo* targetItem, int targetBoneID);
 void RefreshFixedCamera(int cameraID);
 
+// Screen effects
+
 void SetScreenFadeOut(float speed, bool force = false);
 void SetScreenFadeIn(float speed, bool force = false);
 void SetCinematicBars(float height, float speed);
-void ClearCinematicBars();
 void UpdateFadeScreenAndCinematicBars();
+void ClearCinematicBars();
+
 void UpdateListenerPosition(const ItemInfo& item);
 void ClearObjCamera();
 
