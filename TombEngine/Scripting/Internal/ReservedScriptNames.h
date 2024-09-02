@@ -22,10 +22,8 @@ static constexpr char ScriptReserved_Sink[]				= "Sink";
 static constexpr char ScriptReserved_SoundSource[]		= "SoundSource";
 static constexpr char ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char ScriptReserved_Volume[]			= "Volume";
-static constexpr char ScriptReserved_Room[]				= "Room";
 static constexpr char ScriptReserved_Color[]			= "Color";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
-static constexpr char ScriptReserved_Vec2[]				= "Vec2";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 
@@ -198,7 +196,6 @@ static constexpr char ScriptReserved_IsMoveableInside[]		= "IsMoveableInside";
 static constexpr char ScriptReserved_GetFlag[]				= "GetFlag";
 static constexpr char ScriptReserved_SetFlag[]				= "SetFlag";
 static constexpr char ScriptReserved_IsTagPresent[]			= "IsTagPresent";
-static constexpr char ScriptReserved_SetReverbType[]		= "SetReverbType";
 
 // Flow Functions
 static constexpr char ScriptReserved_AddLevel[]					= "AddLevel";
@@ -371,22 +368,39 @@ static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 // Internal
 static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
 
+// Room
+
+constexpr char ScriptReserved_Room[]				= "Room";
+constexpr char ScriptReserved_RoomGetActive[]		= "GetActive";
+constexpr char ScriptReserved_RoomGetColor[]		= "GetColor";
+constexpr char ScriptReserved_RoomGetFlag[]			= "GetFlag";
+constexpr char ScriptReserved_RoomGetName[]			= "GetName";
+constexpr char ScriptReserved_RoomGetReverbType[]	= "GetReverbType";
+constexpr char ScriptReserved_RoomGetRoomNumber[]	= "GetRoomNumber";
+constexpr char ScriptReserved_RoomIsTagPresent[]	= "IsTagPresent";
+constexpr char ScriptReserved_RoomSetFlag[]			= "SetFlag";
+constexpr char ScriptReserved_RoomSetName[]			= "SetName";
+constexpr char ScriptReserved_RoomSetReverbType[]	= "SetReverbType";
+
 // Vec2
+
+constexpr char ScriptReserved_Vec2[]				= "Vec2";
+constexpr char ScriptReserved_Vec2Cross[]			= "Cross";
+constexpr char ScriptReserved_Vec2Distance[]		= "Distance";
+constexpr char ScriptReserved_Vec2Dot[]				= "Dot";
+constexpr char ScriptReserved_Vec2Length[]			= "Length";
+constexpr char ScriptReserved_Vec2Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec2SetLength[]		= "ToLength";
 constexpr char ScriptReserved_Vec2Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec2Rotate[]			= "Rotate";
-constexpr char ScriptReserved_Vec2Lerp[]			= "Lerp";
-constexpr char ScriptReserved_Vec2Cross[]			= "Cross";
-constexpr char ScriptReserved_Vec2Dot[]				= "Dot";
-constexpr char ScriptReserved_Vec2Distance[]		= "Distance";
-constexpr char ScriptReserved_Vec2Length[]			= "Length";
 
 // Vec3
+
 constexpr char ScriptReserved_Vec3[]				= "Vec3";
+constexpr char ScriptReserved_Vec3Cross[]			= "Cross";
+constexpr char ScriptReserved_Vec3Distance[]		= "Distance";
+constexpr char ScriptReserved_Vec3Dot[]				= "Dot";
+constexpr char ScriptReserved_Vec3Length[]			= "Length";
+constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
-constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
-constexpr char ScriptReserved_Vec3Cross[]			= "Cross";
-constexpr char ScriptReserved_Vec3Dot[]				= "Dot";
-constexpr char ScriptReserved_Vec3Distance[]		= "Distance";
-constexpr char ScriptReserved_Vec3Length[]			= "Length";
