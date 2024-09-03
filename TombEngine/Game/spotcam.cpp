@@ -499,7 +499,7 @@ void CalculateSpotCameras()
 		SetFov(cfov, false);
 
 		HandleLookAt(g_Camera, croll);
-		UpdateListenerPosition(*LaraItem);
+		g_Camera.UpdateListenerPosition(*LaraItem);
 
 		if (SpotCam[CurrentSplineCamera].flags & SCF_OVERLAY)
 			SpotcamOverlay = true;

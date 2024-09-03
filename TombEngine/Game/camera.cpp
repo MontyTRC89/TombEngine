@@ -146,7 +146,7 @@ void CameraInfo::UpdateSphere(const ItemInfo& playerItem)
 	{
 		if (g_Config.IsUsingModernControls() && !player.Control.IsLocked)
 		{
-			Rotation.Lerp(GetCameraControlRotation(), CONTROLLED_CAMERA_ROT_LERP_ALPHA);
+			Rotation.Lerp(GetControlRotation(), CONTROLLED_CAMERA_ROT_LERP_ALPHA);
 
 			if (IsPlayerInCombat(playerItem))
 			{
@@ -166,7 +166,7 @@ void CameraInfo::UpdateSphere(const ItemInfo& playerItem)
 		{
 			if (CanControlTankCamera(playerItem))
 			{
-				Rotation.Lerp(GetCameraControlRotation(), CONTROLLED_CAMERA_ROT_LERP_ALPHA);
+				Rotation.Lerp(GetControlRotation(), CONTROLLED_CAMERA_ROT_LERP_ALPHA);
 
 				actualAngle += Rotation.x;
 				actualElevation -= Rotation.y;
@@ -181,6 +181,12 @@ void CameraInfo::UpdateSphere(const ItemInfo& playerItem)
 			}
 		}
 	}
+}
+
+void CameraInfo::UpdateListenerPosition(const ItemInfo& item)
+{
+	float persp = ((g_Config.ScreenWidth / 2) * phd_cos(Fov / 2)) / phd_sin(Fov / 2);
+	ListenerPosition = Position + (persp * Vector3(phd_sin(actualAngle), 0.0f, phd_cos(actualAngle)));
 }
 
 void CameraInfo::HandleFollow(const ItemInfo& playerItem, bool isCombatCamera)
@@ -296,6 +302,51 @@ void CameraInfo::RumbleFromBounce()
 	Rumble(std::clamp(abs(bounce) / 70.0f, 0.0f, 0.8f), 0.2f);
 }
 
+void CameraInfo::LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
+{
+	constexpr auto DIST_COEFF = 0.5f;
+
+	const auto& player = GetLaraInfo(playerItem);
+
+	// Determine base position.
+	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, playerItem.RoomNumber);
+	auto basePos = Vector3(
+		playerItem.Pose.Position.x,
+		isInSwamp ? g_Level.Rooms[playerItem.RoomNumber].TopHeight : playerItem.Pose.Position.y,
+		playerItem.Pose.Position.z);
+
+	// Get camera LOS.
+	auto orient = player.Control.Look.Orientation + EulerAngles(playerItem.Pose.Orientation.x, playerItem.Pose.Orientation.y + targetAngle, 0);
+	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
+	auto cameraLos = GetLos(LookAt, LookAtRoomNumber, -orient.ToDirection(), targetDistance * DIST_COEFF);
+
+	// Update camera.
+	auto lookAtTarget = basePos + GetPlayerOffset(playerItem, coll);
+	LookAt += (lookAtTarget - LookAt) * (1.0f / speed);
+	Update(playerItem, cameraLos.Position, cameraLos.RoomNumber, speed);
+}
+
+EulerAngles CameraInfo::GetControlRotation()
+{
+	constexpr auto SLOW_ROT_COEFF				 = 0.4f;
+	constexpr auto MOUSE_AXIS_SENSITIVITY_COEFF	 = 20.0f;
+	constexpr auto CAMERA_AXIS_SENSITIVITY_COEFF = 12.0f;
+	constexpr auto SMOOTHING_FACTOR				 = 8.0f;
+
+	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
+	auto axisSign = Vector2(g_Config.InvertCameraXAxis ? -1 : 1, g_Config.InvertCameraYAxis ? -1 : 1);
+
+	// Calculate axis.
+	auto axis = (isUsingMouse ? GetMouseAxis() : GetCameraAxis()) * axisSign;
+	float sensitivityCoeff = isUsingMouse ? MOUSE_AXIS_SENSITIVITY_COEFF : CAMERA_AXIS_SENSITIVITY_COEFF;
+	float sensitivity = sensitivityCoeff / (1.0f + (abs(axis.x) + abs(axis.y)));
+	axis *= sensitivity * (isUsingMouse ? SMOOTHING_FACTOR : 1.0f);
+
+	// Calculate and return rotation.
+	auto rotCoeff = IsHeld(In::Walk) ? SLOW_ROT_COEFF : 1.0f;
+	return EulerAngles(ANGLE(axis.x), ANGLE(axis.y), 0) * rotCoeff;
+}
+
 CameraLosCollisionData CameraInfo::GetLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist)
 {
 	auto cameraLos = CameraLosCollisionData{};
@@ -357,6 +408,47 @@ CameraLosCollisionData CameraInfo::GetLos(const Vector3& origin, int roomNumber,
 Vector3 CameraInfo::GetGeometryOffset()
 {
 	return {};
+}
+
+Vector3 CameraInfo::GetPlayerOffset(const ItemInfo& item, const CollisionInfo& coll)
+{
+	constexpr auto VERTICAL_OFFSET_DEFAULT		  = -BLOCK(0.05f);
+	constexpr auto VERTICAL_OFFSET_SWAMP		  = BLOCK(0.4f);
+	constexpr auto VERTICAL_OFFSET_MONKEY_SWING	  = BLOCK(0.25f);
+	constexpr auto VERTICAL_OFFSET_TREADING_WATER = BLOCK(0.5f);
+
+	const auto& player = GetLaraInfo(item);
+
+	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
+
+	// Determine contextual vertical offset.
+	float verticalOffset = coll.Setup.Height;
+	if (player.Control.IsMonkeySwinging)
+	{
+		verticalOffset -= VERTICAL_OFFSET_MONKEY_SWING;
+	}
+	else if (player.Control.WaterStatus == WaterStatus::TreadWater)
+	{
+		verticalOffset -= VERTICAL_OFFSET_TREADING_WATER;
+	}
+	else if (isInSwamp)
+	{
+		verticalOffset = VERTICAL_OFFSET_SWAMP;
+	}
+	else
+	{
+		verticalOffset -= VERTICAL_OFFSET_DEFAULT;
+	}
+
+	// Get floor-to-ceiling height.
+	auto pointColl = GetPointCollision(item);
+	int floorToCeilHeight = abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight());
+
+	// Return offset.
+	return Vector3(
+		0.0f,
+		-((verticalOffset < floorToCeilHeight) ? verticalOffset : floorToCeilHeight),
+		0.0f);
 }
 
 bool CameraInfo::CanControlTankCamera(const ItemInfo& playerItem)
@@ -501,72 +593,6 @@ void CameraInfo::ClampAltitudeAngle(bool isUnderwater)
 	}
 }
 
-EulerAngles GetCameraControlRotation()
-{
-	constexpr auto SLOW_ROT_COEFF				 = 0.4f;
-	constexpr auto MOUSE_AXIS_SENSITIVITY_COEFF	 = 20.0f;
-	constexpr auto CAMERA_AXIS_SENSITIVITY_COEFF = 12.0f;
-	constexpr auto SMOOTHING_FACTOR				 = 8.0f;
-
-	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
-	auto axisSign = Vector2(g_Config.InvertCameraXAxis ? -1 : 1, g_Config.InvertCameraYAxis ? -1 : 1);
-
-	// Calculate axis.
-	auto axis = (isUsingMouse ? GetMouseAxis() : GetCameraAxis()) * axisSign;
-	float sensitivityCoeff = isUsingMouse ? MOUSE_AXIS_SENSITIVITY_COEFF : CAMERA_AXIS_SENSITIVITY_COEFF;
-	float sensitivity = sensitivityCoeff / (1.0f + (abs(axis.x) + abs(axis.y)));
-	axis *= sensitivity * (isUsingMouse ? SMOOTHING_FACTOR : 1.0f);
-
-	// Calculate and return rotation.
-	auto rotCoeff = IsHeld(In::Walk) ? SLOW_ROT_COEFF : 1.0f;
-	return EulerAngles(ANGLE(axis.x), ANGLE(axis.y), 0) * rotCoeff;
-}
-
-static Vector3 GetCameraPlayerOffset(const ItemInfo& item, const CollisionInfo& coll)
-{
-	constexpr auto VERTICAL_OFFSET_DEFAULT		  = -BLOCK(0.05f);
-	constexpr auto VERTICAL_OFFSET_SWAMP		  = BLOCK(0.4f);
-	constexpr auto VERTICAL_OFFSET_MONKEY_SWING	  = BLOCK(0.25f);
-	constexpr auto VERTICAL_OFFSET_TREADING_WATER = BLOCK(0.5f);
-
-	const auto& player = GetLaraInfo(item);
-
-	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
-
-	// Determine contextual vertical offset.
-	float verticalOffset = coll.Setup.Height;
-	if (player.Control.IsMonkeySwinging)
-	{
-		verticalOffset -= VERTICAL_OFFSET_MONKEY_SWING;
-	}
-	else if (player.Control.WaterStatus == WaterStatus::TreadWater)
-	{
-		verticalOffset -= VERTICAL_OFFSET_TREADING_WATER;
-	}
-	else if (isInSwamp)
-	{
-		verticalOffset = VERTICAL_OFFSET_SWAMP;
-	}
-	else
-	{
-		verticalOffset -= VERTICAL_OFFSET_DEFAULT;
-	}
-
-	// Get floor-to-ceiling height.
-	auto pointColl = GetPointCollision(item);
-	int floorToCeilHeight = abs(pointColl.GetCeilingHeight() - pointColl.GetFloorHeight());
-
-	// Return offset.
-	return Vector3(
-		0.0f,
-		-((verticalOffset < floorToCeilHeight) ? verticalOffset : floorToCeilHeight),
-		0.0f);
-}
-
-// --------------
-// MAIN FUNCTIONS
-// --------------
-
 void UpdatePlayerRefCameraOrient(ItemInfo& item)
 {
 	auto& player = GetLaraInfo(item);
@@ -590,30 +616,6 @@ void UpdatePlayerRefCameraOrient(ItemInfo& item)
 	// Update orientation.
 	if (!player.Control.LockRefCameraOrient)
 		player.Control.RefCameraOrient = EulerAngles(g_Camera.actualElevation, g_Camera.actualAngle, 0);
-}
-
-void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll)
-{
-	constexpr auto DIST_COEFF = 0.5f;
-
-	const auto& player = GetLaraInfo(playerItem);
-
-	// Determine base position.
-	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, playerItem.RoomNumber);
-	auto basePos = Vector3(
-		playerItem.Pose.Position.x,
-		isInSwamp ? g_Level.Rooms[playerItem.RoomNumber].TopHeight : playerItem.Pose.Position.y,
-		playerItem.Pose.Position.z);
-
-	// Get camera LOS.
-	auto orient = player.Control.Look.Orientation + EulerAngles(playerItem.Pose.Orientation.x, playerItem.Pose.Orientation.y + g_Camera.targetAngle, 0);
-	orient.x = std::clamp(orient.x, LOOKCAM_ORIENT_CONSTRAINT.first.x, LOOKCAM_ORIENT_CONSTRAINT.second.x);
-	auto cameraLos = g_Camera.GetLos(g_Camera.LookAt, g_Camera.LookAtRoomNumber, -orient.ToDirection(), g_Camera.targetDistance * DIST_COEFF);
-
-	// Update camera.
-	auto lookAt = basePos + GetCameraPlayerOffset(playerItem, coll);
-	g_Camera.LookAt += (lookAt - g_Camera.LookAt) * (1.0f / g_Camera.speed);
-	g_Camera.Update(playerItem, cameraLos.Position, cameraLos.RoomNumber, g_Camera.speed);
 }
 
 void HandleLookAt(CameraInfo& camera, short roll)
@@ -1015,7 +1017,7 @@ void BinocularCamera(ItemInfo* item)
 
 	g_Camera.LookAtRoomNumber = GetPointCollision(g_Camera.Position, g_Camera.LookAtRoomNumber).GetRoomNumber();
 	HandleLookAt(g_Camera, 0);
-	UpdateListenerPosition(*item);
+	g_Camera.UpdateListenerPosition(*item);
 	g_Camera.oldType = g_Camera.type;
 
 	auto origin0 = GameVector(g_Camera.Position, g_Camera.RoomNumber);
@@ -1116,7 +1118,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 	if (item->IsLara())
 	{
 		float heightCoeff = g_Config.IsUsingModernControls() ? 0.9f : 0.75f;
-		auto offset = GetCameraPlayerOffset(*item, coll) * heightCoeff;
+		auto offset = g_Camera.GetPlayerOffset(*item, coll) * heightCoeff;
 		y = item->Pose.Position.y + offset.y;
 	}
 
@@ -1201,7 +1203,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll)
 		g_Camera.fixedCamera = false;
 		if (g_Camera.type == CameraType::Look)
 		{
-			LookCamera(*item, coll);
+			g_Camera.LookCamera(*item, coll);
 		}
 		else
 		{
@@ -1306,12 +1308,6 @@ bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, fl
 {
 	auto sphere = BoundingSphere(g_Camera.Position, radius);
 	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
-}
-
-void UpdateListenerPosition(const ItemInfo& item)
-{
-	float persp = ((g_Config.ScreenWidth / 2) * phd_cos(g_Camera.Fov / 2)) / phd_sin(g_Camera.Fov / 2);
-	g_Camera.ListenerPosition = g_Camera.Position + (persp * Vector3(phd_sin(g_Camera.actualAngle), 0.0f, phd_cos(g_Camera.actualAngle)));
 }
 
 void RumbleScreen()

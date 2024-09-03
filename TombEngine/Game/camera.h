@@ -177,15 +177,25 @@ struct CameraInfo
 
 	CameraLosCollisionData GetLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist);
 	Vector3				   GetGeometryOffset(); // TODO
+	Vector3				   GetPlayerOffset(const ItemInfo& item, const CollisionInfo& coll);
 
 	// Utilities
 
 	void Update(const ItemInfo& playerItem, Vector3 idealPos, int idealRoomNumber, float speed);
 	void UpdateSphere(const ItemInfo& playerItem);
+	void UpdateListenerPosition(const ItemInfo& item);
+
 	void HandleFollow(const ItemInfo& playerItem, bool isCombatCamera);
 	void RumbleFromBounce();
 
+	// Camera types
+
+	void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
+
 private:
+	// Helper getters
+
+	EulerAngles GetControlRotation();
 
 	// Helper inquirers
 
@@ -218,11 +228,6 @@ struct ScreenEffectData
 extern CameraInfo		g_Camera;
 extern ScreenEffectData g_ScreenEffect;
 
-EulerAngles GetCameraControlRotation();
-
-void UpdatePlayerRefCameraOrient(ItemInfo& item);
-void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
-
 void HandleLookAt(CameraInfo& camera, short roll);
 void SetFov(short fov, bool store = true);
 short GetCurrentFov();
@@ -238,6 +243,7 @@ void CalculateCamera(ItemInfo& playerItem, const CollisionInfo& coll);
 void RumbleScreen();
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, float radius);
 void ObjCamera(ItemInfo* item, int boneID, ItemInfo* targetItem, int targetBoneID, bool cond);
+void ClearObjCamera();
 void MoveObjCamera(GameVector* ideal, ItemInfo* item, int boneID, ItemInfo* targetItem, int targetBoneID);
 void RefreshFixedCamera(int cameraID);
 
@@ -248,8 +254,5 @@ void SetScreenFadeIn(float speed, bool force = false);
 void SetCinematicBars(float height, float speed);
 void UpdateFadeScreenAndCinematicBars();
 void ClearCinematicBars();
-
-void UpdateListenerPosition(const ItemInfo& item);
-void ClearObjCamera();
 
 float GetParticleDistanceFade(const Vector3i& pos);
