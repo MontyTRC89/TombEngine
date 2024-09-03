@@ -227,7 +227,6 @@ void CameraInfo::HandleFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			SetFov((short)Lerp(Fov, ANGLE(DEFAULT_FOV), STRAFE_CAMERA_FOV_LERP_ALPHA / 2));
 		}
 
-		// Update camera.
 		float speedCoeff = (type != CameraType::Look) ? 0.2f : 1.0f;
 		Update(playerItem, idealPos, idealRoomNumber, speed * speedCoeff);
 	}
@@ -271,11 +270,12 @@ void CameraInfo::HandleFollow(const ItemInfo& playerItem, bool isCombatCamera)
 			// Has LOS intersection and is initial swivel step.
 			else if (i == 0)
 			{
-				float distSqr = Vector3::DistanceSquared(LookAt, farthestIdealPos);
+				float distSqr = Vector3::DistanceSquared(LookAt, cameraLos.Position);
 				if (distSqr > SQUARE(TANK_CAMERA_CLOSE_DIST_MIN))
 				{
 					farthestIdealPos = cameraLos.Position;
 					farthestIdealAzimuthAngle = azimuthAngle;
+					farthestDistSqr = distSqr;
 					break;
 				}
 			}
@@ -283,14 +283,10 @@ void CameraInfo::HandleFollow(const ItemInfo& playerItem, bool isCombatCamera)
 
 		actualAngle = farthestIdealAzimuthAngle;
 
-		if (isCombatCamera)
-		{
-			// Snap position of fixed camera type.
-			if (oldType == CameraType::Fixed)
-				speed = 1.0f;
-		}
+		// Snap position of fixed camera.
+		if (isCombatCamera && oldType == CameraType::Fixed)
+			speed = 1.0f;
 
-		// Update camera.
 		Update(playerItem, farthestIdealPos, farthestIdealRoomNumber, speed);
 	}
 }
