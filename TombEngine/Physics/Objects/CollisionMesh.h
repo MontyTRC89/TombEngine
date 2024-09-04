@@ -75,7 +75,7 @@ namespace TEN::Physics
 	struct CollisionMeshRayCollisionData
 	{
 		CollisionTriangleData Triangle = {};
-		float Distance = 0.0f;
+		float				  Distance = 0.0f;
 	};
 	
 	class CollisionMesh

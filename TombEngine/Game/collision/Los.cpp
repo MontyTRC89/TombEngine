@@ -72,28 +72,31 @@ namespace TEN::Collision::Los
 
 	static std::vector<MESH_INFO*> GetNearbyStatics(const std::vector<int>& roomNumbers)
 	{
-		// Run through neighbor rooms.
-		auto statics = std::vector<MESH_INFO*>{};
+		// Collect neighbor room numbers.
+		auto neighborRoomNumbers = std::set<int>{};
 		for (int roomNumber : roomNumbers)
 		{
-			// Run through neighbor rooms.
 			const auto& room = g_Level.Rooms[roomNumber];
-			for (auto& neighborRoomNumber : room.NeighborRoomNumbers)
+			neighborRoomNumbers.insert(room.NeighborRoomNumbers.begin(), room.NeighborRoomNumbers.end());
+		}
+
+		// Run through neighbor rooms.
+		auto statics = std::vector<MESH_INFO*>{};
+		for (int neighborRoomNumber : neighborRoomNumbers)
+		{
+			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+			if (!neighborRoom.Active())
+				continue;
+
+			// Run through statics.
+			for (auto& staticObj : neighborRoom.mesh)
 			{
-				auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-				if (!neighborRoom.Active())
+				// Check visibility.
+				if (!(staticObj.flags & StaticMeshFlags::SM_VISIBLE))
 					continue;
 
-				// Run through statics.
-				for (auto& staticObj : neighborRoom.mesh)
-				{
-					// Check visibility.
-					if (!(staticObj.flags & StaticMeshFlags::SM_VISIBLE))
-						continue;
-
-					// Collect static.
-					statics.push_back(&staticObj);
-				}
+				// Collect static.
+				statics.push_back(&staticObj);
 			}
 		}
 
@@ -114,7 +117,6 @@ namespace TEN::Collision::Los
 
 		// 1) Collect room LOS collision.
 		los.Room = GetRoomLosCollision(origin, roomNumber, dir, dist);
-		dist = los.Room.Distance;
 
 		// 2) Collect moveable and sphere LOS collisions.
 		if (collideMoveables || collideSpheres)
@@ -129,7 +131,7 @@ namespace TEN::Collision::Los
 					auto obb = mov->GetObb();
 
 					float intersectDist = 0.0f;
-					if (obb.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
+					if (obb.Intersects(origin, dir, intersectDist) && intersectDist <= los.Room.Distance)
 					{
 						auto pos = Geometry::TranslatePoint(origin, dir, intersectDist);
 						auto offset = pos - mov->Pose.Position.ToVector3();
@@ -154,7 +156,7 @@ namespace TEN::Collision::Los
 						const auto& sphere = spheres[i];
 
 						float intersectDist = 0.0f;
-						if (sphere.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
+						if (sphere.Intersects(origin, dir, intersectDist) && intersectDist <= los.Room.Distance)
 						{
 							auto pos = Geometry::TranslatePoint(origin, dir, intersectDist);
 							auto offset = pos - mov->Pose.Position.ToVector3();
@@ -200,7 +202,7 @@ namespace TEN::Collision::Los
 				auto obb = staticObj->GetObb();
 
 				float intersectDist = 0.0f;
-				if (obb.Intersects(origin, dir, intersectDist) && intersectDist <= dist)
+				if (obb.Intersects(origin, dir, intersectDist) && intersectDist <= los.Room.Distance)
 				{
 					auto pos = Geometry::TranslatePoint(origin, dir, intersectDist);
 					auto offset = pos - staticObj->pos.Position.ToVector3();
@@ -242,7 +244,7 @@ namespace TEN::Collision::Los
 
 		auto roomLos = RoomLosCollisionData{};
 
-		// 1) Initialize ray.
+		// 1) Define ray.
 		auto ray = Ray(origin, dir);
 		float rayDist = dist;
 		int rayRoomNumber = roomNumber;
