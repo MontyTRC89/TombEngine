@@ -10,9 +10,8 @@ struct VaultTestResult;
 
 enum PlayerTurnFlags
 {
-	TurnX = 1,
-	TurnY = 1 << 1,
-
+	TurnX		 = 1 << 0,
+	TurnY		 = 1 << 1,
 	VerticalFlex = 1 << 2,
 	CrawlFlex	 = 1 << 3,
 	SwimFlex	 = 1 << 4

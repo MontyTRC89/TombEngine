@@ -216,17 +216,17 @@ namespace TEN::Structures
 	{
 		int nodeID = 0;
 
-		// Get existing empty node ID.
-		if (!_freeNodeIds.empty())
-		{
-			nodeID = _freeNodeIds.back();
-			_freeNodeIds.pop_back();
-		}
 		// Allocate and get new empty node ID.
-		else
+		if (_freeNodeIds.empty())
 		{
 			nodeID = (int)_nodes.size();
 			_nodes.emplace_back();
+		}
+		// Get existing empty node ID.
+		else
+		{
+			nodeID = _freeNodeIds.back();
+			_freeNodeIds.pop_back();
 		}
 
 		return nodeID;
