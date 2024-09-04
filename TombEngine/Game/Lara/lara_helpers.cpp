@@ -847,6 +847,7 @@ static void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 	short deltaAngle = Geometry::GetShortestAngle(item.Pose.Orientation.y, GetPlayerHeadingAngleY(item));
 	int sign = std::copysign(1, deltaAngle);
 
+	// TODO: Reference hip flex angles from TRL, which uses far more artistically cohrent offsets.
 	// Adjust detla angle if strafing.
 	if (isStrafing && abs(deltaAngle) > BASE_ANGLE)
 		deltaAngle = (((BASE_ANGLE * 2) * sign) - deltaAngle) * -1;
@@ -863,10 +864,6 @@ static void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 	short upperFlexAngleY = ((FLEX_ANGLE_Y_CONSTRAINT * upperFlexAngleYAlpha) * sign) * upperFlexAngleYCoeff;
 	short upperFlexAngleZ = upperFlexAngleY * UPPER_FLEX_ANGLE_Z_COEFF;
 	auto upperFlexRot = EulerAngles(player.ExtraHeadRot.x, upperFlexAngleY, upperFlexAngleZ);
-
-	// TODO: If strafing and has target, lock head forward.
-	// TODO: Narrower head angle constraint when strafing (45 deg).
-	// TODO: Reference hip flex angles from TRL, which uses far more artistically cohrent offsets.
 
 	// Flex hips, torso, and head.
 	player.LimbRot.Hip.Lerp(lowerFlexRot, alpha);
