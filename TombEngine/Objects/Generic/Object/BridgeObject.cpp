@@ -170,7 +170,8 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::UpdateAttractor(const ItemInfo& item)
 	{
-		// TODO
+		//_attractor.SetPosition(item.Pose.Position.ToVector3());
+		//_attractor.SetOrientation(item.Pose.Orientation.ToQuaternion());
 	}
 
 	void BridgeObject::AssignSectors(const ItemInfo& item)

@@ -758,7 +758,7 @@ void CalculateSpotCameras()
 					g_Camera.targetElevation = elevation;
 
 					HandleLookAt(g_Camera, croll);
-					UpdateListenerPosition(*LaraItem);
+					g_Camera.UpdateListenerPosition(*LaraItem);
 
 					SplineToCamera = 1;
 				}

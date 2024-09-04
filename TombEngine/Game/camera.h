@@ -178,6 +178,7 @@ struct CameraInfo
 	CameraLosCollisionData GetLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist);
 	Vector3				   GetGeometryOffset(); // TODO
 	Vector3				   GetPlayerOffset(const ItemInfo& item, const CollisionInfo& coll);
+	EulerAngles			   GetControlRotation();
 
 	// Utilities
 
@@ -193,10 +194,6 @@ struct CameraInfo
 	void LookCamera(const ItemInfo& playerItem, const CollisionInfo& coll);
 
 private:
-	// Helper getters
-
-	EulerAngles GetControlRotation();
-
 	// Helper inquirers
 
 	bool CanControlTankCamera(const ItemInfo& playerItem);
@@ -227,6 +224,8 @@ struct ScreenEffectData
 
 extern CameraInfo		g_Camera;
 extern ScreenEffectData g_ScreenEffect;
+
+void UpdatePlayerRefCameraOrient(ItemInfo& item);
 
 void HandleLookAt(CameraInfo& camera, short roll);
 void SetFov(short fov, bool store = true);

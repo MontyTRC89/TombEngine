@@ -133,9 +133,6 @@ static void HandleBridgeDebug(const ItemInfo& item)
 	{
 		for (auto& item2 : g_Level.Items)
 		{
-			if (!item2.Active)
-				continue;
-
 			if (!item2.IsBridge())
 				continue;
 
@@ -147,14 +144,14 @@ static void HandleBridgeDebug(const ItemInfo& item)
 	}
 
 	// Move bridge with mouse.
-	auto pointColl = GetPointCollision(item);
+	/*auto pointColl = GetPointCollision(item);
 	if (pointColl.GetFloorBridgeItemNumber() != NO_VALUE)
 	{
 		auto& bridgeItem = g_Level.Items[pointColl.GetFloorBridgeItemNumber()];
 
 		bridgeItem.Pose.Position += Vector3i(GetMouseAxis().x * BLOCK(0.5f), 0, GetMouseAxis().y * BLOCK(0.5f));
 		UpdateItemRoom(bridgeItem.Index);
-	}
+	}*/
 }
 
 // temp

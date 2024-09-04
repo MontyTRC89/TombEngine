@@ -588,7 +588,7 @@ void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 	if (g_Config.EnableTankCameraControl &&
 		(GetMouseAxis() != Vector2::Zero || GetCameraAxis() != Vector2::Zero))
 	{
-		auto rot = GetCameraControlRotation() / 2;
+		auto rot = g_Camera.GetControlRotation() / 2;
 		player.Control.Look.Orientation.x += -rot.y;
 		player.Control.Look.Orientation.y += rot.x;
 	}

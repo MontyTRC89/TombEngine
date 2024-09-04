@@ -326,27 +326,6 @@ void CameraInfo::LookCamera(const ItemInfo& playerItem, const CollisionInfo& col
 	Update(playerItem, cameraLos.Position, cameraLos.RoomNumber, speed);
 }
 
-EulerAngles CameraInfo::GetControlRotation()
-{
-	constexpr auto SLOW_ROT_COEFF				 = 0.4f;
-	constexpr auto MOUSE_AXIS_SENSITIVITY_COEFF	 = 20.0f;
-	constexpr auto CAMERA_AXIS_SENSITIVITY_COEFF = 12.0f;
-	constexpr auto SMOOTHING_FACTOR				 = 8.0f;
-
-	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
-	auto axisSign = Vector2(g_Config.InvertCameraXAxis ? -1 : 1, g_Config.InvertCameraYAxis ? -1 : 1);
-
-	// Calculate axis.
-	auto axis = (isUsingMouse ? GetMouseAxis() : GetCameraAxis()) * axisSign;
-	float sensitivityCoeff = isUsingMouse ? MOUSE_AXIS_SENSITIVITY_COEFF : CAMERA_AXIS_SENSITIVITY_COEFF;
-	float sensitivity = sensitivityCoeff / (1.0f + (abs(axis.x) + abs(axis.y)));
-	axis *= sensitivity * (isUsingMouse ? SMOOTHING_FACTOR : 1.0f);
-
-	// Calculate and return rotation.
-	auto rotCoeff = IsHeld(In::Walk) ? SLOW_ROT_COEFF : 1.0f;
-	return EulerAngles(ANGLE(axis.x), ANGLE(axis.y), 0) * rotCoeff;
-}
-
 CameraLosCollisionData CameraInfo::GetLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist)
 {
 	auto cameraLos = CameraLosCollisionData{};
@@ -449,6 +428,27 @@ Vector3 CameraInfo::GetPlayerOffset(const ItemInfo& item, const CollisionInfo& c
 		0.0f,
 		-((verticalOffset < floorToCeilHeight) ? verticalOffset : floorToCeilHeight),
 		0.0f);
+}
+
+EulerAngles CameraInfo::GetControlRotation()
+{
+	constexpr auto SLOW_ROT_COEFF				 = 0.4f;
+	constexpr auto MOUSE_AXIS_SENSITIVITY_COEFF	 = 20.0f;
+	constexpr auto CAMERA_AXIS_SENSITIVITY_COEFF = 12.0f;
+	constexpr auto SMOOTHING_FACTOR				 = 8.0f;
+
+	bool isUsingMouse = (GetCameraAxis() == Vector2::Zero);
+	auto axisSign = Vector2(g_Config.InvertCameraXAxis ? -1 : 1, g_Config.InvertCameraYAxis ? -1 : 1);
+
+	// Calculate axis.
+	auto axis = (isUsingMouse ? GetMouseAxis() : GetCameraAxis()) * axisSign;
+	float sensitivityCoeff = isUsingMouse ? MOUSE_AXIS_SENSITIVITY_COEFF : CAMERA_AXIS_SENSITIVITY_COEFF;
+	float sensitivity = sensitivityCoeff / (1.0f + (abs(axis.x) + abs(axis.y)));
+	axis *= sensitivity * (isUsingMouse ? SMOOTHING_FACTOR : 1.0f);
+
+	// Calculate and return rotation.
+	auto rotCoeff = IsHeld(In::Walk) ? SLOW_ROT_COEFF : 1.0f;
+	return EulerAngles(ANGLE(axis.x), ANGLE(axis.y), 0) * rotCoeff;
 }
 
 bool CameraInfo::CanControlTankCamera(const ItemInfo& playerItem)

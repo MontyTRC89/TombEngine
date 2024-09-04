@@ -839,12 +839,12 @@ namespace TEN::Collision::Floordata
 		constexpr auto SECTOR_SEARCH_DEPTH = 2;
 		constexpr auto STRING_SPACING	   = -20.0f;
 
-		constexpr auto STOPPER_COLOR				 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
-		constexpr auto DEATH_COLOR					 = Vector4(0.4f, 1.0f, 0.4f, 1.0f);
-		constexpr auto MONKEY_SWING_COLOR			 = Vector4(1.0f, 0.4f, 0.4f, 1.0f);
-		constexpr auto BEETLE_MINECART_RIGHT_COLOR	 = Vector4(0.4f, 0.4f, 1.0f, 1.0f);
-		constexpr auto ACTIVATOR_MINECART_LEFT_COLOR = Vector4(1.0f, 0.4f, 1.0f, 1.0f);
-		constexpr auto MINECART_STOP_COLOR			 = Vector4(0.4f, 1.0f, 1.0f, 1.0f);
+		constexpr auto STOPPER_COLOR				 = Color(1.0f, 0.4f, 0.4f);
+		constexpr auto DEATH_COLOR					 = Color(0.4f, 1.0f, 0.4f);
+		constexpr auto MONKEY_SWING_COLOR			 = Color(1.0f, 0.4f, 0.4f);
+		constexpr auto BEETLE_MINECART_RIGHT_COLOR	 = Color(0.4f, 0.4f, 1.0f);
+		constexpr auto ACTIVATOR_MINECART_LEFT_COLOR = Color(1.0f, 0.4f, 1.0f);
+		constexpr auto MINECART_STOP_COLOR			 = Color(0.4f, 1.0f, 1.0f);
 
 		// Get point collision.
 		auto pointColl = GetPointCollision(item);
