@@ -326,7 +326,7 @@ void CameraInfo::LookCamera(const ItemInfo& playerItem, const CollisionInfo& col
 	Update(playerItem, cameraLos.Position, cameraLos.RoomNumber, speed);
 }
 
-CameraLosCollisionData CameraInfo::GetLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist)
+CameraLosCollisionData CameraInfo::GetLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist) const
 {
 	auto cameraLos = CameraLosCollisionData{};
 
@@ -384,12 +384,12 @@ CameraLosCollisionData CameraInfo::GetLos(const Vector3& origin, int roomNumber,
 	return cameraLos;
 }
 
-Vector3 CameraInfo::GetGeometryOffset()
+Vector3 CameraInfo::GetGeometryOffset() const
 {
 	return {};
 }
 
-Vector3 CameraInfo::GetPlayerOffset(const ItemInfo& item, const CollisionInfo& coll)
+Vector3 CameraInfo::GetPlayerOffset(const ItemInfo& item, const CollisionInfo& coll) const
 {
 	constexpr auto VERTICAL_OFFSET_DEFAULT		  = -BLOCK(0.05f);
 	constexpr auto VERTICAL_OFFSET_SWAMP		  = BLOCK(0.4f);
@@ -430,7 +430,7 @@ Vector3 CameraInfo::GetPlayerOffset(const ItemInfo& item, const CollisionInfo& c
 		0.0f);
 }
 
-EulerAngles CameraInfo::GetControlRotation()
+EulerAngles CameraInfo::GetControlRotation() const
 {
 	constexpr auto SLOW_ROT_COEFF				 = 0.4f;
 	constexpr auto MOUSE_AXIS_SENSITIVITY_COEFF	 = 20.0f;
@@ -451,7 +451,7 @@ EulerAngles CameraInfo::GetControlRotation()
 	return EulerAngles(ANGLE(axis.x), ANGLE(axis.y), 0) * rotCoeff;
 }
 
-bool CameraInfo::CanControlTankCamera(const ItemInfo& playerItem)
+bool CameraInfo::CanControlTankCamera(const ItemInfo& playerItem) const
 {
 	if (!g_Config.EnableTankCameraControl)
 		return false;
@@ -478,7 +478,7 @@ bool CameraInfo::CanControlTankCamera(const ItemInfo& playerItem)
 	return false;
 }
 
-bool CameraInfo::TestStrafeZoom(const ItemInfo& playerItem)
+bool CameraInfo::TestStrafeZoom(const ItemInfo& playerItem) const
 {
 	const auto& player = GetLaraInfo(playerItem);
 
@@ -497,7 +497,7 @@ bool CameraInfo::TestStrafeZoom(const ItemInfo& playerItem)
 	return false;
 }
 
-bool CameraInfo::TestCollidableMoveable(const ItemInfo& mov)
+bool CameraInfo::TestCollidableMoveable(const ItemInfo& mov) const
 {
 	// 1) Check if item is player or bridge.
 	if (mov.IsLara())
@@ -524,7 +524,7 @@ bool CameraInfo::TestCollidableMoveable(const ItemInfo& mov)
 	return true;
 }
 
-bool CameraInfo::TestCollidableStatic(const MESH_INFO& staticObj)
+bool CameraInfo::TestCollidableStatic(const MESH_INFO& staticObj) const
 {
 	// 1) Test distance.
 	float distSqr = Vector3i::DistanceSquared(Position, staticObj.pos.Position);
@@ -538,7 +538,7 @@ bool CameraInfo::TestCollidableStatic(const MESH_INFO& staticObj)
 	return true;
 }
 
-bool CameraInfo::TestCollidableObb(const BoundingOrientedBox& obb)
+bool CameraInfo::TestCollidableObb(const BoundingOrientedBox& obb) const
 {
 	// Test if any 2 OBB extents are below threshold.
 	if ((abs(obb.Extents.x) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD && abs(obb.Extents.y) < CAMERA_OBJECT_COLL_EXTENT_THRESHOLD) ||

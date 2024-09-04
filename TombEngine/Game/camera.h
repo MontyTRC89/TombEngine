@@ -175,10 +175,10 @@ struct CameraInfo
 
 	// Getters
 
-	CameraLosCollisionData GetLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist);
-	Vector3				   GetGeometryOffset(); // TODO
-	Vector3				   GetPlayerOffset(const ItemInfo& item, const CollisionInfo& coll);
-	EulerAngles			   GetControlRotation();
+	CameraLosCollisionData GetLos(const Vector3& origin, int roomNumber, const Vector3& dir, float dist) const;
+	Vector3				   GetGeometryOffset() const; // TODO
+	Vector3				   GetPlayerOffset(const ItemInfo& item, const CollisionInfo& coll) const;
+	EulerAngles			   GetControlRotation() const;
 
 	// Utilities
 
@@ -196,11 +196,11 @@ struct CameraInfo
 private:
 	// Helper inquirers
 
-	bool CanControlTankCamera(const ItemInfo& playerItem);
-	bool TestStrafeZoom(const ItemInfo& playerItem);
-	bool TestCollidableMoveable(const ItemInfo& mov);
-	bool TestCollidableStatic(const MESH_INFO& staticObj);
-	bool TestCollidableObb(const BoundingOrientedBox& obb);
+	bool CanControlTankCamera(const ItemInfo& playerItem) const;
+	bool TestStrafeZoom(const ItemInfo& playerItem) const;
+	bool TestCollidableMoveable(const ItemInfo& mov) const;
+	bool TestCollidableStatic(const MESH_INFO& staticObj) const;
+	bool TestCollidableObb(const BoundingOrientedBox& obb) const;
 
 	// Helper utilities
 

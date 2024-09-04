@@ -14,6 +14,7 @@ namespace TEN::Entities::Generic
 	{
 	private:
 		// Members
+
 		BoundingBox		_aabb		   = BoundingBox();
 		CollisionMesh	_collisionMesh = CollisionMesh();
 		//AttractorObject _attractor	   = AttractorObject();
@@ -25,23 +26,27 @@ namespace TEN::Entities::Generic
 
 	public:
 		// Routines
+
 		std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetFloorHeight	  = nullptr;
 		std::function<std::optional<int>(const ItemInfo& item, const Vector3i& pos)> GetCeilingHeight = nullptr;
 		std::function<int(const ItemInfo& item)> GetFloorBorder	  = nullptr;
 		std::function<int(const ItemInfo& item)> GetCeilingBorder = nullptr;
 
 		// Getters
+
 		const BoundingBox&	   GetAabb() const;
 		const CollisionMesh&   GetCollisionMesh() const;
 		//const AttractorObject& GetAttractor() const;
 
 		// Utilities
+
 		void Initialize(const ItemInfo& item);
 		void Update(const ItemInfo& item);
 		void DeassignSectors(const ItemInfo& item) const;
 
 	private:
 		// Helpers
+
 		void InitializeCollisionMesh(const ItemInfo& item);
 		void InitializeAttractor(const ItemInfo& item);
 		void UpdateAabb(const ItemInfo& item);
