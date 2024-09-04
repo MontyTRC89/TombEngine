@@ -834,14 +834,12 @@ static void HandlePlayerTurnLean(ItemInfo& item, short leanAngleMax, float alpha
 static void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 {
 	constexpr auto BASE_ANGLE					   = ANGLE(90.0f);
-	constexpr auto LOWER_FLEX_ANGLE_Y_CONSTRAINT   = ANGLE(65.0f);
-	constexpr auto UPPER_FLEX_ANGLE_Y_CONSTRAINT   = ANGLE(100.0f);
-	constexpr auto UPPER_FLEX_ANGLE_Y_STRAFE_COEFF = 0.4f;
-	constexpr auto UPPER_FLEX_ANGLE_Z_COEFF		   = 0.1f;
-	constexpr auto TORSO_ROT_COEFF				   = 0.5f;
-	constexpr auto HEAD_ROT_COEFF				   = 0.5f;
-
-	// TODO: Better head turn when strafing.
+	constexpr auto FLEX_ANGLE_Y_CONSTRAINT		   = ANGLE(60.0f);
+	constexpr auto UPPER_FLEX_ANGLE_Y_STRAFE_COEFF = 0.9f;
+	constexpr auto UPPER_FLEX_ANGLE_Y_ALPHA_COEFF  = 1.5f;
+	constexpr auto UPPER_FLEX_ANGLE_Z_COEFF		   = 0.2f;
+	constexpr auto TORSO_ROT_COEFF				   = 0.4f;
+	constexpr auto HEAD_ROT_COEFF				   = 0.6f;
 
 	auto& player = GetLaraInfo(item);
 
@@ -854,23 +852,26 @@ static void HandlePlayerTurnFlex(ItemInfo& item, float alpha, bool isStrafing)
 		deltaAngle = (((BASE_ANGLE * 2) * sign) - deltaAngle) * -1;
 
 	// Calculate angle modifiers.
-	float upperFlexAngleYAlpha = std::clamp(abs(deltaAngle) / (float)UPPER_FLEX_ANGLE_Y_CONSTRAINT, 0.0f, 1.0f);
+	float upperFlexAngleYAlpha = std::clamp((abs(deltaAngle) / (float)FLEX_ANGLE_Y_CONSTRAINT) * UPPER_FLEX_ANGLE_Y_ALPHA_COEFF, 0.0f, 1.0f);
 	float upperFlexAngleYCoeff = isStrafing ? UPPER_FLEX_ANGLE_Y_STRAFE_COEFF : 1.0f;
-	int headFlexSign = isStrafing ? -1 : 1;
 
 	// Calculate lower flex rotation.
-	short lowerFlexAngleY = isStrafing ? std::clamp<short>(deltaAngle, -LOWER_FLEX_ANGLE_Y_CONSTRAINT, LOWER_FLEX_ANGLE_Y_CONSTRAINT) : 0;
+	short lowerFlexAngleY = isStrafing ? std::clamp<short>(deltaAngle, -FLEX_ANGLE_Y_CONSTRAINT, FLEX_ANGLE_Y_CONSTRAINT) : 0;
 	auto lowerFlexRot = EulerAngles(0, lowerFlexAngleY, 0);
 
 	// Calculate upper flex rotation.
-	short upperFlexAngleY = ((UPPER_FLEX_ANGLE_Y_CONSTRAINT * upperFlexAngleYAlpha) * sign) * upperFlexAngleYCoeff;
+	short upperFlexAngleY = ((FLEX_ANGLE_Y_CONSTRAINT * upperFlexAngleYAlpha) * sign) * upperFlexAngleYCoeff;
 	short upperFlexAngleZ = upperFlexAngleY * UPPER_FLEX_ANGLE_Z_COEFF;
 	auto upperFlexRot = EulerAngles(player.ExtraHeadRot.x, upperFlexAngleY, upperFlexAngleZ);
+
+	// TODO: If strafing and has target, lock head forward.
+	// TODO: Narrower head angle constraint when strafing (45 deg).
+	// TODO: Reference hip flex angles from TRL, which uses far more artistically cohrent offsets.
 
 	// Flex hips, torso, and head.
 	player.LimbRot.Hip.Lerp(lowerFlexRot, alpha);
 	player.ExtraTorsoRot.Lerp(upperFlexRot * TORSO_ROT_COEFF, alpha);
-	player.ExtraHeadRot.Lerp((upperFlexRot * HEAD_ROT_COEFF) * headFlexSign, alpha);
+	player.ExtraHeadRot.Lerp(upperFlexRot * HEAD_ROT_COEFF, alpha);
 }
 
 // NOTE: Modern control version.

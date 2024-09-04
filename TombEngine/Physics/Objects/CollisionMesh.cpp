@@ -181,7 +181,7 @@ namespace TEN::Physics
 		_vertices = desc.GetVertices();
 
 		// Add triangles.
-		for (int i = 0; i < desc.GetIds().size(); i += LocalCollisionTriangle::VERTEX_COUNT)
+		for (int i = 0; i < (desc.GetTriangleCount() * LocalCollisionTriangle::VERTEX_COUNT); i += LocalCollisionTriangle::VERTEX_COUNT)
 			_triangles.push_back(LocalCollisionTriangle(desc.GetIds()[i], desc.GetIds()[i + 1], desc.GetIds()[i + 2]));
 
 		// Collect triangle IDs and AABBs.
