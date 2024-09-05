@@ -97,9 +97,7 @@ namespace TEN::Player
 		};
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(
-			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
-			ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), ATTRAC_DETECT_RADIUS, item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle);
 
 		// Get front stand edge hang descent climb context.
 		auto attracColl = GetEdgeHangDescecntClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -131,9 +129,7 @@ namespace TEN::Player
 		};
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(
-			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
-			ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), ATTRAC_DETECT_RADIUS, item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle);
 
 		// Get back stand edge hang descent climb context.
 		auto attracColl = GetEdgeHangDescecntClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -169,9 +165,7 @@ namespace TEN::Player
 		};
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(
-			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
-			ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), ATTRAC_DETECT_RADIUS, item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle);
 
 		// Get front crawl edge hang descent climb context.
 		auto attracColl = GetEdgeHangDescecntClimbAttractorCollision(item, coll, SETUP, attracColls);
@@ -203,9 +197,7 @@ namespace TEN::Player
 		};
 
 		// Get attractor collisions.
-		auto attracColls = GetAttractorCollisions(
-			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle,
-			ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(item.Pose.Position.ToVector3(), ATTRAC_DETECT_RADIUS, item.RoomNumber, item.Pose.Orientation.y + SETUP.RelHeadingAngle);
 
 		// Get back crawl edge hang descent climb context.
 		auto attracColl = GetEdgeHangDescecntClimbAttractorCollision(item, coll, SETUP, attracColls);

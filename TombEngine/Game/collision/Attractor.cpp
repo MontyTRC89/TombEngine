@@ -168,7 +168,21 @@ namespace TEN::Collision::Attractor
 		return Vector3::Transform(_points.back(), transformMatrix);
 	}
 
-	std::optional<AttractorCollisionData> AttractorObject::GetCollision(const BoundingSphere& sphere, short headingAngle, unsigned int segmentID, const Vector3& axis)
+	AttractorCollisionData AttractorObject::GetCollision(float pathDist, short headingAngle,
+														 const Vector3& axis)
+	{
+		constexpr auto SPHERE_RADIUS = 1.0f;
+
+		auto intersect = GetIntersectionAtPathDistance(pathDist);
+		unsigned int segmentID = GetSegmentIDAtPathDistance(pathDist);
+
+		auto attracColl = GetCollision(intersect, SPHERE_RADIUS, headingAngle, segmentID, axis);
+		TENAssert(attracColl.has_value(), "AttractorObject::GetCollision(): Path overload failed.");
+		return *attracColl;
+	}
+
+	std::optional<AttractorCollisionData> AttractorObject::GetCollision(const Vector3& pos, float radius, short headingAngle, unsigned int segmentID,
+																		const Vector3& axis)
 	{
 		constexpr auto HEADING_ANGLE_OFFSET = ANGLE(-90.0);
 
@@ -182,7 +196,7 @@ namespace TEN::Collision::Attractor
 		auto transformMatrix = GetTransformMatrix();
 		auto rotMatrix = GetRotationMatrix();
 
-		auto localSphere = BoundingSphere(Vector3::Transform(sphere.Center, transformMatrix.Invert()), sphere.Radius);
+		auto localSphere = BoundingSphere(Vector3::Transform(pos, transformMatrix.Invert()), radius);
 		bool isPath = (_points.size() > 1);
 
 		// Test sphere-segment intersection.
@@ -228,15 +242,6 @@ namespace TEN::Collision::Attractor
 		return attracColl;
 	}
 
-	AttractorCollisionData AttractorObject::GetCollision(float pathDist, short headingAngle, const Vector3& axis)
-	{
-		constexpr auto SPHERE_RADIUS = 1.0f;
-
-		auto sphere = BoundingSphere(GetIntersectionAtPathDistance(pathDist), SPHERE_RADIUS);
-		unsigned int segmentID = GetSegmentIDAtPathDistance(pathDist);
-		return *GetCollision(sphere, headingAngle, segmentID, axis);
-	}
-	
 	void AttractorObject::SetPosition(const Vector3& pos)
 	{
 		_position = pos;
@@ -499,14 +504,13 @@ namespace TEN::Collision::Attractor
 		return boundedAttracs;
 	}
 
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float radius,
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, float radius, int roomNumber, short headingAngle,
 															   const Vector3& axis)
 	{
 		constexpr auto COLL_COUNT_MAX = 64;
 
 		// 1) Get bounded attractors.
-		auto sphere = BoundingSphere(pos, radius);
-		auto attracs = GetBoundedAttractors(sphere, roomNumber);
+		auto attracs = GetBoundedAttractors(BoundingSphere(pos, radius), roomNumber);
 
 		// 2) Collect attractor collisions.
 		auto attracColls = std::vector<AttractorCollisionData>{};
@@ -515,7 +519,7 @@ namespace TEN::Collision::Attractor
 			// Collide every segment.
 			for (int i = 0; i < attrac->GetSegmentCount(); i++)
 			{
-				auto attracColl = attrac->GetCollision(sphere, headingAngle, i);
+				auto attracColl = attrac->GetCollision(pos, radius, headingAngle, i);
 				if (attracColl.has_value())
 					attracColls.push_back(std::move(*attracColl));
 			}
@@ -540,8 +544,8 @@ namespace TEN::Collision::Attractor
 		return attracColls;
 	}
 
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
-															   float forward, float down, float right, float radius,
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, float radius, int roomNumber, short headingAngle,
+															   float forward, float down, float right,
 															   const Vector3& axis)
 	{
 		auto relOffset = Vector3(right, down, forward);

@@ -222,8 +222,8 @@ namespace TEN::Player
 		{
 			int sign = isGoingRight ? 1 : -1;
 			attracCollsSide = GetAttractorCollisions(
-				attracCollCenter.Intersection, attracCollCenter.Attractor->GetRoomNumber(), attracCollCenter.HeadingAngle,
-				0.0f, 0.0f, coll.Setup.Radius * sign, ATTRAC_DETECT_RADIUS);
+				attracCollCenter.Intersection, ATTRAC_DETECT_RADIUS, attracCollCenter.Attractor->GetRoomNumber(), attracCollCenter.HeadingAngle,
+				0.0f, 0.0f, coll.Setup.Radius * sign);
 		}
 
 		// TODO: Assess connecting side attractors for valid position.
@@ -262,8 +262,8 @@ namespace TEN::Player
 		// Get connecting attractor collisions.
 		int sign = isGoingRight ? 1 : -1;
 		auto connectingAttracColls = GetAttractorCollisions(
-			attracCollCenter.Intersection, attracCollCenter.Attractor->GetRoomNumber(), attracCollCenter.HeadingAngle,
-			0.0f, 0.0f, coll.Setup.Radius * sign, ATTRAC_DETECT_RADIUS);
+			attracCollCenter.Intersection, ATTRAC_DETECT_RADIUS, attracCollCenter.Attractor->GetRoomNumber(), attracCollCenter.HeadingAngle,
+			0.0f, 0.0f, coll.Setup.Radius * sign);
 
 		auto cornerAttracColls = std::vector<AttractorCollisionData>{};
 
@@ -321,9 +321,7 @@ namespace TEN::Player
 
 		// Get attractor collisions.
 		auto currentAttracColl = player.Context.Attractor.Attractor->GetCollision(player.Context.Attractor.PathDistance, item.Pose.Orientation.y);
-		auto attracColls = GetAttractorCollisions(
-			currentAttracColl.Intersection, currentAttracColl.Attractor->GetRoomNumber(), currentAttracColl.HeadingAngle,
-			ATTRAC_DETECT_RADIUS);
+		auto attracColls = GetAttractorCollisions(currentAttracColl.Intersection, ATTRAC_DETECT_RADIUS, currentAttracColl.Attractor->GetRoomNumber(), currentAttracColl.HeadingAngle);
 
 		// Calculate 2D intersection on current attractor.
 		auto intersect2D0 = Vector2(currentAttracColl.Intersection.x, currentAttracColl.Intersection.z);

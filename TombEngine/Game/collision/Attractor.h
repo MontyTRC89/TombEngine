@@ -78,8 +78,10 @@ namespace TEN::Collision::Attractor
 		unsigned int GetSegmentIDAtPathDistance(float pathDist) const;
 		Vector3		 GetIntersectionAtPathDistance(float pathDist) const;
 
-		AttractorCollisionData				  GetCollision(float pathDist, short headingAngle, const Vector3& axis = Vector3::UnitY);
-		std::optional<AttractorCollisionData> GetCollision(const BoundingSphere& sphere, short headingAngle, unsigned int segmentID, const Vector3& axis = Vector3::UnitY);
+		AttractorCollisionData				  GetCollision(float pathDist, short headingAngle,
+														   const Vector3& axis = Vector3::UnitY);
+		std::optional<AttractorCollisionData> GetCollision(const Vector3& pos, float radius, short headingAngle, unsigned int segmentID,
+														   const Vector3& axis = Vector3::UnitY);
 
 		// Setters
 		
@@ -109,10 +111,10 @@ namespace TEN::Collision::Attractor
 
 	// Getters
 
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle, float radius,
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, float radius, int roomNumber, short headingAngle,
 															   const Vector3& axis = Vector3::UnitY);
-	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, int roomNumber, short headingAngle,
-															   float forward, float down, float right, float radius,
+	std::vector<AttractorCollisionData> GetAttractorCollisions(const Vector3& pos, float radius, int roomNumber, short headingAngle,
+															   float forward, float down, float right,
 															   const Vector3& axis = Vector3::UnitY);
 
 	// Debug
