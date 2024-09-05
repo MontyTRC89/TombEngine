@@ -32,10 +32,7 @@ namespace TEN::Animation
 
 		// Calculate relative translation and curve alpha.
 		float alpha = (float)frameNumber / (float)frameCount;
-		auto translation = Vector3(
-			(FixedMotionCurveX != BezierCurve2D::Zero) ? FixedMotionCurveX.GetY(alpha) : 0.0f,
-			(FixedMotionCurveY != BezierCurve2D::Zero) ? FixedMotionCurveY.GetY(alpha) : 0.0f,
-			(FixedMotionCurveZ != BezierCurve2D::Zero) ? FixedMotionCurveZ.GetY(alpha) : 0.0f);
+		auto translation = Vector3(FixedMotionCurveX.GetY(alpha), FixedMotionCurveY.GetY(alpha), FixedMotionCurveZ.GetY(alpha));
 
 		// Return fixed motion.
 		return FixedMotionData{ translation, alpha };
