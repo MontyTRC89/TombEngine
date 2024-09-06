@@ -110,7 +110,7 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Moveable">Moveable(object, name, position, rotation, roomID, animNumber, frameNumber, hp, OCB, AIBits)</a></td>
+	<td class="name" ><a href="#Moveable">Moveable(object, name, position, rotation, roomNumber, animNumber, frameNumber, hp, OCB, AIBits)</a></td>
 	<td class="summary">Used to generate a new moveable dynamically at runtime.</td>
 	</tr>
 	<tr>
@@ -392,7 +392,7 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
     <dl class="function">
     <dt>
     <a name = "Moveable"></a>
-    <strong>Moveable(object, name, position, rotation, roomID, animNumber, frameNumber, hp, OCB, AIBits)</strong>
+    <strong>Moveable(object, name, position, rotation, roomNumber, animNumber, frameNumber, hp, OCB, AIBits)</strong>
     </dt>
     <dd>
     Used to generate a new moveable dynamically at runtime. <br/>
@@ -420,9 +420,9 @@ most can just be ignored (see usage).
             <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
          rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
         </li>
-        <li><span class="parameter">roomID</span>
+        <li><span class="parameter">roomNumber</span>
             <span class="types"><span class="type">int</span></span>
-         room ID item is in (default: calculated automatically)
+         the room number the moveable is in (default: calculated automatically).
         </li>
         <li><span class="parameter">animNumber</span>
             <span class="types"><span class="type">int</span></span>

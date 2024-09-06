@@ -424,6 +424,10 @@ namespace TEN::Renderer
 				newItem->PrevTranslation = newItem->Translation;
 				newItem->PrevRotation = newItem->Rotation;
 				newItem->PrevWorld = newItem->World;
+
+				// Otherwise all frames until the next ControlPhase will not 
+				// be interpolated
+				item->DisableInterpolation = false;
 				
 				for (int j = 0; j < MAX_BONES; j++)
 					newItem->PrevAnimTransforms[j] = newItem->AnimTransforms[j];
