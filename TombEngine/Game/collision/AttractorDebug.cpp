@@ -32,12 +32,12 @@ namespace TEN::Collision::Attractor
 
 		auto points = std::vector<Vector3>{ Vector3::Zero, Vector3::Zero };
 
-		player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, Vector3::Zero, Quaternion::Identity,item.RoomNumber, points);
-		player.Context.DebugAttracs.Attrac1 = AttractorObject(AttractorType::Edge, Vector3::Zero, Quaternion::Identity,item.RoomNumber, points);
-		player.Context.DebugAttracs.Attrac2 = AttractorObject(AttractorType::Edge, Vector3::Zero, Quaternion::Identity,item.RoomNumber, points);
+		player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, Vector3::Zero, item.RoomNumber, Quaternion::Identity, points);
+		player.Context.DebugAttracs.Attrac1 = AttractorObject(AttractorType::Edge, Vector3::Zero, item.RoomNumber, Quaternion::Identity, points);
+		player.Context.DebugAttracs.Attrac2 = AttractorObject(AttractorType::Edge, Vector3::Zero, item.RoomNumber, Quaternion::Identity, points);
 
 		for (int i = 0; i < 8; i++)
-			player.Context.DebugAttracs.Attracs.push_back(AttractorObject(AttractorType::Edge, Vector3::Zero, Quaternion::Identity,item.RoomNumber, points));
+			player.Context.DebugAttracs.Attracs.push_back(AttractorObject(AttractorType::Edge, Vector3::Zero, item.RoomNumber, Quaternion::Identity,points));
 	}
 
 	static void SpawnAttractorCircle(ItemInfo& item, bool isOuter)
@@ -66,7 +66,7 @@ namespace TEN::Collision::Attractor
 		if (isOuter)
 			std::reverse(points.begin(), points.end());
 
-		player.Context.DebugAttracs.Attrac2 = AttractorObject(AttractorType::Edge, item.Pose.Position.ToVector3(), item.Pose.Orientation.ToQuaternion(), item.RoomNumber, points);
+		player.Context.DebugAttracs.Attrac2 = AttractorObject(AttractorType::Edge, item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.ToQuaternion(), points);
 	}
 
 	static void SetDebugAttractors(ItemInfo& item)
@@ -90,24 +90,24 @@ namespace TEN::Collision::Attractor
 		if (KeyMap[OIS::KeyCode::KC_Q])
 		{
 			attracAPoint0 = attracPoint;
-			player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, Vector3::Zero, Quaternion::Identity, item.RoomNumber, { attracAPoint0, attracAPoint1 });
+			player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, Vector3::Zero, item.RoomNumber, Quaternion::Identity, { attracAPoint0, attracAPoint1 });
 		}
 		if (KeyMap[OIS::KeyCode::KC_W])
 		{
 			attracAPoint1 = attracPoint;
-			player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, Vector3::Zero, Quaternion::Identity, item.RoomNumber, { attracAPoint0, attracAPoint1 });
+			player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, Vector3::Zero, item.RoomNumber, Quaternion::Identity, { attracAPoint0, attracAPoint1 });
 		}
 
 		// Set debug attractor 1.
 		if (KeyMap[OIS::KeyCode::KC_E])
 		{
 			attracBPoint0 = attracPoint;
-			player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, Vector3::Zero, Quaternion::Identity, item.RoomNumber, { attracBPoint0, attracBPoint1 });
+			player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, Vector3::Zero, item.RoomNumber, Quaternion::Identity, { attracBPoint0, attracBPoint1 });
 		}
 		if (KeyMap[OIS::KeyCode::KC_R])
 		{
 			attracBPoint1 = attracPoint;
-			player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, Vector3::Zero, Quaternion::Identity, item.RoomNumber, { attracBPoint0, attracBPoint1 });
+			player.Context.DebugAttracs.Attrac0 = AttractorObject(AttractorType::Edge, Vector3::Zero, item.RoomNumber, Quaternion::Identity, { attracBPoint0, attracBPoint1 });
 		}
 
 		// Spawn attractor circle.
@@ -130,7 +130,7 @@ namespace TEN::Collision::Attractor
 				};
 				inc -= CLICK(1);
 
-				attrac = AttractorObject(AttractorType::WallEdge, Vector3::Zero, Quaternion::Identity, item.RoomNumber, points);
+				attrac = AttractorObject(AttractorType::WallEdge, Vector3::Zero, item.RoomNumber, Quaternion::Identity, points);
 			}
 		}
 	}

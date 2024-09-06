@@ -65,7 +65,7 @@ std::vector<AttractorObject*> AttractorHandler::Bvh::GetBoundedAttractors(const 
 		{
 			for (int attracID : node.AttractorIds)
 			{
-				if (attracs[attracID].GetWorldObb().Intersects(sphere)) // TODO: Will have to do this differently.
+				if (attracs[attracID].Intersects(sphere))
 					boundedAttracs.push_back(&attracs[attracID]);
 			}
 		}
@@ -92,10 +92,10 @@ int AttractorHandler::Bvh::Generate(const Vector3& pos, const std::vector<Attrac
 	auto node = BvhNode{};
 
 	// Combine boxes.
-	node.Box = attracs[attracIds[start]].GetLocalAabb();
+	node.Box = attracs[attracIds[start]].GetAabb();
 	for (int i = (start + 1); i < end; i++)
 	{
-		node.Box = Geometry::CombineBoundingBoxes(node.Box, attracs[attracIds[i]].GetLocalAabb());
+		node.Box = Geometry::CombineBoundingBoxes(node.Box, attracs[attracIds[i]].GetAabb());
 		*(Vector3*)&node.Box.Center += pos;
 	}
 

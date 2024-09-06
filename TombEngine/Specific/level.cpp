@@ -920,7 +920,7 @@ void ReadRooms()
 				points.push_back(point);
 			}
 
-			attracs.push_back(AttractorObject(type, room.Position.ToVector3(), Quaternion::Identity, roomNumber, points));
+			attracs.push_back(AttractorObject(type, room.Position.ToVector3(), roomNumber, Quaternion::Identity, points));
 		}
 		room.Attractors = AttractorHandler(room.Position.ToVector3(), attracs);
 

@@ -29,6 +29,7 @@ namespace TEN::Collision::Attractor
 		AttractorObject* Attractor = nullptr;
 
 		Vector3		 Intersection = Vector3::Zero;
+		int			 RoomNumber	  = 0;
 		float		 Distance2D	  = 0.0f;
 		float		 Distance3D	  = 0.0f;
 		float		 PathDistance = 0.0f;
@@ -44,15 +45,14 @@ namespace TEN::Collision::Attractor
 	private:
 		// Members
 
-		AttractorType _type		  = AttractorType::Edge;
-		int			  _roomNumber = 0;
-		float		  _length	  = 0.0f;
-		BoundingBox	  _aabb		  = BoundingBox();
-
+		AttractorType		 _type			 = AttractorType::Edge;
 		Vector3				 _position		 = Vector3::Zero;
+		int					 _roomNumber	 = 0;
 		Quaternion			 _orientation	 = Quaternion::Identity;
 		std::vector<Vector3> _points		 = {};
 		std::vector<float>	 _segmentLengths = {};
+		float				 _length		 = 0.0f;
+		BoundingBox			 _aabb			 = BoundingBox();
 
 		std::set<int> _playerItemNumbers = {};
 
@@ -60,7 +60,7 @@ namespace TEN::Collision::Attractor
 		// Constructors
 
 		AttractorObject() { _points.push_back(Vector3::Zero); }; // TEMP
-		AttractorObject(AttractorType type, const Vector3& pos, const Quaternion& orient, int roomNumber, const std::vector<Vector3>& points);
+		AttractorObject(AttractorType type, const Vector3& pos, int roomNumber, const Quaternion& orient, const std::vector<Vector3>& points);
 
 		// Destructors
 
@@ -71,8 +71,7 @@ namespace TEN::Collision::Attractor
 		AttractorType	   GetType() const;
 		int				   GetRoomNumber() const;
 		float			   GetLength() const;
-		const BoundingBox& GetLocalAabb() const;
-		BoundingOrientedBox GetWorldObb() const; // TEMP
+		const BoundingBox& GetAabb() const;
 
 		unsigned int GetSegmentCount() const;
 		unsigned int GetSegmentIDAtPathDistance(float pathDist) const;
@@ -86,11 +85,13 @@ namespace TEN::Collision::Attractor
 		// Setters
 		
 		void SetPosition(const Vector3& pos);
+		void SetRoomNumber(int roomNumber);
 		void SetOrientation(const Quaternion& orient);
 
 		// Inquirers
 
 		bool IsLoop() const;
+		bool Intersects(const BoundingSphere& sphere) const;
 
 		// Utilities
 
@@ -106,7 +107,6 @@ namespace TEN::Collision::Attractor
 
 		float  NormalizePathDistance(float pathDist) const;
 		Matrix GetTransformMatrix() const;
-		Matrix GetRotationMatrix() const;
 	};
 
 	// Getters

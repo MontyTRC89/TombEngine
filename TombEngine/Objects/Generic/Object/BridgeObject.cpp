@@ -19,12 +19,13 @@ namespace TEN::Entities::Generic
 	void BridgeObject::Initialize(const ItemInfo& item)
 	{
 		auto points = GetAttractorPoints(item);
-		_attractor = AttractorObject(AttractorType::Edge, item.Pose.Position.ToVector3(), item.Pose.Orientation.ToQuaternion(), item.RoomNumber, points);
+		_attractor = AttractorObject(AttractorType::Edge, item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.ToQuaternion(), points);
 	}
 
 	void BridgeObject::Update(const ItemInfo& item)
 	{
 		_attractor.SetPosition(item.Pose.Position.ToVector3());
+		_attractor.SetRoomNumber(item.RoomNumber);
 		_attractor.SetOrientation(item.Pose.Orientation.ToQuaternion());
 	}
 

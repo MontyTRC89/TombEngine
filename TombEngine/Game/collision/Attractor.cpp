@@ -20,21 +20,20 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Attractor
 {
-	AttractorObject::AttractorObject(AttractorType type, const Vector3& pos, const Quaternion& orient, int roomNumber, const std::vector<Vector3>& points)
+	AttractorObject::AttractorObject(AttractorType type, const Vector3& pos, int roomNumber, const Quaternion& orient, const std::vector<Vector3>& points)
 	{
 		TENAssert(!points.empty(), "Attempted to initialize invalid attractor with 0 points.");
 
 		_type = type;
-		_roomNumber = roomNumber;
 		_position = pos;
+		_roomNumber = roomNumber;
 		_orientation = orient;
 		_points = points;
-		_aabb = Geometry::GetBoundingBox(points);
 
 		if (_points.size() == 1)
 		{
-			_length = 0.0f;
 			_segmentLengths.push_back(0.0f);
+			_length = 0.0f;
 		}
 		else
 		{
@@ -45,10 +44,12 @@ namespace TEN::Collision::Attractor
 
 				float segmentLength = Vector3::Distance(origin, target);
 
-				_length += segmentLength;
 				_segmentLengths.push_back(segmentLength);
+				_length += segmentLength;
 			}
 		}
+		
+		_aabb = Geometry::GetBoundingBox(points);
 	}
 
 	AttractorObject::~AttractorObject()
@@ -56,14 +57,14 @@ namespace TEN::Collision::Attractor
 		DetachAllPlayers();
 	}
 
-	int AttractorObject::GetRoomNumber() const
-	{
-		return _roomNumber;
-	}
-
 	AttractorType AttractorObject::GetType() const
 	{
 		return _type;
+	}
+
+	int AttractorObject::GetRoomNumber() const
+	{
+		return _roomNumber;
 	}
 
 	float AttractorObject::GetLength() const
@@ -71,14 +72,10 @@ namespace TEN::Collision::Attractor
 		return _length;
 	}
 
-	const BoundingBox& AttractorObject::GetLocalAabb() const
+	// NOTE: AABB is in local space.
+	const BoundingBox& AttractorObject::GetAabb() const
 	{
 		return _aabb;
-	}
-
-	BoundingOrientedBox AttractorObject::GetWorldObb() const
-	{
-		return BoundingOrientedBox(_position + _aabb.Center, _aabb.Extents, _orientation);
 	}
 
 	unsigned int AttractorObject::GetSegmentCount() const
@@ -194,21 +191,26 @@ namespace TEN::Collision::Attractor
 		}
 
 		auto transformMatrix = GetTransformMatrix();
-		auto rotMatrix = GetRotationMatrix();
 
 		auto localSphere = BoundingSphere(Vector3::Transform(pos, transformMatrix.Invert()), radius);
-		bool isPath = (_points.size() > 1);
 
 		// Test sphere-segment intersection.
-		float dist = isPath ?
+		float intersectDist = isPath ?
 			Geometry::GetDistanceToLine(localSphere.Center, _points[segmentID], _points[segmentID + 1]) :
 			Vector3::Distance(localSphere.Center, _points[segmentID]);
-		if (dist > localSphere.Radius)
+		if (intersectDist > localSphere.Radius)
 			return std::nullopt;
 
+		// Calculate intersection.
 		auto intersect = isPath ?
 			Geometry::GetClosestPointOnLinePerp(localSphere.Center, _points[segmentID], _points[segmentID + 1], axis) :
 			_points[segmentID];
+
+		// Determine intersection room number.
+		auto dir = intersect - _position;
+		dir.Normalize();
+		float dist = Vector3::Distance(_position, intersect);
+		int roomNumber = GetPointCollision(_position, _roomNumber, dir, dist).GetRoomNumber();
 
 		// Calculate path distance.
 		float pathDist = 0.0f;
@@ -232,6 +234,7 @@ namespace TEN::Collision::Attractor
 		auto attracColl = AttractorCollisionData{};
 		attracColl.Attractor = this;
 		attracColl.Intersection = Vector3::Transform(intersect, transformMatrix);
+		attracColl.RoomNumber = roomNumber;
 		attracColl.Distance2D = Vector2::Distance(Vector2(localSphere.Center.x, localSphere.Center.z), Vector2(intersect.x, intersect.z));
 		attracColl.Distance3D = Vector3::Distance(localSphere.Center, intersect);
 		attracColl.PathDistance = pathDist;
@@ -247,6 +250,11 @@ namespace TEN::Collision::Attractor
 		_position = pos;
 	}
 
+	void AttractorObject::SetRoomNumber(int roomNumber)
+	{
+		_roomNumber = roomNumber;
+	}
+
 	void AttractorObject::SetOrientation(const Quaternion& orient)
 	{
 		_orientation = orient;
@@ -254,20 +262,28 @@ namespace TEN::Collision::Attractor
 
 	bool AttractorObject::IsLoop() const
 	{
+		constexpr auto DIST_THRESHOLD = 1.0f;
+
 		// Single segment exists; loop not possible.
 		if (GetSegmentCount() == 1)
 			return false;
 
 		// Test if start and end points occupy same approximate position.
 		float distSqr = Vector3::DistanceSquared(_points.front(), _points.back());
-		return (distSqr <= EPSILON);
+		return (distSqr <= DIST_THRESHOLD);
+	}
+
+	bool AttractorObject::Intersects(const BoundingSphere& sphere) const
+	{
+		auto localSphere = BoundingSphere(Vector3::Transform(sphere.Center, GetTransformMatrix().Invert()), sphere.Radius);
+		return localSphere.Intersects(_aabb);
 	}
 
 	void AttractorObject::AttachPlayer(ItemInfo& playerItem)
 	{
 		if (!playerItem.IsLara())
 		{
-			TENLog("Attempted to attach non-player item to attractor.", LogLevel::Warning);
+			TENLog("Attempted to attach non-player moveable to attractor.", LogLevel::Warning);
 			return;
 		}
 
@@ -421,11 +437,6 @@ namespace TEN::Collision::Attractor
 		return (rotMatrix * translationMatrix);
 	}
 
-	Matrix AttractorObject::GetRotationMatrix() const
-	{
-		return Matrix::CreateFromQuaternion(_orientation);
-	}
-
 	static std::vector<AttractorObject*> GetBoundedAttractors(const BoundingSphere& sphere, int roomNumber)
 	{
 		// Debug
@@ -453,7 +464,7 @@ namespace TEN::Collision::Attractor
 		auto debugAttracs = getDebugAttractors();
 		for (auto* attrac : debugAttracs)
 		{
-			if (sphere.Intersects(attrac->GetWorldObb()))
+			if (attrac->Intersects(sphere))
 				boundedAttracs.push_back(attrac);
 		}
 
@@ -493,7 +504,7 @@ namespace TEN::Collision::Attractor
 				auto& bridge = GetBridgeObject(bridgeItem);
 
 				// Test if sphere intersects bridge attractor OBB.
-				if (!sphere.Intersects(bridge.GetAttractor().GetWorldObb()))
+				if (!bridge.GetAttractor().Intersects(sphere))
 					continue;
 
 				boundedAttracs.push_back(&bridge.GetAttractor());
