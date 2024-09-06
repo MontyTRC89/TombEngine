@@ -65,12 +65,12 @@ namespace TEN::Input
 	private:
 		// Members
 
-		ActionID ID				= In::Forward;
-		float	 Value			= 0.0f;
-		float	 PrevValue		= 0.0f;
-		float	 TimeActive		= 0.0f;
-		float	 PrevTimeActive = 0.0f;
-		float	 TimeInactive	= 0.0f;
+		ActionID _id			 = In::Forward;
+		float	 _value			 = 0.0f;
+		float	 _prevValue		 = 0.0f;
+		float	 _timeActive	 = 0.0f;
+		float	 _prevTimeActive = 0.0f;
+		float	 _timeInactive	 = 0.0f;
 
 	public:
 		// Constructors
