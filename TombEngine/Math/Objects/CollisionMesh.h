@@ -1,12 +1,10 @@
 #pragma once
 
-#include "Math/Math.h"
 #include "Specific/Structures/BoundingVolumeHierarchy.h"
 
-using namespace TEN::Math;
 using namespace TEN::Structures;
 
-namespace TEN::Physics
+namespace TEN::Math
 {
 	class CollisionMeshDesc
 	{

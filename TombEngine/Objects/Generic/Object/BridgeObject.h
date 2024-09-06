@@ -1,12 +1,10 @@
 #pragma once
 
 #include "Math/Math.h"
-#include "Physics/Physics.h"
 
 struct ItemInfo;
 
 using namespace TEN::Math;
-using namespace TEN::Physics;
 
 namespace TEN::Entities::Generic
 {

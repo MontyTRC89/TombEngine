@@ -7,12 +7,10 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
-#include "Physics/Physics.h"
 #include "Specific/level.h"
 
 //using namespace TEN::Colllision::Attractor;
 using namespace TEN::Math;
-using namespace TEN::Physics;
 
 namespace TEN::Entities::Generic
 {

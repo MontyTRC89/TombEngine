@@ -10,7 +10,6 @@
 #include "Renderer/Renderer.h"
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
-#include "Physics/Physics.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
@@ -18,7 +17,6 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Room;
 using namespace TEN::Math;
-using namespace TEN::Physics;
 using namespace TEN::Renderer;
 using namespace TEN::Utils;
 
@@ -105,7 +103,7 @@ void RoomData::GenerateCollisionMesh()
 	}
 
 	// Create collision mesh.
-	CollisionMesh = TEN::Physics::CollisionMesh(Position.ToVector3(), Quaternion::Identity, desc);
+	CollisionMesh = TEN::Math::CollisionMesh(Position.ToVector3(), Quaternion::Identity, desc);
 }
 
 void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
@@ -230,7 +228,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 
 			// 2.3) Set north neighbor data.
 			// +---+
-			// |   | North
+			// | X | North
 			// 0---1
 			// +---+
 			// |   | Current
@@ -245,7 +243,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 			// |   | Current
 			// +---+
 			// 0---1
-			// |   | South
+			// | X | South
 			// +---+
 			const auto& surfSouth = isFloor ? sectorSouth.FloorSurface : sectorSouth.CeilingSurface;
 			surfVertices.SouthNeighbor.IsWall = sectorSouth.IsWall(0);
@@ -254,7 +252,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 
 			// 2.5) Set east neighbor data.
 			//         +---+ 1---+
-			// Current |   | |   | East
+			// Current |   | | X | East
 			//         +---+ 0---+
 			const auto& surfEast = isFloor ? sectorEast.FloorSurface : sectorEast.CeilingSurface;
 			bool useEastSurfTri0 = (!sectorEast.IsSurfaceSplit(isFloor) || surfEast.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
@@ -264,7 +262,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 
 			// 2.6) Set west neighbor data.
 			//      +---1 +---+
-			// West |   | |   | Current
+			// West | X | |   | Current
 			//      +---0 +---+
 			const auto& surfWest = isFloor ? sectorWest.FloorSurface : sectorWest.CeilingSurface;
 			bool useWestSurfTri0 = !(!sectorWest.IsSurfaceSplit(isFloor) || surfWest.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);

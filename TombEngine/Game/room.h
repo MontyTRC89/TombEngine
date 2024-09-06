@@ -1,10 +1,8 @@
 #pragma once
 
 #include "Math/Math.h"
-#include "Physics/Physics.h"
 
 using namespace TEN::Math;
-using namespace TEN::Physics;
 
 class FloorInfo;
 class GameBoundingBox;
@@ -159,7 +157,7 @@ struct RoomData
 
 	// Collision members
 
-	CollisionMesh				CollisionMesh  = TEN::Physics::CollisionMesh();
+	CollisionMesh				CollisionMesh  = TEN::Math::CollisionMesh();
 	RoomObjectHandler			Bridges		   = RoomObjectHandler();
 	std::vector<RoomPortalData> Portals		   = {};
 	std::vector<TriggerVolume>	TriggerVolumes = {};
