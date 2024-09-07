@@ -478,7 +478,7 @@ namespace TEN::Collision::Attractor
 			if (!neighborRoom.Active())
 				continue;
 
-			auto attracIds = neighborRoom.AttractorTree.GetBoundedIds(sphere);
+			auto attracIds = neighborRoom.AttractorTree.GetBoundedObjectIds(sphere);
 			for (int attracID : attracIds)
 			{
 				auto& attrac = neighborRoom.Attractors[attracID];
