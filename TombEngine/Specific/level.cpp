@@ -903,6 +903,9 @@ void ReadRooms()
 			g_GameScriptEntities->AddName(volume.Name, volume);
 		}
 
+		auto attracIds = std::vector<int>{};
+		auto attracAabbs = std::vector<BoundingBox>{};
+
 		// Load attractors.
 		int attracCount = ReadInt32();
 		room.Attractors.reserve(attracCount);
@@ -915,13 +918,15 @@ void ReadRooms()
 			points.reserve(pointCount);
 			for (int k = 0; k < pointCount; k++)
 			{
-				auto point = ReadVector3() + room.Position.ToVector3();
+				auto point = ReadVector3();
 				points.push_back(point);
 			}
 
 			room.Attractors.push_back(AttractorObject(type, Vector3::Zero, roomNumber, Quaternion::Identity, points));
-			room.AttractorTree.Insert((int)room.Attractors.size() - 1, room.Attractors.back().GetAabb());
+			attracIds.push_back(j);
+			attracAabbs.push_back(room.Attractors.back().GetAabb());
 		}
+		room.AttractorTree = Bvh(attracIds, attracAabbs);
 
 		room.flippedRoom = ReadInt32();
 		room.flags = ReadInt32();

@@ -493,9 +493,12 @@ namespace TEN::Collision::Attractor
 		auto sectors = GetNeighborSectors((Vector3)sphere.Center, roomNumber, sectorSearchDepth);
 		for (const auto* sector : sectors)
 		{
+			// TODO: Check not working.
 			// Test if sphere intersects sector.
-			if (!sphere.Intersects(sector->Box))
-				continue;
+			//if (!sphere.Intersects(sector->Box))
+			//	continue;
+
+			PrintDebugMessage("%d", (int)sector->BridgeItemNumbers.size());
 
 			// Run through bridges in sector.
 			for (int bridgeItemNumber : sector->BridgeItemNumbers)
