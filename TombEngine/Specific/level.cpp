@@ -905,8 +905,7 @@ void ReadRooms()
 
 		// Load attractors.
 		int attracCount = ReadInt32();
-		auto attracs = std::vector<AttractorObject>{};
-		attracs.reserve(attracCount);
+		room.Attractors.reserve(attracCount);
 		for (int j = 0; j < attracCount; j++)
 		{
 			auto type = (AttractorType)ReadInt32();
@@ -916,13 +915,13 @@ void ReadRooms()
 			points.reserve(pointCount);
 			for (int k = 0; k < pointCount; k++)
 			{
-				auto point = ReadVector3();
+				auto point = ReadVector3() + room.Position.ToVector3();
 				points.push_back(point);
 			}
 
-			attracs.push_back(AttractorObject(type, room.Position.ToVector3(), roomNumber, Quaternion::Identity, points));
+			room.Attractors.push_back(AttractorObject(type, Vector3::Zero, roomNumber, Quaternion::Identity, points));
+			room.AttractorTree.Insert((int)room.Attractors.size() - 1, room.Attractors.back().GetAabb());
 		}
-		room.Attractors = AttractorHandler(room.Position.ToVector3(), attracs);
 
 		room.flippedRoom = ReadInt32();
 		room.flags = ReadInt32();

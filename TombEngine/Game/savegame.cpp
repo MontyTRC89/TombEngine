@@ -328,9 +328,9 @@ const std::vector<byte> SaveGame::Build()
 			if (hasRoomAttrac)
 				break;
 
-			for (int j = 0; j < room.Attractors.GetAttractors().size(); j++)
+			for (int j = 0; j < room.Attractors.size(); j++)
 			{
-				const auto& attrac = room.Attractors.GetAttractors()[j];
+				const auto& attrac = room.Attractors[j];
 				if (&attrac == Lara.Context.Attractor.Attractor)
 				{
 					roomNumber = room.RoomNumber;
@@ -1877,7 +1877,7 @@ static void ParsePlayer(const Save::SaveGame* s)
 	if (roomNumber != NO_VALUE)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
-		attrac = &room.Attractors.GetAttractors()[roomAttracID];
+		attrac = &room.Attractors[roomAttracID];
 	}
 	else if (bridgeItemNumber != NO_VALUE)
 	{

@@ -1,10 +1,12 @@
 #pragma once
-#include "framework.h"
+
 #include "Game/collision/Attractor.h"
 #include "Game/collision/floordata.h"
 #include "Math/Math.h"
+#include "Specific/Structures/BoundingVolumeHierarchy.h"
 
 using namespace TEN::Math;
+using namespace TEN::Structures;
 
 enum GAME_OBJECT_ID : short;
 enum class ReverbType;
@@ -90,62 +92,34 @@ struct MESH_INFO
 	bool Dirty;
 };
 
-class AttractorHandler
+class RoomObjectTreeHandler
 {
 private:
-	struct BvhNode
-	{
-		std::vector<int> AttractorIds = {}; // NOTE: Only leaf nodes store triangles directly.
-		BoundingBox		 Box		  = BoundingBox();
-
-		int LeftChildID	 = NO_VALUE;
-		int RightChildID = NO_VALUE;
-
-		bool IsLeaf() const;
-	};
-
-	class Bvh
-	{
-	public:
-		// Members
-
-		std::vector<BvhNode> Nodes = {};
-
-		// Constructors
-
-		Bvh() = default;
-		Bvh(const Vector3& pos, const std::vector<AttractorObject>& attracs);
-
-		// Utilities
-
-		std::vector<AttractorObject*> GetBoundedAttractors(const BoundingSphere& sphere, std::vector<AttractorObject>& attracs);
-
-	private:
-		// Helpers
-
-		int Generate(const Vector3& pos, const std::vector<AttractorObject>& attracs, const std::vector<int>& attracIds, int start, int end);
-	};
+	// Constants
+	
+	static constexpr auto AABB_BOUNDARY = BLOCK(0.1f);
 
 	// Members
 
-	std::vector<AttractorObject> _attractors = {};
-	Bvh							 _bvh		 = Bvh();
+	Bvh _tree = Bvh();
 
 public:
 	// Constructors
 
-	AttractorHandler() = default;
-	AttractorHandler(const Vector3& pos, std::vector<AttractorObject>& attracs);
+	RoomObjectTreeHandler() = default;
+	RoomObjectTreeHandler(const std::vector<int>& ids, const std::vector<BoundingBox>& aabbs);
 
 	// Getters
 
-	std::vector<AttractorObject>& GetAttractors();
-	std::vector<AttractorObject*> GetBoundedAttractors(const BoundingSphere& sphere);
+	std::vector<int> GetIds() const;
+	std::vector<int> GetBoundedIds(const Ray& ray, float dist) const;
+	std::vector<int> GetBoundedIds(const BoundingSphere& sphere) const;
 
 	// Utilities
 
-	void InsertAttractor(const AttractorObject& attrac);
-	void GenerateBvh(const Vector3& pos);
+	void Insert(int id, const BoundingBox& aabb);
+	void Move(int id, const BoundingBox& aabb);
+	void Remove(int id);
 };
 
 struct ROOM_INFO
@@ -172,18 +146,29 @@ struct ROOM_INFO
 
 	std::vector<int> NeighborRoomNumbers = {};
 
-	AttractorHandler		   Attractors	  = {};
-	std::vector<FloorInfo>	   Sectors		  = {};
-	std::vector<TriggerVolume> TriggerVolumes = {};
+	// Object members
 
-	std::vector<MESH_INFO>	mesh	  = {};
+	std::vector<MESH_INFO> mesh = {}; // Statics
+
+	// Collision members
+
+	std::vector<FloorInfo>		 Sectors		= {};
+	std::vector<ROOM_DOOR>		 doors			= {}; // Portals
+	std::vector<AttractorObject> Attractors		= {};
+	std::vector<TriggerVolume>	 TriggerVolumes = {};
+
+	// Tree members
+
+	RoomObjectTreeHandler AttractorTree = RoomObjectTreeHandler();
+
+	// Renderer members
+
 	std::vector<ROOM_LIGHT> lights	  = {};
 	std::vector<Vector3>	positions = {};
 	std::vector<Vector3>	normals	  = {};
 	std::vector<Vector3>	colors	  = {};
 	std::vector<Vector3>	effects	  = {};
 	std::vector<BUCKET>		buckets	  = {};
-	std::vector<ROOM_DOOR>	doors	  = {};
 
 	bool Active() const;
 };

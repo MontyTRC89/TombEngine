@@ -239,6 +239,15 @@ namespace TEN::Math::Geometry
 		return BoundingBox(center, extents);
 	}
 
+	float GetBoundingBoxArea(const BoundingBox& box)
+	{
+		float width = box.Extents.x * 2;
+		float height = box.Extents.y * 2;
+		float depth = box.Extents.z * 2;
+
+		return (((width * height) + (width * depth) + (height * depth)) * 2);
+	}
+
 	BoundingBox CombineBoundingBoxes(const BoundingBox& box0, const BoundingBox& box1)
 	{
 		auto minPoint = Vector3(

@@ -478,8 +478,12 @@ namespace TEN::Collision::Attractor
 			if (!neighborRoom.Active())
 				continue;
 
-			auto attracs = neighborRoom.Attractors.GetBoundedAttractors(sphere);
-			boundedAttracs.insert(boundedAttracs.end(), attracs.begin(), attracs.end());
+			auto attracIds = neighborRoom.AttractorTree.GetBoundedIds(sphere);
+			for (int attracID : attracIds)
+			{
+				auto& attrac = neighborRoom.Attractors[attracID];
+				boundedAttracs.push_back(&attrac);
+			}
 		}
 
 		auto visitedBridgeItemNumbers = std::set<int>{};

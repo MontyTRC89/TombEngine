@@ -11,6 +11,7 @@
 #include "Renderer/Renderer.h"
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
+#include "Specific/Structures/BoundingVolumeHierarchy.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Collision::Attractor;
@@ -18,6 +19,7 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
+using namespace TEN::Structures;
 using namespace TEN::Utils;
 
 bool FlipStatus = false;
@@ -26,121 +28,39 @@ int  FlipMap[MAX_FLIPMAP];
 
 std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
-bool AttractorHandler::BvhNode::IsLeaf() const
+RoomObjectTreeHandler::RoomObjectTreeHandler(const std::vector<int>& ids, const std::vector<BoundingBox>& aabbs)
 {
-	return (LeftChildID == NO_VALUE && RightChildID == NO_VALUE);
+	_tree = Bvh(ids, aabbs);
 }
 
-AttractorHandler::Bvh::Bvh(const Vector3& pos, const std::vector<AttractorObject>& attracs)
+std::vector<int> RoomObjectTreeHandler::GetIds() const
 {
-	auto attracIds = std::vector<int>{};
-	attracIds.reserve(attracs.size());
-	for (int i = 0; i < attracs.size(); ++i)
-		attracIds.push_back(i);
-
-	Generate(pos, attracs, attracIds, 0, (int)attracs.size());
+	return _tree.GetBoundedObjectIds();
 }
 
-std::vector<AttractorObject*> AttractorHandler::Bvh::GetBoundedAttractors(const BoundingSphere& sphere, std::vector<AttractorObject>& attracs)
+std::vector<int> RoomObjectTreeHandler::GetBoundedIds(const Ray& ray, float dist) const
 {
-	if (Nodes.empty())
-		return {};
-
-	auto boundedAttracs = std::vector<AttractorObject*>{};
-	
-	std::function<void(int)> traverseBvh = [&](int nodeID)
-	{
-		// Invalid node; return early.
-		if (nodeID == NO_VALUE)
-			return;
-
-		const auto& node = Nodes[nodeID];
-
-		// Test node intersection.
-		if (!node.Box.Intersects(sphere))
-			return;
-
-		// Traverse nodes.
-		if (node.IsLeaf())
-		{
-			for (int attracID : node.AttractorIds)
-			{
-				if (attracs[attracID].Intersects(sphere))
-					boundedAttracs.push_back(&attracs[attracID]);
-			}
-		}
-		else
-		{
-			traverseBvh(node.LeftChildID);
-			traverseBvh(node.RightChildID);
-		}
-	};
-
-	// Traverse BVH from root node.
-	traverseBvh((int)Nodes.size() - 1);
-	return boundedAttracs;
+	return _tree.GetBoundedObjectIds(ray, dist);
 }
 
-int AttractorHandler::Bvh::Generate(const Vector3& pos, const std::vector<AttractorObject>& attracs, const std::vector<int>& attracIds, int start, int end)
+std::vector<int> RoomObjectTreeHandler::GetBoundedIds(const BoundingSphere& sphere) const
 {
-	constexpr auto ATTRAC_COUNT_PER_LEAF_MAX = 4;
-
-	// FAILSAFE.
-	if (start >= end)
-		return NO_VALUE;
-
-	auto node = BvhNode{};
-
-	// Combine boxes.
-	node.Box = attracs[attracIds[start]].GetAabb();
-	for (int i = (start + 1); i < end; i++)
-	{
-		node.Box = Geometry::CombineBoundingBoxes(node.Box, attracs[attracIds[i]].GetAabb());
-		*(Vector3*)&node.Box.Center += pos;
-	}
-
-	// Leaf node.
-	if ((end - start) <= ATTRAC_COUNT_PER_LEAF_MAX)
-	{
-		node.AttractorIds.insert(node.AttractorIds.end(), attracIds.begin() + start, attracIds.begin() + end);
-		Nodes.push_back(node);
-		return int(Nodes.size() - 1);
-	}
-	// Split node.
-	else
-	{
-		int mid = (start + end) / 2;
-		node.LeftChildID = Generate(pos, attracs, attracIds, start, mid);
-		node.RightChildID = Generate(pos, attracs, attracIds, mid, end);
-		Nodes.push_back(node);
-		return int(Nodes.size() - 1);
-	}
+	return _tree.GetBoundedObjectIds(sphere);
 }
 
-AttractorHandler::AttractorHandler(const Vector3& pos, std::vector<AttractorObject>& attracs)
+void RoomObjectTreeHandler::Insert(int id, const BoundingBox& aabb)
 {
-	_attractors = attracs;
-	GenerateBvh(pos);
+	_tree.Insert(id, aabb, AABB_BOUNDARY);
 }
 
-std::vector<AttractorObject>& AttractorHandler::GetAttractors()
+void RoomObjectTreeHandler::Move(int id, const BoundingBox& aabb)
 {
-	return _attractors;
+	_tree.Move(id, aabb, AABB_BOUNDARY);
 }
 
-std::vector<AttractorObject*> AttractorHandler::GetBoundedAttractors(const BoundingSphere& sphere)
+void RoomObjectTreeHandler::Remove(int id)
 {
-	return _bvh.GetBoundedAttractors(sphere, _attractors);
-}
-
-void AttractorHandler::InsertAttractor(const AttractorObject& attrac)
-{
-	_attractors.push_back(attrac);
-}
-
-void AttractorHandler::GenerateBvh(const Vector3& pos)
-{
-	_bvh = Bvh(pos, _attractors);
+	_tree.Remove(id);
 }
 
 bool ROOM_INFO::Active() const
@@ -218,7 +138,7 @@ void DoFlipMap(int group)
 			RemoveRoomFlipItems(room);
 
 			// Detach players from attractors.
-			for (auto& attrac : room.Attractors.GetAttractors())
+			for (auto& attrac : room.Attractors)
 				attrac.DetachAllPlayers();
 
 			// Swap rooms.
