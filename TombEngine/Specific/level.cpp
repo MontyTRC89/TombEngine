@@ -910,13 +910,13 @@ void ReadRooms()
 		for (int j = 0; j < attracCount; j++)
 		{
 			auto type = (AttractorType)ReadInt32();
-			auto points = std::vector<Vector3>{};
 
 			int pointCount = ReadInt32();
+			auto points = std::vector<Vector3>{};
 			points.reserve(pointCount);
 			for (int k = 0; k < pointCount; k++)
 			{
-				auto point = ReadVector3() - room.Position.ToVector3(); // TODO: Write local points to level.
+				auto point = ReadVector3();
 				points.push_back(point);
 			}
 

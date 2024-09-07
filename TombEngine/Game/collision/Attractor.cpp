@@ -193,6 +193,7 @@ namespace TEN::Collision::Attractor
 		auto transformMatrix = GetTransformMatrix();
 
 		auto localSphere = BoundingSphere(Vector3::Transform(pos, transformMatrix.Invert()), radius);
+		bool isPath = (_points.size() > 1);
 
 		// Test sphere-segment intersection.
 		float intersectDist = isPath ?
@@ -224,7 +225,7 @@ namespace TEN::Collision::Attractor
 			pathDist += Vector3::Distance(_points[segmentID], intersect);
 		}
 
-		// TODO: Consider axis. Hardcoded to Y+.
+		// TODO: Consider axis here and for 2D distance. Hardcoded to Y+.
 		auto refOrient = EulerAngles(0, headingAngle - EulerAngles(_orientation).y, 0);
 		auto segmentOrient = isPath ?
 			Geometry::GetOrientToPoint(_points[segmentID], _points[segmentID + 1]) + EulerAngles(0, EulerAngles(_orientation).y, 0) :
@@ -564,7 +565,7 @@ namespace TEN::Collision::Attractor
 		auto probePos = pos + Vector3::Transform(relOffset, rotMatrix);
 		int probeRoomNumber = GetPointCollision(pos, roomNumber, headingAngle, forward, down, right).GetRoomNumber();
 
-		return GetAttractorCollisions(probePos, probeRoomNumber, headingAngle, radius);
+		return GetAttractorCollisions(probePos, radius, probeRoomNumber, headingAngle);
 	}
 	
 	void DrawNearbyAttractors(const Vector3& pos, int roomNumber, short headingAngle)
@@ -573,7 +574,7 @@ namespace TEN::Collision::Attractor
 
 		auto uniqueAttracs = std::set<AttractorObject*>{};
 
-		auto attracColls = GetAttractorCollisions(pos, roomNumber, headingAngle, 0.0f, 0.0f, 0.0f, RADIUS);
+		auto attracColls = GetAttractorCollisions(pos, RADIUS, roomNumber, headingAngle, 0.0f, 0.0f, 0.0f);
 		for (const auto& attracColl : attracColls)
 		{
 			uniqueAttracs.insert(attracColl.Attractor);

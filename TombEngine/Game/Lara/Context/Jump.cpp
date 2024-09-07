@@ -270,8 +270,8 @@ namespace TEN::Player
 
 		// Get attractor collisions.
 		auto attracColls = GetAttractorCollisions(
-			item.Pose.Position.ToVector3(), item.RoomNumber, item.Pose.Orientation.y,
-			0.0f, -coll.Setup.Height, 0.0f, ATTRAC_DETECT_RADIUS);
+			item.Pose.Position.ToVector3(), ATTRAC_DETECT_RADIUS, item.RoomNumber, item.Pose.Orientation.y,
+			0.0f, -coll.Setup.Height, 0.0f);
 
 		float range2D = std::max<float>(OFFSET_RADIUS(coll.Setup.Radius), Vector2(item.Animation.Velocity.x, item.Animation.Velocity.z).Length());
 
