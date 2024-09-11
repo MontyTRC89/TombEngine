@@ -138,7 +138,6 @@ void InitializeSpotCam(short Sequence)
 	SpotcamPaused = false;
 	SpotcamLoopCnt = 0;
 	Lara.Control.IsLocked = false;
-	Camera.DisableInterpolation = true;
 
 	LaraAir = Lara.Status.Air;
 
@@ -235,6 +234,8 @@ void InitializeSpotCam(short Sequence)
 			CameraRoll[1] = SpotCam[CurrentSplineCamera].roll;
 			CameraFOV[1] = SpotCam[CurrentSplineCamera].fov;
 			CameraSpeed[1] = SpotCam[CurrentSplineCamera].speed;
+
+			Camera.DisableInterpolation = true;
 
 			SplineFromCamera = 0;
 
@@ -388,6 +389,7 @@ void CalculateSpotCameras()
 	{
 		SetScreenFadeIn(FADE_SCREEN_SPEED);
 		CameraFade = CurrentSplineCamera;
+		Camera.DisableInterpolation = true;
 	}
 
 	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_OUT) &&
@@ -395,6 +397,7 @@ void CalculateSpotCameras()
 	{
 		SetScreenFadeOut(FADE_SCREEN_SPEED);
 		CameraFade = CurrentSplineCamera;
+		Camera.DisableInterpolation = true;
 	}
 
 	sp = 0;
