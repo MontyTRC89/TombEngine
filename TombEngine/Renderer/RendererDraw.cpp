@@ -1725,7 +1725,7 @@ namespace TEN::Renderer
 		//RenderSimpleSceneToParaboloid(&_roomAmbientMapsCache[ambientMapCacheIndex].Back, LaraItem->Pose.Position.ToVector3(), -1);
 
 		// Bind and clear render target.
-		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), _debugPage == RendererDebugPage::WireframeMode ? Colors::White : Colors::Black);
+		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), _debugPage == RendererDebugPage::WireframeMode ? Colors::DimGray : Colors::Black);
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// Reset viewport and scissor

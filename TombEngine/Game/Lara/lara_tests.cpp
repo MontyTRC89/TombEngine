@@ -1087,15 +1087,13 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	auto pointColl = GetPointCollision(*item);
-	int waterDepth = GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, pointColl.GetRoomNumber());
 
-	if (waterDepth == NO_HEIGHT)
+	if (pointColl.GetWaterBottomHeight() == NO_HEIGHT)
 	{
 		item->Animation.Velocity.y = 0.0f;
 		item->Pose.Position = coll->Setup.PrevPosition;
 	}
-
-	else if (waterDepth <= (LARA_HEIGHT - (LARA_HEADROOM / 2)))
+	else if (pointColl.GetWaterBottomHeight() <= (LARA_HEIGHT - (LARA_HEADROOM / 2)))
 	{
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
 		ResetPlayerLean(item);

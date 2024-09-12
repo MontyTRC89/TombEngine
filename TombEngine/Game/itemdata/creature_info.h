@@ -83,12 +83,6 @@ struct CreatureBiteInfo
 		Position = pos;
 		BoneID = boneID;
 	}
-
-	CreatureBiteInfo(float x, float y, float z, int boneID)
-	{
-		Position = Vector3(x, y, z);
-		BoneID = boneID;
-	}
 };
 
 struct CreatureMuzzleFlashInfo

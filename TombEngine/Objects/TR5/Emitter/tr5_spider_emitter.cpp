@@ -232,9 +232,9 @@ void UpdateSpiders()
 					spider->VerticalVelocity = 0;
 				}
 
-				if (spider->Pose.Position.y < g_Level.Rooms[spider->RoomNumber].maxceiling + 50)
+				if (spider->Pose.Position.y < g_Level.Rooms[spider->RoomNumber].TopHeight + 50)
 				{
-					spider->Pose.Position.y = g_Level.Rooms[spider->RoomNumber].maxceiling + 50;
+					spider->Pose.Position.y = g_Level.Rooms[spider->RoomNumber].TopHeight + 50;
 					spider->Pose.Orientation.y += -ANGLE(180.0f);
 					spider->VerticalVelocity = 1;
 				}

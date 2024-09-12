@@ -6,7 +6,6 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
@@ -397,6 +396,7 @@ void KillMoveEffects()
 	ItemNewRoomNo = 0;
 }
 
+// NOTE: No one should use this ever again.
 int GetRandomControl()
 {
 	return Random::GenerateInt();
@@ -576,6 +576,10 @@ GameStatus DoGameLoop(int levelIndex)
 			case InventoryResult::NewGame:
 			case InventoryResult::NewGameSelectedLevel:
 				status = GameStatus::NewGame;
+				break;
+
+			case InventoryResult::HomeLevel:
+				status = GameStatus::HomeLevel;
 				break;
 
 			case InventoryResult::LoadGame:

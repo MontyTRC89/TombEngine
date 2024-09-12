@@ -4,7 +4,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/los.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
@@ -31,6 +31,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -842,32 +843,38 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	auto target = origin + (directionNorm * weapon.TargetDist);
 	auto ray = Ray(origin, directionNorm);
 
-	int num = GetSpheres(&targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int bestJointIndex = NO_VALUE;
-	float bestDistance = INFINITY;
-	for (int i = 0; i < num; i++)
-	{
-		auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
-		float distance = 0.0f;
-		if (ray.Intersects(sphere, distance))
-		{
-			if (distance < bestDistance)
-			{
-				bestDistance = distance;
-				bestJointIndex = i;
-			}
-		}
-	}
-
 	player.Control.Weapon.HasFired = true;
 	player.Control.Weapon.Fired = true;
-	
+
 	auto vOrigin = GameVector(pos);
 	short roomNumber = laraItem.RoomNumber;
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vOrigin.RoomNumber = roomNumber;
 
-	if (bestJointIndex < 0)
+	if (&targetEntity == nullptr)
+	{
+		auto vTarget = GameVector(target);
+		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
+		return FireWeaponType::Miss;
+	}
+
+	auto spheres = targetEntity.GetSpheres();
+	int closestJointIndex = NO_VALUE;
+	float closestDist = INFINITY;
+	for (int i = 0; i < spheres.size(); i++)
+	{
+		float dist = 0.0f;
+		if (ray.Intersects(spheres[i], dist))
+		{
+			if (dist < closestDist)
+			{
+				closestDist = dist;
+				closestJointIndex = i;
+			}
+		}
+	}
+	
+	if (closestJointIndex < 0)
 	{
 		auto vTarget = GameVector(target);
 		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
@@ -876,13 +883,13 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	else
 	{
 		SaveGame::Statistics.Game.AmmoHits++;
-		target = origin + (directionNorm * bestDistance);
+		target = origin + (directionNorm * closestDist);
 		auto vTarget = GameVector(target);
 
 		// NOTE: It seems that entities hit by the player in the normal way must have GetTargetOnLOS return false.
 		// It's strange, but this replicates original behaviour until we fully understand what is happening.
 		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
-			HitTarget(&laraItem, &targetEntity, &vTarget, weapon.Damage, false, bestJointIndex);
+			HitTarget(&laraItem, &targetEntity, &vTarget, weapon.Damage, false, closestJointIndex);
 
 		return FireWeaponType::PossibleHit;
 	}

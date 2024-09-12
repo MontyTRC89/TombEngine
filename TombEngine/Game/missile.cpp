@@ -66,6 +66,7 @@ void ControlMissile(short fxNumber)
 	// Check whether something was hit.
 	if (fx.pos.Position.y >= pointColl.GetFloorHeight() ||
 		fx.pos.Position.y <= pointColl.GetCeilingHeight() ||
+		pointColl.IsWall() ||
 		hasHitPlayer)
 	{
 		if (fx.objectNumber == ID_KNIFETHROWER_KNIFE ||
@@ -111,6 +112,7 @@ void ControlMissile(short fxNumber)
 		}
 
 		KillEffect(fxNumber);
+		return;
 	}
 
 	if (pointColl.GetRoomNumber() != fx.roomNumber)

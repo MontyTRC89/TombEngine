@@ -9,10 +9,12 @@ public:
 	static void Register(sol::table& parent);
 
 	// Members
+
 	float x = 0;
 	float y = 0;
 
 	// Constructors
+
 	Vec2(float x, float y);
 	Vec2(float value);
 	Vec2(const Vector2& vector);
@@ -28,6 +30,7 @@ public:
 	float Length() const;
 
 	// Meta functions
+
 	std::string ToString() const;
 	static Vec2 Add(const Vec2& vector0, const Vec2& vector1);
 	static Vec2 Subtract(const Vec2& vector0, const Vec2& vector1);
@@ -38,9 +41,11 @@ public:
 	static bool IsEqualTo(const Vec2& vector0, const Vec2& vector1);
 
 	// Converters
+
 	Vector2	 ToVector2() const;
 	//Vector2i ToVector2i() const;
 
 	// Operators
+
 	operator Vector2() const;
 };

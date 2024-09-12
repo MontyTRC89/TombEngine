@@ -240,7 +240,7 @@ void CreateZone(ItemInfo* item)
 	auto* creature = GetCreatureInfo(item);
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->PathfindingBoxID;
+	item->BoxNumber = GetSector(room, item->Pose.Position.x - room->Position.x, item->Pose.Position.z - room->Position.z)->PathfindingBoxID;
 
 	if (creature->LOT.Fly)
 	{

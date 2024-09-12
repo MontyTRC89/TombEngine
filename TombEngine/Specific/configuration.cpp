@@ -257,7 +257,7 @@ bool SaveConfiguration()
 
 	// Set Input keys.
 	if (SetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, g_Configuration.MouseSensitivity) != ERROR_SUCCESS ||
-		SetDWORDRegKey(inputKey, REGKEY_MOUSE_SMOOTHING, g_Configuration.MouseSmoothing) != ERROR_SUCCESS)
+		SetDWORDRegKey(inputKey, REGKEY_MENU_OPTION_LOOPING_MODE, (int)g_Configuration.MenuOptionLoopingMode) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		RegCloseKey(graphicsKey);
@@ -330,7 +330,7 @@ void InitDefaultConfiguration()
 	g_Configuration.EnableThumbstickCamera = false;
 
 	g_Configuration.MouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-	g_Configuration.MouseSmoothing = GameConfiguration::DEFAULT_MOUSE_SMOOTHING;
+	g_Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::SaveLoadOnly;
 
 	g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
 	g_Configuration.AdapterName = g_Renderer.GetDefaultAdapterName();
@@ -444,14 +444,14 @@ bool LoadConfiguration()
 	}
 
 	DWORD mouseSensitivity = GameConfiguration::DEFAULT_MOUSE_SENSITIVITY;
-	DWORD mouseSmoothing = GameConfiguration::DEFAULT_MOUSE_SMOOTHING;
+	DWORD menuOptionLoopingMode = (DWORD)MenuOptionLoopingMode::SaveLoadOnly;
 
 	// Load Input keys.
 	HKEY inputKey = NULL;
 	if (RegOpenKeyExA(rootKey, REGKEY_INPUT, 0, KEY_READ, &inputKey) == ERROR_SUCCESS)
 	{
 		if (GetDWORDRegKey(inputKey, REGKEY_MOUSE_SENSITIVITY, &mouseSensitivity, GameConfiguration::DEFAULT_MOUSE_SENSITIVITY) != ERROR_SUCCESS ||
-			GetDWORDRegKey(inputKey, REGKEY_MOUSE_SMOOTHING, &mouseSmoothing, GameConfiguration::DEFAULT_MOUSE_SMOOTHING) != ERROR_SUCCESS)
+			GetDWORDRegKey(inputKey, REGKEY_MENU_OPTION_LOOPING_MODE, &menuOptionLoopingMode, (DWORD)MenuOptionLoopingMode::SaveLoadOnly) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
@@ -519,7 +519,7 @@ bool LoadConfiguration()
 	g_Configuration.EnableThumbstickCamera = enableThumbstickCamera;
 
 	g_Configuration.MouseSensitivity = mouseSensitivity;
-	g_Configuration.MouseSmoothing = mouseSmoothing;
+	g_Configuration.MenuOptionLoopingMode = (MenuOptionLoopingMode)menuOptionLoopingMode;
 
 	// Set legacy variables.
 	SetVolumeTracks(musicVolume);
@@ -558,10 +558,10 @@ LONG GetDWORDRegKey(HKEY hKey, LPCSTR strValueName, DWORD* nValue, DWORD nDefaul
 		NULL,
 		reinterpret_cast<LPBYTE>(&nResult),
 		&dwBufferSize);
-	
+
 	if (ERROR_SUCCESS == nError)
 		*nValue = nResult;
-	
+
 	return nError;
 }
 
@@ -570,10 +570,10 @@ LONG GetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool* bValue, bool bDefaultVa
 	DWORD nDefValue((bDefaultValue) ? 1 : 0);
 	DWORD nResult(nDefValue);
 	LONG nError = GetDWORDRegKey(hKey, strValueName, &nResult, nDefValue);
-	
+
 	if (ERROR_SUCCESS == nError)
 		*bValue = (nResult != 0);
-	
+
 	return nError;
 }
 

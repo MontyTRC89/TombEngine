@@ -17,6 +17,7 @@ enum class GameStatus
 {
 	Normal,
 	NewGame,
+	HomeLevel,
 	LoadGame,
 	SaveGame,
 	ExitToTitle,

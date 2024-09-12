@@ -229,13 +229,13 @@ namespace TEN::Entities::TR4
 		{
 			const auto& room = g_Level.Rooms[LaraItem->RoomNumber];
 
-			x = room.x + room.xSize * BLOCK(1) / 2 - item.Pose.Position.x;
-			z = room.z + room.zSize * BLOCK(1) / 2 - item.Pose.Position.z;
+			x = room.Position.x + room.XSize * BLOCK(1) / 2 - item.Pose.Position.x;
+			z = room.Position.z + room.ZSize * BLOCK(1) / 2 - item.Pose.Position.z;
 
 			distance = SQUARE(x) + SQUARE(z);
 			dy = abs((distance / MAX_VISIBILITY_DISTANCE) - CLICK(1));
 			//Prevent Wraiths to go below floor level
-			y = room.y + ((room.maxceiling - room.minfloor) / 4);
+			y = room.Position.y + ((room.TopHeight - room.BottomHeight) / 4);
 		}
 
 		dy = y - item.Pose.Position.y - dy - CLICK(0.5f);
