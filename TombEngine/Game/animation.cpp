@@ -212,6 +212,13 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 			commandDataPtr += 2;
 			break;
 
+		case AnimCommandType::DisableInterpolation:
+			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+				item.DisableInterpolation = true;
+
+			commandDataPtr += 1;
+			break;
+
 		default:
 			break;
 		}
