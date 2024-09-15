@@ -49,11 +49,9 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Changed Water sound condition to ShallowWater.
 * Enhanced Rolling Spindle detection to avoid them going down through pits.
 * Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
-* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
+* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing-dart emitter ).
 * Enhanced raptor behaviour and handling. https://tombengine.com/docs/ocb-and-setup-instructions/#raptor 
   - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
-* Enhanced pushables. Pushables will now react to the texture sound of the floor below it. 
-  - A soundpack for these new sounds has been created and can be found here: 
 	
 ### Lua API changes
 
