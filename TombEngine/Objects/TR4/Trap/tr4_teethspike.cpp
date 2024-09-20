@@ -62,7 +62,7 @@ namespace TEN::Entities::Traps
 		if (TriggerActive(&item) && item.ItemFlags[2] == 0)
 		{
 			// Get current item bounds and radius.
-			const auto& bounds = GetBestFrame(item).BoundingBox;
+			const auto& bounds = GetClosestKeyframe(item).BoundingBox;
 			int radius = std::max(abs(bounds.X2 - bounds.X1), abs(bounds.Z2 - bounds.Z1)) / 2;
 
 			// Play sound only if spikes are just emerging.
@@ -88,7 +88,7 @@ namespace TEN::Entities::Traps
 				float dot = Vector3::UnitX.Dot(normal);
 				float angle = acos(dot / sqrt(normal.LengthSquared() * Vector3::UnitX.LengthSquared()));
 
-				const auto& playerBounds = GetBestFrame(*LaraItem).BoundingBox;
+				const auto& playerBounds = GetClosestKeyframe(*LaraItem).BoundingBox;
 
 				int bloodCount = 0;
 
@@ -159,7 +159,7 @@ namespace TEN::Entities::Traps
 
 					if (item.Pose.Position.y >= LaraItem->Pose.Position.y && heightFromFloor < CLICK(1))
 					{
-						SetAnimation(LaraItem, LA_SPIKE_DEATH);
+						SetAnimation(*LaraItem, LA_SPIKE_DEATH);
 						LaraItem->Animation.IsAirborne = false;
 					}
 				}

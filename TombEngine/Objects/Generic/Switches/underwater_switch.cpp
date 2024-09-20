@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Switches/underwater_switch.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"
@@ -11,6 +11,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
@@ -80,8 +81,9 @@ namespace TEN::Entities::Switches
 
 						do
 						{
-							AnimateItem(laraItem);
-						} while (laraItem->Animation.TargetState != LS_SWITCH_DOWN);
+							AnimateItem(*laraItem);
+						}
+						while (laraItem->Animation.TargetState != LS_SWITCH_DOWN);
 
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
 						lara->Control.HandStatus = HandStatus::Busy;
@@ -89,7 +91,7 @@ namespace TEN::Entities::Switches
 						switchItem->Status = ITEM_ACTIVE;
 
 						AddActiveItem(itemNumber);
-						AnimateItem(switchItem);
+						AnimateItem(*switchItem);
 					}
 				}
 			}
@@ -135,7 +137,7 @@ namespace TEN::Entities::Switches
 
 			if (doInteraction)
 			{
-				SetAnimation(laraItem, LA_UNDERWATER_CEILING_SWITCH_PULL);
+				SetAnimation(*laraItem, LA_UNDERWATER_CEILING_SWITCH_PULL);
 				laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
 				laraItem->Animation.Velocity.y = 0;
 				lara->Control.IsMoving = false;

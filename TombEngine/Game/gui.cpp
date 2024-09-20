@@ -3,7 +3,7 @@
 
 #include <OISKeyboard.h>
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -27,6 +27,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Utils;
@@ -2163,7 +2164,7 @@ namespace TEN::Gui
 
 				// TODO: To prevent Lara from crouching or performing other actions, the inherent state of
 				// LA_BINOCULARS_IDLE must be changed to LS_IDLE. @Sezz 2022.05.19
-				//SetAnimation(item, LA_BINOCULARS_IDLE);
+				//SetAnimation(*item, LA_BINOCULARS_IDLE);
 
 				if (player.Control.HandStatus != HandStatus::Free)
 					player.Control.HandStatus = HandStatus::WeaponUndraw;

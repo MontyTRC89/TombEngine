@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Objects/TR2/Vehicles/speedboat.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/Point.h"
@@ -17,6 +17,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
@@ -211,7 +212,7 @@ namespace TEN::Entities::Vehicles
 			SetAnimation(*laraItem, ID_SPEEDBOAT_LARA_ANIMS, SPEEDBOAT_ANIM_MOUNT_JUMP);
 			break;
 		} 
-		laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+		laraItem->Animation.FrameNumber = 0;
 
 		if (laraItem->RoomNumber != speedboatItem->RoomNumber)
 			ItemNewRoom(laraItem->Index, speedboatItem->RoomNumber);
@@ -224,7 +225,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.Velocity.y = 0;
 		lara->Control.WaterStatus = WaterStatus::Dry;
 
-		AnimateItem(laraItem);
+		AnimateItem(*laraItem);
 	}
 
 	bool TestSpeedboatDismount(ItemInfo* speedboatItem, int direction)
@@ -264,14 +265,14 @@ namespace TEN::Entities::Vehicles
 
 		if ((laraItem->Animation.ActiveState == SPEEDBOAT_STATE_DISMOUNT_LEFT ||
 			laraItem->Animation.ActiveState == SPEEDBOAT_STATE_DISMOUNT_RIGHT) &&
-			TestLastFrame(laraItem))
+			TestLastFrame(*laraItem))
 		{
 			if (laraItem->Animation.ActiveState == SPEEDBOAT_STATE_DISMOUNT_LEFT)
 				laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 			else if (laraItem->Animation.ActiveState == SPEEDBOAT_STATE_DISMOUNT_RIGHT)
 				laraItem->Pose.Orientation.y += ANGLE(90.0f);
 
-			SetAnimation(laraItem, LA_JUMP_FORWARD);
+			SetAnimation(*laraItem, LA_JUMP_FORWARD);
 			laraItem->Animation.IsAirborne = true;
 			laraItem->Animation.Velocity.z = 40;
 			laraItem->Animation.Velocity.y = -50;
@@ -913,10 +914,10 @@ namespace TEN::Entities::Vehicles
 			laraItem->Pose = speedboatItem->Pose;
 			speedboatItem->Pose.Orientation.z += speedboat->LeanAngle;
 
-			AnimateItem(laraItem);
+			AnimateItem(*laraItem);
 
 			if (laraItem->HitPoints > 0)
-				SyncVehicleAnimation(*speedboatItem, *laraItem);
+				SyncVehicleAnim(*speedboatItem, *laraItem);
 
 			Camera.targetElevation = -ANGLE(20.0f);
 			Camera.targetDistance = BLOCK(2);

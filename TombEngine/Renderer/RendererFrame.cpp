@@ -2,7 +2,7 @@
 #include "Renderer/Renderer.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/Sphere.h"
 #include "Game/effects/effects.h"
@@ -14,6 +14,7 @@
 #include "Specific/level.h"
 #include "Renderer/RenderView.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
