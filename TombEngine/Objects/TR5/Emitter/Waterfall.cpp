@@ -49,66 +49,66 @@ namespace TEN::Effects::WaterfallEmitter
 		auto endColor = (item.Model.Color / 8) * UCHAR_MAX;
 
 		// Spawn particles.
-		unsigned int partCount = (int)round(waterfallWidth / BLOCK(0.5f));
-		for (int i = 0; i < partCount; i++)
-		{
-			auto& part = *GetFreeParticle();
-
-			auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
-			auto relOffset = Vector3(Random::GenerateFloat(-waterfallWidth / 2, waterfallWidth / 2), 0.0f, 0.0f);
-			auto offset = Vector3::Transform(relOffset, rotMatrix);
-			auto sphere = BoundingSphere(offset, SPAWN_RADIUS);
-			offset = Random::GeneratePointInSphere(sphere);
-			auto pos = item.Pose.Position.ToVector3() + offset;
-
-			vel.y = Random::GenerateFloat(0.0f, 16.0f);
-
-			part.on = true;
-			part.SpriteSeqID = ID_WATERFALL;
-			part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_SPLASH_SPRITE_ID;
-			part.x = pos.x;
-			part.y = pos.y;
-			part.z = pos.z;
-			part.roomNumber = item.RoomNumber;
-			part.xVel = vel.x;
-			part.yVel = vel.y;
-			part.zVel = vel.z;
-			part.friction = -2;
-
-			auto pointColl = GetPointCollision(pos, item.RoomNumber, item.Pose.Orientation.y, BLOCK(0.3f));
-			part.targetPos = GameVector(pointColl.GetPosition().x, pointColl.GetFloorHeight(), pointColl.GetPosition().z, pointColl.GetRoomNumber());
-			if (TestEnvironment(ENV_FLAG_WATER, part.targetPos.ToVector3i(), part.roomNumber) ||
-				TestEnvironment(ENV_FLAG_SWAMP, part.targetPos.ToVector3i(), part.roomNumber))
+			unsigned int partCount = (int)round(waterfallWidth / BLOCK(0.5f));
+			for (int i = 0; i < partCount; i++)
 			{
-				part.targetPos.y = pointColl.GetWaterSurfaceHeight();
+					auto& part = *GetFreeParticle();
+
+					auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+					auto relOffset = Vector3(Random::GenerateFloat(-waterfallWidth / 2, waterfallWidth / 2), 0.0f, 0.0f);
+					auto offset = Vector3::Transform(relOffset, rotMatrix);
+					auto sphere = BoundingSphere(offset, SPAWN_RADIUS);
+					offset = Random::GeneratePointInSphere(sphere);
+					auto pos = item.Pose.Position.ToVector3() + offset;
+
+					vel.y = Random::GenerateFloat(0.0f, 16.0f);
+
+					part.on = true;
+					part.SpriteSeqID = ID_WATERFALL;
+					part.SpriteID = Random::TestProbability(1 / 2.2f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_SPLASH_SPRITE_ID;
+					part.x = pos.x;
+					part.y = pos.y;
+					part.z = pos.z;
+					part.roomNumber = item.RoomNumber;
+					part.xVel = vel.x;
+					part.yVel = vel.y;
+					part.zVel = vel.z;
+					part.friction = -2;
+
+					auto pointColl = GetPointCollision(pos, item.RoomNumber, item.Pose.Orientation.y, BLOCK(0.3f));
+					part.targetPos = GameVector(pointColl.GetPosition().x, pointColl.GetFloorHeight(), pointColl.GetPosition().z, pointColl.GetRoomNumber());
+					if (TestEnvironment(ENV_FLAG_WATER, part.targetPos.ToVector3i(), part.roomNumber) ||
+						TestEnvironment(ENV_FLAG_SWAMP, part.targetPos.ToVector3i(), part.roomNumber))
+					{
+						part.targetPos.y = pointColl.GetWaterSurfaceHeight();
+					}
+
+					// TODO: Offset colour earlier.
+					char colorOffset = Random::GenerateInt(-8, 8);
+
+					part.sR = std::clamp((int)startColor.x + colorOffset, 0, UCHAR_MAX);
+					part.sG = std::clamp((int)startColor.y + colorOffset, 0, UCHAR_MAX);
+					part.sB = std::clamp((int)startColor.z + colorOffset, 0, UCHAR_MAX);
+					part.dR = std::clamp((int)endColor.x + colorOffset, 0, UCHAR_MAX);
+					part.dG = std::clamp((int)endColor.y + colorOffset, 0, UCHAR_MAX);
+					part.dB = std::clamp((int)endColor.z + colorOffset, 0, UCHAR_MAX);
+					part.roomNumber = pointColl.GetRoomNumber();
+					part.colFadeSpeed = 2;
+					part.blendMode = BlendMode::Additive;
+					part.gravity = 120;
+					part.life =
+						part.sLife = WATERFALL_LIFE_MAX;
+					part.fxObj = ID_WATERFALL_EMITTER;
+					part.fadeToBlack = 0;
+					part.rotAng = Random::GenerateAngle();
+					part.rotAdd = Random::GenerateAngle(ANGLE(-0.1f), ANGLE(0.1f));
+					part.scalar = item.TriggerFlags < 10 ? Random::GenerateInt(2, 4) : Random::GenerateInt(3, 5);
+					part.maxYvel = 0;
+					part.sSize =
+						part.size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
+					part.dSize = item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(98.0f, 174.0f);
+					part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
 			}
-
-			// TODO: Offset colour earlier.
-			char colorOffset = Random::GenerateInt(-8, 8);
-
-			part.sR = std::clamp((int)startColor.x + colorOffset, 0, UCHAR_MAX);
-			part.sG = std::clamp((int)startColor.y + colorOffset, 0, UCHAR_MAX);
-			part.sB = std::clamp((int)startColor.z + colorOffset, 0, UCHAR_MAX);
-			part.dR = std::clamp((int)endColor.x + colorOffset, 0, UCHAR_MAX);
-			part.dG = std::clamp((int)endColor.y + colorOffset, 0, UCHAR_MAX);
-			part.dB = std::clamp((int)endColor.z + colorOffset, 0, UCHAR_MAX);
-			part.roomNumber = pointColl.GetRoomNumber();
-			part.colFadeSpeed = 2;
-			part.blendMode = BlendMode::Additive;
-			part.gravity = 120;
-			part.life =
-			part.sLife = WATERFALL_LIFE_MAX;
-			part.fxObj = ID_WATERFALL_EMITTER;
-			part.fadeToBlack = 0;
-			part.rotAng = Random::GenerateAngle();
-			part.rotAdd = Random::GenerateAngle(ANGLE(-0.1f), ANGLE(0.1f));
-			part.scalar = item.TriggerFlags < 10 ? Random::GenerateInt(2, 4) : Random::GenerateInt(3, 5);
-			part.maxYvel = 0;
-			part.sSize =
-			part.size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
-			part.dSize = item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(98.0f, 174.0f);
-			part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
-		}
 	}
 
 	void SpawnWaterfallMist(const Vector3& pos, int roomNumber, float scalar, float size, const Color& color)
@@ -128,13 +128,13 @@ namespace TEN::Effects::WaterfallEmitter
 		int minPosX = sin + pos.x;
 		int minPosZ = cos + pos.z;
 
-		auto colorOffset = Color(40.0f); // make constant.
+		auto colorOffset = Color(40.0f, 40.0f, 40.0f); // make constant. Color is Vector 4. 4th value should not be changed.
 
 		auto startColor = (color + colorOffset);
 		auto endColor = (color + colorOffset);
 
 		part.SpriteSeqID = ID_WATERFALL;
-		part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_1_SPRITE_ID : WATERFALL_STREAM_2_SPRITE_ID;
+		part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_STREAM_1_SPRITE_ID;
 
 		part.on = true;
 
@@ -173,7 +173,7 @@ namespace TEN::Effects::WaterfallEmitter
 		part.gravity =
 		part.maxYvel = -64;
 
-		float size1 = (GetRandomControl() & 8) + (size * 4) + scalar;
+		float size1 = (GetRandomControl() & 8) + size + scalar;
 		part.size =
 		part.sSize = size1 / 4;
 		part.dSize = size1;
