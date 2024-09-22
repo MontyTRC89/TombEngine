@@ -200,6 +200,7 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 	{
 	case GAME_OBJECT_ID::ID_KAYAK:
 		InitializeKayak(vehicle->Index);
+		KayakPaddleTake(&playerItem);
 		break;
 
 	case GAME_OBJECT_ID::ID_MOTORBIKE:
@@ -216,6 +217,10 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 
 	case GAME_OBJECT_ID::ID_SNOWMOBILE:
 		InitializeSkidoo(vehicle->Index);
+		break;
+
+	case GAME_OBJECT_ID::ID_MINECART:
+		playerItem.Model.MeshIndex[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
 		break;
 
 	default:
