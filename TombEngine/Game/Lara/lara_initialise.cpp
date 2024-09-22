@@ -122,6 +122,9 @@ void InitializeLaraAnims(ItemInfo* item)
 	player.LeftArm.Locked = false;
 	player.RightArm.Locked = false;
 
+	if (PlayerVehicleObjectID != GAME_OBJECT_ID::ID_NO_OBJECT)
+		return;
+
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		SetAnimation(item, LA_UNDERWATER_IDLE);

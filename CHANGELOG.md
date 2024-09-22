@@ -10,6 +10,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Bug fixes
 * Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
+* Fixed vehicle transfer on leveljump.
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed camera rotating with the player's hips when climbing out of water.
 * Fixed AI for TR2 skidoo driver and worker with shotgun.
@@ -26,7 +27,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed teeth spikes not triggering the player impale animation.
 * Fixed TR4 mine crash with OCB 1 when triggered.
 * Fixed cases where Atlantean mutant's bombs cause the game to crash.
-* Fixed young hair drawing. https://tombengine.com/docs/level-settings/#young_lara
+* Fixed young Lara hair drawing. https://tombengine.com/docs/level-settings/#young_lara
 
 ### Features/Amendments
 
