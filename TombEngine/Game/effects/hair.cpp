@@ -324,7 +324,7 @@ namespace TEN::Effects::Hair
 		{
 			auto& unit = Units[i];
 
-			auto objectID = (i == 0) ? ID_SINGLE_BRAID_HAIR : ID_DUAL_PIGTAIL_HAIR;
+			auto objectID = (i == 0) ? ID_HAIR_PRIMARY : ID_HAIR_SECONDARY;
 			const auto& object = Objects[objectID];
 
 			unit.IsEnabled = (object.loaded && (i == 0 || (i == 1 && isYoung)));
