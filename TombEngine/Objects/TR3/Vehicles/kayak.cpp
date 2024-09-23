@@ -35,7 +35,7 @@ namespace TEN::Entities::Vehicles
 	constexpr int KAYAK_VELOCITY_FRICTION_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_VELOCITY_MAX = 56 * VEHICLE_VELOCITY_SCALE;
 
-	constexpr char KAYAK_FLAG_PADDLE_MESH = 0x80;
+	constexpr auto KAYAK_FLAG_PADDLE_MESH = 0x80;
 	constexpr auto KAYAK_WAKE_OFFSET = Vector3(BLOCK(0.1f), 0.0f, BLOCK(0.25f));
 
 	// TODO: Very confusing.

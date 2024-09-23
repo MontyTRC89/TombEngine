@@ -280,7 +280,7 @@ namespace TEN::Effects::Boss
 		short flags = 0;
 
 		if (item.ObjectNumber == ID_PUNA_BOSS && Objects[ID_LIZARD].loaded)		
-			flags |= (short)BossFlagValue::Lizard;
+			flags |= (short)BossFlagValue::NonPlayerTarget;
 		
 		// The following are only for aesthetics.
 

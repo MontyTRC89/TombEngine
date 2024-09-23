@@ -28,6 +28,7 @@
 #include "Objects/TR1/Trap/DamoclesSword.h"
 #include "Objects/TR1/Trap/SlammingDoors.h"
 #include "Objects/TR1/Trap/SwingingBlade.h"
+#include "Objects/TR1/Trap/ElectricBall.h"
 
 using namespace TEN::Entities::Creatures::TR1;
 using namespace TEN::Entities::Traps;
@@ -268,6 +269,28 @@ static void StartTrap(ObjectInfo* obj)
 		obj->collision = GenericSphereBoxCollision;
 		obj->shadowType = ShadowMode::All;
 		obj->SetHitEffect(true);
+	}
+
+	obj = &Objects[ID_ELECTRIC_BALL];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeElectricBall;
+		obj->control = ControlElectricBall;
+		obj->collision = GenericSphereBoxCollision;
+		obj->shadowType = ShadowMode::All;
+		obj->SetHitEffect(true);
+		obj->HitPoints = NOT_TARGETABLE;
+		obj->intelligent = true;
+		obj->nonLot = true;
+		obj->radius = 102;
+	}
+
+	obj = &Objects[ID_ELECTRIC_BALL_IMPACT_POINT];
+	if (obj->loaded)
+	{
+		//obj->collision = AIPickupCollision;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
 	}
 }
 
