@@ -288,7 +288,7 @@ static void StartTrap(ObjectInfo* obj)
 	obj = &Objects[ID_ELECTRIC_BALL_IMPACT_POINT];
 	if (obj->loaded)
 	{
-		//obj->collision = AIPickupCollision;
+		obj->Initialize = InitializeElectricBallImpactPoint;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}

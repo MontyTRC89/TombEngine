@@ -13,9 +13,9 @@ namespace TEN::Effects::Electricity
 	constexpr auto HELICAL_LASER_LIFE_MAX = 18.0f;
 
 	std::vector<Electricity>  ElectricityArcs = {};
-	std::vector<HelicalLaser> HelicalLasers	  = {};
+	std::vector<HelicalLaser> HelicalLasers = {};
 
-	std::array<Vector3, ELECTRICITY_KNOTS_SIZE>	 ElectricityKnots  = {};
+	std::array<Vector3, ELECTRICITY_KNOTS_SIZE>	 ElectricityKnots = {};
 	std::array<Vector3, ELECTRICITY_BUFFER_SIZE> ElectricityBuffer = {};
 
 	// BIG TODO: Make a family of Bezier, B-Spline, and Catmull-Rom curve classes.
@@ -30,8 +30,8 @@ namespace TEN::Effects::Electricity
 		auto point4 = knots[3];
 
 		auto spline = ((point2 * 2) + (point3 - point1) * alpha) +
-					  (((point1 * 2) - (point2 * 5) + (point3 * 4) - point4) * SQUARE(alpha)) +
-					  (((point1 * -1) + (point2 * 3) - (point3 * 3) + point4) * CUBE(alpha));
+			(((point1 * 2) - (point2 * 5) + (point3 * 4) - point4) * SQUARE(alpha)) +
+			(((point1 * -1) + (point2 * 3) - (point3 * 3) + point4) * CUBE(alpha));
 		return spline;
 	}
 
@@ -64,6 +64,15 @@ namespace TEN::Effects::Electricity
 		return (ret + knot1);
 	}
 
+	float CalculateDistance(const Vector3& p1, const Vector3& p2)
+	{
+		return std::sqrt(
+			(p2.x - p1.x) * (p2.x - p1.x) +
+			(p2.y - p1.y) * (p2.y - p1.y) +
+			(p2.z - p1.z) * (p2.z - p1.z)
+		);
+	}
+
 	// TODO: Pass const Vector4& for color.
 	void SpawnElectricity(const Vector3& origin, const Vector3& target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments)
 	{
@@ -83,7 +92,7 @@ namespace TEN::Effects::Electricity
 					fmod(Random::GenerateInt(), amplitude),
 					fmod(Random::GenerateInt(), amplitude),
 					fmod(Random::GenerateInt(), amplitude)) -
-					Vector3(amplitude/ 2);
+					Vector3(amplitude / 2);
 			}
 			else
 			{
@@ -129,17 +138,17 @@ namespace TEN::Effects::Electricity
 		spark.maxYvel = 0;
 		spark.gravity = 0;
 		spark.sSize =
-		spark.dSize =
-		spark.size = scale + Random::GenerateInt(0, 4);
+			spark.dSize =
+			spark.size = scale + Random::GenerateInt(0, 4);
 		spark.flags = SP_DEF | SP_SCALE;
 	}
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
-	 {
+	{
 		constexpr auto SEGMENTS_NUM_MAX = 128;
-		constexpr auto COLOR			= Vector4(0.0f, 0.375f, 1.0f, 1.0f);
-		constexpr auto LENGTH_MAX		= BLOCK(4);
-		constexpr auto ROTATION			= ANGLE(-10.0f);
+		constexpr auto COLOR = Vector4(0.0f, 0.375f, 1.0f, 1.0f);
+		constexpr auto LENGTH_MAX = BLOCK(4);
+		constexpr auto ROTATION = ANGLE(-10.0f);
 
 		constexpr auto ELECTRICITY_FLAGS = (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::ThinOut;
 
@@ -163,7 +172,7 @@ namespace TEN::Effects::Electricity
 		SpawnElectricity(origin, target, 1, 0, laser.Color.x * UCHAR_MAX, laser.Color.z * UCHAR_MAX, 20, ELECTRICITY_FLAGS, 19, 5);
 		SpawnElectricity(origin, target, 1, 110, 255, 250, 20, ELECTRICITY_FLAGS, 4, 5);
 		SpawnElectricityGlow(laser.LightPosition, 0, 0, (laser.Color.x / 2) * UCHAR_MAX, (laser.Color.z / 2) * UCHAR_MAX);
-	 }
+	}
 
 	void UpdateHelicalLasers()
 	{
@@ -268,7 +277,7 @@ namespace TEN::Effects::Electricity
 		else
 		{
 			int numSegments = (arc.segments * 3) - 1;
-			
+
 			auto deltaPos = (knots[knots.size() - 1] - knots[0]) / numSegments;
 			auto pos = knots[0] + deltaPos + Vector3(
 				fmod(Random::GenerateInt(), arc.amplitude * 2),
