@@ -280,9 +280,9 @@ static void StartTrap(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->SetHitEffect(true);
 		obj->HitPoints = NOT_TARGETABLE;
+		obj->radius = 512;
 		obj->intelligent = true;
-		obj->nonLot = true;
-		obj->radius = 102;
+		//obj->nonLot = true;
 	}
 
 	obj = &Objects[ID_ELECTRIC_BALL_IMPACT_POINT];

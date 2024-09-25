@@ -74,7 +74,7 @@ namespace TEN::Effects::Electricity
 	extern std::array<Vector3, ELECTRICITY_BUFFER_SIZE> ElectricityBuffer;
 
 	void SpawnElectricity(const Vector3& origin, const Vector3& target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments);
-	void SpawnElectricityArm(const Vector3& origin, const Vector3& target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments, const Vector3 armOrigin);
+	void SpawnElectricEffect(const ItemInfo& item, int jointNumber, const Vector3i& offset, const float spawnRadius, float beamOriginRadius, float beamTargetRadius, int frequency, const Vector3& pos);
 	void SpawnElectricityGlow(const Vector3& pos, float scale, byte r, byte g, byte b);
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target);
 	void ApplyRandomBend(Electricity& arc, int bendKnot);

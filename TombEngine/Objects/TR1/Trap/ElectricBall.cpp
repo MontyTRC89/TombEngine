@@ -6,6 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
@@ -18,6 +19,7 @@
 #include "Objects/TR5/Entity/tr5_roman_statue.h"
 #include "Objects/TR5/Light/tr5_light.h"
 #include "Objects/TR5/Light/tr5_light_info.h"
+#include "Objects/TR5/Entity/tr5_roman_statue.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
@@ -37,20 +39,22 @@ namespace TEN::Entities::Traps
 	enum TargetType
 	{
 		None,
-		Target
+		Target, 
+		SwitchTarget
 	};
 
 	struct ElectricBallInfo
 	{
 		Vector3i Position = Vector3i::Zero;
+		Color Colorw;
 		Electricity* EnergyArcs = {};
-		Color Color;
+		Electricity* MainEnergyArc = {};
 		unsigned int Count = 0;
 	};
 
-	ElectricBallInfo ElectricBallData;
+	ElectricBallInfo EldectricBallData;
 
-	constexpr auto ELECTRIC_LIGHTNING_DAMAGE = 350;
+	constexpr auto ELECTRIC_BALL_LIGHTNING_DAMAGE = 350;
 	constexpr auto DAMOCLES_SWORD_DAMAGE = 100;
 
 	constexpr auto DAMOCLES_SWORD_VELOCITY_MIN = BLOCK(1 / 20.0f);
@@ -65,6 +69,7 @@ namespace TEN::Entities::Traps
 
 	constexpr auto DAMOCLES_SWORD_TURN_RATE_MAX = ANGLE(5.0f);
 	constexpr auto DAMOCLES_SWORD_TURN_RATE_MIN = ANGLE(1.0f);
+
 
 	static void TriggerElectricBallShockwaveAttackSparks(int x, int y, int z, byte r, byte g, byte b, byte size)
 	{
@@ -95,6 +100,8 @@ namespace TEN::Entities::Traps
 		spark->gravity = 0;
 		spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 	}
+
+	
 
 	const void SpawnElectricSmoke(const Vector3& pos, const EulerAngles& orient, float life)
 	{
@@ -141,12 +148,11 @@ namespace TEN::Entities::Traps
 	void InitializeElectricBall(short itemNumber)
 	{
 
-		InitializeCreature(itemNumber);
+		//InitializeCreature(itemNumber);
 		auto& item = g_Level.Items[itemNumber];
 		CheckForRequiredObjects(item);
 
-	
-		ElectricBallData.Color = item.Model.Color;
+		EldectricBallData.Colorw = item.Model.Color;
 
 		int sign = Random::TestProbability(0.5f) ? 1 : -1;
 		//item.ItemFlags[0] = Random::GenerateAngle(DAMOCLES_SWORD_TURN_RATE_MIN, DAMOCLES_SWORD_TURN_RATE_MAX) * sign;
@@ -161,7 +167,8 @@ namespace TEN::Entities::Traps
 		for (auto& currentEntity : g_Level.Items)
 		{
 			if (currentEntity.ObjectNumber == ID_ELECTRIC_BALL_IMPACT_POINT &&
-				currentEntity.RoomNumber == item.RoomNumber)
+				currentEntity.RoomNumber == item.RoomNumber &&
+				currentEntity.TriggerFlags == item.TriggerFlags)
 			{
 				entityList.push_back(currentEntity.Index);
 			}
@@ -195,21 +202,23 @@ namespace TEN::Entities::Traps
 		if (targetList.size() == 1)
 			return targetList[0];
 		else
-			return targetList[Random::GenerateInt(0, (int)targetList.size() )];
+			return targetList[Random::GenerateInt(0, (int)targetList.size() - 1 )];
 	}
 
-	static void SpawnElectricBallLightning(ItemInfo& item, const Vector3& pos, const CreatureBiteInfo& bite)
+	void SpawnElectricBallLightning(ItemInfo& item, const Vector3& pos, const CreatureBiteInfo& bite)
 	{
-		const auto& creature = *GetCreatureInfo(&item);
+		//const auto& creature = *GetCreatureInfo(&item);
 
+
+	
 		auto offset = Vector3::Zero;
 		auto origin = GameVector(GetJointPosition(&item, bite), item.RoomNumber);
-		auto targetRandom = Vector3::Zero;
+		auto targetRandom = Vector3i::Zero;
 		auto target = GameVector(pos, item.RoomNumber);
 		constexpr auto SPAWN_RADIUS = BLOCK(0.30f);
 		auto orient = Geometry::GetOrientToPoint(origin.ToVector3(), target.ToVector3());
 		auto pos1 = GetJointPosition(item, 0, Vector3i(0, 200, 0)).ToVector3();
-
+		auto targetNew = GameVector::Zero;
 
 		static constexpr auto raygunSmokeLife = 16.0f;
 		auto distance =  origin -  target;
@@ -219,55 +228,84 @@ namespace TEN::Entities::Traps
 			auto random = Random::GenerateFloat(0.20f, 0.60f);
 			auto halftarget = origin.ToVector3() + Vector3(random, random, random) * (target.ToVector3() - origin.ToVector3());
 
-			SpawnElectricity(origin.ToVector3(), halftarget, 5, 32, 64, 128, 60, (int)ElectricityFlags::Spline , 4, 12);
-
+			SpawnElectricity(origin.ToVector3(), halftarget, 5, 32, 64, 128, 60, (int)ElectricityFlags::Spline , 8, 12);//4
+			//SpawnElectricity(origin.ToVector3(), halftarget, 5, 32, 64, 128, 60, (int)ElectricityFlags::Spline , 4, 12);
 			
-			ElectricBallData.EnergyArcs = &ElectricityArcs.back();
+			//ElectricBallData.EnergyArcs = &ElectricityArcs.back();
 			auto arc = ElectricityArcs.back();;
 
 			SpawnElectricityGlow(arc.pos1, 68, 32, 32, 64);
 
-			targetRandom = Vector3(Random::GenerateInt(515, 650), 0, Random::GenerateInt(615, 810));
-			SpawnElectricity(arc.pos4, target.ToVector3() + targetRandom, 15, 32, 64, 128, 60, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 4, 12);
-			//SpawnElectricity(arc.pos4, target.ToVector3() + targetRandom, 15, 250, 250, 250, 60, (int)ElectricityFlags::Spline, 2, 12);
+
+			targetRandom = Vector3i(Random::GenerateInt(515, 650), 0, Random::GenerateInt(615, 810));
+			targetNew = GameVector((target.ToVector3() - Vector3(0, 120, 0)) + targetRandom.ToVector3(), item.RoomNumber);
+
+			SpawnElectricity(arc.pos4, target.ToVector3() + targetRandom.ToVector3(), 15, 32, 64, 128, 60, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 4, 12);//4
+			TriggerRicochetSpark(targetNew, 12, 12, Color(32, 64, 128, 1.0f));
+			SpawnElectricSmoke((target.ToVector3() - Vector3(0, 120, 0)) + targetRandom.ToVector3(), EulerAngles::Identity, raygunSmokeLife);
+			//TriggerShockwave((Pose*)&targetNew, 1, 15, 3, 32, 64, 128, 80, EulerAngles::Identity, 8, false, true, true, (int)ShockwaveStyle::Invisible);
+
+			SpawnElectricity((target.ToVector3() - Vector3(0, 120, 0)) + targetRandom.ToVector3(), target.ToVector3() + targetRandom.ToVector3(), 15, 32, 64, 128, 160, (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 12, 12);
+			SpawnElectricity((target.ToVector3() - Vector3(0, 120, 0)) + targetRandom.ToVector3(), target.ToVector3() + targetRandom.ToVector3(), 15, 32, 64, 128, 160, (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 12, 12);
+
+			//SpawnElectricity(arc.pos4, target.ToVector3() + targetRandom, 15, 32, 64, 128, 60, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 8, 12);//4
 
 			if (Random::GenerateInt(0, 100) > 20)
 			{
 				halftarget = arc.pos4 + Vector3(random, random, random) * (target.ToVector3() - arc.pos4);
 
-				SpawnElectricity(arc.pos4, halftarget, 10, 32, 64, 128, 60, (int)ElectricityFlags::Spline, 3, 12);
+				SpawnElectricity(arc.pos4, halftarget, 10, 32, 64, 128, 60, (int)ElectricityFlags::Spline, 8, 12);//3
 
-				arc = ElectricityArcs.back();;
+				arc = ElectricityArcs.back();
 			}
+			//Main Arc
+			targetRandom = Vector3i(Random::GenerateInt(5, 20), 0, Random::GenerateInt(5, 20));
+			targetNew = GameVector((target.ToVector3() - Vector3(0, 120, 0)) + targetRandom.ToVector3(), item.RoomNumber);
 
-			targetRandom = Vector3(Random::GenerateInt(15, 50), 0, Random::GenerateInt(15, 20));
-			SpawnElectricity(arc.pos4, target.ToVector3() + targetRandom, 15, 32, 64, 128, 60, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 4, 12);
-			//SpawnElectricity(arc.pos4, target.ToVector3() + targetRandom, 15, 250, 250, 250, 60, (int)ElectricityFlags::Spline, 2, 12);
+			SpawnElectricity(arc.pos4, target.ToVector3() + targetRandom.ToVector3(), 15, 32, 64, 128, 60, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 8, 12);//
+			EldectricBallData.MainEnergyArc = &ElectricityArcs.back();
+			
+			TriggerRicochetSpark(targetNew, 12, 12, Color(32, 64, 128, 1.0f));
+			SpawnElectricSmoke((target.ToVector3() - Vector3(0, 120, 0)) + targetRandom.ToVector3(), EulerAngles::Identity, raygunSmokeLife);
+			//TriggerShockwave((Pose*)&targetNew, 1, 15, 3, 32, 64, 128, 80, EulerAngles::Identity, 8, false, true, true, (int)ShockwaveStyle::Invisible);
+			SpawnElectricity((target.ToVector3() - Vector3(0,220,0)  ) + targetRandom.ToVector3(), target.ToVector3() + targetRandom.ToVector3(), 15, 32, 64, 128, 160,  (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 12, 12);
+			SpawnElectricity((target.ToVector3() - Vector3(0, 120, 0)) + targetRandom.ToVector3(), target.ToVector3() + targetRandom.ToVector3(), 15, 32, 64, 128, 160,  (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 12, 12);
+
+			
+			
 
 			if (Random::GenerateInt(0, 100) > 50)
 			{
 
 				halftarget = arc.pos4 + Vector3(random, random, random) * (target.ToVector3() - arc.pos4);
 
-				SpawnElectricity(arc.pos4, halftarget, 10, 32, 64, 128, 60, (int)ElectricityFlags::Spline, 4, 12);
+				SpawnElectricity(arc.pos4, halftarget, 10, 32, 64, 128, 60, (int)ElectricityFlags::Spline, 8, 12);//4
 
 				arc = ElectricityArcs.back();
 			}
 
 			targetRandom = Vector3(Random::GenerateInt(225, 650), random, Random::GenerateInt(125, 150));
-			SpawnElectricity(arc.pos4, target.ToVector3() + targetRandom, 15, 32, 64, 128, 60, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 4, 12);
+			targetNew = GameVector((target.ToVector3() - Vector3(0, 120, 0)) + targetRandom.ToVector3(), item.RoomNumber);
+
+			SpawnElectricity(arc.pos4, target.ToVector3() + targetRandom.ToVector3(), 15, 32, 64, 128, 60, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 8, 12);//4
+			TriggerRicochetSpark(targetNew, 12, 12, Color(32, 64, 128, 1.0f));
+			SpawnElectricSmoke((target.ToVector3() - Vector3(0, 120, 0)) + targetRandom.ToVector3(), EulerAngles::Identity, raygunSmokeLife);
+			//TriggerShockwave((Pose*)&targetNew, 1, 15, 3, 32, 64, 128, 80, EulerAngles::Identity, 8, false, true, true, (int)ShockwaveStyle::Invisible);
+			SpawnElectricity((target.ToVector3() - Vector3(0, 120, 0)) + targetRandom.ToVector3(), target.ToVector3() + targetRandom.ToVector3(), 15, 32, 64, 128, 160, (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 12, 12);
+			SpawnElectricity((target.ToVector3() - Vector3(0, 120, 0)) + targetRandom.ToVector3(), target.ToVector3() + targetRandom.ToVector3(), 15, 32, 64, 128, 160, (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 12, 12);
+
 			//SpawnElectricity(arc.pos4, target.ToVector3() + targetRandom, 15, 250, 250, 250, 60, (int)ElectricityFlags::Spline, 2, 12);
 
 			
 			item.ItemFlags[3] = Random::GenerateInt(120,230);
 			item.ItemFlags[4] = 120;
-
+			item.ItemFlags[1] = TargetType::None;
 			auto sparkOrigin =  GetJointPosition(item, 0, Vector3i(0, 300, 0)).ToVector3();
 
 			//SpawnElectricityGlow(sparkOrigin, 48, 32, 32, 64);
 			//SpawnCyborgSpark(sparkOrigin);
 			TriggerElectricBallShockwaveAttackSparks(origin.x, origin.y, origin.z, 128, 128, 200, 128);
-
+			
 		}
 
 		if (item.ItemFlags[4] > 90)
@@ -282,16 +320,12 @@ namespace TEN::Entities::Traps
 				TriggerDynamicLight(pos1.x, pos1.y, pos1.z, (item.ItemFlags[4] +8) / 5, red, green, blue);
 				item.ItemFlags[3]--;
 				
-			}
-			else
-			{
-				//item.ItemFlags[4]++;
-			}
-			
+			}		
 		}
+
 		if (item.ItemFlags[4] > 0)
 			item.ItemFlags[4]--;
-
+		
 		if (item.ItemFlags[4] > 110)
 		{
 			//Trigger Smoke on flashesend
@@ -314,27 +348,11 @@ namespace TEN::Entities::Traps
 
 		int randomIndex = Random::GenerateInt(0, 100);
 
+		SpawnElectricEffect(item, 0, Vector3i(0, 0, 0), BLOCK(0.35f), BLOCK(0.45f), BLOCK(0.25f), 6, Vector3::Zero);
+
 		if (randomIndex < 6)
 		{
-			pos1 = GetJointPosition(item, 0, Vector3i(0, 0, 0)).ToVector3();
-			auto sphere2 = BoundingSphere(pos1, BLOCK(0.35f));
-			auto pos3 = Random::GeneratePointOnSphere(sphere2);
-
-			SpawnElectricityGlow(pos3, 28, 32, 32, 64);
-
-			SpawnCyborgSpark(pos3);
-			TriggerDynamicLight(pos3.x, pos3.y, pos3.z, Random::GenerateInt(4, 8), 31, 63, 127);
-
-			pos1 = GetJointPosition(item, 0, Vector3i(0, 0, 0)).ToVector3();
-			sphere2 = BoundingSphere(pos1, BLOCK(0.45f));
-			auto sphere3 = BoundingSphere(pos1, BLOCK(0.25f));
-			pos3 = Random::GeneratePointOnSphere(sphere2);
-			auto pos4 = Random::GeneratePointOnSphere(sphere3);
-
-			SpawnElectricity(pos3, pos4, Random::GenerateInt(8, 16), 32, 64, 128, 24, (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut | (int)ElectricityFlags::ThinIn, 2, 8);
-
 			if (item.ItemFlags[4] > 60)
-
 			{
 				pos1 = GetJointPosition(item, 0, Vector3i(0, 100, 0)).ToVector3();
 				auto sphere = BoundingSphere(pos1, SPAWN_RADIUS);
@@ -344,7 +362,6 @@ namespace TEN::Entities::Traps
 				SpawnElectricSmoke(pos2, EulerAngles::Identity, raygunSmokeLife);
 				SpawnElectricSmoke(pos2, EulerAngles::Identity, raygunSmokeLife);
 			}
-
 		}
 
 		if (item.ItemFlags[4] > 75 && randomIndex < 37)
@@ -358,67 +375,86 @@ namespace TEN::Entities::Traps
 			SpawnElectricSmoke(pos2, EulerAngles::Identity, raygunSmokeLife);
 			SpawnElectricSmoke(pos2, EulerAngles::Identity, raygunSmokeLife);
 		}
-		//auto origin1 = GameVector(Geometry::TranslatePoint(origin.ToVector3(), pos - origin.ToVector3(), distance.ToVector3() / (Random::GenerateInt(0, 4))), item.RoomNumber);
-		//SpawnElectricity(offset, target.ToVector3(), Random::GenerateInt(25, 50), 150, 50, 200, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)(int)ElectricityFlags::ThinOut, 4, 12);
-		//SpawnElectricity(offset, target.ToVector3(), Random::GenerateInt(25, 50), 50, 50, 0, 5, (int)(int)(int)ElectricityFlags::ThinIn | (int)(int)ElectricityFlags::ThinOut, 4, 12);
-		//TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
 
-		if (item.ItemFlags[3] == 1)
-		{
-
-			item.Model.Color = ElectricBallData.Color;
-		}
-		else if (item.ItemFlags[3] < 30)
+		 if (item.ItemFlags[3] < 30)
 		{
 			int intensity = 0.01f;
-			// Set light mesh color. Model.Color max value is 2.0f.
-			item.Model.Color += Color(0.05f, 0.05f, 0.09f, 0.0f); /*Vector4(
-				std::clamp<unsigned char>(intensity , 0.0f, 2.0f),
-				std::clamp<unsigned char>(intensity  , 0.0f, 2.0f),
-				std::clamp<unsigned char>(intensity  , 0.0f, 2.0f),
-				0.0f);*/
-		}
 
+			if (item.Model.Color.x < 4.0f)
+				item.Model.Color.x += 0.05f;
+			else
+				item.Model.Color.x = 4.0f;
+
+			if (item.Model.Color.y < 4.0f)
+				item.Model.Color.y += 0.05f;
+			else
+				item.Model.Color.y = 4.0f;
+
+			if (item.Model.Color.z < 4.0f)
+				item.Model.Color.z += 0.09f;
+			else
+				item.Model.Color.z = 4.0f;
+		}
+		else if (item.ItemFlags[4] > 80)
+		{
+			 if (item.Model.Color.x <= EldectricBallData.Colorw.x)
+				 item.Model.Color.x = EldectricBallData.Colorw.x;
+			 else
+				 item.Model.Color.x -= 0.1f;
+
+			 if (item.Model.Color.y <= EldectricBallData.Colorw.y)
+				 item.Model.Color.y = EldectricBallData.Colorw.y;
+			 else
+				 item.Model.Color.y -= 0.1f;
+
+			 if (item.Model.Color.z <= EldectricBallData.Colorw.z)
+				 item.Model.Color.z = EldectricBallData.Colorw.z;
+			 else
+				 item.Model.Color.z -= 0.1f;
+		}
+		
 		if (item.ItemFlags[3] > 28)
 		{
 			SpawnElectricityGlow(origin.ToVector3(), 108, 22, 22, 54);
 		}
 		else
 		{
-			//auto pos5 = origin.ToVector3 - Vector3(0, 300, 0)
-
-			SpawnElectricityGlow(origin.ToVector3(), 128, 102, 102, 204);
-			//SpawnElectricity( origin.ToVector3() + targetRandom, origin.ToVector3() - Vector3(0, 500, 0), 15, 32, 64, 128, 60, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 4, 12);
-			//SpawnElectricity(origin.ToVector3() + targetRandom, origin.ToVector3() - Vector3(0, 500, 0), 15, 32, 64, 128, 60, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 4, 12);
 			
-			SpawnElectricity(origin.ToVector3() - Vector3(0, 1300, 0), origin.ToVector3() - (targetRandom * 8), 15, 32, 64, 128, 30, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 4, 12);
-			SpawnElectricity(origin.ToVector3() - Vector3(0, 1300, 0), origin.ToVector3() - (targetRandom * 8), 15, 32, 64, 128, 30, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 4, 12);
+			SpawnElectricityGlow(origin.ToVector3(), 128, 102, 102, 204);
+			
+			SpawnElectricity(origin.ToVector3() - Vector3(0, 1300, 0), origin.ToVector3() - (targetRandom.ToVector3() * 8), 15, 32, 64, 128, 30, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 8, 12);//4
+			SpawnElectricity(origin.ToVector3() - Vector3(0, 1300, 0), origin.ToVector3() - (targetRandom.ToVector3() * 8), 15, 32, 64, 128, 30, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 8, 12);//4
+			SpawnElectricity(origin.ToVector3() + Vector3(0, 300, 0), origin.ToVector3() + (targetRandom.ToVector3() * 8), 15, 32, 64, 128, 30, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 8, 12);//4
+			SpawnElectricity(origin.ToVector3() + Vector3(0, 300, 0), origin.ToVector3() + (targetRandom.ToVector3() * 8), 15, 32, 64, 128, 30, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 8, 12);//4
 
-			SpawnElectricity(origin.ToVector3() + Vector3(0, 300, 0), origin.ToVector3() + (targetRandom * 8), 15, 32, 64, 128, 30, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 4, 12);
-			SpawnElectricity(origin.ToVector3() + Vector3(0, 300, 0), origin.ToVector3() + (targetRandom * 8), 15, 32, 64, 128, 30, (int)ElectricityFlags::Spline | (int)(int)ElectricityFlags::ThinOut | (int)ElectricityFlags::MoveEnd, 4, 12);
-
-			if (randomIndex < 80)
-			{
-				pos1 = GetJointPosition(item, 0, Vector3i(0, 0, 0)).ToVector3();
-				auto sphere2 = BoundingSphere(pos1, BLOCK(0.45f));
-				auto pos3 = Random::GeneratePointOnSphere(sphere2);
-
-				SpawnElectricityGlow(pos3, 28, 32, 32, 64);
-
-				SpawnCyborgSpark(pos3);
-				TriggerDynamicLight(pos3.x, pos3.y, pos3.z, Random::GenerateInt(4, 8), 31, 63, 127);
-
-				pos1 = GetJointPosition(item, 0, Vector3i(0, 0, 0)).ToVector3();
-				sphere2 = BoundingSphere(pos1, BLOCK(0.45f));
-				auto sphere3 = BoundingSphere(pos1, BLOCK(0.25f));
-				pos3 = Random::GeneratePointOnSphere(sphere2);
-				auto pos4 = Random::GeneratePointOnSphere(sphere3);
-
-				SpawnElectricity(pos3, pos4, Random::GenerateInt(8, 16), 32, 64, 128, 24, (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut | (int)ElectricityFlags::ThinIn, 6, 8);
-			}
+			SpawnElectricEffect(item, 0, Vector3i(0, 0, 0), BLOCK(0.45f), BLOCK(0.45f), BLOCK(0.25f), 80, Vector3::Zero);
 
 		}
 		
+		if (EldectricBallData.MainEnergyArc != nullptr)
+		{
+			if (EldectricBallData.MainEnergyArc->life > 0)
+			{
+				auto hitPos = Vector3i::Zero;
+				if (ObjectOnLOS2(&origin, &target, &hitPos, nullptr, ID_LARA) == item.ItemFlags[4])
+				{
+					if (LaraItem->HitPoints <= ELECTRIC_BALL_LIGHTNING_DAMAGE)
+					{
+						ItemElectricBurn(LaraItem);
+						DoDamage(LaraItem, ELECTRIC_BALL_LIGHTNING_DAMAGE);
+					}
+					else
+					{
+						DoDamage(LaraItem, ELECTRIC_BALL_LIGHTNING_DAMAGE);
+					}
+				}
+
+			}
+			//else
+			//{
+				//electricBall.MainEnergyArc = nullptr;
+			//}
+		}
 
 	}
 
@@ -427,48 +463,76 @@ namespace TEN::Entities::Traps
 		if (!CreatureActive(itemNumber))
 			return;
 
-		auto& item = g_Level.Items[itemNumber];
-		auto& object = Objects[item.ObjectNumber];
-		auto& creature = *GetCreatureInfo(&item);
-		const auto& laraItem = *LaraItem;
-		static auto targetPos = Vector3i::Zero;
 		
-		// Scan for player.
-		//if (item.Pose.Position.y < GetPointCollision(item).GetFloorHeight())
-		//{
-			/*item.Pose.Orientation.y += item.ItemFlags[0];
 
-			// Check vertical position to player.
-			if (item.Pose.Position.y >= laraItem.Pose.Position.y)
-				return;
 
-			// Check vertical distance.
-			float distanceV = laraItem.Pose.Position.y - item.Pose.Position.y;
-			if (distanceV > DAMOCLES_SWORD_ACTIVATE_RANGE_VERTICAL)
-				return;
+		auto& item = g_Level.Items[itemNumber];
 
-			// Check 2D distance.
-			float distance2D = Vector2i::Distance(
-				Vector2i(item.Pose.Position.x, item.Pose.Position.z),
-				Vector2i(laraItem.Pose.Position.x, laraItem.Pose.Position.z));
-			if (distance2D > DAMOCLES_SWORD_ACTIVATE_RANGE_2D)
-				return;*/
+		auto& object = Objects[item.ObjectNumber];
+		const auto& laraItem = *LaraItem;
+		//auto target = GameVector::Zero;
+		static auto targetPos = Vector3i::Zero;
+
+		AI_INFO ai;
+		CreatureAIInfo(&item, &ai);
+
+		if (ai.distance > SQUARE(BLOCK(7)) )
+		{
+			item.ItemFlags[3] = 70;
+			item.ItemFlags[4] = 70;
+			item.Model.Color = EldectricBallData.Colorw;
+			item.ItemFlags[1] = TargetType::None;
+			return;
+		}
+		
+		/*ai.ahead = true;
+		if (deltaAngle <= ANGLE(-90.0f) || deltaAngle >= ANGLE(90.0f))
+			ai.ahead = false;*/
+		auto targetPlayer = GameVector(GetJointPosition(LaraItem, LM_TORSO), LaraItem->RoomNumber);;
+		auto origin = GameVector(GetJointPosition(item, 0), item.RoomNumber);
+		bool los = LOS(&origin, &targetPlayer);
+		FloorInfo* floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &item.RoomNumber);
 
 			// Drop sword.
-			if (item.ObjectNumber == ID_ELECTRIC_BALL && Objects[ID_ELECTRIC_BALL_IMPACT_POINT].loaded &&
-				item.ItemFlags[1] == TargetType::None)
-			{
-				item.ItemFlags[1] = (short)GetTargetItemNumber(item);
-				creature.Target = GetTargetPosition(item);
+		if (ai.distance < SQUARE(BLOCK(3)) && los)
+		{
+			
+				//target = GameVector(GetJointPosition(LaraItem, LM_TORSO), Laraitem.RoomNumber);
+			targetPos = Vector3(LaraItem->Pose.Position.x, GetFloorHeight(floor, item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z), LaraItem->Pose.Position.z);
+				
+			item.ItemFlags[1] = TargetType::Target;
 
-				targetPos = creature.Target;
-			}
+				item.ItemFlags[5] = LaraItem->Index;
+		}
+		
+		else if ((item.ObjectNumber == ID_ELECTRIC_BALL &&
+			Objects[ID_ELECTRIC_BALL_IMPACT_POINT].loaded &&
+			item.ItemFlags[1] == TargetType::None))
+		{
+			item.ItemFlags[1] = (short)GetTargetItemNumber(item);
+			targetPos = GetTargetPosition(item);
+		
+			item.ItemFlags[5] = g_Level.Items[item.ItemFlags[1]].Index;
+			//target = GameVector(GetJointPosition(&g_Level.Items[item.ItemFlags[1]], 0), item.RoomNumber);
+			//targetPos = creature.Target;
+		}
 
+		
+		//target = GameVector(GetJointPosition(&g_Level.Items[item.ItemFlags[1]]
+
+		//los = LOS(&origin, &target);
 
 			if (item.ItemFlags[1] != TargetType::None)
 			{
+
 				SpawnElectricBallLightning(item, targetPos.ToVector3(), ElectricBallBite);
-				//item.ItemFlags[2] = creature.Target.;
+
+				
+			}
+			else 
+			{
+				item.Model.Color = EldectricBallData.Colorw;
+				item.ItemFlags[1] = TargetType::None;
 			}
 
 			if (item.ItemFlags[3] > 0)

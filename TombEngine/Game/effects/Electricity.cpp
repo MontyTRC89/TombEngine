@@ -2,11 +2,13 @@
 #include "Game/effects/Electricity.h"
 
 #include "Game/effects/effects.h"
+#include "Game/effects/spark.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 
 using namespace TEN::Math;
+using namespace TEN::Effects::Spark;
 
 namespace TEN::Effects::Electricity
 {
@@ -141,6 +143,42 @@ namespace TEN::Effects::Electricity
 			spark.dSize =
 			spark.size = scale + Random::GenerateInt(0, 4);
 		spark.flags = SP_DEF | SP_SCALE;
+	}
+
+	void SpawnElectricEffect(const ItemInfo& item, int jointNumber, const Vector3i& offset, const float spawnRadius, float beamOriginRadius, float beamTargetRadius, int frequency, const Vector3& pos)
+	{
+		//TODO: Make electric effect correctly spawn random on any mesh bounds surface. On water surface too.
+		
+		int randomIndex = Random::GenerateInt(0, 100);
+		Vector3 pos1 = Vector3::Zero;
+
+		if (randomIndex < frequency)
+		{
+			if (pos != Vector3::Zero)
+			{
+
+				pos1 = pos + offset.ToVector3();		
+			}
+			else
+			{
+				pos1 = GetJointPosition(item, jointNumber, offset).ToVector3();
+			}
+
+			auto sphere = BoundingSphere(pos1, spawnRadius);
+			auto pos2 = Random::GeneratePointOnSphere(sphere);
+
+			SpawnElectricityGlow(pos2, 28, 32, 32, 64);
+
+			SpawnCyborgSpark(pos2);
+			TriggerDynamicLight(pos2.x, pos2.y, pos2.z, Random::GenerateInt(4, 8), 31, 63, 127);
+
+			sphere = BoundingSphere(pos1, beamOriginRadius);
+			auto sphere1 = BoundingSphere(pos1, beamTargetRadius);
+			pos1 = Random::GeneratePointOnSphere(sphere);
+			pos2 = Random::GeneratePointOnSphere(sphere1);
+
+			SpawnElectricity(pos1, pos2, Random::GenerateInt(8, 16), 32, 64, 128, 24, (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut | (int)ElectricityFlags::ThinIn, 6, 8);
+		}
 	}
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
