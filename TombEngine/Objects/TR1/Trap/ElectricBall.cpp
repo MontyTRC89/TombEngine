@@ -184,6 +184,8 @@ namespace TEN::Entities::Traps
 		{
 			auto random = Random::GenerateFloat(0.20f, 0.60f);
 			auto halftarget = origin.ToVector3() + Vector3(random, random, random) * (target.ToVector3() - origin.ToVector3());
+			StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
+			SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item.Pose);
 
 			SpawnElectricity(origin.ToVector3(), halftarget, 5, 32, 64, 128, 60, (int)ElectricityFlags::Spline , 8, 12);//4
 			auto arc = ElectricityArcs.back();;
@@ -310,6 +312,13 @@ namespace TEN::Entities::Traps
 			SpawnElectricSmoke(pos2, EulerAngles::Identity, raygunSmokeLife);
 		}
 
+		if (item.ItemFlags[4] > 45)
+		{
+			SoundEffect(SFX_TR4_LARA_ELECTRIC_CRACKLES, &item.Pose);
+			SoundEffect(SFX_TR4_LARA_ELECTRIC_LOOP, &item.Pose);
+			SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
+		}
+
 		 if (item.ItemFlags[3] < 30)
 		{
 			int intensity = 0.01f;
@@ -328,6 +337,8 @@ namespace TEN::Entities::Traps
 				item.Model.Color.z += 0.09f;
 			else
 				item.Model.Color.z = 4.0f;
+			
+			SoundEffect(SFX_TR5_GOD_HEAD_CHARGE, &item.Pose);
 		}
 		else if (item.ItemFlags[4] > 80)
 		{
@@ -376,6 +387,8 @@ namespace TEN::Entities::Traps
 				}			
 			}
 			item.ItemFlags[6]--;
+			SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item.Pose);
+			SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &item.Pose);
 		}	
 	}
 
@@ -401,6 +414,8 @@ namespace TEN::Entities::Traps
 			item.ItemFlags[1] = TargetType::None;
 			return;
 		}
+
+		SoundEffect(SFX_TR5_DOOR_BEAM, &item.Pose);
 
 		auto targetPlayer = GameVector(GetJointPosition(LaraItem, LM_TORSO), LaraItem->RoomNumber);;
 		auto origin = GameVector(GetJointPosition(item, 0), item.RoomNumber);
