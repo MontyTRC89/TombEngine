@@ -400,7 +400,9 @@ namespace TEN::Renderer
 	void Renderer::PrepareParticles(RenderView& view)
 	{
 		for (int i = 0; i < ParticleNodeOffsetIDs::NodeMax; i++)
+		{
 			NodeOffsets[i].gotIt = false;
+		}
 
 		for (auto& particle : Particles)
 		{
@@ -409,27 +411,49 @@ namespace TEN::Renderer
 
 			if (particle.flags & SP_DEF)
 			{
-				auto pos = Vector3(particle.x, particle.y, particle.z);
+				auto pos = Vector3::Lerp(
+					Vector3(particle.PrevX, particle.PrevY, particle.PrevZ),
+					Vector3(particle.x, particle.y, particle.z),
+					_interpolationFactor);
 
 				if (particle.flags & SP_FX)
 				{
 					const auto& fx = EffectList[particle.fxObj];
 
-					pos += fx.pos.Position.ToVector3();
+					RendererEffect* newEffect = &_effects[particle.fxObj];
+
+					newEffect->Translation = Matrix::CreateTranslation(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z);
+					newEffect->Rotation = fx.pos.Orientation.ToRotationMatrix();
+					newEffect->Scale = Matrix::CreateScale(1.0f);
+					newEffect->World = newEffect->Rotation * newEffect->Translation;
+					newEffect->ObjectID = fx.objectNumber;
+					newEffect->RoomNumber = fx.roomNumber;
+					newEffect->Position = fx.pos.Position.ToVector3();
+					
+					newEffect->InterpolatedPosition = Vector3::Lerp(newEffect->PrevPosition, newEffect->Position, _interpolationFactor);
+					newEffect->InterpolatedTranslation = Matrix::Lerp(newEffect->PrevTranslation, newEffect->Translation, _interpolationFactor);
+					newEffect->InterpolatedRotation = Matrix::Lerp(newEffect->InterpolatedRotation, newEffect->Rotation, _interpolationFactor);
+					newEffect->InterpolatedWorld = Matrix::Lerp(newEffect->PrevWorld, newEffect->World, _interpolationFactor);
+					newEffect->InterpolatedScale = Matrix::Lerp(newEffect->PrevScale, newEffect->Scale, _interpolationFactor);
+
+					pos += newEffect->InterpolatedPosition;
 
 					if ((particle.sLife - particle.life) > Random::GenerateInt(8, 12))
 					{
+						// Particle becomes autonome
 						particle.flags &= ~SP_FX;
-						particle.x = pos.x;
-						particle.y = pos.y;
-						particle.z = pos.z;
+
+						particle.x = particle.PrevX = pos.x;
+						particle.y = particle.PrevY = pos.y;
+						particle.z = particle.PrevZ = pos.z;
 					}
 				}
 				else if (!(particle.flags & SP_ITEM))
 				{
-					pos.x = particle.x;
-					pos.y = particle.y;
-					pos.z = particle.z;
+					// NOTE: pos already set before...
+					//pos.x = particle.x;
+					//pos.y = particle.y;
+					//pos.z = particle.z;
 				}
 				else
 				{
@@ -466,15 +490,17 @@ namespace TEN::Renderer
 
 						if ((particle.sLife - particle.life) > Random::GenerateInt(4, 8))
 						{
+							// Particle becomes autonome
 							particle.flags &= ~SP_ITEM;
-							particle.x = pos.x;
-							particle.y = pos.y;
-							particle.z = pos.z;
+
+							particle.x = particle.PrevX = pos.x;
+							particle.y = particle.PrevY = pos.y;
+							particle.z = particle.PrevZ = pos.z;
 						}
 					}
 					else
 					{
-						pos += item->Pose.Position.ToVector3();
+						pos += _items[particle.fxObj].InterpolatedPosition; 
 					}
 				}
 
@@ -494,7 +520,11 @@ namespace TEN::Renderer
 				if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Particle rendering"))
 					continue;
 
-				auto pos = Vector3(particle.x, particle.y, particle.z);
+				auto pos = Vector3::Lerp(
+					Vector3(particle.PrevX, particle.PrevY, particle.PrevZ),
+					Vector3(particle.x, particle.y, particle.z),
+					_interpolationFactor);
+
 				auto axis = Vector3(particle.xVel, particle.yVel, particle.zVel);
 				axis.Normalize();
 
