@@ -200,7 +200,7 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 	{
 	case GAME_OBJECT_ID::ID_KAYAK:
 		InitializeKayak(vehicle->Index);
-		KayakPaddleTake(&playerItem);
+		KayakPaddleTake(GetKayakInfo(&g_Level.Items[vehicle->Index]), &playerItem);
 		break;
 
 	case GAME_OBJECT_ID::ID_MOTORBIKE:
