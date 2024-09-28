@@ -14,6 +14,7 @@
 #include "Game/Setup.h"
 #include "Objects/TR2/Vehicles/skidoo.h"
 #include "Objects/TR3/Vehicles/kayak.h"
+#include "Objects/TR3/Vehicles/minecart.h"
 #include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
@@ -220,7 +221,7 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 		break;
 
 	case GAME_OBJECT_ID::ID_MINECART:
-		playerItem.Model.MeshIndex[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
+		MinecartWrenchTake(GetMinecartInfo(&g_Level.Items[vehicle->Index]), &playerItem);
 		break;
 
 	default:
