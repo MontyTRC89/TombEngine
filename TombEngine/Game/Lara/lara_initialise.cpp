@@ -18,6 +18,7 @@
 #include "Objects/TR3/Vehicles/minecart.h"
 #include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
+#include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include "Specific/level.h"
@@ -234,6 +235,11 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 	case GAME_OBJECT_ID::ID_RUBBER_BOAT:
 		InitializeRubberBoat(vehicle->Index);
 		DoRubberBoatMount(&g_Level.Items[vehicle->Index], &playerItem, VehicleMountType::LevelStart);
+		break;
+
+	case GAME_OBJECT_ID::ID_UPV:
+		DoUPVMount(&g_Level.Items[vehicle->Index], &playerItem, VehicleMountType::LevelStart);
+		GetUPVInfo(&g_Level.Items[vehicle->Index])->Flags = UPVFlags::UPV_FLAG_CONTROL;
 		break;
 
 	default:
