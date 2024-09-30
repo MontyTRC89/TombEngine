@@ -15,7 +15,7 @@ constexpr auto MAX_DYNAMICS = 64;
 constexpr auto MAX_SPLASHES = 8;
 constexpr auto NUM_EFFECTS	= 256;
 
-constexpr auto MAX_PARTICLES		 = 1024;
+constexpr auto PARTICLE_COUNT_MAX		 = 1024;
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 
 enum SpriteEnumFlag
@@ -160,6 +160,27 @@ struct Particle
 	int fxObj;
 	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
+
+	// TODO: Clean above mess.
+	/*int SpriteObjectID = 0;
+
+	Vector3 Position	= Vector3::Zero;
+	int		RoomNumber	= 0;
+	short	Orientation = 0;
+	Vector3 Velocity	= Vector3::Zero;
+	Color	Colora		= Color();
+	Color	ColorStart	= Color();
+	Color	ColorEnd	= Color();
+
+	BlendMode BlendMode = BlendMode::Additive;
+
+	float Life		= 0.0f;
+	float LifeStart = 0.0f;
+
+	float Gravity  = 0.0f;
+	float Friction = 0.0f;
+	short Rotation = 0;
+	float Scalar   = 0.0f;*/
 };
 
 struct SPLASH_STRUCT
@@ -197,7 +218,7 @@ struct ParticleDynamic
 extern GameBoundingBox DeadlyBounds;
 
 // New particle class
-extern Particle Particles[MAX_PARTICLES];
+extern Particle Particles[PARTICLE_COUNT_MAX];
 extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
 extern SPLASH_SETUP SplashSetup;
