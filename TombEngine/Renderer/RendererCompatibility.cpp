@@ -516,7 +516,7 @@ namespace TEN::Renderer
 						&moveable,
 						&g_Level.Meshes[obj->meshIndex + j],
 						j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
-						MoveablesIds[i] == ID_SINGLE_BRAID_HAIR || MoveablesIds[i] == ID_DUAL_PIGTAIL_HAIR, &lastVertex, &lastIndex);
+						MoveablesIds[i] == ID_HAIR_PRIMARY || MoveablesIds[i] == ID_HAIR_SECONDARY, &lastVertex, &lastIndex);
 
 					moveable.ObjectMeshes.push_back(mesh);
 					_meshes.push_back(mesh);
@@ -687,7 +687,7 @@ namespace TEN::Renderer
 							}
 						}
 					}
-					else if (MoveablesIds[i] == ID_SINGLE_BRAID_HAIR && isSkinPresent)
+					else if (MoveablesIds[i] == ID_HAIR_PRIMARY && isSkinPresent)
 					{
 						for (int j = 0; j < obj->nmeshes; j++)
 						{
@@ -723,14 +723,11 @@ namespace TEN::Renderer
 												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
 													auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
-													if (isYoung)
+													if (isYoung && parentVertex->OriginalIndex == parentVertices1[currentVertex->OriginalIndex])
 													{
-														if (parentVertex->OriginalIndex == parentVertices1[currentVertex->OriginalIndex])
-														{
-															currentVertex->Bone = 0;
-															currentVertex->Position = parentVertex->Position;
-															currentVertex->Normal = parentVertex->Normal;
-														}
+														currentVertex->Bone = 0;
+														currentVertex->Position = parentVertex->Position;
+														currentVertex->Normal = parentVertex->Normal;
 													}
 													else if (parentVertex->OriginalIndex == parentVertices0[currentVertex->OriginalIndex])
 													{
@@ -779,7 +776,7 @@ namespace TEN::Renderer
 							}
 						}
 					}
-					else if (MoveablesIds[i] == ID_DUAL_PIGTAIL_HAIR && isSkinPresent)
+					else if (MoveablesIds[i] == ID_HAIR_SECONDARY && isSkinPresent)
 					{
 						for (int j = 0; j < obj->nmeshes; j++)
 						{
@@ -805,17 +802,20 @@ namespace TEN::Renderer
 										auto* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
 										auto* parentBone = skinObj.LinearizedBones[LM_HEAD];
 
-										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
+										if (currentVertex->OriginalIndex < 4)
 										{
-											auto* parentBucket = &parentMesh->Buckets[b2];
-											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
+											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 											{
-												auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
-												if (isYoung && parentVertex->OriginalIndex == parentVertices2[currentVertex->OriginalIndex])
+												auto* parentBucket = &parentMesh->Buckets[b2];
+												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
-													currentVertex->Bone = 0;
-													currentVertex->Position = parentVertex->Position;
-													currentVertex->Normal = parentVertex->Normal;
+													auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
+													if (isYoung && parentVertex->OriginalIndex == parentVertices2[currentVertex->OriginalIndex])
+													{
+														currentVertex->Bone = 0;
+														currentVertex->Position = parentVertex->Position;
+														currentVertex->Normal = parentVertex->Normal;
+													}
 												}
 											}
 										}

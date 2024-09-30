@@ -37,7 +37,7 @@ namespace TEN::Effects::Hair
 		worldMatrix = Matrix::CreateTranslation(relOffset) * worldMatrix;
 
 		// Use player's head bone orientation as base.
-		auto baseOrient = Geometry::ConvertDirectionToQuat(-Geometry::ConvertQuatToDirection(GetBoneOrientation(item, LM_HEAD)));
+		auto baseOrient = Geometry::ConvertDirectionToQuat(-Geometry::ConvertQuatToDirection(GetBoneOrientation(item, LM_HEAD))) * item.Pose.Orientation.ToQuaternion();
 
 		// Set position of base segment.
 		Segments[0].Position = worldMatrix.Translation();
@@ -321,7 +321,7 @@ namespace TEN::Effects::Hair
 		{
 			auto& unit = Units[i];
 
-			auto objectID = (i == 0) ? ID_SINGLE_BRAID_HAIR : ID_DUAL_PIGTAIL_HAIR;
+			auto objectID = (i == 0) ? ID_HAIR_PRIMARY : ID_HAIR_SECONDARY;
 			const auto& object = Objects[objectID];
 
 			unit.IsEnabled = (object.loaded && (i == 0 || (i == 1 && isYoung)));
