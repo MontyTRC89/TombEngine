@@ -1260,7 +1260,7 @@ namespace TEN::Renderer
 		case RendererDebugPage::PlayerStats:
 			PrintDebugMessage("PLAYER STATS");
 			PrintDebugMessage("AnimObjectID: %d", LaraItem->Animation.AnimObjectID);
-			PrintDebugMessage("AnimNumber: %d", LaraItem->Animation.AnimNumber);
+			PrintDebugMessage("AnimNumber: %d", LaraItem->Animation.AnimNumber - Objects[LaraItem->Animation.AnimObjectID].animIndex);
 			PrintDebugMessage("FrameNumber: %d", LaraItem->Animation.FrameNumber);
 			PrintDebugMessage("ActiveState: %d", LaraItem->Animation.ActiveState);
 			PrintDebugMessage("TargetState: %d", LaraItem->Animation.TargetState);
