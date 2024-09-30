@@ -13,8 +13,11 @@
 #include "Game/Lara/PlayerStateMachine.h"
 #include "Game/Setup.h"
 #include "Objects/TR2/Vehicles/skidoo.h"
+#include "Objects/TR2/Vehicles/speedboat.h"
 #include "Objects/TR3/Vehicles/kayak.h"
+#include "Objects/TR3/Vehicles/minecart.h"
 #include "Objects/TR3/Vehicles/quad_bike.h"
+#include "Objects/TR3/Vehicles/rubber_boat.h"
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include "Specific/level.h"
@@ -122,6 +125,9 @@ void InitializeLaraAnims(ItemInfo* item)
 	player.LeftArm.Locked = false;
 	player.RightArm.Locked = false;
 
+	if (PlayerVehicleObjectID != GAME_OBJECT_ID::ID_NO_OBJECT)
+		return;
+
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
 		SetAnimation(item, LA_UNDERWATER_IDLE);
@@ -197,6 +203,7 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 	{
 	case GAME_OBJECT_ID::ID_KAYAK:
 		InitializeKayak(vehicle->Index);
+		KayakPaddleTake(GetKayakInfo(&g_Level.Items[vehicle->Index]), &playerItem);
 		break;
 
 	case GAME_OBJECT_ID::ID_MOTORBIKE:
@@ -215,8 +222,32 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 		InitializeSkidoo(vehicle->Index);
 		break;
 
+	case GAME_OBJECT_ID::ID_MINECART:
+		MinecartWrenchTake(GetMinecartInfo(&g_Level.Items[vehicle->Index]), &playerItem);
+		break;
+
+	case GAME_OBJECT_ID::ID_SPEEDBOAT:
+		InitializeSpeedboat(vehicle->Index);
+		DoSpeedboatMount(&g_Level.Items[vehicle->Index], &playerItem, VehicleMountType::LevelStart);
+		break;
+
+	case GAME_OBJECT_ID::ID_RUBBER_BOAT:
+		InitializeRubberBoat(vehicle->Index);
+		DoRubberBoatMount(&g_Level.Items[vehicle->Index], &playerItem, VehicleMountType::LevelStart);
+		break;
+
 	default:
 		break;
+	}
+
+	// HACK: Reset activity status because boats need to be on active item linked list.
+
+	if (vehicle->ObjectNumber == GAME_OBJECT_ID::ID_RUBBER_BOAT ||
+		vehicle->ObjectNumber == GAME_OBJECT_ID::ID_SPEEDBOAT)
+	{
+		g_Level.Items[vehicle->Index].Active = false;
+		AddActiveItem(vehicle->Index);
+		g_Level.Items[vehicle->Index].Status = ITEM_ACTIVE;
 	}
 }
 

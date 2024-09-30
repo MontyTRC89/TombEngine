@@ -10,6 +10,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Bug fixes
 * Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
+* Fixed leveljump vehicle transfer.
+* Fixed sarcophagus pick-ups.
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed camera rotating with the player's hips when climbing out of water.
 * Fixed AI for TR2 skidoo driver and worker with shotgun.
@@ -26,50 +28,41 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed teeth spikes not triggering the player impale animation.
 * Fixed TR4 mine crash with OCB 1 when triggered.
 * Fixed cases where Atlantean mutant's bombs cause the game to crash.
-* Fixed young hair drawing.
+* Fixed young Lara hair drawing. https://tombengine.com/docs/level-settings/#young_lara
 
 ### Features/Amendments
-* Changed Rome Hammer to not hurt player whilst deactivated.
-* Changed Statue with blade damage, from 20 to 200.
-* Changed TR4 enemy jeep:
-   1) New ocb:
-  - 1: Start without the player having vehicle driven.
-   2) Now it's driven by AI_X1 and add behaviour with AI_X2.
-  - AI_X1 need to start at 0 and end at whatever your path need to end.
-  - AI_X2 have different ocb:
-      - 1: Drop a grenade. (Cooldown is 15 frame)
-      - 2: Make the jeep vault block (it's entirly driven by animation).
-      - 3: Same as 2 but for jumping pit.
-      - 4: Wait until lara is near, need to add distance in block (1024 = 1 block)
-   - Example: You want to have 4 block distance then it's: 4096+4 = 4100 as ocb.
-      - 5: Make the jeep disappear/killed.
-      - 6: Make the jeep trigger heavy trigger below him (just 1 time per AI_X2 having this ocb).
-   - If you need more than 1 animation for both vault/jump pit then you can use these:
-      - 7: Same as 2 (Need new animation + state setup required) and required state id is 8.
-      - 8: Same as 3 (Need new animation + state setup required) and required state id is 9.
-* Enhanced Rolling Spindle detection to avoid them going down through pits.
-* Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
-* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
-* Enhanced raptor behaviour and handling. 
-  - OCB 0: Classic behaviour
-  - OCB 1: Can jump up/down up to 4 steps and jump across gaps up to 2 blocks wide.
-  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
-* Added TR3 seal mutant.
-  - OCB 0: Normal enemy behaviour. (TR3 RX-Tech mines level)
-  - OCB 1: Trap like behaviour. (TR3 Antarctica level)
+
+* Added variable framerate , that allows the engine to run at an unlocked framerate for a much smoother experience. Setting can be toggled on or off in the graphical settings menu.
+* Added a customisable global lensflare effect. https://tombengine.com/docs/level-settings/#lensflare
+* Added a customisable starry sky and meteor effect (based on TR5). https://tombengine.com/docs/level-settings/#stars
+* Added the ability to display "Lara's Home" entry in the main menu.
+* Added F12 as alternative to PrtSc for screenshots.
+* Added option to enable or disable menu option looping.
+  - Menu scrolling using held inputs will stop at the last option until a new input is made.
+* Added TR3 seal mutant. https://tombengine.com/docs/ocb-and-setup-instructions/#sealmutant
   - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Seal_Mutant.wad2
 * Add new sound conditions: Quicksand and Underwater.
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.
+* Added TR4 Enemy_Jeep https://tombengine.com/docs/ocb-and-setup-instructions/#enemy_jeep
+* Changed Rome Hammer to not hurt player whilst deactivated.
+* Changed Statue with blade damage, from 20 to 200.
+* Changed sound effect that is triggered when using the `level.rumble` feature in a level. Sound effect now part of the default soundmap (ID 359) and additional hardcoded pitch shift has been removed.
 * Changed Water sound condition to ShallowWater.
-* Added option to enable or disable menu option looping.
-* Menu scrolling using held inputs will stop at the last option until a new input is made.
-* Added the ability to display "Lara's Home" entry in the main menu.
-
+* Enhanced Rolling Spindle detection to avoid them going down through pits.
+* Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
+* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing-dart emitter ).
+* Enhanced raptor behaviour and handling. https://tombengine.com/docs/ocb-and-setup-instructions/#raptor 
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
+	
 ### Lua API changes
+
+* Added Flow.EnableHomeLevel()
+* Added Flow.LensFlare()
+* Added Flow.Starfield() 
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Input.KeyClearAll()
-* Added Flow.EnableHomeLevel()
+* Added Room:GetRoomNumber()
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
 * Fixed Volume:GetActive() method
 
