@@ -1,6 +1,6 @@
 # Changelog
 
-Here you will find the full changelog of TEN's releases from Version 1.0 and up 
+Here you will find the full changelog of TEN's releases from Version 1.0 and up
 
 The dates are in European standard format where date is presented as **YYYY-MM-DD**
 
@@ -57,14 +57,14 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 	
 ### Lua API changes
 
-* Added Flow.EnableHomeLevel()
-* Added Flow.LensFlare()
-* Added Flow.Starfield() 
+* Added Flow.EnableHomeLevel() function.
+* Added Flow.IsStringPresent() function.
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
-* Added Input.KeyClearAll()
-* Added Room:GetRoomNumber()
+* Added Flow.LensFlare() and Flow.Starfield() classes.
+* Added Input.KeyClearAll() function.
+* Added Room:GetRoomNumber() function.
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
-* Fixed Volume:GetActive() method
+* Fixed Volume:GetActive() method.
 
 ## [Version 1.4](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.1) - 2024-04-21
 
