@@ -113,7 +113,7 @@
 	<td class="summary">Emit a lightning arc.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitParticle">EmitParticle(pos, velocity, spriteIndex, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison)</a></td>
+	<td class="name" ><a href="#EmitParticle">EmitParticle(pos, velocity, spriteID, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison)</a></td>
 	<td class="summary">Emit a particle.</td>
 	</tr>
 	<tr>
@@ -209,7 +209,7 @@
 </dd>
     <dt>
     <a name = "EmitParticle"></a>
-    <strong>EmitParticle(pos, velocity, spriteIndex, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison)</strong>
+    <strong>EmitParticle(pos, velocity, spriteID, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison)</strong>
     </dt>
     <dd>
 
@@ -234,9 +234,9 @@
 
 
         </li>
-        <li><span class="parameter">spriteIndex</span>
+        <li><span class="parameter">spriteID</span>
             <span class="types"><span class="type">int</span></span>
-         an index of a sprite in DEFAULT_SPRITES object.
+         ID of the sprite in the DEFAULT_SPRITES sprite sequence object.
         </li>
         <li><span class="parameter">gravity</span>
             <span class="types"><span class="type">int</span></span>
@@ -288,7 +288,7 @@
         <pre class="example">EmitParticle(
 	yourPositionVarHere,
 	Vec3(<span class="global">math</span>.random(), <span class="global">math</span>.random(), <span class="global">math</span>.random()),
-	<span class="number">22</span>, <span class="comment">-- spriteIndex
+	<span class="number">22</span>, <span class="comment">-- spriteID
 </span>	<span class="number">0</span>, <span class="comment">-- gravity
 </span>	-<span class="number">2</span>, <span class="comment">-- rot
 </span>	Color(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">-- startColor

@@ -65,7 +65,8 @@ namespace TEN::Entities::Creatures::TR5
 		spark->maxYvel = 0;
 		spark->gravity = 0;
 		spark->scalar = 1;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE_LIGHT;
+		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+		spark->SpriteID = SPR_LENSFLARE_LIGHT;
 		spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
 	}
 
@@ -91,7 +92,8 @@ namespace TEN::Entities::Creatures::TR5
 		spark->yVel = pos2->y + (GetRandomControl() & 0x7F) - pos1->y - 64;
 		spark->zVel = pos2->z + (GetRandomControl() & 0x7F) - pos1->z - 64;
 		spark->friction = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLE_CLUSTER;
+		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+		spark->SpriteID = SPR_BUBBLE_CLUSTER;
 		spark->maxYvel = 0;
 		spark->gravity = -4 - (GetRandomControl() & 3);
 		spark->scalar = 1;
