@@ -66,15 +66,6 @@ namespace TEN::Effects::Electricity
 		return (ret + knot1);
 	}
 
-	float CalculateDistance(const Vector3& p1, const Vector3& p2)
-	{
-		return std::sqrt(
-			(p2.x - p1.x) * (p2.x - p1.x) +
-			(p2.y - p1.y) * (p2.y - p1.y) +
-			(p2.z - p1.z) * (p2.z - p1.z)
-		);
-	}
-
 	// TODO: Pass const Vector4& for color.
 	void SpawnElectricity(const Vector3& origin, const Vector3& target, float amplitude, byte r, byte g, byte b, float life, int flags, float width, unsigned int numSegments)
 	{

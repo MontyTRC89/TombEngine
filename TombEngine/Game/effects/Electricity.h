@@ -39,14 +39,6 @@ namespace TEN::Effects::Electricity
 		int rotation;
 		int type;
 		int flags;
-
-		int x;
-
-		int arm;
-		Vector3 armOrigin = Vector3::Zero;;
-		Vector3 target;
-		int armSegment;
-
 	};
 
 	struct HelicalLaser
@@ -77,10 +69,8 @@ namespace TEN::Effects::Electricity
 	void SpawnElectricEffect(const ItemInfo& item, int jointNumber, const Vector3i& offset, const float spawnRadius, float beamOriginRadius, float beamTargetRadius, int frequency, const Vector3& pos);
 	void SpawnElectricityGlow(const Vector3& pos, float scale, byte r, byte g, byte b);
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target);
-	void ApplyRandomBend(Electricity& arc, int bendKnot);
 	void UpdateElectricityArcs();
 	void UpdateHelicalLasers();
-	float CalculateDistance(const Vector3& p1, const Vector3& p2);
 
 	void CalculateElectricitySpline(const Electricity& arc, const std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRICITY_BUFFER_SIZE>& buffer);
 	void CalculateHelixSpline(const HelicalLaser& laser, std::array<Vector3, ELECTRICITY_KNOTS_SIZE>& knots, std::array<Vector3, ELECTRICITY_BUFFER_SIZE>& buffer);

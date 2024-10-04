@@ -278,11 +278,10 @@ static void StartTrap(ObjectInfo* obj)
 		obj->control = ControlElectricBall;
 		obj->collision = GenericSphereBoxCollision;
 		obj->shadowType = ShadowMode::All;
-		obj->SetHitEffect(true);
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->radius = 512;
 		obj->intelligent = true;
-		//obj->nonLot = true;
+		obj->SetHitEffect(true);	
 	}
 
 	obj = &Objects[ID_ELECTRIC_BALL_IMPACT_POINT];

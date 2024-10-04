@@ -274,9 +274,7 @@ namespace TEN::Renderer
 						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 						center,
 						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BlendMode::Additive, direction, true, view);
-				
-					
+						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BlendMode::Additive, direction, true, view);					
 				}
 			}
 		}
