@@ -92,7 +92,6 @@ using namespace TEN::Entities::Effects;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
-int Wibble          = 0;
 
 bool InitializeGame;
 bool DoTheGame;
@@ -179,26 +178,12 @@ GameStatus ControlPhase()
 	ApplyActionQueue();
 	ClearActionQueue();
 
+	UpdateCamera();
 	UpdateAllItems();
 	UpdateAllEffects();
 	UpdateLara(LaraItem, isTitle);
 
 	g_GameScriptEntities->TestCollidingObjects();
-
-	// Draw flyby cameras.
-	if (UseSpotCam)
-	{
-		CalculateSpotCameras();
-	}
-	// Do standard camera.
-	else
-	{
-		TrackCameraInit = false;
-		CalculateCamera(LaraCollision);
-	}
-
-	// Update oscillator seed.
-	Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
 
 	// Smash shatters and clear stopper flags under them.
 	UpdateShatters();
@@ -216,6 +201,7 @@ GameStatus ControlPhase()
 
 	// Update effects.
 	StreamerEffect.Update();
+	UpdateWibble();
 	UpdateSparks();
 	UpdateFireSparks();
 	UpdateSmoke();

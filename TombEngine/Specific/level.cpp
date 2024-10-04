@@ -1471,7 +1471,8 @@ void GetCarriedItems()
 		const auto& object = Objects[item.ObjectNumber];
 
 		if (object.intelligent ||
-			(item.ObjectNumber >= ID_SEARCH_OBJECT1 && item.ObjectNumber <= ID_SEARCH_OBJECT3))
+			(item.ObjectNumber >= ID_SEARCH_OBJECT1 && item.ObjectNumber <= ID_SEARCH_OBJECT3) ||
+			(item.ObjectNumber == ID_SARCOPHAGUS))
 		{
 			for (short linkNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 			{

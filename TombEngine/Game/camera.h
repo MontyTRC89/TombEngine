@@ -105,16 +105,18 @@ void RumbleScreen();
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius);
 void ItemsCollideCamera();
+void RefreshFixedCamera(short camNumber);
+
 void ObjCamera(ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID, bool cond);
 void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID);
-void RefreshFixedCamera(short camNumber);
+void ClearObjCamera();
 
 void SetScreenFadeOut(float speed, bool force = false);
 void SetScreenFadeIn(float speed, bool force = false);
 void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
+void UpdateCamera();
 void UpdateFadeScreenAndCinematicBars();
 void UpdateMikePos(const ItemInfo& item);
-void ClearObjCamera();
 
 float GetParticleDistanceFade(const Vector3i& pos);

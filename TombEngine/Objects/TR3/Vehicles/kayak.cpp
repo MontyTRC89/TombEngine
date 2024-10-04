@@ -221,14 +221,16 @@ namespace TEN::Entities::Vehicles
 		//	SetupRipple(x, kayakItem->Pose.Position.y, z, -2 - (GetRandomControl() & 1), 0, Objects[ID_KAYAK_PADDLE_TRAIL_SPRITE].meshIndex,TO_RAD(kayakItem->Pose.Orientation.y));
 	}
 
-	void KayakPaddleTake(ItemInfo* laraItem)
+	void KayakPaddleTake(KayakInfo* kayak, ItemInfo* laraItem)
 	{
+		kayak->Flags |= KAYAK_FLAG_PADDLE_MESH;
 		laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
 		laraItem->MeshBits.Clear(KayakLaraLegJoints);
 	}
 
-	void KayakPaddlePut(ItemInfo* laraItem)
+	void KayakPaddlePut(KayakInfo* kayak, ItemInfo* laraItem)
 	{
+		kayak->Flags &= ~KAYAK_FLAG_PADDLE_MESH;
 		laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
 		laraItem->MeshBits.Set(KayakLaraLegJoints);
 	}
@@ -910,21 +912,13 @@ namespace TEN::Entities::Vehicles
 		
 		case KAYAK_STATE_MOUNT_LEFT:
 			if (TestAnimNumber(*laraItem, KAYAK_ANIM_GET_PADDLE) && frame == 24 && !(kayak->Flags & KAYAK_FLAG_PADDLE_MESH))
-			{
-				kayak->Flags |= KAYAK_FLAG_PADDLE_MESH;
-				KayakPaddleTake(laraItem);
-			}
-
+				KayakPaddleTake(kayak, laraItem);
 			break;
 		
 		case KAYAK_STATE_DISMOUNT:
-			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_START) && frame == 27 && kayak->Flags & KAYAK_FLAG_PADDLE_MESH)
-			{
-				kayak->Flags &= ~KAYAK_FLAG_PADDLE_MESH;
-				KayakPaddlePut(laraItem);
-			}
-
 			laraItem->Animation.TargetState = laraItem->Animation.RequiredState;
+			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_START) && frame == 27 && kayak->Flags & KAYAK_FLAG_PADDLE_MESH)
+				KayakPaddlePut(kayak, laraItem);
 			break;
 		
 		case KAYAK_STATE_DISMOUNT_LEFT:
