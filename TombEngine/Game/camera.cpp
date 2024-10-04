@@ -952,6 +952,7 @@ void BinocularCamera(ItemInfo* item)
 			player.Inventory.IsBusy = false;
 
 			Camera.type = BinocularOldCamera;
+			Camera.target = LastTarget;
 			AlterFOV(LastFOV);
 			return;
 		}
@@ -1025,6 +1026,8 @@ void BinocularCamera(ItemInfo* item)
 
 	if (IsHeld(In::Action))
 	{
+		ClearAction(In::Action);
+
 		auto origin = Camera.pos.ToVector3i();
 		auto target = Camera.target.ToVector3i();
 		LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
@@ -1516,6 +1519,21 @@ void ItemsCollideCamera()
 
 	// Done.
 	staticList.clear();
+}
+
+void UpdateCamera()
+{
+	if (UseSpotCam)
+	{
+		// Draw flyby cameras.
+		CalculateSpotCameras();
+	}
+	else
+	{
+		// Do the standard camera.
+		TrackCameraInit = false;
+		CalculateCamera(LaraCollision);
+	}
 }
 
 void UpdateMikePos(const ItemInfo& item)

@@ -12,6 +12,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
 * Fixed leveljump vehicle transfer.
 * Fixed sarcophagus pick-ups.
+* Fixed several binocular bugs.
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed camera rotating with the player's hips when climbing out of water.
 * Fixed AI for TR2 skidoo driver and worker with shotgun.
