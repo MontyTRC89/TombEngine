@@ -266,6 +266,13 @@ GameStatus ControlPhase()
 	// Post-loop script and event handling.
 	g_GameScript->OnLoop(DELTA_TIME, true);
 
+	// Update cameras matrices there, after having done all the possible camera logic
+	g_Renderer.UpdateCameraMatrices(
+		&Camera,
+		Camera.currentRoll,
+		Camera.currentFov,
+		g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * BLOCK(1));
+
 	// Clear savegame loaded flag.
 	JustLoaded = false;
 

@@ -1592,6 +1592,7 @@ namespace TEN::Renderer
 			_blinkTime -= PI_MUL_2;
 
 		_oldGameCamera = _currentGameCamera;
+		Camera.DisableInterpolation = false;
 
 		_isLocked = false;
 	}
@@ -3044,8 +3045,6 @@ namespace TEN::Renderer
 			_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
 			_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
 			_gameCamera.Camera.Frustum = _currentGameCamera.Camera.Frustum;
-
-			Camera.DisableInterpolation = false;
 		}
 
 		_gameCamera.Camera.ViewSize = _currentGameCamera.Camera.ViewSize;

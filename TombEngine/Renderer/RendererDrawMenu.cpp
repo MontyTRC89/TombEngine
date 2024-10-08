@@ -1175,8 +1175,6 @@ namespace TEN::Renderer
 			_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
 			_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
 			_gameCamera.Camera.Frustum = _currentGameCamera.Camera.Frustum;
-
-			Camera.DisableInterpolation = false;
 		}
 
 		_gameCamera.Camera.ViewSize = _currentGameCamera.Camera.ViewSize;

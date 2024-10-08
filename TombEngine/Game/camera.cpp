@@ -194,15 +194,8 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 
 void LookAt(CAMERA_INFO* cam, short roll)
 {
-	auto pos = cam->pos.ToVector3();
-	auto target = cam->target.ToVector3();
-	auto up = Vector3::Down;
-	float fov = TO_RAD(CurrentFOV / 1.333333f);
-	float r = TO_RAD(roll);
-
-	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(BLOCK(1));
-
-	g_Renderer.UpdateCameraMatrices(cam, r, fov, levelFarView);
+	cam->currentFov = TO_RAD(CurrentFOV / 1.333333f);
+	cam->currentRoll = TO_RAD(roll);
 }
 
 void AlterFOV(short value, bool store)

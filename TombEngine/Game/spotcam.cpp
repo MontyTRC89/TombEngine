@@ -490,11 +490,22 @@ void CalculateSpotCameras()
 		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
 		if (outsideRoom == NO_VALUE)
 		{
+			if (Camera.pos.RoomNumber != SpotCam[CurrentSplineCamera].roomNumber)
+			{
+				Camera.DisableInterpolation = true;
+			}
 			Camera.pos.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
 			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
 		}
 		else
+		{
+			if (Camera.pos.RoomNumber != outsideRoom)
+			{
+				Camera.DisableInterpolation = true;
+			}
+
 			Camera.pos.RoomNumber = outsideRoom;
+		}
 
 		AlterFOV(cfov, false);
 
@@ -578,6 +589,7 @@ void CalculateSpotCameras()
 						cn = FirstCamera + SpotCam[CurrentSplineCamera].timer;
 
 						Camera.DisableInterpolation = true;
+
 						CameraXposition[1] = SpotCam[cn].x;
 						CameraYposition[1] = SpotCam[cn].y;
 						CameraZposition[1] = SpotCam[cn].z;
@@ -638,7 +650,10 @@ void CalculateSpotCameras()
 				SpotcamPaused = 0;
 
 				if (LastCamera >= CurrentSplineCamera)
+				{
+					Camera.DisableInterpolation = true;
 					return;
+				}
 
 				if (s->flags & SCF_LOOP_SEQUENCE)
 				{
@@ -647,8 +662,6 @@ void CalculateSpotCameras()
 				}
 				else if (s->flags & SCF_CUT_TO_LARA_CAM || SplineToCamera)
 				{
-					Camera.DisableInterpolation = true;
-
 					if (CheckTrigger)
 					{
 						CameraType oldType = Camera.type;
@@ -671,6 +684,7 @@ void CalculateSpotCameras()
 
 					SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
+					Camera.DisableInterpolation = true;
 					UseSpotCam = false;
 					Lara.Control.IsLocked = false;
 					CheckTrigger = false;
