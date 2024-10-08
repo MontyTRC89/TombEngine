@@ -195,3 +195,13 @@ void InitPushableObject(ObjectInfo* object, int objectNumber)
 		object->SetHitEffect(true);
 	}
 }
+
+void InitAIObject(ObjectInfo* object, int objectNumber)
+{
+	object = &Objects[objectNumber];
+	if (object->loaded)
+	{
+		object->drawRoutine = nullptr;
+		object->collision = AIPickupCollision;
+	}
+}

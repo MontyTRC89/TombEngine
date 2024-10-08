@@ -779,11 +779,14 @@ void Moveable::SetColor(const ScriptColor& color)
 // <br />4 - modify
 // <br />5 - follow
 // <br />6 - patrol 2
+// <br />7 - x1
+// <br />8 - x2
+// <br />9 - path
 // @function Moveable:GetAIBits
 // @treturn table a table of AI bits
 aiBitsType Moveable::GetAIBits() const
 {
-	static_assert(63 == ALL_AIOBJ);
+	static_assert(511 == ALL_AIOBJ);
 
 	aiBitsArray ret{};
 	for (size_t i = 0; i < ret.size(); ++i)
