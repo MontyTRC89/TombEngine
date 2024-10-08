@@ -949,6 +949,15 @@ void BinocularCamera(ItemInfo* item)
 			AlterFOV(LastFOV);
 			return;
 		}
+
+		if (IsHeld(In::Action))
+		{
+			ClearAction(In::Action);
+
+			auto origin = Camera.pos.ToVector3i();
+			auto target = Camera.target.ToVector3i();
+			LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
+		}
 	}
 
 	AlterFOV(7 * (ANGLE(11.5f) - player.Control.Look.OpticRange), false);
@@ -1016,15 +1025,6 @@ void BinocularCamera(ItemInfo* item)
 	Camera.oldType = Camera.type;
 
 	GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
-
-	if (IsHeld(In::Action))
-	{
-		ClearAction(In::Action);
-
-		auto origin = Camera.pos.ToVector3i();
-		auto target = Camera.target.ToVector3i();
-		LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
-	}
 }
 
 void ConfirmCameraTargetPos()
