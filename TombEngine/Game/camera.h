@@ -24,11 +24,11 @@ struct CAMERA_INFO
 	GameVector target;
 	CameraType type;
 	CameraType oldType;
+	CameraType lastType;
 	int shift;
 	int flags;
 	bool fixedCamera;
 	bool underwater;
-	int numberFrames;
 	int bounce;
 	int targetDistance;
 	short targetAngle;
@@ -46,6 +46,10 @@ struct CAMERA_INFO
 	ItemInfo* lastItem;
 	int mikeAtLara;
 	Vector3i mikePos;
+	float currentRoll;
+	float currentFov;
+
+	bool DisableInterpolation = false;
 };
 
 struct ObjectCameraInfo

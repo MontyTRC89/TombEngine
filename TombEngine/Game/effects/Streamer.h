@@ -9,10 +9,9 @@ namespace TEN::Effects::Streamer
 {
 	enum class StreamerFlags
 	{
-		FadeLeft  = (1 << 0),
-		FadeRight = (1 << 1),
-
-		BlendModeAdditive = (1 << 2)
+		FadeLeft		  = 1 << 0,
+		FadeRight		  = 1 << 1,
+		BlendModeAdditive = 1 << 2
 	};
 
 	class Streamer
@@ -39,11 +38,21 @@ namespace TEN::Effects::Streamer
 
 			std::array<Vector3, VERTEX_COUNT> Vertices = {};
 
+			Vector4 PrevColor = Vector4::Zero;
+			std::array<Vector3, VERTEX_COUNT> PrevVertices = {};
+
 			void InitializeVertices(const Vector3& pos, float width);
 			void Update();
 
 		private:
 			void TransformVertices(float vel, float scaleRate);
+
+			void StoreInterpolationData()
+			{
+				PrevColor = Color;
+				PrevVertices[0] = Vertices[0];
+				PrevVertices[1] = Vertices[1];
+			}
 		};
 
 		// Members

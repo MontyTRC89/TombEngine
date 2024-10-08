@@ -39,6 +39,7 @@
 #include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Math/Math.h"
+#include "Objects/Effects/LensFlare.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"
@@ -86,6 +87,8 @@ using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
+using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Effects;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -111,33 +114,32 @@ short NextFxFree;
 
 int ControlPhaseTime;
 
-int DrawPhase(bool isTitle)
+void DrawPhase(bool isTitle, float interpolationFactor)
 {
 	if (isTitle)
 	{
-		g_Renderer.RenderTitle();
+		g_Renderer.RenderTitle(interpolationFactor);
 	}
 	else
 	{
-		g_Renderer.Render();
+		g_Renderer.Render(interpolationFactor);
 	}
 
-	// Clear display sprites.
-	ClearDisplaySprites();
-
-	Camera.numberFrames = g_Renderer.Synchronize();
-	return Camera.numberFrames;
+	g_Renderer.Lock();
 }
 
-GameStatus ControlPhase(int numFrames)
+GameStatus ControlPhase()
 {
-	auto time1 = std::chrono::high_resolution_clock::now();
+	static int framesCount = 0;
 
+	auto time1 = std::chrono::high_resolution_clock::now();
 	bool isTitle = (CurrentLevel == 0);
 
+	g_Renderer.PrepareScene();
 	RegeneratePickups();
-
-	numFrames = std::clamp(numFrames, 0, 10);
+	ClearFires();
+	ClearLensFlares();
+	ClearAllDisplaySprites();
 
 	if (TrackCameraInit)
 	{
@@ -146,114 +148,123 @@ GameStatus ControlPhase(int numFrames)
 	}
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
-	
-	bool isFirstTime = true;
-	static int framesCount = 0;
 
-	for (framesCount += numFrames; framesCount > 0; framesCount -= LOOP_FRAME_COUNT)
+	SetupInterpolation();
+	g_Renderer.SaveOldState();
+
+	// Controls are polled before OnLoop to allow input data to be overwritten by script API methods.
+	HandleControls(isTitle);
+
+	// Pre-loop script and event handling.
+	g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
+	HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
+
+	// Control lock is processed after handling scripts because builder may want to process input externally while locking player from input.
+	if (!isTitle && Lara.Control.IsLocked)
+		ClearAllActions();
+
+	// Handle inventory, pause, load, save screens.
+	auto result = HandleMenuCalls(isTitle);
+	if (result != GameStatus::Normal)
+		return result;
+
+	// Handle global input events.
+	result = HandleGlobalInputEvents(isTitle);
+	if (result != GameStatus::Normal)
+		return result;
+
+	// Queued input actions are read again and cleared after UI interrupts are processed,
+	// so first game frame after exiting UI will still register it.
+	ApplyActionQueue();
+	ClearActionQueue();
+
+	UpdateCamera();
+	UpdateAllItems();
+	UpdateAllEffects();
+	UpdateLara(LaraItem, isTitle);
+
+	g_GameScriptEntities->TestCollidingObjects();
+
+	// Smash shatters and clear stopper flags under them.
+	UpdateShatters();
+
+	// Clear last selected item in inventory (must be after on loop event handling, so they can detect that).
+	g_Gui.CancelInventorySelection();
+
+	// Control lock is processed after handling scripts because builder may want to
+	// process input externally while locking player from input.
+	if (!isTitle && Lara.Control.IsLocked)
+		ClearAllActions();
+
+	// Update weather.
+	Weather.Update();
+
+	// Update effects.
+	StreamerEffect.Update();
+	UpdateWibble();
+	UpdateSparks();
+	UpdateFireSparks();
+	UpdateSmoke();
+	UpdateBlood();
+	UpdateBubbles();
+	UpdateDebris();
+	UpdateGunShells();
+	UpdateFootprints();
+	UpdateSplashes();
+	UpdateElectricityArcs();
+	UpdateHelicalLasers();
+	UpdateDrips();
+	UpdateRats();
+	UpdateRipples();
+	UpdateBats();
+	UpdateSpiders();
+	UpdateSparkParticles();
+	UpdateSmokeParticles();
+	UpdateSimpleParticles();
+	UpdateExplosionParticles();
+	UpdateShockwaves();
+	UpdateBeetleSwarm();
+	UpdateLocusts();
+	UpdateUnderwaterBloodParticles();
+	UpdateFishSwarm();
+
+	if (g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareEnabled())
 	{
-		// Controls are polled before OnLoop, so input data could be
-		// overwritten by script API methods.
-		HandleControls(isTitle);
-
-		// Pre-loop script and event handling.
-		g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
-		HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
-
-		// Clear last selected item in inventory (need to be after on loop event handling, so they can detect that).
-		g_Gui.CancelInventorySelection();
-
-		// Control lock is processed after handling scripts, because builder may want to
-		// process input externally, while still locking Lara from input.
-		if (!isTitle && Lara.Control.IsLocked)
-			ClearAllActions();
-
-		// Handle inventory / pause / load / save screens.
-		auto result = HandleMenuCalls(isTitle);
-		if (result != GameStatus::Normal)
-			return result;
-
-		// Handle global input events.
-		result = HandleGlobalInputEvents(isTitle);
-		if (result != GameStatus::Normal)
-			return result;
-
-		// Queued input actions are read again and cleared after UI 
-		// interrupts are processed, so first frame after exiting UI
-		// will still register it.
-		ApplyActionQueue();
-		ClearActionQueue();
-
-		UpdateCamera();
-		UpdateAllItems();
-		UpdateAllEffects();
-		UpdateLara(LaraItem, isTitle);
-
-		g_GameScriptEntities->TestCollidingObjects();
-
-		// Smash shatters and clear stopper flags under them.
-		UpdateShatters();
-
-		// Update weather.
-		Weather.Update();
-
-		// Update effects.
-		UpdateWibble();
-		StreamerEffect.Update();
-		UpdateSparks();
-		UpdateFireSparks();
-		UpdateSmoke();
-		UpdateBlood();
-		UpdateBubbles();
-		UpdateDebris();
-		UpdateGunShells();
-		UpdateFootprints();
-		UpdateSplashes();
-		UpdateElectricityArcs();
-		UpdateHelicalLasers();
-		UpdateDrips();
-		UpdateRats();
-		UpdateRipples();
-		UpdateBats();
-		UpdateSpiders();
-		UpdateSparkParticles();
-		UpdateSmokeParticles();
-		UpdateSimpleParticles();
-		UpdateExplosionParticles();
-		UpdateShockwaves();
-		UpdateBeetleSwarm();
-		UpdateFishSwarm();
-		UpdateLocusts();
-		UpdateUnderwaterBloodParticles();
-
-		// Update HUD.
-		g_Hud.Update(*LaraItem);
-		UpdateFadeScreenAndCinematicBars();
-
-		// Rumble screen (like in submarine level of TRC).
-		if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
-			RumbleScreen();
-
-		PlaySoundSources();
-		DoFlipEffect(FlipEffect, LaraItem);
-
-		// Post-loop script and event handling.
-		g_GameScript->OnLoop(DELTA_TIME, true);
-
-		// Clear savegame loaded flag.
-		JustLoaded = false;
-
-		// Update timers.
-		GameTimer++;
-		GlobalCounter++;
-
-		// Add renderer objects on the first processed frame.
-		if (isFirstTime)
-		{
-			g_Renderer.Lock();
-			isFirstTime = false;
-		}
+		SetupGlobalLensFlare(
+			EulerAngles(g_GameFlow->GetLevel(CurrentLevel)->GetLensFlarePitch(), g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareYaw(), 0),
+			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareColor(),
+			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareSunSpriteID());
 	}
+
+	// Update HUD.
+	g_Hud.Update(*LaraItem);
+	UpdateFadeScreenAndCinematicBars();
+
+	// Rumble screen (like in submarine level of TRC).
+	if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
+		RumbleScreen();
+
+	PlaySoundSources();
+	DoFlipEffect(FlipEffect, LaraItem);
+
+	Sound_UpdateScene();
+
+	// Post-loop script and event handling.
+	g_GameScript->OnLoop(DELTA_TIME, true);
+
+	// Update cameras matrices there, after having done all the possible camera logic
+	g_Renderer.UpdateCameraMatrices(
+		&Camera,
+		Camera.currentRoll,
+		Camera.currentFov,
+		g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * BLOCK(1));
+
+	// Clear savegame loaded flag.
+	JustLoaded = false;
+
+	// Update timers.
+	GameTimer++;
+	GlobalCounter++;
 
 	using ns = std::chrono::nanoseconds;
 	using get_time = std::chrono::steady_clock;
@@ -266,22 +277,26 @@ GameStatus ControlPhase(int numFrames)
 
 unsigned CALLBACK GameMain(void *)
 {
-	TENLog("Starting GameMain...", LogLevel::Info);
+	TENLog("Starting GameMain()...", LogLevel::Info);
 
 	TimeInit();
 
-	// Do a fixed time title image.
+	// Do fixed-time title image.
 	if (g_GameFlow->IntroImagePath.empty())
-		TENLog("Intro image path is not set.", LogLevel::Warning);
+	{
+		TENLog("Intro image path not set.", LogLevel::Warning);
+	}
 	else
+	{
 		g_Renderer.RenderTitleImage();
+	}
 
-	// Execute the Lua gameflow and play the game.
+	// Execute Lua gameflow and play game.
 	g_GameFlow->DoFlow();
 
 	DoTheGame = false;
 
-	// Finish the thread.
+	// Finish thread.
 	PostMessage(WindowsHandle, WM_CLOSE, NULL, NULL);
 	EndThread();
 
@@ -297,7 +312,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 
 	// Load level. Fall back to title if unsuccessful.
 	if (!LoadLevelFile(levelIndex))
-		return isTitle ? GameStatus::ExitGame : GameStatus::ExitToTitle;
+		return (isTitle ? GameStatus::ExitGame : GameStatus::ExitToTitle);
 
 	// Initialize items, effects, lots, and cameras.
 	HairEffect.Initialize();
@@ -354,11 +369,15 @@ void KillMoveItems()
 	{
 		for (int i = 0; i < ItemNewRoomNo; i++)
 		{
-			short itemNumber = ItemNewRooms[2 * i];
+			int itemNumber = ItemNewRooms[i * 2];
 			if (itemNumber >= 0)
-				ItemNewRoom(itemNumber, ItemNewRooms[2 * i + 1]);
+			{
+				ItemNewRoom(itemNumber, ItemNewRooms[(i * 2) + 1]);
+			}
 			else
+			{
 				KillItem(itemNumber & 0x7FFF);
+			}
 		}
 	}
 
@@ -371,11 +390,15 @@ void KillMoveEffects()
 	{
 		for (int i = 0; i < ItemNewRoomNo; i++)
 		{
-			short itemNumber = ItemNewRooms[2 * i];
+			int itemNumber = ItemNewRooms[i * 2];
 			if (itemNumber >= 0)
-				EffectNewRoom(itemNumber, ItemNewRooms[2 * i + 1]);
+			{
+				EffectNewRoom(itemNumber, ItemNewRooms[(i * 2) + 1]);
+			}
 			else
+			{
 				KillEffect(itemNumber & 0x7FFF);
+			}
 		}
 	}
 
@@ -398,13 +421,13 @@ void CleanUp()
 	// Reset oscillator seed.
 	Wibble = 0;
 
-	// Needs to be cleared, otherwise controls will lock if user exits to title while playing flyby with locked controls.
+	// Clear player lock, otherwise controls will lock if user exits to title while playing flyby with locked controls.
 	Lara.Control.IsLocked = false;
 
 	// Resets lightning and wind parameters to avoid holding over previous weather to new level.
 	Weather.Clear();
 
-	// Needs to be cleared, otherwise a list of active creatures from previous level will spill into new level.
+	// Clear creatures, otherwise list of active creatures from previous level will spill into new level.
 	ActiveCreatures.clear();
 
 	// Clear ropes.
@@ -418,7 +441,7 @@ void CleanUp()
 	StreamerEffect.Clear();
 	ClearUnderwaterBloodParticles();
 	ClearBubbles();
-	ClearDisplaySprites();
+	ClearAllDisplaySprites();
 	ClearFootprints();
 	ClearDrips();
 	ClearRipples();
@@ -454,26 +477,27 @@ void InitializeScripting(int levelIndex, LevelLoadType type)
 	g_GameStringsHandler->ClearDisplayStrings();
 	g_GameScript->ResetScripts(!levelIndex || type != LevelLoadType::New);
 
-	auto* level = g_GameFlow->GetLevel(levelIndex);
+	const auto& level = *g_GameFlow->GetLevel(levelIndex);
 
 	// Run level script if it exists.
-	if (!level->ScriptFileName.empty())
+	if (!level.ScriptFileName.empty())
 	{
-		g_GameScript->ExecuteScriptFile(g_GameFlow->GetGameDir() + level->ScriptFileName);
+		g_GameScript->ExecuteScriptFile(g_GameFlow->GetGameDir() + level.ScriptFileName);
 		g_GameScript->InitCallbacks();
 		g_GameStringsHandler->SetCallbackDrawString([](const std::string& key, D3DCOLOR color, const Vec2& pos, float scale, int flags)
 		{
 			g_Renderer.AddString(
 				key,
-				Vector2(((float)pos.x / (float)g_Configuration.ScreenWidth * DISPLAY_SPACE_RES.x),
-				((float)pos.y / (float)g_Configuration.ScreenHeight * DISPLAY_SPACE_RES.y)),
+				Vector2(
+					(pos.x / g_Configuration.ScreenWidth) * DISPLAY_SPACE_RES.x,
+					(pos.y / g_Configuration.ScreenHeight) * DISPLAY_SPACE_RES.y),
 				Color(color), scale, flags);
 		});
 	}
 
 	// Play default background music.
 	if (type != LevelLoadType::Load)
-		PlaySoundTrack(level->GetAmbientTrack(), SoundTrackType::BGM);
+		PlaySoundTrack(level.GetAmbientTrack(), SoundTrackType::BGM);
 }
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
@@ -484,7 +508,7 @@ void DeInitializeScripting(int levelIndex, GameStatus reason)
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
-	if (!levelIndex)
+	if (levelIndex == 0)
 		g_GameScript->ResetScripts(true);
 }
 
@@ -493,7 +517,7 @@ void InitializeOrLoadGame(bool loadGame)
 	g_Gui.SetInventoryItemChosen(NO_VALUE);
 	g_Gui.SetEnterInventory(NO_VALUE);
 
-	// Restore the game?
+	// Restore game?
 	if (loadGame)
 	{
 		SaveGame::Load(g_GameFlow->SelectedSaveGame);
@@ -514,7 +538,7 @@ void InitializeOrLoadGame(bool loadGame)
 	}
 	else
 	{
-		// If not loading a savegame, clear all info.
+		// If not loading savegame, clear all info.
 		SaveGame::Statistics.Level = {};
 
 		if (InitializeGame)
@@ -540,62 +564,89 @@ void InitializeOrLoadGame(bool loadGame)
 
 GameStatus DoGameLoop(int levelIndex)
 {
-	int numFrames = LOOP_FRAME_COUNT;
+	constexpr auto CONTROL_FRAME_TIME = 1000.0f / 30.0f;
+
+	int frameCount = LOOP_FRAME_COUNT;
 	auto& status = g_GameFlow->LastGameStatus;
 
-	// Before entering actual game loop, ControlPhase must be
+	// Before entering actual game loop, ControlPhase() must be
 	// called once to sort out various runtime shenanigangs (e.g. hair).
-	status = ControlPhase(numFrames);
+	status = ControlPhase();
+
+	LARGE_INTEGER lastTime;
+	LARGE_INTEGER currentTime;
+	double controlLag = 0;
+	double frameTime = 0;
+
+	LARGE_INTEGER frequency;
+	QueryPerformanceFrequency(&frequency);
+	QueryPerformanceCounter(&lastTime);
+
+	int controlCalls = 0;
+	int drawCalls = 0;
+	
+	bool legacy30FpsDoneDraw = false;
 
 	while (DoTheGame)
 	{
-		status = ControlPhase(numFrames);
-
-		if (!levelIndex)
+		if (App.ResetClock)
 		{
-			UpdateInputActions(LaraItem);
-
-			auto invStatus = g_Gui.TitleOptions(LaraItem);
-
-			switch (invStatus)
-			{
-			case InventoryResult::NewGame:
-			case InventoryResult::NewGameSelectedLevel:
-				status = GameStatus::NewGame;
-				break;
-
-			case InventoryResult::HomeLevel:
-				status = GameStatus::HomeLevel;
-				break;
-
-			case InventoryResult::LoadGame:
-				status = GameStatus::LoadGame;
-				break;
-
-			case InventoryResult::ExitGame:
-				status = GameStatus::ExitGame;
-				break;
-			}
-
-			if (invStatus != InventoryResult::None)
-				break;
+			App.ResetClock = false;
+			QueryPerformanceCounter(&lastTime);
+			currentTime = lastTime;
+			controlLag = 0;
+			frameTime = 0;
 		}
 		else
 		{
-			if (status == GameStatus::ExitToTitle ||
-				status == GameStatus::LaraDead ||
-				status == GameStatus::LoadGame ||
-				status == GameStatus::LevelComplete)
-			{
-				break;
-			}
+			QueryPerformanceCounter(&currentTime);
+			frameTime = (currentTime.QuadPart - lastTime.QuadPart) * 1000.0 / frequency.QuadPart;
+			lastTime = currentTime;
+			controlLag += frameTime;
 		}
 
-		numFrames = DrawPhase(!levelIndex);
-		Sound_UpdateScene();
+		while (controlLag >= CONTROL_FRAME_TIME)
+		{
+#if _DEBUG
+			constexpr auto DEBUG_SKIP_FRAMES = 10;
+
+			if (controlLag >= DEBUG_SKIP_FRAMES * CONTROL_FRAME_TIME)
+			{
+				TENLog("Game loop is running too slow.", LogLevel::Warning);
+				App.ResetClock = true;
+				break;
+			}
+#endif
+
+			status = ControlPhase();
+			controlLag -= CONTROL_FRAME_TIME;
+			controlCalls++;
+
+			legacy30FpsDoneDraw = false;
+		}
+
+		if (status != GameStatus::Normal)
+			break;
+
+		if (!g_Configuration.EnableVariableFramerate)
+		{
+			if (!legacy30FpsDoneDraw)
+			{
+				DrawPhase(!levelIndex, 0.0f);
+				drawCalls++;
+				legacy30FpsDoneDraw = true;
+			}
+		}
+		else
+		{
+			float interpolationFactor = std::min((float)controlLag / (float)CONTROL_FRAME_TIME, 1.0f);
+			DrawPhase(!levelIndex, interpolationFactor);
+			drawCalls++;
+		}
 	}
 
 	EndGameLoop(levelIndex, status);
+
 	return status;
 }
 
@@ -609,28 +660,50 @@ void EndGameLoop(int levelIndex, GameStatus reason)
 	StopRumble();
 }
 
+void SetupInterpolation()
+{
+	for (int i = 0; i < g_Level.Items.size(); i++)
+		g_Level.Items[i].DisableInterpolation = false;
+}
+
 void HandleControls(bool isTitle)
 {
 	// Poll input devices and update input variables.
-	if (!isTitle)
-	{
-		// TODO: To allow cutscene skipping later, don't clear Deselect action.
-		UpdateInputActions(LaraItem, true);
-	}
-	else
-	{
+	// TODO: To allow cutscene skipping later, don't clear Deselect action.
+	UpdateInputActions(LaraItem, true);
+
+	if (isTitle)
 		ClearAction(In::Look);
-	}
 }
 
 GameStatus HandleMenuCalls(bool isTitle)
 {
-	auto result = GameStatus::Normal;
+	auto gameStatus = GameStatus::Normal;
 
-	if (isTitle || ScreenFading)
-		return result;
+	if (ScreenFading)
+		return gameStatus;
 
-	// Does the player want to enter inventory?
+	if (isTitle)
+	{
+		auto invStatus = g_Gui.TitleOptions(LaraItem);
+
+		switch (invStatus)
+		{
+		case InventoryResult::NewGame:
+		case InventoryResult::NewGameSelectedLevel:
+			return GameStatus::NewGame;
+
+		case InventoryResult::LoadGame:
+			return GameStatus::LoadGame;
+
+		case InventoryResult::ExitGame:
+			return GameStatus::ExitGame;
+		}
+
+		return gameStatus;
+	}
+
+	// Handle inventory.
 	if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
 		g_Gui.GetInventoryMode() != InventoryMode::Save &&
 		g_GameFlow->IsLoadSaveEnabled())
@@ -647,28 +720,28 @@ GameStatus HandleMenuCalls(bool isTitle)
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))
-			result = GameStatus::LoadGame;
+			gameStatus = GameStatus::LoadGame;
 	}
 	else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
 			 g_Gui.GetInventoryMode() != InventoryMode::Pause)
 	{
 		if (g_Gui.CallPause())
-			result = GameStatus::ExitToTitle;
+			gameStatus = GameStatus::ExitToTitle;
 	}
 	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_VALUE) &&
 			 LaraItem->HitPoints > 0 && !Lara.Control.Look.IsUsingBinoculars)
 	{
 		if (g_Gui.CallInventory(LaraItem, true))
-			result = GameStatus::LoadGame;
+			gameStatus = GameStatus::LoadGame;
 	}
 
-	if (result != GameStatus::Normal)
+	if (gameStatus != GameStatus::Normal)
 	{
 		StopAllSounds();
 		StopRumble();
 	}
 
-	return result;
+	return gameStatus;
 }
 
 GameStatus HandleGlobalInputEvents(bool isTitle)

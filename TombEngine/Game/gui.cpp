@@ -26,6 +26,7 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Input;
 using namespace TEN::Renderer;
@@ -192,6 +193,11 @@ namespace TEN::Gui
 		return false;
 	}
 
+	float GuiController::GetSpinSpeed()
+	{
+		return g_Configuration.EnableVariableFramerate ? (g_Renderer.GetScreenRefreshRate() / 30.0f) : 1.0f;
+	}
+
 	bool GuiController::CanDeselect() const
 	{
 		return !(IsHeld(In::Select) || IsHeld(In::Action));
@@ -274,6 +280,7 @@ namespace TEN::Gui
 	void GuiController::DrawInventory()
 	{
 		g_Renderer.RenderInventory();
+		g_Renderer.Lock(); // TODO: When inventory is converted to 60 FPS, move this lock call outside of render loop.
 	}
 
 	InventoryResult GuiController::TitleOptions(ItemInfo* item)
@@ -481,11 +488,12 @@ namespace TEN::Gui
 			Caustics,
 			Antialiasing,
 			AmbientOcclusion,
+			VariableFramerate,
 			Save,
 			Cancel
 		};
 
-		static const int numDisplaySettingsOptions = 7;
+		static const int numDisplaySettingsOptions = 8;
 
 		OptionCount = numDisplaySettingsOptions;
 
@@ -542,6 +550,12 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
 				break;
+
+			case DisplaySettingsOption::VariableFramerate:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableVariableFramerate = !CurrentSettings.Configuration.EnableVariableFramerate;
+				break;
+
 			}
 		}
 
@@ -587,6 +601,11 @@ namespace TEN::Gui
 			case DisplaySettingsOption::AmbientOcclusion:
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
+				break;
+
+			case DisplaySettingsOption::VariableFramerate:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableVariableFramerate = !CurrentSettings.Configuration.EnableVariableFramerate;
 				break;
 			}
 		}
@@ -726,14 +745,19 @@ namespace TEN::Gui
 				if (fromPauseMenu)
 				{
 					g_Renderer.RenderInventory();
-					Camera.numberFrames = g_Renderer.Synchronize();
+					if (!g_Configuration.EnableVariableFramerate)
+					{
+						g_Renderer.Synchronize();
+					}
 				}
 				else
 				{
-					g_Renderer.RenderTitle();
-					Camera.numberFrames = g_Renderer.Synchronize();
-					int numFrames = Camera.numberFrames;
-					ControlPhase(numFrames);
+					g_Renderer.RenderTitle(0);
+					if (!g_Configuration.EnableVariableFramerate)
+					{
+						g_Renderer.Synchronize();
+					}
+					ControlPhase();
 				}
 			}
 		}
@@ -1203,6 +1227,7 @@ namespace TEN::Gui
 
 				case PauseMenuOption::ExitToTitle:
 					SetInventoryMode(InventoryMode::None);
+					App.ResetClock = true;
 					return InventoryResult::ExitToTitle;
 					break;
 				}
@@ -1970,7 +1995,7 @@ namespace TEN::Gui
 		else if (AmmoSelectorFadeDir == 1)
 		{
 			if (AmmoSelectorFadeVal < 128)
-				AmmoSelectorFadeVal += 32;
+				AmmoSelectorFadeVal += 32 / GetSpinSpeed();
 
 			if (AmmoSelectorFadeVal > 128)
 			{
@@ -1981,7 +2006,7 @@ namespace TEN::Gui
 		else if (AmmoSelectorFadeDir == 2)
 		{
 			if (AmmoSelectorFadeVal > 0)
-				AmmoSelectorFadeVal -= 32;
+				AmmoSelectorFadeVal -= 32 / GetSpinSpeed();
 
 			if (AmmoSelectorFadeVal < 0)
 			{
@@ -2624,7 +2649,7 @@ namespace TEN::Gui
 
 	void GuiController::SpinBack(EulerAngles& orient)
 	{
-		orient.Lerp(EulerAngles::Identity, 1.0f / 8);
+		orient.Lerp(EulerAngles::Identity, 1.0f / (8.0f * GetSpinSpeed()));
 	}
 
 	void GuiController::DrawAmmoSelector()
@@ -2647,13 +2672,13 @@ namespace TEN::Gui
 				if (n == *CurrentAmmoType)
 				{
 					if (invObject->RotFlags & INV_ROT_X)
-						AmmoObjectList[n].Orientation.x += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.x += ANGLE(5.0f / GetSpinSpeed());
 
 					if (invObject->RotFlags & INV_ROT_Y)
-						AmmoObjectList[n].Orientation.y += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.y += ANGLE(5.0f / GetSpinSpeed());
 
 					if (invObject->RotFlags & INV_ROT_Z)
-						AmmoObjectList[n].Orientation.z += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.z += ANGLE(5.0f / GetSpinSpeed());
 				}
 				else
 					SpinBack(AmmoObjectList[n].Orientation);
@@ -3025,13 +3050,13 @@ namespace TEN::Gui
 				if (!i && !ring.ObjectListMovement)
 				{
 					if (invObject.RotFlags & INV_ROT_X)
-						listObject.Orientation.x += ANGLE(5.0f);
+						listObject.Orientation.x += ANGLE(5.0f / GetSpinSpeed());
 
 					if (invObject.RotFlags & INV_ROT_Y)
-						listObject.Orientation.y += ANGLE(5.0f);
+						listObject.Orientation.y += ANGLE(5.0f / GetSpinSpeed());
 
 					if (invObject.RotFlags & INV_ROT_Z)
-						listObject.Orientation.z += ANGLE(5.0f);
+						listObject.Orientation.z += ANGLE(5.0f / GetSpinSpeed());
 				}
 				else
 				{
@@ -3087,17 +3112,17 @@ namespace TEN::Gui
 				if (ring.NumObjectsInList != 1 && (ringType != RingTypes::Ammo || CombineRingFadeVal == 128))
 				{
 					if (ring.ObjectListMovement > 0)
-						ring.ObjectListMovement += ANGLE(45.0f);
+						ring.ObjectListMovement += ANGLE(45.0f / GetSpinSpeed());
 
 					if (ring.ObjectListMovement < 0)
-						ring.ObjectListMovement -= ANGLE(45.0f);
+						ring.ObjectListMovement -= ANGLE(45.0f / GetSpinSpeed());
 
 					if (IsHeld(In::Left))
 					{
 						if (!ring.ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							ring.ObjectListMovement += ANGLE(45.0f);
+							ring.ObjectListMovement += ANGLE(45.0f / GetSpinSpeed());
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
@@ -3109,7 +3134,7 @@ namespace TEN::Gui
 						if (!ring.ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							ring.ObjectListMovement -= ANGLE(45.0f);
+							ring.ObjectListMovement -= ANGLE(45.0f / GetSpinSpeed());
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
@@ -3150,6 +3175,8 @@ namespace TEN::Gui
 
 	bool GuiController::CallPause()
 	{
+		constexpr auto CONTROL_FRAME_TIME = 1000.0f / 30.0f;
+
 		g_Renderer.DumpGameScene();
 		PauseAllSounds(SoundPauseMode::Pause);
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
@@ -3160,28 +3187,110 @@ namespace TEN::Gui
 
 		bool doExitToTitle = false;
 
+		LARGE_INTEGER lastTime;
+		LARGE_INTEGER currentTime;
+		double controlLag = 0;
+		double frameTime = 0;
+
+		LARGE_INTEGER frequency;
+		QueryPerformanceFrequency(&frequency);
+		QueryPerformanceCounter(&lastTime);
+
+		int controlCalls = 0;
+		int drawCalls = 0;
+
+		bool legacy30FpsDoneDraw = false;
+
 		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
 		{
-			g_Gui.DrawInventory();
-			g_Renderer.Synchronize();
-
-			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
+			if (ThreadEnded)
 			{
-				doExitToTitle = true;
+				App.ResetClock = true;
+				return false;
+			}
+
+			if (App.ResetClock)
+			{
+				App.ResetClock = false;
+				QueryPerformanceCounter(&lastTime);
+				currentTime = lastTime;
+				controlLag = 0;
+				frameTime = 0;
+			}
+			else
+			{
+				QueryPerformanceCounter(&currentTime);
+				frameTime = (currentTime.QuadPart - lastTime.QuadPart) * 1000.0 / frequency.QuadPart;
+				lastTime = currentTime;
+				controlLag += frameTime;
+			}
+
+			while (controlLag >= CONTROL_FRAME_TIME)
+			{
+#if _DEBUG
+				constexpr auto DEBUG_SKIP_FRAMES = 10;
+
+				if (controlLag >= (DEBUG_SKIP_FRAMES * CONTROL_FRAME_TIME))
+				{
+					TENLog("Game loop is running too slow.", LogLevel::Warning);
+					App.ResetClock = true;
+					break;
+				}
+#endif
+				g_Renderer.PrepareScene();
+
+				if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
+				{
+					doExitToTitle = true;
+					break;
+				}
+
+				controlLag -= CONTROL_FRAME_TIME;
+				controlCalls++;
+
+				legacy30FpsDoneDraw = false;
+			}
+
+			if (doExitToTitle)
 				break;
+
+			if (!g_Configuration.EnableVariableFramerate)
+			{
+				if (!legacy30FpsDoneDraw)
+				{
+					g_Renderer.RenderInventory();
+					g_Renderer.Lock();
+					g_Renderer.Synchronize();
+					drawCalls++;
+					legacy30FpsDoneDraw = true;
+				}
+			}
+			else
+			{
+				g_Renderer.RenderInventory();
+				g_Renderer.Lock();
+				drawCalls++;
 			}
 		}
 
 		if (doExitToTitle)
+		{
 			StopAllSounds();
+		}
 		else
+		{
 			ResumeAllSounds(SoundPauseMode::Pause);
+		}
+
+		App.ResetClock = true;
 
 		return doExitToTitle;
 	}
 
 	bool GuiController::CallInventory(ItemInfo* item, bool resetMode)
 	{
+		constexpr auto CONTROL_FRAME_TIME = 1000.0f / 30.0f;
+
 		auto& player = GetLaraInfo(*item);
 
 		bool doLoad = false;
@@ -3196,85 +3305,149 @@ namespace TEN::Gui
 			SetInventoryMode(InventoryMode::InGame);
 
 		InitializeInventory(item);
-		Camera.numberFrames = 2;
 
+		LARGE_INTEGER lastTime;
+		LARGE_INTEGER currentTime;
+		double controlLag = 0;
+		double frameTime = 0;
+
+		LARGE_INTEGER frequency;
+		QueryPerformanceFrequency(&frequency);
+		QueryPerformanceCounter(&lastTime);
+
+		int controlCalls = 0;
+		int drawCalls = 0;
+
+		bool legacy30FpsDoneDraw = false;
 		bool exitLoop = false;
+
 		while (!exitLoop)
 		{
 			if (ThreadEnded)
+			{
+				App.ResetClock = true;
 				return false;
-
-			TimeInMenu++;
-			GameTimer++;
-
-			UpdateInputActions(item);
-
-			if (GuiIsDeselected() || IsClicked(In::Inventory))
-			{
-				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				exitLoop = true;
 			}
 
-			DrawInventory();
-			DrawCompass(item);
-
-			switch (InvMode)
+			if (App.ResetClock)
 			{
-			case InventoryMode::InGame:
-				DoInventory(item);
-				break;
+				App.ResetClock = false;
+				QueryPerformanceCounter(&lastTime);
+				currentTime = lastTime;
+				controlLag = 0;
+				frameTime = 0;
+			}
+			else
+			{
+				QueryPerformanceCounter(&currentTime);
+				frameTime = (currentTime.QuadPart - lastTime.QuadPart) * 1000.0 / frequency.QuadPart;
+				lastTime = currentTime;
+				controlLag += frameTime;
+			}
 
-			case InventoryMode::Statistics:
-				DoStatisticsMode();
-				break;
+			while (controlLag >= CONTROL_FRAME_TIME)
+			{
+#if _DEBUG
+				constexpr auto DEBUG_SKIP_FRAME_COUNT = 10;
 
-			case InventoryMode::Examine:
-				DoExamineMode();
-				break;
-
-			case InventoryMode::Diary:
-				DoDiary(item);
-				break;
-
-			case InventoryMode::Load:
-				switch (DoLoad())
+				if (controlLag >= (DEBUG_SKIP_FRAME_COUNT * CONTROL_FRAME_TIME))
 				{
-				case LoadResult::Load:
-					doLoad = true;
+					TENLog("Game loop is running too slow.", LogLevel::Warning);
+					App.ResetClock = true;
+					break;
+				}
+#endif
+				TimeInMenu++;
+				GameTimer++;
+
+				UpdateInputActions(item);
+
+				if (GuiIsDeselected() || IsClicked(In::Inventory))
+				{
+					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 					exitLoop = true;
-					break;
-
-				case LoadResult::Cancel:
-					exitLoop = !resetMode;
-
-					if (resetMode)
-						SetInventoryMode(InventoryMode::InGame);
-
-					break;
-
-				case LoadResult::None:
-					break;
 				}
 
-				break;
+				g_Renderer.PrepareScene();
 
-			case InventoryMode::Save:
-				if (DoSave())
+				switch (InvMode)
 				{
-					exitLoop = !resetMode;
-					if (resetMode)
-						SetInventoryMode(InventoryMode::InGame);
+				case InventoryMode::InGame:
+					DoInventory(item);
+					break;
+
+				case InventoryMode::Statistics:
+					DoStatisticsMode();
+					break;
+
+				case InventoryMode::Examine:
+					DoExamineMode();
+					break;
+
+				case InventoryMode::Diary:
+					DoDiary(item);
+					break;
+
+				case InventoryMode::Load:
+					switch (DoLoad())
+					{
+					case LoadResult::Load:
+						doLoad = true;
+						exitLoop = true;
+						break;
+
+					case LoadResult::Cancel:
+						exitLoop = !resetMode;
+
+						if (resetMode)
+							SetInventoryMode(InventoryMode::InGame);
+
+						break;
+
+					case LoadResult::None:
+						break;
+					}
+
+					break;
+
+				case InventoryMode::Save:
+					if (DoSave())
+					{
+						exitLoop = !resetMode;
+						if (resetMode)
+							SetInventoryMode(InventoryMode::InGame);
+					}
+
+					break;
 				}
 
-				break;
+				if (ItemUsed && NoAction())
+					exitLoop = true;
+
+				SetEnterInventory(NO_VALUE);
+				controlLag -= CONTROL_FRAME_TIME;
+				controlCalls++;
+
+				legacy30FpsDoneDraw = false;
 			}
 
-			if (ItemUsed && NoAction())
-				exitLoop = true;
-
-			SetEnterInventory(NO_VALUE);
-
-			Camera.numberFrames = g_Renderer.Synchronize();
+			if (!g_Configuration.EnableVariableFramerate)
+			{
+				if (!legacy30FpsDoneDraw)
+				{
+					g_Renderer.RenderInventory();
+					g_Renderer.Lock();
+					g_Renderer.Synchronize();
+					drawCalls++;
+					legacy30FpsDoneDraw = true;
+				}
+			}
+			else
+			{
+				g_Renderer.RenderInventory();
+				g_Renderer.Lock();
+				drawCalls++;
+			}
 		}
 
 		LastInvItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
@@ -3284,10 +3457,13 @@ namespace TEN::Gui
 			UseItem(*item, InventoryObjectTable[LastInvItem].ObjectNumber);
 
 		AlterFOV(LastFOV);
+		g_Renderer.PrepareScene();
 		ResumeAllSounds(SoundPauseMode::Inventory);
 
 		player.Inventory.IsBusy = player.Inventory.OldBusy;
 		SetInventoryMode(InventoryMode::None);
+
+		App.ResetClock = true;
 
 		return doLoad;
 	}
@@ -3331,8 +3507,8 @@ namespace TEN::Gui
 		auto needleOrient = EulerAngles(0, CompassNeedleAngle, 0);
 		needleOrient.Lerp(EulerAngles(0, item->Pose.Orientation.y, 0), LERP_ALPHA);
 
-		float wibble = std::sin(((float)(GameTimer & 0x3F) / (float)0x3F) * PI_MUL_2);
-		this->CompassNeedleAngle = needleOrient.y + ANGLE(wibble);
+		float wibble = std::sin((float(GameTimer & 0x3F) / (float)0x3F) * PI_MUL_2);
+		CompassNeedleAngle = needleOrient.y + ANGLE(wibble / 2);
 
 		// HACK: Needle is rotated in the draw function.
 		const auto& invObject = InventoryObjectTable[INV_OBJECT_COMPASS];

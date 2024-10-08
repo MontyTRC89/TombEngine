@@ -18,7 +18,10 @@ namespace TEN::Renderer
 	using namespace Utils;
 	Renderer g_Renderer;
 
-	Renderer::Renderer() : _gameCamera({0, 0, 0}, {0, 0, 1}, {0, 1, 0}, 1, 1, 0, 1, 10, 90)
+	Renderer::Renderer() :
+		_gameCamera({0, 0, 0}, {0, 0, 1}, {0, 1, 0}, 1, 1, 0, 1, 10, 90),
+		_oldGameCamera({ 0, 0, 0 }, { 0, 0, 1 }, { 0, 1, 0 }, 1, 1, 0, 1, 10, 90),
+		_currentGameCamera({ 0, 0, 0 }, { 0, 0, 1 }, { 0, 1, 0 }, 1, 1, 0, 1, 10, 90)
 	{
 	}
 
@@ -30,8 +33,6 @@ namespace TEN::Renderer
 	void Renderer::FreeRendererData()
 	{
 		_shadowLight = nullptr;
-
-		ClearSceneItems();
 
 		_moveableObjects.resize(0);
 		_staticObjects.resize(0);
@@ -55,14 +56,6 @@ namespace TEN::Renderer
 			item.ItemNumber = NO_VALUE;
 			item.LightsToDraw.clear();
 		}
-	}
-
-	void Renderer::ClearSceneItems()
-	{
-		_lines2DToDraw.clear();
-		_lines3DToDraw.clear();
-		_triangles3DToDraw.clear();
-		_gameCamera.Clear();
 	}
 
 	void Renderer::Lock()

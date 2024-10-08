@@ -133,12 +133,12 @@ void TriggerChaffSmoke(const Vector3i& pos, const Vector3i& vel, int speed, bool
 
 	smoke->blendMode = BlendMode::Additive;
 	
-	smoke->x = pos.x + (GetRandomControl() & 7) - 3;
-	smoke->y = pos.y + (GetRandomControl() & 7) - 3;
-	smoke->z = pos.z + (GetRandomControl() & 7) - 3;
-	smoke->xVel = vel.x + ((GetRandomDraw() & 63) - 32);
-	smoke->yVel = vel.y;
-	smoke->zVel = vel.z + ((GetRandomDraw() & 63) - 32);
+	smoke->position.x = pos.x + (GetRandomControl() & 7) - 3;
+	smoke->position.y = pos.y + (GetRandomControl() & 7) - 3;
+	smoke->position.z = pos.z + (GetRandomControl() & 7) - 3;
+	smoke->velocity.x = vel.x + ((GetRandomDraw() & 63) - 32);
+	smoke->velocity.y = vel.y;
+	smoke->velocity.z = vel.z + ((GetRandomDraw() & 63) - 32);
 	smoke->friction = 4;
 
 	if (GetRandomControl() & 1)
