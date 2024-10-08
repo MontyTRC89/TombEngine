@@ -227,6 +227,7 @@ static constexpr char ScriptReserved_EnablePointFilter[]		= "EnablePointFilter";
 // Flow Functions
 static constexpr char ScriptReserved_SetStrings[]			= "SetStrings";
 static constexpr char ScriptReserved_GetString[]			= "GetString";
+static constexpr char ScriptReserved_IsStringPresent[]		= "IsStringPresent";
 static constexpr char ScriptReserved_SetLanguageNames[]		= "SetLanguageNames";
 
 // Flow Tables

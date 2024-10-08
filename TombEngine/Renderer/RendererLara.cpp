@@ -85,6 +85,9 @@ void Renderer::UpdateLaraAnimations(bool force)
 	if (!force && rItem.DoneAnimations)
 		return;
 
+	if (_moveableObjects.empty())
+		return;
+
 	auto& playerObject = *_moveableObjects[ID_LARA];
 
 	// Clear extra rotations.

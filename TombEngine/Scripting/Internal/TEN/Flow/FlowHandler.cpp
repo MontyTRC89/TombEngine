@@ -248,6 +248,12 @@ You will not need to call them manually.
 */
 	tableFlow.set_function(ScriptReserved_GetString, &FlowHandler::GetString, this);
 
+/*** Check if translated string is present.
+@function IsStringPresent
+@tparam key string key for translated string
+*/
+	tableFlow.set_function(ScriptReserved_IsStringPresent, &FlowHandler::IsStringPresent, this);
+
 /*** Set language names for translations.
 Specify which translations in the strings table correspond to which languages.
 @function SetLanguageNames
@@ -371,6 +377,11 @@ char const * FlowHandler::GetString(const char* id) const
 	{
 		return _translationMap.at(std::string(id)).at(0).c_str();
 	}
+}
+
+bool FlowHandler::IsStringPresent(const char* id) const
+{
+	return _translationMap.find(id) != _translationMap.end();
 }
 
 Settings* FlowHandler::GetSettings()
