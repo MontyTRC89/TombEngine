@@ -30,7 +30,7 @@ ScriptInterfaceStringsHandler* g_GameStringsHandler;
 ScriptInterfaceFlowHandler* g_GameFlow;
 
 FlowHandler::FlowHandler(sol::state* lua, sol::table& parent) :
-	m_handler(lua)
+	_handler(lua)
 {
 /*** gameflow.lua.
 These functions are called in gameflow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
@@ -38,7 +38,7 @@ They handle a game's 'metadata'; i.e., things such as level titles, loading scre
 ambient tracks.
 @section Flowlua
 */
-	sol::table tableFlow{ m_handler.GetState()->lua_state(), sol::create };
+	sol::table tableFlow{ _handler.GetState()->lua_state(), sol::create };
 	parent.set(ScriptReserved_Flow, tableFlow);
 
 /***
@@ -77,21 +77,23 @@ Must be true or false
 */
 	tableFlow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
 
-	/*** Enable or disable saving and loading of savegames.
-	@function EnableLoadSave
-	@tparam bool enabled true or false.
-	*/
+	/// Enable or disable Home Level entry in the main menu.
+	// @function EnableHomeLevel()
+	// @tparam bool enabled True or false.
+	tableFlow.set_function(ScriptReserved_EnableHomeLevel, &FlowHandler::EnableHomeLevel, this);
+
+	/// Enable or disable saving and loading of savegames.
+	// @function EnableLoadSave()
+	// @tparam bool enabled True or false.
 	tableFlow.set_function(ScriptReserved_EnableLoadSave, &FlowHandler::EnableLoadSave, this);
 
 /*** gameflow.lua or level scripts.
 @section FlowluaOrScripts
 */
 
-/*** Enable or disable DOZY mode (fly cheat).
-Must be true or false
-@function EnableFlyCheat
-@tparam bool enabled true or false
-*/
+	/// Enable or disable the fly cheat.
+	// @function EnableFlyCheat()
+	// @tparam bool enabled True or false.
 	tableFlow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
 
 /*** Enable or disable point texture filter.
@@ -246,6 +248,12 @@ You will not need to call them manually.
 */
 	tableFlow.set_function(ScriptReserved_GetString, &FlowHandler::GetString, this);
 
+/*** Check if translated string is present.
+@function IsStringPresent
+@tparam key string key for translated string
+*/
+	tableFlow.set_function(ScriptReserved_IsStringPresent, &FlowHandler::IsStringPresent, this);
+
 /*** Set language names for translations.
 Specify which translations in the strings table correspond to which languages.
 @function SetLanguageNames
@@ -265,12 +273,12 @@ Specify which translations in the strings table correspond to which languages.
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
 	
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
-	m_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameStatus, GAME_STATUSES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameStatus, GAME_STATUSES);
 }
 
 FlowHandler::~FlowHandler()
@@ -281,35 +289,35 @@ FlowHandler::~FlowHandler()
 
 std::string FlowHandler::GetGameDir()
 {
-	return m_gameDir;
+	return _gameDir;
 }
 
 void FlowHandler::SetGameDir(const std::string& assetDir)
 {
-	m_gameDir = assetDir;
+	_gameDir = assetDir;
 }
 
 void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>>&& src)
 {
-	m_languageNames = std::move(src);
+	_languageNames = std::move(src);
 }
 
 void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src)
 {
-	if (m_translationsMap.empty())
+	if (_translationMap.empty())
 	{
-		m_translationsMap = std::move(src);
+		_translationMap = std::move(src);
 	}
 	else
 	{
 		for (auto& stringPair : src.value())
-			m_translationsMap.insert_or_assign(stringPair.first, stringPair.second);
+			_translationMap.insert_or_assign(stringPair.first, stringPair.second);
 	}
 }
 
 void FlowHandler::SetSettings(Settings const & src)
 {
-	m_settings = src;
+	_settings = src;
 }
 
 void FlowHandler::SetAnimations(Animations const& src)
@@ -339,10 +347,10 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 
 void FlowHandler::LoadFlowScript()
 {
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Gameflow.lua");
-	m_handler.ExecuteScript(m_gameDir + "Scripts/SystemStrings.lua", true);
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Strings.lua", true);
-	m_handler.ExecuteScript(m_gameDir + "Scripts/Settings.lua", true);
+	_handler.ExecuteScript(_gameDir + "Scripts/Gameflow.lua");
+	_handler.ExecuteScript(_gameDir + "Scripts/SystemStrings.lua", true);
+	_handler.ExecuteScript(_gameDir + "Scripts/Strings.lua", true);
+	_handler.ExecuteScript(_gameDir + "Scripts/Settings.lua", true);
 
 	SetScriptErrorMode(GetSettings()->ErrorMode);
 	
@@ -359,19 +367,24 @@ void FlowHandler::LoadFlowScript()
 
 char const * FlowHandler::GetString(const char* id) const
 {
-	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
+	if (!ScriptAssert(_translationMap.find(id) != _translationMap.end(), std::string{ "Couldn't find string " } + id))
 	{
 		return id;
 	}
 	else
 	{
-		return m_translationsMap.at(std::string(id)).at(0).c_str();
+		return _translationMap.at(std::string(id)).at(0).c_str();
 	}
+}
+
+bool FlowHandler::IsStringPresent(const char* id) const
+{
+	return _translationMap.find(id) != _translationMap.end();
 }
 
 Settings* FlowHandler::GetSettings()
 {
-	return &m_settings;
+	return &_settings;
 }
 
 Level* FlowHandler::GetLevel(int id)
@@ -537,9 +550,9 @@ bool FlowHandler::IsFlyCheatEnabled() const
 	return FlyCheat;
 }
 
-void FlowHandler::EnableFlyCheat(bool flyCheat)
+void FlowHandler::EnableFlyCheat(bool enable)
 {
-	FlyCheat = flyCheat;
+	FlyCheat = enable;
 }
 
 bool FlowHandler::IsPointFilterEnabled() const
@@ -547,9 +560,9 @@ bool FlowHandler::IsPointFilterEnabled() const
 	return PointFilter;
 }
 
-void FlowHandler::EnablePointFilter(bool pointFilter)
+void FlowHandler::EnablePointFilter(bool enable)
 {
-	PointFilter = pointFilter;
+	PointFilter = enable;
 }
 
 bool FlowHandler::IsMassPickupEnabled() const
@@ -557,9 +570,9 @@ bool FlowHandler::IsMassPickupEnabled() const
 	return MassPickup;
 }
 
-void FlowHandler::EnableMassPickup(bool massPickup)
+void FlowHandler::EnableMassPickup(bool enable)
 {
-	MassPickup = massPickup;
+	MassPickup = enable;
 }
 
 bool FlowHandler::IsLaraInTitleEnabled() const
@@ -567,14 +580,24 @@ bool FlowHandler::IsLaraInTitleEnabled() const
 	return LaraInTitle;
 }
 
-void FlowHandler::EnableLaraInTitle(bool laraInTitle)
+void FlowHandler::EnableLaraInTitle(bool enable)
 {
-	LaraInTitle = laraInTitle;
+	LaraInTitle = enable;
 }
 
-void FlowHandler::EnableLevelSelect(bool levelSelect)
+void FlowHandler::EnableLevelSelect(bool enable)
 {
-	LevelSelect = levelSelect;
+	LevelSelect = enable;
+}
+
+bool FlowHandler::IsHomeLevelEnabled() const
+{
+	return HomeLevel;
+}
+
+void FlowHandler::EnableHomeLevel(bool enable)
+{
+	HomeLevel = enable;
 }
 
 bool FlowHandler::IsLoadSaveEnabled() const
@@ -582,9 +605,9 @@ bool FlowHandler::IsLoadSaveEnabled() const
 	return LoadSave;
 }
 
-void FlowHandler::EnableLoadSave(bool loadSave)
+void FlowHandler::EnableLoadSave(bool enable)
 {
-	LoadSave = loadSave;
+	LoadSave = enable;
 }
 
 void FlowHandler::PrepareInventoryObjects()
@@ -674,9 +697,17 @@ bool FlowHandler::DoFlow()
 			break;
 
 		case GameStatus::NewGame:
-			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
+			// NOTE: 0 reserved for title level and 1 reserved for home level.
+			CurrentLevel = (SelectedLevelForNewGame != 0) ? SelectedLevelForNewGame : (IsHomeLevelEnabled() ? 2 : 1);
+
 			RequiredStartPos = 0;
 			SelectedLevelForNewGame = 0;
+			InitializeGame = true;
+			break;
+
+		case GameStatus::HomeLevel:
+			CurrentLevel = 1;
+			RequiredStartPos = 0;
 			InitializeGame = true;
 			break;
 

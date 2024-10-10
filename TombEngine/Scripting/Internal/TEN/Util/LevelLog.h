@@ -2,7 +2,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "Game/debug/debug.h"
+#include "Game/Debug/Debug.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 
 /***

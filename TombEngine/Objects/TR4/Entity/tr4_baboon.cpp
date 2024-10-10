@@ -2,6 +2,7 @@
 #include "Objects/TR4/Entity/tr4_baboon.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/control/control.h"
@@ -15,6 +16,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math;
 
@@ -512,9 +514,9 @@ namespace TEN::Entities::TR4
 
 					pos.y = item->Pose.Position.y;
 
-					auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
-					item->Floor = probe.Position.Floor;
-					TestTriggers(pos.x, pos.y, pos.z, probe.RoomNumber, true);
+					auto probe = GetPointCollision(pos, item->RoomNumber);
+					item->Floor = probe.GetFloorHeight();
+					TestTriggers(pos.x, pos.y, pos.z, probe.GetRoomNumber(), true);
 					item->TriggerFlags = 1;
 				}
 

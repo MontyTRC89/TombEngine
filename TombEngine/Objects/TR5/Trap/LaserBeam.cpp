@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
@@ -14,12 +15,13 @@
 #include "Renderer/Renderer.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 
-namespace TEN::Traps::TR5
+namespace TEN::Entities::Traps
 {
 	constexpr auto LASER_BEAM_LIGHT_INTENSITY	  = 0.2f;
 	constexpr auto LASER_BEAM_LIGHT_AMPLITUDE_MAX = 0.1f;
@@ -87,7 +89,7 @@ namespace TEN::Traps::TR5
 		auto origin = GameVector(item.Pose.Position, item.RoomNumber);
 		auto target = GameVector(
 			Geometry::TranslatePoint(origin.ToVector3(), dir, MAX_VISIBILITY_DISTANCE),
-			GetCollision(origin.ToVector3i(), origin.RoomNumber, dir, MAX_VISIBILITY_DISTANCE).RoomNumber);
+			GetPointCollision(origin.ToVector3i(), origin.RoomNumber, dir, MAX_VISIBILITY_DISTANCE).GetRoomNumber());
 
 		// Hit wall; spawn sparks and light.
 		if (!LOS(&origin, &target))
@@ -192,9 +194,9 @@ namespace TEN::Traps::TR5
 		auto rotMatrix = EulerAngles(item.Pose.Orientation.x + ANGLE(180.0f), item.Pose.Orientation.y, item.Pose.Orientation.z);
 		auto target = GameVector(Geometry::TranslatePoint(origin.ToVector3(), rotMatrix, MAX_VISIBILITY_DISTANCE), 0);
 
-		auto pointColl = GetCollision(target.ToVector3i(),item.RoomNumber);
-		if (pointColl.RoomNumber != target.RoomNumber)
-			target.RoomNumber = pointColl.RoomNumber;
+		auto pointColl = GetPointCollision(target.ToVector3i(), item.RoomNumber);
+		if (pointColl.GetRoomNumber() != target.RoomNumber)
+			target.RoomNumber = pointColl.GetRoomNumber();
 
 		bool los2 = LOS(&origin, &target);
 

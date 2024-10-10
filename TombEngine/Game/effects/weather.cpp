@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/tomb4fx.h"
@@ -13,6 +14,7 @@
 #include "Specific/level.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Math::Random;
 
@@ -278,19 +280,19 @@ namespace TEN::Effects::Environment
 			if (p.Type == WeatherType::None)
 				continue;
 
-			CollisionResult coll;
+			auto pointColl = GetPointCollision(p.Position, p.Room);
 			bool collisionCalculated = false;
 
 			if (p.CollisionCheckDelay <= 0)
 			{
-				coll = GetCollision(p.Position.x, p.Position.y, p.Position.z, p.Room);
+				pointColl = GetPointCollision(p.Position, p.Room);
 
 				// Determine collision checking frequency based on nearest floor/ceiling surface position.
 				// If floor and ceiling is too far, don't do precise collision checks, instead doing it 
 				// every 5th frame. If particle approaches floor or ceiling, make checks more frequent.
 				// This allows to avoid unnecessary thousands of calls to GetCollisionResult for every particle.
 				
-				auto coeff = std::min(std::max(0.0f, (coll.Position.Floor - p.Position.y)), std::max(0.0f, (p.Position.y - coll.Position.Ceiling)));
+				auto coeff = std::min(std::max(0.0f, (pointColl.GetFloorHeight() - p.Position.y)), std::max(0.0f, (p.Position.y - pointColl.GetCeilingHeight())));
 				p.CollisionCheckDelay = std::min(floor(coeff / std::max(std::numeric_limits<float>::denorm_min(), p.Velocity.y)), WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY);
 				collisionCalculated = true;
 			}
@@ -305,17 +307,19 @@ namespace TEN::Effects::Environment
 			{
 				if (!collisionCalculated)
 				{
-					coll = GetCollision(p.Position.x, p.Position.y, p.Position.z, p.Room);
+					pointColl = GetPointCollision(p.Position, p.Room);
 					collisionCalculated = true;
 				}
 
-				if (coll.RoomNumber == p.Room)
+				if (pointColl.GetRoomNumber() == p.Room)
 				{
 					p.Enabled = false; // Not landed on door, so out of room bounds - delete
 					continue;
 				}
 				else
-					p.Room = coll.RoomNumber;
+				{
+					p.Room = pointColl.GetRoomNumber();
+				}
 			}
 
 			// If collision was updated, process with position checks.
@@ -325,8 +329,8 @@ namespace TEN::Effects::Environment
 				// If particle is inside water or swamp, count it as "inSubstance".
 				// If particle got below floor or above ceiling, count it as "landed".
 
-				bool inSubstance = g_Level.Rooms[coll.RoomNumber].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
-				bool landed = (coll.Position.Floor <= p.Position.y) || (coll.Position.Ceiling >= p.Position.y);
+				bool inSubstance = g_Level.Rooms[pointColl.GetRoomNumber()].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
+				bool landed = (pointColl.GetFloorHeight() <= p.Position.y) || (pointColl.GetCeilingHeight() >= p.Position.y);
 
 				if (inSubstance || landed)
 				{
@@ -478,9 +482,9 @@ namespace TEN::Effects::Environment
 				if (g_Level.Rooms[outsideRoom].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP))
 					continue;
 
-				auto coll = GetCollision(xPos, yPos, zPos, outsideRoom);
+				auto pointColl = GetPointCollision(Vector3i(xPos, yPos, zPos), outsideRoom);
 
-				if (!(coll.Position.Ceiling < yPos || coll.Block->GetNextRoomNumber(Vector3i(xPos, yPos, zPos), false).has_value()))
+				if (!(pointColl.GetCeilingHeight() < yPos || pointColl.GetSector().GetNextRoomNumber(Vector3i(xPos, yPos, zPos), false).has_value()))
 					continue;
 
 				auto part = WeatherParticle();

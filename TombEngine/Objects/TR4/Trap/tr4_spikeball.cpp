@@ -1,43 +1,46 @@
 #include "framework.h"
-#include "tr4_spikeball.h"
-#include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Objects/TR4/Trap/tr4_spikeball.h"
+
 #include "Game/animation.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
+#include "Specific/level.h"
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-	void SpikeballControl(short itemNumber)
+	void ControlSpikeball(short itemNumber)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 
-		if (TriggerActive(item))
+		if (TriggerActive(&item))
 		{
-			int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+			int frameNumber = item.Animation.FrameNumber - GetAnimData(item).frameBase;
 
 			if ((frameNumber <= 14 || frameNumber >= 24) &&
 				(frameNumber < 138 || frameNumber > 140))
 			{
 				if (frameNumber < 141)
-					*((int*)&item->ItemFlags[0]) = 0;
+				{
+					*((int*)&item.ItemFlags[0]) = 0;
+				}
 				else
 				{
-					item->ItemFlags[3] = 50;
-					*((int*)&item->ItemFlags[0]) = 0x7FF800;
+					item.ItemFlags[3] = 50;
+					*((int*)&item.ItemFlags[0]) = 0x7FF800;
 				}
 			}
 			else
 			{
-				item->ItemFlags[3] = 150;
-				*((int*)&item->ItemFlags[0]) = 0x7FF800;
+				item.ItemFlags[3] = 150;
+				*((int*)&item.ItemFlags[0]) = 0x7FF800;
 			}
 
-			AnimateItem(item);
+			AnimateItem(&item);
 		}
 		else
 		{
-			item->Animation.FrameNumber = GetAnimData(item).frameBase;
-			*((int*)&item->ItemFlags[0]) = 0;
+			item.Animation.FrameNumber = GetAnimData(item).frameBase;
+			*((int*)&item.ItemFlags[0]) = 0;
 		}
 	}
 }

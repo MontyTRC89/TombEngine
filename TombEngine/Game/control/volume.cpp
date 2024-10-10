@@ -10,11 +10,7 @@
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
-#include "Renderer/Renderer.h"
-#include "Renderer/RendererEnums.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
-
-using TEN::Renderer::g_Renderer;
 
 namespace TEN::Control::Volumes
 {
@@ -30,7 +26,7 @@ namespace TEN::Control::Volumes
 		case VolumeType::Box:
 			if (roomNumber == Camera.pos.RoomNumber)
 			{
-				g_Renderer.AddDebugBox(volume.Box, 
+				DrawDebugBox(volume.Box, 
 					Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);
 			}
 			return volume.Box.Intersects(box);
@@ -38,7 +34,7 @@ namespace TEN::Control::Volumes
 		case VolumeType::Sphere:
 			if (roomNumber == Camera.pos.RoomNumber)
 			{
-				g_Renderer.AddDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, 
+				DrawDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, 
 					Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);
 			}
 			return volume.Sphere.Intersects(box);
@@ -49,7 +45,7 @@ namespace TEN::Control::Volumes
 		}
 	}
 
-	BoundingOrientedBox ConstructRoughBox(ItemInfo& item, const CollisionSetup& coll)
+	BoundingOrientedBox ConstructRoughBox(ItemInfo& item, const CollisionSetupData& coll)
 	{
 		auto pBounds = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 		auto pos = Vector3(item.Pose.Position.x, pBounds.Center.y, item.Pose.Position.z);
@@ -89,14 +85,16 @@ namespace TEN::Control::Volumes
 		return nullptr;
 	}
 
-	void HandleEvent(Event& event, Activator& activator)
+	bool HandleEvent(Event& event, Activator& activator)
 	{
 		if (event.Function.empty() || event.CallCounter == 0 || event.CallCounter < NO_CALL_COUNTER)
-			return;
+			return false;
 
 		g_GameScript->ExecuteFunction(event.Function, activator, event.Data);
 		if (event.CallCounter != NO_CALL_COUNTER)
 			event.CallCounter--;
+
+		return true;
 	}
 
 	bool HandleEvent(const std::string& name, EventType eventType, Activator activator)
@@ -141,14 +139,14 @@ namespace TEN::Control::Volumes
 		if (roomNumber == NO_VALUE)
 			return;
 
-		for (int currentRoomIndex : g_Level.Rooms[roomNumber].neighbors)
+		for (int currentRoomIndex : g_Level.Rooms[roomNumber].NeighborRoomNumbers)
 		{
 			auto& room = g_Level.Rooms[currentRoomIndex];
 
 			if (!room.Active())
 				continue;
 
-			for (auto& volume : room.triggerVolumes)
+			for (auto& volume : room.TriggerVolumes)
 			{
 				if (!volume.Enabled)
 					continue;
@@ -244,13 +242,13 @@ namespace TEN::Control::Volumes
 		TestVolumes(roomNumber, box, ActivatorFlags::Static, mesh);
 	}
 
-	void TestVolumes(short itemNumber, const CollisionSetup* coll)
+	void TestVolumes(short itemNumber, const CollisionSetupData* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		auto box = (coll != nullptr) ?
 			ConstructRoughBox(item, *coll) : GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
-		g_Renderer.AddDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
+		DrawDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
 
 		if (item.IsLara() || item.Index == Lara.Context.Vehicle)
 		{

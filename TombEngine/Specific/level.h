@@ -107,8 +107,8 @@ struct LEVEL
 	std::vector<SinkInfo>  Sinks	 = {};
 
 	// Pathfinding data
-	std::vector<BOX_INFO> Boxes	   = {};
-	std::vector<OVERLAP>  Overlaps = {};
+	std::vector<BOX_INFO> PathfindingBoxes				   = {};
+	std::vector<OVERLAP>  Overlaps						   = {};
 	std::vector<int>	  Zones[(int)ZoneType::MaxZone][2] = {};
 
 	// Sound data

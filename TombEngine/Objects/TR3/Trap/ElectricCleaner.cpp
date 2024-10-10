@@ -2,6 +2,8 @@
 #include "Objects/TR3/Trap/ElectricCleaner.h"
 
 #include "Game/collision/collide_item.h"
+#include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/spark.h"
@@ -10,6 +12,8 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 
+using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 
@@ -72,13 +76,13 @@ namespace TEN::Entities::Traps
 
 	static Vector3 GetElectricCleanerMovementDirection(const ItemInfo& item, const Vector3& dir0, const Vector3& dir1, const Vector3& dir2)
 	{
-		if (IsNextSectorValid(item, dir0, BLOCK(1)))
+		if (IsNextSectorValid(item, dir0, BLOCK(1), false))
 			return dir0;
 
-		if (IsNextSectorValid(item, dir1, BLOCK(1)))
+		if (IsNextSectorValid(item, dir1, BLOCK(1), false))
 			return dir1;
 
-		if (IsNextSectorValid(item, dir2, BLOCK(1)))
+		if (IsNextSectorValid(item, dir2, BLOCK(1), false))
 			return dir2;
 
 		return Vector3::Zero;
@@ -110,7 +114,7 @@ namespace TEN::Entities::Traps
 		auto collObjects = GetCollidedObjects(item, true, true);
 		if (!collObjects.IsEmpty())
 		{
-			for (auto* itemPtr : collObjects.ItemPtrs)
+			for (auto* itemPtr : collObjects.Items)
 			{
 				const auto& object = Objects[itemPtr->ObjectNumber];
 
@@ -226,8 +230,8 @@ namespace TEN::Entities::Traps
 
 		case ElectricCleanerState::MOVE:
 			{
-				auto pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
-				item.Pose.Position.y = pointColl.Position.Floor;
+				auto pointColl = GetPointCollision(item);
+				item.Pose.Position.y = pointColl.GetFloorHeight();
 
 				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y, 0).ToDirection();
 
@@ -238,7 +242,7 @@ namespace TEN::Entities::Traps
 					(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
 				{
 					// Only turn on flat floor.
-					if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
+					if (pointColl.GetFloorNormal() == -Vector3::UnitY)
 						activeState = ElectricCleanerState::CHOOSE_PATH;
 				}
 			}
@@ -323,7 +327,7 @@ namespace TEN::Entities::Traps
 
 		AnimateItem(&item);
 
-		int probedRoomNumber = GetCollision(&item).RoomNumber;
+		int probedRoomNumber = GetPointCollision(item).GetRoomNumber();
 		if (item.RoomNumber != probedRoomNumber)
 			ItemNewRoom(itemNumber, probedRoomNumber);
 

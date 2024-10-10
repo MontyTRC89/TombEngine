@@ -44,7 +44,7 @@ void Volume::Register(sol::table& parent)
 		ScriptReserved_Disable, &Volume::Disable,
 		ScriptReserved_ClearActivators, &Volume::ClearActivators,
 
-		ScriptReserved_GetName, &Volume::GetActive,
+		ScriptReserved_GetActive, &Volume::GetActive,
 		ScriptReserved_IsMoveableInside, &Volume::IsMoveableInside);
 }
 

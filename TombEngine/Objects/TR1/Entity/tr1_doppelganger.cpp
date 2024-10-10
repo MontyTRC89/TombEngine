@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
 #include "Game/items.h"
@@ -10,6 +11,8 @@
 #include "Game/Lara/lara_fire.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::Point;
 
 namespace TEN::Entities::Creatures::TR1
 {
@@ -53,14 +56,14 @@ namespace TEN::Entities::Creatures::TR1
 		{
 		case 0:
 		{
-			int laraFloorHeight = GetCollision(LaraItem).Position.Floor;
+			int laraFloorHeight = GetPointCollision(*LaraItem).GetFloorHeight();
 
 			// Get floor heights for comparison.
 			auto pos = Vector3i(
 				(referencePtr->Pose.Position.x * 2) - LaraItem->Pose.Position.x,
 				LaraItem->Pose.Position.y,
 				(referencePtr->Pose.Position.z * 2) - LaraItem->Pose.Position.z);
-			item.Floor = GetCollision(pos.x, pos.y, pos.z, item.RoomNumber).Position.Floor;
+			item.Floor = GetPointCollision(pos, item.RoomNumber).GetFloorHeight();
 
 			// Animate doppelganger, mirroring player's position.
 			item.Animation.AnimNumber = LaraItem->Animation.AnimNumber;
@@ -110,7 +113,7 @@ namespace TEN::Entities::Creatures::TR1
 			}
 
 			TestTriggers(&item, true);
-			item.Floor = GetCollision(&item).Position.Floor;
+			item.Floor = GetPointCollision(item).GetFloorHeight();
 
 			if (item.Pose.Position.y >= item.Floor)
 			{
@@ -134,7 +137,7 @@ namespace TEN::Entities::Creatures::TR1
 			break;
 		}
 
-		ItemNewRoom(itemNumber, GetCollision(&item).RoomNumber);
+		ItemNewRoom(itemNumber, GetPointCollision(item).GetRoomNumber());
 		AnimateItem(&item);
 	}
 }

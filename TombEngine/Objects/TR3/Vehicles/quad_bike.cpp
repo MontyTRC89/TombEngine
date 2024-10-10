@@ -3,8 +3,9 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/tomb4fx.h"
@@ -22,6 +23,7 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -236,19 +238,19 @@ namespace TEN::Entities::Vehicles
 		int y = quadBikeItem->Pose.Position.y;
 		int z = quadBikeItem->Pose.Position.z + CLICK(2) * phd_cos(angle);
 
-		auto collResult = GetCollision(x, y, z, quadBikeItem->RoomNumber);
+		auto pointColl = GetPointCollision(Vector3i(x, y, z), quadBikeItem->RoomNumber);
 
-		if (collResult.Position.FloorSlope ||
-			collResult.Position.Floor == NO_HEIGHT)
+		if (pointColl.IsSteepFloor() ||
+			pointColl.GetFloorHeight() == NO_HEIGHT)
 		{
 			return false;
 		}
 
-		if (abs(collResult.Position.Floor - quadBikeItem->Pose.Position.y) > CLICK(2))
+		if (abs(pointColl.GetFloorHeight() - quadBikeItem->Pose.Position.y) > CLICK(2))
 			return false;
 
-		if ((collResult.Position.Ceiling - quadBikeItem->Pose.Position.y) > -LARA_HEIGHT ||
-			(collResult.Position.Floor - collResult.Position.Ceiling) < LARA_HEIGHT)
+		if ((pointColl.GetCeilingHeight() - quadBikeItem->Pose.Position.y) > -LARA_HEIGHT ||
+			(pointColl.GetFloorHeight() - pointColl.GetCeilingHeight()) < LARA_HEIGHT)
 		{
 			return false;
 		}
@@ -343,7 +345,6 @@ namespace TEN::Entities::Vehicles
 
 	static int DoQuadShift(ItemInfo* quadBikeItem, Vector3i* pos, Vector3i* old)
 	{
-		CollisionResult probe;
 		int x = pos->x / BLOCK(1);
 		int z = pos->z / BLOCK(1);
 		int oldX = old->x / BLOCK(1);
@@ -387,8 +388,8 @@ namespace TEN::Entities::Vehicles
 			x = 0;
 			z = 0;
 
-			probe = GetCollision(old->x, pos->y, pos->z, quadBikeItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			auto pointColl = GetPointCollision(Vector3i(old->x, pos->y, pos->z), quadBikeItem->RoomNumber);
+			if (pointColl.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->z > old->z)
 					z = -shiftZ - 1;
@@ -396,8 +397,8 @@ namespace TEN::Entities::Vehicles
 					z = BLOCK(1) - shiftZ;
 			}
 
-			probe = GetCollision(pos->x, pos->y, old->z, quadBikeItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			pointColl = GetPointCollision(Vector3i(pos->x, pos->y, old->z), quadBikeItem->RoomNumber);
+			if (pointColl.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->x > old->x)
 					x = -shiftX - 1;
@@ -536,9 +537,9 @@ namespace TEN::Entities::Vehicles
 		else
 			quadBikeItem->Pose.Orientation.y += quadBike->TurnRate + quadBike->ExtraRotation;
 
-		auto probe = GetCollision(quadBikeItem);
+		auto probe = GetPointCollision(*quadBikeItem);
 		int speed = 0;
-		if (quadBikeItem->Pose.Position.y >= probe.Position.Floor)
+		if (quadBikeItem->Pose.Position.y >= probe.GetFloorHeight())
 			speed = quadBikeItem->Animation.Velocity.z * phd_cos(quadBikeItem->Pose.Orientation.x);
 		else
 			speed = quadBikeItem->Animation.Velocity.z;
@@ -635,8 +636,8 @@ namespace TEN::Entities::Vehicles
 				rot += rotAdd;
 		}
 
-		probe = GetCollision(quadBikeItem);
-		if (probe.Position.Floor < quadBikeItem->Pose.Position.y - CLICK(1))
+		probe = GetPointCollision(*quadBikeItem);
+		if (probe.GetFloorHeight() < quadBikeItem->Pose.Position.y - CLICK(1))
 			DoQuadShift(quadBikeItem, (Vector3i*)&quadBikeItem->Pose, &old);
 
 		quadBike->ExtraRotation = rot;
@@ -1094,7 +1095,7 @@ namespace TEN::Entities::Vehicles
 
 		bool collide = QuadDynamics(quadBikeItem, laraItem);
 
-		auto probe = GetCollision(quadBikeItem);
+		auto probe = GetPointCollision(*quadBikeItem);
 
 		Vector3i frontLeft, frontRight;
 		auto floorHeightLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false, &frontLeft);
@@ -1129,7 +1130,7 @@ namespace TEN::Entities::Vehicles
 				break;
 
 			default:
-				drive = QuadUserControl(quadBikeItem, probe.Position.Floor, &pitch);
+				drive = QuadUserControl(quadBikeItem, probe.GetFloorHeight(), &pitch);
 				HandleVehicleSpeedometer(quadBikeItem->Animation.Velocity.z, MAX_VELOCITY / (float)VEHICLE_VELOCITY_SCALE);
 				break;
 			}
@@ -1153,7 +1154,7 @@ namespace TEN::Entities::Vehicles
 			quadBike->Pitch = 0;
 		}
 
-		quadBikeItem->Floor = probe.Position.Floor;
+		quadBikeItem->Floor = probe.GetFloorHeight();
 
 		short rotAdd = quadBike->Velocity / 4;
 		quadBike->RearRot -= rotAdd;
@@ -1162,22 +1163,22 @@ namespace TEN::Entities::Vehicles
 
 		quadBike->LeftVerticalVelocity = DoQuadDynamics(floorHeightLeft, quadBike->LeftVerticalVelocity, (int*)&frontLeft.y);
 		quadBike->RightVerticalVelocity = DoQuadDynamics(floorHeightRight, quadBike->RightVerticalVelocity, (int*)&frontRight.y);
-		quadBikeItem->Animation.Velocity.y = DoQuadDynamics(probe.Position.Floor, quadBikeItem->Animation.Velocity.y, (int*)&quadBikeItem->Pose.Position.y);
+		quadBikeItem->Animation.Velocity.y = DoQuadDynamics(probe.GetFloorHeight(), quadBikeItem->Animation.Velocity.y, (int*)&quadBikeItem->Pose.Position.y);
 		quadBike->Velocity = DoVehicleWaterMovement(quadBikeItem, laraItem, quadBike->Velocity, QBIKE_RADIUS, &quadBike->TurnRate, QBIKE_WAKE_OFFSET);
 
-		probe.Position.Floor = (frontLeft.y + frontRight.y) / 2;
-		short xRot = phd_atan(QBIKE_FRONT, quadBikeItem->Pose.Position.y - probe.Position.Floor);
-		short zRot = phd_atan(QBIKE_SIDE, probe.Position.Floor - frontLeft.y);
+		int floorHeight = (frontLeft.y + frontRight.y) / 2;
+		short xRot = phd_atan(QBIKE_FRONT, quadBikeItem->Pose.Position.y - floorHeight);
+		short zRot = phd_atan(QBIKE_SIDE, floorHeight - frontLeft.y);
 
 		quadBikeItem->Pose.Orientation.x += ((xRot - quadBikeItem->Pose.Orientation.x) / 2);
 		quadBikeItem->Pose.Orientation.z += ((zRot - quadBikeItem->Pose.Orientation.z) / 2);
 
 		if (!(quadBike->Flags & QBIKE_FLAG_DEAD))
 		{
-			if (probe.RoomNumber != quadBikeItem->RoomNumber)
+			if (probe.GetRoomNumber() != quadBikeItem->RoomNumber)
 			{
-				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(laraItem->Index, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
+				ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 			}
 
 			laraItem->Pose = quadBikeItem->Pose;

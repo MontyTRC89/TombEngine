@@ -1,8 +1,73 @@
 # Changelog
 
-Here you will find the full changelog of TEN's releases from Version 1.0 and up 
+Here you will find the full changelog of TEN's releases from Version 1.0 and up
 
 The dates are in European standard format where date is presented as **YYYY-MM-DD**
+
+TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
+
+## Version 1.5 - xxxx-xx-xx
+
+### Bug fixes
+* Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
+* Fixed leveljump vehicle transfer.
+* Fixed sarcophagus pick-ups.
+* Fixed several binocular bugs.
+* Fixed incorrect climbing out of water on bridge objects.
+* Fixed faulty death sectors.
+* Fixed incorrect diving animation when swandiving from a high place.
+* Fixed camera rotating with the player's hips when climbing out of water.
+* Fixed AI for TR2 skidoo driver and worker with shotgun.
+* Fixed ember emitter crashing when ocb is between -1 and -10.
+* Fixed electric cleaner and squishy block not detecting collision with certain block heights.
+* Fixed squishy blocks crashing the level.
+* Fixed Larson and Pierre pathfinding.
+* Fixed torch flame delay when the player throws or drops a torch.
+* Fixed dart emitters failing with antitrigger.
+* Fixed homing dart emitter spawning darts continously when player is on its trigger.
+* Fixed four blade trap floor and ceiling collision.
+* Fixed Joby spikes collision and deformation.
+* Fixed sentry gun joint rotation.
+* Fixed teeth spikes not triggering the player impale animation.
+* Fixed TR4 mine crash with OCB 1 when triggered.
+* Fixed cases where Atlantean mutant's bombs cause the game to crash.
+* Fixed young Lara hair drawing. https://tombengine.com/docs/level-settings/#young_lara
+
+### Features/Amendments
+
+* Added variable framerate , that allows the engine to run at an unlocked framerate for a much smoother experience. Setting can be toggled on or off in the graphical settings menu.
+* Added a customisable global lensflare effect. https://tombengine.com/docs/level-settings/#lensflare
+* Added a customisable starry sky and meteor effect (based on TR5). https://tombengine.com/docs/level-settings/#stars
+* Added the ability to display "Lara's Home" entry in the main menu.
+* Added F12 as alternative to PrtSc for screenshots.
+* Added option to enable or disable menu option looping.
+  - Menu scrolling using held inputs will stop at the last option until a new input is made.
+* Added TR3 seal mutant. https://tombengine.com/docs/ocb-and-setup-instructions/#sealmutant
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Seal_Mutant.wad2
+* Add new sound conditions: Quicksand and Underwater.
+  - Quicksand - sound effect plays when a moveable is in quicksand.
+  - Underwater - sound plays when the camera is submerged.
+* Added TR4 Enemy_Jeep https://tombengine.com/docs/ocb-and-setup-instructions/#enemy_jeep
+* Changed Rome Hammer to not hurt player whilst deactivated.
+* Changed Statue with blade damage, from 20 to 200.
+* Changed sound effect that is triggered when using the `level.rumble` feature in a level. Sound effect now part of the default soundmap (ID 359) and additional hardcoded pitch shift has been removed.
+* Changed Water sound condition to ShallowWater.
+* Enhanced Rolling Spindle detection to avoid them going down through pits.
+* Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
+* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing-dart emitter ).
+* Enhanced raptor behaviour and handling. https://tombengine.com/docs/ocb-and-setup-instructions/#raptor 
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
+	
+### Lua API changes
+
+* Added Flow.EnableHomeLevel() function.
+* Added Flow.IsStringPresent() function.
+* Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
+* Added Flow.LensFlare() and Flow.Starfield() classes.
+* Added Input.KeyClearAll() function.
+* Added Room:GetRoomNumber() function.
+* Removed anims.monkeyAutoJump. It is now a player menu configuration.
+* Fixed Volume:GetActive() method.
 
 ## [Version 1.4](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.1) - 2024-04-21
 
@@ -133,24 +198,24 @@ The dates are in European standard format where date is presented as **YYYY-MM-D
 ### Features/Amendments
 * Improve head-on wall collision.
 * Overhaul pushables:
- - Separate climbable and non-climbable pushable object slots.
- - Add new pushable OCB to manipulate pushable properties.
- - Add new animations for pushing pushables off edgees (TR1-3 and TR4-5 versions).
- - Fix pushables not working with raising blocks.
- - Fix miscellaneous pushable bugs.
+  - Separate climbable and non-climbable pushable object slots.
+  - Add new pushable OCB to manipulate pushable properties.
+  - Add new animations for pushing pushables off edgees (TR1-3 and TR4-5 versions).
+  - Fix pushables not working with raising blocks.
+  - Fix miscellaneous pushable bugs.
 * Overhaul look-around feature:
- - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
- - Improve look camera movement and control.
- - Re-enable looking while performing up jump, backward jump, or backward crawl.
- - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
+  - Allow for more consistent and wider viewing angles while crawling, crouching, and hanging.
+  - Improve look camera movement and control.
+  - Re-enable looking while performing up jump, backward jump, or backward crawl.
+  - Add functionality to rotate slowly when holding Walk while using binoculars or lasersight.
 * Add target highlighter system with toggle in Sound and Gameplay settings.
 * Add sprint slide state 191.
 * Add swinging blade.
 * Add crumbling platform and add new OCBs for behaviour:
- - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
- - OCB > 0: When the player steps on the platform, it will crumble after the number of frames set in the OCB.
- - A positive value results in activation via player collision.
- - A negative value requires a trigger to activate.
+  - OCB 0: Default behaviour. When the player steps on the platform, it will shake and crumble after 1.2 seconds.
+  - OCB > 0: When the player steps on the platform, it will crumble after the number of frames set in the OCB.
+  - A positive value results in activation via player collision.
+  - A negative value requires a trigger to activate.
 * Add basic mouse input handling. Allows for binding of mouse inputs in control settings.
 * Add settings for Mouse Sensitivity and Mouse Smoothing (not used in-game yet).
 

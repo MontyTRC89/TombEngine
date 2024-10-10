@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
@@ -22,6 +23,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -102,7 +104,7 @@ namespace TEN::Entities::Generic
 
 		// Update bridge.
 		AddPushableStackBridge(pushableItem, false);
-		int probeRoomNumber = GetCollision(&pushableItem).RoomNumber;
+		int probeRoomNumber = GetPointCollision(pushableItem).GetRoomNumber();
 		AddPushableStackBridge(pushableItem, true);
 
 		// Update room number.
@@ -224,8 +226,8 @@ namespace TEN::Entities::Generic
 
 	void SetPushableStopperFlag(bool isStopper, const Vector3i& pos, int roomNumber)
 	{
-		auto pointColl = GetCollision(pos, roomNumber);
-		pointColl.Block->Stopper = isStopper; 
+		auto pointColl = GetPointCollision(pos, roomNumber);
+		pointColl.GetSector().Stopper = isStopper;
 
 		// TODO: There is a problem, it also has to set/reset the flag in the flipped room.
 		// Because when flipmaps happens, it forgets about the old flag.

@@ -18,6 +18,8 @@ constexpr auto NUM_EFFECTS	= 256;
 constexpr auto MAX_PARTICLES		 = 1024;
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 
+extern int Wibble;
+
 enum SpriteEnumFlag
 {
 	SP_NONE		  = 0,
@@ -211,7 +213,7 @@ extern FX_INFO EffectList[NUM_EFFECTS];
 template <typename TEffect>
 TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
 {
-	assertion(effects.size() <= countMax, "Too many particle effects.");
+	TENAssert(effects.size() <= countMax, "Too many particle effects.");
 
 	// Add and return new effect.
 	if (effects.size() < countMax)
@@ -279,5 +281,6 @@ void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
+void UpdateWibble();
 
 void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff);

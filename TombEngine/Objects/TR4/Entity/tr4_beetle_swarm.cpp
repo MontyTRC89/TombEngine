@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/flipeffect.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
@@ -104,7 +105,7 @@ namespace TEN::Entities::TR4
 		{
 			ZeroMemory(BeetleSwarm, NUM_BEETLES * sizeof(BeetleData));
 			NextBeetle = 0;
-			FlipEffect = -1;
+			FlipEffect = NO_VALUE;
 		}
 	}
 

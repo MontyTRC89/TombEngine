@@ -58,7 +58,7 @@ local strings =
 	
 	-- Level name strings
 	
-	lara_home = { "Lara's Home" },
+	home_level = { "Home Level" },
 	test_level = { "Test Level" },
 	title = { "Title" },
 }

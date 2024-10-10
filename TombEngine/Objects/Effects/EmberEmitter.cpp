@@ -27,10 +27,13 @@ namespace TEN::Effects::EmberEmitter
 		
 		if (item.TriggerFlags < 0)
 		{
+			if (item.TriggerFlags > -11)
+				item.TriggerFlags = -11;
+
 			if (!item.ItemFlags[2])
 			{
-				int div = abs(item.TriggerFlags) % 10 << 10;
-				int mod = abs(item.TriggerFlags) / 10 << 10;
+				int div = (abs(item.TriggerFlags) % 10) << 10;
+				int mod = (abs(item.TriggerFlags) / 10) << 10;
 
 				// TODO: Use Random::GenerateInt()
 				item.ItemFlags[0] = GetRandomControl() % div;
