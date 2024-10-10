@@ -312,7 +312,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								ShatterImpactData.impactDirection = dir;
 								ShatterImpactData.impactLocation = ShatterItem.sphere.Center;
 								ShatterObject(&ShatterItem, 0, 128, target2.RoomNumber, 0);
-								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);							
+								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
 						}
 						else
 						{
@@ -512,89 +512,19 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 			// If mesh is visible.
 			if (item->MeshBits & (1 << i))
 			{
+				float distance;
 				const auto& sphere = spheres[i];
 
-				// NOTE: Not worth doing what's commented below. *Rewrite completely.*
-				// TODO: this approach is the correct one but, again, Core's math is a mystery and this test was meant
-				// to fail deliberately in some way. I've so added again Core's legacy test for allowing the current game logic
-				// but after more testing we should trash it in the future and restore the new way.
-#if 0
-				// Create the bounding sphere and test it against the ray
-				BoundingSphere sph = BoundingSphere(Vector3(sphere->x, sphere->y, sphere->z), sphere->r);
-				float newDist;
-				if (sph.Intersects(rayStart, rayDirNormalized, newDist))
+				if (sphere.Intersects(rayOrigin, rayDir, distance))
 				{
-					// HACK: Core seems to take in account for distance not the real hit point but the centre of the sphere.
-					// This can work well for example for GUARDIAN because the head sphere is so big that would always be hit
-					// and eyes would not be destroyed.
-					newDist = sqrt(SQUARE(sphere->x - start->x) + SQUARE(sphere->y - start->y) + SQUARE(sphere->z - start->z));
+					// Test for minimum distance.
 
-					// Test for min distance
-					if (newDist < minDistance)
+					if (distance < minDist)
 					{
-						minDistance = newDist;
-						meshPtr = &g_Level.Meshes[obj->meshIndex + i];
+						minDist = distance;
+						meshIndex = object->meshIndex + i;
 						bit = 1 << i;
 						sp = i;
-					}
-				}
-#endif
-
-				Vector3i p[4];
-
-				p[1].x = origin.x;
-				p[1].y = origin.y;
-				p[1].z = origin.z;
-				p[2].x = target.x;
-				p[2].y = target.y;
-				p[2].z = target.z;
-				p[3].x = sphere.Center.x;
-				p[3].y = sphere.Center.y;
-				p[3].z = sphere.Center.z;
-
-				int r0 = (p[3].x - p[1].x) * (p[2].x - p[1].x) +
-					(p[3].y - p[1].y) * (p[2].y - p[1].y) +
-					(p[3].z - p[1].z) * (p[2].z - p[1].z);
-
-				int r1 = SQUARE(p[2].x - p[1].x) +
-					SQUARE(p[2].y - p[1].y) +
-					SQUARE(p[2].z - p[1].z);
-
-				if (((r0 < 0 && r1 < 0) ||
-					(r1 > 0 && r0 > 0)) &&
-					(abs(r0) <= abs(r1)))
-				{
-					r1 >>= 16;
-					if (r1)
-						r0 /= r1;
-					else
-						r0 = 0;
-
-					p[0].x = p[1].x + ((r0 * (p[2].x - p[1].x)) >> 16);
-					p[0].y = p[1].y + ((r0 * (p[2].y - p[1].y)) >> 16);
-					p[0].z = p[1].z + ((r0 * (p[2].z - p[1].z)) >> 16);
-
-					int dx = SQUARE(p[0].x - p[3].x);
-					int dy = SQUARE(p[0].y - p[3].y);
-					int dz = SQUARE(p[0].z - p[3].z);
-
-					int distance = dx + dy + dz;
-
-					if (distance < SQUARE(sphere.Radius))
-					{
-						dx = SQUARE(sphere.Center.x - origin.x);
-						dy = SQUARE(sphere.Center.y - origin.y);
-						dz = SQUARE(sphere.Center.z - origin.z);
-
-						distance = dx + dy + dz;
-
-						if (distance < minDist)
-						{
-							minDist = distance;
-							meshIndex = object->meshIndex + i;
-							bit = 1 << i;
-							sp = i;
-						}
 					}
 				}
 			}
