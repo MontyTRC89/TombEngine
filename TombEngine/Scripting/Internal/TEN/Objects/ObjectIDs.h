@@ -745,7 +745,7 @@ The following constants are inside ObjID.
 	SMOKE_EMITTER
 	EARTHQUAKE
 	BUBBLES
-	WATERFALLMIST
+	WATERFALL_MIST
 	GUNSHELL
 	SHOTGUNSHELL
 	GUN_FLASH
@@ -1193,7 +1193,7 @@ Table of constants.
 @table PickupConstants
 */
 
-static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
+static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs{
 	{ "LARA", ID_LARA },
 	{ "LARA_EXTRA_ANIMS", ID_LARA_EXTRA_ANIMS },
 	{ "PISTOLS_ANIM", ID_PISTOLS_ANIM },
@@ -1922,7 +1922,7 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
 	{ "SMOKE_EMITTER", ID_SMOKE_EMITTER },
 	{ "EARTHQUAKE", ID_EARTHQUAKE },
 	{ "BUBBLES", ID_BUBBLES },
-	{ "WATERFALLMIST", ID_WATERFALLMIST },
+	{ "WATERFALL_MIST", ID_WATERFALL_MIST },
 	{ "GUNSHELL", ID_GUNSHELL },
 	{ "SHOTGUNSHELL", ID_SHOTGUNSHELL },
 	{ "GUN_FLASH", ID_GUN_FLASH },
@@ -1984,6 +1984,7 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
 	{ "DOPPELGANGER_ORIGIN", ID_DOPPELGANGER_ORIGIN },
 	{ "CORPSE", ID_CORPSE },
 	{ "WRAITH_TRAP", ID_WRAITH_TRAP },
+	{ "WATERFALL_EMITTER", ID_WATERFALL_EMITTER },
 	{ "MESHSWAP1", ID_MESHSWAP1 },
 	{ "MESHSWAP2", ID_MESHSWAP2 },
 	{ "MESHSWAP3", ID_MESHSWAP3 },
@@ -2166,6 +2167,8 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
 	{ "DASH_BAR_TEXTURE", ID_DASH_BAR_TEXTURE },
 	{ "SFX_BAR_TEXTURE", ID_SFX_BAR_TEXTURE },
 	{ "CROSSHAIR", ID_CROSSHAIR },
+	{ "SPEEDOMETER", ID_SPEEDOMETER },
+	{ "WATERFALL", ID_WATERFALL },
 	{ "PANEL_BORDER", ID_PANEL_BORDER },
 	{ "PANEL_MIDDLE", ID_PANEL_MIDDLE },
 	{ "PANEL_CORNER", ID_PANEL_CORNER },
