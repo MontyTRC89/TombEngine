@@ -9,7 +9,7 @@
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
@@ -83,6 +83,9 @@ void Renderer::UpdateLaraAnimations(bool force)
 	rItem.ItemNumber = LaraItem->Index;
 
 	if (!force && rItem.DoneAnimations)
+		return;
+
+	if (_moveableObjects.empty())
 		return;
 
 	auto& playerObject = *_moveableObjects[ID_LARA];
@@ -328,33 +331,36 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 
 void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
-	if (!Objects[ID_HAIR].loaded)
-		return;
-
-	const auto& hairObject = *_moveableObjects[ID_HAIR];
-
-	for (const auto& unit : HairEffect.Units)
+	for (int i = 0; i < HairEffect.Units.size(); i++)
 	{
+		const auto& unit = HairEffect.Units[i];
 		if (!unit.IsEnabled)
 			continue;
 
-		// First matrix is Lara's head matrix, then all hair unit segment matrices.
-		// Bones are adjusted at load time to account for this.
+		const auto& object = Objects[unit.ObjectID];
+		if (!object.loaded)
+			continue;
+
+		const auto& rendererObject = *_moveableObjects[unit.ObjectID];
+
 		_stItem.World = Matrix::Identity;
 		_stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * _laraWorldMatrix;
 
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{
-			_stItem.BonesMatrices[i + 1] = unit.Segments[i].WorldMatrix;
+			const auto& segment = unit.Segments[i];
+			auto worldMatrix = Matrix::CreateFromQuaternion(segment.Orientation) * Matrix::CreateTranslation(segment.Position);
+
+			_stItem.BonesMatrices[i + 1] = worldMatrix;
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
 		}
 
 		_cbItem.UpdateData(_stItem, _context.Get());
 
-		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
+		for (int i = 0; i < rendererObject.ObjectMeshes.size(); i++)
 		{
-			auto& rMesh = *hairObject.ObjectMeshes[i];
-			DrawMoveableMesh(itemToDraw, &rMesh, room, i, view, rendererPass);
+			auto& rendererMesh = *rendererObject.ObjectMeshes[i];
+			DrawMoveableMesh(itemToDraw, &rendererMesh, room, i, view, rendererPass);
 		}
 	}
 }

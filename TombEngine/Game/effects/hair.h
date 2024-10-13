@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Objects/game_object_ids.h"
+
 struct ItemInfo;
 
 namespace TEN::Effects::Hair
@@ -16,7 +18,6 @@ namespace TEN::Effects::Hair
 			Vector3	   Position	   = Vector3::Zero;
 			Vector3	   Velocity	   = Vector3::Zero;
 			Quaternion Orientation = Quaternion::Identity;
-			Matrix	   WorldMatrix = Matrix::Identity;
 		};
 
 	public:
@@ -24,16 +25,18 @@ namespace TEN::Effects::Hair
 
 		bool IsEnabled	   = false;
 		bool IsInitialized = false;
+
+		GAME_OBJECT_ID			 ObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
 		std::vector<HairSegment> Segments = {};
 
 		// Utilities
 
-		void Update(const ItemInfo& item, int hairUnitIndex);
+		void Update(const ItemInfo& item, int hairUnitID);
 
 	private:
 		// Helpers
 
-		Vector3						GetRelBaseOffset(int hairUnitIndex, bool isYoung);
+		Vector3						GetRelBaseOffset(int hairUnitID, bool isYoung);
 		Vector3						GetWaterProbeOffset(const ItemInfo& item);
 		Quaternion					GetSegmentOrientation(const Vector3& origin, const Vector3& target, const Quaternion& baseOrient);
 		std::vector<BoundingSphere> GetSpheres(const ItemInfo& item, bool isYoung);

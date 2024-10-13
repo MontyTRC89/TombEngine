@@ -3,7 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
@@ -17,6 +17,7 @@
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Hud;
 using namespace TEN::Input;
@@ -56,7 +57,7 @@ namespace TEN::Entities::Vehicles
 			return VehicleMountType::None;
 
 		// Assess object collision.
-		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !TestCollision(vehicleItem, laraItem))
+		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !HandleItemSphereCollision(*vehicleItem, *laraItem))
 			return VehicleMountType::None;
 
 		bool hasInputAction = IsHeld(In::Action);

@@ -407,8 +407,6 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.PrevFrameNumber = item->Animation.FrameNumber;
 	coll->Setup.PrevState = item->Animation.ActiveState;
 
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
-
 	// Handle look-around.
 	if (((IsHeld(In::Look) && CanPlayerLookAround(*item)) ||
 			(player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)) &&
@@ -422,6 +420,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		ResetPlayerLookAround(*item);
 	}
 	player.Control.Look.Mode = LookMode::None;
+
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Process vehicles.
 	if (HandleLaraVehicle(item, coll))

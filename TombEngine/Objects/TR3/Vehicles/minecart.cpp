@@ -3,9 +3,9 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/Point.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
@@ -22,6 +22,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -238,6 +239,18 @@ namespace TEN::Entities::Vehicles
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 2, r, g, 0);
 			}
 		}
+	}
+
+	void MinecartWrenchTake(MinecartInfo* minecart, ItemInfo* laraItem)
+	{
+		laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
+		minecart->Flags |= MINECART_FLAG_WRENCH_MESH;
+	}
+
+	void MinecartWrenchPut(MinecartInfo* minecart, ItemInfo* laraItem)
+	{
+		laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
+		minecart->Flags &= ~MINECART_FLAG_WRENCH_MESH;
 	}
 
 	static int GetMinecartCollision(ItemInfo* minecartItem, short angle, int distance)
@@ -754,8 +767,7 @@ namespace TEN::Entities::Vehicles
 				if (laraItem->Animation.FrameNumber == GetFrameIndex(minecartItem, MINECART_WRENCH_MESH_TOGGLE_FRAME) &&
 					minecart->Flags & MINECART_FLAG_WRENCH_MESH)
 				{
-					laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
-					minecart->Flags &= ~MINECART_FLAG_WRENCH_MESH;
+					MinecartWrenchPut(minecart, laraItem);
 				}
 
 				if (minecart->Flags & MINECART_FLAG_DISMOUNT_RIGHT)
@@ -803,8 +815,7 @@ namespace TEN::Entities::Vehicles
 				if (!(minecart->Flags & MINECART_FLAG_WRENCH_MESH) &&
 					laraItem->Animation.FrameNumber == GetFrameIndex(minecartItem, MINECART_WRENCH_MESH_TOGGLE_FRAME))
 				{
-					laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
-					minecart->Flags |= MINECART_FLAG_WRENCH_MESH;
+					MinecartWrenchTake(minecart, laraItem);
 				}
 			}
 

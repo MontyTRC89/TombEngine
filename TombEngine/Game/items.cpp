@@ -291,6 +291,11 @@ bool ItemInfo::IsBridge() const
 	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
 }
 
+std::vector<BoundingSphere> ItemInfo::GetSpheres() const
+{
+	return g_Renderer.GetSpheres(Index);
+}
+
 bool TestState(int refState, const std::vector<int>& stateList)
 {
 	for (const auto& state : stateList)

@@ -9,7 +9,6 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/collision/floordata.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
 #include "Game/items.h"
@@ -94,6 +93,7 @@ namespace TEN::Entities::TR3
 				ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 			}
 
+			pointColl = GetPointCollision(item);
 			item.Animation.IsAirborne = true;
 
 			if (pointColl.GetFloorHeight() < item.Pose.Position.y)

@@ -4,7 +4,6 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -23,7 +22,7 @@ namespace TEN::Effects::Hair
 {
 	HairEffectController HairEffect = {};
 
-	void HairUnit::Update(const ItemInfo& item, int hairUnitIndex)
+	void HairUnit::Update(const ItemInfo& item, int hairUnitID)
 	{
 		const auto& player = GetLaraInfo(item);
 
@@ -34,15 +33,14 @@ namespace TEN::Effects::Hair
 		g_Renderer.GetBoneMatrix(item.Index, LM_HEAD, &worldMatrix);
 
 		// Apply base offset to world matrix.
-		auto relOffset = GetRelBaseOffset(hairUnitIndex, isYoung);
+		auto relOffset = GetRelBaseOffset(hairUnitID, isYoung);
 		worldMatrix = Matrix::CreateTranslation(relOffset) * worldMatrix;
-		
+
 		// Use player's head bone orientation as base.
-		auto baseOrient = Geometry::ConvertDirectionToQuat(-Geometry::ConvertQuatToDirection(GetBoneOrientation(item, LM_HEAD)));
+		auto baseOrient = Geometry::ConvertDirectionToQuat(-Geometry::ConvertQuatToDirection(GetBoneOrientation(item, LM_HEAD))) * item.Pose.Orientation.ToQuaternion();
 
 		// Set position of base segment.
 		Segments[0].Position = worldMatrix.Translation();
-		Segments[0].WorldMatrix = worldMatrix;
 
 		if (!IsInitialized)
 		{
@@ -53,7 +51,7 @@ namespace TEN::Effects::Hair
 				auto& nextSegment = Segments[i + 1];
 
 				// NOTE: Joint offset determines segment length.
-				auto jointOffset = GetJointOffset(ID_HAIR, i);
+				auto jointOffset = GetJointOffset(ObjectID, i);
 
 				worldMatrix = Matrix::CreateTranslation(segment.Position);
 				worldMatrix = Matrix::CreateFromQuaternion(segment.Orientation) * worldMatrix;
@@ -95,11 +93,10 @@ namespace TEN::Effects::Hair
 				// Calculate world matrix.
 				worldMatrix = Matrix::CreateTranslation(prevSegment.Position);
 				worldMatrix = Matrix::CreateFromQuaternion(prevSegment.Orientation) * worldMatrix;
-				segment.WorldMatrix = worldMatrix;
 
 				auto jointOffset = (i == (Segments.size() - 1)) ?
-					GetJointOffset(ID_HAIR, (i - 1) - 1) :
-					GetJointOffset(ID_HAIR, (i - 1));
+					GetJointOffset(ObjectID, (i - 1) - 1) :
+					GetJointOffset(ObjectID, (i - 1));
 				worldMatrix = Matrix::CreateTranslation(jointOffset) * worldMatrix;
 
 				segment.Position = worldMatrix.Translation();
@@ -108,12 +105,12 @@ namespace TEN::Effects::Hair
 		}
 	}
 
-	Vector3 HairUnit::GetRelBaseOffset(int hairUnitIndex, bool isYoung)
+	Vector3 HairUnit::GetRelBaseOffset(int hairUnitID, bool isYoung)
 	{
 		auto relOffset = Vector3::Zero;
 		if (isYoung)
 		{
-			switch (hairUnitIndex)
+			switch (hairUnitID)
 			{
 			// Left pigtail offset.
 			case 0:
@@ -320,30 +317,37 @@ namespace TEN::Effects::Hair
 		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 
 		// Initialize hair units.
-		bool isHead = true;
-		for (auto& unit : Units)
+		for (int i = 0; i < Units.size(); i++)
 		{
-			unit.IsEnabled = (!isHead || isYoung);
+			auto& unit = Units[i];
+
+			auto objectID = (i == 0) ? ID_HAIR_PRIMARY : ID_HAIR_SECONDARY;
+			const auto& object = Objects[objectID];
+
+			unit.IsEnabled = (object.loaded && (i == 0 || (i == 1 && isYoung)));
 			unit.IsInitialized = false;
-			
-			unsigned int segmentCount = Objects[ID_HAIR].nmeshes + 1;
-			unit.Segments.resize(segmentCount);
+			unit.ObjectID = objectID;
+			unit.Segments.resize(object.nmeshes + 1);
 
 			// Initialize segments.
 			for (auto& segment : unit.Segments)
 			{
-				segment.Position = GetJointOffset(ID_HAIR, 0);
+				segment.Position = GetJointOffset(objectID, 0);
 				segment.Velocity = Vector3::Zero;
 				segment.Orientation = DEFAULT_ORIENT.ToQuaternion();
 			}
-
-			isHead = false;
 		}
 	}
 
 	void HairEffectController::Update(ItemInfo& item)
 	{
 		for (int i = 0; i < Units.size(); i++)
-			Units[i].Update(item, i);
+		{
+			auto& unit = Units[i];
+			if (!unit.IsEnabled)
+				continue;
+
+			unit.Update(item, i);
+		}
 	}
 }
