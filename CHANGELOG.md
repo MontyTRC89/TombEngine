@@ -59,6 +59,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing-dart emitter ).
 * Enhanced raptor behaviour and handling. https://tombengine.com/docs/ocb-and-setup-instructions/#raptor 
   - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
+* Increase active Flame Emitters from 32 to 128
 	
 ### Lua API changes
 

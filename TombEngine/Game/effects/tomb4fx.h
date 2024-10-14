@@ -209,7 +209,7 @@ extern int NextSpider;
 extern int NextGunShell;
 
 constexpr auto MAX_SPARKS_FIRE = 20;
-constexpr auto MAX_FIRE_LIST = 32;
+constexpr auto MAX_FIRE_LIST = 128;
 constexpr auto MAX_SPARKS_SMOKE = 32;
 constexpr auto MAX_SPARKS_BLOOD = 32;
 constexpr auto MAX_GUNFLASH = 4;
