@@ -522,11 +522,6 @@ void InitializeOrLoadGame(bool loadGame)
 	{
 		SaveGame::Load(g_GameFlow->SelectedSaveGame);
 
-		// TODO: hack for forcing Lara's room
-		ItemInfo* firstLaraItem = FindItem(ID_LARA);
-		int firstLaraItemNumber = FindItem(firstLaraItem);
-		ItemNewRoom(firstLaraItemNumber, firstLaraItem->RoomNumber);
-
 		Camera.pos.x = LaraItem->Pose.Position.x + 256;
 		Camera.pos.y = LaraItem->Pose.Position.y + 256;
 		Camera.pos.z = LaraItem->Pose.Position.z + 256;
@@ -559,12 +554,6 @@ void InitializeOrLoadGame(bool loadGame)
 		else
 		{
 			SaveGame::LoadHub(CurrentLevel);
-			
-			// TODO: hack for forcing Lara's room
-			ItemInfo* firstLaraItem = FindItem(ID_LARA);
-			int firstLaraItemNumber = FindItem(firstLaraItem);
-			ItemNewRoom(firstLaraItemNumber, firstLaraItem->RoomNumber);
-
 			TENLog("Starting new level.", LogLevel::Info);
 		}
 
