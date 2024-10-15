@@ -14,6 +14,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed weapons not properly hitting enemies.
 * Fixed laserhead teleporting Lara and making her invisible on death.
 * Fixed sarcophagus pick-ups.
+* Fixed issue with Lara not rotating together with bridges while picking up items.
 * Fixed several binocular bugs.
 * Fixed incorrect climbing out of water on bridge objects.
 * Fixed faulty death sectors.
