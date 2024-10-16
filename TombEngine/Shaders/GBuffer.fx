@@ -1,6 +1,7 @@
 #include "./CBCamera.hlsli"
 #include "./VertexInput.hlsli"
 #include "./VertexEffects.hlsli"
+#include "./AnimatedTextures.hlsli"
 #include "./Blending.hlsli"
 #include "./Math.hlsli"
 
@@ -102,7 +103,16 @@ PixelShaderInput VSRooms(VertexShaderInput input)
 	output.Tangent = input.Tangent;
 	output.Binormal = input.Binormal;
 	output.PositionCopy = screenPos;
-	output.UV = input.UV;
+	
+#ifdef ANIMATED
+
+	if (Type == 0)
+		output.UV = GetFrame(input.PolyIndex, input.AnimationFrameOffset);
+	else
+		output.UV = input.UV; // TODO: true UVRotate in future?
+#else
+    output.UV = input.UV;
+#endif
 
 	return output;
 }

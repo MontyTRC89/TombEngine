@@ -1044,6 +1044,8 @@ void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll)
 		if (CanStepUp(*item, *coll))
 		{
 			item->Animation.TargetState = LS_STEP_UP;
+			item->DisableInterpolation = true;
+
 			if (GetStateDispatch(item, GetAnimData(*item)))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;

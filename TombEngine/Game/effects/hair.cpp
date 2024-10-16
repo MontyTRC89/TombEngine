@@ -24,6 +24,9 @@ namespace TEN::Effects::Hair
 
 	void HairUnit::Update(const ItemInfo& item, int hairUnitID)
 	{
+		for (auto& segment : Segments)
+			segment.StoreInterpolationData();
+
 		const auto& player = GetLaraInfo(item);
 
 		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);

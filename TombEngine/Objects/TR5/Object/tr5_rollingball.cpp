@@ -99,7 +99,10 @@ void RollingBallControl(short itemNumber)
 				item->Animation.Velocity.y = -(GetRandomControl() % int(round(item->Animation.Velocity.z) / 8.0f));
 		}
 		else
+		{
 			item->Animation.Velocity.y = -item->Animation.Velocity.y / 4.0f;
+			item->DisableInterpolation = true;
+		}
 	}
 
 	int frontX = item->Pose.Position.x;
@@ -307,6 +310,8 @@ void RollingBallControl(short itemNumber)
 		}
 		else
 			item->Pose.Orientation.y = angle;
+
+		item->DisableInterpolation = true;
 	}
 
 	item->Pose.Orientation.x -= ((abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2) / vDivider;

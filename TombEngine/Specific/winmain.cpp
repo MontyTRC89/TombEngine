@@ -60,6 +60,22 @@ Vector2i GetScreenResolution()
 	return resolution;
 }
 
+int GetCurrentScreenRefreshRate()
+{
+	DEVMODE devmode;
+	memset(&devmode, 0, sizeof(devmode));
+	devmode.dmSize = sizeof(devmode);
+	
+	if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devmode))
+	{
+		return devmode.dmDisplayFrequency;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 std::vector<Vector2i> GetAllSupportedScreenResolutions()
 {
 	auto resList = std::vector<Vector2i>{};
@@ -163,6 +179,12 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
 	{
 		return 0;
+	}
+
+	if (msg == WM_ACTIVATEAPP)
+	{
+		App.ResetClock = true;
+		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
 	}
 
 	if (msg > WM_CLOSE)
