@@ -60,6 +60,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
+#include "Game/Lara/lara_initialise.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects;
@@ -555,6 +556,10 @@ void InitializeOrLoadGame(bool loadGame)
 		{
 			SaveGame::LoadHub(CurrentLevel);
 			TENLog("Starting new level.", LogLevel::Info);
+
+			// Restore vehicle.
+			auto* item = FindItem(ID_LARA);
+			InitializePlayerVehicle(*item);
 		}
 
 		g_GameScript->OnStart();
