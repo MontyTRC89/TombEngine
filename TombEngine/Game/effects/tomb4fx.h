@@ -3,6 +3,7 @@
 #include "Game/Lara/lara_struct.h"
 #include "Math/Math.h"
 #include "Renderer/RendererEnums.h"
+#include <vector>
 
 enum class LaraWeaponType;
 struct CreatureBiteInfo;
@@ -209,7 +210,6 @@ extern int NextSpider;
 extern int NextGunShell;
 
 constexpr auto MAX_SPARKS_FIRE = 20;
-constexpr auto MAX_FIRE_LIST = 128;
 constexpr auto MAX_SPARKS_SMOKE = 32;
 constexpr auto MAX_SPARKS_BLOOD = 32;
 constexpr auto MAX_GUNFLASH = 4;
@@ -221,7 +221,7 @@ extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
-extern FIRE_LIST Fires[MAX_FIRE_LIST];
+extern std::vector<FIRE_LIST> Fires;
 
 void TriggerBlood(int x, int y, int z, int unk, int num);
 void TriggerExplosionBubble(int x, int y, int z, short roomNumber);
