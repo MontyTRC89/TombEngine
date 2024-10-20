@@ -428,6 +428,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @function Moveable:SetOnCollidedWithObject
 // @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.
 // @usage
+// -- obj1 is the collision moveable
+// -- obj2 is the collider moveable
+//
 // LevelFuncs.objCollided = function(obj1, obj2)
 //     print(obj1:GetName() .. " collided with " .. obj2:GetName())
 // end

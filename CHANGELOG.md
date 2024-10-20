@@ -11,7 +11,11 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Bug fixes
 * Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
 * Fixed leveljump vehicle transfer.
+* Fixed weapons not properly hitting enemies.
+* Fixed laserhead teleporting Lara and making her invisible on death.
 * Fixed sarcophagus pick-ups.
+* Fixed issue with Lara not rotating together with bridges while picking up items.
+* Fixed ghost collision with moveables with zero bounds.
 * Fixed several binocular bugs.
 * Fixed incorrect climbing out of water on bridge objects.
 * Fixed faulty death sectors.
