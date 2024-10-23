@@ -294,24 +294,20 @@ namespace TEN::Renderer
 	{
 		for (const auto& fire : Fires)
 		{
-			
-			if (fire.on)
-			{
-				auto fade = fire.on == 1 ? 1.0f : (float)(255 - fire.on) / 255.0f;
+			auto fade = fire.on == 1 ? 1.0f : (float)(255 - fire.on) / 255.0f;
 
-				for (int i = 0; i < MAX_SPARKS_FIRE; i++) 
+			for (int i = 0; i < MAX_SPARKS_FIRE; i++) 
+			{
+				auto* spark = &FireSparks[i];
+				if (spark->on)
 				{
-					auto* spark = &FireSparks[i];
-					if (spark->on)
-					{
-						AddSpriteBillboard(
-							&_sprites[spark->def],
-							Vector3(fire.x + spark->x * fire.size / 2, fire.y + spark->y * fire.size / 2, fire.z + spark->z * fire.size / 2),
-							Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
-							TO_RAD(spark->rotAng << 4),
-							spark->scalar,
-							Vector2(spark->size * fire.size, spark->size * fire.size), BlendMode::Additive, true, view);
-					}
+					AddSpriteBillboard(
+						&_sprites[spark->def],
+						Vector3(fire.x + spark->x * fire.size / 2, fire.y + spark->y * fire.size / 2, fire.z + spark->z * fire.size / 2),
+						Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
+						TO_RAD(spark->rotAng << 4),
+						spark->scalar,
+						Vector2(spark->size * fire.size, spark->size * fire.size), BlendMode::Additive, true, view);
 				}
 			}
 		}
