@@ -58,8 +58,8 @@ struct OVERLAP
 constexpr auto BLOCKABLE = 0x8000;
 constexpr auto BLOCKED   = 0x4000;
 
-constexpr auto BLOCKED_SEARCH = (1 << 31);
 constexpr auto SEARCH_NUMBER  = INT_MAX;
+constexpr auto SEARCH_BLOCKED = (1 << 31);
 
 constexpr auto BOX_JUMP    = 0x800;
 constexpr auto BOX_MONKEY  = 0x2000;
@@ -77,9 +77,9 @@ constexpr auto CLIP_LEFT   = 0x1;
 constexpr auto CLIP_RIGHT  = 0x2;
 constexpr auto CLIP_TOP    = 0x4;
 constexpr auto CLIP_BOTTOM = 0x8;
-constexpr auto ALL_CLIP = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
+constexpr auto CLIP_ALL    = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 
-constexpr auto SECONDARY_CLIP = 0x10;
+constexpr auto CLIP_SECONDARY = 0x10;
 
 
 void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
