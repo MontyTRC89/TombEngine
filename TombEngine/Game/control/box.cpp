@@ -27,13 +27,11 @@ using namespace TEN::Effects::Smoke;
 
 constexpr auto ESCAPE_DIST = BLOCK(5);
 constexpr auto STALK_DIST = BLOCK(3);
-constexpr auto REACHED_GOAL_RADIUS = 640;
+constexpr auto REACHED_GOAL_RADIUS = BLOCK(0.625);
 constexpr auto ATTACK_RANGE = SQUARE(BLOCK(3));
 constexpr auto ESCAPE_CHANCE = 0x800;
 constexpr auto RECOVER_CHANCE = 0x100;
 constexpr auto BIFF_AVOID_TURN = ANGLE(11.25f);
-constexpr auto FEELER_DISTANCE = CLICK(2);
-constexpr auto FEELER_ANGLE = ANGLE(45.0f);
 constexpr auto CREATURE_AI_ROTATION_MAX = ANGLE(90.0f);
 constexpr auto CREATURE_JOINT_ROTATION_MAX = ANGLE(70.0f);
 
@@ -2183,7 +2181,20 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 	if (creature.Enemy == nullptr)
 		return false;
 
-	float stepDist = BLOCK(0.92f);
+	float stepDist = 0.0f;
+
+	switch (jumpDistType)
+	{
+		default:
+		case JumpDistance::Block1:
+			stepDist = BLOCK(0.51f);
+			break;
+
+		case JumpDistance::Block2:
+			stepDist = BLOCK(0.76f);
+			break;
+	}
+
 	int vPos = item.Pose.Position.y;
 	auto pointCollA = GetPointCollision(item, item.Pose.Orientation.y, stepDist);
 	auto pointCollB = GetPointCollision(item, item.Pose.Orientation.y, stepDist * 2);
@@ -2196,7 +2207,9 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 		if (item.BoxNumber == creature.Enemy->BoxNumber ||
 			vPos >= (pointCollA.GetFloorHeight() - STEPUP_HEIGHT) ||
 			vPos >= (pointCollB.GetFloorHeight() + CLICK(1)) ||
-			vPos <= (pointCollB.GetFloorHeight() - CLICK(1)))
+			vPos <= (pointCollB.GetFloorHeight() - CLICK(1)) ||
+			pointCollA.GetSector().PathfindingBoxID == NO_VALUE ||
+			pointCollB.GetSector().PathfindingBoxID == NO_VALUE)
 		{
 			return false;
 		}
@@ -2208,7 +2221,10 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 			vPos >= (pointCollA.GetFloorHeight() - STEPUP_HEIGHT) ||
 			vPos >= (pointCollB.GetFloorHeight() - STEPUP_HEIGHT) ||
 			vPos >= (pointCollC.GetFloorHeight() + CLICK(1)) ||
-			vPos <= (pointCollC.GetFloorHeight() - CLICK(1)))
+			vPos <= (pointCollC.GetFloorHeight() - CLICK(1)) ||
+			pointCollA.GetSector().PathfindingBoxID == NO_VALUE ||
+			pointCollB.GetSector().PathfindingBoxID == NO_VALUE ||
+			pointCollC.GetSector().PathfindingBoxID == NO_VALUE)
 		{
 			return false;
 		}
