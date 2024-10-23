@@ -371,7 +371,6 @@ void UpdateFireProgress()
 
 void AddFire(int x, int y, int z, short roomNum, float size, short fade)
 {
-	Fires.reserve(DEFAULT_FIRE_COUNT);
 	FIRE_LIST newFire;
 	
 	if (fade)

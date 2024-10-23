@@ -215,7 +215,6 @@ constexpr auto MAX_SPARKS_BLOOD = 32;
 constexpr auto MAX_GUNFLASH = 4;
 constexpr auto MAX_GUNSHELL = 24;
 constexpr auto MAX_SHOCKWAVE = 16;
-constexpr auto DEFAULT_FIRE_COUNT = 32;
 
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
