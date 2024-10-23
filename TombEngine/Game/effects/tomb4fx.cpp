@@ -390,10 +390,6 @@ void AddFire(int x, int y, int z, short roomNum, float size, short fade)
 
 void ClearFires()
 {
-	for (auto& fire : Fires)
-	{
-		fire.on = false;
-	}
 	Fires.clear();
 }
 
