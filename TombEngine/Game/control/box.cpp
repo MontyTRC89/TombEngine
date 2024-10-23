@@ -2181,19 +2181,7 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 	if (creature.Enemy == nullptr)
 		return false;
 
-	float stepDist = 0.0f;
-
-	switch (jumpDistType)
-	{
-		default:
-		case JumpDistance::Block1:
-			stepDist = BLOCK(0.51f);
-			break;
-
-		case JumpDistance::Block2:
-			stepDist = BLOCK(0.76f);
-			break;
-	}
+	float stepDist = BLOCK(0.92f);
 
 	int vPos = item.Pose.Position.y;
 	auto pointCollA = GetPointCollision(item, item.Pose.Orientation.y, stepDist);
