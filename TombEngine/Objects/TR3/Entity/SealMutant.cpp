@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/control/box.h"
+#include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"

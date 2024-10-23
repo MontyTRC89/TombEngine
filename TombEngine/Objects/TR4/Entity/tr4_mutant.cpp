@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/control/control.h"
+#include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
