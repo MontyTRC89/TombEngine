@@ -182,6 +182,10 @@ int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 	auto normal = tri.Plane.Normal();
 	float relPlaneHeight = -((normal.x * sectorPoint.x) + (normal.z * sectorPoint.y)) / normal.y;
 
+	// Due to precision loss, we can't recover NO_HEIGHT constant from the plane, and must return original integer constant.
+	if (tri.Plane.D() == float(NO_HEIGHT))
+		return NO_HEIGHT;
+
 	// Return sector floor or ceiling height. NOTE: Bridges ignored.
 	return (tri.Plane.D() + relPlaneHeight);
 }
