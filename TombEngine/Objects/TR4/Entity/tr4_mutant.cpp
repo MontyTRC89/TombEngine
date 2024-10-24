@@ -287,7 +287,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			TargetNearestEntity(item, creature);
+			TargetNearestEntity(*item);
 		}
 
 		AI_INFO ai;

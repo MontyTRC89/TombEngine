@@ -206,40 +206,39 @@ void InitializeSlot(short itemNumber, bool makeTarget)
 	SlotsUsed++;
 }
 
-
-void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature, const std::vector<GAME_OBJECT_ID>& keyObjectIds, bool ignoreKeyObjectIds)
+void TargetNearestEntity(ItemInfo& item, const std::vector<GAME_OBJECT_ID>& keyObjectIds, bool ignoreKeyObjectIds)
 {
-	float closestDistSqr = INFINITY;
+	auto& creature = *GetCreatureInfo(&item);
 
+	float closestDistSqr = INFINITY;
 	for (auto& creature : ActiveCreatures)
 	{
-		auto* targetItem = &g_Level.Items[creature->ItemNumber];
-
-		if (targetItem->Index == item->Index)
+		auto& targetItem = g_Level.Items[creature->ItemNumber];
+		if (targetItem.Index == item.Index)
 			continue;
 
 		// Ignore or specifically target key object IDs.
-		if (!keyObjectIds.empty() && (ignoreKeyObjectIds ? Contains(keyObjectIds, targetItem->ObjectNumber) : !Contains(keyObjectIds, targetItem->ObjectNumber)))
+		if (!keyObjectIds.empty() && (ignoreKeyObjectIds ? Contains(keyObjectIds, targetItem.ObjectNumber) : !Contains(keyObjectIds, targetItem.ObjectNumber)))
 			continue;
 
-		if (targetItem != item && targetItem->HitPoints > 0 && targetItem->Status != ITEM_INVISIBLE)
+		if (&targetItem != &item && targetItem.HitPoints > 0 && targetItem.Status != ITEM_INVISIBLE)
 		{
-			float distSqr = Vector3i::DistanceSquared(item->Pose.Position, targetItem->Pose.Position);
+			float distSqr = Vector3i::DistanceSquared(item.Pose.Position, targetItem.Pose.Position);
 			if (distSqr < closestDistSqr)
 			{
-				creature->Enemy = targetItem;
+				creature->Enemy = &targetItem;
 				closestDistSqr = distSqr;
 			}
 		}
 	}
 
-	// Handle Lara as a special case.
+	// Handle player as special case.
 	if (!keyObjectIds.empty() && (ignoreKeyObjectIds ? Contains(keyObjectIds, ID_LARA) : !Contains(keyObjectIds, ID_LARA)))
 		return;
 
-	float distToLara = Vector3i::DistanceSquared(item->Pose.Position, LaraItem->Pose.Position);
-	if (distToLara < closestDistSqr)
-		creature->Enemy = LaraItem;
+	float distToPlayerSqr = Vector3i::DistanceSquared(item.Pose.Position, LaraItem->Pose.Position);
+	if (distToPlayerSqr < closestDistSqr)
+		creature.Enemy = LaraItem;
 }
 
 void SetEntityTarget(short itemNum, short target)

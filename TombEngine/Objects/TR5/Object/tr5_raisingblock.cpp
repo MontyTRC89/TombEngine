@@ -93,7 +93,7 @@ namespace TEN::Entities::Generic
 
 	void ShakeRaisingBlock(ItemInfo* item)
 	{
-		SoundEffect(SFX_TR4_RAISING_BLOCK2, &item->Pose);
+		SoundEffect(SFX_TR4_RAISING_BLOCK_2, &item->Pose);
 
 		if (item->TriggerFlags == 0)
 			return;

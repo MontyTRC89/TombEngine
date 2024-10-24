@@ -206,7 +206,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else
 			{
-				TargetNearestEntity(&item, &creature, SealMutantAttackTargetObjectIds, false);
+				TargetNearestEntity(item, SealMutantAttackTargetObjectIds, false);
 			}
 
 			AI_INFO ai;

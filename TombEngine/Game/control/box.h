@@ -55,6 +55,8 @@ struct OVERLAP
 
 #define CreatureEffectFunction short(int x, int y, int z, short speed, short yRot, short roomNumber)
 
+// TODO: Following constants can be moved to new flag enums for improved clarity.
+
 constexpr auto BLOCKABLE = 0x8000;
 constexpr auto BLOCKED   = 0x4000;
 
@@ -80,7 +82,6 @@ constexpr auto CLIP_BOTTOM = 0x8;
 constexpr auto CLIP_ALL    = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 
 constexpr auto CLIP_SECONDARY = 0x10;
-
 
 void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
 void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
