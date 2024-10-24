@@ -8,7 +8,6 @@
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Sound/sound.h"
 #include "Game/camera.h"

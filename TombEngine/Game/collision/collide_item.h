@@ -36,7 +36,7 @@ struct CollidedObjectData
 	bool IsEmpty() const { return (Items.empty() && Statics.empty()); };
 };
 
-void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+void GenericSphereBoxCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll);
 CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible, bool ignorePlayer, float customRadius = 0.0f, ObjectCollectionMode mode = ObjectCollectionMode::All);
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll);
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll);

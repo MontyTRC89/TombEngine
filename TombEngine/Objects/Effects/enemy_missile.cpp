@@ -118,9 +118,7 @@ namespace TEN::Entities::Effects
 		ShatterItem.yRot = fx->pos.Orientation.y;
 		ShatterItem.meshIndex = fx->frameNumber;
 		ShatterItem.color = Vector4::One;
-		ShatterItem.sphere.x = fx->pos.Position.x;
-		ShatterItem.sphere.y = fx->pos.Position.y;
-		ShatterItem.sphere.z = fx->pos.Position.z;
+		ShatterItem.sphere.Center = fx->pos.Position.ToVector3();
 		ShatterItem.bit = 0;
 		ShatterItem.flags = fx->flag2 & 0x400;
 		ShatterObject(&ShatterItem, 0, param2, fx->roomNumber, param1);

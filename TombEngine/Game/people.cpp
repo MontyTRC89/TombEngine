@@ -2,7 +2,6 @@
 
 #include "Game/animation.h"
 #include "Game/control/los.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/debris.h"
 #include "Game/itemdata/creature_info.h"

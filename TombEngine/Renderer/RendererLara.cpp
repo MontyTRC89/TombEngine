@@ -2,7 +2,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/Hair.h"
 #include "Game/items.h"
@@ -80,6 +80,9 @@ void Renderer::UpdateLaraAnimations(bool force)
 	rItem.ItemNumber = LaraItem->Index;
 
 	if (!force && rItem.DoneAnimations)
+		return;
+
+	if (_moveableObjects.empty())
 		return;
 
 	auto& playerObject = *_moveableObjects[ID_LARA];

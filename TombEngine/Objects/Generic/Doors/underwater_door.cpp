@@ -2,7 +2,6 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"

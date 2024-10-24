@@ -149,12 +149,11 @@ namespace TEN::Entities::Generic
 						ShatterItem.yRot = item->Pose.Orientation.y;
 						ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex;
 						ShatterItem.color = item->Model.Color;
-						ShatterItem.sphere.x = item->Pose.Position.x;
-						ShatterItem.sphere.y = item->Pose.Position.y - CLICK(1); // So debris won't spawn below floor
-						ShatterItem.sphere.z = item->Pose.Position.z;
+						ShatterItem.sphere.Center = item->Pose.Position.ToVector3();
+						ShatterItem.sphere.Center.y -= CLICK(1); // Prevent debris from spawning below floor.
 						ShatterItem.bit = 0;
 						ShatterImpactData.impactDirection = Vector3(0, -(float)item->ItemFlags[1] / (float)FALLINGBLOCK_MAX_SPEED, 0);
-						ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
+						ShatterImpactData.impactLocation = ShatterItem.sphere.Center;
 						ShatterObject(&ShatterItem, nullptr, 0, item->RoomNumber, false);
 
 						SoundEffect(SFX_TR4_ROCK_FALL_LAND, &item->Pose);

@@ -125,7 +125,7 @@ namespace TEN::Entities::Generic
 					}
 					else
 					{
-						SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose);
+						SoundEffect(SFX_TR4_RAISING_BLOCK_2, &item->Pose);
 						item->Pose.Position.y -= 4;
 					}
 				}
@@ -137,7 +137,7 @@ namespace TEN::Entities::Generic
 					}
 					else
 					{
-						SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose);
+						SoundEffect(SFX_TR4_RAISING_BLOCK_2, &item->Pose);
 						item->Pose.Position.y += 4;
 					}
 				}

@@ -5,7 +5,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -16,6 +16,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 
 // NOTES:
 // item.ItemFlags[0]: use dynamic motion.
@@ -174,7 +175,7 @@ namespace TEN::Entities::Traps
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 			
-		if (!TestCollision(&item, playerItem))
+		if (!HandleItemSphereCollision(item, *playerItem))
 			return;
 
 		if (!ItemPushItem(&item, playerItem, coll, false, 1))
@@ -200,7 +201,7 @@ namespace TEN::Entities::Traps
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 			
-		if (!TestCollision(&item, playerItem))
+		if (!HandleItemSphereCollision(item, *playerItem))
 			return;
 
 		if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) <= FALLING_BLOCK_IMPACT_FRAME)

@@ -22,6 +22,5 @@ namespace TEN::Entities::Creatures::TR5
 		short yRot;
 		int BaseItem;
 		std::array<int, GUARDIAN_TENTACLE_COUNT> Tentacles = {};
-		int PuzzleItem;
 	};
 }

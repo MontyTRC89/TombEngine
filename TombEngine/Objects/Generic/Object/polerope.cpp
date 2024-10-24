@@ -1,7 +1,7 @@
 #include "Objects/Generic/Object/polerope.h"
 
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
@@ -13,6 +13,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Generic
@@ -116,7 +117,7 @@ namespace TEN::Entities::Generic
 			// Test bounds collision.
 			if (TestBoundsCollide(&poleItem, laraItem, LARA_RADIUS + (int)round(abs(laraItem->Animation.Velocity.z))))
 			{
-				if (TestCollision(&poleItem, laraItem))
+				if (HandleItemSphereCollision(poleItem, *laraItem))
 				{
 					// Temporarily reorient pole.
 					short yOrient = poleItem.Pose.Orientation.y;

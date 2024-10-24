@@ -1,4 +1,3 @@
-#include "Framework.h"
 #include "Game/Lara/lara_cheat.h"
 
 #include "Game/effects/effects.h"

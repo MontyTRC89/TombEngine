@@ -1,7 +1,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
@@ -24,6 +24,8 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
+
+using namespace TEN::Collision::Sphere;
 
 extern GameConfiguration g_Configuration;
 extern ScriptInterfaceFlowHandler *g_GameFlow;
@@ -82,6 +84,10 @@ namespace TEN::Renderer
 
 					rotMatrix = Matrix::CreateFromQuaternion(quat3);
 				}
+
+				// Store bone orientation on current frame.
+				if (rItem != nullptr)
+					rItem->BoneOrientations[bonePtr->Index] = Quaternion::CreateFromRotationMatrix(rotMatrix);
 
 				auto tMatrix = (bonePtr == rObject.Skeleton) ? Matrix::CreateTranslation(offset0) : Matrix::Identity;
 
@@ -397,17 +403,16 @@ namespace TEN::Renderer
 		return _meshes[meshIndex];
 	}
 
-	int Renderer::GetSpheres(short itemNumber, BoundingSphere* spheres, char worldSpace, Matrix local)
+	std::vector<BoundingSphere> Renderer::GetSpheres(int itemNumber)
 	{
-		auto* itemToDraw = &_items[itemNumber];
-		auto* nativeItem = &g_Level.Items[itemNumber];
+		auto& itemToDraw = _items[itemNumber];
+		itemToDraw.ItemNumber = itemNumber;
 
-		itemToDraw->ItemNumber = itemNumber;
+		const auto* nativeItem = &g_Level.Items[itemNumber];
+		if (nativeItem == nullptr)
+			return {};
 
-		if (!nativeItem)
-			return 0;
-
-		if (!itemToDraw->DoneAnimations)
+		if (!itemToDraw.DoneAnimations)
 		{
 			if (itemNumber == LaraItem->Index)
 			{
@@ -419,38 +424,26 @@ namespace TEN::Renderer
 			}
 		}
 
-		auto world = Matrix::Identity;
-		if (worldSpace & SPHERES_SPACE_WORLD)
+		auto translationMatrix = Matrix::CreateTranslation(nativeItem->Pose.Position.ToVector3());
+		auto rotMatrix = nativeItem->Pose.Orientation.ToRotationMatrix();
+		auto worldMatrix = rotMatrix * translationMatrix;
+
+		const auto& moveable = GetRendererObject(nativeItem->ObjectNumber);
+
+		// Collect spheres.
+		auto spheres = std::vector<BoundingSphere>{};
+		for (int i = 0; i < moveable.ObjectMeshes.size(); i++)
 		{
-			world = Matrix::CreateTranslation(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z) * local;
+			const auto& mesh = *moveable.ObjectMeshes[i];
+
+			const auto& translationMatrix = itemToDraw.AnimationTransforms[i];
+			auto pos = Vector3::Transform(mesh.Sphere.Center, translationMatrix * worldMatrix);
+
+			auto sphere = BoundingSphere(pos, mesh.Sphere.Radius);
+			spheres.push_back(sphere);
 		}
-		else
-		{
-			world = Matrix::Identity * local;
-		}
-
-		world = nativeItem->Pose.Orientation.ToRotationMatrix() * world;
-
-		auto& moveable = GetRendererObject(nativeItem->ObjectNumber);
-
-		for (int i = 0; i< moveable.ObjectMeshes.size();i++)
-		{
-			auto mesh = moveable.ObjectMeshes[i];
-
-			auto pos = (Vector3)mesh->Sphere.Center;
-			if (worldSpace & SPHERES_SPACE_BONE_ORIGIN)
-				pos += moveable.LinearizedBones[i]->Translation;
-
-			spheres[i].Center = Vector3::Transform(pos, (itemToDraw->AnimationTransforms[i] * world));
-			spheres[i].Radius = mesh->Sphere.Radius;
-
-			// Spheres debug
-			// auto v1 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
-			// auto v2 = Vector3(spheres[i].Center.x + spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
-			// AddDebugLine(v1, v2, Vector4::One);
-		}
-
-		return (int)moveable.ObjectMeshes.size();
+		
+		return spheres;
 	}
 
 	void Renderer::GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix)
@@ -550,28 +543,38 @@ namespace TEN::Renderer
 		return std::pair<Vector3, Vector3>(nearPoint, farPoint);
 	}
 
-	Vector3 Renderer::GetAbsEntityBonePosition(int itemNumber, int jointIndex, const Vector3& relOffset)
+	Vector3 Renderer::GetMoveableBonePosition(int itemNumber, int boneID, const Vector3& relOffset)
 	{
 		auto* rendererItem = &_items[itemNumber];
-
 		rendererItem->ItemNumber = itemNumber;
 
-		if (!rendererItem)
+		if (rendererItem == nullptr)
 			return Vector3::Zero;
 
 		if (!rendererItem->DoneAnimations)
-		{
-			if (itemNumber == LaraItem->Index)
-				UpdateLaraAnimations(false);
-			else
-				UpdateItemAnimations(itemNumber, false);
-		}
+			(itemNumber == LaraItem->Index) ? UpdateLaraAnimations(false) : UpdateItemAnimations(itemNumber, false);
 
-		if (jointIndex >= MAX_BONES)
-			jointIndex = 0;
+		if (boneID >= MAX_BONES)
+			boneID = 0;
 
-		auto world = rendererItem->AnimationTransforms[jointIndex] * rendererItem->World;
+		auto world = rendererItem->AnimationTransforms[boneID] * rendererItem->World;
 		return Vector3::Transform(relOffset, world);
+	}
+
+	Quaternion Renderer::GetMoveableBoneOrientation(int itemNumber, int boneID)
+	{
+		const auto* rendererItem = &_items[itemNumber];
+
+		if (rendererItem == nullptr)
+			return Quaternion::Identity;
+
+		if (!rendererItem->DoneAnimations)
+			(itemNumber == LaraItem->Index) ? UpdateLaraAnimations(false) : UpdateItemAnimations(itemNumber, false);
+
+		if (boneID >= MAX_BONES)
+			boneID = 0;
+
+		return rendererItem->BoneOrientations[boneID];
 	}
 
 	void Renderer::SaveScreenshot()

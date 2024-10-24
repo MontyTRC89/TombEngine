@@ -7,7 +7,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/Point.h"
 #include "Game/collision/floordata.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -17,6 +17,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 
 namespace TEN::Entities::Traps
 {
@@ -107,8 +108,8 @@ namespace TEN::Entities::Traps
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 
-		if (!TestCollision(&item, playerItem))
-			return;
+	if (!HandleItemSphereCollision(item, *playerItem))
+		return;
 
 		SoundEffect(SFX_TR4_LARA_GENERAL_DEATH, &playerItem->Pose, SoundEnvironment::Always);
 		SoundEffect(SFX_TR4_LARA_HIGH_FALL_DEATH, &playerItem->Pose, SoundEnvironment::Always);

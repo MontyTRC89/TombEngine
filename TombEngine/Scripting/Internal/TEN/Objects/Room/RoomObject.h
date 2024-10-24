@@ -8,32 +8,50 @@ enum class ReverbType;
 class ScriptColor;
 class Vec3; 
 
-class Room : public NamedBase<Room, ROOM_INFO&>
-{
-public:
-	using IdentifierType = std::reference_wrapper<ROOM_INFO>;
-	Room(ROOM_INFO& room);
-	~Room() = default;
+//namespace TEN::Scripting
+//{
+	class Room : public NamedBase<Room, ROOM_INFO&>
+	{
+	private:
+		// Members
 
-	Room& operator =(const Room& other) = delete;
-	Room(const Room& other) = delete;
+		ROOM_INFO& _room;
 
-	static void Register(sol::table& parent);
+	public:
+		using IdentifierType = std::reference_wrapper<ROOM_INFO>;
 
-	[[nodiscard]] bool GetActive() const;
-	[[nodiscard]] ScriptColor GetColor() const;
+		static void Register(sol::table& parent);
 
-	[[nodiscard]] std::string GetName() const;
-	void SetName(const std::string& name);
+		// Constructors
 
-	[[nodiscard]] bool GetFlag(RoomEnvFlags flag) const;
-	void SetFlag(RoomEnvFlags flag, bool value);
+		Room(ROOM_INFO& room);
+		Room(const Room& room) = delete;
 
-	[[nodiscard]] ReverbType GetReverbType() const;
-	void SetReverbType(ReverbType reverbType);
+		// Destructors
 
-	[[nodiscard]] bool IsTagPresent(const std::string& tag) const;
+		~Room() = default;
 
-private:
-	ROOM_INFO& m_room;
-};
+		// Getters
+
+		int			GetRoomNumber() const;
+		std::string GetName() const;
+		ScriptColor GetColor() const;
+		ReverbType	GetReverbType() const;
+
+		// Setters
+
+		void SetName(const std::string& name);
+		void SetReverbType(ReverbType reverbType);
+		void SetFlag(RoomEnvFlags flag, bool value);
+
+		// Inquirers
+
+		bool IsTagPresent(const std::string& tag) const;
+		bool GetActive() const; // TODO: Rename to IsActive().
+		bool GetFlag(RoomEnvFlags flag) const; // TODO: Rename to HasFlag().
+
+		// Operators
+
+		Room& operator =(const Room& room) = delete;
+	};
+//}

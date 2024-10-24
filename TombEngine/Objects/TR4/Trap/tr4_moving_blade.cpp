@@ -2,7 +2,6 @@
 
 #include "Game/animation.h"
 #include "Game/control/control.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"

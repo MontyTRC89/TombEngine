@@ -72,6 +72,6 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 	}
 	else
 	{
-		CollectMultiplePickups(sarcItem->Index);
+		CollectCarriedItems(sarcItem);
 	}
 }

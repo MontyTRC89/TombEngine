@@ -2296,10 +2296,22 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		// Don't load player data in hub mode.
 		if (item->ObjectNumber == ID_LARA && hubMode)
+		{
+			//item->Pose = ToPose(*savedItem->pose());
+			item->RoomNumber = savedItem->room_number();
+			item->Floor = savedItem->floor();
+			item->BoxNumber = savedItem->box_number();
 			continue;
+		}
 
 		if (item->Index == Lara.Context.Vehicle && hubMode)
+		{
+			//item->Pose = ToPose(*savedItem->pose());
+			item->RoomNumber = savedItem->room_number();
+			item->Floor = savedItem->floor();
+			item->BoxNumber = savedItem->box_number();
 			continue;
+		}
 
 		// Position
 		item->Pose = ToPose(*savedItem->pose());

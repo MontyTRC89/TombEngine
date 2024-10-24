@@ -5,7 +5,6 @@
 #include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"

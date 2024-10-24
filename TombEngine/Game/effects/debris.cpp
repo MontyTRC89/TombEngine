@@ -1,10 +1,13 @@
 #include "Game/effects/debris.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Sphere;
+using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 ShatterImpactInfo ShatterImpactData;
@@ -22,17 +25,15 @@ bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits)
 		if (number == BODY_DO_EXPLOSION)
 			number = -64;
 
-		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
+		auto spheres = item->GetSpheres();
 		ShatterItem.yRot = item->Pose.Orientation.y;
 		ShatterItem.bit = 1 << node;
 		ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex + node;
-		ShatterItem.sphere.x = CreatureSpheres[node].x;
-		ShatterItem.sphere.y = CreatureSpheres[node].y;
-		ShatterItem.sphere.z = CreatureSpheres[node].z;
+		ShatterItem.sphere.Center = spheres[node].Center;
 		ShatterItem.color = item->Model.Color;
 		ShatterItem.flags = item->ObjectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
 		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
-		ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
+		ShatterImpactData.impactLocation = ShatterItem.sphere.Center;
 		ShatterObject(&ShatterItem, NULL, number, item->RoomNumber, noXZVel);
 		item->MeshBits &= ~ShatterItem.bit;
 
@@ -84,7 +85,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 		isStatic = false;
 		meshIndex = item->meshIndex;
 		yRot = item->yRot;
-		pos = Vector3(item->sphere.x, item->sphere.y, item->sphere.z);
+		pos = item->sphere.Center;
 		scale = 1.0f;
 	}
 
@@ -194,7 +195,7 @@ Vector3 CalculateFragmentImpactVelocity(const Vector3& fragmentWorldPosition, co
 	radiusStrenght = fmax(radiusStrenght, 0);
 	Vector3 radiusRandomVector = Vector3(Random::GenerateFloat(-0.2f, 0.2f), Random::GenerateFloat(-0.2f, 0.2f), Random::GenerateFloat(-0.2f, 0.2f)) + radiusNormVec;
 	radiusRandomVector.Normalize();
-	Vector3 radiusVelocity = radiusRandomVector * radiusStrenght * 40;
+	Vector3 radiusVelocity = radiusRandomVector * (radiusStrenght * 40);
 	Vector3 impactDirectionVelocity = (impactDirection + Vector3(Random::GenerateFloat(-0.2f, 0.2f), Random::GenerateFloat(-0.2f, 0.2f), Random::GenerateFloat(-0.2f, 0.2f))) * 80 ;
 	return radiusVelocity + impactDirectionVelocity;
 }

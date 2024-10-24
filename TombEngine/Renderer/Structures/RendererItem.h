@@ -18,6 +18,8 @@ namespace TEN::Renderer::Structures
 		Matrix Scale;
 		Matrix AnimationTransforms[MAX_BONES];
 
+		Quaternion BoneOrientations[MAX_BONES];
+
 		int RoomNumber = NO_VALUE;
 		int PrevRoomNumber = NO_VALUE;
 		Vector4 Color;

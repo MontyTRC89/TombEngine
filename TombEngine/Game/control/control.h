@@ -49,15 +49,11 @@ enum FadeStatus
 
 constexpr int MAX_ROOMS = 1024;
 
-constexpr int WIBBLE_SPEED = 4;
-constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
-
 constexpr int LOOP_FRAME_COUNT = 2;
 
 extern int GameTimer;
 extern int RumbleTimer;
 extern int GlobalCounter;
-extern int Wibble;
 
 extern bool InitializeGame;
 extern bool DoTheGame;

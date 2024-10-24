@@ -582,7 +582,7 @@ static void StartVehicles(ObjectInfo* obj)
 	obj = &Objects[ID_UPV];
 	if (obj->loaded)
 	{
-		obj->Initialize = UPVInitialize;
+		obj->Initialize = InitializeUPV;
 		obj->control = UPVEffects;
 		obj->collision = UPVPlayerCollision;
 		obj->shadowType = ShadowMode::Lara;

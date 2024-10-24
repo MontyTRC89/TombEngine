@@ -3,7 +3,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -14,6 +14,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 
 // NOTES:
 // ItemFlags[0]: forward velocity.
@@ -128,7 +129,7 @@ namespace TEN::Entities::Traps
 			if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 				return;
 
-			TestCollision(&item, playerItem);
+			HandleItemSphereCollision(item, *playerItem);
 		}
 		else if (item.Status != ITEM_INVISIBLE)
 		{
