@@ -41,6 +41,7 @@
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Emitter/tr5_smoke_emitter.h"
+#include "Objects/TR5/Emitter/Waterfall.h"
 
 // Objects
 #include "Objects/TR5/Light/tr5_light.h"
@@ -74,6 +75,7 @@
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
 
 using namespace TEN::Effects::EmberEmitter;
+using namespace TEN::Effects::WaterfallEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Traps;
@@ -752,6 +754,15 @@ static void StartObject(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeSmokeEmitter;
 		obj->control = SmokeEmitterControl;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_WATERFALL_EMITTER];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeWaterfall;
+		obj->control = ControlWaterfall;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
