@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Entity/tr4_sphinx.h"
 
 #include "Game/collision/collide_room.h"

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/collision/floordata.h"
 
 struct ItemInfo;

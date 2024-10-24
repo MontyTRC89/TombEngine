@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/items.h"
 
 constexpr auto NUM_BATS = 64;

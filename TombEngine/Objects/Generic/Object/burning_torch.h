@@ -1,5 +1,4 @@
 #pragma once
-#include "Math/Math.h"
 
 struct CollisionInfo;
 struct ItemInfo;

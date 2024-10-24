@@ -1,5 +1,4 @@
 #pragma once
-#include <variant>
 
 struct CAMERA_INFO;
 struct MESH_INFO;

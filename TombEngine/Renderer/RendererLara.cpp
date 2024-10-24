@@ -1,23 +1,20 @@
-#include "framework.h"
 #include "Renderer/Renderer.h"
 
 #include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/collision/Sphere.h"
+#include "Game/control/control.h"
 #include "Game/effects/Hair.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
-#include "Game/control/control.h"
-#include "Game/spotcam.h"
-#include "Game/camera.h"
-#include "Game/collision/Sphere.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
+#include "Game/spotcam.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Hair;
-using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 extern ScriptInterfaceFlowHandler *g_GameFlow;

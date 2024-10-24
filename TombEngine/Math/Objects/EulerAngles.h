@@ -1,8 +1,11 @@
 #pragma once
+
 #include "Math/Objects/AxisAngle.h"
 
-//namespace TEN::Math
-//{
+namespace TEN::Math
+{
+	class AxisAngle;
+
 	class EulerAngles
 	{
 	public:
@@ -18,7 +21,7 @@
 
 		// Constructors
 
-		constexpr EulerAngles() {};
+		constexpr EulerAngles() = default;
 		constexpr EulerAngles(short x, short y, short z) { this->x = x; this->y = y; this->z = z; };
 				  EulerAngles(const Vector3& dir);
 				  EulerAngles(const AxisAngle& axisAngle);
@@ -66,4 +69,4 @@
 		static short Lerp(short angleFrom, short angleTo, float alpha, short epsilon = 3);
 		static short InterpolateConstant(short angleFrom, short angleTo, short angularVel);
 	};
-//}
+}

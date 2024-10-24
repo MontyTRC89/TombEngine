@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/effects/DisplaySprite.h"
 #include "Objects/game_object_ids.h"
 #include "Scripting/Internal/TEN/Color/Color.h"

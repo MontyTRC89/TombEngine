@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR2/Entity/tr2_knife_thrower.h"
 
 #include "Game/collision/collide_item.h"
@@ -13,11 +12,8 @@
 #include "Game/missile.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR2
 {

@@ -1,7 +1,4 @@
-#include "framework.h"
 #include "Game/savegame.h"
-
-#include <filesystem>
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"

@@ -1,9 +1,9 @@
 #pragma once
+
 #include "Game/animation.h"
 #include "Game/itemdata/itemdata.h"
-#include "Math/Math.h"
-#include "Specific/BitField.h"
 #include "Objects/game_object_ids.h"
+#include "Specific/BitField.h"
 #include "Specific/newtypes.h"
 
 using namespace TEN::Utils;

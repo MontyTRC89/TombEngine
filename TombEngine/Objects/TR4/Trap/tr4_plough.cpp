@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Trap/tr4_plough.h"
 
 #include "Game/animation.h"

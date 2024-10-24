@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/effects/tomb4fx.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
@@ -17,7 +16,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
@@ -29,7 +27,7 @@ using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
-using namespace TEN::Math;
+
 using TEN::Renderer::g_Renderer;
 
 // NOTE: This fixes body part exploding instantly if entity is on ground.

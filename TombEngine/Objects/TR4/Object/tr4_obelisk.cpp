@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Object/tr4_obelisk.h"
 
 #include "Game/animation.h"

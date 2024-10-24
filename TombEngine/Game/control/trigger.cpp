@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/control/trigger.h"
 
 #include "Game/camera.h"

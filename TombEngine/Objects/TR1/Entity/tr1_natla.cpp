@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR1/Entity/tr1_natla.h"
 
 #include "Game/control/box.h"
@@ -9,12 +8,9 @@
 #include "Game/missile.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Sound/sound.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
 {

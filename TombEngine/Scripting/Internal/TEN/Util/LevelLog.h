@@ -1,8 +1,5 @@
 #pragma once
-#include <string>
-#include <unordered_map>
 
-#include "Game/Debug/Debug.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 
 /***

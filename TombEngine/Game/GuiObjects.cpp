@@ -1,13 +1,9 @@
-#include "framework.h"
 #include "Game/GuiObjects.h"
 
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_two_guns.h"
-#include "Math/Math.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Gui
 {

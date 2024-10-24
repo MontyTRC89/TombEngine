@@ -1,7 +1,4 @@
-#include "framework.h"
 #include "Game/Gui.h"
-
-#include <OISKeyboard.h>
 
 #include "Game/animation.h"
 #include "Game/camera.h"

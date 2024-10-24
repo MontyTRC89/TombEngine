@@ -1,12 +1,10 @@
 #pragma once
-#include <SimpleMath.h>
-#include "Renderer/Structures/RendererMesh.h"
+
 #include "Renderer/Structures/RendererLight.h"
+#include "Renderer/Structures/RendererMesh.h"
 
 namespace TEN::Renderer::Structures
 {
-	using namespace DirectX::SimpleMath;
-
 	struct RendererEffect
 	{
 		int ObjectNumber;

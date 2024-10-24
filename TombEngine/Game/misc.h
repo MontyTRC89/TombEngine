@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/control/box.h"
 
 #define CHK_ANY(var, flag) (var & flag) != 0

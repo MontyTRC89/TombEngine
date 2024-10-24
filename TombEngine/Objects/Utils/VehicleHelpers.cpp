@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Utils/VehicleHelpers.h"
 
 #include "Game/collision/collide_item.h"
@@ -21,7 +20,6 @@ using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Hud;
 using namespace TEN::Input;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Vehicles
 {

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 
 #include "Game/collision/collide_room.h"

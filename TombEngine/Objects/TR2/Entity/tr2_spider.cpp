@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR2/Entity/tr2_spider.h"
 
 #include "Game/animation.h"
@@ -12,7 +11,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/level.h"
 
 namespace TEN::Entities::Creatures::TR2

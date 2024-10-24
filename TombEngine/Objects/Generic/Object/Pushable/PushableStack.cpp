@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Generic/Object/Pushable/PushableStack.h"
 
 #include "Game/collision/floordata.h"

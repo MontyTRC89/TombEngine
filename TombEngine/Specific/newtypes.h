@@ -1,5 +1,5 @@
 #pragma once
-#include "framework.h"
+
 #include "Renderer/RendererEnums.h"
 
 struct POLYGON

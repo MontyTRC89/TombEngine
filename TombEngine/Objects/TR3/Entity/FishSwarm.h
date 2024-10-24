@@ -1,8 +1,6 @@
 #pragma once
-#include "Game/items.h"
-#include "Math/Math.h"
 
-using namespace TEN::Math;
+#include "Game/items.h"
 
 namespace TEN::Entities::Creatures::TR3
 {

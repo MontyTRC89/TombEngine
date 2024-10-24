@@ -1,10 +1,8 @@
 #pragma once
 
-// Last generated on 18/11/2022
-
-#include <unordered_map>
-#include <string>
 #include "Objects/game_object_ids.h"
+
+// Last generated on 18/11/2022
 
 /***
 Constants for object IDs.

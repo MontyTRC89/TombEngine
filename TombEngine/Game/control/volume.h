@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/control/event.h"
 #include "Game/room.h"
 #include "Game/Setup.h"

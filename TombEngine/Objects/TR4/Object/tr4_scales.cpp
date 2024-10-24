@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR4/Object/tr4_scales.h"
 
 #include "Game/animation.h"

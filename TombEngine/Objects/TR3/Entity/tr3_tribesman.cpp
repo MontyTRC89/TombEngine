@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Entity/tr3_tribesman.h"
 
 #include "Game/animation.h"
@@ -11,13 +10,11 @@
 #include "Game/missile.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
 using namespace TEN::Entities::Traps;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {

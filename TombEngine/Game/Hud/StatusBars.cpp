@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/Hud/StatusBars.h"
 
 #include "Game/camera.h"

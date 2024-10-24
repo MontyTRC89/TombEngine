@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Entity/WaspMutant.h"
 
 #include "Game/control/box.h"
@@ -6,10 +5,8 @@
 #include "Game/effects/spark.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 
 using namespace TEN::Effects::Spark;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
 {

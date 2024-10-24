@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/effects/Footprint.h"
 
 #include "Game/animation.h"
@@ -10,7 +9,6 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Utils/object_helper.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
@@ -18,7 +16,6 @@
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
-using namespace TEN::Math;
 
 namespace TEN::Effects::Footprint
 {

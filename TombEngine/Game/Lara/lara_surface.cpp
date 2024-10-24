@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/Lara/lara_surface.h"
 
 #include "Game/camera.h"

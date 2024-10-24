@@ -1,8 +1,6 @@
 #pragma once
-#include "Math/Math.h"
-#include "Scripting/Internal/LanguageScript.h"
 
-using namespace TEN::Math;
+#include "Scripting/Internal/LanguageScript.h"
 
 struct ItemInfo;
 

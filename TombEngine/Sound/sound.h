@@ -1,6 +1,4 @@
 #pragma once
-#include <bass.h>
-#include <bass_fx.h>
 
 #include "Game/control/control.h"
 #include "Sound/sound_effects.h"

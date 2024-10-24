@@ -1,7 +1,5 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Strings/StringsHandler.h"
-#include "Scripting/Internal/ScriptAssert.h"
-#include "Scripting/Internal/TEN/Flow/FlowHandler.h"
+
 #include "Renderer/RendererEnums.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"

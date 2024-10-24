@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Fog.h"
 
 /***
@@ -56,7 +55,6 @@ void Fog::SetColor(ScriptColor const& col)
 	G = col.GetG();
 	B = col.GetB();
 }
-
 
 ScriptColor Fog::GetColor() const
 {

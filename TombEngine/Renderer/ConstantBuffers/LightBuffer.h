@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Renderer/ConstantBuffers/ShaderLight.h"
 #include "Renderer/RendererEnums.h"
 

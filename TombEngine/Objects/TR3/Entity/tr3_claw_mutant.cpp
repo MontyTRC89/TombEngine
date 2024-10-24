@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR3/Entity/tr3_claw_mutant.h"
 
 #include "Game/animation.h"
@@ -8,11 +7,9 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Effects/enemy_missile.h"
 
 using namespace TEN::Entities::Effects;
-using namespace TEN::Math;
 
 // ItemFlags[5] flag enables damage left (0 = enabled, 1 = disabled).
 // ItemFlags[6] flag enables damage right (0 = enabled, 1 = disabled).

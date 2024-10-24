@@ -1,9 +1,9 @@
 #pragma once
 
-class AxisAngle;
-class EulerAngles;
-class Pose;
-class Vector3i;
+namespace TEN::Math { class AxisAngle; };
+namespace TEN::Math { class EulerAngles; };
+namespace TEN::Math { class Pose; };
+namespace TEN::Math { class Vector3i; };
 
 namespace TEN::Math::Geometry
 {

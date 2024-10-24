@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/Lara/lara_tests.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
@@ -16,7 +15,6 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_monkey.h"
-#include "Math/Math.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -26,7 +24,6 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
-using namespace TEN::Math;
 using namespace TEN::Utils;
 
 // -----------------------------

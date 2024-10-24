@@ -1,7 +1,7 @@
 #pragma once
+
 #include "Game/GuiObjects.h"
 #include "Scripting/Internal/LanguageScript.h"
-#include "Math/Math.h"
 #include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/InputAction.h"
@@ -9,7 +9,6 @@
 struct ItemInfo;
 
 using namespace TEN::Input;
-using namespace TEN::Math;
 
 namespace TEN::Gui
 {

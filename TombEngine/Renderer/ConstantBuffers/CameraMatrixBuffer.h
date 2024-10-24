@@ -1,7 +1,7 @@
 #pragma once
-#include <SimpleMath.h>
-#include "Renderer/ConstantBuffers/ShaderLight.h"
+
 #include "Renderer/ConstantBuffers/ShaderFogBulb.h"
+#include "Renderer/ConstantBuffers/ShaderLight.h"
 #include "Renderer/RendererEnums.h"
 
 namespace TEN::Renderer::ConstantBuffers
@@ -48,4 +48,3 @@ namespace TEN::Renderer::ConstantBuffers
 		ShaderFogBulb FogBulbs[MAX_FOG_BULBS_DRAW];
 	};
 }
-

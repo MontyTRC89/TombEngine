@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/Effects/enemy_missile.h"
 
 #include "Game/collision/collide_item.h"
@@ -11,7 +10,6 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Math/Math.h"
 #include "Objects/TR3/Entity/tr3_claw_mutant.h"
 #include "Objects/TR4/Entity/tr4_mutant.h"
 #include "Objects/TR4/Entity/tr4_demigod.h"
@@ -22,7 +20,6 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::TR4;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Effects
 {

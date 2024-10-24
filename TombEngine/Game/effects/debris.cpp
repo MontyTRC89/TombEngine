@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/effects/debris.h"
 
 #include "Game/collision/collide_room.h"
@@ -6,7 +5,6 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
-#include "Math/Math.h"
 
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
@@ -197,7 +195,7 @@ Vector3 CalculateFragmentImpactVelocity(const Vector3& fragmentWorldPosition, co
 	radiusStrenght = fmax(radiusStrenght, 0);
 	Vector3 radiusRandomVector = Vector3(Random::GenerateFloat(-0.2f, 0.2f), Random::GenerateFloat(-0.2f, 0.2f), Random::GenerateFloat(-0.2f, 0.2f)) + radiusNormVec;
 	radiusRandomVector.Normalize();
-	Vector3 radiusVelocity = radiusRandomVector * radiusStrenght*40;
+	Vector3 radiusVelocity = radiusRandomVector * (radiusStrenght * 40);
 	Vector3 impactDirectionVelocity = (impactDirection + Vector3(Random::GenerateFloat(-0.2f, 0.2f), Random::GenerateFloat(-0.2f, 0.2f), Random::GenerateFloat(-0.2f, 0.2f))) * 80 ;
 	return radiusVelocity + impactDirectionVelocity;
 }

@@ -1,8 +1,6 @@
 #pragma once
-#include "Math/Math.h"
-#include "Objects/game_object_ids.h"
 
-using namespace TEN::Math;
+#include "Objects/game_object_ids.h"
 
 namespace TEN::Hud
 {

@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR5/Entity/tr5_cyborg.h"
 
 #include "Game/animation.h"

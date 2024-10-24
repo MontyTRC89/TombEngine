@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/pickup/pickup_key_items.h"
 
 #include "Game/Lara/lara_struct.h"
