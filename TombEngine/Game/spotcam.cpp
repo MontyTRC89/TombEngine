@@ -491,18 +491,15 @@ void CalculateSpotCameras()
 		if (outsideRoom == NO_VALUE)
 		{
 			if (Camera.pos.RoomNumber != SpotCam[CurrentSplineCamera].roomNumber)
-			{
 				Camera.DisableInterpolation = true;
-			}
+		
 			Camera.pos.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
 			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
 		}
 		else
 		{
 			if (Camera.pos.RoomNumber != outsideRoom)
-			{
 				Camera.DisableInterpolation = true;
-			}
 
 			Camera.pos.RoomNumber = outsideRoom;
 		}

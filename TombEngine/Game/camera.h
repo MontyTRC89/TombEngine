@@ -46,8 +46,9 @@ struct CAMERA_INFO
 	ItemInfo* lastItem;
 	int mikeAtLara;
 	Vector3i mikePos;
-	float currentRoll;
-	float currentFov;
+
+	float Roll = 0.0f;
+	float Fov  = 0.0f;
 
 	bool DisableInterpolation = false;
 };

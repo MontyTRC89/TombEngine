@@ -400,9 +400,7 @@ namespace TEN::Renderer
 	void Renderer::PrepareParticles(RenderView& view)
 	{
 		for (int i = 0; i < ParticleNodeOffsetIDs::NodeMax; i++)
-		{
 			NodeOffsets[i].gotIt = false;
-		}
 
 		for (auto& particle : Particles)
 		{
@@ -420,27 +418,27 @@ namespace TEN::Renderer
 				{
 					const auto& fx = EffectList[particle.fxObj];
 
-					RendererEffect* newEffect = &_effects[particle.fxObj];
+					auto& newEffect = _effects[particle.fxObj];
 
-					newEffect->Translation = Matrix::CreateTranslation(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z);
-					newEffect->Rotation = fx.pos.Orientation.ToRotationMatrix();
-					newEffect->Scale = Matrix::CreateScale(1.0f);
-					newEffect->World = newEffect->Rotation * newEffect->Translation;
-					newEffect->ObjectID = fx.objectNumber;
-					newEffect->RoomNumber = fx.roomNumber;
-					newEffect->Position = fx.pos.Position.ToVector3();
+					newEffect.Translation = Matrix::CreateTranslation(fx.pos.Position.ToVector3());
+					newEffect.Rotation = fx.pos.Orientation.ToRotationMatrix();
+					newEffect.Scale = Matrix::CreateScale(1.0f);
+					newEffect.World = newEffect.Rotation * newEffect.Translation;
+					newEffect.ObjectID = fx.objectNumber;
+					newEffect.RoomNumber = fx.roomNumber;
+					newEffect.Position = fx.pos.Position.ToVector3();
 					
-					newEffect->InterpolatedPosition = Vector3::Lerp(newEffect->PrevPosition, newEffect->Position, _interpolationFactor);
-					newEffect->InterpolatedTranslation = Matrix::Lerp(newEffect->PrevTranslation, newEffect->Translation, _interpolationFactor);
-					newEffect->InterpolatedRotation = Matrix::Lerp(newEffect->InterpolatedRotation, newEffect->Rotation, _interpolationFactor);
-					newEffect->InterpolatedWorld = Matrix::Lerp(newEffect->PrevWorld, newEffect->World, _interpolationFactor);
-					newEffect->InterpolatedScale = Matrix::Lerp(newEffect->PrevScale, newEffect->Scale, _interpolationFactor);
+					newEffect.InterpolatedPosition = Vector3::Lerp(newEffect.PrevPosition, newEffect.Position, _interpolationFactor);
+					newEffect.InterpolatedTranslation = Matrix::Lerp(newEffect.PrevTranslation, newEffect.Translation, _interpolationFactor);
+					newEffect.InterpolatedRotation = Matrix::Lerp(newEffect.InterpolatedRotation, newEffect.Rotation, _interpolationFactor);
+					newEffect.InterpolatedWorld = Matrix::Lerp(newEffect.PrevWorld, newEffect.World, _interpolationFactor);
+					newEffect.InterpolatedScale = Matrix::Lerp(newEffect.PrevScale, newEffect.Scale, _interpolationFactor);
 
-					pos += newEffect->InterpolatedPosition;
+					pos += newEffect.InterpolatedPosition;
 
 					if ((particle.sLife - particle.life) > Random::GenerateInt(8, 12))
 					{
-						// Particle becomes autonome
+						// Particle becomes autonome.
 						particle.flags &= ~SP_FX;
 
 						particle.x = particle.PrevX = pos.x;
@@ -450,7 +448,7 @@ namespace TEN::Renderer
 				}
 				else if (!(particle.flags & SP_ITEM))
 				{
-					// NOTE: pos already set before...
+					// NOTE: pos already set previously.
 					//pos.x = particle.x;
 					//pos.y = particle.y;
 					//pos.z = particle.z;
@@ -490,7 +488,7 @@ namespace TEN::Renderer
 
 						if ((particle.sLife - particle.life) > Random::GenerateInt(4, 8))
 						{
-							// Particle becomes autonome
+							// Particle becomes autonome.
 							particle.flags &= ~SP_ITEM;
 
 							particle.x = particle.PrevX = pos.x;
@@ -504,7 +502,7 @@ namespace TEN::Renderer
 					}
 				}
 
-				// Don't allow sprites out of bounds.
+				// Disallow sprites out of bounds.
 				int spriteIndex = std::clamp((int)particle.spriteIndex, 0, (int)_sprites.size());
 
 				AddSpriteBillboard(

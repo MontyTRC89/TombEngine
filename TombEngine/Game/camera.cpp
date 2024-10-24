@@ -194,8 +194,8 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 
 void LookAt(CAMERA_INFO* cam, short roll)
 {
-	cam->currentFov = TO_RAD(CurrentFOV / 1.333333f);
-	cam->currentRoll = TO_RAD(roll);
+	cam->Fov = TO_RAD(CurrentFOV / 1.333333f);
+	cam->Roll = TO_RAD(roll);
 }
 
 void AlterFOV(short value, bool store)
