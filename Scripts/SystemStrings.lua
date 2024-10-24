@@ -114,6 +114,7 @@ local strings =
 	total_secrets_found = { "Secrets Found Total" },
 	use = { "Use" },
 	used_medipacks = { "Medipacks Used" },
+	variable_framerate = { "Variable Framerate" },
 	vehicle_actions = { "Vehicle Actions" },
 	view = { "View" },
 	volumetric_fog = { "Volumetric Fog" },

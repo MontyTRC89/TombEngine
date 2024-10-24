@@ -18,6 +18,15 @@ namespace TEN::Hud
 		float _opacity		= 0.0f;
 		float _life			= 0.0f;
 
+		short _prevPointerAngle = 0;
+		float _prevOpacity = 0.0f;
+
+		void StoreInterpolationData()
+		{
+			_prevPointerAngle = _pointerAngle;
+			_prevOpacity = _opacity;
+		}
+
 	public:
 		// Utilities
 

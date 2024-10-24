@@ -62,6 +62,8 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				{
 					UpdateItemRoom(item.Index);
 				}
+
+				item.DisableInterpolation = true;
 			}
 
 			commandDataPtr += 3;
@@ -208,6 +210,13 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				DoFlipEffect((commandDataPtr[1] & 0x3FFF), &item);
 
 			commandDataPtr += 2;
+			break;
+
+		case AnimCommandType::DisableInterpolation:
+			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+				item.DisableInterpolation = true;
+
+			commandDataPtr += 1;
 			break;
 
 		default:

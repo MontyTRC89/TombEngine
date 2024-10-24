@@ -141,6 +141,8 @@ void UpdateRats()
 
 			if (rat->On)
 			{
+				rat->StoreInterpolationData();
+
 				int oldX = rat->Pose.Position.x;
 				int oldY = rat->Pose.Position.y;
 				int oldZ = rat->Pose.Position.z;

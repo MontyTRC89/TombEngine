@@ -134,6 +134,8 @@ void UpdateSpiders()
 
 			if (spider->On)
 			{
+				spider->StoreInterpolationData();
+
 				int x = spider->Pose.Position.x;
 				int y = spider->Pose.Position.y;
 				int z = spider->Pose.Position.z;
@@ -241,6 +243,10 @@ void UpdateSpiders()
 
 				if (!i && !(GetRandomControl() & 4))
 					SoundEffect(SFX_TR5_INSECTS,&spider->Pose);
+
+				auto tMatrix = Matrix::CreateTranslation(spider->Pose.Position.ToVector3());
+				auto rotMatrix = spider->Pose.Orientation.ToRotationMatrix();
+				spider->Transform = rotMatrix * tMatrix;
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 #ifndef SHADER_LIGHT
 #define SHADER_LIGHT
 
+#include "./CBCamera.hlsli"
 #include "./Math.hlsli"
 
 float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)
