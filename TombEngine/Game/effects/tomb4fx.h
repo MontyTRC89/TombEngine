@@ -3,7 +3,6 @@
 #include "Game/Lara/lara_struct.h"
 #include "Math/Math.h"
 #include "Renderer/RendererEnums.h"
-#include <vector>
 
 enum class LaraWeaponType;
 struct CreatureBiteInfo;
