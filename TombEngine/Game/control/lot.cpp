@@ -211,9 +211,9 @@ void TargetNearestEntity(ItemInfo& item, const std::vector<GAME_OBJECT_ID>& keyO
 	auto& creature = *GetCreatureInfo(&item);
 
 	float closestDistSqr = INFINITY;
-	for (auto& creature : ActiveCreatures)
+	for (auto& target : ActiveCreatures)
 	{
-		auto& targetItem = g_Level.Items[creature->ItemNumber];
+		auto& targetItem = g_Level.Items[target->ItemNumber];
 		if (targetItem.Index == item.Index)
 			continue;
 
@@ -226,7 +226,7 @@ void TargetNearestEntity(ItemInfo& item, const std::vector<GAME_OBJECT_ID>& keyO
 			float distSqr = Vector3i::DistanceSquared(item.Pose.Position, targetItem.Pose.Position);
 			if (distSqr < closestDistSqr)
 			{
-				creature->Enemy = &targetItem;
+				creature.Enemy = &targetItem;
 				closestDistSqr = distSqr;
 			}
 		}
