@@ -119,7 +119,7 @@ struct FIRE_LIST
 	int x;
 	int y;
 	int z;
-	byte on;
+	unsigned char fade;
 	float size;
 	short roomNumber;
 };
@@ -235,7 +235,7 @@ void ThrowPoison(const ItemInfo& item, int boneID, const Vector3& offset, const 
 void ThrowPoison(const ItemInfo& item, const CreatureBiteInfo& bite, const Vector3& vel, const Color& colorStart, const Color& colorEnd, int spriteID = 0);
 void UpdateFireProgress();
 void ClearFires();
-void AddFire(int x, int y, int z, short roomNum, float size, short fade);
+void AddFire(int x, int y, int z, short roomNum, float size, short fade = 1);
 void UpdateFireSparks();
 int GetFreeSmokeSpark();
 void UpdateSmoke();

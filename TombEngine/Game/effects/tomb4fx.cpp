@@ -373,11 +373,7 @@ void AddFire(int x, int y, int z, short roomNum, float size, short fade)
 {
 	FIRE_LIST newFire;
 	
-	if (fade)
-		newFire.on = fade;
-	else
-		newFire.on = 1;
-
+	newFire.fade = (fade == 0 ? 1 : (unsigned char)fade);
 	newFire.x = x;
 	newFire.y = y;
 	newFire.z = z;

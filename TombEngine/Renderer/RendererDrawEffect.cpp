@@ -294,7 +294,7 @@ namespace TEN::Renderer
 	{
 		for (const auto& fire : Fires)
 		{
-			auto fade = fire.on == 1 ? 1.0f : (float)(255 - fire.on) / 255.0f;
+			auto fade = (fire.fade == 1 ? 1.0f : (float)(255 - fire.fade) / 255.0f);
 
 			for (int i = 0; i < MAX_SPARKS_FIRE; i++) 
 			{
