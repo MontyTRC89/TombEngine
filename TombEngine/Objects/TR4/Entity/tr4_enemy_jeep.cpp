@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR4/Entity/EnemyJeep.h"
+#include "Objects/TR4/Entity/tr4_enemy_jeep.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"

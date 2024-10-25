@@ -579,7 +579,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Entity\tr4_crocodile.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_demigod.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_dog.h" />
-    <ClInclude Include="Objects\TR4\Entity\EnemyJeep.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_enemy_jeep.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_guide.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_hammerhead.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_harpy.h" />
@@ -1078,7 +1078,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_crocodile.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_dog.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\EnemyJeep.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_enemy_jeep.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_hammerhead.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_harpy.cpp" />

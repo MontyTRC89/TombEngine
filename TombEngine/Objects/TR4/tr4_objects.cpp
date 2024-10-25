@@ -11,8 +11,8 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR4/Entity/EnemyJeep.h"
 #include "Objects/TR4/Entity/Wraith.h"
+#include "Objects/TR4/Entity/tr4_enemy_jeep.h"
 #include "Objects/TR4/Entity/tr4_ahmet.h" // OK
 #include "Objects/TR4/Entity/tr4_baddy.h" // OK
 #include "Objects/TR4/Entity/tr4_bat.h" // OK
