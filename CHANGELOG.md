@@ -66,12 +66,12 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * The limit of 32 active Flame Emitters has been removed.
 	
 ### Lua API changes
-
 * Added Flow.EnableHomeLevel() function.
 * Added Flow.IsStringPresent() function.
-* Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Flow.LensFlare() and Flow.Starfield() classes.
+* Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Input.KeyClearAll() function.
+* Added Moveable.GetJointRotation() and optional 'offset' parameter for Moveable.GetJointPosition().
 * Added Room:GetRoomNumber() function.
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
 * Fixed Volume:GetActive() method.
