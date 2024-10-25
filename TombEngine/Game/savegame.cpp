@@ -1078,7 +1078,7 @@ const std::vector<byte> SaveGame::Build()
 
 	// Particles
 	std::vector<flatbuffers::Offset<Save::ParticleInfo>> particles;
-	for (int i = 0; i < PARTICLE_COUNT_MAX; i++)
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
 		auto* particle = &Particles[i];
 

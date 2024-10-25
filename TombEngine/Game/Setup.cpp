@@ -140,9 +140,9 @@ void InitializeSpecialEffects()
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
 	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
-	memset(&Particles, 0, PARTICLE_COUNT_MAX * sizeof(Particle));
+	memset(&Particles, 0, MAX_PARTICLES * sizeof(Particle));
 
-	for (int i = 0; i < PARTICLE_COUNT_MAX; i++)
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
 		Particles[i].on = false;
 		Particles[i].dynamic = -1;

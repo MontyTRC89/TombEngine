@@ -44,7 +44,7 @@ constexpr int WIBBLE_SPEED = 4;
 constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
 
 // New particle class
-Particle Particles[PARTICLE_COUNT_MAX];
+Particle Particles[MAX_PARTICLES];
 ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
 FX_INFO EffectList[NUM_EFFECTS];
@@ -84,7 +84,7 @@ void DetatchSpark(int number, SpriteEnumFlag type)
 {
 	auto* sptr = &Particles[0];
 
-	for (int lp = 0; lp < PARTICLE_COUNT_MAX; lp++, sptr++)
+	for (int lp = 0; lp < MAX_PARTICLES; lp++, sptr++)
 	{
 		if (sptr->on && (sptr->flags & type) && sptr->fxObj == number)
 		{
@@ -129,7 +129,7 @@ Particle* GetFreeParticle()
 	int partID = NO_VALUE;
 
 	// Get first free available particle.
-	for (int i = 0; i < PARTICLE_COUNT_MAX; i++)
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
 		const auto& part = Particles[i];
 		if (!part.on)
@@ -143,7 +143,7 @@ Particle* GetFreeParticle()
 	float shortestLife = INFINITY;
 	if (partID == NO_VALUE)
 	{
-		for (int i = 0; i < PARTICLE_COUNT_MAX; i++)
+		for (int i = 0; i < MAX_PARTICLES; i++)
 		{
 			const auto& part = Particles[i];
 
@@ -199,7 +199,7 @@ void UpdateSparks()
 		LaraItem->Pose.Position.z + bounds.Z1,
 		LaraItem->Pose.Position.z + bounds.Z2);
 
-	for (int i = 0; i < PARTICLE_COUNT_MAX; i++)
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
 		auto* spark = &Particles[i];
 
@@ -367,7 +367,7 @@ void UpdateSparks()
 		}
 	}
 
-	for (int i = 0; i < PARTICLE_COUNT_MAX; i++)
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
 		auto* spark = &Particles[i];
 
