@@ -179,14 +179,14 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 /// Set effect to moveable
 // @function Moveable:SetEffect
 // @tparam Effects.EffectID effect Type of effect to assign.
-// @tparam float timeout time (in seconds) after which effect turns off (optional).
+// @tparam[opt] float timeout time (in seconds) after which effect turns off.
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
 /// Set custom colored burn effect to moveable
 // @function Moveable:SetCustomEffect
 // @tparam Color Color1 color the primary color of the effect (also used for lighting).
 // @tparam Color Color2 color the secondary color of the effect.
-// @tparam float timeout time (in seconds) after which effect turns off (optional).
+// @tparam[opt] float timeout time (in seconds) after which effect turns off.
 	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
 
 /// Get current moveable effect
