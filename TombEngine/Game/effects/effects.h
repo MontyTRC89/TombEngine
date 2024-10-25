@@ -18,6 +18,8 @@ constexpr auto NUM_EFFECTS	= 256;
 constexpr auto PARTICLE_COUNT_MAX		 = 1024;
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 
+extern int Wibble;
+
 enum SpriteEnumFlag
 {
 	SP_NONE		  = 0,
@@ -300,5 +302,6 @@ void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
+void UpdateWibble();
 
 void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff);
