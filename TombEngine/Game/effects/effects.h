@@ -162,27 +162,6 @@ struct Particle
 	int fxObj;
 	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
-
-	// TODO: Clean above mess.
-	/*int SpriteObjectID = 0;
-
-	Vector3 Position	= Vector3::Zero;
-	int		RoomNumber	= 0;
-	short	Orientation = 0;
-	Vector3 Velocity	= Vector3::Zero;
-	Color	Colora		= Color();
-	Color	ColorStart	= Color();
-	Color	ColorEnd	= Color();
-
-	BlendMode BlendMode = BlendMode::Additive;
-
-	float Life		= 0.0f;
-	float LifeStart = 0.0f;
-
-	float Gravity  = 0.0f;
-	float Friction = 0.0f;
-	short Rotation = 0;
-	float Scalar   = 0.0f;*/
 };
 
 struct SPLASH_STRUCT
