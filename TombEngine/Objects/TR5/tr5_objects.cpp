@@ -37,7 +37,7 @@
 #include "Objects/TR5/Entity/tr5_willowwisp.h"	 // OK
 
 // Emitters
-#include "Objects/TR5/Emitter/SmokeEmitter.h"
+#include "Objects/TR5/Emitter/tr4_smoke_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
