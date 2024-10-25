@@ -77,21 +77,23 @@ Must be true or false
 */
 	tableFlow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
 
-	/*** Enable or disable saving and loading of savegames.
-	@function EnableLoadSave
-	@tparam bool enabled true or false.
-	*/
+	/// Enable or disable Home Level entry in the main menu.
+	// @function EnableHomeLevel()
+	// @tparam bool enabled True or false.
+	tableFlow.set_function(ScriptReserved_EnableHomeLevel, &FlowHandler::EnableHomeLevel, this);
+
+	/// Enable or disable saving and loading of savegames.
+	// @function EnableLoadSave()
+	// @tparam bool enabled True or false.
 	tableFlow.set_function(ScriptReserved_EnableLoadSave, &FlowHandler::EnableLoadSave, this);
 
 /*** gameflow.lua or level scripts.
 @section FlowluaOrScripts
 */
 
-/*** Enable or disable DOZY mode (fly cheat).
-Must be true or false
-@function EnableFlyCheat
-@tparam bool enabled true or false
-*/
+	/// Enable or disable the fly cheat.
+	// @function EnableFlyCheat()
+	// @tparam bool enabled True or false.
 	tableFlow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
 
 /*** Enable or disable point texture filter.
@@ -246,6 +248,12 @@ You will not need to call them manually.
 */
 	tableFlow.set_function(ScriptReserved_GetString, &FlowHandler::GetString, this);
 
+/*** Check if translated string is present.
+@function IsStringPresent
+@tparam key string key for translated string
+*/
+	tableFlow.set_function(ScriptReserved_IsStringPresent, &FlowHandler::IsStringPresent, this);
+
 /*** Set language names for translations.
 Specify which translations in the strings table correspond to which languages.
 @function SetLanguageNames
@@ -367,6 +375,11 @@ char const * FlowHandler::GetString(const char* id) const
 	{
 		return _translationMap.at(std::string(id)).at(0).c_str();
 	}
+}
+
+bool FlowHandler::IsStringPresent(const char* id) const
+{
+	return _translationMap.find(id) != _translationMap.end();
 }
 
 Settings* FlowHandler::GetSettings()
@@ -537,9 +550,9 @@ bool FlowHandler::IsFlyCheatEnabled() const
 	return FlyCheat;
 }
 
-void FlowHandler::EnableFlyCheat(bool flyCheat)
+void FlowHandler::EnableFlyCheat(bool enable)
 {
-	FlyCheat = flyCheat;
+	FlyCheat = enable;
 }
 
 bool FlowHandler::IsPointFilterEnabled() const
@@ -547,9 +560,9 @@ bool FlowHandler::IsPointFilterEnabled() const
 	return PointFilter;
 }
 
-void FlowHandler::EnablePointFilter(bool pointFilter)
+void FlowHandler::EnablePointFilter(bool enable)
 {
-	PointFilter = pointFilter;
+	PointFilter = enable;
 }
 
 bool FlowHandler::IsMassPickupEnabled() const
@@ -557,9 +570,9 @@ bool FlowHandler::IsMassPickupEnabled() const
 	return MassPickup;
 }
 
-void FlowHandler::EnableMassPickup(bool massPickup)
+void FlowHandler::EnableMassPickup(bool enable)
 {
-	MassPickup = massPickup;
+	MassPickup = enable;
 }
 
 bool FlowHandler::IsLaraInTitleEnabled() const
@@ -567,14 +580,24 @@ bool FlowHandler::IsLaraInTitleEnabled() const
 	return LaraInTitle;
 }
 
-void FlowHandler::EnableLaraInTitle(bool laraInTitle)
+void FlowHandler::EnableLaraInTitle(bool enable)
 {
-	LaraInTitle = laraInTitle;
+	LaraInTitle = enable;
 }
 
-void FlowHandler::EnableLevelSelect(bool levelSelect)
+void FlowHandler::EnableLevelSelect(bool enable)
 {
-	LevelSelect = levelSelect;
+	LevelSelect = enable;
+}
+
+bool FlowHandler::IsHomeLevelEnabled() const
+{
+	return HomeLevel;
+}
+
+void FlowHandler::EnableHomeLevel(bool enable)
+{
+	HomeLevel = enable;
 }
 
 bool FlowHandler::IsLoadSaveEnabled() const
@@ -582,9 +605,9 @@ bool FlowHandler::IsLoadSaveEnabled() const
 	return LoadSave;
 }
 
-void FlowHandler::EnableLoadSave(bool loadSave)
+void FlowHandler::EnableLoadSave(bool enable)
 {
-	LoadSave = loadSave;
+	LoadSave = enable;
 }
 
 void FlowHandler::PrepareInventoryObjects()
@@ -674,9 +697,17 @@ bool FlowHandler::DoFlow()
 			break;
 
 		case GameStatus::NewGame:
-			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
+			// NOTE: 0 reserved for title level and 1 reserved for home level.
+			CurrentLevel = (SelectedLevelForNewGame != 0) ? SelectedLevelForNewGame : (IsHomeLevelEnabled() ? 2 : 1);
+
 			RequiredStartPos = 0;
 			SelectedLevelForNewGame = 0;
+			InitializeGame = true;
+			break;
+
+		case GameStatus::HomeLevel:
+			CurrentLevel = 1;
+			RequiredStartPos = 0;
 			InitializeGame = true;
 			break;
 

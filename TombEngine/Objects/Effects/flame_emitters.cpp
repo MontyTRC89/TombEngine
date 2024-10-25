@@ -5,7 +5,6 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
 #include "Game/effects/item_fx.h"
@@ -183,7 +182,7 @@ namespace TEN::Entities::Effects
 			else
 			{
 				// Normal flames.
-				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 2.0f, 0);
+				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 2.0f);
 
 				TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 					16 - (GetRandomControl() & 1),

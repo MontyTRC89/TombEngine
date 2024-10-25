@@ -82,7 +82,7 @@ namespace TEN::Entities::Generic
 					return;
 				}
 
-				int distToPortal = *&g_Level.Rooms[item->RoomNumber].maxceiling - item->Pose.Position.y;
+				int distToPortal = *&g_Level.Rooms[item->RoomNumber].TopHeight - item->Pose.Position.y;
 				if (distToPortal <= speed)
 					UpdateBridgeItem(*item);
 
@@ -128,7 +128,7 @@ namespace TEN::Entities::Generic
 					}
 					else
 					{
-						SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose);
+						SoundEffect(SFX_TR4_RAISING_BLOCK_2, &item->Pose);
 						item->Pose.Position.y -= 4;
 					}
 				}
@@ -140,7 +140,7 @@ namespace TEN::Entities::Generic
 					}
 					else
 					{
-						SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose);
+						SoundEffect(SFX_TR4_RAISING_BLOCK_2, &item->Pose);
 						item->Pose.Position.y += 4;
 					}
 				}

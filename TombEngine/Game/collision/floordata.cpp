@@ -182,6 +182,10 @@ int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 	auto normal = tri.Plane.Normal();
 	float relPlaneHeight = -((normal.x * sectorPoint.x) + (normal.z * sectorPoint.y)) / normal.y;
 
+	// Due to precision loss, we can't recover NO_HEIGHT constant from the plane, and must return original integer constant.
+	if (tri.Plane.D() == (float)NO_HEIGHT)
+		return NO_HEIGHT;
+
 	// Return sector floor or ceiling height. NOTE: Bridges ignored.
 	return (tri.Plane.D() + relPlaneHeight);
 }
@@ -368,17 +372,17 @@ namespace TEN::Collision::Floordata
 		const auto& room = g_Level.Rooms[roomNumber];
 
 		// Calculate room grid coord.
-		auto roomGridCoord = Vector2i((x - room.x) / BLOCK(1), (z - room.z) / BLOCK(1));
-		if (x < room.x)
+		auto roomGridCoord = Vector2i((x - room.Position.x) / BLOCK(1), (z - room.Position.z) / BLOCK(1));
+		if (x < room.Position.x)
 			roomGridCoord.x -= 1;
-		if (z < room.z)
+		if (z < room.Position.z)
 			roomGridCoord.y -= 1;
 
 		// Clamp room grid coord to room bounds (if applicable).
 		if (clampToBounds)
 		{
-			roomGridCoord.x = std::clamp(roomGridCoord.x, 0, room.xSize - 1);
-			roomGridCoord.y = std::clamp(roomGridCoord.y, 0, room.zSize - 1);
+			roomGridCoord.x = std::clamp(roomGridCoord.x, 0, room.XSize - 1);
+			roomGridCoord.y = std::clamp(roomGridCoord.y, 0, room.ZSize - 1);
 		}
 
 		return roomGridCoord;
@@ -397,8 +401,8 @@ namespace TEN::Collision::Floordata
 		const auto& room = g_Level.Rooms[roomNumber];
 
 		// Search area out of range; return empty vector.
-		if (xMax <= 0 || xMin >= (room.xSize - 1) ||
-			xMax <= 0 || xMin >= (room.xSize - 1))
+		if (xMax <= 0 || xMin >= (room.XSize - 1) ||
+			xMax <= 0 || xMin >= (room.XSize - 1))
 		{
 			return {};
 		}
@@ -408,13 +412,13 @@ namespace TEN::Collision::Floordata
 		for (int x = xMin; x <= xMax; x++)
 		{
 			// Test if out of room X range.
-			if (x <= 0 || x >= (room.xSize - 1))
+			if (x <= 0 || x >= (room.XSize - 1))
 				continue;
 
 			for (int z = zMin; z <= zMax; z++)
 			{
 				// Test if out of room Z range.
-				if (z <= 0 || z >= (room.zSize - 1))
+				if (z <= 0 || z >= (room.ZSize - 1))
 					continue;
 
 				roomGridCoords.push_back(Vector2i(x, z));
@@ -430,7 +434,7 @@ namespace TEN::Collision::Floordata
 
 		// Run through neighbor rooms.
 		auto& room = g_Level.Rooms[roomNumber];
-		for (int neighborRoomNumber : room.neighbors)
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
 		{
 			// Collect neighbor sectors.
 			auto roomGridCoords = GetNeighborRoomGridCoords(pos, neighborRoomNumber, searchDepth);
@@ -446,8 +450,8 @@ namespace TEN::Collision::Floordata
 	{
 		auto& room = g_Level.Rooms[roomNumber];
 
-		int sectorID = (room.zSize * roomGridCoord.x) + roomGridCoord.y;
-		return room.floor[sectorID];
+		int sectorID = (room.ZSize * roomGridCoord.x) + roomGridCoord.y;
+		return room.Sectors[sectorID];
 	}
 
 	FloorInfo& GetFloor(int roomNumber, int x, int z)
@@ -831,18 +835,18 @@ namespace TEN::Collision::Floordata
 		const auto& room = g_Level.Rooms[item.RoomNumber];
 
 		// Get projected AABB min and max of bridge OBB.
-		float xMin = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.x) / BLOCK(1));
-		float zMin = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.z) / BLOCK(1));
-		float xMax =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.x) / BLOCK(1));
-		float zMax =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.z) / BLOCK(1));
+		float xMin = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.Position.x) / BLOCK(1));
+		float zMin = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.Position.z) / BLOCK(1));
+		float xMax =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.Position.x) / BLOCK(1));
+		float zMax =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.Position.z) / BLOCK(1));
 
 		// Run through sectors enclosed in projected bridge AABB.
-		for (int x = 0; x < room.xSize; x++)
+		for (int x = 0; x < room.XSize; x++)
 		{
-			for (int z = 0; z < room.zSize; z++)
+			for (int z = 0; z < room.ZSize; z++)
 			{
-				float pX = (room.x + BLOCK(x)) + BLOCK(0.5f);
-				float pZ = (room.z + BLOCK(z)) + BLOCK(0.5f);
+				float pX = (room.Position.x + BLOCK(x)) + BLOCK(0.5f);
+				float pZ = (room.Position.z + BLOCK(z)) + BLOCK(0.5f);
 				float offX = pX - item.Pose.Position.x;
 				float offZ = pZ - item.Pose.Position.z;
 
@@ -911,7 +915,7 @@ namespace TEN::Collision::Floordata
 
 		// Run through neighboring rooms.
 		const auto& room = g_Level.Rooms[item.RoomNumber];
-		for (int neighborRoomNumber : room.neighbors)
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
 		{
 			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 
@@ -919,8 +923,8 @@ namespace TEN::Collision::Floordata
 			auto roomGridCoords = GetNeighborRoomGridCoords(item.Pose.Position, neighborRoomNumber, SECTOR_SEARCH_DEPTH);
 			for (const auto& roomGridCoord : roomGridCoords)
 			{
-				pos.x = BLOCK(roomGridCoord.x) + neighborRoom.x;
-				pos.z = BLOCK(roomGridCoord.y) + neighborRoom.z;
+				pos.x = BLOCK(roomGridCoord.x) + neighborRoom.Position.x;
+				pos.z = BLOCK(roomGridCoord.y) + neighborRoom.Position.z;
 
 				pointColl = GetPointCollision(pos, neighborRoomNumber);
 				pos.y = pointColl.GetFloorHeight();

@@ -129,6 +129,10 @@ scripts too.</p>
 	<td class="summary">Enable or disable level selection in title flyby.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#EnableHomeLevel">EnableHomeLevel(enabled)</a></td>
+	<td class="summary">Enable or disable Home Level entry in the main menu.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#EnableLoadSave">EnableLoadSave(enabled)</a></td>
 	<td class="summary">Enable or disable saving and loading of savegames.</td>
 	</tr>
@@ -137,7 +141,7 @@ scripts too.</p>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#EnableFlyCheat">EnableFlyCheat(enabled)</a></td>
-	<td class="summary">Enable or disable DOZY mode (fly cheat).</td>
+	<td class="summary">Enable or disable the fly cheat.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#EnablePointFilter">EnablePointFilter(enabled)</a></td>
@@ -228,6 +232,10 @@ scripts too.</p>
 	<tr>
 	<td class="name" ><a href="#GetString">GetString(string)</a></td>
 	<td class="summary">Get translated string.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsStringPresent">IsStringPresent(string)</a></td>
+	<td class="summary">Check if translated string is present.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#SetLanguageNames">SetLanguageNames(table)</a></td>
@@ -363,11 +371,11 @@ Must be true or false
 
 </dd>
     <dt>
-    <a name = "EnableLoadSave"></a>
-    <strong>EnableLoadSave(enabled)</strong>
+    <a name = "EnableHomeLevel"></a>
+    <strong>EnableHomeLevel(enabled)</strong>
     </dt>
     <dd>
-    Enable or disable saving and loading of savegames.
+    Enable or disable Home Level entry in the main menu. ()
 
 
 
@@ -375,7 +383,29 @@ Must be true or false
     <ul>
         <li><span class="parameter">enabled</span>
             <span class="types"><span class="type">bool</span></span>
-         true or false.
+         True or false.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "EnableLoadSave"></a>
+    <strong>EnableLoadSave(enabled)</strong>
+    </dt>
+    <dd>
+    Enable or disable saving and loading of savegames. ()
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">enabled</span>
+            <span class="types"><span class="type">bool</span></span>
+         True or false.
         </li>
     </ul>
 
@@ -393,8 +423,7 @@ Must be true or false
     <strong>EnableFlyCheat(enabled)</strong>
     </dt>
     <dd>
-    Enable or disable DOZY mode (fly cheat).
-Must be true or false
+    Enable or disable the fly cheat. ()
 
 
 
@@ -402,7 +431,7 @@ Must be true or false
     <ul>
         <li><span class="parameter">enabled</span>
             <span class="types"><span class="type">bool</span></span>
-         true or false
+         True or false.
         </li>
     </ul>
 
@@ -887,6 +916,28 @@ You will not need to call them manually.
     </dt>
     <dd>
     Get translated string.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">string</span>
+            <span class="types"><span class="type">key</span></span>
+         key for translated string
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsStringPresent"></a>
+    <strong>IsStringPresent(string)</strong>
+    </dt>
+    <dd>
+    Check if translated string is present.
 
 
 

@@ -40,6 +40,9 @@ using namespace TEN::Math::Random;
 
 using TEN::Renderer::g_Renderer;
 
+constexpr int WIBBLE_SPEED = 4;
+constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
+
 // New particle class
 Particle Particles[MAX_PARTICLES];
 ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
@@ -49,7 +52,9 @@ FX_INFO EffectList[NUM_EFFECTS];
 GameBoundingBox DeadlyBounds;
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
+
 int SplashCount = 0;
+int Wibble = 0;
 
 Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
 NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax] =
@@ -178,6 +183,13 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 	int numSprites = -Objects[objectID].nmeshes - 1;
 	float normalizedAge = particleAge / particle.life;
 	particle.spriteIndex = Objects[objectID].meshIndex + (int)round(Lerp(0.0f, numSprites, normalizedAge));
+}
+
+void UpdateWibble()
+{
+	// Update oscillator seed.
+	Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
+
 }
 
 void UpdateSparks()
@@ -1308,7 +1320,7 @@ void Splash(ItemInfo* item)
 	if (!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		return;
 
-	int waterHeight = GetWaterHeight(item);
+	int waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 
 	SplashSetup.x = item->Pose.Position.x;
 	SplashSetup.y = waterHeight - 1;
@@ -1940,7 +1952,7 @@ void ProcessEffects(ItemInfo* item)
 	if (item->Effect.Type != EffectType::Sparks && item->Effect.Type != EffectType::Smoke)
 	{
 		const auto& bounds = GameBoundingBox(item);
-		int waterHeight = GetWaterHeight(item);
+		int waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 		int itemLevel = item->Pose.Position.y + bounds.Y2 - (bounds.GetHeight() / 3);
 
 		if (waterHeight != NO_HEIGHT && itemLevel > waterHeight)

@@ -315,7 +315,7 @@ namespace TEN::Entities::Generic
 			waterHeight = pointColl.GetWaterSurfaceHeight();
 
 			if (waterHeight == NO_HEIGHT && TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
-				waterHeight = g_Level.Rooms[item.RoomNumber].maxceiling;
+				waterHeight = g_Level.Rooms[item.RoomNumber].TopHeight;
 
 			AddPushableBridge(item);
 		}
@@ -324,7 +324,7 @@ namespace TEN::Entities::Generic
 			waterHeight = pointColl.GetWaterSurfaceHeight();
 
 			if (waterHeight == NO_HEIGHT && TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber))
-				waterHeight = g_Level.Rooms[item.RoomNumber].maxceiling;
+				waterHeight = g_Level.Rooms[item.RoomNumber].TopHeight;
 		}
 
 		auto pushableColl = PushableCollisionData{};

@@ -120,6 +120,14 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				int soundID = commandDataPtr[1] & 0xFFF;	   // Exclude last 4 bits for sound ID.
 				int soundEnvFlag = commandDataPtr[1] & 0xF000; // Keep only last 4 bits for sound environment flag.
 
+				// FAILSAFE.
+				if (item.RoomNumber == NO_VALUE)
+				{
+					SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
+					commandDataPtr += 2;
+					break;
+				}
+
 				// Get required sound environment from flag.
 				auto requiredSoundEnv = SoundEnvironment::Always;
 				switch (soundEnvFlag)
@@ -703,7 +711,7 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset)
 {
 	// Use matrices done in renderer to transform relative offset.
-	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
+	return Vector3i(g_Renderer.GetMoveableBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
 }
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
@@ -729,16 +737,9 @@ Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
 }
 
-Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex)
+Quaternion GetBoneOrientation(const ItemInfo& item, int boneID)
 {
-	static const auto REF_DIRECTION = Vector3::UnitZ;
-
-	auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex);
-	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex, REF_DIRECTION);
-
-	auto direction = target - origin;
-	direction.Normalize();
-	return Geometry::ConvertDirectionToQuat(direction);
+	return g_Renderer.GetMoveableBoneOrientation(item.Index, boneID);
 }
 
 // NOTE: Will not work for bones at ends of hierarchies.

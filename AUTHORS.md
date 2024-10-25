@@ -20,7 +20,8 @@ This is the credit list of **all** the people who contributed to TombEngine in a
 - TokyoSU (entity and vehicle decompilation)
 - Tomo (general coding, bug fixing)
 - Troye (general coding, refactoring)
-- WolfCheese (general coding)
+- Nickelony (general coding)
+- JesseG, aka WolfCheese (general coding)
 
 ## Testers
 - Adngel

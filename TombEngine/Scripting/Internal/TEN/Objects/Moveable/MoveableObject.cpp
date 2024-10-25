@@ -79,7 +79,7 @@ most can just be ignored (see usage).
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
 	@tparam Rotation rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
-	@tparam int roomID room ID item is in (default: calculated automatically)
+	@tparam int roomNumber the room number the moveable is in (default: calculated automatically).
 	@tparam int animNumber animation number
 	@tparam int frameNumber frame number
 	@tparam int hp HP of item
@@ -435,6 +435,9 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @function Moveable:SetOnCollidedWithObject
 // @tparam function func callback function to be called (must be in LevelFuncs hierarchy). This function can take two arguments; these will store the two @{Moveable}s taking part in the collision.
 // @usage
+// -- obj1 is the collision moveable
+// -- obj2 is the collider moveable
+//
 // LevelFuncs.objCollided = function(obj1, obj2)
 //     print(obj1:GetName() .. " collided with " .. obj2:GetName())
 // end

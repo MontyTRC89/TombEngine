@@ -3,10 +3,10 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/Bubble.h"
@@ -28,6 +28,7 @@
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Input;
@@ -150,21 +151,13 @@ namespace TEN::Entities::Vehicles
 		UPV_BITE_RIGHT_RUDDER_RIGHT = 4,
 		UPV_BITE_RIGHT_RUDDER_LEFT  = 5	 // Unused.
 	};
-	enum UPVFlags
-	{
-		UPV_FLAG_CONTROL = (1 << 0),
-		UPV_FLAG_SURFACE = (1 << 1),
-		UPV_FLAG_DIVE	 = (1 << 2),
-		UPV_FLAG_DEAD	 = (1 << 3)
-	};
-
 
 	UPVInfo* GetUPVInfo(ItemInfo* UPVItem)
 	{
 		return (UPVInfo*)UPVItem->Data;
 	}
 
-	void UPVInitialize(short itemNumber)
+	void InitializeUPV(short itemNumber)
 	{
 		auto* UPVItem = &g_Level.Items[itemNumber];
 		UPVItem->Data = UPVInfo();
@@ -185,7 +178,7 @@ namespace TEN::Entities::Vehicles
 		if (mountType == VehicleMountType::None)
 		{
 			// HACK: Collision in water behaves differently? @Sezz 2022.06.28
-			if (TestBoundsCollide(UPVItem, laraItem, coll->Setup.Radius) && TestCollision(UPVItem, laraItem))
+			if (TestBoundsCollide(UPVItem, laraItem, coll->Setup.Radius) && HandleItemSphereCollision(*UPVItem, *laraItem))
 				ItemPushItem(UPVItem, laraItem, coll, false, 0);
 		}
 		else
@@ -731,8 +724,9 @@ namespace TEN::Entities::Vehicles
 				UPV->Flags &= ~UPV_FLAG_CONTROL;
 				int waterDepth, waterHeight, heightFromWater;
 
-				waterDepth = GetWaterSurface(laraItem);
-				waterHeight = GetWaterHeight(laraItem);
+				auto pointColl = GetPointCollision(*laraItem);
+				waterDepth = pointColl.GetWaterSurfaceHeight();
+				waterHeight = pointColl.GetWaterTopHeight();
 
 				if (waterHeight != NO_HEIGHT)
 					heightFromWater = laraItem->Pose.Position.y - waterHeight;
@@ -871,8 +865,9 @@ namespace TEN::Entities::Vehicles
 			TranslateItem(UPVItem, UPVItem->Pose.Orientation, UPVItem->Animation.Velocity.z);
 		}
 
-		int newHeight = GetPointCollision(*UPVItem).GetFloorHeight();
-		int waterHeight = GetWaterHeight(UPVItem);
+		auto pointColl = GetPointCollision(*UPVItem);
+		int newHeight = pointColl.GetFloorHeight();
+		int waterHeight = pointColl.GetWaterTopHeight();
 
 		if ((newHeight - waterHeight) < UPV_HEIGHT || (newHeight < UPVItem->Pose.Position.y - UPV_HEIGHT / 2) || 
 			(newHeight == NO_HEIGHT) || (waterHeight == NO_HEIGHT))
@@ -943,7 +938,7 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->Velocity || IsDirectionalActionHeld())
 		{
-			waterHeight = GetWaterHeight(UPVItem);
+			waterHeight = GetPointCollision(*UPVItem).GetWaterTopHeight();
 			SpawnVehicleWake(*UPVItem, UPV_WAKE_OFFSET, waterHeight, true);
 		}
 
