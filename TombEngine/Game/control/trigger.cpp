@@ -339,7 +339,7 @@ void Antitrigger(short const value, short const flags)
 		item->ItemFlags[1] = 100;
 	}
 
-	item->Flags &= ~(CODE_BITS | REVERSE);
+	item->Flags &= ~(CODE_BITS | IFLAG_REVERSE);
 
 	if (flags & ONESHOT)
 		item->Flags |= ATONESHOT;
