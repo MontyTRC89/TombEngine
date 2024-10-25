@@ -66,14 +66,14 @@ namespace TEN::Renderer
 	int Renderer::Synchronize()
 	{
 		// Sync the renderer
-		int nf = Sync();
+		int nf = TimeSync();
 		if (nf < 2)
 		{
 			int i = 2 - nf;
 			nf = 2;
 			do
 			{
-				while (!Sync());
+				while (!TimeSync());
 				i--;
 			}
 			while (i);

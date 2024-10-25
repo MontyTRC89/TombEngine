@@ -15,6 +15,7 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_initialise.h"
 #include "Game/misc.h"
 #include "Game/spotcam.h"
 #include "Game/room.h"
@@ -1492,6 +1493,9 @@ void SaveGame::LoadHub(int index)
 	// Load hub data.
 	TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
 	Parse(Hub[index], true);
+
+	// Restore vehicle.
+	InitializePlayerVehicle(*LaraItem);
 }
 
 bool SaveGame::IsOnHub(int index)

@@ -464,7 +464,7 @@ namespace TEN::Renderer
 		DXGI_SWAP_CHAIN_DESC sd;
 		sd.BufferDesc.Width = w;
 		sd.BufferDesc.Height = h;
-		if (!g_Configuration.EnableVariableFramerate)
+		if (!g_Configuration.EnableHighFramerate)
 		{
 			_refreshRate = 30;
 

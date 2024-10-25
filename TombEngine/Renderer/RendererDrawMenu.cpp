@@ -206,9 +206,9 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAmbientOcclusion), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
 			GetNextLinePosition(&y);
 
-			// Enable variable framerate
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_VARIABLE_FRAMERATE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
-			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableVariableFramerate), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
+			// Enable high framerate
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_HIGH_FRAMERATE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableHighFramerate), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
 			GetNextBlockPosition(&y);
 
 			// Apply
@@ -924,7 +924,7 @@ namespace TEN::Renderer
 
 		static EulerAngles orient = EulerAngles::Identity;
 		static float scaler = 1.2f;
-		float multiplier = g_Configuration.EnableVariableFramerate ? g_Renderer.GetScreenRefreshRate() / 30.0f : 1.0f;
+		float multiplier = g_Renderer.GetFramerateMultiplier();
 
 		short invItem = g_Gui.GetRing(RingTypes::Inventory).CurrentObjectList[g_Gui.GetRing(RingTypes::Inventory).CurrentObjectInList].InventoryItem;
 

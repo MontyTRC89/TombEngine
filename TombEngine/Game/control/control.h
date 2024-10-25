@@ -50,7 +50,7 @@ enum FadeStatus
 
 constexpr int MAX_ROOMS = 1024;
 
-constexpr int LOOP_FRAME_COUNT = 2;
+constexpr auto LOOP_FRAME_COUNT = 2;
 
 extern int GameTimer;
 extern int RumbleTimer;

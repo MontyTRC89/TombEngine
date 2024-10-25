@@ -4,6 +4,8 @@
 #include "Game/camera.h"
 #include "Game/control/los.h"
 #include "Math/Math.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 
 using namespace TEN::Math;
@@ -75,10 +77,17 @@ namespace TEN::Entities::Effects
 		LensFlares.push_back(lensFlare);
 	}
 
-	void SetupGlobalLensFlare(const EulerAngles& orient, const Color& color, int spriteID)
+	void UpdateGlobalLensFlare()
 	{
 		constexpr auto BASE_POS = Vector3(0.0f, 0.0f, BLOCK(256));
 
+		if (!g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareEnabled())
+			return;
+
+		auto orient   = EulerAngles(g_GameFlow->GetLevel(CurrentLevel)->GetLensFlarePitch(), g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareYaw(), 0);
+		auto color    = g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareColor();
+		auto spriteID = g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareSunSpriteID();
+		
 		auto pos = Camera.pos.ToVector3();
 		auto rotMatrix = orient.ToRotationMatrix();
 

@@ -361,13 +361,13 @@ namespace TEN::Renderer
 		return (!_isWindowed);
 	}
 
-	void Renderer::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov, float farView)
+	void Renderer::UpdateCameraMatrices(CAMERA_INFO *cam, float farView)
 	{
 		if (farView < MIN_FAR_VIEW)
 			farView = DEFAULT_FAR_VIEW;
 
-		_currentGameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
-		_gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
+		_currentGameCamera = RenderView(cam, cam->Roll, cam->Fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
+		_gameCamera        = RenderView(cam, cam->Roll, cam->Fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
 	}
 
 	bool Renderer::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
@@ -506,6 +506,11 @@ namespace TEN::Renderer
 			return vp;
 
 		return s;
+	}
+
+	float Renderer::GetFramerateMultiplier() const
+	{
+		return g_Configuration.EnableHighFramerate ? (g_Renderer.GetScreenRefreshRate() / (float)FPS) : 1.0f;
 	}
 
 	float Renderer::GetInterpolationFactor() const

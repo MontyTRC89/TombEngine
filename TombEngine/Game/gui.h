@@ -128,9 +128,6 @@ namespace TEN::Gui
 		bool CanSelect() const;
 		bool CanDeselect() const;
 
-		// Variable FPS
-		float GetSpinSpeed();
-
 		// GUI variables
 		Menu MenuToDisplay = Menu::Title;
 		int SelectedOption;

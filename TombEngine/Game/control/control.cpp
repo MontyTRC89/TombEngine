@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Game/control/control.h"
 
-#include <chrono>
 #include <process.h>
 
 #include "Game/camera.h"
@@ -60,7 +59,6 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
-#include "Game/Lara/lara_initialise.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects;
@@ -131,8 +129,6 @@ void DrawPhase(bool isTitle, float interpolationFactor)
 
 GameStatus ControlPhase()
 {
-	static int framesCount = 0;
-
 	auto time1 = std::chrono::high_resolution_clock::now();
 	bool isTitle = (CurrentLevel == 0);
 
@@ -157,7 +153,7 @@ GameStatus ControlPhase()
 	HandleControls(isTitle);
 
 	// Pre-loop script and event handling.
-	g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with variable framerate
+	g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with high framerate.
 	HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
 
 	// Control lock is processed after handling scripts because builder may want to process input externally while locking player from input.
@@ -228,14 +224,7 @@ GameStatus ControlPhase()
 	UpdateLocusts();
 	UpdateUnderwaterBloodParticles();
 	UpdateFishSwarm();
-
-	if (g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareEnabled())
-	{
-		SetupGlobalLensFlare(
-			EulerAngles(g_GameFlow->GetLevel(CurrentLevel)->GetLensFlarePitch(), g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareYaw(), 0),
-			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareColor(),
-			g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareSunSpriteID());
-	}
+	UpdateGlobalLensFlare();
 
 	// Update HUD.
 	g_Hud.Update(*LaraItem);
@@ -245,20 +234,16 @@ GameStatus ControlPhase()
 	if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
 		RumbleScreen();
 
-	PlaySoundSources();
+	// Update cameras matrices there, after having done all the possible camera logic.
+	g_Renderer.UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
+
 	DoFlipEffect(FlipEffect, LaraItem);
 
+	PlaySoundSources();
 	Sound_UpdateScene();
 
 	// Post-loop script and event handling.
 	g_GameScript->OnLoop(DELTA_TIME, true);
-
-	// Update cameras matrices. NOTE: Must be after handling all camera logic.
-	g_Renderer.UpdateCameraMatrices(
-		&Camera,
-		Camera.Roll,
-		Camera.Fov,
-		BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
 
 	// Clear savegame loaded flag.
 	JustLoaded = false;
@@ -267,11 +252,8 @@ GameStatus ControlPhase()
 	GameTimer++;
 	GlobalCounter++;
 
-	using ns = std::chrono::nanoseconds;
-	using get_time = std::chrono::steady_clock;
-
 	auto time2 = std::chrono::high_resolution_clock::now();
-	ControlPhaseTime = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
+	ControlPhaseTime = (std::chrono::duration_cast<std::chrono::nanoseconds>(time2 - time1)).count() / 1000000;
 
 	return GameStatus::Normal;
 }
@@ -556,10 +538,6 @@ void InitializeOrLoadGame(bool loadGame)
 		{
 			SaveGame::LoadHub(CurrentLevel);
 			TENLog("Starting new level.", LogLevel::Info);
-
-			// Restore vehicle.
-			auto* item = FindItem(ID_LARA);
-			InitializePlayerVehicle(*item);
 		}
 
 		g_GameScript->OnStart();
@@ -569,8 +547,6 @@ void InitializeOrLoadGame(bool loadGame)
 
 GameStatus DoGameLoop(int levelIndex)
 {
-	constexpr auto CONTROL_FRAME_TIME = 1000.0f / 30.0f;
-
 	int frameCount = LOOP_FRAME_COUNT;
 	auto& status = g_GameFlow->LastGameStatus;
 
@@ -578,54 +554,17 @@ GameStatus DoGameLoop(int levelIndex)
 	// called once to sort out various runtime shenanigangs (e.g. hair).
 	status = ControlPhase();
 
-	LARGE_INTEGER lastTime;
-	LARGE_INTEGER currentTime;
-	double controlLag = 0;
-	double frameTime = 0;
-
-	LARGE_INTEGER frequency;
-	QueryPerformanceFrequency(&frequency);
-	QueryPerformanceCounter(&lastTime);
-
-	int controlCalls = 0;
-	int drawCalls = 0;
-	
+	g_Synchronizer.Init();
 	bool legacy30FpsDoneDraw = false;
 
 	while (DoTheGame)
 	{
-		if (App.ResetClock)
-		{
-			App.ResetClock = false;
-			QueryPerformanceCounter(&lastTime);
-			currentTime = lastTime;
-			controlLag = 0;
-			frameTime = 0;
-		}
-		else
-		{
-			QueryPerformanceCounter(&currentTime);
-			frameTime = (currentTime.QuadPart - lastTime.QuadPart) * 1000.0 / frequency.QuadPart;
-			lastTime = currentTime;
-			controlLag += frameTime;
-		}
+		g_Synchronizer.Sync();
 
-		while (controlLag >= CONTROL_FRAME_TIME)
+		while (g_Synchronizer.Synced())
 		{
-#if _DEBUG
-			constexpr auto DEBUG_SKIP_FRAMES = 10;
-
-			if (controlLag >= DEBUG_SKIP_FRAMES * CONTROL_FRAME_TIME)
-			{
-				TENLog("Game loop is running too slow.", LogLevel::Warning);
-				App.ResetClock = true;
-				break;
-			}
-#endif
-
 			status = ControlPhase();
-			controlLag -= CONTROL_FRAME_TIME;
-			controlCalls++;
+			g_Synchronizer.Step();
 
 			legacy30FpsDoneDraw = false;
 		}
@@ -633,20 +572,17 @@ GameStatus DoGameLoop(int levelIndex)
 		if (status != GameStatus::Normal)
 			break;
 
-		if (!g_Configuration.EnableVariableFramerate)
+		if (!g_Configuration.EnableHighFramerate)
 		{
 			if (!legacy30FpsDoneDraw)
 			{
 				DrawPhase(!levelIndex, 0.0f);
-				drawCalls++;
 				legacy30FpsDoneDraw = true;
 			}
 		}
 		else
 		{
-			float interpolationFactor = std::min((float)controlLag / (float)CONTROL_FRAME_TIME, 1.0f);
-			DrawPhase(!levelIndex, interpolationFactor);
-			drawCalls++;
+			DrawPhase(!levelIndex, g_Synchronizer.GetInterpolationFactor());
 		}
 	}
 

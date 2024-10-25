@@ -381,7 +381,7 @@ namespace TEN::Renderer
 		VertexBuffer<Vertex> _sortedPolygonsVertexBuffer;
 		IndexBuffer _sortedPolygonsIndexBuffer;
 
-		// Variable framerate.
+		// High framerate.
 		float _interpolationFactor = 0.0f;
 
 		// Private functions
@@ -594,7 +594,7 @@ namespace TEN::Renderer
 		void RenderTitle(float interpFactor);
 		void Lock();
 		bool PrepareDataForTheRenderer();
-		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
+		void UpdateCameraMatrices(CAMERA_INFO* cam, float farView);
 		void RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere);
 		void DumpGameScene();
 		void RenderInventory();
@@ -646,6 +646,7 @@ namespace TEN::Renderer
 		std::string GetDefaultAdapterName();
 		void SaveOldState();
 
+		float						GetFramerateMultiplier() const;
 		float						GetInterpolationFactor() const;
 		Vector2i					GetScreenResolution() const;
 		int							GetScreenRefreshRate() const;
