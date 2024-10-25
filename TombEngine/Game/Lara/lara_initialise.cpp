@@ -18,6 +18,7 @@
 #include "Objects/TR3/Vehicles/minecart.h"
 #include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
+#include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include "Specific/level.h"
@@ -181,7 +182,7 @@ void InitializeLaraStartPosition(ItemInfo& playerItem)
 	playerItem.Location.Height = playerItem.Pose.Position.y;
 }
 
-static void InitializePlayerVehicle(ItemInfo& playerItem)
+void InitializePlayerVehicle(ItemInfo& playerItem)
 {
 	if (PlayerVehicleObjectID == GAME_OBJECT_ID::ID_NO_OBJECT)
 		return;
@@ -193,7 +194,6 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 	// Restore vehicle.
 	TENLog("Transferring vehicle " + GetObjectName(PlayerVehicleObjectID) + " from the previous level.");
 	vehicle->Pose = playerItem.Pose;
-	ItemNewRoom(vehicle->Index, playerItem.RoomNumber);
 	SetLaraVehicle(&playerItem, vehicle);
 	playerItem.Animation = PlayerAnim;
 
@@ -236,6 +236,11 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 		DoRubberBoatMount(&g_Level.Items[vehicle->Index], &playerItem, VehicleMountType::LevelStart);
 		break;
 
+	case GAME_OBJECT_ID::ID_UPV:
+		DoUPVMount(&g_Level.Items[vehicle->Index], &playerItem, VehicleMountType::LevelStart);
+		GetUPVInfo(&g_Level.Items[vehicle->Index])->Flags = UPVFlags::UPV_FLAG_CONTROL;
+		break;
+
 	default:
 		break;
 	}
@@ -245,7 +250,7 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 	if (vehicle->ObjectNumber == GAME_OBJECT_ID::ID_RUBBER_BOAT ||
 		vehicle->ObjectNumber == GAME_OBJECT_ID::ID_SPEEDBOAT)
 	{
-		g_Level.Items[vehicle->Index].Active = false;
+		RemoveActiveItem(vehicle->Index, false);
 		AddActiveItem(vehicle->Index);
 		g_Level.Items[vehicle->Index].Status = ITEM_ACTIVE;
 	}
@@ -291,9 +296,6 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup)
 
 	// Restore hit points.
 	item->HitPoints = PlayerHitPoints;
-
-	// Restore vehicle.
-	InitializePlayerVehicle(*item);
 }
 
 void InitializeLaraDefaultInventory(ItemInfo& item)

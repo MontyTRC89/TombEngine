@@ -120,6 +120,7 @@ static constexpr char ScriptReserved_SetFlags[]				= "SetFlags";
 static constexpr char ScriptReserved_SetTranslated[]		= "SetTranslated";
 static constexpr char ScriptReserved_GetPosition[]			= "GetPosition";
 static constexpr char ScriptReserved_GetJointPosition[]		= "GetJointPosition";
+static constexpr char ScriptReserved_GetJointRotation[]		= "GetJointRotation";
 static constexpr char ScriptReserved_SetPosition[]			= "SetPosition";
 static constexpr char ScriptReserved_GetRotation[]			= "GetRotation";
 static constexpr char ScriptReserved_SetRotation[]			= "SetRotation";
@@ -227,6 +228,7 @@ static constexpr char ScriptReserved_EnablePointFilter[]		= "EnablePointFilter";
 // Flow Functions
 static constexpr char ScriptReserved_SetStrings[]			= "SetStrings";
 static constexpr char ScriptReserved_GetString[]			= "GetString";
+static constexpr char ScriptReserved_IsStringPresent[]		= "IsStringPresent";
 static constexpr char ScriptReserved_SetLanguageNames[]		= "SetLanguageNames";
 
 // Flow Tables

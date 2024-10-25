@@ -566,6 +566,9 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 	const auto& bounds = GetBestFrame(*item).BoundingBox;
 	const auto& playerBounds = GetBestFrame(*laraItem).BoundingBox;
 
+	if (bounds.GetExtents() == Vector3::Zero || playerBounds.GetExtents() == Vector3::Zero)
+		return false;
+
 	if ((item->Pose.Position.y + bounds.Y2) <= (laraItem->Pose.Position.y + playerBounds.Y1))
 		return false;
 
