@@ -133,21 +133,18 @@ GameStatus ControlPhase()
 	bool isTitle = (CurrentLevel == 0);
 
 	g_Renderer.PrepareScene();
-	RegeneratePickups();
+	g_Renderer.SaveOldState();
+
 	ClearFires();
 	ClearLensFlares();
 	ClearAllDisplaySprites();
 
-	if (TrackCameraInit)
-	{
-		UseSpotCam = false;
-		AlterFOV(LastFOV);
-	}
+	SetupInterpolation();
+	PrepareCamera();
+
+	RegeneratePickups();
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
-
-	SetupInterpolation();
-	g_Renderer.SaveOldState();
 
 	// Controls are polled before OnLoop to allow input data to be overwritten by script API methods.
 	HandleControls(isTitle);
@@ -233,9 +230,9 @@ GameStatus ControlPhase()
 	if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
 		RumbleScreen();
 
-	UpdateCamera();
-
 	DoFlipEffect(FlipEffect, LaraItem);
+
+	UpdateCamera();
 
 	PlaySoundSources();
 	Sound_UpdateScene();

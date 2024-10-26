@@ -1515,6 +1515,15 @@ void ItemsCollideCamera()
 	staticList.clear();
 }
 
+void PrepareCamera()
+{
+	if (TrackCameraInit)
+	{
+		UseSpotCam = false;
+		AlterFOV(LastFOV);
+	}
+}
+
 void UpdateCamera()
 {
 	if (UseSpotCam)
