@@ -10,6 +10,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Bug fixes
 * Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
+* Fixed moveable status after antitriggering.
 * Fixed leveljump vehicle transfer.
 * Fixed weapons not properly hitting enemies.
 * Fixed laserhead teleporting Lara and making her invisible on death.
@@ -55,20 +56,22 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Changed Rome Hammer to not hurt player whilst deactivated.
 * Changed Statue with blade damage, from 20 to 200.
 * Changed sound effect that is triggered when using the `level.rumble` feature in a level. Sound effect now part of the default soundmap (ID 359) and additional hardcoded pitch shift has been removed.
+* Changed hardcoded sound for RAISING_BLOCKS back to the soundID used in TRLE (ID 149)
 * Changed Water sound condition to ShallowWater.
 * Enhanced Rolling Spindle detection to avoid them going down through pits.
 * Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
 * Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing-dart emitter ).
 * Enhanced raptor behaviour and handling. https://tombengine.com/docs/ocb-and-setup-instructions/#raptor 
   - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
+* The limit of 32 active Flame Emitters has been removed.
 	
 ### Lua API changes
-
 * Added Flow.EnableHomeLevel() function.
 * Added Flow.IsStringPresent() function.
-* Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Flow.LensFlare() and Flow.Starfield() classes.
+* Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Input.KeyClearAll() function.
+* Added Moveable.GetJointRotation() and optional 'offset' parameter for Moveable.GetJointPosition().
 * Added Room:GetRoomNumber() function.
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
 * Fixed Volume:GetActive() method.
