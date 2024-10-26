@@ -51,7 +51,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - Underwater - sound plays when the camera is submerged.
 * Added TR4 Enemy Jeep. https://tombengine.com/docs/ocb-and-setup-instructions/#enemy_jeep
 * Changed TR5 Rome Hammer to not hurt player whilst deactivated.
-* Changed Statue with blade damage from 20 to 200.
+* Changed TR2 Statue with blade damage from 20 to 200.
 * Changed sound effect that is triggered when using the `level.rumble` feature in a level (ID 359 in the soundmap).
 * Changed hardcoded sound for Raising Block 1/2 back to the ID used in TRLE (ID 149).
 * Enhanced TR2 Rolling Spindle detection to avoid them going down through pits.
