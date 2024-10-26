@@ -53,7 +53,7 @@ SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
-FIRE_LIST Fires[MAX_FIRE_LIST];
+std::vector<FIRE_LIST> Fires;
 
 int GetFreeFireSpark()
 {
@@ -379,31 +379,20 @@ void UpdateFireProgress()
 
 void AddFire(int x, int y, int z, short roomNum, float size, short fade)
 {
-	FIRE_LIST* fptr = &Fires[0];
-	int i = 0;
-	while (fptr->on)
-	{
-		fptr++;
-		if (++i >= MAX_FIRE_LIST)
-			return;
-	}	
+	FIRE_LIST newFire;
 	
-	if (fade)
-		fptr->on = fade;
-	else
-		fptr->on = 1;
-
-	fptr->position = Vector3i(x, y, z);
-	fptr->roomNumber = roomNum;
-	fptr->size = size;
-
-	fptr->StoreInterpolationData();
+	newFire.fade = (fade == 0 ? 1 : (unsigned char)fade);
+	newFire.position = Vector3i(x, y, z);
+	newFire.roomNumber = roomNum;
+	newFire.size = size;
+	newFire.StoreInterpolationData();
+	
+	Fires.push_back(newFire);
 }
 
 void ClearFires()
 {
-	for (int i = 0; i < MAX_FIRE_LIST; i++)
-		Fires[i].on = false;
+	Fires.clear();
 }
 
 void UpdateFireSparks()

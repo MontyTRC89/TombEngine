@@ -167,19 +167,19 @@ struct DRIP_STRUCT
 struct FIRE_LIST
 {
 	Vector3i position;
-	byte on;
+	unsigned char fade;
 	float size;
 	short roomNumber;
 	
 	Vector3i oldPosition;
 	float oldSize;
-	byte oldOn;
+	byte oldFade;
 
 	void StoreInterpolationData()
 	{
 		oldPosition = position;
 		oldSize = size;
-		oldOn = on;
+		oldFade = fade;
 	}
 };
 
@@ -294,7 +294,6 @@ extern int NextSpider;
 extern int NextGunShell;
 
 constexpr auto MAX_SPARKS_FIRE = 20;
-constexpr auto MAX_FIRE_LIST = 32;
 constexpr auto MAX_SPARKS_SMOKE = 32;
 constexpr auto MAX_SPARKS_BLOOD = 32;
 constexpr auto MAX_GUNFLASH = 4;
@@ -306,7 +305,7 @@ extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
-extern FIRE_LIST Fires[MAX_FIRE_LIST];
+extern std::vector<FIRE_LIST> Fires;
 
 void TriggerBlood(int x, int y, int z, int unk, int num);
 void TriggerExplosionBubble(int x, int y, int z, short roomNumber);
@@ -321,7 +320,7 @@ void ThrowPoison(const ItemInfo& item, int boneID, const Vector3& offset, const 
 void ThrowPoison(const ItemInfo& item, const CreatureBiteInfo& bite, const Vector3& vel, const Color& colorStart, const Color& colorEnd, int spriteID = 0);
 void UpdateFireProgress();
 void ClearFires();
-void AddFire(int x, int y, int z, short roomNum, float size, short fade);
+void AddFire(int x, int y, int z, short roomNum, float size, short fade = 1);
 void UpdateFireSparks();
 int GetFreeSmokeSpark();
 void UpdateSmoke();

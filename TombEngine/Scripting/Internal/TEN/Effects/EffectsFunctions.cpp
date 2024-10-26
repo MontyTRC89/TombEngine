@@ -284,7 +284,7 @@ namespace TEN::Scripting::Effects
 */
 	static void EmitFire(Vec3 pos, TypeOrNil<float> size)
 	{
-		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), USE_IF_HAVE(float, size, 1), 0);
+		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), USE_IF_HAVE(float, size, 1));
 	}
 
 /***Make an explosion. Does not hurt Lara

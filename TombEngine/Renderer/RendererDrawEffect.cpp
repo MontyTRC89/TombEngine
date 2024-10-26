@@ -50,7 +50,6 @@ extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
-extern FIRE_LIST Fires[MAX_FIRE_LIST];
 extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern std::array<DebrisFragment, MAX_DEBRIS> DebrisFragments;
@@ -345,53 +344,48 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareFires(RenderView& view) 
 	{
-		for (int k = 0; k < MAX_FIRE_LIST; k++) 
+		for (const auto& fire : Fires)
 		{
-			auto* fire = &Fires[k];
-			if (fire->on) 
+			auto oldFade = fire.oldFade == 1 ? 1.0f : (float)(255 - fire.oldFade) / 255.0f;
+			auto fade = fire.fade == 1 ? 1.0f : (float)(255 - fire.fade) / 255.0f;
+			fade = Lerp(oldFade, fade, _interpolationFactor);
+
+			for (int i = 0; i < MAX_SPARKS_FIRE; i++) 
 			{
-				auto oldFade = fire->oldOn == 1 ? 1.0f : (float)(255 - fire->oldOn) / 255.0f;
-				auto fade = fire->on == 1 ? 1.0f : (float)(255 - fire->on) / 255.0f;
-				fade = Lerp(oldFade, fade, _interpolationFactor);
-
-				for (int i = 0; i < MAX_SPARKS_FIRE; i++) 
+				auto* spark = &FireSparks[i];
+				if (spark->on)
 				{
-					auto* spark = &FireSparks[i];
-
-					if (spark->on)
-					{
-						AddSpriteBillboard(
-							&_sprites[spark->def],
-							Vector3::Lerp(
-								Vector3(
-									fire->oldPosition.x + spark->oldPosition.x * fire->oldSize / 2,
-									fire->oldPosition.y + spark->oldPosition.y * fire->oldSize / 2,
-									fire->oldPosition.z + spark->oldPosition.z * fire->oldSize / 2),
-								Vector3(
-									fire->position.x + spark->position.x * fire->size / 2,
-									fire->position.y + spark->position.y * fire->size / 2,
-									fire->position.z + spark->position.z * fire->size / 2),
-								_interpolationFactor),
-							Vector4::Lerp(
-								Vector4(
-									spark->oldColor.x / 255.0f * fade,
-									spark->oldColor.y / 255.0f * fade,
-									spark->oldColor.z / 255.0f * fade,
-									1.0f),
-								Vector4(
-									spark->color.x / 255.0f * fade,
-									spark->color.y / 255.0f * fade,
-									spark->color.z / 255.0f * fade,
-									1.0f),
-								_interpolationFactor),
-							TO_RAD(Lerp(spark->oldRotAng << 4, spark->rotAng << 4, _interpolationFactor)),
-							Lerp(spark->oldScalar, spark->scalar, _interpolationFactor),
-							Vector2::Lerp(
-								Vector2(fire->oldSize * spark->oldSize, fire->oldSize * spark->oldSize),
-								Vector2(fire->size * spark->size, fire->size * spark->size),
-								_interpolationFactor),
-							BlendMode::Additive, true, view);
-					}
+					AddSpriteBillboard(
+						&_sprites[spark->def],
+						Vector3::Lerp(
+							Vector3(
+								fire->oldPosition.x + spark->oldPosition.x * fire->oldSize / 2,
+								fire->oldPosition.y + spark->oldPosition.y * fire->oldSize / 2,
+								fire->oldPosition.z + spark->oldPosition.z * fire->oldSize / 2),
+							Vector3(
+								fire->position.x + spark->position.x * fire->size / 2,
+								fire->position.y + spark->position.y * fire->size / 2,
+								fire->position.z + spark->position.z * fire->size / 2),
+							_interpolationFactor),
+						Vector4::Lerp(
+							Vector4(
+								spark->oldColor.x / 255.0f * fade,
+								spark->oldColor.y / 255.0f * fade,
+								spark->oldColor.z / 255.0f * fade,
+								1.0f),
+							Vector4(
+								spark->color.x / 255.0f * fade,
+								spark->color.y / 255.0f * fade,
+								spark->color.z / 255.0f * fade,
+								1.0f),
+							_interpolationFactor),
+						TO_RAD(Lerp(spark->oldRotAng << 4, spark->rotAng << 4, _interpolationFactor)),
+						Lerp(spark->oldScalar, spark->scalar, _interpolationFactor),
+						Vector2::Lerp(
+							Vector2(fire->oldSize * spark->oldSize, fire->oldSize * spark->oldSize),
+							Vector2(fire->size * spark->size, fire->size * spark->size),
+							_interpolationFactor),
+						BlendMode::Additive, true, view);
 				}
 			}
 		}

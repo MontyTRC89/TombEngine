@@ -8,3 +8,4 @@ bool TryAddingAmmo(LaraInfo&, GAME_OBJECT_ID objectID, std::optional<int> amount
 bool TryRemovingAmmo(LaraInfo&, GAME_OBJECT_ID objectID, std::optional<int> amount = std::nullopt);
 bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount, ModificationType modType);
 std::optional<int> GetAmmoCount(LaraInfo&, GAME_OBJECT_ID objectID);
+int GetDefaultAmmoCount(GAME_OBJECT_ID objectID);

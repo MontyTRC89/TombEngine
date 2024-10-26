@@ -175,11 +175,10 @@ GameStatus ControlPhase()
 	ApplyActionQueue();
 	ClearActionQueue();
 
-	UpdateCamera();
+	// Item update should happen before camera update, so potential flyby/track camera triggers are processed correctly.
 	UpdateAllItems();
 	UpdateAllEffects();
 	UpdateLara(LaraItem, isTitle);
-
 	g_GameScriptEntities->TestCollidingObjects();
 
 	// Smash shatters and clear stopper flags under them.
@@ -234,8 +233,7 @@ GameStatus ControlPhase()
 	if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
 		RumbleScreen();
 
-	// Update cameras matrices there, after having done all the possible camera logic.
-	g_Renderer.UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
+	UpdateCamera();
 
 	DoFlipEffect(FlipEffect, LaraItem);
 
