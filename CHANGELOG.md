@@ -6,6 +6,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## Version 1.5 - xxxx-xx-xx
 
 ### Bug fixes
+
 * Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
 * Fixed moveable status after antitriggering.
 * Fixed leveljump vehicle transfer.
@@ -54,7 +55,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Changed Rome Hammer to not hurt player whilst deactivated.
 * Changed Statue with blade damage, from 20 to 200.
 * Changed sound effect that is triggered when using the `level.rumble` feature in a level. Sound effect now part of the default soundmap (ID 359) and additional hardcoded pitch shift has been removed.
-* Changed hardcoded sound for RAISING_BLOCKS back to the soundID used in TRLE (ID 149)
+* Changed hardcoded sound for RAISING_BLOCKS back to the soundID used in TRLE (ID 149).
 * Changed Water sound condition to ShallowWater.
 * Enhanced Rolling Spindle detection to avoid them going down through pits.
 * Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
