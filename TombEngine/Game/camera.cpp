@@ -1528,6 +1528,9 @@ void UpdateCamera()
 		TrackCameraInit = false;
 		CalculateCamera(LaraCollision);
 	}
+
+	// Update cameras matrices there, after having done all the possible camera logic.
+	g_Renderer.UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
 }
 
 void UpdateMikePos(const ItemInfo& item)
