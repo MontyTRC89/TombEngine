@@ -83,7 +83,7 @@ constexpr auto CLIP_ALL    = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 
 constexpr auto CLIP_SECONDARY = 0x10;
 
-struct AITargetFlags
+struct AITargetData
 {
 	ItemInfo	   FoundItem   = {};
 	GAME_OBJECT_ID ObjectID	   = GAME_OBJECT_ID::ID_NO_OBJECT;
@@ -97,9 +97,8 @@ struct AITargetFlags
 
 void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
 void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
-void FindAITargetObject(ItemInfo& item, GAME_OBJECT_ID objectID);
-void FindAITargetObject(ItemInfo& item, GAME_OBJECT_ID objectID, int ocb, bool checkSameZone = true);
-bool FindAITargetObject(ItemInfo& item, AITargetFlags& flags);
+void FindAITargetObject(ItemInfo& item, GAME_OBJECT_ID objectID, std::optional<int> ocb = std::nullopt, std::optional<bool> checkSameZone = std::nullopt);
+bool FindAITargetObject(ItemInfo& item, AITargetData& data);
 
 void GetAITarget(CreatureInfo* creature);
 int CreatureVault(short itemNumber, short angle, int vault, int shift);

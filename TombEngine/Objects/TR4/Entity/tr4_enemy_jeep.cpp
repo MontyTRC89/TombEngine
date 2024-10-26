@@ -206,18 +206,18 @@ namespace TEN::Entities::TR4
 			creature.LocationAI++;
 
 		// Use it to get behaviour if you arrive on X2 ai without modifing the creature.Enemy.
-		auto flags = AITargetFlags{};
-		flags.CheckDistance = true;
-		flags.CheckOcb = false;
-		flags.ObjectID = ID_AI_X2;
-		flags.Ocb = NO_VALUE;
-		flags.CheckSameZone = false;
-		flags.DistanceMax = ENEMY_JEEP_NEAR_X2_NODE_DISTANCE;
+		auto data = AITargetData{};
+		data.CheckDistance = true;
+		data.CheckOcb = false;
+		data.ObjectID = ID_AI_X2;
+		data.Ocb = NO_VALUE;
+		data.CheckSameZone = false;
+		data.DistanceMax = ENEMY_JEEP_NEAR_X2_NODE_DISTANCE;
 
-		if (FindAITargetObject(item, flags))
+		if (FindAITargetObject(item, data))
 		{
-			DrawDebugSphere(flags.FoundItem.Pose.Position.ToVector3(), 128.0f, Color(1, 1, 0), RendererDebugPage::WireframeMode, true);
-			item.ItemFlags[1] = flags.FoundItem.TriggerFlags;
+			DrawDebugSphere(data.FoundItem.Pose.Position.ToVector3(), 128.0f, Color(1, 1, 0), RendererDebugPage::WireframeMode, true);
+			item.ItemFlags[1] = data.FoundItem.TriggerFlags;
 		}
 	}
 

@@ -1438,43 +1438,25 @@ void FindAITarget(CreatureInfo* creature, short objectNumber)
 	}
 }
 
-void FindAITargetObject(ItemInfo& item, GAME_OBJECT_ID objectID)
+void FindAITargetObject(ItemInfo& item, GAME_OBJECT_ID objectID, std::optional<int> ocb, std::optional<bool> checkSameZone)
 {
 	auto& creature = *GetCreatureInfo(&item);
 
-	auto flags = AITargetFlags{};
-	flags.CheckDistance = false;
-	flags.CheckOcb = (item.ItemFlags[3] != 0);
-	flags.ObjectID = objectID;
-	flags.Ocb = item.ItemFlags[3];
-	flags.CheckSameZone = true;
+	auto data = AITargetData{};
+	data.CheckDistance = false;
+	data.CheckOcb = ocb.has_value();
+	data.ObjectID = objectID;
+	data.Ocb = ocb.value_or(item.ItemFlags[3]);
+	data.CheckSameZone = checkSameZone.value_or(true);
 
-	if (FindAITargetObject(item, flags))
+	if (FindAITargetObject(item, data))
 	{
-		*creature.AITarget = flags.FoundItem;
+		*creature.AITarget = data.FoundItem;
 		creature.Enemy = creature.AITarget;
 	}
 }
 
-void FindAITargetObject(ItemInfo& item, GAME_OBJECT_ID objectID, int ocb, bool checkSameZone)
-{
-	auto& creature = *GetCreatureInfo(&item);
-
-	auto flags = AITargetFlags{};
-	flags.CheckDistance = false;
-	flags.CheckOcb = (ocb != NO_VALUE);
-	flags.ObjectID = objectID;
-	flags.Ocb = ocb;
-	flags.CheckSameZone = checkSameZone;
-
-	if (FindAITargetObject(item, flags))
-	{
-		*creature.AITarget = flags.FoundItem;
-		creature.Enemy = creature.AITarget;
-	}
-}
-
-bool FindAITargetObject(ItemInfo& item, AITargetFlags& flags)
+bool FindAITargetObject(ItemInfo& item, AITargetData& data)
 {
 	if (g_Level.AIObjects.empty())
 		return false;
@@ -1486,7 +1468,7 @@ bool FindAITargetObject(ItemInfo& item, AITargetFlags& flags)
 	for (const auto& aiObject : g_Level.AIObjects)
 	{
 		// Check if object IDs match.
-		if (aiObject.objectNumber != flags.ObjectID)
+		if (aiObject.objectNumber != data.ObjectID)
 			continue;
 
 		// Check if room is valid.
@@ -1494,21 +1476,21 @@ bool FindAITargetObject(ItemInfo& item, AITargetFlags& flags)
 			continue;
 
 		// Check if distance is valid.
-		if (flags.CheckDistance)
+		if (data.CheckDistance)
 		{
-			if (Vector3i::Distance(item.Pose.Position, aiObject.pos.Position) > flags.DistanceMax)
+			if (Vector3i::Distance(item.Pose.Position, aiObject.pos.Position) > data.DistanceMax)
 				continue;
 		}
 
 		// Check if OCBs match (useful for pathfinding).
-		if (flags.CheckOcb)
+		if (data.CheckOcb)
 		{
-			if (aiObject.triggerFlags != flags.Ocb)
+			if (aiObject.triggerFlags != data.Ocb)
 				continue;
 		}
 
 		// Check if zone IDs match.
-		if (flags.CheckSameZone)
+		if (data.CheckSameZone)
 		{
 			int* zone = g_Level.Zones[(int)creature.LOT.Zone][(int)FlipStatus].data();
 			auto* room = &g_Level.Rooms[item.RoomNumber];
@@ -1549,7 +1531,7 @@ bool FindAITargetObject(ItemInfo& item, AITargetFlags& flags)
 		aiItem.Pose.Position.z += CLICK(1) * phd_cos(aiItem.Pose.Orientation.y);
 	}
 
-	flags.FoundItem = aiItem;
+	data.FoundItem = aiItem;
 	return true;
 }
 
