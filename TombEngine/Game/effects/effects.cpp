@@ -205,6 +205,8 @@ void UpdateSparks()
 
 		if (spark->on)
 		{
+			spark->StoreInterpolationData();
+
 			spark->life--;
 
 			if (!spark->life)
@@ -1053,6 +1055,8 @@ void UpdateSplashes()
 
 		if (splash.isActive)
 		{
+			splash.StoreInterpolationData();
+
 			splash.life--;
 			if (splash.life <= 0)
 				splash.isActive = false;
@@ -1242,7 +1246,7 @@ void KillAllCurrentItems(short itemNumber)
 	// TODO: Reimplement this functionality.
 }
 
-// TODO: Rname to SpawnDynamicLight().
+// TODO: Rename to SpawnDynamicLight().
 void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff)
 {
 	g_Renderer.AddDynamicLight(
@@ -1466,21 +1470,21 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->fadeToBlack = 16;
 	spark->blendMode = BlendMode::Additive;
 	spark->life = spark->sLife = (GetRandomControl() & 0xF) + 64;
-	spark->x = (GetRandomControl() & 0x1F) + x - 16;
-	spark->y = (GetRandomControl() & 0x1F) + y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + z - 16;
+	spark->position.x = (GetRandomControl() & 0x1F) + x - 16;
+	spark->position.y = (GetRandomControl() & 0x1F) + y - 16;
+	spark->position.z = (GetRandomControl() & 0x1F) + z - 16;
 
 	if (water)
 	{
-		spark->xVel = spark->yVel = GetRandomControl() & 0x3FF - 512;
-		spark->zVel = (GetRandomControl() & 0x3FF) - 512;
+		spark->velocity.x = spark->velocity.y = GetRandomControl() & 0x3FF - 512;
+		spark->velocity.z = (GetRandomControl() & 0x3FF) - 512;
 		spark->friction = 68;
 	}
 	else
 	{
-		spark->xVel = 2 * (GetRandomControl() & 0x3FF) - 1024;
-		spark->yVel = -512 - (GetRandomControl() & 0x3FF);
-		spark->zVel = 2 * (GetRandomControl() & 0x3FF) - 1024;
+		spark->velocity.x = 2 * (GetRandomControl() & 0x3FF) - 1024;
+		spark->velocity.y = -512 - (GetRandomControl() & 0x3FF);
+		spark->velocity.z = 2 * (GetRandomControl() & 0x3FF) - 1024;
 		spark->friction = 85;
 	}
 

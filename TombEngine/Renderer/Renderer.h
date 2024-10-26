@@ -66,6 +66,7 @@
 #include "Renderer/ConstantBuffers/SMAABuffer.h"
 #include "Renderer/Structures/RendererObject.h"
 #include "Graphics/Vertices/PostProcessVertex.h"
+#include "Renderer/Structures/RendererStar.h"
 
 enum GAME_OBJECT_ID : short;
 enum class SphereSpaceType;
@@ -151,6 +152,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psHUDTexture;
 		ComPtr<ID3D11PixelShader> _psHUDBarColor;
 		ComPtr<ID3D11VertexShader> _vsGBufferRooms;
+		ComPtr<ID3D11VertexShader> _vsGBufferRoomsAnimated;
 		ComPtr<ID3D11VertexShader> _vsGBufferItems;
 		ComPtr<ID3D11VertexShader> _vsGBufferStatics;
 		ComPtr<ID3D11VertexShader> _vsGBufferInstancedStatics;
@@ -161,6 +163,8 @@ namespace TEN::Renderer
 
 		// Constant buffers
 		RenderView _gameCamera;
+		RenderView _oldGameCamera;
+		RenderView _currentGameCamera;
 		ConstantBuffer<CCameraMatrixBuffer> _cbCameraMatrices;
 		CItemBuffer _stItem;
 		ConstantBuffer<CItemBuffer> _cbItem;
@@ -200,7 +204,7 @@ namespace TEN::Renderer
 		std::vector<RendererStringToDraw> _stringsToDraw;
 		float _blinkColorValue = 0.0f;
 		float _blinkTime		  = 0.0f;
-		bool  _isBlinkUpdated  = false;
+		float _oldBlinkTime = 0.0f;
 
 		// Graphics resources
 		Texture2D _logo;
@@ -304,10 +308,11 @@ namespace TEN::Renderer
 		// Screen settings
 		int _screenWidth;
 		int _screenHeight;
+		int _refreshRate;
 		bool _isWindowed;
 		float _farView = DEFAULT_FAR_VIEW;
 
-		// A flag to prevent extra renderer object addition
+		// A flag to prevent extra renderer object additions
 		bool _isLocked = false;
 
 		// Caching state changes
@@ -354,6 +359,8 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psPostProcessNegative;
 		ComPtr<ID3D11PixelShader> _psPostProcessExclusion;
 		ComPtr<ID3D11PixelShader> _psPostProcessFinalPass;
+		ComPtr<ID3D11PixelShader> _psPostProcessLensFlare;
+
 		bool _doingFullscreenPass = false;
 
 		// SSAO
@@ -373,6 +380,9 @@ namespace TEN::Renderer
 		fast_vector<int> _sortedPolygonsIndices;
 		VertexBuffer<Vertex> _sortedPolygonsVertexBuffer;
 		IndexBuffer _sortedPolygonsIndexBuffer;
+
+		// High framerate.
+		float _interpolationFactor = 0.0f;
 
 		// Private functions
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
@@ -400,8 +410,6 @@ namespace TEN::Renderer
 		void CollectLightsForCamera();
 		void CalculateLightFades(RendererItem* item);
 		void CollectEffects(short roomNumber);
-		void ClearSceneItems();
-		void ClearDynamicLights();
 		void ClearShadowMap();
 		void CalculateSSAO(RenderView& view);
 		void UpdateItemAnimations(RenderView& view);
@@ -495,7 +503,7 @@ namespace TEN::Renderer
 		void SetScissor(RendererRectangle rectangle);
 		bool SetupBlendModeAndAlphaTest(BlendMode blendMode, RendererPass rendererPass, int drawPass);
 		void SortAndPrepareSprites(RenderView& view);
-		void ResetAnimations();
+		void ResetItems();
 		void ResetScissor();
 		void ResetDebugVariables();
 		float CalculateFrameRate();
@@ -582,15 +590,16 @@ namespace TEN::Renderer
 		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
 		void Initialize(int w, int h, bool windowed, HWND handle);
-		void Render();
-		void RenderTitle();
+		void Render(float interpFactor);
+		void RenderTitle(float interpFactor);
 		void Lock();
 		bool PrepareDataForTheRenderer();
-		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
+		void UpdateCameraMatrices(CAMERA_INFO* cam, float farView);
 		void RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere);
 		void DumpGameScene();
 		void RenderInventory();
 		void RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view);
+		void PrepareScene();
 		void ClearScene();
 		void SaveScreenshot();
 		void PrintDebugMessage(LPCSTR msg, va_list args);
@@ -635,9 +644,13 @@ namespace TEN::Renderer
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
+		void SaveOldState();
 
-		Vector2i GetScreenResolution() const;
-		std::optional<Vector2> Get2DPosition(const Vector3& pos) const;
+		float						GetFramerateMultiplier() const;
+		float						GetInterpolationFactor() const;
+		Vector2i					GetScreenResolution() const;
+		int							GetScreenRefreshRate() const;
+		std::optional<Vector2>		Get2DPosition(const Vector3& pos) const;
 		std::pair<Vector3, Vector3> GetRay(const Vector2& pos) const;
 
 		Vector3	   GetMoveableBonePosition(int itemNumber, int boneID, const Vector3& relOffset = Vector3::Zero);

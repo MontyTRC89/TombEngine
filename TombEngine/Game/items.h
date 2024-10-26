@@ -128,11 +128,12 @@ struct ItemInfo
 	short	   RoomNumber = 0; // TODO: Make int.
 	int		   Floor	  = 0;
 
-	int	 HitPoints	= 0;
-	bool HitStatus	= false;
-	bool LookedAt	= false;
-	bool Collidable = false;
-	bool InDrawRoom = false;
+	int	 HitPoints			  = 0;
+	bool HitStatus			  = false;
+	bool LookedAt			  = false;
+	bool Collidable			  = false;
+	bool InDrawRoom			  = false;
+	bool DisableInterpolation = false;
 
 	int BoxNumber = 0;
 	int Timer	  = 0;

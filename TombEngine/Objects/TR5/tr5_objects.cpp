@@ -819,13 +819,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_LENS_FLARE];
-	if (obj->loaded)
-	{
-		//obj->drawRoutine = DrawLensFlare;
-
-	}
-
 	obj = &Objects[ID_WATERFALLSS1];
 	if (obj->loaded)
 	{
