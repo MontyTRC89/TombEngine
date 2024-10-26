@@ -1,9 +1,6 @@
 # Changelog
 
-Here you will find the full changelog of TEN's releases from Version 1.0 and up
-
-The dates are in European standard format where date is presented as **YYYY-MM-DD**
-
+The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
 ## Version 1.5 - xxxx-xx-xx
@@ -40,10 +37,11 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Features/Amendments
 
-* Added variable framerate , that allows the engine to run at an unlocked framerate for a much smoother experience. Setting can be toggled on or off in the graphical settings menu.
+* Added variable framerate.
 * Added a customisable global lensflare effect. https://tombengine.com/docs/level-settings/#lensflare
 * Added a customisable starry sky and meteor effect (based on TR5). https://tombengine.com/docs/level-settings/#stars
 * Added the ability to display "Lara's Home" entry in the main menu.
+* Added the ability to change pickup item count by modifying item hit points.
 * Added F12 as alternative to PrtSc for screenshots.
 * Added option to enable or disable menu option looping.
   - Menu scrolling using held inputs will stop at the last option until a new input is made.
@@ -78,7 +76,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ## [Version 1.4](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.1) - 2024-04-21
 
-### Bug Fixes
+### Bug fixes
 * Fixed drawing of display sprites in title level.
 * Fixed drawing of smoke sprites and various other sprites.
 * Fixed drawing of transparent surfaces when debris are present in scene.
@@ -121,7 +119,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ## [Version 1.3](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7) - 2024-01-06
 
-### Bug Fixes
+### Bug fixes
 * Fixed crash if title logo is removed from Textures folder.
 * Fixed crash if unknown player state ID is encountered.
 * Fixed bug with OCB 2 on pushables, and some other pushable bugs.
@@ -177,7 +175,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ## [Version 1.2](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.9) - 2023-11-11
 
-### Bug Fixes
+### Bug fixes
 * Fix burning torch not working properly if there are more than 256 objects in a level.
 * Fix grenade and rocket projectiles smoke offset in certain directions.
 * Fix projectiles flying through animating objects.
@@ -254,7 +252,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ## [Version 1.1.0](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.8) - 2023-07-29
 
-### Bug Fixes
+### Bug fixes
 * Fix enemies shooting Lara through static meshes and moveables.
 * Fix skeletons and mummies not being affected by explosive weapons.
 * Fix crash on loading if static meshes with IDs above maximum are present.
@@ -465,7 +463,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ## [Version 1.0.6](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.6.4) - 2023-01-29
 
-### Bug FIxes
+### Bug fixes
 * Fix major pathfinding bug which could have caused lots of issues with enemy behaviour.
 * Fix potential random crashes due to incorrect rendering behaviour.
 * Fix savegame crash for disabled enemies with partially set activation mask.
