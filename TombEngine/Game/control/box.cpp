@@ -1398,17 +1398,18 @@ void GetAITarget(CreatureInfo* creature)
 			item->AIBits &= ~FOLLOW;
 		}
 	}
-	/*else if (item->objectNumber == ID_MONKEY && item->carriedItem == NO_VALUE)
+
+	/*else if (item->ObjectNumber == ID_MONKEY && item->CarriedItem == NO_VALUE)
 	{
-		if (item->aiBits != MODIFY)
+		if (item->AIBits != MODIFY)
 		{
-			if (enemyObjectNumber != ID_SMALLMEDI_ITEM)
-				FindAITargetObject(creature, ID_SMALLMEDI_ITEM);
+			if (enemyObjectID != ID_SMALLMEDI_ITEM)
+				FindAITargetObject(*item, ID_SMALLMEDI_ITEM);
 		}
 		else
 		{
-			if (enemyObjectNumber != ID_KEY_ITEM4)
-				FindAITargetObject(creature, ID_KEY_ITEM4);
+			if (enemyObjectID != ID_KEY_ITEM4)
+				FindAITargetObject(*item, ID_KEY_ITEM4);
 		}
 	}*/
 }
