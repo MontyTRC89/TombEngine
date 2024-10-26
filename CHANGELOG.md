@@ -1,6 +1,6 @@
 # Changelog
 
-Here you will find the full changelog of TEN's releases from Version 1.0 and up 
+Here you will find the full changelog of TEN's releases from Version 1.0 and up
 
 The dates are in European standard format where date is presented as **YYYY-MM-DD**
 
@@ -10,6 +10,16 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Bug fixes
 * Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
+* Fixed moveable status after antitriggering.
+* Fixed leveljump vehicle transfer.
+* Fixed weapons not properly hitting enemies.
+* Fixed laserhead teleporting Lara and making her invisible on death.
+* Fixed sarcophagus pick-ups.
+* Fixed issue with Lara not rotating together with bridges while picking up items.
+* Fixed ghost collision with moveables with zero bounds.
+* Fixed several binocular bugs.
+* Fixed incorrect climbing out of water on bridge objects.
+* Fixed faulty death sectors.
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed camera rotating with the player's hips when climbing out of water.
 * Fixed AI for TR2 skidoo driver and worker with shotgun.
@@ -26,36 +36,45 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed teeth spikes not triggering the player impale animation.
 * Fixed TR4 mine crash with OCB 1 when triggered.
 * Fixed cases where Atlantean mutant's bombs cause the game to crash.
-* Fixed young hair drawing.
+* Fixed young Lara hair drawing. https://tombengine.com/docs/level-settings/#young_lara
 
 ### Features/Amendments
-* Changed Rome Hammer to not hurt player whilst deactivated.
-* Changed Statue with blade damage, from 20 to 200.
-* Enhanced Rolling Spindle detection to avoid them going down through pits.
-* Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
-* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing dar emitter ).
-* Enhanced raptor behaviour and handling. 
-  - OCB 0: Classic behaviour
-  - OCB 1: Can jump up/down up to 4 steps and jump across gaps up to 2 blocks wide.
-  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
-* Added TR3 seal mutant.
-  - OCB 0: Normal enemy behaviour. (TR3 RX-Tech mines level)
-  - OCB 1: Trap like behaviour. (TR3 Antarctica level)
+
+* Added variable framerate , that allows the engine to run at an unlocked framerate for a much smoother experience. Setting can be toggled on or off in the graphical settings menu.
+* Added a customisable global lensflare effect. https://tombengine.com/docs/level-settings/#lensflare
+* Added a customisable starry sky and meteor effect (based on TR5). https://tombengine.com/docs/level-settings/#stars
+* Added the ability to display "Lara's Home" entry in the main menu.
+* Added F12 as alternative to PrtSc for screenshots.
+* Added option to enable or disable menu option looping.
+  - Menu scrolling using held inputs will stop at the last option until a new input is made.
+* Added TR3 seal mutant. https://tombengine.com/docs/ocb-and-setup-instructions/#sealmutant
   - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Seal_Mutant.wad2
 * Add new sound conditions: Quicksand and Underwater.
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.
+* Added TR4 Enemy_Jeep https://tombengine.com/docs/ocb-and-setup-instructions/#enemy_jeep
+* Changed Rome Hammer to not hurt player whilst deactivated.
+* Changed Statue with blade damage, from 20 to 200.
+* Changed sound effect that is triggered when using the `level.rumble` feature in a level. Sound effect now part of the default soundmap (ID 359) and additional hardcoded pitch shift has been removed.
+* Changed hardcoded sound for RAISING_BLOCKS back to the soundID used in TRLE (ID 149)
 * Changed Water sound condition to ShallowWater.
-* Added option to enable or disable menu option looping.
-* Menu scrolling using held inputs will stop at the last option until a new input is made.
-* Added the ability to display "Lara's Home" entry in the main menu.
-
+* Enhanced Rolling Spindle detection to avoid them going down through pits.
+* Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
+* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing-dart emitter ).
+* Enhanced raptor behaviour and handling. https://tombengine.com/docs/ocb-and-setup-instructions/#raptor 
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
+* The limit of 32 active Flame Emitters has been removed.
+	
 ### Lua API changes
+* Added Flow.EnableHomeLevel() function.
+* Added Flow.IsStringPresent() function.
+* Added Flow.LensFlare() and Flow.Starfield() classes.
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
-* Added Input.KeyClearAll()
-* Added Flow.EnableHomeLevel()
+* Added Input.KeyClearAll() function.
+* Added Moveable.GetJointRotation() and optional 'offset' parameter for Moveable.GetJointPosition().
+* Added Room:GetRoomNumber() function.
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
-* Fixed Volume:GetActive() method
+* Fixed Volume:GetActive() method.
 
 ## [Version 1.4](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.1) - 2024-04-21
 

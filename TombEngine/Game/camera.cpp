@@ -952,8 +952,18 @@ void BinocularCamera(ItemInfo* item)
 			player.Inventory.IsBusy = false;
 
 			Camera.type = BinocularOldCamera;
+			Camera.target = LastTarget;
 			AlterFOV(LastFOV);
 			return;
+		}
+
+		if (IsHeld(In::Action))
+		{
+			ClearAction(In::Action);
+
+			auto origin = Camera.pos.ToVector3i();
+			auto target = Camera.target.ToVector3i();
+			LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
 		}
 	}
 
@@ -1022,13 +1032,6 @@ void BinocularCamera(ItemInfo* item)
 	Camera.oldType = Camera.type;
 
 	GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
-
-	if (IsHeld(In::Action))
-	{
-		auto origin = Camera.pos.ToVector3i();
-		auto target = Camera.target.ToVector3i();
-		LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
-	}
 }
 
 void ConfirmCameraTargetPos()
@@ -1518,6 +1521,21 @@ void ItemsCollideCamera()
 	staticList.clear();
 }
 
+void UpdateCamera()
+{
+	if (UseSpotCam)
+	{
+		// Draw flyby cameras.
+		CalculateSpotCameras();
+	}
+	else
+	{
+		// Do the standard camera.
+		TrackCameraInit = false;
+		CalculateCamera(LaraCollision);
+	}
+}
+
 void UpdateMikePos(const ItemInfo& item)
 {
 	if (Camera.mikeAtLara)
@@ -1545,7 +1563,8 @@ void UpdateMikePos(const ItemInfo& item)
 void RumbleScreen()
 {
 	if (!(GlobalCounter & 0x1FF))
-		SoundEffect(SFX_TR5_KLAXON, nullptr, SoundEnvironment::Land, 0.25f);
+		// SFX Enum Changed from TR5 and pitch shift removed. User can set this in their sound XML. Stranger1992 31st August 2024
+		SoundEffect(SFX_TR4_ENVIORONMENT_RUMBLE, nullptr, SoundEnvironment::Land);
 
 	if (RumbleTimer >= 0)
 		RumbleTimer++;

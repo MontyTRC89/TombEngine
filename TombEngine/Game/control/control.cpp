@@ -59,6 +59,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
+#include "Game/Lara/lara_initialise.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects;
@@ -89,7 +90,6 @@ using namespace TEN::Renderer;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
-int Wibble          = 0;
 
 bool InitializeGame;
 bool DoTheGame;
@@ -185,26 +185,12 @@ GameStatus ControlPhase(int numFrames)
 		ApplyActionQueue();
 		ClearActionQueue();
 
+		UpdateCamera();
 		UpdateAllItems();
 		UpdateAllEffects();
 		UpdateLara(LaraItem, isTitle);
 
 		g_GameScriptEntities->TestCollidingObjects();
-
-		if (UseSpotCam)
-		{
-			// Draw flyby cameras.
-			CalculateSpotCameras();
-		}
-		else
-		{
-			// Do the standard camera.
-			TrackCameraInit = false;
-			CalculateCamera(LaraCollision);
-		}
-
-		// Update oscillator seed.
-		Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
 
 		// Smash shatters and clear stopper flags under them.
 		UpdateShatters();
@@ -213,6 +199,7 @@ GameStatus ControlPhase(int numFrames)
 		Weather.Update();
 
 		// Update effects.
+		UpdateWibble();
 		StreamerEffect.Update();
 		UpdateSparks();
 		UpdateFireSparks();
@@ -545,6 +532,10 @@ void InitializeOrLoadGame(bool loadGame)
 		{
 			SaveGame::LoadHub(CurrentLevel);
 			TENLog("Starting new level.", LogLevel::Info);
+
+			// Restore vehicle.
+			auto* item = FindItem(ID_LARA);
+			InitializePlayerVehicle(*item);
 		}
 
 		g_GameScript->OnStart();
