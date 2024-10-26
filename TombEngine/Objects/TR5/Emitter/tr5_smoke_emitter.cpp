@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR5/Emitter/tr4_smoke_emitter.h"
+#include "Objects/TR5/Emitter/tr5_smoke_emitter.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
