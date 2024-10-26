@@ -185,10 +185,11 @@ GameStatus ControlPhase(int numFrames)
 		ApplyActionQueue();
 		ClearActionQueue();
 
-		UpdateCamera();
 		UpdateAllItems();
 		UpdateAllEffects();
 		UpdateLara(LaraItem, isTitle);
+
+		UpdateCamera();
 
 		g_GameScriptEntities->TestCollidingObjects();
 
