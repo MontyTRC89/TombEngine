@@ -10,7 +10,7 @@ namespace TEN::Structures
 	enum class BvhBuildStrategy
 	{
 		Fast,	  // O(n): Fast build, okay quality. Top-down approach with median split.
-		Balanced, // O(n * m): Efficient build, good quality. Top-down approach with limited surface area heuristic.
+		Balanced, // O(n * m): Efficient build, good quality. Top-down approach with constrained surface area heuristic.
 		Accurate  // O(n²): Slow build, optimal quality. Top-down approach with exhaustive surface area heuristic.
 	};
 

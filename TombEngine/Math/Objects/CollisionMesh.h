@@ -67,7 +67,7 @@ namespace TEN::Math
 	struct CollisionTriangleData
 	{
 		std::array<Vector3, LocalCollisionTriangle::VERTEX_COUNT> Vertices = {};
-		Vector3 Normal = Vector3::Zero;
+		Vector3													  Normal   = Vector3::Zero;
 	};
 
 	struct CollisionMeshRayCollisionData
