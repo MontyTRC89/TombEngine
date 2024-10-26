@@ -2,6 +2,8 @@
 #include "Game/Hud/PickupSummary.h"
 
 #include "Game/pickup/pickup.h"
+#include "Game/pickup/pickup_ammo.h"
+#include "Game/pickup/pickup_consumable.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer.h"
 #include "Specific/clock.h"
@@ -120,6 +122,20 @@ namespace TEN::Hud
 		pickup.HideVelocity = 0.0f;
 		pickup.StringScale = 0.0f;
 		pickup.StringScalar = 0.0f;
+	}
+
+	void PickupSummaryController::AddDisplayPickup(ItemInfo& item)
+	{
+		// Ammo and consumables are a special case, as internal amount differs from pickup amount.
+
+		int ammoCount       = GetDefaultAmmoCount(item.ObjectNumber);
+		int consumableCount = GetDefaultConsumableCount(item.ObjectNumber);
+
+		int count = DISPLAY_PICKUP_COUNT_ARG_DEFAULT;
+		if (ammoCount != NO_VALUE) count = ammoCount;
+		if (consumableCount != NO_VALUE) count = consumableCount;
+
+		AddDisplayPickup(item.ObjectNumber, item.Pose.Position.ToVector3(), item.HitPoints > 0 ? item.HitPoints : count);
 	}
 
 	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos, unsigned int count)

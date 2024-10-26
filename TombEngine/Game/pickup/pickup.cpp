@@ -211,7 +211,7 @@ void CollectCarriedItems(ItemInfo* item)
 		auto& pickupItem = g_Level.Items[pickupNumber];
 
 		PickedUpObject(pickupItem);
-		g_Hud.PickupSummary.AddDisplayPickup(pickupItem.ObjectNumber, pickupItem.Pose.Position.ToVector3());
+		g_Hud.PickupSummary.AddDisplayPickup(pickupItem);
 		KillItem(pickupNumber);
 
 		pickupNumber = pickupItem.CarriedItem;
@@ -253,7 +253,7 @@ void CollectMultiplePickups(int itemNumber)
 		}
 
 		PickedUpObject(*itemPtr);
-		g_Hud.PickupSummary.AddDisplayPickup(itemPtr->ObjectNumber, itemPtr->Pose.Position.ToVector3());
+		g_Hud.PickupSummary.AddDisplayPickup(*itemPtr);
 
 		if (itemPtr->TriggerFlags & (1 << 8))
 		{
@@ -324,7 +324,7 @@ void DoPickup(ItemInfo* laraItem)
 			}
 
 			PickedUpObject(*pickupItem);
-			g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
+			g_Hud.PickupSummary.AddDisplayPickup(*pickupItem);
 			HideOrDisablePickup(*pickupItem);
 
 			pickupItem->Pose.Orientation = prevOrient;
@@ -353,7 +353,7 @@ void DoPickup(ItemInfo* laraItem)
 				}
 
 				PickedUpObject(*pickupItem);
-				g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
+				g_Hud.PickupSummary.AddDisplayPickup(*pickupItem);
 
 				if (pickupItem->TriggerFlags & (1 << 8))
 				{
@@ -1265,7 +1265,7 @@ void SearchObjectControl(short itemNumber)
 				if (Objects[item2->ObjectNumber].isPickup)
 				{
 					PickedUpObject(*item2);
-					g_Hud.PickupSummary.AddDisplayPickup(item2->ObjectNumber, item2->Pose.Position.ToVector3());
+					g_Hud.PickupSummary.AddDisplayPickup(*item2);
 					KillItem(item->ItemFlags[1]);
 				}
 				else
