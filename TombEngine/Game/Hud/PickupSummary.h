@@ -25,8 +25,21 @@ namespace TEN::Hud
 		float StringScale  = 0.0f;
 		float StringScalar = 0.0f;
 
+		Vector2		PrevPosition	= Vector2::Zero;
+		EulerAngles PrevOrientation = EulerAngles::Identity;
+		float		PrevScale		= 0.0f;
+		float		PrevOpacity		= 0.0f;
+
 		bool IsOffscreen() const;
 		void Update(bool isHead);
+
+		void StoreInterpolationData()
+		{
+			PrevPosition = Position;
+			PrevOrientation = Orientation;
+			PrevScale = Scale;
+			PrevOpacity = Opacity;
+		}
 	};
 
 	class PickupSummaryController

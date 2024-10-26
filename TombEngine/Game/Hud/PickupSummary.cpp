@@ -41,6 +41,8 @@ namespace TEN::Hud
 		constexpr auto ROT_RATE			   = ANGLE(360.0f / (LIFE_MAX * FPS));
 		constexpr auto ROT				   = EulerAngles(0, ROT_RATE, 0);
 
+		StoreInterpolationData();
+
 		// Move offscreen.
 		if (Life <= 0.0f && isHead)
 		{

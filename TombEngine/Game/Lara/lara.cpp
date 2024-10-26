@@ -59,8 +59,8 @@ using namespace TEN::Gui;
 
 using TEN::Renderer::g_Renderer;
 
-LaraInfo Lara = {};
-ItemInfo* LaraItem;
+LaraInfo	  Lara			= {};
+ItemInfo*	  LaraItem		= nullptr;
 CollisionInfo LaraCollision = {};
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
@@ -628,6 +628,7 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 
 	// Control player.
 	InItemControlLoop = true;
+
 	LaraControl(item, &LaraCollision);
 	HandlePlayerFlyCheat(*item);
 	InItemControlLoop = false;

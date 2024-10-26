@@ -75,6 +75,7 @@ local strings =
 	exit_to_title = { "Exit to Title" },
 	general_actions = { "General Actions" },
 	high = { "High" },
+	high_framerate = { "High Framerate" },
 	level_secrets_found = { "Secrets Found in Level" },
 	load_game = { "Load Game" },
 	low = { "Low" },

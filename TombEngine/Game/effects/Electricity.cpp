@@ -175,6 +175,8 @@ namespace TEN::Effects::Electricity
 
 		for (auto& laser : HelicalLasers)
 		{
+			laser.StoreInterpolationData();
+
 			// Set to despawn.
 			laser.Life -= 1.0f;
 			if (laser.Life <= 0.0f)
@@ -213,6 +215,8 @@ namespace TEN::Effects::Electricity
 			if (arc.life <= 0.0f)
 				continue;
 
+			arc.StoreInterpolationData();
+			
 			// If/when this behaviour is changed, modify AddLightningArc accordingly.
 			arc.life -= 2.0f;
 			if (arc.life > 0.0f)
