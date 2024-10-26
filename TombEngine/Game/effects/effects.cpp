@@ -1246,7 +1246,7 @@ void KillAllCurrentItems(short itemNumber)
 	// TODO: Reimplement this functionality.
 }
 
-// TODO: Rname to SpawnDynamicLight().
+// TODO: Rename to SpawnDynamicLight().
 void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff)
 {
 	g_Renderer.AddDynamicLight(
