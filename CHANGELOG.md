@@ -38,33 +38,31 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Features/Amendments
 
-* Added variable framerate.
+* Added high framerate mode (also known as 60 FPS mode).
 * Added a customisable global lensflare effect. https://tombengine.com/docs/level-settings/#lensflare
 * Added a customisable starry sky and meteor effect (based on TR5). https://tombengine.com/docs/level-settings/#stars
 * Added the ability to display "Lara's Home" entry in the main menu.
 * Added the ability to change pickup item count by modifying item hit points.
 * Added F12 as alternative to PrtSc for screenshots.
-* Added option to enable or disable menu option looping.
-  - Menu scrolling using held inputs will stop at the last option until a new input is made.
-* Added TR3 seal mutant. https://tombengine.com/docs/ocb-and-setup-instructions/#sealmutant
+* Added TR3 Seal Mutant. https://tombengine.com/docs/ocb-and-setup-instructions/#sealmutant
   - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Seal_Mutant.wad2
-* Add new sound conditions: Quicksand and Underwater.
+* Added new sound conditions: Quicksand and Underwater.
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.
-* Added TR4 Enemy_Jeep https://tombengine.com/docs/ocb-and-setup-instructions/#enemy_jeep
-* Changed Rome Hammer to not hurt player whilst deactivated.
-* Changed Statue with blade damage, from 20 to 200.
-* Changed sound effect that is triggered when using the `level.rumble` feature in a level. Sound effect now part of the default soundmap (ID 359) and additional hardcoded pitch shift has been removed.
-* Changed hardcoded sound for RAISING_BLOCKS back to the soundID used in TRLE (ID 149).
-* Changed Water sound condition to ShallowWater.
-* Enhanced Rolling Spindle detection to avoid them going down through pits.
-* Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns ( by default PUZZLE_ITEM5 )
-* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots ( by default 32 in dart emitter, and 24 in homing-dart emitter ).
-* Enhanced raptor behaviour and handling. https://tombengine.com/docs/ocb-and-setup-instructions/#raptor 
+* Added TR4 Enemy Jeep. https://tombengine.com/docs/ocb-and-setup-instructions/#enemy_jeep
+* Changed TR5 Rome Hammer to not hurt player whilst deactivated.
+* Changed Statue with blade damage from 20 to 200.
+* Changed sound effect that is triggered when using the `level.rumble` feature in a level (ID 359 in the soundmap).
+* Changed hardcoded sound for Raising Block 1/2 back to the ID used in TRLE (ID 149).
+* Enhanced TR2 Rolling Spindle detection to avoid them going down through pits.
+* Enhanced Sentry Guns, with a new ItemFlags[3], to contain the ID of the inventory item that deactivates the sentry guns (Puzzle Item 5 by default).
+* Enhanced Dart Emitter, with a new ItemFlags[0], to contain the number of frames between shots (by default 32 in Dart Emitter, and 24 in Homing-Dart Emitter).
+* Enhanced Raptor behaviour and handling. https://tombengine.com/docs/ocb-and-setup-instructions/#raptor 
   - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Raptor.wad2
-* The limit of 32 active Flame Emitters has been removed.
+* Removed original limit of 32 active Flame Emitters.
 	
 ### Lua API changes
+
 * Added Flow.EnableHomeLevel() function.
 * Added Flow.IsStringPresent() function.
 * Added Flow.LensFlare() and Flow.Starfield() classes.
