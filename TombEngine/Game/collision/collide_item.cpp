@@ -1864,9 +1864,9 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 						continue;
 
 					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY ||
-						linkItem.ObjectNumber == ID_ENEMY_JEEP) // HACK: Don't kill enemy jeep.
+						object.damageType == DamageMode::None)
 					{
-						// If vehicle is harmless or speed is too low, push enemy.
+						// If vehicle is harmless, enemy is non-damageable, or speed is too low, push enemy.
 						ItemPushItem(&linkItem, item, coll, false, 0);
 						continue;
 					}
