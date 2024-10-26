@@ -428,7 +428,7 @@ namespace TEN::Entities::TR4
 			AlignEntityToSurface(&item, Vector2(object.radius / 3, (object.radius / 3) * 1.33f), 0.8f);
 		}
 
-		// Didn't used Move there because we need the move sound when jump/drop and rotating left/right.
+		// Didn't use Move there because we need the move sound when jump/drop and rotating left/right.
 		if (!IsJeepIdle(item.Animation.ActiveState))
 		{
 			float pitch = std::clamp(0.4f + (float)abs(item.Animation.Velocity.z) / (float)ENEMY_JEEP_PITCH_MAX, 0.6f, 1.4f);
