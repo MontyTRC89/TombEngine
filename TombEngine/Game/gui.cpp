@@ -892,7 +892,6 @@ namespace TEN::Gui
 			ThumbstickCameraControl,
 
 			MouseSensitivity,
-			MenuOptionLooping,
 
 			Apply,
 			Cancel,
@@ -997,27 +996,6 @@ namespace TEN::Gui
 				}
 
 				break;
-
-			case OtherSettingsOption::MenuOptionLooping:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-
-				switch (CurrentSettings.Configuration.MenuOptionLoopingMode)
-				{
-				default:
-				case MenuOptionLoopingMode::AllMenus:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::Disabled;
-					break;
-
-				case MenuOptionLoopingMode::SaveLoadOnly:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::AllMenus;
-					break;
-
-				case MenuOptionLoopingMode::Disabled:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::SaveLoadOnly;
-					break;
-				}
-
-				break;
 			}
 
 			if (isVolumeAdjusted)
@@ -1066,27 +1044,6 @@ namespace TEN::Gui
 						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MAX;
 
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-
-				break;
-
-			case OtherSettingsOption::MenuOptionLooping:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				
-				switch (CurrentSettings.Configuration.MenuOptionLoopingMode)
-				{
-				default:
-				case MenuOptionLoopingMode::AllMenus:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::SaveLoadOnly;
-					break;
-
-				case MenuOptionLoopingMode::SaveLoadOnly:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::Disabled;
-					break;
-
-				case MenuOptionLoopingMode::Disabled:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::AllMenus;
-					break;
 				}
 
 				break;
