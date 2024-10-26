@@ -339,17 +339,23 @@ void Antitrigger(short const value, short const flags)
 		item->ItemFlags[1] = 100;
 	}
 
-	item->Flags &= ~(CODE_BITS | REVERSE);
+	item->Flags &= ~(CODE_BITS | IFLAG_REVERSE);
 
 	if (flags & ONESHOT)
 		item->Flags |= ATONESHOT;
 
-	if (item->Active && Objects[item->ObjectNumber].intelligent)
+	if (item->Active)
 	{
-		DisableEntityAI(value);
-		RemoveActiveItem(value, false);
 		item->Active = false;
-		item->Status = ITEM_INVISIBLE;
+		item->Status = ITEM_DEACTIVATED;
+
+		if (Objects[item->ObjectNumber].intelligent)
+		{
+			DisableEntityAI(value);
+			RemoveActiveItem(value, false);
+
+			item->Status = ITEM_INVISIBLE;
+		}
 	}
 }
 

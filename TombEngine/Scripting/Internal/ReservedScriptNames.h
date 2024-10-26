@@ -120,6 +120,7 @@ static constexpr char ScriptReserved_SetFlags[]				= "SetFlags";
 static constexpr char ScriptReserved_SetTranslated[]		= "SetTranslated";
 static constexpr char ScriptReserved_GetPosition[]			= "GetPosition";
 static constexpr char ScriptReserved_GetJointPosition[]		= "GetJointPosition";
+static constexpr char ScriptReserved_GetJointRotation[]		= "GetJointRotation";
 static constexpr char ScriptReserved_SetPosition[]			= "SetPosition";
 static constexpr char ScriptReserved_GetRotation[]			= "GetRotation";
 static constexpr char ScriptReserved_SetRotation[]			= "SetRotation";
