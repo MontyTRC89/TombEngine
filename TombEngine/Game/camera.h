@@ -24,11 +24,11 @@ struct CAMERA_INFO
 	GameVector target;
 	CameraType type;
 	CameraType oldType;
+	CameraType lastType;
 	int shift;
 	int flags;
 	bool fixedCamera;
 	bool underwater;
-	int numberFrames;
 	int bounce;
 	int targetDistance;
 	short targetAngle;
@@ -46,6 +46,11 @@ struct CAMERA_INFO
 	ItemInfo* lastItem;
 	int mikeAtLara;
 	Vector3i mikePos;
+
+	float Roll = 0.0f;
+	float Fov  = 0.0f;
+
+	bool DisableInterpolation = false;
 };
 
 struct ObjectCameraInfo
@@ -113,6 +118,7 @@ void SetScreenFadeOut(float speed, bool force = false);
 void SetScreenFadeIn(float speed, bool force = false);
 void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
+void PrepareCamera();
 void UpdateCamera();
 void UpdateFadeScreenAndCinematicBars();
 void UpdateMikePos(const ItemInfo& item);

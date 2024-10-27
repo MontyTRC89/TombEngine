@@ -194,15 +194,8 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 
 void LookAt(CAMERA_INFO* cam, short roll)
 {
-	auto pos = cam->pos.ToVector3();
-	auto target = cam->target.ToVector3();
-	auto up = Vector3::Down;
-	float fov = TO_RAD(CurrentFOV / 1.333333f);
-	float r = TO_RAD(roll);
-
-	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(BLOCK(1));
-
-	g_Renderer.UpdateCameraMatrices(cam, r, fov, levelFarView);
+	cam->Fov = TO_RAD(CurrentFOV / 1.333333f);
+	cam->Roll = TO_RAD(roll);
 }
 
 void AlterFOV(short value, bool store)
@@ -248,13 +241,13 @@ void InitializeCamera()
 
 	Camera.targetDistance = BLOCK(1.5f);
 	Camera.item = nullptr;
-	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
 	Camera.speed = 1;
 	Camera.flags = CF_NONE;
 	Camera.bounce = 0;
 	Camera.number = -1;
 	Camera.fixedCamera = false;
+	Camera.DisableInterpolation = true;
 
 	AlterFOV(ANGLE(DEFAULT_FOV));
 
@@ -1171,7 +1164,6 @@ void CalculateCamera(const CollisionInfo& coll)
 				Lara.ExtraTorsoRot.x = Lara.ExtraHeadRot.x;
 
 				Lara.Control.Look.Orientation = lookOrient;
-
 				Camera.type = CameraType::Look;
 				Camera.item->LookedAt = true;
 			}
@@ -1294,6 +1286,8 @@ void CalculateCamera(const CollisionInfo& coll)
 
 	Camera.fixedCamera = isFixedCamera;
 	Camera.last = Camera.number;
+	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
+	Camera.lastType = Camera.type;
 
 	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) &&
 		LaraItem->HitPoints > 0)
@@ -1521,6 +1515,15 @@ void ItemsCollideCamera()
 	staticList.clear();
 }
 
+void PrepareCamera()
+{
+	if (TrackCameraInit)
+	{
+		UseSpotCam = false;
+		AlterFOV(LastFOV);
+	}
+}
+
 void UpdateCamera()
 {
 	if (UseSpotCam)
@@ -1534,6 +1537,9 @@ void UpdateCamera()
 		TrackCameraInit = false;
 		CalculateCamera(LaraCollision);
 	}
+
+	// Update cameras matrices there, after having done all the possible camera logic.
+	g_Renderer.UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
 }
 
 void UpdateMikePos(const ItemInfo& item)

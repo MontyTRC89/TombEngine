@@ -97,6 +97,10 @@ struct PlayerContextData;
 struct PlayerContextDataBuilder;
 struct PlayerContextDataT;
 
+struct CollisionInfoData;
+struct CollisionInfoDataBuilder;
+struct CollisionInfoDataT;
+
 struct Lara;
 struct LaraBuilder;
 struct LaraT;
@@ -4049,11 +4053,81 @@ struct PlayerContextData::Traits {
 
 flatbuffers::Offset<PlayerContextData> CreatePlayerContextData(flatbuffers::FlatBufferBuilder &_fbb, const PlayerContextDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct CollisionInfoDataT : public flatbuffers::NativeTable {
+  typedef CollisionInfoData TableType;
+  int32_t last_bridge_item_number = 0;
+  std::unique_ptr<TEN::Save::Pose> last_bridge_item_pose{};
+};
+
+struct CollisionInfoData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef CollisionInfoDataT NativeTableType;
+  typedef CollisionInfoDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LAST_BRIDGE_ITEM_NUMBER = 4,
+    VT_LAST_BRIDGE_ITEM_POSE = 6
+  };
+  int32_t last_bridge_item_number() const {
+    return GetField<int32_t>(VT_LAST_BRIDGE_ITEM_NUMBER, 0);
+  }
+  const TEN::Save::Pose *last_bridge_item_pose() const {
+    return GetStruct<const TEN::Save::Pose *>(VT_LAST_BRIDGE_ITEM_POSE);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_LAST_BRIDGE_ITEM_NUMBER) &&
+           VerifyField<TEN::Save::Pose>(verifier, VT_LAST_BRIDGE_ITEM_POSE) &&
+           verifier.EndTable();
+  }
+  CollisionInfoDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(CollisionInfoDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<CollisionInfoData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct CollisionInfoDataBuilder {
+  typedef CollisionInfoData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_last_bridge_item_number(int32_t last_bridge_item_number) {
+    fbb_.AddElement<int32_t>(CollisionInfoData::VT_LAST_BRIDGE_ITEM_NUMBER, last_bridge_item_number, 0);
+  }
+  void add_last_bridge_item_pose(const TEN::Save::Pose *last_bridge_item_pose) {
+    fbb_.AddStruct(CollisionInfoData::VT_LAST_BRIDGE_ITEM_POSE, last_bridge_item_pose);
+  }
+  explicit CollisionInfoDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<CollisionInfoData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<CollisionInfoData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<CollisionInfoData> CreateCollisionInfoData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t last_bridge_item_number = 0,
+    const TEN::Save::Pose *last_bridge_item_pose = 0) {
+  CollisionInfoDataBuilder builder_(_fbb);
+  builder_.add_last_bridge_item_pose(last_bridge_item_pose);
+  builder_.add_last_bridge_item_number(last_bridge_item_number);
+  return builder_.Finish();
+}
+
+struct CollisionInfoData::Traits {
+  using type = CollisionInfoData;
+  static auto constexpr Create = CreateCollisionInfoData;
+};
+
+flatbuffers::Offset<CollisionInfoData> CreateCollisionInfoData(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct LaraT : public flatbuffers::NativeTable {
   typedef Lara TableType;
   std::unique_ptr<TEN::Save::PlayerContextDataT> context{};
   std::unique_ptr<TEN::Save::LaraControlDataT> control{};
   std::unique_ptr<TEN::Save::PlayerEffectDataT> effect{};
+  std::unique_ptr<TEN::Save::CollisionInfoDataT> collision{};
   int32_t extra_anim = 0;
   std::unique_ptr<TEN::Save::EulerAngles> extra_head_rot{};
   std::unique_ptr<TEN::Save::EulerAngles> extra_torso_rot{};
@@ -4081,23 +4155,24 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_CONTEXT = 4,
     VT_CONTROL = 6,
     VT_EFFECT = 8,
-    VT_EXTRA_ANIM = 10,
-    VT_EXTRA_HEAD_ROT = 12,
-    VT_EXTRA_TORSO_ROT = 14,
-    VT_FLARE = 16,
-    VT_HIGHEST_LOCATION = 18,
-    VT_HIT_DIRECTION = 20,
-    VT_HIT_FRAME = 22,
-    VT_INVENTORY = 24,
-    VT_LEFT_ARM = 26,
-    VT_LOCATION = 28,
-    VT_LOCATION_PAD = 30,
-    VT_RIGHT_ARM = 32,
-    VT_STATUS = 34,
-    VT_TARGET_ARM_ORIENT = 36,
-    VT_TARGET_ENTITY_NUMBER = 38,
-    VT_TORCH = 40,
-    VT_WEAPONS = 42
+    VT_COLLISION = 10,
+    VT_EXTRA_ANIM = 12,
+    VT_EXTRA_HEAD_ROT = 14,
+    VT_EXTRA_TORSO_ROT = 16,
+    VT_FLARE = 18,
+    VT_HIGHEST_LOCATION = 20,
+    VT_HIT_DIRECTION = 22,
+    VT_HIT_FRAME = 24,
+    VT_INVENTORY = 26,
+    VT_LEFT_ARM = 28,
+    VT_LOCATION = 30,
+    VT_LOCATION_PAD = 32,
+    VT_RIGHT_ARM = 34,
+    VT_STATUS = 36,
+    VT_TARGET_ARM_ORIENT = 38,
+    VT_TARGET_ENTITY_NUMBER = 40,
+    VT_TORCH = 42,
+    VT_WEAPONS = 44
   };
   const TEN::Save::PlayerContextData *context() const {
     return GetPointer<const TEN::Save::PlayerContextData *>(VT_CONTEXT);
@@ -4107,6 +4182,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::PlayerEffectData *effect() const {
     return GetPointer<const TEN::Save::PlayerEffectData *>(VT_EFFECT);
+  }
+  const TEN::Save::CollisionInfoData *collision() const {
+    return GetPointer<const TEN::Save::CollisionInfoData *>(VT_COLLISION);
   }
   int32_t extra_anim() const {
     return GetField<int32_t>(VT_EXTRA_ANIM, 0);
@@ -4167,6 +4245,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(control()) &&
            VerifyOffset(verifier, VT_EFFECT) &&
            verifier.VerifyTable(effect()) &&
+           VerifyOffset(verifier, VT_COLLISION) &&
+           verifier.VerifyTable(collision()) &&
            VerifyField<int32_t>(verifier, VT_EXTRA_ANIM) &&
            VerifyField<TEN::Save::EulerAngles>(verifier, VT_EXTRA_HEAD_ROT) &&
            VerifyField<TEN::Save::EulerAngles>(verifier, VT_EXTRA_TORSO_ROT) &&
@@ -4211,6 +4291,9 @@ struct LaraBuilder {
   }
   void add_effect(flatbuffers::Offset<TEN::Save::PlayerEffectData> effect) {
     fbb_.AddOffset(Lara::VT_EFFECT, effect);
+  }
+  void add_collision(flatbuffers::Offset<TEN::Save::CollisionInfoData> collision) {
+    fbb_.AddOffset(Lara::VT_COLLISION, collision);
   }
   void add_extra_anim(int32_t extra_anim) {
     fbb_.AddElement<int32_t>(Lara::VT_EXTRA_ANIM, extra_anim, 0);
@@ -4279,6 +4362,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     flatbuffers::Offset<TEN::Save::PlayerContextData> context = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
     flatbuffers::Offset<TEN::Save::PlayerEffectData> effect = 0,
+    flatbuffers::Offset<TEN::Save::CollisionInfoData> collision = 0,
     int32_t extra_anim = 0,
     const TEN::Save::EulerAngles *extra_head_rot = 0,
     const TEN::Save::EulerAngles *extra_torso_rot = 0,
@@ -4314,6 +4398,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_extra_torso_rot(extra_torso_rot);
   builder_.add_extra_head_rot(extra_head_rot);
   builder_.add_extra_anim(extra_anim);
+  builder_.add_collision(collision);
   builder_.add_effect(effect);
   builder_.add_control(control);
   builder_.add_context(context);
@@ -4330,6 +4415,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     flatbuffers::Offset<TEN::Save::PlayerContextData> context = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
     flatbuffers::Offset<TEN::Save::PlayerEffectData> effect = 0,
+    flatbuffers::Offset<TEN::Save::CollisionInfoData> collision = 0,
     int32_t extra_anim = 0,
     const TEN::Save::EulerAngles *extra_head_rot = 0,
     const TEN::Save::EulerAngles *extra_torso_rot = 0,
@@ -4353,6 +4439,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       context,
       control,
       effect,
+      collision,
       extra_anim,
       extra_head_rot,
       extra_torso_rot,
@@ -8993,6 +9080,35 @@ inline flatbuffers::Offset<PlayerContextData> CreatePlayerContextData(flatbuffer
       _water_surface_dist);
 }
 
+inline CollisionInfoDataT *CollisionInfoData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<CollisionInfoDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void CollisionInfoData::UnPackTo(CollisionInfoDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = last_bridge_item_number(); _o->last_bridge_item_number = _e; }
+  { auto _e = last_bridge_item_pose(); if (_e) _o->last_bridge_item_pose = std::unique_ptr<TEN::Save::Pose>(new TEN::Save::Pose(*_e)); }
+}
+
+inline flatbuffers::Offset<CollisionInfoData> CollisionInfoData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateCollisionInfoData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<CollisionInfoData> CreateCollisionInfoData(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const CollisionInfoDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _last_bridge_item_number = _o->last_bridge_item_number;
+  auto _last_bridge_item_pose = _o->last_bridge_item_pose ? _o->last_bridge_item_pose.get() : 0;
+  return TEN::Save::CreateCollisionInfoData(
+      _fbb,
+      _last_bridge_item_number,
+      _last_bridge_item_pose);
+}
+
 inline LaraT *Lara::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<LaraT>();
   UnPackTo(_o.get(), _resolver);
@@ -9005,6 +9121,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = context(); if (_e) _o->context = std::unique_ptr<TEN::Save::PlayerContextDataT>(_e->UnPack(_resolver)); }
   { auto _e = control(); if (_e) _o->control = std::unique_ptr<TEN::Save::LaraControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = effect(); if (_e) _o->effect = std::unique_ptr<TEN::Save::PlayerEffectDataT>(_e->UnPack(_resolver)); }
+  { auto _e = collision(); if (_e) _o->collision = std::unique_ptr<TEN::Save::CollisionInfoDataT>(_e->UnPack(_resolver)); }
   { auto _e = extra_anim(); _o->extra_anim = _e; }
   { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
   { auto _e = extra_torso_rot(); if (_e) _o->extra_torso_rot = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
@@ -9035,6 +9152,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _context = _o->context ? CreatePlayerContextData(_fbb, _o->context.get(), _rehasher) : 0;
   auto _control = _o->control ? CreateLaraControlData(_fbb, _o->control.get(), _rehasher) : 0;
   auto _effect = _o->effect ? CreatePlayerEffectData(_fbb, _o->effect.get(), _rehasher) : 0;
+  auto _collision = _o->collision ? CreateCollisionInfoData(_fbb, _o->collision.get(), _rehasher) : 0;
   auto _extra_anim = _o->extra_anim;
   auto _extra_head_rot = _o->extra_head_rot ? _o->extra_head_rot.get() : 0;
   auto _extra_torso_rot = _o->extra_torso_rot ? _o->extra_torso_rot.get() : 0;
@@ -9057,6 +9175,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _context,
       _control,
       _effect,
+      _collision,
       _extra_anim,
       _extra_head_rot,
       _extra_torso_rot,

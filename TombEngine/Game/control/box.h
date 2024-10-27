@@ -11,8 +11,7 @@ struct LOTInfo;
 enum class JumpDistance
 {
 	Block1,
-	Block2,
-	Block3
+	Block2
 };
 
 enum TARGET_TYPE
@@ -84,22 +83,23 @@ constexpr auto CLIP_ALL    = (CLIP_LEFT | CLIP_RIGHT | CLIP_TOP | CLIP_BOTTOM);
 
 constexpr auto CLIP_SECONDARY = 0x10;
 
-struct AITargetFlags
+struct AITargetData
 {
-	bool checkDistance = false;
-	bool checkSameZone = true;
-	bool checkOcb = false;
-	float maxDistance = 0.0f;
-	int ocb = NO_VALUE;
-	int objectNumber = ID_NO_OBJECT;
-	ItemInfo foundItem = {};
+	ItemInfo	   FoundItem   = {};
+	GAME_OBJECT_ID ObjectID	   = GAME_OBJECT_ID::ID_NO_OBJECT;
+	float		   DistanceMax = 0.0f;
+	int			   Ocb		   = NO_VALUE;
+
+	bool CheckDistance = false;
+	bool CheckSameZone = true;
+	bool CheckOcb	   = false;
 };
 
 void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
 void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent);
-void FindAITargetObject(CreatureInfo* creature, int objectNumber);
-void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool checkSameZone = true);
-bool FindAITargetObject(CreatureInfo* creature, AITargetFlags* data);
+void FindAITargetObject(ItemInfo& item, GAME_OBJECT_ID objectID, std::optional<int> ocb = std::nullopt, std::optional<bool> checkSameZone = std::nullopt);
+bool FindAITargetObject(ItemInfo& item, AITargetData& data);
+
 void GetAITarget(CreatureInfo* creature);
 int CreatureVault(short itemNumber, short angle, int vault, int shift);
 bool MoveCreature3DPos(Pose* fromPose, Pose* toPose, int velocity, short angleDif, int angleAdd);
@@ -135,7 +135,7 @@ void CreatureHealth(ItemInfo* item);
 void AdjustStopperFlag(ItemInfo* item, int direction);
 void InitializeItemBoxData();
 
-bool CanCreatureJump(ItemInfo& item, float stepDist, JumpDistance jumpDistType);
+bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType);
 
 void DrawBox(int boxIndex, Vector3 color);
 void DrawNearbyPathfinding(int boxIndex);

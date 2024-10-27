@@ -27,12 +27,8 @@ enum BodyPartFlags
 
 struct SMOKE_SPARKS
 {
-	int x;
-	int y;
-	int z;
-	int xVel;
-	int yVel;
-	int zVel;
+	Vector3i position;
+	Vector3i velocity;
 	int gravity;
 	short rotAng;
 	short flags;
@@ -56,6 +52,21 @@ struct SMOKE_SPARKS
 	byte fxObj;
 	byte nodeNumber;
 	byte mirror;
+
+	Vector3i oldPosition;
+	byte oldShade;
+	byte oldSize;
+	byte oldScalar;
+	short oldRotAng;
+
+	void StoreInterpolationData()
+	{
+		oldPosition = position;
+		oldShade = shade;
+		oldSize = size;
+		oldScalar = scalar;
+		oldRotAng = rotAng;
+	}
 };
 
 struct SHOCKWAVE_STRUCT
@@ -84,6 +95,21 @@ struct SHOCKWAVE_STRUCT
 
 	bool fadeIn = false;
 	bool HasLight = false;
+
+	short oldInnerRad;
+	short oldOuterRad;
+	byte oldR;
+	byte oldG;
+	byte oldB;
+
+	void StoreInterpolationData()
+	{
+		oldInnerRad = innerRad;
+		oldOuterRad = outerRad;
+		oldR = r;
+		oldG = g;
+		oldB = b;
+	}
 };
 
 struct GUNSHELL_STRUCT
@@ -95,6 +121,13 @@ struct GUNSHELL_STRUCT
 	short counter;
 	short dirXrot;
 	short objectNumber;
+
+	Pose oldPos;
+
+	void StoreInterpolationData()
+	{
+		oldPos = pos;
+	}
 };
 
 struct DRIP_STRUCT
@@ -112,26 +145,49 @@ struct DRIP_STRUCT
 	short roomNumber;
 	byte outside;
 	byte pad;
+
+	int oldX;
+	int oldY;
+	int oldZ;
+	byte oldR;
+	byte oldG;
+	byte oldB;
+
+	void StoreInterpolationData()
+	{
+		oldX = x;
+		oldY = y;
+		oldZ = z;
+		oldR = r;
+		oldG = g;
+		oldB = b;
+	}
 };
 
 struct FIRE_LIST
 {
-	int x;
-	int y;
-	int z;
+	Vector3i position;
 	unsigned char fade;
 	float size;
 	short roomNumber;
+	
+	Vector3i oldPosition;
+	float oldSize;
+	byte oldFade;
+
+	void StoreInterpolationData()
+	{
+		oldPosition = position;
+		oldSize = size;
+		oldFade = fade;
+	}
 };
 
 struct FIRE_SPARKS
 {
-	short x;
-	short y;
-	short z;
-	short xVel;
-	short yVel;
-	short zVel;
+	Vector3i position;
+	Vector3i velocity;
+	Vector3i color;
 	short gravity;
 	short rotAng;
 	short flags;
@@ -150,13 +206,25 @@ struct FIRE_SPARKS
 	unsigned char dR;
 	unsigned char dG;
 	unsigned char dB;
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
 	unsigned char colFadeSpeed;
 	unsigned char fadeToBlack;
 	unsigned char sLife;
 	unsigned char life;
+
+	Vector3i oldPosition;
+	Vector3i oldColor;
+	unsigned char oldScalar;
+	unsigned char oldSize;
+	short oldRotAng;
+
+	void StoreInterpolationData()
+	{
+		oldPosition = position;
+		oldColor = color;
+		oldScalar = scalar;
+		oldSize = size;
+		oldRotAng = rotAng;
+	}
 };
 
 struct BLOOD_STRUCT
@@ -183,6 +251,23 @@ struct BLOOD_STRUCT
 	byte sLife;
 	byte life;
 	byte pad;
+
+	int oldX;
+	int oldY;
+	int oldZ;
+	short oldRotAng;
+	byte oldShade;
+	byte oldSize;
+
+	void StoreInterpolationData()
+	{
+		oldX = x;
+		oldY = y;
+		oldZ = z;
+		oldRotAng = rotAng;
+		oldShade = shade;
+		oldSize = size;
+	}
 };
 
 enum class ShockwaveStyle
