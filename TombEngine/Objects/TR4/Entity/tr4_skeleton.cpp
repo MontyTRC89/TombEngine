@@ -136,7 +136,7 @@ namespace TEN::Entities::TR4
 
 		case 3:
 			SetAnimation(item, SKELETON_ANIM_STANDING_UP);
-			item->Status -= ITEM_INVISIBLE;
+			item->Status = ITEM_NOT_ACTIVE;
 			break;
 		}
 	}
