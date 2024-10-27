@@ -154,6 +154,10 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 	<td class="summary">Retrieve the index of the current state.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Moveable:GetTargetState">Moveable:GetTargetState()</a></td>
+	<td class="summary">Retrieve the index of the target state.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Moveable:SetState">Moveable:SetState(index)</a></td>
 	<td class="summary">Set the object's state to the one specified by the given index.</td>
 	</tr>
@@ -678,6 +682,28 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
            <span class="types"><span class="type">int</span></span>
         the index of the active state
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetTargetState"></a>
+    <strong>Moveable:GetTargetState()</strong>
+    </dt>
+    <dd>
+    Retrieve the index of the target state.
+ This corresponds to the state the object is trying to get into, which is sometimes different from the active state.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the index of the target state
     </ol>
 
 
