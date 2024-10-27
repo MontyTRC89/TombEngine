@@ -157,21 +157,6 @@ GameStatus ControlPhase()
 	if (!isTitle && Lara.Control.IsLocked)
 		ClearAllActions();
 
-	// Handle inventory, pause, load, save screens.
-	auto result = HandleMenuCalls(isTitle);
-	if (result != GameStatus::Normal)
-		return result;
-
-	// Handle global input events.
-	result = HandleGlobalInputEvents(isTitle);
-	if (result != GameStatus::Normal)
-		return result;
-
-	// Queued input actions are read again and cleared after UI interrupts are processed,
-	// so first game frame after exiting UI will still register it.
-	ApplyActionQueue();
-	ClearActionQueue();
-
 	// Item update should happen before camera update, so potential flyby/track camera triggers are processed correctly.
 	UpdateAllItems();
 	UpdateAllEffects();
@@ -246,6 +231,16 @@ GameStatus ControlPhase()
 	// Update timers.
 	GameTimer++;
 	GlobalCounter++;
+
+	// Handle inventory, pause, load, save screens.
+	auto result = HandleMenuCalls(isTitle);
+	if (result != GameStatus::Normal)
+		return result;
+
+	// Handle global input events.
+	result = HandleGlobalInputEvents(isTitle);
+	if (result != GameStatus::Normal)
+		return result;
 
 	auto time2 = std::chrono::high_resolution_clock::now();
 	ControlPhaseTime = (std::chrono::duration_cast<std::chrono::nanoseconds>(time2 - time1)).count() / 1000000;

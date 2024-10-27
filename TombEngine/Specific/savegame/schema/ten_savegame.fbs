@@ -274,10 +274,16 @@ table PlayerContextData {
 	water_surface_dist: int32;
 }
 
+table CollisionInfoData {
+	last_bridge_item_number: int32;
+	last_bridge_item_pose: Pose;
+}
+
 table Lara {
 	context: PlayerContextData;
 	control: LaraControlData;
 	effect: PlayerEffectData;
+	collision: CollisionInfoData;
 	extra_anim: int32;
 	extra_head_rot: EulerAngles;
 	extra_torso_rot: EulerAngles;

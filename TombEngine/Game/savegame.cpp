@@ -490,6 +490,11 @@ const std::vector<byte> SaveGame::Build()
 	status.add_stamina(Lara.Status.Stamina);
 	auto statusOffset = status.Finish();
 
+	Save::CollisionInfoDataBuilder collision{ fbb };
+	collision.add_last_bridge_item_number(LaraCollision.LastBridgeItemNumber);
+	collision.add_last_bridge_item_pose(&FromPose(LaraCollision.LastBridgeItemPose));
+	auto collisionOffset = collision.Finish();
+
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
 	for (int i = 0; i < (int)LaraWeaponType::NumWeapons; i++)
 	{
@@ -536,6 +541,7 @@ const std::vector<byte> SaveGame::Build()
 	lara.add_location_pad(Lara.LocationPad);
 	lara.add_right_arm(rightArmOffset);
 	lara.add_status(statusOffset);
+	lara.add_collision(collisionOffset);
 	lara.add_target_arm_orient(&FromEulerAngles(Lara.TargetArmOrient));
 	lara.add_target_entity_number(Lara.TargetEntity == nullptr ? -1 : Lara.TargetEntity->Index);
 	lara.add_torch(torchOffset);
@@ -1986,6 +1992,10 @@ static void ParsePlayer(const Save::SaveGame* s)
 		AlternatePendulum.node = s->alternate_pendulum()->node();
 		AlternatePendulum.rope = rope;
 	}
+
+	// Collision
+	LaraCollision.LastBridgeItemNumber = s->lara()->collision()->last_bridge_item_number();
+	LaraCollision.LastBridgeItemPose = ToPose(*s->lara()->collision()->last_bridge_item_pose());
 
 	for (auto& item : g_Level.Items)
 	{
