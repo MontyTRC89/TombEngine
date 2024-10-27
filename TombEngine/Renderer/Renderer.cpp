@@ -51,6 +51,7 @@ namespace TEN::Renderer
 
 		for (auto& item : _items)
 		{
+			item.DisableInterpolation = true;
 			item.PrevRoomNumber = NO_VALUE;
 			item.RoomNumber = NO_VALUE;
 			item.ItemNumber = NO_VALUE;

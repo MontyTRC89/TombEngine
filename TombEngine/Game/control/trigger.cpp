@@ -408,6 +408,7 @@ void Trigger(short const value, short const flags)
 		}
 
 		item->Status = ITEM_ACTIVE;
+		item->DisableInterpolation = true;
 	}
 }
 
