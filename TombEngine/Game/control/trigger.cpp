@@ -867,10 +867,11 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ItemInfo* item)
 {
-	auto pointColl = GetPointCollision(*item);
-	auto& sector = GetPointCollision(*item).GetBottomSector();
-
 	bool isPlayer = item->IsLara();
+
+	// HACK: because of L-shaped portal configurations, we need to fetch room number from Location struct for player.
+	auto pointColl = isPlayer ? GetPointCollision(item->Pose.Position, item->Location.RoomNumber) : GetPointCollision(*item);
+	auto& sector = pointColl.GetBottomSector();
 
 	// Set monkeyswing and wall climb statuses for player.
 	if (isPlayer)
