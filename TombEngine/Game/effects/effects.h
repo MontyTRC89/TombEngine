@@ -18,6 +18,8 @@ constexpr auto NUM_EFFECTS	= 256;
 constexpr auto MAX_PARTICLES		 = 1024;
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 
+extern int Wibble;
+
 enum SpriteEnumFlag
 {
 	SP_NONE		  = 0,
@@ -89,6 +91,8 @@ struct FX_INFO
 	Vector4 color;
 	short flag1;
 	short flag2;
+
+	bool DisableInterpolation;
 };
 
 struct NODEOFFSET_INFO
@@ -108,17 +112,6 @@ struct SPLASH_SETUP
 	float splashPower;
 	float innerRadius;
 	int room;
-};
-
-struct RIPPLE_STRUCT
-{
-	int x;
-	int y;
-	int z;
-	char flags;
-	unsigned char life;
-	unsigned char size;
-	unsigned char init;
 };
 
 struct Particle
@@ -160,6 +153,27 @@ struct Particle
 	int fxObj;
 	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
+
+	int PrevX;
+	int PrevY;
+	int PrevZ;
+	short PrevRotAng;
+	byte PrevR;
+	byte PrevG; 
+	byte PrevB;
+	byte PrevScalar;
+
+	void StoreInterpolationData()
+	{
+		PrevX = x;
+		PrevY = y;
+		PrevZ = z;
+		PrevRotAng = rotAng;
+		PrevR = r;
+		PrevG = g;
+		PrevB = b;
+		PrevScalar = scalar;
+	}
 };
 
 struct SPLASH_STRUCT
@@ -181,6 +195,25 @@ struct SPLASH_STRUCT
 	unsigned short life;
 	bool isRipple;
 	bool isActive;
+
+	Vector3 PrevPosition	= Vector3::Zero;
+	float	PrevInnerRad	= 0.0f;
+	float	PrevOuterRad	= 0.0f;
+	float	PrevHeight		= 0.0f;
+	float	PrevHeightSpeed = 0.0f;
+	float	PrevAnimPhase	= 0.0f;
+	unsigned short PrevLife = 0;
+
+	void StoreInterpolationData()
+	{
+		PrevPosition = Vector3(x, y, z);
+		PrevInnerRad = innerRad;
+		PrevOuterRad = outerRad;
+		PrevHeight = height;
+		PrevHeightSpeed = heightSpeed;
+		PrevAnimPhase = animationPhase;
+		PrevLife = life;
+	}
 };
 
 struct ParticleDynamic
@@ -279,5 +312,6 @@ void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
+void UpdateWibble();
 
 void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff);

@@ -3,7 +3,6 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -111,6 +110,8 @@ namespace TEN::Entities::TR4
 			auto* locust = &Locusts[i];
 			if (locust->on)
 			{
+				locust->StoreInterpolationData();
+
 				// NOTE: not present in original TR4 code
 				//if (locust->target == nullptr)
 				//    locust->target = LaraItem;

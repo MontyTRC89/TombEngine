@@ -128,11 +128,12 @@ struct ItemInfo
 	short	   RoomNumber = 0; // TODO: Make int.
 	int		   Floor	  = 0;
 
-	int	 HitPoints	= 0;
-	bool HitStatus	= false;
-	bool LookedAt	= false;
-	bool Collidable = false;
-	bool InDrawRoom = false;
+	int	 HitPoints			  = 0;
+	bool HitStatus			  = false;
+	bool LookedAt			  = false;
+	bool Collidable			  = false;
+	bool InDrawRoom			  = false;
+	bool DisableInterpolation = false;
 
 	int BoxNumber = 0;
 	int Timer	  = 0;
@@ -150,11 +151,13 @@ struct ItemInfo
 	short		  CarriedItem = 0;
 
 	// OCB utilities
+
 	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);
 	void ClearAllOcb();
 
 	// ItemFlags utilities
+
 	bool  TestFlags(int id, short flags) const;		// ItemFlags[id] & flags
 	bool  TestFlagField(int id, short flags) const; // ItemFlags[id] == flags
 	short GetFlagField(int id) const;				// ItemFlags[id]
@@ -162,6 +165,7 @@ struct ItemInfo
 	void  ClearFlags(int id, short flags);			// ItemFlags[id] &= ~flags
 
 	// Model utilities
+
 	bool TestMeshSwapFlags(unsigned int flags);
 	bool TestMeshSwapFlags(const std::vector<unsigned int>& flags);
 	void SetMeshSwapFlags(unsigned int flags, bool clear = false);
@@ -169,9 +173,14 @@ struct ItemInfo
 	void ResetModelToDefault();
 
 	// Inquirers
+
 	bool IsLara() const;
 	bool IsCreature() const;
 	bool IsBridge() const;
+
+	// Getters
+
+	std::vector<BoundingSphere> GetSpheres() const;
 };
 
 bool TestState(int refState, const std::vector<int>& stateList);

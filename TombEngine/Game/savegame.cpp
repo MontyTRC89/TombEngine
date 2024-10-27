@@ -15,6 +15,7 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_initialise.h"
 #include "Game/misc.h"
 #include "Game/spotcam.h"
 #include "Game/room.h"
@@ -489,6 +490,11 @@ const std::vector<byte> SaveGame::Build()
 	status.add_stamina(Lara.Status.Stamina);
 	auto statusOffset = status.Finish();
 
+	Save::CollisionInfoDataBuilder collision{ fbb };
+	collision.add_last_bridge_item_number(LaraCollision.LastBridgeItemNumber);
+	collision.add_last_bridge_item_pose(&FromPose(LaraCollision.LastBridgeItemPose));
+	auto collisionOffset = collision.Finish();
+
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
 	for (int i = 0; i < (int)LaraWeaponType::NumWeapons; i++)
 	{
@@ -535,6 +541,7 @@ const std::vector<byte> SaveGame::Build()
 	lara.add_location_pad(Lara.LocationPad);
 	lara.add_right_arm(rightArmOffset);
 	lara.add_status(statusOffset);
+	lara.add_collision(collisionOffset);
 	lara.add_target_arm_orient(&FromEulerAngles(Lara.TargetArmOrient));
 	lara.add_target_entity_number(Lara.TargetEntity == nullptr ? -1 : Lara.TargetEntity->Index);
 	lara.add_torch(torchOffset);
@@ -1492,6 +1499,9 @@ void SaveGame::LoadHub(int index)
 	// Load hub data.
 	TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
 	Parse(Hub[index], true);
+
+	// Restore vehicle.
+	InitializePlayerVehicle(*LaraItem);
 }
 
 bool SaveGame::IsOnHub(int index)
@@ -1983,6 +1993,10 @@ static void ParsePlayer(const Save::SaveGame* s)
 		AlternatePendulum.rope = rope;
 	}
 
+	// Collision
+	LaraCollision.LastBridgeItemNumber = s->lara()->collision()->last_bridge_item_number();
+	LaraCollision.LastBridgeItemPose = ToPose(*s->lara()->collision()->last_bridge_item_pose());
+
 	for (auto& item : g_Level.Items)
 	{
 		if (item.ObjectNumber != ID_LARA || item.Index >= g_Level.NumItems)
@@ -2299,10 +2313,21 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		// Don't load player data in hub mode.
 		if (item->ObjectNumber == ID_LARA && hubMode)
+		{
+			item->RoomNumber = savedItem->room_number();
+			item->Floor = savedItem->floor();
+			item->BoxNumber = savedItem->box_number();
 			continue;
+		}
 
 		if (item->Index == Lara.Context.Vehicle && hubMode)
+		{
+			//item->Pose = ToPose(*savedItem->pose());
+			item->RoomNumber = savedItem->room_number();
+			item->Floor = savedItem->floor();
+			item->BoxNumber = savedItem->box_number();
 			continue;
+		}
 
 		// Position
 		item->Pose = ToPose(*savedItem->pose());

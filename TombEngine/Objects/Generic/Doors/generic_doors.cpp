@@ -10,7 +10,7 @@
 #include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Objects/Generic/Switches/cog_switch.h"
 #include "Objects/objectslist.h"
 #include "Game/Lara/lara.h"
@@ -24,6 +24,7 @@
 #include "Game/itemdata/itemdata.h"
 
 using namespace TEN::Collision::Room;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 
@@ -247,7 +248,7 @@ namespace TEN::Entities::Doors
 
 		if (TestBoundsCollide(doorItem, laraItem, coll->Setup.Radius))
 		{
-			if (TestCollision(doorItem, laraItem))
+			if (HandleItemSphereCollision(*doorItem, *laraItem))
 			{
 				if (coll->Setup.EnableObjectPush)
 				{
@@ -410,7 +411,7 @@ namespace TEN::Entities::Doors
 
 	void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	{
-		static const auto WALL_PLANE = Plane(-Vector3::UnitY, -CLICK(127));
+		static const auto WALL_PLANE = Plane(-Vector3::UnitY, (float)NO_HEIGHT);
 
 		FloorInfo* floor = doorPos->floor;
 

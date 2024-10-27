@@ -209,7 +209,7 @@ void ControlBodyPart(short fxNumber)
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointColl.GetRoomNumber()) &&
 			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
 		{
-			int waterHeight = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, pointColl.GetRoomNumber());
+			int waterHeight = GetPointCollision(fx->pos.Position, pointColl.GetRoomNumber()).GetWaterTopHeight();
 
 			SplashSetup.y = waterHeight - 1;
 			SplashSetup.x = fx->pos.Position.x;

@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/debris.h"
 #include "Game/items.h"
@@ -18,6 +19,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
@@ -308,9 +310,9 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						{
 								item->MeshBits &= ~ShatterItem.bit;
 								ShatterImpactData.impactDirection = dir;
-								ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
+								ShatterImpactData.impactLocation = ShatterItem.sphere.Center;
 								ShatterObject(&ShatterItem, 0, 128, target2.RoomNumber, 0);
-								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);							
+								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
 						}
 						else
 						{
@@ -323,20 +325,19 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								{
 									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 
-									int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+									auto spheres = item->GetSpheres();
 									auto ray = Ray(origin->ToVector3(), dir);
 									float bestDistance = INFINITY;
 									int bestJointIndex = NO_VALUE;
 
-									for (int i = 0; i < num; i++)
+									for (int i = 0; i < spheres.size(); i++)
 									{
-										auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
-										float distance = 0.0f;
-										if (ray.Intersects(sphere, distance))
+										float dist = 0.0f;
+										if (ray.Intersects(spheres[i], dist))
 										{
-											if (distance < bestDistance)
+											if (dist < bestDistance)
 											{
-												bestDistance = distance;
+												bestDistance = dist;
 												bestJointIndex = i;
 											}
 										}
@@ -500,104 +501,30 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 		auto* item = &g_Level.Items[closestItemNumber];
 		auto* object = &Objects[item->ObjectNumber];
 
-		// Get transformed mesh sphere.
-		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-		SPHERE spheres[34];
-		memcpy(spheres, CreatureSpheres, sizeof(SPHERE) * 34);
-
 		if (object->nmeshes <= 0)
 			return false;
 
 		meshIndex = object->meshIndex;
 
+		auto spheres = item->GetSpheres();
 		for (int i = 0; i < object->nmeshes; i++)
 		{
 			// If mesh is visible.
 			if (item->MeshBits & (1 << i))
 			{
-				auto* sphere = &CreatureSpheres[i];
+				float distance;
+				const auto& sphere = spheres[i];
 
-				// TODO: this approach is the correct one but, again, Core's math is a mystery and this test was meant
-				// to fail deliberately in some way. I've so added again Core's legacy test for allowing the current game logic
-				// but after more testing we should trash it in the future and restore the new way.
-
-#if 0
-				// Create the bounding sphere and test it against the ray
-				BoundingSphere sph = BoundingSphere(Vector3(sphere->x, sphere->y, sphere->z), sphere->r);
-				float newDist;
-				if (sph.Intersects(rayStart, rayDirNormalized, newDist))
+				if (sphere.Intersects(rayOrigin, rayDir, distance))
 				{
-					// HACK: Core seems to take in account for distance not the real hit point but the centre of the sphere.
-					// This can work well for example for GUARDIAN because the head sphere is so big that would always be hit
-					// and eyes would not be destroyed.
-					newDist = sqrt(SQUARE(sphere->x - start->x) + SQUARE(sphere->y - start->y) + SQUARE(sphere->z - start->z));
+					// Test for minimum distance.
 
-					// Test for min distance
-					if (newDist < minDistance)
+					if (distance < minDist)
 					{
-						minDistance = newDist;
-						meshPtr = &g_Level.Meshes[obj->meshIndex + i];
+						minDist = distance;
+						meshIndex = object->meshIndex + i;
 						bit = 1 << i;
 						sp = i;
-					}
-				}
-#endif
-
-				Vector3i p[4];
-
-				p[1].x = origin.x;
-				p[1].y = origin.y;
-				p[1].z = origin.z;
-				p[2].x = target.x;
-				p[2].y = target.y;
-				p[2].z = target.z;
-				p[3].x = sphere->x;
-				p[3].y = sphere->y;
-				p[3].z = sphere->z;
-
-				int r0 = (p[3].x - p[1].x) * (p[2].x - p[1].x) +
-					(p[3].y - p[1].y) * (p[2].y - p[1].y) +
-					(p[3].z - p[1].z) * (p[2].z - p[1].z);
-
-				int r1 = SQUARE(p[2].x - p[1].x) +
-					SQUARE(p[2].y - p[1].y) +
-					SQUARE(p[2].z - p[1].z);
-
-				if (((r0 < 0 && r1 < 0) ||
-					(r1 > 0 && r0 > 0)) &&
-					(abs(r0) <= abs(r1)))
-				{
-					r1 >>= 16;
-					if (r1)
-						r0 /= r1;
-					else
-						r0 = 0;
-
-					p[0].x = p[1].x + ((r0 * (p[2].x - p[1].x)) >> 16);
-					p[0].y = p[1].y + ((r0 * (p[2].y - p[1].y)) >> 16);
-					p[0].z = p[1].z + ((r0 * (p[2].z - p[1].z)) >> 16);
-
-					int dx = SQUARE(p[0].x - p[3].x);
-					int dy = SQUARE(p[0].y - p[3].y);
-					int dz = SQUARE(p[0].z - p[3].z);
-
-					int distance = dx + dy + dz;
-
-					if (distance < SQUARE(sphere->r))
-					{
-						dx = SQUARE(sphere->x - origin.x);
-						dy = SQUARE(sphere->y - origin.y);
-						dz = SQUARE(sphere->z - origin.z);
-
-						distance = dx + dy + dz;
-
-						if (distance < minDist)
-						{
-							minDist = distance;
-							meshIndex = object->meshIndex + i;
-							bit = 1 << i;
-							sp = i;
-						}
 					}
 				}
 			}
@@ -622,14 +549,12 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 	{
 		auto* item = &g_Level.Items[closestItemNumber];
 
-		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
+		auto spheres = item->GetSpheres();
 
 		ShatterItem.yRot = item->Pose.Orientation.y;
 		ShatterItem.meshIndex = meshIndex;
 		ShatterItem.color = item->Model.Color;
-		ShatterItem.sphere.x = CreatureSpheres[sp].x;
-		ShatterItem.sphere.y = CreatureSpheres[sp].y;
-		ShatterItem.sphere.z = CreatureSpheres[sp].z;
+		ShatterItem.sphere.Center = spheres[sp].Center;
 		ShatterItem.bit = bit;
 		ShatterItem.flags = 0;
 	}

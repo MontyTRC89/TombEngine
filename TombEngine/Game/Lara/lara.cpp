@@ -59,8 +59,8 @@ using namespace TEN::Gui;
 
 using TEN::Renderer::g_Renderer;
 
-LaraInfo Lara = {};
-ItemInfo* LaraItem;
+LaraInfo	  Lara			= {};
+ItemInfo*	  LaraItem		= nullptr;
 CollisionInfo LaraCollision = {};
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
@@ -362,8 +362,6 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.PrevFrameNumber = item->Animation.FrameNumber;
 	coll->Setup.PrevState = item->Animation.ActiveState;
 
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
-
 	// Handle look-around.
 	if (((IsHeld(In::Look) && CanPlayerLookAround(*item)) ||
 			(player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)) &&
@@ -377,6 +375,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		ResetPlayerLookAround(*item);
 	}
 	player.Control.Look.Mode = LookMode::None;
+
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Process vehicles.
 	if (HandleLaraVehicle(item, coll))
@@ -628,6 +628,7 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 
 	// Control player.
 	InItemControlLoop = true;
+
 	LaraControl(item, &LaraCollision);
 	HandlePlayerFlyCheat(*item);
 	InItemControlLoop = false;
@@ -640,7 +641,7 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	g_Renderer.UpdateLaraAnimations(true);
 
 	// Update player effects.
-	HairEffect.Update(*item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+	HairEffect.Update(*item);
 	HandlePlayerWetnessDrips(*item);
 	HandlePlayerDiveBubbles(*item);
 	ProcessEffects(item);

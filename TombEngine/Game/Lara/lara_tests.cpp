@@ -935,11 +935,11 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	// Extra bridge check.
 	if (coll->Front.Bridge != NO_VALUE)
 	{
-		int bridgeBorder = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
+		frontFloor = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
 		
-		frontFloor = bridgeBorder - CLICK(0.5f);
-		if (frontFloor <= -CLICK(2) ||
-			frontFloor > CLICK(1.25f) - 4)
+		int bridgeBorder = frontFloor - CLICK(0.5f);
+		if (bridgeBorder <= -CLICK(2) ||
+			bridgeBorder > CLICK(1.25f) - 4)
 		{
 			return false;
 		}
@@ -1087,15 +1087,13 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	auto pointColl = GetPointCollision(*item);
-	int waterDepth = GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, pointColl.GetRoomNumber());
 
-	if (waterDepth == NO_HEIGHT)
+	if (pointColl.GetWaterBottomHeight() == NO_HEIGHT)
 	{
 		item->Animation.Velocity.y = 0.0f;
 		item->Pose.Position = coll->Setup.PrevPosition;
 	}
-
-	else if (waterDepth <= (LARA_HEIGHT - (LARA_HEADROOM / 2)))
+	else if (pointColl.GetWaterBottomHeight() <= (LARA_HEIGHT - (LARA_HEADROOM / 2)))
 	{
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
 		ResetPlayerLean(item);

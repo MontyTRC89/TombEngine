@@ -21,6 +21,8 @@ namespace TEN::Effects::Streamer
 
 	void Streamer::StreamerSegment::Update()
 	{
+		StoreInterpolationData();
+
 		// Update opacity.
 		if (Color.w > 0.0f)
 			Color.w = EaseInOutSine(0.0f, OpacityMax, Life / LifeMax);
@@ -190,7 +192,10 @@ namespace TEN::Effects::Streamer
 		pool.erase(
 			std::remove_if(
 				pool.begin(), pool.end(),
-				[](const auto& streamer) { return streamer.Segments.empty(); }),
+				[](const auto& streamer)
+				{
+					return streamer.Segments.empty();
+				}),
 			pool.end());
 	}
 
