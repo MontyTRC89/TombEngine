@@ -11,6 +11,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed moveable status after antitriggering.
 * Fixed leveljump vehicle transfer.
 * Fixed weapons not properly hitting enemies.
+* Fixed falling through dynamic bridges that move upwards.
 * Fixed laserhead teleporting Lara and making her invisible on death.
 * Fixed sarcophagus pick-ups.
 * Fixed issue with Lara not rotating together with bridges while picking up items.
