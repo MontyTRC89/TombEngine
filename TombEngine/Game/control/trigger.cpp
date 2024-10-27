@@ -346,15 +346,16 @@ void Antitrigger(short const value, short const flags)
 
 	if (item->Active)
 	{
-		item->Active = false;
-		item->Status = ITEM_DEACTIVATED;
+		RemoveActiveItem(value, false);
 
 		if (Objects[item->ObjectNumber].intelligent)
 		{
 			DisableEntityAI(value);
-			RemoveActiveItem(value, false);
-
 			item->Status = ITEM_INVISIBLE;
+		}
+		else
+		{
+			item->Status = ITEM_DEACTIVATED;
 		}
 	}
 }
