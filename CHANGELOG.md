@@ -11,7 +11,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed moveable status after antitriggering.
 * Fixed leveljump vehicle transfer.
 * Fixed weapons not properly hitting enemies.
-* Fixed falling through dynamic bridges that move upwards.
+* Fixed falling through dynamic bridges that are moving upwards.
 * Fixed laserhead teleporting Lara and making her invisible on death.
 * Fixed sarcophagus pick-ups.
 * Fixed issue with Lara not rotating together with bridges while picking up items.
@@ -45,12 +45,13 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added the ability to display "Lara's Home" entry in the main menu.
 * Added the ability to change pickup item count by modifying item hit points.
 * Added F12 as alternative to PrtSc for screenshots.
-* Added TR3 Seal Mutant. https://tombengine.com/docs/ocb-and-setup-instructions/#sealmutant
-  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Seal_Mutant.wad2
 * Added new sound conditions: Quicksand and Underwater.
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.
+* Added TR3 Seal Mutant. https://tombengine.com/docs/ocb-and-setup-instructions/#sealmutant
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TEN_Seal_Mutant.wad2
 * Added TR4 Enemy Jeep. https://tombengine.com/docs/ocb-and-setup-instructions/#enemy_jeep
+  - You must use this version: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Enemies/TR4_Enemy_Jeep.wad2
 * Changed TR5 Rome Hammer to not hurt player whilst deactivated.
 * Changed TR2 Statue with blade damage from 20 to 200.
 * Changed sound effect that is triggered when using the `level.rumble` feature in a level (ID 359 in the soundmap).
