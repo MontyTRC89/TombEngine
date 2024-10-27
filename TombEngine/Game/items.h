@@ -109,7 +109,7 @@ struct ItemInfo
 	int			   Index		= 0;			// ItemNumber // TODO: Make int.
 	GAME_OBJECT_ID ObjectNumber = ID_NO_OBJECT; // ObjectID
 
-	/*ItemStatus*/int Status = ITEM_NOT_ACTIVE;
+	ItemStatus Status = ITEM_NOT_ACTIVE;
 	bool	   Active = false;
 
 	// TODO: Refactor linked list.
