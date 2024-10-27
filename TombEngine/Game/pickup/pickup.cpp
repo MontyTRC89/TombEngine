@@ -1090,10 +1090,14 @@ void InitializePickup(short itemNumber)
 					// below pushable or raising block, so ignore its collision.
 					pointColl.GetSector().RemoveBridge(bridgeItemNumber);
 					pointColl = GetPointCollision(*item);
+					item->Pose.Position.y = pointColl.GetFloorHeight() - bounds.Y2;
 					pointColl.GetSector().AddBridge(bridgeItemNumber);
 				}
+				else
+				{
+					item->Pose.Position.y = pointColl.GetFloorHeight() - bounds.Y2;
+				}
 
-				item->Pose.Position.y = pointColl.GetFloorHeight() - bounds.Y2;
 				AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 			}
 		}
