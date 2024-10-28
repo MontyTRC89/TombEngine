@@ -241,6 +241,13 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 				if (customRadius > 0.0f)
 					box1.Extents = Vector3(customRadius);
 
+				// Skip if either bounding box has any zero extent (not a collidable volume).
+				if (box0.Extents.x > 0 || box0.Extents.y > 0 || box0.Extents.z > 0)
+					continue;
+
+				if (box1.Extents.x > 0 || box1.Extents.y > 0 || box1.Extents.z > 0)
+					continue;
+
 				// Test accurate box intersection.
 				if (box0.Intersects(box1))
 					collObjects.Statics.push_back(&staticObj);
