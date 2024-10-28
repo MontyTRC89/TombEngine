@@ -507,6 +507,7 @@ namespace TEN::Renderer
 		void ResetScissor();
 		void ResetDebugVariables();
 		float CalculateFrameRate();
+		void InterpolateCamera(float interpFactor);
 		void CopyRenderTarget(RenderTarget2D* source, RenderTarget2D* dest, RenderView& view);
 
 		void AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,

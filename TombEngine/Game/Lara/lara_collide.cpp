@@ -507,7 +507,6 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-
 void LaraDefaultCollision(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);

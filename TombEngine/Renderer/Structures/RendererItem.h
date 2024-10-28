@@ -29,6 +29,7 @@ namespace TEN::Renderer::Structures
 		float LightFade = 0.0f;
 
 		bool DoneAnimations = false;
+		bool DisableInterpolation = true;
 
 		Vector3 InterpolatedPosition	= Vector3::Zero;
 		Matrix	InterpolatedWorld		= Matrix::Identity;

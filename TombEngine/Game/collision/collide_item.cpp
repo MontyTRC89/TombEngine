@@ -234,6 +234,13 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 				if (!Geometry::CircleIntersects(circle, collidingCircle))
 					continue;
 
+				// Skip if either bounding box has any zero extent (not a collidable volume).
+				if (bounds.GetExtents().Length() > 0)
+					continue;
+
+				if (collidingBounds.GetExtents().Length() > 0)
+					continue;
+
 				auto box0 = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
 				auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
 
@@ -283,7 +290,8 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 {
-	int height = GameBoundingBox(item).GetHeight();
+	auto bbox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
+	auto height = (bbox.Center - bbox.Extents).y - CLICK(1);
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -292,8 +300,9 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 		auto origin = Vector3(
 			item->Pose.Position.x + (sinHeading * (coll->Setup.Radius)),
-			item->Pose.Position.y - (height + CLICK(1)),
+			height,
 			item->Pose.Position.z + (cosHeading * (coll->Setup.Radius)));
+
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0.0f, 0.0f);
 		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 

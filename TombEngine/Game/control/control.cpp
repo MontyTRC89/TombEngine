@@ -593,8 +593,8 @@ void EndGameLoop(int levelIndex, GameStatus reason)
 
 void SetupInterpolation()
 {
-	for (int i = 0; i < g_Level.Items.size(); i++)
-		g_Level.Items[i].DisableInterpolation = false;
+	for (auto& item : g_Level.Items)
+		item.DisableInterpolation = false;
 }
 
 void HandleControls(bool isTitle)

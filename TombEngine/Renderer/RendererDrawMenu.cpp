@@ -1148,35 +1148,6 @@ namespace TEN::Renderer
 
 	void Renderer::RenderTitle(float interpFactor)
 	{
-		_interpolationFactor = interpFactor;
-
-		// Interpolate camera.
-		if (!Camera.DisableInterpolation)
-		{
-			_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpFactor);
-			_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpFactor);
-			_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpFactor);
-			_gameCamera.Camera.Projection = Matrix::Lerp(_oldGameCamera.Camera.Projection, _currentGameCamera.Camera.Projection, interpFactor);
-			_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
-			_gameCamera.Camera.FOV = Lerp(_oldGameCamera.Camera.FOV, _currentGameCamera.Camera.FOV, interpFactor);
-			_gameCamera.Camera.Frustum.Update(_gameCamera.Camera.View, _gameCamera.Camera.Projection);
-		}
-		else
-		{
-			_gameCamera.Camera.WorldPosition = _currentGameCamera.Camera.WorldPosition;
-			_gameCamera.Camera.WorldDirection = _currentGameCamera.Camera.WorldDirection;
-			_gameCamera.Camera.View = _currentGameCamera.Camera.View;
-			_gameCamera.Camera.Projection = _currentGameCamera.Camera.Projection;
-			_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
-			_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
-			_gameCamera.Camera.Frustum = _currentGameCamera.Camera.Frustum;
-		}
-
-		_gameCamera.Camera.ViewSize = _currentGameCamera.Camera.ViewSize;
-		_gameCamera.Camera.InvViewSize = _currentGameCamera.Camera.InvViewSize;
-		_gameCamera.Camera.NearPlane = _currentGameCamera.Camera.NearPlane;
-		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
-
 		_stringsToDraw.clear();
 		_isLocked = false;
 
@@ -1185,6 +1156,7 @@ namespace TEN::Renderer
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 
+		InterpolateCamera(interpFactor);
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 1.0f);
 		
 		_swapChain->Present(1, 0);
@@ -1293,7 +1265,7 @@ namespace TEN::Renderer
 			PrintDebugMessage("Orientation: %d, %d, %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
 			PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
 			PrintDebugMessage("PathfindingBoxID: %d", LaraItem->BoxNumber);
-			PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
+			PrintDebugMessage((Lara.Context.WaterSurfaceDist == -NO_HEIGHT ? "WaterSurfaceDist: N/A" : "WaterSurfaceDist: %d"), Lara.Context.WaterSurfaceDist);
 			PrintDebugMessage("Room Position: %d, %d, %d, %d", room.Position.z, room.Position.z, room.Position.z + BLOCK(room.XSize), room.Position.z + BLOCK(room.ZSize));
 			PrintDebugMessage("Room.y, minFloor, maxCeiling: %d, %d, %d ", room.Position.y, room.BottomHeight, room.TopHeight);
 			PrintDebugMessage("Camera Position: %d, %d, %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);

@@ -417,7 +417,11 @@ namespace TEN::Renderer
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
-			if (item->DisableInterpolation)
+			// Disable interpolation either when renderer slot or item slot has flag. 
+			// Renderer slot has no interpolation flag set in case it is fetched for the first time (e.g. item first time in frustum).
+			newItem->DisableInterpolation = item->DisableInterpolation || newItem->DisableInterpolation;
+
+			if (newItem->DisableInterpolation)
 			{
 				// NOTE: Interpolation alwasy returns same result.
 				newItem->PrevPosition = newItem->Position;
@@ -425,9 +429,8 @@ namespace TEN::Renderer
 				newItem->PrevRotation = newItem->Rotation;
 				newItem->PrevWorld = newItem->World;
 
-				// Otherwise all frames until the next ControlPhase will not 
-				// be interpolated
-				item->DisableInterpolation = false;
+				// Otherwise all frames until the next ControlPhase will not be interpolated.
+				newItem->DisableInterpolation = false;
 				
 				for (int j = 0; j < MAX_BONES; j++)
 					newItem->PrevAnimTransforms[j] = newItem->AnimTransforms[j];

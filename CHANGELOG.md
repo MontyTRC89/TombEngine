@@ -19,6 +19,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed several binocular bugs.
 * Fixed incorrect climbing out of water on bridge objects.
 * Fixed faulty death sectors.
+* Fixed water climbouts in front of static meshes.
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed camera rotating with the player's hips when climbing out of water.
 * Fixed AI for TR2 skidoo driver and worker with shotgun.
@@ -45,6 +46,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added the ability to display "Lara's Home" entry in the main menu.
 * Added the ability to change pickup item count by modifying item hit points.
 * Added F12 as alternative to PrtSc for screenshots.
+* Added visible mouse pointer in windowed mode.
 * Added new sound conditions: Quicksand and Underwater.
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.
