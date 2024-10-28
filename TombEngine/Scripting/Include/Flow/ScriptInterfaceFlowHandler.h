@@ -32,6 +32,7 @@ public:
 	virtual char const* GetString(const char* id) const = 0;
 
 	virtual bool IsFlyCheatEnabled() const = 0;
+	virtual bool IsFlyCheatItemsEnabled() const = 0;
 	virtual bool IsMassPickupEnabled() const = 0;
 	virtual bool IsPointFilterEnabled() const = 0;
 	virtual bool IsLaraInTitleEnabled() const = 0;

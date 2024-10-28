@@ -888,8 +888,11 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 	{
 		if (player.Context.Vehicle == NO_VALUE)
 		{
-			GivePlayerItemsCheat(item);
-			GivePlayerWeaponsCheat(item);
+			if (g_GameFlow->IsFlyCheatItemsEnabled())
+			{
+				GivePlayerItemsCheat(item);
+				GivePlayerWeaponsCheat(item);
+			}
 
 			if (player.Control.WaterStatus != WaterStatus::FlyCheat)
 			{

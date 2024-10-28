@@ -218,6 +218,7 @@ static constexpr char ScriptReserved_SetSecretCount[]			= "SetSecretCount";
 static constexpr char ScriptReserved_SetTotalSecretCount[]		= "SetTotalSecretCount";
 static constexpr char ScriptReserved_AddSecret[]				= "AddSecret";
 static constexpr char ScriptReserved_EnableFlyCheat[]			= "EnableFlyCheat";
+static constexpr char ScriptReserved_EnableFlyCheatItems[]		= "EnableFlyCheatItems";
 static constexpr char ScriptReserved_EnableMassPickup[]			= "EnableMassPickup";
 static constexpr char ScriptReserved_EnableLaraInTitle[]		= "EnableLaraInTitle";
 static constexpr char ScriptReserved_EnableLevelSelect[]		= "EnableLevelSelect";

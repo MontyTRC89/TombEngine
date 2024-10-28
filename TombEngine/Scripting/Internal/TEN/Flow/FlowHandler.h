@@ -29,14 +29,15 @@ public:
 	int FogInDistance  = 0;
 	int FogOutDistance = 0;
 
-	bool LevelSelect = true;
-	bool HomeLevel	 = false;
-	bool LoadSave	 = true;
-	bool FlyCheat	 = true;
-	bool PointFilter = false;
-	bool MassPickup	 = true;
-	bool LaraInTitle = false;
-	bool DebugMode	 = false;
+	bool LevelSelect	= true;
+	bool HomeLevel		= false;
+	bool LoadSave		= true;
+	bool FlyCheat		= true;
+	bool FlyCheatItems	= true;
+	bool PointFilter	= false;
+	bool MassPickup		= true;
+	bool LaraInTitle	= false;
+	bool DebugMode		= false;
 
 	// Table for movesets.
 	Animations Anims = {};
@@ -77,6 +78,8 @@ public:
 	void		SetTotalSecretCount(int secretsNumber);
 	bool		IsFlyCheatEnabled() const;
 	void		EnableFlyCheat(bool enable);
+	bool		IsFlyCheatItemsEnabled() const;
+	void		EnableFlyCheatItems(bool flyCheatItems);
 	bool		IsPointFilterEnabled() const;
 	void		EnablePointFilter(bool enable);
 	bool		IsMassPickupEnabled() const;

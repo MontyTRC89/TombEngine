@@ -70,6 +70,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Flow.EnableHomeLevel() function.
 * Added Flow.IsStringPresent() function.
 * Added Flow.LensFlare() and Flow.Starfield() classes.
+* Added Flow.EnableFlyCheatItems() function for choosing if flyCheat add items or not
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Input.KeyClearAll() function.
 * Added Moveable.GetJointRotation() and optional 'offset' parameter for Moveable.GetJointPosition().

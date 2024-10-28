@@ -96,6 +96,11 @@ Must be true or false
 	// @tparam bool enabled True or false.
 	tableFlow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
 
+	/// Enable or disable Item adding for fly cheat.
+	// @function EnableFlyCheatItems()
+	// @tparam bool enabled True or false.
+	tableFlow.set_function(ScriptReserved_EnableFlyCheatItems, &FlowHandler::EnableFlyCheatItems, this);
+
 /*** Enable or disable point texture filter.
 Must be true or false
 @function EnablePointFilter
@@ -555,6 +560,16 @@ bool FlowHandler::IsFlyCheatEnabled() const
 void FlowHandler::EnableFlyCheat(bool enable)
 {
 	FlyCheat = enable;
+}
+
+bool FlowHandler::IsFlyCheatItemsEnabled() const
+{
+	return FlyCheatItems;
+}
+
+void FlowHandler::EnableFlyCheatItems(bool flyCheatItems)
+{
+	FlyCheatItems = flyCheatItems;
 }
 
 bool FlowHandler::IsPointFilterEnabled() const
