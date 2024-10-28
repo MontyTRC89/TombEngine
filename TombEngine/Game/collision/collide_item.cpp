@@ -234,19 +234,19 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 				if (!Geometry::CircleIntersects(circle, collidingCircle))
 					continue;
 
+				// Skip if either bounding box has any zero extent (not a collidable volume).
+				if (bounds.GetExtents().Length() > 0)
+					continue;
+
+				if (collidingBounds.GetExtents().Length() > 0)
+					continue;
+
 				auto box0 = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
 				auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
 
 				// Override extents if specified.
 				if (customRadius > 0.0f)
 					box1.Extents = Vector3(customRadius);
-
-				// Skip if either bounding box has any zero extent (not a collidable volume).
-				if (box0.Extents.x > 0 || box0.Extents.y > 0 || box0.Extents.z > 0)
-					continue;
-
-				if (box1.Extents.x > 0 || box1.Extents.y > 0 || box1.Extents.z > 0)
-					continue;
 
 				// Test accurate box intersection.
 				if (box0.Intersects(box1))
