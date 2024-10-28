@@ -3023,35 +3023,7 @@ namespace TEN::Renderer
 
 	void Renderer::Render(float interpFactor)
 	{
-		_interpolationFactor = interpFactor;
-
-		// Interpolate camera.
-		if (!Camera.DisableInterpolation)
-		{
-			_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpFactor);
-			_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpFactor);
-			_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpFactor);
-			_gameCamera.Camera.Projection = Matrix::Lerp(_oldGameCamera.Camera.Projection, _currentGameCamera.Camera.Projection, interpFactor);
-			_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
-			_gameCamera.Camera.FOV = Lerp(_oldGameCamera.Camera.FOV, _currentGameCamera.Camera.FOV,interpFactor);
-			_gameCamera.Camera.Frustum.Update(_gameCamera.Camera.View, _gameCamera.Camera.Projection);
-		}
-		else
-		{
-			_gameCamera.Camera.WorldPosition = _currentGameCamera.Camera.WorldPosition;
-			_gameCamera.Camera.WorldDirection = _currentGameCamera.Camera.WorldDirection;
-			_gameCamera.Camera.View = _currentGameCamera.Camera.View;
-			_gameCamera.Camera.Projection = _currentGameCamera.Camera.Projection;
-			_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
-			_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
-			_gameCamera.Camera.Frustum = _currentGameCamera.Camera.Frustum;
-		}
-
-		_gameCamera.Camera.ViewSize = _currentGameCamera.Camera.ViewSize;
-		_gameCamera.Camera.InvViewSize = _currentGameCamera.Camera.InvViewSize;
-		_gameCamera.Camera.NearPlane = _currentGameCamera.Camera.NearPlane;
-		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
-	
+		InterpolateCamera(interpFactor);
 		RenderScene(&_backBuffer, true, _gameCamera);
 
 		_context->ClearState();
@@ -3678,5 +3650,37 @@ namespace TEN::Renderer
 		BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAORenderTarget, SamplerStateRegister::PointWrap);
  
 		DrawTriangles(3, 0);
+	}
+
+	void Renderer::InterpolateCamera(float interpFactor)
+	{
+		_interpolationFactor = interpFactor;
+
+		// Interpolate camera.
+		if (!Camera.DisableInterpolation)
+		{
+			_gameCamera.Camera.WorldPosition = Vector3::Lerp(_oldGameCamera.Camera.WorldPosition, _currentGameCamera.Camera.WorldPosition, interpFactor);
+			_gameCamera.Camera.WorldDirection = Vector3::Lerp(_oldGameCamera.Camera.WorldDirection, _currentGameCamera.Camera.WorldDirection, interpFactor);
+			_gameCamera.Camera.View = Matrix::Lerp(_oldGameCamera.Camera.View, _currentGameCamera.Camera.View, interpFactor);
+			_gameCamera.Camera.Projection = Matrix::Lerp(_oldGameCamera.Camera.Projection, _currentGameCamera.Camera.Projection, interpFactor);
+			_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
+			_gameCamera.Camera.FOV = Lerp(_oldGameCamera.Camera.FOV, _currentGameCamera.Camera.FOV, interpFactor);
+			_gameCamera.Camera.Frustum.Update(_gameCamera.Camera.View, _gameCamera.Camera.Projection);
+		}
+		else
+		{
+			_gameCamera.Camera.WorldPosition = _currentGameCamera.Camera.WorldPosition;
+			_gameCamera.Camera.WorldDirection = _currentGameCamera.Camera.WorldDirection;
+			_gameCamera.Camera.View = _currentGameCamera.Camera.View;
+			_gameCamera.Camera.Projection = _currentGameCamera.Camera.Projection;
+			_gameCamera.Camera.ViewProjection = _gameCamera.Camera.View * _gameCamera.Camera.Projection;
+			_gameCamera.Camera.FOV = _currentGameCamera.Camera.FOV;
+			_gameCamera.Camera.Frustum = _currentGameCamera.Camera.Frustum;
+		}
+
+		_gameCamera.Camera.ViewSize = _currentGameCamera.Camera.ViewSize;
+		_gameCamera.Camera.InvViewSize = _currentGameCamera.Camera.InvViewSize;
+		_gameCamera.Camera.NearPlane = _currentGameCamera.Camera.NearPlane;
+		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
 	}
 }
