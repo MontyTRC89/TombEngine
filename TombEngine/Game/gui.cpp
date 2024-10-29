@@ -3469,6 +3469,11 @@ namespace TEN::Gui
 	{
 		bool canLoop = g_Configuration.MenuOptionLoopingMode == MenuOptionLoopingMode::SaveLoadOnly ||
 					   g_Configuration.MenuOptionLoopingMode == MenuOptionLoopingMode::AllMenus;
+
+		// If load menu is accessed after death, make sure to wait 1 second to allow player to stop spamming input.
+		if (GetLaraInfo(*LaraItem).Control.Count.Death > 0 && TimeInMenu < FPS)
+			return LoadResult::None;
+
 		SelectedSaveSlot = GetLoopedSelectedOption(SelectedSaveSlot, SAVEGAME_MAX - 1, canLoop);
 
 		if (GuiIsSelected())
