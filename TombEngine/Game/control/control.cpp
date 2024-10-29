@@ -220,20 +220,13 @@ GameStatus ControlPhase()
 
 	DoFlipEffect(FlipEffect, LaraItem);
 
-	UpdateCamera();
-
 	PlaySoundSources();
 	Sound_UpdateScene();
 
+	UpdateCamera();
+
 	// Post-loop script and event handling.
 	g_GameScript->OnLoop(DELTA_TIME, true);
-
-	// Clear savegame loaded flag.
-	JustLoaded = false;
-
-	// Update timers.
-	GameTimer++;
-	GlobalCounter++;
 
 	// Handle inventory, pause, load, save screens.
 	auto result = HandleMenuCalls(isTitle);
@@ -244,6 +237,13 @@ GameStatus ControlPhase()
 	result = HandleGlobalInputEvents(isTitle);
 	if (result != GameStatus::Normal)
 		return result;
+
+	// Clear savegame loaded flag.
+	JustLoaded = false;
+
+	// Update timers.
+	GameTimer++;
+	GlobalCounter++;
 
 	auto time2 = std::chrono::high_resolution_clock::now();
 	ControlPhaseTime = (std::chrono::duration_cast<std::chrono::nanoseconds>(time2 - time1)).count() / 1000000;
