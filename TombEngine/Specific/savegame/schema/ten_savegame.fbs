@@ -303,6 +303,11 @@ table Lara {
 	weapons: [CarriedWeaponInfo];
 }
 
+table Camera {
+	position: GameVector;
+	target: GameVector;
+}
+
 table FixedCamera {
 	flags: int32;
 }
@@ -518,6 +523,7 @@ table SaveGame {
 	header: SaveGameHeader;
 	game: SaveGameStatistics;
 	level: SaveGameStatistics;
+	camera: Camera;
 	lara: Lara;
 	rooms: [Room];
 	items: [Item];

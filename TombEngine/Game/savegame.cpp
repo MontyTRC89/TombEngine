@@ -130,6 +130,11 @@ Save::Vector4 FromVector4(const Vector4& vec)
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
 }
 
+Save::GameVector FromGameVector(const GameVector& vec)
+{
+	return Save::GameVector(vec.x, vec.y, vec.z, (int)vec.RoomNumber);
+}
+
 Pose ToPose(const Save::Pose& pose)
 {
 	return Pose(
@@ -170,6 +175,11 @@ Vector4 ToVector4(const Save::Vector3* vec)
 Vector4 ToVector4(const Save::Vector4* vec)
 {
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
+}
+
+GameVector ToGameVector(const Save::GameVector* vec)
+{
+	return GameVector(vec->x(), vec->y(), vec->z(), (short)vec->room_number());
 }
 
 bool SaveGame::IsSaveGameSlotValid(int slot)
@@ -494,6 +504,12 @@ const std::vector<byte> SaveGame::Build()
 	collision.add_last_bridge_item_number(LaraCollision.LastBridgeItemNumber);
 	collision.add_last_bridge_item_pose(&FromPose(LaraCollision.LastBridgeItemPose));
 	auto collisionOffset = collision.Finish();
+
+	Save::CameraBuilder camera{ fbb };
+	camera.add_position(&FromGameVector(Camera.pos));
+	camera.add_target(&FromGameVector(Camera.target));
+	auto cameraOffset = camera.Finish();
+
 
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
 	for (int i = 0; i < (int)LaraWeaponType::NumWeapons; i++)
@@ -1410,6 +1426,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_header(headerOffset);
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
+	sgb.add_camera(cameraOffset);
 	sgb.add_lara(laraOffset);
 	sgb.add_rooms(roomOffset);
 	sgb.add_next_item_free(NextItemFree);
@@ -1996,6 +2013,10 @@ static void ParsePlayer(const Save::SaveGame* s)
 	// Collision
 	LaraCollision.LastBridgeItemNumber = s->lara()->collision()->last_bridge_item_number();
 	LaraCollision.LastBridgeItemPose = ToPose(*s->lara()->collision()->last_bridge_item_pose());
+
+	// Camera
+	Camera.pos = ToGameVector(s->camera()->position());
+	Camera.target = ToGameVector(s->camera()->target());
 
 	for (auto& item : g_Level.Items)
 	{

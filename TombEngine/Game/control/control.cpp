@@ -495,14 +495,6 @@ void InitializeOrLoadGame(bool loadGame)
 	{
 		SaveGame::Load(g_GameFlow->SelectedSaveGame);
 
-		Camera.pos.x = LaraItem->Pose.Position.x + 256;
-		Camera.pos.y = LaraItem->Pose.Position.y + 256;
-		Camera.pos.z = LaraItem->Pose.Position.z + 256;
-
-		Camera.target.x = LaraItem->Pose.Position.x;
-		Camera.target.y = LaraItem->Pose.Position.y;
-		Camera.target.z = LaraItem->Pose.Position.z;
-
 		InitializeGame = false;
 
 		g_GameFlow->SelectedSaveGame = 0;

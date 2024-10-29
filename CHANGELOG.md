@@ -21,6 +21,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect climbing out of water on bridge objects and in front of static meshes.
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed camera rotating with the player's hips when climbing out of water.
+* Fixed camera position after loading a savegame.
 * Fixed AI for TR2 skidoo driver and worker with shotgun.
 * Fixed ember emitter crashing when ocb is between -1 and -10.
 * Fixed electric cleaner and squishy block not detecting collision with certain block heights.
