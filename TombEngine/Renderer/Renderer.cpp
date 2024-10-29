@@ -419,4 +419,9 @@ namespace TEN::Renderer
 
 		_context->RSSetScissorRects(1, rects);
 	}
+
+	void Renderer::SetGraphicsSettingsChanged()
+	{
+		_graphicsSettingsChanged = true;
+	}
 }
