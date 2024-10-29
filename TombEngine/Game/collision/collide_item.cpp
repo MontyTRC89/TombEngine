@@ -109,6 +109,13 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 	auto collidingSphere = BoundingSphere(collidingBounds.GetCenter() + collidingItem.Pose.Position.ToVector3(), collidingExtents.Length());
 	auto collidingCircle = Vector3(collidingSphere.Center.x, collidingSphere.Center.z, (customRadius > 0.0f) ? customRadius : std::hypot(collidingExtents.x, collidingExtents.z));
 
+	// Convert bounding box to DX bounds.
+	auto convertedBounds = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
+
+	// Override extents if specified.
+	if (customRadius > 0.0f)
+		convertedBounds.Extents = Vector3(customRadius);
+
 	// Quickly discard collision if colliding item bounds are below tolerance threshold.
 	if (collidingSphere.Radius <= EXTENTS_LENGTH_MIN)
 		return collObjects;
@@ -185,15 +192,10 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					if (!Geometry::CircleIntersects(circle, collidingCircle))
 						continue;
 
-					auto box0 = bounds.ToBoundingOrientedBox(item.Pose);
-					auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
-
-					// Override extents if specified.
-					if (customRadius > 0.0f)
-						box1.Extents = Vector3(customRadius);
+					auto box = bounds.ToBoundingOrientedBox(item.Pose);
 
 					// Test accurate box intersection.
-					if (box0.Intersects(box1))
+					if (box.Intersects(convertedBounds))
 						collObjects.Items.push_back(&item);
 				}
 				while (itemNumber != NO_VALUE);
@@ -235,21 +237,16 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					continue;
 
 				// Skip if either bounding box has any zero extent (not a collidable volume).
-				if (bounds.GetExtents().Length() > 0)
+				if (bounds.GetExtents().Length() <= EXTENTS_LENGTH_MIN)
 					continue;
 
-				if (collidingBounds.GetExtents().Length() > 0)
+				if (collidingBounds.GetExtents().Length() <= EXTENTS_LENGTH_MIN)
 					continue;
 
-				auto box0 = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
-				auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
-
-				// Override extents if specified.
-				if (customRadius > 0.0f)
-					box1.Extents = Vector3(customRadius);
+				auto box = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
 
 				// Test accurate box intersection.
-				if (box0.Intersects(box1))
+				if (box.Intersects(convertedBounds))
 					collObjects.Statics.push_back(&staticObj);
 			}
 		}
