@@ -234,6 +234,13 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 				if (!Geometry::CircleIntersects(circle, collidingCircle))
 					continue;
 
+				// Skip if either bounding box has any zero extent (not a collidable volume).
+				if (bounds.GetExtents().Length() > 0)
+					continue;
+
+				if (collidingBounds.GetExtents().Length() > 0)
+					continue;
+
 				auto box0 = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
 				auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
 
