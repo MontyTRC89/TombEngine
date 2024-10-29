@@ -17,9 +17,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed issue with Lara not rotating together with bridges while picking up items.
 * Fixed ghost collision with moveables with zero bounds.
 * Fixed several binocular bugs.
-* Fixed incorrect climbing out of water on bridge objects.
 * Fixed faulty death sectors.
-* Fixed water climbouts in front of static meshes.
+* Fixed incorrect climbing out of water on bridge objects and in front of static meshes.
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed camera rotating with the player's hips when climbing out of water.
 * Fixed AI for TR2 skidoo driver and worker with shotgun.
@@ -36,6 +35,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed teeth spikes not triggering the player impale animation.
 * Fixed TR4 mine crash with OCB 1 when triggered.
 * Fixed cases where Atlantean mutant's bombs cause the game to crash.
+* Fixed display sprites and display strings rendering in the inventory background.
 * Fixed young Lara hair drawing. https://tombengine.com/docs/level-settings/#young_lara
 
 ### Features/Amendments
