@@ -684,77 +684,114 @@ namespace TEN::Gui
 		{
 			ClearAllActions();
 
+			g_Synchronizer.Init();
+
+			bool legacy30FpsDoneDraw = false;
+			bool decreaseCounter = false;
+			
 			while (CurrentSettings.NewKeyWaitTimer > 0.0f)
 			{
-				CurrentSettings.NewKeyWaitTimer -= 1.0f;
-				if (CurrentSettings.NewKeyWaitTimer <= 0.0f)
-					CurrentSettings.NewKeyWaitTimer = 0.0f;
+				g_Synchronizer.Sync();
 
-				UpdateInputActions(item);
+				while (g_Synchronizer.Synced())
+				{
+					CurrentSettings.NewKeyWaitTimer -= 1.0f;
+					if (CurrentSettings.NewKeyWaitTimer <= 0.0f)
+						CurrentSettings.NewKeyWaitTimer = 0.0f;
 
-				if (CurrentSettings.IgnoreInput)
-				{
-					if (NoAction())
-						CurrentSettings.IgnoreInput = false;
-				}
-				else
-				{
-					int selectedKey = 0;
-					for (selectedKey = 0; selectedKey < MAX_INPUT_SLOTS; selectedKey++)
+					if (!fromPauseMenu)
 					{
-						if (KeyMap[selectedKey])
-							break;
+						ControlPhase(true);
+					}
+					else
+					{
+						// Just for updating blink time
+						g_Renderer.PrepareScene();
 					}
 
-					if (selectedKey == MAX_INPUT_SLOTS)
-						selectedKey = 0;
+					UpdateInputActions(item);
 
-					if (selectedKey && !g_KeyNames[selectedKey].empty())
+					if (CurrentSettings.IgnoreInput)
 					{
-						unsigned int baseIndex = 0;
-						switch (MenuToDisplay)
+						if (NoAction())
+							CurrentSettings.IgnoreInput = false;
+					}
+					else
+					{
+						int selectedKey = 0;
+						for (selectedKey = 0; selectedKey < MAX_INPUT_SLOTS; selectedKey++)
 						{
-						case Menu::VehicleActions:
-							baseIndex = (unsigned int)GeneralActionStrings.size();
-							break;
-
-						case Menu::QuickActions:
-							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size());
-							break;
-
-						case Menu::MenuActions:
-							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size() + QuickActionStrings.size());
-							break;
-
-						default:
-							break;
+							if (KeyMap[selectedKey])
+								break;
 						}
 
-						Bindings[1][baseIndex + SelectedOption] = selectedKey;
-						DefaultConflict();
+						if (selectedKey == MAX_INPUT_SLOTS)
+							selectedKey = 0;
 
-						CurrentSettings.NewKeyWaitTimer = 0.0f;
-						CurrentSettings.IgnoreInput = true;
-						return;
+						if (selectedKey && !g_KeyNames[selectedKey].empty())
+						{
+							unsigned int baseIndex = 0;
+							switch (MenuToDisplay)
+							{
+							case Menu::VehicleActions:
+								baseIndex = (unsigned int)GeneralActionStrings.size();
+								break;
+
+							case Menu::QuickActions:
+								baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size());
+								break;
+
+							case Menu::MenuActions:
+								baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size() + QuickActionStrings.size());
+								break;
+
+							default:
+								break;
+							}
+
+							Bindings[1][baseIndex + SelectedOption] = selectedKey;
+							DefaultConflict();
+
+							CurrentSettings.NewKeyWaitTimer = 0.0f;
+							CurrentSettings.IgnoreInput = true;
+							return;
+						}
 					}
+
+					g_Synchronizer.Step();
+
+					legacy30FpsDoneDraw = false;
 				}
 
-				if (fromPauseMenu)
+				if (!g_Configuration.EnableHighFramerate)
 				{
-					g_Renderer.RenderInventory();
-					if (!g_Configuration.EnableHighFramerate)
+					if (!legacy30FpsDoneDraw)
 					{
-						g_Renderer.Synchronize();
+						if (fromPauseMenu)
+						{
+							g_Renderer.RenderInventory();
+						}
+						else
+						{
+							g_Renderer.RenderTitle(0);
+						}
+						g_Renderer.Lock();
+						legacy30FpsDoneDraw = true;
 					}
 				}
 				else
 				{
-					g_Renderer.RenderTitle(0);
-					if (!g_Configuration.EnableHighFramerate)
+					//g_Renderer.PrepareScene();
+
+					if (fromPauseMenu)
 					{
-						g_Renderer.Synchronize();
+						g_Renderer.RenderInventory();
 					}
-					ControlPhase();
+					else
+					{
+						g_Renderer.RenderTitle(0);
+					}
+					g_Renderer.Lock();
 				}
 			}
 		}
