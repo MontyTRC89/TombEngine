@@ -1138,8 +1138,23 @@ namespace TEN::Renderer
 
 	void Renderer::RenderInventory()
 	{
+		if (_graphicsSettingsChanged)
+		{
+			_currentGameCamera = RenderView(&Camera, Camera.Roll, Camera.Fov, 32, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()), g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
+			_gameCamera = RenderView(&Camera, Camera.Roll, Camera.Fov, 32, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()), g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
+
+			Camera.DisableInterpolation = true;
+
+			DumpGameScene();
+		}
+
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
+
+		// Reset GPU state.
+		SetBlendMode(BlendMode::Opaque, true);
+		SetDepthState(DepthState::Write, true);
+		SetCullMode(CullMode::CounterClockwise, true);
 
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 0.5f);
 

@@ -384,6 +384,8 @@ namespace TEN::Renderer
 		// High framerate.
 		float _interpolationFactor = 0.0f;
 
+		bool _graphicsSettingsChanged = false;
+
 		// Private functions
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);
@@ -667,6 +669,8 @@ namespace TEN::Renderer
 		void			SetPostProcessStrength(float strength);
 		Vector3			GetPostProcessTint();
 		void			SetPostProcessTint(Vector3 color);
+
+		void			SetGraphicsSettingsChanged();
 	};
 
 	extern Renderer g_Renderer;

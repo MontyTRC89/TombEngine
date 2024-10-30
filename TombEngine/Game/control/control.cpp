@@ -130,7 +130,7 @@ void DrawPhase(bool isTitle, float interpolationFactor)
 	g_Renderer.Lock();
 }
 
-GameStatus ControlPhase()
+GameStatus ControlPhase(bool insideMenu)
 {
 	auto time1 = std::chrono::high_resolution_clock::now();
 	bool isTitle = (CurrentLevel == 0);
@@ -229,14 +229,17 @@ GameStatus ControlPhase()
 	g_GameScript->OnLoop(DELTA_TIME, true);
 
 	// Handle inventory, pause, load, save screens.
-	auto result = HandleMenuCalls(isTitle);
-	if (result != GameStatus::Normal)
-		return result;
+	if (!insideMenu)
+	{
+		auto result = HandleMenuCalls(isTitle);
+		if (result != GameStatus::Normal)
+			return result;
 
-	// Handle global input events.
-	result = HandleGlobalInputEvents(isTitle);
-	if (result != GameStatus::Normal)
-		return result;
+		// Handle global input events.
+		result = HandleGlobalInputEvents(isTitle);
+		if (result != GameStatus::Normal)
+			return result;
+	}
 
 	// Clear savegame loaded flag.
 	JustLoaded = false;
@@ -537,7 +540,7 @@ GameStatus DoGameLoop(int levelIndex)
 
 	// Before entering actual game loop, ControlPhase() must be
 	// called once to sort out various runtime shenanigangs (e.g. hair).
-	status = ControlPhase();
+	status = ControlPhase(false);
 
 	g_Synchronizer.Init();
 	bool legacy30FpsDoneDraw = false;
@@ -548,7 +551,7 @@ GameStatus DoGameLoop(int levelIndex)
 
 		while (g_Synchronizer.Synced())
 		{
-			status = ControlPhase();
+			status = ControlPhase(false);
 			g_Synchronizer.Step();
 
 			legacy30FpsDoneDraw = false;
