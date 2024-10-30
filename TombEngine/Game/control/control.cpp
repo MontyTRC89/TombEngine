@@ -631,7 +631,8 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 	bool playerAlive = LaraItem->HitPoints > 0;
 	
-	bool doLoad      = IsClicked(In::Load) || (!IsClicked(In::Inventory) && !NoAction() && Lara.Control.Count.Death > DEATH_INPUT_TIMEOUT);
+	bool doLoad      = IsClicked(In::Load) || 
+					   (!IsClicked(In::Inventory) && !NoAction() && SaveGame::IsLoadGamePossible() && Lara.Control.Count.Death > DEATH_INPUT_TIMEOUT);
 	bool doSave      = IsClicked(In::Save) && playerAlive;
 	bool doPause     = IsClicked(In::Pause) && playerAlive;
 	bool doInventory = (IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_VALUE) && playerAlive;
@@ -646,9 +647,6 @@ GameStatus HandleMenuCalls(bool isTitle)
 	else if (doLoad && g_GameFlow->IsLoadSaveEnabled() && g_Gui.GetInventoryMode() != InventoryMode::Load)
 	{
 		SaveGame::LoadHeaders();
-
-		if (!SaveGame::IsLoadGamePossible())
-			return gameStatus;
 
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
