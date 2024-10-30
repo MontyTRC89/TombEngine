@@ -12,8 +12,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed leveljump vehicle transfer.
 * Fixed weapons not properly hitting enemies.
 * Fixed falling through dynamic bridges that are moving upwards.
-* Fixed laserhead teleporting Lara and making her invisible on death.
-* Fixed sarcophagus pick-ups.
+* Fixed Laserhead teleporting Lara and making her invisible on death.
+* Fixed pick-ups from Sarcophagus objects.
 * Fixed issue with Lara not rotating together with bridges while picking up items.
 * Fixed ghost collision with objects with zero bounds.
 * Fixed several binocular bugs.
@@ -22,20 +22,20 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed camera rotating with the player's hips when climbing out of water.
 * Fixed camera position after loading a savegame.
-* Fixed AI for TR2 skidoo driver and worker with shotgun.
-* Fixed ember emitter crashing when ocb is between -1 and -10.
-* Fixed electric cleaner and squishy block not detecting collision with certain block heights.
-* Fixed squishy blocks crashing the level.
+* Fixed AI for TR2 Skidoo driver and Worker with shotgun.
+* Fixed Ember Emitter crashing when ocb is between -1 and -10.
+* Fixed Electric Cleaner and Squishy Block not detecting collision with certain block heights.
+* Fixed Squishy Blocks crashing the level.
 * Fixed Larson and Pierre pathfinding.
+* Fixed Dart Emitters failing with antitrigger.
+* Fixed Homing Dart Emitter spawning darts continously when player is on its trigger.
+* Fixed Four Blade Trap floor and ceiling collision.
+* Fixed Joby Spikes collision and deformation.
+* Fixed Sentry Gun joint rotation.
+* Fixed Teeth Spikes not triggering the player impale animation.
+* Fixed TR4 Mine crash with OCB 1 when triggered.
+* Fixed cases where Atlantean Mutant's bombs cause the game to crash.
 * Fixed torch flame delay when the player throws or drops a torch.
-* Fixed dart emitters failing with antitrigger.
-* Fixed homing dart emitter spawning darts continously when player is on its trigger.
-* Fixed four blade trap floor and ceiling collision.
-* Fixed Joby spikes collision and deformation.
-* Fixed sentry gun joint rotation.
-* Fixed teeth spikes not triggering the player impale animation.
-* Fixed TR4 mine crash with OCB 1 when triggered.
-* Fixed cases where Atlantean mutant's bombs cause the game to crash.
 * Fixed display sprites and display strings rendering in the inventory background.
 * Fixed young Lara hair drawing. https://tombengine.com/docs/level-settings/#young_lara
 
@@ -43,7 +43,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 * Added high framerate mode (also known as 60 FPS mode).
 * Added a customisable global lensflare effect. https://tombengine.com/docs/level-settings/#lensflare
-* Added a customisable starry sky and meteor effect (based on TR5). https://tombengine.com/docs/level-settings/#stars
+* Added a customisable starry sky and meteor effect. https://tombengine.com/docs/level-settings/#stars
 * Added the ability to display "Lara's Home" entry in the main menu.
 * Added the ability to change pickup item count by modifying item hit points.
 * Added F12 as alternative to PrtSc for screenshots.
