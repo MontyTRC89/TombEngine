@@ -2,13 +2,12 @@
 
 ![Logo](https://github.com/MontyTRC89/TombEngine/assets/80340234/f22c9ca9-7159-467f-b8ad-7bb32274a278)
 
-In the year 2000, Core Design granted us a great gift: their TR4-based Level Editor, which allowed people to create custom levels. It was, unfortunately, quite limited, hence why over the decades it was upgraded massively with fan patcher projects such as Tomb Raider Engine Patcher (TREP) and Tomb Raider Next Generation (TRNG).
-
-TombEngine (TEN) is a new, open-source engine which aims to abolish all limits, fix bugs from the original games, introduce new features while refining old ones, and provide for a refined, user-friendly level creation process. Current support includes:
+TombEngine (TEN) is an open-source, custom level engine which aims to abolish limits and fix bugs of the classic Tomb Raider games, introduce new features while refining old ones, and provide user-friendly level creation process. Current support includes:
 - Lua (as the native scripting language)
-- All objects from the classic series (1-5)
-- Many more exciting gameplay functionalities such as diagonal shimmying and expanded crawlspace flexibility
-- An enlarged 2D map, allowing for the creation of massive levels (imagine one big level may previously have been split into five!)
+- Many objects from the original series (1-5)
+- Support for high framerate, antialiasing, mipmapping and SSAO
+- Full diagonal geometry support
+- Uncapped 2D map
 - A streamlined player control scheme.
 
 If you would like to participate in TEN discussion with other TEN devs whether it is contributing, bugs or general discussion, then join this discord server: https://discord.gg/h5tUYFmres
