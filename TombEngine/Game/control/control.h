@@ -80,7 +80,7 @@ extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
 void DrawPhase(bool isTitle, float interpolationFactor);
 
-GameStatus ControlPhase();
+GameStatus ControlPhase(bool insideMenu);
 GameStatus DoLevel(int levelIndex, bool loadGame = false);
 GameStatus DoGameLoop(int levelIndex);
 void EndGameLoop(int levelIndex, GameStatus reason);
