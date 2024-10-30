@@ -7,7 +7,7 @@ TombEngine (TEN) is an open-source, custom level engine which aims to abolish li
 - Many objects from the original series (1-5)
 - Support for high framerate, antialiasing, mipmapping and SSAO
 - Full diagonal geometry support
-- Uncapped 2D map
+- Uncapped map size
 - A streamlined player control scheme.
 
 If you would like to participate in TEN discussion with other TEN devs whether it is contributing, bugs or general discussion, then join this discord server: https://discord.gg/h5tUYFmres
