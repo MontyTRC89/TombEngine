@@ -646,6 +646,10 @@ GameStatus HandleMenuCalls(bool isTitle)
 	else if (doLoad && g_GameFlow->IsLoadSaveEnabled() && g_Gui.GetInventoryMode() != InventoryMode::Load)
 	{
 		SaveGame::LoadHeaders();
+
+		if (!SaveGame::IsLoadGamePossible())
+			return gameStatus;
+
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))
