@@ -2,6 +2,7 @@
 #include "Game/control/control.h"
 
 #include <process.h>
+#include <filesystem>
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
@@ -458,7 +459,13 @@ void InitializeScripting(int levelIndex, LevelLoadType type)
 	// Run level script if it exists.
 	if (!level.ScriptFileName.empty())
 	{
-		g_GameScript->ExecuteScriptFile(g_GameFlow->GetGameDir() + level.ScriptFileName);
+		const std::string levelScriptName = g_GameFlow->GetGameDir() + level.ScriptFileName;
+
+		if (std::filesystem::is_regular_file(levelScriptName))
+			g_GameScript->ExecuteScriptFile(levelScriptName);
+		else
+			TENLog("Level script not found: " + levelScriptName, LogLevel::Warning);
+
 		g_GameScript->InitCallbacks();
 		g_GameStringsHandler->SetCallbackDrawString([](const std::string& key, D3DCOLOR color, const Vec2& pos, float scale, int flags)
 		{
