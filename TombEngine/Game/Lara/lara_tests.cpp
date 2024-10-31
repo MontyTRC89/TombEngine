@@ -928,7 +928,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	int frontFloor = NO_HEIGHT;
 	if (coll->Front.Bridge != NO_VALUE)
 	{
-		auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, BLOCK(0.5f), -BLOCK(0.5f));
+		auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, BLOCK(0.2f), -BLOCK(0.5f));
 		frontFloor = (pointColl.GetFloorHeight() - item->Pose.Position.y);
 	}
 	else
@@ -936,7 +936,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 		int yOffset = CLICK(1.25f);
 		while (yOffset > -CLICK(2))
 		{
-			auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, BLOCK(0.5f), yOffset);
+			auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, BLOCK(0.2f), yOffset);
 
 			frontFloor = pointColl.GetFloorHeight() - item->Pose.Position.y;
 			if (frontFloor > -CLICK(2) &&
