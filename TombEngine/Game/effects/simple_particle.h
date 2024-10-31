@@ -1,15 +1,12 @@
 #pragma once
 
 #include "Objects\objectslist.h"
-#include <SimpleMath.h>
 
 enum class BlendMode;
 struct ItemInfo;
 
 namespace TEN::Effects
 {
-	using namespace DirectX::SimpleMath;
-
 	struct SimpleParticle
 	{
 		Vector3 worldPosition;

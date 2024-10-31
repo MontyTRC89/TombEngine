@@ -16,6 +16,7 @@
 #include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Objects/Generic/Object/burning_torch.h"
+#include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"

@@ -31,6 +31,7 @@
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
+using namespace TEN::Gui;
 using namespace TEN::Hud;
 using namespace TEN::Input;
 

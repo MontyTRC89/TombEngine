@@ -13,7 +13,6 @@
 
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Spark;
-using namespace TEN::Input;
 
 namespace TEN::Entities::TR4
 {

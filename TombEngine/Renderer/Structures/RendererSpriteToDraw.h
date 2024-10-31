@@ -5,8 +5,6 @@
 
 namespace TEN::Renderer::Structures
 {
-	using namespace DirectX::SimpleMath;
-
 	struct RendererSpriteToDraw
 	{
 		SpriteType Type;

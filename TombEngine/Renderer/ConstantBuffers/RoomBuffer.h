@@ -5,8 +5,6 @@
 
 namespace TEN::Renderer::ConstantBuffers
 {
-	using namespace DirectX::SimpleMath;
-
 	struct alignas(16) CRoomBuffer
 	{
 		int Water;

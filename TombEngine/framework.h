@@ -3,7 +3,9 @@
 // Disable Unicode for FMT and spdlog to prevent errors when compiling.
 #define FMT_UNICODE 0
 
-// Libraries
+// =========
+// LIBRARIES
+// =========
 
 // Windows
 #pragma comment(lib, "comctl32")
@@ -37,7 +39,9 @@
 #pragma comment(lib, "zlib")
 #endif
 
-// Includes
+// ========
+// INCLUDES
+// ========
 
 // Standard
 #include <algorithm>
@@ -120,6 +124,8 @@ using namespace TEN::Math;
 
 using namespace TEN::Debug;
 
-// Constants
+// =========
+// CONSTANTS
+// =========
 
 constexpr auto NO_VALUE = -1;

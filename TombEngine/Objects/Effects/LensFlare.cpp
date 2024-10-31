@@ -1,14 +1,10 @@
-#include "framework.h"
 #include "Objects/Effects/LensFlare.h"
 
 #include "Game/camera.h"
 #include "Game/control/los.h"
-#include "Math/Math.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Entities::Effects
 {
@@ -84,8 +80,8 @@ namespace TEN::Entities::Effects
 		if (!g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareEnabled())
 			return;
 
-		auto orient   = EulerAngles(g_GameFlow->GetLevel(CurrentLevel)->GetLensFlarePitch(), g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareYaw(), 0);
-		auto color    = g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareColor();
+		auto orient = EulerAngles(g_GameFlow->GetLevel(CurrentLevel)->GetLensFlarePitch(), g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareYaw(), 0);
+		auto color = g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareColor();
 		auto spriteID = g_GameFlow->GetLevel(CurrentLevel)->GetLensFlareSunSpriteID();
 		
 		auto pos = Camera.pos.ToVector3();

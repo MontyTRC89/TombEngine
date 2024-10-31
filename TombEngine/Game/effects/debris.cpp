@@ -4,6 +4,7 @@
 #include "Game/collision/Sphere.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Setup.h"
+#include "Renderer/Renderer.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Sphere;

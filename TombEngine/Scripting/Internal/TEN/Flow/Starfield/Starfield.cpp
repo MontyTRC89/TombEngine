@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Flow/Starfield/Starfield.h"
 
 #include "Game/effects/weather.h"

@@ -13,7 +13,6 @@
 
 namespace TEN::Renderer::Structures
 {
-	using namespace DirectX::SimpleMath;
 	using namespace TEN::Renderer::Graphics::Vertices;
 
 	struct RendererSortableObject

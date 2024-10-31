@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Flow/LensFlare/LensFlare.h"
 
 #include "Objects/game_object_ids.h"
