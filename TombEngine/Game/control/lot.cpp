@@ -196,6 +196,13 @@ void InitializeSlot(short itemNumber, bool makeTarget)
 			creature->LOT.Drop = -BLOCK(1);
 			creature->LOT.Zone = ZoneType::Human;
 			break;
+
+		case LotType::EnemyJeep:
+			creature->LOT.Step = BLOCK(4);
+			creature->LOT.Drop = -BLOCK(4);
+			creature->LOT.CanJump = true;
+			creature->LOT.Zone = ZoneType::Human;
+			break;
 	}
 
 	ClearLOT(&creature->LOT);
@@ -210,9 +217,9 @@ void TargetNearestEntity(ItemInfo& item, const std::vector<GAME_OBJECT_ID>& keyO
 	auto& creature = *GetCreatureInfo(&item);
 
 	float closestDistSqr = INFINITY;
-	for (auto& creature : ActiveCreatures)
+	for (auto& target : ActiveCreatures)
 	{
-		auto& targetItem = g_Level.Items[creature->ItemNumber];
+		auto& targetItem = g_Level.Items[target->ItemNumber];
 		if (targetItem.Index == item.Index)
 			continue;
 
@@ -225,7 +232,7 @@ void TargetNearestEntity(ItemInfo& item, const std::vector<GAME_OBJECT_ID>& keyO
 			float distSqr = Vector3i::DistanceSquared(item.Pose.Position, targetItem.Pose.Position);
 			if (distSqr < closestDistSqr)
 			{
-				creature->Enemy = &targetItem;
+				creature.Enemy = &targetItem;
 				closestDistSqr = distSqr;
 			}
 		}

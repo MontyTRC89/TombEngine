@@ -2,11 +2,10 @@
 
 #include "Scripting/Internal/ReservedScriptNames.h"
 
-/*** Represents a degree-based 3D rotation.
-All values are clamped to the range [0.0, 360.0].
-@tenprimitive Rotation
-@pragma nostrip
-*/
+/// Represents a degree-based 3D rotation.
+// All values are clamped to the range [0.0, 360.0].
+// @tenprimitive Rotation
+// @pragma nostrip
 
 void Rotation::Register(sol::table& parent)
 {
@@ -17,25 +16,23 @@ void Rotation::Register(sol::table& parent)
 		sol::meta_function::to_string, &Rotation::ToString,
 
 		/// (float) X angle component.
-		//@mem x
+		// @mem x
 		"x", &Rotation::x,
 
 		/// (float) Y angle component.
-		//@mem y
+		// @mem y
 		"y", &Rotation::y,
 
 		/// (float) Z angle component.
-		//@mem z
+		// @mem z
 		"z", &Rotation::z);
 }
 
-/*** 
-@tparam float x X angle component.
-@tparam float y Y angle component.
-@tparam float z Z angle component.
-@treturn Rotation A Rotation.
-@function Rotation
-*/
+/// @tparam float x X angle component.
+// @tparam float y Y angle component.
+// @tparam float z Z angle component.
+// @treturn Rotation A Rotation.
+// @function Rotation
 Rotation::Rotation(float x, float y, float z)
 {
 	this->x = x;
@@ -76,11 +73,9 @@ Rotation::operator Vector3() const
 	return Vector3(x, y, z);
 };
 
-/***
-@tparam Rotation rotation this Rotation.
-@treturn string A string showing the X, Y, and Z angle components of the Rotation.
-@function __tostring
-*/
+/// @tparam Rotation rotation this Rotation.
+// @treturn string A string showing the X, Y, and Z angle components of the Rotation.
+// @function __tostring
 std::string Rotation::ToString() const
 {
 	return ("{ " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + " }");

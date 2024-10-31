@@ -327,6 +327,8 @@ void Turn180(ItemInfo* item)
 	item->Pose.Orientation.x = -item->Pose.Orientation.x;
 	item->Pose.Orientation.y += ANGLE(180.0f);
 	item->Pose.Orientation.z = -item->Pose.Orientation.z;
+
+	item->DisableInterpolation = true;
 }
 
 void FinishLevel(ItemInfo* item)

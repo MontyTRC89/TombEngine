@@ -104,6 +104,8 @@ namespace TEN::Effects::Drip
 			if (drip.Life <= 0.0f)
 				continue;
 
+			drip.StoreInterpolationData();
+
 			// Update velocity.
 			drip.Velocity.y += drip.Gravity;
 			if (TestEnvironment(ENV_FLAG_WIND, drip.RoomNumber))

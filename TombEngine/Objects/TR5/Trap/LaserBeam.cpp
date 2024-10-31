@@ -77,6 +77,16 @@ namespace TEN::Entities::Traps
 		TriggerDynamicLight(pos, color * intensityNorm, FALLOFF);
 	}
 
+	void LaserBeamEffect::StoreInterpolationData()
+	{
+		for (int i = 0; i < Vertices.size(); i++)
+		{
+			OldVertices[i] = Vertices[i];
+		}
+
+		OldColor = Color;
+	}
+
 	void LaserBeamEffect::Update(const ItemInfo& item)
 	{
 		auto orient = EulerAngles(item.Pose.Orientation.x + ANGLE(180.0f), item.Pose.Orientation.y, item.Pose.Orientation.z);
@@ -150,6 +160,8 @@ namespace TEN::Entities::Traps
 			item.Model.Color.w = 0.0f;
 			return;
 		}
+
+		beam.StoreInterpolationData();
 
 		// Brightness fade-in and distortion.
 		if (item.Model.Color.w < 1.0f)

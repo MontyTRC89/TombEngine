@@ -15,6 +15,8 @@ namespace TEN::Effects::Spark
 
 			if (!s.active)
 				continue;
+			
+			s.StoreInterpolationData();
 
 			s.age += 1;
 			if (s.age > s.life)

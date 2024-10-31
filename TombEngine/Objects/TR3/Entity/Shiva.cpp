@@ -251,7 +251,7 @@ namespace TEN::Entities::Creatures::TR3
 	void InitializeShiva(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		item.Status &= ~ITEM_INVISIBLE; // Draw the statue from the start.
+		item.Status = ITEM_NOT_ACTIVE; // Draw the statue from the start.
 
 		InitializeCreature(itemNumber);
 		SetAnimation(&item, SHIVA_ANIM_INACTIVE);

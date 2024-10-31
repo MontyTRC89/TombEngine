@@ -607,6 +607,8 @@ short CreateItem()
 	g_Level.Items[NextItemFree].Flags = 0;
 	NextItemFree = g_Level.Items[NextItemFree].NextItem;
 
+	g_Level.Items[itemNumber].DisableInterpolation = true;
+
 	return itemNumber;
 }
 

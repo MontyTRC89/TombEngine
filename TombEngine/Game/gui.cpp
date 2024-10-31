@@ -4,6 +4,7 @@
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
@@ -23,7 +24,9 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
+#include "Specific/winmain.h"
 
+using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Utils;
@@ -271,6 +274,7 @@ namespace TEN::Gui
 	void GuiController::DrawInventory()
 	{
 		g_Renderer.RenderInventory();
+		g_Renderer.Lock(); // TODO: When inventory is converted to 60 FPS, move this lock call outside of render loop.
 	}
 
 	InventoryResult GuiController::TitleOptions(ItemInfo* item)
@@ -478,11 +482,12 @@ namespace TEN::Gui
 			Caustics,
 			Antialiasing,
 			AmbientOcclusion,
+			HighFramerate,
 			Save,
 			Cancel
 		};
 
-		static const int numDisplaySettingsOptions = 7;
+		static const int numDisplaySettingsOptions = 8;
 
 		OptionCount = numDisplaySettingsOptions;
 
@@ -539,6 +544,12 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
 				break;
+
+			case DisplaySettingsOption::HighFramerate:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableHighFramerate = !CurrentSettings.Configuration.EnableHighFramerate;
+				break;
+
 			}
 		}
 
@@ -585,6 +596,11 @@ namespace TEN::Gui
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				CurrentSettings.Configuration.EnableAmbientOcclusion = !CurrentSettings.Configuration.EnableAmbientOcclusion;
 				break;
+
+			case DisplaySettingsOption::HighFramerate:
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+				CurrentSettings.Configuration.EnableHighFramerate = !CurrentSettings.Configuration.EnableHighFramerate;
+				break;
 			}
 		}
 
@@ -607,6 +623,8 @@ namespace TEN::Gui
 				// Reset screen and go back.
 				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.ScreenWidth, CurrentSettings.Configuration.ScreenHeight,
 					CurrentSettings.Configuration.EnableWindowedMode);
+
+				g_Renderer.SetGraphicsSettingsChanged();
 
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 				SelectedOption = fromPauseMenu ? 1 : 0;
@@ -665,72 +683,114 @@ namespace TEN::Gui
 		{
 			ClearAllActions();
 
+			g_Synchronizer.Init();
+
+			bool legacy30FpsDoneDraw = false;
+			bool decreaseCounter = false;
+			
 			while (CurrentSettings.NewKeyWaitTimer > 0.0f)
 			{
-				CurrentSettings.NewKeyWaitTimer -= 1.0f;
-				if (CurrentSettings.NewKeyWaitTimer <= 0.0f)
-					CurrentSettings.NewKeyWaitTimer = 0.0f;
+				g_Synchronizer.Sync();
 
-				UpdateInputActions(item);
+				while (g_Synchronizer.Synced())
+				{
+					CurrentSettings.NewKeyWaitTimer -= 1.0f;
+					if (CurrentSettings.NewKeyWaitTimer <= 0.0f)
+						CurrentSettings.NewKeyWaitTimer = 0.0f;
 
-				if (CurrentSettings.IgnoreInput)
-				{
-					if (NoAction())
-						CurrentSettings.IgnoreInput = false;
-				}
-				else
-				{
-					int selectedKey = 0;
-					for (selectedKey = 0; selectedKey < MAX_INPUT_SLOTS; selectedKey++)
+					if (!fromPauseMenu)
 					{
-						if (KeyMap[selectedKey])
-							break;
+						ControlPhase(true);
+					}
+					else
+					{
+						// Just for updating blink time
+						g_Renderer.PrepareScene();
 					}
 
-					if (selectedKey == MAX_INPUT_SLOTS)
-						selectedKey = 0;
+					UpdateInputActions(item);
 
-					if (selectedKey && !g_KeyNames[selectedKey].empty())
+					if (CurrentSettings.IgnoreInput)
 					{
-						unsigned int baseIndex = 0;
-						switch (MenuToDisplay)
+						if (NoAction())
+							CurrentSettings.IgnoreInput = false;
+					}
+					else
+					{
+						int selectedKey = 0;
+						for (selectedKey = 0; selectedKey < MAX_INPUT_SLOTS; selectedKey++)
 						{
-						case Menu::VehicleActions:
-							baseIndex = (unsigned int)GeneralActionStrings.size();
-							break;
-
-						case Menu::QuickActions:
-							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size());
-							break;
-
-						case Menu::MenuActions:
-							baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size() + QuickActionStrings.size());
-							break;
-
-						default:
-							break;
+							if (KeyMap[selectedKey])
+								break;
 						}
 
-						Bindings[1][baseIndex + SelectedOption] = selectedKey;
-						DefaultConflict();
+						if (selectedKey == MAX_INPUT_SLOTS)
+							selectedKey = 0;
 
-						CurrentSettings.NewKeyWaitTimer = 0.0f;
-						CurrentSettings.IgnoreInput = true;
-						return;
+						if (selectedKey && !g_KeyNames[selectedKey].empty())
+						{
+							unsigned int baseIndex = 0;
+							switch (MenuToDisplay)
+							{
+							case Menu::VehicleActions:
+								baseIndex = (unsigned int)GeneralActionStrings.size();
+								break;
+
+							case Menu::QuickActions:
+								baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size());
+								break;
+
+							case Menu::MenuActions:
+								baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size() + QuickActionStrings.size());
+								break;
+
+							default:
+								break;
+							}
+
+							Bindings[1][baseIndex + SelectedOption] = selectedKey;
+							DefaultConflict();
+
+							CurrentSettings.NewKeyWaitTimer = 0.0f;
+							CurrentSettings.IgnoreInput = true;
+							return;
+						}
 					}
+
+					g_Synchronizer.Step();
+
+					legacy30FpsDoneDraw = false;
 				}
 
-				if (fromPauseMenu)
+				if (!g_Configuration.EnableHighFramerate)
 				{
-					g_Renderer.RenderInventory();
-					Camera.numberFrames = g_Renderer.Synchronize();
+					if (!legacy30FpsDoneDraw)
+					{
+						if (fromPauseMenu)
+						{
+							g_Renderer.RenderInventory();
+						}
+						else
+						{
+							g_Renderer.RenderTitle(0);
+						}
+						g_Renderer.Lock();
+						legacy30FpsDoneDraw = true;
+					}
 				}
 				else
 				{
-					g_Renderer.RenderTitle();
-					Camera.numberFrames = g_Renderer.Synchronize();
-					int numFrames = Camera.numberFrames;
-					ControlPhase(numFrames);
+					//g_Renderer.PrepareScene();
+
+					if (fromPauseMenu)
+					{
+						g_Renderer.RenderInventory();
+					}
+					else
+					{
+						g_Renderer.RenderTitle(0);
+					}
+					g_Renderer.Lock();
 				}
 			}
 		}
@@ -870,7 +930,6 @@ namespace TEN::Gui
 			ThumbstickCameraControl,
 
 			MouseSensitivity,
-			MenuOptionLooping,
 
 			Apply,
 			Cancel,
@@ -975,27 +1034,6 @@ namespace TEN::Gui
 				}
 
 				break;
-
-			case OtherSettingsOption::MenuOptionLooping:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-
-				switch (CurrentSettings.Configuration.MenuOptionLoopingMode)
-				{
-				default:
-				case MenuOptionLoopingMode::AllMenus:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::Disabled;
-					break;
-
-				case MenuOptionLoopingMode::SaveLoadOnly:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::AllMenus;
-					break;
-
-				case MenuOptionLoopingMode::Disabled:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::SaveLoadOnly;
-					break;
-				}
-
-				break;
 			}
 
 			if (isVolumeAdjusted)
@@ -1044,27 +1082,6 @@ namespace TEN::Gui
 						CurrentSettings.Configuration.MouseSensitivity = MOUSE_SENSITIVITY_MAX;
 
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				}
-
-				break;
-
-			case OtherSettingsOption::MenuOptionLooping:
-				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				
-				switch (CurrentSettings.Configuration.MenuOptionLoopingMode)
-				{
-				default:
-				case MenuOptionLoopingMode::AllMenus:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::SaveLoadOnly;
-					break;
-
-				case MenuOptionLoopingMode::SaveLoadOnly:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::Disabled;
-					break;
-
-				case MenuOptionLoopingMode::Disabled:
-					CurrentSettings.Configuration.MenuOptionLoopingMode = MenuOptionLoopingMode::AllMenus;
-					break;
 				}
 
 				break;
@@ -1200,6 +1217,7 @@ namespace TEN::Gui
 
 				case PauseMenuOption::ExitToTitle:
 					SetInventoryMode(InventoryMode::None);
+					App.ResetClock = true;
 					return InventoryResult::ExitToTitle;
 					break;
 				}
@@ -1967,7 +1985,7 @@ namespace TEN::Gui
 		else if (AmmoSelectorFadeDir == 1)
 		{
 			if (AmmoSelectorFadeVal < 128)
-				AmmoSelectorFadeVal += 32;
+				AmmoSelectorFadeVal += 32 / g_Renderer.GetFramerateMultiplier();
 
 			if (AmmoSelectorFadeVal > 128)
 			{
@@ -1978,7 +1996,7 @@ namespace TEN::Gui
 		else if (AmmoSelectorFadeDir == 2)
 		{
 			if (AmmoSelectorFadeVal > 0)
-				AmmoSelectorFadeVal -= 32;
+				AmmoSelectorFadeVal -= 32 / g_Renderer.GetFramerateMultiplier();
 
 			if (AmmoSelectorFadeVal < 0)
 			{
@@ -2621,7 +2639,7 @@ namespace TEN::Gui
 
 	void GuiController::SpinBack(EulerAngles& orient)
 	{
-		orient.Lerp(EulerAngles::Identity, 1.0f / 8);
+		orient.Lerp(EulerAngles::Identity, 1.0f / (8.0f * g_Renderer.GetFramerateMultiplier()));
 	}
 
 	void GuiController::DrawAmmoSelector()
@@ -2644,13 +2662,13 @@ namespace TEN::Gui
 				if (n == *CurrentAmmoType)
 				{
 					if (invObject->RotFlags & INV_ROT_X)
-						AmmoObjectList[n].Orientation.x += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.x += ANGLE(5.0f / g_Renderer.GetFramerateMultiplier());
 
 					if (invObject->RotFlags & INV_ROT_Y)
-						AmmoObjectList[n].Orientation.y += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.y += ANGLE(5.0f / g_Renderer.GetFramerateMultiplier());
 
 					if (invObject->RotFlags & INV_ROT_Z)
-						AmmoObjectList[n].Orientation.z += ANGLE(5.0f);
+						AmmoObjectList[n].Orientation.z += ANGLE(5.0f / g_Renderer.GetFramerateMultiplier());
 				}
 				else
 					SpinBack(AmmoObjectList[n].Orientation);
@@ -3022,13 +3040,13 @@ namespace TEN::Gui
 				if (!i && !ring.ObjectListMovement)
 				{
 					if (invObject.RotFlags & INV_ROT_X)
-						listObject.Orientation.x += ANGLE(5.0f);
+						listObject.Orientation.x += ANGLE(5.0f / g_Renderer.GetFramerateMultiplier());
 
 					if (invObject.RotFlags & INV_ROT_Y)
-						listObject.Orientation.y += ANGLE(5.0f);
+						listObject.Orientation.y += ANGLE(5.0f / g_Renderer.GetFramerateMultiplier());
 
 					if (invObject.RotFlags & INV_ROT_Z)
-						listObject.Orientation.z += ANGLE(5.0f);
+						listObject.Orientation.z += ANGLE(5.0f / g_Renderer.GetFramerateMultiplier());
 				}
 				else
 				{
@@ -3084,17 +3102,17 @@ namespace TEN::Gui
 				if (ring.NumObjectsInList != 1 && (ringType != RingTypes::Ammo || CombineRingFadeVal == 128))
 				{
 					if (ring.ObjectListMovement > 0)
-						ring.ObjectListMovement += ANGLE(45.0f);
+						ring.ObjectListMovement += ANGLE(45.0f / g_Renderer.GetFramerateMultiplier());
 
 					if (ring.ObjectListMovement < 0)
-						ring.ObjectListMovement -= ANGLE(45.0f);
+						ring.ObjectListMovement -= ANGLE(45.0f / g_Renderer.GetFramerateMultiplier());
 
 					if (IsHeld(In::Left))
 					{
 						if (!ring.ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							ring.ObjectListMovement += ANGLE(45.0f);
+							ring.ObjectListMovement += ANGLE(45.0f / g_Renderer.GetFramerateMultiplier());
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
@@ -3106,7 +3124,7 @@ namespace TEN::Gui
 						if (!ring.ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							ring.ObjectListMovement -= ANGLE(45.0f);
+							ring.ObjectListMovement -= ANGLE(45.0f / g_Renderer.GetFramerateMultiplier());
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
@@ -3147,6 +3165,8 @@ namespace TEN::Gui
 
 	bool GuiController::CallPause()
 	{
+		ClearAllDisplaySprites();
+		g_Renderer.PrepareScene();
 		g_Renderer.DumpGameScene();
 		PauseAllSounds(SoundPauseMode::Pause);
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
@@ -3157,22 +3177,65 @@ namespace TEN::Gui
 
 		bool doExitToTitle = false;
 
+		g_Synchronizer.Init();
+
+		bool legacy30FpsDoneDraw = false;
+
 		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
 		{
-			g_Gui.DrawInventory();
-			g_Renderer.Synchronize();
-
-			if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
+			if (ThreadEnded)
 			{
-				doExitToTitle = true;
+				App.ResetClock = true;
+				return false;
+			}
+
+			g_Synchronizer.Sync();
+
+			while (g_Synchronizer.Synced())
+			{
+				g_Renderer.PrepareScene();
+
+				if (g_Gui.DoPauseMenu(LaraItem) == InventoryResult::ExitToTitle)
+				{
+					doExitToTitle = true;
+					break;
+				}
+
+				g_Synchronizer.Step();
+
+				legacy30FpsDoneDraw = false;
+			}
+
+			if (doExitToTitle)
 				break;
+
+			if (!g_Configuration.EnableHighFramerate)
+			{
+				if (!legacy30FpsDoneDraw)
+				{
+					g_Renderer.RenderInventory();
+					g_Renderer.Lock();
+					g_Renderer.Synchronize();
+					legacy30FpsDoneDraw = true;
+				}
+			}
+			else
+			{
+				g_Renderer.RenderInventory();
+				g_Renderer.Lock();
 			}
 		}
 
 		if (doExitToTitle)
+		{
 			StopAllSounds();
+		}
 		else
+		{
 			ResumeAllSounds(SoundPauseMode::Pause);
+		}
+
+		App.ResetClock = true;
 
 		return doExitToTitle;
 	}
@@ -3185,6 +3248,8 @@ namespace TEN::Gui
 
 		player.Inventory.OldBusy = player.Inventory.IsBusy;
 
+		ClearAllDisplaySprites();
+		g_Renderer.PrepareScene();
 		g_Renderer.DumpGameScene();
 		PauseAllSounds(SoundPauseMode::Inventory);
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
@@ -3193,85 +3258,112 @@ namespace TEN::Gui
 			SetInventoryMode(InventoryMode::InGame);
 
 		InitializeInventory(item);
-		Camera.numberFrames = 2;
 
+		g_Synchronizer.Init();
+
+		bool legacy30FpsDoneDraw = false;
 		bool exitLoop = false;
+
 		while (!exitLoop)
 		{
 			if (ThreadEnded)
+			{
+				App.ResetClock = true;
 				return false;
-
-			TimeInMenu++;
-			GameTimer++;
-
-			UpdateInputActions(item);
-
-			if (GuiIsDeselected() || IsClicked(In::Inventory))
-			{
-				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				exitLoop = true;
 			}
 
-			DrawInventory();
-			DrawCompass(item);
+			g_Synchronizer.Sync();
 
-			switch (InvMode)
+			while (g_Synchronizer.Synced())
 			{
-			case InventoryMode::InGame:
-				DoInventory(item);
-				break;
+				TimeInMenu++;
+				GameTimer++;
 
-			case InventoryMode::Statistics:
-				DoStatisticsMode();
-				break;
+				UpdateInputActions(item);
 
-			case InventoryMode::Examine:
-				DoExamineMode();
-				break;
-
-			case InventoryMode::Diary:
-				DoDiary(item);
-				break;
-
-			case InventoryMode::Load:
-				switch (DoLoad())
+				if (GuiIsDeselected() || IsClicked(In::Inventory))
 				{
-				case LoadResult::Load:
-					doLoad = true;
+					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 					exitLoop = true;
-					break;
-
-				case LoadResult::Cancel:
-					exitLoop = !resetMode;
-
-					if (resetMode)
-						SetInventoryMode(InventoryMode::InGame);
-
-					break;
-
-				case LoadResult::None:
-					break;
 				}
 
-				break;
+				g_Renderer.PrepareScene();
 
-			case InventoryMode::Save:
-				if (DoSave())
+				switch (InvMode)
 				{
-					exitLoop = !resetMode;
-					if (resetMode)
-						SetInventoryMode(InventoryMode::InGame);
+				case InventoryMode::InGame:
+					DoInventory(item);
+					break;
+
+				case InventoryMode::Statistics:
+					DoStatisticsMode();
+					break;
+
+				case InventoryMode::Examine:
+					DoExamineMode();
+					break;
+
+				case InventoryMode::Diary:
+					DoDiary(item);
+					break;
+
+				case InventoryMode::Load:
+					switch (DoLoad())
+					{
+					case LoadResult::Load:
+						doLoad = true;
+						exitLoop = true;
+						break;
+
+					case LoadResult::Cancel:
+						exitLoop = !resetMode;
+
+						if (resetMode)
+							SetInventoryMode(InventoryMode::InGame);
+
+						break;
+
+					case LoadResult::None:
+						break;
+					}
+
+					break;
+
+				case InventoryMode::Save:
+					if (DoSave())
+					{
+						exitLoop = !resetMode;
+						if (resetMode)
+							SetInventoryMode(InventoryMode::InGame);
+					}
+
+					break;
 				}
 
-				break;
+				if (ItemUsed && NoAction())
+					exitLoop = true;
+
+				SetEnterInventory(NO_VALUE);
+				g_Synchronizer.Step();
+
+				legacy30FpsDoneDraw = false;
 			}
 
-			if (ItemUsed && NoAction())
-				exitLoop = true;
-
-			SetEnterInventory(NO_VALUE);
-
-			Camera.numberFrames = g_Renderer.Synchronize();
+			if (!g_Configuration.EnableHighFramerate)
+			{
+				if (!legacy30FpsDoneDraw)
+				{
+					g_Renderer.RenderInventory();
+					g_Renderer.Lock();
+					g_Renderer.Synchronize();
+					legacy30FpsDoneDraw = true;
+				}
+			}
+			else
+			{
+				g_Renderer.RenderInventory();
+				g_Renderer.Lock();
+			}
 		}
 
 		LastInvItem = Rings[(int)RingTypes::Inventory].CurrentObjectList[Rings[(int)RingTypes::Inventory].CurrentObjectInList].InventoryItem;
@@ -3281,10 +3373,13 @@ namespace TEN::Gui
 			UseItem(*item, InventoryObjectTable[LastInvItem].ObjectNumber);
 
 		AlterFOV(LastFOV);
+		g_Renderer.PrepareScene();
 		ResumeAllSounds(SoundPauseMode::Inventory);
 
 		player.Inventory.IsBusy = player.Inventory.OldBusy;
 		SetInventoryMode(InventoryMode::None);
+
+		App.ResetClock = true;
 
 		return doLoad;
 	}
@@ -3328,8 +3423,8 @@ namespace TEN::Gui
 		auto needleOrient = EulerAngles(0, CompassNeedleAngle, 0);
 		needleOrient.Lerp(EulerAngles(0, item->Pose.Orientation.y, 0), LERP_ALPHA);
 
-		float wibble = std::sin(((float)(GameTimer & 0x3F) / (float)0x3F) * PI_MUL_2);
-		this->CompassNeedleAngle = needleOrient.y + ANGLE(wibble);
+		float wibble = std::sin((float(GameTimer & 0x3F) / (float)0x3F) * PI_MUL_2);
+		CompassNeedleAngle = needleOrient.y + ANGLE(wibble / 2);
 
 		// HACK: Needle is rotated in the draw function.
 		const auto& invObject = InventoryObjectTable[INV_OBJECT_COMPASS];

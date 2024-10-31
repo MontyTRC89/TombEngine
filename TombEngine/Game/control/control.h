@@ -49,7 +49,7 @@ enum FadeStatus
 
 constexpr int MAX_ROOMS = 1024;
 
-constexpr int LOOP_FRAME_COUNT = 2;
+constexpr auto LOOP_FRAME_COUNT = 2;
 
 extern int GameTimer;
 extern int RumbleTimer;
@@ -77,9 +77,9 @@ extern int ControlPhaseTime;
 
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
-int DrawPhase(bool isTitle);
+void DrawPhase(bool isTitle, float interpolationFactor);
 
-GameStatus ControlPhase(int numFrames);
+GameStatus ControlPhase(bool insideMenu);
 GameStatus DoLevel(int levelIndex, bool loadGame = false);
 GameStatus DoGameLoop(int levelIndex);
 void EndGameLoop(int levelIndex, GameStatus reason);
@@ -100,5 +100,7 @@ void CleanUp();
 void InitializeOrLoadGame(bool loadGame);
 void InitializeScripting(int levelIndex, LevelLoadType type);
 void DeInitializeScripting(int levelIndex);
+
+void SetupInterpolation();
 
 unsigned CALLBACK GameMain(void*);

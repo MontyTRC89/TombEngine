@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -470,6 +470,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Objects\Effects\EmberEmitter.h" />
     <ClInclude Include="Objects\Effects\enemy_missile.h" />
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
+    <ClInclude Include="Objects\Effects\LensFlare.h" />
     <ClInclude Include="Objects\Effects\tr4_locusts.h" />
     <ClInclude Include="Objects\Effects\tr5_electricity.h" />
     <ClInclude Include="Objects\Generic\Doors\double_doors.h" />
@@ -658,9 +659,9 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Objects\TR4\Vehicles\motorbike.h" />
     <ClInclude Include="Objects\TR4\Vehicles\motorbike_info.h" />
     <ClInclude Include="Objects\TR4\tr4_objects.h" />
+    <ClInclude Include="Objects\TR5\Emitter\tr5_smoke_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_bats_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_rats_emitter.h" />
-    <ClInclude Include="Objects\TR5\Emitter\tr5_smoke_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_spider_emitter.h" />
     <ClInclude Include="Objects\TR5\Entity\AutoGun.h" />
     <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
@@ -762,6 +763,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Renderer\Structures\RendererFogBulb.h" />
     <ClInclude Include="Renderer\Structures\RendererHudBar.h" />
     <ClInclude Include="Renderer\Structures\RendererItem.h" />
+    <ClInclude Include="Renderer\Structures\RendererLensFlare.h" />
     <ClInclude Include="Renderer\Structures\RendererLight.h" />
     <ClInclude Include="Renderer\Structures\RendererLine2D.h" />
     <ClInclude Include="Renderer\Structures\RendererLine3D.h" />
@@ -778,6 +780,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Renderer\Structures\RendererSpriteBucket.h" />
     <ClInclude Include="Renderer\Structures\RendererSpriteSequence.h" />
     <ClInclude Include="Renderer\Structures\RendererSpriteToDraw.h" />
+    <ClInclude Include="Renderer\Structures\RendererStar.h" />
     <ClInclude Include="Renderer\Structures\RendererStatic.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererTriangle3D.h" />
@@ -805,10 +808,12 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Scripting\Internal\TEN\Flow\Fog\Fog.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\GameStatuses.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\LensFlare\LensFlare.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Settings\Settings.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Starfield\Starfield.h" />
     <ClInclude Include="Scripting\Internal\TEN\Input\ActionIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Input\InputHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Inventory\InventoryHandler.h" />
@@ -978,6 +983,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClCompile Include="Objects\Effects\EmberEmitter.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
+    <ClCompile Include="Objects\Effects\LensFlare.cpp" />
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
     <ClCompile Include="Objects\Effects\tr5_electricity.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />
@@ -1155,9 +1161,9 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClCompile Include="Objects\TR4\Trap\tr4_teethspike.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\jeep.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
+    <ClCompile Include="Objects\TR5\Emitter\tr5_smoke_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_bats_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_rats_emitter.cpp" />
-    <ClCompile Include="Objects\TR5\Emitter\tr5_smoke_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_spider_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Entity\AutoGun.cpp" />
     <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
@@ -1234,10 +1240,12 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClCompile Include="Scripting\Internal\TEN\Flow\FlowHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Fog\Fog.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\LensFlare\LensFlare.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Settings\Settings.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\Starfield\Starfield.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Input\InputHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Inventory\InventoryHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Logic\LogicHandler.cpp" />

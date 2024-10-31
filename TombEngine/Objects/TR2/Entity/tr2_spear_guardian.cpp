@@ -191,7 +191,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		InitializeCreature(itemNumber);
 		SetAnimation(&item, SPEAR_GUARDIAN_ANIM_AWAKE);
-		item.Status &= ~ITEM_INVISIBLE;
+		item.Status = ITEM_NOT_ACTIVE;
 
 		item.ItemFlags[0] = 0; // Joint index for mesh swap.
 		item.ItemFlags[1] = 1; // Immune state (bool).

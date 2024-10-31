@@ -11,12 +11,10 @@
 
 using TEN::Renderer::g_Renderer;
 
-/***
-Represents a display sprite.
-
-@tenclass View.DisplaySprite
-@pragma nostrip
-*/
+/// Represents a display sprite.
+//
+// @tenclass View.DisplaySprite
+// @pragma nostrip
 
 namespace TEN::Scripting::DisplaySprite
 {
@@ -49,7 +47,7 @@ namespace TEN::Scripting::DisplaySprite
 	}
 
 	/// Create a DisplaySprite object.
-	// @function DisplaySprite
+	// @function DisplaySprite()
 	// @tparam Objects.ObjID ID of the sprite sequence object.
 	// @tparam int int spriteID ID of the sprite in the sequence.
 	// @tparam Vec2 pos Display position in percent.
@@ -189,7 +187,7 @@ namespace TEN::Scripting::DisplaySprite
 		constexpr auto DEFAULT_SCALE_MODE = DisplaySpriteScaleMode::Fit;
 		constexpr auto DEFAULT_BLEND_MODE = BlendMode::AlphaBlend;
 
-		// Object is not a sprite sequence object; return early.
+		// Object is not a sprite sequence; return early.
 		if (_objectID < GAME_OBJECT_ID::ID_HORIZON || _objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
 		{
 			TENLog("Attempted to draw display sprite from non-sprite sequence object " + std::to_string(_objectID), LogLevel::Warning);
@@ -219,6 +217,7 @@ namespace TEN::Scripting::DisplaySprite
 			priority.value_or(DEFAULT_PRIORITY),
 			alignMode.value_or(DEFAULT_ALIGN_MODE),
 			scaleMode.value_or(DEFAULT_SCALE_MODE),
-			blendMode.value_or(DEFAULT_BLEND_MODE));
+			blendMode.value_or(DEFAULT_BLEND_MODE), 
+			DisplaySpritePhase::Control);
 	}
 }

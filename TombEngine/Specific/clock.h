@@ -18,10 +18,29 @@ struct GameTime
 	int Seconds = 0;
 };
 
-int	 Sync();
+class HighFramerateSynchronizer
+{
+private:
+	LARGE_INTEGER _lastTime;
+	LARGE_INTEGER _currentTime;
+	LARGE_INTEGER _frequency;
+	double _controlDelay = 0.0;
+	double _frameTime    = 0.0;
+
+public:
+	void Init();
+	void Sync();
+	void Step();
+	bool Synced();
+	float GetInterpolationFactor();
+};
+
+int	 TimeSync();
 bool TimeInit();
 bool TimeReset();
 
 GameTime GetGameTime(int ticks);
 
 bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs = 0.0f);
+
+extern HighFramerateSynchronizer g_Synchronizer;

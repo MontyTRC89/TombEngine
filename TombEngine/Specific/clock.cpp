@@ -1,11 +1,73 @@
 #include "Specific/clock.h"
+#include "winmain.h"
+
+constexpr auto CONTROL_FRAME_TIME = 1000.0f / 30.0f;
+constexpr auto DEBUG_SKIP_FRAME_TIME = 10 * CONTROL_FRAME_TIME;
 
 // Globals
-LARGE_INTEGER PerformanceCount = {};
-double		  LdFreq		   = 0.0;
-double		  LdSync		   = 0.0;
+double LdFreq = 0.0;
+double LdSync = 0.0;
 
-int Sync()
+HighFramerateSynchronizer g_Synchronizer;
+
+void HighFramerateSynchronizer::Init()
+{
+	_controlDelay = 0;
+	_frameTime = 0;
+
+	_lastTime.QuadPart = 0;
+	_currentTime.QuadPart = 0;
+	_frequency.QuadPart = 0;
+
+	QueryPerformanceFrequency(&_frequency);
+	QueryPerformanceCounter(&_lastTime);
+}
+
+void HighFramerateSynchronizer::Sync()
+{
+	if (App.ResetClock)
+	{
+		App.ResetClock = false;
+		QueryPerformanceCounter(&_lastTime);
+		_currentTime = _lastTime;
+		_controlDelay = 0;
+		_frameTime = 0;
+	}
+	else
+	{
+		QueryPerformanceCounter(&_currentTime);
+		_frameTime = (_currentTime.QuadPart - _lastTime.QuadPart) * 1000.0 / _frequency.QuadPart;
+		_lastTime = _currentTime;
+		_controlDelay += _frameTime;
+	}
+}
+
+bool HighFramerateSynchronizer::Synced()
+{
+#if _DEBUG
+	if (_controlDelay >= DEBUG_SKIP_FRAME_TIME)
+	{
+		TENLog("Game loop is running too slow.", LogLevel::Warning);
+		App.ResetClock = true;
+		return false;
+	}
+#endif
+
+	return (_controlDelay >= CONTROL_FRAME_TIME);
+}
+
+void HighFramerateSynchronizer::Step()
+{
+	_controlDelay -= CONTROL_FRAME_TIME;
+}
+
+float HighFramerateSynchronizer::GetInterpolationFactor()
+{
+	return std::min((float)_controlDelay / (float)CONTROL_FRAME_TIME, 1.0f);
+}
+
+
+int TimeSync()
 {
 	auto ct = LARGE_INTEGER{};
 	QueryPerformanceCounter(&ct);

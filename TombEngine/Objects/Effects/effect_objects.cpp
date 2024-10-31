@@ -1,8 +1,9 @@
 #include "Objects/Effects/effect_objects.h"
 
 #include "Game/Setup.h"
-#include "Objects/Effects/flame_emitters.h"
 #include "Objects/Effects/enemy_missile.h"
+#include "Objects/Effects/flame_emitters.h"
+#include "Objects/Effects/LensFlare.h"
 
 using namespace TEN::Entities::Effects;
 
@@ -53,4 +54,8 @@ void InitializeEffectsObjects()
 		obj->collision = nullptr;
 		obj->control = ControlEnemyMissile;
 	}
+
+	obj = &Objects[ID_LENS_FLARE];
+	if (obj->loaded)
+		obj->control = ControlLensFlare;
 }

@@ -49,6 +49,22 @@ Vector2i GetScreenResolution()
 	return resolution;
 }
 
+int GetCurrentScreenRefreshRate()
+{
+	DEVMODE devmode;
+	memset(&devmode, 0, sizeof(devmode));
+	devmode.dmSize = sizeof(devmode);
+	
+	if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devmode))
+	{
+		return devmode.dmDisplayFrequency;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 std::vector<Vector2i> GetAllSupportedScreenResolutions()
 {
 	auto resList = std::vector<Vector2i>{};
@@ -129,17 +145,6 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 			SuspendThread((HANDLE)ThreadHandle);
 			g_Renderer.ToggleFullScreen();
 			ResumeThread((HANDLE)ThreadHandle);
-
-			if (g_Renderer.IsFullsScreen())
-			{
-				SetCursor(nullptr);
-				ShowCursor(false);
-			}
-			else
-			{
-				SetCursor(LoadCursorA(App.hInstance, (LPCSTR)0x68));
-				ShowCursor(true);
-			}
 		}
 	}
 }
@@ -152,6 +157,21 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
 	{
 		return 0;
+	}
+	
+	if (msg == WM_SETCURSOR)
+	{
+		if (LOWORD(lParam) == HTCLIENT)
+		{
+			SetCursor(g_Renderer.IsFullsScreen() ? nullptr : App.WindowClass.hCursor);
+			return 1;
+		}
+	}
+
+	if (msg == WM_ACTIVATEAPP)
+	{
+		App.ResetClock = true;
+		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
 	}
 
 	if (msg > WM_CLOSE)
@@ -337,7 +357,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	App.WindowClass.lpfnWndProc = WinAppProc;
 	App.WindowClass.cbClsExtra = 0;
 	App.WindowClass.cbWndExtra = 0;
-	App.WindowClass.hCursor = LoadCursor(App.hInstance, IDC_ARROW);
+	App.WindowClass.hCursor = LoadCursorA(NULL, IDC_ARROW);
 
 	// Register main window.
 	if (!RegisterClass(&App.WindowClass))
@@ -428,8 +448,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		UpdateWindow(WindowsHandle);
 		ShowWindow(WindowsHandle, nShowCmd);
 
-		SetCursor(NULL);
-		ShowCursor(FALSE);
 		hAccTable = LoadAccelerators(hInstance, (LPCSTR)0x65);
 	}
 	catch (std::exception& ex)

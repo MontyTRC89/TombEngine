@@ -140,6 +140,8 @@ namespace TEN::Entities::TR4
 
 			if (beetle->On)
 			{
+				beetle->StoreInterpolationData();
+
 				auto oldPos = beetle->Pose.Position;
 
 				beetle->Pose.Position.x += beetle->Velocity * phd_sin(beetle->Pose.Orientation.y);

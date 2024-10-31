@@ -48,9 +48,10 @@ public:
 	void Destroy();
 
 	[[nodiscard]] Vec3 GetPos() const;
-	[[nodiscard]] Vec3 GetJointPos(int index) const;
+	[[nodiscard]] Vec3 GetJointPos(int index, sol::optional<Vec3> offset) const;
 	void SetPos(const Vec3& pos, sol::optional<bool> updateRoom);
 
+	[[nodiscard]] Rotation GetJointRot(int index) const;
 	[[nodiscard]] Rotation GetRot() const;
 	void SetRot(const Rotation& rot);
 

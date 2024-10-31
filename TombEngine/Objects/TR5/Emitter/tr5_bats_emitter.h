@@ -17,8 +17,14 @@ struct BatData
 	byte ZTarget;
 
 	byte Flags;
+	
+	Matrix Transform	 = Matrix::Identity;
+	Matrix PrevTransform = Matrix::Identity;
 
-	Matrix Transform;
+	void StoreInterpolationData()
+	{
+		PrevTransform = Transform;
+	}
 };
 
 extern int NextBat;

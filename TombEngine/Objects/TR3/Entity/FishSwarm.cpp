@@ -181,7 +181,7 @@ namespace TEN::Entities::Creatures::TR3
 		// Follow path.
 		if (item.AIBits && !item.ItemFlags[4])
 		{
-			FindAITargetObject(&creature, ID_AI_FOLLOW, item.ItemFlags[3] + item.ItemFlags[2], false);
+			FindAITargetObject(item, ID_AI_FOLLOW, item.ItemFlags[3] + item.ItemFlags[2], false);
 
 			if (creature.AITarget->TriggerFlags == (item.ItemFlags[3] + item.ItemFlags[2]) &&
 				creature.AITarget->ObjectNumber == ID_AI_FOLLOW)
@@ -257,6 +257,8 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			if (fish.Life <= 0.0f)
 				continue;
+
+			fish.StoreInterpolationData();
 
 			// Increase separation distance for each fish.
 			float separationDist = FISH_BASE_SEPARATION_DISTANCE + (fishID * 3);
@@ -413,6 +415,8 @@ namespace TEN::Entities::Creatures::TR3
 			fish.Undulation += std::clamp(movementValue / 2, 0.3f, 1.0f);
 			if (fish.Undulation > PI_MUL_2)
 				fish.Undulation -= PI_MUL_2;
+
+			fish.Transform = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
 		}
 	}
 

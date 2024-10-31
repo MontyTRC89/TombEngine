@@ -16,16 +16,16 @@ constexpr auto MAX_STATICS = 1000;
 
 enum JointRotationFlags
 {
-	ROT_X = (1 << 2),
-	ROT_Y = (1 << 3),
-	ROT_Z = (1 << 4)
+	ROT_X = 1 << 2,
+	ROT_Y = 1 << 3,
+	ROT_Z = 1 << 4
 };
 
 // Unused.
 enum ShatterFlags
 {
-	NoCollision = (1 << 0),
-	Shatterable = (1 << 1)
+	NoCollision = 1 << 0,
+	Shatterable = 1 << 1
 };
 
 // Custom LOT definition for Creature. Used in InitializeSlot() in lot.cpp.
@@ -39,10 +39,11 @@ enum class LotType
 	HumanPlusJump,
 	HumanPlusJumpAndMonkey,
 	Flyer,
-	Blockable,	  // For large creatures such as trex and shiva.
-	Spider,		  // Only 2 block vault allowed.
-	Ape,		  // Only 2 block vault allowed.
-	SnowmobileGun // Only 1 block vault allowed and 4 block drop max.
+	Blockable,	   // For large creatures such as trex and shiva.
+	Spider,		   // Only 2 block vault allowed.
+	Ape,		   // Only 2 block vault allowed.
+	SnowmobileGun, // Only 1 block vault allowed and 4 block drop max.
+	EnemyJeep
 };
 
 enum class HitEffect

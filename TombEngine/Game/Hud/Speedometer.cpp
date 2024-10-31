@@ -2,8 +2,11 @@
 
 #include "Game/effects/DisplaySprite.h"
 #include "Specific/clock.h"
+#include "Renderer/Renderer.h"
 
 using namespace TEN::Effects::DisplaySprite;
+
+using TEN::Renderer::g_Renderer;
 
 namespace TEN::Hud
 {
@@ -25,6 +28,8 @@ namespace TEN::Hud
 			return;
 		}
 
+		StoreInterpolationData();
+
 		// Update life and updated value status.
 		_life = std::clamp(_life + (_hasValueUpdated ? 1.0f : -1.0f), 0.0f, LIFE_MAX * FPS);
 		_hasValueUpdated = false;
@@ -41,7 +46,7 @@ namespace TEN::Hud
 	void SpeedometerController::Draw() const
 	{
 		constexpr auto POS						 = Vector2(DISPLAY_SPACE_RES.x - (DISPLAY_SPACE_RES.x / 6), DISPLAY_SPACE_RES.y - (DISPLAY_SPACE_RES.y / 10));
-		constexpr auto ORIENT_OFFSET			 = ANGLE(90.0f);
+		constexpr auto POINTER_ANGLE_OFFSET		 = ANGLE(90.0f);
 		constexpr auto SCALE					 = Vector2(0.35f);
 		constexpr auto DIAL_ELEMENT_SPRITE_ID	 = 0;
 		constexpr auto POINTER_ELEMENT_SPRITE_ID = 1;
@@ -53,19 +58,22 @@ namespace TEN::Hud
 		if (_life <= 0.0f)
 			return;
 
-		auto color = Color(1.0f, 1.0f, 1.0f, _opacity);
+		short pointerAngle = (short)Lerp(_prevPointerAngle, _pointerAngle, g_Renderer.GetInterpolationFactor());
+		auto color = Color(1.0f, 1.0f, 1.0f, Lerp(_prevOpacity, _opacity, g_Renderer.GetInterpolationFactor()));
 
 		// Draw dial.
 		AddDisplaySprite(
 			ID_SPEEDOMETER, DIAL_ELEMENT_SPRITE_ID,
 			POS, 0, SCALE, color,
-			DIAL_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend);
+			DIAL_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend,
+			DisplaySpritePhase::Draw);
 
 		// Draw pointer.
 		AddDisplaySprite(
 			ID_SPEEDOMETER, POINTER_ELEMENT_SPRITE_ID,
-			POS, _pointerAngle + ORIENT_OFFSET, SCALE, color,
-			POINTER_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend);
+			POS, pointerAngle + POINTER_ANGLE_OFFSET, SCALE, color,
+			POINTER_PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fit, BlendMode::AlphaBlend,
+			DisplaySpritePhase::Draw);
 	}
 
 	void SpeedometerController::Clear()

@@ -19,7 +19,8 @@ enum class AnimCommandType
 	AttackReady,
 	Deactivate,
 	SoundEffect,
-	Flipeffect
+	Flipeffect,
+	DisableInterpolation
 };
 
 struct AnimFrame

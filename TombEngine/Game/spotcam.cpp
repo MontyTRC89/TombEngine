@@ -233,6 +233,8 @@ void InitializeSpotCam(short Sequence)
 			CameraFOV[1] = SpotCam[CurrentSplineCamera].fov;
 			CameraSpeed[1] = SpotCam[CurrentSplineCamera].speed;
 
+			Camera.DisableInterpolation = true;
+
 			SplineFromCamera = 0;
 
 			int cn = CurrentSplineCamera;
@@ -384,6 +386,7 @@ void CalculateSpotCameras()
 	{
 		SetScreenFadeIn(FADE_SCREEN_SPEED);
 		CameraFade = CurrentSplineCamera;
+		Camera.DisableInterpolation = true;
 	}
 
 	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_OUT) &&
@@ -391,6 +394,7 @@ void CalculateSpotCameras()
 	{
 		SetScreenFadeOut(FADE_SCREEN_SPEED);
 		CameraFade = CurrentSplineCamera;
+		Camera.DisableInterpolation = true;
 	}
 
 	sp = 0;
@@ -483,11 +487,19 @@ void CalculateSpotCameras()
 		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
 		if (outsideRoom == NO_VALUE)
 		{
+			if (Camera.pos.RoomNumber != SpotCam[CurrentSplineCamera].roomNumber)
+				Camera.DisableInterpolation = true;
+		
 			Camera.pos.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
 			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
 		}
 		else
+		{
+			if (Camera.pos.RoomNumber != outsideRoom)
+				Camera.DisableInterpolation = true;
+
 			Camera.pos.RoomNumber = outsideRoom;
+		}
 
 		AlterFOV(cfov, false);
 
@@ -570,6 +582,8 @@ void CalculateSpotCameras()
 					{
 						cn = FirstCamera + SpotCam[CurrentSplineCamera].timer;
 
+						Camera.DisableInterpolation = true;
+
 						CameraXposition[1] = SpotCam[cn].x;
 						CameraYposition[1] = SpotCam[cn].y;
 						CameraZposition[1] = SpotCam[cn].z;
@@ -630,7 +644,10 @@ void CalculateSpotCameras()
 				SpotcamPaused = 0;
 
 				if (LastCamera >= CurrentSplineCamera)
+				{
+					Camera.DisableInterpolation = true;
 					return;
+				}
 
 				if (s->flags & SCF_LOOP_SEQUENCE)
 				{
@@ -661,6 +678,7 @@ void CalculateSpotCameras()
 
 					SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
+					Camera.DisableInterpolation = true;
 					UseSpotCam = false;
 					Lara.Control.IsLocked = false;
 					CheckTrigger = false;

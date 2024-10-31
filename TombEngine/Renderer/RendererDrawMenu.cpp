@@ -201,14 +201,19 @@ namespace TEN::Renderer
 			// Enable SSAO
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AMBIENT_OCCLUSION), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAmbientOcclusion), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
+			GetNextLinePosition(&y);
+
+			// Enable high framerate
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_HIGH_FRAMERATE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableHighFramerate), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
 			GetNextBlockPosition(&y);
 
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 6));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 7));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 7));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 8));
 			break;
 
 		case Menu::OtherSettings:
@@ -273,17 +278,12 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 9));
 			GetNextLinePosition(&y);
 
-			// Menu option looping
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MENU_OPT_LOOP), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 10));
-			AddString(MenuRightSideEntry, y, Str_MenuOptionLoopingMode(g_Gui.GetCurrentSettings().Configuration.MenuOptionLoopingMode), PRINTSTRING_COLOR_WHITE, SF(titleOption == 10));
-			GetNextBlockPosition(&y);
-
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 11));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 10));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 12));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 11));
 			break;
 
 		case Menu::GeneralActions:
@@ -564,6 +564,8 @@ namespace TEN::Renderer
 			RenderOptionsMenu(menu, MenuVerticalOptionsTitle);
 			break;
 		}
+
+		DrawAllStrings();
 	}
 
 	void Renderer::RenderPauseMenu(Menu menu)
@@ -740,13 +742,18 @@ namespace TEN::Renderer
 		constexpr auto COUNT_STRING_INF	   = "Inf";
 		constexpr auto COUNT_STRING_OFFSET = Vector2(DISPLAY_SPACE_RES.x / 40, 0.0f);
 
+		auto pos = Vector2::Lerp(pickup.PrevPosition, pickup.Position, _interpolationFactor);
+		auto orient = EulerAngles::Lerp(pickup.PrevOrientation, pickup.Orientation, _interpolationFactor);
+		float scale = Lerp(pickup.PrevScale, pickup.Scale, _interpolationFactor);
+		float opacity = Lerp(pickup.PrevOpacity, pickup.Opacity, _interpolationFactor);
+
 		// Draw display pickup.
-		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
+		DrawObjectIn2DSpace(pickup.ObjectID, pos, orient, scale);
 
 		// Draw count string.
 		if (pickup.Count != 1)
 		{
-			auto countString = (pickup.Count != -1) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
+			auto countString = (pickup.Count != NO_VALUE) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
 			auto countStringPos = pickup.Position + COUNT_STRING_OFFSET;
 
 			AddString(countString, countStringPos, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
@@ -898,7 +905,7 @@ namespace TEN::Renderer
 
 			DrawFullScreenImage(texture.ShaderResourceView.Get(), Smoothstep(currentFade), _backBuffer.RenderTargetView.Get(), _backBuffer.DepthStencilView.Get());
 			Synchronize();
-			_swapChain->Present(0, 0);
+			_swapChain->Present(1, 0);
 			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		}
 	}
@@ -909,28 +916,29 @@ namespace TEN::Renderer
 
 		static EulerAngles orient = EulerAngles::Identity;
 		static float scaler = 1.2f;
+		float multiplier = g_Renderer.GetFramerateMultiplier();
 
 		short invItem = g_Gui.GetRing(RingTypes::Inventory).CurrentObjectList[g_Gui.GetRing(RingTypes::Inventory).CurrentObjectInList].InventoryItem;
 
 		auto& object = InventoryObjectTable[invItem];
 
 		if (IsHeld(In::Forward))
-			orient.x += ANGLE(3.0f);
+			orient.x += ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Back))
-			orient.x -= ANGLE(3.0f);
+			orient.x -= ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Left))
-			orient.y += ANGLE(3.0f);
+			orient.y += ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Right))
-			orient.y -= ANGLE(3.0f);
+			orient.y -= ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Sprint))
-			scaler += 0.03f;
+			scaler += 0.03f / multiplier;
 
 		if (IsHeld(In::Crouch))
-			scaler -= 0.03f;
+			scaler -= 0.03f / multiplier;
 
 		if (scaler > 1.6f)
 			scaler = 1.6f;
@@ -978,6 +986,9 @@ namespace TEN::Renderer
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 		_context->RSSetViewports(1, &_viewport);
 		ResetScissor();
+
+		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), Colors::Black);
 
 		if (background != nullptr)
 		{
@@ -1113,7 +1124,7 @@ namespace TEN::Renderer
 			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
 				DrawLoadingBar(percentage);
 
-			_swapChain->Present(0, 0);
+			_swapChain->Present(1, 0);
 			_context->ClearState();
 
 			Synchronize();
@@ -1124,25 +1135,42 @@ namespace TEN::Renderer
 
 	void Renderer::RenderInventory()
 	{
+		if (_graphicsSettingsChanged)
+		{
+			UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
+			Camera.DisableInterpolation = true;
+			DumpGameScene();
+		}
+
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 
+		// Reset GPU state.
+		SetBlendMode(BlendMode::Opaque, true);
+		SetDepthState(DepthState::Write, true);
+		SetCullMode(CullMode::CounterClockwise, true);
+
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 0.5f);
 
-		_swapChain->Present(0, 0);
+		_swapChain->Present(1, 0);
 	}
 
-	void Renderer::RenderTitle()
+	void Renderer::RenderTitle(float interpFactor)
 	{
-		RenderScene(&_dumpScreenRenderTarget, false, _gameCamera);
+		_stringsToDraw.clear();
+		_isLocked = false;
+
+		InterpolateCamera(interpFactor);
+		DumpGameScene();
 
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 1.0f);
-		DrawAllStrings();
+		
+		_swapChain->Present(1, 0);
 
-		_swapChain->Present(0, 0);
+		_isLocked = true;
 	}
 
 	void Renderer::DrawDebugInfo(RenderView& view)
@@ -1246,7 +1274,7 @@ namespace TEN::Renderer
 			PrintDebugMessage("Orientation: %d, %d, %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
 			PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
 			PrintDebugMessage("PathfindingBoxID: %d", LaraItem->BoxNumber);
-			PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
+			PrintDebugMessage((Lara.Context.WaterSurfaceDist == -NO_HEIGHT ? "WaterSurfaceDist: N/A" : "WaterSurfaceDist: %d"), Lara.Context.WaterSurfaceDist);
 			PrintDebugMessage("Room Position: %d, %d, %d, %d", room.Position.z, room.Position.z, room.Position.z + BLOCK(room.XSize), room.Position.z + BLOCK(room.ZSize));
 			PrintDebugMessage("Room.y, minFloor, maxCeiling: %d, %d, %d ", room.Position.y, room.BottomHeight, room.TopHeight);
 			PrintDebugMessage("Camera Position: %d, %d, %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);

@@ -15,10 +15,12 @@ struct WINAPP
     HWND WindowHandle;
     bool bNoFocus;
     bool isInScene;
+    bool ResetClock;
 };
 
 extern bool DebugMode;
 extern HWND WindowsHandle;
+extern WINAPP App;
 
 // return handle
 #define BeginThread(function, threadid) _beginthreadex(0, 0, &function, 0, 0, &threadid)
@@ -31,3 +33,4 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void CALLBACK HandleWmCommand(unsigned short wParam);
 Vector2i GetScreenResolution();
 std::vector<Vector2i> GetAllSupportedScreenResolutions();
+int GetCurrentScreenRefreshRate();
