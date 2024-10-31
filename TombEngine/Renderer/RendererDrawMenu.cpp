@@ -1351,6 +1351,10 @@ namespace TEN::Renderer
 			PrintDebugMessage("WIREFRAME MODE");
 			break;
 
+		case RendererDebugPage::PortalDebug:
+			PrintDebugMessage("PORTAL DEBUG");
+			break;
+
 		default:
 			break;
 		}

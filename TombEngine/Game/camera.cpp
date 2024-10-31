@@ -5,6 +5,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/control/los.h"
+#include "Game/Debug/Debug.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
@@ -21,6 +22,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/winmain.h"
 
 
 using namespace TEN::Collision::Point;
@@ -1549,6 +1551,32 @@ void UpdateCamera()
 
 	// Update cameras matrices there, after having done all the possible camera logic.
 	g_Renderer.UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
+
+	DrawPortals();
+}
+
+void DrawPortals()
+{
+	if (!DebugMode)
+		return;
+
+	for (auto& number : g_Level.Rooms[Camera.pos.RoomNumber].NeighborRoomNumbers)
+	{
+		auto& room = g_Level.Rooms[number];
+
+		auto p = room.Position.ToVector3();
+
+		for (auto& door : room.doors)
+		{
+			DrawDebugTriangle(door.vertices[0] + p, door.vertices[1] + p, door.vertices[2] + p, Color(1.0f, 1.0f, 0.0f, 0.2f), RendererDebugPage::PortalDebug);
+			DrawDebugTriangle(door.vertices[2] + p, door.vertices[3] + p, door.vertices[0] + p, Color(1.0f, 1.0f, 0.0f, 0.2f), RendererDebugPage::PortalDebug);
+
+			auto center = p + (door.vertices[0] + door.vertices[1] + door.vertices[2] + door.vertices[3]) * 0.25f;
+			auto target = center + door.normal * 128.0f;
+
+			DrawDebugLine(center, target, Color(1.0f, 1.0f, 0.0f, 1.0f), RendererDebugPage::PortalDebug);
+		}
+	}
 }
 
 void UpdateMikePos(const ItemInfo& item)
