@@ -1557,6 +1557,9 @@ void UpdateCamera()
 
 void DrawPortals()
 {
+	static constexpr auto extColor = Color(1.0f, 1.0f, 0.0f, 0.15f);
+	static constexpr auto intColor = Color(1.0f, 0.0f, 0.0f, 0.15f);
+
 	if (!DebugMode)
 		return;
 
@@ -1565,16 +1568,17 @@ void DrawPortals()
 		auto& room = g_Level.Rooms[number];
 
 		auto p = room.Position.ToVector3();
+		auto color = number == Camera.pos.RoomNumber ? intColor : extColor;
 
 		for (auto& door : room.doors)
 		{
-			DrawDebugTriangle(door.vertices[0] + p, door.vertices[1] + p, door.vertices[2] + p, Color(1.0f, 1.0f, 0.0f, 0.2f), RendererDebugPage::PortalDebug);
-			DrawDebugTriangle(door.vertices[2] + p, door.vertices[3] + p, door.vertices[0] + p, Color(1.0f, 1.0f, 0.0f, 0.2f), RendererDebugPage::PortalDebug);
+			DrawDebugTriangle(door.vertices[0] + p, door.vertices[1] + p, door.vertices[2] + p, color, RendererDebugPage::PortalDebug);
+			DrawDebugTriangle(door.vertices[2] + p, door.vertices[3] + p, door.vertices[0] + p, color, RendererDebugPage::PortalDebug);
 
 			auto center = p + (door.vertices[0] + door.vertices[1] + door.vertices[2] + door.vertices[3]) * 0.25f;
 			auto target = center + door.normal * 128.0f;
 
-			DrawDebugLine(center, target, Color(1.0f, 1.0f, 0.0f, 1.0f), RendererDebugPage::PortalDebug);
+			DrawDebugLine(center, target, color, RendererDebugPage::PortalDebug);
 		}
 	}
 }
