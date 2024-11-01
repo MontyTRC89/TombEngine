@@ -139,11 +139,35 @@
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD "$(ProjectDir)..\Documentation\"
-CALL compile.bat .
+      <Command>SETLOCAL EnableDelayedExpansion
 
-CD "$(ProjectDir)Specific\savegame\schema\"
-CALL gen.bat
+SET SchemaDir=$(ProjectDir)Specific\savegame\schema
+SET TimestampFile=$(TargetDir)flatbuffers.timestamp
+
+FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
+    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
+)
+
+IF EXIST "%TimestampFile%" (
+    SET /P LastTimestamp=&lt;"%TimestampFile%"
+)
+
+SET CurrentTimestamp=%CurrentTimestamp: =%
+SET LastTimestamp=%LastTimestamp: =%
+
+IF "%CurrentTimestamp%" == "%LastTimestamp%" (
+    ECHO Skipping gen.bat, schema files are unchanged
+) ELSE (
+    ECHO Generating savegame code from flatbuffer schema...
+    CD "%SchemaDir%"
+    CALL gen.bat
+    ECHO !CurrentTimestamp! &gt; "%TimestampFile%"
+)
+
+ENDLOCAL
+
+CD "$(ProjectDir)..\Documentation\"
+CALL compile.bat .
 
 SET BuildDir=$(SolutionDir)Build\$(Configuration)
 SET ShaderDir=%BuildDir%\Shaders
@@ -204,11 +228,35 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD "$(ProjectDir)..\Documentation\"
-CALL compile.bat .
+      <Command>SETLOCAL EnableDelayedExpansion
 
-CD "$(ProjectDir)Specific\savegame\schema\"
-CALL gen.bat
+SET SchemaDir=$(ProjectDir)Specific\savegame\schema
+SET TimestampFile=$(TargetDir)flatbuffers.timestamp
+
+FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
+    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
+)
+
+IF EXIST "%TimestampFile%" (
+    SET /P LastTimestamp=&lt;"%TimestampFile%"
+)
+
+SET CurrentTimestamp=%CurrentTimestamp: =%
+SET LastTimestamp=%LastTimestamp: =%
+
+IF "%CurrentTimestamp%" == "%LastTimestamp%" (
+    ECHO Skipping gen.bat, schema files are unchanged
+) ELSE (
+    ECHO Generating savegame code from flatbuffer schema...
+    CD "%SchemaDir%"
+    CALL gen.bat
+    ECHO !CurrentTimestamp! &gt; "%TimestampFile%"
+)
+
+ENDLOCAL
+
+CD "$(ProjectDir)..\Documentation\"
+CALL compile.bat .
 
 SET BuildDir=$(SolutionDir)Build\$(Configuration)
 SET ShaderDir=%BuildDir%\Shaders
