@@ -49,6 +49,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added the ability to change pickup item count by modifying item hit points.
 * Added F12 as alternative to PrtSc for screenshots.
 * Added visible mouse pointer in windowed mode.
+* Added portal debug mode.
 * Added new sound conditions: Quicksand and Underwater.
   - Quicksand - sound effect plays when a moveable is in quicksand.
   - Underwater - sound plays when the camera is submerged.

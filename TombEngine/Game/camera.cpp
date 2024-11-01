@@ -1563,7 +1563,10 @@ void DrawPortals()
 	if (!DebugMode)
 		return;
 
-	for (auto& number : g_Level.Rooms[Camera.pos.RoomNumber].NeighborRoomNumbers)
+	auto neighborRooms = GetNeighborRoomNumbers(Camera.pos.RoomNumber, 1);
+	neighborRooms.push_back(camera.pos.RoomNumber);
+
+	for (auto& number : neighborRooms)
 	{
 		auto& room = g_Level.Rooms[number];
 
@@ -1575,8 +1578,11 @@ void DrawPortals()
 			DrawDebugTriangle(door.vertices[0] + p, door.vertices[1] + p, door.vertices[2] + p, color, RendererDebugPage::PortalDebug);
 			DrawDebugTriangle(door.vertices[2] + p, door.vertices[3] + p, door.vertices[0] + p, color, RendererDebugPage::PortalDebug);
 
+			DrawDebugLine(door.vertices[0] + p, door.vertices[2] + p, color, RendererDebugPage::PortalDebug);
+			DrawDebugLine(door.vertices[1] + p, door.vertices[3] + p, color, RendererDebugPage::PortalDebug);
+
 			auto center = p + (door.vertices[0] + door.vertices[1] + door.vertices[2] + door.vertices[3]) * 0.25f;
-			auto target = center + door.normal * 128.0f;
+			auto target = center + door.normal * CLICK(1);
 
 			DrawDebugLine(center, target, color, RendererDebugPage::PortalDebug);
 		}

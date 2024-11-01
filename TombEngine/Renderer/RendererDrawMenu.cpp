@@ -1348,6 +1348,7 @@ namespace TEN::Renderer
 
 		case RendererDebugPage::PortalDebug:
 			PrintDebugMessage("PORTAL DEBUG");
+			PrintDebugMessage("Camera RoomNumber: %d", Camera.pos.RoomNumber);
 			PrintDebugMessage("Room collector time: %d", _timeRoomsCollector);
 			PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
 			PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);
