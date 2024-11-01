@@ -1178,7 +1178,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawDebugInfo(RenderView& view)
 	{
-		if (CurrentLevel == 0)
+		if (!DebugMode || CurrentLevel == 0)
 			return;
 
 		_currentLineHeight = DISPLAY_SPACE_RES.y / 30;
@@ -1203,7 +1203,6 @@ namespace TEN::Renderer
 			PrintDebugMessage("Update time: %d", _timeUpdate);
 			PrintDebugMessage("Frame time: %d", _timeFrame);
 			PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
-			PrintDebugMessage("Room collector time: %d", _timeRoomsCollector);
 			PrintDebugMessage("TOTAL draw calls: %d", _numDrawCalls);
 			PrintDebugMessage("    Rooms: %d", _numRoomsDrawCalls);
 			PrintDebugMessage("    Movables: %d", _numMoveablesDrawCalls);
@@ -1220,10 +1219,6 @@ namespace TEN::Renderer
 			PrintDebugMessage("    Sprites: %d", _numSortedSpritesDrawCalls);
 			PrintDebugMessage("SHADOW MAP draw calls: %d", _numShadowMapDrawCalls);
 			PrintDebugMessage("DEBRIS draw calls: %d", _numDebrisDrawCalls);
-			PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
-			PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);
-			PrintDebugMessage("    GetVisibleRooms() calls: %d", _numGetVisibleRoomsCalls);
-			PrintDebugMessage("    Dot products: %d", _numDotProducts);
 
 			_spriteBatch->Begin(SpriteSortMode_Deferred, _renderStates->Opaque());
 
@@ -1351,6 +1346,16 @@ namespace TEN::Renderer
 			PrintDebugMessage("WIREFRAME MODE");
 			break;
 
+		case RendererDebugPage::PortalDebug:
+			PrintDebugMessage("PORTAL DEBUG");
+			PrintDebugMessage("Camera RoomNumber: %d", Camera.pos.RoomNumber);
+			PrintDebugMessage("Room collector time: %d", _timeRoomsCollector);
+			PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
+			PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);
+			PrintDebugMessage("    GetVisibleRooms() calls: %d", _numGetVisibleRoomsCalls);
+			PrintDebugMessage("    Dot products: %d", _numDotProducts);
+			break;
+
 		default:
 			break;
 		}
@@ -1365,7 +1370,7 @@ namespace TEN::Renderer
 		{
 			page = (int)RendererDebugPage::Count - 1;
 		}
-		else if (page > (int)RendererDebugPage::WireframeMode)
+		else if (page >= (int)RendererDebugPage::Count)
 		{
 			page = (int)RendererDebugPage::None;
 		}
