@@ -1564,7 +1564,7 @@ void DrawPortals()
 		return;
 
 	auto neighborRooms = GetNeighborRoomNumbers(Camera.pos.RoomNumber, 1);
-	neighborRooms.push_back(camera.pos.RoomNumber);
+	neighborRooms.push_back(Camera.pos.RoomNumber);
 
 	for (auto& number : neighborRooms)
 	{
