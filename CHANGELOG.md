@@ -18,6 +18,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed ghost collision with objects with zero bounds.
 * Fixed several binocular bugs.
 * Fixed faulty death sectors.
+* Fixed shimmy softlocks around static meshes with soft collision.
 * Fixed incorrect climbing out of water on bridge objects and in front of static meshes.
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed camera rotating with the player's hips when climbing out of water.

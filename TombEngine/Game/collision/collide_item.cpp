@@ -939,6 +939,7 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData&
 
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 {
+	coll->HitStatic = false;
 	coll->HitTallObject = false;
 
 	for (auto i : g_Level.Rooms[item->RoomNumber].NeighborRoomNumbers)
@@ -948,8 +949,12 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 
 		for (auto& mesh : g_Level.Rooms[i].mesh)
 		{
-			// Only process meshes which are visible and solid.
-			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE) || !(mesh.flags & StaticMeshFlags::SM_SOLID))
+			// Only process meshes which are visible.
+			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Only process meshes which are solid, or if solid mode is set by the setup.
+			if (!coll->Setup.ForceSolidStatics && !(mesh.flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
 			float distance = Vector3i::Distance(item->Pose.Position, mesh.pos.Position);

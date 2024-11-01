@@ -141,6 +141,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForceSolidStatics = true;
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
 	int embedOffset = 4;

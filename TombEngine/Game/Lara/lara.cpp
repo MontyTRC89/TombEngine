@@ -356,6 +356,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = true;
+	coll->Setup.ForceSolidStatics = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 	coll->Setup.PrevAnimObjectID = item->Animation.AnimObjectID;
 	coll->Setup.PrevAnimNumber = item->Animation.AnimNumber;
@@ -426,6 +427,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
+	coll->Setup.ForceSolidStatics = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
 	// Handle look-around.
@@ -498,6 +500,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
+	coll->Setup.ForceSolidStatics = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
 	// Handle look-around.
