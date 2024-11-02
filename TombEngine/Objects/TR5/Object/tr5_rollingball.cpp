@@ -5,7 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -18,6 +18,8 @@
 
 using namespace TEN::Collision::Point;
 
+using namespace TEN::Collision::Sphere;
+
 constexpr auto ROLLING_BALL_MAX_VELOCITY = BLOCK(3);
 
 void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -25,7 +27,7 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 	auto* ballItem = &g_Level.Items[itemNumber];
 
 	if (!TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius) ||
-		!TestCollision(ballItem, laraItem))
+		!HandleItemSphereCollision(*ballItem, *laraItem))
 	{
 		return;
 	}
@@ -97,7 +99,10 @@ void RollingBallControl(short itemNumber)
 				item->Animation.Velocity.y = -(GetRandomControl() % int(round(item->Animation.Velocity.z) / 8.0f));
 		}
 		else
+		{
 			item->Animation.Velocity.y = -item->Animation.Velocity.y / 4.0f;
+			item->DisableInterpolation = true;
+		}
 	}
 
 	int frontX = item->Pose.Position.x;
@@ -259,23 +264,22 @@ void RollingBallControl(short itemNumber)
 		}
 	}
 
-	auto roomNumber = GetPointCollision(*item).GetRoomNumber();
-
-	if (item->RoomNumber != roomNumber)
+	auto pointColl = GetPointCollision(*item);
+	if (item->RoomNumber != pointColl.GetRoomNumber())
 	{
-		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber) &&
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointColl.GetRoomNumber()) &&
 			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber))
 		{
-			int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
+			int waterHeight = pointColl.GetWaterTopHeight();
 			SplashSetup.y = waterHeight - 1;
 			SplashSetup.x = item->Pose.Position.x;
 			SplashSetup.z = item->Pose.Position.z;
 			SplashSetup.splashPower = item->Animation.Velocity.y * 4;
 			SplashSetup.innerRadius = 160;
-			SetupSplash(&SplashSetup, roomNumber);
+			SetupSplash(&SplashSetup, pointColl.GetRoomNumber());
 		}
 
-		ItemNewRoom(itemNumber, roomNumber);
+		ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 	}
 
 	if (item->ItemFlags[0] > ROLLING_BALL_MAX_VELOCITY)
@@ -306,6 +310,8 @@ void RollingBallControl(short itemNumber)
 		}
 		else
 			item->Pose.Orientation.y = angle;
+
+		item->DisableInterpolation = true;
 	}
 
 	item->Pose.Orientation.x -= ((abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2) / vDivider;
@@ -323,7 +329,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 		if (!TestBoundsCollide(item, lara, coll->Setup.Radius))
 			return;
 
-		if (!TestCollision(item, lara))
+		if (!HandleItemSphereCollision(*item, *lara))
 			return;
 
 		if (lara->Animation.IsAirborne)

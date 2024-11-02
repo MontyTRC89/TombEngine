@@ -62,6 +62,8 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				{
 					UpdateItemRoom(item.Index);
 				}
+
+				item.DisableInterpolation = true;
 			}
 
 			commandDataPtr += 3;
@@ -208,6 +210,13 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				DoFlipEffect((commandDataPtr[1] & 0x3FFF), &item);
 
 			commandDataPtr += 2;
+			break;
+
+		case AnimCommandType::DisableInterpolation:
+			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+				item.DisableInterpolation = true;
+
+			commandDataPtr += 1;
 			break;
 
 		default:
@@ -711,7 +720,7 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset)
 {
 	// Use matrices done in renderer to transform relative offset.
-	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
+	return Vector3i(g_Renderer.GetMoveableBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
 }
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
@@ -737,16 +746,9 @@ Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
 }
 
-Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex)
+Quaternion GetBoneOrientation(const ItemInfo& item, int boneID)
 {
-	static const auto REF_DIRECTION = Vector3::UnitZ;
-
-	auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex);
-	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex, REF_DIRECTION);
-
-	auto direction = target - origin;
-	direction.Normalize();
-	return Geometry::ConvertDirectionToQuat(direction);
+	return g_Renderer.GetMoveableBoneOrientation(item.Index, boneID);
 }
 
 // NOTE: Will not work for bones at ends of hierarchies.

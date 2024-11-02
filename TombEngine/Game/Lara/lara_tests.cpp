@@ -141,6 +141,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForceSolidStatics = true;
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
 	int embedOffset = 4;
@@ -924,22 +925,39 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	if (coll->Middle.Ceiling > -STEPUP_HEIGHT)
 		return false;
 
-	int frontFloor = coll->Front.Floor + LARA_HEIGHT_TREAD;
-	if (coll->Front.Bridge == NO_VALUE &&
-		(frontFloor <= -CLICK(2) ||
-		frontFloor > CLICK(1.25f) - 4))
+	// HACK: Probe at incremetal height steps to account for room stacks. -- Sezz 2024.10.28
+	int frontFloor = NO_HEIGHT;
+	if (coll->Front.Bridge != NO_VALUE)
 	{
-		return false;
+		auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, BLOCK(0.2f), -BLOCK(0.5f));
+		frontFloor = (pointColl.GetFloorHeight() - item->Pose.Position.y);
+	}
+	else
+	{
+		int yOffset = CLICK(1.25f);
+		while (yOffset > -CLICK(2))
+		{
+			auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, BLOCK(0.2f), yOffset);
+
+			frontFloor = pointColl.GetFloorHeight() - item->Pose.Position.y;
+			if (frontFloor > -CLICK(2) &&
+				frontFloor <= (CLICK(1.25f) - 4))
+			{
+				break;
+			}
+
+			yOffset -= CLICK(0.5f);
+		}
 	}
 
 	// Extra bridge check.
 	if (coll->Front.Bridge != NO_VALUE)
 	{
-		int bridgeBorder = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
+		frontFloor = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
 		
-		frontFloor = bridgeBorder - CLICK(0.5f);
-		if (frontFloor <= -CLICK(2) ||
-			frontFloor > CLICK(1.25f) - 4)
+		int bridgeBorder = frontFloor - CLICK(0.5f);
+		if (bridgeBorder <= -CLICK(2) ||
+			bridgeBorder > CLICK(1.25f) - 4)
 		{
 			return false;
 		}
@@ -1087,15 +1105,13 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	auto pointColl = GetPointCollision(*item);
-	int waterDepth = GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, pointColl.GetRoomNumber());
 
-	if (waterDepth == NO_HEIGHT)
+	if (pointColl.GetWaterBottomHeight() == NO_HEIGHT)
 	{
 		item->Animation.Velocity.y = 0.0f;
 		item->Pose.Position = coll->Setup.PrevPosition;
 	}
-
-	else if (waterDepth <= (LARA_HEIGHT - (LARA_HEADROOM / 2)))
+	else if (pointColl.GetWaterBottomHeight() <= (LARA_HEIGHT - (LARA_HEADROOM / 2)))
 	{
 		SetAnimation(item, LA_UNDERWATER_TO_STAND);
 		ResetPlayerLean(item);

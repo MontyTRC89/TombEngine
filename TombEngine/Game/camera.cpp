@@ -5,6 +5,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/control/los.h"
+#include "Game/Debug/Debug.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
@@ -21,6 +22,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/winmain.h"
 
 
 using namespace TEN::Collision::Point;
@@ -166,7 +168,7 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 	bool isInSwamp = TestEnvironment(ENV_FLAG_SWAMP, item.RoomNumber);
 	auto basePos = Vector3i(
 		item.Pose.Position.x,
-		isInSwamp ? g_Level.Rooms[item.RoomNumber].maxceiling : item.Pose.Position.y,
+		isInSwamp ? g_Level.Rooms[item.RoomNumber].TopHeight : item.Pose.Position.y,
 		item.Pose.Position.z);
 
 	// Define landmarks.
@@ -194,15 +196,8 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 
 void LookAt(CAMERA_INFO* cam, short roll)
 {
-	auto pos = cam->pos.ToVector3();
-	auto target = cam->target.ToVector3();
-	auto up = Vector3::Down;
-	float fov = TO_RAD(CurrentFOV / 1.333333f);
-	float r = TO_RAD(roll);
-
-	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(BLOCK(1));
-
-	g_Renderer.UpdateCameraMatrices(cam, r, fov, levelFarView);
+	cam->Fov = TO_RAD(CurrentFOV / 1.333333f);
+	cam->Roll = TO_RAD(roll);
 }
 
 void AlterFOV(short value, bool store)
@@ -248,13 +243,13 @@ void InitializeCamera()
 
 	Camera.targetDistance = BLOCK(1.5f);
 	Camera.item = nullptr;
-	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
 	Camera.speed = 1;
 	Camera.flags = CF_NONE;
 	Camera.bounce = 0;
 	Camera.number = -1;
 	Camera.fixedCamera = false;
+	Camera.DisableInterpolation = true;
 
 	AlterFOV(ANGLE(DEFAULT_FOV));
 
@@ -343,7 +338,7 @@ void MoveCamera(GameVector* ideal, int speed)
 
 	int y = Camera.pos.y;
 	if (TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber))
-		y = g_Level.Rooms[Camera.pos.RoomNumber].y - CLICK(1);
+		y = g_Level.Rooms[Camera.pos.RoomNumber].Position.y - CLICK(1);
 
 	auto pointColl = GetPointCollision(Vector3i(Camera.pos.x, y, Camera.pos.z), Camera.pos.RoomNumber);
 	if (y < pointColl.GetCeilingHeight() ||
@@ -534,7 +529,7 @@ void ChaseCamera(ItemInfo* item)
 	auto pointColl = GetPointCollision(Vector3i(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z), Camera.target.RoomNumber);
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.GetRoomNumber()))
-		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].maxceiling - CLICK(1);
+		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].TopHeight - CLICK(1);
 
 	int y = Camera.target.y;
 	pointColl = GetPointCollision(Vector3i(Camera.target.x, y, Camera.target.z), Camera.target.RoomNumber);
@@ -652,7 +647,7 @@ void CombatCamera(ItemInfo* item)
 
 	auto pointColl = GetPointCollision(Vector3i(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z), Camera.target.RoomNumber);
 	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.GetRoomNumber()))
-		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].y - CLICK(1);
+		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].Position.y - CLICK(1);
 
 	pointColl = GetPointCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber);
 	Camera.target.RoomNumber = pointColl.GetRoomNumber();
@@ -952,8 +947,18 @@ void BinocularCamera(ItemInfo* item)
 			player.Inventory.IsBusy = false;
 
 			Camera.type = BinocularOldCamera;
+			Camera.target = LastTarget;
 			AlterFOV(LastFOV);
 			return;
+		}
+
+		if (IsHeld(In::Action))
+		{
+			ClearAction(In::Action);
+
+			auto origin = Camera.pos.ToVector3i();
+			auto target = Camera.target.ToVector3i();
+			LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
 		}
 	}
 
@@ -1022,13 +1027,6 @@ void BinocularCamera(ItemInfo* item)
 	Camera.oldType = Camera.type;
 
 	GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
-
-	if (IsHeld(In::Action))
-	{
-		auto origin = Camera.pos.ToVector3i();
-		auto target = Camera.target.ToVector3i();
-		LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
-	}
 }
 
 void ConfirmCameraTargetPos()
@@ -1168,7 +1166,6 @@ void CalculateCamera(const CollisionInfo& coll)
 				Lara.ExtraTorsoRot.x = Lara.ExtraHeadRot.x;
 
 				Lara.Control.Look.Orientation = lookOrient;
-
 				Camera.type = CameraType::Look;
 				Camera.item->LookedAt = true;
 			}
@@ -1291,6 +1288,8 @@ void CalculateCamera(const CollisionInfo& coll)
 
 	Camera.fixedCamera = isFixedCamera;
 	Camera.last = Camera.number;
+	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
+	Camera.lastType = Camera.type;
 
 	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) &&
 		LaraItem->HitPoints > 0)
@@ -1393,7 +1392,7 @@ bool CheckItemCollideCamera(ItemInfo* item)
 static std::vector<int> FillCollideableItemList()
 {
 	auto itemList = std::vector<int>{};
-	auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
+	auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].NeighborRoomNumbers;
 
 	for (short i = 0; i < g_Level.NumItems; i++)
 	{
@@ -1443,7 +1442,7 @@ bool CheckStaticCollideCamera(MESH_INFO* mesh)
 std::vector<MESH_INFO*> FillCollideableStaticsList()
 {
 	std::vector<MESH_INFO*> staticList;
-	auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].neighbors;
+	auto& roomList = g_Level.Rooms[Camera.pos.RoomNumber].NeighborRoomNumbers;
 
 	for (int i : roomList)
 	{
@@ -1518,6 +1517,78 @@ void ItemsCollideCamera()
 	staticList.clear();
 }
 
+void PrepareCamera()
+{
+	if (TrackCameraInit)
+	{
+		UseSpotCam = false;
+		AlterFOV(LastFOV);
+	}
+}
+
+void UpdateCamera()
+{
+	// HACK: Disable interpolation when switching to/from flyby camera.
+	// When camera structs are converted to a class, this should go to getter/setter. -- Lwmte, 29.10.2024
+	static bool spotcamSwitched = false;
+	if (UseSpotCam != spotcamSwitched)
+	{
+		Camera.DisableInterpolation = true;
+		spotcamSwitched = UseSpotCam;
+	}
+
+	if (UseSpotCam)
+	{
+		// Draw flyby cameras.
+		CalculateSpotCameras();
+	}
+	else
+	{
+		// Do the standard camera.
+		TrackCameraInit = false;
+		CalculateCamera(LaraCollision);
+	}
+
+	// Update cameras matrices there, after having done all the possible camera logic.
+	g_Renderer.UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
+
+	DrawPortals();
+}
+
+void DrawPortals()
+{
+	static constexpr auto extColor = Color(1.0f, 1.0f, 0.0f, 0.15f);
+	static constexpr auto intColor = Color(1.0f, 0.0f, 0.0f, 0.15f);
+
+	if (!DebugMode)
+		return;
+
+	auto neighborRooms = GetNeighborRoomNumbers(Camera.pos.RoomNumber, 1);
+	neighborRooms.push_back(Camera.pos.RoomNumber);
+
+	for (auto& number : neighborRooms)
+	{
+		auto& room = g_Level.Rooms[number];
+
+		auto p = room.Position.ToVector3();
+		auto color = number == Camera.pos.RoomNumber ? intColor : extColor;
+
+		for (auto& door : room.doors)
+		{
+			DrawDebugTriangle(door.vertices[0] + p, door.vertices[1] + p, door.vertices[2] + p, color, RendererDebugPage::PortalDebug);
+			DrawDebugTriangle(door.vertices[2] + p, door.vertices[3] + p, door.vertices[0] + p, color, RendererDebugPage::PortalDebug);
+
+			DrawDebugLine(door.vertices[0] + p, door.vertices[2] + p, color, RendererDebugPage::PortalDebug);
+			DrawDebugLine(door.vertices[1] + p, door.vertices[3] + p, color, RendererDebugPage::PortalDebug);
+
+			auto center = p + (door.vertices[0] + door.vertices[1] + door.vertices[2] + door.vertices[3]) * 0.25f;
+			auto target = center + door.normal * CLICK(1);
+
+			DrawDebugLine(center, target, color, RendererDebugPage::PortalDebug);
+		}
+	}
+}
+
 void UpdateMikePos(const ItemInfo& item)
 {
 	if (Camera.mikeAtLara)
@@ -1545,7 +1616,8 @@ void UpdateMikePos(const ItemInfo& item)
 void RumbleScreen()
 {
 	if (!(GlobalCounter & 0x1FF))
-		SoundEffect(SFX_TR5_KLAXON, nullptr, SoundEnvironment::Land, 0.25f);
+		// SFX Enum Changed from TR5 and pitch shift removed. User can set this in their sound XML. Stranger1992 31st August 2024
+		SoundEffect(SFX_TR4_ENVIORONMENT_RUMBLE, nullptr, SoundEnvironment::Land);
 
 	if (RumbleTimer >= 0)
 		RumbleTimer++;

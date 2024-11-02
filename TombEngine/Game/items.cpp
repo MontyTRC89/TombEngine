@@ -17,6 +17,7 @@
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
@@ -35,6 +36,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Utils;
+using TEN::Renderer::g_Renderer;
 
 constexpr auto ITEM_DEATH_TIMEOUT = 4 * FPS;
 
@@ -180,6 +182,11 @@ bool ItemInfo::IsCreature() const
 bool ItemInfo::IsBridge() const
 {
 	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
+}
+
+std::vector<BoundingSphere> ItemInfo::GetSpheres() const
+{
+	return g_Renderer.GetSpheres(Index);
 }
 
 bool TestState(int refState, const std::vector<int>& stateList)
@@ -584,7 +591,7 @@ void InitializeItem(short itemNumber)
 	item->NextItem = room->itemNumber;
 	room->itemNumber = itemNumber;
 
-	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
+	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->Position.x, item->Pose.Position.z - room->Position.z);
 	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
 	item->BoxNumber = floor->PathfindingBoxID;
 
@@ -602,6 +609,8 @@ short CreateItem()
 	short itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
 	NextItemFree = g_Level.Items[NextItemFree].NextItem;
+
+	g_Level.Items[itemNumber].DisableInterpolation = true;
 
 	return itemNumber;
 }

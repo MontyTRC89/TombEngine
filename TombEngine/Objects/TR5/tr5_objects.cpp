@@ -75,6 +75,7 @@
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
 
 using namespace TEN::Effects::EmberEmitter;
+using namespace TEN::Effects::SmokeEmitter;
 using namespace TEN::Effects::WaterfallEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
@@ -735,7 +736,7 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSmokeEmitter;
-		obj->control = SmokeEmitterControl;
+		obj->control = ControlSmokeEmitter;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -744,7 +745,7 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSmokeEmitter;
-		obj->control = SmokeEmitterControl;
+		obj->control = ControlSmokeEmitter;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -753,7 +754,7 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSmokeEmitter;
-		obj->control = SmokeEmitterControl;
+		obj->control = ControlSmokeEmitter;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -827,13 +828,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->drawRoutine = nullptr;             // go to nullsub_44() !
 
 		obj->usingDrawAnimatingItem = false;
-	}
-
-	obj = &Objects[ID_LENS_FLARE];
-	if (obj->loaded)
-	{
-		//obj->drawRoutine = DrawLensFlare;
-
 	}
 
 	obj = &Objects[ID_WATERFALLSS1];

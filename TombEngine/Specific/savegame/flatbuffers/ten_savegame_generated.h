@@ -97,9 +97,17 @@ struct PlayerContextData;
 struct PlayerContextDataBuilder;
 struct PlayerContextDataT;
 
+struct CollisionInfoData;
+struct CollisionInfoDataBuilder;
+struct CollisionInfoDataT;
+
 struct Lara;
 struct LaraBuilder;
 struct LaraT;
+
+struct Camera;
+struct CameraBuilder;
+struct CameraT;
 
 struct FixedCamera;
 struct FixedCameraBuilder;
@@ -863,9 +871,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Motorboat *data_as_Motorboat() const {
     return data_type() == TEN::Save::ItemData::Motorboat ? static_cast<const TEN::Save::Motorboat *>(data()) : nullptr;
   }
-  const TEN::Save::GameVector *data_as_GameVector() const {
-    return data_type() == TEN::Save::ItemData::GameVector ? static_cast<const TEN::Save::GameVector *>(data()) : nullptr;
-  }
   const TEN::Save::Wraith *data_as_Wraith() const {
     return data_type() == TEN::Save::ItemData::Wraith ? static_cast<const TEN::Save::Wraith *>(data()) : nullptr;
   }
@@ -1042,10 +1047,6 @@ template<> inline const TEN::Save::UPV *Item::data_as<TEN::Save::UPV>() const {
 
 template<> inline const TEN::Save::Motorboat *Item::data_as<TEN::Save::Motorboat>() const {
   return data_as_Motorboat();
-}
-
-template<> inline const TEN::Save::GameVector *Item::data_as<TEN::Save::GameVector>() const {
-  return data_as_GameVector();
 }
 
 template<> inline const TEN::Save::Wraith *Item::data_as<TEN::Save::Wraith>() const {
@@ -4049,11 +4050,81 @@ struct PlayerContextData::Traits {
 
 flatbuffers::Offset<PlayerContextData> CreatePlayerContextData(flatbuffers::FlatBufferBuilder &_fbb, const PlayerContextDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct CollisionInfoDataT : public flatbuffers::NativeTable {
+  typedef CollisionInfoData TableType;
+  int32_t last_bridge_item_number = 0;
+  std::unique_ptr<TEN::Save::Pose> last_bridge_item_pose{};
+};
+
+struct CollisionInfoData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef CollisionInfoDataT NativeTableType;
+  typedef CollisionInfoDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LAST_BRIDGE_ITEM_NUMBER = 4,
+    VT_LAST_BRIDGE_ITEM_POSE = 6
+  };
+  int32_t last_bridge_item_number() const {
+    return GetField<int32_t>(VT_LAST_BRIDGE_ITEM_NUMBER, 0);
+  }
+  const TEN::Save::Pose *last_bridge_item_pose() const {
+    return GetStruct<const TEN::Save::Pose *>(VT_LAST_BRIDGE_ITEM_POSE);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_LAST_BRIDGE_ITEM_NUMBER) &&
+           VerifyField<TEN::Save::Pose>(verifier, VT_LAST_BRIDGE_ITEM_POSE) &&
+           verifier.EndTable();
+  }
+  CollisionInfoDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(CollisionInfoDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<CollisionInfoData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct CollisionInfoDataBuilder {
+  typedef CollisionInfoData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_last_bridge_item_number(int32_t last_bridge_item_number) {
+    fbb_.AddElement<int32_t>(CollisionInfoData::VT_LAST_BRIDGE_ITEM_NUMBER, last_bridge_item_number, 0);
+  }
+  void add_last_bridge_item_pose(const TEN::Save::Pose *last_bridge_item_pose) {
+    fbb_.AddStruct(CollisionInfoData::VT_LAST_BRIDGE_ITEM_POSE, last_bridge_item_pose);
+  }
+  explicit CollisionInfoDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<CollisionInfoData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<CollisionInfoData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<CollisionInfoData> CreateCollisionInfoData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t last_bridge_item_number = 0,
+    const TEN::Save::Pose *last_bridge_item_pose = 0) {
+  CollisionInfoDataBuilder builder_(_fbb);
+  builder_.add_last_bridge_item_pose(last_bridge_item_pose);
+  builder_.add_last_bridge_item_number(last_bridge_item_number);
+  return builder_.Finish();
+}
+
+struct CollisionInfoData::Traits {
+  using type = CollisionInfoData;
+  static auto constexpr Create = CreateCollisionInfoData;
+};
+
+flatbuffers::Offset<CollisionInfoData> CreateCollisionInfoData(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct LaraT : public flatbuffers::NativeTable {
   typedef Lara TableType;
   std::unique_ptr<TEN::Save::PlayerContextDataT> context{};
   std::unique_ptr<TEN::Save::LaraControlDataT> control{};
   std::unique_ptr<TEN::Save::PlayerEffectDataT> effect{};
+  std::unique_ptr<TEN::Save::CollisionInfoDataT> collision{};
   int32_t extra_anim = 0;
   std::unique_ptr<TEN::Save::EulerAngles> extra_head_rot{};
   std::unique_ptr<TEN::Save::EulerAngles> extra_torso_rot{};
@@ -4081,23 +4152,24 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_CONTEXT = 4,
     VT_CONTROL = 6,
     VT_EFFECT = 8,
-    VT_EXTRA_ANIM = 10,
-    VT_EXTRA_HEAD_ROT = 12,
-    VT_EXTRA_TORSO_ROT = 14,
-    VT_FLARE = 16,
-    VT_HIGHEST_LOCATION = 18,
-    VT_HIT_DIRECTION = 20,
-    VT_HIT_FRAME = 22,
-    VT_INVENTORY = 24,
-    VT_LEFT_ARM = 26,
-    VT_LOCATION = 28,
-    VT_LOCATION_PAD = 30,
-    VT_RIGHT_ARM = 32,
-    VT_STATUS = 34,
-    VT_TARGET_ARM_ORIENT = 36,
-    VT_TARGET_ENTITY_NUMBER = 38,
-    VT_TORCH = 40,
-    VT_WEAPONS = 42
+    VT_COLLISION = 10,
+    VT_EXTRA_ANIM = 12,
+    VT_EXTRA_HEAD_ROT = 14,
+    VT_EXTRA_TORSO_ROT = 16,
+    VT_FLARE = 18,
+    VT_HIGHEST_LOCATION = 20,
+    VT_HIT_DIRECTION = 22,
+    VT_HIT_FRAME = 24,
+    VT_INVENTORY = 26,
+    VT_LEFT_ARM = 28,
+    VT_LOCATION = 30,
+    VT_LOCATION_PAD = 32,
+    VT_RIGHT_ARM = 34,
+    VT_STATUS = 36,
+    VT_TARGET_ARM_ORIENT = 38,
+    VT_TARGET_ENTITY_NUMBER = 40,
+    VT_TORCH = 42,
+    VT_WEAPONS = 44
   };
   const TEN::Save::PlayerContextData *context() const {
     return GetPointer<const TEN::Save::PlayerContextData *>(VT_CONTEXT);
@@ -4107,6 +4179,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::PlayerEffectData *effect() const {
     return GetPointer<const TEN::Save::PlayerEffectData *>(VT_EFFECT);
+  }
+  const TEN::Save::CollisionInfoData *collision() const {
+    return GetPointer<const TEN::Save::CollisionInfoData *>(VT_COLLISION);
   }
   int32_t extra_anim() const {
     return GetField<int32_t>(VT_EXTRA_ANIM, 0);
@@ -4167,6 +4242,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(control()) &&
            VerifyOffset(verifier, VT_EFFECT) &&
            verifier.VerifyTable(effect()) &&
+           VerifyOffset(verifier, VT_COLLISION) &&
+           verifier.VerifyTable(collision()) &&
            VerifyField<int32_t>(verifier, VT_EXTRA_ANIM) &&
            VerifyField<TEN::Save::EulerAngles>(verifier, VT_EXTRA_HEAD_ROT) &&
            VerifyField<TEN::Save::EulerAngles>(verifier, VT_EXTRA_TORSO_ROT) &&
@@ -4211,6 +4288,9 @@ struct LaraBuilder {
   }
   void add_effect(flatbuffers::Offset<TEN::Save::PlayerEffectData> effect) {
     fbb_.AddOffset(Lara::VT_EFFECT, effect);
+  }
+  void add_collision(flatbuffers::Offset<TEN::Save::CollisionInfoData> collision) {
+    fbb_.AddOffset(Lara::VT_COLLISION, collision);
   }
   void add_extra_anim(int32_t extra_anim) {
     fbb_.AddElement<int32_t>(Lara::VT_EXTRA_ANIM, extra_anim, 0);
@@ -4279,6 +4359,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     flatbuffers::Offset<TEN::Save::PlayerContextData> context = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
     flatbuffers::Offset<TEN::Save::PlayerEffectData> effect = 0,
+    flatbuffers::Offset<TEN::Save::CollisionInfoData> collision = 0,
     int32_t extra_anim = 0,
     const TEN::Save::EulerAngles *extra_head_rot = 0,
     const TEN::Save::EulerAngles *extra_torso_rot = 0,
@@ -4314,6 +4395,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_extra_torso_rot(extra_torso_rot);
   builder_.add_extra_head_rot(extra_head_rot);
   builder_.add_extra_anim(extra_anim);
+  builder_.add_collision(collision);
   builder_.add_effect(effect);
   builder_.add_control(control);
   builder_.add_context(context);
@@ -4330,6 +4412,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     flatbuffers::Offset<TEN::Save::PlayerContextData> context = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
     flatbuffers::Offset<TEN::Save::PlayerEffectData> effect = 0,
+    flatbuffers::Offset<TEN::Save::CollisionInfoData> collision = 0,
     int32_t extra_anim = 0,
     const TEN::Save::EulerAngles *extra_head_rot = 0,
     const TEN::Save::EulerAngles *extra_torso_rot = 0,
@@ -4353,6 +4436,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       context,
       control,
       effect,
+      collision,
       extra_anim,
       extra_head_rot,
       extra_torso_rot,
@@ -4373,6 +4457,75 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
 }
 
 flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb, const LaraT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct CameraT : public flatbuffers::NativeTable {
+  typedef Camera TableType;
+  std::unique_ptr<TEN::Save::GameVector> position{};
+  std::unique_ptr<TEN::Save::GameVector> target{};
+};
+
+struct Camera FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef CameraT NativeTableType;
+  typedef CameraBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_POSITION = 4,
+    VT_TARGET = 6
+  };
+  const TEN::Save::GameVector *position() const {
+    return GetStruct<const TEN::Save::GameVector *>(VT_POSITION);
+  }
+  const TEN::Save::GameVector *target() const {
+    return GetStruct<const TEN::Save::GameVector *>(VT_TARGET);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<TEN::Save::GameVector>(verifier, VT_POSITION) &&
+           VerifyField<TEN::Save::GameVector>(verifier, VT_TARGET) &&
+           verifier.EndTable();
+  }
+  CameraT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(CameraT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Camera> Pack(flatbuffers::FlatBufferBuilder &_fbb, const CameraT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct CameraBuilder {
+  typedef Camera Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_position(const TEN::Save::GameVector *position) {
+    fbb_.AddStruct(Camera::VT_POSITION, position);
+  }
+  void add_target(const TEN::Save::GameVector *target) {
+    fbb_.AddStruct(Camera::VT_TARGET, target);
+  }
+  explicit CameraBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<Camera> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Camera>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Camera> CreateCamera(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const TEN::Save::GameVector *position = 0,
+    const TEN::Save::GameVector *target = 0) {
+  CameraBuilder builder_(_fbb);
+  builder_.add_target(target);
+  builder_.add_position(position);
+  return builder_.Finish();
+}
+
+struct Camera::Traits {
+  using type = Camera;
+  static auto constexpr Create = CreateCamera;
+};
+
+flatbuffers::Offset<Camera> CreateCamera(flatbuffers::FlatBufferBuilder &_fbb, const CameraT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct FixedCameraT : public flatbuffers::NativeTable {
   typedef FixedCamera TableType;
@@ -7102,6 +7255,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::SaveGameHeaderT> header{};
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> game{};
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> level{};
+  std::unique_ptr<TEN::Save::CameraT> camera{};
   std::unique_ptr<TEN::Save::LaraT> lara{};
   std::vector<std::unique_ptr<TEN::Save::RoomT>> rooms{};
   std::vector<std::unique_ptr<TEN::Save::ItemT>> items{};
@@ -7161,55 +7315,56 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HEADER = 4,
     VT_GAME = 6,
     VT_LEVEL = 8,
-    VT_LARA = 10,
-    VT_ROOMS = 12,
-    VT_ITEMS = 14,
-    VT_NEXT_ITEM_FREE = 16,
-    VT_NEXT_ITEM_ACTIVE = 18,
-    VT_ROOM_ITEMS = 20,
-    VT_FISH_SWARM = 22,
-    VT_FXINFOS = 24,
-    VT_NEXT_FX_FREE = 26,
-    VT_NEXT_FX_ACTIVE = 28,
-    VT_FIXED_CAMERAS = 30,
-    VT_SINKS = 32,
-    VT_STATIC_MESHES = 34,
-    VT_FLYBY_CAMERAS = 36,
-    VT_PARTICLES = 38,
-    VT_RATS = 40,
-    VT_SPIDERS = 42,
-    VT_SCARABS = 44,
-    VT_BATS = 46,
-    VT_FLIP_MAPS = 48,
-    VT_FLIP_STATS = 50,
-    VT_FLIP_EFFECT = 52,
-    VT_FLIP_TIMER = 54,
-    VT_FLIP_STATUS = 56,
-    VT_CURRENT_FOV = 58,
-    VT_LAST_INV_ITEM = 60,
-    VT_ACTION_QUEUE = 62,
-    VT_SOUNDTRACKS = 64,
-    VT_CD_FLAGS = 66,
-    VT_POSTPROCESS_MODE = 68,
-    VT_POSTPROCESS_STRENGTH = 70,
-    VT_POSTPROCESS_TINT = 72,
-    VT_ROPE = 74,
-    VT_PENDULUM = 76,
-    VT_ALTERNATE_PENDULUM = 78,
-    VT_VOLUMES = 80,
-    VT_GLOBAL_EVENT_SETS = 82,
-    VT_VOLUME_EVENT_SETS = 84,
-    VT_SCRIPT_VARS = 86,
-    VT_CALLBACKS_PRE_START = 88,
-    VT_CALLBACKS_POST_START = 90,
-    VT_CALLBACKS_PRE_END = 92,
-    VT_CALLBACKS_POST_END = 94,
-    VT_CALLBACKS_PRE_SAVE = 96,
-    VT_CALLBACKS_POST_SAVE = 98,
-    VT_CALLBACKS_PRE_LOAD = 100,
-    VT_CALLBACKS_POST_LOAD = 102,
-    VT_CALLBACKS_PRE_LOOP = 104,
-    VT_CALLBACKS_POST_LOOP = 106
+    VT_CAMERA = 10,
+    VT_LARA = 12,
+    VT_ROOMS = 14,
+    VT_ITEMS = 16,
+    VT_NEXT_ITEM_FREE = 18,
+    VT_NEXT_ITEM_ACTIVE = 20,
+    VT_ROOM_ITEMS = 22,
+    VT_FISH_SWARM = 24,
+    VT_FXINFOS = 26,
+    VT_NEXT_FX_FREE = 28,
+    VT_NEXT_FX_ACTIVE = 30,
+    VT_FIXED_CAMERAS = 32,
+    VT_SINKS = 34,
+    VT_STATIC_MESHES = 36,
+    VT_FLYBY_CAMERAS = 38,
+    VT_PARTICLES = 40,
+    VT_RATS = 42,
+    VT_SPIDERS = 44,
+    VT_SCARABS = 46,
+    VT_BATS = 48,
+    VT_FLIP_MAPS = 50,
+    VT_FLIP_STATS = 52,
+    VT_FLIP_EFFECT = 54,
+    VT_FLIP_TIMER = 56,
+    VT_FLIP_STATUS = 58,
+    VT_CURRENT_FOV = 60,
+    VT_LAST_INV_ITEM = 62,
+    VT_ACTION_QUEUE = 64,
+    VT_SOUNDTRACKS = 66,
+    VT_CD_FLAGS = 68,
+    VT_POSTPROCESS_MODE = 70,
+    VT_POSTPROCESS_STRENGTH = 72,
+    VT_POSTPROCESS_TINT = 74,
+    VT_ROPE = 76,
+    VT_PENDULUM = 78,
+    VT_ALTERNATE_PENDULUM = 80,
+    VT_VOLUMES = 82,
+    VT_GLOBAL_EVENT_SETS = 84,
+    VT_VOLUME_EVENT_SETS = 86,
+    VT_SCRIPT_VARS = 88,
+    VT_CALLBACKS_PRE_START = 90,
+    VT_CALLBACKS_POST_START = 92,
+    VT_CALLBACKS_PRE_END = 94,
+    VT_CALLBACKS_POST_END = 96,
+    VT_CALLBACKS_PRE_SAVE = 98,
+    VT_CALLBACKS_POST_SAVE = 100,
+    VT_CALLBACKS_PRE_LOAD = 102,
+    VT_CALLBACKS_POST_LOAD = 104,
+    VT_CALLBACKS_PRE_LOOP = 106,
+    VT_CALLBACKS_POST_LOOP = 108
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -7219,6 +7374,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::SaveGameStatistics *level() const {
     return GetPointer<const TEN::Save::SaveGameStatistics *>(VT_LEVEL);
+  }
+  const TEN::Save::Camera *camera() const {
+    return GetPointer<const TEN::Save::Camera *>(VT_CAMERA);
   }
   const TEN::Save::Lara *lara() const {
     return GetPointer<const TEN::Save::Lara *>(VT_LARA);
@@ -7375,6 +7533,8 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(game()) &&
            VerifyOffset(verifier, VT_LEVEL) &&
            verifier.VerifyTable(level()) &&
+           VerifyOffset(verifier, VT_CAMERA) &&
+           verifier.VerifyTable(camera()) &&
            VerifyOffset(verifier, VT_LARA) &&
            verifier.VerifyTable(lara()) &&
            VerifyOffset(verifier, VT_ROOMS) &&
@@ -7507,6 +7667,9 @@ struct SaveGameBuilder {
   }
   void add_level(flatbuffers::Offset<TEN::Save::SaveGameStatistics> level) {
     fbb_.AddOffset(SaveGame::VT_LEVEL, level);
+  }
+  void add_camera(flatbuffers::Offset<TEN::Save::Camera> camera) {
+    fbb_.AddOffset(SaveGame::VT_CAMERA, camera);
   }
   void add_lara(flatbuffers::Offset<TEN::Save::Lara> lara) {
     fbb_.AddOffset(SaveGame::VT_LARA, lara);
@@ -7671,6 +7834,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<TEN::Save::SaveGameHeader> header = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
+    flatbuffers::Offset<TEN::Save::Camera> camera = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Room>>> rooms = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>>> items = 0,
@@ -7769,6 +7933,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_items(items);
   builder_.add_rooms(rooms);
   builder_.add_lara(lara);
+  builder_.add_camera(camera);
   builder_.add_level(level);
   builder_.add_game(game);
   builder_.add_header(header);
@@ -7786,6 +7951,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::SaveGameHeader> header = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
+    flatbuffers::Offset<TEN::Save::Camera> camera = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::Room>> *rooms = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::Item>> *items = nullptr,
@@ -7872,6 +8038,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       header,
       game,
       level,
+      camera,
       lara,
       rooms__,
       items__,
@@ -8993,6 +9160,35 @@ inline flatbuffers::Offset<PlayerContextData> CreatePlayerContextData(flatbuffer
       _water_surface_dist);
 }
 
+inline CollisionInfoDataT *CollisionInfoData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<CollisionInfoDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void CollisionInfoData::UnPackTo(CollisionInfoDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = last_bridge_item_number(); _o->last_bridge_item_number = _e; }
+  { auto _e = last_bridge_item_pose(); if (_e) _o->last_bridge_item_pose = std::unique_ptr<TEN::Save::Pose>(new TEN::Save::Pose(*_e)); }
+}
+
+inline flatbuffers::Offset<CollisionInfoData> CollisionInfoData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateCollisionInfoData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<CollisionInfoData> CreateCollisionInfoData(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const CollisionInfoDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _last_bridge_item_number = _o->last_bridge_item_number;
+  auto _last_bridge_item_pose = _o->last_bridge_item_pose ? _o->last_bridge_item_pose.get() : 0;
+  return TEN::Save::CreateCollisionInfoData(
+      _fbb,
+      _last_bridge_item_number,
+      _last_bridge_item_pose);
+}
+
 inline LaraT *Lara::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<LaraT>();
   UnPackTo(_o.get(), _resolver);
@@ -9005,6 +9201,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = context(); if (_e) _o->context = std::unique_ptr<TEN::Save::PlayerContextDataT>(_e->UnPack(_resolver)); }
   { auto _e = control(); if (_e) _o->control = std::unique_ptr<TEN::Save::LaraControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = effect(); if (_e) _o->effect = std::unique_ptr<TEN::Save::PlayerEffectDataT>(_e->UnPack(_resolver)); }
+  { auto _e = collision(); if (_e) _o->collision = std::unique_ptr<TEN::Save::CollisionInfoDataT>(_e->UnPack(_resolver)); }
   { auto _e = extra_anim(); _o->extra_anim = _e; }
   { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
   { auto _e = extra_torso_rot(); if (_e) _o->extra_torso_rot = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
@@ -9035,6 +9232,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _context = _o->context ? CreatePlayerContextData(_fbb, _o->context.get(), _rehasher) : 0;
   auto _control = _o->control ? CreateLaraControlData(_fbb, _o->control.get(), _rehasher) : 0;
   auto _effect = _o->effect ? CreatePlayerEffectData(_fbb, _o->effect.get(), _rehasher) : 0;
+  auto _collision = _o->collision ? CreateCollisionInfoData(_fbb, _o->collision.get(), _rehasher) : 0;
   auto _extra_anim = _o->extra_anim;
   auto _extra_head_rot = _o->extra_head_rot ? _o->extra_head_rot.get() : 0;
   auto _extra_torso_rot = _o->extra_torso_rot ? _o->extra_torso_rot.get() : 0;
@@ -9057,6 +9255,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _context,
       _control,
       _effect,
+      _collision,
       _extra_anim,
       _extra_head_rot,
       _extra_torso_rot,
@@ -9074,6 +9273,35 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _target_entity_number,
       _torch,
       _weapons);
+}
+
+inline CameraT *Camera::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<CameraT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Camera::UnPackTo(CameraT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::GameVector>(new TEN::Save::GameVector(*_e)); }
+  { auto _e = target(); if (_e) _o->target = std::unique_ptr<TEN::Save::GameVector>(new TEN::Save::GameVector(*_e)); }
+}
+
+inline flatbuffers::Offset<Camera> Camera::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CameraT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateCamera(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Camera> CreateCamera(flatbuffers::FlatBufferBuilder &_fbb, const CameraT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const CameraT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _position = _o->position ? _o->position.get() : 0;
+  auto _target = _o->target ? _o->target.get() : 0;
+  return TEN::Save::CreateCamera(
+      _fbb,
+      _position,
+      _target);
 }
 
 inline FixedCameraT *FixedCamera::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -10037,6 +10265,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = header(); if (_e) _o->header = std::unique_ptr<TEN::Save::SaveGameHeaderT>(_e->UnPack(_resolver)); }
   { auto _e = game(); if (_e) _o->game = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
   { auto _e = level(); if (_e) _o->level = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
+  { auto _e = camera(); if (_e) _o->camera = std::unique_ptr<TEN::Save::CameraT>(_e->UnPack(_resolver)); }
   { auto _e = lara(); if (_e) _o->lara = std::unique_ptr<TEN::Save::LaraT>(_e->UnPack(_resolver)); }
   { auto _e = rooms(); if (_e) { _o->rooms.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->rooms[_i] = std::unique_ptr<TEN::Save::RoomT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = items(); if (_e) { _o->items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->items[_i] = std::unique_ptr<TEN::Save::ItemT>(_e->Get(_i)->UnPack(_resolver)); } } }
@@ -10099,6 +10328,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _header = _o->header ? CreateSaveGameHeader(_fbb, _o->header.get(), _rehasher) : 0;
   auto _game = _o->game ? CreateSaveGameStatistics(_fbb, _o->game.get(), _rehasher) : 0;
   auto _level = _o->level ? CreateSaveGameStatistics(_fbb, _o->level.get(), _rehasher) : 0;
+  auto _camera = _o->camera ? CreateCamera(_fbb, _o->camera.get(), _rehasher) : 0;
   auto _lara = _o->lara ? CreateLara(_fbb, _o->lara.get(), _rehasher) : 0;
   auto _rooms = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Room>> (_o->rooms.size(), [](size_t i, _VectorArgs *__va) { return CreateRoom(*__va->__fbb, __va->__o->rooms[i].get(), __va->__rehasher); }, &_va );
   auto _items = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>> (_o->items.size(), [](size_t i, _VectorArgs *__va) { return CreateItem(*__va->__fbb, __va->__o->items[i].get(), __va->__rehasher); }, &_va );
@@ -10153,6 +10383,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _header,
       _game,
       _level,
+      _camera,
       _lara,
       _rooms,
       _items,

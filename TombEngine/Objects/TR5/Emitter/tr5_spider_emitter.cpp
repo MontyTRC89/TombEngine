@@ -134,6 +134,8 @@ void UpdateSpiders()
 
 			if (spider->On)
 			{
+				spider->StoreInterpolationData();
+
 				int x = spider->Pose.Position.x;
 				int y = spider->Pose.Position.y;
 				int z = spider->Pose.Position.z;
@@ -232,15 +234,19 @@ void UpdateSpiders()
 					spider->VerticalVelocity = 0;
 				}
 
-				if (spider->Pose.Position.y < g_Level.Rooms[spider->RoomNumber].maxceiling + 50)
+				if (spider->Pose.Position.y < g_Level.Rooms[spider->RoomNumber].TopHeight + 50)
 				{
-					spider->Pose.Position.y = g_Level.Rooms[spider->RoomNumber].maxceiling + 50;
+					spider->Pose.Position.y = g_Level.Rooms[spider->RoomNumber].TopHeight + 50;
 					spider->Pose.Orientation.y += -ANGLE(180.0f);
 					spider->VerticalVelocity = 1;
 				}
 
 				if (!i && !(GetRandomControl() & 4))
 					SoundEffect(SFX_TR5_INSECTS,&spider->Pose);
+
+				auto tMatrix = Matrix::CreateTranslation(spider->Pose.Position.ToVector3());
+				auto rotMatrix = spider->Pose.Orientation.ToRotationMatrix();
+				spider->Transform = rotMatrix * tMatrix;
 			}
 		}
 	}

@@ -687,17 +687,17 @@ void ReadRooms()
 	{
 		auto& room = g_Level.Rooms.emplace_back();
 		
-		room.name = ReadString();
+		room.Name = ReadString();
 
 		int tagCount = ReadInt32();
 		for (int j = 0; j < tagCount; j++)
-			room.tags.push_back(ReadString());
+			room.Tags.push_back(ReadString());
 		
-		room.x = ReadInt32();
-		room.y = 0;
-		room.z = ReadInt32();
-		room.minfloor = ReadInt32();
-		room.maxceiling = ReadInt32();
+		room.Position.x = ReadInt32();
+		room.Position.y = 0;
+		room.Position.z = ReadInt32();
+		room.BottomHeight = ReadInt32();
+		room.TopHeight = ReadInt32();
 
 		int vertexCount = ReadInt32();
 
@@ -769,14 +769,14 @@ void ReadRooms()
 		for (int j = 0; j < portalCount; j++)
 			LoadPortal(room);
 
-		room.zSize = ReadInt32();
-		room.xSize = ReadInt32();
-		auto roomPos = Vector2i(room.x, room.z);
+		room.ZSize = ReadInt32();
+		room.XSize = ReadInt32();
+		auto roomPos = Vector2i(room.Position.x, room.Position.z);
 
-		room.floor.reserve(room.zSize * room.xSize);
-		for (int x = 0; x < room.xSize; x++)
+		room.Sectors.reserve(room.XSize * room.ZSize);
+		for (int x = 0; x < room.XSize; x++)
 		{
-			for (int z = 0; z < room.zSize; z++)
+			for (int z = 0; z < room.ZSize; z++)
 			{
 				auto sector = FloorInfo{};
 
@@ -820,17 +820,17 @@ void ReadRooms()
 				sector.Flags.MarkTriggererActive = 0; // TODO: Needs to be written to and read from savegames.
 				sector.Flags.MarkBeetle = ReadBool();
 
-				room.floor.push_back(sector);
+				room.Sectors.push_back(sector);
 			}
 		}
 
 		room.ambient = ReadVector3();
 
-		int numLights = ReadInt32();
-		room.lights.reserve(numLights);
-		for (int j = 0; j < numLights; j++)
+		int lightCount = ReadInt32();
+		room.lights.reserve(lightCount);
+		for (int j = 0; j < lightCount; j++)
 		{
-			ROOM_LIGHT light;
+			auto light = ROOM_LIGHT{};
 
 			light.x = ReadInt32();
 			light.y = ReadInt32();
@@ -852,9 +852,9 @@ void ReadRooms()
 			room.lights.push_back(light);
 		}
 		
-		int numStatics = ReadInt32();
-		room.mesh.reserve(numStatics);
-		for (int j = 0; j < numStatics; j++)
+		int staticCount = ReadInt32();
+		room.mesh.reserve(staticCount);
+		for (int j = 0; j < staticCount; j++)
 		{
 			auto& mesh = room.mesh.emplace_back();
 
@@ -875,21 +875,17 @@ void ReadRooms()
 			g_GameScriptEntities->AddName(mesh.Name, mesh);
 		}
 
-		int numTriggerVolumes = ReadInt32();
-
-		// Reserve in advance so the vector doesn't resize itself and leave anything
-		// in the script name-to-reference map obsolete.
-		room.triggerVolumes.reserve(numTriggerVolumes);
-		for (int j = 0; j < numTriggerVolumes; j++)
+		int triggerVolumeCount = ReadInt32();
+		room.TriggerVolumes.reserve(triggerVolumeCount);
+		for (int j = 0; j < triggerVolumeCount; j++)
 		{
-			auto& volume = room.triggerVolumes.emplace_back();
+			auto& volume = room.TriggerVolumes.emplace_back();
 
 			volume.Type = (VolumeType)ReadInt32();
 
-			// NOTE: Braces are necessary to ensure correct value init order.
-			auto pos = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
-			auto orient = Quaternion{ ReadFloat(), ReadFloat(), ReadFloat(), ReadFloat() };
-			auto scale = Vector3{ ReadFloat(), ReadFloat(), ReadFloat() };
+			auto pos = ReadVector3();
+			auto orient = ReadVector4();
+			auto scale = ReadVector3();
 
 			volume.Enabled = ReadBool();
 			volume.DetectInAdjacentRooms = ReadBool();
@@ -897,7 +893,7 @@ void ReadRooms()
 			volume.Name = ReadString();
 			volume.EventSetIndex = ReadInt32();
 
-			volume.Box    = BoundingOrientedBox(pos, scale, orient);
+			volume.Box = BoundingOrientedBox(pos, scale, orient);
 			volume.Sphere = BoundingSphere(pos, scale.x);
 
 			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
@@ -913,9 +909,9 @@ void ReadRooms()
 
 		room.itemNumber = NO_VALUE;
 		room.fxNumber = NO_VALUE;
-		room.index = i;
+		room.RoomNumber = i;
 
-		g_GameScriptEntities->AddName(room.name, room);
+		g_GameScriptEntities->AddName(room.Name, room);
 	}
 }
 
@@ -1475,7 +1471,8 @@ void GetCarriedItems()
 		const auto& object = Objects[item.ObjectNumber];
 
 		if (object.intelligent ||
-			(item.ObjectNumber >= ID_SEARCH_OBJECT1 && item.ObjectNumber <= ID_SEARCH_OBJECT3))
+			(item.ObjectNumber >= ID_SEARCH_OBJECT1 && item.ObjectNumber <= ID_SEARCH_OBJECT3) ||
+			(item.ObjectNumber == ID_SARCOPHAGUS))
 		{
 			for (short linkNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 			{
@@ -1543,17 +1540,17 @@ void BuildOutsideRoomsTable()
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		int rx = (room->x / BLOCK(1));
-		int rz = (room->z / BLOCK(1));
+		int rx = (room->Position.x / BLOCK(1));
+		int rz = (room->Position.z / BLOCK(1));
 
 		for (int x = 0; x < OUTSIDE_SIZE; x++)
 		{
-			if (x < (rx + 1) || x > (rx + room->xSize - 2))
+			if (x < (rx + 1) || x > (rx + room->XSize - 2))
 				continue;
 
 			for (int z = 0; z < OUTSIDE_SIZE; z++)
 			{
-				if (z < (rz + 1) || z > (rz + room->zSize - 2))
+				if (z < (rz + 1) || z > (rz + room->ZSize - 2))
 					continue;
 
 				OutsideRoomTable[x][z].push_back(i);

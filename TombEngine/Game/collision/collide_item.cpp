@@ -6,7 +6,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
@@ -23,81 +23,73 @@
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
 
 // Globals
+
 GameBoundingBox GlobalCollisionBounds;
 
-void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+void GenericSphereBoxCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
+	if (item.Status == ITEM_INVISIBLE)
+		return;
 
-	if (item->Status != ITEM_INVISIBLE)
+	if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
+		return;
+
+	HandleItemSphereCollision(item, *playerItem);
+	if (!item.TouchBits.TestAny())
+		return;
+
+	short prevYOrient = item.Pose.Orientation.y;
+	item.Pose.Orientation.y = 0;
+	auto spheres = item.GetSpheres();
+	item.Pose.Orientation.y = prevYOrient;
+
+	int harmBits = *(int*)&item.ItemFlags[0]; // NOTE: Value spread across ItemFlags[0] and ItemFlags[1].
+	
+	auto collidedBits = item.TouchBits;
+	if (item.ItemFlags[2] != 0)
+		collidedBits.Clear(0);
+
+	coll->Setup.EnableObjectPush = (item.ItemFlags[4] == 0);
+
+	// Handle push and damage.
+	for (int i = 0; i < spheres.size(); i++)
 	{
-		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+		if (collidedBits.Test(i))
 		{
-			int collidedBits = TestCollision(item, laraItem);
-			if (collidedBits)
+			const auto& sphere = spheres[i];
+
+			GlobalCollisionBounds.X1 = sphere.Center.x - sphere.Radius - item.Pose.Position.x;
+			GlobalCollisionBounds.X2 = sphere.Center.x + sphere.Radius - item.Pose.Position.x;
+			GlobalCollisionBounds.Y1 = sphere.Center.y - sphere.Radius - item.Pose.Position.y;
+			GlobalCollisionBounds.Y2 = sphere.Center.y + sphere.Radius - item.Pose.Position.y;
+			GlobalCollisionBounds.Z1 = sphere.Center.z - sphere.Radius - item.Pose.Position.z;
+			GlobalCollisionBounds.Z2 = sphere.Center.z + sphere.Radius - item.Pose.Position.z;
+
+			auto pos = playerItem->Pose.Position;
+			if (ItemPushItem(&item, playerItem, coll, harmBits & 1, 3) && (harmBits & 1))
 			{
-				short prevYOrient = item->Pose.Orientation.y;
+				DoDamage(playerItem, item.ItemFlags[3]);
 
-				item->Pose.Orientation.y = 0;
-				GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-				item->Pose.Orientation.y = prevYOrient;
-
-				int deadlyBits = *((int*)&item->ItemFlags[0]);
-				auto* sphere = &CreatureSpheres[0];
-
-				if (item->ItemFlags[2] != 0)
-					collidedBits &= ~1;
-				coll->Setup.EnableObjectPush = item->ItemFlags[4] == 0;
-
-				while (collidedBits)
+				auto deltaPos = pos - playerItem->Pose.Position;
+				if (deltaPos != Vector3i::Zero)
 				{
-					if (collidedBits & 1)
-					{
-						GlobalCollisionBounds.X1 = sphere->x - sphere->r - item->Pose.Position.x;
-						GlobalCollisionBounds.X2 = sphere->x + sphere->r - item->Pose.Position.x;
-						GlobalCollisionBounds.Y1 = sphere->y - sphere->r - item->Pose.Position.y;
-						GlobalCollisionBounds.Y2 = sphere->y + sphere->r - item->Pose.Position.y;
-						GlobalCollisionBounds.Z1 = sphere->z - sphere->r - item->Pose.Position.z;
-						GlobalCollisionBounds.Z2 = sphere->z + sphere->r - item->Pose.Position.z;
-
-						int x = laraItem->Pose.Position.x;
-						int y = laraItem->Pose.Position.y;
-						int z = laraItem->Pose.Position.z;
-
-						if (ItemPushItem(item, laraItem, coll, deadlyBits & 1, 3) && (deadlyBits & 1))
-						{
-							DoDamage(laraItem, item->ItemFlags[3]);
-
-							int dx = x - laraItem->Pose.Position.x;
-							int dy = y - laraItem->Pose.Position.y;
-							int dz = z - laraItem->Pose.Position.z;
-
-							if (dx || dy || dz)
-							{
-								if (TriggerActive(item))
-									TriggerLaraBlood();
-							}
-
-							if (!coll->Setup.EnableObjectPush)
-							{
-								laraItem->Pose.Position.x += dx;
-								laraItem->Pose.Position.y += dy;
-								laraItem->Pose.Position.z += dz;
-							}
-						}
-					}
-
-					collidedBits >>= 1;
-					deadlyBits >>= 1;
-					sphere++;
+					if (TriggerActive(&item))
+						TriggerLaraBlood();
 				}
+
+				if (!coll->Setup.EnableObjectPush)
+					playerItem->Pose.Position += deltaPos;
 			}
 		}
+
+		harmBits >>= 1;
 	}
 }
 
@@ -117,13 +109,20 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 	auto collidingSphere = BoundingSphere(collidingBounds.GetCenter() + collidingItem.Pose.Position.ToVector3(), collidingExtents.Length());
 	auto collidingCircle = Vector3(collidingSphere.Center.x, collidingSphere.Center.z, (customRadius > 0.0f) ? customRadius : std::hypot(collidingExtents.x, collidingExtents.z));
 
+	// Convert bounding box to DX bounds.
+	auto convertedBounds = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
+
+	// Override extents if specified.
+	if (customRadius > 0.0f)
+		convertedBounds.Extents = Vector3(customRadius);
+
 	// Quickly discard collision if colliding item bounds are below tolerance threshold.
 	if (collidingSphere.Radius <= EXTENTS_LENGTH_MIN)
 		return collObjects;
 
 	// Run through neighboring rooms.
 	const auto& room = g_Level.Rooms[collidingItem.RoomNumber];
-	for (int roomNumber : room.neighbors)
+	for (int roomNumber : room.NeighborRoomNumbers)
 	{
 		auto& neighborRoom = g_Level.Rooms[roomNumber];
 		if (!neighborRoom.Active())
@@ -193,15 +192,10 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					if (!Geometry::CircleIntersects(circle, collidingCircle))
 						continue;
 
-					auto box0 = bounds.ToBoundingOrientedBox(item.Pose);
-					auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
-
-					// Override extents if specified.
-					if (customRadius > 0.0f)
-						box1.Extents = Vector3(customRadius);
+					auto box = bounds.ToBoundingOrientedBox(item.Pose);
 
 					// Test accurate box intersection.
-					if (box0.Intersects(box1))
+					if (box.Intersects(convertedBounds))
 						collObjects.Items.push_back(&item);
 				}
 				while (itemNumber != NO_VALUE);
@@ -242,15 +236,17 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 				if (!Geometry::CircleIntersects(circle, collidingCircle))
 					continue;
 
-				auto box0 = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
-				auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
+				// Skip if either bounding box has any zero extent (not a collidable volume).
+				if (bounds.GetExtents().Length() <= EXTENTS_LENGTH_MIN)
+					continue;
 
-				// Override extents if specified.
-				if (customRadius > 0.0f)
-					box1.Extents = Vector3(customRadius);
+				if (collidingBounds.GetExtents().Length() <= EXTENTS_LENGTH_MIN)
+					continue;
+
+				auto box = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
 
 				// Test accurate box intersection.
-				if (box0.Intersects(box1))
+				if (box.Intersects(convertedBounds))
 					collObjects.Statics.push_back(&staticObj);
 			}
 		}
@@ -291,7 +287,8 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 {
-	int height = GameBoundingBox(item).GetHeight();
+	auto bbox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
+	auto height = (bbox.Center - bbox.Extents).y - CLICK(1);
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -300,14 +297,15 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 		auto origin = Vector3(
 			item->Pose.Position.x + (sinHeading * (coll->Setup.Radius)),
-			item->Pose.Position.y - (height + CLICK(1)),
+			height,
 			item->Pose.Position.z + (cosHeading * (coll->Setup.Radius)));
+
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0.0f, 0.0f);
 		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
 		// DrawDebugSphere(origin, 16, Vector4::One, RendererDebugPage::CollisionStats);
 
-		for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
+		for (auto i : g_Level.Rooms[item->RoomNumber].NeighborRoomNumbers)
 		{
 			if (!g_Level.Rooms[i].Active())
 				continue;
@@ -573,6 +571,9 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 {
 	const auto& bounds = GetBestFrame(*item).BoundingBox;
 	const auto& playerBounds = GetBestFrame(*laraItem).BoundingBox;
+
+	if (bounds.GetExtents() == Vector3::Zero || playerBounds.GetExtents() == Vector3::Zero)
+		return false;
 
 	if ((item->Pose.Position.y + bounds.Y2) <= (laraItem->Pose.Position.y + playerBounds.Y1))
 		return false;
@@ -938,17 +939,22 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData&
 
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 {
+	coll->HitStatic = false;
 	coll->HitTallObject = false;
 
-	for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
+	for (auto i : g_Level.Rooms[item->RoomNumber].NeighborRoomNumbers)
 	{
 		if (!g_Level.Rooms[i].Active())
 			continue;
 
 		for (auto& mesh : g_Level.Rooms[i].mesh)
 		{
-			// Only process meshes which are visible and solid.
-			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE) || !(mesh.flags & StaticMeshFlags::SM_SOLID))
+			// Only process meshes which are visible.
+			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Only process meshes which are solid, or if solid mode is set by the setup.
+			if (!coll->Setup.ForceSolidStatics && !(mesh.flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
 			float distance = Vector3i::Distance(item->Pose.Position, mesh.pos.Position);
@@ -1809,7 +1815,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	const auto& room = g_Level.Rooms[item->RoomNumber];
-	for (int neighborRoomNumber : room.neighbors)
+	for (int neighborRoomNumber : room.NeighborRoomNumbers)
 	{
 		auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 		if (!neighborRoom.Active())
@@ -1868,9 +1874,10 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 					if (linkItem.HitPoints <= 0 || linkItem.HitPoints == NOT_TARGETABLE)
 						continue;
 
-					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
+					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY ||
+						object.damageType == DamageMode::None)
 					{
-						// If vehicle is harmless or speed is too low, just push enemy.
+						// If vehicle is harmless, enemy is non-damageable, or speed is too low, push enemy.
 						ItemPushItem(&linkItem, item, coll, false, 0);
 						continue;
 					}
@@ -1958,7 +1965,7 @@ void ObjectCollision(const short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 
 	if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 	{
-		if (TestCollision(item, laraItem))
+		if (HandleItemSphereCollision(*item, *laraItem))
 		{
 			if (coll->Setup.EnableObjectPush)
 				ItemPushItem(item, laraItem, coll, false, 1);
@@ -1973,7 +1980,7 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 	if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		return;
 
-	if (!TestCollision(item, laraItem))
+	if (!HandleItemSphereCollision(*item, *laraItem))
 		return;
 
 	bool doPlayerCollision = laraItem->IsLara();
@@ -2008,7 +2015,7 @@ void TrapCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 
-		TestCollision(&item, playerItem);
+		HandleItemSphereCollision(item, *playerItem);
 	}
 	else if (item.Status != ITEM_INVISIBLE)
 	{

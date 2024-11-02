@@ -3,7 +3,6 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/control/control.h"
@@ -28,13 +27,11 @@ using namespace TEN::Effects::Smoke;
 
 constexpr auto ESCAPE_DIST = BLOCK(5);
 constexpr auto STALK_DIST = BLOCK(3);
-constexpr auto REACHED_GOAL_RADIUS = 640;
+constexpr auto REACHED_GOAL_RADIUS = BLOCK(0.625);
 constexpr auto ATTACK_RANGE = SQUARE(BLOCK(3));
 constexpr auto ESCAPE_CHANCE = 0x800;
 constexpr auto RECOVER_CHANCE = 0x100;
 constexpr auto BIFF_AVOID_TURN = ANGLE(11.25f);
-constexpr auto FEELER_DISTANCE = CLICK(2);
-constexpr auto FEELER_ANGLE = ANGLE(45.0f);
 constexpr auto CREATURE_AI_ROTATION_MAX = ANGLE(90.0f);
 constexpr auto CREATURE_JOINT_ROTATION_MAX = ANGLE(70.0f);
 
@@ -154,13 +151,13 @@ bool SameZone(CreatureInfo* creature, ItemInfo* target)
 	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][(int)FlipStatus].data();
 
 	auto& roomSource = g_Level.Rooms[item.RoomNumber];
-	auto& boxSource = GetSector(&roomSource, item.Pose.Position.x - roomSource.x, item.Pose.Position.z - roomSource.z)->PathfindingBoxID;
+	auto& boxSource = GetSector(&roomSource, item.Pose.Position.x - roomSource.Position.x, item.Pose.Position.z - roomSource.Position.z)->PathfindingBoxID;
 	if (boxSource == NO_VALUE)
 		return false;
 	item.BoxNumber = boxSource;
 
 	auto& roomTarget = g_Level.Rooms[target->RoomNumber];
-	auto& boxTarget = GetSector(&roomTarget, target->Pose.Position.x - roomTarget.x, target->Pose.Position.z - roomTarget.z)->PathfindingBoxID;
+	auto& boxTarget = GetSector(&roomTarget, target->Pose.Position.x - roomTarget.Position.x, target->Pose.Position.z - roomTarget.Position.z)->PathfindingBoxID;
 	if (boxTarget == NO_VALUE)
 		return false;
 	target->BoxNumber = boxTarget;
@@ -613,7 +610,7 @@ void CreatureUnderwater(ItemInfo* item, int depth)
 	}
 	else
 	{
-		waterHeight = GetWaterHeight(item);
+		waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 	}
 
 	int y = waterHeight + waterLevel;
@@ -647,7 +644,7 @@ void CreatureFloat(short itemNumber)
 	item->Pose.Orientation.x = 0;
 
 	int y = item->Pose.Position.y;
-	int waterLevel = GetWaterHeight(item);
+	int waterLevel = GetPointCollision(*item).GetWaterTopHeight();
 	if (waterLevel == NO_HEIGHT)
 		return;
 
@@ -794,7 +791,7 @@ void CreatureHealth(ItemInfo* item)
 		TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[item->RoomNumber]))
 	{
 		auto bounds = GameBoundingBox(item);
-		auto height = item->Pose.Position.y - GetWaterHeight(item);
+		auto height = item->Pose.Position.y - GetPointCollision(*item).GetWaterTopHeight();
 
 		if (abs(bounds.Y1 + bounds.Y2) < height)
 			DoDamage(item, INT_MAX);
@@ -896,7 +893,7 @@ int CreatureCreature(short itemNumber)
 	{
 		auto* linked = &g_Level.Items[link];
 		
-		if (link != itemNumber && linked != LaraItem && linked->Status == ITEM_ACTIVE && linked->HitPoints > 0) // TODO: deal with LaraItem global.
+		if (link != itemNumber && linked != LaraItem && linked->IsCreature() && linked->Status == ITEM_ACTIVE && linked->HitPoints > 0) // TODO: deal with LaraItem global.
 		{
 			int xDistance = abs(linked->Pose.Position.x - x);
 			int zDistance = abs(linked->Pose.Position.z - z);
@@ -1044,7 +1041,7 @@ bool SearchLOT(LOTInfo* LOT, int depth)
 				if ((node->searchNumber & SEARCH_NUMBER) < (expand->searchNumber & SEARCH_NUMBER))
 					continue;
 
-				if (node->searchNumber & BLOCKED_SEARCH)
+				if (node->searchNumber & SEARCH_BLOCKED)
 				{
 					if ((node->searchNumber & SEARCH_NUMBER) == (expand->searchNumber & SEARCH_NUMBER))
 						continue;
@@ -1053,12 +1050,12 @@ bool SearchLOT(LOTInfo* LOT, int depth)
 				}
 				else
 				{
-					if ((node->searchNumber & SEARCH_NUMBER) == (expand->searchNumber & SEARCH_NUMBER) && !(expand->searchNumber & BLOCKED_SEARCH))
+					if ((node->searchNumber & SEARCH_NUMBER) == (expand->searchNumber & SEARCH_NUMBER) && !(expand->searchNumber & SEARCH_BLOCKED))
 						continue;
 
 					if (g_Level.PathfindingBoxes[boxNumber].flags & LOT->BlockMask)
 					{
-						expand->searchNumber = node->searchNumber | BLOCKED_SEARCH;
+						expand->searchNumber = node->searchNumber | SEARCH_BLOCKED;
 					}
 					else
 					{
@@ -1300,11 +1297,15 @@ void GetAITarget(CreatureInfo* creature)
 {
 	auto* enemy = creature->Enemy;
 
-	short enemyObjectNumber;
+	int enemyObjectID = 0;
 	if (enemy)
-		enemyObjectNumber = enemy->ObjectNumber;
+	{
+		enemyObjectID = enemy->ObjectNumber;
+	}
 	else
-		enemyObjectNumber = NO_VALUE;
+	{
+		enemyObjectID = NO_VALUE;
+	}
 
 	auto* item = &g_Level.Items[creature->ItemNumber];
 
@@ -1332,12 +1333,12 @@ void GetAITarget(CreatureInfo* creature)
 		}
 		else if (!creature->Patrol)
 		{
-			if (enemyObjectNumber != ID_AI_PATROL1)
-				FindAITargetObject(creature, ID_AI_PATROL1);
+			if (enemyObjectID != ID_AI_PATROL1)
+				FindAITargetObject(*item, ID_AI_PATROL1);
 		}
-		else if (enemyObjectNumber != ID_AI_PATROL2)
+		else if (enemyObjectID != ID_AI_PATROL2)
 		{
-			FindAITargetObject(creature, ID_AI_PATROL2);
+			FindAITargetObject(*item, ID_AI_PATROL2);
 		}
 		else if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < REACHED_GOAL_RADIUS &&
 			abs(enemy->Pose.Position.y - item->Pose.Position.y) < REACHED_GOAL_RADIUS &&
@@ -1353,8 +1354,8 @@ void GetAITarget(CreatureInfo* creature)
 		// First if was removed probably after TR3 and was it used by monkeys?
 		/*if (!(item->aiBits & MODIFY) && !creature->hurtByLara)
 			creature->enemy = LaraItem;
-		else*/ if (enemyObjectNumber != ID_AI_AMBUSH)
-			FindAITargetObject(creature, ID_AI_AMBUSH);
+		else*/ if (enemyObjectID != ID_AI_AMBUSH)
+			FindAITargetObject(*item, ID_AI_AMBUSH);
 		/*else if (item->objectNumber == ID_MONKEY)
 			return;*/
 		else if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < REACHED_GOAL_RADIUS &&
@@ -1365,6 +1366,7 @@ void GetAITarget(CreatureInfo* creature)
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem;
 			item->AIBits &= ~(AMBUSH /* | MODIFY*/);
+
 			if (item->AIBits != MODIFY)
 			{
 				item->AIBits |= GUARD;
@@ -1384,9 +1386,9 @@ void GetAITarget(CreatureInfo* creature)
 		{
 			item->AIBits &= ~FOLLOW;
 		}
-		else if (enemyObjectNumber != ID_AI_FOLLOW)
+		else if (enemyObjectID != ID_AI_FOLLOW)
 		{
-			FindAITargetObject(creature, ID_AI_FOLLOW);
+			FindAITargetObject(*item, ID_AI_FOLLOW);
 		}
 		else if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < REACHED_GOAL_RADIUS &&
 			abs(enemy->Pose.Position.y - item->Pose.Position.y) < REACHED_GOAL_RADIUS &&
@@ -1396,17 +1398,18 @@ void GetAITarget(CreatureInfo* creature)
 			item->AIBits &= ~FOLLOW;
 		}
 	}
-	/*else if (item->objectNumber == ID_MONKEY && item->carriedItem == NO_VALUE)
+
+	/*else if (item->ObjectNumber == ID_MONKEY && item->CarriedItem == NO_VALUE)
 	{
-		if (item->aiBits != MODIFY)
+		if (item->AIBits != MODIFY)
 		{
-			if (enemyObjectNumber != ID_SMALLMEDI_ITEM)
-				FindAITargetObject(creature, ID_SMALLMEDI_ITEM);
+			if (enemyObjectID != ID_SMALLMEDI_ITEM)
+				FindAITargetObject(*item, ID_SMALLMEDI_ITEM);
 		}
 		else
 		{
-			if (enemyObjectNumber != ID_KEY_ITEM4)
-				FindAITargetObject(creature, ID_KEY_ITEM4);
+			if (enemyObjectID != ID_KEY_ITEM4)
+				FindAITargetObject(*item, ID_KEY_ITEM4);
 		}
 	}*/
 }
@@ -1435,76 +1438,108 @@ void FindAITarget(CreatureInfo* creature, short objectNumber)
 	}
 }
 
-void FindAITargetObject(CreatureInfo* creature, int objectNumber)
+void FindAITargetObject(ItemInfo& item, GAME_OBJECT_ID objectID, std::optional<int> ocb, std::optional<bool> checkSameZone)
 {
-	const auto& item = g_Level.Items[creature->ItemNumber];
+	auto& creature = *GetCreatureInfo(&item);
 
-	FindAITargetObject(creature, objectNumber, item.ItemFlags[3], true);
+	auto data = AITargetData{};
+	data.CheckDistance = false;
+	data.CheckOcb = ocb.has_value();
+	data.ObjectID = objectID;
+	data.Ocb = ocb.value_or(item.ItemFlags[3]);
+	data.CheckSameZone = checkSameZone.value_or(true);
+
+	if (FindAITargetObject(item, data))
+	{
+		*creature.AITarget = data.FoundItem;
+		creature.Enemy = creature.AITarget;
+	}
 }
 
-void FindAITargetObject(CreatureInfo* creature, int objectNumber, int ocb, bool checkSameZone)
+bool FindAITargetObject(ItemInfo& item, AITargetData& data)
 {
-	auto& item = g_Level.Items[creature->ItemNumber];
-
 	if (g_Level.AIObjects.empty())
-		return;
+		return false;
 
-	AI_OBJECT* foundObject = nullptr;
+	auto& creature = *GetCreatureInfo(&item);
 
-	for (auto& aiObject : g_Level.AIObjects)
+	const AI_OBJECT* foundAIObject = nullptr;
+
+	for (const auto& aiObject : g_Level.AIObjects)
 	{
-		if (aiObject.objectNumber == objectNumber &&
-			aiObject.triggerFlags == ocb &&
-			aiObject.roomNumber != NO_VALUE)
+		// Check if object IDs match.
+		if (aiObject.objectNumber != data.ObjectID)
+			continue;
+
+		// Check if room is valid.
+		if (aiObject.roomNumber == NO_VALUE)
+			continue;
+
+		// Check if distance is valid.
+		if (data.CheckDistance)
 		{
-			int* zone = g_Level.Zones[(int)creature->LOT.Zone][(int)FlipStatus].data();
+			if (Vector3i::Distance(item.Pose.Position, aiObject.pos.Position) > data.DistanceMax)
+				continue;
+		}
+
+		// Check if OCBs match (useful for pathfinding).
+		if (data.CheckOcb)
+		{
+			if (aiObject.triggerFlags != data.Ocb)
+				continue;
+		}
+
+		// Check if zone IDs match.
+		if (data.CheckSameZone)
+		{
+			int* zone = g_Level.Zones[(int)creature.LOT.Zone][(int)FlipStatus].data();
 			auto* room = &g_Level.Rooms[item.RoomNumber];
 
-			item.BoxNumber = GetSector(room, item.Pose.Position.x - room->x, item.Pose.Position.z - room->z)->PathfindingBoxID;
+			// NOTE: Avoid changing box ID of item or AI item so a local variable isn't required when searching for AI object near it.
+			int boxID = GetSector(room, item.Pose.Position.x - room->Position.x, item.Pose.Position.z - room->Position.z)->PathfindingBoxID;
 			room = &g_Level.Rooms[aiObject.roomNumber];
-			aiObject.boxNumber = GetSector(room, aiObject.pos.Position.x - room->x, aiObject.pos.Position.z - room->z)->PathfindingBoxID;
+			int aiBoxID = GetSector(room, aiObject.pos.Position.x - room->Position.x, aiObject.pos.Position.z - room->Position.z)->PathfindingBoxID;
 
-			if (item.BoxNumber == NO_VALUE || aiObject.boxNumber == NO_VALUE)
-				return;
+			// Box is invalid or zones don't match; continue.
+			if (boxID == NO_VALUE || aiBoxID == NO_VALUE)
+				continue;
 
-			if (checkSameZone && (zone[item.BoxNumber] != zone[aiObject.boxNumber]))
-				return;
-
-			// Don't check for same zone. Needed for Sophia Leigh.
-			foundObject = &aiObject;
+			// Zone is invalid; continue.
+			if (zone[boxID] != zone[aiBoxID])
+				continue;
 		}
+
+		// HACK: Don't check for matching zone. Needed for Sophia Leigh.
+		foundAIObject = &aiObject;
 	}
 
-	if (foundObject == nullptr)
-		return;
+	if (foundAIObject == nullptr)
+		return false;
 
-	auto& aiItem = *creature->AITarget;
+	auto aiItem = ItemInfo{};
+	aiItem.ObjectNumber = foundAIObject->objectNumber;
+	aiItem.RoomNumber = foundAIObject->roomNumber;
+	aiItem.Pose.Position = foundAIObject->pos.Position;
+	aiItem.Pose.Orientation.y = foundAIObject->pos.Orientation.y;
+	aiItem.Flags = foundAIObject->flags;
+	aiItem.TriggerFlags = foundAIObject->triggerFlags;
+	aiItem.BoxNumber = foundAIObject->boxNumber;
 
-	creature->Enemy = &aiItem;
-
-	aiItem.ObjectNumber = foundObject->objectNumber;
-	aiItem.RoomNumber = foundObject->roomNumber;
-	aiItem.Pose.Position = foundObject->pos.Position;
-	aiItem.Pose.Orientation.y = foundObject->pos.Orientation.y;
-	aiItem.Flags = foundObject->flags;
-	aiItem.TriggerFlags = foundObject->triggerFlags;
-	aiItem.BoxNumber = foundObject->boxNumber;
-
-	if (!(creature->AITarget->Flags & ItemFlags::IFLAG_TRIGGERED))
+	if (!(aiItem.Flags & IFLAG_TRIGGERED))
 	{
-		float sinY = phd_sin(creature->AITarget->Pose.Orientation.y);
-		float cosY = phd_cos(creature->AITarget->Pose.Orientation.y);
-
-		creature->AITarget->Pose.Position.x += CLICK(1) * sinY;
-		creature->AITarget->Pose.Position.z += CLICK(1) * cosY;
+		aiItem.Pose.Position.x += CLICK(1) * phd_sin(aiItem.Pose.Orientation.y);
+		aiItem.Pose.Position.z += CLICK(1) * phd_cos(aiItem.Pose.Orientation.y);
 	}
+
+	data.FoundItem = aiItem;
+	return true;
 }
 
 int TargetReachable(ItemInfo* item, ItemInfo* enemy)
 {
 	const auto& creature = *GetCreatureInfo(item);
 	auto& room = g_Level.Rooms[enemy->RoomNumber];
-	auto* floor = GetSector(&room, enemy->Pose.Position.x - room.x, enemy->Pose.Position.z - room.z);
+	auto* floor = GetSector(&room, enemy->Pose.Position.x - room.Position.x, enemy->Pose.Position.z - room.Position.z);
 
 	// NEW: Only update enemy box number if it is actually reachable by the enemy.
 	// This prevents enemies from running to the player and attacking nothing when they are hanging or shimmying. -- Lwmte, 27.06.22
@@ -1545,7 +1580,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	auto* zone = g_Level.Zones[(int)creature->LOT.Zone][(int)FlipStatus].data();
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->PathfindingBoxID;
+	item->BoxNumber = GetSector(room, item->Pose.Position.x - room->Position.x, item->Pose.Position.z - room->Position.z)->PathfindingBoxID;
 	AI->zoneNumber = zone[item->BoxNumber];
 
 	enemy->BoxNumber = TargetReachable(item, enemy);
@@ -1558,7 +1593,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 			AI->enemyZone |= BLOCKED;
 		}
 		else if (item->BoxNumber != NO_VALUE && 
-			creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
+			creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | SEARCH_BLOCKED))
 		{
 			AI->enemyZone |= BLOCKED;
 		}
@@ -1787,7 +1822,7 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 	auto* enemy = creature->Enemy;
 	auto* LOT = &creature->LOT;
 
-	if (item->BoxNumber == NO_VALUE || creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | BLOCKED_SEARCH))
+	if (item->BoxNumber == NO_VALUE || creature->LOT.Node[item->BoxNumber].searchNumber == (creature->LOT.SearchNumber | SEARCH_BLOCKED))
 		creature->LOT.RequiredBox = NO_VALUE;
 
 	if (creature->Mood != MoodType::Attack && creature->LOT.RequiredBox != NO_VALUE && !ValidBox(item, AI->zoneNumber, creature->LOT.TargetBox))
@@ -1910,7 +1945,7 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 	int right = boxRight;
 	int top = boxTop;
 	int bottom = boxBottom;
-	int direction = ALL_CLIP;
+	int direction = CLIP_ALL;
 
 	do
 	{
@@ -1950,7 +1985,7 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 					if (target->z < (boxLeft + CLICK(2)))
 						target->z = boxLeft + CLICK(2);
 
-					if (direction & SECONDARY_CLIP)
+					if (direction & CLIP_SECONDARY)
 						return TARGET_TYPE::SECONDARY_TARGET;
 
 					if (boxTop > top)
@@ -1965,10 +2000,10 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 				{
 					target->z = (right - CLICK(2));
 
-					if (direction != ALL_CLIP)
+					if (direction != CLIP_ALL)
 						return TARGET_TYPE::SECONDARY_TARGET;
 
-					direction |= (ALL_CLIP | SECONDARY_CLIP);
+					direction |= (CLIP_ALL | CLIP_SECONDARY);
 				}
 			}
 			else if (item->Pose.Position.z > boxRight && direction != CLIP_LEFT)
@@ -1980,7 +2015,7 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 					if (target->z > boxRight - CLICK(2))
 						target->z = boxRight - CLICK(2);
 
-					if (direction & SECONDARY_CLIP)
+					if (direction & CLIP_SECONDARY)
 						return TARGET_TYPE::SECONDARY_TARGET;
 
 					if (boxTop > top)
@@ -1995,10 +2030,10 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 				{
 					target->z = left + CLICK(2);
 
-					if (direction != ALL_CLIP)
+					if (direction != CLIP_ALL)
 						return TARGET_TYPE::SECONDARY_TARGET;
 
-					direction |= (ALL_CLIP | SECONDARY_CLIP);
+					direction |= (CLIP_ALL | CLIP_SECONDARY);
 				}
 			}
 
@@ -2011,7 +2046,7 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 					if (target->x < boxTop + CLICK(2))
 						target->x = boxTop + CLICK(2);
 
-					if (direction & SECONDARY_CLIP)
+					if (direction & CLIP_SECONDARY)
 						return TARGET_TYPE::SECONDARY_TARGET;
 
 					if (boxLeft > left)
@@ -2026,10 +2061,10 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 				{
 					target->x = bottom - CLICK(2);
 
-					if (direction != ALL_CLIP)
+					if (direction != CLIP_ALL)
 						return TARGET_TYPE::SECONDARY_TARGET;
 
-					direction |= (ALL_CLIP | SECONDARY_CLIP);
+					direction |= (CLIP_ALL | CLIP_SECONDARY);
 				}
 			}
 			else if (item->Pose.Position.x > boxBottom && direction != CLIP_TOP)
@@ -2041,7 +2076,7 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 					if (target->x > (boxBottom - CLICK(2)))
 						target->x = (boxBottom - CLICK(2));
 
-					if (direction & SECONDARY_CLIP)
+					if (direction & CLIP_SECONDARY)
 						return TARGET_TYPE::SECONDARY_TARGET;
 
 					if (boxLeft > left)
@@ -2056,10 +2091,10 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 				{
 					target->x = top + CLICK(2);
 
-					if (direction != ALL_CLIP)
+					if (direction != CLIP_ALL)
 						return TARGET_TYPE::SECONDARY_TARGET;
 
-					direction |= (ALL_CLIP | SECONDARY_CLIP);
+					direction |= (CLIP_ALL | CLIP_SECONDARY);
 				}
 			}
 		}
@@ -2070,7 +2105,7 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 			{
 				target->z = LOT->Target.z;
 			}
-			else if (!(direction & SECONDARY_CLIP))
+			else if (!(direction & CLIP_SECONDARY))
 			{
 				if (target->z < (boxLeft + CLICK(2)))
 					target->z = boxLeft + CLICK(2);
@@ -2082,7 +2117,7 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 			{
 				target->x = LOT->Target.x;
 			}
-			else if (!(direction & SECONDARY_CLIP))
+			else if (!(direction & CLIP_SECONDARY))
 			{
 				if (target->x < (boxTop + CLICK(2)))
 					target->x = boxTop + CLICK(2);
@@ -2099,7 +2134,7 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 			break;
 	} while (boxNumber != NO_VALUE);
 
-	if (!(direction & SECONDARY_CLIP))
+	if (!(direction & CLIP_SECONDARY))
 	{
 		if (target->z < (boxLeft + CLICK(2)))
 			target->z = boxLeft + CLICK(2);
@@ -2107,7 +2142,7 @@ TARGET_TYPE CalculateTarget(Vector3i* target, ItemInfo* item, LOTInfo* LOT)
 			target->z = boxRight - CLICK(2);
 	}
 
-	if (!(direction & SECONDARY_CLIP))
+	if (!(direction & CLIP_SECONDARY))
 	{
 		if (target->x < (boxTop + CLICK(2)))
 			target->x = boxTop + CLICK(2);
@@ -2129,14 +2164,14 @@ void AdjustStopperFlag(ItemInfo* item, int direction)
 	int z = item->Pose.Position.z;
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
-	auto* floor = GetSector(room, x - room->x, z - room->z);
+	auto* floor = GetSector(room, x - room->Position.x, z - room->Position.z);
 	floor->Stopper = !floor->Stopper;
 
 	x = item->Pose.Position.x + BLOCK(1) * phd_sin(direction);
 	z = item->Pose.Position.z + BLOCK(1) * phd_cos(direction);
 	room = &g_Level.Rooms[GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetRoomNumber()];
 
-	floor = GetSector(room, x - room->x, z - room->z);
+	floor = GetSector(room, x - room->Position.x, z - room->Position.z);
 	floor->Stopper = !floor->Stopper;
 }
 
@@ -2151,11 +2186,11 @@ void InitializeItemBoxData()
 	{
 		for (const auto& mesh : room.mesh)
 		{
-			long index = ((mesh.pos.Position.z - room.z) / BLOCK(1)) + room.zSize * ((mesh.pos.Position.x - room.x) / BLOCK(1));
-			if (index > room.floor.size())
+			long index = ((mesh.pos.Position.z - room.Position.z) / BLOCK(1)) + room.ZSize * ((mesh.pos.Position.x - room.Position.x) / BLOCK(1));
+			if (index > room.Sectors.size())
 				continue;
 
-			auto* floor = &room.floor[index];
+			auto* floor = &room.Sectors[index];
 			if (floor->PathfindingBoxID == NO_VALUE)
 				continue;
 
@@ -2184,18 +2219,7 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 	if (creature.Enemy == nullptr)
 		return false;
 
-	float stepDist = 0.0f;
-	switch (jumpDistType)
-	{
-	default:
-	case JumpDistance::Block1:
-		stepDist = BLOCK(0.51f);
-		break;
-
-	case JumpDistance::Block2:
-		stepDist = BLOCK(0.76f);
-		break;
-	}
+	float stepDist = BLOCK(0.92f);
 
 	int vPos = item.Pose.Position.y;
 	auto pointCollA = GetPointCollision(item, item.Pose.Orientation.y, stepDist);
@@ -2209,7 +2233,9 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 		if (item.BoxNumber == creature.Enemy->BoxNumber ||
 			vPos >= (pointCollA.GetFloorHeight() - STEPUP_HEIGHT) ||
 			vPos >= (pointCollB.GetFloorHeight() + CLICK(1)) ||
-			vPos <= (pointCollB.GetFloorHeight() - CLICK(1)))
+			vPos <= (pointCollB.GetFloorHeight() - CLICK(1)) ||
+			pointCollA.GetSector().PathfindingBoxID == NO_VALUE ||
+			pointCollB.GetSector().PathfindingBoxID == NO_VALUE)
 		{
 			return false;
 		}
@@ -2221,7 +2247,10 @@ bool CanCreatureJump(ItemInfo& item, JumpDistance jumpDistType)
 			vPos >= (pointCollA.GetFloorHeight() - STEPUP_HEIGHT) ||
 			vPos >= (pointCollB.GetFloorHeight() - STEPUP_HEIGHT) ||
 			vPos >= (pointCollC.GetFloorHeight() + CLICK(1)) ||
-			vPos <= (pointCollC.GetFloorHeight() - CLICK(1)))
+			vPos <= (pointCollC.GetFloorHeight() - CLICK(1)) ||
+			pointCollA.GetSector().PathfindingBoxID == NO_VALUE ||
+			pointCollB.GetSector().PathfindingBoxID == NO_VALUE ||
+			pointCollC.GetSector().PathfindingBoxID == NO_VALUE)
 		{
 			return false;
 		}

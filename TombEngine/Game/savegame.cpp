@@ -15,6 +15,7 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_initialise.h"
 #include "Game/misc.h"
 #include "Game/spotcam.h"
 #include "Game/room.h"
@@ -129,6 +130,11 @@ Save::Vector4 FromVector4(const Vector4& vec)
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
 }
 
+Save::GameVector FromGameVector(const GameVector& vec)
+{
+	return Save::GameVector(vec.x, vec.y, vec.z, (int)vec.RoomNumber);
+}
+
 Pose ToPose(const Save::Pose& pose)
 {
 	return Pose(
@@ -169,6 +175,11 @@ Vector4 ToVector4(const Save::Vector3* vec)
 Vector4 ToVector4(const Save::Vector4* vec)
 {
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
+}
+
+GameVector ToGameVector(const Save::GameVector* vec)
+{
+	return GameVector(vec->x(), vec->y(), vec->z(), (short)vec->room_number());
 }
 
 bool SaveGame::IsSaveGameSlotValid(int slot)
@@ -489,6 +500,17 @@ const std::vector<byte> SaveGame::Build()
 	status.add_stamina(Lara.Status.Stamina);
 	auto statusOffset = status.Finish();
 
+	Save::CollisionInfoDataBuilder collision{ fbb };
+	collision.add_last_bridge_item_number(LaraCollision.LastBridgeItemNumber);
+	collision.add_last_bridge_item_pose(&FromPose(LaraCollision.LastBridgeItemPose));
+	auto collisionOffset = collision.Finish();
+
+	Save::CameraBuilder camera{ fbb };
+	camera.add_position(&FromGameVector(Camera.pos));
+	camera.add_target(&FromGameVector(Camera.target));
+	auto cameraOffset = camera.Finish();
+
+
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
 	for (int i = 0; i < (int)LaraWeaponType::NumWeapons; i++)
 	{
@@ -535,6 +557,7 @@ const std::vector<byte> SaveGame::Build()
 	lara.add_location_pad(Lara.LocationPad);
 	lara.add_right_arm(rightArmOffset);
 	lara.add_status(statusOffset);
+	lara.add_collision(collisionOffset);
 	lara.add_target_arm_orient(&FromEulerAngles(Lara.TargetArmOrient));
 	lara.add_target_entity_number(Lara.TargetEntity == nullptr ? -1 : Lara.TargetEntity->Index);
 	lara.add_torch(torchOffset);
@@ -544,11 +567,11 @@ const std::vector<byte> SaveGame::Build()
 	std::vector<flatbuffers::Offset<Save::Room>> rooms;
 	for (auto& room : g_Level.Rooms)
 	{
-		auto nameOffset = fbb.CreateString(room.name);
+		auto nameOffset = fbb.CreateString(room.Name);
 
 		Save::RoomBuilder serializedInfo{ fbb };
 		serializedInfo.add_name(nameOffset);
-		serializedInfo.add_index(room.index);
+		serializedInfo.add_index(room.RoomNumber);
 		serializedInfo.add_reverb_type((int)room.reverbType);
 		serializedInfo.add_flags(room.flags);
 		auto serializedInfoOffset = serializedInfo.Finish();
@@ -991,14 +1014,14 @@ const std::vector<byte> SaveGame::Build()
 
 			staticMesh.add_flags(room->mesh[j].flags);
 			staticMesh.add_hit_points(room->mesh[j].HitPoints);
-			staticMesh.add_room_number(room->index);
+			staticMesh.add_room_number(room->RoomNumber);
 			staticMesh.add_number(j);
 			staticMeshes.push_back(staticMesh.Finish());
 		}
 
-		for (int j = 0; j < room->triggerVolumes.size(); j++)
+		for (int j = 0; j < room->TriggerVolumes.size(); j++)
 		{
-			auto& currVolume = room->triggerVolumes[j];
+			auto& currVolume = room->TriggerVolumes[j];
 
 			std::vector<flatbuffers::Offset<Save::VolumeState>> queue;
 			for (int k = 0; k < currVolume.StateQueue.size(); k++)
@@ -1022,7 +1045,7 @@ const std::vector<byte> SaveGame::Build()
 			auto nameOffset = fbb.CreateString(currVolume.Name);
 
 			Save::VolumeBuilder volume{ fbb };
-			volume.add_room_number(room->index);
+			volume.add_room_number(room->RoomNumber);
 			volume.add_number(j);
 			volume.add_name(nameOffset);
 			volume.add_enabled(currVolume.Enabled);
@@ -1403,6 +1426,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_header(headerOffset);
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
+	sgb.add_camera(cameraOffset);
 	sgb.add_lara(laraOffset);
 	sgb.add_rooms(roomOffset);
 	sgb.add_next_item_free(NextItemFree);
@@ -1492,6 +1516,9 @@ void SaveGame::LoadHub(int index)
 	// Load hub data.
 	TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
 	Parse(Hub[index], true);
+
+	// Restore vehicle.
+	InitializePlayerVehicle(*LaraItem);
 }
 
 bool SaveGame::IsOnHub(int index)
@@ -1983,6 +2010,14 @@ static void ParsePlayer(const Save::SaveGame* s)
 		AlternatePendulum.rope = rope;
 	}
 
+	// Collision
+	LaraCollision.LastBridgeItemNumber = s->lara()->collision()->last_bridge_item_number();
+	LaraCollision.LastBridgeItemPose = ToPose(*s->lara()->collision()->last_bridge_item_pose());
+
+	// Camera
+	Camera.pos = ToGameVector(s->camera()->position());
+	Camera.target = ToGameVector(s->camera()->target());
+
 	for (auto& item : g_Level.Items)
 	{
 		if (item.ObjectNumber != ID_LARA || item.Index >= g_Level.NumItems)
@@ -2155,7 +2190,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 	for (int i = 0; i < s->rooms()->size(); i++)
 	{
 		auto room = s->rooms()->Get(i);
-		g_Level.Rooms[room->index()].name = room->name()->str();
+		g_Level.Rooms[room->index()].Name = room->name()->str();
 		g_Level.Rooms[room->index()].flags = room->flags();
 		g_Level.Rooms[room->index()].reverbType = (ReverbType)room->reverb_type();
 	}
@@ -2191,18 +2226,18 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 		auto room = &g_Level.Rooms[volume->room_number()];
 		int number = volume->number();
 
-		room->triggerVolumes[number].Enabled = volume->enabled();
-		room->triggerVolumes[number].Name = volume->name()->str();
-		room->triggerVolumes[number].Box.Center =
-		room->triggerVolumes[number].Sphere.Center = ToVector3(volume->position());
-		room->triggerVolumes[number].Box.Orientation = ToVector4(volume->rotation());
-		room->triggerVolumes[number].Box.Extents = ToVector3(volume->scale());
-		room->triggerVolumes[number].Sphere.Radius = room->triggerVolumes[number].Box.Extents.x;
+		room->TriggerVolumes[number].Enabled = volume->enabled();
+		room->TriggerVolumes[number].Name = volume->name()->str();
+		room->TriggerVolumes[number].Box.Center =
+		room->TriggerVolumes[number].Sphere.Center = ToVector3(volume->position());
+		room->TriggerVolumes[number].Box.Orientation = ToVector4(volume->rotation());
+		room->TriggerVolumes[number].Box.Extents = ToVector3(volume->scale());
+		room->TriggerVolumes[number].Sphere.Radius = room->TriggerVolumes[number].Box.Extents.x;
 
 		for (int j = 0; j < volume->queue()->size(); j++)
 		{
 			auto state = volume->queue()->Get(j);
-			room->triggerVolumes[number].StateQueue.push_back(
+			room->TriggerVolumes[number].StateQueue.push_back(
 				VolumeState
 				{
 					(VolumeStateStatus)state->status(),
@@ -2299,10 +2334,21 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		// Don't load player data in hub mode.
 		if (item->ObjectNumber == ID_LARA && hubMode)
+		{
+			item->RoomNumber = savedItem->room_number();
+			item->Floor = savedItem->floor();
+			item->BoxNumber = savedItem->box_number();
 			continue;
+		}
 
 		if (item->Index == Lara.Context.Vehicle && hubMode)
+		{
+			//item->Pose = ToPose(*savedItem->pose());
+			item->RoomNumber = savedItem->room_number();
+			item->Floor = savedItem->floor();
+			item->BoxNumber = savedItem->box_number();
 			continue;
+		}
 
 		// Position
 		item->Pose = ToPose(*savedItem->pose());

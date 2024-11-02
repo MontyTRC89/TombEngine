@@ -3,7 +3,6 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -259,7 +258,7 @@ void AnimatingControl(short itemNumber)
 	else if (item.TriggerFlags == 2) //Make the animating dissapear when anti-triggered.
 	{
 		RemoveActiveItem(itemNumber);
-		item.Status |= ITEM_INVISIBLE;
+		item.Status = ITEM_INVISIBLE;
 	}
 
 	// TODO: ID_SHOOT_SWITCH2 is probably the bell in Trajan Markets, use Lua for that.
