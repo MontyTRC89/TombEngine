@@ -75,7 +75,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 	{
 		spark->scalar = 1;
 		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
-		spark->SpriteID = SPR_LENSFLARE_LIGHT;
+		spark->SpriteID = SPR_LENS_FLARE_LIGHT;
 		spark->size = spark->sSize = (GetRandomControl() & 0x1F) + 160;
 	}
 	else

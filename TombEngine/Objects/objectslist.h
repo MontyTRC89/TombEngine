@@ -53,7 +53,7 @@ template <typename T> std::enable_if_t<std::is_same_v<T, std::underlying_type_t<
 		SPR_LENS_FLARE_BLEND_1,
 		SPR_LENS_FLARE_BLEND_2,
 		SPR_LENS_FLARE_BLEND_3,
-		SPR_LENS_FLARE,
+		SPR_LENS_FLARE_BLEND_4,
 		SPR_WATERFALL_1,
 		SPR_WATERFALL_2
 	};

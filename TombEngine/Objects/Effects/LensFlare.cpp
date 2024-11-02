@@ -100,7 +100,7 @@ namespace TEN::Entities::Effects
 		auto& item = g_Level.Items[itemNumber];
 
 		if (TriggerActive(&item))
-			SetupLensFlare(item.Pose.Position.ToVector3(), item.RoomNumber, Color(), false, SPRITE_TYPES::SPR_LENS_FLARE_3);
+			SetupLensFlare(item.Pose.Position.ToVector3(), item.RoomNumber, Color(), false, SPRITE_TYPES::SPR_LENS_FLARE_BLEND_3);
 	}
 
 	void ClearLensFlares()

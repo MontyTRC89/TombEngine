@@ -66,7 +66,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->gravity = 0;
 		spark->scalar = 1;
 		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
-		spark->SpriteID = SPR_LENSFLARE_LIGHT;
+		spark->SpriteID = SPR_LENS_FLARE_LIGHT;
 		spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
 	}
 
