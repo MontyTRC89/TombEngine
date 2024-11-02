@@ -744,14 +744,16 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 
 bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	int vPos = item->Pose.Position.y;
+	auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius) + item->Animation.Velocity.z);
 
-	int y = item->Pose.Position.y;
-	auto probe = GetPointCollision(*item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius));
+	// 1) Test for wall.
+	if (pointColl.GetFloorHeight() == NO_HEIGHT)
+		return false;
 
-	if ((probe.GetFloorHeight() - y) > 0 &&
-		(probe.GetCeilingHeight() - y) < -CLICK(1.6f) &&
-		probe.GetFloorHeight() != NO_HEIGHT)
+	// 2) Test leg space.
+	if ((pointColl.GetFloorHeight() - vPos) > 0 &&
+		(pointColl.GetCeilingHeight() - vPos) < -CLICK(1.6f))
 	{
 		return true;
 	}

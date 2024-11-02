@@ -5,7 +5,6 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/control/los.h"
-#include "Game/Debug/Debug.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
@@ -23,7 +22,6 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
-
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
@@ -1526,6 +1524,38 @@ void PrepareCamera()
 	}
 }
 
+static void DrawPortals()
+{
+	constexpr auto EXT_COLOR = Color(1.0f, 1.0f, 0.0f, 0.15f);
+	constexpr auto INT_COLOR = Color(1.0f, 0.0f, 0.0f, 0.15f);
+
+	if (!DebugMode)
+		return;
+
+	auto neighborRoomNumbers = GetNeighborRoomNumbers(Camera.pos.RoomNumber, 1);
+	for (auto& roomNumber : neighborRoomNumbers)
+	{
+		const auto& room = g_Level.Rooms[roomNumber];
+
+		auto pos = room.Position.ToVector3();
+		auto color = (roomNumber == Camera.pos.RoomNumber) ? INT_COLOR : EXT_COLOR;
+
+		for (const auto& door : room.doors)
+		{
+			DrawDebugTriangle(door.vertices[0] + pos, door.vertices[1] + pos, door.vertices[2] + pos, color, RendererDebugPage::PortalDebug);
+			DrawDebugTriangle(door.vertices[2] + pos, door.vertices[3] + pos, door.vertices[0] + pos, color, RendererDebugPage::PortalDebug);
+
+			DrawDebugLine(door.vertices[0] + pos, door.vertices[2] + pos, color, RendererDebugPage::PortalDebug);
+			DrawDebugLine(door.vertices[1] + pos, door.vertices[3] + pos, color, RendererDebugPage::PortalDebug);
+
+			auto center = pos + ((door.vertices[0] + door.vertices[1] + door.vertices[2] + door.vertices[3]) / 4);
+			auto target = Geometry::TranslatePoint(center, door.normal, CLICK(1));
+
+			DrawDebugLine(center, target, color, RendererDebugPage::PortalDebug);
+		}
+	}
+}
+
 void UpdateCamera()
 {
 	// HACK: Disable interpolation when switching to/from flyby camera.
@@ -1553,40 +1583,6 @@ void UpdateCamera()
 	g_Renderer.UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
 
 	DrawPortals();
-}
-
-void DrawPortals()
-{
-	static constexpr auto extColor = Color(1.0f, 1.0f, 0.0f, 0.15f);
-	static constexpr auto intColor = Color(1.0f, 0.0f, 0.0f, 0.15f);
-
-	if (!DebugMode)
-		return;
-
-	auto neighborRooms = GetNeighborRoomNumbers(Camera.pos.RoomNumber, 1);
-	neighborRooms.push_back(Camera.pos.RoomNumber);
-
-	for (auto& number : neighborRooms)
-	{
-		auto& room = g_Level.Rooms[number];
-
-		auto p = room.Position.ToVector3();
-		auto color = number == Camera.pos.RoomNumber ? intColor : extColor;
-
-		for (auto& door : room.doors)
-		{
-			DrawDebugTriangle(door.vertices[0] + p, door.vertices[1] + p, door.vertices[2] + p, color, RendererDebugPage::PortalDebug);
-			DrawDebugTriangle(door.vertices[2] + p, door.vertices[3] + p, door.vertices[0] + p, color, RendererDebugPage::PortalDebug);
-
-			DrawDebugLine(door.vertices[0] + p, door.vertices[2] + p, color, RendererDebugPage::PortalDebug);
-			DrawDebugLine(door.vertices[1] + p, door.vertices[3] + p, color, RendererDebugPage::PortalDebug);
-
-			auto center = p + (door.vertices[0] + door.vertices[1] + door.vertices[2] + door.vertices[3]) * 0.25f;
-			auto target = center + door.normal * CLICK(1);
-
-			DrawDebugLine(center, target, color, RendererDebugPage::PortalDebug);
-		}
-	}
 }
 
 void UpdateMikePos(const ItemInfo& item)
