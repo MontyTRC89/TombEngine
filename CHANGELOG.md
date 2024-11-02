@@ -43,6 +43,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Features/Amendments
 
 * Added high framerate mode (also known as 60 FPS mode).
+* Added rapid savegame reloading.
 * Added a customisable global lensflare effect. https://tombengine.com/docs/level-settings/#lensflare
 * Added a customisable starry sky and meteor effect. https://tombengine.com/docs/level-settings/#stars
 * Added the ability to display "Lara's Home" entry in the main menu.
