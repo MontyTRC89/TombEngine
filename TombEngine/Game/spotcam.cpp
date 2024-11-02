@@ -494,6 +494,10 @@ void CalculateSpotCameras()
 		{
 			if (Camera.pos.RoomNumber != SpotCam[CurrentSplineCamera].roomNumber)
 				Camera.DisableInterpolation = true;
+
+			// HACK: Sometimes actual camera room number desyncs from room number derived using floordata functions.
+			// If such case is identified, we do a brute-force search for coherrent room number.
+			// This issue is only present in sub-click floor height setups after TE 1.7.0. -- Lwmte, 02.11.2024
 		
 			auto position = Vector3i(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			int collRoomNumber = GetPointCollision(position, SpotCam[CurrentSplineCamera].roomNumber).GetRoomNumber();
