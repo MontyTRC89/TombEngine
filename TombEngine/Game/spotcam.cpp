@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -14,6 +15,7 @@
 using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;
+using namespace TEN::Collision::Point;
 
 constexpr auto MAX_CAMERA = 18;
 
@@ -493,8 +495,13 @@ void CalculateSpotCameras()
 			if (Camera.pos.RoomNumber != SpotCam[CurrentSplineCamera].roomNumber)
 				Camera.DisableInterpolation = true;
 		
-			Camera.pos.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
-			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
+			auto position = Vector3i(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+			int collRoomNumber = GetPointCollision(position, SpotCam[CurrentSplineCamera].roomNumber).GetRoomNumber();
+
+			if (collRoomNumber != Camera.pos.RoomNumber)
+				collRoomNumber = FindRoomNumber(position, SpotCam[CurrentSplineCamera].roomNumber);
+
+			Camera.pos.RoomNumber = collRoomNumber;
 		}
 		else
 		{

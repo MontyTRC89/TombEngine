@@ -22,6 +22,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect swing ledge grabs with steep grab angles.
 * Fixed incorrect climbing out of water on bridge objects and in front of static meshes.
 * Fixed incorrect diving animation when swandiving from a high place.
+* Fixed room clipping when flyby path goes out of room bounds.
 * Fixed camera rotating with the player's hips when climbing out of water.
 * Fixed camera position after loading a savegame.
 * Fixed broken ropes after loading a savegame.
