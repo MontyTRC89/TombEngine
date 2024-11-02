@@ -137,6 +137,10 @@ struct SwarmObjectInfo;
 struct SwarmObjectInfoBuilder;
 struct SwarmObjectInfoT;
 
+struct RopeSegment;
+struct RopeSegmentBuilder;
+struct RopeSegmentT;
+
 struct Rope;
 struct RopeBuilder;
 struct RopeT;
@@ -5451,14 +5455,112 @@ struct SwarmObjectInfo::Traits {
 
 flatbuffers::Offset<SwarmObjectInfo> CreateSwarmObjectInfo(flatbuffers::FlatBufferBuilder &_fbb, const SwarmObjectInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct RopeSegmentT : public flatbuffers::NativeTable {
+  typedef RopeSegment TableType;
+  std::unique_ptr<TEN::Save::Vector3> segment{};
+  std::unique_ptr<TEN::Save::Vector3> velocity{};
+  std::unique_ptr<TEN::Save::Vector3> normalised_segment{};
+  std::unique_ptr<TEN::Save::Vector3> mesh_segment{};
+  std::unique_ptr<TEN::Save::Vector3> coord{};
+};
+
+struct RopeSegment FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RopeSegmentT NativeTableType;
+  typedef RopeSegmentBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SEGMENT = 4,
+    VT_VELOCITY = 6,
+    VT_NORMALISED_SEGMENT = 8,
+    VT_MESH_SEGMENT = 10,
+    VT_COORD = 12
+  };
+  const TEN::Save::Vector3 *segment() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_SEGMENT);
+  }
+  const TEN::Save::Vector3 *velocity() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_VELOCITY);
+  }
+  const TEN::Save::Vector3 *normalised_segment() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_NORMALISED_SEGMENT);
+  }
+  const TEN::Save::Vector3 *mesh_segment() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_MESH_SEGMENT);
+  }
+  const TEN::Save::Vector3 *coord() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_COORD);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_SEGMENT) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_VELOCITY) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_NORMALISED_SEGMENT) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_MESH_SEGMENT) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_COORD) &&
+           verifier.EndTable();
+  }
+  RopeSegmentT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RopeSegmentT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<RopeSegment> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RopeSegmentT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct RopeSegmentBuilder {
+  typedef RopeSegment Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_segment(const TEN::Save::Vector3 *segment) {
+    fbb_.AddStruct(RopeSegment::VT_SEGMENT, segment);
+  }
+  void add_velocity(const TEN::Save::Vector3 *velocity) {
+    fbb_.AddStruct(RopeSegment::VT_VELOCITY, velocity);
+  }
+  void add_normalised_segment(const TEN::Save::Vector3 *normalised_segment) {
+    fbb_.AddStruct(RopeSegment::VT_NORMALISED_SEGMENT, normalised_segment);
+  }
+  void add_mesh_segment(const TEN::Save::Vector3 *mesh_segment) {
+    fbb_.AddStruct(RopeSegment::VT_MESH_SEGMENT, mesh_segment);
+  }
+  void add_coord(const TEN::Save::Vector3 *coord) {
+    fbb_.AddStruct(RopeSegment::VT_COORD, coord);
+  }
+  explicit RopeSegmentBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<RopeSegment> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<RopeSegment>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<RopeSegment> CreateRopeSegment(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const TEN::Save::Vector3 *segment = 0,
+    const TEN::Save::Vector3 *velocity = 0,
+    const TEN::Save::Vector3 *normalised_segment = 0,
+    const TEN::Save::Vector3 *mesh_segment = 0,
+    const TEN::Save::Vector3 *coord = 0) {
+  RopeSegmentBuilder builder_(_fbb);
+  builder_.add_coord(coord);
+  builder_.add_mesh_segment(mesh_segment);
+  builder_.add_normalised_segment(normalised_segment);
+  builder_.add_velocity(velocity);
+  builder_.add_segment(segment);
+  return builder_.Finish();
+}
+
+struct RopeSegment::Traits {
+  using type = RopeSegment;
+  static auto constexpr Create = CreateRopeSegment;
+};
+
+flatbuffers::Offset<RopeSegment> CreateRopeSegment(flatbuffers::FlatBufferBuilder &_fbb, const RopeSegmentT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct RopeT : public flatbuffers::NativeTable {
   typedef Rope TableType;
-  std::vector<TEN::Save::Vector3> segments{};
-  std::vector<TEN::Save::Vector3> velocities{};
-  std::vector<TEN::Save::Vector3> normalised_segments{};
-  std::vector<TEN::Save::Vector3> mesh_segments{};
+  std::vector<std::unique_ptr<TEN::Save::RopeSegmentT>> segments{};
   std::unique_ptr<TEN::Save::Vector3> position{};
-  std::vector<TEN::Save::Vector3> coords{};
   int32_t segment_length = 0;
   int32_t active = 0;
   int32_t coiled = 0;
@@ -5470,32 +5572,16 @@ struct Rope FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SEGMENTS = 4,
-    VT_VELOCITIES = 6,
-    VT_NORMALISED_SEGMENTS = 8,
-    VT_MESH_SEGMENTS = 10,
-    VT_POSITION = 12,
-    VT_COORDS = 14,
-    VT_SEGMENT_LENGTH = 16,
-    VT_ACTIVE = 18,
-    VT_COILED = 20
+    VT_POSITION = 6,
+    VT_SEGMENT_LENGTH = 8,
+    VT_ACTIVE = 10,
+    VT_COILED = 12
   };
-  const flatbuffers::Vector<const TEN::Save::Vector3 *> *segments() const {
-    return GetPointer<const flatbuffers::Vector<const TEN::Save::Vector3 *> *>(VT_SEGMENTS);
-  }
-  const flatbuffers::Vector<const TEN::Save::Vector3 *> *velocities() const {
-    return GetPointer<const flatbuffers::Vector<const TEN::Save::Vector3 *> *>(VT_VELOCITIES);
-  }
-  const flatbuffers::Vector<const TEN::Save::Vector3 *> *normalised_segments() const {
-    return GetPointer<const flatbuffers::Vector<const TEN::Save::Vector3 *> *>(VT_NORMALISED_SEGMENTS);
-  }
-  const flatbuffers::Vector<const TEN::Save::Vector3 *> *mesh_segments() const {
-    return GetPointer<const flatbuffers::Vector<const TEN::Save::Vector3 *> *>(VT_MESH_SEGMENTS);
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RopeSegment>> *segments() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RopeSegment>> *>(VT_SEGMENTS);
   }
   const TEN::Save::Vector3 *position() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_POSITION);
-  }
-  const flatbuffers::Vector<const TEN::Save::Vector3 *> *coords() const {
-    return GetPointer<const flatbuffers::Vector<const TEN::Save::Vector3 *> *>(VT_COORDS);
   }
   int32_t segment_length() const {
     return GetField<int32_t>(VT_SEGMENT_LENGTH, 0);
@@ -5510,15 +5596,8 @@ struct Rope FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_SEGMENTS) &&
            verifier.VerifyVector(segments()) &&
-           VerifyOffset(verifier, VT_VELOCITIES) &&
-           verifier.VerifyVector(velocities()) &&
-           VerifyOffset(verifier, VT_NORMALISED_SEGMENTS) &&
-           verifier.VerifyVector(normalised_segments()) &&
-           VerifyOffset(verifier, VT_MESH_SEGMENTS) &&
-           verifier.VerifyVector(mesh_segments()) &&
+           verifier.VerifyVectorOfTables(segments()) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION) &&
-           VerifyOffset(verifier, VT_COORDS) &&
-           verifier.VerifyVector(coords()) &&
            VerifyField<int32_t>(verifier, VT_SEGMENT_LENGTH) &&
            VerifyField<int32_t>(verifier, VT_ACTIVE) &&
            VerifyField<int32_t>(verifier, VT_COILED) &&
@@ -5533,23 +5612,11 @@ struct RopeBuilder {
   typedef Rope Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_segments(flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> segments) {
+  void add_segments(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RopeSegment>>> segments) {
     fbb_.AddOffset(Rope::VT_SEGMENTS, segments);
-  }
-  void add_velocities(flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> velocities) {
-    fbb_.AddOffset(Rope::VT_VELOCITIES, velocities);
-  }
-  void add_normalised_segments(flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> normalised_segments) {
-    fbb_.AddOffset(Rope::VT_NORMALISED_SEGMENTS, normalised_segments);
-  }
-  void add_mesh_segments(flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> mesh_segments) {
-    fbb_.AddOffset(Rope::VT_MESH_SEGMENTS, mesh_segments);
   }
   void add_position(const TEN::Save::Vector3 *position) {
     fbb_.AddStruct(Rope::VT_POSITION, position);
-  }
-  void add_coords(flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> coords) {
-    fbb_.AddOffset(Rope::VT_COORDS, coords);
   }
   void add_segment_length(int32_t segment_length) {
     fbb_.AddElement<int32_t>(Rope::VT_SEGMENT_LENGTH, segment_length, 0);
@@ -5573,12 +5640,8 @@ struct RopeBuilder {
 
 inline flatbuffers::Offset<Rope> CreateRope(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> segments = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> velocities = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> normalised_segments = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> mesh_segments = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RopeSegment>>> segments = 0,
     const TEN::Save::Vector3 *position = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> coords = 0,
     int32_t segment_length = 0,
     int32_t active = 0,
     int32_t coiled = 0) {
@@ -5586,11 +5649,7 @@ inline flatbuffers::Offset<Rope> CreateRope(
   builder_.add_coiled(coiled);
   builder_.add_active(active);
   builder_.add_segment_length(segment_length);
-  builder_.add_coords(coords);
   builder_.add_position(position);
-  builder_.add_mesh_segments(mesh_segments);
-  builder_.add_normalised_segments(normalised_segments);
-  builder_.add_velocities(velocities);
   builder_.add_segments(segments);
   return builder_.Finish();
 }
@@ -5602,28 +5661,16 @@ struct Rope::Traits {
 
 inline flatbuffers::Offset<Rope> CreateRopeDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<TEN::Save::Vector3> *segments = nullptr,
-    const std::vector<TEN::Save::Vector3> *velocities = nullptr,
-    const std::vector<TEN::Save::Vector3> *normalised_segments = nullptr,
-    const std::vector<TEN::Save::Vector3> *mesh_segments = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::RopeSegment>> *segments = nullptr,
     const TEN::Save::Vector3 *position = 0,
-    const std::vector<TEN::Save::Vector3> *coords = nullptr,
     int32_t segment_length = 0,
     int32_t active = 0,
     int32_t coiled = 0) {
-  auto segments__ = segments ? _fbb.CreateVectorOfStructs<TEN::Save::Vector3>(*segments) : 0;
-  auto velocities__ = velocities ? _fbb.CreateVectorOfStructs<TEN::Save::Vector3>(*velocities) : 0;
-  auto normalised_segments__ = normalised_segments ? _fbb.CreateVectorOfStructs<TEN::Save::Vector3>(*normalised_segments) : 0;
-  auto mesh_segments__ = mesh_segments ? _fbb.CreateVectorOfStructs<TEN::Save::Vector3>(*mesh_segments) : 0;
-  auto coords__ = coords ? _fbb.CreateVectorOfStructs<TEN::Save::Vector3>(*coords) : 0;
+  auto segments__ = segments ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::RopeSegment>>(*segments) : 0;
   return TEN::Save::CreateRope(
       _fbb,
       segments__,
-      velocities__,
-      normalised_segments__,
-      mesh_segments__,
       position,
-      coords__,
       segment_length,
       active,
       coiled);
@@ -9624,6 +9671,44 @@ inline flatbuffers::Offset<SwarmObjectInfo> CreateSwarmObjectInfo(flatbuffers::F
       _flags);
 }
 
+inline RopeSegmentT *RopeSegment::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<RopeSegmentT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void RopeSegment::UnPackTo(RopeSegmentT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = segment(); if (_e) _o->segment = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = velocity(); if (_e) _o->velocity = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = normalised_segment(); if (_e) _o->normalised_segment = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = mesh_segment(); if (_e) _o->mesh_segment = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = coord(); if (_e) _o->coord = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+}
+
+inline flatbuffers::Offset<RopeSegment> RopeSegment::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RopeSegmentT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRopeSegment(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<RopeSegment> CreateRopeSegment(flatbuffers::FlatBufferBuilder &_fbb, const RopeSegmentT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RopeSegmentT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _segment = _o->segment ? _o->segment.get() : 0;
+  auto _velocity = _o->velocity ? _o->velocity.get() : 0;
+  auto _normalised_segment = _o->normalised_segment ? _o->normalised_segment.get() : 0;
+  auto _mesh_segment = _o->mesh_segment ? _o->mesh_segment.get() : 0;
+  auto _coord = _o->coord ? _o->coord.get() : 0;
+  return TEN::Save::CreateRopeSegment(
+      _fbb,
+      _segment,
+      _velocity,
+      _normalised_segment,
+      _mesh_segment,
+      _coord);
+}
+
 inline RopeT *Rope::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<RopeT>();
   UnPackTo(_o.get(), _resolver);
@@ -9633,12 +9718,8 @@ inline RopeT *Rope::UnPack(const flatbuffers::resolver_function_t *_resolver) co
 inline void Rope::UnPackTo(RopeT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = segments(); if (_e) { _o->segments.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->segments[_i] = *_e->Get(_i); } } }
-  { auto _e = velocities(); if (_e) { _o->velocities.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->velocities[_i] = *_e->Get(_i); } } }
-  { auto _e = normalised_segments(); if (_e) { _o->normalised_segments.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->normalised_segments[_i] = *_e->Get(_i); } } }
-  { auto _e = mesh_segments(); if (_e) { _o->mesh_segments.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->mesh_segments[_i] = *_e->Get(_i); } } }
+  { auto _e = segments(); if (_e) { _o->segments.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->segments[_i] = std::unique_ptr<TEN::Save::RopeSegmentT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = coords(); if (_e) { _o->coords.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->coords[_i] = *_e->Get(_i); } } }
   { auto _e = segment_length(); _o->segment_length = _e; }
   { auto _e = active(); _o->active = _e; }
   { auto _e = coiled(); _o->coiled = _e; }
@@ -9652,23 +9733,15 @@ inline flatbuffers::Offset<Rope> CreateRope(flatbuffers::FlatBufferBuilder &_fbb
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RopeT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _segments = _fbb.CreateVectorOfStructs(_o->segments);
-  auto _velocities = _fbb.CreateVectorOfStructs(_o->velocities);
-  auto _normalised_segments = _fbb.CreateVectorOfStructs(_o->normalised_segments);
-  auto _mesh_segments = _fbb.CreateVectorOfStructs(_o->mesh_segments);
+  auto _segments = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::RopeSegment>> (_o->segments.size(), [](size_t i, _VectorArgs *__va) { return CreateRopeSegment(*__va->__fbb, __va->__o->segments[i].get(), __va->__rehasher); }, &_va );
   auto _position = _o->position ? _o->position.get() : 0;
-  auto _coords = _fbb.CreateVectorOfStructs(_o->coords);
   auto _segment_length = _o->segment_length;
   auto _active = _o->active;
   auto _coiled = _o->coiled;
   return TEN::Save::CreateRope(
       _fbb,
       _segments,
-      _velocities,
-      _normalised_segments,
-      _mesh_segments,
       _position,
-      _coords,
       _segment_length,
       _active,
       _coiled);

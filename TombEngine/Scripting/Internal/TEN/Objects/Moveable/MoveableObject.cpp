@@ -223,6 +223,12 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @treturn int the index of the active state
 	ScriptReserved_GetStateNumber, &Moveable::GetStateNumber,
 
+/// Retrieve the index of the target state.
+// This corresponds to the state the object is trying to get into, which is sometimes different from the active state.
+// @function Moveable:GetTargetState
+// @treturn int the index of the target state
+	ScriptReserved_GetTargetStateNumber, &Moveable::GetTargetStateNumber,
+
 /// Set the object's state to the one specified by the given index.
 // Performs no bounds checking. *Ensure the number given is correct, else
 // object may end up in corrupted animation state.*
@@ -844,6 +850,11 @@ void Moveable::SetAIBits(aiBitsType const & bits)
 int Moveable::GetStateNumber() const
 {
 	return m_item->Animation.ActiveState;
+}
+
+int Moveable::GetTargetStateNumber() const
+{
+	return m_item->Animation.TargetState;
 }
 
 void Moveable::SetStateNumber(int stateNumber)
