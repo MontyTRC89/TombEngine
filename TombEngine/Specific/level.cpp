@@ -1256,12 +1256,13 @@ bool LoadLevel(std::string path, bool partial)
 		char header[4];
 		unsigned char version[4];
 		int systemHash;
+		int levelHash;
 
 		// Read file header
 		ReadFileEx(&header, 1, 4, filePtr);
 		ReadFileEx(&version, 1, 4, filePtr);
 		ReadFileEx(&systemHash, 1, 4, filePtr);
-		ReadFileEx(&LastLevelHash, 1, 4, filePtr);
+		ReadFileEx(&levelHash, 1, 4, filePtr);
 
 		// Check file header.
 		if (std::string(header) != "TEN")
@@ -1269,13 +1270,15 @@ bool LoadLevel(std::string path, bool partial)
 
 		// Check the integrity of the level file to allow or disallow rapid reload.
 		auto timestamp = std::filesystem::last_write_time(path);
-		if (partial && (timestamp != LastLevelTimestamp))
+		if (partial && (timestamp != LastLevelTimestamp || levelHash != LastLevelHash))
 		{
 			TENLog("Level file has changed since the last loading, rapid reload is impossible.", LogLevel::Warning);
 			partial = false;
+			FreeLevel(false); // Erase all precached data
 		}
 		LastLevelFilePath = path;
 		LastLevelTimestamp = timestamp;
+		LastLevelHash = levelHash;
 		
 		TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
 
@@ -1302,7 +1305,7 @@ bool LoadLevel(std::string path, bool partial)
 
 		if (partial)
 		{
-			TENLog("Loading same level. Skipping audiovisual and geometry data.", LogLevel::Info);
+			TENLog("Loading same level. Skipping media and geometry data.", LogLevel::Info);
 			SetScreenFadeOut(FADE_SCREEN_SPEED * 2, true);
 		}
 		else
@@ -1310,10 +1313,9 @@ bool LoadLevel(std::string path, bool partial)
 
 		UpdateProgress(0);
 
-		// Audiovisual block
+		// Media block
 		if (ReadCompressedBlock(filePtr, partial))
 		{
-
 			LoadTextures();
 			UpdateProgress(30);
 
