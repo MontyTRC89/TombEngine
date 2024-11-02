@@ -19,6 +19,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed several binocular bugs.
 * Fixed faulty death sectors.
 * Fixed shimmy softlocks around static meshes with soft collision.
+* Fixed incorrect swing ledge grabs with steep grab angles.
 * Fixed incorrect climbing out of water on bridge objects and in front of static meshes.
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed camera rotating with the player's hips when climbing out of water.
@@ -48,6 +49,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added the ability to display "Lara's Home" entry in the main menu.
 * Added the ability to change pickup item count by modifying item hit points.
 * Added F12 as alternative to PrtSc for screenshots.
+* Added ability to invoke load game dialog after death by pressing any key.
 * Added visible mouse pointer in windowed mode.
 * Added portal debug mode.
 * Added new sound conditions: Quicksand and Underwater.
@@ -76,6 +78,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Input.KeyClearAll() function.
 * Added Moveable.GetJointRotation() and optional 'offset' parameter for Moveable.GetJointPosition().
+* Added Moveable.GetTargetState() function.
 * Added Room:GetRoomNumber() function.
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
 * Fixed Volume:GetActive() method.
