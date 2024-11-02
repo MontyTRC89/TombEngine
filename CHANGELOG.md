@@ -49,6 +49,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added the ability to display "Lara's Home" entry in the main menu.
 * Added the ability to change pickup item count by modifying item hit points.
 * Added F12 as alternative to PrtSc for screenshots.
+* Added ability to invoke load game dialog after death by pressing any key.
 * Added visible mouse pointer in windowed mode.
 * Added portal debug mode.
 * Added new sound conditions: Quicksand and Underwater.
