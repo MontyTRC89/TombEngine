@@ -738,7 +738,7 @@ void LoadDynamicRoomData()
 		}
 
 		int triggerVolumeCount = ReadInt32();
-		room.TriggerVolumes.clear();
+		room.TriggerVolumes.resize(0);
 		room.TriggerVolumes.reserve(triggerVolumeCount);
 
 		for (int j = 0; j < triggerVolumeCount; j++)
