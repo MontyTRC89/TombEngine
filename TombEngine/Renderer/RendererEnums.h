@@ -144,6 +144,7 @@ enum class RendererDebugPage
 	CollisionStats,
 	PathfindingStats,
 	WireframeMode,
+	PortalDebug,
 
 	Count
 };

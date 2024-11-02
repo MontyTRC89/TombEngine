@@ -266,7 +266,7 @@ Vector3i GetRoomCenter(int roomNumber)
 		room.Position.z + halfDepth);
 }
 
-static std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers = std::vector<int>{})
+std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers)
 {
 	// Invalid room; return empty vector.
 	if (g_Level.Rooms.size() <= roomNumber)

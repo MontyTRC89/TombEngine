@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
+#include "Game/effects/DisplaySprite.h"
 #include "Game/effects/Hair.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
@@ -22,12 +23,10 @@
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Renderer/RenderView.h"
 #include "Renderer/Renderer.h"
+#include "Renderer/Structures/RendererSortableObject.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
-#include "Renderer/Structures/RendererSortableObject.h"
-#include "Game/effects/weather.h"
-#include "Game/effects/DisplaySprite.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects::Hair;
