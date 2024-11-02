@@ -1485,7 +1485,9 @@ bool LoadLevelFile(int levelIndex)
 
 	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
 	g_Renderer.SetLoadingScreen(loadingScreenPath);
-	g_Renderer.DumpGameScene();
+
+	if (sameLevel)
+		g_Renderer.DumpGameScene();
 
 	BackupLara();
 	StopAllSounds();
