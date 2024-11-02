@@ -209,8 +209,10 @@ bool SaveGame::DoesSaveGameExist(int slot, bool silent)
 bool SaveGame::IsLoadGamePossible()
 {
 	for (int i = 0; i < SAVEGAME_MAX; i++)
+	{
 		if (Infos[i].Present)
 			return true;
+	}
 
 	return false;
 }
