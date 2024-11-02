@@ -1,8 +1,6 @@
 #include "framework.h"
 #include "Specific/Structures/BoundingVolumeHierarchy.h"
 
-#include <stack>
-
 #include "Math/Math.h"
 
 using namespace TEN::Math;
@@ -16,7 +14,7 @@ namespace TEN::Structures
 
 	BoundingVolumeHierarchy::BoundingVolumeHierarchy(const std::vector<int>& objectIds, const std::vector<BoundingBox>& aabbs, BvhBuildStrategy strategy)
 	{
-		TENAssert(objectIds.size() == aabbs.size(), "BoundingVolumeHierarchy: Object ID and AABB counts unequal in static constructor.");
+		TENAssert(objectIds.size() == aabbs.size(), "BVH: Object ID and AABB counts unequal in static constructor.");
 		if (objectIds.empty() && aabbs.empty())
 			return;
 
@@ -108,7 +106,7 @@ namespace TEN::Structures
 		auto it = _leafIDMap.find(objectID);
 		if (it == _leafIDMap.end())
 		{
-			TENLog("BoundingVolumeHierarchy: Attempted to move missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
+			TENLog("BVH: Attempted to move missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
 			return;
 		}
 
@@ -142,7 +140,7 @@ namespace TEN::Structures
 		auto it = _leafIDMap.find(objectID);
 		if (it == _leafIDMap.end())
 		{
-			TENLog("BoundingVolumeHierarchy: Attempted to remove missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
+			TENLog("BVH: Attempted to remove missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
 			return;
 		}
 
@@ -289,7 +287,7 @@ namespace TEN::Structures
 			siblingID = (leftCost < rightCost) ? leftChildID : rightChildID;
 			if (siblingID == NO_VALUE)
 			{
-				TENLog("BoundingVolumeHierarchy: Sibling leaf search failed.", LogLevel::Warning);
+				TENLog("BVH: Sibling leaf search failed.", LogLevel::Warning);
 				break;
 			}
 		}
@@ -741,7 +739,7 @@ namespace TEN::Structures
 					count++;
 			}
 
-			TENAssert(count == 1, "BoundingVolumeHierarchy: Duplicate object IDs contained.");
+			TENAssert(count == 1, "BVH: Duplicate object IDs contained.");
 		}
 	}
 
@@ -755,42 +753,42 @@ namespace TEN::Structures
 
 		// Validate root.
 		if (nodeID == _rootID)
-			TENAssert(node.ParentID == NO_VALUE, "BoundingVolumeHierarchy: Root node cannot have parent.");
+			TENAssert(node.ParentID == NO_VALUE, "BVH: Root node cannot have parent.");
 
 		// Validate leaf node.
 		if (node.IsLeaf())
 		{
-			TENAssert(node.ObjectID != NO_VALUE, "BoundingVolumeHierarchy: Leaf node must contain object ID.");
-			TENAssert(node.Height == 0, "BoundingVolumeHierarchy: Leaf node must have height of 0.");
+			TENAssert(node.ObjectID != NO_VALUE, "BVH: Leaf node must contain object ID.");
+			TENAssert(node.Height == 0, "BVH: Leaf node must have height of 0.");
 		}
 		// Validate inner node.
 		else
 		{
-			TENAssert(node.ObjectID == NO_VALUE, "BoundingVolumeHierarchy: Inner node cannot contain object ID.");
-			TENAssert(node.Height != 0, "BoundingVolumeHierarchy: Inner node cannot have height of 0.");
+			TENAssert(node.ObjectID == NO_VALUE, "BVH: Inner node cannot contain object ID.");
+			TENAssert(node.Height != 0, "BVH: Inner node cannot have height of 0.");
 		}
 
 		// Validate parent.
 		if (nodeID != _rootID)
-			TENAssert(node.ParentID != NO_VALUE, "BoundingVolumeHierarchy: Non-root node must have parent.");
+			TENAssert(node.ParentID != NO_VALUE, "BVH: Non-root node must have parent.");
 
 		// Validate parent of children.
 		if (node.LeftChildID != NO_VALUE)
 		{
 			const auto& leftChild = _nodes[node.LeftChildID];
-			TENAssert(leftChild.ParentID == nodeID, "BoundingVolumeHierarchy: Left child has wrong parent.");
+			TENAssert(leftChild.ParentID == nodeID, "BVH: Left child has wrong parent.");
 		}
 		if (node.RightChildID != NO_VALUE)
 		{
 			const auto& rightChild = _nodes[node.RightChildID];
-			TENAssert(rightChild.ParentID == nodeID, "BoundingVolumeHierarchy: Right child has wrong parent.");
+			TENAssert(rightChild.ParentID == nodeID, "BVH: Right child has wrong parent.");
 		}
 
 		// Validate height.
 		if (nodeID != _rootID)
 		{
 			const auto& parent = _nodes[node.ParentID];
-			TENAssert(node.Height < parent.Height, "BoundingVolumeHierarchy: Child height must be less than parent height.");
+			TENAssert(node.Height < parent.Height, "BVH: Child height must be less than parent height.");
 		}
 
 		// Validate recursively.
