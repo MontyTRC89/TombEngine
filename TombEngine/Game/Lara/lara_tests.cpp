@@ -747,11 +747,12 @@ bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	int y = item->Pose.Position.y;
-	auto probe = GetPointCollision(*item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius));
+	auto probe = GetPointCollision(*item, item->Pose.Orientation.y, CLICK(1.5f));
 
-	if ((probe.GetFloorHeight() - y) > 0 &&
-		(probe.GetCeilingHeight() - y) < -CLICK(1.6f) &&
-		probe.GetFloorHeight() != NO_HEIGHT)
+	if (probe.GetFloorHeight() != NO_HEIGHT &&
+		probe.GetFloorHeight() - y > 0 &&
+		probe.GetCeilingHeight() - y < -CLICK(1.6f) &&
+		y - probe.GetCeilingHeight() - coll->Setup.Height > -CLICK(0.3f)) // Check if there is enough space above the ledge for Lara's hands / head
 	{
 		return true;
 	}
