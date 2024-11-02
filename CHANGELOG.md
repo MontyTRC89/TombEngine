@@ -78,6 +78,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Input.KeyClearAll() function.
 * Added Moveable.GetJointRotation() and optional 'offset' parameter for Moveable.GetJointPosition().
+* Added Moveable.GetTargetState() function.
 * Added Room:GetRoomNumber() function.
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
 * Fixed Volume:GetActive() method.
