@@ -490,7 +490,7 @@ std::optional<std::string> GetCurrentSubtitle()
 	return std::nullopt;
 }
 
-void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD position)
+void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD position, int forceFadeInTime)
 {
 	if (!g_Configuration.EnableSound)
 		return;
@@ -565,11 +565,11 @@ void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD positio
 	// BGM tracks are crossfaded, and additionally shuffled a bit to make things more natural.
 	// Think everybody are fed up with same start-up sounds of Caves ambience...
 
-	if (crossfade && BASS_ChannelIsActive(SoundtrackSlot[(int)SoundTrackType::BGM].Channel))
+	if ((forceFadeInTime > 0) || (crossfade && BASS_ChannelIsActive(SoundtrackSlot[(int)SoundTrackType::BGM].Channel)))
 	{		
 		// Crossfade...
 		BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, 0.0f);
-		BASS_ChannelSlideAttribute(stream, BASS_ATTRIB_VOL, masterVolume, crossfadeTime);
+		BASS_ChannelSlideAttribute(stream, BASS_ATTRIB_VOL, masterVolume, (forceFadeInTime > 0) ? forceFadeInTime : crossfadeTime);
 
 		// Shuffle...
 		// Only activates if no custom position is passed as argument.
@@ -667,7 +667,7 @@ void StopSoundTracks(bool excludeAmbience)
 		if (excludeAmbience && type == SoundTrackType::BGM)
 			continue;
 
-		StopSoundTrack(type, SOUND_XFADETIME_ONESHOT);
+		StopSoundTrack(type, SOUND_XFADETIME_LEVELJUMP);
 	}
 }
 
