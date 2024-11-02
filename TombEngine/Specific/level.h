@@ -141,6 +141,7 @@ extern std::vector<int> StaticObjectsIds;
 extern std::vector<int> SpriteSequencesIds;
 extern LEVEL g_Level;
 extern int SystemNameHash;
+extern int LastLevelHash;
 
 inline std::future<bool> LevelLoadTask;
 

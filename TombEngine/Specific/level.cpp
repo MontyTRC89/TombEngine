@@ -87,8 +87,9 @@ std::vector<int> SpriteSequencesIds;
 char* DataPtr;
 char* CurrentDataPtr;
 
-
+bool FirstLevel = true;
 int SystemNameHash = 0;
+int LastLevelHash  = 0;
 
 std::filesystem::file_time_type LastLevelTimestamp;
 std::string LastLevelFilePath;
@@ -962,10 +963,9 @@ void LoadRooms()
 
 void FreeLevel(bool partial)
 {
-	static bool firstLevel = true;
-	if (firstLevel)
+	if (FirstLevel)
 	{
-		firstLevel = false;
+		FirstLevel = false;
 		return;
 	}
 
@@ -1233,17 +1233,16 @@ void FinalizeBlock()
 	}
 }
 
-void UpdateProgress(float progress, bool skip)
+void UpdateProgress(float progress, bool skip = false)
 {
 	if (skip)
-		g_Renderer.RenderInventory();
-	else
-		g_Renderer.UpdateProgress(progress);
+		return;
+
+	g_Renderer.UpdateProgress(progress);
 }
 
 bool LoadLevel(std::string path, bool partial)
 {
-	CurrentDataPtr  = nullptr;
 	FILE* filePtr = nullptr;
 	bool loadedSuccessfully;
 
@@ -1262,10 +1261,21 @@ bool LoadLevel(std::string path, bool partial)
 		ReadFileEx(&header, 1, 4, filePtr);
 		ReadFileEx(&version, 1, 4, filePtr);
 		ReadFileEx(&systemHash, 1, 4, filePtr);
+		ReadFileEx(&LastLevelHash, 1, 4, filePtr);
 
-		// Check file header
+		// Check file header.
 		if (std::string(header) != "TEN")
 			throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
+
+		// Check the integrity of the level file to allow or disallow rapid reload.
+		auto timestamp = std::filesystem::last_write_time(path);
+		if (partial && (timestamp != LastLevelTimestamp))
+		{
+			TENLog("Level file has changed since the last loading, rapid reload is impossible.", LogLevel::Warning);
+			partial = false;
+		}
+		LastLevelFilePath = path;
+		LastLevelTimestamp = timestamp;
 		
 		TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
 
@@ -1291,20 +1301,24 @@ bool LoadLevel(std::string path, bool partial)
 		}
 
 		if (partial)
+		{
 			TENLog("Loading same level. Skipping audiovisual and geometry data.", LogLevel::Info);
+			SetScreenFadeOut(FADE_SCREEN_SPEED * 2, true);
+		}
 		else
 			SetScreenFadeIn(FADE_SCREEN_SPEED, true);
 
-		UpdateProgress(0, partial);
+		UpdateProgress(0);
 
 		// Audiovisual block
 		if (ReadCompressedBlock(filePtr, partial))
 		{
+
 			LoadTextures();
-			UpdateProgress(30, partial);
+			UpdateProgress(30);
 
 			LoadSamples();
-			UpdateProgress(40, partial);
+			UpdateProgress(40);
 
 			FinalizeBlock();
 		}
@@ -1313,15 +1327,15 @@ bool LoadLevel(std::string path, bool partial)
 		if (ReadCompressedBlock(filePtr, partial))
 		{
 			LoadRooms();
-			UpdateProgress(50, partial);
+			UpdateProgress(50);
 
 			LoadObjects();
-			UpdateProgress(60, partial);
+			UpdateProgress(60);
 
 			LoadSprites();
 			LoadBoxes();
 			LoadAnimatedTextures();
-			UpdateProgress(70, partial);
+			UpdateProgress(70);
 
 			FinalizeBlock();
 		}
@@ -1342,7 +1356,7 @@ bool LoadLevel(std::string path, bool partial)
 
 		TENLog("Initializing level...", LogLevel::Info);
 
-		// Initialize the game
+		// Initialize the game.
 		InitializeGameFlags();
 		InitializeLara(!InitializeGame && CurrentLevel > 0);
 		InitializeNeighborRoomList();
@@ -1361,6 +1375,9 @@ bool LoadLevel(std::string path, bool partial)
 			SetScreenFadeOut(FADE_SCREEN_SPEED, true);
 
 		UpdateProgress(100, partial);
+
+		if (partial)
+			SetScreenFadeIn(FADE_SCREEN_SPEED, true);
 
 		loadedSuccessfully = true;
 	}
@@ -1480,14 +1497,12 @@ bool LoadLevelFile(int levelIndex)
 	auto timestamp = std::filesystem::last_write_time(levelPath);
 	bool sameLevel = (timestamp == LastLevelTimestamp && levelPath == LastLevelFilePath);
 
-	LastLevelFilePath = levelPath;
-	LastLevelTimestamp = timestamp;
+	// Dumping game scene right after engine launch is impossible, as no scene exists.
+	if (!FirstLevel)
+		g_Renderer.DumpGameScene();
 
 	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
-	g_Renderer.SetLoadingScreen(loadingScreenPath);
-
-	if (sameLevel)
-		g_Renderer.DumpGameScene();
+	g_Renderer.SetLoadingScreen(sameLevel ? std::wstring{} : loadingScreenPath);
 
 	BackupLara();
 	StopAllSounds();

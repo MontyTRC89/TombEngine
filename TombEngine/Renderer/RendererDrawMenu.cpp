@@ -1122,11 +1122,11 @@ namespace TEN::Renderer
 			_context->RSSetViewports(1, &_viewport);
 			ResetScissor();
 
-			// Draw the full screen background
+			// Draw the full screen background. If unavailable, draw last dumped game scene.
 			if (_loadingScreenTexture.Texture)
-				DrawFullScreenQuad(
-					_loadingScreenTexture.ShaderResourceView.Get(),
-					Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
+				DrawFullScreenQuad(_loadingScreenTexture.ShaderResourceView.Get(), Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
+			else if (_dumpScreenRenderTarget.Texture)
+				DrawFullScreenQuad(_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
 
 			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
 				DrawLoadingBar(percentage);
