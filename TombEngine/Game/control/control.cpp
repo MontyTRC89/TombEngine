@@ -102,8 +102,6 @@ int RequiredStartPos;
 int CurrentLevel;
 int NextLevel;
 
-int SystemNameHash = 0;
-
 bool  InItemControlLoop;
 short ItemNewRoomNo;
 short ItemNewRooms[MAX_ROOMS];
