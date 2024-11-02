@@ -339,6 +339,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Game\collision\Attractor.h" />
+    <ClInclude Include="Game\collision\AttractorDebug.h" />
     <ClInclude Include="Game\collision\Point.h" />
     <ClInclude Include="Game\collision\Sphere.h" />
     <ClInclude Include="Game\Debug\Debug.h" />
@@ -350,6 +352,14 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Hud\Speedometer.h" />
     <ClInclude Include="Game\Hud\StatusBars.h" />
     <ClInclude Include="Game\Hud\TargetHighlighter.h" />
+    <ClInclude Include="Game\Lara\Context\Climb.h" />
+    <ClInclude Include="Game\Lara\Context\Context.h" />
+    <ClInclude Include="Game\Lara\Context\GroundMovement.h" />
+    <ClInclude Include="Game\Lara\Context\HangDescent.h" />
+    <ClInclude Include="Game\Lara\Context\Jump.h" />
+    <ClInclude Include="Game\Lara\Context\MonkeySwing.h" />
+    <ClInclude Include="Game\Lara\Context\Structs.h" />
+    <ClInclude Include="Game\Lara\Context\Vault.h" />
     <ClInclude Include="Game\Lara\lara.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
     <ClInclude Include="Game\Lara\lara_cheat.h" />
@@ -411,6 +421,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Game\Lara\PlayerContext.h" />
     <ClInclude Include="Game\Lara\PlayerContextData.h" />
     <ClInclude Include="Game\Lara\PlayerStateMachine.h" />
+    <ClInclude Include="Game\Lara\States\EdgeHang.h" />
+    <ClInclude Include="Game\Lara\States\WallClimb.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
     <ClInclude Include="Game\people.h" />
@@ -858,6 +870,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     </ClCompile>
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\camera.cpp" />
+    <ClCompile Include="Game\collision\Attractor.cpp" />
+    <ClCompile Include="Game\collision\AttractorDebug.cpp" />
     <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Game\collision\floordata.cpp" />
@@ -900,6 +914,13 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\itemdata\creature_info.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\items.cpp" />
+    <ClCompile Include="Game\Lara\Context\Climb.cpp" />
+    <ClCompile Include="Game\Lara\Context\Context.cpp" />
+    <ClCompile Include="Game\Lara\Context\GroundMovement.cpp" />
+    <ClCompile Include="Game\Lara\Context\HangDescent.cpp" />
+    <ClCompile Include="Game\Lara\Context\Jump.cpp" />
+    <ClCompile Include="Game\Lara\Context\MonkeySwing.cpp" />
+    <ClCompile Include="Game\Lara\Context\Vault.cpp" />
     <ClCompile Include="Game\Lara\lara.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />
@@ -923,6 +944,8 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Game\Lara\lara_two_guns.cpp" />
     <ClCompile Include="Game\Lara\PlayerContext.cpp" />
     <ClCompile Include="Game\Lara\PlayerStateMachine.cpp" />
+    <ClCompile Include="Game\Lara\States\EdgeHang.cpp" />
+    <ClCompile Include="Game\Lara\States\WallClimb.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\missile.cpp" />
     <ClCompile Include="Game\people.cpp" />

@@ -35,9 +35,10 @@ namespace TEN::Collision::Attractor
 		float		 PathDistance = 0.0f;
 		unsigned int SegmentID	  = 0;
 
-		short HeadingAngle = 0;
-		short SlopeAngle   = 0;
-		bool  IsInFront	   = false;
+		short HeadingAngle	= 0;
+		short SlopeAngle	= 0;
+		bool  IsInFront		= false;
+		bool  IsFacingFront = false;
 	};
 
 	class AttractorObject
@@ -68,7 +69,6 @@ namespace TEN::Collision::Attractor
 
 		// Getters
 
-		AttractorType	   GetType() const;
 		int				   GetRoomNumber() const;
 		float			   GetLength() const;
 		const BoundingBox& GetAabb() const;
@@ -90,6 +90,8 @@ namespace TEN::Collision::Attractor
 
 		// Inquirers
 
+		bool IsEdge() const;
+		bool IsWallEdge() const;
 		bool IsLoop() const;
 		bool Intersects(const BoundingSphere& sphere) const;
 

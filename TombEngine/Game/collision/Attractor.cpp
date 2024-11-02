@@ -57,11 +57,6 @@ namespace TEN::Collision::Attractor
 		DetachAllPlayers();
 	}
 
-	AttractorType AttractorObject::GetType() const
-	{
-		return _type;
-	}
-
 	int AttractorObject::GetRoomNumber() const
 	{
 		return _roomNumber;
@@ -241,8 +236,9 @@ namespace TEN::Collision::Attractor
 		attracColl.PathDistance = pathDist;
 		attracColl.SegmentID = segmentID;
 		attracColl.HeadingAngle = segmentOrient.y + HEADING_ANGLE_OFFSET;
-		attracColl.SlopeAngle = segmentOrient.x;
+		attracColl.SlopeAngle = abs(segmentOrient.x);
 		attracColl.IsInFront = Geometry::IsPointInFront(localSphere.Center, intersect, refOrient);
+		attracColl.IsFacingFront = Geometry::IsPointOnLeft(localSphere.Center, _points[segmentID], refOrient);
 		return attracColl;
 	}
 
@@ -259,6 +255,16 @@ namespace TEN::Collision::Attractor
 	void AttractorObject::SetOrientation(const Quaternion& orient)
 	{
 		_orientation = orient;
+	}
+
+	bool AttractorObject::IsEdge() const
+	{
+		return (_type == AttractorType::Edge);
+	}
+
+	bool AttractorObject::IsWallEdge() const
+	{
+		return (_type == AttractorType::WallEdge);
 	}
 
 	bool AttractorObject::IsLoop() const
@@ -445,15 +451,15 @@ namespace TEN::Collision::Attractor
 		{
 			auto& player = GetLaraInfo(*LaraItem);
 
-			auto debugAttracs = std::vector<AttractorObject*>{};
-			debugAttracs.push_back(&*player.Context.DebugAttracs.Attrac0);
-			debugAttracs.push_back(&*player.Context.DebugAttracs.Attrac1);
-			debugAttracs.push_back(&*player.Context.DebugAttracs.Attrac2);
+			auto attracs = std::vector<AttractorObject*>{};
+			attracs.push_back(&*player.Context.DebugAttracs.Attrac0);
+			attracs.push_back(&*player.Context.DebugAttracs.Attrac1);
+			attracs.push_back(&*player.Context.DebugAttracs.Attrac2);
 
 			for (auto& attrac : player.Context.DebugAttracs.Attracs)
-				debugAttracs.push_back(&attrac);
+				attracs.push_back(&attrac);
 
-			return debugAttracs;
+			return attracs;
 		};
 
 		DrawDebugSphere(sphere.Center, sphere.Radius, Vector4::One, RendererDebugPage::AttractorStats);
