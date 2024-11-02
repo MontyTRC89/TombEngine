@@ -206,6 +206,17 @@ bool SaveGame::DoesSaveGameExist(int slot, bool silent)
 	return true;
 }
 
+bool SaveGame::IsLoadGamePossible()
+{
+	for (int i = 0; i < SAVEGAME_MAX; i++)
+	{
+		if (Infos[i].Present)
+			return true;
+	}
+
+	return false;
+}
+
 std::string SaveGame::GetSavegameFilename(int slot)
 {
 	return (FullSaveDirectory + SAVEGAME_FILE_MASK + std::to_string(slot));
