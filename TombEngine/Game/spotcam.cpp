@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -14,6 +15,7 @@
 using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;
+using namespace TEN::Collision::Point;
 
 constexpr auto MAX_CAMERA = 18;
 
@@ -492,9 +494,18 @@ void CalculateSpotCameras()
 		{
 			if (Camera.pos.RoomNumber != SpotCam[CurrentSplineCamera].roomNumber)
 				Camera.DisableInterpolation = true;
+
+			// HACK: Sometimes actual camera room number desyncs from room number derived using floordata functions.
+			// If such case is identified, we do a brute-force search for coherrent room number.
+			// This issue is only present in sub-click floor height setups after TE 1.7.0. -- Lwmte, 02.11.2024
 		
-			Camera.pos.RoomNumber = SpotCam[CurrentSplineCamera].roomNumber;
-			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.RoomNumber);
+			auto pos = Vector3i(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+			int collRoomNumber = GetPointCollision(pos, SpotCam[CurrentSplineCamera].roomNumber).GetRoomNumber();
+
+			if (collRoomNumber != Camera.pos.RoomNumber)
+				collRoomNumber = FindRoomNumber(pos, SpotCam[CurrentSplineCamera].roomNumber);
+
+			Camera.pos.RoomNumber = collRoomNumber;
 		}
 		else
 		{
