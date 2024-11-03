@@ -1289,7 +1289,7 @@ void CalculateCamera(const CollisionInfo& coll)
 	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
 	Camera.lastType = Camera.type;
 
-	if (Camera.type != CameraType::Heavy || Camera.timer == -1)
+	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) && !IsDeathCamera())
 	{
 		Camera.type = CameraType::Chase;
 		Camera.speed = 10;
@@ -1302,6 +1302,41 @@ void CalculateCamera(const CollisionInfo& coll)
 		Camera.flags = 0;
 		Camera.laraNode = -1;
 	}
+}
+
+bool IsDeathCamera ()
+{
+	if (LaraItem->HitPoints > 0)
+		return false;
+
+	if (LaraItem->Animation.AnimObjectID == ID_LARA_EXTRA_ANIMS)
+		return true;
+
+	if (LaraItem->Animation.AnimNumber == LA_SPIKE_DEATH)
+	{
+		Camera.pos.RoomNumber = LaraItem->RoomNumber;
+		Camera.flags = CF_FOLLOW_CENTER;
+		Camera.targetAngle = ANGLE(-150.0f);
+		Camera.targetElevation = ANGLE(-25.0f);
+		Camera.targetDistance = BLOCK(1.5);
+		return true;
+	}
+
+	if (LaraItem->Animation.AnimNumber == LA_BOULDER_DEATH)
+	{
+		Camera.pos.RoomNumber = LaraItem->RoomNumber;
+		Camera.flags = CF_FOLLOW_CENTER;
+		Camera.targetAngle = ANGLE(100.0f);
+		Camera.targetElevation = ANGLE(-25.0f);
+		Camera.targetDistance = BLOCK(2);
+		return true;
+	}
+
+	// TODO: Polish camera when the train mechanics were operative.
+	/*if (LaraItem->Animation.AnimNumber == LA_TRAIN_OVERBOARD_DEATH)
+		return true;*/
+
+	return false;
 }
 
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius)
