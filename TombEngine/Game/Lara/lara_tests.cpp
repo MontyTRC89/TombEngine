@@ -929,41 +929,26 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 
 	// HACK: Probe at incremetal height steps to account for room stacks. -- Sezz 2024.10.28
 	int frontFloor = NO_HEIGHT;
-	if (coll->Front.Bridge != NO_VALUE)
+	
+	bool hasLedge = false;
+	int yOffset = CLICK(1.25f);
+	while (yOffset > -CLICK(2))
 	{
-		auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, BLOCK(0.2f), -BLOCK(0.5f));
-		frontFloor = (pointColl.GetFloorHeight() - item->Pose.Position.y);
-	}
-	else
-	{
-		int yOffset = CLICK(1.25f);
-		while (yOffset > -CLICK(2))
+		auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, BLOCK(0.2f), yOffset);
+
+		frontFloor = pointColl.GetFloorHeight() - item->Pose.Position.y;
+		if (frontFloor > -CLICK(2) &&
+			frontFloor <= (CLICK(1.25f) - 4))
 		{
-			auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, BLOCK(0.2f), yOffset);
-
-			frontFloor = pointColl.GetFloorHeight() - item->Pose.Position.y;
-			if (frontFloor > -CLICK(2) &&
-				frontFloor <= (CLICK(1.25f) - 4))
-			{
-				break;
-			}
-
-			yOffset -= CLICK(0.5f);
+			hasLedge = true;
+			break;
 		}
+
+		yOffset -= CLICK(0.5f);
 	}
 
-	// Extra bridge check.
-	if (coll->Front.Bridge != NO_VALUE)
-	{
-		frontFloor = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
-		
-		int bridgeBorder = frontFloor - CLICK(0.5f);
-		if (bridgeBorder <= -CLICK(2) ||
-			bridgeBorder > CLICK(1.25f) - 4)
-		{
-			return false;
-		}
-	}
+	if (!hasLedge)
+		return false;
 
 	if (!TestValidLedge(item, coll))
 		return false;
