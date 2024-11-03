@@ -1,6 +1,6 @@
 #pragma once
 
-namespace TEN::Entities::TR4
+namespace TEN::Entities::Traps
 {
-	void PlinthBladeControl(short itemNumber);
+	void ControlPlinthBlade(short itemNumber);
 }

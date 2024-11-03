@@ -6,7 +6,7 @@ using namespace TEN::Math;
 struct CollisionInfo;
 struct ItemInfo;
 
-namespace TEN::Traps::TR5
+namespace TEN::Entities::Traps
 {
 	struct LaserBeamEffect
 	{
@@ -22,8 +22,13 @@ namespace TEN::Traps::TR5
 		bool IsLethal		  = false;
 		bool IsHeavyActivator = false;
 
+		std::array<Vector3, SUBDIVISION_COUNT * 2> OldVertices = {};
+		Vector4 OldColor;
+
 		void Initialize(const ItemInfo& item);
 		void Update(const ItemInfo& item);
+
+		void StoreInterpolationData();
 	};
 
 	extern std::unordered_map<int, LaserBeamEffect> LaserBeams;

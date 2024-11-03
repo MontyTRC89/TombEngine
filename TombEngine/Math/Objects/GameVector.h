@@ -8,6 +8,7 @@ class Vector3i;
 	{
 	public:
 		// Members
+
 		int	  x			 = 0;
 		int	  y			 = 0;
 		int	  z			 = 0;
@@ -15,9 +16,11 @@ class Vector3i;
 		int	  BoxNumber	 = 0; // Unused.
 
 		// Constants
+
 		static const GameVector Zero;
 
 		// Constructors
+
 		GameVector();
 		GameVector(const Vector3i& pos);
 		GameVector(const Vector3i& pos, short roomNumber);
@@ -25,10 +28,12 @@ class Vector3i;
 		GameVector(int xPos, int yPos, int zPos, short roomNumber);
 
 		// Converters
+
 		Vector3	 ToVector3() const;
 		Vector3i ToVector3i() const;
 
 		// Operators
+
 		bool		operator ==(const GameVector& vector) const;
 		bool		operator !=(const GameVector& vector) const;
 		GameVector& operator =(const GameVector& vector);

@@ -94,21 +94,17 @@ void ClearSwarmEnemies(ItemInfo* item)
 
 void FlashOrange(ItemInfo* item) 
 {
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 	Weather.Flash(255, 128, 0, 0.03f);
 }
 
 void MeshSwapToPour(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
-
 	item->Model.MeshIndex[LM_LHAND] = Objects[item->ItemFlags[2]].meshIndex + LM_LHAND;
 }
 
 void MeshSwapFromPour(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
-
 	item->Model.MeshIndex[LM_LHAND] = item->Model.BaseMesh + LM_LHAND;
 }
 
@@ -149,60 +145,60 @@ void InvisibilityOn(ItemInfo* item)
 
 void SetFog(ItemInfo* item)
 {
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void DrawLeftPistol(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	if (item->Model.MeshIndex[LM_LHAND] == item->Model.BaseMesh + LM_LHAND)
 	{
 		item->Model.MeshIndex[LM_LHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
-		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
+		player.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
 	}
 	else
 	{
 		item->Model.MeshIndex[LM_LHAND] = item->Model.BaseMesh + LM_LHAND;
-		lara->Control.Weapon.HolsterInfo.LeftHolster = GetWeaponHolsterSlot(LaraWeaponType::Pistol);
+		player.Control.Weapon.HolsterInfo.LeftHolster = GetWeaponHolsterSlot(LaraWeaponType::Pistol);
 	}
 }
 
 void DrawRightPistol(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
 	if (item->Model.MeshIndex[LM_RHAND] == item->Model.BaseMesh + LM_RHAND)
 	{
 		item->Model.MeshIndex[LM_RHAND] = Objects[GetWeaponObjectMeshID(*item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
-		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
+		player.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
 	}
 	else
 	{
 		item->Model.MeshIndex[LM_RHAND] = item->Model.BaseMesh + LM_RHAND;
-		lara->Control.Weapon.HolsterInfo.RightHolster = GetWeaponHolsterSlot(LaraWeaponType::Pistol);
+		player.Control.Weapon.HolsterInfo.RightHolster = GetWeaponHolsterSlot(LaraWeaponType::Pistol);
 	}
 }
 
 void ShootLeftGun(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->LeftArm.GunFlash = 3;
+	player.LeftArm.GunFlash = 3;
 }
 
 void ShootRightGun(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->RightArm.GunFlash = 3;
+	player.RightArm.GunFlash = 3;
 }
 
 void LaraHandsFree(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto& player = GetLaraInfo(*item);
 
-	lara->Control.HandStatus = HandStatus::Free;
+	player.Control.HandStatus = HandStatus::Free;
 }
 
 void KillActiveBaddys(ItemInfo* item)
@@ -231,14 +227,14 @@ void KillActiveBaddys(ItemInfo* item)
 		} while (itemNumber != NO_VALUE);
 	}
 
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void LaraLocationPad(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 
 	lara->Location = TriggerTimer;
 	lara->LocationPad = TriggerTimer;
@@ -248,7 +244,7 @@ void LaraLocation(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 
 	lara->Location = TriggerTimer;
 	if (lara->HighestLocation < TriggerTimer)
@@ -259,17 +255,19 @@ void ExplosionFX(ItemInfo* item)
 {
 	SoundEffect(SFX_TR4_EXPLOSION1, nullptr);
 	Camera.bounce = -75;
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void SwapCrowbar(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
-
 	if (item->Model.MeshIndex[LM_RHAND] == item->Model.BaseMesh + LM_RHAND)
+	{
 		item->Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;
+	}
 	else 
+	{
 		item->Model.MeshIndex[LM_RHAND] = item->Model.BaseMesh + LM_RHAND;
+	}
 }
 
 void ActivateKey(ItemInfo* item)
@@ -285,7 +283,7 @@ void ActivateCamera(ItemInfo* item)
 void PoseidonSFX(ItemInfo* item)
 {
 	SoundEffect(SFX_TR4_WATER_FLUSHES, nullptr);
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void RubbleFX(ItemInfo* item)
@@ -303,13 +301,13 @@ void RubbleFX(ItemInfo* item)
 	else
 		Camera.bounce = -150;
 
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void PlaySoundEffect(ItemInfo* item)
 {
 	SoundEffect(TriggerTimer, nullptr);
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 }
 
 void FloorShake(ItemInfo* item)
@@ -331,6 +329,8 @@ void Turn180(ItemInfo* item)
 	item->Pose.Orientation.x = -item->Pose.Orientation.x;
 	item->Pose.Orientation.y += ANGLE(180.0f);
 	item->Pose.Orientation.z = -item->Pose.Orientation.z;
+
+	item->DisableInterpolation = true;
 }
 
 void FinishLevel(ItemInfo* item)

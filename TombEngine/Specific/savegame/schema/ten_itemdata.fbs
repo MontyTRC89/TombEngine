@@ -123,10 +123,6 @@ table Motorboat {
 
 }
 
-table GameVector {
-	
-}
-
 table Wraith {
 
 }
@@ -232,18 +228,14 @@ struct Vector4 {
 	w: float;
 }
 
+struct GameVector {
+	x: int32;
+	y: int32;
+	z: int32;
+	room_number: int32;
+}
+
 union ItemData {
-    /*byte,
-    ubyte,
-    bool,
-    short,
-    ushort,
-    int,
-    uint,
-    float,
-    long,
-    ulong,
-    double,*/
     Int,
     Short,
     Float,
@@ -261,7 +253,6 @@ union ItemData {
     Skidoo,
     UPV,
     Motorboat,
-    GameVector,
     Wraith,
     Rubberboat,
     Pushable,

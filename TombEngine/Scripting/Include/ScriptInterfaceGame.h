@@ -57,8 +57,9 @@ public:
 	virtual void OnLoop(float deltaTime, bool postLoop) = 0;
 	virtual void OnSave() = 0;
 	virtual void OnEnd(GameStatus reason) = 0;
-	virtual void ShortenTENCalls() = 0;
+	virtual void OnUseItem(GAME_OBJECT_ID objectNumber) = 0;
 
+	virtual void ShortenTENCalls() = 0;
 	virtual void FreeLevelScripts() = 0;
 	virtual void ResetScripts(bool clearGameVars) = 0;
 	virtual void ExecuteScriptFile(const std::string& luaFileName) = 0;

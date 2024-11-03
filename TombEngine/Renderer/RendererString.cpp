@@ -2,14 +2,18 @@
 #include "Renderer/Renderer.h"
 
 #include "Specific/trutils.h"
+#include "Specific/winmain.h"
 
 namespace TEN::Renderer
 {
-	void Renderer::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RendererDebugPage page)
+	void Renderer::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, RendererDebugPage page)
 	{
 		constexpr auto FLAGS = (int)PrintStringFlags::Outline | (int)PrintStringFlags::Center;
 
-		if (_debugPage != page)
+		if (_isLocked)
+			return;
+
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
 			return;
 
 		AddString(string, pos, color, scale, FLAGS);
@@ -22,10 +26,6 @@ namespace TEN::Renderer
 
 	void Renderer::AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags)
 	{
-		constexpr auto BLINK_VALUE_MAX = 1.0f;
-		constexpr auto BLINK_VALUE_MIN = 0.1f;
-		constexpr auto BLINK_TIME_STEP = 0.2f;
-
 		if (_isLocked)
 			return;
 
@@ -75,19 +75,6 @@ namespace TEN::Renderer
 				if (flags & (int)PrintStringFlags::Blink)
 				{
 					rString.Color *= _blinkColorValue;
-
-					if (!_isBlinkUpdated)
-					{
-						// Calculate blink increment based on sine wave.
-						_blinkColorValue = ((sin(_blinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
-
-						// Update blink time.
-						_blinkTime += BLINK_TIME_STEP;
-						if (_blinkTime > PI_MUL_2)
-							_blinkTime -= PI_MUL_2;
-
-						_isBlinkUpdated = true;
-					}
 				}
 
 				yOffset += size.y;
@@ -127,8 +114,5 @@ namespace TEN::Renderer
 		}
 
 		_spriteBatch->End();
-
-		_isBlinkUpdated = false;
-		_stringsToDraw.clear();
 	}
 }

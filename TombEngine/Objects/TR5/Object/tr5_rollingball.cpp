@@ -4,7 +4,8 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -15,6 +16,10 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
+
+using namespace TEN::Collision::Sphere;
+
 constexpr auto ROLLING_BALL_MAX_VELOCITY = BLOCK(3);
 
 void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -22,7 +27,7 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 	auto* ballItem = &g_Level.Items[itemNumber];
 
 	if (!TestBoundsCollide(ballItem, laraItem, coll->Setup.Radius) ||
-		!TestCollision(ballItem, laraItem))
+		!HandleItemSphereCollision(*ballItem, *laraItem))
 	{
 		return;
 	}
@@ -36,6 +41,11 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
 		{
 			SetAnimation(laraItem, LA_BOULDER_DEATH);
+
+			Camera.flags = CF_FOLLOW_CENTER;
+			Camera.targetAngle = ANGLE(170.0f);
+			Camera.targetElevation = ANGLE(-25.0f);
+			Camera.targetDistance = BLOCK(2);
 		}
 	}
 	else
@@ -66,7 +76,7 @@ void RollingBallControl(short itemNumber)
 	item->Pose.Position.z += item->ItemFlags[1] / hDivider;
 	item->Animation.Velocity.z = Vector3i::Distance(item->Pose.Position, oldPos.Position);
 
-	int dh = GetCollision(item).Position.Floor - bigRadius;
+	int dh = GetPointCollision(*item).GetFloorHeight() - bigRadius;
 
 	if (item->Pose.Position.y > dh)
 	{
@@ -94,7 +104,10 @@ void RollingBallControl(short itemNumber)
 				item->Animation.Velocity.y = -(GetRandomControl() % int(round(item->Animation.Velocity.z) / 8.0f));
 		}
 		else
+		{
 			item->Animation.Velocity.y = -item->Animation.Velocity.y / 4.0f;
+			item->DisableInterpolation = true;
+		}
 	}
 
 	int frontX = item->Pose.Position.x;
@@ -106,20 +119,20 @@ void RollingBallControl(short itemNumber)
 	int leftX  = item->Pose.Position.x - smallRadius;
 	int leftZ  = item->Pose.Position.z;
 
-	auto frontFloor = GetCollision(frontX, item->Pose.Position.y, frontZ, item->RoomNumber);
-	auto backFloor  = GetCollision(backX,  item->Pose.Position.y, backZ,  item->RoomNumber);
-	auto rightFloor = GetCollision(rightX, item->Pose.Position.y, rightZ, item->RoomNumber);
-	auto leftFloor  = GetCollision(leftX,  item->Pose.Position.y, leftZ,  item->RoomNumber);
+	auto frontFloor = GetPointCollision(Vector3i(frontX, item->Pose.Position.y, frontZ), item->RoomNumber);
+	auto backFloor  = GetPointCollision(Vector3i(backX,  item->Pose.Position.y, backZ),  item->RoomNumber);
+	auto rightFloor = GetPointCollision(Vector3i(rightX, item->Pose.Position.y, rightZ), item->RoomNumber);
+	auto leftFloor  = GetPointCollision(Vector3i(leftX,  item->Pose.Position.y, leftZ),  item->RoomNumber);
 
-	int frontHeight = frontFloor.Position.Floor - bigRadius;
-	int backHeight  = backFloor.Position.Floor  - bigRadius;
-	int rightHeight = rightFloor.Position.Floor - bigRadius;
-	int leftHeight  = leftFloor.Position.Floor  - bigRadius;
+	int frontHeight = frontFloor.GetFloorHeight() - bigRadius;
+	int backHeight  = backFloor.GetFloorHeight()  - bigRadius;
+	int rightHeight = rightFloor.GetFloorHeight() - bigRadius;
+	int leftHeight  = leftFloor.GetFloorHeight()  - bigRadius;
 
-	int frontCeiling = frontFloor.Position.Ceiling + bigRadius;
-	int backCeiling  = backFloor.Position.Ceiling  + bigRadius;
-	int rightCeiling = rightFloor.Position.Ceiling + bigRadius;
-	int leftCeiling  = leftFloor.Position.Ceiling  + bigRadius;
+	int frontCeiling = frontFloor.GetCeilingHeight() + bigRadius;
+	int backCeiling  = backFloor.GetCeilingHeight()  + bigRadius;
+	int rightCeiling = rightFloor.GetCeilingHeight() + bigRadius;
+	int leftCeiling  = leftFloor.GetCeilingHeight()  + bigRadius;
 
 	frontX = item->Pose.Position.x;
 	frontZ = item->Pose.Position.z + bigRadius;
@@ -130,20 +143,20 @@ void RollingBallControl(short itemNumber)
 	leftX  = item->Pose.Position.x - bigRadius;
 	leftZ  = item->Pose.Position.z;
 
-	auto fronFarFloor  = GetCollision(frontX, item->Pose.Position.y, frontZ, item->RoomNumber);
-	auto backFarFloor  = GetCollision(backX,  item->Pose.Position.y, backZ,  item->RoomNumber);
-	auto rightFarFloor = GetCollision(rightX, item->Pose.Position.y, rightZ, item->RoomNumber);
-	auto leftFarFloor  = GetCollision(leftX,  item->Pose.Position.y, leftZ,  item->RoomNumber);
+	auto fronFarFloor  = GetPointCollision(Vector3i(frontX, item->Pose.Position.y, frontZ), item->RoomNumber);
+	auto backFarFloor  = GetPointCollision(Vector3i(backX,  item->Pose.Position.y, backZ),  item->RoomNumber);
+	auto rightFarFloor = GetPointCollision(Vector3i(rightX, item->Pose.Position.y, rightZ), item->RoomNumber);
+	auto leftFarFloor  = GetPointCollision(Vector3i(leftX,  item->Pose.Position.y, leftZ),  item->RoomNumber);
 
-	int frontFarHeight = fronFarFloor.Position.Floor  - bigRadius;
-	int backFarHeight  = backFarFloor.Position.Floor  - bigRadius;
-	int rightFarHeight = rightFarFloor.Position.Floor - bigRadius;
-	int leftFarHeight  = leftFarFloor.Position.Floor  - bigRadius;
+	int frontFarHeight = fronFarFloor.GetFloorHeight()  - bigRadius;
+	int backFarHeight  = backFarFloor.GetFloorHeight()  - bigRadius;
+	int rightFarHeight = rightFarFloor.GetFloorHeight() - bigRadius;
+	int leftFarHeight  = leftFarFloor.GetFloorHeight()  - bigRadius;
 
-	int frontFarCeiling = fronFarFloor.Position.Ceiling  + bigRadius;
-	int backFarCeiling  = backFarFloor.Position.Ceiling  + bigRadius;
-	int rightFarCeiling = rightFarFloor.Position.Ceiling + bigRadius;
-	int leftFarCeiling  = leftFarFloor.Position.Ceiling  + bigRadius;
+	int frontFarCeiling = fronFarFloor.GetCeilingHeight()  + bigRadius;
+	int backFarCeiling  = backFarFloor.GetCeilingHeight()  + bigRadius;
+	int rightFarCeiling = rightFarFloor.GetCeilingHeight() + bigRadius;
+	int leftFarCeiling  = leftFarFloor.GetCeilingHeight()  + bigRadius;
 
 	if (item->Pose.Position.y - dh > -CLICK(1) ||
 		item->Pose.Position.y - frontFarHeight >= CLICK(2) ||
@@ -256,23 +269,22 @@ void RollingBallControl(short itemNumber)
 		}
 	}
 
-	auto roomNumber = GetCollision(item).RoomNumber;
-
-	if (item->RoomNumber != roomNumber)
+	auto pointColl = GetPointCollision(*item);
+	if (item->RoomNumber != pointColl.GetRoomNumber())
 	{
-		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber) &&
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointColl.GetRoomNumber()) &&
 			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber))
 		{
-			int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
+			int waterHeight = pointColl.GetWaterTopHeight();
 			SplashSetup.y = waterHeight - 1;
 			SplashSetup.x = item->Pose.Position.x;
 			SplashSetup.z = item->Pose.Position.z;
 			SplashSetup.splashPower = item->Animation.Velocity.y * 4;
 			SplashSetup.innerRadius = 160;
-			SetupSplash(&SplashSetup, roomNumber);
+			SetupSplash(&SplashSetup, pointColl.GetRoomNumber());
 		}
 
-		ItemNewRoom(itemNumber, roomNumber);
+		ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 	}
 
 	if (item->ItemFlags[0] > ROLLING_BALL_MAX_VELOCITY)
@@ -303,6 +315,8 @@ void RollingBallControl(short itemNumber)
 		}
 		else
 			item->Pose.Orientation.y = angle;
+
+		item->DisableInterpolation = true;
 	}
 
 	item->Pose.Orientation.x -= ((abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2) / vDivider;
@@ -320,7 +334,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 		if (!TestBoundsCollide(item, lara, coll->Setup.Radius))
 			return;
 
-		if (!TestCollision(item, lara))
+		if (!HandleItemSphereCollision(*item, *lara))
 			return;
 
 		if (lara->Animation.IsAirborne)
@@ -355,8 +369,9 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 				SetAnimation(lara, LA_BOULDER_DEATH);
 						
 				Camera.flags = CF_FOLLOW_CENTER;
-				Camera.targetAngle = ANGLE(170);
-				Camera.targetElevation = -ANGLE(25);
+				Camera.targetAngle = ANGLE(170.0f);
+				Camera.targetElevation = -ANGLE(-25.0f);
+				Camera.targetDistance = BLOCK(2);
 
 				for (int i = 0; i < 15; i++)
 				{
@@ -406,12 +421,12 @@ void ClassicRollingBallControl(short itemNum)
 
 		AnimateItem(item);
 
-		auto coll = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+		auto pointColl = GetPointCollision(*item);
 
-		item->Floor = coll.Position.Floor;
+		item->Floor = pointColl.GetFloorHeight();
 
-		if (item->RoomNumber != coll.RoomNumber)
-			ItemNewRoom(itemNum, coll.RoomNumber);
+		if (item->RoomNumber != pointColl.GetRoomNumber())
+			ItemNewRoom(itemNum, pointColl.GetRoomNumber());
 
 		if (item->Pose.Position.y >= item->Floor - CLICK(1))
 		{
@@ -443,8 +458,8 @@ void ClassicRollingBallControl(short itemNum)
 		int x = item->Pose.Position.x + dist * phd_sin(item->Pose.Orientation.y);
 		int z = item->Pose.Position.z + dist * phd_cos(item->Pose.Orientation.y);
 
-		int y1 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
-		int y2 = GetCollision(x, item->Pose.Position.y - ydist, z, item->RoomNumber).Position.Ceiling;
+		int y1 = GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetFloorHeight();
+		int y2 = GetPointCollision(Vector3i(x, item->Pose.Position.y - ydist, z), item->RoomNumber).GetCeilingHeight();
 
 		if (y1 < item->Pose.Position.y || y2 > (item->Pose.Position.y - ydist))
 		{

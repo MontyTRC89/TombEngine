@@ -6,7 +6,10 @@
 #include "Game/animation.h"
 #include "Sound/sound.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/debris.h"
+
+using namespace TEN::Collision::Point;
 
 void ClockworkBeetleControl(short itemNumber)
 {
@@ -323,7 +326,7 @@ void UseClockworkBeetle(short flag)
 			item->Pose.Orientation.z = 0;
 
 			if (Lara.Inventory.BeetleLife)
-				item->ItemFlags[0] = GetCollision(item).Block->Flags.MarkBeetle;
+				item->ItemFlags[0] = GetPointCollision(*item).GetSector().Flags.MarkBeetle;
 			else
 				item->ItemFlags[0] = 0;
 

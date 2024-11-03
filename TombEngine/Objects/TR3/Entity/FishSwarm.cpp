@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
 #include "Game/effects/effects.h"
@@ -18,6 +19,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::TR3;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
@@ -182,7 +184,7 @@ namespace TEN::Entities::Creatures::TR3
 		// Follow path.
 		if (item.AIBits && !item.ItemFlags[4])
 		{
-			FindAITargetObject(&creature, ID_AI_FOLLOW, item.ItemFlags[3] + item.ItemFlags[2], false);
+			FindAITargetObject(item, ID_AI_FOLLOW, item.ItemFlags[3] + item.ItemFlags[2], false);
 
 			if (creature.AITarget->TriggerFlags == (item.ItemFlags[3] + item.ItemFlags[2]) &&
 				creature.AITarget->ObjectNumber == ID_AI_FOLLOW)
@@ -218,18 +220,17 @@ namespace TEN::Entities::Creatures::TR3
 		auto pos = Random::GeneratePointInSpheroid(item.StartPose.Position.ToVector3(), EulerAngles::Identity, SPHEROID_SEMI_MAJOR_AXIS);
 
 		// Get point collision.
-		auto pointColl = GetCollision(pos, item.RoomNumber);
-		int waterHeight = GetWaterHeight(pointColl.Coordinates.x, pointColl.Coordinates.y, pointColl.Coordinates.z, pointColl.RoomNumber);
+		auto pointColl = GetPointCollision(pos, item.RoomNumber);
 
 		// 1) Test for water room.
-		if (!TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
+		if (!TestEnvironment(ENV_FLAG_WATER, pointColl.GetRoomNumber()))
 			return Vector3::Zero;
 
 		// 2) Assess point collision.
-		if (pos.y >= (pointColl.Position.Floor - BUFFER) ||
-			pos.y <= (waterHeight + BUFFER) ||
-			pointColl.Block->IsWall(item.Pose.Position.x + BUFFER, item.Pose.Position.z + BUFFER) ||
-			pointColl.Block->IsWall(item.Pose.Position.x - BUFFER, item.Pose.Position.z - BUFFER))
+		if (pos.y >= (pointColl.GetFloorHeight() - BUFFER) ||
+			pos.y <= (pointColl.GetWaterTopHeight() + BUFFER) ||
+			pointColl.GetSector().IsWall(item.Pose.Position.x + BUFFER, item.Pose.Position.z + BUFFER) ||
+			pointColl.GetSector().IsWall(item.Pose.Position.x - BUFFER, item.Pose.Position.z - BUFFER))
 		{
 			return Vector3::Zero;
 		}
@@ -259,6 +260,8 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			if (fish.Life <= 0.0f)
 				continue;
+
+			fish.StoreInterpolationData();
 
 			// Increase separation distance for each fish.
 			float separationDist = FISH_BASE_SEPARATION_DISTANCE + (fishID * 3);
@@ -366,19 +369,19 @@ namespace TEN::Entities::Creatures::TR3
 				}
 			}
 
-			auto pointColl = GetCollision(fish.Position, fish.RoomNumber);
+			auto pointColl = GetPointCollision(fish.Position, fish.RoomNumber);
 			const auto& room = g_Level.Rooms[fish.RoomNumber];
 
 			// Update fish room number.
-			if (pointColl.RoomNumber != fish.RoomNumber && 
-				pointColl.RoomNumber != NO_VALUE &&
-				TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber))
+			if (pointColl.GetRoomNumber() != fish.RoomNumber && 
+				pointColl.GetRoomNumber() != NO_VALUE &&
+				TestEnvironment(ENV_FLAG_WATER, pointColl.GetRoomNumber()))
 			{
-				fish.RoomNumber = pointColl.RoomNumber;
+				fish.RoomNumber = pointColl.GetRoomNumber();
 			}
 
 			// Clamp position to slightly below water surface.
-			int waterHeight = GetWaterHeight(fish.Position.x, fish.Position.y, fish.Position.z, fish.RoomNumber);
+			int waterHeight = pointColl.GetWaterTopHeight();
 			if (fish.Position.y < (waterHeight + WATER_SURFACE_OFFSET))
 				fish.Position.y = waterHeight + WATER_SURFACE_OFFSET;
 			
@@ -415,6 +418,8 @@ namespace TEN::Entities::Creatures::TR3
 			fish.Undulation += std::clamp(movementValue / 2, 0.3f, 1.0f);
 			if (fish.Undulation > PI_MUL_2)
 				fish.Undulation -= PI_MUL_2;
+
+			fish.Transform = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
 		}
 	}
 

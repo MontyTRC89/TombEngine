@@ -56,6 +56,7 @@ private:
 	sol::protected_function	m_onLoop{};
 	sol::protected_function	m_onSave{};
 	sol::protected_function	m_onEnd{};
+	sol::protected_function	m_onUseItem{};
 
 	std::unordered_set<std::string> m_callbacksPreSave;
 	std::unordered_set<std::string> m_callbacksPostSave;
@@ -170,4 +171,5 @@ public:
 	void OnLoop(float deltaTime, bool postLoop) override;
 	void OnSave() override;
 	void OnEnd(GameStatus reason) override;
+	void OnUseItem(GAME_OBJECT_ID item) override;
 };

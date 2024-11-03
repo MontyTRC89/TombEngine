@@ -4,6 +4,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/Blood.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/Drip.h"
@@ -25,6 +26,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
@@ -38,6 +40,9 @@ using namespace TEN::Math::Random;
 
 using TEN::Renderer::g_Renderer;
 
+constexpr int WIBBLE_SPEED = 4;
+constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
+
 // New particle class
 Particle Particles[MAX_PARTICLES];
 ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
@@ -47,7 +52,9 @@ FX_INFO EffectList[NUM_EFFECTS];
 GameBoundingBox DeadlyBounds;
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
+
 int SplashCount = 0;
+int Wibble = 0;
 
 Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
 NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax] =
@@ -119,46 +126,42 @@ void DetatchSpark(int number, SpriteEnumFlag type)
 
 Particle* GetFreeParticle()
 {
-	int result = -1;
+	int partID = NO_VALUE;
 
-	// Get first free available spark
-
+	// Get first free available particle.
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		auto* particle = &Particles[i];
-
-		if (!particle->on)
+		const auto& part = Particles[i];
+		if (!part.on)
 		{
-			result = i;
+			partID = i;
 			break;
 		}
 	}
 
-	// No free sparks left, hijack existing one with less possible life
-
-	int life = INT_MAX;
-	if (result == -1)
+	// No free particles; get particle with shortest life.
+	float shortestLife = INFINITY;
+	if (partID == NO_VALUE)
 	{
 		for (int i = 0; i < MAX_PARTICLES; i++)
 		{
-			auto* particle = &Particles[i];
+			const auto& part = Particles[i];
 
-			if (particle->life < life && particle->dynamic == -1 && !(particle->flags & SP_EXPLOSION))
+			if (part.life < shortestLife && part.dynamic == NO_VALUE && !(part.flags & SP_EXPLOSION))
 			{
-				result = i;
-				life = particle->life;
+				partID = i;
+				shortestLife = part.life;
 			}
 		}
 	}
 
-	auto* spark = &Particles[result];
+	auto& part = Particles[partID];
+	part.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	part.blendMode = BlendMode::Additive;
+	part.extras = 0;
+	part.dynamic = NO_VALUE;
 
-	spark->extras = 0;
-	spark->dynamic = -1;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-	spark->blendMode = BlendMode::Additive;
-
-	return spark;
+	return &part;
 }
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
@@ -178,6 +181,13 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 	particle.spriteIndex = Objects[objectID].meshIndex + (int)round(Lerp(0.0f, numSprites, normalizedAge));
 }
 
+void UpdateWibble()
+{
+	// Update oscillator seed.
+	Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
+
+}
+
 void UpdateSparks()
 {
 	auto bounds = GameBoundingBox(LaraItem);
@@ -195,6 +205,8 @@ void UpdateSparks()
 
 		if (spark->on)
 		{
+			spark->StoreInterpolationData();
+
 			spark->life--;
 
 			if (!spark->life)
@@ -937,7 +949,7 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 		sptr->xVel = (GetRandomControl() & 0xFF) - 128;
 		sptr->zVel = (GetRandomControl() & 0xFF) - 128;
 
-		float xAngle = item->Pose.Orientation.x;
+		float xAngle = item->Pose.Orientation.x + ANGLE(180); // Nullmesh is rotated 180 degrees in editor
 		float yAngle = item->Pose.Orientation.y;
 		
 		Vector3 dir;
@@ -1043,6 +1055,8 @@ void UpdateSplashes()
 
 		if (splash.isActive)
 		{
+			splash.StoreInterpolationData();
+
 			splash.life--;
 			if (splash.life <= 0)
 				splash.isActive = false;
@@ -1070,11 +1084,15 @@ void UpdateSplashes()
 
 short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomNumber)
 {
-	short probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
+	short probedRoomNumber = GetPointCollision(Vector3i(x, y, z), roomNumber).GetRoomNumber();
 	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
+	{
 		SpawnUnderwaterBlood(Vector3(x, y, z), probedRoomNumber, speed);
+	}
 	else
+	{
 		TriggerBlood(x, y, z, direction >> 4, speed);
+	}
 
 	return 0;
 }
@@ -1228,7 +1246,7 @@ void KillAllCurrentItems(short itemNumber)
 	// TODO: Reimplement this functionality.
 }
 
-// TODO: Rname to SpawnDynamicLight().
+// TODO: Rename to SpawnDynamicLight().
 void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff)
 {
 	g_Renderer.AddDynamicLight(
@@ -1252,15 +1270,15 @@ void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int w
 		return;
 
 	// Get point collision.
-	auto pointColl0 = GetCollision(&item, 0, 0, -(LARA_HEIGHT / 2));
-	auto pointColl1 = GetCollision(&item, 0, 0, item.Animation.Velocity.y);
+	auto pointColl0 = GetPointCollision(item, 0, 0, -(LARA_HEIGHT / 2));
+	auto pointColl1 = GetPointCollision(item, 0, 0, item.Animation.Velocity.y);
 
 	// In swamp; return early.
-	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl1.RoomNumber))
+	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl1.GetRoomNumber()))
 		return;
 
-	bool isWater0 = TestEnvironment(ENV_FLAG_WATER, pointColl0.RoomNumber);
-	bool isWater1 = TestEnvironment(ENV_FLAG_WATER, pointColl1.RoomNumber);
+	bool isWater0 = TestEnvironment(ENV_FLAG_WATER, pointColl0.GetRoomNumber());
+	bool isWater1 = TestEnvironment(ENV_FLAG_WATER, pointColl1.GetRoomNumber());
 
 	// Spawn splash.
 	if (!isWater0 && isWater1 &&
@@ -1273,7 +1291,7 @@ void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int w
 		SplashSetup.innerRadius = 16;
 		SplashSetup.splashPower = item.Animation.Velocity.z;
 
-		SetupSplash(&SplashSetup, pointColl0.RoomNumber);
+		SetupSplash(&SplashSetup, pointColl0.GetRoomNumber());
 		SplashCount = 16;
 	}
 	// Spawn ripple.
@@ -1298,11 +1316,11 @@ void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int w
 
 void Splash(ItemInfo* item)
 {
-	int probedRoomNumber = GetCollision(item).RoomNumber;
+	int probedRoomNumber = GetPointCollision(*item).GetRoomNumber();
 	if (!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		return;
 
-	int waterHeight = GetWaterHeight(item);
+	int waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 
 	SplashSetup.x = item->Pose.Position.x;
 	SplashSetup.y = waterHeight - 1;
@@ -1452,21 +1470,21 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->fadeToBlack = 16;
 	spark->blendMode = BlendMode::Additive;
 	spark->life = spark->sLife = (GetRandomControl() & 0xF) + 64;
-	spark->x = (GetRandomControl() & 0x1F) + x - 16;
-	spark->y = (GetRandomControl() & 0x1F) + y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + z - 16;
+	spark->position.x = (GetRandomControl() & 0x1F) + x - 16;
+	spark->position.y = (GetRandomControl() & 0x1F) + y - 16;
+	spark->position.z = (GetRandomControl() & 0x1F) + z - 16;
 
 	if (water)
 	{
-		spark->xVel = spark->yVel = GetRandomControl() & 0x3FF - 512;
-		spark->zVel = (GetRandomControl() & 0x3FF) - 512;
+		spark->velocity.x = spark->velocity.y = GetRandomControl() & 0x3FF - 512;
+		spark->velocity.z = (GetRandomControl() & 0x3FF) - 512;
 		spark->friction = 68;
 	}
 	else
 	{
-		spark->xVel = 2 * (GetRandomControl() & 0x3FF) - 1024;
-		spark->yVel = -512 - (GetRandomControl() & 0x3FF);
-		spark->zVel = 2 * (GetRandomControl() & 0x3FF) - 1024;
+		spark->velocity.x = 2 * (GetRandomControl() & 0x3FF) - 1024;
+		spark->velocity.y = -512 - (GetRandomControl() & 0x3FF);
+		spark->velocity.z = 2 * (GetRandomControl() & 0x3FF) - 1024;
 		spark->friction = 85;
 	}
 
@@ -1934,7 +1952,7 @@ void ProcessEffects(ItemInfo* item)
 	if (item->Effect.Type != EffectType::Sparks && item->Effect.Type != EffectType::Smoke)
 	{
 		const auto& bounds = GameBoundingBox(item);
-		int waterHeight = GetWaterHeight(item);
+		int waterHeight = GetPointCollision(*item).GetWaterTopHeight();
 		int itemLevel = item->Pose.Position.y + bounds.Y2 - (bounds.GetHeight() / 3);
 
 		if (waterHeight != NO_HEIGHT && itemLevel > waterHeight)

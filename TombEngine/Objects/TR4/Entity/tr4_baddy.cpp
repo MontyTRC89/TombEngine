@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/control/lot.h"
@@ -18,6 +19,7 @@
 #include "Math/Math.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 /*
@@ -343,7 +345,7 @@ namespace TEN::Entities::TR4
 			if (item->TriggerFlags % 1000 > 100)
 			{
 				item->ItemFlags[0] = -80;
-				FindAITargetObject(creature, ID_AI_X1);
+				FindAITargetObject(*item, ID_AI_X1);
 			}
 
 			item->TriggerFlags = 1000 * (item->TriggerFlags / 1000);
@@ -359,15 +361,15 @@ namespace TEN::Entities::TR4
 
 		x += dx;
 		z += dz;
-		int height1 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height1 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height2 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height3 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		int height = 0;
 		bool canJump1Sector = true;
@@ -421,11 +423,11 @@ namespace TEN::Entities::TR4
 
 		item->ItemFlags[1] = item->RoomNumber;
 
-		CollisionResult probe;
+		auto probe = GetPointCollision(*item);
 
 		if (item->HitPoints <= 0)
 		{
-			item->Floor = GetCollision(item).Position.Floor;
+			item->Floor = GetPointCollision(*item).GetFloorHeight();
 			currentCreature->LOT.IsMonkeying = false;
 
 			switch (item->Animation.ActiveState)
@@ -575,7 +577,7 @@ namespace TEN::Entities::TR4
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
-				int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+				int height4 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 				dx = 942 * phd_sin(item->Pose.Orientation.y + ANGLE(78.75f));
 				dz = 942 * phd_cos(item->Pose.Orientation.y + ANGLE(78.75f));
@@ -583,7 +585,7 @@ namespace TEN::Entities::TR4
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
-				int height5 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+				int height5 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 				if (abs(height5 - item->Pose.Position.y) > CLICK(1))
 					jump = false;
@@ -600,7 +602,7 @@ namespace TEN::Entities::TR4
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
-				int height6 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+				int height6 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 				dx = 942 * phd_sin(item->Pose.Orientation.y - ANGLE(78.75f));
 				dz = 942 * phd_cos(item->Pose.Orientation.y - ANGLE(78.75f));
@@ -608,7 +610,7 @@ namespace TEN::Entities::TR4
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
-				int height7 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+				int height7 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 				if (abs(height7 - item->Pose.Position.y) > CLICK(1) ||
 					(height6 + CLICK(2)) >= item->Pose.Position.y)
@@ -715,8 +717,8 @@ namespace TEN::Entities::TR4
 
 				if (currentCreature->MonkeySwingAhead)
 				{
-					probe = GetCollision(item);
-					if (probe.Position.Ceiling == probe.Position.Floor - CLICK(6))
+					probe = GetPointCollision(*item);
+					if (probe.GetCeilingHeight() == probe.GetFloorHeight() - CLICK(6))
 					{
 						if (item->TestMeshSwapFlags(MESHSWAPFLAGS_BADDY_EMPTY))
 						{
@@ -950,7 +952,7 @@ namespace TEN::Entities::TR4
 				joint1 = 0;
 				joint2 = 0;
 
-				probe = GetCollision(item);
+				probe = GetPointCollision(*item);
 
 				if (laraAI.ahead && laraAI.distance < pow(682, 2) &&
 					(LaraItem->Animation.ActiveState == LS_MONKEY_IDLE ||
@@ -965,7 +967,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (item->BoxNumber != currentCreature->LOT.TargetBox &&
 					currentCreature->MonkeySwingAhead ||
-					probe.Position.Ceiling != (probe.Position.Floor - CLICK(6)))
+					probe.GetCeilingHeight() != (probe.GetFloorHeight() - CLICK(6)))
 				{
 					item->Animation.TargetState = BADDY_STATE_MONKEY_FORWARD;
 				}
@@ -989,9 +991,9 @@ namespace TEN::Entities::TR4
 				if (item->BoxNumber == currentCreature->LOT.TargetBox ||
 					!currentCreature->MonkeySwingAhead)
 				{
-					probe = GetCollision(item);
+					probe = GetPointCollision(*item);
 
-					if (probe.Position.Ceiling == probe.Position.Floor - CLICK(6))
+					if (probe.GetCeilingHeight() == probe.GetFloorHeight() - CLICK(6))
 						item->Animation.TargetState = BADDY_STATE_MONKEY_IDLE;
 				}
 

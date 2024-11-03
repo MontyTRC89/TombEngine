@@ -9,6 +9,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
+
+using namespace TEN::Collision::Room;
 
 #define DEFAULT_FLY_UPDOWN_SPEED 16
 #define DEFAULT_SWIM_UPDOWN_SPEED 32
@@ -23,7 +26,7 @@ void InitializeLOTarray(int itemNumber)
 
 	if (!creature->LOT.Initialized)
 	{
-		creature->LOT.Node = std::vector<BoxNode>(g_Level.Boxes.size(), BoxNode{});
+		creature->LOT.Node = std::vector<BoxNode>(g_Level.PathfindingBoxes.size(), BoxNode{});
 		creature->LOT.Initialized = true;
 	}
 }
@@ -194,6 +197,13 @@ void InitializeSlot(short itemNumber, bool makeTarget)
 			creature->LOT.Drop = -BLOCK(1);
 			creature->LOT.Zone = ZoneType::Human;
 			break;
+
+		case LotType::EnemyJeep:
+			creature->LOT.Step = BLOCK(4);
+			creature->LOT.Drop = -BLOCK(4);
+			creature->LOT.CanJump = true;
+			creature->LOT.Zone = ZoneType::Human;
+			break;
 	}
 
 	ClearLOT(&creature->LOT);
@@ -201,6 +211,41 @@ void InitializeSlot(short itemNumber, bool makeTarget)
 		CreateZone(item);
 
 	SlotsUsed++;
+}
+
+void TargetNearestEntity(ItemInfo& item, const std::vector<GAME_OBJECT_ID>& keyObjectIds, bool ignoreKeyObjectIds)
+{
+	auto& creature = *GetCreatureInfo(&item);
+
+	float closestDistSqr = INFINITY;
+	for (auto& target : ActiveCreatures)
+	{
+		auto& targetItem = g_Level.Items[target->ItemNumber];
+		if (targetItem.Index == item.Index)
+			continue;
+
+		// Ignore or specifically target key object IDs.
+		if (!keyObjectIds.empty() && (ignoreKeyObjectIds ? Contains(keyObjectIds, targetItem.ObjectNumber) : !Contains(keyObjectIds, targetItem.ObjectNumber)))
+			continue;
+
+		if (&targetItem != &item && targetItem.HitPoints > 0 && targetItem.Status != ITEM_INVISIBLE)
+		{
+			float distSqr = Vector3i::DistanceSquared(item.Pose.Position, targetItem.Pose.Position);
+			if (distSqr < closestDistSqr)
+			{
+				creature.Enemy = &targetItem;
+				closestDistSqr = distSqr;
+			}
+		}
+	}
+
+	// Handle player as special case.
+	if (!keyObjectIds.empty() && (ignoreKeyObjectIds ? Contains(keyObjectIds, ID_LARA) : !Contains(keyObjectIds, ID_LARA)))
+		return;
+
+	float distToPlayerSqr = Vector3i::DistanceSquared(item.Pose.Position, LaraItem->Pose.Position);
+	if (distToPlayerSqr < closestDistSqr)
+		creature.Enemy = LaraItem;
 }
 
 void SetEntityTarget(short itemNum, short target)
@@ -238,14 +283,14 @@ void CreateZone(ItemInfo* item)
 	auto* creature = GetCreatureInfo(item);
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	item->BoxNumber = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z)->Box;
+	item->BoxNumber = GetSector(room, item->Pose.Position.x - room->Position.x, item->Pose.Position.z - room->Position.z)->PathfindingBoxID;
 
 	if (creature->LOT.Fly)
 	{
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (int i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < g_Level.PathfindingBoxes.size(); i++)
 		{
 			node->boxNumber = i;
 			node++;
@@ -263,7 +308,7 @@ void CreateZone(ItemInfo* item)
 		auto* node = creature->LOT.Node.data();
 		creature->LOT.ZoneCount = 0;
 
-		for (int i = 0; i < g_Level.Boxes.size(); i++)
+		for (int i = 0; i < g_Level.PathfindingBoxes.size(); i++)
 		{
 			if (*zone == zoneNumber || *flippedZone == flippedZoneNumber)
 			{

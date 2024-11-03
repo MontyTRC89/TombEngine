@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -16,6 +17,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Effects::Footprint
@@ -58,14 +60,14 @@ namespace TEN::Effects::Footprint
 			{ MaterialType::Concrete, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS },
 			{ MaterialType::OldWood, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD },
 			{ MaterialType::OldMetal, SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL },
-			{ MaterialType::Custom1, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_1 },
-			{ MaterialType::Custom2, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_2 },
-			{ MaterialType::Custom3, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_3 },
-			{ MaterialType::Custom4, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_4 },
-			{ MaterialType::Custom5, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_5 },
-			{ MaterialType::Custom6, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_6 },
-			{ MaterialType::Custom7, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_7 },
-			{ MaterialType::Custom8, SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_8 }
+			{ MaterialType::Custom1, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_1 },
+			{ MaterialType::Custom2, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_2 },
+			{ MaterialType::Custom3, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_3 },
+			{ MaterialType::Custom4, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_4 },
+			{ MaterialType::Custom5, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_5 },
+			{ MaterialType::Custom6, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_6 },
+			{ MaterialType::Custom7, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_7 },
+			{ MaterialType::Custom8, SOUND_EFFECTS::SFX_TEN_CUSTOM_FOOTSTEPS_8 }
 		};
 
 		auto it = SOUND_MAP.find(material);
@@ -100,7 +102,7 @@ namespace TEN::Effects::Footprint
 		constexpr auto FOOT_OFFSET	   = Vector3i(0, HEIGHT_OFFSET, 0);
 
 		auto footPos = GetJointPosition(item, jointIndex, FOOT_OFFSET);
-		int floorHeight = GetCollision(footPos.x, footPos.y - CLICK(1), footPos.z, item.RoomNumber).Position.Floor;
+		int floorHeight = GetPointCollision(footPos, item.RoomNumber, -Vector3::UnitY, CLICK(1)).GetFloorHeight();
 
 		bool canSpawn = (abs(footPos.y - floorHeight) < ABS_FLOOR_BOUND);
 		auto pos = Vector3(footPos.x, floorHeight - SURFACE_OFFSET, footPos.z);
@@ -112,16 +114,16 @@ namespace TEN::Effects::Footprint
 		constexpr auto ABS_FLOOR_BOUND = CLICK(0.5f);
 
 		// Get point collision at every vertex point.
-		auto pointColl0 = GetCollision(vertexPoints[0].x, pos.y - CLICK(1), vertexPoints[0].z, item.RoomNumber);
-		auto pointColl1 = GetCollision(vertexPoints[1].x, pos.y - CLICK(1), vertexPoints[1].z, item.RoomNumber);
-		auto pointColl2 = GetCollision(vertexPoints[2].x, pos.y - CLICK(1), vertexPoints[2].z, item.RoomNumber);
-		auto pointColl3 = GetCollision(vertexPoints[3].x, pos.y - CLICK(1), vertexPoints[3].z, item.RoomNumber);
+		auto pointColl0 = GetPointCollision(Vector3i(vertexPoints[0].x, pos.y - CLICK(1), vertexPoints[0].z), item.RoomNumber);
+		auto pointColl1 = GetPointCollision(Vector3i(vertexPoints[1].x, pos.y - CLICK(1), vertexPoints[1].z), item.RoomNumber);
+		auto pointColl2 = GetPointCollision(Vector3i(vertexPoints[2].x, pos.y - CLICK(1), vertexPoints[2].z), item.RoomNumber);
+		auto pointColl3 = GetPointCollision(Vector3i(vertexPoints[3].x, pos.y - CLICK(1), vertexPoints[3].z), item.RoomNumber);
 
 		// Don't spawn footprint if floor heights at vertex points are outside upper/lower floor height bound.
-		if ((abs(pointColl0.Position.Floor - pointColl1.Position.Floor) > ABS_FLOOR_BOUND) ||
-			(abs(pointColl1.Position.Floor - pointColl2.Position.Floor) > ABS_FLOOR_BOUND) ||
-			(abs(pointColl2.Position.Floor - pointColl3.Position.Floor) > ABS_FLOOR_BOUND) ||
-			(abs(pointColl3.Position.Floor - pointColl0.Position.Floor) > ABS_FLOOR_BOUND))
+		if ((abs(pointColl0.GetFloorHeight() - pointColl1.GetFloorHeight()) > ABS_FLOOR_BOUND) ||
+			(abs(pointColl1.GetFloorHeight() - pointColl2.GetFloorHeight()) > ABS_FLOOR_BOUND) ||
+			(abs(pointColl2.GetFloorHeight() - pointColl3.GetFloorHeight()) > ABS_FLOOR_BOUND) ||
+			(abs(pointColl3.GetFloorHeight() - pointColl0.GetFloorHeight()) > ABS_FLOOR_BOUND))
 		{
 			return false;
 		}
@@ -163,15 +165,15 @@ namespace TEN::Effects::Footprint
 		// Slightly randomize 2D position.
 		posData.Position += Vector3(Random::GenerateFloat(-5.0f, 5.0f), 0.0f, Random::GenerateFloat(-5.0f, 5.0f));
 
-		auto pointColl = GetCollision(posData.Position.x, posData.Position.y - CLICK(1), posData.Position.z, item.RoomNumber);
+		auto pointColl = GetPointCollision(posData.Position, item.RoomNumber, -Vector3::UnitY, CLICK(1));
 
 		// Don't process material if foot hit bridge object.
 		// TODO: Handle bridges once bridge collision is less stupid.
-		if (pointColl.Position.Bridge != NO_VALUE)
+		if (pointColl.GetFloorBridgeItemNumber() != NO_VALUE)
 			return;
 
 		// Get and emit footstep sound for floor material.
-		auto sfx = GetFootprintSfx(pointColl.BottomBlock->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true));
+		auto sfx = GetFootprintSfx(pointColl.GetBottomSector().GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true));
 		if (sfx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS) // HACK: Must be here until reference WAD2 is revised.
 		{
 			auto pose = item.Pose;
@@ -179,10 +181,10 @@ namespace TEN::Effects::Footprint
 		}
 
 		// Check floor material.
-		if (!TestMaterial(pointColl.BottomBlock->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true), FootprintMaterials))
+		if (!TestMaterial(pointColl.GetBottomSector().GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true), FootprintMaterials))
 			return;
 
-		auto vertexPoints = GetFootprintVertexPoints(item, posData.Position, pointColl.FloorNormal);
+		auto vertexPoints = GetFootprintVertexPoints(item, posData.Position, pointColl.GetFloorNormal());
 
 		// Test floor continuity.
 		if (!TestFootprintFloor(item, posData.Position, vertexPoints))

@@ -5,7 +5,8 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -14,6 +15,9 @@
 #include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 
 // NOTES:
 // item.ItemFlags[0]: use dynamic motion.
@@ -94,12 +98,12 @@ namespace TEN::Entities::Traps
 			{
 				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y + headingAngle, 0).ToDirection();
 
-				auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, forwardDir, BLOCK(0.5f));
+				auto pointColl = GetPointCollision(item.Pose.Position, item.RoomNumber, forwardDir, BLOCK(0.5f));
 
-				if (pointColl.RoomNumber != item.RoomNumber)
-					ItemNewRoom(itemNumber, pointColl.RoomNumber);
+				if (pointColl.GetRoomNumber() != item.RoomNumber)
+					ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
-				if (!IsNextSectorValid(item, forwardDir, BLOCK(0.5f)))
+				if (!IsNextSectorValid(item, forwardDir, BLOCK(0.5f), true))
 				{
 					switch (headingAngle)
 					{
@@ -172,7 +176,7 @@ namespace TEN::Entities::Traps
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 			
-		if (!TestCollision(&item, playerItem))
+		if (!HandleItemSphereCollision(item, *playerItem))
 			return;
 
 		if (!ItemPushItem(&item, playerItem, coll, false, 1))
@@ -198,7 +202,7 @@ namespace TEN::Entities::Traps
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 			
-		if (!TestCollision(&item, playerItem))
+		if (!HandleItemSphereCollision(item, *playerItem))
 			return;
 
 		if ((item.Animation.FrameNumber - GetAnimData(item).frameBase) <= FALLING_BLOCK_IMPACT_FRAME)

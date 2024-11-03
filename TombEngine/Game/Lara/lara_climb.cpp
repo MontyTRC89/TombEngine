@@ -3,7 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -14,6 +14,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 constexpr auto LADDER_TEST_MARGIN = 8;
@@ -327,8 +328,8 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 
 			// HACK: Prevent climbing inside sloped ceilings. Breaks overhang even more, but that shouldn't matter since we'll be doing it over. -- Sezz 2022.05.13
 			int y = item->Pose.Position.y - (coll->Setup.Height + CLICK(0.5f));
-			auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height + CLICK(0.5f)));
-			if ((probe.Position.Ceiling - y) < 0)
+			auto probe = GetPointCollision(*item, 0, 0, -(coll->Setup.Height + CLICK(0.5f)));
+			if ((probe.GetCeilingHeight() - y) < 0)
 			{
 				item->Animation.TargetState = LS_LADDER_UP;
 				item->Pose.Position.y += yShift;
@@ -416,7 +417,7 @@ void lara_as_climb_stepoff_right(ItemInfo* item, CollisionInfo* coll)
 
 short GetClimbFlags(int x, int y, int z, short roomNumber)
 {
-	return GetClimbFlags(GetCollision(x, y, z, roomNumber).BottomBlock);
+	return GetClimbFlags(&GetPointCollision(Vector3i(x, y, z), roomNumber).GetBottomSector());
 }
 
 short GetClimbFlags(FloorInfo* floor)
@@ -787,13 +788,13 @@ int LaraTestClimb(ItemInfo* item, int xOffset, int yOffset, int zOffset, int xFr
 	int y = item->Pose.Position.y + yOffset;
 	int z = item->Pose.Position.z + zOffset;
 
-	auto probeUp = GetCollision(x, y - CLICK(0.5f), z, item->RoomNumber);
-	auto probeDown = GetCollision(x, y, z, item->RoomNumber);
+	auto probeUp = GetPointCollision(Vector3i(x, y - CLICK(0.5f), z), item->RoomNumber);
+	auto probeDown = GetPointCollision(Vector3i(x, y, z), item->RoomNumber);
 
-	if (!lara->Control.CanClimbLadder && !TestLaraNearClimbableWall(item, probeDown.BottomBlock))
+	if (!lara->Control.CanClimbLadder && !TestLaraNearClimbableWall(item, &probeDown.GetBottomSector()))
 		return 0;
 
-	int height = probeUp.Position.Floor;
+	int height = probeUp.GetFloorHeight();
 
 	if (height == NO_HEIGHT)
 		return 0;
@@ -805,7 +806,7 @@ int LaraTestClimb(ItemInfo* item, int xOffset, int yOffset, int zOffset, int xFr
 	if (height < 0)
 		*shift = height;
 
-	int ceiling = probeDown.Position.Ceiling - y;
+	int ceiling = probeDown.GetCeilingHeight() - y;
 	if (ceiling > LADDER_CLIMB_SHIFT)
 		return 0;
 
@@ -822,8 +823,8 @@ int LaraTestClimb(ItemInfo* item, int xOffset, int yOffset, int zOffset, int xFr
 	int dz = zFront + z;
 	int dx = xFront + x;
 
-	auto probeFront = GetCollision(dx, y, dz, item->RoomNumber);
-	height = probeFront.Position.Floor;
+	auto probeFront = GetPointCollision(Vector3i(dx, y, dz), item->RoomNumber);
+	height = probeFront.GetFloorHeight();
 	
 	if (height != NO_HEIGHT)
 		height -= y;
@@ -839,9 +840,9 @@ int LaraTestClimb(ItemInfo* item, int xOffset, int yOffset, int zOffset, int xFr
 				*shift = height;
 		}
 
-		auto probeTop = GetCollision(x, y + itemHeight, z, item->RoomNumber);
-		auto probeTopFront = GetCollision(dx, y + itemHeight, dz, probeTop.RoomNumber);
-		ceiling = probeTopFront.Position.Ceiling;
+		auto probeTop = GetPointCollision(Vector3i(x, y + itemHeight, z), item->RoomNumber);
+		auto probeTopFront = GetPointCollision(Vector3i(dx, y + itemHeight, dz), probeTop.GetRoomNumber());
+		ceiling = probeTopFront.GetCeilingHeight();
 		
 		if (ceiling == NO_HEIGHT)
 			return 1;
@@ -862,7 +863,7 @@ int LaraTestClimb(ItemInfo* item, int xOffset, int yOffset, int zOffset, int xFr
 		return 1;
 	}
 	
-	ceiling = probeFront.Position.Ceiling - y;
+	ceiling = probeFront.GetCeilingHeight() - y;
 	if (ceiling >= CLICK(2))
 		return 1;
 
@@ -895,16 +896,16 @@ int LaraTestClimbUpPos(ItemInfo* item, int front, int right, int* shift, int* le
 	*shift = 0;
 
 	// Test center.
-	auto pointColl = GetCollision(item);
+	auto pointColl = GetPointCollision(*item);
 	int vPos = item->Pose.Position.y - CLICK(4);
-	if ((pointColl.Position.Ceiling - vPos) > LADDER_CLIMB_SHIFT)
+	if ((pointColl.GetCeilingHeight() - vPos) > LADDER_CLIMB_SHIFT)
 		return 0;
 
-	pointColl = GetCollision(probePos.x, probePos.y, probePos.z, item->RoomNumber);
-	int ceiling = (CLICK(1) - probePos.y) + pointColl.Position.Ceiling;
+	pointColl = GetPointCollision(probePos, item->RoomNumber);
+	int ceiling = (CLICK(1) - probePos.y) + pointColl.GetCeilingHeight();
 
-	pointColl = GetCollision(probePos.x + probeOffset.x, probePos.y, probePos.z + probeOffset.z, pointColl.RoomNumber);
-	int height = pointColl.Position.Floor;
+	pointColl = GetPointCollision(Vector3i(probePos.x + probeOffset.x, probePos.y, probePos.z + probeOffset.z), pointColl.GetRoomNumber());
+	int height = pointColl.GetFloorHeight();
 
 	if (height == NO_HEIGHT)
 	{
@@ -933,10 +934,10 @@ int LaraTestClimbUpPos(ItemInfo* item, int front, int right, int* shift, int* le
 			if (height > 0 && height > *shift)
 				*shift = height;
 
-			pointColl = GetCollision(probePos.x, probePos.y + CLICK(2), probePos.z, item->RoomNumber);
-			pointColl = GetCollision(probePos.x + probeOffset.x, probePos.y + CLICK(2), probePos.z + probeOffset.z, pointColl.RoomNumber);
+			pointColl = GetPointCollision(Vector3i(probePos.x, probePos.y + CLICK(2), probePos.z), item->RoomNumber);
+			pointColl = GetPointCollision(Vector3i(probePos.x + probeOffset.x, probePos.y + CLICK(2), probePos.z + probeOffset.z), pointColl.GetRoomNumber());
 
-			ceiling = pointColl.Position.Ceiling - probePos.y;
+			ceiling = pointColl.GetCeilingHeight() - probePos.y;
 			if (ceiling <= height)
 				return 1;
 
@@ -947,7 +948,7 @@ int LaraTestClimbUpPos(ItemInfo* item, int front, int right, int* shift, int* le
 		}
 		else
 		{
-			ceiling = GetCollision(probePos.x + probeOffset.x, probePos.y, probePos.z + probeOffset.z, pointColl.RoomNumber).Position.Ceiling - probePos.y;
+			ceiling = GetPointCollision(Vector3i(probePos.x + probeOffset.x, probePos.y, probePos.z + probeOffset.z), pointColl.GetRoomNumber()).GetCeilingHeight() - probePos.y;
 			if (ceiling < CLICK(2))
 			{
 				if ((height - ceiling) <= LARA_HEIGHT)

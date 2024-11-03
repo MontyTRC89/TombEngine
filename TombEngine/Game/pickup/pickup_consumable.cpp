@@ -30,7 +30,7 @@ static constexpr std::array<ConsumablePickupInfo, 4> kConsumables =
 bool TryModifyingConsumable(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount, ModificationType modType)
 {
 	int arrayPos = GetArraySlot(kConsumables, objectID);
-	if (-1 == arrayPos)
+	if (arrayPos == NO_VALUE)
 		return false;
 
 	ConsumablePickupInfo info = kConsumables[arrayPos];
@@ -42,7 +42,7 @@ bool TryModifyingConsumable(LaraInfo& lara, GAME_OBJECT_ID objectID, std::option
 		break;
 
 	default:
-		if (currentAmt != -1)
+		if (currentAmt != NO_VALUE)
 		{
 			int defaultModify = ModificationType::Add == modType ? info.Amount : -info.Amount;
 			int newVal = currentAmt + (amount.has_value() ? amount.value() : defaultModify);
@@ -70,10 +70,19 @@ bool TryRemovingConsumable(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optiona
 std::optional<int> GetConsumableCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {
 	int arrayPos = GetArraySlot(kConsumables, objectID);
-	if (-1 == arrayPos)
+	if (arrayPos == NO_VALUE)
 		return std::nullopt;
 
 	ConsumablePickupInfo info = kConsumables[arrayPos];
 
 	return lara.Inventory.*(info.Count);
+}
+
+int GetDefaultConsumableCount(GAME_OBJECT_ID objectID)
+{
+	int arrayPos = GetArraySlot(kConsumables, objectID);
+	if (arrayPos == NO_VALUE)
+		return NO_VALUE;
+
+	return kConsumables[arrayPos].Amount;
 }

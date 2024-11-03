@@ -22,10 +22,8 @@ static constexpr char ScriptReserved_Sink[]				= "Sink";
 static constexpr char ScriptReserved_SoundSource[]		= "SoundSource";
 static constexpr char ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char ScriptReserved_Volume[]			= "Volume";
-static constexpr char ScriptReserved_Room[]				= "Room";
 static constexpr char ScriptReserved_Color[]			= "Color";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
-static constexpr char ScriptReserved_Vec2[]				= "Vec2";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 
@@ -53,14 +51,6 @@ static constexpr char ScriptReserved_DisplayStringSetScale[]		= "SetScale";
 static constexpr char ScriptReserved_DisplayStringSetColor[]		= "SetColor";
 static constexpr char ScriptReserved_DisplaySpriteDraw[]			= "Draw";
 
-// Built-in LevelFuncs
-static constexpr char ScriptReserved_OnStart[]			= "OnStart";
-static constexpr char ScriptReserved_OnLoad[]			= "OnLoad";
-static constexpr char ScriptReserved_OnLoop[]			= "OnLoop";
-static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase"; // DEPRECATED
-static constexpr char ScriptReserved_OnSave[]			= "OnSave";
-static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";
-
 static constexpr char ScriptReserved_EndReasonExitToTitle[]		= "EXITTOTITLE";
 static constexpr char ScriptReserved_EndReasonLevelComplete[]	= "LEVELCOMPLETE";
 static constexpr char ScriptReserved_EndReasonLoadGame[]		= "LOADGAME";
@@ -81,15 +71,25 @@ static constexpr char ScriptReserved_PostLoop[]			= "POSTLOOP";
 static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
 static constexpr char ScriptReserved_PostControlPhase[]	= "POSTCONTROLPHASE";
 
-// Event types
-static constexpr char ScriptReserved_EventOnEnter[]	= "ENTER";
-static constexpr char ScriptReserved_EventOnInside[] = "INSIDE";
-static constexpr char ScriptReserved_EventOnLeave[]	= "LEAVE";
-static constexpr char ScriptReserved_EventOnLoad[] = "LOAD";
-static constexpr char ScriptReserved_EventOnSave[] = "SAVE";
-static constexpr char ScriptReserved_EventOnStart[] = "START";
-static constexpr char ScriptReserved_EventOnEnd[] = "END";
-static constexpr char ScriptReserved_EventOnLoop[] = "LOOP";
+// Built-in LevelFuncs
+static constexpr char ScriptReserved_OnStart[]			= "OnStart";
+static constexpr char ScriptReserved_OnLoad[]			= "OnLoad";
+static constexpr char ScriptReserved_OnLoop[]			= "OnLoop";
+static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase"; // DEPRECATED
+static constexpr char ScriptReserved_OnSave[]			= "OnSave";
+static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";
+static constexpr char ScriptReserved_OnUseItem[]		= "OnUseItem";
+
+// Event types (volume events + global events)
+static constexpr char ScriptReserved_EventOnEnter[]		= "ENTER";
+static constexpr char ScriptReserved_EventOnInside[]	= "INSIDE";
+static constexpr char ScriptReserved_EventOnLeave[]		= "LEAVE";
+static constexpr char ScriptReserved_EventOnStart[]		= "START";
+static constexpr char ScriptReserved_EventOnLoad[]		= "LOAD";
+static constexpr char ScriptReserved_EventOnLoop[]		= "LOOP";
+static constexpr char ScriptReserved_EventOnSave[]		= "SAVE";
+static constexpr char ScriptReserved_EventOnEnd[]		= "END";
+static constexpr char ScriptReserved_EventOnUseItem[]	= "USEITEM";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";
@@ -120,6 +120,7 @@ static constexpr char ScriptReserved_SetFlags[]				= "SetFlags";
 static constexpr char ScriptReserved_SetTranslated[]		= "SetTranslated";
 static constexpr char ScriptReserved_GetPosition[]			= "GetPosition";
 static constexpr char ScriptReserved_GetJointPosition[]		= "GetJointPosition";
+static constexpr char ScriptReserved_GetJointRotation[]		= "GetJointRotation";
 static constexpr char ScriptReserved_SetPosition[]			= "SetPosition";
 static constexpr char ScriptReserved_GetRotation[]			= "GetRotation";
 static constexpr char ScriptReserved_SetRotation[]			= "SetRotation";
@@ -148,6 +149,7 @@ static constexpr char ScriptReserved_SetFrameNumber[]		= "SetFrame";
 static constexpr char ScriptReserved_GetAnimNumber[]		= "GetAnim";
 static constexpr char ScriptReserved_SetAnimNumber[]		= "SetAnim";
 static constexpr char ScriptReserved_GetStateNumber[]		= "GetState";
+static constexpr char ScriptReserved_GetTargetStateNumber[]	= "GetTargetState";
 static constexpr char ScriptReserved_SetStateNumber[]		= "SetState";
 static constexpr char ScriptReserved_GetOCB[]				= "GetOCB";
 static constexpr char ScriptReserved_SetOCB[]				= "SetOCB";
@@ -196,7 +198,6 @@ static constexpr char ScriptReserved_IsMoveableInside[]		= "IsMoveableInside";
 static constexpr char ScriptReserved_GetFlag[]				= "GetFlag";
 static constexpr char ScriptReserved_SetFlag[]				= "SetFlag";
 static constexpr char ScriptReserved_IsTagPresent[]			= "IsTagPresent";
-static constexpr char ScriptReserved_SetReverbType[]		= "SetReverbType";
 
 // Flow Functions
 static constexpr char ScriptReserved_AddLevel[]					= "AddLevel";
@@ -221,12 +222,14 @@ static constexpr char ScriptReserved_EnableFlyCheat[]			= "EnableFlyCheat";
 static constexpr char ScriptReserved_EnableMassPickup[]			= "EnableMassPickup";
 static constexpr char ScriptReserved_EnableLaraInTitle[]		= "EnableLaraInTitle";
 static constexpr char ScriptReserved_EnableLevelSelect[]		= "EnableLevelSelect";
+static constexpr char ScriptReserved_EnableHomeLevel[]			= "EnableHomeLevel";
 static constexpr char ScriptReserved_EnableLoadSave[]			= "EnableLoadSave";
 static constexpr char ScriptReserved_EnablePointFilter[]		= "EnablePointFilter";
 
 // Flow Functions
 static constexpr char ScriptReserved_SetStrings[]			= "SetStrings";
 static constexpr char ScriptReserved_GetString[]			= "GetString";
+static constexpr char ScriptReserved_IsStringPresent[]		= "IsStringPresent";
 static constexpr char ScriptReserved_SetLanguageNames[]		= "SetLanguageNames";
 
 // Flow Tables
@@ -259,6 +262,9 @@ static constexpr char ScriptReserved_GiveInvItem[]					= "GiveItem";
 static constexpr char ScriptReserved_TakeInvItem[]					= "TakeItem";
 static constexpr char ScriptReserved_GetInvItemCount[]				= "GetItemCount";
 static constexpr char ScriptReserved_SetInvItemCount[]				= "SetItemCount";
+static constexpr char ScriptReserved_GetUsedItem[]					= "GetUsedItem";
+static constexpr char ScriptReserved_SetUsedItem[]					= "SetUsedItem";
+static constexpr char ScriptReserved_ClearUsedItem[]				= "ClearUsedItem";
 static constexpr char ScriptReserved_GetMoveableByName[]			= "GetMoveableByName";
 static constexpr char ScriptReserved_GetStaticByName[]				= "GetStaticByName";
 static constexpr char ScriptReserved_GetMoveablesBySlot[]			= "GetMoveablesBySlot";
@@ -313,6 +319,7 @@ static constexpr char ScriptReserved_KeyIsHeld[]					= "KeyIsHeld";
 static constexpr char ScriptReserved_KeyIsHit[]						= "KeyIsHit";
 static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
 static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
+static constexpr char ScriptReserved_KeyClearAll[]					= "KeyClearAll";
 
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
 static constexpr char ScriptReserved_GetFlipMapStatus[]				= "GetFlipMapStatus";
@@ -364,22 +371,39 @@ static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 // Internal
 static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
 
+// Room
+
+constexpr char ScriptReserved_Room[]				= "Room";
+constexpr char ScriptReserved_RoomGetActive[]		= "GetActive";
+constexpr char ScriptReserved_RoomGetColor[]		= "GetColor";
+constexpr char ScriptReserved_RoomGetFlag[]			= "GetFlag";
+constexpr char ScriptReserved_RoomGetName[]			= "GetName";
+constexpr char ScriptReserved_RoomGetReverbType[]	= "GetReverbType";
+constexpr char ScriptReserved_RoomGetRoomNumber[]	= "GetRoomNumber";
+constexpr char ScriptReserved_RoomIsTagPresent[]	= "IsTagPresent";
+constexpr char ScriptReserved_RoomSetFlag[]			= "SetFlag";
+constexpr char ScriptReserved_RoomSetName[]			= "SetName";
+constexpr char ScriptReserved_RoomSetReverbType[]	= "SetReverbType";
+
 // Vec2
+
+constexpr char ScriptReserved_Vec2[]				= "Vec2";
+constexpr char ScriptReserved_Vec2Cross[]			= "Cross";
+constexpr char ScriptReserved_Vec2Distance[]		= "Distance";
+constexpr char ScriptReserved_Vec2Dot[]				= "Dot";
+constexpr char ScriptReserved_Vec2Length[]			= "Length";
+constexpr char ScriptReserved_Vec2Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec2SetLength[]		= "ToLength";
 constexpr char ScriptReserved_Vec2Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec2Rotate[]			= "Rotate";
-constexpr char ScriptReserved_Vec2Lerp[]			= "Lerp";
-constexpr char ScriptReserved_Vec2Cross[]			= "Cross";
-constexpr char ScriptReserved_Vec2Dot[]				= "Dot";
-constexpr char ScriptReserved_Vec2Distance[]		= "Distance";
-constexpr char ScriptReserved_Vec2Length[]			= "Length";
 
 // Vec3
+
 constexpr char ScriptReserved_Vec3[]				= "Vec3";
+constexpr char ScriptReserved_Vec3Cross[]			= "Cross";
+constexpr char ScriptReserved_Vec3Distance[]		= "Distance";
+constexpr char ScriptReserved_Vec3Dot[]				= "Dot";
+constexpr char ScriptReserved_Vec3Length[]			= "Length";
+constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
-constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
-constexpr char ScriptReserved_Vec3Cross[]			= "Cross";
-constexpr char ScriptReserved_Vec3Dot[]				= "Dot";
-constexpr char ScriptReserved_Vec3Distance[]		= "Distance";
-constexpr char ScriptReserved_Vec3Length[]			= "Length";

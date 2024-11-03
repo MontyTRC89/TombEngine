@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/weather.h"
@@ -12,6 +13,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Collision::Floordata;
@@ -105,17 +107,19 @@ namespace TEN::Effects::Drip
 			if (drip.Life <= 0.0f)
 				continue;
 
+			drip.StoreInterpolationData();
+
 			// Update velocity.
 			drip.Velocity.y += drip.Gravity;
 			if (TestEnvironment(ENV_FLAG_WIND, drip.RoomNumber))
 				drip.Velocity += Weather.Wind();
 
 			int prevRoomNumber = drip.RoomNumber;
-			auto pointColl = GetCollision(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
+			auto pointColl = GetPointCollision(drip.Position, drip.RoomNumber);
 
 			// Update position.
 			drip.Position += drip.Velocity;
-			drip.RoomNumber = pointColl.RoomNumber;
+			drip.RoomNumber = pointColl.GetRoomNumber();
 
 			// Update size and color.
 			float alpha = 1.0f - (drip.Life / drip.LifeMax);
@@ -128,10 +132,9 @@ namespace TEN::Effects::Drip
 				// Spawn ripple on surface only.
 				if (!TestEnvironment(ENV_FLAG_WATER, prevRoomNumber))
 				{
-					float waterHeight = GetWaterHeight(drip.Position.x, drip.Position.y, drip.Position.z, drip.RoomNumber);
 					SpawnRipple(
-						Vector3(drip.Position.x, waterHeight - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
-						pointColl.RoomNumber,
+						Vector3(drip.Position.x, pointColl.GetWaterTopHeight() - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
+						pointColl.GetRoomNumber(),
 						Random::GenerateFloat(RIPPLE_SIZE_WATER_MIN, RIPPLE_SIZE_WATER_MAX),
 						(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity);
 				}
@@ -140,20 +143,20 @@ namespace TEN::Effects::Drip
 				continue;
 			}
 			// Hit floor; spawn ripple.
-			else if (drip.Position.y >= pointColl.Position.Floor)
+			else if (drip.Position.y >= pointColl.GetFloorHeight())
 			{
 				SpawnRipple(
-					Vector3(drip.Position.x, pointColl.Position.Floor - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
-					pointColl.RoomNumber,
+					Vector3(drip.Position.x, pointColl.GetFloorHeight() - RIPPLE_HEIGHT_OFFSET, drip.Position.z),
+					pointColl.GetRoomNumber(),
 					Random::GenerateFloat(RIPPLE_SIZE_GROUND_MIN, RIPPLE_SIZE_GROUND_MAX),
 					(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity | (int)RippleFlags::OnGround,
-					pointColl.FloorNormal);
+					pointColl.GetFloorNormal());
 
 				drip.Life = 0.0f;
 				continue;
 			}
 			// Hit ceiling; deactivate.
-			else if (drip.Position.y <= pointColl.Position.Ceiling)
+			else if (drip.Position.y <= pointColl.GetCeilingHeight())
 			{
 				drip.Life = 0.0f;
 				continue;

@@ -7,8 +7,8 @@
 #include "Game/control/control.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/collision/floordata.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
 #include "Game/items.h"
@@ -19,6 +19,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Math;
 
@@ -72,30 +73,30 @@ namespace TEN::Entities::TR3
 			bool isWater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
 			float verticalVelCoeff = isWater ? 81.0f : 1.0f;
 			
-			int roomNumber = GetCollision(&item).RoomNumber;
-			if (item.RoomNumber != roomNumber)
+			auto pointColl = GetPointCollision(item);
+			if (item.RoomNumber != pointColl.GetRoomNumber())
 			{
-				if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber) &&
+				if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointColl.GetRoomNumber()) &&
 					!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber))
 				{
-					int waterHeight = GetWaterHeight(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, roomNumber);
+					int waterHeight = pointColl.GetWaterTopHeight();
 					SplashSetup.y = waterHeight - 1;
 					SplashSetup.x = item.Pose.Position.x;
 					SplashSetup.z = item.Pose.Position.z;
 					SplashSetup.splashPower = item.Animation.Velocity.y * 4;
 					SplashSetup.innerRadius = 160.0f;
 
-					SetupSplash(&SplashSetup, roomNumber);
+					SetupSplash(&SplashSetup, pointColl.GetRoomNumber());
 					item.Animation.Velocity.y = 0.0f;
 				}
 
-				ItemNewRoom(itemNumber, roomNumber);
+				ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 			}
 
-			auto pointColl = GetCollision(&item);
+			pointColl = GetPointCollision(item);
 			item.Animation.IsAirborne = true;
 
-			if (pointColl.Position.Floor < item.Pose.Position.y)
+			if (pointColl.GetFloorHeight() < item.Pose.Position.y)
 			{
 				if (!isWater)
 				{

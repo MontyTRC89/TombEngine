@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
 #include "Game/effects/item_fx.h"
@@ -20,6 +20,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Items;
@@ -63,7 +64,7 @@ namespace TEN::Entities::Effects
 	void BurnNearbyItems(ItemInfo* item, int radius)
 	{
 		auto collObjects = GetCollidedObjects(*item, true, false, radius, ObjectCollectionMode::Items);
-		for (auto* itemPtr : collObjects.ItemPtrs)
+		for (auto* itemPtr : collObjects.Items)
 		{
 			if (TestEnvironment(ENV_FLAG_WATER, itemPtr->RoomNumber))
 				continue;
@@ -181,7 +182,7 @@ namespace TEN::Entities::Effects
 			else
 			{
 				// Normal flames.
-				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 2.0f, 0);
+				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 2.0f);
 
 				TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 					16 - (GetRandomControl() & 1),
@@ -261,21 +262,21 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.x += phd_sin(item->Pose.Orientation.y - ANGLE(180)) * (CLICK(1) / FPS);
 					item->Pose.Position.z += phd_cos(item->Pose.Orientation.y - ANGLE(180)) * (CLICK(1) / FPS);
 
-					auto pointColl = GetCollision(item);
+					auto pointColl = GetPointCollision(*item);
 
-					if (TestEnvironment(ENV_FLAG_WATER, pointColl.RoomNumber) ||
-						pointColl.Position.Floor - item->Pose.Position.y > CLICK(2) ||
-						pointColl.Position.Floor == NO_HEIGHT)
+					if (TestEnvironment(ENV_FLAG_WATER, pointColl.GetRoomNumber()) ||
+						pointColl.GetFloorHeight() - item->Pose.Position.y > CLICK(2) ||
+						pointColl.GetFloorHeight() == NO_HEIGHT)
 					{
 						Weather.Flash(255, 128, 0, 0.03f);
 						KillItem(itemNumber);
 						return;
 					}
 
-					if (item->RoomNumber != pointColl.RoomNumber)
-						ItemNewRoom(itemNumber, pointColl.RoomNumber);
+					if (item->RoomNumber != pointColl.GetRoomNumber())
+						ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
-					item->Pose.Position.y = pointColl.Position.Floor;
+					item->Pose.Position.y = pointColl.GetFloorHeight();
 
 					if (Wibble & 7)
 						TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y - 32, item->Pose.Position.z, FlameType::Medium);

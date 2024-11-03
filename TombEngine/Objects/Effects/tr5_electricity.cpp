@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
@@ -17,6 +17,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
 
@@ -73,7 +74,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 	if (glow)
 	{
 		spark->scalar = 1;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE_LIGHT;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_LIGHT;
 		spark->size = spark->sSize = (GetRandomControl() & 0x1F) + 160;
 	}
 	else
@@ -178,7 +179,7 @@ void ElectricityWiresControl(short itemNumber)
 		return;
 
 	auto collObjects = GetCollidedObjects(*item, true, false, BLOCK(2), ObjectCollectionMode::Items);
-	for (auto* itemPtr : collObjects.ItemPtrs)
+	for (auto* itemPtr : collObjects.Items)
 	{
 		const auto& object = Objects[itemPtr->ObjectNumber];
 
@@ -215,10 +216,9 @@ void ElectricityWiresControl(short itemNumber)
 			for (int j = 0; j < object.nmeshes; j++)
 			{
 				auto collPos = GetJointPosition(itemPtr, j);
+				auto pointCollJointRoom = GetPointCollision(collPos, itemPtr->RoomNumber).GetRoomNumber();
 
-				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, itemPtr->RoomNumber).RoomNumber;
-
-				if (!isWaterNearby && isTouchingWater && roomNumber == collJointRoom)
+				if (!isWaterNearby && isTouchingWater && roomNumber == pointCollJointRoom)
 					isWaterNearby = true;
 			}
 

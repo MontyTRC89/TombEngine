@@ -30,6 +30,7 @@ namespace TEN::Gui
 		None,
 		UseItem,
 		NewGame,
+		HomeLevel,
 		LoadGame,
 		SaveGame,
 		ExitGame,
@@ -139,7 +140,7 @@ namespace TEN::Gui
 		// Inventory variables
 		short CombineObject1;
 		short CombineObject2;
-		bool UseItem;
+		bool ItemUsed;
 		char SeperateTypeFlag;
 		char CombineTypeFlag;
 		InventoryRing Rings[2];
@@ -180,8 +181,11 @@ namespace TEN::Gui
 		void DrawAmmoSelector();
 		bool PerformWaterskinCombine(ItemInfo* item, bool flag);
 		void DrawCompass(ItemInfo* item);
+		void CancelInventorySelection();
+		void UseItem(ItemInfo& item, int objectNumber);
 
 		// Getters
+
 		const InventoryRing& GetRing(RingTypes ringType);
 		int GetSelectedOption();
 		Menu GetMenuToDisplay();
@@ -191,8 +195,10 @@ namespace TEN::Gui
 		int GetLastInventoryItem();
 		SettingsData& GetCurrentSettings();
 		int GetLoadSaveSelection();
+		int GetLoopedSelectedOption(int selectedOption, int optionCount, bool canLoop);
 
 		// Setters
+
 		void SetSelectedOption(int menu);
 		void SetMenuToDisplay(Menu menu);
 		void SetInventoryMode(InventoryMode mode);
@@ -220,7 +226,6 @@ namespace TEN::Gui
 		void SeparateObject(ItemInfo* item, int objectNumber);
 		void InsertObjectIntoList(int objectNumber);
 		void InsertObjectIntoList_v2(int objectNumber);
-		void UseCurrentItem(ItemInfo* item);
 		void SpinBack(EulerAngles& orient);
 		void UpdateWeaponStatus(ItemInfo* item);
 		void DoStatisticsMode();

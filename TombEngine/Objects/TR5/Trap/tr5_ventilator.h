@@ -1,4 +1,7 @@
 #pragma once
 
-void InitializeVentilator(short itemNumber);
-void VentilatorControl(short itemNumber);
+namespace TEN::Entities::Traps
+{
+	void InitializeVentilator(short itemNumber);
+	void ControlVentilator(short itemNumber);
+}
