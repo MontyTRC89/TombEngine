@@ -1306,12 +1306,15 @@ void CalculateCamera(const CollisionInfo& coll)
 
 bool IsDeathCamera ()
 {
+	// If player is alive, it's not a death camera.
 	if (LaraItem->HitPoints > 0)
 		return false;
-
+	
+	// If Lara is in a special death animation (from extra_anims) triggered by enemies.
 	if (LaraItem->Animation.AnimObjectID == ID_LARA_EXTRA_ANIMS)
 		return true;
 
+	// Teeth spikes death animation
 	if (LaraItem->Animation.AnimNumber == LA_SPIKE_DEATH)
 	{
 		Camera.pos.RoomNumber = LaraItem->RoomNumber;
@@ -1322,6 +1325,7 @@ bool IsDeathCamera ()
 		return true;
 	}
 
+	// Rolling ball death animation
 	if (LaraItem->Animation.AnimNumber == LA_BOULDER_DEATH)
 	{
 		Camera.pos.RoomNumber = LaraItem->RoomNumber;
