@@ -1289,6 +1289,9 @@ void CalculateCamera(const CollisionInfo& coll)
 	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
 	Camera.lastType = Camera.type;
 
+	if (CalculateDeathCamera())
+		return;
+
 	if (Camera.type != CameraType::Heavy || Camera.timer == -1)
 	{
 		Camera.type = CameraType::Chase;
@@ -1302,6 +1305,27 @@ void CalculateCamera(const CollisionInfo& coll)
 		Camera.flags = 0;
 		Camera.laraNode = -1;
 	}
+}
+
+bool CalculateDeathCamera()
+{
+	// If player is alive, it's not a death camera.
+	if (LaraItem->HitPoints > 0)
+		return false;
+	
+	// If Lara is in a special death animation (from extra_anims) triggered by enemies.
+	if (LaraItem->Animation.AnimObjectID == ID_LARA_EXTRA_ANIMS)
+		return true;
+
+	// Special death animations
+	if (LaraItem->Animation.AnimNumber == LA_SPIKE_DEATH || 
+		LaraItem->Animation.AnimNumber == LA_BOULDER_DEATH || 
+		LaraItem->Animation.AnimNumber == LA_TRAIN_OVERBOARD_DEATH)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius)
