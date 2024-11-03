@@ -1,6 +1,6 @@
 # TombEngine 
 
-![Logo](https://github.com/MontyTRC89/TombEngine/assets/80340234/f22c9ca9-7159-467f-b8ad-7bb32274a278)
+![Logo](https://github.com/MontyTRC89/TombEngine/blob/7c50d26ca898c74978336d41e16ce3ce0c8ecacd/TEN%20logo.png)
 
 TombEngine (TEN) is an open-source, custom level engine which aims to abolish limits and fix bugs of the classic Tomb Raider games, introduce new features while refining old ones, and provide user-friendly level creation process. Current support includes:
 - Lua (as the native scripting language)
