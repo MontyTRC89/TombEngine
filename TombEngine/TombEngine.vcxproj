@@ -142,20 +142,39 @@
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(LocalDebuggerWorkingDirectory)\Bin\x86"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).exp"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).lib"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).pdb"</Command>
+      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(SolutionDir)Game\Bin\x86\$(Configuration)"
+del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).exp"
+del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).lib"
+del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).pdb"</Command>
       <Message>Copy dll and exe to game directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD "$(SolutionDir)Documentation"
+      <Command>SETLOCAL EnableDelayedExpansion
+SET SchemaDir=$(ProjectDir)Specific\savegame\schema
+SET TimestampFile=$(TargetDir)flatbuffers.timestamp
+FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
+    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
+)
+IF EXIST "%TimestampFile%" (
+    SET /P LastTimestamp=&amp;lt;"%TimestampFile%"
+)
+SET CurrentTimestamp=%CurrentTimestamp: =%
+SET LastTimestamp=%LastTimestamp: =%
+IF "%CurrentTimestamp%" == "%LastTimestamp%" (
+    ECHO Skipping gen.bat, schema files are unchanged
+) ELSE (
+    ECHO Generating savegame code from flatbuffer schema...
+    CD "%SchemaDir%"
+    CALL gen.bat
+    ECHO !CurrentTimestamp! &amp;gt; "%TimestampFile%"
+)
+ENDLOCAL
+
+CD "$(SolutionDir)Documentation"
 CALL compile.bat .
 
-CD "$(ProjectDir)Specific\savegame\schema\"
-CALL gen.bat
-
 md "$(SolutionDir)Game\Shaders"
+
 xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
 xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
@@ -199,18 +218,42 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(LocalDebuggerWorkingDirectory)\Bin\x64"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).exp"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).lib"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).pdb"</Command>
+      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(SolutionDir)Game\Bin\x64\$(Configuration)"
+del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).exp"
+del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).lib"
+del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).pdb"</Command>
       <Message>Copying DLLs and EXE to Game directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD "$(SolutionDir)Documentation"
-CALL compile.bat .
+      <Command>SETLOCAL EnableDelayedExpansion
 
-CD "$(ProjectDir)Specific\savegame\schema\"
-CALL gen.bat
+SET SchemaDir=$(ProjectDir)Specific\savegame\schema
+SET TimestampFile=$(TargetDir)flatbuffers.timestamp
+
+FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
+    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
+)
+
+IF EXIST "%TimestampFile%" (
+    SET /P LastTimestamp=&amp;lt;"%TimestampFile%"
+)
+
+SET CurrentTimestamp=%CurrentTimestamp: =%
+SET LastTimestamp=%LastTimestamp: =%
+
+IF "%CurrentTimestamp%" == "%LastTimestamp%" (
+    ECHO Skipping gen.bat, schema files are unchanged
+) ELSE (
+    ECHO Generating savegame code from flatbuffer schema...
+    CD "%SchemaDir%"
+    CALL gen.bat
+    ECHO !CurrentTimestamp! &amp;gt; "%TimestampFile%"
+)
+
+ENDLOCAL
+
+CD "$(ProjectDir)..\Documentation\"
+CALL compile.bat .
 
 md "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
@@ -267,20 +310,39 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(LocalDebuggerWorkingDirectory)\Bin\x86"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).exp"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).lib"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x86\$(TargetName).pdb"</Command>
+      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(SolutionDir)Game\Bin\x86\$(Configuration)"
+del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).exp"
+del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).lib"
+del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).pdb"</Command>
       <Message>Copy dll and exe to game directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD "$(SolutionDir)Documentation"
+      <Command>SETLOCAL EnableDelayedExpansion
+SET SchemaDir=$(ProjectDir)Specific\savegame\schema
+SET TimestampFile=$(TargetDir)flatbuffers.timestamp
+FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
+    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
+)
+IF EXIST "%TimestampFile%" (
+    SET /P LastTimestamp=&amp;lt;"%TimestampFile%"
+)
+SET CurrentTimestamp=%CurrentTimestamp: =%
+SET LastTimestamp=%LastTimestamp: =%
+IF "%CurrentTimestamp%" == "%LastTimestamp%" (
+    ECHO Skipping gen.bat, schema files are unchanged
+) ELSE (
+    ECHO Generating savegame code from flatbuffer schema...
+    CD "%SchemaDir%"
+    CALL gen.bat
+    ECHO !CurrentTimestamp! &amp;gt; "%TimestampFile%"
+)
+ENDLOCAL
+
+CD "$(SolutionDir)Documentation"
 CALL compile.bat .
 
-CD "$(ProjectDir)Specific\savegame\schema\"
-CALL gen.bat
-
 md "$(SolutionDir)Game\Shaders"
+
 xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
 xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
@@ -336,18 +398,42 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
       <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(LocalDebuggerWorkingDirectory)\Bin\x64"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).exp"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).lib"
-del "$(LocalDebuggerWorkingDirectory)\Bin\x64\$(TargetName).pdb"</Command>
+      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(SolutionDir)Game\Bin\x64\$(Configuration)"
+del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).exp"
+del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).lib"
+del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).pdb"</Command>
       <Message>Copy dll and exe to game directory.</Message>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD "$(SolutionDir)Documentation"
-CALL compile.bat .
+      <Command>SETLOCAL EnableDelayedExpansion
 
-CD "$(ProjectDir)Specific\savegame\schema\"
-CALL gen.bat
+SET SchemaDir=$(ProjectDir)Specific\savegame\schema
+SET TimestampFile=$(TargetDir)flatbuffers.timestamp
+
+FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
+    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
+)
+
+IF EXIST "%TimestampFile%" (
+    SET /P LastTimestamp=&amp;lt;"%TimestampFile%"
+)
+
+SET CurrentTimestamp=%CurrentTimestamp: =%
+SET LastTimestamp=%LastTimestamp: =%
+
+IF "%CurrentTimestamp%" == "%LastTimestamp%" (
+    ECHO Skipping gen.bat, schema files are unchanged
+) ELSE (
+    ECHO Generating savegame code from flatbuffer schema...
+    CD "%SchemaDir%"
+    CALL gen.bat
+    ECHO !CurrentTimestamp! &amp;gt; "%TimestampFile%"
+)
+
+ENDLOCAL
+
+CD "$(ProjectDir)..\Documentation\"
+CALL compile.bat .
 
 md "$(SolutionDir)Game\Shaders"
 xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"

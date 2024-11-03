@@ -90,6 +90,10 @@ mkdir Game\Audio
 mkdir Game\Bin
 mkdir Game\Bin\x64
 mkdir Game\Bin\x86
+mkdir Game\Bin\x64\Debug
+mkdir Game\Bin\x64\Release
+mkdir Game\Bin\x86\Debug
+mkdir Game\Bin\x86\Release
 mkdir Game\Data
 mkdir Game\Scripts
 mkdir Game\Scripts\Engine
