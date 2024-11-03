@@ -1317,31 +1317,13 @@ bool CalculateDeathCamera()
 	if (LaraItem->Animation.AnimObjectID == ID_LARA_EXTRA_ANIMS)
 		return true;
 
-	// Teeth spikes death animation
-	if (LaraItem->Animation.AnimNumber == LA_SPIKE_DEATH)
+	// Special death animations
+	if (LaraItem->Animation.AnimNumber == LA_SPIKE_DEATH || 
+		LaraItem->Animation.AnimNumber == LA_BOULDER_DEATH || 
+		LaraItem->Animation.AnimNumber == LA_TRAIN_OVERBOARD_DEATH)
 	{
-		Camera.pos.RoomNumber = LaraItem->RoomNumber;
-		Camera.flags = CF_FOLLOW_CENTER;
-		Camera.targetAngle = ANGLE(-150.0f);
-		Camera.targetElevation = ANGLE(-25.0f);
-		Camera.targetDistance = BLOCK(1.5);
 		return true;
 	}
-
-	// Rolling ball death animation
-	if (LaraItem->Animation.AnimNumber == LA_BOULDER_DEATH)
-	{
-		Camera.pos.RoomNumber = LaraItem->RoomNumber;
-		Camera.flags = CF_FOLLOW_CENTER;
-		Camera.targetAngle = ANGLE(100.0f);
-		Camera.targetElevation = ANGLE(-25.0f);
-		Camera.targetDistance = BLOCK(2);
-		return true;
-	}
-
-	// TODO: Polish camera when the train mechanics were operative.
-	/*if (LaraItem->Animation.AnimNumber == LA_TRAIN_OVERBOARD_DEATH)
-		return true;*/
 
 	return false;
 }
