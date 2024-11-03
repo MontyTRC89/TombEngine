@@ -1289,8 +1289,7 @@ void CalculateCamera(const CollisionInfo& coll)
 	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
 	Camera.lastType = Camera.type;
 
-	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) &&
-		LaraItem->HitPoints > 0)
+	if (Camera.type != CameraType::Heavy || Camera.timer == -1)
 	{
 		Camera.type = CameraType::Chase;
 		Camera.speed = 10;

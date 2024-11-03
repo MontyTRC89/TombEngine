@@ -24,6 +24,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed room clipping when flyby path goes out of room bounds.
 * Fixed camera rotating with the player's hips when climbing out of water.
+* Fixed camera behaviour on sloped surfaces after player's death.
 * Fixed camera position after loading a savegame.
 * Fixed broken ropes after loading a savegame.
 * Fixed AI for TR2 Skidoo driver and Worker with shotgun.
