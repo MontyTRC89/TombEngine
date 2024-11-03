@@ -512,9 +512,6 @@ void CalculateSpotCameras()
 		}
 		else
 		{
-			if (Camera.pos.RoomNumber != outsideRoom)
-				Camera.DisableInterpolation = true;
-
 			Camera.pos.RoomNumber = outsideRoom;
 		}
 
