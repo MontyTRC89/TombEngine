@@ -42,7 +42,6 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 		{
 			SetAnimation(laraItem, LA_BOULDER_DEATH);
 
-			Camera.pos.RoomNumber = LaraItem->RoomNumber;
 			Camera.flags = CF_FOLLOW_CENTER;
 			Camera.targetAngle = ANGLE(170.0f);
 			Camera.targetElevation = ANGLE(-25.0f);
@@ -370,8 +369,8 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 				SetAnimation(lara, LA_BOULDER_DEATH);
 						
 				Camera.flags = CF_FOLLOW_CENTER;
-				Camera.targetAngle = ANGLE(170);
-				Camera.targetElevation = -ANGLE(-25);
+				Camera.targetAngle = ANGLE(170.0f);
+				Camera.targetElevation = -ANGLE(-25.0f);
 				Camera.targetDistance = BLOCK(2);
 
 				for (int i = 0; i < 15; i++)
