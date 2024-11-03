@@ -1289,7 +1289,10 @@ void CalculateCamera(const CollisionInfo& coll)
 	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
 	Camera.lastType = Camera.type;
 
-	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) && !IsDeathCamera())
+	if (CalculateDeathCamera())
+		return;
+
+	if (Camera.type != CameraType::Heavy || Camera.timer == -1)
 	{
 		Camera.type = CameraType::Chase;
 		Camera.speed = 10;
@@ -1304,7 +1307,7 @@ void CalculateCamera(const CollisionInfo& coll)
 	}
 }
 
-bool IsDeathCamera ()
+bool CalculateDeathCamera()
 {
 	// If player is alive, it's not a death camera.
 	if (LaraItem->HitPoints > 0)
