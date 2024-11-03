@@ -148,8 +148,8 @@ enum class RendererDebugPage
 	InputStats,
 	CollisionStats,
 	PathfindingStats,
-	WireframeMode,
 	PortalDebug,
+	WireframeMode,
 
 	Count
 };
