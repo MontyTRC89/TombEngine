@@ -1311,7 +1311,7 @@ void CalculateCamera(const CollisionInfo& coll)
 	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
 	Camera.lastType = Camera.type;
 
-	if (CalculateDeathCamera())
+	if (CalculateDeathCamera(*LaraItem))
 		return;
 
 	if (Camera.type != CameraType::Heavy || Camera.timer == -1)
