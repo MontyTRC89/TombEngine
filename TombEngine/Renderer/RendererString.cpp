@@ -50,7 +50,7 @@ namespace TEN::Renderer
 				rString.Flags = flags;
 				rString.X = 0;
 				rString.Y = 0;
-				rString.Color = color.ToVector3();
+				rString.Color = color;
 				rString.Scale = (uiScale * fontScale) * scale;
 
 				// Measure string.
@@ -109,7 +109,7 @@ namespace TEN::Renderer
 			_gameFont->DrawString(
 				_spriteBatch.get(), rString.String.c_str(),
 				Vector2(rString.X, rString.Y),
-				Vector4(rString.Color.x, rString.Color.y, rString.Color.z, 1.0f) * ScreenFadeCurrent,
+				rString.Color * ScreenFadeCurrent,
 				0.0f, Vector4::Zero, rString.Scale);
 		}
 
