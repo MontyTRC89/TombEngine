@@ -64,7 +64,6 @@ namespace TEN::Entities::Generic
 		bridgeItem.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(bridgeItem);
 
-		// Initialize routines.
 		switch (bridgeItem.ObjectNumber)
 		{
 		default:

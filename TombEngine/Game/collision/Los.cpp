@@ -6,6 +6,7 @@
 #include "Game/collision/sphere.h"
 #include "Game/items.h"
 #include "Game/room.h"
+#include "Game/Setup.h"
 #include "Objects/game_object_ids.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer.h"
@@ -54,8 +55,12 @@ namespace TEN::Collision::Los
 					continue;
 
 				// 2) Check collidability.
-				if (!mov.Collidable)
+				const auto& object = Objects[mov.ObjectNumber];
+				if (!mov.Collidable || mov.Flags & IFLAG_KILLED ||
+					object.drawRoutine == nullptr || object.drawRoutine == nullptr)
+				{
 					continue;
+				}
 
 				// 3) Check status.
 				if (mov.Status == ItemStatus::ITEM_INVISIBLE || mov.Status == ItemStatus::ITEM_DEACTIVATED)

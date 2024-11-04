@@ -337,7 +337,7 @@ void AddActiveItem(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	item->Flags |= IFLAG_TRIGGERED;
 
-	if (Objects[item->ObjectNumber].control == NULL)
+	if (Objects[item->ObjectNumber].control == nullptr)
 	{
 		item->Status = ITEM_NOT_ACTIVE;
 		return;
