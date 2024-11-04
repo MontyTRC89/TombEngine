@@ -471,11 +471,11 @@ void CalculateSpotCameras()
 	if ((s->flags & SCF_DISABLE_BREAKOUT) || !lookPressed)
 	{
 		// Disable interpolation if camera traveled too far.
-		auto p1 = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-		auto p2 = Vector3(cpx, cpy, cpz);
-		auto dist = Vector3::Distance(p1, p2);
+		auto origin = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		auto target = Vector3(cpx, cpy, cpz);
+		float dist = Vector3::Distance(origin, target);
 
-		if (dist > CLICK(1))
+		if (dist > BLOCK(0.25f))
 			Camera.DisableInterpolation = true;
 
 		Camera.pos.x = cpx;
@@ -495,7 +495,7 @@ void CalculateSpotCameras()
 			Camera.target.z = ctz;
 		}
 
-		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
+		int outsideRoom = IsRoomOutside(cpx, cpy, cpz);
 		if (outsideRoom == NO_VALUE)
 		{
 			// HACK: Sometimes actual camera room number desyncs from room number derived using floordata functions.
