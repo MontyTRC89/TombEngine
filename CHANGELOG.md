@@ -11,6 +11,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 	
 ### Lua API changes
 
+* Added support for transparency value in DisplayString class.
+
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 
 ### Bug fixes
