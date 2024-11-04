@@ -33,7 +33,6 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::Initialize(const ItemInfo& item)
 	{
-		// @BRIDGEME
 		// TODO: For some reason, AssignSectors() doesn't work on its own when initialising at level start.
 		// Must keep using this for now. -- Sezz 2024.11.04
 		UpdateBridgeItem(item);
@@ -41,7 +40,7 @@ namespace TEN::Entities::Generic
 		UpdateAabb(item);
 		InitializeCollisionMesh(item);
 		InitializeAttractor(item);
-		//AssignSectors(item);
+		//AssignSectors(item); // TODO: Uncomment when UpdateBridgeItem() call above is removed.
 
 		auto& room = g_Level.Rooms[item.RoomNumber];
 		room.Bridges.Insert(item.Index, item.GetAabb());
@@ -85,9 +84,6 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::DeassignSectors(const ItemInfo& item) const
 	{
-		// TODO: Remove.
-		UpdateBridgeItem(item, true);
-
 		// Deassign sectors.
 		unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_prevObb.Extents.x, _prevObb.Extents.y), _prevObb.Extents.z) / BLOCK(1));
 		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);
@@ -162,7 +158,7 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::InitializeAttractor(const ItemInfo& item)
 	{
-		// TODO: Implement once attractors are complete.
+		// TODO: Implement when attractors are complete.
 	}
 
 	void BridgeObject::UpdateAabb(const ItemInfo& item)

@@ -96,9 +96,9 @@ static void HandleLosDebug(const ItemInfo& item)
 	float closestDist = los.Room.Distance;
 	target = los.Room.Position;
 
-	for (const auto& movLos : los.Moveables)
+	for (const auto& movLos : los.Items)
 	{
-		if (movLos.Moveable->ObjectNumber == ID_LARA)
+		if (movLos.Item->ObjectNumber == ID_LARA)
 			continue;
 
 		if (movLos.Distance < closestDist)
