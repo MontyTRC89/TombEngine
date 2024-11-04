@@ -791,6 +791,7 @@ namespace TEN::Collision::Floordata
 		}
 	}
 
+	// TODO: Query collision mesh instead.
 	// Get precise floor/ceiling height from object's bounding box.
 	// Animated objects are also supported, although horizontal collision shifting is unstable.
 	// Method: get accurate bounds in world transform by converting to OBB, then do a ray test

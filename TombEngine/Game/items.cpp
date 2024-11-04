@@ -40,6 +40,20 @@ using TEN::Renderer::g_Renderer;
 
 constexpr auto ITEM_DEATH_TIMEOUT = 4 * FPS;
 
+BoundingBox ItemInfo::GetAabb() const
+{
+	return Geometry::GetBoundingBox(GetObb());
+}
+
+BoundingOrientedBox ItemInfo::GetObb() const
+{
+	auto frameData = GetFrameInterpData(*this);
+	if (frameData.Alpha == 0.0f)
+		return frameData.FramePtr0->BoundingBox.ToBoundingOrientedBox(Pose);
+
+	return (frameData.FramePtr0->BoundingBox + (((frameData.FramePtr1->BoundingBox - frameData.FramePtr0->BoundingBox) * frameData.Alpha))).ToBoundingOrientedBox(Pose);
+}
+
 bool ItemInfo::TestOcb(short ocbFlags) const
 {
 	return ((TriggerFlags & ocbFlags) == ocbFlags);
@@ -276,7 +290,13 @@ void KillItem(short const itemNumber)
 		// AI target generation uses a hack with making a dummy item without ObjectNumber.
 		// Therefore, a check should be done here to prevent access violation.
 		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && item->IsBridge())
-			UpdateBridgeItem(*item, true);
+		{
+			auto& bridge = GetBridgeObject(*item);
+			bridge.DeassignSectors(*item);
+
+			auto& room = g_Level.Rooms[item->RoomNumber];
+			room.Bridges.Remove(item->Index);
+		}
 
 		GameScriptHandleKilled(itemNumber, true);
 
@@ -759,32 +779,35 @@ void UpdateAllItems()
 {
 	InItemControlLoop = true;
 
-	short itemNumber = NextItemActive;
+	int itemNumber = NextItemActive;
 	while (itemNumber != NO_VALUE)
 	{
-		auto* item = &g_Level.Items[itemNumber];
-		short nextItem = item->NextActive;
+		auto& item = g_Level.Items[itemNumber];
+		int nextItemNumber = item.NextActive;
 
-		if (!Objects.CheckID(item->ObjectNumber))
+		if (!Objects.CheckID(item.ObjectNumber))
 			continue;
 
-		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
+		if (item.AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
-			if (Objects[item->ObjectNumber].control)
-				Objects[item->ObjectNumber].control(itemNumber);
+			const auto& object = Objects[item.ObjectNumber];
+			if (object.control != nullptr)
+				object.control(itemNumber);
 
 			TestVolumes(itemNumber);
-			ProcessEffects(item);
+			ProcessEffects(&item);
 
-			if (item->AfterDeath > 0 && item->AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
-				item->AfterDeath++;
-			if (item->AfterDeath == ITEM_DEATH_TIMEOUT)
+			if (item.AfterDeath > 0 && item.AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
+				item.AfterDeath++;
+			if (item.AfterDeath == ITEM_DEATH_TIMEOUT)
 				KillItem(itemNumber);
 		}
 		else
+		{
 			KillItem(itemNumber);
+		}
 
-		itemNumber = nextItem;
+		itemNumber = nextItemNumber;
 	}
 
 	InItemControlLoop = false;

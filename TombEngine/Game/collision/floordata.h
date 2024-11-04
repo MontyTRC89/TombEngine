@@ -60,11 +60,13 @@ class RoomVector
 {
 public:
 	// Members
+
 	int RoomNumber = 0;
 	int Height	   = 0;
 
 	// Constructors
-	RoomVector() {};
+
+	RoomVector() = default;
 	RoomVector(int roomNumber, int height)
 	{
 		RoomNumber = roomNumber;
@@ -136,8 +138,10 @@ class FloorInfo
 {
 public:
 	// Members
+
 	Vector2i		  Position		 = Vector2i::Zero;
 	int				  RoomNumber	 = 0;
+	BoundingBox		  Aabb			 = BoundingBox();
 	SectorSurfaceData FloorSurface	 = {};
 	SectorSurfaceData CeilingSurface = {};
 	SectorFlagData	  Flags			 = {};
@@ -150,6 +154,7 @@ public:
 	bool Stopper		  = true;
 
 	// Getters
+
 	int								 GetSurfaceTriangleID(int x, int z, bool isFloor) const;
 	const SectorSurfaceTriangleData& GetSurfaceTriangle(int x, int z, bool isFloor) const;
 	Vector3							 GetSurfaceNormal(int triID, bool isFloor) const;
@@ -166,6 +171,7 @@ public:
 	int GetBridgeSurfaceHeight(const Vector3i& pos, bool isFloor) const;
 
 	// Inquirers
+
 	bool IsSurfaceSplit(bool isFloor) const;
 	bool IsSurfaceDiagonalStep(bool isFloor) const;
 	bool IsSurfaceSplitPortal(bool isFloor) const;
@@ -173,6 +179,7 @@ public:
 	bool IsWall(int x, int z) const;
 
 	// Bridge utilities
+
 	int	 GetInsideBridgeItemNumber(const Vector3i& pos, bool floorBorder, bool ceilingBorder) const;
 	void AddBridge(int itemNumber);
 	void RemoveBridge(int itemNumber);
@@ -181,6 +188,7 @@ public:
 namespace TEN::Collision::Floordata
 {
 	// Deprecated
+
 	Vector2i GetSurfaceTilt(const Vector3& normal, bool isFloor);
 
 	Vector2i				GetSectorPoint(int x, int z);
@@ -196,12 +204,11 @@ namespace TEN::Collision::Floordata
 	std::optional<int> GetSurfaceHeight(const RoomVector& location, int x, int z, bool isFloor);
 	RoomVector		   GetRoomVector(RoomVector location, const Vector3i& pos);
 
-	void AddBridge(int itemNumber, int x = 0, int z = 0);
-	void RemoveBridge(int itemNumber, int x = 0, int z = 0);
-
+	void			   AddBridge(int itemNumber, int x = 0, int z = 0);
+	void			   RemoveBridge(int itemNumber, int x = 0, int z = 0);
 	std::optional<int> GetBridgeItemIntersect(const ItemInfo& item, const Vector3i& pos, bool useBottomHeight);
-	int	 GetBridgeBorder(const ItemInfo& item, bool isBottom);
-	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval = false);
+	int				   GetBridgeBorder(const ItemInfo& item, bool isBottom);
+	void			   UpdateBridgeItem(const ItemInfo& item, bool forceRemoval = false);
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials);
 	

@@ -1342,18 +1342,18 @@ namespace TEN::Renderer
 			PrintDebugMessage("BoxNumber: %d", LaraItem->BoxNumber);
 			break;
 
-		case RendererDebugPage::WireframeMode:
-			PrintDebugMessage("WIREFRAME MODE");
-			break;
-
-		case RendererDebugPage::PortalDebug:
-			PrintDebugMessage("PORTAL DEBUG");
+		case RendererDebugPage::PortalStats:
+			PrintDebugMessage("PORTAL STATS");
 			PrintDebugMessage("Camera RoomNumber: %d", Camera.pos.RoomNumber);
 			PrintDebugMessage("Room collector time: %d", _timeRoomsCollector);
 			PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
 			PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);
 			PrintDebugMessage("    GetVisibleRooms() calls: %d", _numGetVisibleRoomsCalls);
 			PrintDebugMessage("    Dot products: %d", _numDotProducts);
+			break;
+
+		case RendererDebugPage::WireframeMode:
+			PrintDebugMessage("WIREFRAME MODE");
 			break;
 
 		default:

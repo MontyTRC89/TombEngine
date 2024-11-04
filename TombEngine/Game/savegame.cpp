@@ -2415,8 +2415,12 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
 		}
 
+		// Initialize bridges.
 		if (item->IsBridge())
-			UpdateBridgeItem(g_Level.Items[i]);
+		{
+			auto& bridge = GetBridgeObject(*item);
+			bridge.Initialize(*item);
+		}
 
 		// Creature data for intelligent items.
 		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)

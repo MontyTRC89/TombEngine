@@ -4,7 +4,7 @@ struct CollisionInfo;
 struct DOORPOS_DATA;
 struct DOOR_DATA;
 struct ItemInfo;
-struct ROOM_INFO;
+struct RoomData;
 
 namespace TEN::Entities::Doors
 {

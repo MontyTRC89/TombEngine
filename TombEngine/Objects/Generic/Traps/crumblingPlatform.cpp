@@ -87,15 +87,15 @@ namespace TEN::Entities::Traps
 		item.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(item);
 
+		int delayInFrameTime = (item.TriggerFlags != 0) ? std::abs(item.TriggerFlags) : (int)round(CRUMBLING_PLATFORM_DELAY * FPS);
+		item.ItemFlags[0] = delayInFrameTime;
+
 		// Initialize routines.
 		bridge.GetFloorHeight = GetCrumblingPlatformFloorHeight;
 		bridge.GetCeilingHeight = GetCrumblingPlatformCeilingHeight;
 		bridge.GetFloorBorder = GetCrumblingPlatformFloorBorder;
 		bridge.GetCeilingBorder = GetCrumblingPlatformCeilingBorder;
-
-		int delayInFrameTime = (item.TriggerFlags != 0) ? std::abs(item.TriggerFlags) : (int)round(CRUMBLING_PLATFORM_DELAY * FPS);
-		item.ItemFlags[0] = delayInFrameTime;
-		UpdateBridgeItem(item);
+		bridge.Initialize(item);
 	}
 
 	static void ActivateCrumblingPlatform(short itemNumber)
@@ -112,6 +112,9 @@ namespace TEN::Entities::Traps
 	void ControlCrumblingPlatform(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(item);
+
+		bridge.Update(item);
 
 		// OCB < 0; must be activated by trigger.
 		if (item.TriggerFlags < 0)
@@ -140,9 +143,11 @@ namespace TEN::Entities::Traps
 			{
 				item.Animation.TargetState = CRUMBLING_PLATFORM_STATE_FALL;
 				item.ItemFlags[1] = CRUMBLING_PLATFORM_VELOCITY_MIN;
+				
+				bridge.DeassignSectors(item);
 
-				auto pointColl = GetPointCollision(item);
-				pointColl.GetSector().RemoveBridge(itemNumber);
+				auto& room = g_Level.Rooms[item.RoomNumber];
+				room.Bridges.Remove(item.Index);
 			}
 		}
 

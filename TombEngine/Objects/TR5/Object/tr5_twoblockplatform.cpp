@@ -56,15 +56,16 @@ namespace TEN::Entities::Generic
 		bridge.GetCeilingHeight = GetTwoBlockPlatformCeilingHeight;
 		bridge.GetFloorBorder = GetTwoBlockPlatformFloorBorder;
 		bridge.GetCeilingBorder = GetTwoBlockPlatformCeilingBorder;
+		bridge.Initialize(item);
 
 		item.ItemFlags[0] = item.Pose.Position.y;
 		item.ItemFlags[1] = 1;
-		UpdateBridgeItem(item);
 	}
 
 	void TwoBlockPlatformControl(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(*item);
 
 		if (TriggerActive(item))
 		{
@@ -146,5 +147,7 @@ namespace TEN::Entities::Generic
 				}
 			}
 		}
+
+		bridge.Update(*item);
 	}
 }

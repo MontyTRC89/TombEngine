@@ -70,6 +70,7 @@ namespace TEN::Entities::Generic
 		bridge.GetCeilingHeight = GetRaisingBlockCeilingHeight;
 		bridge.GetFloorBorder = GetRaisingBlockFloorBorder;
 		bridge.GetCeilingBorder = GetRaisingBlockCeilingBorder;
+		bridge.Initialize(*item);
 
 		short roomNumber = item->RoomNumber;
 		auto* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -87,8 +88,6 @@ namespace TEN::Entities::Generic
 			AddActiveItem(itemNumber);
 			item->Status = ITEM_ACTIVE;
 		}
-
-		TEN::Collision::Floordata::UpdateBridgeItem(*item);
 	}
 
 	void ShakeRaisingBlock(ItemInfo* item)
@@ -110,6 +109,9 @@ namespace TEN::Entities::Generic
 	void ControlRaisingBlock(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(*item);
+
+		bridge.Update(*item);
 
 		if (TriggerActive(item))
 		{

@@ -619,7 +619,10 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 	}
 
 	if (m_item->IsBridge())
-		UpdateBridgeItem(*m_item);
+	{
+		auto& bridge = GetBridgeObject(*m_item);
+		bridge.Update(*m_item);
+	}
 
 	if (bigDistance)
 		m_item->DisableInterpolation = true;
@@ -661,7 +664,10 @@ void Moveable::SetRot(const Rotation& rot)
 	m_item->Pose.Orientation = newRot;
 
 	if (m_item->IsBridge())
-		UpdateBridgeItem(*m_item);
+	{
+		auto& bridge = GetBridgeObject(*m_item);
+		bridge.Update(*m_item);
+	}
 
 	if (bigRotation)
 		m_item->DisableInterpolation = true;

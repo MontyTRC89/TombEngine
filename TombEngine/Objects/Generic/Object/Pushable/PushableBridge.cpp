@@ -96,11 +96,12 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void UpdatePushableBridge(const ItemInfo& pushableItem)
+	void UpdatePushableBridge(ItemInfo& pushableItem)
 	{
 		const auto& pushable = GetPushableInfo(pushableItem);
+		auto& bridge = GetBridgeObject(pushableItem);
 
 		if (pushable.UseRoomCollision)
-			UpdateBridgeItem(pushableItem);
+			bridge.Update(pushableItem);
 	}
 }

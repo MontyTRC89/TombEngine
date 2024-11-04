@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Math/Math.h"
 
 using namespace TEN::Math;
@@ -21,24 +22,24 @@ extern int  FlipMap[MAX_FLIPMAP];
 
 enum RoomEnvFlags
 {
-	ENV_FLAG_WATER			  = (1 << 0),
-	ENV_FLAG_SWAMP			  = (1 << 2),
-	ENV_FLAG_OUTSIDE		  = (1 << 3),
-	ENV_FLAG_DYNAMIC_LIT	  = (1 << 4),
-	ENV_FLAG_WIND			  = (1 << 5),
-	ENV_FLAG_NOT_NEAR_OUTSIDE = (1 << 6),
-	ENV_FLAG_NO_LENSFLARE	  = (1 << 7),
-	ENV_FLAG_MIST			  = (1 << 8),
-	ENV_FLAG_CAUSTICS		  = (1 << 9),
-	ENV_FLAG_UNKNOWN3		  = (1 << 10),
-	ENV_FLAG_DAMAGE			  = (1 << 11),
-	ENV_FLAG_COLD			  = (1 << 12)
+	ENV_FLAG_WATER			  = 1 << 0,
+	ENV_FLAG_SWAMP			  = 1 << 2,
+	ENV_FLAG_OUTSIDE		  = 1 << 3,
+	ENV_FLAG_DYNAMIC_LIT	  = 1 << 4,
+	ENV_FLAG_WIND			  = 1 << 5,
+	ENV_FLAG_NOT_NEAR_OUTSIDE = 1 << 6,
+	ENV_FLAG_NO_LENSFLARE	  = 1 << 7,
+	ENV_FLAG_MIST			  = 1 << 8,
+	ENV_FLAG_CAUSTICS		  = 1 << 9,
+	ENV_FLAG_UNKNOWN3		  = 1 << 10,
+	ENV_FLAG_DAMAGE			  = 1 << 11,
+	ENV_FLAG_COLD			  = 1 << 12
 };
 
 enum StaticMeshFlags : short
 {
-	SM_VISIBLE = 1,
-	SM_SOLID = 2
+	SM_VISIBLE = 1 << 0,
+	SM_SOLID   = 1 << 1,
 };
 
 struct ROOM_VERTEX
@@ -49,27 +50,6 @@ struct ROOM_VERTEX
 	Vector3 color;
 	int		effects;
 	int		index;
-};
-
-struct ROOM_DOOR
-{
-	short room;
-	Vector3 normal;
-	Vector3 vertices[4];
-};
-
-struct ROOM_LIGHT
-{
-	int x, y, z;       // Position of light, in world coordinates
-	float r, g, b;       // Colour of the light
-	float intensity;
-	float in;            // Cosine of the IN value for light / size of IN value
-	float out;           // Cosine of the OUT value for light / size of OUT value
-	float length;         // Range of light
-	float cutoff;         // Range of light
-	float dx, dy, dz;    // Direction - used only by sun and spot lights
-	byte type;
-	bool castShadows;
 };
 
 struct MESH_INFO
@@ -83,9 +63,69 @@ struct MESH_INFO
 	short HitPoints;
 	std::string Name;
 	bool Dirty;
+	
+	BoundingOrientedBox GetObb() const;
+	BoundingOrientedBox GetVisibilityObb() const;
 };
 
-struct ROOM_INFO
+struct RoomLightData
+{
+	int x, y, z;       // Position of light, in world coordinates
+	float r, g, b;       // Colour of the light
+	float intensity;
+	float in;            // Cosine of the IN value for light / size of IN value
+	float out;           // Cosine of the OUT value for light / size of OUT value
+	float length;         // Range of light
+	float cutoff;         // Range of light
+	float dx, dy, dz;    // Direction - used only by sun and spot lights
+	byte type;
+	bool castShadows;
+};
+
+struct PortalData
+{
+private:
+	static constexpr auto VERTEX_COUNT = 4;
+
+public:
+	int			  RoomNumber	= 0;
+	CollisionMesh CollisionMesh = {};
+	Vector3		  Normal		= Vector3::Zero;
+
+	std::array<Vector3, VERTEX_COUNT> Vertices = {};
+};
+
+class RoomObjectHandler
+{
+private:
+	// Constants
+
+	static constexpr auto AABB_BOUNDARY = BLOCK(0.1f);
+
+	// Members
+
+	Bvh _tree = Bvh();
+
+public:
+	// Constructors
+
+	RoomObjectHandler() = default;
+
+	// Getters
+
+	std::vector<int> GetIds() const;
+	std::vector<int> GetBoundedIds(const Ray& ray, float dist) const;
+	std::vector<int> GetBoundedIds(const BoundingSphere& sphere) const;
+
+	// Utilities
+
+	void Insert(int id, const BoundingBox& aabb);
+	void Move(int id, const BoundingBox& aabb);
+	void Remove(int id);
+};
+
+// TODO: Make class?
+struct RoomData
 {
 	int						 RoomNumber = 0;
 	std::string				 Name		= {};
@@ -109,19 +149,37 @@ struct ROOM_INFO
 
 	std::vector<int> NeighborRoomNumbers = {};
 
-	std::vector<FloorInfo>	   Sectors		  = {};
-	std::vector<ROOM_LIGHT>	   lights		  = {};
-	std::vector<MESH_INFO>	   mesh			  = {}; // Statics
-	std::vector<TriggerVolume> TriggerVolumes = {};
+	// Object members
 
-	std::vector<Vector3>   positions = {};
-	std::vector<Vector3>   normals	 = {};
-	std::vector<Vector3>   colors	 = {};
-	std::vector<Vector3>   effects	 = {};
-	std::vector<BUCKET>	   buckets	 = {};
-	std::vector<ROOM_DOOR> doors	 = {};
+	//RoomObjectHandler Moveables = RoomObjectHandler(); // TODO: Refactor linked list of items in room to use a BVH instead.
+	//RoomObjectHandler Statics	= RoomObjectHandler(); // TODO: Refactor to use BVH.
+	std::vector<MESH_INFO> mesh = {}; // Statics
+
+	// Collision members
+
+	CollisionMesh				CollisionMesh  = TEN::Math::CollisionMesh();
+	RoomObjectHandler			Bridges		   = RoomObjectHandler();
+	std::vector<PortalData> Portals		   = {};
+	std::vector<TriggerVolume>	TriggerVolumes = {};
+	std::vector<FloorInfo>		Sectors		   = {};
+
+	// Renderer members
+
+	std::vector<RoomLightData> lights	 = {};
+	std::vector<Vector3>	   positions = {};
+	std::vector<Vector3>	   normals	 = {};
+	std::vector<Vector3>	   colors	 = {};
+	std::vector<Vector3>	   effects	 = {};
+	std::vector<BUCKET>		   buckets	 = {};
 
 	bool Active() const;
+	void GenerateCollisionMesh();
+
+private:
+	void CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
+											 const FloorInfo& sector,
+											 const FloorInfo& sectorNorth, const FloorInfo& sectorSouth,
+											 const FloorInfo& sectorEast, const FloorInfo& sectorWest);
 };
 
 void DoFlipMap(int group);
@@ -137,5 +195,6 @@ std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth
 
 namespace TEN::Collision::Room
 {
-	FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
+	RoomData&  GetRoom(int roomNumber);
+	FloorInfo* GetSector(RoomData* room, int x, int z);
 }

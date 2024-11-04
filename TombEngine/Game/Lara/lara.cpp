@@ -63,10 +63,119 @@ LaraInfo	  Lara			= {};
 ItemInfo*	  LaraItem		= nullptr;
 CollisionInfo LaraCollision = {};
 
+//debug
+#include <Game/control/los.h>
+#include "Specific/Input/Input.h"
+#include <OISKeyboard.h>
+#include <Game/collision/Los.h>
+using namespace TEN::Collision::Room;
+using namespace TEN::Collision::Los;
+
+static void HandleLosDebug(const ItemInfo& item)
+{
+	static auto rot = EulerAngles::Identity;
+	if (KeyMap[OIS::KC_T])
+	{
+		rot.x += ANGLE(2);
+	}
+	else if (KeyMap[OIS::KC_G])
+	{
+		rot.x -= ANGLE(2);
+	}
+
+	auto dir = (item.Pose.Orientation + rot).ToDirection();
+
+	float dist = BLOCK(4.5f);
+
+	short roomNumber = item.RoomNumber;
+	GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber);
+
+	auto origin = (item.Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
+	auto target = Geometry::TranslatePoint(origin, dir, dist);
+	auto los = GetLosCollision(origin, roomNumber, dir, dist, true, true, true);
+	float closestDist = los.Room.Distance;
+	target = los.Room.Position;
+
+	for (const auto& movLos : los.Moveables)
+	{
+		if (movLos.Moveable->ObjectNumber == ID_LARA)
+			continue;
+
+		if (movLos.Distance < closestDist)
+		{
+			closestDist = movLos.Distance;
+			target = movLos.Position;
+			break;
+		}
+	}
+
+	for (const auto& staticLos : los.Statics)
+	{
+		if (staticLos.Distance < closestDist)
+		{
+			closestDist = staticLos.Distance;
+			target = staticLos.Position;
+			break;
+		}
+	}
+
+	DrawDebugLine(origin, target, Vector4::One);
+	DrawDebugTarget(target, Quaternion::Identity, 100, Color(1, 1, 1));
+}
+
+static void HandleBridgeDebug(const ItemInfo& item)
+{
+	const auto& room = GetRoom(item.RoomNumber);
+	for (int bridgeItemNumber : room.Bridges.GetIds())
+	{
+		auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+		auto& bridge = GetBridgeObject(bridgeItem);
+
+		bridge.GetCollisionMesh().DrawDebug();
+
+		//if (IsClicked(In::Action))
+		//	bridge.Initialize(bridgeItem);
+	}
+
+	// Force init bridges. For some reason they don't init properly right now.
+	/*static bool hasRun = false;
+	if (!hasRun)
+	{
+		for (auto& item2 : g_Level.Items)
+		{
+			if (!item2.IsBridge())
+				continue;
+
+			auto& bridge = GetBridgeObject(item2);
+			bridge.Initialize(item2);
+		}
+
+		hasRun = true;
+	}*/
+
+	// Move bridge with mouse.
+	auto pointColl = GetPointCollision(item);
+	if (pointColl.GetFloorBridgeItemNumber() != NO_VALUE)
+	{
+		auto& bridgeItem = g_Level.Items[pointColl.GetFloorBridgeItemNumber()];
+
+		auto matrix = Matrix::CreateRotationY(TO_RAD(Camera.actualAngle));
+		auto delta = Vector3::Transform(Vector3(GetMouseAxis().x * BLOCK(0.5f), 0, -GetMouseAxis().y * BLOCK(0.5f)), matrix);
+
+		bridgeItem.Pose.Position += delta;
+		UpdateItemRoom(bridgeItem.Index);
+	}
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
+	// DEBUG
+	HandleLosDebug(*item);
+	HandleBridgeDebug(*item);
+	//------
+	
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)
 	{

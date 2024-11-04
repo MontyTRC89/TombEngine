@@ -12,6 +12,7 @@
 #include <set>
 #include <SimpleMath.h>
 #include <sol.hpp>
+#include <stack>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

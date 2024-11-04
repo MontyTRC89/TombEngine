@@ -2050,7 +2050,7 @@ namespace TEN::Renderer
 		{
 			int index = i;
 			RendererRoom* room = &_rooms[index];
-			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
+			RoomData* nativeRoom = &g_Level.Rooms[room->RoomNumber];
 
 			// Avoid drawing of too far rooms... Environment map is tiny, blurred, so very far rooms would not contribute to the
 			// final pixel colors
@@ -3392,7 +3392,7 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
 
-		ROOM_INFO* nativeRoom = &g_Level.Rooms[objectInfo->Room->RoomNumber];
+		RoomData* nativeRoom = &g_Level.Rooms[objectInfo->Room->RoomNumber];
 
 		_context->PSSetShader(_psRooms.Get(), nullptr, 0);
 
