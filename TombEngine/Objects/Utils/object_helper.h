@@ -19,3 +19,4 @@ void InitFlare(ObjectInfo* object, int objectNumber);
 void InitProjectile(ObjectInfo* object, std::function<InitFunction> func, int objectNumber, bool noLoad = false);
 void InitSearchObject(ObjectInfo* object, int objectNumber);
 void InitPushableObject(ObjectInfo* object, int objectNumber);
+void InitAIObject(ObjectInfo* object, int objectNumber);

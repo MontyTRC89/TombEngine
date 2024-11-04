@@ -799,15 +799,15 @@ static void StartObject(ObjectInfo *obj)
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	for (int objectNumber = ID_AI_GUARD; objectNumber <= ID_AI_X2; objectNumber++)
-	{
-		obj = &Objects[objectNumber];
-		if (obj->loaded)
-		{
-			obj->drawRoutine = nullptr;
-			obj->collision = AIPickupCollision;
-		}
-	}
+	InitAIObject(obj, ID_AI_GUARD);
+	InitAIObject(obj, ID_AI_AMBUSH);
+	InitAIObject(obj, ID_AI_PATROL1);
+	InitAIObject(obj, ID_AI_MODIFY);
+	InitAIObject(obj, ID_AI_FOLLOW);
+	InitAIObject(obj, ID_AI_PATROL2);
+	InitAIObject(obj, ID_AI_X1);
+	InitAIObject(obj, ID_AI_X2);
+	InitAIObject(obj, ID_AI_PATH);
 
 	obj = &Objects[ID_PORTAL];
 	if (obj->loaded)
