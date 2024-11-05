@@ -28,23 +28,23 @@ namespace TEN::Math
 	void CollisionMeshDesc::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
 	{
 		auto getVertexID = [&](const Vector3& vertex)
+		{
+			// Get existing vertex ID.
+			auto it = _vertexMap.find(vertex);
+			if (it != _vertexMap.end())
 			{
-				// Get existing vertex ID.
-				auto it = _vertexMap.find(vertex);
-				if (it != _vertexMap.end())
-				{
-					int vertexID = it->second;
-					return vertexID;
-				}
-
-				// Add and cache new vertex.
-				int vertexID = (int)_vertices.size();
-				_vertices.push_back(vertex);
-				_vertexMap[vertex] = vertexID;
-
-				// Get new vertex ID.
+				int vertexID = it->second;
 				return vertexID;
-			};
+			}
+
+			// Add and cache new vertex.
+			int vertexID = (int)_vertices.size();
+			_vertices.push_back(vertex);
+			_vertexMap[vertex] = vertexID;
+
+			// Get new vertex ID.
+			return vertexID;
+		};
 
 		// Allocate vertices.
 		int vertex0ID = getVertexID(vertex0);
@@ -153,7 +153,7 @@ namespace TEN::Math
 
 	void LocalCollisionTriangle::DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices) const
 	{
-		constexpr auto TRI_COLOR		  = Color(1.0f, 1.0f, 0.0f, 0.2f);
+		constexpr auto TRI_COLOR		  = Color(1.0f, 1.0f, 0.0f, 0.1f);
 		constexpr auto NORMAL_LINE_LENGTH = BLOCK(0.1f);
 		constexpr auto NORMAL_LINE_COLOR  = Color(1.0f, 1.0f, 1.0f);
 

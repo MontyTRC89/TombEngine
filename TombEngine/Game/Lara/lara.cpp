@@ -125,16 +125,6 @@ static void HandleLosDebug(const ItemInfo& item)
 
 static void HandleBridgeDebug(const ItemInfo& item)
 {
-	// Draw bridge collision meshes in current room.
-	const auto& room = GetRoom(item.RoomNumber);
-	for (int bridgeItemNumber : room.Bridges.GetIds())
-	{
-		auto& bridgeItem = g_Level.Items[bridgeItemNumber];
-		auto& bridge = GetBridgeObject(bridgeItem);
-
-		bridge.GetCollisionMesh().DrawDebug();
-	}
-
 	auto pointColl = GetPointCollision(item);
 
 	// Print bridge moveable IDs in current sector.
@@ -436,6 +426,42 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	{
 		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().PathfindingBoxID);
 		DrawNearbySectorFlags(*item);
+
+		// Draw collision meshes.
+		if (g_Renderer.GetDebugPage() == RendererDebugPage::CollisionMeshStats)
+		{
+			auto bridgeItemNumbers = std::set<int>{};
+
+			const auto& room = GetRoom(Camera.pos.RoomNumber);
+			for (int neighborRoomNumber : room.NeighborRoomNumbers)
+			{
+				const auto& neighborRoom = GetRoom(neighborRoomNumber);
+
+				neighborRoom.CollisionMesh.DrawDebug();
+				for (int bridgeItemNumber : neighborRoom.Bridges.GetIds())
+					bridgeItemNumbers.insert(bridgeItemNumber);
+			}
+
+			for (int bridgeItemNumber : bridgeItemNumbers)
+			{
+				auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+				auto& bridge = GetBridgeObject(bridgeItem);
+
+				bridge.GetCollisionMesh().DrawDebug();
+			}
+		}
+
+		// Draw nearby portals.
+		if (g_Renderer.GetDebugPage() == RendererDebugPage::PortalStats)
+		{
+			const auto& room = GetRoom(Camera.pos.RoomNumber);
+			for (int neighborRoomNumber : room.NeighborRoomNumbers)
+			{
+				const auto& neighborRoom = GetRoom(neighborRoomNumber);
+				for (const auto& portal : neighborRoom.Portals)
+					portal.CollisionMesh.DrawDebug();
+			}
+		}
 	}
 }
 

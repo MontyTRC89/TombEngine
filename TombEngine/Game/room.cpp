@@ -548,6 +548,7 @@ static void AddRoomFlipItems(const RoomData& room)
 		auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
 
+		// @BRIDGEME
 		// Add bridges.
 		if (item.IsBridge())
 		{

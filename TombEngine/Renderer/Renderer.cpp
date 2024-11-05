@@ -424,4 +424,9 @@ namespace TEN::Renderer
 	{
 		_graphicsSettingsChanged = true;
 	}
+
+	RendererDebugPage Renderer::GetDebugPage() const
+	{
+		return _debugPage;
+	}
 }

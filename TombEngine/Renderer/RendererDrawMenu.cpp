@@ -7,6 +7,7 @@
 #include "Game/Gui.h"
 #include "Game/Hud/Hud.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
@@ -1181,9 +1182,12 @@ namespace TEN::Renderer
 		if (!DebugMode || CurrentLevel == 0)
 			return;
 
+		const auto& playerItem = *LaraItem;
+		const auto& player = GetLaraInfo(playerItem);
+
 		_currentLineHeight = DISPLAY_SPACE_RES.y / 30;
 
-		const auto& room = g_Level.Rooms[LaraItem->RoomNumber];
+		const auto& room = g_Level.Rooms[playerItem.RoomNumber];
 
 		float aspectRatio = _screenWidth / (float)_screenHeight;
 		int thumbWidth = _screenWidth / 6;
@@ -1268,11 +1272,11 @@ namespace TEN::Renderer
 
 		case RendererDebugPage::DimensionStats:
 			PrintDebugMessage("DIMENSION STATS");
-			PrintDebugMessage("Position: %d, %d, %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-			PrintDebugMessage("Orientation: %d, %d, %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
-			PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
-			PrintDebugMessage("PathfindingBoxID: %d", LaraItem->BoxNumber);
-			PrintDebugMessage((Lara.Context.WaterSurfaceDist == -NO_HEIGHT ? "WaterSurfaceDist: N/A" : "WaterSurfaceDist: %d"), Lara.Context.WaterSurfaceDist);
+			PrintDebugMessage("Position: %d, %d, %d", playerItem.Pose.Position.x, playerItem.Pose.Position.y, playerItem.Pose.Position.z);
+			PrintDebugMessage("Orientation: %d, %d, %d", playerItem.Pose.Orientation.x, playerItem.Pose.Orientation.y, playerItem.Pose.Orientation.z);
+			PrintDebugMessage("RoomNumber: %d", playerItem.RoomNumber);
+			PrintDebugMessage("PathfindingBoxID: %d", playerItem.BoxNumber);
+			PrintDebugMessage((player.Context.WaterSurfaceDist == -NO_HEIGHT ? "WaterSurfaceDist: N/A" : "WaterSurfaceDist: %d"), player.Context.WaterSurfaceDist);
 			PrintDebugMessage("Room Position: %d, %d, %d, %d", room.Position.z, room.Position.z, room.Position.z + BLOCK(room.XSize), room.Position.z + BLOCK(room.ZSize));
 			PrintDebugMessage("Room.y, minFloor, maxCeiling: %d, %d, %d ", room.Position.y, room.BottomHeight, room.TopHeight);
 			PrintDebugMessage("Camera Position: %d, %d, %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
@@ -1282,18 +1286,18 @@ namespace TEN::Renderer
 
 		case RendererDebugPage::PlayerStats:
 			PrintDebugMessage("PLAYER STATS");
-			PrintDebugMessage("AnimObjectID: %d", LaraItem->Animation.AnimObjectID);
-			PrintDebugMessage("AnimNumber: %d", LaraItem->Animation.AnimNumber - Objects[LaraItem->Animation.AnimObjectID].animIndex);
-			PrintDebugMessage("FrameNumber: %d", LaraItem->Animation.FrameNumber - GetAnimData(LaraItem).frameBase);
-			PrintDebugMessage("ActiveState: %d", LaraItem->Animation.ActiveState);
-			PrintDebugMessage("TargetState: %d", LaraItem->Animation.TargetState);
-			PrintDebugMessage("Velocity: %.3f, %.3f, %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
-			PrintDebugMessage("IsAirborne: %d", LaraItem->Animation.IsAirborne);
-			PrintDebugMessage("HandStatus: %d", Lara.Control.HandStatus);
-			PrintDebugMessage("WaterStatus: %d", Lara.Control.WaterStatus);
-			PrintDebugMessage("CanClimbLadder: %d", Lara.Control.CanClimbLadder);
-			PrintDebugMessage("CanMonkeySwing: %d", Lara.Control.CanMonkeySwing);
-			PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
+			PrintDebugMessage("AnimObjectID: %d", playerItem.Animation.AnimObjectID);
+			PrintDebugMessage("AnimNumber: %d", playerItem.Animation.AnimNumber - Objects[playerItem.Animation.AnimObjectID].animIndex);
+			PrintDebugMessage("FrameNumber: %d", playerItem.Animation.FrameNumber - GetAnimData(LaraItem).frameBase);
+			PrintDebugMessage("ActiveState: %d", playerItem.Animation.ActiveState);
+			PrintDebugMessage("TargetState: %d", playerItem.Animation.TargetState);
+			PrintDebugMessage("Velocity: %.3f, %.3f, %.3f", playerItem.Animation.Velocity.z, playerItem.Animation.Velocity.y, playerItem.Animation.Velocity.x);
+			PrintDebugMessage("IsAirborne: %d", playerItem.Animation.IsAirborne);
+			PrintDebugMessage("HandStatus: %d", player.Control.HandStatus);
+			PrintDebugMessage("WaterStatus: %d", player.Control.WaterStatus);
+			PrintDebugMessage("CanClimbLadder: %d", player.Control.CanClimbLadder);
+			PrintDebugMessage("CanMonkeySwing: %d", player.Control.CanMonkeySwing);
+			PrintDebugMessage("Target HitPoints: %d", player.TargetEntity ? player.TargetEntity->HitPoints : 0);
 			break;
 
 		case RendererDebugPage::InputStats:
@@ -1318,9 +1322,9 @@ namespace TEN::Renderer
 			PrintDebugMessage(("Clicked actions: " + clickedActions.ToString()).c_str());
 			PrintDebugMessage(("Held actions: " + heldActions.ToString()).c_str());
 			PrintDebugMessage(("Released actions: " + releasedActions.ToString()).c_str());
-			PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[(int)InputAxis::Move].x, AxisMap[(int)InputAxis::Move].y);
-			PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[(int)InputAxis::Camera].x, AxisMap[(int)InputAxis::Camera].y);
-			PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[(int)InputAxis::Mouse].x, AxisMap[(int)InputAxis::Mouse].y);
+			PrintDebugMessage("Move axes: %.3f, %.3f", GetMoveAxis().x, GetMoveAxis().y);
+			PrintDebugMessage("Camera axes: %.3f, %.3f", GetCameraAxis().x, GetCameraAxis().y);
+			PrintDebugMessage("Mouse axes: %.3f, %.3f", GetMouseAxis().x, GetMouseAxis().y);
 			PrintDebugMessage("Cursor pos: %.3f, %.3f", GetMouse2DPosition().x, GetMouse2DPosition().y);
 		}
 			break;
@@ -1337,9 +1341,13 @@ namespace TEN::Renderer
 			PrintDebugMessage("Front right ceil: %d", LaraCollision.FrontRight.Ceiling);
 			break;
 
+		case RendererDebugPage::CollisionMeshStats:
+			PrintDebugMessage("COLLISION MESH STATS");
+			break;
+
 		case RendererDebugPage::PathfindingStats:
 			PrintDebugMessage("PATHFINDING STATS");
-			PrintDebugMessage("BoxNumber: %d", LaraItem->BoxNumber);
+			PrintDebugMessage("BoxNumber: %d", playerItem.BoxNumber);
 			break;
 
 		case RendererDebugPage::PortalStats:
