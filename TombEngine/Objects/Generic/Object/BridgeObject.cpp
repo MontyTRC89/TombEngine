@@ -40,6 +40,7 @@ namespace TEN::Entities::Generic
 
 		auto obb = item.GetObb();
 
+		// TODO: GetNeighborSectors() doesn't work for some reason when initialising the game. -- Sezz 2024.11.05
 		/*unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_aabb.Extents.x, _aabb.Extents.y), _aabb.Extents.z) / BLOCK(1));
 		auto sectors = GetNeighborSectors(item.Pose.Position, item.RoomNumber, sectorSearchDepth);
 		for (auto* sector : sectors)
@@ -51,8 +52,7 @@ namespace TEN::Entities::Generic
 		auto& room = g_Level.Rooms[item.RoomNumber];
 		room.Bridges.Insert(item.Index, item.GetAabb());
 
-		// TODO: GetNeighborSectors() doesn't work for some reason when initialising the game.
-		// Must use this for correct init for now, which doesn't assign to neighbor rooms. -- Sezz 2024.11.05
+		// TODO: Remove this block when the above commented one starts working.
 		for (int x = 0; x < room.XSize; x++)
 		{
 			for (int z = 0; z < room.ZSize; z++)

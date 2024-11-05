@@ -58,7 +58,7 @@ namespace TEN::Entities::Generic
 	void InitializePushableBlock(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		if (pushableItem.Data == NULL) // First pushableItem in initialize.
+		if (pushableItem.Data == nullptr) // First pushableItem.
 			InitializePushableStacks();
 		
 		auto& pushable = GetPushableInfo(pushableItem);
@@ -69,8 +69,10 @@ namespace TEN::Entities::Generic
 		if (pushableItem.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 &&
 			pushableItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
+			auto& bridge = GetBridgeObject(pushableItem);
+			bridge.Initialize(pushableItem);
+
 			pushable.UseRoomCollision = true;
-			AddPushableBridge(pushableItem);
 		}
 		else
 		{

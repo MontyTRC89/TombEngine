@@ -58,7 +58,9 @@ namespace TEN::Entities::Generic
 
 		if (pushable.UseRoomCollision)
 		{
-			AddBridge(pushableItem.Index);
+			// @BRIDGEME
+			//AddBridge(pushableItem.Index);
+
 			pushable.UseBridgeCollision = true;
 		}
 	}
@@ -72,16 +74,18 @@ namespace TEN::Entities::Generic
 		if (!pushablePtr->UseRoomCollision)
 			return;
 
-		if (pushablePtr->UseBridgeCollision)
-			addBridge ? AddBridge(pushableItem.Index) : RemoveBridge(pushableItem.Index);
+		// @BRIDGEME
+		//if (pushablePtr->UseBridgeCollision)
+		//	addBridge ? AddBridge(pushableItem.Index) : RemoveBridge(pushableItem.Index);
 		
 		while (pushablePtr->Stack.ItemNumberAbove != NO_VALUE)
 		{
 			pushableItemPtr = &g_Level.Items[pushablePtr->Stack.ItemNumberAbove];
 			pushablePtr = &GetPushableInfo(*pushableItemPtr);
 
-			if (pushablePtr->UseBridgeCollision)
-				addBridge ? AddBridge(pushableItemPtr->Index) : RemoveBridge(pushableItemPtr->Index);
+			// @BRIDGEME
+			//if (pushablePtr->UseBridgeCollision)
+			//	addBridge ? AddBridge(pushableItemPtr->Index) : RemoveBridge(pushableItemPtr->Index);
 		}
 	}
 
@@ -91,7 +95,8 @@ namespace TEN::Entities::Generic
 
 		if (pushable.UseRoomCollision)
 		{
-			RemoveBridge(pushableItem.Index);
+			// @BRIDGEME
+			//RemoveBridge(pushableItem.Index);
 			pushable.UseBridgeCollision = false;
 		}
 	}
