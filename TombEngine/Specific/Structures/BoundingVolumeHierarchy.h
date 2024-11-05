@@ -32,7 +32,7 @@ namespace TEN::Structures
 	private:
 		struct Node
 		{
-			int			ObjectID = 1; // NOTE: Only stored by leaf.
+			int			ObjectID = -1; // NOTE: Only stored by leaf.
 			BoundingBox Aabb	 = BoundingBox();
 
 			int Height		 = 0;
