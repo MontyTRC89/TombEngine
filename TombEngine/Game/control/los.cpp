@@ -64,19 +64,82 @@ bool LOS(const GameVector* origin, GameVector* target)
 // Deprecated.
 bool LOSAndReturnTarget(GameVector* origin, GameVector* target, int push)
 {
-	if (!LOS(origin, target))
-		return true;
+	int x = origin->x;
+	int y = origin->y;
+	int z = origin->z;
+	short roomNumber = origin->RoomNumber;
+	short roomNumber2 = roomNumber;
+	int dx = (target->x - x) >> 3;
+	int dy = (target->y - y) >> 3;
+	int dz = (target->z - z) >> 3;
+	bool flag = false;
+	bool result = false;
 
-	auto dir = target->ToVector3() - origin->ToVector3();
-	dir.Normalize();
+	int i;
+	for (i = 0; i < 8; ++i)
+	{
+		roomNumber2 = roomNumber;
+		auto* floor = GetFloor(x, y, z, &roomNumber);
 
-	auto offset = target->ToVector3() - origin->ToVector3();
-	auto pointColl = GetPointCollision(target->ToVector3i(), target->RoomNumber, offset);
+		if (g_Level.Rooms[roomNumber2].flags & ENV_FLAG_SWAMP)
+		{
+			flag = true;
+			break;
+		}
 
-	*target = GameVector(Geometry::TranslatePoint(target->ToVector3(), -dir, push), target->RoomNumber);
-	target->RoomNumber = GetPointCollision(target->ToVector3i(), target->RoomNumber).GetRoomNumber();
+		int floorHeight = GetFloorHeight(floor, x, y, z);
+		int ceilingHeight = GetCeiling(floor, x, y, z);
+		if (floorHeight != NO_HEIGHT && ceilingHeight != NO_HEIGHT && ceilingHeight < floorHeight)
+		{
+			if (y > floorHeight)
+			{
+				if (y - floorHeight >= push)
+				{
+					flag = true;
+					break;
+				}
 
-	return false;
+				y = floorHeight;
+			}
+
+			if (y < ceilingHeight)
+			{
+				if (ceilingHeight - y >= push)
+				{
+					flag = true;
+					break;
+				}
+
+				y = ceilingHeight;
+			}
+
+			result = true;
+		}
+		else if (result)
+		{
+			flag = true;
+			break;
+		}
+
+		x += dx;
+		y += dy;
+		z += dz;
+	}
+
+	if (i)
+	{
+		x -= dx;
+		y -= dy;
+		z -= dz;
+	}
+
+	GetFloor(x, y, z, &roomNumber2);
+	target->x = x;
+	target->y = y;
+	target->z = z;
+	target->RoomNumber = roomNumber2;
+
+	return !flag;
 }
 
 bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, bool isFiring)
