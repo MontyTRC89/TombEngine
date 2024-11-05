@@ -548,7 +548,7 @@ static void AddRoomFlipItems(const RoomData& room)
 		auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
 
-		// @BRIDGEME
+		// @BRIDGEME: Check bridges when flipmap happens.
 		// Add bridges.
 		if (item.IsBridge())
 		{
