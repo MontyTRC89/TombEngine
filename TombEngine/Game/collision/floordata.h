@@ -139,6 +139,8 @@ class FloorInfo
 public:
 	// Members
 
+	int ID = 0;
+
 	Vector2i		  Position		 = Vector2i::Zero;
 	int				  RoomNumber	 = 0;
 	BoundingBox		  Aabb			 = BoundingBox();
@@ -208,7 +210,6 @@ namespace TEN::Collision::Floordata
 	void			   RemoveBridge(int itemNumber, int x = 0, int z = 0);
 	std::optional<int> GetBridgeItemIntersect(const ItemInfo& item, const Vector3i& pos, bool useBottomHeight);
 	int				   GetBridgeBorder(const ItemInfo& item, bool isBottom);
-	void			   UpdateBridgeItem(const ItemInfo& item, bool forceRemoval = false);
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials);
 	

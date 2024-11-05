@@ -5,7 +5,17 @@
 // https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
 // https://www.gdcvault.com/play/1025909/Math-for-Game-Developers-Dynamic
 
-// TODO: Can't use NO_VALUE because of compiler errors.
+// !!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!
+// TODO: Can't use NO_VALUE because of compiler errors. Using magic -1 for now.
+// !!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// NOTE: _leafIDMap is a hash map for convenience. If performance ever suffers because of too many Move() and Remove() calls, it can be substituted for a method
+// with faster access. However, this optimised solution will require maintaining a weird index variable outside the BVH instance,
+// so I'd prefer to keep the hash map if possible. -- Sezz 2024.11.05
 
 namespace TEN::Structures
 {

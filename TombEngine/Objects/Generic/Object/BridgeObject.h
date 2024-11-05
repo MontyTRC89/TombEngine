@@ -15,7 +15,7 @@ namespace TEN::Entities::Generic
 
 		BoundingBox		_aabb		   = BoundingBox();
 		CollisionMesh	_collisionMesh = CollisionMesh();
-		// TODO: Uncomment once attractors are complete.
+		// TODO: Uncomment when attractors are complete.
 		//AttractorObject _attractor	   = AttractorObject();
 
 		Pose				_prevPose		= Pose::Zero;
@@ -35,7 +35,7 @@ namespace TEN::Entities::Generic
 
 		const BoundingBox&	   GetAabb() const;
 		const CollisionMesh&   GetCollisionMesh() const;
-		// TODO: Uncomment once attractors are complete.
+		// TODO: Uncomment when attractors are complete.
 		//const AttractorObject& GetAttractor() const;
 
 		// Utilities

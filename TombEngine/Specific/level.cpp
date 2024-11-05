@@ -813,6 +813,7 @@ void ReadRooms()
 			{
 				auto sector = FloorInfo{};
 
+				sector.ID = (x * room.ZSize) + z;
 				sector.Position = roomPos + Vector2i(BLOCK(x), BLOCK(z));
 				sector.RoomNumber = i;
 				sector.Aabb = BoundingBox(Vector3(sector.Position.x, 0.0f, sector.Position.y) + SECTOR_BOX_CENTER_OFFSET, SECTOR_BOX_EXTENTS);

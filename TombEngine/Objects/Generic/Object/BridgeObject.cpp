@@ -33,17 +33,35 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::Initialize(const ItemInfo& item)
 	{
-		// TODO: For some reason, AssignSectors() doesn't work on its own when initialising at level start.
-		// Must keep using this for now. -- Sezz 2024.11.04
-		UpdateBridgeItem(item);
-
 		UpdateAabb(item);
 		InitializeCollisionMesh(item);
 		InitializeAttractor(item);
 		//AssignSectors(item); // TODO: Uncomment when UpdateBridgeItem() call above is removed.
 
+		auto obb = item.GetObb();
+
+		/*unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_aabb.Extents.x, _aabb.Extents.y), _aabb.Extents.z) / BLOCK(1));
+		auto sectors = GetNeighborSectors(item.Pose.Position, item.RoomNumber, sectorSearchDepth);
+		for (auto* sector : sectors)
+		{
+			if (obb.Intersects(sector->Aabb))
+				sector->AddBridge(item.Index);
+		}*/
+
 		auto& room = g_Level.Rooms[item.RoomNumber];
 		room.Bridges.Insert(item.Index, item.GetAabb());
+
+		// TODO: GetNeighborSectors() doesn't work for some reason when initialising the game.
+		// Must use this for correct init for now, which doesn't assign to neighbor rooms. -- Sezz 2024.11.05
+		for (int x = 0; x < room.XSize; x++)
+		{
+			for (int z = 0; z < room.ZSize; z++)
+			{
+				auto& sector = room.Sectors[(x * room.ZSize) + z];
+				if (obb.Intersects(sector.Aabb))
+					sector.AddBridge(item.Index);
+			}
+		}
 
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
@@ -84,8 +102,8 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::DeassignSectors(const ItemInfo& item) const
 	{
-		// Deassign sectors.
-		unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_prevObb.Extents.x, _prevObb.Extents.y), _prevObb.Extents.z) / BLOCK(1));
+		// Deassign from sectors.
+		unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_prevAabb.Extents.x, _prevAabb.Extents.y), _prevAabb.Extents.z) / BLOCK(1));
 		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);
 		for (auto* sector : sectors)
 		{
@@ -93,9 +111,12 @@ namespace TEN::Entities::Generic
 			if (!_prevAabb.Intersects(sector->Aabb))
 				continue;
 
+			// Test if previous OBB intersects sector.
 			// Remove previous bridge assignment if within sector.
-			if (_prevObb.Intersects(sector->Aabb))
-				sector->RemoveBridge(item.Index);
+			if (!_prevObb.Intersects(sector->Aabb))
+				continue;
+
+			sector->RemoveBridge(item.Index);
 		}
 	}
 
@@ -181,7 +202,7 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::AssignSectors(const ItemInfo& item)
 	{
-		// Deassign sectors from previous position.
+		// Deassign from sectors in previous position.
 		DeassignSectors(item);
 		if (item.Flags & IFLAG_KILLED)
 			return;

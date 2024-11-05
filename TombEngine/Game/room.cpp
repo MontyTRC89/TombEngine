@@ -545,12 +545,15 @@ static void AddRoomFlipItems(const RoomData& room)
 	// Run through linked items.
 	for (int itemNumber = room.itemNumber; itemNumber != NO_VALUE; itemNumber = g_Level.Items[itemNumber].NextItem)
 	{
-		const auto& item = g_Level.Items[itemNumber];
+		auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
 
 		// Add bridges.
 		if (item.IsBridge())
-			UpdateBridgeItem(item);
+		{
+			auto& bridge = GetBridgeObject(item);
+			bridge.Update(item);
+		}
 	}
 }
 

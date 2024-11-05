@@ -82,19 +82,20 @@ namespace TEN::Entities::Generic
 					return;
 				}
 
+				// @BRIDGEME
 				int distToPortal = *&g_Level.Rooms[item->RoomNumber].TopHeight - item->Pose.Position.y;
 				if (distToPortal <= speed)
-					UpdateBridgeItem(*item);
+					bridge.Update(*item);
 
-				auto probe = GetPointCollision(*item);
+				auto pointColl = GetPointCollision(*item);
 
-				item->Floor = probe.GetFloorHeight();
+				item->Floor = pointColl.GetFloorHeight();
 
-				if (probe.GetRoomNumber() != item->RoomNumber)
+				if (pointColl.GetRoomNumber() != item->RoomNumber)
 				{
-					UpdateBridgeItem(*item, true);
-					ItemNewRoom(itemNumber, probe.GetRoomNumber());
-					UpdateBridgeItem(*item);
+					bridge.Update(*item);
+					ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
+					bridge.Update(*item);
 				}
 			}
 			else

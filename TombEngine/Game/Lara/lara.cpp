@@ -125,6 +125,7 @@ static void HandleLosDebug(const ItemInfo& item)
 
 static void HandleBridgeDebug(const ItemInfo& item)
 {
+	// Draw bridge collision meshes in current room.
 	const auto& room = GetRoom(item.RoomNumber);
 	for (int bridgeItemNumber : room.Bridges.GetIds())
 	{
@@ -132,35 +133,24 @@ static void HandleBridgeDebug(const ItemInfo& item)
 		auto& bridge = GetBridgeObject(bridgeItem);
 
 		bridge.GetCollisionMesh().DrawDebug();
-
-		//if (IsClicked(In::Action))
-		//	bridge.Initialize(bridgeItem);
 	}
 
-	// Force init bridges. For some reason they don't init properly right now.
-	/*static bool hasRun = false;
-	if (!hasRun)
-	{
-		for (auto& item2 : g_Level.Items)
-		{
-			if (!item2.IsBridge())
-				continue;
-
-			auto& bridge = GetBridgeObject(item2);
-			bridge.Initialize(item2);
-		}
-
-		hasRun = true;
-	}*/
-
-	// Move bridge with mouse.
 	auto pointColl = GetPointCollision(item);
+
+	// Print bridge moveable IDs in current sector.
+	PrintDebugMessage("Bridge moveable IDs in room %d, sector %d:", pointColl.GetRoomNumber(), pointColl.GetSector().ID);
+	for (int bridgeItemNumber : pointColl.GetSector().BridgeItemNumbers)
+		PrintDebugMessage("%d", bridgeItemNumber);
+
+	// Move bridge with mouse. Hold Y to move vertically.
 	if (pointColl.GetFloorBridgeItemNumber() != NO_VALUE)
 	{
 		auto& bridgeItem = g_Level.Items[pointColl.GetFloorBridgeItemNumber()];
 
 		auto matrix = Matrix::CreateRotationY(TO_RAD(Camera.actualAngle));
-		auto delta = Vector3::Transform(Vector3(GetMouseAxis().x * BLOCK(0.5f), 0, -GetMouseAxis().y * BLOCK(0.5f)), matrix);
+		auto delta = KeyMap[OIS::KC_Y] ?
+			Vector3(0.0f, GetMouseAxis().y * BLOCK(0.5f), 0.0f) :
+			Vector3::Transform(Vector3(GetMouseAxis().x * BLOCK(0.5f), 0, GetMouseAxis().y * -BLOCK(0.5f)), matrix);
 
 		bridgeItem.Pose.Position += delta;
 		UpdateItemRoom(bridgeItem.Index);
