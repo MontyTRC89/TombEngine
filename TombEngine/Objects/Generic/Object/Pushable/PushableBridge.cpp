@@ -52,14 +52,14 @@ namespace TEN::Entities::Generic
 		return item.Pose.Position.y;
 	}
 
-	void AddPushableBridge(ItemInfo& pushableItem)
+	void AddPushableBridge (ItemInfo& pushableItem)
 	{
 		auto& pushable = GetPushableInfo(pushableItem);
 
 		if (pushable.UseRoomCollision)
 		{
-			// @BRIDGEME
-			//AddBridge(pushableItem.Index);
+			auto& bridge = GetBridgeObject(pushableItem);
+			bridge.Initialize(pushableItem);
 
 			pushable.UseBridgeCollision = true;
 		}
@@ -95,8 +95,9 @@ namespace TEN::Entities::Generic
 
 		if (pushable.UseRoomCollision)
 		{
-			// @BRIDGEME
-			//RemoveBridge(pushableItem.Index);
+			auto& bridge = GetBridgeObject(pushableItem);
+			bridge.DeassignSectors(pushableItem);
+
 			pushable.UseBridgeCollision = false;
 		}
 	}

@@ -33,12 +33,14 @@ namespace TEN::Entities::Generic
 		auto pointColl = GetPointCollision(pushableItem);
 		if (pushable.UseRoomCollision)
 		{
-			RemovePushableBridge(pushableItem);
+			// @BRIDGEME
+			// TODO: Formally removed the bridge to avoid conflict with raycast
 
 			pointColl = GetPointCollision(pushableItem);
 			pointColl.GetFloorHeight();
 
-			AddPushableBridge(pushableItem);
+			// @BRIDGEME
+			// TODO: Formally restored the bridge
 		}
 
 		// 1) Check for wall.
@@ -130,6 +132,8 @@ namespace TEN::Entities::Generic
 			if (object.isPickup)
 				continue;
 
+			// @BRIDGEME
+			// TODO: Review the other bridge objects detections.
 			if (!itemPtr->IsBridge())
 				return false;
 
@@ -204,6 +208,8 @@ namespace TEN::Entities::Generic
 			if (object.isPickup)
 				continue;
 
+			// @BRIDGEME
+			// TODO: Review the other bridge objects detections.
 			if (!itemPtr->IsBridge())
 			{
 				return false;
@@ -307,12 +313,14 @@ namespace TEN::Entities::Generic
 
 		auto pushableColl = PushableCollisionData{};
 
+
+		// TODO: If bridges system changes, this routine may be similar to object pushables ones, consider for review.
 		if (pushable.UseBridgeCollision)
 		{
-			RemovePushableBridge(item);
+			// @BRIDGEME
+			// TODO: Formally removed the bridge to avoid conflict with raycast
 
 			pointColl = GetPointCollision(item);
-			pointColl.GetFloorHeight();
 
 			waterHeight = pointColl.GetWaterSurfaceHeight();
 
@@ -322,7 +330,8 @@ namespace TEN::Entities::Generic
 			pushableColl.FloorHeight = pointColl.GetFloorHeight();
 			pushableColl.CeilingHeight = pointColl.GetCeilingHeight();
 
-			AddPushableBridge(item);
+			// @BRIDGEME
+			// TODO: Formally restored the bridge
 		}
 		else
 		{
