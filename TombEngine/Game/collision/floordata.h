@@ -131,6 +131,15 @@ struct SectorFlagData
 	}
 };
 
+struct BridgeCacheEntry
+{
+	int Index;
+	Pose Pose;
+	Vector3i Point;
+	bool UseBottomHeight;
+	std::optional<int> Result;
+};
+
 // SectorData
 class FloorInfo
 {

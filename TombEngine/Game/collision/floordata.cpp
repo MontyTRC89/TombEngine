@@ -19,6 +19,12 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using namespace TEN::Renderer;
 
+// Caching last 20 bridge tests allows to save up to 30% CPU time spent in that function,
+// as usually player collision checks tend to repeat probing in same places multiple times.
+constexpr auto CACHE_SIZE = 20;
+std::array<BridgeCacheEntry, 20> BridgeCache;
+size_t CacheIndex = 0;
+
 int FloorInfo::GetSurfaceTriangleID(int x, int z, bool isFloor) const
 {
 	constexpr auto TRI_ID_0 = 0;
@@ -799,44 +805,58 @@ namespace TEN::Collision::Floordata
 	{
 		constexpr auto VERTICAL_MARGIN = 4;
 
+		// Check the cache for an existing entry.
+		for (const auto& entry : BridgeCache) 
+		{
+			if (entry.Index == item.Index && entry.Pose == item.Pose && 
+				entry.Point == pos && entry.UseBottomHeight == useBottomHeight)
+			{
+				return entry.Result;
+			}
+		}
+
 		auto box = GameBoundingBox(&item);
 		auto extents = box.GetExtents();
+
+		std::optional<int> result = std::nullopt;
 
 		// Test rough circle intersection to discard bridges not intersecting horizontally.
 		auto circle1 = Vector3(pos.x, pos.z, BLOCK(1));
 		auto circle2 = Vector3(item.Pose.Position.x, item.Pose.Position.z, std::hypot(extents.x, extents.z));
-		if (!Geometry::CircleIntersects(circle1, circle2))
-			return std::nullopt;
 
-		auto origin = Vector3i(pos.x, pos.y + (useBottomHeight ? VERTICAL_MARGIN : -VERTICAL_MARGIN), pos.z) - item.Pose.Position;
-
-		float cosAngle = phd_cos(-item.Pose.Orientation.y);
-		float sinAngle = phd_sin(-item.Pose.Orientation.y);
-
-		auto localOrigin = Vector3(
-			origin.x * cosAngle - origin.z * sinAngle,
-			origin.y,
-			origin.x * sinAngle + origin.z * cosAngle
-		);
-
-		// Calculate intersection t-value (distance along the ray)
-		auto direction = (useBottomHeight ? -Vector3::UnitY : Vector3::UnitY);
-		float targetY = useBottomHeight ? box.Y2 : box.Y1;
-		float t = (targetY - localOrigin.y) / direction.y;
-
-		// Compute the intersection point
-		Vector3 intersectionPoint = localOrigin + t * direction;
-
-		std::optional<int> result = std::nullopt;
-
-		// Check if the intersection point is within the bounding box's X and Z extents
-		if (intersectionPoint.x >= box.X1 && intersectionPoint.x <= box.X2 &&
-			intersectionPoint.z >= box.Z1 && intersectionPoint.z <= box.Z2)
+		if (Geometry::CircleIntersects(circle1, circle2))
 		{
-			// Transform the intersection point back to world coordinates
-			auto worldIntersectionY = item.Pose.Position.y + intersectionPoint.y;
-			result = (int)worldIntersectionY;
+			auto origin = Vector3i(pos.x, pos.y + (useBottomHeight ? VERTICAL_MARGIN : -VERTICAL_MARGIN), pos.z) - item.Pose.Position;
+
+			float cosAngle = phd_cos(-item.Pose.Orientation.y);
+			float sinAngle = phd_sin(-item.Pose.Orientation.y);
+
+			auto localOrigin = Vector3(
+				origin.x * cosAngle - origin.z * sinAngle,
+				origin.y,
+				origin.x * sinAngle + origin.z * cosAngle
+			);
+
+			// Calculate intersection t-value (distance along the ray).
+			auto direction = (useBottomHeight ? -Vector3::UnitY : Vector3::UnitY);
+			float targetY = useBottomHeight ? box.Y2 : box.Y1;
+			float t = (targetY - localOrigin.y) / direction.y;
+
+			// Compute the intersection point.
+			Vector3 intersectionPoint = localOrigin + t * direction;
+
+			// Check if the intersection point is within the bounding box's X and Z extents.
+			if (intersectionPoint.x >= box.X1 && intersectionPoint.x <= box.X2 &&
+				intersectionPoint.z >= box.Z1 && intersectionPoint.z <= box.Z2)
+			{
+				// Transform the intersection point back to world coordinates.
+				auto worldIntersectionY = item.Pose.Position.y + intersectionPoint.y;
+				result = (int)worldIntersectionY;
+			}
 		}
+
+		BridgeCache[CacheIndex] = { item.Index, item.Pose, pos, useBottomHeight, result };
+		CacheIndex = (CacheIndex + 1) % CACHE_SIZE;  // Move to the next cache slot in a circular fashion.
 
 		return result;
 	}
@@ -937,6 +957,9 @@ namespace TEN::Collision::Floordata
 
 	void DrawNearbySectorFlags(const ItemInfo& item)
 	{
+		if (g_Renderer.GetCurrentDebugPage() != RendererDebugPage::CollisionStats)
+			return;
+
 		constexpr auto SECTOR_SEARCH_DEPTH = 2;
 		constexpr auto STRING_SPACING	   = -20.0f;
 
