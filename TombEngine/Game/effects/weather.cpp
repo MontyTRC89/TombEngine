@@ -503,16 +503,19 @@ namespace TEN::Effects::Environment
 			int xPos = Camera.pos.x + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
 			int yPos = Camera.pos.y + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
 			int zPos = Camera.pos.z + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
+			auto pos = Vector3i(xPos, yPos, zPos);
 
 			// Use more memory-efficient GetFloor() instead of GetPointCollision() as a lot of dust may spawn at a time.
-			short roomNumber = Camera.pos.RoomNumber;
-			auto* floor = GetFloor(xPos, yPos, zPos, &roomNumber);
+			int roomNumber = Camera.pos.RoomNumber;
+			
+			if (!IsPointInRoom(pos, roomNumber))
+				roomNumber = FindRoomNumber(pos, Camera.pos.RoomNumber, true);
+
+			if (roomNumber == NO_VALUE)
+				continue;
 
 			// Check if water room.
 			if (!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber))
-				continue;
-
-			if (!IsPointInRoom(Vector3i(xPos, yPos, zPos), roomNumber))
 				continue;
 
 			auto part = WeatherParticle();
