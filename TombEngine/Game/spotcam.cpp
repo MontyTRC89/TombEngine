@@ -56,6 +56,7 @@ int NumberSpotcams;
 
 bool CheckTrigger = false;
 bool UseSpotCam = false;
+bool SpotcamSwitched = false;
 bool SpotcamDontDrawLara = false;
 bool SpotcamOverlay = false;
 
