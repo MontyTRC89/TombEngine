@@ -145,8 +145,7 @@ namespace TEN::Entities::Traps
 				item.ItemFlags[1] = CRUMBLING_PLATFORM_VELOCITY_MIN;
 
 				auto& room = g_Level.Rooms[item.RoomNumber];
-				room.Bridges.Remove(item.Index);
-				bridge.DeassignSectors(item);
+				bridge.Disable(item);
 			}
 		}
 

@@ -35,6 +35,8 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::Initialize(const ItemInfo& item)
 	{
+		_isEnabled = true;
+
 		UpdateAabb(item);
 		InitializeCollisionMesh(item);
 		InitializeAttractor(item);
@@ -74,13 +76,17 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::Update(const ItemInfo& item)
 	{
+		if (!_isEnabled)
+			return;
+
 		if (item.Pose == _prevPose && item.RoomNumber == _prevRoomNumber)
 			return;
 
-		UpdateItemRoom(item.Index);
+		//UpdateItemRoom(item.Index);  // TODO: Not needed? Should be handled by each moveable itself.
 		UpdateAabb(item);
 		UpdateCollisionMesh(item);
 		UpdateAttractor(item);
+		DeassignSectors(item);
 		AssignSectors(item);
 
 		auto& room = GetRoom(item.RoomNumber);
@@ -104,27 +110,36 @@ namespace TEN::Entities::Generic
 		_prevObb = item.GetObb();
 	}
 
-	void BridgeObject::DeassignSectors(const ItemInfo& item) const
+	void BridgeObject::Enable(const ItemInfo& item)
 	{
+		_isEnabled = true;
+
+		UpdateAabb(item);
+		UpdateCollisionMesh(item);
+		InitializeAttractor(item);
+		AssignSectors(item);
+
+		// Insert into room bridge tree.
+		auto& room = GetRoom(item.RoomNumber);
+		room.Bridges.Insert(item.Index, item.GetAabb());
+
+		// Store previous parameters.
+		_prevPose = item.Pose;
+		_prevRoomNumber = item.RoomNumber;
+		_prevAabb = _aabb;
+		_prevObb = item.GetObb();
+	}
+
+	void BridgeObject::Disable(const ItemInfo& item)
+	{
+		_isEnabled = false;
+
+		// Destroy attractor here. Maybe contain in std::optional?
+		DeassignSectors(item);
+
 		// Remove from room bridge tree.
-		//auto& room = GetRoom(item.RoomNumber);
-		//room.Bridges.Remove(item.Index);
-
-		// Deassign from sectors.
-		unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_prevAabb.Extents.x, _prevAabb.Extents.y), _prevAabb.Extents.z) / BLOCK(1));
-		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);
-		for (auto* sector : sectors)
-		{
-			// Test if previous AABB intersects sector.
-			if (!_prevAabb.Intersects(sector->Aabb))
-				continue;
-
-			// Test if previous OBB intersects sector.
-			if (!_prevObb.Intersects(sector->Aabb))
-				continue;
-
-			sector->RemoveBridge(item.Index);
-		}
+		auto& prevRoom = GetRoom(_prevRoomNumber);
+		prevRoom.Bridges.Remove(item.Index);
 	}
 
 	void BridgeObject::InitializeCollisionMesh(const ItemInfo& item)
@@ -211,8 +226,6 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::AssignSectors(const ItemInfo& item)
 	{
-		// Deassign from sectors in previous position.
-		DeassignSectors(item);
 		if (item.Flags & IFLAG_KILLED)
 			return;
 
@@ -233,6 +246,29 @@ namespace TEN::Entities::Generic
 				continue;
 
 			sector->AddBridge(item.Index);
+		}
+	}
+
+	void BridgeObject::DeassignSectors(const ItemInfo& item) const
+	{
+		// Remove from room bridge tree.
+		//auto& room = GetRoom(item.RoomNumber);
+		//room.Bridges.Remove(item.Index);
+
+		// Deassign from sectors.
+		unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_prevAabb.Extents.x, _prevAabb.Extents.y), _prevAabb.Extents.z) / BLOCK(1));
+		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);
+		for (auto* sector : sectors)
+		{
+			// Test if previous AABB intersects sector.
+			if (!_prevAabb.Intersects(sector->Aabb))
+				continue;
+
+			// Test if previous OBB intersects sector.
+			if (!_prevObb.Intersects(sector->Aabb))
+				continue;
+
+			sector->RemoveBridge(item.Index);
 		}
 	}
 

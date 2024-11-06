@@ -95,8 +95,9 @@ namespace TEN::Entities::Generic
 
 		if (pushable.UseRoomCollision)
 		{
+			// @BRIDGEME
 			auto& bridge = GetBridgeObject(pushableItem);
-			bridge.DeassignSectors(pushableItem);
+			bridge.Disable(pushableItem);
 
 			pushable.UseBridgeCollision = false;
 		}
