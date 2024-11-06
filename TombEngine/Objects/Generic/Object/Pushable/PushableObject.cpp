@@ -58,7 +58,7 @@ namespace TEN::Entities::Generic
 	void InitializePushableBlock(int itemNumber)
 	{
 		auto& pushableItem = g_Level.Items[itemNumber];
-		if (pushableItem.Data == nullptr) // First pushableItem.
+		if (pushableItem.Data == NULL) // First pushableItem.
 			InitializePushableStacks();
 		
 		auto& pushable = GetPushableInfo(pushableItem);

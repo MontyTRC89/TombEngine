@@ -13,9 +13,9 @@ namespace std
 		size_t operator ()(const Vector3& vector) const noexcept
 		{
 			size_t seed = 0;
-			seed ^= std::hash<int>()(vector.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= std::hash<int>()(vector.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= std::hash<int>()(vector.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hash<int>()(vector.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hash<int>()(vector.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hash<int>()(vector.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 			return seed;
 		}
 	};
@@ -84,13 +84,13 @@ namespace TEN::Math
 	struct CollisionTriangleData
 	{
 		std::array<Vector3, LocalCollisionTriangle::VERTEX_COUNT> Vertices = {};
-		Vector3 Normal = Vector3::Zero;
+		Vector3													  Normal   = Vector3::Zero;
 	};
 
 	struct CollisionMeshRayCollisionData
 	{
 		CollisionTriangleData Triangle = {};
-		float Distance = 0.0f;
+		float				  Distance = 0.0f;
 	};
 
 	class CollisionMesh

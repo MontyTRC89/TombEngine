@@ -132,10 +132,23 @@ static void HandleBridgeDebug(const ItemInfo& item)
 	for (int bridgeItemNumber : pointColl.GetSector().BridgeItemNumbers)
 		PrintDebugMessage("%d", bridgeItemNumber);
 
-	// Move bridge with mouse. Hold Y to move vertically.
+	// Move bridge with mouse.
+	// Hold Y to move vertically.
+	// Hold R/E to rotate.
 	if (pointColl.GetFloorBridgeItemNumber() != NO_VALUE)
 	{
 		auto& bridgeItem = g_Level.Items[pointColl.GetFloorBridgeItemNumber()];
+
+		auto rot = EulerAngles::Identity;
+		if (KeyMap[OIS::KC_R])
+		{
+			rot.y += ANGLE(2);
+		}
+		else if (KeyMap[OIS::KC_E])
+		{
+			rot.y -= ANGLE(2);
+		}
+		bridgeItem.Pose.Orientation += rot;
 
 		auto matrix = Matrix::CreateRotationY(TO_RAD(Camera.actualAngle));
 		auto delta = KeyMap[OIS::KC_Y] ?

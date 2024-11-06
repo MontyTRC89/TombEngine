@@ -4,6 +4,7 @@
 // TODO: Uncomment when attractors are complete.
 //#include "Game/collision/Attractor.h"
 #include "Game/items.h"
+#include "Game/room.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
@@ -11,6 +12,7 @@
 
 // TODO: Uncomment when attractors are complete.
 //using namespace TEN::Colllision::Attractor;
+using namespace TEN::Collision::Room;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Generic
@@ -36,7 +38,11 @@ namespace TEN::Entities::Generic
 		UpdateAabb(item);
 		InitializeCollisionMesh(item);
 		InitializeAttractor(item);
-		//AssignSectors(item); // TODO: Uncomment when UpdateBridgeItem() call above is removed.
+		//AssignSectors(item); // TODO: Uncomment when commented block below starts working.
+
+		// Insert into room bridge tree.
+		auto& room = GetRoom(item.RoomNumber);
+		room.Bridges.Insert(item.Index, item.GetAabb());
 
 		auto obb = item.GetObb();
 
@@ -49,10 +55,7 @@ namespace TEN::Entities::Generic
 				sector->AddBridge(item.Index);
 		}*/
 
-		auto& room = g_Level.Rooms[item.RoomNumber];
-		room.Bridges.Insert(item.Index, item.GetAabb());
-
-		// TODO: Remove this block when the above commented one starts working.
+		// TODO: Temporary substitute for commented block above.
 		for (int x = 0; x < room.XSize; x++)
 		{
 			for (int z = 0; z < room.ZSize; z++)
@@ -63,8 +66,10 @@ namespace TEN::Entities::Generic
 			}
 		}
 
+		// Store previous parameters.
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
+		// TODO: May need previous AABB and OBB if proportions mutate based on anim AABB.
 	}
 
 	void BridgeObject::Update(const ItemInfo& item)
@@ -78,13 +83,13 @@ namespace TEN::Entities::Generic
 		UpdateAttractor(item);
 		AssignSectors(item);
 
-		auto& room = g_Level.Rooms[item.RoomNumber];
-		auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
+		auto& room = GetRoom(item.RoomNumber);
+		auto& prevRoom = GetRoom(_prevRoomNumber);
 
-		if (item.RoomNumber == _prevRoomNumber)
+		// Update room bridge trees.
+		if (item.Pose != _prevPose && item.RoomNumber == _prevRoomNumber)
 		{
-			if (item.Pose != _prevPose)
-				room.Bridges.Move(item.Index, item.GetAabb());
+			room.Bridges.Move(item.Index, item.GetAabb());
 		}
 		else
 		{
@@ -92,8 +97,7 @@ namespace TEN::Entities::Generic
 			prevRoom.Bridges.Remove(item.Index);
 		}
 
-		_prevPose = item.Pose;
-		_prevRoomNumber = item.RoomNumber;
+		// Store previous parameters.
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = _aabb;
@@ -102,6 +106,10 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::DeassignSectors(const ItemInfo& item) const
 	{
+		// Remove from room bridge tree.
+		//auto& room = GetRoom(item.RoomNumber);
+		//room.Bridges.Remove(item.Index);
+
 		// Deassign from sectors.
 		unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_prevAabb.Extents.x, _prevAabb.Extents.y), _prevAabb.Extents.z) / BLOCK(1));
 		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);
@@ -112,7 +120,6 @@ namespace TEN::Entities::Generic
 				continue;
 
 			// Test if previous OBB intersects sector.
-			// Remove previous bridge assignment if within sector.
 			if (!_prevObb.Intersects(sector->Aabb))
 				continue;
 
@@ -189,6 +196,8 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
 	{
+		// TODO: Also update proportions based on AABB animation?
+
 		_collisionMesh.SetPosition(item.Pose.Position.ToVector3());
 		_collisionMesh.SetOrientation(item.Pose.Orientation.ToQuaternion());
 	}
