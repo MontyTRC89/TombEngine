@@ -7,6 +7,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Bug fixes
 
+* Fixed bad engine performance around multiple stacked bridges.
+
 ### Features/Amendments
 	
 ### Lua API changes
