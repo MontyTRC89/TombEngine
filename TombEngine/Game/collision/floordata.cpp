@@ -799,17 +799,46 @@ namespace TEN::Collision::Floordata
 	{
 		constexpr auto VERTICAL_MARGIN = 4;
 
-		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-		
-		auto origin = Vector3(pos.x, pos.y + (useBottomHeight ? VERTICAL_MARGIN : -VERTICAL_MARGIN), pos.z);
-		auto dir = useBottomHeight ? -Vector3::UnitY : Vector3::UnitY;
+		auto box = GameBoundingBox(&item);
+		auto extents = box.GetExtents();
 
-		// Ray intersects box; return bridge box height.
-		float dist = 0.0f;
-		if (box.Intersects(origin, dir, dist))
-			return Geometry::TranslatePoint(origin, dir, dist).y;
+		// Test rough circle intersection to discard bridges not intersecting horizontally.
+		auto circle1 = Vector3(pos.x, pos.z, BLOCK(1));
+		auto circle2 = Vector3(item.Pose.Position.x, item.Pose.Position.z, std::hypot(extents.x, extents.z));
+		if (!Geometry::CircleIntersects(circle1, circle2))
+			return std::nullopt;
 
-		return std::nullopt;
+		auto origin = Vector3i(pos.x, pos.y + (useBottomHeight ? VERTICAL_MARGIN : -VERTICAL_MARGIN), pos.z) - item.Pose.Position;
+
+		float cosAngle = phd_cos(-item.Pose.Orientation.y);
+		float sinAngle = phd_sin(-item.Pose.Orientation.y);
+
+		auto localOrigin = Vector3(
+			origin.x * cosAngle - origin.z * sinAngle,
+			origin.y,
+			origin.x * sinAngle + origin.z * cosAngle
+		);
+
+		// Calculate intersection t-value (distance along the ray)
+		auto direction = (useBottomHeight ? -Vector3::UnitY : Vector3::UnitY);
+		float targetY = useBottomHeight ? box.Y2 : box.Y1;
+		float t = (targetY - localOrigin.y) / direction.y;
+
+		// Compute the intersection point
+		Vector3 intersectionPoint = localOrigin + t * direction;
+
+		std::optional<int> result = std::nullopt;
+
+		// Check if the intersection point is within the bounding box's X and Z extents
+		if (intersectionPoint.x >= box.X1 && intersectionPoint.x <= box.X2 &&
+			intersectionPoint.z >= box.Z1 && intersectionPoint.z <= box.Z2)
+		{
+			// Transform the intersection point back to world coordinates
+			auto worldIntersectionY = item.Pose.Position.y + intersectionPoint.y;
+			result = (int)worldIntersectionY;
+		}
+
+		return result;
 	}
 
 	// Gets bridge min or max height regardless of actual X/Z world position.
