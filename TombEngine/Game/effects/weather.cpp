@@ -361,8 +361,9 @@ namespace TEN::Effects::Environment
 			if (part.Type == WeatherType::None)
 				continue;
 
-			auto pointColl = GetPointCollision(part.Position, part.RoomNumber);
+			PointCollisionData pointColl;
 			bool collisionCalculated = false;
+			bool landed = false;
 
 			if (part.CollisionCheckDelay <= 0)
 			{
@@ -393,9 +394,8 @@ namespace TEN::Effects::Environment
 
 				if (pointColl.GetRoomNumber() == part.RoomNumber)
 				{
-					// Not landed on door, so out of room bounds - delete.
-					part.Enabled = false;
-					continue;
+					// Not landed on door, so out of room bounds - land.
+					landed = true;
 				}
 				else
 				{
@@ -409,7 +409,7 @@ namespace TEN::Effects::Environment
 				// If particle is inside water or swamp, count it as "inSubstance".
 				// If particle got below floor or above ceiling, count it as "landed".
 				bool inSubstance = g_Level.Rooms[pointColl.GetRoomNumber()].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
-				bool landed = (pointColl.GetFloorHeight() <= part.Position.y) || (pointColl.GetCeilingHeight() >= part.Position.y);
+				landed = landed || (pointColl.GetFloorHeight() <= part.Position.y) || (pointColl.GetCeilingHeight() >= part.Position.y);
 
 				if (inSubstance || landed)
 				{
@@ -427,6 +427,8 @@ namespace TEN::Effects::Environment
 						part.Enabled = false;
 						AddWaterSparks(prevPos.x, prevPos.y, prevPos.z, 6);
 					}
+
+					continue;
 				}
 			}
 
