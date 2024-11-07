@@ -67,8 +67,7 @@ namespace TEN::Entities::Generic
 
 				ResetPlayerFlex(LaraItem);
 				
-				// @BRIDGEME
-				// TODO: Formally, it was deactivating the bridge to avoid the interference during the horizontal movement.
+				DisablePushableBridge(pushableItem);
 			}
 			else if (playerItem.Animation.ActiveState != LS_PUSHABLE_GRAB &&
 				playerItem.Animation.ActiveState != LS_PUSHABLE_PULL &&
@@ -132,8 +131,7 @@ namespace TEN::Entities::Generic
 				pushable.BehaviorState = PushableBehaviourState::Fall;
 				SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
 
-				// @BRIDGEME
-				// TODO: Formally removed the bridge to can move it vertically.
+				DisablePushableBridge(pushableItem);
 			}
 			else
 			{
@@ -147,8 +145,7 @@ namespace TEN::Entities::Generic
 
 		case PushableEnvironmentType::Water:
 			
-			// @BRIDGEME
-			// TODO: Formally removed the bridge to can move it vertically.
+			DisablePushableBridge(pushableItem);
 
 			SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
 
@@ -323,8 +320,7 @@ namespace TEN::Entities::Generic
 					// Set upper pushables back to normal(?).
 					StopMovePushableStack(pushableItem.Index);
 					
-					// @BRIDGEME
-					// TODO: Formally added the bridge to can climb it or collide with it..
+					EnablePushableBridge(pushableItem);
 
 					// Connect to another stack.
 					int foundStack = SearchNearPushablesStack(pushableItem.Index);
@@ -342,13 +338,11 @@ namespace TEN::Entities::Generic
 					movementDir.Normalize();
 					playerItem.Pose.Position = playerItem.Pose.Position + movementDir * BLOCK(1);
 
-					// @BRIDGEME
-					// TODO: Formally removed the bridge to can move it vertically.
+					DisablePushableBridge(pushableItem);
 				}
 				else
 				{
-					// @BRIDGEME
-					// TODO: Formally removed the bridge to can continue the horizontal movement
+					DisablePushableBridge(pushableItem);
 				}
 				break;
 
@@ -491,8 +485,7 @@ namespace TEN::Entities::Generic
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 				pushable.BehaviorState = PushableBehaviourState::Idle;
 
-				// @BRIDGEME
-				// TODO: Formally added the bridge to can collide it
+				EnablePushableBridge(pushableItem);
 				break;
 
 			case PushableEnvironmentType::Water:
@@ -558,8 +551,7 @@ namespace TEN::Entities::Generic
 			pushableItem.Pose.Position.y = pushableColl.FloorHeight;
 			pushable.BehaviorState = PushableBehaviourState::Idle;
 
-			// @BRIDGEME
-			// TODO: Formally added the bridge to collide it
+			EnablePushableBridge(pushableItem);
 
 			break;
 
@@ -652,8 +644,7 @@ namespace TEN::Entities::Generic
 				pushable.BehaviorState = PushableBehaviourState::UnderwaterIdle;
 				pushable.Gravity = PUSHABLE_GRAVITY_WATER;
 				
-				// @BRIDGEME
-				// TODO: Formally added the bridge to can collide it.
+				EnablePushableBridge(pushableItem);
 
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 
@@ -731,8 +722,7 @@ namespace TEN::Entities::Generic
 				pushable.BehaviorState = PushableBehaviourState::WaterSurfaceIdle;
 				pushable.Gravity = PUSHABLE_GRAVITY_WATER;
 				
-				// @BRIDGEME
-				// TODO: Formally added the bridge to can collide it
+				EnablePushableBridge(pushableItem);
 			}
 
 			break;
@@ -843,8 +833,7 @@ namespace TEN::Entities::Generic
 			pushable.BehaviorState = PushableBehaviourState::Fall;
 			pushable.Gravity = PUSHABLE_GRAVITY_AIR;
 
-			// @BRIDGEME
-			// TODO: Formally removed the bridge to can continue the vertical movement
+			DisablePushableBridge(pushableItem);
 			break;
 
 		case PushableEnvironmentType::Water:

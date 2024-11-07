@@ -70,7 +70,10 @@ namespace TEN::Entities::Generic
 			pushableItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
 			pushable.UseRoomCollision = true;
-			// @BRIDGEME
+			
+			pushable.Bridge = GetBridgeObject(pushableItem);
+			pushable.Bridge.Initialize(pushableItem);
+			pushable.UseBridgeCollision = true;
 		}
 		else
 		{
@@ -102,11 +105,11 @@ namespace TEN::Entities::Generic
 		HandlePushableBehaviorState(pushableItem);
 		HandlePushableSoundState(pushableItem);
 
-		// @BRIDGEME
-		// TODO: probeRoomNumber may interfere with the bridge collider of the own pushabler, or the stacked ones.
-
 		// Update room number.
+		pushable.Bridge.Disable(pushableItem);
 		int probeRoomNumber = GetPointCollision(pushableItem).GetRoomNumber();
+		pushable.Bridge.Enable(pushableItem);
+
 		if (pushableItem.RoomNumber != probeRoomNumber)
 		{
 			ItemNewRoom(itemNumber, probeRoomNumber);
