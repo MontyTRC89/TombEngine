@@ -8,6 +8,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Bug fixes
 
 * Fixed bad engine performance around multiple stacked bridges.
+* Fixed enemy pickups dropping on death sectors.
 
 ### Features/Amendments
 	
