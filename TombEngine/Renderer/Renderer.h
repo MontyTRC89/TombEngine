@@ -595,10 +595,6 @@ namespace TEN::Renderer
 		void PrepareScene();
 		void ClearScene();
 		void SaveScreenshot();
-		void PrintDebugMessage(LPCSTR msg, va_list args);
-		void PrintDebugMessage(LPCSTR msg, ...);
-		void DrawDebugInfo(RenderView& view);
-		void SwitchDebugPage(bool goBack);
 		void DrawDisplayPickup(const DisplayPickup& pickup);
 		int  Synchronize();
 		void AddString(int x, int y, const std::string& string, D3DCOLOR color, int flags);
@@ -626,6 +622,12 @@ namespace TEN::Renderer
 		void AddDebugCylinder(const Vector3& center, const Quaternion& orient, float radius, float length, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 		void AddDebugSphere(const Vector3& center, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 		void AddDebugSphere(const BoundingSphere& sphere, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+
+		void PrintDebugMessage(LPCSTR msg, va_list args);
+		void PrintDebugMessage(LPCSTR msg, ...);
+		void DrawDebugInfo(RenderView& view);
+		void SwitchDebugPage(bool goBack);
+		RendererDebugPage GetCurrentDebugPage();
 
 		void ChangeScreenResolution(int width, int height, bool windowed);
 		void FlipRooms(short roomNumber1, short roomNumber2);

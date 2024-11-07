@@ -515,7 +515,6 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 				if (sphere.Intersects(rayOrigin, rayDir, distance))
 				{
 					// Test for minimum distance.
-
 					if (distance < minDist)
 					{
 						minDist = distance;

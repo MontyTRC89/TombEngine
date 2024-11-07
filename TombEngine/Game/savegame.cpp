@@ -203,6 +203,17 @@ bool SaveGame::DoesSaveGameExist(int slot, bool silent)
 	return true;
 }
 
+bool SaveGame::IsLoadGamePossible()
+{
+	for (int i = 0; i < SAVEGAME_MAX; i++)
+	{
+		if (Infos[i].Present)
+			return true;
+	}
+
+	return false;
+}
+
 std::string SaveGame::GetSavegameFilename(int slot)
 {
 	return (FullSaveDirectory + SAVEGAME_FILE_MASK + std::to_string(slot));
@@ -1223,38 +1234,24 @@ const std::vector<byte> SaveGame::Build()
 	{
 		ROPE_STRUCT* rope = &Ropes[Lara.Control.Rope.Ptr];
 
-		std::vector<const Save::Vector3*> segments;
+		std::vector<flatbuffers::Offset<Save::RopeSegment>> segments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			segments.push_back(&FromVector3i(rope->segment[i]));
-		auto segmentsOffset = fbb.CreateVector(segments);
+		{
+			Save::RopeSegmentBuilder segment{ fbb };
 
-		std::vector<const Save::Vector3*> velocities;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			velocities.push_back(&FromVector3i(rope->velocity[i]));
-		auto velocitiesOffset = fbb.CreateVector(velocities);
+			segment.add_segment(&FromVector3i(rope->segment[i]));
+			segment.add_velocity(&FromVector3i(rope->velocity[i]));
+			segment.add_normalised_segment(&FromVector3i(rope->normalisedSegment[i]));
+			segment.add_mesh_segment(&FromVector3i(rope->meshSegment[i]));
+			segment.add_coord(&FromVector3i(rope->coords[i]));
 
-		std::vector<const Save::Vector3*> normalisedSegments;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			normalisedSegments.push_back(&FromVector3i(rope->normalisedSegment[i]));
-		auto normalisedSegmentsOffset = fbb.CreateVector(normalisedSegments);
-
-		std::vector<const Save::Vector3*> meshSegments;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			meshSegments.push_back(&FromVector3i(rope->meshSegment[i]));
-		auto meshSegmentsOffset = fbb.CreateVector(meshSegments);
-
-		std::vector<const Save::Vector3*> coords;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			coords.push_back(&FromVector3i(rope->coords[i]));
-		auto coordsOffset = fbb.CreateVector(coords);
+			segments.push_back(segment.Finish());
+		}
+		auto ropeSegmentsOffset = fbb.CreateVector(segments);
 
 		Save::RopeBuilder ropeInfo{ fbb };
 
-		ropeInfo.add_segments(segmentsOffset);
-		ropeInfo.add_velocities(velocitiesOffset);
-		ropeInfo.add_mesh_segments(meshSegmentsOffset);
-		ropeInfo.add_normalised_segments(normalisedSegmentsOffset);
-		ropeInfo.add_coords(coordsOffset);
+		ropeInfo.add_segments(ropeSegmentsOffset);
 		ropeInfo.add_coiled(rope->coiled);
 		ropeInfo.add_position(&FromVector3i(rope->position));
 		ropeInfo.add_segment_length(rope->segmentLength);
@@ -1981,13 +1978,14 @@ static void ParsePlayer(const Save::SaveGame* s)
 	{
 		auto* rope = &Ropes[Lara.Control.Rope.Ptr];
 
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
+		for (int i = 0; i < s->rope()->segments()->size(); i++)
 		{
-			rope->segment[i] = ToVector3i(s->rope()->segments()->Get(i));
-			rope->normalisedSegment[i] = ToVector3i(s->rope()->normalised_segments()->Get(i));
-			rope->meshSegment[i] = ToVector3i(s->rope()->mesh_segments()->Get(i));
-			rope->coords[i] = ToVector3i(s->rope()->coords()->Get(i));
-			rope->velocity[i] = ToVector3i(s->rope()->velocities()->Get(i));
+			auto ropeSegment = s->rope()->segments()->Get(i);
+			rope->segment[i] = ToVector3i(ropeSegment->segment());
+			rope->normalisedSegment[i] = ToVector3i(ropeSegment->normalised_segment());
+			rope->meshSegment[i] = ToVector3i(ropeSegment->mesh_segment());
+			rope->coords[i] = ToVector3i(ropeSegment->coord());
+			rope->velocity[i] = ToVector3i(ropeSegment->velocity());
 		}
 
 		rope->coiled = s->rope()->coiled();

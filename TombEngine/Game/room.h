@@ -123,7 +123,7 @@ struct ROOM_INFO
 void DoFlipMap(int group);
 bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID);
 bool IsPointInRoom(const Vector3i& pos, int roomNumber);
-int FindRoomNumber(const Vector3i& pos, int startRoomNumber = NO_VALUE);
+int FindRoomNumber(const Vector3i& pos, int startRoomNumber = NO_VALUE, bool onlyNeighbors = false);
 Vector3i GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 void InitializeNeighborRoomList();

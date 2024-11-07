@@ -123,7 +123,7 @@ namespace TEN::Hud
 		pickup.StringScalar = 0.0f;
 	}
 
-	void PickupSummaryController::AddDisplayPickup(ItemInfo& item)
+	void PickupSummaryController::AddDisplayPickup(const ItemInfo& item)
 	{
 		// NOTE: Ammo and consumables are a special case, as internal amount differs from pickup amount.
 		int ammoCount = GetDefaultAmmoCount(item.ObjectNumber);

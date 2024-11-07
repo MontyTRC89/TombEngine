@@ -51,6 +51,7 @@ extern int CameraCnt[MAX_SPOTCAMS];
 extern int LastSpotCamSequence;
 extern int NumberSpotcams;
 extern bool UseSpotCam;
+extern bool SpotcamSwitched;
 extern bool SpotcamDontDrawLara;
 extern bool SpotcamOverlay;
 extern bool TrackCameraInit;

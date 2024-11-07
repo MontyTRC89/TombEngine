@@ -1058,6 +1058,28 @@ void ConfirmCameraTargetPos()
 	}
 }
 
+// HACK: Temporary fix for camera bouncing on slopes during player death.
+static bool CalculateDeathCamera(const ItemInfo& item)
+{
+	// If player is alive, it's not a death camera.
+	if (item.HitPoints > 0)
+		return false;
+
+	// If player is in a special death animation (from EXTRA_ANIMS slot) triggered by enemies.
+	if (item.Animation.AnimObjectID == ID_LARA_EXTRA_ANIMS)
+		return true;
+
+	// Special death animations.
+	if (item.Animation.AnimNumber == LA_SPIKE_DEATH || 
+		item.Animation.AnimNumber == LA_BOULDER_DEATH || 
+		item.Animation.AnimNumber == LA_TRAIN_OVERBOARD_DEATH)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void CalculateCamera(const CollisionInfo& coll)
 {
 	CamOldPos.x = Camera.pos.x;
@@ -1286,8 +1308,10 @@ void CalculateCamera(const CollisionInfo& coll)
 	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
 	Camera.lastType = Camera.type;
 
-	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) &&
-		LaraItem->HitPoints > 0)
+	if (CalculateDeathCamera(*LaraItem))
+		return;
+
+	if (Camera.type != CameraType::Heavy || Camera.timer == -1)
 	{
 		Camera.type = CameraType::Chase;
 		Camera.speed = 10;
@@ -1557,11 +1581,10 @@ void UpdateCamera()
 {
 	// HACK: Disable interpolation when switching to/from flyby camera.
 	// When camera structs are converted to a class, this should go to getter/setter. -- Lwmte, 29.10.2024
-	static bool spotcamSwitched = false;
-	if (UseSpotCam != spotcamSwitched)
+	if (UseSpotCam != SpotcamSwitched)
 	{
 		Camera.DisableInterpolation = true;
-		spotcamSwitched = UseSpotCam;
+		SpotcamSwitched = UseSpotCam;
 	}
 
 	if (UseSpotCam)

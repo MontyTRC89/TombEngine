@@ -80,9 +80,13 @@ namespace TEN::Entities::Creatures::TR2
 		auto& item = g_Level.Items[itemNumber];
 
 		if (item.Flags & IFLAG_REVERSE)
+		{
 			item.Status = ITEM_NOT_ACTIVE;
+		}
 		else
+		{
 			item.Status = ITEM_INVISIBLE;
+		}
 	}
 
 	void SkidooManCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

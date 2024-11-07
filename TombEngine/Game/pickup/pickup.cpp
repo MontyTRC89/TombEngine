@@ -864,7 +864,7 @@ void DropPickups(ItemInfo* item)
 		auto collPoint = GetPointCollision(candidatePos, item->RoomNumber);
 
 		// If position is inside a wall or on a slope, don't use it.
-		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsSteepFloor())
+		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsSteepFloor() || collPoint.GetBottomSector().Flags.Death)
 			continue;
 
 		// Remember floor position for a tested point.
@@ -876,7 +876,7 @@ void DropPickups(ItemInfo* item)
 		collPoint = GetPointCollision(candidatePos, item->RoomNumber);
 
 		// If position is inside a wall or on a slope, don't use it.
-		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsSteepFloor())
+		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsSteepFloor() || collPoint.GetBottomSector().Flags.Death)
 			continue;
 
 		// If position is not in the same room, don't use it.

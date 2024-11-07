@@ -83,6 +83,9 @@ using namespace TEN::Renderer;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Effects;
 
+constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
+constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
+
 int GameTimer       = 0;
 int GlobalCounter   = 0;
 
@@ -214,11 +217,6 @@ GameStatus ControlPhase(bool insideMenu)
 	PlaySoundSources();
 	Sound_UpdateScene();
 
-	UpdateCamera();
-
-	// Post-loop script and event handling.
-	g_GameScript->OnLoop(DELTA_TIME, true);
-
 	// Handle inventory, pause, load, save screens.
 	if (!insideMenu)
 	{
@@ -231,6 +229,11 @@ GameStatus ControlPhase(bool insideMenu)
 		if (result != GameStatus::Normal)
 			return result;
 	}
+
+	UpdateCamera();
+
+	// Post-loop script and event handling.
+	g_GameScript->OnLoop(DELTA_TIME, true);
 
 	// Clear savegame loaded flag.
 	JustLoaded = false;
@@ -632,33 +635,36 @@ GameStatus HandleMenuCalls(bool isTitle)
 		return gameStatus;
 	}
 
+	bool playerAlive = LaraItem->HitPoints > 0;
+	
+	bool doLoad      = IsClicked(In::Load) || 
+					   (!IsClicked(In::Inventory) && !NoAction() && SaveGame::IsLoadGamePossible() && Lara.Control.Count.Death > DEATH_INPUT_TIMEOUT);
+	bool doSave      = IsClicked(In::Save) && playerAlive;
+	bool doPause     = IsClicked(In::Pause) && playerAlive;
+	bool doInventory = (IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_VALUE) && playerAlive;
+
 	// Handle inventory.
-	if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
-		g_Gui.GetInventoryMode() != InventoryMode::Save &&
-		g_GameFlow->IsLoadSaveEnabled())
+	if (doSave && g_GameFlow->IsLoadSaveEnabled() && g_Gui.GetInventoryMode() != InventoryMode::Save)
 	{
 		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 		g_Gui.CallInventory(LaraItem, false);
 	}
-	else if (IsClicked(In::Load) &&
-		g_Gui.GetInventoryMode() != InventoryMode::Load &&
-		g_GameFlow->IsLoadSaveEnabled())
+	else if (doLoad && g_GameFlow->IsLoadSaveEnabled() && g_Gui.GetInventoryMode() != InventoryMode::Load)
 	{
 		SaveGame::LoadHeaders();
+
 		g_Gui.SetInventoryMode(InventoryMode::Load);
 
 		if (g_Gui.CallInventory(LaraItem, false))
 			gameStatus = GameStatus::LoadGame;
 	}
-	else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
-			 g_Gui.GetInventoryMode() != InventoryMode::Pause)
+	else if (doPause && g_Gui.GetInventoryMode() != InventoryMode::Pause)
 	{
 		if (g_Gui.CallPause())
 			gameStatus = GameStatus::ExitToTitle;
 	}
-	else if ((IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_VALUE) &&
-			 LaraItem->HitPoints > 0 && !Lara.Control.Look.IsUsingBinoculars)
+	else if (doInventory && LaraItem->HitPoints > 0 && !Lara.Control.Look.IsUsingBinoculars)
 	{
 		if (g_Gui.CallInventory(LaraItem, true))
 			gameStatus = GameStatus::LoadGame;
@@ -675,9 +681,6 @@ GameStatus HandleMenuCalls(bool isTitle)
 
 GameStatus HandleGlobalInputEvents(bool isTitle)
 {
-	constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
-	constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
-
 	if (isTitle)
 		return GameStatus::Normal;
 
