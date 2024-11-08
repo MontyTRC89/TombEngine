@@ -6,21 +6,19 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## Version 1.6 - xxxx-xx-xx
 
 ### Bug fixes
-
 * Fixed engine performance around multiple stacked bridges.
 * Fixed engine performance if weather effects are active.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemy pickups dropping on death sectors.
 
 ### Features/Amendments
-
 * Added fast savegame reloading.
+
 ### Lua API changes
 
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 
 ### Bug fixes
-
 * Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
 * Fixed moveable status after antitriggering.
 * Fixed leveljump vehicle transfer.
@@ -59,9 +57,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed young Lara hair drawing. https://tombengine.com/docs/level-settings/#young_lara
 
 ### Features/Amendments
-
 * Added high framerate mode (also known as 60 FPS mode).
-* Added fast savegame reloading.
 * Added a customisable global lensflare effect. https://tombengine.com/docs/level-settings/#lensflare
 * Added a customisable starry sky and meteor effect. https://tombengine.com/docs/level-settings/#stars
 * Added the ability to display "Lara's Home" entry in the main menu.
@@ -89,7 +85,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Removed original limit of 32 active Flame Emitters.
 	
 ### Lua API changes
-
 * Added Flow.EnableHomeLevel() function.
 * Added Flow.IsStringPresent() function.
 * Added Flow.LensFlare() and Flow.Starfield() classes.
