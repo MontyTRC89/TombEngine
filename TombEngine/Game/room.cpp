@@ -73,6 +73,45 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 	}
 }
 
+void SwapRoom(int index, ROOM_INFO& firstRoom, ROOM_INFO& secondRoom)
+{
+	RemoveRoomFlipItems(firstRoom);
+
+	// Swap rooms.
+	std::swap(firstRoom, secondRoom);
+	firstRoom.flippedRoom = secondRoom.flippedRoom;
+	secondRoom.flippedRoom = NO_VALUE;
+	firstRoom.itemNumber = secondRoom.itemNumber;
+	firstRoom.fxNumber = secondRoom.fxNumber;
+
+	AddRoomFlipItems(firstRoom);
+
+	// Update active room sectors.
+	for (auto& sector : firstRoom.Sectors)
+		sector.RoomNumber = index;
+
+	// Update flipped room sectors.
+	for (auto& sector : secondRoom.Sectors)
+		sector.RoomNumber = firstRoom.flippedRoom;
+}
+
+void ResetRoomData()
+{	
+	// Run through rooms.
+	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
+	{
+		auto& room = g_Level.Rooms[roomNumber];
+		if (room.flippedRoom != NO_VALUE && room.flipNumber != NO_VALUE && FlipStats[room.flipNumber])
+		{
+			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
+			SwapRoom(roomNumber, room, flippedRoom);
+		}
+
+		for (auto& sector : room.Sectors)
+			sector.BridgeItemNumbers.clear();
+	}
+}
+
 void DoFlipMap(int group)
 {
 	if (group >= MAX_FLIPMAP)
@@ -87,30 +126,12 @@ void DoFlipMap(int group)
 		auto& room = g_Level.Rooms[roomNumber];
 
 		// Handle flipmap.
-		if (room.flippedRoom >= 0 && room.flipNumber == group)
+		if (room.flippedRoom != NO_VALUE && room.flipNumber == group)
 		{
 			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
-
-			RemoveRoomFlipItems(room);
-
-			// Swap rooms.
-			std::swap(room, flippedRoom);
-			room.flippedRoom = flippedRoom.flippedRoom;
-			flippedRoom.flippedRoom = NO_VALUE;
-			room.itemNumber = flippedRoom.itemNumber;
-			room.fxNumber = flippedRoom.fxNumber;
-
-			AddRoomFlipItems(room);
+			SwapRoom(roomNumber, room, flippedRoom);
 
 			g_Renderer.FlipRooms(roomNumber, room.flippedRoom);
-
-			// Update active room sectors.
-			for (auto& sector : room.Sectors)
-				sector.RoomNumber = roomNumber;
-
-			// Update flipped room sectors.
-			for (auto& sector : flippedRoom.Sectors)
-				sector.RoomNumber = room.flippedRoom;
 		}
 	}
 

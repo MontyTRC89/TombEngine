@@ -247,6 +247,7 @@ const std::vector<byte> SaveGame::Build()
 
 	Save::SaveGameHeaderBuilder sghb{ fbb };
 	sghb.add_level_name(levelNameOffset);
+	sghb.add_level_hash(LastLevelHash);
 
 	auto gameTime = GetGameTime(GameTimer);
 	sghb.add_days(gameTime.Days);
@@ -2652,6 +2653,7 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 
 		header->Level = s->header()->level();
 		header->LevelName = s->header()->level_name()->str();
+		header->LevelHash = s->header()->level_hash();
 		header->Days = s->header()->days();
 		header->Hours = s->header()->hours();
 		header->Minutes = s->header()->minutes();

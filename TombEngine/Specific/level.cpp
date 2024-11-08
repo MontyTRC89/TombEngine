@@ -216,54 +216,51 @@ void LoadItems()
 
 	InitializeItemArray(ITEM_COUNT_MAX);
 
-	if (g_Level.NumItems > 0)
+	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		for (int i = 0; i < g_Level.NumItems; i++)
-		{
-			auto* item = &g_Level.Items[i];
+		auto* item = &g_Level.Items[i];
 
-			item->Data = ItemData{};
-			item->ObjectNumber = from_underlying(ReadInt16());
-			item->RoomNumber = ReadInt16();
-			item->Pose.Position.x = ReadInt32();
-			item->Pose.Position.y = ReadInt32();
-			item->Pose.Position.z = ReadInt32();
-			item->Pose.Orientation.y = ReadInt16();
-			item->Pose.Orientation.x = ReadInt16();
-			item->Pose.Orientation.z = ReadInt16();
-			item->Model.Color = ReadVector4();
-			item->TriggerFlags = ReadInt16();
-			item->Flags = ReadInt16();
-			item->Name = ReadString();
+		item->Data = ItemData{};
+		item->ObjectNumber = from_underlying(ReadInt16());
+		item->RoomNumber = ReadInt16();
+		item->Pose.Position.x = ReadInt32();
+		item->Pose.Position.y = ReadInt32();
+		item->Pose.Position.z = ReadInt32();
+		item->Pose.Orientation.y = ReadInt16();
+		item->Pose.Orientation.x = ReadInt16();
+		item->Pose.Orientation.z = ReadInt16();
+		item->Model.Color = ReadVector4();
+		item->TriggerFlags = ReadInt16();
+		item->Flags = ReadInt16();
+		item->Name = ReadString();
 			
-			g_GameScriptEntities->AddName(item->Name, (short)i);
-			g_GameScriptEntities->TryAddColliding((short)i);
+		g_GameScriptEntities->AddName(item->Name, (short)i);
+		g_GameScriptEntities->TryAddColliding((short)i);
 
-			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
-		}
+		memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
+	}
 
-		// Initialize items.
-		for (int i = 0; i <= 1; i++)
+	// Initialize items.
+	for (int i = 0; i <= 1; i++)
+	{
+		// HACK: Initialize bridges first. Required because other items need final floordata to init properly.
+		if (i == 0)
 		{
-			// HACK: Initialize bridges first. Required because other items need final floordata to init properly.
-			if (i == 0)
+			for (int j = 0; j < g_Level.NumItems; j++)
 			{
-				for (int j = 0; j < g_Level.NumItems; j++)
-				{
-					const auto& item = g_Level.Items[j];
-					if (Contains(BRIDGE_OBJECT_IDS, item.ObjectNumber))
-						InitializeItem(j);
-				}
+				const auto& item = g_Level.Items[j];
+				if (Contains(BRIDGE_OBJECT_IDS, item.ObjectNumber))
+					InitializeItem(j);
 			}
-			// Initialize non-bridge items second.
-			else if (i == 1)
+		}
+		// Initialize non-bridge items second.
+		else if (i == 1)
+		{
+			for (int j = 0; j < g_Level.NumItems; j++)
 			{
-				for (int j = 0; j < g_Level.NumItems; j++)
-				{
-					const auto& item = g_Level.Items[j];
-					if (!item.IsBridge())
-						InitializeItem(j);
-				}
+				const auto& item = g_Level.Items[j];
+				if (!item.IsBridge())
+					InitializeItem(j);
 			}
 		}
 	}
@@ -983,7 +980,10 @@ void FreeLevel(bool partial)
 	g_GameScriptEntities->FreeEntities();
 
 	if (partial)
+	{
+		ResetRoomData();
 		return;
+	}
 
 	MoveablesIds.resize(0);
 	StaticObjectsIds.resize(0);
@@ -1276,6 +1276,7 @@ bool LoadLevel(std::string path, bool partial)
 			partial = false;
 			FreeLevel(false); // Erase all precached data
 		}
+
 		LastLevelFilePath = path;
 		LastLevelTimestamp = timestamp;
 		LastLevelHash = levelHash;
@@ -1500,7 +1501,7 @@ bool LoadLevelFile(int levelIndex)
 	bool sameLevel = (timestamp == LastLevelTimestamp && levelPath == LastLevelFilePath);
 
 	// Dumping game scene right after engine launch is impossible, as no scene exists.
-	if (!FirstLevel)
+	if (!FirstLevel && sameLevel)
 		g_Renderer.DumpGameScene();
 
 	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);

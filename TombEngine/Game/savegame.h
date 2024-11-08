@@ -29,6 +29,7 @@ struct GameStats
 struct SaveGameHeader
 {
 	std::string LevelName;
+	int LevelHash;
 	int Days;
 	int Hours;
 	int Minutes;
