@@ -1498,6 +1498,12 @@ bool LoadLevelFile(int levelIndex)
 	auto assetDir = g_GameFlow->GetGameDir();
 	auto levelPath = assetDir + level->FileName;
 
+	if (!std::filesystem::is_regular_file(levelPath))
+	{
+		TENLog("Level file not found: " + levelPath, LogLevel::Error);
+		return false;
+	}
+
 	TENLog("Loading level file: " + levelPath, LogLevel::Info);
 
 	auto timestamp = std::filesystem::last_write_time(levelPath);
