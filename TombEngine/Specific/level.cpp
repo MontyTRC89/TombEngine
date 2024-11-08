@@ -966,6 +966,9 @@ void FreeLevel(bool partial)
 		return;
 	}
 
+	if (partial)
+		ResetRoomData(); // Should happen before resetting items.
+
 	g_Level.Items.resize(0);
 	g_Level.AIObjects.resize(0);
 	g_Level.Cameras.resize(0);
@@ -979,10 +982,7 @@ void FreeLevel(bool partial)
 	g_GameScriptEntities->FreeEntities();
 
 	if (partial)
-	{
-		ResetRoomData();
 		return;
-	}
 
 	g_Renderer.FreeRendererData();
 

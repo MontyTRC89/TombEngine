@@ -93,6 +93,9 @@ void SwapRoom(int index, ROOM_INFO& firstRoom, ROOM_INFO& secondRoom)
 	// Update flipped room sectors.
 	for (auto& sector : secondRoom.Sectors)
 		sector.RoomNumber = firstRoom.flippedRoom;
+
+	// Update renderer data.
+	g_Renderer.FlipRooms(index, firstRoom.flippedRoom);
 }
 
 void ResetRoomData()
@@ -130,8 +133,6 @@ void DoFlipMap(int group)
 		{
 			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
 			SwapRoom(roomNumber, room, flippedRoom);
-
-			g_Renderer.FlipRooms(roomNumber, room.flippedRoom);
 		}
 	}
 
