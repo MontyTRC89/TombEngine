@@ -1108,7 +1108,7 @@ __The order of loading is as follows:__
 @tfield function(float) OnLoop Will be called during the game's update loop,
 and provides the delta time (a float representing game time since last call) via its argument.
 @tfield function OnSave Will be called when the player saves the game, just *before* data is saved
-@tfield function(EndReason) OnEnd Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. It can take an `EndReason` arg:
+@tfield function OnEnd(EndReason) Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. It can take an `EndReason` arg:
 
 	EXITTOTITLE
 	LEVELCOMPLETE
@@ -1120,14 +1120,6 @@ For example:
 	LevelFuncs.OnEnd = function(reason)
 		if(reason == TEN.Logic.EndReason.DEATH) then
 			print("death")
-		end
-	end
-
-@tfield function(obj) OnUseItem Will be called when the player will use an inventory item
-For example:
-	LevelFuncs.OnUseItem = function(obj)
-		if obj == Objects.ObjID.PICKUP_ITEM2 then
-			print("Good job!")
 		end
 	end
 @table LevelFuncs
