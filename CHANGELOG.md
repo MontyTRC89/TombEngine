@@ -12,6 +12,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed snow particles not always melting on the ground.
 * Fixed enemy pickups dropping on death sectors.
 * Fixed audio tracks placed in subfolders not restoring after loading savegame.
+* Fixed Lara's Home entry not working.
 
 ### Features/Amendments
 	

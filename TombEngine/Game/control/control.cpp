@@ -632,6 +632,10 @@ GameStatus HandleMenuCalls(bool isTitle)
 		case InventoryResult::NewGameSelectedLevel:
 			return GameStatus::NewGame;
 
+		case InventoryResult::HomeLevel:
+			return GameStatus::HomeLevel;
+			break;
+
 		case InventoryResult::LoadGame:
 			return GameStatus::LoadGame;
 
