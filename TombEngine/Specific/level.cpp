@@ -1270,17 +1270,17 @@ bool LoadLevel(std::string path, bool partial)
 			throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
 
 		// Check the integrity of the level file to allow or disallow fast reload.
-		auto timestamp = std::filesystem::last_write_time(path);
-		if (partial && (timestamp != LastLevelTimestamp || levelHash != LastLevelHash))
+		if (partial && levelHash != LastLevelHash)
 		{
 			TENLog("Level file has changed since the last loading, fast reload is impossible.", LogLevel::Warning);
 			partial = false;
 			FreeLevel(false); // Erase all precached data
 		}
 
+		// Store information about last loaded level file.
 		LastLevelFilePath = path;
-		LastLevelTimestamp = timestamp;
 		LastLevelHash = levelHash;
+		LastLevelTimestamp = std::filesystem::last_write_time(path);
 		
 		TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
 

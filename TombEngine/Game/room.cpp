@@ -7,14 +7,16 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
-#include "Renderer/Renderer.h"
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
+#include "Objects/Generic/Doors/generic_doors.h"
+#include "Renderer/Renderer.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Math;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
+using namespace TEN::Entities::Doors;
 using namespace TEN::Renderer;
 using namespace TEN::Utils;
 
@@ -99,8 +101,27 @@ void SwapRoom(int index, ROOM_INFO& firstRoom, ROOM_INFO& secondRoom)
 }
 
 void ResetRoomData()
-{	
-	// Run through rooms.
+{
+	// Remove all door collisions.
+	for (auto& item : g_Level.Items)
+	{
+		if (item.ObjectNumber == NO_VALUE || !item.Data.is<DOOR_DATA>())
+			continue;
+
+		auto* doorItem = &g_Level.Items[item.Index];
+		auto* doorData = (DOOR_DATA*)doorItem->Data;
+
+		if (doorData->opened)
+			continue;
+
+		OpenThatDoor(&doorData->d1, doorData);
+		OpenThatDoor(&doorData->d2, doorData);
+		OpenThatDoor(&doorData->d1flip, doorData);
+		OpenThatDoor(&doorData->d2flip, doorData);
+		doorData->opened = true;
+	}
+
+	// Unflip all rooms and remove all bridges and stopper flags.
 	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
@@ -111,7 +132,10 @@ void ResetRoomData()
 		}
 
 		for (auto& sector : room.Sectors)
+		{
+			sector.Stopper = false;
 			sector.BridgeItemNumbers.clear();
+		}
 	}
 }
 
