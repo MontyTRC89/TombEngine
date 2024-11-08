@@ -1501,7 +1501,7 @@ bool LoadLevelFile(int levelIndex)
 	TENLog("Loading level file: " + levelPath, LogLevel::Info);
 
 	auto timestamp = std::filesystem::last_write_time(levelPath);
-	bool sameLevel = (timestamp == LastLevelTimestamp && levelPath == LastLevelFilePath);
+	bool sameLevel = (levelIndex == CurrentLevel && timestamp == LastLevelTimestamp && levelPath == LastLevelFilePath);
 
 	// Dumping game scene right after engine launch is impossible, as no scene exists.
 	if (!FirstLevel && sameLevel)
