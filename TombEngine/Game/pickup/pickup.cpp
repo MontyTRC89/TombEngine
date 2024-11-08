@@ -160,6 +160,11 @@ void PickedUpObject(GAME_OBJECT_ID objectID, std::optional<int> count)
 	}
 }
 
+void PickedUpObject(ItemInfo& item)
+{
+	PickedUpObject(item.ObjectNumber, item.HitPoints > 0 ? std::optional<int>(item.HitPoints) : std::nullopt);
+}
+
 int GetInventoryCount(GAME_OBJECT_ID objectID)
 {
 	auto boolResult = HasWeapon(Lara, objectID);
@@ -198,18 +203,18 @@ void RemoveObjectFromInventory(GAME_OBJECT_ID objectID, std::optional<int> count
 		}
 }
 
-void CollectCarriedItems(ItemInfo* item) 
+void CollectCarriedItems(ItemInfo* item)
 {
 	short pickupNumber = item->CarriedItem;
 	while (pickupNumber != NO_VALUE)
 	{
-		auto* pickupItem = &g_Level.Items[pickupNumber];
+		auto& pickupItem = g_Level.Items[pickupNumber];
 
-		PickedUpObject(pickupItem->ObjectNumber);
-		g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
+		PickedUpObject(pickupItem);
+		g_Hud.PickupSummary.AddDisplayPickup(pickupItem);
 		KillItem(pickupNumber);
 
-		pickupNumber = pickupItem->CarriedItem;
+		pickupNumber = pickupItem.CarriedItem;
 	}
 
 	item->CarriedItem = NO_VALUE;
@@ -247,8 +252,8 @@ void CollectMultiplePickups(int itemNumber)
 			continue;
 		}
 
-		PickedUpObject(itemPtr->ObjectNumber);
-		g_Hud.PickupSummary.AddDisplayPickup(itemPtr->ObjectNumber, itemPtr->Pose.Position.ToVector3());
+		PickedUpObject(*itemPtr);
+		g_Hud.PickupSummary.AddDisplayPickup(*itemPtr);
 
 		if (itemPtr->TriggerFlags & (1 << 8))
 		{
@@ -318,8 +323,8 @@ void DoPickup(ItemInfo* laraItem)
 				return;
 			}
 
-			PickedUpObject(pickupItem->ObjectNumber);
-			g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
+			PickedUpObject(*pickupItem);
+			g_Hud.PickupSummary.AddDisplayPickup(*pickupItem);
 			HideOrDisablePickup(*pickupItem);
 
 			pickupItem->Pose.Orientation = prevOrient;
@@ -347,8 +352,8 @@ void DoPickup(ItemInfo* laraItem)
 					return;
 				}
 
-				PickedUpObject(pickupItem->ObjectNumber);
-				g_Hud.PickupSummary.AddDisplayPickup(pickupItem->ObjectNumber, pickupItem->Pose.Position.ToVector3());
+				PickedUpObject(*pickupItem);
+				g_Hud.PickupSummary.AddDisplayPickup(*pickupItem);
 
 				if (pickupItem->TriggerFlags & (1 << 8))
 				{
@@ -860,7 +865,7 @@ void DropPickups(ItemInfo* item)
 		auto collPoint = GetPointCollision(candidatePos, item->RoomNumber);
 
 		// If position is inside a wall or on a slope, don't use it.
-		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsSteepFloor())
+		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsSteepFloor() || collPoint.GetBottomSector().Flags.Death)
 			continue;
 
 		// Remember floor position for a tested point.
@@ -872,7 +877,7 @@ void DropPickups(ItemInfo* item)
 		collPoint = GetPointCollision(candidatePos, item->RoomNumber);
 
 		// If position is inside a wall or on a slope, don't use it.
-		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsSteepFloor())
+		if (collPoint.GetFloorHeight() == NO_HEIGHT || collPoint.IsSteepFloor() || collPoint.GetBottomSector().Flags.Death)
 			continue;
 
 		// If position is not in the same room, don't use it.
@@ -1085,10 +1090,14 @@ void InitializePickup(short itemNumber)
 					// below pushable or raising block, so ignore its collision.
 					pointColl.GetSector().RemoveBridge(bridgeItemNumber);
 					pointColl = GetPointCollision(*item);
+					item->Pose.Position.y = pointColl.GetFloorHeight() - bounds.Y2;
 					pointColl.GetSector().AddBridge(bridgeItemNumber);
 				}
+				else
+				{
+					item->Pose.Position.y = pointColl.GetFloorHeight() - bounds.Y2;
+				}
 
-				item->Pose.Position.y = pointColl.GetFloorHeight() - bounds.Y2;
 				AlignEntityToSurface(item, Vector2(Objects[item->ObjectNumber].radius));
 			}
 		}
@@ -1259,8 +1268,8 @@ void SearchObjectControl(short itemNumber)
 
 				if (Objects[item2->ObjectNumber].isPickup)
 				{
-					PickedUpObject(item2->ObjectNumber);
-					g_Hud.PickupSummary.AddDisplayPickup(item2->ObjectNumber, item2->Pose.Position.ToVector3());
+					PickedUpObject(*item2);
+					g_Hud.PickupSummary.AddDisplayPickup(*item2);
 					KillItem(item->ItemFlags[1]);
 				}
 				else

@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.4 Lua API</title>
+    <title>TombEngine 1.5 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -49,10 +49,12 @@
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li>    <a href="../2 classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
   <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li>    <a href="../2 classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
@@ -120,11 +122,11 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 	<td class="summary">Shatter item.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetEffect">Moveable:SetEffect(effect, timeout)</a></td>
+	<td class="name" ><a href="#Moveable:SetEffect">Moveable:SetEffect(effect[, timeout])</a></td>
 	<td class="summary">Set effect to moveable</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetCustomEffect">Moveable:SetCustomEffect(Color1, Color2, timeout)</a></td>
+	<td class="name" ><a href="#Moveable:SetCustomEffect">Moveable:SetCustomEffect(Color1, Color2[, timeout])</a></td>
 	<td class="summary">Set custom colored burn effect to moveable</td>
 	</tr>
 	<tr>
@@ -150,6 +152,10 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 	<tr>
 	<td class="name" ><a href="#Moveable:GetState">Moveable:GetState()</a></td>
 	<td class="summary">Retrieve the index of the current state.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetTargetState">Moveable:GetTargetState()</a></td>
+	<td class="summary">Retrieve the index of the target state.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetState">Moveable:SetState(index)</a></td>
@@ -225,8 +231,12 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 	<td class="summary">Determine whether the moveable is active or not</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(index)</a></td>
+	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(index[, offset])</a></td>
 	<td class="summary">Get the object's joint position</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetJointRotation">Moveable:GetJointRotation(index)</a></td>
+	<td class="summary">Get the object's joint rotation</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetRotation">Moveable:GetRotation()</a></td>
@@ -494,7 +504,7 @@ most can just be ignored (see usage).
 </dd>
     <dt>
     <a name = "Moveable:SetEffect"></a>
-    <strong>Moveable:SetEffect(effect, timeout)</strong>
+    <strong>Moveable:SetEffect(effect[, timeout])</strong>
     </dt>
     <dd>
     Set effect to moveable
@@ -509,7 +519,8 @@ most can just be ignored (see usage).
         </li>
         <li><span class="parameter">timeout</span>
             <span class="types"><span class="type">float</span></span>
-         time (in seconds) after which effect turns off (optional).
+         time (in seconds) after which effect turns off.
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -520,7 +531,7 @@ most can just be ignored (see usage).
 </dd>
     <dt>
     <a name = "Moveable:SetCustomEffect"></a>
-    <strong>Moveable:SetCustomEffect(Color1, Color2, timeout)</strong>
+    <strong>Moveable:SetCustomEffect(Color1, Color2[, timeout])</strong>
     </dt>
     <dd>
     Set custom colored burn effect to moveable
@@ -539,7 +550,8 @@ most can just be ignored (see usage).
         </li>
         <li><span class="parameter">timeout</span>
             <span class="types"><span class="type">float</span></span>
-         time (in seconds) after which effect turns off (optional).
+         time (in seconds) after which effect turns off.
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -676,6 +688,28 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
            <span class="types"><span class="type">int</span></span>
         the index of the active state
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetTargetState"></a>
+    <strong>Moveable:GetTargetState()</strong>
+    </dt>
+    <dd>
+    Retrieve the index of the target state.
+ This corresponds to the state the object is trying to get into, which is sometimes different from the active state.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the index of the target state
     </ol>
 
 
@@ -1096,7 +1130,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 </dd>
     <dt>
     <a name = "Moveable:GetJointPosition"></a>
-    <strong>Moveable:GetJointPosition(index)</strong>
+    <strong>Moveable:GetJointPosition(index[, offset])</strong>
     </dt>
     <dd>
     Get the object's joint position
@@ -1109,13 +1143,46 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
             <span class="types"><span class="type">int</span></span>
          of a joint to get position
         </li>
+        <li><span class="parameter">offset</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         a pre-rotation offset to the joint
+         (<em>optional</em>)
+        </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        a copy of the moveable's position
+        a copy of the moveable's joint position
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetJointRotation"></a>
+    <strong>Moveable:GetJointRotation(index)</strong>
+    </dt>
+    <dd>
+    Get the object's joint rotation
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a joint to get rotation
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+        a calculated copy of the moveable's joint rotation
     </ol>
 
 
@@ -1359,7 +1426,10 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">LevelFuncs.objCollided = <span class="keyword">function</span>(obj1, obj2)
+        <pre class="example"><span class="comment">-- obj1 is the collision moveable
+</span><span class="comment">-- obj2 is the collider moveable
+</span>
+LevelFuncs.objCollided = <span class="keyword">function</span>(obj1, obj2)
     <span class="global">print</span>(obj1:GetName() .. <span class="string">" collided with "</span> .. obj2:GetName())
 <span class="keyword">end</span>
 baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)</pre>

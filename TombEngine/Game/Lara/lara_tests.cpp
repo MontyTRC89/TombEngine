@@ -141,6 +141,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForceSolidStatics = true;
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
 	int embedOffset = 4;
@@ -743,14 +744,16 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 
 bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	int vPos = item->Pose.Position.y;
+	auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius) + item->Animation.Velocity.z);
 
-	int y = item->Pose.Position.y;
-	auto probe = GetPointCollision(*item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius));
+	// 1) Test for wall.
+	if (pointColl.GetFloorHeight() == NO_HEIGHT)
+		return false;
 
-	if ((probe.GetFloorHeight() - y) > 0 &&
-		(probe.GetCeilingHeight() - y) < -CLICK(1.6f) &&
-		probe.GetFloorHeight() != NO_HEIGHT)
+	// 2) Test leg space.
+	if ((pointColl.GetFloorHeight() - vPos) > 0 &&
+		(pointColl.GetCeilingHeight() - vPos) < -CLICK(1.6f))
 	{
 		return true;
 	}
@@ -924,26 +927,28 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	if (coll->Middle.Ceiling > -STEPUP_HEIGHT)
 		return false;
 
-	int frontFloor = coll->Front.Floor + LARA_HEIGHT_TREAD;
-	if (coll->Front.Bridge == NO_VALUE &&
-		(frontFloor <= -CLICK(2) ||
-		frontFloor > CLICK(1.25f) - 4))
+	// HACK: Probe at incremetal height steps to account for room stacks. -- Sezz 2024.10.28
+	int frontFloor = NO_HEIGHT;
+	
+	bool hasLedge = false;
+	int yOffset = CLICK(1.25f);
+	while (yOffset > -CLICK(2))
 	{
-		return false;
+		auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, BLOCK(0.2f), yOffset);
+
+		frontFloor = pointColl.GetFloorHeight() - item->Pose.Position.y;
+		if (frontFloor > -CLICK(2) &&
+			frontFloor <= (CLICK(1.25f) - 4))
+		{
+			hasLedge = true;
+			break;
+		}
+
+		yOffset -= CLICK(0.5f);
 	}
 
-	// Extra bridge check.
-	if (coll->Front.Bridge != NO_VALUE)
-	{
-		frontFloor = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
-		
-		int bridgeBorder = frontFloor - CLICK(0.5f);
-		if (bridgeBorder <= -CLICK(2) ||
-			bridgeBorder > CLICK(1.25f) - 4)
-		{
-			return false;
-		}
-	}
+	if (!hasLedge)
+		return false;
 
 	if (!TestValidLedge(item, coll))
 		return false;

@@ -179,14 +179,14 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 /// Set effect to moveable
 // @function Moveable:SetEffect
 // @tparam Effects.EffectID effect Type of effect to assign.
-// @tparam float timeout time (in seconds) after which effect turns off (optional).
+// @tparam[opt] float timeout time (in seconds) after which effect turns off.
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
 /// Set custom colored burn effect to moveable
 // @function Moveable:SetCustomEffect
 // @tparam Color Color1 color the primary color of the effect (also used for lighting).
 // @tparam Color Color2 color the secondary color of the effect.
-// @tparam float timeout time (in seconds) after which effect turns off (optional).
+// @tparam[opt] float timeout time (in seconds) after which effect turns off.
 	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
 
 /// Get current moveable effect
@@ -222,6 +222,12 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @function Moveable:GetState
 // @treturn int the index of the active state
 	ScriptReserved_GetStateNumber, &Moveable::GetStateNumber,
+
+/// Retrieve the index of the target state.
+// This corresponds to the state the object is trying to get into, which is sometimes different from the active state.
+// @function Moveable:GetTargetState
+// @treturn int the index of the target state
+	ScriptReserved_GetTargetStateNumber, &Moveable::GetTargetStateNumber,
 
 /// Set the object's state to the one specified by the given index.
 // Performs no bounds checking. *Ensure the number given is correct, else
@@ -365,8 +371,15 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 /// Get the object's joint position
 // @function Moveable:GetJointPosition
 // @tparam int index of a joint to get position
-// @treturn Vec3 a copy of the moveable's position
+// @tparam[opt] Vec3 offset a pre-rotation offset to the joint
+// @treturn Vec3 a copy of the moveable's joint position
 	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
+
+/// Get the object's joint rotation
+// @function Moveable:GetJointRotation
+// @tparam int index of a joint to get rotation
+// @treturn Rotation a calculated copy of the moveable's joint rotation
+	ScriptReserved_GetJointRotation, & Moveable::GetJointRot,
 
 	ScriptReserved_SetPosition, & Moveable::SetPos,
 
@@ -583,8 +596,12 @@ Vec3 Moveable::GetPos() const
 // @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
 void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 {
-	auto prevPos = m_item->Pose.Position.ToVector3();
-	m_item->Pose.Position = pos.ToVector3i();
+	constexpr auto BIG_DISTANCE_THRESHOLD = BLOCK(1);
+
+	auto newPos = pos.ToVector3i();
+	bool bigDistance = Vector3i::Distance(newPos, m_item->Pose.Position) > BIG_DISTANCE_THRESHOLD;
+	
+	m_item->Pose.Position = newPos;
 
 	bool willUpdate = !updateRoom.has_value() || updateRoom.value();
 
@@ -593,8 +610,7 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 		bool isRoomUpdated = m_item->IsLara() ? UpdateLaraRoom(m_item, pos.y) : UpdateItemRoom(m_item->Index);
 
 		// In case direct portal room update didn't happen and distance between old and new points is significant, do predictive room update.
-		if (!isRoomUpdated && 
-			(willUpdate || Vector3::Distance(prevPos, m_item->Pose.Position.ToVector3()) > BLOCK(1)))
+		if (!isRoomUpdated && (willUpdate || bigDistance))
 		{
 			int potentialNewRoom = FindRoomNumber(m_item->Pose.Position, m_item->RoomNumber);
 			if (potentialNewRoom != m_item->RoomNumber)
@@ -604,12 +620,21 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 
 	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
+
+	if (bigDistance)
+		m_item->DisableInterpolation = true;
 }
 
-Vec3 Moveable::GetJointPos(int jointIndex) const
+Vec3 Moveable::GetJointPos(int jointIndex, sol::optional<Vec3> offset) const
 {
-	auto result = GetJointPosition(m_item, jointIndex);
+	Vector3i vec = offset.has_value() ? offset->ToVector3i() : Vector3i(0, 0, 0);
+	auto result = GetJointPosition(m_item, jointIndex, vec);
 	return Vec3(result.x, result.y, result.z);
+}
+
+Rotation Moveable::GetJointRot(int jointIndex) const
+{
+	return GetBoneOrientation(*m_item, jointIndex);
 }
 
 // This does not guarantee that the returned value will be identical
@@ -628,12 +653,18 @@ Rotation Moveable::GetRot() const
 
 void Moveable::SetRot(const Rotation& rot)
 {
-	m_item->Pose.Orientation.x = ANGLE(rot.x);
-	m_item->Pose.Orientation.y = ANGLE(rot.y);
-	m_item->Pose.Orientation.z = ANGLE(rot.z);
+	constexpr auto BIG_ANGLE_THRESHOLD = ANGLE(30.0f);
+
+	auto newRot = rot.ToEulerAngles();
+	bool bigRotation = !EulerAngles::Compare(newRot, m_item->Pose.Orientation, BIG_ANGLE_THRESHOLD);
+
+	m_item->Pose.Orientation = newRot;
 
 	if (m_item->IsBridge())
 		UpdateBridgeItem(*m_item);
+
+	if (bigRotation)
+		m_item->DisableInterpolation = true;
 }
 
 short Moveable::GetHP() const
@@ -819,6 +850,11 @@ void Moveable::SetAIBits(aiBitsType const & bits)
 int Moveable::GetStateNumber() const
 {
 	return m_item->Animation.ActiveState;
+}
+
+int Moveable::GetTargetStateNumber() const
+{
+	return m_item->Animation.TargetState;
 }
 
 void Moveable::SetStateNumber(int stateNumber)

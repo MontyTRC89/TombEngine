@@ -1,19 +1,21 @@
 #include "framework.h"
 #include "Renderer/Renderer.h"
 
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/Sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Game/spotcam.h"
 #include "Game/Setup.h"
+#include "Game/spotcam.h"
 #include "Math/Math.h"
-#include "Specific/level.h"
+#include "Objects/Effects/LensFlare.h"
 #include "Renderer/RenderView.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/level.h"
 
+using namespace TEN::Entities::Effects;
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
@@ -28,10 +30,10 @@ namespace TEN::Renderer
 		_visitedRoomsStack.clear();
 
 		for (int i = 0; i < g_Level.Rooms.size(); i++)
-		{ 
+		{
 			auto& room = _rooms[i];
-			                         
-			room.ItemsToDraw.clear();        
+
+			room.ItemsToDraw.clear();
 			room.EffectsToDraw.clear();
 			room.StaticsToDraw.clear();
 			room.LightsToDraw.clear();
@@ -48,7 +50,7 @@ namespace TEN::Renderer
 
 		GetVisibleRooms(NO_VALUE, renderView.Camera.RoomNumber, VIEW_PORT, false, 0, onlyRooms, renderView);
 
-		_invalidateCache = false; 
+		_invalidateCache = false;
 
 		// Prepare real DX scissor test rectangle.
 		for (auto* roomPtr : renderView.RoomsToDraw)
@@ -57,17 +59,17 @@ namespace TEN::Renderer
 			roomPtr->ClipBounds.Bottom = (1.0f - roomPtr->ViewPort.y) * _screenHeight * 0.5f;
 			roomPtr->ClipBounds.Right = (roomPtr->ViewPort.z + 1.0f) * _screenWidth * 0.5f;
 			roomPtr->ClipBounds.Top = (1.0f - roomPtr->ViewPort.w) * _screenHeight * 0.5f;
-		} 
+		}
 
 		// Collect fog bulbs.
 		std::vector<RendererFogBulb> tempFogBulbs;
 		tempFogBulbs.reserve(MAX_FOG_BULBS_DRAW);
 
-		for (auto& room : _rooms)     
+		for (auto& room : _rooms)
 		{
 			if (!g_Level.Rooms[room.RoomNumber].Active())
 				continue;
-			      
+
 			for (const auto& light : room.Lights)
 			{
 				if (light.Type != LightType::FogBulb)
@@ -77,7 +79,7 @@ namespace TEN::Renderer
 				if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out * 1.2f))
 				{
 					RendererFogBulb bulb;
-					
+
 					bulb.Position = light.Position;
 					bulb.Density = light.Intensity;
 					bulb.Color = light.Color;
@@ -89,11 +91,9 @@ namespace TEN::Renderer
 				}
 			}
 		}
-		
-		// Sort fog bulbs.
+
 		std::sort(
-			tempFogBulbs.begin(),
-			tempFogBulbs.end(),
+			tempFogBulbs.begin(), tempFogBulbs.end(),
 			[](const RendererFogBulb& bulb0, const RendererFogBulb& bulb1)
 			{
 				return bulb0.Distance < bulb1.Distance;
@@ -101,6 +101,52 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < std::min(MAX_FOG_BULBS_DRAW, (int)tempFogBulbs.size()); i++)
 			renderView.FogBulbsToDraw.push_back(tempFogBulbs[i]);
+
+		// Collect lens flares.
+		auto tempLensFlares = std::vector<RendererLensFlare>{};
+		tempLensFlares.reserve(MAX_LENS_FLARES_DRAW);
+
+		for (const auto& lensFlare : LensFlares)
+		{
+			auto lensFlareToCamera = lensFlare.Position - renderView.Camera.WorldPosition;
+			
+			float dist = 0.0f;
+			if (!lensFlare.IsGlobal)
+				dist = lensFlareToCamera.Length();
+			lensFlareToCamera.Normalize();
+			
+			auto cameraDir = renderView.Camera.WorldDirection;
+			cameraDir.Normalize();
+
+			if (lensFlareToCamera.Dot(cameraDir) >= 0.0f)
+			{
+				auto lensFlareToDraw = RendererLensFlare{};
+				lensFlareToDraw.Position = lensFlare.Position;
+				lensFlareToDraw.Distance = dist;
+				lensFlareToDraw.Color = lensFlare.Color;
+				lensFlareToDraw.SpriteID = lensFlare.SpriteID;
+				lensFlareToDraw.Direction = lensFlareToCamera;
+				lensFlareToDraw.IsGlobal = lensFlare.IsGlobal;
+
+				tempLensFlares.push_back(lensFlareToDraw);
+			}
+		}
+
+		std::sort(
+			tempLensFlares.begin(), tempLensFlares.end(),
+			[](const RendererLensFlare& lensFlare0, const RendererLensFlare& lensFlare1)
+			{
+				if (lensFlare0.IsGlobal && !lensFlare1.IsGlobal)
+					return true;
+
+				if (!lensFlare0.IsGlobal && lensFlare1.IsGlobal)
+					return false;
+
+				return (lensFlare0.Distance < lensFlare1.Distance);
+			});
+
+		for (int i = 0; i < std::min(MAX_LENS_FLARES_DRAW, (int)tempLensFlares.size()); i++)
+			renderView.LensFlaresToDraw.push_back(tempLensFlares[i]);
 	}
 
 	bool Renderer::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)
@@ -148,16 +194,14 @@ namespace TEN::Renderer
 		door->Visited = true;
 
 		if (zClip == 4)
-		{
 			return false;
-		}
 
 		if (zClip > 0)
 		{
 			for (int i = 0; i < 4; i++) 
 			{
-				Vector4 a = p[i];
-				Vector4 b = p[(i + 1) % 4];
+				auto a = p[i];
+				auto b = p[(i + 1) % 4];
 
 				if ((a.w > 0.0f) ^ (b.w > 0.0f))
 				{
@@ -199,7 +243,10 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (clipPort->x > viewPort.z || clipPort->y > viewPort.w || clipPort->z < viewPort.x || clipPort->w < viewPort.y)
+		if (clipPort->x > viewPort.z ||
+			clipPort->y > viewPort.w ||
+			clipPort->z < viewPort.x || 
+			clipPort->w < viewPort.y)
 		{
 			return false;
 		}
@@ -225,7 +272,7 @@ namespace TEN::Renderer
 		{
 			if (_visitedRoomsStack[i] == to)
 			{
-				TENLog("Circle detected! Room " + std::to_string(to), LogLevel::Warning, LogConfig::Debug);
+				TENLog("Circle detected in room " + std::to_string(to), LogLevel::Warning, LogConfig::Debug);
 				return;
 			}
 		}
@@ -233,8 +280,9 @@ namespace TEN::Renderer
 		static constexpr int MAX_SEARCH_DEPTH = 64;
 		if (_rooms[to].Visited && count > MAX_SEARCH_DEPTH)
 		{
-			TENLog("Maximum room collection depth of " + std::to_string(MAX_SEARCH_DEPTH) + 
-				   " was reached with room " + std::to_string(to), LogLevel::Warning, LogConfig::Debug);
+			TENLog(
+				"Maximum room collection depth of " + std::to_string(MAX_SEARCH_DEPTH) + " was reached with room " + std::to_string(to),
+				LogLevel::Warning, LogConfig::Debug);
 			return;
 		}
 
@@ -242,7 +290,7 @@ namespace TEN::Renderer
 
 		_numGetVisibleRoomsCalls++;
 
-		RendererRoom* room = &_rooms[to];
+		auto* room = &_rooms[to];
 
 		if (!room->Visited)
 		{
@@ -268,12 +316,10 @@ namespace TEN::Renderer
 		Vector4 clipPort;
 		for (int i = 0; i < room->Doors.size(); i++)
 		{
-			RendererDoor* door = &room->Doors[i];
+			auto* door = &room->Doors[i];
 
 			if (door->InvisibleFromCamera)
-			{
 				continue;
-			}
 
 			if (!door->Visited)
 			{
@@ -312,49 +358,35 @@ namespace TEN::Renderer
 	void Renderer::CollectItems(short roomNumber, RenderView& renderView)
 	{
 		if (_rooms.size() < roomNumber)
-		{
 			return;
-		}
 
-		RendererRoom& room = _rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
+		auto& room = _rooms[roomNumber];
+		auto* r = &g_Level.Rooms[room.RoomNumber];
 
 		short itemNum = NO_VALUE;
 		for (itemNum = r->itemNumber; itemNum != NO_VALUE; itemNum = g_Level.Items[itemNum].NextItem)
 		{
-			ItemInfo* item = &g_Level.Items[itemNum];
+			auto* item = &g_Level.Items[itemNum];
 
 			if (item->ObjectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].NextItem)
-			{
 				break;
-			}
 
 			if (item->Status == ITEM_INVISIBLE)
-			{
 				continue;
-			}
 
 			if (item->ObjectNumber == ID_LARA && (Lara.Control.Look.OpticRange || SpotcamOverlay || SpotcamDontDrawLara))
-			{
 				continue;
-			}
 
 			if (item->ObjectNumber == ID_LARA && CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
-			{
 				continue;
-			}
 
 			if (!_moveableObjects[item->ObjectNumber].has_value())
-			{
 				continue;
-			}
 
 			auto& obj = _moveableObjects[item->ObjectNumber].value();
 
 			if (obj.DoNotDraw)
-			{
 				continue;
-			}
 
 			// Clip object by frustum only if it doesn't cast shadows. Otherwise we may see
 			// disappearing shadows if object gets out of frustum.
@@ -369,7 +401,7 @@ namespace TEN::Renderer
 					// Blow up sphere radius by half for cases of too small calculated spheres.
 					if (renderView.Camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
 						inFrustum = true;
-				
+
 				if (!inFrustum)
 					continue;
 			}
@@ -377,13 +409,40 @@ namespace TEN::Renderer
 			auto newItem = &_items[itemNum];
 
 			newItem->ItemNumber = itemNum;
-			newItem->ObjectNumber = item->ObjectNumber;
+			newItem->ObjectID = item->ObjectNumber;
 			newItem->Color = item->Model.Color;
 			newItem->Position = item->Pose.Position.ToVector3();
-			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+			newItem->Translation = Matrix::CreateTranslation(newItem->Position.x, newItem->Position.y, newItem->Position.z);
 			newItem->Rotation = item->Pose.Orientation.ToRotationMatrix();
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
+
+			// Disable interpolation either when renderer slot or item slot has flag. 
+			// Renderer slot has no interpolation flag set in case it is fetched for the first time (e.g. item first time in frustum).
+			newItem->DisableInterpolation = item->DisableInterpolation || newItem->DisableInterpolation;
+
+			if (newItem->DisableInterpolation)
+			{
+				// NOTE: Interpolation alwasy returns same result.
+				newItem->PrevPosition = newItem->Position;
+				newItem->PrevTranslation = newItem->Translation;
+				newItem->PrevRotation = newItem->Rotation;
+				newItem->PrevWorld = newItem->World;
+
+				// Otherwise all frames until the next ControlPhase will not be interpolated.
+				newItem->DisableInterpolation = false;
+				
+				for (int j = 0; j < MAX_BONES; j++)
+					newItem->PrevAnimTransforms[j] = newItem->AnimTransforms[j];
+			}
+
+			newItem->InterpolatedPosition = Vector3::Lerp(newItem->PrevPosition, newItem->Position, _interpolationFactor);
+			newItem->InterpolatedTranslation = Matrix::Lerp(newItem->PrevTranslation, newItem->Translation, _interpolationFactor);
+			newItem->InterpolatedRotation = Matrix::Lerp(newItem->InterpolatedRotation, newItem->Rotation, _interpolationFactor);
+			newItem->InterpolatedWorld = Matrix::Lerp(newItem->PrevWorld, newItem->World, _interpolationFactor);
+			
+			for (int j = 0; j < MAX_BONES; j++)
+				newItem->InterpolatedAnimTransforms[j] = Matrix::Lerp(newItem->PrevAnimTransforms[j], newItem->AnimTransforms[j], _interpolationFactor);
 
 			CalculateLightFades(newItem);
 			CollectLightsForItem(newItem);
@@ -395,22 +454,18 @@ namespace TEN::Renderer
 	void Renderer::CollectStatics(short roomNumber, RenderView& renderView)
 	{
 		if (_rooms.size() < roomNumber)
-		{
 			return;
-		}
 
-		RendererRoom& room = _rooms[roomNumber];
-		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
+		auto& room = _rooms[roomNumber];
+		auto* r = &g_Level.Rooms[room.RoomNumber];
 
 		if (r->mesh.empty())
-		{
 			return;
-		}
 
 		for (int i = 0; i < room.Statics.size(); i++)
 		{
 			auto* mesh = &room.Statics[i];
-			MESH_INFO* nativeMesh = &r->mesh[i];
+			auto* nativeMesh = &r->mesh[i];
 
 			if (nativeMesh->Dirty || _invalidateCache)
 			{
@@ -425,26 +480,18 @@ namespace TEN::Renderer
 			}
 
 			if (!(nativeMesh->flags & StaticMeshFlags::SM_VISIBLE))
-			{
 				continue;
-			}
 
 			if (!_staticObjects[mesh->ObjectNumber].has_value())
-			{
 				continue;
-			}
 
 			auto& obj = *_staticObjects[mesh->ObjectNumber];
 
 			if (obj.ObjectMeshes.empty())
-			{
 				continue;
-			}
 
 			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->VisibilityBox.Center, mesh->VisibilitySphereRadius))
-			{
 				continue;
-			}
 			 
 			// Collect the lights
 			std::vector<RendererLight*> lights;
@@ -481,15 +528,13 @@ namespace TEN::Renderer
 	void Renderer::CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLightNode>* roomsLights, std::vector<RendererLight*>* outputLights)
 	{
 		if (_rooms.size() < roomNumber)
-		{
 			return;
-		}
 
 		// Now collect lights from dynamic list and from rooms
 		std::vector<RendererLightNode> tempLights;
 		tempLights.reserve(MAX_LIGHTS_DRAW);
 		
-		RendererRoom& room = _rooms[roomNumber];
+		auto& room = _rooms[roomNumber];
 
 		RendererLight* brightestLight = nullptr;
 		float brightest = 0.0f;
@@ -497,24 +542,20 @@ namespace TEN::Renderer
 		// Dynamic lights have the priority
 		for (auto& light : _dynamicLights)
 		{
-			float distanceSquared =
+			float distSqr =
 				SQUARE(position.x - light.Position.x) +
 				SQUARE(position.y - light.Position.y) +
 				SQUARE(position.z - light.Position.z);
 
 			// Collect only lights nearer than 20 sectors
-			if (distanceSquared >= SQUARE(BLOCK(20)))
-			{
+			if (distSqr >= SQUARE(BLOCK(20)))
 				continue;
-			}
 
 			// Check the out radius
-			if (distanceSquared > SQUARE(light.Out + radius))
-			{
+			if (distSqr > SQUARE(light.Out + radius))
 				continue;
-			}
 
-			float distance = sqrt(distanceSquared);
+			float distance = sqrt(distSqr);
 			float attenuation = 1.0f - distance / light.Out;
 			float intensity = attenuation * light.Intensity * light.Luma;
 
@@ -524,55 +565,49 @@ namespace TEN::Renderer
 	
 		if (!useCachedRoomLights)
 		{
-			// Check current room and also neighbour rooms
+			// Check current room and neighbor rooms.
 			for (int roomToCheck : room.Neighbors)
 			{
-				RendererRoom& currentRoom = _rooms[roomToCheck];
-				int numLights = (int)currentRoom.Lights.size();
+				auto& currentRoom = _rooms[roomToCheck];
+				int lightCount = (int)currentRoom.Lights.size();
 
-				for (int j = 0; j < numLights; j++)
+				for (int j = 0; j < lightCount; j++)
 				{
-					RendererLight* light = &currentRoom.Lights[j];
+					auto* light = &currentRoom.Lights[j];
 
 					float intensity = 0;
-					float distance = 0;
+					float dist = 0;
 
-					// Check only lights different from sun
+					// Check only lights different from sun.
 					if (light->Type == LightType::Sun)
 					{
-						// Suns from non-adjacent rooms are not added!
+						// Suns from non-adjacent rooms not added.
 						if (roomToCheck != roomNumber && (prevRoomNumber != roomToCheck || prevRoomNumber == NO_VALUE))
-						{
 							continue;
-						}
 
-						// Sun is added without distance checks
+						// Sun is added without distance checks.
 						intensity = light->Intensity * Luma(light->Color);						
 					}
 					else if (light->Type == LightType::Point || light->Type == LightType::Shadow)
 					{
-						float distanceSquared =
+						float distSqr =
 							SQUARE(position.x - light->Position.x) +
 							SQUARE(position.y - light->Position.y) +
 							SQUARE(position.z - light->Position.z);
 
-						// Collect only lights nearer than 20 sectors
-						if (distanceSquared >= SQUARE(BLOCK(20)))
-						{
+						// Collect only lights nearer than 20 blocks.
+						if (distSqr >= SQUARE(BLOCK(20)))
 							continue;
-						}
 
-						// Check the out radius
-						if (distanceSquared > SQUARE(light->Out + radius))
-						{
+						// Check out radius.
+						if (distSqr > SQUARE(light->Out + radius))
 							continue;
-						}
 
-						distance = sqrt(distanceSquared);
-						float attenuation = 1.0f - distance / light->Out;
+						dist = sqrt(distSqr);
+						float attenuation = 1.0f - dist / light->Out;
 						intensity = attenuation * light->Intensity * Luma(light->Color);
 
-						// If collecting shadows, try to collect shadow casting light
+						// If collecting shadows, try collecting shadow-casting light.
 						if (light->CastShadows && prioritizeShadowLight && light->Type == LightType::Point)
 						{
 							if (intensity >= brightest)
@@ -584,28 +619,24 @@ namespace TEN::Renderer
 					}
 					else if (light->Type == LightType::Spot)
 					{
-						float distanceSquared =
+						float distSqr =
 							SQUARE(position.x - light->Position.x) +
 							SQUARE(position.y - light->Position.y) +
 							SQUARE(position.z - light->Position.z);
 
-						// Collect only lights nearer than 20 sectors
-						if (distanceSquared >= SQUARE(BLOCK(20)))
-						{
+						// Collect only lights nearer than 20 blocks.
+						if (distSqr >= SQUARE(BLOCK(20)))
 							continue;
-						}
 
-						// Check the range
-						if (distanceSquared > SQUARE(light->Out + radius))
-						{
+						// Check range.
+						if (distSqr > SQUARE(light->Out + radius))
 							continue;
-						}
 
-						distance = sqrt(distanceSquared);
-						float attenuation = 1.0f - distance / light->Out;
+						dist = sqrt(distSqr);
+						float attenuation = 1.0f - dist / light->Out;
 						intensity = attenuation * light->Intensity * light->Luma;
 
-						// If shadow pointer provided, try to collect shadow casting light
+						// If shadow pointer provided, try collecting shadow-casting light.
 						if (light->CastShadows && prioritizeShadowLight)
 						{
 							if (intensity >= brightest)
@@ -617,16 +648,14 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						// Invalid light type
+						// Invalid light type.
 						continue;
 					}
 
-					RendererLightNode node = { light, intensity, distance, 0 };
+					RendererLightNode node = { light, intensity, dist, 0 };
 
 					if (roomsLights != nullptr)
-					{
 						roomsLights->push_back(node);
-					}
 
 					tempLights.push_back(node);
 				}
@@ -635,12 +664,10 @@ namespace TEN::Renderer
 		else
 		{
 			for (int i = 0; i < roomsLights->size(); i++)
-			{
 				tempLights.push_back(roomsLights->at(i));
-			}
 		}
 
-		// Sort lights
+		// Sort lights.
 		if (tempLights.size() > MAX_LIGHTS_PER_ITEM)
 		{
 			std::sort(
@@ -649,36 +676,33 @@ namespace TEN::Renderer
 				[](RendererLightNode a, RendererLightNode b)
 				{
 					if (a.Dynamic == b.Dynamic)
-						return a.LocalIntensity > b.LocalIntensity;
+					{
+						return (a.LocalIntensity > b.LocalIntensity);
+					}
 					else
-						return a.Dynamic > b.Dynamic;
-				}
-			);
+					{
+						return (a.Dynamic > b.Dynamic);
+					}
+				});
 		}
 
-		// Now put actual lights to provided vector
+		// Put actual lights in provided vector.
 		outputLights->clear();
 
-		// Always add brightest light, if collecting shadow light is specified, even if it's far in range
+		// Add brightest ligh, if collecting shadow light is specified, even if it's far in range.
 		if (prioritizeShadowLight && brightestLight)
-		{
 			outputLights->push_back(brightestLight);
-		}
 
-		// Add max 8 lights per item, including the shadow light for Lara eventually
+		// Add max 8 lights per item, including shadow light for player eventually.
 		for (auto l : tempLights)
 		{
 			if (prioritizeShadowLight && brightestLight == l.Light)
-			{
 				continue;
-			}
 
 			outputLights->push_back(l.Light);
 
 			if (outputLights->size() == MAX_LIGHTS_PER_ITEM)
-			{
 				break;
-			}
 		}
 	}
 
@@ -809,16 +833,32 @@ namespace TEN::Renderer
 
 			RendererEffect *newEffect = &_effects[fxNum];
 
-			Matrix translation = Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
-			Matrix rotation = fx->pos.Orientation.ToRotationMatrix();
-
-			newEffect->ObjectNumber = fx->objectNumber;
+			newEffect->Translation = Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
+			newEffect->Rotation = fx->pos.Orientation.ToRotationMatrix();
+			newEffect->Scale = Matrix::CreateScale(1.0f);
+			newEffect->World = newEffect->Rotation * newEffect->Translation;
+			newEffect->ObjectID = fx->objectNumber;
 			newEffect->RoomNumber = fx->roomNumber;
 			newEffect->Position = fx->pos.Position.ToVector3();
 			newEffect->AmbientLight = room.AmbientLight;
 			newEffect->Color = fx->color;
-			newEffect->World = rotation * translation;
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
+
+			if (fx->DisableInterpolation)
+			{
+				// In this way the interpolation will return always the same result
+				newEffect->PrevPosition = newEffect->Position;
+				newEffect->PrevTranslation = newEffect->Translation;
+				newEffect->PrevRotation = newEffect->Rotation;
+				newEffect->PrevWorld = newEffect->World;
+				newEffect->PrevScale = newEffect->Scale;
+			}
+
+			newEffect->InterpolatedPosition = Vector3::Lerp(newEffect->PrevPosition, newEffect->Position, _interpolationFactor);
+			newEffect->InterpolatedTranslation = Matrix::Lerp(newEffect->PrevTranslation, newEffect->Translation, _interpolationFactor);
+			newEffect->InterpolatedRotation = Matrix::Lerp(newEffect->InterpolatedRotation, newEffect->Rotation, _interpolationFactor);
+			newEffect->InterpolatedWorld = Matrix::Lerp(newEffect->PrevWorld, newEffect->World, _interpolationFactor);
+			newEffect->InterpolatedScale = Matrix::Lerp(newEffect->PrevScale, newEffect->Scale, _interpolationFactor);
 
 			CollectLightsForEffect(fx->roomNumber, newEffect);
 
@@ -826,11 +866,33 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::ResetAnimations()
+	void Renderer::ResetItems()
 	{
 		for (int i = 0; i < ITEM_COUNT_MAX; i++)
 			_items[i].DoneAnimations = false;
 	}
 
-} // namespace TEN::Renderer
+	void Renderer::SaveOldState()
+	{
+		for (int i = 0; i < g_Level.Items.size(); i++)
+		{
+			_items[i].PrevPosition = _items[i].Position;
+			_items[i].PrevWorld = _items[i].World;
+			_items[i].PrevTranslation = _items[i].Translation;
+			_items[i].PrevRotation = _items[i].Rotation;
+			_items[i].PrevScale = _items[i].Scale;
 
+			for (int j = 0; j < MAX_BONES; j++)
+				_items[i].PrevAnimTransforms[j] = _items[i].AnimTransforms[j];
+		}
+
+		for (int i = 0; i < ITEM_COUNT_MAX; i++)
+		{
+			_effects[i].PrevPosition = _effects[i].Position;
+			_effects[i].PrevWorld = _effects[i].World;
+			_effects[i].PrevTranslation = _effects[i].Translation;
+			_effects[i].PrevRotation = _effects[i].Rotation;
+			_effects[i].PrevScale = _effects[i].Scale;
+		}
+	}
+}

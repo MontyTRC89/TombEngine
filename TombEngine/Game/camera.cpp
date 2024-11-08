@@ -21,7 +21,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-
+#include "Specific/winmain.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
@@ -194,15 +194,8 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 
 void LookAt(CAMERA_INFO* cam, short roll)
 {
-	auto pos = cam->pos.ToVector3();
-	auto target = cam->target.ToVector3();
-	auto up = Vector3::Down;
-	float fov = TO_RAD(CurrentFOV / 1.333333f);
-	float r = TO_RAD(roll);
-
-	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(BLOCK(1));
-
-	g_Renderer.UpdateCameraMatrices(cam, r, fov, levelFarView);
+	cam->Fov = TO_RAD(CurrentFOV / 1.333333f);
+	cam->Roll = TO_RAD(roll);
 }
 
 void AlterFOV(short value, bool store)
@@ -248,13 +241,13 @@ void InitializeCamera()
 
 	Camera.targetDistance = BLOCK(1.5f);
 	Camera.item = nullptr;
-	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
 	Camera.speed = 1;
 	Camera.flags = CF_NONE;
 	Camera.bounce = 0;
 	Camera.number = -1;
 	Camera.fixedCamera = false;
+	Camera.DisableInterpolation = true;
 
 	AlterFOV(ANGLE(DEFAULT_FOV));
 
@@ -1068,6 +1061,28 @@ void ConfirmCameraTargetPos()
 	}
 }
 
+// HACK: Temporary fix for camera bouncing on slopes during player death.
+static bool CalculateDeathCamera(const ItemInfo& item)
+{
+	// If player is alive, it's not a death camera.
+	if (item.HitPoints > 0)
+		return false;
+
+	// If player is in a special death animation (from EXTRA_ANIMS slot) triggered by enemies.
+	if (item.Animation.AnimObjectID == ID_LARA_EXTRA_ANIMS)
+		return true;
+
+	// Special death animations.
+	if (item.Animation.AnimNumber == LA_SPIKE_DEATH || 
+		item.Animation.AnimNumber == LA_BOULDER_DEATH || 
+		item.Animation.AnimNumber == LA_TRAIN_OVERBOARD_DEATH)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void CalculateCamera(const CollisionInfo& coll)
 {
 	CamOldPos.x = Camera.pos.x;
@@ -1171,7 +1186,6 @@ void CalculateCamera(const CollisionInfo& coll)
 				Lara.ExtraTorsoRot.x = Lara.ExtraHeadRot.x;
 
 				Lara.Control.Look.Orientation = lookOrient;
-
 				Camera.type = CameraType::Look;
 				Camera.item->LookedAt = true;
 			}
@@ -1294,9 +1308,13 @@ void CalculateCamera(const CollisionInfo& coll)
 
 	Camera.fixedCamera = isFixedCamera;
 	Camera.last = Camera.number;
+	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
+	Camera.lastType = Camera.type;
 
-	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) &&
-		LaraItem->HitPoints > 0)
+	if (CalculateDeathCamera(*LaraItem))
+		return;
+
+	if (Camera.type != CameraType::Heavy || Camera.timer == -1)
 	{
 		Camera.type = CameraType::Chase;
 		Camera.speed = 10;
@@ -1521,8 +1539,57 @@ void ItemsCollideCamera()
 	staticList.clear();
 }
 
+void PrepareCamera()
+{
+	if (TrackCameraInit)
+	{
+		UseSpotCam = false;
+		AlterFOV(LastFOV);
+	}
+}
+
+static void DrawPortals()
+{
+	constexpr auto EXT_COLOR = Color(1.0f, 1.0f, 0.0f, 0.15f);
+	constexpr auto INT_COLOR = Color(1.0f, 0.0f, 0.0f, 0.15f);
+
+	if (!DebugMode)
+		return;
+
+	auto neighborRoomNumbers = GetNeighborRoomNumbers(Camera.pos.RoomNumber, 1);
+	for (auto& roomNumber : neighborRoomNumbers)
+	{
+		const auto& room = g_Level.Rooms[roomNumber];
+
+		auto pos = room.Position.ToVector3();
+		auto color = (roomNumber == Camera.pos.RoomNumber) ? INT_COLOR : EXT_COLOR;
+
+		for (const auto& door : room.doors)
+		{
+			DrawDebugTriangle(door.vertices[0] + pos, door.vertices[1] + pos, door.vertices[2] + pos, color, RendererDebugPage::PortalDebug);
+			DrawDebugTriangle(door.vertices[2] + pos, door.vertices[3] + pos, door.vertices[0] + pos, color, RendererDebugPage::PortalDebug);
+
+			DrawDebugLine(door.vertices[0] + pos, door.vertices[2] + pos, color, RendererDebugPage::PortalDebug);
+			DrawDebugLine(door.vertices[1] + pos, door.vertices[3] + pos, color, RendererDebugPage::PortalDebug);
+
+			auto center = pos + ((door.vertices[0] + door.vertices[1] + door.vertices[2] + door.vertices[3]) / 4);
+			auto target = Geometry::TranslatePoint(center, door.normal, CLICK(1));
+
+			DrawDebugLine(center, target, color, RendererDebugPage::PortalDebug);
+		}
+	}
+}
+
 void UpdateCamera()
 {
+	// HACK: Disable interpolation when switching to/from flyby camera.
+	// When camera structs are converted to a class, this should go to getter/setter. -- Lwmte, 29.10.2024
+	if (UseSpotCam != SpotcamSwitched)
+	{
+		Camera.DisableInterpolation = true;
+		SpotcamSwitched = UseSpotCam;
+	}
+
 	if (UseSpotCam)
 	{
 		// Draw flyby cameras.
@@ -1534,6 +1601,11 @@ void UpdateCamera()
 		TrackCameraInit = false;
 		CalculateCamera(LaraCollision);
 	}
+
+	// Update cameras matrices there, after having done all the possible camera logic.
+	g_Renderer.UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
+
+	DrawPortals();
 }
 
 void UpdateMikePos(const ItemInfo& item)

@@ -229,7 +229,7 @@ bool IsPointInRoom(const Vector3i& pos, int roomNumber)
 	return false;
 }
 
-int FindRoomNumber(const Vector3i& pos, int startRoomNumber)
+int FindRoomNumber(const Vector3i& pos, int startRoomNumber, bool onlyNeighbors)
 {
 	if (startRoomNumber != NO_VALUE && startRoomNumber < g_Level.Rooms.size())
 	{
@@ -244,6 +244,9 @@ int FindRoomNumber(const Vector3i& pos, int startRoomNumber)
 			}
 		}
 	}
+
+	if (onlyNeighbors)
+		return startRoomNumber;
 
 	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
 	{
@@ -269,7 +272,7 @@ Vector3i GetRoomCenter(int roomNumber)
 		room.Position.z + halfDepth);
 }
 
-static std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers = std::vector<int>{})
+std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers)
 {
 	// Invalid room; return empty vector.
 	if (g_Level.Rooms.size() <= roomNumber)

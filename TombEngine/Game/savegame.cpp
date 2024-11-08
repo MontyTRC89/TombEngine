@@ -15,6 +15,7 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_initialise.h"
 #include "Game/misc.h"
 #include "Game/spotcam.h"
 #include "Game/room.h"
@@ -129,6 +130,11 @@ Save::Vector4 FromVector4(const Vector4& vec)
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
 }
 
+Save::GameVector FromGameVector(const GameVector& vec)
+{
+	return Save::GameVector(vec.x, vec.y, vec.z, (int)vec.RoomNumber);
+}
+
 Pose ToPose(const Save::Pose& pose)
 {
 	return Pose(
@@ -171,6 +177,11 @@ Vector4 ToVector4(const Save::Vector4* vec)
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
+GameVector ToGameVector(const Save::GameVector* vec)
+{
+	return GameVector(vec->x(), vec->y(), vec->z(), (short)vec->room_number());
+}
+
 bool SaveGame::IsSaveGameSlotValid(int slot)
 {
 	if (slot < 0 || slot > SAVEGAME_MAX_SLOT)
@@ -193,6 +204,17 @@ bool SaveGame::DoesSaveGameExist(int slot, bool silent)
 	}
 
 	return true;
+}
+
+bool SaveGame::IsLoadGamePossible()
+{
+	for (int i = 0; i < SAVEGAME_MAX; i++)
+	{
+		if (Infos[i].Present)
+			return true;
+	}
+
+	return false;
 }
 
 std::string SaveGame::GetSavegameFilename(int slot)
@@ -489,6 +511,17 @@ const std::vector<byte> SaveGame::Build()
 	status.add_stamina(Lara.Status.Stamina);
 	auto statusOffset = status.Finish();
 
+	Save::CollisionInfoDataBuilder collision{ fbb };
+	collision.add_last_bridge_item_number(LaraCollision.LastBridgeItemNumber);
+	collision.add_last_bridge_item_pose(&FromPose(LaraCollision.LastBridgeItemPose));
+	auto collisionOffset = collision.Finish();
+
+	Save::CameraBuilder camera{ fbb };
+	camera.add_position(&FromGameVector(Camera.pos));
+	camera.add_target(&FromGameVector(Camera.target));
+	auto cameraOffset = camera.Finish();
+
+
 	std::vector<flatbuffers::Offset<Save::CarriedWeaponInfo>> carriedWeapons;
 	for (int i = 0; i < (int)LaraWeaponType::NumWeapons; i++)
 	{
@@ -535,6 +568,7 @@ const std::vector<byte> SaveGame::Build()
 	lara.add_location_pad(Lara.LocationPad);
 	lara.add_right_arm(rightArmOffset);
 	lara.add_status(statusOffset);
+	lara.add_collision(collisionOffset);
 	lara.add_target_arm_orient(&FromEulerAngles(Lara.TargetArmOrient));
 	lara.add_target_entity_number(Lara.TargetEntity == nullptr ? -1 : Lara.TargetEntity->Index);
 	lara.add_torch(torchOffset);
@@ -1203,38 +1237,24 @@ const std::vector<byte> SaveGame::Build()
 	{
 		ROPE_STRUCT* rope = &Ropes[Lara.Control.Rope.Ptr];
 
-		std::vector<const Save::Vector3*> segments;
+		std::vector<flatbuffers::Offset<Save::RopeSegment>> segments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			segments.push_back(&FromVector3i(rope->segment[i]));
-		auto segmentsOffset = fbb.CreateVector(segments);
+		{
+			Save::RopeSegmentBuilder segment{ fbb };
 
-		std::vector<const Save::Vector3*> velocities;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			velocities.push_back(&FromVector3i(rope->velocity[i]));
-		auto velocitiesOffset = fbb.CreateVector(velocities);
+			segment.add_segment(&FromVector3i(rope->segment[i]));
+			segment.add_velocity(&FromVector3i(rope->velocity[i]));
+			segment.add_normalised_segment(&FromVector3i(rope->normalisedSegment[i]));
+			segment.add_mesh_segment(&FromVector3i(rope->meshSegment[i]));
+			segment.add_coord(&FromVector3i(rope->coords[i]));
 
-		std::vector<const Save::Vector3*> normalisedSegments;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			normalisedSegments.push_back(&FromVector3i(rope->normalisedSegment[i]));
-		auto normalisedSegmentsOffset = fbb.CreateVector(normalisedSegments);
-
-		std::vector<const Save::Vector3*> meshSegments;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			meshSegments.push_back(&FromVector3i(rope->meshSegment[i]));
-		auto meshSegmentsOffset = fbb.CreateVector(meshSegments);
-
-		std::vector<const Save::Vector3*> coords;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			coords.push_back(&FromVector3i(rope->coords[i]));
-		auto coordsOffset = fbb.CreateVector(coords);
+			segments.push_back(segment.Finish());
+		}
+		auto ropeSegmentsOffset = fbb.CreateVector(segments);
 
 		Save::RopeBuilder ropeInfo{ fbb };
 
-		ropeInfo.add_segments(segmentsOffset);
-		ropeInfo.add_velocities(velocitiesOffset);
-		ropeInfo.add_mesh_segments(meshSegmentsOffset);
-		ropeInfo.add_normalised_segments(normalisedSegmentsOffset);
-		ropeInfo.add_coords(coordsOffset);
+		ropeInfo.add_segments(ropeSegmentsOffset);
 		ropeInfo.add_coiled(rope->coiled);
 		ropeInfo.add_position(&FromVector3i(rope->position));
 		ropeInfo.add_segment_length(rope->segmentLength);
@@ -1403,6 +1423,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_header(headerOffset);
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
+	sgb.add_camera(cameraOffset);
 	sgb.add_lara(laraOffset);
 	sgb.add_rooms(roomOffset);
 	sgb.add_next_item_free(NextItemFree);
@@ -1492,6 +1513,9 @@ void SaveGame::LoadHub(int index)
 	// Load hub data.
 	TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
 	Parse(Hub[index], true);
+
+	// Restore vehicle.
+	InitializePlayerVehicle(*LaraItem);
 }
 
 bool SaveGame::IsOnHub(int index)
@@ -1957,13 +1981,14 @@ static void ParsePlayer(const Save::SaveGame* s)
 	{
 		auto* rope = &Ropes[Lara.Control.Rope.Ptr];
 
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
+		for (int i = 0; i < s->rope()->segments()->size(); i++)
 		{
-			rope->segment[i] = ToVector3i(s->rope()->segments()->Get(i));
-			rope->normalisedSegment[i] = ToVector3i(s->rope()->normalised_segments()->Get(i));
-			rope->meshSegment[i] = ToVector3i(s->rope()->mesh_segments()->Get(i));
-			rope->coords[i] = ToVector3i(s->rope()->coords()->Get(i));
-			rope->velocity[i] = ToVector3i(s->rope()->velocities()->Get(i));
+			auto ropeSegment = s->rope()->segments()->Get(i);
+			rope->segment[i] = ToVector3i(ropeSegment->segment());
+			rope->normalisedSegment[i] = ToVector3i(ropeSegment->normalised_segment());
+			rope->meshSegment[i] = ToVector3i(ropeSegment->mesh_segment());
+			rope->coords[i] = ToVector3i(ropeSegment->coord());
+			rope->velocity[i] = ToVector3i(ropeSegment->velocity());
 		}
 
 		rope->coiled = s->rope()->coiled();
@@ -1982,6 +2007,14 @@ static void ParsePlayer(const Save::SaveGame* s)
 		AlternatePendulum.node = s->alternate_pendulum()->node();
 		AlternatePendulum.rope = rope;
 	}
+
+	// Collision
+	LaraCollision.LastBridgeItemNumber = s->lara()->collision()->last_bridge_item_number();
+	LaraCollision.LastBridgeItemPose = ToPose(*s->lara()->collision()->last_bridge_item_pose());
+
+	// Camera
+	Camera.pos = ToGameVector(s->camera()->position());
+	Camera.target = ToGameVector(s->camera()->target());
 
 	for (auto& item : g_Level.Items)
 	{
@@ -2300,7 +2333,6 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 		// Don't load player data in hub mode.
 		if (item->ObjectNumber == ID_LARA && hubMode)
 		{
-			//item->Pose = ToPose(*savedItem->pose());
 			item->RoomNumber = savedItem->room_number();
 			item->Floor = savedItem->floor();
 			item->BoxNumber = savedItem->box_number();

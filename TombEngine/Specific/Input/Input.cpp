@@ -718,7 +718,10 @@ namespace TEN::Input
 			action.Update(Key((int)action.GetID()));
 
 		if (applyQueue)
+		{
 			ApplyActionQueue();
+			ClearActionQueue();
+		}
 
 		// Additional handling.
 		HandleHotkeyActions();
