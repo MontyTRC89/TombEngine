@@ -222,11 +222,6 @@ GameStatus ControlPhase(bool insideMenu)
 	PlaySoundSources();
 	Sound_UpdateScene();
 
-	UpdateCamera();
-
-	// Post-loop script and event handling.
-	g_GameScript->OnLoop(DELTA_TIME, true);
-
 	// Handle inventory, pause, load, save screens.
 	if (!insideMenu)
 	{
@@ -239,6 +234,11 @@ GameStatus ControlPhase(bool insideMenu)
 		if (result != GameStatus::Normal)
 			return result;
 	}
+
+	UpdateCamera();
+
+	// Post-loop script and event handling.
+	g_GameScript->OnLoop(DELTA_TIME, true);
 
 	// Clear savegame loaded flag.
 	JustLoaded = false;

@@ -56,6 +56,7 @@ int NumberSpotcams;
 
 bool CheckTrigger = false;
 bool UseSpotCam = false;
+bool SpotcamSwitched = false;
 bool SpotcamDontDrawLara = false;
 bool SpotcamOverlay = false;
 
@@ -391,7 +392,6 @@ void CalculateSpotCameras()
 	{
 		SetScreenFadeIn(FADE_SCREEN_SPEED);
 		CameraFade = CurrentSplineCamera;
-		Camera.DisableInterpolation = true;
 	}
 
 	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_OUT) &&
@@ -399,7 +399,6 @@ void CalculateSpotCameras()
 	{
 		SetScreenFadeOut(FADE_SCREEN_SPEED);
 		CameraFade = CurrentSplineCamera;
-		Camera.DisableInterpolation = true;
 	}
 
 	sp = 0;
@@ -472,6 +471,14 @@ void CalculateSpotCameras()
 
 	if ((s->flags & SCF_DISABLE_BREAKOUT) || !lookPressed)
 	{
+		// Disable interpolation if camera traveled too far.
+		auto origin = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		auto target = Vector3(cpx, cpy, cpz);
+		float dist = Vector3::Distance(origin, target);
+
+		if (dist > BLOCK(0.25f))
+			Camera.DisableInterpolation = true;
+
 		Camera.pos.x = cpx;
 		Camera.pos.y = cpy;
 		Camera.pos.z = cpz;
@@ -489,29 +496,23 @@ void CalculateSpotCameras()
 			Camera.target.z = ctz;
 		}
 
-		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
+		int outsideRoom = IsRoomOutside(cpx, cpy, cpz);
 		if (outsideRoom == NO_VALUE)
 		{
-			if (Camera.pos.RoomNumber != SpotCam[CurrentSplineCamera].roomNumber)
-				Camera.DisableInterpolation = true;
-
 			// HACK: Sometimes actual camera room number desyncs from room number derived using floordata functions.
 			// If such case is identified, we do a brute-force search for coherrent room number.
 			// This issue is only present in sub-click floor height setups after TE 1.7.0. -- Lwmte, 02.11.2024
 		
-			auto position = Vector3i(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-			int collRoomNumber = GetPointCollision(position, SpotCam[CurrentSplineCamera].roomNumber).GetRoomNumber();
+			auto pos = Vector3i(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+			int collRoomNumber = GetPointCollision(pos, SpotCam[CurrentSplineCamera].roomNumber).GetRoomNumber();
 
 			if (collRoomNumber != Camera.pos.RoomNumber)
-				collRoomNumber = FindRoomNumber(position, SpotCam[CurrentSplineCamera].roomNumber);
+				collRoomNumber = FindRoomNumber(pos, SpotCam[CurrentSplineCamera].roomNumber);
 
 			Camera.pos.RoomNumber = collRoomNumber;
 		}
 		else
 		{
-			if (Camera.pos.RoomNumber != outsideRoom)
-				Camera.DisableInterpolation = true;
-
 			Camera.pos.RoomNumber = outsideRoom;
 		}
 
@@ -705,10 +706,10 @@ void CalculateSpotCameras()
 						Camera.pos.x = InitialCameraPosition.x;
 						Camera.pos.y = InitialCameraPosition.y;
 						Camera.pos.z = InitialCameraPosition.z;
+						Camera.pos.RoomNumber = InitialCameraRoom;
 						Camera.target.x = InitialCameraTarget.x;
 						Camera.target.y = InitialCameraTarget.y;
 						Camera.target.z = InitialCameraTarget.z;
-						Camera.pos.RoomNumber = InitialCameraRoom;
 					}
 
 					SpotcamOverlay = false;

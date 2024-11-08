@@ -3,7 +3,20 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## Version 1.5 - xxxx-xx-xx
+## Version 1.6 - xxxx-xx-xx
+
+### Bug fixes
+
+* Fixed engine performance around multiple stacked bridges.
+* Fixed engine performance if weather effects are active.
+* Fixed snow particles not always melting on the ground.
+* Fixed enemy pickups dropping on death sectors.
+
+### Features/Amendments
+	
+### Lua API changes
+
+## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 
 ### Bug fixes
 
@@ -24,6 +37,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect diving animation when swandiving from a high place.
 * Fixed room clipping when flyby path goes out of room bounds.
 * Fixed camera rotating with the player's hips when climbing out of water.
+* Fixed camera behaviour on sloped surfaces after player's death.
 * Fixed camera position after loading a savegame.
 * Fixed broken ropes after loading a savegame.
 * Fixed AI for TR2 Skidoo driver and Worker with shotgun.
