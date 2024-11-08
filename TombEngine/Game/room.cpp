@@ -219,6 +219,9 @@ bool IsPointInRoom(const Vector3i& pos, int roomNumber)
 {
 	const auto& room = g_Level.Rooms[roomNumber];
 
+	if (!room.Active())
+		return false;
+
 	if (pos.z >= (room.Position.z + BLOCK(1)) && pos.z <= (room.Position.z + BLOCK(room.ZSize - 1)) &&
 		pos.y <= room.BottomHeight && pos.y > room.TopHeight &&
 		pos.x >= (room.Position.x + BLOCK(1)) && pos.x <= (room.Position.x + BLOCK(room.XSize - 1)))
