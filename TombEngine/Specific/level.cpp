@@ -975,7 +975,6 @@ void FreeLevel(bool partial)
 	g_Level.GlobalEventSets.resize(0);
 	g_Level.LoopedEventSetIndices.resize(0);
 
-	g_Renderer.FreeRendererData();
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
@@ -984,6 +983,8 @@ void FreeLevel(bool partial)
 		ResetRoomData();
 		return;
 	}
+
+	g_Renderer.FreeRendererData();
 
 	MoveablesIds.resize(0);
 	StaticObjectsIds.resize(0);
@@ -1310,7 +1311,9 @@ bool LoadLevel(std::string path, bool partial)
 			SetScreenFadeOut(FADE_SCREEN_SPEED * 2, true);
 		}
 		else
+		{
 			SetScreenFadeIn(FADE_SCREEN_SPEED, true);
+		}
 
 		UpdateProgress(0);
 
@@ -1368,19 +1371,19 @@ bool LoadLevel(std::string path, bool partial)
 		g_GameScriptEntities->AssignLara();
 		UpdateProgress(90, partial);
 
-		TENLog("Preparing renderer...", LogLevel::Info);
-
-		g_Renderer.PrepareDataForTheRenderer();
-
-		TENLog("Level loading complete.", LogLevel::Info);
-
 		if (!partial)
+		{
+			g_Renderer.PrepareDataForTheRenderer();
 			SetScreenFadeOut(FADE_SCREEN_SPEED, true);
+		}
+		else
+		{
+			SetScreenFadeIn(FADE_SCREEN_SPEED, true);
+		}
 
 		UpdateProgress(100, partial);
 
-		if (partial)
-			SetScreenFadeIn(FADE_SCREEN_SPEED, true);
+		TENLog("Level loading complete.", LogLevel::Info);
 
 		loadedSuccessfully = true;
 	}
