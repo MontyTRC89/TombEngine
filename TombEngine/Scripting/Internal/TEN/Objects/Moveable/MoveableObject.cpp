@@ -170,16 +170,31 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 
 /// Explode item. This also kills and disables item.
 // @function Moveable:Explode
+// @usage
+// levelFuncs.explodeShiva = function()
+//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		shiva:Explode()
+// end
 	ScriptReserved_Explode, &Moveable::Explode,
 
 /// Shatter item. This also kills and disables item.
 // @function Moveable:Shatter
+// @usage
+// levelFuncs.shatterShiva = function()
+//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		shiva:Shatter()
+// end
 	ScriptReserved_Shatter, &Moveable::Shatter,
 
 /// Set effect to moveable
 // @function Moveable:SetEffect
 // @tparam Effects.EffectID effect Type of effect to assign.
 // @tparam[opt] float timeout time (in seconds) after which effect turns off.
+// @usage
+// levelFuncs.setShivaOnFire = function()
+//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		shiva:SetEffect(EffectID.FIRE, 4) -- Shiva is set on fire for 4 seconds.
+// end
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
 
 /// Set custom colored burn effect to moveable
@@ -187,21 +202,52 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @tparam Color Color1 color the primary color of the effect (also used for lighting).
 // @tparam Color Color2 color the secondary color of the effect.
 // @tparam[opt] float timeout time (in seconds) after which effect turns off.
+// @usage
+// levelFuncs.putGreenAndPurpleOnShiva = function()
+//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		shiva:SetCustomEffect(Color(0,255,0), Color(128,0,128) 4) 
+//		-- Shiva is set on custom effect for 4 seconds.
+// end
 	ScriptReserved_SetCustomEffect, &Moveable::SetCustomEffect,
 
 /// Get current moveable effect
 // @function Moveable:GetEffect
 // @treturn Effects.EffectID effect type currently assigned to moveable.
+// @usage 
+// function checkOnFire()
+//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		if shiva:GetEffect() == EffectID.FIRE then
+//			print("Shiva is on fire!")
+//		end
+// end
+// 
+// levelFuncs.hasEffect == function()
+//		checkOnFire()
+// end
 	ScriptReserved_GetEffect, &Moveable::GetEffect,
 
 /// Get the moveable's status.
 // @function Moveable:GetStatus()
 // @treturn Objects.MoveableStatus The moveable's status.
+// @usage 
+// levelfuncs.checkShivaStatus = function()
+//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		if shiva:GetStatus() == Objects.MoveableStatus.ACTIVE then
+//			print("Shiva is currently active")
+//		else
+//			print("shiva currently has another status")
+//		end
+// end
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
 
 /// Set the moveable's status.
 // @function Moveable:SetStatus()
 // @tparam Objects.MoveableStatus status The new status of the moveable.
+// @usage 
+// levelFuncs.setShivaInactive = function()
+//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		shiva:SetStatus(Objects.MoveableStatus.INACTIVE)
+// end
 	ScriptReserved_SetStatus, &Moveable::SetStatus,
 
 /// Retrieve the object ID
