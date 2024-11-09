@@ -7,9 +7,13 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Bug fixes
 * Fixed engine performance around multiple stacked bridges.
+* Fixed engine performance around bridges.
 * Fixed engine performance if weather effects are active.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemy pickups dropping on death sectors.
+* Fixed audio tracks placed in subfolders not restoring after loading savegame.
+* Fixed scripted input events not registering on the same game frame.
+* Fixed Lara's Home entry not working.
 
 ### Features/Amendments
 * Added fast savegame reloading.
