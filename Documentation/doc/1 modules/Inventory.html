@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.3 Lua API</title>
+    <title>TombEngine 1.5 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -49,10 +49,12 @@
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li>    <a href="../2 classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
   <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li>    <a href="../2 classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
@@ -123,6 +125,18 @@
 	<tr>
 	<td class="name" ><a href="#SetItemCount">SetItemCount(objectID, count)</a></td>
 	<td class="summary">Set the amount of an item in the player's inventory.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetUsedItem">GetUsedItem()</a></td>
+	<td class="summary">Get last item used in the player's inventory.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetUsedItem">SetUsedItem(objectID)</a></td>
+	<td class="summary">Set last item used in the player's inventory.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#ClearUsedItem">ClearUsedItem()</a></td>
+	<td class="summary">Clear last item used in the player's inventory.</td>
 	</tr>
 </table>
 
@@ -240,6 +254,70 @@
          The amount of items to set. -1 indicates infinity.
         </li>
     </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetUsedItem"></a>
+    <strong>GetUsedItem()</strong>
+    </dt>
+    <dd>
+    Get last item used in the player's inventory.
+ This value will be valid only for a single frame after exiting inventory, after which Lara says "No".
+ Therefore, this function must be preferably used either in OnLoop or OnUseItem events.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
+        Last item used in the inventory.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetUsedItem"></a>
+    <strong>SetUsedItem(objectID)</strong>
+    </dt>
+    <dd>
+    Set last item used in the player's inventory.
+ You will be able to specify only objects which already exist in the inventory.
+ Will only be valid for the next frame. If not processed by the game, Lara will say "No".
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">objectID</span>
+            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
+         Object ID of the item to select from inventory.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ClearUsedItem"></a>
+    <strong>ClearUsedItem()</strong>
+    </dt>
+    <dd>
+    Clear last item used in the player's inventory.
+ When this function is used in OnUseItem level function, it allows to override existing item functionality.
+ For items without existing functionality, this function is needed to avoid Lara saying "No" after using it.
+
+
+
 
 
 

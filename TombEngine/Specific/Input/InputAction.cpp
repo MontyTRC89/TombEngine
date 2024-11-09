@@ -1,47 +1,44 @@
 #include "framework.h"
 #include "Specific/Input/InputAction.h"
 
-#include "Renderer/Renderer.h"
 #include "Specific/clock.h"
-
-using TEN::Renderer::g_Renderer;
 
 namespace TEN::Input
 {
 	InputAction::InputAction(InputActionID actionID)
 	{
-		ID = actionID;
+		_id = actionID;
 	}
 
 	InputActionID InputAction::GetID() const
 	{
-		return ID;
+		return _id;
 	}
 
 	float InputAction::GetValue() const
 	{
-		return Value;
+		return _value;
 	}
 
 	float InputAction::GetTimeActive() const
 	{
-		return TimeActive;
+		return _timeActive;
 	}
 
 	float InputAction::GetTimeInactive() const
 	{
-		return TimeInactive;
+		return _timeInactive;
 	}
 
 	bool InputAction::IsClicked() const
 	{
-		return ((Value != 0.0f) && (PrevValue == 0.0f));
+		return ((_value != 0.0f) && (_prevValue == 0.0f));
 	}
 
 	bool InputAction::IsHeld(float delayInSec) const
 	{
 		float delayInFrameTime = (delayInSec == 0.0f) ? 0.0f : round(delayInSec / DELTA_TIME);
-		return ((Value != 0.0f) && (TimeActive >= delayInFrameTime));
+		return ((_value != 0.0f) && (_timeActive >= delayInFrameTime));
 	}
 
 	// NOTE: To avoid stutter on second pulse, ensure initialDelayInSec is multiple of delayInSec.
@@ -50,12 +47,12 @@ namespace TEN::Input
 		if (IsClicked())
 			return true;
 
-		if (!IsHeld() || PrevTimeActive == 0.0f || TimeActive == PrevTimeActive)
+		if (!IsHeld() || _prevTimeActive == 0.0f || _timeActive == _prevTimeActive)
 			return false;
 
-		float activeDelayInFrameTime = (TimeActive > round(initialDelayInSec / DELTA_TIME)) ? round(delayInSec / DELTA_TIME) : round(initialDelayInSec / DELTA_TIME);
-		float delayInFrameTime = std::floor(TimeActive / activeDelayInFrameTime) * activeDelayInFrameTime;
-		if (delayInFrameTime > (std::floor(PrevTimeActive / activeDelayInFrameTime) * activeDelayInFrameTime))
+		float activeDelayInFrameTime = (_timeActive > round(initialDelayInSec / DELTA_TIME)) ? round(delayInSec / DELTA_TIME) : round(initialDelayInSec / DELTA_TIME);
+		float delayInFrameTime = std::floor(_timeActive / activeDelayInFrameTime) * activeDelayInFrameTime;
+		if (delayInFrameTime > (std::floor(_prevTimeActive / activeDelayInFrameTime) * activeDelayInFrameTime))
 			return true;
 
 		// Keeping version counting real time for future reference. -- Sezz 2022.10.01
@@ -72,7 +69,7 @@ namespace TEN::Input
 	bool InputAction::IsReleased(float delayInSecMax) const
 	{
 		float delayInFrameTimeMax = (delayInSecMax == INFINITY) ? INFINITY : round(delayInSecMax / DELTA_TIME);
-		return ((Value == 0.0f) && (PrevValue != 0.0f) && (TimeActive <= delayInFrameTimeMax));
+		return ((_value == 0.0f) && (_prevValue != 0.0f) && (_timeActive <= delayInFrameTimeMax));
 	}
 
 	void InputAction::Update(bool value)
@@ -91,58 +88,58 @@ namespace TEN::Input
 
 		if (IsClicked())
 		{
-			PrevTimeActive = 0.0f;
-			TimeActive = 0.0f;
-			TimeInactive += FRAME_TIME;// DELTA_TIME;
+			_prevTimeActive = 0.0f;
+			_timeActive = 0.0f;
+			_timeInactive += FRAME_TIME;// DELTA_TIME;
 		}
 		else if (IsReleased())
 		{
-			PrevTimeActive = TimeActive;
-			TimeActive += FRAME_TIME;// DELTA_TIME;
-			TimeInactive = 0.0f;
+			_prevTimeActive = _timeActive;
+			_timeActive += FRAME_TIME;// DELTA_TIME;
+			_timeInactive = 0.0f;
 		}
 		else if (IsHeld())
 		{
-			PrevTimeActive = TimeActive;
-			TimeActive += FRAME_TIME;// DELTA_TIME;
-			TimeInactive = 0.0f;
+			_prevTimeActive = _timeActive;
+			_timeActive += FRAME_TIME;// DELTA_TIME;
+			_timeInactive = 0.0f;
 		}
 		else
 		{
-			PrevTimeActive = 0.0f;
-			TimeActive = 0.0f;
-			TimeInactive += FRAME_TIME;// DELTA_TIME;
+			_prevTimeActive = 0.0f;
+			_timeActive = 0.0f;
+			_timeInactive += FRAME_TIME;// DELTA_TIME;
 		}
 	}
 
 	void InputAction::Clear()
 	{
-		Value = 0.0f;
-		PrevValue = 0.0f;
-		TimeActive = 0.0f;
-		PrevTimeActive = 0.0f;
-		TimeInactive = 0.0f;
+		_value = 0.0f;
+		_prevValue = 0.0f;
+		_timeActive = 0.0f;
+		_prevTimeActive = 0.0f;
+		_timeInactive = 0.0f;
 	}
 
 	void InputAction::DrawDebug() const
 	{
 		g_Renderer.PrintDebugMessage("INPUT ACTION DEBUG");
-		g_Renderer.PrintDebugMessage("ID: %d", (int)ID);
-		g_Renderer.PrintDebugMessage("IsClicked: %d", IsClicked());
-		g_Renderer.PrintDebugMessage("IsHeld: %d", IsHeld());
-		g_Renderer.PrintDebugMessage("IsPulsed (.2s, .6s): %d", IsPulsed(0.2f, 0.6f));
-		g_Renderer.PrintDebugMessage("IsReleased: %d", IsReleased());
-		g_Renderer.PrintDebugMessage("");
-		g_Renderer.PrintDebugMessage("Value: %.3f", Value);
-		g_Renderer.PrintDebugMessage("PrevValue: %.3f", PrevValue);
-		g_Renderer.PrintDebugMessage("TimeActive: %.3f", TimeActive);
-		g_Renderer.PrintDebugMessage("PrevTimeActive: %.3f", PrevTimeActive);
-		g_Renderer.PrintDebugMessage("TimeInactive: %.3f", TimeInactive);
+		PrintDebugMessage("ID: %d", (int)_id);
+		PrintDebugMessage("IsClicked: %d", IsClicked());
+		PrintDebugMessage("IsHeld: %d", IsHeld());
+		PrintDebugMessage("IsPulsed (.2s, .6s): %d", IsPulsed(0.2f, 0.6f));
+		PrintDebugMessage("IsReleased: %d", IsReleased());
+		PrintDebugMessage("");
+		PrintDebugMessage("Value: %.3f", _value);
+		PrintDebugMessage("PrevValue: %.3f", _prevValue);
+		PrintDebugMessage("TimeActive: %.3f", _timeActive);
+		PrintDebugMessage("PrevTimeActive: %.3f", _prevTimeActive);
+		PrintDebugMessage("TimeInactive: %.3f", _timeInactive);
 	}
 
 	void InputAction::UpdateValue(float value)
 	{
-		PrevValue = Value;
-		Value = value;
+		_prevValue = _value;
+		_value = value;
 	}
 }

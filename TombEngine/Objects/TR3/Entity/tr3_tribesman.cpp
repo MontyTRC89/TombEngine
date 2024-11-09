@@ -2,7 +2,6 @@
 #include "Objects/TR3/Entity/tr3_tribesman.h"
 
 #include "Game/animation.h"
-#include "Game/collision/sphere.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
@@ -363,7 +362,7 @@ namespace TEN::Entities::Creatures::TR3
 	void TribesmanShotDart(ItemInfo* item)
 	{
 		int dartItemNumber = CreateItem();
-		if (dartItemNumber == NO_ITEM)
+		if (dartItemNumber == NO_VALUE)
 			return;
 		
 		auto* dartItem = &g_Level.Items[dartItemNumber];
@@ -391,8 +390,7 @@ namespace TEN::Entities::Creatures::TR3
 		pos1.z += 96;
 		pos1 = GetJointPosition(item, TribesmanDartBite2.BoneID, pos1);
 
-		TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, true);
-		TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, true);
+		SpawnDartSmoke(pos1.ToVector3(), Vector3::Zero, true);
 	}
 
 	void TribemanDartsControl(short itemNumber)

@@ -70,10 +70,10 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 		if (dx < -MAX_TRIGGER_RANGE || dx > MAX_TRIGGER_RANGE || dz < -MAX_TRIGGER_RANGE || dz > MAX_TRIGGER_RANGE)
 			return;
 
-		ColorData color;
-		color.r = 255;
-		color.g = (GetRandomDraw() & 127) + 64;
-		color.b = 192 - color.g;
+		auto color = Color();
+		color.x = 1.0f;
+		color.y = Random::GenerateFloat(0.25f, 0.75f);
+		color.z = 0.75f - color.G();
 
 		TriggerChaffSparkles(pos, vel, color, age, item);
 
@@ -91,7 +91,7 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 	}
 }
 
-void TriggerChaffSparkles(const Vector3i& pos, const Vector3i& vel, const ColorData& color, int age, const ItemInfo& item)
+void TriggerChaffSparkles(const Vector3i& pos, const Vector3i& vel, const Color& color, int age, const ItemInfo& item)
 {
 	TEN::Effects::Spark::TriggerFlareSparkParticles(pos, vel, color, item.RoomNumber);
 }
@@ -133,12 +133,12 @@ void TriggerChaffSmoke(const Vector3i& pos, const Vector3i& vel, int speed, bool
 
 	smoke->blendMode = BlendMode::Additive;
 	
-	smoke->x = pos.x + (GetRandomControl() & 7) - 3;
-	smoke->y = pos.y + (GetRandomControl() & 7) - 3;
-	smoke->z = pos.z + (GetRandomControl() & 7) - 3;
-	smoke->xVel = vel.x + ((GetRandomDraw() & 63) - 32);
-	smoke->yVel = vel.y;
-	smoke->zVel = vel.z + ((GetRandomDraw() & 63) - 32);
+	smoke->position.x = pos.x + (GetRandomControl() & 7) - 3;
+	smoke->position.y = pos.y + (GetRandomControl() & 7) - 3;
+	smoke->position.z = pos.z + (GetRandomControl() & 7) - 3;
+	smoke->velocity.x = vel.x + ((GetRandomDraw() & 63) - 32);
+	smoke->velocity.y = vel.y;
+	smoke->velocity.z = vel.z + ((GetRandomDraw() & 63) - 32);
 	smoke->friction = 4;
 
 	if (GetRandomControl() & 1)

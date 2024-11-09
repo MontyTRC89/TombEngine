@@ -4,8 +4,9 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/control/box.h"
-#include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
@@ -20,6 +21,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
@@ -118,7 +120,7 @@ namespace TEN::Entities::Vehicles
 	void BigGunFire(ItemInfo* bigGunItem, ItemInfo* laraItem)
 	{
 		short itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 		auto* lara = GetLaraInfo(laraItem);
 		auto* bigGun = GetBigGunInfo(bigGunItem);
@@ -126,8 +128,8 @@ namespace TEN::Entities::Vehicles
 		auto* projectileItem = &g_Level.Items[itemNumber];
 		projectileItem->ObjectNumber = ID_ROCKET;
 		auto pos = GetJointPosition(bigGunItem, BigGunBite);
-		auto probe = GetCollision(pos.x, pos.y, pos.z, bigGunItem->RoomNumber);
-		projectileItem->RoomNumber = probe.RoomNumber;
+		auto pointColl = GetPointCollision(pos, bigGunItem->RoomNumber);
+		projectileItem->RoomNumber = pointColl.GetRoomNumber();
 		projectileItem->Pose.Position = pos;
 		projectileItem->Pose.Orientation = EulerAngles(
 			-((bigGun->XOrientFrame - 32) * ANGLE(1.0f)),
@@ -154,7 +156,7 @@ namespace TEN::Entities::Vehicles
 		auto* bigGun = GetBigGunInfo(bigGunItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints <= 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		if (BigGunTestMount(laraItem, bigGunItem))

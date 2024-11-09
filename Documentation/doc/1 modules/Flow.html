@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.3 Lua API</title>
+    <title>TombEngine 1.5 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -49,10 +49,12 @@
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li>    <a href="../2 classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
   <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li>    <a href="../2 classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
@@ -129,6 +131,10 @@ scripts too.</p>
 	<td class="summary">Enable or disable level selection in title flyby.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#EnableHomeLevel">EnableHomeLevel(enabled)</a></td>
+	<td class="summary">Enable or disable Home Level entry in the main menu.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#EnableLoadSave">EnableLoadSave(enabled)</a></td>
 	<td class="summary">Enable or disable saving and loading of savegames.</td>
 	</tr>
@@ -137,7 +143,7 @@ scripts too.</p>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#EnableFlyCheat">EnableFlyCheat(enabled)</a></td>
-	<td class="summary">Enable or disable DOZY mode (fly cheat).</td>
+	<td class="summary">Enable or disable the fly cheat.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#EnablePointFilter">EnablePointFilter(enabled)</a></td>
@@ -195,6 +201,14 @@ scripts too.</p>
 	<td class="name" ><a href="#SetTotalSecretCount">SetTotalSecretCount(total)</a></td>
 	<td class="summary">Total number of secrets in game.</td>
 	</tr>
+	<tr>
+	<td class="name" ><a href="#FlipMap">FlipMap(flipmap)</a></td>
+	<td class="summary">Do FlipMap with specific group ID.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetFlipMapStatus">GetFlipMapStatus([index])</a></td>
+	<td class="summary">Get current FlipMap status for specific group ID.</td>
+	</tr>
 </table>
 <h2><a href="#settings_lua">settings.lua </a></h2>
 <table class="function_list">
@@ -220,6 +234,10 @@ scripts too.</p>
 	<tr>
 	<td class="name" ><a href="#GetString">GetString(string)</a></td>
 	<td class="summary">Get translated string.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsStringPresent">IsStringPresent(string)</a></td>
+	<td class="summary">Check if translated string is present.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#SetLanguageNames">SetLanguageNames(table)</a></td>
@@ -355,11 +373,11 @@ Must be true or false
 
 </dd>
     <dt>
-    <a name = "EnableLoadSave"></a>
-    <strong>EnableLoadSave(enabled)</strong>
+    <a name = "EnableHomeLevel"></a>
+    <strong>EnableHomeLevel(enabled)</strong>
     </dt>
     <dd>
-    Enable or disable saving and loading of savegames.
+    Enable or disable Home Level entry in the main menu. ()
 
 
 
@@ -367,7 +385,29 @@ Must be true or false
     <ul>
         <li><span class="parameter">enabled</span>
             <span class="types"><span class="type">bool</span></span>
-         true or false.
+         True or false.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "EnableLoadSave"></a>
+    <strong>EnableLoadSave(enabled)</strong>
+    </dt>
+    <dd>
+    Enable or disable saving and loading of savegames. ()
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">enabled</span>
+            <span class="types"><span class="type">bool</span></span>
+         True or false.
         </li>
     </ul>
 
@@ -385,8 +425,7 @@ Must be true or false
     <strong>EnableFlyCheat(enabled)</strong>
     </dt>
     <dd>
-    Enable or disable DOZY mode (fly cheat).
-Must be true or false
+    Enable or disable the fly cheat. ()
 
 
 
@@ -394,7 +433,7 @@ Must be true or false
     <ul>
         <li><span class="parameter">enabled</span>
             <span class="types"><span class="type">bool</span></span>
-         true or false
+         True or false.
         </li>
     </ul>
 
@@ -735,6 +774,57 @@ Must be an integer value (0 means no secrets).
 
 
 </dd>
+    <dt>
+    <a name = "FlipMap"></a>
+    <strong>FlipMap(flipmap)</strong>
+    </dt>
+    <dd>
+    Do FlipMap with specific group ID.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">flipmap</span>
+            <span class="types"><span class="type">int</span></span>
+         (ID of flipmap group to actuvate / deactivate)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetFlipMapStatus"></a>
+    <strong>GetFlipMapStatus([index])</strong>
+    </dt>
+    <dd>
+    Get current FlipMap status for specific group ID.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         Flipmap group ID to check. If no group specified or group is -1, function returns overall flipmap status (on or off).
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        Status of the flipmap group (true means on, false means off).
+    </ol>
+
+
+
+
+</dd>
 </dl>
     <h2 class="section-header has-description"><a name="settings_lua"></a>settings.lua </h2>
 
@@ -828,6 +918,28 @@ You will not need to call them manually.
     </dt>
     <dd>
     Get translated string.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">string</span>
+            <span class="types"><span class="type">key</span></span>
+         key for translated string
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsStringPresent"></a>
+    <strong>IsStringPresent(string)</strong>
+    </dt>
+    <dd>
+    Check if translated string is present.
 
 
 

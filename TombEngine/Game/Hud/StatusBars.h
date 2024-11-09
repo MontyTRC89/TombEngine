@@ -26,6 +26,7 @@ namespace TEN::Hud
 	{
 	private:
 		// Members
+
 		StatusBar _airBar	   = {};
 		StatusBar _exposureBar = {};
 		StatusBar _healthBar   = {};
@@ -35,6 +36,7 @@ namespace TEN::Hud
 
 	public:
 		// Utilities
+
 		void Initialize(const ItemInfo& item);
 		void Update(const ItemInfo& item);
 		void Draw(const ItemInfo& item) const;
@@ -42,12 +44,14 @@ namespace TEN::Hud
 
 	private:
 		// Update helpers
+
 		void UpdateAirBar(const ItemInfo& item);
 		void UpdateExposureBar(const ItemInfo& item);
 		void UpdateHealthBar(const ItemInfo& item);
 		void UpdateStaminaBar(const ItemInfo& item);
 
 		// Draw helpers
+
 		void DrawStatusBar(float value, float criticalValue, const RendererHudBar& rHudBar, GAME_OBJECT_ID textureID, int frame, bool isPoisoned) const;
 		void DrawAirBar() const;
 		void DrawExposureBar() const;

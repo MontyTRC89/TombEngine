@@ -61,7 +61,7 @@ namespace TEN::Entities::Creatures::TR1
 	static void SpawnSkateboard(ItemInfo& item)
 	{
 		int skateItemNumber = CreateItem();
-		if (skateItemNumber == NO_ITEM)
+		if (skateItemNumber == NO_VALUE)
 			return;
 
 		auto& skate = g_Level.Items[skateItemNumber];
@@ -77,7 +77,7 @@ namespace TEN::Entities::Creatures::TR1
 		AddActiveItem(skateItemNumber);
 
 		skate.Active = false;
-		skate.Status |= ITEM_INVISIBLE;
+		skate.Status = ITEM_INVISIBLE;
 		item.ItemFlags[0] = skateItemNumber;
 	}
 
@@ -112,22 +112,25 @@ namespace TEN::Entities::Creatures::TR1
 	{
 		if (!CreatureActive(itemNumber))
 			return;
+
 		auto& item = g_Level.Items[itemNumber];
-		if (item.ItemFlags[0] == NO_ITEM)
+
+		if (item.ItemFlags[0] == NO_VALUE)
 		{
 			TENLog("Failed to do the skateboard kid control (itemNumber: " + std::to_string(itemNumber) + "), the skateboard itemNumber is missing, probably failed to be created !");
 			return;
 		}
+
 		auto& creature = *GetCreatureInfo(&item);
 		auto& skateItem = g_Level.Items[item.ItemFlags[0]];
 		short headingAngle = 0;
 		auto extraHeadRot = EulerAngles::Identity;
 		auto extraTorsoRot = EulerAngles::Identity;
 
-		if (skateItem.Status & ITEM_INVISIBLE)
+		if (skateItem.Status == ITEM_INVISIBLE)
 		{
 			skateItem.Active = true;
-			skateItem.Status &= ~(ITEM_INVISIBLE);
+			skateItem.Status = ITEM_ACTIVE;
 		}
 
 		for (auto& flash : creature.MuzzleFlash)
@@ -164,7 +167,7 @@ namespace TEN::Entities::Creatures::TR1
 				creature.MaxTurn = KID_TURN_RATE_MAX;
 				creature.Flags = 0;
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}

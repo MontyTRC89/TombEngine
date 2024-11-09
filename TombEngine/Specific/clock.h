@@ -11,14 +11,35 @@ constexpr auto DAY_UNIT   = 24;
 
 struct GameTime
 {
-	int Days;
-	int Hours;
-	int Minutes;
-	int Seconds;
+	int Days	= 0;
+	int Hours	= 0;
+	int Minutes = 0;
+	int Seconds = 0;
 };
 
-int Sync();
+class HighFramerateSynchronizer
+{
+private:
+	LARGE_INTEGER _lastTime;
+	LARGE_INTEGER _currentTime;
+	LARGE_INTEGER _frequency;
+	double _controlDelay = 0.0;
+	double _frameTime    = 0.0;
+
+public:
+	void Init();
+	void Sync();
+	void Step();
+	bool Synced();
+	float GetInterpolationFactor();
+};
+
+int	 TimeSync();
 bool TimeInit();
 bool TimeReset();
 
-GameTime GetGameTime(int frameCount);
+GameTime GetGameTime(int ticks);
+
+bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs = 0.0f);
+
+extern HighFramerateSynchronizer g_Synchronizer;

@@ -15,6 +15,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Room;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
@@ -175,7 +176,7 @@ namespace TEN::Entities::Creatures::TR5
 						if (creature->Mood == MoodType::Bored ||
 							(item->AIBits & FOLLOW && (creature->ReachedGoal || distance > pow(BLOCK(2), 2))))
 						{
-							if (item->Animation.RequiredState != NO_STATE)
+							if (item->Animation.RequiredState != NO_VALUE)
 								item->Animation.TargetState = item->Animation.RequiredState;
 							else if (Random::TestProbability(1 / 64.0f))
 								item->Animation.TargetState = GLADIATOR_STATE_IDLE;
@@ -336,7 +337,7 @@ namespace TEN::Entities::Creatures::TR5
 
 					auto pos = GetJointPosition(item, 16);
 
-					auto* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
+					auto* floor = GetSector(room, pos.x - room->Position.x, pos.z - room->Position.z);
 					if (floor->Stopper)
 					{
 						for (int i = 0; i < room->mesh.size(); i++)

@@ -1,3 +1,7 @@
 #pragma once
 
-void InitializeRomeHammer(short itemNumber);
+namespace TEN::Entities::Traps
+{
+	void InitializeRomeHammer(short itemNumber);
+	void ControlRomeHammer(short itemNumber);
+}

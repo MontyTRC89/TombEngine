@@ -59,10 +59,6 @@ struct Motorboat;
 struct MotorboatBuilder;
 struct MotorboatT;
 
-struct GameVector;
-struct GameVectorBuilder;
-struct GameVectorT;
-
 struct Wraith;
 struct WraithBuilder;
 struct WraithT;
@@ -111,6 +107,8 @@ struct Vector3;
 
 struct Vector4;
 
+struct GameVector;
+
 enum class ItemData : uint8_t {
   NONE = 0,
   Int = 1,
@@ -130,16 +128,15 @@ enum class ItemData : uint8_t {
   Skidoo = 15,
   UPV = 16,
   Motorboat = 17,
-  GameVector = 18,
-  Wraith = 19,
-  Rubberboat = 20,
-  Pushable = 21,
-  Minecart = 22,
+  Wraith = 18,
+  Rubberboat = 19,
+  Pushable = 20,
+  Minecart = 21,
   MIN = NONE,
   MAX = Minecart
 };
 
-inline const ItemData (&EnumValuesItemData())[23] {
+inline const ItemData (&EnumValuesItemData())[22] {
   static const ItemData values[] = {
     ItemData::NONE,
     ItemData::Int,
@@ -159,7 +156,6 @@ inline const ItemData (&EnumValuesItemData())[23] {
     ItemData::Skidoo,
     ItemData::UPV,
     ItemData::Motorboat,
-    ItemData::GameVector,
     ItemData::Wraith,
     ItemData::Rubberboat,
     ItemData::Pushable,
@@ -169,7 +165,7 @@ inline const ItemData (&EnumValuesItemData())[23] {
 }
 
 inline const char * const *EnumNamesItemData() {
-  static const char * const names[24] = {
+  static const char * const names[23] = {
     "NONE",
     "Int",
     "Short",
@@ -188,7 +184,6 @@ inline const char * const *EnumNamesItemData() {
     "Skidoo",
     "UPV",
     "Motorboat",
-    "GameVector",
     "Wraith",
     "Rubberboat",
     "Pushable",
@@ -274,10 +269,6 @@ template<> struct ItemDataTraits<TEN::Save::UPV> {
 
 template<> struct ItemDataTraits<TEN::Save::Motorboat> {
   static const ItemData enum_value = ItemData::Motorboat;
-};
-
-template<> struct ItemDataTraits<TEN::Save::GameVector> {
-  static const ItemData enum_value = ItemData::GameVector;
 };
 
 template<> struct ItemDataTraits<TEN::Save::Wraith> {
@@ -463,14 +454,6 @@ struct ItemDataUnion {
   const TEN::Save::MotorboatT *AsMotorboat() const {
     return type == ItemData::Motorboat ?
       reinterpret_cast<const TEN::Save::MotorboatT *>(value) : nullptr;
-  }
-  TEN::Save::GameVectorT *AsGameVector() {
-    return type == ItemData::GameVector ?
-      reinterpret_cast<TEN::Save::GameVectorT *>(value) : nullptr;
-  }
-  const TEN::Save::GameVectorT *AsGameVector() const {
-    return type == ItemData::GameVector ?
-      reinterpret_cast<const TEN::Save::GameVectorT *>(value) : nullptr;
   }
   TEN::Save::WraithT *AsWraith() {
     return type == ItemData::Wraith ?
@@ -695,6 +678,46 @@ FLATBUFFERS_STRUCT_END(Vector4, 16);
 
 struct Vector4::Traits {
   using type = Vector4;
+};
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) GameVector FLATBUFFERS_FINAL_CLASS {
+ private:
+  int32_t x_;
+  int32_t y_;
+  int32_t z_;
+  int32_t room_number_;
+
+ public:
+  struct Traits;
+  GameVector()
+      : x_(0),
+        y_(0),
+        z_(0),
+        room_number_(0) {
+  }
+  GameVector(int32_t _x, int32_t _y, int32_t _z, int32_t _room_number)
+      : x_(flatbuffers::EndianScalar(_x)),
+        y_(flatbuffers::EndianScalar(_y)),
+        z_(flatbuffers::EndianScalar(_z)),
+        room_number_(flatbuffers::EndianScalar(_room_number)) {
+  }
+  int32_t x() const {
+    return flatbuffers::EndianScalar(x_);
+  }
+  int32_t y() const {
+    return flatbuffers::EndianScalar(y_);
+  }
+  int32_t z() const {
+    return flatbuffers::EndianScalar(z_);
+  }
+  int32_t room_number() const {
+    return flatbuffers::EndianScalar(room_number_);
+  }
+};
+FLATBUFFERS_STRUCT_END(GameVector, 16);
+
+struct GameVector::Traits {
+  using type = GameVector;
 };
 
 struct CreatureTargetT : public flatbuffers::NativeTable {
@@ -2030,51 +2053,6 @@ struct Motorboat::Traits {
 };
 
 flatbuffers::Offset<Motorboat> CreateMotorboat(flatbuffers::FlatBufferBuilder &_fbb, const MotorboatT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-struct GameVectorT : public flatbuffers::NativeTable {
-  typedef GameVector TableType;
-};
-
-struct GameVector FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef GameVectorT NativeTableType;
-  typedef GameVectorBuilder Builder;
-  struct Traits;
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           verifier.EndTable();
-  }
-  GameVectorT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(GameVectorT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<GameVector> Pack(flatbuffers::FlatBufferBuilder &_fbb, const GameVectorT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct GameVectorBuilder {
-  typedef GameVector Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  explicit GameVectorBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<GameVector> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<GameVector>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<GameVector> CreateGameVector(
-    flatbuffers::FlatBufferBuilder &_fbb) {
-  GameVectorBuilder builder_(_fbb);
-  return builder_.Finish();
-}
-
-struct GameVector::Traits {
-  using type = GameVector;
-  static auto constexpr Create = CreateGameVector;
-};
-
-flatbuffers::Offset<GameVector> CreateGameVector(flatbuffers::FlatBufferBuilder &_fbb, const GameVectorT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct WraithT : public flatbuffers::NativeTable {
   typedef Wraith TableType;
@@ -3442,29 +3420,6 @@ inline flatbuffers::Offset<Motorboat> CreateMotorboat(flatbuffers::FlatBufferBui
       _fbb);
 }
 
-inline GameVectorT *GameVector::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<GameVectorT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void GameVector::UnPackTo(GameVectorT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-}
-
-inline flatbuffers::Offset<GameVector> GameVector::Pack(flatbuffers::FlatBufferBuilder &_fbb, const GameVectorT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateGameVector(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<GameVector> CreateGameVector(flatbuffers::FlatBufferBuilder &_fbb, const GameVectorT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const GameVectorT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  return TEN::Save::CreateGameVector(
-      _fbb);
-}
-
 inline WraithT *Wraith::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<WraithT>();
   UnPackTo(_o.get(), _resolver);
@@ -3882,10 +3837,6 @@ inline bool VerifyItemData(flatbuffers::Verifier &verifier, const void *obj, Ite
       auto ptr = reinterpret_cast<const TEN::Save::Motorboat *>(obj);
       return verifier.VerifyTable(ptr);
     }
-    case ItemData::GameVector: {
-      auto ptr = reinterpret_cast<const TEN::Save::GameVector *>(obj);
-      return verifier.VerifyTable(ptr);
-    }
     case ItemData::Wraith: {
       auto ptr = reinterpret_cast<const TEN::Save::Wraith *>(obj);
       return verifier.VerifyTable(ptr);
@@ -3988,10 +3939,6 @@ inline void *ItemDataUnion::UnPack(const void *obj, ItemData type, const flatbuf
       auto ptr = reinterpret_cast<const TEN::Save::Motorboat *>(obj);
       return ptr->UnPack(resolver);
     }
-    case ItemData::GameVector: {
-      auto ptr = reinterpret_cast<const TEN::Save::GameVector *>(obj);
-      return ptr->UnPack(resolver);
-    }
     case ItemData::Wraith: {
       auto ptr = reinterpret_cast<const TEN::Save::Wraith *>(obj);
       return ptr->UnPack(resolver);
@@ -4082,10 +4029,6 @@ inline flatbuffers::Offset<void> ItemDataUnion::Pack(flatbuffers::FlatBufferBuil
       auto ptr = reinterpret_cast<const TEN::Save::MotorboatT *>(value);
       return CreateMotorboat(_fbb, ptr, _rehasher).Union();
     }
-    case ItemData::GameVector: {
-      auto ptr = reinterpret_cast<const TEN::Save::GameVectorT *>(value);
-      return CreateGameVector(_fbb, ptr, _rehasher).Union();
-    }
     case ItemData::Wraith: {
       auto ptr = reinterpret_cast<const TEN::Save::WraithT *>(value);
       return CreateWraith(_fbb, ptr, _rehasher).Union();
@@ -4174,10 +4117,6 @@ inline ItemDataUnion::ItemDataUnion(const ItemDataUnion &u) : type(u.type), valu
     }
     case ItemData::Motorboat: {
       value = new TEN::Save::MotorboatT(*reinterpret_cast<TEN::Save::MotorboatT *>(u.value));
-      break;
-    }
-    case ItemData::GameVector: {
-      value = new TEN::Save::GameVectorT(*reinterpret_cast<TEN::Save::GameVectorT *>(u.value));
       break;
     }
     case ItemData::Wraith: {
@@ -4285,11 +4224,6 @@ inline void ItemDataUnion::Reset() {
     }
     case ItemData::Motorboat: {
       auto ptr = reinterpret_cast<TEN::Save::MotorboatT *>(value);
-      delete ptr;
-      break;
-    }
-    case ItemData::GameVector: {
-      auto ptr = reinterpret_cast<TEN::Save::GameVectorT *>(value);
       delete ptr;
       break;
     }

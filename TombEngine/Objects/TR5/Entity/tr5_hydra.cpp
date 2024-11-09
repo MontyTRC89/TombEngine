@@ -59,7 +59,7 @@ namespace TEN::Entities::Creatures::TR5
 	static void HydraBubblesAttack(Pose* pos, short roomNumber, int count)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
-		if (fxNumber != NO_ITEM)
+		if (fxNumber != NO_VALUE)
 		{
 			auto* fx = &EffectList[fxNumber];
 

@@ -23,6 +23,8 @@ namespace TEN::Effects::Spark
 
 			if (!s.active)
 				continue;
+			
+			s.StoreInterpolationData();
 
 			s.age += 1;
 			if (s.age > s.life)
@@ -54,7 +56,7 @@ namespace TEN::Effects::Spark
 		return SparkParticles[0];
 	}
 
-	void TriggerFlareSparkParticles(const Vector3i& pos, const Vector3i& vel, const ColorData& color, int roomNumber)
+	void TriggerFlareSparkParticles(const Vector3i& pos, const Vector3i& vel, const Color& color, int roomNumber)
 	{
 		auto& s = GetFreeSparkParticle();
 		s = {};
@@ -70,8 +72,8 @@ namespace TEN::Effects::Spark
 		v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
 		v.Normalize(v);
 		s.velocity = v *GenerateFloat(17,24);
-		s.sourceColor = Vector4::One;
-		s.destinationColor = Vector4(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, 1.0f);
+		s.sourceColor = Color(1.0f, 1.0f, 1.0f);
+		s.destinationColor = color;
 		s.active = true;
 	}
 

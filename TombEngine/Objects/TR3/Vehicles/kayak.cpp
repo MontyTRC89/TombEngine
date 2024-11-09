@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -18,6 +19,7 @@
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
@@ -31,9 +33,9 @@ namespace TEN::Entities::Vehicles
 	constexpr int KAYAK_VELOCITY_LR_ACCEL = 16 * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_VELOCITY_HOLD_TURN_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_VELOCITY_FRICTION_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
-
 	constexpr int KAYAK_VELOCITY_MAX = 56 * VEHICLE_VELOCITY_SCALE;
 
+	constexpr auto KAYAK_FLAG_PADDLE_MESH = 0x80;
 	constexpr auto KAYAK_WAKE_OFFSET = Vector3(BLOCK(0.1f), 0.0f, BLOCK(0.25f));
 
 	// TODO: Very confusing.
@@ -146,7 +148,7 @@ namespace TEN::Entities::Vehicles
 		auto* kayak = GetKayakInfo(kayakItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_ITEM)
+		if (laraItem->HitPoints < 0 || lara->Context.Vehicle != NO_VALUE)
 			return;
 
 		auto mountType = GetVehicleMountType(kayakItem, laraItem, coll, KayakMountTypes, KAYAK_MOUNT_DISTANCE, LARA_HEIGHT);
@@ -212,11 +214,25 @@ namespace TEN::Entities::Vehicles
 		int x = kayakItem->Pose.Position.x + (zOffset * sinY) + (xOffset * cosY);
 		int z = kayakItem->Pose.Position.z + (zOffset * cosY) - (xOffset * sinY);
 
-		int probedRoomNumber = GetCollision(x, kayakItem->Pose.Position.y, z, kayakItem->RoomNumber).RoomNumber;
-		int waterHeight = GetWaterHeight(x, kayakItem->Pose.Position.y, z, probedRoomNumber);
+		int probedRoomNumber = GetPointCollision(Vector3i(x, kayakItem->Pose.Position.y, z), kayakItem->RoomNumber).GetRoomNumber();
+		int waterHeight = GetPointCollision(Vector3i(x, kayakItem->Pose.Position.y, z), probedRoomNumber).GetWaterTopHeight();
 
 		//if (waterHeight != NO_HEIGHT)
 		//	SetupRipple(x, kayakItem->Pose.Position.y, z, -2 - (GetRandomControl() & 1), 0, Objects[ID_KAYAK_PADDLE_TRAIL_SPRITE].meshIndex,TO_RAD(kayakItem->Pose.Orientation.y));
+	}
+
+	void KayakPaddleTake(KayakInfo* kayak, ItemInfo* laraItem)
+	{
+		kayak->Flags |= KAYAK_FLAG_PADDLE_MESH;
+		laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
+		laraItem->MeshBits.Clear(KayakLaraLegJoints);
+	}
+
+	void KayakPaddlePut(KayakInfo* kayak, ItemInfo* laraItem)
+	{
+		kayak->Flags &= ~KAYAK_FLAG_PADDLE_MESH;
+		laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
+		laraItem->MeshBits.Set(KayakLaraLegJoints);
 	}
 
 	int KayakGetCollisionAnim(ItemInfo* kayakItem, int xDiff, int zDiff)
@@ -405,8 +421,8 @@ namespace TEN::Entities::Vehicles
 			x = 0;
 			z = 0;
 
-			auto probe = GetCollision(old->x, pos->y, pos->z, kayakItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			auto probe = GetPointCollision(Vector3i(old->x, pos->y, pos->z), kayakItem->RoomNumber);
+			if (probe.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->z > old->z)
 					z = -zShift - 1;
@@ -414,8 +430,8 @@ namespace TEN::Entities::Vehicles
 					z = BLOCK(1) - zShift;
 			}
 
-			probe = GetCollision(pos->x, pos->y, old->z, kayakItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
+			probe = GetPointCollision(Vector3i(pos->x, pos->y, old->z), kayakItem->RoomNumber);
+			if (probe.GetFloorHeight() < (old->y - CLICK(1)))
 			{
 				if (pos->x > old->x)
 					x = -xShift - 1;
@@ -533,22 +549,22 @@ namespace TEN::Entities::Vehicles
 
 		kayakItem->Pose.Orientation.y += rot;
 
-		auto probe = GetCollision(kayakItem);
-		int probedRoomNum = probe.RoomNumber;
+		auto probe = GetPointCollision(*kayakItem);
+		int probedRoomNum = probe.GetRoomNumber();
 
-		height2 = GetWaterHeight(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z, probedRoomNum);
+		height2 = GetPointCollision(kayakItem->Pose.Position, probedRoomNum).GetWaterTopHeight();
 		if (height2 == NO_HEIGHT)
-			height2 = probe.Position.Floor;
+			height2 = probe.GetFloorHeight();
 
 		if (height2 < (kayakItem->Pose.Position.y - KAYAK_COLLIDE))
 			KayakDoShift(kayakItem, (Vector3i*)&kayakItem->Pose, &oldPos[8]);
 
-		probe = GetCollision(kayakItem);
-		probedRoomNum = probe.RoomNumber;
+		probe = GetPointCollision(*kayakItem);
+		probedRoomNum = probe.GetRoomNumber();
 
-		height2 = GetWaterHeight(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z, probedRoomNum);
+		height2 = GetPointCollision(kayakItem->Pose.Position, probedRoomNum).GetWaterTopHeight();
 		if (height2 == NO_HEIGHT)
-			height2 = probe.Position.Floor;
+			height2 = probe.GetFloorHeight();
 
 		if (height2 == NO_HEIGHT)
 		{
@@ -895,28 +911,14 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_MOUNT_LEFT:
-			if (TestAnimNumber(*laraItem, KAYAK_ANIM_GET_PADDLE) &&
-				frame == 24 &&
-				!(kayak->Flags & 0x80))
-			{
-				kayak->Flags |= 0x80;
-				laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
-				laraItem->MeshBits.Clear(KayakLaraLegJoints);
-			}
-
+			if (TestAnimNumber(*laraItem, KAYAK_ANIM_GET_PADDLE) && frame == 24 && !(kayak->Flags & KAYAK_FLAG_PADDLE_MESH))
+				KayakPaddleTake(kayak, laraItem);
 			break;
 		
 		case KAYAK_STATE_DISMOUNT:
-			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_START) &&
-				frame == 27 &&
-				kayak->Flags & 0x80)
-			{
-				kayak->Flags &= ~0x80;
-				laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
-				laraItem->MeshBits.Set(KayakLaraLegJoints);
-			}
-
 			laraItem->Animation.TargetState = laraItem->Animation.RequiredState;
+			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_START) && frame == 27 && kayak->Flags & KAYAK_FLAG_PADDLE_MESH)
+				KayakPaddlePut(kayak, laraItem);
 			break;
 		
 		case KAYAK_STATE_DISMOUNT_LEFT:
@@ -996,19 +998,21 @@ namespace TEN::Entities::Vehicles
 
 	void KayakToItemCollision(ItemInfo* kayakItem, ItemInfo* laraItem)
 	{
-		for (auto i : g_Level.Rooms[kayakItem->RoomNumber].neighbors)
+		for (auto i : g_Level.Rooms[kayakItem->RoomNumber].NeighborRoomNumbers)
 		{
 			if (!g_Level.Rooms[i].Active())
 				continue;
 
 			short itemNum = g_Level.Rooms[i].itemNumber;
 
-			while (itemNum != NO_ITEM)
+			while (itemNum != NO_VALUE)
 			{
 				auto* item = &g_Level.Items[itemNum];
 				short nextItem = item->NextItem;
 
-				if (item->Collidable && item->Status != ITEM_INVISIBLE)
+				if (item->Collidable &&
+					item->Status != ITEM_INVISIBLE &&
+					item != laraItem && item != kayakItem)
 				{
 					auto* object = &Objects[item->ObjectNumber];
 
@@ -1079,13 +1083,13 @@ namespace TEN::Entities::Vehicles
 		KayakToBackground(kayakItem, laraItem);
 		TestTriggers(kayakItem, false);
 
-		auto probe = GetCollision(kayakItem);
-		int water = GetWaterHeight(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z, probe.RoomNumber);
+		auto probe = GetPointCollision(*kayakItem);
+		int water = GetPointCollision(kayakItem->Pose.Position, probe.GetRoomNumber()).GetWaterTopHeight();
 		kayak->WaterHeight = water;
 
 		if (kayak->WaterHeight == NO_HEIGHT)
 		{
-			water = probe.Position.Floor;
+			water = probe.GetFloorHeight();
 			kayak->WaterHeight = water;
 			kayak->TrueWater = false;
 		}
@@ -1104,12 +1108,12 @@ namespace TEN::Entities::Vehicles
 				DoDamage(laraItem, (damage - 160) * 8);
 		}
 
-		if (lara->Context.Vehicle != NO_ITEM)
+		if (lara->Context.Vehicle != NO_VALUE)
 		{
-			if (kayakItem->RoomNumber != probe.RoomNumber)
+			if (kayakItem->RoomNumber != probe.GetRoomNumber())
 			{
-				ItemNewRoom(lara->Context.Vehicle, probe.RoomNumber);
-				ItemNewRoom(laraItem->Index, probe.RoomNumber);
+				ItemNewRoom(lara->Context.Vehicle, probe.GetRoomNumber());
+				ItemNewRoom(laraItem->Index, probe.GetRoomNumber());
 			}
 
 			laraItem->Pose.Position = kayakItem->Pose.Position;
@@ -1127,7 +1131,7 @@ namespace TEN::Entities::Vehicles
 		if (kayak->TrueWater &&
 			(kayakItem->Animation.Velocity.z != 0.0f || lara->Context.WaterCurrentPull != Vector3i::Zero))
 		{
-			int waterHeight = GetWaterHeight(kayakItem);
+			int waterHeight = GetPointCollision(*kayakItem).GetWaterTopHeight();
 			SpawnVehicleWake(*kayakItem, KAYAK_WAKE_OFFSET, waterHeight);
 		}
 
@@ -1156,6 +1160,6 @@ namespace TEN::Entities::Vehicles
 
 		KayakToItemCollision(kayakItem, laraItem);
 
-		return (lara->Context.Vehicle != NO_ITEM) ? true : false;
+		return (lara->Context.Vehicle != NO_VALUE) ? true : false;
 	}
 }

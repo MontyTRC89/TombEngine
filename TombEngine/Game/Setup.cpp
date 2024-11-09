@@ -20,6 +20,7 @@
 #include "Objects/Generic/Traps/falling_block.h"
 #include "Objects/TR1/tr1_objects.h"
 #include "Objects/TR2/tr2_objects.h"
+#include "Objects/TR3/Entity/FishSwarm.h"
 #include "Objects/TR3/tr3_objects.h"
 #include "Objects/TR4/tr4_objects.h"
 #include "Objects/TR5/tr5_objects.h"
@@ -78,7 +79,14 @@ ObjectInfo& ObjectHandler::GetFirstAvailableObject()
 // NOTE: JointRotationFlags allows bones to be rotated with CreatureJoint().
 void ObjectInfo::SetBoneRotationFlags(int boneID, int flags)
 {
-	g_Level.Bones[boneIndex + (boneID * 4)] |= flags;
+	int index = boneIndex + (boneID * 4);
+	if (index < 0 || index >= g_Level.Bones.size())
+	{
+		TENLog("Failed to set rotation flag for bone ID " + std::to_string(boneID), LogLevel::Warning);
+		return;
+	}
+
+	g_Level.Bones[index] |= flags;
 }
 
 void ObjectInfo::SetHitEffect(HitEffect hitEffect)
@@ -126,7 +134,7 @@ void InitializeGameFlags()
 	ZeroMemory(FlipMap, MAX_FLIPMAP * sizeof(int));
 	ZeroMemory(FlipStats, MAX_FLIPMAP * sizeof(bool));
 
-	FlipEffect = -1;
+	FlipEffect = NO_VALUE;
 	FlipStatus = false;
 	Camera.underwater = false;
 }
@@ -153,6 +161,7 @@ void InitializeSpecialEffects()
 	NextBlood = 0;
 
 	TEN::Entities::TR4::ClearBeetleSwarm();
+	TEN::Entities::Creatures::TR3::ClearFishSwarm();
 }
 
 void CustomObjects()
@@ -187,7 +196,7 @@ void InitializeObjects()
 		obj->usingDrawAnimatingItem = true;
 		obj->damageType = DamageMode::Any;
 		obj->LotType = LotType::Basic;
-		obj->meshSwapSlot = NO_ITEM;
+		obj->meshSwapSlot = NO_VALUE;
 		obj->isPickup = false;
 		obj->isPuzzleHole = false;
 	}

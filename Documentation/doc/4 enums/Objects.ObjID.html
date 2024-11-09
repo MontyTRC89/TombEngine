@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.3 Lua API</title>
+    <title>TombEngine 1.5 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -49,10 +49,12 @@
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li>    <a href="../2 classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
   <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li>    <a href="../2 classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
@@ -171,7 +173,8 @@ LARA_PETROL_MESH
 LARA_DIRT_MESH
 LARA_CROWBAR_ANIM
 LARA_TORCH_ANIM
-HAIR
+HAIR_PRIMARY
+HAIR_SECONDARY
 SNOWMOBILE_LARA_ANIMS
 SNOWMOBILE
 QUAD_LARA_ANIMS
@@ -357,7 +360,7 @@ WASP_MUTANT
 SKATEBOARD
 SKATEBOARD_KID
 WINSTON
-ARMY_WINSTON
+SEAL_MUTANT
 SPRINGBOARD
 ROLLING_SPINDLE
 DISK_SHOOTER
@@ -462,9 +465,9 @@ SEARCH_OBJECT4
 SARCOPHAGUS
 ENEMY_PIECE
 EXPANDING_PLATFORM
-SQUISHY_BLOCK1
-SQUISHY_BLOCK2
-TRIPWIRE
+SQUISHY_BLOCK_HORIZONTAL
+SQUISHY_BLOCK_VERTICAL
+LASER_BEAM
 MINE_DETECTOR
 MAP
 SECRET_MAP
@@ -943,6 +946,7 @@ MESHSWAP_ROMAN_GOD1
 MESHSWAP_ROMAN_GOD2
 MESHSWAP_MONKEY_MEDIPACK
 MESHSWAP_MONKEY_KEY
+MESHSWAP_WINSTON_ARMY_OUTFIT
 ANIMATING1
 ANIMATING2
 ANIMATING3
@@ -1104,6 +1108,10 @@ HEALTH_BAR_TEXTURE
 AIR_BAR_TEXTURE
 DASH_BAR_TEXTURE
 SFX_BAR_TEXTURE
+SPEEDOMETER
+CUSTOM_BAR_GRAPHIC
+CUSTOM_AMMO_GRAPHIC
+
 PANEL_BORDER
 PANEL_MIDDLE
 PANEL_CORNER

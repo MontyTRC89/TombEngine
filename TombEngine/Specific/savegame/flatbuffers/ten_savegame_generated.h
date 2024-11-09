@@ -97,9 +97,17 @@ struct PlayerContextData;
 struct PlayerContextDataBuilder;
 struct PlayerContextDataT;
 
+struct CollisionInfoData;
+struct CollisionInfoDataBuilder;
+struct CollisionInfoDataT;
+
 struct Lara;
 struct LaraBuilder;
 struct LaraT;
+
+struct Camera;
+struct CameraBuilder;
+struct CameraT;
 
 struct FixedCamera;
 struct FixedCameraBuilder;
@@ -129,6 +137,10 @@ struct SwarmObjectInfo;
 struct SwarmObjectInfoBuilder;
 struct SwarmObjectInfoT;
 
+struct RopeSegment;
+struct RopeSegmentBuilder;
+struct RopeSegmentT;
+
 struct Rope;
 struct RopeBuilder;
 struct RopeT;
@@ -148,6 +160,10 @@ struct VolumeStateT;
 struct Volume;
 struct VolumeBuilder;
 struct VolumeT;
+
+struct FishData;
+struct FishDataBuilder;
+struct FishDataT;
 
 struct KeyValPair;
 
@@ -859,9 +875,6 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Motorboat *data_as_Motorboat() const {
     return data_type() == TEN::Save::ItemData::Motorboat ? static_cast<const TEN::Save::Motorboat *>(data()) : nullptr;
   }
-  const TEN::Save::GameVector *data_as_GameVector() const {
-    return data_type() == TEN::Save::ItemData::GameVector ? static_cast<const TEN::Save::GameVector *>(data()) : nullptr;
-  }
   const TEN::Save::Wraith *data_as_Wraith() const {
     return data_type() == TEN::Save::ItemData::Wraith ? static_cast<const TEN::Save::Wraith *>(data()) : nullptr;
   }
@@ -1038,10 +1051,6 @@ template<> inline const TEN::Save::UPV *Item::data_as<TEN::Save::UPV>() const {
 
 template<> inline const TEN::Save::Motorboat *Item::data_as<TEN::Save::Motorboat>() const {
   return data_as_Motorboat();
-}
-
-template<> inline const TEN::Save::GameVector *Item::data_as<TEN::Save::GameVector>() const {
-  return data_as_GameVector();
 }
 
 template<> inline const TEN::Save::Wraith *Item::data_as<TEN::Save::Wraith>() const {
@@ -4045,11 +4054,81 @@ struct PlayerContextData::Traits {
 
 flatbuffers::Offset<PlayerContextData> CreatePlayerContextData(flatbuffers::FlatBufferBuilder &_fbb, const PlayerContextDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct CollisionInfoDataT : public flatbuffers::NativeTable {
+  typedef CollisionInfoData TableType;
+  int32_t last_bridge_item_number = 0;
+  std::unique_ptr<TEN::Save::Pose> last_bridge_item_pose{};
+};
+
+struct CollisionInfoData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef CollisionInfoDataT NativeTableType;
+  typedef CollisionInfoDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_LAST_BRIDGE_ITEM_NUMBER = 4,
+    VT_LAST_BRIDGE_ITEM_POSE = 6
+  };
+  int32_t last_bridge_item_number() const {
+    return GetField<int32_t>(VT_LAST_BRIDGE_ITEM_NUMBER, 0);
+  }
+  const TEN::Save::Pose *last_bridge_item_pose() const {
+    return GetStruct<const TEN::Save::Pose *>(VT_LAST_BRIDGE_ITEM_POSE);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_LAST_BRIDGE_ITEM_NUMBER) &&
+           VerifyField<TEN::Save::Pose>(verifier, VT_LAST_BRIDGE_ITEM_POSE) &&
+           verifier.EndTable();
+  }
+  CollisionInfoDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(CollisionInfoDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<CollisionInfoData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct CollisionInfoDataBuilder {
+  typedef CollisionInfoData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_last_bridge_item_number(int32_t last_bridge_item_number) {
+    fbb_.AddElement<int32_t>(CollisionInfoData::VT_LAST_BRIDGE_ITEM_NUMBER, last_bridge_item_number, 0);
+  }
+  void add_last_bridge_item_pose(const TEN::Save::Pose *last_bridge_item_pose) {
+    fbb_.AddStruct(CollisionInfoData::VT_LAST_BRIDGE_ITEM_POSE, last_bridge_item_pose);
+  }
+  explicit CollisionInfoDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<CollisionInfoData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<CollisionInfoData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<CollisionInfoData> CreateCollisionInfoData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t last_bridge_item_number = 0,
+    const TEN::Save::Pose *last_bridge_item_pose = 0) {
+  CollisionInfoDataBuilder builder_(_fbb);
+  builder_.add_last_bridge_item_pose(last_bridge_item_pose);
+  builder_.add_last_bridge_item_number(last_bridge_item_number);
+  return builder_.Finish();
+}
+
+struct CollisionInfoData::Traits {
+  using type = CollisionInfoData;
+  static auto constexpr Create = CreateCollisionInfoData;
+};
+
+flatbuffers::Offset<CollisionInfoData> CreateCollisionInfoData(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct LaraT : public flatbuffers::NativeTable {
   typedef Lara TableType;
   std::unique_ptr<TEN::Save::PlayerContextDataT> context{};
   std::unique_ptr<TEN::Save::LaraControlDataT> control{};
   std::unique_ptr<TEN::Save::PlayerEffectDataT> effect{};
+  std::unique_ptr<TEN::Save::CollisionInfoDataT> collision{};
   int32_t extra_anim = 0;
   std::unique_ptr<TEN::Save::EulerAngles> extra_head_rot{};
   std::unique_ptr<TEN::Save::EulerAngles> extra_torso_rot{};
@@ -4077,23 +4156,24 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_CONTEXT = 4,
     VT_CONTROL = 6,
     VT_EFFECT = 8,
-    VT_EXTRA_ANIM = 10,
-    VT_EXTRA_HEAD_ROT = 12,
-    VT_EXTRA_TORSO_ROT = 14,
-    VT_FLARE = 16,
-    VT_HIGHEST_LOCATION = 18,
-    VT_HIT_DIRECTION = 20,
-    VT_HIT_FRAME = 22,
-    VT_INVENTORY = 24,
-    VT_LEFT_ARM = 26,
-    VT_LOCATION = 28,
-    VT_LOCATION_PAD = 30,
-    VT_RIGHT_ARM = 32,
-    VT_STATUS = 34,
-    VT_TARGET_ARM_ORIENT = 36,
-    VT_TARGET_ENTITY_NUMBER = 38,
-    VT_TORCH = 40,
-    VT_WEAPONS = 42
+    VT_COLLISION = 10,
+    VT_EXTRA_ANIM = 12,
+    VT_EXTRA_HEAD_ROT = 14,
+    VT_EXTRA_TORSO_ROT = 16,
+    VT_FLARE = 18,
+    VT_HIGHEST_LOCATION = 20,
+    VT_HIT_DIRECTION = 22,
+    VT_HIT_FRAME = 24,
+    VT_INVENTORY = 26,
+    VT_LEFT_ARM = 28,
+    VT_LOCATION = 30,
+    VT_LOCATION_PAD = 32,
+    VT_RIGHT_ARM = 34,
+    VT_STATUS = 36,
+    VT_TARGET_ARM_ORIENT = 38,
+    VT_TARGET_ENTITY_NUMBER = 40,
+    VT_TORCH = 42,
+    VT_WEAPONS = 44
   };
   const TEN::Save::PlayerContextData *context() const {
     return GetPointer<const TEN::Save::PlayerContextData *>(VT_CONTEXT);
@@ -4103,6 +4183,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::PlayerEffectData *effect() const {
     return GetPointer<const TEN::Save::PlayerEffectData *>(VT_EFFECT);
+  }
+  const TEN::Save::CollisionInfoData *collision() const {
+    return GetPointer<const TEN::Save::CollisionInfoData *>(VT_COLLISION);
   }
   int32_t extra_anim() const {
     return GetField<int32_t>(VT_EXTRA_ANIM, 0);
@@ -4163,6 +4246,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(control()) &&
            VerifyOffset(verifier, VT_EFFECT) &&
            verifier.VerifyTable(effect()) &&
+           VerifyOffset(verifier, VT_COLLISION) &&
+           verifier.VerifyTable(collision()) &&
            VerifyField<int32_t>(verifier, VT_EXTRA_ANIM) &&
            VerifyField<TEN::Save::EulerAngles>(verifier, VT_EXTRA_HEAD_ROT) &&
            VerifyField<TEN::Save::EulerAngles>(verifier, VT_EXTRA_TORSO_ROT) &&
@@ -4207,6 +4292,9 @@ struct LaraBuilder {
   }
   void add_effect(flatbuffers::Offset<TEN::Save::PlayerEffectData> effect) {
     fbb_.AddOffset(Lara::VT_EFFECT, effect);
+  }
+  void add_collision(flatbuffers::Offset<TEN::Save::CollisionInfoData> collision) {
+    fbb_.AddOffset(Lara::VT_COLLISION, collision);
   }
   void add_extra_anim(int32_t extra_anim) {
     fbb_.AddElement<int32_t>(Lara::VT_EXTRA_ANIM, extra_anim, 0);
@@ -4275,6 +4363,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     flatbuffers::Offset<TEN::Save::PlayerContextData> context = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
     flatbuffers::Offset<TEN::Save::PlayerEffectData> effect = 0,
+    flatbuffers::Offset<TEN::Save::CollisionInfoData> collision = 0,
     int32_t extra_anim = 0,
     const TEN::Save::EulerAngles *extra_head_rot = 0,
     const TEN::Save::EulerAngles *extra_torso_rot = 0,
@@ -4310,6 +4399,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_extra_torso_rot(extra_torso_rot);
   builder_.add_extra_head_rot(extra_head_rot);
   builder_.add_extra_anim(extra_anim);
+  builder_.add_collision(collision);
   builder_.add_effect(effect);
   builder_.add_control(control);
   builder_.add_context(context);
@@ -4326,6 +4416,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     flatbuffers::Offset<TEN::Save::PlayerContextData> context = 0,
     flatbuffers::Offset<TEN::Save::LaraControlData> control = 0,
     flatbuffers::Offset<TEN::Save::PlayerEffectData> effect = 0,
+    flatbuffers::Offset<TEN::Save::CollisionInfoData> collision = 0,
     int32_t extra_anim = 0,
     const TEN::Save::EulerAngles *extra_head_rot = 0,
     const TEN::Save::EulerAngles *extra_torso_rot = 0,
@@ -4349,6 +4440,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       context,
       control,
       effect,
+      collision,
       extra_anim,
       extra_head_rot,
       extra_torso_rot,
@@ -4369,6 +4461,75 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
 }
 
 flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb, const LaraT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct CameraT : public flatbuffers::NativeTable {
+  typedef Camera TableType;
+  std::unique_ptr<TEN::Save::GameVector> position{};
+  std::unique_ptr<TEN::Save::GameVector> target{};
+};
+
+struct Camera FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef CameraT NativeTableType;
+  typedef CameraBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_POSITION = 4,
+    VT_TARGET = 6
+  };
+  const TEN::Save::GameVector *position() const {
+    return GetStruct<const TEN::Save::GameVector *>(VT_POSITION);
+  }
+  const TEN::Save::GameVector *target() const {
+    return GetStruct<const TEN::Save::GameVector *>(VT_TARGET);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<TEN::Save::GameVector>(verifier, VT_POSITION) &&
+           VerifyField<TEN::Save::GameVector>(verifier, VT_TARGET) &&
+           verifier.EndTable();
+  }
+  CameraT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(CameraT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Camera> Pack(flatbuffers::FlatBufferBuilder &_fbb, const CameraT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct CameraBuilder {
+  typedef Camera Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_position(const TEN::Save::GameVector *position) {
+    fbb_.AddStruct(Camera::VT_POSITION, position);
+  }
+  void add_target(const TEN::Save::GameVector *target) {
+    fbb_.AddStruct(Camera::VT_TARGET, target);
+  }
+  explicit CameraBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<Camera> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Camera>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Camera> CreateCamera(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const TEN::Save::GameVector *position = 0,
+    const TEN::Save::GameVector *target = 0) {
+  CameraBuilder builder_(_fbb);
+  builder_.add_target(target);
+  builder_.add_position(position);
+  return builder_.Finish();
+}
+
+struct Camera::Traits {
+  using type = Camera;
+  static auto constexpr Create = CreateCamera;
+};
+
+flatbuffers::Offset<Camera> CreateCamera(flatbuffers::FlatBufferBuilder &_fbb, const CameraT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct FixedCameraT : public flatbuffers::NativeTable {
   typedef FixedCamera TableType;
@@ -5294,14 +5455,112 @@ struct SwarmObjectInfo::Traits {
 
 flatbuffers::Offset<SwarmObjectInfo> CreateSwarmObjectInfo(flatbuffers::FlatBufferBuilder &_fbb, const SwarmObjectInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct RopeSegmentT : public flatbuffers::NativeTable {
+  typedef RopeSegment TableType;
+  std::unique_ptr<TEN::Save::Vector3> segment{};
+  std::unique_ptr<TEN::Save::Vector3> velocity{};
+  std::unique_ptr<TEN::Save::Vector3> normalised_segment{};
+  std::unique_ptr<TEN::Save::Vector3> mesh_segment{};
+  std::unique_ptr<TEN::Save::Vector3> coord{};
+};
+
+struct RopeSegment FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef RopeSegmentT NativeTableType;
+  typedef RopeSegmentBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SEGMENT = 4,
+    VT_VELOCITY = 6,
+    VT_NORMALISED_SEGMENT = 8,
+    VT_MESH_SEGMENT = 10,
+    VT_COORD = 12
+  };
+  const TEN::Save::Vector3 *segment() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_SEGMENT);
+  }
+  const TEN::Save::Vector3 *velocity() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_VELOCITY);
+  }
+  const TEN::Save::Vector3 *normalised_segment() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_NORMALISED_SEGMENT);
+  }
+  const TEN::Save::Vector3 *mesh_segment() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_MESH_SEGMENT);
+  }
+  const TEN::Save::Vector3 *coord() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_COORD);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_SEGMENT) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_VELOCITY) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_NORMALISED_SEGMENT) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_MESH_SEGMENT) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_COORD) &&
+           verifier.EndTable();
+  }
+  RopeSegmentT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(RopeSegmentT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<RopeSegment> Pack(flatbuffers::FlatBufferBuilder &_fbb, const RopeSegmentT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct RopeSegmentBuilder {
+  typedef RopeSegment Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_segment(const TEN::Save::Vector3 *segment) {
+    fbb_.AddStruct(RopeSegment::VT_SEGMENT, segment);
+  }
+  void add_velocity(const TEN::Save::Vector3 *velocity) {
+    fbb_.AddStruct(RopeSegment::VT_VELOCITY, velocity);
+  }
+  void add_normalised_segment(const TEN::Save::Vector3 *normalised_segment) {
+    fbb_.AddStruct(RopeSegment::VT_NORMALISED_SEGMENT, normalised_segment);
+  }
+  void add_mesh_segment(const TEN::Save::Vector3 *mesh_segment) {
+    fbb_.AddStruct(RopeSegment::VT_MESH_SEGMENT, mesh_segment);
+  }
+  void add_coord(const TEN::Save::Vector3 *coord) {
+    fbb_.AddStruct(RopeSegment::VT_COORD, coord);
+  }
+  explicit RopeSegmentBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<RopeSegment> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<RopeSegment>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<RopeSegment> CreateRopeSegment(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const TEN::Save::Vector3 *segment = 0,
+    const TEN::Save::Vector3 *velocity = 0,
+    const TEN::Save::Vector3 *normalised_segment = 0,
+    const TEN::Save::Vector3 *mesh_segment = 0,
+    const TEN::Save::Vector3 *coord = 0) {
+  RopeSegmentBuilder builder_(_fbb);
+  builder_.add_coord(coord);
+  builder_.add_mesh_segment(mesh_segment);
+  builder_.add_normalised_segment(normalised_segment);
+  builder_.add_velocity(velocity);
+  builder_.add_segment(segment);
+  return builder_.Finish();
+}
+
+struct RopeSegment::Traits {
+  using type = RopeSegment;
+  static auto constexpr Create = CreateRopeSegment;
+};
+
+flatbuffers::Offset<RopeSegment> CreateRopeSegment(flatbuffers::FlatBufferBuilder &_fbb, const RopeSegmentT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct RopeT : public flatbuffers::NativeTable {
   typedef Rope TableType;
-  std::vector<TEN::Save::Vector3> segments{};
-  std::vector<TEN::Save::Vector3> velocities{};
-  std::vector<TEN::Save::Vector3> normalised_segments{};
-  std::vector<TEN::Save::Vector3> mesh_segments{};
+  std::vector<std::unique_ptr<TEN::Save::RopeSegmentT>> segments{};
   std::unique_ptr<TEN::Save::Vector3> position{};
-  std::vector<TEN::Save::Vector3> coords{};
   int32_t segment_length = 0;
   int32_t active = 0;
   int32_t coiled = 0;
@@ -5313,32 +5572,16 @@ struct Rope FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SEGMENTS = 4,
-    VT_VELOCITIES = 6,
-    VT_NORMALISED_SEGMENTS = 8,
-    VT_MESH_SEGMENTS = 10,
-    VT_POSITION = 12,
-    VT_COORDS = 14,
-    VT_SEGMENT_LENGTH = 16,
-    VT_ACTIVE = 18,
-    VT_COILED = 20
+    VT_POSITION = 6,
+    VT_SEGMENT_LENGTH = 8,
+    VT_ACTIVE = 10,
+    VT_COILED = 12
   };
-  const flatbuffers::Vector<const TEN::Save::Vector3 *> *segments() const {
-    return GetPointer<const flatbuffers::Vector<const TEN::Save::Vector3 *> *>(VT_SEGMENTS);
-  }
-  const flatbuffers::Vector<const TEN::Save::Vector3 *> *velocities() const {
-    return GetPointer<const flatbuffers::Vector<const TEN::Save::Vector3 *> *>(VT_VELOCITIES);
-  }
-  const flatbuffers::Vector<const TEN::Save::Vector3 *> *normalised_segments() const {
-    return GetPointer<const flatbuffers::Vector<const TEN::Save::Vector3 *> *>(VT_NORMALISED_SEGMENTS);
-  }
-  const flatbuffers::Vector<const TEN::Save::Vector3 *> *mesh_segments() const {
-    return GetPointer<const flatbuffers::Vector<const TEN::Save::Vector3 *> *>(VT_MESH_SEGMENTS);
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RopeSegment>> *segments() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RopeSegment>> *>(VT_SEGMENTS);
   }
   const TEN::Save::Vector3 *position() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_POSITION);
-  }
-  const flatbuffers::Vector<const TEN::Save::Vector3 *> *coords() const {
-    return GetPointer<const flatbuffers::Vector<const TEN::Save::Vector3 *> *>(VT_COORDS);
   }
   int32_t segment_length() const {
     return GetField<int32_t>(VT_SEGMENT_LENGTH, 0);
@@ -5353,15 +5596,8 @@ struct Rope FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_SEGMENTS) &&
            verifier.VerifyVector(segments()) &&
-           VerifyOffset(verifier, VT_VELOCITIES) &&
-           verifier.VerifyVector(velocities()) &&
-           VerifyOffset(verifier, VT_NORMALISED_SEGMENTS) &&
-           verifier.VerifyVector(normalised_segments()) &&
-           VerifyOffset(verifier, VT_MESH_SEGMENTS) &&
-           verifier.VerifyVector(mesh_segments()) &&
+           verifier.VerifyVectorOfTables(segments()) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION) &&
-           VerifyOffset(verifier, VT_COORDS) &&
-           verifier.VerifyVector(coords()) &&
            VerifyField<int32_t>(verifier, VT_SEGMENT_LENGTH) &&
            VerifyField<int32_t>(verifier, VT_ACTIVE) &&
            VerifyField<int32_t>(verifier, VT_COILED) &&
@@ -5376,23 +5612,11 @@ struct RopeBuilder {
   typedef Rope Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_segments(flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> segments) {
+  void add_segments(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RopeSegment>>> segments) {
     fbb_.AddOffset(Rope::VT_SEGMENTS, segments);
-  }
-  void add_velocities(flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> velocities) {
-    fbb_.AddOffset(Rope::VT_VELOCITIES, velocities);
-  }
-  void add_normalised_segments(flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> normalised_segments) {
-    fbb_.AddOffset(Rope::VT_NORMALISED_SEGMENTS, normalised_segments);
-  }
-  void add_mesh_segments(flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> mesh_segments) {
-    fbb_.AddOffset(Rope::VT_MESH_SEGMENTS, mesh_segments);
   }
   void add_position(const TEN::Save::Vector3 *position) {
     fbb_.AddStruct(Rope::VT_POSITION, position);
-  }
-  void add_coords(flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> coords) {
-    fbb_.AddOffset(Rope::VT_COORDS, coords);
   }
   void add_segment_length(int32_t segment_length) {
     fbb_.AddElement<int32_t>(Rope::VT_SEGMENT_LENGTH, segment_length, 0);
@@ -5416,12 +5640,8 @@ struct RopeBuilder {
 
 inline flatbuffers::Offset<Rope> CreateRope(
     flatbuffers::FlatBufferBuilder &_fbb,
-    flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> segments = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> velocities = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> normalised_segments = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> mesh_segments = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RopeSegment>>> segments = 0,
     const TEN::Save::Vector3 *position = 0,
-    flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::Vector3 *>> coords = 0,
     int32_t segment_length = 0,
     int32_t active = 0,
     int32_t coiled = 0) {
@@ -5429,11 +5649,7 @@ inline flatbuffers::Offset<Rope> CreateRope(
   builder_.add_coiled(coiled);
   builder_.add_active(active);
   builder_.add_segment_length(segment_length);
-  builder_.add_coords(coords);
   builder_.add_position(position);
-  builder_.add_mesh_segments(mesh_segments);
-  builder_.add_normalised_segments(normalised_segments);
-  builder_.add_velocities(velocities);
   builder_.add_segments(segments);
   return builder_.Finish();
 }
@@ -5445,28 +5661,16 @@ struct Rope::Traits {
 
 inline flatbuffers::Offset<Rope> CreateRopeDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<TEN::Save::Vector3> *segments = nullptr,
-    const std::vector<TEN::Save::Vector3> *velocities = nullptr,
-    const std::vector<TEN::Save::Vector3> *normalised_segments = nullptr,
-    const std::vector<TEN::Save::Vector3> *mesh_segments = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::RopeSegment>> *segments = nullptr,
     const TEN::Save::Vector3 *position = 0,
-    const std::vector<TEN::Save::Vector3> *coords = nullptr,
     int32_t segment_length = 0,
     int32_t active = 0,
     int32_t coiled = 0) {
-  auto segments__ = segments ? _fbb.CreateVectorOfStructs<TEN::Save::Vector3>(*segments) : 0;
-  auto velocities__ = velocities ? _fbb.CreateVectorOfStructs<TEN::Save::Vector3>(*velocities) : 0;
-  auto normalised_segments__ = normalised_segments ? _fbb.CreateVectorOfStructs<TEN::Save::Vector3>(*normalised_segments) : 0;
-  auto mesh_segments__ = mesh_segments ? _fbb.CreateVectorOfStructs<TEN::Save::Vector3>(*mesh_segments) : 0;
-  auto coords__ = coords ? _fbb.CreateVectorOfStructs<TEN::Save::Vector3>(*coords) : 0;
+  auto segments__ = segments ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::RopeSegment>>(*segments) : 0;
   return TEN::Save::CreateRope(
       _fbb,
       segments__,
-      velocities__,
-      normalised_segments__,
-      mesh_segments__,
       position,
-      coords__,
       segment_length,
       active,
       coiled);
@@ -5876,6 +6080,185 @@ inline flatbuffers::Offset<Volume> CreateVolumeDirect(
 }
 
 flatbuffers::Offset<Volume> CreateVolume(flatbuffers::FlatBufferBuilder &_fbb, const VolumeT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct FishDataT : public flatbuffers::NativeTable {
+  typedef FishData TableType;
+  bool is_patrolling = false;
+  bool is_lethal = false;
+  int32_t leader_item_number = 0;
+  float life = 0.0f;
+  int32_t mesh_index = 0;
+  std::unique_ptr<TEN::Save::EulerAngles> orientation{};
+  std::unique_ptr<TEN::Save::Vector3> position{};
+  std::unique_ptr<TEN::Save::Vector3> position_target{};
+  int32_t room_number = 0;
+  int32_t target_item_number = 0;
+  float undulation = 0.0f;
+  float velocity = 0.0f;
+};
+
+struct FishData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FishDataT NativeTableType;
+  typedef FishDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_IS_PATROLLING = 4,
+    VT_IS_LETHAL = 6,
+    VT_LEADER_ITEM_NUMBER = 8,
+    VT_LIFE = 10,
+    VT_MESH_INDEX = 12,
+    VT_ORIENTATION = 14,
+    VT_POSITION = 16,
+    VT_POSITION_TARGET = 18,
+    VT_ROOM_NUMBER = 20,
+    VT_TARGET_ITEM_NUMBER = 22,
+    VT_UNDULATION = 24,
+    VT_VELOCITY = 26
+  };
+  bool is_patrolling() const {
+    return GetField<uint8_t>(VT_IS_PATROLLING, 0) != 0;
+  }
+  bool is_lethal() const {
+    return GetField<uint8_t>(VT_IS_LETHAL, 0) != 0;
+  }
+  int32_t leader_item_number() const {
+    return GetField<int32_t>(VT_LEADER_ITEM_NUMBER, 0);
+  }
+  float life() const {
+    return GetField<float>(VT_LIFE, 0.0f);
+  }
+  int32_t mesh_index() const {
+    return GetField<int32_t>(VT_MESH_INDEX, 0);
+  }
+  const TEN::Save::EulerAngles *orientation() const {
+    return GetStruct<const TEN::Save::EulerAngles *>(VT_ORIENTATION);
+  }
+  const TEN::Save::Vector3 *position() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_POSITION);
+  }
+  const TEN::Save::Vector3 *position_target() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_POSITION_TARGET);
+  }
+  int32_t room_number() const {
+    return GetField<int32_t>(VT_ROOM_NUMBER, 0);
+  }
+  int32_t target_item_number() const {
+    return GetField<int32_t>(VT_TARGET_ITEM_NUMBER, 0);
+  }
+  float undulation() const {
+    return GetField<float>(VT_UNDULATION, 0.0f);
+  }
+  float velocity() const {
+    return GetField<float>(VT_VELOCITY, 0.0f);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_IS_PATROLLING) &&
+           VerifyField<uint8_t>(verifier, VT_IS_LETHAL) &&
+           VerifyField<int32_t>(verifier, VT_LEADER_ITEM_NUMBER) &&
+           VerifyField<float>(verifier, VT_LIFE) &&
+           VerifyField<int32_t>(verifier, VT_MESH_INDEX) &&
+           VerifyField<TEN::Save::EulerAngles>(verifier, VT_ORIENTATION) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION_TARGET) &&
+           VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
+           VerifyField<int32_t>(verifier, VT_TARGET_ITEM_NUMBER) &&
+           VerifyField<float>(verifier, VT_UNDULATION) &&
+           VerifyField<float>(verifier, VT_VELOCITY) &&
+           verifier.EndTable();
+  }
+  FishDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FishDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<FishData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FishDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct FishDataBuilder {
+  typedef FishData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_is_patrolling(bool is_patrolling) {
+    fbb_.AddElement<uint8_t>(FishData::VT_IS_PATROLLING, static_cast<uint8_t>(is_patrolling), 0);
+  }
+  void add_is_lethal(bool is_lethal) {
+    fbb_.AddElement<uint8_t>(FishData::VT_IS_LETHAL, static_cast<uint8_t>(is_lethal), 0);
+  }
+  void add_leader_item_number(int32_t leader_item_number) {
+    fbb_.AddElement<int32_t>(FishData::VT_LEADER_ITEM_NUMBER, leader_item_number, 0);
+  }
+  void add_life(float life) {
+    fbb_.AddElement<float>(FishData::VT_LIFE, life, 0.0f);
+  }
+  void add_mesh_index(int32_t mesh_index) {
+    fbb_.AddElement<int32_t>(FishData::VT_MESH_INDEX, mesh_index, 0);
+  }
+  void add_orientation(const TEN::Save::EulerAngles *orientation) {
+    fbb_.AddStruct(FishData::VT_ORIENTATION, orientation);
+  }
+  void add_position(const TEN::Save::Vector3 *position) {
+    fbb_.AddStruct(FishData::VT_POSITION, position);
+  }
+  void add_position_target(const TEN::Save::Vector3 *position_target) {
+    fbb_.AddStruct(FishData::VT_POSITION_TARGET, position_target);
+  }
+  void add_room_number(int32_t room_number) {
+    fbb_.AddElement<int32_t>(FishData::VT_ROOM_NUMBER, room_number, 0);
+  }
+  void add_target_item_number(int32_t target_item_number) {
+    fbb_.AddElement<int32_t>(FishData::VT_TARGET_ITEM_NUMBER, target_item_number, 0);
+  }
+  void add_undulation(float undulation) {
+    fbb_.AddElement<float>(FishData::VT_UNDULATION, undulation, 0.0f);
+  }
+  void add_velocity(float velocity) {
+    fbb_.AddElement<float>(FishData::VT_VELOCITY, velocity, 0.0f);
+  }
+  explicit FishDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<FishData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FishData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FishData> CreateFishData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    bool is_patrolling = false,
+    bool is_lethal = false,
+    int32_t leader_item_number = 0,
+    float life = 0.0f,
+    int32_t mesh_index = 0,
+    const TEN::Save::EulerAngles *orientation = 0,
+    const TEN::Save::Vector3 *position = 0,
+    const TEN::Save::Vector3 *position_target = 0,
+    int32_t room_number = 0,
+    int32_t target_item_number = 0,
+    float undulation = 0.0f,
+    float velocity = 0.0f) {
+  FishDataBuilder builder_(_fbb);
+  builder_.add_velocity(velocity);
+  builder_.add_undulation(undulation);
+  builder_.add_target_item_number(target_item_number);
+  builder_.add_room_number(room_number);
+  builder_.add_position_target(position_target);
+  builder_.add_position(position);
+  builder_.add_orientation(orientation);
+  builder_.add_mesh_index(mesh_index);
+  builder_.add_life(life);
+  builder_.add_leader_item_number(leader_item_number);
+  builder_.add_is_lethal(is_lethal);
+  builder_.add_is_patrolling(is_patrolling);
+  return builder_.Finish();
+}
+
+struct FishData::Traits {
+  using type = FishData;
+  static auto constexpr Create = CreateFishData;
+};
+
+flatbuffers::Offset<FishData> CreateFishData(flatbuffers::FlatBufferBuilder &_fbb, const FishDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct ScriptTableT : public flatbuffers::NativeTable {
   typedef ScriptTable TableType;
@@ -6919,12 +7302,14 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::SaveGameHeaderT> header{};
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> game{};
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> level{};
+  std::unique_ptr<TEN::Save::CameraT> camera{};
   std::unique_ptr<TEN::Save::LaraT> lara{};
   std::vector<std::unique_ptr<TEN::Save::RoomT>> rooms{};
   std::vector<std::unique_ptr<TEN::Save::ItemT>> items{};
   int32_t next_item_free = 0;
   int32_t next_item_active = 0;
   std::vector<int32_t> room_items{};
+  std::vector<std::unique_ptr<TEN::Save::FishDataT>> fish_swarm{};
   std::vector<std::unique_ptr<TEN::Save::FXInfoT>> fxinfos{};
   int32_t next_fx_free = 0;
   int32_t next_fx_active = 0;
@@ -6977,54 +7362,56 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HEADER = 4,
     VT_GAME = 6,
     VT_LEVEL = 8,
-    VT_LARA = 10,
-    VT_ROOMS = 12,
-    VT_ITEMS = 14,
-    VT_NEXT_ITEM_FREE = 16,
-    VT_NEXT_ITEM_ACTIVE = 18,
-    VT_ROOM_ITEMS = 20,
-    VT_FXINFOS = 22,
-    VT_NEXT_FX_FREE = 24,
-    VT_NEXT_FX_ACTIVE = 26,
-    VT_FIXED_CAMERAS = 28,
-    VT_SINKS = 30,
-    VT_STATIC_MESHES = 32,
-    VT_FLYBY_CAMERAS = 34,
-    VT_PARTICLES = 36,
-    VT_RATS = 38,
-    VT_SPIDERS = 40,
-    VT_SCARABS = 42,
-    VT_BATS = 44,
-    VT_FLIP_MAPS = 46,
-    VT_FLIP_STATS = 48,
-    VT_FLIP_EFFECT = 50,
-    VT_FLIP_TIMER = 52,
-    VT_FLIP_STATUS = 54,
-    VT_CURRENT_FOV = 56,
-    VT_LAST_INV_ITEM = 58,
-    VT_ACTION_QUEUE = 60,
-    VT_SOUNDTRACKS = 62,
-    VT_CD_FLAGS = 64,
-    VT_POSTPROCESS_MODE = 66,
-    VT_POSTPROCESS_STRENGTH = 68,
-    VT_POSTPROCESS_TINT = 70,
-    VT_ROPE = 72,
-    VT_PENDULUM = 74,
-    VT_ALTERNATE_PENDULUM = 76,
-    VT_VOLUMES = 78,
-    VT_GLOBAL_EVENT_SETS = 80,
-    VT_VOLUME_EVENT_SETS = 82,
-    VT_SCRIPT_VARS = 84,
-    VT_CALLBACKS_PRE_START = 86,
-    VT_CALLBACKS_POST_START = 88,
-    VT_CALLBACKS_PRE_END = 90,
-    VT_CALLBACKS_POST_END = 92,
-    VT_CALLBACKS_PRE_SAVE = 94,
-    VT_CALLBACKS_POST_SAVE = 96,
-    VT_CALLBACKS_PRE_LOAD = 98,
-    VT_CALLBACKS_POST_LOAD = 100,
-    VT_CALLBACKS_PRE_LOOP = 102,
-    VT_CALLBACKS_POST_LOOP = 104
+    VT_CAMERA = 10,
+    VT_LARA = 12,
+    VT_ROOMS = 14,
+    VT_ITEMS = 16,
+    VT_NEXT_ITEM_FREE = 18,
+    VT_NEXT_ITEM_ACTIVE = 20,
+    VT_ROOM_ITEMS = 22,
+    VT_FISH_SWARM = 24,
+    VT_FXINFOS = 26,
+    VT_NEXT_FX_FREE = 28,
+    VT_NEXT_FX_ACTIVE = 30,
+    VT_FIXED_CAMERAS = 32,
+    VT_SINKS = 34,
+    VT_STATIC_MESHES = 36,
+    VT_FLYBY_CAMERAS = 38,
+    VT_PARTICLES = 40,
+    VT_RATS = 42,
+    VT_SPIDERS = 44,
+    VT_SCARABS = 46,
+    VT_BATS = 48,
+    VT_FLIP_MAPS = 50,
+    VT_FLIP_STATS = 52,
+    VT_FLIP_EFFECT = 54,
+    VT_FLIP_TIMER = 56,
+    VT_FLIP_STATUS = 58,
+    VT_CURRENT_FOV = 60,
+    VT_LAST_INV_ITEM = 62,
+    VT_ACTION_QUEUE = 64,
+    VT_SOUNDTRACKS = 66,
+    VT_CD_FLAGS = 68,
+    VT_POSTPROCESS_MODE = 70,
+    VT_POSTPROCESS_STRENGTH = 72,
+    VT_POSTPROCESS_TINT = 74,
+    VT_ROPE = 76,
+    VT_PENDULUM = 78,
+    VT_ALTERNATE_PENDULUM = 80,
+    VT_VOLUMES = 82,
+    VT_GLOBAL_EVENT_SETS = 84,
+    VT_VOLUME_EVENT_SETS = 86,
+    VT_SCRIPT_VARS = 88,
+    VT_CALLBACKS_PRE_START = 90,
+    VT_CALLBACKS_POST_START = 92,
+    VT_CALLBACKS_PRE_END = 94,
+    VT_CALLBACKS_POST_END = 96,
+    VT_CALLBACKS_PRE_SAVE = 98,
+    VT_CALLBACKS_POST_SAVE = 100,
+    VT_CALLBACKS_PRE_LOAD = 102,
+    VT_CALLBACKS_POST_LOAD = 104,
+    VT_CALLBACKS_PRE_LOOP = 106,
+    VT_CALLBACKS_POST_LOOP = 108
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -7034,6 +7421,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::SaveGameStatistics *level() const {
     return GetPointer<const TEN::Save::SaveGameStatistics *>(VT_LEVEL);
+  }
+  const TEN::Save::Camera *camera() const {
+    return GetPointer<const TEN::Save::Camera *>(VT_CAMERA);
   }
   const TEN::Save::Lara *lara() const {
     return GetPointer<const TEN::Save::Lara *>(VT_LARA);
@@ -7052,6 +7442,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::Vector<int32_t> *room_items() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_ROOM_ITEMS);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>> *fish_swarm() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>> *>(VT_FISH_SWARM);
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *>(VT_FXINFOS);
@@ -7187,6 +7580,8 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(game()) &&
            VerifyOffset(verifier, VT_LEVEL) &&
            verifier.VerifyTable(level()) &&
+           VerifyOffset(verifier, VT_CAMERA) &&
+           verifier.VerifyTable(camera()) &&
            VerifyOffset(verifier, VT_LARA) &&
            verifier.VerifyTable(lara()) &&
            VerifyOffset(verifier, VT_ROOMS) &&
@@ -7199,6 +7594,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_NEXT_ITEM_ACTIVE) &&
            VerifyOffset(verifier, VT_ROOM_ITEMS) &&
            verifier.VerifyVector(room_items()) &&
+           VerifyOffset(verifier, VT_FISH_SWARM) &&
+           verifier.VerifyVector(fish_swarm()) &&
+           verifier.VerifyVectorOfTables(fish_swarm()) &&
            VerifyOffset(verifier, VT_FXINFOS) &&
            verifier.VerifyVector(fxinfos()) &&
            verifier.VerifyVectorOfTables(fxinfos()) &&
@@ -7317,6 +7715,9 @@ struct SaveGameBuilder {
   void add_level(flatbuffers::Offset<TEN::Save::SaveGameStatistics> level) {
     fbb_.AddOffset(SaveGame::VT_LEVEL, level);
   }
+  void add_camera(flatbuffers::Offset<TEN::Save::Camera> camera) {
+    fbb_.AddOffset(SaveGame::VT_CAMERA, camera);
+  }
   void add_lara(flatbuffers::Offset<TEN::Save::Lara> lara) {
     fbb_.AddOffset(SaveGame::VT_LARA, lara);
   }
@@ -7334,6 +7735,9 @@ struct SaveGameBuilder {
   }
   void add_room_items(flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items) {
     fbb_.AddOffset(SaveGame::VT_ROOM_ITEMS, room_items);
+  }
+  void add_fish_swarm(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>>> fish_swarm) {
+    fbb_.AddOffset(SaveGame::VT_FISH_SWARM, fish_swarm);
   }
   void add_fxinfos(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos) {
     fbb_.AddOffset(SaveGame::VT_FXINFOS, fxinfos);
@@ -7477,12 +7881,14 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<TEN::Save::SaveGameHeader> header = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
+    flatbuffers::Offset<TEN::Save::Camera> camera = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Room>>> rooms = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>>> items = 0,
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>>> fish_swarm = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos = 0,
     int32_t next_fx_free = 0,
     int32_t next_fx_active = 0,
@@ -7567,12 +7973,14 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_next_fx_active(next_fx_active);
   builder_.add_next_fx_free(next_fx_free);
   builder_.add_fxinfos(fxinfos);
+  builder_.add_fish_swarm(fish_swarm);
   builder_.add_room_items(room_items);
   builder_.add_next_item_active(next_item_active);
   builder_.add_next_item_free(next_item_free);
   builder_.add_items(items);
   builder_.add_rooms(rooms);
   builder_.add_lara(lara);
+  builder_.add_camera(camera);
   builder_.add_level(level);
   builder_.add_game(game);
   builder_.add_header(header);
@@ -7590,12 +7998,14 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::SaveGameHeader> header = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
+    flatbuffers::Offset<TEN::Save::Camera> camera = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::Room>> *rooms = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::Item>> *items = nullptr,
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
     const std::vector<int32_t> *room_items = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::FishData>> *fish_swarm = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos = nullptr,
     int32_t next_fx_free = 0,
     int32_t next_fx_active = 0,
@@ -7641,6 +8051,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto rooms__ = rooms ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Room>>(*rooms) : 0;
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto room_items__ = room_items ? _fbb.CreateVector<int32_t>(*room_items) : 0;
+  auto fish_swarm__ = fish_swarm ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FishData>>(*fish_swarm) : 0;
   auto fxinfos__ = fxinfos ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>>(*fxinfos) : 0;
   auto fixed_cameras__ = fixed_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>>(*fixed_cameras) : 0;
   auto sinks__ = sinks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>>(*sinks) : 0;
@@ -7674,12 +8085,14 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       header,
       game,
       level,
+      camera,
       lara,
       rooms__,
       items__,
       next_item_free,
       next_item_active,
       room_items__,
+      fish_swarm__,
       fxinfos__,
       next_fx_free,
       next_fx_active,
@@ -8794,6 +9207,35 @@ inline flatbuffers::Offset<PlayerContextData> CreatePlayerContextData(flatbuffer
       _water_surface_dist);
 }
 
+inline CollisionInfoDataT *CollisionInfoData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<CollisionInfoDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void CollisionInfoData::UnPackTo(CollisionInfoDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = last_bridge_item_number(); _o->last_bridge_item_number = _e; }
+  { auto _e = last_bridge_item_pose(); if (_e) _o->last_bridge_item_pose = std::unique_ptr<TEN::Save::Pose>(new TEN::Save::Pose(*_e)); }
+}
+
+inline flatbuffers::Offset<CollisionInfoData> CollisionInfoData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateCollisionInfoData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<CollisionInfoData> CreateCollisionInfoData(flatbuffers::FlatBufferBuilder &_fbb, const CollisionInfoDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const CollisionInfoDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _last_bridge_item_number = _o->last_bridge_item_number;
+  auto _last_bridge_item_pose = _o->last_bridge_item_pose ? _o->last_bridge_item_pose.get() : 0;
+  return TEN::Save::CreateCollisionInfoData(
+      _fbb,
+      _last_bridge_item_number,
+      _last_bridge_item_pose);
+}
+
 inline LaraT *Lara::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<LaraT>();
   UnPackTo(_o.get(), _resolver);
@@ -8806,6 +9248,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = context(); if (_e) _o->context = std::unique_ptr<TEN::Save::PlayerContextDataT>(_e->UnPack(_resolver)); }
   { auto _e = control(); if (_e) _o->control = std::unique_ptr<TEN::Save::LaraControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = effect(); if (_e) _o->effect = std::unique_ptr<TEN::Save::PlayerEffectDataT>(_e->UnPack(_resolver)); }
+  { auto _e = collision(); if (_e) _o->collision = std::unique_ptr<TEN::Save::CollisionInfoDataT>(_e->UnPack(_resolver)); }
   { auto _e = extra_anim(); _o->extra_anim = _e; }
   { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
   { auto _e = extra_torso_rot(); if (_e) _o->extra_torso_rot = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
@@ -8836,6 +9279,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _context = _o->context ? CreatePlayerContextData(_fbb, _o->context.get(), _rehasher) : 0;
   auto _control = _o->control ? CreateLaraControlData(_fbb, _o->control.get(), _rehasher) : 0;
   auto _effect = _o->effect ? CreatePlayerEffectData(_fbb, _o->effect.get(), _rehasher) : 0;
+  auto _collision = _o->collision ? CreateCollisionInfoData(_fbb, _o->collision.get(), _rehasher) : 0;
   auto _extra_anim = _o->extra_anim;
   auto _extra_head_rot = _o->extra_head_rot ? _o->extra_head_rot.get() : 0;
   auto _extra_torso_rot = _o->extra_torso_rot ? _o->extra_torso_rot.get() : 0;
@@ -8858,6 +9302,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _context,
       _control,
       _effect,
+      _collision,
       _extra_anim,
       _extra_head_rot,
       _extra_torso_rot,
@@ -8875,6 +9320,35 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _target_entity_number,
       _torch,
       _weapons);
+}
+
+inline CameraT *Camera::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<CameraT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Camera::UnPackTo(CameraT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::GameVector>(new TEN::Save::GameVector(*_e)); }
+  { auto _e = target(); if (_e) _o->target = std::unique_ptr<TEN::Save::GameVector>(new TEN::Save::GameVector(*_e)); }
+}
+
+inline flatbuffers::Offset<Camera> Camera::Pack(flatbuffers::FlatBufferBuilder &_fbb, const CameraT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateCamera(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Camera> CreateCamera(flatbuffers::FlatBufferBuilder &_fbb, const CameraT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const CameraT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _position = _o->position ? _o->position.get() : 0;
+  auto _target = _o->target ? _o->target.get() : 0;
+  return TEN::Save::CreateCamera(
+      _fbb,
+      _position,
+      _target);
 }
 
 inline FixedCameraT *FixedCamera::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -9197,6 +9671,44 @@ inline flatbuffers::Offset<SwarmObjectInfo> CreateSwarmObjectInfo(flatbuffers::F
       _flags);
 }
 
+inline RopeSegmentT *RopeSegment::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<RopeSegmentT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void RopeSegment::UnPackTo(RopeSegmentT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = segment(); if (_e) _o->segment = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = velocity(); if (_e) _o->velocity = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = normalised_segment(); if (_e) _o->normalised_segment = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = mesh_segment(); if (_e) _o->mesh_segment = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = coord(); if (_e) _o->coord = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+}
+
+inline flatbuffers::Offset<RopeSegment> RopeSegment::Pack(flatbuffers::FlatBufferBuilder &_fbb, const RopeSegmentT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateRopeSegment(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<RopeSegment> CreateRopeSegment(flatbuffers::FlatBufferBuilder &_fbb, const RopeSegmentT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RopeSegmentT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _segment = _o->segment ? _o->segment.get() : 0;
+  auto _velocity = _o->velocity ? _o->velocity.get() : 0;
+  auto _normalised_segment = _o->normalised_segment ? _o->normalised_segment.get() : 0;
+  auto _mesh_segment = _o->mesh_segment ? _o->mesh_segment.get() : 0;
+  auto _coord = _o->coord ? _o->coord.get() : 0;
+  return TEN::Save::CreateRopeSegment(
+      _fbb,
+      _segment,
+      _velocity,
+      _normalised_segment,
+      _mesh_segment,
+      _coord);
+}
+
 inline RopeT *Rope::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<RopeT>();
   UnPackTo(_o.get(), _resolver);
@@ -9206,12 +9718,8 @@ inline RopeT *Rope::UnPack(const flatbuffers::resolver_function_t *_resolver) co
 inline void Rope::UnPackTo(RopeT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = segments(); if (_e) { _o->segments.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->segments[_i] = *_e->Get(_i); } } }
-  { auto _e = velocities(); if (_e) { _o->velocities.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->velocities[_i] = *_e->Get(_i); } } }
-  { auto _e = normalised_segments(); if (_e) { _o->normalised_segments.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->normalised_segments[_i] = *_e->Get(_i); } } }
-  { auto _e = mesh_segments(); if (_e) { _o->mesh_segments.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->mesh_segments[_i] = *_e->Get(_i); } } }
+  { auto _e = segments(); if (_e) { _o->segments.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->segments[_i] = std::unique_ptr<TEN::Save::RopeSegmentT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = coords(); if (_e) { _o->coords.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->coords[_i] = *_e->Get(_i); } } }
   { auto _e = segment_length(); _o->segment_length = _e; }
   { auto _e = active(); _o->active = _e; }
   { auto _e = coiled(); _o->coiled = _e; }
@@ -9225,23 +9733,15 @@ inline flatbuffers::Offset<Rope> CreateRope(flatbuffers::FlatBufferBuilder &_fbb
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const RopeT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _segments = _fbb.CreateVectorOfStructs(_o->segments);
-  auto _velocities = _fbb.CreateVectorOfStructs(_o->velocities);
-  auto _normalised_segments = _fbb.CreateVectorOfStructs(_o->normalised_segments);
-  auto _mesh_segments = _fbb.CreateVectorOfStructs(_o->mesh_segments);
+  auto _segments = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::RopeSegment>> (_o->segments.size(), [](size_t i, _VectorArgs *__va) { return CreateRopeSegment(*__va->__fbb, __va->__o->segments[i].get(), __va->__rehasher); }, &_va );
   auto _position = _o->position ? _o->position.get() : 0;
-  auto _coords = _fbb.CreateVectorOfStructs(_o->coords);
   auto _segment_length = _o->segment_length;
   auto _active = _o->active;
   auto _coiled = _o->coiled;
   return TEN::Save::CreateRope(
       _fbb,
       _segments,
-      _velocities,
-      _normalised_segments,
-      _mesh_segments,
       _position,
-      _coords,
       _segment_length,
       _active,
       _coiled);
@@ -9385,6 +9885,65 @@ inline flatbuffers::Offset<Volume> CreateVolume(flatbuffers::FlatBufferBuilder &
       _rotation,
       _scale,
       _queue);
+}
+
+inline FishDataT *FishData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<FishDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void FishData::UnPackTo(FishDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = is_patrolling(); _o->is_patrolling = _e; }
+  { auto _e = is_lethal(); _o->is_lethal = _e; }
+  { auto _e = leader_item_number(); _o->leader_item_number = _e; }
+  { auto _e = life(); _o->life = _e; }
+  { auto _e = mesh_index(); _o->mesh_index = _e; }
+  { auto _e = orientation(); if (_e) _o->orientation = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
+  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = position_target(); if (_e) _o->position_target = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = room_number(); _o->room_number = _e; }
+  { auto _e = target_item_number(); _o->target_item_number = _e; }
+  { auto _e = undulation(); _o->undulation = _e; }
+  { auto _e = velocity(); _o->velocity = _e; }
+}
+
+inline flatbuffers::Offset<FishData> FishData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FishDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFishData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<FishData> CreateFishData(flatbuffers::FlatBufferBuilder &_fbb, const FishDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FishDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _is_patrolling = _o->is_patrolling;
+  auto _is_lethal = _o->is_lethal;
+  auto _leader_item_number = _o->leader_item_number;
+  auto _life = _o->life;
+  auto _mesh_index = _o->mesh_index;
+  auto _orientation = _o->orientation ? _o->orientation.get() : 0;
+  auto _position = _o->position ? _o->position.get() : 0;
+  auto _position_target = _o->position_target ? _o->position_target.get() : 0;
+  auto _room_number = _o->room_number;
+  auto _target_item_number = _o->target_item_number;
+  auto _undulation = _o->undulation;
+  auto _velocity = _o->velocity;
+  return TEN::Save::CreateFishData(
+      _fbb,
+      _is_patrolling,
+      _is_lethal,
+      _leader_item_number,
+      _life,
+      _mesh_index,
+      _orientation,
+      _position,
+      _position_target,
+      _room_number,
+      _target_item_number,
+      _undulation,
+      _velocity);
 }
 
 inline ScriptTableT *ScriptTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -9779,12 +10338,14 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = header(); if (_e) _o->header = std::unique_ptr<TEN::Save::SaveGameHeaderT>(_e->UnPack(_resolver)); }
   { auto _e = game(); if (_e) _o->game = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
   { auto _e = level(); if (_e) _o->level = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
+  { auto _e = camera(); if (_e) _o->camera = std::unique_ptr<TEN::Save::CameraT>(_e->UnPack(_resolver)); }
   { auto _e = lara(); if (_e) _o->lara = std::unique_ptr<TEN::Save::LaraT>(_e->UnPack(_resolver)); }
   { auto _e = rooms(); if (_e) { _o->rooms.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->rooms[_i] = std::unique_ptr<TEN::Save::RoomT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = items(); if (_e) { _o->items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->items[_i] = std::unique_ptr<TEN::Save::ItemT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = next_item_free(); _o->next_item_free = _e; }
   { auto _e = next_item_active(); _o->next_item_active = _e; }
   { auto _e = room_items(); if (_e) { _o->room_items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->room_items[_i] = _e->Get(_i); } } }
+  { auto _e = fish_swarm(); if (_e) { _o->fish_swarm.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fish_swarm[_i] = std::unique_ptr<TEN::Save::FishDataT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = fxinfos(); if (_e) { _o->fxinfos.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fxinfos[_i] = std::unique_ptr<TEN::Save::FXInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = next_fx_free(); _o->next_fx_free = _e; }
   { auto _e = next_fx_active(); _o->next_fx_active = _e; }
@@ -9840,12 +10401,14 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _header = _o->header ? CreateSaveGameHeader(_fbb, _o->header.get(), _rehasher) : 0;
   auto _game = _o->game ? CreateSaveGameStatistics(_fbb, _o->game.get(), _rehasher) : 0;
   auto _level = _o->level ? CreateSaveGameStatistics(_fbb, _o->level.get(), _rehasher) : 0;
+  auto _camera = _o->camera ? CreateCamera(_fbb, _o->camera.get(), _rehasher) : 0;
   auto _lara = _o->lara ? CreateLara(_fbb, _o->lara.get(), _rehasher) : 0;
   auto _rooms = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Room>> (_o->rooms.size(), [](size_t i, _VectorArgs *__va) { return CreateRoom(*__va->__fbb, __va->__o->rooms[i].get(), __va->__rehasher); }, &_va );
   auto _items = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>> (_o->items.size(), [](size_t i, _VectorArgs *__va) { return CreateItem(*__va->__fbb, __va->__o->items[i].get(), __va->__rehasher); }, &_va );
   auto _next_item_free = _o->next_item_free;
   auto _next_item_active = _o->next_item_active;
   auto _room_items = _fbb.CreateVector(_o->room_items);
+  auto _fish_swarm = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FishData>> (_o->fish_swarm.size(), [](size_t i, _VectorArgs *__va) { return CreateFishData(*__va->__fbb, __va->__o->fish_swarm[i].get(), __va->__rehasher); }, &_va );
   auto _fxinfos = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>> (_o->fxinfos.size(), [](size_t i, _VectorArgs *__va) { return CreateFXInfo(*__va->__fbb, __va->__o->fxinfos[i].get(), __va->__rehasher); }, &_va );
   auto _next_fx_free = _o->next_fx_free;
   auto _next_fx_active = _o->next_fx_active;
@@ -9893,12 +10456,14 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _header,
       _game,
       _level,
+      _camera,
       _lara,
       _rooms,
       _items,
       _next_item_free,
       _next_item_active,
       _room_items,
+      _fish_swarm,
       _fxinfos,
       _next_fx_free,
       _next_fx_active,

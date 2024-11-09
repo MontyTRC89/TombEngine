@@ -1,4 +1,7 @@
 #pragma once
 
-void InitializeExplosion(short itemNumber);
-void ExplosionControl(short itemNumber);
+namespace TEN::Entities::Traps
+{
+	void InitializeExplosion(short itemNumber);
+	void ControlExplosion(short itemNumber);
+}

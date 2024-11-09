@@ -61,19 +61,6 @@ namespace TEN::Hud
 		ColorTarget = COLOR_GRAY;
 	}
 
-	bool CrosshairData::IsOffscreen() const
-	{
-		if (!Position.has_value())
-			return true;
-
-		// TODO: Not working?
-		float screenEdgeThreshold = GetRadius();
-		return (Position->x <= -screenEdgeThreshold ||
-				Position->y <= -screenEdgeThreshold ||
-				Position->x >= (DISPLAY_SPACE_RES.x + screenEdgeThreshold) ||
-				Position->y >= (DISPLAY_SPACE_RES.y + screenEdgeThreshold));
-	}
-
 	void CrosshairData::Update(const Vector3& targetPos, bool isActive, bool doPulse)
 	{
 		constexpr auto ROT					   = ANGLE(2.0f);
@@ -86,6 +73,9 @@ namespace TEN::Hud
 		constexpr auto MORPH_LERP_ALPHA		   = 0.3f;
 		constexpr auto ORIENT_LERP_ALPHA	   = 0.1f;
 		constexpr auto RADIUS_LERP_ALPHA	   = 0.2f;
+
+		if (Position.has_value())
+			StoreInterpolationData();
 
 		// Update active status.
 		IsActive = isActive;
@@ -146,30 +136,36 @@ namespace TEN::Hud
 		constexpr auto STATIC_ELEMENT_SPRITE_ID	 = 0;
 		constexpr auto SEGMENT_ELEMENT_SPRITE_ID = 1;
 		constexpr auto PRIORITY					 = 0; // TODO: Check later. May interfere with Lua display sprites. -- Sezz 2023.10.06
-		constexpr auto ALIGN_MODE				 = DisplaySpriteAlignMode::Center;
-		constexpr auto SCALE_MODE				 = DisplaySpriteScaleMode::Fill;
-		constexpr auto BLEND_MODE				 = BlendMode::Additive;
 
-		if (IsOffscreen())
+		if (!Position.has_value())
 			return;
+
+		auto pos0 = Vector2::Lerp(PrevPosition, *Position, g_Renderer.GetInterpolationFactor());
+		short orient0 = PrevOrientation + Geometry::GetShortestAngle(PrevOrientation, Orientation) * g_Renderer.GetInterpolationFactor();
+		float scale = Lerp(PrevScale, Scale, g_Renderer.GetInterpolationFactor());
+		auto color = Color::Lerp(PrevColor, Color, g_Renderer.GetInterpolationFactor());
 
 		// Draw main static element.
 		AddDisplaySprite(
 			SPRITE_SEQUENCE_OBJECT_ID, STATIC_ELEMENT_SPRITE_ID,
-			*Position, Orientation, Vector2(Scale), Color,
-			PRIORITY, ALIGN_MODE, SCALE_MODE, BLEND_MODE);
+			pos0, orient0, Vector2(scale), color,
+			PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fill,
+			BlendMode::Additive, DisplaySpritePhase::Draw);
 
 		// Draw animated outer segment elements.
-		for (const auto& segment : Segments)
+		for (int i = 0; i < Segments.size(); i++)
 		{
-			auto pos = *Position + segment.PosOffset;
-			short orient = Orientation + segment.OrientOffset;
-			auto scale = Vector2(Scale / 2);
+			const auto& segment = Segments[i];
+			const auto& prevSegment = PrevSegments[i];
+
+			auto pos1 = pos0 + Vector2::Lerp(prevSegment.PosOffset, segment.PosOffset, g_Renderer.GetInterpolationFactor());
+			short orient1 = orient0 + (prevSegment.OrientOffset + (Geometry::GetShortestAngle(prevSegment.OrientOffset, segment.OrientOffset) * g_Renderer.GetInterpolationFactor()));
 
 			AddDisplaySprite(
 				SPRITE_SEQUENCE_OBJECT_ID, SEGMENT_ELEMENT_SPRITE_ID,
-				pos, orient, scale, Color,
-				PRIORITY, ALIGN_MODE, SCALE_MODE, BLEND_MODE);
+				pos1, orient1, Vector2(scale / 2), color,
+				PRIORITY, DisplaySpriteAlignMode::Center, DisplaySpriteScaleMode::Fill,
+				BlendMode::Additive, DisplaySpritePhase::Draw);
 		}
 	}
 
@@ -188,23 +184,23 @@ namespace TEN::Hud
 
 		// Loop over player targets.
 		auto itemNumbers = std::vector<int>{};
-		for (const auto* itemPtr : player.TargetList)
+		for (const auto* item : player.TargetList)
 		{
-			if (itemPtr == nullptr)
+			if (item == nullptr)
 				continue;
 
 			// Collect item number.
-			itemNumbers.push_back(itemPtr->Index);
+			if (item->HitPoints != NOT_TARGETABLE)
+				itemNumbers.push_back(item->Index);
 
 			// Find crosshair at item number key.
-			auto it = _crosshairs.find(itemPtr->Index);
+			auto it = _crosshairs.find(item->Index);
 			if (it == _crosshairs.end())
 				continue;
 
 			// Set crosshair as primary or peripheral.
 			auto& crosshair = it->second;
-			if (player.TargetEntity != nullptr &&
-				itemPtr->Index == player.TargetEntity->Index)
+			if (player.TargetEntity != nullptr && item->Index == player.TargetEntity->Index)
 			{
 				crosshair.SetPrimary();
 			}
@@ -313,8 +309,7 @@ namespace TEN::Hud
 	// TODO: If crosshair happens to be in view upon spawn, first frame is sometimes garbage.
 	void TargetHighlighterController::AddCrosshair(int itemNumber, const Vector3& targetPos)
 	{
-		constexpr auto SCALE_START		  = 0.75f;
-		constexpr auto RADIUS_SCALE_START = 1.5f * SQRT_2;
+		constexpr auto RADIUS_SCALE_START = 0.25f;
 		constexpr auto ANGLE_STEP		  = ANGLE(360.0f / CrosshairData::SEGMENT_COUNT);
 
 		auto pos = g_Renderer.Get2DPosition(targetPos);
@@ -328,7 +323,7 @@ namespace TEN::Hud
 		crosshair.IsPrimary = false;
 		crosshair.Position = *pos;
 		crosshair.Orientation = 0;
-		crosshair.Scale = SCALE_START;
+		crosshair.Scale = 0.0f;
 		crosshair.Color = CrosshairData::COLOR_GRAY;
 		crosshair.Color.w = 0.0f;
 		crosshair.ColorTarget = CrosshairData::COLOR_GRAY;
@@ -358,22 +353,15 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::DrawDebug() const
 	{
-		unsigned int visibleCount = 0;
 		unsigned int primaryCount = 0;
 		unsigned int peripheralCount = 0;
 
 		for (const auto& [itemNumber, crosshair] : _crosshairs)
-		{
 			crosshair.IsPrimary ? primaryCount++ : peripheralCount++;
-			
-			if (!crosshair.IsOffscreen())
-				visibleCount++;
-		}
 
-		g_Renderer.PrintDebugMessage("TARGET HIGHLIGHTER DEBUG");
-		g_Renderer.PrintDebugMessage(g_Configuration.EnableTargetHighlighter ? "Enabled" : "Disabled");
-		g_Renderer.PrintDebugMessage("Visible crosshairs: %d", visibleCount);
-		g_Renderer.PrintDebugMessage("Primary crosshairs: %d", primaryCount);
-		g_Renderer.PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
+		PrintDebugMessage("TARGET HIGHLIGHTER DEBUG");
+		PrintDebugMessage(g_Configuration.EnableTargetHighlighter ? "Enabled" : "Disabled");
+		PrintDebugMessage("Primary crosshairs: %d", primaryCount);
+		PrintDebugMessage("Peripheral crosshairs: %d", peripheralCount);
 	}
 }

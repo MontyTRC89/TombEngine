@@ -1,11 +1,11 @@
 #include "./CBCamera.hlsli"
 #include "./Blending.hlsli"
-#include "./VertexInput.hlsli"
 #include "./Math.hlsli"
+#include "./SpriteEffects.hlsli"
 #include "./ShaderLight.hlsli"
+#include "./VertexInput.hlsli"
 
-// NOTE: This shader is used for all 3D and alpha blended sprites, because we send aleady transformed vertices to the GPU 
-// instead of instances
+// NOTE: Shader is used for all 3D and alpha blended sprites because transformed vertices are already sent to GPU instead of instances.
 
 #define FADE_FACTOR .789f
 
@@ -77,9 +77,14 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		output = DoLaserBarrierEffect(input.Position, output, input.UV, FADE_FACTOR, Frame);
 	}
 
+	if (RenderType == 2)
+	{
+		output = DoLaserBeamEffect(input.Position, output, input.UV, FADE_FACTOR, Frame);
+	}
+
 	output.xyz -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
 	output.xyz = saturate(output.xyz);
-	
+
 	output = DoDistanceFogForPixel(output, float4(0.0f, 0.0f, 0.0f, 0.0f), input.DistanceFog);
 
 	return output;

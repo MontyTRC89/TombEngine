@@ -39,17 +39,7 @@ void lara_void_func(ItemInfo* item, CollisionInfo* coll)
 
 void lara_default_col(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
-
-	player.Control.MoveAngle = item->Pose.Orientation.y;
-	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
-	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
-	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeDown = true;
-	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
-	GetCollisionInfo(coll, item);
-	LaraResetGravityStatus(item, coll);
+	LaraDefaultCollision(item, coll);
 }
 
 // Boulder death.
@@ -239,7 +229,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CollisionType::Front)
 	{
 		HandlePlayerElevationChange(item, coll);
 		return;
@@ -394,7 +384,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		LaraCollideStop(item, coll);
 	}
 
-	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CollisionType::Front)
 	{
 		HandlePlayerElevationChange(item, coll);
 		return;
@@ -1823,7 +1813,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 	if (TestAndDoLaraLadderClimb(item, coll))
 		return;
 
-	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CollisionType::Front)
 	{
 		HandlePlayerElevationChange(item, coll);
 		return;
@@ -1948,7 +1938,7 @@ void lara_col_sprint_slide(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CT_FRONT)
+	if (CanChangeElevation(*item, *coll) && coll->CollisionType != CollisionType::Front)
 	{
 		HandlePlayerElevationChange(item, coll);
 		return;

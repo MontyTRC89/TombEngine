@@ -41,6 +41,7 @@
 #include "Objects/TR2/Vehicles/skidoo.h"
 
 using namespace TEN::Entities::Creatures::TR2;
+using namespace TEN::Entities::Traps;
 
 static void StartEntity(ObjectInfo* obj)
 {
@@ -459,14 +460,12 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_DRAGON_BONE_FRONT];
 	if (obj->loaded)
 	{
-		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 	}
 
 	obj = &Objects[ID_DRAGON_BONE_BACK];
 	if (obj->loaded)
 	{
-		obj->collision = CreatureCollision;
 		obj->shadowType = ShadowMode::All;
 	}
 
@@ -536,7 +535,7 @@ static void StartTrap(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSpinningBlade;
-		obj->control = SpinningBladeControl;
+		obj->control = ControlSpinningBlade;
 		obj->collision = ObjectCollision;
 	}
 
@@ -550,7 +549,7 @@ static void StartTrap(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeKillerStatue;
-		obj->control = KillerStatueControl;
+		obj->control = ControlKillerStatue;
 		obj->collision = ObjectCollision;
 		obj->SetHitEffect(true);
 	}

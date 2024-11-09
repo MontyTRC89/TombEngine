@@ -7,6 +7,7 @@ using namespace TEN::Input;
 using namespace TEN::Math;
 
 // Directories
+
 constexpr auto REGKEY_ROOT	   = "Software\\TombEngine\\1.1.0";
 constexpr auto REGKEY_GRAPHICS = "Graphics";
 constexpr auto REGKEY_SOUND	   = "Sound";
@@ -14,6 +15,7 @@ constexpr auto REGKEY_GAMEPLAY = "Gameplay";
 constexpr auto REGKEY_INPUT	   = "Input";
 
 // Graphics keys
+
 constexpr auto REGKEY_SCREEN_WIDTH		   = "ScreenWidth";
 constexpr auto REGKEY_SCREEN_HEIGHT		   = "ScreenHeight";
 constexpr auto REGKEY_ENABLE_WINDOWED_MODE = "EnableWindowedMode";
@@ -23,8 +25,10 @@ constexpr auto REGKEY_SHADOW_BLOBS_MAX	   = "ShadowBlobsMax";
 constexpr auto REGKEY_ENABLE_CAUSTICS	   = "EnableCaustics";
 constexpr auto REGKEY_ANTIALIASING_MODE	   = "AntialiasingMode";
 constexpr auto REGKEY_AMBIENT_OCCLUSION	   = "AmbientOcclusion";
+constexpr auto REGKEY_HIGH_FRAMERATE       = "EnableHighFramerate";
 
 // Sound keys
+
 constexpr auto REGKEY_SOUND_DEVICE	= "SoundDevice";
 constexpr auto REGKEY_ENABLE_SOUND	= "EnableSound";
 constexpr auto REGKEY_ENABLE_REVERB = "EnableReverb";
@@ -32,24 +36,34 @@ constexpr auto REGKEY_MUSIC_VOLUME	= "MusicVolume";
 constexpr auto REGKEY_SFX_VOLUME	= "SfxVolume";
 
 // Gameplay keys
+
 constexpr auto REGKEY_ENABLE_SUBTITLES			= "EnableSubtitles";
+constexpr auto REGKEY_ENABLE_AUTO_MONKEY_JUMP	= "EnableAutoMonkeySwingJump";
 constexpr auto REGKEY_ENABLE_AUTO_TARGETING		= "EnableAutoTargeting";
 constexpr auto REGKEY_ENABLE_TARGET_HIGHLIGHTER = "EnableTargetHighlighter";
 constexpr auto REGKEY_ENABLE_RUMBLE				= "EnableRumble";
 constexpr auto REGKEY_ENABLE_THUMBSTICK_CAMERA	= "EnableThumbstickCamera";
 
 // Input keys
-constexpr auto REGKEY_MOUSE_SENSITIVITY = "MouseSensitivity";
-constexpr auto REGKEY_MOUSE_SMOOTHING	= "MouseSmoothing";
 
-struct GameConfiguration 
+constexpr auto REGKEY_MOUSE_SENSITIVITY		   = "MouseSensitivity";
+constexpr auto REGKEY_MENU_OPTION_LOOPING_MODE = "MenuOptionLoopingMode";
+
+enum class MenuOptionLoopingMode
+{
+	AllMenus,
+	SaveLoadOnly,
+	Disabled
+};
+
+struct GameConfiguration
 {
 	static constexpr auto DEFAULT_SHADOW_MAP_SIZE	= 1024;
 	static constexpr auto DEFAULT_SHADOW_BLOBS_MAX	= 16;
 	static constexpr auto DEFAULT_MOUSE_SENSITIVITY = 6;
-	static constexpr auto DEFAULT_MOUSE_SMOOTHING	= 1;
 
 	// Graphics
+
 	int		   ScreenWidth		  = 0;
 	int		   ScreenHeight		  = 0;
 	bool	   EnableWindowedMode = false;
@@ -58,9 +72,11 @@ struct GameConfiguration
 	int		   ShadowBlobsMax	  = DEFAULT_SHADOW_BLOBS_MAX;
 	bool	   EnableCaustics	  = false;
 	bool	   EnableAmbientOcclusion = false;
+	bool	   EnableHighFramerate    = true;
 	AntialiasingMode AntialiasingMode = AntialiasingMode::None;
 
 	// Sound
+
 	int	 SoundDevice  = 0;
 	bool EnableSound  = false;
 	bool EnableReverb = false;
@@ -68,16 +84,18 @@ struct GameConfiguration
 	int	 SfxVolume	  = 0;
 
 	// Gameplay
-	bool EnableSubtitles		 = false;
-	bool EnableAutoTargeting	 = false;
-	bool EnableTargetHighlighter = false;
-	bool EnableRumble			 = false;
-	bool EnableThumbstickCamera	 = false;
+
+	bool EnableSubtitles		   = false;
+	bool EnableAutoMonkeySwingJump = false;
+	bool EnableAutoTargeting	   = false;
+	bool EnableTargetHighlighter   = false;
+	bool EnableRumble			   = false;
+	bool EnableThumbstickCamera	   = false;
 
 	// Input
-	int MouseSensitivity = DEFAULT_MOUSE_SENSITIVITY;
-	int MouseSmoothing	 = DEFAULT_MOUSE_SMOOTHING;
-	BindingProfile Bindings = {};
+	int					  MouseSensitivity		= DEFAULT_MOUSE_SENSITIVITY;
+	MenuOptionLoopingMode MenuOptionLoopingMode = MenuOptionLoopingMode::SaveLoadOnly;
+	BindingProfile		  Bindings				= {};
 
 	std::vector<Vector2i> SupportedScreenResolutions = {};
 	std::string			  AdapterName				 = {};

@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
@@ -17,6 +17,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
 
@@ -73,7 +74,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 	if (glow)
 	{
 		spark->scalar = 1;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE_LIGHT;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_LIGHT;
 		spark->size = spark->sSize = (GetRandomControl() & 0x1F) + 160;
 	}
 	else
@@ -142,8 +143,6 @@ void ElectricityWiresControl(short itemNumber)
 
 	SoundEffect(SFX_TR5_ELECTRIC_WIRES, &item->Pose);
 
-	GetCollidedObjects(item, BLOCK(4), true, CollidedItems, nullptr, 0) && CollidedItems[0];
-
 	auto* object = &Objects[item->ObjectNumber];
 
 	auto cableBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
@@ -179,21 +178,18 @@ void ElectricityWiresControl(short itemNumber)
 	if (GetRandomControl() & 1)
 		return;
 
-	int k = 0;
-	while (CollidedItems[k] != nullptr)
+	auto collObjects = GetCollidedObjects(*item, true, false, BLOCK(2), ObjectCollectionMode::Items);
+	for (auto* itemPtr : collObjects.Items)
 	{
-		auto* collItem = CollidedItems[k];
-		auto* collObj = &Objects[collItem->ObjectNumber];
+		const auto& object = Objects[itemPtr->ObjectNumber];
 
-		k++;
-
-		if (collItem->ObjectNumber != ID_LARA && !collObj->intelligent)
+		if (itemPtr->ObjectNumber != ID_LARA && !object.intelligent)
 			continue;
 
 		bool isWaterNearby = false;
-		auto npcBox = GameBoundingBox(collItem).ToBoundingOrientedBox(collItem->Pose);
+		auto npcBox = GameBoundingBox(itemPtr).ToBoundingOrientedBox(itemPtr->Pose);
 
-		for (int i = 0; i < object->nmeshes; i++)
+		for (int i = 0; i < object.nmeshes; i++)
 		{
 			auto pos = GetJointPosition(item, i, Vector3i(0, 0, CLICK(1)));
 			short roomNumber = item->RoomNumber;
@@ -217,13 +213,12 @@ void ElectricityWiresControl(short itemNumber)
 			if (pos.y < cableBottomPlane)
 				continue;
 
-			for (int j = 0; j < collObj->nmeshes; j++)
+			for (int j = 0; j < object.nmeshes; j++)
 			{
-				auto collPos = GetJointPosition(collItem, j);
+				auto collPos = GetJointPosition(itemPtr, j);
+				auto pointCollJointRoom = GetPointCollision(collPos, itemPtr->RoomNumber).GetRoomNumber();
 
-				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, collItem->RoomNumber).RoomNumber;
-
-				if (!isWaterNearby && isTouchingWater && roomNumber == collJointRoom)
+				if (!isWaterNearby && isTouchingWater && roomNumber == pointCollJointRoom)
 					isWaterNearby = true;
 			}
 
@@ -233,29 +228,35 @@ void ElectricityWiresControl(short itemNumber)
 			{
 				if (!isWaterNearby)
 				{
-					if (collItem->Effect.Type != EffectType::Smoke)
+					if (itemPtr->Effect.Type != EffectType::Smoke)
 					{
-						ItemBlueElectricBurn(collItem, 2 *FPS);
+						ItemBlueElectricBurn(itemPtr, 2 *FPS);
 					}
 					else
-						ItemSmoke(collItem, -1);
+					{
+						ItemSmoke(itemPtr, -1);
+					}
 				}
 
 				if (instantKill)
-					DoDamage(collItem, INT_MAX);
+				{
+					DoDamage(itemPtr, INT_MAX);
+				}
 				else
-					DoDamage(collItem, 8);
+				{
+					DoDamage(itemPtr, 8);
+				}
 
-				for (int j = 0; j < collObj->nmeshes; j++)
+				for (int j = 0; j < object.nmeshes; j++)
 				{
 					if ((GetRandomControl() & 127) < 16)
-						TriggerElectricitySparks(collItem, j, false);
+						TriggerElectricitySparks(itemPtr, j, false);
 				}
 
 				TriggerDynamicLight(
-					collItem->Pose.Position.x,
-					collItem->Pose.Position.y,
-					collItem->Pose.Position.z,
+					itemPtr->Pose.Position.x,
+					itemPtr->Pose.Position.y,
+					itemPtr->Pose.Position.z,
 					5,
 					0,
 					(GetRandomControl() & 0x3F) + 0x2F,

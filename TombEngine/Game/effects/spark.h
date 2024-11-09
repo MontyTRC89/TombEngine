@@ -22,6 +22,15 @@ namespace TEN::Effects::Spark
 		float width;
 		float height;
 		bool active;
+
+		Vector3 PrevPosition = Vector3::Zero;
+		Vector3 PrevVelocity = Vector3::Zero;
+
+		void StoreInterpolationData()
+		{
+			PrevPosition = pos;
+			PrevVelocity = velocity;
+		}
 	};
 	extern std::array<SparkParticle, 128> SparkParticles;
 			
@@ -29,7 +38,7 @@ namespace TEN::Effects::Spark
 	void DisableSparkParticles();
 	SparkParticle& GetFreeSparkParticle();
 
-	void TriggerFlareSparkParticles(const Vector3i& pos, const Vector3i& vel, const ColorData& color, int roomNumber);
+	void TriggerFlareSparkParticles(const Vector3i& pos, const Vector3i& vel, const Color& color, int roomNumber);
 	void TriggerRicochetSpark(const GameVector& pos, short angle, int num, const Vector4& colorStart = SPARK_RICOCHET_COLOR_DEFAULT);
 	void TriggerFrictionSpark(const GameVector& pos, const EulerAngles& angle, float length, int count);
 	void TriggerElectricSpark(const GameVector& pos, const EulerAngles& angle, int count);

@@ -4,13 +4,16 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::Sphere;
 
 namespace TEN::Entities::Traps
 {
@@ -39,9 +42,9 @@ namespace TEN::Entities::Traps
 		int lowerCeilBound = bounds.Y1;
 
 		// Get point collision.
-		auto pointColl = GetCollision(&item);
-		int relFloorHeight = pointColl.Position.Floor - item.Pose.Position.y;
-		int relCeilHeight = pointColl.Position.Ceiling - item.Pose.Position.y;
+		auto pointColl = GetPointCollision(item);
+		int relFloorHeight = pointColl.GetFloorHeight() - item.Pose.Position.y;
+		int relCeilHeight = pointColl.GetCeilingHeight() - item.Pose.Position.y;
 
 		int verticalVel = item.ItemFlags[0];
 
@@ -57,8 +60,8 @@ namespace TEN::Entities::Traps
 		{
 			item.Pose.Position.y += verticalVel;
 
-			if (pointColl.RoomNumber != item.RoomNumber)
-				ItemNewRoom(itemNumber, pointColl.RoomNumber);
+			if (pointColl.GetRoomNumber() != item.RoomNumber)
+				ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item.Pose);
 		}
@@ -77,7 +80,7 @@ namespace TEN::Entities::Traps
 			if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 				return;
 
-			TestCollision(&item, playerItem);
+			HandleItemSphereCollision(item, *playerItem);
 		}
 		else if (item.Status != ITEM_INVISIBLE)
 		{

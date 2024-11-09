@@ -2,6 +2,7 @@
 #include "Objects/TR1/Entity/tr1_big_rat.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -13,6 +14,7 @@
 #include "Math/Math.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR1
@@ -83,8 +85,7 @@ namespace TEN::Entities::Creatures::TR1
 
 	bool RatOnWater(ItemInfo* item)
 	{
-		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-		
+		int waterDepth = GetPointCollision(*item).GetWaterSurfaceHeight();
 		if (item->IsCreature())
 		{
 			auto& creature = *GetCreatureInfo(item);
@@ -145,7 +146,7 @@ namespace TEN::Entities::Creatures::TR1
 			switch (item->Animation.ActiveState)
 			{
 			case BIG_RAT_STATE_IDLE:
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (ai.bite && ai.distance < BIG_RAT_LAND_BITE_ATTACK_RANGE)
 					item->Animation.TargetState = BIG_RAT_STATE_LAND_BITE_ATTACK;
@@ -180,7 +181,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BIG_RAT_STATE_LAND_BITE_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE && ai.ahead &&
+				if (item->Animation.RequiredState == NO_VALUE && ai.ahead &&
 					item->TouchBits.Test(BigRatBite.BoneID))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_BITE_ATTACK_DAMAGE);
@@ -191,7 +192,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BIG_RAT_STATE_POUNCE_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE && ai.ahead &&
+				if (item->Animation.RequiredState == NO_VALUE && ai.ahead &&
 					item->TouchBits.Test(BigRatBite.BoneID))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_POUNCE_ATTACK_DAMAGE);
@@ -222,7 +223,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case BIG_RAT_STATE_SWIM_BITE_ATTACK:
-				if (item->Animation.RequiredState == NO_STATE && ai.ahead &&
+				if (item->Animation.RequiredState == NO_VALUE && ai.ahead &&
 					item->TouchBits.Test(BigRatBite.BoneID))
 				{
 					DoDamage(creature->Enemy, BIG_RAT_BITE_ATTACK_DAMAGE);
@@ -240,7 +241,7 @@ namespace TEN::Entities::Creatures::TR1
 		if (RatOnWater(item))
 		{
 			CreatureUnderwater(item, 0);
-			item->Pose.Position.y = GetWaterHeight(item) - BIG_RAT_WATER_SURFACE_OFFSET;
+			item->Pose.Position.y = GetPointCollision(*item).GetWaterTopHeight() - BIG_RAT_WATER_SURFACE_OFFSET;
 		}
 		else
 		{

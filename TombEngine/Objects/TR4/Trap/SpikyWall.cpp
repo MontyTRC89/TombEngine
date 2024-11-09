@@ -3,7 +3,8 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -14,6 +15,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
 // NOTES:
@@ -47,21 +50,23 @@ namespace TEN::Entities::Traps
 		int forwardVel = item.ItemFlags[0];
 		auto bounds = GameBoundingBox(&item);
 
-		auto pointColl0 = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2);
-		auto pointColl1 = GetCollision(&item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2, (bounds.X2 - bounds.X1) / 2);
+		auto pointColl0 = GetPointCollision(item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2);
+		auto pointColl1 = GetPointCollision(item, item.Pose.Orientation.y, (forwardVel >= 0) ? bounds.Z2 : bounds.Z1, bounds.Y2, (bounds.X2 - bounds.X1) / 2);
 
-		if (GetCollidedObjects(&item, CLICK(1), true, CollidedItems, CollidedMeshes, true))
+		auto collObjects = GetCollidedObjects(item, true, true);
+		if (!collObjects.IsEmpty())
 		{
-			int collidedItemNumber = 0;
-			while (CollidedItems[collidedItemNumber] != nullptr)
+			for (auto* itemPtr : collObjects.Items)
 			{
-				if (Objects[CollidedItems[collidedItemNumber]->ObjectNumber].intelligent)
+				const auto& object = Objects[itemPtr->ObjectNumber];
+
+				if (object.intelligent)
 				{
-					CollidedItems[collidedItemNumber]->HitPoints = 0;
+					itemPtr->HitPoints = 0;
 				}
-				else if (CollidedItems[collidedItemNumber]->ObjectNumber == ID_SPIKY_WALL && !item.ItemFlags[1])
+				else if (itemPtr->ObjectNumber == ID_SPIKY_WALL && !item.ItemFlags[1])
 				{
-					CollidedItems[collidedItemNumber]->TriggerFlags = 0;
+					itemPtr->TriggerFlags = 0;
 
 					item.TriggerFlags = 0;
 					item.Status = ITEM_DEACTIVATED;
@@ -69,25 +74,23 @@ namespace TEN::Entities::Traps
 
 					StopSoundEffect(SFX_TR4_ROLLING_BALL);
 				}
-
-				collidedItemNumber++;
 			}
 		}
 
 		// Stop moving.
 		if (!item.TriggerFlags ||
-			pointColl0.Block->IsWall(item.Pose.Position.x, item.Pose.Position.z) || 
-			pointColl0.Block->Stopper ||
-			pointColl1.Block->IsWall(item.Pose.Position.x, item.Pose.Position.z) ||
-			pointColl1.Block->Stopper)
+			pointColl0.GetSector().IsWall(item.Pose.Position.x, item.Pose.Position.z) || 
+			pointColl0.GetSector().Stopper ||
+			pointColl1.GetSector().IsWall(item.Pose.Position.x, item.Pose.Position.z) ||
+			pointColl1.GetSector().Stopper)
 		{
 			auto& room = g_Level.Rooms[item.RoomNumber];
 			for (auto& mesh : room.mesh)
 			{
-				if ((abs(pointColl0.Coordinates.x - mesh.pos.Position.x) < BLOCK(1) &&
-					abs(pointColl0.Coordinates.z - mesh.pos.Position.z) < BLOCK(1)) ||
-					abs(pointColl1.Coordinates.x - mesh.pos.Position.x) < BLOCK(1) &&
-					abs(pointColl1.Coordinates.z - mesh.pos.Position.z) < BLOCK(1) &&
+				if ((abs(pointColl0.GetPosition().x - mesh.pos.Position.x) < BLOCK(1) &&
+					abs(pointColl0.GetPosition().z - mesh.pos.Position.z) < BLOCK(1)) ||
+					abs(pointColl1.GetPosition().x - mesh.pos.Position.x) < BLOCK(1) &&
+					abs(pointColl1.GetPosition().z - mesh.pos.Position.z) < BLOCK(1) &&
 					StaticObjects[mesh.staticNumber].shatterType != ShatterType::None)
 				{					
 					if (mesh.HitPoints != 0)
@@ -109,8 +112,8 @@ namespace TEN::Entities::Traps
 			item.Pose.Position = Geometry::TranslatePoint(item.Pose.Position, item.Pose.Orientation.y, forwardVel);
 			item.Status = ITEM_ACTIVE;
 
-			if (pointColl0.RoomNumber != item.RoomNumber)
-				ItemNewRoom(itemNumber, pointColl0.RoomNumber);
+			if (pointColl0.GetRoomNumber() != item.RoomNumber)
+				ItemNewRoom(itemNumber, pointColl0.GetRoomNumber());
 
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item.Pose);
 		}
@@ -129,7 +132,7 @@ namespace TEN::Entities::Traps
 			if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 				return;
 
-			TestCollision(&item, playerItem);
+			HandleItemSphereCollision(item, *playerItem);
 		}
 		else if (item.Status != ITEM_INVISIBLE)
 		{

@@ -16,8 +16,8 @@ Statics
 @pragma nostrip
 */
 
-static auto index_error = index_error_maker(Static, ScriptReserved_Static);
-static auto newindex_error = newindex_error_maker(Static, ScriptReserved_Static);
+static auto IndexError = index_error_maker(Static, ScriptReserved_Static);
+static auto NewIndexError = newindex_error_maker(Static, ScriptReserved_Static);
 
 Static::Static(MESH_INFO & ref) : m_mesh{ref}
 {};
@@ -26,8 +26,8 @@ void Static::Register(sol::table & parent)
 {
 	parent.new_usertype<Static>(ScriptReserved_Static,
 		sol::no_constructor, // ability to spawn new ones could be added later
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 
 		/// Enable the static, for cases when it was shattered or manually disabled before.
 		// @function Static:Enable
@@ -40,17 +40,17 @@ void Static::Register(sol::table & parent)
 		/// Get static mesh visibility
 		// @function Static:GetActive
 		// @treturn bool visibility state
-		ScriptReserved_GetActive, & Static::GetActive,
+		ScriptReserved_GetActive, &Static::GetActive,
 
 		/// Get static mesh solid collision state
 		// @function Static:GetSolid
 		// @treturn bool solid collision state (true if solid, false if soft)
-		ScriptReserved_GetSolid, & Static::GetSolid,
+		ScriptReserved_GetSolid, &Static::GetSolid,
 
 		/// Set static mesh solid collision state
 		// @function Static:SetSolid
 		// @tparam bool solidState if set, collision will be solid, if not, will be soft
-		ScriptReserved_SetSolid, & Static::SetSolid,
+		ScriptReserved_SetSolid, &Static::SetSolid,
 
 		/// Get the static's position
 		// @function Static:GetPosition
@@ -75,12 +75,24 @@ void Static::Register(sol::table & parent)
 		/// Get the static's scale
 		// @function Static:GetScale
 		// @treturn float current static scale
-		ScriptReserved_GetScale, & Static::GetScale,
+		ScriptReserved_GetScale, &Static::GetScale,
 
 		/// Set the static's scale
 		// @function Static:SetScale
 		// @tparam Scale scale the static's new scale
-		ScriptReserved_SetScale, & Static::SetScale,
+		ScriptReserved_SetScale, &Static::SetScale,
+
+		/// Get current HP (hit points/health points)
+		// Used only with shatterable static meshes.
+		// @function Static:GetHP
+		// @treturn int the amount of HP the static currently has
+		ScriptReserved_GetHP, &Static::GetHP,
+
+		/// Set current HP (hit points/health points)
+		// Used only with shatterable static meshes.
+		// @function Static:SetHP
+		// @tparam int HP the amount of HP to give the static
+		ScriptReserved_SetHP, &Static::SetHP,
 
 		/// Get the static's unique string identifier
 		// @function Static:GetName
@@ -168,6 +180,16 @@ void Static::SetScale(float const& scale)
 {
 	m_mesh.scale = scale;
 	m_mesh.Dirty = true;
+}
+
+int Static::GetHP() const
+{
+	return m_mesh.HitPoints;
+}
+
+void Static::SetHP(short hitPoints)
+{
+	m_mesh.HitPoints = hitPoints;
 }
 
 // This does not guarantee that the returned value will be identical

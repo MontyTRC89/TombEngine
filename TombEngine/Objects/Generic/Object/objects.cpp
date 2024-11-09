@@ -3,7 +3,6 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -236,13 +235,31 @@ void InitializeAnimating(short itemNumber)
 
 void AnimatingControl(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	if (!TriggerActive(item))
-		return;
+	if (TriggerActive(&item))
+	{
+		item.Status = ITEM_ACTIVE;
+		AnimateItem(&item);
 
-	item->Status = ITEM_ACTIVE;
-	AnimateItem(item);
+		if (item.TriggerFlags == 666) //OCB used for the helicopter animating in the Train level.
+		{
+			auto pos = GetJointPosition(item, 0);
+			SoundEffect(SFX_TR4_HELICOPTER_LOOP, (Pose*)&pos);
+
+			if (item.Animation.FrameNumber == GetAnimData(item).frameEnd)
+			{
+				item.Flags &= 0xC1;
+				RemoveActiveItem(itemNumber);
+				item.Status = ITEM_NOT_ACTIVE;
+			}
+		}
+	}
+	else if (item.TriggerFlags == 2) //Make the animating dissapear when anti-triggered.
+	{
+		RemoveActiveItem(itemNumber);
+		item.Status = ITEM_INVISIBLE;
+	}
 
 	// TODO: ID_SHOOT_SWITCH2 is probably the bell in Trajan Markets, use Lua for that.
 	/*if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
@@ -254,61 +271,4 @@ void AnimatingControl(short itemNumber)
 	}*/
 }
 
-void HighObject2Control(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
 
-	if (!TriggerActive(item))
-		return;
-
-	if (!item->ItemFlags[2])
-	{
-		int div = item->TriggerFlags % 10 << 10;
-		int mod = item->TriggerFlags / 10 << 10;
-		item->ItemFlags[0] = GetRandomControl() % div;
-		item->ItemFlags[1] = GetRandomControl() % mod;
-		item->ItemFlags[2] = (GetRandomControl() & 0xF) + 15;
-	}
-
-	if (--item->ItemFlags[2] < 15)
-	{
-		auto* spark = GetFreeParticle();
-		spark->on = 1;
-		spark->sR = -1;
-		spark->sB = 16;
-		spark->sG = (GetRandomControl() & 0x1F) + 48;
-		spark->dR = (GetRandomControl() & 0x3F) - 64;
-		spark->dB = 0;
-		spark->dG = (GetRandomControl() & 0x3F) + -128;
-		spark->fadeToBlack = 4;
-		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->blendMode = BlendMode::Additive;
-		spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
-		spark->x = item->ItemFlags[1] + (GetRandomControl() & 0x3F) + item->Pose.Position.x - 544;
-		spark->y = item->Pose.Position.y;
-		spark->z = item->ItemFlags[0] + (GetRandomControl() & 0x3F) + item->Pose.Position.z - 544;
-		spark->xVel = (GetRandomControl() & 0x1FF) - 256;
-		spark->friction = 6;
-		spark->zVel = (GetRandomControl() & 0x1FF) - 256;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
-		spark->maxYvel = 0;
-		spark->yVel = -512 - (GetRandomControl() & 0x3FF);
-		spark->sSize = spark->size = (GetRandomControl() & 0x0F) + 32;
-		spark->dSize = spark->size / 4;
-
-		if (GetRandomControl() & 3)
-		{
-			spark->flags = SP_ROTATE | SP_DEF | SP_SCALE | SP_EXPDEF;
-			spark->scalar = 3;
-			spark->gravity = (GetRandomControl() & 0x3F) + 32;
-		}
-		else
-		{
-			spark->flags = SP_ROTATE | SP_DEF | SP_SCALE;
-			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
-			spark->scalar = 1;
-			spark->gravity = (GetRandomControl() & 0xF) + 64;
-		}
-	}
-}

@@ -1,42 +1,37 @@
 #pragma once
+
 #include "Math/Constants.h"
 
 constexpr auto FP_SHIFT				   = 16;
 constexpr auto W2V_SHIFT			   = 14;
 constexpr auto PREDICTIVE_SCALE_FACTOR = 14;
 
-struct ColorData
+constexpr auto SHORTS_TO_1_DEGREE = 65536.0f / 360.0f;
+constexpr auto DEGREES_TO_1_SHORT = 360.0f / 65536.0f;
+
+constexpr float ROUND(float value)
 {
-	byte r, g, b;
-	byte cd;
-};
+	return ((value > 0.0f) ? int(value + 0.5f) : int(value - 0.5f));
+}
 
 constexpr short ANGLE(float degrees)
 {
-	constexpr auto SHORTS_TO_ONE_DEGREE = 65536.0f / 360.0f;
-
-	return short(degrees * SHORTS_TO_ONE_DEGREE);
+	return (short)ROUND(degrees * SHORTS_TO_1_DEGREE);
 }
 
 constexpr short FROM_RAD(float radians)
 {
-	constexpr auto SHORTS_TO_ONE_DEGREE = 65536.0f / 360.0f;
-
-	return short((radians / RADIAN) * SHORTS_TO_ONE_DEGREE);
+	return (short)ROUND((radians / RADIAN) * SHORTS_TO_1_DEGREE);
 }
 
 constexpr float TO_DEGREES(short shortAngle)
 {
-	constexpr auto DEGREES_TO_ONE_SHORT = 360.0f / 65536.0f;
-
-	return (shortAngle * DEGREES_TO_ONE_SHORT);
+	return (shortAngle * DEGREES_TO_1_SHORT);
 }
 
 constexpr float TO_RAD(short shortAngle)
 {
-	constexpr auto DEGREES_TO_ONE_SHORT = 360.0f / 65536.0f;
-
-	return ((shortAngle * DEGREES_TO_ONE_SHORT) * RADIAN);
+	return ((shortAngle * DEGREES_TO_1_SHORT) * RADIAN);
 }
 
 constexpr float RAD_TO_DEG(float radians)

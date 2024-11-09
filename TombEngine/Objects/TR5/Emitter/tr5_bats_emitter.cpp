@@ -74,7 +74,7 @@ short GetNextBat()
 		index++;
 
 		if (index >= NUM_BATS)
-			return NO_ITEM;
+			return NO_VALUE;
 	}
 
 	NextBat = (batNumber + 1) & (NUM_BATS - 1);
@@ -86,7 +86,7 @@ void TriggerLittleBat(ItemInfo* item)
 {
 	short batNumber = GetNextBat();
 
-	if (batNumber != NO_ITEM)
+	if (batNumber != NO_VALUE)
 	{
 		auto* bat = &Bats[batNumber];
 
@@ -129,6 +129,8 @@ void UpdateBats()
 
 		if (!bat->On)
 			continue;
+
+		bat->StoreInterpolationData();
 
 		if ((LaraItem->Effect.Type != EffectType::None || LaraItem->HitPoints <= 0) &&
 			bat->Counter > 90 &&

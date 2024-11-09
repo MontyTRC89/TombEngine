@@ -14,7 +14,7 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR5/Entity/AutoGun.h"		 // OK
+#include "Objects/TR5/Entity/AutoGun.h"			 // OK
 #include "Objects/TR5/Entity/HeavyGuard.h"		 // OK
 #include "Objects/TR5/Entity/tr5_brownbeast.h"	 // OK
 #include "Objects/TR5/Entity/tr5_chef.h"		 // OK
@@ -37,10 +37,10 @@
 #include "Objects/TR5/Entity/tr5_willowwisp.h"	 // OK
 
 // Emitters
+#include "Objects/TR5/Emitter/tr5_smoke_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
-#include "Objects/TR5/Emitter/tr5_smoke_emitter.h"
 
 // Objects
 #include "Objects/TR5/Light/tr5_light.h"
@@ -55,8 +55,10 @@
 #include "Objects/TR5/Object/tr5_twoblockplatform.h"
 
 // Traps
+#include "Objects/Effects/EmberEmitter.h"
 #include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
+#include "Objects/TR5/Trap/LaserBeam.h"
 #include "Objects/TR5/Trap/ZipLine.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
 #include "Objects/TR5/Trap/tr5_ventilator.h"
@@ -71,9 +73,11 @@
 // Shatters
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
 
+using namespace TEN::Effects::EmberEmitter;
+using namespace TEN::Effects::SmokeEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
-using namespace TEN::Traps::TR5;
+using namespace TEN::Entities::Traps;
 
 static void StartEntity(ObjectInfo *obj)
 {
@@ -371,7 +375,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->LotType = LotType::Human;
+		obj->LotType = LotType::Basic;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 		obj->SetHitEffect();
@@ -388,7 +392,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->pivotLength = 50;
 		obj->radius = 102;
 		obj->intelligent = true;
-		obj->LotType = LotType::Human;
+		obj->LotType = LotType::Basic;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y);
 		obj->SetHitEffect();
@@ -730,7 +734,7 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSmokeEmitter;
-		obj->control = SmokeEmitterControl;
+		obj->control = ControlSmokeEmitter;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -739,7 +743,7 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSmokeEmitter;
-		obj->control = SmokeEmitterControl;
+		obj->control = ControlSmokeEmitter;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -748,7 +752,7 @@ static void StartObject(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeSmokeEmitter;
-		obj->control = SmokeEmitterControl;
+		obj->control = ControlSmokeEmitter;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -773,11 +777,11 @@ static void StartObject(ObjectInfo *obj)
 		obj->collision = ObjectCollision;
 	}
 
-	obj = &Objects[ID_HIGH_OBJECT2];
+	obj = &Objects[ID_EMBER_EMITTER];
 	if (obj->loaded)
 	{
 		obj->drawRoutine = nullptr;
-		obj->control = HighObject2Control;
+		obj->control = ControlEmberEmitter;
 	}
 
 	obj = &Objects[ID_GEN_SLOT1];
@@ -815,13 +819,6 @@ static void StartObject(ObjectInfo *obj)
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_LENS_FLARE];
-	if (obj->loaded)
-	{
-		//obj->drawRoutine = DrawLensFlare;
-
-	}
-
 	obj = &Objects[ID_WATERFALLSS1];
 	if (obj->loaded)
 	{
@@ -850,7 +847,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeVentilator;
-		obj->control = VentilatorControl;
+		obj->control = ControlVentilator;
 		obj->SetHitEffect(true);
 	}
 
@@ -858,7 +855,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeVentilator;
-		obj->control = VentilatorControl;
+		obj->control = ControlVentilator;
 		obj->SetHitEffect(true);
 	}
 
@@ -873,7 +870,7 @@ static void StartTrap(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeRomeHammer;
 		obj->collision = GenericSphereBoxCollision;
-		obj->control = AnimatingControl;
+		obj->control = ControlRomeHammer;
 		obj->SetHitEffect(true);
 	}
 
@@ -881,7 +878,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->collision = TrapCollision;
-		obj->control = FallingCeilingControl;
+		obj->control = ControlFallingCeiling;
 	}
 
 	obj = &Objects[ID_ROLLINGBALL];
@@ -931,7 +928,7 @@ static void StartTrap(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeExplosion;
-		obj->control = ExplosionControl;
+		obj->control = ControlExplosion;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -942,6 +939,16 @@ static void StartTrap(ObjectInfo *obj)
 		obj->Initialize = InitializeLaserBarrier;
 		obj->control = ControlLaserBarrier;
 		obj->collision = CollideLaserBarrier;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_LASER_BEAM];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeLaserBeam;
+		obj->control = ControlLaserBeam;
+		obj->collision = CollideLaserBeam;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -970,8 +977,8 @@ static void StartSwitch(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeWreckingBall;
-		obj->collision = WreckingBallCollision;
-		obj->control = WreckingBallControl;
+		obj->collision = CollideWreckingBall;
+		obj->control = ControlWreckingBall;
 		obj->SetHitEffect(true);
 	}
 }

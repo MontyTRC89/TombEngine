@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Objects/NamedBase.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
@@ -47,13 +48,15 @@ public:
 	void Destroy();
 
 	[[nodiscard]] Vec3 GetPos() const;
-	[[nodiscard]] Vec3 GetJointPos(int index) const;
+	[[nodiscard]] Vec3 GetJointPos(int index, sol::optional<Vec3> offset) const;
 	void SetPos(const Vec3& pos, sol::optional<bool> updateRoom);
 
+	[[nodiscard]] Rotation GetJointRot(int index) const;
 	[[nodiscard]] Rotation GetRot() const;
 	void SetRot(const Rotation& rot);
 
 	[[nodiscard]] int GetStateNumber() const;
+	[[nodiscard]] int GetTargetStateNumber() const;
 	void SetStateNumber(int stateNumber);
 
 	[[nodiscard]] int GetAnimNumber() const;
@@ -90,6 +93,7 @@ public:
 	[[nodiscard]] short GetLocationAI() const;
 	void SetLocationAI(short value);
 
+	[[nodiscard]] short GetMeshCount() const;
 	[[nodiscard]] bool GetMeshVisible(int meshId) const;
 	void SetMeshVisible(int meshId, bool isVisible);
 	void ShatterMesh(int meshId);
@@ -110,7 +114,7 @@ public:
 	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
 	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
 
-	void EnableItem();
+	void EnableItem(sol::optional<float> timer);
 	void DisableItem();
 	void MakeInvisible();
 	void SetVisible(bool isVisible);

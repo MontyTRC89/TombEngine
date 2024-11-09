@@ -152,7 +152,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WOLF_STATE_IDLE:
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
@@ -169,7 +169,7 @@ namespace TEN::Entities::Creatures::TR1
 				if (creature.Mood != MoodType::Bored)
 				{
 					item.Animation.TargetState = WOLF_STATE_STALK;
-					item.Animation.RequiredState = NO_STATE;
+					item.Animation.RequiredState = NO_VALUE;
 				}
 				else if (Random::TestProbability(WOLF_SLEEP_CHANCE))
 				{
@@ -180,7 +180,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WOLF_STATE_CROUCH:
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
@@ -257,7 +257,7 @@ namespace TEN::Entities::Creatures::TR1
 					else
 					{
 						item.Animation.TargetState = WOLF_STATE_JUMP_ATTACK;
-						item.Animation.RequiredState = NO_STATE;
+						item.Animation.RequiredState = NO_VALUE;
 					}
 				}
 				else if (creature.Mood == MoodType::Stalk &&
@@ -276,7 +276,7 @@ namespace TEN::Entities::Creatures::TR1
 			case WOLF_STATE_JUMP_ATTACK:
 				tiltAngle = headingAngle;
 
-				if (item.Animation.RequiredState == NO_STATE &&
+				if (item.Animation.RequiredState == NO_VALUE &&
 					item.TouchBits.Test(WolfAttackJoints))
 				{
 					item.Animation.RequiredState = WOLF_STATE_RUN;
@@ -288,7 +288,7 @@ namespace TEN::Entities::Creatures::TR1
 				break;
 
 			case WOLF_STATE_BITE_ATTACK:
-				if (ai.ahead && item.Animation.RequiredState == NO_STATE &&
+				if (ai.ahead && item.Animation.RequiredState == NO_VALUE &&
 					item.TouchBits.Test(WolfAttackJoints))
 				{
 					item.Animation.RequiredState = WOLF_STATE_CROUCH;

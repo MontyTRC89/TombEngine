@@ -10,7 +10,6 @@
 #include "Game/Lara/lara.h"
 #include "Math/Math.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Sound/sound.h"
 #include "Game/camera.h"
@@ -155,6 +154,8 @@ namespace TEN::Entities::Generic
 		if (TriggerActive(item))
 		{
 			rope->active = 1;
+			rope->StoreInterpolationData();
+
 			RopeDynamics(rope);
 		}
 		else
@@ -277,9 +278,9 @@ namespace TEN::Entities::Generic
 
 			for (int i = pendulumPointer->node; i >= 0; --i)
 			{
-				rope->segment[i].x = rope->meshSegment[i - 1].x + ((int64_t)rope->segmentLength * vec.x >> FP_SHIFT);
-				rope->segment[i].y = rope->meshSegment[i - 1].y + ((int64_t)rope->segmentLength * vec.y >> FP_SHIFT);
-				rope->segment[i].z = rope->meshSegment[i - 1].z + ((int64_t)rope->segmentLength * vec.z >> FP_SHIFT);
+				rope->segment[i].x = rope->meshSegment[std::clamp(i - 1, 0, ROPE_SEGMENTS)].x + ((int64_t)rope->segmentLength * vec.x >> FP_SHIFT);
+				rope->segment[i].y = rope->meshSegment[std::clamp(i - 1, 0, ROPE_SEGMENTS)].y + ((int64_t)rope->segmentLength * vec.y >> FP_SHIFT);
+				rope->segment[i].z = rope->meshSegment[std::clamp(i - 1, 0, ROPE_SEGMENTS)].z + ((int64_t)rope->segmentLength * vec.z >> FP_SHIFT);
 
 				rope->velocity[i].x = 0;
 				rope->velocity[i].y = 0;
@@ -604,9 +605,9 @@ namespace TEN::Entities::Generic
 		GetCollisionInfo(coll, item);
 
 		bool stumble = testForStumble &&
-			((coll->CollisionType != CollisionType::CT_NONE && 
-			  coll->CollisionType != CollisionType::CT_TOP  &&
-			  coll->CollisionType != CollisionType::CT_TOP_FRONT) || 
+			((coll->CollisionType != CollisionType::None && 
+			  coll->CollisionType != CollisionType::Top &&
+			  coll->CollisionType != CollisionType::TopFront) || 
 			  coll->HitStatic);
 
 		if (stumble || 

@@ -17,7 +17,7 @@ namespace TEN::Entities::Creatures::TR2
 {
 	constexpr auto TRANSFORM_EFFECT_1_TIME = 100;
 	constexpr auto TRANSFORM_EFFECT_2_TIME = 115;
-	constexpr auto TRANSFORM_EFFECT_3_TIME = 130;
+	constexpr auto TRANSFORM_EFFECT_3_TIME = 125;
 
 	constexpr auto EXPLOSION_LIVE_TIME = 100;
 

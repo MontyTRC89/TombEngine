@@ -61,6 +61,6 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 
 void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo);
 void LaraTargetInfo(ItemInfo& laraItem, const WeaponInfo& weaponInfo);
-void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, bool isExplosive, int bestJointIndex = NO_JOINT);
+void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, int damage, bool isExplosive, int bestJointIndex = NO_VALUE);
 
 void SmashItem(short itemNumber);

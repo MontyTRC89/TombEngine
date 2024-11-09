@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
@@ -18,6 +19,8 @@
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+
+using namespace TEN::Collision::Point;
 
 using namespace TEN::Math;
 
@@ -62,7 +65,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->maxYvel = 0;
 		spark->gravity = 0;
 		spark->scalar = 1;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE_LIGHT;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_LIGHT;
 		spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
 	}
 
@@ -134,7 +137,7 @@ namespace TEN::Entities::Creatures::TR5
 	void SubmarineAttack(ItemInfo* item)
 	{
 		short itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 
 		auto* torpedoItem = &g_Level.Items[itemNumber];
@@ -395,7 +398,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		Vector3i pos;
 
-		if (item->ItemFlags[0] == NO_ITEM)
+		if (item->ItemFlags[0] == NO_VALUE)
 		{
 			bool found = false;
 			for (int i = g_Level.NumItems; i < 256; i++)
@@ -429,7 +432,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				pos.x = 4 * item->Animation.ActiveState;
 				pos.y = 4 * item->Animation.TargetState;
-				pos.z = 4 * (item->Animation.RequiredState == NO_STATE) ? 0 : item->Animation.RequiredState;
+				pos.z = 4 * (item->Animation.RequiredState == NO_VALUE) ? 0 : item->Animation.RequiredState;
 			}
 		}
 
@@ -486,11 +489,11 @@ namespace TEN::Entities::Creatures::TR5
 
 		TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity.z);
 		
-		auto probe = GetCollision(item);
+		auto probe = GetPointCollision(*item);
 
-		if (item->Pose.Position.y < probe.Position.Floor &&
-			item->Pose.Position.y > probe.Position.Ceiling &&
-			TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber))
+		if (item->Pose.Position.y < probe.GetFloorHeight() &&
+			item->Pose.Position.y > probe.GetCeilingHeight() &&
+			TestEnvironment(ENV_FLAG_WATER, probe.GetRoomNumber()))
 		{
 			if (ItemNearLara(item->Pose.Position, 200))
 			{
@@ -506,8 +509,8 @@ namespace TEN::Entities::Creatures::TR5
 				//	if (ItemNearLara(&item->pos, 400) && Lara.anxiety < 0xE0)
 				//		Lara.anxiety += 32;
 
-				if (probe.RoomNumber != item->RoomNumber)
-					ItemNewRoom(itemNumber, probe.RoomNumber);
+				if (probe.GetRoomNumber() != item->RoomNumber)
+					ItemNewRoom(itemNumber, probe.GetRoomNumber());
 
 				auto pos1 = GetJointPosition(item, 0, Vector3i(0, 0, -64));
 				auto pos2 = GetJointPosition(item, 0, Vector3i(0, 0, -64 << ((GlobalCounter & 1) + 2)));

@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
@@ -24,6 +25,7 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Switches;
 
@@ -114,7 +116,7 @@ int GetSwitchTrigger(ItemInfo* item, short* itemNumbersPtr, int attatchedToSwitc
 	return k;
 }
 
-int SwitchTrigger(short itemNumber, short timer)
+bool SwitchTrigger(short itemNumber, short timer)
 {
 	auto& item = g_Level.Items[itemNumber];
 	const auto& player = Lara;
@@ -127,7 +129,7 @@ int SwitchTrigger(short itemNumber, short timer)
 		item.Status = ITEM_ACTIVE;
 		item.ItemFlags[1] = false;
 	
-		return 1;
+		return true;
 	}
 
 	if (item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16 &&
@@ -137,13 +139,13 @@ int SwitchTrigger(short itemNumber, short timer)
 		item.Status = ITEM_DEACTIVATED;
 		item.ItemFlags[1] = false;
 	
-		return 1;
+		return true;
 	}
 
 	if ((item.ObjectNumber >= ID_PUZZLE_DONE1 && item.ObjectNumber <= ID_PUZZLE_DONE16) ||
 		(item.ObjectNumber >= ID_PUZZLE_HOLE1 && item.ObjectNumber <= ID_PUZZLE_HOLE16))
 	{
-		return 0;
+		return false;
 	}
 
 	// Handle reusable receptacles.
@@ -156,7 +158,7 @@ int SwitchTrigger(short itemNumber, short timer)
 		item.Status = ITEM_ACTIVE;
 		item.ItemFlags[5] = (int)ReusableReceptacleState::Done;
 		item.ItemFlags[1] = false;
-		return 1;
+		return true;
 	}
 
 	if (item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16 && 
@@ -167,11 +169,11 @@ int SwitchTrigger(short itemNumber, short timer)
 		item.Status = ITEM_DEACTIVATED;
 		item.ItemFlags[5] = (int)ReusableReceptacleState::Empty;
 		item.ItemFlags[1] = false;
-		return 1;
+		return true;
 	}
 
 	if (item.ObjectNumber >= ID_KEY_HOLE1 && item.ObjectNumber <= ID_KEY_HOLE16)
-		return 0;
+		return false;
 
 	// Handle switches.
 	if (item.Status == ITEM_DEACTIVATED)
@@ -186,7 +188,7 @@ int SwitchTrigger(short itemNumber, short timer)
 			if (timer != 1)
 				item.Timer = FPS * timer;
 
-			return 1;
+			return true;
 		}
 	
 		if (item.TriggerFlags >= 0 || item.Animation.ActiveState != SWITCH_OFF)
@@ -197,12 +199,12 @@ int SwitchTrigger(short itemNumber, short timer)
 			if (!item.ItemFlags[0] == 0)
 				item.Flags |= ONESHOT;
 
-			return 1;
+			return true;
 		}
 		else
 		{
 			item.Status = ITEM_ACTIVE;
-			return 1;
+			return true;
 		}
 	}
 	else if (item.Status != ITEM_NOT_ACTIVE)
@@ -211,13 +213,14 @@ int SwitchTrigger(short itemNumber, short timer)
 			item.Animation.AnimNumber == GetAnimIndex(item, 2) &&
 			item.Animation.FrameNumber == GetFrameIndex(&item, 0))
 		{
-			return 1;
+			return true;
 		}
 
-		return ((item.Flags & ONESHOT) >> 8);
+		if (item.Flags & ONESHOT)
+			return true;
 	}
 
-	return 0;
+	return false;
 }
 
 int KeyTrigger(short itemNumber)
@@ -306,23 +309,23 @@ void RefreshCamera(short type, short* data)
 		if (!targetOk || (targetOk == 2 && Camera.item->LookedAt && Camera.item != Camera.lastItem))
 			Camera.item = nullptr;
 
-	if (Camera.number == -1 && Camera.timer > 0)
-		Camera.timer = -1;
+	if (Camera.number == NO_VALUE && Camera.timer > 0)
+		Camera.timer = NO_VALUE;
 }
 
 short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 {
-	auto bottomBlock = GetCollision(x, y, z, floor->RoomNumber).BottomBlock; 
+	const auto& bottomSector = GetPointCollision(Vector3i(x, y, z), floor->RoomNumber).GetBottomSector(); 
 
-	if (bottomBlock->TriggerIndex == -1)
+	if (bottomSector.TriggerIndex == NO_VALUE)
 		return nullptr;
 
-	return &g_Level.FloorData[bottomBlock->TriggerIndex];
+	return &g_Level.FloorData[bottomSector.TriggerIndex];
 }
 
 short* GetTriggerIndex(ItemInfo* item)
 {
-	auto roomNumber = item->RoomNumber;
+	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 	return GetTriggerIndex(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 }
@@ -330,35 +333,50 @@ short* GetTriggerIndex(ItemInfo* item)
 void Antitrigger(short const value, short const flags)
 {
 	ItemInfo* item = &g_Level.Items[value];
-	if (item->ObjectNumber == ID_EARTHQUAKE)
+
+	if (item->Flags & IFLAG_KILLED)
+		return;
+
+	if (item->ObjectNumber == ID_EARTHQUAKE) // HACK: move to earthquake control function!
 	{
 		item->ItemFlags[0] = 0;
 		item->ItemFlags[1] = 100;
 	}
 
-	item->Flags &= ~(CODE_BITS | REVERSE);
+	item->Flags &= ~(CODE_BITS | IFLAG_REVERSE);
 
 	if (flags & ONESHOT)
 		item->Flags |= ATONESHOT;
 
-	if (item->Active && Objects[item->ObjectNumber].intelligent)
+	if (Objects[item->ObjectNumber].intelligent)
 	{
-		DisableEntityAI(value);
-		RemoveActiveItem(value, false);
-		item->Active = false;
-		item->Status = ITEM_INVISIBLE;
+		if (item->Active)
+		{
+			DisableEntityAI(value);
+			RemoveActiveItem(value, false);
+			item->Status = ITEM_INVISIBLE;
+		}
+	}
+	else
+	{
+		item->Status = ITEM_DEACTIVATED;
 	}
 }
 
 void Trigger(short const value, short const flags)
 {
 	ItemInfo* item = &g_Level.Items[value];
+
+	if (item->Flags & IFLAG_KILLED)
+		return;
+
+	item->TouchBits = NO_JOINT_BITS;
 	item->Flags |= TRIGGERED;
 
 	if (flags & ONESHOT)
 		item->Flags |= ONESHOT;
 
-	if (!(item->Active) && !(item->Flags & IFLAG_KILLED))
+	if (!item->Active)
 	{
 		if (Objects[item->ObjectNumber].intelligent)
 		{
@@ -366,47 +384,41 @@ void Trigger(short const value, short const flags)
 			{
 				if (item->Status == ITEM_INVISIBLE)
 				{
-					item->TouchBits = NO_JOINT_BITS;
 					if (EnableEntityAI(value, false))
 					{
-						item->Status = ITEM_ACTIVE;
 						AddActiveItem(value);
 					}
 					else
 					{
 						item->Status = ITEM_INVISIBLE;
 						AddActiveItem(value);
+						return;
 					}
 				}
 			}
 			else
 			{
-				item->TouchBits = NO_JOINT_BITS;
-				item->Status = ITEM_ACTIVE;
 				AddActiveItem(value);
 				EnableEntityAI(value, true);
 			}
 		}
 		else
 		{
-			item->TouchBits = NO_JOINT_BITS;
 			AddActiveItem(value);
-			item->Status = ITEM_ACTIVE;
 		}
+
+		item->Status = ITEM_ACTIVE;
+		item->DisableInterpolation = true;
 	}
 }
 
 void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bool heavy, int heavyFlags)
 {
-	int flip = -1;
-	int flipAvailable = 0;
-	int newEffect = -1;
-	int switchOff = 0;
-	//int switchFlag = 0;
-	short objectNumber = 0;
+	bool switchOff = false;
+	bool flipAvailable = false;
+	int flip = NO_VALUE;
+	int newEffect = NO_VALUE;
 	int keyResult = 0;
-	short cameraFlags = 0;
-	short cameraTimer = 0;
 	int spotCamIndex = 0;
 
 	auto data = GetTriggerIndex(floor, x, y, z);
@@ -466,13 +478,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			if (!SwitchTrigger(value, timer))
 				return;
 
-			objectNumber = g_Level.Items[value].ObjectNumber;
-			//This disables the antitrigger of the Valve switch (ocb 5). I don't know the purpose of this in TR4.
-			//if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
-				//switchFlag = 1;
-
-			switchOff = (g_Level.Items[value].Animation.ActiveState == 1);
-
+			switchOff = (triggerType == TRIGGER_TYPES::SWITCH && timer && g_Level.Items[value].Animation.ActiveState == 1);
 			break;
 
 		case TRIGGER_TYPES::MONKEY:
@@ -516,8 +522,11 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
-			if (GetCollision(floor, x, y, z).Position.Floor == y)
+		{
+			auto pointColl = GetPointCollision(Vector3i(x, y, z), floor->RoomNumber);
+			if (pointColl.GetFloorHeight() == y && pointColl.GetFloorBridgeItemNumber() == NO_VALUE)
 				break;
+		}
 			return;
 
 		case TRIGGER_TYPES::KEY:
@@ -568,8 +577,8 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 
 			if (keyResult >= 2 ||
 				(triggerType == TRIGGER_TYPES::ANTIPAD ||
-					triggerType == TRIGGER_TYPES::ANTITRIGGER ||
-					triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER) &&
+				 triggerType == TRIGGER_TYPES::ANTITRIGGER ||
+				 triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER) &&
 				item->Flags & ATONESHOT)
 				break;
 
@@ -653,7 +662,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			if (triggerType == TRIGGER_TYPES::COMBAT)
 				break;
 
-			if (triggerType == TRIGGER_TYPES::SWITCH && timer && switchOff)
+			if (switchOff)
 				break;
 
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
@@ -669,6 +678,9 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			trigger = *(data++);
 
 			if (keyResult == 1)
+				break;
+
+			if (switchOff)
 				break;
 
 			if (triggerType == TRIGGER_TYPES::ANTIPAD ||
@@ -745,17 +757,26 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			break;
 
 		case TO_FLIPEFFECT:
+			if (switchOff)
+				break;
+
 			TriggerTimer = timer;
 			newEffect = value;
 			break;
 
 		case TO_FINISH:
+			if (switchOff)
+				break;
+
 			NextLevel = value ? value : (CurrentLevel + 1);
 			RequiredStartPos = timer;
 			break;
 
 		case TO_CD:
-			PlaySoundTrack(value, flags);
+			if (switchOff)
+				break;
+
+			PlaySoundTrack(value, flags & CODE_BITS);
 			break;
 
 		case TO_CUTSCENE:
@@ -763,17 +784,22 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			break;
 
 		case TO_SECRET:
-			if (!(Statistics.Level.Secrets & (1 << value)))
+			if (switchOff)
+				break;
+
+			if (!(SaveGame::Statistics.Level.Secrets & (1 << value)))
 			{
 				PlaySecretTrack();
-				Statistics.Level.Secrets |= (1 << value);
-				Statistics.Game.Secrets++;
+				SaveGame::Statistics.Level.Secrets |= (1 << value);
+				SaveGame::Statistics.Game.Secrets++;
 			}
 			break;
 
 		case TO_VOLUMEEVENT:
 		case TO_GLOBALEVENT:
 			trigger = *(data++);
+
+			if (!switchOff)
 			{
 				auto& list = targetType == TO_VOLUMEEVENT ? g_Level.VolumeEventSets : g_Level.GlobalEventSets;
 
@@ -812,16 +838,16 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 	if (cameraItem && (Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
 		Camera.item = cameraItem;
 
-	if (flip != -1)
+	if (flip != NO_VALUE)
 		DoFlipMap(flip);
 
-	if (newEffect != -1 && (flip || !flipAvailable))
+	if (newEffect != NO_VALUE && (flip || !flipAvailable))
 		FlipEffect = newEffect;
 }
 
 void TestTriggers(ItemInfo* item, bool isHeavy, int heavyFlags)
 {
-	auto roomNumber = item->RoomNumber;
+	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
 	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, item->Index, isHeavy, heavyFlags);
@@ -841,37 +867,44 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ItemInfo* item)
 {
-	auto pointColl = GetCollision(item);
-	auto* sectorPtr = GetCollision(item).BottomBlock;
-
 	bool isPlayer = item->IsLara();
 
-	// Monkeyswing and climb (only for Lara)
+	// HACK: because of L-shaped portal configurations, we need to fetch room number from Location struct for player.
+	auto pointColl = isPlayer ? GetPointCollision(item->Pose.Position, item->Location.RoomNumber) : GetPointCollision(*item);
+	auto& sector = pointColl.GetBottomSector();
+
+	// Set monkeyswing and wall climb statuses for player.
 	if (isPlayer)
 	{
-		auto* lara = GetLaraInfo(item);
+		auto& player = GetLaraInfo(*item);
 
-		// Set climb status
-		if (TestLaraNearClimbableWall(item, sectorPtr))
-			lara->Control.CanClimbLadder = true;
+		// Set wall climb status.
+		if (TestLaraNearClimbableWall(item, &sector))
+		{
+			player.Control.CanClimbLadder = true;
+		}
 		else
-			lara->Control.CanClimbLadder = false;
+		{
+			player.Control.CanClimbLadder = false;
+		}
 
-		// Set monkeyswing status
-		lara->Control.CanMonkeySwing = sectorPtr->Flags.Monkeyswing;
+		// Set monkey swing status.
+		player.Control.CanMonkeySwing = sector.Flags.Monkeyswing;
 	}
 
-	// Burn or drown item
-	if (sectorPtr->Flags.Death && item->Pose.Position.y == item->Floor)
+	// Burn or drown item.
+	if (sector.Flags.Death && item->Pose.Position.y == item->Floor && pointColl.GetFloorBridgeItemNumber() == NO_VALUE)
 	{
 		if (isPlayer)
 		{
+			const auto& player = GetLaraInfo(*item);
+
 			if (!IsJumpState((LaraState)item->Animation.ActiveState) || 
-				GetLaraInfo(item)->Control.WaterStatus != WaterStatus::Dry)
+				player.Control.WaterStatus != WaterStatus::Dry)
 			{
-				// To allow both lava and rapids in same level, also check floor material flag.
-				if (sectorPtr->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water &&
-					Objects[ID_KAYAK_LARA_ANIMS].loaded)
+				// Check floor material.
+				auto material = sector.GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true);
+				if (material == MaterialType::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded) // HACK: Allow both lava and rapids in same level.
 				{
 					KayakLaraRapidsDrown(item);
 				}
@@ -883,10 +916,11 @@ void ProcessSectorFlags(ItemInfo* item)
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 		{
-			if (sectorPtr->GetSurfaceMaterial(pointColl.Coordinates.x, pointColl.Coordinates.z, true) == MaterialType::Water ||
-				TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sectorPtr->RoomNumber))
+			auto material = sector.GetSurfaceMaterial(pointColl.GetPosition().x, pointColl.GetPosition().z, true);
+			if (material == MaterialType::Water || TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, sector.RoomNumber))
 			{
-				DoDamage(item, INT_MAX); // TODO: Implement correct rapids behaviour for other objects!
+				// TODO: Implement correct rapids behaviour for other objects.
+				DoDamage(item, INT_MAX);
 			}
 			else
 			{

@@ -4,7 +4,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/los.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
@@ -31,6 +31,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -571,7 +572,7 @@ void HandleWeapon(ItemInfo& laraItem)
 					player.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
 			}
 			else if (player.Control.Weapon.RequestGunType == LaraWeaponType::Flare ||
-				(player.Context.Vehicle == NO_ITEM &&
+				(player.Context.Vehicle == NO_VALUE &&
 					(player.Control.Weapon.RequestGunType == LaraWeaponType::HarpoonGun ||
 						player.Control.WaterStatus == WaterStatus::Dry ||
 						(player.Control.WaterStatus == WaterStatus::Wade &&
@@ -760,7 +761,7 @@ void HandleWeapon(ItemInfo& laraItem)
 	case HandStatus::Free:
 		if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
-			if (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates))
+			if (player.Context.Vehicle != NO_VALUE || TestState(laraItem.Animation.ActiveState, FlarePoseStates))
 			{
 				if (player.Flare.ControlLeft)
 				{
@@ -792,7 +793,7 @@ void HandleWeapon(ItemInfo& laraItem)
 		{
 			if (laraItem.Model.MeshIndex[LM_LHAND] == Objects[ID_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
-				player.Flare.ControlLeft = (player.Context.Vehicle != NO_ITEM || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
+				player.Flare.ControlLeft = (player.Context.Vehicle != NO_VALUE || TestState(laraItem.Animation.ActiveState, FlarePoseStates));
 
 				if (Contains(UnavailableFlarePoseAnims, laraItem.Animation.AnimNumber))
 					player.Flare.ControlLeft = false;
@@ -842,32 +843,38 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	auto target = origin + (directionNorm * weapon.TargetDist);
 	auto ray = Ray(origin, directionNorm);
 
-	int num = GetSpheres(&targetEntity, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int bestJointIndex = NO_JOINT;
-	float bestDistance = INFINITY;
-	for (int i = 0; i < num; i++)
-	{
-		auto sphere = BoundingSphere(Vector3(CreatureSpheres[i].x, CreatureSpheres[i].y, CreatureSpheres[i].z), CreatureSpheres[i].r);
-		float distance = 0.0f;
-		if (ray.Intersects(sphere, distance))
-		{
-			if (distance < bestDistance)
-			{
-				bestDistance = distance;
-				bestJointIndex = i;
-			}
-		}
-	}
-
 	player.Control.Weapon.HasFired = true;
 	player.Control.Weapon.Fired = true;
-	
+
 	auto vOrigin = GameVector(pos);
 	short roomNumber = laraItem.RoomNumber;
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vOrigin.RoomNumber = roomNumber;
 
-	if (bestJointIndex < 0)
+	if (&targetEntity == nullptr)
+	{
+		auto vTarget = GameVector(target);
+		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
+		return FireWeaponType::Miss;
+	}
+
+	auto spheres = targetEntity.GetSpheres();
+	int closestJointIndex = NO_VALUE;
+	float closestDist = INFINITY;
+	for (int i = 0; i < spheres.size(); i++)
+	{
+		float dist = 0.0f;
+		if (ray.Intersects(spheres[i], dist))
+		{
+			if (dist < closestDist)
+			{
+				closestDist = dist;
+				closestJointIndex = i;
+			}
+		}
+	}
+	
+	if (closestJointIndex < 0)
 	{
 		auto vTarget = GameVector(target);
 		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
@@ -875,14 +882,14 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	}
 	else
 	{
-		Statistics.Game.AmmoHits++;
-		target = origin + (directionNorm * bestDistance);
+		SaveGame::Statistics.Game.AmmoHits++;
+		target = origin + (directionNorm * closestDist);
 		auto vTarget = GameVector(target);
 
 		// NOTE: It seems that entities hit by the player in the normal way must have GetTargetOnLOS return false.
 		// It's strange, but this replicates original behaviour until we fully understand what is happening.
 		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
-			HitTarget(&laraItem, &targetEntity, &vTarget, weapon.Damage, false, bestJointIndex);
+			HitTarget(&laraItem, &targetEntity, &vTarget, weapon.Damage, false, closestJointIndex);
 
 		return FireWeaponType::PossibleHit;
 	}
@@ -917,7 +924,7 @@ void FindNewTarget(ItemInfo& laraItem, const WeaponInfo& weaponInfo)
 	for (auto* creaturePtr : ActiveCreatures)
 	{
 		// Continue loop if no item.
-		if (creaturePtr->ItemNumber == NO_ITEM)
+		if (creaturePtr->ItemNumber == NO_VALUE)
 			continue;
 
 		auto& item = g_Level.Items[creaturePtr->ItemNumber];

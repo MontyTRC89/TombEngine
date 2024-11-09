@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -17,6 +18,7 @@
 #include "Renderer/RendererEnums.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::TR4;
@@ -119,9 +121,7 @@ namespace TEN::Entities::Effects
 		ShatterItem.yRot = fx->pos.Orientation.y;
 		ShatterItem.meshIndex = fx->frameNumber;
 		ShatterItem.color = Vector4::One;
-		ShatterItem.sphere.x = fx->pos.Position.x;
-		ShatterItem.sphere.y = fx->pos.Position.y;
-		ShatterItem.sphere.z = fx->pos.Position.z;
+		ShatterItem.sphere.Center = fx->pos.Position.ToVector3();
 		ShatterItem.bit = 0;
 		ShatterItem.flags = fx->flag2 & 0x400;
 		ShatterObject(&ShatterItem, 0, param2, fx->roomNumber, param1);
@@ -221,9 +221,9 @@ namespace TEN::Entities::Effects
 		fx.pos.Position.y += -((fx.speed * phd_sin(fx.pos.Orientation.x))) + fx.fallspeed;
 		fx.pos.Position.z += speed * phd_cos(fx.pos.Orientation.y);
 
-		auto pointColl = GetCollision(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, fx.roomNumber);
+		auto pointColl = GetPointCollision(fx.pos.Position, fx.roomNumber);
 
-		if (fx.pos.Position.y >= pointColl.Position.Floor || fx.pos.Position.y <= pointColl.Position.Ceiling)
+		if (fx.pos.Position.y >= pointColl.GetFloorHeight() || fx.pos.Position.y <= pointColl.GetCeilingHeight())
 		{
 			fx.pos.Position = prevPos;
 
@@ -361,8 +361,8 @@ namespace TEN::Entities::Effects
 		}
 		else
 		{
-			if (pointColl.RoomNumber != fx.roomNumber)
-				EffectNewRoom(fxNumber, pointColl.RoomNumber);
+			if (pointColl.GetRoomNumber() != fx.roomNumber)
+				EffectNewRoom(fxNumber, pointColl.GetRoomNumber());
 
 			auto deltaPos = prevPos - fx.pos.Position;
 

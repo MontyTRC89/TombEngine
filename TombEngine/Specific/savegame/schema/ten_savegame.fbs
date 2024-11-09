@@ -274,10 +274,16 @@ table PlayerContextData {
 	water_surface_dist: int32;
 }
 
+table CollisionInfoData {
+	last_bridge_item_number: int32;
+	last_bridge_item_pose: Pose;
+}
+
 table Lara {
 	context: PlayerContextData;
 	control: LaraControlData;
 	effect: PlayerEffectData;
+	collision: CollisionInfoData;
 	extra_anim: int32;
 	extra_head_rot: EulerAngles;
 	extra_torso_rot: EulerAngles;
@@ -295,6 +301,11 @@ table Lara {
 	target_entity_number: int32;
 	torch: TorchData;
 	weapons: [CarriedWeaponInfo];
+}
+
+table Camera {
+	position: GameVector;
+	target: GameVector;
 }
 
 table FixedCamera {
@@ -371,13 +382,17 @@ table SwarmObjectInfo {
 	flags: int32;
 }
 
+table RopeSegment {
+	segment: Vector3;
+	velocity: Vector3;
+	normalised_segment: Vector3;
+	mesh_segment: Vector3;
+	coord: Vector3;
+}
+
 table Rope {
-	segments: [Vector3];
-	velocities: [Vector3];
-	normalised_segments: [Vector3];
-	mesh_segments: [Vector3];
+	segments: [RopeSegment];
 	position: Vector3;
-	coords: [Vector3];
 	segment_length: int32;
 	active: int32;
 	coiled: int32;
@@ -409,6 +424,21 @@ table Volume {
 	rotation: Vector4;
 	scale: Vector3;
 	queue: [VolumeState];
+}
+
+table FishData {
+	is_patrolling: bool;
+	is_lethal: bool;
+	leader_item_number: int32;
+	life: float;
+	mesh_index: int32;
+	orientation: EulerAngles;
+	position: Vector3;
+	position_target: Vector3;
+	room_number: int32;
+	target_item_number: int32;
+	undulation: float;
+	velocity: float;
 }
 
 struct KeyValPair {
@@ -497,12 +527,14 @@ table SaveGame {
 	header: SaveGameHeader;
 	game: SaveGameStatistics;
 	level: SaveGameStatistics;
+	camera: Camera;
 	lara: Lara;
 	rooms: [Room];
 	items: [Item];
 	next_item_free: int32;
 	next_item_active: int32;
 	room_items: [int32];
+	fish_swarm: [FishData];
 	fxinfos: [FXInfo];
 	next_fx_free: int32;
 	next_fx_active: int32;
