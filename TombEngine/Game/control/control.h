@@ -26,6 +26,13 @@ enum class GameStatus
 	LevelComplete
 };
 
+enum class GameMode
+{
+	Normal,
+	Frozen,
+	Menu
+};
+
 enum class LevelLoadType
 {
 	New,

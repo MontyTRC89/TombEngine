@@ -216,6 +216,8 @@ static constexpr char ScriptReserved_SetSettings[]				= "SetSettings";
 static constexpr char ScriptReserved_SetAnimations[]			= "SetAnimations";
 static constexpr char ScriptReserved_EndLevel[]					= "EndLevel";
 static constexpr char ScriptReserved_GetGameStatus[]			= "GetGameStatus";
+static constexpr char ScriptReserved_SetGameMode[]				= "SetGameMode";
+static constexpr char ScriptReserved_GetGameMode[]				= "GetGameMode";
 static constexpr char ScriptReserved_SaveGame[]					= "SaveGame";
 static constexpr char ScriptReserved_LoadGame[]					= "LoadGame";
 static constexpr char ScriptReserved_DeleteSaveGame[]			= "DeleteSaveGame";
@@ -249,6 +251,7 @@ static constexpr char ScriptReserved_LaraWeaponType[] = "LaraWeaponType";
 static constexpr char ScriptReserved_PlayerAmmoType[] = "PlayerAmmoType";
 static constexpr char ScriptReserved_HandStatus[]	  = "HandStatus";
 static constexpr char ScriptReserved_GameStatus[]	  = "GameStatus";
+static constexpr char ScriptReserved_GameMode[]		  = "GameMode";
 
 // Functions
 static constexpr char ScriptReserved_ShowString[]					= "ShowString";

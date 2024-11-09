@@ -8,6 +8,7 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Flow/GameModes.h"
 #include "Scripting/Internal/TEN/Flow/GameStatuses.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
@@ -142,6 +143,20 @@ Get current game status, such as normal game loop, exiting to title, etc.
 @treturn Flow.GameStatus the current game status
 */
 	tableFlow.set_function(ScriptReserved_GetGameStatus, &FlowHandler::GetGameStatus, this);
+
+/***
+Get current game mode, such as normal, frozen or menu.
+@function GetGameMode
+@treturn Flow.GameMode the current game mode
+*/
+	tableFlow.set_function(ScriptReserved_GetGameMode, &FlowHandler::GetGameMode, this);
+
+/***
+Set current game mode, such as normal, frozen or menu.
+@function SetGameMode
+@tparam Flow.GameMode new game mode to set.
+*/
+	tableFlow.set_function(ScriptReserved_SetGameMode, &FlowHandler::SetGameMode, this);
 
 /***
 Save the game to a savegame slot.
@@ -281,6 +296,7 @@ Specify which translations in the strings table correspond to which languages.
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameStatus, GAME_STATUSES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameMode, GAME_MODES);
 }
 
 FlowHandler::~FlowHandler()
@@ -464,6 +480,16 @@ void FlowHandler::EndLevel(std::optional<int> nextLevel, std::optional<int> star
 GameStatus FlowHandler::GetGameStatus()
 {
 	return this->LastGameStatus;
+}
+
+GameMode FlowHandler::GetGameMode()
+{
+	return this->CurrentGameMode;
+}
+
+void FlowHandler::SetGameMode(GameMode mode)
+{
+	this->CurrentGameMode = mode;
 }
 
 void FlowHandler::FlipMap(int group)
