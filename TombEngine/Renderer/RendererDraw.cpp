@@ -1860,7 +1860,9 @@ namespace TEN::Renderer
 		ClearDrawPhaseDisplaySprites();
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		g_Hud.Draw(*LaraItem);
+
+		if (g_GameFlow->CurrentBreakMode == BreakMode::None)
+			g_Hud.Draw(*LaraItem);
 		
 		_doingFullscreenPass = true;
 

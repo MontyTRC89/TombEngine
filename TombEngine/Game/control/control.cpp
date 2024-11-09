@@ -259,6 +259,7 @@ GameStatus GamePhase(bool insideMenu)
 
 GameStatus BreakPhase()
 {
+	// We've just entered freeze mode, do initialization, if needed.
 	if (LastBreakMode == BreakMode::None)
 	{
 		if (g_GameFlow->CurrentBreakMode == BreakMode::Full)
@@ -271,6 +272,15 @@ GameStatus BreakPhase()
 		StopRumble();
 	}
 
+	// Remember last player's animation to queue hair update if needed.
+	int lastAnimationNumber = LaraItem->Animation.AnimNumber;
+
+	// Poll controls and call scripting events.
+	HandleControls(false);
+	g_GameScript->OnBreak(LastBreakMode, g_GameFlow->CurrentBreakMode);
+	HandleAllGlobalEvents(EventType::Break, (Activator)LaraItem->Index);
+
+	// If freeze mode isn't full, partially update scene.
 	if (g_GameFlow->CurrentBreakMode != BreakMode::Full)
 	{
 		g_Renderer.PrepareScene();
@@ -281,13 +291,9 @@ GameStatus BreakPhase()
 
 		PrepareCamera();
 
-		if (g_GameFlow->CurrentBreakMode == BreakMode::Player)
-		{
-			UpdateLara(LaraItem, false);
-			UpdateAllItems();
-		}
+		UpdateLara(LaraItem, false);
+		UpdateAllItems();
 
-		g_Hud.Update(*LaraItem);
 		UpdateGlobalLensFlare();
 
 		UpdateCamera();
@@ -296,12 +302,16 @@ GameStatus BreakPhase()
 		Sound_UpdateScene();
 	}
 
+	// Update Lara hair, if animation was switched in spectator mode.
+	if (g_GameFlow->CurrentBreakMode == BreakMode::Spectator &&
+		lastAnimationNumber != LaraItem->Animation.AnimNumber)
+	{
+		lastAnimationNumber = LaraItem->Animation.AnimNumber;
+		for (int i = 0; i < FPS; ++i)
+			HairEffect.Update(*LaraItem);
+	}
+
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
-
-	HandleControls(false);
-
-	g_GameScript->OnBreak(LastBreakMode, g_GameFlow->CurrentBreakMode);
-	HandleAllGlobalEvents(EventType::Break, (Activator)LaraItem->Index);
 
 	LastBreakMode = g_GameFlow->CurrentBreakMode;
 	return GameStatus::Normal;
