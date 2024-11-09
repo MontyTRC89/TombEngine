@@ -51,23 +51,28 @@ private:
 	// "LevelFuncs.MyLevel.CoolFuncs"
 	std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_levelFuncs_tablesOfNames{};
 
+	std::unordered_set<std::string> m_callbacksPreStart;
+	std::unordered_set<std::string> m_callbacksPostStart;
+	std::unordered_set<std::string> m_callbacksPreLoop;
+	std::unordered_set<std::string> m_callbacksPostLoop;
+	std::unordered_set<std::string> m_callbacksPreLoad;
+	std::unordered_set<std::string> m_callbacksPostLoad;
+	std::unordered_set<std::string> m_callbacksPreSave;
+	std::unordered_set<std::string> m_callbacksPostSave;
+	std::unordered_set<std::string> m_callbacksPreEnd;
+	std::unordered_set<std::string> m_callbacksPostEnd;
+	std::unordered_set<std::string> m_callbacksPreUseItem;
+	std::unordered_set<std::string> m_callbacksPostUseItem;
+	std::unordered_set<std::string> m_callbacksPreMenu;
+	std::unordered_set<std::string> m_callbacksPostMenu;
+
 	sol::protected_function	m_onStart{};
-	sol::protected_function	m_onLoad{};
 	sol::protected_function	m_onLoop{};
+	sol::protected_function	m_onLoad{};
 	sol::protected_function	m_onSave{};
 	sol::protected_function	m_onEnd{};
 	sol::protected_function	m_onUseItem{};
-
-	std::unordered_set<std::string> m_callbacksPreSave;
-	std::unordered_set<std::string> m_callbacksPostSave;
-	std::unordered_set<std::string> m_callbacksPreLoad;
-	std::unordered_set<std::string> m_callbacksPostLoad;
-	std::unordered_set<std::string> m_callbacksPreStart;
-	std::unordered_set<std::string> m_callbacksPostStart;
-	std::unordered_set<std::string> m_callbacksPreEnd;
-	std::unordered_set<std::string> m_callbacksPostEnd;
-	std::unordered_set<std::string> m_callbacksPreLoop;
-	std::unordered_set<std::string> m_callbacksPostLoop;
+	sol::protected_function	m_onMenu{};
 
 	std::unordered_map<CallbackPoint, std::unordered_set<std::string> *> m_callbacks;
 
@@ -148,11 +153,15 @@ public:
 							const std::vector<std::string>& preEnd,
 							const std::vector<std::string>& postEnd,
 							const std::vector<std::string>& preSave,
-							const std::vector<std::string>& postSave, 
-							const std::vector<std::string>& preLoad,   
-							const std::vector<std::string>& postLoad, 
-							const std::vector<std::string>& preLoop,   
-							const std::vector<std::string>& postLoop) override;
+							const std::vector<std::string>& postSave,
+							const std::vector<std::string>& preLoad,
+							const std::vector<std::string>& postLoad,
+							const std::vector<std::string>& preLoop,
+							const std::vector<std::string>& postLoop,
+							const std::vector<std::string>& preUseItem,
+							const std::vector<std::string>& postUseItem,
+							const std::vector<std::string>& preMenu,
+							const std::vector<std::string>& postMenu) override;
 
 	void GetCallbackStrings(std::vector<std::string>& preStart,
 							std::vector<std::string>& postStart,
@@ -163,7 +172,11 @@ public:
 							std::vector<std::string>& preLoad,
 							std::vector<std::string>& postLoad,
 							std::vector<std::string>& preLoop,
-							std::vector<std::string>& postLoop) const override;
+							std::vector<std::string>& postLoop,
+							std::vector<std::string>& preUseItem,
+							std::vector<std::string>& postUseItem,
+							std::vector<std::string>& preMenu,
+							std::vector<std::string>& postMenu) const override;
 
 	void InitCallbacks() override;
 	void OnStart() override;
@@ -172,4 +185,5 @@ public:
 	void OnSave() override;
 	void OnEnd(GameStatus reason) override;
 	void OnUseItem(GAME_OBJECT_ID item) override;
+	void OnMenu() override;
 };

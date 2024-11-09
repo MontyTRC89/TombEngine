@@ -36,7 +36,11 @@ enum class CallbackPoint
 	PreSave,
 	PostSave,
 	PreEnd,
-	PostEnd
+	PostEnd,
+	PreUseItem,
+	PostUseItem,
+	PreMenu,
+	PostMenu
 };
 
 static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
@@ -49,11 +53,14 @@ static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 	{ ScriptReserved_PostLoop, CallbackPoint::PostLoop },
 	{ ScriptReserved_PreControlPhase, CallbackPoint::PreLoop },    // DEPRECATED
 	{ ScriptReserved_PostControlPhase, CallbackPoint::PostLoop },  // DEPRECATED
-	{ ScriptReserved_PostSave, CallbackPoint::PostSave },
-	{ ScriptReserved_PostSave, CallbackPoint::PostSave },
 	{ ScriptReserved_PreSave, CallbackPoint::PreSave },
+	{ ScriptReserved_PostSave, CallbackPoint::PostSave },
 	{ ScriptReserved_PreEnd, CallbackPoint::PreEnd },
-	{ ScriptReserved_PostEnd, CallbackPoint::PostEnd }
+	{ ScriptReserved_PostEnd, CallbackPoint::PostEnd },
+	{ ScriptReserved_PreUseItem, CallbackPoint::PreUseItem },
+	{ ScriptReserved_PostUseItem, CallbackPoint::PostUseItem },
+	{ ScriptReserved_PreMenu, CallbackPoint::PreMenu },
+	{ ScriptReserved_PostMenu, CallbackPoint::PostMenu }
 };
 
 static const std::unordered_map<std::string, EventType> EVENT_TYPES
@@ -66,7 +73,8 @@ static const std::unordered_map<std::string, EventType> EVENT_TYPES
 	{ ScriptReserved_EventOnSave, EventType::Save },
 	{ ScriptReserved_EventOnStart, EventType::Start },
 	{ ScriptReserved_EventOnEnd, EventType::End },
-	{ ScriptReserved_EventOnUseItem, EventType::UseItem }
+	{ ScriptReserved_EventOnUseItem, EventType::UseItem },
+	{ ScriptReserved_EventOnMenu, EventType::Menu }
 };
 
 enum class LevelEndReason
@@ -190,6 +198,10 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostSave, &m_callbacksPostSave));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreEnd, &m_callbacksPreEnd));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostEnd, &m_callbacksPostEnd));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PreUseItem, &m_callbacksPreUseItem));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PostUseItem, &m_callbacksPostUseItem));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PreMenu, &m_callbacksPreMenu));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PostMenu, &m_callbacksPostMenu));
 
 	LevelFunc::Register(tableLogic);
 
@@ -221,6 +233,9 @@ Possible values for `point`:
 	PRELOAD -- will be called immediately before OnLoad
 	POSTLOAD -- will be called immediately after OnLoad
 
+	PREMENU -- will be called immediately before OnMenu
+	POSTMENU -- will be called immediately after OnMenu
+
 	-- These take a LevelEndReason arg, like OnEnd
 	PREEND -- will be called immediately before OnEnd
 	POSTEND -- will be called immediately after OnEnd
@@ -228,6 +243,10 @@ Possible values for `point`:
 	-- These take functions which accepts a deltaTime argument
 	PRELOOP -- will be called in the beginning of game loop
 	POSTLOOP -- will be called at the end of game loop
+
+	-- These take functions which accepts an objectNumber argument, like OnUseItem
+	PREUSEITEM -- will be called immediately before OnUseItem
+	POSTUSEITEM -- will be called immediately after OnUseItem
 
 The order in which two functions with the same CallbackPoint are called is undefined.
 i.e. if you register `MyFunc` and `MyFunc2` with `PRELOOP`, both will be called in the beginning of game loop, but there is no guarantee that `MyFunc` will be called before `MyFunc2`, or vice-versa.
@@ -295,6 +314,7 @@ Possible event type values:
 	END
 	LOOP
 	USEITEM
+	MENU
 
 @function HandleEvent
 @tparam string name Name of the event set to find.
@@ -460,6 +480,7 @@ void LogicHandler::FreeLevelScripts()
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
 	m_onUseItem = sol::nil;
+	m_onMenu = sol::nil;
 	m_handler.GetState()->collect_garbage();
 }
 
@@ -778,7 +799,12 @@ void LogicHandler::GetCallbackStrings(
 	std::vector<std::string>& preLoad,
 	std::vector<std::string>& postLoad,
 	std::vector<std::string>& preLoop,
-	std::vector<std::string>& postLoop) const
+	std::vector<std::string>& postLoop,
+	std::vector<std::string>& preUseItem,
+	std::vector<std::string>& postUseItem,
+	std::vector<std::string>& preMenu,
+	std::vector<std::string>& postMenu
+	) const
 {
 	auto populateWith = [](std::vector<std::string>& dest, const std::unordered_set<std::string>& src)
 	{
@@ -800,6 +826,12 @@ void LogicHandler::GetCallbackStrings(
 
 	populateWith(preLoop, m_callbacksPreLoop);
 	populateWith(postLoop, m_callbacksPostLoop);
+
+	populateWith(preUseItem, m_callbacksPreUseItem);
+	populateWith(postUseItem, m_callbacksPostUseItem);
+
+	populateWith(preMenu, m_callbacksPreMenu);
+	populateWith(postMenu, m_callbacksPostMenu);
 }
 
 void LogicHandler::SetCallbackStrings(	
@@ -812,7 +844,11 @@ void LogicHandler::SetCallbackStrings(
 	const std::vector<std::string>& preLoad,
 	const std::vector<std::string>& postLoad,
 	const std::vector<std::string>& preLoop,
-	const std::vector<std::string>& postLoop)
+	const std::vector<std::string>& postLoop,
+	const std::vector<std::string>& preUseItem,
+	const std::vector<std::string>& postUseItem,
+	const std::vector<std::string>& preMenu,
+	const std::vector<std::string>& postMenu)
 {
 	auto populateWith = [](std::unordered_set<std::string>& dest, const std::vector<std::string>& src)
 	{
@@ -834,6 +870,12 @@ void LogicHandler::SetCallbackStrings(
 
 	populateWith(m_callbacksPreLoop, preLoop);
 	populateWith(m_callbacksPostLoop, postLoop);
+
+	populateWith(m_callbacksPreUseItem, preUseItem);
+	populateWith(m_callbacksPostUseItem, postUseItem);
+
+	populateWith(m_callbacksPreMenu, preMenu);
+	populateWith(m_callbacksPostMenu, postMenu);
 }
 
 template <typename R, char const * S, typename mapType>
@@ -913,7 +955,6 @@ void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volume
 		func(nullptr, arguments);
 	}
 }
-
 
 void LogicHandler::OnStart()
 {
@@ -995,7 +1036,7 @@ void LogicHandler::OnEnd(GameStatus reason)
 	for (auto& name : m_callbacksPreEnd)
 		CallLevelFuncByName(name, endReason);
 
-	if(m_onEnd.valid())
+	if (m_onEnd.valid())
 		CallLevelFunc(m_onEnd, endReason);
 
 	for (auto& name : m_callbacksPostEnd)
@@ -1004,8 +1045,26 @@ void LogicHandler::OnEnd(GameStatus reason)
 
 void LogicHandler::OnUseItem(GAME_OBJECT_ID objectNumber)
 {
+	for (auto& name : m_callbacksPreUseItem)
+		CallLevelFuncByName(name, objectNumber);
+
 	if (m_onUseItem.valid())
 		CallLevelFunc(m_onUseItem, objectNumber);
+
+	for (auto& name : m_callbacksPostUseItem)
+		CallLevelFuncByName(name, objectNumber);
+}
+
+void LogicHandler::OnMenu()
+{
+	for (auto& name : m_callbacksPreMenu)
+		CallLevelFuncByName(name);
+
+	if (m_onMenu.valid())
+		CallLevelFunc(m_onMenu);
+
+	for (auto& name : m_callbacksPostMenu)
+		CallLevelFuncByName(name);
 }
 
 /*** Special tables
@@ -1152,4 +1211,5 @@ void LogicHandler::InitCallbacks()
 	assignCB(m_onSave, ScriptReserved_OnSave);
 	assignCB(m_onEnd, ScriptReserved_OnEnd);
 	assignCB(m_onUseItem, ScriptReserved_OnUseItem);
+	assignCB(m_onMenu, ScriptReserved_OnMenu);
 }

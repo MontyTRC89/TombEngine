@@ -1395,6 +1395,12 @@ const std::vector<byte> SaveGame::Build()
 	std::vector<std::string> callbackVecPreLoop;
 	std::vector<std::string> callbackVecPostLoop;
 
+	std::vector<std::string> callbackVecPreUseItem;
+	std::vector<std::string> callbackVecPostUseItem;
+
+	std::vector<std::string> callbackVecPreMenu;
+	std::vector<std::string> callbackVecPostMenu;
+
 	g_GameScript->GetCallbackStrings(
 		callbackVecPreStart,
 		callbackVecPostStart,
@@ -1405,7 +1411,11 @@ const std::vector<byte> SaveGame::Build()
 		callbackVecPreLoad,
 		callbackVecPostLoad,
 		callbackVecPreLoop,
-		callbackVecPostLoop);
+		callbackVecPostLoop,
+		callbackVecPreUseItem,
+		callbackVecPostUseItem,
+		callbackVecPreMenu,
+		callbackVecPostMenu);
 
 	auto stringsCallbackPreStart = fbb.CreateVectorOfStrings(callbackVecPreStart);
 	auto stringsCallbackPostStart = fbb.CreateVectorOfStrings(callbackVecPostStart);
@@ -1417,6 +1427,10 @@ const std::vector<byte> SaveGame::Build()
 	auto stringsCallbackPostLoad = fbb.CreateVectorOfStrings(callbackVecPostLoad);
 	auto stringsCallbackPreLoop = fbb.CreateVectorOfStrings(callbackVecPreLoop);
 	auto stringsCallbackPostLoop = fbb.CreateVectorOfStrings(callbackVecPostLoop);
+	auto stringsCallbackPreUseItem = fbb.CreateVectorOfStrings(callbackVecPreUseItem);
+	auto stringsCallbackPostUseItem = fbb.CreateVectorOfStrings(callbackVecPostUseItem);
+	auto stringsCallbackPreMenu = fbb.CreateVectorOfStrings(callbackVecPreMenu);
+	auto stringsCallbackPostMenu = fbb.CreateVectorOfStrings(callbackVecPostMenu);
 
 	Save::SaveGameBuilder sgb{ fbb };
 
@@ -1482,6 +1496,12 @@ const std::vector<byte> SaveGame::Build()
 
 	sgb.add_callbacks_pre_loop(stringsCallbackPreLoop);
 	sgb.add_callbacks_post_loop(stringsCallbackPostLoop);
+
+	sgb.add_callbacks_pre_useitem(stringsCallbackPreUseItem);
+	sgb.add_callbacks_post_useitem(stringsCallbackPostUseItem);
+
+	sgb.add_callbacks_pre_menu(stringsCallbackPreMenu);
+	sgb.add_callbacks_post_menu(stringsCallbackPostMenu);
 
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
@@ -1776,6 +1796,12 @@ static void ParseLua(const Save::SaveGame* s)
 	auto callbacksPreLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_loop);
 	auto callbacksPostLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_loop);
 
+	auto callbacksPreUseItemVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_useitem);
+	auto callbacksPostUseItemVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_useitem);
+
+	auto callbacksPreMenuVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_menu);
+	auto callbacksPostMenuVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_menu);
+
 	g_GameScript->SetCallbackStrings(
 		callbacksPreStartVec,
 		callbacksPostStartVec,
@@ -1786,7 +1812,11 @@ static void ParseLua(const Save::SaveGame* s)
 		callbacksPreLoadVec,
 		callbacksPostLoadVec,
 		callbacksPreLoopVec,
-		callbacksPostLoopVec);
+		callbacksPostLoopVec,
+		callbacksPreUseItemVec,
+		callbacksPostUseItemVec,
+		callbacksPreMenuVec,
+		callbacksPostMenuVec);
 }
 
 static void ParsePlayer(const Save::SaveGame* s)
