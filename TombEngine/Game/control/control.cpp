@@ -287,9 +287,11 @@ GameStatus BreakPhase()
 			UpdateAllItems();
 		}
 
+		g_Hud.Update(*LaraItem);
+		UpdateGlobalLensFlare();
+
 		UpdateCamera();
 
-		UpdateGlobalLensFlare();
 		PlaySoundSources();
 		Sound_UpdateScene();
 	}
