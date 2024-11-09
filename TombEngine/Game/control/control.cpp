@@ -261,38 +261,47 @@ GameStatus BreakPhase()
 {
 	if (LastBreakMode == BreakMode::None)
 	{
-		if (g_GameFlow->CurrentBreakMode == BreakMode::Static)
+		if (g_GameFlow->CurrentBreakMode == BreakMode::Full)
 		{
 			g_Renderer.DumpGameScene();
 			PauseAllSounds(SoundPauseMode::Pause);
 		}
 
+		SetupInterpolation();
 		StopRumble();
 	}
 
-	if (g_GameFlow->CurrentBreakMode == BreakMode::Game)
+	if (g_GameFlow->CurrentBreakMode != BreakMode::Full)
 	{
 		g_Renderer.PrepareScene();
+		g_Renderer.SaveOldState();
 
 		ClearLensFlares();
 		ClearAllDisplaySprites();
 
 		PrepareCamera();
 
+		if (g_GameFlow->CurrentBreakMode == BreakMode::Player)
+		{
+			UpdateLara(LaraItem, false);
+			UpdateAllItems();
+		}
+
+		UpdateCamera();
+
 		UpdateGlobalLensFlare();
 		PlaySoundSources();
 		Sound_UpdateScene();
-		UpdateCamera();
 	}
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 
 	HandleControls(false);
+
 	g_GameScript->OnBreak(LastBreakMode, g_GameFlow->CurrentBreakMode);
 	HandleAllGlobalEvents(EventType::Break, (Activator)LaraItem->Index);
 
 	LastBreakMode = g_GameFlow->CurrentBreakMode;
-
 	return GameStatus::Normal;
 }
 

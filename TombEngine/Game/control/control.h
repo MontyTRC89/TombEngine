@@ -29,8 +29,9 @@ enum class GameStatus
 enum class BreakMode
 {
 	None,
-	Game,
-	Static
+	Full,
+	Spectator,
+	Player
 };
 
 enum class LevelLoadType

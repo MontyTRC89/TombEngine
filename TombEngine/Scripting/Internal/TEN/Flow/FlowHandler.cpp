@@ -145,18 +145,20 @@ Get current game status, such as normal game loop, exiting to title, etc.
 	tableFlow.set_function(ScriptReserved_GetGameStatus, &FlowHandler::GetGameStatus, this);
 
 /***
+Set current break mode, such as none, full, spectator or player. 
+Break mode specifies whether game is in normal mode or paused in a particular way to allow
+custom menu creation, photo mode or time freeze.
+@function SetBreakMode
+@tparam Flow.BreakMode new break mode to set.
+*/
+	tableFlow.set_function(ScriptReserved_SetBreakMode, &FlowHandler::SetBreakMode, this);
+
+/***
 Get current break mode, such as none, game or static.
 @function GetBreakMode
 @treturn Flow.BreakMode the current break mode
 */
 	tableFlow.set_function(ScriptReserved_GetBreakMode, &FlowHandler::GetBreakMode, this);
-
-/***
-Set current break mode, such as none, game or static.
-@function SetBreakMode
-@tparam Flow.BreakMode new break mode to set.
-*/
-	tableFlow.set_function(ScriptReserved_SetBreakMode, &FlowHandler::SetBreakMode, this);
 
 /***
 Save the game to a savegame slot.

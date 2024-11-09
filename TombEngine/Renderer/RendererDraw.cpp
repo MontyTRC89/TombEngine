@@ -1538,7 +1538,7 @@ namespace TEN::Renderer
 
 	void Renderer::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 	{
-		if (_isLocked)
+		if (_isLocked || g_GameFlow->CurrentBreakMode != BreakMode::None)
 			return;
 
 		RendererLight dynamicLight = {};
@@ -1569,7 +1569,9 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareScene()
 	{
-		_dynamicLights.clear();
+		if (g_GameFlow->CurrentBreakMode == BreakMode::None)
+			_dynamicLights.clear();
+
 		_lines2DToDraw.clear();
 		_lines3DToDraw.clear();
 		_triangles3DToDraw.clear();
@@ -1631,6 +1633,11 @@ namespace TEN::Renderer
 		CollectLightsForCamera();
 		RenderItemShadows(view);
 
+		// Prevent particle interpolations if game is in break mode.
+		float interpolationFactorBackup = _interpolationFactor;
+		if (g_GameFlow->CurrentBreakMode != BreakMode::None)
+			_interpolationFactor = 0.0f;
+
 		// Prepare all sprites for later.
 		PrepareFires(view);
 		PrepareSmokes(view);
@@ -1657,6 +1664,9 @@ namespace TEN::Renderer
 
 		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected at a later stage.
 		SortAndPrepareSprites(view);
+		
+		// Continue interpolating.
+		_interpolationFactor = interpolationFactorBackup;
 
 		auto time2 = std::chrono::high_resolution_clock::now();
 		_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;

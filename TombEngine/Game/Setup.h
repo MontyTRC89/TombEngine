@@ -90,6 +90,7 @@ struct ObjectInfo
 	int radius;
 
 	int HitPoints;
+	bool alwaysActive;  // IsAlwaysActive
 	bool intelligent;	// IsIntelligent
 	bool waterCreature; // IsWaterCreature
 	bool nonLot;		// IsNonLot

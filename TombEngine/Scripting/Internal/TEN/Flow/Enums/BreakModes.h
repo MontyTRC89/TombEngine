@@ -15,8 +15,9 @@ Constants for break modes.
 The following constants are inside Flow.BreakMode.
 
 	NONE
-	GAME
-	STATIC
+	FULL
+	SPECTATOR
+	PLAYER
 
 @section Flow.BreakMode
 */
@@ -28,6 +29,7 @@ The following constants are inside Flow.BreakMode.
 static const std::unordered_map<std::string, BreakMode> BREAK_MODES
 {
 	{ "NONE", BreakMode::None },
-	{ "GAME", BreakMode::Game },
-	{ "STATIC", BreakMode::Static }
+	{ "FULL", BreakMode::Full },
+	{ "SPECTATOR", BreakMode::Spectator },
+	{ "PLAYER", BreakMode::Player }
 };
