@@ -46,11 +46,24 @@ namespace TEN::Scripting::Util
 			ObjectOnLOS2(&vector0, &vector1, &vector, nullptr) == NO_LOS_ITEM);
 	}
 
-	///Calculate the distance between two positions.
-	//@function CalculateDistance
-	//@tparam Vec3 posA First position.
-	//@tparam Vec3 posB Second position.
-	//@treturn float Distance between two positions.
+	/// Calculate the distance between two positions.
+	// @function CalculateDistance
+	// @tparam Vec3 posA First position.
+	// @tparam Vec3 posB Second position.
+	// @treturn float Distance between two positions.
+	// @usage 
+	// levelFuncs.checkDistance = function()
+	//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+	//		
+	//		laraPos = Lara:GetPosition()
+	//		shivaPos = shiva:GetPosition()
+	//		
+	//		distance = CalculateDistance(laraPos, shivaPos)
+	//		if distance < 50.0 then
+	//			print("Lara and Shiva are very close")
+	//		else
+	//			print("Lara and Shiva are far from each other")
+	//		end
 	static float CalculateDistance(const Vec3& posA, const Vec3& posB)
 	{
 		return posA.Distance(posB);
@@ -61,6 +74,19 @@ namespace TEN::Scripting::Util
 	// @tparam Vec3 posA First position.
 	// @tparam Vec3 posB Second position.
 	// @treturn float Horizontal distance between the two positions.
+	// @usage
+	// levelFuncs.checkDistance = function()
+	//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+	//		
+	//		laraPos = Lara:GetPosition()
+	//		shivaPos = shiva:GetPosition()
+	//		
+	//		hDistance = CalculateHorizontalDistance(laraPos, shivaPos)
+	//		if Hdistance < 50.0 then
+	//			print("Lara and Shiva are very close, horizontally")
+	//		else
+	//			print("Lara and Shiva are far from each other, horizontally")
+	//		end
 	static float CalculateHorizontalDistance(const Vec3& posA, const Vec3& posB)
 	{
 		auto pos0 = Vector2(posA.x, posA.z);
