@@ -1055,16 +1055,22 @@ void LogicHandler::OnUseItem(GAME_OBJECT_ID objectNumber)
 		CallLevelFuncByName(name, objectNumber);
 }
 
-void LogicHandler::OnBreak()
+void LogicHandler::OnBreak(BreakMode lastMode, BreakMode nextMode)
 {
-	for (auto& name : m_callbacksPreBreak)
-		CallLevelFuncByName(name);
+	if (lastMode == BreakMode::None)
+	{
+		for (auto& name : m_callbacksPreBreak)
+			CallLevelFuncByName(name);
+	}
 
 	if (m_onBreak.valid())
 		CallLevelFunc(m_onBreak);
 
-	for (auto& name : m_callbacksPostBreak)
-		CallLevelFuncByName(name);
+	if (nextMode == BreakMode::None)
+	{
+		for (auto& name : m_callbacksPostBreak)
+			CallLevelFuncByName(name);
+	}
 }
 
 /*** Special tables

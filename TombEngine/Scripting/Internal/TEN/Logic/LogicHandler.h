@@ -185,5 +185,5 @@ public:
 	void OnSave() override;
 	void OnEnd(GameStatus reason) override;
 	void OnUseItem(GAME_OBJECT_ID item) override;
-	void OnBreak() override;
+	void OnBreak(BreakMode lastMode, BreakMode nextMode) override;
 };

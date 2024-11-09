@@ -100,6 +100,7 @@ bool InitializeGame;
 bool DoTheGame;
 bool JustLoaded;
 bool ThreadEnded;
+auto LastBreakMode = BreakMode::None;
 
 int RequiredStartPos;
 int CurrentLevel;
@@ -131,7 +132,7 @@ void DrawPhase(bool isTitle, float interpolationFactor)
 	g_Renderer.Lock();
 }
 
-GameStatus ControlPhase(bool insideMenu)
+GameStatus GamePhase(bool insideMenu)
 {
 	auto time1 = std::chrono::high_resolution_clock::now();
 	bool isTitle = (CurrentLevel == 0);
@@ -254,6 +255,54 @@ GameStatus ControlPhase(bool insideMenu)
 	ControlPhaseTime = (std::chrono::duration_cast<std::chrono::nanoseconds>(time2 - time1)).count() / 1000000;
 
 	return GameStatus::Normal;
+}
+
+GameStatus BreakPhase()
+{
+	if (LastBreakMode == BreakMode::None)
+	{
+		if (g_GameFlow->CurrentBreakMode == BreakMode::Static)
+		{
+			g_Renderer.DumpGameScene();
+			PauseAllSounds(SoundPauseMode::Pause);
+		}
+
+		StopRumble();
+	}
+
+	if (g_GameFlow->CurrentBreakMode == BreakMode::Game)
+	{
+		g_Renderer.PrepareScene();
+
+		ClearLensFlares();
+		ClearAllDisplaySprites();
+
+		PrepareCamera();
+
+		UpdateGlobalLensFlare();
+		PlaySoundSources();
+		Sound_UpdateScene();
+		UpdateCamera();
+	}
+
+	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
+
+	HandleControls(false);
+	g_GameScript->OnBreak(LastBreakMode, g_GameFlow->CurrentBreakMode);
+	HandleAllGlobalEvents(EventType::Break, (Activator)LaraItem->Index);
+
+	LastBreakMode = g_GameFlow->CurrentBreakMode;
+
+	return GameStatus::Normal;
+}
+
+GameStatus ControlPhase(bool insideMenu)
+{
+	// For safety measures, only allow to break game loop in non-title levels.
+	if (g_GameFlow->CurrentBreakMode == BreakMode::None || CurrentLevel == 0)
+		return GamePhase(insideMenu);
+	else
+		return BreakPhase();
 }
 
 unsigned CALLBACK GameMain(void *)
