@@ -7,7 +7,8 @@ class ScriptInterfaceFlowHandler
 {
 public:
 	GameStatus	LastGameStatus		 = GameStatus::Normal;
-	GameMode	CurrentGameMode		 = GameMode::Normal;
+	BreakMode	CurrentBreakMode	 = BreakMode::None;
+
 	std::string	IntroImagePath		 = {};
 	std::string	TitleScreenImagePath = {};
 

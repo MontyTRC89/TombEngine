@@ -8,8 +8,8 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
-#include "Scripting/Internal/TEN/Flow/GameModes.h"
-#include "Scripting/Internal/TEN/Flow/GameStatuses.h"
+#include "Scripting/Internal/TEN/Flow/Enums/BreakModes.h"
+#include "Scripting/Internal/TEN/Flow/Enums/GameStatuses.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
@@ -145,18 +145,18 @@ Get current game status, such as normal game loop, exiting to title, etc.
 	tableFlow.set_function(ScriptReserved_GetGameStatus, &FlowHandler::GetGameStatus, this);
 
 /***
-Get current game mode, such as normal, frozen or menu.
-@function GetGameMode
-@treturn Flow.GameMode the current game mode
+Get current break mode, such as none, game or static.
+@function GetBreakMode
+@treturn Flow.BreakMode the current break mode
 */
-	tableFlow.set_function(ScriptReserved_GetGameMode, &FlowHandler::GetGameMode, this);
+	tableFlow.set_function(ScriptReserved_GetBreakMode, &FlowHandler::GetBreakMode, this);
 
 /***
-Set current game mode, such as normal, frozen or menu.
-@function SetGameMode
-@tparam Flow.GameMode new game mode to set.
+Set current break mode, such as none, game or static.
+@function SetBreakMode
+@tparam Flow.BreakMode new break mode to set.
 */
-	tableFlow.set_function(ScriptReserved_SetGameMode, &FlowHandler::SetGameMode, this);
+	tableFlow.set_function(ScriptReserved_SetBreakMode, &FlowHandler::SetBreakMode, this);
 
 /***
 Save the game to a savegame slot.
@@ -296,7 +296,7 @@ Specify which translations in the strings table correspond to which languages.
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameStatus, GAME_STATUSES);
-	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameMode, GAME_MODES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_BreakMode, BREAK_MODES);
 }
 
 FlowHandler::~FlowHandler()
@@ -482,14 +482,14 @@ GameStatus FlowHandler::GetGameStatus()
 	return this->LastGameStatus;
 }
 
-GameMode FlowHandler::GetGameMode()
+BreakMode FlowHandler::GetBreakMode()
 {
-	return this->CurrentGameMode;
+	return this->CurrentBreakMode;
 }
 
-void FlowHandler::SetGameMode(GameMode mode)
+void FlowHandler::SetBreakMode(BreakMode mode)
 {
-	this->CurrentGameMode = mode;
+	this->CurrentBreakMode = mode;
 }
 
 void FlowHandler::FlipMap(int group)

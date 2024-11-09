@@ -63,8 +63,8 @@ private:
 	std::unordered_set<std::string> m_callbacksPostEnd;
 	std::unordered_set<std::string> m_callbacksPreUseItem;
 	std::unordered_set<std::string> m_callbacksPostUseItem;
-	std::unordered_set<std::string> m_callbacksPreMenu;
-	std::unordered_set<std::string> m_callbacksPostMenu;
+	std::unordered_set<std::string> m_callbacksPreBreak;
+	std::unordered_set<std::string> m_callbacksPostBreak;
 
 	sol::protected_function	m_onStart{};
 	sol::protected_function	m_onLoop{};
@@ -72,7 +72,7 @@ private:
 	sol::protected_function	m_onSave{};
 	sol::protected_function	m_onEnd{};
 	sol::protected_function	m_onUseItem{};
-	sol::protected_function	m_onMenu{};
+	sol::protected_function	m_onBreak{};
 
 	std::unordered_map<CallbackPoint, std::unordered_set<std::string> *> m_callbacks;
 
@@ -160,8 +160,8 @@ public:
 							const std::vector<std::string>& postLoop,
 							const std::vector<std::string>& preUseItem,
 							const std::vector<std::string>& postUseItem,
-							const std::vector<std::string>& preMenu,
-							const std::vector<std::string>& postMenu) override;
+							const std::vector<std::string>& preBreak,
+							const std::vector<std::string>& postBreak) override;
 
 	void GetCallbackStrings(std::vector<std::string>& preStart,
 							std::vector<std::string>& postStart,
@@ -175,8 +175,8 @@ public:
 							std::vector<std::string>& postLoop,
 							std::vector<std::string>& preUseItem,
 							std::vector<std::string>& postUseItem,
-							std::vector<std::string>& preMenu,
-							std::vector<std::string>& postMenu) const override;
+							std::vector<std::string>& preBreak,
+							std::vector<std::string>& postBreak) const override;
 
 	void InitCallbacks() override;
 	void OnStart() override;
@@ -185,5 +185,5 @@ public:
 	void OnSave() override;
 	void OnEnd(GameStatus reason) override;
 	void OnUseItem(GAME_OBJECT_ID item) override;
-	void OnMenu() override;
+	void OnBreak() override;
 };

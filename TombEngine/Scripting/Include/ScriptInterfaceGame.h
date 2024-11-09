@@ -58,7 +58,7 @@ public:
 	virtual void OnSave() = 0;
 	virtual void OnEnd(GameStatus reason) = 0;
 	virtual void OnUseItem(GAME_OBJECT_ID objectNumber) = 0;
-	virtual void OnMenu() = 0;
+	virtual void OnBreak() = 0;
 
 	virtual void ShortenTENCalls() = 0;
 	virtual void FreeLevelScripts() = 0;
@@ -84,8 +84,8 @@ public:
 		std::vector<std::string>& postLoop,
 		std::vector<std::string>& preUseItem,
 		std::vector<std::string>& postUseItem,
-		std::vector<std::string>& preMenu,
-		std::vector<std::string>& postMenu) const = 0;
+		std::vector<std::string>& preBreak,
+		std::vector<std::string>& postBreak) const = 0;
 
 	virtual void SetCallbackStrings(
 		const std::vector<std::string>& preStart,
@@ -100,8 +100,8 @@ public:
 		const std::vector<std::string>& postLoop,
 		const std::vector<std::string>& preUseItem,
 		const std::vector<std::string>& postUseItem,
-		const std::vector<std::string>& preMenu,
-		const std::vector<std::string>& postMenu) = 0;
+		const std::vector<std::string>& preBreak,
+		const std::vector<std::string>& postBreak) = 0;
 };
 
 extern ScriptInterfaceGame* g_GameScript;

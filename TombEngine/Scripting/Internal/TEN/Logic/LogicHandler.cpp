@@ -39,8 +39,8 @@ enum class CallbackPoint
 	PostEnd,
 	PreUseItem,
 	PostUseItem,
-	PreMenu,
-	PostMenu
+	PreBreak,
+	PostBreak
 };
 
 static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
@@ -59,8 +59,8 @@ static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 	{ ScriptReserved_PostEnd, CallbackPoint::PostEnd },
 	{ ScriptReserved_PreUseItem, CallbackPoint::PreUseItem },
 	{ ScriptReserved_PostUseItem, CallbackPoint::PostUseItem },
-	{ ScriptReserved_PreMenu, CallbackPoint::PreMenu },
-	{ ScriptReserved_PostMenu, CallbackPoint::PostMenu }
+	{ ScriptReserved_PreBreak, CallbackPoint::PreBreak },
+	{ ScriptReserved_PostBreak, CallbackPoint::PostBreak }
 };
 
 static const std::unordered_map<std::string, EventType> EVENT_TYPES
@@ -74,7 +74,7 @@ static const std::unordered_map<std::string, EventType> EVENT_TYPES
 	{ ScriptReserved_EventOnStart, EventType::Start },
 	{ ScriptReserved_EventOnEnd, EventType::End },
 	{ ScriptReserved_EventOnUseItem, EventType::UseItem },
-	{ ScriptReserved_EventOnMenu, EventType::Menu }
+	{ ScriptReserved_EventOnBreak, EventType::Break }
 };
 
 enum class LevelEndReason
@@ -200,8 +200,8 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostEnd, &m_callbacksPostEnd));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreUseItem, &m_callbacksPreUseItem));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostUseItem, &m_callbacksPostUseItem));
-	m_callbacks.insert(std::make_pair(CallbackPoint::PreMenu, &m_callbacksPreMenu));
-	m_callbacks.insert(std::make_pair(CallbackPoint::PostMenu, &m_callbacksPostMenu));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PreBreak, &m_callbacksPreBreak));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PostBreak, &m_callbacksPostBreak));
 
 	LevelFunc::Register(tableLogic);
 
@@ -233,8 +233,8 @@ Possible values for `point`:
 	PRELOAD -- will be called immediately before OnLoad
 	POSTLOAD -- will be called immediately after OnLoad
 
-	PREMENU -- will be called immediately before OnMenu
-	POSTMENU -- will be called immediately after OnMenu
+	PREBREAK -- will be called immediately before OnBreak
+	POSTBREAK -- will be called immediately after OnBreak
 
 	-- These take a LevelEndReason arg, like OnEnd
 	PREEND -- will be called immediately before OnEnd
@@ -480,7 +480,7 @@ void LogicHandler::FreeLevelScripts()
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
 	m_onUseItem = sol::nil;
-	m_onMenu = sol::nil;
+	m_onBreak = sol::nil;
 	m_handler.GetState()->collect_garbage();
 }
 
@@ -802,8 +802,8 @@ void LogicHandler::GetCallbackStrings(
 	std::vector<std::string>& postLoop,
 	std::vector<std::string>& preUseItem,
 	std::vector<std::string>& postUseItem,
-	std::vector<std::string>& preMenu,
-	std::vector<std::string>& postMenu
+	std::vector<std::string>& preBreak,
+	std::vector<std::string>& postBreak
 	) const
 {
 	auto populateWith = [](std::vector<std::string>& dest, const std::unordered_set<std::string>& src)
@@ -830,8 +830,8 @@ void LogicHandler::GetCallbackStrings(
 	populateWith(preUseItem, m_callbacksPreUseItem);
 	populateWith(postUseItem, m_callbacksPostUseItem);
 
-	populateWith(preMenu, m_callbacksPreMenu);
-	populateWith(postMenu, m_callbacksPostMenu);
+	populateWith(preBreak, m_callbacksPreBreak);
+	populateWith(postBreak, m_callbacksPostBreak);
 }
 
 void LogicHandler::SetCallbackStrings(	
@@ -847,8 +847,8 @@ void LogicHandler::SetCallbackStrings(
 	const std::vector<std::string>& postLoop,
 	const std::vector<std::string>& preUseItem,
 	const std::vector<std::string>& postUseItem,
-	const std::vector<std::string>& preMenu,
-	const std::vector<std::string>& postMenu)
+	const std::vector<std::string>& preBreak,
+	const std::vector<std::string>& postBreak)
 {
 	auto populateWith = [](std::unordered_set<std::string>& dest, const std::vector<std::string>& src)
 	{
@@ -874,8 +874,8 @@ void LogicHandler::SetCallbackStrings(
 	populateWith(m_callbacksPreUseItem, preUseItem);
 	populateWith(m_callbacksPostUseItem, postUseItem);
 
-	populateWith(m_callbacksPreMenu, preMenu);
-	populateWith(m_callbacksPostMenu, postMenu);
+	populateWith(m_callbacksPreBreak, preBreak);
+	populateWith(m_callbacksPostBreak, postBreak);
 }
 
 template <typename R, char const * S, typename mapType>
@@ -1055,15 +1055,15 @@ void LogicHandler::OnUseItem(GAME_OBJECT_ID objectNumber)
 		CallLevelFuncByName(name, objectNumber);
 }
 
-void LogicHandler::OnMenu()
+void LogicHandler::OnBreak()
 {
-	for (auto& name : m_callbacksPreMenu)
+	for (auto& name : m_callbacksPreBreak)
 		CallLevelFuncByName(name);
 
-	if (m_onMenu.valid())
-		CallLevelFunc(m_onMenu);
+	if (m_onBreak.valid())
+		CallLevelFunc(m_onBreak);
 
-	for (auto& name : m_callbacksPostMenu)
+	for (auto& name : m_callbacksPostBreak)
 		CallLevelFuncByName(name);
 }
 
@@ -1211,5 +1211,5 @@ void LogicHandler::InitCallbacks()
 	assignCB(m_onSave, ScriptReserved_OnSave);
 	assignCB(m_onEnd, ScriptReserved_OnEnd);
 	assignCB(m_onUseItem, ScriptReserved_OnUseItem);
-	assignCB(m_onMenu, ScriptReserved_OnMenu);
+	assignCB(m_onBreak, ScriptReserved_OnBreak);
 }

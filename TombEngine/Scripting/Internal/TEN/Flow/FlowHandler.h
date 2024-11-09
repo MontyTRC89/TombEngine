@@ -63,8 +63,8 @@ public:
 	int			GetNumLevels() const;
 	void		EndLevel(std::optional<int> nextLevel, std::optional<int> startPosIndex);
 	GameStatus	GetGameStatus();
-	GameMode	GetGameMode();
-	void		SetGameMode(GameMode mode);
+	BreakMode	GetBreakMode();
+	void		SetBreakMode(BreakMode mode);
 	void		FlipMap(int group);
 	bool		GetFlipMapStatus(std::optional<int> group);
 	void		SaveGame(int slot);

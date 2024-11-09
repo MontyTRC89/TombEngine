@@ -42,7 +42,7 @@ namespace TEN::Control::Volumes
 		Start,
 		End,
 		UseItem,
-		Menu,
+		Break,
 
 		Count
 	};
