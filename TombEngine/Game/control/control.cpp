@@ -162,9 +162,6 @@ GameStatus GamePhase(bool insideMenu)
 	// emulated keypresses from the script.
 	ApplyActionQueue();
 
-	// Clear last selected item in inventory (must be after on loop event handling, so they can detect that).
-	g_Gui.CancelInventorySelection();
-
 	// Control lock is processed after handling scripts because builder may want to process input externally
 	// while locking player from input.
 	if (!isTitle && Lara.Control.IsLocked)
@@ -179,6 +176,9 @@ GameStatus GamePhase(bool insideMenu)
 
 	// Smash shatters and clear stopper flags under them.
 	UpdateShatters();
+
+	// Clear last selected item in inventory (must be after on loop event handling, so they can detect that).
+	g_Gui.CancelInventorySelection();
 
 	// Update weather.
 	Weather.Update();
