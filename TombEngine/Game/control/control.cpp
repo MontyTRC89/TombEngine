@@ -262,11 +262,9 @@ GameStatus BreakPhase()
 	// We've just entered freeze mode, do initialization, if needed.
 	if (LastBreakMode == BreakMode::None)
 	{
+		// Capture the screen for drawing it as a background.
 		if (g_GameFlow->CurrentBreakMode == BreakMode::Full)
-		{
 			g_Renderer.DumpGameScene();
-			PauseAllSounds(SoundPauseMode::Pause);
-		}
 
 		SetupInterpolation();
 		StopRumble();
@@ -296,7 +294,17 @@ GameStatus BreakPhase()
 
 		UpdateGlobalLensFlare();
 
-		UpdateCamera();
+
+		if (g_GameFlow->CurrentBreakMode == BreakMode::Player)
+		{
+			// Player mode needs to update camera, as in normal control loop.
+			UpdateCamera();
+		}
+		else
+		{
+			// Just update camera matrices, camera update will happen elsewhere.
+			g_Renderer.UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
+		}
 
 		PlaySoundSources();
 		Sound_UpdateScene();
