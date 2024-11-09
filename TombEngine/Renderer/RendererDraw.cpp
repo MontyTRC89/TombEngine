@@ -1665,8 +1665,9 @@ namespace TEN::Renderer
 		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected at a later stage.
 		SortAndPrepareSprites(view);
 		
-		// Continue interpolating.
-		_interpolationFactor = interpolationFactorBackup;
+		// Continue interpolating for any break mode but spectator.
+		if (g_GameFlow->CurrentBreakMode != BreakMode::Spectator)
+			_interpolationFactor = interpolationFactorBackup;
 
 		auto time2 = std::chrono::high_resolution_clock::now();
 		_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
