@@ -8,7 +8,7 @@ using namespace OIS;
 
 namespace TEN::Input
 {
-	const auto KEY_NAME_MAP = std::unordered_map<int, std::string>
+	static const auto KEY_NAME_MAP = std::unordered_map<int, std::string>
 	{
 		{ KC_UNASSIGNED, "<None>" },
 
