@@ -227,9 +227,9 @@ void UpdateSparks()
 		if (spark->fxObj == ID_WATERFALL_EMITTER && spark->y >= spark->targetPos.y)
 		{
 			spark->on = false;
-			spark->y = spark->targetPos.y;
-			spark->x = spark->targetPos.x;
-			spark->z = spark->targetPos.z;
+			spark->targetPos.y = spark->y;
+			spark->targetPos.x = spark->x;
+			spark->targetPos.z = spark->z;
 
 			if (Random::TestProbability(1 / 2.0f))
 				SpawnWaterfallMist(spark->targetPos.ToVector3(), spark->roomNumber, spark->scalar, spark->size, Color(spark->sR, spark->sG, spark->sB));

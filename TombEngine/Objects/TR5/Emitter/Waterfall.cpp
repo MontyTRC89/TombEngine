@@ -41,7 +41,7 @@ namespace TEN::Effects::WaterfallEmitter
 		if (!TriggerActive(&item))
 			return;
 
-		float waterfallWidth = std::max(BLOCK(item.TriggerFlags / 8.0f), BLOCK(0.5f));
+		float waterfallWidth = std::max(CLICK(float(item.TriggerFlags)), CLICK(0.1f));
 
 		auto vel = item.Pose.Orientation.ToDirection() * BLOCK(0.2f);
 
@@ -60,6 +60,8 @@ namespace TEN::Effects::WaterfallEmitter
 					auto sphere = BoundingSphere(offset, SPAWN_RADIUS);
 					offset = Random::GeneratePointInSphere(sphere);
 					auto pos = item.Pose.Position.ToVector3() + offset;
+					auto orient2 = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, item.Pose.Orientation.z);
+					auto origin2 = Geometry::TranslatePoint(Vector3(pos.x, pos.y, pos.z), orient2, BLOCK(0.3));
 
 					vel.y = Random::GenerateFloat(0.0f, 16.0f);
 
@@ -75,12 +77,20 @@ namespace TEN::Effects::WaterfallEmitter
 					part.zVel = vel.z;
 					part.friction = -2;
 
-					auto pointColl = GetPointCollision(pos, item.RoomNumber, item.Pose.Orientation.y, BLOCK(0.3f));
-					part.targetPos = GameVector(pointColl.GetPosition().x, pointColl.GetFloorHeight(), pointColl.GetPosition().z, pointColl.GetRoomNumber());
+					auto pointColl = GetPointCollision(origin2, item.RoomNumber, item.Pose.Orientation.y, BLOCK(0.3f));
+
+					if (pointColl.GetSector().IsWall(pos.x, pos.z))
+					{
+						part.on = false;
+						continue;
+					}
+
+					int relFloorHeight = pointColl.GetFloorHeight() - part.y;
+					part.targetPos = GameVector(origin2.x, origin2.y + relFloorHeight, origin2.z, pointColl.GetRoomNumber());
 					if (TestEnvironment(ENV_FLAG_WATER, part.targetPos.ToVector3i(), part.roomNumber) ||
 						TestEnvironment(ENV_FLAG_SWAMP, part.targetPos.ToVector3i(), part.roomNumber))
 					{
-						part.targetPos.y = pointColl.GetWaterSurfaceHeight();
+						part.targetPos.y =  pointColl.GetWaterSurfaceHeight();
 					}
 
 					// TODO: Offset colour earlier.
@@ -165,7 +175,7 @@ namespace TEN::Effects::WaterfallEmitter
 		part.friction = 3;
 		part.rotAng = Random::GenerateAngle();
 
-		auto scale = (scalar == 3.0f) ? (scalar - 1.0f) : (scalar + 4.0f);
+		auto scale = (scalar == 3.0f) ? (scalar - 1.0f) : (scalar + 3.0f);
 		scale = std::clamp(int(scale), 2, 9);
 		part.scalar = scale;
 
