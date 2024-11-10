@@ -795,23 +795,24 @@ std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth
 	auto stack = std::stack<std::pair<int, unsigned int>>{};
 	stack.push({ roomNumber, searchDepth });
 
+	// Collect neighbor room numbers.
 	auto neighborRoomNumbers = std::vector<int>{};
 	while (!stack.empty())
 	{
 		auto [currentRoomNumber, depth] = stack.top();
 		stack.pop();
 
+		// Add neighbor room number.
+		neighborRoomNumbers.push_back(currentRoomNumber);
+
 		// Depth limit reached; continue.
-		if (depth == 0)
+		if (depth <= 0)
 			continue;
 
 		// Get room and check for neighbors.
 		const auto& room = g_Level.Rooms[currentRoomNumber];
 		for (const auto& portal : room.Portals)
-		{
-			neighborRoomNumbers.push_back(portal.RoomNumber);
 			stack.push({ portal.RoomNumber, depth - 1 });
-		}
 	}
 
 	// Sort and remove duplicates.
