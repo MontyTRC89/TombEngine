@@ -194,7 +194,7 @@ namespace TEN::Entities::Generic
 		{
 			room.Bridges.Move(item.Index, item.GetAabb());
 		}
-		else
+		else if (item.RoomNumber != _prevRoomNumber)
 		{
 			room.Bridges.Insert(item.Index, item.GetAabb());
 			prevRoom.Bridges.Remove(item.Index);
