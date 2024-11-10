@@ -136,6 +136,9 @@ namespace TEN::Control::Volumes
 
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, ActivatorFlags activatorFlag, Activator activator)
 	{
+		if (g_GameFlow->CurrentFreezeMode != FreezeMode::None)
+			return;
+	
 		if (roomNumber == NO_VALUE)
 			return;
 

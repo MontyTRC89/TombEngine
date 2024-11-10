@@ -414,6 +414,9 @@ void Trigger(short const value, short const flags)
 
 void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bool heavy, int heavyFlags)
 {
+	if (g_GameFlow->CurrentFreezeMode != FreezeMode::None)
+		return;
+
 	bool switchOff = false;
 	bool flipAvailable = false;
 	int flip = NO_VALUE;
@@ -867,6 +870,9 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ItemInfo* item)
 {
+	if (g_GameFlow->CurrentFreezeMode != FreezeMode::None)
+		return;
+
 	bool isPlayer = item->IsLara();
 
 	// HACK: because of L-shaped portal configurations, we need to fetch room number from Location struct for player.
