@@ -623,10 +623,6 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	if (isTitle && !g_GameFlow->IsLaraInTitleEnabled())
 		return;
 
-	if (g_GameFlow->CurrentFreezeMode != FreezeMode::None &&
-		g_GameFlow->CurrentFreezeMode != FreezeMode::Player)
-		return;
-
 	// HACK: backup controls until proper control lock is implemented -- Lwmte, 07.12.22
 	auto actionMap = ActionMap;
 

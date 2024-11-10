@@ -298,7 +298,9 @@ GameStatus FreezePhase()
 	// If freeze mode isn't full, partially update scene.
 	if (currentFreezeMode != FreezeMode::Full)
 	{
-		UpdateLara(LaraItem, false);
+		if (currentFreezeMode == FreezeMode::Player)
+			UpdateLara(LaraItem, false);
+
 		UpdateAllItems();
 		UpdateGlobalLensFlare();
 
