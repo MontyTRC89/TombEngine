@@ -276,7 +276,7 @@ GameStatus FreezePhase()
 	// Poll controls and call scripting events.
 	HandleControls(false);
 	g_GameScript->OnFreeze(LastFreezeMode, g_GameFlow->CurrentFreezeMode);
-	HandleAllGlobalEvents(EventType::Break, (Activator)LaraItem->Index);
+	HandleAllGlobalEvents(EventType::Freeze, (Activator)LaraItem->Index);
 
 	// If freeze mode isn't full, partially update scene.
 	if (g_GameFlow->CurrentFreezeMode != FreezeMode::Full)
