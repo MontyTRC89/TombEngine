@@ -77,7 +77,7 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Flow.BreakMode.html">Flow.BreakMode</a></li>
+  <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
@@ -171,12 +171,12 @@ scripts too.</p>
 	<td class="summary">Get current game status, such as normal game loop, exiting to title, etc.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SetBreakMode">SetBreakMode(new)</a></td>
-	<td class="summary">Set current break mode, such as none, full, spectator or player.</td>
+	<td class="name" ><a href="#SetFreezeMode">SetFreezeMode(new)</a></td>
+	<td class="summary">Set current freeze mode, such as none, full, spectator or player.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetBreakMode">GetBreakMode()</a></td>
-	<td class="summary">Get current break mode, such as none, game or static.</td>
+	<td class="name" ><a href="#GetFreezeMode">GetFreezeMode()</a></td>
+	<td class="summary">Get current freeze mode, such as none, full, spectator or player.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#SaveGame">SaveGame(slotID)</a></td>
@@ -601,12 +601,12 @@ teleported to such object with OCB similar to provided second argument.
 
 </dd>
     <dt>
-    <a name = "SetBreakMode"></a>
-    <strong>SetBreakMode(new)</strong>
+    <a name = "SetFreezeMode"></a>
+    <strong>SetFreezeMode(new)</strong>
     </dt>
     <dd>
-    Set current break mode, such as none, full, spectator or player. <br/>
-Break mode specifies whether game is in normal mode or paused in a particular way to allow
+    Set current freeze mode, such as none, full, spectator or player. <br/>
+Freeze mode specifies whether game is in normal mode or paused in a particular way to allow
 custom menu creation, photo mode or time freeze.
 
 
@@ -614,8 +614,8 @@ custom menu creation, photo mode or time freeze.
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">new</span>
-            <span class="types"><a class="type" href="../4 enums/Flow.BreakMode.html#">BreakMode</a></span>
-         break mode to set.
+            <span class="types"><a class="type" href="../4 enums/Flow.FreezeMode.html#">FreezeMode</a></span>
+         freeze mode to set.
         </li>
     </ul>
 
@@ -625,11 +625,11 @@ custom menu creation, photo mode or time freeze.
 
 </dd>
     <dt>
-    <a name = "GetBreakMode"></a>
-    <strong>GetBreakMode()</strong>
+    <a name = "GetFreezeMode"></a>
+    <strong>GetFreezeMode()</strong>
     </dt>
     <dd>
-    Get current break mode, such as none, game or static.
+    Get current freeze mode, such as none, full, spectator or player.
 
 
 
@@ -637,8 +637,8 @@ custom menu creation, photo mode or time freeze.
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../4 enums/Flow.BreakMode.html#">BreakMode</a></span>
-        the current break mode
+           <span class="types"><a class="type" href="../4 enums/Flow.FreezeMode.html#">FreezeMode</a></span>
+        the current freeze mode
     </ol>
 
 

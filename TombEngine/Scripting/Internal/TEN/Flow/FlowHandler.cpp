@@ -8,7 +8,7 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
-#include "Scripting/Internal/TEN/Flow/Enums/BreakModes.h"
+#include "Scripting/Internal/TEN/Flow/Enums/FreezeModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/GameStatuses.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
@@ -145,20 +145,20 @@ Get current game status, such as normal game loop, exiting to title, etc.
 	tableFlow.set_function(ScriptReserved_GetGameStatus, &FlowHandler::GetGameStatus, this);
 
 /***
-Set current break mode, such as none, full, spectator or player. 
-Break mode specifies whether game is in normal mode or paused in a particular way to allow
+Set current freeze mode, such as none, full, spectator or player. 
+Freeze mode specifies whether game is in normal mode or paused in a particular way to allow
 custom menu creation, photo mode or time freeze.
-@function SetBreakMode
-@tparam Flow.BreakMode new break mode to set.
+@function SetFreezeMode
+@tparam Flow.FreezeMode new freeze mode to set.
 */
-	tableFlow.set_function(ScriptReserved_SetBreakMode, &FlowHandler::SetBreakMode, this);
+	tableFlow.set_function(ScriptReserved_SetFreezeMode, &FlowHandler::SetFreezeMode, this);
 
 /***
-Get current break mode, such as none, game or static.
-@function GetBreakMode
-@treturn Flow.BreakMode the current break mode
+Get current freeze mode, such as none, full, spectator or player.
+@function GetFreezeMode
+@treturn Flow.FreezeMode the current freeze mode
 */
-	tableFlow.set_function(ScriptReserved_GetBreakMode, &FlowHandler::GetBreakMode, this);
+	tableFlow.set_function(ScriptReserved_GetFreezeMode, &FlowHandler::GetFreezeMode, this);
 
 /***
 Save the game to a savegame slot.
@@ -298,7 +298,7 @@ Specify which translations in the strings table correspond to which languages.
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameStatus, GAME_STATUSES);
-	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_BreakMode, BREAK_MODES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_FreezeMode, FREEZE_MODES);
 }
 
 FlowHandler::~FlowHandler()
@@ -484,14 +484,14 @@ GameStatus FlowHandler::GetGameStatus()
 	return this->LastGameStatus;
 }
 
-BreakMode FlowHandler::GetBreakMode()
+FreezeMode FlowHandler::GetFreezeMode()
 {
-	return this->CurrentBreakMode;
+	return this->CurrentFreezeMode;
 }
 
-void FlowHandler::SetBreakMode(BreakMode mode)
+void FlowHandler::SetFreezeMode(FreezeMode mode)
 {
-	this->CurrentBreakMode = mode;
+	this->CurrentFreezeMode = mode;
 }
 
 void FlowHandler::FlipMap(int group)

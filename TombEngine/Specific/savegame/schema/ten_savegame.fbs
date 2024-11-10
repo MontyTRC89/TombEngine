@@ -584,8 +584,8 @@ table SaveGame {
 	callbacks_post_loop: [string];
 	callbacks_pre_useitem: [string];
 	callbacks_post_useitem: [string];
-	callbacks_pre_break: [string];
-	callbacks_post_break: [string];
+	callbacks_pre_freeze: [string];
+	callbacks_post_freeze: [string];
 }
 
 root_type TEN.Save.SaveGame;

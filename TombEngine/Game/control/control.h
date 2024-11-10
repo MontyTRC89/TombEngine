@@ -26,7 +26,7 @@ enum class GameStatus
 	LevelComplete
 };
 
-enum class BreakMode
+enum class FreezeMode
 {
 	None,
 	Full,

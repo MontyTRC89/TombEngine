@@ -39,8 +39,8 @@ enum class CallbackPoint
 	PostEnd,
 	PreUseItem,
 	PostUseItem,
-	PreBreak,
-	PostBreak
+	PreFreeze,
+	PostFreeze
 };
 
 static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
@@ -59,8 +59,8 @@ static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 	{ ScriptReserved_PostEnd, CallbackPoint::PostEnd },
 	{ ScriptReserved_PreUseItem, CallbackPoint::PreUseItem },
 	{ ScriptReserved_PostUseItem, CallbackPoint::PostUseItem },
-	{ ScriptReserved_PreBreak, CallbackPoint::PreBreak },
-	{ ScriptReserved_PostBreak, CallbackPoint::PostBreak }
+	{ ScriptReserved_PreFreeze, CallbackPoint::PreFreeze },
+	{ ScriptReserved_PostFreeze, CallbackPoint::PostFreeze }
 };
 
 static const std::unordered_map<std::string, EventType> EVENT_TYPES
@@ -74,7 +74,7 @@ static const std::unordered_map<std::string, EventType> EVENT_TYPES
 	{ ScriptReserved_EventOnStart, EventType::Start },
 	{ ScriptReserved_EventOnEnd, EventType::End },
 	{ ScriptReserved_EventOnUseItem, EventType::UseItem },
-	{ ScriptReserved_EventOnBreak, EventType::Break }
+	{ ScriptReserved_EventOnFreeze, EventType::Break }
 };
 
 enum class LevelEndReason
@@ -200,8 +200,8 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostEnd, &m_callbacksPostEnd));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PreUseItem, &m_callbacksPreUseItem));
 	m_callbacks.insert(std::make_pair(CallbackPoint::PostUseItem, &m_callbacksPostUseItem));
-	m_callbacks.insert(std::make_pair(CallbackPoint::PreBreak, &m_callbacksPreBreak));
-	m_callbacks.insert(std::make_pair(CallbackPoint::PostBreak, &m_callbacksPostBreak));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PreFreeze, &m_callbacksPreFreeze));
+	m_callbacks.insert(std::make_pair(CallbackPoint::PostFreeze, &m_callbacksPostFreeze));
 
 	LevelFunc::Register(tableLogic);
 
@@ -233,8 +233,8 @@ Possible values for `point`:
 	PRELOAD -- will be called immediately before OnLoad
 	POSTLOAD -- will be called immediately after OnLoad
 
-	PREBREAK -- will be called immediately before OnBreak
-	POSTBREAK -- will be called immediately after OnBreak
+	PREFREEZE -- will be called before entering freeze mode
+	POSTFREEZE -- will be called immediately after exiting freeze mode
 
 	-- These take a LevelEndReason arg, like OnEnd
 	PREEND -- will be called immediately before OnEnd
@@ -830,8 +830,8 @@ void LogicHandler::GetCallbackStrings(
 	populateWith(preUseItem, m_callbacksPreUseItem);
 	populateWith(postUseItem, m_callbacksPostUseItem);
 
-	populateWith(preBreak, m_callbacksPreBreak);
-	populateWith(postBreak, m_callbacksPostBreak);
+	populateWith(preBreak, m_callbacksPreFreeze);
+	populateWith(postBreak, m_callbacksPostFreeze);
 }
 
 void LogicHandler::SetCallbackStrings(	
@@ -874,8 +874,8 @@ void LogicHandler::SetCallbackStrings(
 	populateWith(m_callbacksPreUseItem, preUseItem);
 	populateWith(m_callbacksPostUseItem, postUseItem);
 
-	populateWith(m_callbacksPreBreak, preBreak);
-	populateWith(m_callbacksPostBreak, postBreak);
+	populateWith(m_callbacksPreFreeze, preBreak);
+	populateWith(m_callbacksPostFreeze, postBreak);
 }
 
 template <typename R, char const * S, typename mapType>
@@ -1055,20 +1055,20 @@ void LogicHandler::OnUseItem(GAME_OBJECT_ID objectNumber)
 		CallLevelFuncByName(name, objectNumber);
 }
 
-void LogicHandler::OnBreak(BreakMode lastMode, BreakMode nextMode)
+void LogicHandler::OnFreeze(FreezeMode lastMode, FreezeMode nextMode)
 {
-	if (lastMode == BreakMode::None)
+	if (lastMode == FreezeMode::None)
 	{
-		for (auto& name : m_callbacksPreBreak)
+		for (auto& name : m_callbacksPreFreeze)
 			CallLevelFuncByName(name);
 	}
 
 	if (m_onBreak.valid())
 		CallLevelFunc(m_onBreak);
 
-	if (nextMode == BreakMode::None)
+	if (nextMode == FreezeMode::None)
 	{
-		for (auto& name : m_callbacksPostBreak)
+		for (auto& name : m_callbacksPostFreeze)
 			CallLevelFuncByName(name);
 	}
 }
@@ -1217,5 +1217,5 @@ void LogicHandler::InitCallbacks()
 	assignCB(m_onSave, ScriptReserved_OnSave);
 	assignCB(m_onEnd, ScriptReserved_OnEnd);
 	assignCB(m_onUseItem, ScriptReserved_OnUseItem);
-	assignCB(m_onBreak, ScriptReserved_OnBreak);
+	assignCB(m_onBreak, ScriptReserved_OnFreeze);
 }

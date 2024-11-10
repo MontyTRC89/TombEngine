@@ -58,7 +58,7 @@ public:
 	virtual void OnSave() = 0;
 	virtual void OnEnd(GameStatus reason) = 0;
 	virtual void OnUseItem(GAME_OBJECT_ID objectNumber) = 0;
-	virtual void OnBreak(BreakMode lastMode, BreakMode nextMode) = 0;
+	virtual void OnFreeze(FreezeMode lastMode, FreezeMode nextMode) = 0;
 
 	virtual void ShortenTENCalls() = 0;
 	virtual void FreeLevelScripts() = 0;

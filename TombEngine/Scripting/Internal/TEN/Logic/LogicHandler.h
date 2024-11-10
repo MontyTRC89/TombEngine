@@ -63,8 +63,8 @@ private:
 	std::unordered_set<std::string> m_callbacksPostEnd;
 	std::unordered_set<std::string> m_callbacksPreUseItem;
 	std::unordered_set<std::string> m_callbacksPostUseItem;
-	std::unordered_set<std::string> m_callbacksPreBreak;
-	std::unordered_set<std::string> m_callbacksPostBreak;
+	std::unordered_set<std::string> m_callbacksPreFreeze;
+	std::unordered_set<std::string> m_callbacksPostFreeze;
 
 	sol::protected_function	m_onStart{};
 	sol::protected_function	m_onLoop{};
@@ -185,5 +185,5 @@ public:
 	void OnSave() override;
 	void OnEnd(GameStatus reason) override;
 	void OnUseItem(GAME_OBJECT_ID item) override;
-	void OnBreak(BreakMode lastMode, BreakMode nextMode) override;
+	void OnFreeze(FreezeMode lastMode, FreezeMode nextMode) override;
 };

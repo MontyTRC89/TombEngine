@@ -100,7 +100,7 @@ bool InitializeGame;
 bool DoTheGame;
 bool JustLoaded;
 bool ThreadEnded;
-auto LastBreakMode = BreakMode::None;
+auto LastFreezeMode = FreezeMode::None;
 
 int RequiredStartPos;
 int CurrentLevel;
@@ -260,10 +260,10 @@ GameStatus GamePhase(bool insideMenu)
 GameStatus BreakPhase()
 {
 	// We've just entered freeze mode, do initialization, if needed.
-	if (LastBreakMode == BreakMode::None)
+	if (LastFreezeMode == FreezeMode::None)
 	{
 		// Capture the screen for drawing it as a background.
-		if (g_GameFlow->CurrentBreakMode == BreakMode::Full)
+		if (g_GameFlow->CurrentFreezeMode == FreezeMode::Full)
 			g_Renderer.DumpGameScene();
 
 		SetupInterpolation();
@@ -275,11 +275,11 @@ GameStatus BreakPhase()
 
 	// Poll controls and call scripting events.
 	HandleControls(false);
-	g_GameScript->OnBreak(LastBreakMode, g_GameFlow->CurrentBreakMode);
+	g_GameScript->OnFreeze(LastFreezeMode, g_GameFlow->CurrentFreezeMode);
 	HandleAllGlobalEvents(EventType::Break, (Activator)LaraItem->Index);
 
 	// If freeze mode isn't full, partially update scene.
-	if (g_GameFlow->CurrentBreakMode != BreakMode::Full)
+	if (g_GameFlow->CurrentFreezeMode != FreezeMode::Full)
 	{
 		g_Renderer.PrepareScene();
 		g_Renderer.SaveOldState();
@@ -295,7 +295,7 @@ GameStatus BreakPhase()
 		UpdateGlobalLensFlare();
 
 
-		if (g_GameFlow->CurrentBreakMode == BreakMode::Player)
+		if (g_GameFlow->CurrentFreezeMode == FreezeMode::Player)
 		{
 			// Player mode needs to update camera, as in normal control loop.
 			UpdateCamera();
@@ -311,7 +311,7 @@ GameStatus BreakPhase()
 	}
 
 	// Update Lara hair, if animation was switched in spectator mode.
-	if (g_GameFlow->CurrentBreakMode == BreakMode::Spectator &&
+	if (g_GameFlow->CurrentFreezeMode == FreezeMode::Spectator &&
 		lastAnimationNumber != LaraItem->Animation.AnimNumber)
 	{
 		lastAnimationNumber = LaraItem->Animation.AnimNumber;
@@ -321,14 +321,14 @@ GameStatus BreakPhase()
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 
-	LastBreakMode = g_GameFlow->CurrentBreakMode;
+	LastFreezeMode = g_GameFlow->CurrentFreezeMode;
 	return GameStatus::Normal;
 }
 
 GameStatus ControlPhase(bool insideMenu)
 {
 	// For safety measures, only allow to break game loop in non-title levels.
-	if (g_GameFlow->CurrentBreakMode == BreakMode::None || CurrentLevel == 0)
+	if (g_GameFlow->CurrentFreezeMode == FreezeMode::None || CurrentLevel == 0)
 		return GamePhase(insideMenu);
 	else
 		return BreakPhase();

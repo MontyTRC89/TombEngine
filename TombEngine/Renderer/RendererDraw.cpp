@@ -1538,7 +1538,7 @@ namespace TEN::Renderer
 
 	void Renderer::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 	{
-		if (_isLocked || g_GameFlow->CurrentBreakMode != BreakMode::None)
+		if (_isLocked || g_GameFlow->CurrentFreezeMode != FreezeMode::None)
 			return;
 
 		RendererLight dynamicLight = {};
@@ -1569,7 +1569,7 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareScene()
 	{
-		if (g_GameFlow->CurrentBreakMode == BreakMode::None)
+		if (g_GameFlow->CurrentFreezeMode == FreezeMode::None)
 			_dynamicLights.clear();
 
 		_lines2DToDraw.clear();
@@ -1633,9 +1633,9 @@ namespace TEN::Renderer
 		CollectLightsForCamera();
 		RenderItemShadows(view);
 
-		// Prevent particle interpolations if game is in break mode.
+		// Prevent particle interpolations if game is in freeze mode.
 		float interpolationFactorBackup = _interpolationFactor;
-		if (g_GameFlow->CurrentBreakMode != BreakMode::None)
+		if (g_GameFlow->CurrentFreezeMode != FreezeMode::None)
 			_interpolationFactor = 0.0f;
 
 		// Prepare all sprites for later.
@@ -1665,8 +1665,8 @@ namespace TEN::Renderer
 		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected at a later stage.
 		SortAndPrepareSprites(view);
 		
-		// Continue interpolating for any break mode but spectator.
-		if (g_GameFlow->CurrentBreakMode != BreakMode::Spectator)
+		// Continue interpolating for any freeze mode but spectator.
+		if (g_GameFlow->CurrentFreezeMode != FreezeMode::Spectator)
 			_interpolationFactor = interpolationFactorBackup;
 
 		auto time2 = std::chrono::high_resolution_clock::now();
@@ -1861,7 +1861,7 @@ namespace TEN::Renderer
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		if (g_GameFlow->CurrentBreakMode == BreakMode::None)
+		if (g_GameFlow->CurrentFreezeMode == FreezeMode::None)
 			g_Hud.Draw(*LaraItem);
 		
 		_doingFullscreenPass = true;

@@ -768,7 +768,7 @@ void UpdateAllItems()
 		if (!Objects.CheckID(item->ObjectNumber))
 			continue;
 
-		if (g_GameFlow->CurrentBreakMode != BreakMode::None && !Objects[item->ObjectNumber].alwaysActive)
+		if (g_GameFlow->CurrentFreezeMode != FreezeMode::None && !Objects[item->ObjectNumber].alwaysActive)
 			continue;
 
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
