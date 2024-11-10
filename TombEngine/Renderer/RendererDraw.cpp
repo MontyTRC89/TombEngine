@@ -2165,10 +2165,9 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque, true);*/
 	}
 
-	void Renderer::DumpGameScene()
+	void Renderer::DumpGameScene(bool fullPass)
 	{
-		RenderScene(&_dumpScreenRenderTarget, _gameCamera);
-
+		RenderScene(&_dumpScreenRenderTarget, _gameCamera, fullPass);
 		_graphicsSettingsChanged = false;
 	}
 

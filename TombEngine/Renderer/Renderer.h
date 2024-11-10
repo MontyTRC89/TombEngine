@@ -599,7 +599,7 @@ namespace TEN::Renderer
 		bool PrepareDataForTheRenderer();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float farView);
 		void RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere);
-		void DumpGameScene();
+		void DumpGameScene(bool fullPass = true);
 		void RenderInventory();
 		void RenderScene(RenderTarget2D* renderTarget, RenderView& view, bool fullPass = true);
 		void PrepareScene();
