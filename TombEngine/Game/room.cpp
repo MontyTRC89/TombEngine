@@ -789,40 +789,32 @@ Vector3i GetRoomCenter(int roomNumber)
 		room.Position.z + halfDepth);
 }
 
-std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers)
+std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth)
 {
-	// Invalid room; return empty vector.
-	if (g_Level.Rooms.size() <= roomNumber)
-		return {};
-
-	// Search depth limit reached; return empty vector.
-	if (searchDepth == 0)
-		return {};
-
-	// Collect current room number as neighbor of itself.
-	visitedRoomNumbers.push_back(roomNumber);
+	// Initialize stack.
+	auto stack = std::stack<std::pair<int, unsigned int>>{};
+	stack.push({ roomNumber, searchDepth });
 
 	auto neighborRoomNumbers = std::vector<int>{};
+	while (!stack.empty())
+	{
+		auto [currentRoomNumber, depth] = stack.top();
+		stack.pop();
 
-	// Recursively collect neighbors of current neighbor.
-	const auto& room = g_Level.Rooms[roomNumber];
-	if (room.Portals.empty())
-	{
-		neighborRoomNumbers.push_back(roomNumber);
-	}
-	else
-	{
-		for (int doorID = 0; doorID < room.Portals.size(); doorID++)
+		// Depth limit reached; continue.
+		if (depth == 0)
+			continue;
+
+		// Get room and check for neighbors.
+		const auto& room = g_Level.Rooms[currentRoomNumber];
+		for (const auto& portal : room.Portals)
 		{
-			int neighborRoomNumber = room.Portals[doorID].RoomNumber;
-			neighborRoomNumbers.push_back(neighborRoomNumber);
-
-			auto recNeighborRoomNumbers = GetNeighborRoomNumbers(neighborRoomNumber, searchDepth - 1, visitedRoomNumbers);
-			neighborRoomNumbers.insert(neighborRoomNumbers.end(), recNeighborRoomNumbers.begin(), recNeighborRoomNumbers.end());
+			neighborRoomNumbers.push_back(portal.RoomNumber);
+			stack.push({ portal.RoomNumber, depth - 1 });
 		}
 	}
 
-	// Sort and clean collection.
+	// Sort and remove duplicates.
 	std::sort(neighborRoomNumbers.begin(), neighborRoomNumbers.end());
 	neighborRoomNumbers.erase(std::unique(neighborRoomNumbers.begin(), neighborRoomNumbers.end()), neighborRoomNumbers.end());
 

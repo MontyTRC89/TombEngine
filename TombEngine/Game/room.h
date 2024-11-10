@@ -185,7 +185,7 @@ int IsRoomOutside(int x, int y, int z);
 void InitializeNeighborRoomList();
 
 GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox);
-std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers = std::vector<int>{});
+std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth);
 
 namespace TEN::Collision::Room
 {
