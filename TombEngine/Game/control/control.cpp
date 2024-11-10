@@ -124,9 +124,13 @@ void DrawPhase(bool isTitle, float interpolationFactor)
 	{
 		g_Renderer.RenderTitle(interpolationFactor);
 	}
-	else
+	else if (g_GameFlow->CurrentFreezeMode == FreezeMode::None)
 	{
 		g_Renderer.Render(interpolationFactor);
+	}
+	else
+	{
+		g_Renderer.RenderFreezeMode(interpolationFactor, g_GameFlow->CurrentFreezeMode == FreezeMode::Full);
 	}
 
 	g_Renderer.Lock();
@@ -260,35 +264,40 @@ GameStatus GamePhase(bool insideMenu)
 GameStatus FreezePhase()
 {
 	// We've just entered freeze mode, do initialization, if needed.
-	if (LastFreezeMode == FreezeMode::None)
+	bool entering = (LastFreezeMode == FreezeMode::None);
+	auto currentFreezeMode = g_GameFlow->CurrentFreezeMode;
+
+	if (entering)
 	{
 		// Capture the screen for drawing it as a background.
-		if (g_GameFlow->CurrentFreezeMode == FreezeMode::Full)
+		if (currentFreezeMode == FreezeMode::Full)
 			g_Renderer.DumpGameScene();
 
-		SetupInterpolation();
 		StopRumble();
 	}
+
+	g_Renderer.PrepareScene();
+	g_Renderer.SaveOldState();
+
+	ClearLensFlares();
+	ClearAllDisplaySprites();
+
+	SetupInterpolation();
+	PrepareCamera();
+
+	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 
 	// Remember last player's animation to queue hair update if needed.
 	int lastAnimationNumber = LaraItem->Animation.AnimNumber;
 
 	// Poll controls and call scripting events.
 	HandleControls(false);
-	g_GameScript->OnFreeze(LastFreezeMode, g_GameFlow->CurrentFreezeMode);
+	g_GameScript->OnFreeze();
 	HandleAllGlobalEvents(EventType::Freeze, (Activator)LaraItem->Index);
 
 	// If freeze mode isn't full, partially update scene.
-	if (g_GameFlow->CurrentFreezeMode != FreezeMode::Full)
+	if (currentFreezeMode != FreezeMode::Full)
 	{
-		g_Renderer.PrepareScene();
-		g_Renderer.SaveOldState();
-
-		ClearLensFlares();
-		ClearAllDisplaySprites();
-
-		PrepareCamera();
-
 		UpdateLara(LaraItem, false);
 		UpdateAllItems();
 		UpdateGlobalLensFlare();
@@ -299,16 +308,15 @@ GameStatus FreezePhase()
 		Sound_UpdateScene();
 	}
 
-	// Update Lara hair, if animation was switched in spectator mode.
-	if (g_GameFlow->CurrentFreezeMode == FreezeMode::Spectator &&
+	// HACK: Update Lara hair, if animation was switched in spectator mode.
+	// Needed for photo mode and other similar functionality.
+	if (currentFreezeMode == FreezeMode::Spectator &&
 		lastAnimationNumber != LaraItem->Animation.AnimNumber)
 	{
 		lastAnimationNumber = LaraItem->Animation.AnimNumber;
 		for (int i = 0; i < FPS; ++i)
 			HairEffect.Update(*LaraItem);
 	}
-
-	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 
 	LastFreezeMode = g_GameFlow->CurrentFreezeMode;
 	return GameStatus::Normal;
@@ -637,6 +645,9 @@ GameStatus DoGameLoop(int levelIndex)
 
 		if (status != GameStatus::Normal)
 			break;
+
+		if (LastFreezeMode != g_GameFlow->CurrentFreezeMode)
+			continue;
 
 		if (!g_Configuration.EnableHighFramerate)
 		{

@@ -1606,7 +1606,7 @@ namespace TEN::Renderer
 		ClearShadowMap();
 	}
 
-	void Renderer::RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view)
+	void Renderer::RenderScene(RenderTarget2D* renderTarget, RenderView& view, bool fullPass)
 	{
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
@@ -1861,28 +1861,25 @@ namespace TEN::Renderer
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		if (g_GameFlow->CurrentFreezeMode == FreezeMode::None)
+		if (fullPass)
 			g_Hud.Draw(*LaraItem);
 		
 		_doingFullscreenPass = true;
 
 		// Apply antialiasing.
-		if (doAntialiasing)
+		switch (g_Configuration.AntialiasingMode)
 		{
-			switch (g_Configuration.AntialiasingMode)
-			{
-			case AntialiasingMode::None:
-				break;
+		case AntialiasingMode::None:
+			break;
 
-			case AntialiasingMode::Low:
-				ApplyFXAA(&_renderTarget, view);
-				break;
+		case AntialiasingMode::Low:
+			ApplyFXAA(&_renderTarget, view);
+			break;
 
-			case AntialiasingMode::Medium:
-			case AntialiasingMode::High:
-				ApplySMAA(&_renderTarget, view);
-				break;
-			}
+		case AntialiasingMode::Medium:
+		case AntialiasingMode::High:
+			ApplySMAA(&_renderTarget, view);
+			break;
 		}
 
 		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
@@ -1890,22 +1887,25 @@ namespace TEN::Renderer
 
 		_doingFullscreenPass = false;
 
+		// Draw binoculars or lasersight overlay.
+		DrawOverlays(view);
+
 		// Draw 2D debug lines.
 		DrawLines2D();
 
-		// Draw display sprites sorted by priority.
-		CollectDisplaySprites(view);
-		DrawDisplaySprites(view);
+		if (fullPass)
+		{
+			// Draw display sprites sorted by priority.
+			CollectDisplaySprites(view);
+			DrawDisplaySprites(view);
 
-		// Draw binoculars or lasersight overlay.
-		DrawOverlays(view); 
+			DrawDebugInfo(view);
+			DrawAllStrings();
+		}
 
 		time2 = std::chrono::high_resolution_clock::now();
 		_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 		time1 = time2;
-
-		DrawDebugInfo(view);
-		DrawAllStrings();
 
 		ClearScene();
 		CalculateFrameRate();
@@ -2167,7 +2167,7 @@ namespace TEN::Renderer
 
 	void Renderer::DumpGameScene()
 	{
-		RenderScene(&_dumpScreenRenderTarget, false, _gameCamera);
+		RenderScene(&_dumpScreenRenderTarget, _gameCamera);
 
 		_graphicsSettingsChanged = false;
 	}
@@ -3038,7 +3038,7 @@ namespace TEN::Renderer
 	void Renderer::Render(float interpFactor)
 	{
 		InterpolateCamera(interpFactor);
-		RenderScene(&_backBuffer, true, _gameCamera);
+		RenderScene(&_backBuffer, _gameCamera);
 
 		_context->ClearState();
 		_swapChain->Present(1, 0);

@@ -185,5 +185,5 @@ public:
 	void OnSave() override;
 	void OnEnd(GameStatus reason) override;
 	void OnUseItem(GAME_OBJECT_ID item) override;
-	void OnFreeze(FreezeMode lastMode, FreezeMode nextMode) override;
+	void OnFreeze() override;
 };

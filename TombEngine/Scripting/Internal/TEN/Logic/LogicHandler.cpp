@@ -1055,22 +1055,16 @@ void LogicHandler::OnUseItem(GAME_OBJECT_ID objectNumber)
 		CallLevelFuncByName(name, objectNumber);
 }
 
-void LogicHandler::OnFreeze(FreezeMode lastMode, FreezeMode nextMode)
+void LogicHandler::OnFreeze()
 {
-	if (lastMode == FreezeMode::None)
-	{
-		for (auto& name : m_callbacksPreFreeze)
-			CallLevelFuncByName(name);
-	}
+	for (auto& name : m_callbacksPreFreeze)
+		CallLevelFuncByName(name);
 
 	if (m_onBreak.valid())
 		CallLevelFunc(m_onBreak);
-
-	if (nextMode == FreezeMode::None)
-	{
-		for (auto& name : m_callbacksPostFreeze)
-			CallLevelFuncByName(name);
-	}
+		
+	for (auto& name : m_callbacksPostFreeze)
+		CallLevelFuncByName(name);
 }
 
 /*** Special tables

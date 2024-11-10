@@ -601,7 +601,7 @@ namespace TEN::Renderer
 		void RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere);
 		void DumpGameScene();
 		void RenderInventory();
-		void RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view);
+		void RenderScene(RenderTarget2D* renderTarget, RenderView& view, bool fullPass = true);
 		void PrepareScene();
 		void ClearScene();
 		void SaveScreenshot();
@@ -613,6 +613,7 @@ namespace TEN::Renderer
 		void FreeRendererData();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void RenderLoadingScreen(float percentage);
+		void RenderFreezeMode(float interpFactor, bool staticBackground);
 		void UpdateProgress(float value);
 		void ToggleFullScreen(bool force = false);
 		void SetFullScreen();
