@@ -739,6 +739,9 @@ bool IsPointInRoom(const Vector3i& pos, int roomNumber)
 {
 	const auto& room = g_Level.Rooms[roomNumber];
 
+	if (!room.Active())
+		return false;
+
 	if (pos.z >= (room.Position.z + BLOCK(1)) && pos.z <= (room.Position.z + BLOCK(room.ZSize - 1)) &&
 		pos.y <= room.BottomHeight && pos.y > room.TopHeight &&
 		pos.x >= (room.Position.x + BLOCK(1)) && pos.x <= (room.Position.x + BLOCK(room.XSize - 1)))
@@ -749,7 +752,7 @@ bool IsPointInRoom(const Vector3i& pos, int roomNumber)
 	return false;
 }
 
-int FindRoomNumber(const Vector3i& pos, int startRoomNumber)
+int FindRoomNumber(const Vector3i& pos, int startRoomNumber, bool onlyNeighbors)
 {
 	if (startRoomNumber != NO_VALUE && startRoomNumber < g_Level.Rooms.size())
 	{
@@ -757,18 +760,20 @@ int FindRoomNumber(const Vector3i& pos, int startRoomNumber)
 		for (int neighborRoomNumber : room.NeighborRoomNumbers)
 		{
 			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-			if (neighborRoomNumber != startRoomNumber && neighborRoom.Active() &&
-				IsPointInRoom(pos, neighborRoomNumber))
+			if (neighborRoomNumber != startRoomNumber && IsPointInRoom(pos, neighborRoomNumber))
 			{
 				return neighborRoomNumber;
 			}
 		}
 	}
 
-	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
+	if (!onlyNeighbors)
 	{
-		if (IsPointInRoom(pos, roomNumber) && g_Level.Rooms[roomNumber].Active())
-			return roomNumber;
+		for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
+		{
+			if (IsPointInRoom(pos, roomNumber))
+				return roomNumber;
+		}
 	}
 
 	return (startRoomNumber != NO_VALUE) ? startRoomNumber : 0;

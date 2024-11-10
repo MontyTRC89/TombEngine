@@ -1552,11 +1552,10 @@ void UpdateCamera()
 {
 	// HACK: Disable interpolation when switching to/from flyby camera.
 	// When camera structs are converted to a class, this should go to getter/setter. -- Lwmte, 29.10.2024
-	static bool spotcamSwitched = false;
-	if (UseSpotCam != spotcamSwitched)
+	if (UseSpotCam != SpotcamSwitched)
 	{
 		Camera.DisableInterpolation = true;
-		spotcamSwitched = UseSpotCam;
+		SpotcamSwitched = UseSpotCam;
 	}
 
 	if (UseSpotCam)
