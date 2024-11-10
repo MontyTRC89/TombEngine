@@ -14,6 +14,7 @@ void Settings::Register(sol::table & parent)
 		sol::call_constructor, sol::constructors<Settings>(),
 
 /*** How should the application respond to script errors?
+<br>
 Must be one of the following:
 `ErrorMode.TERMINATE` - print to the log file and return to the title level when any script error is hit.
 This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.
@@ -31,6 +32,16 @@ has an unrecoverable error, the game will close.
 
 @mem errorMode
 */
-		"errorMode", &Settings::ErrorMode
+		"errorMode", &Settings::ErrorMode,
+
+/*** Can game utilize fast reload feature?
+<br>
+When set to `True`, game will attempt to perform fast savegame reloading, if current level is the same as
+level loaded from the savegame. It will not work if level timestamp or checksum has changed (i.e. level was
+updated). If set to `False` this functionality is turned off.
+
+@mem fastReload
+*/
+		"fastReload", &Settings::FastReload
 		);
 }

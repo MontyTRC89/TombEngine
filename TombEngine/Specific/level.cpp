@@ -1506,22 +1506,22 @@ bool LoadLevelFile(int levelIndex)
 
 	TENLog("Loading level file: " + levelPath, LogLevel::Info);
 
-	auto timestamp = std::filesystem::last_write_time(levelPath);
-	bool sameLevel = (levelIndex == CurrentLevel && timestamp == LastLevelTimestamp && levelPath == LastLevelFilePath);
+	auto timestamp  = std::filesystem::last_write_time(levelPath);
+	bool fastReload = (g_GameFlow->GetSettings()->FastReload && levelIndex == CurrentLevel && timestamp == LastLevelTimestamp && levelPath == LastLevelFilePath);
 
 	// Dumping game scene right after engine launch is impossible, as no scene exists.
-	if (!FirstLevel && sameLevel)
+	if (!FirstLevel && fastReload)
 		g_Renderer.DumpGameScene();
 
 	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
-	g_Renderer.SetLoadingScreen(sameLevel ? std::wstring{} : loadingScreenPath);
+	g_Renderer.SetLoadingScreen(fastReload ? std::wstring{} : loadingScreenPath);
 
 	BackupLara();
 	StopAllSounds();
 	CleanUp();
-	FreeLevel(sameLevel);
+	FreeLevel(fastReload);
 	
-	LevelLoadTask = std::async(std::launch::async, LoadLevel, levelPath, sameLevel);
+	LevelLoadTask = std::async(std::launch::async, LoadLevel, levelPath, fastReload);
 
 	return LevelLoadTask.get();
 }

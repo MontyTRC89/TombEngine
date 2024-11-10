@@ -16,6 +16,7 @@ namespace sol {
 struct Settings
 {
 	ErrorMode ErrorMode;
+	bool FastReload;
 
 	static void Register(sol::table & parent);
 };
