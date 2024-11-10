@@ -257,7 +257,7 @@ GameStatus GamePhase(bool insideMenu)
 	return GameStatus::Normal;
 }
 
-GameStatus BreakPhase()
+GameStatus FreezePhase()
 {
 	// We've just entered freeze mode, do initialization, if needed.
 	if (LastFreezeMode == FreezeMode::None)
@@ -319,7 +319,7 @@ GameStatus ControlPhase(bool insideMenu)
 	if (g_GameFlow->CurrentFreezeMode == FreezeMode::None || CurrentLevel == 0)
 		return GamePhase(insideMenu);
 	else
-		return BreakPhase();
+		return FreezePhase();
 }
 
 unsigned CALLBACK GameMain(void *)
