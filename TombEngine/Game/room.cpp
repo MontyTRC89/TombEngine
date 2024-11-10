@@ -75,7 +75,7 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 	}
 }
 
-void SwapRoom(int index, ROOM_INFO& firstRoom, ROOM_INFO& secondRoom)
+void FlipRooms(int index, ROOM_INFO& firstRoom, ROOM_INFO& secondRoom)
 {
 	RemoveRoomFlipItems(firstRoom);
 
@@ -128,7 +128,7 @@ void ResetRoomData()
 		if (room.flippedRoom != NO_VALUE && room.flipNumber != NO_VALUE && FlipStats[room.flipNumber])
 		{
 			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
-			SwapRoom(roomNumber, room, flippedRoom);
+			FlipRooms(roomNumber, room, flippedRoom);
 		}
 
 		for (auto& sector : room.Sectors)
@@ -160,7 +160,7 @@ void DoFlipMap(int group)
 		if (room.flippedRoom != NO_VALUE && room.flipNumber == group)
 		{
 			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
-			SwapRoom(roomNumber, room, flippedRoom);
+			FlipRooms(roomNumber, room, flippedRoom);
 		}
 	}
 
