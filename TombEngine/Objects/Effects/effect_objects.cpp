@@ -58,5 +58,8 @@ void InitializeEffectsObjects()
 
 	obj = &Objects[ID_LENS_FLARE];
 	if (obj->loaded)
+	{
+		obj->drawRoutine = nullptr;
 		obj->control = ControlLensFlare;
+	}
 }

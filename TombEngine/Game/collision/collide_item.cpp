@@ -152,7 +152,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 					// Ignore items not feasible for collision.
 					if (item.Index == collidingItem.Index ||
-						item.Flags & IFLAG_KILLED || item.MeshBits == NO_JOINT_BITS ||
+						item.Flags & IFLAG_KILLED || item.MeshBits == NO_JOINT_BITS || !item.Collidable ||
 						(object.drawRoutine == nullptr && !item.IsLara()) ||
 						(object.collision == nullptr && !item.IsLara()))
 					{

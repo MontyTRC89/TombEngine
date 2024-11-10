@@ -409,7 +409,7 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 
 	//get mesh 0 coordinates.	
 	auto pos = GetJointPosition(camSlotId, 0, Vector3i::Zero);
-	auto dest = Vector3(pos.x, pos.y, pos.z);
+	auto dest = Vector3(pos.x, pos.y, pos.z) + camSlotId->Pose.Position.ToVector3();
 
 	GameVector from = GameVector(dest, camSlotId->RoomNumber);
 	Camera.fixedCamera = true;
@@ -1061,6 +1061,28 @@ void ConfirmCameraTargetPos()
 	}
 }
 
+// HACK: Temporary fix for camera bouncing on slopes during player death.
+static bool CalculateDeathCamera(const ItemInfo& item)
+{
+	// If player is alive, it's not a death camera.
+	if (item.HitPoints > 0)
+		return false;
+
+	// If player is in a special death animation (from EXTRA_ANIMS slot) triggered by enemies.
+	if (item.Animation.AnimObjectID == ID_LARA_EXTRA_ANIMS)
+		return true;
+
+	// Special death animations.
+	if (item.Animation.AnimNumber == LA_SPIKE_DEATH || 
+		item.Animation.AnimNumber == LA_BOULDER_DEATH || 
+		item.Animation.AnimNumber == LA_TRAIN_OVERBOARD_DEATH)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void CalculateCamera(const CollisionInfo& coll)
 {
 	CamOldPos.x = Camera.pos.x;
@@ -1289,7 +1311,7 @@ void CalculateCamera(const CollisionInfo& coll)
 	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
 	Camera.lastType = Camera.type;
 
-	if (CalculateDeathCamera())
+	if (CalculateDeathCamera(*LaraItem))
 		return;
 
 	if (Camera.type != CameraType::Heavy || Camera.timer == -1)
@@ -1305,27 +1327,6 @@ void CalculateCamera(const CollisionInfo& coll)
 		Camera.flags = 0;
 		Camera.laraNode = -1;
 	}
-}
-
-bool CalculateDeathCamera()
-{
-	// If player is alive, it's not a death camera.
-	if (LaraItem->HitPoints > 0)
-		return false;
-	
-	// If Lara is in a special death animation (from extra_anims) triggered by enemies.
-	if (LaraItem->Animation.AnimObjectID == ID_LARA_EXTRA_ANIMS)
-		return true;
-
-	// Special death animations
-	if (LaraItem->Animation.AnimNumber == LA_SPIKE_DEATH || 
-		LaraItem->Animation.AnimNumber == LA_BOULDER_DEATH || 
-		LaraItem->Animation.AnimNumber == LA_TRAIN_OVERBOARD_DEATH)
-	{
-		return true;
-	}
-
-	return false;
 }
 
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius)
@@ -1583,11 +1584,10 @@ void UpdateCamera()
 {
 	// HACK: Disable interpolation when switching to/from flyby camera.
 	// When camera structs are converted to a class, this should go to getter/setter. -- Lwmte, 29.10.2024
-	static bool spotcamSwitched = false;
-	if (UseSpotCam != spotcamSwitched)
+	if (UseSpotCam != SpotcamSwitched)
 	{
 		Camera.DisableInterpolation = true;
-		spotcamSwitched = UseSpotCam;
+		SpotcamSwitched = UseSpotCam;
 	}
 
 	if (UseSpotCam)

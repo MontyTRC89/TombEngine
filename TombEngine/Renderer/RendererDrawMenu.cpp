@@ -1361,6 +1361,11 @@ namespace TEN::Renderer
 		}
 	}
 
+	RendererDebugPage Renderer::GetCurrentDebugPage()
+	{
+		return _debugPage;
+	}
+
 	void Renderer::SwitchDebugPage(bool goBack)
 	{
 		int page = (int)_debugPage;

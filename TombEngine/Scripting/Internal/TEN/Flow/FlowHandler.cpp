@@ -701,7 +701,6 @@ bool FlowHandler::DoFlow()
 		case GameStatus::NewGame:
 			// NOTE: 0 reserved for title level and 1 reserved for home level.
 			CurrentLevel = (SelectedLevelForNewGame != 0) ? SelectedLevelForNewGame : (IsHomeLevelEnabled() ? 2 : 1);
-
 			RequiredStartPos = 0;
 			SelectedLevelForNewGame = 0;
 			InitializeGame = true;
