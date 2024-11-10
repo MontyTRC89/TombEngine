@@ -52,10 +52,12 @@ namespace TEN::Entities::Generic
 
 		void InitializeCollisionMesh(const ItemInfo& item);
 		void InitializeAttractor(const ItemInfo& item);
+		void InitializeBridgeCollision(const ItemInfo& item);
 
 		void UpdateAabb(const ItemInfo& item);
 		void UpdateCollisionMesh(const ItemInfo& item);
 		void UpdateAttractor(const ItemInfo& item);
+		void UpdateBridgeCollision(const ItemInfo& item);
 
 		void AssignSectors(const ItemInfo& item);
 		void DeassignSectors(const ItemInfo& item) const;

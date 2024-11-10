@@ -40,34 +40,8 @@ namespace TEN::Entities::Generic
 		UpdateAabb(item);
 		InitializeCollisionMesh(item);
 		InitializeAttractor(item);
-		//AssignSectors(item); // TODO: Uncomment when commented block below starts working.
-
-		// Insert into room bridge tree.
-		auto& room = g_Level.Rooms[item.RoomNumber];
-		room.Bridges.Insert(item.Index, item.GetAabb());
-
-		auto obb = item.GetObb();
-
-		// TODO: GetNeighborSectors() doesn't work for some reason when initialising the game. -- Sezz 2024.11.05
-		/*unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_aabb.Extents.x, _aabb.Extents.y), _aabb.Extents.z) / BLOCK(1));
-		auto sectors = GetNeighborSectors(item.Pose.Position, item.RoomNumber, sectorSearchDepth);
-		for (auto* sector : sectors)
-		{
-			if (obb.Intersects(sector->Aabb))
-				sector->AddBridge(item.Index);
-		}*/
-
-		// TODO: Temporary substitute for commented block above.
-		for (int x = 0; x < room.XSize; x++)
-		{
-			for (int z = 0; z < room.ZSize; z++)
-			{
-				auto& sector = room.Sectors[(x * room.ZSize) + z];
-				if (obb.Intersects(sector.Aabb))
-					sector.AddBridge(item.Index);
-			}
-		}
-
+		InitializeBridgeCollision(item);
+		
 		// Store previous parameters.
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
@@ -85,22 +59,7 @@ namespace TEN::Entities::Generic
 		UpdateAabb(item);
 		UpdateCollisionMesh(item);
 		UpdateAttractor(item);
-		DeassignSectors(item);
-		AssignSectors(item);
-
-		auto& room = g_Level.Rooms[item.RoomNumber];
-		auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
-
-		// Update room bridge trees.
-		if (item.Pose != _prevPose && item.RoomNumber == _prevRoomNumber)
-		{
-			room.Bridges.Move(item.Index, item.GetAabb());
-		}
-		else
-		{
-			room.Bridges.Insert(item.Index, item.GetAabb());
-			prevRoom.Bridges.Remove(item.Index);
-		}
+		UpdateBridgeCollision(item);
 
 		// Store previous parameters.
 		_prevPose = item.Pose;
@@ -116,11 +75,7 @@ namespace TEN::Entities::Generic
 		UpdateAabb(item);
 		UpdateCollisionMesh(item);
 		InitializeAttractor(item);
-		AssignSectors(item);
-
-		// Insert into room bridge tree.
-		auto& room = g_Level.Rooms[item.RoomNumber];
-		room.Bridges.Insert(item.Index, item.GetAabb());
+		InitializeBridgeCollision(item);
 
 		// Store previous parameters.
 		_prevPose = item.Pose;
@@ -203,6 +158,38 @@ namespace TEN::Entities::Generic
 		// TODO: Implement when attractors are complete.
 	}
 
+	void BridgeObject::InitializeBridgeCollision(const ItemInfo& item)
+	{
+		// TODO: Uncomment when commented block below starts working.
+		//AssignSectors(item);
+
+		// Insert into room bridge tree.
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		room.Bridges.Insert(item.Index, item.GetAabb());
+
+		auto obb = item.GetObb();
+
+		// TODO: GetNeighborSectors() doesn't work for some reason when initialising the game. -- Sezz 2024.11.05
+		/*unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_aabb.Extents.x, _aabb.Extents.y), _aabb.Extents.z) / BLOCK(1));
+		auto sectors = GetNeighborSectors(item.Pose.Position, item.RoomNumber, sectorSearchDepth);
+		for (auto* sector : sectors)
+		{
+			if (obb.Intersects(sector->Aabb))
+				sector->AddBridge(item.Index);
+		}*/
+
+		// TODO: Temporary substitute for commented block above.
+		for (int x = 0; x < room.XSize; x++)
+		{
+			for (int z = 0; z < room.ZSize; z++)
+			{
+				auto& sector = room.Sectors[(x * room.ZSize) + z];
+				if (obb.Intersects(sector.Aabb))
+					sector.AddBridge(item.Index);
+			}
+		}
+	}
+
 	void BridgeObject::UpdateAabb(const ItemInfo& item)
 	{
 		_aabb = Geometry::GetBoundingBox(item.GetObb());
@@ -221,6 +208,26 @@ namespace TEN::Entities::Generic
 		// TODO: Uncomment when attractors are complete.
 		//_attractor.SetPosition(item.Pose.Position.ToVector3());
 		//_attractor.SetOrientation(item.Pose.Orientation.ToQuaternion());
+	}
+
+	void BridgeObject::UpdateBridgeCollision(const ItemInfo& item)
+	{
+		DeassignSectors(item);
+		AssignSectors(item);
+
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
+
+		// Update room bridge trees.
+		if (item.Pose != _prevPose && item.RoomNumber == _prevRoomNumber)
+		{
+			room.Bridges.Move(item.Index, item.GetAabb());
+		}
+		else
+		{
+			room.Bridges.Insert(item.Index, item.GetAabb());
+			prevRoom.Bridges.Remove(item.Index);
+		}
 	}
 
 	void BridgeObject::AssignSectors(const ItemInfo& item)
