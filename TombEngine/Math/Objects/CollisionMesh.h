@@ -127,7 +127,7 @@ namespace TEN::Math
 	private:
 		// Helpers
 
-		Matrix GetTransformMatrix() const;
+		Matrix GetTranslationMatrix() const;
 		Matrix GetRotationMatrix() const;
 	};
 }

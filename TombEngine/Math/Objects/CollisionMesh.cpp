@@ -201,8 +201,8 @@ namespace TEN::Math
 	std::optional<CollisionMeshRayCollisionData> CollisionMesh::GetCollision(const Ray& ray, float dist) const
 	{
 		// Get matrices.
-		auto transformMatrix = GetTransformMatrix();
 		auto rotMatrix = GetRotationMatrix();
+		auto transformMatrix = GetTranslationMatrix() * rotMatrix;
 
 		// Calculate local ray.
 		auto localRay = Ray(Vector3::Transform(ray.position, transformMatrix.Invert()), Vector3::Transform(ray.direction, rotMatrix.Invert()));
@@ -260,15 +260,16 @@ namespace TEN::Math
 
 	void CollisionMesh::DrawDebug() const
 	{
+		auto rotMatrix = GetRotationMatrix();
+		auto transformMatrix = GetTranslationMatrix() * rotMatrix;
+
 		for (const auto& tri : _triangles)
-			tri.DrawDebug(GetTransformMatrix(), GetRotationMatrix(), _vertices);
+			tri.DrawDebug(transformMatrix, rotMatrix, _vertices);
 	}
 
-	Matrix CollisionMesh::GetTransformMatrix() const
+	Matrix CollisionMesh::GetTranslationMatrix() const
 	{
-		auto translationMatrix = Matrix::CreateTranslation(_position);
-		auto rotMatrix = Matrix::CreateFromQuaternion(_orientation);
-		return (rotMatrix * translationMatrix);
+		return Matrix::CreateTranslation(_position);
 	}
 
 	Matrix CollisionMesh::GetRotationMatrix() const
