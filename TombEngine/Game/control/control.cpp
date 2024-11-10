@@ -291,20 +291,8 @@ GameStatus BreakPhase()
 
 		UpdateLara(LaraItem, false);
 		UpdateAllItems();
-
 		UpdateGlobalLensFlare();
-
-
-		if (g_GameFlow->CurrentFreezeMode == FreezeMode::Player)
-		{
-			// Player mode needs to update camera, as in normal control loop.
-			UpdateCamera();
-		}
-		else
-		{
-			// Just update camera matrices, camera update will happen elsewhere.
-			g_Renderer.UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
-		}
+		UpdateCamera();
 
 		PlaySoundSources();
 		Sound_UpdateScene();
