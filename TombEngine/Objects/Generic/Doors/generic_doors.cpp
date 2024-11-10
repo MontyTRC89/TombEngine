@@ -405,13 +405,12 @@ namespace TEN::Entities::Doors
 				creature->LOT.TargetBox = NO_VALUE;
 		}
 
+		auto& room = g_Level.Rooms[dd->d1.floor->RoomNumber];
+		auto& neighborRoom = g_Level.Rooms[dd->d2.floor->RoomNumber];
+
 		// HACK: Regenerate room collision meshes.
-		const auto& room = g_Level.Rooms[sector->RoomNumber];
-		for (int neighborRoomNumber : room.NeighborRoomNumbers)
-		{
-			auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-			neighborRoom.GenerateCollisionMesh();
-		}
+		room.GenerateCollisionMesh();
+		neighborRoom.GenerateCollisionMesh();
 	}
 
 	void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
