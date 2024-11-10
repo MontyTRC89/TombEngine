@@ -661,44 +661,44 @@ namespace TEN::Structures
 		else
 		{
 			auto getBestSplit = [&]()
-				{
-					int bestSplit = (start + end) / 2;
+			{
+				int bestSplit = (start + end) / 2;
 
-					// Fast strategy: median split.
-					if (strategy == BvhBuildStrategy::Fast)
-						return bestSplit;
-
-					float bestCost = INFINITY;
-					int range = (strategy == BvhBuildStrategy::Balanced) ? BALANCED_STRAT_SPLIT_RANGE_MAX : (end - start);
-
-					// Balanced or accurate strategy: surface area heuristic.
-					for (int split = std::max(start + 1, bestSplit - range); split < std::min(end, bestSplit + range); split++)
-					{
-						// Calculate AABB 0.
-						auto aabb0 = aabbs[start];
-						for (int i = (start + 1); i < split; i++)
-							BoundingBox::CreateMerged(aabb0, aabb0, aabbs[i]);
-
-						// Calculate AABB 1.
-						auto aabb1 = aabbs[split];
-						for (int i = split; i < end; i++)
-							BoundingBox::CreateMerged(aabb1, aabb1, aabbs[i]);
-
-						// Calculate cost.
-						float surfaceArea0 = Geometry::GetBoundingBoxArea(aabb0);
-						float surfaceArea1 = Geometry::GetBoundingBoxArea(aabb1);
-						float cost = (surfaceArea0 * (split - start)) + (surfaceArea1 * (end - split));
-
-						// Track best split.
-						if (cost < bestCost)
-						{
-							bestSplit = split;
-							bestCost = cost;
-						}
-					}
-
+				// Fast strategy: median split.
+				if (strategy == BvhBuildStrategy::Fast)
 					return bestSplit;
-				};
+
+				float bestCost = INFINITY;
+				int range = (strategy == BvhBuildStrategy::Balanced) ? BALANCED_STRAT_SPLIT_RANGE_MAX : (end - start);
+
+				// Balanced or accurate strategy: surface area heuristic.
+				for (int split = std::max(start + 1, bestSplit - range); split < std::min(end, bestSplit + range); split++)
+				{
+					// Calculate AABB 0.
+					auto aabb0 = aabbs[start];
+					for (int i = (start + 1); i < split; i++)
+						BoundingBox::CreateMerged(aabb0, aabb0, aabbs[i]);
+
+					// Calculate AABB 1.
+					auto aabb1 = aabbs[split];
+					for (int i = split; i < end; i++)
+						BoundingBox::CreateMerged(aabb1, aabb1, aabbs[i]);
+
+					// Calculate cost.
+					float surfaceArea0 = Geometry::GetBoundingBoxArea(aabb0);
+					float surfaceArea1 = Geometry::GetBoundingBoxArea(aabb1);
+					float cost = (surfaceArea0 * (split - start)) + (surfaceArea1 * (end - split));
+
+					// Track best split.
+					if (cost < bestCost)
+					{
+						bestSplit = split;
+						bestCost = cost;
+					}
+				}
+
+				return bestSplit;
+			};
 
 			int bestSplit = getBestSplit();
 

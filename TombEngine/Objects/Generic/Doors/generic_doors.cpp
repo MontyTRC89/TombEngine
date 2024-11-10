@@ -42,6 +42,24 @@ namespace TEN::Entities::Doors
 			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f)))
 	};
 
+	// HACK: Regenerate room collision meshes.
+	static void UpdateDoorRoomCollisionMeshes(const DOOR_DATA& door)
+	{
+		// Generate current room collision mesh.
+		if (door.d1.floor != nullptr)
+		{
+			auto& room = g_Level.Rooms[door.d1.floor->RoomNumber];
+			room.GenerateCollisionMesh();
+		}
+
+		// Generate neighbor room collision mesh.
+		if (door.d2.floor != nullptr)
+		{
+			auto& room = g_Level.Rooms[door.d2.floor->RoomNumber];
+			room.GenerateCollisionMesh();
+		}
+	}
+
 	void InitializeDoor(short itemNumber)
 	{
 		auto* doorItem = &g_Level.Items[itemNumber];
@@ -165,6 +183,8 @@ namespace TEN::Entities::Doors
 			doorItem->RoomNumber = roomNumber;
 			doorItem->InDrawRoom = true;
 		}
+
+		UpdateDoorRoomCollisionMeshes(*doorData);
 	}
 
 	void DoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -288,6 +308,8 @@ namespace TEN::Entities::Doors
 					OpenThatDoor(&doorData->d1flip, doorData);
 					OpenThatDoor(&doorData->d2flip, doorData);
 					doorData->opened = true;
+
+					UpdateDoorRoomCollisionMeshes(*doorData);
 				}
 			}
 			else
@@ -304,6 +326,8 @@ namespace TEN::Entities::Doors
 						ShutThatDoor(&doorData->d1flip, doorData);
 						ShutThatDoor(&doorData->d2flip, doorData);
 						doorData->opened = false;
+
+						UpdateDoorRoomCollisionMeshes(*doorData);
 					}
 				}
 			}
@@ -324,6 +348,8 @@ namespace TEN::Entities::Doors
 					OpenThatDoor(&doorData->d1flip, doorData);
 					OpenThatDoor(&doorData->d2flip, doorData);
 					doorData->opened = true;
+
+					UpdateDoorRoomCollisionMeshes(*doorData);
 				}
 			}
 			else
@@ -339,6 +365,8 @@ namespace TEN::Entities::Doors
 					ShutThatDoor(&doorData->d1flip, doorData);
 					ShutThatDoor(&doorData->d2flip, doorData);
 					doorData->opened = false;
+
+					UpdateDoorRoomCollisionMeshes(*doorData);
 				}
 			}
 		}
@@ -356,6 +384,8 @@ namespace TEN::Entities::Doors
 						ShutThatDoor(&door->d1flip, door);
 						ShutThatDoor(&door->d2flip, door);
 						door->opened = false;
+
+						UpdateDoorRoomCollisionMeshes(*door);
 					}
 				}
 				else
@@ -382,6 +412,8 @@ namespace TEN::Entities::Doors
 					OpenThatDoor(&door->d2flip, door);
 					DontUnlockBox = false;
 					door->opened = true;
+
+					UpdateDoorRoomCollisionMeshes(*door);
 				}
 			}*/
 		}
@@ -404,13 +436,6 @@ namespace TEN::Entities::Doors
 			for (auto& creature : ActiveCreatures)
 				creature->LOT.TargetBox = NO_VALUE;
 		}
-
-		auto& room = g_Level.Rooms[dd->d1.floor->RoomNumber];
-		auto& neighborRoom = g_Level.Rooms[dd->d2.floor->RoomNumber];
-
-		// HACK: Regenerate room collision meshes.
-		room.GenerateCollisionMesh();
-		neighborRoom.GenerateCollisionMesh();
 	}
 
 	void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
@@ -445,12 +470,5 @@ namespace TEN::Entities::Doors
 			for (auto& creature : ActiveCreatures)
 				creature->LOT.TargetBox = NO_VALUE;
 		}
-
-		auto& room = g_Level.Rooms[dd->d1.floor->RoomNumber];
-		auto& neighborRoom = g_Level.Rooms[dd->d2.floor->RoomNumber];
-
-		// HACK: Regenerate room collision meshes.
-		room.GenerateCollisionMesh();
-		neighborRoom.GenerateCollisionMesh();
 	}
 }
