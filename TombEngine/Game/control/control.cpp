@@ -292,6 +292,7 @@ GameStatus FreezePhase()
 		UpdateLara(LaraItem, false);
 		UpdateAllItems();
 		UpdateGlobalLensFlare();
+
 		UpdateCamera();
 
 		PlaySoundSources();
