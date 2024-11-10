@@ -673,6 +673,9 @@ void StopSoundTracks(int fadeoutTime, bool excludeAmbience)
 
 void StopSoundTrack(SoundTrackType mode, int fadeoutTime)
 {
+	if (SoundtrackSlot[(int)mode].Channel == NULL)
+		return;
+	
 	// Do fadeout.
 	BASS_ChannelSlideAttribute(SoundtrackSlot[(int)mode].Channel, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1.0f, fadeoutTime);
 

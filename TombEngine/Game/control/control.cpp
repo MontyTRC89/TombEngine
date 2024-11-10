@@ -592,6 +592,7 @@ void EndGameLoop(int levelIndex, GameStatus reason)
 	DeInitializeScripting(levelIndex, reason);
 
 	StopAllSounds();
+	StopSoundTracks(SOUND_XFADETIME_LEVELJUMP, true);
 	StopRumble();
 }
 
