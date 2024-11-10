@@ -1375,10 +1375,12 @@ bool LoadLevel(std::string path, bool partial)
 		{
 			g_Renderer.PrepareDataForTheRenderer();
 			SetScreenFadeOut(FADE_SCREEN_SPEED, true);
+			StopSoundTracks(SOUND_XFADETIME_BGM_START);
 		}
 		else
 		{
 			SetScreenFadeIn(FADE_SCREEN_SPEED, true);
+			StopSoundTracks(SOUND_XFADETIME_LEVELJUMP);
 		}
 
 		UpdateProgress(100, partial);
@@ -1390,6 +1392,7 @@ bool LoadLevel(std::string path, bool partial)
 	catch (std::exception& ex)
 	{
 		FinalizeBlock();
+		StopSoundTracks(SOUND_XFADETIME_LEVELJUMP);
 
 		TENLog("Error while loading level: " + std::string(ex.what()), LogLevel::Error);
 		loadedSuccessfully = false;

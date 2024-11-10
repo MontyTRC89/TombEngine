@@ -659,7 +659,7 @@ void PlaySoundTrack(int index, short mask)
 	PlaySoundTrack(SoundTracks[index].Name, SoundTracks[index].Mode);
 }
 
-void StopSoundTracks(bool excludeAmbience)
+void StopSoundTracks(int fadeoutTime, bool excludeAmbience)
 {
 	for (int i = 0; i < (int)SoundTrackType::Count; i++)
 	{
@@ -667,7 +667,7 @@ void StopSoundTracks(bool excludeAmbience)
 		if (excludeAmbience && type == SoundTrackType::BGM)
 			continue;
 
-		StopSoundTrack(type, SOUND_XFADETIME_LEVELJUMP);
+		StopSoundTrack(type, fadeoutTime);
 	}
 }
 

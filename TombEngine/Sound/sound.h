@@ -169,7 +169,7 @@ void PlaySoundTrack(const std::string& trackName, SoundTrackType mode, QWORD pos
 void PlaySoundTrack(const std::string& trackName, short mask = 0);
 void PlaySoundTrack(int index, short mask = 0);
 void StopSoundTrack(SoundTrackType mode, int fadeoutTime);
-void StopSoundTracks(bool excludeAmbience = false);
+void StopSoundTracks(int fadeoutTime = SOUND_XFADETIME_LEVELJUMP, bool excludeAmbience = false);
 void ClearSoundTrackMasks();
 void PlaySecretTrack();
 void EnumerateLegacyTracks();
