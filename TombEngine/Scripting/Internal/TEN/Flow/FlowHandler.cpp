@@ -145,6 +145,13 @@ Get current game status, such as normal game loop, exiting to title, etc.
 	tableFlow.set_function(ScriptReserved_GetGameStatus, &FlowHandler::GetGameStatus, this);
 
 /***
+Get current freeze mode, such as none, full, spectator or player.
+@function GetFreezeMode
+@treturn Flow.FreezeMode the current freeze mode
+*/
+	tableFlow.set_function(ScriptReserved_GetFreezeMode, &FlowHandler::GetFreezeMode, this);
+
+/***
 Set current freeze mode, such as none, full, spectator or player. 
 Freeze mode specifies whether game is in normal mode or paused in a particular way to allow
 custom menu creation, photo mode or time freeze.
@@ -152,13 +159,6 @@ custom menu creation, photo mode or time freeze.
 @tparam Flow.FreezeMode new freeze mode to set.
 */
 	tableFlow.set_function(ScriptReserved_SetFreezeMode, &FlowHandler::SetFreezeMode, this);
-
-/***
-Get current freeze mode, such as none, full, spectator or player.
-@function GetFreezeMode
-@treturn Flow.FreezeMode the current freeze mode
-*/
-	tableFlow.set_function(ScriptReserved_GetFreezeMode, &FlowHandler::GetFreezeMode, this);
 
 /***
 Save the game to a savegame slot.
