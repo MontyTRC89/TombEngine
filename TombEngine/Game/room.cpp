@@ -137,6 +137,10 @@ void ResetRoomData()
 			sector.BridgeItemNumbers.clear();
 		}
 	}
+
+	// Make sure no pathfinding boxes are blocked (either by doors or by other door-like objects).
+	for (int boxNumber = 0; boxNumber < g_Level.PathfindingBoxes.size(); boxNumber++)
+		g_Level.PathfindingBoxes[boxNumber].flags &= ~BLOCKED;
 }
 
 void DoFlipMap(int group)
