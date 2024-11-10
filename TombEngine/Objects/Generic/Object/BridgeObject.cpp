@@ -17,11 +17,6 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Generic
 {
-	const BoundingBox& BridgeObject::GetAabb() const
-	{
-		return _aabb;
-	}
-
 	const CollisionMesh& BridgeObject::GetCollisionMesh() const
 	{
 		return _collisionMesh;
@@ -37,7 +32,6 @@ namespace TEN::Entities::Generic
 	{
 		_isEnabled = true;
 
-		UpdateAabb(item);
 		InitializeCollisionMesh(item);
 		InitializeAttractor(item);
 		InitializeBridgeCollision(item);
@@ -45,19 +39,18 @@ namespace TEN::Entities::Generic
 		// Store previous parameters.
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
-		_prevAabb = _aabb;
+		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
 	}
 
 	void BridgeObject::Update(const ItemInfo& item)
 	{
-		if (!_isEnabled)
+		if (!_isEnabled || item.Flags & IFLAG_KILLED)
 			return;
 
 		if (item.Pose == _prevPose && item.RoomNumber == _prevRoomNumber)
 			return;
 
-		UpdateAabb(item);
 		UpdateCollisionMesh(item);
 		UpdateAttractor(item);
 		UpdateBridgeCollision(item);
@@ -65,15 +58,17 @@ namespace TEN::Entities::Generic
 		// Store previous parameters.
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
-		_prevAabb = _aabb;
+		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
 	}
 
 	void BridgeObject::Enable(const ItemInfo& item)
 	{
+		if (item.Flags & IFLAG_KILLED)
+			return;
+
 		_isEnabled = true;
 
-		UpdateAabb(item);
 		UpdateCollisionMesh(item);
 		InitializeAttractor(item);
 		InitializeBridgeCollision(item);
@@ -81,12 +76,15 @@ namespace TEN::Entities::Generic
 		// Store previous parameters.
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
-		_prevAabb = _aabb;
+		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
 	}
 
 	void BridgeObject::Disable(const ItemInfo& item)
 	{
+		if (item.Flags & IFLAG_KILLED)
+			return;
+
 		_isEnabled = false;
 
 		// Destroy attractor here. Maybe contain in std::optional?
@@ -168,11 +166,6 @@ namespace TEN::Entities::Generic
 		room.Bridges.Insert(item.Index, item.GetAabb());
 	}
 
-	void BridgeObject::UpdateAabb(const ItemInfo& item)
-	{
-		_aabb = Geometry::GetBoundingBox(item.GetObb());
-	}
-
 	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
 	{
 		// TODO: Also update proportions based on AABB animation?
@@ -210,19 +203,19 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::AssignSectors(const ItemInfo& item)
 	{
-		if (item.Flags & IFLAG_KILLED)
-			return;
-
-		// Get OBB.
+		// Get AABB and OBB.
+		auto aabb = item.GetAabb();
 		auto obb = item.GetObb();
 
-		// Assign sectors.
+		// Assign to sectors.
 		int searchDepth = (int)ceil(std::max(std::max(obb.Extents.x, obb.Extents.y), obb.Extents.z) / BLOCK(1));
 		auto sectors = GetNeighborSectors(item.Pose.Position, item.RoomNumber, searchDepth);
 		for (auto* sector : sectors)
 		{
+			// TODO: Could be more efficient to additionally check for bridge AABB collision with room's AABB.
+			
 			// Test if AABB intersects sector.
-			if (!_aabb.Intersects(sector->Aabb))
+			if (!aabb.Intersects(sector->Aabb))
 				continue;
 
 			// Test if OBB intersects sector.
@@ -240,6 +233,8 @@ namespace TEN::Entities::Generic
 		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);
 		for (auto* sector : sectors)
 		{
+			// TODO: Could be more efficient to additionally check for bridge AABB collision with room's AABB.
+			
 			// Test if previous AABB intersects sector.
 			if (!_prevAabb.Intersects(sector->Aabb))
 				continue;

@@ -15,7 +15,6 @@ namespace TEN::Entities::Generic
 
 		bool _isEnabled = false;
 
-		BoundingBox		_aabb		   = BoundingBox();
 		CollisionMesh	_collisionMesh = CollisionMesh();
 		// TODO: Uncomment when attractors are complete.
 		//AttractorObject _attractor	   = AttractorObject();
@@ -35,7 +34,6 @@ namespace TEN::Entities::Generic
 
 		// Getters
 
-		const BoundingBox&	   GetAabb() const;
 		const CollisionMesh&   GetCollisionMesh() const;
 		// TODO: Uncomment when attractors are complete.
 		//const AttractorObject& GetAttractor() const;
@@ -54,7 +52,6 @@ namespace TEN::Entities::Generic
 		void InitializeAttractor(const ItemInfo& item);
 		void InitializeBridgeCollision(const ItemInfo& item);
 
-		void UpdateAabb(const ItemInfo& item);
 		void UpdateCollisionMesh(const ItemInfo& item);
 		void UpdateAttractor(const ItemInfo& item);
 		void UpdateBridgeCollision(const ItemInfo& item);

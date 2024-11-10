@@ -92,7 +92,7 @@ static void HandleLosDebug(const ItemInfo& item)
 
 	auto origin = (item.Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
 	auto target = Geometry::TranslatePoint(origin, dir, dist);
-	auto los = GetLosCollision(origin, roomNumber, dir, dist, true, true, true);
+	auto los = GetLosCollision(origin, roomNumber, dir, dist, true, false, true);
 	float closestDist = los.Room.Distance;
 	target = los.Room.Position;
 
@@ -175,7 +175,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	HandleLosDebug(*item);
 	HandleBridgeDebug(*item);
 	//------
-	
+
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)
 	{
@@ -192,7 +192,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			player.Control.HandStatus = HandStatus::Free;
 		}
 
-		++player.Control.Count.PositionAdjust;
+		player.Control.Count.PositionAdjust++;
 	}
 	else
 	{
