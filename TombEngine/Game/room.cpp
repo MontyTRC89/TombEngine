@@ -92,7 +92,7 @@ void RoomData::GenerateCollisionMesh()
 			const auto* sectorNorth = &Sectors[(x * ZSize) + (z + 1)];
 			if (sectorNorth->SidePortalRoomNumber != NO_VALUE)
 			{
-				const auto& room = GetRoom(sectorNorth->SidePortalRoomNumber);
+				const auto& room = g_Level.Rooms[sectorNorth->SidePortalRoomNumber];
 				auto gridCoord = GetRoomGridCoord(sectorNorth->SidePortalRoomNumber, sectorNorth->Position.x, sectorNorth->Position.y);
 
 				sectorNorth = &room.Sectors[(gridCoord.x * room.ZSize) + gridCoord.y];
@@ -102,7 +102,7 @@ void RoomData::GenerateCollisionMesh()
 			const auto* sectorSouth = &Sectors[(x * ZSize) + (z - 1)];
 			if (sectorSouth->SidePortalRoomNumber != NO_VALUE)
 			{
-				const auto& prevRoomZ = GetRoom(sectorSouth->SidePortalRoomNumber);
+				const auto& prevRoomZ = g_Level.Rooms[sectorSouth->SidePortalRoomNumber];
 				auto prevRoomGridCoordZ = GetRoomGridCoord(sectorSouth->SidePortalRoomNumber, sectorSouth->Position.x, sectorSouth->Position.y);
 
 				sectorSouth = &prevRoomZ.Sectors[(prevRoomGridCoordZ.x * prevRoomZ.ZSize) + prevRoomGridCoordZ.y];
@@ -112,7 +112,7 @@ void RoomData::GenerateCollisionMesh()
 			const auto* sectorEast = &Sectors[((x + 1) * ZSize) + z];
 			if (sectorEast->SidePortalRoomNumber != NO_VALUE)
 			{
-				const auto& room = GetRoom(sectorEast->SidePortalRoomNumber);
+				const auto& room = g_Level.Rooms[sectorEast->SidePortalRoomNumber];
 				auto gridCoord = GetRoomGridCoord(sectorEast->SidePortalRoomNumber, sectorEast->Position.x, sectorEast->Position.y);
 
 				sectorEast = &room.Sectors[(gridCoord.x * room.ZSize) + gridCoord.y];
@@ -122,7 +122,7 @@ void RoomData::GenerateCollisionMesh()
 			const auto* sectorWest = &Sectors[((x - 1) * ZSize) + z];
 			if (sectorWest->SidePortalRoomNumber != NO_VALUE)
 			{
-				const auto& room = GetRoom(sectorWest->SidePortalRoomNumber);
+				const auto& room = g_Level.Rooms[sectorWest->SidePortalRoomNumber];
 				auto gridCoord = GetRoomGridCoord(sectorWest->SidePortalRoomNumber, sectorWest->Position.x, sectorWest->Position.y);
 
 				sectorWest = &room.Sectors[(gridCoord.x * room.ZSize) + gridCoord.y];
@@ -579,9 +579,8 @@ static void RemoveRoomFlipItems(const RoomData& room)
 		if (item.IsBridge())
 		{
 			auto& bridge = GetBridgeObject(item);
-			bridge.DeassignSectors(item);
 
-			auto& room = GetRoom(item.RoomNumber);
+			auto& room = g_Level.Rooms[item.RoomNumber];
 			room.Bridges.Remove(item.Index);
 		}
 	}
@@ -629,7 +628,7 @@ void DoFlipMap(int group)
 			// Regenerate neighbor room collision meshes.
 			for (int neightborRoomNumber : room.NeighborRoomNumbers)
 			{
-				auto& neighborRoom = GetRoom(neightborRoomNumber);
+				auto& neighborRoom = g_Level.Rooms[neightborRoomNumber];
 				neighborRoom.GenerateCollisionMesh();
 			}
 		}
@@ -706,17 +705,6 @@ int IsRoomOutside(int x, int y, int z)
 
 namespace TEN::Collision::Room
 {
-	RoomData& GetRoom(int roomNumber)
-	{
-		if (roomNumber < 0 || roomNumber >= g_Level.Rooms.size())
-		{
-			TENLog("Attempted to get invalid room " + std::to_string(roomNumber) + ". Returning room 0.", LogLevel::Warning);
-			return g_Level.Rooms.front();
-		}
-
-		return g_Level.Rooms[roomNumber];
-	}
-
 	// TODO: Can use floordata's GetRoomGridCoord()?
 	FloorInfo* GetSector(RoomData* room, int x, int z)
 	{

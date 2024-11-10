@@ -47,8 +47,6 @@ namespace TEN::Entities::Generic
 		void Enable(const ItemInfo& item);
 		void Disable(const ItemInfo& item);
 
-		void DeassignSectors(const ItemInfo& item) const;
-
 	private:
 		// Helpers
 
@@ -60,9 +58,7 @@ namespace TEN::Entities::Generic
 		void UpdateAttractor(const ItemInfo& item);
 
 		void AssignSectors(const ItemInfo& item);
-
-		// TODO: There are compilation errors if this function is set on private.
-		//void DeassignSectors(const ItemInfo& item) const;
+		void DeassignSectors(const ItemInfo& item) const;
 	};
 
 	const BridgeObject& GetBridgeObject(const ItemInfo& item);

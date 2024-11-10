@@ -129,8 +129,15 @@ static void HandleBridgeDebug(const ItemInfo& item)
 
 	// Print bridge moveable IDs in current sector.
 	PrintDebugMessage("Bridge moveable IDs in room %d, sector %d:", pointColl.GetRoomNumber(), pointColl.GetSector().ID);
-	for (int bridgeItemNumber : pointColl.GetSector().BridgeItemNumbers)
-		PrintDebugMessage("%d", bridgeItemNumber);
+	if (pointColl.GetSector().BridgeItemNumbers.empty())
+	{
+		PrintDebugMessage("None");
+	}
+	else
+	{
+		for (int bridgeItemNumber : pointColl.GetSector().BridgeItemNumbers)
+			PrintDebugMessage("%d", bridgeItemNumber);
+	}
 
 	// Move bridge with mouse.
 	// Hold Y to move vertically.
@@ -445,10 +452,10 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		{
 			auto bridgeItemNumbers = std::set<int>{};
 
-			const auto& room = GetRoom(Camera.pos.RoomNumber);
+			const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
 			for (int neighborRoomNumber : room.NeighborRoomNumbers)
 			{
-				const auto& neighborRoom = GetRoom(neighborRoomNumber);
+				const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 
 				neighborRoom.CollisionMesh.DrawDebug();
 				for (int bridgeItemNumber : neighborRoom.Bridges.GetIds())
@@ -467,10 +474,10 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		// Draw nearby portals.
 		if (g_Renderer.GetDebugPage() == RendererDebugPage::PortalStats)
 		{
-			const auto& room = GetRoom(Camera.pos.RoomNumber);
+			const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
 			for (int neighborRoomNumber : room.NeighborRoomNumbers)
 			{
-				const auto& neighborRoom = GetRoom(neighborRoomNumber);
+				const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 				for (const auto& portal : neighborRoom.Portals)
 					portal.CollisionMesh.DrawDebug();
 			}

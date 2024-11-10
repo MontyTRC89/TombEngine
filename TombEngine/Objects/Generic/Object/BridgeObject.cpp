@@ -43,7 +43,7 @@ namespace TEN::Entities::Generic
 		//AssignSectors(item); // TODO: Uncomment when commented block below starts working.
 
 		// Insert into room bridge tree.
-		auto& room = GetRoom(item.RoomNumber);
+		auto& room = g_Level.Rooms[item.RoomNumber];
 		room.Bridges.Insert(item.Index, item.GetAabb());
 
 		auto obb = item.GetObb();
@@ -82,15 +82,14 @@ namespace TEN::Entities::Generic
 		if (item.Pose == _prevPose && item.RoomNumber == _prevRoomNumber)
 			return;
 
-		//UpdateItemRoom(item.Index);  // TODO: Not needed? Should be handled by each moveable itself.
 		UpdateAabb(item);
 		UpdateCollisionMesh(item);
 		UpdateAttractor(item);
 		DeassignSectors(item);
 		AssignSectors(item);
 
-		auto& room = GetRoom(item.RoomNumber);
-		auto& prevRoom = GetRoom(_prevRoomNumber);
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
 
 		// Update room bridge trees.
 		if (item.Pose != _prevPose && item.RoomNumber == _prevRoomNumber)
@@ -120,7 +119,7 @@ namespace TEN::Entities::Generic
 		AssignSectors(item);
 
 		// Insert into room bridge tree.
-		auto& room = GetRoom(item.RoomNumber);
+		auto& room = g_Level.Rooms[item.RoomNumber];
 		room.Bridges.Insert(item.Index, item.GetAabb());
 
 		// Store previous parameters.
@@ -138,7 +137,7 @@ namespace TEN::Entities::Generic
 		DeassignSectors(item);
 
 		// Remove from room bridge tree.
-		auto& prevRoom = GetRoom(_prevRoomNumber);
+		auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
 		prevRoom.Bridges.Remove(item.Index);
 	}
 
@@ -251,10 +250,6 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::DeassignSectors(const ItemInfo& item) const
 	{
-		// Remove from room bridge tree.
-		//auto& room = GetRoom(item.RoomNumber);
-		//room.Bridges.Remove(item.Index);
-
 		// Deassign from sectors.
 		unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_prevAabb.Extents.x, _prevAabb.Extents.y), _prevAabb.Extents.z) / BLOCK(1));
 		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);

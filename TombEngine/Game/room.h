@@ -149,21 +149,15 @@ struct RoomData
 
 	std::vector<int> NeighborRoomNumbers = {};
 
-	// Object members
-
 	//RoomObjectHandler Moveables = RoomObjectHandler(); // TODO: Refactor linked list of items in room to use a BVH instead.
 	//RoomObjectHandler Statics	= RoomObjectHandler(); // TODO: Refactor to use BVH.
 	std::vector<MESH_INFO> mesh = {}; // Statics
 
-	// Collision members
-
-	CollisionMesh				CollisionMesh  = TEN::Math::CollisionMesh();
-	RoomObjectHandler			Bridges		   = RoomObjectHandler();
-	std::vector<PortalData> Portals		   = {};
-	std::vector<TriggerVolume>	TriggerVolumes = {};
-	std::vector<FloorInfo>		Sectors		   = {};
-
-	// Renderer members
+	CollisionMesh			   CollisionMesh  = TEN::Math::CollisionMesh();
+	RoomObjectHandler		   Bridges		  = RoomObjectHandler();
+	std::vector<PortalData>	   Portals		  = {};
+	std::vector<TriggerVolume> TriggerVolumes = {};
+	std::vector<FloorInfo>	   Sectors		  = {};
 
 	std::vector<RoomLightData> lights	 = {};
 	std::vector<Vector3>	   positions = {};
@@ -195,6 +189,5 @@ std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth
 
 namespace TEN::Collision::Room
 {
-	RoomData&  GetRoom(int roomNumber);
 	FloorInfo* GetSector(RoomData* room, int x, int z);
 }

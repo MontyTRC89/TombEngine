@@ -230,7 +230,7 @@ namespace TEN::Collision::Los
 				});
 		}
 
-		// 4) Return sorted LOS collision data.
+		// 4) Return sorted LOS collision.
 		return los;
 	}
 
@@ -328,7 +328,7 @@ namespace TEN::Collision::Los
 					rayDist -= closestDist;
 					rayRoomNumber = portalRoomNumber;
 				}
-				// Hit tangible triangle; collect remaining room LOS collision data.
+				// Hit tangible triangle; collect remaining room LOS data.
 				else
 				{
 					if (portalRoomNumber != NO_VALUE)
