@@ -45,7 +45,8 @@ namespace TEN::Entities::Generic
 		// Store previous parameters.
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
-		// TODO: May need previous AABB and OBB if proportions mutate based on anim AABB.
+		_prevAabb = _aabb;
+		_prevObb = item.GetObb();
 	}
 
 	void BridgeObject::Update(const ItemInfo& item)
