@@ -158,9 +158,9 @@ namespace TEN::Math
 		constexpr auto NORMAL_LINE_COLOR  = Color(1.0f, 1.0f, 1.0f);
 
 		// Get vertices.
-		const auto& vertex0 = Vector3::Transform(GetVertex0(vertices), transformMatrix);
-		const auto& vertex1 = Vector3::Transform(GetVertex1(vertices), transformMatrix);
-		const auto& vertex2 = Vector3::Transform(GetVertex2(vertices), transformMatrix);
+		auto vertex0 = Vector3::Transform(GetVertex0(vertices), transformMatrix);
+		auto vertex1 = Vector3::Transform(GetVertex1(vertices), transformMatrix);
+		auto vertex2 = Vector3::Transform(GetVertex2(vertices), transformMatrix);
 
 		// Get normal.
 		auto normal = Vector3::Transform(GetNormal(vertices), rotMatrix);
