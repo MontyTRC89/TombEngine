@@ -202,8 +202,8 @@ namespace TEN::Renderer
 		// Text
 		std::unique_ptr<SpriteFont> _gameFont;
 		std::vector<RendererStringToDraw> _stringsToDraw;
-		float _blinkColorValue = 0.0f;
-		float _blinkTime		  = 0.0f;
+		Vector4 _blinkColorValue = Vector4::Zero;
+		float _blinkTime    = 0.0f;
 		float _oldBlinkTime = 0.0f;
 
 		// Graphics resources
