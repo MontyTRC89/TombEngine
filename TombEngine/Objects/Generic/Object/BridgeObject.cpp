@@ -160,34 +160,11 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::InitializeBridgeCollision(const ItemInfo& item)
 	{
-		// TODO: Uncomment when commented block below starts working.
-		//AssignSectors(item);
+		AssignSectors(item);
 
 		// Insert into room bridge tree.
 		auto& room = g_Level.Rooms[item.RoomNumber];
 		room.Bridges.Insert(item.Index, item.GetAabb());
-
-		auto obb = item.GetObb();
-
-		// TODO: GetNeighborSectors() doesn't work for some reason when initialising the game. -- Sezz 2024.11.05
-		/*unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_aabb.Extents.x, _aabb.Extents.y), _aabb.Extents.z) / BLOCK(1));
-		auto sectors = GetNeighborSectors(item.Pose.Position, item.RoomNumber, sectorSearchDepth);
-		for (auto* sector : sectors)
-		{
-			if (obb.Intersects(sector->Aabb))
-				sector->AddBridge(item.Index);
-		}*/
-
-		// TODO: Temporary substitute for commented block above.
-		for (int x = 0; x < room.XSize; x++)
-		{
-			for (int z = 0; z < room.ZSize; z++)
-			{
-				auto& sector = room.Sectors[(x * room.ZSize) + z];
-				if (obb.Intersects(sector.Aabb))
-					sector.AddBridge(item.Index);
-			}
-		}
 	}
 
 	void BridgeObject::UpdateAabb(const ItemInfo& item)

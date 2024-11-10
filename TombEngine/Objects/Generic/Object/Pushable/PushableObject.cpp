@@ -71,9 +71,9 @@ namespace TEN::Entities::Generic
 		{
 			pushable.UseRoomCollision = true;
 			
+			pushable.UseBridgeCollision = true;
 			pushable.Bridge = GetBridgeObject(pushableItem);
 			pushable.Bridge.Initialize(pushableItem);
-			pushable.UseBridgeCollision = true;
 		}
 		else
 		{

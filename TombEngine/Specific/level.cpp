@@ -966,6 +966,8 @@ void LoadRooms()
 	int numFloorData = ReadInt32(); 
 	g_Level.FloorData.resize(numFloorData);
 	ReadBytes(g_Level.FloorData.data(), numFloorData * sizeof(short));
+
+	InitializeNeighborRoomList();
 }
 
 void FreeLevel()
@@ -1313,10 +1315,9 @@ bool LoadLevel(int levelIndex)
 
 		TENLog("Initializing level...", LogLevel::Info);
 
-		// Initialize the game
+		// Initialize game.
 		InitializeGameFlags();
 		InitializeLara(!InitializeGame && CurrentLevel > 0);
-		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
 		g_GameScriptEntities->AssignLara();
