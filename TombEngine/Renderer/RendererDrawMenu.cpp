@@ -1120,7 +1120,6 @@ namespace TEN::Renderer
 
 			// Draw the full screen background.
 			DrawFullScreenQuad(_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3::One);
-
 		}
 		else
 		{
@@ -1135,6 +1134,8 @@ namespace TEN::Renderer
 		CollectDisplaySprites(_gameCamera);
 		DrawDisplaySprites(_gameCamera);
 		DrawAllStrings();
+
+		ClearScene();
 
 		_context->ClearState();
 		_swapChain->Present(1, 0);
