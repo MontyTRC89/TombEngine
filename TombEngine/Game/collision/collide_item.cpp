@@ -27,6 +27,7 @@ using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
+constexpr auto COLLIDABLE_BOUNDS_THRESHOLD = 4;
 
 // Globals
 
@@ -95,7 +96,6 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* playerItem, Collision
 
 CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible, bool ignorePlayer, float customRadius, ObjectCollectionMode mode)
 {
-	constexpr auto EXTENTS_LENGTH_MIN	= 2.0f;
 	constexpr auto ROUGH_BOX_HEIGHT_MIN = BLOCK(1 / 8.0f);
 
 	auto collObjects = CollidedObjectData{};
@@ -117,7 +117,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 		convertedBounds.Extents = Vector3(customRadius);
 
 	// Quickly discard collision if colliding item bounds are below tolerance threshold.
-	if (collidingSphere.Radius <= EXTENTS_LENGTH_MIN)
+	if (collidingSphere.Radius <= COLLIDABLE_BOUNDS_THRESHOLD)
 		return collObjects;
 
 	// Run through neighboring rooms.
@@ -172,7 +172,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					auto extents = bounds.GetExtents();
 
 					// If item bounding box extents is below tolerance threshold, discard object.
-					if (extents.Length() <= EXTENTS_LENGTH_MIN)
+					if (extents.Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
 						continue;
 
 					// Test rough vertical distance to discard objects not intersecting vertically.
@@ -237,10 +237,10 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					continue;
 
 				// Skip if either bounding box has any zero extent (not a collidable volume).
-				if (bounds.GetExtents().Length() <= EXTENTS_LENGTH_MIN)
+				if (bounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
 					continue;
 
-				if (collidingBounds.GetExtents().Length() <= EXTENTS_LENGTH_MIN)
+				if (collidingBounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
 					continue;
 
 				auto box = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
@@ -971,12 +971,12 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 {
 	bool result = false;
 
+	// Ignore processing null bounds.
+	if (box.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+		return false;
+
 	// Get DX static bounds in global coordinates.
 	auto staticBounds = box.ToBoundingOrientedBox(pose);
-
-	// Ignore processing null bounds.
-	if (Vector3(staticBounds.Extents) == Vector3::Zero)
-		return false;
 
 	// Get local TR bounds and DX item bounds in global coordinates.
 	auto itemBBox = GameBoundingBox(item);
@@ -1805,7 +1805,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 
 	if (isPlayer)
 	{
-		GetLaraInfo(*item).HitDirection = -1;
+		GetLaraInfo(*item).HitDirection = NO_VALUE;
 
 		if (item->HitPoints <= 0)
 			return;
