@@ -105,8 +105,6 @@ int RequiredStartPos;
 int CurrentLevel;
 int NextLevel;
 
-int SystemNameHash = 0;
-
 bool  InItemControlLoop;
 short ItemNewRoomNo;
 short ItemNewRooms[MAX_ROOMS];
@@ -508,10 +506,8 @@ void InitializeOrLoadGame(bool loadGame)
 	g_Gui.SetEnterInventory(NO_VALUE);
 
 	// Restore game?
-	if (loadGame)
+	if (loadGame && SaveGame::Load(g_GameFlow->SelectedSaveGame))
 	{
-		SaveGame::Load(g_GameFlow->SelectedSaveGame);
-
 		InitializeGame = false;
 
 		g_GameFlow->SelectedSaveGame = 0;
@@ -596,7 +592,7 @@ void EndGameLoop(int levelIndex, GameStatus reason)
 	DeInitializeScripting(levelIndex, reason);
 
 	StopAllSounds();
-	StopSoundTracks();
+	StopSoundTracks(SOUND_XFADETIME_LEVELJUMP, true);
 	StopRumble();
 }
 

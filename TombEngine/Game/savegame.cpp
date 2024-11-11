@@ -247,6 +247,7 @@ const std::vector<byte> SaveGame::Build()
 
 	Save::SaveGameHeaderBuilder sghb{ fbb };
 	sghb.add_level_name(levelNameOffset);
+	sghb.add_level_hash(LastLevelHash);
 
 	auto gameTime = GetGameTime(GameTimer);
 	sghb.add_days(gameTime.Days);
@@ -1581,50 +1582,68 @@ bool SaveGame::Save(int slot)
 bool SaveGame::Load(int slot)
 {
 	if (!IsSaveGameSlotValid(slot))
+	{
+		TENLog("Savegame slot " + std::to_string(slot) + " is invalid, load is impossible.", LogLevel::Error);
 		return false;
+	}
 
 	if (!DoesSaveGameExist(slot))
+	{
+		TENLog("Savegame in slot " + std::to_string(slot) + " does not exist.", LogLevel::Error);
 		return false;
+	}
 
 	auto fileName = GetSavegameFilename(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
-	std::ifstream file;
-	file.open(fileName, std::ios_base::app | std::ios_base::binary);
-
-	int size; 
-	file.read(reinterpret_cast<char*>(&size), sizeof(size));
-
-	// Read current level save data.
-	std::vector<byte> saveData(size);
-	file.read(reinterpret_cast<char*>(saveData.data()), size);
-
-	// Reset hub data, as it's about to be replaced with saved one.
-	ResetHub();
-
-	// Read hub data from savegame.
-	int hubCount;
-	file.read(reinterpret_cast<char*>(&hubCount), sizeof(hubCount));
-
-	TENLog("Hub count: " + std::to_string(hubCount), LogLevel::Info);
-
-	for (int i = 0; i < hubCount; i++)
+	auto file = std::ifstream();
+	try
 	{
-		int index;
-		file.read(reinterpret_cast<char*>(&index), sizeof(index));
+		file.open(fileName, std::ios_base::app | std::ios_base::binary);
 
+		int size = 0;
 		file.read(reinterpret_cast<char*>(&size), sizeof(size));
-		std::vector<byte> hubBuffer(size);
-		file.read(reinterpret_cast<char*>(hubBuffer.data()), size);
 
-		Hub[index] = hubBuffer;
+		// Read current level save data.
+		auto saveData = std::vector<byte>(size);
+		file.read(reinterpret_cast<char*>(saveData.data()), size);
+
+		// Reset hub data, as it's about to be replaced with saved one.
+		ResetHub();
+
+		// Read hub data from savegame.
+		int hubCount = 0;
+		file.read(reinterpret_cast<char*>(&hubCount), sizeof(hubCount));
+
+		TENLog("Hub count: " + std::to_string(hubCount), LogLevel::Info);
+
+		for (int i = 0; i < hubCount; i++)
+		{
+			int index = 0;
+			file.read(reinterpret_cast<char*>(&index), sizeof(index));
+
+			file.read(reinterpret_cast<char*>(&size), sizeof(size));
+			auto hubBuffer = std::vector<byte>(size);
+			file.read(reinterpret_cast<char*>(hubBuffer.data()), size);
+
+			Hub[index] = hubBuffer;
+		}
+
+		file.close();
+
+		// Load save data for current level.
+		Parse(saveData, false);
+		return true;
+	}
+	catch (std::exception& ex)
+	{
+		TENLog("Error while loading savegame: " + std::string(ex.what()), LogLevel::Error);
+
+		if (file.is_open())
+			file.close();
 	}
 
-	file.close();
-
-	// Load save data for current level.
-	Parse(saveData, false);
-	return true;
+	return false;
 }
 
 static void ParseStatistics(const Save::SaveGame* s, bool isHub)
@@ -2046,7 +2065,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		TENAssert(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
 
 		auto track = s->soundtracks()->Get(i);
-		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position());
+		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position(), SOUND_XFADETIME_LEVELJUMP);
 	}
 
 	// Load fish swarm.
@@ -2652,6 +2671,7 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 
 		header->Level = s->header()->level();
 		header->LevelName = s->header()->level_name()->str();
+		header->LevelHash = s->header()->level_hash();
 		header->Days = s->header()->days();
 		header->Hours = s->header()->hours();
 		header->Minutes = s->header()->minutes();
