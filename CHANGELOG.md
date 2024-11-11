@@ -18,6 +18,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect camera movement near walls after leaving look mode.
 * Fixed binocular or lasersight camera not switching off correctly after flyby.
 * Fixed Lara's Home entry not working.
+* Fixed exploding TR3 bosses.
 * Fixed Lens Flare object not functioning properly.
 
 ### Features/Amendments
