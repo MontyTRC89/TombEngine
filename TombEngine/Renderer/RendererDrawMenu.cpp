@@ -1046,7 +1046,7 @@ namespace TEN::Renderer
 			if (g_Gui.GetInventoryMode() == InventoryMode::InGame ||
 				g_Gui.GetInventoryMode() == InventoryMode::Examine)
 			{
-				// Set texture
+				// Set texture.
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
 				BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
 			}
@@ -1107,26 +1107,30 @@ namespace TEN::Renderer
 
 	void Renderer::RenderLoadingScreen(float percentage)
 	{
-		// Set basic render states
+		// Set basic render states.
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
 		do
 		{
-			// Clear screen
+			// Clear screen.
 			_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-			// Bind the back buffer
+			// Bind back buffer.
 			_context->OMSetRenderTargets(1, _backBuffer.RenderTargetView.GetAddressOf(), _backBuffer.DepthStencilView.Get());
 			_context->RSSetViewports(1, &_viewport);
 			ResetScissor();
 
-			// Draw the full screen background. If unavailable, draw last dumped game scene.
+			// Draw fullscreen background. If unavailable, draw last dumped game scene.
 			if (_loadingScreenTexture.Texture)
+			{
 				DrawFullScreenQuad(_loadingScreenTexture.ShaderResourceView.Get(), Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
+			}
 			else if (_dumpScreenRenderTarget.Texture)
+			{
 				DrawFullScreenQuad(_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
+			}
 
 			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
 				DrawLoadingBar(percentage);

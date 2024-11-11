@@ -1594,34 +1594,34 @@ bool SaveGame::Load(int slot)
 	auto fileName = GetSavegameFilename(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
-	std::ifstream file;
+	auto file = std::ifstream();
 	try
 	{
 		file.open(fileName, std::ios_base::app | std::ios_base::binary);
 
-		int size;
+		int size = 0;
 		file.read(reinterpret_cast<char*>(&size), sizeof(size));
 
 		// Read current level save data.
-		std::vector<byte> saveData(size);
+		auto saveData = std::vector<byte>(size);
 		file.read(reinterpret_cast<char*>(saveData.data()), size);
 
 		// Reset hub data, as it's about to be replaced with saved one.
 		ResetHub();
 
 		// Read hub data from savegame.
-		int hubCount;
+		int hubCount = 0;
 		file.read(reinterpret_cast<char*>(&hubCount), sizeof(hubCount));
 
 		TENLog("Hub count: " + std::to_string(hubCount), LogLevel::Info);
 
 		for (int i = 0; i < hubCount; i++)
 		{
-			int index;
+			int index = 0;
 			file.read(reinterpret_cast<char*>(&index), sizeof(index));
 
 			file.read(reinterpret_cast<char*>(&size), sizeof(size));
-			std::vector<byte> hubBuffer(size);
+			auto hubBuffer = std::vector<byte>(size);
 			file.read(reinterpret_cast<char*>(hubBuffer.data()), size);
 
 			Hub[index] = hubBuffer;

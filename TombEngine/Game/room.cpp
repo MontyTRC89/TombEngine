@@ -75,50 +75,50 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 	}
 }
 
-void FlipRooms(int index, ROOM_INFO& firstRoom, ROOM_INFO& secondRoom)
+static void FlipRooms(int roomNumber, ROOM_INFO& activeRoom, ROOM_INFO& flippedRoom)
 {
-	RemoveRoomFlipItems(firstRoom);
+	RemoveRoomFlipItems(activeRoom);
 
 	// Swap rooms.
-	std::swap(firstRoom, secondRoom);
-	firstRoom.flippedRoom = secondRoom.flippedRoom;
-	secondRoom.flippedRoom = NO_VALUE;
-	firstRoom.itemNumber = secondRoom.itemNumber;
-	firstRoom.fxNumber = secondRoom.fxNumber;
+	std::swap(activeRoom, flippedRoom);
+	activeRoom.flippedRoom = flippedRoom.flippedRoom;
+	flippedRoom.flippedRoom = NO_VALUE;
+	activeRoom.itemNumber = flippedRoom.itemNumber;
+	activeRoom.fxNumber = flippedRoom.fxNumber;
 
-	AddRoomFlipItems(firstRoom);
+	AddRoomFlipItems(activeRoom);
 
 	// Update active room sectors.
-	for (auto& sector : firstRoom.Sectors)
-		sector.RoomNumber = index;
+	for (auto& sector : activeRoom.Sectors)
+		sector.RoomNumber = roomNumber;
 
 	// Update flipped room sectors.
-	for (auto& sector : secondRoom.Sectors)
-		sector.RoomNumber = firstRoom.flippedRoom;
+	for (auto& sector : flippedRoom.Sectors)
+		sector.RoomNumber = activeRoom.flippedRoom;
 
 	// Update renderer data.
-	g_Renderer.FlipRooms(index, firstRoom.flippedRoom);
+	g_Renderer.FlipRooms(roomNumber, activeRoom.flippedRoom);
 }
 
 void ResetRoomData()
 {
 	// Remove all door collisions.
-	for (auto& item : g_Level.Items)
+	for (const auto& item : g_Level.Items)
 	{
 		if (item.ObjectNumber == NO_VALUE || !item.Data.is<DOOR_DATA>())
 			continue;
 
-		auto* doorItem = &g_Level.Items[item.Index];
-		auto* doorData = (DOOR_DATA*)doorItem->Data;
+		auto& doorItem = g_Level.Items[item.Index];
+		auto& door = *(DOOR_DATA*)doorItem.Data;
 
-		if (doorData->opened)
+		if (door.opened)
 			continue;
 
-		OpenThatDoor(&doorData->d1, doorData);
-		OpenThatDoor(&doorData->d2, doorData);
-		OpenThatDoor(&doorData->d1flip, doorData);
-		OpenThatDoor(&doorData->d2flip, doorData);
-		doorData->opened = true;
+		OpenThatDoor(&door.d1, &door);
+		OpenThatDoor(&door.d2, &door);
+		OpenThatDoor(&door.d1flip, &door);
+		OpenThatDoor(&door.d2flip, &door);
+		door.opened = true;
 	}
 
 	// Unflip all rooms and remove all bridges and stopper flags.
@@ -139,8 +139,8 @@ void ResetRoomData()
 	}
 
 	// Make sure no pathfinding boxes are blocked (either by doors or by other door-like objects).
-	for (int boxNumber = 0; boxNumber < g_Level.PathfindingBoxes.size(); boxNumber++)
-		g_Level.PathfindingBoxes[boxNumber].flags &= ~BLOCKED;
+	for (int pathfindingBoxID = 0; pathfindingBoxID < g_Level.PathfindingBoxes.size(); pathfindingBoxID++)
+		g_Level.PathfindingBoxes[pathfindingBoxID].flags &= ~BLOCKED;
 }
 
 void DoFlipMap(int group)

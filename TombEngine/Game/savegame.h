@@ -11,33 +11,33 @@ constexpr auto SAVEGAME_MAX = 16;
 
 struct Stats
 {
-	unsigned int Timer;
-	unsigned int Distance;
-	unsigned int AmmoHits;
-	unsigned int AmmoUsed;
-	unsigned int HealthUsed;
-	unsigned int Kills;
-	unsigned int Secrets;
+	unsigned int Timer		= 0;
+	unsigned int Distance	= 0;
+	unsigned int AmmoHits	= 0;
+	unsigned int AmmoUsed	= 0;
+	unsigned int HealthUsed = 0;
+	unsigned int Kills		= 0;
+	unsigned int Secrets	= 0;
 };
 
 struct GameStats
 {
-	Stats Game;
-	Stats Level;
+	Stats Game	= {};
+	Stats Level = {};
 };
 
 struct SaveGameHeader
 {
-	std::string LevelName;
-	int LevelHash;
-	int Days;
-	int Hours;
-	int Minutes;
-	int Seconds;
-	int Level;
-	int Timer;
-	int Count;
-	bool Present;
+	std::string LevelName = {};
+	int			LevelHash = 0;
+	int			Days	  = 0;
+	int			Hours	  = 0;
+	int			Minutes	  = 0;
+	int			Seconds	  = 0;
+	int			Level	  = 0;
+	int			Timer	  = 0;
+	int			Count	  = 0;
+	bool		Present	  = false;
 };
 
 class SaveGame 

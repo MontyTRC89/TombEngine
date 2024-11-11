@@ -1,15 +1,14 @@
 #include "framework.h"
-#include "Settings.h"
+#include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
 
-/***
-Settings that will be run on game startup.
-@tenclass Flow.Settings
-@pragma nostrip
-*/
+/// Settings that will be run on game startup.
+// @tenclass Flow.Settings
+// @pragma nostrip
 
-void Settings::Register(sol::table & parent)
+void Settings::Register(sol::table& parent)
 {
-	parent.new_usertype<Settings>("Settings",
+	parent.new_usertype<Settings>(
+		"Settings",
 		sol::constructors<Settings()>(),
 		sol::call_constructor, sol::constructors<Settings>(),
 
@@ -34,14 +33,12 @@ has an unrecoverable error, the game will close.
 */
 		"errorMode", &Settings::ErrorMode,
 
-/*** Can game utilize fast reload feature?
-<br>
-When set to `True`, game will attempt to perform fast savegame reloading, if current level is the same as
-level loaded from the savegame. It will not work if level timestamp or checksum has changed (i.e. level was
-updated). If set to `False` this functionality is turned off.
-
-@mem fastReload
-*/
-		"fastReload", &Settings::FastReload
-		);
+/// Can the game utilize the fast reload feature?
+// <br>
+// When set to `true`, the game will attempt to perform fast savegame reloading if current level is the same as
+// the level loaded from the savegame. It will not work if the level timestamp or checksum has changed
+// (i.e. level was updated). If set to `false`, this functionality is turned off.
+//
+// @mem fastReload
+		"fastReload", &Settings::FastReload);
 }

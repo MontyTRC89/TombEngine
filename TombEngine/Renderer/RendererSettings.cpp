@@ -67,7 +67,7 @@ namespace TEN::Renderer
 		{
 			texture = Texture2D(_device.Get(), path);
 		}
-		else if (!path.empty()) // Loading default texture without a path may be intentional.
+		else if (!path.empty()) // Loading default texture without path may be intentional.
 		{
 			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 			TENLog("Texture file not found: " + converter.to_bytes(path), LogLevel::Warning);

@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Specific/level.h"
 
-#include <filesystem>
 #include <process.h>
 #include <zlib.h>
 
@@ -966,8 +965,9 @@ void FreeLevel(bool partial)
 		return;
 	}
 
+	// Should happen before resetting items.
 	if (partial)
-		ResetRoomData(); // Should happen before resetting items.
+		ResetRoomData();
 
 	g_Level.Items.resize(0);
 	g_Level.AIObjects.resize(0);
@@ -1201,8 +1201,8 @@ bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 
 bool ReadCompressedBlock(FILE* filePtr, bool skip)
 {
-	int compressedSize;
-	int uncompressedSize;
+	int compressedSize = 0;
+	int uncompressedSize = 0;
 
 	ReadFileEx(&uncompressedSize, 1, 4, filePtr);
 	ReadFileEx(&compressedSize, 1, 4, filePtr);
@@ -1226,12 +1226,12 @@ bool ReadCompressedBlock(FILE* filePtr, bool skip)
 
 void FinalizeBlock()
 {
-	if (DataPtr)
-	{
-		free(DataPtr);
-		DataPtr = nullptr;
-		CurrentDataPtr = nullptr;
-	}
+	if (DataPtr == nullptr)
+		return;
+
+	free(DataPtr);
+	DataPtr = nullptr;
+	CurrentDataPtr = nullptr;
 }
 
 void UpdateProgress(float progress, bool skip = false)
@@ -1245,7 +1245,7 @@ void UpdateProgress(float progress, bool skip = false)
 bool LoadLevel(std::string path, bool partial)
 {
 	FILE* filePtr = nullptr;
-	bool loadedSuccessfully;
+	bool loadedSuccessfully = false;
 
 	try
 	{
@@ -1256,8 +1256,8 @@ bool LoadLevel(std::string path, bool partial)
 
 		char header[4];
 		unsigned char version[4];
-		int systemHash;
-		int levelHash;
+		int systemHash = 0;
+		int levelHash = 0;
 
 		// Read file header
 		ReadFileEx(&header, 1, 4, filePtr);
@@ -1269,12 +1269,12 @@ bool LoadLevel(std::string path, bool partial)
 		if (std::string(header) != "TEN")
 			throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
 
-		// Check the integrity of the level file to allow or disallow fast reload.
+		// Check level file integrity to allow or disallow fast reload.
 		if (partial && levelHash != LastLevelHash)
 		{
-			TENLog("Level file has changed since the last loading, fast reload is impossible.", LogLevel::Warning);
+			TENLog("Level file has changed since the last load; fast reload is not possible.", LogLevel::Warning);
 			partial = false;
-			FreeLevel(false); // Erase all precached data
+			FreeLevel(false); // Erase all precached data.
 		}
 
 		// Store information about last loaded level file.
@@ -1362,7 +1362,7 @@ bool LoadLevel(std::string path, bool partial)
 
 		TENLog("Initializing level...", LogLevel::Info);
 
-		// Initialize the game.
+		// Initialize game.
 		InitializeGameFlags();
 		InitializeLara(!InitializeGame && CurrentLevel > 0);
 		InitializeNeighborRoomList();
@@ -1496,10 +1496,10 @@ void LoadBoxes()
 
 bool LoadLevelFile(int levelIndex)
 {
-	auto* level = g_GameFlow->GetLevel(levelIndex);
+	const auto& level = *g_GameFlow->GetLevel(levelIndex);
 
 	auto assetDir = g_GameFlow->GetGameDir();
-	auto levelPath = assetDir + level->FileName;
+	auto levelPath = assetDir + level.FileName;
 
 	if (!std::filesystem::is_regular_file(levelPath))
 	{
@@ -1516,7 +1516,7 @@ bool LoadLevelFile(int levelIndex)
 	if (!FirstLevel && fastReload)
 		g_Renderer.DumpGameScene();
 
-	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
+	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level.LoadScreenFileName);
 	g_Renderer.SetLoadingScreen(fastReload ? std::wstring{} : loadingScreenPath);
 
 	BackupLara();
