@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Renderer/Renderer.h"
 
+#include "version.h"
 #include "Game/animation.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -1186,6 +1187,14 @@ namespace TEN::Renderer
 
 	void Renderer::DrawDebugInfo(RenderView& view)
 	{
+#ifdef TEST_BUILD
+		if (CurrentLevel == 0)
+		{
+			AddString("TombEngine " + std::string(TEN_VERSION_STRING) + " test build - not for distribution",
+				Vector2(20, 560), Vector4(1.0f, 0, 0, 0.5f), 0.7f, 0);
+		}
+#endif
+
 		if (!DebugMode || CurrentLevel == 0)
 			return;
 
