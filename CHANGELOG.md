@@ -10,14 +10,19 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed engine performance if weather effects are active.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemy pickups dropping on death sectors.
+* Fixed vehicle transfer not happening for levels which were not previously visited.
 * Fixed audio tracks placed in subfolders not restoring after loading savegame.
 * Fixed scripted input events not registering on the same game frame.
 * Fixed incorrect object camera position.
+* Fixed incorrect camera movement near walls after leaving look mode.
+* Fixed binocular or lasersight camera not switching off correctly after flyby.
 * Fixed Lara's Home entry not working.
+* Fixed exploding TR3 bosses.
 * Fixed Lens Flare object not functioning properly.
 
 ### Features/Amendments
 * Added fast savegame reloading.
+* Added ricochet sounds and make the effect more prominent.
 
 ### Lua API changes
 

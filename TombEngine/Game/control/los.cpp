@@ -296,8 +296,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
 					}
 
-					TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
-					TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+					TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
 				}
 				else
 				{
@@ -312,7 +311,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								ShatterImpactData.impactDirection = dir;
 								ShatterImpactData.impactLocation = ShatterItem.sphere.Center;
 								ShatterObject(&ShatterItem, 0, 128, target2.RoomNumber, 0);
-								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, false);
 						}
 						else
 						{
@@ -348,7 +347,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								{
 									// TR5
 									if (object->hitEffect == HitEffect::Richochet)
-										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
 								}
 							}
 							else
@@ -420,7 +419,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 							}
 						}
 
-						TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+						TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
 					}
 				}
 			}
@@ -447,7 +446,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			target2.z -= (target2.z - origin->z) >> 5;
 
 			if (isFiring && !result)
-				TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 8, 0);
+				TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
 		}
 	}
 
