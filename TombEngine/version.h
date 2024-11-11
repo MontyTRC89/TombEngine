@@ -12,9 +12,8 @@
 
 #define TEST_BUILD 1
 
-#define STRINGIFY(x) #x
-#define MAKE_VERSION_STRING(major, minor, build, revision) STRINGIFY(major) "." STRINGIFY(minor) "." STRINGIFY(build) "." STRINGIFY(revision)
+#define TOSTR(x) #x
+#define MAKE_VERSION_STRING(major, minor, build, revision) TOSTR(major) "." TOSTR(minor) "." TOSTR(build) "." TOSTR(revision)
 
-// Define the version string using your version components
 #define TE_VERSION_STRING MAKE_VERSION_STRING(TE_MAJOR_VERSION, TE_MINOR_VERSION, TE_BUILD_NUMBER, TE_REVISION_NUMBER)
 #define TEN_VERSION_STRING MAKE_VERSION_STRING(TEN_MAJOR_VERSION, TEN_MINOR_VERSION, TEN_BUILD_NUMBER, TEN_REVISION_NUMBER)
