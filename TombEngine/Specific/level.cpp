@@ -1523,14 +1523,11 @@ bool LoadLevelFile(int levelIndex)
 	auto assetDir = g_GameFlow->GetGameDir();
 	auto levelPath = assetDir + level.FileName;
 
-	bool usingEmbeddedLevelFile = false;
-
 	if (!std::filesystem::is_regular_file(levelPath))
 	{
 		if (levelIndex == 0 && GenerateTitleLevel(levelPath))
 		{
-			usingEmbeddedLevelFile = true;
-			TENLog("Regenerated title level file from embedded data: " + levelPath, LogLevel::Info);
+			TENLog("Title level file not found, generating dummy level: " + levelPath, LogLevel::Info);
 		}
 		else
 		{
@@ -1557,12 +1554,7 @@ bool LoadLevelFile(int levelIndex)
 	FreeLevel(fastReload);
 	
 	LevelLoadTask = std::async(std::launch::async, LoadLevel, levelPath, fastReload);
-	bool result = LevelLoadTask.get();
-
-	if (usingEmbeddedLevelFile)
-		std::filesystem::remove(levelPath);
-
-	return result;
+	return LevelLoadTask.get();
 }
 
 void LoadSprites()
