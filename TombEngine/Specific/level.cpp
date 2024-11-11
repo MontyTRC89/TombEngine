@@ -687,7 +687,7 @@ void LoadDynamicRoomData()
 	int roomCount = ReadInt32();
 
 	if (g_Level.Rooms.size() != roomCount)
-		throw std::exception("Dynamic room data count is inconsistent with room count");
+		throw std::exception("Dynamic room data count is inconsistent with room count.");
 
 	for (int i = 0; i < roomCount; i++)
 	{
@@ -1200,6 +1200,21 @@ bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 	return false;
 }
 
+long GetRemainingSize(FILE* filePtr)
+{
+	long current_position = ftell(filePtr);
+
+	if (fseek(filePtr, 0, SEEK_END) != 0)
+		return NO_VALUE;
+
+	long size = ftell(filePtr);
+
+	if (fseek(filePtr, current_position, SEEK_SET) != 0)
+		return NO_VALUE;
+
+	return size;
+}
+
 bool ReadCompressedBlock(FILE* filePtr, bool skip)
 {
 	int compressedSize = 0;
@@ -1207,6 +1222,11 @@ bool ReadCompressedBlock(FILE* filePtr, bool skip)
 
 	ReadFileEx(&uncompressedSize, 1, 4, filePtr);
 	ReadFileEx(&compressedSize, 1, 4, filePtr);
+
+	// Safeguard against changed file format.
+	long remainingSize = GetRemainingSize(filePtr);
+	if (uncompressedSize <= 0 || compressedSize <= 0 || compressedSize > remainingSize)
+		throw std::exception{ "Data block size is incorrect. Probably old level version?" };
 
 	if (skip) 
 	{
