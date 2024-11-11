@@ -40,17 +40,7 @@ void lara_void_func(ItemInfo* item, CollisionInfo* coll)
 
 void lara_default_col(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
-
-	player.Control.MoveAngle = item->Pose.Orientation.y;
-	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
-	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
-	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeDown = true;
-	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
-	GetCollisionInfo(coll, item);
-	LaraResetGravityStatus(item, coll);
+	LaraDefaultCollision(item, coll);
 }
 
 // Boulder death.

@@ -1,6 +1,9 @@
 #include "framework.h"
-#include "FlowLevel.h"
+#include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
+
 #include "Scripting/Internal/ScriptAssert.h"
+
+using namespace TEN::Scripting;
 
 /***
 Stores level metadata.
@@ -15,12 +18,14 @@ These are things things which aren't present in the compiled level file itself.
 	@treturn Level a Level object
 	*/
 void Level::Register(sol::table& parent)
-{	
-	parent.new_usertype<Level>("Level",
+{
+	// Register type.
+	parent.new_usertype<Level>(
+		"Level",
 		sol::constructors<Level()>(),
 		sol::call_constructor, sol::constructors<Level()>(),
-/// (string) string key for the level's (localised) name.
-// Corresponds to an entry in strings.lua.
+
+		// Corresponds to an entry in strings.lua.
 //@mem nameKey
 		"nameKey", &Level::NameStringKey,
 
@@ -51,6 +56,14 @@ void Level::Register(sol::table& parent)
 /// (@{Flow.SkyLayer}) Secondary sky layer
 //@mem layer2
 		"layer2", &Level::Layer2,
+
+		/// (@{Flow.Starfield}) Starfield.
+		// @mem starfield
+		"starfield", &Level::Starfield,
+
+		/// (@{Flow.LensFlare}) Global lens flare .
+		// @mem lensFlare
+		"lensFlare", &Level::LensFlare,
 
 /// (@{Flow.Fog}) omni fog RGB color and distance.
 // As seen in TR4's Desert Railroad.
@@ -276,4 +289,59 @@ int Level::GetSecrets() const
 std::string Level::GetAmbientTrack() const
 {
 	return AmbientTrack;
+}
+
+bool Level::GetLensFlareEnabled() const
+{
+	return LensFlare.GetEnabled();
+}
+
+int Level::GetLensFlareSunSpriteID() const
+{
+	return LensFlare.GetSunSpriteID();
+}
+
+short Level::GetLensFlarePitch() const
+{
+	return ANGLE(LensFlare.GetPitch());
+}
+
+short Level::GetLensFlareYaw() const
+{
+	return ANGLE(LensFlare.GetYaw());
+}
+
+Color Level::GetLensFlareColor() const
+{
+	return LensFlare.GetColor();
+}
+
+bool Level::GetStarfieldStarsEnabled() const
+{
+	return Starfield.GetStarsEnabled();
+}
+
+bool Level::GetStarfieldMeteorsEnabled() const
+{
+	return Starfield.GetMeteorsEnabled();
+}
+
+int Level::GetStarfieldStarCount() const
+{
+	return Starfield.GetStarCount();
+}
+
+int Level::GetStarfieldMeteorCount() const
+{
+	return Starfield.GetMeteorCount();
+}
+
+int Level::GetStarfieldMeteorSpawnDensity() const
+{
+	return Starfield.GetMeteorSpawnDensity();
+}
+
+float Level::GetStarfieldMeteorVelocity() const
+{
+	return Starfield.GetMeteorVelocity();
 }

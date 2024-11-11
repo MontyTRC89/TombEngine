@@ -1043,6 +1043,8 @@ void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (CanStepUp(*item, *coll))
 		{
+			item->DisableInterpolation = true;
+
 			const auto* dispatch = GetStateDispatch(*item, LS_STEP_UP);
 			if (dispatch != nullptr)
 			{

@@ -25,6 +25,9 @@ namespace TEN::Effects::Hair
 
 	void HairUnit::Update(const ItemInfo& item, int hairUnitID)
 	{
+		for (auto& segment : Segments)
+			segment.StoreInterpolationData();
+
 		const auto& player = GetLaraInfo(item);
 
 		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
@@ -321,7 +324,7 @@ namespace TEN::Effects::Hair
 		{
 			auto& unit = Units[i];
 
-			auto objectID = (i == 0) ? ID_SINGLE_BRAID_HAIR : ID_DUAL_PIGTAIL_HAIR;
+			auto objectID = (i == 0) ? ID_HAIR_PRIMARY : ID_HAIR_SECONDARY;
 			const auto& object = Objects[objectID];
 
 			unit.IsEnabled = (object.loaded && (i == 0 || (i == 1 && isYoung)));

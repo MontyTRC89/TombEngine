@@ -34,9 +34,9 @@ namespace TEN::Entities::Vehicles
 	constexpr int KAYAK_VELOCITY_LR_ACCEL = 16 * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_VELOCITY_HOLD_TURN_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_VELOCITY_FRICTION_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
-
 	constexpr int KAYAK_VELOCITY_MAX = 56 * VEHICLE_VELOCITY_SCALE;
 
+	constexpr auto KAYAK_FLAG_PADDLE_MESH = 0x80;
 	constexpr auto KAYAK_WAKE_OFFSET = Vector3(BLOCK(0.1f), 0.0f, BLOCK(0.25f));
 
 	// TODO: Very confusing.
@@ -211,6 +211,20 @@ namespace TEN::Entities::Vehicles
 
 		//if (waterHeight != NO_HEIGHT)
 		//	SetupRipple(x, kayakItem->Pose.Position.y, z, -2 - (GetRandomControl() & 1), 0, Objects[ID_KAYAK_PADDLE_TRAIL_SPRITE].meshIndex,TO_RAD(kayakItem->Pose.Orientation.y));
+	}
+
+	void KayakPaddleTake(KayakInfo* kayak, ItemInfo* laraItem)
+	{
+		kayak->Flags |= KAYAK_FLAG_PADDLE_MESH;
+		laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
+		laraItem->MeshBits.Clear(KayakLaraLegJoints);
+	}
+
+	void KayakPaddlePut(KayakInfo* kayak, ItemInfo* laraItem)
+	{
+		kayak->Flags &= ~KAYAK_FLAG_PADDLE_MESH;
+		laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
+		laraItem->MeshBits.Set(KayakLaraLegJoints);
 	}
 
 	int KayakGetCollisionAnim(ItemInfo* kayakItem, int xDiff, int zDiff)
@@ -889,28 +903,14 @@ namespace TEN::Entities::Vehicles
 			break;
 		
 		case KAYAK_STATE_MOUNT_LEFT:
-			if (laraItem->Animation.AnimNumber == KAYAK_ANIM_GET_PADDLE &&
-				frame == 24 &&
-				!(kayak->Flags & 0x80))
-			{
-				kayak->Flags |= 0x80;
-				laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
-				laraItem->MeshBits.Clear(KayakLaraLegJoints);
-			}
-
+			if (laraItem->Animation.AnimNumber == KAYAK_ANIM_GET_PADDLE && frame == 24 && !(kayak->Flags & KAYAK_FLAG_PADDLE_MESH))
+				KayakPaddleTake(kayak, laraItem);
 			break;
 		
 		case KAYAK_STATE_DISMOUNT:
-			if (laraItem->Animation.AnimNumber == KAYAK_ANIM_DISMOUNT_START &&
-				frame == 27 &&
-				kayak->Flags & 0x80)
-			{
-				kayak->Flags &= ~0x80;
-				laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
-				laraItem->MeshBits.Set(KayakLaraLegJoints);
-			}
-
 			laraItem->Animation.TargetState = laraItem->Animation.RequiredState;
+			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_START) && frame == 27 && kayak->Flags & KAYAK_FLAG_PADDLE_MESH)
+				KayakPaddlePut(kayak, laraItem);
 			break;
 		
 		case KAYAK_STATE_DISMOUNT_LEFT:

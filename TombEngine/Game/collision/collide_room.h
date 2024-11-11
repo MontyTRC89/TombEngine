@@ -80,8 +80,9 @@ struct CollisionSetupData
 	bool BlockMonkeySwingEdge = false;
 	
 	// Inquirers
-	bool EnableObjectPush = false;
-	bool EnableSpasm	  = false;
+	bool EnableObjectPush	= false;
+	bool EnableSpasm		= false;
+	bool ForceSolidStatics	= false;
 
 	// Previous parameters
 	Vector3i	   PrevPosition		= Vector3i::Zero;

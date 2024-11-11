@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.4 Lua API</title>
+    <title>TombEngine 1.5 Lua API</title>
     <link rel="stylesheet" href="ldoc.css" type="text/css" />
 </head>
 <body>
@@ -49,10 +49,12 @@
   <li>    <a href="2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li>    <a href="2 classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="2 classes/Flow.Settings.html">Flow.Settings</a></li>
   <li>    <a href="2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li>    <a href="2 classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
   <li>    <a href="2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
@@ -100,7 +102,7 @@
 <div id="content">
 
 
-  <h2>TombEngine 1.4 scripting interface</h2>
+  <h2>TombEngine 1.5 scripting interface</h2>
   <p>Welcome to the TombEngine scripting API. This is a work in progress and some information might be wrong or outdated. Please also note that this is primarily a reference document, not a tutorial, so expect descriptions to be fairly sparse.</p>
 
 <p>At the time of writing, there is a tutorial describing the basics of Lua, as well as a number of example scripts, on <a href="https://www.tombengine.com">the TombEngine website</a>.</p>
@@ -184,6 +186,10 @@ local door = GetMoveableByName("door_type4_14")
 		<td class="summary">Represents the properties of an object as it appears in the inventory.</td>
 	</tr>
 	<tr>
+		<td class="name"  ><a href="2 classes/Flow.LensFlare.html">Flow.LensFlare</a></td>
+		<td class="summary">Represents a lens flare.</td>
+	</tr>
+	<tr>
 		<td class="name"  ><a href="2 classes/Flow.Level.html">Flow.Level</a></td>
 		<td class="summary">Stores level metadata.</td>
 	</tr>
@@ -198,6 +204,10 @@ local door = GetMoveableByName("door_type4_14")
 	<tr>
 		<td class="name"  ><a href="2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></td>
 		<td class="summary">Describes a layer of moving clouds.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Flow.Starfield.html">Flow.Starfield</a></td>
+		<td class="summary">Represents a starfield.</td>
 	</tr>
 	<tr>
 		<td class="name"  ><a href="2 classes/Objects.AIObject.html">Objects.AIObject</a></td>
@@ -217,7 +227,7 @@ local door = GetMoveableByName("door_type4_14")
 	</tr>
 	<tr>
 		<td class="name"  ><a href="2 classes/Objects.Room.html">Objects.Room</a></td>
-		<td class="summary">Rooms</td>
+		<td class="summary">Room object.</td>
 	</tr>
 	<tr>
 		<td class="name"  ><a href="2 classes/Objects.Sink.html">Objects.Sink</a></td>

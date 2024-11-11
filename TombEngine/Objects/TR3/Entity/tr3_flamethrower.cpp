@@ -96,7 +96,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else
 			{
-				TargetNearestEntity(item, creature, FlamethrowerTargetIds, false);
+				TargetNearestEntity(*item, FlamethrowerTargetIds, false);
 			}
 
 			AI_INFO AI;

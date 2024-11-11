@@ -51,7 +51,7 @@ namespace TEN::Renderer
 		RendererBone* bones[MAX_BONES] = {};
 		int nextBone = 0;
 
-		auto* transforms = ((rItem == nullptr) ? rObject.AnimationTransforms.data() : &rItem->AnimationTransforms[0]);
+		auto* transforms = ((rItem == nullptr) ? rObject.AnimationTransforms.data() : &rItem->AnimTransforms[0]);
 
 		// Push.
 		bones[nextBone++] = rObject.Skeleton;
@@ -69,7 +69,7 @@ namespace TEN::Renderer
 				(interpData.Alpha != 0.0f && interpData.Keyframe0.BoneOrientations.size() <= bonePtr->Index))
 			{
 				TENLog(
-					"Attempted to animate object with ID " + GetObjectName((GAME_OBJECT_ID)rItem->ObjectNumber) +
+					"Attempted to animate object with ID " + GetObjectName((GAME_OBJECT_ID)rItem->ObjectID) +
 					" using incorrect animation data. Bad animations set for slot?",
 					LogLevel::Error);
 
@@ -180,7 +180,7 @@ namespace TEN::Renderer
 		auto& moveableObj = *_moveableObjects[nativeItem->ObjectNumber];
 
 		// Copy meshswaps
-		itemToDraw->MeshIndex = nativeItem->Model.MeshIndex;
+		itemToDraw->MeshIds = nativeItem->Model.MeshIndex;
 
 		if (obj->Animations.empty())
 			return;
@@ -316,7 +316,7 @@ namespace TEN::Renderer
 		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX);
 
 		for (int m = 0; m < obj->nmeshes; m++)
-			itemToDraw->AnimationTransforms[m] = itemToDraw->AnimationTransforms[m];
+			itemToDraw->AnimTransforms[m] = itemToDraw->AnimTransforms[m];
 	}
 
 	void Renderer::UpdateItemAnimations(RenderView& view)
@@ -362,13 +362,13 @@ namespace TEN::Renderer
 		return (!_isWindowed);
 	}
 
-	void Renderer::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov, float farView)
+	void Renderer::UpdateCameraMatrices(CAMERA_INFO *cam, float farView)
 	{
 		if (farView < MIN_FAR_VIEW)
 			farView = DEFAULT_FAR_VIEW;
 
-		farView = farView;
-		_gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
+		_currentGameCamera = RenderView(cam, cam->Roll, cam->Fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
+		_gameCamera        = RenderView(cam, cam->Roll, cam->Fov, 32, farView, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight);
 	}
 
 	bool Renderer::SphereBoxIntersection(BoundingBox box, Vector3 sphereCentre, float sphereRadius)
@@ -447,7 +447,7 @@ namespace TEN::Renderer
 		{
 			const auto& mesh = *moveable.ObjectMeshes[i];
 
-			const auto& translationMatrix = itemToDraw.AnimationTransforms[i];
+			const auto& translationMatrix = itemToDraw.AnimTransforms[i];
 			auto pos = Vector3::Transform(mesh.Sphere.Center, translationMatrix * worldMatrix);
 
 			auto sphere = BoundingSphere(pos, mesh.Sphere.Radius);
@@ -509,9 +509,24 @@ namespace TEN::Renderer
 		return s;
 	}
 
+	float Renderer::GetFramerateMultiplier() const
+	{
+		return g_Configuration.EnableHighFramerate ? (g_Renderer.GetScreenRefreshRate() / (float)FPS) : 1.0f;
+	}
+
+	float Renderer::GetInterpolationFactor() const
+	{
+		return _interpolationFactor;
+	}
+
 	Vector2i Renderer::GetScreenResolution() const
 	{
 		return Vector2i(_screenWidth, _screenHeight);
+	}
+
+	int Renderer::GetScreenRefreshRate() const
+	{
+		return _refreshRate;
 	}
 
 	std::optional<Vector2> Renderer::Get2DPosition(const Vector3& pos) const
@@ -568,7 +583,8 @@ namespace TEN::Renderer
 		if (boneID >= MAX_BONES)
 			boneID = 0;
 
-		auto world = rendererItem->AnimationTransforms[boneID] * rendererItem->World;
+		auto world = rendererItem->AnimTransforms[boneID] * rendererItem->World;
+
 		return Vector3::Transform(relOffset, world);
 	}
 

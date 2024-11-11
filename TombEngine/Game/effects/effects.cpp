@@ -41,6 +41,9 @@ using namespace TEN::Math::Random;
 
 using TEN::Renderer::g_Renderer;
 
+constexpr int WIBBLE_SPEED = 4;
+constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
+
 // New particle class
 Particle Particles[MAX_PARTICLES];
 ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
@@ -50,7 +53,9 @@ FX_INFO EffectList[NUM_EFFECTS];
 GameBoundingBox DeadlyBounds;
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
+
 int SplashCount = 0;
+int Wibble = 0;
 
 Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
 NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax] =
@@ -122,46 +127,42 @@ void DetatchSpark(int number, SpriteEnumFlag type)
 
 Particle* GetFreeParticle()
 {
-	int result = -1;
+	int partID = NO_VALUE;
 
-	// Get first free available spark
-
+	// Get first free available particle.
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		auto* particle = &Particles[i];
-
-		if (!particle->on)
+		const auto& part = Particles[i];
+		if (!part.on)
 		{
-			result = i;
+			partID = i;
 			break;
 		}
 	}
 
-	// No free sparks left, hijack existing one with less possible life
-
-	int life = INT_MAX;
-	if (result == -1)
+	// No free particles; get particle with shortest life.
+	float shortestLife = INFINITY;
+	if (partID == NO_VALUE)
 	{
 		for (int i = 0; i < MAX_PARTICLES; i++)
 		{
-			auto* particle = &Particles[i];
+			const auto& part = Particles[i];
 
-			if (particle->life < life && particle->dynamic == -1 && !(particle->flags & SP_EXPLOSION))
+			if (part.life < shortestLife && part.dynamic == NO_VALUE && !(part.flags & SP_EXPLOSION))
 			{
-				result = i;
-				life = particle->life;
+				partID = i;
+				shortestLife = part.life;
 			}
 		}
 	}
 
-	auto* spark = &Particles[result];
+	auto& part = Particles[partID];
+	part.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	part.blendMode = BlendMode::Additive;
+	part.extras = 0;
+	part.dynamic = NO_VALUE;
 
-	spark->extras = 0;
-	spark->dynamic = -1;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
-	spark->blendMode = BlendMode::Additive;
-
-	return spark;
+	return &part;
 }
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
@@ -181,6 +182,13 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 	particle.spriteIndex = Objects[objectID].meshIndex + (int)round(Lerp(0.0f, numSprites, normalizedAge));
 }
 
+void UpdateWibble()
+{
+	// Update oscillator seed.
+	Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
+
+}
+
 void UpdateSparks()
 {
 	auto bounds = GameBoundingBox(LaraItem);
@@ -198,6 +206,8 @@ void UpdateSparks()
 
 		if (spark->on)
 		{
+			spark->StoreInterpolationData();
+
 			spark->life--;
 
 			if (!spark->life)
@@ -441,9 +451,13 @@ void UpdateSparks()
 	}
 }
 
-void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk)
+void TriggerRicochetSpark(const GameVector& pos, short angle, bool sound)
 {
+	int count = Random::GenerateInt(3, 8);
 	TriggerRicochetSpark(pos, angle, count);
+
+	if (sound && Random::TestProbability(1 / 3.0f))
+		SoundEffect(SFX_TR4_WEAPON_RICOCHET, &Pose(pos.ToVector3i()));
 }
 
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
@@ -1046,6 +1060,8 @@ void UpdateSplashes()
 
 		if (splash.isActive)
 		{
+			splash.StoreInterpolationData();
+
 			splash.life--;
 			if (splash.life <= 0)
 				splash.isActive = false;
@@ -1124,8 +1140,7 @@ void Ricochet(Pose& pose)
 {
 	short angle = Geometry::GetOrientToPoint(pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
 	auto target = GameVector(pose.Position);
-	TriggerRicochetSpark(target, angle / 16, 3, 0);
-	SoundEffect(SFX_TR4_WEAPON_RICOCHET, &pose);
+	TriggerRicochetSpark(target, angle / 16);
 }
 
 void ControlWaterfallMist(short itemNumber)
@@ -1235,7 +1250,7 @@ void KillAllCurrentItems(short itemNumber)
 	// TODO: Reimplement this functionality.
 }
 
-// TODO: Rname to SpawnDynamicLight().
+// TODO: Rename to SpawnDynamicLight().
 void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff)
 {
 	g_Renderer.AddDynamicLight(
@@ -1459,21 +1474,21 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->fadeToBlack = 16;
 	spark->blendMode = BlendMode::Additive;
 	spark->life = spark->sLife = (GetRandomControl() & 0xF) + 64;
-	spark->x = (GetRandomControl() & 0x1F) + x - 16;
-	spark->y = (GetRandomControl() & 0x1F) + y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + z - 16;
+	spark->position.x = (GetRandomControl() & 0x1F) + x - 16;
+	spark->position.y = (GetRandomControl() & 0x1F) + y - 16;
+	spark->position.z = (GetRandomControl() & 0x1F) + z - 16;
 
 	if (water)
 	{
-		spark->xVel = spark->yVel = GetRandomControl() & 0x3FF - 512;
-		spark->zVel = (GetRandomControl() & 0x3FF) - 512;
+		spark->velocity.x = spark->velocity.y = GetRandomControl() & 0x3FF - 512;
+		spark->velocity.z = (GetRandomControl() & 0x3FF) - 512;
 		spark->friction = 68;
 	}
 	else
 	{
-		spark->xVel = 2 * (GetRandomControl() & 0x3FF) - 1024;
-		spark->yVel = -512 - (GetRandomControl() & 0x3FF);
-		spark->zVel = 2 * (GetRandomControl() & 0x3FF) - 1024;
+		spark->velocity.x = 2 * (GetRandomControl() & 0x3FF) - 1024;
+		spark->velocity.y = -512 - (GetRandomControl() & 0x3FF);
+		spark->velocity.z = 2 * (GetRandomControl() & 0x3FF) - 1024;
 		spark->friction = 85;
 	}
 

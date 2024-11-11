@@ -278,10 +278,7 @@ namespace TEN::Input
 				break;
 			}
 		}
-	}
 
-	void ClearActionQueue()
-	{
 		for (auto& queue : ActionQueue)
 			queue = QueueState::None;
 	}
@@ -632,9 +629,9 @@ namespace TEN::Input
 	{
 		// Save screenshot.
 		static bool dbScreenshot = true;
-		if (KeyMap[KC_SYSRQ] && dbScreenshot)
+		if ((KeyMap[KC_SYSRQ] || KeyMap[KC_F12]) && dbScreenshot)
 			g_Renderer.SaveScreenshot();
-		dbScreenshot = !KeyMap[KC_SYSRQ];
+		dbScreenshot = !(KeyMap[KC_SYSRQ] || KeyMap[KC_F12]);
 
 		// Toggle fullscreen.
 		static bool dbFullscreen = true;

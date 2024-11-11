@@ -64,12 +64,10 @@ namespace TEN::Entities::Creatures::TR5
 		smoke.fadeToBlack = 32;
 		smoke.blendMode = BlendMode::Additive;
 		smoke.life = smoke.sLife = Random::GenerateInt(40, 44);
-		smoke.x = smokePos.x;
-		smoke.y = smokePos.y;
-		smoke.z = smokePos.z;
-		smoke.xVel = 0;
-		smoke.yVel = 0;
-		smoke.zVel = 0;
+		smoke.position.x = smokePos.x;
+		smoke.position.y = smokePos.y;
+		smoke.position.z = smokePos.z;
+		smoke.velocity = Vector3i::Zero;
 		smoke.friction = 4;
 		smoke.flags = SP_ROTATE;
 		smoke.rotAng = Random::GenerateInt(0, 4096);
@@ -171,7 +169,7 @@ namespace TEN::Entities::Creatures::TR5
 						pos.z += dz + GetRandomControl() - 128;
 
 						if (!LOS(&origin, &pos))
-							TriggerRicochetSpark(pos, Random::GenerateAngle(), 3, 0);
+							TriggerRicochetSpark(pos, Random::GenerateAngle());
 					}
 				}
 				else

@@ -340,6 +340,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 		item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
 		item->ItemFlags[5] = (int)ReusableReceptacleState::Done;
 		SetAnimation(*item, 0);
+		item->DisableInterpolation = true;
 		item->ResetModelToDefault();	
 	}
 	else
@@ -350,6 +351,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 		item->Animation.ActiveState =
 		item->Animation.TargetState = GetAnimData(*item).StateID;
 		item->Animation.RequiredState = NO_VALUE;
+		item->DisableInterpolation = true;
 		item->ResetModelToDefault();
 
 		AddActiveItem(itemNumber);

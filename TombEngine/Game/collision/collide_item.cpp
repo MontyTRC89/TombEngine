@@ -28,6 +28,7 @@ using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
+constexpr auto COLLIDABLE_BOUNDS_THRESHOLD = 4;
 
 // Globals
 
@@ -96,7 +97,6 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* playerItem, Collision
 
 CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible, bool ignorePlayer, float customRadius, ObjectCollectionMode mode)
 {
-	constexpr auto EXTENTS_LENGTH_MIN	= 2.0f;
 	constexpr auto ROUGH_BOX_HEIGHT_MIN = BLOCK(1 / 8.0f);
 
 	auto collObjects = CollidedObjectData{};
@@ -110,8 +110,15 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 	auto collidingSphere = BoundingSphere(collidingBounds.GetCenter() + collidingItem.Pose.Position.ToVector3(), collidingExtents.Length());
 	auto collidingCircle = Vector3(collidingSphere.Center.x, collidingSphere.Center.z, (customRadius > 0.0f) ? customRadius : std::hypot(collidingExtents.x, collidingExtents.z));
 
+	// Convert bounding box to DX bounds.
+	auto convertedBounds = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
+
+	// Override extents if specified.
+	if (customRadius > 0.0f)
+		convertedBounds.Extents = Vector3(customRadius);
+
 	// Quickly discard collision if colliding item bounds are below tolerance threshold.
-	if (collidingSphere.Radius <= EXTENTS_LENGTH_MIN)
+	if (collidingSphere.Radius <= COLLIDABLE_BOUNDS_THRESHOLD)
 		return collObjects;
 
 	// Run through neighboring rooms.
@@ -146,7 +153,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 					// Ignore items not feasible for collision.
 					if (item.Index == collidingItem.Index ||
-						item.Flags & IFLAG_KILLED || item.MeshBits == NO_JOINT_BITS ||
+						item.Flags & IFLAG_KILLED || item.MeshBits == NO_JOINT_BITS || !item.Collidable ||
 						(object.drawRoutine == nullptr && !item.IsLara()) ||
 						(object.collision == nullptr && !item.IsLara()))
 					{
@@ -166,7 +173,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					auto extents = bounds.GetExtents();
 
 					// If item bounding box extents is below tolerance threshold, discard object.
-					if (extents.Length() <= EXTENTS_LENGTH_MIN)
+					if (extents.Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
 						continue;
 
 					// Test rough vertical distance to discard objects not intersecting vertically.
@@ -186,15 +193,10 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					if (!Geometry::CircleIntersects(circle, collidingCircle))
 						continue;
 
-					auto box0 = bounds.ToBoundingOrientedBox(item.Pose);
-					auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
-
-					// Override extents if specified.
-					if (customRadius > 0.0f)
-						box1.Extents = Vector3(customRadius);
+					auto box = bounds.ToBoundingOrientedBox(item.Pose);
 
 					// Test accurate box intersection.
-					if (box0.Intersects(box1))
+					if (box.Intersects(convertedBounds))
 						collObjects.Items.push_back(&item);
 				}
 				while (itemNumber != NO_VALUE);
@@ -235,15 +237,17 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 				if (!Geometry::CircleIntersects(circle, collidingCircle))
 					continue;
 
-				auto box0 = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
-				auto box1 = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
+				// Skip if either bounding box has any zero extent (not a collidable volume).
+				if (bounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+					continue;
 
-				// Override extents if specified.
-				if (customRadius > 0.0f)
-					box1.Extents = Vector3(customRadius);
+				if (collidingBounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+					continue;
+
+				auto box = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
 
 				// Test accurate box intersection.
-				if (box0.Intersects(box1))
+				if (box.Intersects(convertedBounds))
 					collObjects.Statics.push_back(&staticObj);
 			}
 		}
@@ -284,7 +288,8 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 {
-	int height = GameBoundingBox(item).GetHeight();
+	auto bbox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
+	auto height = (bbox.Center - bbox.Extents).y - CLICK(1);
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -293,8 +298,9 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 		auto origin = Vector3(
 			item->Pose.Position.x + (sinHeading * (coll->Setup.Radius)),
-			item->Pose.Position.y - (height + CLICK(1)),
+			height,
 			item->Pose.Position.z + (cosHeading * (coll->Setup.Radius)));
+
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0.0f, 0.0f);
 		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
@@ -566,6 +572,9 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 {
 	const auto& bounds = GetClosestKeyframe(*item).BoundingBox;
 	const auto& playerBounds = GetClosestKeyframe(*laraItem).BoundingBox;
+
+	if (bounds.GetExtents() == Vector3::Zero || playerBounds.GetExtents() == Vector3::Zero)
+		return false;
 
 	if ((item->Pose.Position.y + bounds.Y2) <= (laraItem->Pose.Position.y + playerBounds.Y1))
 		return false;
@@ -933,6 +942,7 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData&
 
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 {
+	coll->HitStatic = false;
 	coll->HitTallObject = false;
 
 	for (auto i : g_Level.Rooms[item->RoomNumber].NeighborRoomNumbers)
@@ -942,8 +952,12 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 
 		for (auto& mesh : g_Level.Rooms[i].mesh)
 		{
-			// Only process meshes which are visible and solid.
-			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE) || !(mesh.flags & StaticMeshFlags::SM_SOLID))
+			// Only process meshes which are visible.
+			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Only process meshes which are solid, or if solid mode is set by the setup.
+			if (!coll->Setup.ForceSolidStatics && !(mesh.flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
 			float distance = Vector3i::Distance(item->Pose.Position, mesh.pos.Position);
@@ -960,12 +974,12 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 {
 	bool result = false;
 
+	// Ignore processing null bounds.
+	if (box.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+		return false;
+
 	// Get DX static bounds in global coordinates.
 	auto staticBounds = box.ToBoundingOrientedBox(pose);
-
-	// Ignore processing null bounds.
-	if (Vector3(staticBounds.Extents) == Vector3::Zero)
-		return false;
 
 	// Get local TR bounds and DX item bounds in global coordinates.
 	auto itemBBox = GameBoundingBox(item);
@@ -1794,7 +1808,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 
 	if (isPlayer)
 	{
-		GetLaraInfo(*item).HitDirection = -1;
+		GetLaraInfo(*item).HitDirection = NO_VALUE;
 
 		if (item->HitPoints <= 0)
 			return;
@@ -1863,9 +1877,10 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 					if (linkItem.HitPoints <= 0 || linkItem.HitPoints == NOT_TARGETABLE)
 						continue;
 
-					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
+					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY ||
+						object.damageType == DamageMode::None)
 					{
-						// If vehicle is harmless or speed is too low, just push enemy.
+						// If vehicle is harmless, enemy is non-damageable, or speed is too low, push enemy.
 						ItemPushItem(&linkItem, item, coll, false, 0);
 						continue;
 					}

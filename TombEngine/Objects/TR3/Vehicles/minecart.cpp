@@ -242,6 +242,18 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
+	void MinecartWrenchTake(MinecartInfo* minecart, ItemInfo* laraItem)
+	{
+		laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
+		minecart->Flags |= MINECART_FLAG_WRENCH_MESH;
+	}
+
+	void MinecartWrenchPut(MinecartInfo* minecart, ItemInfo* laraItem)
+	{
+		laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
+		minecart->Flags &= ~MINECART_FLAG_WRENCH_MESH;
+	}
+
 	static int GetMinecartCollision(ItemInfo* minecartItem, short angle, int distance)
 	{
 		auto probe = GetPointCollision(*minecartItem, angle, distance, -LARA_HEIGHT);
@@ -758,8 +770,7 @@ namespace TEN::Entities::Vehicles
 				if (laraItem->Animation.FrameNumber == MINECART_WRENCH_MESH_TOGGLE_FRAME &&
 					minecart->Flags & MINECART_FLAG_WRENCH_MESH)
 				{
-					laraItem->Model.MeshIndex[LM_RHAND] = laraItem->Model.BaseMesh + LM_RHAND;
-					minecart->Flags &= ~MINECART_FLAG_WRENCH_MESH;
+					MinecartWrenchPut(minecart, laraItem);
 				}
 
 				if (minecart->Flags & MINECART_FLAG_DISMOUNT_RIGHT)
@@ -807,8 +818,7 @@ namespace TEN::Entities::Vehicles
 				if (!(minecart->Flags & MINECART_FLAG_WRENCH_MESH) &&
 					laraItem->Animation.FrameNumber == MINECART_WRENCH_MESH_TOGGLE_FRAME)
 				{
-					laraItem->Model.MeshIndex[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
-					minecart->Flags |= MINECART_FLAG_WRENCH_MESH;
+					MinecartWrenchTake(minecart, laraItem);
 				}
 			}
 

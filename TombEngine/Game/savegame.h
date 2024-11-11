@@ -64,6 +64,7 @@ public:
 	static void Delete(int slot);
 
 	static bool DoesSaveGameExist(int slot, bool silent = false);
+	static bool IsLoadGamePossible();
 
 	static void SaveHub(int index);
 	static void LoadHub(int index);
