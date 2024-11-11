@@ -28,6 +28,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/trutils.h"
+#include "Specific/winmain.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -1242,7 +1243,7 @@ void UpdateProgress(float progress, bool skip = false)
 	g_Renderer.UpdateProgress(progress);
 }
 
-bool LoadLevel(std::string path, bool partial)
+bool LoadLevel(const std::string& path, bool partial)
 {
 	FILE* filePtr = nullptr;
 	bool loadedSuccessfully = false;
@@ -1494,6 +1495,7 @@ void LoadBoxes()
 	}
 }
 
+
 bool LoadLevelFile(int levelIndex)
 {
 	const auto& level = *g_GameFlow->GetLevel(levelIndex);
@@ -1501,10 +1503,20 @@ bool LoadLevelFile(int levelIndex)
 	auto assetDir = g_GameFlow->GetGameDir();
 	auto levelPath = assetDir + level.FileName;
 
+	bool usingEmbeddedLevelFile = false;
+
 	if (!std::filesystem::is_regular_file(levelPath))
 	{
-		TENLog("Level file not found: " + levelPath, LogLevel::Error);
-		return false;
+		if (levelIndex == 0 && GenerateTitleLevel(levelPath))
+		{
+			usingEmbeddedLevelFile = true;
+			TENLog("Regenerated title level file from embedded data: " + levelPath, LogLevel::Info);
+		}
+		else
+		{
+			TENLog("Level file not found: " + levelPath, LogLevel::Error);
+			return false;
+		}
 	}
 
 	TENLog("Loading level file: " + levelPath, LogLevel::Info);
@@ -1525,8 +1537,12 @@ bool LoadLevelFile(int levelIndex)
 	FreeLevel(fastReload);
 	
 	LevelLoadTask = std::async(std::launch::async, LoadLevel, levelPath, fastReload);
+	bool result = LevelLoadTask.get();
 
-	return LevelLoadTask.get();
+	if (usingEmbeddedLevelFile)
+		std::filesystem::remove(levelPath);
+
+	return result;
 }
 
 void LoadSprites()

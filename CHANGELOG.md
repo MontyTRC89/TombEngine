@@ -22,6 +22,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Features/Amendments
 * Added fast savegame reloading.
+* Added ability to run engine without title level file.
 * Added ricochet sounds and make the effect more prominent.
 
 ### Lua API changes
