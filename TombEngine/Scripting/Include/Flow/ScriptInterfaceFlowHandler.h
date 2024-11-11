@@ -1,5 +1,7 @@
 #pragma once
+
 #include "Game/control/control.h"
+#include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
 
 class ScriptInterfaceLevel;
 
@@ -20,6 +22,7 @@ public:
 	virtual ~ScriptInterfaceFlowHandler() = default;
 
 	virtual void LoadFlowScript() = 0;
+	virtual Settings* GetSettings() = 0;
 
 	virtual void SetGameDir(const std::string& assetDir) = 0;
 	virtual std::string GetGameDir() = 0;

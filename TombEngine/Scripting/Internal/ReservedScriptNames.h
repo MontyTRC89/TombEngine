@@ -246,6 +246,7 @@ static constexpr char ScriptReserved_LaraType[]		  = "LaraType";
 static constexpr char ScriptReserved_RotationAxis[]	  = "RotationAxis";
 static constexpr char ScriptReserved_ItemAction[]	  = "ItemAction";
 static constexpr char ScriptReserved_ErrorMode[]	  = "ErrorMode";
+static constexpr char ScriptReserved_FastReload[]	  = "FastReload";
 static constexpr char ScriptReserved_InventoryItem[]  = "InventoryItem";
 static constexpr char ScriptReserved_LaraWeaponType[] = "LaraWeaponType";
 static constexpr char ScriptReserved_PlayerAmmoType[] = "PlayerAmmoType";

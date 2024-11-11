@@ -6,28 +6,34 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## Version 1.6 - xxxx-xx-xx
 
 ### Bug fixes
-
 * Fixed engine performance around bridges.
-* Fixed engine performance if weather effects are active.
+* Fixed engine performance if weather or bubble effects are active.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemy pickups dropping on death sectors.
+* Fixed vehicle transfer not happening for levels which were not previously visited.
 * Fixed audio tracks placed in subfolders not restoring after loading savegame.
 * Fixed scripted input events not registering on the same game frame.
 * Fixed incorrect object camera position.
+* Fixed incorrect camera movement near walls after leaving look mode.
+* Fixed binocular or lasersight camera not switching off correctly after flyby.
 * Fixed Lara's Home entry not working.
+* Fixed exploding TR3 bosses.
 * Fixed Lens Flare object not functioning properly.
 
 ### Features/Amendments
-	
+* Added fast savegame reloading.
+* Added ability to run engine without title level file.
+* Added ricochet sounds and make the effect more prominent.
+
 ### Lua API changes
 
 * Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
 * Added missing callbacks for OnUseItem event.
+* Added support for transparency value in DisplayString class.
 
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 
 ### Bug fixes
-
 * Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
 * Fixed moveable status after antitriggering.
 * Fixed leveljump vehicle transfer.
@@ -66,7 +72,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed young Lara hair drawing. https://tombengine.com/docs/level-settings/#young_lara
 
 ### Features/Amendments
-
 * Added high framerate mode (also known as 60 FPS mode).
 * Added a customisable global lensflare effect. https://tombengine.com/docs/level-settings/#lensflare
 * Added a customisable starry sky and meteor effect. https://tombengine.com/docs/level-settings/#stars
@@ -95,7 +100,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Removed original limit of 32 active Flame Emitters.
 	
 ### Lua API changes
-
 * Added Flow.EnableHomeLevel() function.
 * Added Flow.IsStringPresent() function.
 * Added Flow.LensFlare() and Flow.Starfield() classes.

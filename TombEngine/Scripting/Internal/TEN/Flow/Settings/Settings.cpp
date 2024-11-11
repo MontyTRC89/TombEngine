@@ -1,19 +1,19 @@
 #include "framework.h"
-#include "Settings.h"
+#include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
 
-/***
-Settings that will be run on game startup.
-@tenclass Flow.Settings
-@pragma nostrip
-*/
+/// Settings that will be run on game startup.
+// @tenclass Flow.Settings
+// @pragma nostrip
 
-void Settings::Register(sol::table & parent)
+void Settings::Register(sol::table& parent)
 {
-	parent.new_usertype<Settings>("Settings",
+	parent.new_usertype<Settings>(
+		"Settings",
 		sol::constructors<Settings()>(),
 		sol::call_constructor, sol::constructors<Settings>(),
 
 /*** How should the application respond to script errors?
+<br>
 Must be one of the following:
 `ErrorMode.TERMINATE` - print to the log file and return to the title level when any script error is hit.
 This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.
@@ -31,6 +31,14 @@ has an unrecoverable error, the game will close.
 
 @mem errorMode
 */
-		"errorMode", &Settings::ErrorMode
-		);
+		"errorMode", &Settings::ErrorMode,
+
+/// Can the game utilize the fast reload feature?
+// <br>
+// When set to `true`, the game will attempt to perform fast savegame reloading if current level is the same as
+// the level loaded from the savegame. It will not work if the level timestamp or checksum has changed
+// (i.e. level was updated). If set to `false`, this functionality is turned off.
+//
+// @mem fastReload
+		"fastReload", &Settings::FastReload);
 }

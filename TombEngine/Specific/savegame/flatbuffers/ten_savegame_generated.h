@@ -7017,6 +7017,7 @@ flatbuffers::Offset<UnionVec> CreateUnionVec(flatbuffers::FlatBufferBuilder &_fb
 struct SaveGameHeaderT : public flatbuffers::NativeTable {
   typedef SaveGameHeader TableType;
   std::string level_name{};
+  int32_t level_hash = 0;
   int32_t days = 0;
   int32_t hours = 0;
   int32_t minutes = 0;
@@ -7032,16 +7033,20 @@ struct SaveGameHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_LEVEL_NAME = 4,
-    VT_DAYS = 6,
-    VT_HOURS = 8,
-    VT_MINUTES = 10,
-    VT_SECONDS = 12,
-    VT_LEVEL = 14,
-    VT_TIMER = 16,
-    VT_COUNT = 18
+    VT_LEVEL_HASH = 6,
+    VT_DAYS = 8,
+    VT_HOURS = 10,
+    VT_MINUTES = 12,
+    VT_SECONDS = 14,
+    VT_LEVEL = 16,
+    VT_TIMER = 18,
+    VT_COUNT = 20
   };
   const flatbuffers::String *level_name() const {
     return GetPointer<const flatbuffers::String *>(VT_LEVEL_NAME);
+  }
+  int32_t level_hash() const {
+    return GetField<int32_t>(VT_LEVEL_HASH, 0);
   }
   int32_t days() const {
     return GetField<int32_t>(VT_DAYS, 0);
@@ -7068,6 +7073,7 @@ struct SaveGameHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_LEVEL_NAME) &&
            verifier.VerifyString(level_name()) &&
+           VerifyField<int32_t>(verifier, VT_LEVEL_HASH) &&
            VerifyField<int32_t>(verifier, VT_DAYS) &&
            VerifyField<int32_t>(verifier, VT_HOURS) &&
            VerifyField<int32_t>(verifier, VT_MINUTES) &&
@@ -7088,6 +7094,9 @@ struct SaveGameHeaderBuilder {
   flatbuffers::uoffset_t start_;
   void add_level_name(flatbuffers::Offset<flatbuffers::String> level_name) {
     fbb_.AddOffset(SaveGameHeader::VT_LEVEL_NAME, level_name);
+  }
+  void add_level_hash(int32_t level_hash) {
+    fbb_.AddElement<int32_t>(SaveGameHeader::VT_LEVEL_HASH, level_hash, 0);
   }
   void add_days(int32_t days) {
     fbb_.AddElement<int32_t>(SaveGameHeader::VT_DAYS, days, 0);
@@ -7124,6 +7133,7 @@ struct SaveGameHeaderBuilder {
 inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> level_name = 0,
+    int32_t level_hash = 0,
     int32_t days = 0,
     int32_t hours = 0,
     int32_t minutes = 0,
@@ -7139,6 +7149,7 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(
   builder_.add_minutes(minutes);
   builder_.add_hours(hours);
   builder_.add_days(days);
+  builder_.add_level_hash(level_hash);
   builder_.add_level_name(level_name);
   return builder_.Finish();
 }
@@ -7151,6 +7162,7 @@ struct SaveGameHeader::Traits {
 inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeaderDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *level_name = nullptr,
+    int32_t level_hash = 0,
     int32_t days = 0,
     int32_t hours = 0,
     int32_t minutes = 0,
@@ -7162,6 +7174,7 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeaderDirect(
   return TEN::Save::CreateSaveGameHeader(
       _fbb,
       level_name__,
+      level_hash,
       days,
       hours,
       minutes,
@@ -10309,6 +10322,7 @@ inline void SaveGameHeader::UnPackTo(SaveGameHeaderT *_o, const flatbuffers::res
   (void)_o;
   (void)_resolver;
   { auto _e = level_name(); if (_e) _o->level_name = _e->str(); }
+  { auto _e = level_hash(); _o->level_hash = _e; }
   { auto _e = days(); _o->days = _e; }
   { auto _e = hours(); _o->hours = _e; }
   { auto _e = minutes(); _o->minutes = _e; }
@@ -10327,6 +10341,7 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(flatbuffers::Fla
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const SaveGameHeaderT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _level_name = _o->level_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->level_name);
+  auto _level_hash = _o->level_hash;
   auto _days = _o->days;
   auto _hours = _o->hours;
   auto _minutes = _o->minutes;
@@ -10337,6 +10352,7 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(flatbuffers::Fla
   return TEN::Save::CreateSaveGameHeader(
       _fbb,
       _level_name,
+      _level_hash,
       _days,
       _hours,
       _minutes,

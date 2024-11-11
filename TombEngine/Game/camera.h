@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/items.h"
 #include "Math/Math.h"
+#include "Specific/Clock.h"
 
 struct CollisionInfo;
 
@@ -61,7 +62,7 @@ enum CAMERA_FLAGS
 	CF_CHASE_OBJECT	 = 3,
 };
 
-constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
+constexpr auto FADE_SCREEN_SPEED = 2.0f / FPS;
 constexpr auto DEFAULT_FOV = 80.0f;
 
 extern CAMERA_INFO Camera;
