@@ -25,6 +25,7 @@ constexpr auto REGKEY_SHADOW_BLOBS_MAX	   = "ShadowBlobsMax";
 constexpr auto REGKEY_ENABLE_CAUSTICS	   = "EnableCaustics";
 constexpr auto REGKEY_ANTIALIASING_MODE	   = "AntialiasingMode";
 constexpr auto REGKEY_AMBIENT_OCCLUSION	   = "AmbientOcclusion";
+constexpr auto REGKEY_HIGH_FRAMERATE       = "EnableHighFramerate";
 
 // Sound keys
 
@@ -71,6 +72,7 @@ struct GameConfiguration
 	int		   ShadowBlobsMax	  = DEFAULT_SHADOW_BLOBS_MAX;
 	bool	   EnableCaustics	  = false;
 	bool	   EnableAmbientOcclusion = false;
+	bool	   EnableHighFramerate    = true;
 	AntialiasingMode AntialiasingMode = AntialiasingMode::None;
 
 	// Sound

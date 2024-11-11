@@ -64,6 +64,7 @@ constexpr auto MAX_ITEMS_DRAW = 128;
 constexpr auto MAX_LIGHTS_DRAW = 48;
 constexpr auto MAX_FOG_BULBS_DRAW = 32;
 constexpr auto MAX_SPRITES_DRAW = 512;
+constexpr auto MAX_LENS_FLARES_DRAW = 8;
 
 constexpr auto ROOM_AMBIENT_MAP_SIZE = 32;
 constexpr auto MAX_ROOM_AMBIENT_MAPS = 10;
@@ -147,6 +148,7 @@ enum class RendererDebugPage
 	InputStats,
 	CollisionStats,
 	PathfindingStats,
+	PortalDebug,
 	WireframeMode,
 
 	Count

@@ -3,6 +3,7 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/flipeffect.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
@@ -143,6 +144,8 @@ namespace TEN::Entities::TR4
 
 			if (beetle->On)
 			{
+				beetle->StoreInterpolationData();
+
 				auto oldPos = beetle->Pose.Position;
 
 				beetle->Pose.Position.x += beetle->Velocity * phd_sin(beetle->Pose.Orientation.y);

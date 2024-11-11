@@ -21,6 +21,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
@@ -194,15 +195,8 @@ void LookCamera(ItemInfo& item, const CollisionInfo& coll)
 
 void LookAt(CAMERA_INFO* cam, short roll)
 {
-	auto pos = cam->pos.ToVector3();
-	auto target = cam->target.ToVector3();
-	auto up = Vector3::Down;
-	float fov = TO_RAD(CurrentFOV / 1.333333f);
-	float r = TO_RAD(roll);
-
-	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(BLOCK(1));
-
-	g_Renderer.UpdateCameraMatrices(cam, r, fov, levelFarView);
+	cam->Fov = TO_RAD(CurrentFOV / 1.333333f);
+	cam->Roll = TO_RAD(roll);
 }
 
 void AlterFOV(short value, bool store)
@@ -248,13 +242,13 @@ void InitializeCamera()
 
 	Camera.targetDistance = BLOCK(1.5f);
 	Camera.item = nullptr;
-	Camera.numberFrames = 1;
 	Camera.type = CameraType::Chase;
 	Camera.speed = 1;
 	Camera.flags = CF_NONE;
 	Camera.bounce = 0;
 	Camera.number = -1;
 	Camera.fixedCamera = false;
+	Camera.DisableInterpolation = true;
 
 	AlterFOV(ANGLE(DEFAULT_FOV));
 
@@ -416,7 +410,7 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 
 	//get mesh 0 coordinates.	
 	auto pos = GetJointPosition(camSlotId, 0, Vector3i::Zero);
-	auto dest = Vector3(pos.x, pos.y, pos.z);
+	auto dest = Vector3(pos.x, pos.y, pos.z) + camSlotId->Pose.Position.ToVector3();
 
 	GameVector from = GameVector(dest, camSlotId->RoomNumber);
 	Camera.fixedCamera = true;
@@ -528,6 +522,13 @@ void ChaseCamera(ItemInfo* item)
 		Camera.actualElevation = ANGLE(85.0f);
 	else if (Camera.actualElevation < ANGLE(-85.0f))
 		Camera.actualElevation = ANGLE(-85.0f);
+
+	// Force item position after exiting look mode to avoid weird movements near walls.
+	if (Camera.oldType == CameraType::Look)
+	{
+		Camera.target.x = item->Pose.Position.x;
+		Camera.target.z = item->Pose.Position.z;
+	}
 
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
@@ -952,8 +953,18 @@ void BinocularCamera(ItemInfo* item)
 			player.Inventory.IsBusy = false;
 
 			Camera.type = BinocularOldCamera;
+			Camera.target = LastTarget;
 			AlterFOV(LastFOV);
 			return;
+		}
+
+		if (IsHeld(In::Action))
+		{
+			ClearAction(In::Action);
+
+			auto origin = Camera.pos.ToVector3i();
+			auto target = Camera.target.ToVector3i();
+			LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
 		}
 	}
 
@@ -1022,13 +1033,6 @@ void BinocularCamera(ItemInfo* item)
 	Camera.oldType = Camera.type;
 
 	GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
-
-	if (IsHeld(In::Action))
-	{
-		auto origin = Camera.pos.ToVector3i();
-		auto target = Camera.target.ToVector3i();
-		LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
-	}
 }
 
 void ConfirmCameraTargetPos()
@@ -1063,6 +1067,28 @@ void ConfirmCameraTargetPos()
 		Camera.target.y = pos.y;
 		Camera.target.z = pos.z;
 	}
+}
+
+// HACK: Temporary fix for camera bouncing on slopes during player death.
+static bool CalculateDeathCamera(const ItemInfo& item)
+{
+	// If player is alive, it's not a death camera.
+	if (item.HitPoints > 0)
+		return false;
+
+	// If player is in a special death animation (from EXTRA_ANIMS slot) triggered by enemies.
+	if (item.Animation.AnimObjectID == ID_LARA_EXTRA_ANIMS)
+		return true;
+
+	// Special death animations.
+	if (item.Animation.AnimNumber == LA_SPIKE_DEATH || 
+		item.Animation.AnimNumber == LA_BOULDER_DEATH || 
+		item.Animation.AnimNumber == LA_TRAIN_OVERBOARD_DEATH)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 void CalculateCamera(const CollisionInfo& coll)
@@ -1168,7 +1194,6 @@ void CalculateCamera(const CollisionInfo& coll)
 				Lara.ExtraTorsoRot.x = Lara.ExtraHeadRot.x;
 
 				Lara.Control.Look.Orientation = lookOrient;
-
 				Camera.type = CameraType::Look;
 				Camera.item->LookedAt = true;
 			}
@@ -1243,8 +1268,8 @@ void CalculateCamera(const CollisionInfo& coll)
 		if (isFixedCamera == Camera.fixedCamera)
 		{
 			Camera.fixedCamera = false;
-			if (Camera.speed != 1 &&
-				!Lara.Control.Look.IsUsingBinoculars)
+
+			if (Camera.speed != 1 && !Lara.Control.Look.IsUsingBinoculars)
 			{
 				if (TargetSnaps <= 8)
 				{
@@ -1291,9 +1316,13 @@ void CalculateCamera(const CollisionInfo& coll)
 
 	Camera.fixedCamera = isFixedCamera;
 	Camera.last = Camera.number;
+	Camera.DisableInterpolation = (Camera.DisableInterpolation || Camera.lastType != Camera.type);
+	Camera.lastType = Camera.type;
 
-	if ((Camera.type != CameraType::Heavy || Camera.timer == -1) &&
-		LaraItem->HitPoints > 0)
+	if (CalculateDeathCamera(*LaraItem))
+		return;
+
+	if (Camera.type != CameraType::Heavy || Camera.timer == -1)
 	{
 		Camera.type = CameraType::Chase;
 		Camera.speed = 10;
@@ -1310,8 +1339,13 @@ void CalculateCamera(const CollisionInfo& coll)
 
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius)
 {
-	auto sphere = BoundingSphere(Camera.pos.ToVector3(), radius);
-	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
+	auto camSphere = BoundingSphere(Camera.pos.ToVector3(), radius);
+	auto boundsSphere = BoundingSphere(pose.Position.ToVector3(), bounds.GetExtents().Length());
+
+	if (!camSphere.Intersects(boundsSphere))
+		return false;
+
+	return camSphere.Intersects(bounds.ToBoundingOrientedBox(pose));
 }
 
 float GetParticleDistanceFade(const Vector3i& pos)
@@ -1486,9 +1520,12 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, item->Pose, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &item->Pose, RADIUS);
 
-		DrawDebugBox(
-			bounds.ToBoundingOrientedBox(item->Pose),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
+		if (DebugMode)
+		{
+			DrawDebugBox(
+				bounds.ToBoundingOrientedBox(item->Pose),
+				Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
+		}
 	}
 
 	// Done.
@@ -1509,13 +1546,85 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, mesh->pos, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &mesh->pos, RADIUS);
 
-		DrawDebugBox(
-			bounds.ToBoundingOrientedBox(mesh->pos),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
+		if (DebugMode)
+		{
+			DrawDebugBox(
+				bounds.ToBoundingOrientedBox(mesh->pos),
+				Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
+		}
 	}
 
 	// Done.
 	staticList.clear();
+}
+
+void PrepareCamera()
+{
+	if (TrackCameraInit)
+	{
+		UseSpotCam = false;
+		AlterFOV(LastFOV);
+	}
+}
+
+static void DrawPortals()
+{
+	constexpr auto EXT_COLOR = Color(1.0f, 1.0f, 0.0f, 0.15f);
+	constexpr auto INT_COLOR = Color(1.0f, 0.0f, 0.0f, 0.15f);
+
+	if (!DebugMode)
+		return;
+
+	auto neighborRoomNumbers = GetNeighborRoomNumbers(Camera.pos.RoomNumber, 1);
+	for (auto& roomNumber : neighborRoomNumbers)
+	{
+		const auto& room = g_Level.Rooms[roomNumber];
+
+		auto pos = room.Position.ToVector3();
+		auto color = (roomNumber == Camera.pos.RoomNumber) ? INT_COLOR : EXT_COLOR;
+
+		for (const auto& door : room.doors)
+		{
+			DrawDebugTriangle(door.vertices[0] + pos, door.vertices[1] + pos, door.vertices[2] + pos, color, RendererDebugPage::PortalDebug);
+			DrawDebugTriangle(door.vertices[2] + pos, door.vertices[3] + pos, door.vertices[0] + pos, color, RendererDebugPage::PortalDebug);
+
+			DrawDebugLine(door.vertices[0] + pos, door.vertices[2] + pos, color, RendererDebugPage::PortalDebug);
+			DrawDebugLine(door.vertices[1] + pos, door.vertices[3] + pos, color, RendererDebugPage::PortalDebug);
+
+			auto center = pos + ((door.vertices[0] + door.vertices[1] + door.vertices[2] + door.vertices[3]) / 4);
+			auto target = Geometry::TranslatePoint(center, door.normal, CLICK(1));
+
+			DrawDebugLine(center, target, color, RendererDebugPage::PortalDebug);
+		}
+	}
+}
+
+void UpdateCamera()
+{
+	// HACK: Disable interpolation when switching to/from flyby camera.
+	// When camera structs are converted to a class, this should go to getter/setter. -- Lwmte, 29.10.2024
+	if (UseSpotCam != SpotcamSwitched)
+	{
+		Camera.DisableInterpolation = true;
+		SpotcamSwitched = UseSpotCam;
+	}
+
+	if (UseSpotCam)
+	{
+		// Draw flyby cameras.
+		CalculateSpotCameras();
+	}
+	else
+	{
+		// Do the standard camera.
+		TrackCameraInit = false;
+		CalculateCamera(LaraCollision);
+	}
+
+	// Update cameras matrices there, after having done all the possible camera logic.
+	g_Renderer.UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
+
+	DrawPortals();
 }
 
 void UpdateMikePos(const ItemInfo& item)
@@ -1545,7 +1654,8 @@ void UpdateMikePos(const ItemInfo& item)
 void RumbleScreen()
 {
 	if (!(GlobalCounter & 0x1FF))
-		SoundEffect(SFX_TR5_KLAXON, nullptr, SoundEnvironment::Land, 0.25f);
+		// SFX Enum Changed from TR5 and pitch shift removed. User can set this in their sound XML. Stranger1992 31st August 2024
+		SoundEffect(SFX_TR4_ENVIORONMENT_RUMBLE, nullptr, SoundEnvironment::Land);
 
 	if (RumbleTimer >= 0)
 		RumbleTimer++;

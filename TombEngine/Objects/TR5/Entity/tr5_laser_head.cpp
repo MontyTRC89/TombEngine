@@ -591,9 +591,12 @@ namespace TEN::Entities::Creatures::TR5
 	void DoGuardianDeath(int itemNumber, ItemInfo& item)
 	{
 		const auto& guardian = GetGuardianInfo(item);
-
-		ExplodeItemNode(&g_Level.Items[guardian.BaseItem], 0, 0, 128);
-		KillItem(guardian.BaseItem);
+		
+		if (g_Level.Items[guardian.BaseItem].ObjectNumber == ID_LASERHEAD_BASE)
+		{
+			ExplodeItemNode(&g_Level.Items[guardian.BaseItem], 0, 0, 128);
+			KillItem(guardian.BaseItem);
+		}
 
 		ExplodeItemNode(&item, 0, 0, 128);
 
@@ -605,7 +608,6 @@ namespace TEN::Entities::Creatures::TR5
 		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, EulerAngles(0x3000, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 		TriggerShockwave(&item.Pose, 32, 160, 64, 0, 128, 64, 36, EulerAngles(0x6000, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
 
-		g_Level.Items[guardian.PuzzleItem].Pose.Position.y = item.Pose.Position.y;
 		TestTriggers(&item, true);
 
 		SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item.Pose, SoundEnvironment::Land, 0.5f);

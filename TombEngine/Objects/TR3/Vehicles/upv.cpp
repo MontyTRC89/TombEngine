@@ -152,21 +152,13 @@ namespace TEN::Entities::Vehicles
 		UPV_BITE_RIGHT_RUDDER_RIGHT = 4,
 		UPV_BITE_RIGHT_RUDDER_LEFT  = 5	 // Unused.
 	};
-	enum UPVFlags
-	{
-		UPV_FLAG_CONTROL = (1 << 0),
-		UPV_FLAG_SURFACE = (1 << 1),
-		UPV_FLAG_DIVE	 = (1 << 2),
-		UPV_FLAG_DEAD	 = (1 << 3)
-	};
-
 
 	UPVInfo* GetUPVInfo(ItemInfo* UPVItem)
 	{
 		return (UPVInfo*)UPVItem->Data;
 	}
 
-	void UPVInitialize(short itemNumber)
+	void InitializeUPV(short itemNumber)
 	{
 		auto* UPVItem = &g_Level.Items[itemNumber];
 		UPVItem->Data = UPVInfo();

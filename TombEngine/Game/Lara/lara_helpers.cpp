@@ -953,7 +953,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 
 void HandlePlayerDiveBubbles(ItemInfo& item)
 {
-	constexpr auto BUBBLE_COUNT_MULT = 6;
+	constexpr auto BUBBLE_COUNT_MULT = 3;
 
 	auto& player = *GetLaraInfo(&item);
 
@@ -1043,6 +1043,8 @@ void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (CanStepUp(*item, *coll))
 		{
+			item->DisableInterpolation = true;
+
 			const auto* dispatch = GetStateDispatch(*item, LS_STEP_UP);
 			if (dispatch != nullptr)
 			{

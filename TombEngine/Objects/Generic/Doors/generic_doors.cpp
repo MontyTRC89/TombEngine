@@ -94,7 +94,7 @@ namespace TEN::Entities::Doors
 		doorData->d1.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
 		doorData->d1.data = *doorData->d1.floor;
 
-		if (r->flippedRoom != -1)
+		if (r->flippedRoom != NO_VALUE)
 		{
 			r = &g_Level.Rooms[r->flippedRoom];
 			doorData->d1flip.floor = GetSector(r, doorItem->Pose.Position.x - r->Position.x + xOffset, doorItem->Pose.Position.z - r->Position.z + zOffset);
@@ -413,7 +413,7 @@ namespace TEN::Entities::Doors
 
 	void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	{
-		static const auto WALL_PLANE = Plane(-Vector3::UnitY, -CLICK(127));
+		static const auto WALL_PLANE = Plane(-Vector3::UnitY, (float)NO_HEIGHT);
 
 		FloorInfo* floor = doorPos->floor;
 

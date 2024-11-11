@@ -42,6 +42,11 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, laraItem))
 		{
 			SetAnimation(*laraItem, LA_BOULDER_DEATH);
+
+			Camera.flags = CF_FOLLOW_CENTER;
+			Camera.targetAngle = ANGLE(170.0f);
+			Camera.targetElevation = ANGLE(-25.0f);
+			Camera.targetDistance = BLOCK(2);
 		}
 	}
 	else
@@ -100,7 +105,10 @@ void RollingBallControl(short itemNumber)
 				item->Animation.Velocity.y = -(GetRandomControl() % int(round(item->Animation.Velocity.z) / 8.0f));
 		}
 		else
+		{
 			item->Animation.Velocity.y = -item->Animation.Velocity.y / 4.0f;
+			item->DisableInterpolation = true;
+		}
 	}
 
 	int frontX = item->Pose.Position.x;
@@ -308,6 +316,8 @@ void RollingBallControl(short itemNumber)
 		}
 		else
 			item->Pose.Orientation.y = angle;
+
+		item->DisableInterpolation = true;
 	}
 
 	item->Pose.Orientation.x -= ((abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2) / vDivider;
@@ -360,8 +370,9 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 				SetAnimation(*lara, LA_BOULDER_DEATH);
 						
 				Camera.flags = CF_FOLLOW_CENTER;
-				Camera.targetAngle = ANGLE(170);
-				Camera.targetElevation = -ANGLE(25);
+				Camera.targetAngle = ANGLE(170.0f);
+				Camera.targetElevation = -ANGLE(-25.0f);
+				Camera.targetDistance = BLOCK(2);
 
 				for (int i = 0; i < 15; i++)
 				{

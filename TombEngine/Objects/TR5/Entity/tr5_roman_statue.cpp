@@ -114,12 +114,16 @@ namespace TEN::Entities::Creatures::TR5
 			spark->dShade = (GetRandomControl() & 0xF) + 64;
 			spark->blendMode = BlendMode::Additive;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 64;
-			spark->x = (GetRandomControl() & 0x1F) + pos->x - 16;
-			spark->y = (GetRandomControl() & 0x1F) + pos->y - 16;
-			spark->z = (GetRandomControl() & 0x1F) + pos->z - 16;
-			spark->xVel = (GetRandomControl() & 0x7F) - 64;
-			spark->yVel = 0;
-			spark->zVel = (GetRandomControl() & 0x7F) - 64;
+			spark->position = Vector3i(
+				(GetRandomControl() & 0x1F) + pos->x - 16,
+				(GetRandomControl() & 0x1F) + pos->y - 16,
+				(GetRandomControl() & 0x1F) + pos->z - 16
+			);
+			spark->velocity = Vector3i(
+				(GetRandomControl() & 0x7F) - 64,
+				0,
+				(GetRandomControl() & 0x7F) - 64
+			);
 			spark->friction = 4;
 			spark->flags = SP_ROTATE;
 			spark->rotAng = GetRandomControl() & 0xFFF;
@@ -157,7 +161,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->flags = SP_SCALE | SP_DEF;
 		spark->scalar = 3;
 		spark->maxYvel = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE_LIGHT;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_LIGHT;
 		spark->gravity = 0;
 		spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 	}
@@ -879,7 +883,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (object.hitEffect == HitEffect::Richochet && pos.has_value())
 		{
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, false);
 			SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &target.Pose);
 		}
 

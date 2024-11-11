@@ -105,6 +105,9 @@ void Renderer::UpdateLaraAnimations(bool force)
 	if (!force && rItem.DoneAnimations)
 		return;
 
+	if (_moveableObjects.empty())
+		return;
+
 	auto& playerObject = *_moveableObjects[ID_LARA];
 
 	// Clear extra rotations.
@@ -262,10 +265,10 @@ void Renderer::UpdateLaraAnimations(bool force)
 
 	// Copy matrices in player object.
 	for (int m = 0; m < NUM_LARA_MESHES; m++)
-		playerObject.AnimationTransforms[m] = rItem.AnimationTransforms[m];
+		playerObject.AnimationTransforms[m] = rItem.InterpolatedAnimTransforms[m];
 
 	// Copy meshswap indices.
-	rItem.MeshIndex = LaraItem->Model.MeshIndex;
+	rItem.MeshIds = LaraItem->Model.MeshIndex;
 	rItem.DoneAnimations = true;
 }
 
@@ -296,10 +299,10 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 
 	RendererRoom* room = &_rooms[LaraItem->RoomNumber];
 
-	_stItem.World = _laraWorldMatrix;
+	_stItem.World = item->InterpolatedWorld; // _laraWorldMatrix;
 	_stItem.Color = item->Color;
 	_stItem.AmbientLight = item->AmbientLight;
-	memcpy(_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), laraObj.AnimationTransforms.size() * sizeof(Matrix));
+	memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, laraObj.AnimationTransforms.size() * sizeof(Matrix));
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
@@ -335,12 +338,16 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		const auto& rendererObject = *_moveableObjects[unit.ObjectID];
 
 		_stItem.World = Matrix::Identity;
-		_stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * _laraWorldMatrix;
+		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimTransforms[LM_HEAD] * itemToDraw->InterpolatedWorld;
 
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{
 			const auto& segment = unit.Segments[i];
-			auto worldMatrix = Matrix::CreateFromQuaternion(segment.Orientation) * Matrix::CreateTranslation(segment.Position);
+			auto worldMatrix = 
+				Matrix::CreateFromQuaternion(
+					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, _interpolationFactor)) *
+				Matrix::CreateTranslation(
+					Vector3::Lerp(segment.PrevPosition, segment.Position, _interpolationFactor));
 
 			_stItem.BonesMatrices[i + 1] = worldMatrix;
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;

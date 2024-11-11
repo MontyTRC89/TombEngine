@@ -22,6 +22,8 @@ namespace TEN::Renderer
 
 	bool Renderer::PrepareDataForTheRenderer()
 	{
+		TENLog("Preparing renderer...", LogLevel::Info);
+
 		_lastBlendMode = BlendMode::Unknown;
 		_lastCullMode = CullMode::Unknown;
 		_lastDepthState = DepthState::Unknown;
@@ -516,7 +518,7 @@ namespace TEN::Renderer
 						&moveable,
 						&g_Level.Meshes[obj->meshIndex + j],
 						j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
-						MoveablesIds[i] == ID_SINGLE_BRAID_HAIR || MoveablesIds[i] == ID_DUAL_PIGTAIL_HAIR, &lastVertex, &lastIndex);
+						MoveablesIds[i] == ID_HAIR_PRIMARY || MoveablesIds[i] == ID_HAIR_SECONDARY, &lastVertex, &lastIndex);
 
 					moveable.ObjectMeshes.push_back(mesh);
 					_meshes.push_back(mesh);
@@ -687,7 +689,7 @@ namespace TEN::Renderer
 							}
 						}
 					}
-					else if (MoveablesIds[i] == ID_SINGLE_BRAID_HAIR && isSkinPresent)
+					else if (MoveablesIds[i] == ID_HAIR_PRIMARY && isSkinPresent)
 					{
 						for (int j = 0; j < obj->nmeshes; j++)
 						{
@@ -776,7 +778,7 @@ namespace TEN::Renderer
 							}
 						}
 					}
-					else if (MoveablesIds[i] == ID_DUAL_PIGTAIL_HAIR && isSkinPresent)
+					else if (MoveablesIds[i] == ID_HAIR_SECONDARY && isSkinPresent)
 					{
 						for (int j = 0; j < obj->nmeshes; j++)
 						{

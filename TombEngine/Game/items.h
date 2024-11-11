@@ -126,7 +126,7 @@ struct ItemInfo
 	int			   Index		= 0;			// ItemNumber // TODO: Make int.
 	GAME_OBJECT_ID ObjectNumber = ID_NO_OBJECT; // ObjectID
 
-	/*ItemStatus*/int Status = ITEM_NOT_ACTIVE;
+	ItemStatus Status = ITEM_NOT_ACTIVE;
 	bool	   Active = false;
 
 	// TODO: Refactor linked list.
@@ -145,11 +145,12 @@ struct ItemInfo
 	short	   RoomNumber = 0; // TODO: Make int.
 	int		   Floor	  = 0;
 
-	int	 HitPoints	= 0;
-	bool HitStatus	= false;
-	bool LookedAt	= false;
-	bool Collidable = false;
-	bool InDrawRoom = false;
+	int	 HitPoints			  = 0;
+	bool HitStatus			  = false;
+	bool LookedAt			  = false;
+	bool Collidable			  = false;
+	bool InDrawRoom			  = false;
+	bool DisableInterpolation = false;
 
 	int BoxNumber = 0;
 	int Timer	  = 0;

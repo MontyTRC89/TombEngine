@@ -3,6 +3,7 @@
 
 #include "Game/Animation/Animation.h"
 #include "Game/control/box.h"
+#include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara.h"
@@ -205,7 +206,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 			else
 			{
-				TargetNearestEntity(&item, &creature, SealMutantAttackTargetObjectIds, false);
+				TargetNearestEntity(item, SealMutantAttackTargetObjectIds, false);
 			}
 
 			AI_INFO ai;

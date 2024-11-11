@@ -111,6 +111,8 @@ namespace TEN::Entities::TR4
 			auto* locust = &Locusts[i];
 			if (locust->on)
 			{
+				locust->StoreInterpolationData();
+
 				// NOTE: not present in original TR4 code
 				//if (locust->target == nullptr)
 				//    locust->target = LaraItem;
