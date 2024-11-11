@@ -6,9 +6,9 @@
 #define TE_REVISION_NUMBER 0
 
 #define TEN_MAJOR_VERSION   1
-#define TEN_MINOR_VERSION   6
+#define TEN_MINOR_VERSION   5
 #define TEN_BUILD_NUMBER    0
-#define TEN_REVISION_NUMBER 0
+#define TEN_REVISION_NUMBER 3
 
 #define TEST_BUILD 1
 
