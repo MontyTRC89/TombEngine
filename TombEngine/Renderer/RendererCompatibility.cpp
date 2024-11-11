@@ -22,6 +22,8 @@ namespace TEN::Renderer
 
 	bool Renderer::PrepareDataForTheRenderer()
 	{
+		TENLog("Preparing renderer...", LogLevel::Info);
+
 		_lastBlendMode = BlendMode::Unknown;
 		_lastCullMode = CullMode::Unknown;
 		_lastDepthState = DepthState::Unknown;
