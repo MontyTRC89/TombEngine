@@ -15,6 +15,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed scripted input events not registering on the same game frame.
 * Fixed incorrect object camera position.
 * Fixed incorrect camera movement near walls after leaving look mode.
+* Fixed binocular or lasersight camera not switching off correctly after flyby.
 * Fixed Lara's Home entry not working.
 * Fixed Lens Flare object not functioning properly.
 
