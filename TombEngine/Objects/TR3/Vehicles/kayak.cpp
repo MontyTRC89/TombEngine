@@ -909,8 +909,9 @@ namespace TEN::Entities::Vehicles
 		
 		case KAYAK_STATE_DISMOUNT:
 			laraItem->Animation.TargetState = laraItem->Animation.RequiredState;
-			if (TestAnimNumber(*laraItem, KAYAK_ANIM_DISMOUNT_START) && frame == 27 && kayak->Flags & KAYAK_FLAG_PADDLE_MESH)
+			if (laraItem->Animation.AnimNumber == KAYAK_ANIM_DISMOUNT_START && frame == 27 && kayak->Flags & KAYAK_FLAG_PADDLE_MESH)
 				KayakPaddlePut(kayak, laraItem);
+
 			break;
 		
 		case KAYAK_STATE_DISMOUNT_LEFT:
