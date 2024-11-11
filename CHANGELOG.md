@@ -21,7 +21,9 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Lens Flare object not functioning properly.
 
 ### Features/Amendments
-	
+
+* Added ricochet sounds and make the effect more prominent.
+
 ### Lua API changes
 
 * Added support for transparency value in DisplayString class.
