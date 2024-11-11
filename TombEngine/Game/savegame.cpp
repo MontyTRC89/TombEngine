@@ -1506,15 +1506,18 @@ void SaveGame::SaveHub(int index)
 
 void SaveGame::LoadHub(int index)
 {
-	// Don't attempt to load hub data if it doesn't exist, or level is a title level.
-	if (index == 0 || !IsOnHub(index))
+	// Don't attempt to load hub data if level is a title level.
+	if (index == 0)
 		return;
 
-	// Load hub data.
-	TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
-	Parse(Hub[index], true);
+	if (IsOnHub(index))
+	{
+		// Load hub data.
+		TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
+		Parse(Hub[index], true);
+	}
 
-	// Restore vehicle.
+	// Restore vehicle (also for cases when no hub data yet exists).
 	InitializePlayerVehicle(*LaraItem);
 }
 
