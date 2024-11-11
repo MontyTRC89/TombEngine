@@ -14,6 +14,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed audio tracks placed in subfolders not restoring after loading savegame.
 * Fixed scripted input events not registering on the same game frame.
 * Fixed incorrect object camera position.
+* Fixed incorrect camera movement near walls after leaving look mode.
 * Fixed Lara's Home entry not working.
 * Fixed Lens Flare object not functioning properly.
 
