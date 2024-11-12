@@ -117,7 +117,14 @@ namespace TEN::Entities::Traps
 		auto& item = g_Level.Items[itemNumber];
 
 		EldectricBallData.Colorw = item.Model.Color;
-		item.ItemFlags[1] = TargetType::None;
+
+		//Distance before switch off.
+		item.ItemFlags[0] = SQUARE(BLOCK(7));
+
+		//Distance to attack Lara.
+		item.ItemFlags[1] = SQUARE(BLOCK(3));
+
+		item.ItemFlags[2] = TargetType::None;
 	}
 
 	static std::vector<int> GetTargetEntityList(const ItemInfo& item)
@@ -139,9 +146,9 @@ namespace TEN::Entities::Traps
 
 	static Vector3 GetTargetPosition(ItemInfo& item)
 	{
-		if (item.ItemFlags[1] != TargetType::None)
+		if (item.ItemFlags[2] != TargetType::None)
 		{
-			const auto& targetEntity = g_Level.Items[item.ItemFlags[1]];
+			const auto& targetEntity = g_Level.Items[item.ItemFlags[2]];
 			return targetEntity.Pose.Position.ToVector3();
 		}
 
@@ -243,7 +250,7 @@ namespace TEN::Entities::Traps
 			item.ItemFlags[3] = Random::GenerateInt(120,230);
 			item.ItemFlags[4] = 120;
 			item.ItemFlags[6] = 20;
-			item.ItemFlags[1] = TargetType::None;
+			item.ItemFlags[2] = TargetType::None;
 			auto sparkOrigin =  GetJointPosition(item, 0, Vector3i(0, 300, 0)).ToVector3();
 
 			TriggerElectricBallShockwaveAttackSparks(origin.x, origin.y, origin.z, 128, 128, 200, 128);		
@@ -405,12 +412,12 @@ namespace TEN::Entities::Traps
 		AI_INFO ai;
 		CreatureAIInfo(&item, &ai);
 
-		if (ai.distance > SQUARE(BLOCK(7)) )
+		if (ai.distance > item.ItemFlags[0])
 		{
 			item.ItemFlags[3] = 70;
 			item.ItemFlags[4] = 70;
 			item.Model.Color = EldectricBallData.Colorw;
-			item.ItemFlags[1] = TargetType::None;
+			item.ItemFlags[2] = TargetType::None;
 			return;
 		}
 
@@ -421,32 +428,32 @@ namespace TEN::Entities::Traps
 		bool los = LOS(&origin, &targetPlayer);
 		FloorInfo* floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &item.RoomNumber);
 
-		if (ai.distance < SQUARE(BLOCK(3)) && los)
+		if (ai.distance < item.ItemFlags[1] && los)
 		{
 			targetPos = Vector3(LaraItem->Pose.Position.x, GetFloorHeight(floor, item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z), LaraItem->Pose.Position.z);
 				
-			item.ItemFlags[1] = TargetType::Target;
+			item.ItemFlags[2] = TargetType::Target;
 			item.ItemFlags[5] = LaraItem->Index;
 		}
 		
 		else if ((item.ObjectNumber == ID_ELECTRIC_BALL &&
 			Objects[ID_ELECTRIC_BALL_IMPACT_POINT].loaded &&
-			item.ItemFlags[1] == TargetType::None))
+			item.ItemFlags[2] == TargetType::None))
 		{
-			item.ItemFlags[1] = (short)GetTargetItemNumber(item);
+			item.ItemFlags[2] = (short)GetTargetItemNumber(item);
 			targetPos = GetTargetPosition(item);
 		
-			item.ItemFlags[5] = g_Level.Items[item.ItemFlags[1]].Index;
+			item.ItemFlags[5] = g_Level.Items[item.ItemFlags[2]].Index;
 		}
 
-			if (item.ItemFlags[1] != TargetType::None)
+			if (item.ItemFlags[2] != TargetType::None)
 			{
 				SpawnElectricBallLightning(item, targetPos.ToVector3(), ElectricBallBite);	
 			}
 			else 
 			{
 				item.Model.Color = EldectricBallData.Colorw;
-				item.ItemFlags[1] = TargetType::None;
+				item.ItemFlags[2] = TargetType::None;
 			}
 
 		if (item.ItemFlags[3] > 0)
