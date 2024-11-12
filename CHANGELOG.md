@@ -25,6 +25,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added fast savegame reloading.
 * Added ricochet sounds and make the effect more prominent.
 * Automatically generate title level, if one is missing.
+* Allow more than 1024 objects in a level.
 
 ### Lua API changes
 
