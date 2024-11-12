@@ -34,6 +34,8 @@ namespace TEN::Renderer
 	{
 		_shadowLight = nullptr;
 
+		_items.resize(0);
+		_effects.resize(0);
 		_moveableObjects.resize(0);
 		_staticObjects.resize(0);
 		_sprites.resize(0);
@@ -48,15 +50,6 @@ namespace TEN::Renderer
 		for (auto& mesh : _meshes)
 			delete mesh;
 		_meshes.resize(0);
-
-		for (auto& item : _items)
-		{
-			item.DisableInterpolation = true;
-			item.PrevRoomNumber = NO_VALUE;
-			item.RoomNumber = NO_VALUE;
-			item.ItemNumber = NO_VALUE;
-			item.LightsToDraw.clear();
-		}
 	}
 
 	void Renderer::Lock()

@@ -131,11 +131,11 @@ namespace TEN::Renderer
 		_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
 		_triangles3DToDraw = createVector<RendererTriangle3D>(MAX_TRIANGLES_3D);
 
-		for (int i = 0; i < ITEM_COUNT_MAX; i++)
-		{
-			_items[i].LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
-			_effects[i].LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
-		}
+		for (auto& item : _items)
+			item.LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
+
+		for (auto& effect : _effects)
+			effect.LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 
 		D3D11_BLEND_DESC blendStateDesc{};
 		blendStateDesc.AlphaToCoverageEnable = false;

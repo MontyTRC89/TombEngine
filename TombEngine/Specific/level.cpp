@@ -214,7 +214,7 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	InitializeItemArray(ITEM_COUNT_MAX);
+	InitializeItemArray(g_Level.NumItems + MAX_SPAWNED_ITEM_COUNT);
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
