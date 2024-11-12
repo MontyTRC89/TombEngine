@@ -1123,6 +1123,7 @@ void LoadEvent(EventSet& eventSet)
 	evt.Function = ReadString();
 	evt.Data = ReadString();
 	evt.CallCounter = ReadInt32();
+	evt.Enabled = ReadBool();
 }
 
 void LoadEventSets()
