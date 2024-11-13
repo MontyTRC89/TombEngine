@@ -67,7 +67,7 @@ namespace TEN::Entities::Traps
 		spark->flags = SP_SCALE | SP_DEF;
 		spark->scalar = 3;
 		spark->maxYvel = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE_LIGHT;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_LIGHT;
 		spark->gravity = 0;
 		spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 	}
@@ -80,7 +80,7 @@ namespace TEN::Entities::Traps
 
 		smoke.on = true;
 		smoke.blendMode = BlendMode::Additive;
-		smoke.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE_LIGHT;// SPR_LENSFLARE_LIGHT;
+		smoke.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_LIGHT;// SPR_LENSFLARE_LIGHT;
 
 		smoke.x = pos.x;
 		smoke.y = pos.y;
