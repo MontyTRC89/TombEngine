@@ -137,8 +137,8 @@ struct RoomData
 
 	Vector3i	Position	 = Vector3i::Zero;
 	BoundingBox Aabb		 = BoundingBox();
-	int			BottomHeight = 0;
-	int			TopHeight	 = 0;
+	int			BottomHeight = 0; // Deprecated. Can derive from AABB instead.
+	int			TopHeight	 = 0; // Deprecated. Can derive from AABB instead.
 	int			XSize		 = 0;
 	int			ZSize		 = 0;
 
