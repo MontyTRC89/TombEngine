@@ -38,6 +38,10 @@ namespace TEN::Entities::Generic
 		// TODO: Uncomment when attractors are complete.
 		//const AttractorObject& GetAttractor() const;
 
+		// Inquirers
+
+		bool IsEnabled() const;
+
 		// Utilities
 
 		void Initialize(const ItemInfo& item);
@@ -50,7 +54,6 @@ namespace TEN::Entities::Generic
 
 		void InitializeCollisionMesh(const ItemInfo& item);
 		void InitializeAttractor(const ItemInfo& item);
-		void InitializeBridgeCollision(const ItemInfo& item);
 
 		void UpdateCollisionMesh(const ItemInfo& item);
 		void UpdateAttractor(const ItemInfo& item);

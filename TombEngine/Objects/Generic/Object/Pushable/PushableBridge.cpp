@@ -101,13 +101,4 @@ namespace TEN::Entities::Generic
 			bridge.Disable(pushableItem);
 		}
 	}
-
-	void UpdatePushableBridge(ItemInfo& pushableItem)
-	{
-		const auto& pushable = GetPushableInfo(pushableItem);
-		auto& bridge = GetBridgeObject(pushableItem);
-
-		if (pushable.UseRoomCollision && pushable.Bridge.has_value())
-			bridge.Update(pushableItem);
-	}
 }

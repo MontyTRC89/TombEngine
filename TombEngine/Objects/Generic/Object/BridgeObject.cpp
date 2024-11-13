@@ -28,14 +28,23 @@ namespace TEN::Entities::Generic
 		return _attractor;
 	}*/
 
+	bool BridgeObject::IsEnabled() const
+	{
+		return _isEnabled;
+	}
+
 	void BridgeObject::Initialize(const ItemInfo& item)
 	{
 		_isEnabled = true;
 
 		InitializeCollisionMesh(item);
 		InitializeAttractor(item);
-		InitializeBridgeCollision(item);
-		
+		AssignSectors(item);
+
+		// Insert into room bridge tree.
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		room.Bridges.Insert(item.Index, item.GetAabb());
+
 		// Store previous parameters.
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
@@ -61,6 +70,20 @@ namespace TEN::Entities::Generic
 		UpdateAttractor(item);
 		UpdateBridgeCollision(item);
 
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
+
+		// Update room bridge trees.
+		if (item.Pose != _prevPose && item.RoomNumber == _prevRoomNumber)
+		{
+			room.Bridges.Move(item.Index, item.GetAabb());
+		}
+		else if (item.RoomNumber != _prevRoomNumber)
+		{
+			room.Bridges.Insert(item.Index, item.GetAabb());
+			prevRoom.Bridges.Remove(item.Index);
+		}
+
 		// Store previous parameters.
 		_prevPose = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
@@ -74,7 +97,11 @@ namespace TEN::Entities::Generic
 
 		UpdateCollisionMesh(item);
 		InitializeAttractor(item);
-		InitializeBridgeCollision(item);
+		AssignSectors(item);
+
+		// Insert into room bridge tree.
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		room.Bridges.Insert(item.Index, item.GetAabb());
 
 		// Store previous parameters.
 		_prevPose = item.Pose;
@@ -157,15 +184,6 @@ namespace TEN::Entities::Generic
 		// TODO: Implement when attractors are complete.
 	}
 
-	void BridgeObject::InitializeBridgeCollision(const ItemInfo& item)
-	{
-		AssignSectors(item);
-
-		// Insert into room bridge tree.
-		auto& room = g_Level.Rooms[item.RoomNumber];
-		room.Bridges.Insert(item.Index, item.GetAabb());
-	}
-
 	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
 	{
 		// TODO: Also update proportions based on AABB animation?
@@ -185,20 +203,6 @@ namespace TEN::Entities::Generic
 	{
 		DeassignSectors(item);
 		AssignSectors(item);
-
-		auto& room = g_Level.Rooms[item.RoomNumber];
-		auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
-
-		// Update room bridge trees.
-		if (item.Pose != _prevPose && item.RoomNumber == _prevRoomNumber)
-		{
-			room.Bridges.Move(item.Index, item.GetAabb());
-		}
-		else if (item.RoomNumber != _prevRoomNumber)
-		{
-			room.Bridges.Insert(item.Index, item.GetAabb());
-			prevRoom.Bridges.Remove(item.Index);
-		}
 	}
 
 	void BridgeObject::AssignSectors(const ItemInfo& item)

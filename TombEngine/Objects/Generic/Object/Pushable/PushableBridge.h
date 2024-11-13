@@ -13,5 +13,4 @@ namespace TEN::Entities::Generic
 	void EnablePushableBridge(ItemInfo& pushableItem);
 	void EnablePushableStackBridge(ItemInfo& pushableItem, bool addBridge);
 	void DisablePushableBridge(ItemInfo& pushableItem);
-	void UpdatePushableBridge(ItemInfo& pushableItem);
 }

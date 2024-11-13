@@ -34,15 +34,22 @@ namespace TEN::Entities::Generic
 		if (pushable.UseRoomCollision)
 		{
 			// @BRIDGEME
-			// HACK: Temporarily disable bridge before probing.
+			// HACK: Track if bridge was disabled by behaviour state.
+			bool isEnabled = false;
 			if (pushable.Bridge.has_value())
+				isEnabled = pushable.Bridge->IsEnabled();
+
+			// @BRIDGEME
+			// HACK: Temporarily disable bridge before probing.
+			if (isEnabled && pushable.Bridge.has_value())
 				pushable.Bridge->Disable(pushableItem);
 
 			pointColl = GetPointCollision(pushableItem);
 			pointColl.GetFloorHeight();
 
+			// @BRIDGEME
 			// HACK: Reenable bridge after probing.
-			if (pushable.Bridge.has_value())
+			if (isEnabled && pushable.Bridge.has_value())
 				pushable.Bridge->Enable(pushableItem);
 		}
 
@@ -316,8 +323,14 @@ namespace TEN::Entities::Generic
 		if (pushable.UseBridgeCollision)
 		{
 			// @BRIDGEME
-			// HACK: Temporarily disable bridge before probing.
+			// HACK: Track if bridge was disabled by behaviour state.
+			bool isEnabled = false;
 			if (pushable.Bridge.has_value())
+				isEnabled = pushable.Bridge->IsEnabled();
+
+			// @BRIDGEME
+			// HACK: Temporarily disable bridge before probing.
+			if (isEnabled && pushable.Bridge.has_value())
 				pushable.Bridge->Disable(item);
 
 			pointColl = GetPointCollision(item);
@@ -329,8 +342,9 @@ namespace TEN::Entities::Generic
 			pushableColl.FloorHeight = pointColl.GetFloorHeight();
 			pushableColl.CeilingHeight = pointColl.GetCeilingHeight();
 
+			// @BRIDGEME
 			// HACK: Reenable bridge after probing.
-			if (pushable.Bridge.has_value())
+			if (isEnabled && pushable.Bridge.has_value())
 				pushable.Bridge->Enable(item);
 		}
 		else

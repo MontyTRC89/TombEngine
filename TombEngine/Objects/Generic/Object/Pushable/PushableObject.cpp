@@ -116,15 +116,21 @@ namespace TEN::Entities::Generic
 		HandlePushableSoundState(pushableItem);
 
 		// @BRIDGEME
-		// HACK: Temporarily disable bridge before probing.
+		// HACK: Track if bridge was disabled by behaviour state.
+		bool isEnabled = false;
 		if (pushable.Bridge.has_value())
+			isEnabled = pushable.Bridge->IsEnabled();
+
+		// @BRIDGEME
+		// HACK: Temporarily disable bridge before probing.
+		if (isEnabled && pushable.Bridge.has_value())
 			pushable.Bridge->Disable(pushableItem);
 
 		int probeRoomNumber = GetPointCollision(pushableItem).GetRoomNumber();
 
 		// @BRIDGEME
 		// HACK: Reenable bridge after probing.
-		if (pushable.Bridge.has_value())
+		if (isEnabled && pushable.Bridge.has_value())
 			pushable.Bridge->Enable(pushableItem);
 
 		// Update room number.

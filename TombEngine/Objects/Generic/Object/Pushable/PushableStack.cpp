@@ -34,16 +34,16 @@ namespace TEN::Entities::Generic
 
 		// 2) Prepare data to create several lists per each stack group (one for each XZ and ground floor height).
 		// PROBLEM: Missing hash function in Vector3i, creating custom version Vector3iHasher at the top of this source code.
-		std::unordered_map<Vector3i, std::vector<int>, Vector3iHasher> stackGroups; // stack Position - pushable itemNumber  
+		auto stackGroups = std::unordered_map<Vector3i, std::vector<int>, Vector3iHasher>{}; // stack Position - pushable itemNumber  
 
 		// 3) Iterate through the pushables list, to put them in their different stack groups. According to their XZ and ground floor height).
-		//Extra, I moved also the .Data initialization here, to can store data in all the pushables objects (even the ones not initialized yet).
+		// Extra, I moved also the .Data initialization here, to can store data in all the pushables objects (even the ones not initialized yet).
 		for (int itemNumber : pushableItemNumbers)
 		{
 			auto& pushableItem = g_Level.Items[itemNumber];
 			pushableItem.Data = PushableInfo();
 
-			// @BRIDGEME What???
+			// @BRIDGEME
 			// Initialize bridge routines.
 			auto& pushable = GetPushableInfo(pushableItem);
 			if (pushable.Bridge.has_value())
