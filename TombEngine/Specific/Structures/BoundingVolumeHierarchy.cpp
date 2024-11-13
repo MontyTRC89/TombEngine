@@ -87,6 +87,14 @@ namespace TEN::Structures
 
 	void BoundingVolumeHierarchy::Insert(int objectID, const BoundingBox& aabb, float boundary)
 	{
+		// FAILSAFE: Find leaf containing object ID.
+		auto it = _leafIDMap.find(objectID);
+		if (it != _leafIDMap.end())
+		{
+			TENLog("BVH: Attempted to insert leaf with existing object ID " + std::to_string(objectID) + ".", LogLevel::Warning, LogConfig::All, true);
+			return;
+		}
+
 		// Allocate new leaf.
 		int leafID = GetNewNodeID();
 		auto& leaf = _nodes[leafID];
@@ -106,7 +114,7 @@ namespace TEN::Structures
 		auto it = _leafIDMap.find(objectID);
 		if (it == _leafIDMap.end())
 		{
-			TENLog("BVH: Attempted to move missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
+			TENLog("BVH: Attempted to move missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning, LogConfig::All, true);
 			return;
 		}
 
@@ -140,7 +148,7 @@ namespace TEN::Structures
 		auto it = _leafIDMap.find(objectID);
 		if (it == _leafIDMap.end())
 		{
-			TENLog("BVH: Attempted to remove missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning);
+			TENLog("BVH: Attempted to remove missing leaf with object ID " + std::to_string(objectID) + ".", LogLevel::Warning, LogConfig::All, true);
 			return;
 		}
 
