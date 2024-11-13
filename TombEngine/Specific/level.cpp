@@ -676,8 +676,8 @@ static Plane ConvertFakePlaneToPlane(const Vector3& fakePlane, bool isFloor)
 
 void ReadRooms()
 {
-	constexpr auto SECTOR_BOX_CENTER_OFFSET = Vector3(BLOCK(0.5f), 0.0f, BLOCK(0.5f));
-	constexpr auto SECTOR_BOX_EXTENTS		= Vector3(BLOCK(0.5f), BLOCK(4096), BLOCK(0.5f));
+	constexpr auto SECTOR_AABB_CENTER_OFFSET = Vector3(BLOCK(0.5f), 0.0f, BLOCK(0.5f));
+	constexpr auto SECTOR_AABB_EXTENTS_BASE	= Vector3(BLOCK(0.5f), 0.0f, BLOCK(0.5f));
 
 	int roomCount = ReadInt32();
 	TENLog("Rooms: " + std::to_string(roomCount), LogLevel::Info);
@@ -806,6 +806,13 @@ void ReadRooms()
 		room.XSize = ReadInt32();
 		auto roomPos = Vector2i(room.Position.x, room.Position.z);
 
+		auto center = Vector3(
+			room.Position.x + (BLOCK(room.XSize) / 2),
+			room.BottomHeight + (room.TopHeight - room.BottomHeight) / 2,
+			room.Position.z + (BLOCK(room.ZSize) / 2));
+		auto extents = Vector3((BLOCK(room.XSize) / 2) - BLOCK(1), (room.BottomHeight - room.TopHeight) / 2, (BLOCK(room.ZSize) / 2) - BLOCK(1));
+		room.Aabb = BoundingBox(center, extents);
+
 		room.Sectors.reserve(room.XSize * room.ZSize);
 		for (int x = 0; x < room.XSize; x++)
 		{
@@ -816,7 +823,10 @@ void ReadRooms()
 				sector.ID = (x * room.ZSize) + z;
 				sector.Position = roomPos + Vector2i(BLOCK(x), BLOCK(z));
 				sector.RoomNumber = i;
-				sector.Aabb = BoundingBox(Vector3(sector.Position.x, 0.0f, sector.Position.y) + SECTOR_BOX_CENTER_OFFSET, SECTOR_BOX_EXTENTS);
+
+				auto center = Vector3(sector.Position.x, room.Aabb.Center.y, sector.Position.y) + SECTOR_AABB_CENTER_OFFSET;
+				auto extents = Vector3(SECTOR_AABB_EXTENTS_BASE.x, room.Aabb.Extents.y, SECTOR_AABB_EXTENTS_BASE.z);
+				sector.Aabb = BoundingBox(center, extents);
 
 				sector.TriggerIndex = ReadInt32();
 				sector.PathfindingBoxID = ReadInt32();

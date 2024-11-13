@@ -903,8 +903,11 @@ namespace TEN::Collision::Floordata
 					DrawSectorFlagLabel(pos, std::to_string(bridgeItemNumber), BRIDGE_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
-				DrawSectorFlagLabel(pos, "Bridges", BRIDGE_COLOR, verticalOffset);
-				verticalOffset += STRING_SPACING;
+				if (!pointColl.GetSector().BridgeItemNumbers.empty())
+				{
+					DrawSectorFlagLabel(pos, "Bridges", BRIDGE_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
 			}
 		}
 	}

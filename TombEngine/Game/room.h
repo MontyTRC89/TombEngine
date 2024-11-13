@@ -135,11 +135,12 @@ struct RoomData
 	std::string				 Name		= {};
 	std::vector<std::string> Tags		= {};
 
-	Vector3i Position	  = Vector3i::Zero;
-	int		 BottomHeight = 0;
-	int		 TopHeight	  = 0;
-	int		 XSize		  = 0;
-	int		 ZSize		  = 0;
+	Vector3i	Position	 = Vector3i::Zero;
+	BoundingBox Aabb		 = BoundingBox();
+	int			BottomHeight = 0;
+	int			TopHeight	 = 0;
+	int			XSize		 = 0;
+	int			ZSize		 = 0;
 
 	Vector3 ambient;
 	int flags;

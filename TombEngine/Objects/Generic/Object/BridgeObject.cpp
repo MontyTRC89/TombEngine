@@ -216,8 +216,6 @@ namespace TEN::Entities::Generic
 		auto sectors = GetNeighborSectors(item.Pose.Position, item.RoomNumber, searchDepth);
 		for (auto* sector : sectors)
 		{
-			// TODO: Could be more efficient to additionally check for bridge AABB collision with room's AABB.
-			
 			// Test if AABB intersects sector.
 			if (!aabb.Intersects(sector->Aabb))
 				continue;
@@ -237,8 +235,6 @@ namespace TEN::Entities::Generic
 		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);
 		for (auto* sector : sectors)
 		{
-			// TODO: Could be more efficient to additionally check for bridge AABB collision with room's AABB.
-			
 			// Test if previous AABB intersects sector.
 			if (!_prevAabb.Intersects(sector->Aabb))
 				continue;
