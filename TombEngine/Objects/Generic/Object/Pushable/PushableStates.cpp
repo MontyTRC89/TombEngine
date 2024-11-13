@@ -66,7 +66,8 @@ namespace TEN::Entities::Generic
 				StartMovePushableStack(pushableItem.Index);
 
 				ResetPlayerFlex(LaraItem);
-				
+
+				// @BRIDGEME
 				DisablePushableBridge(pushableItem);
 			}
 			else if (playerItem.Animation.ActiveState != LS_PUSHABLE_GRAB &&
@@ -130,7 +131,8 @@ namespace TEN::Entities::Generic
 			{
 				pushable.BehaviorState = PushableBehaviourState::Fall;
 				SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
-
+				
+				// @BRIDGEME
 				DisablePushableBridge(pushableItem);
 			}
 			else
@@ -144,7 +146,7 @@ namespace TEN::Entities::Generic
 			break;
 
 		case PushableEnvironmentType::Water:
-			
+			// @BRIDGEME
 			DisablePushableBridge(pushableItem);
 
 			SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
@@ -319,7 +321,8 @@ namespace TEN::Entities::Generic
 
 					// Set upper pushables back to normal(?).
 					StopMovePushableStack(pushableItem.Index);
-					
+
+					// @BRIDGEME
 					EnablePushableBridge(pushableItem);
 
 					// Connect to another stack.
@@ -338,12 +341,15 @@ namespace TEN::Entities::Generic
 					movementDir.Normalize();
 					playerItem.Pose.Position = playerItem.Pose.Position + movementDir * BLOCK(1);
 
+					// @BRIDGEME
 					DisablePushableBridge(pushableItem);
 				}
 				else
 				{
+					// @BRIDGEME
 					DisablePushableBridge(pushableItem);
 				}
+
 				break;
 
 			case PushableEnvironmentType::Air:
@@ -485,6 +491,7 @@ namespace TEN::Entities::Generic
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 				pushable.BehaviorState = PushableBehaviourState::Idle;
 
+				// @BRIDGEME
 				EnablePushableBridge(pushableItem);
 				break;
 
@@ -551,8 +558,8 @@ namespace TEN::Entities::Generic
 			pushableItem.Pose.Position.y = pushableColl.FloorHeight;
 			pushable.BehaviorState = PushableBehaviourState::Idle;
 
+			// @BRIDGEME
 			EnablePushableBridge(pushableItem);
-
 			break;
 
 		case PushableEnvironmentType::SlopedFloor:
@@ -643,7 +650,8 @@ namespace TEN::Entities::Generic
 				pushableItem.Animation.Velocity.y = 0.0f;
 				pushable.BehaviorState = PushableBehaviourState::UnderwaterIdle;
 				pushable.Gravity = PUSHABLE_GRAVITY_WATER;
-				
+
+				// @BRIDGEME
 				EnablePushableBridge(pushableItem);
 
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
@@ -684,7 +692,6 @@ namespace TEN::Entities::Generic
 
 		case PushableEnvironmentType::Water:
 		case PushableEnvironmentType::WaterFloor:
-
 			// Determine target height.
 			if (pushable.WaterSurfaceHeight == NO_HEIGHT)
 			{
@@ -721,7 +728,8 @@ namespace TEN::Entities::Generic
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 				pushable.BehaviorState = PushableBehaviourState::WaterSurfaceIdle;
 				pushable.Gravity = PUSHABLE_GRAVITY_WATER;
-				
+
+				// @BRIDGEME
 				EnablePushableBridge(pushableItem);
 			}
 
@@ -833,6 +841,7 @@ namespace TEN::Entities::Generic
 			pushable.BehaviorState = PushableBehaviourState::Fall;
 			pushable.Gravity = PUSHABLE_GRAVITY_AIR;
 
+			// @BRIDGEME
 			DisablePushableBridge(pushableItem);
 			break;
 
@@ -860,7 +869,7 @@ namespace TEN::Entities::Generic
 			pushableItem.Pose.Position.y = pushableColl.FloorHeight;
 			pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
 		}
-		break;
+			break;
 
 		default:
 			TENLog("Error handling pushable collision in water surface state for pushable item " + std::to_string(pushableItem.Index), LogLevel::Warning, LogConfig::All, false);

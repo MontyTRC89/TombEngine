@@ -70,6 +70,8 @@ namespace TEN::Entities::Generic
 		bridge.GetCeilingHeight = GetRaisingBlockCeilingHeight;
 		bridge.GetFloorBorder = GetRaisingBlockFloorBorder;
 		bridge.GetCeilingBorder = GetRaisingBlockCeilingBorder;
+
+		// @BRIDGEME
 		bridge.Initialize(*item);
 
 		short roomNumber = item->RoomNumber;
@@ -111,6 +113,7 @@ namespace TEN::Entities::Generic
 		auto* item = &g_Level.Items[itemNumber];
 		auto& bridge = GetBridgeObject(*item);
 
+		// @BRIDGEME
 		bridge.Update(*item);
 
 		if (TriggerActive(item))

@@ -45,8 +45,14 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::Update(const ItemInfo& item)
 	{
-		if (!_isEnabled || item.Flags & IFLAG_KILLED)
+		if (!_isEnabled)
 			return;
+
+		if (item.Flags & IFLAG_KILLED)
+		{
+			Disable(item);
+			return;
+		}
 
 		if (item.Pose == _prevPose && item.RoomNumber == _prevRoomNumber)
 			return;
@@ -64,9 +70,6 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::Enable(const ItemInfo& item)
 	{
-		if (item.Flags & IFLAG_KILLED)
-			return;
-
 		_isEnabled = true;
 
 		UpdateCollisionMesh(item);
@@ -82,12 +85,9 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::Disable(const ItemInfo& item)
 	{
-		if (item.Flags & IFLAG_KILLED)
-			return;
-
 		_isEnabled = false;
 
-		// Destroy attractor here. Maybe contain in std::optional?
+		// TODO: Also destroy attractor here when they're ready. Maybe contain in std::optional?
 		DeassignSectors(item);
 
 		// Remove from room bridge tree.

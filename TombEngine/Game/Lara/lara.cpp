@@ -457,7 +457,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			{
 				const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 
-				neighborRoom.CollisionMesh.DrawDebug();
+				//neighborRoom.CollisionMesh.DrawDebug();
+
 				for (int bridgeItemNumber : neighborRoom.Bridges.GetIds())
 					bridgeItemNumbers.insert(bridgeItemNumber);
 			}

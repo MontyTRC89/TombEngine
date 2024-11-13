@@ -52,7 +52,7 @@ namespace TEN::Entities::Generic
 		return item.Pose.Position.y;
 	}
 
-	void EnablePushableBridge (ItemInfo& pushableItem)
+	void EnablePushableBridge(ItemInfo& pushableItem)
 	{
 		auto& pushable = GetPushableInfo(pushableItem);
 
@@ -67,25 +67,24 @@ namespace TEN::Entities::Generic
 
 	void AddPushableStackBridge(ItemInfo& pushableItem, bool addBridge)
 	{
-		auto* pushableItemPtr = &g_Level.Items[pushableItem.Index];
-		const auto* pushablePtr = &GetPushableInfo(*pushableItemPtr);
+		auto* currentPushableItem = &g_Level.Items[pushableItem.Index];
+		auto* currentPushable = &GetPushableInfo(*currentPushableItem);
 
-		// NOTE: Can't have stacked items on bridge.
-		if (!pushablePtr->UseRoomCollision)
+		// NOTE: Can't stack pushable object on pushable bridge.
+		if (!currentPushable->UseRoomCollision)
 			return;
 
-		// @BRIDGEME
-		//if (pushablePtr->UseBridgeCollision)
-		//	addBridge ? AddBridge(pushableItem.Index) : RemoveBridge(pushableItem.Index);
+		if (currentPushable->UseBridgeCollision)
+			addBridge ? currentPushable->Bridge.Enable(pushableItem) : currentPushable->Bridge.Disable(pushableItem);
 		
-		while (pushablePtr->Stack.ItemNumberAbove != NO_VALUE)
+		while (currentPushable->Stack.ItemNumberAbove != NO_VALUE)
 		{
-			pushableItemPtr = &g_Level.Items[pushablePtr->Stack.ItemNumberAbove];
-			pushablePtr = &GetPushableInfo(*pushableItemPtr);
+			currentPushableItem = &g_Level.Items[currentPushable->Stack.ItemNumberAbove];
+			currentPushable = &GetPushableInfo(*currentPushableItem);
 
 			// @BRIDGEME
-			//if (pushablePtr->UseBridgeCollision)
-			//	addBridge ? AddBridge(pushableItemPtr->Index) : RemoveBridge(pushableItemPtr->Index);
+			if (currentPushable->UseBridgeCollision)
+				addBridge ? currentPushable->Bridge.Enable(*currentPushableItem) : currentPushable->Bridge.Disable(*currentPushableItem);
 		}
 	}
 
@@ -95,7 +94,6 @@ namespace TEN::Entities::Generic
 
 		if (pushable.UseRoomCollision)
 		{
-			// @BRIDGEME
 			auto& bridge = GetBridgeObject(pushableItem);
 			bridge.Disable(pushableItem);
 

@@ -263,11 +263,10 @@ namespace TEN::Entities::Generic
 			auto& currentPushableItem = g_Level.Items[currentItemNumber];
 			auto& currentPushable = GetPushableInfo(currentPushableItem);
 
-			// Deactivate collision.
 			// @BRIDGEME
-			// TODO: with new bridge, it may require new methods.
-			//if (currentPushable.UseRoomCollision)
-				//RemovePushableBridge(currentPushableItem);
+			// Deactivate collision.
+			if (currentPushable.UseRoomCollision)
+				currentPushable.Bridge.Disable(currentPushableItem);
 
 			currentPushable.BehaviorState = PushableBehaviourState::MoveStackHorizontal;
 
@@ -288,12 +287,10 @@ namespace TEN::Entities::Generic
 
 			currentPushableItem.Pose.Position = GetNearestSectorCenter(currentPushableItem.Pose.Position);
 
-			// Activate collision.
-
 			// @BRIDGEME
-			// TODO: with new bridge, it may require a new methods.
-			//if (currentPushable.UseRoomCollision)
-				//AddPushableBridge(currentPushableItem);
+			// Activate collision.
+			if (currentPushable.UseRoomCollision)
+				currentPushable.Bridge.Enable(currentPushableItem);
 
 			currentPushable.BehaviorState = PushableBehaviourState::Idle;
 
