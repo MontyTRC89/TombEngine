@@ -56,12 +56,12 @@ namespace TEN::Entities::Generic
 	{
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (pushable.UseRoomCollision)
+		if (pushable.UseRoomCollision && pushable.Bridge.has_value())
 		{
+			pushable.UseBridgeCollision = true;
+
 			auto& bridge = GetBridgeObject(pushableItem);
 			bridge.Enable(pushableItem);
-
-			pushable.UseBridgeCollision = true;
 		}
 	}
 
@@ -93,12 +93,12 @@ namespace TEN::Entities::Generic
 	{
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (pushable.UseRoomCollision)
+		if (pushable.UseRoomCollision && pushable.Bridge.has_value())
 		{
+			pushable.UseBridgeCollision = false;
+
 			auto& bridge = GetBridgeObject(pushableItem);
 			bridge.Disable(pushableItem);
-
-			pushable.UseBridgeCollision = false;
 		}
 	}
 
@@ -107,7 +107,7 @@ namespace TEN::Entities::Generic
 		const auto& pushable = GetPushableInfo(pushableItem);
 		auto& bridge = GetBridgeObject(pushableItem);
 
-		if (pushable.UseRoomCollision)
+		if (pushable.UseRoomCollision && pushable.Bridge.has_value())
 			bridge.Update(pushableItem);
 	}
 }
