@@ -50,7 +50,7 @@ namespace TEN::Structures
 			return {};
 
 		// Return object IDs from cell.
-		const auto& cell = it->second;
+		const auto& [keyPos, cell] = *it;
 		return cell.ObjectIds;
 	}
 
@@ -72,7 +72,7 @@ namespace TEN::Structures
 				continue;
 
 			// Collect object IDs from cell.
-			const auto& cell = it->second;
+			const auto& [keyPos, cell] = *it;
 			objectIds.insert(cell.ObjectIds.begin(), cell.ObjectIds.end());
 		}
 
@@ -97,7 +97,7 @@ namespace TEN::Structures
 				continue;
 
 			// Collect object IDs from cell.
-			const auto& cell = it->second;
+			const auto& [keyPos, cell] = *it;
 			objectIds.insert(cell.ObjectIds.begin(), cell.ObjectIds.end());
 		}
 
@@ -122,7 +122,7 @@ namespace TEN::Structures
 				continue;
 
 			// Collect object IDs from cell.
-			const auto& cell = it->second;
+			const auto& [keyPos, cell] = *it;
 			objectIds.insert(cell.ObjectIds.begin(), cell.ObjectIds.end());
 		}
 
@@ -147,7 +147,7 @@ namespace TEN::Structures
 				continue;
 
 			// Collect object IDs from cell.
-			const auto& cell = it->second;
+			const auto& [keyPos, cell] = *it;
 			objectIds.insert(cell.ObjectIds.begin(), cell.ObjectIds.end());
 		}
 
@@ -420,7 +420,7 @@ namespace TEN::Structures
 				continue;
 
 			// Remove object ID from cell.
-			auto& cell = it->second;
+			auto& [keyPos, cell] = *it;
 			cell.ObjectIds.erase(objectID);
 
 			// Remove cell if empty.

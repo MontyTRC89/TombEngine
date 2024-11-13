@@ -119,7 +119,7 @@ namespace TEN::Structures
 		}
 
 		// Get leaf.
-		int leafID = it->second;
+		const auto& [keyObjectID, leafID] = *it;
 		auto& leaf = _nodes[leafID];
 
 		// Test if object AABB is inside node AABB.
@@ -153,7 +153,7 @@ namespace TEN::Structures
 		}
 
 		// Remove leaf.
-		int leafID = it->second;
+		const auto& [key, leafID] = *it;
 		RemoveLeaf(leafID);
 	}
 

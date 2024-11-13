@@ -19,7 +19,7 @@ namespace TEN::Structures
 
 		// Members
 
-		std::unordered_map<Vector3i, Cell> _cellMap = {};
+		std::unordered_map<Vector3i, Cell> _cellMap = {}; // Key = position, value = cell.
 
 		float	_cellSize		 = 0.0f;
 		Vector3 _cellAabbExtents = Vector3::Zero;
