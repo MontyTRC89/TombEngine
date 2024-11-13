@@ -65,7 +65,7 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void AddPushableStackBridge(ItemInfo& pushableItem, bool addBridge)
+	void EnablePushableStackBridge(ItemInfo& pushableItem, bool addBridge)
 	{
 		auto* currentPushableItem = &g_Level.Items[pushableItem.Index];
 		auto* currentPushable = &GetPushableInfo(*currentPushableItem);
@@ -74,8 +74,9 @@ namespace TEN::Entities::Generic
 		if (!currentPushable->UseRoomCollision)
 			return;
 
-		if (currentPushable->UseBridgeCollision)
-			addBridge ? currentPushable->Bridge.Enable(pushableItem) : currentPushable->Bridge.Disable(pushableItem);
+		// @BRIDGEME
+		if (currentPushable->UseBridgeCollision && currentPushable->Bridge.has_value())
+			addBridge ? currentPushable->Bridge->Enable(pushableItem) : currentPushable->Bridge->Disable(pushableItem);
 		
 		while (currentPushable->Stack.ItemNumberAbove != NO_VALUE)
 		{
@@ -83,8 +84,8 @@ namespace TEN::Entities::Generic
 			currentPushable = &GetPushableInfo(*currentPushableItem);
 
 			// @BRIDGEME
-			if (currentPushable->UseBridgeCollision)
-				addBridge ? currentPushable->Bridge.Enable(*currentPushableItem) : currentPushable->Bridge.Disable(*currentPushableItem);
+			if (currentPushable->UseBridgeCollision && currentPushable->Bridge.has_value())
+				addBridge ? currentPushable->Bridge->Enable(*currentPushableItem) : currentPushable->Bridge->Disable(*currentPushableItem);
 		}
 	}
 

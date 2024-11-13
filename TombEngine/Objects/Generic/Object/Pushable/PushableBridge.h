@@ -11,7 +11,7 @@ namespace TEN::Entities::Generic
 	int GetPushableBridgeCeilingBorder(const ItemInfo& item);
 
 	void EnablePushableBridge(ItemInfo& pushableItem);
-	void AddPushableStackBridge(ItemInfo& pushableItem, bool addBridge);
+	void EnablePushableStackBridge(ItemInfo& pushableItem, bool addBridge);
 	void DisablePushableBridge(ItemInfo& pushableItem);
 	void UpdatePushableBridge(ItemInfo& pushableItem);
 }

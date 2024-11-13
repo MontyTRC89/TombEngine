@@ -51,12 +51,6 @@ namespace TEN::Entities::Generic
 		UseRoomCollision = false;
 		UseBridgeCollision = false;
 
-		// Initialize bridge routines.
-		Bridge.GetFloorHeight = GetPushableBridgeFloorHeight;
-		Bridge.GetCeilingHeight = GetPushableBridgeCeilingHeight;
-		Bridge.GetFloorBorder = GetPushableBridgeFloorBorder;
-		Bridge.GetCeilingBorder = GetPushableBridgeCeilingBorder;
-
 		EdgeAttribs =
 		{
 			{ CardinalDirection::NORTH, PushableEdgeAttribs() },

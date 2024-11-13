@@ -56,7 +56,7 @@ namespace TEN::Entities::Generic
 		bool UseBridgeCollision = false;
 		std::map<int, PushableEdgeAttribs> EdgeAttribs = {};
 
-		BridgeObject Bridge = {};
+		std::optional<BridgeObject> Bridge = std::nullopt;
 
 		PushableInfo();
 	};
