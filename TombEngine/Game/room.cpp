@@ -787,16 +787,7 @@ int FindRoomNumber(const Vector3i& pos, int startRoomNumber, bool onlyNeighbors)
 Vector3i GetRoomCenter(int roomNumber)
 {
 	const auto& room = g_Level.Rooms[roomNumber];
-
-	int halfLength = BLOCK(room.XSize) / 2;
-	int halfDepth = BLOCK(room.ZSize) / 2;
-	int halfHeight = (room.TopHeight - room.BottomHeight) / 2;
-
-	// Calculate and return center.
-	return Vector3i(
-		room.Position.x + halfLength,
-		room.BottomHeight + halfHeight,
-		room.Position.z + halfDepth);
+	return Vector3i(room.Aabb.Center);
 }
 
 std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth)
