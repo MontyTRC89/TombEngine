@@ -127,17 +127,6 @@ namespace TEN::Effects::WaterfallEmitter
 
 		auto& part = *GetFreeParticle();
 
-		short angle = pos.y; // TODO: Not an angle, how does it work?
-
-		// TODO: Matrix math.
-		float cos = phd_cos(angle);
-		float sin = phd_sin(angle);
-
-		int maxPosX = sin + pos.x;
-		int maxPosZ = cos + pos.z;
-		int minPosX = sin + pos.x;
-		int minPosZ = cos + pos.z;
-
 		auto colorOffset = Color(40.0f, 40.0f, 40.0f); // make constant. Color is Vector 4. 4th value should not be changed.
 
 		auto startColor = (color + colorOffset);
@@ -148,9 +137,9 @@ namespace TEN::Effects::WaterfallEmitter
 
 		part.on = true;
 
-		part.x = cos * Random::GenerateInt(-12, 12) + pos.x;
+		part.x = Random::GenerateInt(-12, 12) + pos.x;
 		part.y = Random::GenerateInt(0, 16) + pos.y - 8;
-		part.z = sin * Random::GenerateInt(-12, 12) + pos.z;
+		part.z = Random::GenerateInt(-12, 12) + pos.z;
 		part.roomNumber = roomNumber;
 
 		// TODO: Generate normal color representation, then convert to legacy.
