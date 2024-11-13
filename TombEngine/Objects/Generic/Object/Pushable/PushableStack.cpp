@@ -279,7 +279,7 @@ namespace TEN::Entities::Generic
 			if (currentPushable.UseRoomCollision && currentPushable.Bridge.has_value())
 				currentPushable.Bridge->Disable(currentPushableItem);
 
-			currentPushable.BehaviorState = PushableBehaviourState::MoveStackHorizontal;
+			currentPushable.BehaviorState = PushableBehaviorState::MoveStackHorizontal;
 
 			currentItemNumber = currentPushable.Stack.ItemNumberAbove;
 		}
@@ -303,7 +303,7 @@ namespace TEN::Entities::Generic
 			if (currentPushable.UseRoomCollision && currentPushable.Bridge.has_value())
 				currentPushable.Bridge->Enable(currentPushableItem);
 
-			currentPushable.BehaviorState = PushableBehaviourState::Idle;
+			currentPushable.BehaviorState = PushableBehaviorState::Idle;
 
 			currentItemNumber = currentPushable.Stack.ItemNumberAbove;
 		}

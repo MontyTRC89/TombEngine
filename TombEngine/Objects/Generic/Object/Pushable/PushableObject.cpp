@@ -122,6 +122,7 @@ namespace TEN::Entities::Generic
 
 		int probeRoomNumber = GetPointCollision(pushableItem).GetRoomNumber();
 
+		// @BRIDGEME
 		// HACK: Reenable bridge after probing.
 		if (pushable.Bridge.has_value())
 			pushable.Bridge->Enable(pushableItem);
@@ -151,7 +152,7 @@ namespace TEN::Entities::Generic
 			!playerItem->Animation.IsAirborne &&
 			player.Control.HandStatus == HandStatus::Free &&
 			IsPushableValid(pushableItem)) &&
-			pushable.BehaviorState == PushableBehaviourState::Idle && 
+			pushable.BehaviorState == PushableBehaviorState::Idle && 
 			(pushableSidesAttributes.IsPushable || pushableSidesAttributes.IsPullable) || // Can interact with this side.
 			(player.Control.IsMoving && player.Context.InteractedItem == itemNumber))	  // Already interacting.
 		{

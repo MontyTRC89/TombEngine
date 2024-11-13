@@ -31,7 +31,7 @@ namespace TEN::Entities::Generic
 		constexpr auto DEFAULT_OSC		   = 0.75f;
 		constexpr auto DEFAULT_STACK_LIMIT = 3;
 
-		BehaviorState = PushableBehaviourState::Idle;
+		BehaviorState = PushableBehaviorState::Idle;
 		SoundState = PushableSoundState::None;
 		AnimSetID = 0;
 

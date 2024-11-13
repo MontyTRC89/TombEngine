@@ -2541,7 +2541,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 			auto* pushable = (PushableInfo*)item->Data;
 			auto* savedPushable = (Save::Pushable*)savedItem->data();
 
-			pushable->BehaviorState = (PushableBehaviourState)savedPushable->pushable_behaviour_state();
+			pushable->BehaviorState = (PushableBehaviorState)savedPushable->pushable_behaviour_state();
 			pushable->Gravity = savedPushable->pushable_gravity();
 			pushable->Oscillation = savedPushable->pushable_water_force();
 

@@ -57,7 +57,7 @@ namespace TEN::Entities::Generic
 
 				pushable.StartPos = pushableItem.Pose.Position;
 				pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
-				pushable.BehaviorState = PushableBehaviourState::Move;
+				pushable.BehaviorState = PushableBehaviorState::Move;
 
 				// Unstack lower pushables.
 				UnstackPushable(pushableItem.Index);
@@ -110,12 +110,12 @@ namespace TEN::Entities::Generic
 				{
 					if (pushable.IsBuoyant && pushable.Stack.ItemNumberAbove == NO_VALUE)
 					{
-						pushable.BehaviorState = PushableBehaviourState::Float;
+						pushable.BehaviorState = PushableBehaviorState::Float;
 						pushable.Gravity = 0.0f;
 					}
 					else
 					{
-						pushable.BehaviorState = PushableBehaviourState::UnderwaterIdle;
+						pushable.BehaviorState = PushableBehaviorState::UnderwaterIdle;
 					}
 				}
 				else
@@ -129,9 +129,9 @@ namespace TEN::Entities::Generic
 			// Pass to fall state if distance to floor is beyond threshold.
 			if (abs(pushableColl.FloorHeight - pushableItem.Pose.Position.y) > CLICK(0.75f))
 			{
-				pushable.BehaviorState = PushableBehaviourState::Fall;
+				pushable.BehaviorState = PushableBehaviorState::Fall;
 				SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
-				
+
 				// @BRIDGEME
 				DisablePushableBridge(pushableItem);
 			}
@@ -153,12 +153,12 @@ namespace TEN::Entities::Generic
 
 			if (pushable.IsBuoyant && pushable.Stack.ItemNumberAbove == NO_VALUE)
 			{
-				pushable.BehaviorState = PushableBehaviourState::Float;
+				pushable.BehaviorState = PushableBehaviorState::Float;
 				pushable.Gravity = 0.0f;
 			}
 			else
 			{
-				pushable.BehaviorState = PushableBehaviourState::Sink;
+				pushable.BehaviorState = PushableBehaviorState::Sink;
 				pushable.Gravity = PUSHABLE_GRAVITY_WATER;
 			}
 
@@ -236,7 +236,7 @@ namespace TEN::Entities::Generic
 			int travelledDist = Vector3i::Distance(pushableItem.Pose.Position, pushable.StartPos.ToVector3i());
 			if (pushable.IsOnEdge && travelledDist >= BLOCK(0.5f))
 			{
-				pushable.BehaviorState = PushableBehaviourState::EdgeSlip;
+				pushable.BehaviorState = PushableBehaviorState::EdgeSlip;
 				return;
 			}
 
@@ -317,7 +317,7 @@ namespace TEN::Entities::Generic
 					!IsPushableValid(pushableItem))
 				{
 					playerItem.Animation.TargetState = LS_IDLE;
-					pushable.BehaviorState = PushableBehaviourState::Idle;
+					pushable.BehaviorState = PushableBehaviorState::Idle;
 
 					// Set upper pushables back to normal(?).
 					StopMovePushableStack(pushableItem.Index);
@@ -353,7 +353,7 @@ namespace TEN::Entities::Generic
 				break;
 
 			case PushableEnvironmentType::Air:
-				pushable.BehaviorState = PushableBehaviourState::Fall;
+				pushable.BehaviorState = PushableBehaviorState::Fall;
 				pushable.SoundState = PushableSoundState::None;
 				playerItem.Animation.TargetState = LS_IDLE;
 				player.Context.InteractedItem = NO_VALUE;
@@ -364,7 +364,7 @@ namespace TEN::Entities::Generic
 				break;
 
 			case PushableEnvironmentType::Water:
-				pushable.BehaviorState = PushableBehaviourState::Sink;
+				pushable.BehaviorState = PushableBehaviorState::Sink;
 				pushable.SoundState = PushableSoundState::None;
 				playerItem.Animation.TargetState = LS_IDLE;
 				player.Context.InteractedItem = NO_VALUE;
@@ -480,7 +480,7 @@ namespace TEN::Entities::Generic
 			switch (pushableColl.EnvType)
 			{
 			case PushableEnvironmentType::Air:
-				pushable.BehaviorState = PushableBehaviourState::Fall;
+				pushable.BehaviorState = PushableBehaviorState::Fall;
 				pushableItem.Animation.Velocity.y = PUSHABLE_FALL_VELOCITY_MAX / 2;
 				break;
 
@@ -489,7 +489,7 @@ namespace TEN::Entities::Generic
 				pushableItem.Animation.Velocity.y = 0.0f;
 				pushableItem.Pose.Position.y = pushableColl.FloorHeight;
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
-				pushable.BehaviorState = PushableBehaviourState::Idle;
+				pushable.BehaviorState = PushableBehaviorState::Idle;
 
 				// @BRIDGEME
 				EnablePushableBridge(pushableItem);
@@ -497,14 +497,14 @@ namespace TEN::Entities::Generic
 
 			case PushableEnvironmentType::Water:
 				pushableItem.Animation.Velocity.y = PUSHABLE_WATER_VELOCITY_MAX / 2;
-				pushable.BehaviorState = PushableBehaviourState::Sink;
+				pushable.BehaviorState = PushableBehaviorState::Sink;
 					
 				SpawnPushableSplash(pushableItem);
 				break;
 
 			case PushableEnvironmentType::SlopedFloor:
 				pushableItem.Animation.Velocity.y = 0.0f;
-				pushable.BehaviorState = PushableBehaviourState::Idle;
+				pushable.BehaviorState = PushableBehaviorState::Idle;
 				break;
 
 			default:
@@ -556,7 +556,7 @@ namespace TEN::Entities::Generic
 			// Place on floor.
 			pushableItem.Animation.Velocity.y = 0.0f;
 			pushableItem.Pose.Position.y = pushableColl.FloorHeight;
-			pushable.BehaviorState = PushableBehaviourState::Idle;
+			pushable.BehaviorState = PushableBehaviorState::Idle;
 
 			// @BRIDGEME
 			EnablePushableBridge(pushableItem);
@@ -565,11 +565,11 @@ namespace TEN::Entities::Generic
 		case PushableEnvironmentType::SlopedFloor:
 			pushableItem.Animation.Velocity.y = 0.0f;
 			pushableItem.Pose.Position.y = pushableColl.FloorHeight;
-			pushable.BehaviorState = PushableBehaviourState::Slide;
+			pushable.BehaviorState = PushableBehaviorState::Slide;
 			break;
 
 		case PushableEnvironmentType::Water:
-			pushable.BehaviorState = PushableBehaviourState::Sink;
+			pushable.BehaviorState = PushableBehaviorState::Sink;
 			SpawnPushableSplash(pushableItem);
 			break;
 
@@ -597,7 +597,7 @@ namespace TEN::Entities::Generic
 			if (pushable.Stack.ItemNumberBelow == NO_VALUE)
 				SetPushableStopperFlag(true, pushableItem.Pose.Position, pushableItem.RoomNumber);
 
-			pushable.BehaviorState = PushableBehaviourState::Fall;
+			pushable.BehaviorState = PushableBehaviorState::Fall;
 			pushable.Gravity = PUSHABLE_GRAVITY_AIR;
 			break;
 
@@ -609,7 +609,7 @@ namespace TEN::Entities::Generic
 				pushable.Gravity = pushable.Gravity - PUSHABLE_GRAVITY_ACCEL;
 				if (pushable.Gravity <= 0.0f)
 				{
-					pushable.BehaviorState = PushableBehaviourState::Float;
+					pushable.BehaviorState = PushableBehaviorState::Float;
 					return;
 				}
 			}
@@ -641,14 +641,14 @@ namespace TEN::Entities::Generic
 			if (pushable.IsBuoyant && pushable.Stack.ItemNumberAbove == NO_VALUE)
 			{
 				pushableItem.Pose.Position.y = pushableColl.FloorHeight;
-				pushable.BehaviorState = PushableBehaviourState::Float;
+				pushable.BehaviorState = PushableBehaviorState::Float;
 				pushable.Gravity = 0.0f;
 			}
 			else
 			{
 				pushableItem.Pose.Position.y = pushableColl.FloorHeight;
 				pushableItem.Animation.Velocity.y = 0.0f;
-				pushable.BehaviorState = PushableBehaviourState::UnderwaterIdle;
+				pushable.BehaviorState = PushableBehaviorState::UnderwaterIdle;
 				pushable.Gravity = PUSHABLE_GRAVITY_WATER;
 
 				// @BRIDGEME
@@ -686,7 +686,7 @@ namespace TEN::Entities::Generic
 			if (pushable.Stack.ItemNumberBelow == NO_VALUE)
 				SetPushableStopperFlag(true, pushableItem.Pose.Position, pushableItem.RoomNumber);
 
-			pushable.BehaviorState = PushableBehaviourState::Fall;
+			pushable.BehaviorState = PushableBehaviorState::Fall;
 			pushable.Gravity = PUSHABLE_GRAVITY_AIR;
 			break;
 
@@ -726,7 +726,7 @@ namespace TEN::Entities::Generic
 				pushableItem.Animation.Velocity.y = 0.0f;
 				pushableItem.Pose.Position.y = targetHeight;
 				pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
-				pushable.BehaviorState = PushableBehaviourState::WaterSurfaceIdle;
+				pushable.BehaviorState = PushableBehaviorState::WaterSurfaceIdle;
 				pushable.Gravity = PUSHABLE_GRAVITY_WATER;
 
 				// @BRIDGEME
@@ -759,7 +759,7 @@ namespace TEN::Entities::Generic
 
 			pushableItem.Animation.Velocity.y = 0.0f;
 			pushableItem.Pose.Position.y = pushableColl.FloorHeight;
-			pushable.BehaviorState = PushableBehaviourState::Idle;
+			pushable.BehaviorState = PushableBehaviorState::Idle;
 			pushable.Gravity = PUSHABLE_GRAVITY_AIR;	
 			break;
 
@@ -773,14 +773,14 @@ namespace TEN::Entities::Generic
 				{
 					pushableItem.Animation.Velocity.y = 0.0f;
 					pushableItem.Pose.Position.y = pushableColl.FloorHeight;
-					pushable.BehaviorState = PushableBehaviourState::Idle;
+					pushable.BehaviorState = PushableBehaviorState::Idle;
 					pushable.Gravity = PUSHABLE_GRAVITY_AIR;
 				}
 			}
 			else if (pushable.IsBuoyant && pushable.Stack.ItemNumberAbove == NO_VALUE)
 			{
 				pushableItem.Animation.Velocity.y = 0.0f;
-				pushable.BehaviorState = PushableBehaviourState::Float;
+				pushable.BehaviorState = PushableBehaviorState::Float;
 				pushable.Gravity = 0.0f;
 			}
 
@@ -795,20 +795,20 @@ namespace TEN::Entities::Generic
 			if (pushable.IsBuoyant && pushable.Stack.ItemNumberAbove == NO_VALUE)
 			{
 				pushableItem.Animation.Velocity.y = 0.0f;
-				pushable.BehaviorState = PushableBehaviourState::Float;
+				pushable.BehaviorState = PushableBehaviorState::Float;
 				pushable.Gravity = 0.0f;
 				return;
 			}
 
-			//Only pass to sinking if distance is noticeable. If is small, just stuck it to the ground.
+			// Only pass to sinking if distance is noticeable. If small, stick to floor.
 			if (abs(pushableColl.FloorHeight - pushableItem.Pose.Position.y) > CLICK(0.75f))
 			{
-				//Reset Stopper Flag
+				// Reset Stopper flag.
 				if (pushable.Stack.ItemNumberBelow == NO_VALUE)
 					SetPushableStopperFlag(false, pushableItem.Pose.Position, pushableItem.RoomNumber);
 					
 				pushableItem.Animation.Velocity.y = 0.0f;
-				pushable.BehaviorState = PushableBehaviourState::Sink;
+				pushable.BehaviorState = PushableBehaviorState::Sink;
 				pushable.Gravity = 0.0f;
 			}
 			else
@@ -838,7 +838,7 @@ namespace TEN::Entities::Generic
 		case PushableEnvironmentType::Air:
 			pushableItem.Animation.Velocity.y = 0.0f;
 			pushableItem.Pose.Orientation = EulerAngles(0, pushableItem.Pose.Orientation.y, 0);
-			pushable.BehaviorState = PushableBehaviourState::Fall;
+			pushable.BehaviorState = PushableBehaviorState::Fall;
 			pushable.Gravity = PUSHABLE_GRAVITY_AIR;
 
 			// @BRIDGEME
@@ -856,12 +856,12 @@ namespace TEN::Entities::Generic
 			int waterheight = abs(pushableColl.FloorHeight - pushable.WaterSurfaceHeight);
 			if (waterheight < GetPushableHeight(pushableItem))
 			{
-				pushable.BehaviorState = PushableBehaviourState::Idle;
+				pushable.BehaviorState = PushableBehaviorState::Idle;
 				pushable.Gravity = PUSHABLE_GRAVITY_AIR;
 			}
 			else
 			{
-				pushable.BehaviorState = PushableBehaviourState::UnderwaterIdle;
+				pushable.BehaviorState = PushableBehaviorState::UnderwaterIdle;
 				pushable.Gravity = PUSHABLE_GRAVITY_WATER;
 			}
 
@@ -918,18 +918,19 @@ namespace TEN::Entities::Generic
 
 	void HandlePushableBehaviorState(ItemInfo& pushableItem)
 	{
-		static const auto BEHAVIOR_STATE_MAP = std::unordered_map<PushableBehaviourState, std::function<void(ItemInfo& pushableItem)>>
+		// Key = behavior state, key = state function.
+		static const auto BEHAVIOR_STATE_MAP = std::unordered_map<PushableBehaviorState, std::function<void(ItemInfo& pushableItem)>>
 		{
-			{ PushableBehaviourState::Idle, &HandleIdleState },
-			{ PushableBehaviourState::Move, &HandleMoveState },
-			{ PushableBehaviourState::EdgeSlip, &HandleEdgeSlipState },
-			{ PushableBehaviourState::Fall, &HandleFallState },
-			{ PushableBehaviourState::Sink, &HandleSinkState },
-			{ PushableBehaviourState::Float, &HandleFloatState },
-			{ PushableBehaviourState::UnderwaterIdle, &HandleUnderwaterState },
-			{ PushableBehaviourState::WaterSurfaceIdle, &HandleWaterSurfaceState },
-			{ PushableBehaviourState::Slide, &HandleSlideState },
-			{ PushableBehaviourState::MoveStackHorizontal, &HandleMoveStackHorizontalState }
+			{ PushableBehaviorState::Idle, &HandleIdleState },
+			{ PushableBehaviorState::Move, &HandleMoveState },
+			{ PushableBehaviorState::EdgeSlip, &HandleEdgeSlipState },
+			{ PushableBehaviorState::Fall, &HandleFallState },
+			{ PushableBehaviorState::Sink, &HandleSinkState },
+			{ PushableBehaviorState::Float, &HandleFloatState },
+			{ PushableBehaviorState::UnderwaterIdle, &HandleUnderwaterState },
+			{ PushableBehaviorState::WaterSurfaceIdle, &HandleWaterSurfaceState },
+			{ PushableBehaviorState::Slide, &HandleSlideState },
+			{ PushableBehaviorState::MoveStackHorizontal, &HandleMoveStackHorizontalState }
 		};
 
 		auto& pushable = GetPushableInfo(pushableItem);
@@ -941,6 +942,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		it->second(pushableItem);
+		const auto& [stateKey, stateRoutine] = *it;
+		stateRoutine(pushableItem);
 	}
 }
