@@ -35,11 +35,17 @@ namespace TEN::Effects::WaterfallEmitter
 	void ControlWaterfall(short itemNumber)
 	{
 		constexpr auto SCALE		= 3.0f;
-		constexpr auto SPAWN_RADIUS = BLOCK(1 / 16.0f);
+		//constexpr auto SPAWN_RADIUS = BLOCK(1 / 16.0f);
 
+
+		auto SPAWN_RADIUS = CLICK(1);
 		auto& item = g_Level.Items[itemNumber];
 		if (!TriggerActive(&item))
 			return;
+
+		
+
+		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item.Pose);
 
 		float waterfallWidth = std::max(CLICK(float(item.TriggerFlags)), CLICK(0.1f));
 
@@ -76,6 +82,7 @@ namespace TEN::Effects::WaterfallEmitter
 					part.yVel = vel.y;
 					part.zVel = vel.z;
 					part.friction = -2;
+					part.itemNumber = itemNumber;
 
 					auto pointColl = GetPointCollision(origin2, item.RoomNumber, item.Pose.Orientation.y, BLOCK(0.3f));
 
@@ -86,9 +93,9 @@ namespace TEN::Effects::WaterfallEmitter
 					}
 
 					int relFloorHeight = pointColl.GetFloorHeight() - part.y;
-					part.targetPos = GameVector(origin2.x, origin2.y + relFloorHeight, origin2.z, pointColl.GetRoomNumber());
-					if (TestEnvironment(ENV_FLAG_WATER, part.targetPos.ToVector3i(), part.roomNumber) ||
-						TestEnvironment(ENV_FLAG_SWAMP, part.targetPos.ToVector3i(), part.roomNumber))
+					part.targetPos = Vector4(origin2.x, origin2.y + relFloorHeight, origin2.z, itemNumber); // pointColl.GetRoomNumber());
+					if (TestEnvironment(ENV_FLAG_WATER, Vector3i(part.targetPos.x, part.targetPos.y, part.targetPos.z), part.roomNumber) ||
+						TestEnvironment(ENV_FLAG_SWAMP, Vector3i(part.targetPos.x, part.targetPos.y, part.targetPos.z), part.roomNumber))
 					{
 						part.targetPos.y =  pointColl.GetWaterSurfaceHeight();
 					}
@@ -121,9 +128,8 @@ namespace TEN::Effects::WaterfallEmitter
 			}
 	}
 
-	void SpawnWaterfallMist(const Vector3& pos, int roomNumber, float scalar, float size, const Color& color)
+	void SpawnWaterfallMist(const Vector4& pos, int roomNumber, float scalar, float size, const Color& color)
 	{
-		constexpr auto SPHERE_RADIUS = BLOCK(0.01f);
 
 		auto& part = *GetFreeParticle();
 

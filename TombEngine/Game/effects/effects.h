@@ -176,7 +176,8 @@ struct Particle
 	byte PrevG; 
 	byte PrevB;
 	byte PrevScalar;
-	GameVector targetPos;
+	int itemNumber = 0;
+	Vector4 targetPos;
 
 	void StoreInterpolationData()
 	{
