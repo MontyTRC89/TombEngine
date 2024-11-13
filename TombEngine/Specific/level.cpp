@@ -214,7 +214,7 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	InitializeItemArray(ITEM_COUNT_MAX);
+	InitializeItemArray(g_Level.NumItems + MAX_SPAWNED_ITEM_COUNT);
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
@@ -687,7 +687,7 @@ void LoadDynamicRoomData()
 	int roomCount = ReadInt32();
 
 	if (g_Level.Rooms.size() != roomCount)
-		throw std::exception("Dynamic room data count is inconsistent with room count");
+		throw std::exception("Dynamic room data count is inconsistent with room count.");
 
 	for (int i = 0; i < roomCount; i++)
 	{
@@ -1123,6 +1123,7 @@ void LoadEvent(EventSet& eventSet)
 	evt.Function = ReadString();
 	evt.Data = ReadString();
 	evt.CallCounter = ReadInt32();
+	evt.Enabled = ReadBool();
 }
 
 void LoadEventSets()
@@ -1200,6 +1201,21 @@ bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 	return false;
 }
 
+long GetRemainingSize(FILE* filePtr)
+{
+	long current_position = ftell(filePtr);
+
+	if (fseek(filePtr, 0, SEEK_END) != 0)
+		return NO_VALUE;
+
+	long size = ftell(filePtr);
+
+	if (fseek(filePtr, current_position, SEEK_SET) != 0)
+		return NO_VALUE;
+
+	return size;
+}
+
 bool ReadCompressedBlock(FILE* filePtr, bool skip)
 {
 	int compressedSize = 0;
@@ -1207,6 +1223,11 @@ bool ReadCompressedBlock(FILE* filePtr, bool skip)
 
 	ReadFileEx(&uncompressedSize, 1, 4, filePtr);
 	ReadFileEx(&compressedSize, 1, 4, filePtr);
+
+	// Safeguard against changed file format.
+	long remainingSize = GetRemainingSize(filePtr);
+	if (uncompressedSize <= 0 || compressedSize <= 0 || compressedSize > remainingSize)
+		throw std::exception{ "Data block size is incorrect. Probably old level version?" };
 
 	if (skip) 
 	{
@@ -1503,14 +1524,11 @@ bool LoadLevelFile(int levelIndex)
 	auto assetDir = g_GameFlow->GetGameDir();
 	auto levelPath = assetDir + level.FileName;
 
-	bool usingEmbeddedLevelFile = false;
-
 	if (!std::filesystem::is_regular_file(levelPath))
 	{
 		if (levelIndex == 0 && GenerateTitleLevel(levelPath))
 		{
-			usingEmbeddedLevelFile = true;
-			TENLog("Regenerated title level file from embedded data: " + levelPath, LogLevel::Info);
+			TENLog("Title level file not found, generating dummy level: " + levelPath, LogLevel::Info);
 		}
 		else
 		{
@@ -1537,12 +1555,7 @@ bool LoadLevelFile(int levelIndex)
 	FreeLevel(fastReload);
 	
 	LevelLoadTask = std::async(std::launch::async, LoadLevel, levelPath, fastReload);
-	bool result = LevelLoadTask.get();
-
-	if (usingEmbeddedLevelFile)
-		std::filesystem::remove(levelPath);
-
-	return result;
+	return LevelLoadTask.get();
 }
 
 void LoadSprites()

@@ -879,7 +879,7 @@ namespace TEN::Collision::Floordata
 	}
 
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
-	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval)
+	void UpdateBridgeItem(const ItemInfo& item, BridgeUpdateType updateType)
 	{
 		constexpr auto SECTOR_EXTENTS = Vector3(BLOCK(0.5f));
 
@@ -891,7 +891,7 @@ namespace TEN::Collision::Floordata
 
 		// Force removal if item was killed.
 		if (item.Flags & IFLAG_KILLED)
-			forceRemoval = true;
+			updateType = BridgeUpdateType::Remove;
 
 		// Get bridge OBB.
 		auto bridgeBox = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
@@ -919,10 +919,11 @@ namespace TEN::Collision::Floordata
 				float offZ = pZ - item.Pose.Position.z;
 
 				// Clean previous bridge state.
-				RemoveBridge(item.Index, offX, offZ);
+				if (updateType != BridgeUpdateType::Initialize)
+					RemoveBridge(item.Index, offX, offZ);
 
-				// In sweep mode; don't try readding to sector.
-				if (forceRemoval)
+				// In removal mode; don't try re-adding to sector.
+				if (updateType == BridgeUpdateType::Remove)
 					continue;
 
 				// Sector is outside enclosed AABB space; ignore precise check.

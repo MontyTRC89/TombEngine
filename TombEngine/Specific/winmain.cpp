@@ -154,19 +154,22 @@ bool GenerateTitleLevel(const std::string& levelPath)
 	// Write the resource data to the file
 	try
 	{
+		std::filesystem::path dir = std::filesystem::path(levelPath).parent_path();
+		std::filesystem::create_directories(dir);
+
 		std::ofstream outFile(levelPath, std::ios::binary);
 		if (!outFile)
-			throw std::ios_base::failure("Failed to create title level file");
+			throw std::ios_base::failure("Failed to create title level file.");
 
 		outFile.write(reinterpret_cast<const char*>(pData), dwSize);
 		if (!outFile)
-			throw std::ios_base::failure("Failed to write to title level file");
+			throw std::ios_base::failure("Failed to write to title level file.");
 
 		outFile.close();
 	}
 	catch (const std::exception& ex)
 	{
-		TENLog("Error while regenerating title level file: " + std::string(ex.what()), LogLevel::Error);
+		TENLog("Error while generating title level file: " + std::string(ex.what()), LogLevel::Error);
 		return false;
 	}
 

@@ -595,14 +595,6 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 				&& (item->Flags & ONESHOT))
 				break;
 
-			if (triggerType != TRIGGER_TYPES::ANTIPAD 
-				&& triggerType != TRIGGER_TYPES::ANTITRIGGER 
-				&& triggerType != TRIGGER_TYPES::HEAVYANTITRIGGER)
-			{
-				if (item->ObjectNumber == ID_DART_EMITTER && item->Active)
-					break;
-			}
-
 			item->Timer = timer;
 			if (timer != 1)
 				item->Timer = FPS * timer;
@@ -612,10 +604,6 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			{
 				if (heavyFlags >= 0)
 				{
-					//if (switchFlag)
-						//item->Flags |= (flags & CODE_BITS);
-					//else
-
 					item->Flags ^= (flags & CODE_BITS);
 
 					if (flags & ONESHOT)

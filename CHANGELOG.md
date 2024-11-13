@@ -8,6 +8,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Bug fixes
 * Fixed engine performance around bridges.
 * Fixed engine performance if weather or bubble effects are active.
+* Fixed silent engine crashes if loaded level is corrupted or in incorrect format.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemy pickups dropping on death sectors.
 * Fixed vehicle transfer not happening for levels which were not previously visited.
@@ -18,18 +19,22 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed binocular or lasersight camera not switching off correctly after flyby.
 * Fixed Lara's Home entry not working.
 * Fixed exploding TR3 bosses.
+* Fixed the original issue with deactivation of Dart Emitter.
 * Fixed Lens Flare object not functioning properly.
+* Fixed Skeleton and Mummy not reacting to shotgun hits.
 
 ### Features/Amendments
 * Added fast savegame reloading.
-* Added ability to run engine without title level file.
 * Added ricochet sounds and make the effect more prominent.
+* Automatically generate title level, if one is missing.
+* Allow more than 1024 objects in a level.
 
 ### Lua API changes
 
 * Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
 * Added missing callbacks for OnUseItem event.
 * Added support for transparency value in DisplayString class.
+* Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
 
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 

@@ -313,9 +313,6 @@ namespace TEN::Renderer
 
 		auto frameData = GetFrameInterpData(*nativeItem);
 		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX);
-
-		for (int m = 0; m < obj->nmeshes; m++)
-			itemToDraw->AnimTransforms[m] = itemToDraw->AnimTransforms[m];
 	}
 
 	void Renderer::UpdateItemAnimations(RenderView& view)

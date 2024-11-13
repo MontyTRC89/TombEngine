@@ -87,11 +87,11 @@ namespace TEN::Control::Volumes
 
 	bool HandleEvent(Event& event, Activator& activator)
 	{
-		if (event.Function.empty() || event.CallCounter == 0 || event.CallCounter < NO_CALL_COUNTER)
+		if (!event.Enabled || event.CallCounter == 0 || event.Function.empty())
 			return false;
 
 		g_GameScript->ExecuteFunction(event.Function, activator, event.Data);
-		if (event.CallCounter != NO_CALL_COUNTER)
+		if (event.CallCounter != NO_VALUE)
 			event.CallCounter--;
 
 		return true;
@@ -124,12 +124,7 @@ namespace TEN::Control::Volumes
 		if (eventSet == nullptr)
 			return false;
 
-		auto& event = eventSet->Events[(int)eventType];
-		bool disabled = eventSet->Events[(int)eventType].CallCounter < NO_CALL_COUNTER;
-
-		// Flip the call counter to indicate that it is currently disabled.
-		if ((enabled && disabled) || (!enabled && !disabled))
-			eventSet->Events[(int)eventType].CallCounter += enabled ? EVENT_STATE_MASK : -EVENT_STATE_MASK;
+		eventSet->Events[(int)eventType].Enabled = enabled;
 
 		return true;
 	}

@@ -47,7 +47,7 @@ constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
 Particle Particles[MAX_PARTICLES];
 ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
-FX_INFO EffectList[NUM_EFFECTS];
+FX_INFO EffectList[MAX_SPAWNED_ITEM_COUNT];
 
 GameBoundingBox DeadlyBounds;
 SPLASH_SETUP SplashSetup;
