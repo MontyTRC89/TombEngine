@@ -38,6 +38,8 @@ namespace TEN::Entities::Traps
 	ElectricBallInfo EldectricBallData;
 
 	constexpr auto ELECTRIC_BALL_LIGHTNING_DAMAGE = 40;
+	constexpr auto ELECTRIC_BALL_DISTANCE_RANDOM_TARGET = 7;
+	constexpr auto ELECTRIC_BALL_DISTANCE_LARA_TARGET = 3;
 	const auto ElectricBallBite = CreatureBiteInfo(Vector3::Zero, 0);
 
 	 void TriggerElectricBallShockwaveAttackSparks(int x, int y, int z, byte r, byte g, byte b, byte size)
@@ -119,10 +121,10 @@ namespace TEN::Entities::Traps
 		EldectricBallData.Colorw = item.Model.Color;
 
 		//Distance before switch off.
-		item.ItemFlags[0] = SQUARE(BLOCK(7));
+		item.ItemFlags[0] = ELECTRIC_BALL_DISTANCE_RANDOM_TARGET;
 
 		//Distance to attack Lara.
-		item.ItemFlags[1] = SQUARE(BLOCK(3));
+		item.ItemFlags[1] = ELECTRIC_BALL_DISTANCE_LARA_TARGET;
 
 		item.ItemFlags[2] = TargetType::None;
 	}
@@ -412,7 +414,7 @@ namespace TEN::Entities::Traps
 		AI_INFO ai;
 		CreatureAIInfo(&item, &ai);
 
-		if (ai.distance > item.ItemFlags[0])
+		if (ai.distance > SQUARE(BLOCK(item.ItemFlags[0])))
 		{
 			item.ItemFlags[3] = 70;
 			item.ItemFlags[4] = 70;
@@ -428,7 +430,7 @@ namespace TEN::Entities::Traps
 		bool los = LOS(&origin, &targetPlayer);
 		FloorInfo* floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &item.RoomNumber);
 
-		if (ai.distance < item.ItemFlags[1] && los)
+		if (ai.distance < SQUARE(BLOCK(item.ItemFlags[1])) && los)
 		{
 			targetPos = Vector3(LaraItem->Pose.Position.x, GetFloorHeight(floor, item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z), LaraItem->Pose.Position.z);
 				
