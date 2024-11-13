@@ -161,12 +161,12 @@ namespace TEN::Structures
 	{
 		constexpr auto BOX_COLOR = Color(1.0f, 1.0f, 1.0f, 0.5f);
 
-		PrintDebugMessage("BOUNDING TREE DEBUG");
+		//PrintDebugMessage("BOUNDING TREE DEBUG");
 
 		if (!_nodes.empty())
 		{
-			PrintDebugMessage("Nodes: %d", (int)_nodes.size());
-			PrintDebugMessage("Root height: %d", _nodes[_rootID].Height);
+			//PrintDebugMessage("Nodes: %d", (int)_nodes.size());
+			//PrintDebugMessage("Root height: %d", _nodes[_rootID].Height);
 		}
 
 		for (const auto& node : _nodes)

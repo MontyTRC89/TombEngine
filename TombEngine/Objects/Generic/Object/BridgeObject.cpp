@@ -68,7 +68,7 @@ namespace TEN::Entities::Generic
 
 		UpdateCollisionMesh(item);
 		UpdateAttractor(item);
-		UpdateBridgeCollision(item);
+		UpdateSectorAssignments(item);
 
 		auto& room = g_Level.Rooms[item.RoomNumber];
 		auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
@@ -199,7 +199,7 @@ namespace TEN::Entities::Generic
 		//_attractor.SetOrientation(item.Pose.Orientation.ToQuaternion());
 	}
 
-	void BridgeObject::UpdateBridgeCollision(const ItemInfo& item)
+	void BridgeObject::UpdateSectorAssignments(const ItemInfo& item)
 	{
 		DeassignSectors(item);
 		AssignSectors(item);

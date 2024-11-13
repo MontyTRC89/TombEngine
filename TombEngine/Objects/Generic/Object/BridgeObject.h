@@ -57,7 +57,7 @@ namespace TEN::Entities::Generic
 
 		void UpdateCollisionMesh(const ItemInfo& item);
 		void UpdateAttractor(const ItemInfo& item);
-		void UpdateBridgeCollision(const ItemInfo& item);
+		void UpdateSectorAssignments(const ItemInfo& item);
 
 		void AssignSectors(const ItemInfo& item);
 		void DeassignSectors(const ItemInfo& item) const;

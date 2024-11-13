@@ -66,6 +66,11 @@ void RoomObjectHandler::Remove(int id)
 	_tree.Remove(id);
 }
 
+void RoomObjectHandler::DrawDebug() const
+{
+	_tree.DrawDebug();
+}
+
 bool RoomData::Active() const
 {
 	if (flipNumber == NO_VALUE)

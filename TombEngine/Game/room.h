@@ -122,6 +122,10 @@ public:
 	void Insert(int id, const BoundingBox& aabb);
 	void Move(int id, const BoundingBox& aabb);
 	void Remove(int id);
+
+	// Debug
+
+	void DrawDebug() const;
 };
 
 // TODO: Make class?
