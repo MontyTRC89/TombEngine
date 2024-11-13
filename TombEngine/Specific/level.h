@@ -140,6 +140,8 @@ extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
 extern std::vector<int> SpriteSequencesIds;
 extern LEVEL g_Level;
+extern int SystemNameHash;
+extern int LastLevelHash;
 
 inline std::future<bool> LevelLoadTask;
 
@@ -149,7 +151,7 @@ void FileClose(FILE* ptr);
 bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned long uncompressedSize);
 
 bool LoadLevelFile(int levelIndex);
-void FreeLevel();
+void FreeLevel(bool partial);
 
 void LoadTextures();
 void LoadRooms();

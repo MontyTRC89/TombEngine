@@ -202,8 +202,8 @@ namespace TEN::Renderer
 		// Text
 		std::unique_ptr<SpriteFont> _gameFont;
 		std::vector<RendererStringToDraw> _stringsToDraw;
-		float _blinkColorValue = 0.0f;
-		float _blinkTime		  = 0.0f;
+		Vector4 _blinkColorValue = Vector4::Zero;
+		float _blinkTime    = 0.0f;
 		float _oldBlinkTime = 0.0f;
 
 		// Graphics resources
@@ -260,11 +260,12 @@ namespace TEN::Renderer
 		std::vector<TexturePair> _staticTextures;
 		std::vector<Texture2D> _spritesTextures;
 
-		// Preallocated pools of objects for avoiding new/delete
+		// Preallocated pools of objects for avoiding new/delete.
 		// Items and effects are safe (can't be more than 1024 items in TR), 
 		// lights should be oversized (eventually ignore lights more than MAX_LIGHTS)
-		RendererItem _items[ITEM_COUNT_MAX];
-		RendererEffect _effects[ITEM_COUNT_MAX];
+
+		std::vector<RendererItem> _items;
+		std::vector<RendererEffect> _effects;
 
 		// Debug variables
 		int _numDrawCalls = 0;
@@ -605,10 +606,6 @@ namespace TEN::Renderer
 		void PrepareScene();
 		void ClearScene();
 		void SaveScreenshot();
-		void PrintDebugMessage(LPCSTR msg, va_list args);
-		void PrintDebugMessage(LPCSTR msg, ...);
-		void DrawDebugInfo(RenderView& view);
-		void SwitchDebugPage(bool goBack);
 		void DrawDisplayPickup(const DisplayPickup& pickup);
 		int  Synchronize();
 		void AddString(int x, int y, const std::string& string, D3DCOLOR color, int flags);
@@ -636,6 +633,12 @@ namespace TEN::Renderer
 		void AddDebugCylinder(const Vector3& center, const Quaternion& orient, float radius, float length, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 		void AddDebugSphere(const Vector3& center, float radius, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
 		void AddDebugSphere(const BoundingSphere& sphere, const Color& color, RendererDebugPage page = RendererDebugPage::None, bool isWireframe = true);
+
+		void PrintDebugMessage(LPCSTR msg, va_list args);
+		void PrintDebugMessage(LPCSTR msg, ...);
+		void DrawDebugInfo(RenderView& view);
+		void SwitchDebugPage(bool goBack);
+		RendererDebugPage GetCurrentDebugPage();
 
 		void ChangeScreenResolution(int width, int height, bool windowed);
 		void FlipRooms(short roomNumber1, short roomNumber2);

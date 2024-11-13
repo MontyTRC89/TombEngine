@@ -868,31 +868,31 @@ namespace TEN::Renderer
 
 	void Renderer::ResetItems()
 	{
-		for (int i = 0; i < ITEM_COUNT_MAX; i++)
-			_items[i].DoneAnimations = false;
+		for (auto& item : _items)
+			item.DoneAnimations = false;
 	}
 
 	void Renderer::SaveOldState()
 	{
-		for (int i = 0; i < g_Level.Items.size(); i++)
+		for (auto& item : _items)
 		{
-			_items[i].PrevPosition = _items[i].Position;
-			_items[i].PrevWorld = _items[i].World;
-			_items[i].PrevTranslation = _items[i].Translation;
-			_items[i].PrevRotation = _items[i].Rotation;
-			_items[i].PrevScale = _items[i].Scale;
+			item.PrevPosition = item.Position;
+			item.PrevWorld = item.World;
+			item.PrevTranslation = item.Translation;
+			item.PrevRotation = item.Rotation;
+			item.PrevScale = item.Scale;
 
 			for (int j = 0; j < MAX_BONES; j++)
-				_items[i].PrevAnimTransforms[j] = _items[i].AnimTransforms[j];
+				item.PrevAnimTransforms[j] = item.AnimTransforms[j];
 		}
 
-		for (int i = 0; i < ITEM_COUNT_MAX; i++)
+		for (auto& effect : _effects)
 		{
-			_effects[i].PrevPosition = _effects[i].Position;
-			_effects[i].PrevWorld = _effects[i].World;
-			_effects[i].PrevTranslation = _effects[i].Translation;
-			_effects[i].PrevRotation = _effects[i].Rotation;
-			_effects[i].PrevScale = _effects[i].Scale;
+			effect.PrevPosition = effect.Position;
+			effect.PrevWorld = effect.World;
+			effect.PrevTranslation = effect.Translation;
+			effect.PrevRotation = effect.Rotation;
+			effect.PrevScale = effect.Scale;
 		}
 	}
 }

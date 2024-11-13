@@ -105,8 +105,6 @@ int RequiredStartPos;
 int CurrentLevel;
 int NextLevel;
 
-int SystemNameHash = 0;
-
 bool  InItemControlLoop;
 short ItemNewRoomNo;
 short ItemNewRooms[MAX_ROOMS];
@@ -157,11 +155,17 @@ GameStatus ControlPhase(bool insideMenu)
 	g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with high framerate.
 	HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
 
-	// Control lock is processed after handling scripts because builder may want to process input externally while locking player from input.
+	// Queued input actions are read again after OnLoop, so that remaining control loop can immediately register
+	// emulated keypresses from the script.
+	ApplyActionQueue();
+
+	// Control lock is processed after handling scripts because builder may want to process input externally
+	// while locking player from input.
 	if (!isTitle && Lara.Control.IsLocked)
 		ClearAllActions();
 
-	// Item update should happen before camera update, so potential flyby/track camera triggers are processed correctly.
+	// Item update should happen before camera update, so potential flyby/track camera triggers
+	// are processed correctly.
 	UpdateAllItems();
 	UpdateAllEffects();
 	UpdateLara(LaraItem, isTitle);
@@ -172,11 +176,6 @@ GameStatus ControlPhase(bool insideMenu)
 
 	// Clear last selected item in inventory (must be after on loop event handling, so they can detect that).
 	g_Gui.CancelInventorySelection();
-
-	// Control lock is processed after handling scripts because builder may want to
-	// process input externally while locking player from input.
-	if (!isTitle && Lara.Control.IsLocked)
-		ClearAllActions();
 
 	// Update weather.
 	Weather.Update();
@@ -224,11 +223,6 @@ GameStatus ControlPhase(bool insideMenu)
 	PlaySoundSources();
 	Sound_UpdateScene();
 
-	UpdateCamera();
-
-	// Post-loop script and event handling.
-	g_GameScript->OnLoop(DELTA_TIME, true);
-
 	// Handle inventory, pause, load, save screens.
 	if (!insideMenu)
 	{
@@ -241,6 +235,11 @@ GameStatus ControlPhase(bool insideMenu)
 		if (result != GameStatus::Normal)
 			return result;
 	}
+
+	UpdateCamera();
+
+	// Post-loop script and event handling.
+	g_GameScript->OnLoop(DELTA_TIME, true);
 
 	// Clear savegame loaded flag.
 	JustLoaded = false;
@@ -507,10 +506,8 @@ void InitializeOrLoadGame(bool loadGame)
 	g_Gui.SetEnterInventory(NO_VALUE);
 
 	// Restore game?
-	if (loadGame)
+	if (loadGame && SaveGame::Load(g_GameFlow->SelectedSaveGame))
 	{
-		SaveGame::Load(g_GameFlow->SelectedSaveGame);
-
 		InitializeGame = false;
 
 		g_GameFlow->SelectedSaveGame = 0;
@@ -595,7 +592,7 @@ void EndGameLoop(int levelIndex, GameStatus reason)
 	DeInitializeScripting(levelIndex, reason);
 
 	StopAllSounds();
-	StopSoundTracks();
+	StopSoundTracks(SOUND_XFADETIME_LEVELJUMP, true);
 	StopRumble();
 }
 
@@ -631,6 +628,10 @@ GameStatus HandleMenuCalls(bool isTitle)
 		case InventoryResult::NewGame:
 		case InventoryResult::NewGameSelectedLevel:
 			return GameStatus::NewGame;
+
+		case InventoryResult::HomeLevel:
+			return GameStatus::HomeLevel;
+			break;
 
 		case InventoryResult::LoadGame:
 			return GameStatus::LoadGame;

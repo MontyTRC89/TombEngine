@@ -126,18 +126,19 @@ namespace TEN::Hud
 		pickup.StringScalar = 0.0f;
 	}
 
-	void PickupSummaryController::AddDisplayPickup(ItemInfo& item)
+	void PickupSummaryController::AddDisplayPickup(const ItemInfo& item)
 	{
-		// Ammo and consumables are a special case, as internal amount differs from pickup amount.
-
-		int ammoCount       = GetDefaultAmmoCount(item.ObjectNumber);
+		// NOTE: Ammo and consumables are a special case, as internal amount differs from pickup amount.
+		int ammoCount = GetDefaultAmmoCount(item.ObjectNumber);
 		int consumableCount = GetDefaultConsumableCount(item.ObjectNumber);
 
 		int count = DISPLAY_PICKUP_COUNT_ARG_DEFAULT;
-		if (ammoCount != NO_VALUE) count = ammoCount;
-		if (consumableCount != NO_VALUE) count = consumableCount;
+		if (ammoCount != NO_VALUE)
+			count = ammoCount;
+		if (consumableCount != NO_VALUE)
+			count = consumableCount;
 
-		AddDisplayPickup(item.ObjectNumber, item.Pose.Position.ToVector3(), item.HitPoints > 0 ? item.HitPoints : count);
+		AddDisplayPickup(item.ObjectNumber, item.Pose.Position.ToVector3(), (item.HitPoints > 0) ? item.HitPoints : count);
 	}
 
 	void PickupSummaryController::AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos, unsigned int count)

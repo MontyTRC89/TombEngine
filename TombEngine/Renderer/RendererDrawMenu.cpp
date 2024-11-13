@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Renderer/Renderer.h"
 
+#include "version.h"
 #include "Game/animation.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -1013,10 +1014,6 @@ namespace TEN::Renderer
 		_context->VSSetShader(_vsInventory.Get(), nullptr, 0);
 		_context->PSSetShader(_psInventory.Get(), nullptr, 0);
 
-		// Set texture
-		BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
-		BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
-
 		if (CurrentLevel == 0)
 		{
 			auto titleMenu = g_Gui.GetMenuToDisplay();
@@ -1047,6 +1044,14 @@ namespace TEN::Renderer
 		}
 		else
 		{
+			if (g_Gui.GetInventoryMode() == InventoryMode::InGame ||
+				g_Gui.GetInventoryMode() == InventoryMode::Examine)
+			{
+				// Set texture.
+				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
+				BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
+			}
+
 			switch (g_Gui.GetInventoryMode())
 			{
 			case InventoryMode::Load:
@@ -1103,26 +1108,30 @@ namespace TEN::Renderer
 
 	void Renderer::RenderLoadingScreen(float percentage)
 	{
-		// Set basic render states
+		// Set basic render states.
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
 		do
 		{
-			// Clear screen
+			// Clear screen.
 			_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-			// Bind the back buffer
+			// Bind back buffer.
 			_context->OMSetRenderTargets(1, _backBuffer.RenderTargetView.GetAddressOf(), _backBuffer.DepthStencilView.Get());
 			_context->RSSetViewports(1, &_viewport);
 			ResetScissor();
 
-			// Draw the full screen background
+			// Draw fullscreen background. If unavailable, draw last dumped game scene.
 			if (_loadingScreenTexture.Texture)
-				DrawFullScreenQuad(
-					_loadingScreenTexture.ShaderResourceView.Get(),
-					Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
+			{
+				DrawFullScreenQuad(_loadingScreenTexture.ShaderResourceView.Get(), Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
+			}
+			else if (_dumpScreenRenderTarget.Texture)
+			{
+				DrawFullScreenQuad(_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
+			}
 
 			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
 				DrawLoadingBar(percentage);
@@ -1178,6 +1187,14 @@ namespace TEN::Renderer
 
 	void Renderer::DrawDebugInfo(RenderView& view)
 	{
+#ifdef TEST_BUILD
+		if (CurrentLevel == 0)
+		{
+			AddString("TombEngine " + std::string(TEN_VERSION_STRING) + " test build - not for distribution",
+				Vector2(20, 560), Vector4(1.0f, 0, 0, 0.5f), 0.7f, 0);
+		}
+#endif
+
 		if (!DebugMode || CurrentLevel == 0)
 			return;
 
@@ -1359,6 +1376,11 @@ namespace TEN::Renderer
 		default:
 			break;
 		}
+	}
+
+	RendererDebugPage Renderer::GetCurrentDebugPage()
+	{
+		return _debugPage;
 	}
 
 	void Renderer::SwitchDebugPage(bool goBack)

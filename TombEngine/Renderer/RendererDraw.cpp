@@ -1583,7 +1583,8 @@ namespace TEN::Renderer
 		constexpr auto BLINK_TIME_STEP = 0.2f;
 
 		// Calculate blink increment based on sine wave.
-		_blinkColorValue = ((sin(_blinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
+		float blink = ((sin(_blinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
+		_blinkColorValue = Vector4(blink, blink, blink, 1.0f);
 
 		// Update blink time.
 		_blinkTime += BLINK_TIME_STEP;

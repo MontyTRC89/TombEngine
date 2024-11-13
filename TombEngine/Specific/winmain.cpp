@@ -3,11 +3,11 @@
 
 #include <CommCtrl.h>
 #include <process.h>
-#include <resource.h>
 #include <iostream>
 #include <codecvt>
 #include <filesystem>
 
+#include "resource.h"
 #include "Game/control/control.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer.h"
@@ -127,6 +127,53 @@ void DisableDpiAwareness()
 
 	setDpiAwareness(PROCESS_SYSTEM_DPI_AWARE);
 	FreeLibrary(lib);
+}
+
+bool GenerateTitleLevel(const std::string& levelPath)
+{
+	// Try to load the embedded resource "data.bin"
+	HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_TITLELEVEL), "BIN");
+	if (hResource == NULL)
+	{
+		TENLog("Embedded title level file not found.", LogLevel::Error);
+		return false;
+	}
+
+	// Load the resource into memory
+	HGLOBAL hGlobal = LoadResource(NULL, hResource);
+	if (hGlobal == NULL)
+	{
+		TENLog("Failed to load embedded title level file.", LogLevel::Error);
+		return false;
+	}
+
+	// Lock the resource to get a pointer to the data
+	void* pData = LockResource(hGlobal);
+	DWORD dwSize = SizeofResource(NULL, hResource);
+
+	// Write the resource data to the file
+	try
+	{
+		std::filesystem::path dir = std::filesystem::path(levelPath).parent_path();
+		std::filesystem::create_directories(dir);
+
+		std::ofstream outFile(levelPath, std::ios::binary);
+		if (!outFile)
+			throw std::ios_base::failure("Failed to create title level file.");
+
+		outFile.write(reinterpret_cast<const char*>(pData), dwSize);
+		if (!outFile)
+			throw std::ios_base::failure("Failed to write to title level file.");
+
+		outFile.close();
+	}
+	catch (const std::exception& ex)
+	{
+		TENLog("Error while generating title level file: " + std::string(ex.what()), LogLevel::Error);
+		return false;
+	}
+
+	return true;
 }
 
 void WinProcMsg()
@@ -305,6 +352,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					   std::to_string(ver[0]) + "." +
 					   std::to_string(ver[1]) + "." +
 					   std::to_string(ver[2]) + " " +
+					   std::to_string(ver[3]) + " " +
 #ifdef _WIN64
 					   "(64-bit)"
 #else

@@ -38,6 +38,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 void WinClose();
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void CALLBACK HandleWmCommand(unsigned short wParam);
+
 Vector2i GetScreenResolution();
 std::vector<Vector2i> GetAllSupportedScreenResolutions();
 int GetCurrentScreenRefreshRate();
+
+bool GenerateTitleLevel(const std::string& levelPath);

@@ -168,7 +168,7 @@ namespace TEN::Entities::Creatures::TR5
 						pos.z += dz + GetRandomControl() - 128;
 
 						if (!LOS(&origin, &pos))
-							TriggerRicochetSpark(pos, Random::GenerateAngle(), 3, 0);
+							TriggerRicochetSpark(pos, Random::GenerateAngle());
 					}
 				}
 				else

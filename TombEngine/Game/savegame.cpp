@@ -247,6 +247,7 @@ const std::vector<byte> SaveGame::Build()
 
 	Save::SaveGameHeaderBuilder sghb{ fbb };
 	sghb.add_level_name(levelNameOffset);
+	sghb.add_level_hash(LastLevelHash);
 
 	auto gameTime = GetGameTime(GameTimer);
 	sghb.add_days(gameTime.Days);
@@ -1237,38 +1238,24 @@ const std::vector<byte> SaveGame::Build()
 	{
 		ROPE_STRUCT* rope = &Ropes[Lara.Control.Rope.Ptr];
 
-		std::vector<const Save::Vector3*> segments;
+		std::vector<flatbuffers::Offset<Save::RopeSegment>> segments;
 		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			segments.push_back(&FromVector3i(rope->segment[i]));
-		auto segmentsOffset = fbb.CreateVector(segments);
+		{
+			Save::RopeSegmentBuilder segment{ fbb };
 
-		std::vector<const Save::Vector3*> velocities;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			velocities.push_back(&FromVector3i(rope->velocity[i]));
-		auto velocitiesOffset = fbb.CreateVector(velocities);
+			segment.add_segment(&FromVector3i(rope->segment[i]));
+			segment.add_velocity(&FromVector3i(rope->velocity[i]));
+			segment.add_normalised_segment(&FromVector3i(rope->normalisedSegment[i]));
+			segment.add_mesh_segment(&FromVector3i(rope->meshSegment[i]));
+			segment.add_coord(&FromVector3i(rope->coords[i]));
 
-		std::vector<const Save::Vector3*> normalisedSegments;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			normalisedSegments.push_back(&FromVector3i(rope->normalisedSegment[i]));
-		auto normalisedSegmentsOffset = fbb.CreateVector(normalisedSegments);
-
-		std::vector<const Save::Vector3*> meshSegments;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			meshSegments.push_back(&FromVector3i(rope->meshSegment[i]));
-		auto meshSegmentsOffset = fbb.CreateVector(meshSegments);
-
-		std::vector<const Save::Vector3*> coords;
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
-			coords.push_back(&FromVector3i(rope->coords[i]));
-		auto coordsOffset = fbb.CreateVector(coords);
+			segments.push_back(segment.Finish());
+		}
+		auto ropeSegmentsOffset = fbb.CreateVector(segments);
 
 		Save::RopeBuilder ropeInfo{ fbb };
 
-		ropeInfo.add_segments(segmentsOffset);
-		ropeInfo.add_velocities(velocitiesOffset);
-		ropeInfo.add_mesh_segments(meshSegmentsOffset);
-		ropeInfo.add_normalised_segments(normalisedSegmentsOffset);
-		ropeInfo.add_coords(coordsOffset);
+		ropeInfo.add_segments(ropeSegmentsOffset);
 		ropeInfo.add_coiled(rope->coiled);
 		ropeInfo.add_position(&FromVector3i(rope->position));
 		ropeInfo.add_segment_length(rope->segmentLength);
@@ -1520,15 +1507,18 @@ void SaveGame::SaveHub(int index)
 
 void SaveGame::LoadHub(int index)
 {
-	// Don't attempt to load hub data if it doesn't exist, or level is a title level.
-	if (index == 0 || !IsOnHub(index))
+	// Don't attempt to load hub data if level is a title level.
+	if (index == 0)
 		return;
 
-	// Load hub data.
-	TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
-	Parse(Hub[index], true);
+	if (IsOnHub(index))
+	{
+		// Load hub data.
+		TENLog("Loading hub data for level #" + std::to_string(index), LogLevel::Info);
+		Parse(Hub[index], true);
+	}
 
-	// Restore vehicle.
+	// Restore vehicle (also for cases when no hub data yet exists).
 	InitializePlayerVehicle(*LaraItem);
 }
 
@@ -1593,50 +1583,68 @@ bool SaveGame::Save(int slot)
 bool SaveGame::Load(int slot)
 {
 	if (!IsSaveGameSlotValid(slot))
+	{
+		TENLog("Savegame slot " + std::to_string(slot) + " is invalid, load is impossible.", LogLevel::Error);
 		return false;
+	}
 
 	if (!DoesSaveGameExist(slot))
+	{
+		TENLog("Savegame in slot " + std::to_string(slot) + " does not exist.", LogLevel::Error);
 		return false;
+	}
 
 	auto fileName = GetSavegameFilename(slot);
 	TENLog("Loading from savegame: " + fileName, LogLevel::Info);
 
-	std::ifstream file;
-	file.open(fileName, std::ios_base::app | std::ios_base::binary);
-
-	int size; 
-	file.read(reinterpret_cast<char*>(&size), sizeof(size));
-
-	// Read current level save data.
-	std::vector<byte> saveData(size);
-	file.read(reinterpret_cast<char*>(saveData.data()), size);
-
-	// Reset hub data, as it's about to be replaced with saved one.
-	ResetHub();
-
-	// Read hub data from savegame.
-	int hubCount;
-	file.read(reinterpret_cast<char*>(&hubCount), sizeof(hubCount));
-
-	TENLog("Hub count: " + std::to_string(hubCount), LogLevel::Info);
-
-	for (int i = 0; i < hubCount; i++)
+	auto file = std::ifstream();
+	try
 	{
-		int index;
-		file.read(reinterpret_cast<char*>(&index), sizeof(index));
+		file.open(fileName, std::ios_base::app | std::ios_base::binary);
 
+		int size = 0;
 		file.read(reinterpret_cast<char*>(&size), sizeof(size));
-		std::vector<byte> hubBuffer(size);
-		file.read(reinterpret_cast<char*>(hubBuffer.data()), size);
 
-		Hub[index] = hubBuffer;
+		// Read current level save data.
+		auto saveData = std::vector<byte>(size);
+		file.read(reinterpret_cast<char*>(saveData.data()), size);
+
+		// Reset hub data, as it's about to be replaced with saved one.
+		ResetHub();
+
+		// Read hub data from savegame.
+		int hubCount = 0;
+		file.read(reinterpret_cast<char*>(&hubCount), sizeof(hubCount));
+
+		TENLog("Hub count: " + std::to_string(hubCount), LogLevel::Info);
+
+		for (int i = 0; i < hubCount; i++)
+		{
+			int index = 0;
+			file.read(reinterpret_cast<char*>(&index), sizeof(index));
+
+			file.read(reinterpret_cast<char*>(&size), sizeof(size));
+			auto hubBuffer = std::vector<byte>(size);
+			file.read(reinterpret_cast<char*>(hubBuffer.data()), size);
+
+			Hub[index] = hubBuffer;
+		}
+
+		file.close();
+
+		// Load save data for current level.
+		Parse(saveData, false);
+		return true;
+	}
+	catch (std::exception& ex)
+	{
+		TENLog("Error while loading savegame: " + std::string(ex.what()), LogLevel::Error);
+
+		if (file.is_open())
+			file.close();
 	}
 
-	file.close();
-
-	// Load save data for current level.
-	Parse(saveData, false);
-	return true;
+	return false;
 }
 
 static void ParseStatistics(const Save::SaveGame* s, bool isHub)
@@ -1995,13 +2003,14 @@ static void ParsePlayer(const Save::SaveGame* s)
 	{
 		auto* rope = &Ropes[Lara.Control.Rope.Ptr];
 
-		for (int i = 0; i < ROPE_SEGMENTS; i++)
+		for (int i = 0; i < s->rope()->segments()->size(); i++)
 		{
-			rope->segment[i] = ToVector3i(s->rope()->segments()->Get(i));
-			rope->normalisedSegment[i] = ToVector3i(s->rope()->normalised_segments()->Get(i));
-			rope->meshSegment[i] = ToVector3i(s->rope()->mesh_segments()->Get(i));
-			rope->coords[i] = ToVector3i(s->rope()->coords()->Get(i));
-			rope->velocity[i] = ToVector3i(s->rope()->velocities()->Get(i));
+			auto ropeSegment = s->rope()->segments()->Get(i);
+			rope->segment[i] = ToVector3i(ropeSegment->segment());
+			rope->normalisedSegment[i] = ToVector3i(ropeSegment->normalised_segment());
+			rope->meshSegment[i] = ToVector3i(ropeSegment->mesh_segment());
+			rope->coords[i] = ToVector3i(ropeSegment->coord());
+			rope->velocity[i] = ToVector3i(ropeSegment->velocity());
 		}
 
 		rope->coiled = s->rope()->coiled();
@@ -2059,7 +2068,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		TENAssert(i < (int)SoundTrackType::Count, "Soundtrack type count was changed");
 
 		auto track = s->soundtracks()->Get(i);
-		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position());
+		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position(), SOUND_XFADETIME_LEVELJUMP);
 	}
 
 	// Load fish swarm.
@@ -2361,6 +2370,10 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 			continue;
 		}
 
+		// If object is bridge - remove it from existing sectors.
+		if (item->IsBridge())
+			UpdateBridgeItem(g_Level.Items[i], BridgeUpdateType::Remove);
+
 		// Position
 		item->Pose = ToPose(*savedItem->pose());
 		item->RoomNumber = savedItem->room_number();
@@ -2428,8 +2441,9 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
 		}
 
+		// Re-add bridges at new position.
 		if (item->IsBridge())
-			UpdateBridgeItem(g_Level.Items[i]);
+			UpdateBridgeItem(g_Level.Items[i], BridgeUpdateType::Initialize);
 
 		// Creature data for intelligent items.
 		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)
@@ -2665,6 +2679,7 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 
 		header->Level = s->header()->level();
 		header->LevelName = s->header()->level_name()->str();
+		header->LevelHash = s->header()->level_hash();
 		header->Days = s->header()->days();
 		header->Hours = s->header()->hours();
 		header->Minutes = s->header()->minutes();

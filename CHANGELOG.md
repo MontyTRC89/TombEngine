@@ -3,10 +3,39 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## Version 1.5 - xxxx-xx-xx
+## Version 1.6 - xxxx-xx-xx
 
 ### Bug fixes
+* Fixed engine performance around bridges.
+* Fixed engine performance if weather or bubble effects are active.
+* Fixed silent engine crashes if loaded level is corrupted or in incorrect format.
+* Fixed snow particles not always melting on the ground.
+* Fixed enemy pickups dropping on death sectors.
+* Fixed vehicle transfer not happening for levels which were not previously visited.
+* Fixed audio tracks placed in subfolders not restoring after loading savegame.
+* Fixed scripted input events not registering on the same game frame.
+* Fixed incorrect object camera position.
+* Fixed incorrect camera movement near walls after leaving look mode.
+* Fixed binocular or lasersight camera not switching off correctly after flyby.
+* Fixed Lara's Home entry not working.
+* Fixed exploding TR3 bosses.
+* Fixed the original issue with deactivation of Dart Emitter.
+* Fixed Lens Flare object not functioning properly.
 
+### Features/Amendments
+* Added fast savegame reloading.
+* Added ricochet sounds and make the effect more prominent.
+* Automatically generate title level, if one is missing.
+* Allow more than 1024 objects in a level.
+
+### Lua API changes
+
+* Added support for transparency value in DisplayString class.
+* Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
+
+## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
+
+### Bug fixes
 * Fixed original issue with classic switch off trigger incorrectly activating some trigger actions.
 * Fixed moveable status after antitriggering.
 * Fixed leveljump vehicle transfer.
@@ -22,8 +51,11 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect swing ledge grabs with steep grab angles.
 * Fixed incorrect climbing out of water on bridge objects and in front of static meshes.
 * Fixed incorrect diving animation when swandiving from a high place.
+* Fixed room clipping when flyby path goes out of room bounds.
 * Fixed camera rotating with the player's hips when climbing out of water.
+* Fixed camera behaviour on sloped surfaces after player's death.
 * Fixed camera position after loading a savegame.
+* Fixed broken ropes after loading a savegame.
 * Fixed AI for TR2 Skidoo driver and Worker with shotgun.
 * Fixed Ember Emitter crashing when ocb is between -1 and -10.
 * Fixed Electric Cleaner and Squishy Block not detecting collision with certain block heights.
@@ -42,7 +74,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed young Lara hair drawing. https://tombengine.com/docs/level-settings/#young_lara
 
 ### Features/Amendments
-
 * Added high framerate mode (also known as 60 FPS mode).
 * Added a customisable global lensflare effect. https://tombengine.com/docs/level-settings/#lensflare
 * Added a customisable starry sky and meteor effect. https://tombengine.com/docs/level-settings/#stars
@@ -71,7 +102,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Removed original limit of 32 active Flame Emitters.
 	
 ### Lua API changes
-
 * Added Flow.EnableHomeLevel() function.
 * Added Flow.IsStringPresent() function.
 * Added Flow.LensFlare() and Flow.Starfield() classes.

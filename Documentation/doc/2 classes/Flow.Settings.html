@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.4 Lua API</title>
+    <title>TombEngine 1.5 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -114,6 +114,10 @@
 	<td class="name" ><a href="#errorMode">errorMode</a></td>
 	<td class="summary">How should the application respond to script errors?</td>
 	</tr>
+	<tr>
+	<td class="name" ><a href="#fastReload">fastReload</a></td>
+	<td class="summary">Can game utilize fast reload feature?</td>
+	</tr>
 </table>
 
 <br/>
@@ -129,6 +133,7 @@
     </dt>
     <dd>
     How should the application respond to script errors?
+<br>
 Must be one of the following:
 <code>ErrorMode.TERMINATE</code> - print to the log file and return to the title level when any script error is hit.
 This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.</p>
@@ -143,6 +148,25 @@ an invalid argument.</p>
 
 <p>In all of these modes, an <em>unrecoverable</em> error will boot you to the title level. If the title level itself
 has an unrecoverable error, the game will close.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "fastReload"></a>
+    <strong>fastReload</strong>
+    </dt>
+    <dd>
+    Can game utilize fast reload feature?
+<br>
+When set to <code>True</code>, game will attempt to perform fast savegame reloading, if current level is the same as
+level loaded from the savegame. It will not work if level timestamp or checksum has changed (i.e. level was
+updated). If set to <code>False</code> this functionality is turned off.
 
 
 

@@ -883,7 +883,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (object.hitEffect == HitEffect::Richochet && pos.has_value())
 		{
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, false);
 			SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &target.Pose);
 		}
 
