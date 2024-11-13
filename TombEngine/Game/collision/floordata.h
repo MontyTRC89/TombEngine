@@ -55,6 +55,13 @@ enum class ClimbDirectionFlags
 	West  = 1 << 11
 };
 
+enum class BridgeUpdateType
+{
+	Normal,
+	Initialize,
+	Remove
+};
+
 // NOTE: Describes vertical room location.
 class RoomVector 
 {
@@ -201,7 +208,7 @@ namespace TEN::Collision::Floordata
 
 	std::optional<int> GetBridgeItemIntersect(const ItemInfo& item, const Vector3i& pos, bool useBottomHeight);
 	int	 GetBridgeBorder(const ItemInfo& item, bool isBottom);
-	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval = false);
+	void UpdateBridgeItem(const ItemInfo& item, BridgeUpdateType updateType = BridgeUpdateType::Normal);
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials);
 	

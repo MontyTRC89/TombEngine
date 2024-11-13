@@ -71,7 +71,7 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 
 		// Clear bridge.
 		if (item.IsBridge())
-			UpdateBridgeItem(item, true);
+			UpdateBridgeItem(item, BridgeUpdateType::Remove);
 	}
 }
 

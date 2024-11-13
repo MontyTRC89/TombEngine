@@ -2370,6 +2370,10 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 			continue;
 		}
 
+		// If object is bridge - remove it from existing sectors.
+		if (item->IsBridge())
+			UpdateBridgeItem(g_Level.Items[i], BridgeUpdateType::Remove);
+
 		// Position
 		item->Pose = ToPose(*savedItem->pose());
 		item->RoomNumber = savedItem->room_number();
@@ -2437,8 +2441,9 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
 		}
 
+		// Re-add bridges at new position.
 		if (item->IsBridge())
-			UpdateBridgeItem(g_Level.Items[i]);
+			UpdateBridgeItem(g_Level.Items[i], BridgeUpdateType::Initialize);
 
 		// Creature data for intelligent items.
 		if (item->ObjectNumber != ID_LARA && item->Status == ITEM_ACTIVE && obj->intelligent)
