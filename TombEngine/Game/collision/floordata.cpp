@@ -19,6 +19,23 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using namespace TEN::Renderer;
 
+constexpr auto BRIDGE_CACHE_SIZE = 20;
+
+struct BridgeCacheEntry
+{
+	int	 BridgeItemNumber = 0;
+	Pose BridgePose		  = Pose::Zero;
+
+	bool			   UseBottomHeight = false;
+	Vector3i		   Position		   = Vector3i::Zero;
+	std::optional<int> Height		   = std::nullopt;
+};
+
+// NOTE: Caching most recent bridge data saves up to 30% CPU time spent in GetBridgeItemIntersect(),
+// as player collision checks tend to repeat probing in same places multiple times.
+auto BridgeCache	   = std::array<BridgeCacheEntry, BRIDGE_CACHE_SIZE>{};
+int	 BridgeCacheSlotID = 0;
+
 int FloorInfo::GetSurfaceTriangleID(int x, int z, bool isFloor) const
 {
 	constexpr auto TRI_ID_0 = 0;
@@ -182,6 +199,10 @@ int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 	auto normal = tri.Plane.Normal();
 	float relPlaneHeight = -((normal.x * sectorPoint.x) + (normal.z * sectorPoint.y)) / normal.y;
 
+	// Due to precision loss, we can't recover NO_HEIGHT constant from the plane, and must return original integer constant.
+	if (tri.Plane.D() == (float)NO_HEIGHT)
+		return NO_HEIGHT;
+
 	// Return sector floor or ceiling height. NOTE: Bridges ignored.
 	return (tri.Plane.D() + relPlaneHeight);
 }
@@ -198,18 +219,27 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridge = GetBridgeObject(bridgeItem);
 
+		auto bridgeFloorHeight   = bridge.GetFloorHeight(bridgeItem, pos);
+		auto bridgeCeilingHeight = bridge.GetCeilingHeight(bridgeItem, pos);
+
 		// 2.1) Get bridge surface height.
 		auto bridgeSurfaceHeight = isFloor ? bridge.GetFloorHeight(bridgeItem, pos) : bridge.GetCeilingHeight(bridgeItem, pos);
+
 		if (!bridgeSurfaceHeight.has_value())
 			continue;
+
+		// Use bridge midpoint to decide whether to return bridge height or room height, in case probe point
+		// is located within the bridge. Without it, dynamic bridges may fail while Lara is standing on them.
+		int thickness = bridge.GetCeilingBorder(bridgeItem) - bridge.GetFloorBorder(bridgeItem);
+		int midpoint  = bridgeItem.Pose.Position.y + thickness / 2;
 
 		// 2.2) Track closest floor or ceiling height.
 		if (isFloor)
 		{
 			// Test if bridge floor height is closer.
-			if (*bridgeSurfaceHeight >= pos.y &&	   // Bridge floor height is below position.
-				*bridgeSurfaceHeight < floorHeight &&  // Bridge floor height is above current closest floor height.
-				*bridgeSurfaceHeight >= ceilingHeight) // Bridge ceiling height is below sector ceiling height.
+			if (midpoint >= pos.y &&					// Bridge midpoint is below position.
+				*bridgeSurfaceHeight < floorHeight &&   // Bridge floor height is above current closest floor height.
+				*bridgeSurfaceHeight >= ceilingHeight)  // Bridge ceiling height is below sector ceiling height.
 			{
 				floorHeight = *bridgeSurfaceHeight;
 			}
@@ -217,7 +247,7 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		else
 		{
 			// Test if bridge ceiling height is closer.
-			if (*bridgeSurfaceHeight <= pos.y &&		// Bridge ceiling height is above position.
+			if (midpoint <= pos.y &&					// Bridge midpoint is above position.
 				*bridgeSurfaceHeight > ceilingHeight && // Bridge ceiling height is below current closest ceiling height.
 				*bridgeSurfaceHeight <= floorHeight)	// Bridge floor height is above sector floor height.
 			{
@@ -778,6 +808,7 @@ namespace TEN::Collision::Floordata
 		}
 	}
 
+	// TODO: Load anim frame AABBs as DX BoundingBox objects and do regular ray test for gain of 3-5 frames. -- Sezz 2024.11.07
 	// Get precise floor/ceiling height from object's bounding box.
 	// Animated objects are also supported, although horizontal collision shifting is unstable.
 	// Method: get accurate bounds in world transform by converting to OBB, then do a ray test
@@ -786,17 +817,58 @@ namespace TEN::Collision::Floordata
 	{
 		constexpr auto VERTICAL_MARGIN = 4;
 
-		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-		
-		auto origin = Vector3(pos.x, pos.y + (useBottomHeight ? VERTICAL_MARGIN : -VERTICAL_MARGIN), pos.z);
-		auto dir = useBottomHeight ? -Vector3::UnitY : Vector3::UnitY;
+		// Check bridge cache for existing entry.
+		for (const auto& entry : BridgeCache) 
+		{
+			if (entry.BridgeItemNumber == item.Index && entry.BridgePose == item.Pose && 
+				entry.UseBottomHeight == useBottomHeight && entry.Position == pos)
+			{
+				return entry.Height;
+			}
+		}
 
-		// Ray intersects box; return bridge box height.
-		float dist = 0.0f;
-		if (box.Intersects(origin, dir, dist))
-			return Geometry::TranslatePoint(origin, dir, dist).y;
+		auto box = GameBoundingBox(&item);
+		auto extents = box.GetExtents();
 
-		return std::nullopt;
+		// Test rough circle intersection to discard bridges not intersecting on XZ plane.
+		auto circle1 = Vector3(pos.x, pos.z, BLOCK(1));
+		auto circle2 = Vector3(item.Pose.Position.x, item.Pose.Position.z, std::hypot(extents.x, extents.z));
+
+		auto height = std::optional<int>();
+		if (Geometry::CircleIntersects(circle1, circle2))
+		{
+			auto origin = Vector3i(pos.x, pos.y + (useBottomHeight ? VERTICAL_MARGIN : -VERTICAL_MARGIN), pos.z) - item.Pose.Position;
+
+			float sinAngle = phd_sin(-item.Pose.Orientation.y);
+			float cosAngle = phd_cos(-item.Pose.Orientation.y);
+
+			auto localOrigin = Vector3i(
+				(origin.x * cosAngle) - (origin.z * sinAngle),
+				origin.y,
+				(origin.x * sinAngle) + (origin.z * cosAngle));
+
+			// Calculate intersection distance.
+			auto direction = useBottomHeight ? -Vector3::UnitY : Vector3::UnitY;
+			float targetY = useBottomHeight ? box.Y2 : box.Y1;
+			float dist = (targetY - localOrigin.y) / direction.y;
+
+			// Compute intersection point.
+			auto intersectionPoint = Geometry::TranslatePoint(localOrigin, direction, dist);
+
+			// Check if intersection point is within bounding box's X and Z extents.
+			if (intersectionPoint.x >= box.X1 && intersectionPoint.x <= box.X2 &&
+				intersectionPoint.z >= box.Z1 && intersectionPoint.z <= box.Z2)
+			{
+				// Transform intersection point back to world coordinates.
+				height = item.Pose.Position.y + intersectionPoint.y;
+			}
+		}
+
+		// Cache bridge data.
+		BridgeCache[BridgeCacheSlotID] = BridgeCacheEntry{ item.Index, item.Pose, useBottomHeight, pos, height };
+		BridgeCacheSlotID = (BridgeCacheSlotID + 1) % BRIDGE_CACHE_SIZE; // Wrap to next slot ID.
+
+		return height;
 	}
 
 	// Gets bridge min or max height regardless of actual X/Z world position.
@@ -807,7 +879,7 @@ namespace TEN::Collision::Floordata
 	}
 
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
-	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval)
+	void UpdateBridgeItem(const ItemInfo& item, BridgeUpdateType updateType)
 	{
 		constexpr auto SECTOR_EXTENTS = Vector3(BLOCK(0.5f));
 
@@ -819,7 +891,7 @@ namespace TEN::Collision::Floordata
 
 		// Force removal if item was killed.
 		if (item.Flags & IFLAG_KILLED)
-			forceRemoval = true;
+			updateType = BridgeUpdateType::Remove;
 
 		// Get bridge OBB.
 		auto bridgeBox = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
@@ -847,10 +919,11 @@ namespace TEN::Collision::Floordata
 				float offZ = pZ - item.Pose.Position.z;
 
 				// Clean previous bridge state.
-				RemoveBridge(item.Index, offX, offZ);
+				if (updateType != BridgeUpdateType::Initialize)
+					RemoveBridge(item.Index, offX, offZ);
 
-				// In sweep mode; don't try readding to sector.
-				if (forceRemoval)
+				// In removal mode; don't try re-adding to sector.
+				if (updateType == BridgeUpdateType::Remove)
 					continue;
 
 				// Sector is outside enclosed AABB space; ignore precise check.
@@ -904,6 +977,9 @@ namespace TEN::Collision::Floordata
 		constexpr auto BEETLE_MINECART_RIGHT_COLOR	 = Vector4(0.4f, 0.4f, 1.0f, 1.0f);
 		constexpr auto ACTIVATOR_MINECART_LEFT_COLOR = Vector4(1.0f, 0.4f, 1.0f, 1.0f);
 		constexpr auto MINECART_STOP_COLOR			 = Vector4(0.4f, 1.0f, 1.0f, 1.0f);
+
+		if (g_Renderer.GetCurrentDebugPage() != RendererDebugPage::CollisionStats)
+			return;
 
 		// Get point collision.
 		auto pointColl = GetPointCollision(item);

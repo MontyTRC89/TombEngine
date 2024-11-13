@@ -120,6 +120,7 @@ static constexpr char ScriptReserved_SetFlags[]				= "SetFlags";
 static constexpr char ScriptReserved_SetTranslated[]		= "SetTranslated";
 static constexpr char ScriptReserved_GetPosition[]			= "GetPosition";
 static constexpr char ScriptReserved_GetJointPosition[]		= "GetJointPosition";
+static constexpr char ScriptReserved_GetJointRotation[]		= "GetJointRotation";
 static constexpr char ScriptReserved_SetPosition[]			= "SetPosition";
 static constexpr char ScriptReserved_GetRotation[]			= "GetRotation";
 static constexpr char ScriptReserved_SetRotation[]			= "SetRotation";
@@ -148,6 +149,7 @@ static constexpr char ScriptReserved_SetFrameNumber[]		= "SetFrame";
 static constexpr char ScriptReserved_GetAnimNumber[]		= "GetAnim";
 static constexpr char ScriptReserved_SetAnimNumber[]		= "SetAnim";
 static constexpr char ScriptReserved_GetStateNumber[]		= "GetState";
+static constexpr char ScriptReserved_GetTargetStateNumber[]	= "GetTargetState";
 static constexpr char ScriptReserved_SetStateNumber[]		= "SetState";
 static constexpr char ScriptReserved_GetOCB[]				= "GetOCB";
 static constexpr char ScriptReserved_SetOCB[]				= "SetOCB";
@@ -227,6 +229,7 @@ static constexpr char ScriptReserved_EnablePointFilter[]		= "EnablePointFilter";
 // Flow Functions
 static constexpr char ScriptReserved_SetStrings[]			= "SetStrings";
 static constexpr char ScriptReserved_GetString[]			= "GetString";
+static constexpr char ScriptReserved_IsStringPresent[]		= "IsStringPresent";
 static constexpr char ScriptReserved_SetLanguageNames[]		= "SetLanguageNames";
 
 // Flow Tables
@@ -235,6 +238,7 @@ static constexpr char ScriptReserved_LaraType[]		  = "LaraType";
 static constexpr char ScriptReserved_RotationAxis[]	  = "RotationAxis";
 static constexpr char ScriptReserved_ItemAction[]	  = "ItemAction";
 static constexpr char ScriptReserved_ErrorMode[]	  = "ErrorMode";
+static constexpr char ScriptReserved_FastReload[]	  = "FastReload";
 static constexpr char ScriptReserved_InventoryItem[]  = "InventoryItem";
 static constexpr char ScriptReserved_LaraWeaponType[] = "LaraWeaponType";
 static constexpr char ScriptReserved_PlayerAmmoType[] = "PlayerAmmoType";

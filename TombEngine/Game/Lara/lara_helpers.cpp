@@ -895,7 +895,9 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 			{
 				SetAnimation(item, LA_FLY_CHEAT);
 				ResetPlayerFlex(&item);
-				item.Animation.IsAirborne = false;
+				item.Animation.Velocity = Vector3::Zero;
+				item.Animation.IsAirborne = true;
+				item.Pose.Position.y -= CLICK(0.5f);
 				item.HitPoints = LARA_HEALTH_MAX;
 
 				player.Control.WaterStatus = WaterStatus::FlyCheat;
@@ -953,7 +955,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 
 void HandlePlayerDiveBubbles(ItemInfo& item)
 {
-	constexpr auto BUBBLE_COUNT_MULT = 6;
+	constexpr auto BUBBLE_COUNT_MULT = 3;
 
 	auto& player = *GetLaraInfo(&item);
 
@@ -1044,6 +1046,8 @@ void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll)
 		if (CanStepUp(*item, *coll))
 		{
 			item->Animation.TargetState = LS_STEP_UP;
+			item->DisableInterpolation = true;
+
 			if (GetStateDispatch(item, GetAnimData(*item)))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;

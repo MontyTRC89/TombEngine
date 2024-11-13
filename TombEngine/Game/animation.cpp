@@ -62,6 +62,8 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				{
 					UpdateItemRoom(item.Index);
 				}
+
+				item.DisableInterpolation = true;
 			}
 
 			commandDataPtr += 3;
@@ -210,6 +212,13 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 			commandDataPtr += 2;
 			break;
 
+		case AnimCommandType::DisableInterpolation:
+			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+				item.DisableInterpolation = true;
+
+			commandDataPtr += 1;
+			break;
+
 		default:
 			break;
 		}
@@ -310,10 +319,13 @@ void AnimateItem(ItemInfo* item)
 			}
 			else
 			{
-				item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
-				item->Animation.Velocity.z += animAccel.z;
+				if (item->Animation.ActiveState != LS_FLY_CHEAT)
+				{
+					item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
+					item->Animation.Velocity.z += animAccel.z;
 
-				item->Pose.Position.y += item->Animation.Velocity.y;
+					item->Pose.Position.y += item->Animation.Velocity.y;
+				}
 			}
 		}
 		else

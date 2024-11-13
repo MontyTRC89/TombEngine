@@ -50,15 +50,11 @@ enum FadeStatus
 
 constexpr int MAX_ROOMS = 1024;
 
-constexpr int WIBBLE_SPEED = 4;
-constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
-
-constexpr int LOOP_FRAME_COUNT = 2;
+constexpr auto LOOP_FRAME_COUNT = 2;
 
 extern int GameTimer;
 extern int RumbleTimer;
 extern int GlobalCounter;
-extern int Wibble;
 
 extern bool InitializeGame;
 extern bool DoTheGame;
@@ -68,7 +64,6 @@ extern bool ThreadEnded;
 extern int RequiredStartPos;
 extern int CurrentLevel;
 extern int NextLevel;
-extern int SystemNameHash;
 
 extern bool  InItemControlLoop;
 extern short ItemNewRoomNo;
@@ -82,9 +77,9 @@ extern int ControlPhaseTime;
 
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
-int DrawPhase(bool isTitle);
+void DrawPhase(bool isTitle, float interpolationFactor);
 
-GameStatus ControlPhase(int numFrames);
+GameStatus ControlPhase(bool insideMenu);
 GameStatus DoLevel(int levelIndex, bool loadGame = false);
 GameStatus DoGameLoop(int levelIndex);
 void EndGameLoop(int levelIndex, GameStatus reason);
@@ -105,5 +100,7 @@ void CleanUp();
 void InitializeOrLoadGame(bool loadGame);
 void InitializeScripting(int levelIndex, LevelLoadType type);
 void DeInitializeScripting(int levelIndex);
+
+void SetupInterpolation();
 
 unsigned CALLBACK GameMain(void*);

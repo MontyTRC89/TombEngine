@@ -345,7 +345,7 @@ namespace TEN::Entities::TR4
 			if (item->TriggerFlags % 1000 > 100)
 			{
 				item->ItemFlags[0] = -80;
-				FindAITargetObject(creature, ID_AI_X1);
+				FindAITargetObject(*item, ID_AI_X1);
 			}
 
 			item->TriggerFlags = 1000 * (item->TriggerFlags / 1000);
@@ -1315,7 +1315,7 @@ namespace TEN::Entities::TR4
 			{
 				// Baddy2 bullet deflection with sword.
 				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
-				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, false);
 				return;
 			}
 			else if (object.hitEffect == HitEffect::Blood)

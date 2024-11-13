@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -139,20 +139,58 @@
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)..\Documentation\
+      <Command>SETLOCAL EnableDelayedExpansion
+
+SET SchemaDir=$(ProjectDir)Specific\savegame\schema
+SET TimestampFile=$(TargetDir)flatbuffers.timestamp
+
+FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
+    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
+)
+
+IF EXIST "%TimestampFile%" (
+    SET /P LastTimestamp=&lt;"%TimestampFile%"
+)
+
+SET CurrentTimestamp=%CurrentTimestamp: =%
+SET LastTimestamp=%LastTimestamp: =%
+
+IF "%CurrentTimestamp%" == "%LastTimestamp%" (
+    ECHO Skipping gen.bat, schema files are unchanged
+) ELSE (
+    ECHO Generating savegame code from flatbuffer schema...
+    CD "%SchemaDir%"
+    CALL gen.bat
+    ECHO !CurrentTimestamp! &gt; "%TimestampFile%"
+)
+
+ENDLOCAL
+
+CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
 
-CD $(ProjectDir)Specific\savegame\schema\
-CALL gen.bat
+SET BuildDir=$(SolutionDir)Build\$(Configuration)
+SET ShaderDir=%BuildDir%\Shaders
+SET ScriptsDir=%BuildDir%\Scripts
+SET EngineDir=%ScriptsDir%\Engine
 
-md "$(SolutionDir)Build\$(Configuration)\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Build\$(Configuration)\Shaders\"
-xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Build\$(Configuration)\Shaders\HUD\"
+if not exist %ShaderDir% mkdir %ShaderDir%
+if not exist %ScriptsDir% mkdir %ScriptsDir%
+if not exist %EngineDir% mkdir %EngineDir%
+
+xcopy /D /Y /I /E "$(ProjectDir)Shaders\*.*" %ShaderDir%
 
 xcopy /Y "$(SolutionDir)Libs\bass\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
+xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"
+
+xcopy /D /Y /I /E "$(SolutionDir)Scripts\Engine\*.*" %EngineDir%
+xcopy /D /Y "$(SolutionDir)Scripts\SystemStrings.lua" %ScriptsDir%
+
+if not exist "%ScriptsDir%\Gameflow.lua" xcopy /Y "$(SolutionDir)Scripts\Gameflow.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Settings.lua" xcopy /Y "$(SolutionDir)Scripts\Settings.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.lua" %ScriptsDir%</Command>
       <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -190,20 +228,58 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)..\Documentation\
+      <Command>SETLOCAL EnableDelayedExpansion
+
+SET SchemaDir=$(ProjectDir)Specific\savegame\schema
+SET TimestampFile=$(TargetDir)flatbuffers.timestamp
+
+FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
+    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
+)
+
+IF EXIST "%TimestampFile%" (
+    SET /P LastTimestamp=&lt;"%TimestampFile%"
+)
+
+SET CurrentTimestamp=%CurrentTimestamp: =%
+SET LastTimestamp=%LastTimestamp: =%
+
+IF "%CurrentTimestamp%" == "%LastTimestamp%" (
+    ECHO Skipping gen.bat, schema files are unchanged
+) ELSE (
+    ECHO Generating savegame code from flatbuffer schema...
+    CD "%SchemaDir%"
+    CALL gen.bat
+    ECHO !CurrentTimestamp! &gt; "%TimestampFile%"
+)
+
+ENDLOCAL
+
+CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
 
-CD $(ProjectDir)Specific\savegame\schema\
-CALL gen.bat
+SET BuildDir=$(SolutionDir)Build\$(Configuration)
+SET ShaderDir=%BuildDir%\Shaders
+SET ScriptsDir=%BuildDir%\Scripts
+SET EngineDir=%ScriptsDir%\Engine
 
-md "$(SolutionDir)Build\$(Configuration)\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Build\$(Configuration)\Shaders\"
-xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Build\$(Configuration)\Shaders\HUD\"
+if not exist %ShaderDir% mkdir %ShaderDir%
+if not exist %ScriptsDir% mkdir %ScriptsDir%
+if not exist %EngineDir% mkdir %EngineDir%
+
+xcopy /D /Y /I /E "$(ProjectDir)Shaders\*.*" %ShaderDir%
 
 xcopy /Y "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
+xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"
+
+xcopy /D /Y /I /E "$(SolutionDir)Scripts\Engine\*.*" %EngineDir%
+xcopy /D /Y "$(SolutionDir)Scripts\SystemStrings.lua" %ScriptsDir%
+
+if not exist "%ScriptsDir%\Gameflow.lua" xcopy /Y "$(SolutionDir)Scripts\Gameflow.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Settings.lua" xcopy /Y "$(SolutionDir)Scripts\Settings.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.lua" %ScriptsDir%</Command>
       <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -254,20 +330,34 @@ del "$(TargetDir)*.exp" /q
 del "$(TargetDir)OIS_d.dll" /q</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)..\Documentation\
+      <Command>CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
 
-CD $(ProjectDir)Specific\savegame\schema\
+CD "$(ProjectDir)Specific\savegame\schema\"
 CALL gen.bat
 
-md "$(SolutionDir)Build\$(Configuration)\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Build\$(Configuration)\Shaders\"
-xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Build\$(Configuration)\Shaders\HUD\"
+SET BuildDir=$(SolutionDir)Build\$(Configuration)
+SET ShaderDir=%BuildDir%\Shaders
+SET ScriptsDir=%BuildDir%\Scripts
+SET EngineDir=%ScriptsDir%\Engine
+
+if not exist %ShaderDir% mkdir %ShaderDir%
+if not exist %ScriptsDir% mkdir %ScriptsDir%
+if not exist %EngineDir% mkdir %EngineDir%
+
+xcopy /D /Y /I /E "$(ProjectDir)Shaders\*.*" %ShaderDir%
 
 xcopy /Y "$(SolutionDir)Libs\bass\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"</Command>
+xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"
+
+xcopy /D /Y /I /E "$(SolutionDir)Scripts\Engine\*.*" %EngineDir%
+xcopy /D /Y "$(SolutionDir)Scripts\SystemStrings.lua" %ScriptsDir%
+
+if not exist "%ScriptsDir%\Gameflow.lua" xcopy /Y "$(SolutionDir)Scripts\Gameflow.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Settings.lua" xcopy /Y "$(SolutionDir)Scripts\Settings.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.lua" %ScriptsDir%</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
@@ -319,20 +409,34 @@ del "$(TargetDir)*.exp" /q
 del "$(TargetDir)OIS_d.dll" /q</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD $(ProjectDir)..\Documentation\
+      <Command>CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
 
-CD $(ProjectDir)Specific\savegame\schema\
+CD "$(ProjectDir)Specific\savegame\schema\"
 CALL gen.bat
 
-md "$(SolutionDir)Build\$(Configuration)\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Build\$(Configuration)\Shaders\"
-xcopy /Y /D "$(ProjectDir)Shaders\HUD\*.hlsl" "$(SolutionDir)Build\$(Configuration)\Shaders\HUD\"
+SET BuildDir=$(SolutionDir)Build\$(Configuration)
+SET ShaderDir=%BuildDir%\Shaders
+SET ScriptsDir=%BuildDir%\Scripts
+SET EngineDir=%ScriptsDir%\Engine
+
+if not exist %ShaderDir% mkdir %ShaderDir%
+if not exist %ScriptsDir% mkdir %ScriptsDir%
+if not exist %EngineDir% mkdir %EngineDir%
+
+xcopy /D /Y /I /E "$(ProjectDir)Shaders\*.*" %ShaderDir%
 
 xcopy /Y "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
 xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
-xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
+xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"
+
+xcopy /D /Y /I /E "$(SolutionDir)Scripts\Engine\*.*" %EngineDir%
+xcopy /D /Y "$(SolutionDir)Scripts\SystemStrings.lua" %ScriptsDir%
+
+if not exist "%ScriptsDir%\Gameflow.lua" xcopy /Y "$(SolutionDir)Scripts\Gameflow.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Settings.lua" xcopy /Y "$(SolutionDir)Scripts\Settings.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.lua" %ScriptsDir%</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
@@ -444,6 +548,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\Effects\EmberEmitter.h" />
     <ClInclude Include="Objects\Effects\enemy_missile.h" />
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
+    <ClInclude Include="Objects\Effects\LensFlare.h" />
     <ClInclude Include="Objects\Effects\tr4_locusts.h" />
     <ClInclude Include="Objects\Effects\tr5_electricity.h" />
     <ClInclude Include="Objects\Generic\Doors\double_doors.h" />
@@ -633,9 +738,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Objects\TR4\Vehicles\motorbike.h" />
     <ClInclude Include="Objects\TR4\Vehicles\motorbike_info.h" />
     <ClInclude Include="Objects\TR4\tr4_objects.h" />
+    <ClInclude Include="Objects\TR5\Emitter\tr5_smoke_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_bats_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_rats_emitter.h" />
-    <ClInclude Include="Objects\TR5\Emitter\tr5_smoke_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_spider_emitter.h" />
     <ClInclude Include="Objects\TR5\Entity\AutoGun.h" />
     <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
@@ -737,6 +842,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Structures\RendererFogBulb.h" />
     <ClInclude Include="Renderer\Structures\RendererHudBar.h" />
     <ClInclude Include="Renderer\Structures\RendererItem.h" />
+    <ClInclude Include="Renderer\Structures\RendererLensFlare.h" />
     <ClInclude Include="Renderer\Structures\RendererLight.h" />
     <ClInclude Include="Renderer\Structures\RendererLine2D.h" />
     <ClInclude Include="Renderer\Structures\RendererLine3D.h" />
@@ -753,6 +859,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Renderer\Structures\RendererSpriteBucket.h" />
     <ClInclude Include="Renderer\Structures\RendererSpriteSequence.h" />
     <ClInclude Include="Renderer\Structures\RendererSpriteToDraw.h" />
+    <ClInclude Include="Renderer\Structures\RendererStar.h" />
     <ClInclude Include="Renderer\Structures\RendererStatic.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererTriangle3D.h" />
@@ -779,10 +886,12 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="Scripting\Internal\TEN\Flow\Fog\Fog.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\GameStatuses.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\LensFlare\LensFlare.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Settings\Settings.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Starfield\Starfield.h" />
     <ClInclude Include="Scripting\Internal\TEN\Input\ActionIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Input\InputHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Inventory\InventoryHandler.h" />
@@ -849,6 +958,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClInclude Include="framework.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="framework.cpp">
@@ -954,6 +1064,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\Effects\EmberEmitter.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
+    <ClCompile Include="Objects\Effects\LensFlare.cpp" />
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
     <ClCompile Include="Objects\Effects\tr5_electricity.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />
@@ -1132,9 +1243,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Objects\TR4\Trap\tr4_teethspike.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\jeep.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
+    <ClCompile Include="Objects\TR5\Emitter\tr5_smoke_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_bats_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_rats_emitter.cpp" />
-    <ClCompile Include="Objects\TR5\Emitter\tr5_smoke_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_spider_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Entity\AutoGun.cpp" />
     <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
@@ -1211,10 +1322,12 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <ClCompile Include="Scripting\Internal\TEN\Flow\FlowHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Fog\Fog.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\LensFlare\LensFlare.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Settings\Settings.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\Starfield\Starfield.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Input\InputHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Inventory\InventoryHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Logic\LogicHandler.cpp" />
@@ -1253,7 +1366,7 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   <ItemGroup>
     <None Include="Objects\Generic\Switches\rail_switch.h" />
     <None Include="packages.config" />
-    <None Include="Resources.aps" />
+    <None Include="Resources\title.bin" />
     <None Include="RuleSet.ruleset" />
     <None Include="Shaders\AnimatedTextures.hlsli" />
     <None Include="Shaders\CBCamera.hlsli">
@@ -1294,9 +1407,6 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="ten.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\HUD.hlsl">
@@ -1523,6 +1633,9 @@ xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"</Command>
     <None Include="Shaders\PostProcess.fx">
       <DeploymentContent>true</DeploymentContent>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\ten.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

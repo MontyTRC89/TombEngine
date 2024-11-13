@@ -278,10 +278,7 @@ namespace TEN::Input
 				break;
 			}
 		}
-	}
 
-	void ClearActionQueue()
-	{
 		for (auto& queue : ActionQueue)
 			queue = QueueState::None;
 	}

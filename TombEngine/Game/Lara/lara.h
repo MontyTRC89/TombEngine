@@ -82,7 +82,7 @@ constexpr auto LARA_STAMINA_MIN       = LARA_STAMINA_MAX / 10;
 constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
 
 constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
-constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
+constexpr auto PLAYER_BUBBLE_NODE_MAX = 8.0f;
 
 constexpr auto STEPUP_HEIGHT		= (int)CLICK(1.5f);
 constexpr auto CRAWL_STEPUP_HEIGHT	= CLICK(1) - 1;
@@ -93,8 +93,8 @@ constexpr auto WADE_WATER_DEPTH		= STEPUP_HEIGHT;
 constexpr auto SWIM_WATER_DEPTH		= CLICK(2.75f);
 constexpr auto SLOPE_DIFFERENCE		= 60;
 
-extern LaraInfo Lara;
-extern ItemInfo* LaraItem;
+extern LaraInfo		 Lara;
+extern ItemInfo*	 LaraItem;
 extern CollisionInfo LaraCollision;
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll);

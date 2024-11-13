@@ -3,11 +3,11 @@
 
 #include <CommCtrl.h>
 #include <process.h>
-#include <resource.h>
 #include <iostream>
 #include <codecvt>
 #include <filesystem>
 
+#include "resource.h"
 #include "Game/control/control.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer.h"
@@ -58,6 +58,22 @@ Vector2i GetScreenResolution()
 	resolution.x = desktop.right;
 	resolution.y = desktop.bottom;
 	return resolution;
+}
+
+int GetCurrentScreenRefreshRate()
+{
+	DEVMODE devmode;
+	memset(&devmode, 0, sizeof(devmode));
+	devmode.dmSize = sizeof(devmode);
+	
+	if (EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devmode))
+	{
+		return devmode.dmDisplayFrequency;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 std::vector<Vector2i> GetAllSupportedScreenResolutions()
@@ -113,6 +129,53 @@ void DisableDpiAwareness()
 	FreeLibrary(lib);
 }
 
+bool GenerateTitleLevel(const std::string& levelPath)
+{
+	// Try to load the embedded resource "data.bin"
+	HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_TITLELEVEL), "BIN");
+	if (hResource == NULL)
+	{
+		TENLog("Embedded title level file not found.", LogLevel::Error);
+		return false;
+	}
+
+	// Load the resource into memory
+	HGLOBAL hGlobal = LoadResource(NULL, hResource);
+	if (hGlobal == NULL)
+	{
+		TENLog("Failed to load embedded title level file.", LogLevel::Error);
+		return false;
+	}
+
+	// Lock the resource to get a pointer to the data
+	void* pData = LockResource(hGlobal);
+	DWORD dwSize = SizeofResource(NULL, hResource);
+
+	// Write the resource data to the file
+	try
+	{
+		std::filesystem::path dir = std::filesystem::path(levelPath).parent_path();
+		std::filesystem::create_directories(dir);
+
+		std::ofstream outFile(levelPath, std::ios::binary);
+		if (!outFile)
+			throw std::ios_base::failure("Failed to create title level file.");
+
+		outFile.write(reinterpret_cast<const char*>(pData), dwSize);
+		if (!outFile)
+			throw std::ios_base::failure("Failed to write to title level file.");
+
+		outFile.close();
+	}
+	catch (const std::exception& ex)
+	{
+		TENLog("Error while generating title level file: " + std::string(ex.what()), LogLevel::Error);
+		return false;
+	}
+
+	return true;
+}
+
 void WinProcMsg()
 {
 	MSG Msg;
@@ -140,17 +203,6 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 			SuspendThread((HANDLE)ThreadHandle);
 			g_Renderer.ToggleFullScreen();
 			ResumeThread((HANDLE)ThreadHandle);
-
-			if (g_Renderer.IsFullsScreen())
-			{
-				SetCursor(nullptr);
-				ShowCursor(false);
-			}
-			else
-			{
-				SetCursor(LoadCursorA(App.hInstance, (LPCSTR)0x68));
-				ShowCursor(true);
-			}
 		}
 	}
 }
@@ -163,6 +215,21 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
 	{
 		return 0;
+	}
+	
+	if (msg == WM_SETCURSOR)
+	{
+		if (LOWORD(lParam) == HTCLIENT)
+		{
+			SetCursor(g_Renderer.IsFullsScreen() ? nullptr : App.WindowClass.hCursor);
+			return 1;
+		}
+	}
+
+	if (msg == WM_ACTIVATEAPP)
+	{
+		App.ResetClock = true;
+		return DefWindowProcA(hWnd, msg, wParam, (LPARAM)lParam);
 	}
 
 	if (msg > WM_CLOSE)
@@ -285,6 +352,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					   std::to_string(ver[0]) + "." +
 					   std::to_string(ver[1]) + "." +
 					   std::to_string(ver[2]) + " " +
+					   std::to_string(ver[3]) + " " +
 #ifdef _WIN64
 					   "(64-bit)"
 #else
@@ -348,7 +416,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	App.WindowClass.lpfnWndProc = WinAppProc;
 	App.WindowClass.cbClsExtra = 0;
 	App.WindowClass.cbWndExtra = 0;
-	App.WindowClass.hCursor = LoadCursor(App.hInstance, IDC_ARROW);
+	App.WindowClass.hCursor = LoadCursorA(NULL, IDC_ARROW);
 
 	// Register main window.
 	if (!RegisterClass(&App.WindowClass))
@@ -439,8 +507,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		UpdateWindow(WindowsHandle);
 		ShowWindow(WindowsHandle, nShowCmd);
 
-		SetCursor(NULL);
-		ShowCursor(FALSE);
 		hAccTable = LoadAccelerators(hInstance, (LPCSTR)0x65);
 	}
 	catch (std::exception& ex)

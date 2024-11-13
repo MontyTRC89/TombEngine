@@ -6,13 +6,14 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
+	KayakInfo* GetKayakInfo(ItemInfo* kayakItem);
 	void InitializeKayak(short itemNumber);
 
 	void KayakPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void DoKayakMount(ItemInfo* kayakItem, ItemInfo* laraItem, VehicleMountType mountType);
 
-	void KayakPaddleTake(ItemInfo* laraItem);
-	void KayakPaddlePut(ItemInfo* laraItem);
+	void KayakPaddleTake(KayakInfo* kayak, ItemInfo* laraItem);
+	void KayakPaddlePut(KayakInfo* kayak, ItemInfo* laraItem);
 
 	void KayakDraw(ItemInfo* kayakItem);
 

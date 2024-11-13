@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/items.h"
 #include "Math/Math.h"
+#include "Specific/Clock.h"
 
 struct CollisionInfo;
 
@@ -24,11 +25,11 @@ struct CAMERA_INFO
 	GameVector target;
 	CameraType type;
 	CameraType oldType;
+	CameraType lastType;
 	int shift;
 	int flags;
 	bool fixedCamera;
 	bool underwater;
-	int numberFrames;
 	int bounce;
 	int targetDistance;
 	short targetAngle;
@@ -46,6 +47,11 @@ struct CAMERA_INFO
 	ItemInfo* lastItem;
 	int mikeAtLara;
 	Vector3i mikePos;
+
+	float Roll = 0.0f;
+	float Fov  = 0.0f;
+
+	bool DisableInterpolation = false;
 };
 
 struct ObjectCameraInfo
@@ -62,7 +68,7 @@ enum CAMERA_FLAGS
 	CF_CHASE_OBJECT	 = 3,
 };
 
-constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
+constexpr auto FADE_SCREEN_SPEED = 2.0f / FPS;
 constexpr auto DEFAULT_FOV = 80.0f;
 
 extern CAMERA_INFO Camera;
@@ -103,16 +109,20 @@ void RumbleScreen();
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius);
 void ItemsCollideCamera();
+void RefreshFixedCamera(short camNumber);
+
 void ObjCamera(ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID, bool cond);
 void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshID, ItemInfo* targetItem, int targetMeshID);
-void RefreshFixedCamera(short camNumber);
+void ClearObjCamera();
 
 void SetScreenFadeOut(float speed, bool force = false);
 void SetScreenFadeIn(float speed, bool force = false);
 void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
+void PrepareCamera();
+void UpdateCamera();
+void DrawPortals();
 void UpdateFadeScreenAndCinematicBars();
 void UpdateMikePos(const ItemInfo& item);
-void ClearObjCamera();
 
 float GetParticleDistanceFade(const Vector3i& pos);

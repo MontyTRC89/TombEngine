@@ -22,6 +22,8 @@ namespace TEN::Renderer
 
 	bool Renderer::PrepareDataForTheRenderer()
 	{
+		TENLog("Preparing renderer...", LogLevel::Info);
+
 		_lastBlendMode = BlendMode::Unknown;
 		_lastCullMode = CullMode::Unknown;
 		_lastDepthState = DepthState::Unknown;
@@ -32,6 +34,14 @@ namespace TEN::Renderer
 		_rooms.resize(g_Level.Rooms.size());
 
 		_meshes.clear();
+
+		int allocatedItemSize = (int)g_Level.Items.size() + MAX_SPAWNED_ITEM_COUNT;
+
+		auto item = RendererItem();
+		_items = std::vector<RendererItem>(allocatedItemSize, item);
+
+		auto effect = RendererEffect();
+		_effects = std::vector<RendererEffect>(allocatedItemSize, effect);
 
 		TENLog("Allocated renderer object memory.", LogLevel::Info);
 

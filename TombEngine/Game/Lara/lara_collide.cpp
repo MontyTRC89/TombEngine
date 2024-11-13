@@ -507,6 +507,21 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
+void LaraDefaultCollision(ItemInfo* item, CollisionInfo* coll)
+{
+	auto& player = GetLaraInfo(*item);
+
+	player.Control.MoveAngle = item->Pose.Orientation.y;
+	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
+	coll->Setup.LowerCeilingBound = 0;
+	coll->Setup.BlockFloorSlopeDown = true;
+	coll->Setup.BlockFloorSlopeUp = true;
+	coll->Setup.ForwardAngle = player.Control.MoveAngle;
+	GetCollisionInfo(coll, item);
+	LaraResetGravityStatus(item, coll);
+}
+
 void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
