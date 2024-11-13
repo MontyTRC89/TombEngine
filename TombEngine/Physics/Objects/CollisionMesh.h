@@ -4,24 +4,7 @@
 
 using namespace TEN::Structures;
 
-// TODO: Move to Math/Utils.h
-namespace std
-{
-	template <>
-	struct hash<Vector3>
-	{
-		size_t operator ()(const Vector3& vector) const noexcept
-		{
-			size_t seed = 0;
-			seed ^= hash<int>()(vector.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= hash<int>()(vector.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= hash<int>()(vector.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			return seed;
-		}
-	};
-}
-
-namespace TEN::Math
+namespace TEN::Physics
 {
 	class CollisionMeshDesc
 	{

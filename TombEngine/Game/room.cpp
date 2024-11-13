@@ -138,7 +138,7 @@ void RoomData::GenerateCollisionMesh()
 	}
 
 	// Create collision mesh.
-	CollisionMesh = TEN::Math::CollisionMesh(Position.ToVector3(), Quaternion::Identity, desc);
+	CollisionMesh = TEN::Physics::CollisionMesh(Position.ToVector3(), Quaternion::Identity, desc);
 }
 
 void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,

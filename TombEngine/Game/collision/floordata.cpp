@@ -826,6 +826,7 @@ namespace TEN::Collision::Floordata
 		constexpr auto BEETLE_MINECART_RIGHT_COLOR	 = Vector4(0.4f, 0.4f, 1.0f, 1.0f);
 		constexpr auto ACTIVATOR_MINECART_LEFT_COLOR = Vector4(1.0f, 0.4f, 1.0f, 1.0f);
 		constexpr auto MINECART_STOP_COLOR			 = Vector4(0.4f, 1.0f, 1.0f, 1.0f);
+		constexpr auto BRIDGE_COLOR					 = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 
 		if (g_Renderer.GetCurrentDebugPage() != RendererDebugPage::CollisionStats)
 			return;
@@ -895,6 +896,15 @@ namespace TEN::Collision::Floordata
 					DrawSectorFlagLabel(pos, "Minecart Stop", MINECART_STOP_COLOR, verticalOffset);
 					verticalOffset += STRING_SPACING;
 				}
+
+				// Bridges
+				for (int bridgeItemNumber : pointColl.GetSector().BridgeItemNumbers)
+				{
+					DrawSectorFlagLabel(pos, std::to_string(bridgeItemNumber), BRIDGE_COLOR, verticalOffset);
+					verticalOffset += STRING_SPACING;
+				}
+				DrawSectorFlagLabel(pos, "Bridges", BRIDGE_COLOR, verticalOffset);
+				verticalOffset += STRING_SPACING;
 			}
 		}
 	}

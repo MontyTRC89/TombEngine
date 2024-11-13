@@ -2,7 +2,6 @@
 #include "Math/Constants.h"
 #include "Math/Geometry.h"
 #include "Math/Legacy.h"
-#include "Math/Objects/CollisionMesh.h"
 #include "Math/Objects/EulerAngles.h"
 #include "Math/Objects/GameBoundingBox.h"
 #include "Math/Objects/GameVector.h"

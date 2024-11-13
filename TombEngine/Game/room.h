@@ -157,7 +157,7 @@ struct RoomData
 	//RoomObjectHandler Statics	= RoomObjectHandler(); // TODO: Refactor to use BVH.
 	std::vector<MESH_INFO> mesh = {}; // Statics
 
-	CollisionMesh			   CollisionMesh  = TEN::Math::CollisionMesh();
+	CollisionMesh			   CollisionMesh  = TEN::Physics::CollisionMesh();
 	RoomObjectHandler		   Bridges		  = RoomObjectHandler();
 	std::vector<PortalData>	   Portals		  = {};
 	std::vector<TriggerVolume> TriggerVolumes = {};

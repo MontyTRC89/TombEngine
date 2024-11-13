@@ -1,14 +1,15 @@
 #include "framework.h"
-#include "Math/Objects/CollisionMesh.h"
+#include "Physics/Objects/CollisionMesh.h"
 
 #include "Math/Math.h"
 #include "Specific/Structures/BoundingVolumeHierarchy.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Math;
 using namespace TEN::Structures;
 using namespace TEN::Utils;
 
-namespace TEN::Math
+namespace TEN::Physics
 {
 	unsigned int CollisionMeshDesc::GetTriangleCount() const
 	{

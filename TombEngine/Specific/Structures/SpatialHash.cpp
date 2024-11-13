@@ -2,7 +2,6 @@
 #include "Specific/Structures/SpatialHash.h"
 
 #include "Math/Math.h"
-#include "Renderer/Renderer.h"
 
 using namespace TEN::Math;
 
@@ -404,7 +403,7 @@ namespace TEN::Structures
 			auto [it, isInserted] = _cellMap.try_emplace(key, Cell(BoundingBox(key.ToVector3(), _cellAabbExtents)));
 
 			// Insert object ID into cell.
-			auto& cell = it->second;
+			auto& [keyPos, cell] = *it;
 			cell.ObjectIds.insert(objectID);
 		}
 	}
