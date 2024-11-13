@@ -8,7 +8,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Bug fixes
 * Fixed engine performance around bridges.
 * Fixed engine performance if weather or bubble effects are active.
-* Fixed silent engine crashes if loaded level is corrupted or in incorrect format.
+* Fixed silent crashes if loaded level is corrupted or in incorrect format.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemy pickups dropping on death sectors.
 * Fixed vehicle transfer not happening for levels which were not previously visited.
@@ -26,7 +26,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Features/Amendments
 * Added fast savegame reloading.
 * Added ricochet sounds and make the effect more prominent.
-* Automatically generate title level, if one is missing.
+* Allow to run the engine without title level.
 * Allow more than 1024 objects in a level.
 
 ### Lua API changes
