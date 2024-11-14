@@ -105,39 +105,46 @@ namespace TEN::Entities::Generic
 
 	void ControlPushableBlock(int itemNumber)
 	{
+		const auto& player = Lara;
 		auto& pushableItem = g_Level.Items[itemNumber];
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		if (Lara.Context.InteractedItem == itemNumber && Lara.Control.IsMoving)
+		if (player.Context.InteractedItem == itemNumber && player.Control.IsMoving)
 			return;
+
+		auto prevPos = pushableItem.Pose.Position;
 
 		// Handle behaviour and sound state.
 		HandlePushableBehaviorState(pushableItem);
 		HandlePushableSoundState(pushableItem);
 
-		// @BRIDGEME
-		// HACK: Track if bridge was disabled by behaviour state.
-		bool isEnabled = false;
-		if (pushable.Bridge.has_value())
-			isEnabled = pushable.Bridge->IsEnabled();
-
-		// @BRIDGEME
-		// HACK: Temporarily disable bridge before probing.
-		if (isEnabled && pushable.Bridge.has_value())
-			pushable.Bridge->Disable(pushableItem);
-
-		int probeRoomNumber = GetPointCollision(pushableItem).GetRoomNumber();
-
-		// @BRIDGEME
-		// HACK: Reenable bridge after probing.
-		if (isEnabled && pushable.Bridge.has_value())
-			pushable.Bridge->Enable(pushableItem);
-
 		// Update room number.
-		if (pushableItem.RoomNumber != probeRoomNumber)
+		if (pushableItem.Pose.Position != prevPos)
 		{
-			ItemNewRoom(itemNumber, probeRoomNumber);
-			pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
+			// @BRIDGEME
+			// HACK: Track if bridge was disabled by behaviour state.
+			bool isEnabled = false;
+			if (pushable.Bridge.has_value())
+				isEnabled = pushable.Bridge->IsEnabled();
+
+			// @BRIDGEME
+			// HACK: Temporarily disable bridge before probing.
+			if (isEnabled && pushable.Bridge.has_value())
+				pushable.Bridge->Disable(pushableItem);
+
+			int probeRoomNumber = GetPointCollision(pushableItem).GetRoomNumber();
+
+			// @BRIDGEME
+			// HACK: Reenable bridge after probing.
+			if (isEnabled && pushable.Bridge.has_value())
+				pushable.Bridge->Enable(pushableItem);
+
+			// Update room number.
+			if (pushableItem.RoomNumber != probeRoomNumber)
+			{
+				ItemNewRoom(itemNumber, probeRoomNumber);
+				pushable.StartPos.RoomNumber = pushableItem.RoomNumber;
+			}
 		}
 	}
 
