@@ -3506,7 +3506,7 @@ namespace TEN::Gui
 
 	LoadResult GuiController::DoLoad()
 	{
-		constexpr auto DEATH_NO_INPUT_LOAD_TIMEOUT = 1 * FPS;
+		constexpr int DEATH_NO_INPUT_LOAD_TIMEOUT = FPS / 2;
 
 		bool canLoop = g_Configuration.MenuOptionLoopingMode == MenuOptionLoopingMode::SaveLoadOnly ||
 					   g_Configuration.MenuOptionLoopingMode == MenuOptionLoopingMode::AllMenus;
