@@ -9,6 +9,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed engine performance around bridges.
 * Fixed engine performance if weather or bubble effects are active.
 * Fixed silent crashes if loaded level is corrupted or in incorrect format.
+* Fixed incorrect clipping of scaled static meshes.
 * Fixed uzi targeting issues after using flycheat.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemy pickups dropping on death sectors.

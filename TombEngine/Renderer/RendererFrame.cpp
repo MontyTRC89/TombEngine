@@ -471,7 +471,7 @@ namespace TEN::Renderer
 			{
 				mesh->ObjectNumber = nativeMesh->staticNumber;
 				mesh->Color = nativeMesh->color;
-				mesh->OriginalVisibilityBox = StaticObjects[mesh->ObjectNumber].visibilityBox;
+				mesh->OriginalSphere = StaticObjects[mesh->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
 				mesh->Pose = nativeMesh->pos;
 				mesh->Scale = nativeMesh->scale;
 				mesh->Update();
@@ -490,7 +490,7 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.empty())
 				continue;
 
-			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->VisibilityBox.Center, mesh->VisibilitySphereRadius))
+			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
 				continue;
 			 
 			// Collect the lights

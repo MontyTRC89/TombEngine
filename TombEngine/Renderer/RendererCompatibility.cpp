@@ -273,7 +273,7 @@ namespace TEN::Renderer
 					staticInfo->AmbientLight = r->AmbientLight;
 					staticInfo->Pose = oldMesh->pos;
 					staticInfo->Scale = oldMesh->scale;
-					staticInfo->OriginalVisibilityBox = StaticObjects[staticInfo->ObjectNumber].visibilityBox;
+					staticInfo->OriginalSphere = StaticObjects[staticInfo->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
 					staticInfo->IndexInRoom = l;
 
 					staticInfo->Update();
