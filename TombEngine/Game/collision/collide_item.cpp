@@ -151,13 +151,12 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 						continue;
 
 					// Ignore items not feasible for collision.
-					if (item.Index == collidingItem.Index ||
-						item.Flags & IFLAG_KILLED || item.MeshBits == NO_JOINT_BITS || !item.Collidable ||
-						(object.drawRoutine == nullptr && !item.IsLara()) ||
-						(object.collision == nullptr && !item.IsLara()))
-					{
+					if (item.Index == collidingItem.Index || item.Flags & IFLAG_KILLED || item.MeshBits == NO_JOINT_BITS)
 						continue;
-					}
+
+					// Ignore non-Lara items without collision or draw routines or with collidable flag unset.
+					if (!item.IsLara() && (!item.Collidable || object.drawRoutine == nullptr || object.collision == nullptr))
+						continue;
 
 					// HACK: Ignore UPV and big gun.
 					if ((item.ObjectNumber == ID_UPV || item.ObjectNumber == ID_BIGGUN) && item.HitPoints == 1)
