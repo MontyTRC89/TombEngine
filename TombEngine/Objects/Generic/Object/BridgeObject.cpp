@@ -47,6 +47,7 @@ namespace TEN::Entities::Generic
 
 		// Store previous parameters.
 		_prevPose = item.Pose;
+		_prevScale = item.Model.Mutators.front().Scale;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
@@ -63,8 +64,11 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		if (item.Pose == _prevPose && item.RoomNumber == _prevRoomNumber)
+		if (item.Pose == _prevPose && item.Model.Mutators.front().Scale == _prevScale &&
+			item.RoomNumber == _prevRoomNumber)
+		{
 			return;
+		}
 
 		UpdateCollisionMesh(item);
 		UpdateAttractor(item);
@@ -86,6 +90,7 @@ namespace TEN::Entities::Generic
 
 		// Store previous parameters.
 		_prevPose = item.Pose;
+		_prevScale = item.Model.Mutators.front().Scale;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
@@ -105,6 +110,7 @@ namespace TEN::Entities::Generic
 
 		// Store previous parameters.
 		_prevPose = item.Pose;
+		_prevScale = item.Model.Mutators.front().Scale;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
@@ -148,9 +154,12 @@ namespace TEN::Entities::Generic
 			break;
 		}
 
+		// Get scale.
+		auto scale = item.Model.Mutators.front().Scale;
+
 		// Get local AABB corners.
 		const auto& bounds = GetAnimFrame(item, 0, 0).BoundingBox;
-		auto aabb = BoundingBox(bounds.GetCenter(), bounds.GetExtents());
+		auto aabb = BoundingBox(bounds.GetCenter() - (bounds.GetExtents() * (scale - Vector3::One)), bounds.GetExtents() * scale);
 		auto corners = std::array<Vector3, BoundingBox::CORNER_COUNT>{};
 		aabb.GetCorners(corners.data());
 
@@ -186,10 +195,16 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
 	{
-		// TODO: Also update proportions based on AABB animation?
-
-		_collisionMesh.SetPosition(item.Pose.Position.ToVector3());
-		_collisionMesh.SetOrientation(item.Pose.Orientation.ToQuaternion());
+		auto scale = item.Model.Mutators.front().Scale;
+		if (scale != _prevScale)
+		{
+			InitializeCollisionMesh(item);
+		}
+		else
+		{
+			_collisionMesh.SetPosition(item.Pose.Position.ToVector3());
+			_collisionMesh.SetOrientation(item.Pose.Orientation.ToQuaternion());
+		}
 	}
 
 	void BridgeObject::UpdateAttractor(const ItemInfo& item)

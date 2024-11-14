@@ -20,6 +20,7 @@ namespace TEN::Entities::Generic
 		//AttractorObject _attractor	   = AttractorObject();
 
 		Pose				_prevPose		= Pose::Zero;
+		Vector3				_prevScale		= Vector3::Zero;
 		int					_prevRoomNumber = 0;
 		BoundingBox			_prevAabb		= BoundingBox();
 		BoundingOrientedBox _prevObb		= BoundingOrientedBox();

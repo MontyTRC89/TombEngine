@@ -65,24 +65,15 @@ namespace TEN::Entities::Generic
 		item->Data = BridgeObject();
 		auto& bridge = GetBridgeObject(*item);
 
-		// Initialize routines.
-		bridge.GetFloorHeight = GetRaisingBlockFloorHeight;
-		bridge.GetCeilingHeight = GetRaisingBlockCeilingHeight;
-		bridge.GetFloorBorder = GetRaisingBlockFloorBorder;
-		bridge.GetCeilingBorder = GetRaisingBlockCeilingBorder;
-
-		// @BRIDGEME
-		bridge.Initialize(*item);
-
 		short roomNumber = item->RoomNumber;
 		auto* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
 		if (floor->PathfindingBoxID != NO_VALUE)
 			g_Level.PathfindingBoxes[floor->PathfindingBoxID].flags &= ~BLOCKED;
 
-		// Set mutators to EulerAngles identity by default.
+		// Set mutator Y scale to 0 by default.
 		for (auto& mutator : item->Model.Mutators)
-			mutator.Scale.y = 0;
+			mutator.Scale.y = 0.0f;
 
 		if (item->TriggerFlags < 0)
 		{
@@ -90,6 +81,12 @@ namespace TEN::Entities::Generic
 			AddActiveItem(itemNumber);
 			item->Status = ITEM_ACTIVE;
 		}
+
+		bridge.GetFloorHeight = GetRaisingBlockFloorHeight;
+		bridge.GetCeilingHeight = GetRaisingBlockCeilingHeight;
+		bridge.GetFloorBorder = GetRaisingBlockFloorBorder;
+		bridge.GetCeilingBorder = GetRaisingBlockCeilingBorder;
+		bridge.Initialize(*item);
 	}
 
 	void ShakeRaisingBlock(ItemInfo* item)
@@ -112,9 +109,6 @@ namespace TEN::Entities::Generic
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		auto& bridge = GetBridgeObject(*item);
-
-		// @BRIDGEME
-		bridge.Update(*item);
 
 		if (TriggerActive(item))
 		{
@@ -166,5 +160,7 @@ namespace TEN::Entities::Generic
 			for (auto& mutator : item->Model.Mutators)
 				mutator.Scale = Vector3(1.0f, item->ItemFlags[1] / BLOCK(4.0f), 1.0f);
 		}
+
+		bridge.Update(*item);
 	}
 }
