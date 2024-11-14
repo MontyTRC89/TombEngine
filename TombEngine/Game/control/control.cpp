@@ -223,20 +223,27 @@ GameStatus ControlPhase(bool insideMenu)
 	PlaySoundSources();
 	Sound_UpdateScene();
 
-	// Handle inventory, pause, load, save screens.
+	UpdateCamera();
+
 	if (!insideMenu)
 	{
+		// Handle inventory, pause, load, save screens.
 		auto result = HandleMenuCalls(isTitle);
-		if (result != GameStatus::Normal)
-			return result;
 
 		// Handle global input events.
-		result = HandleGlobalInputEvents(isTitle);
-		if (result != GameStatus::Normal)
-			return result;
-	}
+		if (result == GameStatus::Normal)
+			result = HandleGlobalInputEvents(isTitle);
 
-	UpdateCamera();
+		if (result != GameStatus::Normal)
+		{
+			// Call post-loop callbacks last time and end level.
+			g_GameScript->OnLoop(DELTA_TIME, true);
+			g_GameScript->OnEnd(result);
+			HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
+
+			return result;
+		}
+	}
 
 	// Post-loop script and event handling.
 	g_GameScript->OnLoop(DELTA_TIME, true);
@@ -490,9 +497,6 @@ void InitializeScripting(int levelIndex, LevelLoadType type)
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
-	g_GameScript->OnEnd(reason);
-	HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
-
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
