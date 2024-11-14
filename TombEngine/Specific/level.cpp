@@ -1549,9 +1549,10 @@ bool LoadLevelFile(int levelIndex)
 	bool fastReload = (g_GameFlow->GetSettings()->FastReload && levelIndex == CurrentLevel && timestamp == LastLevelTimestamp && levelPath == LastLevelFilePath);
 
 	// Dumping game scene right after engine launch is impossible, as no scene exists.
-	if (!FirstLevel && fastReload)
+	if (!FirstLevel)
 		g_Renderer.DumpGameScene();
 
+	// If fast reload is in action, don't draw loading screen, and instead draw last game frame.
 	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level.LoadScreenFileName);
 	g_Renderer.SetLoadingScreen(fastReload ? std::wstring{} : loadingScreenPath);
 

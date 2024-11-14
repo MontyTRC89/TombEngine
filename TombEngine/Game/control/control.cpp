@@ -223,30 +223,32 @@ GameStatus ControlPhase(bool insideMenu)
 	PlaySoundSources();
 	Sound_UpdateScene();
 
-	UpdateCamera();
+	auto result = GameStatus::Normal;
 
 	if (!insideMenu)
 	{
 		// Handle inventory, pause, load, save screens.
-		auto result = HandleMenuCalls(isTitle);
+		result = HandleMenuCalls(isTitle);
 
 		// Handle global input events.
 		if (result == GameStatus::Normal)
 			result = HandleGlobalInputEvents(isTitle);
-
-		if (result != GameStatus::Normal)
-		{
-			// Call post-loop callbacks last time and end level.
-			g_GameScript->OnLoop(DELTA_TIME, true);
-			g_GameScript->OnEnd(result);
-			HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
-
-			return result;
-		}
 	}
 
-	// Post-loop script and event handling.
-	g_GameScript->OnLoop(DELTA_TIME, true);
+	if (result != GameStatus::Normal)
+	{
+		// Call post-loop callbacks last time and end level.
+		g_GameScript->OnLoop(DELTA_TIME, true);
+		g_GameScript->OnEnd(result);
+		HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
+	}
+	else
+	{
+		// Post-loop script and event handling.
+		g_GameScript->OnLoop(DELTA_TIME, true);
+	}
+
+	UpdateCamera();
 
 	// Clear savegame loaded flag.
 	JustLoaded = false;
@@ -258,7 +260,7 @@ GameStatus ControlPhase(bool insideMenu)
 	auto time2 = std::chrono::high_resolution_clock::now();
 	ControlPhaseTime = (std::chrono::duration_cast<std::chrono::nanoseconds>(time2 - time1)).count() / 1000000;
 
-	return GameStatus::Normal;
+	return result;
 }
 
 unsigned CALLBACK GameMain(void *)
