@@ -594,6 +594,8 @@ GameStatus DoGameLoop(int levelIndex)
 
 void EndGameLoop(int levelIndex, GameStatus reason)
 {
+	g_Renderer.DumpGameScene(); // Save last screenshot for loading screen.
+
 	SaveGame::SaveHub(levelIndex);
 	DeInitializeScripting(levelIndex, reason);
 
