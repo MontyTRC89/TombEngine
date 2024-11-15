@@ -494,7 +494,7 @@ void InitializeScripting(int levelIndex, LevelLoadType type)
 
 	// Play default background music.
 	if (type != LevelLoadType::Load)
-		PlaySoundTrack(level.GetAmbientTrack(), SoundTrackType::BGM);
+		PlaySoundTrack(level.GetAmbientTrack(), SoundTrackType::BGM, 0, SOUND_XFADETIME_LEVELJUMP);
 }
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
