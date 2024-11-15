@@ -46,7 +46,7 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[(int)ReverbType::Count] =    // Reverb 
   {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
 };
 
-const  std::string TRACKS_EXTENSIONS[] = {".wav", ".mp3", ".ogg"};
+const  std::string TRACKS_EXTENSIONS[] = {".wav", ".ogg", ".mp3" };
 const  std::string TRACKS_PATH = "Audio/";
 static std::string FullAudioDirectory;
 
