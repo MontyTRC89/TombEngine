@@ -726,7 +726,7 @@ static void GivePlayerItemsCheat(ItemInfo& item)
 			player.Inventory.Puzzles[i] = true;
 
 		player.Inventory.PuzzlesCombo[2 * i] = false;
-		player.Inventory.PuzzlesCombo[(92 * i) + 1] = false;
+		player.Inventory.PuzzlesCombo[(2 * i) + 1] = false;
 	}
 
 	for (int i = 0; i < 8; ++i)

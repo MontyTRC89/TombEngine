@@ -228,23 +228,32 @@ GameStatus GamePhase(bool insideMenu)
 	PlaySoundSources();
 	Sound_UpdateScene();
 
-	// Handle inventory, pause, load, save screens.
+	auto result = GameStatus::Normal;
+
 	if (!insideMenu)
 	{
-		auto result = HandleMenuCalls(isTitle);
-		if (result != GameStatus::Normal)
-			return result;
+		// Handle inventory, pause, load, save screens.
+		result = HandleMenuCalls(isTitle);
 
 		// Handle global input events.
-		result = HandleGlobalInputEvents(isTitle);
-		if (result != GameStatus::Normal)
-			return result;
+		if (result == GameStatus::Normal)
+			result = HandleGlobalInputEvents(isTitle);
+	}
+
+	if (result != GameStatus::Normal)
+	{
+		// Call post-loop callbacks last time and end level.
+		g_GameScript->OnLoop(DELTA_TIME, true);
+		g_GameScript->OnEnd(result);
+		HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
+	}
+	else
+	{
+		// Post-loop script and event handling.
+		g_GameScript->OnLoop(DELTA_TIME, true);
 	}
 
 	UpdateCamera();
-
-	// Post-loop script and event handling.
-	g_GameScript->OnLoop(DELTA_TIME, true);
 
 	// Clear savegame loaded flag.
 	JustLoaded = false;
@@ -256,7 +265,7 @@ GameStatus GamePhase(bool insideMenu)
 	auto time2 = std::chrono::high_resolution_clock::now();
 	ControlPhaseTime = (std::chrono::duration_cast<std::chrono::nanoseconds>(time2 - time1)).count() / 1000000;
 
-	return GameStatus::Normal;
+	return result;
 }
 
 GameStatus FreezePhase()
@@ -567,9 +576,6 @@ void InitializeScripting(int levelIndex, LevelLoadType type)
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
-	g_GameScript->OnEnd(reason);
-	HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
-
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 

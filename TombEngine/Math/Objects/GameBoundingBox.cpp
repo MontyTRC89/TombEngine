@@ -85,6 +85,11 @@
 		Z2 = (int)round(boxMax.z);
 	}
 
+	BoundingSphere GameBoundingBox::ToLocalBoundingSphere() const
+	{
+		return BoundingSphere(GetCenter(), GetExtents().Length());
+	}
+
 	BoundingOrientedBox GameBoundingBox::ToBoundingOrientedBox(const Pose& pose) const
 	{
 		return ToBoundingOrientedBox(pose.Position.ToVector3(), pose.Orientation.ToQuaternion());

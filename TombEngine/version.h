@@ -8,7 +8,7 @@
 #define TEN_MAJOR_VERSION   1
 #define TEN_MINOR_VERSION   5
 #define TEN_BUILD_NUMBER    0
-#define TEN_REVISION_NUMBER 3
+#define TEN_REVISION_NUMBER 4
 
 #define TEST_BUILD 1
 

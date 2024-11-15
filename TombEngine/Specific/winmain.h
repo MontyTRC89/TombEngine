@@ -43,4 +43,4 @@ Vector2i GetScreenResolution();
 std::vector<Vector2i> GetAllSupportedScreenResolutions();
 int GetCurrentScreenRefreshRate();
 
-bool GenerateTitleLevel(const std::string& levelPath);
+bool GenerateDummyLevel(const std::string& levelPath);

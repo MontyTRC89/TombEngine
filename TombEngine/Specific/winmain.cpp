@@ -129,7 +129,7 @@ void DisableDpiAwareness()
 	FreeLibrary(lib);
 }
 
-bool GenerateTitleLevel(const std::string& levelPath)
+bool GenerateDummyLevel(const std::string& levelPath)
 {
 	// Try to load the embedded resource "data.bin"
 	HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_TITLELEVEL), "BIN");
@@ -155,7 +155,8 @@ bool GenerateTitleLevel(const std::string& levelPath)
 	try
 	{
 		std::filesystem::path dir = std::filesystem::path(levelPath).parent_path();
-		std::filesystem::create_directories(dir);
+		if (!dir.empty())
+			std::filesystem::create_directories(dir);
 
 		std::ofstream outFile(levelPath, std::ios::binary);
 		if (!outFile)

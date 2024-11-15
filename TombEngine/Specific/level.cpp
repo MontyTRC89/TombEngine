@@ -1524,11 +1524,16 @@ bool LoadLevelFile(int levelIndex)
 	auto assetDir = g_GameFlow->GetGameDir();
 	auto levelPath = assetDir + level.FileName;
 
+	bool isDummyLevel = false;
+
 	if (!std::filesystem::is_regular_file(levelPath))
 	{
-		if (levelIndex == 0 && GenerateTitleLevel(levelPath))
+		levelPath = assetDir + "dummy.ten";
+
+		if (levelIndex == 0 && GenerateDummyLevel(levelPath))
 		{
-			TENLog("Title level file not found, generating dummy level: " + levelPath, LogLevel::Info);
+			TENLog("Title level file not found, using dummy level.", LogLevel::Info);
+			isDummyLevel = true;
 		}
 		else
 		{
@@ -1537,15 +1542,17 @@ bool LoadLevelFile(int levelIndex)
 		}
 	}
 
-	TENLog("Loading level file: " + levelPath, LogLevel::Info);
+	if (!isDummyLevel)
+		TENLog("Loading level file: " + levelPath, LogLevel::Info);
 
 	auto timestamp  = std::filesystem::last_write_time(levelPath);
 	bool fastReload = (g_GameFlow->GetSettings()->FastReload && levelIndex == CurrentLevel && timestamp == LastLevelTimestamp && levelPath == LastLevelFilePath);
 
 	// Dumping game scene right after engine launch is impossible, as no scene exists.
-	if (!FirstLevel && fastReload)
+	if (!FirstLevel)
 		g_Renderer.DumpGameScene();
 
+	// If fast reload is in action, don't draw loading screen, and instead draw last game frame.
 	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level.LoadScreenFileName);
 	g_Renderer.SetLoadingScreen(fastReload ? std::wstring{} : loadingScreenPath);
 
@@ -1555,7 +1562,12 @@ bool LoadLevelFile(int levelIndex)
 	FreeLevel(fastReload);
 	
 	LevelLoadTask = std::async(std::launch::async, LoadLevel, levelPath, fastReload);
-	return LevelLoadTask.get();
+	bool loadSuccess = LevelLoadTask.get();
+
+	if (loadSuccess && isDummyLevel)
+		std::filesystem::remove(levelPath);
+
+	return loadSuccess;
 }
 
 void LoadSprites()
