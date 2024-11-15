@@ -105,20 +105,20 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 	// Establish parameters of colliding item.
 	const auto& collidingBounds = GetBestFrame(collidingItem).BoundingBox;
-	auto collidingExtents = collidingBounds.GetExtents();
-	auto collidingSphere = BoundingSphere(collidingBounds.GetCenter() + collidingItem.Pose.Position.ToVector3(), collidingExtents.Length());
-	auto collidingCircle = Vector3(collidingSphere.Center.x, collidingSphere.Center.z, (customRadius > 0.0f) ? customRadius : std::hypot(collidingExtents.x, collidingExtents.z));
+
+	// Quickly discard collision if colliding item bounds are below tolerance threshold.
+	if (!customRadius && collidingBounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+		return collObjects;
 
 	// Convert bounding box to DX bounds.
 	auto convertedBounds = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
 
+	// Create conservative AABB for rough tests.
+	auto& collidingAABB = collidingBounds.ToConservativeBoundingBox(collidingItem.Pose);
+
 	// Override extents if specified.
 	if (customRadius > 0.0f)
-		convertedBounds.Extents = Vector3(customRadius);
-
-	// Quickly discard collision if colliding item bounds are below tolerance threshold.
-	if (collidingSphere.Radius <= COLLIDABLE_BOUNDS_THRESHOLD)
-		return collObjects;
+		collidingAABB = BoundingBox(collidingItem.Pose.Position.ToVector3(), Vector3(customRadius));
 
 	// Run through neighboring rooms.
 	const auto& room = g_Level.Rooms[collidingItem.RoomNumber];
@@ -168,27 +168,14 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 						continue;
 
 					const auto& bounds = GetBestFrame(item).BoundingBox;
-					auto extents = bounds.GetExtents();
 
 					// If item bounding box extents is below tolerance threshold, discard object.
-					if (extents.Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+					if (bounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
 						continue;
 
-					// Test rough vertical distance to discard objects not intersecting vertically.
-					if (((collidingItem.Pose.Position.y + collidingBounds.Y1) - ROUGH_BOX_HEIGHT_MIN) >
-						((item.Pose.Position.y + bounds.Y2) + ROUGH_BOX_HEIGHT_MIN))
-					{
-						continue;
-					}
-					if (((collidingItem.Pose.Position.y + collidingBounds.Y2) + ROUGH_BOX_HEIGHT_MIN) <
-						((item.Pose.Position.y + bounds.Y1) - ROUGH_BOX_HEIGHT_MIN))
-					{
-						continue;
-					}
-
-					// Test rough circle intersection to discard objects not intersecting horizontally.
-					auto circle = Vector3(item.Pose.Position.x, item.Pose.Position.z, std::hypot(extents.x, extents.z));
-					if (!Geometry::CircleIntersects(circle, collidingCircle))
+					// Test conservative AABB intersection.
+					const auto& AABB = bounds.ToConservativeBoundingBox(item.Pose);
+					if (!AABB.Intersects(collidingAABB))
 						continue;
 
 					auto box = bounds.ToBoundingOrientedBox(item.Pose);
@@ -218,28 +205,13 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 				const auto& bounds = GetBoundsAccurate(staticObj, false);
 
-				// Test rough vertical distance to discard statics not intersecting vertically.
-				if (((collidingItem.Pose.Position.y + collidingBounds.Y1) - ROUGH_BOX_HEIGHT_MIN) >
-					((staticObj.pos.Position.y + bounds.Y2) + ROUGH_BOX_HEIGHT_MIN))
-				{
-					continue;
-				}
-				if (((collidingItem.Pose.Position.y + collidingBounds.Y2) + ROUGH_BOX_HEIGHT_MIN) <
-					((staticObj.pos.Position.y + bounds.Y1) - ROUGH_BOX_HEIGHT_MIN))
-				{
-					continue;
-				}
-
-				// Test rough circle intersection to discard statics not intersecting horizontally.
-				auto circle = Vector3(staticObj.pos.Position.x, staticObj.pos.Position.z, (bounds.GetExtents() * Vector3(1.0f, 0.0f, 1.0f)).Length());
-				if (!Geometry::CircleIntersects(circle, collidingCircle))
-					continue;
-
 				// Skip if either bounding box has any zero extent (not a collidable volume).
 				if (bounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
 					continue;
 
-				if (collidingBounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+				// Test conservative AABB intersection.
+				const auto& AABB = bounds.ToConservativeBoundingBox(staticObj.pos);
+				if (!AABB.Intersects(collidingAABB))
 					continue;
 
 				auto box = bounds.ToBoundingOrientedBox(staticObj.pos.Position);

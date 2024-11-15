@@ -9,7 +9,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed engine performance around bridges.
 * Fixed engine performance if weather or bubble effects are active.
 * Fixed silent crashes if loaded level is corrupted or in incorrect format.
-* Fixed incorrect clipping of scaled static meshes.
+* Fixed incorrect clipping of scaled off-centered static meshes.
+* Fixed incorrect collision detection for off-centered meshes.
 * Fixed uzi targeting issues after using flycheat.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemy pickups dropping on death sectors.
@@ -22,7 +23,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed binocular or lasersight camera not switching off correctly after flyby.
 * Fixed Lara's Home entry not working.
 * Fixed exploding TR3 bosses.
-* Fixed the original issue with deactivation of Dart Emitter.
+* Fixed original issue with deactivation of Dart Emitter.
 * Fixed Lens Flare object not functioning properly.
 * Fixed Skeleton and Mummy not reacting to shotgun hits.
 
@@ -33,7 +34,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Allow more than 1024 objects in a level.
 
 ### Lua API changes
-
 * Added support for transparency value in DisplayString class.
 * Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
 * Fixed DisplayString class not supporting empty lines in multiline strings.

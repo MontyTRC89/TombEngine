@@ -48,6 +48,7 @@ struct ObjectInfo;
 		BoundingSphere ToLocalBoundingSphere() const;
 		BoundingOrientedBox ToBoundingOrientedBox(const Pose& pose) const;
 		BoundingOrientedBox ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const;
+		BoundingBox ToConservativeBoundingBox(const Pose& pose) const;
 
 		// Operators
 

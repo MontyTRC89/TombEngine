@@ -85,6 +85,33 @@
 		Z2 = (int)round(boxMax.z);
 	}
 
+	BoundingBox GameBoundingBox::ToConservativeBoundingBox(const Pose& pose) const
+	{
+		// Compute extents.
+		auto extents = GetExtents();
+
+		// Calculate conservative radius in the XZ plane for Y-axis rotation.
+		float xzRadius = sqrt(extents.x * extents.x + extents.z * extents.z);
+
+		// Extents remain unchanged along the Y-axis.
+		auto conservativeExtents = Vector3(xzRadius, extents.y, xzRadius);
+
+		// Manual 2D rotation for Y-axis only.
+		auto center = GetCenter();
+		float cos = phd_cos(pose.Orientation.y);
+		float sin = phd_sin(pose.Orientation.y);
+
+		// Rotate the centerOffset in the XZ plane (ignore Y rotation for height).
+		float rotatedX =  cos * center.x + sin * center.z;
+		float rotatedZ = -sin * center.x + cos * center.z;
+
+		// The center of the bounding box is now the position plus the rotated offset.
+		auto rotatedCenter = pose.Position.ToVector3() + Vector3(rotatedX, center.y, rotatedZ);
+
+		// Build and return the conservative AABB.
+		return BoundingBox(rotatedCenter, conservativeExtents);
+	}
+
 	BoundingSphere GameBoundingBox::ToLocalBoundingSphere() const
 	{
 		return BoundingSphere(GetCenter(), GetExtents().Length());
