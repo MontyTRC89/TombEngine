@@ -1395,13 +1395,12 @@ bool LoadLevel(const std::string& path, bool partial)
 
 		if (!partial)
 		{
-			g_Renderer.PrepareData();
+			g_Renderer.PrepareDataForTheRenderer();
 			SetScreenFadeOut(FADE_SCREEN_SPEED, true);
 			StopSoundTracks(SOUND_XFADETIME_BGM_START);
 		}
 		else
 		{
-			g_Renderer.ResetData();
 			SetScreenFadeIn(FADE_SCREEN_SPEED, true);
 			StopSoundTracks(SOUND_XFADETIME_LEVELJUMP);
 		}

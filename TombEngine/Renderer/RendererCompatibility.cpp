@@ -20,18 +20,7 @@ namespace TEN::Renderer
 {
 	template class VertexBuffer<Vertex>;
 
-	void Renderer::ResetData()
-	{
-		int allocatedItemSize = (int)g_Level.Items.size() + MAX_SPAWNED_ITEM_COUNT;
-
-		auto item = RendererItem();
-		_items = std::vector<RendererItem>(allocatedItemSize, item);
-
-		auto effect = RendererEffect();
-		_effects = std::vector<RendererEffect>(allocatedItemSize, effect);
-	}
-
-	bool Renderer::PrepareData()
+	bool Renderer::PrepareDataForTheRenderer()
 	{
 		TENLog("Preparing renderer...", LogLevel::Info);
 
@@ -46,7 +35,13 @@ namespace TEN::Renderer
 
 		_meshes.clear();
 
-		ResetData();
+		int allocatedItemSize = (int)g_Level.Items.size() + MAX_SPAWNED_ITEM_COUNT;
+
+		auto item = RendererItem();
+		_items = std::vector<RendererItem>(allocatedItemSize, item);
+
+		auto effect = RendererEffect();
+		_effects = std::vector<RendererEffect>(allocatedItemSize, effect);
 
 		TENLog("Allocated renderer object memory.", LogLevel::Info);
 
