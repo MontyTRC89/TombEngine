@@ -14,6 +14,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed uzi targeting issues after using flycheat.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemy pickups dropping on death sectors.
+* Fixed Sarcophagus and Search Object pickup triggers.
 * Fixed vehicle transfer not happening for levels which were not previously visited.
 * Fixed audio tracks placed in subfolders not restoring after loading savegame.
 * Fixed lack of fade-in for looped audio track on level start.

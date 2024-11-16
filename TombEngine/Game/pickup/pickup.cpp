@@ -203,23 +203,6 @@ void RemoveObjectFromInventory(GAME_OBJECT_ID objectID, std::optional<int> count
 		}
 }
 
-void CollectCarriedItems(ItemInfo* item)
-{
-	short pickupNumber = item->CarriedItem;
-	while (pickupNumber != NO_VALUE)
-	{
-		auto& pickupItem = g_Level.Items[pickupNumber];
-
-		PickedUpObject(pickupItem);
-		g_Hud.PickupSummary.AddDisplayPickup(pickupItem);
-		KillItem(pickupNumber);
-
-		pickupNumber = pickupItem.CarriedItem;
-	}
-
-	item->CarriedItem = NO_VALUE;
-}
-
 static void HideOrDisablePickup(ItemInfo& pickupItem)
 {
 	if (pickupItem.TriggerFlags & 0xC0)
@@ -232,6 +215,23 @@ static void HideOrDisablePickup(ItemInfo& pickupItem)
 	{
 		KillItem(pickupItem.Index);
 	}
+}
+
+void CollectCarriedItems(ItemInfo* item)
+{
+	short pickupNumber = item->CarriedItem;
+	while (pickupNumber != NO_VALUE)
+	{
+		auto& pickupItem = g_Level.Items[pickupNumber];
+
+		PickedUpObject(pickupItem);
+		g_Hud.PickupSummary.AddDisplayPickup(pickupItem);
+		HideOrDisablePickup(pickupItem);
+
+		pickupNumber = pickupItem.CarriedItem;
+	}
+
+	item->CarriedItem = NO_VALUE;
 }
 
 void CollectMultiplePickups(int itemNumber)
