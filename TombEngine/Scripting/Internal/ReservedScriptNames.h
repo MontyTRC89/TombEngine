@@ -203,6 +203,7 @@ static constexpr char ScriptReserved_IsTagPresent[]			= "IsTagPresent";
 static constexpr char ScriptReserved_AddLevel[]					= "AddLevel";
 static constexpr char ScriptReserved_GetLevel[]					= "GetLevel";
 static constexpr char ScriptReserved_GetCurrentLevel[]			= "GetCurrentLevel";
+static constexpr char ScriptReserved_GetNextLevel[]				= "GetNextLevel";
 static constexpr char ScriptReserved_SetIntroImagePath[]		= "SetIntroImagePath";
 static constexpr char ScriptReserved_SetTitleScreenImagePath[]	= "SetTitleScreenImagePath";
 static constexpr char ScriptReserved_SetFarView[]				= "SetFarView";

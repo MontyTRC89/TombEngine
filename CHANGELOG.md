@@ -35,6 +35,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Allow more than 1024 objects in a level.
 
 ### Lua API changes
+* Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
 * Added support for transparency value in DisplayString class.
 * Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.

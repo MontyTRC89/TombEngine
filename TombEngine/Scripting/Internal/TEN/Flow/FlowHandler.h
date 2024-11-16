@@ -59,6 +59,7 @@ public:
 	Settings*	GetSettings();
 	Level*		GetLevel(int id);
 	Level*		GetCurrentLevel();
+	Level*		GetNextLevel();
 	int			GetLevelNumber(const std::string& flieName);
 	int			GetNumLevels() const;
 	void		EndLevel(std::optional<int> nextLevel, std::optional<int> startPosIndex);
