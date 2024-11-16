@@ -40,10 +40,17 @@ int FloorInfo::GetSurfaceTriangleID(int x, int z, bool isFloor) const
 {
 	constexpr auto TRI_ID_0 = 0;
 	constexpr auto TRI_ID_1 = 1;
+
+	static const auto ROT_MATRIX_0 = Matrix::CreateRotationZ(TO_RAD(SectorSurfaceData::SPLIT_ANGLE_0));
+	static const auto ROT_MATRIX_1 = Matrix::CreateRotationZ(TO_RAD(SectorSurfaceData::SPLIT_ANGLE_1));
 	
+	// Get matrix.
+	const auto& rotMatrix = isFloor ?
+		((FloorSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0) ? ROT_MATRIX_0 : ROT_MATRIX_1) :
+		((CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0) ? ROT_MATRIX_0 : ROT_MATRIX_1);
+
 	// Calculate bias.
 	auto sectorPoint = GetSectorPoint(x, z).ToVector2();
-	auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(isFloor ? FloorSurface.SplitAngle : CeilingSurface.SplitAngle));
 	float bias = Vector2::Transform(sectorPoint, rotMatrix).x;
 
 	// Return triangle ID according to bias.
