@@ -957,7 +957,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="framework.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="version.h" />
+    <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="framework.cpp">
@@ -1364,7 +1364,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
   <ItemGroup>
     <None Include="Objects\Generic\Switches\rail_switch.h" />
     <None Include="packages.config" />
-    <None Include="Resources\title.bin" />
+    <None Include="Resources\Title.bin" />
     <None Include="RuleSet.ruleset" />
     <None Include="Shaders\AnimatedTextures.hlsli" />
     <None Include="Shaders\CBCamera.hlsli">
@@ -1633,7 +1633,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\ten.ico" />
+    <Image Include="Resources\Ten.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1517,7 +1517,6 @@ void LoadBoxes()
 	}
 }
 
-
 bool LoadLevelFile(int levelIndex)
 {
 	const auto& level = *g_GameFlow->GetLevel(levelIndex);

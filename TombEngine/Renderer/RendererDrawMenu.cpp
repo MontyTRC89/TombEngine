@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Renderer/Renderer.h"
 
-#include "version.h"
 #include "Game/animation.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -16,6 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
+#include "Version.h"
 
 using namespace TEN::Gui;
 using namespace TEN::Hud;

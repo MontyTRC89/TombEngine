@@ -3,7 +3,7 @@
 #pragma code_page(65001)
 
 #include "resource.h"
-#include "version.h"
+#include "Version.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -65,8 +65,8 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_ICON1               ICON                    "Resources\\ten.ico"
-IDR_TITLELEVEL          BIN                     "Resources\\title.bin"
+IDI_ICON1               ICON                    "Resources\\Ten.ico"
+IDR_TITLELEVEL          BIN                     "Resources\\Title.bin"
 
 
 /////////////////////////////////////////////////////////////////////////////
