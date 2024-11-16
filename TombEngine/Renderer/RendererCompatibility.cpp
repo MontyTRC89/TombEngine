@@ -20,8 +20,21 @@ namespace TEN::Renderer
 {
 	template class VertexBuffer<Vertex>;
 
-	bool Renderer::PrepareDataForTheRenderer()
+	void Renderer::ResetData()
 	{
+		int allocatedItemSize = (int)g_Level.Items.size() + MAX_SPAWNED_ITEM_COUNT;
+
+		auto item = RendererItem();
+		_items = std::vector<RendererItem>(allocatedItemSize, item);
+
+		auto effect = RendererEffect();
+		_effects = std::vector<RendererEffect>(allocatedItemSize, effect);
+	}
+
+	bool Renderer::PrepareData()
+	{
+		TENLog("Preparing renderer...", LogLevel::Info);
+
 		_lastBlendMode = BlendMode::Unknown;
 		_lastCullMode = CullMode::Unknown;
 		_lastDepthState = DepthState::Unknown;
@@ -32,6 +45,8 @@ namespace TEN::Renderer
 		_rooms.resize(g_Level.Rooms.size());
 
 		_meshes.clear();
+
+		ResetData();
 
 		TENLog("Allocated renderer object memory.", LogLevel::Info);
 
@@ -264,7 +279,7 @@ namespace TEN::Renderer
 					staticInfo->AmbientLight = rendererRoom.AmbientLight;
 					staticInfo->Pose = oldMesh->pos;
 					staticInfo->Scale = oldMesh->scale;
-					staticInfo->OriginalVisibilityBox = StaticObjects[staticInfo->ObjectNumber].visibilityBox;
+					staticInfo->OriginalSphere = StaticObjects[staticInfo->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
 					staticInfo->IndexInRoom = l;
 
 					staticInfo->Update();

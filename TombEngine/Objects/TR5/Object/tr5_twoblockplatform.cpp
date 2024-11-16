@@ -93,9 +93,9 @@ namespace TEN::Entities::Generic
 
 				if (pointColl.GetRoomNumber() != item->RoomNumber)
 				{
-					bridge.Update(*item);
+					bridge.Disable(*item);
 					ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
-					bridge.Update(*item);
+					bridge.Enable(*item);
 				}
 			}
 			else

@@ -3,7 +3,6 @@
 
 #include <CommCtrl.h>
 #include <process.h>
-#include <resource.h>
 #include <iostream>
 #include <codecvt>
 #include <filesystem>
@@ -11,6 +10,7 @@
 #include "Game/control/control.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer.h"
+#include "resource.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
@@ -129,20 +129,68 @@ void DisableDpiAwareness()
 	FreeLibrary(lib);
 }
 
+bool GenerateDummyLevel(const std::string& levelPath)
+{
+	// Try loading embedded resource "data.bin"
+	HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_TITLELEVEL), "BIN");
+	if (hResource == NULL)
+	{
+		TENLog("Embedded title level file not found.", LogLevel::Error);
+		return false;
+	}
+
+	// Load resource into memory.
+	HGLOBAL hGlobal = LoadResource(NULL, hResource);
+	if (hGlobal == NULL)
+	{
+		TENLog("Failed to load embedded title level file.", LogLevel::Error);
+		return false;
+	}
+
+	// Lock resource to get data pointer.
+	void* pData = LockResource(hGlobal);
+	DWORD dwSize = SizeofResource(NULL, hResource);
+
+	// Write resource data to file.
+	try
+	{
+		auto dir = std::filesystem::path(levelPath).parent_path();
+		if (!dir.empty())
+			std::filesystem::create_directories(dir);
+
+		auto outFile = std::ofstream(levelPath, std::ios::binary);
+		if (!outFile)
+			throw std::ios_base::failure("Failed to create title level file.");
+
+		outFile.write(reinterpret_cast<const char*>(pData), dwSize);
+		if (!outFile)
+			throw std::ios_base::failure("Failed to write to title level file.");
+
+		outFile.close();
+	}
+	catch (const std::exception& ex)
+	{
+		TENLog("Error while generating title level file: " + std::string(ex.what()), LogLevel::Error);
+		return false;
+	}
+
+	return true;
+}
+
 void WinProcMsg()
 {
-	MSG Msg;
+	MSG msg;
 
 	do
 	{
-		GetMessage(&Msg, 0, 0, 0);
-		if (!TranslateAccelerator(WindowsHandle, hAccTable, &Msg))
+		GetMessage(&msg, 0, 0, 0);
+		if (!TranslateAccelerator(WindowsHandle, hAccTable, &msg))
 		{
-			TranslateMessage(&Msg);
-			DispatchMessage(&Msg);
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 	}
-	while (!ThreadEnded && Msg.message != WM_QUIT);
+	while (!ThreadEnded && msg.message != WM_QUIT);
 }
 
 void CALLBACK HandleWmCommand(unsigned short wParam)
@@ -305,6 +353,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					   std::to_string(ver[0]) + "." +
 					   std::to_string(ver[1]) + "." +
 					   std::to_string(ver[2]) + " " +
+					   std::to_string(ver[3]) + " " +
 #ifdef _WIN64
 					   "(64-bit)"
 #else

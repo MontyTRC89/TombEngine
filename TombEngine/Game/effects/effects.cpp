@@ -47,7 +47,7 @@ constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
 Particle Particles[MAX_PARTICLES];
 ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
-FX_INFO EffectList[NUM_EFFECTS];
+FX_INFO EffectList[MAX_SPAWNED_ITEM_COUNT];
 
 GameBoundingBox DeadlyBounds;
 SPLASH_SETUP SplashSetup;
@@ -450,9 +450,13 @@ void UpdateSparks()
 	}
 }
 
-void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk)
+void TriggerRicochetSpark(const GameVector& pos, short angle, bool sound)
 {
+	int count = Random::GenerateInt(3, 8);
 	TriggerRicochetSpark(pos, angle, count);
+
+	if (sound && Random::TestProbability(1 / 3.0f))
+		SoundEffect(SFX_TR4_WEAPON_RICOCHET, &Pose(pos.ToVector3i()));
 }
 
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
@@ -1135,8 +1139,7 @@ void Ricochet(Pose& pose)
 {
 	short angle = Geometry::GetOrientToPoint(pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
 	auto target = GameVector(pose.Position);
-	TriggerRicochetSpark(target, angle / 16, 3, 0);
-	SoundEffect(SFX_TR4_WEAPON_RICOCHET, &pose);
+	TriggerRicochetSpark(target, angle / 16);
 }
 
 void ControlWaterfallMist(short itemNumber)

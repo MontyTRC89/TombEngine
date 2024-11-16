@@ -693,13 +693,14 @@ void CalculateSpotCameras()
 
 					SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
-					Camera.DisableInterpolation = true;
 					UseSpotCam = false;
-					Lara.Control.IsLocked = false;
 					CheckTrigger = false;
+					Lara.Control.IsLocked = false;
+					Lara.Control.Look.IsUsingBinoculars = false;
 					Camera.oldType = CameraType::Fixed;
 					Camera.type = CameraType::Chase;
 					Camera.speed = 1;
+					Camera.DisableInterpolation = true;
 
 					if (s->flags & SCF_CUT_TO_LARA_CAM)
 					{

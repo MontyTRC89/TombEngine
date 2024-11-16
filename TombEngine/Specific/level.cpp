@@ -28,6 +28,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/trutils.h"
+#include "Specific/winmain.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -77,44 +78,54 @@ const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 	ID_BRIDGE_CUSTOM
 };
 
-char* LevelDataPtr;
+LEVEL g_Level;
+
 std::vector<int> MoveablesIds;
 std::vector<int> StaticObjectsIds;
 std::vector<int> SpriteSequencesIds;
-LEVEL g_Level;
+
+char* DataPtr;
+char* CurrentDataPtr;
+
+bool FirstLevel = true;
+int SystemNameHash = 0;
+int LastLevelHash  = 0;
+
+std::filesystem::file_time_type LastLevelTimestamp;
+std::string LastLevelFilePath;
 
 unsigned char ReadUInt8()
 {
-	unsigned char value = *(unsigned char*)LevelDataPtr;
-	LevelDataPtr += 1;
+	unsigned char value = *(unsigned char*)CurrentDataPtr;
+	CurrentDataPtr += 1;
 	return value;
 }
 
 short ReadInt16()
 {
-	short value = *(short*)LevelDataPtr;
-	LevelDataPtr += 2;
+	short value = *(short*)CurrentDataPtr;
+	CurrentDataPtr += 2;
 	return value;
 }
 
 unsigned short ReadUInt16()
 {
-	unsigned short value = *(unsigned short*)LevelDataPtr;
-	LevelDataPtr += 2;
+	unsigned short value = *(unsigned short*)CurrentDataPtr;
+	CurrentDataPtr += 2;
 	return value;
 }
 
 int ReadInt32()
 {
-	int value = *(int*)LevelDataPtr;
-	LevelDataPtr += 4;
+	int value = *(int*)CurrentDataPtr;
+	CurrentDataPtr += 4;
 	return value;
 }
 
 float ReadFloat()
 {
-	float value = *(float*)LevelDataPtr;
-	LevelDataPtr += 4;
+	float value = *(float*)CurrentDataPtr;
+	CurrentDataPtr += 4;
 	return value;
 }
 
@@ -152,8 +163,8 @@ bool ReadBool()
 
 void ReadBytes(void* dest, int count)
 {
-	memcpy(dest, LevelDataPtr, count);
-	LevelDataPtr += count;
+	memcpy(dest, CurrentDataPtr, count);
+	CurrentDataPtr += count;
 }
 
 long long ReadLEB128(bool sign)
@@ -188,9 +199,9 @@ std::string ReadString()
 		return std::string();
 	else
 	{
-		auto newPtr = LevelDataPtr + numBytes;
-		auto result = std::string(LevelDataPtr, newPtr);
-		LevelDataPtr = newPtr;
+		auto newPtr = CurrentDataPtr + numBytes;
+		auto result = std::string(CurrentDataPtr, newPtr);
+		CurrentDataPtr = newPtr;
 		return result;
 	}
 }
@@ -203,56 +214,53 @@ void LoadItems()
 	if (g_Level.NumItems == 0)
 		return;
 
-	InitializeItemArray(ITEM_COUNT_MAX);
+	InitializeItemArray(g_Level.NumItems + MAX_SPAWNED_ITEM_COUNT);
 
-	if (g_Level.NumItems > 0)
+	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		for (int i = 0; i < g_Level.NumItems; i++)
-		{
-			auto* item = &g_Level.Items[i];
+		auto* item = &g_Level.Items[i];
 
-			item->Data = ItemData{};
-			item->ObjectNumber = from_underlying(ReadInt16());
-			item->RoomNumber = ReadInt16();
-			item->Pose.Position.x = ReadInt32();
-			item->Pose.Position.y = ReadInt32();
-			item->Pose.Position.z = ReadInt32();
-			item->Pose.Orientation.y = ReadInt16();
-			item->Pose.Orientation.x = ReadInt16();
-			item->Pose.Orientation.z = ReadInt16();
-			item->Model.Color = ReadVector4();
-			item->TriggerFlags = ReadInt16();
-			item->Flags = ReadInt16();
-			item->Name = ReadString();
+		item->Data = ItemData{};
+		item->ObjectNumber = from_underlying(ReadInt16());
+		item->RoomNumber = ReadInt16();
+		item->Pose.Position.x = ReadInt32();
+		item->Pose.Position.y = ReadInt32();
+		item->Pose.Position.z = ReadInt32();
+		item->Pose.Orientation.y = ReadInt16();
+		item->Pose.Orientation.x = ReadInt16();
+		item->Pose.Orientation.z = ReadInt16();
+		item->Model.Color = ReadVector4();
+		item->TriggerFlags = ReadInt16();
+		item->Flags = ReadInt16();
+		item->Name = ReadString();
 			
-			g_GameScriptEntities->AddName(item->Name, (short)i);
-			g_GameScriptEntities->TryAddColliding((short)i);
+		g_GameScriptEntities->AddName(item->Name, (short)i);
+		g_GameScriptEntities->TryAddColliding((short)i);
 
-			memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
-		}
+		memcpy(&item->StartPose, &item->Pose, sizeof(Pose));
+	}
 
-		// Initialize items.
-		for (int i = 0; i <= 1; i++)
+	// Initialize items.
+	for (int i = 0; i <= 1; i++)
+	{
+		// HACK: Initialize bridges first. Required because other items need final floordata to init properly.
+		if (i == 0)
 		{
-			// HACK: Initialize bridges first. Required because other items need final floordata to init properly.
-			if (i == 0)
+			for (int j = 0; j < g_Level.NumItems; j++)
 			{
-				for (int j = 0; j < g_Level.NumItems; j++)
-				{
-					const auto& item = g_Level.Items[j];
-					if (Contains(BRIDGE_OBJECT_IDS, item.ObjectNumber))
-						InitializeItem(j);
-				}
+				const auto& item = g_Level.Items[j];
+				if (Contains(BRIDGE_OBJECT_IDS, item.ObjectNumber))
+					InitializeItem(j);
 			}
-			// Initialize non-bridge items second.
-			else if (i == 1)
+		}
+		// Initialize non-bridge items second.
+		else if (i == 1)
+		{
+			for (int j = 0; j < g_Level.NumItems; j++)
 			{
-				for (int j = 0; j < g_Level.NumItems; j++)
-				{
-					const auto& item = g_Level.Items[j];
-					if (!item.IsBridge())
-						InitializeItem(j);
-				}
+				const auto& item = g_Level.Items[j];
+				if (!item.IsBridge())
+					InitializeItem(j);
 			}
 		}
 	}
@@ -674,7 +682,95 @@ static Plane ConvertFakePlaneToPlane(const Vector3& fakePlane, bool isFloor)
 	return Plane(normal, dist);
 }
 
-void ReadRooms()
+void LoadDynamicRoomData()
+{
+	int roomCount = ReadInt32();
+
+	if (g_Level.Rooms.size() != roomCount)
+		throw std::exception("Dynamic room data count is inconsistent with room count.");
+
+	for (int i = 0; i < roomCount; i++)
+	{
+		auto& room = g_Level.Rooms[i];
+
+		room.Name = ReadString();
+
+		int tagCount = ReadInt32();
+		room.Tags.resize(0);
+		room.Tags.reserve(tagCount);
+
+		for (int j = 0; j < tagCount; j++)
+			room.Tags.push_back(ReadString());
+
+		room.ambient = ReadVector3();
+
+		room.flippedRoom = ReadInt32();
+		room.flags = ReadInt32();
+		room.meshEffect = ReadInt32();
+		room.reverbType = (ReverbType)ReadInt32();
+		room.flipNumber = ReadInt32();
+
+		int staticCount = ReadInt32();
+		room.mesh.resize(0);
+		room.mesh.reserve(staticCount);
+
+		for (int j = 0; j < staticCount; j++)
+		{
+			auto& mesh = room.mesh.emplace_back();
+
+			mesh.roomNumber = i;
+			mesh.pos.Position.x = ReadInt32();
+			mesh.pos.Position.y = ReadInt32();
+			mesh.pos.Position.z = ReadInt32();
+			mesh.pos.Orientation.y = ReadUInt16();
+			mesh.pos.Orientation.x = ReadUInt16();
+			mesh.pos.Orientation.z = ReadUInt16();
+			mesh.scale = ReadFloat();
+			mesh.flags = ReadUInt16();
+			mesh.color = ReadVector4();
+			mesh.staticNumber = ReadUInt16();
+			mesh.HitPoints = ReadInt16();
+			mesh.Name = ReadString();
+
+			g_GameScriptEntities->AddName(mesh.Name, mesh);
+		}
+
+		int triggerVolumeCount = ReadInt32();
+		room.TriggerVolumes.resize(0);
+		room.TriggerVolumes.reserve(triggerVolumeCount);
+
+		for (int j = 0; j < triggerVolumeCount; j++)
+		{
+			auto& volume = room.TriggerVolumes.emplace_back();
+
+			volume.Type = (VolumeType)ReadInt32();
+
+			auto pos = ReadVector3();
+			auto orient = ReadVector4();
+			auto scale = ReadVector3();
+
+			volume.Enabled = ReadBool();
+			volume.DetectInAdjacentRooms = ReadBool();
+
+			volume.Name = ReadString();
+			volume.EventSetIndex = ReadInt32();
+
+			volume.Box = BoundingOrientedBox(pos, scale, orient);
+			volume.Sphere = BoundingSphere(pos, scale.x);
+
+			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
+
+			g_GameScriptEntities->AddName(volume.Name, volume);
+		}
+
+		g_GameScriptEntities->AddName(room.Name, room);
+
+		room.itemNumber = NO_VALUE;
+		room.fxNumber = NO_VALUE;
+	}
+}
+
+void LoadStaticRoomData()
 {
 	constexpr auto SECTOR_AABB_CENTER_OFFSET = Vector3(BLOCK(0.5f), 0.0f, BLOCK(0.5f));
 	constexpr auto SECTOR_AABB_EXTENTS_BASE	= Vector3(BLOCK(0.5f), 0.0f, BLOCK(0.5f));
@@ -686,12 +782,6 @@ void ReadRooms()
 	for (int i = 0; i < roomCount; i++)
 	{
 		auto& room = g_Level.Rooms.emplace_back();
-		
-		room.Name = ReadString();
-
-		int tagCount = ReadInt32();
-		for (int j = 0; j < tagCount; j++)
-			room.Tags.push_back(ReadString());
 		
 		room.Position.x = ReadInt32();
 		room.Position.y = 0;
@@ -869,8 +959,6 @@ void ReadRooms()
 			}
 		}
 
-		room.ambient = ReadVector3();
-
 		int lightCount = ReadInt32();
 		room.lights.reserve(lightCount);
 		for (int j = 0; j < lightCount; j++)
@@ -896,67 +984,8 @@ void ReadRooms()
 
 			room.lights.push_back(light);
 		}
-		
-		int staticCount = ReadInt32();
-		room.mesh.reserve(staticCount);
-		for (int j = 0; j < staticCount; j++)
-		{
-			auto& mesh = room.mesh.emplace_back();
 
-			mesh.roomNumber = i;
-			mesh.pos.Position.x = ReadInt32();
-			mesh.pos.Position.y = ReadInt32();
-			mesh.pos.Position.z = ReadInt32();
-			mesh.pos.Orientation.y = ReadUInt16();
-			mesh.pos.Orientation.x = ReadUInt16();
-			mesh.pos.Orientation.z = ReadUInt16();
-			mesh.scale = ReadFloat();
-			mesh.flags = ReadUInt16();
-			mesh.color = ReadVector4();
-			mesh.staticNumber = ReadUInt16();
-			mesh.HitPoints = ReadInt16();
-			mesh.Name = ReadString();
-
-			g_GameScriptEntities->AddName(mesh.Name, mesh);
-		}
-
-		int triggerVolumeCount = ReadInt32();
-		room.TriggerVolumes.reserve(triggerVolumeCount);
-		for (int j = 0; j < triggerVolumeCount; j++)
-		{
-			auto& volume = room.TriggerVolumes.emplace_back();
-
-			volume.Type = (VolumeType)ReadInt32();
-
-			auto pos = ReadVector3();
-			auto orient = ReadVector4();
-			auto scale = ReadVector3();
-
-			volume.Enabled = ReadBool();
-			volume.DetectInAdjacentRooms = ReadBool();
-
-			volume.Name = ReadString();
-			volume.EventSetIndex = ReadInt32();
-
-			volume.Box = BoundingOrientedBox(pos, scale, orient);
-			volume.Sphere = BoundingSphere(pos, scale.x);
-
-			volume.StateQueue.reserve(VOLUME_STATE_QUEUE_SIZE);
-
-			g_GameScriptEntities->AddName(volume.Name, volume);
-		}
-
-		room.flippedRoom = ReadInt32();
-		room.flags = ReadInt32();
-		room.meshEffect = ReadInt32();
-		room.reverbType = (ReverbType)ReadInt32();
-		room.flipNumber = ReadInt32();
-
-		room.itemNumber = NO_VALUE;
-		room.fxNumber = NO_VALUE;
 		room.RoomNumber = i;
-
-		g_GameScriptEntities->AddName(room.Name, room);
 	}
 
 	// Generate room collision meshes.
@@ -970,7 +999,7 @@ void LoadRooms()
 	
 	Wibble = 0;
 
-	ReadRooms();
+	LoadStaticRoomData();
 	BuildOutsideRoomsTable();
 
 	int numFloorData = ReadInt32(); 
@@ -980,14 +1009,38 @@ void LoadRooms()
 	InitializeNeighborRoomList();
 }
 
-void FreeLevel()
+void FreeLevel(bool partial)
 {
-	static bool firstLevel = true;
-	if (firstLevel)
+	if (FirstLevel)
 	{
-		firstLevel = false;
+		FirstLevel = false;
 		return;
 	}
+
+	// Should happen before resetting items.
+	if (partial)
+		ResetRoomData();
+
+	g_Level.Items.resize(0);
+	g_Level.AIObjects.resize(0);
+	g_Level.Cameras.resize(0);
+	g_Level.Sinks.resize(0);
+	g_Level.SoundSources.resize(0);
+	g_Level.VolumeEventSets.resize(0);
+	g_Level.GlobalEventSets.resize(0);
+	g_Level.LoopedEventSetIndices.resize(0);
+
+	g_GameScript->FreeLevelScripts();
+	g_GameScriptEntities->FreeEntities();
+
+	if (partial)
+		return;
+
+	g_Renderer.FreeRendererData();
+
+	MoveablesIds.resize(0);
+	StaticObjectsIds.resize(0);
+	SpriteSequencesIds.resize(0);
 
 	g_Level.RoomTextures.resize(0);
 	g_Level.MoveablesTextures.resize(0);
@@ -998,8 +1051,6 @@ void FreeLevel()
 	g_Level.Rooms.resize(0);
 	g_Level.Bones.resize(0);
 	g_Level.Meshes.resize(0);
-	MoveablesIds.resize(0);
-	SpriteSequencesIds.resize(0);
 	g_Level.PathfindingBoxes.resize(0);
 	g_Level.Overlaps.resize(0);
 	g_Level.Anims.resize(0);
@@ -1011,24 +1062,12 @@ void FreeLevel()
 	g_Level.SoundDetails.resize(0);
 	g_Level.SoundMap.resize(0);
 	g_Level.FloorData.resize(0);
-	g_Level.Cameras.resize(0);
-	g_Level.Sinks.resize(0);
-	g_Level.SoundSources.resize(0);
-	g_Level.AIObjects.resize(0);
-	g_Level.VolumeEventSets.resize(0);
-	g_Level.GlobalEventSets.resize(0);
-	g_Level.LoopedEventSetIndices.resize(0);
-	g_Level.Items.resize(0);
 
 	for (int i = 0; i < 2; i++)
 	{
 		for (int j = 0; j < (int)ZoneType::MaxZone; j++)
 			g_Level.Zones[j][i].clear();
 	}
-
-	g_Renderer.FreeRendererData();
-	g_GameScript->FreeLevelScripts();
-	g_GameScriptEntities->FreeEntities();
 
 	FreeSamples();
 }
@@ -1135,6 +1174,7 @@ void LoadEvent(EventSet& eventSet)
 	evt.Function = ReadString();
 	evt.Data = ReadString();
 	evt.CallCounter = ReadInt32();
+	evt.Enabled = ReadBool();
 }
 
 void LoadEventSets()
@@ -1212,46 +1252,108 @@ bool Decompress(byte* dest, byte* src, unsigned long compressedSize, unsigned lo
 	return false;
 }
 
-bool LoadLevel(int levelIndex)
+long GetRemainingSize(FILE* filePtr)
 {
-	auto* level = g_GameFlow->GetLevel(levelIndex);
+	long current_position = ftell(filePtr);
 
-	auto assetDir = g_GameFlow->GetGameDir();
-	auto levelPath = assetDir + level->FileName;
-	TENLog("Loading level file: " + levelPath, LogLevel::Info);
+	if (fseek(filePtr, 0, SEEK_END) != 0)
+		return NO_VALUE;
 
-	LevelDataPtr = nullptr;
+	long size = ftell(filePtr);
+
+	if (fseek(filePtr, current_position, SEEK_SET) != 0)
+		return NO_VALUE;
+
+	return size;
+}
+
+bool ReadCompressedBlock(FILE* filePtr, bool skip)
+{
+	int compressedSize = 0;
+	int uncompressedSize = 0;
+
+	ReadFileEx(&uncompressedSize, 1, 4, filePtr);
+	ReadFileEx(&compressedSize, 1, 4, filePtr);
+
+	// Safeguard against changed file format.
+	long remainingSize = GetRemainingSize(filePtr);
+	if (uncompressedSize <= 0 || compressedSize <= 0 || compressedSize > remainingSize)
+		throw std::exception{ "Data block size is incorrect. Probably old level version?" };
+
+	if (skip) 
+	{
+		fseek(filePtr, compressedSize, SEEK_CUR);
+		return false;
+	}
+
+	auto compressedBuffer = (char*)malloc(compressedSize);
+	ReadFileEx(compressedBuffer, compressedSize, 1, filePtr);
+	DataPtr = (char*)malloc(uncompressedSize);
+	Decompress((byte*)DataPtr, (byte*)compressedBuffer, compressedSize, uncompressedSize);
+	free(compressedBuffer);
+
+	CurrentDataPtr = DataPtr;
+
+	return true;
+}
+
+void FinalizeBlock()
+{
+	if (DataPtr == nullptr)
+		return;
+
+	free(DataPtr);
+	DataPtr = nullptr;
+	CurrentDataPtr = nullptr;
+}
+
+void UpdateProgress(float progress, bool skip = false)
+{
+	if (skip)
+		return;
+
+	g_Renderer.UpdateProgress(progress);
+}
+
+bool LoadLevel(const std::string& path, bool partial)
+{
 	FILE* filePtr = nullptr;
-	char* dataPtr = nullptr;
-	bool LoadedSuccessfully;
-
-	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level->LoadScreenFileName);
-	g_Renderer.SetLoadingScreen(loadingScreenPath);
-
-	SetScreenFadeIn(FADE_SCREEN_SPEED, true);
-	g_Renderer.UpdateProgress(0);
+	bool loadedSuccessfully = false;
 
 	try
 	{
-		filePtr = FileOpen(levelPath.c_str());
+		filePtr = FileOpen(path.c_str());
 
 		if (!filePtr)
-			throw std::exception{ (std::string{ "Unable to read level file: " } + levelPath).c_str() };
+			throw std::exception{ (std::string{ "Unable to read level file: " } + path).c_str() };
 
 		char header[4];
 		unsigned char version[4];
-		int compressedSize;
-		int uncompressedSize;
-		int systemHash;
+		int systemHash = 0;
+		int levelHash = 0;
 
 		// Read file header
 		ReadFileEx(&header, 1, 4, filePtr);
 		ReadFileEx(&version, 1, 4, filePtr);
 		ReadFileEx(&systemHash, 1, 4, filePtr);
+		ReadFileEx(&levelHash, 1, 4, filePtr);
 
-		// Check file header
+		// Check file header.
 		if (std::string(header) != "TEN")
 			throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
+
+		// Check level file integrity to allow or disallow fast reload.
+		if (partial && levelHash != LastLevelHash)
+		{
+			TENLog("Level file has changed since the last load; fast reload is not possible.", LogLevel::Warning);
+			partial = false;
+			FreeLevel(false); // Erase all precached data.
+		}
+
+		// Store information about last loaded level file.
+		LastLevelFilePath = path;
+		LastLevelHash = levelHash;
+		LastLevelTimestamp = std::filesystem::last_write_time(path);
 		
 		TENLog("Level compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
 
@@ -1276,52 +1378,60 @@ bool LoadLevel(int levelIndex)
 			SystemNameHash = 0;
 		}
 
-		// Read data sizes
-		ReadFileEx(&uncompressedSize, 1, 4, filePtr);
-		ReadFileEx(&compressedSize, 1, 4, filePtr);
+		if (partial)
+		{
+			TENLog("Loading same level. Skipping media and geometry data.", LogLevel::Info);
+			SetScreenFadeOut(FADE_SCREEN_SPEED * 2, true);
+		}
+		else
+		{
+			SetScreenFadeIn(FADE_SCREEN_SPEED, true);
+		}
 
-		// The entire level is ZLIB compressed
-		auto compressedBuffer = (char*)malloc(compressedSize);
-		dataPtr = (char*)malloc(uncompressedSize);
-		LevelDataPtr = dataPtr;
+		UpdateProgress(0);
 
-		ReadFileEx(compressedBuffer, compressedSize, 1, filePtr);
-		Decompress((byte*)LevelDataPtr, (byte*)compressedBuffer, compressedSize, uncompressedSize);
+		// Media block
+		if (ReadCompressedBlock(filePtr, partial))
+		{
+			LoadTextures();
+			UpdateProgress(30);
 
-		// Now the entire level is decompressed, we can close it
-		free(compressedBuffer);
-		FileClose(filePtr);
-		filePtr = nullptr;
+			LoadSamples();
+			UpdateProgress(40);
 
-		LoadTextures();
+			FinalizeBlock();
+		}
 
-		g_Renderer.UpdateProgress(20);
+		// Geometry block
+		if (ReadCompressedBlock(filePtr, partial))
+		{
+			LoadRooms();
+			UpdateProgress(50);
 
-		LoadRooms();
-		g_Renderer.UpdateProgress(40);
+			LoadObjects();
+			UpdateProgress(60);
 
-		LoadObjects();
-		g_Renderer.UpdateProgress(50);
+			LoadSprites();
+			LoadBoxes();
+			LoadAnimatedTextures();
+			UpdateProgress(70);
 
-		LoadSprites();
-		LoadCameras();
-		LoadSoundSources();
-		g_Renderer.UpdateProgress(60);
+			FinalizeBlock();
+		}
 
-		LoadBoxes();
+		// Dynamic data block
+		if (ReadCompressedBlock(filePtr, false))
+		{
+			LoadDynamicRoomData();
+			LoadItems();
+			LoadAIObjects();
+			LoadCameras();
+			LoadSoundSources();
+			LoadEventSets();
+			UpdateProgress(80, partial);
 
-		//InitializeLOTarray(true);
-
-		LoadAnimatedTextures();
-		g_Renderer.UpdateProgress(70);
-
-		LoadItems();
-		LoadAIObjects();
-
-		LoadEventSets();
-
-		LoadSamples();
-		g_Renderer.UpdateProgress(80);
+			FinalizeBlock();
+		}
 
 		TENLog("Initializing level...", LogLevel::Info);
 
@@ -1331,39 +1441,42 @@ bool LoadLevel(int levelIndex)
 		GetCarriedItems();
 		GetAIPickups();
 		g_GameScriptEntities->AssignLara();
-		g_Renderer.UpdateProgress(90);
+		UpdateProgress(90, partial);
 
-		TENLog("Preparing renderer...", LogLevel::Info);
+		if (!partial)
+		{
+			g_Renderer.PrepareData();
+			SetScreenFadeOut(FADE_SCREEN_SPEED, true);
+			StopSoundTracks(SOUND_XFADETIME_BGM_START);
+		}
+		else
+		{
+			g_Renderer.ResetData();
+			SetScreenFadeIn(FADE_SCREEN_SPEED, true);
+			StopSoundTracks(SOUND_XFADETIME_LEVELJUMP);
+		}
 
-		g_Renderer.PrepareDataForTheRenderer();
+		UpdateProgress(100, partial);
 
 		TENLog("Level loading complete.", LogLevel::Info);
 
-		SetScreenFadeOut(FADE_SCREEN_SPEED, true);
-		g_Renderer.UpdateProgress(100);
-
-		LoadedSuccessfully = true;
+		loadedSuccessfully = true;
 	}
 	catch (std::exception& ex)
 	{
-		if (filePtr)
-		{
-			FileClose(filePtr);
-			filePtr = nullptr;
-		}
+		FinalizeBlock();
+		StopSoundTracks(SOUND_XFADETIME_LEVELJUMP);
 
 		TENLog("Error while loading level: " + std::string(ex.what()), LogLevel::Error);
-		LoadedSuccessfully = false;
+		loadedSuccessfully = false;
 		SystemNameHash = 0;
 	}
 
-	if (dataPtr)
-	{
-		free(dataPtr);
-		dataPtr = LevelDataPtr = nullptr;
-	}
+	// Now the entire level is decompressed, we can close it
+	FileClose(filePtr);
+	filePtr = nullptr;
 
-	return LoadedSuccessfully;
+	return loadedSuccessfully;
 }
 
 void LoadSamples()
@@ -1436,7 +1549,7 @@ void LoadBoxes()
 				int excessiveZoneGroups = numZoneGroups - j + 1;
 				TENLog("Level file contains extra pathfinding data, number of excessive zone groups is " + 
 					std::to_string(excessiveZoneGroups) + ". These zone groups will be ignored.", LogLevel::Warning);
-				LevelDataPtr += numBoxes * sizeof(int);
+				CurrentDataPtr += numBoxes * sizeof(int);
 			}
 			else
 			{
@@ -1456,15 +1569,51 @@ void LoadBoxes()
 
 bool LoadLevelFile(int levelIndex)
 {
-	TENLog("Loading level file...", LogLevel::Info);
+	const auto& level = *g_GameFlow->GetLevel(levelIndex);
+
+	auto assetDir = g_GameFlow->GetGameDir();
+	auto levelPath = assetDir + level.FileName;
+
+	bool isDummyLevel = false;
+
+	if (!std::filesystem::is_regular_file(levelPath))
+	{
+		if (levelIndex == 0)
+		{
+			levelPath = assetDir + "dummy.ten";
+			GenerateDummyLevel(levelPath);
+			TENLog("Title level file not found, using dummy level.", LogLevel::Info);
+			isDummyLevel = true;
+		}
+		else
+		{
+			TENLog("Level file not found: " + levelPath, LogLevel::Error);
+			return false;
+		}
+	}
+
+	if (!isDummyLevel)
+		TENLog("Loading level file: " + levelPath, LogLevel::Info);
+
+	auto timestamp  = std::filesystem::last_write_time(levelPath);
+	bool fastReload = (g_GameFlow->GetSettings()->FastReload && levelIndex == CurrentLevel && timestamp == LastLevelTimestamp && levelPath == LastLevelFilePath);
+
+	// If fast reload is in action, draw last game frame instead of loading screen.
+	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level.LoadScreenFileName);
+	g_Renderer.SetLoadingScreen(fastReload ? std::wstring{} : loadingScreenPath);
 
 	BackupLara();
+	StopAllSounds();
 	CleanUp();
-	FreeLevel();
+	FreeLevel(fastReload);
 	
-	LevelLoadTask = std::async(std::launch::async, LoadLevel, levelIndex);
+	LevelLoadTask = std::async(std::launch::async, LoadLevel, levelPath, fastReload);
+	bool loadSuccess = LevelLoadTask.get();
 
-	return LevelLoadTask.get();
+	if (loadSuccess && isDummyLevel)
+		std::filesystem::remove(levelPath);
+
+	return loadSuccess;
 }
 
 void LoadSprites()

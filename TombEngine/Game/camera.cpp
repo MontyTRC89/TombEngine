@@ -409,7 +409,7 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 
 	//get mesh 0 coordinates.	
 	auto pos = GetJointPosition(camSlotId, 0, Vector3i::Zero);
-	auto dest = Vector3(pos.x, pos.y, pos.z);
+	auto dest = Vector3(pos.x, pos.y, pos.z) + camSlotId->Pose.Position.ToVector3();
 
 	GameVector from = GameVector(dest, camSlotId->RoomNumber);
 	Camera.fixedCamera = true;
@@ -521,6 +521,13 @@ void ChaseCamera(ItemInfo* item)
 		Camera.actualElevation = ANGLE(85.0f);
 	else if (Camera.actualElevation < ANGLE(-85.0f))
 		Camera.actualElevation = ANGLE(-85.0f);
+
+	// Force item position after exiting look mode to avoid weird movements near walls.
+	if (Camera.oldType == CameraType::Look)
+	{
+		Camera.target.x = item->Pose.Position.x;
+		Camera.target.z = item->Pose.Position.z;
+	}
 
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
@@ -1260,7 +1267,8 @@ void CalculateCamera(const CollisionInfo& coll)
 		if (isFixedCamera == Camera.fixedCamera)
 		{
 			Camera.fixedCamera = false;
-			if (Camera.speed != 1 &&
+
+			if (Camera.speed != 1 && Camera.oldType != CameraType::Look &&
 				!Lara.Control.Look.IsUsingBinoculars)
 			{
 				if (TargetSnaps <= 8)
@@ -1331,8 +1339,13 @@ void CalculateCamera(const CollisionInfo& coll)
 
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius)
 {
-	auto sphere = BoundingSphere(Camera.pos.ToVector3(), radius);
-	return sphere.Intersects(bounds.ToBoundingOrientedBox(pose));
+	auto camSphere = BoundingSphere(Camera.pos.ToVector3(), radius);
+	auto boundsSphere = BoundingSphere(pose.Position.ToVector3(), bounds.GetExtents().Length());
+
+	if (!camSphere.Intersects(boundsSphere))
+		return false;
+
+	return camSphere.Intersects(bounds.ToBoundingOrientedBox(pose));
 }
 
 float GetParticleDistanceFade(const Vector3i& pos)
@@ -1507,9 +1520,12 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, item->Pose, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &item->Pose, RADIUS);
 
-		DrawDebugBox(
-			bounds.ToBoundingOrientedBox(item->Pose),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
+		if (DebugMode)
+		{
+			DrawDebugBox(
+				bounds.ToBoundingOrientedBox(item->Pose),
+				Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
+		}
 	}
 
 	// Done.
@@ -1530,9 +1546,12 @@ void ItemsCollideCamera()
 		if (TestBoundsCollideCamera(bounds, mesh->pos, CAMERA_RADIUS))
 			ItemPushCamera(&bounds, &mesh->pos, RADIUS);
 
-		DrawDebugBox(
-			bounds.ToBoundingOrientedBox(mesh->pos),
-			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
+		if (DebugMode)
+		{
+			DrawDebugBox(
+				bounds.ToBoundingOrientedBox(mesh->pos),
+				Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
+		}
 	}
 
 	// Done.

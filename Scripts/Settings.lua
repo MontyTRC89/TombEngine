@@ -5,6 +5,7 @@ local Flow = TEN.Flow
 
 local settings = Flow.Settings.new()
 settings.errorMode = Flow.ErrorMode.WARN
+settings.fastReload = true
 Flow.SetSettings(settings)
 
 local anims = Flow.Animations.new()

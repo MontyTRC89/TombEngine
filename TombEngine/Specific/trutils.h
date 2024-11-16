@@ -11,7 +11,7 @@ namespace TEN::Utils
 	std::string ToString(const wchar_t* wString);
 	std::wstring ToWString(const std::string& string);
 	std::wstring ToWString(const char* cString);
-	std::vector<std::string> SplitString(const std::string& string);
+	std::vector<std::wstring> SplitString(const std::wstring& string);
 
 	// 2D space utilities
 	Vector2 GetAspectCorrect2DPosition(const Vector2& pos);

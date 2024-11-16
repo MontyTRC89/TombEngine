@@ -874,7 +874,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 		}
 	}
 	
-	if (closestJointIndex < 0)
+	if (closestJointIndex == NO_VALUE)
 	{
 		auto vTarget = GameVector(target);
 		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
@@ -1108,6 +1108,9 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	targetEntity->HitStatus = true;
 	if (targetEntity->IsCreature())
 		GetCreatureInfo(targetEntity)->HurtByLara = true;
+
+	if (object.HitRoutine == nullptr)
+		return;
 
 	if (hitPos != nullptr)
 	{
