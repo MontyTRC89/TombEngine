@@ -597,7 +597,8 @@ namespace TEN::Renderer
 		void Render(float interpFactor);
 		void RenderTitle(float interpFactor);
 		void Lock();
-		bool PrepareDataForTheRenderer();
+		void ResetData();
+		bool PrepareData();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float farView);
 		void RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere);
 		void DumpGameScene();

@@ -136,6 +136,9 @@ void ResetRoomData()
 			sector.Stopper = false;
 			sector.BridgeItemNumbers.clear();
 		}
+
+		for (auto& mesh : room.mesh)
+			mesh.Dirty = true;
 	}
 
 	// Make sure no pathfinding boxes are blocked (either by doors or by other door-like objects).
