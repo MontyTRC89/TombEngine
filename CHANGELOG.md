@@ -17,7 +17,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Sarcophagus and Search Object pickup triggers.
 * Fixed vehicle transfer not happening for levels which were not previously visited.
 * Fixed audio tracks placed in subfolders not restoring after loading savegame.
-* Fixed lack of fade-in for looped audio track on level start.
+* Fixed initial position and lack of fade-in for looped audio track on level start.
 * Fixed scripted input events not registering on the same game frame.
 * Fixed incorrect object camera position.
 * Fixed incorrect camera movement near walls after leaving look mode.
@@ -36,6 +36,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Lua API changes
 * Added support for transparency value in DisplayString class.
+* Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
 * Fixed DisplayString class not supporting empty lines in multiline strings.
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
