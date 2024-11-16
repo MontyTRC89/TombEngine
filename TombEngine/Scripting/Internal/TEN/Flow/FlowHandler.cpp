@@ -125,10 +125,9 @@ have an ID of 0, the second an ID of 1, and so on.
 */
 	tableFlow.set_function(ScriptReserved_GetCurrentLevel, &FlowHandler::GetCurrentLevel, this);
 
-/*** Returns the level that is about to load. If no new level is about to load, returns current level.
-@function GetNextLevel
-@treturn Flow.Level incoming new level or current level, if no new level is loading
-*/
+	/// Returns the level that is about to load. If no new level is about to load, returns current level.
+	// @function GetNextLevel
+	// @treturn Flow.Level incoming new level or current level, if no new level is loading
 	tableFlow.set_function(ScriptReserved_GetNextLevel, &FlowHandler::GetNextLevel, this);
 
 /***
@@ -410,7 +409,8 @@ Level* FlowHandler::GetNextLevel()
 	if (NextLevel == CurrentLevel)
 		return Levels[CurrentLevel];
 
-	return Levels[abs(NextLevel)]; // Negative value indicates incoming savegame.
+	// NOTE: Negative value indicates incoming savegame.
+	return Levels[abs(NextLevel)];
 }
 
 int	FlowHandler::GetNumLevels() const

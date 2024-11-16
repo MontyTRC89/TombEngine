@@ -1549,7 +1549,7 @@ bool LoadLevelFile(int levelIndex)
 	auto timestamp  = std::filesystem::last_write_time(levelPath);
 	bool fastReload = (g_GameFlow->GetSettings()->FastReload && levelIndex == CurrentLevel && timestamp == LastLevelTimestamp && levelPath == LastLevelFilePath);
 
-	// If fast reload is in action, don't draw loading screen, and instead draw last game frame.
+	// If fast reload is in action, draw last game frame instead of loading screen.
 	auto loadingScreenPath = TEN::Utils::ToWString(assetDir + level.LoadScreenFileName);
 	g_Renderer.SetLoadingScreen(fastReload ? std::wstring{} : loadingScreenPath);
 

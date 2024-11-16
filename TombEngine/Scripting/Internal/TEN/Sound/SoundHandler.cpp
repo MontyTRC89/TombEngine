@@ -24,14 +24,14 @@ namespace TEN::Scripting::Sound
 		PlaySoundTrack(trackName, playMode);
 	}
 
-	///Set and play an ambient track
-	//@function SetAmbientTrack
-	//@tparam string name of track (without file extension) to play
-	//@tparam bool specifies whether ambient track should play from the beginning, or crossfade at a random position
+	/// Set and play an ambient track
+	// @function SetAmbientTrack
+	// @tparam string name of track (without file extension) to play
+	// @tparam bool specifies whether ambient track should play from the beginning, or crossfade at a random position
 	static void SetAmbientTrack(const std::string& trackName, TypeOrNil<bool> fromTheBeginning)
 	{
-		std::optional<QWORD> position = USE_IF_HAVE(bool, fromTheBeginning, false) ? std::optional<QWORD>(0) : std::nullopt;
-		PlaySoundTrack(trackName, SoundTrackType::BGM, position, position.has_value() ? SOUND_XFADETIME_ONESHOT : SOUND_XFADETIME_BGM);
+		auto pos = USE_IF_HAVE(bool, fromTheBeginning, false) ? std::optional<QWORD>(0) : std::optional<QWORD>();
+		PlaySoundTrack(trackName, SoundTrackType::BGM, pos, pos.has_value() ? SOUND_XFADETIME_ONESHOT : SOUND_XFADETIME_BGM);
 	}
 
 	///Stop any audio tracks currently playing

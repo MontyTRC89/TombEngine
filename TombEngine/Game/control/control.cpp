@@ -223,23 +223,23 @@ GameStatus ControlPhase(bool insideMenu)
 	PlaySoundSources();
 	Sound_UpdateScene();
 
-	auto result = GameStatus::Normal;
+	auto gameStatus = GameStatus::Normal;
 
 	if (!insideMenu)
 	{
 		// Handle inventory, pause, load, save screens.
-		result = HandleMenuCalls(isTitle);
+		gameStatus = HandleMenuCalls(isTitle);
 
 		// Handle global input events.
-		if (result == GameStatus::Normal)
-			result = HandleGlobalInputEvents(isTitle);
+		if (gameStatus == GameStatus::Normal)
+			gameStatus = HandleGlobalInputEvents(isTitle);
 	}
 
-	if (result != GameStatus::Normal)
+	if (gameStatus != GameStatus::Normal)
 	{
 		// Call post-loop callbacks last time and end level.
 		g_GameScript->OnLoop(DELTA_TIME, true);
-		g_GameScript->OnEnd(result);
+		g_GameScript->OnEnd(gameStatus);
 		HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
 	}
 	else
@@ -260,7 +260,7 @@ GameStatus ControlPhase(bool insideMenu)
 	auto time2 = std::chrono::high_resolution_clock::now();
 	ControlPhaseTime = (std::chrono::duration_cast<std::chrono::nanoseconds>(time2 - time1)).count() / 1000000;
 
-	return result;
+	return gameStatus;
 }
 
 unsigned CALLBACK GameMain(void *)
@@ -594,7 +594,8 @@ GameStatus DoGameLoop(int levelIndex)
 
 void EndGameLoop(int levelIndex, GameStatus reason)
 {
-	g_Renderer.DumpGameScene(); // Save last screenshot for loading screen.
+	// Save last screenshot for loading screen.
+	g_Renderer.DumpGameScene();
 
 	SaveGame::SaveHub(levelIndex);
 	DeInitializeScripting(levelIndex, reason);

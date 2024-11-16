@@ -114,11 +114,11 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 	auto convertedBounds = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
 
 	// Create conservative AABB for rough tests.
-	auto& collidingAABB = collidingBounds.ToConservativeBoundingBox(collidingItem.Pose);
+	auto collidingAabb = collidingBounds.ToConservativeBoundingBox(collidingItem.Pose);
 
 	// Override extents if specified.
 	if (customRadius > 0.0f)
-		collidingAABB = BoundingBox(collidingItem.Pose.Position.ToVector3(), Vector3(customRadius));
+		collidingAabb = BoundingBox(collidingItem.Pose.Position.ToVector3(), Vector3(customRadius));
 
 	// Run through neighboring rooms.
 	const auto& room = g_Level.Rooms[collidingItem.RoomNumber];
@@ -154,7 +154,7 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					if (item.Index == collidingItem.Index || item.Flags & IFLAG_KILLED || item.MeshBits == NO_JOINT_BITS)
 						continue;
 
-					// Ignore non-Lara items without collision or draw routines or with collidable flag unset.
+					// Ignore non-collidable non-player.
 					if (!item.IsLara() && (!item.Collidable || object.drawRoutine == nullptr || object.collision == nullptr))
 						continue;
 
@@ -167,21 +167,19 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					if (dist > COLLISION_CHECK_DISTANCE)
 						continue;
 
-					const auto& bounds = GetBestFrame(item).BoundingBox;
-
 					// If item bounding box extents is below tolerance threshold, discard object.
+					const auto& bounds = GetBestFrame(item).BoundingBox;
 					if (bounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
 						continue;
 
 					// Test conservative AABB intersection.
-					const auto& AABB = bounds.ToConservativeBoundingBox(item.Pose);
-					if (!AABB.Intersects(collidingAABB))
+					auto aabb = bounds.ToConservativeBoundingBox(item.Pose);
+					if (!aabb.Intersects(collidingAabb))
 						continue;
 
-					auto box = bounds.ToBoundingOrientedBox(item.Pose);
-
-					// Test accurate box intersection.
-					if (box.Intersects(convertedBounds))
+					// Test accurate OBB intersection.
+					auto obb = bounds.ToBoundingOrientedBox(item.Pose);
+					if (obb.Intersects(convertedBounds))
 						collObjects.Items.push_back(&item);
 				}
 				while (itemNumber != NO_VALUE);
@@ -203,21 +201,19 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 				if (dist > COLLISION_CHECK_DISTANCE)
 					continue;
 
-				const auto& bounds = GetBoundsAccurate(staticObj, false);
-
 				// Skip if either bounding box has any zero extent (not a collidable volume).
+				const auto& bounds = GetBoundsAccurate(staticObj, false);
 				if (bounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
 					continue;
 
 				// Test conservative AABB intersection.
-				const auto& AABB = bounds.ToConservativeBoundingBox(staticObj.pos);
-				if (!AABB.Intersects(collidingAABB))
+				auto aabb = bounds.ToConservativeBoundingBox(staticObj.pos);
+				if (!aabb.Intersects(collidingAabb))
 					continue;
 
-				auto box = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
-
-				// Test accurate box intersection.
-				if (box.Intersects(convertedBounds))
+				// Test accurate OBB intersection.
+				auto obb = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
+				if (obb.Intersects(convertedBounds))
 					collObjects.Statics.push_back(&staticObj);
 			}
 		}

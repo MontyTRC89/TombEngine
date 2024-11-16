@@ -490,7 +490,7 @@ std::optional<std::string> GetCurrentSubtitle()
 	return std::nullopt;
 }
 
-void PlaySoundTrack(const std::string& track, SoundTrackType mode, std::optional<QWORD> position, int forceFadeInTime)
+void PlaySoundTrack(const std::string& track, SoundTrackType mode, std::optional<QWORD> pos, int forceFadeInTime)
 {
 	if (!g_Configuration.EnableSound)
 		return;
@@ -505,10 +505,11 @@ void PlaySoundTrack(const std::string& track, SoundTrackType mode, std::optional
 	bool channelActive = BASS_ChannelIsActive(SoundtrackSlot[(int)mode].Channel);
 	if (channelActive && SoundtrackSlot[(int)mode].Track.compare(track) == 0)
 	{
-		// Same track is incoming with different playhead, set it to a new position.
+		// Same track is incoming with different playhead; set it to new position.
 		auto stream = SoundtrackSlot[(int)mode].Channel;
-		if (position.has_value() && (BASS_ChannelGetLength(stream, BASS_POS_BYTE) > position.value()))
-			BASS_ChannelSetPosition(stream, position.value(), BASS_POS_BYTE);
+		if (pos.has_value() && BASS_ChannelGetLength(stream, BASS_POS_BYTE) > pos.value())
+			BASS_ChannelSetPosition(stream, pos.value(), BASS_POS_BYTE);
+
 		return;
 	}
 
@@ -573,20 +574,22 @@ void PlaySoundTrack(const std::string& track, SoundTrackType mode, std::optional
 
 		// Shuffle...
 		// Only activates if no custom position is passed as argument.
-		if (!position.has_value())
+		if (!pos.has_value())
 		{
 			QWORD newPos = BASS_ChannelGetLength(stream, BASS_POS_BYTE) * (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX));
 			BASS_ChannelSetPosition(stream, newPos, BASS_POS_BYTE);
 		}
 	}
 	else
+	{
 		BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, masterVolume);
+	}
 
 	BASS_ChannelPlay(stream, false);
 
 	// Try to restore position, if specified.
-	if (position.has_value() && (BASS_ChannelGetLength(stream, BASS_POS_BYTE) > position.value()))
-		BASS_ChannelSetPosition(stream, position.value(), BASS_POS_BYTE);
+	if (pos.has_value() && BASS_ChannelGetLength(stream, BASS_POS_BYTE) > pos.value())
+		BASS_ChannelSetPosition(stream, pos.value(), BASS_POS_BYTE);
 
 	if (Sound_CheckBASSError("Playing soundtrack '%s'", true, fullTrackName.filename().string().c_str()))
 		return;
