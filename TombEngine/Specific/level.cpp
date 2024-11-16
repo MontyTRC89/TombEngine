@@ -1528,10 +1528,10 @@ bool LoadLevelFile(int levelIndex)
 
 	if (!std::filesystem::is_regular_file(levelPath))
 	{
-		levelPath = assetDir + "dummy.ten";
-
-		if (levelIndex == 0 && GenerateDummyLevel(levelPath))
+		if (levelIndex == 0)
 		{
+			levelPath = assetDir + "dummy.ten";
+			GenerateDummyLevel(levelPath);
 			TENLog("Title level file not found, using dummy level.", LogLevel::Info);
 			isDummyLevel = true;
 		}
