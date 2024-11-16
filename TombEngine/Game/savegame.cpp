@@ -2229,6 +2229,8 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		room->mesh[number].flags = staticMesh->flags();
 		room->mesh[number].HitPoints = staticMesh->hit_points();
+
+		room->mesh[number].Dirty = true;
 		
 		if (!room->mesh[number].flags)
 		{
