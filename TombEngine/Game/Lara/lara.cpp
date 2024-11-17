@@ -168,14 +168,16 @@ static void HandlePlayerDebug(const ItemInfo& item)
 
 	// Collision stats.
 	if (g_Renderer.GetDebugPage() == RendererDebugPage::CollisionStats)
+	{
 		DrawNearbySectorFlags(item);
-
+	}
 	// Pathfinding stats.
-	if (g_Renderer.GetDebugPage() == RendererDebugPage::PathfindingStats)
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::PathfindingStats)
+	{
 		DrawNearbyPathfinding(GetPointCollision(item).GetBottomSector().PathfindingBoxID);
-
+	}
 	// Room stats.
-	if (g_Renderer.GetDebugPage() == RendererDebugPage::RoomStats)
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::RoomStats)
 	{
 		const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
 
@@ -192,9 +194,8 @@ static void HandlePlayerDebug(const ItemInfo& item)
 			neighborRoom.CollisionMesh.DrawDebug();
 		}
 	}
-
 	// Bridge stats.
-	if (g_Renderer.GetDebugPage() == RendererDebugPage::BridgeStats)
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::BridgeStats)
 	{
 		auto bridgeItemNumbers = std::set<int>{};
 
@@ -233,9 +234,8 @@ static void HandlePlayerDebug(const ItemInfo& item)
 				PrintDebugMessage("%d", bridgeItemNumber);
 		}
 	}
-
 	// Portal stats.
-	if (g_Renderer.GetDebugPage() == RendererDebugPage::PortalStats)
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::PortalStats)
 	{
 		const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
 		PrintDebugMessage("Portals in room %d: %d", room.RoomNumber, room.Portals.size());
