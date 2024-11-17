@@ -39,7 +39,7 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 		return;
 
 	// Get command data pointer.
-	short* commandDataPtr = &g_Level.Commands[anim.CommandIndex];
+	int* commandDataPtr = &g_Level.Commands[anim.CommandIndex];
 
 	for (int i = anim.NumCommands; i > 0; i--)
 	{
@@ -173,7 +173,7 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 
 		case AnimCommandType::Flipeffect:
 			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
-				DoFlipEffect((commandDataPtr[1] & 0x3FFF), &item);
+				DoFlipEffect(commandDataPtr[1], &item);
 
 			commandDataPtr += 2;
 			break;

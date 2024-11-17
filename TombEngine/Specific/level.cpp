@@ -387,7 +387,7 @@ void LoadObjects()
 
 	int numCommands = ReadInt32();
 	g_Level.Commands.resize(numCommands);
-	ReadBytes(g_Level.Commands.data(), sizeof(short) * numCommands);
+	ReadBytes(g_Level.Commands.data(), sizeof(int) * numCommands);
 
 	int numBones = ReadInt32();
 	g_Level.Bones.resize(numBones);
