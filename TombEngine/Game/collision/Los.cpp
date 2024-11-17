@@ -278,14 +278,14 @@ namespace TEN::Collision::Los
 					const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 
 					// Run through bounded bridges.
-					auto bridgeMovIds = neighborRoom.Bridges.GetBoundedIds(ray, closestDist);
-					for (int bridgeMovID : bridgeMovIds)
+					auto bridgeItemNumbers = neighborRoom.Bridges.GetBoundedIds(ray, closestDist);
+					for (int bridgeItemNumber : bridgeItemNumbers)
 					{
-						const auto& bridgeMov = g_Level.Items[bridgeMovID];
-						const auto& bridge = GetBridgeObject(bridgeMov);
+						const auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+						const auto& bridge = GetBridgeObject(bridgeItem);
 
 						// Check bridge status.
-						if (bridgeMov.Status == ItemStatus::ITEM_INVISIBLE || bridgeMov.Status == ItemStatus::ITEM_DEACTIVATED)
+						if (bridgeItem.Status == ItemStatus::ITEM_DEACTIVATED || bridgeItem.Status == ItemStatus::ITEM_INVISIBLE)
 							continue;
 
 						// Clip bridge.
@@ -322,17 +322,26 @@ namespace TEN::Collision::Los
 
 				// Hit portal triangle; update ray to traverse new room.
 				if (portalRoomNumber != NO_VALUE &&
-					rayRoomNumber != portalRoomNumber) // FAILSAFE: Prevent infinite loop.
+					rayRoomNumber != portalRoomNumber) // FAILSAFE: Prevent infinite loop if room portal leads back to itself.
 				{
+					auto prevIntersectPos = ray.position;
+
 					ray.position = intersectPos;
 					rayDist -= closestDist;
 					rayRoomNumber = portalRoomNumber;
+
+					// FAILSAFE: Prevent infinite loop if room portals lead back to each other.
+					if (prevIntersectPos == intersectPos)
+					{
+						traversePortal = false;
+						TENLog("GetRoomLosCollision(): Room portals cannot lead back to each other.", LogLevel::Warning);
+					}
 				}
 				// Hit tangible triangle; collect remaining room LOS data.
 				else
 				{
 					if (portalRoomNumber != NO_VALUE)
-						TENLog("GetRoomLosCollision(): Room portal cannot link back to itself.", LogLevel::Warning);
+						TENLog("GetRoomLosCollision(): Room portal cannot lead back to itself.", LogLevel::Warning);
 
 					roomLos.Triangle = *closestTri;
 					roomLos.Position = intersectPos;

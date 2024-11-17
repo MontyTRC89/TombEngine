@@ -1291,7 +1291,7 @@ namespace TEN::Renderer
 			PrintDebugMessage("DIMENSION STATS");
 			PrintDebugMessage("Position: %d, %d, %d", playerItem.Pose.Position.x, playerItem.Pose.Position.y, playerItem.Pose.Position.z);
 			PrintDebugMessage("Orientation: %d, %d, %d", playerItem.Pose.Orientation.x, playerItem.Pose.Orientation.y, playerItem.Pose.Orientation.z);
-			PrintDebugMessage("RoomNumber: %d", playerItem.RoomNumber);
+			PrintDebugMessage("Room number: %d", playerItem.RoomNumber);
 			PrintDebugMessage("PathfindingBoxID: %d", playerItem.BoxNumber);
 			PrintDebugMessage((player.Context.WaterSurfaceDist == -NO_HEIGHT ? "WaterSurfaceDist: N/A" : "WaterSurfaceDist: %d"), player.Context.WaterSurfaceDist);
 			PrintDebugMessage("Room Position: %d, %d, %d, %d", room.Position.z, room.Position.z, room.Position.z + BLOCK(room.XSize), room.Position.z + BLOCK(room.ZSize));
@@ -1358,18 +1358,22 @@ namespace TEN::Renderer
 			PrintDebugMessage("Front right ceil: %d", LaraCollision.FrontRight.Ceiling);
 			break;
 
-		case RendererDebugPage::CollisionMeshStats:
-			PrintDebugMessage("COLLISION MESH STATS");
-			break;
-
 		case RendererDebugPage::PathfindingStats:
 			PrintDebugMessage("PATHFINDING STATS");
 			PrintDebugMessage("BoxNumber: %d", playerItem.BoxNumber);
 			break;
 
+		case RendererDebugPage::BridgeStats:
+			PrintDebugMessage("BRIDGE STATS");
+			break;
+
+		case RendererDebugPage::RoomStats:
+			PrintDebugMessage("ROOM STATS");
+			break;
+
 		case RendererDebugPage::PortalStats:
 			PrintDebugMessage("PORTAL STATS");
-			PrintDebugMessage("Camera RoomNumber: %d", Camera.pos.RoomNumber);
+			PrintDebugMessage("Camera room number: %d", Camera.pos.RoomNumber);
 			PrintDebugMessage("Room collector time: %d", _timeRoomsCollector);
 			PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
 			PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);

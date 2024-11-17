@@ -60,7 +60,9 @@ namespace TEN::Physics
 
 	LocalCollisionTriangle::LocalCollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID)
 	{
-		_vertexIds = { vertex0ID, vertex1ID, vertex2ID };
+		_vertexIds[0] = vertex0ID;
+		_vertexIds[1] = vertex1ID;
+		_vertexIds[2] = vertex2ID;
 	}
 
 	const Vector3& LocalCollisionTriangle::GetVertex0(const std::vector<Vector3>& vertices) const
@@ -155,7 +157,7 @@ namespace TEN::Physics
 	void LocalCollisionTriangle::DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices) const
 	{
 		constexpr auto TRI_COLOR		  = Color(1.0f, 1.0f, 0.0f, 0.1f);
-		constexpr auto NORMAL_LINE_LENGTH = BLOCK(0.1f);
+		constexpr auto NORMAL_LINE_LENGTH = BLOCK(0.15f);
 		constexpr auto NORMAL_LINE_COLOR  = Color(1.0f, 1.0f, 1.0f);
 
 		// Get vertices.
@@ -229,24 +231,21 @@ namespace TEN::Physics
 			}
 		}
 
-		if (closestTri != nullptr)
+		// No triangle collision; return early.
+		if (closestTri == nullptr)
+			return std::nullopt;
+
+		// Create and return ray-mesh collision.
+		auto meshColl = CollisionMeshRayCollisionData{};
+		meshColl.Triangle.Vertices =
 		{
-			auto meshColl = CollisionMeshRayCollisionData{};
-
-			meshColl.Triangle.Vertices =
-			{
-				Vector3::Transform(closestTri->GetVertex0(_vertices), transformMatrix),
-				Vector3::Transform(closestTri->GetVertex1(_vertices), transformMatrix),
-				Vector3::Transform(closestTri->GetVertex2(_vertices), transformMatrix)
-			};
-
-			meshColl.Triangle.Normal = Vector3::Transform(closestTri->GetNormal(_vertices), rotMatrix);
-			meshColl.Distance = closestDist;
-
-			return meshColl;
-		}
-
-		return std::nullopt;
+			Vector3::Transform(closestTri->GetVertex0(_vertices), transformMatrix),
+			Vector3::Transform(closestTri->GetVertex1(_vertices), transformMatrix),
+			Vector3::Transform(closestTri->GetVertex2(_vertices), transformMatrix)
+		};
+		meshColl.Triangle.Normal = Vector3::Transform(closestTri->GetNormal(_vertices), rotMatrix);
+		meshColl.Distance = closestDist;
+		return meshColl;
 	}
 
 	void CollisionMesh::SetPosition(const Vector3& pos)

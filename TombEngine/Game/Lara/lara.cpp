@@ -63,7 +63,7 @@ LaraInfo	  Lara			= {};
 ItemInfo*	  LaraItem		= nullptr;
 CollisionInfo LaraCollision = {};
 
-//debug
+//temp debug
 #include <Game/control/los.h>
 #include "Specific/Input/Input.h"
 #include <OISKeyboard.h>
@@ -71,8 +71,10 @@ CollisionInfo LaraCollision = {};
 using namespace TEN::Collision::Room;
 using namespace TEN::Collision::Los;
 
+//temp debug
 static void HandleLosDebug(const ItemInfo& item)
 {
+	// Hold T/G to rotate LOS ray.
 	static auto rot = EulerAngles::Identity;
 	if (KeyMap[OIS::KC_T])
 	{
@@ -92,7 +94,7 @@ static void HandleLosDebug(const ItemInfo& item)
 
 	auto origin = (item.Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
 	auto target = Geometry::TranslatePoint(origin, dir, dist);
-	auto los = GetLosCollision(origin, roomNumber, dir, dist, true, false, true);
+	auto los = GetLosCollision(origin, roomNumber, dir, dist, false, false, false);
 	float closestDist = los.Room.Distance;
 	target = los.Room.Position;
 
@@ -123,21 +125,10 @@ static void HandleLosDebug(const ItemInfo& item)
 	DrawDebugTarget(target, Quaternion::Identity, 100, Color(1, 1, 1));
 }
 
+//temp debug
 static void HandleBridgeDebug(const ItemInfo& item)
 {
 	auto pointColl = GetPointCollision(item);
-
-	// Print bridge moveable IDs in current sector.
-	PrintDebugMessage("Bridge moveable IDs in room %d, sector %d:", pointColl.GetRoomNumber(), pointColl.GetSector().ID);
-	if (pointColl.GetSector().BridgeItemNumbers.empty())
-	{
-		PrintDebugMessage("None");
-	}
-	else
-	{
-		for (int bridgeItemNumber : pointColl.GetSector().BridgeItemNumbers)
-			PrintDebugMessage("%d", bridgeItemNumber);
-	}
 
 	// Move bridge with mouse.
 	// Hold Y to move vertically.
@@ -167,14 +158,100 @@ static void HandleBridgeDebug(const ItemInfo& item)
 	}
 }
 
+static void HandlePlayerDebug(const ItemInfo& item)
+{
+	HandleLosDebug(item);
+	HandleBridgeDebug(item);
+
+	if constexpr (!DebugBuild)
+		return;
+
+	// Collision stats.
+	if (g_Renderer.GetDebugPage() == RendererDebugPage::CollisionStats)
+		DrawNearbySectorFlags(item);
+
+	// Pathfinding stats.
+	if (g_Renderer.GetDebugPage() == RendererDebugPage::PathfindingStats)
+		DrawNearbyPathfinding(GetPointCollision(item).GetBottomSector().PathfindingBoxID);
+
+	// Room stats.
+	if (g_Renderer.GetDebugPage() == RendererDebugPage::RoomStats)
+	{
+		const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
+
+		PrintDebugMessage("Room number: %d", room.RoomNumber);
+		PrintDebugMessage("Sectors: %d", room.Sectors.size());
+		PrintDebugMessage("Bridges: %d", room.Bridges.GetIds().size());
+		PrintDebugMessage("Trigger volumes: %d", room.TriggerVolumes.size());
+
+		// Draw room collision meshes.
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
+		{
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+
+			neighborRoom.CollisionMesh.DrawDebug();
+		}
+	}
+
+	// Bridge stats.
+	if (g_Renderer.GetDebugPage() == RendererDebugPage::BridgeStats)
+	{
+		auto bridgeItemNumbers = std::set<int>{};
+
+		const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
+		{
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+
+			// Collect bridge item numbers.
+			for (int bridgeItemNumber : neighborRoom.Bridges.GetIds())
+				bridgeItemNumbers.insert(bridgeItemNumber);
+
+			// Draw bridge tree.
+			neighborRoom.Bridges.DrawDebug();
+		}
+
+		// Draw bridge collision meshes.
+		for (int bridgeItemNumber : bridgeItemNumbers)
+		{
+			auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+			auto& bridge = GetBridgeObject(bridgeItem);
+
+			bridge.GetCollisionMesh().DrawDebug();
+		}
+
+		// Print bridge item numbers in sector.
+		auto pointColl = GetPointCollision(item);
+		PrintDebugMessage("Bridge moveable IDs in room %d, sector %d:", pointColl.GetRoomNumber(), pointColl.GetSector().ID);
+		if (pointColl.GetSector().BridgeItemNumbers.empty())
+		{
+			PrintDebugMessage("None");
+		}
+		else
+		{
+			for (int bridgeItemNumber : pointColl.GetSector().BridgeItemNumbers)
+				PrintDebugMessage("%d", bridgeItemNumber);
+		}
+	}
+
+	// Portal stats.
+	if (g_Renderer.GetDebugPage() == RendererDebugPage::PortalStats)
+	{
+		const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
+		PrintDebugMessage("Portals in room %d: %d", room.RoomNumber, room.Portals.size());
+
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
+		{
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+			for (const auto& portal : neighborRoom.Portals)
+				portal.CollisionMesh.DrawDebug();
+		}
+	}
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
-
-	// DEBUG
-	HandleLosDebug(*item);
-	HandleBridgeDebug(*item);
-	//------
 
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)
@@ -442,49 +519,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 	SaveGame::Statistics.Game.Distance += (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
 
-	if (DebugMode)
-	{
-		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().PathfindingBoxID);
-		DrawNearbySectorFlags(*item);
-
-		// Draw collision meshes.
-		if (g_Renderer.GetDebugPage() == RendererDebugPage::CollisionMeshStats)
-		{
-			auto bridgeItemNumbers = std::set<int>{};
-
-			const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
-			for (int neighborRoomNumber : room.NeighborRoomNumbers)
-			{
-				const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-
-				neighborRoom.Bridges.DrawDebug();
-				//neighborRoom.CollisionMesh.DrawDebug();
-
-				for (int bridgeItemNumber : neighborRoom.Bridges.GetIds())
-					bridgeItemNumbers.insert(bridgeItemNumber);
-			}
-
-			for (int bridgeItemNumber : bridgeItemNumbers)
-			{
-				auto& bridgeItem = g_Level.Items[bridgeItemNumber];
-				auto& bridge = GetBridgeObject(bridgeItem);
-
-				bridge.GetCollisionMesh().DrawDebug();
-			}
-		}
-
-		// Draw nearby portals.
-		if (g_Renderer.GetDebugPage() == RendererDebugPage::PortalStats)
-		{
-			const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
-			for (int neighborRoomNumber : room.NeighborRoomNumbers)
-			{
-				const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-				for (const auto& portal : neighborRoom.Portals)
-					portal.CollisionMesh.DrawDebug();
-			}
-		}
-	}
+	HandlePlayerDebug(*item);
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
