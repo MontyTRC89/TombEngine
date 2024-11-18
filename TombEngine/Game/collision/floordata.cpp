@@ -230,21 +230,16 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		auto bridgeCeilingHeight = bridge.GetCeilingHeight(bridgeItem, pos);
 
 		// 2.1) Get bridge surface height.
-		auto bridgeSurfaceHeight = isFloor ? bridge.GetFloorHeight(bridgeItem, pos) : bridge.GetCeilingHeight(bridgeItem, pos);
+		auto bridgeSurfaceHeight = isFloor ? bridgeFloorHeight : bridgeCeilingHeight;
 
 		if (!bridgeSurfaceHeight.has_value())
 			continue;
-
-		// Use bridge midpoint to decide whether to return bridge height or room height, in case probe point
-		// is located within the bridge. Without it, dynamic bridges may fail while Lara is standing on them.
-		int thickness = bridge.GetCeilingBorder(bridgeItem) - bridge.GetFloorBorder(bridgeItem);
-		int midpoint  = bridgeItem.Pose.Position.y + thickness / 2;
 
 		// 2.2) Track closest floor or ceiling height.
 		if (isFloor)
 		{
 			// Test if bridge floor height is closer.
-			if (midpoint >= pos.y &&					// Bridge midpoint is below position.
+			if (*bridgeCeilingHeight >= pos.y &&					// Bridge midpoint is below position.
 				*bridgeSurfaceHeight < floorHeight &&   // Bridge floor height is above current closest floor height.
 				*bridgeSurfaceHeight >= ceilingHeight)  // Bridge ceiling height is below sector ceiling height.
 			{
@@ -254,7 +249,7 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		else
 		{
 			// Test if bridge ceiling height is closer.
-			if (midpoint <= pos.y &&					// Bridge midpoint is above position.
+			if (*bridgeFloorHeight <= pos.y &&					// Bridge midpoint is above position.
 				*bridgeSurfaceHeight > ceilingHeight && // Bridge ceiling height is below current closest ceiling height.
 				*bridgeSurfaceHeight <= floorHeight)	// Bridge floor height is above sector floor height.
 			{
