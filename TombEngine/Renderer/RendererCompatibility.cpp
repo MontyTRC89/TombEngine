@@ -877,15 +877,13 @@ namespace TEN::Renderer
 
 		totalVertices = 0;
 		totalIndices = 0;
-		for (auto kv : StaticObjects)
+		for (const auto& [staticID, staticObj] : StaticObjects)
 		{
-			StaticInfo& obj = kv.second;
-			MESH* mesh = &g_Level.Meshes[obj.meshNumber];
-
-			for (auto& bucket : mesh->buckets)
+			const auto& mesh = g_Level.Meshes[staticObj.meshNumber];
+			for (const auto& bucket : mesh.buckets)
 			{
-				totalVertices += bucket.numQuads * 4 + bucket.numTriangles * 3;
-				totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
+				totalVertices += (bucket.numQuads * 4) + (bucket.numTriangles * 3);
+				totalIndices += (bucket.numQuads * 6) + (bucket.numTriangles * 3);
 			}
 		}
 
@@ -894,20 +892,18 @@ namespace TEN::Renderer
 
 		lastVertex = 0;
 		lastIndex = 0;
-		for (auto kv : StaticObjects)
+		for (const auto& [staticID, staticObj] : StaticObjects)
 		{
-			StaticInfo& obj = kv.second;
+			auto newStaticObj = RendererObject();
+			newStaticObj.Type = 1;
+			newStaticObj.Id = staticID;
 
-			RendererObject staticObject = RendererObject();
-			staticObject.Type = 1;
-			staticObject.Id = kv.first;
+			auto& mesh = *GetRendererMeshFromTrMesh(&newStaticObj, &g_Level.Meshes[staticObj.meshNumber], 0, false, false, &lastVertex, &lastIndex);
 
-			RendererMesh *mesh = GetRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj.meshNumber], 0, false, false, &lastVertex, &lastIndex);
+			newStaticObj.ObjectMeshes.push_back(&mesh);
+			_meshes.push_back(&mesh);
 
-			staticObject.ObjectMeshes.push_back(mesh);
-			_meshes.push_back(mesh);
-
-			_staticObjects[kv.first] = staticObject;
+			_staticObjects[staticID] = newStaticObj;
 		}
 
 		_staticsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_staticsVertices.size(), _staticsVertices.data());

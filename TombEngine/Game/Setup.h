@@ -136,7 +136,7 @@ struct StaticInfo
 	int shatterSound;
 };
 
-extern ObjectHandler Objects;
+extern ObjectHandler					   Objects;
 extern std::unordered_map<int, StaticInfo> StaticObjects;
 
 void InitializeGameFlags();

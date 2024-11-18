@@ -439,45 +439,44 @@ void LoadObjects()
 	TENLog("Initializing objects...", LogLevel::Info);
 	InitializeObjects();
 
-	int numStatics = ReadInt32();
-	TENLog("Num statics: " + std::to_string(numStatics), LogLevel::Info);
+	int staticCount = ReadInt32();
+	TENLog("Statics: " + std::to_string(staticCount), LogLevel::Info);
 
-	for (int i = 0; i < numStatics; i++)
+	for (int i = 0; i < staticCount; i++)
 	{
-		int meshID = ReadInt32();
-
-		if (meshID >= MAX_STATICS)
+		int staticID = ReadInt32();
+		if (staticID >= MAX_STATICS)
 		{
-			TENLog("Static with ID " + std::to_string(meshID) + " detected, while maximum is " + std::to_string(MAX_STATICS) + ". " +
-				   "Change static mesh ID in WadTool to a value below maximum.", LogLevel::Warning);
+			TENLog("Static with ID " + std::to_string(staticID) + " detected, surpassing maximum of " + std::to_string(MAX_STATICS) + ". " +
+				   "Change static object ID in WadTool to a value below the maximum.", LogLevel::Warning);
 			
-			meshID = 0;
+			staticID = 0;
 		}
 
-		StaticInfo staticInfo;
+		auto staticObj = StaticInfo{};
 
-		staticInfo.meshNumber = (short)ReadInt32();
+		staticObj.meshNumber = ReadInt32();
 
-		staticInfo.visibilityBox.X1 = ReadInt16();
-		staticInfo.visibilityBox.X2 = ReadInt16();
-		staticInfo.visibilityBox.Y1 = ReadInt16();
-		staticInfo.visibilityBox.Y2 = ReadInt16();
-		staticInfo.visibilityBox.Z1 = ReadInt16();
-		staticInfo.visibilityBox.Z2 = ReadInt16();
+		staticObj.visibilityBox.X1 = ReadInt16();
+		staticObj.visibilityBox.X2 = ReadInt16();
+		staticObj.visibilityBox.Y1 = ReadInt16();
+		staticObj.visibilityBox.Y2 = ReadInt16();
+		staticObj.visibilityBox.Z1 = ReadInt16();
+		staticObj.visibilityBox.Z2 = ReadInt16();
 
-		staticInfo.collisionBox.X1 = ReadInt16();
-		staticInfo.collisionBox.X2 = ReadInt16();
-		staticInfo.collisionBox.Y1 = ReadInt16();
-		staticInfo.collisionBox.Y2 = ReadInt16();
-		staticInfo.collisionBox.Z1 = ReadInt16();
-		staticInfo.collisionBox.Z2 = ReadInt16();
+		staticObj.collisionBox.X1 = ReadInt16();
+		staticObj.collisionBox.X2 = ReadInt16();
+		staticObj.collisionBox.Y1 = ReadInt16();
+		staticObj.collisionBox.Y2 = ReadInt16();
+		staticObj.collisionBox.Z1 = ReadInt16();
+		staticObj.collisionBox.Z2 = ReadInt16();
 
-		staticInfo.flags = (short)ReadInt16();
+		staticObj.flags = ReadInt16();
 
-		staticInfo.shatterType = (ShatterType)ReadInt16();
-		staticInfo.shatterSound = (short)ReadInt16();
+		staticObj.shatterType = (ShatterType)ReadInt16();
+		staticObj.shatterSound = ReadInt16();
 
-		StaticObjects[meshID] = staticInfo;
+		StaticObjects[staticID] = staticObj;
 	}
 }
 
