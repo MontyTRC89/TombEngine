@@ -446,16 +446,9 @@ void LoadObjects()
 
 	for (int i = 0; i < staticCount; i++)
 	{
-		int staticID = ReadInt32();
-		if (staticID >= MAX_STATICS)
-		{
-			TENLog("Static with ID " + std::to_string(staticID) + " detected, surpassing maximum of " + std::to_string(MAX_STATICS) + ". " +
-				"Change static object ID in WadTool to a value below the maximum.", LogLevel::Warning);
-
-			staticID = 0;
-		}
-
 		auto staticObj = StaticInfo{};
+
+		int staticID = ReadInt32();
 
 		staticObj.meshNumber = ReadInt32();
 
