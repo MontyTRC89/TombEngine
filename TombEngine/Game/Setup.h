@@ -137,7 +137,7 @@ struct StaticInfo
 };
 
 extern ObjectHandler Objects;
-extern StaticInfo StaticObjects[MAX_STATICS];
+extern std::unordered_map<int, StaticInfo> StaticObjects;
 
 void InitializeGameFlags();
 void InitializeSpecialEffects();

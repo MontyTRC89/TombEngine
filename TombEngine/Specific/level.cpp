@@ -81,7 +81,6 @@ const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 LEVEL g_Level;
 
 std::vector<int> MoveablesIds;
-std::vector<int> StaticObjectsIds;
 std::vector<int> SpriteSequencesIds;
 
 char* DataPtr;
@@ -269,7 +268,7 @@ void LoadItems()
 void LoadObjects()
 {
 	Objects.Initialize();
-	std::memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
+	StaticObjects.clear();
 
 	int numMeshes = ReadInt32();
 	TENLog("Num meshes: " + std::to_string(numMeshes), LogLevel::Info);
@@ -435,8 +434,6 @@ void LoadObjects()
 		Objects[objNum].boneIndex = ReadInt32();
 		Objects[objNum].frameBase = ReadInt32();
 		Objects[objNum].animIndex = ReadInt32();
-
-		Objects[objNum].loaded = true;
 	}
 
 	TENLog("Initializing objects...", LogLevel::Info);
@@ -457,28 +454,30 @@ void LoadObjects()
 			meshID = 0;
 		}
 
-		StaticObjectsIds.push_back(meshID);
+		StaticInfo staticInfo;
 
-		StaticObjects[meshID].meshNumber = (short)ReadInt32();
+		staticInfo.meshNumber = (short)ReadInt32();
 
-		StaticObjects[meshID].visibilityBox.X1 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.X2 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Y1 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Y2 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Z1 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Z2 = ReadInt16();
+		staticInfo.visibilityBox.X1 = ReadInt16();
+		staticInfo.visibilityBox.X2 = ReadInt16();
+		staticInfo.visibilityBox.Y1 = ReadInt16();
+		staticInfo.visibilityBox.Y2 = ReadInt16();
+		staticInfo.visibilityBox.Z1 = ReadInt16();
+		staticInfo.visibilityBox.Z2 = ReadInt16();
 
-		StaticObjects[meshID].collisionBox.X1 = ReadInt16();
-		StaticObjects[meshID].collisionBox.X2 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Y1 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Y2 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Z1 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Z2 = ReadInt16();
+		staticInfo.collisionBox.X1 = ReadInt16();
+		staticInfo.collisionBox.X2 = ReadInt16();
+		staticInfo.collisionBox.Y1 = ReadInt16();
+		staticInfo.collisionBox.Y2 = ReadInt16();
+		staticInfo.collisionBox.Z1 = ReadInt16();
+		staticInfo.collisionBox.Z2 = ReadInt16();
 
-		StaticObjects[meshID].flags = (short)ReadInt16();
+		staticInfo.flags = (short)ReadInt16();
 
-		StaticObjects[meshID].shatterType = (ShatterType)ReadInt16();
-		StaticObjects[meshID].shatterSound = (short)ReadInt16();
+		staticInfo.shatterType = (ShatterType)ReadInt16();
+		staticInfo.shatterSound = (short)ReadInt16();
+
+		StaticObjects[meshID] = staticInfo;
 	}
 }
 
@@ -988,7 +987,6 @@ void FreeLevel(bool partial)
 	g_Renderer.FreeRendererData();
 
 	MoveablesIds.resize(0);
-	StaticObjectsIds.resize(0);
 	SpriteSequencesIds.resize(0);
 
 	g_Level.RoomTextures.resize(0);

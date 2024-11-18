@@ -30,7 +30,6 @@ namespace TEN::Renderer
 
 		_moveableObjects.resize(ID_NUMBER_OBJECTS);
 		_spriteSequences.resize(ID_NUMBER_OBJECTS);
-		_staticObjects.resize(MAX_STATICS);
 		_rooms.resize(g_Level.Rooms.size());
 
 		_meshes.clear();
@@ -878,11 +877,10 @@ namespace TEN::Renderer
 
 		totalVertices = 0;
 		totalIndices = 0;
-		for (int i = 0; i < StaticObjectsIds.size(); i++)
+		for (auto kv : StaticObjects)
 		{
-			int objNum = StaticObjectsIds[i];
-			StaticInfo* obj = &StaticObjects[objNum];
-			MESH* mesh = &g_Level.Meshes[obj->meshNumber];
+			StaticInfo& obj = kv.second;
+			MESH* mesh = &g_Level.Meshes[obj.meshNumber];
 
 			for (auto& bucket : mesh->buckets)
 			{
@@ -896,20 +894,20 @@ namespace TEN::Renderer
 
 		lastVertex = 0;
 		lastIndex = 0;
-		for (int i = 0; i < StaticObjectsIds.size(); i++)
+		for (auto kv : StaticObjects)
 		{
-			StaticInfo*obj = &StaticObjects[StaticObjectsIds[i]];
-			_staticObjects[StaticObjectsIds[i]] = RendererObject();
-			RendererObject &staticObject = *_staticObjects[StaticObjectsIds[i]];
-			staticObject.Type = 1;
-			staticObject.Id = StaticObjectsIds[i];
+			StaticInfo& obj = kv.second;
 
-			RendererMesh *mesh = GetRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj->meshNumber], 0, false, false, &lastVertex, &lastIndex);
+			RendererObject staticObject = RendererObject();
+			staticObject.Type = 1;
+			staticObject.Id = kv.first;
+
+			RendererMesh *mesh = GetRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj.meshNumber], 0, false, false, &lastVertex, &lastIndex);
 
 			staticObject.ObjectMeshes.push_back(mesh);
 			_meshes.push_back(mesh);
 
-			_staticObjects[StaticObjectsIds[i]] = staticObject;
+			_staticObjects[kv.first] = staticObject;
 		}
 
 		_staticsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_staticsVertices.size(), _staticsVertices.data());

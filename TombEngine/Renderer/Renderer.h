@@ -248,7 +248,7 @@ namespace TEN::Renderer
 
 		// Textures, objects and sprites
 		std::vector<std::optional<RendererObject>> _moveableObjects;
-		std::vector<std::optional<RendererObject>> _staticObjects;
+		std::unordered_map<int, std::optional<RendererObject>> _staticObjects;
 		std::vector<RendererSprite> _sprites;
 		std::vector<RendererSpriteSequence> _spriteSequences;
 		Matrix _laraWorldMatrix;
