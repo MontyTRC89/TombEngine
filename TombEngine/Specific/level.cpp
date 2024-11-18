@@ -208,7 +208,7 @@ std::string ReadString()
 void LoadItems()
 {
 	g_Level.NumItems = ReadInt32();
-	TENLog("Num items: " + std::to_string(g_Level.NumItems), LogLevel::Info);
+	TENLog("Moveables: " + std::to_string(g_Level.NumItems), LogLevel::Info);
 
 	if (g_Level.NumItems == 0)
 		return;
@@ -271,7 +271,7 @@ void LoadObjects()
 	StaticObjects.clear();
 
 	int numMeshes = ReadInt32();
-	TENLog("Num meshes: " + std::to_string(numMeshes), LogLevel::Info);
+	TENLog("Meshes: " + std::to_string(numMeshes), LogLevel::Info);
 
 	g_Level.Meshes.reserve(numMeshes);
 	for (int i = 0; i < numMeshes; i++)
@@ -354,7 +354,7 @@ void LoadObjects()
 	}
 
 	int numAnimations = ReadInt32();
-	TENLog("Num animations: " + std::to_string(numAnimations), LogLevel::Info);
+	TENLog("Animations: " + std::to_string(numAnimations), LogLevel::Info);
 
 	g_Level.Anims.resize(numAnimations);
 	for (int i = 0; i < numAnimations; i++)
@@ -421,7 +421,7 @@ void LoadObjects()
 	}
 
 	int numModels = ReadInt32();
-	TENLog("Num models: " + std::to_string(numModels), LogLevel::Info);
+	TENLog("Models: " + std::to_string(numModels), LogLevel::Info);
 
 	for (int i = 0; i < numModels; i++)
 	{
@@ -448,8 +448,8 @@ void LoadObjects()
 		if (staticID >= MAX_STATICS)
 		{
 			TENLog("Static with ID " + std::to_string(staticID) + " detected, surpassing maximum of " + std::to_string(MAX_STATICS) + ". " +
-				   "Change static object ID in WadTool to a value below the maximum.", LogLevel::Warning);
-			
+				"Change static object ID in WadTool to a value below the maximum.", LogLevel::Warning);
+
 			staticID = 0;
 		}
 
@@ -483,7 +483,7 @@ void LoadObjects()
 void LoadCameras()
 {
 	int numCameras = ReadInt32();
-	TENLog("Num cameras: " + std::to_string(numCameras), LogLevel::Info);
+	TENLog("Cameras: " + std::to_string(numCameras), LogLevel::Info);
 
 	g_Level.Cameras.reserve(numCameras);
 	for (int i = 0; i < numCameras; i++)
@@ -508,7 +508,7 @@ void LoadCameras()
 		ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
 
 	int numSinks = ReadInt32();
-	TENLog("Num sinks: " + std::to_string(numSinks), LogLevel::Info);
+	TENLog("Sinks: " + std::to_string(numSinks), LogLevel::Info);
 
 	g_Level.Sinks.reserve(numSinks);
 	for (int i = 0; i < numSinks; i++)
@@ -532,7 +532,7 @@ void LoadTextures()
 	int size;
 
 	int numTextures = ReadInt32();
-	TENLog("Num room textures: " + std::to_string(numTextures), LogLevel::Info);
+	TENLog("Room textures: " + std::to_string(numTextures), LogLevel::Info);
 
 	g_Level.RoomTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
@@ -558,7 +558,7 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
-	TENLog("Num object textures: " + std::to_string(numTextures), LogLevel::Info);
+	TENLog("Object textures: " + std::to_string(numTextures), LogLevel::Info);
 
 	g_Level.MoveablesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
@@ -584,7 +584,7 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
-	TENLog("Num static textures: " + std::to_string(numTextures), LogLevel::Info);
+	TENLog("Static textures: " + std::to_string(numTextures), LogLevel::Info);
 
 	g_Level.StaticsTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
@@ -610,7 +610,7 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
-	TENLog("Num anim textures: " + std::to_string(numTextures), LogLevel::Info);
+	TENLog("Anim textures: " + std::to_string(numTextures), LogLevel::Info);
 
 	g_Level.AnimatedTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
@@ -636,7 +636,7 @@ void LoadTextures()
 	}
 
 	numTextures = ReadInt32();
-	TENLog("Num sprite textures: " + std::to_string(numTextures), LogLevel::Info);
+	TENLog("Sprite textures: " + std::to_string(numTextures), LogLevel::Info);
 
 	g_Level.SpritesTextures.reserve(numTextures);
 	for (int i = 0; i < numTextures; i++)
@@ -1029,7 +1029,7 @@ size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream)
 void LoadSoundSources()
 {
 	int numSoundSources = ReadInt32();
-	TENLog("Num sound sources: " + std::to_string(numSoundSources), LogLevel::Info);
+	TENLog("Sound sources: " + std::to_string(numSoundSources), LogLevel::Info);
 
 	g_Level.SoundSources.reserve(numSoundSources);
 	for (int i = 0; i < numSoundSources; i++)
@@ -1050,7 +1050,7 @@ void LoadSoundSources()
 void LoadAnimatedTextures()
 {
 	int numAnimatedTextures = ReadInt32();
-	TENLog("Num anim textures: " + std::to_string(numAnimatedTextures), LogLevel::Info);
+	TENLog("Anim textures: " + std::to_string(numAnimatedTextures), LogLevel::Info);
 
 	for (int i = 0; i < numAnimatedTextures; i++)
 	{
@@ -1080,7 +1080,7 @@ void LoadAnimatedTextures()
 void LoadAIObjects()
 {
 	int nAIObjects = ReadInt32();
-	TENLog("Num AI objects: " + std::to_string(nAIObjects), LogLevel::Info);
+	TENLog("AI objects: " + std::to_string(nAIObjects), LogLevel::Info);
 
 	g_Level.AIObjects.reserve(nAIObjects);
 	for (int i = 0; i < nAIObjects; i++)
@@ -1130,7 +1130,7 @@ void LoadEventSets()
 		return;
 
 	int globalEventSetCount = ReadInt32();
-	TENLog("Num global event sets: " + std::to_string(globalEventSetCount), LogLevel::Info);
+	TENLog("Global event sets: " + std::to_string(globalEventSetCount), LogLevel::Info);
 
 	for (int i = 0; i < globalEventSetCount; i++)
 	{
@@ -1149,7 +1149,7 @@ void LoadEventSets()
 	}
 
 	int volumeEventSetCount = ReadInt32();
-	TENLog("Num volume event sets: " + std::to_string(volumeEventSetCount), LogLevel::Info);
+	TENLog("Volume event sets: " + std::to_string(volumeEventSetCount), LogLevel::Info);
 
 	for (int i = 0; i < volumeEventSetCount; i++)
 	{
@@ -1442,7 +1442,7 @@ void LoadSamples()
 		return;
 	}
 
-	TENLog("Num sample infos: " + std::to_string(numSampleInfos), LogLevel::Info);
+	TENLog("Sample infos: " + std::to_string(numSampleInfos), LogLevel::Info);
 
 	g_Level.SoundDetails.resize(numSampleInfos);
 	ReadBytes(g_Level.SoundDetails.data(), numSampleInfos * sizeof(SampleInfo));
@@ -1451,7 +1451,7 @@ void LoadSamples()
 	if (numSamples <= 0)
 		return;
 
-	TENLog("Num samples: " + std::to_string(numSamples), LogLevel::Info);
+	TENLog("Samples: " + std::to_string(numSamples), LogLevel::Info);
 
 	int uncompressedSize;
 	int compressedSize;
@@ -1472,19 +1472,19 @@ void LoadBoxes()
 {
 	// Read boxes
 	int numBoxes = ReadInt32();
-	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
+	TENLog("Boxes: " + std::to_string(numBoxes), LogLevel::Info);
 	g_Level.PathfindingBoxes.resize(numBoxes);
 	ReadBytes(g_Level.PathfindingBoxes.data(), numBoxes * sizeof(BOX_INFO));
 
 	// Read overlaps
 	int numOverlaps = ReadInt32();
-	TENLog("Num overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
+	TENLog("Overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
 	g_Level.Overlaps.resize(numOverlaps);
 	ReadBytes(g_Level.Overlaps.data(), numOverlaps * sizeof(OVERLAP));
 
 	// Read zones
 	int numZoneGroups = ReadInt32();
-	TENLog("Num zone groups: " + std::to_string(numZoneGroups), LogLevel::Info);
+	TENLog("Zone groups: " + std::to_string(numZoneGroups), LogLevel::Info);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -1567,7 +1567,7 @@ void LoadSprites()
 	int numSprites = ReadInt32();
 	g_Level.Sprites.resize(numSprites);
 
-	TENLog("Num sprites: " + std::to_string(numSprites), LogLevel::Info);
+	TENLog("Sprites: " + std::to_string(numSprites), LogLevel::Info);
 
 	for (int i = 0; i < numSprites; i++)
 	{
@@ -1585,7 +1585,7 @@ void LoadSprites()
 
 	int numSequences = ReadInt32();
 
-	TENLog("Num sprite sequences: " + std::to_string(numSequences), LogLevel::Info);
+	TENLog("Sprite sequences: " + std::to_string(numSequences), LogLevel::Info);
 
 	for (int i = 0; i < numSequences; i++)
 	{
