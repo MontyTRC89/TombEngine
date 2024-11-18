@@ -34,6 +34,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added ricochet sounds and make the effect more prominent.
 * Allow to run the engine without title level.
 * Allow more than 1024 objects in a level.
+* Allow more then 1000 static objects in a level
 
 ### Lua API changes
 * Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
