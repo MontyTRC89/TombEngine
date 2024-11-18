@@ -1270,7 +1270,7 @@ void SearchObjectControl(short itemNumber)
 				{
 					PickedUpObject(*item2);
 					g_Hud.PickupSummary.AddDisplayPickup(*item2);
-					KillItem(item->ItemFlags[1]);
+					HideOrDisablePickup(*item2);
 				}
 				else
 				{
