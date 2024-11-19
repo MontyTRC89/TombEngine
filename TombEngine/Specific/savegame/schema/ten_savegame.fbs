@@ -406,6 +406,7 @@ table Pendulum {
 
 table EventSet {
 	index: int32;
+	statuses: [bool];
 	call_counters: [int32];
 }
 

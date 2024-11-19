@@ -176,6 +176,11 @@ namespace TEN::Effects::Hair
 		// Calculate absolute orientation.
 		auto absDir = target - origin;
 		absDir.Normalize();
+
+		// Handle cases with zero normal (can happen if 2 hair segments have same offset).
+		if (absDir == Vector3::Zero)
+			return Quaternion();
+
 		auto absOrient = Geometry::ConvertDirectionToQuat(absDir);
 
 		// Calculate relative twist rotation.

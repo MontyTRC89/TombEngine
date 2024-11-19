@@ -2187,7 +2187,7 @@ void InitializeItemBoxData()
 		for (const auto& mesh : room.mesh)
 		{
 			long index = ((mesh.pos.Position.z - room.Position.z) / BLOCK(1)) + room.ZSize * ((mesh.pos.Position.x - room.Position.x) / BLOCK(1));
-			if (index > room.Sectors.size())
+			if (index >= room.Sectors.size())
 				continue;
 
 			auto* floor = &room.Sectors[index];

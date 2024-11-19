@@ -45,9 +45,10 @@ struct ObjectInfo;
 
 		// Converters
 
-		BoundingSphere ToLocalBoundingSphere() const;
+		BoundingSphere		ToLocalBoundingSphere() const;
+		BoundingBox			ToConservativeBoundingBox(const Pose& pose) const; // TODO: item.GetAabb() method.
 		BoundingOrientedBox ToBoundingOrientedBox(const Pose& pose) const;
-		BoundingOrientedBox ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const;
+		BoundingOrientedBox ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const; // TODO: item.GetObb() method.
 
 		// Operators
 

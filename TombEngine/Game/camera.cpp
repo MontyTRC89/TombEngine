@@ -1258,7 +1258,8 @@ void CalculateCamera(const CollisionInfo& coll)
 		{
 			Camera.fixedCamera = false;
 
-			if (Camera.speed != 1 && !Lara.Control.Look.IsUsingBinoculars && Camera.oldType != CameraType::Look)
+			if (Camera.speed != 1 && Camera.oldType != CameraType::Look &&
+				!Lara.Control.Look.IsUsingBinoculars)
 			{
 				if (TargetSnaps <= 8)
 				{

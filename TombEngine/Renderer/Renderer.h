@@ -90,6 +90,7 @@ namespace TEN::Renderer
 	{
 	private:
 		// Core DX11 objects
+
 		ComPtr<ID3D11Device> _device = nullptr;
 		ComPtr<ID3D11DeviceContext> _context = nullptr;
 		ComPtr<IDXGISwapChain> _swapChain = nullptr;
@@ -109,6 +110,7 @@ namespace TEN::Renderer
 		Viewport _viewportToolkit;
 
 		// Render targets
+
 		RenderTarget2D _normalsRenderTarget;
 		RenderTarget2D _depthRenderTarget;
 		RenderTarget2D _backBuffer;
@@ -123,6 +125,7 @@ namespace TEN::Renderer
 		Texture2DArray _shadowMap;
 
 		// Shaders
+
 		ComPtr<ID3D11VertexShader> _vsRooms;
 		ComPtr<ID3D11VertexShader> _vsRoomsAnimatedTextures;
 		ComPtr<ID3D11PixelShader> _psRooms;
@@ -162,6 +165,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psRoomAmbient;
 
 		// Constant buffers
+
 		RenderView _gameCamera;
 		RenderView _oldGameCamera;
 		RenderView _currentGameCamera;
@@ -196,10 +200,12 @@ namespace TEN::Renderer
 		ConstantBuffer<CSMAABuffer> _cbSMAABuffer;
 
 		// Primitive batches
+
 		std::unique_ptr<SpriteBatch> _spriteBatch;
 		std::unique_ptr<PrimitiveBatch<Vertex>> _primitiveBatch;
 
 		// Text
+
 		std::unique_ptr<SpriteFont> _gameFont;
 		std::vector<RendererStringToDraw> _stringsToDraw;
 		Vector4 _blinkColorValue = Vector4::Zero;
@@ -207,6 +213,7 @@ namespace TEN::Renderer
 		float _oldBlinkTime = 0.0f;
 
 		// Graphics resources
+
 		Texture2D _logo;
 		Texture2D _skyTexture;
 		Texture2D _whiteTexture;
@@ -233,32 +240,37 @@ namespace TEN::Renderer
 		std::vector<int> _staticsIndices;
 
 		// Rooms and collector
+
 		std::vector<RendererRoom> _rooms;
 		bool _invalidateCache;
 		std::vector<short> _visitedRoomsStack;
 
 		// Lights
+
 		std::vector<RendererLight> _dynamicLights;
 		RendererLight* _shadowLight;
 
 		// Lines
+
 		std::vector<RendererLine2D>		_lines2DToDraw	   = {};
 		std::vector<RendererLine3D>		_lines3DToDraw	   = {};
 		std::vector<RendererTriangle3D> _triangles3DToDraw = {};
 
 		// Textures, objects and sprites
-		std::vector<std::optional<RendererObject>> _moveableObjects;
-		std::vector<std::optional<RendererObject>> _staticObjects;
-		std::vector<RendererSprite> _sprites;
-		std::vector<RendererSpriteSequence> _spriteSequences;
+
+		std::vector<std::optional<RendererObject>>			   _moveableObjects;
+		std::unordered_map<int, std::optional<RendererObject>> _staticObjects; // Key = static ID, value = renderer object.
+		std::vector<RendererSprite>							   _sprites;
+		std::vector<RendererSpriteSequence>					   _spriteSequences;
+		std::vector<RendererAnimatedTextureSet>				   _animatedTextureSets;
+		std::vector<RendererMesh*>							   _meshes;
+		std::vector<TexturePair>							   _roomTextures;
+		std::vector<TexturePair>							   _animatedTextures;
+		std::vector<TexturePair>							   _moveablesTextures;
+		std::vector<TexturePair>							   _staticTextures;
+		std::vector<Texture2D>								   _spritesTextures;
+
 		Matrix _laraWorldMatrix;
-		std::vector<RendererAnimatedTextureSet> _animatedTextureSets;
-		std::vector<RendererMesh*> _meshes;
-		std::vector<TexturePair> _roomTextures;
-		std::vector<TexturePair> _animatedTextures;
-		std::vector<TexturePair> _moveablesTextures;
-		std::vector<TexturePair> _staticTextures;
-		std::vector<Texture2D> _spritesTextures;
 
 		// Preallocated pools of objects for avoiding new/delete.
 		// Items and effects are safe (can't be more than 1024 items in TR), 
@@ -268,6 +280,7 @@ namespace TEN::Renderer
 		std::vector<RendererEffect> _effects;
 
 		// Debug variables
+
 		int _numDrawCalls = 0;
 
 		int _numRoomsDrawCalls = 0;
@@ -299,6 +312,7 @@ namespace TEN::Renderer
 		RendererDebugPage _debugPage = RendererDebugPage::None;
 
 		// Times for debug
+
 		int _timeUpdate;
 		int _timeRoomsCollector;
 		int _timeDraw;
@@ -307,6 +321,7 @@ namespace TEN::Renderer
 		int _currentCausticsFrame;
 
 		// Screen settings
+
 		int _screenWidth;
 		int _screenHeight;
 		int _refreshRate;
@@ -314,9 +329,11 @@ namespace TEN::Renderer
 		float _farView = DEFAULT_FAR_VIEW;
 
 		// A flag to prevent extra renderer object additions
+
 		bool _isLocked = false;
 
 		// Caching state changes
+
 		TextureBase* _lastTexture;
 		BlendMode _lastBlendMode;
 		DepthState _lastDepthState;
@@ -327,6 +344,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11SamplerState> _shadowSampler;
 
 		// Antialiasing
+
 		Texture2D _SMAAAreaTexture;
 		Texture2D _SMAASearchTexture;
 		RenderTarget2D _SMAASceneRenderTarget;
@@ -347,7 +365,8 @@ namespace TEN::Renderer
 		ComPtr<ID3D11VertexShader> _vsFXAA;
 		ComPtr<ID3D11PixelShader> _psFXAA;
 
-		// Post process
+		// Post-process
+
 		PostProcessMode _postProcessMode = PostProcessMode::None;
 		float _postProcessStrength = 1.0f;
 		Vector3 _postProcessTint = Vector3::One;
@@ -365,6 +384,7 @@ namespace TEN::Renderer
 		bool _doingFullscreenPass = false;
 
 		// SSAO
+
 		ComPtr<ID3D11VertexShader> _vsSSAO;
 		ComPtr<ID3D11PixelShader> _psSSAO;
 		ComPtr<ID3D11PixelShader> _psSSAOBlur;
@@ -374,20 +394,24 @@ namespace TEN::Renderer
 		std::vector<Vector4> _SSAOKernel;
 
 		// Special effects
+
 		std::vector<Texture2D> _causticTextures;
 
 		// Transparency
+
 		fast_vector<Vertex> _sortedPolygonsVertices;
 		fast_vector<int> _sortedPolygonsIndices;
 		VertexBuffer<Vertex> _sortedPolygonsVertexBuffer;
 		IndexBuffer _sortedPolygonsIndexBuffer;
 
 		// High framerate.
+
 		float _interpolationFactor = 0.0f;
 
 		bool _graphicsSettingsChanged = false;
 
 		// Private functions
+
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);
 		void BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateRegister samplerType);

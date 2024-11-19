@@ -9,19 +9,24 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed engine performance around bridges.
 * Fixed engine performance if weather or bubble effects are active.
 * Fixed silent crashes if loaded level is corrupted or in incorrect format.
-* Fixed incorrect clipping of scaled static meshes.
+* Fixed occasional crashes if there are static meshes placed within room border walls.
+* Fixed incorrect clipping of scaled off-centered static meshes.
+* Fixed incorrect collision detection for off-centered moveables.
+* Fixed stutter during jumps between cameras in a flyby sequence.
 * Fixed uzi targeting issues after using flycheat.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemy pickups dropping on death sectors.
+* Fixed Sarcophagus and Search Object pickup triggers.
 * Fixed vehicle transfer not happening for levels which were not previously visited.
 * Fixed audio tracks placed in subfolders not restoring after loading savegame.
+* Fixed initial position and lack of fade-in for looped audio track on level start.
 * Fixed scripted input events not registering on the same game frame.
 * Fixed incorrect object camera position.
 * Fixed incorrect camera movement near walls after leaving look mode.
 * Fixed binocular or lasersight camera not switching off correctly after flyby.
 * Fixed Lara's Home entry not working.
 * Fixed exploding TR3 bosses.
-* Fixed the original issue with deactivation of Dart Emitter.
+* Fixed original issue with deactivation of Dart Emitter.
 * Fixed Lens Flare object not functioning properly.
 * Fixed Skeleton and Mummy not reacting to shotgun hits.
 
@@ -30,15 +35,18 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added ricochet sounds and make the effect more prominent.
 * Allow to run the engine without title level.
 * Allow more than 1024 objects in a level.
+* Allow more then 1000 static objects in a level
 
 ### Lua API changes
-
 * Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
+* Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
 * Added missing callbacks for OnUseItem event.
 * Added support for transparency value in DisplayString class.
+* Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
 * Fixed DisplayString class not supporting empty lines in multiline strings.
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
+* Fixed collision callbacks not properly clearing after leveljump.
 
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 

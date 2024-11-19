@@ -49,12 +49,8 @@ For use in @{Strings.ShowString|ShowString} and @{Strings.HideString|HideString}
 @tparam[opt] Color color the color of the text. __Default: white__
 @tparam[opt] bool translated If false or omitted, the input string argument will be displayed.
 If true, the string argument will be the key of a translated string specified in strings.lua. __Default: false__.
-@tparam[opt] table flags A table of string display options. Can be empty or omitted. The possible values and their effects are:
-	TEN.Strings.DisplayStringOption.CENTER: set the horizontal origin point to the center of the string.
-	TEN.Strings.DisplayStringOption.RIGHT: set the horizontal origin point to right of the string.
-	TEN.Strings.DisplayStringOption.SHADOW: give the string a small shadow.
-	TEN.Strings.DisplayStringOption.BLINK: blink the string.
-__Default: empty__
+@tparam Strings.DisplayStringOption table
+__Default: None.__ _Please note that Strings are automatically aligned to the LEFT_
 @treturn DisplayString A new DisplayString object.
 */
 static std::unique_ptr<DisplayString> CreateString(const std::string& key, const Vec2& pos, TypeOrNil<float> scale, TypeOrNil<ScriptColor> color,
