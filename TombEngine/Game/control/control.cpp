@@ -319,7 +319,7 @@ GameStatus FreezePhase()
 	// HACK: Update player hair if animation was switched in spectator mode.
 	// Needed for photo mode and other similar functionality.
 	if (g_GameFlow->LastFreezeMode == FreezeMode::Spectator &&
-		lastAnimationNumber != LaraItem->Animation.AnimNumber)
+		lastAnimNumber != LaraItem->Animation.AnimNumber)
 	{
 		lastAnimNumber = LaraItem->Animation.AnimNumber;
 		for (int i = 0; i < FPS; i++)
