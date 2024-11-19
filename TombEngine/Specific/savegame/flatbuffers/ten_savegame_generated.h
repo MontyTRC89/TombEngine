@@ -5761,6 +5761,7 @@ flatbuffers::Offset<Pendulum> CreatePendulum(flatbuffers::FlatBufferBuilder &_fb
 struct EventSetT : public flatbuffers::NativeTable {
   typedef EventSet TableType;
   int32_t index = 0;
+  std::vector<bool> statuses{};
   std::vector<int32_t> call_counters{};
 };
 
@@ -5770,10 +5771,14 @@ struct EventSet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_INDEX = 4,
-    VT_CALL_COUNTERS = 6
+    VT_STATUSES = 6,
+    VT_CALL_COUNTERS = 8
   };
   int32_t index() const {
     return GetField<int32_t>(VT_INDEX, 0);
+  }
+  const flatbuffers::Vector<uint8_t> *statuses() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_STATUSES);
   }
   const flatbuffers::Vector<int32_t> *call_counters() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_CALL_COUNTERS);
@@ -5781,6 +5786,8 @@ struct EventSet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_INDEX) &&
+           VerifyOffset(verifier, VT_STATUSES) &&
+           verifier.VerifyVector(statuses()) &&
            VerifyOffset(verifier, VT_CALL_COUNTERS) &&
            verifier.VerifyVector(call_counters()) &&
            verifier.EndTable();
@@ -5796,6 +5803,9 @@ struct EventSetBuilder {
   flatbuffers::uoffset_t start_;
   void add_index(int32_t index) {
     fbb_.AddElement<int32_t>(EventSet::VT_INDEX, index, 0);
+  }
+  void add_statuses(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> statuses) {
+    fbb_.AddOffset(EventSet::VT_STATUSES, statuses);
   }
   void add_call_counters(flatbuffers::Offset<flatbuffers::Vector<int32_t>> call_counters) {
     fbb_.AddOffset(EventSet::VT_CALL_COUNTERS, call_counters);
@@ -5814,9 +5824,11 @@ struct EventSetBuilder {
 inline flatbuffers::Offset<EventSet> CreateEventSet(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t index = 0,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> statuses = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> call_counters = 0) {
   EventSetBuilder builder_(_fbb);
   builder_.add_call_counters(call_counters);
+  builder_.add_statuses(statuses);
   builder_.add_index(index);
   return builder_.Finish();
 }
@@ -5829,11 +5841,14 @@ struct EventSet::Traits {
 inline flatbuffers::Offset<EventSet> CreateEventSetDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t index = 0,
+    const std::vector<uint8_t> *statuses = nullptr,
     const std::vector<int32_t> *call_counters = nullptr) {
+  auto statuses__ = statuses ? _fbb.CreateVector<uint8_t>(*statuses) : 0;
   auto call_counters__ = call_counters ? _fbb.CreateVector<int32_t>(*call_counters) : 0;
   return TEN::Save::CreateEventSet(
       _fbb,
       index,
+      statuses__,
       call_counters__);
 }
 
@@ -9802,6 +9817,7 @@ inline void EventSet::UnPackTo(EventSetT *_o, const flatbuffers::resolver_functi
   (void)_o;
   (void)_resolver;
   { auto _e = index(); _o->index = _e; }
+  { auto _e = statuses(); if (_e) { _o->statuses.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->statuses[_i] = _e->Get(_i) != 0; } } }
   { auto _e = call_counters(); if (_e) { _o->call_counters.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->call_counters[_i] = _e->Get(_i); } } }
 }
 
@@ -9814,10 +9830,12 @@ inline flatbuffers::Offset<EventSet> CreateEventSet(flatbuffers::FlatBufferBuild
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const EventSetT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _index = _o->index;
+  auto _statuses = _fbb.CreateVector(_o->statuses);
   auto _call_counters = _fbb.CreateVector(_o->call_counters);
   return TEN::Save::CreateEventSet(
       _fbb,
       _index,
+      _statuses,
       _call_counters);
 }
 

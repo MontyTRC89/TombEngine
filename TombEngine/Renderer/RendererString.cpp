@@ -40,13 +40,13 @@ namespace TEN::Renderer
 			float fontSpacing = _gameFont->GetLineSpacing();
 			float fontScale = REFERENCE_FONT_SIZE / fontSpacing;
 
-			auto stringLines = SplitString(string);
+			auto stringLines = SplitString(TEN::Utils::ToWString(string));
 			float yOffset = 0.0f;
 			for (const auto& line : stringLines)
 			{
 				// Prepare structure for renderer.
 				RendererStringToDraw rString;
-				rString.String = TEN::Utils::ToWString(line);
+				rString.String = line;
 				rString.Flags = flags;
 				rString.X = 0;
 				rString.Y = 0;
@@ -54,7 +54,8 @@ namespace TEN::Renderer
 				rString.Scale = (uiScale * fontScale) * scale;
 
 				// Measure string.
-				auto size = Vector2(_gameFont->MeasureString(rString.String.c_str())) * rString.Scale;
+				auto size = line.empty() ? Vector2(0, fontSpacing * rString.Scale) : Vector2(_gameFont->MeasureString(line.c_str())) * rString.Scale;
+
 				if (flags & (int)PrintStringFlags::Center)
 				{
 					rString.X = (pos.x * factor.x) - (size.x / 2.0f);
@@ -66,7 +67,7 @@ namespace TEN::Renderer
 				else
 				{
 					// Calculate indentation to account for string scaling.
-					auto indent = _gameFont->FindGlyph(line.at(0))->XAdvance * rString.Scale;
+					auto indent = line.empty() ? 0 : _gameFont->FindGlyph(line.at(0))->XAdvance * rString.Scale;
 					rString.X = pos.x * factor.x + indent;
 				}
 

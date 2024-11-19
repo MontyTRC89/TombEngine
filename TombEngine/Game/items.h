@@ -10,7 +10,7 @@
 using namespace TEN::Animation;
 using namespace TEN::Utils;
 
-constexpr auto ITEM_COUNT_MAX  = 1024;
+constexpr auto MAX_SPAWNED_ITEM_COUNT = 256;
 constexpr auto ITEM_FLAG_COUNT = 8;
 
 constexpr auto NOT_TARGETABLE = SHRT_MIN / 2;

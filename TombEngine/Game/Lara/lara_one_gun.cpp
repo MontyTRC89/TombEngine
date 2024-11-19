@@ -436,7 +436,7 @@ void FireShotgun(ItemInfo& laraItem)
 
 		player.RightArm.GunFlash = Weapons[(int)LaraWeaponType::Shotgun].FlashTime;
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::ShallowWater : SoundEnvironment::Land);
+		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, TestEnvironment(ENV_FLAG_WATER, &laraItem) ? SoundEnvironment::Underwater : SoundEnvironment::Land);
 		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem.Pose);
 
 		Rumble(0.5f, 0.2f);

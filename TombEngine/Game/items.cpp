@@ -297,7 +297,7 @@ void KillItem(short const itemNumber)
 		// AI target generation uses a hack with making a dummy item without ObjectNumber.
 		// Therefore, a check should be done here to prevent access violation.
 		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && item->IsBridge())
-			UpdateBridgeItem(*item, true);
+			UpdateBridgeItem(*item, BridgeUpdateType::Remove);
 
 		GameScriptHandleKilled(itemNumber, true);
 
@@ -500,13 +500,13 @@ void InitializeFXArray()
 	NextFxActive = NO_VALUE;
 	NextFxFree = 0;
 
-	for (int i = 0; i < NUM_EFFECTS; i++)
+	for (int i = 0; i < MAX_SPAWNED_ITEM_COUNT; i++)
 	{
 		auto* fx = &EffectList[i];
 		fx->nextFx = i + 1;
 	}
 
-	EffectList[NUM_EFFECTS - 1].nextFx = NO_VALUE;
+	EffectList[MAX_SPAWNED_ITEM_COUNT - 1].nextFx = NO_VALUE;
 }
 
 void RemoveDrawnItem(short itemNumber) 

@@ -267,13 +267,14 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			SoundEffect(SFX_TR4_REVOLVER_FIRE, nullptr);
 	}
 
-	bool hasHit = false;
+	bool hitProcessed = false;
 
 	MESH_INFO* mesh = nullptr;
 	auto vector = Vector3i::Zero;
 	int itemNumber = ObjectOnLOS2(origin, target, &vector, &mesh);
+	bool hasHit = itemNumber != NO_LOS_ITEM;
 
-	if (itemNumber != NO_LOS_ITEM)
+	if (hasHit)
 	{
 		target2.x = vector.x - ((vector.x - origin->x) >> 5);
 		target2.y = vector.y - ((vector.y - origin->y) >> 5);
@@ -295,6 +296,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 						ShatterObject(nullptr, mesh, 128, target2.RoomNumber, 0);
 						SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
+						hitProcessed = true;
 					}
 
 					TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
@@ -313,13 +315,14 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								ShatterImpactData.impactLocation = ShatterItem.sphere.Center;
 								ShatterObject(&ShatterItem, 0, 128, target2.RoomNumber, 0);
 								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, false);
+								hitProcessed = true;
 						}
 						else
 						{
 							auto* object = &Objects[item->ObjectNumber];
 
 							if (drawTarget && (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver ||
-								Lara.Control.Weapon.GunType == LaraWeaponType::HK))
+											   Lara.Control.Weapon.GunType == LaraWeaponType::HK))
 							{
 								if (object->intelligent || object->HitRoutine)
 								{
@@ -342,7 +345,9 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 											}
 										}
 									}
+
 									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, false, bestJointIndex);
+									hitProcessed = true;
 								}
 								else
 								{
@@ -351,24 +356,10 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
 								}
 							}
-							else
+							else if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8)
 							{
-								if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8)
-								{
-									SmashObject(itemNumber);
-								}
-								else
-								{
-									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
-									if (object->HitRoutine != nullptr)
-									{
-										object->HitRoutine(*item, *LaraItem, target2, weapon.Damage, false, NO_VALUE);
-									}
-									else
-									{
-										DefaultItemHit(*item, *LaraItem, target2, weapon.Damage, false, NO_VALUE);
-									}
-								}
+								SmashObject(itemNumber);
+								hitProcessed = true;
 							}
 						}
 					}
@@ -418,6 +409,8 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								item->Status = ITEM_ACTIVE;
 								item->Flags |= IFLAG_ACTIVATION_MASK | 0x40;
 							}
+
+							hitProcessed = true;
 						}
 
 						TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
@@ -430,8 +423,6 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 					FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 			}
 		}
-
-		hasHit = true;
 	}
 	else
 	{
@@ -460,7 +451,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 		LaserSightZ = target2.z;
 	}
 
-	return hasHit;
+	return hitProcessed;
 }
 
 static bool DoRayBox(const GameVector& origin, const GameVector& target, const GameBoundingBox& bounds,

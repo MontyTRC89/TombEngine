@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.5 Lua API</title>
+    <title>TombEngine 1.6 (Developer Version) Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -85,6 +85,7 @@
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
   <li>    <a href="../4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Strings.DisplayStringOption.html">Strings.DisplayStringOption</a></li>
   <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
   <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
   <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
@@ -116,7 +117,7 @@ when you need to use screen-space coordinates.</p>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#DisplayString">DisplayString(string, Position[, scale][, color][, translated][, flags])</a></td>
+	<td class="name" ><a href="#DisplayString">DisplayString(string, Position[, scale][, color][, translated], table)</a></td>
 	<td class="summary">Create a DisplayString.</td>
 	</tr>
 	<tr>
@@ -170,7 +171,7 @@ when you need to use screen-space coordinates.</p>
     <dl class="function">
     <dt>
     <a name = "DisplayString"></a>
-    <strong>DisplayString(string, Position[, scale][, color][, translated][, flags])</strong>
+    <strong>DisplayString(string, Position[, scale][, color][, translated], table)</strong>
     </dt>
     <dd>
     Create a DisplayString.
@@ -204,16 +205,9 @@ For use in <a href="../1 modules/Strings.html#ShowString">ShowString</a> and <a 
 If true, the string argument will be the key of a translated string specified in strings.lua. <strong>Default: false</strong>.
          (<em>optional</em>)
         </li>
-        <li><span class="parameter">flags</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
-         A table of string display options. Can be empty or omitted. The possible values and their effects are:</p>
-<pre><code>TEN.Strings.DisplayStringOption.CENTER: set the horizontal origin point to the center of the string.
-TEN.Strings.DisplayStringOption.RIGHT: set the horizontal origin point to right of the string.
-TEN.Strings.DisplayStringOption.SHADOW: give the string a small shadow.
-TEN.Strings.DisplayStringOption.BLINK: blink the string.
-</code></pre>
-<p><strong>Default: empty</strong>
-         (<em>optional</em>)
+        <li><span class="parameter">table</span>
+            <span class="types"><a class="type" href="../4 enums/Strings.DisplayStringOption.html#">DisplayStringOption</a></span>
+        <strong>Default: None.</strong> <em>Please note that Strings are automatically aligned to the LEFT</em>
         </li>
     </ul>
 

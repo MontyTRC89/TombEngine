@@ -726,7 +726,7 @@ static void GivePlayerItemsCheat(ItemInfo& item)
 			player.Inventory.Puzzles[i] = true;
 
 		player.Inventory.PuzzlesCombo[2 * i] = false;
-		player.Inventory.PuzzlesCombo[(92 * i) + 1] = false;
+		player.Inventory.PuzzlesCombo[(2 * i) + 1] = false;
 	}
 
 	for (int i = 0; i < 8; ++i)
@@ -895,7 +895,9 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 			{
 				SetAnimation(item, LA_FLY_CHEAT);
 				ResetPlayerFlex(&item);
-				item.Animation.IsAirborne = false;
+				item.Animation.Velocity = Vector3::Zero;
+				item.Animation.IsAirborne = true;
+				item.Pose.Position.y -= CLICK(0.5f);
 				item.HitPoints = LARA_HEALTH_MAX;
 
 				player.Control.WaterStatus = WaterStatus::FlyCheat;
@@ -990,7 +992,7 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 {
 	constexpr auto BUBBLE_COUNT_MAX = 3;
 
-	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::ShallowWater);
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Underwater);
 
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
@@ -1469,7 +1471,7 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 		auto mul1 = (float)abs(lara->Control.Subsuit.Velocity[0]) / BLOCK(8);
 		auto mul2 = (float)abs(lara->Control.Subsuit.Velocity[1]) / BLOCK(8);
 		auto vol = ((mul1 + mul2) * 5.0f) + 0.5f;
-		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::ShallowWater, 1.0f + (mul1 + mul2), vol);
+		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::Underwater, 1.0f + (mul1 + mul2), vol);
 	}
 }
 
