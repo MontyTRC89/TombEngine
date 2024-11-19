@@ -100,7 +100,6 @@ bool InitializeGame	= false;
 bool DoTheGame		= false;
 bool JustLoaded		= false;
 bool ThreadEnded	= false;
-auto LastFreezeMode = FreezeMode::None;
 
 int RequiredStartPos;
 int CurrentLevel;
@@ -271,17 +270,17 @@ GameStatus GamePhase(bool insideMenu)
 GameStatus FreezePhase()
 {
 	// If needed when first entering freeze mode, do initialization.
-	bool entering = (LastFreezeMode == FreezeMode::None);
-	auto currentFreezeMode = g_GameFlow->CurrentFreezeMode;
-
-	if (entering)
+	if (g_GameFlow->LastFreezeMode == FreezeMode::None)
 	{
-		// Capture screen for drawing as background.
-		if (currentFreezeMode == FreezeMode::Full)
+		// Capture the screen for drawing it as a background.
+		if (g_GameFlow->LastFreezeMode == FreezeMode::Full)
 			g_Renderer.DumpGameScene(SceneRenderMode::NoHud);
 
 		StopRumble();
 	}
+	
+	// Update last freeze mode here, so that items won't update inside freeze loop.
+	g_GameFlow->LastFreezeMode = g_GameFlow->CurrentFreezeMode;
 
 	g_Renderer.PrepareScene();
 	g_Renderer.SaveOldState();
@@ -303,9 +302,9 @@ GameStatus FreezePhase()
 	HandleAllGlobalEvents(EventType::Freeze, (Activator)LaraItem->Index);
 
 	// Partially update scene if not using full freeze mode.
-	if (currentFreezeMode != FreezeMode::Full)
+	if (g_GameFlow->LastFreezeMode != FreezeMode::Full)
 	{
-		if (currentFreezeMode == FreezeMode::Player)
+		if (g_GameFlow->LastFreezeMode == FreezeMode::Player)
 			UpdateLara(LaraItem, false);
 
 		UpdateAllItems();
@@ -319,15 +318,17 @@ GameStatus FreezePhase()
 
 	// HACK: Update player hair if animation was switched in spectator mode.
 	// Needed for photo mode and other similar functionality.
-	if (currentFreezeMode == FreezeMode::Spectator &&
-		lastAnimNumber != LaraItem->Animation.AnimNumber)
+	if (g_GameFlow->LastFreezeMode == FreezeMode::Spectator &&
+		lastAnimationNumber != LaraItem->Animation.AnimNumber)
 	{
 		lastAnimNumber = LaraItem->Animation.AnimNumber;
 		for (int i = 0; i < FPS; i++)
 			HairEffect.Update(*LaraItem);
 	}
 
-	LastFreezeMode = g_GameFlow->CurrentFreezeMode;
+	// Update last freeze mode again, as it may have been changed in a script.
+	g_GameFlow->LastFreezeMode = g_GameFlow->CurrentFreezeMode;
+
 	return GameStatus::Normal;
 }
 
@@ -654,7 +655,7 @@ GameStatus DoGameLoop(int levelIndex)
 		if (status != GameStatus::Normal)
 			break;
 
-		if (LastFreezeMode != g_GameFlow->CurrentFreezeMode)
+		if (g_GameFlow->LastFreezeMode != g_GameFlow->CurrentFreezeMode)
 			continue;
 
 		if (!g_Configuration.EnableHighFramerate)

@@ -8,8 +8,9 @@ class ScriptInterfaceLevel;
 class ScriptInterfaceFlowHandler
 {
 public:
-	GameStatus	LastGameStatus		 = GameStatus::Normal;
-	FreezeMode	CurrentFreezeMode	 = FreezeMode::None;
+	GameStatus	LastGameStatus		= GameStatus::Normal;
+	FreezeMode	LastFreezeMode		= FreezeMode::None;
+	FreezeMode	CurrentFreezeMode	= FreezeMode::None;
 
 	std::string	IntroImagePath		 = {};
 	std::string	TitleScreenImagePath = {};

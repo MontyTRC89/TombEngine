@@ -1538,7 +1538,7 @@ namespace TEN::Renderer
 
 	void Renderer::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 	{
-		if (_isLocked || g_GameFlow->CurrentFreezeMode != FreezeMode::None)
+		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
 			return;
 
 		RendererLight dynamicLight = {};
