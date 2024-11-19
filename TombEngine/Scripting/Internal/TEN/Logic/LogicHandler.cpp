@@ -803,8 +803,7 @@ void LogicHandler::GetCallbackStrings(
 	std::vector<std::string>& preUseItem,
 	std::vector<std::string>& postUseItem,
 	std::vector<std::string>& preBreak,
-	std::vector<std::string>& postBreak
-	) const
+	std::vector<std::string>& postBreak) const
 {
 	auto populateWith = [](std::vector<std::string>& dest, const std::unordered_set<std::string>& src)
 	{
@@ -938,7 +937,7 @@ void LogicHandler::ExecuteString(const std::string& command)
 // These wind up calling CallLevelFunc, which is where all error checking is.
 void LogicHandler::ExecuteFunction(const std::string& name, short idOne, short idTwo) 
 {
-	sol::protected_function func = m_levelFuncs_luaFunctions[name];
+	auto func = m_levelFuncs_luaFunctions[name];
 
 	func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
 }
@@ -958,25 +957,25 @@ void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volume
 
 void LogicHandler::OnStart()
 {
-	for (auto& name : m_callbacksPreStart)
+	for (const auto& name : m_callbacksPreStart)
 		CallLevelFuncByName(name);
 
 	if (m_onStart.valid())
 		CallLevelFunc(m_onStart);
 
-	for (auto& name : m_callbacksPostStart)
+	for (const auto& name : m_callbacksPostStart)
 		CallLevelFuncByName(name);
 }
 
 void LogicHandler::OnLoad()
 {
-	for (auto& name : m_callbacksPreLoad)
+	for (const auto& name : m_callbacksPreLoad)
 		CallLevelFuncByName(name);
 
 	if (m_onLoad.valid())
 		CallLevelFunc(m_onLoad);
 
-	for (auto& name : m_callbacksPostLoad)
+	for (const auto& name : m_callbacksPostLoad)
 		CallLevelFuncByName(name);
 }
 
@@ -984,7 +983,7 @@ void LogicHandler::OnLoop(float deltaTime, bool postLoop)
 {
 	if (!postLoop)
 	{
-		for (auto& name : m_callbacksPreLoop)
+		for (const auto& name : m_callbacksPreLoop)
 			CallLevelFuncByName(name, deltaTime);
 
 		lua_gc(m_handler.GetState()->lua_state(), LUA_GCCOLLECT, 0);
@@ -993,27 +992,26 @@ void LogicHandler::OnLoop(float deltaTime, bool postLoop)
 	}
 	else
 	{
-		for (auto& name : m_callbacksPostLoop)
+		for (const auto& name : m_callbacksPostLoop)
 			CallLevelFuncByName(name, deltaTime);
 	}
 }
 
 void LogicHandler::OnSave()
 {
-	for (auto& name : m_callbacksPreSave)
+	for (const auto& name : m_callbacksPreSave)
 		CallLevelFuncByName(name);
 
 	if (m_onSave.valid())
 		CallLevelFunc(m_onSave);
 
-	for (auto& name : m_callbacksPostSave)
+	for (const auto& name : m_callbacksPostSave)
 		CallLevelFuncByName(name);
 }
 
 void LogicHandler::OnEnd(GameStatus reason)
 {
-	auto endReason{LevelEndReason::Other};
-
+	auto endReason = LevelEndReason::Other;
 	switch (reason)
 	{
 	case GameStatus::LaraDead:
@@ -1033,37 +1031,37 @@ void LogicHandler::OnEnd(GameStatus reason)
 		break;
 	}
 
-	for (auto& name : m_callbacksPreEnd)
+	for (const auto& name : m_callbacksPreEnd)
 		CallLevelFuncByName(name, endReason);
 
 	if (m_onEnd.valid())
 		CallLevelFunc(m_onEnd, endReason);
 
-	for (auto& name : m_callbacksPostEnd)
+	for (const auto& name : m_callbacksPostEnd)
 		CallLevelFuncByName(name, endReason);
 }
 
 void LogicHandler::OnUseItem(GAME_OBJECT_ID objectNumber)
 {
-	for (auto& name : m_callbacksPreUseItem)
+	for (const auto& name : m_callbacksPreUseItem)
 		CallLevelFuncByName(name, objectNumber);
 
 	if (m_onUseItem.valid())
 		CallLevelFunc(m_onUseItem, objectNumber);
 
-	for (auto& name : m_callbacksPostUseItem)
+	for (const auto& name : m_callbacksPostUseItem)
 		CallLevelFuncByName(name, objectNumber);
 }
 
 void LogicHandler::OnFreeze()
 {
-	for (auto& name : m_callbacksPreFreeze)
+	for (const auto& name : m_callbacksPreFreeze)
 		CallLevelFuncByName(name);
 
 	if (m_onBreak.valid())
 		CallLevelFunc(m_onBreak);
 		
-	for (auto& name : m_callbacksPostFreeze)
+	for (const auto& name : m_callbacksPostFreeze)
 		CallLevelFuncByName(name);
 }
 

@@ -1118,12 +1118,12 @@ namespace TEN::Renderer
 			_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-			// Bind the back buffer.
+			// Bind back buffer.
 			_context->OMSetRenderTargets(1, _backBuffer.RenderTargetView.GetAddressOf(), _backBuffer.DepthStencilView.Get());
 			_context->RSSetViewports(1, &_viewport);
 			ResetScissor();
 
-			// Draw the full screen background.
+			// Draw full screen background.
 			DrawFullScreenQuad(_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3::One);
 		}
 		else

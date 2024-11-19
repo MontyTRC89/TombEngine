@@ -62,7 +62,7 @@ private:
 	bool _isTranslated	 = false;
 	bool _deleteWhenZero = false;
 
-	FreezeMode _owner	 = FreezeMode::None;
+	FreezeMode _owner = FreezeMode::None;
 
 	// Constructors
 	UserDisplayString() = default;

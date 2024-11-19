@@ -1634,8 +1634,8 @@ namespace TEN::Renderer
 		CollectLightsForCamera();
 		RenderItemShadows(view);
 
-		// Prevent particle interpolations if game is in freeze mode.
-		float interpolationFactorBackup = _interpolationFactor;
+		// Prevent particle interpolation if game is in freeze mode.
+		float interpFactorBackup = _interpolationFactor;
 		if (g_GameFlow->CurrentFreezeMode != FreezeMode::None)
 			_interpolationFactor = 0.0f;
 
@@ -1666,9 +1666,9 @@ namespace TEN::Renderer
 		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected at a later stage.
 		SortAndPrepareSprites(view);
 		
-		// Continue interpolating for any freeze mode but spectator.
+		// Continue interpolating for any freeze mode except spectator.
 		if (g_GameFlow->CurrentFreezeMode != FreezeMode::Spectator)
-			_interpolationFactor = interpolationFactorBackup;
+			_interpolationFactor = interpFactorBackup;
 
 		auto time2 = std::chrono::high_resolution_clock::now();
 		_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
@@ -1862,7 +1862,7 @@ namespace TEN::Renderer
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		// HUD needs to be drawn before postprocessing to be antialiased.
+		// HUD must be drawn before post-processing to be antialiased.
 		if (renderMode == SceneRenderMode::Full)
 			g_Hud.Draw(*LaraItem);
 		

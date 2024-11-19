@@ -68,6 +68,7 @@ enum class ShatterType
 	Explode
 };
 
+// TODO: All fields to PascalCase.
 struct ObjectInfo
 {
 	bool loaded = false; // IsLoaded
@@ -87,14 +88,14 @@ struct ObjectInfo
 	int pivotLength;
 	int radius;
 
-	int HitPoints;
-	bool alwaysActive;  // IsAlwaysActive
-	bool intelligent;	// IsIntelligent
-	bool waterCreature; // IsWaterCreature
-	bool nonLot;		// IsNonLot
-	bool isPickup;		// IsPickup
-	bool isPuzzleHole;	// IsReceptacle
-	bool usingDrawAnimatingItem;
+	int	 HitPoints				= 0;
+	bool AlwaysActive			= false;
+	bool intelligent			= false;
+	bool waterCreature			= false;
+	bool nonLot					= false;
+	bool isPickup				= false;
+	bool isPuzzleHole			= false;
+	bool usingDrawAnimatingItem = false;
 
 	DWORD explodableMeshbits;
 

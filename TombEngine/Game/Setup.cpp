@@ -191,7 +191,7 @@ void InitializeObjects()
 		obj->hitEffect = HitEffect::None;
 		obj->explodableMeshbits = 0;
 		obj->intelligent = false;
-		obj->alwaysActive = false;
+		obj->AlwaysActive = false;
 		obj->waterCreature = false;
 		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;

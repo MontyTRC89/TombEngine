@@ -61,6 +61,6 @@ void InitializeEffectsObjects()
 	{
 		obj->drawRoutine = nullptr;
 		obj->control = ControlLensFlare;
-		obj->alwaysActive = true;
+		obj->AlwaysActive = true;
 	}
 }

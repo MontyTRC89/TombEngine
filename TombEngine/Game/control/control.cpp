@@ -93,13 +93,13 @@ using namespace TEN::Entities::Effects;
 constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
 constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
 
-int GameTimer       = 0;
-int GlobalCounter   = 0;
+int GameTimer	  = 0;
+int GlobalCounter = 0;
 
-bool InitializeGame;
-bool DoTheGame;
-bool JustLoaded;
-bool ThreadEnded;
+bool InitializeGame	= false;
+bool DoTheGame		= false;
+bool JustLoaded		= false;
+bool ThreadEnded	= false;
 auto LastFreezeMode = FreezeMode::None;
 
 int RequiredStartPos;
@@ -270,13 +270,13 @@ GameStatus GamePhase(bool insideMenu)
 
 GameStatus FreezePhase()
 {
-	// We've just entered freeze mode, do initialization, if needed.
+	// If needed when first entering freeze mode, do initialization.
 	bool entering = (LastFreezeMode == FreezeMode::None);
 	auto currentFreezeMode = g_GameFlow->CurrentFreezeMode;
 
 	if (entering)
 	{
-		// Capture the screen for drawing it as a background.
+		// Capture screen for drawing as background.
 		if (currentFreezeMode == FreezeMode::Full)
 			g_Renderer.DumpGameScene(SceneRenderMode::NoHud);
 
@@ -294,15 +294,15 @@ GameStatus FreezePhase()
 
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 
-	// Remember last player's animation to queue hair update if needed.
-	int lastAnimationNumber = LaraItem->Animation.AnimNumber;
+	// Track previous player animation to queue hair update if needed.
+	int lastAnimNumber = LaraItem->Animation.AnimNumber;
 
 	// Poll controls and call scripting events.
 	HandleControls(false);
 	g_GameScript->OnFreeze();
 	HandleAllGlobalEvents(EventType::Freeze, (Activator)LaraItem->Index);
 
-	// If freeze mode isn't full, partially update scene.
+	// Partially update scene if not using full freeze mode.
 	if (currentFreezeMode != FreezeMode::Full)
 	{
 		if (currentFreezeMode == FreezeMode::Player)
@@ -317,13 +317,13 @@ GameStatus FreezePhase()
 		Sound_UpdateScene();
 	}
 
-	// HACK: Update Lara hair, if animation was switched in spectator mode.
+	// HACK: Update player hair if animation was switched in spectator mode.
 	// Needed for photo mode and other similar functionality.
 	if (currentFreezeMode == FreezeMode::Spectator &&
-		lastAnimationNumber != LaraItem->Animation.AnimNumber)
+		lastAnimNumber != LaraItem->Animation.AnimNumber)
 	{
-		lastAnimationNumber = LaraItem->Animation.AnimNumber;
-		for (int i = 0; i < FPS; ++i)
+		lastAnimNumber = LaraItem->Animation.AnimNumber;
+		for (int i = 0; i < FPS; i++)
 			HairEffect.Update(*LaraItem);
 	}
 
@@ -333,11 +333,15 @@ GameStatus FreezePhase()
 
 GameStatus ControlPhase(bool insideMenu)
 {
-	// For safety measures, only allow to break game loop in non-title levels.
+	// For safety, only allow to break game loop in non-title levels.
 	if (g_GameFlow->CurrentFreezeMode == FreezeMode::None || CurrentLevel == 0)
+	{
 		return GamePhase(insideMenu);
+	}
 	else
+	{
 		return FreezePhase();
+	}
 }
 
 unsigned CALLBACK GameMain(void *)

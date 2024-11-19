@@ -1,32 +1,27 @@
 #pragma once
-#include <string>
-#include <unordered_map>
 
 #include "Game/control/control.h"
 
-/***
-Constants for freeze modes.
-@enum Flow.FreezeMode
-@pragma nostrip
-*/
 
-/*** Flow.FreezeMode constants.
+/// Constants for freeze modes.
+// @enum Flow.FreezeMode
+// @pragma nostrip
 
-The following constants are inside Flow.FreezeMode.
+// Flow.FreezeMode constants.
 
-	NONE - Normal in-game operation.
-	FULL - Game is completely frozen, as in pause or inventory menu.
-	SPECTATOR - As above, but with ability to control camera.
-	PLAYER - As above, but with ability to control player. Experimental mode.
+// The following constants are inside Flow.FreezeMode.
+// 
+// 	NONE - Normal in-game operation.
+// 	FULL - Game is completely frozen, as in pause or inventory menus.
+// 	SPECTATOR - Game is completely frozen, but with ability to control camera.
+// 	PLAYER - Game is completely frozen, but with ability to control player. Experimental.
+//
+// @section Flow.FreezeMode
 
-@section Flow.FreezeMode
-*/
+/// Table of freeze modes.
+// @table CONSTANT_STRING_HERE
 
-/*** Table of freeze modes.
-@table CONSTANT_STRING_HERE
-*/
-
-static const std::unordered_map<std::string, FreezeMode> FREEZE_MODES
+static const auto FREEZE_MODES = std::unordered_map<std::string, FreezeMode>
 {
 	{ "NONE", FreezeMode::None },
 	{ "FULL", FreezeMode::Full },
