@@ -35,7 +35,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added ricochet sounds and make the effect more prominent.
 * Allow to run the engine without title level.
 * Allow more than 1024 objects in a level.
-* Allow more then 1000 static objects in a level
+* Allow more than 1000 static mesh slots in a level.
 
 ### Lua API changes
 * Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
