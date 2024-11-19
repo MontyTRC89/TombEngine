@@ -177,9 +177,9 @@ namespace TEN::Effects::Hair
 		auto absDir = target - origin;
 		absDir.Normalize();
 
-		// Handle cases with zero normal (can happen if 2 hair segments have same offset).
+		// FAILSAFE: Handle case with zero normal (can happen if 2 hair segments have same offset).
 		if (absDir == Vector3::Zero)
-			return Quaternion();
+			return Quaternion::Identity;
 
 		auto absOrient = Geometry::ConvertDirectionToQuat(absDir);
 
