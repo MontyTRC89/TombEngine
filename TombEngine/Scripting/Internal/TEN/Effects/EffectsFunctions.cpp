@@ -6,11 +6,11 @@
 #include "Game/control/los.h"
 #include "Game/effects/DisplaySprite.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/weather.h"
 #include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/effects/weather.h"
 #include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Scripting/Internal/LuaHandler.h"
@@ -310,10 +310,10 @@ namespace TEN::Scripting::Effects
 		Camera.bounce = -str;
 	}
 
-	/// Get the current wind for the current frame.
+	/// Get the wind vector for the current game frame.
 	// This represents the 3D displacement applied by the engine on things like particles affected by wind.
-	// @function GetWind
-	// @treturn Vec3 The wind.
+	// @function GetWind()
+	// @treturn Vec3 Wind vector.
 	static Vec3 GetWind()
 	{
 		return Vec3(Weather.Wind());
