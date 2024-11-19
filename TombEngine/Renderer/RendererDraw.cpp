@@ -280,7 +280,7 @@ namespace TEN::Renderer
 			auto prevRotMatrix = gunshell->oldPos.Orientation.ToRotationMatrix();
 			auto prevWorldMatrix = prevRotMatrix * prevTranslation;
 
-			worldMatrix = Matrix::Lerp(prevWorldMatrix, worldMatrix, _interpolationFactor);
+			worldMatrix = Matrix::Lerp(prevWorldMatrix, worldMatrix, GetInterpolationFactor());
 
 			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellCount].World = worldMatrix;
 			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellCount].Ambient = room.AmbientLight;
@@ -346,7 +346,7 @@ namespace TEN::Renderer
 				relPos = Vector3(segment->x >> FP_SHIFT, segment->y >> FP_SHIFT, segment->z >> FP_SHIFT);
 				auto currentOutput = Vector3::Transform(relPos, translationMatrix);
 
-				auto absolutePos = Vector3::Lerp(prevOutput, currentOutput, _interpolationFactor);
+				auto absolutePos = Vector3::Lerp(prevOutput, currentOutput, GetInterpolationFactor());
 				absolutePoints[i] = absolutePos;
 			}
 
@@ -628,7 +628,7 @@ namespace TEN::Renderer
 						
 					for (auto& poly : bucket.Polygons)
 					{
-						auto worldMatrix = Matrix::Lerp(fish.PrevTransform, fish.Transform, _interpolationFactor);
+						auto worldMatrix = Matrix::Lerp(fish.PrevTransform, fish.Transform, GetInterpolationFactor());
 						auto center = Vector3::Transform(poly.Centre, worldMatrix);
 						float dist = Vector3::Distance(center, view.Camera.WorldPosition);
 
@@ -689,7 +689,7 @@ namespace TEN::Renderer
 
 					const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
 
-					_stStatic.World = Matrix::Lerp(fish.PrevTransform, fish.Transform, _interpolationFactor);
+					_stStatic.World = Matrix::Lerp(fish.PrevTransform, fish.Transform, GetInterpolationFactor());
 					_stStatic.Color = Vector4::One;
 					_stStatic.AmbientLight = _rooms[fish.RoomNumber].AmbientLight;
 
@@ -743,7 +743,7 @@ namespace TEN::Renderer
 
 					for (int p = 0; p < bucket.Polygons.size(); p++)
 					{
-						auto transformMatrix = Matrix::Lerp(bat.PrevTransform, bat.Transform, _interpolationFactor);	
+						auto transformMatrix = Matrix::Lerp(bat.PrevTransform, bat.Transform, GetInterpolationFactor());
 						auto centre = Vector3::Transform(bucket.Polygons[p].Centre, transformMatrix);
 						float dist = (centre - view.Camera.WorldPosition).Length();
 
@@ -773,7 +773,7 @@ namespace TEN::Renderer
 				{
 					auto& room = _rooms[bat.RoomNumber];
 
-					auto transformMatrix = Matrix::Lerp(bat.PrevTransform, bat.Transform, _interpolationFactor);
+					auto transformMatrix = Matrix::Lerp(bat.PrevTransform, bat.Transform, GetInterpolationFactor());
 
 					_stInstancedStaticMeshBuffer.StaticMeshes[batCount].World = transformMatrix;
 					_stInstancedStaticMeshBuffer.StaticMeshes[batCount].Ambient = room.AmbientLight;
@@ -848,7 +848,7 @@ namespace TEN::Renderer
 				if (!beetle.On)
 					continue;
 
-				auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, _interpolationFactor);
+				auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, GetInterpolationFactor());
 
 				for (auto& bucket : mesh.Buckets)
 				{
@@ -886,7 +886,7 @@ namespace TEN::Renderer
 				{
 					auto& room = _rooms[beetle.RoomNumber];
 
-					auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, _interpolationFactor);
+					auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, GetInterpolationFactor());
 
 					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = transformMatrix;
 					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Ambient = room.AmbientLight;
@@ -977,7 +977,7 @@ namespace TEN::Renderer
 
 					for (int p = 0; p < bucket.Polygons.size(); p++)
 					{
-						auto transformMatrix = Matrix::Lerp(locust.PrevTransform, locust.Transform, _interpolationFactor);	
+						auto transformMatrix = Matrix::Lerp(locust.PrevTransform, locust.Transform, GetInterpolationFactor());
 						auto centre = Vector3::Transform(bucket.Polygons[p].Centre, transformMatrix);
 						float dist = (centre - view.Camera.WorldPosition).Length();
 
@@ -1039,7 +1039,7 @@ namespace TEN::Renderer
 
 					auto& mesh = *GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust.counter & 3));
 
-					_stStatic.World = Matrix::Lerp(locust.PrevTransform, locust.Transform, _interpolationFactor);
+					_stStatic.World = Matrix::Lerp(locust.PrevTransform, locust.Transform, GetInterpolationFactor());
 					_stStatic.Color = Vector4::One;
 					_stStatic.AmbientLight = _rooms[locust.roomNumber].AmbientLight;
 					_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -1634,11 +1634,6 @@ namespace TEN::Renderer
 		CollectLightsForCamera();
 		RenderItemShadows(view);
 
-		// Prevent particle interpolation if game is in freeze mode.
-		float interpFactorBackup = _interpolationFactor;
-		if (g_GameFlow->CurrentFreezeMode != FreezeMode::None)
-			_interpolationFactor = 0.0f;
-
 		// Prepare all sprites for later.
 		PrepareFires(view);
 		PrepareSmokes(view);
@@ -1665,10 +1660,6 @@ namespace TEN::Renderer
 
 		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected at a later stage.
 		SortAndPrepareSprites(view);
-		
-		// Continue interpolating for any freeze mode except spectator.
-		if (g_GameFlow->CurrentFreezeMode != FreezeMode::Spectator)
-			_interpolationFactor = interpFactorBackup;
 
 		auto time2 = std::chrono::high_resolution_clock::now();
 		_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
@@ -2893,7 +2884,7 @@ namespace TEN::Renderer
 						rDrawSprite.Type = SpriteType::CustomBillboard;
 						rDrawSprite.pos =
 							renderView.Camera.WorldPosition +
-							Vector3::Lerp(meteor.PrevPosition, meteor.Position, _interpolationFactor);
+							Vector3::Lerp(meteor.PrevPosition, meteor.Position, GetInterpolationFactor());
 						rDrawSprite.Rotation = 0;
 						rDrawSprite.Scale = 1;
 						rDrawSprite.Width = 2;
@@ -2905,7 +2896,7 @@ namespace TEN::Renderer
 							meteor.Color.x,
 							meteor.Color.y,
 							meteor.Color.z,
-							Lerp(meteor.PrevFade, meteor.Fade, _interpolationFactor));
+							Lerp(meteor.PrevFade, meteor.Fade, GetInterpolationFactor()));
 						_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
 						_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = 0;
 

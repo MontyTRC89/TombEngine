@@ -678,7 +678,7 @@ namespace TEN::Renderer
 		void SaveOldState();
 
 		float						GetFramerateMultiplier() const;
-		float						GetInterpolationFactor() const;
+		float						GetInterpolationFactor(bool forceRawValue = false) const;
 		Vector2i					GetScreenResolution() const;
 		int							GetScreenRefreshRate() const;
 		std::optional<Vector2>		Get2DPosition(const Vector3& pos) const;
