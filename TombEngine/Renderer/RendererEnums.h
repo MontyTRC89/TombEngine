@@ -229,6 +229,13 @@ enum class RendererPass
 	RoomAmbient
 };
 
+enum class SceneRenderMode
+{
+	Full,
+	NoHud,
+	NoPostprocess
+};
+
 enum class SpriteRenderType
 {
 	Default,

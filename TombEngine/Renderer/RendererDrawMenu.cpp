@@ -1129,7 +1129,7 @@ namespace TEN::Renderer
 		else
 		{
 			InterpolateCamera(interpFactor);
-			RenderScene(&_backBuffer, _gameCamera, false);
+			RenderScene(&_backBuffer, _gameCamera, SceneRenderMode::NoHud);
 		}
 
 		// TODO: Put 3D object drawing management here (don't forget about interpolation!)

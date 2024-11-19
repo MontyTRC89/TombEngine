@@ -1607,7 +1607,7 @@ namespace TEN::Renderer
 		ClearShadowMap();
 	}
 
-	void Renderer::RenderScene(RenderTarget2D* renderTarget, RenderView& view, bool fullPass)
+	void Renderer::RenderScene(RenderTarget2D* renderTarget, RenderView& view, SceneRenderMode renderMode)
 	{
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
@@ -1862,39 +1862,43 @@ namespace TEN::Renderer
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		if (fullPass)
+		// HUD needs to be drawn before postprocessing to be antialiased.
+		if (renderMode == SceneRenderMode::Full)
 			g_Hud.Draw(*LaraItem);
 		
-		_doingFullscreenPass = true;
-
-		// Apply antialiasing.
-		switch (g_Configuration.AntialiasingMode)
+		if (renderMode != SceneRenderMode::NoPostprocess)
 		{
-		case AntialiasingMode::None:
-			break;
+			_doingFullscreenPass = true;
 
-		case AntialiasingMode::Low:
-			ApplyFXAA(&_renderTarget, view);
-			break;
+			// Apply antialiasing.
+			switch (g_Configuration.AntialiasingMode)
+			{
+			case AntialiasingMode::None:
+				break;
 
-		case AntialiasingMode::Medium:
-		case AntialiasingMode::High:
-			ApplySMAA(&_renderTarget, view);
-			break;
+			case AntialiasingMode::Low:
+				ApplyFXAA(&_renderTarget, view);
+				break;
+
+			case AntialiasingMode::Medium:
+			case AntialiasingMode::High:
+				ApplySMAA(&_renderTarget, view);
+				break;
+			}
+
+			// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
+			DrawPostprocess(renderTarget, view);
+
+			_doingFullscreenPass = false;
+
+			// Draw binoculars or lasersight overlay.
+			DrawOverlays(view);
+
+			// Draw 2D debug lines.
+			DrawLines2D();
 		}
 
-		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
-		DrawPostprocess(renderTarget, view);
-
-		_doingFullscreenPass = false;
-
-		// Draw binoculars or lasersight overlay.
-		DrawOverlays(view);
-
-		// Draw 2D debug lines.
-		DrawLines2D();
-
-		if (fullPass)
+		if (renderMode == SceneRenderMode::Full)
 		{
 			// Draw display sprites sorted by priority.
 			CollectDisplaySprites(view);
@@ -2166,9 +2170,9 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque, true);*/
 	}
 
-	void Renderer::DumpGameScene(bool fullPass)
+	void Renderer::DumpGameScene(SceneRenderMode renderMode)
 	{
-		RenderScene(&_dumpScreenRenderTarget, _gameCamera, fullPass);
+		RenderScene(&_dumpScreenRenderTarget, _gameCamera, renderMode);
 		_graphicsSettingsChanged = false;
 	}
 

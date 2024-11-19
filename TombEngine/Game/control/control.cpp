@@ -278,7 +278,7 @@ GameStatus FreezePhase()
 	{
 		// Capture the screen for drawing it as a background.
 		if (currentFreezeMode == FreezeMode::Full)
-			g_Renderer.DumpGameScene(false);
+			g_Renderer.DumpGameScene(SceneRenderMode::NoHud);
 
 		StopRumble();
 	}
