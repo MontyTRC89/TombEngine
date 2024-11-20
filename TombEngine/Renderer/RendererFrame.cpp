@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Renderer/Renderer.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/Sphere.h"
 #include "Game/effects/effects.h"
@@ -15,8 +15,9 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 
-using namespace TEN::Entities::Effects;
+using namespace TEN::Animation;
 using namespace TEN::Collision::Sphere;
+using namespace TEN::Entities::Effects;
 using namespace TEN::Math;
 
 namespace TEN::Renderer

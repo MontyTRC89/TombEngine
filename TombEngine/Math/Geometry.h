@@ -36,6 +36,11 @@ namespace TEN::Math::Geometry
 	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& axis = Vector3::UnitY);
 	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& axis = Vector3::UnitY);
 
+	// Box getters
+
+	BoundingBox GetAabb(const BoundingOrientedBox& obb);
+	BoundingBox GetAabb(const std::vector<Vector3>& points);
+
 	// Misc. getters
 
 	float		GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
@@ -43,7 +48,6 @@ namespace TEN::Math::Geometry
 	Vector3		GetClosestPointOnLinePerp(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1, const Vector3& axis = Vector3::UnitY);
 	EulerAngles GetOrientToPoint(const Vector3& origin, const Vector3& target);
 	EulerAngles GetRelOrientToNormal(short orient, const Vector3& normal, const Vector3& axis = Vector3::UnitY);
-	BoundingBox GetBoundingBox(const std::vector<Vector3>& points);
 
 	// Converters
 

@@ -2,7 +2,7 @@
 #include "Game/pickup/pickup.h"
 
 #include "pickuputil.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/Point.h"
@@ -31,6 +31,7 @@
 #include "Specific/level.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
@@ -427,7 +428,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 						}
 
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
-						laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+						laraItem->Animation.FrameNumber = 0;
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
 					}
@@ -564,7 +565,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			laraItem->Animation.ActiveState = LS_PICKUP;
 			item->Status = ITEM_ACTIVE;
 			AddActiveItem(itemNumber);
-			AnimateItem(item);
+			AnimateItem(*item);
 			flag = true;
 		}
 
@@ -610,11 +611,11 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			{
 				if (triggerFlags == 3 || triggerFlags == 7)
 				{
-					SetAnimation(laraItem, LA_PICKUP_PEDESTAL_HIGH);
+					SetAnimation(*laraItem, LA_PICKUP_PEDESTAL_HIGH);
 				}
 				else
 				{
-					SetAnimation(laraItem, LA_PICKUP_PEDESTAL_LOW);
+					SetAnimation(*laraItem, LA_PICKUP_PEDESTAL_LOW);
 				}
 
 				flag = true;
@@ -651,7 +652,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 		if (MoveLaraPosition(JobyCrowPickUpPosition, item, laraItem))
 		{
-			SetAnimation(laraItem, LA_CROWBAR_PRY_WALL_SLOW);
+			SetAnimation(*laraItem, LA_CROWBAR_PRY_WALL_SLOW);
 			item->Status = ITEM_ACTIVE;
 			AddActiveItem(itemNumber);
 			flag = true;
@@ -751,7 +752,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	if (flag)
 	{
-		laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+		laraItem->Animation.FrameNumber = 0;
 		ResetPlayerFlex(laraItem);
 		lara->Control.IsMoving = false;
 		lara->Control.HandStatus = HandStatus::Busy;
@@ -988,7 +989,7 @@ void PickupControl(short itemNumber)
 	case 7:
 	case 8:
 	case 9:
-		AnimateItem(item);
+		AnimateItem(*item);
 		break;
 
 	case 11:
@@ -1011,7 +1012,7 @@ const GameBoundingBox* FindPlinth(ItemInfo* item)
 		if (item->Pose.Position.x != mesh->pos.Position.x || item->Pose.Position.z != mesh->pos.Position.z)
 			continue;
 
-		const auto& bounds = GetBestFrame(*item).BoundingBox;
+		const auto& bounds = GetClosestKeyframe(*item).BoundingBox;
 		auto& bBox = GetBoundsAccurate(*mesh, false);
 
 		if (bounds.X1 <= bBox.X2 && bounds.X2 >= bBox.X1 &&
@@ -1047,7 +1048,7 @@ const GameBoundingBox* FindPlinth(ItemInfo* item)
 	}
 	else
 	{
-		return &GetBestFrame(g_Level.Items[itemNumber]).BoundingBox;
+		return &GetClosestKeyframe(g_Level.Items[itemNumber]).BoundingBox;
 	}
 }
 
@@ -1193,7 +1194,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 			{
 				ResetPlayerFlex(laraItem);
 				laraItem->Animation.AnimNumber = SearchAnims[objectNumber];
-				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+				laraItem->Animation.FrameNumber = 0;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 				lara->Control.IsMoving = false;
 				lara->Control.HandStatus = HandStatus::Busy;
@@ -1206,12 +1207,14 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 					item->Status = ITEM_ACTIVE;
 				}
 
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-				item->Animation.FrameNumber = GetAnimData(item).frameBase;
-				AnimateItem(item);
+				item->Animation.AnimNumber = 1;
+				item->Animation.FrameNumber = 0;
+				AnimateItem(*item);
 			}
 			else
+			{
 				lara->Context.InteractedItem = itemNumber;
+			}
 		}
 		else if (lara->Control.IsMoving && lara->Context.InteractedItem ==  itemNumber)
 		{
@@ -1220,7 +1223,9 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 		}
 	}
 	else if (laraItem->Animation.ActiveState != LS_MISC_CONTROL)
+	{
 		ObjectCollision(itemNumber, laraItem, coll);
+	}
 }
 
 void SearchObjectControl(short itemNumber)
@@ -1230,9 +1235,9 @@ void SearchObjectControl(short itemNumber)
 	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1);
 
 	if (item->ObjectNumber != ID_SEARCH_OBJECT4 || item->ItemFlags[0] == 1)
-		AnimateItem(item);
+		AnimateItem(*item);
 
-	int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
+	int frameNumber = item->Animation.FrameNumber;
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
 	{
 		if (frameNumber > 0)
@@ -1323,7 +1328,7 @@ bool UseSpecialItem(ItemInfo* laraItem)
 		else if (itemIDToUse == ID_CLOCKWORK_BEETLE)
 		{
 			flag = 4;
-			SetAnimation(laraItem, LA_MECHANICAL_BEETLE_USE);
+			SetAnimation(*laraItem, LA_MECHANICAL_BEETLE_USE);
 			UseClockworkBeetle(1);
 		}
 
@@ -1360,9 +1365,9 @@ bool UseSpecialItem(ItemInfo* laraItem)
 		if (flag)
 		{
 			if (flag == 1)
-				SetAnimation(laraItem, LA_WATERSKIN_FILL);
+				SetAnimation(*laraItem, LA_WATERSKIN_FILL);
 			else if (flag == 2)
-				SetAnimation(laraItem, LA_WATERSKIN_POUR_LOW);
+				SetAnimation(*laraItem, LA_WATERSKIN_POUR_LOW);
 
 			lara->Control.HandStatus = HandStatus::Busy;
 			g_Gui.SetInventoryItemChosen(NO_VALUE);

@@ -2,7 +2,7 @@
 #include "Game/Lara/lara_tests.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
@@ -22,6 +22,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Player;
@@ -168,14 +169,14 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 				{
 					LaraSnapToEdgeOfBlock(item, coll, GetQuadrant(item->Pose.Orientation.y));
 					item->Pose.Position.y = coll->Setup.PrevPosition.y;
-					SetAnimation(item, LA_REACH_TO_HANG, 21);
+					SetAnimation(*item, LA_REACH_TO_HANG, 21);
 				}
 
 				result = true;
 			}
 			else
 			{
-				if (((item->Animation.AnimNumber == LA_REACH_TO_HANG && item->Animation.FrameNumber == GetFrameIndex(item, 21)) || item->Animation.AnimNumber == LA_HANG_IDLE)  &&
+				if (((item->Animation.AnimNumber == LA_REACH_TO_HANG && item->Animation.FrameNumber == 21) || item->Animation.AnimNumber == LA_HANG_IDLE)  &&
 					TestLaraClimbIdle(item, coll))
 				{
 					item->Animation.TargetState = LS_LADDER_IDLE;
@@ -184,7 +185,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		}
 		else // Death or action release
 		{
-			SetAnimation(item, LA_FALL_START);
+			SetAnimation(*item, LA_FALL_START);
 			item->Pose.Position.y += CLICK(1);
 			item->Animation.IsAirborne = true;
 			item->Animation.Velocity.z = 2;
@@ -246,7 +247,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 				if (item->Animation.ActiveState == LS_SHIMMY_LEFT ||
 					item->Animation.ActiveState == LS_SHIMMY_RIGHT)
 				{
-					SetAnimation(item, LA_REACH_TO_HANG, 21);
+					SetAnimation(*item, LA_REACH_TO_HANG, 21);
 				}
 
 				result = true;
@@ -254,7 +255,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		}
 		else // Death, incorrect ledge or ACTION release
 		{
-			SetAnimation(item, LA_JUMP_UP, 9);
+			SetAnimation(*item, LA_JUMP_UP, 9);
 			item->Pose.Position.x += coll->Shift.Position.x;
 			item->Pose.Position.y += GameBoundingBox(item).Y2 * 1.8f;
 			item->Pose.Position.z += coll->Shift.Position.z;
@@ -277,7 +278,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 
 	if (CanGrabMonkeySwing(*item, *coll))
 	{
-		SetAnimation(item, LA_REACH_TO_MONKEY);
+		SetAnimation(*item, LA_REACH_TO_MONKEY);
 		ResetPlayerFlex(item);
 		item->Animation.Velocity.z = 0;
 		item->Animation.Velocity.y = 0;
@@ -304,11 +305,11 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestHangSwingIn(item, coll))
 	{
-		SetAnimation(item, LA_REACH_TO_HANG_OSCILLATE);
+		SetAnimation(*item, LA_REACH_TO_HANG_OSCILLATE);
 		ResetPlayerFlex(item);
 	}
 	else
-		SetAnimation(item, LA_REACH_TO_HANG);
+		SetAnimation(*item, LA_REACH_TO_HANG);
 
 	auto bounds = GameBoundingBox(item);
 	if (edgeCatch <= 0)
@@ -342,7 +343,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 
 	if (CanGrabMonkeySwing(*item, *coll))
 	{
-		SetAnimation(item, LA_JUMP_UP_TO_MONKEY);
+		SetAnimation(*item, LA_JUMP_UP_TO_MONKEY);
 		item->Animation.Velocity.z = 0;
 		item->Animation.Velocity.y = 0;
 		item->Animation.IsAirborne = false;
@@ -366,7 +367,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 		return false;
 	}
 
-	SetAnimation(item, LA_REACH_TO_HANG, 12);
+	SetAnimation(*item, LA_REACH_TO_HANG, 12);
 
 	auto bounds = GameBoundingBox(item);
 	if (edgeCatch <= 0)
@@ -891,11 +892,11 @@ bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 
 	if ((pointColl.GetFloorHeight() - vPos) >= -CLICK(0.5f))
 	{
-		SetAnimation(item, LA_STAND_IDLE);
+		SetAnimation(*item, LA_STAND_IDLE);
 	}
 	else
 	{
-		SetAnimation(item, LA_ONWATER_TO_WADE_1_STEP);
+		SetAnimation(*item, LA_ONWATER_TO_WADE_1_STEP);
 		item->Animation.TargetState = LS_IDLE;
 	}
 
@@ -965,24 +966,24 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 		if (headroom < LARA_HEIGHT)
 		{
 			if (g_GameFlow->HasCrawlExtended())
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_1_STEP);
+				SetAnimation(*item, LA_ONWATER_TO_CROUCH_1_STEP);
 			else
 				return false;
 		}
 		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_1_STEP);
+			SetAnimation(*item, LA_ONWATER_TO_STAND_1_STEP);
 	}
 	else if (frontFloor > CLICK(0.5f))
 	{
 		if (headroom < LARA_HEIGHT)
 		{
 			if (g_GameFlow->HasCrawlExtended())
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1_STEP);
+				SetAnimation(*item, LA_ONWATER_TO_CROUCH_M1_STEP);
 			else
 				return false;
 		}
 		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_M1_STEP);
+			SetAnimation(*item, LA_ONWATER_TO_STAND_M1_STEP);
 	}
 
 	else
@@ -990,12 +991,12 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 		if (headroom < LARA_HEIGHT)
 		{
 			if (g_GameFlow->HasCrawlExtended())
-				SetAnimation(item, LA_ONWATER_TO_CROUCH_0_STEP);
+				SetAnimation(*item, LA_ONWATER_TO_CROUCH_0_STEP);
 			else
 				return false;
 		}
 		else
-			SetAnimation(item, LA_ONWATER_TO_STAND_0_STEP);
+			SetAnimation(*item, LA_ONWATER_TO_STAND_0_STEP);
 	}
 
 	if (coll->Front.Bridge == NO_VALUE)
@@ -1070,9 +1071,9 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 		break;
 	}
 
-	SetAnimation(item, LA_ONWATER_IDLE);
+	SetAnimation(*item, LA_ONWATER_IDLE);
 	item->Animation.TargetState = LS_LADDER_IDLE;
-	AnimateItem(item);
+	AnimateItem(*item);
 
 	item->Pose.Position.y -= 10; // Otherwise she falls back into the water.
 	item->Pose.Orientation.x = 0;
@@ -1100,7 +1101,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 	}
 	else if (pointColl.GetWaterBottomHeight() <= (LARA_HEIGHT - (LARA_HEADROOM / 2)))
 	{
-		SetAnimation(item, LA_UNDERWATER_TO_STAND);
+		SetAnimation(*item, LA_UNDERWATER_TO_STAND);
 		ResetPlayerLean(item);
 		item->Animation.TargetState = LS_IDLE;
 		item->Pose.Position.y = pointColl.GetFloorHeight();
@@ -1466,7 +1467,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value())
 		{
 			vaultResult->TargetState = LS_VAULT_1_STEP_CROUCH;
-			if (!HasStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1477,7 +1478,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value())
 		{
 			vaultResult->TargetState = LS_VAULT_2_STEPS;
-			if (!HasStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1488,7 +1489,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value() && g_GameFlow->HasCrawlExtended())
 		{
 			vaultResult->TargetState = LS_VAULT_2_STEPS_CROUCH;
-			if (!HasStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1499,7 +1500,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value())
 		{
 			vaultResult->TargetState = LS_VAULT_3_STEPS;
-			if (!HasStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1510,7 +1511,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value() && g_GameFlow->HasCrawlExtended())
 		{
 			vaultResult->TargetState = LS_VAULT_3_STEPS_CROUCH;
-			if (!HasStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1521,7 +1522,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 		if (vaultResult.has_value())
 		{
 			vaultResult->TargetState = LS_AUTO_JUMP;
-			if (!HasStateDispatch(item, vaultResult->TargetState))
+			if (!TestStateDispatch(*item, vaultResult->TargetState))
 				return std::nullopt;
 
 			return vaultResult;
@@ -1536,7 +1537,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 	if (vaultResult.has_value() && g_Configuration.EnableAutoMonkeySwingJump)
 	{
 		vaultResult->TargetState = LS_AUTO_JUMP;
-		if (!HasStateDispatch(item, vaultResult->TargetState))
+		if (!TestStateDispatch(*item, vaultResult->TargetState))
 			return std::nullopt;
 
 		return vaultResult;
@@ -1563,7 +1564,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 		// TODO: Somehow harmonise Context.CalcJumpVelocity to work for both ledge and ladder auto jumps, because otherwise there will be a need for an odd workaround in the future.
 		lara->Context.CalcJumpVelocity = -3 - sqrt(-9600 - 12 * std::max((vaultResult->Height - item->Pose.Position.y + CLICK(0.2f)), -CLICK(7.1f)));
 		item->Animation.AnimNumber = LA_STAND_SOLID;
-		item->Animation.FrameNumber = GetFrameIndex(item, 0);
+		item->Animation.FrameNumber = 0;
 		item->Animation.TargetState = LS_JUMP_UP;
 		item->Animation.ActiveState = LS_IDLE;
 		lara->Control.TurnRate = 0;
@@ -1571,7 +1572,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 		ShiftItem(item, coll);
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
 		lara->Context.TargetOrientation = EulerAngles(0, item->Pose.Orientation.y, 0);
-		AnimateItem(item);
+		AnimateItem(*item);
 
 		return true;
 	}
@@ -1581,7 +1582,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 	if (vaultResult.has_value() && TestLaraClimbIdle(item, coll))
 	{
 		item->Animation.AnimNumber = LA_STAND_SOLID;
-		item->Animation.FrameNumber = GetFrameIndex(item, 0);
+		item->Animation.FrameNumber = 0;
 		item->Animation.TargetState = LS_LADDER_IDLE;
 		item->Animation.ActiveState = LS_IDLE;
 		lara->Control.HandStatus = HandStatus::Busy;
@@ -1589,7 +1590,7 @@ bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 
 		ShiftItem(item, coll);
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
-		AnimateItem(item);
+		AnimateItem(*item);
 
 		return true;
 	}
@@ -1715,7 +1716,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 		else
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_STEP_DOWN;
 
-		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = TestStateDispatch(*item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -1728,7 +1729,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 		else
 			crawlVaultResult.TargetState = LS_CRAWL_EXIT_JUMP;
 
-		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = TestStateDispatch(*item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -1737,7 +1738,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	if (crawlVaultResult.Success)
 	{
 		crawlVaultResult.TargetState = LS_CRAWL_STEP_UP;
-		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = TestStateDispatch(*item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
@@ -1746,7 +1747,7 @@ CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll)
 	if (crawlVaultResult.Success)
 	{
 		crawlVaultResult.TargetState = LS_CRAWL_STEP_DOWN;
-		crawlVaultResult.Success = HasStateDispatch(item, crawlVaultResult.TargetState);
+		crawlVaultResult.Success = TestStateDispatch(*item, crawlVaultResult.TargetState);
 		return crawlVaultResult;
 	}
 
