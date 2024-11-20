@@ -20,18 +20,7 @@ namespace TEN::Renderer
 {
 	template class VertexBuffer<Vertex>;
 
-	void Renderer::ResetData()
-	{
-		int allocatedItemSize = (int)g_Level.Items.size() + MAX_SPAWNED_ITEM_COUNT;
-
-		auto item = RendererItem();
-		_items = std::vector<RendererItem>(allocatedItemSize, item);
-
-		auto effect = RendererEffect();
-		_effects = std::vector<RendererEffect>(allocatedItemSize, effect);
-	}
-
-	bool Renderer::PrepareData()
+	bool Renderer::PrepareDataForTheRenderer()
 	{
 		TENLog("Preparing renderer...", LogLevel::Info);
 
@@ -41,12 +30,17 @@ namespace TEN::Renderer
 
 		_moveableObjects.resize(ID_NUMBER_OBJECTS);
 		_spriteSequences.resize(ID_NUMBER_OBJECTS);
-		_staticObjects.resize(MAX_STATICS);
 		_rooms.resize(g_Level.Rooms.size());
 
 		_meshes.clear();
 
-		ResetData();
+		int allocatedItemSize = (int)g_Level.Items.size() + MAX_SPAWNED_ITEM_COUNT;
+
+		auto item = RendererItem();
+		_items = std::vector<RendererItem>(allocatedItemSize, item);
+
+		auto effect = RendererEffect();
+		_effects = std::vector<RendererEffect>(allocatedItemSize, effect);
 
 		TENLog("Allocated renderer object memory.", LogLevel::Info);
 
@@ -279,7 +273,7 @@ namespace TEN::Renderer
 					staticInfo->AmbientLight = rendererRoom.AmbientLight;
 					staticInfo->Pose = oldMesh->pos;
 					staticInfo->Scale = oldMesh->scale;
-					staticInfo->OriginalSphere = StaticObjects[staticInfo->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
+					staticInfo->OriginalSphere = GetStaticObject(staticInfo->ObjectNumber).visibilityBox.ToLocalBoundingSphere();
 					staticInfo->IndexInRoom = l;
 
 					staticInfo->Update();
@@ -884,16 +878,13 @@ namespace TEN::Renderer
 
 		totalVertices = 0;
 		totalIndices = 0;
-		for (int i = 0; i < StaticObjectsIds.size(); i++)
+		for (const auto& staticObj : StaticObjects)
 		{
-			int objNum = StaticObjectsIds[i];
-			StaticInfo* obj = &StaticObjects[objNum];
-			MESH* mesh = &g_Level.Meshes[obj->meshNumber];
-
-			for (auto& bucket : mesh->buckets)
+			const auto& mesh = g_Level.Meshes[staticObj.meshNumber];
+			for (const auto& bucket : mesh.buckets)
 			{
-				totalVertices += bucket.numQuads * 4 + bucket.numTriangles * 3;
-				totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
+				totalVertices += (bucket.numQuads * 4) + (bucket.numTriangles * 3);
+				totalIndices += (bucket.numQuads * 6) + (bucket.numTriangles * 3);
 			}
 		}
 
@@ -902,20 +893,18 @@ namespace TEN::Renderer
 
 		lastVertex = 0;
 		lastIndex = 0;
-		for (int i = 0; i < StaticObjectsIds.size(); i++)
+		for (const auto& staticObj : StaticObjects)
 		{
-			StaticInfo*obj = &StaticObjects[StaticObjectsIds[i]];
-			_staticObjects[StaticObjectsIds[i]] = RendererObject();
-			RendererObject &staticObject = *_staticObjects[StaticObjectsIds[i]];
-			staticObject.Type = 1;
-			staticObject.Id = StaticObjectsIds[i];
+			auto newStaticObj = RendererObject();
+			newStaticObj.Type = 1;
+			newStaticObj.Id = staticObj.ObjectNumber;
 
-			RendererMesh *mesh = GetRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj->meshNumber], 0, false, false, &lastVertex, &lastIndex);
+			auto& mesh = *GetRendererMeshFromTrMesh(&newStaticObj, &g_Level.Meshes[staticObj.meshNumber], 0, false, false, &lastVertex, &lastIndex);
 
-			staticObject.ObjectMeshes.push_back(mesh);
-			_meshes.push_back(mesh);
+			newStaticObj.ObjectMeshes.push_back(&mesh);
+			_meshes.push_back(&mesh);
 
-			_staticObjects[StaticObjectsIds[i]] = staticObject;
+			_staticObjects.push_back(newStaticObj);
 		}
 
 		_staticsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_staticsVertices.size(), _staticsVertices.data());

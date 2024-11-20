@@ -81,7 +81,8 @@ const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 LEVEL g_Level;
 
 std::vector<int> MoveablesIds;
-std::vector<int> StaticObjectsIds;
+int* StaticObjectsLUT = nullptr;
+int StaticObjectsLUTSize = 0;
 std::vector<int> SpriteSequencesIds;
 
 char* DataPtr;
@@ -193,13 +194,15 @@ long long ReadLEB128(bool sign)
 
 std::string ReadString()
 {
-	auto numBytes = ReadLEB128(false);
+	auto byteCount = ReadLEB128(false);
 
-	if (numBytes <= 0)
+	if (byteCount <= 0)
+	{
 		return std::string();
+	}
 	else
 	{
-		auto newPtr = CurrentDataPtr + numBytes;
+		auto newPtr = CurrentDataPtr + byteCount;
 		auto result = std::string(CurrentDataPtr, newPtr);
 		CurrentDataPtr = newPtr;
 		return result;
@@ -269,15 +272,22 @@ void LoadItems()
 void LoadObjects()
 {
 	Objects.Initialize();
-	std::memset(StaticObjects, 0, sizeof(StaticInfo) * MAX_STATICS);
+	StaticObjects.clear();
 
-	int numMeshes = ReadInt32();
-	TENLog("Meshes: " + std::to_string(numMeshes), LogLevel::Info);
-
-	g_Level.Meshes.reserve(numMeshes);
-	for (int i = 0; i < numMeshes; i++)
+	if (StaticObjectsLUT != nullptr)
 	{
-		MESH mesh;
+		delete StaticObjectsLUT;
+	}
+	StaticObjectsLUTSize = 1000;
+	StaticObjectsLUT = (int*)malloc(StaticObjectsLUTSize * sizeof(int));
+
+	int meshCount = ReadInt32();
+	TENLog("Mesh count: " + std::to_string(meshCount), LogLevel::Info);
+
+	g_Level.Meshes.reserve(meshCount);
+	for (int i = 0; i < meshCount; i++)
+	{
+		auto mesh = MESH{};
 
 		mesh.lightMode = (LightMode)ReadUInt8();
 
@@ -286,25 +296,25 @@ void LoadObjects()
 		mesh.sphere.Center.z = ReadFloat();
 		mesh.sphere.Radius = ReadFloat();
 
-		int numVertices = ReadInt32();
+		int vertexCount = ReadInt32();
 
-		mesh.positions.resize(numVertices);
-		ReadBytes(mesh.positions.data(), 12 * numVertices);
+		mesh.positions.resize(vertexCount);
+		ReadBytes(mesh.positions.data(), 12 * vertexCount);
 
-		mesh.colors.resize(numVertices);
-		ReadBytes(mesh.colors.data(), 12 * numVertices);
+		mesh.colors.resize(vertexCount);
+		ReadBytes(mesh.colors.data(), 12 * vertexCount);
 
-		mesh.effects.resize(numVertices);
-		ReadBytes(mesh.effects.data(), 12 * numVertices);
+		mesh.effects.resize(vertexCount);
+		ReadBytes(mesh.effects.data(), 12 * vertexCount);
 
-		mesh.bones.resize(numVertices);
-		ReadBytes(mesh.bones.data(), 4 * numVertices);
+		mesh.bones.resize(vertexCount);
+		ReadBytes(mesh.bones.data(), 4 * vertexCount);
 		
-		int numBuckets = ReadInt32();
-		mesh.buckets.reserve(numBuckets);
-		for (int j = 0; j < numBuckets; j++)
+		int bucketCount = ReadInt32();
+		mesh.buckets.reserve(bucketCount);
+		for (int j = 0; j < bucketCount; j++)
 		{
-			BUCKET bucket;
+			auto bucket = BUCKET{};
 
 			bucket.texture = ReadInt32();
 			bucket.blendMode = (BlendMode)ReadUInt8();
@@ -312,11 +322,11 @@ void LoadObjects()
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
 
-			int numPolygons = ReadInt32();
-			bucket.polygons.reserve(numPolygons);
-			for (int k = 0; k < numPolygons; k++)
+			int polyCount = ReadInt32();
+			bucket.polygons.reserve(polyCount);
+			for (int k = 0; k < polyCount; k++)
 			{
-				POLYGON poly;
+				auto poly = POLYGON{};
 
 				poly.shape = ReadInt32();
 				poly.animatedSequence = ReadInt32();
@@ -354,11 +364,11 @@ void LoadObjects()
 		g_Level.Meshes.push_back(mesh);
 	}
 
-	int numAnimations = ReadInt32();
-	TENLog("Animations: " + std::to_string(numAnimations), LogLevel::Info);
+	int animCount = ReadInt32();
+	TENLog("Animation count: " + std::to_string(animCount), LogLevel::Info);
 
-	g_Level.Anims.resize(numAnimations);
-	for (int i = 0; i < numAnimations; i++)
+	g_Level.Anims.resize(animCount);
+	for (int i = 0; i < animCount; i++)
 	{
 		auto* anim = &g_Level.Anims[i];
 
@@ -377,25 +387,25 @@ void LoadObjects()
 		anim->CommandIndex = ReadInt32();
 	}
 
-	int numChanges = ReadInt32();
-	g_Level.Changes.resize(numChanges);
-	ReadBytes(g_Level.Changes.data(), sizeof(StateDispatchData) * numChanges);
+	int changeCount = ReadInt32();
+	g_Level.Changes.resize(changeCount);
+	ReadBytes(g_Level.Changes.data(), sizeof(StateDispatchData) * changeCount);
 
-	int numRanges = ReadInt32();
-	g_Level.Ranges.resize(numRanges);
-	ReadBytes(g_Level.Ranges.data(), sizeof(StateDispatchRangeData) * numRanges);
+	int rangeCount = ReadInt32();
+	g_Level.Ranges.resize(rangeCount);
+	ReadBytes(g_Level.Ranges.data(), sizeof(StateDispatchRangeData) * rangeCount);
 
-	int numCommands = ReadInt32();
-	g_Level.Commands.resize(numCommands);
-	ReadBytes(g_Level.Commands.data(), sizeof(short) * numCommands);
+	int commandCount = ReadInt32();
+	g_Level.Commands.resize(commandCount);
+	ReadBytes(g_Level.Commands.data(), sizeof(short) * commandCount);
 
-	int numBones = ReadInt32();
-	g_Level.Bones.resize(numBones);
-	ReadBytes(g_Level.Bones.data(), 4 * numBones);
+	int boneCount = ReadInt32();
+	g_Level.Bones.resize(boneCount);
+	ReadBytes(g_Level.Bones.data(), 4 * boneCount);
 
-	int numFrames = ReadInt32();
-	g_Level.Frames.resize(numFrames);
-	for (int i = 0; i < numFrames; i++)
+	int frameCount = ReadInt32();
+	g_Level.Frames.resize(frameCount);
+	for (int i = 0; i < frameCount; i++)
 	{
 		auto* frame = &g_Level.Frames[i];
 
@@ -409,9 +419,9 @@ void LoadObjects()
 		// NOTE: Braces are necessary to ensure correct value init order.
 		frame->Offset = Vector3{ (float)ReadInt16(), (float)ReadInt16(), (float)ReadInt16() };
 
-		int numAngles = ReadInt16();
-		frame->BoneOrientations.resize(numAngles);
-		for (int j = 0; j < numAngles; j++)
+		int angleCount = ReadInt16();
+		frame->BoneOrientations.resize(angleCount);
+		for (int j = 0; j < angleCount; j++)
 		{
 			auto* q = &frame->BoneOrientations[j];
 			q->x = ReadFloat();
@@ -421,10 +431,10 @@ void LoadObjects()
 		}
 	}
 
-	int numModels = ReadInt32();
-	TENLog("Models: " + std::to_string(numModels), LogLevel::Info);
+	int modelCount = ReadInt32();
+	TENLog("Model count: " + std::to_string(modelCount), LogLevel::Info);
 
-	for (int i = 0; i < numModels; i++)
+	for (int i = 0; i < modelCount; i++)
 	{
 		int objNum = ReadInt32();
 		MoveablesIds.push_back(objNum);
@@ -435,60 +445,61 @@ void LoadObjects()
 		Objects[objNum].boneIndex = ReadInt32();
 		Objects[objNum].frameBase = ReadInt32();
 		Objects[objNum].animIndex = ReadInt32();
-
-		Objects[objNum].loaded = true;
 	}
 
 	TENLog("Initializing objects...", LogLevel::Info);
 	InitializeObjects();
 
-	int numStatics = ReadInt32();
-	TENLog("Statics: " + std::to_string(numStatics), LogLevel::Info);
+	int staticCount = ReadInt32();
+	TENLog("Statics: " + std::to_string(staticCount), LogLevel::Info);
 
-	for (int i = 0; i < numStatics; i++)
+	for (int i = 0; i < staticCount; i++)
 	{
-		int meshID = ReadInt32();
+		auto staticObj = StaticInfo{};
 
-		if (meshID >= MAX_STATICS)
+		staticObj.ObjectNumber = ReadInt32();
+		staticObj.meshNumber = ReadInt32();
+
+		staticObj.visibilityBox.X1 = ReadInt16();
+		staticObj.visibilityBox.X2 = ReadInt16();
+		staticObj.visibilityBox.Y1 = ReadInt16();
+		staticObj.visibilityBox.Y2 = ReadInt16();
+		staticObj.visibilityBox.Z1 = ReadInt16();
+		staticObj.visibilityBox.Z2 = ReadInt16();
+
+		staticObj.collisionBox.X1 = ReadInt16();
+		staticObj.collisionBox.X2 = ReadInt16();
+		staticObj.collisionBox.Y1 = ReadInt16();
+		staticObj.collisionBox.Y2 = ReadInt16();
+		staticObj.collisionBox.Z1 = ReadInt16();
+		staticObj.collisionBox.Z2 = ReadInt16();
+
+		staticObj.flags = ReadInt16();
+
+		staticObj.shatterType = (ShatterType)ReadInt16();
+		staticObj.shatterSound = ReadInt16();
+
+		if (staticObj.ObjectNumber >= StaticObjectsLUTSize)
 		{
-			TENLog("Static with ID " + std::to_string(meshID) + " detected, while maximum is " + std::to_string(MAX_STATICS) + ". " +
-				   "Change static mesh ID in WadTool to a value below maximum.", LogLevel::Warning);
-			
-			meshID = 0;
+			int* LUT = (int*)malloc(staticObj.ObjectNumber * sizeof(int));
+			memcpy(LUT, StaticObjectsLUT, StaticObjectsLUTSize * sizeof(int));
+			delete StaticObjectsLUT;
+			StaticObjectsLUT = LUT;
+			StaticObjectsLUTSize = staticObj.ObjectNumber;
 		}
 
-		StaticObjectsIds.push_back(meshID);
-
-		StaticObjects[meshID].meshNumber = (short)ReadInt32();
-
-		StaticObjects[meshID].visibilityBox.X1 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.X2 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Y1 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Y2 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Z1 = ReadInt16();
-		StaticObjects[meshID].visibilityBox.Z2 = ReadInt16();
-
-		StaticObjects[meshID].collisionBox.X1 = ReadInt16();
-		StaticObjects[meshID].collisionBox.X2 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Y1 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Y2 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Z1 = ReadInt16();
-		StaticObjects[meshID].collisionBox.Z2 = ReadInt16();
-
-		StaticObjects[meshID].flags = (short)ReadInt16();
-
-		StaticObjects[meshID].shatterType = (ShatterType)ReadInt16();
-		StaticObjects[meshID].shatterSound = (short)ReadInt16();
+		StaticObjectsLUT[staticObj.ObjectNumber] = (int)StaticObjects.size();
+		StaticObjects.push_back(staticObj);
 	}
 }
 
 void LoadCameras()
 {
-	int numCameras = ReadInt32();
-	TENLog("Cameras: " + std::to_string(numCameras), LogLevel::Info);
+	int cameraCount = ReadInt32();
+	TENLog("Camera count: " + std::to_string(cameraCount), LogLevel::Info);
 
-	g_Level.Cameras.reserve(numCameras);
-	for (int i = 0; i < numCameras; i++)
+	g_Level.Cameras.reserve(cameraCount);
+	for (int i = 0; i < cameraCount; i++)
 	{
 		auto& camera = g_Level.Cameras.emplace_back();
 		camera.Index = i;
@@ -509,11 +520,11 @@ void LoadCameras()
 	if (NumberSpotcams != 0)
 		ReadBytes(SpotCam, NumberSpotcams * sizeof(SPOTCAM));
 
-	int numSinks = ReadInt32();
-	TENLog("Sinks: " + std::to_string(numSinks), LogLevel::Info);
+	int sinkCount = ReadInt32();
+	TENLog("Sink count: " + std::to_string(sinkCount), LogLevel::Info);
 
-	g_Level.Sinks.reserve(numSinks);
-	for (int i = 0; i < numSinks; i++)
+	g_Level.Sinks.reserve(sinkCount);
+	for (int i = 0; i < sinkCount; i++)
 	{
 		auto& sink = g_Level.Sinks.emplace_back();
 		sink.Position.x = ReadInt32();
@@ -533,13 +544,13 @@ void LoadTextures()
 
 	int size;
 
-	int numTextures = ReadInt32();
-	TENLog("Room textures: " + std::to_string(numTextures), LogLevel::Info);
+	int textureCount = ReadInt32();
+	TENLog("Room texture count: " + std::to_string(textureCount), LogLevel::Info);
 
-	g_Level.RoomTextures.reserve(numTextures);
-	for (int i = 0; i < numTextures; i++)
+	g_Level.RoomTextures.reserve(textureCount);
+	for (int i = 0; i < textureCount; i++)
 	{
-		TEXTURE texture;
+		auto texture = TEXTURE{};
 
 		texture.width = ReadInt32();
 		texture.height = ReadInt32();
@@ -559,13 +570,13 @@ void LoadTextures()
 		g_Level.RoomTextures.push_back(texture);
 	}
 
-	numTextures = ReadInt32();
-	TENLog("Object textures: " + std::to_string(numTextures), LogLevel::Info);
+	textureCount = ReadInt32();
+	TENLog("Object texture count: " + std::to_string(textureCount), LogLevel::Info);
 
-	g_Level.MoveablesTextures.reserve(numTextures);
-	for (int i = 0; i < numTextures; i++)
+	g_Level.MoveablesTextures.reserve(textureCount);
+	for (int i = 0; i < textureCount; i++)
 	{
-		TEXTURE texture;
+		auto texture = TEXTURE{};
 
 		texture.width = ReadInt32();
 		texture.height = ReadInt32();
@@ -585,13 +596,13 @@ void LoadTextures()
 		g_Level.MoveablesTextures.push_back(texture);
 	}
 
-	numTextures = ReadInt32();
-	TENLog("Static textures: " + std::to_string(numTextures), LogLevel::Info);
+	textureCount = ReadInt32();
+	TENLog("Static texture count: " + std::to_string(textureCount), LogLevel::Info);
 
-	g_Level.StaticsTextures.reserve(numTextures);
-	for (int i = 0; i < numTextures; i++)
+	g_Level.StaticsTextures.reserve(textureCount);
+	for (int i = 0; i < textureCount; i++)
 	{
-		TEXTURE texture;
+		auto texture = TEXTURE{};
 
 		texture.width = ReadInt32();
 		texture.height = ReadInt32();
@@ -611,13 +622,13 @@ void LoadTextures()
 		g_Level.StaticsTextures.push_back(texture);
 	}
 
-	numTextures = ReadInt32();
-	TENLog("Anim textures: " + std::to_string(numTextures), LogLevel::Info);
+	textureCount = ReadInt32();
+	TENLog("Anim texture count: " + std::to_string(textureCount), LogLevel::Info);
 
-	g_Level.AnimatedTextures.reserve(numTextures);
-	for (int i = 0; i < numTextures; i++)
+	g_Level.AnimatedTextures.reserve(textureCount);
+	for (int i = 0; i < textureCount; i++)
 	{
-		TEXTURE texture;
+		auto texture = TEXTURE{};
 
 		texture.width = ReadInt32();
 		texture.height = ReadInt32();
@@ -637,13 +648,13 @@ void LoadTextures()
 		g_Level.AnimatedTextures.push_back(texture);
 	}
 
-	numTextures = ReadInt32();
-	TENLog("Sprite textures: " + std::to_string(numTextures), LogLevel::Info);
+	textureCount = ReadInt32();
+	TENLog("Sprite texture count: " + std::to_string(textureCount), LogLevel::Info);
 
-	g_Level.SpritesTextures.reserve(numTextures);
-	for (int i = 0; i < numTextures; i++)
+	g_Level.SpritesTextures.reserve(textureCount);
+	for (int i = 0; i < textureCount; i++)
 	{
-		TEXTURE texture;
+		auto texture = TEXTURE{};
 
 		texture.width = ReadInt32();
 		texture.height = ReadInt32();
@@ -776,7 +787,7 @@ void LoadStaticRoomData()
 	constexpr auto SECTOR_AABB_EXTENTS_BASE	= Vector3(BLOCK(0.5f), 0.0f, BLOCK(0.5f));
 
 	int roomCount = ReadInt32();
-	TENLog("Rooms: " + std::to_string(roomCount), LogLevel::Info);
+	TENLog("Room count: " + std::to_string(roomCount), LogLevel::Info);
 
 	g_Level.Rooms.reserve(roomCount);
 	for (int i = 0; i < roomCount; i++)
@@ -1002,11 +1013,9 @@ void LoadRooms()
 	LoadStaticRoomData();
 	BuildOutsideRoomsTable();
 
-	int numFloorData = ReadInt32(); 
-	g_Level.FloorData.resize(numFloorData);
-	ReadBytes(g_Level.FloorData.data(), numFloorData * sizeof(short));
-
-	InitializeNeighborRoomList();
+	int floordataCount = ReadInt32(); 
+	g_Level.FloorData.resize(floordataCount);
+	ReadBytes(g_Level.FloorData.data(), floordataCount * sizeof(short));
 }
 
 void FreeLevel(bool partial)
@@ -1039,7 +1048,6 @@ void FreeLevel(bool partial)
 	g_Renderer.FreeRendererData();
 
 	MoveablesIds.resize(0);
-	StaticObjectsIds.resize(0);
 	SpriteSequencesIds.resize(0);
 
 	g_Level.RoomTextures.resize(0);
@@ -1082,11 +1090,11 @@ size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream)
 
 void LoadSoundSources()
 {
-	int numSoundSources = ReadInt32();
-	TENLog("Sound sources: " + std::to_string(numSoundSources), LogLevel::Info);
+	int soundSourceCount = ReadInt32();
+	TENLog("Sound source count: " + std::to_string(soundSourceCount), LogLevel::Info);
 
-	g_Level.SoundSources.reserve(numSoundSources);
-	for (int i = 0; i < numSoundSources; i++)
+	g_Level.SoundSources.reserve(soundSourceCount);
+	for (int i = 0; i < soundSourceCount; i++)
 	{
 		auto& source = g_Level.SoundSources.emplace_back(SoundSourceInfo{});
 
@@ -1103,19 +1111,19 @@ void LoadSoundSources()
 
 void LoadAnimatedTextures()
 {
-	int numAnimatedTextures = ReadInt32();
-	TENLog("Anim textures: " + std::to_string(numAnimatedTextures), LogLevel::Info);
+	int animatedTextureCount = ReadInt32();
+	TENLog("Anim texture count: " + std::to_string(animatedTextureCount), LogLevel::Info);
 
-	for (int i = 0; i < numAnimatedTextures; i++)
+	for (int i = 0; i < animatedTextureCount; i++)
 	{
-		ANIMATED_TEXTURES_SEQUENCE sequence;
+		auto sequence = ANIMATED_TEXTURES_SEQUENCE{};
 		sequence.atlas = ReadInt32();
 		sequence.Fps = ReadInt32();
 		sequence.numFrames = ReadInt32();
 
 		for (int j = 0; j < sequence.numFrames; j++)
 		{
-			ANIMATED_TEXTURES_FRAME frame;
+			auto frame = ANIMATED_TEXTURES_FRAME{};
 			frame.x1 = ReadFloat();
 			frame.y1 = ReadFloat();
 			frame.x2 = ReadFloat();
@@ -1133,11 +1141,11 @@ void LoadAnimatedTextures()
 
 void LoadAIObjects()
 {
-	int nAIObjects = ReadInt32();
-	TENLog("AI objects: " + std::to_string(nAIObjects), LogLevel::Info);
+	int aiObjectCount = ReadInt32();
+	TENLog("AI object count: " + std::to_string(aiObjectCount), LogLevel::Info);
 
-	g_Level.AIObjects.reserve(nAIObjects);
-	for (int i = 0; i < nAIObjects; i++)
+	g_Level.AIObjects.reserve(aiObjectCount);
+	for (int i = 0; i < aiObjectCount; i++)
 	{
 		auto& obj = g_Level.AIObjects.emplace_back();
 
@@ -1184,7 +1192,7 @@ void LoadEventSets()
 		return;
 
 	int globalEventSetCount = ReadInt32();
-	TENLog("Global event sets: " + std::to_string(globalEventSetCount), LogLevel::Info);
+	TENLog("Global event set count: " + std::to_string(globalEventSetCount), LogLevel::Info);
 
 	for (int i = 0; i < globalEventSetCount; i++)
 	{
@@ -1203,7 +1211,7 @@ void LoadEventSets()
 	}
 
 	int volumeEventSetCount = ReadInt32();
-	TENLog("Volume event sets: " + std::to_string(volumeEventSetCount), LogLevel::Info);
+	TENLog("Volume event set count: " + std::to_string(volumeEventSetCount), LogLevel::Info);
 
 	for (int i = 0; i < volumeEventSetCount; i++)
 	{
@@ -1445,13 +1453,12 @@ bool LoadLevel(const std::string& path, bool partial)
 
 		if (!partial)
 		{
-			g_Renderer.PrepareData();
+			g_Renderer.PrepareDataForTheRenderer();
 			SetScreenFadeOut(FADE_SCREEN_SPEED, true);
 			StopSoundTracks(SOUND_XFADETIME_BGM_START);
 		}
 		else
 		{
-			g_Renderer.ResetData();
 			SetScreenFadeIn(FADE_SCREEN_SPEED, true);
 			StopSoundTracks(SOUND_XFADETIME_LEVELJUMP);
 		}
@@ -1489,29 +1496,29 @@ void LoadSamples()
 	g_Level.SoundMap.resize(soundMapSize);
 	ReadBytes(g_Level.SoundMap.data(), soundMapSize * sizeof(short));
 
-	int numSampleInfos = ReadInt32();
-	if (!numSampleInfos)
+	int sampleInfoCount = ReadInt32();
+	if (!sampleInfoCount)
 	{
-		TENLog("No samples were found and loaded.", LogLevel::Warning);
+		TENLog("No samples were found or loaded.", LogLevel::Warning);
 		return;
 	}
 
-	TENLog("Sample infos: " + std::to_string(numSampleInfos), LogLevel::Info);
+	TENLog("Sample info count: " + std::to_string(sampleInfoCount), LogLevel::Info);
 
-	g_Level.SoundDetails.resize(numSampleInfos);
-	ReadBytes(g_Level.SoundDetails.data(), numSampleInfos * sizeof(SampleInfo));
+	g_Level.SoundDetails.resize(sampleInfoCount);
+	ReadBytes(g_Level.SoundDetails.data(), sampleInfoCount * sizeof(SampleInfo));
 
-	int numSamples = ReadInt32();
-	if (numSamples <= 0)
+	int sampleCount = ReadInt32();
+	if (sampleCount <= 0)
 		return;
 
-	TENLog("Samples: " + std::to_string(numSamples), LogLevel::Info);
+	TENLog("Sample count: " + std::to_string(sampleCount), LogLevel::Info);
 
-	int uncompressedSize;
-	int compressedSize;
+	int uncompressedSize = 0;
+	int compressedSize = 0;
 	char* buffer = (char*)malloc(2 * 1024 * 1024);
 
-	for (int i = 0; i < numSamples; i++)
+	for (int i = 0; i < sampleCount; i++)
 	{
 		uncompressedSize = ReadInt32();
 		compressedSize = ReadInt32();
@@ -1525,42 +1532,42 @@ void LoadSamples()
 void LoadBoxes()
 {
 	// Read boxes
-	int numBoxes = ReadInt32();
-	TENLog("Boxes: " + std::to_string(numBoxes), LogLevel::Info);
-	g_Level.PathfindingBoxes.resize(numBoxes);
-	ReadBytes(g_Level.PathfindingBoxes.data(), numBoxes * sizeof(BOX_INFO));
+	int boxCount = ReadInt32();
+	TENLog("Box count: " + std::to_string(boxCount), LogLevel::Info);
+	g_Level.PathfindingBoxes.resize(boxCount);
+	ReadBytes(g_Level.PathfindingBoxes.data(), boxCount * sizeof(BOX_INFO));
 
 	// Read overlaps
-	int numOverlaps = ReadInt32();
-	TENLog("Overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
-	g_Level.Overlaps.resize(numOverlaps);
-	ReadBytes(g_Level.Overlaps.data(), numOverlaps * sizeof(OVERLAP));
+	int overlapCount = ReadInt32();
+	TENLog("Overlap count: " + std::to_string(overlapCount), LogLevel::Info);
+	g_Level.Overlaps.resize(overlapCount);
+	ReadBytes(g_Level.Overlaps.data(), overlapCount * sizeof(OVERLAP));
 
 	// Read zones
-	int numZoneGroups = ReadInt32();
-	TENLog("Zone groups: " + std::to_string(numZoneGroups), LogLevel::Info);
+	int zoneGroupCount = ReadInt32();
+	TENLog("Zone group count: " + std::to_string(zoneGroupCount), LogLevel::Info);
 
 	for (int i = 0; i < 2; i++)
 	{
-		for (int j = 0; j < numZoneGroups; j++)
+		for (int j = 0; j < zoneGroupCount; j++)
 		{
 			if (j >= (int)ZoneType::MaxZone)
 			{
-				int excessiveZoneGroups = numZoneGroups - j + 1;
+				int excessiveZoneGroups = zoneGroupCount - j + 1;
 				TENLog("Level file contains extra pathfinding data, number of excessive zone groups is " + 
 					std::to_string(excessiveZoneGroups) + ". These zone groups will be ignored.", LogLevel::Warning);
-				CurrentDataPtr += numBoxes * sizeof(int);
+				CurrentDataPtr += boxCount * sizeof(int);
 			}
 			else
 			{
-				g_Level.Zones[j][i].resize(numBoxes);
-				ReadBytes(g_Level.Zones[j][i].data(), numBoxes * sizeof(int));
+				g_Level.Zones[j][i].resize(boxCount);
+				ReadBytes(g_Level.Zones[j][i].data(), boxCount * sizeof(int));
 			}
 		}
 	}
 
 	// By default all blockable boxes are blocked
-	for (int i = 0; i < numBoxes; i++)
+	for (int i = 0; i < boxCount; i++)
 	{
 		if (g_Level.PathfindingBoxes[i].flags & BLOCKABLE)
 			g_Level.PathfindingBoxes[i].flags |= BLOCKED;
@@ -1618,12 +1625,12 @@ bool LoadLevelFile(int levelIndex)
 
 void LoadSprites()
 {
-	int numSprites = ReadInt32();
-	g_Level.Sprites.resize(numSprites);
+	int spriteCount = ReadInt32();
+	g_Level.Sprites.resize(spriteCount);
 
-	TENLog("Sprites: " + std::to_string(numSprites), LogLevel::Info);
+	TENLog("Sprite count: " + std::to_string(spriteCount), LogLevel::Info);
 
-	for (int i = 0; i < numSprites; i++)
+	for (int i = 0; i < spriteCount; i++)
 	{
 		auto* spr = &g_Level.Sprites[i];
 		spr->tile = ReadInt32();
@@ -1637,17 +1644,19 @@ void LoadSprites()
 		spr->y4 = ReadFloat();
 	}
 
-	int numSequences = ReadInt32();
+	int spriteSeqCount = ReadInt32();
 
-	TENLog("Sprite sequences: " + std::to_string(numSequences), LogLevel::Info);
+	TENLog("Sprite sequence count: " + std::to_string(spriteSeqCount), LogLevel::Info);
 
-	for (int i = 0; i < numSequences; i++)
+	for (int i = 0; i < spriteSeqCount; i++)
 	{
 		int spriteID = ReadInt32();
 		short negLength = ReadInt16();
 		short offset = ReadInt16();
 		if (spriteID >= ID_NUMBER_OBJECTS)
-			StaticObjects[spriteID - ID_NUMBER_OBJECTS].meshNumber = offset;
+		{
+			GetStaticObject(spriteID - ID_NUMBER_OBJECTS).meshNumber = offset;
+		}
 		else
 		{
 			Objects[spriteID].nmeshes = negLength;

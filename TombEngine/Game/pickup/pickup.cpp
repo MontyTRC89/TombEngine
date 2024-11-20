@@ -903,7 +903,7 @@ void DropPickups(ItemInfo* item)
 
 		for (auto* staticPtr : collObjects.Statics)
 		{
-			auto& object = StaticObjects[staticPtr->staticNumber];
+			auto& object = GetStaticObject(staticPtr->staticNumber);
 
 			auto box = object.collisionBox.ToBoundingOrientedBox(staticPtr->pos);
 			if (box.Intersects(sphere))
@@ -1270,7 +1270,7 @@ void SearchObjectControl(short itemNumber)
 				{
 					PickedUpObject(*item2);
 					g_Hud.PickupSummary.AddDisplayPickup(*item2);
-					KillItem(item->ItemFlags[1]);
+					HideOrDisablePickup(*item2);
 				}
 				else
 				{

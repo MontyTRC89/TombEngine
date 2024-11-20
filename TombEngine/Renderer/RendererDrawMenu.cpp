@@ -1207,7 +1207,7 @@ namespace TEN::Renderer
 		const auto& room = g_Level.Rooms[playerItem.RoomNumber];
 
 		float aspectRatio = _screenWidth / (float)_screenHeight;
-		int thumbWidth = _screenWidth / 6;
+		int thumbWidth = _screenWidth / 8;
 		auto rect = RECT{};
 		int thumbY = 0;
 
@@ -1282,6 +1282,22 @@ namespace TEN::Renderer
 				_spriteBatch->Draw(_SMAABlendRenderTarget.ShaderResourceView.Get(), rect);
 				thumbY += thumbWidth / aspectRatio;
 			}
+
+			rect.left = _screenWidth - thumbWidth;
+			rect.top = thumbY;
+			rect.right = rect.left + thumbWidth;
+			rect.bottom = rect.top + thumbWidth;
+
+			_spriteBatch->Draw(_roomAmbientMapFront.ShaderResourceView.Get(), rect);
+			thumbY += thumbWidth;
+
+			rect.left = _screenWidth - thumbWidth;
+			rect.top = thumbY;
+			rect.right = rect.left + thumbWidth;
+			rect.bottom = rect.top + thumbWidth;
+
+			_spriteBatch->Draw(_roomAmbientMapBack.ShaderResourceView.Get(), rect);
+			thumbY += thumbWidth;
 
 			_spriteBatch->End();
 

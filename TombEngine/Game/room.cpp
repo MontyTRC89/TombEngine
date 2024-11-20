@@ -655,9 +655,6 @@ void ResetRoomData()
 			sector.Stopper = false;
 			sector.BridgeItemNumbers.clear();
 		}
-
-		for (auto& mesh : room.mesh)
-			mesh.Dirty = true;
 	}
 
 	// Make sure no pathfinding boxes are blocked (either by doors or by other door-like objects).
@@ -777,11 +774,11 @@ GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox)
 
 	if (getVisibilityBox)
 	{
-		bounds = StaticObjects[mesh.staticNumber].visibilityBox * mesh.scale;
+		bounds = GetStaticObject(mesh.staticNumber).visibilityBox * mesh.scale;
 	}
 	else
 	{
-		bounds = StaticObjects[mesh.staticNumber].collisionBox * mesh.scale;
+		bounds = GetStaticObject(mesh.staticNumber).collisionBox * mesh.scale;
 	}
 
 	return bounds;

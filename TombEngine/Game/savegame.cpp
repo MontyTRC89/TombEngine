@@ -1075,17 +1075,23 @@ const std::vector<byte> SaveGame::Build()
 	std::vector<flatbuffers::Offset<Save::EventSet>> globalEventSets{};
 	for (int j = 0; j < g_Level.GlobalEventSets.size(); j++)
 	{
+		std::vector<bool> statuses = {};
 		std::vector<int> callCounters = {};
 
 		for (int k = 0; k < g_Level.GlobalEventSets[j].Events.size(); k++)
+		{
+			statuses.push_back(g_Level.GlobalEventSets[j].Events[k].Enabled);
 			callCounters.push_back(g_Level.GlobalEventSets[j].Events[k].CallCounter);
+		}
 
-		auto vec = fbb.CreateVector(callCounters);
+		auto vecStatuses = fbb.CreateVector(statuses);
+		auto vecCounters = fbb.CreateVector(callCounters);
 
 		Save::EventSetBuilder eventSet{ fbb };
 
 		eventSet.add_index(j);
-		eventSet.add_call_counters(vec);
+		eventSet.add_statuses(vecStatuses);
+		eventSet.add_call_counters(vecCounters);
 
 		globalEventSets.push_back(eventSet.Finish());
 	}
@@ -1095,17 +1101,23 @@ const std::vector<byte> SaveGame::Build()
 	std::vector<flatbuffers::Offset<Save::EventSet>> volumeEventSets{};
 	for (int j = 0; j < g_Level.VolumeEventSets.size(); j++)
 	{
+		std::vector<bool> statuses = {};
 		std::vector<int> callCounters = {};
 
 		for (int k = 0; k < g_Level.VolumeEventSets[j].Events.size(); k++)
+		{
+			statuses.push_back(g_Level.VolumeEventSets[j].Events[k].Enabled);
 			callCounters.push_back(g_Level.VolumeEventSets[j].Events[k].CallCounter);
+		}
 
-		auto vec = fbb.CreateVector(callCounters);
+		auto vecStatuses = fbb.CreateVector(statuses);
+		auto vecCounters = fbb.CreateVector(callCounters);
 
 		Save::EventSetBuilder eventSet{ fbb };
 
 		eventSet.add_index(j);
-		eventSet.add_call_counters(vec);
+		eventSet.add_statuses(vecStatuses);
+		eventSet.add_call_counters(vecCounters);
 
 		volumeEventSets.push_back(eventSet.Finish());
 	}
@@ -1682,7 +1694,10 @@ static void ParseLua(const Save::SaveGame* s)
 		{
 			auto setSaved = s->volume_event_sets()->Get(i);
 			for (int j = 0; j < setSaved->call_counters()->size(); ++j)
+			{
+				g_Level.VolumeEventSets[setSaved->index()].Events[j].Enabled = setSaved->statuses()->Get(j);
 				g_Level.VolumeEventSets[setSaved->index()].Events[j].CallCounter = setSaved->call_counters()->Get(j);
+			}
 		}
 	}
 
@@ -1692,7 +1707,10 @@ static void ParseLua(const Save::SaveGame* s)
 		{
 			auto setSaved = s->global_event_sets()->Get(i);
 			for (int j = 0; j < setSaved->call_counters()->size(); ++j)
+			{
+				g_Level.GlobalEventSets[setSaved->index()].Events[j].Enabled = setSaved->statuses()->Get(j);
 				g_Level.GlobalEventSets[setSaved->index()].Events[j].CallCounter = setSaved->call_counters()->Get(j);
+			}
 		}
 	}
 
@@ -2229,6 +2247,8 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		room->mesh[number].flags = staticMesh->flags();
 		room->mesh[number].HitPoints = staticMesh->hit_points();
+
+		room->mesh[number].Dirty = true;
 		
 		if (!room->mesh[number].flags)
 		{

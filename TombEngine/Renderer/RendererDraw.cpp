@@ -1698,8 +1698,8 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// TODO: Needs improvements before enabling it.
-		//RenderSimpleSceneToParaboloid(&_roomAmbientMapsCache[ambientMapCacheIndex].Front, LaraItem->Pose.Position.ToVector3(), 1);
-		//RenderSimpleSceneToParaboloid(&_roomAmbientMapsCache[ambientMapCacheIndex].Back, LaraItem->Pose.Position.ToVector3(), -1);
+		// RenderSimpleSceneToParaboloid(&_roomAmbientMapFront, LaraItem->Pose.Position.ToVector3(), 1);
+		// RenderSimpleSceneToParaboloid(&_roomAmbientMapBack, LaraItem->Pose.Position.ToVector3(), -1);
 
 		// Bind and clear render target.
 		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), _debugPage == RendererDebugPage::WireframeMode ? Colors::DimGray : Colors::Black);
@@ -2057,7 +2057,7 @@ namespace TEN::Renderer
 			// final pixel colors
 			if (Vector3::Distance(room->BoundingBox.Center, LaraItem->Pose.Position.ToVector3()) >= BLOCK(40))
 			{
-				continue;
+				//continue;
 			}
 			  
 			cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[_rooms[i].RoomNumber].flags & ENV_FLAG_WATER;
@@ -2406,7 +2406,7 @@ namespace TEN::Renderer
 				std::vector<RendererStatic*> statics = it->second;
 
 				RendererStatic* refStatic = statics[0];
-				RendererObject& refStaticObj = *_staticObjects[refStatic->ObjectNumber];
+				RendererObject& refStaticObj = GetStaticRendererObject(refStatic->ObjectNumber);
 				if (refStaticObj.ObjectMeshes.size() == 0)
 					continue;
 
@@ -2484,7 +2484,7 @@ namespace TEN::Renderer
 				std::vector<RendererStatic*> statics = it->second;
 
 				RendererStatic* refStatic = statics[0];
-				RendererObject& refStaticObj = *_staticObjects[refStatic->ObjectNumber];
+				RendererObject& refStaticObj = GetStaticRendererObject(refStatic->ObjectNumber);
 				if (refStaticObj.ObjectMeshes.size() == 0)
 					continue;
 
@@ -3530,7 +3530,7 @@ namespace TEN::Renderer
 		_stStatic.World = objectInfo->Static->World;
 		_stStatic.Color = objectInfo->Static->Color;
 		_stStatic.AmbientLight = objectInfo->Room->AmbientLight;
-		_stStatic.LightMode = (int)_staticObjects[objectInfo->Static->ObjectNumber]->ObjectMeshes[0]->LightMode;
+		_stStatic.LightMode = (int)GetStaticRendererObject(objectInfo->Static->ObjectNumber).ObjectMeshes[0]->LightMode;
 		BindStaticLights(objectInfo->Static->LightsToDraw);
 		_cbStatic.UpdateData(_stStatic, _context.Get());
 

@@ -168,6 +168,9 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 
 	ScriptReserved_SetVisible, &Moveable::SetVisible,
 
+	ScriptReserved_SetCollidable, & Moveable::SetCollidable,
+	ScriptReserved_GetCollidable, & Moveable::GetCollidable,
+
 /// Explode item. This also kills and disables item.
 // @function Moveable:Explode
 	ScriptReserved_Explode, &Moveable::Explode,
@@ -1170,6 +1173,22 @@ void Moveable::Shatter()
 
 	CreatureDie(m_num, false);
 	KillItem(m_num);
+}
+
+/// Get the item's collision state.
+// @treturn bool item's collision state
+// @function Moveable:GetCollidable
+bool Moveable::GetCollidable()
+{
+	return m_item->Collidable;
+}
+
+/// Set the item's collision.
+// @bool collidable true if the caller should be collidable, false if no collision should occur.
+// @function Moveable:SetCollidable
+void Moveable::SetCollidable(bool isCollidable)
+{
+	m_item->Collidable = isCollidable;
 }
 
 /// Make the item invisible. Alias for `Moveable:SetVisible(false)`.

@@ -659,10 +659,7 @@ void CalculateSpotCameras()
 				SpotcamPaused = 0;
 
 				if (LastCamera >= CurrentSplineCamera)
-				{
-					Camera.DisableInterpolation = true;
 					return;
-				}
 
 				if (s->flags & SCF_LOOP_SEQUENCE)
 				{

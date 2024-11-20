@@ -12,8 +12,6 @@ constexpr auto DEFAULT_RADIUS = 10;
 constexpr auto GRAVITY		  = 6.0f;
 constexpr auto SWAMP_GRAVITY  = GRAVITY / 3.0f;
 
-constexpr auto MAX_STATICS = 1000;
-
 enum JointRotationFlags
 {
 	ROT_X = 1 << 2,
@@ -134,10 +132,13 @@ struct StaticInfo
 	GameBoundingBox collisionBox;
 	ShatterType shatterType;
 	int shatterSound;
+	int ObjectNumber;
 };
 
-extern ObjectHandler Objects;
-extern StaticInfo StaticObjects[MAX_STATICS];
+extern ObjectHandler					   Objects;
+extern std::vector<StaticInfo>			   StaticObjects;
+
+#define GetStaticObject(x) StaticObjects[StaticObjectsLUT[x]]
 
 void InitializeGameFlags();
 void InitializeSpecialEffects();
