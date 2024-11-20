@@ -77,6 +77,7 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
@@ -142,6 +143,10 @@
 	<tr>
 	<td class="name" ><a href="#MakeEarthquake">MakeEarthquake(strength)</a></td>
 	<td class="summary">Make an earthquake</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetWind">GetWind()</a></td>
+	<td class="summary">Get the wind vector for the current game frame.</td>
 	</tr>
 </table>
 
@@ -494,6 +499,28 @@
         </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetWind"></a>
+    <strong>GetWind()</strong>
+    </dt>
+    <dd>
+    Get the wind vector for the current game frame.
+ This represents the 3D displacement applied by the engine on things like particles affected by wind.()
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        Wind vector.
+    </ol>
 
 
 

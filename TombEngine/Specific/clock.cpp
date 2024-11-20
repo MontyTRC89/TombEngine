@@ -69,7 +69,6 @@ float HighFramerateSynchronizer::GetInterpolationFactor()
 	return std::min((float)_controlDelay / (float)CONTROL_FRAME_TIME, 1.0f);
 }
 
-
 int TimeSync()
 {
 	auto ct = LARGE_INTEGER{};

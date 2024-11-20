@@ -746,10 +746,10 @@ namespace TEN::Renderer
 		constexpr auto COUNT_STRING_INF	   = "Inf";
 		constexpr auto COUNT_STRING_OFFSET = Vector2(DISPLAY_SPACE_RES.x / 40, 0.0f);
 
-		auto pos = Vector2::Lerp(pickup.PrevPosition, pickup.Position, _interpolationFactor);
-		auto orient = EulerAngles::Lerp(pickup.PrevOrientation, pickup.Orientation, _interpolationFactor);
-		float scale = Lerp(pickup.PrevScale, pickup.Scale, _interpolationFactor);
-		float opacity = Lerp(pickup.PrevOpacity, pickup.Opacity, _interpolationFactor);
+		auto pos = Vector2::Lerp(pickup.PrevPosition, pickup.Position, GetInterpolationFactor());
+		auto orient = EulerAngles::Lerp(pickup.PrevOrientation, pickup.Orientation, GetInterpolationFactor());
+		float scale = Lerp(pickup.PrevScale, pickup.Scale, GetInterpolationFactor());
+		float opacity = Lerp(pickup.PrevOpacity, pickup.Opacity, GetInterpolationFactor());
 
 		// Draw display pickup.
 		DrawObjectIn2DSpace(pickup.ObjectID, pos, orient, scale);
@@ -1106,6 +1106,46 @@ namespace TEN::Renderer
 		SetTextureOrDefault(_loadingScreenTexture, fileName);
 	}
 
+	void Renderer::RenderFreezeMode(float interpFactor, bool staticBackground)
+	{
+		if (staticBackground)
+		{	
+			// Set basic render states.
+			SetBlendMode(BlendMode::Opaque);
+			SetCullMode(CullMode::CounterClockwise);
+
+			// Clear screen
+			_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
+			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+			// Bind back buffer.
+			_context->OMSetRenderTargets(1, _backBuffer.RenderTargetView.GetAddressOf(), _backBuffer.DepthStencilView.Get());
+			_context->RSSetViewports(1, &_viewport);
+			ResetScissor();
+
+			// Draw full screen background.
+			DrawFullScreenQuad(_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3::One);
+		}
+		else
+		{
+			InterpolateCamera(interpFactor);
+			RenderScene(&_backBuffer, _gameCamera, SceneRenderMode::NoHud);
+		}
+
+		// TODO: Put 3D object drawing management here (don't forget about interpolation!)
+		// Draw3DObjectsIn2DSpace(_gameCamera);
+
+		// Draw display sprites sorted by priority.
+		CollectDisplaySprites(_gameCamera);
+		DrawDisplaySprites(_gameCamera);
+		DrawAllStrings();
+
+		ClearScene();
+
+		_context->ClearState();
+		_swapChain->Present(1, 0);
+	}
+
 	void Renderer::RenderLoadingScreen(float percentage)
 	{
 		// Set basic render states.
@@ -1203,7 +1243,7 @@ namespace TEN::Renderer
 		const auto& room = g_Level.Rooms[LaraItem->RoomNumber];
 
 		float aspectRatio = _screenWidth / (float)_screenHeight;
-		int thumbWidth = _screenWidth / 6;
+		int thumbWidth = _screenWidth / 8;
 		auto rect = RECT{};
 		int thumbY = 0;
 
@@ -1278,6 +1318,22 @@ namespace TEN::Renderer
 				_spriteBatch->Draw(_SMAABlendRenderTarget.ShaderResourceView.Get(), rect);
 				thumbY += thumbWidth / aspectRatio;
 			}
+
+			rect.left = _screenWidth - thumbWidth;
+			rect.top = thumbY;
+			rect.right = rect.left + thumbWidth;
+			rect.bottom = rect.top + thumbWidth;
+
+			_spriteBatch->Draw(_roomAmbientMapFront.ShaderResourceView.Get(), rect);
+			thumbY += thumbWidth;
+
+			rect.left = _screenWidth - thumbWidth;
+			rect.top = thumbY;
+			rect.right = rect.left + thumbWidth;
+			rect.bottom = rect.top + thumbWidth;
+
+			_spriteBatch->Draw(_roomAmbientMapBack.ShaderResourceView.Get(), rect);
+			thumbY += thumbWidth;
 
 			_spriteBatch->End();
 

@@ -903,7 +903,7 @@ void DropPickups(ItemInfo* item)
 
 		for (auto* staticPtr : collObjects.Statics)
 		{
-			auto& object = StaticObjects[staticPtr->staticNumber];
+			auto& object = Statics[staticPtr->staticNumber];
 
 			auto box = object.collisionBox.ToBoundingOrientedBox(staticPtr->pos);
 			if (box.Intersects(sphere))

@@ -37,7 +37,7 @@ namespace TEN::Renderer
 		_items.resize(0);
 		_effects.resize(0);
 		_moveableObjects.resize(0);
-		_staticObjects.resize(0);
+		_staticObjects.clear();
 		_sprites.resize(0);
 		_rooms.resize(0);
 		_roomTextures.resize(0);
