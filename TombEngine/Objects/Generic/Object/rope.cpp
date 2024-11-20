@@ -38,6 +38,7 @@ namespace TEN::Entities::Generic
 		PrepareRope(&rope, &itemPos, &pos, CLICK(0.5f), item);
 
 		item->TriggerFlags = short(Ropes.size());
+		item->Collidable = false;
 
 		Ropes.push_back(rope);
 	}

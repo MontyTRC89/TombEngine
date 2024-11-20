@@ -13,6 +13,7 @@
 #include <set>
 #include <SimpleMath.h>
 #include <sol.hpp>
+#include <stack>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,8 +23,10 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
+constexpr auto NO_VALUE = -1;
+
 #include "Game/Debug/Debug.h"
+#include "Physics/Physics.h"
 
 using namespace TEN::Debug;
-
-constexpr auto NO_VALUE = -1;
+using namespace TEN::Physics;

@@ -51,20 +51,20 @@ namespace TEN::Entities::Generic
 		item.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(item);
 
-		// Initialize routines.
+		item.ItemFlags[0] = item.Pose.Position.y;
+		item.ItemFlags[1] = 1;
+
 		bridge.GetFloorHeight = GetTwoBlockPlatformFloorHeight;
 		bridge.GetCeilingHeight = GetTwoBlockPlatformCeilingHeight;
 		bridge.GetFloorBorder = GetTwoBlockPlatformFloorBorder;
 		bridge.GetCeilingBorder = GetTwoBlockPlatformCeilingBorder;
-
-		item.ItemFlags[0] = item.Pose.Position.y;
-		item.ItemFlags[1] = 1;
-		UpdateBridgeItem(item);
+		bridge.Initialize(item);
 	}
 
 	void TwoBlockPlatformControl(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(*item);
 
 		if (TriggerActive(item))
 		{
@@ -82,19 +82,20 @@ namespace TEN::Entities::Generic
 					return;
 				}
 
+				// @BRIDGEME
 				int distToPortal = *&g_Level.Rooms[item->RoomNumber].TopHeight - item->Pose.Position.y;
 				if (distToPortal <= speed)
-					UpdateBridgeItem(*item);
+					bridge.Update(*item);
 
-				auto probe = GetPointCollision(*item);
+				auto pointColl = GetPointCollision(*item);
 
-				item->Floor = probe.GetFloorHeight();
+				item->Floor = pointColl.GetFloorHeight();
 
-				if (probe.GetRoomNumber() != item->RoomNumber)
+				if (pointColl.GetRoomNumber() != item->RoomNumber)
 				{
-					UpdateBridgeItem(*item, BridgeUpdateType::Remove);
-					ItemNewRoom(itemNumber, probe.GetRoomNumber());
-					UpdateBridgeItem(*item);
+					bridge.Disable(*item);
+					ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
+					bridge.Enable(*item);
 				}
 			}
 			else
@@ -146,5 +147,7 @@ namespace TEN::Entities::Generic
 				}
 			}
 		}
+
+		bridge.Update(*item);
 	}
 }
