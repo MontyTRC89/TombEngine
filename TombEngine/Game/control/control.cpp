@@ -633,9 +633,9 @@ GameStatus DoGameLoop(int levelIndex)
 	int frameCount = LOOP_FRAME_COUNT;
 	auto& status = g_GameFlow->LastGameStatus;
 
-	// Before entering actual game loop, ControlPhase() must be
-	// called once to sort out various runtime shenanigangs (e.g. hair).
-	status = ControlPhase(false);
+	// Before entering actual game loop, GamePhase() must be called once to sort out
+	// various runtime shenanigangs (e.g. hair or freeze mode initialization).
+	status = GamePhase(false);
 
 	g_Synchronizer.Init();
 	bool legacy30FpsDoneDraw = false;
