@@ -70,7 +70,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 			return;
 
 		isStatic = true;
-		meshIndex = GetStaticObject(mesh->staticNumber).meshNumber;
+		meshIndex = Statics[mesh->staticNumber].meshNumber;
 		yRot = mesh->pos.Orientation.y;
 		pos = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 		scale = mesh->scale;

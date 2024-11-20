@@ -474,7 +474,7 @@ namespace TEN::Renderer
 			{
 				mesh->ObjectNumber = nativeMesh->staticNumber;
 				mesh->Color = nativeMesh->color;
-				mesh->OriginalSphere = GetStaticObject(mesh->ObjectNumber).visibilityBox.ToLocalBoundingSphere();
+				mesh->OriginalSphere = Statics[mesh->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
 				mesh->Pose = nativeMesh->pos;
 				mesh->Scale = nativeMesh->scale;
 				mesh->Update();
@@ -485,7 +485,7 @@ namespace TEN::Renderer
 			if (!(nativeMesh->flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
-			if (!_staticObjects[StaticObjectsLUT[mesh->ObjectNumber]].has_value())
+			if (!_staticObjects[Statics.GetIndex(mesh->ObjectNumber)].has_value())
 				continue;
 
 			auto& obj = GetStaticRendererObject(mesh->ObjectNumber);

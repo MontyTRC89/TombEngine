@@ -1084,8 +1084,8 @@ void PlaySecretTrack()
 
 int GetShatterSound(int shatterID)
 {
-	auto fxID = GetStaticObject(shatterID).shatterSound;
-	if (fxID != -1 && fxID < NUM_SFX)
+	auto fxID = Statics[shatterID].shatterSound;
+	if (fxID != NO_VALUE && fxID < NUM_SFX)
 		return fxID;
 
 	if (shatterID < 3)

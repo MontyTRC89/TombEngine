@@ -6,6 +6,7 @@
 #include <d3d9types.h>
 #include <SimpleMath.h>
 #include <PostProcess.h>
+
 #include "Math/Math.h"
 #include "Game/control/box.h"
 #include "Game/items.h"
@@ -15,11 +16,13 @@
 #include "Game/Hud/PickupSummary.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
 #include "Specific/fast_vector.h"
+#include "Renderer/Frustum.h"
 #include "Renderer/RendererEnums.h"
-#include "Renderer/Structures/RendererLight.h"
 #include "Renderer/RenderView.h"
+#include "Renderer/Structures/RendererLight.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
 #include "Renderer/ConstantBuffers/HUDBarBuffer.h"
@@ -33,26 +36,23 @@
 #include "Renderer/ConstantBuffers/SpriteBuffer.h"
 #include "Renderer/ConstantBuffers/InstancedStaticBuffer.h"
 #include "Renderer/ConstantBuffers/InstancedSpriteBuffer.h"
-#include "Frustum.h"
-#include "Specific/level.h"
-#include "ConstantBuffers/ConstantBuffer.h"
-#include "Specific/fast_vector.h"
-#include "Renderer/ConstantBuffers/InstancedSpriteBuffer.h"
+#include "Renderer/ConstantBuffers/ConstantBuffer.h"
 #include "Renderer/ConstantBuffers/PostProcessBuffer.h"
+#include "Renderer/ConstantBuffers/SMAABuffer.h"
 #include "Renderer/Structures/RendererBone.h"
+#include "Renderer/Structures/RendererDoor.h"
 #include "Renderer/Structures/RendererStringToDraw.h"
 #include "Renderer/Structures/RendererRoom.h"
 #include "Renderer/Structures/RendererSprite.h"
-#include "Renderer/Graphics/VertexBuffer.h"
-#include "Renderer/Structures/RendererDoor.h"
-#include "Structures/RendererAnimatedTexture.h"
-#include "Structures/RendererAnimatedTextureSet.h"
-#include "Structures/RendererRoom.h"
+#include "Renderer/Structures/RendererAnimatedTexture.h"
+#include "Renderer/Structures/RendererAnimatedTextureSet.h"
 #include "Renderer/Graphics/Texture2D.h"
 #include "Renderer/Graphics/IndexBuffer.h"
 #include "Renderer/Graphics/RenderTarget2D.h"
 #include "Renderer/Graphics/RenderTargetCube.h"
 #include "Renderer/Graphics/Texture2DArray.h"
+#include "Renderer/Graphics/VertexBuffer.h"
+#include "Renderer/Graphics/Vertices/PostProcessVertex.h"
 #include "Renderer/Structures/RendererItem.h"
 #include "Renderer/Structures/RendererEffect.h"
 #include "Renderer/Structures/RendererLine3D.h"
@@ -63,9 +63,7 @@
 #include "Renderer/Structures/RendererLine2D.h"
 #include "Renderer/Structures/RendererHudBar.h"
 #include "Renderer/Structures/RendererRoomAmbientMap.h"
-#include "Renderer/ConstantBuffers/SMAABuffer.h"
 #include "Renderer/Structures/RendererObject.h"
-#include "Graphics/Vertices/PostProcessVertex.h"
 #include "Renderer/Structures/RendererStar.h"
 
 enum GAME_OBJECT_ID : short;
@@ -616,7 +614,7 @@ namespace TEN::Renderer
 
 		inline RendererObject& GetStaticRendererObject(short objectNumber)
 		{
-			return _staticObjects[StaticObjectsLUT[objectNumber]].value();
+			return _staticObjects[Statics.GetIndex(objectNumber)].value();
 		}
 
 	public:
