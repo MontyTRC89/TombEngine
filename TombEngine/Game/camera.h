@@ -111,7 +111,6 @@ void ClearObjCamera();
 
 void SetScreenFadeOut(float speed, bool force = false);
 void SetScreenFadeIn(float speed, bool force = false);
-void ClearScreenFade();
 void SetCinematicBars(float height, float speed);
 void ClearCinematicBars();
 void PrepareCamera();

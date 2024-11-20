@@ -277,7 +277,6 @@ GameStatus FreezePhase()
 			g_Renderer.DumpGameScene(SceneRenderMode::NoHud);
 
 		StopRumble();
-		ClearScreenFade();
 	}
 	
 	// Update last freeze mode here, so that items won't update inside freeze loop.

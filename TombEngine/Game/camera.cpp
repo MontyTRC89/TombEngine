@@ -1699,16 +1699,6 @@ void SetScreenFadeIn(float speed, bool force)
 	ScreenFadeCurrent = ScreenFadeStart;
 }
 
-void ClearScreenFade()
-{
-	ScreenFadedOut = false;
-	ScreenFading = false;
-	ScreenFadeSpeed = 0;
-	ScreenFadeStart = 0;
-	ScreenFadeEnd = 0;
-	ScreenFadeCurrent = 1.0f;
-}
-
 void SetCinematicBars(float height, float speed)
 {
 	CinematicBarsDestinationHeight = height;
