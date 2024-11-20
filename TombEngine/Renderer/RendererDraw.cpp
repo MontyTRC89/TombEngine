@@ -1878,7 +1878,7 @@ namespace TEN::Renderer
 			}
 
 			// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
-			DrawPostprocess(renderTarget, view);
+			DrawPostprocess(renderTarget, view, renderMode);
 
 			_doingFullscreenPass = false;
 
