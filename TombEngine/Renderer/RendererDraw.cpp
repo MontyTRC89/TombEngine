@@ -2406,7 +2406,7 @@ namespace TEN::Renderer
 				std::vector<RendererStatic*> statics = it->second;
 
 				RendererStatic* refStatic = statics[0];
-				RendererObject& refStaticObj = *_staticObjects[refStatic->ObjectNumber];
+				RendererObject& refStaticObj = GetStaticRendererObject(refStatic->ObjectNumber);
 				if (refStaticObj.ObjectMeshes.size() == 0)
 					continue;
 
@@ -2484,7 +2484,7 @@ namespace TEN::Renderer
 				std::vector<RendererStatic*> statics = it->second;
 
 				RendererStatic* refStatic = statics[0];
-				RendererObject& refStaticObj = *_staticObjects[refStatic->ObjectNumber];
+				RendererObject& refStaticObj = GetStaticRendererObject(refStatic->ObjectNumber);
 				if (refStaticObj.ObjectMeshes.size() == 0)
 					continue;
 
@@ -3530,7 +3530,7 @@ namespace TEN::Renderer
 		_stStatic.World = objectInfo->Static->World;
 		_stStatic.Color = objectInfo->Static->Color;
 		_stStatic.AmbientLight = objectInfo->Room->AmbientLight;
-		_stStatic.LightMode = (int)_staticObjects[objectInfo->Static->ObjectNumber]->ObjectMeshes[0]->LightMode;
+		_stStatic.LightMode = (int)GetStaticRendererObject(objectInfo->Static->ObjectNumber).ObjectMeshes[0]->LightMode;
 		BindStaticLights(objectInfo->Static->LightsToDraw);
 		_cbStatic.UpdateData(_stStatic, _context.Get());
 
