@@ -118,6 +118,8 @@ public:
 	void DisableItem();
 	void MakeInvisible();
 	void SetVisible(bool isVisible);
+	[[nodiscard]] bool GetCollidable();
+	void SetCollidable(bool isCollidable);
 	void Explode();
 	void Shatter();
 
