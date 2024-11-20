@@ -40,14 +40,13 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Lua API changes
 * Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
 * Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
+* Added Effects.GetWind() function to get current wind speed vector.
 * Added support for transparency value in DisplayString class.
 * Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
 * Fixed DisplayString class not supporting empty lines in multiline strings.
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
 * Fixed collision callbacks not properly clearing after leveljump.
-
-* Added Effects.GetWind() function.
 
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 
