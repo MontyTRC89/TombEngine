@@ -99,7 +99,7 @@ struct LEVEL
 	std::vector<AnimFrame>				Frames	 = {};
 	std::vector<StateDispatchData>		Changes	 = {};
 	std::vector<StateDispatchRangeData> Ranges	 = {};
-	std::vector<short>					Commands = {};
+	std::vector<int>					Commands = {};
 
 	// Collision data
 	std::vector<ROOM_INFO> Rooms	 = {};
