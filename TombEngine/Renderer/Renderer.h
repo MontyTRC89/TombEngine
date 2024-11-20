@@ -373,6 +373,10 @@ namespace TEN::Renderer
 		RenderTarget2D _SSAOBlurredRenderTarget;
 		std::vector<Vector4> _SSAOKernel;
 
+		// New ambient light techinque
+		RenderTarget2D _roomAmbientMapFront;
+		RenderTarget2D _roomAmbientMapBack;
+
 		// Special effects
 		std::vector<Texture2D> _causticTextures;
 
