@@ -74,7 +74,6 @@ namespace TEN::Entities::Generic
 		if (!currentPushable->UseRoomCollision)
 			return;
 
-		// @BRIDGEME
 		if (currentPushable->UseBridgeCollision && currentPushable->Bridge.has_value())
 			addBridge ? currentPushable->Bridge->Enable(pushableItem) : currentPushable->Bridge->Disable(pushableItem);
 		
@@ -83,7 +82,6 @@ namespace TEN::Entities::Generic
 			currentPushableItem = &g_Level.Items[currentPushable->Stack.ItemNumberAbove];
 			currentPushable = &GetPushableInfo(*currentPushableItem);
 
-			// @BRIDGEME
 			if (currentPushable->UseBridgeCollision && currentPushable->Bridge.has_value())
 				addBridge ? currentPushable->Bridge->Enable(*currentPushableItem) : currentPushable->Bridge->Disable(*currentPushableItem);
 		}

@@ -636,6 +636,8 @@ void ResetRoomData()
 		OpenThatDoor(&door.d1flip, &door);
 		OpenThatDoor(&door.d2flip, &door);
 		door.opened = true;
+
+		UpdateDoorRoomCollisionMeshes(door);
 	}
 
 	// Unflip all rooms and remove all bridges and stopper flags.

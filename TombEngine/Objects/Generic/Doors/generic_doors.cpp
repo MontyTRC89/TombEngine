@@ -42,24 +42,6 @@ namespace TEN::Entities::Doors
 			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f)))
 	};
 
-	// HACK: Regenerate room collision meshes.
-	static void UpdateDoorRoomCollisionMeshes(const DOOR_DATA& door)
-	{
-		// Generate current room collision mesh.
-		if (door.d1.floor != nullptr)
-		{
-			auto& room = g_Level.Rooms[door.d1.floor->RoomNumber];
-			room.GenerateCollisionMesh();
-		}
-
-		// Generate neighbor room collision mesh.
-		if (door.d2.floor != nullptr)
-		{
-			auto& room = g_Level.Rooms[door.d2.floor->RoomNumber];
-			room.GenerateCollisionMesh();
-		}
-	}
-
 	void InitializeDoor(short itemNumber)
 	{
 		auto* doorItem = &g_Level.Items[itemNumber];
@@ -469,6 +451,24 @@ namespace TEN::Entities::Doors
 
 			for (auto& creature : ActiveCreatures)
 				creature->LOT.TargetBox = NO_VALUE;
+		}
+	}
+
+	// HACK: Regenerate room collision meshes.
+	void UpdateDoorRoomCollisionMeshes(const DOOR_DATA& door)
+	{
+		// Generate current room collision mesh.
+		if (door.d1.floor != nullptr)
+		{
+			auto& room = g_Level.Rooms[door.d1.floor->RoomNumber];
+			room.GenerateCollisionMesh();
+		}
+
+		// Generate neighbor room collision mesh.
+		if (door.d2.floor != nullptr)
+		{
+			auto& room = g_Level.Rooms[door.d2.floor->RoomNumber];
+			room.GenerateCollisionMesh();
 		}
 	}
 }

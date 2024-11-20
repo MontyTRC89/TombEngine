@@ -43,7 +43,6 @@ namespace TEN::Entities::Generic
 			auto& pushableItem = g_Level.Items[itemNumber];
 			pushableItem.Data = PushableInfo();
 
-			// @BRIDGEME
 			// Initialize bridge routines.
 			auto& pushable = GetPushableInfo(pushableItem);
 			if (pushable.Bridge.has_value())
@@ -274,7 +273,6 @@ namespace TEN::Entities::Generic
 			auto& currentPushableItem = g_Level.Items[currentItemNumber];
 			auto& currentPushable = GetPushableInfo(currentPushableItem);
 
-			// @BRIDGEME
 			// Disable bridge.
 			if (currentPushable.UseRoomCollision && currentPushable.Bridge.has_value())
 				currentPushable.Bridge->Disable(currentPushableItem);
@@ -298,7 +296,6 @@ namespace TEN::Entities::Generic
 
 			currentPushableItem.Pose.Position = GetNearestSectorCenter(currentPushableItem.Pose.Position);
 
-			// @BRIDGEME
 			// Enable bridge.
 			if (currentPushable.UseRoomCollision && currentPushable.Bridge.has_value())
 				currentPushable.Bridge->Enable(currentPushableItem);

@@ -79,7 +79,6 @@ namespace TEN::Entities::Generic
 			pushable.Bridge->GetFloorBorder = GetPushableBridgeFloorBorder;
 			pushable.Bridge->GetCeilingBorder = GetPushableBridgeCeilingBorder;
 
-			// @BRIDGEME
 			if (pushable.Bridge.has_value())
 				pushable.Bridge->Initialize(pushableItem);
 		}
@@ -121,20 +120,17 @@ namespace TEN::Entities::Generic
 		// Update room number.
 		if (pushableItem.Pose.Position != prevPos)
 		{
-			// @BRIDGEME
 			// HACK: Track if bridge was disabled by behaviour state.
 			bool isEnabled = false;
 			if (pushable.Bridge.has_value())
 				isEnabled = pushable.Bridge->IsEnabled();
 
-			// @BRIDGEME
 			// HACK: Temporarily disable bridge before probing.
 			if (isEnabled && pushable.Bridge.has_value())
 				pushable.Bridge->Disable(pushableItem);
 
 			int probeRoomNumber = GetPointCollision(pushableItem).GetRoomNumber();
 
-			// @BRIDGEME
 			// HACK: Reenable bridge after probing.
 			if (isEnabled && pushable.Bridge.has_value())
 				pushable.Bridge->Enable(pushableItem);

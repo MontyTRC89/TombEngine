@@ -94,7 +94,7 @@ static void HandleLosDebug(const ItemInfo& item)
 
 	auto origin = (item.Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
 	auto target = Geometry::TranslatePoint(origin, dir, dist);
-	auto los = GetLosCollision(origin, roomNumber, dir, dist, false, false, false);
+	auto los = GetLosCollision(origin, roomNumber, dir, dist, true, true, true);
 	float closestDist = los.Room.Distance;
 	target = los.Room.Position;
 

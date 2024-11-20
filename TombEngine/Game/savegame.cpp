@@ -2370,7 +2370,6 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 			continue;
 		}
 
-		// @BRIDGEME
 		// Remove bridge from sectors.
 		if (item->IsBridge())
 		{
