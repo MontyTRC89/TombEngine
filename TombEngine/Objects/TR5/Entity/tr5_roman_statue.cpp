@@ -559,7 +559,7 @@ namespace TEN::Entities::Creatures::TR5
 
 							if (!((mesh->pos.Position.z ^ pos.z) & 0xFFFFFC00) && !((mesh->pos.Position.x ^ pos.x) & 0xFFFFFC00))
 							{
-								if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
+								if (GetStaticObject(mesh->staticNumber).shatterType != ShatterType::None)
 								{
 									ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
 									SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);

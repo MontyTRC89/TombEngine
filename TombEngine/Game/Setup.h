@@ -134,10 +134,13 @@ struct StaticInfo
 	GameBoundingBox collisionBox;
 	ShatterType shatterType;
 	int shatterSound;
+	int ObjectNumber;
 };
 
 extern ObjectHandler					   Objects;
-extern std::unordered_map<int, StaticInfo> StaticObjects;
+extern std::vector<StaticInfo>			   StaticObjects;
+
+#define GetStaticObject(x) StaticObjects[StaticObjectsLUT[x]]
 
 void InitializeGameFlags();
 void InitializeSpecialEffects();

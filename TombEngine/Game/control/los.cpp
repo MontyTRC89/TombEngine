@@ -288,7 +288,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			{
 				if (itemNumber < 0)
 				{
-					if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
+					if (GetStaticObject(mesh->staticNumber).shatterType != ShatterType::None)
 					{
 						const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 						mesh->HitPoints -= weapon.Damage;
@@ -593,7 +593,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 			if (priorityObjectID != GAME_OBJECT_ID::ID_NO_OBJECT && item.ObjectNumber != priorityObjectID)
 				continue;
 
-			if (item.ObjectNumber != ID_LARA && Objects[item.ObjectNumber].collision == nullptr)
+			if (item.ObjectNumber != ID_LARA && (Objects[item.ObjectNumber].collision == nullptr || !item.Collidable))
 				continue;
 
 			if (item.ObjectNumber == ID_LARA && priorityObjectID != ID_LARA)

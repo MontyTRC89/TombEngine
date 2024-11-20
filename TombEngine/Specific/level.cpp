@@ -80,6 +80,8 @@ const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 LevelData g_Level;
 
 std::vector<int> MoveablesIds;
+int* StaticObjectsLUT = nullptr;
+int StaticObjectsLUTSize = 0;
 std::vector<int> SpriteSequencesIds;
 
 char* DataPtr;
@@ -278,6 +280,13 @@ void LoadObjects()
 {
 	Objects.Initialize();
 	StaticObjects.clear();
+
+	if (StaticObjectsLUT != nullptr)
+	{
+		delete StaticObjectsLUT;
+	}
+	StaticObjectsLUTSize = 1000;
+	StaticObjectsLUT = (int*)malloc(StaticObjectsLUTSize * sizeof(int));
 
 	int meshCount = ReadInt32();
 	TENLog("Mesh count: " + std::to_string(meshCount), LogLevel::Info);
@@ -521,8 +530,7 @@ void LoadObjects()
 	{
 		auto staticObj = StaticInfo{};
 
-		int staticID = ReadInt32();
-
+		staticObj.ObjectNumber = ReadInt32();
 		staticObj.meshNumber = ReadInt32();
 
 		staticObj.visibilityBox.X1 = ReadInt16();
@@ -544,7 +552,17 @@ void LoadObjects()
 		staticObj.shatterType = (ShatterType)ReadInt16();
 		staticObj.shatterSound = ReadInt16();
 
-		StaticObjects[staticID] = staticObj;
+		if (staticObj.ObjectNumber >= StaticObjectsLUTSize)
+		{
+			int* LUT = (int*)malloc(staticObj.ObjectNumber * sizeof(int));
+			memcpy(LUT, StaticObjectsLUT, StaticObjectsLUTSize * sizeof(int));
+			delete StaticObjectsLUT;
+			StaticObjectsLUT = LUT;
+			StaticObjectsLUTSize = staticObj.ObjectNumber;
+		}
+
+		StaticObjectsLUT[staticObj.ObjectNumber] = (int)StaticObjects.size();
+		StaticObjects.push_back(staticObj);
 	}
 }
 
@@ -1657,7 +1675,7 @@ void LoadSprites()
 		short offset = ReadInt16();
 		if (spriteID >= ID_NUMBER_OBJECTS)
 		{
-			StaticObjects[spriteID - ID_NUMBER_OBJECTS].meshNumber = offset;
+			GetStaticObject(spriteID - ID_NUMBER_OBJECTS).meshNumber = offset;
 		}
 		else
 		{

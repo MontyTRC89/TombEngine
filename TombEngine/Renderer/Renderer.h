@@ -261,7 +261,7 @@ namespace TEN::Renderer
 		// Textures, objects and sprites
 
 		std::vector<std::optional<RendererObject>>			   _moveableObjects;
-		std::unordered_map<int, std::optional<RendererObject>> _staticObjects; // Key = static ID, value = renderer object.
+		std::vector<std::optional<RendererObject>>			   _staticObjects; // Key = static ID, value = renderer object.
 		std::vector<RendererSprite>							   _sprites;
 		std::vector<RendererSpriteSequence>					   _spriteSequences;
 		std::vector<RendererAnimatedTextureSet>				   _animatedTextureSets;
@@ -394,6 +394,10 @@ namespace TEN::Renderer
 		RenderTarget2D _SSAORenderTarget;
 		RenderTarget2D _SSAOBlurredRenderTarget;
 		std::vector<Vector4> _SSAOKernel;
+
+		// New ambient light techinque
+		RenderTarget2D _roomAmbientMapFront;
+		RenderTarget2D _roomAmbientMapBack;
 
 		// Special effects
 
@@ -610,6 +614,11 @@ namespace TEN::Renderer
 				blendMode == BlendMode::AlphaTest ||
 				blendMode == BlendMode::Additive ||
 				blendMode == BlendMode::FastAlphaBlend);
+		}
+
+		inline RendererObject& GetStaticRendererObject(short objectNumber)
+		{
+			return _staticObjects[StaticObjectsLUT[objectNumber]].value();
 		}
 
 	public:

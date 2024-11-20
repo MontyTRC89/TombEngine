@@ -10,6 +10,7 @@
 #include "Game/effects/explosion.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/effects/weather.h"
 #include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Scripting/Internal/LuaHandler.h"
@@ -31,6 +32,7 @@ Functions to generate effects.
 
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Electricity;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 
@@ -308,6 +310,15 @@ namespace TEN::Scripting::Effects
 		Camera.bounce = -str;
 	}
 
+	/// Get the wind vector for the current game frame.
+	// This represents the 3D displacement applied by the engine on things like particles affected by wind.
+	// @function GetWind()
+	// @treturn Vec3 Wind vector.
+	static Vec3 GetWind()
+	{
+		return Vec3(Weather.Wind());
+	}
+
 	void Register(sol::state* state, sol::table& parent) 
 	{
 		auto tableEffects = sol::table(state->lua_state(), sol::create);
@@ -321,6 +332,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
+		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
 
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);

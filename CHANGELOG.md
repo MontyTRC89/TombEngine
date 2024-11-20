@@ -38,7 +38,9 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Allow more than 1000 static mesh slots in a level.
 
 ### Lua API changes
+* Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
 * Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
+* Added Effects.GetWind() function to get current wind speed vector.
 * Added support for transparency value in DisplayString class.
 * Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
@@ -120,8 +122,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Flow.LensFlare() and Flow.Starfield() classes.
 * Added Inventory.GetUsedItem(), Inventory.SetUsedItem() and Inventory.ClearUsedItem() functions.
 * Added Input.KeyClearAll() function.
-* Added Moveable.GetJointRotation() and optional 'offset' parameter for Moveable.GetJointPosition().
-* Added Moveable.GetTargetState() function.
+* Added Moveable:GetJointRotation() and optional 'offset' parameter for Moveable.GetJointPosition().
+* Added Moveable:GetTargetState() function.
 * Added Room:GetRoomNumber() function.
 * Removed anims.monkeyAutoJump. It is now a player menu configuration.
 * Fixed Volume:GetActive() method.
