@@ -9,6 +9,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed engine performance around bridges.
 * Fixed engine performance if weather or bubble effects are active.
 * Fixed silent crashes if loaded level is corrupted or in incorrect format.
+* Fixed occasional crashes if there are static meshes placed within room border walls.
 * Fixed incorrect clipping of scaled off-centered static meshes.
 * Fixed incorrect collision detection for off-centered moveables.
 * Fixed stutter during jumps between cameras in a flyby sequence.
@@ -34,7 +35,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added ricochet sounds and make the effect more prominent.
 * Allow to run the engine without title level.
 * Allow more than 1024 objects in a level.
-* Allow more then 1000 static objects in a level
+* Allow more than 1000 static mesh slots in a level.
 
 ### Lua API changes
 * Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.

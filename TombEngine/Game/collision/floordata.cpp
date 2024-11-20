@@ -83,7 +83,7 @@ Vector3 FloorInfo::GetSurfaceNormal(int x, int z, bool isFloor) const
 	return GetSurfaceNormal(triID, isFloor);
 }
 
-short FloorInfo::GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const
+short FloorInfo::GetSurfaceSteepSlopeAngle(int x, int z, bool isFloor) const
 {
 	const auto& tri = GetSurfaceTriangle(x, z, isFloor);
 	return tri.SteepSlopeAngle;

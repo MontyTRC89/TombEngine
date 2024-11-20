@@ -12,8 +12,6 @@ constexpr auto DEFAULT_RADIUS = 10;
 constexpr auto GRAVITY		  = 6.0f;
 constexpr auto SWAMP_GRAVITY  = GRAVITY / 3.0f;
 
-constexpr auto MAX_STATICS = 1000;
-
 enum JointRotationFlags
 {
 	ROT_X = 1 << 2,
@@ -136,7 +134,7 @@ struct StaticInfo
 	int shatterSound;
 };
 
-extern ObjectHandler Objects;
+extern ObjectHandler					   Objects;
 extern std::unordered_map<int, StaticInfo> StaticObjects;
 
 void InitializeGameFlags();
