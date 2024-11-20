@@ -287,7 +287,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			{
 				if (itemNumber < 0)
 				{
-					if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
+					if (GetStaticObject(mesh->staticNumber).shatterType != ShatterType::None)
 					{
 						const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 						mesh->HitPoints -= weapon.Damage;

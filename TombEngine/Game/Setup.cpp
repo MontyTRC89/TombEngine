@@ -33,7 +33,7 @@ using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
 ObjectHandler						Objects;
-std::unordered_map<int, StaticInfo> StaticObjects;
+std::vector<StaticInfo>				StaticObjects;
 
 void ObjectHandler::Initialize() 
 { 

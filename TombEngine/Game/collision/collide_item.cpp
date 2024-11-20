@@ -1888,7 +1888,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			// HACK: Shatter statics only by harmful vehicles.
 			if (!isPlayer && 
 				!isHarmless && abs(item->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
-				StaticObjects[staticObject.staticNumber].shatterType != ShatterType::None)
+				GetStaticObject(staticObject.staticNumber).shatterType != ShatterType::None)
 			{
 				SoundEffect(GetShatterSound(staticObject.staticNumber), &staticObject.pos);
 				ShatterObject(nullptr, &staticObject, -128, item->RoomNumber, 0);
