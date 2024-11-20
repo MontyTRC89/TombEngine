@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.6 (Developer Version) Lua API</title>
+    <title>TombEngine 1.5 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -77,16 +77,15 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
+  <li>    <here>Flow.GameMode</here></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
-  <li>    <here>Objects.MoveableStatus</here></li>
+  <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
   <li>    <a href="../4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
-  <li>    <a href="../4 enums/Strings.DisplayStringOption.html">Strings.DisplayStringOption</a></li>
   <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
   <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
   <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
@@ -103,18 +102,18 @@
 
 <div id="content">
 
-<h1>Enum <code>Objects.MoveableStatus</code></h1>
-<p>Constants for moveable statuses.</p>
+<h1>Enum <code>Flow.GameMode</code></h1>
+<p>Constants for game modes.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Objects_MoveableStatus_constants">Objects.MoveableStatus constants </a></h2>
+<h2><a href="#Flow_GameMode_constants">Flow.GameMode constants </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#CONSTANT_STRING_HERE">CONSTANT_STRING_HERE</a></td>
-	<td class="summary">Table of moveable statuses.</td>
+	<td class="summary">Table of game modes.</td>
 	</tr>
 </table>
 
@@ -122,18 +121,17 @@
 <br/>
 
 
-    <h2 class="section-header has-description"><a name="Objects_MoveableStatus_constants"></a>Objects.MoveableStatus constants </h2>
+    <h2 class="section-header has-description"><a name="Flow_GameMode_constants"></a>Flow.GameMode constants </h2>
 
           <div class="section-description">
 
 
 
-<p>The following constants are inside Objects.MoveableStatus.</p>
+<p>The following constants are inside Flow.GameMode.</p>
 
-<pre><code>INACTIVE
-ACTIVE
-DEACTIVATED
-INVISIBLE
+<pre><code>NORMAL
+FROZEN
+MENU
 </code></pre>
 
 
@@ -144,7 +142,7 @@ INVISIBLE
     <strong>CONSTANT_STRING_HERE</strong>
     </dt>
     <dd>
-    Table of moveable statuses.
+    Table of game modes.
 
 
 

@@ -26,6 +26,14 @@ enum class GameStatus
 	LevelComplete
 };
 
+enum class FreezeMode
+{
+	None,
+	Full,
+	Spectator,
+	Player
+};
+
 enum class LevelLoadType
 {
 	New,

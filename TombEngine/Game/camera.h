@@ -54,12 +54,6 @@ struct CAMERA_INFO
 	bool DisableInterpolation = false;
 };
 
-struct ObjectCameraInfo
-{
-	GameVector LastAngle;
-	bool ItemCameraOn;
-};
-
 enum CAMERA_FLAGS
 {
 	CF_NONE			 = 0,

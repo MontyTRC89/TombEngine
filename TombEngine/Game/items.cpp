@@ -763,28 +763,30 @@ void UpdateAllItems()
 	while (itemNumber != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		short nextItem = item->NextActive;
+		itemNumber = item->NextActive;
 
 		if (!Objects.CheckID(item->ObjectNumber))
+			continue;
+
+		if (g_GameFlow->LastFreezeMode != FreezeMode::None && !Objects[item->ObjectNumber].AlwaysActive)
 			continue;
 
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
 			if (Objects[item->ObjectNumber].control)
-				Objects[item->ObjectNumber].control(itemNumber);
+				Objects[item->ObjectNumber].control(item->Index);
 
-			TestVolumes(itemNumber);
+			TestVolumes(item->Index);
 			ProcessEffects(item);
 
 			if (item->AfterDeath > 0 && item->AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
 				item->AfterDeath++;
 			if (item->AfterDeath == ITEM_DEATH_TIMEOUT)
-				KillItem(itemNumber);
+				KillItem(item->Index);
 		}
 		else
-			KillItem(itemNumber);
+			KillItem(item->Index);
 
-		itemNumber = nextItem;
 	}
 
 	InItemControlLoop = false;

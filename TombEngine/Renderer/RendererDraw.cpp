@@ -280,7 +280,7 @@ namespace TEN::Renderer
 			auto prevRotMatrix = gunshell->oldPos.Orientation.ToRotationMatrix();
 			auto prevWorldMatrix = prevRotMatrix * prevTranslation;
 
-			worldMatrix = Matrix::Lerp(prevWorldMatrix, worldMatrix, _interpolationFactor);
+			worldMatrix = Matrix::Lerp(prevWorldMatrix, worldMatrix, GetInterpolationFactor());
 
 			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellCount].World = worldMatrix;
 			_stInstancedStaticMeshBuffer.StaticMeshes[gunShellCount].Ambient = room.AmbientLight;
@@ -346,7 +346,7 @@ namespace TEN::Renderer
 				relPos = Vector3(segment->x >> FP_SHIFT, segment->y >> FP_SHIFT, segment->z >> FP_SHIFT);
 				auto currentOutput = Vector3::Transform(relPos, translationMatrix);
 
-				auto absolutePos = Vector3::Lerp(prevOutput, currentOutput, _interpolationFactor);
+				auto absolutePos = Vector3::Lerp(prevOutput, currentOutput, GetInterpolationFactor());
 				absolutePoints[i] = absolutePos;
 			}
 
@@ -628,7 +628,7 @@ namespace TEN::Renderer
 						
 					for (auto& poly : bucket.Polygons)
 					{
-						auto worldMatrix = Matrix::Lerp(fish.PrevTransform, fish.Transform, _interpolationFactor);
+						auto worldMatrix = Matrix::Lerp(fish.PrevTransform, fish.Transform, GetInterpolationFactor());
 						auto center = Vector3::Transform(poly.Centre, worldMatrix);
 						float dist = Vector3::Distance(center, view.Camera.WorldPosition);
 
@@ -689,7 +689,7 @@ namespace TEN::Renderer
 
 					const auto& mesh = *GetMesh(Objects[ID_FISH_EMITTER].meshIndex + fish.MeshIndex);
 
-					_stStatic.World = Matrix::Lerp(fish.PrevTransform, fish.Transform, _interpolationFactor);
+					_stStatic.World = Matrix::Lerp(fish.PrevTransform, fish.Transform, GetInterpolationFactor());
 					_stStatic.Color = Vector4::One;
 					_stStatic.AmbientLight = _rooms[fish.RoomNumber].AmbientLight;
 
@@ -743,7 +743,7 @@ namespace TEN::Renderer
 
 					for (int p = 0; p < bucket.Polygons.size(); p++)
 					{
-						auto transformMatrix = Matrix::Lerp(bat.PrevTransform, bat.Transform, _interpolationFactor);	
+						auto transformMatrix = Matrix::Lerp(bat.PrevTransform, bat.Transform, GetInterpolationFactor());
 						auto centre = Vector3::Transform(bucket.Polygons[p].Centre, transformMatrix);
 						float dist = (centre - view.Camera.WorldPosition).Length();
 
@@ -773,7 +773,7 @@ namespace TEN::Renderer
 				{
 					auto& room = _rooms[bat.RoomNumber];
 
-					auto transformMatrix = Matrix::Lerp(bat.PrevTransform, bat.Transform, _interpolationFactor);
+					auto transformMatrix = Matrix::Lerp(bat.PrevTransform, bat.Transform, GetInterpolationFactor());
 
 					_stInstancedStaticMeshBuffer.StaticMeshes[batCount].World = transformMatrix;
 					_stInstancedStaticMeshBuffer.StaticMeshes[batCount].Ambient = room.AmbientLight;
@@ -848,7 +848,7 @@ namespace TEN::Renderer
 				if (!beetle.On)
 					continue;
 
-				auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, _interpolationFactor);
+				auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, GetInterpolationFactor());
 
 				for (auto& bucket : mesh.Buckets)
 				{
@@ -886,7 +886,7 @@ namespace TEN::Renderer
 				{
 					auto& room = _rooms[beetle.RoomNumber];
 
-					auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, _interpolationFactor);
+					auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, GetInterpolationFactor());
 
 					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = transformMatrix;
 					_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].Ambient = room.AmbientLight;
@@ -977,7 +977,7 @@ namespace TEN::Renderer
 
 					for (int p = 0; p < bucket.Polygons.size(); p++)
 					{
-						auto transformMatrix = Matrix::Lerp(locust.PrevTransform, locust.Transform, _interpolationFactor);	
+						auto transformMatrix = Matrix::Lerp(locust.PrevTransform, locust.Transform, GetInterpolationFactor());
 						auto centre = Vector3::Transform(bucket.Polygons[p].Centre, transformMatrix);
 						float dist = (centre - view.Camera.WorldPosition).Length();
 
@@ -1039,7 +1039,7 @@ namespace TEN::Renderer
 
 					auto& mesh = *GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust.counter & 3));
 
-					_stStatic.World = Matrix::Lerp(locust.PrevTransform, locust.Transform, _interpolationFactor);
+					_stStatic.World = Matrix::Lerp(locust.PrevTransform, locust.Transform, GetInterpolationFactor());
 					_stStatic.Color = Vector4::One;
 					_stStatic.AmbientLight = _rooms[locust.roomNumber].AmbientLight;
 					_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -1538,7 +1538,7 @@ namespace TEN::Renderer
 
 	void Renderer::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 	{
-		if (_isLocked)
+		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
 			return;
 
 		RendererLight dynamicLight = {};
@@ -1569,7 +1569,9 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareScene()
 	{
-		_dynamicLights.clear();
+		if (g_GameFlow->CurrentFreezeMode == FreezeMode::None)
+			_dynamicLights.clear();
+
 		_lines2DToDraw.clear();
 		_lines3DToDraw.clear();
 		_triangles3DToDraw.clear();
@@ -1605,7 +1607,7 @@ namespace TEN::Renderer
 		ClearShadowMap();
 	}
 
-	void Renderer::RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view)
+	void Renderer::RenderScene(RenderTarget2D* renderTarget, RenderView& view, SceneRenderMode renderMode)
 	{
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
@@ -1850,13 +1852,16 @@ namespace TEN::Renderer
 		ClearDrawPhaseDisplaySprites();
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		g_Hud.Draw(*LaraItem);
-		
-		_doingFullscreenPass = true;
 
-		// Apply antialiasing.
-		if (doAntialiasing)
+		// HUD must be drawn before post-processing to be antialiased.
+		if (renderMode == SceneRenderMode::Full)
+			g_Hud.Draw(*LaraItem);
+		
+		if (renderMode != SceneRenderMode::NoPostprocess)
 		{
+			_doingFullscreenPass = true;
+
+			// Apply antialiasing.
 			switch (g_Configuration.AntialiasingMode)
 			{
 			case AntialiasingMode::None:
@@ -1871,29 +1876,32 @@ namespace TEN::Renderer
 				ApplySMAA(&_renderTarget, view);
 				break;
 			}
+
+			// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
+			DrawPostprocess(renderTarget, view, renderMode);
+
+			_doingFullscreenPass = false;
+
+			// Draw binoculars or lasersight overlay.
+			DrawOverlays(view);
+
+			// Draw 2D debug lines.
+			DrawLines2D();
 		}
 
-		// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
-		DrawPostprocess(renderTarget, view);
+		if (renderMode == SceneRenderMode::Full)
+		{
+			// Draw display sprites sorted by priority.
+			CollectDisplaySprites(view);
+			DrawDisplaySprites(view);
 
-		_doingFullscreenPass = false;
-
-		// Draw 2D debug lines.
-		DrawLines2D();
-
-		// Draw display sprites sorted by priority.
-		CollectDisplaySprites(view);
-		DrawDisplaySprites(view);
-
-		// Draw binoculars or lasersight overlay.
-		DrawOverlays(view); 
+			DrawDebugInfo(view);
+			DrawAllStrings();
+		}
 
 		time2 = std::chrono::high_resolution_clock::now();
 		_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 		time1 = time2;
-
-		DrawDebugInfo(view);
-		DrawAllStrings();
 
 		ClearScene();
 		CalculateFrameRate();
@@ -2153,10 +2161,9 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque, true);*/
 	}
 
-	void Renderer::DumpGameScene()
+	void Renderer::DumpGameScene(SceneRenderMode renderMode)
 	{
-		RenderScene(&_dumpScreenRenderTarget, false, _gameCamera);
-
+		RenderScene(&_dumpScreenRenderTarget, _gameCamera, renderMode);
 		_graphicsSettingsChanged = false;
 	}
 
@@ -2877,7 +2884,7 @@ namespace TEN::Renderer
 						rDrawSprite.Type = SpriteType::CustomBillboard;
 						rDrawSprite.pos =
 							renderView.Camera.WorldPosition +
-							Vector3::Lerp(meteor.PrevPosition, meteor.Position, _interpolationFactor);
+							Vector3::Lerp(meteor.PrevPosition, meteor.Position, GetInterpolationFactor());
 						rDrawSprite.Rotation = 0;
 						rDrawSprite.Scale = 1;
 						rDrawSprite.Width = 2;
@@ -2889,7 +2896,7 @@ namespace TEN::Renderer
 							meteor.Color.x,
 							meteor.Color.y,
 							meteor.Color.z,
-							Lerp(meteor.PrevFade, meteor.Fade, _interpolationFactor));
+							Lerp(meteor.PrevFade, meteor.Fade, GetInterpolationFactor()));
 						_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
 						_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = 0;
 
@@ -3026,7 +3033,7 @@ namespace TEN::Renderer
 	void Renderer::Render(float interpFactor)
 	{
 		InterpolateCamera(interpFactor);
-		RenderScene(&_backBuffer, true, _gameCamera);
+		RenderScene(&_backBuffer, _gameCamera);
 
 		_context->ClearState();
 		_swapChain->Present(1, 0);

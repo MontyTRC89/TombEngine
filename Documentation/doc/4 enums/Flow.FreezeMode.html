@@ -77,11 +77,11 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
+  <li>    <here>Flow.FreezeMode</here></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
-  <li>    <here>Objects.MoveableStatus</here></li>
+  <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
@@ -103,18 +103,18 @@
 
 <div id="content">
 
-<h1>Enum <code>Objects.MoveableStatus</code></h1>
-<p>Constants for moveable statuses.</p>
+<h1>Enum <code>Flow.FreezeMode</code></h1>
+<p>Constants for freeze modes.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Objects_MoveableStatus_constants">Objects.MoveableStatus constants </a></h2>
+<h2><a href="#Flow_FreezeMode_constants">Flow.FreezeMode constants </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#CONSTANT_STRING_HERE">CONSTANT_STRING_HERE</a></td>
-	<td class="summary">Table of moveable statuses.</td>
+	<td class="summary">Table of freeze modes.</td>
 	</tr>
 </table>
 
@@ -122,18 +122,18 @@
 <br/>
 
 
-    <h2 class="section-header has-description"><a name="Objects_MoveableStatus_constants"></a>Objects.MoveableStatus constants </h2>
+    <h2 class="section-header has-description"><a name="Flow_FreezeMode_constants"></a>Flow.FreezeMode constants </h2>
 
           <div class="section-description">
 
 
 
-<p>The following constants are inside Objects.MoveableStatus.</p>
+<p>The following constants are inside Flow.FreezeMode.</p>
 
-<pre><code>INACTIVE
-ACTIVE
-DEACTIVATED
-INVISIBLE
+<pre><code>NONE - Normal in-game operation.
+FULL - Game is completely frozen, as in pause or inventory menus.
+SPECTATOR - Game is completely frozen, but with ability to control camera.
+PLAYER - Game is completely frozen, but with ability to control player. Experimental.
 </code></pre>
 
 
@@ -144,7 +144,7 @@ INVISIBLE
     <strong>CONSTANT_STRING_HERE</strong>
     </dt>
     <dd>
-    Table of moveable statuses.
+    Table of freeze modes.
 
 
 

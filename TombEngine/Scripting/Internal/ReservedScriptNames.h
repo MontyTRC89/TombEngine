@@ -66,10 +66,14 @@ static constexpr char ScriptReserved_PreSave[]			= "PRESAVE";
 static constexpr char ScriptReserved_PostSave[]			= "POSTSAVE";
 static constexpr char ScriptReserved_PreLoad[]			= "PRELOAD";
 static constexpr char ScriptReserved_PostLoad[]			= "POSTLOAD";
+static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";  // DEPRECATED
+static constexpr char ScriptReserved_PostControlPhase[]	= "POSTCONTROLPHASE"; // DEPRECATED
 static constexpr char ScriptReserved_PreLoop[]			= "PRELOOP";
 static constexpr char ScriptReserved_PostLoop[]			= "POSTLOOP";
-static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
-static constexpr char ScriptReserved_PostControlPhase[]	= "POSTCONTROLPHASE";
+static constexpr char ScriptReserved_PreUseItem[]		= "PREUSEITEM";
+static constexpr char ScriptReserved_PostUseItem[]		= "POSTUSEITEM";
+static constexpr char ScriptReserved_PreFreeze[]			= "PREFREEZE";
+static constexpr char ScriptReserved_PostFreeze[]		= "POSTFREEZE";
 
 // Built-in LevelFuncs
 static constexpr char ScriptReserved_OnStart[]			= "OnStart";
@@ -79,6 +83,7 @@ static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase"; // DEP
 static constexpr char ScriptReserved_OnSave[]			= "OnSave";
 static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";
 static constexpr char ScriptReserved_OnUseItem[]		= "OnUseItem";
+static constexpr char ScriptReserved_OnFreeze[]			= "OnFreeze";
 
 // Event types (volume events + global events)
 static constexpr char ScriptReserved_EventOnEnter[]		= "ENTER";
@@ -90,6 +95,7 @@ static constexpr char ScriptReserved_EventOnLoop[]		= "LOOP";
 static constexpr char ScriptReserved_EventOnSave[]		= "SAVE";
 static constexpr char ScriptReserved_EventOnEnd[]		= "END";
 static constexpr char ScriptReserved_EventOnUseItem[]	= "USEITEM";
+static constexpr char ScriptReserved_EventOnFreeze[]	= "FREEZE";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";
@@ -213,6 +219,8 @@ static constexpr char ScriptReserved_SetSettings[]				= "SetSettings";
 static constexpr char ScriptReserved_SetAnimations[]			= "SetAnimations";
 static constexpr char ScriptReserved_EndLevel[]					= "EndLevel";
 static constexpr char ScriptReserved_GetGameStatus[]			= "GetGameStatus";
+static constexpr char ScriptReserved_SetFreezeMode[]			= "SetFreezeMode";
+static constexpr char ScriptReserved_GetFreezeMode[]			= "GetFreezeMode";
 static constexpr char ScriptReserved_SaveGame[]					= "SaveGame";
 static constexpr char ScriptReserved_LoadGame[]					= "LoadGame";
 static constexpr char ScriptReserved_DeleteSaveGame[]			= "DeleteSaveGame";
@@ -247,6 +255,7 @@ static constexpr char ScriptReserved_LaraWeaponType[] = "LaraWeaponType";
 static constexpr char ScriptReserved_PlayerAmmoType[] = "PlayerAmmoType";
 static constexpr char ScriptReserved_HandStatus[]	  = "HandStatus";
 static constexpr char ScriptReserved_GameStatus[]	  = "GameStatus";
+static constexpr char ScriptReserved_FreezeMode[]	  = "FreezeMode";
 
 // Functions
 static constexpr char ScriptReserved_ShowString[]					= "ShowString";

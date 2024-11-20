@@ -5,17 +5,13 @@
 
 class ScriptInterfaceLevel;
 
-enum class TitleType
-{
-	Flyby,
-	Background
-};
-
 class ScriptInterfaceFlowHandler
 {
 public:
-	GameStatus	LastGameStatus		 = GameStatus::Normal;
-	TitleType	TitleType			 = TitleType::Flyby;
+	GameStatus	LastGameStatus		= GameStatus::Normal;
+	FreezeMode	LastFreezeMode		= FreezeMode::None;
+	FreezeMode	CurrentFreezeMode	= FreezeMode::None;
+
 	std::string	IntroImagePath		 = {};
 	std::string	TitleScreenImagePath = {};
 

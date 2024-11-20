@@ -39,6 +39,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Lua API changes
 * Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
+* Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
 * Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
 * Added Effects.GetWind() function to get current wind speed vector.
 * Added support for transparency value in DisplayString class.

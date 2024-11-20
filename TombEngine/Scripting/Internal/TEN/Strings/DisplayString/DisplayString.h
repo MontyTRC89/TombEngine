@@ -1,4 +1,6 @@
 #pragma once
+
+#include "Game/control/control.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 
@@ -60,11 +62,13 @@ private:
 	bool _isTranslated	 = false;
 	bool _deleteWhenZero = false;
 
+	FreezeMode _owner = FreezeMode::None;
+
 	// Constructors
 	UserDisplayString() = default;
 
 public:
-	UserDisplayString(const std::string& key, const Vec2& pos, float scale, D3DCOLOR color, const FlagArray& flags, bool isTranslated);
+	UserDisplayString(const std::string& key, const Vec2& pos, float scale, D3DCOLOR color, const FlagArray& flags, bool isTranslated, FreezeMode owner);
 };
 
 using DisplayStringID	 = uintptr_t;
