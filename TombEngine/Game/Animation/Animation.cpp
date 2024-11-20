@@ -57,7 +57,7 @@ namespace TEN::Animation
 				}
 				else
 				{
-					TENLog("Attempted to get anim root motion for frame 0 from cycle with 1 frame.", LogLevel::Info);
+					TENLog("Attempted to get anim root motion for frame 0 from cycle with 1 frame.", LogLevel::Warning);
 					return {};
 				}
 			}
