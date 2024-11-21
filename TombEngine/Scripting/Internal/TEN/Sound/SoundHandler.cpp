@@ -27,7 +27,7 @@ namespace TEN::Scripting::Sound
 	/// Set and play an ambient track
 	// @function SetAmbientTrack
 	// @tparam string name of track (without file extension) to play
-	// @tparam bool specifies whether ambient track should play from the beginning, or crossfade at a random position
+	// @tparam bool fromStart specifies whether ambient track should play from the start, or crossfade at a random position
 	static void SetAmbientTrack(const std::string& trackName, TypeOrNil<bool> fromTheBeginning)
 	{
 		auto pos = USE_IF_HAVE(bool, fromTheBeginning, false) ? std::optional<QWORD>(0) : std::optional<QWORD>();

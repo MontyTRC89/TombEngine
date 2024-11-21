@@ -117,7 +117,7 @@
 	<td class="summary">Play an audio track</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SetAmbientTrack">SetAmbientTrack(name, specifies)</a></td>
+	<td class="name" ><a href="#SetAmbientTrack">SetAmbientTrack(name, fromStart)</a></td>
 	<td class="summary">Set and play an ambient track</td>
 	</tr>
 	<tr>
@@ -189,7 +189,7 @@
 </dd>
     <dt>
     <a name = "SetAmbientTrack"></a>
-    <strong>SetAmbientTrack(name, specifies)</strong>
+    <strong>SetAmbientTrack(name, fromStart)</strong>
     </dt>
     <dd>
     Set and play an ambient track
@@ -202,9 +202,9 @@
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
          of track (without file extension) to play
         </li>
-        <li><span class="parameter">specifies</span>
+        <li><span class="parameter">fromStart</span>
             <span class="types"><span class="type">bool</span></span>
-         whether ambient track should play from the beginning, or crossfade at a random position
+         specifies whether ambient track should play from the start, or crossfade at a random position
         </li>
     </ul>
 
