@@ -63,6 +63,7 @@ namespace TEN::Entities::Effects
 			if (TestEnvironment(ENV_FLAG_NO_LENSFLARE, Camera.pos.RoomNumber))
 				return;
 
+			// Gradually move lensflare position to a nearest point within closest room.
 			AdjustLensflarePosition(lensFlarePos, cameraPos, 8.0f, BLOCK(256));
 			AdjustLensflarePosition(lensFlarePos, cameraPos, 4.0f, BLOCK(32));
 
@@ -92,24 +93,39 @@ namespace TEN::Entities::Effects
 		bool isVisible = false;
 		if (roomNumber != NO_VALUE)
 		{
+			// Don't draw lensflares in rooms which aren't outside or adjacent to outside rooms.
 			if (TestEnvironment(ENV_FLAG_NOT_NEAR_OUTSIDE, roomNumber) || !isGlobal)
 			{
 				auto origin = GameVector(lensFlarePos, roomNumber);
 				auto target = Camera.pos;
+				auto distance = Vector3::Distance(origin.ToVector3(), target.ToVector3());
+
+				// Check room occlusion.
+				isVisible = LOS(&origin, &target);
 
 				MESH_INFO* mesh = nullptr;
-				auto tempVector = Vector3i();
+				auto pointOfContact = Vector3i();
 
-				isVisible = LOS(&origin, &target) && ObjectOnLOS2(&origin, &target, &tempVector, &mesh) == NO_LOS_ITEM && 
-							ObjectOnLOS2(&origin, &target, &tempVector, nullptr, ID_LARA) == NO_LOS_ITEM;
+				// Check occlusion for all static meshes and moveables but player.
+				bool collided = isVisible && ObjectOnLOS2(&origin, &target, &pointOfContact, &mesh) != NO_LOS_ITEM;
+				if (collided && Vector3::Distance(pointOfContact.ToVector3(), origin.ToVector3()) < distance)
+					isVisible = false;
+
+				// Check occlusion only for player.
+				collided = isVisible && ObjectOnLOS2(&origin, &target, &pointOfContact, nullptr, ID_LARA) != NO_LOS_ITEM;
+				if (collided && Vector3::Distance(pointOfContact.ToVector3(), origin.ToVector3()) < distance)
+					isVisible = false;
 			}
 		}
 
+		// Fade in/out lensflares depending on their visibility.
 		UpdateLensFlareIntensity(isVisible, intensity);
 
+		// Lensflare is completely invisible.
 		if (!isVisible && !isGlobal && intensity == 0.0f)
 			return;
 
+		// Generate slight shimmer.
 		float shimmer = Random::GenerateFloat(-SHIMMER_STRENGTH, SHIMMER_STRENGTH);
 		float finalIntensity = std::clamp(Smoothstep(intensity) + shimmer * intensity, 0.0f, MAX_INTENSITY);
 
