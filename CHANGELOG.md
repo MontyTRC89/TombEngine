@@ -46,7 +46,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added support for transparency value in DisplayString class.
 * Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
-* Fixed DisplayString class not supporting empty lines in multiline strings.
+* Fixed DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
 * Fixed Util.HasLineOfSight() not taking static meshes into consideration.
 * Fixed collision callbacks not properly clearing after leveljump.
