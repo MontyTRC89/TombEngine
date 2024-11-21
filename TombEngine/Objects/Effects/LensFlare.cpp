@@ -45,6 +45,16 @@ namespace TEN::Entities::Effects
 
 	static void SetupLensFlare(const Vector3& pos, int roomNumber, const Color& color, float& intensity, int spriteID)
 	{
+		auto cameraPos = Camera.pos.ToVector3();
+		auto cameraTarget = Camera.target.ToVector3();
+
+		auto forward = (cameraTarget - cameraPos);
+		forward.Normalize();
+
+		// Discard lensflares behind camera.
+		if (forward.Dot(pos - cameraPos) < 0.0f)
+			return;
+
 		auto lensFlarePos = pos;
 		bool isGlobal = roomNumber == NO_VALUE;
 
@@ -53,8 +63,8 @@ namespace TEN::Entities::Effects
 			if (TestEnvironment(ENV_FLAG_NO_LENSFLARE, Camera.pos.RoomNumber))
 				return;
 
-			AdjustLensflarePosition(lensFlarePos, Camera.pos.ToVector3(), 8.0f, BLOCK(256));
-			AdjustLensflarePosition(lensFlarePos, Camera.pos.ToVector3(), 4.0f, BLOCK(32));
+			AdjustLensflarePosition(lensFlarePos, cameraPos, 8.0f, BLOCK(256));
+			AdjustLensflarePosition(lensFlarePos, cameraPos, 4.0f, BLOCK(32));
 
 			// FAILSAFE: Break while loop if room can't be found (e.g. camera is in the void).
 			int narrowingCycleCount = 0;
@@ -68,13 +78,13 @@ namespace TEN::Entities::Effects
 					break;
 				}
 
-				AdjustLensflarePosition(lensFlarePos, Camera.pos.ToVector3(), 2.0f, BLOCK(1));
+				AdjustLensflarePosition(lensFlarePos, cameraPos, 2.0f, BLOCK(32));
 				narrowingCycleCount++;
 			}
 		}
 		else
 		{
-			float dist = Vector3::Distance(lensFlarePos, Camera.pos.ToVector3());
+			float dist = Vector3::Distance(lensFlarePos, cameraPos);
 			if (dist > BLOCK(32))
 				return;
 		}
@@ -84,12 +94,14 @@ namespace TEN::Entities::Effects
 		{
 			if (TestEnvironment(ENV_FLAG_NOT_NEAR_OUTSIDE, roomNumber) || !isGlobal)
 			{
-				auto origin = Camera.pos;
-				auto target = GameVector(lensFlarePos, roomNumber);
+				auto origin = GameVector(lensFlarePos, roomNumber);
+				auto target = Camera.pos;
 
 				MESH_INFO* mesh = nullptr;
 				auto tempVector = Vector3i();
-				isVisible = LOS(&origin, &target) && ObjectOnLOS2(&origin, &target, &tempVector, &mesh) == NO_LOS_ITEM;
+
+				isVisible = LOS(&origin, &target) && ObjectOnLOS2(&origin, &target, &tempVector, &mesh) == NO_LOS_ITEM && 
+							ObjectOnLOS2(&origin, &target, &tempVector, nullptr, ID_LARA) == NO_LOS_ITEM;
 			}
 		}
 
