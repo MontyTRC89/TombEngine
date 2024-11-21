@@ -2164,7 +2164,6 @@ namespace TEN::Renderer
 	void Renderer::DumpGameScene(SceneRenderMode renderMode)
 	{
 		RenderScene(&_dumpScreenRenderTarget, _gameCamera, renderMode);
-		_graphicsSettingsChanged = false;
 	}
 
 	void Renderer::DrawItems(RenderView& view, RendererPass rendererPass)

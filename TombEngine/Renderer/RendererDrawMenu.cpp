@@ -1192,6 +1192,7 @@ namespace TEN::Renderer
 			UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
 			Camera.DisableInterpolation = true;
 			DumpGameScene();
+			_graphicsSettingsChanged = false;
 		}
 
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
