@@ -1072,8 +1072,7 @@ static bool CalculateDeathCamera(const ItemInfo& item)
 		return true;
 
 	// Special death animations.
-	if (item.Animation.AnimNumber == LA_SPIKE_DEATH || 
-		item.Animation.AnimNumber == LA_BOULDER_DEATH || 
+	if (item.Animation.AnimNumber == LA_SPIKE_DEATH ||
 		item.Animation.AnimNumber == LA_TRAIN_OVERBOARD_DEATH)
 	{
 		return true;
