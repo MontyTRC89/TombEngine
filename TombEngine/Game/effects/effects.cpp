@@ -454,9 +454,7 @@ void TriggerRicochetSpark(const GameVector& pos, short angle, bool sound)
 {
 	int count = Random::GenerateInt(3, 8);
 	TriggerRicochetSpark(pos, angle, count);
-
-	if (sound && Random::TestProbability(1 / 3.0f))
-		SoundEffect(SFX_TR4_WEAPON_RICOCHET, &Pose(pos.ToVector3i()));
+	SoundEffect(SFX_TR4_WEAPON_RICOCHET, &Pose(pos.ToVector3i()));
 }
 
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
