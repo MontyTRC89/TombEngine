@@ -2730,7 +2730,7 @@ namespace TEN::Renderer
 		for (int k = 0; k < renderView.RoomsToDraw.size(); k++)
 		{
 			const auto& nativeRoom = g_Level.Rooms[renderView.RoomsToDraw[k]->RoomNumber];
-			if (nativeRoom.flags & ENV_FLAG_OUTSIDE)
+			if (nativeRoom.flags & ENV_FLAG_SKYBOX)
 			{
 				anyOutsideRooms = true;
 				break;

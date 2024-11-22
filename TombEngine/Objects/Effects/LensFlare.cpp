@@ -55,14 +55,17 @@ namespace TEN::Entities::Effects
 		if (forward.Dot(pos - cameraPos) < 0.0f)
 			return;
 
-		auto lensFlarePos = pos;
 		bool isGlobal = roomNumber == NO_VALUE;
+		bool isVisible = true;
+
+		// Don't draw global lensflare if camera is in a room with no lensflare flag set.
+		if (isGlobal && TestEnvironment(ENV_FLAG_NO_LENSFLARE, Camera.pos.RoomNumber))
+			isVisible = false;
+
+		auto lensFlarePos = pos;
 
 		if (isGlobal)
 		{
-			if (TestEnvironment(ENV_FLAG_NO_LENSFLARE, Camera.pos.RoomNumber))
-				return;
-
 			// Gradually move lensflare position to a nearest point within closest room.
 			AdjustLensflarePosition(lensFlarePos, cameraPos, 8.0f, BLOCK(256));
 			AdjustLensflarePosition(lensFlarePos, cameraPos, 4.0f, BLOCK(32));
@@ -82,47 +85,46 @@ namespace TEN::Entities::Effects
 				AdjustLensflarePosition(lensFlarePos, cameraPos, 2.0f, BLOCK(32));
 				narrowingCycleCount++;
 			}
+
+			// Don't draw global lensflare, if not in room or in rooms where skybox is not visible.
+			if (roomNumber == NO_VALUE || TestEnvironment(ENV_FLAG_NOT_NEAR_SKYBOX, roomNumber))
+				isVisible = false;
 		}
 		else
 		{
-			float dist = Vector3::Distance(lensFlarePos, cameraPos);
-			if (dist > BLOCK(32))
-				return;
+			if (Vector3::Distance(lensFlarePos, cameraPos) > BLOCK(64))
+				isVisible = false;
 		}
 
-		bool isVisible = false;
-		if (roomNumber != NO_VALUE)
+		// Do occlusion tests only if lensflare passed the previous checks.
+		if (isVisible)
 		{
-			// Don't draw lensflares in rooms which aren't outside or adjacent to outside rooms.
-			if (TestEnvironment(ENV_FLAG_NOT_NEAR_OUTSIDE, roomNumber) || !isGlobal)
-			{
-				auto origin = GameVector(lensFlarePos, roomNumber);
-				auto target = Camera.pos;
-				auto distance = Vector3::Distance(origin.ToVector3(), target.ToVector3());
+			auto origin = GameVector(lensFlarePos, roomNumber);
+			auto target = Camera.pos;
+			auto distance = Vector3::Distance(origin.ToVector3(), target.ToVector3());
 
-				// Check room occlusion.
-				isVisible = LOS(&origin, &target);
+			// Check room occlusion.
+			isVisible = LOS(&origin, &target);
 
-				MESH_INFO* mesh = nullptr;
-				auto pointOfContact = Vector3i();
+			MESH_INFO* mesh = nullptr;
+			auto pointOfContact = Vector3i();
 
-				// Check occlusion for all static meshes and moveables but player.
-				bool collided = isVisible && ObjectOnLOS2(&origin, &target, &pointOfContact, &mesh) != NO_LOS_ITEM;
-				if (collided && Vector3::Distance(pointOfContact.ToVector3(), origin.ToVector3()) < distance)
-					isVisible = false;
+			// Check occlusion for all static meshes and moveables but player.
+			bool collided = isVisible && ObjectOnLOS2(&origin, &target, &pointOfContact, &mesh) != NO_LOS_ITEM;
+			if (collided && Vector3::Distance(pointOfContact.ToVector3(), origin.ToVector3()) < distance)
+				isVisible = false;
 
-				// Check occlusion only for player.
-				collided = isVisible && ObjectOnLOS2(&origin, &target, &pointOfContact, nullptr, ID_LARA) != NO_LOS_ITEM;
-				if (collided && Vector3::Distance(pointOfContact.ToVector3(), origin.ToVector3()) < distance)
-					isVisible = false;
-			}
+			// Check occlusion only for player.
+			collided = isVisible && ObjectOnLOS2(&origin, &target, &pointOfContact, nullptr, ID_LARA) != NO_LOS_ITEM;
+			if (collided && Vector3::Distance(pointOfContact.ToVector3(), origin.ToVector3()) < distance)
+				isVisible = false;
 		}
 
 		// Fade in/out lensflares depending on their visibility.
 		UpdateLensFlareIntensity(isVisible, intensity);
 
 		// Lensflare is completely invisible.
-		if (!isVisible && !isGlobal && intensity == 0.0f)
+		if (!isVisible && intensity == 0.0f)
 			return;
 
 		// Generate slight shimmer.
