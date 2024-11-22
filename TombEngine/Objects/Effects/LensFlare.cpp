@@ -163,12 +163,27 @@ namespace TEN::Entities::Effects
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		if (TriggerActive(&item))
+		if (!TriggerActive(&item))
+			return;
+
+		auto color = item.Model.Color;
+
+		// If OCB is set, it specifies distance in blocks, after which flare starts to fadeout.
+		if (item.TriggerFlags > 0)
 		{
-			float currentIntensity = (float)item.ItemFlags[0] / 100.0f;
-			SetupLensFlare(item.Pose.Position.ToVector3(), item.RoomNumber, item.Model.Color, currentIntensity, SPRITE_TYPES::SPR_LENS_FLARE_3);
-			item.ItemFlags[0] = (short)(currentIntensity * 100.0f);
+			float falloff  = (float)item.TriggerFlags * BLOCK(1);
+			float distance = Vector3i::Distance(item.Pose.Position, Camera.pos.ToVector3i());
+			if (distance > falloff)
+			{
+				float fadeMultiplier = std::max((1.0f - ((distance - falloff) / falloff)), 0.0f);
+				color *= fadeMultiplier;
+			}
 		}
+
+		// Intensity value can be modified inside lensflare setup function.
+		float currentIntensity = (float)item.ItemFlags[0] / 100.0f;
+		SetupLensFlare(item.Pose.Position.ToVector3(), item.RoomNumber, color, currentIntensity, SPRITE_TYPES::SPR_LENS_FLARE_3);
+		item.ItemFlags[0] = (short)(currentIntensity * 100.0f);
 	}
 
 	void ClearLensFlares()
