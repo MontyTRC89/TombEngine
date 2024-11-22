@@ -15,6 +15,7 @@ namespace TEN::Entities::Effects
 	constexpr float MAX_INTENSITY = 1.0f;		// Maximum intensity
 	constexpr float FADE_SPEED = 0.10f;			// Speed of fade-in/out per frame
 	constexpr float SHIMMER_STRENGTH = 0.15f;	// Max shimmer amplitude
+	constexpr float DEFAULT_FALLOFF_RADIUS = BLOCK(64);
 
 	float GlobalLensFlareIntensity = 0;
 
@@ -90,11 +91,6 @@ namespace TEN::Entities::Effects
 			if (roomNumber == NO_VALUE || TestEnvironment(ENV_FLAG_NOT_NEAR_SKYBOX, roomNumber))
 				isVisible = false;
 		}
-		else
-		{
-			if (Vector3::Distance(lensFlarePos, cameraPos) > BLOCK(64))
-				isVisible = false;
-		}
 
 		// Do occlusion tests only if lensflare passed the previous checks.
 		if (isVisible)
@@ -168,16 +164,19 @@ namespace TEN::Entities::Effects
 
 		auto color = item.Model.Color;
 
-		// If OCB is set, it specifies distance in blocks, after which flare starts to fadeout.
-		if (item.TriggerFlags > 0)
+		// If OCB is set, it specifies radius in blocks, after which flare starts to fadeout.
+		float radius   = (item.TriggerFlags > 0) ? (float)(item.TriggerFlags * BLOCK(1)) : DEFAULT_FALLOFF_RADIUS;
+		float distance = Vector3i::Distance(item.Pose.Position, Camera.pos.ToVector3i());
+
+		if (distance > radius)
 		{
-			float falloff  = (float)item.TriggerFlags * BLOCK(1);
-			float distance = Vector3i::Distance(item.Pose.Position, Camera.pos.ToVector3i());
-			if (distance > falloff)
-			{
-				float fadeMultiplier = std::max((1.0f - ((distance - falloff) / falloff)), 0.0f);
-				color *= fadeMultiplier;
-			}
+			float fadeMultiplier = std::max((1.0f - ((distance - radius) / radius)), 0.0f);
+
+			// Discard flare, if it is out of falloff sphere radius.
+			if (fadeMultiplier <= 0.0f)
+				return;
+
+			color *= fadeMultiplier;
 		}
 
 		// Intensity value can be modified inside lensflare setup function.
