@@ -1841,10 +1841,9 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 					if (linkItem.HitPoints <= 0 || linkItem.HitPoints == NOT_TARGETABLE)
 						continue;
 
-					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY ||
-						object.damageType == DamageMode::None)
+					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
 					{
-						// If vehicle is harmless, enemy is non-damageable, or speed is too low, push enemy.
+						// If vehicle is harmless or speed is too low, just push enemy.
 						ItemPushItem(&linkItem, item, coll, false, 0);
 						continue;
 					}
