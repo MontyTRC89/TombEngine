@@ -713,7 +713,7 @@ namespace TEN::Entities::TR4
 					TriggerShockwave((Pose*)&pos, 24, 88, 200, 128, 128, 128, 32, EulerAngles::Identity, 8, true, false, true, (int)ShockwaveStyle::Normal);
 
 					auto lightColor = Color(1.0f, 0.4f, 0.2f);
-					TriggerDynamicLight(pos.ToVector3(), lightColor, 0.1f);
+					TriggerDynamicPointLight(pos.ToVector3(), lightColor, BLOCK(6));
 
 					Camera.bounce = -128;
 

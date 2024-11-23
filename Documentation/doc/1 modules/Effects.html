@@ -129,6 +129,10 @@
 	<td class="summary">Emit dynamic light that lasts for a single frame.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#EmitSpotLight">EmitSpotLight(pos, dir, color, radius, falloff, distance)</a></td>
+	<td class="summary">Emit dynamic directional spotlight that lasts for a single frame.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#EmitBlood">EmitBlood(pos, count)</a></td>
 	<td class="summary">Emit blood.</td>
 	</tr>
@@ -375,9 +379,42 @@
     <ul>
         <li><span class="parameter">pos</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         position of the light
+        </li>
+        <li><span class="parameter">color</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         light color (default Color(255, 255, 255))
+        </li>
+        <li><span class="parameter">radius</span>
+            <span class="types"><span class="type">int</span></span>
+         measured in "clicks" or 256 world units (default 20)
+        </li>
+    </ul>
 
 
 
+
+
+</dd>
+    <dt>
+    <a name = "EmitSpotLight"></a>
+    <strong>EmitSpotLight(pos, dir, color, radius, falloff, distance)</strong>
+    </dt>
+    <dd>
+    Emit dynamic directional spotlight that lasts for a single frame.
+ If you want a light that sticks around, you must call this each frame.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         position of the light
+        </li>
+        <li><span class="parameter">dir</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         direction, or a point to which spotlight should be directed to
         </li>
         <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
@@ -385,7 +422,15 @@
         </li>
         <li><span class="parameter">radius</span>
             <span class="types"><span class="type">int</span></span>
-         (default 20) corresponds loosely to both intensity and range
+         overall radius at the endpoint of a light cone, measured in "clicks" or 256 world units (default 10)
+        </li>
+        <li><span class="parameter">falloff</span>
+            <span class="types"><span class="type">int</span></span>
+         radius, at which light starts to fade out, measured in "clicks" (default 5)
+        </li>
+        <li><span class="parameter">distance</span>
+            <span class="types"><span class="type">int</span></span>
+         distance, at which light cone fades out, measured in "clicks" (default 20)
         </li>
     </ul>
 

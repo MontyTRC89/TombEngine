@@ -643,7 +643,8 @@ namespace TEN::Renderer
 		void AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags);
 		void AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, RendererDebugPage page = RendererDebugPage::None);
 		void FreeRendererData();
-		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
+		void AddDynamicPointLight(const Vector3& pos, float radius, const Color& color);
+		void AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color);
 		void RenderLoadingScreen(float percentage);
 		void RenderFreezeMode(float interpFactor, bool staticBackground);
 		void UpdateProgress(float value);

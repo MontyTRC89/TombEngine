@@ -1536,32 +1536,58 @@ namespace TEN::Renderer
 		AddDebugSphere(sphere.Center, sphere.Radius, color, page, isWireframe);
 	}
 
-	void Renderer::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
+	void Renderer::AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color)
 	{
 		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
 			return;
 
 		RendererLight dynamicLight = {};
 
-		if (falloff >= 8)
-		{
-			dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
-		}
-		else
-		{
-			r = (r * falloff) >> 3;
-			g = (g * falloff) >> 3;
-			b = (b * falloff) >> 3;
+		dynamicLight.Color = Vector3(color.x, color.y, color.z) * 2.0f;
+		if (falloff < 8)
+			dynamicLight.Color *= (falloff / 8.0f);
 
-			dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
-		}
+		// Calculate outer cone angle (degrees) based on radius at the cone's end distance.
+		float outerConeAngle = atan(radius / distance) * (180.0f / PI);
+		float innerConeAngle = atan((radius - falloff) / distance) * (180.0f / PI);
+		float innerDistance = std::max(0.0f, distance - distance * (falloff / radius));
+
+		// Normalize direction for safety.
+		auto normalizedDirection = dir;
+		normalizedDirection.Normalize();
 
 		dynamicLight.RoomNumber = NO_VALUE;
 		dynamicLight.Intensity = 1.0f;
-		dynamicLight.Position = Vector3(float(x), float(y), float(z));
-		dynamicLight.Out = falloff * 256.0f;
+		dynamicLight.Position = pos;
+		dynamicLight.Direction = normalizedDirection;
+		dynamicLight.In = innerDistance;
+		dynamicLight.Out = distance;
+		dynamicLight.InRange = innerConeAngle > 0.0f ? innerConeAngle : 0.5f;
+		dynamicLight.OutRange = outerConeAngle;
+		dynamicLight.Type = LightType::Spot;
+		dynamicLight.BoundingSphere = BoundingSphere(pos, distance);
+		dynamicLight.Luma = Luma(dynamicLight.Color);
+
+		_dynamicLights.push_back(dynamicLight);
+	}
+
+	void Renderer::AddDynamicPointLight(const Vector3& pos, float radius, const Color& color)
+	{
+		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
+			return;
+
+		RendererLight dynamicLight = {};
+
+		dynamicLight.Color = Vector3(color.x, color.y, color.z) * 2.0f;
+		if (radius < BLOCK(2))
+			dynamicLight.Color *= (radius / BLOCK(2));
+
+		dynamicLight.RoomNumber = NO_VALUE;
+		dynamicLight.Intensity = 1.0f;
+		dynamicLight.Position = pos;
+		dynamicLight.Out = radius;
 		dynamicLight.Type = LightType::Point;
-		dynamicLight.BoundingSphere = BoundingSphere(dynamicLight.Position, dynamicLight.Out);
+		dynamicLight.BoundingSphere = BoundingSphere(pos, radius);
 		dynamicLight.Luma = Luma(dynamicLight.Color);
 
 		_dynamicLights.push_back(dynamicLight);
