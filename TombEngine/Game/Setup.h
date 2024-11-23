@@ -37,10 +37,11 @@ enum class LotType
 	HumanPlusJump,
 	HumanPlusJumpAndMonkey,
 	Flyer,
-	Blockable,	  // For large creatures such as trex and shiva.
-	Spider,		  // Only 2 block vault allowed.
-	Ape,		  // Only 2 block vault allowed.
-	SnowmobileGun // Only 1 block vault allowed and 4 block drop max.
+	Blockable,	   // For large creatures such as trex and shiva.
+	Spider,		   // Only 2 block vault allowed.
+	Ape,		   // Only 2 block vault allowed.
+	SnowmobileGun, // Only 1 block vault allowed and 4 block drop max.
+	EnemyJeep
 };
 
 enum class HitEffect
