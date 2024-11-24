@@ -6,9 +6,9 @@ namespace TEN::Math::Random
 {
 	// Value generation
 
-	int	  GenerateInt(int min = 0, int max = SHRT_MAX);
-	float GenerateFloat(float min = 0.0f, float max = 1.0f);
-	short GenerateAngle(short min = SHRT_MIN, short max = SHRT_MAX);
+	int	  GenerateInt(int low = 0, int high = SHRT_MAX);
+	float GenerateFloat(float low = 0.0f, float high = 1.0f);
+	short GenerateAngle(short low = SHRT_MIN, short high = SHRT_MAX);
 
 	// 2D geometric generation
 
