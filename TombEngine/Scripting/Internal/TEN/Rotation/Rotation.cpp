@@ -77,6 +77,29 @@ Rotation::operator Vector3() const
 	return Vector3(x, y, z);
 };
 
+/// Converts rotation to a directional vector or normal.
+/// @tparam[opt] Vec3 position if specified, directional vector will be placed in relation to a given position.
+/// @tparam[opt] float distance if specified, vector will be scaled to this distance, otherwise its X, Y and Z values will be normalized on a range from -1 to 1.
+// @treturn Vec3 resulting directional vector calculated from this rotation.
+// @function ToDirection
+Vec3 Rotation::ToDirection(sol::optional<Vec3> position, sol::optional<float> distance) const
+{
+	// Convert degrees to radians.
+	float pitch = x * RADIAN;
+	float yaw   = y * RADIAN;
+
+	// Calculate the direction vector.
+	float dirX = std::cos(yaw) * std::cos(pitch);
+	float dirY = std::sin(pitch);
+	float dirZ = std::sin(yaw) * std::cos(pitch);
+
+	Vec3  pos  = position.value_or(Vec3(0));
+	float dist = distance.value_or(0);
+
+	// Scale by the given distance.
+	return pos + Vec3(dirX * dist, dirY * dist, dirZ * dist);
+}
+
 /// @tparam Rotation rotation this Rotation.
 // @treturn string A string showing the X, Y, and Z angle components of the Rotation.
 // @function __tostring
