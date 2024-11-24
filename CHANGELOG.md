@@ -20,6 +20,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed vehicle transfer not happening for levels which were not previously visited.
 * Fixed audio tracks placed in subfolders not restoring after loading savegame.
 * Fixed initial position and lack of fade-in for looped audio track on level start.
+* Fixed shatter debris spawning on incorrect position for the first frame.
 * Fixed scripted input events not registering on the same game frame.
 * Fixed incorrect object camera position.
 * Fixed incorrect camera movement near walls after leaving look mode.

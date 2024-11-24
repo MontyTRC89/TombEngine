@@ -3020,9 +3020,10 @@ namespace TEN::Renderer
 			rDrawSprite.Scale = 1.0f;
 			rDrawSprite.Width = SUN_SIZE;
 			rDrawSprite.Height = SUN_SIZE;
+			rDrawSprite.color = renderView.LensFlaresToDraw[0].Color;
 
 			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
-			_stInstancedSpriteBuffer.Sprites[0].Color = Vector4::One;
+			_stInstancedSpriteBuffer.Sprites[0].Color = renderView.LensFlaresToDraw[0].Color;
 			_stInstancedSpriteBuffer.Sprites[0].IsBillboard = 1;
 			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = 0;
 

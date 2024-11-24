@@ -183,6 +183,9 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 				fragment->numBounces = 0;
 				fragment->color = isStatic ? mesh->color : item->color;
 				fragment->lightMode = fragmentsMesh->lightMode;
+
+				fragment->UpdateTransform();
+				fragment->StoreInterpolationData();
 			}
 		}
 	}
@@ -259,9 +262,7 @@ void UpdateDebris()
 				deb.numBounces++;
 			}
 
-			auto translation = Matrix::CreateTranslation(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z);
-			auto rotation = Matrix::CreateFromQuaternion(deb.rotation);
-			deb.Transform = rotation * translation;
+			deb.UpdateTransform();
 		}
 	}
 }
