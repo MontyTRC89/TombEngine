@@ -3168,9 +3168,7 @@ namespace TEN::Gui
 
 	bool GuiController::CallPause()
 	{
-		ClearAllDisplaySprites();
-		g_Renderer.PrepareScene();
-		g_Renderer.DumpGameScene();
+		g_Renderer.DumpGameScene(SceneRenderMode::NoHud);
 		PauseAllSounds(SoundPauseMode::Pause);
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -3251,9 +3249,7 @@ namespace TEN::Gui
 
 		player.Inventory.OldBusy = player.Inventory.IsBusy;
 
-		ClearAllDisplaySprites();
-		g_Renderer.PrepareScene();
-		g_Renderer.DumpGameScene();
+		g_Renderer.DumpGameScene(SceneRenderMode::NoHud);
 		PauseAllSounds(SoundPauseMode::Inventory);
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -3506,7 +3502,7 @@ namespace TEN::Gui
 
 	LoadResult GuiController::DoLoad()
 	{
-		constexpr auto DEATH_NO_INPUT_LOAD_TIMEOUT = 1 * FPS;
+		constexpr auto DEATH_NO_INPUT_LOAD_TIMEOUT = FPS / 2;
 
 		bool canLoop = g_Configuration.MenuOptionLoopingMode == MenuOptionLoopingMode::SaveLoadOnly ||
 					   g_Configuration.MenuOptionLoopingMode == MenuOptionLoopingMode::AllMenus;
@@ -3524,7 +3520,7 @@ namespace TEN::Gui
 			else
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				g_GameFlow->SelectedSaveGame = SelectedSaveSlot;
+				NextLevel = -(SelectedSaveSlot + 1);
 				return LoadResult::Load;
 			}
 		}

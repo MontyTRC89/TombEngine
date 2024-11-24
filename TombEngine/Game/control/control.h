@@ -26,6 +26,14 @@ enum class GameStatus
 	LevelComplete
 };
 
+enum class FreezeMode
+{
+	None,
+	Full,
+	Spectator,
+	Player
+};
+
 enum class LevelLoadType
 {
 	New,
@@ -64,7 +72,6 @@ extern bool ThreadEnded;
 extern int RequiredStartPos;
 extern int CurrentLevel;
 extern int NextLevel;
-extern int SystemNameHash;
 
 extern bool  InItemControlLoop;
 extern short ItemNewRoomNo;

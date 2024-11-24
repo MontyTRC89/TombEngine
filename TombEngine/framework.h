@@ -4,6 +4,7 @@
 #include <array>
 #include <d3d11.h>
 #include <deque>
+#include <filesystem>
 #include <functional>
 #include <future>
 #include <map>

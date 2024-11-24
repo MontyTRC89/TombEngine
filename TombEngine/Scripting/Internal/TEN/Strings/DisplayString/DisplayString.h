@@ -1,6 +1,26 @@
 #pragma once
+
+#include "Game/control/control.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
+
+/***
+Constants for Display String Options.
+@enum Strings.DisplayStringOption
+@pragma nostrip
+*/
+
+/*** Strings.DisplayStringOption constants.
+
+@table Strings.DisplayStringOption
+	CENTER	-- set the horizontal origin point to the center of the string.
+	RIGHT	-- set the horizontal origin point to right of the string.
+	SHADOW	-- gives the string a small drop shadow.
+	BLINK	-- blinks the string
+*/
+/***
+
+*/
 
 enum class DisplayStringOptions
 {
@@ -42,11 +62,13 @@ private:
 	bool _isTranslated	 = false;
 	bool _deleteWhenZero = false;
 
+	FreezeMode _owner = FreezeMode::None;
+
 	// Constructors
 	UserDisplayString() = default;
 
 public:
-	UserDisplayString(const std::string& key, const Vec2& pos, float scale, D3DCOLOR color, const FlagArray& flags, bool isTranslated);
+	UserDisplayString(const std::string& key, const Vec2& pos, float scale, D3DCOLOR color, const FlagArray& flags, bool isTranslated, FreezeMode owner);
 };
 
 using DisplayStringID	 = uintptr_t;

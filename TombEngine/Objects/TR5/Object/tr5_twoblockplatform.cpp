@@ -92,7 +92,7 @@ namespace TEN::Entities::Generic
 
 				if (probe.GetRoomNumber() != item->RoomNumber)
 				{
-					UpdateBridgeItem(*item, true);
+					UpdateBridgeItem(*item, BridgeUpdateType::Remove);
 					ItemNewRoom(itemNumber, probe.GetRoomNumber());
 					UpdateBridgeItem(*item);
 				}

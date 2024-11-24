@@ -117,9 +117,9 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 		}
 		else
 		{
-			if (!endOfLife || str._isInfinite)
+			if ((!endOfLife || str._isInfinite) && str._owner == g_GameFlow->CurrentFreezeMode)
 			{
-				auto cstr = str._isTranslated ? g_GameFlow->GetString(str._key.c_str()) : str._key.c_str();
+				auto cstr = str._isTranslated ? g_GameFlow->GetString(str._key.c_str()) : str._key;
 				int flags = 0;
 
 				if (str._flags[(size_t)DisplayStringOptions::Center])

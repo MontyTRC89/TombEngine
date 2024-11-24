@@ -540,7 +540,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (target.ItemFlags[1] == 1)
 		{
 			if (pos.has_value())
-				TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y);
 
 			return;
 		}

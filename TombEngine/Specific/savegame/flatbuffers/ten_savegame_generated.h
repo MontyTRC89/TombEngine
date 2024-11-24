@@ -5761,6 +5761,7 @@ flatbuffers::Offset<Pendulum> CreatePendulum(flatbuffers::FlatBufferBuilder &_fb
 struct EventSetT : public flatbuffers::NativeTable {
   typedef EventSet TableType;
   int32_t index = 0;
+  std::vector<bool> statuses{};
   std::vector<int32_t> call_counters{};
 };
 
@@ -5770,10 +5771,14 @@ struct EventSet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_INDEX = 4,
-    VT_CALL_COUNTERS = 6
+    VT_STATUSES = 6,
+    VT_CALL_COUNTERS = 8
   };
   int32_t index() const {
     return GetField<int32_t>(VT_INDEX, 0);
+  }
+  const flatbuffers::Vector<uint8_t> *statuses() const {
+    return GetPointer<const flatbuffers::Vector<uint8_t> *>(VT_STATUSES);
   }
   const flatbuffers::Vector<int32_t> *call_counters() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_CALL_COUNTERS);
@@ -5781,6 +5786,8 @@ struct EventSet FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_INDEX) &&
+           VerifyOffset(verifier, VT_STATUSES) &&
+           verifier.VerifyVector(statuses()) &&
            VerifyOffset(verifier, VT_CALL_COUNTERS) &&
            verifier.VerifyVector(call_counters()) &&
            verifier.EndTable();
@@ -5796,6 +5803,9 @@ struct EventSetBuilder {
   flatbuffers::uoffset_t start_;
   void add_index(int32_t index) {
     fbb_.AddElement<int32_t>(EventSet::VT_INDEX, index, 0);
+  }
+  void add_statuses(flatbuffers::Offset<flatbuffers::Vector<uint8_t>> statuses) {
+    fbb_.AddOffset(EventSet::VT_STATUSES, statuses);
   }
   void add_call_counters(flatbuffers::Offset<flatbuffers::Vector<int32_t>> call_counters) {
     fbb_.AddOffset(EventSet::VT_CALL_COUNTERS, call_counters);
@@ -5814,9 +5824,11 @@ struct EventSetBuilder {
 inline flatbuffers::Offset<EventSet> CreateEventSet(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t index = 0,
+    flatbuffers::Offset<flatbuffers::Vector<uint8_t>> statuses = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> call_counters = 0) {
   EventSetBuilder builder_(_fbb);
   builder_.add_call_counters(call_counters);
+  builder_.add_statuses(statuses);
   builder_.add_index(index);
   return builder_.Finish();
 }
@@ -5829,11 +5841,14 @@ struct EventSet::Traits {
 inline flatbuffers::Offset<EventSet> CreateEventSetDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t index = 0,
+    const std::vector<uint8_t> *statuses = nullptr,
     const std::vector<int32_t> *call_counters = nullptr) {
+  auto statuses__ = statuses ? _fbb.CreateVector<uint8_t>(*statuses) : 0;
   auto call_counters__ = call_counters ? _fbb.CreateVector<int32_t>(*call_counters) : 0;
   return TEN::Save::CreateEventSet(
       _fbb,
       index,
+      statuses__,
       call_counters__);
 }
 
@@ -7017,6 +7032,7 @@ flatbuffers::Offset<UnionVec> CreateUnionVec(flatbuffers::FlatBufferBuilder &_fb
 struct SaveGameHeaderT : public flatbuffers::NativeTable {
   typedef SaveGameHeader TableType;
   std::string level_name{};
+  int32_t level_hash = 0;
   int32_t days = 0;
   int32_t hours = 0;
   int32_t minutes = 0;
@@ -7032,16 +7048,20 @@ struct SaveGameHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_LEVEL_NAME = 4,
-    VT_DAYS = 6,
-    VT_HOURS = 8,
-    VT_MINUTES = 10,
-    VT_SECONDS = 12,
-    VT_LEVEL = 14,
-    VT_TIMER = 16,
-    VT_COUNT = 18
+    VT_LEVEL_HASH = 6,
+    VT_DAYS = 8,
+    VT_HOURS = 10,
+    VT_MINUTES = 12,
+    VT_SECONDS = 14,
+    VT_LEVEL = 16,
+    VT_TIMER = 18,
+    VT_COUNT = 20
   };
   const flatbuffers::String *level_name() const {
     return GetPointer<const flatbuffers::String *>(VT_LEVEL_NAME);
+  }
+  int32_t level_hash() const {
+    return GetField<int32_t>(VT_LEVEL_HASH, 0);
   }
   int32_t days() const {
     return GetField<int32_t>(VT_DAYS, 0);
@@ -7068,6 +7088,7 @@ struct SaveGameHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_LEVEL_NAME) &&
            verifier.VerifyString(level_name()) &&
+           VerifyField<int32_t>(verifier, VT_LEVEL_HASH) &&
            VerifyField<int32_t>(verifier, VT_DAYS) &&
            VerifyField<int32_t>(verifier, VT_HOURS) &&
            VerifyField<int32_t>(verifier, VT_MINUTES) &&
@@ -7088,6 +7109,9 @@ struct SaveGameHeaderBuilder {
   flatbuffers::uoffset_t start_;
   void add_level_name(flatbuffers::Offset<flatbuffers::String> level_name) {
     fbb_.AddOffset(SaveGameHeader::VT_LEVEL_NAME, level_name);
+  }
+  void add_level_hash(int32_t level_hash) {
+    fbb_.AddElement<int32_t>(SaveGameHeader::VT_LEVEL_HASH, level_hash, 0);
   }
   void add_days(int32_t days) {
     fbb_.AddElement<int32_t>(SaveGameHeader::VT_DAYS, days, 0);
@@ -7124,6 +7148,7 @@ struct SaveGameHeaderBuilder {
 inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> level_name = 0,
+    int32_t level_hash = 0,
     int32_t days = 0,
     int32_t hours = 0,
     int32_t minutes = 0,
@@ -7139,6 +7164,7 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(
   builder_.add_minutes(minutes);
   builder_.add_hours(hours);
   builder_.add_days(days);
+  builder_.add_level_hash(level_hash);
   builder_.add_level_name(level_name);
   return builder_.Finish();
 }
@@ -7151,6 +7177,7 @@ struct SaveGameHeader::Traits {
 inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeaderDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *level_name = nullptr,
+    int32_t level_hash = 0,
     int32_t days = 0,
     int32_t hours = 0,
     int32_t minutes = 0,
@@ -7162,6 +7189,7 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeaderDirect(
   return TEN::Save::CreateSaveGameHeader(
       _fbb,
       level_name__,
+      level_hash,
       days,
       hours,
       minutes,
@@ -7352,6 +7380,10 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::vector<std::string> callbacks_post_load{};
   std::vector<std::string> callbacks_pre_loop{};
   std::vector<std::string> callbacks_post_loop{};
+  std::vector<std::string> callbacks_pre_useitem{};
+  std::vector<std::string> callbacks_post_useitem{};
+  std::vector<std::string> callbacks_pre_freeze{};
+  std::vector<std::string> callbacks_post_freeze{};
 };
 
 struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -7411,7 +7443,11 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_CALLBACKS_PRE_LOAD = 102,
     VT_CALLBACKS_POST_LOAD = 104,
     VT_CALLBACKS_PRE_LOOP = 106,
-    VT_CALLBACKS_POST_LOOP = 108
+    VT_CALLBACKS_POST_LOOP = 108,
+    VT_CALLBACKS_PRE_USEITEM = 110,
+    VT_CALLBACKS_POST_USEITEM = 112,
+    VT_CALLBACKS_PRE_FREEZE = 114,
+    VT_CALLBACKS_POST_FREEZE = 116
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -7572,6 +7608,18 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_loop() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_CALLBACKS_POST_LOOP);
   }
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_useitem() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_CALLBACKS_PRE_USEITEM);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_useitem() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_CALLBACKS_POST_USEITEM);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_freeze() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_CALLBACKS_PRE_FREEZE);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_freeze() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_CALLBACKS_POST_FREEZE);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_HEADER) &&
@@ -7695,6 +7743,18 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_CALLBACKS_POST_LOOP) &&
            verifier.VerifyVector(callbacks_post_loop()) &&
            verifier.VerifyVectorOfStrings(callbacks_post_loop()) &&
+           VerifyOffset(verifier, VT_CALLBACKS_PRE_USEITEM) &&
+           verifier.VerifyVector(callbacks_pre_useitem()) &&
+           verifier.VerifyVectorOfStrings(callbacks_pre_useitem()) &&
+           VerifyOffset(verifier, VT_CALLBACKS_POST_USEITEM) &&
+           verifier.VerifyVector(callbacks_post_useitem()) &&
+           verifier.VerifyVectorOfStrings(callbacks_post_useitem()) &&
+           VerifyOffset(verifier, VT_CALLBACKS_PRE_FREEZE) &&
+           verifier.VerifyVector(callbacks_pre_freeze()) &&
+           verifier.VerifyVectorOfStrings(callbacks_pre_freeze()) &&
+           VerifyOffset(verifier, VT_CALLBACKS_POST_FREEZE) &&
+           verifier.VerifyVector(callbacks_post_freeze()) &&
+           verifier.VerifyVectorOfStrings(callbacks_post_freeze()) &&
            verifier.EndTable();
   }
   SaveGameT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -7865,6 +7925,18 @@ struct SaveGameBuilder {
   void add_callbacks_post_loop(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_loop) {
     fbb_.AddOffset(SaveGame::VT_CALLBACKS_POST_LOOP, callbacks_post_loop);
   }
+  void add_callbacks_pre_useitem(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_useitem) {
+    fbb_.AddOffset(SaveGame::VT_CALLBACKS_PRE_USEITEM, callbacks_pre_useitem);
+  }
+  void add_callbacks_post_useitem(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_useitem) {
+    fbb_.AddOffset(SaveGame::VT_CALLBACKS_POST_USEITEM, callbacks_post_useitem);
+  }
+  void add_callbacks_pre_freeze(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_freeze) {
+    fbb_.AddOffset(SaveGame::VT_CALLBACKS_PRE_FREEZE, callbacks_pre_freeze);
+  }
+  void add_callbacks_post_freeze(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_freeze) {
+    fbb_.AddOffset(SaveGame::VT_CALLBACKS_POST_FREEZE, callbacks_post_freeze);
+  }
   explicit SaveGameBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -7930,8 +8002,16 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_load = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_load = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_loop = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_loop = 0) {
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_loop = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_useitem = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_useitem = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_pre_freeze = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>>> callbacks_post_freeze = 0) {
   SaveGameBuilder builder_(_fbb);
+  builder_.add_callbacks_post_freeze(callbacks_post_freeze);
+  builder_.add_callbacks_pre_freeze(callbacks_pre_freeze);
+  builder_.add_callbacks_post_useitem(callbacks_post_useitem);
+  builder_.add_callbacks_pre_useitem(callbacks_pre_useitem);
   builder_.add_callbacks_post_loop(callbacks_post_loop);
   builder_.add_callbacks_pre_loop(callbacks_pre_loop);
   builder_.add_callbacks_post_load(callbacks_post_load);
@@ -8047,7 +8127,11 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_load = nullptr,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_load = nullptr,
     const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_loop = nullptr,
-    const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_loop = nullptr) {
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_loop = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_useitem = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_useitem = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_pre_freeze = nullptr,
+    const std::vector<flatbuffers::Offset<flatbuffers::String>> *callbacks_post_freeze = nullptr) {
   auto rooms__ = rooms ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Room>>(*rooms) : 0;
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto room_items__ = room_items ? _fbb.CreateVector<int32_t>(*room_items) : 0;
@@ -8080,6 +8164,10 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto callbacks_post_load__ = callbacks_post_load ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_post_load) : 0;
   auto callbacks_pre_loop__ = callbacks_pre_loop ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_pre_loop) : 0;
   auto callbacks_post_loop__ = callbacks_post_loop ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_post_loop) : 0;
+  auto callbacks_pre_useitem__ = callbacks_pre_useitem ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_pre_useitem) : 0;
+  auto callbacks_post_useitem__ = callbacks_post_useitem ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_post_useitem) : 0;
+  auto callbacks_pre_freeze__ = callbacks_pre_freeze ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_pre_freeze) : 0;
+  auto callbacks_post_freeze__ = callbacks_post_freeze ? _fbb.CreateVector<flatbuffers::Offset<flatbuffers::String>>(*callbacks_post_freeze) : 0;
   return TEN::Save::CreateSaveGame(
       _fbb,
       header,
@@ -8134,7 +8222,11 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       callbacks_pre_load__,
       callbacks_post_load__,
       callbacks_pre_loop__,
-      callbacks_post_loop__);
+      callbacks_post_loop__,
+      callbacks_pre_useitem__,
+      callbacks_post_useitem__,
+      callbacks_pre_freeze__,
+      callbacks_post_freeze__);
 }
 
 flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -9789,6 +9881,7 @@ inline void EventSet::UnPackTo(EventSetT *_o, const flatbuffers::resolver_functi
   (void)_o;
   (void)_resolver;
   { auto _e = index(); _o->index = _e; }
+  { auto _e = statuses(); if (_e) { _o->statuses.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->statuses[_i] = _e->Get(_i) != 0; } } }
   { auto _e = call_counters(); if (_e) { _o->call_counters.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->call_counters[_i] = _e->Get(_i); } } }
 }
 
@@ -9801,10 +9894,12 @@ inline flatbuffers::Offset<EventSet> CreateEventSet(flatbuffers::FlatBufferBuild
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const EventSetT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _index = _o->index;
+  auto _statuses = _fbb.CreateVector(_o->statuses);
   auto _call_counters = _fbb.CreateVector(_o->call_counters);
   return TEN::Save::CreateEventSet(
       _fbb,
       _index,
+      _statuses,
       _call_counters);
 }
 
@@ -10245,6 +10340,7 @@ inline void SaveGameHeader::UnPackTo(SaveGameHeaderT *_o, const flatbuffers::res
   (void)_o;
   (void)_resolver;
   { auto _e = level_name(); if (_e) _o->level_name = _e->str(); }
+  { auto _e = level_hash(); _o->level_hash = _e; }
   { auto _e = days(); _o->days = _e; }
   { auto _e = hours(); _o->hours = _e; }
   { auto _e = minutes(); _o->minutes = _e; }
@@ -10263,6 +10359,7 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(flatbuffers::Fla
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const SaveGameHeaderT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _level_name = _o->level_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->level_name);
+  auto _level_hash = _o->level_hash;
   auto _days = _o->days;
   auto _hours = _o->hours;
   auto _minutes = _o->minutes;
@@ -10273,6 +10370,7 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(flatbuffers::Fla
   return TEN::Save::CreateSaveGameHeader(
       _fbb,
       _level_name,
+      _level_hash,
       _days,
       _hours,
       _minutes,
@@ -10388,6 +10486,10 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = callbacks_post_load(); if (_e) { _o->callbacks_post_load.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_post_load[_i] = _e->Get(_i)->str(); } } }
   { auto _e = callbacks_pre_loop(); if (_e) { _o->callbacks_pre_loop.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_pre_loop[_i] = _e->Get(_i)->str(); } } }
   { auto _e = callbacks_post_loop(); if (_e) { _o->callbacks_post_loop.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_post_loop[_i] = _e->Get(_i)->str(); } } }
+  { auto _e = callbacks_pre_useitem(); if (_e) { _o->callbacks_pre_useitem.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_pre_useitem[_i] = _e->Get(_i)->str(); } } }
+  { auto _e = callbacks_post_useitem(); if (_e) { _o->callbacks_post_useitem.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_post_useitem[_i] = _e->Get(_i)->str(); } } }
+  { auto _e = callbacks_pre_freeze(); if (_e) { _o->callbacks_pre_freeze.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_pre_freeze[_i] = _e->Get(_i)->str(); } } }
+  { auto _e = callbacks_post_freeze(); if (_e) { _o->callbacks_post_freeze.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->callbacks_post_freeze[_i] = _e->Get(_i)->str(); } } }
 }
 
 inline flatbuffers::Offset<SaveGame> SaveGame::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -10451,6 +10553,10 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _callbacks_post_load = _fbb.CreateVectorOfStrings(_o->callbacks_post_load);
   auto _callbacks_pre_loop = _fbb.CreateVectorOfStrings(_o->callbacks_pre_loop);
   auto _callbacks_post_loop = _fbb.CreateVectorOfStrings(_o->callbacks_post_loop);
+  auto _callbacks_pre_useitem = _fbb.CreateVectorOfStrings(_o->callbacks_pre_useitem);
+  auto _callbacks_post_useitem = _fbb.CreateVectorOfStrings(_o->callbacks_post_useitem);
+  auto _callbacks_pre_freeze = _fbb.CreateVectorOfStrings(_o->callbacks_pre_freeze);
+  auto _callbacks_post_freeze = _fbb.CreateVectorOfStrings(_o->callbacks_post_freeze);
   return TEN::Save::CreateSaveGame(
       _fbb,
       _header,
@@ -10505,7 +10611,11 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _callbacks_pre_load,
       _callbacks_post_load,
       _callbacks_pre_loop,
-      _callbacks_post_loop);
+      _callbacks_post_loop,
+      _callbacks_pre_useitem,
+      _callbacks_post_useitem,
+      _callbacks_pre_freeze,
+      _callbacks_post_freeze);
 }
 
 inline bool VerifyVarUnion(flatbuffers::Verifier &verifier, const void *obj, VarUnion type) {

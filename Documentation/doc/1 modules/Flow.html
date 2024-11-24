@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.5 Lua API</title>
+    <title>TombEngine 1.6 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -77,6 +77,7 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
@@ -85,6 +86,7 @@
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
   <li>    <a href="../4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Strings.DisplayStringOption.html">Strings.DisplayStringOption</a></li>
   <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
   <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
   <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
@@ -162,12 +164,24 @@ scripts too.</p>
 	<td class="summary">Returns the level that the game control is running in that moment.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#GetNextLevel">GetNextLevel()</a></td>
+	<td class="summary">Returns the level that is about to load.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#EndLevel">EndLevel([index][, startPos])</a></td>
 	<td class="summary">Finishes the current level, with optional level index and start position index provided.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#GetGameStatus">GetGameStatus()</a></td>
 	<td class="summary">Get current game status, such as normal game loop, exiting to title, etc.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetFreezeMode">GetFreezeMode()</a></td>
+	<td class="summary">Get current freeze mode, such as none, full, spectator or player.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetFreezeMode">SetFreezeMode(new)</a></td>
+	<td class="summary">Set current freeze mode, such as none, full, spectator or player.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#SaveGame">SaveGame(slotID)</a></td>
@@ -540,6 +554,27 @@ have an ID of 0, the second an ID of 1, and so on.
 
 </dd>
     <dt>
+    <a name = "GetNextLevel"></a>
+    <strong>GetNextLevel()</strong>
+    </dt>
+    <dd>
+    Returns the level that is about to load.  If no new level is about to load, returns current level.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Flow.Level.html#">Level</a></span>
+        incoming new level or current level, if no new level is loading
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "EndLevel"></a>
     <strong>EndLevel([index][, startPos])</strong>
     </dt>
@@ -586,6 +621,51 @@ teleported to such object with OCB similar to provided second argument.
            <span class="types"><a class="type" href="../4 enums/Flow.GameStatus.html#">GameStatus</a></span>
         the current game status
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetFreezeMode"></a>
+    <strong>GetFreezeMode()</strong>
+    </dt>
+    <dd>
+    Get current freeze mode, such as none, full, spectator or player.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../4 enums/Flow.FreezeMode.html#">FreezeMode</a></span>
+        the current freeze mode
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetFreezeMode"></a>
+    <strong>SetFreezeMode(new)</strong>
+    </dt>
+    <dd>
+    Set current freeze mode, such as none, full, spectator or player. <br/>
+Freeze mode specifies whether game is in normal mode or paused in a particular way to allow
+custom menu creation, photo mode or time freeze.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">new</span>
+            <span class="types"><a class="type" href="../4 enums/Flow.FreezeMode.html#">FreezeMode</a></span>
+         freeze mode to set.
+        </li>
+    </ul>
+
 
 
 

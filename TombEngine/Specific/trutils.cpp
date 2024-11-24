@@ -132,20 +132,20 @@ namespace TEN::Utils
 		return result;
 	}
 
-	std::vector<std::string> SplitString(const std::string& string)
+	std::vector<std::wstring> SplitString(const std::wstring& string)
 	{
-		auto strings = std::vector<std::string>{};
+		auto strings = std::vector<std::wstring>{};
 
 		// Exit early if string is single line.
-		if (string.find('\n') == std::string::npos)
+		if (string.find(L'\n') == std::wstring::npos)
 		{
 			strings.push_back(string);
 			return strings;
 		}
 
-		std::string::size_type pos = 0;
-		std::string::size_type prev = 0;
-		while ((pos = string.find('\n', prev)) != std::string::npos)
+		std::wstring::size_type pos = 0;
+		std::wstring::size_type prev = 0;
+		while ((pos = string.find(L'\n', prev)) != std::string::npos)
 		{
 			strings.push_back(string.substr(prev, pos - prev));
 			prev = pos + 1;

@@ -276,7 +276,7 @@ void KillItem(short const itemNumber)
 		// AI target generation uses a hack with making a dummy item without ObjectNumber.
 		// Therefore, a check should be done here to prevent access violation.
 		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && item->IsBridge())
-			UpdateBridgeItem(*item, true);
+			UpdateBridgeItem(*item, BridgeUpdateType::Remove);
 
 		GameScriptHandleKilled(itemNumber, true);
 
@@ -479,13 +479,13 @@ void InitializeFXArray()
 	NextFxActive = NO_VALUE;
 	NextFxFree = 0;
 
-	for (int i = 0; i < NUM_EFFECTS; i++)
+	for (int i = 0; i < MAX_SPAWNED_ITEM_COUNT; i++)
 	{
 		auto* fx = &EffectList[i];
 		fx->nextFx = i + 1;
 	}
 
-	EffectList[NUM_EFFECTS - 1].nextFx = NO_VALUE;
+	EffectList[MAX_SPAWNED_ITEM_COUNT - 1].nextFx = NO_VALUE;
 }
 
 void RemoveDrawnItem(short itemNumber) 
@@ -763,28 +763,30 @@ void UpdateAllItems()
 	while (itemNumber != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		short nextItem = item->NextActive;
+		itemNumber = item->NextActive;
 
 		if (!Objects.CheckID(item->ObjectNumber))
+			continue;
+
+		if (g_GameFlow->LastFreezeMode != FreezeMode::None && !Objects[item->ObjectNumber].AlwaysActive)
 			continue;
 
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
 			if (Objects[item->ObjectNumber].control)
-				Objects[item->ObjectNumber].control(itemNumber);
+				Objects[item->ObjectNumber].control(item->Index);
 
-			TestVolumes(itemNumber);
+			TestVolumes(item->Index);
 			ProcessEffects(item);
 
 			if (item->AfterDeath > 0 && item->AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
 				item->AfterDeath++;
 			if (item->AfterDeath == ITEM_DEATH_TIMEOUT)
-				KillItem(itemNumber);
+				KillItem(item->Index);
 		}
 		else
-			KillItem(itemNumber);
+			KillItem(item->Index);
 
-		itemNumber = nextItem;
 	}
 
 	InItemControlLoop = false;
@@ -893,7 +895,7 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 			break;
 
 		case HitEffect::Richochet:
-			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y);
 			break;
 
 		case HitEffect::Smoke:

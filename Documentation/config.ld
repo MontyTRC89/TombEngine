@@ -12,7 +12,7 @@ new_type("luautil", "5 Lua utility modules", true)
 
 not_luadoc = true
 
-local version = "1.5"
+local version = "1.6"
 project = "TombEngine"
 title = "TombEngine " .. version .. " Lua API"
 description = "TombEngine " .. version .. " scripting interface"
@@ -34,7 +34,7 @@ If this happens, check __logs/TENLog.txt__ and look for an error message with th
 
 Enjoy.
 
-\- _squidshire_
+\- _squidshire and the TombEngine development team._
 ]]
 
 convert_opt=true 

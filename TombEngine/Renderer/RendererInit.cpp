@@ -131,11 +131,11 @@ namespace TEN::Renderer
 		_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
 		_triangles3DToDraw = createVector<RendererTriangle3D>(MAX_TRIANGLES_3D);
 
-		for (int i = 0; i < ITEM_COUNT_MAX; i++)
-		{
-			_items[i].LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
-			_effects[i].LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
-		}
+		for (auto& item : _items)
+			item.LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
+
+		for (auto& effect : _effects)
+			effect.LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 
 		D3D11_BLEND_DESC blendStateDesc{};
 		blendStateDesc.AlphaToCoverageEnable = false;
@@ -257,7 +257,7 @@ namespace TEN::Renderer
 		//_tempRoomAmbientRenderTarget2 = RenderTarget2D(_device.Get(), ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D24_UNORM_S8_UINT);
 		//_tempRoomAmbientRenderTarget3 = RenderTarget2D(_device.Get(), ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D24_UNORM_S8_UINT);
 		//_tempRoomAmbientRenderTarget4 = RenderTarget2D(_device.Get(), ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D24_UNORM_S8_UINT);
-
+		 
 		_SMAAAreaTexture = Texture2D(_device.Get(), AREATEX_WIDTH, AREATEX_HEIGHT, DXGI_FORMAT_R8G8_UNORM, AREATEX_PITCH, areaTexBytes);
 		_SMAASearchTexture = Texture2D(_device.Get(), SEARCHTEX_WIDTH, SEARCHTEX_HEIGHT, DXGI_FORMAT_R8_UNORM, SEARCHTEX_PITCH, searchTexBytes);
 
@@ -266,6 +266,9 @@ namespace TEN::Renderer
 		InitializeGameBars();
 		InitializeSpriteQuad();
 		InitializeSky();
+
+		_roomAmbientMapFront = RenderTarget2D(_device.Get(), ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D32_FLOAT);
+		_roomAmbientMapBack = RenderTarget2D(_device.Get(), ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D32_FLOAT);
 
 		_sortedPolygonsVertices.reserve(MAX_TRANSPARENT_VERTICES);
 		_sortedPolygonsIndices.reserve(MAX_TRANSPARENT_VERTICES);

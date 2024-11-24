@@ -27,6 +27,7 @@ using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
+constexpr auto COLLIDABLE_BOUNDS_THRESHOLD = 4;
 
 // Globals
 
@@ -95,7 +96,6 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* playerItem, Collision
 
 CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible, bool ignorePlayer, float customRadius, ObjectCollectionMode mode)
 {
-	constexpr auto EXTENTS_LENGTH_MIN	= 2.0f;
 	constexpr auto ROUGH_BOX_HEIGHT_MIN = BLOCK(1 / 8.0f);
 
 	auto collObjects = CollidedObjectData{};
@@ -105,20 +105,20 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 	// Establish parameters of colliding item.
 	const auto& collidingBounds = GetBestFrame(collidingItem).BoundingBox;
-	auto collidingExtents = collidingBounds.GetExtents();
-	auto collidingSphere = BoundingSphere(collidingBounds.GetCenter() + collidingItem.Pose.Position.ToVector3(), collidingExtents.Length());
-	auto collidingCircle = Vector3(collidingSphere.Center.x, collidingSphere.Center.z, (customRadius > 0.0f) ? customRadius : std::hypot(collidingExtents.x, collidingExtents.z));
+
+	// Quickly discard collision if colliding item bounds are below tolerance threshold.
+	if (!customRadius && collidingBounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+		return collObjects;
 
 	// Convert bounding box to DX bounds.
 	auto convertedBounds = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
 
+	// Create conservative AABB for rough tests.
+	auto collidingAabb = collidingBounds.ToConservativeBoundingBox(collidingItem.Pose);
+
 	// Override extents if specified.
 	if (customRadius > 0.0f)
-		convertedBounds.Extents = Vector3(customRadius);
-
-	// Quickly discard collision if colliding item bounds are below tolerance threshold.
-	if (collidingSphere.Radius <= EXTENTS_LENGTH_MIN)
-		return collObjects;
+		collidingAabb = BoundingBox(collidingItem.Pose.Position.ToVector3(), Vector3(customRadius));
 
 	// Run through neighboring rooms.
 	const auto& room = g_Level.Rooms[collidingItem.RoomNumber];
@@ -151,13 +151,12 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 						continue;
 
 					// Ignore items not feasible for collision.
-					if (item.Index == collidingItem.Index ||
-						item.Flags & IFLAG_KILLED || item.MeshBits == NO_JOINT_BITS ||
-						(object.drawRoutine == nullptr && !item.IsLara()) ||
-						(object.collision == nullptr && !item.IsLara()))
-					{
+					if (item.Index == collidingItem.Index || item.Flags & IFLAG_KILLED || item.MeshBits == NO_JOINT_BITS)
 						continue;
-					}
+
+					// Ignore non-collidable non-player.
+					if (!item.IsLara() && (!item.Collidable || object.drawRoutine == nullptr || object.collision == nullptr))
+						continue;
 
 					// HACK: Ignore UPV and big gun.
 					if ((item.ObjectNumber == ID_UPV || item.ObjectNumber == ID_BIGGUN) && item.HitPoints == 1)
@@ -168,34 +167,19 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 					if (dist > COLLISION_CHECK_DISTANCE)
 						continue;
 
-					const auto& bounds = GetBestFrame(item).BoundingBox;
-					auto extents = bounds.GetExtents();
-
 					// If item bounding box extents is below tolerance threshold, discard object.
-					if (extents.Length() <= EXTENTS_LENGTH_MIN)
+					const auto& bounds = GetBestFrame(item).BoundingBox;
+					if (bounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
 						continue;
 
-					// Test rough vertical distance to discard objects not intersecting vertically.
-					if (((collidingItem.Pose.Position.y + collidingBounds.Y1) - ROUGH_BOX_HEIGHT_MIN) >
-						((item.Pose.Position.y + bounds.Y2) + ROUGH_BOX_HEIGHT_MIN))
-					{
-						continue;
-					}
-					if (((collidingItem.Pose.Position.y + collidingBounds.Y2) + ROUGH_BOX_HEIGHT_MIN) <
-						((item.Pose.Position.y + bounds.Y1) - ROUGH_BOX_HEIGHT_MIN))
-					{
-						continue;
-					}
-
-					// Test rough circle intersection to discard objects not intersecting horizontally.
-					auto circle = Vector3(item.Pose.Position.x, item.Pose.Position.z, std::hypot(extents.x, extents.z));
-					if (!Geometry::CircleIntersects(circle, collidingCircle))
+					// Test conservative AABB intersection.
+					auto aabb = bounds.ToConservativeBoundingBox(item.Pose);
+					if (!aabb.Intersects(collidingAabb))
 						continue;
 
-					auto box = bounds.ToBoundingOrientedBox(item.Pose);
-
-					// Test accurate box intersection.
-					if (box.Intersects(convertedBounds))
+					// Test accurate OBB intersection.
+					auto obb = bounds.ToBoundingOrientedBox(item.Pose);
+					if (obb.Intersects(convertedBounds))
 						collObjects.Items.push_back(&item);
 				}
 				while (itemNumber != NO_VALUE);
@@ -217,36 +201,19 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 				if (dist > COLLISION_CHECK_DISTANCE)
 					continue;
 
-				const auto& bounds = GetBoundsAccurate(staticObj, false);
-
-				// Test rough vertical distance to discard statics not intersecting vertically.
-				if (((collidingItem.Pose.Position.y + collidingBounds.Y1) - ROUGH_BOX_HEIGHT_MIN) >
-					((staticObj.pos.Position.y + bounds.Y2) + ROUGH_BOX_HEIGHT_MIN))
-				{
-					continue;
-				}
-				if (((collidingItem.Pose.Position.y + collidingBounds.Y2) + ROUGH_BOX_HEIGHT_MIN) <
-					((staticObj.pos.Position.y + bounds.Y1) - ROUGH_BOX_HEIGHT_MIN))
-				{
-					continue;
-				}
-
-				// Test rough circle intersection to discard statics not intersecting horizontally.
-				auto circle = Vector3(staticObj.pos.Position.x, staticObj.pos.Position.z, (bounds.GetExtents() * Vector3(1.0f, 0.0f, 1.0f)).Length());
-				if (!Geometry::CircleIntersects(circle, collidingCircle))
-					continue;
-
 				// Skip if either bounding box has any zero extent (not a collidable volume).
-				if (bounds.GetExtents().Length() <= EXTENTS_LENGTH_MIN)
+				const auto& bounds = GetBoundsAccurate(staticObj, false);
+				if (bounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
 					continue;
 
-				if (collidingBounds.GetExtents().Length() <= EXTENTS_LENGTH_MIN)
+				// Test conservative AABB intersection.
+				auto aabb = bounds.ToConservativeBoundingBox(staticObj.pos);
+				if (!aabb.Intersects(collidingAabb))
 					continue;
 
-				auto box = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
-
-				// Test accurate box intersection.
-				if (box.Intersects(convertedBounds))
+				// Test accurate OBB intersection.
+				auto obb = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
+				if (obb.Intersects(convertedBounds))
 					collObjects.Statics.push_back(&staticObj);
 			}
 		}
@@ -971,12 +938,12 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 {
 	bool result = false;
 
+	// Ignore processing null bounds.
+	if (box.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+		return false;
+
 	// Get DX static bounds in global coordinates.
 	auto staticBounds = box.ToBoundingOrientedBox(pose);
-
-	// Ignore processing null bounds.
-	if (Vector3(staticBounds.Extents) == Vector3::Zero)
-		return false;
 
 	// Get local TR bounds and DX item bounds in global coordinates.
 	auto itemBBox = GameBoundingBox(item);
@@ -1805,7 +1772,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 
 	if (isPlayer)
 	{
-		GetLaraInfo(*item).HitDirection = -1;
+		GetLaraInfo(*item).HitDirection = NO_VALUE;
 
 		if (item->HitPoints <= 0)
 			return;
@@ -1874,10 +1841,9 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 					if (linkItem.HitPoints <= 0 || linkItem.HitPoints == NOT_TARGETABLE)
 						continue;
 
-					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY ||
-						object.damageType == DamageMode::None)
+					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
 					{
-						// If vehicle is harmless, enemy is non-damageable, or speed is too low, push enemy.
+						// If vehicle is harmless or speed is too low, just push enemy.
 						ItemPushItem(&linkItem, item, coll, false, 0);
 						continue;
 					}
@@ -1921,7 +1887,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			// HACK: Shatter statics only by harmful vehicles.
 			if (!isPlayer && 
 				!isHarmless && abs(item->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
-				StaticObjects[staticObject.staticNumber].shatterType != ShatterType::None)
+				Statics[staticObject.staticNumber].shatterType != ShatterType::None)
 			{
 				SoundEffect(GetShatterSound(staticObject.staticNumber), &staticObject.pos);
 				ShatterObject(nullptr, &staticObject, -128, item->RoomNumber, 0);

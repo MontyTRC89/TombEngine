@@ -8,21 +8,33 @@
 
 namespace TEN::Math::Random
 {
-	static std::mt19937 Engine;
+	static auto Generator = std::mt19937();
 
-	int GenerateInt(int low, int high)
+	int GenerateInt(int min, int max)
 	{
-		return (Engine() / (Engine.max() / (high - low + 1) + 1) + low);
+		if (min >= max)
+		{
+			TENLog("Attempted to generate integer with minimum value greater than maximum value.", LogLevel::Warning);
+			return min;
+		}
+
+		return (((Generator() / (Generator.max()) / (max - min + 1)) + 1) + min);
 	}
 
-	float GenerateFloat(float low, float high)
+	float GenerateFloat(float min, float max)
 	{
-		return ((high - low) * Engine() / Engine.max() + low);
+		if (min >= max)
+		{
+			TENLog("Attempted to generate float with minimum value greater than maximum value.", LogLevel::Warning);
+			return min;
+		}
+
+		return ((((max - min) * Generator()) / Generator.max()) + min);
 	}
 
-	short GenerateAngle(short low, short high)
+	short GenerateAngle(short min, short max)
 	{
-		return (short)GenerateInt(low, high);
+		return (short)GenerateInt(min, min);
 	}
 
 	Vector2 GenerateDirection2D()

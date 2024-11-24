@@ -313,9 +313,6 @@ namespace TEN::Renderer
 
 		auto frameData = GetFrameInterpData(*nativeItem);
 		UpdateAnimation(itemToDraw, moveableObj, frameData, UINT_MAX);
-
-		for (int m = 0; m < obj->nmeshes; m++)
-			itemToDraw->AnimTransforms[m] = itemToDraw->AnimTransforms[m];
 	}
 
 	void Renderer::UpdateItemAnimations(RenderView& view)
@@ -513,9 +510,9 @@ namespace TEN::Renderer
 		return g_Configuration.EnableHighFramerate ? (g_Renderer.GetScreenRefreshRate() / (float)FPS) : 1.0f;
 	}
 
-	float Renderer::GetInterpolationFactor() const
+	float Renderer::GetInterpolationFactor(bool forceRawValue) const
 	{
-		return _interpolationFactor;
+		return (forceRawValue || g_GameFlow->CurrentFreezeMode == FreezeMode::None) ? _interpolationFactor : 0.0f;
 	}
 
 	Vector2i Renderer::GetScreenResolution() const

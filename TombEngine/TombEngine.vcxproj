@@ -883,7 +883,8 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Scripting\Internal\TEN\Flow\Animations\Animations.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\FlowHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Fog\Fog.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Flow\GameStatuses.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Enums\FreezeModes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Enums\GameStatuses.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\LensFlare\LensFlare.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.h" />
@@ -957,6 +958,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="framework.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="framework.cpp">
@@ -1363,6 +1365,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
   <ItemGroup>
     <None Include="Objects\Generic\Switches\rail_switch.h" />
     <None Include="packages.config" />
+    <None Include="Resources\Title.bin" />
     <None Include="RuleSet.ruleset" />
     <None Include="Shaders\AnimatedTextures.hlsli" />
     <None Include="Shaders\CBCamera.hlsli">
@@ -1403,9 +1406,6 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="ten.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\HUD.hlsl">
@@ -1632,6 +1632,9 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <None Include="Shaders\PostProcess.fx">
       <DeploymentContent>true</DeploymentContent>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Ten.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

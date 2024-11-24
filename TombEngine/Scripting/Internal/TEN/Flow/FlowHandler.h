@@ -59,10 +59,13 @@ public:
 	Settings*	GetSettings();
 	Level*		GetLevel(int id);
 	Level*		GetCurrentLevel();
+	Level*		GetNextLevel();
 	int			GetLevelNumber(const std::string& flieName);
 	int			GetNumLevels() const;
 	void		EndLevel(std::optional<int> nextLevel, std::optional<int> startPosIndex);
 	GameStatus	GetGameStatus();
+	FreezeMode	GetFreezeMode();
+	void		SetFreezeMode(FreezeMode mode);
 	void		FlipMap(int group);
 	bool		GetFlipMapStatus(std::optional<int> group);
 	void		SaveGame(int slot);

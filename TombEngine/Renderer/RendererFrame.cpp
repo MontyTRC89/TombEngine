@@ -436,13 +436,16 @@ namespace TEN::Renderer
 					newItem->PrevAnimTransforms[j] = newItem->AnimTransforms[j];
 			}
 
-			newItem->InterpolatedPosition = Vector3::Lerp(newItem->PrevPosition, newItem->Position, _interpolationFactor);
-			newItem->InterpolatedTranslation = Matrix::Lerp(newItem->PrevTranslation, newItem->Translation, _interpolationFactor);
-			newItem->InterpolatedRotation = Matrix::Lerp(newItem->InterpolatedRotation, newItem->Rotation, _interpolationFactor);
-			newItem->InterpolatedWorld = Matrix::Lerp(newItem->PrevWorld, newItem->World, _interpolationFactor);
+			// Force interpolation only for Lara in player freeze mode.
+			bool forceValue = g_GameFlow->CurrentFreezeMode == FreezeMode::Player && item->ObjectNumber == ID_LARA;
+
+			newItem->InterpolatedPosition = Vector3::Lerp(newItem->PrevPosition, newItem->Position, GetInterpolationFactor(forceValue));
+			newItem->InterpolatedTranslation = Matrix::Lerp(newItem->PrevTranslation, newItem->Translation, GetInterpolationFactor(forceValue));
+			newItem->InterpolatedRotation = Matrix::Lerp(newItem->InterpolatedRotation, newItem->Rotation, GetInterpolationFactor(forceValue));
+			newItem->InterpolatedWorld = Matrix::Lerp(newItem->PrevWorld, newItem->World, GetInterpolationFactor(forceValue));
 			
 			for (int j = 0; j < MAX_BONES; j++)
-				newItem->InterpolatedAnimTransforms[j] = Matrix::Lerp(newItem->PrevAnimTransforms[j], newItem->AnimTransforms[j], _interpolationFactor);
+				newItem->InterpolatedAnimTransforms[j] = Matrix::Lerp(newItem->PrevAnimTransforms[j], newItem->AnimTransforms[j], GetInterpolationFactor(forceValue));
 
 			CalculateLightFades(newItem);
 			CollectLightsForItem(newItem);
@@ -471,7 +474,7 @@ namespace TEN::Renderer
 			{
 				mesh->ObjectNumber = nativeMesh->staticNumber;
 				mesh->Color = nativeMesh->color;
-				mesh->OriginalVisibilityBox = StaticObjects[mesh->ObjectNumber].visibilityBox;
+				mesh->OriginalSphere = Statics[mesh->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
 				mesh->Pose = nativeMesh->pos;
 				mesh->Scale = nativeMesh->scale;
 				mesh->Update();
@@ -482,15 +485,15 @@ namespace TEN::Renderer
 			if (!(nativeMesh->flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
-			if (!_staticObjects[mesh->ObjectNumber].has_value())
+			if (!_staticObjects[Statics.GetIndex(mesh->ObjectNumber)].has_value())
 				continue;
 
-			auto& obj = *_staticObjects[mesh->ObjectNumber];
+			auto& obj = GetStaticRendererObject(mesh->ObjectNumber);
 
 			if (obj.ObjectMeshes.empty())
 				continue;
 
-			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->VisibilityBox.Center, mesh->VisibilitySphereRadius))
+			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
 				continue;
 			 
 			// Collect the lights
@@ -854,11 +857,11 @@ namespace TEN::Renderer
 				newEffect->PrevScale = newEffect->Scale;
 			}
 
-			newEffect->InterpolatedPosition = Vector3::Lerp(newEffect->PrevPosition, newEffect->Position, _interpolationFactor);
-			newEffect->InterpolatedTranslation = Matrix::Lerp(newEffect->PrevTranslation, newEffect->Translation, _interpolationFactor);
-			newEffect->InterpolatedRotation = Matrix::Lerp(newEffect->InterpolatedRotation, newEffect->Rotation, _interpolationFactor);
-			newEffect->InterpolatedWorld = Matrix::Lerp(newEffect->PrevWorld, newEffect->World, _interpolationFactor);
-			newEffect->InterpolatedScale = Matrix::Lerp(newEffect->PrevScale, newEffect->Scale, _interpolationFactor);
+			newEffect->InterpolatedPosition = Vector3::Lerp(newEffect->PrevPosition, newEffect->Position, GetInterpolationFactor());
+			newEffect->InterpolatedTranslation = Matrix::Lerp(newEffect->PrevTranslation, newEffect->Translation, GetInterpolationFactor());
+			newEffect->InterpolatedRotation = Matrix::Lerp(newEffect->InterpolatedRotation, newEffect->Rotation, GetInterpolationFactor());
+			newEffect->InterpolatedWorld = Matrix::Lerp(newEffect->PrevWorld, newEffect->World, GetInterpolationFactor());
+			newEffect->InterpolatedScale = Matrix::Lerp(newEffect->PrevScale, newEffect->Scale, GetInterpolationFactor());
 
 			CollectLightsForEffect(fx->roomNumber, newEffect);
 
@@ -868,31 +871,31 @@ namespace TEN::Renderer
 
 	void Renderer::ResetItems()
 	{
-		for (int i = 0; i < ITEM_COUNT_MAX; i++)
-			_items[i].DoneAnimations = false;
+		for (auto& item : _items)
+			item.DoneAnimations = false;
 	}
 
 	void Renderer::SaveOldState()
 	{
-		for (int i = 0; i < g_Level.Items.size(); i++)
+		for (auto& item : _items)
 		{
-			_items[i].PrevPosition = _items[i].Position;
-			_items[i].PrevWorld = _items[i].World;
-			_items[i].PrevTranslation = _items[i].Translation;
-			_items[i].PrevRotation = _items[i].Rotation;
-			_items[i].PrevScale = _items[i].Scale;
+			item.PrevPosition = item.Position;
+			item.PrevWorld = item.World;
+			item.PrevTranslation = item.Translation;
+			item.PrevRotation = item.Rotation;
+			item.PrevScale = item.Scale;
 
 			for (int j = 0; j < MAX_BONES; j++)
-				_items[i].PrevAnimTransforms[j] = _items[i].AnimTransforms[j];
+				item.PrevAnimTransforms[j] = item.AnimTransforms[j];
 		}
 
-		for (int i = 0; i < ITEM_COUNT_MAX; i++)
+		for (auto& effect : _effects)
 		{
-			_effects[i].PrevPosition = _effects[i].Position;
-			_effects[i].PrevWorld = _effects[i].World;
-			_effects[i].PrevTranslation = _effects[i].Translation;
-			_effects[i].PrevRotation = _effects[i].Rotation;
-			_effects[i].PrevScale = _effects[i].Scale;
+			effect.PrevPosition = effect.Position;
+			effect.PrevWorld = effect.World;
+			effect.PrevTranslation = effect.Translation;
+			effect.PrevRotation = effect.Rotation;
+			effect.PrevScale = effect.Scale;
 		}
 	}
 }
