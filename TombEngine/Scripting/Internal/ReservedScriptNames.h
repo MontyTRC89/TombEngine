@@ -422,3 +422,7 @@ constexpr char ScriptReserved_Vec3Length[]			= "Length";
 constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
+
+// Rotation
+
+constexpr char ScriptReserved_RotationDirection[]	= "Direction";

@@ -28,7 +28,7 @@ public:
 	// Converters
 	std::string ToString() const;
 	EulerAngles ToEulerAngles() const;
-	Vec3 ToDirection(sol::optional<Vec3> position, sol::optional<float> distance) const;
+	Vec3 Direction() const;
 
 	// Operators
 	operator Vector3() const;
