@@ -136,7 +136,7 @@ public:
 	friend bool operator ==(const Moveable&, const Moveable&);
 	friend void SetLevelFuncCallback(const TypeOrNil<LevelFunc>& cb, const std::string& callerName, Moveable& mov, std::string& toModify);
 
-	short GetIndex() const;
+	int GetIndex() const;
 
 protected:
 	ItemInfo* m_item;

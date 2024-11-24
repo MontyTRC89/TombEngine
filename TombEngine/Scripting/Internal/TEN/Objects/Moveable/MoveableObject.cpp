@@ -525,9 +525,9 @@ void SetLevelFuncCallback(const TypeOrNil<LevelFunc>& cb, const std::string& cal
 
 }
 
-short Moveable::GetIndex() const
+int Moveable::GetIndex() const
 {
-	return m_num;
+	return (int)m_num;
 }
 
 void Moveable::SetOnHit(const TypeOrNil<LevelFunc>& cb)
