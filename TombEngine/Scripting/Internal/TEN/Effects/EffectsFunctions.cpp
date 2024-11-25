@@ -259,14 +259,15 @@ namespace TEN::Scripting::Effects
  * If you want a light that sticks around, you must call this each frame.
 @function EmitLight
 @tparam Vec3 pos position of the light
-@tparam Color color light color (default Color(255, 255, 255))
-@tparam int radius measured in "clicks" or 256 world units (default 20)
+@tparam[opt] Color color light color (default Color(255, 255, 255))
+@tparam[opt] int radius measured in "clicks" or 256 world units (default 20)
+@tparam[opt] bool shadows determines whether light should generate dynamic shadows for applicable moveables (default is false)
 */
-	static void EmitLight(Vec3 pos, TypeOrNil<ScriptColor> col, TypeOrNil<int> radius)
+	static void EmitLight(Vec3 pos, TypeOrNil<ScriptColor> col, TypeOrNil<int> radius, TypeOrNil<bool> castShadows)
 	{
 		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
 		int rad = (float)(USE_IF_HAVE(int, radius, 20) * BLOCK(0.25f));
-		TriggerDynamicPointLight(pos.ToVector3(), color, rad);
+		TriggerDynamicPointLight(pos.ToVector3(), color, rad, USE_IF_HAVE(bool, castShadows, false));
 	}
 
 /***Emit dynamic directional spotlight that lasts for a single frame.
@@ -274,18 +275,19 @@ namespace TEN::Scripting::Effects
 @function EmitSpotLight
 @tparam Vec3 pos position of the light
 @tparam Vec3 dir direction, or a point to which spotlight should be directed to
-@tparam Color color (default Color(255, 255, 255))
-@tparam int radius overall radius at the endpoint of a light cone, measured in "clicks" or 256 world units (default 10)
-@tparam int falloff radius, at which light starts to fade out, measured in "clicks" (default 5)
-@tparam int distance distance, at which light cone fades out, measured in "clicks" (default 20)
+@tparam[opt] Color color (default Color(255, 255, 255))
+@tparam[opt] int radius overall radius at the endpoint of a light cone, measured in "clicks" or 256 world units (default 10)
+@tparam[opt] int falloff radius, at which light starts to fade out, measured in "clicks" (default 5)
+@tparam[opt] int distance distance, at which light cone fades out, measured in "clicks" (default 20)
+@tparam[opt] bool shadows determines whether light should generate dynamic shadows for applicable moveables (default is false)
 */
-	static void EmitSpotLight(Vec3 pos, Vec3 dir, TypeOrNil<ScriptColor> col, TypeOrNil<int> radius, TypeOrNil<int> falloff, TypeOrNil<int> distance)
+	static void EmitSpotLight(Vec3 pos, Vec3 dir, TypeOrNil<ScriptColor> col, TypeOrNil<int> radius, TypeOrNil<int> falloff, TypeOrNil<int> distance, TypeOrNil<bool> castShadows)
 	{
 		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
 		int rad =	  (float)(USE_IF_HAVE(int, radius,   10) * BLOCK(0.25f));
 		int fallOff = (float)(USE_IF_HAVE(int, falloff,   5) * BLOCK(0.25f));
 		int dist =	  (float)(USE_IF_HAVE(int, distance, 20) * BLOCK(0.25f));
-		TriggerDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist);
+		TriggerDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, USE_IF_HAVE(bool, castShadows, false));
 	}
 
 /***Emit blood.

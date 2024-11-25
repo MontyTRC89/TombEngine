@@ -1536,7 +1536,7 @@ namespace TEN::Renderer
 		AddDebugSphere(sphere.Center, sphere.Radius, color, page, isWireframe);
 	}
 
-	void Renderer::AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color)
+	void Renderer::AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color, bool castShadows)
 	{
 		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
 			return;
@@ -1565,13 +1565,14 @@ namespace TEN::Renderer
 		dynamicLight.InRange = innerConeAngle > 0.0f ? innerConeAngle : 0.5f;
 		dynamicLight.OutRange = outerConeAngle;
 		dynamicLight.Type = LightType::Spot;
+		dynamicLight.CastShadows = castShadows;
 		dynamicLight.BoundingSphere = BoundingSphere(pos, distance);
 		dynamicLight.Luma = Luma(dynamicLight.Color);
 
 		_dynamicLights.push_back(dynamicLight);
 	}
 
-	void Renderer::AddDynamicPointLight(const Vector3& pos, float radius, const Color& color)
+	void Renderer::AddDynamicPointLight(const Vector3& pos, float radius, const Color& color, bool castShadows)
 	{
 		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
 			return;
@@ -1587,6 +1588,7 @@ namespace TEN::Renderer
 		dynamicLight.Position = pos;
 		dynamicLight.Out = radius;
 		dynamicLight.Type = LightType::Point;
+		dynamicLight.CastShadows = castShadows;
 		dynamicLight.BoundingSphere = BoundingSphere(pos, radius);
 		dynamicLight.Luma = Luma(dynamicLight.Color);
 
