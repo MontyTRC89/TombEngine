@@ -3520,7 +3520,7 @@ namespace TEN::Gui
 			else
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				NextLevel = -(SelectedSaveSlot + 1);
+				g_GameFlow->SelectedSaveGame = SelectedSaveSlot;
 				return LoadResult::Load;
 			}
 		}
