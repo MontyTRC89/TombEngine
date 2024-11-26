@@ -148,8 +148,7 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
-		int steps = _shadowLight->Type == LightType::Point ? 6 : 1;
-		for (int step = 0; step < steps; step++)
+		for (int step = 0; step < 6; step++)
 		{
 			// Bind render target
 			_context->OMSetRenderTargets(1, _shadowMap.RenderTargetView[step].GetAddressOf(),
@@ -178,27 +177,11 @@ namespace TEN::Renderer
 			BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
 
 			// Set camera matrices
-			Matrix view;
-			Matrix projection;
-			if (_shadowLight->Type == LightType::Point)
-			{
-				view = Matrix::CreateLookAt(_shadowLight->Position, _shadowLight->Position +
-					RenderTargetCube::forwardVectors[step] * BLOCK(10),
-					RenderTargetCube::upVectors[step]);
+			Matrix view = Matrix::CreateLookAt(_shadowLight->Position, _shadowLight->Position +
+				RenderTargetCube::forwardVectors[step] * BLOCK(10),
+				RenderTargetCube::upVectors[step]);
 
-				projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, _shadowLight->Out);
-
-			}
-			else if (_shadowLight->Type == LightType::Spot)
-			{
-				view = Matrix::CreateLookAt(_shadowLight->Position,
-					_shadowLight->Position + _shadowLight->Direction * BLOCK(10),
-					Vector3(0.0f, -1.0f, 0.0f));
-
-				// Vertex lighting fades out in 1024-steps. increase angle artificially for a bigger blend radius.
-				float projectionAngle = _shadowLight->OutRange * 1.5f * (PI / 180.0f);
-				projection = Matrix::CreatePerspectiveFieldOfView(projectionAngle, 1.0f, 16.0f, _shadowLight->Out);
-			}
+			Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, _shadowLight->Out);
 
 			CCameraMatrixBuffer shadowProjection;
 			shadowProjection.ViewProjection = view * projection;
