@@ -92,9 +92,10 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
         float3 dir = normalize(worldPos - Light.Position);
         float4 lightClipSpace = mul(float4(worldPos, 1.0f), LightViewProjections[i]);
         lightClipSpace.xyz /= lightClipSpace.w;
+
         if (lightClipSpace.x >= -1.0f && lightClipSpace.x <= 1.0f &&
             lightClipSpace.y >= -1.0f && lightClipSpace.y <= 1.0f &&
-            lightClipSpace.z >= 0.0f && lightClipSpace.z <= 1.0f)
+            lightClipSpace.z >=  0.0f && lightClipSpace.z <= 1.0f)
         {
             lightClipSpace.x = lightClipSpace.x / 2 + 0.5;
             lightClipSpace.y = lightClipSpace.y / -2 + 0.5;
@@ -102,8 +103,7 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
             float sum = 0;
             float x, y;
 
-            // Perform PCF filtering on a 4 x 4 texel neighborhood
-            // what about borders of cubemap?
+            // Perform PCF filtering on a 4 x 4 texel neighborhood.
             for (y = -1.5; y <= 1.5; y += 1.0)
             {
                 for (x = -1.5; x <= 1.5; x += 1.0)
@@ -115,6 +115,8 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
             shadowFactor = sum / 16.0;
         }
     }
+	
+	// Compute attenuation and combine lighting contribution with shadow factor
     float distanceFactor = saturate(((distance(worldPos, Light.Position)) / (Light.Out)));
     lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * INV_SHADOW_INTENSITY));
 }
@@ -126,12 +128,9 @@ void DoSpotLightShadow(float3 worldPos, inout float3 lighting)
 
     // Calculate the angle between the light direction and the spotlight direction
     float cosTheta = dot(lightDir, normalize(Light.Direction));
-	
-    float innerConeRadians = radians(Light.InRange);
-    float outerConeRadians = radians(Light.OutRange);
 
     // Compute spotlight falloff based on the inner and outer cones
-    float spotFactor = smoothstep(outerConeRadians, innerConeRadians, cosTheta);
+    float spotFactor = smoothstep(radians(Light.OutRange), radians(Light.InRange), cosTheta);
 
     // If outside the outer cone, no lighting contribution
     if (spotFactor <= 0.0f)
@@ -143,9 +142,10 @@ void DoSpotLightShadow(float3 worldPos, inout float3 lighting)
         float3 dir = normalize(worldPos - Light.Position);
         float4 lightClipSpace = mul(float4(worldPos, 1.0f), LightViewProjections[i]);
         lightClipSpace.xyz /= lightClipSpace.w;
+
         if (lightClipSpace.x >= -1.0f && lightClipSpace.x <= 1.0f &&
             lightClipSpace.y >= -1.0f && lightClipSpace.y <= 1.0f &&
-            lightClipSpace.z >= 0.0f && lightClipSpace.z <= 1.0f)
+            lightClipSpace.z >=  0.0f && lightClipSpace.z <= 1.0f)
         {
             lightClipSpace.x = lightClipSpace.x / 2 + 0.5;
             lightClipSpace.y = lightClipSpace.y / -2 + 0.5;
@@ -153,8 +153,7 @@ void DoSpotLightShadow(float3 worldPos, inout float3 lighting)
             float sum = 0;
             float x, y;
 
-            // Perform PCF filtering on a 4 x 4 texel neighborhood
-            // what about borders of cubemap?
+            // Perform PCF filtering on a 4 x 4 texel neighborhood.
             for (y = -1.5; y <= 1.5; y += 1.0)
             {
                 for (x = -1.5; x <= 1.5; x += 1.0)
