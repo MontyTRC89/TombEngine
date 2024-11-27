@@ -125,11 +125,11 @@
 	<td class="summary">Emit a shockwave, similar to that seen when a harpy projectile hits something.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitLight">EmitLight(pos, color, radius)</a></td>
+	<td class="name" ><a href="#EmitLight">EmitLight(pos[, color][, radius][, shadows][, name])</a></td>
 	<td class="summary">Emit dynamic light that lasts for a single frame.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitSpotLight">EmitSpotLight(pos, dir, color, radius, falloff, distance)</a></td>
+	<td class="name" ><a href="#EmitSpotLight">EmitSpotLight(pos, dir[, color][, radius][, falloff][, distance][, shadows][, name])</a></td>
 	<td class="summary">Emit dynamic directional spotlight that lasts for a single frame.</td>
 	</tr>
 	<tr>
@@ -367,7 +367,7 @@
 </dd>
     <dt>
     <a name = "EmitLight"></a>
-    <strong>EmitLight(pos, color, radius)</strong>
+    <strong>EmitLight(pos[, color][, radius][, shadows][, name])</strong>
     </dt>
     <dd>
     Emit dynamic light that lasts for a single frame.
@@ -384,10 +384,22 @@
         <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          light color (default Color(255, 255, 255))
+         (<em>optional</em>)
         </li>
         <li><span class="parameter">radius</span>
             <span class="types"><span class="type">int</span></span>
          measured in "clicks" or 256 world units (default 20)
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">shadows</span>
+            <span class="types"><span class="type">bool</span></span>
+         determines whether light should generate dynamic shadows for applicable moveables (default is false)
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         if provided, engine will interpolate this light for high framerate mode (be careful not to use same name for different lights)
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -398,7 +410,7 @@
 </dd>
     <dt>
     <a name = "EmitSpotLight"></a>
-    <strong>EmitSpotLight(pos, dir, color, radius, falloff, distance)</strong>
+    <strong>EmitSpotLight(pos, dir[, color][, radius][, falloff][, distance][, shadows][, name])</strong>
     </dt>
     <dd>
     Emit dynamic directional spotlight that lasts for a single frame.
@@ -419,18 +431,32 @@
         <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          (default Color(255, 255, 255))
+         (<em>optional</em>)
         </li>
         <li><span class="parameter">radius</span>
             <span class="types"><span class="type">int</span></span>
          overall radius at the endpoint of a light cone, measured in "clicks" or 256 world units (default 10)
+         (<em>optional</em>)
         </li>
         <li><span class="parameter">falloff</span>
             <span class="types"><span class="type">int</span></span>
          radius, at which light starts to fade out, measured in "clicks" (default 5)
+         (<em>optional</em>)
         </li>
         <li><span class="parameter">distance</span>
             <span class="types"><span class="type">int</span></span>
          distance, at which light cone fades out, measured in "clicks" (default 20)
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">shadows</span>
+            <span class="types"><span class="type">bool</span></span>
+         determines whether light should generate dynamic shadows for applicable moveables (default is false)
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         if provided, engine will interpolate this light for high framerate mode (be careful not to use same name for different lights)
+         (<em>optional</em>)
         </li>
     </ul>
 
