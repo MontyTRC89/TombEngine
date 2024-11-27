@@ -30,6 +30,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed original issue with deactivation of Dart Emitter.
 * Fixed Lens Flare object not functioning properly.
 * Fixed lens flares not being occluded by static meshes and moveables.
+* Fixed spotlight shadows.
 * Fixed Skeleton and Mummy not reacting to shotgun hits.
 
 ### New Features
@@ -44,6 +45,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
 * Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
 * Added Effects.EmitSpotLight() function for directional spotlights.
+* Added optional cast shadow and name parameters for Effects.EmitLight() function.
 * Added Effects.GetWind() function to get current wind speed vector.
 * Added support for transparency value in DisplayString class.
 * Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
