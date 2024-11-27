@@ -125,7 +125,7 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
 
 void DoSpotLightShadow(float3 worldPos, float3 normal, inout float3 lighting)
 {
-    float3 influence = 1.0f - Luma(DoSpotLight(worldPos, normal, Light));
+    float influence = 1.0f - Luma(DoSpotLight(worldPos, normal, Light));
 	
     float shadowFactor = 1.0f;
     for (int i = 0; i < 6; i++)
