@@ -47,6 +47,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Effects.EmitSpotLight() function for directional spotlights.
 * Added optional cast shadow and name parameters for Effects.EmitLight() function.
 * Added Effects.GetWind() function to get current wind speed vector.
+* Added Rotation:Direction() method to get directional vector.
 * Added support for transparency value in DisplayString class.
 * Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
