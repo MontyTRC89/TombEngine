@@ -1247,14 +1247,14 @@ void KillAllCurrentItems(short itemNumber)
 	// TODO: Reimplement this functionality.
 }
 
-void TriggerDynamicPointLight(const Vector3& pos, const Color& color, float falloff, bool castShadows)
+void TriggerDynamicPointLight(const Vector3& pos, const Color& color, float falloff, bool castShadows, int hash)
 {
-	g_Renderer.AddDynamicPointLight(pos, falloff , color, castShadows);
+	g_Renderer.AddDynamicPointLight(pos, falloff , color, castShadows, hash);
 }
 
-void TriggerDynamicSpotLight(const Vector3& pos, const Vector3& dir, const Color& color, float radius, float falloff, float distance, bool castShadows)
+void TriggerDynamicSpotLight(const Vector3& pos, const Vector3& dir, const Color& color, float radius, float falloff, float distance, bool castShadows, int hash)
 {
-	g_Renderer.AddDynamicSpotLight(pos, dir, radius, falloff, distance, color, castShadows);
+	g_Renderer.AddDynamicSpotLight(pos, dir, radius, falloff, distance, color, castShadows, hash);
 }
 
 // Deprecated. Use above version instead.

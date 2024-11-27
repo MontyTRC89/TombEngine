@@ -148,6 +148,9 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
+		auto shadowLightPos = _shadowLight->Hash == 0 ? _shadowLight->Position :
+			Vector3::Lerp(_shadowLight->PrevPosition, _shadowLight->Position, GetInterpolationFactor());
+
 		for (int step = 0; step < 6; step++)
 		{
 			// Bind render target
@@ -157,7 +160,7 @@ namespace TEN::Renderer
 			_context->RSSetViewports(1, &_shadowMapViewport);
 			ResetScissor();
 
-			if (_shadowLight->Position == item->Position)
+			if (shadowLightPos == item->Position)
 				return;
 
 			UINT stride = sizeof(Vertex);
@@ -177,7 +180,7 @@ namespace TEN::Renderer
 			BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
 
 			// Set camera matrices
-			Matrix view = Matrix::CreateLookAt(_shadowLight->Position, _shadowLight->Position +
+			Matrix view = Matrix::CreateLookAt(shadowLightPos, shadowLightPos +
 				RenderTargetCube::forwardVectors[step] * BLOCK(10),
 				RenderTargetCube::upVectors[step]);
 
@@ -1519,7 +1522,7 @@ namespace TEN::Renderer
 		AddDebugSphere(sphere.Center, sphere.Radius, color, page, isWireframe);
 	}
 
-	void Renderer::AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color, bool castShadows)
+	void Renderer::AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color, bool castShadows, int hash)
 	{
 		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
 			return;
@@ -1551,11 +1554,13 @@ namespace TEN::Renderer
 		dynamicLight.CastShadows = castShadows;
 		dynamicLight.BoundingSphere = BoundingSphere(pos, distance);
 		dynamicLight.Luma = Luma(dynamicLight.Color);
+		dynamicLight.Hash = hash;
 
-		_dynamicLights.push_back(dynamicLight);
+		StoreInterpolatedDynamicLightData(dynamicLight);
+		_dynamicLights[_dynamicLightList].push_back(dynamicLight);
 	}
 
-	void Renderer::AddDynamicPointLight(const Vector3& pos, float radius, const Color& color, bool castShadows)
+	void Renderer::AddDynamicPointLight(const Vector3& pos, float radius, const Color& color, bool castShadows, int hash)
 	{
 		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
 			return;
@@ -1574,14 +1579,44 @@ namespace TEN::Renderer
 		dynamicLight.CastShadows = castShadows;
 		dynamicLight.BoundingSphere = BoundingSphere(pos, radius);
 		dynamicLight.Luma = Luma(dynamicLight.Color);
+		dynamicLight.Hash = hash;
 
-		_dynamicLights.push_back(dynamicLight);
+		StoreInterpolatedDynamicLightData(dynamicLight);
+		_dynamicLights[_dynamicLightList].push_back(dynamicLight);
+	}
+
+	void Renderer::StoreInterpolatedDynamicLightData(RendererLight& light)
+	{
+		// Hash is not provided, do not search for same light in old buffer.
+		if (light.Hash == 0)
+			return;
+
+		// Determine the previous buffer index.
+		const auto& previousList = _dynamicLights[1 - _dynamicLightList];
+
+		// Find a light in the previous buffer with the same Hash.
+		auto it = std::find_if(previousList.begin(), previousList.end(),
+			[&light](const auto& prevLight)
+			{
+				return prevLight.Hash == light.Hash;
+			});
+
+		if (it == previousList.end())
+			return;
+
+		// If a matching light is found, copy its data.
+		const auto& prevLight = *it;
+		light.PrevPosition = prevLight.Position;
+		light.PrevDirection = prevLight.Direction;
 	}
 
 	void Renderer::PrepareScene()
 	{
 		if (g_GameFlow->CurrentFreezeMode == FreezeMode::None)
-			_dynamicLights.clear();
+		{
+			_dynamicLightList ^= 1;
+			_dynamicLights[_dynamicLightList].clear();
+		}
 
 		_lines2DToDraw.clear();
 		_lines3DToDraw.clear();
