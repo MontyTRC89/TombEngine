@@ -1,3 +1,5 @@
+#include "./ShaderLight.hlsli"
+
 #define SHADOW_INTENSITY (0.55f)
 #define INV_SHADOW_INTENSITY (1.0f - SHADOW_INTENSITY)
 
@@ -121,20 +123,9 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
     lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * INV_SHADOW_INTENSITY));
 }
 
-void DoSpotLightShadow(float3 worldPos, inout float3 lighting)
+void DoSpotLightShadow(float3 worldPos, float3 normal, inout float3 lighting)
 {
-    // Compute direction from the light to the world position
-    float3 lightDir = normalize(worldPos - Light.Position);
-
-    // Calculate the angle between the light direction and the spotlight direction
-    float cosTheta = dot(lightDir, normalize(Light.Direction));
-
-    // Compute spotlight falloff based on the inner and outer cones
-    float spotFactor = smoothstep(radians(Light.OutRange), radians(Light.InRange), cosTheta);
-
-    // If outside the outer cone, no lighting contribution
-    if (spotFactor <= 0.0f)
-        return;
+    float3 influence = 1.0f - Luma(DoSpotLight(worldPos, normal, Light));
 	
     float shadowFactor = 1.0f;
     for (int i = 0; i < 6; i++)
@@ -165,8 +156,7 @@ void DoSpotLightShadow(float3 worldPos, inout float3 lighting)
             shadowFactor = sum / 16.0;
         }
     }
-
+	
 	// Compute attenuation and combine lighting contribution with shadow factor
-    float distanceFactor = saturate(spotFactor * ((distance(worldPos, Light.Position)) / (Light.Out)));
-    lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 2) * INV_SHADOW_INTENSITY));
+    lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(influence, 4) * INV_SHADOW_INTENSITY));
 }

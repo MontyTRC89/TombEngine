@@ -149,7 +149,7 @@ PixelShaderOutput PS(PixelShaderInput input)
         }
         else if (Light.Type == LT_SPOT)
         {
-            DoSpotLightShadow(input.WorldPosition, lighting);
+            DoSpotLightShadow(input.WorldPosition, normal, lighting);
         }
 	}
 
