@@ -484,9 +484,8 @@ bool DoFlareLight(const Vector3i& pos, int roomNumber, int flareLife)
 
 	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, (int)falloff, color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
 
-	intensity /= 2.0f;
 	if (g_GameFlow->GetCustomizations()->Flare.Lensflare)
-		SetupLensFlare(pos.ToVector3() + Vector3(0, -32, 0), roomNumber, Color(color) / Vector3(2.0f), nullptr, 0);
+		SetupLensFlare(pos.ToVector3(), roomNumber, Color(color) / Vector3(2.0f), nullptr, 0);
 
 	// Return chaff spawn status.
 	return ((isDying || isEnding) ? spawnChaff : true);
