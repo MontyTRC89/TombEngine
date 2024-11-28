@@ -1,7 +1,10 @@
 #pragma once
 
 #include "Game/control/control.h"
+#include "Scripting/Internal/TEN/Flow/Customization/Customization.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
+
+using namespace TEN::Scripting::Customization;
 
 class ScriptInterfaceLevel;
 
@@ -24,6 +27,7 @@ public:
 
 	virtual void LoadFlowScript() = 0;
 	virtual Settings* GetSettings() = 0;
+	virtual Customizations* GetCustomizations() = 0;
 
 	virtual void SetGameDir(const std::string& assetDir) = 0;
 	virtual std::string GetGameDir() = 0;

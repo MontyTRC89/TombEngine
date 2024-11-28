@@ -15,6 +15,7 @@
 #include "Specific/level.h"
 #include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Math;
@@ -44,6 +45,7 @@ void TriggerChaffEffects(ItemInfo& item, int age)
 
 void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& vel, int speed, bool isUnderwater, int age)
 {
+
 	auto pose = item.Pose;
 	if (item.IsLara())
 	{
@@ -70,12 +72,11 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 		if (dx < -MAX_TRIGGER_RANGE || dx > MAX_TRIGGER_RANGE || dz < -MAX_TRIGGER_RANGE || dz > MAX_TRIGGER_RANGE)
 			return;
 
-		auto color = Color();
-		color.x = 1.0f;
-		color.y = Random::GenerateFloat(0.25f, 0.75f);
-		color.z = 0.75f - color.G();
+		if (g_GameFlow->GetCustomizations()->Flare.HasSparks)
+			TriggerChaffSparkles(pos, vel, g_GameFlow->GetCustomizations()->Flare.Color, age, item);
 
-		TriggerChaffSparkles(pos, vel, color, age, item);
+		if (!g_GameFlow->GetCustomizations()->Flare.HasSmoke)
+			continue;
 
 		if (isUnderwater)
 		{

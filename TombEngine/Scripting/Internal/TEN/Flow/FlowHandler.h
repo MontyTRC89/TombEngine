@@ -8,15 +8,19 @@
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LogicHandler.h"
 #include "Scripting/Internal/TEN/Flow/Animations/Animations.h"
+#include "Scripting/Internal/TEN/Flow/Customization/Customization.h"
 #include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
+
+using namespace TEN::Scripting::Customization;
 
 class FlowHandler : public ScriptInterfaceFlowHandler
 {
 private:
-	LuaHandler	_handler;
-	Settings	_settings = {};
-	std::string _gameDir  = {};
+	LuaHandler		_handler;
+	Settings		_settings = {};
+	Customizations  _customizations = {};
+	std::string		_gameDir  = {};
 
 	std::map<int, int> _moveableMap = {};
 
@@ -54,9 +58,6 @@ public:
 	bool		IsStringPresent(const char* id) const;
 	void		SetStrings(sol::nested<std::unordered_map<std::string, std::vector<std::string>>>&& src);
 	void		SetLanguageNames(sol::as_table_t<std::vector<std::string>>&& src);
-	void		SetAnimations(const Animations& src);
-	void		SetSettings(const Settings& src);
-	Settings*	GetSettings();
 	Level*		GetLevel(int id);
 	Level*		GetCurrentLevel();
 	Level*		GetNextLevel();
@@ -92,6 +93,12 @@ public:
 	void		EnableHomeLevel(bool enable);
 	bool		IsLoadSaveEnabled() const;
 	void		EnableLoadSave(bool enable);
+	
+	void			SetAnimations(const Animations& src);
+	void			SetSettings(const Settings& src);
+	Settings*		GetSettings();
+	void			SetCustomizations(const Customizations& src);
+	Customizations* GetCustomizations();
 
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
 	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }

@@ -15,6 +15,7 @@
 #include "Game/Lara/lara_tests.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
@@ -22,7 +23,6 @@
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
-constexpr auto FLARE_LIFE_MAX	 = 60.0f * FPS;
 constexpr auto FLARE_DEATH_DELAY = 1.0f  * FPS;
 
 void FlareControl(short itemNumber)
@@ -70,7 +70,7 @@ void FlareControl(short itemNumber)
 
 	int& life = flareItem.Data;
 	life &= 0x7FFF;
-	if (life >= FLARE_LIFE_MAX)
+	if (life >= g_GameFlow->GetCustomizations()->Flare.Timeout)
 	{
 		if (flareItem.Animation.Velocity.y == 0.0f &&
 			flareItem.Animation.Velocity.z == 0.0f)
@@ -399,7 +399,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 	if (DoFlareLight(pos, flareLife))
 		TriggerChaffEffects(lara.Control.Look.IsUsingBinoculars ? 0 : flareLife);
 
-	if (lara.Flare.Life >= FLARE_LIFE_MAX - (FLARE_DEATH_DELAY / 2))
+	if (lara.Flare.Life >= g_GameFlow->GetCustomizations()->Flare.Timeout - (FLARE_DEATH_DELAY / 2))
 	{
 		// Prevent player from intercepting reach/jump states with flare throws.
 		if (laraItem.Animation.IsAirborne ||
@@ -427,18 +427,20 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	constexpr auto CHAFF_SPAWN_CHANCE		 = 4 / 10.0f;
 	constexpr auto CHAFF_SPAWN_ENDING_CHANCE = CHAFF_SPAWN_CHANCE / 2;
 	constexpr auto CHAFF_SPAWN_DYING_CHANCE	 = CHAFF_SPAWN_CHANCE / 4;
-	constexpr auto LIGHT_RADIUS				 = 9.0f;
 	constexpr auto LIGHT_SPHERE_RADIUS		 = BLOCK(1 / 16.0f);
 	constexpr auto LIGHT_POS_OFFSET			 = Vector3(0.0f, -BLOCK(1 / 8.0f), 0.0f);
-	constexpr auto LIGHT_COLOR				 = Vector3(0.9f, 0.5f, 0.3f);
 
-	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
+	auto flareRange = g_GameFlow->GetCustomizations()->Flare.Range;
+	auto flareColor = Vector3(g_GameFlow->GetCustomizations()->Flare.Color);
+	auto flareTimeout = g_GameFlow->GetCustomizations()->Flare.Timeout * FPS;
+
+	if (flareLife >= flareTimeout || flareLife == 0)
 		return false;
 
 	// Determine flare progress.
 	bool isStarting = (flareLife <= START_DELAY);
-	bool isEnding   = (flareLife >  (FLARE_LIFE_MAX - END_DELAY));
-	bool isDying    = (flareLife >  (FLARE_LIFE_MAX - FLARE_DEATH_DELAY));
+	bool isEnding   = (flareLife >  (flareTimeout - END_DELAY));
+	bool isDying    = (flareLife >  (flareTimeout - FLARE_DEATH_DELAY));
 
 	bool spawnChaff = false;
 	float mult = 1.0f;
@@ -450,7 +452,7 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	}
 	else if (isDying)
 	{
-		mult = (FLARE_LIFE_MAX - (float)flareLife) / FLARE_DEATH_DELAY;
+		mult = (flareTimeout - (float)flareLife) / FLARE_DEATH_DELAY;
 		spawnChaff = Random::TestProbability(CHAFF_SPAWN_DYING_CHANCE);
 	}
 	else if (isEnding)
@@ -469,8 +471,8 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 
 	// Calculate color.
 	float intensity = Random::GenerateFloat(INTENSITY_MIN, INTENSITY_MAX);
-	float falloff = intensity * mult * LIGHT_RADIUS;
-	auto color = (LIGHT_COLOR * intensity * std::clamp(mult, 0.0f, 1.0f)) * UCHAR_MAX;
+	float falloff = intensity * mult * flareRange;
+	auto color = (flareColor * intensity * std::clamp(mult, 0.0f, 1.0f)) * UCHAR_MAX;
 
 	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, (int)falloff, color.x, color.y, color.z);
 

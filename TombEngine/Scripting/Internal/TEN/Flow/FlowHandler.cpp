@@ -10,12 +10,15 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Flow/Enums/FreezeModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/GameStatuses.h"
+#include "Scripting/Internal/TEN/Flow/Customization/Customization.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
+
+using namespace TEN::Scripting::Customization;
 
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
@@ -246,6 +249,16 @@ settings.lua shouldn't be bundled with any finished levels/games.
 @tparam Flow.Settings settings a settings object 
 */
 	tableFlow.set_function(ScriptReserved_SetSettings, &FlowHandler::SetSettings, this);
+	
+/*** customizations.lua.
+These functions are called in customizations.lua, a file which holds global customizations, such as flare color or weapon damage.
+@section customizationslua
+*/
+/***
+@function SetCustomizations
+@tparam Flow.Customizations customizations a customizations object 
+*/
+	tableFlow.set_function(ScriptReserved_SetCustomizations, &FlowHandler::SetCustomizations, this);
 
 /***
 @function SetAnimations
@@ -292,6 +305,7 @@ Specify which translations in the strings table correspond to which languages.
 	Mirror::Register(tableFlow);
 	InventoryItem::Register(tableFlow);
 	Animations::Register(tableFlow);
+	Customizations::Register(tableFlow);
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
 	LensFlare::Register(tableFlow);
@@ -343,6 +357,11 @@ void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::ve
 void FlowHandler::SetSettings(Settings const & src)
 {
 	_settings = src;
+}
+
+void FlowHandler::SetCustomizations(Customizations const& src)
+{
+	_customizations = src;
 }
 
 void FlowHandler::SetAnimations(Animations const& src)
@@ -410,6 +429,11 @@ bool FlowHandler::IsStringPresent(const char* id) const
 Settings* FlowHandler::GetSettings()
 {
 	return &_settings;
+}
+
+Customizations* FlowHandler::GetCustomizations()
+{
+	return &_customizations;
 }
 
 Level* FlowHandler::GetLevel(int id)
