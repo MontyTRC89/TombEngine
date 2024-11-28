@@ -15,12 +15,14 @@
 #include "Game/Lara/lara_tests.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/Effects/LensFlare.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Entities::Effects;
 using namespace TEN::Math;
 
 constexpr auto FLARE_DEATH_DELAY = 1.0f  * FPS;
@@ -70,7 +72,7 @@ void FlareControl(short itemNumber)
 
 	int& life = flareItem.Data;
 	life &= 0x7FFF;
-	if (life >= g_GameFlow->GetCustomizations()->Flare.Timeout)
+	if (life >= g_GameFlow->GetCustomizations()->Flare.Timeout * FPS)
 	{
 		if (flareItem.Animation.Velocity.y == 0.0f &&
 			flareItem.Animation.Velocity.z == 0.0f)
@@ -84,7 +86,7 @@ void FlareControl(short itemNumber)
 		life++;
 	}
 
-	if (DoFlareLight(flareItem.Pose.Position, life))
+	if (DoFlareLight(flareItem.Pose.Position, flareItem.RoomNumber, life))
 	{
 		TriggerChaffEffects(flareItem, life);
 		life |= 0x8000;
@@ -376,7 +378,7 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 		flareItem.Data = (int)0;
 		int& life = flareItem.Data;
 
-		if (DoFlareLight(flareItem.Pose.Position, lara.Flare.Life))
+		if (DoFlareLight(flareItem.Pose.Position, flareItem.RoomNumber, lara.Flare.Life))
 			life = lara.Flare.Life | 0x8000;
 		else
 			life = lara.Flare.Life & 0x7FFF;
@@ -396,10 +398,10 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 
 	auto pos = GetJointPosition(&laraItem, LM_LHAND, Vector3i(11, 32, 41));
 
-	if (DoFlareLight(pos, flareLife))
+	if (DoFlareLight(pos, laraItem.RoomNumber, flareLife))
 		TriggerChaffEffects(lara.Control.Look.IsUsingBinoculars ? 0 : flareLife);
 
-	if (lara.Flare.Life >= g_GameFlow->GetCustomizations()->Flare.Timeout - (FLARE_DEATH_DELAY / 2))
+	if (lara.Flare.Life >= g_GameFlow->GetCustomizations()->Flare.Timeout * FPS - (FLARE_DEATH_DELAY / 2))
 	{
 		// Prevent player from intercepting reach/jump states with flare throws.
 		if (laraItem.Animation.IsAirborne ||
@@ -418,7 +420,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 	}
 }
 
-bool DoFlareLight(const Vector3i& pos, int flareLife)
+bool DoFlareLight(const Vector3i& pos, int roomNumber, int flareLife)
 {
 	constexpr auto START_DELAY				 = 0.25f * FPS;
 	constexpr auto END_DELAY				 = 3.0f  * FPS;
@@ -466,15 +468,25 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	}
 
 	// Determine light position.
-	auto sphere = BoundingSphere(pos.ToVector3() + LIGHT_POS_OFFSET, LIGHT_SPHERE_RADIUS);
-	auto lightPos = Random::GeneratePointInSphere(sphere);
+	auto lightPos = pos.ToVector3();
+	auto intensity = 1.0f;
+
+	if (g_GameFlow->GetCustomizations()->Flare.Flicker)
+	{
+		auto sphere = BoundingSphere(pos.ToVector3() + LIGHT_POS_OFFSET, LIGHT_SPHERE_RADIUS);
+		lightPos = Random::GeneratePointInSphere(sphere);
+		intensity = Random::GenerateFloat(INTENSITY_MIN, INTENSITY_MAX);
+	}
 
 	// Calculate color.
-	float intensity = Random::GenerateFloat(INTENSITY_MIN, INTENSITY_MAX);
 	float falloff = intensity * mult * flareRange;
-	auto color = (flareColor * intensity * std::clamp(mult, 0.0f, 1.0f)) * UCHAR_MAX;
+	auto color = (flareColor * intensity * std::clamp(mult, 0.0f, 1.0f));
 
-	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, (int)falloff, color.x, color.y, color.z);
+	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, (int)falloff, color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
+
+	intensity /= 2.0f;
+	if (g_GameFlow->GetCustomizations()->Flare.Lensflare)
+		SetupLensFlare(pos.ToVector3() + Vector3(0, -32, 0), roomNumber, Color(color) / Vector3(2.0f), nullptr, 0);
 
 	// Return chaff spawn status.
 	return ((isDying || isEnding) ? spawnChaff : true);

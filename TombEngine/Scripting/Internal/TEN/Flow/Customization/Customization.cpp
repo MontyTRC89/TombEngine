@@ -12,8 +12,10 @@ namespace TEN::Scripting::Customization
 
 			"color", &FlareCustomization::Color,
 			"range", &FlareCustomization::Range,
-			"hasSparks", &FlareCustomization::HasSparks,
-			"hasSmoke", &FlareCustomization::HasSmoke,
+			"sparks", &FlareCustomization::Sparks,
+			"smoke", &FlareCustomization::Smoke,
+			"lensflare", &FlareCustomization::Lensflare,
+			"flicker", &FlareCustomization::Flicker,
 			"timeout", &FlareCustomization::Timeout
 		);
 

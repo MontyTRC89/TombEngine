@@ -15,8 +15,10 @@ namespace TEN::Scripting::Customization
 	struct FlareCustomization
 	{
 		ScriptColor Color = ScriptColor(255, 180, 0);
-		bool HasSparks = true;
-		bool HasSmoke = true;
+		bool Sparks = true;
+		bool Smoke = true;
+		bool Lensflare = false;
+		bool Flicker = true;
 		int  Timeout = 60 * FPS;
 		int  Range = 9;
 	};
