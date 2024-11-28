@@ -543,7 +543,7 @@ namespace TEN::Renderer
 		float brightest = 0.0f;
 
 		// Dynamic lights have the priority
-		for (auto& light : _dynamicLights)
+		for (auto& light : _dynamicLights[_dynamicLightList])
 		{
 			float distSqr =
 				SQUARE(position.x - light.Position.x) +
@@ -784,9 +784,9 @@ namespace TEN::Renderer
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 		
 		// Collect dynamic lights for rooms
-		for (int i = 0; i < _dynamicLights.size(); i++)
+		for (int i = 0; i < _dynamicLights[_dynamicLightList].size(); i++)
 		{
-			RendererLight* light = &_dynamicLights[i];
+			RendererLight* light = &_dynamicLights[_dynamicLightList][i];
 
 			// If no radius, ignore
 			if (light->Out == 0.0f)
