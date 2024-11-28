@@ -118,7 +118,7 @@ namespace TEN::Entities::Effects
 				isVisible = false;
 		}
 
-		float inputIntensity = (intensity != nullptr) ? *intensity : (isVisible ? 1.0f : 0.0f);
+		float inputIntensity = (intensity != nullptr) ? *intensity : 1.0f;
 
 		// Fade in/out lensflares depending on their visibility.
 		if (intensity != nullptr)
