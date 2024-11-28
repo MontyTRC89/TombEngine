@@ -10,6 +10,7 @@
 #include "Game/room.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Environment;
@@ -100,7 +101,7 @@ namespace TEN::Effects::Smoke
 		s.velocity = direction2 * Random::GenerateFloat(7, 9);
 		s.gravity = -0.2f;
 		s.friction = Random::GenerateFloat(0.7f, 0.85f);
-		s.sourceColor = Vector4(1, 131 / 255.0f, 100 / 255.0f, 1);
+		s.sourceColor = g_GameFlow->GetCustomizations()->Flare.Color * Vector4(0.5f);
 		s.destinationColor = Vector4(1, 1, 1, 0);
 		s.life = Random::GenerateFloat(25, 35);
 		s.angularVelocity = Random::GenerateFloat(-0.3f, 0.3f);

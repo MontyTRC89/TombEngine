@@ -45,7 +45,6 @@ void TriggerChaffEffects(ItemInfo& item, int age)
 
 void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& vel, int speed, bool isUnderwater, int age)
 {
-
 	auto pose = item.Pose;
 	if (item.IsLara())
 	{
