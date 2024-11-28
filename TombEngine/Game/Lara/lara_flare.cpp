@@ -86,7 +86,8 @@ void FlareControl(short itemNumber)
 		life++;
 	}
 
-	if (DoFlareLight(flareItem.Pose.Position, flareItem.RoomNumber, life))
+	auto lightPos = GetJointPosition(flareItem, 0, Vector3i(0, 0, 48));
+	if (DoFlareLight(lightPos, flareItem.RoomNumber, life))
 	{
 		TriggerChaffEffects(flareItem, life);
 		life |= 0x8000;
