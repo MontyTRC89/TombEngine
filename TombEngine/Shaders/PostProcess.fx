@@ -143,12 +143,19 @@ float3 LensFlare(float2 uv, float2 pos)
 	    f22 + f42 + f52 + f62,
 	    f23 + f43 + f53 + f63
 	);
+	
+    // Subtle anamorphic glare
+    float anamorphicScaleX = 1.2f; // Horizontal stretch factor
+    float anamorphicScaleY = 35.0f;  // Vertical compression factor
+	float2 anamorphicOffset = main; // Center at the lensflare source
+    float glare = exp(-pow(anamorphicOffset.x * anamorphicScaleX, 2.0f) - pow(anamorphicOffset.y * anamorphicScaleY, 2.0f));
+    float3 anamorphicGlare = float3(glare * 0.6f, glare * 0.5f, glare * 1.0f) * 0.05f;
 
-	// Combine the effects and adjust intensity
-	float3 c = saturate(sunflare) * 0.5f + lensflare;
-	c = c * 1.3f - float3(length(uvd) * 0.05f, length(uvd) * 0.05f, length(uvd) * 0.05f);
+    // Combine the effects and adjust intensity
+    float3 c = saturate(sunflare) * 0.5f + lensflare + anamorphicGlare;
+    c = c * 1.3f - float3(length(uvd) * 0.05f, length(uvd) * 0.05f, length(uvd) * 0.05f);
 
-	return c * intensity;
+    return c * intensity;
 }
 
 float3 LensFlareColorCorrection(float3 color, float factor,float factor2) 
