@@ -221,6 +221,7 @@ static constexpr char ScriptReserved_SetTitleScreenImagePath[]	= "SetTitleScreen
 static constexpr char ScriptReserved_SetFarView[]				= "SetFarView";
 static constexpr char ScriptReserved_SetSettings[]				= "SetSettings";
 static constexpr char ScriptReserved_SetAnimations[]			= "SetAnimations";
+static constexpr char ScriptReserved_GetCustomizations[]		= "GetCustomizations";
 static constexpr char ScriptReserved_SetCustomizations[]		= "SetCustomizations";
 static constexpr char ScriptReserved_EndLevel[]					= "EndLevel";
 static constexpr char ScriptReserved_GetGameStatus[]			= "GetGameStatus";

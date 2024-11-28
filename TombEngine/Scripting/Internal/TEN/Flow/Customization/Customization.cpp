@@ -7,7 +7,9 @@ namespace TEN::Scripting::Customization
 {
 	void Customizations::Register(sol::table& parent)
 	{
-		parent.new_usertype<FlareCustomization>(ScriptReserved_CustomFlare, sol::constructors<FlareCustomization()>(),
+		parent.new_usertype<FlareCustomization>(ScriptReserved_CustomFlare,
+			sol::constructors<FlareCustomization()>(),
+
 			"color", &FlareCustomization::Color,
 			"range", &FlareCustomization::Range,
 			"hasSparks", &FlareCustomization::HasSparks,
@@ -15,7 +17,8 @@ namespace TEN::Scripting::Customization
 			"timeout", &FlareCustomization::Timeout
 		);
 
-		parent.new_usertype<Customizations>(ScriptReserved_Custom, sol::constructors<Customizations()>(),
+		parent.new_usertype<Customizations>(ScriptReserved_Custom,
+			sol::constructors<Customizations()>(),
 			ScriptReserved_CustomFlare, &Customizations::Flare);
 	}
 }

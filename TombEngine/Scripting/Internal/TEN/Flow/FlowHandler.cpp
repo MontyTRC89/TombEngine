@@ -250,15 +250,20 @@ settings.lua shouldn't be bundled with any finished levels/games.
 */
 	tableFlow.set_function(ScriptReserved_SetSettings, &FlowHandler::SetSettings, this);
 	
-/*** customizations.lua.
-These functions are called in customizations.lua, a file which holds global customizations, such as flare color or weapon damage.
-@section customizationslua
+/*** customization.lua.
+These functions are called in customization.lua, a file which holds global customizations, such as flare color or weapon damage.
+@section customizationlua
 */
 /***
 @function SetCustomizations
 @tparam Flow.Customizations customizations a customizations object 
 */
 	tableFlow.set_function(ScriptReserved_SetCustomizations, &FlowHandler::SetCustomizations, this);
+/***
+@function GetCustomizations
+@tparam Flow.Customizations customizations a customizations object 
+*/
+	tableFlow.set_function(ScriptReserved_GetCustomizations, &FlowHandler::GetCustomizations, this);
 
 /***
 @function SetAnimations
