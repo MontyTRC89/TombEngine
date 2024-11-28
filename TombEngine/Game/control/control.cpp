@@ -756,7 +756,8 @@ GameStatus HandleMenuCalls(bool isTitle)
 	{
 		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
-		g_Gui.CallInventory(LaraItem, false);
+		if (g_Gui.CallInventory(LaraItem, false))
+			gameStatus = GameStatus::LoadGame;
 	}
 	else if (doPause && g_Gui.GetInventoryMode() != InventoryMode::Pause)
 	{

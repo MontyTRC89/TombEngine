@@ -7,6 +7,7 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
+#include "Game/Lara/lara_helpers.h"
 
 using namespace TEN::Math;
 
@@ -111,7 +112,8 @@ namespace TEN::Entities::Effects
 				isVisible = false;
 
 			// Check occlusion only for player.
-			collided = isVisible && ObjectOnLOS2(&origin, &target, &pointOfContact, nullptr, ID_LARA) != NO_LOS_ITEM;
+			int playerItemNumber = isVisible ? ObjectOnLOS2(&origin, &target, &pointOfContact, nullptr, ID_LARA) : NO_LOS_ITEM;
+			collided = isVisible && playerItemNumber != NO_LOS_ITEM && !GetLaraInfo(g_Level.Items[playerItemNumber]).Control.Look.IsUsingBinoculars;
 			if (collided && Vector3::Distance(pointOfContact.ToVector3(), origin.ToVector3()) < distance)
 				isVisible = false;
 		}
