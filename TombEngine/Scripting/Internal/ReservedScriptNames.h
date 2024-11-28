@@ -306,6 +306,7 @@ static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
 static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
 static constexpr char ScriptReserved_EmitShockwave[]				= "EmitShockwave";
 static constexpr char ScriptReserved_EmitLight[]					= "EmitLight";
+static constexpr char ScriptReserved_EmitSpotLight[]				= "EmitSpotLight";
 static constexpr char ScriptReserved_EmitBlood[]					= "EmitBlood";
 static constexpr char ScriptReserved_EmitFire[]						= "EmitFire";
 static constexpr char ScriptReserved_MakeExplosion[]				= "MakeExplosion";
@@ -421,3 +422,7 @@ constexpr char ScriptReserved_Vec3Length[]			= "Length";
 constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
+
+// Rotation
+
+constexpr char ScriptReserved_RotationDirection[]	= "Direction";

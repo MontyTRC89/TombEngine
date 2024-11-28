@@ -600,7 +600,7 @@ namespace TEN::Entities::Creatures::TR5
 							TriggerShockwave(&Pose(pos1), 16, 160, 64, 0, color / 2, color, 48, EulerAngles::Identity, 1, true, false, true, (int)ShockwaveStyle::Normal);
 							
 							auto lightColor = Color(0.4f, 0.3f, 0.0f);
-							TriggerDynamicLight(pos.ToVector3(), lightColor, 0.04f);
+							TriggerDynamicPointLight(pos.ToVector3(), lightColor, BLOCK(2.5f));
 						}
 
 						deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
@@ -629,7 +629,7 @@ namespace TEN::Entities::Creatures::TR5
 							if (item->ItemFlags[3])
 							{
 								auto lightColor = Color(0.0f, 0.4f, 1.0f);
-								TriggerDynamicLight(pos.ToVector3(), lightColor, 0.06f);
+								TriggerDynamicPointLight(pos.ToVector3(), lightColor, BLOCK(4));
 							}
 						}
 					}
