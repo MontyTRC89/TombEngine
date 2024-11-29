@@ -118,7 +118,10 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 	// Override extents if specified.
 	if (customRadius > 0.0f)
+	{
 		collidingAabb = BoundingBox(collidingItem.Pose.Position.ToVector3(), Vector3(customRadius));
+		convertedBounds.Extents = Vector3(customRadius);
+	}
 
 	// Run through neighboring rooms.
 	const auto& room = g_Level.Rooms[collidingItem.RoomNumber];
