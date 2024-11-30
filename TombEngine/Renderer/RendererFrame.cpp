@@ -542,6 +542,15 @@ namespace TEN::Renderer
 		RendererLight* brightestLight = nullptr;
 		float brightest = 0.0f;
 
+		auto updateBrightestLight = [&brightestLight, &brightest, prioritizeShadowLight](RendererLight& light, float intensity)
+		{
+			if (light.CastShadows && prioritizeShadowLight && intensity >= brightest)
+			{
+				brightest = intensity;
+				brightestLight = &light;
+			}
+		};
+
 		// Dynamic lights have the priority
 		for (auto& light : _dynamicLights[_dynamicLightList])
 		{
@@ -562,6 +571,8 @@ namespace TEN::Renderer
 			float attenuation = 1.0f - distance / light.Out;
 			float intensity = attenuation * light.Intensity * light.Luma;
 
+			updateBrightestLight(light, intensity);
+
 			RendererLightNode node = { &light, intensity, distance, 1 };
 			tempLights.push_back(node);
 		}
@@ -574,80 +585,44 @@ namespace TEN::Renderer
 				auto& currentRoom = _rooms[roomToCheck];
 				int lightCount = (int)currentRoom.Lights.size();
 
-				for (int j = 0; j < lightCount; j++)
+				for (auto& light : currentRoom.Lights)
 				{
-					auto* light = &currentRoom.Lights[j];
-
 					float intensity = 0;
 					float dist = 0;
 
 					// Check only lights different from sun.
-					if (light->Type == LightType::Sun)
+					if (light.Type == LightType::Sun)
 					{
 						// Suns from non-adjacent rooms not added.
 						if (roomToCheck != roomNumber && (prevRoomNumber != roomToCheck || prevRoomNumber == NO_VALUE))
 							continue;
 
 						// Sun is added without distance checks.
-						intensity = light->Intensity * Luma(light->Color);						
+						intensity = light.Intensity * Luma(light.Color);						
 					}
-					else if (light->Type == LightType::Point || light->Type == LightType::Shadow)
+					else if (light.Type == LightType::Point || 
+							 light.Type == LightType::Shadow ||
+							 light.Type == LightType::Spot)
 					{
 						float distSqr =
-							SQUARE(position.x - light->Position.x) +
-							SQUARE(position.y - light->Position.y) +
-							SQUARE(position.z - light->Position.z);
-
-						// Collect only lights nearer than 20 blocks.
-						if (distSqr >= SQUARE(BLOCK(20)))
-							continue;
-
-						// Check out radius.
-						if (distSqr > SQUARE(light->Out + radius))
-							continue;
-
-						dist = sqrt(distSqr);
-						float attenuation = 1.0f - dist / light->Out;
-						intensity = attenuation * light->Intensity * Luma(light->Color);
-
-						// If collecting shadows, try collecting shadow-casting light.
-						if (light->CastShadows && prioritizeShadowLight && light->Type == LightType::Point)
-						{
-							if (intensity >= brightest)
-							{
-								brightest = intensity;
-								brightestLight = light;
-							}
-						}
-					}
-					else if (light->Type == LightType::Spot)
-					{
-						float distSqr =
-							SQUARE(position.x - light->Position.x) +
-							SQUARE(position.y - light->Position.y) +
-							SQUARE(position.z - light->Position.z);
+							SQUARE(position.x - light.Position.x) +
+							SQUARE(position.y - light.Position.y) +
+							SQUARE(position.z - light.Position.z);
 
 						// Collect only lights nearer than 20 blocks.
 						if (distSqr >= SQUARE(BLOCK(20)))
 							continue;
 
 						// Check range.
-						if (distSqr > SQUARE(light->Out + radius))
+						if (distSqr > SQUARE(light.Out + radius))
 							continue;
 
 						dist = sqrt(distSqr);
-						float attenuation = 1.0f - dist / light->Out;
-						intensity = attenuation * light->Intensity * light->Luma;
+						float attenuation = 1.0f - dist / light.Out;
+						intensity = attenuation * light.Intensity * light.Luma;
 
 						// If shadow pointer provided, try collecting shadow-casting light.
-						if (light->CastShadows && prioritizeShadowLight)
-						{
-							if (intensity >= brightest)
-							{
-								brightest = intensity;
-								brightestLight = light;
-							}
-						}
+						updateBrightestLight(light, intensity);
 					}
 					else
 					{
@@ -655,7 +630,7 @@ namespace TEN::Renderer
 						continue;
 					}
 
-					RendererLightNode node = { light, intensity, dist, 0 };
+					RendererLightNode node = { &light, intensity, dist, 0 };
 
 					if (roomsLights != nullptr)
 						roomsLights->push_back(node);
