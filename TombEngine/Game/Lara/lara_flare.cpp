@@ -72,7 +72,7 @@ void FlareControl(short itemNumber)
 
 	int& life = flareItem.Data;
 	life &= 0x7FFF;
-	if (life >= g_GameFlow->GetCustomizations()->Flare.Timeout * FPS)
+	if (life >= g_GameFlow->GetSettings()->Flare.Timeout * FPS)
 	{
 		if (flareItem.Animation.Velocity.y == 0.0f &&
 			flareItem.Animation.Velocity.z == 0.0f)
@@ -402,7 +402,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 	if (DoFlareLight(pos, laraItem.RoomNumber, flareLife))
 		TriggerChaffEffects(lara.Control.Look.IsUsingBinoculars ? 0 : flareLife);
 
-	if (lara.Flare.Life >= g_GameFlow->GetCustomizations()->Flare.Timeout * FPS - (FLARE_DEATH_DELAY / 2))
+	if (lara.Flare.Life >= g_GameFlow->GetSettings()->Flare.Timeout * FPS - (FLARE_DEATH_DELAY / 2))
 	{
 		// Prevent player from intercepting reach/jump states with flare throws.
 		if (laraItem.Animation.IsAirborne ||
@@ -433,9 +433,9 @@ bool DoFlareLight(const Vector3i& pos, int roomNumber, int flareLife)
 	constexpr auto LIGHT_SPHERE_RADIUS		 = BLOCK(1 / 16.0f);
 	constexpr auto LIGHT_POS_OFFSET			 = Vector3(0.0f, -BLOCK(1 / 8.0f), 0.0f);
 
-	auto flareRange = g_GameFlow->GetCustomizations()->Flare.Range;
-	auto flareColor = Vector3(g_GameFlow->GetCustomizations()->Flare.Color);
-	auto flareTimeout = g_GameFlow->GetCustomizations()->Flare.Timeout * FPS;
+	auto flareRange = g_GameFlow->GetSettings()->Flare.Range;
+	auto flareColor = Vector3(g_GameFlow->GetSettings()->Flare.Color);
+	auto flareTimeout = g_GameFlow->GetSettings()->Flare.Timeout * FPS;
 
 	if (flareLife >= flareTimeout || flareLife == 0)
 		return false;
@@ -472,7 +472,8 @@ bool DoFlareLight(const Vector3i& pos, int roomNumber, int flareLife)
 	auto lightPos = pos.ToVector3();
 	auto intensity = 1.0f;
 
-	if (g_GameFlow->GetCustomizations()->Flare.Flicker)
+	// Flicker effect, if specified.
+	if (g_GameFlow->GetSettings()->Flare.Flicker)
 	{
 		auto sphere = BoundingSphere(pos.ToVector3() + LIGHT_POS_OFFSET, LIGHT_SPHERE_RADIUS);
 		lightPos = Random::GeneratePointInSphere(sphere);
@@ -483,10 +484,13 @@ bool DoFlareLight(const Vector3i& pos, int roomNumber, int flareLife)
 	float falloff = intensity * mult * flareRange;
 	auto color = (flareColor * intensity * std::clamp(mult, 0.0f, 1.0f));
 
+	// Trigger dynamic light.
 	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, (int)falloff, color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
 
-	if (g_GameFlow->GetCustomizations()->Flare.Lensflare)
-		SetupLensFlare(pos.ToVector3(), roomNumber, Color(color) / Vector3(2.0f), nullptr, 0);
+	// Spawn lensflare, if brightness is not zero.
+	float lensflareBrightness = g_GameFlow->GetSettings()->Flare.LensflareBrightness;
+	if (lensflareBrightness > EPSILON)
+		SetupLensFlare(pos.ToVector3(), roomNumber, Color(color) * lensflareBrightness, nullptr, 0);
 
 	// Return chaff spawn status.
 	return ((isDying || isEnding) ? spawnChaff : true);

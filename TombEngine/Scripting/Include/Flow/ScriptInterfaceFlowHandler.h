@@ -1,10 +1,7 @@
 #pragma once
 
 #include "Game/control/control.h"
-#include "Scripting/Internal/TEN/Flow/Customization/Customization.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
-
-using namespace TEN::Scripting::Customization;
 
 class ScriptInterfaceLevel;
 
@@ -27,7 +24,6 @@ public:
 
 	virtual void LoadFlowScript() = 0;
 	virtual Settings* GetSettings() = 0;
-	virtual Customizations* GetCustomizations() = 0;
 
 	virtual void SetGameDir(const std::string& assetDir) = 0;
 	virtual std::string GetGameDir() = 0;
@@ -40,15 +36,6 @@ public:
 	virtual bool IsLaraInTitleEnabled() const = 0;
 	virtual bool IsHomeLevelEnabled() const = 0;
 	virtual bool IsLoadSaveEnabled() const = 0;
-	virtual bool HasCrawlExtended() const = 0;
-	virtual bool HasCrouchRoll() const = 0;
-	virtual bool HasCrawlspaceDive() const = 0;
-	virtual bool HasAutoMonkeySwingJump() const = 0;
-	virtual bool HasSprintJump() const = 0;
-	virtual bool HasAFKPose() const = 0;
-	virtual bool HasOverhangClimb() const = 0;
-	virtual bool HasSlideExtended() const = 0;
-	virtual bool HasLedgeJumps() const = 0;
 
 	virtual ScriptInterfaceLevel * GetLevel(int level) = 0;
 	virtual int	GetLevelNumber(std::string const& fileName) = 0;

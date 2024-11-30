@@ -27,9 +27,11 @@ static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 
-// Customization sections
-static constexpr char ScriptReserved_Custom[]			= "Customizations";
-static constexpr char ScriptReserved_CustomFlare[]		= "Flare";
+// Settings sections
+static constexpr char ScriptReserved_Settings[]			= "Settings";
+static constexpr char ScriptReserved_SystemSettings[]	= "System";
+static constexpr char ScriptReserved_FlareSettings[]	= "Flare";
+static constexpr char ScriptReserved_AnimSettings[]		= "Animations";
 
 // Moveable object
 static constexpr char ScriptReserved_Moveable[]			= "Moveable";
@@ -219,10 +221,9 @@ static constexpr char ScriptReserved_GetNextLevel[]				= "GetNextLevel";
 static constexpr char ScriptReserved_SetIntroImagePath[]		= "SetIntroImagePath";
 static constexpr char ScriptReserved_SetTitleScreenImagePath[]	= "SetTitleScreenImagePath";
 static constexpr char ScriptReserved_SetFarView[]				= "SetFarView";
-static constexpr char ScriptReserved_SetSettings[]				= "SetSettings";
 static constexpr char ScriptReserved_SetAnimations[]			= "SetAnimations";
-static constexpr char ScriptReserved_GetCustomizations[]		= "GetCustomizations";
-static constexpr char ScriptReserved_SetCustomizations[]		= "SetCustomizations";
+static constexpr char ScriptReserved_GetSettings[]		= "GetSettings";
+static constexpr char ScriptReserved_SetSettings[]		= "SetSettings";
 static constexpr char ScriptReserved_EndLevel[]					= "EndLevel";
 static constexpr char ScriptReserved_GetGameStatus[]			= "GetGameStatus";
 static constexpr char ScriptReserved_SetFreezeMode[]			= "SetFreezeMode";

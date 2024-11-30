@@ -3,9 +3,9 @@
 
 #include "Objects/game_object_ids.h"
 #include "Scripting/Internal/TEN/Rotation/Rotation.h"
-#include "Specific\level.h"
+#include "Specific/level.h"
 
-/// Represents a lens flare.
+/// Represents a global lens flare (not to be confused with lensflare object).
 //
 // @tenclass Flow.LensFlare
 // @pragma nostrip

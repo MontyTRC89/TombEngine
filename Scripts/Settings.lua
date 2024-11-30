@@ -4,17 +4,25 @@
 local Flow = TEN.Flow
 
 local settings = Flow.Settings.new()
-settings.errorMode = Flow.ErrorMode.WARN
-settings.fastReload = true
-Flow.SetSettings(settings)
 
-local anims = Flow.Animations.new()
-anims.crawlExtended = true
-anims.crouchRoll = true
-anims.crawlspaceSwandive = true
-anims.overhangClimb = false
-anims.slideExtended = false
-anims.sprintJump = false
-anims.pose = false
-anims.ledgeJumps = false
-Flow.SetAnimations(anims)
+	settings.Animations.crawlExtended = true
+	settings.Animations.crouchRoll = true
+	settings.Animations.crawlspaceSwandive = true
+	settings.Animations.overhangClimb = false
+	settings.Animations.slideExtended = false
+	settings.Animations.sprintJump = false
+	settings.Animations.ledgeJumps = false
+	settings.Animations.poseTimeout = 0
+	
+	settings.Flare.color = Color(240, 150, 0)
+	settings.Flare.range = 10
+	settings.Flare.timeout = 60
+	settings.Flare.lensflareBrightness = 0.5
+	settings.Flare.sparks = true
+	settings.Flare.smoke = true
+	settings.Flare.flicker = true
+	
+	settings.System.errorMode = Flow.ErrorMode.WARN
+	settings.System.fastReload = true
+	
+Flow.SetSettings(settings)

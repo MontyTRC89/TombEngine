@@ -45,12 +45,12 @@
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
+  <li>    <here>Flow.Customizations</here></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../2 classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
-  <li>    <here>Flow.Settings</here></li>
   <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
   <li>    <a href="../2 classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
@@ -102,9 +102,10 @@
 
 <div id="content">
 
-<h1>Class <code>Flow.Settings</code></h1>
-<p>Global engine settings, which don't fall into particular category or can't be assigned to a specific object.</p>
-<p>Can be accessed using <a href="../1 modules/Flow.html#SetSettings">Flow.SetSettings</a> and <a href="../1 modules/Flow.html#GetSettings">Flow.GetSettings</a> functions.</p>
+<h1>Class <code>Flow.Customizations</code></h1>
+<p>Global engine customization options, which don't fall into particular category
+or can't be assigned to a specific object.</p>
+<p>Can be accessed using <a href="../1 modules/Flow.html#SetCustomizations">Flow.SetCustomizations</a> and <a href="../1 modules/Flow.html#GetCustomizations">Flow.GetCustomizations</a> functions.</p>
 
 
 <h2><a href="#Flare">Flare </a></h2>
@@ -173,7 +174,7 @@
 	<td class="summary">Pose timeout</td>
 	</tr>
 </table>
-<h2><a href="#System">System </a></h2>
+<h2><a href="#Settings">Settings </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#errorMode">errorMode</a></td>
@@ -424,7 +425,7 @@
     <ul>
         <li><span class="parameter">overhangClimb</span>
             <span class="types"><span class="type">bool</span></span>
-         enables overhang climbing feature. Currently does not work.
+         enables overhang climbing feature. Currently does not work correctly.
         </li>
     </ul>
 
@@ -518,7 +519,7 @@
 
 </dd>
 </dl>
-    <h2 class="section-header has-description"><a name="System"></a>System </h2>
+    <h2 class="section-header has-description"><a name="Settings"></a>Settings </h2>
 
           <div class="section-description">
           Global system settings that is not directly related to gameplay.

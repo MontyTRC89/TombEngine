@@ -10,7 +10,7 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
+#include "Scripting/Internal/TEN/View/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"

@@ -45,6 +45,8 @@
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
+  <li>    <a href="../2 classes/View.DisplaySprite.html">View.DisplaySprite</a></li>
+  <li>    <a href="../2 classes/Flow.Customizations.html">Flow.Customizations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../2 classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
@@ -54,7 +56,7 @@
   <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
   <li>    <a href="../2 classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
-  <li>    <here>Objects.Camera</here></li>
+  <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
   <li>    <a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
   <li>    <a href="../2 classes/Objects.Room.html">Objects.Room</a></li>
@@ -63,7 +65,6 @@
   <li>    <a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
   <li>    <a href="../2 classes/Objects.Volume.html">Objects.Volume</a></li>
   <li>    <a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
-  <li>    <a href="../2 classes/View.DisplaySprite.html">View.DisplaySprite</a></li>
 </ul>
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
@@ -97,237 +98,28 @@
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
 </ul>
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li>    <here>ten.flow.customization.animations.animations</here></li>
+  <li>    <a href="../modules/ten.flow.customization.flare.flare.html">ten.flow.customization.flare.flare</a></li>
+</ul>
 
 </div>
 
 <div id="content">
 
-<h1>Class <code>Objects.Camera</code></h1>
-<p>Basic cameras that can point at Lara or at a CAMERA_TARGET.</p>
+<h1>Module <code>ten.flow.customization.animations.animations</code></h1>
 <p>
 
 </p>
+<p> Extended crawl moveset.</p>
 
 
-<h2><a href="#Functions">Functions</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" ><a href="#Camera:GetPosition">Camera:GetPosition()</a></td>
-	<td class="summary">Get the camera's position</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Camera:SetPosition">Camera:SetPosition(position)</a></td>
-	<td class="summary">Set the camera's position</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Camera:GetName">Camera:GetName()</a></td>
-	<td class="summary">Get the camera's unique string identifier</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Camera:SetName">Camera:SetName(name)</a></td>
-	<td class="summary">Set the camera's name (its unique string identifier)</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Camera:GetRoom">Camera:GetRoom()</a></td>
-	<td class="summary">Get the current room of the camera</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Camera:GetRoomNumber">Camera:GetRoomNumber()</a></td>
-	<td class="summary">Get the current room number of the camera</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Camera:SetRoomNumber">Camera:SetRoomNumber(ID)</a></td>
-	<td class="summary">Set room of camera
- This is used in conjunction with SetPosition to teleport the camera to a new room.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Camera:PlayCamera">Camera:PlayCamera([Target])</a></td>
-	<td class="summary">Active the camera during that frame.</td>
-	</tr>
-</table>
 
 <br/>
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "Camera:GetPosition"></a>
-    <strong>Camera:GetPosition()</strong>
-    </dt>
-    <dd>
-    Get the camera's position
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        a copy of the camera's position
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:SetPosition"></a>
-    <strong>Camera:SetPosition(position)</strong>
-    </dt>
-    <dd>
-    Set the camera's position
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">position</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         the new position of the camera
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:GetName"></a>
-    <strong>Camera:GetName()</strong>
-    </dt>
-    <dd>
-    Get the camera's unique string identifier
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        the camera's name
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:SetName"></a>
-    <strong>Camera:SetName(name)</strong>
-    </dt>
-    <dd>
-    Set the camera's name (its unique string identifier)
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         The camera's new name
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:GetRoom"></a>
-    <strong>Camera:GetRoom()</strong>
-    </dt>
-    <dd>
-    Get the current room of the camera
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">Room</span></span>
-        current room of the camera
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:GetRoomNumber"></a>
-    <strong>Camera:GetRoomNumber()</strong>
-    </dt>
-    <dd>
-    Get the current room number of the camera
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        number representing the current room of the camera
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:SetRoomNumber"></a>
-    <strong>Camera:SetRoomNumber(ID)</strong>
-    </dt>
-    <dd>
-    Set room of camera
- This is used in conjunction with SetPosition to teleport the camera to a new room.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">ID</span>
-            <span class="types"><span class="type">int</span></span>
-         the ID of the new room
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Camera:PlayCamera"></a>
-    <strong>Camera:PlayCamera([Target])</strong>
-    </dt>
-    <dd>
-    Active the camera during that frame.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">Target</span>
-            <span class="types"><span class="type">Moveable</span></span>
-         If you put a moveable, the camera will look at it. Otherwise, it will look at Lara.
-         (<em>optional</em>)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-</dl>
 
 
 </div> <!-- id="content" -->

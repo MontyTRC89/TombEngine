@@ -10,11 +10,17 @@ enum class ErrorMode
 	Terminate
 };
 
+static const std::unordered_map<std::string, ErrorMode> ERROR_MODES
+{
+	{ "SILENT", ErrorMode::Silent },
+	{ "WARN", ErrorMode::Warn },
+	{ "TERMINATE", ErrorMode::Terminate }
+};
+
 void SetScriptErrorMode(ErrorMode mode);
 ErrorMode GetScriptErrorMode();
 
 void ScriptWarn(const std::string& msg);
-
 bool ScriptAssert(bool cond, const std::string& msg, std::optional<ErrorMode> forceMode = std::nullopt);
 
 template <typename ... Ts> bool ScriptAssertF(bool cond, std::string_view str, Ts...args)

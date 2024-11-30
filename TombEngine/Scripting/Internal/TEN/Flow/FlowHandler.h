@@ -7,20 +7,15 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LogicHandler.h"
-#include "Scripting/Internal/TEN/Flow/Animations/Animations.h"
-#include "Scripting/Internal/TEN/Flow/Customization/Customization.h"
 #include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
-
-using namespace TEN::Scripting::Customization;
 
 class FlowHandler : public ScriptInterfaceFlowHandler
 {
 private:
-	LuaHandler		_handler;
-	Settings		_settings = {};
-	Customizations  _customizations = {};
-	std::string		_gameDir  = {};
+	LuaHandler	_handler;
+	std::string	_gameDir  = {};
+	Settings	_settings = {};
 
 	std::map<int, int> _moveableMap = {};
 
@@ -41,9 +36,6 @@ public:
 	bool MassPickup	 = true;
 	bool LaraInTitle = false;
 	bool DebugMode	 = false;
-
-	// Table for movesets.
-	Animations Anims = {};
 
 	std::vector<Level*>	Levels;
 
@@ -94,22 +86,8 @@ public:
 	bool		IsLoadSaveEnabled() const;
 	void		EnableLoadSave(bool enable);
 	
-	void			SetAnimations(const Animations& src);
-	void			SetSettings(const Settings& src);
-	Settings*		GetSettings();
-	void			SetCustomizations(const Customizations& src);
-	Customizations* GetCustomizations();
+	void		SetSettings(const Settings& src);
+	Settings*	GetSettings();
 
-	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
-	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }
-	bool HasCrawlspaceDive() const override { return Anims.HasCrawlspaceDive; }
-	bool HasAFKPose() const override { return Anims.HasPose; }
-	bool HasOverhangClimb() const override { return Anims.HasOverhangClimb; }
-	bool HasSlideExtended() const override { return Anims.HasSlideExtended; }
-	bool HasSprintJump() const override { return Anims.HasSprintJump; }
-	bool HasLedgeJumps() const override { return Anims.HasLedgeJumps; }
 	bool DoFlow() override;
-
-	// NOTE: Removed. Keep for now to maintain compatibility. -- Sezz 2024.06.06
-	bool HasAutoMonkeySwingJump() const override { return Anims.HasAutoMonkeySwingJump; }
 };
