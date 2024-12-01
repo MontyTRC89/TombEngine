@@ -197,6 +197,13 @@ void InitializeSlot(short itemNumber, bool makeTarget)
 			creature->LOT.Drop = -BLOCK(1);
 			creature->LOT.Zone = ZoneType::Human;
 			break;
+
+		case LotType::EnemyJeep:
+			creature->LOT.Step = BLOCK(4);
+			creature->LOT.Drop = -BLOCK(4);
+			creature->LOT.CanJump = true;
+			creature->LOT.Zone = ZoneType::Human;
+			break;
 	}
 
 	ClearLOT(&creature->LOT);
