@@ -2338,7 +2338,7 @@ namespace TEN::Renderer
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 		{
-			if (!(nativeItem->MeshBits & (1 << k)))
+			if (!nativeItem->MeshBits.Test(k))
 				continue;
 
 			DrawMoveableMesh(item, GetMesh(item->MeshIds[k]), room, k, view, rendererPass);
