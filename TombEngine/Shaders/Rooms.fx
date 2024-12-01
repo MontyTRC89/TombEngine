@@ -160,19 +160,6 @@ PixelShaderOutput PS(PixelShaderInput input)
 		for (int i = 0; i < NumRoomLights; i++)
 		{
 			int lightType = RoomLights[i].Type;
-			float3 lightPos = RoomLights[i].Position.xyz;
-			float3 color = RoomLights[i].Color.xyz;
-			float radius = RoomLights[i].Out;
-
-			float3 lightVec = (lightPos - input.WorldPosition);
-			float distance = length(lightVec);
-			if (distance > radius)
-				continue;
-
-			lightVec = normalize(lightVec);
-			float d = saturate(dot(normal, lightVec ));
-			if (d < 0)
-				continue;
 
 			if (lightType == LT_POINT)
 			{
