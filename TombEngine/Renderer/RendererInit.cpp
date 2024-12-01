@@ -653,19 +653,6 @@ namespace TEN::Renderer
 		}
 
 		Utils::throwIfFailed(res);
-
-		// Display the device name and properties.
-
-		IDXGIAdapter* adapter   = nullptr;
-		IDXGIDevice* dxgiDevice = nullptr;
-		_device->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
-
-		dxgiDevice->GetAdapter(&adapter);
-
-		DXGI_ADAPTER_DESC desc;
-		adapter->GetDesc(&desc);
-		auto str = std::wstring(desc.Description);
-		TENLog("Device created: " + std::string(str.begin(), str.end()), LogLevel::Info);
 	}
 
 	void Renderer::ToggleFullScreen(bool force)
