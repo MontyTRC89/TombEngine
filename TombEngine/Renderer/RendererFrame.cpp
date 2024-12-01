@@ -530,7 +530,7 @@ namespace TEN::Renderer
 
 	void Renderer::CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLightNode>* roomsLights, std::vector<RendererLight*>* outputLights)
 	{
-		if (_rooms.size() < roomNumber)
+		if (_rooms.size() <= roomNumber)
 			return;
 
 		// Now collect lights from dynamic list and from rooms
@@ -540,56 +540,50 @@ namespace TEN::Renderer
 		auto& room = _rooms[roomNumber];
 
 		RendererLight* brightestLight = nullptr;
-		float brightest = 0.0f;
+		float highestIntensity = 0.0f;
 
-		auto updateBrightestLight = [&brightestLight, &brightest, prioritizeShadowLight](RendererLight& light, float intensity)
+		auto calculateIntensity = [](float distSqr, const RendererLight& light, float radius) -> std::optional<float>
 		{
-			if (light.CastShadows && prioritizeShadowLight && intensity >= brightest)
+			if (distSqr >= SQUARE(BLOCK(20)) || distSqr > SQUARE(light.Out + radius))
+				return std::nullopt; // Light is too far.
+
+			float distance = sqrt(distSqr);
+			float attenuation = 1.0f - distance / light.Out;
+			return attenuation * light.Intensity * light.Luma;
+		};
+
+		auto processLight = [&](RendererLight& light, float distSqr, int dynamicFlag)
+		{
+			float distance = sqrt(distSqr);
+			float intensity = calculateIntensity(distSqr, light, radius).value_or(0.0f);
+
+			if (intensity <= EPSILON)
+				return;
+
+			if (light.CastShadows && prioritizeShadowLight && intensity >= highestIntensity)
 			{
-				brightest = intensity;
+				highestIntensity = intensity;
 				brightestLight = &light;
 			}
+
+			tempLights.push_back({ &light, intensity, distance, dynamicFlag });
 		};
 
 		// Dynamic lights have the priority
 		for (auto& light : _dynamicLights[_dynamicLightList])
 		{
-			float distSqr =
-				SQUARE(position.x - light.Position.x) +
-				SQUARE(position.y - light.Position.y) +
-				SQUARE(position.z - light.Position.z);
-
-			// Collect only lights nearer than 20 sectors
-			if (distSqr >= SQUARE(BLOCK(20)))
-				continue;
-
-			// Check the out radius
-			if (distSqr > SQUARE(light.Out + radius))
-				continue;
-
-			float distance = sqrt(distSqr);
-			float attenuation = 1.0f - distance / light.Out;
-			float intensity = attenuation * light.Intensity * light.Luma;
-
-			updateBrightestLight(light, intensity);
-
-			RendererLightNode node = { &light, intensity, distance, 1 };
-			tempLights.push_back(node);
+			float distSqr = Vector3::DistanceSquared(position, light.Position);
+			processLight(light, distSqr, 1);
 		}
-	
+
 		if (!useCachedRoomLights)
 		{
 			// Check current room and neighbor rooms.
 			for (int roomToCheck : room.Neighbors)
 			{
 				auto& currentRoom = _rooms[roomToCheck];
-				int lightCount = (int)currentRoom.Lights.size();
-
 				for (auto& light : currentRoom.Lights)
 				{
-					float intensity = 0;
-					float dist = 0;
-
 					// Check only lights different from sun.
 					if (light.Type == LightType::Sun)
 					{
@@ -598,70 +592,41 @@ namespace TEN::Renderer
 							continue;
 
 						// Sun is added without distance checks.
-						intensity = light.Intensity * Luma(light.Color);						
+						float intensity = light.Intensity * Luma(light.Color);
+						RendererLightNode node = { &light, intensity, 0.0f, 0 };
+						tempLights.push_back(node);
+
+						if (roomsLights != nullptr)
+							roomsLights->push_back(node);
 					}
 					else if (light.Type == LightType::Point || 
 							 light.Type == LightType::Shadow ||
 							 light.Type == LightType::Spot)
 					{
-						float distSqr =
-							SQUARE(position.x - light.Position.x) +
-							SQUARE(position.y - light.Position.y) +
-							SQUARE(position.z - light.Position.z);
-
-						// Collect only lights nearer than 20 blocks.
-						if (distSqr >= SQUARE(BLOCK(20)))
-							continue;
-
-						// Check range.
-						if (distSqr > SQUARE(light.Out + radius))
-							continue;
-
-						dist = sqrt(distSqr);
-						float attenuation = 1.0f - dist / light.Out;
-						intensity = attenuation * light.Intensity * light.Luma;
-
-						// If shadow pointer provided, try collecting shadow-casting light.
-						updateBrightestLight(light, intensity);
+						float distSqr = Vector3::DistanceSquared(position, light.Position);
+						processLight(light, distSqr, 0);
 					}
 					else
 					{
 						// Invalid light type.
 						continue;
 					}
-
-					RendererLightNode node = { &light, intensity, dist, 0 };
-
-					if (roomsLights != nullptr)
-						roomsLights->push_back(node);
-
-					tempLights.push_back(node);
 				}
 			}
 		}
 		else
 		{
-			for (int i = 0; i < roomsLights->size(); i++)
-				tempLights.push_back(roomsLights->at(i));
+			for (auto& node : *roomsLights)
+				tempLights.push_back(node);
 		}
 
 		// Sort lights.
 		if (tempLights.size() > MAX_LIGHTS_PER_ITEM)
 		{
-			std::sort(
-				tempLights.begin(),
-				tempLights.end(),
-				[](RendererLightNode a, RendererLightNode b)
-				{
-					if (a.Dynamic == b.Dynamic)
-					{
-						return (a.LocalIntensity > b.LocalIntensity);
-					}
-					else
-					{
-						return (a.Dynamic > b.Dynamic);
-					}
-				});
+			std::sort(tempLights.begin(), tempLights.end(), [](const RendererLightNode& a, const RendererLightNode& b)
+			{
+				return (a.Dynamic == b.Dynamic) ? (a.LocalIntensity > b.LocalIntensity) : (a.Dynamic > b.Dynamic);
+			});
 		}
 
 		// Put actual lights in provided vector.
@@ -672,7 +637,7 @@ namespace TEN::Renderer
 			outputLights->push_back(brightestLight);
 
 		// Add max 8 lights per item, including shadow light for player eventually.
-		for (auto l : tempLights)
+		for (auto& l : tempLights)
 		{
 			if (prioritizeShadowLight && brightestLight == l.Light)
 				continue;
