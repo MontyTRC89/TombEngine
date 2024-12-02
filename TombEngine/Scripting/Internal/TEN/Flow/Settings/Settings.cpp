@@ -11,14 +11,16 @@ Can be accessed using @{Flow.SetSettings} and @{Flow.GetSettings} functions.
 
 void Settings::Register(sol::table& parent)
 {
-	FlareSettings::Register(parent);
 	AnimSettings::Register(parent);
+	FlareSettings::Register(parent);
+	HudSettings::Register(parent);
 	SystemSettings::Register(parent);
 
 	parent.new_usertype<Settings>(ScriptReserved_Settings,
 		sol::constructors<Settings()>(),
-		ScriptReserved_FlareSettings, &Settings::Flare,
 		ScriptReserved_AnimSettings, &Settings::Animations,
+		ScriptReserved_FlareSettings, &Settings::Flare,
+		ScriptReserved_HudSettings, &Settings::Hud,
 		ScriptReserved_SystemSettings, &Settings::System);
 }
 
@@ -32,31 +34,31 @@ void FlareSettings::Register(sol::table& parent)
 	parent.create().new_usertype<FlareSettings>(ScriptReserved_FlareSettings, sol::constructors<FlareSettings()>(),
 		sol::call_constructor, sol::constructors<FlareSettings()>(),
 
-	/*** Flare color 
+	/*** Flare color.
 	@tfield Color color flare color. Used for sparks and lensflare coloring as well. */
 	"color", &FlareSettings::Color,
 
-	/*** Light range
+	/*** Light range.
 	@tfield int range flare light radius or range. Represented in "clicks" equal to 256 world units. */
 	"range", &FlareSettings::Range,
 
-	/*** Toggle flicker effect
+	/*** Toggle flicker effect.
 	@tfield int timeout flare duration. Flare stops working after specified timeout (specified in seconds).*/
 	"timeout", & FlareSettings::Timeout,
 
-	/*** Lens flare brightness
+	/*** Lens flare brightness.
 	@tfield float lensflareBrightness brightness multiplier. Specifies how bright lens flare is in relation to light (on a range from 0 to 1).*/
 	"lensflareBrightness", & FlareSettings::LensflareBrightness,
 
-	/*** Toggle spark effect
+	/*** Toggle spark effect.
 	@tfield bool sparks spark effect. Determines whether flare generates sparks when burning. */
 	"sparks", &FlareSettings::Sparks,
 
-	/*** Toggle smoke effect
+	/*** Toggle smoke effect.
 	@tfield bool smoke smoke effect. Determines whether flare generates smoke when burning. */
 	"smoke", &FlareSettings::Smoke,
 
-	/*** Toggle flicker effect
+	/*** Toggle flicker effect.
 	@tfield bool flicker light and lensflare flickering. When turned off, flare light will be constant.*/
 	"flicker", &FlareSettings::Flicker);
 }
@@ -71,37 +73,64 @@ void AnimSettings::Register(sol::table& parent)
 	parent.create().new_usertype<AnimSettings>(ScriptReserved_AnimSettings, sol::constructors<AnimSettings()>(),
 		sol::call_constructor, sol::constructors<AnimSettings()>(),
 
-	/*** Extended crawl moveset
+	/*** Extended crawl moveset.
 	@tfield bool crawlExtended when enabled, player will be able to traverse across one-click steps in crawlspaces. */
 	"crawlExtended", &AnimSettings::CrawlExtended,
 
-	/*** Crouch roll
+	/*** Crouch roll.
 	@tfield bool crouchRoll when enabled, player can perform crawlspace roll by pressing sprint key. */
 	"crouchRoll", &AnimSettings::CrouchRoll,
 
-	/*** Crawlspace dive
+	/*** Crawlspace dive.
 	@tfield bool crawlspaceSwandive when enabled, player will be able to swandive into crawlspaces. */
 	"crawlspaceSwandive", &AnimSettings::CrawlspaceDive,
 
-	/*** Overhang climbing
+	/*** Overhang climbing.
 	@tfield bool overhangClimb enables overhang climbing feature. Currently does not work. */
 	"overhangClimb", &AnimSettings::OverhangClimb,
 
-	/*** Extended slide mechanics
+	/*** Extended slide mechanics.
 	@tfield bool slideExtended if enabled, player will be able to change slide direction with controls. Currently does not work. */
 	"slideExtended", &AnimSettings::SlideExtended,
 
-	/*** Sprint jump
+	/*** Sprint jump.
 	@tfield bool sprintJump if enabled, player will be able to perform extremely long jump when sprinting. */
 	"sprintJump", &AnimSettings::SprintJump,
 
-	/*** Ledge jumps
+	/*** Ledge jumps.
 	@tfield bool ledgeJumps if this setting is enabled, player will be able to jump upwards while hanging on the ledge. */
 	"ledgeJumps", &AnimSettings::LedgeJumps,
 
-	/*** Pose timeout
+	/*** Pose timeout.
 	@tfield int poseTimeout if this setting is larger than 0, idle standing pose animation will be performed after given timeout (in seconds). */
 	"poseTimeout", & AnimSettings::PoseTimeout);
+}
+
+/*** Hud
+@section Hud
+These settings determine visibility of particular in-game HUD elements.
+*/
+
+void HudSettings::Register(sol::table& parent)
+{
+	parent.create().new_usertype<HudSettings>(ScriptReserved_HudSettings, sol::constructors<HudSettings()>(),
+		sol::call_constructor, sol::constructors<HudSettings()>(),
+
+		/*** Toggle in-game status bars visibility.
+		@tfield bool statusBars if disabled, all status bars (health, air, stamina) will be hidden.. */
+		"statusBars", & HudSettings::StatusBars,
+
+		/*** Toggle loading bar visibility.
+		@tfield bool loadingBar if disabled, loading bar will be invisible in game. */
+		"loadingBar", & HudSettings::LoadingBar,
+
+		/*** Toggle speedometer visibility.
+		@tfield bool speedometer if disabled, speedometer will be invisible in game. */
+		"speedometer", & HudSettings::Speedometer,
+
+		/*** Toggle pickup notifier visibility.
+		@tfield bool pickupNotifier if disabled, pickup notifier will be invisible in game. */
+		"pickupNotifier", & HudSettings::PickupNotifier);
 }
 
 /*** System
@@ -115,7 +144,7 @@ void SystemSettings::Register(sol::table& parent)
 		sol::call_constructor, sol::constructors<SystemSettings()>(),
 
 /*** How should the application respond to script errors? <br>
-Must be one of the following:
+Must be one of the following: <br>
 `ErrorMode.TERMINATE` - print to the log file and return to the title level when any script error is hit.
 This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.
 

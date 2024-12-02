@@ -33,6 +33,16 @@ struct FlareSettings
 	static void Register(sol::table& parent);
 };
 
+struct HudSettings
+{
+	bool StatusBars = true;
+	bool LoadingBar = true;
+	bool Speedometer = true;
+	bool PickupNotifier = true;
+
+	static void Register(sol::table& parent);
+};
+
 struct SystemSettings
 {
 	ErrorMode ErrorMode = ErrorMode::Warn;
@@ -43,8 +53,9 @@ struct SystemSettings
 
 struct Settings
 {
-	FlareSettings Flare = {};
 	AnimSettings Animations = {};
+	FlareSettings Flare = {};
+	HudSettings Hud = {};
 	SystemSettings System = {};
 
 	static void Register(sol::table& parent);

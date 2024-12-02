@@ -22,6 +22,11 @@ local settings = Flow.Settings.new()
 	settings.Flare.smoke = true
 	settings.Flare.flicker = true
 	
+	settings.Hud.statusBars = true
+	settings.Hud.loadingBar = true
+	settings.Hud.speedometer = true
+	settings.Hud.pickupNotifier = true
+	
 	settings.System.errorMode = Flow.ErrorMode.WARN
 	settings.System.fastReload = true
 	

@@ -8,6 +8,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/game_object_ids.h"
 #include "Renderer/Renderer.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Renderer;
@@ -75,6 +76,10 @@ namespace TEN::Hud
 
 	void StatusBarsController::Draw(const ItemInfo& item) const
 	{
+		// Avoid drawing if HUD is disabled.
+		if (!g_GameFlow->GetSettings()->Hud.StatusBars)
+			return;
+
 		// Avoid drawing in title level and during cutscenes.
 		if (CurrentLevel == 0 || CinematicBarsHeight > 0)
 			return;
