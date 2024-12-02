@@ -15,6 +15,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed stutter during jumps between cameras in a flyby sequence.
 * Fixed uzi targeting issues after using flycheat.
 * Fixed snow particles not always melting on the ground.
+* Fixed enemies not damaging Lara if she is staying on the sector where enemies were triggered.
 * Fixed enemy pickups dropping on death sectors.
 * Fixed Sarcophagus and Search Object pickup triggers.
 * Fixed vehicle transfer not happening for levels which were not previously visited.
@@ -53,6 +54,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
 * Fixed DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
+* Fixed DisplayString not being deallocated after showing.
 * Fixed incorrect behaviour of Moveable:GetJointRotation() function.
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
 * Fixed Util.HasLineOfSight() not taking static meshes into consideration.

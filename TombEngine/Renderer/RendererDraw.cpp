@@ -1574,6 +1574,7 @@ namespace TEN::Renderer
 		dynamicLight.RoomNumber = NO_VALUE;
 		dynamicLight.Intensity = 1.0f;
 		dynamicLight.Position = pos;
+		dynamicLight.In = 1.0f;
 		dynamicLight.Out = radius;
 		dynamicLight.Type = LightType::Point;
 		dynamicLight.CastShadows = castShadows;

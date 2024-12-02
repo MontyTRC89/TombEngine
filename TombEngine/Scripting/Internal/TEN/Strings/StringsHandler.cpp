@@ -30,7 +30,7 @@ Default: nil (i.e. infinite)
 @tparam bool autoDelete should be string automatically deleted after timeout is reached.
 If not given, the string will remain allocated even after timeout is reached, and can be
 shown again without re-initialization.
-Default: false
+Default: true
 */
 	table.set_function(ScriptReserved_ShowString, &StringsHandler::ShowString, this);
 
@@ -93,7 +93,7 @@ void StringsHandler::ShowString(const DisplayString& str, sol::optional<float> n
 	auto it = m_userDisplayStrings.find(str.GetID());
 	it->second._timeRemaining = numSeconds.value_or(0.0f);
 	it->second._isInfinite = !numSeconds.has_value();
-	it->second._deleteWhenZero = autoDelete.value_or(false);
+	it->second._deleteWhenZero = autoDelete.value_or(true);
 }
 
 bool StringsHandler::IsStringDisplaying(const DisplayString& displayString)
