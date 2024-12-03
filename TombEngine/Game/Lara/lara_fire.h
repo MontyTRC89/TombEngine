@@ -4,6 +4,7 @@
 class EulerAngles;
 struct CollisionInfo;
 struct ItemInfo;
+struct Settings;
 
 enum class FireWeaponType
 {
@@ -47,6 +48,7 @@ extern int FlashGrenadeAftershockTimer;
 extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 
 void InitializeNewWeapon(ItemInfo& laraItem);
+void InitializeWeaponInfo(LaraWeaponType weaponType, Settings const& setting);
 
 const WeaponInfo& GetWeaponInfo(LaraWeaponType weaponType);
 Ammo&			  GetAmmo(LaraInfo& lara, LaraWeaponType weaponType);

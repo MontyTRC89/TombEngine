@@ -4,12 +4,15 @@
 #include <filesystem>
 
 #include "Game/Gui.h"
+#include "Game/Lara/lara_fire.h"
 #include "Game/savegame.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Flow/Enums/ErrorModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/FreezeModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/GameStatuses.h"
+#include "Scripting/Internal/TEN/Flow/Enums/WeaponTypes.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
@@ -165,7 +168,7 @@ Set current freeze mode, such as none, full, spectator or player.
 Freeze mode specifies whether game is in normal mode or paused in a particular way to allow
 custom menu creation, photo mode or time freeze.
 @function SetFreezeMode
-@tparam Flow.FreezeMode new freeze mode to set.
+@tparam Flow.FreezeMode freezeMode new freeze mode to set.
 */
 	tableFlow.set_function(ScriptReserved_SetFreezeMode, &FlowHandler::SetFreezeMode, this);
 
@@ -304,6 +307,7 @@ Specify which translations in the strings table correspond to which languages.
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeaponType, WEAPON_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameStatus, GAME_STATUSES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_FreezeMode, FREEZE_MODES);
 }
@@ -345,6 +349,10 @@ void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::ve
 void FlowHandler::SetSettings(Settings const& src)
 {
 	_settings = src;
+
+	// Copy weapon settings to native table. Subtract 1 because weapon enum starts from 1.
+	for (auto weapon : WEAPON_TYPES)
+		InitializeWeaponInfo(weapon.second, _settings);
 }
 
 void FlowHandler::AddLevel(Level const& level)

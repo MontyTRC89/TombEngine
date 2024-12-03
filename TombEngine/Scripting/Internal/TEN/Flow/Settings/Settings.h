@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "Game/Lara/lara_struct.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
 #include "Specific/clock.h"
@@ -51,12 +52,28 @@ struct SystemSettings
 	static void Register(sol::table& parent);
 };
 
+struct WeaponSettings
+{
+	float Accuracy = 0.0f;
+	float Distance = BLOCK(8);
+	
+	int   RecoilTimeout   = 0;
+	int	  WaterLevel      = 0;
+	int	  FlashDuration   = 0;
+	int	  Damage          = 0;
+	int	  SecondaryDamage = 0;
+
+	static void Register(sol::table& parent);
+};
+
 struct Settings
 {
 	AnimSettings Animations = {};
 	FlareSettings Flare = {};
 	HudSettings Hud = {};
 	SystemSettings System = {};
+	std::array<WeaponSettings, (int)LaraWeaponType::NumWeapons> Weapons = {};
 
+	Settings();
 	static void Register(sol::table& parent);
 };

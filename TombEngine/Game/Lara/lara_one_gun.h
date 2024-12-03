@@ -45,7 +45,7 @@ void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose = std::nul
 void FireCrossBowFromLaserSight(ItemInfo& laraItem, GameVector* origin, GameVector* target);
 void CrossbowBoltControl(short itemNumber);
 
-void FireHK(ItemInfo& laraItem, int mode);
+void FireHK(ItemInfo& laraItem, bool mode);
 void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType);
 void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType);
 

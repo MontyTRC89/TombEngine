@@ -64,8 +64,6 @@ constexpr auto HK_BURST_AND_SNIPER_MODE_SHOT_INTERVAL = 12.0f;
 constexpr auto HK_RAPID_MODE_SHOT_INTERVAL			  = 3.0f;
 
 constexpr auto SHOTGUN_PELLET_COUNT			   = 6;
-constexpr auto SHOTGUN_NORMAL_PELLET_SCATTER   = 10.0f;
-constexpr auto SHOTGUN_WIDESHOT_PELLET_SCATTER = 30.0f;
 
 static Vector3i GetWeaponSmokeRelOffset(LaraWeaponType weaponType)
 {
@@ -223,7 +221,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 						}
 						else
 						{
-							FireHK(laraItem, 0);
+							FireHK(laraItem, false);
 							player.Control.Weapon.Timer = 1.0f;
 							item.Animation.TargetState = WEAPON_STATE_RECOIL;
 
@@ -304,7 +302,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 						}
 						else
 						{
-							FireHK(laraItem, 1);
+							FireHK(laraItem, true);
 							player.Control.Weapon.Timer = 1.0f;
 							item.Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
 
@@ -387,8 +385,8 @@ void FireShotgun(ItemInfo& laraItem)
 		armOrient += EulerAngles(player.ExtraTorsoRot.x, player.ExtraTorsoRot.y, 0);
 
 	bool hasFired = false;
-	int scatter = ((player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1) ? 
-		ANGLE(SHOTGUN_NORMAL_PELLET_SCATTER) : ANGLE(SHOTGUN_WIDESHOT_PELLET_SCATTER));
+	int scatter = Weapons[(int)LaraWeaponType::Shotgun].ShotAccuracy * 
+		(player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1) ? 1 : 3;
 
 	for (int i = 0; i < SHOTGUN_PELLET_COUNT; i++)
 	{
@@ -1111,7 +1109,7 @@ void CrossbowBoltControl(short itemNumber)
 	HandleProjectile(boltItem, *LaraItem, prevPos, (ProjectileType)boltItem.ItemFlags[0], damage);
 }
 
-void FireHK(ItemInfo& laraItem, int mode)
+void FireHK(ItemInfo& laraItem, bool mode)
 {
 	auto& player = *GetLaraInfo(&laraItem);
 	const auto& weapon = player.Weapons[(int)LaraWeaponType::HK];
@@ -1142,16 +1140,15 @@ void FireHK(ItemInfo& laraItem, int mode)
 			player.ExtraTorsoRot.y + player.LeftArm.Orientation.y + laraItem.Pose.Orientation.y,
 			0);
 	}
+	
+	// HACK: Backup unmodified accuracy/damage values.
+	auto accuracy = Weapons[(int)LaraWeaponType::HK].ShotAccuracy;
+	auto damage = Weapons[(int)LaraWeaponType::HK].Damage;
 
 	if (mode)
 	{
-		Weapons[(int)LaraWeaponType::HK].ShotAccuracy = ANGLE(12.0f);
-		Weapons[(int)LaraWeaponType::HK].Damage = 1;
-	}
-	else
-	{
-		Weapons[(int)LaraWeaponType::HK].ShotAccuracy = ANGLE(4.0f);
-		Weapons[(int)LaraWeaponType::HK].Damage = 3;
+		Weapons[(int)LaraWeaponType::HK].ShotAccuracy = accuracy * 3;
+		Weapons[(int)LaraWeaponType::HK].Damage = damage / 3;
 	}
 
 	if (FireWeapon(LaraWeaponType::HK, *player.TargetEntity, laraItem, angles) != FireWeaponType::NoAmmo)
@@ -1163,6 +1160,10 @@ void FireHK(ItemInfo& laraItem, int mode)
 
 		Rumble(0.2f, 0.1f);
 	}
+
+	// HACK: Restore accuracy/damage values.
+	Weapons[(int)LaraWeaponType::HK].ShotAccuracy = accuracy;
+	Weapons[(int)LaraWeaponType::HK].Damage = damage;
 }
 
 void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)

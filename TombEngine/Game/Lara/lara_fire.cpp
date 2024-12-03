@@ -147,7 +147,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
 		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
 		ANGLE(10.0f),
-		0,
+		ANGLE(10.0f),
 		500,
 		BLOCK(8),
 		3,
@@ -302,6 +302,23 @@ const WeaponInfo& GetWeaponInfo(LaraWeaponType weaponType)
 		return Weapons[0];
 
 	return (Weapons[(int)weaponType]);
+}
+
+void InitializeWeaponInfo(LaraWeaponType weaponType, Settings const& settings)
+{
+	if ((int)weaponType <= 0 || (int)weaponType >= (int)LaraWeaponType::NumWeapons)
+		return;
+
+	auto& weapon = Weapons[(int)weaponType];
+	auto& setting = settings.Weapons[(int)weaponType - 1]; // Lua counts from 1
+
+	weapon.Damage = setting.Damage;
+	weapon.ExplosiveDamage = setting.SecondaryDamage;
+	weapon.FlashTime = setting.FlashDuration;
+	weapon.GunHeight = setting.WaterLevel;
+	weapon.ShotAccuracy = ANGLE(setting.Accuracy);
+	weapon.TargetDist = setting.Distance;
+	weapon.RecoilFrame = setting.RecoilTimeout;
 }
 
 void InitializeNewWeapon(ItemInfo& laraItem)

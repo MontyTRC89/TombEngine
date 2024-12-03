@@ -76,8 +76,10 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
+  <li>    <a href="../4 enums/Flow.WeaponType.html">Flow.WeaponType</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
@@ -528,8 +530,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">int</span></span>
-        weapon type 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
+           <span class="types"><a class="type" href="../4 enums/Flow.WeaponType.html#">WeaponType</a></span>
+        current weapon type.
     </ol>
 
 
@@ -552,23 +554,9 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">weaponType</span>
-            <span class="types"><span class="type">LaraWeaponType</span></span>
+            <span class="types"><a class="type" href="../4 enums/Flow.WeaponType.html#">WeaponType</a></span>
 
 
-<p> Must be one of:</p>
-<pre><code>NONE
-PISTOLS
-REVOLVER
-UZI
-SHOTGUN
-HK
-CROSSBOW
-FLARE
-TORCH
-GRENADELAUNCHER
-HARPOONGUN
-ROCKETLAUNCHER
-</code></pre>
 
         </li>
         <li><span class="parameter">activate</span>
@@ -582,7 +570,7 @@ ROCKETLAUNCHER
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">Lara:SetWeaponType(LaraWeaponType.PISTOLS, <span class="keyword">false</span>)</pre>
+        <pre class="example">Lara:SetWeaponType(WeaponType.PISTOLS, <span class="keyword">false</span>)</pre>
     </ul>
 
 </dd>

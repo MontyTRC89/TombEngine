@@ -876,6 +876,8 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Scripting\Internal\ScriptAssert.h" />
     <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
     <ClInclude Include="Scripting\Internal\TEN\Color\Color.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Enums\WeaponTypes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Enums\ErrorModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\DisplaySprite\ScriptDisplaySprite.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\BlendIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />

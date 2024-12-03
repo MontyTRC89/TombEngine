@@ -26,7 +26,7 @@ The following constants are inside Flow.GameStatus.
 */
 
 /*** Table of game statuses.
-@table CONSTANT_STRING_HERE
+@table GameStatus
 */
 
 static const std::unordered_map<std::string, GameStatus> GAME_STATUSES

@@ -76,8 +76,10 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
+  <li>    <a href="../4 enums/Flow.WeaponType.html">Flow.WeaponType</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
@@ -190,6 +192,37 @@
 	<tr>
 	<td class="name" ><a href="#pickupNotifier">pickupNotifier</a></td>
 	<td class="summary">Toggle pickup notifier visibility.</td>
+	</tr>
+</table>
+<h2><a href="#Weapons">Weapons </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#accuracy">accuracy</a></td>
+	<td class="summary">Shooting accuracy.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#targetingDistance">targetingDistance</a></td>
+	<td class="summary">Targeting distance.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#recoilTimeout">recoilTimeout</a></td>
+	<td class="summary">Recoil timeout.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#damage">damage</a></td>
+	<td class="summary">Damage.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#secondaryDamage">secondaryDamage</a></td>
+	<td class="summary">Secondary damage.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#flashDuration">flashDuration</a></td>
+	<td class="summary">Gunflash duration.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#waterLevel">waterLevel</a></td>
+	<td class="summary">Water level.</td>
 	</tr>
 </table>
 <h2><a href="#System">System </a></h2>
@@ -628,6 +661,161 @@
 
 </dd>
 </dl>
+    <h2 class="section-header has-description"><a name="Weapons"></a>Weapons </h2>
+
+          <div class="section-description">
+          This is a table of weapon settings, with several parameters available for every weapon.
+Access particular weapon's settings by using {Flow.WeaponType} as an index into array, e.g. <code>settings.Weapons[Flow.WeaponType.PISTOL]</code>.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "accuracy"></a>
+    <strong>accuracy</strong>
+    </dt>
+    <dd>
+    Shooting accuracy.
+
+
+
+    <ul>
+        <li><span class="parameter">accuracy</span>
+            <span class="types"><span class="type">float</span></span>
+         determines accuracy range in angles (smaller angles mean higher accuracy). Not applicable for projectile weapons.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "targetingDistance"></a>
+    <strong>targetingDistance</strong>
+    </dt>
+    <dd>
+    Targeting distance.
+
+
+
+    <ul>
+        <li><span class="parameter">targetingDistance</span>
+            <span class="types"><span class="type">float</span></span>
+         specifies maximum targeting distance in world units (1 block = 1024 world units) for a given weapon.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "recoilTimeout"></a>
+    <strong>recoilTimeout</strong>
+    </dt>
+    <dd>
+    Recoil timeout.
+
+
+
+    <ul>
+        <li><span class="parameter">recoilTimeout</span>
+            <span class="types"><span class="type">float</span></span>
+         specifies a timeout (in frames) of recoil before Lara is able to shoot again. Not applicable for backholster weapons.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "damage"></a>
+    <strong>damage</strong>
+    </dt>
+    <dd>
+    Damage.
+
+
+
+    <ul>
+        <li><span class="parameter">damage</span>
+            <span class="types"><span class="type">int</span></span>
+         amount of hit points taken for every hit. For crossbow, specifies damage only for normal crossbow bolts.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "secondaryDamage"></a>
+    <strong>secondaryDamage</strong>
+    </dt>
+    <dd>
+    Secondary damage.
+
+
+
+    <ul>
+        <li><span class="parameter">secondaryDamage</span>
+            <span class="types"><span class="type">int</span></span>
+         applicable only to weapons with alternate ammo, such as crossbow explosive ammo or grenade super ammo.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "flashDuration"></a>
+    <strong>flashDuration</strong>
+    </dt>
+    <dd>
+    Gunflash duration.
+
+
+
+    <ul>
+        <li><span class="parameter">flashDuration</span>
+            <span class="types"><span class="type">int</span></span>
+         specifies the duration of a gunflash effect. Not applicable for weapons without gunflash.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "waterLevel"></a>
+    <strong>waterLevel</strong>
+    </dt>
+    <dd>
+    Water level.
+
+
+
+    <ul>
+        <li><span class="parameter">waterLevel</span>
+            <span class="types"><span class="type">int</span></span>
+         specifies water depth, at which Lara will put weapons back into holsters, indicating it's not possible to use it in water.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header has-description"><a name="System"></a>System </h2>
 
           <div class="section-description">
@@ -639,24 +827,16 @@
     <strong>errorMode</strong>
     </dt>
     <dd>
-    How should the application respond to script errors?  <br>
-Must be one of the following: <br>
-<code>ErrorMode.TERMINATE</code> - print to the log file and return to the title level when any script error is hit.
-This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.</p>
-
-<p><code>ErrorMode.WARN</code> - print to the log file and continue running the application when a recoverable script error is hit.
-Choose this one if booting to the title level is too much for you.</p>
-
-<p><code>ErrorMode.SILENT</code> - do nothing when a recoverable script error is hit.
-Think <strong>very</strong> carefully before using this setting. These error modes are here to help you to keep your scripts
-working properly, but if you opt to ignore errors, you won't be alerted if you've misused a function or passed
-an invalid argument.</p>
-
-<p>In all of these modes, an <em>unrecoverable</em> error will boot you to the title level. If the title level itself
-has an unrecoverable error, the game will close.
+    How should the application respond to script errors?
 
 
 
+    <ul>
+        <li><span class="parameter">errorMode</span>
+            <span class="types"><a class="type" href="../4 enums/Flow.ErrorMode.html#">ErrorMode</a></span>
+         error mode to use.
+        </li>
+    </ul>
 
 
 
@@ -668,13 +848,23 @@ has an unrecoverable error, the game will close.
     <strong>fastReload</strong>
     </dt>
     <dd>
-    Can the game utilize the fast reload feature?  <br>
+
+<p>Can the game utilize the fast reload feature?  <br>
 When set to <code>true</code>, the game will attempt to perform fast savegame reloading if current level is the same as
 the level loaded from the savegame. It will not work if the level timestamp or checksum has changed
-(i.e. level was updated). If set to <code>false</code>, this functionality is turned off.
+(i.e. level was updated). If set to <code>false</code>, this functionality is turned off.</p>
+<pre><code>
+</code></pre>
 
 
 
+
+    <ul>
+        <li><span class="parameter">fastReload</span>
+            <span class="types"><span class="type">bool</span></span>
+         toggle fast reload on or off.
+        </li>
+    </ul>
 
 
 

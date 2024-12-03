@@ -33,6 +33,7 @@ static constexpr char ScriptReserved_SystemSettings[]	= "System";
 static constexpr char ScriptReserved_FlareSettings[]	= "Flare";
 static constexpr char ScriptReserved_AnimSettings[]		= "Animations";
 static constexpr char ScriptReserved_HudSettings[]		= "Hud";
+static constexpr char ScriptReserved_WeaponSettings[]	= "Weapons";
 
 // Moveable object
 static constexpr char ScriptReserved_Moveable[]			= "Moveable";
@@ -254,6 +255,7 @@ static constexpr char ScriptReserved_SetLanguageNames[]		= "SetLanguageNames";
 // Flow Tables
 static constexpr char ScriptReserved_WeatherType[]	  = "WeatherType";
 static constexpr char ScriptReserved_LaraType[]		  = "LaraType";
+static constexpr char ScriptReserved_WeaponType[]	  = "WeaponType";
 static constexpr char ScriptReserved_RotationAxis[]	  = "RotationAxis";
 static constexpr char ScriptReserved_ItemAction[]	  = "ItemAction";
 static constexpr char ScriptReserved_ErrorMode[]	  = "ErrorMode";
