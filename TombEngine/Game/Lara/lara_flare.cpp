@@ -433,7 +433,7 @@ bool DoFlareLight(const Vector3i& pos, int roomNumber, int flareLife)
 	constexpr auto LIGHT_SPHERE_RADIUS		 = BLOCK(1 / 16.0f);
 	constexpr auto LIGHT_POS_OFFSET			 = Vector3(0.0f, -BLOCK(1 / 8.0f), 0.0f);
 
-	auto flareRange = g_GameFlow->GetSettings()->Flare.Range;
+	auto flareRange = g_GameFlow->GetSettings()->Flare.Range * BLOCK(0.25f);
 	auto flareColor = Vector3(g_GameFlow->GetSettings()->Flare.Color);
 	auto flareTimeout = g_GameFlow->GetSettings()->Flare.Timeout * FPS;
 
@@ -485,7 +485,7 @@ bool DoFlareLight(const Vector3i& pos, int roomNumber, int flareLife)
 	auto color = (flareColor * intensity * std::clamp(mult, 0.0f, 1.0f));
 
 	// Trigger dynamic light.
-	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, (int)falloff, color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
+	TriggerDynamicPointLight(lightPos, Color(color), falloff, false);
 
 	// Spawn lensflare, if brightness is not zero.
 	float lensflareBrightness = g_GameFlow->GetSettings()->Flare.LensflareBrightness;

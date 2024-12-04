@@ -318,7 +318,7 @@ void InitializeWeaponInfo(LaraWeaponType weaponType, Settings const& settings)
 	weapon.GunHeight = setting.WaterLevel;
 	weapon.ShotAccuracy = ANGLE(setting.Accuracy);
 	weapon.TargetDist = setting.Distance;
-	weapon.RecoilFrame = setting.RecoilTimeout;
+	weapon.RecoilFrame = setting.Interval;
 }
 
 void InitializeNewWeapon(ItemInfo& laraItem)

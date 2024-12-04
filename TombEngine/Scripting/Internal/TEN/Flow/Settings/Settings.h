@@ -23,8 +23,8 @@ struct AnimSettings
 
 struct FlareSettings
 {
-	ScriptColor Color = ScriptColor(255, 180, 0);
-	float LensflareBrightness = 1.0f;
+	ScriptColor Color = ScriptColor(128, 64, 0);
+	float LensflareBrightness = 0.5f;
 	bool Sparks = true;
 	bool Smoke = true;
 	bool Flicker = true;
@@ -57,7 +57,7 @@ struct WeaponSettings
 	float Accuracy = 0.0f;
 	float Distance = BLOCK(8);
 	
-	int   RecoilTimeout   = 0;
+	int   Interval        = 0;
 	int	  WaterLevel      = 0;
 	int	  FlashDuration   = 0;
 	int	  Damage          = 0;

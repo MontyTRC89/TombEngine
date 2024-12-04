@@ -18,7 +18,7 @@ Settings::Settings()
 	Weapons[(int)LaraWeaponType::Shotgun        ] = { 10.0f, BLOCK(8),  9,  (int)BLOCK(0.50f), 3, 3,  3  };
 	Weapons[(int)LaraWeaponType::Crossbow       ] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 5,  20 };
 	Weapons[(int)LaraWeaponType::HK             ] = { 4.0f,  BLOCK(12), 0,  (int)BLOCK(0.50f), 3, 4,  4  };
-	Weapons[(int)LaraWeaponType::GrenadeLauncher] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 20, 30 };
+	Weapons[(int)LaraWeaponType::GrenadeLauncher] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 30, 30 };
 	Weapons[(int)LaraWeaponType::RocketLauncher ] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 30, 30 };
 	Weapons[(int)LaraWeaponType::HarpoonGun     ] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 6,  6  };
 }
@@ -169,9 +169,9 @@ void WeaponSettings::Register(sol::table& parent)
 		@tfield float targetingDistance specifies maximum targeting distance in world units (1 block = 1024 world units) for a given weapon. */
 		"distance", &WeaponSettings::Distance,
 
-		/*** Recoil timeout.
-		@tfield float recoilTimeout specifies a timeout (in frames) of recoil before Lara is able to shoot again. Not applicable for backholster weapons. */
-		"recoilTimeout", & WeaponSettings::RecoilTimeout,
+		/*** Shooting interval.
+		@tfield float interval specifies an interval (in frames), after which Lara is able to shoot again. Not applicable for backholster weapons. */
+		"interval", & WeaponSettings::Interval,
 
 		/*** Damage.
 		@tfield int damage amount of hit points taken for every hit. For crossbow, specifies damage only for normal crossbow bolts. */
