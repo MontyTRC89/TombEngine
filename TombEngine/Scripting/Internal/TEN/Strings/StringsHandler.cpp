@@ -110,7 +110,7 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 	{
 		auto& str = it->second;
 		bool endOfLife = 0.0f >= str._timeRemaining;
-		if (str._deleteWhenZero && endOfLife)
+		if (!str._isInfinite && str._deleteWhenZero && endOfLife)
 		{
 			ScriptAssertF(!str._isInfinite, "The infinite string {} (key \"{}\") went out of scope without being hidden.", it->first, str._key);
 			it = m_userDisplayStrings.erase(it);
