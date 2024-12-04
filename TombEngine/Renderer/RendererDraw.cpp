@@ -1901,7 +1901,7 @@ namespace TEN::Renderer
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// HUD must be drawn before post-processing to be antialiased.
-		if (renderMode == SceneRenderMode::Full)
+		if (renderMode == SceneRenderMode::Full && g_GameFlow->LastGameStatus == GameStatus::Normal)
 			g_Hud.Draw(*LaraItem);
 		
 		if (renderMode != SceneRenderMode::NoPostprocess)
@@ -1936,7 +1936,7 @@ namespace TEN::Renderer
 			DrawLines2D();
 		}
 
-		if (renderMode == SceneRenderMode::Full)
+		if (renderMode == SceneRenderMode::Full && g_GameFlow->LastGameStatus == GameStatus::Normal)
 		{
 			// Draw display sprites sorted by priority.
 			CollectDisplaySprites(view);
