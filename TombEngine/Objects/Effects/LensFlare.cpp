@@ -188,9 +188,9 @@ namespace TEN::Entities::Effects
 		}
 
 		// Intensity value can be modified inside lensflare setup function.
-		float currentIntensity = (float)item.ItemFlags[0] / 100.0f;
+		float currentIntensity = (float)item.ItemFlags[0] / LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE;
 		SetupLensFlare(item.Pose.Position.ToVector3(), item.RoomNumber, color, &currentIntensity, SPRITE_TYPES::SPR_LENS_FLARE_3);
-		item.ItemFlags[0] = (short)(currentIntensity * 100.0f);
+		item.ItemFlags[0] = (short)(currentIntensity * LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE);
 	}
 
 	void ClearLensFlares()

@@ -87,7 +87,7 @@ void FlareControl(short itemNumber)
 	}
 
 	auto lightPos = GetJointPosition(flareItem, 0, Vector3i(0, 0, 48));
-	if (DoFlareLight(lightPos, flareItem.RoomNumber, life))
+	if (DoFlareLight(lightPos, flareItem, life))
 	{
 		TriggerChaffEffects(flareItem, life);
 		life |= 0x8000;
@@ -379,7 +379,7 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 		flareItem.Data = (int)0;
 		int& life = flareItem.Data;
 
-		if (DoFlareLight(flareItem.Pose.Position, flareItem.RoomNumber, lara.Flare.Life))
+		if (DoFlareLight(flareItem.Pose.Position, flareItem, lara.Flare.Life))
 			life = lara.Flare.Life | 0x8000;
 		else
 			life = lara.Flare.Life & 0x7FFF;
@@ -399,7 +399,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 
 	auto pos = GetJointPosition(&laraItem, LM_LHAND, Vector3i(11, 32, 41));
 
-	if (DoFlareLight(pos, laraItem.RoomNumber, flareLife))
+	if (DoFlareLight(pos, laraItem, flareLife))
 		TriggerChaffEffects(lara.Control.Look.IsUsingBinoculars ? 0 : flareLife);
 
 	if (lara.Flare.Life >= g_GameFlow->GetSettings()->Flare.Timeout * FPS - (FLARE_DEATH_DELAY / 2))
@@ -421,7 +421,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 	}
 }
 
-bool DoFlareLight(const Vector3i& pos, int roomNumber, int flareLife)
+bool DoFlareLight(const Vector3i& pos, ItemInfo& item, int flareLife)
 {
 	constexpr auto START_DELAY				 = 0.25f * FPS;
 	constexpr auto END_DELAY				 = 3.0f  * FPS;
@@ -490,7 +490,16 @@ bool DoFlareLight(const Vector3i& pos, int roomNumber, int flareLife)
 	// Spawn lensflare, if brightness is not zero.
 	float lensflareBrightness = g_GameFlow->GetSettings()->Flare.LensflareBrightness;
 	if (lensflareBrightness > EPSILON)
-		SetupLensFlare(pos.ToVector3(), roomNumber, Color(color) * lensflareBrightness, nullptr, 0);
+	{
+		if (item.ObjectNumber == GAME_OBJECT_ID::ID_FLARE_ITEM)
+		{
+			float currentIntensity = (float)item.ItemFlags[0] / LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE;
+			SetupLensFlare(pos.ToVector3(), item.RoomNumber, Color(color) * lensflareBrightness, &currentIntensity, 0);
+			item.ItemFlags[0] = (short)(currentIntensity * LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE);
+		}
+		else
+			SetupLensFlare(pos.ToVector3(), item.RoomNumber, Color(color) * lensflareBrightness, nullptr, 0);
+	}
 
 	// Return chaff spawn status.
 	return ((isDying || isEnding) ? spawnChaff : true);
