@@ -58,6 +58,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
 * Fixed Util.HasLineOfSight() not taking static meshes into consideration.
 * Fixed collision callbacks not properly clearing after leveljump.
+* Fixed SetIntroImagePath() not using the correct path
 
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 
