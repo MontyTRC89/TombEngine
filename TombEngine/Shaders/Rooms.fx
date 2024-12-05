@@ -153,7 +153,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		lighting = pointLightShadow * isPointLight + spotLightShadow * isSpotLight;
 	}
 
-    DoBlobShadows(input.WorldPosition, lighting);
+    lighting = DoBlobShadows(input.WorldPosition, lighting);
 
 	for (int i = 0; i < NumRoomLights; i++)
 	{
