@@ -1801,9 +1801,6 @@ namespace TEN::Renderer
 		DrawRats(nullptr, view, RendererPass::GBuffer);
 		DrawLocusts(nullptr, view, RendererPass::GBuffer);
 
-		// Downsample G-Buffer for making faster soft particles and SSAO
-		DownsampleGBuffer();
-
 		// Calculate ambient occlusion.
 		if (g_Configuration.EnableAmbientOcclusion)
 		{
@@ -3734,8 +3731,8 @@ namespace TEN::Renderer
 		D3D11_VIEWPORT viewport;
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
-		viewport.Width = _screenWidth/2;
-		viewport.Height = _screenHeight / 2;
+		viewport.Width = _screenWidth;
+		viewport.Height = _screenHeight;
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 
@@ -3809,59 +3806,5 @@ namespace TEN::Renderer
 		_gameCamera.Camera.InvViewSize = _currentGameCamera.Camera.InvViewSize;
 		_gameCamera.Camera.NearPlane = _currentGameCamera.Camera.NearPlane;
 		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
-	}
-
-	void Renderer::DownsampleGBuffer()
-	{
-		// Downsample depth
-		_doingFullscreenPass = true;
-
-		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CullMode::CounterClockwise);
-		SetDepthState(DepthState::Write);
-
-		// Common vertex shader to all full screen effects
-		_context->VSSetShader(_vsPostProcess.Get(), nullptr, 0);
-
-		_context->PSSetShader(_psDownsampleDepthBuffer.Get(), nullptr, 0);
-		_context->ClearRenderTargetView(_downsampledDepthRenderTarget.RenderTargetView.Get(), Colors::White);
-		_context->OMSetRenderTargets(1, _downsampledDepthRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
-
-		D3D11_VIEWPORT viewport;
-		viewport.TopLeftX = 0;
-		viewport.TopLeftY = 0;
-		viewport.Width = _screenWidth / 2;
-		viewport.Height = _screenHeight / 2;
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
-
-		_context->RSSetViewports(1, &viewport);
-
-		D3D11_RECT rects[1];
-		rects[0].left = 0;
-		rects[0].right = viewport.Width;
-		rects[0].top = 0;
-		rects[0].bottom = viewport.Height;
-
-		_context->RSSetScissorRects(1, rects);
-
-		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		_context->IASetInputLayout(_fullscreenTriangleInputLayout.Get());
-
-		UINT stride = sizeof(PostProcessVertex);
-		UINT offset = 0;
-
-		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-
-		BindRenderTargetAsTexture(static_cast<TextureRegister>(0), &_depthRenderTarget, SamplerStateRegister::PointWrap);
-
-		_stPostProcessBuffer.ViewportWidth = viewport.Width;
-		_stPostProcessBuffer.ViewportHeight = viewport.Height;
-		memcpy(_stPostProcessBuffer.SSAOKernel, _SSAOKernel.data(), 16 * _SSAOKernel.size());
-		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
-
-		DrawTriangles(3, 0);
-
-		_doingFullscreenPass = false;
 	}
 }

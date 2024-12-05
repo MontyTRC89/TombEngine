@@ -1421,12 +1421,15 @@ bool LoadLevel(const std::string& path, bool partial)
 		g_Level.Mirrors.clear();
 
 		MirrorInfo mirror;
-		mirror.RoomNumber = 7;
-		mirror.MirrorPlane = Plane(Vector3(0, 0, 30000), Vector3(0, 0, -1));
+		mirror.RoomNumber = 17;
+		mirror.MirrorPlane = Plane(Vector3(BLOCK(10), 0, 0), Vector3(-1, 0, 0));
 		g_Level.Mirrors.push_back(mirror);
+		
+		//mirror.MirrorPlane = Plane(Vector3(0, 0, 30000), Vector3(0, 0, -1));
+		//g_Level.Mirrors.push_back(mirror);
 
-		mirror.MirrorPlane = Plane(Vector3(0, -2048, 0), Vector3(0,-1, 0));
-		g_Level.Mirrors.push_back(mirror);
+		//mirror.MirrorPlane = Plane(Vector3(0, -2048, 0), Vector3(0,-1, 0));
+		//g_Level.Mirrors.push_back(mirror);
 
 		TENLog("Level loading complete.", LogLevel::Info);
 
