@@ -135,7 +135,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 	if (AmbientOcclusion == 1)
 	{
 		float2 samplePosition;
-		samplePosition = input.PositionCopy.xy / input.PositionCopy.w;               // perspective divide
+		samplePosition = input.PositionCopy.xy / input.PositionCopy.w; // Perspective divide
 		samplePosition = samplePosition * 0.5f + 0.5f; // transform to range 0.0 - 1.0  
 		samplePosition.y = 1.0f - samplePosition.y;
 		occlusion = pow(SSAOTexture.Sample(SSAOSampler, samplePosition).x, AmbientOcclusionExponent);
@@ -143,28 +143,25 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	if (CastShadows)
 	{
-        if (Light.Type == LT_POINT)
-        {
-            DoPointLightShadow(input.WorldPosition, lighting);
-        }
-        else if (Light.Type == LT_SPOT)
-        {
-            DoSpotLightShadow(input.WorldPosition, normal, lighting);
-        }
+		float isPointLight = step(0.5f, Light.Type == LT_POINT); // 1.0 if LT_POINT, 0.0 otherwise
+		float isSpotLight  = step(0.5f, Light.Type == LT_SPOT);  // 1.0 if LT_SPOT,  0.0 otherwise
+		
+		float3 pointLightShadow = DoPointLightShadow(input.WorldPosition, lighting);
+		float3 spotLightShadow  = DoSpotLightShadow(input.WorldPosition, normal, lighting);
+		
+		// Blend the shadows based on the light type
+		lighting = pointLightShadow * isPointLight + spotLightShadow * isSpotLight;
 	}
 
     DoBlobShadows(input.WorldPosition, lighting);
 
-	if (doLights)
+	for (int i = 0; i < NumRoomLights; i++)
 	{
-		for (int i = 0; i < NumRoomLights; i++)
-		{
-			float isPointLightRoom = step(0.5f, RoomLights[i].Type == LT_POINT);
-			float isSpotLightRoom  = step(0.5f, RoomLights[i].Type == LT_SPOT);
+		float isPointLightRoom = step(0.5f, RoomLights[i].Type == LT_POINT);
+		float isSpotLightRoom  = step(0.5f, RoomLights[i].Type == LT_SPOT);
 
-			lighting += DoPointLight(input.WorldPosition, normal, RoomLights[i]) * isPointLightRoom;
-			lighting += DoSpotLight(input.WorldPosition, normal, RoomLights[i]) * isSpotLightRoom;
-		}
+		lighting += DoPointLight(input.WorldPosition, normal, RoomLights[i]) * isPointLightRoom;
+		lighting += DoSpotLight(input.WorldPosition, normal, RoomLights[i]) * isSpotLightRoom;
 	}
 
 	if (Caustics)

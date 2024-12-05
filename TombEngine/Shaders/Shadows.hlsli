@@ -68,27 +68,29 @@ float2 GetCubeUVFromDir(int faceIndex, float3 dir)
     return uv * .5 + .5;
 }
 
-void DoBlobShadows(float3 worldPos, inout float3 lighting)
+float3 DoBlobShadows(float3 worldPos, float3 lighting)
 {
     float shadowFactor = 1.0f;
+
     for (int i = 0; i < NumSpheres; i++)
     {
         Sphere s = Spheres[i];
         float dist = distance(worldPos, s.position);
-        if (dist > s.radius)
-            continue;
+        float insideSphere = saturate(1.0f - step(s.radius, dist)); // Eliminates branching
         float radiusFactor = dist / s.radius;
-        float factor = 1 - (saturate(radiusFactor));
+        float factor = (1.0f - saturate(radiusFactor)) * insideSphere;
         shadowFactor -= factor * shadowFactor;
-
     }
+
     shadowFactor = saturate(shadowFactor);
-    lighting *= saturate((shadowFactor + SHADOW_INTENSITY));
+    return lighting * saturate(shadowFactor + SHADOW_INTENSITY);
 }
 
-void DoPointLightShadow(float3 worldPos, inout float3 lighting)
+float3 DoPointLightShadow(float3 worldPos, float3 lighting)
 {
     float shadowFactor = 1.0f;
+	
+    [unroll]
     for (int i = 0; i < 6; i++)
     {
         float3 dir = normalize(worldPos - Light.Position);
@@ -106,8 +108,10 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
             float x, y;
 
             // Perform PCF filtering on a 4 x 4 texel neighborhood.
+			[unroll]
             for (y = -1.5; y <= 1.5; y += 1.0)
             {
+				[unroll]
                 for (x = -1.5; x <= 1.5; x += 1.0)
                 {
                     sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(lightClipSpace.xy + TexOffset(x, y), i), lightClipSpace.z);
@@ -120,14 +124,16 @@ void DoPointLightShadow(float3 worldPos, inout float3 lighting)
 	
 	// Compute attenuation and combine lighting contribution with shadow factor
     float distanceFactor = saturate(((distance(worldPos, Light.Position)) / (Light.Out)));
-    lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * INV_SHADOW_INTENSITY));
+    return lighting * saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * INV_SHADOW_INTENSITY));
 }
 
-void DoSpotLightShadow(float3 worldPos, float3 normal, inout float3 lighting)
+float3 DoSpotLightShadow(float3 worldPos, float3 normal, float3 lighting)
 {
     float influence = 1.0f - Luma(DoSpotLight(worldPos, normal, Light));
 	
     float shadowFactor = 1.0f;
+	
+    [unroll]
     for (int i = 0; i < 6; i++)
     {
         float3 dir = normalize(worldPos - Light.Position);
@@ -145,8 +151,10 @@ void DoSpotLightShadow(float3 worldPos, float3 normal, inout float3 lighting)
             float x, y;
 
             // Perform PCF filtering on a 4 x 4 texel neighborhood.
+			[unroll]
             for (y = -1.5; y <= 1.5; y += 1.0)
             {
+				[unroll]
                 for (x = -1.5; x <= 1.5; x += 1.0)
                 {
                     sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(lightClipSpace.xy + TexOffset(x, y), i), lightClipSpace.z);
@@ -158,5 +166,5 @@ void DoSpotLightShadow(float3 worldPos, float3 normal, inout float3 lighting)
     }
 	
 	// Compute attenuation and combine lighting contribution with shadow factor
-    lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(influence, 4) * INV_SHADOW_INTENSITY));
+    return lighting * saturate((shadowFactor + SHADOW_INTENSITY) + (pow(influence, 4) * INV_SHADOW_INTENSITY));
 }
