@@ -1417,6 +1417,17 @@ bool LoadLevel(const std::string& path, bool partial)
 
 		UpdateProgress(100, partial);
 
+		// MIRROR: remove after TE changes
+		g_Level.Mirrors.clear();
+
+		MirrorInfo mirror;
+		mirror.RoomNumber = 7;
+		mirror.MirrorPlane = Plane(Vector3(0, 0, 30000), Vector3(0, 0, -1));
+		g_Level.Mirrors.push_back(mirror);
+
+		mirror.MirrorPlane = Plane(Vector3(0, -2048, 0), Vector3(0,-1, 0));
+		g_Level.Mirrors.push_back(mirror);
+
 		TENLog("Level loading complete.", LogLevel::Info);
 
 		loadedSuccessfully = true;

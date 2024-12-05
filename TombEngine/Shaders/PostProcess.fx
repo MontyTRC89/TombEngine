@@ -32,6 +32,20 @@ PixelShaderInput VS(VertexShaderInput input)
     return output;
 }
 
+float4 PSDownsampleDepthBuffer(PixelShaderInput input) : SV_Target
+{
+	// Use 2x2 max technique
+    float d1 = ColorTexture.Sample(ColorSampler, input.UV, float2(0, 0)).r;
+    float d2 = ColorTexture.Sample(ColorSampler, input.UV, float2(0, 1)).r;
+    float d3 = ColorTexture.Sample(ColorSampler, input.UV, float2(1, 0)).r;
+    float d4 = ColorTexture.Sample(ColorSampler, input.UV, float2(1, 1)).r;
+	
+    return float4(
+		max(max(d1, d2), max(d3, d4)),
+		0, 0, 1
+	);
+}
+
 float4 PSCopy(PixelShaderInput input) : SV_Target
 {
     return ColorTexture.Sample(ColorSampler, input.UV);

@@ -243,7 +243,7 @@ namespace TEN::Renderer
 				object.Centre = rDrawSprite.pos;
 				object.Distance = distance;
 				object.Sprite = &rDrawSprite;
-				object.World = GetWorldMatrixForSprite(&rDrawSprite, view);
+				//object.World = GetWorldMatrixForSprite(&rDrawSprite, view);
 
 				view.TransparentObjectsToDraw.push_back(object);
 			}
@@ -256,7 +256,7 @@ namespace TEN::Renderer
 		_spriteBuckets.push_back(currentSpriteBucket);
 	}
 
-	void Renderer::DrawSprites(RenderView& view, RendererPass rendererPass)
+	void Renderer::DrawSprites(RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
 	{
 		if (view.SpritesToDraw.empty())
 			return;
@@ -296,7 +296,7 @@ namespace TEN::Renderer
 			{
 				auto& rDrawSprite = spriteBucket.SpritesToDraw[i];
 
-				_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, view);
+				_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, mirror, view);
 				_stInstancedSpriteBuffer.Sprites[i].Color = rDrawSprite.color;
 				_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
 				_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = rDrawSprite.SoftParticle ? 1 : 0;
@@ -414,7 +414,7 @@ namespace TEN::Renderer
 			UINT offset = 0;
 			_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
-			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(object->Sprite, view);
+			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(object->Sprite, nullptr, view);
 			_stInstancedSpriteBuffer.Sprites[0].Color = object->Sprite->color;
 			_stInstancedSpriteBuffer.Sprites[0].IsBillboard = 1;
 			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = object->Sprite->SoftParticle ? 1 : 0;

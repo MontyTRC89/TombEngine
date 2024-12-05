@@ -85,6 +85,13 @@ struct MESH
 	std::vector<BUCKET> buckets;
 };
 
+struct MirrorInfo
+{
+	short RoomNumber;
+	short MirroredRoomNumber;
+	Plane MirrorPlane;
+};
+
 // LevelData
 struct LEVEL
 {
@@ -123,6 +130,7 @@ struct LEVEL
 	std::vector<int>			 LoopedEventSetIndices = {};
 	std::vector<AI_OBJECT>		 AIObjects = {};
 	std::vector<SPRITE>			 Sprites   = {};
+	std::vector<MirrorInfo>			 Mirrors = {};
 
 	// Texture data
 	TEXTURE				 SkyTexture		   = {};

@@ -380,6 +380,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psPostProcessExclusion;
 		ComPtr<ID3D11PixelShader> _psPostProcessFinalPass;
 		ComPtr<ID3D11PixelShader> _psPostProcessLensFlare;
+		ComPtr<ID3D11PixelShader> _psDownsampleDepthBuffer;
 
 		bool _doingFullscreenPass = false;
 
@@ -454,12 +455,12 @@ namespace TEN::Renderer
 		void PrepareSingleLaserBeam(RenderView& view);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, RendererPass rendererPass);
-		void DrawItems(RenderView& view, RendererPass rendererPass);
-		void DrawAnimatingItem(RendererItem* item, RenderView& view, RendererPass rendererPass);
-		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RendererPass rendererPass);
-		void DrawBaddyGunflashes(RenderView& view);
-		void DrawStatics(RenderView& view, RendererPass rendererPass);
-		void DrawLara(RenderView& view, RendererPass rendererPass);
+		void DrawItems(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
+		void DrawAnimatingItem(RendererItem* item, RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
+		void DrawWaterfalls(RendererItem* item, RendererMirror* mirror, RenderView& view, int fps, RendererPass rendererPass);
+		void DrawBaddyGunflashes(RendererMirror* mirror, RenderView& view);
+		void DrawStatics(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
+		void DrawLara(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
 		void PrepareFires(RenderView& view);
 		void PrepareParticles(RenderView& view);
 		void PrepareSmokes(RenderView& view);
@@ -472,9 +473,9 @@ namespace TEN::Renderer
 		void DrawEffects(RenderView& view, RendererPass rendererPass);
 		void DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass);
 		void PrepareSplashes(RenderView& view);
-		void DrawSprites(RenderView& view, RendererPass rendererPass);
+		void DrawSprites(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
 		void DrawDisplaySprites(RenderView& view);
-		void DrawSortedFaces(RenderView& view);
+		void DrawSortedFaces(RendererMirror* mirror, RenderView& view);
 		void DrawSingleSprite(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
 		void DrawRoomSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view);
 		void DrawItemSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view);
@@ -487,13 +488,13 @@ namespace TEN::Renderer
 		void DrawOverlays(RenderView& view);
 		void PrepareRopes(RenderView& view);
 		void DrawFishSwarm(RenderView& view, RendererPass rendererPass);
-		void DrawBats(RenderView& view, RendererPass rendererPass);
-		void DrawRats(RenderView& view, RendererPass rendererPass);
-		void DrawScarabs(RenderView& view, RendererPass rendererPass);
+		void DrawBats(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
+		void DrawRats(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
+		void DrawScarabs(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
 		void DrawSpiders(RenderView& view, RendererPass rendererPass);
-		bool DrawGunFlashes(RenderView& view);
-		void DrawGunShells(RenderView& view, RendererPass rendererPass);
-		void DrawLocusts(RenderView& view, RendererPass rendererPass);
+		bool DrawGunFlashes(RendererMirror* mirror, RenderView& view);
+		void DrawGunShells(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
+		void DrawLocusts(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
 		void DrawStatistics();
 		void DrawExamines();
 		void DrawDiary();
@@ -508,9 +509,9 @@ namespace TEN::Renderer
 		void PrepareSmokeParticles(RenderView& view);
 		void PrepareSparkParticles(RenderView& view);
 		void PrepareExplosionParticles(RenderView& view);
-		void DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass);
-		void DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass);
-		void DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass);
+		void DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
+		void DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
+		void DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
 		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RenderView& view, RendererPass rendererPass);
 		void PrepareSimpleParticles(RenderView& view);
 		void PrepareStreamers(RenderView& view);
@@ -561,7 +562,7 @@ namespace TEN::Renderer
 							const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
 							BlendMode blendMode, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 
-		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
+		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RendererMirror* mirror, RenderView& view);
 		RendererObject& GetRendererObject(GAME_OBJECT_ID id);
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();

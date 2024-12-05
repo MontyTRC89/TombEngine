@@ -278,8 +278,13 @@ void Renderer::UpdateLaraAnimations(bool force)
 	rItem.DoneAnimations = true;
 }
 
-void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
+void TEN::Renderer::Renderer::DrawLara(RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
 {
+	if (mirror != nullptr && LaraItem->RoomNumber != mirror->RoomNumber)
+	{
+		return;
+	}
+
 	// Don't draw player if using optics.
 	if (Lara.Control.Look.OpticRange != 0 || SpotcamDontDrawLara)
 		return;
@@ -305,7 +310,12 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 
 	RendererRoom* room = &_rooms[LaraItem->RoomNumber];
 
-	_stItem.World = item->InterpolatedWorld; // _laraWorldMatrix;
+	_stItem.World = item->InterpolatedWorld;
+	if (mirror != nullptr)
+	{
+		_stItem.World = _stItem.World * mirror->ReflectionMatrix;
+	}
+
 	_stItem.Color = item->Color;
 	_stItem.AmbientLight = item->AmbientLight;
 	memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, laraObj.AnimationTransforms.size() * sizeof(Matrix));
@@ -324,12 +334,12 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 		DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, view, rendererPass);
 	}
 
-	DrawLaraHolsters(item, room, view, rendererPass);
-	DrawLaraJoints(item, room, view, rendererPass);
-	DrawLaraHair(item, room, view, rendererPass);
+	DrawLaraHolsters(item, room, mirror, view, rendererPass);
+	DrawLaraJoints(item, room, mirror, view, rendererPass);
+	DrawLaraHair(item, room, mirror, view, rendererPass);
 }
 
-void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
+void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
 {
 	for (int i = 0; i < HairEffect.Units.size(); i++)
 	{
@@ -345,6 +355,10 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 
 		_stItem.World = Matrix::Identity;
 		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimTransforms[LM_HEAD] * itemToDraw->InterpolatedWorld;
+		if (mirror != nullptr)
+		{
+			_stItem.BonesMatrices[0] = _stItem.BonesMatrices[0] * mirror->ReflectionMatrix;
+		}
 
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{
@@ -354,6 +368,11 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, _interpolationFactor)) *
 				Matrix::CreateTranslation(
 					Vector3::Lerp(segment.PrevPosition, segment.Position, _interpolationFactor));
+			
+			if (mirror != nullptr)
+			{
+				worldMatrix = worldMatrix * mirror->ReflectionMatrix;
+			}
 
 			_stItem.BonesMatrices[i + 1] = worldMatrix;
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
@@ -369,7 +388,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 	}
 }
 
-void Renderer::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
+void Renderer::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
 {
 	if (!_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 		return;
@@ -383,7 +402,7 @@ void Renderer::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, Rend
 	}
 }
 
-void Renderer::DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
+void Renderer::DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
 {
 	HolsterSlot leftHolsterID = Lara.Control.Weapon.HolsterInfo.LeftHolster;
 	HolsterSlot rightHolsterID = Lara.Control.Weapon.HolsterInfo.RightHolster;

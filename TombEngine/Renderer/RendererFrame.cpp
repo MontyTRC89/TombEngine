@@ -147,6 +147,19 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < std::min(MAX_LENS_FLARES_DRAW, (int)tempLensFlares.size()); i++)
 			renderView.LensFlaresToDraw.push_back(tempLensFlares[i]);
+
+		for (auto& mirror : g_Level.Mirrors)
+		{
+			if (mirror.RoomNumber == LaraItem->RoomNumber)
+			{
+				RendererMirror rendererMirror;
+				rendererMirror.RoomNumber = mirror.RoomNumber;
+				rendererMirror.MirroredRoomNumber = mirror.MirroredRoomNumber;
+				rendererMirror.Plane = mirror.MirrorPlane;
+				rendererMirror.ReflectionMatrix = Matrix::CreateReflection(rendererMirror.Plane);
+				renderView.Mirrors.push_back(rendererMirror);
+			}
+		}
 	}
 
 	bool Renderer::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)

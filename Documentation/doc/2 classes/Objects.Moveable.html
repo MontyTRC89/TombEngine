@@ -383,6 +383,14 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 	<td class="summary">Disable the item, as if an antitrigger for it had been stepped on (i.e.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Moveable:GetCollidable">Moveable:GetCollidable()</a></td>
+	<td class="summary">Get the item's collision state.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetCollidable">Moveable:SetCollidable(collidable)</a></td>
+	<td class="summary">Set the item's collision.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Moveable:MakeInvisible">Moveable:MakeInvisible()</a></td>
 	<td class="summary">Make the item invisible.</td>
 	</tr>
@@ -1962,6 +1970,49 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
 
 
 
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetCollidable"></a>
+    <strong>Moveable:GetCollidable()</strong>
+    </dt>
+    <dd>
+    Get the item's collision state.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        item's collision state
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetCollidable"></a>
+    <strong>Moveable:SetCollidable(collidable)</strong>
+    </dt>
+    <dd>
+    Set the item's collision.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">collidable</span>
+            <span class="types"><span class="type">bool</span></span>
+         true if the caller should be collidable, false if no collision should occur.
+        </li>
+    </ul>
 
 
 

@@ -1009,7 +1009,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	bool Renderer::DrawGunFlashes(RenderView& view) 
+	bool Renderer::DrawGunFlashes(RendererMirror* mirror, RenderView& view)
 	{
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
 		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
@@ -1106,6 +1106,11 @@ namespace TEN::Renderer
 					worldMatrix = tMatrix * worldMatrix;
 					worldMatrix = rotMatrix * worldMatrix;
 
+					if (mirror != nullptr)
+					{
+						worldMatrix = worldMatrix * mirror->ReflectionMatrix;
+					}
+
 					_stStatic.World = worldMatrix;
 					_cbStatic.UpdateData(_stStatic, _context.Get());
 
@@ -1119,6 +1124,11 @@ namespace TEN::Renderer
 					worldMatrix = itemPtr->AnimTransforms[LM_RHAND] * itemPtr->World;
 					worldMatrix = tMatrix * worldMatrix;
 					worldMatrix = rotMatrix * worldMatrix;
+
+					if (mirror != nullptr)
+					{
+						worldMatrix = worldMatrix * mirror->ReflectionMatrix;
+					}
 
 					_stStatic.World = worldMatrix;
 					_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -1134,7 +1144,7 @@ namespace TEN::Renderer
 		return true;
 	}
 
-	void Renderer::DrawBaddyGunflashes(RenderView& view)
+	void Renderer::DrawBaddyGunflashes(RendererMirror* mirror, RenderView& view)
 	{
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
 		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
@@ -1150,6 +1160,11 @@ namespace TEN::Renderer
 			for (auto* rItemPtr : rRoomPtr->ItemsToDraw)
 			{
 				auto& nativeItem = g_Level.Items[rItemPtr->ItemNumber];
+
+				if (mirror != nullptr && nativeItem.RoomNumber != mirror->RoomNumber)
+				{
+					continue;
+				}
 
 				if (!nativeItem.IsCreature())
 					continue;
@@ -1196,6 +1211,11 @@ namespace TEN::Renderer
 						if (creature.MuzzleFlash[0].ApplyZRotation)
 							worldMatrix = rotMatrixZ * worldMatrix;
 
+						if (mirror != nullptr)
+						{
+							worldMatrix = worldMatrix * mirror->ReflectionMatrix;
+						}
+
 						_stStatic.World = worldMatrix;
 						_cbStatic.UpdateData(_stStatic, _context.Get());
 
@@ -1236,6 +1256,11 @@ namespace TEN::Renderer
 						if (creature.MuzzleFlash[1].ApplyZRotation)
 							worldMatrix = rotMatrixZ * worldMatrix;
 
+						if (mirror != nullptr)
+						{
+							worldMatrix = worldMatrix * mirror->ReflectionMatrix;
+						}
+
 						_stStatic.World = worldMatrix;
 						_cbStatic.UpdateData(_stStatic, _context.Get());
 
@@ -1267,17 +1292,23 @@ namespace TEN::Renderer
 		}
 	}
 
-	Matrix Renderer::GetWorldMatrixForSprite(RendererSpriteToDraw* sprite, RenderView& view)
+	Matrix Renderer::GetWorldMatrixForSprite(RendererSpriteToDraw* sprite, RendererMirror* mirror, RenderView& view)
 	{
 		auto spriteMatrix = Matrix::Identity;
 		auto scaleMatrix = Matrix::CreateScale(sprite->Width * sprite->Scale, sprite->Height * sprite->Scale, sprite->Scale);
+
+		Vector3 spritePosition = sprite->pos;
+		if (mirror != nullptr)
+		{
+			spritePosition = Vector3::Transform(spritePosition, mirror->ReflectionMatrix); // Vector3::Reflect(spritePosition, mirror->Plane.Normal());
+		}
 
 		switch (sprite->Type)
 		{
 		case SpriteType::Billboard:
 		{
 			auto cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
-			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(sprite->pos, Camera.pos.ToVector3(), cameraUp);
+			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(spritePosition, Camera.pos.ToVector3(), cameraUp);
 		}
 		break;
 
@@ -1286,7 +1317,7 @@ namespace TEN::Renderer
 			auto rotMatrix = Matrix::CreateRotationY(sprite->Rotation);
 			auto quadForward = Vector3(0.0f, 0.0f, 1.0f);
 			spriteMatrix = scaleMatrix * Matrix::CreateConstrainedBillboard(
-				sprite->pos,
+				spritePosition,
 				Camera.pos.ToVector3(),
 				sprite->ConstrainAxis,
 				nullptr,
@@ -1296,7 +1327,7 @@ namespace TEN::Renderer
 
 		case SpriteType::LookAtBillboard:
 		{
-			auto tMatrix = Matrix::CreateTranslation(sprite->pos);
+			auto tMatrix = Matrix::CreateTranslation(spritePosition);
 			auto rotMatrix = Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite->LookAtAxis, Vector3::UnitZ);
 			spriteMatrix = scaleMatrix * rotMatrix * tMatrix;
 		}
