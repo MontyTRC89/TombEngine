@@ -159,32 +159,11 @@ PixelShaderOutput PS(PixelShaderInput input)
 	{
 		for (int i = 0; i < NumRoomLights; i++)
 		{
-			int lightType = RoomLights[i].Type;
+			float isPointLightRoom = step(0.5f, RoomLights[i].Type == LT_POINT);
+			float isSpotLightRoom  = step(0.5f, RoomLights[i].Type == LT_SPOT);
 
-			if (lightType == LT_POINT)
-			{
-				// Use simplified unrolled light calculation for point lights, because
-				// using DoPointLight can cause extreme slowdowns on slower systems.
-
-				float radius = RoomLights[i].Out;
-
-				float3 lightVec = (RoomLights[i].Position.xyz - input.WorldPosition);
-				float distance = length(lightVec);
-				if (distance > radius)
-					continue;
-
-				lightVec = normalize(lightVec);
-				float d = saturate(dot(normal, lightVec));
-				if (d < 0)
-					continue;
-			
-				float attenuation = pow(((radius - distance) / radius), 2);
-				lighting += RoomLights[i].Color.xyz * attenuation * d;
-			}
-			else if (lightType == LT_SPOT)
-			{
-				lighting += DoSpotLight(input.WorldPosition, normal, RoomLights[i]);
-			}
+			lighting += DoPointLight(input.WorldPosition, normal, RoomLights[i]) * isPointLightRoom;
+			lighting += DoSpotLight(input.WorldPosition, normal, RoomLights[i]) * isSpotLightRoom;
 		}
 	}
 
