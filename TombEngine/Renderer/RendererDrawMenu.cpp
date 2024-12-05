@@ -884,9 +884,8 @@ namespace TEN::Renderer
 
 	void Renderer::RenderTitleImage()
 	{
-		auto assetDir = g_GameFlow->GetGameDir();
 		Texture2D texture;
-		SetTextureOrDefault(texture, TEN::Utils::ToWString(assetDir + g_GameFlow->IntroImagePath.c_str()));
+		SetTextureOrDefault(texture, TEN::Utils::ToWString(g_GameFlow->GetGameDir() + g_GameFlow->IntroImagePath.c_str()));
 
 		if (!texture.Texture)
 			return;
