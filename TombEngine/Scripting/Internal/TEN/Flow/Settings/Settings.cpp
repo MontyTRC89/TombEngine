@@ -161,33 +161,33 @@ void WeaponSettings::Register(sol::table& parent)
 	parent.create().new_usertype<WeaponSettings>(ScriptReserved_WeaponSettings, sol::constructors<WeaponSettings()>(),
 		sol::call_constructor, sol::constructors<WeaponSettings()>(),
 
-		/*** Shooting accuracy.
-		@tfield float accuracy determines accuracy range in angles (smaller angles mean higher accuracy). Not applicable for projectile weapons. */
-		"accuracy", &WeaponSettings::Accuracy,
+	/*** Shooting accuracy.
+	@tfield float accuracy determines accuracy range in angles (smaller angles mean higher accuracy). Not applicable for projectile weapons. */
+	"accuracy", &WeaponSettings::Accuracy,
 
-		/*** Targeting distance.
-		@tfield float targetingDistance specifies maximum targeting distance in world units (1 block = 1024 world units) for a given weapon. */
-		"distance", &WeaponSettings::Distance,
+	/*** Targeting distance.
+	@tfield float targetingDistance specifies maximum targeting distance in world units (1 block = 1024 world units) for a given weapon. */
+	"distance", &WeaponSettings::Distance,
 
-		/*** Shooting interval.
-		@tfield float interval specifies an interval (in frames), after which Lara is able to shoot again. Not applicable for backholster weapons. */
-		"interval", & WeaponSettings::Interval,
+	/*** Shooting interval.
+	@tfield float interval specifies an interval (in frames), after which Lara is able to shoot again. Not applicable for backholster weapons. */
+	"interval", & WeaponSettings::Interval,
 
-		/*** Damage.
-		@tfield int damage amount of hit points taken for every hit. For crossbow, specifies damage only for normal crossbow bolts. */
-		"damage", &WeaponSettings::Damage,
+	/*** Damage.
+	@tfield int damage amount of hit points taken for every hit. For crossbow, specifies damage only for normal crossbow bolts. */
+	"damage", &WeaponSettings::Damage,
 
-		/*** Secondary damage.
-		@tfield int secondaryDamage applicable only to weapons with alternate ammo, such as crossbow explosive ammo or grenade super ammo. */
-		"secondaryDamage", & WeaponSettings::SecondaryDamage,
+	/*** Secondary damage.
+	@tfield int secondaryDamage applicable only to weapons with alternate ammo, such as crossbow explosive ammo or grenade super ammo. */
+	"secondaryDamage", & WeaponSettings::SecondaryDamage,
 
-		/*** Gunflash duration.
-		@tfield int flashDuration specifies the duration of a gunflash effect. Not applicable for weapons without gunflash. */
-		"flashDuration", &WeaponSettings::FlashDuration,
+	/*** Gunflash duration.
+	@tfield int flashDuration specifies the duration of a gunflash effect. Not applicable for weapons without gunflash. */
+	"flashDuration", &WeaponSettings::FlashDuration,
 
-		/*** Water level.
-		@tfield int waterLevel specifies water depth, at which Lara will put weapons back into holsters, indicating it's not possible to use it in water. */
-		"waterLevel", &WeaponSettings::WaterLevel);
+	/*** Water level.
+	@tfield int waterLevel specifies water depth, at which Lara will put weapons back into holsters, indicating it's not possible to use it in water. */
+	"waterLevel", &WeaponSettings::WaterLevel);
 }
 
 /*** System
