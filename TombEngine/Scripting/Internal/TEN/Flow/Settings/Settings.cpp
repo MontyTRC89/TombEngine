@@ -59,7 +59,7 @@ void FlareSettings::Register(sol::table& parent)
 	@tfield int range flare light radius or range. Represented in "clicks" equal to 256 world units. */
 	"range", &FlareSettings::Range,
 
-	/*** Toggle flicker effect.
+	/*** Timeout.
 	@tfield int timeout flare duration. Flare stops working after specified timeout (specified in seconds).*/
 	"timeout", &FlareSettings::Timeout,
 
@@ -177,9 +177,9 @@ void WeaponSettings::Register(sol::table& parent)
 	@tfield int damage amount of hit points taken for every hit. For crossbow, specifies damage only for normal crossbow bolts. */
 	"damage", &WeaponSettings::Damage,
 
-	/*** Secondary damage.
-	@tfield int secondaryDamage applicable only to weapons with alternate ammo, such as crossbow explosive ammo or grenade super ammo. */
-	"secondaryDamage", & WeaponSettings::SecondaryDamage,
+	/*** Alternate damage.
+	@tfield int alternateDamage for Revolver and HK, specifies damage in lasersight mode. For crossbow, specifies damage for explosive ammo. */
+	"alternateDamage", & WeaponSettings::AlternateDamage,
 
 	/*** Gunflash duration.
 	@tfield int flashDuration specifies the duration of a gunflash effect. Not applicable for weapons without gunflash. */

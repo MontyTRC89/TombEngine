@@ -61,7 +61,7 @@ struct WeaponSettings
 	int	  WaterLevel      = 0;
 	int	  FlashDuration   = 0;
 	int	  Damage          = 0;
-	int	  SecondaryDamage = 0;
+	int	  AlternateDamage = 0;
 
 	static void Register(sol::table& parent);
 };

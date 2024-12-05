@@ -849,7 +849,7 @@ void GrenadeControl(short itemNumber)
 		grenadeItem.Pose.Orientation.y = sYOrient;
 	}
 
-	HandleProjectile(grenadeItem, *LaraItem, prevPos, (ProjectileType)grenadeItem.ItemFlags[0], Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
+	HandleProjectile(grenadeItem, *LaraItem, prevPos, (ProjectileType)grenadeItem.ItemFlags[0], Weapons[(int)LaraWeaponType::GrenadeLauncher].Damage);
 }
 
 void FireRocket(ItemInfo& laraItem)
@@ -988,7 +988,7 @@ void RocketControl(short itemNumber)
 	auto prevPos = rocketItem.Pose.Position;
 	TranslateItem(&rocketItem, rocketItem.Pose.Orientation, rocketItem.Animation.Velocity.z);
 
-	HandleProjectile(rocketItem, *LaraItem, prevPos, ProjectileType::Explosive, Weapons[(int)LaraWeaponType::RocketLauncher].ExplosiveDamage);
+	HandleProjectile(rocketItem, *LaraItem, prevPos, ProjectileType::Explosive, Weapons[(int)LaraWeaponType::RocketLauncher].Damage);
 }
 
 void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose)
@@ -1104,7 +1104,7 @@ void CrossbowBoltControl(short itemNumber)
 	TranslateItem(&boltItem, boltItem.Pose.Orientation, boltItem.Animation.Velocity.z);
 
 	int damage = (boltItem.ItemFlags[0] == (int)ProjectileType::Explosive) ?
-		Weapons[(int)LaraWeaponType::Crossbow].ExplosiveDamage : Weapons[(int)LaraWeaponType::Crossbow].Damage;
+		Weapons[(int)LaraWeaponType::Crossbow].AlternateDamage : Weapons[(int)LaraWeaponType::Crossbow].Damage;
 
 	HandleProjectile(boltItem, *LaraItem, prevPos, (ProjectileType)boltItem.ItemFlags[0], damage);
 }

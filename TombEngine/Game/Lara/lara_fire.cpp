@@ -313,7 +313,7 @@ void InitializeWeaponInfo(LaraWeaponType weaponType, Settings const& settings)
 	auto& setting = settings.Weapons[(int)weaponType - 1]; // Lua counts from 1
 
 	weapon.Damage = setting.Damage;
-	weapon.ExplosiveDamage = setting.SecondaryDamage;
+	weapon.AlternateDamage = setting.AlternateDamage;
 	weapon.FlashTime = setting.FlashDuration;
 	weapon.GunHeight = setting.WaterLevel;
 	weapon.ShotAccuracy = ANGLE(setting.Accuracy);

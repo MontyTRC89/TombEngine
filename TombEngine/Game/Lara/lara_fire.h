@@ -41,7 +41,7 @@ struct WeaponInfo
 	int	  FlashTime		  = 0;
 	int	  DrawFrame		  = 0;
 	int	  SampleNum		  = 0;
-	int	  ExplosiveDamage = 0;
+	int	  AlternateDamage = 0;
 };
 
 extern int FlashGrenadeAftershockTimer;
