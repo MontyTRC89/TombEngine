@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/Objects/EulerAngles.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 
 class EulerAngles;
 class Pose;
@@ -27,6 +28,7 @@ public:
 	// Converters
 	std::string ToString() const;
 	EulerAngles ToEulerAngles() const;
+	Vec3 Direction() const;
 
 	// Operators
 	operator Vector3() const;

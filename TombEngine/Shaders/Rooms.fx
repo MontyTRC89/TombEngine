@@ -146,11 +146,10 @@ PixelShaderOutput PS(PixelShaderInput input)
         if (Light.Type == LT_POINT)
         {
             DoPointLightShadow(input.WorldPosition, lighting);
-
         }
         else if (Light.Type == LT_SPOT)
         {
-            DoSpotLightShadow(input.WorldPosition, lighting);
+            DoSpotLightShadow(input.WorldPosition, normal, lighting);
         }
 	}
 
@@ -160,23 +159,11 @@ PixelShaderOutput PS(PixelShaderInput input)
 	{
 		for (int i = 0; i < NumRoomLights; i++)
 		{
-			float3 lightPos = RoomLights[i].Position.xyz;
-			float3 color = RoomLights[i].Color.xyz;
-			float radius = RoomLights[i].Out;
+			float isPointLightRoom = step(0.5f, RoomLights[i].Type == LT_POINT);
+			float isSpotLightRoom  = step(0.5f, RoomLights[i].Type == LT_SPOT);
 
-			float3 lightVec = (lightPos - input.WorldPosition);
-			float distance = length(lightVec);
-			if (distance > radius)
-				continue;
-
-			lightVec = normalize(lightVec);
-			float d = saturate(dot(normal, lightVec ));
-			if (d < 0)
-				continue;
-			
-			float attenuation = pow(((radius - distance) / radius), 2);
-
-			lighting += color * attenuation * d;
+			lighting += DoPointLight(input.WorldPosition, normal, RoomLights[i]) * isPointLightRoom;
+			lighting += DoSpotLight(input.WorldPosition, normal, RoomLights[i]) * isSpotLightRoom;
 		}
 	}
 

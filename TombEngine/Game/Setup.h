@@ -37,11 +37,10 @@ enum class LotType
 	HumanPlusJump,
 	HumanPlusJumpAndMonkey,
 	Flyer,
-	Blockable,	   // For large creatures such as trex and shiva.
-	Spider,		   // Only 2 block vault allowed.
-	Ape,		   // Only 2 block vault allowed.
-	SnowmobileGun, // Only 1 block vault allowed and 4 block drop max.
-	EnemyJeep
+	Blockable,	  // For large creatures such as trex and shiva.
+	Spider,		  // Only 2 block vault allowed.
+	Ape,		  // Only 2 block vault allowed.
+	SnowmobileGun // Only 1 block vault allowed and 4 block drop max.
 };
 
 enum class HitEffect
@@ -68,6 +67,7 @@ enum class ShatterType
 	Explode
 };
 
+// TODO: All fields to PascalCase.
 struct ObjectInfo
 {
 	bool loaded = false; // IsLoaded
@@ -87,13 +87,14 @@ struct ObjectInfo
 	int pivotLength;
 	int radius;
 
-	int HitPoints;
-	bool intelligent;	// IsIntelligent
-	bool waterCreature; // IsWaterCreature
-	bool nonLot;		// IsNonLot
-	bool isPickup;		// IsPickup
-	bool isPuzzleHole;	// IsReceptacle
-	bool usingDrawAnimatingItem;
+	int	 HitPoints				= 0;
+	bool AlwaysActive			= false;
+	bool intelligent			= false;
+	bool waterCreature			= false;
+	bool nonLot					= false;
+	bool isPickup				= false;
+	bool isPuzzleHole			= false;
+	bool usingDrawAnimatingItem = false;
 
 	DWORD explodableMeshbits;
 
@@ -113,15 +114,13 @@ class ObjectHandler
 {
 private:
 	ObjectInfo _objects[ID_NUMBER_OBJECTS];
+	ObjectInfo& GetFirstAvailableObject();
 
 public:
 	void Initialize();
 	bool CheckID(GAME_OBJECT_ID objectID, bool isSilent = false);
 
 	ObjectInfo& operator [](int objectID);
-
-private:
-	ObjectInfo& GetFirstAvailableObject();
 };
 
 struct StaticInfo
@@ -135,10 +134,31 @@ struct StaticInfo
 	int ObjectNumber;
 };
 
-extern ObjectHandler					   Objects;
-extern std::vector<StaticInfo>			   StaticObjects;
+class StaticHandler
+{
+private:
+	static const int _defaultLUTSize = 256;
 
-#define GetStaticObject(x) StaticObjects[StaticObjectsLUT[x]]
+	std::vector<StaticInfo> _statics = {};
+	std::vector<int> _lookupTable = {};
+
+public:
+	void Initialize();
+	int  GetIndex(int staticID);
+
+	StaticInfo& operator [](int staticID);
+
+	// Iterators
+	auto begin() { return _statics.begin(); }			// Non-const begin
+	auto end() { return _statics.end(); }				// Non-const end
+	auto begin() const { return _statics.cbegin(); }	// Const begin
+	auto end() const { return _statics.cend(); }		// Const end
+	auto cbegin() const { return _statics.cbegin(); }	// Explicit const begin
+	auto cend() const { return _statics.cend(); }		// Explicit const end
+};
+
+extern ObjectHandler Objects;
+extern StaticHandler Statics;
 
 void InitializeGameFlags();
 void InitializeSpecialEffects();

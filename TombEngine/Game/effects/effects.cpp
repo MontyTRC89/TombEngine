@@ -454,9 +454,7 @@ void TriggerRicochetSpark(const GameVector& pos, short angle, bool sound)
 {
 	int count = Random::GenerateInt(3, 8);
 	TriggerRicochetSpark(pos, angle, count);
-
-	if (sound && Random::TestProbability(1 / 3.0f))
-		SoundEffect(SFX_TR4_WEAPON_RICOCHET, &Pose(pos.ToVector3i()));
+	SoundEffect(SFX_TR4_WEAPON_RICOCHET, &Pose(pos.ToVector3i()));
 }
 
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
@@ -1249,19 +1247,20 @@ void KillAllCurrentItems(short itemNumber)
 	// TODO: Reimplement this functionality.
 }
 
-// TODO: Rename to SpawnDynamicLight().
-void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff)
+void TriggerDynamicPointLight(const Vector3& pos, const Color& color, float falloff, bool castShadows, int hash)
 {
-	g_Renderer.AddDynamicLight(
-		pos.x, pos.y, pos.z,
-		falloff * UCHAR_MAX,
-		color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
+	g_Renderer.AddDynamicPointLight(pos, falloff , color, castShadows, hash);
+}
+
+void TriggerDynamicSpotLight(const Vector3& pos, const Vector3& dir, const Color& color, float radius, float falloff, float distance, bool castShadows, int hash)
+{
+	g_Renderer.AddDynamicSpotLight(pos, dir, radius, falloff, distance, color, castShadows, hash);
 }
 
 // Deprecated. Use above version instead.
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
-	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
+	g_Renderer.AddDynamicPointLight(Vector3(x, y, z), (float)(falloff * UCHAR_MAX), Color(r / (float)UCHAR_MAX, g / (float)UCHAR_MAX, b / (float)UCHAR_MAX), false);
 }
 
 void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth)

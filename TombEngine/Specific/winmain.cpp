@@ -352,7 +352,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	auto windowName = (std::string("Starting TombEngine version ") +
 					   std::to_string(ver[0]) + "." +
 					   std::to_string(ver[1]) + "." +
-					   std::to_string(ver[2]) + " " +
+					   std::to_string(ver[2]) + "." +
 					   std::to_string(ver[3]) + " " +
 #ifdef _WIN64
 					   "(64-bit)"

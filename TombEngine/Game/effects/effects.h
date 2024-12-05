@@ -300,6 +300,8 @@ void ControlWaterfallMist(short itemNumber);
 void TriggerWaterfallMist(const ItemInfo& item);
 void KillAllCurrentItems(short itemNumber);
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
+void TriggerDynamicPointLight(const Vector3& pos, const Color& color, float falloff, bool castShadows = false, int hash = 0);
+void TriggerDynamicSpotLight(const Vector3& pos, const Vector3& dir, const Color& color, float radius, float falloff, float distance, bool castShadows = false, int hash = 0);
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
 void TriggerRocketSmoke(int x, int y, int z);
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
@@ -313,5 +315,3 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
 void UpdateWibble();
-
-void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff);

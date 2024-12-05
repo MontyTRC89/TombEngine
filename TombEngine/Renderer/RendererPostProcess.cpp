@@ -4,7 +4,7 @@
 
 namespace TEN::Renderer
 {
-	void Renderer::DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view)
+	void Renderer::DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view, SceneRenderMode renderMode)
 	{
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
@@ -12,10 +12,13 @@ namespace TEN::Renderer
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
+		float screenFadeFactor = renderMode == SceneRenderMode::Full ? ScreenFadeCurrent : 1.0f;
+		float cinematicBarsHeight = renderMode == SceneRenderMode::Full ? Smoothstep(CinematicBarsHeight) * SPOTCAM_CINEMATIC_BARS_HEIGHT : 0.0f;
+
+		_stPostProcessBuffer.ScreenFadeFactor = screenFadeFactor;
+		_stPostProcessBuffer.CinematicBarsHeight = cinematicBarsHeight;
 		_stPostProcessBuffer.ViewportWidth = _screenWidth;
 		_stPostProcessBuffer.ViewportHeight = _screenHeight;
-		_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
-		_stPostProcessBuffer.CinematicBarsHeight = Smoothstep(CinematicBarsHeight) * SPOTCAM_CINEMATIC_BARS_HEIGHT;
 		_stPostProcessBuffer.EffectStrength = _postProcessStrength;
 		_stPostProcessBuffer.Tint = _postProcessTint;
 		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());

@@ -25,7 +25,8 @@ void Level::Register(sol::table& parent)
 		sol::constructors<Level()>(),
 		sol::call_constructor, sol::constructors<Level()>(),
 
-		// Corresponds to an entry in strings.lua.
+/// (string) string key for the level's (localised) name.
+// Corresponds to an entry in strings.lua.
 //@mem nameKey
 		"nameKey", &Level::NameStringKey,
 

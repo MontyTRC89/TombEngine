@@ -3168,9 +3168,7 @@ namespace TEN::Gui
 
 	bool GuiController::CallPause()
 	{
-		ClearAllDisplaySprites();
-		g_Renderer.PrepareScene();
-		g_Renderer.DumpGameScene();
+		g_Renderer.DumpGameScene(SceneRenderMode::NoHud);
 		PauseAllSounds(SoundPauseMode::Pause);
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -3251,9 +3249,7 @@ namespace TEN::Gui
 
 		player.Inventory.OldBusy = player.Inventory.IsBusy;
 
-		ClearAllDisplaySprites();
-		g_Renderer.PrepareScene();
-		g_Renderer.DumpGameScene();
+		g_Renderer.DumpGameScene(SceneRenderMode::NoHud);
 		PauseAllSounds(SoundPauseMode::Inventory);
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -3524,7 +3520,7 @@ namespace TEN::Gui
 			else
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				NextLevel = -(SelectedSaveSlot + 1);
+				g_GameFlow->SelectedSaveGame = SelectedSaveSlot;
 				return LoadResult::Load;
 			}
 		}

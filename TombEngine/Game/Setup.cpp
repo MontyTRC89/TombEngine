@@ -32,8 +32,8 @@ using namespace TEN::Effects::Hair;
 using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
-ObjectHandler						Objects;
-std::vector<StaticInfo>				StaticObjects;
+ObjectHandler Objects;
+StaticHandler Statics;
 
 void ObjectHandler::Initialize() 
 { 
@@ -74,6 +74,44 @@ ObjectInfo& ObjectHandler::GetFirstAvailableObject()
 	}
 
 	return _objects[0];
+}
+
+void StaticHandler::Initialize()
+{
+	_lookupTable.resize(0);
+	_lookupTable.reserve(_defaultLUTSize);
+	_statics.resize(0);
+}
+
+int StaticHandler::GetIndex(int staticID)
+{
+	if (staticID < 0 || staticID >= _lookupTable.size())
+	{
+		TENLog("Attempt to get nonexistent static mesh ID slot index (" + std::to_string(staticID) + ")", LogLevel::Warning);
+		return _lookupTable.front();
+	}
+
+	return _lookupTable[staticID];
+}
+
+StaticInfo& StaticHandler::operator [](int staticID)
+{
+	if (staticID < 0)
+	{
+		TENLog("Attempt to access illegal static mesh ID slot info", LogLevel::Warning);
+		return _statics.front();
+	}
+
+	if (staticID >= _lookupTable.size())
+		_lookupTable.resize(staticID + 1, NO_VALUE);
+
+	if (_lookupTable[staticID] != NO_VALUE)
+		return _statics[_lookupTable[staticID]];
+
+	_statics.emplace_back();
+	_lookupTable[staticID] = (int)_statics.size() - 1;
+
+	return _statics.back();
 }
 
 // NOTE: JointRotationFlags allows bones to be rotated with CreatureJoint().
@@ -191,6 +229,7 @@ void InitializeObjects()
 		obj->hitEffect = HitEffect::None;
 		obj->explodableMeshbits = 0;
 		obj->intelligent = false;
+		obj->AlwaysActive = false;
 		obj->waterCreature = false;
 		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;

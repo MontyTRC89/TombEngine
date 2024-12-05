@@ -6,6 +6,7 @@
 #include <d3d9types.h>
 #include <SimpleMath.h>
 #include <PostProcess.h>
+
 #include "Math/Math.h"
 #include "Game/control/box.h"
 #include "Game/items.h"
@@ -15,11 +16,13 @@
 #include "Game/Hud/PickupSummary.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
+#include "Game/Setup.h"
 #include "Specific/level.h"
 #include "Specific/fast_vector.h"
+#include "Renderer/Frustum.h"
 #include "Renderer/RendererEnums.h"
-#include "Renderer/Structures/RendererLight.h"
 #include "Renderer/RenderView.h"
+#include "Renderer/Structures/RendererLight.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
 #include "Renderer/ConstantBuffers/HUDBarBuffer.h"
@@ -33,26 +36,23 @@
 #include "Renderer/ConstantBuffers/SpriteBuffer.h"
 #include "Renderer/ConstantBuffers/InstancedStaticBuffer.h"
 #include "Renderer/ConstantBuffers/InstancedSpriteBuffer.h"
-#include "Frustum.h"
-#include "Specific/level.h"
-#include "ConstantBuffers/ConstantBuffer.h"
-#include "Specific/fast_vector.h"
-#include "Renderer/ConstantBuffers/InstancedSpriteBuffer.h"
+#include "Renderer/ConstantBuffers/ConstantBuffer.h"
 #include "Renderer/ConstantBuffers/PostProcessBuffer.h"
+#include "Renderer/ConstantBuffers/SMAABuffer.h"
 #include "Renderer/Structures/RendererBone.h"
+#include "Renderer/Structures/RendererDoor.h"
 #include "Renderer/Structures/RendererStringToDraw.h"
 #include "Renderer/Structures/RendererRoom.h"
 #include "Renderer/Structures/RendererSprite.h"
-#include "Renderer/Graphics/VertexBuffer.h"
-#include "Renderer/Structures/RendererDoor.h"
-#include "Structures/RendererAnimatedTexture.h"
-#include "Structures/RendererAnimatedTextureSet.h"
-#include "Structures/RendererRoom.h"
+#include "Renderer/Structures/RendererAnimatedTexture.h"
+#include "Renderer/Structures/RendererAnimatedTextureSet.h"
 #include "Renderer/Graphics/Texture2D.h"
 #include "Renderer/Graphics/IndexBuffer.h"
 #include "Renderer/Graphics/RenderTarget2D.h"
 #include "Renderer/Graphics/RenderTargetCube.h"
 #include "Renderer/Graphics/Texture2DArray.h"
+#include "Renderer/Graphics/VertexBuffer.h"
+#include "Renderer/Graphics/Vertices/PostProcessVertex.h"
 #include "Renderer/Structures/RendererItem.h"
 #include "Renderer/Structures/RendererEffect.h"
 #include "Renderer/Structures/RendererLine3D.h"
@@ -63,9 +63,7 @@
 #include "Renderer/Structures/RendererLine2D.h"
 #include "Renderer/Structures/RendererHudBar.h"
 #include "Renderer/Structures/RendererRoomAmbientMap.h"
-#include "Renderer/ConstantBuffers/SMAABuffer.h"
 #include "Renderer/Structures/RendererObject.h"
-#include "Graphics/Vertices/PostProcessVertex.h"
 #include "Renderer/Structures/RendererStar.h"
 
 enum GAME_OBJECT_ID : short;
@@ -247,7 +245,8 @@ namespace TEN::Renderer
 
 		// Lights
 
-		std::vector<RendererLight> _dynamicLights;
+		int _dynamicLightList = 0;
+		std::vector<RendererLight> _dynamicLights[2];
 		RendererLight* _shadowLight;
 
 		// Lines
@@ -420,10 +419,11 @@ namespace TEN::Renderer
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);
 		void BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateRegister samplerType);
-		void BindRoomLights(std::vector<RendererLight*>& lights);
-		void BindStaticLights(std::vector<RendererLight*>& lights);
-		void BindInstancedStaticLights(std::vector<RendererLight*>& lights, int instanceID);
-		void BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade);
+		void BindLight(RendererLight& light, ShaderLight* lights, int index, RendererMirror* mirror);
+		void BindRoomLights(std::vector<RendererLight*>& lights, RendererMirror* mirror);
+		void BindStaticLights(std::vector<RendererLight*>& lights, RendererMirror* mirror);
+		void BindInstancedStaticLights(std::vector<RendererLight*>& lights, int instanceID, RendererMirror* mirror);
+		void BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade, RendererMirror* mirror);
 		void BindRenderTargetAsTexture(TextureRegister registerType, RenderTarget2D* target, SamplerStateRegister samplerType);
 		void BindConstantBufferVS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
@@ -517,7 +517,7 @@ namespace TEN::Renderer
 		void PrepareStreamers(RenderView& view);
 		void PrepareFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
-		void DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view);
+		void DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view, SceneRenderMode renderMode);
 		void RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background, float backgroundFade);
 		void RenderTitleMenu(Menu menu);
 		void RenderPauseMenu(Menu menu);
@@ -617,7 +617,7 @@ namespace TEN::Renderer
 
 		inline RendererObject& GetStaticRendererObject(short objectNumber)
 		{
-			return _staticObjects[StaticObjectsLUT[objectNumber]].value();
+			return _staticObjects[Statics.GetIndex(objectNumber)].value();
 		}
 
 	public:
@@ -634,9 +634,9 @@ namespace TEN::Renderer
 		bool PrepareDataForTheRenderer();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float farView);
 		void RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere);
-		void DumpGameScene();
+		void DumpGameScene(SceneRenderMode renderMode = SceneRenderMode::Full);
 		void RenderInventory();
-		void RenderScene(RenderTarget2D* renderTarget, bool doAntialiasing, RenderView& view);
+		void RenderScene(RenderTarget2D* renderTarget, RenderView& view, SceneRenderMode renderMode = SceneRenderMode::Full);
 		void PrepareScene();
 		void ClearScene();
 		void SaveScreenshot();
@@ -646,8 +646,11 @@ namespace TEN::Renderer
 		void AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags);
 		void AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, RendererDebugPage page = RendererDebugPage::None);
 		void FreeRendererData();
-		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
+		void AddDynamicPointLight(const Vector3& pos, float radius, const Color& color, bool castShadows, int hash = 0);
+		void AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color, bool castShadows, int hash = 0);
+		void StoreInterpolatedDynamicLightData(RendererLight& light);
 		void RenderLoadingScreen(float percentage);
+		void RenderFreezeMode(float interpFactor, bool staticBackground);
 		void UpdateProgress(float value);
 		void ToggleFullScreen(bool force = false);
 		void SetFullScreen();
@@ -687,7 +690,7 @@ namespace TEN::Renderer
 		void SaveOldState();
 
 		float						GetFramerateMultiplier() const;
-		float						GetInterpolationFactor() const;
+		float						GetInterpolationFactor(bool forceRawValue = false) const;
 		Vector2i					GetScreenResolution() const;
 		int							GetScreenRefreshRate() const;
 		std::optional<Vector2>		Get2DPosition(const Vector3& pos) const;

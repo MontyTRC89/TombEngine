@@ -1,5 +1,6 @@
 #include "framework.h"
 
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Internal/TEN/Strings/DisplayString/DisplayString.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
@@ -20,13 +21,14 @@ when you need to use screen-space coordinates.
 @pragma nostrip
 */
 
-UserDisplayString::UserDisplayString(const std::string& key, const Vec2& pos, float scale, D3DCOLOR color, const FlagArray& flags, bool isTranslated) :
+UserDisplayString::UserDisplayString(const std::string& key, const Vec2& pos, float scale, D3DCOLOR color, const FlagArray& flags, bool isTranslated, FreezeMode owner) :
 	_key(key),
 	_position(pos),
 	_scale(scale),
 	_color(color),
 	_flags(flags),
-	_isTranslated(isTranslated)
+	_isTranslated(isTranslated),
+	_owner(owner)
 {
 }
 
@@ -89,7 +91,10 @@ static std::unique_ptr<DisplayString> CreateString(const std::string& key, const
 	if (!IsValidOptionalArg(scale))	
 		ScriptAssertF(false, "Wrong argument type for {}.new \"scale\" argument; must be a float or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
 
-	auto string = UserDisplayString(key, pos, USE_IF_HAVE(float, scale, 1.0f), USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255)), flagArray, USE_IF_HAVE(bool, isTranslated, false));
+	auto string = UserDisplayString(key, pos, USE_IF_HAVE(float, scale, 1.0f), USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255)),
+									flagArray, USE_IF_HAVE(bool, isTranslated, false), g_GameFlow->CurrentFreezeMode);
+
+
 	DisplayString::SetItemCallbackRoutine(id, string);
 	return ptr;
 }

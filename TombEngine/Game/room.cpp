@@ -255,11 +255,11 @@ GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox)
 
 	if (getVisibilityBox)
 	{
-		bounds = GetStaticObject(mesh.staticNumber).visibilityBox * mesh.scale;
+		bounds = Statics[mesh.staticNumber].visibilityBox * mesh.scale;
 	}
 	else
 	{
-		bounds = GetStaticObject(mesh.staticNumber).collisionBox * mesh.scale;
+		bounds = Statics[mesh.staticNumber].collisionBox * mesh.scale;
 	}
 
 	return bounds;

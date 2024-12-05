@@ -323,7 +323,7 @@ void TEN::Renderer::Renderer::DrawLara(RendererMirror* mirror, RenderView& view,
 	{
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
 	}
-	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
+	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, mirror);
 	_cbItem.UpdateData(_stItem, _context.Get());
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
@@ -341,6 +341,8 @@ void TEN::Renderer::Renderer::DrawLara(RendererMirror* mirror, RenderView& view,
 
 void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
 {
+	bool forceValue = g_GameFlow->CurrentFreezeMode == FreezeMode::Player;
+
 	for (int i = 0; i < HairEffect.Units.size(); i++)
 	{
 		const auto& unit = HairEffect.Units[i];
@@ -365,9 +367,9 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 			const auto& segment = unit.Segments[i];
 			auto worldMatrix = 
 				Matrix::CreateFromQuaternion(
-					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, _interpolationFactor)) *
+					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, GetInterpolationFactor(forceValue))) *
 				Matrix::CreateTranslation(
-					Vector3::Lerp(segment.PrevPosition, segment.Position, _interpolationFactor));
+					Vector3::Lerp(segment.PrevPosition, segment.Position, GetInterpolationFactor(forceValue)));
 			
 			if (mirror != nullptr)
 			{
