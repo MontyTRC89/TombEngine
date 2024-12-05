@@ -428,31 +428,25 @@ float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, floa
 
 	for (int i = 0; i < numLights; i++)
 	{
-		int lightType = lights[i].Type;
+		float isPoint   = step(0.5f, float(lights[i].Type == LT_POINT));
+		float isShadow  = step(0.5f, float(lights[i].Type == LT_SHADOW));
+		float isSun     = step(0.5f, float(lights[i].Type == LT_SUN));
+		float isSpot    = step(0.5f, float(lights[i].Type == LT_SPOT));
 
-		if (lightType == LT_POINT)
-		{
-			diffuse += DoPointLight(pos, normal, lights[i]);
-			spec += DoSpecularPoint(pos, normal, lights[i], sheen);
-		}
-		else if (lightType == LT_SHADOW)
-		{
-			shadow += DoShadowLight(pos, normal, lights[i]);
-		}
-		else if (lightType == LT_SUN)
-		{
-			diffuse += DoDirectionalLight(pos, normal, lights[i]);
-			spec += DoSpecularSun(normal, lights[i], sheen);
-		}
-		else if (lightType == LT_SPOT)
-		{
-			diffuse += DoSpotLight(pos, normal, lights[i]);
-			spec += DoSpecularSpot(pos, normal, lights[i], sheen);
-		}
+		diffuse += isPoint * DoPointLight(pos, normal, lights[i]);
+		spec    += isPoint * DoSpecularPoint(pos, normal, lights[i], sheen);
+
+		shadow  += isShadow * DoShadowLight(pos, normal, lights[i]);
+
+		diffuse += isSun * DoDirectionalLight(pos, normal, lights[i]);
+		spec    += isSun * DoSpecularSun(normal, lights[i], sheen);
+
+		diffuse += isSpot * DoSpotLight(pos, normal, lights[i]);
+		spec    += isSpot * DoSpecularSpot(pos, normal, lights[i], sheen);
 	}
 
 	shadow = saturate(shadow);
-	diffuse.xyz *= tex.xyz;
+	diffuse *= tex;
 
 	float3 ambTex = saturate(ambient - shadow) * tex;
 	float3 combined = ambTex + diffuse + spec;
