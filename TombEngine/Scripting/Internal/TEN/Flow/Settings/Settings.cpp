@@ -114,8 +114,8 @@ void FlareSettings::Register(sol::table& parent)
 	@tfield int range flare light radius or range. Represented in "clicks" equal to 256 world units. */
 	"range", &FlareSettings::Range,
 
-	/*** Timeout.
-	@tfield int timeout flare duration. Flare stops working after specified timeout (specified in seconds).*/
+	/*** Burn timeout.
+	@tfield int timeout flare burn timeout. Flare will stop working after given timeout (specified in seconds).*/
 	"timeout", &FlareSettings::Timeout,
 
 	/*** Lens flare brightness.
