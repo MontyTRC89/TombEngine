@@ -145,12 +145,13 @@ PixelShaderOutput PS(PixelShaderInput input)
 	{
 		float isPointLight = step(0.5f, Light.Type == LT_POINT); // 1.0 if LT_POINT, 0.0 otherwise
 		float isSpotLight  = step(0.5f, Light.Type == LT_SPOT);  // 1.0 if LT_SPOT,  0.0 otherwise
+		float isOtherLight = 1.0 - (isPointLight + isSpotLight); // 1.0 if neither LT_POINT nor LT_SPOT
 		
 		float3 pointLightShadow = DoPointLightShadow(input.WorldPosition, lighting);
 		float3 spotLightShadow  = DoSpotLightShadow(input.WorldPosition, normal, lighting);
 		
 		// Blend the shadows based on the light type
-		lighting = pointLightShadow * isPointLight + spotLightShadow * isSpotLight;
+		lighting = pointLightShadow * isPointLight + spotLightShadow * isSpotLight + lighting * isOtherLight;
 	}
 
     lighting = DoBlobShadows(input.WorldPosition, lighting);
