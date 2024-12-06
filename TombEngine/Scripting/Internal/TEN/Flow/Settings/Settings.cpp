@@ -231,8 +231,8 @@ void SystemSettings::Register(sol::table& parent)
 When set to `true`, the game will attempt to perform fast savegame reloading if current level is the same as
 the level loaded from the savegame. It will not work if the level timestamp or checksum has changed
 (i.e. level was updated). If set to `false`, this functionality is turned off.
-	
-	@tfield bool fastReload toggle fast reload on or off.
-	*/
+
+@tfield bool fastReload toggle fast reload on or off.
+*/
 	"fastReload", &SystemSettings::FastReload);
 }
