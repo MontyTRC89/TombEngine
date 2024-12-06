@@ -197,7 +197,7 @@ void WeaponSettings::Register(sol::table& parent)
 	"interval", & WeaponSettings::Interval,
 
 	/*** Damage.
-	@tfield int damage amount of hit points taken for every hit. For crossbow, specifies damage only for normal crossbow bolts. */
+	@tfield int damage amount of hit points taken for every hit. */
 	"damage", &WeaponSettings::Damage,
 
 	/*** Alternate damage.
