@@ -29,7 +29,7 @@ The following constants are inside BlendID.
 */
 
 /*** Table of blend mode constants (for use with particles).
-@table CONSTANT_STRING_HERE
+@table BlendID
 */
 
 static const std::unordered_map<std::string, BlendMode> BLEND_IDS

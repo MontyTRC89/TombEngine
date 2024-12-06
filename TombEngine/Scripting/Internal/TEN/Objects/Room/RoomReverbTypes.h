@@ -24,7 +24,7 @@ The following constants are inside RoomReverb.
 */
 
 /*** Table of room reverb constants (for use with Room:SetReverb / Room:GetReverb command).
-@table CONSTANT_STRING_HERE
+@table RoomReverb
 */
 
 static const std::unordered_map<std::string, ReverbType> ROOM_REVERB_TYPES

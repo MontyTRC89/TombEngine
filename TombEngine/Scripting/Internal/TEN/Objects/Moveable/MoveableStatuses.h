@@ -23,7 +23,7 @@ The following constants are inside Objects.MoveableStatus.
 */
 
 /*** Table of moveable statuses.
-@table CONSTANT_STRING_HERE
+@table MoveableStatus
 */
 
 static const std::unordered_map<std::string, ItemStatus> MOVEABLE_STATUSES

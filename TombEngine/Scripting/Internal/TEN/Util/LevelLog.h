@@ -22,7 +22,7 @@ The following constants are inside LogLevel.
 */
 
 /*** Table of LogLevel ID constants (for use with PrintLog() command).
-@table CONSTANT_STRING_HERE
+@table LogLevel
 */
 
 static const std::unordered_map<std::string, LogLevel> LOG_LEVEL

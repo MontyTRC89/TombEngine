@@ -32,7 +32,7 @@ namespace TEN::Scripting::View
 	*/
 
 	/*** Table of align modes.
-	@table CONSTANT_STRING_HERE
+	@table AlignMode
 	*/
 
 	static const std::unordered_map<std::string, DisplaySpriteAlignMode> ALIGN_MODES
