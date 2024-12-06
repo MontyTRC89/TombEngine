@@ -1341,15 +1341,21 @@ namespace TEN::Renderer
 		return spriteMatrix;
 	}
 
-	void Renderer::DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass) 
+	void Renderer::DrawEffect(RendererMirror* mirror, RenderView& view, RendererEffect* effect, RendererPass rendererPass)
 	{
 		const auto& room = _rooms[effect->RoomNumber];
 
-		_stStatic.World = effect->InterpolatedWorld;
+		Matrix world = effect->InterpolatedWorld;
+		if (mirror != nullptr)
+		{
+			world = world * mirror->ReflectionMatrix;
+		}
+		_stStatic.World = world;
+
 		_stStatic.Color = effect->Color;
 		_stStatic.AmbientLight = effect->AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Dynamic;
-		BindStaticLights(effect->LightsToDraw, nullptr);
+		BindStaticLights(effect->LightsToDraw, mirror);
 		_cbStatic.UpdateData(_stStatic, _context.Get());
 
 		auto& mesh = *effect->Mesh;
@@ -1375,7 +1381,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawEffects(RenderView& view, RendererPass rendererPass) 
+	void Renderer::DrawEffects(RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
 	{
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
 		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
@@ -1390,22 +1396,28 @@ namespace TEN::Renderer
 		{
 			for (auto* effectPtr : roomPtr->EffectsToDraw)
 			{
+				if (mirror != nullptr && effectPtr->RoomNumber != mirror->RoomNumber)
+					continue;
+
 				const auto& room = _rooms[effectPtr->RoomNumber];
 				const auto& object = Objects[effectPtr->ObjectID];
 
 				if (object.drawRoutine && object.loaded)
-					DrawEffect(view, effectPtr, rendererPass);
+					DrawEffect(mirror, view, effectPtr, rendererPass);
 			}
 		}
 	}
 
-	void Renderer::DrawDebris(RenderView& view, RendererPass rendererPass)
+	void Renderer::DrawDebris(RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
 	{
 		bool activeDebrisExist = false;
 		for (auto& deb : DebrisFragments)
 		{
 			if (deb.active)
 			{
+				if (mirror != nullptr && deb.roomNumber != mirror->RoomNumber)
+					continue;
+
 				activeDebrisExist = true;
 				break;
 			}
@@ -1422,6 +1434,9 @@ namespace TEN::Renderer
 			{
 				if (deb.active)
 				{
+					if (mirror != nullptr && deb.roomNumber != mirror->RoomNumber)
+						continue;
+
 					if (!SetupBlendModeAndAlphaTest(deb.mesh.blendMode, rendererPass, 0))
 						continue;
 
@@ -1434,7 +1449,13 @@ namespace TEN::Renderer
 						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[deb.mesh.tex]), SamplerStateRegister::LinearClamp);
 					}
 
-					_stStatic.World = Matrix::Lerp(deb.PrevTransform, deb.Transform, GetInterpolationFactor());
+					Matrix world = Matrix::Lerp(deb.PrevTransform, deb.Transform, GetInterpolationFactor());
+					if (mirror != nullptr)
+					{
+						world = world * mirror->ReflectionMatrix;
+					}
+					_stStatic.World = world;
+
 					_stStatic.Color = deb.color;
 					_stStatic.AmbientLight = _rooms[deb.roomNumber].AmbientLight;
 					_stStatic.LightMode = (int)deb.lightMode;

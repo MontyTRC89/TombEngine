@@ -281,9 +281,7 @@ void Renderer::UpdateLaraAnimations(bool force)
 void TEN::Renderer::Renderer::DrawLara(RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
 {
 	if (mirror != nullptr && LaraItem->RoomNumber != mirror->RoomNumber)
-	{
 		return;
-	}
 
 	// Don't draw player if using optics.
 	if (Lara.Control.Look.OpticRange != 0 || SpotcamDontDrawLara)

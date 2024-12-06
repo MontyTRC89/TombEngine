@@ -480,6 +480,9 @@ namespace TEN::Renderer
 			{
 				auto* rat = &Rats[i];
 
+				if (mirror != nullptr && rat->RoomNumber != mirror->RoomNumber)
+					continue;
+
 				if (rat->On)
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
@@ -519,6 +522,9 @@ namespace TEN::Renderer
 			for (int i = 0; i < NUM_RATS; i++)
 			{
 				auto* rat = &Rats[i];
+
+				if (mirror != nullptr && rat->RoomNumber != mirror->RoomNumber)
+					continue;
 
 				if (rat->On)
 				{
@@ -732,6 +738,9 @@ namespace TEN::Renderer
 				if (!bat.On)
 					continue;
 
+				if (mirror != nullptr && bat.RoomNumber != mirror->RoomNumber)
+					continue;
+
 				for (auto& bucket : mesh.Buckets)
 				{
 					if (!IsSortedBlendMode(bucket.BlendMode))
@@ -764,6 +773,9 @@ namespace TEN::Renderer
 			for (int i = 0; i < NUM_BATS; i++)
 			{
 				const auto& bat = Bats[i];
+
+				if (mirror != nullptr && bat.RoomNumber != mirror->RoomNumber)
+					continue;
 
 				if (bat.On)
 				{
@@ -883,6 +895,9 @@ namespace TEN::Renderer
 			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
 				const auto& beetle = TEN::Entities::TR4::BeetleSwarm[i];
+				
+				if (mirror != nullptr && beetle.RoomNumber != mirror->RoomNumber)
+					continue;
 
 				if (beetle.On)
 				{
@@ -976,6 +991,9 @@ namespace TEN::Renderer
 				if (!locust.on)
 					continue;
 
+				if (mirror != nullptr && locust.roomNumber != mirror->RoomNumber)
+					continue;
+
 				auto& mesh = *GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust.counter & 3));
 
 				for (auto& bucket : mesh.Buckets)
@@ -1010,6 +1028,9 @@ namespace TEN::Renderer
 			for (const auto& locust : TEN::Entities::TR4::Locusts)
 			{
 				if (!locust.on)
+					continue;
+
+				if (mirror != nullptr && locust.roomNumber != mirror->RoomNumber)
 					continue;
 
 				activeLocustsExist = true;
@@ -1847,7 +1868,7 @@ namespace TEN::Renderer
 		DrawScarabs(nullptr, view, RendererPass::GBuffer);
 		DrawGunShells(nullptr, view, RendererPass::GBuffer);
 		DrawBats(nullptr, view, RendererPass::GBuffer);
-		DrawEffects(view, RendererPass::GBuffer);
+		DrawEffects(nullptr, view, RendererPass::GBuffer);
 		DrawRats(nullptr, view, RendererPass::GBuffer);
 		DrawLocusts(nullptr, view, RendererPass::GBuffer);
 
@@ -1880,10 +1901,10 @@ namespace TEN::Renderer
 		DrawScarabs(nullptr, view, RendererPass::Opaque);
 		DrawGunShells(nullptr, view, RendererPass::Opaque);
 		DrawBats(nullptr, view, RendererPass::Opaque);
-		DrawEffects(view, RendererPass::Opaque);
+		DrawEffects(nullptr, view, RendererPass::Opaque);
 		DrawRats(nullptr, view, RendererPass::Opaque);
 		DrawLocusts(nullptr, view, RendererPass::Opaque);
-		DrawDebris(view, RendererPass::Opaque);
+		DrawDebris(nullptr, view, RendererPass::Opaque);
 		DrawSprites(nullptr, view, RendererPass::Opaque);
 		DrawFishSwarm(view, RendererPass::Opaque);
 
@@ -1899,8 +1920,10 @@ namespace TEN::Renderer
 				DrawScarabs(&mirror, view, RendererPass::Opaque);
 				DrawGunShells(&mirror, view, RendererPass::Opaque);
 				DrawBats(&mirror, view, RendererPass::Opaque);
+				DrawEffects(&mirror, view, RendererPass::Opaque);
 				DrawRats(&mirror, view, RendererPass::Opaque);
 				DrawLocusts(&mirror, view, RendererPass::Opaque);
+				DrawDebris(&mirror, view, RendererPass::Opaque);
 				DrawSprites(&mirror, view, RendererPass::Opaque);
 			}
 
@@ -1914,10 +1937,10 @@ namespace TEN::Renderer
 		DrawSpiders(view, RendererPass::Additive);
 		DrawScarabs(nullptr, view, RendererPass::Additive);
 		DrawBats(nullptr, view, RendererPass::Additive);
-		DrawEffects(view, RendererPass::Additive);
+		DrawEffects(nullptr, view, RendererPass::Additive);
 		DrawRats(nullptr, view, RendererPass::Additive);
 		DrawLocusts(nullptr, view, RendererPass::Additive);
-		DrawDebris(view, RendererPass::Additive);
+		DrawDebris(nullptr, view, RendererPass::Additive);
 		DrawSprites(nullptr, view, RendererPass::Additive);
 		DrawFishSwarm(view, RendererPass::Additive);
 
@@ -1932,8 +1955,10 @@ namespace TEN::Renderer
 				DrawStatics(&mirror, view, RendererPass::Additive);
 				DrawScarabs(&mirror, view, RendererPass::Additive);
 				DrawBats(&mirror, view, RendererPass::Additive);
+				DrawEffects(&mirror, view, RendererPass::Additive);
 				DrawRats(&mirror, view, RendererPass::Additive);
 				DrawLocusts(&mirror, view, RendererPass::Additive);
+				DrawDebris(&mirror, view, RendererPass::Additive);
 				DrawSprites(&mirror, view, RendererPass::Additive);
 			}
 
@@ -1946,7 +1971,7 @@ namespace TEN::Renderer
 		DrawItems(nullptr, view, RendererPass::CollectTransparentFaces);
 		DrawStatics(nullptr, view, RendererPass::CollectTransparentFaces);
 		DrawBats(nullptr, view, RendererPass::CollectTransparentFaces);
-		DrawEffects(view, RendererPass::CollectTransparentFaces);
+		DrawEffects(nullptr, view, RendererPass::CollectTransparentFaces);
 		DrawRats(nullptr, view, RendererPass::CollectTransparentFaces);
 		DrawLocusts(nullptr, view, RendererPass::CollectTransparentFaces);
 		DrawFishSwarm(view, RendererPass::CollectTransparentFaces);
@@ -2421,9 +2446,7 @@ namespace TEN::Renderer
 	void Renderer::DrawAnimatingItem(RendererItem* item, RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
 	{
 		if (mirror != nullptr && item->RoomNumber != mirror->RoomNumber)
-		{
 			return;
-		}
 
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 		RendererRoom* room = &_rooms[item->RoomNumber];
@@ -2646,6 +2669,9 @@ namespace TEN::Renderer
 		}
 		else
 		{
+			if (mirror != nullptr)
+				return;
+
 			// Collect sorted blend modes faces ordered by room, if transparent pass
 
 			for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
@@ -2661,6 +2687,11 @@ namespace TEN::Renderer
 
 				for (int i = 0; i < statics.size(); i++)
 				{
+					if (mirror != nullptr && statics[i]->RoomNumber != mirror->RoomNumber)
+					{
+						continue;
+					}
+
 					for (int j = 0; j < refMesh->Buckets.size(); j++)
 					{
 						auto& bucket = refMesh->Buckets[j];
@@ -3349,14 +3380,17 @@ namespace TEN::Renderer
 
 	void Renderer::DrawSortedFaces(RendererMirror* mirror, RenderView& view)
 	{
-		std::sort(
-			view.TransparentObjectsToDraw.begin(),
-			view.TransparentObjectsToDraw.end(),
-			[](RendererSortableObject& a, RendererSortableObject& b)
-			{
-				return (a.Distance > b.Distance);
-			}
-		);
+		if (mirror == nullptr)
+		{
+			std::sort(
+				view.TransparentObjectsToDraw.begin(),
+				view.TransparentObjectsToDraw.end(),
+				[](RendererSortableObject& a, RendererSortableObject& b)
+				{
+					return (a.Distance > b.Distance);
+				}
+			);
+		}
 
 		for (int i = 0; i < view.TransparentObjectsToDraw.size(); i++)
 		{
@@ -3366,7 +3400,7 @@ namespace TEN::Renderer
 			_sortedPolygonsVertices.clear();
 			_sortedPolygonsIndices.clear();
 
-			if (mirror != nullptr && object->ObjectType != RendererObjectType::Sprite)
+			if (mirror != nullptr && object->ObjectType == RendererObjectType::Room)
 			{
 				continue;
 			}
@@ -3665,7 +3699,8 @@ namespace TEN::Renderer
 		_context->PSSetShader(_psItems.Get(), nullptr, 0);
 
 		// Bind main item properties.
-		_stItem.World = objectInfo->Item->InterpolatedWorld;
+		Matrix world = objectInfo->Item->InterpolatedWorld;
+		_stItem.World = world;
 		_stItem.Color = objectInfo->Item->Color;
 		_stItem.AmbientLight = objectInfo->Item->AmbientLight;
 		memcpy(_stItem.BonesMatrices, objectInfo->Item->InterpolatedAnimTransforms, sizeof(Matrix) * MAX_BONES);
@@ -3704,7 +3739,9 @@ namespace TEN::Renderer
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
 		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
 
-		_stStatic.World = objectInfo->Static->World;
+		Matrix world = objectInfo->Static->World;
+		_stStatic.World = world;
+
 		_stStatic.Color = objectInfo->Static->Color;
 		_stStatic.AmbientLight = objectInfo->Room->AmbientLight;
 		_stStatic.LightMode = (int)GetStaticRendererObject(objectInfo->Static->ObjectNumber).ObjectMeshes[0]->LightMode;
@@ -3741,7 +3778,9 @@ namespace TEN::Renderer
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
 		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
 
-		_stStatic.World = objectInfo->World;
+		Matrix world = objectInfo->World;
+		_stStatic.World = world;
+
 		_stStatic.Color = Vector4::One;
 		_stStatic.AmbientLight = objectInfo->Room->AmbientLight;
 		_stStatic.LightMode = (int)objectInfo->Mesh->LightMode;

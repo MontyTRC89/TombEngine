@@ -470,8 +470,8 @@ namespace TEN::Renderer
 		void PrepareWeatherParticles(RenderView& view);
 		void PrepareDrips(RenderView& view);
 		void PrepareBubbles(RenderView& view);
-		void DrawEffects(RenderView& view, RendererPass rendererPass);
-		void DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass);
+		void DrawEffects(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
+		void DrawEffect(RendererMirror* mirror, RenderView& view, RendererEffect* effect, RendererPass rendererPass);
 		void PrepareSplashes(RenderView& view);
 		void DrawSprites(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
 		void DrawDisplaySprites(RenderView& view);
@@ -498,7 +498,7 @@ namespace TEN::Renderer
 		void DrawStatistics();
 		void DrawExamines();
 		void DrawDiary();
-		void DrawDebris(RenderView& view, RendererPass rendererPass);
+		void DrawDebris(RendererMirror* mirror, RenderView& view, RendererPass rendererPass);
 		void DrawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target,
 		                         ID3D11DepthStencilView* depthTarget);
 		void PrepareShockwaves(RenderView& view);
