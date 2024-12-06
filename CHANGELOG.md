@@ -38,7 +38,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### New Features
 * Added fast savegame reloading.
-* Added ability to customize flare colour and effects.
+* Added ability to customize many hardcoded parameters, such as flare, weapon, and hair settings.
 * Added ricochet sounds and make the effect more prominent.
 * Allow to run the engine without title level.
 * Allow more than 1024 objects in a level.
