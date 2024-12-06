@@ -310,13 +310,12 @@ float DoFogBulbForSky(float3 pos, ShaderFogBulb bulb)
 
 float DoDistanceFogForVertex(float3 pos)
 {
-	float fog = 0.0f;
+	float d = length(CamPositionWS.xyz - pos);
+	float fogRange = FogMaxDistance * 1024 - FogMinDistance * 1024;
 
-	if (FogMaxDistance > 0.0f)
-	{
-		float d = length(CamPositionWS.xyz - pos);
-		fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
-	}
+	float fogEnabled = step(0.0f, FogMaxDistance);
+	float fogFactor = (d - FogMinDistance * 1024) / fogRange;
+	float fog = saturate(fogFactor) * fogEnabled;
 
 	return fog;
 }
@@ -324,16 +323,16 @@ float DoDistanceFogForVertex(float3 pos)
 float4 DoFogBulbsForVertex(float3 pos)
 {
 	float4 fog = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	
+
 	for (int i = 0; i < NumFogBulbs; i++)
 	{
 		float fogFactor = DoFogBulb(pos, FogBulbs[i]);
-		fog.xyz += FogBulbs[i].Color.xyz * fogFactor;
+		float3 fogColor = FogBulbs[i].Color.xyz * fogFactor;
+
+		fog.xyz += fogColor;
 		fog.w += fogFactor;
-		if (fog.w >= 1.0f)
-		{
-			break;
-		}
+
+		fog.w = saturate(fog.w);
 	}
 
 	return fog;
@@ -346,12 +345,12 @@ float4 DoFogBulbsForSky(float3 pos)
 	for (int i = 0; i < NumFogBulbs; i++)
 	{
 		float fogFactor = DoFogBulbForSky(pos, FogBulbs[i]);
-		fog.xyz += FogBulbs[i].Color.xyz * fogFactor;
+		float3 fogColor = FogBulbs[i].Color.xyz * fogFactor;
+
+		fog.xyz += fogColor;
 		fog.w += fogFactor;
-		if (fog.w >= 1.0f)
-		{
-			break;
-		}
+
+		fog.w = saturate(fog.w);
 	}
 
 	return fog;
