@@ -1,7 +1,11 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
+
+#include "Game/effects/Hair.h"
 #include "Scripting/Internal/TEN/Flow/Enums/WeaponTypes.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+
+using namespace TEN::Effects::Hair;
 
 /***
 Global engine settings, which don't fall into particular category or can't be assigned to a specific object.
@@ -12,6 +16,10 @@ Can be accessed using @{Flow.SetSettings} and @{Flow.GetSettings} functions.
 
 Settings::Settings()
 {
+	Hair[(int)LaraHairType::Normal]     = { {  -4.0f,  -4.0f, -48.0f }, { 37, 39, 40, 38 } };
+	Hair[(int)LaraHairType::YoungLeft]  = { { -48.0f, -48.0f, -50.0f }, { 79, 78, 76, 77 } };
+	Hair[(int)LaraHairType::YoungRight] = { {  48.0f, -48.0f, -50.0f }, { 68, 69, 70, 71 } };
+
 	Weapons[(int)LaraWeaponType::Pistol         ] = { 8.0f,  BLOCK(8),  9,  (int)BLOCK(0.65f), 3, 1,  1  };
 	Weapons[(int)LaraWeaponType::Revolver       ] = { 4.0f,  BLOCK(8),  16, (int)BLOCK(0.65f), 3, 21, 21 };
 	Weapons[(int)LaraWeaponType::Uzi            ] = { 8.0f,  BLOCK(8),  3,  (int)BLOCK(0.65f), 3, 1,  1  };
