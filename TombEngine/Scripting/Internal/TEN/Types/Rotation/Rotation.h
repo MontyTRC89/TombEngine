@@ -1,6 +1,6 @@
 #pragma once
 #include "Math/Objects/EulerAngles.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
 class EulerAngles;
 class Pose;

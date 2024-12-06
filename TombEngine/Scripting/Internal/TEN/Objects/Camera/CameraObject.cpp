@@ -7,7 +7,7 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Specific/LevelCameraInfo.h"
 #include "Specific/level.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
 /***
 Basic cameras that can point at Lara or at a CAMERA_TARGET.

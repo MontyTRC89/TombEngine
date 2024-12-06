@@ -5,7 +5,7 @@
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Internal/LanguageScript.h"
 #include "Scripting/Internal/LuaHandler.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LogicHandler.h"
 #include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"

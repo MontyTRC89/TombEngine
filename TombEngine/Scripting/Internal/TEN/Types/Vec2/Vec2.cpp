@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 
 #include "Math/Math.h"
 #include "Scripting/Internal/ReservedScriptNames.h"

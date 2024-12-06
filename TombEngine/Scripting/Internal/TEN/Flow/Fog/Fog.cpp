@@ -4,7 +4,7 @@
 /***
 Fog
 
-@tenclass Flow.Fog
+@tenprimitive Flow.Fog
 @pragma nostrip
 */
  
