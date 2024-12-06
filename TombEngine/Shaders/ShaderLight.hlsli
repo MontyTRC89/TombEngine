@@ -367,20 +367,20 @@ float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, floa
 	for (int i = 0; i < numLights; i++)
 	{
 		float isPoint   = step(0.5f, float(lights[i].Type == LT_POINT));
-		float isShadow  = step(0.5f, float(lights[i].Type == LT_SHADOW));
-		float isSun     = step(0.5f, float(lights[i].Type == LT_SUN));
 		float isSpot    = step(0.5f, float(lights[i].Type == LT_SPOT));
+		float isSun     = step(0.5f, float(lights[i].Type == LT_SUN));
+		float isShadow  = step(0.5f, float(lights[i].Type == LT_SHADOW));
 
 		diffuse += isPoint * DoPointLight(pos, normal, lights[i]);
 		spec    += isPoint * DoSpecularPoint(pos, normal, lights[i], sheen);
 
-		shadow  += isShadow * DoShadowLight(pos, normal, lights[i]);
+		diffuse += isSpot * DoSpotLight(pos, normal, lights[i]);
+		spec    += isSpot * DoSpecularSpot(pos, normal, lights[i], sheen);
 
 		diffuse += isSun * DoDirectionalLight(pos, normal, lights[i]);
 		spec    += isSun * DoSpecularSun(normal, lights[i], sheen);
 
-		diffuse += isSpot * DoSpotLight(pos, normal, lights[i]);
-		spec    += isSpot * DoSpecularSpot(pos, normal, lights[i], sheen);
+		shadow  += isShadow * DoShadowLight(pos, normal, lights[i]);
 	}
 
 	shadow = saturate(shadow);
