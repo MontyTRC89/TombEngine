@@ -14,7 +14,7 @@ local settings = Flow.Settings.new()
 	settings.Animations.ledgeJumps = false
 	settings.Animations.poseTimeout = 0
 	
-	settings.Flare.color = Color(128, 64, 0)
+	settings.Flare.color = Color(128, 60, 0)
 	settings.Flare.range = 10
 	settings.Flare.timeout = 60
 	settings.Flare.lensflareBrightness = 0.5
@@ -27,79 +27,27 @@ local settings = Flow.Settings.new()
 	settings.Hud.speedometer = true
 	settings.Hud.pickupNotifier = true
 	
+	settings.Physics.gravity = 6
+	settings.Physics.swimVelocity = 50
+	
+	settings.System.errorMode = Flow.ErrorMode.WARN
+	settings.System.fastReload = true
+	
+	-- Example hair setting entry. You can use types [2] and [3] as well for young Lara hair.
+	-- To know default parameters, you can fetch settings using Flow.GetSettings() method.
+	
+	settings.Hair[1].offset = Vec3(-4, -4, -48)
+	settings.Hair[1].indices = { 37, 39, 40, 38 }
+	
+	-- Example  setting entry. You can use other weapon types as well.
+	-- To know default parameters, you can fetch settings using Flow.GetSettings() method.
+	
 	settings.Weapons[WeaponType.PISTOL].accuracy = 8
 	settings.Weapons[WeaponType.PISTOL].distance = 8192
 	settings.Weapons[WeaponType.PISTOL].interval = 9
 	settings.Weapons[WeaponType.PISTOL].waterLevel = 650
 	settings.Weapons[WeaponType.PISTOL].flashDuration = 3
 	settings.Weapons[WeaponType.PISTOL].damage = 1
-	settings.Weapons[WeaponType.PISTOL].secondaryDamage = 1
-	
-	settings.Weapons[WeaponType.REVOLVER].accuracy = 4
-	settings.Weapons[WeaponType.REVOLVER].distance = 8192
-	settings.Weapons[WeaponType.REVOLVER].interval = 16
-	settings.Weapons[WeaponType.REVOLVER].waterLevel = 650
-	settings.Weapons[WeaponType.REVOLVER].flashDuration = 3
-	settings.Weapons[WeaponType.REVOLVER].damage = 21
-	settings.Weapons[WeaponType.REVOLVER].secondaryDamage = 21
-	
-	settings.Weapons[WeaponType.UZI].accuracy = 8
-	settings.Weapons[WeaponType.UZI].distance = 8192
-	settings.Weapons[WeaponType.UZI].interval = 3
-	settings.Weapons[WeaponType.UZI].waterLevel = 650
-	settings.Weapons[WeaponType.UZI].flashDuration = 3
-	settings.Weapons[WeaponType.UZI].damage = 1
-	settings.Weapons[WeaponType.UZI].secondaryDamage = 1
-	
-	settings.Weapons[WeaponType.SHOTGUN].accuracy = 10
-	settings.Weapons[WeaponType.SHOTGUN].distance = 8192
-	settings.Weapons[WeaponType.SHOTGUN].interval = 9
-	settings.Weapons[WeaponType.SHOTGUN].waterLevel = 500
-	settings.Weapons[WeaponType.SHOTGUN].flashDuration = 3
-	settings.Weapons[WeaponType.SHOTGUN].damage = 3
-	settings.Weapons[WeaponType.SHOTGUN].secondaryDamage = 3
-	
-	settings.Weapons[WeaponType.CROSSBOW].accuracy = 8
-	settings.Weapons[WeaponType.CROSSBOW].distance = 8192
-	settings.Weapons[WeaponType.CROSSBOW].interval = 0
-	settings.Weapons[WeaponType.CROSSBOW].waterLevel = 500
-	settings.Weapons[WeaponType.CROSSBOW].flashDuration = 2
-	settings.Weapons[WeaponType.CROSSBOW].damage = 5
-	settings.Weapons[WeaponType.CROSSBOW].secondaryDamage = 20
-	
-	settings.Weapons[WeaponType.HK].accuracy = 4
-	settings.Weapons[WeaponType.HK].distance = 12288
-	settings.Weapons[WeaponType.HK].interval = 0
-	settings.Weapons[WeaponType.HK].waterLevel = 500
-	settings.Weapons[WeaponType.HK].flashDuration = 3
-	settings.Weapons[WeaponType.HK].damage = 4
-	settings.Weapons[WeaponType.HK].secondaryDamage = 4
-	
-	settings.Weapons[WeaponType.GRENADE_LAUNCHER].accuracy = 8
-	settings.Weapons[WeaponType.GRENADE_LAUNCHER].distance = 8192
-	settings.Weapons[WeaponType.GRENADE_LAUNCHER].interval = 0
-	settings.Weapons[WeaponType.GRENADE_LAUNCHER].waterLevel = 500
-	settings.Weapons[WeaponType.GRENADE_LAUNCHER].flashDuration = 2
-	settings.Weapons[WeaponType.GRENADE_LAUNCHER].damage = 20
-	settings.Weapons[WeaponType.GRENADE_LAUNCHER].secondaryDamage = 30
-	
-	settings.Weapons[WeaponType.ROCKET_LAUNCHER].accuracy = 8
-	settings.Weapons[WeaponType.ROCKET_LAUNCHER].distance = 8192
-	settings.Weapons[WeaponType.ROCKET_LAUNCHER].interval = 0
-	settings.Weapons[WeaponType.ROCKET_LAUNCHER].waterLevel = 500
-	settings.Weapons[WeaponType.ROCKET_LAUNCHER].flashDuration = 2
-	settings.Weapons[WeaponType.ROCKET_LAUNCHER].damage = 30
-	settings.Weapons[WeaponType.ROCKET_LAUNCHER].secondaryDamage = 30
-	
-	settings.Weapons[WeaponType.HARPOON_GUN].accuracy = 8
-	settings.Weapons[WeaponType.HARPOON_GUN].distance = 8192
-	settings.Weapons[WeaponType.HARPOON_GUN].interval = 0
-	settings.Weapons[WeaponType.HARPOON_GUN].waterLevel = 500
-	settings.Weapons[WeaponType.HARPOON_GUN].flashDuration = 2
-	settings.Weapons[WeaponType.HARPOON_GUN].damage = 6
-	settings.Weapons[WeaponType.HARPOON_GUN].secondaryDamage = 6
-	
-	settings.System.errorMode = Flow.ErrorMode.WARN
-	settings.System.fastReload = true
+	settings.Weapons[WeaponType.PISTOL].alternateDamage = 1
 	
 Flow.SetSettings(settings)
