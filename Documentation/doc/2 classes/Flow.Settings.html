@@ -109,37 +109,6 @@
 <p>Can be accessed using <a href="../1 modules/Flow.html#SetSettings">Flow.SetSettings</a> and <a href="../1 modules/Flow.html#GetSettings">Flow.GetSettings</a> functions.</p>
 
 
-<h2><a href="#Flare">Flare </a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" ><a href="#color">color</a></td>
-	<td class="summary">Flare color.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#range">range</a></td>
-	<td class="summary">Light range.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#timeout">timeout</a></td>
-	<td class="summary">Toggle flicker effect.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#lensflareBrightness">lensflareBrightness</a></td>
-	<td class="summary">Lens flare brightness.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#sparks">sparks</a></td>
-	<td class="summary">Toggle spark effect.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#smoke">smoke</a></td>
-	<td class="summary">Toggle smoke effect.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#flicker">flicker</a></td>
-	<td class="summary">Toggle flicker effect.</td>
-	</tr>
-</table>
 <h2><a href="#Animations">Animations </a></h2>
 <table class="function_list">
 	<tr>
@@ -175,6 +144,48 @@
 	<td class="summary">Pose timeout.</td>
 	</tr>
 </table>
+<h2><a href="#Flare">Flare </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#color">color</a></td>
+	<td class="summary">Flare color.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#range">range</a></td>
+	<td class="summary">Light range.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#timeout">timeout</a></td>
+	<td class="summary">Timeout.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#lensflareBrightness">lensflareBrightness</a></td>
+	<td class="summary">Lens flare brightness.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#sparks">sparks</a></td>
+	<td class="summary">Toggle spark effect.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#smoke">smoke</a></td>
+	<td class="summary">Toggle smoke effect.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#flicker">flicker</a></td>
+	<td class="summary">Toggle flicker effect.</td>
+	</tr>
+</table>
+<h2><a href="#Hair">Hair </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#offset">offset</a></td>
+	<td class="summary">Relative braid offset to a headmesh.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#indices">indices</a></td>
+	<td class="summary">Braid connection indices.</td>
+	</tr>
+</table>
 <h2><a href="#Hud">Hud </a></h2>
 <table class="function_list">
 	<tr>
@@ -205,16 +216,16 @@
 	<td class="summary">Targeting distance.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#recoilTimeout">recoilTimeout</a></td>
-	<td class="summary">Recoil timeout.</td>
+	<td class="name" ><a href="#interval">interval</a></td>
+	<td class="summary">Shooting interval.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#damage">damage</a></td>
 	<td class="summary">Damage.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#secondaryDamage">secondaryDamage</a></td>
-	<td class="summary">Secondary damage.</td>
+	<td class="name" ><a href="#alternateDamage">alternateDamage</a></td>
+	<td class="summary">Alternate damage.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#flashDuration">flashDuration</a></td>
@@ -241,160 +252,6 @@
 <br/>
 
 
-    <h2 class="section-header has-description"><a name="Flare"></a>Flare </h2>
-
-          <div class="section-description">
-          These settings change appearance and behaviour of a flare.
-          </div>
-    <dl class="function">
-    <dt>
-    <a name = "color"></a>
-    <strong>color</strong>
-    </dt>
-    <dd>
-    Flare color.
-
-
-
-    <ul>
-        <li><span class="parameter">color</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         flare color. Used for sparks and lensflare coloring as well.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "range"></a>
-    <strong>range</strong>
-    </dt>
-    <dd>
-    Light range.
-
-
-
-    <ul>
-        <li><span class="parameter">range</span>
-            <span class="types"><span class="type">int</span></span>
-         flare light radius or range. Represented in "clicks" equal to 256 world units.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "timeout"></a>
-    <strong>timeout</strong>
-    </dt>
-    <dd>
-    Toggle flicker effect.
-
-
-
-    <ul>
-        <li><span class="parameter">timeout</span>
-            <span class="types"><span class="type">int</span></span>
-         flare duration. Flare stops working after specified timeout (specified in seconds).
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "lensflareBrightness"></a>
-    <strong>lensflareBrightness</strong>
-    </dt>
-    <dd>
-    Lens flare brightness.
-
-
-
-    <ul>
-        <li><span class="parameter">lensflareBrightness</span>
-            <span class="types"><span class="type">float</span></span>
-         brightness multiplier. Specifies how bright lens flare is in relation to light (on a range from 0 to 1).
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "sparks"></a>
-    <strong>sparks</strong>
-    </dt>
-    <dd>
-    Toggle spark effect.
-
-
-
-    <ul>
-        <li><span class="parameter">sparks</span>
-            <span class="types"><span class="type">bool</span></span>
-         spark effect. Determines whether flare generates sparks when burning.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "smoke"></a>
-    <strong>smoke</strong>
-    </dt>
-    <dd>
-    Toggle smoke effect.
-
-
-
-    <ul>
-        <li><span class="parameter">smoke</span>
-            <span class="types"><span class="type">bool</span></span>
-         smoke effect. Determines whether flare generates smoke when burning.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "flicker"></a>
-    <strong>flicker</strong>
-    </dt>
-    <dd>
-    Toggle flicker effect.
-
-
-
-    <ul>
-        <li><span class="parameter">flicker</span>
-            <span class="types"><span class="type">bool</span></span>
-         light and lensflare flickering. When turned off, flare light will be constant.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-</dl>
     <h2 class="section-header has-description"><a name="Animations"></a>Animations </h2>
 
           <div class="section-description">
@@ -570,6 +427,211 @@
 
 </dd>
 </dl>
+    <h2 class="section-header has-description"><a name="Flare"></a>Flare </h2>
+
+          <div class="section-description">
+          These settings change appearance and behaviour of a flare.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "color"></a>
+    <strong>color</strong>
+    </dt>
+    <dd>
+    Flare color.
+
+
+
+    <ul>
+        <li><span class="parameter">color</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         flare color. Used for sparks and lensflare coloring as well.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "range"></a>
+    <strong>range</strong>
+    </dt>
+    <dd>
+    Light range.
+
+
+
+    <ul>
+        <li><span class="parameter">range</span>
+            <span class="types"><span class="type">int</span></span>
+         flare light radius or range. Represented in "clicks" equal to 256 world units.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "timeout"></a>
+    <strong>timeout</strong>
+    </dt>
+    <dd>
+    Timeout.
+
+
+
+    <ul>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">int</span></span>
+         flare duration. Flare stops working after specified timeout (specified in seconds).
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "lensflareBrightness"></a>
+    <strong>lensflareBrightness</strong>
+    </dt>
+    <dd>
+    Lens flare brightness.
+
+
+
+    <ul>
+        <li><span class="parameter">lensflareBrightness</span>
+            <span class="types"><span class="type">float</span></span>
+         brightness multiplier. Specifies how bright lens flare is in relation to light (on a range from 0 to 1).
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sparks"></a>
+    <strong>sparks</strong>
+    </dt>
+    <dd>
+    Toggle spark effect.
+
+
+
+    <ul>
+        <li><span class="parameter">sparks</span>
+            <span class="types"><span class="type">bool</span></span>
+         spark effect. Determines whether flare generates sparks when burning.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "smoke"></a>
+    <strong>smoke</strong>
+    </dt>
+    <dd>
+    Toggle smoke effect.
+
+
+
+    <ul>
+        <li><span class="parameter">smoke</span>
+            <span class="types"><span class="type">bool</span></span>
+         smoke effect. Determines whether flare generates smoke when burning.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "flicker"></a>
+    <strong>flicker</strong>
+    </dt>
+    <dd>
+    Toggle flicker effect.
+
+
+
+    <ul>
+        <li><span class="parameter">flicker</span>
+            <span class="types"><span class="type">bool</span></span>
+         light and lensflare flickering. When turned off, flare light will be constant.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Hair"></a>Hair </h2>
+
+          <div class="section-description">
+          This is a table of Lara's braid object settings.
+Table consists of three entries, with first one representing classic Lara braid, and 2 and 3 representing left and right young Lara braids respectively.
+Therefore, if you want to access classic Lara braid settings, use <code>settings.Hair[1]</code>, and so on.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "offset"></a>
+    <strong>offset</strong>
+    </dt>
+    <dd>
+    Relative braid offset to a headmesh.
+
+
+
+    <ul>
+        <li><span class="parameter">offset</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         specifies how braid is positioned in relation to a headmesh.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "indices"></a>
+    <strong>indices</strong>
+    </dt>
+    <dd>
+    Braid connection indices.
+
+
+
+    <ul>
+        <li><span class="parameter">indices</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+         a list of headmesh's vertex connection indices. Each index corresponds to nearest braid rootmesh vertex. Amount of indices is unlimited.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header has-description"><a name="Hud"></a>Hud </h2>
 
           <div class="section-description">
@@ -665,7 +727,7 @@
 
           <div class="section-description">
           This is a table of weapon settings, with several parameters available for every weapon.
-Access particular weapon's settings by using {Flow.WeaponType} as an index into array, e.g. <code>settings.Weapons[Flow.WeaponType.PISTOL]</code>.
+Access particular weapon's settings by using {Flow.WeaponType} as an index for this table, e.g. <code>settings.Weapons[Flow.WeaponType.PISTOL]</code>.
           </div>
     <dl class="function">
     <dt>
@@ -711,18 +773,18 @@ Access particular weapon's settings by using {Flow.WeaponType} as an index into 
 
 </dd>
     <dt>
-    <a name = "recoilTimeout"></a>
-    <strong>recoilTimeout</strong>
+    <a name = "interval"></a>
+    <strong>interval</strong>
     </dt>
     <dd>
-    Recoil timeout.
+    Shooting interval.
 
 
 
     <ul>
-        <li><span class="parameter">recoilTimeout</span>
+        <li><span class="parameter">interval</span>
             <span class="types"><span class="type">float</span></span>
-         specifies a timeout (in frames) of recoil before Lara is able to shoot again. Not applicable for backholster weapons.
+         specifies an interval (in frames), after which Lara is able to shoot again. Not applicable for backholster weapons.
         </li>
     </ul>
 
@@ -753,18 +815,18 @@ Access particular weapon's settings by using {Flow.WeaponType} as an index into 
 
 </dd>
     <dt>
-    <a name = "secondaryDamage"></a>
-    <strong>secondaryDamage</strong>
+    <a name = "alternateDamage"></a>
+    <strong>alternateDamage</strong>
     </dt>
     <dd>
-    Secondary damage.
+    Alternate damage.
 
 
 
     <ul>
-        <li><span class="parameter">secondaryDamage</span>
+        <li><span class="parameter">alternateDamage</span>
             <span class="types"><span class="type">int</span></span>
-         applicable only to weapons with alternate ammo, such as crossbow explosive ammo or grenade super ammo.
+         for Revolver and HK, specifies damage in lasersight mode. For crossbow, specifies damage for explosive ammo.
         </li>
     </ul>
 

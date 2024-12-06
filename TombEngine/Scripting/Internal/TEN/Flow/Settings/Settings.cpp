@@ -27,6 +27,7 @@ void Settings::Register(sol::table& parent)
 {
 	AnimSettings::Register(parent);
 	FlareSettings::Register(parent);
+	HairSettings::Register(parent);
 	HudSettings::Register(parent);
 	SystemSettings::Register(parent);
 	WeaponSettings::Register(parent);
@@ -35,49 +36,11 @@ void Settings::Register(sol::table& parent)
 		sol::constructors<Settings()>(),
 		ScriptReserved_AnimSettings, &Settings::Animations,
 		ScriptReserved_FlareSettings, &Settings::Flare,
+		ScriptReserved_HairSettings, &Settings::Hair,
 		ScriptReserved_HudSettings, &Settings::Hud,
 		ScriptReserved_SystemSettings, &Settings::System,
 		ScriptReserved_WeaponSettings, &Settings::Weapons
 	);
-}
-
-/*** Flare
-@section Flare
-These settings change appearance and behaviour of a flare.
-*/
-
-void FlareSettings::Register(sol::table& parent)
-{
-	parent.create().new_usertype<FlareSettings>(ScriptReserved_FlareSettings, sol::constructors<FlareSettings()>(),
-		sol::call_constructor, sol::constructors<FlareSettings()>(),
-
-	/*** Flare color.
-	@tfield Color color flare color. Used for sparks and lensflare coloring as well. */
-	"color", &FlareSettings::Color,
-
-	/*** Light range.
-	@tfield int range flare light radius or range. Represented in "clicks" equal to 256 world units. */
-	"range", &FlareSettings::Range,
-
-	/*** Timeout.
-	@tfield int timeout flare duration. Flare stops working after specified timeout (specified in seconds).*/
-	"timeout", &FlareSettings::Timeout,
-
-	/*** Lens flare brightness.
-	@tfield float lensflareBrightness brightness multiplier. Specifies how bright lens flare is in relation to light (on a range from 0 to 1).*/
-	"lensflareBrightness", &FlareSettings::LensflareBrightness,
-
-	/*** Toggle spark effect.
-	@tfield bool sparks spark effect. Determines whether flare generates sparks when burning. */
-	"sparks", &FlareSettings::Sparks,
-
-	/*** Toggle smoke effect.
-	@tfield bool smoke smoke effect. Determines whether flare generates smoke when burning. */
-	"smoke", &FlareSettings::Smoke,
-
-	/*** Toggle flicker effect.
-	@tfield bool flicker light and lensflare flickering. When turned off, flare light will be constant.*/
-	"flicker", &FlareSettings::Flicker);
 }
 
 /*** Animations
@@ -123,6 +86,66 @@ void AnimSettings::Register(sol::table& parent)
 	"poseTimeout", &AnimSettings::PoseTimeout);
 }
 
+/*** Flare
+@section Flare
+These settings change appearance and behaviour of a flare.
+*/
+
+void FlareSettings::Register(sol::table& parent)
+{
+	parent.create().new_usertype<FlareSettings>(ScriptReserved_FlareSettings, sol::constructors<FlareSettings()>(),
+		sol::call_constructor, sol::constructors<FlareSettings()>(),
+
+	/*** Flare color.
+	@tfield Color color flare color. Used for sparks and lensflare coloring as well. */
+	"color", &FlareSettings::Color,
+
+	/*** Light range.
+	@tfield int range flare light radius or range. Represented in "clicks" equal to 256 world units. */
+	"range", &FlareSettings::Range,
+
+	/*** Timeout.
+	@tfield int timeout flare duration. Flare stops working after specified timeout (specified in seconds).*/
+	"timeout", &FlareSettings::Timeout,
+
+	/*** Lens flare brightness.
+	@tfield float lensflareBrightness brightness multiplier. Specifies how bright lens flare is in relation to light (on a range from 0 to 1).*/
+	"lensflareBrightness", &FlareSettings::LensflareBrightness,
+
+	/*** Toggle spark effect.
+	@tfield bool sparks spark effect. Determines whether flare generates sparks when burning. */
+	"sparks", &FlareSettings::Sparks,
+
+	/*** Toggle smoke effect.
+	@tfield bool smoke smoke effect. Determines whether flare generates smoke when burning. */
+	"smoke", &FlareSettings::Smoke,
+
+	/*** Toggle flicker effect.
+	@tfield bool flicker light and lensflare flickering. When turned off, flare light will be constant.*/
+	"flicker", &FlareSettings::Flicker);
+}
+
+/*** Hair
+@section Hair
+This is a table of Lara's braid object settings.
+Table consists of three entries, with first one representing classic Lara braid, and 2 and 3 representing left and right young Lara braids respectively.
+Therefore, if you want to access classic Lara braid settings, use `settings.Hair[1]`, and so on.
+*/
+
+void HairSettings::Register(sol::table& parent)
+{
+	parent.create().new_usertype<HairSettings>(ScriptReserved_HairSettings, sol::constructors<HairSettings()>(),
+		sol::call_constructor, sol::constructors<HairSettings()>(),
+
+	/*** Relative braid offset to a headmesh.
+	@tfield Vec3 offset specifies how braid is positioned in relation to a headmesh. */
+	"offset", &HairSettings::Offset,
+	
+	/*** Braid connection indices.
+	@tfield table indices a list of headmesh's vertex connection indices. Each index corresponds to nearest braid rootmesh vertex. Amount of indices is unlimited. */
+	"indices", &HairSettings::Indices);
+}
+
 /*** Hud
 @section Hud
 These settings determine visibility of particular in-game HUD elements.
@@ -153,7 +176,7 @@ void HudSettings::Register(sol::table& parent)
 /*** Weapons
 @section Weapons
 This is a table of weapon settings, with several parameters available for every weapon.
-Access particular weapon's settings by using {Flow.WeaponType} as an index into array, e.g. `settings.Weapons[Flow.WeaponType.PISTOL]`.
+Access particular weapon's settings by using {Flow.WeaponType} as an index for this table, e.g. `settings.Weapons[Flow.WeaponType.PISTOL]`.
 */
 
 void WeaponSettings::Register(sol::table& parent)

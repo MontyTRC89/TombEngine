@@ -117,19 +117,19 @@ namespace TEN::Effects::Hair
 			{
 			// Left pigtail offset.
 			case 0:
-				relOffset = Vector3(-48.0f, -48.0f, -50.0f);
+				relOffset = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungLeft].Offset;
 				break;
 
 			// Right pigtail offset.
 			case 1:
-				relOffset = Vector3(48.0f, -48.0f, -50.0f);
+				relOffset = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungRight].Offset;
 				break;
 			}
 		}
 		else
 		{
 			// Center braid offset.
-			relOffset = Vector3(-4.0f, -4.0f, -48.0f);
+			relOffset = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::Normal].Offset;;
 		}
 
 		return relOffset;

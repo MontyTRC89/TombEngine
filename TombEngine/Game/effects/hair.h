@@ -6,6 +6,13 @@ struct ItemInfo;
 
 namespace TEN::Effects::Hair
 {
+	enum class LaraHairType
+	{
+		Normal,
+		YoungLeft,
+		YoungRight
+	};
+
 	class HairUnit
 	{
 	private:

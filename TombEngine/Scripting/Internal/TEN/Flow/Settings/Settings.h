@@ -4,6 +4,7 @@
 #include "Game/Lara/lara_struct.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Specific/clock.h"
 
 struct AnimSettings
@@ -30,6 +31,14 @@ struct FlareSettings
 	bool Flicker = true;
 	int Range = 9;
 	int Timeout = 60 * FPS;
+
+	static void Register(sol::table& parent);
+};
+
+struct HairSettings
+{
+	Vec3 Offset = {};
+	std::vector<int> Indices = {};
 
 	static void Register(sol::table& parent);
 };
@@ -72,6 +81,7 @@ struct Settings
 	FlareSettings Flare = {};
 	HudSettings Hud = {};
 	SystemSettings System = {};
+	std::array<HairSettings, 3> Hair = {};
 	std::array<WeaponSettings, (int)LaraWeaponType::NumWeapons> Weapons = {};
 
 	Settings();

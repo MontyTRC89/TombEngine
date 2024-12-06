@@ -6,6 +6,7 @@
 #include <tuple>
 
 #include "Game/control/control.h"
+#include "Game/effects/Hair.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
@@ -15,6 +16,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Renderer::Graphics;
+using namespace TEN::Effects::Hair;
 
 namespace TEN::Renderer
 {
@@ -719,16 +721,15 @@ namespace TEN::Renderer
 									{
 										bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 
-										// HACK: Hardcoded hair base parent vertices.
-										int parentVertices0[] = { 37, 39, 40, 38 }; // Single braid.
-										int parentVertices1[] = { 79, 78, 76, 77 }; // Left pigtail.
+										auto& vertices0 = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::Normal].Indices;
+										auto& vertices1 = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungLeft].Indices;
 
 										auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 										auto* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
 										auto* parentBone = skinObj.LinearizedBones[LM_HEAD];
 
 										// Link first 4 vertices.
-										if (currentVertex->OriginalIndex < 4)
+										if (currentVertex->OriginalIndex < vertices0.size() || currentVertex->OriginalIndex < vertices1.size())
 										{
 											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 											{
@@ -736,13 +737,13 @@ namespace TEN::Renderer
 												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
 													auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
-													if (isYoung && parentVertex->OriginalIndex == parentVertices1[currentVertex->OriginalIndex])
+													if (isYoung && currentVertex->OriginalIndex < vertices1.size() && parentVertex->OriginalIndex == vertices1[currentVertex->OriginalIndex])
 													{
 														currentVertex->Bone = 0;
 														currentVertex->Position = parentVertex->Position;
 														currentVertex->Normal = parentVertex->Normal;
 													}
-													else if (parentVertex->OriginalIndex == parentVertices0[currentVertex->OriginalIndex])
+													else if (currentVertex->OriginalIndex < vertices0.size() && parentVertex->OriginalIndex == vertices0[currentVertex->OriginalIndex])
 													{
 														currentVertex->Bone = 0;
 														currentVertex->Position = parentVertex->Position;
@@ -808,14 +809,13 @@ namespace TEN::Renderer
 									{
 										bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 
-										// HACK: Hardcoded hair base parent vertices.
-										int parentVertices2[] = { 68, 69, 70, 71 }; // Right pigtail.
+										auto& vertices = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungRight].Indices;
 
 										auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 										auto* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
 										auto* parentBone = skinObj.LinearizedBones[LM_HEAD];
 
-										if (currentVertex->OriginalIndex < 4)
+										if (currentVertex->OriginalIndex < vertices.size())
 										{
 											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 											{
@@ -823,7 +823,7 @@ namespace TEN::Renderer
 												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
 													auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
-													if (isYoung && parentVertex->OriginalIndex == parentVertices2[currentVertex->OriginalIndex])
+													if (isYoung && parentVertex->OriginalIndex == vertices[currentVertex->OriginalIndex])
 													{
 														currentVertex->Bone = 0;
 														currentVertex->Position = parentVertex->Position;
