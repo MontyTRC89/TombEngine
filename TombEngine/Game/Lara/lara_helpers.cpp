@@ -1019,7 +1019,7 @@ void EasePlayerElevation(ItemInfo* item, int relHeight)
 	// Handle swamp case.
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && relHeight > 0)
 	{
-		item->Pose.Position.y += SWAMP_GRAVITY;
+		item->Pose.Position.y += g_GameFlow->GetSettings()->Physics.Gravity / SWAMP_GRAVITY;
 		return;
 	}
 
@@ -1693,7 +1693,7 @@ void SetLaraSwimDiveAnimation(ItemInfo* item)
 
 	SetAnimation(item, LA_ONWATER_DIVE);
 	item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
-	item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX * 0.4f;
+	item->Animation.Velocity.y = g_GameFlow->GetSettings()->Physics.SwimVelocity * 0.4f;
 	item->Pose.Orientation.x = -ANGLE(45.0f);
 	lara->Control.WaterStatus = WaterStatus::Underwater;
 }

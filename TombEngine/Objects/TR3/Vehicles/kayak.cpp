@@ -18,6 +18,7 @@
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
@@ -279,7 +280,7 @@ namespace TEN::Entities::Vehicles
 				verticalVelocity = 0;
 			}
 			else
-				verticalVelocity += GRAVITY;
+				verticalVelocity += g_GameFlow->GetSettings()->Physics.Gravity;
 		}
 		else
 		{

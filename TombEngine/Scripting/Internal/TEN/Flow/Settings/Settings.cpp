@@ -37,6 +37,7 @@ void Settings::Register(sol::table& parent)
 	FlareSettings::Register(parent);
 	HairSettings::Register(parent);
 	HudSettings::Register(parent);
+	PhysicsSettings::Register(parent);
 	SystemSettings::Register(parent);
 	WeaponSettings::Register(parent);
 
@@ -46,6 +47,7 @@ void Settings::Register(sol::table& parent)
 		ScriptReserved_FlareSettings, &Settings::Flare,
 		ScriptReserved_HairSettings, &Settings::Hair,
 		ScriptReserved_HudSettings, &Settings::Hud,
+		ScriptReserved_PhysicsSettings, &Settings::Physics,
 		ScriptReserved_SystemSettings, &Settings::System,
 		ScriptReserved_WeaponSettings, &Settings::Weapons
 	);
@@ -179,6 +181,25 @@ void HudSettings::Register(sol::table& parent)
 	/*** Toggle pickup notifier visibility.
 	@tfield bool pickupNotifier if disabled, pickup notifier will be invisible in game. */
 	"pickupNotifier", &HudSettings::PickupNotifier);
+}
+
+/*** Physics
+@section Physics
+Here you will find various settings for game world physics.
+*/
+
+void PhysicsSettings::Register(sol::table& parent)
+{
+	parent.create().new_usertype<PhysicsSettings>(ScriptReserved_PhysicsSettings, sol::constructors<PhysicsSettings()>(),
+		sol::call_constructor, sol::constructors<PhysicsSettings()>(),
+
+		/*** Global world gravity.
+		@tfield float gravity specifies global gravity. Mostly affects Lara and several other objects. */
+		"gravity", & PhysicsSettings::Gravity,
+
+		/*** Swim velocity.
+		@tfield float swimVelocity specifies swim velocity for Lara. Affects both surface and underwater. */
+		"swimVelocity", & PhysicsSettings::SwimVelocity);
 }
 
 /*** Weapons

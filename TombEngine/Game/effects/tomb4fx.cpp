@@ -986,7 +986,7 @@ void UpdateGunShells()
 				gunshell->speed -= gunshell->speed >> 1;
 			}
 			else
-				gunshell->fallspeed += 6;
+				gunshell->fallspeed += g_GameFlow->GetSettings()->Physics.Gravity;
 
 			gunshell->pos.Orientation.x += ((gunshell->speed / 2) + 7) * ANGLE(1.0f);
 			gunshell->pos.Orientation.y += gunshell->speed * ANGLE(1.0f);

@@ -18,6 +18,7 @@
 #include "Math/Math.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
@@ -125,7 +126,7 @@ namespace TEN::Entities::TR3
 				}
 				else
 				{
-					item.Animation.Velocity.y += GRAVITY;
+					item.Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 				}
 			}
 		}

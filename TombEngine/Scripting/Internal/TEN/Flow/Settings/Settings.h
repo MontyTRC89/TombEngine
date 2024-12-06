@@ -53,6 +53,14 @@ struct HudSettings
 	static void Register(sol::table& parent);
 };
 
+struct PhysicsSettings
+{
+	float Gravity = 6.0f;
+	float SwimVelocity = 50.0f;
+
+	static void Register(sol::table& parent);
+};
+
 struct SystemSettings
 {
 	ErrorMode ErrorMode = ErrorMode::Warn;
@@ -80,6 +88,7 @@ struct Settings
 	AnimSettings Animations = {};
 	FlareSettings Flare = {};
 	HudSettings Hud = {};
+	PhysicsSettings Physics = {};
 	SystemSettings System = {};
 	std::array<HairSettings, 3> Hair = {};
 	std::array<WeaponSettings, (int)LaraWeaponType::NumWeapons> Weapons = {};

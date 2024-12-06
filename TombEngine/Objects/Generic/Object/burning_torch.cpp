@@ -16,6 +16,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Entities::Effects;
 using namespace TEN::Input;
@@ -250,7 +251,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			item->Animation.Velocity.y += 6;
+			item->Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 		}
 
 		item->Pose.Position.y += item->Animation.Velocity.y;

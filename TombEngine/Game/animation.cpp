@@ -15,6 +15,7 @@
 #include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
@@ -565,7 +566,7 @@ const AnimFrame& GetBestFrame(const ItemInfo& item)
 
 float GetEffectiveGravity(float verticalVel)
 {
-	return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
+	return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : g_GameFlow->GetSettings()->Physics.Gravity);
 }
 
 int GetAnimNumber(const ItemInfo& item)

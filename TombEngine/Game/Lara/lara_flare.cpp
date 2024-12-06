@@ -20,6 +20,7 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Effects;
@@ -64,7 +65,7 @@ void FlareControl(short itemNumber)
 	}
 	else
 	{
-		flareItem.Animation.Velocity.y += 6;
+		flareItem.Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 	}
 
 	flareItem.Pose.Position.y += flareItem.Animation.Velocity.y;

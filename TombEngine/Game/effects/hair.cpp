@@ -272,7 +272,7 @@ namespace TEN::Effects::Hair
 				segment.Position += Weather.Wind() * 2;
 
 			// Apply gravity.
-			segment.Position.y += HAIR_GRAVITY;
+			segment.Position.y += g_GameFlow->GetSettings()->Physics.Gravity * HAIR_GRAVITY;
 
 			// Float on water surface.
 			if (waterHeight != NO_HEIGHT && segment.Position.y > waterHeight)

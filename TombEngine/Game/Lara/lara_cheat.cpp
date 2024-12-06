@@ -9,6 +9,7 @@
 #include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
 
@@ -16,6 +17,8 @@ namespace TEN::Entities::Player
 {
 	void lara_as_fly_cheat(ItemInfo* item, CollisionInfo* coll)
 	{
+		float baseVelocity = g_GameFlow->GetSettings()->Physics.SwimVelocity;
+
 		if (IsHeld(In::Forward))
 		{
 			item->Pose.Orientation.x -= ANGLE(3.0f);
@@ -41,13 +44,13 @@ namespace TEN::Entities::Player
 		{
 			float velCoeff = IsHeld(In::Sprint) ? 2.5f : 1.0f;
 
-			item->Animation.Velocity.y += (LARA_SWIM_VELOCITY_ACCEL * 4) * velCoeff;
-			if (item->Animation.Velocity.y > (LARA_SWIM_VELOCITY_MAX * 2) * velCoeff)
-				item->Animation.Velocity.y = (LARA_SWIM_VELOCITY_MAX * 2) * velCoeff;
+			item->Animation.Velocity.y += (baseVelocity * LARA_SWIM_VELOCITY_ACCEL * 4) * velCoeff;
+			if (item->Animation.Velocity.y > (baseVelocity * 2) * velCoeff)
+				item->Animation.Velocity.y = (baseVelocity * 2) * velCoeff;
 		}
 		else
 		{
-			if (item->Animation.Velocity.y >= LARA_SWIM_VELOCITY_ACCEL)
+			if (item->Animation.Velocity.y >= baseVelocity * LARA_SWIM_VELOCITY_ACCEL)
 			{
 				item->Animation.Velocity.y -= item->Animation.Velocity.y / 8;
 			}

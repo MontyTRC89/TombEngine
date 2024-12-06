@@ -34,6 +34,7 @@ static constexpr char ScriptReserved_FlareSettings[]	= "Flare";
 static constexpr char ScriptReserved_AnimSettings[]		= "Animations";
 static constexpr char ScriptReserved_HairSettings[]		= "Hair";
 static constexpr char ScriptReserved_HudSettings[]		= "Hud";
+static constexpr char ScriptReserved_PhysicsSettings[]	= "Physics";
 static constexpr char ScriptReserved_WeaponSettings[]	= "Weapons";
 
 // Moveable object
