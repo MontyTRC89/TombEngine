@@ -576,7 +576,8 @@ namespace TEN::Renderer
 			if (intensity <= EPSILON)
 				return;
 
-			if (light.CastShadows && prioritizeShadowLight && intensity >= highestIntensity)
+			if ((light.Type == LightType::Point || light.Type == LightType::Spot) &&
+				 light.CastShadows && prioritizeShadowLight && intensity >= highestIntensity)
 			{
 				highestIntensity = intensity;
 				brightestLight = &light;
@@ -648,7 +649,7 @@ namespace TEN::Renderer
 		// Put actual lights in provided vector.
 		outputLights->clear();
 
-		// Add brightest ligh, if collecting shadow light is specified, even if it's far in range.
+		// Add brightest light, if collecting shadow light is specified, even if it's far in range.
 		if (prioritizeShadowLight && brightestLight)
 			outputLights->push_back(brightestLight);
 
@@ -670,7 +671,7 @@ namespace TEN::Renderer
 		std::vector<RendererLight*> lightsToDraw;
 		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.RoomNumber, NO_VALUE, true, false, nullptr, &lightsToDraw);
 
-		if (lightsToDraw.size() > 0 && lightsToDraw.front()->CastShadows)
+		if (!lightsToDraw.empty() && lightsToDraw.front()->CastShadows)
 		{
 			_shadowLight = lightsToDraw.front();
 		}
