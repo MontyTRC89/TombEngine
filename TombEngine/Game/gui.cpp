@@ -2040,7 +2040,7 @@ namespace TEN::Gui
 
 		// Use item event handling.
 		g_GameScript->OnUseItem((GAME_OBJECT_ID)InventoryItemChosen);
-		HandleAllGlobalEvents(EventType::UseItem, (Activator)item.Index);
+		HandleAllGlobalEvents(EventType::UseItem, (Activator)short(item.Index));
 
 		// Quickly discard further processing if chosen item was reset in script.
 		if (InventoryItemChosen == NO_VALUE)
