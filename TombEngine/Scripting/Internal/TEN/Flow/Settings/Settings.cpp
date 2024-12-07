@@ -212,7 +212,7 @@ void PhysicsSettings::Register(sol::table& parent)
 /*** Weapons
 @section Weapons
 This is a table of weapon settings, with several parameters available for every weapon.
-Access particular weapon's settings by using @{Flow.WeaponType} as an index for this table, e.g. `settings.Weapons[Flow.WeaponType.PISTOL]`.
+Access particular weapon's settings by using @{Flow.WeaponType} as an index for this table, e.g. `settings.Weapons[Flow.WeaponType.PISTOLS]`.
 */
 
 void WeaponSettings::Register(sol::table& parent)

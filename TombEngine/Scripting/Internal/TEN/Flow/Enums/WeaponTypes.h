@@ -16,7 +16,7 @@ Note that this enumeration also contains flare and torch - these are counted as 
 an object that is currently in Lara's hands, as seen in @{Objects.LaraObject.GetWeaponType}.
 
 	WeaponType.NONE
-	WeaponType.PISTOL
+	WeaponType.PISTOLS
 	WeaponType.UZI
 	WeaponType.REVOLVER
 	WeaponType.SHOTGUN
@@ -38,7 +38,8 @@ an object that is currently in Lara's hands, as seen in @{Objects.LaraObject.Get
 static const std::unordered_map<std::string, LaraWeaponType> WEAPON_TYPES
 {
 	{ "NONE", LaraWeaponType::None },
-	{ "PISTOL", LaraWeaponType::Pistol },
+	{ "PISTOL", LaraWeaponType::Pistol }, // Deprecated
+	{ "PISTOLS", LaraWeaponType::Pistol },
 	{ "REVOLVER", LaraWeaponType::Revolver },
 	{ "UZI", LaraWeaponType::Uzi },
 	{ "SHOTGUN", LaraWeaponType::Shotgun },
