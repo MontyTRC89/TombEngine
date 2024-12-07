@@ -121,7 +121,7 @@ void FlareSettings::Register(sol::table& parent)
 	@tfield int timeout flare burn timeout. Flare will stop working after given timeout (specified in seconds).*/
 	"timeout", &FlareSettings::Timeout,
 
-	/*** Flare pickup count.
+	/*** Default flare pickup count.
 	@tfield int pickupCount specifies amount of flares that you get when you pick up a box of flares.*/
 	"pickupCount", &FlareSettings::PickupCount,
 
