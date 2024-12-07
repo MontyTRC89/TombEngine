@@ -11,17 +11,22 @@ Constants for weapon types.
 
 /*** Flow.WeaponType constants.
 
-The following constants are inside Flow.WeaponType.
+The following constants are inside Flow.WeaponType. <br>
+Note that this enumeration also contains flare and torch - these are counted as "weapon" internally by the engine, and indicate
+an object that is currently in Lara's hands, as seen in @{Objects.LaraObject.GetWeaponType}.
 
+	WeaponType.NONE
 	WeaponType.PISTOL
 	WeaponType.UZI
 	WeaponType.REVOLVER
 	WeaponType.SHOTGUN
-	WeaponType.CROSSBOW
-	WeaponType.GRENADE_LAUNCHER
-	WeaponType.ROCKET_LAUNCHER
-	WeaponType.HARPOON_GUN
 	WeaponType.HK
+	WeaponType.CROSSBOW
+	WeaponType.FLARE
+	WeaponType.TORCH
+	WeaponType.GRENADE_LAUNCHER
+	WeaponType.HARPOON_GUN
+	WeaponType.ROCKET_LAUNCHER
 
 @section Flow.WeaponType
 */

@@ -19,16 +19,19 @@ Settings::Settings()
 	Hair[(int)LaraHairType::Normal]     = { {  -4.0f,  -4.0f, -48.0f }, { 37, 39, 40, 38 } };
 	Hair[(int)LaraHairType::YoungLeft]  = { { -48.0f, -48.0f, -50.0f }, { 79, 78, 76, 77 } };
 	Hair[(int)LaraHairType::YoungRight] = { {  48.0f, -48.0f, -50.0f }, { 68, 69, 70, 71 } };
+	
+	// Since we directly bind Weapons array to Lua, and Lua accesses this array by native enum, where 0 is NONE, and 1 is
+	// PISTOLS, zero index is omitted due to Lua indexing arrays starting from 1. Therefore we subtract 1 from initializer index.
 
-	Weapons[(int)LaraWeaponType::Pistol         ] = { 8.0f,  BLOCK(8),  9,  (int)BLOCK(0.65f), 3, 1,  1  };
-	Weapons[(int)LaraWeaponType::Revolver       ] = { 4.0f,  BLOCK(8),  16, (int)BLOCK(0.65f), 3, 21, 21 };
-	Weapons[(int)LaraWeaponType::Uzi            ] = { 8.0f,  BLOCK(8),  3,  (int)BLOCK(0.65f), 3, 1,  1  };
-	Weapons[(int)LaraWeaponType::Shotgun        ] = { 10.0f, BLOCK(8),  9,  (int)BLOCK(0.50f), 3, 3,  3  };
-	Weapons[(int)LaraWeaponType::Crossbow       ] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 5,  20 };
-	Weapons[(int)LaraWeaponType::HK             ] = { 4.0f,  BLOCK(12), 0,  (int)BLOCK(0.50f), 3, 4,  4  };
-	Weapons[(int)LaraWeaponType::GrenadeLauncher] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 30, 30 };
-	Weapons[(int)LaraWeaponType::RocketLauncher ] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 30, 30 };
-	Weapons[(int)LaraWeaponType::HarpoonGun     ] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 6,  6  };
+	Weapons[(int)LaraWeaponType::Pistol          - 1] = { 8.0f,  BLOCK(8),  9,  (int)BLOCK(0.65f), 3, 1,  1,  30, true,  true  };
+	Weapons[(int)LaraWeaponType::Revolver        - 1] = { 4.0f,  BLOCK(8),  16, (int)BLOCK(0.65f), 3, 21, 21, 6,  true,  false };
+	Weapons[(int)LaraWeaponType::Uzi             - 1] = { 8.0f,  BLOCK(8),  3,  (int)BLOCK(0.65f), 3, 1,  1,  30, true,  true  };
+	Weapons[(int)LaraWeaponType::Shotgun         - 1] = { 10.0f, BLOCK(8),  9,  (int)BLOCK(0.50f), 3, 3,  3,  6,  true,  true  };
+	Weapons[(int)LaraWeaponType::Crossbow        - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 5,  20, 10, false, false };
+	Weapons[(int)LaraWeaponType::HK              - 1] = { 4.0f,  BLOCK(12), 0,  (int)BLOCK(0.50f), 3, 4,  4,  30, true,  true  };
+	Weapons[(int)LaraWeaponType::GrenadeLauncher - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 30, 30, 10, true,  false };
+	Weapons[(int)LaraWeaponType::RocketLauncher  - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 30, 30, 1,  true,  false };
+	Weapons[(int)LaraWeaponType::HarpoonGun      - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 6,  6,  10, false, false };
 }
 
 void Settings::Register(sol::table& parent)
@@ -118,6 +121,10 @@ void FlareSettings::Register(sol::table& parent)
 	@tfield int timeout flare burn timeout. Flare will stop working after given timeout (specified in seconds).*/
 	"timeout", &FlareSettings::Timeout,
 
+	/*** Flare pickup count.
+	@tfield int pickupCount specifies amount of flares that you get when you pick up a box of flares.*/
+	"pickupCount", &FlareSettings::PickupCount,
+
 	/*** Lens flare brightness.
 	@tfield float lensflareBrightness brightness multiplier. Specifies how bright lens flare is in relation to light (on a range from 0 to 1).*/
 	"lensflareBrightness", &FlareSettings::LensflareBrightness,
@@ -193,13 +200,13 @@ void PhysicsSettings::Register(sol::table& parent)
 	parent.create().new_usertype<PhysicsSettings>(ScriptReserved_PhysicsSettings, sol::constructors<PhysicsSettings()>(),
 		sol::call_constructor, sol::constructors<PhysicsSettings()>(),
 
-		/*** Global world gravity.
-		@tfield float gravity specifies global gravity. Mostly affects Lara and several other objects. */
-		"gravity", & PhysicsSettings::Gravity,
+	/*** Global world gravity.
+	@tfield float gravity specifies global gravity. Mostly affects Lara and several other objects. */
+	"gravity", &PhysicsSettings::Gravity,
 
-		/*** Swim velocity.
-		@tfield float swimVelocity specifies swim velocity for Lara. Affects both surface and underwater. */
-		"swimVelocity", & PhysicsSettings::SwimVelocity);
+	/*** Swim velocity.
+	@tfield float swimVelocity specifies swim velocity for Lara. Affects both surface and underwater. */
+	"swimVelocity", &PhysicsSettings::SwimVelocity);
 }
 
 /*** Weapons
@@ -223,7 +230,7 @@ void WeaponSettings::Register(sol::table& parent)
 
 	/*** Shooting interval.
 	@tfield float interval specifies an interval (in frames), after which Lara is able to shoot again. Not applicable for backholster weapons. */
-	"interval", & WeaponSettings::Interval,
+	"interval", &WeaponSettings::Interval,
 
 	/*** Damage.
 	@tfield int damage amount of hit points taken for every hit. */
@@ -231,7 +238,19 @@ void WeaponSettings::Register(sol::table& parent)
 
 	/*** Alternate damage.
 	@tfield int alternateDamage for Revolver and HK, specifies damage in lasersight mode. For crossbow, specifies damage for explosive ammo. */
-	"alternateDamage", & WeaponSettings::AlternateDamage,
+	"alternateDamage", &WeaponSettings::AlternateDamage,
+
+	/*** Default ammo pickup count.
+	@tfield int pickupCount amount of ammo which is given with every ammo pickup for this weapon. */
+	"pickupCount", &WeaponSettings::PickupCount,
+
+	/*** Gun smoke.
+	@tfield bool smoke if set to true, indicates that weapon emits gun smoke. Not applicable for crossbow and harpoon gun. */
+	"smoke", &WeaponSettings::Smoke,
+
+	/*** Gun shell.
+	@tfield bool shell if set to true, indicates that weapon emits gun shell. Not applicable for projectile weapons. */
+	"shell", &WeaponSettings::Shell,
 
 	/*** Gunflash duration.
 	@tfield int flashDuration specifies the duration of a gunflash effect. Not applicable for weapons without gunflash. */

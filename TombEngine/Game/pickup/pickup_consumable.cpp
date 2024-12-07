@@ -17,7 +17,7 @@ struct ConsumablePickupInfo
 	int Amount;
 };
 
-static constexpr std::array<ConsumablePickupInfo, 4> kConsumables =
+static std::array<ConsumablePickupInfo, 4> Consumables =
 {
 	{
 		{ ID_SMALLMEDI_ITEM, &PlayerInventoryData::TotalSmallMedipacks, 1 },
@@ -27,13 +27,18 @@ static constexpr std::array<ConsumablePickupInfo, 4> kConsumables =
 	}
  };
 
+void InitializeConsumables(Settings const& settings)
+{
+	Consumables[GetArraySlot(Consumables, GAME_OBJECT_ID::ID_FLARE_INV_ITEM)].Amount = settings.Flare.PickupCount;
+}
+
 bool TryModifyingConsumable(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount, ModificationType modType)
 {
-	int arrayPos = GetArraySlot(kConsumables, objectID);
+	int arrayPos = GetArraySlot(Consumables, objectID);
 	if (arrayPos == NO_VALUE)
 		return false;
 
-	ConsumablePickupInfo info = kConsumables[arrayPos];
+	ConsumablePickupInfo info = Consumables[arrayPos];
 	auto & currentAmt = lara.Inventory.*(info.Count);
 	switch (modType)
 	{
@@ -69,20 +74,20 @@ bool TryRemovingConsumable(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optiona
 
 std::optional<int> GetConsumableCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {
-	int arrayPos = GetArraySlot(kConsumables, objectID);
+	int arrayPos = GetArraySlot(Consumables, objectID);
 	if (arrayPos == NO_VALUE)
 		return std::nullopt;
 
-	ConsumablePickupInfo info = kConsumables[arrayPos];
+	ConsumablePickupInfo info = Consumables[arrayPos];
 
 	return lara.Inventory.*(info.Count);
 }
 
 int GetDefaultConsumableCount(GAME_OBJECT_ID objectID)
 {
-	int arrayPos = GetArraySlot(kConsumables, objectID);
+	int arrayPos = GetArraySlot(Consumables, objectID);
 	if (arrayPos == NO_VALUE)
 		return NO_VALUE;
 
-	return kConsumables[arrayPos].Amount;
+	return Consumables[arrayPos].Amount;
 }

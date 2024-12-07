@@ -898,52 +898,55 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 			pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(-16, 35, 48));
 	}
 
-	auto* gshell = &Gunshells[GetFreeGunshell()];
-
-	gshell->pos.Position = pos;
-	gshell->pos.Orientation.x = 0;
-	gshell->pos.Orientation.y = 0;
-	gshell->pos.Orientation.z = GetRandomControl();
-	gshell->roomNumber = LaraItem->RoomNumber;
-	gshell->speed = (GetRandomControl() & 0x1F) + 16;
-	gshell->fallspeed = -48 - (GetRandomControl() & 7);
-	gshell->objectNumber = objNum;
-	gshell->counter = (GetRandomControl() & 0x1F) + 60;
-
-	if (hand)
+	if (g_GameFlow->GetSettings()->Weapons[(int)weaponType - 1].Shell)
 	{
-		if (weaponType == LaraWeaponType::Shotgun)
-		{
-			gshell->dirXrot =
-				Lara.LeftArm.Orientation.y +
-				Lara.ExtraTorsoRot.y +
-				LaraItem->Pose.Orientation.y -
-				(GetRandomControl() & 0xFFF) +
-				10240;
-			gshell->pos.Orientation.y +=
-				Lara.LeftArm.Orientation.y +
-				Lara.ExtraTorsoRot.y +
-				LaraItem->Pose.Orientation.y;
+		auto* gshell = &Gunshells[GetFreeGunshell()];
 
-			if (gshell->speed < 24)
-				gshell->speed += 24;
+		gshell->pos.Position = pos;
+		gshell->pos.Orientation.x = 0;
+		gshell->pos.Orientation.y = 0;
+		gshell->pos.Orientation.z = GetRandomControl();
+		gshell->roomNumber = LaraItem->RoomNumber;
+		gshell->speed = (GetRandomControl() & 0x1F) + 16;
+		gshell->fallspeed = -48 - (GetRandomControl() & 7);
+		gshell->objectNumber = objNum;
+		gshell->counter = (GetRandomControl() & 0x1F) + 60;
+
+		if (hand)
+		{
+			if (weaponType == LaraWeaponType::Shotgun)
+			{
+				gshell->dirXrot =
+					Lara.LeftArm.Orientation.y +
+					Lara.ExtraTorsoRot.y +
+					LaraItem->Pose.Orientation.y -
+					(GetRandomControl() & 0xFFF) +
+					10240;
+				gshell->pos.Orientation.y +=
+					Lara.LeftArm.Orientation.y +
+					Lara.ExtraTorsoRot.y +
+					LaraItem->Pose.Orientation.y;
+
+				if (gshell->speed < 24)
+					gshell->speed += 24;
+			}
+			else
+			{
+				gshell->dirXrot =
+					Lara.LeftArm.Orientation.y +
+					LaraItem->Pose.Orientation.y -
+					(GetRandomControl() & 0xFFF) +
+					18432;
+			}
 		}
 		else
 		{
 			gshell->dirXrot =
 				Lara.LeftArm.Orientation.y +
-				LaraItem->Pose.Orientation.y -
-				(GetRandomControl() & 0xFFF) +
+				LaraItem->Pose.Orientation.y +
+				(GetRandomControl() & 0xFFF) -
 				18432;
 		}
-	}
-	else
-	{
-		gshell->dirXrot =
-			Lara.LeftArm.Orientation.y +
-			LaraItem->Pose.Orientation.y +
-			(GetRandomControl() & 0xFFF) -
-			18432;
 	}
 
 	if (LaraItem->MeshBits.TestAny())

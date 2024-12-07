@@ -5,6 +5,8 @@
 
 #include "Game/Gui.h"
 #include "Game/Lara/lara_fire.h"
+#include "Game/pickup/pickup_ammo.h"
+#include "Game/pickup/pickup_consumable.h"
 #include "Game/savegame.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
@@ -353,6 +355,10 @@ void FlowHandler::SetSettings(Settings const& src)
 	// Copy weapon settings to native table. Subtract 1 because weapon enum starts from 1.
 	for (auto weapon : WEAPON_TYPES)
 		InitializeWeaponInfo(weapon.second, _settings);
+
+	// Also copy pickup counts.
+	InitializeAmmo(_settings);
+	InitializeConsumables(_settings);
 }
 
 void FlowHandler::AddLevel(Level const& level)

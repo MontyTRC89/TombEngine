@@ -31,6 +31,7 @@ struct FlareSettings
 	bool Flicker = true;
 	int Range = 9;
 	int Timeout = 60 * FPS;
+	int PickupCount = 12;
 
 	static void Register(sol::table& parent);
 };
@@ -79,6 +80,10 @@ struct WeaponSettings
 	int	  FlashDuration   = 0;
 	int	  Damage          = 0;
 	int	  AlternateDamage = 0;
+	int   PickupCount     = 0;
+
+	bool  Smoke = false;
+	bool  Shell = false;
 
 	static void Register(sol::table& parent);
 };
@@ -91,7 +96,7 @@ struct Settings
 	PhysicsSettings Physics = {};
 	SystemSettings System = {};
 	std::array<HairSettings, 3> Hair = {};
-	std::array<WeaponSettings, (int)LaraWeaponType::NumWeapons> Weapons = {};
+	std::array<WeaponSettings, (int)LaraWeaponType::NumWeapons - 1> Weapons = {};
 
 	Settings();
 	static void Register(sol::table& parent);

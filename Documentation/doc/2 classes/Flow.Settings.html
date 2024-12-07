@@ -159,6 +159,10 @@
 	<td class="summary">Burn timeout.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#pickupCount">pickupCount</a></td>
+	<td class="summary">Flare pickup count.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#lensflareBrightness">lensflareBrightness</a></td>
 	<td class="summary">Lens flare brightness.</td>
 	</tr>
@@ -237,6 +241,18 @@
 	<tr>
 	<td class="name" ><a href="#alternateDamage">alternateDamage</a></td>
 	<td class="summary">Alternate damage.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#pickupCount">pickupCount</a></td>
+	<td class="summary">Default ammo pickup count.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#smoke">smoke</a></td>
+	<td class="summary">Gun smoke.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#shell">shell</a></td>
+	<td class="summary">Gun shell.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#flashDuration">flashDuration</a></td>
@@ -499,6 +515,27 @@
         <li><span class="parameter">timeout</span>
             <span class="types"><span class="type">int</span></span>
          flare burn timeout. Flare will stop working after given timeout (specified in seconds).
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "pickupCount"></a>
+    <strong>pickupCount</strong>
+    </dt>
+    <dd>
+    Flare pickup count.
+
+
+
+    <ul>
+        <li><span class="parameter">pickupCount</span>
+            <span class="types"><span class="type">int</span></span>
+         specifies amount of flares that you get when you pick up a box of flares.
         </li>
     </ul>
 
@@ -887,6 +924,69 @@ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType
         <li><span class="parameter">alternateDamage</span>
             <span class="types"><span class="type">int</span></span>
          for Revolver and HK, specifies damage in lasersight mode. For crossbow, specifies damage for explosive ammo.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "pickupCount"></a>
+    <strong>pickupCount</strong>
+    </dt>
+    <dd>
+    Default ammo pickup count.
+
+
+
+    <ul>
+        <li><span class="parameter">pickupCount</span>
+            <span class="types"><span class="type">int</span></span>
+         amount of ammo which is given with every ammo pickup for this weapon.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "smoke"></a>
+    <strong>smoke</strong>
+    </dt>
+    <dd>
+    Gun smoke.
+
+
+
+    <ul>
+        <li><span class="parameter">smoke</span>
+            <span class="types"><span class="type">bool</span></span>
+         if set to true, indicates that weapon emits gun smoke. Not applicable for crossbow and harpoon gun.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "shell"></a>
+    <strong>shell</strong>
+    </dt>
+    <dd>
+    Gun shell.
+
+
+
+    <ul>
+        <li><span class="parameter">shell</span>
+            <span class="types"><span class="type">bool</span></span>
+         if set to true, indicates that weapon emits gun shell. Not applicable for projectile weapons.
         </li>
     </ul>
 

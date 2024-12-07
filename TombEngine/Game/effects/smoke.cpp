@@ -122,6 +122,9 @@ namespace TEN::Effects::Smoke
 
 	void SpawnGunSmokeParticles(const Vector3& pos, const Vector3& direction, int roomNumber, byte initial, LaraWeaponType weaponType, int count)
 	{
+		if (!g_GameFlow->GetSettings()->Weapons[(int)weaponType - 1].Smoke)
+			return;
+
 		auto& s = GetFreeSmokeParticle();
 		s = {};
 		s.active = true;
