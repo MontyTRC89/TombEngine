@@ -18,6 +18,7 @@ void Rotation::Register(sol::table& parent)
 		ctors(),
 		sol::call_constructor, ctors(),
 		sol::meta_function::to_string, &Rotation::ToString,
+		ScriptReserved_RotationDirection, &Rotation::Direction,
 
 		/// (float) X angle component.
 		// @mem x
@@ -76,6 +77,24 @@ Rotation::operator Vector3() const
 {
 	return Vector3(x, y, z);
 };
+
+/// Converts rotation to a direction normal.
+// @treturn Vec3 resulting normal calculated from this rotation.
+// @function Direction
+Vec3 Rotation::Direction() const
+{
+	// Convert degrees to radians.
+	float xRad = x * RADIAN;
+	float yRad = y * RADIAN;
+
+	// Calculate the direction vector.
+	float dirX =  sin(yRad) * cos(xRad);
+	float dirY = -sin(xRad);
+	float dirZ =  cos(yRad) * cos(xRad);
+
+	// Scale by the given distance.
+	return Vec3(dirX, dirY, dirZ);
+}
 
 /// @tparam Rotation rotation this Rotation.
 // @treturn string A string showing the X, Y, and Z angle components of the Rotation.

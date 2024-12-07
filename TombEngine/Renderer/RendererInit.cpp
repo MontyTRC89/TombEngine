@@ -126,10 +126,12 @@ namespace TEN::Renderer
 		_currentCausticsFrame = 0;
 
 		// Preallocate lists
-		_dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
 		_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
 		_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
 		_triangles3DToDraw = createVector<RendererTriangle3D>(MAX_TRIANGLES_3D);
+
+		for (auto& dynamicLightList : _dynamicLights)
+			dynamicLightList = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
 
 		for (auto& item : _items)
 			item.LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);

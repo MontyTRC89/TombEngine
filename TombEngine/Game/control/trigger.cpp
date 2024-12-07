@@ -370,7 +370,6 @@ void Trigger(short const value, short const flags)
 	if (item->Flags & IFLAG_KILLED)
 		return;
 
-	item->TouchBits = NO_JOINT_BITS;
 	item->Flags |= TRIGGERED;
 
 	if (flags & ONESHOT)
@@ -408,6 +407,7 @@ void Trigger(short const value, short const flags)
 		}
 
 		item->Status = ITEM_ACTIVE;
+		item->TouchBits = NO_JOINT_BITS;
 		item->DisableInterpolation = true;
 	}
 }

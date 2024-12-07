@@ -34,6 +34,10 @@ namespace TEN::Renderer
 
 		_meshes.clear();
 
+		_dynamicLightList = 0;
+		for (auto& dynamicLightList : _dynamicLights)
+			dynamicLightList.clear();
+
 		int allocatedItemSize = (int)g_Level.Items.size() + MAX_SPAWNED_ITEM_COUNT;
 
 		auto item = RendererItem();
