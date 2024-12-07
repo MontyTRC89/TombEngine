@@ -21,6 +21,7 @@ local settings = Flow.Settings.new()
 	settings.Flare.sparks = true
 	settings.Flare.smoke = true
 	settings.Flare.flicker = true
+	settings.Flare.pickupCount = 12
 	
 	settings.Hud.statusBars = true
 	settings.Hud.loadingBar = true
@@ -39,15 +40,18 @@ local settings = Flow.Settings.new()
 	settings.Hair[1].offset = Vec3(-4, -4, -48)
 	settings.Hair[1].indices = { 37, 39, 40, 38 }
 	
-	-- Example  setting entry. You can use other weapon types as well.
+	-- Example weapon setting entry. You can use other weapon types as well.
 	-- To know default parameters, you can fetch settings using Flow.GetSettings() method.
 	
-	settings.Weapons[WeaponType.PISTOL].accuracy = 8
-	settings.Weapons[WeaponType.PISTOL].distance = 8192
-	settings.Weapons[WeaponType.PISTOL].interval = 9
-	settings.Weapons[WeaponType.PISTOL].waterLevel = 650
-	settings.Weapons[WeaponType.PISTOL].flashDuration = 3
-	settings.Weapons[WeaponType.PISTOL].damage = 1
-	settings.Weapons[WeaponType.PISTOL].alternateDamage = 1
+	settings.Weapons[WeaponType.REVOLVER].accuracy = 4
+	settings.Weapons[WeaponType.REVOLVER].targetingDistance = 8192
+	settings.Weapons[WeaponType.REVOLVER].interval = 16
+	settings.Weapons[WeaponType.REVOLVER].waterLevel = 650
+	settings.Weapons[WeaponType.REVOLVER].flashDuration = 3
+	settings.Weapons[WeaponType.REVOLVER].damage = 21
+	settings.Weapons[WeaponType.REVOLVER].alternateDamage = 21
+	settings.Weapons[WeaponType.REVOLVER].pickupCount = 6
+	settings.Weapons[WeaponType.REVOLVER].smoke = true
+	settings.Weapons[WeaponType.REVOLVER].shell = false
 	
 Flow.SetSettings(settings)

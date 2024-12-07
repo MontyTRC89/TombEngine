@@ -226,7 +226,7 @@ void WeaponSettings::Register(sol::table& parent)
 
 	/*** Targeting distance.
 	@tfield float targetingDistance specifies maximum targeting distance in world units (1 block = 1024 world units) for a given weapon. */
-	"distance", &WeaponSettings::Distance,
+	"targetingDistance", &WeaponSettings::Distance,
 
 	/*** Shooting interval.
 	@tfield float interval specifies an interval (in frames), after which Lara is able to shoot again. Not applicable for backholster weapons. */
