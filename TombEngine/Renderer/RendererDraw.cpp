@@ -148,8 +148,10 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
-		int steps = _shadowLight->Type == LightType::Point ? 6 : 1;
-		for (int step = 0; step < steps; step++)
+		auto shadowLightPos = _shadowLight->Hash == 0 ? _shadowLight->Position :
+			Vector3::Lerp(_shadowLight->PrevPosition, _shadowLight->Position, GetInterpolationFactor());
+
+		for (int step = 0; step < 6; step++)
 		{
 			// Bind render target
 			_context->OMSetRenderTargets(1, _shadowMap.RenderTargetView[step].GetAddressOf(),
@@ -158,7 +160,7 @@ namespace TEN::Renderer
 			_context->RSSetViewports(1, &_shadowMapViewport);
 			ResetScissor();
 
-			if (_shadowLight->Position == item->Position)
+			if (shadowLightPos == item->Position)
 				return;
 
 			UINT stride = sizeof(Vertex);
@@ -178,27 +180,11 @@ namespace TEN::Renderer
 			BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
 
 			// Set camera matrices
-			Matrix view;
-			Matrix projection;
-			if (_shadowLight->Type == LightType::Point)
-			{
-				view = Matrix::CreateLookAt(_shadowLight->Position, _shadowLight->Position +
-					RenderTargetCube::forwardVectors[step] * BLOCK(10),
-					RenderTargetCube::upVectors[step]);
+			Matrix view = Matrix::CreateLookAt(shadowLightPos, shadowLightPos +
+				RenderTargetCube::forwardVectors[step] * BLOCK(10),
+				RenderTargetCube::upVectors[step]);
 
-				projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, _shadowLight->Out);
-
-			}
-			else if (_shadowLight->Type == LightType::Spot)
-			{
-				view = Matrix::CreateLookAt(_shadowLight->Position,
-					_shadowLight->Position + _shadowLight->Direction * BLOCK(10),
-					Vector3(0.0f, -1.0f, 0.0f));
-
-				// Vertex lighting fades out in 1024-steps. increase angle artificially for a bigger blend radius.
-				float projectionAngle = _shadowLight->OutRange * 1.5f * (PI / 180.0f);
-				projection = Matrix::CreatePerspectiveFieldOfView(projectionAngle, 1.0f, 16.0f, _shadowLight->Out);
-			}
+			Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, _shadowLight->Out);
 
 			CCameraMatrixBuffer shadowProjection;
 			shadowProjection.ViewProjection = view * projection;
@@ -1536,41 +1522,102 @@ namespace TEN::Renderer
 		AddDebugSphere(sphere.Center, sphere.Radius, color, page, isWireframe);
 	}
 
-	void Renderer::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
+	void Renderer::AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color, bool castShadows, int hash)
 	{
 		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
 			return;
 
 		RendererLight dynamicLight = {};
 
-		if (falloff >= 8)
-		{
-			dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
-		}
-		else
-		{
-			r = (r * falloff) >> 3;
-			g = (g * falloff) >> 3;
-			b = (b * falloff) >> 3;
+		dynamicLight.Color = Vector3(color.x, color.y, color.z) * 2.0f;
+		if (falloff < 8)
+			dynamicLight.Color *= (falloff / 8.0f);
 
-			dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
-		}
+		// Calculate outer cone angle (degrees) based on radius at the cone's end distance.
+		float outerConeAngle = atan(radius / distance) * (180.0f / PI);
+		float innerConeAngle = atan((radius - falloff) / distance) * (180.0f / PI);
+		float innerDistance = std::max(0.0f, distance - distance * (falloff / radius));
+
+		// Normalize direction for safety.
+		auto normalizedDirection = dir;
+		normalizedDirection.Normalize();
 
 		dynamicLight.RoomNumber = NO_VALUE;
 		dynamicLight.Intensity = 1.0f;
-		dynamicLight.Position = Vector3(float(x), float(y), float(z));
-		dynamicLight.Out = falloff * 256.0f;
-		dynamicLight.Type = LightType::Point;
-		dynamicLight.BoundingSphere = BoundingSphere(dynamicLight.Position, dynamicLight.Out);
+		dynamicLight.Position = pos;
+		dynamicLight.Direction = normalizedDirection;
+		dynamicLight.In = innerDistance;
+		dynamicLight.Out = distance;
+		dynamicLight.InRange = innerConeAngle > 0.0f ? innerConeAngle : 0.5f;
+		dynamicLight.OutRange = outerConeAngle;
+		dynamicLight.Type = LightType::Spot;
+		dynamicLight.CastShadows = castShadows;
+		dynamicLight.BoundingSphere = BoundingSphere(pos, distance);
 		dynamicLight.Luma = Luma(dynamicLight.Color);
+		dynamicLight.Hash = hash;
 
-		_dynamicLights.push_back(dynamicLight);
+		StoreInterpolatedDynamicLightData(dynamicLight);
+		_dynamicLights[_dynamicLightList].push_back(dynamicLight);
+	}
+
+	void Renderer::AddDynamicPointLight(const Vector3& pos, float radius, const Color& color, bool castShadows, int hash)
+	{
+		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
+			return;
+
+		RendererLight dynamicLight = {};
+
+		dynamicLight.Color = Vector3(color.x, color.y, color.z) * 2.0f;
+		if (radius < BLOCK(2))
+			dynamicLight.Color *= (radius / BLOCK(2));
+
+		dynamicLight.RoomNumber = NO_VALUE;
+		dynamicLight.Intensity = 1.0f;
+		dynamicLight.Position = pos;
+		dynamicLight.In = 1.0f;
+		dynamicLight.Out = radius;
+		dynamicLight.Type = LightType::Point;
+		dynamicLight.CastShadows = castShadows;
+		dynamicLight.BoundingSphere = BoundingSphere(pos, radius);
+		dynamicLight.Luma = Luma(dynamicLight.Color);
+		dynamicLight.Hash = hash;
+
+		StoreInterpolatedDynamicLightData(dynamicLight);
+		_dynamicLights[_dynamicLightList].push_back(dynamicLight);
+	}
+
+	void Renderer::StoreInterpolatedDynamicLightData(RendererLight& light)
+	{
+		// Hash is not provided, do not search for same light in old buffer.
+		if (light.Hash == 0)
+			return;
+
+		// Determine the previous buffer index.
+		const auto& previousList = _dynamicLights[1 - _dynamicLightList];
+
+		// Find a light in the previous buffer with the same Hash.
+		auto it = std::find_if(previousList.begin(), previousList.end(),
+			[&light](const auto& prevLight)
+			{
+				return prevLight.Hash == light.Hash;
+			});
+
+		if (it == previousList.end())
+			return;
+
+		// If a matching light is found, copy its data.
+		const auto& prevLight = *it;
+		light.PrevPosition = prevLight.Position;
+		light.PrevDirection = prevLight.Direction;
 	}
 
 	void Renderer::PrepareScene()
 	{
 		if (g_GameFlow->CurrentFreezeMode == FreezeMode::None)
-			_dynamicLights.clear();
+		{
+			_dynamicLightList ^= 1;
+			_dynamicLights[_dynamicLightList].clear();
+		}
 
 		_lines2DToDraw.clear();
 		_lines3DToDraw.clear();
@@ -1854,7 +1901,7 @@ namespace TEN::Renderer
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		// HUD must be drawn before post-processing to be antialiased.
-		if (renderMode == SceneRenderMode::Full)
+		if (renderMode == SceneRenderMode::Full && g_GameFlow->LastGameStatus == GameStatus::Normal)
 			g_Hud.Draw(*LaraItem);
 		
 		if (renderMode != SceneRenderMode::NoPostprocess)
@@ -1889,7 +1936,7 @@ namespace TEN::Renderer
 			DrawLines2D();
 		}
 
-		if (renderMode == SceneRenderMode::Full)
+		if (renderMode == SceneRenderMode::Full && g_GameFlow->LastGameStatus == GameStatus::Normal)
 		{
 			// Draw display sprites sorted by priority.
 			CollectDisplaySprites(view);
@@ -2292,7 +2339,7 @@ namespace TEN::Renderer
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 		{
-			if (!(nativeItem->MeshBits & (1 << k)))
+			if (!nativeItem->MeshBits.Test(k))
 				continue;
 
 			DrawMoveableMesh(item, GetMesh(item->MeshIds[k]), room, k, view, rendererPass);

@@ -155,6 +155,21 @@ namespace TEN::Utils
 		return strings;
 	}
 
+	int GetHash(const std::string& string)
+	{
+		if (string.empty())
+			return 0;
+
+		uint32_t hash = 2166136261u;
+		for (char c : string)
+		{
+			hash ^= static_cast<uint8_t>(c);
+			hash *= 16777619u;
+		}
+
+		return static_cast<int>(hash);
+	}
+
     Vector2 GetAspectCorrect2DPosition(const Vector2& pos)
     {
        constexpr auto DISPLAY_SPACE_ASPECT = DISPLAY_SPACE_RES.x / DISPLAY_SPACE_RES.y;

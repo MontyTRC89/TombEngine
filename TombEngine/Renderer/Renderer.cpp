@@ -32,8 +32,6 @@ namespace TEN::Renderer
 
 	void Renderer::FreeRendererData()
 	{
-		_shadowLight = nullptr;
-
 		_items.resize(0);
 		_effects.resize(0);
 		_moveableObjects.resize(0);
@@ -46,6 +44,12 @@ namespace TEN::Renderer
 		_spritesTextures.resize(0);
 		_animatedTextures.resize(0);
 		_animatedTextureSets.resize(0);
+
+		_shadowLight = nullptr;
+
+		_dynamicLightList = 0;
+		for (auto& dynamicLightList : _dynamicLights)
+			dynamicLightList.resize(0);
 
 		for (auto& mesh : _meshes)
 			delete mesh;
@@ -195,12 +199,23 @@ namespace TEN::Renderer
 		}
 
 		_context->PSSetSamplers((UINT)registerType, 1, &samplerState);
-	} 
+	}
+
+	void Renderer::BindLight(RendererLight& light, ShaderLight* lights, int index)
+	{
+		memcpy(&lights[index], &light, sizeof(ShaderLight));
+
+		if (light.Hash == 0)
+			return;
+
+		lights[index].Position = Vector3::Lerp(light.PrevPosition, light.Position, GetInterpolationFactor());
+		lights[index].Direction = Vector3::Lerp(light.PrevDirection, light.Direction, GetInterpolationFactor());
+	}
 
 	void Renderer::BindRoomLights(std::vector<RendererLight*>& lights)
 	{
 		for (int i = 0; i < lights.size(); i++)
-			memcpy(&_stRoom.RoomLights[i], lights[i], sizeof(ShaderLight));
+			BindLight(*lights[i], _stRoom.RoomLights, i);
 		
 		_stRoom.NumRoomLights = (int)lights.size();
 	}
@@ -208,7 +223,7 @@ namespace TEN::Renderer
 	void Renderer::BindStaticLights(std::vector<RendererLight*>& lights)
 	{
 		for (int i = 0; i < lights.size(); i++)
-			memcpy(&_stStatic.Lights[i], lights[i], sizeof(ShaderLight));
+			BindLight(*lights[i], _stStatic.Lights, i);
 		
 		_stStatic.NumLights = (int)lights.size();
 	}
@@ -216,7 +231,7 @@ namespace TEN::Renderer
 	void Renderer::BindInstancedStaticLights(std::vector<RendererLight*>& lights, int instanceID)
 	{
 		for (int i = 0; i < lights.size(); i++)
-			memcpy(&_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].Lights[i], lights[i], sizeof(ShaderLight));
+			BindLight(*lights[i], _stInstancedStaticMeshBuffer.StaticMeshes[instanceID].Lights, i);
 
 		_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].NumLights = (int)lights.size();
 	}
@@ -242,7 +257,7 @@ namespace TEN::Renderer
 			if (fadedCoeff == 0.0f)
 				continue;
 
-			memcpy(&_stItem.Lights[numLights], lights[i], sizeof(ShaderLight));
+			BindLight(*lights[i], _stItem.Lights, numLights);
 			_stItem.Lights[numLights].Intensity *= fadedCoeff;
 			numLights++;
 		}

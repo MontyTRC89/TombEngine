@@ -6,15 +6,18 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## Version 1.6 - xxxx-xx-xx
 
 ### Bug fixes
-* Fixed engine performance around bridges.
-* Fixed engine performance if weather or bubble effects are active.
+* Significantly improved renderer performance.
+* Improved engine performance around bridges.
+* Improved engine performance if weather or bubble effects are active.
 * Fixed silent crashes if loaded level is corrupted or in incorrect format.
 * Fixed occasional crashes if there are static meshes placed within room border walls.
 * Fixed incorrect clipping of scaled off-centered static meshes.
 * Fixed incorrect collision detection for off-centered moveables.
+* Fixed incorrect slide directions for sub-click geometry.
 * Fixed stutter during jumps between cameras in a flyby sequence.
 * Fixed uzi targeting issues after using flycheat.
 * Fixed snow particles not always melting on the ground.
+* Fixed enemies not damaging Lara if she is staying on the sector where enemies were triggered.
 * Fixed enemy pickups dropping on death sectors.
 * Fixed Sarcophagus and Search Object pickup triggers.
 * Fixed vehicle transfer not happening for levels which were not previously visited.
@@ -30,6 +33,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed original issue with deactivation of Dart Emitter.
 * Fixed Lens Flare object not functioning properly.
 * Fixed lens flares not being occluded by static meshes and moveables.
+* Fixed spotlight shadows.
 * Fixed Skeleton and Mummy not reacting to shotgun hits.
 
 ### New Features
@@ -43,14 +47,20 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
 * Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
 * Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
+* Added Effects.EmitSpotLight() function for directional spotlights.
+* Added optional cast shadow and name parameters for Effects.EmitLight() function.
 * Added Effects.GetWind() function to get current wind speed vector.
+* Added Rotation:Direction() method to get directional vector.
 * Added support for transparency value in DisplayString class.
 * Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
 * Fixed DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
+* Fixed DisplayString not being deallocated after showing.
+* Fixed incorrect behaviour of Moveable:GetJointRotation() function.
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
 * Fixed Util.HasLineOfSight() not taking static meshes into consideration.
 * Fixed collision callbacks not properly clearing after leveljump.
+* Fixed SetIntroImagePath() not using the correct path
 
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 
