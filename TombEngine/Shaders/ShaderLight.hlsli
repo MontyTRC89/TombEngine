@@ -310,12 +310,13 @@ float DoFogBulbForSky(float3 pos, ShaderFogBulb bulb)
 
 float DoDistanceFogForVertex(float3 pos)
 {
-	float d = length(CamPositionWS.xyz - pos);
-	float fogRange = FogMaxDistance * 1024 - FogMinDistance * 1024;
+	float fog = 0.0f;
 
-	float fogEnabled = step(0.0f, FogMaxDistance);
-	float fogFactor = (d - FogMinDistance * 1024) / max(fogRange, 1e-6);
-	float fog = saturate(fogFactor) * fogEnabled;
+	if (FogMaxDistance > 0.0f)
+	{
+		float d = length(CamPositionWS.xyz - pos);
+		fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
+	}
 
 	return fog;
 }
