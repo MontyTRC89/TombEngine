@@ -314,7 +314,7 @@ float DoDistanceFogForVertex(float3 pos)
 	float fogRange = FogMaxDistance * 1024 - FogMinDistance * 1024;
 
 	float fogEnabled = step(0.0f, FogMaxDistance);
-	float fogFactor = (d - FogMinDistance * 1024) / fogRange;
+	float fogFactor = (d - FogMinDistance * 1024) / max(fogRange, 1e-6);
 	float fog = saturate(fogFactor) * fogEnabled;
 
 	return fog;
