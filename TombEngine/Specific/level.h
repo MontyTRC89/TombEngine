@@ -88,8 +88,7 @@ struct MESH
 struct MirrorInfo
 {
 	short RoomNumber;
-	short MirroredRoomNumber;
-	Plane MirrorPlane;
+	Vector4 MirrorPlane;
 };
 
 // LevelData
@@ -172,6 +171,7 @@ void LoadSoundSources();
 void LoadAnimatedTextures();
 void LoadEventSets();
 void LoadAIObjects();
+void LoadMirrors();
 
 void LoadPortal(ROOM_INFO& room);
 

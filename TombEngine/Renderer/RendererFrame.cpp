@@ -154,8 +154,11 @@ namespace TEN::Renderer
 			{
 				RendererMirror rendererMirror;
 				rendererMirror.RoomNumber = mirror.RoomNumber;
-				rendererMirror.MirroredRoomNumber = mirror.MirroredRoomNumber;
-				rendererMirror.Plane = mirror.MirrorPlane;
+				rendererMirror.Plane = Plane(
+					Vector3(mirror.MirrorPlane.x,
+						    mirror.MirrorPlane.y,
+							mirror.MirrorPlane.z),
+					mirror.MirrorPlane.w);
 				rendererMirror.ReflectionMatrix = Matrix::CreateReflection(rendererMirror.Plane);
 				renderView.Mirrors.push_back(rendererMirror);
 			}

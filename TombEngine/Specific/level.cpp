@@ -980,6 +980,7 @@ void FreeLevel(bool partial)
 	g_Level.VolumeEventSets.resize(0);
 	g_Level.GlobalEventSets.resize(0);
 	g_Level.LoopedEventSetIndices.resize(0);
+	g_Level.Mirrors.resize(0);
 
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
@@ -1363,6 +1364,7 @@ bool LoadLevel(const std::string& path, bool partial)
 
 			LoadSprites();
 			LoadBoxes();
+			LoadMirrors();
 			LoadAnimatedTextures();
 			UpdateProgress(70);
 
@@ -1407,20 +1409,6 @@ bool LoadLevel(const std::string& path, bool partial)
 		}
 
 		UpdateProgress(100, partial);
-
-		// MIRROR: remove after TE changes
-		g_Level.Mirrors.clear();
-
-		MirrorInfo mirror;
-		mirror.RoomNumber = 17;
-		mirror.MirrorPlane = Plane(Vector3(BLOCK(10), 0, 0), Vector3(-1, 0, 0));
-		g_Level.Mirrors.push_back(mirror);
-		
-		//mirror.MirrorPlane = Plane(Vector3(0, 0, 30000), Vector3(0, 0, -1));
-		//g_Level.Mirrors.push_back(mirror);
-
-		//mirror.MirrorPlane = Plane(Vector3(0, -2048, 0), Vector3(0,-1, 0));
-		//g_Level.Mirrors.push_back(mirror);
 
 		TENLog("Level loading complete.", LogLevel::Info);
 
@@ -1528,6 +1516,23 @@ void LoadBoxes()
 	{
 		if (g_Level.PathfindingBoxes[i].flags & BLOCKABLE)
 			g_Level.PathfindingBoxes[i].flags |= BLOCKED;
+	}
+}
+
+void LoadMirrors()
+{
+	int mirrorCount = ReadCount(CUBE(1024));
+	TENLog("Mirror count: " + std::to_string(mirrorCount), LogLevel::Info);
+	g_Level.Mirrors.reserve(mirrorCount);
+	for (int i = 0; i < mirrorCount; i++)
+	{
+		auto& mirror = g_Level.Mirrors.emplace_back();
+
+		mirror.RoomNumber = ReadInt16();
+		mirror.MirrorPlane.x = ReadFloat();
+		mirror.MirrorPlane.y = ReadFloat();
+		mirror.MirrorPlane.z = ReadFloat();
+		mirror.MirrorPlane.w = ReadFloat();
 	}
 }
 
