@@ -78,11 +78,11 @@ void AnimSettings::Register(sol::table& parent)
 	@tfield bool crawlspaceSwandive when enabled, player will be able to swandive into crawlspaces. */
 	"crawlspaceSwandive", &AnimSettings::CrawlspaceDive,
 
-	/*** Overhang climbing.
+	/* Overhang climbing.
 	@tfield bool overhangClimb enables overhang climbing feature. Currently does not work. */
 	"overhangClimb", &AnimSettings::OverhangClimb,
 
-	/*** Extended slide mechanics.
+	/* Extended slide mechanics.
 	@tfield bool slideExtended if enabled, player will be able to change slide direction with controls. Currently does not work. */
 	"slideExtended", &AnimSettings::SlideExtended,
 
