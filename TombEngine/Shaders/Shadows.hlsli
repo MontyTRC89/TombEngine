@@ -140,8 +140,8 @@ float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
     float isSpot  = step(0.5f, Light.Type == LT_SPOT);  // 1.0 if LT_SPOT,  0.0 otherwise
     float isOther = 1.0 - (isPoint + isSpot); // 1.0 if neither LT_POINT nor LT_SPOT
 
-    float pointFactor  = saturate(distance(worldPos, Light.Position) / Light.Out);
-    float spotFactor   = 1.0f - Luma(DoSpotLight(worldPos, normal, Light));
+    float pointFactor = 1.0f - Luma(DoPointLight(worldPos, normal, Light));
+    float spotFactor  = 1.0f - Luma(DoSpotLight(worldPos, normal, Light));
 
     float3 pointShadow = lighting * saturate((shadowFactor + SHADOW_INTENSITY) + (pow(pointFactor, 4) * INV_SHADOW_INTENSITY));
     float3 spotShadow  = lighting * saturate((shadowFactor + SHADOW_INTENSITY) + (pow(spotFactor,  4) * INV_SHADOW_INTENSITY));
