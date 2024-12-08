@@ -14,6 +14,10 @@ local settings = Flow.Settings.new()
 	settings.Animations.ledgeJumps = false
 	settings.Animations.poseTimeout = 0
 	
+	settings.Camera.binocularLight = true
+	settings.Camera.lasersightLight = true
+	settings.Camera.objectCollision = true
+	
 	settings.Flare.color = Color(128, 60, 0)
 	settings.Flare.range = 10
 	settings.Flare.timeout = 60
@@ -30,9 +34,6 @@ local settings = Flow.Settings.new()
 	
 	settings.Physics.gravity = 6
 	settings.Physics.swimVelocity = 50
-	
-	settings.System.errorMode = Flow.ErrorMode.WARN
-	settings.System.fastReload = true
 	
 	-- Example hair setting entry. You can use types [2] and [3] as well for young Lara hair.
 	-- To know default parameters, you can fetch settings using Flow.GetSettings() method.
@@ -53,5 +54,8 @@ local settings = Flow.Settings.new()
 	settings.Weapons[WeaponType.REVOLVER].pickupCount = 6
 	settings.Weapons[WeaponType.REVOLVER].smoke = true
 	settings.Weapons[WeaponType.REVOLVER].shell = false
+	
+	settings.System.errorMode = Flow.ErrorMode.WARN
+	settings.System.fastReload = true
 	
 Flow.SetSettings(settings)

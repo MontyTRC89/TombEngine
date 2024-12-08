@@ -281,12 +281,6 @@ enum class ShockwaveStyle
 #define ENERGY_ARC_CIRCLE			1
 #define ENERGY_ARC_NO_RANDOMIZE		1
 
-extern int LaserSightX;
-extern int LaserSightY;
-extern int LaserSightZ;
-extern char LaserSightActive;
-extern char LaserSightCol;
-
 extern int NextFireSpark;
 extern int NextSmokeSpark;
 extern int NextBlood;

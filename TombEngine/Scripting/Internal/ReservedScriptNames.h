@@ -31,6 +31,7 @@ static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 static constexpr char ScriptReserved_Settings[]			= "Settings";
 static constexpr char ScriptReserved_SystemSettings[]	= "System";
 static constexpr char ScriptReserved_FlareSettings[]	= "Flare";
+static constexpr char ScriptReserved_CameraSettings[]	= "Camera";
 static constexpr char ScriptReserved_AnimSettings[]		= "Animations";
 static constexpr char ScriptReserved_HairSettings[]		= "Hair";
 static constexpr char ScriptReserved_HudSettings[]		= "Hud";

@@ -1489,6 +1489,9 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 
 void ItemsCollideCamera()
 {
+	if (!g_GameFlow->GetSettings()->Camera.ObjectCollision)
+		return;
+
 	constexpr auto RADIUS = CLICK(0.5f);
 
 	auto itemList = FillCollideableItemList();

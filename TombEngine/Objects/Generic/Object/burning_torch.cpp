@@ -298,6 +298,9 @@ namespace TEN::Entities::Generic
 
 	void LaraTorch(Vector3i* origin, Vector3i* target, int rot, int color)
 	{
+		if (!g_GameFlow->GetSettings()->Camera.BinocularLight)
+			return;
+
 		auto pos1 = GameVector(*origin, LaraItem->RoomNumber);
 		auto pos2 = GameVector(*target);
 

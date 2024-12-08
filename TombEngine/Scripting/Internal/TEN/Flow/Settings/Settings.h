@@ -22,6 +22,15 @@ struct AnimSettings
 	static void Register(sol::table& parent);
 };
 
+struct CameraSettings
+{
+	bool BinocularLight = true;
+	bool LasersightLight = true;
+	bool ObjectCollision = true;
+
+	static void Register(sol::table& parent);
+};
+
 struct FlareSettings
 {
 	ScriptColor Color = ScriptColor(128, 64, 0);
@@ -91,6 +100,7 @@ struct WeaponSettings
 struct Settings
 {
 	AnimSettings Animations = {};
+	CameraSettings Camera = {};
 	FlareSettings Flare = {};
 	HudSettings Hud = {};
 	PhysicsSettings Physics = {};

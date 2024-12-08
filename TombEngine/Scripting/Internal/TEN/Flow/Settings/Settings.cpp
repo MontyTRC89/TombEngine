@@ -37,6 +37,7 @@ Settings::Settings()
 void Settings::Register(sol::table& parent)
 {
 	AnimSettings::Register(parent);
+	CameraSettings::Register(parent);
 	FlareSettings::Register(parent);
 	HairSettings::Register(parent);
 	HudSettings::Register(parent);
@@ -48,6 +49,7 @@ void Settings::Register(sol::table& parent)
 		sol::constructors<Settings()>(),
 		ScriptReserved_AnimSettings, &Settings::Animations,
 		ScriptReserved_FlareSettings, &Settings::Flare,
+		ScriptReserved_CameraSettings, &Settings::Camera,
 		ScriptReserved_HairSettings, &Settings::Hair,
 		ScriptReserved_HudSettings, &Settings::Hud,
 		ScriptReserved_PhysicsSettings, &Settings::Physics,
@@ -97,6 +99,29 @@ void AnimSettings::Register(sol::table& parent)
 	/*** Pose timeout.
 	@tfield int poseTimeout if this setting is larger than 0, idle standing pose animation will be performed after given timeout (in seconds). */
 	"poseTimeout", &AnimSettings::PoseTimeout);
+}
+
+/*** Camera
+@section Camera
+Parameters to customize camera and everything related to it.
+*/
+
+void CameraSettings::Register(sol::table& parent)
+{
+	parent.create().new_usertype<CameraSettings>(ScriptReserved_AnimSettings, sol::constructors<CameraSettings()>(),
+		sol::call_constructor, sol::constructors<CameraSettings()>(),
+
+	/*** Enable or disable highlight feature in binoculars.
+	@tfield bool binocularLight when enabled, a highlight can be activated by pressing Action in binocular mode. */
+	"binocularLight", &CameraSettings::BinocularLight,
+	
+	/*** Enable or disable highlight feature in lasersight.
+	@tfield bool lasersightLight when enabled, lasersight will have red highlight. */
+	"lasersightLight", &CameraSettings::LasersightLight,
+	
+	/*** Specify whether camera can collide with objects.
+	@tfield bool objectCollision when enabled, camera will collide with moveables and statics. Disable or TR4-like camera behaviour. */
+	"objectCollision", &CameraSettings::ObjectCollision);
 }
 
 /*** Flare
