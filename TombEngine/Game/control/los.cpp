@@ -444,8 +444,8 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 
 	if (drawTarget && (hasHit || !result))
 	{
-		if (g_GameFlow->GetSettings()->Camera.LasersightLight)
-			TriggerDynamicLight(target2.x, target2.y, target2.z, 64, 255, 0, 0);
+		auto& color = g_GameFlow->GetSettings()->Camera.LasersightLightColor;
+		TriggerDynamicLight(target2.x, target2.y, target2.z, color.GetR(), color.GetG(), color.GetB(), 0);
 	}
 
 	return hitProcessed;

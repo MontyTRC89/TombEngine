@@ -955,7 +955,7 @@ void BinocularCamera(ItemInfo* item)
 
 			auto origin = Camera.pos.ToVector3i();
 			auto target = Camera.target.ToVector3i();
-			LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
+			LaraTorch(&origin, &target);
 		}
 	}
 

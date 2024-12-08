@@ -111,13 +111,13 @@ void CameraSettings::Register(sol::table& parent)
 	parent.create().new_usertype<CameraSettings>(ScriptReserved_AnimSettings, sol::constructors<CameraSettings()>(),
 		sol::call_constructor, sol::constructors<CameraSettings()>(),
 
-	/*** Enable or disable highlight feature in binoculars.
-	@tfield bool binocularLight when enabled, a highlight can be activated by pressing Action in binocular mode. */
-	"binocularLight", &CameraSettings::BinocularLight,
+	/*** Determines highlight color in binocular mode.
+	@tfield Color binocularLightColor color of highlight, when player presses action. Zero color means there will be no highlight. */
+	"binocularLightColor", &CameraSettings::BinocularLightColor,
 	
-	/*** Enable or disable highlight feature in lasersight.
-	@tfield bool lasersightLight when enabled, lasersight will have red highlight. */
-	"lasersightLight", &CameraSettings::LasersightLight,
+	/*** Determines highlight color in lasersight mode.
+	@tfield Color lasersightLightColor lasersight highlight color. Zero color means there will be no highlight. */
+	"lasersightLightColor", &CameraSettings::LasersightLightColor,
 	
 	/*** Specify whether camera can collide with objects.
 	@tfield bool objectCollision when enabled, camera will collide with moveables and statics. Disable or TR4-like camera behaviour. */
