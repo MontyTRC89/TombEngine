@@ -1521,7 +1521,8 @@ void LoadBoxes()
 
 void LoadMirrors()
 {
-	int mirrorCount = ReadCount(CUBE(1024));
+	int mirrorCount = ReadCount();
+
 	TENLog("Mirror count: " + std::to_string(mirrorCount), LogLevel::Info);
 	g_Level.Mirrors.reserve(mirrorCount);
 	for (int i = 0; i < mirrorCount; i++)
