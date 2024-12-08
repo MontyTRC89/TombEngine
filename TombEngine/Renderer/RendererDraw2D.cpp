@@ -14,6 +14,7 @@
 #include "Objects/Utils/object_helper.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Structures/RendererHudBar.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
@@ -181,6 +182,9 @@ namespace TEN::Renderer
 
 	void Renderer::DrawLoadingBar(float percentage)
 	{
+		if (!g_GameFlow->GetSettings()->Hud.LoadingBar)
+			return;
+
 		unsigned int strides = sizeof(Vertex);
 		unsigned int offset = 0;
 		

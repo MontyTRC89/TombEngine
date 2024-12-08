@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
 
 /// Represents an RGBA or RGB color.
 // Components are specified in bytes. All values are clamped to the range [0, 255].

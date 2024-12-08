@@ -4,16 +4,22 @@
 #include <filesystem>
 
 #include "Game/Gui.h"
+#include "Game/Lara/lara_fire.h"
+#include "Game/pickup/pickup_ammo.h"
+#include "Game/pickup/pickup_consumable.h"
 #include "Game/savegame.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Flow/Enums/ErrorModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/FreezeModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/GameStatuses.h"
+#include "Scripting/Internal/TEN/Flow/Enums/WeaponTypes.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
+#include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
 
@@ -78,23 +84,26 @@ Must be true or false
 */
 	tableFlow.set_function(ScriptReserved_EnableLevelSelect, &FlowHandler::EnableLevelSelect, this);
 
-	/// Enable or disable Home Level entry in the main menu.
-	// @function EnableHomeLevel()
-	// @tparam bool enabled True or false.
+/*** Enable or disable Home Level entry in the main menu.
+@function EnableHomeLevel()
+@tparam bool enabled True or false.
+*/
 	tableFlow.set_function(ScriptReserved_EnableHomeLevel, &FlowHandler::EnableHomeLevel, this);
 
-	/// Enable or disable saving and loading of savegames.
-	// @function EnableLoadSave()
-	// @tparam bool enabled True or false.
+/*** Enable or disable saving and loading of savegames.
+@function EnableLoadSave()
+@tparam bool enabled True or false.
+*/
 	tableFlow.set_function(ScriptReserved_EnableLoadSave, &FlowHandler::EnableLoadSave, this);
 
 /*** gameflow.lua or level scripts.
 @section FlowluaOrScripts
 */
 
-	/// Enable or disable the fly cheat.
-	// @function EnableFlyCheat()
-	// @tparam bool enabled True or false.
+/*** Enable or disable the fly cheat.
+@function EnableFlyCheat()
+@tparam bool enabled True or false.
+*/
 	tableFlow.set_function(ScriptReserved_EnableFlyCheat, &FlowHandler::EnableFlyCheat, this);
 
 /*** Enable or disable point texture filter.
@@ -126,13 +135,13 @@ have an ID of 0, the second an ID of 1, and so on.
 */
 	tableFlow.set_function(ScriptReserved_GetCurrentLevel, &FlowHandler::GetCurrentLevel, this);
 
-	/// Returns the level that is about to load. If no new level is about to load, returns current level.
-	// @function GetNextLevel
-	// @treturn Flow.Level incoming new level or current level, if no new level is loading
+/*** Returns the level that is about to load. If no new level is about to load, returns current level.
+@function GetNextLevel
+@treturn Flow.Level incoming new level or current level, if no new level is loading
+*/
 	tableFlow.set_function(ScriptReserved_GetNextLevel, &FlowHandler::GetNextLevel, this);
 
-/***
-Finishes the current level, with optional level index and start position index provided.
+/*** Finishes the current level, with optional level index and start position index provided.
 If level index is not provided or is zero, jumps to next level. If level index is more than
 level count, jumps to title. If LARA\_START\_POS objects are present in level, player will be
 teleported to such object with OCB similar to provided second argument.
@@ -161,7 +170,7 @@ Set current freeze mode, such as none, full, spectator or player.
 Freeze mode specifies whether game is in normal mode or paused in a particular way to allow
 custom menu creation, photo mode or time freeze.
 @function SetFreezeMode
-@tparam Flow.FreezeMode new freeze mode to set.
+@tparam Flow.FreezeMode freezeMode new freeze mode to set.
 */
 	tableFlow.set_function(ScriptReserved_SetFreezeMode, &FlowHandler::SetFreezeMode, this);
 
@@ -235,29 +244,28 @@ Must be an integer value (0 means no secrets).
 @treturn int Status of the flipmap group (true means on, false means off).
 */
 	tableFlow.set_function(ScriptReserved_GetFlipMapStatus, &FlowHandler::GetFlipMapStatus, this);
-
+	
 /*** settings.lua.
-These functions are called in settings.lua, a file which holds your local settings.
-settings.lua shouldn't be bundled with any finished levels/games.
+These functions are called in settings.lua, a file which holds global settings, such as system settings, flare color or animation movesets.
 @section settingslua
 */
-/***
+/*** Set provided settings table to an engine.
 @function SetSettings
 @tparam Flow.Settings settings a settings object 
 */
 	tableFlow.set_function(ScriptReserved_SetSettings, &FlowHandler::SetSettings, this);
-
-/***
-@function SetAnimations
-@tparam Flow.Animations animations an animations object 
+/*** Get settings table from an engine.
+@function GetSettings
+@tparam Flow.Settings settings a settings object 
 */
-	tableFlow.set_function(ScriptReserved_SetAnimations, &FlowHandler::SetAnimations, this);
+	tableFlow.set_function(ScriptReserved_GetSettings, &FlowHandler::GetSettings, this);
 
 /*** strings.lua. 
 These functions used in strings.lua, which is generated by TombIDE.
 You will not need to call them manually.
 @section stringslua
 */
+
 /*** Set string variable keys and their translations.
 @function SetStrings
 @tparam tab table array-style table with strings
@@ -291,7 +299,6 @@ Specify which translations in the strings table correspond to which languages.
 	SkyLayer::Register(tableFlow);
 	Mirror::Register(tableFlow);
 	InventoryItem::Register(tableFlow);
-	Animations::Register(tableFlow);
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
 	LensFlare::Register(tableFlow);
@@ -302,6 +309,7 @@ Specify which translations in the strings table correspond to which languages.
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ItemAction, ITEM_MENU_ACTIONS);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_ErrorMode, ERROR_MODES);
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeaponType, WEAPON_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_GameStatus, GAME_STATUSES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_FreezeMode, FREEZE_MODES);
 }
@@ -340,14 +348,17 @@ void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::ve
 	}
 }
 
-void FlowHandler::SetSettings(Settings const & src)
+void FlowHandler::SetSettings(Settings const& src)
 {
 	_settings = src;
-}
 
-void FlowHandler::SetAnimations(Animations const& src)
-{
-	Anims = src;
+	// Copy weapon settings to native table. Subtract 1 because weapon enum starts from 1.
+	for (auto weapon : WEAPON_TYPES)
+		InitializeWeaponInfo(weapon.second, _settings);
+
+	// Also copy pickup counts.
+	InitializeAmmo(_settings);
+	InitializeConsumables(_settings);
 }
 
 void FlowHandler::AddLevel(Level const& level)
@@ -377,7 +388,7 @@ void FlowHandler::LoadFlowScript()
 	_handler.ExecuteScript(_gameDir + "Scripts/Strings.lua", true);
 	_handler.ExecuteScript(_gameDir + "Scripts/Settings.lua", true);
 
-	SetScriptErrorMode(GetSettings()->ErrorMode);
+	SetScriptErrorMode(GetSettings()->System.ErrorMode);
 	
 	// Check if levels exist in Gameflow.lua.
 	if (Levels.empty())

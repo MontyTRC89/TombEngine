@@ -1,8 +1,8 @@
 #pragma once
 #include "Objects/game_object_ids.h"
 #include "Objects/objectslist.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 
 namespace sol { class state; }
 

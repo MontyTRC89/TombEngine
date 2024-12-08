@@ -31,7 +31,7 @@ The following constants are inside AmmoType.
 */
 
 /*** AmmoType constants table.
-@table CONSTANT_STRING_HERE
+@table AmmoType
 */
 static const std::unordered_map<std::string, PlayerAmmoType> PLAYER_AMMO_TYPES
 {

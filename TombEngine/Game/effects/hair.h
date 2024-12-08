@@ -6,12 +6,19 @@ struct ItemInfo;
 
 namespace TEN::Effects::Hair
 {
+	enum class LaraHairType
+	{
+		Normal,
+		YoungLeft,
+		YoungRight
+	};
+
 	class HairUnit
 	{
 	private:
 		// Constants
 
-		static constexpr auto HAIR_GRAVITY = 10.0f;
+		static constexpr auto HAIR_GRAVITY = 1.66f;
 
 		struct HairSegment
 		{

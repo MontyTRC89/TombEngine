@@ -153,7 +153,7 @@ namespace TEN::Entities::Traps
 						else if (itemPtr->ObjectNumber != ID_SWITCH_TYPE7 && itemPtr->ObjectNumber != ID_SWITCH_TYPE8)
 						{
 							if (Objects[itemPtr->ObjectNumber].intelligent)
-								DoExplosiveDamage(*LaraItem, *itemPtr, item, Weapons[(int)LaraWeaponType::GrenadeLauncher].ExplosiveDamage);
+								DoExplosiveDamage(*LaraItem, *itemPtr, item, Weapons[(int)LaraWeaponType::GrenadeLauncher].Damage);
 						}
 						else
 						{

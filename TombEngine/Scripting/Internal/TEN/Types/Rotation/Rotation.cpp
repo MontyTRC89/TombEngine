@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 
 #include "Math/Math.h"
 #include "Scripting/Internal/ReservedScriptNames.h"

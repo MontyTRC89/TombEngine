@@ -10,6 +10,7 @@
 #include "Game/Setup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 int NextSpider;
 SpiderData Spiders[NUM_SPIDERS];
@@ -143,7 +144,7 @@ void UpdateSpiders()
 				spider->Pose.Position.x += spider->Velocity * phd_sin(spider->Pose.Orientation.y);
 				spider->Pose.Position.y += spider->VerticalVelocity;
 				spider->Pose.Position.z += spider->Velocity * phd_cos(spider->Pose.Orientation.y);
-				spider->VerticalVelocity += GRAVITY;
+				spider->VerticalVelocity += g_GameFlow->GetSettings()->Physics.Gravity;
 
 				int dx = LaraItem->Pose.Position.x - spider->Pose.Position.x;
 				int dy = LaraItem->Pose.Position.y - spider->Pose.Position.y;

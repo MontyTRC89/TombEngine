@@ -345,7 +345,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 										}
 									}
 
-									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, false, bestJointIndex);
+									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].AlternateDamage, false, bestJointIndex);
 									hitProcessed = true;
 								}
 								else

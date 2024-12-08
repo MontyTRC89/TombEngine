@@ -15,7 +15,7 @@ struct AmmoPickupInfo
 	int Amount;
 };
 
-static constexpr std::array<AmmoPickupInfo, 14> kAmmo
+static std::array<AmmoPickupInfo, 14> Ammo
 {
 	{
 		{ ID_PISTOLS_AMMO_ITEM, LaraWeaponType::Pistol, WeaponAmmoType::Ammo1, 30 },
@@ -35,13 +35,19 @@ static constexpr std::array<AmmoPickupInfo, 14> kAmmo
 	}
 };
 
+void InitializeAmmo(Settings const& settings)
+{
+	for (auto& entry : Ammo)
+		entry.Amount = settings.Weapons[(int)entry.LaraWeaponType - 1].PickupCount;
+}
+
 bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount, ModificationType modType)
 {
-	int arrayPos = GetArraySlot(kAmmo, objectID);
+	int arrayPos = GetArraySlot(Ammo, objectID);
 	if (arrayPos == NO_VALUE)
 		return false;
 
-	auto ammoPickup = kAmmo[arrayPos];
+	auto ammoPickup = Ammo[arrayPos];
 
 	auto& currentWeapon = lara.Weapons[(int)ammoPickup.LaraWeaponType];
 	auto& currentAmmo = currentWeapon.Ammo[(int)ammoPickup.AmmoType];
@@ -82,11 +88,11 @@ bool TryRemovingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int>
 
 std::optional<int> GetAmmoCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {
-	int arrayPos = GetArraySlot(kAmmo, objectID);
+	int arrayPos = GetArraySlot(Ammo, objectID);
 	if (arrayPos == NO_VALUE)
 		return std::nullopt;
 
-	AmmoPickupInfo info = kAmmo[arrayPos];
+	AmmoPickupInfo info = Ammo[arrayPos];
 
 	if (!lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].HasInfinite())
 		return lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].GetCount();
@@ -97,9 +103,9 @@ std::optional<int> GetAmmoCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
 
 int GetDefaultAmmoCount(GAME_OBJECT_ID objectID)
 {
-	int arrayPos = GetArraySlot(kAmmo, objectID);
+	int arrayPos = GetArraySlot(Ammo, objectID);
 	if (arrayPos == NO_VALUE)
 		return NO_VALUE;
 
-	return kAmmo[arrayPos].Amount;
+	return Ammo[arrayPos].Amount;
 }

@@ -963,7 +963,7 @@ void PickupControl(short itemNumber)
 	switch (triggerFlags)
 	{
 	case 5:
-		item->Animation.Velocity.y += 6.0f;
+		item->Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 		item->Pose.Position.y += item->Animation.Velocity.y;
 		
 		roomNumber = item->RoomNumber;
