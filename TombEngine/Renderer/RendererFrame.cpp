@@ -14,10 +14,12 @@
 #include "Renderer/RenderView.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Entities::Effects;
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
+using namespace TEN::Utils;
 
 namespace TEN::Renderer
 {
@@ -150,18 +152,18 @@ namespace TEN::Renderer
 
 		for (auto& mirror : g_Level.Mirrors)
 		{
-			if (mirror.RoomNumber == LaraItem->RoomNumber)
-			{
-				RendererMirror rendererMirror;
-				rendererMirror.RoomNumber = mirror.RoomNumber;
-				rendererMirror.Plane = Plane(
-					Vector3(mirror.MirrorPlane.x,
-						    mirror.MirrorPlane.y,
-							mirror.MirrorPlane.z),
-					mirror.MirrorPlane.w);
-				rendererMirror.ReflectionMatrix = Matrix::CreateReflection(rendererMirror.Plane);
-				renderView.Mirrors.push_back(rendererMirror);
-			}
+			if (mirror.RoomNumber != Camera.pos.RoomNumber)
+				continue;
+
+			auto& rendererMirror = renderView.Mirrors.emplace_back();
+
+			rendererMirror.RoomNumber = mirror.RoomNumber;
+			rendererMirror.Plane = Plane(
+				Vector3(mirror.MirrorPlane.x,
+						mirror.MirrorPlane.y,
+						mirror.MirrorPlane.z),
+				mirror.MirrorPlane.w);
+			rendererMirror.ReflectionMatrix = Matrix::CreateReflection(rendererMirror.Plane);
 		}
 	}
 
