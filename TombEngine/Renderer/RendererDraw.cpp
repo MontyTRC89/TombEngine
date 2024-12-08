@@ -1811,7 +1811,7 @@ namespace TEN::Renderer
 		pRenderViewPtrs[0] = _normalsRenderTarget.RenderTargetView.Get();
 		pRenderViewPtrs[1] = _depthRenderTarget.RenderTargetView.Get();
 		_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
-
+		   
 		DrawRooms(view, RendererPass::GBuffer);
 		DrawItems(view, RendererPass::GBuffer);
 		DrawStatics(view, RendererPass::GBuffer);
@@ -1822,6 +1822,8 @@ namespace TEN::Renderer
 		DrawEffects(view, RendererPass::GBuffer);
 		DrawRats(view, RendererPass::GBuffer);
 		DrawLocusts(view, RendererPass::GBuffer);
+
+		DownsampleGBuffer();
 
 		// Calculate ambient occlusion.
 		if (g_Configuration.EnableAmbientOcclusion)
@@ -3738,5 +3740,45 @@ namespace TEN::Renderer
 		_gameCamera.Camera.InvViewSize = _currentGameCamera.Camera.InvViewSize;
 		_gameCamera.Camera.NearPlane = _currentGameCamera.Camera.NearPlane;
 		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
+	}
+
+	void Renderer::DownsampleGBuffer()
+	{
+		return;
+		ID3D11RenderTargetView* nullRTVs[2] = { nullptr, nullptr };
+		_context->OMSetRenderTargets(2, nullRTVs, nullptr);
+
+		// Set the compute shader
+		_context->CSSetShader(_csDownsampleGBuffer.Get(), nullptr, 0);
+
+		// Set the shader resource views (SRVs) for input textures
+		_context->CSSetShaderResources(0, 1, _depthRenderTarget.ShaderResourceView.GetAddressOf());
+		_context->CSSetShaderResources(1, 1, _normalsRenderTarget.ShaderResourceView.GetAddressOf());
+
+		// Set the unordered access views (UAVs) for output textures
+		_context->CSSetUnorderedAccessViews(0, 1, _downsampledDepthRenderTarget.UnorderedAccessView.GetAddressOf(), nullptr);
+		_context->CSSetUnorderedAccessViews(1, 1, _downsampledDepthRenderTarget.UnorderedAccessView.GetAddressOf(), nullptr);
+
+		// Set the sampler state
+		ID3D11SamplerState* samplerState = _renderStates->LinearWrap();
+		_context->CSSetSamplers(0, 1, &samplerState);
+		_context->CSSetSamplers(1, 1, &samplerState);
+
+		// Create and set constant buffer for texture size
+		_context->CSSetConstantBuffers(0, 1, _cbCameraMatrices.get());
+
+		// Dispatch the compute shader
+		uint32_t threadGroupX = (_screenWidth + 15) / 16; // Calculate number of thread groups in X
+		uint32_t threadGroupY = (_screenHeight + 15) / 16; // Calculate number of thread groups in Y
+		_context->Dispatch(threadGroupX, threadGroupY, 1);
+
+		// Unbind resources after dispatch
+		ID3D11ShaderResourceView* nullSRVs[2] = { nullptr, nullptr };
+		_context->CSSetShaderResources(0, 2, nullSRVs);
+
+		ID3D11UnorderedAccessView* nullUAVs[2] = { nullptr, nullptr };
+		_context->CSSetUnorderedAccessViews(0, 2, nullUAVs, nullptr);
+
+		_context->CSSetShader(nullptr, nullptr, 0);
 	}
 }

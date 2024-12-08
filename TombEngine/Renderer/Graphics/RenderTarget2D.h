@@ -21,11 +21,12 @@ namespace TEN::Renderer::Graphics
 
 		RenderTarget2D() {};
 
-		RenderTarget2D(ID3D11Device* device, int width, int height, DXGI_FORMAT colorFormat, bool isTypeless, DXGI_FORMAT depthFormat)
+		RenderTarget2D(ID3D11Device* device, int width, int height, DXGI_FORMAT colorFormat, bool isTypeless, DXGI_FORMAT depthFormat, bool forComputeShader)
 		{
 			auto srvDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			auto dsvDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 			auto rtvDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			auto uavDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
 
 			// Set up render target.
 			auto desc = D3D11_TEXTURE2D_DESC{};
@@ -38,6 +39,10 @@ namespace TEN::Renderer::Graphics
 			desc.SampleDesc.Quality = 0;
 			desc.Usage = D3D11_USAGE_DEFAULT;
 			desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+			if (forComputeShader)
+			{
+				desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+			}
 			desc.CPUAccessFlags = 0;
 			desc.MiscFlags = 0;
 
@@ -88,6 +93,14 @@ namespace TEN::Renderer::Graphics
 
 				res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, &DepthStencilView);
 				throwIfFailed(res);
+			}
+
+			if (forComputeShader)
+			{
+				D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+				uavDesc.Format = colorFormat;
+				uavDesc.ViewDimension = uavDimension;
+				res = device->CreateUnorderedAccessView(Texture.Get(), &uavDesc, &UnorderedAccessView);
 			}
 		}
 

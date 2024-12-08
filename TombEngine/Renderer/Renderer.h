@@ -111,6 +111,8 @@ namespace TEN::Renderer
 
 		RenderTarget2D _normalsRenderTarget;
 		RenderTarget2D _depthRenderTarget;
+		RenderTarget2D _downsampledNormalsRenderTarget;
+		RenderTarget2D _downsampledDepthRenderTarget;
 		RenderTarget2D _backBuffer;
 		RenderTarget2D _dumpScreenRenderTarget;
 		RenderTarget2D _renderTarget;
@@ -161,6 +163,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11VertexShader> _vsRoomAmbient;
 		ComPtr<ID3D11VertexShader> _vsRoomAmbientSky;
 		ComPtr<ID3D11PixelShader> _psRoomAmbient;
+		ComPtr<ID3D11ComputeShader> _csDownsampleGBuffer;
 
 		// Constant buffers
 
@@ -478,7 +481,7 @@ namespace TEN::Renderer
 		void DrawSingleSprite(RendererSortableObject* object, RendererObjectType lastObjectType, RenderView& view);
 		void DrawRoomSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view);
 		void DrawItemSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view);
-		void DrawStaticSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view);
+		void DrawStaticSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectTypempile, RenderView& view);
 		void DrawSpriteSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view);
 		void DrawMoveableAsStaticSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view);
 		void DrawLines2D();
@@ -571,6 +574,7 @@ namespace TEN::Renderer
 		void InitializePostProcess();
 		void CreateSSAONoiseTexture();
 		void InitializeSMAA();
+		void DownsampleGBuffer();
 
 		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
 		{

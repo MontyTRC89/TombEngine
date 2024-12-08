@@ -1636,6 +1636,11 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
   <ItemGroup>
     <Image Include="Resources\Ten.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\DownsampleGBuffer.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets')" />

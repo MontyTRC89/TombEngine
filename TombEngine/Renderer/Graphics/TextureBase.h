@@ -11,5 +11,6 @@ namespace TEN::Renderer::Graphics
 	{
 	public:
 		ComPtr<ID3D11ShaderResourceView> ShaderResourceView;
+		ComPtr<ID3D11UnorderedAccessView> UnorderedAccessView;
 	};
 }
