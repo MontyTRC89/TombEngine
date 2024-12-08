@@ -1823,6 +1823,9 @@ namespace TEN::Renderer
 		DrawRats(view, RendererPass::GBuffer);
 		DrawLocusts(view, RendererPass::GBuffer);
 
+		ID3D11RenderTargetView* nullRTVs[2] = { nullptr, nullptr };
+		_context->OMSetRenderTargets(2, &nullRTVs[0], nullptr);
+
 		DownsampleGBuffer();
 
 		// Calculate ambient occlusion.
@@ -3744,10 +3747,6 @@ namespace TEN::Renderer
 
 	void Renderer::DownsampleGBuffer()
 	{
-		return;
-		ID3D11RenderTargetView* nullRTVs[2] = { nullptr, nullptr };
-		_context->OMSetRenderTargets(2, nullRTVs, nullptr);
-
 		// Set the compute shader
 		_context->CSSetShader(_csDownsampleGBuffer.Get(), nullptr, 0);
 
@@ -3757,7 +3756,7 @@ namespace TEN::Renderer
 
 		// Set the unordered access views (UAVs) for output textures
 		_context->CSSetUnorderedAccessViews(0, 1, _downsampledDepthRenderTarget.UnorderedAccessView.GetAddressOf(), nullptr);
-		_context->CSSetUnorderedAccessViews(1, 1, _downsampledDepthRenderTarget.UnorderedAccessView.GetAddressOf(), nullptr);
+		_context->CSSetUnorderedAccessViews(1, 1, _downsampledNormalsRenderTarget.UnorderedAccessView.GetAddressOf(), nullptr);
 
 		// Set the sampler state
 		ID3D11SamplerState* samplerState = _renderStates->LinearWrap();
@@ -3768,8 +3767,8 @@ namespace TEN::Renderer
 		_context->CSSetConstantBuffers(0, 1, _cbCameraMatrices.get());
 
 		// Dispatch the compute shader
-		uint32_t threadGroupX = (_screenWidth + 15) / 16; // Calculate number of thread groups in X
-		uint32_t threadGroupY = (_screenHeight + 15) / 16; // Calculate number of thread groups in Y
+		uint32_t threadGroupX = (_screenWidth / 2 + 15) / 16; // Calculate number of thread groups in X
+		uint32_t threadGroupY = (_screenHeight / 2 + 15) / 16; // Calculate number of thread groups in Y
 		_context->Dispatch(threadGroupX, threadGroupY, 1);
 
 		// Unbind resources after dispatch

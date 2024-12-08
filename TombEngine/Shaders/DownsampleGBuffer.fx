@@ -11,17 +11,12 @@ RWTexture2D<float4> OutNormal : register(u1); // Downsampled normal (RGBA format
 
 float GetDepth(float2 uv)
 {
-    int3 texelCoord = int3(uv * ViewSize, 1);
-    return DepthTarget.Load(texelCoord).r;
-    //return DepthTarget.Sample(DepthTargetSampler, uv, 0).r;
+    return DepthTarget.SampleLevel(DepthTargetSampler, uv, 0).r;
 }
 
 float3 GetNormal(float2 uv)
 {
-    int3 texelCoord = int3(uv * ViewSize, 1);
-    return normalize(NormalTarget.Load(texelCoord) * 2.0f - 1.0f);
-    
-    //return normalize(NormalTarget.Sample(NormalTargetSampler, uv, 0) * 2.0f - 1.0f); // Assuming normals are in range [-1, 1]
+    return normalize(NormalTarget.SampleLevel(NormalTargetSampler, uv, 0) * 2.0f - 1.0f); // Assuming normals are in range [-1, 1]
 }
 
 float DownsampleDepth(float2 uv)
@@ -56,7 +51,7 @@ float3 DownsampleNormal(float2 uv)
 void CS(uint3 dispatchThreadID : SV_DispatchThreadID)
 {
     // Calculate the current texel's UV coordinates for downsampling
-    float2 uv = dispatchThreadID.xy / ViewSize;
+    float2 uv = dispatchThreadID.xy / ViewSize * 2;
 
     // Downsample the depth and normal buffers
     float depth = DownsampleDepth(uv);
