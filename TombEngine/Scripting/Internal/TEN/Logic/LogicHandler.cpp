@@ -323,7 +323,7 @@ Possible event type values:
 */
 void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
 {
-	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)LaraItem->Index);
+	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)short(LaraItem->Index));
 }
 
 /*** Attempt to find an event set and enable specified event in it.

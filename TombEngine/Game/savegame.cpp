@@ -1574,7 +1574,7 @@ bool SaveGame::Save(int slot)
 		return false;
 
 	g_GameScript->OnSave();
-	HandleAllGlobalEvents(EventType::Save, (Activator)LaraItem->Index);
+	HandleAllGlobalEvents(EventType::Save, (Activator)short(LaraItem->Index));
 
 	// Savegame infos need to be reloaded so that last savegame counter properly increases.
 	LoadHeaders();
