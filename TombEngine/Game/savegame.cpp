@@ -1629,7 +1629,7 @@ bool SaveGame::Load(int slot)
 {
 	if (!IsSaveGameValid(slot))
 	{
-		TENLog("Loading from savegame in slot " + std::to_string(slot) + " is impossible, data is incorrect or missing.", LogLevel::Error);
+		TENLog("Loading from savegame in slot " + std::to_string(slot) + " is impossible, data is missing or level has changed.", LogLevel::Error);
 		return false;
 	}
 
