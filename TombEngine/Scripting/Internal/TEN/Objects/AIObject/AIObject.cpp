@@ -3,7 +3,7 @@
 
 #include "AIObject.h"
 #include "Scripting/Internal/ScriptAssert.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 /***

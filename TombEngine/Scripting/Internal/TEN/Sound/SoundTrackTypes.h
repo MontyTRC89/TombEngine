@@ -19,7 +19,7 @@ The following constants are inside SoundTrackType.
 */
 
 /*** Table of sound track type constants (for use with sound track functions).
-@table CONSTANT_STRING_HERE
+@table SoundTrackType
 */
 
 static const std::unordered_map<std::string, SoundTrackType> SOUNDTRACK_TYPE

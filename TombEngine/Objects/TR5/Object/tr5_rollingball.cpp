@@ -15,6 +15,7 @@
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Collision::Point;
 
@@ -70,7 +71,7 @@ void RollingBallControl(short itemNumber)
 	int smallRadius = CLICK(0.5f);
 	int bigRadius   = CLICK(2) - 1;
 
-	item->Animation.Velocity.y += GRAVITY;
+	item->Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 	item->Pose.Position.x += item->ItemFlags[0] / hDivider;
 	item->Pose.Position.y += item->Animation.Velocity.y / vDivider;
 	item->Pose.Position.z += item->ItemFlags[1] / hDivider;

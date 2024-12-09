@@ -27,7 +27,7 @@ The following constants are inside EffectID.
 */
 
 /*** Table of effect ID constants (for use Moveable:SetEffect / Moveable:GetEffect functions).
-@table CONSTANT_STRING_HERE
+@table EffectID
 */
 
 static const std::unordered_map<std::string, EffectType> EFFECT_IDS

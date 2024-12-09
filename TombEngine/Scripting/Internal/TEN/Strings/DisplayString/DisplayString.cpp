@@ -5,7 +5,7 @@
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 
 /*** A string appearing on the screen.
 Can be used for subtitles and "2001, somewhere in Egypt"-style messages.

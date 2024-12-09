@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Game/control/control.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 
 /***
 Constants for Display String Options.

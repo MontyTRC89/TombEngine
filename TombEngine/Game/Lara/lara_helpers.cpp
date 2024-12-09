@@ -56,9 +56,8 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update AFK pose timer.
-	if (lara->Control.Count.Pose < PLAYER_POSE_TIME && 
-		!(IsHeld(In::Look) || IsOpticActionHeld()) &&
-		g_GameFlow->HasAFKPose())
+	if (lara->Control.Count.Pose < (g_GameFlow->GetSettings()->Animations.PoseTimeout * FPS) &&
+		!(IsHeld(In::Look) || IsOpticActionHeld()))
 	{
 		lara->Control.Count.Pose++;
 	}
@@ -1024,7 +1023,7 @@ void EasePlayerElevation(ItemInfo* item, int relHeight)
 	// Handle swamp case.
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && relHeight > 0)
 	{
-		item->Pose.Position.y += SWAMP_GRAVITY;
+		item->Pose.Position.y += g_GameFlow->GetSettings()->Physics.Gravity / SWAMP_GRAVITY;
 		return;
 	}
 
@@ -1292,7 +1291,7 @@ short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 		return coll->Setup.ForwardAngle;
 
 	// Return slide heading angle.
-	if (g_GameFlow->HasSlideExtended())
+	if (g_GameFlow->GetSettings()->Animations.SlideExtended)
 	{
 		return Geometry::GetSurfaceAspectAngle(pointColl.GetFloorNormal());
 	}
@@ -1485,7 +1484,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	constexpr int minVelocity = 50;
 	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
 
-	if (g_GameFlow->HasSlideExtended())
+	if (g_GameFlow->GetSettings()->Animations.SlideExtended)
 	{
 		auto probe = GetPointCollision(*item);
 		short minSlideAngle = ANGLE(33.75f);
@@ -1635,7 +1634,7 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	short headinAngle = GetPlayerSlideHeadingAngle(item, coll);
 	short deltaAngle = headinAngle - item->Pose.Orientation.y;
 
-	if (!g_GameFlow->HasSlideExtended())
+	if (!g_GameFlow->GetSettings()->Animations.SlideExtended)
 		item->Pose.Orientation.y = headinAngle;
 
 	// Snap to height upon slide entrance.
@@ -1698,7 +1697,7 @@ void SetLaraSwimDiveAnimation(ItemInfo* item)
 
 	SetAnimation(item, LA_ONWATER_DIVE);
 	item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
-	item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX * 0.4f;
+	item->Animation.Velocity.y = g_GameFlow->GetSettings()->Physics.SwimVelocity * 0.4f;
 	item->Pose.Orientation.x = -ANGLE(45.0f);
 	lara->Control.WaterStatus = WaterStatus::Underwater;
 }

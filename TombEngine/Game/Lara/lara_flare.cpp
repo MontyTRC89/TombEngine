@@ -15,14 +15,17 @@
 #include "Game/Lara/lara_tests.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/Effects/LensFlare.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Entities::Effects;
 using namespace TEN::Math;
 
-constexpr auto FLARE_LIFE_MAX	 = 60.0f * FPS;
 constexpr auto FLARE_DEATH_DELAY = 1.0f  * FPS;
 
 void FlareControl(short itemNumber)
@@ -62,7 +65,7 @@ void FlareControl(short itemNumber)
 	}
 	else
 	{
-		flareItem.Animation.Velocity.y += 6;
+		flareItem.Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 	}
 
 	flareItem.Pose.Position.y += flareItem.Animation.Velocity.y;
@@ -70,7 +73,7 @@ void FlareControl(short itemNumber)
 
 	int& life = flareItem.Data;
 	life &= 0x7FFF;
-	if (life >= FLARE_LIFE_MAX)
+	if (life >= g_GameFlow->GetSettings()->Flare.Timeout * FPS)
 	{
 		if (flareItem.Animation.Velocity.y == 0.0f &&
 			flareItem.Animation.Velocity.z == 0.0f)
@@ -84,7 +87,8 @@ void FlareControl(short itemNumber)
 		life++;
 	}
 
-	if (DoFlareLight(flareItem.Pose.Position, life))
+	auto lightPos = GetJointPosition(flareItem, 0, Vector3i(0, 0, 48));
+	if (DoFlareLight(lightPos, flareItem, life))
 	{
 		TriggerChaffEffects(flareItem, life);
 		life |= 0x8000;
@@ -376,7 +380,7 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 		flareItem.Data = (int)0;
 		int& life = flareItem.Data;
 
-		if (DoFlareLight(flareItem.Pose.Position, lara.Flare.Life))
+		if (DoFlareLight(flareItem.Pose.Position, flareItem, lara.Flare.Life))
 			life = lara.Flare.Life | 0x8000;
 		else
 			life = lara.Flare.Life & 0x7FFF;
@@ -396,10 +400,10 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 
 	auto pos = GetJointPosition(&laraItem, LM_LHAND, Vector3i(11, 32, 41));
 
-	if (DoFlareLight(pos, flareLife))
+	if (DoFlareLight(pos, laraItem, flareLife))
 		TriggerChaffEffects(lara.Control.Look.IsUsingBinoculars ? 0 : flareLife);
 
-	if (lara.Flare.Life >= FLARE_LIFE_MAX - (FLARE_DEATH_DELAY / 2))
+	if (lara.Flare.Life >= g_GameFlow->GetSettings()->Flare.Timeout * FPS - (FLARE_DEATH_DELAY / 2))
 	{
 		// Prevent player from intercepting reach/jump states with flare throws.
 		if (laraItem.Animation.IsAirborne ||
@@ -418,7 +422,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 	}
 }
 
-bool DoFlareLight(const Vector3i& pos, int flareLife)
+bool DoFlareLight(const Vector3i& pos, ItemInfo& item, int flareLife)
 {
 	constexpr auto START_DELAY				 = 0.25f * FPS;
 	constexpr auto END_DELAY				 = 3.0f  * FPS;
@@ -427,18 +431,20 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	constexpr auto CHAFF_SPAWN_CHANCE		 = 4 / 10.0f;
 	constexpr auto CHAFF_SPAWN_ENDING_CHANCE = CHAFF_SPAWN_CHANCE / 2;
 	constexpr auto CHAFF_SPAWN_DYING_CHANCE	 = CHAFF_SPAWN_CHANCE / 4;
-	constexpr auto LIGHT_RADIUS				 = 9.0f;
 	constexpr auto LIGHT_SPHERE_RADIUS		 = BLOCK(1 / 16.0f);
 	constexpr auto LIGHT_POS_OFFSET			 = Vector3(0.0f, -BLOCK(1 / 8.0f), 0.0f);
-	constexpr auto LIGHT_COLOR				 = Vector3(0.9f, 0.5f, 0.3f);
 
-	if (flareLife >= FLARE_LIFE_MAX || flareLife == 0)
+	auto flareRange = g_GameFlow->GetSettings()->Flare.Range * BLOCK(0.25f);
+	auto flareColor = Vector3(g_GameFlow->GetSettings()->Flare.Color);
+	auto flareTimeout = g_GameFlow->GetSettings()->Flare.Timeout * FPS;
+
+	if (flareLife >= flareTimeout || flareLife == 0)
 		return false;
 
 	// Determine flare progress.
 	bool isStarting = (flareLife <= START_DELAY);
-	bool isEnding   = (flareLife >  (FLARE_LIFE_MAX - END_DELAY));
-	bool isDying    = (flareLife >  (FLARE_LIFE_MAX - FLARE_DEATH_DELAY));
+	bool isEnding   = (flareLife >  (flareTimeout - END_DELAY));
+	bool isDying    = (flareLife >  (flareTimeout - FLARE_DEATH_DELAY));
 
 	bool spawnChaff = false;
 	float mult = 1.0f;
@@ -450,7 +456,7 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	}
 	else if (isDying)
 	{
-		mult = (FLARE_LIFE_MAX - (float)flareLife) / FLARE_DEATH_DELAY;
+		mult = (flareTimeout - (float)flareLife) / FLARE_DEATH_DELAY;
 		spawnChaff = Random::TestProbability(CHAFF_SPAWN_DYING_CHANCE);
 	}
 	else if (isEnding)
@@ -464,15 +470,37 @@ bool DoFlareLight(const Vector3i& pos, int flareLife)
 	}
 
 	// Determine light position.
-	auto sphere = BoundingSphere(pos.ToVector3() + LIGHT_POS_OFFSET, LIGHT_SPHERE_RADIUS);
-	auto lightPos = Random::GeneratePointInSphere(sphere);
+	auto lightPos = pos.ToVector3();
+	auto intensity = 1.0f;
+
+	// Flicker effect, if specified.
+	if (g_GameFlow->GetSettings()->Flare.Flicker)
+	{
+		auto sphere = BoundingSphere(pos.ToVector3() + LIGHT_POS_OFFSET, LIGHT_SPHERE_RADIUS);
+		lightPos = Random::GeneratePointInSphere(sphere);
+		intensity = Random::GenerateFloat(INTENSITY_MIN, INTENSITY_MAX);
+	}
 
 	// Calculate color.
-	float intensity = Random::GenerateFloat(INTENSITY_MIN, INTENSITY_MAX);
-	float falloff = intensity * mult * LIGHT_RADIUS;
-	auto color = (LIGHT_COLOR * intensity * std::clamp(mult, 0.0f, 1.0f)) * UCHAR_MAX;
+	float falloff = intensity * mult * flareRange;
+	auto color = (flareColor * intensity * std::clamp(mult, 0.0f, 1.0f));
 
-	TriggerDynamicLight(lightPos.x, lightPos.y, lightPos.z, (int)falloff, color.x, color.y, color.z);
+	// Trigger dynamic light.
+	TriggerDynamicPointLight(lightPos, Color(color), falloff, false);
+
+	// Spawn lensflare, if brightness is not zero.
+	float lensflareBrightness = g_GameFlow->GetSettings()->Flare.LensflareBrightness;
+	if (lensflareBrightness > EPSILON)
+	{
+		if (item.ObjectNumber == GAME_OBJECT_ID::ID_FLARE_ITEM)
+		{
+			float currentIntensity = (float)item.ItemFlags[0] / LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE;
+			SetupLensFlare(pos.ToVector3(), item.RoomNumber, Color(color) * lensflareBrightness, &currentIntensity, 0);
+			item.ItemFlags[0] = (short)(currentIntensity * LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE);
+		}
+		else
+			SetupLensFlare(pos.ToVector3(), item.RoomNumber, Color(color) * lensflareBrightness, nullptr, 0);
+	}
 
 	// Return chaff spawn status.
 	return ((isDying || isEnding) ? spawnChaff : true);

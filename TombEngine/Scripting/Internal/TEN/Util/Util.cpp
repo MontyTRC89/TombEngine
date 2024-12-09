@@ -12,9 +12,9 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Objects/Static/StaticObject.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Util/LevelLog.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 

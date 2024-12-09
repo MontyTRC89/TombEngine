@@ -186,13 +186,11 @@ HandStatus LaraObject::GetHandStatus() const
 	return  HandStatus{ lara->Control.HandStatus };
 }
 
-//todo make these into enums - Squidshire 18/11/2022
-
 /// Get actual weapon type of Lara
 // @function LaraObject:GetWeaponType
 // @usage
 // local weaponType = Lara:GetWeaponType()
-// @treturn int weapon type 0=None, 1=Pistols, 2=Revolver, 3=Uzi, 4=Shotgun, 5=HK, 6=Crossbow, 7=Flare, 8=Torch, 9=GrenadeLauncher, 10=Harpoon, 11=RocketLauncher.
+// @treturn Flow.WeaponType current weapon type.
 LaraWeaponType LaraObject::GetWeaponType() const
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -202,21 +200,8 @@ LaraWeaponType LaraObject::GetWeaponType() const
 /// Set Lara weapon type
 // @function LaraObject:SetWeaponType
 // @usage
-// Lara:SetWeaponType(LaraWeaponType.PISTOLS, false)
-// @tparam LaraWeaponType weaponType
-// Must be one of:
-//	NONE
-//	PISTOLS
-//	REVOLVER
-//	UZI
-//	SHOTGUN
-//	HK
-//	CROSSBOW
-//	FLARE
-//	TORCH
-//	GRENADELAUNCHER
-//	HARPOONGUN
-//	ROCKETLAUNCHER
+// Lara:SetWeaponType(WeaponType.PISTOLS, false)
+// @tparam Flow.WeaponType weaponType 
 // @tparam bool activate true = let her also draw the weapons, set torch lit. false = let Laras new weapons remain holstered until she draws them, set torch unlit.
 void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 {
