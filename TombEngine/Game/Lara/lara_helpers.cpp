@@ -342,6 +342,10 @@ void HandlePlayerQuickActions(ItemInfo& item)
 		g_Gui.UseItem(item, GAME_OBJECT_ID::ID_BIGMEDI_ITEM);
 	}
 
+	// Don't process weapon hotkeys in optics mode.
+	if (player.Control.Look.IsUsingBinoculars)
+		return;
+
 	// Handle weapon scroll request.
 	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
 	{
