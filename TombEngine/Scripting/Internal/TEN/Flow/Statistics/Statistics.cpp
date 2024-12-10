@@ -22,7 +22,7 @@ void Statistics::Register(sol::table& parent)
 		"ammoUsed", &Statistics::AmmoUsed,
 
 		/*** Distance traveled.
-		@tfield int traveledDistance amount of traveled distance (approximately in meters). */
+		@tfield int traveledDistance amount of traveled distance in world units. One meter is 420 world units. */
 		"traveledDistance", &Statistics::Distance,
 
 		/*** Health packs used.
