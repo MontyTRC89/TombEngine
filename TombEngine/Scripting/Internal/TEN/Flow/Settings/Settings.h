@@ -39,7 +39,7 @@ struct FlareSettings
 	bool Smoke = true;
 	bool Flicker = true;
 	int Range = 9;
-	int Timeout = 60 * FPS;
+	int Timeout = 60;
 	int PickupCount = 12;
 
 	static void Register(sol::table& parent);
