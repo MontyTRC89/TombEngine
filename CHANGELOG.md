@@ -41,6 +41,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added fast savegame reloading.
 * Added ability to customize many hardcoded parameters, such as flare, weapon, and hair settings.
 * Added ricochet sounds and make the effect more prominent.
+* Allow camera shake during flybys.
 * Allow to run the engine without title level.
 * Allow more than 1024 objects in a level.
 * Allow more than 1000 static mesh slots in a level.

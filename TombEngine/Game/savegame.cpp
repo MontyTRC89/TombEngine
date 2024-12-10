@@ -206,6 +206,19 @@ bool SaveGame::DoesSaveGameExist(int slot, bool silent)
 	return true;
 }
 
+bool SaveGame::IsSaveGameValid(int slot)
+{
+	SaveGameHeader header;
+	if (!LoadHeader(slot, &header))
+		return false;
+
+	// Hash mismatch between savegame and level file means that level version has changed.
+	if (header.LevelHash != LastLevelHash)
+		return false;
+
+	return true;
+}
+
 bool SaveGame::IsLoadGamePossible()
 {
 	for (int i = 0; i < SAVEGAME_MAX; i++)
@@ -1614,15 +1627,9 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	if (!IsSaveGameSlotValid(slot))
+	if (!IsSaveGameValid(slot))
 	{
-		TENLog("Savegame slot " + std::to_string(slot) + " is invalid, load is impossible.", LogLevel::Error);
-		return false;
-	}
-
-	if (!DoesSaveGameExist(slot))
-	{
-		TENLog("Savegame in slot " + std::to_string(slot) + " does not exist.", LogLevel::Error);
+		TENLog("Loading from savegame in slot " + std::to_string(slot) + " is impossible, data is missing or level has changed.", LogLevel::Error);
 		return false;
 	}
 

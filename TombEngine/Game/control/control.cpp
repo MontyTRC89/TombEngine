@@ -594,8 +594,14 @@ void InitializeOrLoadGame(bool loadGame)
 	g_Gui.SetEnterInventory(NO_VALUE);
 
 	// Restore game?
-	if (loadGame && SaveGame::Load(g_GameFlow->SelectedSaveGame))
+	if (loadGame)
 	{
+		if (!SaveGame::Load(g_GameFlow->SelectedSaveGame))
+		{
+			NextLevel = g_GameFlow->GetNumLevels();
+			return;
+		}
+
 		InitializeGame = false;
 
 		g_GameFlow->SelectedSaveGame = 0;

@@ -66,6 +66,7 @@ public:
 
 	static bool DoesSaveGameExist(int slot, bool silent = false);
 	static bool IsLoadGamePossible();
+	static bool IsSaveGameValid(int slot);
 
 	static void SaveHub(int index);
 	static void LoadHub(int index);
