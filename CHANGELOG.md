@@ -40,6 +40,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### New Features
 * Added fast savegame reloading.
 * Added ability to customize many hardcoded parameters, such as flare, weapon, and hair settings.
+* Added dynamic shadow casting on objects and static meshes.
 * Added ricochet sounds and make the effect more prominent.
 * Allow camera shake during flybys.
 * Allow to run the engine without title level.
@@ -47,12 +48,13 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Allow more than 1000 static mesh slots in a level.
 
 ### Lua API changes
-* Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
+* Added Flow.Statistics class, Flow.GetStatistics() and Flow.SetStatistics() functions.
 * Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
 * Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
 * Added Effects.EmitSpotLight() function for directional spotlights.
 * Added optional cast shadow and name parameters for Effects.EmitLight() function.
 * Added Effects.GetWind() function to get current wind speed vector.
+* Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
 * Added Rotation:Direction() method to get directional vector.
 * Added support for transparency value in DisplayString class.
 * Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
