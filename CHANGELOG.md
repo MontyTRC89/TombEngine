@@ -39,6 +39,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### New Features
 * Added fast savegame reloading.
+* Added dynamic shadow casting on objects and static meshes.
 * Added ricochet sounds and make the effect more prominent.
 * Allow camera shake during flybys.
 * Allow to run the engine without title level.
