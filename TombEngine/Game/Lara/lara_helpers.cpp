@@ -112,7 +112,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 			player.Status.Poison = LARA_POISON_MAX;
 
 		if (!(Wibble & 0xFF))
-			item.HitPoints -= player.Status.Poison;
+			DoDamage(&item, player.Status.Poison, true);
 	}
 
 	// Update stamina status.
@@ -134,7 +134,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 				if (player.Status.Air < 0)
 				{
 					player.Status.Air = -1;
-					item.HitPoints -= 10;
+					DoDamage(&item, 10, true);
 				}
 			}
 		}
@@ -168,7 +168,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 							if (player.Status.Exposure <= 0)
 							{
 								player.Status.Exposure = 0;
-								item.HitPoints -= 10;
+								DoDamage(&item, 10, true);
 							}
 						}
 					}
@@ -188,7 +188,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 					if (player.Status.Exposure <= 0)
 					{
 						player.Status.Exposure = 0;
-						item.HitPoints -= 10;
+						DoDamage(&item, 10, true);
 					}
 				}
 				else
@@ -211,8 +211,8 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 
 			if (player.Status.Air < 0)
 			{
-				item.HitPoints -= 5;
 				player.Status.Air = -1;
+				DoDamage(&item, 5, true);
 			}
 
 			if (water.IsCold)
@@ -221,7 +221,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 				if (player.Status.Exposure <= 0)
 				{
 					player.Status.Exposure = 0;
-					item.HitPoints -= 10;
+					DoDamage(&item, 10, true);
 				}
 			}
 			else
@@ -247,7 +247,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 				if (player.Status.Exposure <= 0)
 				{
 					player.Status.Exposure = 0;
-					item.HitPoints -= 10;
+					DoDamage(&item, 10, true);
 				}
 			}
 		}
@@ -1167,7 +1167,7 @@ void DoLaraFallDamage(ItemInfo* item)
 		else
 		{
 			float base = item->Animation.Velocity.y - (LARA_DAMAGE_VELOCITY - 1.0f);
-			item->HitPoints -= LARA_HEALTH_MAX * (SQUARE(base) / 196.0f);
+			DoDamage(item, LARA_HEALTH_MAX * (SQUARE(base) / 196.0f));
 		}
 
 		float rumblePower = (item->Animation.Velocity.y / LARA_DEATH_VELOCITY) * RUMBLE_POWER_COEFF;

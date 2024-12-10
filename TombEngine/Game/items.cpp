@@ -829,7 +829,7 @@ bool UpdateItemRoom(short itemNumber)
 	return false;
 }
 
-void DoDamage(ItemInfo* item, int damage)
+void DoDamage(ItemInfo* item, int damage, bool silent)
 {
 	static int lastHurtTime = 0;
 
@@ -854,14 +854,17 @@ void DoDamage(ItemInfo* item, int damage)
 	{
 		if (damage > 0)
 		{
-			float power = item->HitPoints ? Random::GenerateFloat(0.1f, 0.4f) : 0.5f;
-			Rumble(power, 0.15f);
+			if (!silent)
+			{
+				float power = item->HitPoints ? Random::GenerateFloat(0.1f, 0.4f) : 0.5f;
+				Rumble(power, 0.15f);
+			}
 
 			SaveGame::Statistics.Game.DamageTaken += damage;
 			SaveGame::Statistics.Level.DamageTaken += damage;
 		}
 
-		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + Random::GenerateInt(0, FPS)))
+		if (!silent && (GlobalCounter - lastHurtTime) > (FPS * 2 + Random::GenerateInt(0, FPS)))
 		{
 			SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
 			lastHurtTime = GlobalCounter;
