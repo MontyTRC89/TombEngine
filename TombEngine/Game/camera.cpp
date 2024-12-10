@@ -222,22 +222,19 @@ void CalculateBounce(bool binocularMode)
 
 	if (Camera.bounce <= 0)
 	{
-		if (GlobalCounter & 3)
+		if (binocularMode)
 		{
-			if (binocularMode)
-			{
-				Camera.target.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
-				Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
-				Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
-			}
-			else
-			{
-				int bounce = -Camera.bounce;
-				int bounce2 = bounce / 2;
-				Camera.target.x += GetRandomControl() % bounce - bounce2;
-				Camera.target.y += GetRandomControl() % bounce - bounce2;
-				Camera.target.z += GetRandomControl() % bounce - bounce2;
-			}
+			Camera.target.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+		}
+		else
+		{
+			int bounce = -Camera.bounce;
+			int bounce2 = bounce / 2;
+			Camera.target.x += GetRandomControl() % bounce - bounce2;
+			Camera.target.y += GetRandomControl() % bounce - bounce2;
+			Camera.target.z += GetRandomControl() % bounce - bounce2;
 		}
 
 		Camera.bounce += 5;
