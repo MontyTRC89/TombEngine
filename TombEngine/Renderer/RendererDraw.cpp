@@ -3663,13 +3663,13 @@ namespace TEN::Renderer
 
 		_context->ClearRenderTargetView(_SSAORenderTarget.RenderTargetView.Get(), Colors::White);
 		_context->OMSetRenderTargets(1, _SSAORenderTarget.RenderTargetView.GetAddressOf(), nullptr);
-
+		    
 		// Need to set correctly the viewport because SSAO is done at 1/4 screen resolution
 		D3D11_VIEWPORT viewport;
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
-		viewport.Width = _screenWidth;
-		viewport.Height = _screenHeight;
+		viewport.Width = _screenWidth / 2.0f;
+		viewport.Height = _screenHeight / 2.0f;
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 
@@ -3691,14 +3691,46 @@ namespace TEN::Renderer
 
 		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
-		BindRenderTargetAsTexture(static_cast<TextureRegister>(0), &_depthRenderTarget, SamplerStateRegister::PointWrap);
-		BindRenderTargetAsTexture(static_cast<TextureRegister>(1), &_normalsRenderTarget, SamplerStateRegister::PointWrap);
+		BindRenderTargetAsTexture(static_cast<TextureRegister>(0), &_downsampledDepthRenderTarget, SamplerStateRegister::PointWrap);
+		BindRenderTargetAsTexture(static_cast<TextureRegister>(1), &_downsampledNormalsRenderTarget, SamplerStateRegister::PointWrap);
 		BindTexture(static_cast<TextureRegister>(2), &_SSAONoiseTexture, SamplerStateRegister::PointWrap);
 
 		_stPostProcessBuffer.ViewportWidth = viewport.Width;
 		_stPostProcessBuffer.ViewportHeight = viewport.Height;
 		memcpy(_stPostProcessBuffer.SSAOKernel, _SSAOKernel.data(), 16 * _SSAOKernel.size());
 		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
+		
+		DrawTriangles(3, 0);
+
+		// Reset viewport
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = _screenWidth;
+		viewport.Height = _screenHeight;
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+
+		_context->RSSetViewports(1, &viewport);
+		  
+		rects[0].left = 0;
+		rects[0].right = viewport.Width;
+		rects[0].top = 0;
+		rects[0].bottom = viewport.Height;
+		 
+		_context->RSSetScissorRects(1, rects);
+
+		// Upscale step
+		_context->PSSetShader(_psSSAOUpscale.Get(), nullptr, 0);
+		 
+		_context->ClearRenderTargetView(_SSAOUpscaledRenderTarget.RenderTargetView.Get(), Colors::White);
+		ID3D11RenderTargetView* RTVs[1] = {
+			_SSAOUpscaledRenderTarget.RenderTargetView.Get(),
+		};
+		_context->OMSetRenderTargets(1, RTVs, nullptr);
+		 
+		BindRenderTargetAsTexture(static_cast<TextureRegister>(0), &_depthRenderTarget, SamplerStateRegister::PointWrap);
+		BindRenderTargetAsTexture(static_cast<TextureRegister>(1), &_normalsRenderTarget, SamplerStateRegister::PointWrap);
+		BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAORenderTarget, SamplerStateRegister::PointWrap);
 
 		DrawTriangles(3, 0);
 
@@ -3708,7 +3740,7 @@ namespace TEN::Renderer
 		_context->ClearRenderTargetView(_SSAOBlurredRenderTarget.RenderTargetView.Get(), Colors::Black);
 		_context->OMSetRenderTargets(1, _SSAOBlurredRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
 
-		BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAORenderTarget, SamplerStateRegister::PointWrap);
+		BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAOUpscaledRenderTarget, SamplerStateRegister::PointWrap);
  
 		DrawTriangles(3, 0);
 	}
@@ -3747,37 +3779,73 @@ namespace TEN::Renderer
 
 	void Renderer::DownsampleGBuffer()
 	{
-		// Set the compute shader
-		_context->CSSetShader(_csDownsampleGBuffer.Get(), nullptr, 0);
+		_doingFullscreenPass = true;
 
-		// Set the shader resource views (SRVs) for input textures
-		_context->CSSetShaderResources(0, 1, _depthRenderTarget.ShaderResourceView.GetAddressOf());
-		_context->CSSetShaderResources(1, 1, _normalsRenderTarget.ShaderResourceView.GetAddressOf());
+		SetBlendMode(BlendMode::Opaque);
+		SetCullMode(CullMode::CounterClockwise);
+		SetDepthState(DepthState::Write);
 
-		// Set the unordered access views (UAVs) for output textures
-		_context->CSSetUnorderedAccessViews(0, 1, _downsampledDepthRenderTarget.UnorderedAccessView.GetAddressOf(), nullptr);
-		_context->CSSetUnorderedAccessViews(1, 1, _downsampledNormalsRenderTarget.UnorderedAccessView.GetAddressOf(), nullptr);
+		// Common vertex shader to all full screen effects
+		_context->VSSetShader(_vsPostProcess.Get(), nullptr, 0);
 
-		// Set the sampler state
-		ID3D11SamplerState* samplerState = _renderStates->LinearWrap();
-		_context->CSSetSamplers(0, 1, &samplerState);
-		_context->CSSetSamplers(1, 1, &samplerState);
+		// SSAO pixel shader
+		_context->PSSetShader(_psDownsampleGBuffer.Get(), nullptr, 0);
 
-		// Create and set constant buffer for texture size
-		_context->CSSetConstantBuffers(0, 1, _cbCameraMatrices.get());
+		_context->ClearRenderTargetView(_downsampledDepthRenderTarget.RenderTargetView.Get(), Colors::White);
+		_context->ClearRenderTargetView(_downsampledNormalsRenderTarget.RenderTargetView.Get(), Colors::White);
+		ID3D11RenderTargetView* RTVs[2] = {
+			_downsampledNormalsRenderTarget.RenderTargetView.Get(),
+			_downsampledDepthRenderTarget.RenderTargetView.Get()
+		};
+		_context->OMSetRenderTargets(2, RTVs, nullptr);
 
-		// Dispatch the compute shader
-		uint32_t threadGroupX = (_screenWidth / 2 + 15) / 16; // Calculate number of thread groups in X
-		uint32_t threadGroupY = (_screenHeight / 2 + 15) / 16; // Calculate number of thread groups in Y
-		_context->Dispatch(threadGroupX, threadGroupY, 1);
+		D3D11_VIEWPORT viewport;
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = _screenWidth / 2.0f;
+		viewport.Height = _screenHeight / 2.0f;
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
 
-		// Unbind resources after dispatch
-		ID3D11ShaderResourceView* nullSRVs[2] = { nullptr, nullptr };
-		_context->CSSetShaderResources(0, 2, nullSRVs);
+		_context->RSSetViewports(1, &viewport);
 
-		ID3D11UnorderedAccessView* nullUAVs[2] = { nullptr, nullptr };
-		_context->CSSetUnorderedAccessViews(0, 2, nullUAVs, nullptr);
+		D3D11_RECT rects[1];
+		rects[0].left = 0;
+		rects[0].right = viewport.Width;
+		rects[0].top = 0;
+		rects[0].bottom = viewport.Height;
 
-		_context->CSSetShader(nullptr, nullptr, 0);
+		_context->RSSetScissorRects(1, rects);
+
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetInputLayout(_fullscreenTriangleInputLayout.Get());
+
+		UINT stride = sizeof(PostProcessVertex);
+		UINT offset = 0;
+
+		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		   
+		BindRenderTargetAsTexture(static_cast<TextureRegister>(0), &_depthRenderTarget, SamplerStateRegister::PointWrap);
+		BindRenderTargetAsTexture(static_cast<TextureRegister>(1), &_normalsRenderTarget, SamplerStateRegister::PointWrap);
+
+		DrawTriangles(3, 0);
+
+		viewport.TopLeftX = 0;
+		viewport.TopLeftY = 0;
+		viewport.Width = _screenWidth;
+		viewport.Height = _screenHeight;
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+
+		_context->RSSetViewports(1, &viewport);
+
+		rects[0].left = 0;
+		rects[0].right = viewport.Width;
+		rects[0].top = 0;
+		rects[0].bottom = viewport.Height;
+
+		_context->RSSetScissorRects(1, rects);
+
+		_doingFullscreenPass = false;
 	}
 }

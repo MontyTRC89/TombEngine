@@ -163,7 +163,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11VertexShader> _vsRoomAmbient;
 		ComPtr<ID3D11VertexShader> _vsRoomAmbientSky;
 		ComPtr<ID3D11PixelShader> _psRoomAmbient;
-		ComPtr<ID3D11ComputeShader> _csDownsampleGBuffer;
+		ComPtr<ID3D11PixelShader> _psDownsampleGBuffer;
 
 		// Constant buffers
 
@@ -390,8 +390,10 @@ namespace TEN::Renderer
 		ComPtr<ID3D11VertexShader> _vsSSAO;
 		ComPtr<ID3D11PixelShader> _psSSAO;
 		ComPtr<ID3D11PixelShader> _psSSAOBlur;
+		ComPtr<ID3D11PixelShader> _psSSAOUpscale;
 		Texture2D _SSAONoiseTexture;
 		RenderTarget2D _SSAORenderTarget;
+		RenderTarget2D _SSAOUpscaledRenderTarget;
 		RenderTarget2D _SSAOBlurredRenderTarget;
 		std::vector<Vector4> _SSAOKernel;
 

@@ -98,11 +98,13 @@ namespace TEN::Renderer
 		_psFXAA = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\FXAA.fx"), "PS", "ps_5_0", nullptr, blob);
 		_psSSAO = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\SSAO.fx"), "PS", "ps_5_0", nullptr, blob);
 		_psSSAOBlur = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\SSAO.fx"), "PSBlur", "ps_5_0", nullptr, blob);
+		_psSSAOUpscale = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\SSAO.fx"), "PSUpscale", "ps_5_0", nullptr, blob);
 
 		const D3D_SHADER_MACRO transparentDefines[] = { "TRANSPARENT", "", nullptr, nullptr };
 		_psRoomsTransparent = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\Rooms.fx"), "PS", "ps_5_0", &transparentDefines[0], blob);
 
-		_csDownsampleGBuffer = Utils::compileComputeShader(_device.Get(), GetAssetPath(L"Shaders\\DownsampleGBuffer.fx"), "CS", "cs_5_0", nullptr, blob);
+		//_csDownsampleGBuffer = Utils::compileComputeShader(_device.Get(), GetAssetPath(L"Shaders\\DownsampleGBuffer.fx"), "CS", "cs_5_0", nullptr, blob);
+		_psDownsampleGBuffer = Utils::compilePixelShader(_device.Get(), GetAssetPath(L"Shaders\\DownsampleGBuffer.fx"), "PS", "ps_5_0", nullptr, blob);
 
 		// Initialize constant buffers
 		_cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();
@@ -528,10 +530,11 @@ namespace TEN::Renderer
 		_shadowMap = Texture2DArray(_device.Get(), g_Configuration.ShadowMapSize, 6, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D24_UNORM_S8_UINT);
 		_depthRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, false, DXGI_FORMAT_UNKNOWN, false);
 		_normalsRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN, false);
-		_SSAORenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN, false);
+		_SSAORenderTarget = RenderTarget2D(_device.Get(), w / 2.0f, h / 2.0f, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN, false);
+		_SSAOUpscaledRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN, false);
 		_SSAOBlurredRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN, false);
-		_downsampledDepthRenderTarget = RenderTarget2D(_device.Get(), w / 2, h / 2, DXGI_FORMAT_R32_FLOAT, false, DXGI_FORMAT_UNKNOWN, true);
-		_downsampledNormalsRenderTarget = RenderTarget2D(_device.Get(), w / 2, h / 2, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN, true);
+		_downsampledDepthRenderTarget = RenderTarget2D(_device.Get(), w / 2, h / 2, DXGI_FORMAT_R32_FLOAT, false, DXGI_FORMAT_UNKNOWN, false);
+		_downsampledNormalsRenderTarget = RenderTarget2D(_device.Get(), w / 2, h / 2, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN, false);
 
 		// Initialize sprite and primitive batches
 		_spriteBatch = std::make_unique<SpriteBatch>(_context.Get());

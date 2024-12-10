@@ -2,9 +2,13 @@
 #include "./CBCamera.hlsli"
 #include "./CBPostProcess.hlsli"
 
-#define SIGMA 3.0
-#define BSIGMA 0.3
-#define MSIZE 5
+#define BLUR_KERNEL_SIZE 5
+#define BLUR_SIGMA 3.0
+#define BLUR_BSIGMA 0.3
+
+#define UPSCALE_KERNEL_SIZE 5
+#define UPSCALE_SPATIAL_SIGMA 2.0  
+#define UPSCALE_DEPTH_SIGMA 0.3  
 
 struct PixelShaderInput
 {
@@ -23,6 +27,8 @@ SamplerState NoiseSampler : register(s2);
 
 Texture2D SSAOTexture : register(t9);
 SamplerState SSAOSampler : register(s9);
+
+RWTexture2D<float4> UpscaledSSAOTexture : register(u0);
 
 float3 DecodeNormal(float3 n)
 {
@@ -100,21 +106,21 @@ float PSBlur(PixelShaderInput input) : SV_Target
     float2 texelSize = 1.0f / float2(ViewportWidth, ViewportHeight);
     float result = 0.0f;
 
-    const int kernelSize = (MSIZE - 1) / 2;
-    float kernel[MSIZE];
+    const int kernelSize = (BLUR_KERNEL_SIZE - 1) / 2;
+    float kernel[BLUR_KERNEL_SIZE];
     float bZ = 0.0;
 
     // Create the 1-D kernel
     for (int j = 0; j <= kernelSize; j++)
     {
-        kernel[kernelSize + j] = kernel[kernelSize - j] = normpdf(float(j), SIGMA);
+        kernel[kernelSize + j] = kernel[kernelSize - j] = normpdf(float(j), BLUR_SIGMA);
     }
 
     float color;
     float baseColor = SSAOTexture.Sample(SSAOSampler, input.UV).x;
     float gfactor;
     float bfactor;
-    float bZnorm = 1.0 / normpdf(0.0, BSIGMA);
+    float bZnorm = 1.0 / normpdf(0.0, BLUR_BSIGMA);
 
     // Read out the texels
     for (int i = -kernelSize; i <= kernelSize; i++)
@@ -127,7 +133,7 @@ float PSBlur(PixelShaderInput input) : SV_Target
 
             // Compute both the gaussian smoothed and bilateral
             gfactor = kernel[kernelSize + j] * kernel[kernelSize + i];
-            bfactor = normpdf(color - baseColor, BSIGMA) * bZnorm * gfactor;
+            bfactor = normpdf(color - baseColor, BLUR_BSIGMA) * bZnorm * gfactor;
             bZ += bfactor;
 
             result += bfactor * color;
@@ -135,4 +141,73 @@ float PSBlur(PixelShaderInput input) : SV_Target
     }
 
     return (result / bZ);
+}
+
+// Function to compute the Gaussian weight based on spatial distance
+float GaussianWeight(float2 delta, float sigma)
+{
+    return exp(-(delta.x * delta.x + delta.y * delta.y) / (2.0 * sigma * sigma));
+}
+
+// Function to compute the bilateral weight based on depth and normal similarity
+float BilateralWeight(float3 normal1, float3 normal2, float depth1, float depth2, float depthSigma)
+{
+    // Calculate the spatial weight (based only on the position of the pixels)
+    float spatialWeight = GaussianWeight(float2(0.0f, 0.0f), UPSCALE_SPATIAL_SIGMA);
+
+    // Compute the depth difference (the closer the depth, the more influence the pixel has)
+    float depthDifference = abs(depth1 - depth2);
+    float depthWeight = exp(-(depthDifference * depthDifference) / (2.0 * depthSigma * depthSigma));
+
+    // The bilateral weight is a combination of the spatial and depth weights
+    return spatialWeight * depthWeight;
+}
+
+// Upscaling function for SSAO using bilateral filtering to reduce edge bleeding
+float4 PSUpscale(PixelShaderInput input) : SV_Target
+{
+    // Calculate the offset for sampling neighbors (assuming a 5x5 kernel)
+    float2 texelSize = float2(1.0f / (ViewSize.x / 2.0f), 1.0f / (ViewSize.y / 2.0f));
+
+    // Initialize accumulators for the SSAO value
+    float accumulatedSSAO = 0.0f;
+    float weightSum = 0.0f;
+
+    // Get the current pixel's normal and depth for comparison
+    float3 centerNormal = NormalsTexture.Sample(NormalsSampler, input.UV);
+    float centerDepth = DepthTexture.Sample(DepthSampler, input.UV);
+
+    // Loop through the neighboring pixels in a 5x5 kernel (bilateral filter)
+    for (int dy = -UPSCALE_KERNEL_SIZE / 2; dy <= UPSCALE_KERNEL_SIZE / 2; ++dy)
+    {
+        for (int dx = -UPSCALE_KERNEL_SIZE / 2; dx <= UPSCALE_KERNEL_SIZE / 2; ++dx)
+        {
+            // Calculate the texture coordinates for the neighboring pixel
+            float2 neighborCoord = input.UV + float2(dx, dy) * texelSize;
+
+            // Make sure we are within bounds of the texture
+            if (neighborCoord.x >= 0.0f && neighborCoord.x <= 1.0f && neighborCoord.y >= 0.0f && neighborCoord.y <= 1.0f)
+            {
+                // Sample the SSAO, normal, and depth from the neighboring pixel
+                float neighborSSAO = SSAOTexture.Sample(SSAOSampler, neighborCoord);
+                float3 neighborNormal = NormalsTexture.Sample(NormalsSampler, neighborCoord);
+                float neighborDepth = DepthTexture.Sample(DepthSampler, neighborCoord);
+
+                // Compute the bilateral weight based on depth and normal similarity
+                float weight = BilateralWeight(centerNormal, neighborNormal, centerDepth, neighborDepth, UPSCALE_DEPTH_SIGMA);
+
+                // Accumulate the weighted SSAO values
+                accumulatedSSAO += neighborSSAO * weight;
+                weightSum += weight;
+            }
+        }
+    }
+
+    // Normalize the accumulated SSAO value
+    if (weightSum > 0.0f)
+    {
+        accumulatedSSAO /= weightSum;
+    }
+
+    return float4(accumulatedSSAO, 0, 0, 1);
 }
