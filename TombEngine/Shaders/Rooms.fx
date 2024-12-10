@@ -7,6 +7,8 @@
 #include "./Shadows.hlsli"
 #include "./ShaderLight.hlsli"
 
+#define ROOM_LIGHT_COEFF 0.7f
+
 cbuffer RoomBuffer : register(b5)
 {
 	int Water;
@@ -151,7 +153,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 	{
 		if (onlyPointLights)
 		{
-			lighting += DoPointLight(input.WorldPosition, normal, RoomLights[i]);
+			lighting += DoPointLight(input.WorldPosition, normal, RoomLights[i]) * ROOM_LIGHT_COEFF;
 		}
 		else
 		{
@@ -164,7 +166,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 			float3 spotLight  = float3(0.0f, 0.0f, 0.0f);
 			DoPointAndSpotLight(input.WorldPosition, normal, RoomLights[i], pointLight, spotLight);
 			
-			lighting += pointLight * isPoint + spotLight  * isSpot;
+			lighting += pointLight * isPoint * ROOM_LIGHT_COEFF + spotLight  * isSpot * ROOM_LIGHT_COEFF;
 		}
 	}
 
