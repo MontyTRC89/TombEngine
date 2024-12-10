@@ -68,7 +68,7 @@ public:
 	void		DeleteSaveGame(int slot);
 	bool		DoesSaveGameExist(int slot);
 	Statistics* GetStatistics(std::optional<bool> game) const;
-	void		SetStatistics(const Statistics& src, bool level);
+	void		SetStatistics(const Statistics& src, std::optional<bool> game);
 	int			GetSecretCount() const;
 	void		SetSecretCount(int secretsNum);
 	void		AddSecret(int levelSecretIndex);

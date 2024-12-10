@@ -175,8 +175,12 @@ scripts too.</p>
 	<td class="summary">Finishes the current level, with optional level index and start position index provided.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetStatistics">GetStatistics(getLevelStatistics)</a></td>
+	<td class="name" ><a href="#GetStatistics">GetStatistics(game)</a></td>
 	<td class="summary">Get game or level statistics.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetStatistics">SetStatistics(statistics, game)</a></td>
+	<td class="summary">Set game or level statistics.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#GetGameStatus">GetGameStatus()</a></td>
@@ -610,7 +614,7 @@ teleported to such object with OCB similar to provided second argument.
 </dd>
     <dt>
     <a name = "GetStatistics"></a>
-    <strong>GetStatistics(getLevelStatistics)</strong>
+    <strong>GetStatistics(game)</strong>
     </dt>
     <dd>
     Get game or level statistics.  For reference about statistics class, see <a href="../3 primitive classes/Flow.Statistics.html#">Flow.Statistics</a>.
@@ -619,18 +623,44 @@ teleported to such object with OCB similar to provided second argument.
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">getLevelStatistics</span>
+        <li><span class="parameter">game</span>
             <span class="types"><span class="type">bool</span></span>
-         if true, returns current level statistics, otherwise returns overall game statistics
+         if true, returns overall game statistics, otherwise returns current level statistics (default: false)
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Statistics</span></span>
+           <span class="types"><a class="type" href="../3 primitive classes/Flow.Statistics.html#">Statistics</a></span>
         statistics structure representing game or level statistics
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetStatistics"></a>
+    <strong>SetStatistics(statistics, game)</strong>
+    </dt>
+    <dd>
+    Set game or level statistics.  For reference about statistics class, see <a href="../3 primitive classes/Flow.Statistics.html#">Flow.Statistics</a>.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">statistics</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Flow.Statistics.html#">Statistics</a></span>
+         statistic object to set
+        </li>
+        <li><span class="parameter">game</span>
+            <span class="types"><span class="type">bool</span></span>
+         if true, sets overall game statistics, otherwise sets current level statistics (default: false)
+        </li>
+    </ul>
+
 
 
 

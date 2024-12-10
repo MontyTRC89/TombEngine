@@ -48,7 +48,7 @@ void Vec2::Register(sol::table& parent)
 }
 
 /// Create a Vec2 object.
-// @function Vec2(x, y)
+// @function Vec2
 // @tparam float x X component.
 // @tparam float y Y component.
 // @treturn Vec2 A new Vec2 object.
@@ -59,7 +59,7 @@ Vec2::Vec2(float x, float y)
 }
 
 /// Create a Vec2 object.
-// @function Vec(value)
+// @function Vec
 // @tparam float value X and Z component.
 // @treturn Vec2 A new Vec2 object.
 Vec2::Vec2(float value)
@@ -90,7 +90,7 @@ std::string Vec2::ToString() const
 }
 
 /// Get a copy of this Vec2 normalized to length 1.
-// @function Vec2:Normalize()
+// @function Vec2:Normalize
 // @treturn Vec2 Normalized vector.
 Vec2 Vec2::Normalize() const
 {
@@ -101,7 +101,7 @@ Vec2 Vec2::Normalize() const
 }
 
 /// Get a copy of this Vec2 rotated by the input rotation in degrees.
-// @function Vec2:Rotate(rot)
+// @function Vec2:Rotate
 // @tparam float rot Rotation in degrees.
 // @treturn Vec2 Rotated Vec2.
 Vec2 Vec2::Rotate(float rot) const
@@ -113,7 +113,7 @@ Vec2 Vec2::Rotate(float rot) const
 }
 
 /// Get the linearly interpolated Vec2 between this Vec2 and the input Vec2 according to the input interpolation alpha.
-// @function Vec2:Lerp(vector)
+// @function Vec2:Lerp
 // @tparam Vec2 vector Target interpolation vector.
 // @tparam float alpha Interpolation alpha in the range [0, 1].
 // @treturn Vec2 Linearly interpolated vector
@@ -126,7 +126,7 @@ Vec2 Vec2::Lerp(const Vec2& vector, float alpha) const
 }
 
 /// Get the cross product of this Vec2 and the input Vec2.
-// @function Vec2:Cross(vector)
+// @function Vec2:Cross
 // @tparam Vec2 vector Input vector.
 // @treturn Vec2 Cross product.
 Vec2 Vec2::Cross(const Vec2& vector) const
@@ -138,7 +138,7 @@ Vec2 Vec2::Cross(const Vec2& vector) const
 }
 
 /// Get the dot product of this Vec2 and the input Vec2.
-// @function Vec2:Dot(vector)
+// @function Vec2:Dot
 // @tparam Vec2 vector Input vector.
 // @treturn float Dot product.
 float Vec2::Dot(const Vec2& vector) const
@@ -150,7 +150,7 @@ float Vec2::Dot(const Vec2& vector) const
 }
 
 /// Get the distance between this Vec2 and the input Vec2.
-// @function Vec2:Distance(vector)
+// @function Vec2:Distance
 // @tparam Vec2 vector Input vector.
 // @treturn float Distance.
 float Vec2::Distance(const Vec2& vector) const
@@ -162,7 +162,7 @@ float Vec2::Distance(const Vec2& vector) const
 }
 
 /// Get the length of this Vec2.
-// @function Vec2:Length()
+// @function Vec2:Length
 // @treturn float Length.
 float Vec2::Length() const
 {

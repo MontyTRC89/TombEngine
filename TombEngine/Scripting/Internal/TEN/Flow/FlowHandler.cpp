@@ -155,10 +155,18 @@ teleported to such object with OCB similar to provided second argument.
 /***
 Get game or level statistics. For reference about statistics class, see @{Flow.Statistics}.
 @function GetStatistics
-@bool getLevelStatistics if true, returns current level statistics, otherwise returns overall game statistics
-@treturn Statistics statistics structure representing game or level statistics
+@tparam bool game if true, returns overall game statistics, otherwise returns current level statistics (default: false)
+@treturn Flow.Statistics statistics structure representing game or level statistics
 */
 	tableFlow.set_function(ScriptReserved_GetStatistics, &FlowHandler::GetStatistics, this);
+
+/***
+Set game or level statistics. For reference about statistics class, see @{Flow.Statistics}.
+@function SetStatistics
+@tparam Flow.Statistics statistics statistic object to set
+@tparam bool game if true, sets overall game statistics, otherwise sets current level statistics (default: false)
+*/
+	tableFlow.set_function(ScriptReserved_SetStatistics, &FlowHandler::SetStatistics, this);
 
 /***
 Get current game status, such as normal game loop, exiting to title, etc.
@@ -361,15 +369,15 @@ void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::ve
 
 Statistics* FlowHandler::GetStatistics(std::optional<bool> game) const
 {
-	return game ? &SaveGame::Statistics.Game : &SaveGame::Statistics.Level;
+	return game.value_or(false) ? &SaveGame::Statistics.Game : &SaveGame::Statistics.Level;
 }
 
-void FlowHandler::SetStatistics(Statistics const& src, bool level)
+void FlowHandler::SetStatistics(Statistics const& src, std::optional<bool> game)
 {
-	if (level)
-		SaveGame::Statistics.Level = src;
-	else
+	if (game.value_or(false))
 		SaveGame::Statistics.Game = src;
+	else
+		SaveGame::Statistics.Level = src;
 }
 
 void FlowHandler::SetSettings(Settings const& src)
