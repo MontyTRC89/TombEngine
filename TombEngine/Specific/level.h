@@ -87,7 +87,8 @@ struct MESH
 
 struct MirrorInfo
 {
-	short RoomNumber;
+	short RealRoom;
+	short VirtualRoom;
 	Vector4 MirrorPlane;
 };
 

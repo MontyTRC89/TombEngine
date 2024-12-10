@@ -480,7 +480,7 @@ namespace TEN::Renderer
 			{
 				auto* rat = &Rats[i];
 
-				if (mirror != nullptr && rat->RoomNumber != mirror->RoomNumber)
+				if (mirror != nullptr && rat->RoomNumber != mirror->RealRoom)
 					continue;
 
 				if (rat->On)
@@ -523,7 +523,7 @@ namespace TEN::Renderer
 			{
 				auto* rat = &Rats[i];
 
-				if (mirror != nullptr && rat->RoomNumber != mirror->RoomNumber)
+				if (mirror != nullptr && rat->RoomNumber != mirror->RealRoom)
 					continue;
 
 				if (rat->On)
@@ -738,7 +738,7 @@ namespace TEN::Renderer
 				if (!bat.On)
 					continue;
 
-				if (mirror != nullptr && bat.RoomNumber != mirror->RoomNumber)
+				if (mirror != nullptr && bat.RoomNumber != mirror->RealRoom)
 					continue;
 
 				for (auto& bucket : mesh.Buckets)
@@ -774,7 +774,7 @@ namespace TEN::Renderer
 			{
 				const auto& bat = Bats[i];
 
-				if (mirror != nullptr && bat.RoomNumber != mirror->RoomNumber)
+				if (mirror != nullptr && bat.RoomNumber != mirror->RealRoom)
 					continue;
 
 				if (bat.On)
@@ -896,7 +896,7 @@ namespace TEN::Renderer
 			{
 				const auto& beetle = TEN::Entities::TR4::BeetleSwarm[i];
 				
-				if (mirror != nullptr && beetle.RoomNumber != mirror->RoomNumber)
+				if (mirror != nullptr && beetle.RoomNumber != mirror->RealRoom)
 					continue;
 
 				if (beetle.On)
@@ -991,7 +991,7 @@ namespace TEN::Renderer
 				if (!locust.on)
 					continue;
 
-				if (mirror != nullptr && locust.roomNumber != mirror->RoomNumber)
+				if (mirror != nullptr && locust.roomNumber != mirror->RealRoom)
 					continue;
 
 				auto& mesh = *GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust.counter & 3));
@@ -1030,7 +1030,7 @@ namespace TEN::Renderer
 				if (!locust.on)
 					continue;
 
-				if (mirror != nullptr && locust.roomNumber != mirror->RoomNumber)
+				if (mirror != nullptr && locust.roomNumber != mirror->RealRoom)
 					continue;
 
 				activeLocustsExist = true;
@@ -2397,7 +2397,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawWaterfalls(RendererItem* item, RendererMirror* mirror, RenderView& view, int fps, RendererPass rendererPass)
 	{
-		if (mirror != nullptr && item->RoomNumber != mirror->RoomNumber)
+		if (mirror != nullptr && item->RoomNumber != mirror->RealRoom)
 		{
 			return;
 		}
@@ -2445,7 +2445,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawAnimatingItem(RendererItem* item, RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
 	{
-		if (mirror != nullptr && item->RoomNumber != mirror->RoomNumber)
+		if (mirror != nullptr && item->RoomNumber != mirror->RealRoom)
 			return;
 
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
@@ -2611,12 +2611,18 @@ namespace TEN::Renderer
 						RendererStatic* current = statics[s];
 						RendererRoom* room = &_rooms[current->RoomNumber];
 
-						if (mirror != nullptr && current->RoomNumber != mirror->RoomNumber)
+						if (mirror != nullptr && current->RoomNumber != mirror->RealRoom)
 						{
 							continue;
 						}
 
-						_stInstancedStaticMeshBuffer.StaticMeshes[k].World = current->World;
+						Matrix world = current->World;
+						if (mirror != nullptr)
+						{
+							world = world * mirror->ReflectionMatrix;
+						}
+						_stInstancedStaticMeshBuffer.StaticMeshes[k].World = world;
+
 						_stInstancedStaticMeshBuffer.StaticMeshes[k].Color = current->Color;
 						_stInstancedStaticMeshBuffer.StaticMeshes[k].Ambient = room->AmbientLight;
 						_stInstancedStaticMeshBuffer.StaticMeshes[k].LightMode = (int)refMesh->LightMode;
@@ -2687,7 +2693,7 @@ namespace TEN::Renderer
 
 				for (int i = 0; i < statics.size(); i++)
 				{
-					if (mirror != nullptr && statics[i]->RoomNumber != mirror->RoomNumber)
+					if (mirror != nullptr && statics[i]->RoomNumber != mirror->RealRoom)
 					{
 						continue;
 					}

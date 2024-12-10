@@ -27,6 +27,28 @@ namespace TEN::Renderer
 
 	void Renderer::CollectRooms(RenderView& renderView, bool onlyRooms)
 	{
+		for (auto& mirror : g_Level.Mirrors)
+		{
+			if (mirror.RealRoom != Camera.pos.RoomNumber)
+				continue;
+
+			auto& rendererMirror = renderView.Mirrors.emplace_back();
+
+			rendererMirror.RealRoom = mirror.RealRoom;
+			rendererMirror.VirtualRoom = mirror.VirtualRoom;
+			rendererMirror.Plane = Plane(
+				Vector3(mirror.MirrorPlane.x,
+					mirror.MirrorPlane.y,
+					mirror.MirrorPlane.z),
+				mirror.MirrorPlane.w);
+
+			Plane p = Plane(Vector3(mirror.MirrorPlane.x,
+				mirror.MirrorPlane.y,
+				mirror.MirrorPlane.z), Vector3(0, 0, BLOCK(21)));
+
+			rendererMirror.ReflectionMatrix = Matrix::CreateReflection(rendererMirror.Plane);
+		}
+
 		constexpr auto VIEW_PORT = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
 
 		_visitedRoomsStack.clear();
@@ -149,22 +171,6 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < std::min(MAX_LENS_FLARES_DRAW, (int)tempLensFlares.size()); i++)
 			renderView.LensFlaresToDraw.push_back(tempLensFlares[i]);
-
-		for (auto& mirror : g_Level.Mirrors)
-		{
-			if (mirror.RoomNumber != Camera.pos.RoomNumber)
-				continue;
-
-			auto& rendererMirror = renderView.Mirrors.emplace_back();
-
-			rendererMirror.RoomNumber = mirror.RoomNumber;
-			rendererMirror.Plane = Plane(
-				Vector3(mirror.MirrorPlane.x,
-						mirror.MirrorPlane.y,
-						mirror.MirrorPlane.z),
-				mirror.MirrorPlane.w);
-			rendererMirror.ReflectionMatrix = Matrix::CreateReflection(rendererMirror.Plane);
-		}
 	}
 
 	bool Renderer::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)
@@ -409,7 +415,17 @@ namespace TEN::Renderer
 			// Clip object by frustum only if it doesn't cast shadows. Otherwise we may see
 			// disappearing shadows if object gets out of frustum.
 
-			if (obj.ShadowType == ShadowMode::None)
+			bool isMirrorRoom = false;
+			for (auto& mirror : g_Level.Mirrors)
+			{
+				if (Camera.pos.RoomNumber == mirror.RealRoom)
+				{
+					isMirrorRoom = true;
+					break;
+				}
+			}
+
+			if (obj.ShadowType == ShadowMode::None && !isMirrorRoom)
 			{
 				// Get all spheres and check if frustum intersects any of them.
 				auto spheres = GetSpheres(itemNum);
@@ -511,9 +527,22 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.empty())
 				continue;
 
-			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
-				continue;
-			 
+			bool isMirrorRoom = false;
+			for (auto& mirror : g_Level.Mirrors)
+			{
+				if (Camera.pos.RoomNumber == mirror.RealRoom)
+				{
+					isMirrorRoom = true;
+					break;
+				}
+			}
+
+			if (!isMirrorRoom)
+			{
+				if (!renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
+					continue;
+			}
+
 			// Collect the lights
 			std::vector<RendererLight*> lights;
 			std::vector<RendererLightNode> cachedRoomLights;
@@ -742,6 +771,16 @@ namespace TEN::Renderer
 		RendererRoom& room = _rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 		
+		bool isMirrorRoom = false;
+		for (auto& mirror : renderView.Mirrors)
+		{
+			if (mirror.RealRoom == roomNumber)
+			{
+				isMirrorRoom = true;
+				break;
+			}
+		}
+
 		// Collect dynamic lights for rooms
 		for (int i = 0; i < _dynamicLights[_dynamicLightList].size(); i++)
 		{

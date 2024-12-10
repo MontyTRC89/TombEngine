@@ -8,7 +8,8 @@ namespace TEN::Renderer::Structures
 
 	struct RendererMirror
 	{
-		short RoomNumber;
+		short RealRoom;
+		short VirtualRoom;
 		Plane Plane;
 		Matrix ReflectionMatrix;
 	};

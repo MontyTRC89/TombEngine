@@ -1161,7 +1161,7 @@ namespace TEN::Renderer
 			{
 				auto& nativeItem = g_Level.Items[rItemPtr->ItemNumber];
 
-				if (mirror != nullptr && nativeItem.RoomNumber != mirror->RoomNumber)
+				if (mirror != nullptr && nativeItem.RoomNumber != mirror->RealRoom)
 				{
 					continue;
 				}
@@ -1396,7 +1396,7 @@ namespace TEN::Renderer
 		{
 			for (auto* effectPtr : roomPtr->EffectsToDraw)
 			{
-				if (mirror != nullptr && effectPtr->RoomNumber != mirror->RoomNumber)
+				if (mirror != nullptr && effectPtr->RoomNumber != mirror->RealRoom)
 					continue;
 
 				const auto& room = _rooms[effectPtr->RoomNumber];
@@ -1415,7 +1415,7 @@ namespace TEN::Renderer
 		{
 			if (deb.active)
 			{
-				if (mirror != nullptr && deb.roomNumber != mirror->RoomNumber)
+				if (mirror != nullptr && deb.roomNumber != mirror->RealRoom)
 					continue;
 
 				activeDebrisExist = true;
@@ -1434,7 +1434,7 @@ namespace TEN::Renderer
 			{
 				if (deb.active)
 				{
-					if (mirror != nullptr && deb.roomNumber != mirror->RoomNumber)
+					if (mirror != nullptr && deb.roomNumber != mirror->RealRoom)
 						continue;
 
 					if (!SetupBlendModeAndAlphaTest(deb.mesh.blendMode, rendererPass, 0))
