@@ -1,9 +1,6 @@
 #include "framework.h"
 #include "Time.h"
 
-#include <sstream>
-#include <iomanip>
-#include <stdexcept>
 #include <regex>
 
 #include "Math/Math.h"
