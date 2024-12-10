@@ -71,7 +71,7 @@ namespace TEN::Entities::Generic
 		spark->size = Random::GenerateFloat(64, 150);
 		spark->dSize = spark->size / 8;
 
-		int spriteOffset = GameTimer % Objects[ID_FIRE_SPRITES].nmeshes;
+		int spriteOffset = GlobalCounter % Objects[ID_FIRE_SPRITES].nmeshes;
 		spark->spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + spriteOffset;
 	}
 

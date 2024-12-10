@@ -431,6 +431,7 @@ void FireShotgun(ItemInfo& laraItem)
 
 		Rumble(0.5f, 0.2f);
 
+		SaveGame::Statistics.Level.AmmoUsed++;
 		SaveGame::Statistics.Game.AmmoUsed++;
 	}
 }
@@ -1196,6 +1197,7 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 		if (player.Control.Weapon.GunType == LaraWeaponType::Revolver)
 		{
 			player.Control.Weapon.Interval = 16.0f;
+			SaveGame::Statistics.Level.AmmoUsed++;
 			SaveGame::Statistics.Game.AmmoUsed++;
 			isFiring = true;
 
@@ -1332,9 +1334,11 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 		if (&target != &emitter)
 		{
 			SaveGame::Statistics.Game.AmmoHits++;
+			SaveGame::Statistics.Level.AmmoHits++;
 			if (target.HitPoints <= 0)
 			{
 				SaveGame::Statistics.Level.Kills++;
+				SaveGame::Statistics.Game.Kills++;
 				CreatureDie(target.Index, true);
 			}
 		}

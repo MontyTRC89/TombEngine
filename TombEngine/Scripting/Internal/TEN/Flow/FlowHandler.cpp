@@ -18,6 +18,7 @@
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
+#include "Scripting/Internal/TEN/Types/Time/Time.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Sound/sound.h"
@@ -150,6 +151,14 @@ teleported to such object with OCB similar to provided second argument.
 @int[opt] startPos player start position (default 0)
 */
 	tableFlow.set_function(ScriptReserved_EndLevel, &FlowHandler::EndLevel, this);
+
+/***
+Get game or level statistics. For reference about statistics class, see @{Flow.Statistics}.
+@function GetStatistics
+@bool getLevelStatistics if true, returns current level statistics, otherwise returns overall game statistics
+@treturn Statistics statistics structure representing game or level statistics
+*/
+	tableFlow.set_function(ScriptReserved_GetStatistics, &FlowHandler::GetStatistics, this);
 
 /***
 Get current game status, such as normal game loop, exiting to title, etc.
@@ -293,6 +302,8 @@ Specify which translations in the strings table correspond to which languages.
 
 	ScriptColor::Register(parent);
 	Rotation::Register(parent);
+	Statistics::Register(parent);
+	Time::Register(parent);
 	Vec2::Register(parent);
 	Vec3::Register(parent);
 	Level::Register(tableFlow);
@@ -346,6 +357,19 @@ void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::ve
 		for (auto& stringPair : src.value())
 			_translationMap.insert_or_assign(stringPair.first, stringPair.second);
 	}
+}
+
+Statistics* FlowHandler::GetStatistics(std::optional<bool> game) const
+{
+	return game ? &SaveGame::Statistics.Game : &SaveGame::Statistics.Level;
+}
+
+void FlowHandler::SetStatistics(Statistics const& src, bool level)
+{
+	if (level)
+		SaveGame::Statistics.Level = src;
+	else
+		SaveGame::Statistics.Game = src;
 }
 
 void FlowHandler::SetSettings(Settings const& src)
@@ -586,7 +610,7 @@ void FlowHandler::AddSecret(int levelSecretIndex)
 		return;
 	}
 
-	if (SaveGame::Statistics.Level.Secrets & (1 << levelSecretIndex))
+	if (SaveGame::Statistics.SecretMap & (1 << levelSecretIndex))
 		return;
 
 	if (SaveGame::Statistics.Game.Secrets >= UINT_MAX)
@@ -596,7 +620,8 @@ void FlowHandler::AddSecret(int levelSecretIndex)
 	}
 
 	PlaySecretTrack();
-	SaveGame::Statistics.Level.Secrets |= (1 << levelSecretIndex);
+	SaveGame::Statistics.SecretMap |= (1 << levelSecretIndex);
+	SaveGame::Statistics.Level.Secrets++;
 	SaveGame::Statistics.Game.Secrets++;
 }
 
@@ -772,7 +797,6 @@ bool FlowHandler::DoFlow()
 			// Load level.
 			CurrentLevel = header.Level;
 			NextLevel = 0;
-			GameTimer = header.Timer;
 			loadFromSavegame = true;
 			break;
 

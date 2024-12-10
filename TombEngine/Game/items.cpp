@@ -837,10 +837,18 @@ void DoDamage(ItemInfo* item, int damage)
 		return;
 
 	item->HitStatus = true;
-
 	item->HitPoints -= damage;
-	if (item->HitPoints < 0)
+
+	if (item->HitPoints <= 0)
+	{
 		item->HitPoints = 0;
+
+		if (!item->IsLara())
+		{
+			SaveGame::Statistics.Level.Kills++;
+			SaveGame::Statistics.Game.Kills++;
+		}
+	}
 
 	if (item->IsLara())
 	{
@@ -848,6 +856,9 @@ void DoDamage(ItemInfo* item, int damage)
 		{
 			float power = item->HitPoints ? Random::GenerateFloat(0.1f, 0.4f) : 0.5f;
 			Rumble(power, 0.15f);
+
+			SaveGame::Statistics.Game.DamageTaken += damage;
+			SaveGame::Statistics.Level.DamageTaken += damage;
 		}
 
 		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + Random::GenerateInt(0, FPS)))
@@ -867,6 +878,7 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 	{
 		if (target->HitPoints > 0)
 		{
+			SaveGame::Statistics.Game.AmmoHits++;
 			SaveGame::Statistics.Level.AmmoHits++;
 			DoDamage(target, damage);
 		}

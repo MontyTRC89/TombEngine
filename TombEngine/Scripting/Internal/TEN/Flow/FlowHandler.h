@@ -6,9 +6,11 @@
 #include "Scripting/Internal/LanguageScript.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Time/Time.h"
 #include "Scripting/Internal/TEN/Logic/LogicHandler.h"
 #include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
+#include "Scripting/Internal/TEN/Flow/Statistics/Statistics.h"
 
 class FlowHandler : public ScriptInterfaceFlowHandler
 {
@@ -65,6 +67,8 @@ public:
 	void		LoadGame(int slot);
 	void		DeleteSaveGame(int slot);
 	bool		DoesSaveGameExist(int slot);
+	Statistics* GetStatistics(std::optional<bool> game) const;
+	void		SetStatistics(const Statistics& src, bool level);
 	int			GetSecretCount() const;
 	void		SetSecretCount(int secretsNum);
 	void		AddSecret(int levelSecretIndex);
@@ -86,8 +90,8 @@ public:
 	bool		IsLoadSaveEnabled() const;
 	void		EnableLoadSave(bool enable);
 	
-	void		SetSettings(const Settings& src);
 	Settings*	GetSettings();
+	void		SetSettings(const Settings& src);
 
 	bool DoFlow() override;
 };

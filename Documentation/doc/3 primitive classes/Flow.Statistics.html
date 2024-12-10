@@ -53,7 +53,7 @@
   <li>    <a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
   <li>    <a href="../2 classes/Objects.Room.html">Objects.Room</a></li>
   <li>    <a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
-  <li>    <here>Objects.SoundSource</here></li>
+  <li>    <a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
   <li>    <a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
   <li>    <a href="../2 classes/Objects.Volume.html">Objects.Volume</a></li>
   <li>    <a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
@@ -67,7 +67,7 @@
   <li>    <a href="../3 primitive classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
   <li>    <a href="../3 primitive classes/Flow.Starfield.html">Flow.Starfield</a></li>
-  <li>    <a href="../3 primitive classes/Flow.Statistics.html">Flow.Statistics</a></li>
+  <li>    <here>Flow.Statistics</here></li>
   <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
   <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
   <li>    <a href="../3 primitive classes/Time.html">Time</a></li>
@@ -106,39 +106,44 @@
 
 <div id="content">
 
-<h1>Class <code>Objects.SoundSource</code></h1>
-<p>Sound source</p>
-<p>
-
-</p>
+<h1>Primitive Class <code>Flow.Statistics</code></h1>
+<p>A set of different gameplay statistics.</p>
+<p> Can be accessed using <a href="../1 modules/Flow.html#GetStatistics">Flow.GetStatistics</a> and ??? functions.</p>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Fields">Fields</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#SoundSource:GetPosition">SoundSource:GetPosition()</a></td>
-	<td class="summary">Get the sound source's position</td>
+	<td class="name" ><a href="#ammoHits">ammoHits</a></td>
+	<td class="summary">Ammo hits.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SoundSource:SetPosition">SoundSource:SetPosition(position)</a></td>
-	<td class="summary">Set the sound source's position</td>
+	<td class="name" ><a href="#ammoUsed">ammoUsed</a></td>
+	<td class="summary">Ammo used.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SoundSource:GetName">SoundSource:GetName()</a></td>
-	<td class="summary">Get the sound source's unique string identifier</td>
+	<td class="name" ><a href="#traveledDistance">traveledDistance</a></td>
+	<td class="summary">Distance traveled.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SoundSource:SetName">SoundSource:SetName(name)</a></td>
-	<td class="summary">Set the sound source's name (its unique string identifier)</td>
+	<td class="name" ><a href="#healthPacksUsed">healthPacksUsed</a></td>
+	<td class="summary">Health packs used.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SoundSource:GetSoundID">SoundSource:GetSoundID()</a></td>
-	<td class="summary">Get the sound source's unique int identifier</td>
+	<td class="name" ><a href="#damageTaken">damageTaken</a></td>
+	<td class="summary">Damage taken.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SoundSource:SetSoundID">SoundSource:SetSoundID(name)</a></td>
-	<td class="summary">Set the sound source's ID
- <strong>TODO</strong> this and getSoundID should use enums</td>
+	<td class="name" ><a href="#kills">kills</a></td>
+	<td class="summary">Kills.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#secrets">secrets</a></td>
+	<td class="summary">Secrets.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#timeTaken">timeTaken</a></td>
+	<td class="summary">Time taken.</td>
 	</tr>
 </table>
 
@@ -146,131 +151,169 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
 
     <dl class="function">
     <dt>
-    <a name = "SoundSource:GetPosition"></a>
-    <strong>SoundSource:GetPosition()</strong>
+    <a name = "ammoHits"></a>
+    <strong>ammoHits</strong>
     </dt>
     <dd>
-    Get the sound source's position
+    Ammo hits.
 
 
 
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        a copy of the sound source's position
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SoundSource:SetPosition"></a>
-    <strong>SoundSource:SetPosition(position)</strong>
-    </dt>
-    <dd>
-    Set the sound source's position
-
-
-
-    <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">position</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         the new position of the sound source
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SoundSource:GetName"></a>
-    <strong>SoundSource:GetName()</strong>
-    </dt>
-    <dd>
-    Get the sound source's unique string identifier
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        the sound source's name
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SoundSource:SetName"></a>
-    <strong>SoundSource:SetName(name)</strong>
-    </dt>
-    <dd>
-    Set the sound source's name (its unique string identifier)
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         The sound source's new name
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SoundSource:GetSoundID"></a>
-    <strong>SoundSource:GetSoundID()</strong>
-    </dt>
-    <dd>
-    Get the sound source's unique int identifier
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        the ID of the sound
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SoundSource:SetSoundID"></a>
-    <strong>SoundSource:SetSoundID(name)</strong>
-    </dt>
-    <dd>
-    Set the sound source's ID
- <strong>TODO</strong> this and getSoundID should use enums
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
+        <li><span class="parameter">ammoHits</span>
             <span class="types"><span class="type">int</span></span>
-         The sound source's new name
+         amount of successful enemy hits.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "ammoUsed"></a>
+    <strong>ammoUsed</strong>
+    </dt>
+    <dd>
+    Ammo used.
+
+
+
+    <ul>
+        <li><span class="parameter">ammoUsed</span>
+            <span class="types"><span class="type">int</span></span>
+         amount of used ammo.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "traveledDistance"></a>
+    <strong>traveledDistance</strong>
+    </dt>
+    <dd>
+    Distance traveled.
+
+
+
+    <ul>
+        <li><span class="parameter">traveledDistance</span>
+            <span class="types"><span class="type">int</span></span>
+         amount of traveled distance (approximately in meters).
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "healthPacksUsed"></a>
+    <strong>healthPacksUsed</strong>
+    </dt>
+    <dd>
+    Health packs used.
+
+
+
+    <ul>
+        <li><span class="parameter">healthPacksUsed</span>
+            <span class="types"><span class="type">int</span></span>
+         amount of used medipacks.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "damageTaken"></a>
+    <strong>damageTaken</strong>
+    </dt>
+    <dd>
+    Damage taken.
+
+
+
+    <ul>
+        <li><span class="parameter">damageTaken</span>
+            <span class="types"><span class="type">int</span></span>
+         overall amount of taken damage.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "kills"></a>
+    <strong>kills</strong>
+    </dt>
+    <dd>
+    Kills.
+
+
+
+    <ul>
+        <li><span class="parameter">kills</span>
+            <span class="types"><span class="type">int</span></span>
+         amount of killed enemies.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "secrets"></a>
+    <strong>secrets</strong>
+    </dt>
+    <dd>
+    Secrets.
+
+
+
+    <ul>
+        <li><span class="parameter">secrets</span>
+            <span class="types"><span class="type">int</span></span>
+         amount of found secrets.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "timeTaken"></a>
+    <strong>timeTaken</strong>
+    </dt>
+    <dd>
+    Time taken.
+
+
+
+    <ul>
+        <li><span class="parameter">timeTaken</span>
+            <span class="types"><span class="type">int</span></span>
+         amount of time passed.
         </li>
     </ul>
 

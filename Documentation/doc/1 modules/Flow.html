@@ -67,8 +67,10 @@
   <li>    <a href="../3 primitive classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
   <li>    <a href="../3 primitive classes/Flow.Starfield.html">Flow.Starfield</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Statistics.html">Flow.Statistics</a></li>
   <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
   <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li>    <a href="../3 primitive classes/Time.html">Time</a></li>
   <li>    <a href="../3 primitive classes/Vec2.html">Vec2</a></li>
   <li>    <a href="../3 primitive classes/Vec3.html">Vec3</a></li>
 </ul>
@@ -171,6 +173,10 @@ scripts too.</p>
 	<tr>
 	<td class="name" ><a href="#EndLevel">EndLevel([index][, startPos])</a></td>
 	<td class="summary">Finishes the current level, with optional level index and start position index provided.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetStatistics">GetStatistics(getLevelStatistics)</a></td>
+	<td class="summary">Get game or level statistics.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#GetGameStatus">GetGameStatus()</a></td>
@@ -597,6 +603,34 @@ teleported to such object with OCB similar to provided second argument.
         </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetStatistics"></a>
+    <strong>GetStatistics(getLevelStatistics)</strong>
+    </dt>
+    <dd>
+    Get game or level statistics.  For reference about statistics class, see <a href="../3 primitive classes/Flow.Statistics.html#">Flow.Statistics</a>.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">getLevelStatistics</span>
+            <span class="types"><span class="type">bool</span></span>
+         if true, returns current level statistics, otherwise returns overall game statistics
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Statistics</span></span>
+        statistics structure representing game or level statistics
+    </ol>
 
 
 

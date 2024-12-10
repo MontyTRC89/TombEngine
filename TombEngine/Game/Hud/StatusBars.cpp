@@ -64,7 +64,7 @@ namespace TEN::Hud
 		constexpr auto FLASH_INTERVAL = 0.2f;
 
 		// Update flash.
-		if ((GameTimer % (int)round(FLASH_INTERVAL * FPS)) == 0)
+		if ((GlobalCounter % (int)round(FLASH_INTERVAL * FPS)) == 0)
 			_doFlash = !_doFlash;
 
 		// Update bars.

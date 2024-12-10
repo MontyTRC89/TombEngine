@@ -6,31 +6,23 @@
 #include "Specific/IO/ChunkWriter.h"
 #include "Specific/IO/LEB128.h"
 #include "Specific/IO/Streams.h"
+#include "Scripting/Internal/TEN/Types/Time/Time.h"
+#include "Scripting/Internal/TEN/Flow/Statistics/Statistics.h"
 
 constexpr auto SAVEGAME_MAX = 16;
 
-struct Stats
-{
-	unsigned int Timer		= 0;
-	unsigned int Distance	= 0;
-	unsigned int AmmoHits	= 0;
-	unsigned int AmmoUsed	= 0;
-	unsigned int HealthUsed = 0;
-	unsigned int Kills		= 0;
-	unsigned int Secrets	= 0;
-};
-
 struct GameStats
 {
-	Stats Game	= {};
-	Stats Level = {};
+	unsigned int SecretMap = 0;
+
+	Statistics Game	= {};
+	Statistics Level = {};
 };
 
 struct SaveGameHeader
 {
 	std::string LevelName = {};
 	int			LevelHash = 0;
-	int			Days	  = 0;
 	int			Hours	  = 0;
 	int			Minutes	  = 0;
 	int			Seconds	  = 0;

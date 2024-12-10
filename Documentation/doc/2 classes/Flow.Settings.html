@@ -67,8 +67,10 @@
   <li>    <a href="../3 primitive classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
   <li>    <a href="../3 primitive classes/Flow.Starfield.html">Flow.Starfield</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Statistics.html">Flow.Statistics</a></li>
   <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
   <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li>    <a href="../3 primitive classes/Time.html">Time</a></li>
   <li>    <a href="../3 primitive classes/Vec2.html">Vec2</a></li>
   <li>    <a href="../3 primitive classes/Vec3.html">Vec3</a></li>
 </ul>
@@ -134,6 +136,21 @@
 	<tr>
 	<td class="name" ><a href="#poseTimeout">poseTimeout</a></td>
 	<td class="summary">Pose timeout.</td>
+	</tr>
+</table>
+<h2><a href="#Camera">Camera </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#binocularLightColor">binocularLightColor</a></td>
+	<td class="summary">Determines highlight color in binocular mode.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#lasersightLightColor">lasersightLightColor</a></td>
+	<td class="summary">Determines highlight color in lasersight mode.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#objectCollision">objectCollision</a></td>
+	<td class="summary">Specify whether camera can collide with objects.</td>
 	</tr>
 </table>
 <h2><a href="#Flare">Flare </a></h2>
@@ -395,6 +412,76 @@
         <li><span class="parameter">poseTimeout</span>
             <span class="types"><span class="type">int</span></span>
          if this setting is larger than 0, idle standing pose animation will be performed after given timeout (in seconds).
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Camera"></a>Camera </h2>
+
+          <div class="section-description">
+          Parameters to customize camera and everything related to it.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "binocularLightColor"></a>
+    <strong>binocularLightColor</strong>
+    </dt>
+    <dd>
+    Determines highlight color in binocular mode.
+
+
+
+    <ul>
+        <li><span class="parameter">binocularLightColor</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         color of highlight, when player presses action. Zero color means there will be no highlight.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "lasersightLightColor"></a>
+    <strong>lasersightLightColor</strong>
+    </dt>
+    <dd>
+    Determines highlight color in lasersight mode.
+
+
+
+    <ul>
+        <li><span class="parameter">lasersightLightColor</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         lasersight highlight color. Zero color means there will be no highlight.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "objectCollision"></a>
+    <strong>objectCollision</strong>
+    </dt>
+    <dd>
+    Specify whether camera can collide with objects.
+
+
+
+    <ul>
+        <li><span class="parameter">objectCollision</span>
+            <span class="types"><span class="type">bool</span></span>
+         when enabled, camera will collide with moveables and statics. Disable or TR4-like camera behaviour.
         </li>
     </ul>
 

@@ -53,7 +53,7 @@
   <li>    <a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
   <li>    <a href="../2 classes/Objects.Room.html">Objects.Room</a></li>
   <li>    <a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
-  <li>    <here>Objects.SoundSource</here></li>
+  <li>    <a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
   <li>    <a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
   <li>    <a href="../2 classes/Objects.Volume.html">Objects.Volume</a></li>
   <li>    <a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
@@ -70,7 +70,7 @@
   <li>    <a href="../3 primitive classes/Flow.Statistics.html">Flow.Statistics</a></li>
   <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
   <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
-  <li>    <a href="../3 primitive classes/Time.html">Time</a></li>
+  <li>    <here>Time</here></li>
   <li>    <a href="../3 primitive classes/Vec2.html">Vec2</a></li>
   <li>    <a href="../3 primitive classes/Vec3.html">Vec3</a></li>
 </ul>
@@ -106,39 +106,61 @@
 
 <div id="content">
 
-<h1>Class <code>Objects.SoundSource</code></h1>
-<p>Sound source</p>
+<h1>Primitive Class <code>Time</code></h1>
+<p>Represents a time value with support for formatting to hours, minutes, seconds, and centiseconds (1/100th of a second).</p>
 <p>
 
 </p>
 
 
+<h2><a href="#Members">Members</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#h">h</a></td>
+	<td class="summary">(int) Hours component.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#m">m</a></td>
+	<td class="summary">(int) Minutes component.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#s">s</a></td>
+	<td class="summary">(int) Seconds component.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#c">c</a></td>
+	<td class="summary">(int) Centiseconds component.</td>
+	</tr>
+</table>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#SoundSource:GetPosition">SoundSource:GetPosition()</a></td>
-	<td class="summary">Get the sound source's position</td>
+	<td class="name" ><a href="#Time">Time()</a></td>
+	<td class="summary">Create a Time object.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SoundSource:SetPosition">SoundSource:SetPosition(position)</a></td>
-	<td class="summary">Set the sound source's position</td>
+	<td class="name" ><a href="#Time">Time(frames)</a></td>
+	<td class="summary">Create a Time object from a total game frame count (1 second = 30 frames).</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SoundSource:GetName">SoundSource:GetName()</a></td>
-	<td class="summary">Get the sound source's unique string identifier</td>
+	<td class="name" ><a href="#Time">Time(formattedTime)</a></td>
+	<td class="summary">Create a Time object from a formatted string.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SoundSource:SetName">SoundSource:SetName(name)</a></td>
-	<td class="summary">Set the sound source's name (its unique string identifier)</td>
+	<td class="name" ><a href="#Time">Time(timeUnits)</a></td>
+	<td class="summary">Create a Time object from a time unit table (hours, minutes, seconds, centiseconds).</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SoundSource:GetSoundID">SoundSource:GetSoundID()</a></td>
-	<td class="summary">Get the sound source's unique int identifier</td>
+	<td class="name" ><a href="#Time:GetFrameCount">Time:GetFrameCount()</a></td>
+	<td class="summary">Get the total game frame count.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SoundSource:SetSoundID">SoundSource:SetSoundID(name)</a></td>
-	<td class="summary">Set the sound source's ID
- <strong>TODO</strong> this and getSoundID should use enums</td>
+	<td class="name" ><a href="#Time:GetTimeUnits">Time:GetTimeUnits()</a></td>
+	<td class="summary">Get the time in hours, minutes, seconds, and centiseconds as a table.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#tostring">tostring(this)</a></td>
+	<td class="summary">Convert this Time object to a formatted string.</td>
 	</tr>
 </table>
 
@@ -146,15 +168,79 @@
 <br/>
 
 
+    <h2 class="section-header "><a name="Members"></a>Members</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "h"></a>
+    <strong>h</strong>
+    </dt>
+    <dd>
+    (int) Hours component.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "m"></a>
+    <strong>m</strong>
+    </dt>
+    <dd>
+    (int) Minutes component.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "s"></a>
+    <strong>s</strong>
+    </dt>
+    <dd>
+    (int) Seconds component.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "c"></a>
+    <strong>c</strong>
+    </dt>
+    <dd>
+    (int) Centiseconds component.
+
+
+
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "SoundSource:GetPosition"></a>
-    <strong>SoundSource:GetPosition()</strong>
+    <a name = "Time"></a>
+    <strong>Time()</strong>
     </dt>
     <dd>
-    Get the sound source's position
+    Create a Time object.
 
 
 
@@ -162,8 +248,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        a copy of the sound source's position
+           <span class="types"><a class="type" href="../3 primitive classes/Time.html#">Time</a></span>
+        A new Time object initialized to zero time.
     </ol>
 
 
@@ -171,42 +257,27 @@
 
 </dd>
     <dt>
-    <a name = "SoundSource:SetPosition"></a>
-    <strong>SoundSource:SetPosition(position)</strong>
+    <a name = "Time"></a>
+    <strong>Time(frames)</strong>
     </dt>
     <dd>
-    Set the sound source's position
+    Create a Time object from a total game frame count (1 second = 30 frames).
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">position</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         the new position of the sound source
+        <li><span class="parameter">frames</span>
+            <span class="types"><span class="type">int</span></span>
+         Total game frame count.
         </li>
     </ul>
 
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SoundSource:GetName"></a>
-    <strong>SoundSource:GetName()</strong>
-    </dt>
-    <dd>
-    Get the sound source's unique string identifier
-
-
-
-
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        the sound source's name
+           <span class="types"><a class="type" href="../3 primitive classes/Time.html#">Time</a></span>
+        A new Time object initialized with the given frame count.
     </ol>
 
 
@@ -214,33 +285,67 @@
 
 </dd>
     <dt>
-    <a name = "SoundSource:SetName"></a>
-    <strong>SoundSource:SetName(name)</strong>
+    <a name = "Time"></a>
+    <strong>Time(formattedTime)</strong>
     </dt>
     <dd>
-    Set the sound source's name (its unique string identifier)
+    Create a Time object from a formatted string.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">name</span>
+        <li><span class="parameter">formattedTime</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         The sound source's new name
+         Time in the format "HH:MM:SS[.CC]", where [.CC] is centiseconds, and is optional.
         </li>
     </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Time.html#">Time</a></span>
+        A new Time object parsed from the given string.
+    </ol>
 
 
 
 
 </dd>
     <dt>
-    <a name = "SoundSource:GetSoundID"></a>
-    <strong>SoundSource:GetSoundID()</strong>
+    <a name = "Time"></a>
+    <strong>Time(timeUnits)</strong>
     </dt>
     <dd>
-    Get the sound source's unique int identifier
+    Create a Time object from a time unit table (hours, minutes, seconds, centiseconds).
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">timeUnits</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+         A time unit table in the format {HH, MM, SS, [CC]}, where [CC] is optional.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Time.html#">Time</a></span>
+        A new Time object initialized with the given values.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Time:GetFrameCount"></a>
+    <strong>Time:GetFrameCount()</strong>
+    </dt>
+    <dd>
+    Get the total game frame count.
 
 
 
@@ -249,7 +354,7 @@
     <ol>
 
            <span class="types"><span class="type">int</span></span>
-        the ID of the sound
+        Total number of game frames.
     </ol>
 
 
@@ -257,23 +362,49 @@
 
 </dd>
     <dt>
-    <a name = "SoundSource:SetSoundID"></a>
-    <strong>SoundSource:SetSoundID(name)</strong>
+    <a name = "Time:GetTimeUnits"></a>
+    <strong>Time:GetTimeUnits()</strong>
     </dt>
     <dd>
-    Set the sound source's ID
- <strong>TODO</strong> this and getSoundID should use enums
+    Get the time in hours, minutes, seconds, and centiseconds as a table.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+        A table in the format {HH, MM, SS, CC}.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "tostring"></a>
+    <strong>tostring(this)</strong>
+    </dt>
+    <dd>
+    Convert this Time object to a formatted string.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><span class="type">int</span></span>
-         The sound source's new name
+        <li><span class="parameter">this</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Time.html#">Time</a></span>
+         Time.
         </li>
     </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        A string showing time in "HH:MM:SS.CC" format.
+    </ol>
 
 
 
