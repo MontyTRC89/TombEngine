@@ -1,3 +1,5 @@
+#include "./Blending.hlsli"
+#include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
 
 #define SHADOW_INTENSITY (0.55f)
@@ -86,20 +88,32 @@ float3 DoBlobShadows(float3 worldPos, float3 lighting)
     return lighting * saturate(shadowFactor + SHADOW_INTENSITY);
 }
 
-float3 DoPointLightShadow(float3 worldPos, float3 lighting)
+float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
 {
+    if (!CastShadows)
+        return lighting;
+
+    if (BlendMode != BLENDMODE_OPAQUE && BlendMode != BLENDMODE_ALPHATEST && BlendMode != BLENDMODE_ALPHABLEND)	
+        return lighting;
+
     float shadowFactor = 1.0f;
-	
+
+    float3 dir = normalize(Light.Position - worldPos);
+    float ndot = dot(normal, dir);
+    float facingFactor = saturate((ndot - bias) / (1.0f - bias + EPSILON));
+
     [unroll]
     for (int i = 0; i < 6; i++)
     {
-        float3 dir = normalize(worldPos - Light.Position);
         float4 lightClipSpace = mul(float4(worldPos, 1.0f), LightViewProjections[i]);
         lightClipSpace.xyz /= lightClipSpace.w;
 
-        if (lightClipSpace.x >= -1.0f && lightClipSpace.x <= 1.0f &&
-            lightClipSpace.y >= -1.0f && lightClipSpace.y <= 1.0f &&
-            lightClipSpace.z >=  0.0f && lightClipSpace.z <= 1.0f)
+        float insideLightBounds =
+            step(-1.0f, lightClipSpace.x) * step(lightClipSpace.x, 1.0f) *
+            step(-1.0f, lightClipSpace.y) * step(lightClipSpace.y, 1.0f) *
+            step( 0.0f, lightClipSpace.z) * step(lightClipSpace.z, 1.0f);
+
+        if (insideLightBounds > 0.0f)
         {
             lightClipSpace.x = lightClipSpace.x / 2 + 0.5;
             lightClipSpace.y = lightClipSpace.y / -2 + 0.5;
@@ -108,63 +122,29 @@ float3 DoPointLightShadow(float3 worldPos, float3 lighting)
             float x, y;
 
             // Perform PCF filtering on a 4 x 4 texel neighborhood.
-			[unroll]
+            [unroll]
             for (y = -1.5; y <= 1.5; y += 1.0)
             {
-				[unroll]
+                [unroll]
                 for (x = -1.5; x <= 1.5; x += 1.0)
                 {
                     sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(lightClipSpace.xy + TexOffset(x, y), i), lightClipSpace.z);
                 }
             }
 
-            shadowFactor = sum / 16.0;
+            shadowFactor = lerp(shadowFactor, sum / 16.0, facingFactor * insideLightBounds);
         }
     }
-	
-	// Compute attenuation and combine lighting contribution with shadow factor
-    float distanceFactor = saturate(((distance(worldPos, Light.Position)) / (Light.Out)));
-    return lighting * saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * INV_SHADOW_INTENSITY));
-}
 
-float3 DoSpotLightShadow(float3 worldPos, float3 normal, float3 lighting)
-{
-    float influence = 1.0f - Luma(DoSpotLight(worldPos, normal, Light));
-	
-    float shadowFactor = 1.0f;
-	
-    [unroll]
-    for (int i = 0; i < 6; i++)
-    {
-        float3 dir = normalize(worldPos - Light.Position);
-        float4 lightClipSpace = mul(float4(worldPos, 1.0f), LightViewProjections[i]);
-        lightClipSpace.xyz /= lightClipSpace.w;
+    float isPoint = step(0.5f, Light.Type == LT_POINT); // 1.0 if LT_POINT, 0.0 otherwise
+    float isSpot  = step(0.5f, Light.Type == LT_SPOT);  // 1.0 if LT_SPOT,  0.0 otherwise
+    float isOther = 1.0 - (isPoint + isSpot); // 1.0 if neither LT_POINT nor LT_SPOT
 
-        if (lightClipSpace.x >= -1.0f && lightClipSpace.x <= 1.0f &&
-            lightClipSpace.y >= -1.0f && lightClipSpace.y <= 1.0f &&
-            lightClipSpace.z >=  0.0f && lightClipSpace.z <= 1.0f)
-        {
-            lightClipSpace.x = lightClipSpace.x / 2 + 0.5;
-            lightClipSpace.y = lightClipSpace.y / -2 + 0.5;
+    float pointFactor = 1.0f - Luma(DoPointLight(worldPos, normal, Light));
+    float spotFactor  = 1.0f - Luma(DoSpotLight(worldPos, normal, Light));
 
-            float sum = 0;
-            float x, y;
+    float3 pointShadow = lighting * saturate((shadowFactor + SHADOW_INTENSITY) + (pow(pointFactor, 4) * INV_SHADOW_INTENSITY));
+    float3 spotShadow  = lighting * saturate((shadowFactor + SHADOW_INTENSITY) + (pow(spotFactor,  4) * INV_SHADOW_INTENSITY));
 
-            // Perform PCF filtering on a 4 x 4 texel neighborhood.
-			[unroll]
-            for (y = -1.5; y <= 1.5; y += 1.0)
-            {
-				[unroll]
-                for (x = -1.5; x <= 1.5; x += 1.0)
-                {
-                    sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(lightClipSpace.xy + TexOffset(x, y), i), lightClipSpace.z);
-                }
-            }
-
-            shadowFactor = sum / 16.0;
-        }
-    }
-	
-	// Compute attenuation and combine lighting contribution with shadow factor
-    return lighting * saturate((shadowFactor + SHADOW_INTENSITY) + (pow(influence, 4) * INV_SHADOW_INTENSITY));
+    return pointShadow * isPoint + spotShadow * isSpot + lighting * isOther;
 }

@@ -278,9 +278,9 @@ void Renderer::UpdateLaraAnimations(bool force)
 	rItem.DoneAnimations = true;
 }
 
-void TEN::Renderer::Renderer::DrawLara(RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
+void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 {
-	if (mirror != nullptr && LaraItem->RoomNumber != mirror->RealRoom)
+	if (_currentMirror != nullptr && LaraItem->RoomNumber != _currentMirror->RealRoom)
 		return;
 
 	// Don't draw player if using optics.
@@ -309,9 +309,9 @@ void TEN::Renderer::Renderer::DrawLara(RendererMirror* mirror, RenderView& view,
 	RendererRoom* room = &_rooms[LaraItem->RoomNumber];
 
 	_stItem.World = item->InterpolatedWorld;
-	if (mirror != nullptr)
+	if (_currentMirror != nullptr)
 	{
-		_stItem.World = _stItem.World * mirror->ReflectionMatrix;
+		_stItem.World = _stItem.World * _currentMirror->ReflectionMatrix;
 	}
 
 	_stItem.Color = item->Color;
@@ -321,7 +321,7 @@ void TEN::Renderer::Renderer::DrawLara(RendererMirror* mirror, RenderView& view,
 	{
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
 	}
-	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, mirror);
+	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
 	_cbItem.UpdateData(_stItem, _context.Get());
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
@@ -332,12 +332,12 @@ void TEN::Renderer::Renderer::DrawLara(RendererMirror* mirror, RenderView& view,
 		DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, view, rendererPass);
 	}
 
-	DrawLaraHolsters(item, room, mirror, view, rendererPass);
-	DrawLaraJoints(item, room, mirror, view, rendererPass);
-	DrawLaraHair(item, room, mirror, view, rendererPass);
+	DrawLaraHolsters(item, room, view, rendererPass);
+	DrawLaraJoints(item, room, view, rendererPass);
+	DrawLaraHair(item, room, view, rendererPass);
 }
 
-void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
+void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
 	bool forceValue = g_GameFlow->CurrentFreezeMode == FreezeMode::Player;
 
@@ -355,9 +355,9 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 
 		_stItem.World = Matrix::Identity;
 		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimTransforms[LM_HEAD] * itemToDraw->InterpolatedWorld;
-		if (mirror != nullptr)
+		if (_currentMirror != nullptr)
 		{
-			_stItem.BonesMatrices[0] = _stItem.BonesMatrices[0] * mirror->ReflectionMatrix;
+			_stItem.BonesMatrices[0] = _stItem.BonesMatrices[0] * _currentMirror->ReflectionMatrix;
 		}
 
 		for (int i = 0; i < unit.Segments.size(); i++)
@@ -369,9 +369,9 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 				Matrix::CreateTranslation(
 					Vector3::Lerp(segment.PrevPosition, segment.Position, GetInterpolationFactor(forceValue)));
 			
-			if (mirror != nullptr)
+			if (_currentMirror != nullptr)
 			{
-				worldMatrix = worldMatrix * mirror->ReflectionMatrix;
+				worldMatrix = worldMatrix * _currentMirror->ReflectionMatrix;
 			}
 
 			_stItem.BonesMatrices[i + 1] = worldMatrix;
@@ -388,7 +388,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 	}
 }
 
-void Renderer::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
+void Renderer::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
 	if (!_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 		return;
@@ -402,7 +402,7 @@ void Renderer::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, Rend
 	}
 }
 
-void Renderer::DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
+void Renderer::DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
 	HolsterSlot leftHolsterID = Lara.Control.Weapon.HolsterInfo.LeftHolster;
 	HolsterSlot rightHolsterID = Lara.Control.Weapon.HolsterInfo.RightHolster;

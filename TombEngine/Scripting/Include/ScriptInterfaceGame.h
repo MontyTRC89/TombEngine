@@ -69,7 +69,7 @@ public:
 	virtual void ExecuteFunction(const std::string& luaFuncName, short idOne, short idTwo = 0) = 0;
 
 	virtual void GetVariables(std::vector<SavedVar>& vars) = 0;
-	virtual void SetVariables(const std::vector<SavedVar>& vars) = 0;
+	virtual void SetVariables(const std::vector<SavedVar>& vars, bool onlyLevelVars) = 0;
 
 	virtual void GetCallbackStrings(
 		std::vector<std::string>& preStart,

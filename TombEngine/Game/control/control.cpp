@@ -376,7 +376,6 @@ unsigned CALLBACK GameMain(void *)
 GameStatus DoLevel(int levelIndex, bool loadGame)
 {
 	bool isTitle = !levelIndex;
-	auto loadType = loadGame ? LevelLoadType::Load : (SaveGame::IsOnHub(levelIndex) ? LevelLoadType::Hub : LevelLoadType::New);
 
 	TENLog(isTitle ? "DoTitle" : "DoLevel", LogLevel::Info);
 
@@ -392,7 +391,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeItemBoxData();
 
 	// Initialize scripting.
-	InitializeScripting(levelIndex, loadType);
+	InitializeScripting(levelIndex, loadGame);
 	InitializeNodeScripts();
 
 	// Initialize menu and inventory state.
@@ -540,12 +539,12 @@ void CleanUp()
 	ClearObjCamera();
 }
 
-void InitializeScripting(int levelIndex, LevelLoadType type)
+void InitializeScripting(int levelIndex, bool loadGame)
 {
 	TENLog("Loading level script...", LogLevel::Info);
 
 	g_GameStringsHandler->ClearDisplayStrings();
-	g_GameScript->ResetScripts(!levelIndex || type != LevelLoadType::New);
+	g_GameScript->ResetScripts(!levelIndex || loadGame);
 
 	const auto& level = *g_GameFlow->GetLevel(levelIndex);
 
@@ -575,7 +574,7 @@ void InitializeScripting(int levelIndex, LevelLoadType type)
 	}
 
 	// Play default background music.
-	if (type != LevelLoadType::Load)
+	if (!loadGame)
 		PlaySoundTrack(level.GetAmbientTrack(), SoundTrackType::BGM, 0, SOUND_XFADETIME_LEVELJUMP);
 }
 
@@ -594,8 +593,14 @@ void InitializeOrLoadGame(bool loadGame)
 	g_Gui.SetEnterInventory(NO_VALUE);
 
 	// Restore game?
-	if (loadGame && SaveGame::Load(g_GameFlow->SelectedSaveGame))
+	if (loadGame)
 	{
+		if (!SaveGame::Load(g_GameFlow->SelectedSaveGame))
+		{
+			NextLevel = g_GameFlow->GetNumLevels();
+			return;
+		}
+
 		InitializeGame = false;
 
 		g_GameFlow->SelectedSaveGame = 0;

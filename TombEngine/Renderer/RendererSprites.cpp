@@ -256,7 +256,7 @@ namespace TEN::Renderer
 		_spriteBuckets.push_back(currentSpriteBucket);
 	}
 
-	void Renderer::DrawSprites(RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
+	void Renderer::DrawSprites(RenderView& view, RendererPass rendererPass)
 	{
 		if (view.SpritesToDraw.empty())
 			return;
@@ -296,7 +296,7 @@ namespace TEN::Renderer
 			{
 				auto& rDrawSprite = spriteBucket.SpritesToDraw[i];
 
-				_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, mirror, view);
+				_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, _currentMirror, view);
 				_stInstancedSpriteBuffer.Sprites[i].Color = rDrawSprite.color;
 				_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
 				_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = rDrawSprite.SoftParticle ? 1 : 0;

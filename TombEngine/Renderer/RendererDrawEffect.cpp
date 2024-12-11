@@ -1009,7 +1009,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	bool Renderer::DrawGunFlashes(RendererMirror* mirror, RenderView& view)
+	bool Renderer::DrawGunFlashes(RenderView& view)
 	{
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
 		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
@@ -1033,7 +1033,7 @@ namespace TEN::Renderer
 		_stStatic.Color = Vector4::One;
 		_stStatic.AmbientLight = room.AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Static;
-		BindStaticLights(itemPtr->LightsToDraw, mirror);
+		BindStaticLights(itemPtr->LightsToDraw);
 
 		short length = 0;
 		short zOffset = 0;
@@ -1106,9 +1106,9 @@ namespace TEN::Renderer
 					worldMatrix = tMatrix * worldMatrix;
 					worldMatrix = rotMatrix * worldMatrix;
 
-					if (mirror != nullptr)
+					if (_currentMirror != nullptr)
 					{
-						worldMatrix = worldMatrix * mirror->ReflectionMatrix;
+						worldMatrix = worldMatrix * _currentMirror->ReflectionMatrix;
 					}
 
 					_stStatic.World = worldMatrix;
@@ -1125,9 +1125,9 @@ namespace TEN::Renderer
 					worldMatrix = tMatrix * worldMatrix;
 					worldMatrix = rotMatrix * worldMatrix;
 
-					if (mirror != nullptr)
+					if (_currentMirror != nullptr)
 					{
-						worldMatrix = worldMatrix * mirror->ReflectionMatrix;
+						worldMatrix = worldMatrix * _currentMirror->ReflectionMatrix;
 					}
 
 					_stStatic.World = worldMatrix;
@@ -1144,7 +1144,7 @@ namespace TEN::Renderer
 		return true;
 	}
 
-	void Renderer::DrawBaddyGunflashes(RendererMirror* mirror, RenderView& view)
+	void Renderer::DrawBaddyGunflashes(RenderView& view)
 	{
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
 		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
@@ -1161,7 +1161,7 @@ namespace TEN::Renderer
 			{
 				auto& nativeItem = g_Level.Items[rItemPtr->ItemNumber];
 
-				if (mirror != nullptr && nativeItem.RoomNumber != mirror->RealRoom)
+				if (_currentMirror != nullptr && nativeItem.RoomNumber != _currentMirror->RealRoom)
 				{
 					continue;
 				}
@@ -1176,7 +1176,7 @@ namespace TEN::Renderer
 				_stStatic.AmbientLight = rRoom.AmbientLight;
 				_stStatic.LightMode = (int)LightMode::Static;
 
-				BindStaticLights(rItemPtr->LightsToDraw, mirror); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
+				BindStaticLights(rItemPtr->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 				SetBlendMode(BlendMode::Additive);
 				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
@@ -1211,9 +1211,9 @@ namespace TEN::Renderer
 						if (creature.MuzzleFlash[0].ApplyZRotation)
 							worldMatrix = rotMatrixZ * worldMatrix;
 
-						if (mirror != nullptr)
+						if (_currentMirror != nullptr)
 						{
-							worldMatrix = worldMatrix * mirror->ReflectionMatrix;
+							worldMatrix = worldMatrix * _currentMirror->ReflectionMatrix;
 						}
 
 						_stStatic.World = worldMatrix;
@@ -1256,9 +1256,9 @@ namespace TEN::Renderer
 						if (creature.MuzzleFlash[1].ApplyZRotation)
 							worldMatrix = rotMatrixZ * worldMatrix;
 
-						if (mirror != nullptr)
+						if (_currentMirror != nullptr)
 						{
-							worldMatrix = worldMatrix * mirror->ReflectionMatrix;
+							worldMatrix = worldMatrix * _currentMirror->ReflectionMatrix;
 						}
 
 						_stStatic.World = worldMatrix;
@@ -1341,21 +1341,21 @@ namespace TEN::Renderer
 		return spriteMatrix;
 	}
 
-	void Renderer::DrawEffect(RendererMirror* mirror, RenderView& view, RendererEffect* effect, RendererPass rendererPass)
+	void Renderer::DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass)
 	{
 		const auto& room = _rooms[effect->RoomNumber];
 
 		Matrix world = effect->InterpolatedWorld;
-		if (mirror != nullptr)
+		if (_currentMirror != nullptr)
 		{
-			world = world * mirror->ReflectionMatrix;
+			world = world * _currentMirror->ReflectionMatrix;
 		}
 		_stStatic.World = world;
 
 		_stStatic.Color = effect->Color;
 		_stStatic.AmbientLight = effect->AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Dynamic;
-		BindStaticLights(effect->LightsToDraw, mirror);
+		BindStaticLights(effect->LightsToDraw);
 		_cbStatic.UpdateData(_stStatic, _context.Get());
 
 		auto& mesh = *effect->Mesh;
@@ -1381,7 +1381,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawEffects(RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
+	void Renderer::DrawEffects(RenderView& view, RendererPass rendererPass)
 	{
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
 		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
@@ -1396,26 +1396,26 @@ namespace TEN::Renderer
 		{
 			for (auto* effectPtr : roomPtr->EffectsToDraw)
 			{
-				if (mirror != nullptr && effectPtr->RoomNumber != mirror->RealRoom)
+				if (_currentMirror != nullptr && effectPtr->RoomNumber != _currentMirror->RealRoom)
 					continue;
 
 				const auto& room = _rooms[effectPtr->RoomNumber];
 				const auto& object = Objects[effectPtr->ObjectID];
 
 				if (object.drawRoutine && object.loaded)
-					DrawEffect(mirror, view, effectPtr, rendererPass);
+					DrawEffect(view, effectPtr, rendererPass);
 			}
 		}
 	}
 
-	void Renderer::DrawDebris(RendererMirror* mirror, RenderView& view, RendererPass rendererPass)
+	void Renderer::DrawDebris(RenderView& view, RendererPass rendererPass)
 	{
 		bool activeDebrisExist = false;
 		for (auto& deb : DebrisFragments)
 		{
 			if (deb.active)
 			{
-				if (mirror != nullptr && deb.roomNumber != mirror->RealRoom)
+				if (_currentMirror != nullptr && deb.roomNumber != _currentMirror->RealRoom)
 					continue;
 
 				activeDebrisExist = true;
@@ -1434,7 +1434,7 @@ namespace TEN::Renderer
 			{
 				if (deb.active)
 				{
-					if (mirror != nullptr && deb.roomNumber != mirror->RealRoom)
+					if (_currentMirror != nullptr && deb.roomNumber != _currentMirror->RealRoom)
 						continue;
 
 					if (!SetupBlendModeAndAlphaTest(deb.mesh.blendMode, rendererPass, 0))
@@ -1450,9 +1450,9 @@ namespace TEN::Renderer
 					}
 
 					Matrix world = Matrix::Lerp(deb.PrevTransform, deb.Transform, GetInterpolationFactor());
-					if (mirror != nullptr)
+					if (_currentMirror != nullptr)
 					{
-						world = world * mirror->ReflectionMatrix;
+						world = world * _currentMirror->ReflectionMatrix;
 					}
 					_stStatic.World = world;
 
@@ -1495,7 +1495,7 @@ namespace TEN::Renderer
 
 			SetBlendMode(BlendMode::Opaque, true);
 			SetDepthState(DepthState::Write, true);
-			SetCullMode(mirror != nullptr ? CullMode::Clockwise : CullMode::CounterClockwise, true);
+			SetCullMode(_currentMirror != nullptr ? CullMode::Clockwise : CullMode::CounterClockwise, true);
 		}
 	}
 
